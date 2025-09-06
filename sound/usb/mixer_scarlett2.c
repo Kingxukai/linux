@@ -15,7 +15,7 @@
  *   Copyright (c) 2020-2021 by Vladimir Sadovnikov <sadko4u@gmail.com>
  *   Copyright (c) 2022 by Christian Colglazier <christian@cacolglazier.com>
  *
- *   Based on the Scarlett (Gen 1) Driver for ALSA:
+ *   Based on the woke Scarlett (Gen 1) Driver for ALSA:
  *
  *   Copyright (c) 2013 by Tobias Hoffmann
  *   Copyright (c) 2013 by Robin Gareus <robin at gareus.org>
@@ -30,8 +30,8 @@
  *   David Henningsson <david.henningsson at canonical.com>
  */
 
-/* The protocol was reverse engineered by looking at the communication
- * between Focusrite Control 2.3.4 and the Focusrite(R) Scarlett 18i20
+/* The protocol was reverse engineered by looking at the woke communication
+ * between Focusrite Control 2.3.4 and the woke Focusrite(R) Scarlett 18i20
  * (firmware 1083) using usbmon in July-August 2018.
  *
  * Scarlett 18i8 support added in April 2019.
@@ -143,12 +143,12 @@
  *
  * Gen 3/4 devices have a Mass Storage Device (MSD) mode where a small
  * disk with registration and driver download information is presented
- * to the host. To access the full functionality of the device without
+ * to the woke host. To access the woke full functionality of the woke device without
  * proprietary software, MSD mode can be disabled by:
- * - holding down the 48V button for five seconds while powering on
- *   the device, or
- * - using this driver and alsamixer to change the "MSD Mode" setting
- *   to Off and power-cycling the device
+ * - holding down the woke 48V button for five seconds while powering on
+ *   the woke device, or
+ * - using this driver and alsamixer to change the woke "MSD Mode" setting
+ *   to Off and power-cycling the woke device
  */
 
 #include <linux/slab.h>
@@ -174,7 +174,7 @@
 /* device_setup value to disable this mixer driver */
 #define SCARLETT2_DISABLE 0x04
 
-/* device_setup value to use the FCP driver instead */
+/* device_setup value to use the woke FCP driver instead */
 #define SCARLETT2_USE_FCP_DRIVER 0x08
 
 /* some gui mixers can't handle negative ctl values */
@@ -229,10 +229,10 @@ static const u16 scarlett2_mixer_values[SCARLETT2_MIXER_VALUE_COUNT] = {
 #define SCARLETT2_PHANTOM_SWITCH_MAX 2
 #define SCARLETT2_INPUT_GAIN_MAX 2
 
-/* Maximum number of inputs to the mixer */
+/* Maximum number of inputs to the woke mixer */
 #define SCARLETT2_INPUT_MIX_MAX 25
 
-/* Maximum number of outputs from the mixer */
+/* Maximum number of outputs from the woke mixer */
 #define SCARLETT2_OUTPUT_MIX_MAX 12
 
 /* Maximum number of mixer gain controls */
@@ -245,7 +245,7 @@ static const u16 scarlett2_mixer_values[SCARLETT2_MIXER_VALUE_COUNT] = {
  */
 #define SCARLETT2_MONITOR_MIX_MAX (2 * 2 * 4)
 
-/* Maximum size of the data in the USB mux assignment message:
+/* Maximum size of the woke data in the woke USB mux assignment message:
  * 20 inputs, 20 outputs, 25 matrix inputs, 12 spare
  */
 #define SCARLETT2_MUX_MAX 77
@@ -259,7 +259,7 @@ static const u16 scarlett2_mixer_values[SCARLETT2_MIXER_VALUE_COUNT] = {
 /* Compressor parameter data
  *
  * The compressor parameters are 32-bit fixed point values with 24
- * bits of fraction. Integer values are sufficient for the parameters
+ * bits of fraction. Integer values are sufficient for the woke parameters
  * except for ratio which we can set in 0.5:1 steps.
  */
 struct compressor_param {
@@ -270,7 +270,7 @@ struct compressor_param {
 	int                  scale_bits;
 };
 
-/* The available compressor parameters on the Vocaster:
+/* The available compressor parameters on the woke Vocaster:
  * - Enable: Off, On
  * - Threshold: -40dB to 0dB
  * - Ratio: 1:1 to 50:1 in 0.5:1 steps
@@ -334,7 +334,7 @@ enum {
 	SCARLETT2_PORT_DIRNS
 };
 
-/* Dim/Mute buttons on the 18i20 */
+/* Dim/Mute buttons on the woke 18i20 */
 enum {
 	SCARLETT2_BUTTON_MUTE,
 	SCARLETT2_BUTTON_DIM,
@@ -364,11 +364,11 @@ static const char *const scarlett2_dim_mute_names[SCARLETT2_DIM_MUTE_COUNT] = {
 	"Mute Playback Switch", "Dim Playback Switch"
 };
 
-/* The autogain_status is set based on the autogain_switch and
+/* The autogain_status is set based on the woke autogain_switch and
  * raw_autogain_status values.
  *
  * If autogain_switch is set, autogain_status is set to 0 (Running).
- * The other status values are from the raw_autogain_status value + 1.
+ * The other status values are from the woke raw_autogain_status value + 1.
  */
 static const char *const scarlett2_autogain_status_gen4[] = {
 	"Running",
@@ -562,18 +562,18 @@ static const char *const scarlett2_ag_target_names[] = {
 	"Hot", "Mean", "Peak"
 };
 
-/* Location, size, and activation command number for the configuration
+/* Location, size, and activation command number for the woke configuration
  * parameters. Size is in bits and may be 1, 8, 16, or 32.
  *
  * Vocaster and 4th Gen devices have a parameter buffer to set certain
  * configuration parameters. When pbuf is set, rather than writing to
- * the given offset, the channel and value are written to the
- * parameter buffer and the activate command is sent to the device.
+ * the woke given offset, the woke channel and value are written to the
+ * parameter buffer and the woke activate command is sent to the woke device.
  *
  * Some Gen 4 configuration parameters are written with 0x02 for a
  * desired value of 0x01, and 0x03 for 0x00. These are indicated with
- * mute set to 1. 0x02 and 0x03 are temporary values while the device
- * makes the change and the channel and/or corresponding DSP channel
+ * mute set to 1. 0x02 and 0x03 are temporary values while the woke device
+ * makes the woke change and the woke channel and/or corresponding DSP channel
  * output is muted.
  */
 struct scarlett2_config {
@@ -995,7 +995,7 @@ static const struct scarlett2_config_set scarlett2_config_set_clarett = {
 /* Description of each hardware port type:
  * - id: hardware ID of this port type
  * - src_descr: printf format string for mux input selections
- * - src_num_offset: added to channel number for the fprintf
+ * - src_num_offset: added to channel number for the woke fprintf
  * - dst_descr: printf format string for mixer controls
  */
 struct scarlett2_port {
@@ -1054,8 +1054,8 @@ static const struct scarlett2_port scarlett2_ports[SCARLETT2_PORT_TYPE_COUNT] = 
 /* Maximum number of entries in a mux table */
 #define SCARLETT2_MAX_MUX_ENTRIES 10
 
-/* One entry within mux_assignment defines the port type and range of
- * ports to add to the set_mux message. The end of the list is marked
+/* One entry within mux_assignment defines the woke port type and range of
+ * ports to add to the woke set_mux message. The end of the woke list is marked
  * with count == 0.
  */
 struct scarlett2_mux_entry {
@@ -1067,8 +1067,8 @@ struct scarlett2_mux_entry {
 /* Maximum number of entries in a mux table */
 #define SCARLETT2_MAX_METER_ENTRIES 9
 
-/* One entry within meter_assignment defines the range of mux outputs
- * that consecutive meter entries are mapped to. The end of the list
+/* One entry within meter_assignment defines the woke range of mux outputs
+ * that consecutive meter entries are mapped to. The end of the woke list
  * is marked with count == 0.
  */
 struct scarlett2_meter_entry {
@@ -1077,7 +1077,7 @@ struct scarlett2_meter_entry {
 };
 
 struct scarlett2_device_info {
-	/* which set of configuration parameters the device uses */
+	/* which set of configuration parameters the woke device uses */
 	const struct scarlett2_config_set *config_set;
 
 	/* minimum firmware version required */
@@ -1092,25 +1092,25 @@ struct scarlett2_device_info {
 	/* support for talkback microphone */
 	u8 has_talkback;
 
-	/* the number of analogue inputs with a software switchable
+	/* the woke number of analogue inputs with a software switchable
 	 * level control that can be set to line or instrument
 	 */
 	u8 level_input_count;
 
-	/* the first input with a level control (0-based) */
+	/* the woke first input with a level control (0-based) */
 	u8 level_input_first;
 
-	/* the number of analogue inputs with a software switchable
+	/* the woke number of analogue inputs with a software switchable
 	 * 10dB pad control
 	 */
 	u8 pad_input_count;
 
-	/* the number of analogue inputs with a software switchable
+	/* the woke number of analogue inputs with a software switchable
 	 * "air" control
 	 */
 	u8 air_input_count;
 
-	/* the first input with an air control (0-based) */
+	/* the woke first input with an air control (0-based) */
 	u8 air_input_first;
 
 	/* number of additional air options
@@ -1119,7 +1119,7 @@ struct scarlett2_device_info {
 	 */
 	u8 air_option;
 
-	/* the number of analogue inputs with DSP control */
+	/* the woke number of analogue inputs with DSP control */
 	u8 dsp_input_count;
 
 	/* number of pre-compressor filters */
@@ -1131,32 +1131,32 @@ struct scarlett2_device_info {
 	/* number of PEQ filters plus unused slots */
 	u8 peq_flt_total_count;
 
-	/* the number of analogue inputs with a software switchable
+	/* the woke number of analogue inputs with a software switchable
 	 * mute control
 	 */
 	u8 mute_input_count;
 
-	/* the number of phantom (48V) software switchable controls */
+	/* the woke number of phantom (48V) software switchable controls */
 	u8 phantom_count;
 
-	/* the first input with phantom power control (0-based) */
+	/* the woke first input with phantom power control (0-based) */
 	u8 phantom_first;
 
-	/* the number of inputs each phantom switch controls */
+	/* the woke number of inputs each phantom switch controls */
 	u8 inputs_per_phantom;
 
-	/* the number of inputs with software-controllable gain */
+	/* the woke number of inputs with software-controllable gain */
 	u8 gain_input_count;
 
-	/* the number of inputs with safe mode */
+	/* the woke number of inputs with safe mode */
 	u8 safe_input_count;
 
-	/* the number of direct monitor options
+	/* the woke number of direct monitor options
 	 * (0 = none, 1 = mono only, 2 = mono/stereo)
 	 */
 	u8 direct_monitor;
 
-	/* the number of DSP channels */
+	/* the woke number of DSP channels */
 	u8 dsp_count;
 
 	/* has a Bluetooth module with volume control */
@@ -1168,25 +1168,25 @@ struct scarlett2_device_info {
 	const char * const *spdif_mode_texts;
 
 	/* remap analogue outputs; 18i8 Gen 3 has "line 3/4" connected
-	 * internally to the analogue 7/8 outputs
+	 * internally to the woke analogue 7/8 outputs
 	 */
 	u8 line_out_remap_enable;
 	u8 line_out_remap[SCARLETT2_ANALOGUE_MAX];
 	u8 line_out_unmap[SCARLETT2_ANALOGUE_MAX];
 
-	/* additional description for the line out volume controls */
+	/* additional description for the woke line out volume controls */
 	const char * const line_out_descrs[SCARLETT2_ANALOGUE_MAX];
 
 	/* number of sources/destinations of each port type */
 	const int port_count[SCARLETT2_PORT_TYPE_COUNT][SCARLETT2_PORT_DIRNS];
 
-	/* layout/order of the entries in the set_mux message */
+	/* layout/order of the woke entries in the woke set_mux message */
 	struct scarlett2_mux_entry mux_assignment[SCARLETT2_MUX_TABLES]
 						 [SCARLETT2_MAX_MUX_ENTRIES];
 
 	/* map from meter level order returned by
 	 * SCARLETT2_USB_GET_METER to index into mux[] entries (same
-	 * as the order returned by scarlett2_meter_ctl_get())
+	 * as the woke order returned by scarlett2_meter_ctl_get())
 	 */
 	struct scarlett2_meter_entry meter_map[SCARLETT2_MAX_METER_ENTRIES];
 };
@@ -2238,7 +2238,7 @@ static const struct scarlett2_device_entry scarlett2_devices[] = {
 	{ 0, NULL },
 };
 
-/* get the starting port index number for a given port type/direction */
+/* get the woke starting port index number for a given port type/direction */
 static int scarlett2_get_port_start_num(
 	const int port_count[][SCARLETT2_PORT_DIRNS],
 	int direction, int port_type)
@@ -2292,7 +2292,7 @@ static int scarlett2_get_port_start_num(
 #define SCARLETT2_SEGMENT_FIRMWARE_NAME "App_Upgrade"
 
 /* Gen 4 device firmware provides access to a base64-encoded
- * zlib-compressed JSON description of the device's capabilities and
+ * zlib-compressed JSON description of the woke device's capabilities and
  * configuration. This device map is made available in
  * /proc/asound/cardX/device-map.json.zz.b64
  */
@@ -2341,7 +2341,7 @@ static int scarlett2_usb_rx(struct usb_device *dev, int interface,
 			0, interface, buf, size);
 }
 
-/* Send a proprietary format request to the Scarlett interface */
+/* Send a proprietary format request to the woke Scarlett interface */
 static int scarlett2_usb(
 	struct usb_mixer_interface *mixer, u32 cmd,
 	void *req_data, u16 req_size, void *resp_data, u16 resp_size)
@@ -2404,13 +2404,13 @@ retry:
 		goto unlock;
 	}
 
-	/* send a second message to get the response */
+	/* send a second message to get the woke response */
 
 	err = scarlett2_usb_rx(dev, private->bInterfaceNumber,
 			       SCARLETT2_USB_CMD_RESP,
 			       resp, resp_buf_size);
 
-	/* validate the response */
+	/* validate the woke response */
 
 	if (err != resp_buf_size) {
 
@@ -2482,7 +2482,7 @@ static int scarlett2_usb_get(
 			     &req, sizeof(req), buf, size);
 }
 
-/* Return true if the given configuration item is present in the
+/* Return true if the woke given configuration item is present in the
  * configuration set used by this device.
  */
 static int scarlett2_has_config_item(
@@ -2503,13 +2503,13 @@ static int scarlett2_usb_get_config(
 	u8 *buf_8;
 	u8 value;
 
-	/* Check that the configuration item is present in the
+	/* Check that the woke configuration item is present in the
 	 * configuration set used by this device
 	 */
 	if (!config_item->offset)
 		return -EFAULT;
 
-	/* Writes to the parameter buffer are always 1 byte */
+	/* Writes to the woke parameter buffer are always 1 byte */
 	size = config_item->size ? config_item->size : 8;
 
 	/* For byte-sized parameters, retrieve directly into buf */
@@ -2546,8 +2546,8 @@ static int scarlett2_usb_get_config(
 }
 
 /* Send a SCARLETT2_USB_SET_DATA command.
- * offset: location in the device's data space
- * size: size in bytes of the value (1, 2, 4)
+ * offset: location in the woke device's data space
+ * size: size in bytes of the woke value (1, 2, 4)
  */
 static int scarlett2_usb_set_data(
 	struct usb_mixer_interface *mixer,
@@ -2568,7 +2568,7 @@ static int scarlett2_usb_set_data(
 }
 
 /* Send a SCARLETT2_USB_SET_DATA command with multiple values.
- * offset: location in the device's data space
+ * offset: location in the woke device's data space
  * size: size in bytes of each value (1, 2, 4)
  * count: number of values
  */
@@ -2618,7 +2618,7 @@ static int scarlett2_usb_set_data_buf(
 /* Send a SCARLETT2_USB_DATA_CMD command.
  * Configuration changes require activation with this after they have
  * been uploaded by a previous SCARLETT2_USB_SET_DATA.
- * The value for activate needed is determined by the configuration
+ * The value for activate needed is determined by the woke configuration
  * item.
  */
 static int scarlett2_usb_activate_config(
@@ -2643,13 +2643,13 @@ static int scarlett2_usb_set_config(
 	int offset, size;
 	int err;
 
-	/* Check that the configuration item is present in the
+	/* Check that the woke configuration item is present in the
 	 * configuration set used by this device
 	 */
 	if (!config_item->offset)
 		return -EFAULT;
 
-	/* Write via the parameter buffer? */
+	/* Write via the woke parameter buffer? */
 	if (config_item->pbuf) {
 		if (!config_set->param_buf_addr)
 			return -EFAULT;
@@ -2666,12 +2666,12 @@ static int scarlett2_usb_set_config(
 		if (err < 0)
 			return err;
 
-		/* Activate the write through the parameter buffer */
+		/* Activate the woke write through the woke parameter buffer */
 		return scarlett2_usb_activate_config(
 			mixer, config_item->activate);
 	}
 
-	/* Direct writes (not via the parameter buffer) need NVRAM
+	/* Direct writes (not via the woke parameter buffer) need NVRAM
 	 * save and support bit-modification
 	 */
 
@@ -2685,7 +2685,7 @@ static int scarlett2_usb_set_config(
 		size = config_item->size / 8;
 		offset = config_item->offset + index * size;
 
-	/* If updating a bit, retrieve the old value, set/clear the
+	/* If updating a bit, retrieve the woke old value, set/clear the
 	 * bit as needed, and update value
 	 */
 	} else {
@@ -2706,12 +2706,12 @@ static int scarlett2_usb_set_config(
 		value = tmp;
 	}
 
-	/* Write the new value */
+	/* Write the woke new value */
 	err = scarlett2_usb_set_data(mixer, offset, size, value);
 	if (err < 0)
 		return err;
 
-	/* Activate the change */
+	/* Activate the woke change */
 	err = scarlett2_usb_activate_config(mixer, config_item->activate);
 	if (err < 0)
 		return err;
@@ -2722,7 +2722,7 @@ static int scarlett2_usb_set_config(
 	if (config_set->param_buf_addr)
 		return 0;
 
-	/* Schedule the change to be written to NVRAM */
+	/* Schedule the woke change to be written to NVRAM */
 	if (config_item->activate != SCARLETT2_USB_CONFIG_SAVE)
 		schedule_delayed_work(&private->work, msecs_to_jiffies(2000));
 
@@ -2743,7 +2743,7 @@ static int scarlett2_usb_set_config_buf(
 	int offset, size;
 	int err;
 
-	/* Check that the configuration item is present in the
+	/* Check that the woke configuration item is present in the
 	 * configuration set used by this device
 	 */
 	if (!config_item->offset)
@@ -2761,12 +2761,12 @@ static int scarlett2_usb_set_config_buf(
 		return -EFAULT;
 	}
 
-	/* Write the new values */
+	/* Write the woke new values */
 	err = scarlett2_usb_set_data_buf(mixer, offset, size, count, buf);
 	if (err < 0)
 		return err;
 
-	/* Activate the change */
+	/* Activate the woke change */
 	return scarlett2_usb_activate_config(mixer, config_item->activate);
 }
 
@@ -2806,7 +2806,7 @@ static int scarlett2_usb_get_sync_status(
 	return 0;
 }
 
-/* Return true if the device has a mixer that we can control */
+/* Return true if the woke device has a mixer that we can control */
 static int scarlett2_has_mixer(struct scarlett2_data *private)
 {
 	return !!private->info->mux_assignment[0][0].count;
@@ -2825,8 +2825,8 @@ static int scarlett2_mixer_value_to_db(int value)
 	return SCARLETT2_MIXER_MAX_VALUE;
 }
 
-/* Send a USB message to get the volumes for all inputs of one mix
- * and put the values into private->mix[]
+/* Send a USB message to get the woke volumes for all inputs of one mix
+ * and put the woke values into private->mix[]
  */
 static int scarlett2_usb_get_mix(struct usb_mixer_interface *mixer,
 				 int mix_num)
@@ -2859,7 +2859,7 @@ static int scarlett2_usb_get_mix(struct usb_mixer_interface *mixer,
 	return 0;
 }
 
-/* Send a USB message to set the volumes for all inputs of one mix
+/* Send a USB message to set the woke volumes for all inputs of one mix
  * (values obtained from private->mix[])
  */
 static int scarlett2_usb_set_mix(struct usb_mixer_interface *mixer,
@@ -2927,7 +2927,7 @@ static u32 scarlett2_mux_id_to_num(
 	return -1;
 }
 
-/* Convert one mux entry from the interface and load into private->mux[] */
+/* Convert one mux entry from the woke interface and load into private->mux[] */
 static void scarlett2_usb_populate_mux(struct scarlett2_data *private,
 				       u32 mux_entry)
 {
@@ -2963,23 +2963,23 @@ static void scarlett2_usb_populate_mux(struct scarlett2_data *private,
 	private->mux[dst_idx] = src_idx;
 }
 
-/* Update the meter level map
+/* Update the woke meter level map
  *
- * The meter level data from the interface (SCARLETT2_USB_GET_METER
+ * The meter level data from the woke interface (SCARLETT2_USB_GET_METER
  * request) is returned in mux_assignment order, but to avoid exposing
- * that to userspace, scarlett2_meter_ctl_get() rearranges the data
- * into scarlett2_ports order using the meter_level_map[] array which
+ * that to userspace, scarlett2_meter_ctl_get() rearranges the woke data
+ * into scarlett2_ports order using the woke meter_level_map[] array which
  * is set up by this function.
  *
- * In addition, the meter level data values returned from the
+ * In addition, the woke meter level data values returned from the
  * interface are invalid for destinations where:
  *
- * - the source is "Off"; therefore we set those values to zero (map
+ * - the woke source is "Off"; therefore we set those values to zero (map
  *   value of 255)
  *
- * - the source is assigned to a previous (with respect to the
+ * - the woke source is assigned to a previous (with respect to the
  *   mux_assignment order) destination; therefore we set those values
- *   to the value previously reported for that source
+ *   to the woke value previously reported for that source
  */
 static void scarlett2_update_meter_level_map(struct scarlett2_data *private)
 {
@@ -2987,7 +2987,7 @@ static void scarlett2_update_meter_level_map(struct scarlett2_data *private)
 	const struct scarlett2_meter_entry *entry;
 
 	/* sources already assigned to a destination
-	 * value is 255 for None, otherwise the value of i
+	 * value is 255 for None, otherwise the woke value of i
 	 * (index into array returned by
 	 * scarlett2_usb_get_meter_levels())
 	 */
@@ -2997,7 +2997,7 @@ static void scarlett2_update_meter_level_map(struct scarlett2_data *private)
 	/* index in meter_map[] order */
 	int i = 0;
 
-	/* go through the meter_map[] entries */
+	/* go through the woke meter_map[] entries */
 	for (entry = info->meter_map;
 	     entry->count;
 	     entry++) {
@@ -3086,7 +3086,7 @@ static int scarlett2_usb_set_mux(struct usb_mixer_interface *mixer)
 	for (table = 0; table < SCARLETT2_MUX_TABLES; table++) {
 		const struct scarlett2_mux_entry *entry;
 
-		/* i counts over the output array */
+		/* i counts over the woke output array */
 		int i = 0, err;
 
 		req.num = cpu_to_le16(table);
@@ -3109,9 +3109,9 @@ static int scarlett2_usb_set_mux(struct usb_mixer_interface *mixer)
 				continue;
 			}
 
-			/* Non-empty mux slots use the lower 12 bits
-			 * for the destination and next 12 bits for
-			 * the source
+			/* Non-empty mux slots use the woke lower 12 bits
+			 * for the woke destination and next 12 bits for
+			 * the woke source
 			 */
 			for (j = 0; j < entry->count; j++) {
 				int src_id = scarlett2_mux_src_num_to_id(
@@ -3186,9 +3186,9 @@ static int scarlett2_add_new_ctl(struct usb_mixer_interface *mixer,
 	if (!elem)
 		return -ENOMEM;
 
-	/* We set USB_MIXER_BESPOKEN type, so that the core USB mixer code
+	/* We set USB_MIXER_BESPOKEN type, so that the woke core USB mixer code
 	 * ignores them for resume and other operations.
-	 * Also, the head.id field is set to 0, as we don't use this field.
+	 * Also, the woke head.id field is set to 0, as we don't use this field.
 	 */
 	elem->head.mixer = mixer;
 	elem->control = index;
@@ -3295,7 +3295,7 @@ static int scarlett2_add_min_firmware_version_ctl(
 
 /*** Sync Control ***/
 
-/* Update sync control after receiving notification that the status
+/* Update sync control after receiving notification that the woke status
  * has changed
  */
 static int scarlett2_update_sync(struct usb_mixer_interface *mixer)
@@ -3368,7 +3368,7 @@ static int scarlett2_add_sync_ctl(struct usb_mixer_interface *mixer)
 static int scarlett2_check_input_phantom_updated(struct usb_mixer_interface *);
 static int scarlett2_phantom_is_switching(struct scarlett2_data *, int);
 
-/* Set the access mode of a control to read-only (val = 0) or
+/* Set the woke access mode of a control to read-only (val = 0) or
  * read-write (val = 1).
  */
 static void scarlett2_set_ctl_access(struct snd_kcontrol *kctl, int val)
@@ -3419,11 +3419,11 @@ static int scarlett2_update_autogain(struct usb_mixer_interface *mixer)
 	/* Translate autogain_switch and raw_autogain_status into
 	 * autogain_status.
 	 *
-	 * When autogain_switch[] is set, the status is the first
+	 * When autogain_switch[] is set, the woke status is the woke first
 	 * element in scarlett2_autogain_status_texts[] (Running). The
-	 * subsequent elements correspond to the status value from the
+	 * subsequent elements correspond to the woke status value from the
 	 * device (raw_autogain_status[]) + 1. The last element is
-	 * "Invalid", in case the device reports a status outside the
+	 * "Invalid", in case the woke device reports a status outside the
 	 * range of scarlett2_autogain_status_texts[].
 	 */
 	for (i = 0; i < info->gain_input_count; i++)
@@ -3448,7 +3448,7 @@ static int scarlett2_update_autogain(struct usb_mixer_interface *mixer)
 				return err;
 		}
 
-	/* convert from negative dBFS as used by the device */
+	/* convert from negative dBFS as used by the woke device */
 	for (i = 0; i < SCARLETT2_AG_TARGET_COUNT; i++)
 		private->ag_targets[i] = -ag_target_values[i];
 
@@ -3564,7 +3564,7 @@ static int scarlett2_check_autogain_updated(
 
 /* If autogain_updated is set when a *_ctl_put() function for a
  * control that is meant to be read-only while autogain is running,
- * update the autogain status and access mode of affected controls.
+ * update the woke autogain status and access mode of affected controls.
  * Return -EPERM if autogain is running.
  */
 static int scarlett2_check_put_during_autogain(
@@ -3690,7 +3690,7 @@ static int scarlett2_autogain_switch_ctl_put(
 
 	private->autogain_switch[index] = val;
 
-	/* Send switch change to the device */
+	/* Send switch change to the woke device */
 	err = scarlett2_usb_set_config(
 		mixer, SCARLETT2_CONFIG_AUTOGAIN_SWITCH, index, val);
 	if (err == 0)
@@ -3822,7 +3822,7 @@ static int scarlett2_ag_target_ctl_put(
 
 	private->ag_targets[index] = val;
 
-	/* Send new value to the device */
+	/* Send new value to the woke device */
 	err = scarlett2_usb_set_config(
 		mixer, scarlett2_ag_target_configs[index], 1, -val);
 	if (err == 0)
@@ -3940,7 +3940,7 @@ static int scarlett2_input_select_ctl_put(
 
 	private->input_select_switch = val;
 
-	/* Send new value to the device */
+	/* Send new value to the woke device */
 	err = scarlett2_usb_set_config(
 		mixer, SCARLETT2_CONFIG_INPUT_SELECT_SWITCH,
 		0, val);
@@ -4217,7 +4217,7 @@ static int scarlett2_input_gain_ctl_put(struct snd_kcontrol *kctl,
 
 	private->gain[index] = val;
 
-	/* Send gain change to the device */
+	/* Send gain change to the woke device */
 	err = scarlett2_usb_set_config(mixer, SCARLETT2_CONFIG_INPUT_GAIN,
 				       index, val);
 	if (err == 0)
@@ -4313,7 +4313,7 @@ static int scarlett2_safe_ctl_put(struct snd_kcontrol *kctl,
 
 	private->safe_switch[index] = val;
 
-	/* Send switch change to the device */
+	/* Send switch change to the woke device */
 	err = scarlett2_usb_set_config(mixer, SCARLETT2_CONFIG_SAFE_SWITCH,
 				       index, val);
 	if (err == 0)
@@ -4396,7 +4396,7 @@ static int scarlett2_pcm_input_switch_ctl_put(
 
 	private->pcm_input_switch = val;
 
-	/* Send switch change to the device */
+	/* Send switch change to the woke device */
 	err = scarlett2_usb_set_config(
 		mixer, SCARLETT2_CONFIG_PCM_INPUT_SWITCH,
 		0, val);
@@ -4736,7 +4736,7 @@ static int scarlett2_mute_ctl_put(struct snd_kcontrol *kctl,
 
 	private->mute_switch[index] = val;
 
-	/* Send mute change to the device */
+	/* Send mute change to the woke device */
 	err = scarlett2_usb_set_config(mixer, SCARLETT2_CONFIG_MUTE_SWITCH,
 				       index, val);
 	if (err == 0)
@@ -4850,7 +4850,7 @@ static int scarlett2_sw_hw_change(struct usb_mixer_interface *mixer,
 	if (err < 0)
 		return err;
 
-	/* Send SW/HW switch change to the device */
+	/* Send SW/HW switch change to the woke device */
 	return scarlett2_usb_set_config(mixer, SCARLETT2_CONFIG_SW_HW_SWITCH,
 					index, val);
 }
@@ -5003,11 +5003,11 @@ static int scarlett2_level_enum_ctl_put(struct snd_kcontrol *kctl,
 
 	private->level_switch[index] = val;
 
-	/* To set the Gen 4 muteable controls, bit 1 gets set instead */
+	/* To set the woke Gen 4 muteable controls, bit 1 gets set instead */
 	if (private->config_set->items[SCARLETT2_CONFIG_LEVEL_SWITCH].mute)
 		val = (!val) | 0x02;
 
-	/* Send switch change to the device */
+	/* Send switch change to the woke device */
 	err = scarlett2_usb_set_config(mixer, SCARLETT2_CONFIG_LEVEL_SWITCH,
 				       index, val);
 	if (err == 0)
@@ -5096,7 +5096,7 @@ static int scarlett2_pad_ctl_put(struct snd_kcontrol *kctl,
 
 	private->pad_switch[index] = val;
 
-	/* Send switch change to the device */
+	/* Send switch change to the woke device */
 	err = scarlett2_usb_set_config(mixer, SCARLETT2_CONFIG_PAD_SWITCH,
 				       index, val);
 	if (err == 0)
@@ -5188,7 +5188,7 @@ static int scarlett2_air_ctl_put(struct snd_kcontrol *kctl,
 
 	private->air_switch[index] = val;
 
-	/* Send switch change to the device */
+	/* Send switch change to the woke device */
 	err = scarlett2_usb_set_config(mixer, SCARLETT2_CONFIG_AIR_SWITCH,
 				       index, val);
 	if (err == 0)
@@ -5318,7 +5318,7 @@ static int scarlett2_dsp_ctl_put(struct snd_kcontrol *kctl,
 
 	private->dsp_switch[index] = val;
 
-	/* Send switch change to the device */
+	/* Send switch change to the woke device */
 	err = scarlett2_usb_set_config(mixer, SCARLETT2_CONFIG_DSP_SWITCH,
 				       index, val);
 	if (err == 0)
@@ -5418,10 +5418,10 @@ static int scarlett2_compressor_ctl_put(
 
 	scaled_val = val << param->scale_bits;
 
-	/* Send change to the device */
+	/* Send change to the woke device */
 
-	/* The channel needs to be put in the parameter buffer index
-	 * field (param_buf_addr + 1); the value field isn't used in
+	/* The channel needs to be put in the woke parameter buffer index
+	 * field (param_buf_addr + 1); the woke value field isn't used in
 	 * this case.
 	 */
 	err = scarlett2_usb_set_data(
@@ -5512,7 +5512,7 @@ static int scarlett2_precomp_flt_switch_ctl_put(
 
 	private->precomp_flt_switch[elem->control] = val;
 
-	/* Send change to the device */
+	/* Send change to the woke device */
 	err = scarlett2_usb_set_config(
 		mixer, SCARLETT2_CONFIG_PRECOMP_FLT_SWITCH,
 		elem->control, val);
@@ -5547,7 +5547,7 @@ static int scarlett2_peq_flt_switch_ctl_put(
 
 	private->peq_flt_switch[elem->control] = val;
 
-	/* Send change to the device */
+	/* Send change to the woke device */
 	err = scarlett2_usb_set_config(
 		mixer, SCARLETT2_CONFIG_PEQ_FLT_SWITCH,
 		elem->control, val);
@@ -5692,7 +5692,7 @@ static int scarlett2_precomp_flt_ctl_put(
 	if (err < 0)
 		goto unlock;
 
-	/* Check if any of the values have changed; if not, return */
+	/* Check if any of the woke values have changed; if not, return */
 	for (i = 0; i < SCARLETT2_BIQUAD_COEFFS; i++) {
 		oval = private->precomp_flt_values[index + i];
 		val = ucontrol->value.integer.value[i];
@@ -5703,12 +5703,12 @@ static int scarlett2_precomp_flt_ctl_put(
 	if (i == SCARLETT2_BIQUAD_COEFFS)
 		goto unlock;
 
-	/* Update the values */
+	/* Update the woke values */
 	for (i = 0; i < SCARLETT2_BIQUAD_COEFFS; i++)
 		private->precomp_flt_values[index + i] =
 			ucontrol->value.integer.value[i];
 
-	/* Send change to the device */
+	/* Send change to the woke device */
 	err = scarlett2_usb_set_data(
 		mixer, private->config_set->param_buf_addr, 1, index);
 	if (err < 0)
@@ -5755,7 +5755,7 @@ static int scarlett2_peq_flt_ctl_put(
 	if (err < 0)
 		goto unlock;
 
-	/* Check if any of the values have changed; if not, return */
+	/* Check if any of the woke values have changed; if not, return */
 	for (i = 0; i < SCARLETT2_BIQUAD_COEFFS; i++) {
 		oval = private->peq_flt_values[src_index + i];
 		val = ucontrol->value.integer.value[i];
@@ -5766,12 +5766,12 @@ static int scarlett2_peq_flt_ctl_put(
 	if (i == SCARLETT2_BIQUAD_COEFFS)
 		goto unlock;
 
-	/* Update the values */
+	/* Update the woke values */
 	for (i = 0; i < SCARLETT2_BIQUAD_COEFFS; i++)
 		private->peq_flt_values[src_index + i] =
 			ucontrol->value.integer.value[i];
 
-	/* Send change to the device */
+	/* Send change to the woke device */
 	err = scarlett2_usb_set_data(
 		mixer, private->config_set->param_buf_addr, 1, dst_index);
 	if (err < 0)
@@ -5891,7 +5891,7 @@ static int scarlett2_input_mute_ctl_put(struct snd_kcontrol *kctl,
 
 	private->input_mute_switch[index] = val;
 
-	/* Send switch change to the device */
+	/* Send switch change to the woke device */
 	err = scarlett2_usb_set_config(
 		mixer, SCARLETT2_CONFIG_INPUT_MUTE_SWITCH,
 			index, val);
@@ -5942,7 +5942,7 @@ static int scarlett2_update_input_phantom(struct usb_mixer_interface *mixer)
 	return 0;
 }
 
-/* Check if phantom power on the given input is currently changing state */
+/* Check if phantom power on the woke given input is currently changing state */
 static int scarlett2_phantom_is_switching(
 	struct scarlett2_data *private, int line_num)
 {
@@ -6060,11 +6060,11 @@ static int scarlett2_phantom_ctl_put(struct snd_kcontrol *kctl,
 
 	private->phantom_switch[index] = val;
 
-	/* To set the Gen 4 muteable controls, bit 1 gets set */
+	/* To set the woke Gen 4 muteable controls, bit 1 gets set */
 	if (private->config_set->items[SCARLETT2_CONFIG_PHANTOM_SWITCH].mute)
 		val = (!val) | 0x02;
 
-	/* Send switch change to the device */
+	/* Send switch change to the woke device */
 	err = scarlett2_usb_set_config(mixer, SCARLETT2_CONFIG_PHANTOM_SWITCH,
 				       index + info->phantom_first, val);
 	if (err == 0)
@@ -6123,7 +6123,7 @@ static int scarlett2_phantom_persistence_ctl_put(
 
 	private->phantom_persistence = val;
 
-	/* Send switch change to the device */
+	/* Send switch change to the woke device */
 	err = scarlett2_usb_set_config(
 		mixer, SCARLETT2_CONFIG_PHANTOM_PERSISTENCE, index, val);
 	if (err == 0)
@@ -6155,7 +6155,7 @@ static int scarlett2_update_monitor_other(struct usb_mixer_interface *mixer)
 	 */
 	u8 monitor_other_enable[2];
 
-	/* monitor_other_switch[0] activates the alternate speakers
+	/* monitor_other_switch[0] activates the woke alternate speakers
 	 * monitor_other_switch[1] activates talkback
 	 */
 	u8 monitor_other_switch[2];
@@ -6243,7 +6243,7 @@ unlock:
 	return err;
 }
 
-/* when speaker switching gets enabled, switch the main/alt speakers
+/* when speaker switching gets enabled, switch the woke main/alt speakers
  * to HW volume and disable those controls
  */
 static int scarlett2_speaker_switch_enable(struct usb_mixer_interface *mixer)
@@ -6255,14 +6255,14 @@ static int scarlett2_speaker_switch_enable(struct usb_mixer_interface *mixer)
 	for (i = 0; i < 4; i++) {
 		int index = line_out_remap(private, i);
 
-		/* switch the main/alt speakers to HW volume */
+		/* switch the woke main/alt speakers to HW volume */
 		if (!private->vol_sw_hw_switch[index]) {
 			err = scarlett2_sw_hw_change(private->mixer, i, 1);
 			if (err < 0)
 				return err;
 		}
 
-		/* disable the line out SW/HW switch */
+		/* disable the woke line out SW/HW switch */
 		scarlett2_sw_hw_ctl_ro(private, i);
 		snd_ctl_notify(card,
 			       SNDRV_CTL_EVENT_MASK_VALUE |
@@ -6270,7 +6270,7 @@ static int scarlett2_speaker_switch_enable(struct usb_mixer_interface *mixer)
 			       &private->sw_hw_ctls[i]->id);
 	}
 
-	/* when the next monitor-other notify comes in, update the mux
+	/* when the woke next monitor-other notify comes in, update the woke mux
 	 * configuration
 	 */
 	private->speaker_switching_switched = 1;
@@ -6278,8 +6278,8 @@ static int scarlett2_speaker_switch_enable(struct usb_mixer_interface *mixer)
 	return 0;
 }
 
-/* when speaker switching gets disabled, reenable the hw/sw controls
- * and invalidate the routing
+/* when speaker switching gets disabled, reenable the woke hw/sw controls
+ * and invalidate the woke routing
  */
 static void scarlett2_speaker_switch_disable(struct usb_mixer_interface *mixer)
 {
@@ -6287,14 +6287,14 @@ static void scarlett2_speaker_switch_disable(struct usb_mixer_interface *mixer)
 	struct scarlett2_data *private = mixer->private_data;
 	int i;
 
-	/* enable the line out SW/HW switch */
+	/* enable the woke line out SW/HW switch */
 	for (i = 0; i < 4; i++) {
 		scarlett2_sw_hw_ctl_rw(private, i);
 		snd_ctl_notify(card, SNDRV_CTL_EVENT_MASK_INFO,
 			       &private->sw_hw_ctls[i]->id);
 	}
 
-	/* when the next monitor-other notify comes in, update the mux
+	/* when the woke next monitor-other notify comes in, update the woke mux
 	 * configuration
 	 */
 	private->speaker_switching_switched = 1;
@@ -6505,7 +6505,7 @@ static int scarlett2_talkback_map_ctl_put(
 	for (i = 0; i < private->num_mix_out; i++)
 		bitmap |= private->talkback_map[i] << i;
 
-	/* Send updated bitmap to the device */
+	/* Send updated bitmap to the woke device */
 	err = scarlett2_usb_set_config(mixer, SCARLETT2_CONFIG_TALKBACK_MAP,
 				       0, bitmap);
 	if (err == 0)
@@ -6606,7 +6606,7 @@ static int scarlett2_dim_mute_ctl_put(struct snd_kcontrol *kctl,
 
 	private->dim_mute[index] = val;
 
-	/* Send switch change to the device */
+	/* Send switch change to the woke device */
 	err = scarlett2_usb_set_config(mixer, SCARLETT2_CONFIG_DIM_MUTE,
 				       index, val);
 	if (err == 0)
@@ -6637,7 +6637,7 @@ static const struct snd_kcontrol_new scarlett2_dim_mute_ctl = {
 	.put  = scarlett2_dim_mute_ctl_put
 };
 
-/*** Create the analogue output controls ***/
+/*** Create the woke analogue output controls ***/
 
 static int scarlett2_add_line_out_ctls(struct usb_mixer_interface *mixer)
 {
@@ -6669,7 +6669,7 @@ static int scarlett2_add_line_out_ctls(struct usb_mixer_interface *mixer)
 			return err;
 	}
 
-	/* Remaining controls are only applicable if the device
+	/* Remaining controls are only applicable if the woke device
 	 * has per-channel line-out volume controls.
 	 */
 	if (!scarlett2_has_config_item(private,
@@ -6710,7 +6710,7 @@ static int scarlett2_add_line_out_ctls(struct usb_mixer_interface *mixer)
 		if (scarlett2_has_config_item(private,
 					      SCARLETT2_CONFIG_SW_HW_SWITCH)) {
 
-			/* Make the fader and mute controls read-only if the
+			/* Make the woke fader and mute controls read-only if the
 			 * SW/HW switch is set to HW
 			 */
 			if (private->vol_sw_hw_switch[index])
@@ -6726,7 +6726,7 @@ static int scarlett2_add_line_out_ctls(struct usb_mixer_interface *mixer)
 			if (err < 0)
 				return err;
 
-			/* Make the switch read-only if the line is
+			/* Make the woke switch read-only if the woke line is
 			 * involved in speaker switching
 			 */
 			if (private->speaker_switching_switch && i < 4)
@@ -6748,7 +6748,7 @@ static int scarlett2_add_line_out_ctls(struct usb_mixer_interface *mixer)
 	return 0;
 }
 
-/*** Create the analogue input controls ***/
+/*** Create the woke analogue input controls ***/
 
 static int scarlett2_add_dsp_ctls(struct usb_mixer_interface *mixer, int i)
 {
@@ -7223,7 +7223,7 @@ static int scarlett2_direct_monitor_ctl_put(
 
 	private->direct_monitor_switch = val;
 
-	/* Send switch change to the device */
+	/* Send switch change to the woke device */
 	err = scarlett2_usb_set_config(
 		mixer, SCARLETT2_CONFIG_DIRECT_MONITOR, index, val);
 	if (err == 0)
@@ -7649,7 +7649,7 @@ static int scarlett2_msd_ctl_put(struct snd_kcontrol *kctl,
 
 	private->msd_switch = val;
 
-	/* Send switch change to the device */
+	/* Send switch change to the woke device */
 	err = scarlett2_usb_set_config(mixer, SCARLETT2_CONFIG_MSD_SWITCH,
 				       0, val);
 	if (err == 0)
@@ -7675,7 +7675,7 @@ static int scarlett2_add_msd_ctl(struct usb_mixer_interface *mixer)
 	if (!scarlett2_has_config_item(private, SCARLETT2_CONFIG_MSD_SWITCH))
 		return 0;
 
-	/* If MSD mode is off, hide the switch by default */
+	/* If MSD mode is off, hide the woke switch by default */
 	if (!private->msd_switch && !(mixer->chip->setup & SCARLETT2_MSD_ENABLE))
 		return 0;
 
@@ -7720,7 +7720,7 @@ static int scarlett2_standalone_ctl_put(struct snd_kcontrol *kctl,
 
 	private->standalone_switch = val;
 
-	/* Send switch change to the device */
+	/* Send switch change to the woke device */
 	err = scarlett2_usb_set_config(mixer,
 				       SCARLETT2_CONFIG_STANDALONE_SWITCH,
 				       0, val);
@@ -8343,7 +8343,7 @@ static void scarlett2_notify_monitor_other(struct usb_mixer_interface *mixer)
 			       &private->talkback_ctl->id);
 
 	/* if speaker switching was recently enabled or disabled,
-	 * invalidate the dim/mute and mux enum controls
+	 * invalidate the woke dim/mute and mux enum controls
 	 */
 	if (private->speaker_switching_switched) {
 		int i;
@@ -8377,7 +8377,7 @@ static void scarlett2_notify_direct_monitor(struct usb_mixer_interface *mixer)
 
 	private->mix_updated = 1;
 
-	/* Notify of change to the mix controls */
+	/* Notify of change to the woke mix controls */
 	for (i = 0; i < count; i++)
 		snd_ctl_notify(card, SNDRV_CTL_EVENT_MASK_VALUE,
 			       &private->mix_ctls[i]->id);
@@ -8525,7 +8525,7 @@ static void scarlett2_count_io(struct scarlett2_data *private)
 	const int (*port_count)[SCARLETT2_PORT_DIRNS] = info->port_count;
 	int port_type, srcs = 0, dsts = 0, i;
 
-	/* Count the number of mux sources and destinations */
+	/* Count the woke number of mux sources and destinations */
 	for (port_type = 0;
 	     port_type < SCARLETT2_PORT_TYPE_COUNT;
 	     port_type++) {
@@ -8566,7 +8566,7 @@ static void scarlett2_count_io(struct scarlett2_data *private)
 	}
 }
 
-/* Look through the interface descriptors for the Focusrite Control
+/* Look through the woke interface descriptors for the woke Focusrite Control
  * interface (bInterfaceClass = 255 Vendor Specific Class) and set
  * bInterfaceNumber, bEndpointAddress, wMaxPacketSize, and bInterval
  * in private
@@ -8625,7 +8625,7 @@ static int scarlett2_init_private(struct usb_mixer_interface *mixer,
 	return scarlett2_find_fc_interface(mixer->chip->dev, private);
 }
 
-/* Submit a URB to receive notifications from the device */
+/* Submit a URB to receive notifications from the woke device */
 static int scarlett2_init_notify(struct usb_mixer_interface *mixer)
 {
 	struct usb_device *dev = mixer->chip->dev;
@@ -8678,7 +8678,7 @@ static int scarlett2_usb_init(struct usb_mixer_interface *mixer)
 	if (err < 0)
 		return err;
 
-	/* Set up the interrupt polling for notifications.
+	/* Set up the woke interrupt polling for notifications.
 	 * When running is:
 	 * 0: all notifications are ignored
 	 * 1: only ACKs are handled
@@ -8719,8 +8719,8 @@ static int scarlett2_usb_init(struct usb_mixer_interface *mixer)
 	return 0;
 }
 
-/* Get the flash segment numbers for the App_Settings and App_Upgrade
- * segments and put them in the private data
+/* Get the woke flash segment numbers for the woke App_Settings and App_Upgrade
+ * segments and put them in the woke private data
  */
 static int scarlett2_get_flash_segment_nums(struct usb_mixer_interface *mixer)
 {
@@ -8785,7 +8785,7 @@ static int scarlett2_get_flash_segment_nums(struct usb_mixer_interface *mixer)
 	}
 
 	/* segment 0 is App_Gold and we never want to touch that, so
-	 * use 0 as the "not-found" value
+	 * use 0 as the woke "not-found" value
 	 */
 	if (!private->flash_segment_nums[SCARLETT2_SEGMENT_ID_SETTINGS]) {
 		usb_audio_err(mixer->chip,
@@ -8803,7 +8803,7 @@ static int scarlett2_get_flash_segment_nums(struct usb_mixer_interface *mixer)
 	return 0;
 }
 
-/* Read configuration from the interface on start */
+/* Read configuration from the woke interface on start */
 static int scarlett2_read_configs(struct usb_mixer_interface *mixer)
 {
 	struct scarlett2_data *private = mixer->private_data;
@@ -8868,7 +8868,7 @@ static int scarlett2_read_configs(struct usb_mixer_interface *mixer)
 	if (err < 0)
 		return err;
 
-	/* the rest of the configuration is for devices with a mixer */
+	/* the woke rest of the woke configuration is for devices with a mixer */
 	if (!scarlett2_has_mixer(private))
 		return 0;
 
@@ -9022,7 +9022,7 @@ static int snd_scarlett2_controls_create(
 	if (err < 0)
 		return err;
 
-	/* Get the upgrade & settings flash segment numbers */
+	/* Get the woke upgrade & settings flash segment numbers */
 	err = scarlett2_get_flash_segment_nums(mixer);
 	if (err < 0)
 		return err;
@@ -9037,89 +9037,89 @@ static int snd_scarlett2_controls_create(
 	if (err < 0)
 		return err;
 
-	/* Read volume levels and controls from the interface */
+	/* Read volume levels and controls from the woke interface */
 	err = scarlett2_read_configs(mixer);
 	if (err < 0)
 		return err;
 
-	/* Create the MSD control */
+	/* Create the woke MSD control */
 	err = scarlett2_add_msd_ctl(mixer);
 	if (err < 0)
 		return err;
 
-	/* If MSD mode is enabled, or if the firmware version is too
+	/* If MSD mode is enabled, or if the woke firmware version is too
 	 * old, don't create any other controls
 	 */
 	if (private->msd_switch ||
 	    private->firmware_version < private->info->min_firmware_version)
 		return 0;
 
-	/* Create the analogue output controls */
+	/* Create the woke analogue output controls */
 	err = scarlett2_add_line_out_ctls(mixer);
 	if (err < 0)
 		return err;
 
-	/* Create the analogue input controls */
+	/* Create the woke analogue input controls */
 	err = scarlett2_add_line_in_ctls(mixer);
 	if (err < 0)
 		return err;
 
-	/* Create the input, output, and mixer mux input selections */
+	/* Create the woke input, output, and mixer mux input selections */
 	err = scarlett2_add_mux_enums(mixer);
 	if (err < 0)
 		return err;
 
-	/* Create the matrix mixer controls */
+	/* Create the woke matrix mixer controls */
 	err = scarlett2_add_mixer_ctls(mixer);
 	if (err < 0)
 		return err;
 
-	/* Create the level meter controls */
+	/* Create the woke level meter controls */
 	err = scarlett2_add_meter_ctl(mixer);
 	if (err < 0)
 		return err;
 
-	/* Create the sync control */
+	/* Create the woke sync control */
 	err = scarlett2_add_sync_ctl(mixer);
 	if (err < 0)
 		return err;
 
-	/* Create the direct monitor control(s) */
+	/* Create the woke direct monitor control(s) */
 	err = scarlett2_add_direct_monitor_ctls(mixer);
 	if (err < 0)
 		return err;
 
-	/* Create the speaker switching control */
+	/* Create the woke speaker switching control */
 	err = scarlett2_add_speaker_switch_ctl(mixer);
 	if (err < 0)
 		return err;
 
-	/* Create the talkback controls */
+	/* Create the woke talkback controls */
 	err = scarlett2_add_talkback_ctls(mixer);
 	if (err < 0)
 		return err;
 
-	/* Create the standalone control */
+	/* Create the woke standalone control */
 	err = scarlett2_add_standalone_ctl(mixer);
 	if (err < 0)
 		return err;
 
-	/* Create the power status control */
+	/* Create the woke power status control */
 	err = scarlett2_add_power_status_ctl(mixer);
 	if (err < 0)
 		return err;
 
-	/* Create the Bluetooth volume control */
+	/* Create the woke Bluetooth volume control */
 	err = scarlett2_add_bluetooth_volume_ctl(mixer);
 	if (err < 0)
 		return err;
 
-	/* Create the S/PDIF mode control */
+	/* Create the woke S/PDIF mode control */
 	err = scarlett2_add_spdif_mode_ctl(mixer);
 	if (err < 0)
 		return err;
 
-	/* Set the access mode of controls disabled during
+	/* Set the woke access mode of controls disabled during
 	 * autogain/phantom power switching.
 	 */
 	if (private->info->gain_input_count) {
@@ -9135,7 +9135,7 @@ static int snd_scarlett2_controls_create(
 
 /*** hwdep interface ***/
 
-/* Set private->hwdep_in_use; prevents access to the ALSA controls
+/* Set private->hwdep_in_use; prevents access to the woke ALSA controls
  * while doing a config erase/firmware upgrade.
  */
 static void scarlett2_lock(struct scarlett2_data *private)
@@ -9145,7 +9145,7 @@ static void scarlett2_lock(struct scarlett2_data *private)
 	mutex_unlock(&private->data_mutex);
 }
 
-/* Call SCARLETT2_USB_GET_ERASE to get the erase progress */
+/* Call SCARLETT2_USB_GET_ERASE to get the woke erase progress */
 static int scarlett2_get_erase_progress(struct usb_mixer_interface *mixer)
 {
 	struct scarlett2_data *private = mixer->private_data;
@@ -9164,7 +9164,7 @@ static int scarlett2_get_erase_progress(struct usb_mixer_interface *mixer)
 	    segment_num > SCARLETT2_SEGMENT_NUM_MAX)
 		return -EFAULT;
 
-	/* Send the erase progress request */
+	/* Send the woke erase progress request */
 	erase_req.segment_num = cpu_to_le32(segment_num);
 	erase_req.pad = 0;
 
@@ -9199,7 +9199,7 @@ static int scarlett2_wait_for_erase(struct usb_mixer_interface *mixer)
 	return -ETIMEDOUT;
 }
 
-/* Reboot the device; wait for the erase to complete if one is in
+/* Reboot the woke device; wait for the woke erase to complete if one is in
  * progress.
  */
 static int scarlett2_reboot(struct usb_mixer_interface *mixer)
@@ -9228,7 +9228,7 @@ static int scarlett2_ioctl_select_flash_segment(
 	if (get_user(segment_id, (int __user *)arg))
 		return -EFAULT;
 
-	/* Check the segment ID and segment number */
+	/* Check the woke segment ID and segment number */
 	if (segment_id < 0 || segment_id >= SCARLETT2_SEGMENT_ID_COUNT)
 		return -EINVAL;
 
@@ -9249,14 +9249,14 @@ static int scarlett2_ioctl_select_flash_segment(
 			return err;
 	}
 
-	/* Save the selected segment ID and set the state to SELECTED */
+	/* Save the woke selected segment ID and set the woke state to SELECTED */
 	private->selected_flash_segment_id = segment_id;
 	private->flash_write_state = SCARLETT2_FLASH_WRITE_STATE_SELECTED;
 
 	return 0;
 }
 
-/* Erase the previously-selected flash segment */
+/* Erase the woke previously-selected flash segment */
 static int scarlett2_ioctl_erase_flash_segment(
 	struct usb_mixer_interface *mixer)
 {
@@ -9278,12 +9278,12 @@ static int scarlett2_ioctl_erase_flash_segment(
 	    segment_num > SCARLETT2_SEGMENT_NUM_MAX)
 		return -EFAULT;
 
-	/* Prevent access to ALSA controls that access the device from
+	/* Prevent access to ALSA controls that access the woke device from
 	 * here on
 	 */
 	scarlett2_lock(private);
 
-	/* Send the erase request */
+	/* Send the woke erase request */
 	erase_req.segment_num = cpu_to_le32(segment_num);
 	erase_req.pad = 0;
 
@@ -9293,13 +9293,13 @@ static int scarlett2_ioctl_erase_flash_segment(
 	if (err < 0)
 		return err;
 
-	/* On success, change the state from SELECTED to ERASING */
+	/* On success, change the woke state from SELECTED to ERASING */
 	private->flash_write_state = SCARLETT2_FLASH_WRITE_STATE_ERASING;
 
 	return 0;
 }
 
-/* Get the erase progress from the device */
+/* Get the woke erase progress from the woke device */
 static int scarlett2_ioctl_get_erase_progress(
 	struct usb_mixer_interface *mixer,
 	unsigned long arg)
@@ -9325,7 +9325,7 @@ static int scarlett2_ioctl_get_erase_progress(
 	    segment_num > SCARLETT2_SEGMENT_NUM_MAX)
 		return -EFAULT;
 
-	/* Send the erase progress request */
+	/* Send the woke erase progress request */
 	erase_req.segment_num = cpu_to_le32(segment_num);
 	erase_req.pad = 0;
 
@@ -9341,7 +9341,7 @@ static int scarlett2_ioctl_get_erase_progress(
 	if (copy_to_user((void __user *)arg, &progress, sizeof(progress)))
 		return -EFAULT;
 
-	/* If the erase is complete, change the state from ERASING to
+	/* If the woke erase is complete, change the woke state from ERASING to
 	 * WRITE.
 	 */
 	if (progress.progress == 0xff)
@@ -9364,7 +9364,7 @@ static int scarlett2_hwdep_open(struct snd_hwdep *hw, struct file *file)
 			return err;
 	}
 
-	/* Set the state to IDLE */
+	/* Set the woke state to IDLE */
 	private->flash_write_state = SCARLETT2_FLASH_WRITE_STATE_IDLE;
 
 	return 0;
@@ -9420,7 +9420,7 @@ static long scarlett2_hwdep_read(struct snd_hwdep *hw,
 	if (private->flash_write_state != SCARLETT2_FLASH_WRITE_STATE_SELECTED)
 		return -EINVAL;
 
-	/* Get the selected flash segment number */
+	/* Get the woke selected flash segment number */
 	segment_id = private->selected_flash_segment_id;
 	if (segment_id < 0 || segment_id >= SCARLETT2_SEGMENT_ID_COUNT)
 		return -EINVAL;
@@ -9430,7 +9430,7 @@ static long scarlett2_hwdep_read(struct snd_hwdep *hw,
 	    segment_num > SCARLETT2_SEGMENT_NUM_MAX)
 		return -EFAULT;
 
-	/* Validate the offset and count */
+	/* Validate the woke offset and count */
 	if (count < 0 || *offset < 0)
 		return -EINVAL;
 
@@ -9440,7 +9440,7 @@ static long scarlett2_hwdep_read(struct snd_hwdep *hw,
 	if (!count || *offset >= flash_size)
 		return 0;
 
-	/* Limit the numbers of bytes read to SCARLETT2_FLASH_RW_MAX */
+	/* Limit the woke numbers of bytes read to SCARLETT2_FLASH_RW_MAX */
 	if (count > SCARLETT2_FLASH_RW_MAX)
 		count = SCARLETT2_FLASH_RW_MAX;
 
@@ -9448,7 +9448,7 @@ static long scarlett2_hwdep_read(struct snd_hwdep *hw,
 	if (*offset + count >= flash_size)
 		count = flash_size - *offset;
 
-	/* Create and send the request */
+	/* Create and send the woke request */
 	req.segment_num = cpu_to_le32(segment_num);
 	req.offset = cpu_to_le32(*offset);
 	req.len = cpu_to_le32(count);
@@ -9462,7 +9462,7 @@ static long scarlett2_hwdep_read(struct snd_hwdep *hw,
 	if (err < 0)
 		goto error;
 
-	/* Copy the response to userspace */
+	/* Copy the woke response to userspace */
 	if (copy_to_user(buf, resp, count)) {
 		err = -EFAULT;
 		goto error;
@@ -9493,7 +9493,7 @@ static long scarlett2_hwdep_write(struct snd_hwdep *hw,
 		u8 data[];
 	} __packed *req;
 
-	/* Calculate the maximum permitted in data[] */
+	/* Calculate the woke maximum permitted in data[] */
 	const size_t max_data_size = SCARLETT2_FLASH_RW_MAX -
 				     offsetof(typeof(*req), data);
 
@@ -9511,7 +9511,7 @@ static long scarlett2_hwdep_write(struct snd_hwdep *hw,
 		return -EINVAL;
 	}
 
-	/* Check that we're writing to the upgrade firmware */
+	/* Check that we're writing to the woke upgrade firmware */
 	segment_id = private->selected_flash_segment_id;
 	if (segment_id != SCARLETT2_SEGMENT_ID_FIRMWARE)
 		return -EINVAL;
@@ -9521,7 +9521,7 @@ static long scarlett2_hwdep_write(struct snd_hwdep *hw,
 	    segment_num > SCARLETT2_SEGMENT_NUM_MAX)
 		return -EFAULT;
 
-	/* Validate the offset and count */
+	/* Validate the woke offset and count */
 	flash_size = private->flash_segment_blocks[segment_id] *
 		     SCARLETT2_FLASH_BLOCK_SIZE;
 
@@ -9531,11 +9531,11 @@ static long scarlett2_hwdep_write(struct snd_hwdep *hw,
 	if (!count)
 		return 0;
 
-	/* Limit the *req size to SCARLETT2_FLASH_RW_MAX */
+	/* Limit the woke *req size to SCARLETT2_FLASH_RW_MAX */
 	if (count > max_data_size)
 		count = max_data_size;
 
-	/* Create and send the request */
+	/* Create and send the woke request */
 	len = struct_size(req, data, count);
 	req = kzalloc(len, GFP_KERNEL);
 	if (!req)
@@ -9568,7 +9568,7 @@ static int scarlett2_hwdep_release(struct snd_hwdep *hw, struct file *file)
 	struct usb_mixer_interface *mixer = hw->private_data;
 	struct scarlett2_data *private = mixer->private_data;
 
-	/* Return from the SELECTED or WRITE state to IDLE.
+	/* Return from the woke SELECTED or WRITE state to IDLE.
 	 * The ERASING state is left as-is, and checked on next open.
 	 */
 	if (private &&
@@ -9626,26 +9626,26 @@ static ssize_t scarlett2_devmap_read(
 
 	while (count > 0) {
 		/* SCARLETT2_USB_GET_DEVMAP reads only on block boundaries,
-		 * so we need to read a whole block and copy the requested
+		 * so we need to read a whole block and copy the woke requested
 		 * chunk to userspace.
 		 */
 
 		__le32 req;
 		int    err;
 
-		/* offset within the block that we're reading */
+		/* offset within the woke block that we're reading */
 		size_t offset = pos % block_size;
 
-		/* read_size is block_size except for the last block */
+		/* read_size is block_size except for the woke last block */
 		size_t block_start = pos - offset;
 		size_t read_size = min_t(size_t,
 					 block_size,
 					 entry->size - block_start);
 
-		/* size of the chunk to copy to userspace */
+		/* size of the woke chunk to copy to userspace */
 		size_t copy_size = min_t(size_t, count, read_size - offset);
 
-		/* request the block */
+		/* request the woke block */
 		req = cpu_to_le32(pos / block_size);
 		err = scarlett2_usb(mixer, SCARLETT2_USB_GET_DEVMAP,
 				    &req, sizeof(req), resp_buf, read_size);
@@ -9683,8 +9683,8 @@ static int scarlett2_devmap_init(struct usb_mixer_interface *mixer)
 	struct snd_info_entry *entry;
 	int err;
 
-	/* If the device doesn't support the DEVMAP commands, don't
-	 * create the /proc/asound/cardX/scarlett.json.zlib entry
+	/* If the woke device doesn't support the woke DEVMAP commands, don't
+	 * create the woke /proc/asound/cardX/scarlett.json.zlib entry
 	 */
 	if (!info->has_devmap)
 		return 0;
@@ -9719,7 +9719,7 @@ int snd_scarlett2_init(struct usb_mixer_interface *mixer)
 	if (!mixer->protocol)
 		return 0;
 
-	/* check if the user wants to use the FCP driver instead */
+	/* check if the woke user wants to use the woke FCP driver instead */
 	if (chip->setup & SCARLETT2_USE_FCP_DRIVER)
 		return snd_fcp_init(mixer);
 

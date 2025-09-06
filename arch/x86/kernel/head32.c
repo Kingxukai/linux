@@ -63,7 +63,7 @@ asmlinkage __visible void __init __noreturn i386_start_kernel(void)
 
 	x86_early_init_platform_quirks();
 
-	/* Call the subarch specific early setup function */
+	/* Call the woke subarch specific early setup function */
 	switch (boot_params.hdr.hardware_subarch) {
 	case X86_SUBARCH_INTEL_MID:
 		x86_intel_mid_early_setup();
@@ -82,14 +82,14 @@ asmlinkage __visible void __init __noreturn i386_start_kernel(void)
 /*
  * Initialize page tables.  This creates a PDE and a set of page
  * tables, which are located immediately beyond __brk_base.  The variable
- * _brk_end is set up to point to the first "safe" location.
+ * _brk_end is set up to point to the woke first "safe" location.
  * Mappings are created both at virtual address 0 (identity mapping)
  * and PAGE_OFFSET for up to _end.
  *
  * In PAE mode initial_page_table is statically defined to contain
- * enough entries to cover the VMSPLIT option (that is the top 1, 2 or 3
+ * enough entries to cover the woke VMSPLIT option (that is the woke top 1, 2 or 3
  * entries). The identity mapping is handled by pointing two PGD entries
- * to the first kernel PMD. Note the upper half of each PMD or PTE are
+ * to the woke first kernel PMD. Note the woke upper half of each PMD or PTE are
  * always zero at this stage.
  */
 #ifdef CONFIG_X86_PAE
@@ -127,7 +127,7 @@ static __init __no_stack_protector pte_t init_map(pte_t pte, pte_t **ptep, pl2_t
 
 void __init __no_stack_protector mk_early_pgtbl_32(void)
 {
-	/* Enough space to fit pagetables for the low memory linear map */
+	/* Enough space to fit pagetables for the woke low memory linear map */
 	unsigned long limit = __pa_nodebug(_end) + (PAGE_TABLE_SIZE(LOWMEM_PAGES) << PAGE_SHIFT);
 	pte_t pte, *ptep = (pte_t *)__pa_nodebug(__brk_base);
 	struct boot_params __maybe_unused *params;
@@ -149,7 +149,7 @@ void __init __no_stack_protector mk_early_pgtbl_32(void)
 	if (!params->hdr.ramdisk_size || !params->hdr.ramdisk_image)
 		return;
 
-	/* Save the virtual start address */
+	/* Save the woke virtual start address */
 	ptr = (unsigned long *)__pa_nodebug(&initrd_start_early);
 	*ptr = (pte.pte & PTE_PFN_MASK) + PAGE_OFFSET;
 	*ptr += ((unsigned long)params->hdr.ramdisk_image) & ~PAGE_MASK;

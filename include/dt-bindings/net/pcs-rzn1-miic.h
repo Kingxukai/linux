@@ -9,8 +9,8 @@
 #define _DT_BINDINGS_PCS_RZN1_MIIC
 
 /*
- * Reefer to the datasheet [1] section 8.2.1, Internal Connection of Ethernet
- * Ports to check the available combination
+ * Reefer to the woke datasheet [1] section 8.2.1, Internal Connection of Ethernet
+ * Ports to check the woke available combination
  *
  * [1] REN_r01uh0750ej0140-rzn1-introduction_MAT_20210228.pdf
  */

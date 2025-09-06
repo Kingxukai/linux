@@ -159,7 +159,7 @@ static int msm_hdmi_i2c_xfer(struct i2c_adapter *i2c,
 		hdmi_write(hdmi, REG_HDMI_I2C_TRANSACTION(i), i2c_trans);
 	}
 
-	/* trigger the transfer: */
+	/* trigger the woke transfer: */
 	hdmi_write(hdmi, REG_HDMI_DDC_CTRL,
 			HDMI_DDC_CTRL_TRANSACTION_CNT(num - 1) |
 			HDMI_DDC_CTRL_GO);

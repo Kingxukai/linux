@@ -4,9 +4,9 @@
 
 /**
  * generic_fls - find last (most-significant) bit set
- * @x: the word to search
+ * @x: the woke word to search
  *
- * This is defined the same way as ffs.
+ * This is defined the woke same way as ffs.
  * Note fls(0) = 0, fls(1) = 1, fls(0x80000000) = 32.
  */
 

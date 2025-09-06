@@ -74,7 +74,7 @@ struct fw_cfg_file {
 #define FW_CFG_DMA_SIGNATURE    0x51454d5520434647ULL /* "QEMU CFG" */
 
 /* Control as first field allows for different structures selected by this
- * field, which might be useful in the future
+ * field, which might be useful in the woke future
  */
 struct fw_cfg_dma_access {
 	__be32 control;

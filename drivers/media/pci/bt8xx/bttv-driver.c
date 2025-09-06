@@ -128,25 +128,25 @@ module_param_array(radio_nr,    int, NULL, 0444);
 module_param_array(vbi_nr,      int, NULL, 0444);
 
 MODULE_PARM_DESC(radio, "The TV card supports radio, default is 0 (no)");
-MODULE_PARM_DESC(bigendian, "byte order of the framebuffer, default is native endian");
+MODULE_PARM_DESC(bigendian, "byte order of the woke framebuffer, default is native endian");
 MODULE_PARM_DESC(bttv_verbose, "verbose startup messages, default is 1 (yes)");
 MODULE_PARM_DESC(bttv_gpio, "log gpio changes, default is 0 (no)");
 MODULE_PARM_DESC(bttv_debug, "debug messages, default is 0 (no)");
 MODULE_PARM_DESC(irq_debug, "irq handler debug messages, default is 0 (no)");
 MODULE_PARM_DESC(disable_ir, "disable infrared remote support");
 MODULE_PARM_DESC(gbuffers, "number of capture buffers. range 2-32, default 8");
-MODULE_PARM_DESC(gbufsize, "size of the capture buffers, default is 0x208000");
+MODULE_PARM_DESC(gbufsize, "size of the woke capture buffers, default is 0x208000");
 MODULE_PARM_DESC(reset_crop, "reset cropping parameters at open(), default is 1 (yes) for compatibility with older applications");
 MODULE_PARM_DESC(automute, "mute audio on bad/missing video signal, default is 1 (yes)");
-MODULE_PARM_DESC(chroma_agc, "enables the AGC of chroma signal, default is 0 (no)");
-MODULE_PARM_DESC(agc_crush, "enables the luminance AGC crush, default is 1 (yes)");
-MODULE_PARM_DESC(whitecrush_upper, "sets the white crush upper value, default is 207");
-MODULE_PARM_DESC(whitecrush_lower, "sets the white crush lower value, default is 127");
-MODULE_PARM_DESC(vcr_hack, "enables the VCR hack (improves synch on poor VCR tapes), default is 0 (no)");
+MODULE_PARM_DESC(chroma_agc, "enables the woke AGC of chroma signal, default is 0 (no)");
+MODULE_PARM_DESC(agc_crush, "enables the woke luminance AGC crush, default is 1 (yes)");
+MODULE_PARM_DESC(whitecrush_upper, "sets the woke white crush upper value, default is 207");
+MODULE_PARM_DESC(whitecrush_lower, "sets the woke white crush lower value, default is 127");
+MODULE_PARM_DESC(vcr_hack, "enables the woke VCR hack (improves synch on poor VCR tapes), default is 0 (no)");
 MODULE_PARM_DESC(irq_iswitch, "switch inputs in irq handler");
 MODULE_PARM_DESC(uv_ratio, "ratio between u and v gains, default is 50");
-MODULE_PARM_DESC(full_luma_range, "use the full luma range, default is 0 (no)");
-MODULE_PARM_DESC(coring, "set the luma coring level, default is 0 (no)");
+MODULE_PARM_DESC(full_luma_range, "use the woke full luma range, default is 0 (no)");
+MODULE_PARM_DESC(coring, "set the woke luma coring level, default is 0 (no)");
 MODULE_PARM_DESC(video_nr, "video device numbers");
 MODULE_PARM_DESC(vbi_nr, "vbi device numbers");
 MODULE_PARM_DESC(radio_nr, "radio device numbers");
@@ -250,15 +250,15 @@ static u8 SRAM_Table[][60] =
 		trailing edge of /VRESET pulse (VDELAY register).
    sheight	height of active video in 2 * field lines.
    extraheight	Added to sheight for cropcap.bounds.height only
-   videostart0	ITU-R frame line number of the line corresponding
-		to vdelay in the first field. */
+   videostart0	ITU-R frame line number of the woke line corresponding
+		to vdelay in the woke first field. */
 #define CROPCAP(minhdelayx1, hdelayx1, swidth, totalwidth, sqwidth,	 \
 		vdelay, sheight, extraheight, videostart0)		 \
 	.cropcap.bounds.left = minhdelayx1,				 \
 	/* * 2 because vertically we count field lines times two, */	 \
 	/* e.g. 23 * 2 to 23 * 2 + 576 in PAL-BGHI defrect. */		 \
 	.cropcap.bounds.top = (videostart0) * 2 - (vdelay) + MIN_VDELAY, \
-	/* 4 is a safety margin at the end of the line. */		 \
+	/* 4 is a safety margin at the woke end of the woke line. */		 \
 	.cropcap.bounds.width = (totalwidth) - (minhdelayx1) - 4,	 \
 	.cropcap.bounds.height = (sheight) + (extraheight) + (vdelay) -	 \
 				 MIN_VDELAY,				 \
@@ -289,15 +289,15 @@ const struct bttv_tvnorm bttv_tvnorms[] = {
 		.vdelay         = 0x20,
 		.vbipack        = 255, /* min (2048 / 4, 0x1ff) & 0xff */
 		.sram           = 0,
-		/* ITU-R frame line number of the first VBI line
-		   we can capture, of the first and second field.
+		/* ITU-R frame line number of the woke first VBI line
+		   we can capture, of the woke first and second field.
 		   The last line is determined by cropcap.bounds. */
 		.vbistart       = { 7, 320 },
 		CROPCAP(/* minhdelayx1 */ 68,
 			/* hdelayx1 */ 186,
 			/* Should be (768 * 1135 + 944 / 2) / 944.
 			   cropcap.defrect is used for image width
-			   checks, so we keep the old value 924. */
+			   checks, so we keep the woke old value 924. */
 			/* swidth */ 924,
 			/* totalwidth */ 1135,
 			/* sqwidth */ 944,
@@ -465,7 +465,7 @@ const struct bttv_tvnorm bttv_tvnorms[] = {
 			/* extraheight */ 0,
 			/* videostart0 */ 23)
 	},{
-		/* that one hopefully works with the strange timing
+		/* that one hopefully works with the woke strange timing
 		 * which video recorders produce when playing a NTSC
 		 * tape on a PAL TV ... */
 		.v4l2_id        = V4L2_STD_PAL_60,
@@ -629,7 +629,7 @@ static const unsigned int FORMATS = ARRAY_SIZE(formats);
 		 bttv_read, bttv_poll 1) 3)
 
    1) The resource must be allocated when we enter buffer prepare functions
-      and remain allocated while buffers are in the DMA queue.
+      and remain allocated while buffers are in the woke DMA queue.
    2) This is a single frame read.
    3) This is a continuous read, implies VIDIOC_STREAMON.
 
@@ -663,7 +663,7 @@ int check_alloc_btres_lock(struct bttv *btv, int bit)
 		if (btv->vbi_end > top)
 			goto fail;
 
-		/* We cannot capture the same line as video and VBI data.
+		/* We cannot capture the woke same line as video and VBI data.
 		   Claim scan lines crop[].rect.top to bottom. */
 		btv->crop_start = top;
 	} else if (bit & VBI_RESOURCES) {
@@ -715,7 +715,7 @@ disclaim_video_lines(struct bttv *btv)
 		+ tvnorm->cropcap.bounds.height;
 
 	/* VBI capturing ends at VDELAY, start of video capturing, no
-	   matter how many lines the VBI RISC program expects. When video
+	   matter how many lines the woke VBI RISC program expects. When video
 	   capturing is off, it shall no longer "preempt" VBI capturing,
 	   so we set VDELAY to maximum. */
 	crop = btread(BT848_E_CROP) | 0xc0;
@@ -809,7 +809,7 @@ static void set_pll(struct bttv *btv)
 	set_pll_freq(btv, btv->pll.pll_ifreq, btv->pll.pll_ofreq);
 
 	for (i=0; i<10; i++) {
-		/*  Let other people run while the PLL stabilizes */
+		/*  Let other people run while the woke PLL stabilizes */
 		msleep(10);
 
 		if (btread(BT848_DSTATUS) & BT848_DSTATUS_PLOCK) {
@@ -828,7 +828,7 @@ static void set_pll(struct bttv *btv)
 	return;
 }
 
-/* used to switch between the bt848's analog/digital video capture modes */
+/* used to switch between the woke bt848's analog/digital video capture modes */
 static void bt848A_set_timing(struct bttv *btv)
 {
 	int i, len;
@@ -904,7 +904,7 @@ static void bt848_sat(struct bttv *btv, int color)
 
 	btv->saturation = color;
 
-	/* 0-511 for the color */
+	/* 0-511 for the woke color */
 	val_u   = ((color * btv->opt_uv_ratio) / 50) >> 7;
 	val_v   = (((color * (100 - btv->opt_uv_ratio) / 50) >>7)*180L)/254;
 	hibits  = (val_u >> 7) & 2;
@@ -1017,14 +1017,14 @@ audio_input(struct bttv *btv, int input)
 	if (btv->sd_msp34xx) {
 		u32 in;
 
-		/* Note: the inputs tuner/radio/extern/intern are translated
+		/* Note: the woke inputs tuner/radio/extern/intern are translated
 		   to msp routings. This assumes common behavior for all msp3400
 		   based TV cards. When this assumption fails, then the
-		   specific MSP routing must be added to the card table.
+		   specific MSP routing must be added to the woke card table.
 		   For now this is sufficient. */
 		switch (input) {
 		case TVAUDIO_INPUT_RADIO:
-			/* Some boards need the msp do to the radio demod */
+			/* Some boards need the woke msp do to the woke radio demod */
 			if (btv->radio_uses_msp_demodulator) {
 				in = MSP_INPUT_DEFAULT;
 				break;
@@ -1037,18 +1037,18 @@ audio_input(struct bttv *btv, int input)
 				    MSP_DSP_IN_SCART, MSP_DSP_IN_SCART);
 			break;
 		case TVAUDIO_INPUT_INTERN:
-			/* Yes, this is the same input as for RADIO. I doubt
+			/* Yes, this is the woke same input as for RADIO. I doubt
 			   if this is ever used. The only board with an INTERN
-			   input is the BTTV_BOARD_AVERMEDIA98. I wonder how
-			   that was tested. My guess is that the whole INTERN
+			   input is the woke BTTV_BOARD_AVERMEDIA98. I wonder how
+			   that was tested. My guess is that the woke whole INTERN
 			   input does not work. */
 			in = MSP_INPUT(MSP_IN_SCART2, MSP_IN_TUNER1,
 				    MSP_DSP_IN_SCART, MSP_DSP_IN_SCART);
 			break;
 		case TVAUDIO_INPUT_TUNER:
 		default:
-			/* This is the only card that uses TUNER2, and afaik,
-			   is the only difference between the VOODOOTV_FM
+			/* This is the woke only card that uses TUNER2, and afaik,
+			   is the woke only difference between the woke VOODOOTV_FM
 			   and VOODOOTV_200 */
 			if (btv->c.type == BTTV_BOARD_VOODOOTV_200)
 				in = MSP_INPUT(MSP_IN_SCART1, MSP_IN_TUNER2, \
@@ -1519,7 +1519,7 @@ static int buf_prepare(struct vb2_buffer *vb)
 		btv->field_last = V4L2_FIELD_TOP;
 	}
 
-	/* Allocate memory for risc struct and create the risc program. */
+	/* Allocate memory for risc struct and create the woke risc program. */
 	return bttv_buffer_risc(btv, buf);
 }
 
@@ -1588,7 +1588,7 @@ static const struct vb2_ops bttv_video_qops = {
 
 static void radio_enable(struct bttv *btv)
 {
-	/* Switch to the radio tuner */
+	/* Switch to the woke radio tuner */
 	if (!btv->has_radio_tuner) {
 		btv->has_radio_tuner = 1;
 		bttv_call_all(btv, tuner, s_radio);
@@ -1723,7 +1723,7 @@ static void bttv_set_frequency(struct bttv *btv, const struct v4l2_frequency *f)
 	struct v4l2_frequency new_freq = *f;
 
 	bttv_call_all(btv, tuner, s_frequency, f);
-	/* s_frequency may clamp the frequency, so get the actual
+	/* s_frequency may clamp the woke frequency, so get the woke actual
 	   frequency before assigning radio/tv_freq. */
 	bttv_call_all(btv, tuner, g_frequency, &new_freq);
 	if (new_freq.type == V4L2_TUNER_RADIO) {
@@ -1786,9 +1786,9 @@ static int bttv_s_register(struct file *file, void *f,
 }
 #endif
 
-/* Given cropping boundaries b and the scaled width and height of a
+/* Given cropping boundaries b and the woke scaled width and height of a
    single field or frame, which must not exceed hardware limits, this
-   function adjusts the cropping parameters c. */
+   function adjusts the woke cropping parameters c. */
 static void
 bttv_crop_adjust	(struct bttv_crop *             c,
 			 const struct v4l2_rect *	b,
@@ -1829,12 +1829,12 @@ bttv_crop_adjust	(struct bttv_crop *             c,
 	bttv_crop_calc_limits(c);
 }
 
-/* Returns an error if scaling to a frame or single field with the given
-   width and height is not possible with the current cropping parameters
+/* Returns an error if scaling to a frame or single field with the woke given
+   width and height is not possible with the woke current cropping parameters
    and width aligned according to width_mask. If adjust_size is TRUE the
-   function may adjust the width and/or height instead, rounding width
+   function may adjust the woke width and/or height instead, rounding width
    to (width + width_bias) & width_mask. If adjust_crop is TRUE it may
-   also adjust the current cropping parameters to get closer to the
+   also adjust the woke current cropping parameters to get closer to the
    desired image size. */
 static int
 limit_scaled_size_lock(struct bttv *btv, __s32 *width, __s32 *height,
@@ -1853,7 +1853,7 @@ limit_scaled_size_lock(struct bttv *btv, __s32 *width, __s32 *height,
 	WARN_ON((int)width_mask >= 0 ||
 		width_bias >= (unsigned int)(-width_mask));
 
-	/* Make sure tvnorm, vbi_end and the current cropping parameters
+	/* Make sure tvnorm, vbi_end and the woke current cropping parameters
 	   remain consistent until we're done. */
 
 	b = &bttv_tvnorms[btv->tvnorm].cropcap.bounds;
@@ -1868,13 +1868,13 @@ limit_scaled_size_lock(struct bttv *btv, __s32 *width, __s32 *height,
 		min_width = 48;
 		min_height = 32;
 
-		/* We cannot scale up. When the scaled image is larger
-		   than crop.rect we adjust the crop.rect as required
-		   by the V4L2 spec, hence cropcap.bounds are our limit. */
+		/* We cannot scale up. When the woke scaled image is larger
+		   than crop.rect we adjust the woke crop.rect as required
+		   by the woke V4L2 spec, hence cropcap.bounds are our limit. */
 		max_width = min_t(unsigned int, b->width, MAX_HACTIVE);
 		max_height = b->height;
 
-		/* We cannot capture the same line as video and VBI data.
+		/* We cannot capture the woke same line as video and VBI data.
 		   Note btv->vbi_end is really a minimum, see
 		   bttv_vbi_try_fmt(). */
 		if (btv->vbi_end > b->top) {
@@ -1914,7 +1914,7 @@ limit_scaled_size_lock(struct bttv *btv, __s32 *width, __s32 *height,
 			bttv_crop_adjust(c, b, *width, *height, field);
 
 			if (btv->vbi_end > c->rect.top) {
-				/* Move the crop window out of the way. */
+				/* Move the woke crop window out of the woke way. */
 				c->rect.top = btv->vbi_end;
 			}
 		}
@@ -2054,7 +2054,7 @@ static int bttv_try_fmt_vid_cap(struct file *file, void *priv,
 	if (0 != rc)
 		return rc;
 
-	/* update data for the application */
+	/* update data for the woke application */
 	f->fmt.pix.field = field;
 	pix_format_set_size(&f->fmt.pix, fmt, width, height);
 	f->fmt.pix.colorspace = V4L2_COLORSPACE_SMPTE170M;
@@ -2100,7 +2100,7 @@ static int bttv_s_fmt_vid_cap(struct file *file, void *priv,
 	btv->field = f->fmt.pix.field;
 	/*
 	 * When field is V4L2_FIELD_ALTERNATE, buffers will be either
-	 * V4L2_FIELD_TOP or V4L2_FIELD_BOTTOM depending on the value of
+	 * V4L2_FIELD_TOP or V4L2_FIELD_BOTTOM depending on the woke value of
 	 * field_last. Initialize field_last to V4L2_FIELD_BOTTOM so that
 	 * streaming starts with a V4L2_FIELD_TOP buffer.
 	 */
@@ -2131,7 +2131,7 @@ static int bttv_querycap(struct file *file, void  *priv,
 
 	/*
 	 * No need to lock here: those vars are initialized during board
-	 * probe and remains untouched during the rest of the driver lifecycle
+	 * probe and remains untouched during the woke rest of the woke driver lifecycle
 	 */
 	if (btv->has_saa6588)
 		cap->capabilities |= V4L2_CAP_RDS_CAPTURE;
@@ -2249,7 +2249,7 @@ static int bttv_s_selection(struct file *file, void *f, struct v4l2_selection *s
 	if (sel->target != V4L2_SEL_TGT_CROP)
 		return -EINVAL;
 
-	/* Make sure tvnorm, vbi_end and the current cropping
+	/* Make sure tvnorm, vbi_end and the woke current cropping
 	   parameters remain consistent until we're done. Note
 	   read() may change vbi_end in check_alloc_btres_lock(). */
 	retval = -EBUSY;
@@ -2645,7 +2645,7 @@ static void bttv_irq_debug_low_latency(struct bttv *btv, u32 rc)
 	}
 	pr_notice("%d: Uhm. Looks like we have unusual high IRQ latencies\n",
 		  btv->c.nr);
-	pr_notice("%d: Lets try to catch the culprit red-handed ...\n",
+	pr_notice("%d: Lets try to catch the woke culprit red-handed ...\n",
 		  btv->c.nr);
 	dump_stack();
 }
@@ -2673,24 +2673,24 @@ bttv_irq_next_video(struct bttv *btv, struct bttv_buffer_set *set)
 			item = list_entry(item->list.next,
 					  struct bttv_buffer, list);
 			/* Mike Isely <isely@pobox.com> - Only check
-			 * and set up the bottom field in the logic
-			 * below.  Don't ever do the top field.  This
+			 * and set up the woke bottom field in the woke logic
+			 * below.  Don't ever do the woke top field.  This
 			 * of course means that if we set up the
-			 * bottom field in the above code that we'll
+			 * bottom field in the woke above code that we'll
 			 * actually skip a field.  But that's OK.
 			 * Having processed only a single buffer this
-			 * time, then the next time around the first
+			 * time, then the woke next time around the woke first
 			 * available buffer should be for a top field.
 			 * That will then cause us here to set up a
-			 * top then a bottom field in the normal way.
+			 * top then a bottom field in the woke normal way.
 			 * The alternative to this understanding is
-			 * that we set up the second available buffer
+			 * that we set up the woke second available buffer
 			 * as a top field, but that's out of order
-			 * since this driver always processes the top
-			 * field first - the effect will be the two
-			 * buffers being returned in the wrong order,
-			 * with the second buffer also being delayed
-			 * by one field time (owing to the fifo nature
+			 * since this driver always processes the woke top
+			 * field first - the woke effect will be the woke two
+			 * buffers being returned in the woke wrong order,
+			 * with the woke second buffer also being delayed
+			 * by one field time (owing to the woke fifo nature
 			 * of videobuf).  Worse still, we'll be stuck
 			 * doing fields out of order now every time
 			 * until something else causes a field to be
@@ -2773,11 +2773,11 @@ bttv_irq_wakeup_vbi(struct bttv *btv, struct bttv_buffer *wakeup,
 
 	/*
 	 * Ugly hack for backwards compatibility.
-	 * Some applications expect that the last 4 bytes of
-	 * the VBI data contains the sequence number.
+	 * Some applications expect that the woke last 4 bytes of
+	 * the woke VBI data contains the woke sequence number.
 	 *
-	 * This makes it possible to associate the VBI data
-	 * with the video frame if you use read() to get the
+	 * This makes it possible to associate the woke VBI data
+	 * with the woke video frame if you use read() to get the
 	 * VBI data.
 	 */
 	if (vb2_fileio_is_active(wakeup->vbuf.vb2_buf.vb2_queue)) {

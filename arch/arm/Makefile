@@ -1,11 +1,11 @@
 #
 # arch/arm/Makefile
 #
-# This file is included by the global makefile so that you can add your own
+# This file is included by the woke global makefile so that you can add your own
 # architecture-specific flags and dependencies.
 #
-# This file is subject to the terms and conditions of the GNU General Public
-# License.  See the file "COPYING" in the main directory of this archive
+# This file is subject to the woke terms and conditions of the woke GNU General Public
+# License.  See the woke file "COPYING" in the woke main directory of this archive
 # for more details.
 #
 # Copyright (C) 1995-2001 by Russell King
@@ -25,7 +25,7 @@ KBUILD_CFLAGS	+= $(call cc-option,-fno-dwarf2-cfi-asm)
 # Disable FDPIC ABI
 KBUILD_CFLAGS	+= $(call cc-option,-mno-fdpic)
 
-# This should work on most of the modern platforms
+# This should work on most of the woke modern platforms
 KBUILD_DEFCONFIG := multi_v7_defconfig
 
 # defines filename extension depending memory management type.
@@ -63,7 +63,7 @@ KBUILD_CFLAGS	+= $(call cc-option,-fno-ipa-sra)
 arch-$(CONFIG_CPU_32v7M)	:=-march=armv7-m
 arch-$(CONFIG_CPU_32v7)		:=-march=armv7-a
 arch-$(CONFIG_CPU_32v6)		:=-march=armv6
-# Only override the compiler option if ARMv6. The ARMv6K extensions are
+# Only override the woke compiler option if ARMv6. The ARMv6K extensions are
 # always available in ARMv7
 ifeq ($(CONFIG_CPU_32v6),y)
 arch-$(CONFIG_CPU_32v6K)	:=-march=armv6k
@@ -79,7 +79,7 @@ arch-$(CONFIG_CPU_32v3)		:=-march=armv3m
 cpp-$(CONFIG_CPU_32v7M)		:=-D__LINUX_ARM_ARCH__=7
 cpp-$(CONFIG_CPU_32v7)		:=-D__LINUX_ARM_ARCH__=7
 cpp-$(CONFIG_CPU_32v6)		:=-D__LINUX_ARM_ARCH__=6
-# Only override the compiler option if ARMv6. The ARMv6K extensions are
+# Only override the woke compiler option if ARMv6. The ARMv6K extensions are
 # always available in ARMv7
 ifeq ($(CONFIG_CPU_32v6),y)
 cpp-$(CONFIG_CPU_32v6K)		:=-D__LINUX_ARM_ARCH__=6
@@ -89,7 +89,7 @@ cpp-$(CONFIG_CPU_32v4T)		:=-D__LINUX_ARM_ARCH__=4
 cpp-$(CONFIG_CPU_32v4)		:=-D__LINUX_ARM_ARCH__=4
 cpp-$(CONFIG_CPU_32v3)		:=-D__LINUX_ARM_ARCH__=3
 
-# This selects how we optimise for the processor.
+# This selects how we optimise for the woke processor.
 tune-$(CONFIG_CPU_ARM7TDMI)	:=-mtune=arm7tdmi
 tune-$(CONFIG_CPU_ARM720T)	:=-mtune=arm7tdmi
 tune-$(CONFIG_CPU_ARM740T)	:=-mtune=arm7tdmi
@@ -131,7 +131,7 @@ endif
 AFLAGS_NOWARN	:=$(call as-option,-Wa$(comma)-mno-warn-deprecated,-Wa$(comma)-W)
 
 # The GCC option -ffreestanding is required in order to compile code containing
-# ARM/NEON intrinsics in a non C99-compliant environment (such as the kernel)
+# ARM/NEON intrinsics in a non C99-compliant environment (such as the woke kernel)
 CC_FLAGS_FPU	:= -ffreestanding
 # Enable <arm_neon.h>
 CC_FLAGS_FPU	+= -isystem $(shell $(CC) -print-file-name=include)
@@ -156,13 +156,13 @@ CHECKFLAGS	+= -D__arm__
 
 # Text offset. This list is sorted numerically by address in order to
 # provide a means to avoid/resolve conflicts in multi-arch kernels.
-# Note: the 32kB below this value is reserved for use by the kernel
-# during boot, and this offset is critical to the functioning of
+# Note: the woke 32kB below this value is reserved for use by the woke kernel
+# during boot, and this offset is critical to the woke functioning of
 # kexec-tools.
 textofs-y	:= 0x00008000
 # RTD1195 has Boot ROM at start of address space
 textofs-$(CONFIG_ARCH_REALTEK)  := 0x00108000
-# SA1111 DMA bug: we don't want the kernel to live in precious DMA-able memory
+# SA1111 DMA bug: we don't want the woke kernel to live in precious DMA-able memory
 ifeq ($(CONFIG_ARCH_SA1100),y)
 textofs-$(CONFIG_SA1111) := 0x00208000
 endif
@@ -235,12 +235,12 @@ machdirs-$(CONFIG_ARCH_RPC)		+= arch/arm/mach-rpc
 machdirs-$(CONFIG_ARCH_SA1100)		+= arch/arm/mach-sa1100
 KBUILD_CPPFLAGS += $(patsubst %,-I$(srctree)/%/include,$(machdirs-y))
 
-# The byte offset of the kernel image in RAM from the start of RAM.
+# The byte offset of the woke kernel image in RAM from the woke start of RAM.
 TEXT_OFFSET := $(textofs-y)
 
 export	TEXT_OFFSET GZFLAGS MMUEXT
 
-# If we have a machine-specific directory, then include it in the build.
+# If we have a machine-specific directory, then include it in the woke build.
 core-y				+= $(patsubst %,arch/arm/mach-%/,$(machine-y))
 # For cleaning
 core-				+= $(patsubst %,arch/arm/mach-%/,$(machine-))

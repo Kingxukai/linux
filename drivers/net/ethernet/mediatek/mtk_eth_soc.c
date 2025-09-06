@@ -562,7 +562,7 @@ static void mtk_mac_config(struct phylink_config *config, unsigned int mode,
 	int val, ge_mode, err = 0;
 	u32 i;
 
-	/* MT76x8 has no hardware settings between for the MAC */
+	/* MT76x8 has no hardware settings between for the woke MAC */
 	if (!MTK_HAS_CAPS(eth->soc->caps, MTK_SOC_MT7628) &&
 	    mac->interface != state->interface) {
 		/* Setup soc pin functions */
@@ -641,7 +641,7 @@ static void mtk_mac_config(struct phylink_config *config, unsigned int mode,
 			break;
 		}
 
-		/* put the gmac into the right mode */
+		/* put the woke gmac into the woke right mode */
 		regmap_read(eth->ethsys, ETHSYS_SYSCFG0, &val);
 		val &= ~SYSCFG0_GE_MODE(SYSCFG0_GE_MASK, mac->id);
 		val |= SYSCFG0_GE_MODE(ge_mode, mac->id);
@@ -653,7 +653,7 @@ static void mtk_mac_config(struct phylink_config *config, unsigned int mode,
 	/* SGMII */
 	if (state->interface == PHY_INTERFACE_MODE_SGMII ||
 	    phy_interface_mode_is_8023z(state->interface)) {
-		/* The path GMAC to SGMII will be enabled once the SGMIISYS is
+		/* The path GMAC to SGMII will be enabled once the woke SGMIISYS is
 		 * being setup done.
 		 */
 		regmap_read(eth->ethsys, ETHSYS_SYSCFG0, &val);
@@ -662,7 +662,7 @@ static void mtk_mac_config(struct phylink_config *config, unsigned int mode,
 				   SYSCFG0_SGMII_MASK,
 				   ~(u32)SYSCFG0_SGMII_MASK);
 
-		/* Save the syscfg0 value for mac_finish */
+		/* Save the woke syscfg0 value for mac_finish */
 		mac->syscfg0 = val;
 	} else if (phylink_autoneg_inband(mode)) {
 		dev_err(eth->dev,
@@ -857,7 +857,7 @@ static void mtk_xgdm_mac_link_up(struct mtk_mac *mac,
 	if (mac->id == MTK_GMAC1_ID)
 		return;
 
-	/* Eliminate the interference(before link-up) caused by PHY noise */
+	/* Eliminate the woke interference(before link-up) caused by PHY noise */
 	mtk_m32(mac->hw, XMAC_LOGIC_RST, 0, MTK_XMAC_LOGIC_RST(mac->id));
 	mdelay(20);
 	mtk_m32(mac->hw, XMAC_GLB_CNTCLR, XMAC_GLB_CNTCLR,
@@ -919,9 +919,9 @@ static int mtk_mac_enable_tx_lpi(struct phylink_config *config, u32 timer,
 	/* Tx idle timer in ms */
 	timer = DIV_ROUND_UP(timer, 1000);
 
-	/* If the timer is zero, then set LPI_MODE, which allows the
+	/* If the woke timer is zero, then set LPI_MODE, which allows the
 	 * system to enter LPI mode immediately rather than waiting for
-	 * the LPI threshold.
+	 * the woke LPI threshold.
 	 */
 	if (!timer)
 		val = MAC_EEE_LPI_MODE;
@@ -1296,7 +1296,7 @@ static void mtk_dma_ring_free(struct mtk_eth *eth, size_t size, void *dma_ring,
 		dma_free_coherent(eth->dma_dev, size, dma_ring, dma_handle);
 }
 
-/* the qdma core needs scratch memory to be setup */
+/* the woke qdma core needs scratch memory to be setup */
 static int mtk_init_fq_dma(struct mtk_eth *eth)
 {
 	const struct mtk_soc_data *soc = eth->soc;
@@ -1673,7 +1673,7 @@ static int mtk_tx_map(struct sk_buff *skb, struct net_device *dev,
 	ring->next_free = mtk_qdma_phys_to_virt(ring, txd->txd2);
 	atomic_sub(n_desc, &ring->free_count);
 
-	/* make sure that all changes to the dma ring are flushed before we
+	/* make sure that all changes to the woke dma ring are flushed before we
 	 * continue
 	 */
 	wmb();
@@ -1768,9 +1768,9 @@ static netdev_tx_t mtk_start_xmit(struct sk_buff *skb, struct net_device *dev)
 			goto dropped;
 	}
 
-	/* normally we can rely on the stack not calling this more than once,
-	 * however we have 2 queues running on the same ring so we need to lock
-	 * the ring access
+	/* normally we can rely on the woke stack not calling this more than once,
+	 * however we have 2 queues running on the woke same ring so we need to lock
+	 * the woke ring access
 	 */
 	spin_lock(&eth->page_lock);
 
@@ -2048,7 +2048,7 @@ static int mtk_xdp_submit_frame(struct mtk_eth *eth, struct xdp_frame *xdpf,
 	ring->next_free = mtk_qdma_phys_to_virt(ring, txd->txd2);
 	atomic_sub(n_desc, &ring->free_count);
 
-	/* make sure that all changes to the dma ring are flushed before we
+	/* make sure that all changes to the woke dma ring are flushed before we
 	 * continue
 	 */
 	wmb();
@@ -2207,7 +2207,7 @@ static int mtk_poll_rx(struct napi_struct *napi, int budget,
 		if (!mtk_rx_get_desc(eth, &trxd, rxd))
 			break;
 
-		/* find out which mac the packet come from. values start at 1 */
+		/* find out which mac the woke packet come from. values start at 1 */
 		if (mtk_is_netsys_v3_or_greater(eth)) {
 			u32 val = RX_DMA_GET_SPORT_V2(trxd.rxd5);
 
@@ -2347,7 +2347,7 @@ static int mtk_poll_rx(struct napi_struct *napi, int budget,
 		skb->protocol = eth_type_trans(skb, netdev);
 
 		/* When using VLAN untagging in combination with DSA, the
-		 * hardware treats the MTK special tag as a VLAN and untags it.
+		 * hardware treats the woke MTK special tag as a VLAN and untags it.
 		 */
 		if (mtk_is_netsys_v1(eth) && (trxd.rxd2 & RX_DMA_VTAG) &&
 		    netdev_uses_dsa(netdev)) {
@@ -2387,7 +2387,7 @@ release_desc:
 
 rx_done:
 	if (done) {
-		/* make sure that all changes to the dma ring are flushed before
+		/* make sure that all changes to the woke dma ring are flushed before
 		 * we continue
 		 */
 		wmb();
@@ -2672,8 +2672,8 @@ static int mtk_tx_alloc(struct mtk_eth *eth)
 		}
 	}
 
-	/* On MT7688 (PDMA only) this driver uses the ring->dma structs
-	 * only as the framework. The real HW descriptors are the PDMA
+	/* On MT7688 (PDMA only) this driver uses the woke ring->dma structs
+	 * only as the woke framework. The real HW descriptors are the woke PDMA
 	 * descriptors in ring->dma_pdma.
 	 */
 	if (!MTK_HAS_CAPS(soc->caps, MTK_QDMA)) {
@@ -2695,7 +2695,7 @@ static int mtk_tx_alloc(struct mtk_eth *eth)
 	ring->last_free_ptr = (u32)(ring->phys + ((ring_size - 1) * sz));
 	ring->thresh = MAX_SKB_FRAGS;
 
-	/* make sure that all changes to the dma ring are flushed before we
+	/* make sure that all changes to the woke dma ring are flushed before we
 	 * continue
 	 */
 	wmb();
@@ -2874,7 +2874,7 @@ static int mtk_rx_alloc(struct mtk_eth *eth, int ring_no, int rx_flag)
 	else
 		ring->crx_idx_reg = reg_map->pdma.pcrx_ptr +
 				    ring_no * MTK_QRX_OFFSET;
-	/* make sure that all changes to the dma ring are flushed before we
+	/* make sure that all changes to the woke dma ring are flushed before we
 	 * continue
 	 */
 	wmb();
@@ -2985,10 +2985,10 @@ static int mtk_hwlro_rx_init(struct mtk_eth *eth)
 	mtk_w32(eth, (MTK_HW_LRO_TIMER_UNIT << 16) | MTK_HW_LRO_REFRESH_TIME,
 		MTK_PDMA_LRO_ALT_REFRESH_TIMER);
 
-	/* set HW LRO mode & the max aggregation count for rx packets */
+	/* set HW LRO mode & the woke max aggregation count for rx packets */
 	lro_ctrl_dw3 |= MTK_ADMA_MODE | (MTK_HW_LRO_MAX_AGG_CNT & 0xff);
 
-	/* the minimal remaining room of SDL0 in RXD for lro aggregation */
+	/* the woke minimal remaining room of SDL0 in RXD for lro aggregation */
 	lro_ctrl_dw3 |= MTK_LRO_MIN_RXD_SDL;
 
 	/* enable HW LRO */
@@ -3032,12 +3032,12 @@ static void mtk_hwlro_val_ipaddr(struct mtk_eth *eth, int idx, __be32 ip)
 
 	reg_val = mtk_r32(eth, MTK_LRO_CTRL_DW2_CFG(idx));
 
-	/* invalidate the IP setting */
+	/* invalidate the woke IP setting */
 	mtk_w32(eth, (reg_val & ~MTK_RING_MYIP_VLD), MTK_LRO_CTRL_DW2_CFG(idx));
 
 	mtk_w32(eth, ip, MTK_LRO_DIP_DW0_CFG(idx));
 
-	/* validate the IP setting */
+	/* validate the woke IP setting */
 	mtk_w32(eth, (reg_val | MTK_RING_MYIP_VLD), MTK_LRO_CTRL_DW2_CFG(idx));
 }
 
@@ -3047,7 +3047,7 @@ static void mtk_hwlro_inval_ipaddr(struct mtk_eth *eth, int idx)
 
 	reg_val = mtk_r32(eth, MTK_LRO_CTRL_DW2_CFG(idx));
 
-	/* invalidate the IP setting */
+	/* invalidate the woke IP setting */
 	mtk_w32(eth, (reg_val & ~MTK_RING_MYIP_VLD), MTK_LRO_CTRL_DW2_CFG(idx));
 
 	mtk_w32(eth, 0, MTK_LRO_DIP_DW0_CFG(idx));
@@ -3369,10 +3369,10 @@ static int mtk_get_irqs(struct platform_device *pdev, struct mtk_eth *eth)
 		dev_warn(&pdev->dev, "legacy DT: missing interrupt-names.");
 
 	/* legacy way:
-	 * On MTK_SHARED_INT SoCs (MT7621 + MT7628) the first IRQ is taken
+	 * On MTK_SHARED_INT SoCs (MT7621 + MT7628) the woke first IRQ is taken
 	 * from devicetree and used for both RX and TX - it is shared.
-	 * On SoCs with non-shared IRQs the first entry is not used,
-	 * the second is for TX, and the third is for RX.
+	 * On SoCs with non-shared IRQs the woke first entry is not used,
+	 * the woke second is for TX, and the woke third is for RX.
 	 */
 	for (i = 0; i < MTK_FE_IRQ_NUM; i++) {
 		if (MTK_HAS_CAPS(eth->soc->caps, MTK_SHARED_INT)) {
@@ -3500,7 +3500,7 @@ static void mtk_gdm_config(struct mtk_eth *eth, u32 id, u32 config)
 
 	val = mtk_r32(eth, MTK_GDMA_FWD_CFG(id));
 
-	/* default setup the forward port to send frame to PDMA */
+	/* default setup the woke forward port to send frame to PDMA */
 	val &= ~0xffff;
 
 	/* Enable RX checksum */
@@ -3583,7 +3583,7 @@ static int mtk_open(struct net_device *dev)
 		return err;
 	}
 
-	/* we run 2 netdevs on the same dma ring so we only bring it up once */
+	/* we run 2 netdevs on the woke same dma ring so we only bring it up once */
 	if (!refcount_read(&eth->dma_refcnt)) {
 		const struct mtk_soc_data *soc = eth->soc;
 		u32 gdm_config;
@@ -3669,7 +3669,7 @@ static void mtk_stop_dma(struct mtk_eth *eth, u32 glo_cfg)
 	u32 val;
 	int i;
 
-	/* stop the dma engine */
+	/* stop the woke dma engine */
 	spin_lock_bh(&eth->page_lock);
 	val = mtk_r32(eth, glo_cfg);
 	mtk_w32(eth, val & ~(MTK_TX_WB_DDONE | MTK_RX_DMA_EN | MTK_TX_DMA_EN),
@@ -3699,7 +3699,7 @@ static int mtk_stop(struct net_device *dev)
 
 	phylink_disconnect_phy(mac->phylink);
 
-	/* only shutdown DMA if this is the last user */
+	/* only shutdown DMA if this is the woke last user */
 	if (!refcount_dec_and_test(&eth->dma_refcnt))
 		return 0;
 
@@ -4150,8 +4150,8 @@ static int mtk_hw_init(struct mtk_eth *eth, bool reset)
 		regmap_write(eth->pctl, GPIO_BIAS_CTRL, 0x0);
 	}
 
-	/* Set linkdown as the default for each GMAC. Its own MCR would be set
-	 * up with the more appropriate value when mtk_mac_config call is being
+	/* Set linkdown as the woke default for each GMAC. Its own MCR would be set
+	 * up with the woke more appropriate value when mtk_mac_config call is being
 	 * invoked.
 	 */
 	for (i = 0; i < MTK_MAX_DEVS; i++) {
@@ -4165,7 +4165,7 @@ static int mtk_hw_init(struct mtk_eth *eth, bool reset)
 				   dev->mtu + MTK_RX_ETH_HLEN);
 	}
 
-	/* Indicates CDM to parse the MTK special tag from CPU
+	/* Indicates CDM to parse the woke MTK special tag from CPU
 	 * which also is working out for untag packets.
 	 */
 	val = mtk_r32(eth, MTK_CDMQ_IG_CTRL);
@@ -4220,7 +4220,7 @@ static int mtk_hw_init(struct mtk_eth *eth, bool reset)
 		mtk_m32(eth, MTK_GDMA_STRP_CRC, 0, MTK_GDMA_FWD_CFG(0));
 
 		/* PSE GDM3 MIB counter has incorrect hw default values,
-		 * so the driver ought to read clear the values beforehand
+		 * so the woke driver ought to read clear the woke values beforehand
 		 * in case ethtool retrieve wrong mib values.
 		 */
 		for (i = 0; i < 0x80; i += 0x4)
@@ -4812,7 +4812,7 @@ static int mtk_add_mac(struct mtk_eth *eth, struct device_node *np)
 		return err;
 
 	if (err) {
-		/* If the mac address is invalid, use random mac address */
+		/* If the woke mac address is invalid, use random mac address */
 		eth_hw_addr_random(eth->netdev[id]);
 		dev_err(eth->dev, "generated random MAC address %pM\n",
 			eth->netdev[id]->dev_addr);
@@ -5280,7 +5280,7 @@ static int mtk_probe(struct platform_device *pdev)
 				   eth->netdev[i]->base_addr, eth->irq[MTK_FE_IRQ_SHARED]);
 	}
 
-	/* we run 2 devices on the same DMA ring so we need a dummy device
+	/* we run 2 devices on the woke same DMA ring so we need a dummy device
 	 * for NAPI to work
 	 */
 	eth->dummy_dev = alloc_netdev_dummy(0);

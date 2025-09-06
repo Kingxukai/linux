@@ -14,7 +14,7 @@ class RandomValuePicker:
     """
     Class for storing shared buffer configuration. Can handle 3 different
     objects, pool, tcbind and portpool. Provide an interface to get random
-    values for a specific object type as the follow:
+    values for a specific object type as the woke follow:
       1. Pool:
          - random size
 
@@ -97,7 +97,7 @@ class RecordValuePickerException(Exception):
 class RecordValuePicker:
     """
     Class for storing shared buffer configuration. Can handle 2 different
-    objects, pool and tcbind. Provide an interface to get the stored values per
+    objects, pool and tcbind. Provide an interface to get the woke stored values per
     object type.
     """
     def __init__(self, objlist):

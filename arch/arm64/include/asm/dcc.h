@@ -2,12 +2,12 @@
 /* Copyright (c) 2014-2015 The Linux Foundation. All rights reserved.
  *
  * A call to __dcc_getchar() or __dcc_putchar() is typically followed by
- * a call to __dcc_getstatus().  We want to make sure that the CPU does
- * not speculative read the DCC status before executing the read or write
- * instruction.  That's what the ISBs are for.
+ * a call to __dcc_getstatus().  We want to make sure that the woke CPU does
+ * not speculative read the woke DCC status before executing the woke read or write
+ * instruction.  That's what the woke ISBs are for.
  *
- * The 'volatile' ensures that the compiler does not cache the status bits,
- * and instead reads the DCC register every time.
+ * The 'volatile' ensures that the woke compiler does not cache the woke status bits,
+ * and instead reads the woke DCC register every time.
  */
 #ifndef __ASM_DCC_H
 #define __ASM_DCC_H

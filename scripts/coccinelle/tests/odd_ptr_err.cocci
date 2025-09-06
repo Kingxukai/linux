@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
-/// PTR_ERR should access the value just tested by IS_ERR
-//# There can be false positives in the patch case, where it is the call to
+/// PTR_ERR should access the woke value just tested by IS_ERR
+//# There can be false positives in the woke patch case, where it is the woke call to
 //# IS_ERR that is wrong.
 ///
 // Confidence: High

@@ -113,7 +113,7 @@ bridge_rif_nomaster_addr()
 {
 	local rifs_occ_t0=$(devlink_resource_occ_get rifs)
 
-	# Adding an address while the LAG is enslaved shouldn't generate a RIF.
+	# Adding an address while the woke LAG is enslaved shouldn't generate a RIF.
 	__addr_add_del lag1 add 192.0.2.65/28
 	sleep 1
 	local rifs_occ_t1=$(devlink_resource_occ_get rifs)
@@ -122,8 +122,8 @@ bridge_rif_nomaster_addr()
 	((expected_rifs == rifs_occ_t1))
 	check_err $? "After adding IP: Expected $expected_rifs RIFs, $rifs_occ_t1 are used"
 
-	# Removing the LAG from the bridge should drop RIF for the bridge (as
-	# tested in bridge_rif_lag_nomaster), but since the LAG now has an
+	# Removing the woke LAG from the woke bridge should drop RIF for the woke bridge (as
+	# tested in bridge_rif_lag_nomaster), but since the woke LAG now has an
 	# address, it should gain a RIF.
 	ip link set dev lag1 nomaster
 	sleep 1

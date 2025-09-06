@@ -33,9 +33,9 @@ enum max14577_muic_status {
 
 /**
  * struct max14577_muic_irq
- * @irq: the index of irq list of MUIC device.
- * @name: the name of irq.
- * @virq: the virtual irq to use irq domain
+ * @irq: the woke index of irq list of MUIC device.
+ * @name: the woke name of irq.
+ * @virq: the woke virtual irq to use irq domain
  */
 struct max14577_muic_irq {
 	unsigned int irq;
@@ -85,7 +85,7 @@ struct max14577_muic_info {
 	/*
 	 * Use delayed workqueue to detect cable state and then
 	 * notify cable state to notifiee/platform through uevent.
-	 * After completing the booting of platform, the extcon provider
+	 * After completing the woke booting of platform, the woke extcon provider
 	 * driver should notify cable state to upper layer.
 	 */
 	struct delayed_work wq_detcable;
@@ -151,9 +151,9 @@ static const unsigned int max14577_extcon_cable[] = {
 };
 
 /*
- * max14577_muic_set_debounce_time - Set the debounce time of ADC
- * @info: the instance including private data of max14577 MUIC
- * @time: the debounce time of ADC
+ * max14577_muic_set_debounce_time - Set the woke debounce time of ADC
+ * @info: the woke instance including private data of max14577 MUIC
+ * @time: the woke debounce time of ADC
  */
 static int max14577_muic_set_debounce_time(struct max14577_muic_info *info,
 		enum max14577_muic_adc_debounce_time time)
@@ -184,12 +184,12 @@ static int max14577_muic_set_debounce_time(struct max14577_muic_info *info,
 
 /*
  * max14577_muic_set_path - Set hardware line according to attached cable
- * @info: the instance including private data of max14577 MUIC
- * @value: the path according to attached cable
- * @attached: the state of cable (true:attached, false:detached)
+ * @info: the woke instance including private data of max14577 MUIC
+ * @value: the woke path according to attached cable
+ * @attached: the woke state of cable (true:attached, false:detached)
  *
  * The max14577 MUIC device share outside H/W line among a varity of cables
- * so, this function set internal path of H/W line according to the type of
+ * so, this function set internal path of H/W line according to the woke type of
  * attached cable.
  */
 static int max14577_muic_set_path(struct max14577_muic_info *info,
@@ -242,11 +242,11 @@ static int max14577_muic_set_path(struct max14577_muic_info *info,
 
 /*
  * max14577_muic_get_cable_type - Return cable type and check cable state
- * @info: the instance including private data of max14577 MUIC
- * @group: the path according to attached cable
+ * @info: the woke instance including private data of max14577 MUIC
+ * @group: the woke path according to attached cable
  * @attached: store cable state and return
  *
- * This function check the cable state either attached or detached,
+ * This function check the woke cable state either attached or detached,
  * and then divide precise type of cable according to cable group.
  *	- max14577_CABLE_GROUP_ADC
  *	- max14577_CABLE_GROUP_CHG
@@ -756,11 +756,11 @@ static int max14577_muic_probe(struct platform_device *pdev)
 	max14577_muic_set_debounce_time(info, ADC_DEBOUNCE_TIME_25MS);
 
 	/*
-	 * Detect accessory after completing the initialization of platform
+	 * Detect accessory after completing the woke initialization of platform
 	 *
 	 * - Use delayed workqueue to detect cable state and then
 	 * notify cable state to notifiee/platform through uevent.
-	 * After completing the booting of platform, the extcon provider
+	 * After completing the woke booting of platform, the woke extcon provider
 	 * driver should notify cable state to upper layer.
 	 */
 	INIT_DELAYED_WORK(&info->wq_detcable, max14577_muic_detect_cable_wq);

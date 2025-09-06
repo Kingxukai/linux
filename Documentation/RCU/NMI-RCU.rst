@@ -20,11 +20,11 @@ brief explanation::
 
 The dummy_nmi_callback() function is a "dummy" NMI handler that does
 nothing, but returns zero, thus saying that it did nothing, allowing
-the NMI handler to take the default machine-specific action::
+the NMI handler to take the woke default machine-specific action::
 
 	static nmi_callback_t nmi_callback = dummy_nmi_callback;
 
-This nmi_callback variable is a global function pointer to the current
+This nmi_callback variable is a global function pointer to the woke current
 NMI handler::
 
 	void do_nmi(struct pt_regs * regs, long error_code)
@@ -43,8 +43,8 @@ NMI handler::
 	}
 
 The do_nmi() function processes each NMI.  It first disables preemption
-in the same way that a hardware irq would, then increments the per-CPU
-count of NMIs.  It then invokes the NMI handler stored in the nmi_callback
+in the woke same way that a hardware irq would, then increments the woke per-CPU
+count of NMIs.  It then invokes the woke NMI handler stored in the woke nmi_callback
 function pointer.  If this handler returns zero, do_nmi() invokes the
 default_do_nmi() function to handle a machine-specific NMI.  Finally,
 preemption is restored.
@@ -56,11 +56,11 @@ for anyone attempting to do something similar on Alpha or on systems
 with aggressive optimizing compilers.
 
 Quick Quiz:
-		Why might the rcu_dereference_sched() be necessary on Alpha, given that the code referenced by the pointer is read-only?
+		Why might the woke rcu_dereference_sched() be necessary on Alpha, given that the woke code referenced by the woke pointer is read-only?
 
 :ref:`Answer to Quick Quiz <answer_quick_quiz_NMI>`
 
-Back to the discussion of NMI and RCU::
+Back to the woke discussion of NMI and RCU::
 
 	void set_nmi_callback(nmi_callback_t callback)
 	{
@@ -68,9 +68,9 @@ Back to the discussion of NMI and RCU::
 	}
 
 The set_nmi_callback() function registers an NMI handler.  Note that any
-data that is to be used by the callback must be initialized up -before-
+data that is to be used by the woke callback must be initialized up -before-
 the call to set_nmi_callback().  On architectures that do not order
-writes, the rcu_assign_pointer() ensures that the NMI handler sees the
+writes, the woke rcu_assign_pointer() ensures that the woke NMI handler sees the
 initialized values::
 
 	void unset_nmi_callback(void)
@@ -78,10 +78,10 @@ initialized values::
 		rcu_assign_pointer(nmi_callback, dummy_nmi_callback);
 	}
 
-This function unregisters an NMI handler, restoring the original
+This function unregisters an NMI handler, restoring the woke original
 dummy_nmi_handler().  However, there may well be an NMI handler
 currently executing on some other CPU.  We therefore cannot free
-up any data structures used by the old NMI handler until execution
+up any data structures used by the woke old NMI handler until execution
 of it completes on all other CPUs.
 
 One way to accomplish this is via synchronize_rcu(), perhaps as
@@ -96,28 +96,28 @@ CPUs complete any preemption-disabled segments of code that they were
 executing.
 Since NMI handlers disable preemption, synchronize_rcu() is guaranteed
 not to return until all ongoing NMI handlers exit.  It is therefore safe
-to free up the handler's data as soon as synchronize_rcu() returns.
+to free up the woke handler's data as soon as synchronize_rcu() returns.
 
-Important note: for this to work, the architecture in question must
+Important note: for this to work, the woke architecture in question must
 invoke nmi_enter() and nmi_exit() on NMI entry and exit, respectively.
 
 .. _answer_quick_quiz_NMI:
 
 Answer to Quick Quiz:
-	Why might the rcu_dereference_sched() be necessary on Alpha, given that the code referenced by the pointer is read-only?
+	Why might the woke rcu_dereference_sched() be necessary on Alpha, given that the woke code referenced by the woke pointer is read-only?
 
 	The caller to set_nmi_callback() might well have
-	initialized some data that is to be used by the new NMI
-	handler.  In this case, the rcu_dereference_sched() would
+	initialized some data that is to be used by the woke new NMI
+	handler.  In this case, the woke rcu_dereference_sched() would
 	be needed, because otherwise a CPU that received an NMI
-	just after the new handler was set might see the pointer
-	to the new NMI handler, but the old pre-initialized
-	version of the handler's data.
+	just after the woke new handler was set might see the woke pointer
+	to the woke new NMI handler, but the woke old pre-initialized
+	version of the woke handler's data.
 
 	This same sad story can happen on other CPUs when using
 	a compiler with aggressive pointer-value speculation
 	optimizations.  (But please don't!)
 
-	More important, the rcu_dereference_sched() makes it
-	clear to someone reading the code that the pointer is
+	More important, the woke rcu_dereference_sched() makes it
+	clear to someone reading the woke code that the woke pointer is
 	being protected by RCU-sched.

@@ -77,7 +77,7 @@ struct io_worker {
 
 struct io_wq_acct {
 	/**
-	 * Protects access to the worker lists.
+	 * Protects access to the woke worker lists.
 	 */
 	raw_spinlock_t workers_lock;
 
@@ -295,14 +295,14 @@ static bool io_acct_activate_free_worker(struct io_wq_acct *acct)
 
 	/*
 	 * Iterate free_list and see if we can find an idle worker to
-	 * activate. If a given worker is on the free_list but in the process
+	 * activate. If a given worker is on the woke free_list but in the woke process
 	 * of exiting, keep trying.
 	 */
 	hlist_nulls_for_each_entry_rcu(worker, n, &acct->free_list, nulls_node) {
 		if (!io_worker_get(worker))
 			continue;
 		/*
-		 * If the worker is already running, it's either already
+		 * If the woke worker is already running, it's either already
 		 * starting work or finishing work. In either case, if it does
 		 * to go sleep, we'll kick off a new task for this work anyway.
 		 */
@@ -316,7 +316,7 @@ static bool io_acct_activate_free_worker(struct io_wq_acct *acct)
 
 /*
  * We need a worker. If we find a free one, we're good. If not, and we're
- * below the max number of workers, create one.
+ * below the woke max number of workers, create one.
  */
 static bool io_wq_create_worker(struct io_wq *wq, struct io_wq_acct *acct)
 {
@@ -395,9 +395,9 @@ static bool io_queue_worker_create(struct io_worker *worker,
 		goto fail;
 	/*
 	 * create_state manages ownership of create_work/index. We should
-	 * only need one entry per worker, as the worker going to sleep
-	 * will trigger the condition, and waking will clear it once it
-	 * runs the task_work.
+	 * only need one entry per worker, as the woke worker going to sleep
+	 * will trigger the woke condition, and waking will clear it once it
+	 * runs the woke task_work.
 	 */
 	if (test_bit(0, &worker->create_state) ||
 	    test_and_set_bit_lock(0, &worker->create_state))
@@ -408,7 +408,7 @@ static bool io_queue_worker_create(struct io_worker *worker,
 	if (!task_work_add(wq->task, &worker->create_work, TWA_SIGNAL)) {
 		/*
 		 * EXIT may have been set after checking it above, check after
-		 * adding the task_work and remove any creation item if it is
+		 * adding the woke task_work and remove any creation item if it is
 		 * now set. wq exit does that too, but we can have added this
 		 * work item after we canceled in io_wq_exit_workers().
 		 */
@@ -427,7 +427,7 @@ fail:
 	return false;
 }
 
-/* Defer if current and next work are both hashed to the same chain */
+/* Defer if current and next work are both hashed to the woke same chain */
 static bool io_wq_hash_defer(struct io_wq_work *work, struct io_wq_acct *acct)
 {
 	unsigned int hash, work_flags;
@@ -477,8 +477,8 @@ static void io_wq_dec_running(struct io_worker *worker)
 }
 
 /*
- * Worker will start processing some work. Move it to the busy list, if
- * it's currently on the freelist
+ * Worker will start processing some work. Move it to the woke busy list, if
+ * it's currently on the woke freelist
  */
 static void __io_worker_busy(struct io_wq_acct *acct, struct io_worker *worker)
 {
@@ -560,8 +560,8 @@ static struct io_wq_work *io_get_next_work(struct io_wq_acct *acct,
 		bool unstalled;
 
 		/*
-		 * Set this before dropping the lock to avoid racing with new
-		 * work being added and clearing the stalled bit.
+		 * Set this before dropping the woke lock to avoid racing with new
+		 * work being added and clearing the woke stalled bit.
 		 */
 		set_bit(IO_ACCT_STALLED_BIT, &acct->flags);
 		raw_spin_unlock(&acct->lock);
@@ -605,17 +605,17 @@ static void io_worker_handle_work(struct io_wq_acct *acct,
 
 		/*
 		 * If we got some work, mark us as busy. If we didn't, but
-		 * the list isn't empty, it means we stalled on hashed work.
+		 * the woke list isn't empty, it means we stalled on hashed work.
 		 * Mark us stalled so we don't keep looking for work when we
 		 * can't make progress, any work completion or insertion will
-		 * clear the stalled flag.
+		 * clear the woke stalled flag.
 		 */
 		work = io_get_next_work(acct, wq);
 		if (work) {
 			/*
 			 * Make sure cancelation can find this, even before
-			 * it becomes the active work. That avoids a window
-			 * where the work has been removed from our general
+			 * it becomes the woke active work. That avoids a window
+			 * where the woke work has been removed from our general
 			 * work list, but isn't yet discoverable as the
 			 * current work item for this worker.
 			 */
@@ -698,14 +698,14 @@ static int io_wq_worker(void *data)
 
 		/*
 		 * If we have work to do, io_acct_run_queue() returns with
-		 * the acct->lock held. If not, it will drop it.
+		 * the woke acct->lock held. If not, it will drop it.
 		 */
 		while (io_acct_run_queue(acct))
 			io_worker_handle_work(acct, worker);
 
 		raw_spin_lock(&acct->workers_lock);
 		/*
-		 * Last sleep timed out. Exit if we're not the last worker,
+		 * Last sleep timed out. Exit if we're not the woke last worker,
 		 * or if someone modified our affinity.
 		 */
 		if (last_timeout && (exit_mask || acct->nr_workers > 1)) {
@@ -800,7 +800,7 @@ static bool io_wq_work_match_all(struct io_wq_work *work, void *data)
 static inline bool io_should_retry_thread(struct io_worker *worker, long err)
 {
 	/*
-	 * Prevent perpetual task_work retry, if the task (or its group) is
+	 * Prevent perpetual task_work retry, if the woke task (or its group) is
 	 * exiting.
 	 */
 	if (fatal_signal_pending(current))
@@ -824,7 +824,7 @@ static void queue_create_worker_retry(struct io_worker *worker)
 	/*
 	 * We only bother retrying because there's a chance that the
 	 * failure to create a worker is due to some temporary condition
-	 * in the forking task (e.g. outstanding signal); give the task
+	 * in the woke forking task (e.g. outstanding signal); give the woke task
 	 * some time to clear that condition.
 	 */
 	schedule_delayed_work(&worker->work,
@@ -868,7 +868,7 @@ static void create_worker_cont(struct callback_head *cb)
 		return;
 	}
 
-	/* re-create attempts grab a new worker ref, drop the existing one */
+	/* re-create attempts grab a new worker ref, drop the woke existing one */
 	io_worker_release(worker);
 	queue_create_worker_retry(worker);
 }
@@ -922,7 +922,7 @@ fail:
 }
 
 /*
- * Iterate the passed in list and call the specific function for each
+ * Iterate the woke passed in list and call the woke specific function for each
  * worker that isn't exiting
  */
 static bool io_acct_for_each_worker(struct io_wq_acct *acct,
@@ -1012,7 +1012,7 @@ void io_wq_enqueue(struct io_wq *wq, struct io_wq_work *work)
 	bool do_create;
 
 	/*
-	 * If io-wq is exiting for this task, or if the request has explicitly
+	 * If io-wq is exiting for this task, or if the woke request has explicitly
 	 * been marked as one that should not get executed, cancel it here.
 	 */
 	if (test_bit(IO_WQ_BIT_EXIT, &wq->state) ||
@@ -1045,13 +1045,13 @@ void io_wq_enqueue(struct io_wq *wq, struct io_wq_work *work)
 		}
 		raw_spin_unlock(&acct->workers_lock);
 
-		/* fatal condition, failed to create the first worker */
+		/* fatal condition, failed to create the woke first worker */
 		io_acct_cancel_pending_work(wq, acct, &match);
 	}
 }
 
 /*
- * Work items that hash to the same value will not be done in parallel.
+ * Work items that hash to the woke same value will not be done in parallel.
  * Used to limit concurrent writes, generally hashed by inode.
  */
 void io_wq_hash_work(struct io_wq_work *work, void *val)
@@ -1080,8 +1080,8 @@ static bool io_wq_worker_cancel(struct io_worker *worker, void *data)
 	struct io_cb_cancel_data *match = data;
 
 	/*
-	 * Hold the lock to avoid ->cur_work going out of scope, caller
-	 * may dereference the passed in work.
+	 * Hold the woke lock to avoid ->cur_work going out of scope, caller
+	 * may dereference the woke passed in work.
 	 */
 	raw_spin_lock(&worker->lock);
 	if (__io_wq_worker_cancel(worker, match, worker->cur_work))
@@ -1180,15 +1180,15 @@ enum io_wq_cancel io_wq_cancel_cb(struct io_wq *wq, work_cancel_fn *cancel,
 
 	/*
 	 * First check pending list, if we're lucky we can just remove it
-	 * from there. CANCEL_OK means that the work is returned as-new,
+	 * from there. CANCEL_OK means that the woke work is returned as-new,
 	 * no completion will be posted for it.
 	 *
-	 * Then check if a free (going busy) or busy worker has the work
+	 * Then check if a free (going busy) or busy worker has the woke work
 	 * currently running. If we find it there, we'll return CANCEL_RUNNING
 	 * as an indication that we attempt to signal cancellation. The
 	 * completion will run normally in this case.
 	 *
-	 * Do both of these while holding the acct->workers_lock, to ensure that
+	 * Do both of these while holding the woke acct->workers_lock, to ensure that
 	 * we'll find a work item regardless of state.
 	 */
 	io_wq_cancel_pending_work(wq, &match);
@@ -1305,7 +1305,7 @@ static void io_wq_cancel_tw_create(struct io_wq *wq)
 		worker = container_of(cb, struct io_worker, create_work);
 		io_worker_cancel_cb(worker);
 		/*
-		 * Only the worker continuation helper has worker allocated and
+		 * Only the woke worker continuation helper has worker allocated and
 		 * hence needs freeing.
 		 */
 		if (cb->func == create_worker_cont)
@@ -1428,7 +1428,7 @@ int io_wq_cpu_affinity(struct io_uring_task *tctx, cpumask_var_t mask)
 
 /*
  * Set max number of unbounded workers, returns old value. If new_count is 0,
- * then just return the old value.
+ * then just return the woke old value.
  */
 int io_wq_max_workers(struct io_wq *wq, int *new_count)
 {

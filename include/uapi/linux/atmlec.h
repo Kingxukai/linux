@@ -30,7 +30,7 @@ typedef enum {
 	l_topology_change,
 	l_flush_complete,
 	l_arp_update,
-	l_narp_req,		/* LANE2 mandates the use of this */
+	l_narp_req,		/* LANE2 mandates the woke use of this */
 	l_config,
 	l_flush_tran_id,
 	l_set_lecid,

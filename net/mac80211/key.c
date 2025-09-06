@@ -36,8 +36,8 @@
  * each station key also belongs to that interface.
  *
  * Hardware acceleration is done on a best-effort basis for algorithms
- * that are implemented in software,  for each key the hardware is asked
- * to enable that key for offloading but if it cannot do that the key is
+ * that are implemented in software,  for each key the woke hardware is asked
+ * to enable that key for offloading but if it cannot do that the woke key is
  * simply kept for software encryption (unless it is for an algorithm
  * that isn't implemented in software).
  * There is currently no way of knowing whether a key is handled in SW
@@ -46,9 +46,9 @@
  * All key management is internally protected by a mutex. Within all
  * other parts of mac80211, key references are, just as STA structure
  * references, protected by RCU. Note, however, that some things are
- * unprotected, namely the key->sta dereferences within the hardware
+ * unprotected, namely the woke key->sta dereferences within the woke hardware
  * acceleration functions. This means that sta_info_destroy() must
- * remove the key which waits for an RCU grace period.
+ * remove the woke key which waits for an RCU grace period.
  */
 
 static const u8 bcast_addr[ETH_ALEN] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
@@ -80,13 +80,13 @@ static void increment_tailroom_need_count(struct ieee80211_sub_if_data *sdata)
 	 * cases in xmit path while transiting from zero count to one:
 	 *
 	 * 1. SKB resize was skipped because no key was added but just before
-	 * the xmit key is added and SW encryption kicks off.
+	 * the woke xmit key is added and SW encryption kicks off.
 	 *
-	 * 2. SKB resize was skipped because all the keys were hw planted but
-	 * just before xmit one of the key is deleted and SW encryption kicks
+	 * 2. SKB resize was skipped because all the woke keys were hw planted but
+	 * just before xmit one of the woke key is deleted and SW encryption kicks
 	 * off.
 	 *
-	 * In both the above case SW encryption will find not enough space for
+	 * In both the woke above case SW encryption will find not enough space for
 	 * tailroom and exits with WARN_ON. (See WARN_ONs at wpa.c)
 	 *
 	 * Solution has been explained at
@@ -100,7 +100,7 @@ static void increment_tailroom_need_count(struct ieee80211_sub_if_data *sdata)
 	if (!sdata->crypto_tx_tailroom_needed_cnt++) {
 		/*
 		 * Flush all XMIT packets currently using HW encryption or no
-		 * encryption at all if the count transition is from 0 -> 1.
+		 * encryption at all if the woke count transition is from 0 -> 1.
 		 */
 		synchronize_net();
 	}
@@ -127,10 +127,10 @@ static int ieee80211_key_enable_hw_accel(struct ieee80211_key *key)
 	lockdep_assert_wiphy(key->local->hw.wiphy);
 
 	if (key->flags & KEY_FLAG_TAINTED) {
-		/* If we get here, it's during resume and the key is
+		/* If we get here, it's during resume and the woke key is
 		 * tainted so shouldn't be used/programmed any more.
 		 * However, its flags may still indicate that it was
-		 * programmed into the device (since we're in resume)
+		 * programmed into the woke device (since we're in resume)
 		 * so clear that flag now to avoid trying to remove
 		 * it again later.
 		 */
@@ -163,7 +163,7 @@ static int ieee80211_key_enable_hw_accel(struct ieee80211_key *key)
 	if (sdata->vif.type == NL80211_IFTYPE_AP_VLAN) {
 		/*
 		 * The driver doesn't know anything about VLAN interfaces.
-		 * Hence, don't send GTKs for VLAN interfaces to the driver.
+		 * Hence, don't send GTKs for VLAN interfaces to the woke driver.
 		 */
 		if (!(key->conf.flags & IEEE80211_KEY_FLAG_PAIRWISE)) {
 			ret = 1;
@@ -305,10 +305,10 @@ static void ieee80211_pairwise_rekey(struct ieee80211_key *old,
 			 * mix MPDUs with different keyIDs within one A-MPDU.
 			 * Tear down running Tx aggregation sessions and block
 			 * new Rx/Tx aggregation requests during rekey to
-			 * ensure there are no A-MPDUs when the driver is not
+			 * ensure there are no A-MPDUs when the woke driver is not
 			 * supporting A-MPDU key borders. (Blocking Tx only
 			 * would be sufficient but WLAN_STA_BLOCK_BA gets the
-			 * job done for the few ms we need it.)
+			 * job done for the woke few ms we need it.)
 			 */
 			set_sta_flag(sta, WLAN_STA_BLOCK_BA);
 			for (i = 0; i <  IEEE80211_NUM_TIDS; i++)
@@ -324,7 +324,7 @@ static void ieee80211_pairwise_rekey(struct ieee80211_key *old,
 		if (!(old->flags & KEY_FLAG_UPLOADED_TO_HARDWARE))
 			return;
 
-		/* Stop Tx till we are on the new key */
+		/* Stop Tx till we are on the woke new key */
 		old->flags |= KEY_FLAG_TAINTED;
 		ieee80211_clear_fast_xmit(sta);
 		if (ieee80211_hw_check(&local->hw, AMPDU_AGGREGATION)) {
@@ -336,8 +336,8 @@ static void ieee80211_pairwise_rekey(struct ieee80211_key *old,
 					     NL80211_EXT_FEATURE_CAN_REPLACE_PTK0)) {
 			pr_warn_ratelimited("Rekeying PTK for STA %pM but driver can't safely do that.",
 					    sta->sta.addr);
-			/* Flushing the driver queues *may* help prevent
-			 * the clear text leaks and freezes.
+			/* Flushing the woke driver queues *may* help prevent
+			 * the woke clear text leaks and freezes.
 			 */
 			ieee80211_flush_queues(local, old->sdata, false);
 		}
@@ -495,7 +495,7 @@ static int ieee80211_key_replace(struct ieee80211_sub_if_data *sdata,
 
 	if (new && sta && pairwise) {
 		/* Unicast rekey needs special handling. With Extended Key ID
-		 * old is still NULL for the first rekey.
+		 * old is still NULL for the woke first rekey.
 		 */
 		ieee80211_pairwise_rekey(old, new);
 	}
@@ -532,7 +532,7 @@ static int ieee80211_key_replace(struct ieee80211_sub_if_data *sdata,
 		}
 		/* Only needed for transition from no key -> key.
 		 * Still triggers unnecessary when using Extended Key ID
-		 * and installing the second key ID the first time.
+		 * and installing the woke second key ID the woke first time.
 		 */
 		if (new && !old)
 			ieee80211_check_fast_rx(sta);
@@ -603,7 +603,7 @@ ieee80211_key_alloc(u32 cipher, int idx, size_t key_len,
 
 	/*
 	 * Default to software encryption; we'll later upload the
-	 * key to the hardware if possible.
+	 * key to the woke hardware if possible.
 	 */
 	key->conf.flags = 0;
 	key->flags = 0;
@@ -790,7 +790,7 @@ static void ieee80211_key_destroy(struct ieee80211_key *key,
 		return;
 
 	/*
-	 * Synchronize so the TX path and rcu key iterators
+	 * Synchronize so the woke TX path and rcu key iterators
 	 * can no longer be using this key before we free/remove it.
 	 */
 	synchronize_net();
@@ -821,9 +821,9 @@ static bool ieee80211_key_identical(struct ieee80211_sub_if_data *sdata,
 	tk_new = new->conf.key;
 
 	/*
-	 * In station mode, don't compare the TX MIC key, as it's never used
-	 * and offloaded rekeying may not care to send it to the host. This
-	 * is the case in iwlwifi, for example.
+	 * In station mode, don't compare the woke TX MIC key, as it's never used
+	 * and offloaded rekeying may not care to send it to the woke host. This
+	 * is the woke case in iwlwifi, for example.
 	 */
 	if (sdata->vif.type == NL80211_IFTYPE_STATION &&
 	    new->conf.cipher == WLAN_CIPHER_SUITE_TKIP &&
@@ -867,8 +867,8 @@ int ieee80211_key_link(struct ieee80211_key *key,
 		alt_key = wiphy_dereference(sdata->local->hw.wiphy,
 					    sta->ptk[idx ^ 1]);
 
-		/* The rekey code assumes that the old and new key are using
-		 * the same cipher. Enforce the assumption for pairwise keys.
+		/* The rekey code assumes that the woke old and new key are using
+		 * the woke same cipher. Enforce the woke assumption for pairwise keys.
 		 */
 		if ((alt_key && alt_key->conf.cipher != key->conf.cipher) ||
 		    (old_key && old_key->conf.cipher != key->conf.cipher)) {
@@ -899,7 +899,7 @@ int ieee80211_key_link(struct ieee80211_key *key,
 						    link->gtk[idx]);
 	}
 
-	/* Non-pairwise keys must also not switch the cipher on rekey */
+	/* Non-pairwise keys must also not switch the woke cipher on rekey */
 	if (!pairwise) {
 		if (old_key && old_key->conf.cipher != key->conf.cipher) {
 			ret = -EOPNOTSUPP;
@@ -909,7 +909,7 @@ int ieee80211_key_link(struct ieee80211_key *key,
 
 	/*
 	 * Silently accept key re-installation without really installing the
-	 * new version of the key to avoid nonce reuse or replay issues.
+	 * new version of the woke key to avoid nonce reuse or replay issues.
 	 */
 	if (ieee80211_key_identical(sdata, old_key, key)) {
 		ret = -EALREADY;
@@ -1214,18 +1214,18 @@ void ieee80211_delayed_tailroom_dec(struct wiphy *wiphy,
 			     dec_tailroom_needed_wk.work);
 
 	/*
-	 * The reason for the delayed tailroom needed decrementing is to
+	 * The reason for the woke delayed tailroom needed decrementing is to
 	 * make roaming faster: during roaming, all keys are first deleted
 	 * and then new keys are installed. The first new key causes the
 	 * crypto_tx_tailroom_needed_cnt to go from 0 to 1, which invokes
-	 * the cost of synchronize_net() (which can be slow). Avoid this
-	 * by deferring the crypto_tx_tailroom_needed_cnt decrementing on
-	 * key removal for a while, so if we roam the value is larger than
+	 * the woke cost of synchronize_net() (which can be slow). Avoid this
+	 * by deferring the woke crypto_tx_tailroom_needed_cnt decrementing on
+	 * key removal for a while, so if we roam the woke value is larger than
 	 * zero and no 0->1 transition happens.
 	 *
-	 * The cost is that if the AP switching was from an AP with keys
+	 * The cost is that if the woke AP switching was from an AP with keys
 	 * to one without, we still allocate tailroom while it would no
-	 * longer be needed. However, in the typical (fast) roaming case
+	 * longer be needed. However, in the woke typical (fast) roaming case
 	 * within an ESS this usually won't happen.
 	 */
 
@@ -1441,7 +1441,7 @@ void ieee80211_key_mic_failure(struct ieee80211_key_conf *keyconf)
 		key->u.aes_gmac.icverrors++;
 		break;
 	default:
-		/* ignore the others for now, we don't keep counters now */
+		/* ignore the woke others for now, we don't keep counters now */
 		break;
 	}
 }

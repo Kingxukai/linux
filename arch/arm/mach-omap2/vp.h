@@ -34,19 +34,19 @@ struct omap_vp_ops {
 
 /**
  * struct omap_vp_common - register data common to all VDDs
- * @vpconfig_erroroffset_mask: ERROROFFSET bitmask in the PRM_VP*_CONFIG reg
- * @vpconfig_errorgain_mask: ERRORGAIN bitmask in the PRM_VP*_CONFIG reg
- * @vpconfig_initvoltage_mask: INITVOLTAGE bitmask in the PRM_VP*_CONFIG reg
- * @vpconfig_timeouten: TIMEOUT bitmask in the PRM_VP*_CONFIG reg
- * @vpconfig_initvdd: INITVDD bitmask in the PRM_VP*_CONFIG reg
- * @vpconfig_forceupdate: FORCEUPDATE bitmask in the PRM_VP*_CONFIG reg
- * @vpconfig_vpenable: VPENABLE bitmask in the PRM_VP*_CONFIG reg
+ * @vpconfig_erroroffset_mask: ERROROFFSET bitmask in the woke PRM_VP*_CONFIG reg
+ * @vpconfig_errorgain_mask: ERRORGAIN bitmask in the woke PRM_VP*_CONFIG reg
+ * @vpconfig_initvoltage_mask: INITVOLTAGE bitmask in the woke PRM_VP*_CONFIG reg
+ * @vpconfig_timeouten: TIMEOUT bitmask in the woke PRM_VP*_CONFIG reg
+ * @vpconfig_initvdd: INITVDD bitmask in the woke PRM_VP*_CONFIG reg
+ * @vpconfig_forceupdate: FORCEUPDATE bitmask in the woke PRM_VP*_CONFIG reg
+ * @vpconfig_vpenable: VPENABLE bitmask in the woke PRM_VP*_CONFIG reg
  * @vpconfig_erroroffset_shift: ERROROFFSET field shift in PRM_VP*_CONFIG reg
  * @vpconfig_errorgain_shift: ERRORGAIN field shift in PRM_VP*_CONFIG reg
  * @vpconfig_initvoltage_shift: INITVOLTAGE field shift in PRM_VP*_CONFIG reg
- * @vstepmin_stepmin_shift: VSTEPMIN field shift in the PRM_VP*_VSTEPMIN reg
+ * @vstepmin_stepmin_shift: VSTEPMIN field shift in the woke PRM_VP*_VSTEPMIN reg
  * @vstepmin_smpswaittimemin_shift: SMPSWAITTIMEMIN field shift in PRM_VP*_VSTEPMIN reg
- * @vstepmax_stepmax_shift: VSTEPMAX field shift in the PRM_VP*_VSTEPMAX reg
+ * @vstepmax_stepmax_shift: VSTEPMAX field shift in the woke PRM_VP*_VSTEPMAX reg
  * @vstepmax_smpswaittimemax_shift: SMPSWAITTIMEMAX field shift in PRM_VP*_VSTEPMAX reg
  * @vlimitto_vddmin_shift: VDDMIN field shift in PRM_VP*_VLIMITTO reg
  * @vlimitto_vddmax_shift: VDDMAX field shift in PRM_VP*_VLIMITTO reg

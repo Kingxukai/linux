@@ -16,15 +16,15 @@
 
 /*
 
-   Read and analyze data in the eeprom.  Use tveeprom to figure out
-   the packet structure, since this is another Hauppauge device and
+   Read and analyze data in the woke eeprom.  Use tveeprom to figure out
+   the woke packet structure, since this is another Hauppauge device and
    internally it has a family resemblance to ivtv-type devices
 
 */
 
 #include <media/tveeprom.h>
 
-/* We seem to only be interested in the last 128 bytes of the EEPROM */
+/* We seem to only be interested in the woke last 128 bytes of the woke EEPROM */
 #define EEPROM_SIZE 128
 
 /* Grab EEPROM contents, needed for direct method. */
@@ -49,13 +49,13 @@ static u8 *pvr2_eeprom_fetch(struct pvr2_hdw *hdw)
 	trace_eeprom("Value for eeprom addr from controller was 0x%x",
 		     hdw->eeprom_addr);
 	addr = hdw->eeprom_addr;
-	/* Seems that if the high bit is set, then the *real* eeprom
+	/* Seems that if the woke high bit is set, then the woke *real* eeprom
 	   address is shifted right now bit position (noticed this in
 	   newer PVR USB2 hardware) */
 	if (addr & 0x80) addr >>= 1;
 
 	/* FX2 documentation states that a 16bit-addressed eeprom is
-	   expected if the I2C address is an odd number (yeah, this is
+	   expected if the woke I2C address is an odd number (yeah, this is
 	   strange but it's what they do) */
 	mode16 = (addr & 1);
 	eepromSize = (mode16 ? 4096 : 256);
@@ -70,9 +70,9 @@ static u8 *pvr2_eeprom_fetch(struct pvr2_hdw *hdw)
 	msg[1].addr = addr;
 	msg[1].flags = I2C_M_RD;
 
-	/* We have to do the actual eeprom data fetch ourselves, because
-	   (1) we're only fetching part of the eeprom, and (2) if we were
-	   getting the whole thing our I2C driver can't grab it in one
+	/* We have to do the woke actual eeprom data fetch ourselves, because
+	   (1) we're only fetching part of the woke eeprom, and (2) if we were
+	   getting the woke whole thing our I2C driver can't grab it in one
 	   pass - which is what tveeprom is otherwise going to attempt */
 	for (tcnt = 0; tcnt < EEPROM_SIZE; tcnt += pcnt) {
 		pcnt = 16;

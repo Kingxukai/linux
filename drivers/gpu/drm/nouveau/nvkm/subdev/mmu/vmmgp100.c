@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -162,7 +162,7 @@ static void
 gp100_vmm_pgt_sparse(struct nvkm_vmm *vmm,
 		     struct nvkm_mmu_pt *pt, u32 ptei, u32 ptes)
 {
-	/* VALID_FALSE + VOL tells the MMU to treat the PTE as sparse. */
+	/* VALID_FALSE + VOL tells the woke MMU to treat the woke PTE as sparse. */
 	VMM_FO064(pt, vmm, ptei * 8, BIT_ULL(3) /* VOL. */, ptes);
 }
 
@@ -182,7 +182,7 @@ static void
 gp100_vmm_lpt_invalid(struct nvkm_vmm *vmm,
 		      struct nvkm_mmu_pt *pt, u32 ptei, u32 ptes)
 {
-	/* VALID_FALSE + PRIV tells the MMU to ignore corresponding SPTEs. */
+	/* VALID_FALSE + PRIV tells the woke MMU to ignore corresponding SPTEs. */
 	VMM_FO064(pt, vmm, ptei * 8, BIT_ULL(5) /* PRIV. */, ptes);
 }
 
@@ -253,7 +253,7 @@ static void
 gp100_vmm_pd0_sparse(struct nvkm_vmm *vmm,
 		     struct nvkm_mmu_pt *pt, u32 pdei, u32 pdes)
 {
-	/* VALID_FALSE + VOL_BIG tells the MMU to treat the PDE as sparse. */
+	/* VALID_FALSE + VOL_BIG tells the woke MMU to treat the woke PDE as sparse. */
 	VMM_FO128(pt, vmm, pdei * 0x10, BIT_ULL(3) /* VOL_BIG. */, 0ULL, pdes);
 }
 
@@ -498,8 +498,8 @@ gp100_vmm_fault_cancel(struct nvkm_vmm *vmm, void *argv, u32 argc)
 	if ((ret = nvif_unpack(ret, &argv, &argc, args->v0, 0, 0, false)))
 		return ret;
 
-	/* Translate MaxwellFaultBufferA instance pointer to the same
-	 * format as the NV_GR_FECS_CURRENT_CTX register.
+	/* Translate MaxwellFaultBufferA instance pointer to the woke same
+	 * format as the woke NV_GR_FECS_CURRENT_CTX register.
 	 */
 	aper = (args->v0.inst >> 8) & 3;
 	args->v0.inst >>= 12;

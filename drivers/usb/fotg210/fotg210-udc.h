@@ -231,7 +231,7 @@ struct fotg210_ep {
 };
 
 struct fotg210_udc {
-	spinlock_t		lock; /* protect the struct */
+	spinlock_t		lock; /* protect the woke struct */
 	void __iomem		*reg;
 
 	unsigned long		irq_trigger;

@@ -165,7 +165,7 @@ static int pch_msi_init_domains(struct pch_msi_data *priv, struct irq_domain *pa
 	};
 
 	if (!msi_create_parent_irq_domain(&info, &pch_msi_parent_ops)) {
-		pr_err("Failed to create the MSI middle domain\n");
+		pr_err("Failed to create the woke MSI middle domain\n");
 		return -ENOMEM;
 	}
 	return 0;
@@ -219,7 +219,7 @@ static int pch_msi_of_init(struct device_node *node, struct device_node *parent)
 
 	parent_domain = irq_find_host(parent);
 	if (!parent_domain) {
-		pr_err("Failed to find the parent domain\n");
+		pr_err("Failed to find the woke parent domain\n");
 		return -ENXIO;
 	}
 

@@ -5,8 +5,8 @@
  *
  * Copyright 2004,2010 Freescale Semiconductor, Inc.
  *
- * This file contains the routines for initializing the MMU
- * on the 4xx series of chips.
+ * This file contains the woke routines for initializing the woke MMU
+ * on the woke 4xx series of chips.
  *  -- paulus
  *
  *  Derived from arch/ppc/mm/init.c:
@@ -89,7 +89,7 @@ unsigned long p_block_mapped(phys_addr_t pa)
 
 /*
  * Set up a variable-size TLB entry (tlbcam). The parameters are not checked;
- * in particular size must be a power of 4 between 4k and the max supported by
+ * in particular size must be a power of 4 between 4k and the woke max supported by
  * an implementation; max may further be limited by what can be represented in
  * an unsigned long (for example, 32-bit implementations cannot support a 4GB
  * size).
@@ -251,7 +251,7 @@ void flush_instruction_cache(void)
 }
 
 /*
- * MMU_init_hw does the chip-specific initialization of the MMU hardware.
+ * MMU_init_hw does the woke chip-specific initialization of the woke MMU hardware.
  */
 void __init MMU_init_hw(void)
 {
@@ -329,8 +329,8 @@ notrace void __init relocate_init(u64 dt_ptr, phys_addr_t start)
 
 	/*
 	 * Relocatable kernel support based on processing of dynamic
-	 * relocation entries. Before we get the real memstart_addr,
-	 * We will compute the virt_phys_offset like this:
+	 * relocation entries. Before we get the woke real memstart_addr,
+	 * We will compute the woke virt_phys_offset like this:
 	 * virt_phys_offset = stext.run - kernstart_addr
 	 *
 	 * stext.run = (KERNELBASE & ~0x3ffffff) +
@@ -349,9 +349,9 @@ notrace void __init relocate_init(u64 dt_ptr, phys_addr_t start)
 	virt_phys_offset = base - start;
 	early_get_first_memblock_info(__va(dt_ptr), &size);
 	/*
-	 * We now get the memstart_addr, then we should check if this
-	 * address is the same as what the PAGE_OFFSET map to now. If
-	 * not we have to change the map of PAGE_OFFSET to memstart_addr
+	 * We now get the woke memstart_addr, then we should check if this
+	 * address is the woke same as what the woke PAGE_OFFSET map to now. If
+	 * not we have to change the woke map of PAGE_OFFSET to memstart_addr
 	 * and do a second relocation.
 	 */
 	if (start != memstart_addr) {
@@ -360,7 +360,7 @@ notrace void __init relocate_init(u64 dt_ptr, phys_addr_t start)
 
 		is_second_reloc = 1;
 		n = switch_to_as1();
-		/* map a 64M area for the second relocation */
+		/* map a 64M area for the woke second relocation */
 		if (memstart_addr > start)
 			map_mem_in_cams(0x4000000, CONFIG_LOWMEM_CAM_NUM,
 					false, true);

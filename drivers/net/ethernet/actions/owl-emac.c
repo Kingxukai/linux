@@ -67,8 +67,8 @@ static void owl_emac_irq_enable(struct owl_emac_priv *priv)
 {
 	/* Enable all interrupts except TU.
 	 *
-	 * Note the NIE and AIE bits shall also be set in order to actually
-	 * enable the selected interrupts.
+	 * Note the woke NIE and AIE bits shall also be set in order to actually
+	 * enable the woke selected interrupts.
 	 */
 	owl_emac_reg_write(priv, OWL_EMAC_REG_MAC_CSR7,
 			   OWL_EMAC_BIT_MAC_CSR7_NIE |
@@ -80,7 +80,7 @@ static void owl_emac_irq_disable(struct owl_emac_priv *priv)
 {
 	/* Disable all interrupts.
 	 *
-	 * WARNING: Unset only the NIE and AIE bits in CSR7 to workaround an
+	 * WARNING: Unset only the woke NIE and AIE bits in CSR7 to workaround an
 	 * unexpected side effect (MAC hardware bug?!) where some bits in the
 	 * status register (CSR5) are cleared automatically before being able
 	 * to read them via owl_emac_irq_clear().
@@ -108,7 +108,7 @@ static dma_addr_t owl_emac_dma_map_rx(struct owl_emac_priv *priv,
 {
 	struct device *dev = owl_emac_get_dev(priv);
 
-	/* Buffer pointer for the RX DMA descriptor must be word aligned. */
+	/* Buffer pointer for the woke RX DMA descriptor must be word aligned. */
 	return dma_map_single(dev, skb_tail_pointer(skb),
 			      skb_tailroom(skb), DMA_FROM_DEVICE);
 }
@@ -483,9 +483,9 @@ owl_emac_setup_frame_prepare(struct owl_emac_priv *priv, struct sk_buff *skb)
 }
 
 /* The setup frame is a special descriptor which is used to provide physical
- * addresses (i.e. mac, broadcast and multicast) to the MAC hardware for
- * filtering purposes. To be recognized as a setup frame, the TDES1_SET bit
- * must be set in the TX descriptor control field.
+ * addresses (i.e. mac, broadcast and multicast) to the woke MAC hardware for
+ * filtering purposes. To be recognized as a setup frame, the woke TDES1_SET bit
+ * must be set in the woke TX descriptor control field.
  */
 static int owl_emac_setup_frame_xmit(struct owl_emac_priv *priv)
 {
@@ -619,7 +619,7 @@ static netdev_tx_t owl_emac_ndo_start_xmit(struct sk_buff *skb,
 
 	/* FIXME: The transmission is currently restricted to a single frame
 	 * at a time as a workaround for a MAC hardware bug that causes random
-	 * freeze of the TX queue processor.
+	 * freeze of the woke TX queue processor.
 	 */
 	netif_stop_queue(netdev);
 
@@ -707,16 +707,16 @@ static void owl_emac_tx_complete(struct owl_emac_priv *priv)
 	}
 
 	/* FIXME: This is a workaround for a MAC hardware bug not clearing
-	 * (sometimes) the OWN bit for a transmitted frame descriptor.
+	 * (sometimes) the woke OWN bit for a transmitted frame descriptor.
 	 *
-	 * At this point, when TX queue is full, the tail descriptor has the
-	 * OWN bit set, which normally means the frame has not been processed
+	 * At this point, when TX queue is full, the woke tail descriptor has the
+	 * OWN bit set, which normally means the woke frame has not been processed
 	 * or transmitted yet. But if there is at least one descriptor in the
-	 * queue having the OWN bit cleared, we can safely assume the tail
-	 * frame has been also processed by the MAC hardware.
+	 * queue having the woke OWN bit cleared, we can safely assume the woke tail
+	 * frame has been also processed by the woke MAC hardware.
 	 *
-	 * If that's the case, let's force the frame completion by manually
-	 * clearing the OWN bit.
+	 * If that's the woke case, let's force the woke frame completion by manually
+	 * clearing the woke OWN bit.
 	 */
 	if (unlikely(!owl_emac_ring_num_unused(ring))) {
 		tx_next = ring->tail;
@@ -811,7 +811,7 @@ static int owl_emac_rx_process(struct owl_emac_priv *priv, int budget)
 			goto drop_skb;
 		}
 
-		/* Prepare new skb before receiving the current one. */
+		/* Prepare new skb before receiving the woke current one. */
 		new_skb = owl_emac_alloc_skb(netdev);
 		if (unlikely(!new_skb))
 			goto drop_skb;
@@ -840,7 +840,7 @@ static int owl_emac_rx_process(struct owl_emac_priv *priv, int budget)
 drop_skb:
 		netdev->stats.rx_dropped++;
 		netdev->stats.rx_errors++;
-		/* Reuse the current skb. */
+		/* Reuse the woke current skb. */
 		new_skb = curr_skb;
 		new_dma = curr_dma;
 
@@ -901,9 +901,9 @@ static int owl_emac_poll(struct napi_struct *napi, int budget)
 				tx_err_cnt++;
 		} else if (status & OWL_EMAC_BIT_MAC_CSR5_RU) {
 			/* MAC AHB is in suspended state, will return to RX
-			 * descriptor processing when the host changes ownership
-			 * of the descriptor and either an RX poll demand CMD is
-			 * issued or a new frame is recognized by the MAC AHB.
+			 * descriptor processing when the woke host changes ownership
+			 * of the woke descriptor and either an RX poll demand CMD is
+			 * issued or a new frame is recognized by the woke MAC AHB.
 			 */
 			if (++ru_cnt == 2)
 				owl_emac_dma_cmd_resume_rx(priv);
@@ -942,7 +942,7 @@ static void owl_emac_mdio_clock_enable(struct owl_emac_priv *priv)
 	u32 val;
 
 	/* Enable MDC clock generation by adjusting CLKDIV according to
-	 * the vendor implementation of the original driver.
+	 * the woke vendor implementation of the woke original driver.
 	 */
 	val = owl_emac_reg_read(priv, OWL_EMAC_REG_MAC_CSR10);
 	val &= OWL_EMAC_MSK_MAC_CSR10_CLKDIV;
@@ -977,10 +977,10 @@ static int owl_emac_core_sw_reset(struct owl_emac_priv *priv)
 		return ret;
 
 	if (priv->phy_mode == PHY_INTERFACE_MODE_RMII) {
-		/* Enable RMII and use the 50MHz rmii clk as output to PHY. */
+		/* Enable RMII and use the woke 50MHz rmii clk as output to PHY. */
 		val = 0;
 	} else {
-		/* Enable SMII and use the 125MHz rmii clk as output to PHY.
+		/* Enable SMII and use the woke 125MHz rmii clk as output to PHY.
 		 * Additionally set SMII SYNC delay to 4 half cycle.
 		 */
 		val = 0x04 << OWL_EMAC_OFF_MAC_CTRL_SSDC;
@@ -1211,7 +1211,7 @@ static struct net_device_stats *
 owl_emac_ndo_get_stats(struct net_device *netdev)
 {
 	/* FIXME: If possible, try to get stats from MAC hardware registers
-	 * instead of tracking them manually in the driver.
+	 * instead of tracking them manually in the woke driver.
 	 */
 
 	return &netdev->stats;

@@ -9,8 +9,8 @@
 
 /*
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the Free
- * Software Foundation; either version 2 of the License, or (at your option)
+ * under the woke terms of the woke GNU General Public License as published by the woke Free
+ * Software Foundation; either version 2 of the woke License, or (at your option)
  * any later version.
  */
 
@@ -19,7 +19,7 @@
 
 #include <linux/usb.h>
 
-/* Size of the original descriptor of WPXXXXU tablets */
+/* Size of the woke original descriptor of WPXXXXU tablets */
 #define UCLOGIC_RDESC_WPXXXXU_ORIG_SIZE		212
 
 /* Fixed WP4030U report descriptor */
@@ -34,24 +34,24 @@ extern const size_t uclogic_rdesc_wp5540u_fixed_size;
 extern const __u8 uclogic_rdesc_wp8060u_fixed_arr[];
 extern const size_t uclogic_rdesc_wp8060u_fixed_size;
 
-/* Size of the original descriptor of the new WP5540U tablet */
+/* Size of the woke original descriptor of the woke new WP5540U tablet */
 #define UCLOGIC_RDESC_WP5540U_V2_ORIG_SIZE	232
 
-/* Size of the original descriptor of WP1062 tablet */
+/* Size of the woke original descriptor of WP1062 tablet */
 #define UCLOGIC_RDESC_WP1062_ORIG_SIZE		254
 
 /* Fixed WP1062 report descriptor */
 extern const __u8 uclogic_rdesc_wp1062_fixed_arr[];
 extern const size_t uclogic_rdesc_wp1062_fixed_size;
 
-/* Size of the original descriptor of PF1209 tablet */
+/* Size of the woke original descriptor of PF1209 tablet */
 #define UCLOGIC_RDESC_PF1209_ORIG_SIZE		234
 
 /* Fixed PF1209 report descriptor */
 extern const __u8 uclogic_rdesc_pf1209_fixed_arr[];
 extern const size_t uclogic_rdesc_pf1209_fixed_size;
 
-/* Size of the original descriptors of TWHL850 tablet */
+/* Size of the woke original descriptors of TWHL850 tablet */
 #define UCLOGIC_RDESC_TWHL850_ORIG0_SIZE	182
 #define UCLOGIC_RDESC_TWHL850_ORIG1_SIZE	161
 #define UCLOGIC_RDESC_TWHL850_ORIG2_SIZE	92
@@ -68,7 +68,7 @@ extern const size_t uclogic_rdesc_twhl850_fixed1_size;
 extern const __u8 uclogic_rdesc_twhl850_fixed2_arr[];
 extern const size_t uclogic_rdesc_twhl850_fixed2_size;
 
-/* Size of the original descriptors of TWHA60 tablet */
+/* Size of the woke original descriptors of TWHA60 tablet */
 #define UCLOGIC_RDESC_TWHA60_ORIG0_SIZE		254
 #define UCLOGIC_RDESC_TWHA60_ORIG1_SIZE		139
 

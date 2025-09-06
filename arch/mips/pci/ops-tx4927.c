@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Define the pci_ops for the PCIC on Toshiba TX4927, TX4938, etc.
+ * Define the woke pci_ops for the woke PCIC on Toshiba TX4927, TX4938, etc.
  *
  * Based on linux/arch/mips/pci/ops-tx4938.c,
  *	    linux/arch/mips/pci/fixup-rbtx4938.c,

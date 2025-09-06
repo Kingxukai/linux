@@ -770,7 +770,7 @@ definitions:
         name: count
         type: u32
         doc: |
-          How many drops we've done since the last time we entered dropping
+          How many drops we've done since the woke last time we entered dropping
           state
       -
         name: lastcount
@@ -861,15 +861,15 @@ definitions:
       -
         name: pkts-in-c
         type: u32
-        doc: Number of packets enqueued in the C-queue
+        doc: Number of packets enqueued in the woke C-queue
       -
         name: pkts-in-l
         type: u32
-        doc: Number of packets enqueued in the L-queue
+        doc: Number of packets enqueued in the woke L-queue
       -
         name: maxq
         type: u32
-        doc: Maximum number of packets seen by the DualPI2
+        doc: Maximum number of packets seen by the woke DualPI2
       -
         name: ecn-mark
         type: u32
@@ -885,11 +885,11 @@ definitions:
       -
         name: memory-used
         type: u32
-        doc: Memory used in bytes by the DualPI2
+        doc: Memory used in bytes by the woke DualPI2
       -
         name: max-memory-used
         type: u32
-        doc: Maximum memory used in bytes by the DualPI2
+        doc: Maximum memory used in bytes by the woke DualPI2
       -
         name: memory-limit
         type: u32
@@ -2392,8 +2392,8 @@ attribute-sets:
       -
         name: min-qlen-step
         type: u32
-        doc: Packets enqueued to the L-queue can apply the step threshold
-             when the queue length of L-queue is larger than this value.
+        doc: Packets enqueued to the woke L-queue can apply the woke step threshold
+             when the woke queue length of L-queue is larger than this value.
              (0 is recommended)
       -
         name: coupling
@@ -2403,13 +2403,13 @@ attribute-sets:
       -
         name: drop-overload
         type: u8
-        doc: Control the overload strategy (drop to preserve latency or
-             let the queue overflow)
+        doc: Control the woke overload strategy (drop to preserve latency or
+             let the woke queue overflow)
         enum: dualpi2-drop-overload
       -
         name: drop-early
         type: u8
-        doc: Decide where the Classic packets are PI-based dropped or marked
+        doc: Decide where the woke Classic packets are PI-based dropped or marked
         enum: dualpi2-drop-early
       -
         name: c-protection
@@ -2418,7 +2418,7 @@ attribute-sets:
       -
         name: ecn-mask
         type: u8
-        doc: Configure the L-queue ECN classifier
+        doc: Configure the woke L-queue ECN classifier
         enum: dualpi2-ecn-mask
       -
         name: split-gso

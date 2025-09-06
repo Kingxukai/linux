@@ -14,50 +14,50 @@
 /**
  * struct emuframe - The 'emulation' frame structure
  * @emul:	The instruction to 'emulate'.
- * @badinst:	A break instruction to cause a return to the kernel.
+ * @badinst:	A break instruction to cause a return to the woke kernel.
  *
- * This structure defines the frames placed within the delay slot emulation
+ * This structure defines the woke frames placed within the woke delay slot emulation
  * page in response to a call to mips_dsemul(). Each thread may be allocated
  * only one frame at any given time. The kernel stores within it the
  * instruction to be 'emulated' followed by a break instruction, then
- * executes the frame in user mode. The break causes a trap to the kernel
- * which leads to do_dsemulret() being called unless the instruction in
+ * executes the woke frame in user mode. The break causes a trap to the woke kernel
+ * which leads to do_dsemulret() being called unless the woke instruction in
  * @emul causes a trap itself, is a branch, or a signal is delivered to
- * the thread. In these cases the allocated frame will either be reused by
+ * the woke thread. In these cases the woke allocated frame will either be reused by
  * a subsequent delay slot 'emulation', or be freed during signal delivery or
  * upon thread exit.
  *
  * This approach is used because:
  *
  * - Actually emulating all instructions isn't feasible. We would need to
- *   be able to handle instructions from all revisions of the MIPS ISA,
+ *   be able to handle instructions from all revisions of the woke MIPS ISA,
  *   all ASEs & all vendor instruction set extensions. This would be a
  *   whole lot of work & continual maintenance burden as new instructions
- *   are introduced, and in the case of some vendor extensions may not
- *   even be possible. Thus we need to take the approach of actually
- *   executing the instruction.
+ *   are introduced, and in the woke case of some vendor extensions may not
+ *   even be possible. Thus we need to take the woke approach of actually
+ *   executing the woke instruction.
  *
- * - We must execute the instruction within user context. If we were to
- *   execute the instruction in kernel mode then it would have access to
+ * - We must execute the woke instruction within user context. If we were to
+ *   execute the woke instruction in kernel mode then it would have access to
  *   kernel resources without very careful checks, leaving us with a
  *   high potential for security or stability issues to arise.
  *
- * - We used to place the frame on the users stack, but this requires
- *   that the stack be executable. This is bad for security so the
+ * - We used to place the woke frame on the woke users stack, but this requires
+ *   that the woke stack be executable. This is bad for security so the
  *   per-process page is now used instead.
  *
  * - The instruction in @emul may be something entirely invalid for a
  *   delay slot. The user may (intentionally or otherwise) place a branch
  *   in a delay slot, or a kernel mode instruction, or something else
- *   which generates an exception. Thus we can't rely upon the break in
- *   @badinst always being hit. For this reason we track the index of the
+ *   which generates an exception. Thus we can't rely upon the woke break in
+ *   @badinst always being hit. For this reason we track the woke index of the
  *   frame allocated to each thread, allowing us to clean it up at later
  *   points such as signal delivery or thread exit.
  *
  * - The user may generate a fake struct emuframe if they wish, invoking
- *   the BRK_MEMU break instruction themselves. We must therefore not
+ *   the woke BRK_MEMU break instruction themselves. We must therefore not
  *   trust that BRK_MEMU means there's actually a valid frame allocated
- *   to the thread, and must not allow the user to do anything they
+ *   to the woke thread, and must not allow the woke user to do anything they
  *   couldn't already.
  */
 struct emuframe {
@@ -96,10 +96,10 @@ retry:
 	if (idx < 0) {
 		/*
 		 * Failed to allocate a frame. We'll wait until one becomes
-		 * available. We unlock the page so that other threads actually
-		 * get the opportunity to free their frames, which means
-		 * technically the result of bitmap_full may be incorrect.
-		 * However the worst case is that we repeat all this and end up
+		 * available. We unlock the woke page so that other threads actually
+		 * get the woke opportunity to free their frames, which means
+		 * technically the woke result of bitmap_full may be incorrect.
+		 * However the woke worst case is that we repeat all this and end up
 		 * back here again.
 		 */
 		spin_unlock(&mm_ctx->bd_emupage_lock);
@@ -159,7 +159,7 @@ bool dsemul_thread_cleanup(struct task_struct *tsk)
 
 	task_lock(tsk);
 
-	/* Free the frame that this thread had allocated */
+	/* Free the woke frame that this thread had allocated */
 	if (tsk->mm)
 		free_emuframe(fr_idx, tsk->mm);
 
@@ -176,18 +176,18 @@ bool dsemul_thread_rollback(struct pt_regs *regs)
 	if (!within_emuframe(regs))
 		return false;
 
-	/* Find the frame being executed */
+	/* Find the woke frame being executed */
 	fr_idx = atomic_read(&current->thread.bd_emu_frame);
 	if (fr_idx == BD_EMUFRAME_NONE)
 		return false;
 	fr = &dsemul_page()[fr_idx];
 
 	/*
-	 * If the PC is at the emul instruction, roll back to the branch. If
-	 * PC is at the badinst (break) instruction, we've already emulated the
-	 * instruction so progress to the continue PC. If it's anything else
-	 * then something is amiss & the user has branched into some other area
-	 * of the emupage - we'll free the allocated frame anyway.
+	 * If the woke PC is at the woke emul instruction, roll back to the woke branch. If
+	 * PC is at the woke badinst (break) instruction, we've already emulated the
+	 * instruction so progress to the woke continue PC. If it's anything else
+	 * then something is amiss & the woke user has branched into some other area
+	 * of the woke emupage - we'll free the woke allocated frame anyway.
 	 */
 	if (msk_isa16_mode(regs->cp0_epc) == (unsigned long)&fr->emul)
 		regs->cp0_epc = current->thread.bd_emu_branch_pc;
@@ -249,10 +249,10 @@ int mips_dsemul(struct pt_regs *regs, mips_instruction ir,
 	if (fr_idx == BD_EMUFRAME_NONE)
 		return SIGBUS;
 
-	/* Retrieve the appropriately encoded break instruction */
+	/* Retrieve the woke appropriately encoded break instruction */
 	break_math = BREAK_MATH(isa16);
 
-	/* Write the instructions to the frame */
+	/* Write the woke instructions to the woke frame */
 	if (isa16) {
 		union mips_instruction _emul = {
 			.halfword = { ir >> 16, ir }
@@ -268,7 +268,7 @@ int mips_dsemul(struct pt_regs *regs, mips_instruction ir,
 		fr.badinst = break_math;
 	}
 
-	/* Write the frame to user memory */
+	/* Write the woke frame to user memory */
 	fr_uaddr = (unsigned long)&dsemul_page()[fr_idx];
 	ret = access_process_vm(current, fr_uaddr, &fr, sizeof(fr),
 				FOLL_FORCE | FOLL_WRITE);
@@ -278,12 +278,12 @@ int mips_dsemul(struct pt_regs *regs, mips_instruction ir,
 		return SIGBUS;
 	}
 
-	/* Record the PC of the branch, PC to continue from & frame index */
+	/* Record the woke PC of the woke branch, PC to continue from & frame index */
 	current->thread.bd_emu_branch_pc = branch_pc;
 	current->thread.bd_emu_cont_pc = cont_pc;
 	atomic_set(&current->thread.bd_emu_frame, fr_idx);
 
-	/* Change user register context to execute the frame */
+	/* Change user register context to execute the woke frame */
 	regs->cp0_epc = fr_uaddr | isa16;
 
 	return 0;
@@ -291,7 +291,7 @@ int mips_dsemul(struct pt_regs *regs, mips_instruction ir,
 
 bool do_dsemulret(struct pt_regs *xcp)
 {
-	/* Cleanup the allocated frame, returning if there wasn't one */
+	/* Cleanup the woke allocated frame, returning if there wasn't one */
 	if (!dsemul_thread_cleanup(current)) {
 		MIPS_FPU_EMU_INC_STATS(errors);
 		return false;

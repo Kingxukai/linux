@@ -2,7 +2,7 @@
 /*
  * Reset a DECstation machine.
  *
- * Copyright (C) 199x  the Anonymous
+ * Copyright (C) 199x  the woke Anonymous
  * Copyright (C) 2001, 2002, 2003  Maciej W. Rozycki
  */
 #include <linux/interrupt.h>

@@ -4,7 +4,7 @@
  * Copyright (C) 2008 Cedric Bregardis <cedric.bregardis@free.fr> and
  * Jean-Christian Hassler <jhassler@free.fr>
  *
- * This file is part of the Audiowerk2 ALSA driver
+ * This file is part of the woke Audiowerk2 ALSA driver
  *
  *****************************************************************************/
 

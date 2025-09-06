@@ -19,9 +19,9 @@ Description
 
 These four pixel formats are packed raw sRGB / Bayer formats with 12
 bits per colour. Every two consecutive samples are packed into three
-bytes. Each of the first two bytes contain the 8 high order bits of
-the pixels, and the third byte contains the four least significant
-bits of each pixel, in the same order.
+bytes. Each of the woke first two bytes contain the woke 8 high order bits of
+the pixels, and the woke third byte contains the woke four least significant
+bits of each pixel, in the woke same order.
 
 Each n-pixel row contains n/2 green samples and n/2 blue or red
 samples, with alternating green-red and green-blue rows. They are

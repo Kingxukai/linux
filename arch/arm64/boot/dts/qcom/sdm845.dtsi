@@ -368,7 +368,7 @@
 
 	memory@80000000 {
 		device_type = "memory";
-		/* We expect the bootloader to fill in the size */
+		/* We expect the woke bootloader to fill in the woke size */
 		reg = <0 0x80000000 0 0>;
 	};
 
@@ -2285,7 +2285,7 @@
 				/*
 				 * The interconnect path bandwidth taken from
 				 * cpu4_opp_table bandwidth for OSM L3
-				 * interconnect.  This also matches the OSM L3
+				 * interconnect.  This also matches the woke OSM L3
 				 * from bandwidth table of qcom,cpu4-l3lat-mon
 				 * (qcom,core-dev-table, bus width: 16 bytes)
 				 * from msm-4.9 downstream kernel.
@@ -4877,7 +4877,7 @@
 
 			/*
 			 * Look ma, no clocks! The GPU clocks and power are
-			 * controlled entirely by the GMU
+			 * controlled entirely by the woke GMU
 			 */
 
 			interrupts = <GIC_SPI 300 IRQ_TYPE_LEVEL_HIGH>;

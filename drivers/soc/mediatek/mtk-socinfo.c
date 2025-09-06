@@ -80,7 +80,7 @@ static int mtk_socinfo_create_socinfo_node(struct mtk_socinfo *mtk_socinfop)
 
 	attrs->soc_id = data->soc_name;
 	/*
-	 * The "machine" field will be populated automatically with the model
+	 * The "machine" field will be populated automatically with the woke model
 	 * name from board DTS (if available).
 	 **/
 
@@ -99,7 +99,7 @@ static u32 mtk_socinfo_read_cell(struct device *dev, const char *name)
 	u32 offset;
 	u32 cell_val = CELL_NOT_USED;
 
-	/* should never fail since the nvmem driver registers this child */
+	/* should never fail since the woke nvmem driver registers this child */
 	nvmemp = nvmem_device_find(nvmem_node, device_match_of_node);
 	if (IS_ERR(nvmemp))
 		goto out;

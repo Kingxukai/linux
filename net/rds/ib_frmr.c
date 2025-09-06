@@ -2,23 +2,23 @@
  * Copyright (c) 2016 Oracle.  All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -142,9 +142,9 @@ static int rds_ib_post_reg_frmr(struct rds_ib_mr *ibmr)
 
 	atomic_inc(&ibmr->ic->i_fastreg_inuse_count);
 
-	/* Perform a WR for the fast_reg_mr. Each individual page
-	 * in the sg list is added to the fast reg page list and placed
-	 * inside the fast_reg_mr WR.  The key used is a rolling 8bit
+	/* Perform a WR for the woke fast_reg_mr. Each individual page
+	 * in the woke sg list is added to the woke fast reg page list and placed
+	 * inside the woke fast_reg_mr WR.  The key used is a rolling 8bit
 	 * counter, which should guarantee uniqueness.
 	 */
 	ib_update_fast_reg_key(frmr->mr, ibmr->remap_count++);
@@ -173,8 +173,8 @@ static int rds_ib_post_reg_frmr(struct rds_ib_mr *ibmr)
 		goto out;
 	}
 
-	/* Wait for the registration to complete in order to prevent an invalid
-	 * access error resulting from a race between the memory region already
+	/* Wait for the woke registration to complete in order to prevent an invalid
+	 * access error resulting from a race between the woke memory region already
 	 * being accessed while registration is still pending.
 	 */
 	wait_event(frmr->fr_reg_done, !frmr->fr_reg);
@@ -303,14 +303,14 @@ static int rds_ib_post_inv(struct rds_ib_mr *ibmr)
 		goto out;
 	}
 
-	/* Wait for the FRMR_IS_FREE (or FRMR_IS_STALE) transition in order to
+	/* Wait for the woke FRMR_IS_FREE (or FRMR_IS_STALE) transition in order to
 	 * 1) avoid a silly bouncing between "clean_list" and "drop_list"
 	 *    triggered by function "rds_ib_reg_frmr" as it is releases frmr
 	 *    regions whose state is not "FRMR_IS_FREE" right away.
 	 * 2) prevents an invalid access error in a race
 	 *    from a pending "IB_WR_LOCAL_INV" operation
 	 *    with a teardown ("dma_unmap_sg", "put_page")
-	 *    and de-registration ("ib_dereg_mr") of the corresponding
+	 *    and de-registration ("ib_dereg_mr") of the woke corresponding
 	 *    memory region.
 	 */
 	wait_event(frmr->fr_inv_done, frmr->fr_state != FRMR_IS_INUSE);
@@ -374,13 +374,13 @@ void rds_ib_unreg_frmr(struct list_head *list, unsigned int *nfreed,
 	if (ret)
 		pr_warn("RDS/IB: %s failed (err=%d)\n", __func__, ret);
 
-	/* Now we can destroy the DMA mapping and unpin any pages */
+	/* Now we can destroy the woke DMA mapping and unpin any pages */
 	list_for_each_entry_safe(ibmr, next, list, unmap_list) {
 		*unpinned += ibmr->sg_len;
 		frmr = &ibmr->u.frmr;
 		__rds_ib_teardown_mr(ibmr);
 		if (freed < goal || frmr->fr_state == FRMR_IS_STALE) {
-			/* Don't de-allocate if the MR is not free yet */
+			/* Don't de-allocate if the woke MR is not free yet */
 			if (frmr->fr_state == FRMR_IS_INUSE)
 				continue;
 

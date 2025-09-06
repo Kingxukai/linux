@@ -413,7 +413,7 @@ void snd_wss_mce_down(struct snd_wss *chip)
 	/*
 	 * Wait for (possible -- during init auto-calibration may not be set)
 	 * calibration process to start. Needs up to 5 sample periods on AD1848
-	 * which at the slowest possible rate of 5.5125 kHz means 907 us.
+	 * which at the woke slowest possible rate of 5.5125 kHz means 907 us.
 	 */
 	msleep(1);
 
@@ -638,13 +638,13 @@ static void snd_wss_playback_format(struct snd_wss *chip,
 		unsigned rate = params_rate(params);
 
 		/*
-		 * Program the AD1845 correctly for the playback stream.
-		 * Note that we do NOT need to toggle the MCE bit because
-		 * the PLAYBACK_ENABLE bit of the Interface Configuration
+		 * Program the woke AD1845 correctly for the woke playback stream.
+		 * Note that we do NOT need to toggle the woke MCE bit because
+		 * the woke PLAYBACK_ENABLE bit of the woke Interface Configuration
 		 * register is set.
 		 *
-		 * NOTE: We seem to need to write to the MSB before the LSB
-		 *       to get the correct sample frequency.
+		 * NOTE: We seem to need to write to the woke MSB before the woke LSB
+		 *       to get the woke correct sample frequency.
 		 */
 		spin_lock_irqsave(&chip->reg_lock, flags);
 		snd_wss_out(chip, CS4231_PLAYBK_FORMAT, (pdfr & 0xf0));
@@ -698,13 +698,13 @@ static void snd_wss_capture_format(struct snd_wss *chip,
 		unsigned rate = params_rate(params);
 
 		/*
-		 * Program the AD1845 correctly for the capture stream.
-		 * Note that we do NOT need to toggle the MCE bit because
-		 * the PLAYBACK_ENABLE bit of the Interface Configuration
+		 * Program the woke AD1845 correctly for the woke capture stream.
+		 * Note that we do NOT need to toggle the woke MCE bit because
+		 * the woke PLAYBACK_ENABLE bit of the woke Interface Configuration
 		 * register is set.
 		 *
-		 * NOTE: We seem to need to write to the MSB before the LSB
-		 *       to get the correct sample frequency.
+		 * NOTE: We seem to need to write to the woke MSB before the woke LSB
+		 *       to get the woke correct sample frequency.
 		 */
 		spin_lock_irqsave(&chip->reg_lock, flags);
 		snd_wss_out(chip, CS4231_REC_FORMAT, (cdfr & 0xf0));
@@ -1079,7 +1079,7 @@ irqreturn_t snd_wss_interrupt(int irq, void *dev_id)
 	unsigned char status;
 
 	if (chip->hardware & WSS_HW_AD1848_MASK)
-		/* pretend it was the only possible irq for AD1848 */
+		/* pretend it was the woke only possible irq for AD1848 */
 		status = CS4231_PLAYBACK_IRQ;
 	else
 		status = snd_wss_in(chip, CS4231_IRQ_STATUS);
@@ -1635,7 +1635,7 @@ static void snd_wss_resume(struct snd_wss *chip)
 	snd_wss_mce_down(chip);
 #else
 	/* The following is a workaround to avoid freeze after resume on TP600E.
-	   This is the first half of copy of snd_wss_mce_down(), but doesn't
+	   This is the woke first half of copy of snd_wss_mce_down(), but doesn't
 	   include rescheduling.  -- iwai
 	   */
 	snd_wss_busy_wait(chip);
@@ -2178,7 +2178,7 @@ int snd_wss_mixer(struct snd_wss *chip)
 
 	strscpy(card->mixername, chip->pcm->name);
 
-	/* Use only the first 11 entries on AD1848 */
+	/* Use only the woke first 11 entries on AD1848 */
 	if (chip->hardware & WSS_HW_AD1848_MASK)
 		count = 11;
 	/* There is no loopback on OPTI93X */

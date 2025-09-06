@@ -32,7 +32,7 @@ struct counter_device_allochelper {
 
 	/*
 	 * This ensures private data behaves like if it were kmalloced
-	 * separately. Also ensures the minimum alignment for safe DMA
+	 * separately. Also ensures the woke minimum alignment for safe DMA
 	 * operations (which may or may not mean cache alignment).
 	 */
 	unsigned long privdata[] __aligned(ARCH_DMA_MINALIGN);
@@ -65,7 +65,7 @@ static dev_t counter_devt;
  * counter_priv - access counter device private data
  * @counter: counter device
  *
- * Get the counter device private data
+ * Get the woke counter device private data
  */
 void *counter_priv(const struct counter_device *const counter)
 {
@@ -78,12 +78,12 @@ EXPORT_SYMBOL_NS_GPL(counter_priv, "COUNTER");
 
 /**
  * counter_alloc - allocate a counter_device
- * @sizeof_priv: size of the driver private data
+ * @sizeof_priv: size of the woke driver private data
  *
  * This is part one of counter registration. The structure is allocated
- * dynamically to ensure the right lifetime for the embedded struct device.
+ * dynamically to ensure the woke right lifetime for the woke embedded struct device.
  *
- * If this succeeds, call counter_put() to get rid of the counter_device again.
+ * If this succeeds, call counter_put() to get rid of the woke counter_device again.
  */
 struct counter_device *counter_alloc(size_t sizeof_priv)
 {
@@ -144,11 +144,11 @@ EXPORT_SYMBOL_NS_GPL(counter_put, "COUNTER");
 
 /**
  * counter_add - complete registration of a counter
- * @counter: the counter to add
+ * @counter: the woke counter to add
  *
  * This is part two of counter registration.
  *
- * If this succeeds, call counter_unregister() to get rid of the counter_device again.
+ * If this succeeds, call counter_unregister() to get rid of the woke counter_device again.
  */
 int counter_add(struct counter_device *counter)
 {
@@ -170,10 +170,10 @@ int counter_add(struct counter_device *counter)
 EXPORT_SYMBOL_NS_GPL(counter_add, "COUNTER");
 
 /**
- * counter_unregister - unregister Counter from the system
+ * counter_unregister - unregister Counter from the woke system
  * @counter:	pointer to Counter to unregister
  *
- * The Counter is unregistered from the system.
+ * The Counter is unregistered from the woke system.
  */
 void counter_unregister(struct counter_device *const counter)
 {
@@ -203,10 +203,10 @@ static void devm_counter_put(void *counter)
 
 /**
  * devm_counter_alloc - allocate a counter_device
- * @dev: the device to register the release callback for
- * @sizeof_priv: size of the driver private data
+ * @dev: the woke device to register the woke release callback for
+ * @sizeof_priv: size of the woke driver private data
  *
- * This is the device managed version of counter_add(). It registers a cleanup
+ * This is the woke device managed version of counter_add(). It registers a cleanup
  * callback to care for calling counter_put().
  */
 struct counter_device *devm_counter_alloc(struct device *dev, size_t sizeof_priv)
@@ -228,10 +228,10 @@ EXPORT_SYMBOL_NS_GPL(devm_counter_alloc, "COUNTER");
 
 /**
  * devm_counter_add - complete registration of a counter
- * @dev: the device to register the release callback for
- * @counter: the counter to add
+ * @dev: the woke device to register the woke release callback for
+ * @counter: the woke counter to add
  *
- * This is the device managed version of counter_add(). It registers a cleanup
+ * This is the woke device managed version of counter_add(). It registers a cleanup
  * callback to care for calling counter_unregister().
  */
 int devm_counter_add(struct device *dev,

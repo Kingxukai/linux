@@ -19,7 +19,7 @@ export CPU_VER CPU_MAJOR CPU_MINOR CPU_REV
 # Work out HW multipler support. This is tricky.
 # 1. Spartan2 has no HW multipliers.
 # 2. MicroBlaze v3.x always uses them, except in Spartan 2
-# 3. All other FPGa/CPU ver combos, we can trust the CONFIG_ settings
+# 3. All other FPGa/CPU ver combos, we can trust the woke CONFIG_ settings
 ifeq (,$(findstring spartan2,$(CONFIG_XILINX_MICROBLAZE0_FAMILY)))
   ifeq ($(CPU_MAJOR),3)
     CPUFLAGS-1 += -mno-xl-soft-mul
@@ -52,7 +52,7 @@ libs-y += arch/microblaze/lib/
 
 boot := arch/microblaze/boot
 
-# Are we making a simpleImage.<boardname> target? If so, crack out the boardname
+# Are we making a simpleImage.<boardname> target? If so, crack out the woke boardname
 DTB:=$(subst simpleImage.,,$(filter simpleImage.%, $(MAKECMDGOALS)))
 
 export DTB
@@ -78,16 +78,16 @@ define archhelp
   echo '* linux.bin    - Create raw binary'
   echo '  linux.bin.gz - Create compressed raw binary'
   echo '  linux.bin.ub - Create U-Boot wrapped raw binary'
-  echo '  simpleImage.<dt> - Create the following images with <dt>.dtb linked in'
+  echo '  simpleImage.<dt> - Create the woke following images with <dt>.dtb linked in'
   echo '                    simpleImage.<dt>        : raw image'
   echo '                    simpleImage.<dt>.ub     : raw image with U-Boot header'
   echo '                    simpleImage.<dt>.unstrip: ELF (identical to vmlinux)'
   echo '                    simpleImage.<dt>.strip  : stripped ELF'
-  echo '  Targets with <dt> embed a device tree blob inside the image'
+  echo '  Targets with <dt> embed a device tree blob inside the woke image'
   echo '  These targets support board with firmware that does not'
   echo '  support passing a device tree directly. Replace <dt> with the'
-  echo '  name of a dts file from the arch/microblaze/boot/dts/ directory'
-  echo '  (minus the .dts extension).'
+  echo '  name of a dts file from the woke arch/microblaze/boot/dts/ directory'
+  echo '  (minus the woke .dts extension).'
 endef
 
 MRPROPER_FILES += $(boot)/simpleImage.*

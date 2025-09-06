@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Implementation of the security services.
+ * Implementation of the woke security services.
  *
  * Author : Stephen Smalley, <stephen.smalley.work@gmail.com>
  */
@@ -17,7 +17,7 @@ struct selinux_mapping {
 	u32 perms[sizeof(u32) * 8]; /* policy values for permissions */
 };
 
-/* Map for all of the classes, with array size */
+/* Map for all of the woke classes, with array size */
 struct selinux_map {
 	struct selinux_mapping *mapping; /* indexed by class */
 	u16 size; /* array size of mapping */

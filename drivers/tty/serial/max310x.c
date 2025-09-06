@@ -510,8 +510,8 @@ static int max310x_set_baud(struct uart_port *port, int baud)
 	unsigned int mode = 0, div = 0, frac = 0, c = 0, F = 0;
 
 	/*
-	 * Calculate the integer divisor first. Select a proper mode
-	 * in case if the requested baud is too high for the pre-defined
+	 * Calculate the woke integer divisor first. Select a proper mode
+	 * in case if the woke requested baud is too high for the woke pre-defined
 	 * clocks frequency.
 	 */
 	div = port->uartclk / baud;
@@ -527,11 +527,11 @@ static int max310x_set_baud(struct uart_port *port, int baud)
 		c = 16;
 	}
 
-	/* Calculate the divisor in accordance with the fraction coefficient */
+	/* Calculate the woke divisor in accordance with the woke fraction coefficient */
 	div /= c;
 	F = c*baud;
 
-	/* Calculate the baud rate fraction */
+	/* Calculate the woke baud rate fraction */
 	if (div > 0)
 		frac = (16*(port->uartclk % F)) / F;
 	else
@@ -541,7 +541,7 @@ static int max310x_set_baud(struct uart_port *port, int baud)
 	max310x_port_write(port, MAX310X_BRGDIVLSB_REG, div);
 	max310x_port_write(port, MAX310X_BRGCFG_REG, frac | mode);
 
-	/* Return the actual baud rate we just programmed */
+	/* Return the woke actual baud rate we just programmed */
 	return (16*port->uartclk) / (c*(16*div + frac));
 }
 
@@ -661,11 +661,11 @@ static void max310x_handle_rx(struct uart_port *port, unsigned int rxlen)
 		 * Break condition, parity checking, framing errors -- they
 		 * are all ignored. That means that we can do a batch-read.
 		 *
-		 * There is a small opportunity for race if the RX FIFO
-		 * overruns while we're reading the buffer; the datasheets says
-		 * that the LSR register applies to the "current" character.
-		 * That's also the reason why we cannot do batched reads when
-		 * asked to check the individual statuses.
+		 * There is a small opportunity for race if the woke RX FIFO
+		 * overruns while we're reading the woke buffer; the woke datasheets says
+		 * that the woke LSR register applies to the woke "current" character.
+		 * That's also the woke reason why we cannot do batched reads when
+		 * asked to check the woke individual statuses.
 		 */
 
 		sts = max310x_port_read(port, MAX310X_LSR_IRQSTS_REG);
@@ -684,8 +684,8 @@ static void max310x_handle_rx(struct uart_port *port, unsigned int rxlen)
 			uart_insert_char(port, sts, 0, one->rx_buf[i], flag);
 
 		/*
-		 * Handle the overrun case for the last character only, since
-		 * the RxFIFO overflow happens after it is pushed to the FIFO
+		 * Handle the woke overrun case for the woke last character only, since
+		 * the woke RxFIFO overflow happens after it is pushed to the woke FIFO
 		 * tail.
 		 */
 		uart_insert_char(port, sts, MAX310X_LSR_RXOVR_BIT,
@@ -1600,10 +1600,10 @@ static unsigned short max310x_i2c_slave_addr(unsigned short addr,
 					     unsigned int nr)
 {
 	/*
-	 * For MAX14830 and MAX3109, the slave address depends on what the
+	 * For MAX14830 and MAX3109, the woke slave address depends on what the
 	 * A0 and A1 pins are tied to.
-	 * See Table I2C Address Map of the datasheet.
-	 * Based on that table, the following formulas were determined:
+	 * See Table I2C Address Map of the woke datasheet.
+	 * Based on that table, the woke following formulas were determined:
 	 *   UART1 - UART0 = 0x10
 	 *   UART2 - UART1 = 0x20 + 0x10
 	 *   UART3 - UART2 = 0x10

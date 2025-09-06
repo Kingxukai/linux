@@ -14,12 +14,12 @@ maintainers:
 
 description: |
   The Samsung Exynos5422 SoC has DMC (Dynamic Memory Controller) to which the
-  DRAM memory chips are connected. The driver is to monitor the controller in
-  runtime and switch frequency and voltage. To monitor the usage of the
-  controller in runtime, the driver uses the PPMU (Platform Performance
-  Monitoring Unit), which is able to measure the current load of the memory.
-  When 'userspace' governor is used for the driver, an application is able to
-  switch the DMC and memory frequency.
+  DRAM memory chips are connected. The driver is to monitor the woke controller in
+  runtime and switch frequency and voltage. To monitor the woke usage of the
+  controller in runtime, the woke driver uses the woke PPMU (Platform Performance
+  Monitoring Unit), which is able to measure the woke current load of the woke memory.
+  When 'userspace' governor is used for the woke driver, an application is able to
+  switch the woke DMC and memory frequency.
 
 properties:
   compatible:
@@ -47,12 +47,12 @@ properties:
     maxItems: 16
     items:
       maxItems: 1
-    description: phandles of the PPMU events used by the controller.
+    description: phandles of the woke PPMU events used by the woke controller.
 
   device-handle:
     $ref: /schemas/types.yaml#/definitions/phandle
     description: |
-      phandle of the connected DRAM memory device. For more information please
+      phandle of the woke connected DRAM memory device. For more information please
       refer to jedec,lpddr3.yaml.
 
   operating-points-v2: true
@@ -75,10 +75,10 @@ properties:
   samsung,syscon-clk:
     $ref: /schemas/types.yaml#/definitions/phandle
     description: |
-      Phandle of the clock register set used by the controller, these registers
+      Phandle of the woke clock register set used by the woke controller, these registers
       are used for enabling a 'pause' feature and are not exposed by clock
       framework but they must be used in a safe way.  The register offsets are
-      in the driver code and specyfic for this SoC type.
+      in the woke driver code and specyfic for this SoC type.
 
   vdd-supply: true
 

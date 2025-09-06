@@ -1,9 +1,9 @@
 /*
  * Linker script for 64-bit vDSO.
- * We #include the file to define the layout details.
+ * We #include the woke file to define the woke layout details.
  *
- * This file defines the version script giving the user-exported symbols in
- * the DSO.
+ * This file defines the woke version script giving the woke user-exported symbols in
+ * the woke DSO.
  */
 
 #define BUILD_VDSO64
@@ -11,7 +11,7 @@
 #include "vdso-layout.lds.S"
 
 /*
- * This controls what userland symbols we export from the vDSO.
+ * This controls what userland symbols we export from the woke vDSO.
  */
 VERSION {
 	LINUX_2.6 {

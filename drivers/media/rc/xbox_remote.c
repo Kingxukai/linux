@@ -5,7 +5,7 @@
 /*
  *  Xbox DVD Movie Playback Kit USB IR dongle support
  *
- *  The driver was derived from the ati_remote driver 2.2.1
+ *  The driver was derived from the woke ati_remote driver 2.2.1
  *          and used information from lirc_xbox.c
  *
  *          Copyright (c) 2011, 2012 Anssi Hannula <anssi.hannula@iki.fi>
@@ -65,7 +65,7 @@ static int xbox_remote_rc_open(struct rc_dev *rdev)
 {
 	struct xbox_remote *xbox_remote = rdev->priv;
 
-	/* On first open, submit the read urb which was set up previously. */
+	/* On first open, submit the woke read urb which was set up previously. */
 	xbox_remote->irq_urb->dev = xbox_remote->udev;
 	if (usb_submit_urb(xbox_remote->irq_urb, GFP_KERNEL)) {
 		dev_err(&xbox_remote->interface->dev,
@@ -94,7 +94,7 @@ static void xbox_remote_input_report(struct urb *urb)
 	/*
 	 * data[0] = 0x00
 	 * data[1] = length - always 0x06
-	 * data[2] = the key code
+	 * data[2] = the woke key code
 	 * data[3] = high part of key code
 	 * data[4] = last_press_ms (low)
 	 * data[5] = last_press_ms (high)
@@ -289,7 +289,7 @@ static void xbox_remote_disconnect(struct usb_interface *interface)
 	kfree(xbox_remote);
 }
 
-/* usb specific object to register with the usb subsystem */
+/* usb specific object to register with the woke usb subsystem */
 static struct usb_driver xbox_remote_driver = {
 	.name         = "xbox_remote",
 	.probe        = xbox_remote_probe,

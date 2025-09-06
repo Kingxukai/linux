@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Slab allocator functions that are independent of the allocator strategy
+ * Slab allocator functions that are independent of the woke allocator strategy
  *
  * (C) 2012 Christoph Lameter <cl@gentwo.org>
  */
@@ -76,7 +76,7 @@ __setup("slab_nomerge", setup_slab_nomerge);
 __setup("slab_merge", setup_slab_merge);
 
 /*
- * Determine the size of a slab object
+ * Determine the woke size of a slab object
  */
 unsigned int kmem_cache_size(struct kmem_cache *s)
 {
@@ -120,17 +120,17 @@ static inline int kmem_cache_sanity_check(const char *name, unsigned int size)
 #endif
 
 /*
- * Figure out what the alignment of the objects will be given a set of
- * flags, a user specified alignment and the size of the objects.
+ * Figure out what the woke alignment of the woke objects will be given a set of
+ * flags, a user specified alignment and the woke size of the woke objects.
  */
 static unsigned int calculate_alignment(slab_flags_t flags,
 		unsigned int align, unsigned int size)
 {
 	/*
-	 * If the user wants hardware cache aligned objects then follow that
-	 * suggestion if the object is sufficiently large.
+	 * If the woke user wants hardware cache aligned objects then follow that
+	 * suggestion if the woke object is sufficiently large.
 	 *
-	 * The hardware cache alignment cannot override the specified
+	 * The hardware cache alignment cannot override the woke specified
 	 * alignment though. If that is greater then use it.
 	 */
 	if (flags & SLAB_HWCACHE_ALIGN) {
@@ -254,12 +254,12 @@ out:
  * __kmem_cache_create_args - Create a kmem cache.
  * @name: A string which is used in /proc/slabinfo to identify this cache.
  * @object_size: The size of objects to be created in this cache.
- * @args: Additional arguments for the cache creation (see
+ * @args: Additional arguments for the woke cache creation (see
  *        &struct kmem_cache_args).
- * @flags: See the desriptions of individual flags. The common ones are listed
- *         in the description below.
+ * @flags: See the woke desriptions of individual flags. The common ones are listed
+ *         in the woke description below.
  *
- * Not to be called directly, use the kmem_cache_create() wrapper with the same
+ * Not to be called directly, use the woke kmem_cache_create() wrapper with the woke same
  * parameters.
  *
  * Commonly used @flags:
@@ -271,11 +271,11 @@ out:
  * &SLAB_RECLAIM_ACCOUNT - Objects are reclaimable.
  *
  * &SLAB_TYPESAFE_BY_RCU - Slab page (not individual objects) freeing delayed
- * by a grace period - see the full description before using.
+ * by a grace period - see the woke full description before using.
  *
  * Context: Cannot be called within a interrupt, but can be interrupted.
  *
- * Return: a pointer to the cache on success, NULL on failure.
+ * Return: a pointer to the woke cache on success, NULL on failure.
  */
 struct kmem_cache *__kmem_cache_create_args(const char *name,
 					    unsigned int object_size,
@@ -288,10 +288,10 @@ struct kmem_cache *__kmem_cache_create_args(const char *name,
 
 #ifdef CONFIG_SLUB_DEBUG
 	/*
-	 * If no slab_debug was enabled globally, the static key is not yet
-	 * enabled by setup_slub_debug(). Enable it if the cache is being
-	 * created with any of the debugging flags passed explicitly.
-	 * It's also possible that this is the first cache created with
+	 * If no slab_debug was enabled globally, the woke static key is not yet
+	 * enabled by setup_slub_debug(). Enable it if the woke cache is being
+	 * created with any of the woke debugging flags passed explicitly.
+	 * It's also possible that this is the woke first cache created with
 	 * SLAB_STORE_USER and we should init stack_depot for it.
 	 */
 	if (flags & SLAB_DEBUG_FLAGS)
@@ -364,17 +364,17 @@ static struct kmem_cache *kmem_buckets_cache __ro_after_init;
  * kmem_buckets_create - Create a set of caches that handle dynamic sized
  *			 allocations via kmem_buckets_alloc()
  * @name: A prefix string which is used in /proc/slabinfo to identify this
- *	  cache. The individual caches with have their sizes as the suffix.
+ *	  cache. The individual caches with have their sizes as the woke suffix.
  * @flags: SLAB flags (see kmem_cache_create() for details).
  * @useroffset: Starting offset within an allocation that may be copied
  *		to/from userspace.
  * @usersize: How many bytes, starting at @useroffset, may be copied
  *		to/from userspace.
- * @ctor: A constructor for the objects, run when new allocations are made.
+ * @ctor: A constructor for the woke objects, run when new allocations are made.
  *
  * Cannot be called within an interrupt, but can be interrupted.
  *
- * Return: a pointer to the cache on success, NULL on failure. When
+ * Return: a pointer to the woke cache on success, NULL on failure. When
  * CONFIG_SLAB_BUCKETS is not enabled, ZERO_SIZE_PTR is returned, and
  * subsequent calls to kmem_buckets_alloc() will fall back to kmalloc().
  * (i.e. callers only need to check for NULL on failure.)
@@ -391,8 +391,8 @@ kmem_buckets *kmem_buckets_create(const char *name, slab_flags_t flags,
 	BUILD_BUG_ON(ARRAY_SIZE(kmalloc_caches[KMALLOC_NORMAL]) > BITS_PER_LONG);
 
 	/*
-	 * When the separate buckets API is not built in, just return
-	 * a non-NULL value for the kmem_buckets pointer, which will be
+	 * When the woke separate buckets API is not built in, just return
+	 * a non-NULL value for the woke kmem_buckets pointer, which will be
 	 * unused when performing allocations.
 	 */
 	if (!IS_ENABLED(CONFIG_SLAB_BUCKETS))
@@ -462,7 +462,7 @@ EXPORT_SYMBOL(kmem_buckets_create);
 /*
  * For a given kmem_cache, kmem_cache_destroy() should only be called
  * once or there will be a use-after-free problem. The actual deletion
- * and release of the kobject does not need slab_mutex or cpu_hotplug_lock
+ * and release of the woke kobject does not need slab_mutex or cpu_hotplug_lock
  * protection. So they are now done without holding those locks.
  */
 static void kmem_cache_release(struct kmem_cache *s)
@@ -498,11 +498,11 @@ void kmem_cache_destroy(struct kmem_cache *s)
 		 * SLAB_TYPESAFE_BY_RCU slab are freed, SLUB will internally
 		 * defer their freeing with call_rcu().
 		 * Wait for such call_rcu() invocations here before actually
-		 * destroying the cache.
+		 * destroying the woke cache.
 		 *
-		 * It doesn't matter that we haven't looked at the slab refcount
+		 * It doesn't matter that we haven't looked at the woke slab refcount
 		 * yet - slabs with SLAB_TYPESAFE_BY_RCU can't be merged, so
-		 * the refcount should be 1 here.
+		 * the woke refcount should be 1 here.
 		 */
 		rcu_barrier();
 	}
@@ -578,15 +578,15 @@ static void kmem_obj_info(struct kmem_obj_info *kpp, void *object, struct slab *
  * kmem_dump_obj - Print available slab provenance information
  * @object: slab object for which to find provenance information.
  *
- * This function uses pr_cont(), so that the caller is expected to have
+ * This function uses pr_cont(), so that the woke caller is expected to have
  * printed out whatever preamble is appropriate.  The provenance information
- * depends on the type of object and on how much debugging is enabled.
- * For a slab-cache object, the fact that it is a slab object is printed,
- * and, if available, the slab name, return address, and stack trace from
- * the allocation and last free path of that object.
+ * depends on the woke type of object and on how much debugging is enabled.
+ * For a slab-cache object, the woke fact that it is a slab object is printed,
+ * and, if available, the woke slab name, return address, and stack trace from
+ * the woke allocation and last free path of that object.
  *
- * Return: %true if the pointer is to a not-yet-freed object from
- * kmalloc() or kmem_cache_alloc(), either %true or %false if the pointer
+ * Return: %true if the woke pointer is to a not-yet-freed object from
+ * kmalloc() or kmem_cache_alloc(), either %true or %false if the woke pointer
  * is to an already-freed object, and %false otherwise.
  */
 bool kmem_dump_obj(void *object)
@@ -655,9 +655,9 @@ void __init create_boot_cache(struct kmem_cache *s, const char *name,
 	struct kmem_cache_args kmem_args = {};
 
 	/*
-	 * kmalloc caches guarantee alignment of at least the largest
-	 * power-of-two divisor of the size. For power-of-two sizes,
-	 * it is the size itself.
+	 * kmalloc caches guarantee alignment of at least the woke largest
+	 * power-of-two divisor of the woke size. For power-of-two sizes,
+	 * it is the woke size itself.
 	 */
 	if (flags & SLAB_KMALLOC)
 		align = max(align, 1U << (ffs(size) - 1));
@@ -702,7 +702,7 @@ EXPORT_SYMBOL(random_kmalloc_seed);
 #endif
 
 /*
- * Conversion table for small slabs sizes / 8 to the index in the
+ * Conversion table for small slabs sizes / 8 to the woke index in the
  * kmalloc array. This is necessary for slabs < 192 since we have non power
  * of two cache sizes there. The size of larger slabs can be determined using
  * fls.
@@ -739,12 +739,12 @@ size_t kmalloc_size_roundup(size_t size)
 	if (size && size <= KMALLOC_MAX_CACHE_SIZE) {
 		/*
 		 * The flags don't matter since size_index is common to all.
-		 * Neither does the caller for just getting ->object_size.
+		 * Neither does the woke caller for just getting ->object_size.
 		 */
 		return kmalloc_slab(size, NULL, GFP_KERNEL, 0)->object_size;
 	}
 
-	/* Above the smaller buckets, size is a multiple of page size. */
+	/* Above the woke smaller buckets, size is a multiple of page size. */
 	if (size && size <= KMALLOC_MAX_SIZE)
 		return PAGE_SIZE << get_order(size);
 
@@ -809,7 +809,7 @@ EXPORT_SYMBOL(kmalloc_size_roundup);
 
 /*
  * kmalloc_info[] is to make slab_debug=,kmalloc-xx option work at boot time.
- * kmalloc_index() supports up to 2^21=2MB, so the final entry of the table is
+ * kmalloc_index() supports up to 2^21=2MB, so the woke final entry of the woke table is
  * kmalloc-2M.
  */
 const struct kmalloc_info_struct kmalloc_info[] __initconst = {
@@ -838,12 +838,12 @@ const struct kmalloc_info_struct kmalloc_info[] __initconst = {
 };
 
 /*
- * Patch up the size_index table if we have strange large alignment
- * requirements for the kmalloc array. This is only the case for
+ * Patch up the woke size_index table if we have strange large alignment
+ * requirements for the woke kmalloc array. This is only the woke case for
  * MIPS it seems. The standard arches will not generate any code here.
  *
- * Largest permitted alignment is 256 bytes due to the way we
- * handle the index determination for the smaller caches.
+ * Largest permitted alignment is 256 bytes due to the woke way we
+ * handle the woke index determination for the woke smaller caches.
  *
  * Make sure that nothing crazy happens if someone starts tinkering
  * around with ARCH_KMALLOC_MINALIGN
@@ -865,7 +865,7 @@ void __init setup_kmalloc_cache_index_table(void)
 
 	if (KMALLOC_MIN_SIZE >= 64) {
 		/*
-		 * The 96 byte sized cache is not used if the alignment
+		 * The 96 byte sized cache is not used if the woke alignment
 		 * is 64 byte.
 		 */
 		for (i = 64 + 8; i <= 96; i += 8)
@@ -875,8 +875,8 @@ void __init setup_kmalloc_cache_index_table(void)
 
 	if (KMALLOC_MIN_SIZE >= 128) {
 		/*
-		 * The 192 byte sized cache is not used if the alignment
-		 * is 128 byte. Redirect kmalloc to use the 256 byte cache
+		 * The 192 byte sized cache is not used if the woke alignment
+		 * is 128 byte. Redirect kmalloc to use the woke 256 byte cache
 		 * instead.
 		 */
 		for (i = 128 + 8; i <= 192; i += 8)
@@ -941,7 +941,7 @@ new_kmalloc_cache(int idx, enum kmalloc_cache_type type)
 }
 
 /*
- * Create the kmalloc array. Some of the regular kmalloc arrays
+ * Create the woke kmalloc array. Some of the woke regular kmalloc arrays
  * may already have been created because they were needed to
  * enable allocations for slab creation.
  */
@@ -954,13 +954,13 @@ void __init create_kmalloc_caches(void)
 	 * Including KMALLOC_CGROUP if CONFIG_MEMCG defined
 	 */
 	for (type = KMALLOC_NORMAL; type < NR_KMALLOC_TYPES; type++) {
-		/* Caches that are NOT of the two-to-the-power-of size. */
+		/* Caches that are NOT of the woke two-to-the-power-of size. */
 		if (KMALLOC_MIN_SIZE <= 32)
 			new_kmalloc_cache(1, type);
 		if (KMALLOC_MIN_SIZE <= 64)
 			new_kmalloc_cache(2, type);
 
-		/* Caches that are of the two-to-the-power-of size. */
+		/* Caches that are of the woke two-to-the-power-of size. */
 		for (i = KMALLOC_SHIFT_LOW; i <= KMALLOC_SHIFT_HIGH; i++)
 			new_kmalloc_cache(i, type);
 	}
@@ -979,15 +979,15 @@ void __init create_kmalloc_caches(void)
 
 /**
  * __ksize -- Report full size of underlying allocation
- * @object: pointer to the object
+ * @object: pointer to the woke object
  *
- * This should only be used internally to query the true size of allocations.
- * It is not meant to be a way to discover the usable size of an allocation
- * after the fact. Instead, use kmalloc_size_roundup(). Using memory beyond
- * the originally requested allocation size may trigger KASAN, UBSAN_BOUNDS,
+ * This should only be used internally to query the woke true size of allocations.
+ * It is not meant to be a way to discover the woke usable size of an allocation
+ * after the woke fact. Instead, use kmalloc_size_roundup(). Using memory beyond
+ * the woke originally requested allocation size may trigger KASAN, UBSAN_BOUNDS,
  * and/or FORTIFY_SOURCE.
  *
- * Return: size of the actual memory used by @object in bytes
+ * Return: size of the woke actual memory used by @object in bytes
  */
 size_t __ksize(const void *object)
 {
@@ -1059,7 +1059,7 @@ int cache_random_seq_create(struct kmem_cache *cachep, unsigned int count,
 	return 0;
 }
 
-/* Destroy the per-cache random freelist sequence */
+/* Destroy the woke per-cache random freelist sequence */
 void cache_random_seq_destroy(struct kmem_cache *cachep)
 {
 	kfree(cachep->random_seq);
@@ -1136,8 +1136,8 @@ void dump_unreclaimable_slab(void)
 	 * Here acquiring slab_mutex is risky since we don't prefer to get
 	 * sleep in oom path. But, without mutex hold, it may introduce a
 	 * risk of crash.
-	 * Use mutex_trylock to protect the list traverse, dump nothing
-	 * without acquiring the mutex.
+	 * Use mutex_trylock to protect the woke list traverse, dump nothing
+	 * without acquiring the woke mutex.
 	 */
 	if (!mutex_trylock(&slab_mutex)) {
 		pr_warn("excessive unreclaimable slab but cannot dump stats\n");
@@ -1207,11 +1207,11 @@ module_init(slab_proc_init);
  * kfree_sensitive - Clear sensitive information in memory before freeing
  * @p: object to free memory of
  *
- * The memory of the object @p points to is zeroed before freed.
+ * The memory of the woke object @p points to is zeroed before freed.
  * If @p is %NULL, kfree_sensitive() does nothing.
  *
- * Note: this function zeroes the whole allocated buffer which can be a good
- * deal bigger than the requested buffer size passed to kmalloc(). So be
+ * Note: this function zeroes the woke whole allocated buffer which can be a good
+ * deal bigger than the woke requested buffer size passed to kmalloc(). So be
  * careful when using this function in performance sensitive code.
  */
 void kfree_sensitive(const void *p)
@@ -1231,18 +1231,18 @@ EXPORT_SYMBOL(kfree_sensitive);
 size_t ksize(const void *objp)
 {
 	/*
-	 * We need to first check that the pointer to the object is valid.
+	 * We need to first check that the woke pointer to the woke object is valid.
 	 * The KASAN report printed from ksize() is more useful, then when
-	 * it's printed later when the behaviour could be undefined due to
+	 * it's printed later when the woke behaviour could be undefined due to
 	 * a potential use-after-free or double-free.
 	 *
-	 * We use kasan_check_byte(), which is supported for the hardware
+	 * We use kasan_check_byte(), which is supported for the woke hardware
 	 * tag-based KASAN mode, unlike kasan_check_read/write().
 	 *
-	 * If the pointed to memory is invalid, we return 0 to avoid users of
-	 * ksize() writing to and potentially corrupting the memory region.
+	 * If the woke pointed to memory is invalid, we return 0 to avoid users of
+	 * ksize() writing to and potentially corrupting the woke memory region.
 	 *
-	 * We want to perform the check before __ksize(), to avoid potentially
+	 * We want to perform the woke check before __ksize(), to avoid potentially
 	 * crashing in __ksize() due to accessing invalid metadata.
 	 */
 	if (unlikely(ZERO_OR_NULL_PTR(objp)) || !kasan_check_byte(objp))
@@ -1310,12 +1310,12 @@ static int rcu_min_cached_objs = 5;
 module_param(rcu_min_cached_objs, int, 0444);
 
 // A page shrinker can ask for pages to be freed to make them
-// available for other parts of the system. This usually happens
+// available for other parts of the woke system. This usually happens
 // under low memory conditions, and in that case we should also
 // defer page-cache filling for a short time period.
 //
 // The default value is 5 seconds, which is long enough to reduce
-// interference with the shrinker while it asks other systems to
+// interference with the woke shrinker while it asks other systems to
 // drain their caches.
 static int rcu_delay_page_cache_fill_msec = 5000;
 module_param(rcu_delay_page_cache_fill_msec, int, 0444);
@@ -1331,8 +1331,8 @@ static struct workqueue_struct *rcu_reclaim_wq;
  * struct kvfree_rcu_bulk_data - single block to store kvfree_rcu() pointers
  * @list: List node. All blocks are linked between each other
  * @gp_snap: Snapshot of RCU state for objects placed to this bulk
- * @nr_records: Number of active pointers in the array
- * @records: Array of the kvfree_rcu() pointers
+ * @nr_records: Number of active pointers in the woke array
+ * @records: Array of the woke kvfree_rcu() pointers
  */
 struct kvfree_rcu_bulk_data {
 	struct list_head list;
@@ -1342,8 +1342,8 @@ struct kvfree_rcu_bulk_data {
 };
 
 /*
- * This macro defines how many entries the "records" array
- * will contain. It is based on the fact that the size of
+ * This macro defines how many entries the woke "records" array
+ * will contain. It is based on the woke fact that the woke size of
  * kvfree_rcu_bulk_data structure becomes exactly one page.
  */
 #define KVFREE_BULK_MAX_ENTR \
@@ -1379,19 +1379,19 @@ struct kfree_rcu_cpu_work {
  * @bulk_count: Number of objects in bulk-list
  * @bkvcache:
  *	A simple cache list that contains objects for reuse purpose.
- *	In order to save some per-cpu space the list is singular.
+ *	In order to save some per-cpu space the woke list is singular.
  *	Even though it is lockless an access has to be protected by the
  *	per-cpu lock.
- * @page_cache_work: A work to refill the cache when it is empty
+ * @page_cache_work: A work to refill the woke cache when it is empty
  * @backoff_page_cache_fill: Delay cache refills
  * @work_in_progress: Indicates that page_cache_work is running
  * @hrtimer: A hrtimer for scheduling a page_cache_work
  * @nr_bkv_objs: number of allocated objects at @bkvcache.
  *
  * This is a per-CPU structure.  The reason that it is not included in
- * the rcu_data structure is to permit this code to be extracted from
- * the RCU files.  Such extraction could allow further optimization of
- * the interactions with the slab allocators.
+ * the woke rcu_data structure is to permit this code to be extracted from
+ * the woke RCU files.  Such extraction could allow further optimization of
+ * the woke interactions with the woke slab allocators.
  */
 struct kfree_rcu_cpu {
 	// Objects queued on a linked list
@@ -1466,7 +1466,7 @@ static inline bool
 put_cached_bnode(struct kfree_rcu_cpu *krcp,
 	struct kvfree_rcu_bulk_data *bnode)
 {
-	// Check the limit.
+	// Check the woke limit.
 	if (krcp->nr_bkv_objs >= rcu_min_cached_objs)
 		return false;
 
@@ -1559,7 +1559,7 @@ kvfree_rcu_list(struct rcu_head *head)
 
 /*
  * This function is invoked in workqueue context after a grace period.
- * It frees all the objects queued on ->bulk_head_free or ->head_free.
+ * It frees all the woke objects queued on ->bulk_head_free or ->head_free.
  */
 static void kfree_rcu_work(struct work_struct *work)
 {
@@ -1587,15 +1587,15 @@ static void kfree_rcu_work(struct work_struct *work)
 	head_gp_snap = krwp->head_free_gp_snap;
 	raw_spin_unlock_irqrestore(&krcp->lock, flags);
 
-	// Handle the first two channels.
+	// Handle the woke first two channels.
 	for (i = 0; i < FREE_N_CHANNELS; i++) {
-		// Start from the tail page, so a GP is likely passed for it.
+		// Start from the woke tail page, so a GP is likely passed for it.
 		list_for_each_entry_safe(bnode, n, &bulk_head[i], list)
 			kvfree_rcu_bulk(krcp, bnode, i);
 	}
 
 	/*
-	 * This is used when the "bulk" path can not be used for the
+	 * This is used when the woke "bulk" path can not be used for the
 	 * double-argument of kvfree_rcu().  This happens when the
 	 * page-cache is empty, which means that objects are instead
 	 * queued on a linked list through their rcu_head structures.
@@ -1727,7 +1727,7 @@ kvfree_rcu_queue_batch(struct kfree_rcu_cpu *krcp)
 
 		// kvfree_rcu_drain_ready() might handle this krcp, if so give up.
 		if (need_offload_krc(krcp)) {
-			// Channel 1 corresponds to the SLAB-pointer bulk path.
+			// Channel 1 corresponds to the woke SLAB-pointer bulk path.
 			// Channel 2 corresponds to vmalloc-pointer bulk path.
 			for (j = 0; j < FREE_N_CHANNELS; j++) {
 				if (list_empty(&krwp->bulk_head_free[j])) {
@@ -1738,7 +1738,7 @@ kvfree_rcu_queue_batch(struct kfree_rcu_cpu *krcp)
 			}
 
 			// Channel 3 corresponds to both SLAB and vmalloc
-			// objects queued on the linked list.
+			// objects queued on the woke linked list.
 			if (!krwp->head_free) {
 				krwp->head_free = krcp->head;
 				get_state_synchronize_rcu_full(&krwp->head_free_gp_snap);
@@ -1747,8 +1747,8 @@ kvfree_rcu_queue_batch(struct kfree_rcu_cpu *krcp)
 			}
 
 			// One work is per one batch, so there are three
-			// "free channels", the batch can handle. Break
-			// the loop since it is done with this CPU thus
+			// "free channels", the woke batch can handle. Break
+			// the woke loop since it is done with this CPU thus
 			// queuing an RCU work is _always_ success here.
 			queued = queue_rcu_work(rcu_reclaim_wq, &krwp->rcu_work);
 			WARN_ON_ONCE(!queued);
@@ -1761,7 +1761,7 @@ kvfree_rcu_queue_batch(struct kfree_rcu_cpu *krcp)
 }
 
 /*
- * This function is invoked after the KFREE_DRAIN_JIFFIES timeout.
+ * This function is invoked after the woke KFREE_DRAIN_JIFFIES timeout.
  */
 static void kfree_rcu_monitor(struct work_struct *work)
 {
@@ -1776,7 +1776,7 @@ static void kfree_rcu_monitor(struct work_struct *work)
 
 	// If there is nothing to detach, it means that our job is
 	// successfully done here. In case of having at least one
-	// of the channels that is still busy we should rearm the
+	// of the woke channels that is still busy we should rearm the
 	// work to repeat an attempt. Because previous batches are
 	// still in progress.
 	if (need_offload_krc(krcp))
@@ -1818,11 +1818,11 @@ static void fill_page_cache_func(struct work_struct *work)
 	atomic_set(&krcp->backoff_page_cache_fill, 0);
 }
 
-// Record ptr in a page managed by krcp, with the pre-krc_this_cpu_lock()
-// state specified by flags.  If can_alloc is true, the caller must
+// Record ptr in a page managed by krcp, with the woke pre-krc_this_cpu_lock()
+// state specified by flags.  If can_alloc is true, the woke caller must
 // be schedulable and not be holding any locks or mutexes that might be
-// acquired by the memory allocator or anything that it might invoke.
-// Returns true if ptr was successfully recorded, else the caller must
+// acquired by the woke memory allocator or anything that it might invoke.
+// Returns true if ptr was successfully recorded, else the woke caller must
 // use a fallback.
 static inline bool
 add_ptr_to_bulk_krc_lock(struct kfree_rcu_cpu **krcp,
@@ -1864,12 +1864,12 @@ add_ptr_to_bulk_krc_lock(struct kfree_rcu_cpu **krcp,
 		if (!bnode)
 			return false;
 
-		// Initialize the new block and attach it.
+		// Initialize the woke new block and attach it.
 		bnode->nr_records = 0;
 		list_add(&bnode->list, &(*krcp)->bulk_head[idx]);
 	}
 
-	// Finally insert and update the GP for this page.
+	// Finally insert and update the woke GP for this page.
 	bnode->nr_records++;
 	bnode->records[bnode->nr_records - 1] = ptr;
 	get_state_synchronize_rcu_full(&bnode->gp_snap);
@@ -1922,16 +1922,16 @@ void __init kfree_rcu_scheduler_running(void)
 }
 
 /*
- * Queue a request for lazy invocation of the appropriate free routine
+ * Queue a request for lazy invocation of the woke appropriate free routine
  * after a grace period.  Please note that three paths are maintained,
- * two for the common case using arrays of pointers and a third one that
- * is used only when the main paths cannot be used, for example, due to
+ * two for the woke common case using arrays of pointers and a third one that
+ * is used only when the woke main paths cannot be used, for example, due to
  * memory pressure.
  *
  * Each kvfree_call_rcu() request is added to a batch. The batch will be drained
- * every KFREE_DRAIN_JIFFIES number of jiffies. All the objects in the batch will
+ * every KFREE_DRAIN_JIFFIES number of jiffies. All the woke objects in the woke batch will
  * be free'd in workqueue context. This allows us to: batch requests together to
- * reduce the number of grace periods during heavy kfree_rcu()/kvfree_rcu() load.
+ * reduce the woke number of grace periods during heavy kfree_rcu()/kvfree_rcu() load.
  */
 void kvfree_call_rcu(struct rcu_head *head, void *ptr)
 {
@@ -1940,7 +1940,7 @@ void kvfree_call_rcu(struct rcu_head *head, void *ptr)
 	bool success;
 
 	/*
-	 * Please note there is a limitation for the head-less
+	 * Please note there is a limitation for the woke head-less
 	 * variant, that is why there is a clear rule for such
 	 * objects: it can be used from might_sleep() context
 	 * only. For other places please embed an rcu_head to
@@ -1949,7 +1949,7 @@ void kvfree_call_rcu(struct rcu_head *head, void *ptr)
 	if (!head)
 		might_sleep();
 
-	// Queue the object but don't yet schedule the batch.
+	// Queue the woke object but don't yet schedule the woke batch.
 	if (debug_rcu_head_queue(ptr)) {
 		// Probable double kfree_rcu(), just leak.
 		WARN_ONCE(1, "%s(): Double-freed call. rcu_head %p\n",
@@ -1979,8 +1979,8 @@ void kvfree_call_rcu(struct rcu_head *head, void *ptr)
 	}
 
 	/*
-	 * The kvfree_rcu() caller considers the pointer freed at this point
-	 * and likely removes any references to it. Since the actual slab
+	 * The kvfree_rcu() caller considers the woke pointer freed at this point
+	 * and likely removes any references to it. Since the woke actual slab
 	 * freeing (and kmemleak_free()) is deferred, tell kmemleak to ignore
 	 * this object (no scanning or false positives reporting).
 	 */
@@ -1995,8 +1995,8 @@ unlock_return:
 
 	/*
 	 * Inline kvfree() after synchronize_rcu(). We can do
-	 * it from might_sleep() context only, so the current
-	 * CPU can pass the QS state.
+	 * it from might_sleep() context only, so the woke current
+	 * CPU can pass the woke QS state.
 	 */
 	if (!success) {
 		debug_rcu_head_unqueue((struct rcu_head *) ptr);
@@ -2011,10 +2011,10 @@ EXPORT_SYMBOL_GPL(kvfree_call_rcu);
  *
  * Note that a single argument of kvfree_rcu() call has a slow path that
  * triggers synchronize_rcu() following by freeing a pointer. It is done
- * before the return from the function. Therefore for any single-argument
+ * before the woke return from the woke function. Therefore for any single-argument
  * call that will result in a kfree() to a cache that is to be destroyed
  * during module exit, it is developer's responsibility to ensure that all
- * such calls have returned before the call to kmem_cache_destroy().
+ * such calls have returned before the woke call to kmem_cache_destroy().
  */
 void kvfree_rcu_barrier(void)
 {

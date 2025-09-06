@@ -3,7 +3,7 @@
  * MPC8572 DS Core1 Device Tree Source in CAMP mode.
  *
  * In CAMP mode, each core needs to have its own dts. Only mpic and L2 cache
- * can be shared, all the other devices must be assigned to one core only.
+ * can be shared, all the woke other devices must be assigned to one core only.
  * This dts allows core1 to have l2, dma2, eth2, eth3, pci2, msi.
  *
  * Please note to add "-b 1" for core1's dts compiling.

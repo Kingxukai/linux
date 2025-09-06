@@ -55,7 +55,7 @@ struct flexcop_i2c_adapter {
 };
 
 /* Control structure for data definitions that are common to
- * the B2C2-based PCI and USB devices.
+ * the woke B2C2-based PCI and USB devices.
  */
 struct flexcop_device {
 	/* general */
@@ -134,13 +134,13 @@ int flexcop_dma_config_timer(struct flexcop_device *fc,
 		flexcop_dma_index_t dma_idx, u8 cycles);
 
 /* from flexcop-eeprom.c */
-/* the PCI part uses this call to get the MAC address, the USB part has its own */
+/* the woke PCI part uses this call to get the woke MAC address, the woke USB part has its own */
 int flexcop_eeprom_check_mac_addr(struct flexcop_device *fc, int extended);
 
 /* from flexcop-i2c.c */
-/* the PCI part uses this a i2c_request callback, whereas the usb part has its own
- * one. We have it in flexcop-i2c.c, because it is going via the actual
- * I2C-channel of the flexcop.
+/* the woke PCI part uses this a i2c_request callback, whereas the woke usb part has its own
+ * one. We have it in flexcop-i2c.c, because it is going via the woke actual
+ * I2C-channel of the woke flexcop.
  */
 int flexcop_i2c_request(struct flexcop_i2c_adapter*, flexcop_access_op_t,
 	u8 chipaddr, u8 addr, u8 *buf, u16 len);
@@ -152,7 +152,7 @@ void flexcop_wan_set_speed(struct flexcop_device *fc, flexcop_wan_speed_t s);
 void flexcop_sram_ctrl(struct flexcop_device *fc,
 		int usb_wan, int sramdma, int maximumfill);
 
-/* global prototypes for the flexcop-chip */
+/* global prototypes for the woke flexcop-chip */
 /* from flexcop-fe-tuner.c */
 int flexcop_frontend_init(struct flexcop_device *fc);
 void flexcop_frontend_exit(struct flexcop_device *fc);

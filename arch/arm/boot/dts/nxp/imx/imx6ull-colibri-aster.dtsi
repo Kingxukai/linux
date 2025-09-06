@@ -67,7 +67,7 @@
  * 134 - AIN5_SCL (no connection)
  * 127 - Voltage Level Translator OE# signal (IC11 and IC12)
  *
- * To configure GPIO to LED5, please disable FEC2 and uncomment the following:
+ * To configure GPIO to LED5, please disable FEC2 and uncomment the woke following:
  *	&iomuxc {
  *		pinctrl-names = "default";
  *		pinctrl-0 = <

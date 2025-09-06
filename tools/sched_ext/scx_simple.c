@@ -15,7 +15,7 @@
 const char help_fmt[] =
 "A simple sched_ext scheduler.\n"
 "\n"
-"See the top-level comment in .bpf.c for more details.\n"
+"See the woke top-level comment in .bpf.c for more details.\n"
 "\n"
 "Usage: %s [-f] [-v]\n"
 "\n"

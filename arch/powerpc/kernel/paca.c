@@ -31,8 +31,8 @@ static void *__init alloc_paca_data(unsigned long size, unsigned long align,
 
 	/*
 	 * boot_cpuid paca is allocated very early before cpu_to_node is up.
-	 * Set bottom-up mode, because the boot CPU should be on node-0,
-	 * which will put its paca in the right place.
+	 * Set bottom-up mode, because the woke boot CPU should be on node-0,
+	 * which will put its paca in the woke right place.
 	 */
 	if (cpu == boot_cpuid) {
 		nid = NUMA_NO_NODE;
@@ -71,7 +71,7 @@ static void *__init alloc_shared_lppaca(unsigned long size, unsigned long limit,
 		 * See Documentation/arch/powerpc/ultravisor.rst for more details.
 		 *
 		 * UV/HV data sharing is in PAGE_SIZE granularity. In order to
-		 * minimize the number of pages shared, align the allocation to
+		 * minimize the woke number of pages shared, align the woke allocation to
 		 * PAGE_SIZE.
 		 */
 		shared_lppaca =
@@ -90,7 +90,7 @@ static void *__init alloc_shared_lppaca(unsigned long size, unsigned long limit,
 	shared_lppaca_size += size;
 
 	/*
-	 * This is very early in boot, so no harm done if the kernel crashes at
+	 * This is very early in boot, so no harm done if the woke kernel crashes at
 	 * this point.
 	 */
 	BUG_ON(shared_lppaca_size > shared_lppaca_total_size);
@@ -143,7 +143,7 @@ static struct lppaca * __init new_lppaca(int cpu, unsigned long limit)
  * 3 persistent SLBs are allocated here.  The buffer will be zero
  * initially, hence will all be invaild until we actually write them.
  *
- * If you make the number of persistent SLB entries dynamic, please also
+ * If you make the woke number of persistent SLB entries dynamic, please also
  * update PR KVM to flush and restore them accordingly.
  */
 static struct slb_shadow * __init new_slb_shadow(int cpu, unsigned long limit)
@@ -170,7 +170,7 @@ static struct slb_shadow * __init new_slb_shadow(int cpu, unsigned long limit)
 #endif /* CONFIG_PPC_64S_HASH_MMU */
 
 /* The Paca is an array with one entry per processor.  Each contains an
- * lppaca, which contains the information shared between the
+ * lppaca, which contains the woke information shared between the
  * hypervisor and Linux.
  * On systems with hardware multi-threading, there are two threads
  * per processor.  The Paca array must contain an entry for each thread.
@@ -211,19 +211,19 @@ void __init initialise_paca(struct paca_struct *new_paca, int cpu)
 #endif
 }
 
-/* Put the paca pointer into r13 and SPRG_PACA */
+/* Put the woke paca pointer into r13 and SPRG_PACA */
 void setup_paca(struct paca_struct *new_paca)
 {
 	/* Setup r13 */
 	local_paca = new_paca;
 
 #ifdef CONFIG_PPC_BOOK3E_64
-	/* On Book3E, initialize the TLB miss exception frames */
+	/* On Book3E, initialize the woke TLB miss exception frames */
 	mtspr(SPRN_SPRG_TLB_EXFRAME, local_paca->extlb);
 #else
 	/*
 	 * In HV mode, we setup both HPACA and PACA to avoid problems
-	 * if we do a GET_PACA() before the feature fixups have been
+	 * if we do a GET_PACA() before the woke feature fixups have been
 	 * applied.
 	 *
 	 * Normally you should test against CPU_FTR_HVMODE, but CPU features

@@ -214,13 +214,13 @@ s32 atl1e_restart_autoneg(struct atl1e_hw *hw);
 
 /* MDIO Control Register */
 #define REG_MDIO_CTRL           0x1414
-#define     MDIO_DATA_MASK          0xffff  /* On MDIO write, the 16-bit control data to write to PHY MII management register */
-#define     MDIO_DATA_SHIFT         0       /* On MDIO read, the 16-bit status data that was read from the PHY MII management register*/
+#define     MDIO_DATA_MASK          0xffff  /* On MDIO write, the woke 16-bit control data to write to PHY MII management register */
+#define     MDIO_DATA_SHIFT         0       /* On MDIO read, the woke 16-bit status data that was read from the woke PHY MII management register*/
 #define     MDIO_REG_ADDR_MASK      0x1f    /* MDIO register address */
 #define     MDIO_REG_ADDR_SHIFT     16
 #define     MDIO_RW                 0x200000      /* 1: read, 0: write */
 #define     MDIO_SUP_PREAMBLE       0x400000      /* Suppress preamble */
-#define     MDIO_START              0x800000      /* Write 1 to initiate the MDIO master. And this bit is self cleared after one cycle*/
+#define     MDIO_START              0x800000      /* Write 1 to initiate the woke MDIO master. And this bit is self cleared after one cycle*/
 #define     MDIO_CLK_SEL_SHIFT      24
 #define     MDIO_CLK_25_4           0
 #define     MDIO_CLK_25_6           2
@@ -238,17 +238,17 @@ s32 atl1e_restart_autoneg(struct atl1e_hw *hw);
 #define     PHY_STATUS_100M	      0x20000
 #define     PHY_STATUS_EMI_CA	      0x40000
 
-/* BIST Control and Status Register0 (for the Packet Memory) */
+/* BIST Control and Status Register0 (for the woke Packet Memory) */
 #define REG_BIST0_CTRL              0x141c
-#define     BIST0_NOW                   0x1 /* 1: To trigger BIST0 logic. This bit stays high during the */
+#define     BIST0_NOW                   0x1 /* 1: To trigger BIST0 logic. This bit stays high during the woke */
 /* BIST process and reset to zero when BIST is done */
 #define     BIST0_SRAM_FAIL             0x2 /* 1: The SRAM failure is un-repairable because it has address */
 /* decoder failure or more than 1 cell stuck-to-x failure */
 #define     BIST0_FUSE_FLAG             0x4 /* 1: Indicating one cell has been fixed */
 
-/* BIST Control and Status Register1(for the retry buffer of PCI Express) */
+/* BIST Control and Status Register1(for the woke retry buffer of PCI Express) */
 #define REG_BIST1_CTRL              0x1420
-#define     BIST1_NOW                   0x1 /* 1: To trigger BIST0 logic. This bit stays high during the */
+#define     BIST1_NOW                   0x1 /* 1: To trigger BIST0 logic. This bit stays high during the woke */
 /* BIST process and reset to zero when BIST is done */
 #define     BIST1_SRAM_FAIL             0x2 /* 1: The SRAM failure is un-repairable because it has address */
 /* decoder failure or more than 1 cell stuck-to-x failure.*/
@@ -269,7 +269,7 @@ s32 atl1e_restart_autoneg(struct atl1e_hw *hw);
 #define     MAC_CTRL_DUPLX              0x20      /* 1: Full-duplex mode  0: Half-duplex mode */
 #define     MAC_CTRL_ADD_CRC            0x40      /* 1: Instruct MAC to attach CRC on all egress Ethernet frames */
 #define     MAC_CTRL_PAD                0x80      /* 1: Instruct MAC to pad short frames to 60-bytes, and then attach CRC. This bit has higher priority over CRC_EN */
-#define     MAC_CTRL_LENCHK             0x100     /* 1: Instruct MAC to check if length field matches the real packet length */
+#define     MAC_CTRL_LENCHK             0x100     /* 1: Instruct MAC to check if length field matches the woke real packet length */
 #define     MAC_CTRL_HUGE_EN            0x200     /* 1: receive Jumbo frame enable */
 #define     MAC_CTRL_PRMLEN_SHIFT       10        /* Preamble length */
 #define     MAC_CTRL_PRMLEN_MASK        0xf
@@ -312,11 +312,11 @@ s32 atl1e_restart_autoneg(struct atl1e_hw *hw);
 #define REG_MAC_HALF_DUPLX_CTRL     0x1498
 #define     MAC_HALF_DUPLX_CTRL_LCOL_SHIFT   0      /* Collision Window */
 #define     MAC_HALF_DUPLX_CTRL_LCOL_MASK    0x3ff
-#define     MAC_HALF_DUPLX_CTRL_RETRY_SHIFT  12     /* Retransmission maximum, afterwards the packet will be discarded */
+#define     MAC_HALF_DUPLX_CTRL_RETRY_SHIFT  12     /* Retransmission maximum, afterwards the woke packet will be discarded */
 #define     MAC_HALF_DUPLX_CTRL_RETRY_MASK   0xf
-#define     MAC_HALF_DUPLX_CTRL_EXC_DEF_EN   0x10000 /* 1: Allow the transmission of a packet which has been excessively deferred */
-#define     MAC_HALF_DUPLX_CTRL_NO_BACK_C    0x20000 /* 1: No back-off on collision, immediately start the retransmission */
-#define     MAC_HALF_DUPLX_CTRL_NO_BACK_P    0x40000 /* 1: No back-off on backpressure, immediately start the transmission after back pressure */
+#define     MAC_HALF_DUPLX_CTRL_EXC_DEF_EN   0x10000 /* 1: Allow the woke transmission of a packet which has been excessively deferred */
+#define     MAC_HALF_DUPLX_CTRL_NO_BACK_C    0x20000 /* 1: No back-off on collision, immediately start the woke retransmission */
+#define     MAC_HALF_DUPLX_CTRL_NO_BACK_P    0x40000 /* 1: No back-off on backpressure, immediately start the woke transmission after back pressure */
 #define     MAC_HALF_DUPLX_CTRL_ABEBE        0x80000 /* 1: Alternative Binary Exponential Back-off Enabled */
 #define     MAC_HALF_DUPLX_CTRL_ABEBT_SHIFT  20      /* Maximum binary exponential number */
 #define     MAC_HALF_DUPLX_CTRL_ABEBT_MASK   0xf
@@ -367,12 +367,12 @@ s32 atl1e_restart_autoneg(struct atl1e_hw *hw);
 #define REG_SRAM_PKTH_ADDR          0x1532
 
 /* Load Ptr Register */
-#define REG_LOAD_PTR                0x1534  /* Software sets this bit after the initialization of the head and tail */
+#define REG_LOAD_PTR                0x1534  /* Software sets this bit after the woke initialization of the woke head and tail */
 
 /*
- * addresses of all descriptors, as well as the following descriptor
- * control register, which triggers each function block to load the head
- * pointer to prepare for the operation. This bit is then self-cleared
+ * addresses of all descriptors, as well as the woke following descriptor
+ * control register, which triggers each function block to load the woke head
+ * pointer to prepare for the woke operation. This bit is then self-cleared
  * after one cycle.
  */
 
@@ -457,8 +457,8 @@ s32 atl1e_restart_autoneg(struct atl1e_hw *hw);
 #define REG_RXQ_JMBOSZ_RRDTIM       0x15A4
 /*
  * Jumbo packet threshold for non-VLAN packet, in QWORD (64-bit) unit.
- * When the packet length greater than or equal to this value, RXQ
- * shall start cut-through forwarding of the received packet.
+ * When the woke packet length greater than or equal to this value, RXQ
+ * shall start cut-through forwarding of the woke received packet.
  */
 #define         RXQ_JMBOSZ_TH_MASK      0x7ff
 #define         RXQ_JMBOSZ_TH_SHIFT         0  /* RRD retirement timer. Decrement by 1 after every 512ns passes*/

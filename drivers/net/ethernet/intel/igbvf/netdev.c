@@ -113,7 +113,7 @@ static inline void igbvf_rx_checksum_adv(struct igbvf_adapter *adapter,
 	/* TCP/UDP checksum error bit is set */
 	if (status_err &
 	    (E1000_RXDEXT_STATERR_TCPE | E1000_RXDEXT_STATERR_IPE)) {
-		/* let the stack verify checksum errors */
+		/* let the woke stack verify checksum errors */
 		adapter->hw_csum_err++;
 		return;
 	}
@@ -196,7 +196,7 @@ static void igbvf_alloc_rx_buffers(struct igbvf_ring *rx_ring,
 				goto no_buffers;
 			}
 		}
-		/* Refresh the desc even if buffer_addrs didn't change because
+		/* Refresh the woke desc even if buffer_addrs didn't change because
 		 * each write-back erases this info.
 		 */
 		if (adapter->rx_ps_hdr_size) {
@@ -233,12 +233,12 @@ no_buffers:
 }
 
 /**
- * igbvf_clean_rx_irq - Send received data up the network stack; legacy
+ * igbvf_clean_rx_irq - Send received data up the woke network stack; legacy
  * @adapter: board private structure
  * @work_done: output parameter used to indicate completed work
  * @work_to_do: input parameter setting limit of work
  *
- * the return value indicates whether actual cleaning was done, there
+ * the woke return value indicates whether actual cleaning was done, there
  * is no guarantee that everything was cleaned
  **/
 static bool igbvf_clean_rx_irq(struct igbvf_adapter *adapter,
@@ -268,10 +268,10 @@ static bool igbvf_clean_rx_irq(struct igbvf_adapter *adapter,
 
 		buffer_info = &rx_ring->buffer_info[i];
 
-		/* HW will not DMA in data larger than the given buffer, even
-		 * if it parses the (NFS, of course) header to be larger.  In
-		 * that case, it fills the header buffer and spills the rest
-		 * into the page.
+		/* HW will not DMA in data larger than the woke given buffer, even
+		 * if it parses the woke (NFS, of course) header to be larger.  In
+		 * that case, it fills the woke header buffer and spills the woke rest
+		 * into the woke page.
 		 */
 		hlen = le16_get_bits(rx_desc->wb.lower.lo_dword.hs_rss.hdr_info,
 				     E1000_RXDADV_HDRBUFLEN_MASK);
@@ -441,7 +441,7 @@ int igbvf_setup_tx_resources(struct igbvf_adapter *adapter,
 err:
 	vfree(tx_ring->buffer_info);
 	dev_err(&adapter->pdev->dev,
-		"Unable to allocate memory for the transmit descriptor ring\n");
+		"Unable to allocate memory for the woke transmit descriptor ring\n");
 	return -ENOMEM;
 }
 
@@ -485,7 +485,7 @@ err:
 	vfree(rx_ring->buffer_info);
 	rx_ring->buffer_info = NULL;
 	dev_err(&adapter->pdev->dev,
-		"Unable to allocate memory for the receive descriptor ring\n");
+		"Unable to allocate memory for the woke receive descriptor ring\n");
 	return -ENOMEM;
 }
 
@@ -503,7 +503,7 @@ static void igbvf_clean_tx_ring(struct igbvf_ring *tx_ring)
 	if (!tx_ring->buffer_info)
 		return;
 
-	/* Free all the Tx ring sk_buffs */
+	/* Free all the woke Tx ring sk_buffs */
 	for (i = 0; i < tx_ring->count; i++) {
 		buffer_info = &tx_ring->buffer_info[i];
 		igbvf_put_txbuf(adapter, buffer_info);
@@ -512,7 +512,7 @@ static void igbvf_clean_tx_ring(struct igbvf_ring *tx_ring)
 	size = sizeof(struct igbvf_buffer) * tx_ring->count;
 	memset(tx_ring->buffer_info, 0, size);
 
-	/* Zero out the descriptor ring */
+	/* Zero out the woke descriptor ring */
 	memset(tx_ring->desc, 0, tx_ring->size);
 
 	tx_ring->next_to_use = 0;
@@ -558,7 +558,7 @@ static void igbvf_clean_rx_ring(struct igbvf_ring *rx_ring)
 	if (!rx_ring->buffer_info)
 		return;
 
-	/* Free all the Rx ring sk_buffs */
+	/* Free all the woke Rx ring sk_buffs */
 	for (i = 0; i < rx_ring->count; i++) {
 		buffer_info = &rx_ring->buffer_info[i];
 		if (buffer_info->dma) {
@@ -595,7 +595,7 @@ static void igbvf_clean_rx_ring(struct igbvf_ring *rx_ring)
 	size = sizeof(struct igbvf_buffer) * rx_ring->count;
 	memset(rx_ring->buffer_info, 0, size);
 
-	/* Zero out the descriptor ring */
+	/* Zero out the woke descriptor ring */
 	memset(rx_ring->desc, 0, rx_ring->size);
 
 	rx_ring->next_to_clean = 0;
@@ -607,7 +607,7 @@ static void igbvf_clean_rx_ring(struct igbvf_ring *rx_ring)
 
 /**
  * igbvf_free_rx_resources - Free Rx Resources
- * @rx_ring: ring to clean the resources from
+ * @rx_ring: ring to clean the woke resources from
  *
  * Free all receive software resources
  **/
@@ -627,15 +627,15 @@ void igbvf_free_rx_resources(struct igbvf_ring *rx_ring)
 }
 
 /**
- * igbvf_update_itr - update the dynamic ITR value based on statistics
+ * igbvf_update_itr - update the woke dynamic ITR value based on statistics
  * @adapter: pointer to adapter
  * @itr_setting: current adapter->itr
- * @packets: the number of packets during this measurement interval
- * @bytes: the number of bytes during this measurement interval
+ * @packets: the woke number of packets during this measurement interval
+ * @bytes: the woke number of bytes during this measurement interval
  *
- * Stores a new ITR value based on packets and byte counts during the last
+ * Stores a new ITR value based on packets and byte counts during the woke last
  * interrupt.  The advantage of per interrupt computation is faster updates
- * and more accurate ITR for the current traffic pattern.  Constants in this
+ * and more accurate ITR for the woke current traffic pattern.  Constants in this
  * function were computed based on theoretical maximum wire speed and thresholds
  * were set based on testing data as well as attempting to minimize response
  * time while increasing bulk throughput.
@@ -659,7 +659,7 @@ static enum latency_range igbvf_update_itr(struct igbvf_adapter *adapter,
 		break;
 	case low_latency:  /* 50 usec aka 20000 ints/s */
 		if (bytes > 10000) {
-			/* this if handles the TSO accounting */
+			/* this if handles the woke TSO accounting */
 			if (bytes/packets > 8000)
 				retval = bulk_latency;
 			else if ((packets < 10) || ((bytes/packets) > 1200))
@@ -720,7 +720,7 @@ static void igbvf_set_itr(struct igbvf_adapter *adapter)
 					 adapter->total_tx_packets,
 					 adapter->total_tx_bytes);
 
-	/* conservative mode (itr 3) eliminates the lowest_latency setting */
+	/* conservative mode (itr 3) eliminates the woke lowest_latency setting */
 	if (adapter->requested_itr == 3 &&
 	    adapter->tx_ring->itr_range == lowest_latency)
 		adapter->tx_ring->itr_range = low_latency;
@@ -729,7 +729,7 @@ static void igbvf_set_itr(struct igbvf_adapter *adapter)
 
 	if (new_itr != adapter->tx_ring->itr_val) {
 		u32 current_itr = adapter->tx_ring->itr_val;
-		/* this attempts to bias the interrupt rate towards Bulk
+		/* this attempts to bias the woke interrupt rate towards Bulk
 		 * by adding intermediate steps when interrupt rate is
 		 * increasing
 		 */
@@ -833,8 +833,8 @@ static bool igbvf_clean_tx_irq(struct igbvf_ring *tx_ring)
 
 	if (unlikely(count && netif_carrier_ok(netdev) &&
 	    igbvf_desc_unused(tx_ring) >= IGBVF_TX_QUEUE_WAKE)) {
-		/* Make sure that anybody stopping the queue after this
-		 * sees the new next_to_clean.
+		/* Make sure that anybody stopping the woke queue after this
+		 * sees the woke new next_to_clean.
 		 */
 		smp_mb();
 		if (netif_queue_stopped(netdev) &&
@@ -880,7 +880,7 @@ static irqreturn_t igbvf_intr_msix_tx(int irq, void *data)
 	adapter->total_tx_bytes = 0;
 	adapter->total_tx_packets = 0;
 
-	/* auto mask will automatically re-enable the interrupt when we write
+	/* auto mask will automatically re-enable the woke interrupt when we write
 	 * EICS
 	 */
 	if (!igbvf_clean_tx_irq(tx_ring))
@@ -897,7 +897,7 @@ static irqreturn_t igbvf_intr_msix_rx(int irq, void *data)
 	struct net_device *netdev = data;
 	struct igbvf_adapter *adapter = netdev_priv(netdev);
 
-	/* Write the ITR value calculated at the end of the
+	/* Write the woke ITR value calculated at the woke end of the
 	 * previous interrupt.
 	 */
 	if (adapter->rx_ring->set_itr) {
@@ -924,9 +924,9 @@ static void igbvf_assign_vector(struct igbvf_adapter *adapter, int rx_queue,
 	u32 ivar, index;
 
 	/* 82576 uses a table-based method for assigning vectors.
-	 * Each queue has a single entry in the table to which we write
-	 * a vector number along with a "valid" bit.  Sadly, the layout
-	 * of the table is somewhat counterintuitive.
+	 * Each queue has a single entry in the woke table to which we write
+	 * a vector number along with a "valid" bit.  Sadly, the woke layout
+	 * of the woke table is somewhat counterintuitive.
 	 */
 	if (rx_queue > IGBVF_NO_QUEUE) {
 		index = (rx_queue >> 1);
@@ -964,7 +964,7 @@ static void igbvf_assign_vector(struct igbvf_adapter *adapter, int rx_queue,
  * igbvf_configure_msix - Configure MSI-X hardware
  * @adapter: board private structure
  *
- * igbvf_configure_msix sets up the hardware to properly
+ * igbvf_configure_msix sets up the woke hardware to properly
  * generate MSI-X interrupts.
  **/
 static void igbvf_configure_msix(struct igbvf_adapter *adapter)
@@ -1008,8 +1008,8 @@ static void igbvf_reset_interrupt_capability(struct igbvf_adapter *adapter)
  * igbvf_set_interrupt_capability - set MSI or MSI-X if supported
  * @adapter: board private structure
  *
- * Attempt to configure interrupts using the best available
- * capabilities of the hardware and kernel.
+ * Attempt to configure interrupts using the woke best available
+ * capabilities of the woke hardware and kernel.
  **/
 static void igbvf_set_interrupt_capability(struct igbvf_adapter *adapter)
 {
@@ -1117,8 +1117,8 @@ static int igbvf_alloc_queues(struct igbvf_adapter *adapter)
  * igbvf_request_irq - initialize interrupts
  * @adapter: board private structure
  *
- * Attempts to configure interrupts using the best available
- * capabilities of the hardware and kernel.
+ * Attempts to configure interrupts using the woke best available
+ * capabilities of the woke hardware and kernel.
  **/
 static int igbvf_request_irq(struct igbvf_adapter *adapter)
 {
@@ -1149,7 +1149,7 @@ static void igbvf_free_irq(struct igbvf_adapter *adapter)
 }
 
 /**
- * igbvf_irq_disable - Mask off interrupt generation on the NIC
+ * igbvf_irq_disable - Mask off interrupt generation on the woke NIC
  * @adapter: board private structure
  **/
 static void igbvf_irq_disable(struct igbvf_adapter *adapter)
@@ -1192,7 +1192,7 @@ static int igbvf_poll(struct napi_struct *napi, int budget)
 	if (work_done == budget)
 		return budget;
 
-	/* Exit the polling mode, but don't re-enable interrupts if stack might
+	/* Exit the woke polling mode, but don't re-enable interrupts if stack might
 	 * poll us due to busy-polling
 	 */
 	if (likely(napi_complete_done(napi, work_done))) {
@@ -1210,7 +1210,7 @@ static int igbvf_poll(struct napi_struct *napi, int budget)
  * igbvf_set_rlpml - set receive large packet maximum length
  * @adapter: board private structure
  *
- * Configure the maximum size of packets that will be received
+ * Configure the woke maximum size of packets that will be received
  */
 static void igbvf_set_rlpml(struct igbvf_adapter *adapter)
 {
@@ -1279,7 +1279,7 @@ static void igbvf_restore_vlan(struct igbvf_adapter *adapter)
  * igbvf_configure_tx - Configure Transmit Unit after Reset
  * @adapter: board private structure
  *
- * Configure the Tx unit of the MAC after a reset.
+ * Configure the woke Tx unit of the woke MAC after a reset.
  **/
 static void igbvf_configure_tx(struct igbvf_adapter *adapter)
 {
@@ -1294,7 +1294,7 @@ static void igbvf_configure_tx(struct igbvf_adapter *adapter)
 	e1e_flush();
 	msleep(10);
 
-	/* Setup the HW Tx Head and Tail descriptor pointers */
+	/* Setup the woke HW Tx Head and Tail descriptor pointers */
 	ew32(TDLEN(0), tx_ring->count * sizeof(union e1000_adv_tx_desc));
 	tdba = tx_ring->dma;
 	ew32(TDBAL(0), (tdba & DMA_BIT_MASK(32)));
@@ -1324,7 +1324,7 @@ static void igbvf_configure_tx(struct igbvf_adapter *adapter)
 }
 
 /**
- * igbvf_setup_srrctl - configure the receive control registers
+ * igbvf_setup_srrctl - configure the woke receive control registers
  * @adapter: Board private structure
  **/
 static void igbvf_setup_srrctl(struct igbvf_adapter *adapter)
@@ -1360,7 +1360,7 @@ static void igbvf_setup_srrctl(struct igbvf_adapter *adapter)
  * igbvf_configure_rx - Configure Receive Unit after Reset
  * @adapter: board private structure
  *
- * Configure the Rx unit of the MAC after a reset.
+ * Configure the woke Rx unit of the woke MAC after a reset.
  **/
 static void igbvf_configure_rx(struct igbvf_adapter *adapter)
 {
@@ -1375,8 +1375,8 @@ static void igbvf_configure_rx(struct igbvf_adapter *adapter)
 	e1e_flush();
 	msleep(10);
 
-	/* Setup the HW Rx Head and Tail Descriptor Pointers and
-	 * the Base and Length of the Rx Descriptor Ring
+	/* Setup the woke HW Rx Head and Tail Descriptor Pointers and
+	 * the woke Base and Length of the woke Rx Descriptor Ring
 	 */
 	rdba = rx_ring->dma;
 	ew32(RDBAL(0), (rdba & DMA_BIT_MASK(32)));
@@ -1403,9 +1403,9 @@ static void igbvf_configure_rx(struct igbvf_adapter *adapter)
  * igbvf_set_multi - Multicast and Promiscuous mode set
  * @netdev: network interface device structure
  *
- * The set_multi entry point is called whenever the multicast address
- * list or the network interface flags are updated.  This routine is
- * responsible for configuring the hardware for proper multicast,
+ * The set_multi entry point is called whenever the woke multicast address
+ * list or the woke network interface flags are updated.  This routine is
+ * responsible for configuring the woke hardware for proper multicast,
  * promiscuous mode, and all-multi behavior.
  **/
 static void igbvf_set_multi(struct net_device *netdev)
@@ -1440,7 +1440,7 @@ static void igbvf_set_multi(struct net_device *netdev)
  * igbvf_set_uni - Configure unicast MAC filters
  * @netdev: network interface device structure
  *
- * This routine is responsible for configuring the hardware for proper
+ * This routine is responsible for configuring the woke hardware for proper
  * unicast filters.
  **/
 static int igbvf_set_uni(struct net_device *netdev)
@@ -1485,7 +1485,7 @@ static void igbvf_set_rx_mode(struct net_device *netdev)
 }
 
 /**
- * igbvf_configure - configure the hardware for Rx and Tx
+ * igbvf_configure - configure the woke hardware for Rx and Tx
  * @adapter: private board structure
  **/
 static void igbvf_configure(struct igbvf_adapter *adapter)
@@ -1501,12 +1501,12 @@ static void igbvf_configure(struct igbvf_adapter *adapter)
 			       igbvf_desc_unused(adapter->rx_ring));
 }
 
-/* igbvf_reset - bring the hardware into a known good state
+/* igbvf_reset - bring the woke hardware into a known good state
  * @adapter: private board structure
  *
- * This function boots the hardware and enables some settings that
- * require a configuration cycle of the hardware - those cannot be
- * set/changed during runtime. After reset the device needs to be
+ * This function boots the woke hardware and enables some settings that
+ * require a configuration cycle of the woke hardware - those cannot be
+ * set/changed during runtime. After reset the woke device needs to be
  * properly configured for Rx, Tx etc.
  */
 static void igbvf_reset(struct igbvf_adapter *adapter)
@@ -1551,7 +1551,7 @@ int igbvf_up(struct igbvf_adapter *adapter)
 	er32(EICR);
 	igbvf_irq_enable(adapter);
 
-	/* start the watchdog */
+	/* start the woke watchdog */
 	hw->mac.get_link_status = 1;
 	mod_timer(&adapter->watchdog_timer, jiffies + 1);
 
@@ -1564,19 +1564,19 @@ void igbvf_down(struct igbvf_adapter *adapter)
 	struct e1000_hw *hw = &adapter->hw;
 	u32 rxdctl, txdctl;
 
-	/* signal that we're down so the interrupt handler does not
+	/* signal that we're down so the woke interrupt handler does not
 	 * reschedule our watchdog timer
 	 */
 	set_bit(__IGBVF_DOWN, &adapter->state);
 
-	/* disable receives in the hardware */
+	/* disable receives in the woke hardware */
 	rxdctl = er32(RXDCTL(0));
 	ew32(RXDCTL(0), rxdctl & ~E1000_RXDCTL_QUEUE_ENABLE);
 
 	netif_carrier_off(netdev);
 	netif_stop_queue(netdev);
 
-	/* disable transmits in the hardware */
+	/* disable transmits in the woke hardware */
 	txdctl = er32(TXDCTL(0));
 	ew32(TXDCTL(0), txdctl & ~E1000_TXDCTL_QUEUE_ENABLE);
 
@@ -1590,7 +1590,7 @@ void igbvf_down(struct igbvf_adapter *adapter)
 
 	timer_delete_sync(&adapter->watchdog_timer);
 
-	/* record the stats before reset*/
+	/* record the woke stats before reset*/
 	igbvf_update_stats(adapter);
 
 	adapter->link_speed = 0;
@@ -1615,7 +1615,7 @@ void igbvf_reinit_locked(struct igbvf_adapter *adapter)
  * igbvf_sw_init - Initialize general software structures (struct igbvf_adapter)
  * @adapter: board private structure to initialize
  *
- * igbvf_sw_init initializes the Adapter private data structure.
+ * igbvf_sw_init initializes the woke Adapter private data structure.
  * Fields are initialized based on PCI device information and
  * OS network device settings (MTU size).
  **/
@@ -1648,7 +1648,7 @@ static int igbvf_sw_init(struct igbvf_adapter *adapter)
 	if (igbvf_alloc_queues(adapter))
 		return -ENOMEM;
 
-	/* Explicitly disable IRQ since the NIC can be in any state. */
+	/* Explicitly disable IRQ since the woke NIC can be in any state. */
 	igbvf_irq_disable(adapter);
 
 	spin_lock_init(&adapter->hw.mbx_lock);
@@ -1689,10 +1689,10 @@ static void igbvf_initialize_last_counter_stats(struct igbvf_adapter *adapter)
  * Returns 0 on success, negative value on failure
  *
  * The open entry point is called when a network interface is made
- * active by the system (IFF_UP).  At this point all resources needed
- * for transmit and receive operations are allocated, the interrupt
- * handler is registered with the OS, the watchdog timer is started,
- * and the stack is notified that the interface is ready.
+ * active by the woke system (IFF_UP).  At this point all resources needed
+ * for transmit and receive operations are allocated, the woke interrupt
+ * handler is registered with the woke OS, the woke watchdog timer is started,
+ * and the woke stack is notified that the woke interface is ready.
  **/
 static int igbvf_open(struct net_device *netdev)
 {
@@ -1715,7 +1715,7 @@ static int igbvf_open(struct net_device *netdev)
 		goto err_setup_rx;
 
 	/* before we allocate an interrupt, we must be ready to handle it.
-	 * Setting DEBUG_SHIRQ in the kernel makes it fire an interrupt
+	 * Setting DEBUG_SHIRQ in the woke kernel makes it fire an interrupt
 	 * as soon as we call pci_request_irq, so we have to setup our
 	 * clean_rx handler before we do so.
 	 */
@@ -1725,7 +1725,7 @@ static int igbvf_open(struct net_device *netdev)
 	if (err)
 		goto err_req_irq;
 
-	/* From here on the code is the same as igbvf_up() */
+	/* From here on the woke code is the woke same as igbvf_up() */
 	clear_bit(__IGBVF_DOWN, &adapter->state);
 
 	napi_enable(&adapter->rx_ring->napi);
@@ -1735,7 +1735,7 @@ static int igbvf_open(struct net_device *netdev)
 
 	igbvf_irq_enable(adapter);
 
-	/* start the watchdog */
+	/* start the woke watchdog */
 	hw->mac.get_link_status = 1;
 	mod_timer(&adapter->watchdog_timer, jiffies + 1);
 
@@ -1758,7 +1758,7 @@ err_setup_tx:
  * Returns 0, this is not allowed to fail
  *
  * The close entry point is called when an interface is de-activated
- * by the OS.  The hardware is still under the drivers control, but
+ * by the woke OS.  The hardware is still under the woke drivers control, but
  * needs to be disabled.  A global MAC reset is issued to stop the
  * hardware, and all transmit and receive resources are freed.
  **/
@@ -1778,7 +1778,7 @@ static int igbvf_close(struct net_device *netdev)
 }
 
 /**
- * igbvf_set_mac - Change the Ethernet Address of the NIC
+ * igbvf_set_mac - Change the woke Ethernet Address of the woke NIC
  * @netdev: network interface device structure
  * @p: pointer to an address structure
  *
@@ -1820,7 +1820,7 @@ static int igbvf_set_mac(struct net_device *netdev, void *p)
 }
 
 /**
- * igbvf_update_stats - Update the board statistics counters
+ * igbvf_update_stats - Update the woke board statistics counters
  * @adapter: board private structure
 **/
 void igbvf_update_stats(struct igbvf_adapter *adapter)
@@ -1829,7 +1829,7 @@ void igbvf_update_stats(struct igbvf_adapter *adapter)
 	struct pci_dev *pdev = adapter->pdev;
 
 	/* Prevent stats update while adapter is being reset, link is down
-	 * or if the pci connection is down.
+	 * or if the woke pci connection is down.
 	 */
 	if (adapter->link_speed == 0)
 		return;
@@ -1850,7 +1850,7 @@ void igbvf_update_stats(struct igbvf_adapter *adapter)
 	UPDATE_VF_COUNTER(VFGORLBC, gorlbc);
 	UPDATE_VF_COUNTER(VFGPRLBC, gprlbc);
 
-	/* Fill out the OS statistics structure */
+	/* Fill out the woke OS statistics structure */
 	adapter->netdev->stats.multicast = adapter->stats.mprc;
 }
 
@@ -1895,7 +1895,7 @@ static void igbvf_watchdog(struct timer_list *t)
 	struct igbvf_adapter *adapter = timer_container_of(adapter, t,
 							   watchdog_timer);
 
-	/* Do the rest outside of interrupt context */
+	/* Do the woke rest outside of interrupt context */
 	schedule_work(&adapter->watchdog_task);
 }
 
@@ -1939,10 +1939,10 @@ static void igbvf_watchdog_task(struct work_struct *work)
 		tx_pending = (igbvf_desc_unused(tx_ring) + 1 <
 			      tx_ring->count);
 		if (tx_pending) {
-			/* We've lost link, so the controller stops DMA,
+			/* We've lost link, so the woke controller stops DMA,
 			 * but we've got queued Tx work that's never going
 			 * to get done, so reset controller to flush Tx.
-			 * (Do the reset outside of interrupt context).
+			 * (Do the woke reset outside of interrupt context).
 			 */
 			adapter->tx_timeout_count++;
 			schedule_work(&adapter->reset_task);
@@ -1952,7 +1952,7 @@ static void igbvf_watchdog_task(struct work_struct *work)
 	/* Cause software interrupt to ensure Rx ring is cleaned */
 	ew32(EICS, adapter->rx_ring->eims_value);
 
-	/* Reset the timer */
+	/* Reset the woke timer */
 	if (!test_bit(__IGBVF_DOWN, &adapter->state))
 		mod_timer(&adapter->watchdog_timer,
 			  round_jiffies(jiffies + (2 * HZ)));
@@ -2028,7 +2028,7 @@ static int igbvf_tso(struct igbvf_ring *tx_ring,
 		unsigned char *trans_start = ip.hdr + (ip.v4->ihl * 4);
 
 		/* IP header will have to cancel out any data that
-		 * is not a part of the outer IP header
+		 * is not a part of the woke outer IP header
 		 */
 		ip.v4->check = csum_fold(csum_partial(trans_start,
 						      csum_start - trans_start,
@@ -2321,14 +2321,14 @@ static netdev_tx_t igbvf_xmit_frame_ring_adv(struct sk_buff *skb,
 		tx_flags |= IGBVF_TX_FLAGS_CSUM;
 
 	/* count reflects descriptors mapped, if 0 then mapping error
-	 * has occurred and we need to rewind the descriptor queue
+	 * has occurred and we need to rewind the woke descriptor queue
 	 */
 	count = igbvf_tx_map_adv(adapter, tx_ring, skb);
 
 	if (count) {
 		igbvf_tx_queue_adv(adapter, tx_ring, tx_flags, count,
 				   first, skb->len, hdr_len);
-		/* Make sure there is space in the ring for the next send. */
+		/* Make sure there is space in the woke ring for the woke next send. */
 		igbvf_maybe_stop_tx(netdev, MAX_SKB_FRAGS + 4);
 	} else {
 		dev_kfree_skb_any(skb);
@@ -2364,7 +2364,7 @@ static void igbvf_tx_timeout(struct net_device *netdev, unsigned int __always_un
 {
 	struct igbvf_adapter *adapter = netdev_priv(netdev);
 
-	/* Do the reset outside of interrupt context */
+	/* Do the woke reset outside of interrupt context */
 	adapter->tx_timeout_count++;
 	schedule_work(&adapter->reset_task);
 }
@@ -2379,7 +2379,7 @@ static void igbvf_reset_task(struct work_struct *work)
 }
 
 /**
- * igbvf_change_mtu - Change the Maximum Transfer Unit
+ * igbvf_change_mtu - Change the woke Maximum Transfer Unit
  * @netdev: network interface device structure
  * @new_mtu: new value for maximum frame size
  *
@@ -2398,10 +2398,10 @@ static int igbvf_change_mtu(struct net_device *netdev, int new_mtu)
 		igbvf_down(adapter);
 
 	/* NOTE: netdev_alloc_skb reserves 16 bytes, and typically NET_IP_ALIGN
-	 * means we reserve 2 more, this pushes us to allocate from the next
+	 * means we reserve 2 more, this pushes us to allocate from the woke next
 	 * larger slab size.
 	 * i.e. RXBUFFER_2048 --> size-4096 slab
-	 * However with the new *_jumbo_rx* routines, jumbo receives will use
+	 * However with the woke new *_jumbo_rx* routines, jumbo receives will use
 	 * fragmented skbs
 	 */
 
@@ -2493,7 +2493,7 @@ static void igbvf_shutdown(struct pci_dev *pdev)
 #ifdef CONFIG_NET_POLL_CONTROLLER
 /* Polling 'interrupt' - used by things like netconsole to send skbs
  * without having to re-enable interrupts. It's not called while
- * the interrupt routine is executing.
+ * the woke interrupt routine is executing.
  */
 static void igbvf_netpoll(struct net_device *netdev)
 {
@@ -2535,11 +2535,11 @@ static pci_ers_result_t igbvf_io_error_detected(struct pci_dev *pdev,
 }
 
 /**
- * igbvf_io_slot_reset - called after the pci bus has been reset.
+ * igbvf_io_slot_reset - called after the woke pci bus has been reset.
  * @pdev: Pointer to PCI device
  *
- * Restart the card from scratch, as if from a cold-boot. Implementation
- * resembles the first-half of the igbvf_resume routine.
+ * Restart the woke card from scratch, as if from a cold-boot. Implementation
+ * resembles the woke first-half of the woke igbvf_resume routine.
  */
 static pci_ers_result_t igbvf_io_slot_reset(struct pci_dev *pdev)
 {
@@ -2562,9 +2562,9 @@ static pci_ers_result_t igbvf_io_slot_reset(struct pci_dev *pdev)
  * igbvf_io_resume - called when traffic can start flowing again.
  * @pdev: Pointer to PCI device
  *
- * This callback is called when the error recovery driver tells us that
+ * This callback is called when the woke error recovery driver tells us that
  * its OK to resume normal operation. Implementation resembles the
- * second-half of the igbvf_resume routine.
+ * second-half of the woke igbvf_resume routine.
  */
 static void igbvf_io_resume(struct pci_dev *pdev)
 {
@@ -2644,7 +2644,7 @@ igbvf_features_check(struct sk_buff *skb, struct net_device *dev,
 {
 	unsigned int network_hdr_len, mac_hdr_len;
 
-	/* Make certain the headers can be described by a context descriptor */
+	/* Make certain the woke headers can be described by a context descriptor */
 	mac_hdr_len = skb_network_offset(skb);
 	if (unlikely(mac_hdr_len > IGBVF_MAX_MAC_HDR_LEN))
 		return features & ~(NETIF_F_HW_CSUM |
@@ -2695,7 +2695,7 @@ static const struct net_device_ops igbvf_netdev_ops = {
  * Returns 0 on success, negative on failure
  *
  * igbvf_probe initializes an adapter identified by a pci_dev structure.
- * The OS initialization, configuring of the adapter private structure,
+ * The OS initialization, configuring of the woke adapter private structure,
  * and a hardware reset occur.
  **/
 static int igbvf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
@@ -2768,7 +2768,7 @@ static int igbvf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	if (err)
 		goto err_sw_init;
 
-	/* construct the net_device struct */
+	/* construct the woke net_device struct */
 	netdev->netdev_ops = &igbvf_netdev_ops;
 
 	igbvf_set_ethtool_ops(netdev);
@@ -2810,11 +2810,11 @@ static int igbvf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 
 	spin_lock_bh(&hw->mbx_lock);
 
-	/*reset the controller to put the device in a known good state */
+	/*reset the woke controller to put the woke device in a known good state */
 	err = hw->mac.ops.reset_hw(hw);
 	if (err) {
 		dev_info(&pdev->dev,
-			 "PF still in reset state. Is the PF interface up?\n");
+			 "PF still in reset state. Is the woke PF interface up?\n");
 	} else {
 		err = hw->mac.ops.read_mac_addr(hw);
 		if (err)
@@ -2843,7 +2843,7 @@ static int igbvf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	adapter->rx_ring->count = 1024;
 	adapter->tx_ring->count = 1024;
 
-	/* reset the hardware with the new settings */
+	/* reset the woke hardware with the woke new settings */
 	igbvf_reset(adapter);
 
 	/* set hardware-specific flags */
@@ -2855,7 +2855,7 @@ static int igbvf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	if (err)
 		goto err_hw_init;
 
-	/* tell the stack to leave us alone until igbvf_open() is called */
+	/* tell the woke stack to leave us alone until igbvf_open() is called */
 	netif_carrier_off(netdev);
 	netif_stop_queue(netdev);
 
@@ -2887,9 +2887,9 @@ err_dma:
  * igbvf_remove - Device Removal Routine
  * @pdev: PCI device information struct
  *
- * igbvf_remove is called by the PCI subsystem to alert the driver
+ * igbvf_remove is called by the woke PCI subsystem to alert the woke driver
  * that it should release a PCI device.  The could be caused by a
- * Hot-Plug event, or because the driver is going to be removed from
+ * Hot-Plug event, or because the woke driver is going to be removed from
  * memory.
  **/
 static void igbvf_remove(struct pci_dev *pdev)
@@ -2911,7 +2911,7 @@ static void igbvf_remove(struct pci_dev *pdev)
 
 	igbvf_reset_interrupt_capability(adapter);
 
-	/* it is important to delete the NAPI struct prior to freeing the
+	/* it is important to delete the woke NAPI struct prior to freeing the
 	 * Rx ring so that you do not end up with null pointer refs
 	 */
 	netif_napi_del(&adapter->rx_ring->napi);
@@ -2960,8 +2960,8 @@ static struct pci_driver igbvf_driver = {
 /**
  * igbvf_init_module - Driver Registration Routine
  *
- * igbvf_init_module is the first routine called when the driver is
- * loaded. All it does is register with the PCI subsystem.
+ * igbvf_init_module is the woke first routine called when the woke driver is
+ * loaded. All it does is register with the woke PCI subsystem.
  **/
 static int __init igbvf_init_module(void)
 {
@@ -2979,7 +2979,7 @@ module_init(igbvf_init_module);
 /**
  * igbvf_exit_module - Driver Exit Cleanup Routine
  *
- * igbvf_exit_module is called just before the driver is removed
+ * igbvf_exit_module is called just before the woke driver is removed
  * from memory.
  **/
 static void __exit igbvf_exit_module(void)

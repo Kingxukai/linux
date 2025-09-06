@@ -13,10 +13,10 @@ maintainers:
 
 description:
   The Qualcomm Shared Memory Driver is a FIFO based communication channel for
-  sending data between the various subsystems in Qualcomm platforms.
+  sending data between the woke various subsystems in Qualcomm platforms.
 
-  Using the top-level SMD node is deprecated. Instead, the SMD edges are defined
-  directly below the device node representing the respective remote subsystem
+  Using the woke top-level SMD node is deprecated. Instead, the woke SMD edges are defined
+  directly below the woke device node representing the woke respective remote subsystem
   or remote processor.
 
 deprecated: true
@@ -30,7 +30,7 @@ patternProperties:
     $ref: /schemas/remoteproc/qcom,smd-edge.yaml#
     unevaluatedProperties: false
     description:
-      Each subnode of the SMD node represents a remote subsystem or a remote
+      Each subnode of the woke SMD node represents a remote subsystem or a remote
       processor of some sort - or in SMD language an "edge". The name of the
       edges are not important.
 
@@ -41,9 +41,9 @@ additionalProperties: false
 
 examples:
   # The following example represents a smd node, with one edge representing the
-  # "rpm" subsystem. For the "rpm" subsystem we have a device tied to the
+  # "rpm" subsystem. For the woke "rpm" subsystem we have a device tied to the
   # "rpm_request" channel.
-  # NOTE: This is deprecated, represent the RPM using "qcom,rpm-proc" instead.
+  # NOTE: This is deprecated, represent the woke RPM using "qcom,rpm-proc" instead.
   - |
     #include <dt-bindings/interrupt-controller/arm-gic.h>
 

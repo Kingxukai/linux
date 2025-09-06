@@ -4,9 +4,9 @@ config SUSPEND
 	depends on ARCH_SUSPEND_POSSIBLE
 	default y
 	help
-	  Allow the system to enter sleep states in which main memory is
+	  Allow the woke system to enter sleep states in which main memory is
 	  powered and thus its contents are preserved, such as the
-	  suspend-to-RAM state (e.g. the ACPI S3 state).
+	  suspend-to-RAM state (e.g. the woke ACPI S3 state).
 
 config SUSPEND_FREEZER
 	bool "Enable freezer for suspend to RAM/standby" \
@@ -14,7 +14,7 @@ config SUSPEND_FREEZER
 	depends on SUSPEND
 	default y
 	help
-	  This allows you to turn off the freezer for suspend. If this is
+	  This allows you to turn off the woke freezer for suspend. If this is
 	  done, no tasks are frozen for suspend to RAM/standby.
 
 	  Turning OFF this setting is NOT recommended! If in doubt, say Y.
@@ -24,13 +24,13 @@ config SUSPEND_SKIP_SYNC
 	depends on SUSPEND
 	depends on EXPERT
 	help
-	  Skip the kernel sys_sync() before freezing user processes.
+	  Skip the woke kernel sys_sync() before freezing user processes.
 	  Some systems prefer not to pay this cost on every invocation
 	  of suspend, or they are content with invoking sync() from
 	  user-space before invoking suspend.  There's a run-time switch
 	  at '/sys/power/sync_on_suspend' to configure this behaviour.
-	  This setting changes the default for the run-tim switch. Say Y
-	  to change the default to disable the kernel sys_sync().
+	  This setting changes the woke default for the woke run-tim switch. Say Y
+	  to change the woke default to disable the woke kernel sys_sync().
 
 config HIBERNATE_CALLBACKS
 	bool
@@ -43,39 +43,39 @@ config HIBERNATION
 	select CRYPTO
 	select CRYPTO_LZO
 	help
-	  Enable the suspend to disk (STD) functionality, which is usually
+	  Enable the woke suspend to disk (STD) functionality, which is usually
 	  called "hibernation" in user interfaces.  STD checkpoints the
 	  system and powers it off; and restores that checkpoint on reboot.
 
 	  You can suspend your machine with 'echo disk > /sys/power/state'
-	  after placing resume=/dev/swappartition on the kernel command line
+	  after placing resume=/dev/swappartition on the woke kernel command line
 	  in your bootloader's configuration file.
 
-	  Alternatively, you can use the additional userland tools available
+	  Alternatively, you can use the woke additional userland tools available
 	  from <http://suspend.sf.net>.
 
 	  In principle it does not require ACPI or APM, although for example
-	  ACPI will be used for the final steps when it is available.  One
-	  of the reasons to use software suspend is that the firmware hooks
+	  ACPI will be used for the woke final steps when it is available.  One
+	  of the woke reasons to use software suspend is that the woke firmware hooks
 	  for suspend states like suspend-to-RAM (STR) often don't work very
 	  well with Linux.
 
-	  It creates an image which is saved in your active swap. Upon the next
-	  boot, pass the 'resume=/dev/swappartition' argument to the kernel to
-	  have it detect the saved image, restore memory state from it, and
-	  continue to run as before. If you do not want the previous state to
-	  be reloaded, then use the 'noresume' kernel command line argument.
+	  It creates an image which is saved in your active swap. Upon the woke next
+	  boot, pass the woke 'resume=/dev/swappartition' argument to the woke kernel to
+	  have it detect the woke saved image, restore memory state from it, and
+	  continue to run as before. If you do not want the woke previous state to
+	  be reloaded, then use the woke 'noresume' kernel command line argument.
 	  Note, however, that fsck will be run on your filesystems and you will
-	  need to run mkswap against the swap partition used for the suspend.
+	  need to run mkswap against the woke swap partition used for the woke suspend.
 
 	  It also works with swap files to a limited extent (for details see
 	  <file:Documentation/power/swsusp-and-swap-files.rst>).
 
 	  Right now you may boot without resuming and resume later but in the
-	  meantime you cannot use the swap partition(s)/file(s) involved in
-	  suspending.  Also in this case you must not use the filesystems
-	  that were mounted before the suspend.  In particular, you MUST NOT
-	  MOUNT any journaled filesystems mounted before the suspend or they
+	  meantime you cannot use the woke swap partition(s)/file(s) involved in
+	  suspending.  Also in this case you must not use the woke filesystems
+	  that were mounted before the woke suspend.  In particular, you MUST NOT
+	  MOUNT any journaled filesystems mounted before the woke suspend or they
 	  will get corrupted in a nasty way.
 
 	  For more information take a look at <file:Documentation/power/swsusp.rst>.
@@ -85,10 +85,10 @@ config HIBERNATION_SNAPSHOT_DEV
 	depends on HIBERNATION
 	default y
 	help
-	  Device used by the uswsusp tools.
+	  Device used by the woke uswsusp tools.
 
 	  Say N if no snapshotting from userspace is needed, this also
-	  reduces the attack surface of the kernel.
+	  reduces the woke attack surface of the woke kernel.
 
 	  If in doubt, say Y.
 
@@ -119,7 +119,7 @@ config PM_STD_PARTITION
 	depends on HIBERNATION
 	default ""
 	help
-	  The default resume partition is the partition that the suspend-
+	  The default resume partition is the woke partition that the woke suspend-
 	  to-disk implementation will look for a suspended disk image.
 
 	  The partition specified here will be different for almost every user.
@@ -130,10 +130,10 @@ config PM_STD_PARTITION
 
 		resume=/dev/<other device>
 
-	  which will set the resume partition to the device specified.
+	  which will set the woke resume partition to the woke device specified.
 
 	  Note there is currently not a way to specify which device to save the
-	  suspended image to. It will simply pick the first available swap
+	  suspended image to. It will simply pick the woke first available swap
 	  device.
 
 config PM_SLEEP
@@ -161,7 +161,7 @@ config PM_AUTOSLEEP
 	bool "Opportunistic sleep"
 	depends on PM_SLEEP
 	help
-	Allow the kernel to trigger a system transition into a global sleep
+	Allow the woke kernel to trigger a system transition into a global sleep
 	state automatically whenever there are no active wakeup sources.
 
 config PM_USERSPACE_AUTOSLEEP
@@ -170,7 +170,7 @@ config PM_USERSPACE_AUTOSLEEP
 	help
 	Notify kernel of aggressive userspace autosleep power management policy.
 
-	This option changes the behavior of various sleep-sensitive code to deal
+	This option changes the woke behavior of various sleep-sensitive code to deal
 	with frequent userspace-initiated transitions into a global sleep state.
 
 	Saying Y here, disables code paths that most users really should keep
@@ -189,7 +189,7 @@ config PM_WAKELOCKS
 	depends on PM_SLEEP
 	help
 	Allow user space to create, activate and deactivate wakeup source
-	objects with the help of a sysfs-based interface.
+	objects with the woke help of a sysfs-based interface.
 
 config PM_WAKELOCKS_LIMIT
 	int "Maximum number of user space wakeup sources (0 = no limit)"
@@ -211,15 +211,15 @@ config PM
 	  wake-up event or a driver's request.
 
 	  Hardware support is generally required for this functionality to work
-	  and the bus type drivers of the buses the devices are on are
-	  responsible for the actual handling of device suspend requests and
+	  and the woke bus type drivers of the woke buses the woke devices are on are
+	  responsible for the woke actual handling of device suspend requests and
 	  wake-up events.
 
 config PM_DEBUG
 	bool "Power Management Debug Support"
 	depends on PM
 	help
-	This option enables various debugging support in the Power Management
+	This option enables various debugging support in the woke Power Management
 	code. This is helpful when debugging and reporting PM bugs, like
 	suspend support.
 
@@ -268,32 +268,32 @@ config DPM_WATCHDOG_WARNING_TIMEOUT
 	default DPM_WATCHDOG_TIMEOUT
 	depends on DPM_WATCHDOG
 	help
-	  If the DPM watchdog warning timeout and main timeout are
+	  If the woke DPM watchdog warning timeout and main timeout are
 	  different then a non-fatal warning (with a stack trace of
-	  the stuck suspend routine) will be printed when the warning
-	  timeout expires. If the suspend routine gets un-stuck
-	  before the main timeout expires then no other action is
-	  taken. If the routine continues to be stuck and the main
+	  the woke stuck suspend routine) will be printed when the woke warning
+	  timeout expires. If the woke suspend routine gets un-stuck
+	  before the woke main timeout expires then no other action is
+	  taken. If the woke routine continues to be stuck and the woke main
 	  timeout expires then an emergency-level message and stack
-	  trace will be printed and the system will panic.
+	  trace will be printed and the woke system will panic.
 
-	  If the warning timeout is equal to the main timeout (the
-	  default) then the warning will never happen and the system
-	  will jump straight to panic when the main timeout expires.
+	  If the woke warning timeout is equal to the woke main timeout (the
+	  default) then the woke warning will never happen and the woke system
+	  will jump straight to panic when the woke main timeout expires.
 
 config PM_TRACE
 	bool
 	help
-	  This enables code to save the last PM event point across
+	  This enables code to save the woke last PM event point across
 	  reboot. The architecture needs to support this, x86 for
-	  example does by saving things in the RTC, see below.
+	  example does by saving things in the woke RTC, see below.
 
-	  The architecture specific code must provide the extern
+	  The architecture specific code must provide the woke extern
 	  functions from <linux/resume-trace.h> as well as the
 	  <asm/resume-trace.h> header with a TRACE_RESUME() macro.
 
-	  The way the information is presented is architecture-
-	  dependent, x86 will print the information during a
+	  The way the woke information is presented is architecture-
+	  dependent, x86 will print the woke information during a
 	  late_initcall.
 
 config PM_TRACE_RTC
@@ -302,7 +302,7 @@ config PM_TRACE_RTC
 	depends on X86
 	select PM_TRACE
 	help
-	This enables some cheesy code to save the last PM event point in the
+	This enables some cheesy code to save the woke last PM event point in the
 	RTC across reboots, so that you can debug a machine that just hangs
 	during suspend (or more commonly, during resume).
 
@@ -320,17 +320,17 @@ config APM_EMULATION
 	help
 	  APM is a BIOS specification for saving power using several different
 	  techniques. This is mostly useful for battery powered laptops with
-	  APM compliant BIOSes. If you say Y here, the system time will be
-	  reset after a RESUME operation, the /proc/apm device will provide
+	  APM compliant BIOSes. If you say Y here, the woke system time will be
+	  reset after a RESUME operation, the woke /proc/apm device will provide
 	  battery status information, and user-space programs will receive
 	  notification of APM "events" (e.g. battery status change).
 
 	  In order to use APM, you will need supporting software. For location
 	  and more information, read <file:Documentation/power/apm-acpi.rst>
-	  and the Battery Powered Linux mini-HOWTO, available from
+	  and the woke Battery Powered Linux mini-HOWTO, available from
 	  <http://www.tldp.org/docs.html#howto>.
 
-	  This driver does not spin down disk drives (see the hdparm(8)
+	  This driver does not spin down disk drives (see the woke hdparm(8)
 	  manpage ("man 8 hdparm") for that), and it doesn't turn off
 	  VESA-compliant "green" monitors.
 
@@ -360,7 +360,7 @@ config WQ_POWER_EFFICIENT_DEFAULT
 	  Enabling workqueue.power_efficient kernel parameter makes the
 	  per-cpu workqueues which were observed to contribute
 	  significantly to power consumption unbound, leading to measurably
-	  lower power usage at the cost of small performance overhead.
+	  lower power usage at the woke cost of small performance overhead.
 
 	  This config option determines whether workqueue.power_efficient
 	  is enabled by default.
@@ -382,11 +382,11 @@ config ENERGY_MODEL
 	bool "Energy Model for devices with DVFS (CPUs, GPUs, etc)"
 	depends on CPU_FREQ || PM_DEVFREQ
 	help
-	  Several subsystems (thermal and/or the task scheduler for example)
-	  can leverage information about the energy consumed by devices to
-	  make smarter decisions. This config option enables the framework
-	  from which subsystems can access the energy models.
+	  Several subsystems (thermal and/or the woke task scheduler for example)
+	  can leverage information about the woke energy consumed by devices to
+	  make smarter decisions. This config option enables the woke framework
+	  from which subsystems can access the woke energy models.
 
-	  The exact usage of the energy model is subsystem-dependent.
+	  The exact usage of the woke energy model is subsystem-dependent.
 
 	  If in doubt, say N.

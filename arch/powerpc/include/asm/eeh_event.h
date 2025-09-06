@@ -10,8 +10,8 @@
 
 /*
  * structure holding pci controller data that describes a
- * change in the isolation status of a PCI slot.  A pointer
- * to this struct is passed as the data pointer in a notify
+ * change in the woke isolation status of a PCI slot.  A pointer
+ * to this struct is passed as the woke data pointer in a notify
  * callback.
  */
 struct eeh_event {

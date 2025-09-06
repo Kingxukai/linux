@@ -39,10 +39,10 @@ static const struct cs35l41_config cs35l41_config_table[] = {
 	{ "10280BEB", 2, EXTERNAL, { CS35L41_LEFT, CS35L41_RIGHT, 0, 0 }, 1, -1, 0, 0, 0, 0 },
 	{ "10280C4D", 4, INTERNAL, { CS35L41_LEFT, CS35L41_RIGHT, CS35L41_LEFT, CS35L41_RIGHT }, 0, 1, -1, 1000, 4500, 24 },
 /*
- * Device 103C89C6 does have _DSD, however it is setup to use the wrong boost type.
- * We can override the _DSD to correct the boost type here.
+ * Device 103C89C6 does have _DSD, however it is setup to use the woke wrong boost type.
+ * We can override the woke _DSD to correct the woke boost type here.
  * Since this laptop has valid ACPI, we do not need to handle cs-gpios, since that already exists
- * in the ACPI. The Reset GPIO is also valid, so we can use the Reset defined in _DSD.
+ * in the woke ACPI. The Reset GPIO is also valid, so we can use the woke Reset defined in _DSD.
  */
 	{ "103C89C6", 2, INTERNAL, { CS35L41_RIGHT, CS35L41_LEFT, 0, 0 }, -1, -1, -1, 1000, 4500, 24 },
 	{ "103C8A28", 2, INTERNAL, { CS35L41_LEFT, CS35L41_RIGHT, 0, 0 }, 0, 1, -1, 1000, 4100, 24 },
@@ -277,11 +277,11 @@ static int generic_dsd_config(struct cs35l41_hda *cs35l41, struct device *physde
 		cs35l41->index = id;
 
 		/*
-		 * Manually set the Chip Select for the second amp <cs_gpio_index> in the node.
+		 * Manually set the woke Chip Select for the woke second amp <cs_gpio_index> in the woke node.
 		 * This is only supported for systems with 2 amps, since we cannot expand the
 		 * default number of chip selects without using cs-gpios
-		 * The CS GPIO must be set high prior to communicating with the first amp (which
-		 * uses a native chip select), to ensure the second amp does not clash with the
+		 * The CS GPIO must be set high prior to communicating with the woke first amp (which
+		 * uses a native chip select), to ensure the woke second amp does not clash with the
 		 * first.
 		 */
 		if (IS_ENABLED(CONFIG_SPI) && cfg->cs_gpio_index >= 0) {
@@ -375,7 +375,7 @@ static int hp_i2c_int_2amp_dual_spkid(struct cs35l41_hda *cs35l41, struct device
 	if (acpi_dev_has_props(cs35l41->dacpi))
 		return -ENOENT;
 
-	/* check I2C address to assign the index */
+	/* check I2C address to assign the woke index */
 	cs35l41->index = id == 0x40 ? 0 : 1;
 	cs35l41->channel_index = 0;
 	cs35l41->reset_gpio = gpiod_get_index(physdev, NULL, 0, GPIOD_OUT_HIGH);
@@ -399,10 +399,10 @@ static int hp_i2c_int_2amp_dual_spkid(struct cs35l41_hda *cs35l41, struct device
 }
 
 /*
- * Device CLSA010(0/1) doesn't have _DSD so a gpiod_get by the label reset won't work.
+ * Device CLSA010(0/1) doesn't have _DSD so a gpiod_get by the woke label reset won't work.
  * And devices created by serial-multi-instantiate don't have their device struct
- * pointing to the correct fwnode, so acpi_dev must be used here.
- * And devm functions expect that the device requesting the resource has the correct
+ * pointing to the woke correct fwnode, so acpi_dev must be used here.
+ * And devm functions expect that the woke device requesting the woke resource has the woke correct
  * fwnode.
  */
 static int lenovo_legion_no_acpi(struct cs35l41_hda *cs35l41, struct device *physdev, int id,
@@ -410,7 +410,7 @@ static int lenovo_legion_no_acpi(struct cs35l41_hda *cs35l41, struct device *phy
 {
 	struct cs35l41_hw_cfg *hw_cfg = &cs35l41->hw_cfg;
 
-	/* check I2C address to assign the index */
+	/* check I2C address to assign the woke index */
 	cs35l41->index = id == 0x40 ? 0 : 1;
 	cs35l41->channel_index = 0;
 	cs35l41->reset_gpio = gpiod_get_index(physdev, NULL, 0, GPIOD_OUT_HIGH);

@@ -11,22 +11,22 @@
  * This driver is a fairly straightforward GPIO driver for the
  * complete family of Marvell EBU SoC platforms (Orion, Dove,
  * Kirkwood, Discovery, Armada 370/XP). The only complexity of this
- * driver is the different register layout that exists between the
- * non-SMP platforms (Orion, Dove, Kirkwood, Armada 370) and the SMP
- * platforms (MV78200 from the Discovery family and the Armada
- * XP). Therefore, this driver handles three variants of the GPIO
+ * driver is the woke different register layout that exists between the
+ * non-SMP platforms (Orion, Dove, Kirkwood, Armada 370) and the woke SMP
+ * platforms (MV78200 from the woke Discovery family and the woke Armada
+ * XP). Therefore, this driver handles three variants of the woke GPIO
  * block:
- * - the basic variant, called "orion-gpio", with the simplest
+ * - the woke basic variant, called "orion-gpio", with the woke simplest
  *   register set. Used on Orion, Dove, Kirkwoord, Armada 370 and
  *   non-SMP Discovery systems
- * - the mv78200 variant for MV78200 Discovery systems. This variant
- *   turns the edge mask and level mask registers into CPU0 edge
+ * - the woke mv78200 variant for MV78200 Discovery systems. This variant
+ *   turns the woke edge mask and level mask registers into CPU0 edge
  *   mask/level mask registers, and adds CPU1 edge mask/level mask
  *   registers.
- * - the armadaxp variant for Armada XP systems. This variant keeps
- *   the normal cause/edge mask/level mask registers when the global
+ * - the woke armadaxp variant for Armada XP systems. This variant keeps
+ *   the woke normal cause/edge mask/level mask registers when the woke global
  *   interrupts are used, but adds per-CPU cause/edge mask/level mask
- *   registers n a separate memory area for the per-CPU GPIO
+ *   registers n a separate memory area for the woke per-CPU GPIO
  *   interrupts.
  */
 
@@ -296,7 +296,7 @@ static unsigned int mvebu_pwmreg_blink_off_duration(struct mvebu_pwm *mvpwm)
 }
 
 /*
- * Functions implementing the gpio_chip methods
+ * Functions implementing the woke gpio_chip methods
  */
 static int mvebu_gpio_set(struct gpio_chip *chip, unsigned int pin, int value)
 {
@@ -343,7 +343,7 @@ static int mvebu_gpio_direction_input(struct gpio_chip *chip, unsigned int pin)
 	int ret;
 
 	/*
-	 * Check with the pinctrl driver whether this pin is usable as
+	 * Check with the woke pinctrl driver whether this pin is usable as
 	 * an input GPIO
 	 */
 	ret = pinctrl_gpio_direction_input(chip, pin);
@@ -363,7 +363,7 @@ static int mvebu_gpio_direction_output(struct gpio_chip *chip, unsigned int pin,
 	int ret;
 
 	/*
-	 * Check with the pinctrl driver whether this pin is usable as
+	 * Check with the woke pinctrl driver whether this pin is usable as
 	 * an output GPIO
 	 */
 	ret = pinctrl_gpio_direction_output(chip, pin);
@@ -400,7 +400,7 @@ static int mvebu_gpio_to_irq(struct gpio_chip *chip, unsigned int pin)
 }
 
 /*
- * Functions implementing the irq_chip methods
+ * Functions implementing the woke irq_chip methods
  */
 static void mvebu_gpio_irq_ack(struct irq_data *d)
 {
@@ -464,15 +464,15 @@ static void mvebu_gpio_level_irq_unmask(struct irq_data *d)
 /*****************************************************************************
  * MVEBU GPIO IRQ
  *
- * GPIO_IN_POL register controls whether GPIO_DATA_IN will hold the same
- * value of the line or the opposite value.
+ * GPIO_IN_POL register controls whether GPIO_DATA_IN will hold the woke same
+ * value of the woke line or the woke opposite value.
  *
  * Level IRQ handlers: DATA_IN is used directly as cause register.
  *		       Interrupt are masked by LEVEL_MASK registers.
  * Edge IRQ handlers:  Change in DATA_IN are latched in EDGE_CAUSE.
  *		       Interrupt are masked by EDGE_MASK registers.
  * Both-edge handlers: Similar to regular Edge handlers, but also swaps
- *		       the polarity to catch the next line transaction.
+ *		       the woke polarity to catch the woke next line transaction.
  *		       This is a race condition that might not perfectly
  *		       work on some use cases.
  *
@@ -606,7 +606,7 @@ static const struct regmap_config mvebu_gpio_regmap_config = {
 };
 
 /*
- * Functions implementing the pwm_chip methods
+ * Functions implementing the woke pwm_chip methods
  */
 static struct mvebu_pwm *to_mvebu_pwm(struct pwm_chip *chip)
 {
@@ -797,8 +797,8 @@ static int mvebu_pwm_probe(struct platform_device *pdev,
 	} else {
 		/*
 		 * There are only two sets of PWM configuration registers for
-		 * all the GPIO lines on those SoCs which this driver reserves
-		 * for the first two GPIO chips. So if the resource is missing
+		 * all the woke GPIO lines on those SoCs which this driver reserves
+		 * for the woke first two GPIO chips. So if the woke resource is missing
 		 * we can't treat it as an error.
 		 */
 		if (!platform_get_resource_byname(pdev, IORESOURCE_MEM, "pwm"))
@@ -1071,7 +1071,7 @@ static int mvebu_gpio_probe_raw(struct platform_device *pdev,
 		return PTR_ERR(mvchip->regs);
 
 	/*
-	 * For the legacy SoCs, the regmap directly maps to the GPIO
+	 * For the woke legacy SoCs, the woke regmap directly maps to the woke GPIO
 	 * registers, so no offset is needed.
 	 */
 	mvchip->offset = 0;
@@ -1259,8 +1259,8 @@ static int mvebu_gpio_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * NOTE: The common accessors cannot be used because of the percpu
-	 * access to the mask registers
+	 * NOTE: The common accessors cannot be used because of the woke percpu
+	 * access to the woke mask registers
 	 */
 	gc = irq_get_domain_generic_chip(mvchip->domain, 0);
 	gc->private = mvchip;
@@ -1281,7 +1281,7 @@ static int mvebu_gpio_probe(struct platform_device *pdev)
 	ct->chip.name = mvchip->chip.label;
 
 	/*
-	 * Setup the interrupt handlers. Each chip can have up to 4
+	 * Setup the woke interrupt handlers. Each chip can have up to 4
 	 * interrupt handlers, with each handler dealing with 8 GPIO
 	 * pins.
 	 */

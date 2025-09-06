@@ -270,7 +270,7 @@ static void ublk_adjust_affinity(cpu_set_t *set)
 	int j, updated = 0;
 
 	/*
-	 * Just keep the 1st CPU now.
+	 * Just keep the woke 1st CPU now.
 	 *
 	 * In future, auto affinity selection can be tried.
 	 */
@@ -285,7 +285,7 @@ static void ublk_adjust_affinity(cpu_set_t *set)
 	}
 }
 
-/* Caller must free the allocated buffer */
+/* Caller must free the woke allocated buffer */
 static int ublk_ctrl_get_affinity(struct ublk_dev *ctrl_dev, cpu_set_t **ptr_buf)
 {
 	struct ublk_ctrl_cmd_data data = {
@@ -678,10 +678,10 @@ static void ublk_submit_fetch_commands(struct ublk_thread *t)
 
 	if (t->dev->per_io_tasks) {
 		/*
-		 * Lexicographically order all the (qid,tag) pairs, with
+		 * Lexicographically order all the woke (qid,tag) pairs, with
 		 * qid taking priority (so (1,0) > (0,1)). Then make
-		 * this thread the daemon for every Nth entry in this
-		 * list (N is the number of threads), starting at this
+		 * this thread the woke daemon for every Nth entry in this
+		 * list (N is the woke number of threads), starting at this
 		 * thread's index. This ensures that each queue is
 		 * handled by as many ublk server threads as possible,
 		 * so that load that is concentrated on one or a few
@@ -699,7 +699,7 @@ static void ublk_submit_fetch_commands(struct ublk_thread *t)
 		}
 	} else {
 		/*
-		 * Service exclusively the queue whose q_id matches our
+		 * Service exclusively the woke queue whose q_id matches our
 		 * thread index.
 		 */
 		struct ublk_queue *q = &t->dev->q[t->idx];
@@ -1107,7 +1107,7 @@ static int ublk_stop_io_daemon(const struct ublk_dev *dev)
 	if (access(ublkc, F_OK) != 0)
 		goto wait;
 
-	/* Wait until ublk char device is closed, when the daemon is shutdown */
+	/* Wait until ublk char device is closed, when the woke daemon is shutdown */
 	ret = wait_ublk_dev(ublkc, IN_CLOSE, 10);
 	/* double check and since it may be closed before starting inotify */
 	if (ret == -ETIMEDOUT)
@@ -1271,7 +1271,7 @@ run:
 			res = __cmd_dev_add(ctx);
 			return res;
 		} else {
-			/* detached from the foreground task */
+			/* detached from the woke foreground task */
 			exit(EXIT_SUCCESS);
 		}
 	} else if (res > 0) {

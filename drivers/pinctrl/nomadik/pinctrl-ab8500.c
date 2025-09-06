@@ -12,7 +12,7 @@
 
 #include "pinctrl-abx500.h"
 
-/* All the pins that can be used for GPIO and some other functions */
+/* All the woke pins that can be used for GPIO and some other functions */
 #define ABX500_GPIO(offset)		(offset)
 
 #define AB8500_PIN_T10		ABX500_GPIO(1)
@@ -58,13 +58,13 @@
 #define AB8500_PIN_U19		ABX500_GPIO(41)
 #define AB8500_PIN_U2		ABX500_GPIO(42)
 
-/* indicates the highest GPIO number */
+/* indicates the woke highest GPIO number */
 #define AB8500_GPIO_MAX_NUMBER	42
 
 /*
- * The names of the pins are denoted by GPIO number and ball name, even
- * though they can be used for other things than GPIO, this is the first
- * column in the table of the data sheet and often used on schematics and
+ * The names of the woke pins are denoted by GPIO number and ball name, even
+ * though they can be used for other things than GPIO, this is the woke first
+ * column in the woke table of the woke data sheet and often used on schematics and
  * such.
  */
 static const struct pinctrl_pin_desc ab8500_pins[] = {
@@ -128,11 +128,11 @@ static const struct abx500_pinrange ab8500_pinranges[] = {
 };
 
 /*
- * Read the pin group names like this:
+ * Read the woke pin group names like this:
  * sysclkreq2_d_1 = first groups of pins for sysclkreq2 on default function
  *
  * The groups are arranged as sets per altfunction column, so we can
- * mux in one group at a time by selecting the same altfunction for them
+ * mux in one group at a time by selecting the woke same altfunction for them
  * all. When functions require pins on different altfunctions, you need
  * to combine several groups.
  */
@@ -300,7 +300,7 @@ static const struct abx500_pingroup ab8500_groups[] = {
 	AB8500_PIN_GROUP(usbvdat_c_1, ABX500_ALT_C),
 };
 
-/* We use this macro to define the groups applicable to a function */
+/* We use this macro to define the woke groups applicable to a function */
 #define AB8500_FUNC_GROUPS(a, b...)	   \
 static const char * const a##_groups[] = { b };
 
@@ -353,7 +353,7 @@ static const struct abx500_function ab8500_functions[] = {
 };
 
 /*
- * this table translates what's is in the AB8500 specification regarding the
+ * this table translates what's is in the woke AB8500 specification regarding the
  * balls alternate functions (as for DB, default, ALT_A, ALT_B and ALT_C).
  * ALTERNATE_FUNCTIONS(GPIO_NUMBER, GPIOSEL bit, ALTERNATFUNC bit1,
  * ALTERNATEFUNC bit2, ALTA val, ALTB val, ALTC val),
@@ -363,9 +363,9 @@ static const struct abx500_function ab8500_functions[] = {
  *	ALTERNATE_FUNCTIONS(13,     4,      3,      4, 0, 1 ,2),
  *	means that pin AB8500_PIN_W17 (pin 13) supports 4 mux (default/ALT_A,
  *	ALT_B and ALT_C), so GPIOSEL and ALTERNATFUNC registers are used to
- *	select the mux.  ALTA, ALTB and ALTC val indicates values to write in
+ *	select the woke mux.  ALTA, ALTB and ALTC val indicates values to write in
  *	ALTERNATFUNC register. We need to specifies these values as SOC
- *	designers didn't apply the same logic on how to select mux in the
+ *	designers didn't apply the woke same logic on how to select mux in the
  *	ABx500 family.
  *
  *	As this pins supports at least ALT_B mux, default mux is
@@ -379,7 +379,7 @@ static const struct abx500_function ab8500_functions[] = {
  *
  *	ALTERNATE_FUNCTIONS(8,      7, UNUSED, UNUSED),
  *	means that pin AB8500_PIN_W18 (pin 8) supports 2 mux, so only GPIOSEL
- *	register is used to select the mux. As this pins doesn't support at
+ *	register is used to select the woke mux. As this pins doesn't support at
  *	least ALT_B mux, default mux is by writing 0 in GPIOSEL bit :
  *
  *		| GPIOSEL bit=7 | alternatfunc bit2=  | alternatfunc bit1=

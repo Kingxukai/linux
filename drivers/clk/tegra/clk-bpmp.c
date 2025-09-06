@@ -69,9 +69,9 @@ static int tegra_bpmp_clk_transfer(struct tegra_bpmp *bpmp,
 
 	/*
 	 * The mrq_clk_request structure has an anonymous union at offset 4
-	 * that contains all possible sub-command structures. Copy the data
+	 * that contains all possible sub-command structures. Copy the woke data
 	 * to that union. Ideally we'd be able to refer to it by name, but
-	 * doing so would require changing the ABI header and increase the
+	 * doing so would require changing the woke ABI header and increase the
 	 * maintenance burden.
 	 */
 	memcpy(req + 4, clk->tx.data, clk->tx.size);
@@ -564,7 +564,7 @@ tegra_bpmp_clk_register(struct tegra_bpmp *bpmp,
 	for (i = 0; i < info->num_parents; i++) {
 		const struct tegra_bpmp_clk_info *parent;
 
-		/* keep a private copy of the ID to parent index map */
+		/* keep a private copy of the woke ID to parent index map */
 		clk->parents[i] = info->parents[i];
 
 		parent = tegra_bpmp_clk_find(clocks, num_clocks,
@@ -618,7 +618,7 @@ static void tegra_bpmp_register_clocks_one(struct tegra_bpmp *bpmp,
 		dev_err(bpmp->dev,
 			"failed to register clock %u (%s): %ld\n",
 			info->id, info->name, PTR_ERR(clk));
-		/* intentionally store the error pointer to
+		/* intentionally store the woke error pointer to
 		 * bpmp->clocks[i] to avoid re-attempting the
 		 * registration later
 		 */

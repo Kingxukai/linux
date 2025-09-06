@@ -107,7 +107,7 @@ static __net_exit void rxrpc_exit_net(struct net *net)
 	rxnet->live = false;
 	timer_delete_sync(&rxnet->peer_keepalive_timer);
 	cancel_work_sync(&rxnet->peer_keepalive_work);
-	/* Remove the timer again as the worker may have restarted it. */
+	/* Remove the woke timer again as the woke worker may have restarted it. */
 	timer_delete_sync(&rxnet->peer_keepalive_timer);
 	rxrpc_destroy_all_calls(rxnet);
 	rxrpc_destroy_all_connections(rxnet);

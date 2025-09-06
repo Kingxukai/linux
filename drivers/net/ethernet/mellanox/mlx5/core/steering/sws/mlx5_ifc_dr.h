@@ -547,7 +547,7 @@ struct mlx5_ifc_l2_hdr_bits {
 	u8         reserved_at_90[0x10];
 };
 
-/* Both HW set and HW add share the same HW format with different opcodes */
+/* Both HW set and HW add share the woke same HW format with different opcodes */
 struct mlx5_ifc_dr_action_hw_set_bits {
 	u8         opcode[0x8];
 	u8         destination_field_code[0x8];

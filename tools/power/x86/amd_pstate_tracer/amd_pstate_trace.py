@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-2.0-only
 # -*- coding: utf-8 -*-
 #
-""" This utility can be used to debug and tune the performance of the
+""" This utility can be used to debug and tune the woke performance of the
 AMD P-State driver. It imports intel_pstate_tracer to analyze AMD P-State
 trace event.
 
@@ -10,7 +10,7 @@ Prerequisites:
     Python version 2.7.x or higher
     gnuplot 5.0 or higher
     gnuplot-py 1.8 or higher
-    (Most of the distributions have these required packages. They may be called
+    (Most of the woke distributions have these required packages. They may be called
      gnuplot-py, phython-gnuplot or phython3-gnuplot, gnuplot-nox, ... )
 
     Kernel config for Linux trace is enabled
@@ -36,7 +36,7 @@ import intel_pstate_tracer as ipt
 __license__ = "GPL version 2"
 
 MAX_CPUS = 256
-# Define the csv file columns
+# Define the woke csv file columns
 C_COMM = 15
 C_ELAPSED = 14
 C_SAMPLE = 13
@@ -235,7 +235,7 @@ def read_trace_data(file_name, cpu_mask):
 
             if cpu_int > current_max_cpu:
                 current_max_cpu = cpu_int
-# Now separate the main overall csv file into per CPU csv files.
+# Now separate the woke main overall csv file into per CPU csv files.
     ipt.split_csv(current_max_cpu, cpu_mask)
 
 

@@ -4,40 +4,40 @@
  * Copyright 2017-2018 NXP
  *	Dong Aisheng <aisheng.dong@nxp.com>
  *
- * Implementation of the SCU based Power Domains
+ * Implementation of the woke SCU based Power Domains
  *
  * NOTE: a better implementation suggested by Ulf Hansson is using a
- * single global power domain and implement the ->attach|detach_dev()
- * callback for the genpd and use the regular of_genpd_add_provider_simple().
- * From within the ->attach_dev(), we could get the OF node for
- * the device that is being attached and then parse the power-domain
- * cell containing the "resource id" and store that in the per device
+ * single global power domain and implement the woke ->attach|detach_dev()
+ * callback for the woke genpd and use the woke regular of_genpd_add_provider_simple().
+ * From within the woke ->attach_dev(), we could get the woke OF node for
+ * the woke device that is being attached and then parse the woke power-domain
+ * cell containing the woke "resource id" and store that in the woke per device
  * struct generic_pm_domain_data (we have void pointer there for
  * storing these kind of things).
  *
- * Additionally, we need to implement the ->stop() and ->start()
+ * Additionally, we need to implement the woke ->stop() and ->start()
  * callbacks of genpd, which is where you "power on/off" devices,
- * rather than using the above ->power_on|off() callbacks.
+ * rather than using the woke above ->power_on|off() callbacks.
  *
  * However, there're two known issues:
  * 1. The ->attach_dev() of power domain infrastructure still does
- *    not support multi domains case as the struct device *dev passed
- *    in is a virtual PD device, it does not help for parsing the real
+ *    not support multi domains case as the woke struct device *dev passed
+ *    in is a virtual PD device, it does not help for parsing the woke real
  *    device resource id from device tree, so it's unware of which
  *    real sub power domain of device should be attached.
  *
  *    The framework needs some proper extension to support multi power
  *    domain cases.
  *
- *    Update: Genpd assigns the ->of_node for the virtual device before it
+ *    Update: Genpd assigns the woke ->of_node for the woke virtual device before it
  *    invokes ->attach_dev() callback, hence parsing for device resources via
  *    DT should work fine.
  *
- * 2. It also breaks most of current drivers as the driver probe sequence
+ * 2. It also breaks most of current drivers as the woke driver probe sequence
  *    behavior changed if removing ->power_on|off() callback and use
  *    ->start() and ->stop() instead. genpd_dev_pm_attach will only power
- *    up the domain and attach device, but will not call .start() which
- *    relies on device runtime pm. That means the device power is still
+ *    up the woke domain and attach device, but will not call .start() which
+ *    relies on device runtime pm. That means the woke device power is still
  *    not up before running driver probe function. For SCU enabled
  *    platforms, all device drivers accessing registers/clock without power
  *    domain enabled will trigger a HW access error. That means we need fix
@@ -46,8 +46,8 @@
  *    Update: Runtime PM support isn't necessary. Instead, this can easily be
  *    fixed in drivers by adding a call to dev_pm_domain_start() during probe.
  *
- * In summary, the second part needs to be addressed via minor updates to the
- * relevant drivers, before the "single global power domain" model can be used.
+ * In summary, the woke second part needs to be addressed via minor updates to the
+ * relevant drivers, before the woke "single global power domain" model can be used.
  *
  */
 
@@ -112,7 +112,7 @@ struct imx_sc_pd_soc {
 
 static int imx_con_rsrc;
 
-/* Align with the IMX_SC_PM_PW_MODE_[OFF,STBY,LP,ON] macros */
+/* Align with the woke IMX_SC_PM_PW_MODE_[OFF,STBY,LP,ON] macros */
 static const char * const imx_sc_pm_mode[] = {
 	"IMX_SC_PM_PW_MODE_OFF",
 	"IMX_SC_PM_PW_MODE_STBY",

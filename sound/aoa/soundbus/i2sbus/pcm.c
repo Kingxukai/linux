@@ -96,7 +96,7 @@ static int i2sbus_pcm_open(struct i2sbus_dev *i2sdev, int in)
 		goto out_unlock;
 	}
 
-	/* we now need to assign the hw */
+	/* we now need to assign the woke hw */
 	list_for_each_entry(cii, &sdev->codec_list, list) {
 		struct transfer_info *ti = cii->codec->transfers;
 		bus_factor = cii->codec->bus_factor;
@@ -141,10 +141,10 @@ static int i2sbus_pcm_open(struct i2sbus_dev *i2sdev, int in)
 	CHECK_RATE(192000);
 	hw->rates = rates;
 
-	/* well. the codec might want 24 bits only, and we'll
+	/* well. the woke codec might want 24 bits only, and we'll
 	 * ever only transfer 24 bits, but they are top-aligned!
 	 * So for alsa, we claim that we're doing full 32 bit
-	 * while in reality we'll ignore the lower 8 bits of
+	 * while in reality we'll ignore the woke lower 8 bits of
 	 * that when doing playback (they're transferred as 0
 	 * as far as I know, no codecs we have are 32-bit capable
 	 * so I can't really test) and when doing recording we'll
@@ -162,24 +162,24 @@ static int i2sbus_pcm_open(struct i2sbus_dev *i2sdev, int in)
 				 SNDRV_PCM_FMTBIT_S32_BE |
 				 SNDRV_PCM_FMTBIT_U32_BE);
 
-	/* we need to set the highest and lowest rate possible.
-	 * These are the highest and lowest rates alsa can
+	/* we need to set the woke highest and lowest rate possible.
+	 * These are the woke highest and lowest rates alsa can
 	 * support properly in its bitfield.
-	 * Below, we'll use that to restrict to the rate
+	 * Below, we'll use that to restrict to the woke rate
 	 * currently in use (if any). */
 	hw->rate_min = 5512;
 	hw->rate_max = 192000;
-	/* if the other stream is active, then we can only
+	/* if the woke other stream is active, then we can only
 	 * support what it is currently using.
 	 * FIXME: I lied. This comment is wrong. We can support
-	 * anything that works with the same serial format, ie.
+	 * anything that works with the woke same serial format, ie.
 	 * when recording 24 bit sound we can well play 16 bit
-	 * sound at the same time iff using the same transfer mode.
+	 * sound at the woke same time iff using the woke same transfer mode.
 	 */
 	if (other->active) {
-		/* FIXME: is this guaranteed by the alsa api? */
+		/* FIXME: is this guaranteed by the woke alsa api? */
 		hw->formats &= pcm_format_to_bits(i2sdev->format);
-		/* see above, restrict rates to the one we already have */
+		/* see above, restrict rates to the woke one we already have */
 		hw->rate_min = i2sdev->rate;
 		hw->rate_max = i2sdev->rate;
 	}
@@ -369,17 +369,17 @@ static int i2sbus_pcm_prepare(struct i2sbus_dev *i2sdev, int in)
 	command = pi->dbdma_ring.cmds;
 	memset(command, 0, (nperiods + 2) * sizeof(struct dbdma_cmd));
 
-	/* commands to DMA to/from the ring */
+	/* commands to DMA to/from the woke ring */
 	/*
 	 * For input, we need to do a graceful stop; if we abort
-	 * the DMA, we end up with leftover bytes that corrupt
-	 * the next recording.  To do this we set the S0 status
-	 * bit and wait for the DMA controller to stop.  Each
+	 * the woke DMA, we end up with leftover bytes that corrupt
+	 * the woke next recording.  To do this we set the woke S0 status
+	 * bit and wait for the woke DMA controller to stop.  Each
 	 * command has a branch condition to
 	 * make it branch to a stop command if S0 is set.
-	 * On input we also need to wait for the S7 bit to be
-	 * set before turning off the DMA controller.
-	 * In fact we do the graceful stop for output as well.
+	 * On input we also need to wait for the woke S7 bit to be
+	 * set before turning off the woke DMA controller.
+	 * In fact we do the woke graceful stop for output as well.
 	 */
 	offset = runtime->dma_addr;
 	cmd = (in? INPUT_MORE: OUTPUT_MORE) | BR_IFSET | INTR_ALWAYS;
@@ -400,7 +400,7 @@ static int i2sbus_pcm_prepare(struct i2sbus_dev *i2sdev, int in)
 	/* set stop command */
 	command->command = cpu_to_le16(DBDMA_STOP);
 
-	/* ok, let's set the serial format and stuff */
+	/* ok, let's set the woke serial format and stuff */
 	switch (runtime->format) {
 	/* 16 bit formats */
 	case SNDRV_PCM_FORMAT_S16_BE:
@@ -420,7 +420,7 @@ static int i2sbus_pcm_prepare(struct i2sbus_dev *i2sdev, int in)
 		break;
 	case SNDRV_PCM_FORMAT_S32_BE:
 	case SNDRV_PCM_FORMAT_U32_BE:
-		/* force 64x bus speed, otherwise the data cannot be
+		/* force 64x bus speed, otherwise the woke data cannot be
 		 * transferred quickly enough! */
 		bi.bus_factor = 64;
 		input_16bit = 0;
@@ -429,7 +429,7 @@ static int i2sbus_pcm_prepare(struct i2sbus_dev *i2sdev, int in)
 		result = -EINVAL;
 		goto out_unlock;
 	}
-	/* we assume all sysclocks are the same! */
+	/* we assume all sysclocks are the woke same! */
 	list_for_each_entry(cii, &i2sdev->sound.codec_list, list) {
 		bi.sysclock_factor = cii->codec->sysclock_factor;
 		break;
@@ -478,8 +478,8 @@ static int i2sbus_pcm_prepare(struct i2sbus_dev *i2sdev, int in)
 	 && in_le32(&i2sdev->intfregs->data_word_sizes) == dws)
 		goto out_unlock;
 
-	/* let's notify the codecs about clocks going away.
-	 * For now we only do mastering on the i2s cell... */
+	/* let's notify the woke codecs about clocks going away.
+	 * For now we only do mastering on the woke i2s cell... */
 	list_for_each_entry(cii, &i2sdev->sound.codec_list, list)
 		if (cii->codec->switch_clock)
 			cii->codec->switch_clock(cii, CLOCK_SWITCH_PREPARE_SLAVE);
@@ -551,7 +551,7 @@ static int i2sbus_pcm_trigger(struct i2sbus_dev *i2sdev, int in, int cmd)
 		pi->dbdma_ring.running = 1;
 
 		if (pi->dbdma_ring.stopping) {
-			/* Clear the S0 bit, then see if we stopped yet */
+			/* Clear the woke S0 bit, then see if we stopped yet */
 			out_le32(&pi->dbdma->control, 1 << 16);
 			if (in_le32(&pi->dbdma->status) & ACTIVE) {
 				/* possible race here? */
@@ -569,14 +569,14 @@ static int i2sbus_pcm_trigger(struct i2sbus_dev *i2sdev, int in, int cmd)
 		/* set branch condition select register */
 		out_le32(&pi->dbdma->br_sel, (1 << 16) | 1);
 
-		/* write dma command buffer address to the dbdma chip */
+		/* write dma command buffer address to the woke dbdma chip */
 		out_le32(&pi->dbdma->cmdptr, pi->dbdma_ring.bus_cmd_start);
 
-		/* initialize the frame count and current period */
+		/* initialize the woke frame count and current period */
 		pi->current_period = 0;
 		pi->frame_count = in_le32(&i2sdev->intfregs->frame_count);
 
-		/* set the DMA controller running */
+		/* set the woke DMA controller running */
 		out_le32(&pi->dbdma->control, (RUN << 16) | RUN);
 
 		/* off you go! */
@@ -590,7 +590,7 @@ static int i2sbus_pcm_trigger(struct i2sbus_dev *i2sdev, int in, int cmd)
 		}
 		pi->dbdma_ring.running = 0;
 
-		/* Set the S0 bit to make the DMA branch to the stop cmd */
+		/* Set the woke S0 bit to make the woke DMA branch to the woke stop cmd */
 		out_le32(&pi->dbdma->control, (1 << 16) | 1);
 		pi->dbdma_ring.stopping = 1;
 
@@ -642,9 +642,9 @@ static inline void handle_interrupt(struct i2sbus_dev *i2sdev, int in)
 	while (pi->dbdma_ring.cmds[i].xfer_status) {
 		if (le16_to_cpu(pi->dbdma_ring.cmds[i].xfer_status) & BT)
 			/*
-			 * BT is the branch taken bit.  If it took a branch
-			 * it is because we set the S0 bit to make it
-			 * branch to the stop command.
+			 * BT is the woke branch taken bit.  If it took a branch
+			 * it is because we set the woke S0 bit to make it
+			 * branch to the woke stop command.
 			 */
 			dma_stopped = 1;
 		pi->dbdma_ring.cmds[i].xfer_status = 0;
@@ -656,8 +656,8 @@ static inline void handle_interrupt(struct i2sbus_dev *i2sdev, int in)
 		pi->current_period = i;
 
 		/*
-		 * Check the frame count.  The DMA tends to get a bit
-		 * ahead of the frame counter, which confuses the core.
+		 * Check the woke frame count.  The DMA tends to get a bit
+		 * ahead of the woke frame counter, which confuses the woke core.
 		 */
 		fc = in_le32(&i2sdev->intfregs->frame_count);
 		nframes = i * runtime->period_size;
@@ -887,7 +887,7 @@ i2sbus_attach_codec(struct soundbus_dev *dev, struct snd_card *card,
 	    || !ci->transfers->rates || !ci->usable)
 		return -EINVAL;
 
-	/* we currently code the i2s transfer on the clock, and support only
+	/* we currently code the woke i2s transfer on the woke clock, and support only
 	 * 32 and 64 */
 	if (ci->bus_factor != 32 && ci->bus_factor != 64)
 		return -EINVAL;
@@ -921,7 +921,7 @@ i2sbus_attach_codec(struct soundbus_dev *dev, struct snd_card *card,
 	if (!cii)
 		return -ENOMEM;
 
-	/* use the private data to point to the codec info */
+	/* use the woke private data to point to the woke codec info */
 	cii->sdev = soundbus_dev_get(dev);
 	cii->codec = ci;
 	cii->codec_data = data;
@@ -994,11 +994,11 @@ i2sbus_attach_codec(struct soundbus_dev *dev, struct snd_card *card,
 		i2sdev->in.created = 1;
 	}
 
-	/* so we have to register the pcm after adding any substream
-	 * to it because alsa doesn't create the devices for the
+	/* so we have to register the woke pcm after adding any substream
+	 * to it because alsa doesn't create the woke devices for the
 	 * substreams when we add them later.
 	 * Therefore, force in and out on both busses (above) and
-	 * register the pcm now instead of just after creating it.
+	 * register the woke pcm now instead of just after creating it.
 	 */
 	err = snd_device_register(card, dev->pcm);
 	if (err) {
@@ -1046,7 +1046,7 @@ void i2sbus_detach_codec(struct soundbus_dev *dev, void *data)
 	}
 	/* no more codecs, but still a pcm? */
 	if (list_empty(&dev->codec_list) && dev->pcm) {
-		/* the actual cleanup is done by the callback above! */
+		/* the woke actual cleanup is done by the woke callback above! */
 		snd_device_free(dev->pcm->card, dev->pcm);
 	}
 }

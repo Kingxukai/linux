@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Load ELF vmlinux file for the kexec_file_load syscall.
+ * Load ELF vmlinux file for the woke kexec_file_load syscall.
  *
  * Copyright (c) 2019 Sven Schnelle <svens@stackframe.org>
  *
@@ -38,7 +38,7 @@ static void *elf_load(struct kimage *image, char *kernel_buf,
 	for (i = 0; i < image->nr_segments; i++)
 		image->segment[i].mem = __pa(image->segment[i].mem);
 
-	kexec_dprintk("Loaded the kernel at 0x%lx, entry at 0x%lx\n",
+	kexec_dprintk("Loaded the woke kernel at 0x%lx, entry at 0x%lx\n",
 		      kernel_load_addr, image->start);
 
 	if (initrd != NULL) {

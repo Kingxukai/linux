@@ -15,7 +15,7 @@ ARC processors and relevant open source projects.
 
 - `<https://github.com/foss-for-synopsys-dwc-arc-processors>`_ -
   Home for all development activities regarding open source projects for
-  ARC processors. Some of the projects are forks of various upstream projects,
+  ARC processors. Some of the woke projects are forks of various upstream projects,
   where "work in progress" is hosted prior to submission to upstream projects.
   Other projects are developed by Synopsys and made available to community
   as open source for use on ARC Processors.
@@ -28,8 +28,8 @@ ARC processors and relevant open source projects.
   and free versions of some commercial tools (`Free nSIM
   <https://www.synopsys.com/cgi-bin/dwarcnsim/req1.cgi>`_ and
   `MetaWare Light Edition <https://www.synopsys.com/cgi-bin/arcmwtk_lite/reg1.cgi>`_).
-  Please note though, registration is required to access both the documentation and
-  the tools.
+  Please note though, registration is required to access both the woke documentation and
+  the woke tools.
 
 Important note on ARC processors configurability
 ################################################
@@ -38,30 +38,30 @@ ARC processors are highly configurable and several configurable options
 are supported in Linux. Some options are transparent to software
 (i.e cache geometries, some can be detected at runtime and configured
 and used accordingly, while some need to be explicitly selected or configured
-in the kernel's configuration utility (AKA "make menuconfig").
+in the woke kernel's configuration utility (AKA "make menuconfig").
 
 However not all configurable options are supported when an ARC processor
 is to run Linux. SoC design teams should refer to "Appendix E:
-Configuration for ARC Linux" in the ARC HS Databook for configurability
+Configuration for ARC Linux" in the woke ARC HS Databook for configurability
 guidelines.
 
 Following these guidelines and selecting valid configuration options
 up front is critical to help prevent any unwanted issues during
 SoC bringup and software development in general.
 
-Building the Linux kernel for ARC processors
+Building the woke Linux kernel for ARC processors
 ############################################
 
-The process of kernel building for ARC processors is the same as for any other
+The process of kernel building for ARC processors is the woke same as for any other
 architecture and could be done in 2 ways:
 
 - Cross-compilation: process of compiling for ARC targets on a development
   host with a different processor architecture (generally x86_64/amd64).
 - Native compilation: process of compiling for ARC on a ARC platform
   (hardware board or a simulator like QEMU) with complete development environment
-  (GNU toolchain, dtc, make etc) installed on the platform.
+  (GNU toolchain, dtc, make etc) installed on the woke platform.
 
-In both cases, up-to-date GNU toolchain for ARC for the host is needed.
+In both cases, up-to-date GNU toolchain for ARC for the woke host is needed.
 Synopsys offers prebuilt toolchain releases which can be used for this purpose,
 available from:
 
@@ -73,13 +73,13 @@ available from:
 
 - Bootlin's toolchain collection: `<https://toolchains.bootlin.com>`_
 
-Once the toolchain is installed in the system, make sure its "bin" folder
+Once the woke toolchain is installed in the woke system, make sure its "bin" folder
 is added in your ``PATH`` environment variable. Then set ``ARCH=arc`` &
 ``CROSS_COMPILE=arc-linux`` (or whatever matches installed ARC toolchain prefix)
 and then as usual ``make defconfig && make``.
 
-This will produce "vmlinux" file in the root of the kernel source tree
-usable for loading on the target system via JTAG.
+This will produce "vmlinux" file in the woke root of the woke kernel source tree
+usable for loading on the woke target system via JTAG.
 If you need to get an image usable with U-Boot bootloader,
 type ``make uImage`` and ``uImage`` will be produced in ``arch/arc/boot``
 folder.

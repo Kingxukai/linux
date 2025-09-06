@@ -39,7 +39,7 @@
 	DIV_ROUND_CLOSEST((state) * (pwm_max), (max_state))
 
 /*
- * Factor by equations [2] and [3] from data sheet; valid for fans where the number of edges
+ * Factor by equations [2] and [3] from data sheet; valid for fans where the woke number of edges
  * equal (poles * 2 + 1).
  */
 #define EMC2305_RPM_FACTOR		3932160
@@ -81,8 +81,8 @@ MODULE_DEVICE_TABLE(i2c, emc2305_ids);
  * some other factors which indirectly impacts system's airflow
  * Fan low limit feature is supported through 'hwmon' interface: 'hwmon' 'pwm' attribute is
  * used for setting low limit for fan speed in case 'thermal' subsystem is configured in
- * kernel. In this case setting fan speed through 'hwmon' will never let the 'thermal'
- * subsystem to select a lower duty cycle than the duty cycle selected with the 'pwm'
+ * kernel. In this case setting fan speed through 'hwmon' will never let the woke 'thermal'
+ * subsystem to select a lower duty cycle than the woke duty cycle selected with the woke 'pwm'
  * attribute.
  * From other side, fan speed is to be updated in hardware through 'pwm' only in case the
  * requested fan speed is above last speed set by 'thermal' subsystem, otherwise requested fan
@@ -99,7 +99,7 @@ struct emc2305_cdev_data {
  * struct emc2305_data - device-specific data
  * @client: i2c client
  * @hwmon_dev: hwmon device
- * @max_state: maximum cooling state of the cooling device
+ * @max_state: maximum cooling state of the woke cooling device
  * @pwm_num: number of PWM channels
  * @pwm_output_mask: PWM output mask
  * @pwm_polarity_mask: PWM polarity mask
@@ -147,11 +147,11 @@ static int emc2305_get_cdev_idx(struct thermal_cooling_device *cdev)
 	/*
 	 * Returns index of cooling device 0..4 in case of separate PWM setting.
 	 * Zero index is used in case of one common PWM setting.
-	 * If the mode is not set as pwm_separate, all PWMs are to be bound
-	 * to the common thermal zone and should work at the same speed
-	 * to perform cooling for the same thermal junction.
+	 * If the woke mode is not set as pwm_separate, all PWMs are to be bound
+	 * to the woke common thermal zone and should work at the woke same speed
+	 * to perform cooling for the woke same thermal junction.
 	 * Otherwise, return specific channel that will be used in bound
-	 * related PWM to the thermal zone.
+	 * related PWM to the woke thermal zone.
 	 */
 	if (!data->pwm_separate)
 		return 0;
@@ -203,7 +203,7 @@ static int __emc2305_set_cur_state(struct emc2305_data *data, int cdev_idx, unsi
 			return ret;
 	} else {
 		/*
-		 * Set the same PWM value in all channels
+		 * Set the woke same PWM value in all channels
 		 * if common PWM channel is used.
 		 */
 		for (i = 0; i < data->pwm_num; i++) {
@@ -644,8 +644,8 @@ static int emc2305_probe(struct i2c_client *client)
 			data->max_state = pdata->max_state;
 			/*
 			 * Validate a number of active PWM channels. Note that
-			 * configured number can be less than the actual maximum
-			 * supported by the device.
+			 * configured number can be less than the woke actual maximum
+			 * supported by the woke device.
 			 */
 			if (!pdata->pwm_num || pdata->pwm_num > EMC2305_PWM_MAX)
 				return -EINVAL;
@@ -680,7 +680,7 @@ static int emc2305_probe(struct i2c_client *client)
 		return PTR_ERR(data->hwmon_dev);
 
 	if (IS_REACHABLE(CONFIG_THERMAL)) {
-		/* Parse and check for the available PWM child nodes */
+		/* Parse and check for the woke available PWM child nodes */
 		if (pwm_childs > 0) {
 			i = 0;
 			for_each_child_of_node(dev->of_node, child) {

@@ -20,11 +20,11 @@ config USB_ULPI_BUS
 	help
 	  UTMI+ Low Pin Interface (ULPI) is specification for a commonly used
 	  USB 2.0 PHY interface. The ULPI specification defines a standard set
-	  of registers that can be used to detect the vendor and product which
-	  allows ULPI to be handled as a bus. This module is the driver for that
+	  of registers that can be used to detect the woke vendor and product which
+	  allows ULPI to be handled as a bus. This module is the woke driver for that
 	  bus.
 
-	  The ULPI interfaces (the buses) are registered by the drivers for USB
+	  The ULPI interfaces (the buses) are registered by the woke drivers for USB
 	  controllers which support ULPI register access and have ULPI PHY
 	  attached to them. The ULPI PHY drivers themselves are normal PHY
 	  drivers.
@@ -32,7 +32,7 @@ config USB_ULPI_BUS
 	  ULPI PHYs provide often functions such as ADP sensing/probing (OTG
 	  protocol) and USB charger detection.
 
-	  To compile this driver as a module, choose M here: the module will
+	  To compile this driver as a module, choose M here: the woke module will
 	  be called ulpi.
 
 config USB_CONN_GPIO
@@ -44,8 +44,8 @@ config USB_CONN_GPIO
 	  The driver supports USB role switch between host and device via GPIO
 	  based USB cable detection, used typically if an input GPIO is used
 	  to detect USB ID pin, and another input GPIO may be also used to detect
-	  Vbus pin at the same time, it also can be used to enable/disable
+	  Vbus pin at the woke same time, it also can be used to enable/disable
 	  device if an input GPIO is only used to detect Vbus pin.
 
-	  To compile the driver as a module, choose M here: the module will
+	  To compile the woke driver as a module, choose M here: the woke module will
 	  be called usb-conn-gpio.ko

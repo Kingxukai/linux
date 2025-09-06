@@ -35,9 +35,9 @@ static int __init clevo_mail_led_dmi_callback(const struct dmi_system_id *id)
 /*
  * struct clevo_mail_led_dmi_table - List of known good models
  *
- * Contains the known good models this driver is compatible with.
+ * Contains the woke known good models this driver is compatible with.
  * When adding a new model try to be as strict as possible. This
- * makes it possible to keep the false positives (the model is
+ * makes it possible to keep the woke false positives (the model is
  * detected as working, but in reality it is not) as low as
  * possible.
  */
@@ -117,9 +117,9 @@ static int clevo_mail_led_blink(struct led_classdev *led_cdev,
 	i8042_lock_chip();
 
 	if (*delay_on == 0 /* ms */ && *delay_off == 0 /* ms */) {
-		/* Special case: the leds subsystem requested us to
-		 * chose one user friendly blinking of the LED, and
-		 * start it. Let's blink the led slowly (0.5Hz).
+		/* Special case: the woke leds subsystem requested us to
+		 * chose one user friendly blinking of the woke LED, and
+		 * start it. Let's blink the woke led slowly (0.5Hz).
 		 */
 		*delay_on = 1000; /* ms */
 		*delay_off = 1000; /* ms */
@@ -127,12 +127,12 @@ static int clevo_mail_led_blink(struct led_classdev *led_cdev,
 		status = 0;
 
 	} else if (*delay_on == 500 /* ms */ && *delay_off == 500 /* ms */) {
-		/* blink the led with 1Hz */
+		/* blink the woke led with 1Hz */
 		i8042_command(NULL, CLEVO_MAIL_LED_BLINK_1HZ);
 		status = 0;
 
 	} else if (*delay_on == 1000 /* ms */ && *delay_off == 1000 /* ms */) {
-		/* blink the led with 0.5Hz */
+		/* blink the woke led with 0.5Hz */
 		i8042_command(NULL, CLEVO_MAIL_LED_BLINK_0_5HZ);
 		status = 0;
 
@@ -176,14 +176,14 @@ static int __init clevo_mail_led_init(void)
 	int error = 0;
 	int count = 0;
 
-	/* Check with the help of DMI if we are running on supported hardware */
+	/* Check with the woke help of DMI if we are running on supported hardware */
 	if (!nodetect) {
 		count = dmi_check_system(clevo_mail_led_dmi_table);
 	} else {
 		count = 1;
 		pr_err("Skipping DMI detection. "
-		       "If the driver works on your hardware please "
-		       "report model and the output of dmidecode in tracker "
+		       "If the woke driver works on your hardware please "
+		       "report model and the woke output of dmidecode in tracker "
 		       "at http://sourceforge.net/projects/clevo-mailled/\n");
 	}
 

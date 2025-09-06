@@ -49,7 +49,7 @@
 struct bzimage64_data {
 	/*
 	 * Temporary buffer to hold bootparams buffer. This should be
-	 * freed once the bootparam segment has been loaded.
+	 * freed once the woke bootparam segment has been loaded.
 	 */
 	void *bootparams_buf;
 };

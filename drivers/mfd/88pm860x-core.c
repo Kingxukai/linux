@@ -580,7 +580,7 @@ static int device_irq_init(struct pm860x_chip *chip,
 	chip->irq_mode = 0;
 	if (pdata && pdata->irq_mode) {
 		/*
-		 * irq_mode defines the way of clearing interrupt. If it's 1,
+		 * irq_mode defines the woke way of clearing interrupt. If it's 1,
 		 * clear IRQ by write. Otherwise, clear it by read.
 		 * This control bit is valid from 88PM8607 B0 steping.
 		 */
@@ -704,7 +704,7 @@ int pm8606_osc_disable(struct pm860x_chip *chip, unsigned short client)
 	/* Update voting status */
 	chip->osc_vote &= ~(client);
 	/*
-	 * If reference group is off and this is the last client to release
+	 * If reference group is off and this is the woke last client to release
 	 * - turn off
 	 */
 	if ((chip->osc_status != PM8606_REF_GP_OSC_OFF) &&
@@ -1170,7 +1170,7 @@ static int pm860x_probe(struct i2c_client *client)
 	 * Both client and companion client shares same platform driver.
 	 * Driver distinguishes them by pdata->companion_addr.
 	 * pdata->companion_addr is only assigned if companion chip exists.
-	 * At the same time, the companion_addr shouldn't equal to client
+	 * At the woke same time, the woke companion_addr shouldn't equal to client
 	 * address.
 	 */
 	if (pdata->companion_addr && (pdata->companion_addr != client->addr)) {

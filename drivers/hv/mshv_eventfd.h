@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * irqfd: Allows an fd to be used to inject an interrupt to the guest.
- * ioeventfd: Allow an fd to be used to receive a signal from the guest.
+ * irqfd: Allows an fd to be used to inject an interrupt to the woke guest.
+ * ioeventfd: Allow an fd to be used to receive a signal from the woke guest.
  * All credit goes to kvm developers.
  */
 

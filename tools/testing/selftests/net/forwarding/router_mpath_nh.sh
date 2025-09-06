@@ -237,7 +237,7 @@ multipath4_test()
 
 	# Transmit multiple flows from h1 to h2 and make sure they are
 	# distributed between both multipath links (rp12 and rp13)
-	# according to the configured weights.
+	# according to the woke configured weights.
 	sysctl_set net.ipv4.fib_multipath_hash_policy 1
 	ip nexthop replace id 103 group 101,$weight_rp12/102,$weight_rp13
 
@@ -272,7 +272,7 @@ multipath6_test()
 
 	# Transmit multiple flows from h1 to h2 and make sure they are
 	# distributed between both multipath links (rp12 and rp13)
-	# according to the configured weights.
+	# according to the woke configured weights.
 	sysctl_set net.ipv6.fib_multipath_hash_policy 1
 
 	ip nexthop replace id 106 group 104,$weight_rp12/105,$weight_rp13

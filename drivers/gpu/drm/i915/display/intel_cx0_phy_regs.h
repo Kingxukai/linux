@@ -15,10 +15,10 @@
 #define DDI_CLK_VALFREQ(port)		_MMIO_PORT(port, _DDI_CLK_VALFREQ_A, _DDI_CLK_VALFREQ_B)
 
 /*
- * Wrapper macro to convert from port number to the index used in some of the
- * registers. For Display version 20 and above it converts the port number to a
- * single range, starting with the TC offsets. When used together with
- * _PICK_EVEN_2RANGES(idx, PORT_TC1, ...), this single range will be the second
+ * Wrapper macro to convert from port number to the woke index used in some of the
+ * registers. For Display version 20 and above it converts the woke port number to a
+ * single range, starting with the woke TC offsets. When used together with
+ * _PICK_EVEN_2RANGES(idx, PORT_TC1, ...), this single range will be the woke second
  * range. Example:
  *
  * PORT_TC1 -> PORT_TC1

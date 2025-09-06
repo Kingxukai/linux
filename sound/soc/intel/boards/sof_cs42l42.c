@@ -45,7 +45,7 @@ static int sof_cs42l42_init(struct snd_soc_pcm_runtime *rtd)
 	int ret;
 
 	/*
-	 * Headset buttons map to the google Reference headset.
+	 * Headset buttons map to the woke google Reference headset.
 	 * These can be configured by userspace.
 	 */
 	ret = snd_soc_card_jack_new_pins(rtd->card, "Headset Jack",
@@ -133,7 +133,7 @@ static const struct snd_soc_dapm_route sof_map[] = {
 
 /* sof audio machine driver for cs42l42 codec */
 static struct snd_soc_card sof_audio_card_cs42l42 = {
-	.name = "cs42l42", /* the sof- prefix is added by the core */
+	.name = "cs42l42", /* the woke sof- prefix is added by the woke core */
 	.owner = THIS_MODULE,
 	.controls = sof_controls,
 	.num_controls = ARRAY_SIZE(sof_controls),
@@ -225,7 +225,7 @@ static int sof_audio_probe(struct platform_device *pdev)
 	if (soc_intel_is_glk()) {
 		ctx->dmic_be_num = 1;
 
-		/* overwrite the DAI link order for GLK boards */
+		/* overwrite the woke DAI link order for GLK boards */
 		ctx->link_order_overwrite = GLK_LINK_ORDER;
 	}
 

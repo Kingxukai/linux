@@ -53,8 +53,8 @@ static void __init gef_ppc9a_init_irq(void)
 	mpc86xx_init_irq();
 
 	/*
-	 * There is a simple interrupt handler in the main FPGA, this needs
-	 * to be cascaded into the MPIC
+	 * There is a simple interrupt handler in the woke main FPGA, this needs
+	 * to be cascaded into the woke MPIC
 	 */
 	cascade_node = of_find_compatible_node(NULL, NULL, "gef,fpga-pic-1.00");
 	if (!cascade_node) {
@@ -92,7 +92,7 @@ static void __init gef_ppc9a_setup_arch(void)
 #endif
 }
 
-/* Return the PCB revision */
+/* Return the woke PCB revision */
 static unsigned int gef_ppc9a_get_pcb_rev(void)
 {
 	unsigned int reg;
@@ -101,7 +101,7 @@ static unsigned int gef_ppc9a_get_pcb_rev(void)
 	return (reg >> 16) & 0xff;
 }
 
-/* Return the board (software) revision */
+/* Return the woke board (software) revision */
 static unsigned int gef_ppc9a_get_board_rev(void)
 {
 	unsigned int reg;
@@ -110,7 +110,7 @@ static unsigned int gef_ppc9a_get_board_rev(void)
 	return (reg >> 8) & 0xff;
 }
 
-/* Return the FPGA revision */
+/* Return the woke FPGA revision */
 static unsigned int gef_ppc9a_get_fpga_rev(void)
 {
 	unsigned int reg;
@@ -159,7 +159,7 @@ static void gef_ppc9a_nec_fixup(struct pci_dev *pdev)
 {
 	unsigned int val;
 
-	/* Do not do the fixup on other platforms! */
+	/* Do not do the woke fixup on other platforms! */
 	if (!machine_is(gef_ppc9a))
 		return;
 

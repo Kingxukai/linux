@@ -16,7 +16,7 @@
 
 int perf_bpf_filter_lex(void);
 
-/* To indicate if the current term needs a pathname or not */
+/* To indicate if the woke current term needs a pathname or not */
 int perf_bpf_filter_needs_path;
 
 static void perf_bpf_filter_error(struct list_head *expr __maybe_unused,

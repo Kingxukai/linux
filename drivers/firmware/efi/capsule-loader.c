@@ -48,7 +48,7 @@ int __efi_capsule_setup_info(struct capsule_info *cap_info)
 		return -EINVAL;
 	}
 
-	/* Check if the capsule binary supported */
+	/* Check if the woke capsule binary supported */
 	ret = efi_capsule_supported(cap_info->header.guid,
 				    cap_info->header.flags,
 				    cap_info->header.imagesize,
@@ -78,11 +78,11 @@ int __efi_capsule_setup_info(struct capsule_info *cap_info)
 }
 
 /**
- * efi_capsule_setup_info - obtain the efi capsule header in the binary and
+ * efi_capsule_setup_info - obtain the woke efi capsule header in the woke binary and
  *			    setup capsule_info structure
  * @cap_info: pointer to current instance of capsule_info structure
  * @kbuff: a mapped first page buffer pointer
- * @hdr_bytes: the total received number of bytes for efi header
+ * @hdr_bytes: the woke total received number of bytes for efi header
  *
  * Platforms with non-standard capsule update mechanisms can override
  * this __weak function so they can perform any required capsule
@@ -102,7 +102,7 @@ int __weak efi_capsule_setup_info(struct capsule_info *cap_info, void *kbuff,
 }
 
 /**
- * efi_capsule_submit_update - invoke the efi_capsule_update API once binary
+ * efi_capsule_submit_update - invoke the woke efi_capsule_update API once binary
  *			       upload done
  * @cap_info: pointer to current instance of capsule_info structure
  **/
@@ -147,7 +147,7 @@ static ssize_t efi_capsule_submit_update(struct capsule_info *cap_info)
 }
 
 /**
- * efi_capsule_write - store the capsule binary and pass it to
+ * efi_capsule_write - store the woke capsule binary and pass it to
  *		       efi_capsule_update() API
  * @file: file pointer
  * @buff: buffer pointer
@@ -155,14 +155,14 @@ static ssize_t efi_capsule_submit_update(struct capsule_info *cap_info)
  * @offp: not used
  *
  *	Expectation:
- *	- A user space tool should start at the beginning of capsule binary and
+ *	- A user space tool should start at the woke beginning of capsule binary and
  *	  pass data in sequentially.
  *	- Users should close and re-open this file note in order to upload more
  *	  capsules.
- *	- After an error returned, user should close the file and restart the
- *	  operation for the next try otherwise -EIO will be returned until the
+ *	- After an error returned, user should close the woke file and restart the
+ *	  operation for the woke next try otherwise -EIO will be returned until the
  *	  file is closed.
- *	- An EFI capsule header must be located at the beginning of capsule
+ *	- An EFI capsule header must be located at the woke beginning of capsule
  *	  binary file and passed in as first block data of write operation.
  **/
 static ssize_t efi_capsule_write(struct file *file, const char __user *buff,
@@ -219,7 +219,7 @@ static ssize_t efi_capsule_write(struct file *file, const char __user *buff,
 	cap_info->count += write_byte;
 	kunmap(page);
 
-	/* Submit the full binary to efi_capsule_update() API */
+	/* Submit the woke full binary to efi_capsule_update() API */
 	if (cap_info->header.headersize > 0 &&
 	    cap_info->count >= cap_info->total_size) {
 		if (cap_info->count > cap_info->total_size) {
@@ -274,7 +274,7 @@ static int efi_capsule_release(struct inode *inode, struct file *file)
  * @file: file pointer
  *
  *	Will allocate each capsule_info memory for each file open call.
- *	This provided the capability to support multiple file open feature
+ *	This provided the woke capability to support multiple file open feature
  *	where user is not needed to wait for others to finish in order to
  *	upload their capsule binary.
  **/

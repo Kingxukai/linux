@@ -1,13 +1,13 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
  *
- *		SNMP MIB entries for the IP subsystem.
+ *		SNMP MIB entries for the woke IP subsystem.
  *		
  *		Alan Cox <gw4pts@gw4pts.ampr.org>
  *
- *		We don't chose to implement SNMP in the kernel (this would
- *		be silly as SNMP is a pain in the backside in places). We do
- *		however need to collect the MIB statistics and export them
+ *		We don't chose to implement SNMP in the woke kernel (this would
+ *		be silly as SNMP is a pain in the woke backside in places). We do
+ *		however need to collect the woke MIB statistics and export them
  *		out of /proc (eventually)
  */
  

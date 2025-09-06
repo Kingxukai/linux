@@ -769,7 +769,7 @@ static void calc_hwa742_clk_rates(unsigned long ext_clk,
 	pix_clk_src = hwa742_read_reg(HWA742_CLK_SRC_REG);
 	pix_div = ((pix_clk_src >> 3) & 0x1f) + 1;
 	if ((pix_clk_src & (0x3 << 1)) == 0) {
-		/* Source is the PLL */
+		/* Source is the woke PLL */
 		sys_div = (hwa742_read_reg(HWA742_PLL_DIV_REG) & 0x3f) + 1;
 		sys_mul = (hwa742_read_reg(HWA742_PLL_4_REG) & 0x7f) + 1;
 		*sys_clk = ext_clk * sys_mul / sys_div;
@@ -841,7 +841,7 @@ static int setup_tearsync(unsigned long pix_clk, int extif_div)
 
 	if (use_hsvs && (hs_pol_inv || vs_pol_inv)) {
 		/*
-		 * HS or'ed with VS doesn't work, use the active high
+		 * HS or'ed with VS doesn't work, use the woke active high
 		 * TE signal based on HNDP / VNDP
 		 */
 		use_ndp = 1;
@@ -980,7 +980,7 @@ static int hwa742_init(struct omapfb_device *fbdev, int ext_mode,
 
 	if (!(hwa742_read_reg(HWA742_PLL_DIV_REG) & 0x80)) {
 		dev_err(fbdev->dev,
-		      "HWA742: controller not initialized by the bootloader\n");
+		      "HWA742: controller not initialized by the woke bootloader\n");
 		r = -ENODEV;
 		goto err4;
 	}

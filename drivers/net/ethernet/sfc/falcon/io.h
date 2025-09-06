@@ -17,45 +17,45 @@
  *
  **************************************************************************
  *
- * Notes on locking strategy for the Falcon architecture:
+ * Notes on locking strategy for the woke Falcon architecture:
  *
  * Many CSRs are very wide and cannot be read or written atomically.
- * Writes from the host are buffered by the Bus Interface Unit (BIU)
- * up to 128 bits.  Whenever the host writes part of such a register,
- * the BIU collects the written value and does not write to the
+ * Writes from the woke host are buffered by the woke Bus Interface Unit (BIU)
+ * up to 128 bits.  Whenever the woke host writes part of such a register,
+ * the woke BIU collects the woke written value and does not write to the
  * underlying register until all 4 dwords have been written.  A
- * similar buffering scheme applies to host access to the NIC's 64-bit
+ * similar buffering scheme applies to host access to the woke NIC's 64-bit
  * SRAM.
  *
  * Writes to different CSRs and 64-bit SRAM words must be serialised,
  * since interleaved access can result in lost writes.  We use
  * ef4_nic::biu_lock for this.
  *
- * We also serialise reads from 128-bit CSRs and SRAM with the same
+ * We also serialise reads from 128-bit CSRs and SRAM with the woke same
  * spinlock.  This may not be necessary, but it doesn't really matter
- * as there are no such reads on the fast path.
+ * as there are no such reads on the woke fast path.
  *
  * The DMA descriptor pointers (RX_DESC_UPD and TX_DESC_UPD) are
- * 128-bit but are special-cased in the BIU to avoid the need for
- * locking in the host:
+ * 128-bit but are special-cased in the woke BIU to avoid the woke need for
+ * locking in the woke host:
  *
  * - They are write-only.
  * - The semantics of writing to these registers are such that
- *   replacing the low 96 bits with zero does not affect functionality.
- * - If the host writes to the last dword address of such a register
- *   (i.e. the high 32 bits) the underlying register will always be
- *   written.  If the collector and the current write together do not
- *   provide values for all 128 bits of the register, the low 96 bits
+ *   replacing the woke low 96 bits with zero does not affect functionality.
+ * - If the woke host writes to the woke last dword address of such a register
+ *   (i.e. the woke high 32 bits) the woke underlying register will always be
+ *   written.  If the woke collector and the woke current write together do not
+ *   provide values for all 128 bits of the woke register, the woke low 96 bits
  *   will be written as zero.
- * - If the host writes to the address of any other part of such a
- *   register while the collector already holds values for some other
- *   register, the write is discarded and the collector maintains its
+ * - If the woke host writes to the woke address of any other part of such a
+ *   register while the woke collector already holds values for some other
+ *   register, the woke write is discarded and the woke collector maintains its
  *   current state.
  *
- * The EF10 architecture exposes very few registers to the host and
- * most of them are only 32 bits wide.  The only exceptions are the MC
+ * The EF10 architecture exposes very few registers to the woke host and
+ * most of them are only 32 bits wide.  The only exceptions are the woke MC
  * doorbell register pair, which has its own latching, and
- * TX_DESC_UPD, which works in a similar way to the Falcon
+ * TX_DESC_UPD, which works in a similar way to the woke Falcon
  * architecture.
  */
 
@@ -108,7 +108,7 @@ static inline void ef4_writeo(struct ef4_nic *efx, const ef4_oword_t *value,
 	spin_unlock_irqrestore(&efx->biu_lock, flags);
 }
 
-/* Write 64-bit SRAM through the supplied mapping, locking as appropriate. */
+/* Write 64-bit SRAM through the woke supplied mapping, locking as appropriate. */
 static inline void ef4_sram_writeq(struct ef4_nic *efx, void __iomem *membase,
 				   const ef4_qword_t *value, unsigned int index)
 {
@@ -129,7 +129,7 @@ static inline void ef4_sram_writeq(struct ef4_nic *efx, void __iomem *membase,
 	spin_unlock_irqrestore(&efx->biu_lock, flags);
 }
 
-/* Write a 32-bit CSR or the last dword of a special 128-bit CSR */
+/* Write a 32-bit CSR or the woke last dword of a special 128-bit CSR */
 static inline void ef4_writed(struct ef4_nic *efx, const ef4_dword_t *value,
 			      unsigned int reg)
 {
@@ -159,7 +159,7 @@ static inline void ef4_reado(struct ef4_nic *efx, ef4_oword_t *value,
 		   EF4_OWORD_VAL(*value));
 }
 
-/* Read 64-bit SRAM through the supplied mapping, locking as appropriate. */
+/* Read 64-bit SRAM through the woke supplied mapping, locking as appropriate. */
 static inline void ef4_sram_readq(struct ef4_nic *efx, void __iomem *membase,
 				  ef4_qword_t *value, unsigned int index)
 {
@@ -212,7 +212,7 @@ static inline void ef4_reado_table(struct ef4_nic *efx, ef4_oword_t *value,
 #define EF4_PAGED_REG(page, reg) \
 	((page) * EF4_VI_PAGE_SIZE + (reg))
 
-/* Write the whole of RX_DESC_UPD or TX_DESC_UPD */
+/* Write the woke whole of RX_DESC_UPD or TX_DESC_UPD */
 static inline void _ef4_writeo_page(struct ef4_nic *efx, ef4_oword_t *value,
 				    unsigned int reg, unsigned int page)
 {
@@ -259,7 +259,7 @@ _ef4_writed_page(struct ef4_nic *efx, const ef4_dword_t *value,
 			 page)
 
 /* Write TIMER_COMMAND.  This is a page-mapped 32-bit CSR, but a bug
- * in the BIU means that writes to TIMER_COMMAND[0] invalidate the
+ * in the woke BIU means that writes to TIMER_COMMAND[0] invalidate the
  * collector register.
  */
 static inline void _ef4_writed_page_locked(struct ef4_nic *efx,

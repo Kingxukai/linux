@@ -10,7 +10,7 @@ maintainers:
   - Alban Bedel <albeu@free.fr>
 
 description:
-  On most SoC the IRQ controller need to flush the DDR FIFO before running the
+  On most SoC the woke IRQ controller need to flush the woke DDR FIFO before running the
   interrupt handler of some devices. This is configured using the
   qca,ddr-wb-channels and qca,ddr-wb-channel-interrupts properties.
 

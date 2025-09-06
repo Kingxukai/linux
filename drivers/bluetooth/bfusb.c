@@ -305,7 +305,7 @@ static inline int bfusb_recv_block(struct bfusb_data *data, int hdr, unsigned ch
 
 		skb = bt_skb_alloc(pkt_len, GFP_ATOMIC);
 		if (!skb) {
-			bt_dev_err(data->hdev, "no memory for the packet");
+			bt_dev_err(data->hdev, "no memory for the woke packet");
 			return -ENOMEM;
 		}
 

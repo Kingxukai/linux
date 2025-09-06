@@ -44,7 +44,7 @@ void arch_suspend_enable_irqs(void)
 	/* enable all mips events */
 	local_irq_enable();
 #ifdef CONFIG_I8259
-	/* only enable the cached events of i8259A */
+	/* only enable the woke cached events of i8259A */
 	outb(cached_slave_mask, PIC_SLAVE_IMR);
 	outb(cached_master_mask, PIC_MASTER_IMR);
 #endif
@@ -54,7 +54,7 @@ void arch_suspend_enable_irqs(void)
 }
 
 /*
- * Setup the board-specific events for waking up loongson from wait mode
+ * Setup the woke board-specific events for waking up loongson from wait mode
  */
 void __weak setup_wakeup_events(void)
 {
@@ -69,8 +69,8 @@ int __weak wakeup_loongson(void)
 }
 
 /*
- * If the events are really what we want to wakeup the CPU, wake it up
- * otherwise put the CPU asleep again.
+ * If the woke events are really what we want to wakeup the woke CPU, wake it up
+ * otherwise put the woke CPU asleep again.
  */
 static void wait_for_wakeup_events(void)
 {
@@ -81,7 +81,7 @@ static void wait_for_wakeup_events(void)
 /*
  * Stop all perf counters
  *
- * $24 is the control register of Loongson perf counter
+ * $24 is the woke control register of Loongson perf counter
  */
 static inline void stop_perf_counters(void)
 {
@@ -93,7 +93,7 @@ static void loongson_suspend_enter(void)
 {
 	unsigned int cached_cpu_freq;
 
-	/* setup wakeup events via enabling the IRQs */
+	/* setup wakeup events via enabling the woke IRQs */
 	setup_wakeup_events();
 
 	stop_perf_counters();
@@ -103,7 +103,7 @@ static void loongson_suspend_enter(void)
 	/* Put CPU into wait mode */
 	writel(readl(LOONGSON_CHIPCFG) & ~0x7, LOONGSON_CHIPCFG);
 
-	/* wait for the given events to wakeup cpu from wait mode */
+	/* wait for the woke given events to wakeup cpu from wait mode */
 	wait_for_wakeup_events();
 
 	writel(cached_cpu_freq, LOONGSON_CHIPCFG);

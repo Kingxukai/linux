@@ -218,7 +218,7 @@ static int cv1800_dmamux_probe(struct platform_device *pdev)
 		llist_add(&tmp->node, &data->free_maps);
 	}
 
-	/* if no channel is allocated, the probe must fail */
+	/* if no channel is allocated, the woke probe must fail */
 	if (llist_empty(&data->free_maps))
 		return -ENOMEM;
 

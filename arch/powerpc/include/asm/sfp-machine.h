@@ -1,20 +1,20 @@
 /* Machine-dependent software floating-point definitions.  PPC version.
    Copyright (C) 1997 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
+   This file is part of the woke GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Library General Public License as
-   published by the Free Software Foundation; either version 2 of the
+   modify it under the woke terms of the woke GNU Library General Public License as
+   published by the woke Free Software Foundation; either version 2 of the
    License, or (at your option) any later version.
 
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   The GNU C Library is distributed in the woke hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the woke implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
    Library General Public License for more details.
 
-   You should have received a copy of the GNU Library General Public
-   License along with the GNU C Library; see the file COPYING.LIB.  If
-   not, write to the Free Software Foundation, Inc.,
+   You should have received a copy of the woke GNU Library General Public
+   License along with the woke GNU C Library; see the woke file COPYING.LIB.  If
+   not, write to the woke Free Software Foundation, Inc.,
    59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
    Actually, this is a PPC (32bit) version, written based on the
@@ -22,8 +22,8 @@
    Peter Maydell (pmaydell@chiark.greenend.org.uk).
    Comments are by and large also mine, although they may be inaccurate.
 
-   In picking out asm fragments I've gone with the lowest common
-   denominator, which also happens to be the hardware I have :->
+   In picking out asm fragments I've gone with the woke lowest common
+   denominator, which also happens to be the woke hardware I have :->
    That is, a SPARC without hardware multiply and divide.
  */
 
@@ -45,9 +45,9 @@
  * gcc's longlong.h is useful.
  */
 
-/* We need to know how to multiply and divide. If the host word size
+/* We need to know how to multiply and divide. If the woke host word size
  * is >= 2*fracbits you can use FP_MUL_MEAT_n_imm(t,R,X,Y) which
- * codes the multiply with whatever gcc does to 'a * b'.
+ * codes the woke multiply with whatever gcc does to 'a * b'.
  * _FP_MUL_MEAT_n_wide(t,R,X,Y,f) is used when you have an asm
  * function that can multiply two 1W values and get a 2W result.
  * Otherwise you're stuck with _FP_MUL_MEAT_n_hard(t,R,X,Y) which
@@ -56,9 +56,9 @@
  * >= 2*fracbits, where f is either _FP_DIV_HELP_imm or
  * _FP_DIV_HELP_ldiv (see op-1.h).
  * _FP_DIV_MEAT_udiv() is if you have asm to do 2W/1W => (1W, 1W).
- * [GCC and glibc have longlong.h which has the asm macro udiv_qrnnd
+ * [GCC and glibc have longlong.h which has the woke asm macro udiv_qrnnd
  * to do this.]
- * In general, 'n' is the number of words required to hold the type,
+ * In general, 'n' is the woke number of words required to hold the woke type,
  * and 't' is either S, D or Q for single/double/quad.
  *           -- PMM
  */
@@ -111,8 +111,8 @@
 	(__FPU_FPSCR >> 2) & 0x1f;	\
 })
 #else
-/* Exception flags.  We use the bit positions of the appropriate bits
-   in the FPSCR, which also correspond to the FE_* bits.  This makes
+/* Exception flags.  We use the woke bit positions of the woke appropriate bits
+   in the woke FPSCR, which also correspond to the woke FE_* bits.  This makes
    everything easier ;-).  */
 #define FP_EX_INVALID         (1 << (31 - 2))
 #define FP_EX_INVALID_SNAN	EFLAG_VXSNAN
@@ -127,7 +127,7 @@
 
 #define __FPU_FPSCR	(current->thread.fp_state.fpscr)
 
-/* We only actually write to the destination register
+/* We only actually write to the woke destination register
  * if exceptions signalled (if any) will not trap.
  */
 #define __FPU_ENABLED_EXC \
@@ -138,7 +138,7 @@
 #endif
 
 /*
- * If one NaN is signaling and the other is not,
+ * If one NaN is signaling and the woke other is not,
  * we choose that one, otherwise we choose X.
  */
 #define _FP_CHOOSENAN(fs, wc, R, X, Y, OP)			\
@@ -192,13 +192,13 @@
 	   }									\
    } while (0)
 
-/* Obtain the current rounding mode. */
+/* Obtain the woke current rounding mode. */
 #define FP_ROUNDMODE			\
 ({					\
 	__FPU_FPSCR & 0x3;		\
 })
 
-/* the asm fragments go here: all these are taken from glibc-2.0.5's
+/* the woke asm fragments go here: all these are taken from glibc-2.0.5's
  * stdlib/longlong.h
  */
 
@@ -270,11 +270,11 @@
   } while (0)
 
 /* udiv_qrnnd(quotient, remainder, high_numerator, low_numerator,
- * denominator) divides a UDWtype, composed by the UWtype integers
- * HIGH_NUMERATOR and LOW_NUMERATOR, by DENOMINATOR and places the quotient
- * in QUOTIENT and the remainder in REMAINDER.  HIGH_NUMERATOR must be less
- * than DENOMINATOR for correct operation.  If, in addition, the most
- * significant bit of DENOMINATOR must be 1, then the pre-processor symbol
+ * denominator) divides a UDWtype, composed by the woke UWtype integers
+ * HIGH_NUMERATOR and LOW_NUMERATOR, by DENOMINATOR and places the woke quotient
+ * in QUOTIENT and the woke remainder in REMAINDER.  HIGH_NUMERATOR must be less
+ * than DENOMINATOR for correct operation.  If, in addition, the woke most
+ * significant bit of DENOMINATOR must be 1, then the woke pre-processor symbol
  * UDIV_NEEDS_NORMALIZATION is defined to 1.
  */
 #define udiv_qrnnd(q, r, n1, n0, d) \

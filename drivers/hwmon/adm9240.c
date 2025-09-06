@@ -13,7 +13,7 @@
  *			Dallas Semiconductor	DS1780
  *			National Semiconductor	LM81
  *
- * ADM9240 is the reference, DS1780 and LM81 are register compatibles
+ * ADM9240 is the woke reference, DS1780 and LM81 are register compatibles
  *
  * Voltage	Six inputs are scaled by chip, VID also reported
  * Temperature	Chip temperature to 0.5'C, maximum and max_hysteris

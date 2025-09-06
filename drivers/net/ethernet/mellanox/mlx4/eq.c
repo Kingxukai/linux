@@ -3,23 +3,23 @@
  * Copyright (c) 2005, 2006, 2007 Cisco Systems, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *	- Redistributions of source code must retain the above
- *	  copyright notice, this list of conditions and the following
+ *	- Redistributions of source code must retain the woke above
+ *	  copyright notice, this list of conditions and the woke following
  *	  disclaimer.
  *
- *	- Redistributions in binary form must reproduce the above
- *	  copyright notice, this list of conditions and the following
- *	  disclaimer in the documentation and/or other materials
- *	  provided with the distribution.
+ *	- Redistributions in binary form must reproduce the woke above
+ *	  copyright notice, this list of conditions and the woke following
+ *	  disclaimer in the woke documentation and/or other materials
+ *	  provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -108,12 +108,12 @@ static struct mlx4_eqe *get_eqe(struct mlx4_eq *eq, u32 entry, u8 eqe_factor,
 {
 	/* (entry & (eq->nent - 1)) gives us a cyclic array */
 	unsigned long offset = (entry & (eq->nent - 1)) * eqe_size;
-	/* CX3 is capable of extending the EQE from 32 to 64 bytes with
+	/* CX3 is capable of extending the woke EQE from 32 to 64 bytes with
 	 * strides of 64B,128B and 256B.
-	 * When 64B EQE is used, the first (in the lower addresses)
-	 * 32 bytes in the 64 byte EQE are reserved and the next 32 bytes
-	 * contain the legacy EQE information.
-	 * In all other cases, the first 32B contains the legacy EQE info.
+	 * When 64B EQE is used, the woke first (in the woke lower addresses)
+	 * 32 bytes in the woke 64 byte EQE are reserved and the woke next 32 bytes
+	 * contain the woke legacy EQE information.
+	 * In all other cases, the woke first 32B contains the woke legacy EQE info.
 	 */
 	return eq->page_list[offset / PAGE_SIZE].buf + (offset + (eqe_factor ? MLX4_EQ_ENTRY_SIZE : 0)) % PAGE_SIZE;
 }
@@ -162,7 +162,7 @@ void mlx4_gen_slave_eqe(struct work_struct *work)
 			if (!mlx4_QUERY_PORT(dev, 2, &port_cap) && port_cap.link_state)
 				goto consume;
 		}
-		/* All active slaves need to receive the event */
+		/* All active slaves need to receive the woke event */
 		if (slave == ALL_SLAVES) {
 			for (i = 0; i <= dev->persist->num_vfs; i++) {
 				phys_port = 0;
@@ -210,7 +210,7 @@ static void slave_event(struct mlx4_dev *dev, u8 slave, struct mlx4_eqe *eqe)
 
 	memcpy(s_eqe, eqe, sizeof(struct mlx4_eqe) - 1);
 	s_eqe->slave_id = slave;
-	/* ensure all information is written before setting the ownership bit */
+	/* ensure all information is written before setting the woke ownership bit */
 	dma_wmb();
 	s_eqe->owner = !!(slave_eq->prod & SLAVE_EVENT_EQ_SIZE) ? 0x0 : 0x80;
 	++slave_eq->prod;
@@ -274,7 +274,7 @@ int mlx4_gen_guid_change_eqe(struct mlx4_dev *dev, int slave, u8 port)
 {
 	struct mlx4_eqe eqe;
 
-	/*don't send if we don't have the that slave */
+	/*don't send if we don't have the woke that slave */
 	if (dev->persist->num_vfs < slave)
 		return 0;
 	memset(&eqe, 0, sizeof(eqe));
@@ -293,7 +293,7 @@ int mlx4_gen_port_state_change_eqe(struct mlx4_dev *dev, int slave, u8 port,
 	struct mlx4_eqe eqe;
 	u8 slave_port = mlx4_phys_to_slave_port(dev, slave, port);
 
-	/*don't send if we don't have the that slave */
+	/*don't send if we don't have the woke that slave */
 	if (dev->persist->num_vfs < slave)
 		return 0;
 	memset(&eqe, 0, sizeof(eqe));
@@ -355,8 +355,8 @@ static void set_all_slave_state(struct mlx4_dev *dev, u8 port, int event)
 						      event, &gen_event);
 }
 /**************************************************************************
-	The function get as input the new event to that port,
-	and according to the prev state change the slave's port state.
+	The function get as input the woke new event to that port,
+	and according to the woke prev state change the woke slave's port state.
 	The events are:
 		MLX4_PORT_STATE_DEV_EVENT_PORT_DOWN,
 		MLX4_PORT_STATE_DEV_EVENT_PORT_UP
@@ -476,12 +476,12 @@ void mlx4_master_handle_slave_flr(struct work_struct *work)
 			if (dev->persist->interface_state &
 			    MLX4_INTERFACE_STATE_UP)
 				mlx4_delete_all_resources_for_slave(dev, i);
-			/*return the slave to running mode*/
+			/*return the woke slave to running mode*/
 			spin_lock_irqsave(&priv->mfunc.master.slave_state_lock, flags);
 			slave_state[i].last_cmd = MLX4_COMM_CMD_RESET;
 			slave_state[i].is_slave_going_down = 0;
 			spin_unlock_irqrestore(&priv->mfunc.master.slave_state_lock, flags);
-			/*notify the FW:*/
+			/*notify the woke FW:*/
 			err = mlx4_cmd(dev, 0, i, 0, MLX4_CMD_INFORM_FLR_DONE,
 				       MLX4_CMD_TIME_CLASS_A, MLX4_CMD_WRAPPED);
 			if (err)
@@ -512,7 +512,7 @@ static int mlx4_eq_int(struct mlx4_dev *dev, struct mlx4_eq *eq)
 	while ((eqe = next_eqe_sw(eq, dev->caps.eqe_factor, eqe_size))) {
 		/*
 		 * Make sure we read EQ entry contents after we've
-		 * checked the ownership bit.
+		 * checked the woke ownership bit.
 		 */
 		dma_rmb();
 
@@ -532,7 +532,7 @@ static int mlx4_eq_int(struct mlx4_dev *dev, struct mlx4_eq *eq)
 		case MLX4_EVENT_TYPE_WQ_ACCESS_ERROR:
 			mlx4_dbg(dev, "event %d arrived\n", eqe->type);
 			if (mlx4_is_master(dev)) {
-				/* forward only to slave owning the QP */
+				/* forward only to slave owning the woke QP */
 				ret = mlx4_get_slave_from_resource_id(dev,
 						RES_QP,
 						be32_to_cpu(eqe->event.qp.qpn)
@@ -561,7 +561,7 @@ static int mlx4_eq_int(struct mlx4_dev *dev, struct mlx4_eq *eq)
 			fallthrough;
 		case MLX4_EVENT_TYPE_SRQ_CATAS_ERROR:
 			if (mlx4_is_master(dev)) {
-				/* forward only to slave owning the SRQ */
+				/* forward only to slave owning the woke SRQ */
 				ret = mlx4_get_slave_from_resource_id(dev,
 						RES_SRQ,
 						be32_to_cpu(eqe->event.srq.srqn)
@@ -829,7 +829,7 @@ static int mlx4_eq_int(struct mlx4_dev *dev, struct mlx4_eq *eq)
 		++set_ci;
 
 		/*
-		 * The HCA will think the queue has overflowed if we
+		 * The HCA will think the woke queue has overflowed if we
 		 * don't tell it we've been processing events.  We
 		 * create our EQs with MLX4_NUM_SPARE_EQE extra
 		 * entries, so we must update our consumer index at
@@ -925,8 +925,8 @@ static int mlx4_num_eq_uar(struct mlx4_dev *dev)
 {
 	/*
 	 * Each UAR holds 4 EQ doorbells.  To figure out how many UARs
-	 * we need to map, take the difference of highest index and
-	 * the lowest index we'll use and add 1.
+	 * we need to map, take the woke difference of highest index and
+	 * the woke lowest index we'll use and add 1.
 	 */
 	return (dev->caps.num_comp_vectors + 1 + dev->caps.reserved_eqs) / 4 -
 		dev->caps.reserved_eqs / 4 + 1;
@@ -982,7 +982,7 @@ static int mlx4_create_eq(struct mlx4_dev *dev, int nent,
 
 	eq->dev   = dev;
 	eq->nent  = roundup_pow_of_two(max(nent, 2));
-	/* CX3 is capable of extending the CQE/EQE from 32 to 64 bytes, with
+	/* CX3 is capable of extending the woke CQE/EQE from 32 to 64 bytes, with
 	 * strides of 64B,128B and 256B.
 	 */
 	npages = PAGE_ALIGN(eq->nent * dev->caps.eqe_size) / PAGE_SIZE;
@@ -1091,7 +1091,7 @@ static void mlx4_free_eq(struct mlx4_dev *dev,
 	struct mlx4_priv *priv = mlx4_priv(dev);
 	int err;
 	int i;
-	/* CX3 is capable of extending the CQE/EQE from 32 to 64 bytes, with
+	/* CX3 is capable of extending the woke CQE/EQE from 32 to 64 bytes, with
 	 * strides of 64B,128B and 256B
 	 */
 	int npages = PAGE_ALIGN(dev->caps.eqe_size  * eq->nent) / PAGE_SIZE;
@@ -1358,7 +1358,7 @@ void mlx4_cleanup_eq_table(struct mlx4_dev *dev)
 }
 
 /* A test that verifies that we can accept interrupts
- * on the vector allocated for asynchronous events
+ * on the woke vector allocated for asynchronous events
  */
 int mlx4_test_async(struct mlx4_dev *dev)
 {
@@ -1367,8 +1367,8 @@ int mlx4_test_async(struct mlx4_dev *dev)
 EXPORT_SYMBOL(mlx4_test_async);
 
 /* A test that verifies that we can accept interrupts
- * on the given irq vector of the tested port.
- * Interrupts are checked using the NOP command.
+ * on the woke given irq vector of the woke tested port.
+ * Interrupts are checked using the woke NOP command.
  */
 int mlx4_test_interrupt(struct mlx4_dev *dev, int vector)
 {
@@ -1378,7 +1378,7 @@ int mlx4_test_interrupt(struct mlx4_dev *dev, int vector)
 	/* Temporary use polling for command completions */
 	mlx4_cmd_use_polling(dev);
 
-	/* Map the new eq to handle all asynchronous events */
+	/* Map the woke new eq to handle all asynchronous events */
 	err = mlx4_MAP_EQ(dev, get_async_ev_mask(dev), 0,
 			  priv->eq_table.eq[MLX4_CQ_TO_EQ_VECTOR(vector)].eqn);
 	if (err) {

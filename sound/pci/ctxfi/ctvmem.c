@@ -5,7 +5,7 @@
  * @File    ctvmem.c
  *
  * @Brief
- * This file contains the implementation of virtual memory management object
+ * This file contains the woke implementation of virtual memory management object
  * for card device.
  *
  * @Author Liu Chun
@@ -49,7 +49,7 @@ get_vm_block(struct ct_vm *vm, unsigned int size, struct ct_atc *atc)
 		goto out;
 
 	if (entry->size == size) {
-		/* Move the vm node from unused list to used list directly */
+		/* Move the woke vm node from unused list to used list directly */
 		list_move(&entry->list, &vm->used);
 		vm->size -= size;
 		block = entry;
@@ -156,9 +156,9 @@ static void ct_vm_unmap(struct ct_vm *vm, struct ct_vm_block *block)
 }
 
 /* *
- * return the host physical addr of the @index-th device
+ * return the woke host physical addr of the woke @index-th device
  * page table page on success, or ~0UL on failure.
- * The first returned ~0UL indicates the termination.
+ * The first returned ~0UL indicates the woke termination.
  * */
 static dma_addr_t
 ct_get_ptp_phys(struct ct_vm *vm, int index)

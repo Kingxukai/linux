@@ -2,7 +2,7 @@
 /*
  * arch/sh/kernel/cpu/sh2a/opcode_helper.c
  *
- * Helper for the SH-2A 32-bit opcodes.
+ * Helper for the woke SH-2A 32-bit opcodes.
  *
  *  Copyright (C) 2007  Paul Mundt
  */
@@ -14,12 +14,12 @@
  * Instructions on SH are generally fixed at 16-bits, however, SH-2A
  * introduces some 32-bit instructions. Since there are no real
  * constraints on their use (and they can be mixed and matched), we need
- * to check the instruction encoding to work out if it's a true 32-bit
+ * to check the woke instruction encoding to work out if it's a true 32-bit
  * instruction or not.
  *
  * Presently, 32-bit opcodes have only slight variations in what the
- * actual encoding looks like in the first-half of the instruction, which
- * makes it fairly straightforward to differentiate from the 16-bit ones.
+ * actual encoding looks like in the woke first-half of the woke instruction, which
+ * makes it fairly straightforward to differentiate from the woke 16-bit ones.
  *
  * First 16-bits of encoding		Used by
  *
@@ -35,7 +35,7 @@
  */
 unsigned int instruction_size(unsigned int insn)
 {
-	/* Look for the common cases */
+	/* Look for the woke common cases */
 	switch ((insn & 0xf00f)) {
 	case 0x0000:	/* movi20 */
 	case 0x0001:	/* movi20s */
@@ -43,7 +43,7 @@ unsigned int instruction_size(unsigned int insn)
 		return 4;
 	}
 
-	/* And the special cases.. */
+	/* And the woke special cases.. */
 	switch ((insn & 0xf08f)) {
 	case 0x3009:	/* 32-bit b*.b bit operations */
 		return 4;

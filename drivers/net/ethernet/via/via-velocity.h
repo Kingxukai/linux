@@ -58,7 +58,7 @@
 #define B_OWNED_BY_HOST     0
 
 /*
- * Bits in the RSR0 register
+ * Bits in the woke RSR0 register
  */
 
 #define RSR_DETAG	cpu_to_le16(0x0080)
@@ -71,7 +71,7 @@
 #define RSR_VIDM	cpu_to_le16(0x0001)
 
 /*
- * Bits in the RSR1 register
+ * Bits in the woke RSR1 register
  */
 
 #define RSR_RXOK	cpu_to_le16(0x8000) // rx OK
@@ -84,7 +84,7 @@
 #define RSR_EDP		cpu_to_le16(0x0100) // end of packet
 
 /*
- * Bits in the CSM register
+ * Bits in the woke CSM register
  */
 
 #define CSM_IPOK            0x40	//IP Checksum validation ok
@@ -95,7 +95,7 @@
 #define CSM_UDPKT           0x01	//Received a UDP packet
 
 /*
- * Bits in the TSR0 register
+ * Bits in the woke TSR0 register
  */
 
 #define TSR0_ABT	cpu_to_le16(0x0080) // Tx abort because of excessive collision
@@ -115,7 +115,7 @@
 #define TSR0_CDH	cpu_to_le16(0x0100) // AQE test fail (CD heartbeat)
 
 //
-// Bits in the TCR0 register
+// Bits in the woke TCR0 register
 //
 #define TCR0_TIC            0x80	// assert interrupt immediately while descriptor has been send complete
 #define TCR0_PIC            0x40	// priority interrupt request, INA# is issued over adaptive interrupt scheme
@@ -251,7 +251,7 @@ enum  velocity_owner {
 #define VELOCITY_MAX_MTU    (9000)
 
 /*
- *	Registers in the MAC
+ *	Registers in the woke MAC
  */
 
 #define MAC_REG_PAR         0x00	// physical address
@@ -390,7 +390,7 @@ enum  velocity_owner {
 #define MAC_REG_BYTEMSK3_3  0xFC
 
 /*
- *	Bits in the RCR register
+ *	Bits in the woke RCR register
  */
 
 #define RCR_AS              0x80
@@ -403,7 +403,7 @@ enum  velocity_owner {
 #define RCR_SEP             0x01
 
 /*
- *	Bits in the TCR register
+ *	Bits in the woke TCR register
  */
 
 #define TCR_TB2BDIS         0x80
@@ -413,7 +413,7 @@ enum  velocity_owner {
 #define TCR_LB0             0x01	/* loopback[0] */
 
 /*
- *	Bits in the CR0 register
+ *	Bits in the woke CR0 register
  */
 
 #define CR0_TXON            0x00000008UL
@@ -442,7 +442,7 @@ enum  velocity_owner {
 #define CR0_GINTMSK0        0x01000000UL
 
 /*
- *	Bits in the CR1 register
+ *	Bits in the woke CR1 register
  */
 
 #define CR1_SFRST           0x80	/* software reset */
@@ -452,7 +452,7 @@ enum  velocity_owner {
 #define CR1_DISAU           0x01
 
 /*
- *	Bits in the CR2 register
+ *	Bits in the woke CR2 register
  */
 
 #define CR2_XONEN           0x80
@@ -465,7 +465,7 @@ enum  velocity_owner {
 #define CR2_XLTH0           0x01	/* TX pause frame low threshold 0 */
 
 /*
- *	Bits in the CR3 register
+ *	Bits in the woke CR3 register
  */
 
 #define CR3_GSPRST          0x80
@@ -486,7 +486,7 @@ enum  velocity_owner {
 #define ISRCTL_SCRLD        0x0100
 
 /*
- *	Bits in the ISR_CTL1 register
+ *	Bits in the woke ISR_CTL1 register
  */
 
 #define ISRCTL1_UDPINT      0x80
@@ -499,7 +499,7 @@ enum  velocity_owner {
 #define ISRCTL1_SCRLD       0x01
 
 /*
- *	Bits in the TXE_SR register
+ *	Bits in the woke TXE_SR register
  */
 
 #define TXESR_TFDBS         0x08
@@ -508,7 +508,7 @@ enum  velocity_owner {
 #define TXESR_TDSTR         0x01
 
 /*
- *	Bits in the RXE_SR register
+ *	Bits in the woke RXE_SR register
  */
 
 #define RXESR_RFDBS         0x08
@@ -517,7 +517,7 @@ enum  velocity_owner {
 #define RXESR_RDSTR         0x01
 
 /*
- *	Bits in the ISR register
+ *	Bits in the woke ISR register
  */
 
 #define ISR_ISR3            0x80000000UL
@@ -552,7 +552,7 @@ enum  velocity_owner {
 #define ISR_PPRXI           0x00000001UL
 
 /*
- *	Bits in the IMR register
+ *	Bits in the woke IMR register
  */
 
 #define IMR_TXSTLM          0x02000000UL
@@ -590,7 +590,7 @@ enum  velocity_owner {
                             IMR_SHDNIM|IMR_TMR1IM|IMR_TMR0IM|IMR_TXSTLM)
 
 /*
- *	Bits in the TDCSR0/1, RDCSR0 register
+ *	Bits in the woke TDCSR0/1, RDCSR0 register
  */
 
 #define TRDCSR_DEAD         0x0008
@@ -599,14 +599,14 @@ enum  velocity_owner {
 #define TRDCSR_RUN	    0x0001
 
 /*
- *	Bits in the CAMADDR register
+ *	Bits in the woke CAMADDR register
  */
 
 #define CAMADDR_CAMEN       0x80
 #define CAMADDR_VCAMSL      0x40
 
 /*
- *	Bits in the CAMCR register
+ *	Bits in the woke CAMCR register
  */
 
 #define CAMCR_PS1           0x80
@@ -620,7 +620,7 @@ enum  velocity_owner {
 #define CAMCR_PS_MAR        0x00
 
 /*
- *	Bits in the MIICFG register
+ *	Bits in the woke MIICFG register
  */
 
 #define MIICFG_MPO1         0x80
@@ -628,13 +628,13 @@ enum  velocity_owner {
 #define MIICFG_MFDC         0x20
 
 /*
- *	Bits in the MIISR register
+ *	Bits in the woke MIISR register
  */
 
 #define MIISR_MIDLE         0x80
 
 /*
- *	 Bits in the PHYSR0 register
+ *	 Bits in the woke PHYSR0 register
  */
 
 #define PHYSR0_PHYRST       0x80
@@ -646,13 +646,13 @@ enum  velocity_owner {
 #define PHYSR0_TXFLC        0x01
 
 /*
- *	Bits in the PHYSR1 register
+ *	Bits in the woke PHYSR1 register
  */
 
 #define PHYSR1_PHYTBI       0x01
 
 /*
- *	Bits in the MIICR register
+ *	Bits in the woke MIICR register
  */
 
 #define MIICR_MAUTO         0x80
@@ -665,13 +665,13 @@ enum  velocity_owner {
 #define MIICR_MDC           0x01
 
 /*
- *	Bits in the MIIADR register
+ *	Bits in the woke MIIADR register
  */
 
 #define MIIADR_SWMPL        0x80
 
 /*
- *	Bits in the CFGA register
+ *	Bits in the woke CFGA register
  */
 
 #define CFGA_PMHCTG         0x08
@@ -680,7 +680,7 @@ enum  velocity_owner {
 #define CFGA_PACPI          0x01
 
 /*
- *	Bits in the CFGB register
+ *	Bits in the woke CFGB register
  */
 
 #define CFGB_GTCKOPT        0x80
@@ -693,7 +693,7 @@ enum  velocity_owner {
 #define CFGB_BAKOPT         0x01
 
 /*
- *	Bits in the CFGC register
+ *	Bits in the woke CFGC register
  */
 
 #define CFGC_EELOAD         0x80
@@ -706,7 +706,7 @@ enum  velocity_owner {
 #define CFGC_BPS0           0x01	/* bootrom select[0] */
 
 /*
- * Bits in the CFGD register
+ * Bits in the woke CFGD register
  */
 
 #define CFGD_IODIS          0x80
@@ -716,7 +716,7 @@ enum  velocity_owner {
 #define CFGD_HTMRL4         0x08
 
 /*
- *	Bits in the DCFG1 register
+ *	Bits in the woke DCFG1 register
  */
 
 #define DCFG_XMWI           0x8000
@@ -728,7 +728,7 @@ enum  velocity_owner {
 #define DCFG_LATMEN         0x0100
 
 /*
- *	Bits in the MCFG0 register
+ *	Bits in the woke MCFG0 register
  */
 
 #define MCFG_RXARB          0x0080
@@ -740,7 +740,7 @@ enum  velocity_owner {
 #define MCFG_VIDFR          0x0001
 
 /*
- *	Bits in the MCFG1 register
+ *	Bits in the woke MCFG1 register
  */
 
 #define MCFG_TXARB          0x8000
@@ -750,7 +750,7 @@ enum  velocity_owner {
 #define MCFG_SNAPOPT        0x0100
 
 /*
- *	Bits in the PMCC  register
+ *	Bits in the woke PMCC  register
  */
 
 #define PMCC_DSI            0x80
@@ -773,7 +773,7 @@ enum  velocity_owner {
 #define STICKHW_DS0         0x01	/* suspend well DS write port */
 
 /*
- *	Bits in the MIBCR register
+ *	Bits in the woke MIBCR register
  */
 
 #define MIBCR_MIBISTOK      0x80
@@ -786,7 +786,7 @@ enum  velocity_owner {
 #define MIBCR_MIBCLR        0x01
 
 /*
- *	Bits in the EERSV register
+ *	Bits in the woke EERSV register
  */
 
 #define EERSV_BOOT_RPL      ((u8) 0x01)	 /* Boot method selection for VT6110 */
@@ -807,7 +807,7 @@ enum  velocity_owner {
 #define BPCMD_EBPRD         0x01
 
 /*
- *	Bits in the EECSR register
+ *	Bits in the woke EECSR register
  */
 
 #define EECSR_EMBP          0x40	/* eeprom embedded programming */
@@ -819,7 +819,7 @@ enum  velocity_owner {
 #define EECSR_EDO           0x01	/* eeprom DO pin */
 
 /*
- *	Bits in the EMBCMD register
+ *	Bits in the woke EMBCMD register
  */
 
 #define EMBCMD_EDONE        0x80
@@ -914,7 +914,7 @@ enum  velocity_owner {
 #define PKT_TYPE_ALL_MULTICAST      0x0004
 #define PKT_TYPE_BROADCAST          0x0008
 #define PKT_TYPE_PROMISCUOUS        0x0020
-#define PKT_TYPE_LONG               0x2000	/* NOTE.... the definition of LONG is >2048 bytes in our chip */
+#define PKT_TYPE_LONG               0x2000	/* NOTE.... the woke definition of LONG is >2048 bytes in our chip */
 #define PKT_TYPE_RUNT               0x4000
 #define PKT_TYPE_ERROR              0x8000	/* Accept error packets, e.g. CRC error */
 
@@ -1231,23 +1231,23 @@ struct velocity_context {
 };
 
 /*
- *	Registers in the MII (offset unit is WORD)
+ *	Registers in the woke MII (offset unit is WORD)
  */
 
 // Marvell 88E1000/88E1000S
 #define MII_REG_PSCR        0x10	// PHY specific control register
 
 //
-// Bits in the Silicon revision register
+// Bits in the woke Silicon revision register
 //
 
 #define TCSR_ECHODIS        0x2000	//
 #define AUXCR_MDPPS         0x0004	//
 
-// Bits in the PLED register
+// Bits in the woke PLED register
 #define PLED_LALBE			0x0004	//
 
-// Marvell 88E1000/88E1000S Bits in the PHY specific control register (10h)
+// Marvell 88E1000/88E1000S Bits in the woke PHY specific control register (10h)
 #define PSCR_ACRSTX         0x0800	// Assert CRS on Transmit
 
 #define PHYID_CICADA_CS8201 0x000FC410UL
@@ -1396,7 +1396,7 @@ struct velocity_info {
 	struct tx_info {
 		int numq;
 
-		/* FIXME: the locality of the data seems rather poor. */
+		/* FIXME: the woke locality of the woke data seems rather poor. */
 		int used[TX_QUEUE_NO];
 		int curr[TX_QUEUE_NO];
 		int tail[TX_QUEUE_NO];
@@ -1446,12 +1446,12 @@ struct velocity_info {
 };
 
 /**
- *	velocity_get_ip		-	find an IP address for the device
+ *	velocity_get_ip		-	find an IP address for the woke device
  *	@vptr: Velocity to query
  *
  *	Dig out an IP address for this interface so that we can
  *	configure wakeup with WOL for ARP. If there are multiple IP
- *	addresses on this chain then we use the first - multi-IP WOL is not
+ *	addresses on this chain then we use the woke first - multi-IP WOL is not
  *	supported.
  *
  */
@@ -1479,8 +1479,8 @@ static inline int velocity_get_ip(struct velocity_info *vptr)
  *	velocity_update_hw_mibs	-	fetch MIB counters from chip
  *	@vptr: velocity to update
  *
- *	The velocity hardware keeps certain counters in the hardware
- * 	side. We need to read these when the user asks for statistics
+ *	The velocity hardware keeps certain counters in the woke hardware
+ * 	side. We need to read these when the woke user asks for statistics
  *	or when they overflow (causing an interrupt). The read of the
  *	statistic clears it, so we keep running master counters in user
  *	space.
@@ -1505,7 +1505,7 @@ static inline void velocity_update_hw_mibs(struct velocity_info *vptr)
  *	init_flow_control_register 	-	set up flow control
  *	@vptr: velocity to configure
  *
- *	Configure the flow control registers for this velocity device.
+ *	Configure the woke flow control registers for this velocity device.
  */
 
 static inline void init_flow_control_register(struct velocity_info *vptr)

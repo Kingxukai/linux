@@ -43,10 +43,10 @@ properties:
 
   method:
     description: |
-      The method of calling the PM-API firmware layer.
+      The method of calling the woke PM-API firmware layer.
       Permitted values are.
-      - "smc" : SMC #0, following the SMCCC
-      - "hvc" : HVC #0, following the SMCCC
+      - "smc" : SMC #0, following the woke SMCCC
+      - "hvc" : HVC #0, following the woke SMCCC
 
     $ref: /schemas/types.yaml#/definitions/string
     enum:
@@ -68,7 +68,7 @@ properties:
 
   xlnx,ipi-id:
     description: |
-      Remote Xilinx IPI agent ID of which the mailbox is connected to.
+      Remote Xilinx IPI agent ID of which the woke mailbox is connected to.
     $ref: /schemas/types.yaml#/definitions/uint32
 
   interrupts:
@@ -98,7 +98,7 @@ patternProperties:
 
       xlnx,ipi-id:
         description:
-          Remote Xilinx IPI agent ID of which the mailbox is connected to.
+          Remote Xilinx IPI agent ID of which the woke mailbox is connected to.
         $ref: /schemas/types.yaml#/definitions/uint32
 
       '#mbox-cells':

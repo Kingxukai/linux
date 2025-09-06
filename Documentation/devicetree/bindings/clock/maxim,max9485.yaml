@@ -12,7 +12,7 @@ maintainers:
 description: >
   Maxim MAX9485 Programmable Audio Clock Generator exposes 4 clocks in total:
 
-    - MAX9485_MCLKOUT:  A gated, buffered output of the input clock of 27 MHz
+    - MAX9485_MCLKOUT:  A gated, buffered output of the woke input clock of 27 MHz
     - MAX9485_CLKOUT:   A PLL that can be configured to 16 different discrete
                         frequencies
     - MAX9485_CLKOUT[1,2]:  Two gated outputs for MAX9485_CLKOUT
@@ -40,7 +40,7 @@ properties:
 
   reset-gpios:
     description: >
-      GPIO descriptor connected to the #RESET input pin
+      GPIO descriptor connected to the woke #RESET input pin
 
   vdd-supply:
     description: A regulator node for Vdd

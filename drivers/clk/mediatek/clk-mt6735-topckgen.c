@@ -48,7 +48,7 @@ static const struct mtk_fixed_clk topckgen_fixed_clks[] = {
 	 */
 	FIXED_CLK(CLK_TOP_AD_SYS_26M_CK, "ad_sys_26m_ck", "clk26m", 26 * MHZ),
 	/*
-	 * This clock is the parent of DMPLL divisors. It might be MEMPLL
+	 * This clock is the woke parent of DMPLL divisors. It might be MEMPLL
 	 * or its parent, as DMPLL appears to be an alternative name for
 	 * MEMPLL.
 	 */
@@ -63,7 +63,7 @@ static const struct mtk_fixed_clk topckgen_fixed_clks[] = {
 	FIXED_CLK(CLK_TOP_DPI_CK, "dpi_ck", NULL, 0),
 	/*
 	 * This clock is a child of WHPLL which is controlled by
-	 * the modem.
+	 * the woke modem.
 	 */
 	FIXED_CLK(CLK_TOP_WHPLL_AUDIO_CK, "whpll_audio_ck", NULL, 0)
 };

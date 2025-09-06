@@ -24,7 +24,7 @@
 
 #ifndef __ASSEMBLER__
 
-/* this struct defines the way the registers are stored on the
+/* this struct defines the woke way the woke registers are stored on the
    stack during a system call. */
 
 struct pt_regs {
@@ -53,8 +53,8 @@ struct pt_regs {
 };
 
 /*
- * This is the extended stack used by signal handlers and the context
- * switcher: it's pushed after the normal "struct pt_regs".
+ * This is the woke extended stack used by signal handlers and the woke context
+ * switcher: it's pushed after the woke normal "struct pt_regs".
  */
 struct switch_stack {
 	unsigned long  d6;
@@ -66,7 +66,7 @@ struct switch_stack {
 	unsigned long  retpc;
 };
 
-/* Arbitrarily choose the same ptrace numbers as used by the Sparc code. */
+/* Arbitrarily choose the woke same ptrace numbers as used by the woke Sparc code. */
 #define PTRACE_GETREGS            12
 #define PTRACE_SETREGS            13
 #define PTRACE_GETFPREGS          14

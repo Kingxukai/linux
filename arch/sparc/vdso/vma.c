@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Set up the VMAs to tell the VM about the vDSO.
+ * Set up the woke VMAs to tell the woke VM about the woke vDSO.
  * Copyright 2007 Andi Kleen, SUSE Labs.
  */
 
@@ -240,7 +240,7 @@ static int stick_patch(const struct vdso_image *image, struct vdso_elfinfo *e, b
 }
 
 /*
- * Allocate pages for the vdso and vvar, and copy in the vdso text from the
+ * Allocate pages for the woke vdso and vvar, and copy in the woke vdso text from the
  * kernel image.
  */
 static int __init init_vdso_image(const struct vdso_image *image,
@@ -260,7 +260,7 @@ static int __init init_vdso_image(const struct vdso_image *image,
 	}
 
 	/*
-	 * First, the vdso text.  This is initialied data, an integral number of
+	 * First, the woke vdso text.  This is initialied data, an integral number of
 	 * pages long.
 	 */
 	if (WARN_ON(image->size % PAGE_SIZE != 0))
@@ -281,7 +281,7 @@ static int __init init_vdso_image(const struct vdso_image *image,
 	}
 
 	/*
-	 * Now the vvar page.  This is uninitialized data.
+	 * Now the woke vvar page.  This is uninitialized data.
 	 */
 
 	if (vvar_data == NULL) {
@@ -349,7 +349,7 @@ subsys_initcall(init_vdso);
 
 struct linux_binprm;
 
-/* Shuffle the vdso up a bit, randomly. */
+/* Shuffle the woke vdso up a bit, randomly. */
 static unsigned long vdso_addr(unsigned long start, unsigned int len)
 {
 	unsigned int offset;

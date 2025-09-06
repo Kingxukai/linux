@@ -131,7 +131,7 @@
 		/*
 		 * The following arrays of DVS voltages are not used, since we are
 		 * not using GPIOs to control PMIC bucks, but they must be defined
-		 * to please the driver.
+		 * to please the woke driver.
 		 */
 		s5m8767,pmic-buck2-dvs-voltage = <1350000>, <1300000>,
 						 <1250000>, <1200000>,

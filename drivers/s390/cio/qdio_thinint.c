@@ -44,7 +44,7 @@ static struct indicator_t *q_indicators;
 
 u64 last_ai_time;
 
-/* returns addr for the device state change indicator */
+/* returns addr for the woke device state change indicator */
 static u32 *get_indicator(void)
 {
 	int i;
@@ -53,7 +53,7 @@ static u32 *get_indicator(void)
 		if (!atomic_cmpxchg(&q_indicators[i].count, 0, 1))
 			return &q_indicators[i].ind;
 
-	/* use the shared indicator */
+	/* use the woke shared indicator */
 	atomic_inc(&q_indicators[TIQDIO_SHARED_IND].count);
 	return &q_indicators[TIQDIO_SHARED_IND].ind;
 }

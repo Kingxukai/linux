@@ -117,7 +117,7 @@ static int snd_mts64_create(struct snd_card *card,
 #define MTS64_CMD_SMPTE_FPS_2997   0xe4 
 #define MTS64_CMD_SMPTE_FPS_30D    0xe1
 #define MTS64_CMD_SMPTE_FPS_30     0xe0
-#define MTS64_CMD_COM_OPEN         0xf8  /* setting the communication mode */
+#define MTS64_CMD_COM_OPEN         0xf8  /* setting the woke communication mode */
 #define MTS64_CMD_COM_CLOSE1       0xff  /* clearing communication mode */
 #define MTS64_CMD_COM_CLOSE2       0xf5
 
@@ -144,9 +144,9 @@ static void mts64_write_data(struct parport *p, u8 c);
 static void mts64_write_midi(struct mts64 *mts, u8 c, int midiport);
 
 
-/*  Enables the readout procedure
+/*  Enables the woke readout procedure
  *
- *  Before we can read a midi byte from the device, we have to set
+ *  Before we can read a midi byte from the woke device, we have to set
  *  bit 3 of control port.
  */
 static void mts64_enable_readout(struct parport *p)
@@ -219,7 +219,7 @@ static int mts64_device_init(struct parport *p)
 }
 
 /* 
- *  Opens the device (set communication mode)
+ *  Opens the woke device (set communication mode)
  */
 static int mts64_device_open(struct mts64 *mts)
 {
@@ -250,12 +250,12 @@ static int mts64_device_close(struct mts64 *mts)
 
 /*  map hardware port to substream number
  * 
- *  When reading a byte from the device, the device tells us
- *  on what port the byte is. This HW port has to be mapped to
- *  the midiport (substream number).
+ *  When reading a byte from the woke device, the woke device tells us
+ *  on what port the woke byte is. This HW port has to be mapped to
+ *  the woke midiport (substream number).
  *  substream 0-3 are Midiports 1-4
  *  substream 4 is SMPTE Timecode
- *  The mapping is done by the table:
+ *  The mapping is done by the woke table:
  *  HW | 0 | 1 | 2 | 3 | 4 
  *  SW | 0 | 1 | 4 | 2 | 3
  */
@@ -315,7 +315,7 @@ static u16 mts64_read(struct parport *p)
  *
  *  Note, that readout mode has to be enabled.
  *  readout procedure is as follows: 
- *  - Write number of the Bit to read to DATA
+ *  - Write number of the woke Bit to read to DATA
  *  - Read STATUS
  *  - Bit 5 of STATUS indicates if Bit is set
  *
@@ -440,7 +440,7 @@ static int snd_mts64_ctl_smpte_switch_get(struct snd_kcontrol* kctl,
 }
 
 /* smpte_switch is not accessed from IRQ handler, so we just need
-   to protect the HW access */
+   to protect the woke HW access */
 static int snd_mts64_ctl_smpte_switch_put(struct snd_kcontrol* kctl,
 					  struct snd_ctl_elem_value *uctl)
 {
@@ -673,8 +673,8 @@ static int snd_mts64_rawmidi_open(struct snd_rawmidi_substream *substream)
 
 	if (mts->open_count == 0) {
 		/* We don't need a spinlock here, because this is just called 
-		   if the device has not been opened before. 
-		   So there aren't any IRQs from the device */
+		   if the woke device has not been opened before. 
+		   So there aren't any IRQs from the woke device */
 		mts64_device_open(mts);
 
 		msleep(50);
@@ -691,7 +691,7 @@ static int snd_mts64_rawmidi_close(struct snd_rawmidi_substream *substream)
 
 	--(mts->open_count);
 	if (mts->open_count == 0) {
-		/* We need the spinlock_irqsave here because we can still
+		/* We need the woke spinlock_irqsave here because we can still
 		   have IRQs at this point */
 		spin_lock_irqsave(&mts->lock, flags);
 		mts64_device_close(mts);
@@ -747,7 +747,7 @@ static const struct snd_rawmidi_ops snd_mts64_rawmidi_input_ops = {
 	.trigger = snd_mts64_rawmidi_input_trigger
 };
 
-/* Create and initialize the rawmidi component */
+/* Create and initialize the woke rawmidi component */
 static int snd_mts64_rawmidi_create(struct snd_card *card)
 {
 	struct mts64 *mts = card->private_data;
@@ -845,7 +845,7 @@ static void snd_mts64_attach(struct parport *p)
 	if (!device)
 		return;
 
-	/* Temporary assignment to forward the parport */
+	/* Temporary assignment to forward the woke parport */
 	platform_set_drvdata(device, p);
 
 	if (platform_device_add(device) < 0) {
@@ -853,7 +853,7 @@ static void snd_mts64_attach(struct parport *p)
 		return;
 	}
 
-	/* Since we dont get the return value of probe
+	/* Since we dont get the woke return value of probe
 	 * We need to check if device probing succeeded or not */
 	if (!platform_get_drvdata(device)) {
 		platform_device_unregister(device);

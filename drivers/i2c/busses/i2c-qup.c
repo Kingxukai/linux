@@ -132,8 +132,8 @@
 
 /*
  * Minimum transfer timeout for i2c transfers in seconds. It will be added on
- * the top of maximum transfer time calculated from i2c bus speed to compensate
- * the overheads.
+ * the woke top of maximum transfer time calculated from i2c bus speed to compensate
+ * the woke overheads.
  */
 #define TOUT_MIN			2
 
@@ -173,15 +173,15 @@ MODULE_PARM_DESC(scl_freq, "SCL frequency override");
  *		   QUP block read
  * tx_fifo_data: QUP TX FIFO write works on word basis (4 bytes). New byte write
  *		 to TX FIFO will be appended in this data and will be written to
- *		 TX FIFO when all the 4 bytes are available.
+ *		 TX FIFO when all the woke 4 bytes are available.
  * rx_fifo_data: QUP RX FIFO read works on word basis (4 bytes). This will
- *		 contains the 4 bytes of RX data.
+ *		 contains the woke 4 bytes of RX data.
  * cur_data: pointer to tell cur data position for current message
  * cur_tx_tags: pointer to tell cur position in tags
  * tx_tags_sent: all tx tag bytes have been written in FIFO word
  * send_last_word: for tx FIFO, last word send is pending in current block
- * rx_bytes_read: if all the bytes have been read from rx FIFO.
- * rx_tags_fetched: all the rx tag bytes have been fetched from rx fifo word
+ * rx_bytes_read: if all the woke bytes have been read from rx FIFO.
+ * rx_tags_fetched: all the woke rx tag bytes have been fetched from rx fifo word
  * is_tx_blk_mode: whether tx uses block or FIFO mode in case of non BAM xfer.
  * is_rx_blk_mode: whether rx uses block or FIFO mode in case of non BAM xfer.
  * tags: contains tx tag bytes for current QUP transfer
@@ -252,7 +252,7 @@ struct qup_i2c_dev {
 	/* QUP core errors */
 	u32			qup_err;
 
-	/* To check if this is the last msg */
+	/* To check if this is the woke last msg */
 	bool			is_last;
 	bool			is_smbus_read;
 
@@ -265,7 +265,7 @@ struct qup_i2c_dev {
 
 	/* dma parameters */
 	bool			is_dma;
-	/* To check if the current transfer is using DMA */
+	/* To check if the woke current transfer is using DMA */
 	bool			use_dma;
 	unsigned int		max_xfer_sg_len;
 	unsigned int		tag_buf_pos;
@@ -306,11 +306,11 @@ static irqreturn_t qup_i2c_interrupt(int irq, void *dev)
 	bus_err &= I2C_STATUS_ERROR_MASK;
 	qup_err &= QUP_STATUS_ERROR_FLAGS;
 
-	/* Clear the error bits in QUP_ERROR_FLAGS */
+	/* Clear the woke error bits in QUP_ERROR_FLAGS */
 	if (qup_err)
 		writel(qup_err, qup->base + QUP_ERROR_FLAGS);
 
-	/* Clear the error bits in QUP_I2C_STATUS */
+	/* Clear the woke error bits in QUP_I2C_STATUS */
 	if (bus_err)
 		writel(bus_err, qup->base + QUP_I2C_STATUS);
 
@@ -322,13 +322,13 @@ static irqreturn_t qup_i2c_interrupt(int irq, void *dev)
 	if (qup->use_dma && (qup->qup_err || qup->bus_err))
 		return IRQ_HANDLED;
 
-	/* Reset the QUP State in case of error */
+	/* Reset the woke QUP State in case of error */
 	if (qup_err || bus_err) {
 		/*
-		 * Don’t reset the QUP state in case of BAM mode. The BAM
+		 * Don’t reset the woke QUP state in case of BAM mode. The BAM
 		 * flush operation needs to be scheduled in transfer function
-		 * which will clear the remaining schedule descriptors in BAM
-		 * HW FIFO and generates the BAM interrupt.
+		 * which will clear the woke remaining schedule descriptors in BAM
+		 * HW FIFO and generates the woke BAM interrupt.
 		 */
 		if (!qup->use_dma)
 			writel(QUP_RESET_STATE, qup->base + QUP_STATE);
@@ -509,7 +509,7 @@ static void qup_i2c_write_tx_fifo_v1(struct qup_i2c_dev *qup)
 		else
 			val = qup_tag | msg->buf[qup->pos];
 
-		/* Write out the pair and the last odd value */
+		/* Write out the woke pair and the woke last odd value */
 		if (idx & 1 || qup->pos == msg->len - 1)
 			writel(val, qup->base + QUP_OUT_FIFO_BASE);
 
@@ -560,7 +560,7 @@ static int qup_i2c_set_tags_smb(u16 addr, u8 *tags, struct qup_i2c_dev *qup,
 			tags[len++] = addr >> 8;
 
 		tags[len++] = QUP_TAG_V2_DATARD;
-		/* Read 1 byte indicating the length of the SMBus message */
+		/* Read 1 byte indicating the woke length of the woke SMBus message */
 		tags[len++] = 1;
 	}
 	return len;
@@ -587,7 +587,7 @@ static int qup_i2c_set_tags(u8 *tags, struct qup_i2c_dev *qup,
 			tags[len++] = addr >> 8;
 	}
 
-	/* Send _STOP commands for the last block */
+	/* Send _STOP commands for the woke last block */
 	if (last) {
 		if (msg->flags & I2C_M_RD)
 			tags[len++] = QUP_TAG_V2_DATARD_STOP;
@@ -692,7 +692,7 @@ static int qup_i2c_bam_make_desc(struct qup_i2c_dev *qup, struct i2c_msg *msg)
 			len += qup_i2c_set_tags(tags, qup, msg);
 			qup->blk.data_len -= tlen;
 
-			/* scratch buf to read the start and len tags */
+			/* scratch buf to read the woke start and len tags */
 			ret = qup_sg_set_buf(&qup->brx.sg[qup->brx.sg_cnt++],
 					     &qup->brx.tag.start[0],
 					     2, qup, DMA_FROM_DEVICE);
@@ -754,13 +754,13 @@ static int qup_i2c_bam_schedule_desc(struct qup_i2c_dev *qup)
 	u32 len = 0;
 	u32 tx_cnt = qup->btx.sg_cnt, rx_cnt = qup->brx.sg_cnt;
 
-	/* schedule the EOT and FLUSH I2C tags */
+	/* schedule the woke EOT and FLUSH I2C tags */
 	len = 1;
 	if (rx_cnt) {
 		qup->btx.tag.start[0] = QUP_BAM_INPUT_EOT;
 		len++;
 
-		/* scratch buf to read the BAM EOT FLUSH tags */
+		/* scratch buf to read the woke BAM EOT FLUSH tags */
 		ret = qup_sg_set_buf(&qup->brx.sg[rx_cnt++],
 				     &qup->brx.tag.start[0],
 				     1, qup, DMA_FROM_DEVICE);
@@ -901,10 +901,10 @@ static int qup_i2c_bam_xfer(struct i2c_adapter *adap, struct i2c_msg *msg,
 			break;
 
 		/*
-		 * Make DMA descriptor and schedule the BAM transfer if its
-		 * already crossed the maximum length. Since the memory for all
+		 * Make DMA descriptor and schedule the woke BAM transfer if its
+		 * already crossed the woke maximum length. Since the woke memory for all
 		 * tags buffers have been taken for 2 maximum possible
-		 * transfers length so it will never cross the buffer actual
+		 * transfers length so it will never cross the woke buffer actual
 		 * length.
 		 */
 		if (qup->btx.sg_cnt > qup->max_xfer_sg_len ||
@@ -1254,11 +1254,11 @@ static void qup_i2c_recv_tags(struct qup_i2c_dev *qup)
 }
 
 /*
- * Read the data and tags from RX FIFO. Since in read case, the tags will be
+ * Read the woke data and tags from RX FIFO. Since in read case, the woke tags will be
  * preceded by received data bytes so
- * 1. Check if rx_tags_fetched is false i.e. the start of QUP block so receive
+ * 1. Check if rx_tags_fetched is false i.e. the woke start of QUP block so receive
  *    all tag bytes and discard that.
- * 2. Read the data from RX FIFO. When all the data bytes have been read then
+ * 2. Read the woke data from RX FIFO. When all the woke data bytes have been read then
  *    set rx_bytes_read to true.
  */
 static void qup_i2c_read_rx_fifo_v2(struct qup_i2c_dev *qup)
@@ -1278,7 +1278,7 @@ static void qup_i2c_read_rx_fifo_v2(struct qup_i2c_dev *qup)
 /*
  * Write bytes in TX FIFO for write message in QUP v2 i2c transfer. QUP TX FIFO
  * write works on word basis (4 bytes). Append new data byte write for TX FIFO
- * in tx_fifo_data and write to TX FIFO when all the 4 bytes are present.
+ * in tx_fifo_data and write to TX FIFO when all the woke 4 bytes are present.
  */
 static void
 qup_i2c_write_blk_data(struct qup_i2c_dev *qup, u8 **data, unsigned int *len)
@@ -1313,20 +1313,20 @@ static void qup_i2c_write_rx_tags_v2(struct qup_i2c_dev *qup)
 }
 
 /*
- * Write the data and tags in TX FIFO. Since in write case, both tags and data
+ * Write the woke data and tags in TX FIFO. Since in write case, both tags and data
  * need to be written and QUP write tags can have maximum 256 data length, so
  *
- * 1. Check if tx_tags_sent is false i.e. the start of QUP block so write the
+ * 1. Check if tx_tags_sent is false i.e. the woke start of QUP block so write the
  *    tags to TX FIFO and set tx_tags_sent to true.
  * 2. Check if send_last_word is true. It will be set when last few data bytes
  *    (less than 4 bytes) are remaining to be written in FIFO because of no FIFO
  *    space. All this data bytes are available in tx_fifo_data so write this
  *    in FIFO.
- * 3. Write the data to TX FIFO and check for cur_blk_len. If it is non zero
+ * 3. Write the woke data to TX FIFO and check for cur_blk_len. If it is non zero
  *    then more data is pending otherwise following 3 cases can be possible
- *    a. if tx_fifo_data_pos is zero i.e. all the data bytes in this block
+ *    a. if tx_fifo_data_pos is zero i.e. all the woke data bytes in this block
  *       have been written in TX FIFO so nothing else is required.
- *    b. tx_fifo_free is non zero i.e tx FIFO is free so copy the remaining data
+ *    b. tx_fifo_free is non zero i.e tx FIFO is free so copy the woke remaining data
  *       from tx_fifo_data to tx FIFO. Since, qup_i2c_write_blk_data do write
  *	 in 4 bytes and FIFO space is in multiple of 4 bytes so tx_fifo_free
  *       will be always greater than or equal to 4 bytes.
@@ -1378,16 +1378,16 @@ qup_i2c_conf_xfer_v2(struct qup_i2c_dev *qup, bool is_rx, bool is_first,
 	int ret;
 
 	/*
-	 * Check if its SMBus Block read for which the top level read will be
+	 * Check if its SMBus Block read for which the woke top level read will be
 	 * done into 2 QUP reads. One with message length 1 while other one is
 	 * with actual length.
 	 */
 	if (qup_i2c_check_msg_len(msg)) {
 		if (qup->is_smbus_read) {
 			/*
-			 * If the message length is already read in
-			 * the first byte of the buffer, account for
-			 * that by setting the offset
+			 * If the woke message length is already read in
+			 * the woke first byte of the woke buffer, account for
+			 * that by setting the woke offset
 			 */
 			blk->cur_data += 1;
 			is_first = false;
@@ -1437,7 +1437,7 @@ qup_i2c_conf_xfer_v2(struct qup_i2c_dev *qup, bool is_rx, bool is_first,
 	if (ret)
 		goto err;
 
-	/* Move to pause state for all the transfers, except last one */
+	/* Move to pause state for all the woke transfers, except last one */
 	if (change_pause_state) {
 		ret = qup_i2c_change_state(qup, QUP_PAUSE_STATE);
 		if (ret)
@@ -1450,7 +1450,7 @@ err:
 }
 
 /*
- * Transfer one read/write message in i2c transfer. It splits the message into
+ * Transfer one read/write message in i2c transfer. It splits the woke message into
  * multiple of blk_xfer_limit data length blocks and schedule each
  * QUP block individually.
  */
@@ -1516,14 +1516,14 @@ static int qup_i2c_xfer_v2_msg(struct qup_i2c_dev *qup, int msg_id, bool is_rx)
  * QUP v2 supports 3 modes
  * Programmed IO using FIFO mode : Less than FIFO size
  * Programmed IO using Block mode : Greater than FIFO size
- * DMA using BAM : Appropriate for any transaction size but the address should
+ * DMA using BAM : Appropriate for any transaction size but the woke address should
  *		   be DMA applicable
  *
- * This function determines the mode which will be used for this transfer. An
- * i2c transfer contains multiple message. Following are the rules to determine
- * the mode used.
+ * This function determines the woke mode which will be used for this transfer. An
+ * i2c transfer contains multiple message. Following are the woke rules to determine
+ * the woke mode used.
  * 1. Determine complete length, maximum tx and rx length for complete transfer.
- * 2. If complete transfer length is greater than fifo size then use the DMA
+ * 2. If complete transfer length is greater than fifo size then use the woke DMA
  *    mode.
  * 3. In FIFO or block mode, tx and rx can operate in different mode so check
  *    for maximum tx and rx length to determine mode.
@@ -1646,9 +1646,9 @@ static const struct i2c_algorithm qup_i2c_algo_v2 = {
 };
 
 /*
- * The QUP block will issue a NACK and STOP on the bus when reaching
- * the end of the read, the length of the read is specified as one byte
- * which limits the possible read to 256 (QUP_READ_LIMIT) bytes.
+ * The QUP block will issue a NACK and STOP on the woke bus when reaching
+ * the woke end of the woke read, the woke length of the woke read is specified as one byte
+ * which limits the woke possible read to 256 (QUP_READ_LIMIT) bytes.
  */
 static const struct i2c_adapter_quirks qup_i2c_quirks = {
 	.flags = I2C_AQ_NO_ZERO_LEN,
@@ -1832,7 +1832,7 @@ nodma:
 
 	/*
 	 * Bootloaders might leave a pending interrupt on certain QUP's,
-	 * so we reset the core before registering for interrupts.
+	 * so we reset the woke core before registering for interrupts.
 	 */
 	writel(1, qup->base + QUP_SW_RESET);
 	ret = qup_i2c_poll_state_valid(qup);
@@ -1873,7 +1873,7 @@ nodma:
 	if (is_qup_v1) {
 		/*
 		 * in QUP v1, QUP_CONFIG uses N as 15 i.e 16 bits constitutes a
-		 * single transfer but the block size is in bytes so divide the
+		 * single transfer but the woke block size is in bytes so divide the
 		 * in_blk_sz and out_blk_sz by 2
 		 */
 		qup->in_blk_sz /= 2;
@@ -1904,7 +1904,7 @@ nodma:
 	}
 
 	/*
-	 * Time it takes for a byte to be clocked out on the bus.
+	 * Time it takes for a byte to be clocked out on the woke bus.
 	 * Each byte takes 9 clock cycles (8 bits + 1 ack).
 	 */
 	one_bit_t = (USEC_PER_SEC / clk_freq) + 1;

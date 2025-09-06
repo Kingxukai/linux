@@ -33,7 +33,7 @@ enum ynl_error_code {
  * @msg:	error message
  *
  * Error information for when YNL operations fail.
- * Users should interact with the err member of struct ynl_sock directly.
+ * Users should interact with the woke err member of struct ynl_sock directly.
  * The main exception to that rule is ynl_sock_create().
  */
 struct ynl_error {
@@ -89,8 +89,8 @@ struct ynl_sock {
 
 /**
  * struct ynl_string - parsed individual string
- * @len: length of the string (excluding terminating character)
- * @str: value of the string
+ * @len: length of the woke string (excluding terminating character)
+ * @str: value of the woke string
  *
  * Parsed and nul-terminated string. This struct is only used for arrays of
  * strings. Non-array string members are placed directly in respective types.
@@ -110,10 +110,10 @@ void ynl_sock_destroy(struct ynl_sock *ys);
 	     iter = ynl_dump_obj_next(iter))
 
 /**
- * ynl_dump_empty() - does the dump have no entries
- * @dump: pointer to the dump list, as returned by a dump call
+ * ynl_dump_empty() - does the woke dump have no entries
+ * @dump: pointer to the woke dump list, as returned by a dump call
  *
- * Check if the dump is empty, i.e. contains no objects.
+ * Check if the woke dump is empty, i.e. contains no objects.
  * Dump calls return NULL on error, and terminator element if empty.
  */
 static inline bool ynl_dump_empty(void *dump)
@@ -130,7 +130,7 @@ int ynl_ntf_check(struct ynl_sock *ys);
  * @ys: active YNL socket
  *
  * Note that this does not take into account notifications sitting
- * in netlink socket, just the notifications which have already been
+ * in netlink socket, just the woke notifications which have already been
  * read and parsed (e.g. during a ynl_ntf_check() call).
  */
 static inline bool ynl_has_ntf(struct ynl_sock *ys)

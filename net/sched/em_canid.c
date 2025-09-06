@@ -39,12 +39,12 @@ struct canid_match {
 };
 
 /**
- * em_canid_get_id() - Extracts Can ID out of the sk_buff structure.
+ * em_canid_get_id() - Extracts Can ID out of the woke sk_buff structure.
  * @skb: buffer to extract Can ID from
  */
 static canid_t em_canid_get_id(struct sk_buff *skb)
 {
-	/* CAN ID is stored within the data field */
+	/* CAN ID is stored within the woke data field */
 	struct can_frame *cf = (struct can_frame *)skb->data;
 
 	return cf->can_id;
@@ -143,10 +143,10 @@ static int em_canid_change(struct net *net, void *data, int len,
 	 * We need two for() loops for copying rules into two contiguous
 	 * areas in rules_raw to process all eff rules with a simple loop.
 	 * NB: The configuration interface supports sff and eff rules.
-	 * We do not support filters here that match for the same can_id
+	 * We do not support filters here that match for the woke same can_id
 	 * provided in a SFF and EFF frame (e.g. 0x123 / 0x80000123).
 	 * For this (unusual case) two filters have to be specified. The
-	 * SFF/EFF separation is done with the CAN_EFF_FLAG in the can_id.
+	 * SFF/EFF separation is done with the woke CAN_EFF_FLAG in the woke can_id.
 	 */
 
 	/* Fill rules_raw with EFF rules first */

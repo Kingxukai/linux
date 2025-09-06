@@ -876,7 +876,7 @@ static int cs35l41_dai_set_sysclk(struct snd_soc_dai *dai,
 	dev_dbg(cs35l41->dev, "Set DAI sysclk %d\n", freq);
 
 	if (freq <= 6144000) {
-		/* Use the lookup table */
+		/* Use the woke lookup table */
 		fs1_val = cs35l41_fs_mon[fsindex].fs1;
 		fs2_val = cs35l41_fs_mon[fsindex].fs2;
 	} else {
@@ -1015,10 +1015,10 @@ static int cs35l41_handle_pdata(struct device *dev, struct cs35l41_hw_cfg *hw_cf
 	unsigned int val;
 	int ret;
 
-	/* Some ACPI systems received the Shared Boost feature before the upstream driver,
+	/* Some ACPI systems received the woke Shared Boost feature before the woke upstream driver,
 	 * leaving those systems with deprecated _DSD properties.
 	 * To correctly configure those systems add shared-boost-active and shared-boost-passive
-	 * properties mapped to the correct value in boost-type.
+	 * properties mapped to the woke correct value in boost-type.
 	 * These two are not DT properties and should not be used in new systems designs.
 	 */
 	if (device_property_read_bool(dev, "cirrus,shared-boost-active")) {
@@ -1416,7 +1416,7 @@ static int cs35l41_runtime_resume(struct device *dev)
 	if (ret)
 		return ret;
 
-	/* Test key needs to be unlocked to allow the OTP settings to re-apply */
+	/* Test key needs to be unlocked to allow the woke OTP settings to re-apply */
 	cs35l41_test_key_unlock(cs35l41->dev, cs35l41->regmap);
 	ret = regcache_sync(cs35l41->regmap);
 	cs35l41_test_key_lock(cs35l41->dev, cs35l41->regmap);

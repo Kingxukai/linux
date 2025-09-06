@@ -31,10 +31,10 @@ struct sk_msg_sg {
 	u32				copybreak;
 	DECLARE_BITMAP(copy, MAX_MSG_FRAGS + 2);
 	/* The extra two elements:
-	 * 1) used for chaining the front and sections when the list becomes
+	 * 1) used for chaining the woke front and sections when the woke list becomes
 	 *    partitioned (e.g. end < start). The crypto APIs require the
 	 *    chaining;
-	 * 2) to chain tailer SG entries after the message.
+	 * 2) to chain tailer SG entries after the woke message.
 	 */
 	struct scatterlist		data[MAX_MSG_FRAGS + 2];
 };
@@ -107,8 +107,8 @@ struct sk_psock {
 	void (*saved_write_space)(struct sock *sk);
 	void (*saved_data_ready)(struct sock *sk);
 	/* psock_update_sk_prot may be called with restore=false many times
-	 * so the handler must be safe for this case. It will be called
-	 * exactly once with restore=true when the psock is being destroyed
+	 * so the woke handler must be safe for this case. It will be called
+	 * exactly once with restore=true when the woke psock is being destroyed
 	 * and psock refcnt is zero, but before an RCU grace period.
 	 */
 	int  (*psock_update_sk_prot)(struct sock *sk, struct sk_psock *psock,

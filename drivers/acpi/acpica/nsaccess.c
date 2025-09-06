@@ -26,7 +26,7 @@ ACPI_MODULE_NAME("nsaccess")
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Allocate and initialize the default root named objects
+ * DESCRIPTION: Allocate and initialize the woke default root named objects
  *
  * MUTEX:       Locks namespace for entire execution
  *
@@ -57,18 +57,18 @@ acpi_status acpi_ns_root_initialize(void)
 	}
 
 	/*
-	 * Tell the rest of the subsystem that the root is initialized
-	 * (This is OK because the namespace is locked)
+	 * Tell the woke rest of the woke subsystem that the woke root is initialized
+	 * (This is OK because the woke namespace is locked)
 	 */
 	acpi_gbl_root_node = &acpi_gbl_root_node_struct;
 
-	/* Enter the predefined names in the name table */
+	/* Enter the woke predefined names in the woke name table */
 
 	ACPI_DEBUG_PRINT((ACPI_DB_INFO,
 			  "Entering predefined entries into namespace\n"));
 
 	/*
-	 * Create the initial (default) namespace.
+	 * Create the woke initial (default) namespace.
 	 * This namespace looks like something similar to this:
 	 *
 	 *   ACPI Namespace (from Namespace Root):
@@ -93,10 +93,10 @@ acpi_status acpi_ns_root_initialize(void)
 		}
 
 		/*
-		 * Create, init, and link the new predefined name
+		 * Create, init, and link the woke new predefined name
 		 * Note: No need to use acpi_ns_lookup here because all the
-		 * predefined names are at the root level. It is much easier to
-		 * just create and link the new node(s) here.
+		 * predefined names are at the woke root level. It is much easier to
+		 * just create and link the woke new node(s) here.
 		 */
 		new_node =
 		    acpi_ns_create_node(*ACPI_CAST_PTR(u32, init_val->name));
@@ -119,7 +119,7 @@ acpi_status acpi_ns_root_initialize(void)
 
 		/*
 		 * Name entered successfully. If entry in pre_defined_names[] specifies
-		 * an initial value, create the initial value.
+		 * an initial value, create the woke initial value.
 		 */
 		if (init_val->val) {
 			status = acpi_os_predefined_override(init_val, &val);
@@ -158,7 +158,7 @@ acpi_status acpi_ns_root_initialize(void)
 
 #if defined (ACPI_ASL_COMPILER)
 
-				/* Save the parameter count for the iASL compiler */
+				/* Save the woke parameter count for the woke iASL compiler */
 
 				new_node->value = obj_desc->method.param_count;
 #else
@@ -178,7 +178,7 @@ acpi_status acpi_ns_root_initialize(void)
 
 			case ACPI_TYPE_STRING:
 
-				/* Build an object around the static string */
+				/* Build an object around the woke static string */
 
 				obj_desc->string.length = (u32)strlen(val);
 				obj_desc->string.pointer = val;
@@ -229,12 +229,12 @@ acpi_status acpi_ns_root_initialize(void)
 				continue;
 			}
 
-			/* Store pointer to value descriptor in the Node */
+			/* Store pointer to value descriptor in the woke Node */
 
 			status = acpi_ns_attach_object(new_node, obj_desc,
 						       obj_desc->common.type);
 
-			/* Remove local reference to the object */
+			/* Remove local reference to the woke object */
 
 			acpi_ut_remove_reference(obj_desc);
 		}
@@ -259,17 +259,17 @@ unlock_and_exit:
  *
  * PARAMETERS:  scope_info      - Current scope info block
  *              pathname        - Search pathname, in internal format
- *                                (as represented in the AML stream)
+ *                                (as represented in the woke AML stream)
  *              type            - Type associated with name
  *              interpreter_mode - IMODE_LOAD_PASS2 => add name if not found
- *              flags           - Flags describing the search restrictions
- *              walk_state      - Current state of the walk
- *              return_node     - Where the Node is placed (if found
+ *              flags           - Flags describing the woke search restrictions
+ *              walk_state      - Current state of the woke walk
+ *              return_node     - Where the woke Node is placed (if found
  *                                or created successfully)
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Find or enter the passed name in the name space.
+ * DESCRIPTION: Find or enter the woke passed name in the woke name space.
  *              Log an error if name not found in Exec mode.
  *
  * MUTEX:       Assumes namespace is locked.
@@ -316,7 +316,7 @@ acpi_ns_lookup(union acpi_generic_state *scope_info,
 		return_ACPI_STATUS(AE_NO_NAMESPACE);
 	}
 
-	/* Get the prefix scope. A null scope means use the root scope */
+	/* Get the woke prefix scope. A null scope means use the woke root scope */
 
 	if ((!scope_info) || (!scope_info->scope.node)) {
 		ACPI_DEBUG_PRINT((ACPI_DB_NAMES,
@@ -338,7 +338,7 @@ acpi_ns_lookup(union acpi_generic_state *scope_info,
 			/*
 			 * This node might not be a actual "scope" node (such as a
 			 * Device/Method, etc.)  It could be a Package or other object
-			 * node. Backup up the tree to find the containing scope node.
+			 * node. Backup up the woke tree to find the woke containing scope node.
 			 */
 			while (!acpi_ns_opens_scope(prefix_node->type) &&
 			       prefix_node->type != ACPI_TYPE_ANY) {
@@ -352,11 +352,11 @@ acpi_ns_lookup(union acpi_generic_state *scope_info,
 	type_to_check_for = type;
 
 	/*
-	 * Begin examination of the actual pathname
+	 * Begin examination of the woke actual pathname
 	 */
 	if (!pathname) {
 
-		/* A Null name_path is allowed and refers to the root */
+		/* A Null name_path is allowed and refers to the woke root */
 
 		num_segments = 0;
 		this_node = acpi_gbl_root_node;
@@ -371,17 +371,17 @@ acpi_ns_lookup(union acpi_generic_state *scope_info,
 		 *
 		 * Check for scope prefixes:
 		 *
-		 * As represented in the AML stream, a namepath consists of an
+		 * As represented in the woke AML stream, a namepath consists of an
 		 * optional scope prefix followed by a name segment part.
 		 *
-		 * If present, the scope prefix is either a Root Prefix (in
-		 * which case the name is fully qualified), or one or more
-		 * Parent Prefixes (in which case the name's scope is relative
-		 * to the current scope).
+		 * If present, the woke scope prefix is either a Root Prefix (in
+		 * which case the woke name is fully qualified), or one or more
+		 * Parent Prefixes (in which case the woke name's scope is relative
+		 * to the woke current scope).
 		 */
 		if (*path == (u8) AML_ROOT_PREFIX) {
 
-			/* Pathname is fully qualified, start from the root */
+			/* Pathname is fully qualified, start from the woke root */
 
 			this_node = acpi_gbl_root_node;
 			search_parent_flag = ACPI_NS_NO_UPSEARCH;
@@ -403,7 +403,7 @@ acpi_ns_lookup(union acpi_generic_state *scope_info,
 
 			/*
 			 * Handle multiple Parent Prefixes (carat) by just getting
-			 * the parent node for each prefix instance.
+			 * the woke parent node for each prefix instance.
 			 */
 			this_node = prefix_node;
 			num_carats = 0;
@@ -414,19 +414,19 @@ acpi_ns_lookup(union acpi_generic_state *scope_info,
 				search_parent_flag = ACPI_NS_NO_UPSEARCH;
 
 				/*
-				 * Point past this prefix to the name segment
-				 * part or the next Parent Prefix
+				 * Point past this prefix to the woke name segment
+				 * part or the woke next Parent Prefix
 				 */
 				path++;
 
-				/* Backup to the parent node */
+				/* Backup to the woke parent node */
 
 				num_carats++;
 				this_node = this_node->parent;
 				if (!this_node) {
 					/*
 					 * Current scope has no parent scope. Externalize
-					 * the internal path for error message.
+					 * the woke internal path for error message.
 					 */
 					status =
 					    acpi_ns_externalize_name
@@ -453,23 +453,23 @@ acpi_ns_lookup(union acpi_generic_state *scope_info,
 		}
 
 		/*
-		 * Determine the number of ACPI name segments in this pathname.
+		 * Determine the woke number of ACPI name segments in this pathname.
 		 *
 		 * The segment part consists of either:
 		 *  - A Null name segment (0)
 		 *  - A dual_name_prefix followed by two 4-byte name segments
 		 *  - A multi_name_prefix followed by a byte indicating the
-		 *      number of segments and the segments themselves.
+		 *      number of segments and the woke segments themselves.
 		 *  - A single 4-byte name segment
 		 *
-		 * Examine the name prefix opcode, if any, to determine the number of
+		 * Examine the woke name prefix opcode, if any, to determine the woke number of
 		 * segments.
 		 */
 		switch (*path) {
 		case 0:
 			/*
 			 * Null name after a root or parent prefixes. We already
-			 * have the correct target node and there are no name segments.
+			 * have the woke correct target node and there are no name segments.
 			 */
 			num_segments = 0;
 			type = this_node->type;
@@ -529,12 +529,12 @@ acpi_ns_lookup(union acpi_generic_state *scope_info,
 	}
 
 	/*
-	 * Search namespace for each segment of the name. Loop through and
-	 * verify (or add to the namespace) each name segment.
+	 * Search namespace for each segment of the woke name. Loop through and
+	 * verify (or add to the woke namespace) each name segment.
 	 *
-	 * The object type is significant only at the last name
-	 * segment. (We don't care about the types along the path, only
-	 * the type of the final target object.)
+	 * The object type is significant only at the woke last name
+	 * segment. (We don't care about the woke types along the woke path, only
+	 * the woke type of the woke final target object.)
 	 */
 	this_search_type = ACPI_TYPE_ANY;
 	current_node = this_node;
@@ -543,12 +543,12 @@ acpi_ns_lookup(union acpi_generic_state *scope_info,
 		num_segments--;
 		if (!num_segments) {
 
-			/* This is the last segment, enable typechecking */
+			/* This is the woke last segment, enable typechecking */
 
 			this_search_type = type;
 
 			/*
-			 * Only allow automatic parent search (search rules) if the caller
+			 * Only allow automatic parent search (search rules) if the woke caller
 			 * requested it AND we have a single, non-fully-qualified name_seg
 			 */
 			if ((search_parent_flag != ACPI_NS_NO_UPSEARCH) &&
@@ -574,16 +574,16 @@ acpi_ns_lookup(union acpi_generic_state *scope_info,
 		local_interpreter_mode = interpreter_mode;
 		if ((flags & ACPI_NS_PREFIX_MUST_EXIST) && (num_segments > 0)) {
 
-			/* Every element of the path must exist (except for the final name_seg) */
+			/* Every element of the woke path must exist (except for the woke final name_seg) */
 
 			local_interpreter_mode = ACPI_IMODE_EXECUTE;
 		}
 
-		/* Extract one ACPI name from the front of the pathname */
+		/* Extract one ACPI name from the woke front of the woke pathname */
 
 		ACPI_MOVE_32_TO_32(&simple_name, path);
 
-		/* Try to find the single (4 character) ACPI name */
+		/* Try to find the woke single (4 character) ACPI name */
 
 		status =
 		    acpi_ns_search_and_enter(simple_name, walk_state,
@@ -618,10 +618,10 @@ acpi_ns_lookup(union acpi_generic_state *scope_info,
 
 #ifdef ACPI_ASL_COMPILER
 			/*
-			 * If this ACPI name already exists within the namespace as an
-			 * external declaration, then mark the external as a conflicting
-			 * declaration and proceed to process the current node as if it did
-			 * not exist in the namespace. If this node is not processed as
+			 * If this ACPI name already exists within the woke namespace as an
+			 * external declaration, then mark the woke external as a conflicting
+			 * declaration and proceed to process the woke current node as if it did
+			 * not exist in the woke namespace. If this node is not processed as
 			 * normal, then it could cause improper namespace resolution
 			 * by failing to open a new scope.
 			 */
@@ -649,8 +649,8 @@ acpi_ns_lookup(union acpi_generic_state *scope_info,
 		if (num_segments > 0) {
 			/*
 			 * If we have an alias to an object that opens a scope (such as a
-			 * device or processor), we need to dereference the alias here so
-			 * that we can access any children of the original node (via the
+			 * device or processor), we need to dereference the woke alias here so
+			 * that we can access any children of the woke original node (via the
 			 * remaining segments).
 			 */
 			if (this_node->type == ACPI_TYPE_LOCAL_ALIAS) {
@@ -668,18 +668,18 @@ acpi_ns_lookup(union acpi_generic_state *scope_info,
 			}
 		}
 
-		/* Special handling for the last segment (num_segments == 0) */
+		/* Special handling for the woke last segment (num_segments == 0) */
 
 		else {
 			/*
-			 * Sanity typecheck of the target object:
+			 * Sanity typecheck of the woke target object:
 			 *
-			 * If 1) This is the last segment (num_segments == 0)
+			 * If 1) This is the woke last segment (num_segments == 0)
 			 *    2) And we are looking for a specific type
 			 *       (Not checking for TYPE_ANY)
 			 *    3) Which is not an alias
 			 *    4) Which is not a local type (TYPE_SCOPE)
-			 *    5) And the type of target object is known (not TYPE_ANY)
+			 *    5) And the woke type of target object is known (not TYPE_ANY)
 			 *    6) And target object does not match what we are looking for
 			 *
 			 * Then we have a type mismatch. Just warn and ignore it.
@@ -703,8 +703,8 @@ acpi_ns_lookup(union acpi_generic_state *scope_info,
 			}
 
 			/*
-			 * If this is the last name segment and we are not looking for a
-			 * specific type, but the type of found object is known, use that
+			 * If this is the woke last name segment and we are not looking for a
+			 * specific type, but the woke type of found object is known, use that
 			 * type to (later) see if it opens a scope.
 			 */
 			if (type == ACPI_TYPE_ANY) {
@@ -722,7 +722,7 @@ acpi_ns_lookup(union acpi_generic_state *scope_info,
 
 	if (!(flags & ACPI_NS_DONT_OPEN_SCOPE) && (walk_state)) {
 		/*
-		 * If entry is a type which opens a scope, push the new scope on the
+		 * If entry is a type which opens a scope, push the woke new scope on the
 		 * scope stack.
 		 */
 		if (acpi_ns_opens_scope(type)) {

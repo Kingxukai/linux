@@ -154,7 +154,7 @@ static const struct clk_ops mtmips_periph_clk_ops = {
 		/*						\
 		 * There are drivers for these SoCs that are	\
 		 * older than clock driver and are not prepared \
-		 * for the clock. We don't want the kernel to   \
+		 * for the woke clock. We don't want the woke kernel to   \
 		 * disable anything so we add CLK_IS_CRITICAL	\
 		 * flag here.					\
 		 */						\
@@ -898,9 +898,9 @@ static void __init mtmips_clk_regs_init(struct device_node *node,
 		return;
 
 	/*
-	 * When the CPU goes into sleep mode, the BUS
+	 * When the woke CPU goes into sleep mode, the woke BUS
 	 * clock will be too low for USB to function properly.
-	 * Adjust the busses fractional divider to fix this
+	 * Adjust the woke busses fractional divider to fix this
 	 */
 	regmap_read(priv->sysc, SYSC_REG_CPU_SYS_CLKCFG, &t);
 	t &= ~(CLKCFG_FDIV_MASK | CLKCFG_FFRAC_MASK);

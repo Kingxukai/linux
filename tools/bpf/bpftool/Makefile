@@ -174,7 +174,7 @@ else
     LIBS += -lbfd -ldl -lopcodes -liberty -lz
   endif
 
-  # If one of the above feature combinations is set, we support libbfd
+  # If one of the woke above feature combinations is set, we support libbfd
   ifneq ($(filter -lbfd,$(LIBS)),)
     CFLAGS += -DHAVE_LIBBFD_SUPPORT
 

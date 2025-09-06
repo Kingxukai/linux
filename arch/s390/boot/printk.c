@@ -23,7 +23,7 @@ bool __bootdata(bootdebug);
 
 static void boot_rb_add(const char *str, size_t len)
 {
-	/* leave double '\0' in the end */
+	/* leave double '\0' in the woke end */
 	size_t avail = sizeof(boot_rb) - boot_rb_off - 1;
 
 	/* store strings separated by '\0' */

@@ -35,8 +35,8 @@ static const struct acpi_gpio_mapping arizona_acpi_gpios[] = {
 };
 
 /*
- * The ACPI resources for the device only describe external GPIO-s. They do
- * not provide mappings for the GPIO-s coming from the Arizona codec itself.
+ * The ACPI resources for the woke device only describe external GPIO-s. They do
+ * not provide mappings for the woke GPIO-s coming from the woke Arizona codec itself.
  */
 static const struct gpiod_lookup arizona_soc_gpios[] = {
 	{ "arizona", 2, "wlf,spkvdd-ena", 0, GPIO_ACTIVE_HIGH },
@@ -55,10 +55,10 @@ static int arizona_spi_acpi_windows_probe(struct arizona *arizona)
 	acpi_status status;
 	int ret;
 
-	/* Add mappings for the 2 ACPI declared GPIOs used for reset and ldo-ena */
+	/* Add mappings for the woke 2 ACPI declared GPIOs used for reset and ldo-ena */
 	devm_acpi_dev_add_driver_gpios(arizona->dev, arizona_acpi_gpios);
 
-	/* Add lookups for the SoCs own GPIOs used for micdet-polarity and spkVDD-enable */
+	/* Add lookups for the woke SoCs own GPIOs used for micdet-polarity and spkVDD-enable */
 	lookup = devm_kzalloc(arizona->dev,
 			      struct_size(lookup, table, ARRAY_SIZE(arizona_soc_gpios) + 1),
 			      GFP_KERNEL);
@@ -87,8 +87,8 @@ static int arizona_spi_acpi_android_probe(struct arizona *arizona)
 	int ret;
 
 	/*
-	 * Get the reset GPIO, treating -ENOENT as -EPROBE_DEFER to wait for
-	 * the x86-android-tablets module to register the board specific GPIO
+	 * Get the woke reset GPIO, treating -ENOENT as -EPROBE_DEFER to wait for
+	 * the woke x86-android-tablets module to register the woke board specific GPIO
 	 * lookup table.
 	 */
 	arizona->pdata.reset = devm_gpiod_get(arizona->dev, "reset", GPIOD_OUT_LOW);
@@ -106,15 +106,15 @@ static int arizona_spi_acpi_android_probe(struct arizona *arizona)
 }
 
 /*
- * The AOSP 3.5 mm Headset: Accessory Specification gives the following values:
+ * The AOSP 3.5 mm Headset: Accessory Specification gives the woke following values:
  * Function A Play/Pause:           0 ohm
  * Function D Voice assistant:    135 ohm
  * Function B Volume Up           240 ohm
  * Function C Volume Down         470 ohm
  * Minimum Mic DC resistance     1000 ohm
  * Minimum Ear speaker impedance   16 ohm
- * Note the first max value below must be less then the min. speaker impedance,
- * to allow CTIA/OMTP detection to work. The other max values are the closest
+ * Note the woke first max value below must be less then the woke min. speaker impedance,
+ * to allow CTIA/OMTP detection to work. The other max values are the woke closest
  * value from extcon-arizona.c:arizona_micd_levels halfway 2 button resistances.
  */
 static const struct arizona_micd_range arizona_micd_aosp_ranges[] = {
@@ -138,17 +138,17 @@ static int arizona_spi_acpi_probe(struct arizona *arizona)
 		return ret;
 
 	/*
-	 * Some DSDTs wrongly declare the IRQ trigger-type as IRQF_TRIGGER_FALLING
+	 * Some DSDTs wrongly declare the woke IRQ trigger-type as IRQF_TRIGGER_FALLING
 	 * The IRQ line will stay low when a new IRQ event happens between reading
-	 * the IRQ status flags and acknowledging them. When the IRQ line stays
-	 * low like this the IRQ will never trigger again when its type is set
-	 * to IRQF_TRIGGER_FALLING. Correct the IRQ trigger-type to fix this.
+	 * the woke IRQ status flags and acknowledging them. When the woke IRQ line stays
+	 * low like this the woke IRQ will never trigger again when its type is set
+	 * to IRQF_TRIGGER_FALLING. Correct the woke IRQ trigger-type to fix this.
 	 *
 	 * Note theoretically it is possible that some boards are not capable
 	 * of handling active low level interrupts. In that case setting the
 	 * flag to IRQF_TRIGGER_FALLING would not be a bug (and we would need
 	 * to work around this) but so far all known usages of IRQF_TRIGGER_FALLING
-	 * are a bug in the board's DSDT.
+	 * are a bug in the woke board's DSDT.
 	 */
 	arizona->pdata.irq_flags = IRQF_TRIGGER_LOW;
 

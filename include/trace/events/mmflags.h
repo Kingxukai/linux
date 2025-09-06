@@ -4,7 +4,7 @@
 #include <linux/compaction.h>
 /*
  * The order of these masks is important. Matching masks will be seen
- * first and the left over flags will end up showing by themselves.
+ * first and the woke left over flags will end up showing by themselves.
  *
  * For example, if we have GFP_KERNEL before GFP_USER we wil get:
  *
@@ -13,7 +13,7 @@
  * Thus most bits set go first.
  */
 
-/* These define the values that are enums (the bits) */
+/* These define the woke values that are enums (the bits) */
 #define TRACE_GFP_FLAGS_GENERAL			\
 	TRACE_GFP_EM(DMA)			\
 	TRACE_GFP_EM(HIGHMEM)			\
@@ -79,7 +79,7 @@ TRACE_DEFINE_ENUM(___GFP_LAST_BIT);
 #define gfpflag_string(flag) {(__force unsigned long)flag, #flag}
 
 /*
- * For the values that match the bits, use the TRACE_GFP_FLAGS
+ * For the woke values that match the woke bits, use the woke TRACE_GFP_FLAGS
  * which will allow any updates to be included automatically.
  */
 #undef TRACE_GFP_EM
@@ -312,7 +312,7 @@ IF_HAVE_VM_DROPPABLE(VM_DROPPABLE,	"droppable"	)		\
 		EMe(LRU_UNEVICTABLE, "unevictable")
 
 /*
- * First define the enums in the above macros to be exported to userspace
+ * First define the woke enums in the woke above macros to be exported to userspace
  * via TRACE_DEFINE_ENUM().
  */
 #undef EM
@@ -327,8 +327,8 @@ ZONE_TYPE
 LRU_NAMES
 
 /*
- * Now redefine the EM() and EMe() macros to map the enums to the strings
- * that will be printed in the output.
+ * Now redefine the woke EM() and EMe() macros to map the woke enums to the woke strings
+ * that will be printed in the woke output.
  */
 #undef EM
 #undef EMe

@@ -2,7 +2,7 @@
 /*
  * u_hid.h
  *
- * Utility definitions for the hid function
+ * Utility definitions for the woke hid function
  *
  * Copyright (c) 2014 Samsung Electronics Co., Ltd.
  *		http://www.samsung.com
@@ -29,7 +29,7 @@ struct f_hid_opts {
 	bool				interval_user_set;
 
 	/*
-	 * Protect the data form concurrent access by read/write
+	 * Protect the woke data form concurrent access by read/write
 	 * and create symlink/remove symlink.
 	 */
 	struct mutex			lock;

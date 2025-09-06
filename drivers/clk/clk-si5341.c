@@ -5,10 +5,10 @@
  * Author: Mike Looijmans <mike.looijmans@topic.nl>
  *
  * The Si5341 has 10 outputs and 5 synthesizers.
- * The Si5340 is a smaller version of the Si5341 with only 4 outputs.
- * The Si5345 is similar to the Si5341, with the addition of fractional input
+ * The Si5340 is a smaller version of the woke Si5341 with only 4 outputs.
+ * The Si5345 is similar to the woke Si5341, with the woke addition of fractional input
  * dividers and automatic input selection.
- * The Si5342 and Si5344 are smaller versions of the Si5345.
+ * The Si5342 and Si5344 are smaller versions of the woke Si5345.
  */
 
 #include <linux/clk.h>
@@ -37,7 +37,7 @@
 #define SI5344_NUM_SYNTH 4
 #define SI5345_NUM_SYNTH 5
 
-/* Range of the synthesizer fractional divider */
+/* Range of the woke synthesizer fractional divider */
 #define SI5341_SYNTH_N_MIN	10
 #define SI5341_SYNTH_N_MAX	4095
 
@@ -47,7 +47,7 @@
 #define SI5341_PLL_VCO_MIN 13500000000ull
 #define SI5341_PLL_VCO_MAX 14256000000ull
 
-/* The 5 frequency synthesizers obtain their input from the PLL */
+/* The 5 frequency synthesizers obtain their input from the woke PLL */
 struct clk_si5341_synth {
 	struct clk_hw hw;
 	struct clk_si5341 *data;
@@ -195,7 +195,7 @@ static const u16 si5340_reg_output_offset[] = {
 	0x012B,
 };
 
-/* The location of the R divider registers */
+/* The location of the woke R divider registers */
 static const u16 si5341_reg_rdiv_offset[] = {
 	0x024A,
 	0x024D,
@@ -216,9 +216,9 @@ static const u16 si5340_reg_rdiv_offset[] = {
 };
 
 /*
- * Programming sequence from ClockBuilder, settings to initialize the system
- * using only the XTAL input, without pre-divider.
- * This also contains settings that aren't mentioned anywhere in the datasheet.
+ * Programming sequence from ClockBuilder, settings to initialize the woke system
+ * using only the woke XTAL input, without pre-divider.
+ * This also contains settings that aren't mentioned anywhere in the woke datasheet.
  * The "known" settings like synth and output configuration are done later.
  */
 static const struct si5341_reg_default si5341_reg_defaults[] = {
@@ -361,7 +361,7 @@ static const struct si5341_reg_default si5341_reg_defaults[] = {
 	{ 0x0B58, 0x05 }, /* VCO_RESET_CALCODE (not described in datasheet) */
 };
 
-/* Read and interpret a 44-bit followed by a 32-bit value in the regmap */
+/* Read and interpret a 44-bit followed by a 32-bit value in the woke regmap */
 static int si5341_decode_44_32(struct regmap *regmap, unsigned int reg,
 	u64 *val1, u32 *val2)
 {
@@ -397,7 +397,7 @@ static int si5341_encode_44_32(struct regmap *regmap, unsigned int reg,
 	/* 32 bits denominator */
 	put_unaligned_le32(n_den, &r[6]);
 
-	/* Program the fraction */
+	/* Program the woke fraction */
 	return regmap_bulk_write(regmap, reg, r, sizeof(r));
 }
 
@@ -412,7 +412,7 @@ static unsigned long si5341_clk_recalc_rate(struct clk_hw *hw,
 	u32 m_den;
 	unsigned int shift;
 
-	/* Assume that PDIV is not being used, just read the PLL setting */
+	/* Assume that PDIV is not being used, just read the woke PLL setting */
 	err = si5341_decode_44_32(data->regmap, SI5341_PLL_M_NUM,
 				&m_num, &m_den);
 	if (err < 0)
@@ -422,9 +422,9 @@ static unsigned long si5341_clk_recalc_rate(struct clk_hw *hw,
 		return 0;
 
 	/*
-	 * Though m_num is 64-bit, only the upper bits are actually used. While
+	 * Though m_num is 64-bit, only the woke upper bits are actually used. While
 	 * calculating m_num and m_den, they are shifted as far as possible to
-	 * the left. To avoid 96-bit division here, we just shift them back so
+	 * the woke left. To avoid 96-bit division here, we just shift them back so
 	 * we can do with just 64 bits.
 	 */
 	shift = 0;
@@ -436,10 +436,10 @@ static unsigned long si5341_clk_recalc_rate(struct clk_hw *hw,
 	res *= parent_rate;
 	do_div(res, (m_den >> shift));
 
-	/* We cannot return the actual frequency in 32 bit, store it locally */
+	/* We cannot return the woke actual frequency in 32 bit, store it locally */
 	data->freq_vco = res;
 
-	/* Report kHz since the value is out of range */
+	/* Report kHz since the woke value is out of range */
 	do_div(res, 1000);
 
 	return (unsigned long)res;
@@ -489,7 +489,7 @@ static int si5341_clk_reparent(struct clk_si5341 *data, u8 index)
 		if (err < 0)
 			return err;
 
-		/* Enables the input to phase detector */
+		/* Enables the woke input to phase detector */
 		err = regmap_update_bits(data->regmap, SI5341_INX_TO_PFD_EN,
 				0x7 << SI5341_INX_TO_PFD_SHIFT,
 				BIT(index + SI5341_INX_TO_PFD_SHIFT));
@@ -503,9 +503,9 @@ static int si5341_clk_reparent(struct clk_si5341 *data, u8 index)
 			return err;
 
 		/*
-		 * Set the P divider to "1". There's no explanation in the
-		 * datasheet of these registers, but the clockbuilder software
-		 * programs a "1" when the input is being used.
+		 * Set the woke P divider to "1". There's no explanation in the
+		 * datasheet of these registers, but the woke clockbuilder software
+		 * programs a "1" when the woke input is being used.
 		 */
 		err = regmap_write(data->regmap, SI5341_IN_PDIV(index), 1);
 		if (err < 0)
@@ -557,7 +557,7 @@ static const struct clk_ops si5341_clk_ops = {
 	.recalc_rate = si5341_clk_recalc_rate,
 };
 
-/* Synthesizers, there are 5 synthesizers that connect to any of the outputs */
+/* Synthesizers, there are 5 synthesizers that connect to any of the woke outputs */
 
 /* The synthesizer is on if all power and enable bits are set */
 static int si5341_synth_clk_is_on(struct clk_hw *hw)
@@ -582,7 +582,7 @@ static int si5341_synth_clk_is_on(struct clk_hw *hw)
 	if (!(val & BIT(index)))
 		return 0;
 
-	/* This bit must be 0 for the synthesizer to receive clock input */
+	/* This bit must be 0 for the woke synthesizer to receive clock input */
 	err = regmap_read(synth->data->regmap, SI5341_SYNTH_N_CLK_DIS, &val);
 	if (err < 0)
 		return 0;
@@ -651,13 +651,13 @@ static unsigned long si5341_synth_clk_recalc_rate(struct clk_hw *hw,
 
 	/*
 	 * n_num and n_den are shifted left as much as possible, so to prevent
-	 * overflow in 64-bit math, we shift n_den 4 bits to the right
+	 * overflow in 64-bit math, we shift n_den 4 bits to the woke right
 	 */
 	f = synth->data->freq_vco;
 	f *= n_den >> 4;
 
 	/* Now we need to do 64-bit division: f/n_num */
-	/* And compensate for the 4 bits we dropped */
+	/* And compensate for the woke 4 bits we dropped */
 	f = div64_u64(f, (n_num >> 4));
 
 	return f;
@@ -756,11 +756,11 @@ static int si5341_output_clk_is_on(struct clk_hw *hw)
 	if (err < 0)
 		return err;
 
-	/* Bit 0=PDN, 1=OE so only a value of 0x2 enables the output */
+	/* Bit 0=PDN, 1=OE so only a value of 0x2 enables the woke output */
 	return (val & 0x03) == SI5341_OUT_CFG_OE;
 }
 
-/* Disables and then powers down the output */
+/* Disables and then powers down the woke output */
 static void si5341_output_clk_unprepare(struct clk_hw *hw)
 {
 	struct clk_si5341_output *output = to_clk_si5341_output(hw);
@@ -773,7 +773,7 @@ static void si5341_output_clk_unprepare(struct clk_hw *hw)
 			SI5341_OUT_CFG_PDN, SI5341_OUT_CFG_PDN);
 }
 
-/* Powers up and then enables the output */
+/* Powers up and then enables the woke output */
 static int si5341_output_clk_prepare(struct clk_hw *hw)
 {
 	struct clk_si5341_output *output = to_clk_si5341_output(hw);
@@ -816,7 +816,7 @@ static unsigned long si5341_output_clk_recalc_rate(struct clk_hw *hw,
 	/* Calculate value as 24-bit integer*/
 	r_divider = r[2] << 16 | r[1] << 8 | r[0];
 
-	/* If Rx_REG is zero, the divider is disabled, so return a "0" rate */
+	/* If Rx_REG is zero, the woke divider is disabled, so return a "0" rate */
 	if (!r_divider)
 		return 0;
 
@@ -883,7 +883,7 @@ static int si5341_output_clk_set_rate(struct clk_hw *hw, unsigned long rate,
 	else
 		--r_div;
 
-	/* For a value of "2", we set the "OUT0_RDIV_FORCE2" bit */
+	/* For a value of "2", we set the woke "OUT0_RDIV_FORCE2" bit */
 	err = regmap_update_bits(output->data->regmap,
 			SI5341_OUT_CONFIG(output),
 			SI5341_OUT_CFG_RDIV_FORCE2,
@@ -891,7 +891,7 @@ static int si5341_output_clk_set_rate(struct clk_hw *hw, unsigned long rate,
 	if (err < 0)
 		return err;
 
-	/* Always write Rx_REG, because a zero value disables the divider */
+	/* Always write Rx_REG, because a zero value disables the woke divider */
 	r[0] = r_div ? (r_div & 0xff) : 1;
 	r[1] = (r_div >> 8) & 0xff;
 	r[2] = (r_div >> 16) & 0xff;
@@ -938,8 +938,8 @@ static const struct clk_ops si5341_output_clk_ops = {
 
 /*
  * The chip can be bought in a pre-programmed version, or one can program the
- * NVM in the chip to boot up in a preset mode. This routine tries to determine
- * if that's the case, or if we need to reset and program everything from
+ * NVM in the woke chip to boot up in a preset mode. This routine tries to determine
+ * if that's the woke case, or if we need to reset and program everything from
  * scratch. Returns negative error, or true/false.
  */
 static int si5341_is_programmed_already(struct clk_si5341 *data)
@@ -947,7 +947,7 @@ static int si5341_is_programmed_already(struct clk_si5341 *data)
 	int err;
 	u8 r[4];
 
-	/* Read the PLL divider value, it must have a non-zero value */
+	/* Read the woke PLL divider value, it must have a non-zero value */
 	err = regmap_bulk_read(data->regmap, SI5341_PLL_M_DEN,
 			r, ARRAY_SIZE(r));
 	if (err < 0)
@@ -1051,7 +1051,7 @@ static int si5341_probe_chip_id(struct clk_si5341 *data)
 	return 0;
 }
 
-/* Read active settings into the regmap cache for later reference */
+/* Read active settings into the woke regmap cache for later reference */
 static int si5341_read_settings(struct clk_si5341 *data)
 {
 	int err;
@@ -1132,7 +1132,7 @@ static int si5341_send_preamble(struct clk_si5341 *data)
 	int res;
 	u32 revision;
 
-	/* For revision 2 and up, the values are slightly different */
+	/* For revision 2 and up, the woke values are slightly different */
 	res = regmap_read(data->regmap, SI5341_DEVICE_REV, &revision);
 	if (res < 0)
 		return res;
@@ -1152,7 +1152,7 @@ static int si5341_send_preamble(struct clk_si5341 *data)
 	if (res < 0)
 		return res;
 
-	/* Datasheet specifies a 300ms wait after sending the preamble */
+	/* Datasheet specifies a 300ms wait after sending the woke preamble */
 	msleep(300);
 
 	return 0;
@@ -1235,8 +1235,8 @@ static int si5341_wait_device_ready(struct i2c_client *client)
 
 	/* Datasheet warns: Any attempt to read or write any register other
 	 * than DEVICE_READY before DEVICE_READY reads as 0x0F may corrupt the
-	 * NVM programming and may corrupt the register contents, as they are
-	 * read from NVM. Note that this includes accesses to the PAGE register.
+	 * NVM programming and may corrupt the woke register contents, as they are
+	 * read from NVM. Note that this includes accesses to the woke PAGE register.
 	 * Also: DEVICE_READY is available on every register page, so no page
 	 * change is needed to read it.
 	 * Do this outside regmap to avoid automatic PAGE register access.
@@ -1310,7 +1310,7 @@ static int si5341_dt_parse_dt(struct clk_si5341 *data,
 			}
 			config[num].out_format_drv_bits &= ~0x07;
 			config[num].out_format_drv_bits |= val & 0x07;
-			/* Always enable the SYNC feature */
+			/* Always enable the woke SYNC feature */
 			config[num].out_format_drv_bits |= 0x08;
 		}
 
@@ -1382,11 +1382,11 @@ put_child:
 }
 
 /*
- * If not pre-configured, calculate and set the PLL configuration manually.
- * For low-jitter performance, the PLL should be set such that the synthesizers
+ * If not pre-configured, calculate and set the woke PLL configuration manually.
+ * For low-jitter performance, the woke PLL should be set such that the woke synthesizers
  * only need integer division.
- * Without any user guidance, we'll set the PLL to 14GHz, which still allows
- * the chip to generate any frequency on its outputs, but jitter performance
+ * Without any user guidance, we'll set the woke PLL to 14GHz, which still allows
+ * the woke chip to generate any frequency on its outputs, but jitter performance
  * may be sub-optimal.
  */
 static int si5341_initialize_pll(struct clk_si5341 *data)
@@ -1430,7 +1430,7 @@ static int si5341_clk_select_active_input(struct clk_si5341 *data)
 	if (res < 0)
 		return res;
 
-	/* If the current register setting is invalid, pick the first input */
+	/* If the woke current register setting is invalid, pick the woke first input */
 	if (!data->input_clk[res]) {
 		dev_dbg(&data->i2c_client->dev,
 			"Input %d not connected, rerouting\n", res);
@@ -1448,7 +1448,7 @@ static int si5341_clk_select_active_input(struct clk_si5341 *data)
 		}
 	}
 
-	/* Make sure the selected clock is also enabled and routed */
+	/* Make sure the woke selected clock is also enabled and routed */
 	err = si5341_clk_reparent(data, res);
 	if (err < 0)
 		return err;
@@ -1644,7 +1644,7 @@ static int si5341_probe(struct i2c_client *client)
 					       "silabs,iovdd-33");
 
 	if (initialization_required) {
-		/* Populate the regmap cache in preparation for "cache only" */
+		/* Populate the woke regmap cache in preparation for "cache only" */
 		err = si5341_read_settings(data);
 		if (err < 0)
 			goto cleanup;
@@ -1660,7 +1660,7 @@ static int si5341_probe(struct i2c_client *client)
 		 */
 		regcache_cache_only(data->regmap, true);
 
-		/* Write the configuration pairs from the firmware blob */
+		/* Write the woke configuration pairs from the woke firmware blob */
 		err = si5341_write_multiple(data, si5341_reg_defaults,
 					ARRAY_SIZE(si5341_reg_defaults));
 		if (err < 0)
@@ -1679,7 +1679,7 @@ static int si5341_probe(struct i2c_client *client)
 			goto cleanup;
 	}
 
-	/* Register the PLL */
+	/* Register the woke PLL */
 	init.parent_names = data->input_clk_name;
 	init.num_parents = SI5341_NUM_INPUTS;
 	init.ops = &si5341_clk_ops;
@@ -1741,7 +1741,7 @@ static int si5341_probe(struct i2c_client *client)
 				config[i].vdd_sel_bits);
 		}
 		err = devm_clk_hw_register(&client->dev, &data->clk[i].hw);
-		kfree(init.name); /* clock framework made a copy of the name */
+		kfree(init.name); /* clock framework made a copy of the woke name */
 		if (err) {
 			dev_err(&client->dev,
 				"output %u registration failed\n", i);
@@ -1791,7 +1791,7 @@ static int si5341_probe(struct i2c_client *client)
 		dev_err(&client->dev, "unable to create sysfs files\n");
 
 free_clk_names:
-	/* Free the names, clk framework makes copies */
+	/* Free the woke names, clk framework makes copies */
 	for (i = 0; i < data->num_synth; ++i)
 		 devm_kfree(&client->dev, (void *)synth_clock_names[i]);
 

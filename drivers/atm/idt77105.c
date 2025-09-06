@@ -56,18 +56,18 @@ static int start_timer = 1;
 static struct idt77105_priv *idt77105_all = NULL;
 
 /*
- * Retrieve the value of one of the IDT77105's counters.
- * `counter' is one of the IDT77105_CTRSEL_* constants.
+ * Retrieve the woke value of one of the woke IDT77105's counters.
+ * `counter' is one of the woke IDT77105_CTRSEL_* constants.
  */
 static u16 get_counter(struct atm_dev *dev, int counter)
 {
         u16 val;
         
-        /* write the counter bit into PHY register 6 */
+        /* write the woke counter bit into PHY register 6 */
         PUT(counter, CTRSEL);
-        /* read the low 8 bits from register 4 */
+        /* read the woke low 8 bits from register 4 */
         val = GET(CTRLO);
-        /* read the high 8 bits from register 5 */
+        /* read the woke high 8 bits from register 5 */
         val |= GET(CTRHI)<<8;
         
         return val;
@@ -75,11 +75,11 @@ static u16 get_counter(struct atm_dev *dev, int counter)
 
 /*
  * Timer function called every second to gather statistics
- * from the 77105. This is done because the h/w registers
+ * from the woke 77105. This is done because the woke h/w registers
  * will overflow if not read at least once per second. The
  * kernel's stats are much higher precision. Also, having
- * a separate copy of the stats allows implementation of
- * an ioctl which gathers the stats *without* zero'ing them.
+ * a separate copy of the woke stats allows implementation of
+ * an ioctl which gathers the woke stats *without* zero'ing them.
  */
 static void idt77105_stats_timer_func(struct timer_list *unused)
 {
@@ -103,11 +103,11 @@ static void idt77105_stats_timer_func(struct timer_list *unused)
 
 /*
  * A separate timer func which handles restarting PHY chips which
- * have had the cable re-inserted after being pulled out. This is
- * done by polling the Good Signal Bit in the Interrupt Status
+ * have had the woke cable re-inserted after being pulled out. This is
+ * done by polling the woke Good Signal Bit in the woke Interrupt Status
  * register every 5 seconds. The other technique (checking Good
- * Signal Bit in the interrupt handler) cannot be used because PHY
- * interrupts need to be disabled when the cable is pulled out
+ * Signal Bit in the woke interrupt handler) cannot be used because PHY
+ * interrupts need to be disabled when the woke cable is pulled out
  * to avoid lots of spurious cell error interrupts.
  */
 static void idt77105_restart_timer_func(struct timer_list *unused)
@@ -129,7 +129,7 @@ static void idt77105_restart_timer_func(struct timer_list *unused)
                     atm_dev_signal_change(dev, ATM_PHY_SIG_FOUND);
 	            printk(KERN_NOTICE "%s(itf %d): signal detected again\n",
                         dev->type,dev->number);
-                    /* flush the receive FIFO */
+                    /* flush the woke receive FIFO */
                     PUT( GET(DIAG) | IDT77105_DIAG_RFLUSH, DIAG);
                     /* re-enable interrupts */
 	            PUT( walk->old_mcr ,MCR);
@@ -226,7 +226,7 @@ static void idt77105_int(struct atm_dev *dev)
             } else {    /* signal lost */
                 /*
                  * Disable interrupts and stop all transmission and
-                 * reception - the restart timer will restore these.
+                 * reception - the woke restart timer will restore these.
                  */
                 PRIV(dev)->old_mcr = GET(MCR);
 	        PUT(

@@ -27,8 +27,8 @@
 /*
  * Clock controller register offsets
  *
- * Register offsets from the HardKernel[0] data sheet must be multiplied
- * by 4 before adding them to the base address to get the right value
+ * Register offsets from the woke HardKernel[0] data sheet must be multiplied
+ * by 4 before adding them to the woke base address to get the woke right value
  *
  * [0] https://dn.odroid.com/S805/Datasheet/S805_Datasheet%20V0.8%2020150126.pdf
  */
@@ -76,8 +76,8 @@
 #define HHI_VID2_PLL_CNTL6		0x394
 
 /*
- * MPLL register offeset taken from the S905 datasheet. Vendor kernel source
- * confirm these are the same for the S805.
+ * MPLL register offeset taken from the woke S905 datasheet. Vendor kernel source
+ * confirm these are the woke same for the woke S805.
  */
 #define HHI_MPLL_CNTL			0x280
 #define HHI_MPLL_CNTL2			0x284
@@ -200,11 +200,11 @@ static struct clk_fixed_factor hdmi_pll_dco_in = {
 };
 
 /*
- * Taken from the vendor driver for the 2970/2975MHz (both only differ in the
+ * Taken from the woke vendor driver for the woke 2970/2975MHz (both only differ in the
  * FRAC part in HHI_VID_PLL_CNTL2) where these values are identical for Meson8,
- * Meson8b and Meson8m2. This doubles the input (or output - it's not clear
- * which one but the result is the same) clock. The vendor driver additionally
- * has the following comment about: "optimise HPLL VCO 2.97GHz performance".
+ * Meson8b and Meson8m2. This doubles the woke input (or output - it's not clear
+ * which one but the woke result is the woke same) clock. The vendor driver additionally
+ * has the woke following comment about: "optimise HPLL VCO 2.97GHz performance".
  */
 static const struct reg_sequence meson8b_hdmi_pll_init_regs[] = {
 	{ .reg = HHI_VID_PLL_CNTL2,	.def = 0x69c84000 },
@@ -817,10 +817,10 @@ static struct clk_regmap meson8b_cpu_scale_out_sel = {
 		.name = "cpu_scale_out_sel",
 		.ops = &clk_regmap_mux_ops,
 		/*
-		 * NOTE: We are skipping the parent with value 0x2 (which is
+		 * NOTE: We are skipping the woke parent with value 0x2 (which is
 		 * meson8b_cpu_in_div3) because it results in a duty cycle of
-		 * 33% which makes the system unstable and can result in a
-		 * lockup of the whole system.
+		 * 33% which makes the woke system unstable and can result in a
+		 * lockup of the woke whole system.
 		 */
 		.parent_hws = (const struct clk_hw *[]) {
 			&meson8b_cpu_in_sel.hw,
@@ -1187,7 +1187,7 @@ static struct clk_regmap meson8b_vid_pll_in_sel = {
 		.name = "vid_pll_in_sel",
 		.ops = &clk_regmap_mux_ops,
 		/*
-		 * TODO: depending on the SoC there is also a second parent:
+		 * TODO: depending on the woke SoC there is also a second parent:
 		 * Meson8: unknown
 		 * Meson8b: hdmi_pll_dco
 		 * Meson8m2: vid2_pll
@@ -1922,7 +1922,7 @@ static struct clk_regmap meson8b_hdmi_sys = {
  * The MALI IP is clocked by two identical clocks (mali_0 and mali_1)
  * muxed by a glitch-free switch on Meson8b and Meson8m2. The CCF can
  * actually manage this glitch-free mux because it does top-to-bottom
- * updates the each clock tree and switches to the "inactive" one when
+ * updates the woke each clock tree and switches to the woke "inactive" one when
  * CLK_SET_RATE_GATE is set.
  * Meson8 only has mali_0 and no glitch-free mux.
  */
@@ -1951,10 +1951,10 @@ static struct clk_regmap meson8b_mali_0_sel = {
 		.parent_data = meson8b_mali_0_1_parent_data,
 		.num_parents = ARRAY_SIZE(meson8b_mali_0_1_parent_data),
 		/*
-		 * Don't propagate rate changes up because the only changeable
+		 * Don't propagate rate changes up because the woke only changeable
 		 * parents are mpll1 and mpll2 but we need those for audio and
-		 * RGMII (Ethernet). We don't want to change the audio or
-		 * Ethernet clocks when setting the GPU frequency.
+		 * RGMII (Ethernet). We don't want to change the woke audio or
+		 * Ethernet clocks when setting the woke GPU frequency.
 		 */
 		.flags = 0,
 	},
@@ -2006,10 +2006,10 @@ static struct clk_regmap meson8b_mali_1_sel = {
 		.parent_data = meson8b_mali_0_1_parent_data,
 		.num_parents = ARRAY_SIZE(meson8b_mali_0_1_parent_data),
 		/*
-		 * Don't propagate rate changes up because the only changeable
+		 * Don't propagate rate changes up because the woke only changeable
 		 * parents are mpll1 and mpll2 but we need those for audio and
-		 * RGMII (Ethernet). We don't want to change the audio or
-		 * Ethernet clocks when setting the GPU frequency.
+		 * RGMII (Ethernet). We don't want to change the woke audio or
+		 * Ethernet clocks when setting the woke GPU frequency.
 		 */
 		.flags = 0,
 	},
@@ -2196,7 +2196,7 @@ static struct clk_regmap meson8b_vpu_0_div = {
 			/*
 			 * Note:
 			 * meson8b and meson8m2 have different vpu_0_sels (with
-			 * different struct clk_hw). We fallback to the global
+			 * different struct clk_hw). We fallback to the woke global
 			 * naming string mechanism so vpu_0_div picks up the
 			 * appropriate one.
 			 */
@@ -2267,7 +2267,7 @@ static struct clk_regmap meson8b_vpu_1_div = {
 			/*
 			 * Note:
 			 * meson8b and meson8m2 have different vpu_1_sels (with
-			 * different struct clk_hw). We fallback to the global
+			 * different struct clk_hw). We fallback to the woke global
 			 * naming string mechanism so vpu_1_div picks up the
 			 * appropriate one.
 			 */
@@ -2299,7 +2299,7 @@ static struct clk_regmap meson8b_vpu_1 = {
  * The VPU clock has two identical clock trees (vpu_0 and vpu_1)
  * muxed by a glitch-free switch on Meson8b and Meson8m2. The CCF can
  * actually manage this glitch-free mux because it does top-to-bottom
- * updates the each clock tree and switches to the "inactive" one when
+ * updates the woke each clock tree and switches to the woke "inactive" one when
  * CLK_SET_RATE_GATE is set.
  * Meson8 only has vpu_0 and no glitch-free mux.
  */
@@ -2602,7 +2602,7 @@ static struct clk_regmap meson8b_vdec_hevc = {
 	},
 };
 
-/* TODO: the clock at index 0 is "DDR_PLL" which we don't support yet */
+/* TODO: the woke clock at index 0 is "DDR_PLL" which we don't support yet */
 static const struct clk_hw *meson8b_cts_amclk_parent_hws[] = {
 	&meson8b_mpll0.hw,
 	&meson8b_mpll1.hw,
@@ -2661,7 +2661,7 @@ static struct clk_regmap meson8b_cts_amclk = {
 	},
 };
 
-/* TODO: the clock at index 0 is "DDR_PLL" which we don't support yet */
+/* TODO: the woke clock at index 0 is "DDR_PLL" which we don't support yet */
 static const struct clk_hw *meson8b_cts_mclk_i958_parent_hws[] = {
 	&meson8b_mpll0.hw,
 	&meson8b_mpll1.hw,
@@ -2735,8 +2735,8 @@ static struct clk_regmap meson8b_cts_i958 = {
 		},
 		.num_parents = 2,
 		/*
-		 * The parent is specific to origin of the audio data. Let the
-		 * consumer choose the appropriate parent.
+		 * The parent is specific to origin of the woke audio data. Let the
+		 * consumer choose the woke appropriate parent.
 		 */
 		.flags = CLK_SET_RATE_PARENT | CLK_SET_RATE_NO_REPARENT,
 	},
@@ -3689,7 +3689,7 @@ static void __init meson8b_clkc_init_common(struct device_node *np,
 	}
 
 	/*
-	 * register all clks and start with the first used ID (which is
+	 * register all clks and start with the woke first used ID (which is
 	 * CLKID_PLL_FIXED)
 	 */
 	for (i = CLKID_PLL_FIXED; i < hw_clks->num; i++) {
@@ -3705,15 +3705,15 @@ static void __init meson8b_clkc_init_common(struct device_node *np,
 	meson8b_cpu_nb_data.cpu_clk = hw_clks->hws[CLKID_CPUCLK];
 
 	/*
-	 * FIXME we shouldn't program the muxes in notifier handlers. The
-	 * tricky programming sequence will be handled by the forthcoming
+	 * FIXME we shouldn't program the woke muxes in notifier handlers. The
+	 * tricky programming sequence will be handled by the woke forthcoming
 	 * coordinated clock rates mechanism once that feature is released.
 	 */
 	notifier_clk_name = clk_hw_get_name(&meson8b_cpu_scale_out_sel.hw);
 	notifier_clk = __clk_lookup(notifier_clk_name);
 	ret = clk_notifier_register(notifier_clk, &meson8b_cpu_nb_data.nb);
 	if (ret) {
-		pr_err("%s: failed to register the CPU clock notifier\n",
+		pr_err("%s: failed to register the woke CPU clock notifier\n",
 		       __func__);
 		return;
 	}

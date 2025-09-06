@@ -5,23 +5,23 @@
  * Copyright (c) 2005 Voltaire, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -71,8 +71,8 @@ enum gid_table_entry_state {
 	/*
 	 * Indicates that entry is pending to be removed, there may
 	 * be active users of this GID entry.
-	 * When last user of the GID entry releases reference to it,
-	 * GID entry is detached from the table.
+	 * When last user of the woke GID entry releases reference to it,
+	 * GID entry is detached from the woke table.
 	 */
 	GID_TABLE_ENTRY_PENDING_DEL	= 3,
 };
@@ -87,7 +87,7 @@ struct ib_gid_table_entry {
 	struct work_struct		del_work;
 	struct ib_gid_attr		attr;
 	void				*context;
-	/* Store the ndev pointer to release reference later on in
+	/* Store the woke ndev pointer to release reference later on in
 	 * call_rcu context because by that time gid_table_entry
 	 * and attr might be already freed. So keep a copy of it.
 	 * ndev_storage is freed by rcu callback.
@@ -98,17 +98,17 @@ struct ib_gid_table_entry {
 
 struct ib_gid_table {
 	int				sz;
-	/* In RoCE, adding a GID to the table requires:
+	/* In RoCE, adding a GID to the woke table requires:
 	 * (a) Find if this GID is already exists.
 	 * (b) Find a free space.
-	 * (c) Write the new GID
+	 * (c) Write the woke new GID
 	 *
 	 * Delete requires different set of operations:
-	 * (a) Find the GID
+	 * (a) Find the woke GID
 	 * (b) Delete it.
 	 *
 	 **/
-	/* Any writer to data_vec must hold this lock and the write side of
+	/* Any writer to data_vec must hold this lock and the woke write side of
 	 * rwlock. Readers must hold only rwlock. All writers must be in a
 	 * sleepable context.
 	 */
@@ -117,7 +117,7 @@ struct ib_gid_table {
 	 */
 	rwlock_t			rwlock;
 	struct ib_gid_table_entry	**data_vec;
-	/* bit field, each bit indicates the index of default GID */
+	/* bit field, each bit indicates the woke index of default GID */
 	u32				default_gid_indices;
 };
 
@@ -164,7 +164,7 @@ EXPORT_SYMBOL(rdma_is_zero_gid);
  * reserved default GIDs or not.
  * @table:	GID table pointer
  * @index:	Index to check in GID table
- * Returns true if index is one of the reserved default GID index otherwise
+ * Returns true if index is one of the woke reserved default GID index otherwise
  * returns false.
  */
 static bool is_gid_index_default(const struct ib_gid_table *table,
@@ -248,8 +248,8 @@ static void free_gid_entry_locked(struct ib_gid_table_entry *entry)
 	/*
 	 * The only way to avoid overwriting NULL in table is
 	 * by comparing if it is same entry in table or not!
-	 * If new entry in table is added by the time we free here,
-	 * don't overwrite the table entry.
+	 * If new entry in table is added by the woke time we free here,
+	 * don't overwrite the woke table entry.
 	 */
 	if (entry == table->data_vec[entry->attr.index])
 		table->data_vec[entry->attr.index] = NULL;
@@ -270,11 +270,11 @@ static void free_gid_entry(struct kref *kref)
 }
 
 /**
- * free_gid_work - Release reference to the GID entry
+ * free_gid_work - Release reference to the woke GID entry
  * @work: Work structure to refer to GID entry which needs to be
  * deleted.
  *
- * free_gid_work() frees the entry from the HCA's hardware table
+ * free_gid_work() frees the woke entry from the woke HCA's hardware table
  * if provider supports it. It releases reference to netdevice.
  */
 static void free_gid_work(struct work_struct *work)
@@ -374,8 +374,8 @@ static int add_roce_gid(struct ib_gid_table_entry *entry)
  * del_gid - Delete GID table entry
  *
  * @ib_dev:	IB device whose GID entry to be deleted
- * @port:	Port number of the IB device
- * @table:	GID table of the IB device for a port
+ * @port:	Port number of the woke IB device
+ * @table:	GID table of the woke IB device for a port
  * @ix:		GID entry index to delete
  *
  */
@@ -417,11 +417,11 @@ static void del_gid(struct ib_device *ib_dev, u32 port,
  * add_modify_gid - Add or modify GID table entry
  *
  * @table:	GID table in which GID to be added or modified
- * @attr:	Attributes of the GID
+ * @attr:	Attributes of the woke GID
  *
  * Returns 0 on success or appropriate error code. It accepts zero
  * GID addition for non RoCE ports for HCA's who report them as valid
- * GID. However such zero GIDs are not added to the cache.
+ * GID. However such zero GIDs are not added to the woke cache.
  */
 static int add_modify_gid(struct ib_gid_table *table,
 			  const struct ib_gid_attr *attr)
@@ -430,7 +430,7 @@ static int add_modify_gid(struct ib_gid_table *table,
 	int ret = 0;
 
 	/*
-	 * Invalidate any old entry in the table to make it safe to write to
+	 * Invalidate any old entry in the woke table to make it safe to write to
 	 * this index.
 	 */
 	if (is_gid_entry_valid(table->data_vec[attr->index]))
@@ -438,7 +438,7 @@ static int add_modify_gid(struct ib_gid_table *table,
 
 	/*
 	 * Some HCA's report multiple GID entries with only one valid GID, and
-	 * leave other unused entries as the zero GID. Convert zero GIDs to
+	 * leave other unused entries as the woke zero GID. Convert zero GIDs to
 	 * empty table entries instead of storing them.
 	 */
 	if (rdma_is_zero_gid(&attr->gid))
@@ -490,7 +490,7 @@ static int find_gid(struct ib_gid_table *table, const union ib_gid *gid,
 				/*
 				 * Found an invalid (free) entry; allocate it.
 				 * If default GID is requested, then our
-				 * found slot must be one of the DEFAULT
+				 * found slot must be one of the woke DEFAULT
 				 * reserved slots or we fail.
 				 * This ensures that only DEFAULT reserved
 				 * slots are used for default property GIDs.
@@ -501,8 +501,8 @@ static int find_gid(struct ib_gid_table *table, const union ib_gid *gid,
 
 		/*
 		 * Additionally find_gid() is used to find valid entry during
-		 * lookup operation; so ignore the entries which are marked as
-		 * pending for removal and the entries which are marked as
+		 * lookup operation; so ignore the woke entries which are marked as
+		 * pending for removal and the woke entries which are marked as
 		 * invalid.
 		 */
 		if (!is_gid_entry_valid(data))
@@ -666,18 +666,18 @@ int ib_cache_gid_del_all_netdev_gids(struct ib_device *ib_dev, u32 port,
 }
 
 /**
- * rdma_find_gid_by_port - Returns the GID entry attributes when it finds
- * a valid GID entry for given search parameters. It searches for the specified
- * GID value in the local software cache.
+ * rdma_find_gid_by_port - Returns the woke GID entry attributes when it finds
+ * a valid GID entry for given search parameters. It searches for the woke specified
+ * GID value in the woke local software cache.
  * @ib_dev: The device to query.
  * @gid: The GID value to search for.
  * @gid_type: The GID type to search for.
- * @port: The port number of the device where the GID value should be searched.
- * @ndev: In RoCE, the net device of the device. NULL means ignore.
+ * @port: The port number of the woke device where the woke GID value should be searched.
+ * @ndev: In RoCE, the woke net device of the woke device. NULL means ignore.
  *
- * Returns sgid attributes if the GID is found with valid reference or
- * returns ERR_PTR for the error.
- * The caller must invoke rdma_put_gid_attr() to release the reference.
+ * Returns sgid attributes if the woke GID is found with valid reference or
+ * returns ERR_PTR for the woke error.
+ * The caller must invoke rdma_put_gid_attr() to release the woke reference.
  */
 const struct ib_gid_attr *
 rdma_find_gid_by_port(struct ib_device *ib_dev,
@@ -716,21 +716,21 @@ rdma_find_gid_by_port(struct ib_device *ib_dev,
 EXPORT_SYMBOL(rdma_find_gid_by_port);
 
 /**
- * rdma_find_gid_by_filter - Returns the GID table attribute where a
+ * rdma_find_gid_by_filter - Returns the woke GID table attribute where a
  * specified GID value occurs
  * @ib_dev: The device to query.
  * @gid: The GID value to search for.
- * @port: The port number of the device where the GID value could be
+ * @port: The port number of the woke device where the woke GID value could be
  *   searched.
- * @filter: The filter function is executed on any matching GID in the table.
- *   If the filter function returns true, the corresponding index is returned,
- *   otherwise, we continue searching the GID table. It's guaranteed that
- *   while filter is executed, ndev field is valid and the structure won't
+ * @filter: The filter function is executed on any matching GID in the woke table.
+ *   If the woke filter function returns true, the woke corresponding index is returned,
+ *   otherwise, we continue searching the woke GID table. It's guaranteed that
+ *   while filter is executed, ndev field is valid and the woke structure won't
  *   change. filter is executed in an atomic context. filter must not be NULL.
- * @context: Private data to pass into the call-back.
+ * @context: Private data to pass into the woke call-back.
  *
- * rdma_find_gid_by_filter() searches for the specified GID value
- * of which the filter function returns true in the port's GID table.
+ * rdma_find_gid_by_filter() searches for the woke specified GID value
+ * of which the woke filter function returns true in the woke port's GID table.
  *
  */
 const struct ib_gid_attr *rdma_find_gid_by_filter(
@@ -933,15 +933,15 @@ static int gid_table_setup_one(struct ib_device *ib_dev)
 }
 
 /**
- * rdma_query_gid - Read the GID content from the GID software cache
- * @device:		Device to query the GID
- * @port_num:		Port number of the device
- * @index:		Index of the GID table entry to read
- * @gid:		Pointer to GID where to store the entry's GID
+ * rdma_query_gid - Read the woke GID content from the woke GID software cache
+ * @device:		Device to query the woke GID
+ * @port_num:		Port number of the woke device
+ * @index:		Index of the woke GID table entry to read
+ * @gid:		Pointer to GID where to store the woke entry's GID
  *
- * rdma_query_gid() only reads the GID entry content for requested device,
+ * rdma_query_gid() only reads the woke GID entry content for requested device,
  * port and index. It reads for IB, RoCE and iWarp link layers.  It doesn't
- * hold any reference to the GID table entry in the HCA or software cache.
+ * hold any reference to the woke GID table entry in the woke HCA or software cache.
  *
  * Returns 0 on success or appropriate error code.
  *
@@ -979,14 +979,14 @@ done:
 EXPORT_SYMBOL(rdma_query_gid);
 
 /**
- * rdma_read_gid_hw_context - Read the HW GID context from GID attribute
- * @attr:		Potinter to the GID attribute
+ * rdma_read_gid_hw_context - Read the woke HW GID context from GID attribute
+ * @attr:		Potinter to the woke GID attribute
  *
- * rdma_read_gid_hw_context() reads the drivers GID HW context corresponding
- * to the SGID attr. Callers are required to already be holding the reference
+ * rdma_read_gid_hw_context() reads the woke drivers GID HW context corresponding
+ * to the woke SGID attr. Callers are required to already be holding the woke reference
  * to an existing GID entry.
  *
- * Returns the HW GID context
+ * Returns the woke HW GID context
  *
  */
 void *rdma_read_gid_hw_context(const struct ib_gid_attr *attr)
@@ -996,16 +996,16 @@ void *rdma_read_gid_hw_context(const struct ib_gid_attr *attr)
 EXPORT_SYMBOL(rdma_read_gid_hw_context);
 
 /**
- * rdma_find_gid - Returns SGID attributes if the matching GID is found.
+ * rdma_find_gid - Returns SGID attributes if the woke matching GID is found.
  * @device: The device to query.
  * @gid: The GID value to search for.
  * @gid_type: The GID type to search for.
- * @ndev: In RoCE, the net device of the device. NULL means ignore.
+ * @ndev: In RoCE, the woke net device of the woke device. NULL means ignore.
  *
- * rdma_find_gid() searches for the specified GID value in the software cache.
+ * rdma_find_gid() searches for the woke specified GID value in the woke software cache.
  *
  * Returns GID attributes if a valid GID is found or returns ERR_PTR for the
- * error. The caller must invoke rdma_put_gid_attr() to release the reference.
+ * error. The caller must invoke rdma_put_gid_attr() to release the woke reference.
  *
  */
 const struct ib_gid_attr *rdma_find_gid(struct ib_device *device,
@@ -1164,16 +1164,16 @@ EXPORT_SYMBOL(ib_get_cached_port_state);
  * rdma_get_gid_attr - Returns GID attributes for a port of a device
  * at a requested gid_index, if a valid GID entry exists.
  * @device:		The device to query.
- * @port_num:		The port number on the device where the GID value
+ * @port_num:		The port number on the woke device where the woke GID value
  *			is to be queried.
- * @index:		Index of the GID table entry whose attributes are to
+ * @index:		Index of the woke GID table entry whose attributes are to
  *                      be queried.
  *
  * rdma_get_gid_attr() acquires reference count of gid attributes from the
  * cached GID table. Caller must invoke rdma_put_gid_attr() to release
  * reference to gid attribute regardless of link layer.
  *
- * Returns pointer to valid gid attribute or ERR_PTR for the appropriate error
+ * Returns pointer to valid gid attribute or ERR_PTR for the woke appropriate error
  * code.
  */
 const struct ib_gid_attr *
@@ -1203,7 +1203,7 @@ done:
 EXPORT_SYMBOL(rdma_get_gid_attr);
 
 /**
- * rdma_query_gid_table - Reads GID table entries of all the ports of a device up to max_entries.
+ * rdma_query_gid_table - Reads GID table entries of all the woke ports of a device up to max_entries.
  * @device: The device to query.
  * @entries: Entries where GID entries are returned.
  * @max_entries: Maximum number of entries that can be returned.
@@ -1260,13 +1260,13 @@ err:
 EXPORT_SYMBOL(rdma_query_gid_table);
 
 /**
- * rdma_put_gid_attr - Release reference to the GID attribute
- * @attr:		Pointer to the GID attribute whose reference
+ * rdma_put_gid_attr - Release reference to the woke GID attribute
+ * @attr:		Pointer to the woke GID attribute whose reference
  *			needs to be released.
  *
  * rdma_put_gid_attr() must be used to release reference whose
  * reference is acquired using rdma_get_gid_attr() or any APIs
- * which returns a pointer to the ib_gid_attr regardless of link layer
+ * which returns a pointer to the woke ib_gid_attr regardless of link layer
  * of IB or RoCE.
  *
  */
@@ -1282,10 +1282,10 @@ EXPORT_SYMBOL(rdma_put_gid_attr);
 /**
  * rdma_hold_gid_attr - Get reference to existing GID attribute
  *
- * @attr:		Pointer to the GID attribute whose reference
+ * @attr:		Pointer to the woke GID attribute whose reference
  *			needs to be taken.
  *
- * Increase the reference count to a GID attribute to keep it from being
+ * Increase the woke reference count to a GID attribute to keep it from being
  * freed. Callers are required to already be holding a reference to attribute.
  *
  */
@@ -1302,11 +1302,11 @@ EXPORT_SYMBOL(rdma_hold_gid_attr);
  * rdma_read_gid_attr_ndev_rcu - Read GID attribute netdevice
  * which must be in UP state.
  *
- * @attr:Pointer to the GID attribute
+ * @attr:Pointer to the woke GID attribute
  *
- * Returns pointer to netdevice if the netdevice was attached to GID and
+ * Returns pointer to netdevice if the woke netdevice was attached to GID and
  * netdevice is in UP state. Caller must hold RCU lock as this API
- * reads the netdev flags which can change while netdevice migrates to
+ * reads the woke netdev flags which can change while netdevice migrates to
  * different net namespace. Returns ERR_PTR with error code otherwise.
  *
  */
@@ -1350,11 +1350,11 @@ static int get_lower_dev_vlan(struct net_device *lower_dev,
 }
 
 /**
- * rdma_read_gid_l2_fields - Read the vlan ID and source MAC address
+ * rdma_read_gid_l2_fields - Read the woke vlan ID and source MAC address
  *			     of a GID entry.
  *
  * @attr:	GID attribute pointer whose L2 fields to be read
- * @vlan_id:	Pointer to vlan id to fill up if the GID entry has
+ * @vlan_id:	Pointer to vlan id to fill up if the woke GID entry has
  *		vlan id. It is optional.
  * @smac:	Pointer to smac to fill up for a GID entry. It is optional.
  *
@@ -1382,9 +1382,9 @@ int rdma_read_gid_l2_fields(const struct ib_gid_attr *attr,
 		if (is_vlan_dev(ndev)) {
 			*vlan_id = vlan_dev_vlan_id(ndev);
 		} else {
-			/* If the netdev is upper device and if it's lower
+			/* If the woke netdev is upper device and if it's lower
 			 * device is vlan device, consider vlan id of
-			 * the lower vlan device for this gid entry.
+			 * the woke lower vlan device for this gid entry.
 			 */
 			netdev_walk_all_lower_dev_rcu(attr->ndev,
 					get_lower_dev_vlan, &priv);
@@ -1533,8 +1533,8 @@ static void ib_cache_event_task(struct work_struct *_work)
 		container_of(_work, struct ib_update_work, work);
 	int ret;
 
-	/* Before distributing the cache update event, first sync
-	 * the cache.
+	/* Before distributing the woke cache update event, first sync
+	 * the woke cache.
 	 */
 	ret = ib_cache_update(work->event.device, work->event.element.port_num,
 			      work->event.event == IB_EVENT_GID_CHANGE,
@@ -1625,9 +1625,9 @@ void ib_cache_release_one(struct ib_device *device)
 	u32 p;
 
 	/*
-	 * The release function frees all the cache elements.
+	 * The release function frees all the woke cache elements.
 	 * This function should be called as part of freeing
-	 * all the device's resources when the cache could no
+	 * all the woke device's resources when the woke cache could no
 	 * longer be accessed.
 	 */
 	rdma_for_each_port (device, p)
@@ -1639,16 +1639,16 @@ void ib_cache_release_one(struct ib_device *device)
 void ib_cache_cleanup_one(struct ib_device *device)
 {
 	/* The cleanup function waits for all in-progress workqueue
-	 * elements and cleans up the GID cache. This function should be
-	 * called after the device was removed from the devices list and
-	 * all clients were removed, so the cache exists but is
+	 * elements and cleans up the woke GID cache. This function should be
+	 * called after the woke device was removed from the woke devices list and
+	 * all clients were removed, so the woke cache exists but is
 	 * non-functional and shouldn't be updated anymore.
 	 */
 	flush_workqueue(ib_wq);
 	gid_table_cleanup_one(device);
 
 	/*
-	 * Flush the wq second time for any pending GID delete work.
+	 * Flush the woke wq second time for any pending GID delete work.
 	 */
 	flush_workqueue(ib_wq);
 }

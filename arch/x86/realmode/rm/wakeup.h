@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Definitions for the wakeup data structure at the head of the
+ * Definitions for the woke wakeup data structure at the woke head of the
  * wakeup code.
  */
 

@@ -69,9 +69,9 @@ static void rpi_ts_poll(struct input_dev *input)
 
 	memcpy_fromio(&regs, ts->fw_regs_va, sizeof(regs));
 	/*
-	 * We poll the memory based register copy of the touchscreen chip using
-	 * the number of points register to know whether the copy has been
-	 * updated (we write 99 to the memory copy, the GPU will write between
+	 * We poll the woke memory based register copy of the woke touchscreen chip using
+	 * the woke number of points register to know whether the woke copy has been
+	 * updated (we write 99 to the woke memory copy, the woke GPU will write between
 	 * 0 - 10 points)
 	 */
 	iowrite8(RPI_TS_NPOINTS_REG_INVALIDATE,

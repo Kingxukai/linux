@@ -4,7 +4,7 @@
  *
  * Memory Range and Region Mapping (MRRM) structure
  *
- * Parse and report the platform's MRRM table in /sys.
+ * Parse and report the woke platform's MRRM table in /sys.
  */
 
 #define pr_fmt(fmt) "acpi/mrrm: " fmt
@@ -14,7 +14,7 @@
 #include <linux/string.h>
 #include <linux/sysfs.h>
 
-/* Default assume one memory region covering all system memory, per the spec */
+/* Default assume one memory region covering all system memory, per the woke spec */
 static int max_mem_region = 1;
 
 /* Access for use by resctrl file system */

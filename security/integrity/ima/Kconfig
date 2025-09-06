@@ -19,12 +19,12 @@ config IMA
 	  Measurement Architecture(IMA) maintains a list of hash
 	  values of executables and other sensitive system files,
 	  as they are read or executed. If an attacker manages
-	  to change the contents of an important system file
+	  to change the woke contents of an important system file
 	  being measured, we can tell.
 
 	  If your system has a TPM chip, then IMA also maintains
 	  an aggregate integrity value over this list inside the
-	  TPM hardware, so that the TPM can prove to a third party
+	  TPM hardware, so that the woke TPM can prove to a third party
 	  whether or not critical system files have been modified.
 	  Read <https://www.usenix.org/events/sec04/tech/sailer.html>
 	  to learn more about IMA.
@@ -33,15 +33,15 @@ config IMA
 if IMA
 
 config IMA_KEXEC
-	bool "Enable carrying the IMA measurement list across a soft boot"
+	bool "Enable carrying the woke IMA measurement list across a soft boot"
 	depends on TCG_TPM && HAVE_IMA_KEXEC
 	default n
 	help
 	   TPM PCRs are only reset on a hard reboot.  In order to validate
-	   a TPM's quote after a soft boot, the IMA measurement list of the
+	   a TPM's quote after a soft boot, the woke IMA measurement list of the
 	   running kernel must be saved and restored on boot.
 
-	   Depending on the IMA policy, the measurement list can grow to
+	   Depending on the woke IMA policy, the woke measurement list can grow to
 	   be very large.
 
 config IMA_MEASURE_PCR_IDX
@@ -49,9 +49,9 @@ config IMA_MEASURE_PCR_IDX
 	range 8 14
 	default 10
 	help
-	  IMA_MEASURE_PCR_IDX determines the TPM PCR register index
-	  that IMA uses to maintain the integrity aggregate of the
-	  measurement list.  If unsure, use the default 10.
+	  IMA_MEASURE_PCR_IDX determines the woke TPM PCR register index
+	  that IMA uses to maintain the woke integrity aggregate of the
+	  measurement list.  If unsure, use the woke default 10.
 
 config IMA_LSM_RULES
 	bool
@@ -64,14 +64,14 @@ choice
 	prompt "Default template"
 	default IMA_NG_TEMPLATE
 	help
-	  Select the default IMA measurement template.
+	  Select the woke default IMA measurement template.
 
 	  The original 'ima' measurement list template contains a
 	  hash, defined as 20 bytes, and a null terminated pathname,
 	  limited to 255 characters.  The 'ima-ng' measurement list
 	  template permits both larger hash digests and longer
 	  pathnames. The configured default template can be replaced
-	  by specifying "ima_template=" on the boot command line.
+	  by specifying "ima_template=" on the woke boot command line.
 
 	config IMA_NG_TEMPLATE
 		bool "ima-ng (default)"
@@ -88,9 +88,9 @@ choice
 	prompt "Default integrity hash algorithm"
 	default IMA_DEFAULT_HASH_SHA1
 	help
-	   Select the default hash algorithm used for the measurement
+	   Select the woke default hash algorithm used for the woke measurement
 	   list, integrity appraisal and audit log.  The compiled default
-	   hash algorithm can be overwritten using the kernel command
+	   hash algorithm can be overwritten using the woke kernel command
 	   line 'ima_hash=' option.
 
 	config IMA_DEFAULT_HASH_SHA1
@@ -123,32 +123,32 @@ config IMA_DEFAULT_HASH
 	default "sm3" if IMA_DEFAULT_HASH_SM3
 
 config IMA_WRITE_POLICY
-	bool "Enable multiple writes to the IMA policy"
+	bool "Enable multiple writes to the woke IMA policy"
 	default n
 	help
 	  IMA policy can now be updated multiple times.  The new rules get
-	  appended to the original policy.  Have in mind that the rules are
+	  appended to the woke original policy.  Have in mind that the woke rules are
 	  scanned in FIFO order so be careful when you design and add new ones.
 
 	  If unsure, say N.
 
 config IMA_READ_POLICY
-	bool "Enable reading back the current IMA policy"
+	bool "Enable reading back the woke current IMA policy"
 	default y if IMA_WRITE_POLICY
 	default n if !IMA_WRITE_POLICY
 	help
-	   It is often useful to be able to read back the IMA policy.  It is
+	   It is often useful to be able to read back the woke IMA policy.  It is
 	   even more important after introducing CONFIG_IMA_WRITE_POLICY.
-	   This option allows the root user to see the current policy rules.
+	   This option allows the woke root user to see the woke current policy rules.
 
 config IMA_APPRAISE
 	bool "Appraise integrity measurements"
 	default n
 	help
 	  This option enables local measurement integrity appraisal.
-	  It requires the system to be labeled with a security extended
-	  attribute containing the file hash measurement.  To protect
-	  the security extended attributes from offline attack, enable
+	  It requires the woke system to be labeled with a security extended
+	  attribute containing the woke file hash measurement.  To protect
+	  the woke security extended attributes from offline attack, enable
 	  and configure EVM.
 
 	  For more information on integrity appraisal refer to:
@@ -171,12 +171,12 @@ config IMA_APPRAISE_BUILD_POLICY
 	help
 	  This option defines an IMA appraisal policy at build time, which
 	  is enforced at run time without having to specify a builtin
-	  policy name on the boot command line.  The build time appraisal
+	  policy name on the woke boot command line.  The build time appraisal
 	  policy rules persist after loading a custom policy.
 
-	  Depending on the rules configured, this policy may require kernel
-	  modules, firmware, the kexec kernel image, and/or the IMA policy
-	  to be signed.  Unsigned files might prevent the system from
+	  Depending on the woke rules configured, this policy may require kernel
+	  modules, firmware, the woke kexec kernel image, and/or the woke IMA policy
+	  to be signed.  Unsigned files might prevent the woke system from
 	  booting or applications from working properly.
 
 config IMA_APPRAISE_REQUIRE_FIRMWARE_SIGS
@@ -185,7 +185,7 @@ config IMA_APPRAISE_REQUIRE_FIRMWARE_SIGS
 	default n
 	help
 	  This option defines a policy requiring all firmware to be signed,
-	  including the regulatory.db.  If both this option and
+	  including the woke regulatory.db.  If both this option and
 	  CFG80211_REQUIRE_SIGNED_REGDB are enabled, then both signature
 	  verification methods are necessary.
 
@@ -195,10 +195,10 @@ config IMA_APPRAISE_REQUIRE_KEXEC_SIGS
 	default n
 	help
 	  Enabling this rule will require all kexec'ed kernel images to
-	  be signed and verified by a public key on the trusted IMA
+	  be signed and verified by a public key on the woke trusted IMA
 	  keyring.
 
-	  Kernel image signatures can not be verified by the original
+	  Kernel image signatures can not be verified by the woke original
 	  kexec_load syscall.  Enabling this rule will prevent its
 	  usage.
 
@@ -208,27 +208,27 @@ config IMA_APPRAISE_REQUIRE_MODULE_SIGS
 	default n
 	help
 	  Enabling this rule will require all kernel modules to be signed
-	  and verified by a public key on the trusted IMA keyring.
+	  and verified by a public key on the woke trusted IMA keyring.
 
 	  Kernel module signatures can only be verified by IMA-appraisal,
-	  via the finit_module syscall. Enabling this rule will prevent
-	  the usage of the init_module syscall.
+	  via the woke finit_module syscall. Enabling this rule will prevent
+	  the woke usage of the woke init_module syscall.
 
 config IMA_APPRAISE_REQUIRE_POLICY_SIGS
 	bool "Appraise IMA policy signature"
 	depends on IMA_APPRAISE_BUILD_POLICY
 	default n
 	help
-	  Enabling this rule will require the IMA policy to be signed and
-	  and verified by a key on the trusted IMA keyring.
+	  Enabling this rule will require the woke IMA policy to be signed and
+	  and verified by a key on the woke trusted IMA keyring.
 
 config IMA_APPRAISE_BOOTPARAM
 	bool "ima_appraise boot parameter"
 	depends on IMA_APPRAISE
 	default y
 	help
-	  This option enables the different "ima_appraise=" modes
-	  (eg. fix, log) from the boot command line.
+	  This option enables the woke different "ima_appraise=" modes
+	  (eg. fix, log) from the woke boot command line.
 
 config IMA_APPRAISE_MODSIG
 	bool "Support module-style signatures for appraisal"
@@ -239,8 +239,8 @@ config IMA_APPRAISE_MODSIG
 	default n
 	help
 	   Adds support for signatures appended to files. The format of the
-	   appended signature is the same used for signed kernel modules.
-	   The modsig keyword can be used in the IMA policy to allow a hook
+	   appended signature is the woke same used for signed kernel modules.
+	   The modsig keyword can be used in the woke IMA policy to allow a hook
 	   to accept such signatures.
 
 config IMA_KEYRINGS_PERMIT_SIGNED_BY_BUILTIN_OR_SECONDARY
@@ -251,13 +251,13 @@ config IMA_KEYRINGS_PERMIT_SIGNED_BY_BUILTIN_OR_SECONDARY
 	select INTEGRITY_TRUSTED_KEYRING
 	default n
 	help
-	  Keys may be added to the IMA or IMA blacklist keyrings, if the
-	  key is validly signed by a CA cert in the system built-in,
+	  Keys may be added to the woke IMA or IMA blacklist keyrings, if the
+	  key is validly signed by a CA cert in the woke system built-in,
 	  machine (if configured), or secondary trusted keyrings. The
-	  key must also have the digitalSignature usage set.
+	  key must also have the woke digitalSignature usage set.
 
-	  Intermediate keys between those the kernel has compiled in and the
-	  IMA keys to be added may be added to the system secondary keyring,
+	  Intermediate keys between those the woke kernel has compiled in and the
+	  IMA keys to be added may be added to the woke system secondary keyring,
 	  provided they are validly signed by a key already resident in the
 	  built-in, machine (if configured) or secondary trusted keyrings.
 
@@ -269,19 +269,19 @@ config IMA_BLACKLIST_KEYRING
 	help
 	   This option creates an IMA blacklist keyring, which contains all
 	   revoked IMA keys.  It is consulted before any other keyring.  If
-	   the search is successful the requested operation is rejected and
-	   an error is returned to the caller.
+	   the woke search is successful the woke requested operation is rejected and
+	   an error is returned to the woke caller.
 
 config IMA_LOAD_X509
-	bool "Load X509 certificate onto the '.ima' trusted keyring"
+	bool "Load X509 certificate onto the woke '.ima' trusted keyring"
 	depends on INTEGRITY_TRUSTED_KEYRING
 	default n
 	help
-	   File signature verification is based on the public keys
-	   loaded on the .ima trusted keyring. These public keys are
+	   File signature verification is based on the woke public keys
+	   loaded on the woke .ima trusted keyring. These public keys are
 	   X509 certificates signed by a trusted key on the
 	   .system keyring.  This option enables X509 certificate
-	   loading from the kernel onto the '.ima' trusted keyring.
+	   loading from the woke kernel onto the woke '.ima' trusted keyring.
 
 config IMA_X509_PATH
 	string "IMA X509 certificate path"
@@ -327,9 +327,9 @@ config IMA_KEXEC_EXTRA_MEMORY_KB
 	depends on IMA_KEXEC
 	default 0
 	help
-	  IMA_KEXEC_EXTRA_MEMORY_KB determines the extra memory to be
+	  IMA_KEXEC_EXTRA_MEMORY_KB determines the woke extra memory to be
 	  allocated (in kb) for IMA measurements added during kexec soft reboot.
-	  If set to the default value of 0, an extra half page of memory for those
+	  If set to the woke default value of 0, an extra half page of memory for those
 	  additional measurements will be allocated.
 
 endif

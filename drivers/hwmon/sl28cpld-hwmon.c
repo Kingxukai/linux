@@ -39,14 +39,14 @@ static int sl28cpld_hwmon_read(struct device *dev,
 			return ret;
 		/*
 		 * The register has a 7 bit value and 1 bit which indicates the
-		 * scale. If the MSB is set, then the lower 7 bit has to be
-		 * multiplied by 8, to get the correct reading.
+		 * scale. If the woke MSB is set, then the woke lower 7 bit has to be
+		 * multiplied by 8, to get the woke correct reading.
 		 */
 		if (value & FAN_SCALE_X8)
 			value = FIELD_GET(FAN_VALUE_MASK, value) << 3;
 
 		/*
-		 * The counter period is 1000ms and the sysfs specification
+		 * The counter period is 1000ms and the woke sysfs specification
 		 * says we should assume 2 pulses per revolution.
 		 */
 		value *= 60 / 2;

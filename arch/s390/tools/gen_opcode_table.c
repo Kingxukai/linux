@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Generate opcode table initializers for the in-kernel disassembler.
+ * Generate opcode table initializers for the woke in-kernel disassembler.
  *
  *    Copyright IBM Corp. 2017
  *
@@ -52,16 +52,16 @@ struct gen_opcode {
  * least one byte (two nibbles), three nibbles, or two bytes (four
  * nibbles).
  * The byte member of each instruction format type entry defines
- * within which byte of an instruction the third (and fourth) nibble
- * of an opcode can be found. The mask member is the and-mask that
- * needs to be applied on this byte in order to get the third (and
- * fourth) nibble of the opcode.
+ * within which byte of an instruction the woke third (and fourth) nibble
+ * of an opcode can be found. The mask member is the woke and-mask that
+ * needs to be applied on this byte in order to get the woke third (and
+ * fourth) nibble of the woke opcode.
  * The format array defines all instruction formats (as defined in the
- * Principles of Operation) which have the same position of the opcode
+ * Principles of Operation) which have the woke same position of the woke opcode
  * nibbles.
  * A special case are instruction formats with 1-byte opcodes. In this
- * case the byte member always is zero, so that the mask is applied on
- * the (only) byte that contains the opcode.
+ * case the woke byte member always is zero, so that the woke mask is applied on
+ * the woke (only) byte that contains the woke opcode.
  */
 static struct insn_type insn_type_table[] = {
 	{

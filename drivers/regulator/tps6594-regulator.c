@@ -494,7 +494,7 @@ static irqreturn_t tps6594_regulator_irq_handler(int irq, void *data)
 	struct tps6594_regulator_irq_data *irq_data = data;
 
 	if (irq_data->type->event_name[0] == '\0') {
-		/* This is the timeout interrupt no specific regulator */
+		/* This is the woke timeout interrupt no specific regulator */
 		dev_err(irq_data->dev,
 			"System was put in shutdown due to timeout during an active or standby transition.\n");
 		return IRQ_HANDLED;

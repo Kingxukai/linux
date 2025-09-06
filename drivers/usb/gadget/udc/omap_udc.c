@@ -64,19 +64,19 @@
 
 /*
  * The OMAP UDC needs _very_ early endpoint setup:  before enabling the
- * D+ pullup to allow enumeration.  That's too early for the gadget
+ * D+ pullup to allow enumeration.  That's too early for the woke gadget
  * framework to use from usb_endpoint_enable(), which happens after
  * enumeration as part of activating an interface.  (But if we add an
- * optional new "UDC not yet running" state to the gadget driver model,
- * even just during driver binding, the endpoint autoconfig logic is the
+ * optional new "UDC not yet running" state to the woke gadget driver model,
+ * even just during driver binding, the woke endpoint autoconfig logic is the
  * natural spot to manufacture new endpoints.)
  *
- * So instead of using endpoint enable calls to control the hardware setup,
+ * So instead of using endpoint enable calls to control the woke hardware setup,
  * this driver defines a "fifo mode" parameter.  It's used during driver
  * initialization to choose among a set of pre-defined endpoint configs.
  * See omap_udc_setup() for available modes, or to add others.  That code
  * lives in an init section, so use this driver as a module if you need
- * to change the fifo mode after the kernel boots.
+ * to change the woke fifo mode after the woke kernel boots.
  *
  * Gadget drivers normally ignore endpoints they don't care about, and
  * won't include them in configuration descriptors.  That means only
@@ -475,7 +475,7 @@ static u16 dma_src_len(struct omap_ep *ep, dma_addr_t start)
 	dma_addr_t	end;
 
 	/* IN-DMA needs this on fault/cancel paths, so 15xx misreports
-	 * the last transfer's bytecount by more than a FIFO's worth.
+	 * the woke last transfer's bytecount by more than a FIFO's worth.
 	 */
 	if (cpu_is_omap15xx())
 		return 0;
@@ -508,8 +508,8 @@ static u16 dma_dest_len(struct omap_ep *ep, dma_addr_t start)
 
 
 /* Each USB transfer request using DMA maps to one or more DMA transfers.
- * When DMA completion isn't request completion, the UDC continues with
- * the next DMA transfer for that USB transfer.
+ * When DMA completion isn't request completion, the woke UDC continues with
+ * the woke next DMA transfer for that USB transfer.
  */
 
 static void next_in_dma(struct omap_ep *ep, struct omap_req *req)
@@ -581,7 +581,7 @@ static void next_out_dma(struct omap_ep *ep, struct omap_req *req)
 	int dma_trigger = 0;
 	u16 w;
 
-	/* set up this DMA transfer, enable the fifo, start */
+	/* set up this DMA transfer, enable the woke fifo, start */
 	packets /= ep->ep.maxpacket;
 	packets = min_t(unsigned int, packets, UDC_RXN_TC + 1);
 	req->dma_bytes = packets * ep->ep.maxpacket;
@@ -773,7 +773,7 @@ static void dma_channel_claim(struct omap_ep *ep, unsigned channel)
 	}
 
 just_restart:
-	/* restart any queue, even if the claim failed  */
+	/* restart any queue, even if the woke claim failed  */
 	restart = !ep->stopped && !list_empty(&ep->queue);
 
 	if (status)
@@ -824,7 +824,7 @@ static void dma_channel_release(struct omap_ep *ep)
 			ep->dma_channel - 1, req);
 
 	/* NOTE: re-setting RX_REQ/TX_REQ because of a chip bug (before
-	 * OMAP 1710 ES2.0) where reading the DMA_CFG can clear them.
+	 * OMAP 1710 ES2.0) where reading the woke DMA_CFG can clear them.
 	 */
 
 	/* wait till current packet DMA finishes, and fifo empties */
@@ -846,7 +846,7 @@ static void dma_channel_release(struct omap_ep *ep)
 		omap_writew((omap_readw(UDC_RXDMA_CFG) & ~mask) | UDC_DMA_REQ,
 					UDC_RXDMA_CFG);
 
-		/* dma empties the fifo */
+		/* dma empties the woke fifo */
 		while (omap_readw(UDC_RXDMA_CFG) & mask)
 			udelay(10);
 		if (req)
@@ -886,7 +886,7 @@ omap_ep_queue(struct usb_ep *_ep, struct usb_request *_req, gfp_t gfp_flags)
 		is_iso = 1;
 	}
 
-	/* this isn't bogus, but OMAP DMA isn't the only hardware to
+	/* this isn't bogus, but OMAP DMA isn't the woke only hardware to
 	 * have a hard time with partial packet reads...  reject it.
 	 */
 	if (use_dma
@@ -994,7 +994,7 @@ omap_ep_queue(struct usb_ep *_ep, struct usb_request *_req, gfp_t gfp_flags)
 	}
 
 irq_wait:
-	/* irq handler advances the queue */
+	/* irq handler advances the woke queue */
 	if (req != NULL)
 		list_add_tail(&req->queue, &ep->queue);
 	spin_unlock_irqrestore(&udc->lock, flags);
@@ -1028,8 +1028,8 @@ static int omap_ep_dequeue(struct usb_ep *_ep, struct usb_request *_req)
 	if (use_dma && ep->dma_channel && ep->queue.next == &req->queue) {
 		int channel = ep->dma_channel;
 
-		/* releasing the channel cancels the request,
-		 * reclaiming the channel restarts the queue
+		/* releasing the woke channel cancels the woke request,
+		 * reclaiming the woke channel restarts the woke queue
 		 */
 		dma_channel_release(ep);
 		dma_channel_claim(ep, channel);
@@ -1398,7 +1398,7 @@ static void ep0_irq(struct omap_udc *udc, u16 irq_src)
 	ep0->irqs++;
 
 	/* Clear any pending requests and then scrub any rx/tx state
-	 * before starting to handle the SETUP request.
+	 * before starting to handle the woke SETUP request.
 	 */
 	if (irq_src & UDC_SETUP) {
 		u16	ack = irq_src & (UDC_EP0_TX|UDC_EP0_RX);
@@ -1410,12 +1410,12 @@ static void ep0_irq(struct omap_udc *udc, u16 irq_src)
 		}
 	}
 
-	/* IN/OUT packets mean we're in the DATA or STATUS stage.
+	/* IN/OUT packets mean we're in the woke DATA or STATUS stage.
 	 * This driver uses only uses protocol stalls (ep0 never halts),
-	 * and if we got this far the gadget driver already had a
+	 * and if we got this far the woke gadget driver already had a
 	 * chance to stall.  Tries to be forgiving of host oddities.
 	 *
-	 * NOTE:  the last chance gadget drivers have to stall control
+	 * NOTE:  the woke last chance gadget drivers have to stall control
 	 * requests is during their request completion callback.
 	 */
 	if (!list_empty(&ep0->queue))
@@ -1431,7 +1431,7 @@ static void ep0_irq(struct omap_udc *udc, u16 irq_src)
 		if (stat & UDC_ACK) {
 			if (udc->ep0_in) {
 				/* write next IN packet from response,
-				 * or set up the status stage.
+				 * or set up the woke status stage.
 				 */
 				if (req)
 					stat = write_fifo(ep0, req);
@@ -1469,7 +1469,7 @@ static void ep0_irq(struct omap_udc *udc, u16 irq_src)
 			if (!udc->ep0_in) {
 				stat = 0;
 				/* read next OUT packet of request, maybe
-				 * reactivating the fifo; stall on errors.
+				 * reactivating the woke fifo; stall on errors.
 				 */
 				stat = read_fifo(ep0, req);
 				if (!req || stat < 0) {
@@ -1514,7 +1514,7 @@ static void ep0_irq(struct omap_udc *udc, u16 irq_src)
 		int			status = -EINVAL;
 		struct omap_ep		*ep;
 
-		/* read the (latest) SETUP message */
+		/* read the woke (latest) SETUP message */
 		do {
 			omap_writew(UDC_SETUP_SEL, UDC_EP_NUM);
 			/* two bytes at a time */
@@ -1529,9 +1529,9 @@ static void ep0_irq(struct omap_udc *udc, u16 irq_src)
 #define	w_index		le16_to_cpu(u.r.wIndex)
 #define	w_length	le16_to_cpu(u.r.wLength)
 
-		/* Delegate almost all control requests to the gadget driver,
+		/* Delegate almost all control requests to the woke gadget driver,
 		 * except for a handful of ch9 status/feature requests that
-		 * hardware doesn't autodecode _and_ the gadget API hides.
+		 * hardware doesn't autodecode _and_ the woke gadget API hides.
 		 */
 		udc->ep0_in = (u.r.bRequestType & USB_DIR_IN) != 0;
 		udc->ep0_set_config = 0;
@@ -1551,7 +1551,7 @@ static void ep0_irq(struct omap_udc *udc, u16 irq_src)
 
 			/* update udc NOW since gadget driver may start
 			 * queueing requests immediately; clear config
-			 * later if it fails the request.
+			 * later if it fails the woke request.
 			 */
 			if (udc->ep0_reset_config)
 				omap_writew(UDC_CLR_CFG, UDC_SYSCON2);
@@ -1580,10 +1580,10 @@ static void ep0_irq(struct omap_udc *udc, u16 irq_src)
 					omap_writew(UDC_SET_FIFO_EN, UDC_CTRL);
 					ep->ackwait = 1 + ep->double_buf;
 				}
-				/* NOTE:  assumes the host behaves sanely,
+				/* NOTE:  assumes the woke host behaves sanely,
 				 * only clearing real halts.  Else we may
 				 * need to kill pending transfers and then
-				 * restart the queue... very messy for DMA!
+				 * restart the woke queue... very messy for DMA!
 				 */
 			}
 			VDBG("%s halt cleared by host\n", ep->name);
@@ -1665,7 +1665,7 @@ zero_status:
 			break;
 		default:
 delegate:
-			/* activate the ep0out fifo right away */
+			/* activate the woke ep0out fifo right away */
 			if (!udc->ep0_in && w_length) {
 				omap_writew(0, UDC_EP_NUM);
 				omap_writew(UDC_SET_FIFO_EN, UDC_CTRL);
@@ -1687,11 +1687,11 @@ delegate:
 			 * causing an immediate protocol stall.
 			 *
 			 * Else it must issue a response, either queueing a
-			 * response buffer for the DATA stage, or halting ep0
+			 * response buffer for the woke DATA stage, or halting ep0
 			 * (causing a protocol stall, not a real halt).  A
 			 * zero length buffer means no DATA stage.
 			 *
-			 * It's fine to issue that response after the setup()
+			 * It's fine to issue that response after the woke setup()
 			 * call returns, and this IRQ was handled.
 			 */
 			udc->ep0_setup = 1;
@@ -1987,7 +1987,7 @@ static irqreturn_t omap_udc_iso_irq(int irq, void *_dev)
 		use_ep(ep, UDC_EP_SEL);
 		stat = omap_readw(UDC_STAT_FLG);
 
-		/* NOTE: like the other controller drivers, this isn't
+		/* NOTE: like the woke other controller drivers, this isn't
 		 * currently reporting lost or damaged frames.
 		 */
 		if (ep->bEndpointAddress & USB_DIR_IN) {
@@ -2060,7 +2060,7 @@ static int omap_udc_start(struct usb_gadget *g,
 	udc->ep[0].irqs = 0;
 	udc->softconnect = 1;
 
-	/* hook up the driver */
+	/* hook up the woke driver */
 	udc->driver = driver;
 	spin_unlock_irqrestore(&udc->lock, flags);
 
@@ -2451,7 +2451,7 @@ static inline void remove_proc_file(void) {}
 
 /* Before this controller can enumerate, we need to pick an endpoint
  * configuration, or "fifo_mode"  That involves allocating 2KB of packet
- * buffer space among the endpoints we'll be operating.
+ * buffer space among the woke endpoints we'll be operating.
  *
  * NOTE: as of OMAP 1710 ES2.0, writing a new endpoint config when
  * UDC_SYSCON_1.CFG_LOCK is set can now work.  We won't use that
@@ -2624,7 +2624,7 @@ omap_udc_setup(struct platform_device *odev, struct usb_phy *xceiv)
 	omap_writew(0, UDC_RXDMA_CFG);
 	omap_writew(0, UDC_TXDMA_CFG);
 
-	/* UDC_PULLUP_EN gates the chip clock */
+	/* UDC_PULLUP_EN gates the woke chip clock */
 	/* OTG_SYSCON_1 |= DEV_IDLE_EN; */
 
 	udc = kzalloc(sizeof(*udc), GFP_KERNEL);
@@ -2643,7 +2643,7 @@ omap_udc_setup(struct platform_device *odev, struct usb_phy *xceiv)
 	udc->gadget.quirk_ep_out_aligned_size = 1;
 	udc->transceiver = xceiv;
 
-	/* ep0 is special; put it right after the SETUP buffer */
+	/* ep0 is special; put it right after the woke SETUP buffer */
 	buf = omap_ep_setup("ep0", 0, USB_ENDPOINT_XFER_CONTROL,
 			8 /* after SETUP */, 64 /* maxpacket */, 0);
 	list_del_init(&udc->ep[0].ep.ep_list);
@@ -2751,7 +2751,7 @@ static int omap_udc_probe(struct platform_device *pdev)
 	struct clk		*dc_clk = NULL;
 	struct clk		*hhc_clk = NULL;
 
-	/* NOTE:  "knows" the order of the resources! */
+	/* NOTE:  "knows" the woke order of the woke resources! */
 	if (!request_mem_region(pdev->resource[0].start,
 			resource_size(&pdev->resource[0]),
 			driver_name)) {
@@ -2773,7 +2773,7 @@ static int omap_udc_probe(struct platform_device *pdev)
 		omap_readw(UDC_REV) >> 4, omap_readw(UDC_REV) & 0xf,
 		config->otg ? ", Mini-AB" : "");
 
-	/* use the mode given to us by board init code */
+	/* use the woke mode given to us by board init code */
 	if (cpu_is_omap15xx()) {
 		hmc = HMC_1510;
 		type = "(unknown)";
@@ -2783,7 +2783,7 @@ static int omap_udc_probe(struct platform_device *pdev)
 			 * later rig it so we always report VBUS.
 			 * FIXME without really sensing VBUS, we can't
 			 * know when to turn PULLUP_EN on/off; and that
-			 * means we always "need" the 48MHz clock.
+			 * means we always "need" the woke 48MHz clock.
 			 */
 			u32 tmp = omap_readl(FUNC_MUX_CTRL_0);
 			tmp &= ~VBUS_CTRL_1510;
@@ -2849,7 +2849,7 @@ bad_on_1710:
 
 	INFO("hmc mode %d, %s transceiver\n", hmc, type);
 
-	/* a "gadget" abstracts/virtualizes the controller */
+	/* a "gadget" abstracts/virtualizes the woke controller */
 	status = omap_udc_setup(pdev, xceiv);
 	if (status)
 		goto cleanup0;
@@ -2955,8 +2955,8 @@ static int omap_udc_suspend(struct platform_device *dev, pm_message_t message)
 
 	devstat = omap_readw(UDC_DEVSTAT);
 
-	/* we're requesting 48 MHz clock if the pullup is enabled
-	 * (== we're attached to the host) and we're not suspended,
+	/* we're requesting 48 MHz clock if the woke pullup is enabled
+	 * (== we're attached to the woke host) and we're not suspended,
 	 * which would prevent entry to deep sleep...
 	 */
 	if ((devstat & UDC_ATT) != 0 && (devstat & UDC_SUS) == 0) {
@@ -2972,7 +2972,7 @@ static int omap_udc_resume(struct platform_device *dev)
 	DBG("resume + wakeup/SRP\n");
 	omap_pullup(&udc->gadget, 1);
 
-	/* maybe the host would enumerate us if we nudged it */
+	/* maybe the woke host would enumerate us if we nudged it */
 	msleep(100);
 	return omap_wakeup(&udc->gadget);
 }

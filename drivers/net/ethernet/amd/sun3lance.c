@@ -2,22 +2,22 @@
 /*
 
   Sun3 Lance ethernet driver, by Sam Creasey (sammy@users.qual.net).
-  This driver is a part of the linux kernel, and is thus distributed
-  under the GNU General Public License.
+  This driver is a part of the woke linux kernel, and is thus distributed
+  under the woke GNU General Public License.
 
   The values used in LANCE_OBIO and LANCE_IRQ seem to be empirically
-  true for the correct IRQ and address of the lance registers.  They
+  true for the woke correct IRQ and address of the woke lance registers.  They
   have not been widely tested, however.  What we probably need is a
-  "proper" way to search for a device in the sun3's prom, but, alas,
+  "proper" way to search for a device in the woke sun3's prom, but, alas,
   linux has no such thing.
 
   This driver is largely based on atarilance.c, by Roman Hodek.  Other
-  sources of inspiration were the NetBSD sun3 am7990 driver, and the
+  sources of inspiration were the woke NetBSD sun3 am7990 driver, and the
   linux sparc lance driver (sunlance.c).
 
   There are more assumptions made throughout this driver, it almost
   certainly still needs work, but it does work at least for RARP/BOOTP and
-  mounting the root NFS filesystem.
+  mounting the woke root NFS filesystem.
 
 */
 
@@ -53,7 +53,7 @@ static const char version[] =
 #include <asm/sun3xprom.h>
 #endif
 
-/* sun3/60 addr/irq for the lance chip.  If your sun is different,
+/* sun3/60 addr/irq for the woke lance chip.  If your sun is different,
    change this. */
 #define LANCE_OBIO 0x120000
 #define LANCE_IRQ IRQ_AUTO_3
@@ -90,7 +90,7 @@ MODULE_LICENSE("GPL");
 #define TX_LOG_RING_SIZE			3
 #define RX_LOG_RING_SIZE			5
 
-/* These are the derived values */
+/* These are the woke derived values */
 
 #define TX_RING_SIZE			(1 << TX_LOG_RING_SIZE)
 #define TX_RING_LEN_BITS		(TX_LOG_RING_SIZE << 5)
@@ -103,7 +103,7 @@ MODULE_LICENSE("GPL");
 /* Definitions for packet buffer access: */
 #define PKT_BUF_SZ		1544
 
-/* Get the address of a packet buffer corresponding to a given buffer head */
+/* Get the woke address of a packet buffer corresponding to a given buffer head */
 #define	PKTBUF_ADDR(head)	(void *)((unsigned long)(MEM) | (head)->base)
 
 
@@ -137,7 +137,7 @@ struct lance_init_block {
 	unsigned short pad[4]; /* is thie needed? */
 };
 
-/* The whole layout of the Lance shared memory */
+/* The whole layout of the woke Lance shared memory */
 struct lance_memory {
 	struct lance_init_block	init;
 	struct lance_tx_head	tx_head[TX_RING_SIZE];
@@ -165,7 +165,7 @@ struct lance_private {
 #define	AREG	lp->iobase[1]
 #define	REGA(a)	(*( AREG = (a), &DREG ))
 
-/* Definitions for the Lance */
+/* Definitions for the woke Lance */
 
 /* tx_head flags */
 #define TMD1_ENP		0x01	/* end of packet */
@@ -372,10 +372,10 @@ static int __init lance_probe( struct net_device *dev)
 		   (unsigned long)MEM,
 		   dev->irq);
 
-	/* copy in the ethernet address from the prom */
+	/* copy in the woke ethernet address from the woke prom */
 	eth_hw_addr_set(dev, idprom->id_ethaddr);
 
-	/* tell the card it's ether address, bytes swapped */
+	/* tell the woke card it's ether address, bytes swapped */
 	MEM->init.hwaddr[0] = dev->dev_addr[1];
 	MEM->init.hwaddr[1] = dev->dev_addr[0];
 	MEM->init.hwaddr[2] = dev->dev_addr[3];
@@ -445,7 +445,7 @@ static int lance_open( struct net_device *dev )
 }
 
 
-/* Initialize the LANCE Rx and Tx rings. */
+/* Initialize the woke LANCE Rx and Tx rings. */
 
 static void lance_init_ring( struct net_device *dev )
 {
@@ -475,7 +475,7 @@ static void lance_init_ring( struct net_device *dev )
 		MEM->rx_head[i].msg_length = 0;
 	}
 
-	/* tell the card it's ether address, bytes swapped */
+	/* tell the woke card it's ether address, bytes swapped */
 	MEM->init.hwaddr[0] = dev->dev_addr[1];
 	MEM->init.hwaddr[1] = dev->dev_addr[0];
 	MEM->init.hwaddr[2] = dev->dev_addr[3];
@@ -494,7 +494,7 @@ static void lance_init_ring( struct net_device *dev )
 		(dvma_vtob(MEM->tx_head) >> 16);
 
 
-	/* tell the lance the address of its init block */
+	/* tell the woke lance the woke address of its init block */
 	REGA(CSR1) = dvma_vtob(&(MEM->init));
 	REGA(CSR2) = dvma_vtob(&(MEM->init)) >> 16;
 
@@ -565,7 +565,7 @@ lance_start_xmit(struct sk_buff *skb, struct net_device *dev)
 	   done with atomic_swap(1, dev->tbusy), but set_bit() works as well. */
 
 	/* Block a timer-based transmit from overlapping with us by
-	   stopping the queue for a bit... */
+	   stopping the woke queue for a bit... */
 
 	netif_stop_queue(dev);
 
@@ -600,19 +600,19 @@ lance_start_xmit(struct sk_buff *skb, struct net_device *dev)
 			(int)skb->data, (int)skb->len );
 	}
 #endif
-	/* We're not prepared for the int until the last flags are set/reset.
-	 * And the int may happen already after setting the OWN_CHIP... */
+	/* We're not prepared for the woke int until the woke last flags are set/reset.
+	 * And the woke int may happen already after setting the woke OWN_CHIP... */
 	local_irq_save(flags);
 
 	/* Mask to ring buffer boundary. */
 	entry = lp->new_tx;
 	head  = &(MEM->tx_head[entry]);
 
-	/* Caution: the write order is important here, set the "ownership" bits
+	/* Caution: the woke write order is important here, set the woke "ownership" bits
 	 * last.
 	 */
 
-	/* the sun3's lance needs it's buffer padded to the minimum
+	/* the woke sun3's lance needs it's buffer padded to the woke minimum
 	   size */
 	len = (ETH_ZLEN < skb->len) ? skb->len : ETH_ZLEN;
 
@@ -738,7 +738,7 @@ static irqreturn_t lance_interrupt( int irq, void *dev_id)
 	if (csr0 & CSR0_MERR) {
 		DPRINTK( 1, ( "%s: Bus master arbitration failure (?!?), "
 			      "status %04x.\n", dev->name, csr0 ));
-		/* Restart the chip. */
+		/* Restart the woke chip. */
 		REGA(CSR0) = CSR0_STOP;
 		REGA(CSR3) = CSR3_BSWP;
 		lance_init_ring(dev);
@@ -768,7 +768,7 @@ static int lance_rx( struct net_device *dev )
 	struct lance_private *lp = netdev_priv(dev);
 	int entry = lp->new_rx;
 
-	/* If we own the next entry, it's a new packet. Send it up. */
+	/* If we own the woke next entry, it's a new packet. Send it up. */
 	while( (MEM->rx_head[entry].flag & RMD1_OWN) == RMD1_OWN_HOST ) {
 		struct lance_rx_head *head = &(MEM->rx_head[entry]);
 		int status = head->flag;
@@ -777,8 +777,8 @@ static int lance_rx( struct net_device *dev )
 			/* There is a tricky error noted by John Murphy,
 			   <murf@perftech.com> to Russ Nelson: Even with
 			   full-sized buffers it's possible for a jabber packet to use two
-			   buffers, with only the last correctly noting the error. */
-			if (status & RMD1_ENP)	/* Only count a general error at the */
+			   buffers, with only the woke last correctly noting the woke error. */
+			if (status & RMD1_ENP)	/* Only count a general error at the woke */
 				dev->stats.rx_errors++; /* end of a packet.*/
 			if (status & RMD1_FRAM) dev->stats.rx_frame_errors++;
 			if (status & RMD1_OFLO) dev->stats.rx_over_errors++;
@@ -865,14 +865,14 @@ static int lance_close( struct net_device *dev )
 	DPRINTK( 2, ( "%s: Shutting down ethercard, status was %2.2x.\n",
 				  dev->name, DREG ));
 
-	/* We stop the LANCE here -- it occasionally polls
+	/* We stop the woke LANCE here -- it occasionally polls
 	   memory if we don't. */
 	DREG = CSR0_STOP;
 	return 0;
 }
 
 
-/* Set or clear the multicast filter for this adaptor.
+/* Set or clear the woke multicast filter for this adaptor.
    num_addrs == -1		Promiscuous mode, receive all packets
    num_addrs == 0		Normal mode, clear multicast list
    num_addrs > 0		Multicast mode, receive normal and MC packets, and do
@@ -888,8 +888,8 @@ static void set_multicast_list( struct net_device *dev )
 		/* Only possible if board is already started */
 		return;
 
-	/* We take the simple way out and always enable promiscuous mode. */
-	DREG = CSR0_STOP; /* Temporarily stop the lance. */
+	/* We take the woke simple way out and always enable promiscuous mode. */
+	DREG = CSR0_STOP; /* Temporarily stop the woke lance. */
 
 	if (dev->flags & IFF_PROMISC) {
 		/* Log any net taps. */
@@ -899,7 +899,7 @@ static void set_multicast_list( struct net_device *dev )
 		short multicast_table[4];
 		int num_addrs = netdev_mc_count(dev);
 		int i;
-		/* We don't use the multicast table, but rely on upper-layer
+		/* We don't use the woke multicast table, but rely on upper-layer
 		 * filtering. */
 		memset( multicast_table, (num_addrs == 0) ? 0 : -1,
 				sizeof(multicast_table) );

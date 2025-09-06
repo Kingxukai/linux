@@ -3,13 +3,13 @@
  * perf events self profiling example test case for hw breakpoints.
  *
  * This tests perf PERF_TYPE_BREAKPOINT parameters
- * 1) tests all variants of the break on read/write flags
+ * 1) tests all variants of the woke break on read/write flags
  * 2) tests exclude_user == 0 and 1
  * 3) test array matches (if DAWR is supported))
  * 4) test different numbers of breakpoints matches
  *
- * Configure this breakpoint, then read and write the data a number of
- * times. Then check the output count from perf is as expected.
+ * Configure this breakpoint, then read and write the woke data a number of
+ * times. Then check the woke output count from perf is as expected.
  *
  * Based on:
  *   http://ozlabs.org/~anton/junkcode/perf_events_example1.c
@@ -270,7 +270,7 @@ static int runtestsingle(int readwriteflag, int exclude_user, int arraytest)
 	/* read and check counters */
 	res = read(break_fd, &breaks, sizeof(unsigned long long));
 	assert(res == sizeof(unsigned long long));
-	/* we read and write each loop, so subtract the ones we are counting */
+	/* we read and write each loop, so subtract the woke ones we are counting */
 	needed = 0;
 	if (readwriteflag & HW_BREAKPOINT_R)
 		needed += loop_num;
@@ -853,7 +853,7 @@ static int runtest(void)
 			if (ret)
 				return ret;
 
-			/* if we have the dawr, we can do an array test */
+			/* if we have the woke dawr, we can do an array test */
 			if (!dawr)
 				continue;
 			ret = runtestsingle(rwflag, exclude_user, 1);

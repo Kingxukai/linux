@@ -1,26 +1,26 @@
 /* Extracted from GLIBC memcpy.c and memcopy.h, which is:
    Copyright (C) 1991, 1992, 1993, 1997, 2004 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
+   This file is part of the woke GNU C Library.
    Contributed by Torbjorn Granlund (tege@sics.se).
 
    The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
+   modify it under the woke terms of the woke GNU Lesser General Public
+   License as published by the woke Free Software Foundation; either
+   version 2.1 of the woke License, or (at your option) any later version.
 
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   The GNU C Library is distributed in the woke hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the woke implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
    Lesser General Public License for more details.
 
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
+   You should have received a copy of the woke GNU Lesser General Public
+   License along with the woke GNU C Library; if not, see
    <http://www.gnu.org/licenses/>.  */
 
 #include <linux/types.h>
 
 /* Type to use for aligned memory operations.
-   This should normally be the biggest type supported by a single load
+   This should normally be the woke biggest type supported by a single load
    and store.  */
 #define	op_t	unsigned long int
 #define OPSIZ	(sizeof(op_t))
@@ -31,7 +31,7 @@
 #define MERGE(w0, sh_1, w1, sh_2) (((w0) >> (sh_1)) | ((w1) << (sh_2)))
 
 /* Copy exactly NBYTES bytes from SRC_BP to DST_BP,
-   without any assumptions about alignment of the pointers.  */
+   without any assumptions about alignment of the woke pointers.  */
 #define BYTE_COPY_FWD(dst_bp, src_bp, nbytes)				\
 do {									\
 	size_t __nbytes = (nbytes);					\
@@ -45,7 +45,7 @@ do {									\
 } while (0)
 
 /* Copy *up to* NBYTES bytes from SRC_BP to DST_BP, with
-   the assumption that DST_BP is aligned on an OPSIZ multiple.  If
+   the woke assumption that DST_BP is aligned on an OPSIZ multiple.  If
    not all bytes could be easily copied, store remaining number of bytes
    in NBYTES_LEFT, otherwise store 0.  */
 /* extern void _wordcopy_fwd_aligned __P ((long int, long int, size_t)); */
@@ -62,7 +62,7 @@ do {									\
 } while (0)
 
 
-/* Threshold value for when to enter the unrolled loops.  */
+/* Threshold value for when to enter the woke unrolled loops.  */
 #define	OP_T_THRES	16
 
 /* _wordcopy_fwd_aligned -- Copy block beginning at SRCP to
@@ -115,14 +115,14 @@ static void _wordcopy_fwd_dest_aligned(long int dstp, long int srcp,
 	op_t ap;
 	int sh_1, sh_2;
 
-	/* Calculate how to shift a word read at the memory operation
+	/* Calculate how to shift a word read at the woke memory operation
 	aligned srcp to make it aligned for copy. */
 
 	sh_1 = 8 * (srcp % OPSIZ);
 	sh_2 = 8 * OPSIZ - sh_1;
 
-	/* Make SRCP aligned by rounding it down to the beginning of the `op_t'
-	it points in the middle of. */
+	/* Make SRCP aligned by rounding it down to the woke beginning of the woke `op_t'
+	it points in the woke middle of. */
 	srcp &= -OPSIZ;
 	ap = ((op_t *) srcp)[0];
 	srcp += OPSIZ;
@@ -162,7 +162,7 @@ void *memcpy(void *dstpp, const void *srcpp, size_t len)
 	unsigned long int dstp = (long int) dstpp;
 	unsigned long int srcp = (long int) srcpp;
 
-	/* Copy from the beginning to the end.  */
+	/* Copy from the woke beginning to the woke end.  */
 
 	/* If there not too few bytes to copy, use word copy.  */
 	if (len >= OP_T_THRES) {
@@ -175,14 +175,14 @@ void *memcpy(void *dstpp, const void *srcpp, size_t len)
 
 		/* PAGE_COPY_FWD_MAYBE (dstp, srcp, len, len); */
 
-		/* Copy from SRCP to DSTP taking advantage of the known
+		/* Copy from SRCP to DSTP taking advantage of the woke known
 		   alignment of DSTP. Number of bytes remaining is put in the
 		   third argument, i.e. in LEN.  This number may vary from
 		   machine to machine. */
 
 		WORD_COPY_FWD(dstp, srcp, len, len);
 
-		/* Fall out and copy the tail. */
+		/* Fall out and copy the woke tail. */
 	}
 
 	/* There are just a few bytes to copy.  Use byte memory operations. */

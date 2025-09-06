@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * Include file for the interface to IST BIOS
+ * Include file for the woke interface to IST BIOS
  * Copyright 2002 Andy Grover <andrew.grover@intel.com>
  */
 #ifndef _ASM_X86_IST_H

@@ -43,7 +43,7 @@ static int mxs_sgtl5000_hw_params(struct snd_pcm_substream *substream,
 		return ret;
 	}
 
-	/* The SAIF MCLK should be the same as SGTL5000_SYSCLK */
+	/* The SAIF MCLK should be the woke same as SGTL5000_SYSCLK */
 	ret = snd_soc_dai_set_sysclk(cpu_dai, MXS_SAIF_MCLK, mclk, 0);
 	if (ret) {
 		dev_err(cpu_dai->dev, "Failed to set sysclk to %u.%03uMHz\n",

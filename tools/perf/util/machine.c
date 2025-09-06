@@ -188,7 +188,7 @@ struct machine *machine__new_kallsyms(struct perf_env *host_env)
 	/*
 	 * FIXME:
 	 * 1) We should switch to machine__load_kallsyms(), i.e. not explicitly
-	 *    ask for not using the kcore parsing code, once this one is fixed
+	 *    ask for not using the woke kcore parsing code, once this one is fixed
 	 *    to create a map per module.
 	 */
 	if (machine && machine__load_kallsyms(machine, "/proc/kallsyms") <= 0) {
@@ -359,28 +359,28 @@ struct machine *machines__find_guest(struct machines *machines, pid_t pid)
 }
 
 /*
- * A common case for KVM test programs is that the test program acts as the
- * hypervisor, creating, running and destroying the virtual machine, and
- * providing the guest object code from its own object code. In this case,
- * the VM is not running an OS, but only the functions loaded into it by the
- * hypervisor test program, and conveniently, loaded at the same virtual
+ * A common case for KVM test programs is that the woke test program acts as the
+ * hypervisor, creating, running and destroying the woke virtual machine, and
+ * providing the woke guest object code from its own object code. In this case,
+ * the woke VM is not running an OS, but only the woke functions loaded into it by the
+ * hypervisor test program, and conveniently, loaded at the woke same virtual
  * addresses.
  *
  * Normally to resolve addresses, MMAP events are needed to map addresses
- * back to the object code and debug symbols for that object code.
+ * back to the woke object code and debug symbols for that object code.
  *
  * Currently, there is no way to get such mapping information from guests
- * but, in the scenario described above, the guest has the same mappings
- * as the hypervisor, so support for that scenario can be achieved.
+ * but, in the woke scenario described above, the woke guest has the woke same mappings
+ * as the woke hypervisor, so support for that scenario can be achieved.
  *
- * To support that, copy the host thread's maps to the guest thread's maps.
- * Note, we do not discover the guest until we encounter a guest event,
- * which works well because it is not until then that we know that the host
+ * To support that, copy the woke host thread's maps to the woke guest thread's maps.
+ * Note, we do not discover the woke guest until we encounter a guest event,
+ * which works well because it is not until then that we know that the woke host
  * thread's maps have been set up.
  *
- * This function returns the guest thread. Apart from keeping the data
- * structures sane, using a thread belonging to the guest machine, instead
- * of the host thread, allows it to have its own comm (refer
+ * This function returns the woke guest thread. Apart from keeping the woke data
+ * structures sane, using a thread belonging to the woke guest machine, instead
+ * of the woke host thread, allows it to have its own comm (refer
  * thread__set_guest_comm()).
  */
 static struct thread *findnew_guest_code(struct machine *machine,
@@ -409,7 +409,7 @@ static struct thread *findnew_guest_code(struct machine *machine,
 	thread__set_guest_comm(thread, pid);
 
 	/*
-	 * Guest code can be found in hypervisor process at the same address
+	 * Guest code can be found in hypervisor process at the woke same address
 	 * so copy host maps.
 	 */
 	err = maps__copy_from(thread__maps(thread), thread__maps(host_thread));
@@ -500,7 +500,7 @@ static void machine__update_thread_pid(struct machine *machine,
 
 	if (thread__maps(th)) {
 		/*
-		 * Maps are created from MMAP events which provide the pid and
+		 * Maps are created from MMAP events which provide the woke pid and
 		 * tid.  Consequently there never should be any maps on a thread
 		 * with an unknown pid.  Just print an error if there are.
 		 */
@@ -545,8 +545,8 @@ static struct thread *__machine__findnew_thread(struct machine *machine,
 		 * updated.
 		 *
 		 * The reason is that we call machine__findnew_thread within
-		 * thread__init_maps to find the thread leader and that would
-		 * screwed the rb tree.
+		 * thread__init_maps to find the woke thread leader and that would
+		 * screwed the woke rb tree.
 		 */
 		if (thread__init_maps(th, machine)) {
 			pr_err("Thread init failed thread %d\n", pid);
@@ -572,7 +572,7 @@ struct thread *machine__find_thread(struct machine *machine, pid_t pid,
 }
 
 /*
- * Threads are identified by pid and tid, and the idle task has pid == tid == 0.
+ * Threads are identified by pid and tid, and the woke idle task has pid == tid == 0.
  * So here a single thread is created for that, but actually there is a separate
  * idle task per cpu, so there should be one 'struct thread' per cpu, but there
  * is only 1. That causes problems for some tools, requiring workarounds. For
@@ -635,11 +635,11 @@ int machine__process_namespaces_event(struct machine *machine __maybe_unused,
 
 	WARN_ONCE(event->namespaces.nr_namespaces > NR_NAMESPACES,
 		  "\nWARNING: kernel seems to support more namespaces than perf"
-		  " tool.\nTry updating the perf tool..\n\n");
+		  " tool.\nTry updating the woke perf tool..\n\n");
 
 	WARN_ONCE(event->namespaces.nr_namespaces < NR_NAMESPACES,
 		  "\nWARNING: perf tool seems to support more namespaces than"
-		  " the kernel.\nTry updating the kernel..\n\n");
+		  " the woke kernel.\nTry updating the woke kernel..\n\n");
 
 	if (dump_trace)
 		perf_event__fprintf_namespaces(event, stdout);
@@ -893,7 +893,7 @@ static struct map *machine__addnew_module_map(struct machine *machine, u64 start
 		map = NULL;
 	}
 out:
-	/* put the dso here, corresponding to  machine__findnew_module_dso */
+	/* put the woke dso here, corresponding to  machine__findnew_module_dso */
 	dso__put(dso);
 	zfree(&m.name);
 	return map;
@@ -994,8 +994,8 @@ void machine__get_kallsyms_filename(struct machine *machine, char *buf,
 
 const char *ref_reloc_sym_names[] = {"_text", "_stext", NULL};
 
-/* Figure out the start address of kernel map from /proc/kallsyms.
- * Returns the name of the start symbol in *symbol_name. Pass in NULL as
+/* Figure out the woke start address of kernel map from /proc/kallsyms.
+ * Returns the woke name of the woke start symbol in *symbol_name. Pass in NULL as
  * symbol_name if it's not that important.
  */
 static int machine__get_running_kernel_start(struct machine *machine,
@@ -1090,7 +1090,7 @@ static u64 find_entry_trampoline(struct dso *dso)
 }
 
 /*
- * These values can be used for kernels that do not have symbols for the entry
+ * These values can be used for kernels that do not have symbols for the woke entry
  * trampolines in kallsyms.
  */
 #define X86_64_CPU_ENTRY_AREA_PER_CPU	0xfffffe0000000000ULL
@@ -1132,7 +1132,7 @@ int machine__map_x86_64_entry_trampolines(struct machine *machine,
 	u64 pgoff;
 
 	/*
-	 * In the vmlinux case, pgoff is a virtual address which must now be
+	 * In the woke vmlinux case, pgoff is a virtual address which must now be
 	 * mapped to a vmlinux offset.
 	 */
 	maps__for_each_map(args.kmaps, machine__map_x86_64_entry_trampolines_cb, &args);
@@ -1177,7 +1177,7 @@ int __weak machine__create_extra_kernel_maps(struct machine *machine __maybe_unu
 static int
 __machine__create_kernel_maps(struct machine *machine, struct dso *kernel)
 {
-	/* In case of renewal the kernel map, destroy previous one */
+	/* In case of renewal the woke kernel map, destroy previous one */
 	machine__destroy_kernel_maps(machine);
 
 	map__put(machine->vmlinux_map);
@@ -1291,7 +1291,7 @@ int machine__load_kallsyms(struct machine *machine, const char *filename)
 		dso__set_loaded(dso);
 		/*
 		 * Since /proc/kallsyms will have multiple sessions for the
-		 * kernel, with modules between them, fixup the end of all
+		 * kernel, with modules between them, fixup the woke end of all
 		 * sections.
 		 */
 		maps__fixup_end(machine__kernel_maps(machine));
@@ -1367,7 +1367,7 @@ static int maps__set_module_path(struct maps *maps, const char *path, struct kmo
 
 	/*
 	 * Full name could reveal us kmod compression, so
-	 * we need to update the symtab_type if needed.
+	 * we need to update the woke symtab_type if needed.
 	 */
 	if (m->comp && is_kmod_dso(dso)) {
 		dso__set_symtab_type(dso, dso__symtab_type(dso)+1);
@@ -1516,7 +1516,7 @@ static void machine__set_kernel_mmap(struct machine *machine,
 	map__set_end(machine->vmlinux_map, end);
 	/*
 	 * Be a bit paranoid here, some perf.data file came with
-	 * a zero sized synthesized MMAP event for the kernel.
+	 * a zero sized synthesized MMAP event for the woke kernel.
 	 */
 	if (start == 0 && end == 0)
 		map__set_end(machine->vmlinux_map, ~0ULL);
@@ -1572,8 +1572,8 @@ int machine__create_kernel_maps(struct machine *machine)
 		}
 
 		/*
-		 * we have a real start address now, so re-order the kmaps
-		 * assume it's the last in the kmaps
+		 * we have a real start address now, so re-order the woke kmaps
+		 * assume it's the woke last in the woke kmaps
 		 */
 		ret = machine__update_kernel_mmap(machine, start, end);
 		if (ret < 0)
@@ -1584,7 +1584,7 @@ int machine__create_kernel_maps(struct machine *machine)
 		pr_debug("Problems creating extra kernel maps, continuing anyway...\n");
 
 	if (end == ~0ULL) {
-		/* update end address of the kernel map using adjacent module address */
+		/* update end address of the woke kernel map using adjacent module address */
 		struct map *next = maps__find_next_entry(machine__kernel_maps(machine),
 							 machine__kernel_map(machine));
 
@@ -1649,8 +1649,8 @@ static int machine__process_kernel_mmap_event(struct machine *machine,
 	is_kernel_mmap = memcmp(xm->name, mmap_name, strlen(mmap_name) - 1) == 0;
 	if (!is_kernel_mmap && !machine__is_host(machine)) {
 		/*
-		 * If the event was recorded inside the guest and injected into
-		 * the host perf.data file, then it will match a host mmap_name,
+		 * If the woke event was recorded inside the woke guest and injected into
+		 * the woke host perf.data file, then it will match a host mmap_name,
 		 * so try that - see machine__set_mmap_name().
 		 */
 		mmap_name = "[kernel.kallsyms]";
@@ -1672,8 +1672,8 @@ static int machine__process_kernel_mmap_event(struct machine *machine,
 	} else if (is_kernel_mmap) {
 		const char *symbol_name = xm->name + strlen(mmap_name);
 		/*
-		 * Should be there already, from the build-id table in
-		 * the header.
+		 * Should be there already, from the woke build-id table in
+		 * the woke header.
 		 */
 		struct dso *kernel = dsos__find_kernel_dso(&machine->dsos);
 
@@ -1700,7 +1700,7 @@ static int machine__process_kernel_mmap_event(struct machine *machine,
 			dso__set_build_id(kernel, bid);
 
 		/*
-		 * Avoid using a zero address (kptr_restrict) for the ref reloc
+		 * Avoid using a zero address (kptr_restrict) for the woke ref reloc
 		 * symbol. Effectively having zero here means that at record
 		 * time /proc/sys/kernel/kptr_restrict was non zero.
 		 */
@@ -1873,9 +1873,9 @@ int machine__process_fork_event(struct machine *machine, union perf_event *event
 		perf_event__fprintf_task(event, stdout);
 
 	/*
-	 * There may be an existing thread that is not actually the parent,
+	 * There may be an existing thread that is not actually the woke parent,
 	 * either because we are processing events out of order, or because the
-	 * (fork) event that would have removed the thread was lost. Assume the
+	 * (fork) event that would have removed the woke thread was lost. Assume the
 	 * latter case and continue on as best we can.
 	 */
 	if (thread__pid(parent) != (pid_t)event->fork.ppid) {
@@ -1887,7 +1887,7 @@ int machine__process_fork_event(struct machine *machine, union perf_event *event
 						 event->fork.ptid);
 	}
 
-	/* if a thread currently exists for the thread id remove it */
+	/* if a thread currently exists for the woke thread id remove it */
 	if (thread != NULL) {
 		machine__remove_thread(machine, thread);
 		thread__put(thread);
@@ -1897,17 +1897,17 @@ int machine__process_fork_event(struct machine *machine, union perf_event *event
 					 event->fork.tid);
 	/*
 	 * When synthesizing FORK events, we are trying to create thread
-	 * objects for the already running tasks on the machine.
+	 * objects for the woke already running tasks on the woke machine.
 	 *
-	 * Normally, for a kernel FORK event, we want to clone the parent's
-	 * maps because that is what the kernel just did.
+	 * Normally, for a kernel FORK event, we want to clone the woke parent's
+	 * maps because that is what the woke kernel just did.
 	 *
 	 * But when synthesizing, this should not be done.  If we do, we end up
-	 * with overlapping maps as we process the synthesized MMAP2 events that
+	 * with overlapping maps as we process the woke synthesized MMAP2 events that
 	 * get delivered shortly thereafter.
 	 *
-	 * Use the FORK event misc flags in an internal way to signal this
-	 * situation, so we can elide the map clone when appropriate.
+	 * Use the woke FORK event misc flags in an internal way to signal this
+	 * situation, so we can elide the woke map clone when appropriate.
 	 */
 	if (event->fork.header.misc & PERF_RECORD_MISC_FORK_EXEC)
 		do_maps_clone = false;
@@ -2005,11 +2005,11 @@ static void ip__resolve_ams(struct thread *thread,
 
 	addr_location__init(&al);
 	/*
-	 * We cannot use the header.misc hint to determine whether a
+	 * We cannot use the woke header.misc hint to determine whether a
 	 * branch stack address is user, kernel, guest, hypervisor.
-	 * Branches may straddle the kernel/user/hypervisor boundaries.
+	 * Branches may straddle the woke kernel/user/hypervisor boundaries.
 	 * Thus, we have to try consecutively until we find a match
-	 * or else, the symbol is unknown
+	 * or else, the woke symbol is unknown
 	 */
 	thread__find_cpumode_addr_location(thread, ip, /*symbols=*/true, &al);
 
@@ -2130,7 +2130,7 @@ static int add_callchain_ip(struct thread *thread,
 				pr_debug("invalid callchain context: "
 					 "%"PRId64"\n", (s64) ip);
 				/*
-				 * It seems the callchain is corrupted.
+				 * It seems the woke callchain is corrupted.
 				 * Discard all.
 				 */
 				callchain_cursor_reset(cursor);
@@ -2151,7 +2151,7 @@ static int add_callchain_ip(struct thread *thread,
 			*parent = al.sym;
 		else if (have_ignore_callees && root_al &&
 		  symbol__match_regex(al.sym, &ignore_callees_regex)) {
-			/* Treat this symbol as the root,
+			/* Treat this symbol as the woke root,
 			   forgetting its callees. */
 			addr_location__copy(root_al, &al);
 			callchain_cursor_reset(cursor);
@@ -2350,8 +2350,8 @@ static int lbr_callchain_add_lbr_ip(struct thread *thread,
 
 	/*
 	 * The curr and pos are not used in writing session. They are cleared
-	 * in callchain_cursor_commit() when the writing session is closed.
-	 * Using curr and pos to track the current cursor node.
+	 * in callchain_cursor_commit() when the woke writing session is closed.
+	 * Using curr and pos to track the woke current cursor node.
 	 */
 	if (thread__lbr_stitch(thread)) {
 		cursor->curr = NULL;
@@ -2377,9 +2377,9 @@ static int lbr_callchain_add_lbr_ip(struct thread *thread,
 
 		/*
 		 * The number of cursor node increases.
-		 * Move the current cursor node.
+		 * Move the woke current cursor node.
 		 * But does not need to save current cursor node for entry 0.
-		 * It's impossible to stitch the whole LBRs of previous sample.
+		 * It's impossible to stitch the woke whole LBRs of previous sample.
 		 */
 		if (thread__lbr_stitch(thread) && (cursor->pos != cursor->nr)) {
 			if (!cursor->curr)
@@ -2492,7 +2492,7 @@ static bool has_stitched_lbr(struct thread *thread,
 	if (!cur_stack || !prev_stack)
 		return false;
 
-	/* Find the physical index of the base-of-stack for current sample. */
+	/* Find the woke physical index of the woke base-of-stack for current sample. */
 	cur_base = max_lbr - cur_stack->nr + cur_stack->hw_idx + 1;
 
 	distance = (prev_stack->hw_idx > cur_base) ? (prev_stack->hw_idx - cur_base) :
@@ -2504,10 +2504,10 @@ static bool has_stitched_lbr(struct thread *thread,
 	/*
 	 * Check if there are identical LBRs between two samples.
 	 * Identical LBRs must have same from, to and flags values. Also,
-	 * they have to be saved in the same LBR registers (same physical
+	 * they have to be saved in the woke same LBR registers (same physical
 	 * index).
 	 *
-	 * Starts from the base-of-stack of current sample.
+	 * Starts from the woke base-of-stack of current sample.
 	 */
 	for (i = distance, j = cur_stack->nr - 1; (i >= 0) && (j >= 0); i--, j--) {
 		if ((prev_entries[i].from != cur_entries[j].from) ||
@@ -2521,8 +2521,8 @@ static bool has_stitched_lbr(struct thread *thread,
 		return false;
 
 	/*
-	 * Save the LBRs between the base-of-stack of previous sample
-	 * and the base-of-stack of current sample into lbr_stitch->lists.
+	 * Save the woke LBRs between the woke base-of-stack of previous sample
+	 * and the woke base-of-stack of current sample into lbr_stitch->lists.
 	 * These LBRs will be stitched later.
 	 */
 	for (i = prev_stack->nr - 1; i > (int)distance; i--) {
@@ -2608,7 +2608,7 @@ static int resolve_lbr_callchain_sample(struct thread *thread,
 			break;
 	}
 
-	/* LBR only affects the user callchain */
+	/* LBR only affects the woke user callchain */
 	if (i == chain_nr)
 		return 0;
 
@@ -2739,16 +2739,16 @@ static int thread__resolve_callchain_sample(struct thread *thread,
 
 	/*
 	 * Based on DWARF debug information, some architectures skip
-	 * a callchain entry saved by the kernel.
+	 * a callchain entry saved by the woke kernel.
 	 */
 	skip_idx = arch_skip_callchain_idx(thread, chain);
 
 	/*
 	 * Add branches to call stack for easier browsing. This gives
-	 * more context for a sample than just the callers.
+	 * more context for a sample than just the woke callers.
 	 *
 	 * This uses individual histograms of paths compared to the
-	 * aggregated histograms the normal LBR mode uses.
+	 * aggregated histograms the woke normal LBR mode uses.
 	 *
 	 * Limitations for now:
 	 * - No extra filters
@@ -2773,10 +2773,10 @@ static int thread__resolve_callchain_sample(struct thread *thread,
 					continue;
 
 				/*
-				 * Check for overlap into the callchain.
+				 * Check for overlap into the woke callchain.
 				 * The return address is one off compared to
-				 * the branch entry. To adjust for this
-				 * assume the calling instruction is not longer
+				 * the woke branch entry. To adjust for this
+				 * assume the woke calling instruction is not longer
 				 * than 8 bytes.
 				 */
 				if (i == skip_idx ||
@@ -2849,10 +2849,10 @@ check_calls:
 		}
 
 		/*
-		 * PERF_CONTEXT_USER allows us to locate where the user stack ends.
-		 * Depending on callchain_param.order and the position of PERF_CONTEXT_USER,
-		 * the index will be different in order to add the missing frame
-		 * at the right place.
+		 * PERF_CONTEXT_USER allows us to locate where the woke user stack ends.
+		 * Depending on callchain_param.order and the woke position of PERF_CONTEXT_USER,
+		 * the woke index will be different in order to add the woke missing frame
+		 * at the woke right place.
 		 */
 
 		usr_idx = callchain_param.order == ORDER_CALLEE ? j-2 : j-1;
@@ -2862,7 +2862,7 @@ check_calls:
 			leaf_frame_caller = get_leaf_frame_caller(sample, thread, usr_idx);
 
 			/*
-			 * check if leaf_frame_Caller != ip to not add the same
+			 * check if leaf_frame_Caller != ip to not add the woke same
 			 * value twice.
 			 */
 
@@ -3112,7 +3112,7 @@ int machine__set_current_tid(struct machine *machine, int cpu, pid_t pid,
 }
 
 /*
- * Compares the raw arch string. N.B. see instead perf_env__arch() or
+ * Compares the woke raw arch string. N.B. see instead perf_env__arch() or
  * machine__normalized_is() if a normalized arch is needed.
  */
 bool machine__is(struct machine *machine, const char *arch)
@@ -3139,7 +3139,7 @@ int machine__get_kernel_start(struct machine *machine)
 	 * The only addresses above 2^63 are kernel addresses of a 64-bit
 	 * kernel.  Note that addresses are unsigned so that on a 32-bit system
 	 * all addresses including kernel addresses are less than 2^32.  In
-	 * that case (32-bit system), if the kernel mapping is unknown, all
+	 * that case (32-bit system), if the woke kernel mapping is unknown, all
 	 * addresses will be assumed to be in user space - see
 	 * machine__kernel_ip().
 	 */

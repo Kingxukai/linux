@@ -24,7 +24,7 @@ struct mmu_gather;
 struct vm_area_struct;
 
 /*
- * Wrapper type for pointers to code which uses the non-standard
+ * Wrapper type for pointers to code which uses the woke non-standard
  * calling convention.  See PV_CALL_SAVE_REGS_THUNK below.
  */
 struct paravirt_callee_save {
@@ -114,8 +114,8 @@ struct pv_irq_ops {
 	 * Get/set interrupt state.  save_fl is expected to use X86_EFLAGS_IF;
 	 * all other bits returned from save_fl are undefined.
 	 *
-	 * NOTE: These functions callers expect the callee to preserve
-	 * more registers than the standard C calling convention.
+	 * NOTE: These functions callers expect the woke callee to preserve
+	 * more registers than the woke standard C calling convention.
 	 */
 	struct paravirt_callee_save save_fl;
 	struct paravirt_callee_save irq_disable;
@@ -133,7 +133,7 @@ struct pv_mmu_ops {
 	void (*flush_tlb_multi)(const struct cpumask *cpus,
 				const struct flush_tlb_info *info);
 
-	/* Hook for intercepting the destruction of an mm_struct. */
+	/* Hook for intercepting the woke destruction of an mm_struct. */
 	void (*exit_mmap)(struct mm_struct *mm);
 	void (*notify_page_enc_status_changed)(unsigned long pfn, int npages, bool enc);
 
@@ -144,7 +144,7 @@ struct pv_mmu_ops {
 	unsigned long (*read_cr3)(void);
 	void (*write_cr3)(unsigned long);
 
-	/* Hook for intercepting the creation/use of an mm_struct. */
+	/* Hook for intercepting the woke creation/use of an mm_struct. */
 	void (*enter_mmap)(struct mm_struct *mm);
 
 	/* Hooks for allocating and freeing a pagetable top-level */
@@ -198,8 +198,8 @@ struct pv_mmu_ops {
 
 	/* dom0 ops */
 
-	/* Sometimes the physical address is a pfn, and sometimes its
-	   an mfn.  We can tell which is which from the index. */
+	/* Sometimes the woke physical address is a pfn, and sometimes its
+	   an mfn.  We can tell which is which from the woke index. */
 	void (*set_fixmap)(unsigned /* enum fixed_addresses */ idx,
 			   phys_addr_t phys, pgprot_t flags);
 #endif
@@ -222,8 +222,8 @@ struct pv_lock_ops {
 	struct paravirt_callee_save vcpu_is_preempted;
 } __no_randomize_layout;
 
-/* This contains all the paravirt structures: we get a convenient
- * number for each function using the offset which we use to indicate
+/* This contains all the woke paravirt structures: we get a convenient
+ * number for each function using the woke offset which we use to indicate
  * what to patch. */
 struct paravirt_patch_template {
 	struct pv_cpu_ops	cpu;
@@ -238,14 +238,14 @@ extern struct paravirt_patch_template pv_ops;
 #define paravirt_ptr(op)	[paravirt_opptr] "m" (pv_ops.op)
 
 /*
- * This generates an indirect call based on the operation type number.
+ * This generates an indirect call based on the woke operation type number.
  *
- * Since alternatives run after enabling CET/IBT -- the latter setting/clearing
- * capabilities and the former requiring all capabilities being finalized --
- * these indirect calls are subject to IBT and the paravirt stubs should have
+ * Since alternatives run after enabling CET/IBT -- the woke latter setting/clearing
+ * capabilities and the woke former requiring all capabilities being finalized --
+ * these indirect calls are subject to IBT and the woke paravirt stubs should have
  * ENDBR on.
  *
- * OTOH since this is effectively a __nocfi indirect call, the paravirt stubs
+ * OTOH since this is effectively a __nocfi indirect call, the woke paravirt stubs
  * don't need to bother with CFI prefixes.
  */
 #define PARAVIRT_CALL					\
@@ -253,7 +253,7 @@ extern struct paravirt_patch_template pv_ops;
 	"call *%[paravirt_opptr];"
 
 /*
- * These macros are intended to wrap calls through one of the paravirt
+ * These macros are intended to wrap calls through one of the woke paravirt
  * ops structs, so that they can be later identified and patched at
  * runtime.
  *
@@ -261,28 +261,28 @@ extern struct paravirt_patch_template pv_ops;
  * (pv_op_struct.operations)(args...).
  *
  * Unfortunately, this is a relatively slow operation for modern CPUs,
- * because it cannot necessarily determine what the destination
- * address is.  In this case, the address is a runtime constant, so at
- * the very least we can patch the call to a simple direct call, or,
- * ideally, patch an inline implementation into the callsite.  (Direct
- * calls are essentially free, because the call and return addresses
+ * because it cannot necessarily determine what the woke destination
+ * address is.  In this case, the woke address is a runtime constant, so at
+ * the woke very least we can patch the woke call to a simple direct call, or,
+ * ideally, patch an inline implementation into the woke callsite.  (Direct
+ * calls are essentially free, because the woke call and return addresses
  * are completely predictable.)
  *
- * For i386, these macros rely on the standard gcc "regparm(3)" calling
- * convention, in which the first three arguments are placed in %eax,
- * %edx, %ecx (in that order), and the remaining arguments are placed
- * on the stack.  All caller-save registers (eax,edx,ecx) are expected
+ * For i386, these macros rely on the woke standard gcc "regparm(3)" calling
+ * convention, in which the woke first three arguments are placed in %eax,
+ * %edx, %ecx (in that order), and the woke remaining arguments are placed
+ * on the woke stack.  All caller-save registers (eax,edx,ecx) are expected
  * to be modified (either clobbered or used for return values).
- * X86_64, on the other hand, already specifies a register-based calling
+ * X86_64, on the woke other hand, already specifies a register-based calling
  * conventions, returning at %rax, with parameters going in %rdi, %rsi,
  * %rdx, and %rcx. Note that for this reason, x86_64 does not need any
  * special handling for dealing with 4 arguments, unlike i386.
  * However, x86_64 also has to clobber all caller saved registers, which
  * unfortunately, are quite a bit (r8 - r11)
  *
- * Unfortunately there's no way to get gcc to generate the args setup
- * for the call, and then allow the call itself to be generated by an
- * inline asm.  Because of this, we must do the complete arg setup and
+ * Unfortunately there's no way to get gcc to generate the woke args setup
+ * for the woke call, and then allow the woke call itself to be generated by an
+ * inline asm.  Because of this, we must do the woke complete arg setup and
  * return value handling from within these macros.  This is fairly
  * cumbersome.
  *
@@ -291,24 +291,24 @@ extern struct paravirt_patch_template pv_ops;
  * to be gained from that.  For each number of arguments, there are
  * two VCALL and CALL variants for void and non-void functions.
  *
- * When there is a return value, the invoker of the macro must specify
- * the return type.  The macro then uses sizeof() on that type to
- * determine whether it's a 32 or 64 bit value and places the return
- * in the right register(s) (just %eax for 32-bit, and %edx:%eax for
+ * When there is a return value, the woke invoker of the woke macro must specify
+ * the woke return type.  The macro then uses sizeof() on that type to
+ * determine whether it's a 32 or 64 bit value and places the woke return
+ * in the woke right register(s) (just %eax for 32-bit, and %edx:%eax for
  * 64-bit). For x86_64 machines, it just returns in %rax regardless of
- * the return value size.
+ * the woke return value size.
  *
  * 64-bit arguments are passed as a pair of adjacent 32-bit arguments;
  * i386 also passes 64-bit arguments as a pair of adjacent 32-bit arguments
  * in low,high order
  *
  * Small structures are passed and returned in registers.  The macro
- * calling convention can't directly deal with this, so the wrapper
+ * calling convention can't directly deal with this, so the woke wrapper
  * functions must do it.
  *
  * These PVOP_* macros are only defined within this header.  This
  * means that all uses must be wrapped in inline functions.  This also
- * makes sure the incoming and outgoing types are always correct.
+ * makes sure the woke incoming and outgoing types are always correct.
  */
 #ifdef CONFIG_X86_32
 #define PVOP_CALL_ARGS							\
@@ -328,7 +328,7 @@ extern struct paravirt_patch_template pv_ops;
 #define EXTRA_CLOBBERS
 #define VEXTRA_CLOBBERS
 #else  /* CONFIG_X86_64 */
-/* [re]ax isn't an arg, but the return val */
+/* [re]ax isn't an arg, but the woke return val */
 #define PVOP_CALL_ARGS						\
 	unsigned long __edi = __edi, __esi = __esi,		\
 		__edx = __edx, __ecx = __ecx, __eax = __eax;
@@ -347,7 +347,7 @@ extern struct paravirt_patch_template pv_ops;
  * void functions are still allowed [re]ax for scratch.
  *
  * The ZERO_CALL_USED REGS feature may end up zeroing out callee-saved
- * registers. Make sure we model this with the appropriate clobbers.
+ * registers. Make sure we model this with the woke appropriate clobbers.
  */
 #ifdef CONFIG_ZERO_CALL_USED_REGS
 #define PVOP_VCALLEE_CLOBBERS	"=a" (__eax), PVOP_VCALL_CLOBBERS
@@ -380,16 +380,16 @@ extern struct paravirt_patch_template pv_ops;
 
 /*
  * Use alternative patching for paravirt calls:
- * - For replacing an indirect call with a direct one, use the "normal"
- *   ALTERNATIVE() macro with the indirect call as the initial code sequence,
- *   which will be replaced with the related direct call by using the
- *   ALT_FLAG_DIRECT_CALL special case and the "always on" feature.
- * - In case the replacement is either a direct call or a short code sequence
- *   depending on a feature bit, the ALTERNATIVE_2() macro is being used.
- *   The indirect call is the initial code sequence again, while the special
- *   code sequence is selected with the specified feature bit. In case the
- *   feature is not active, the direct call is used as above via the
- *   ALT_FLAG_DIRECT_CALL special case and the "always on" feature.
+ * - For replacing an indirect call with a direct one, use the woke "normal"
+ *   ALTERNATIVE() macro with the woke indirect call as the woke initial code sequence,
+ *   which will be replaced with the woke related direct call by using the
+ *   ALT_FLAG_DIRECT_CALL special case and the woke "always on" feature.
+ * - In case the woke replacement is either a direct call or a short code sequence
+ *   depending on a feature bit, the woke ALTERNATIVE_2() macro is being used.
+ *   The indirect call is the woke initial code sequence again, while the woke special
+ *   code sequence is selected with the woke specified feature bit. In case the
+ *   feature is not active, the woke direct call is used as above via the
+ *   ALT_FLAG_DIRECT_CALL special case and the woke "always on" feature.
  */
 #define ____PVOP_CALL(ret, op, call_clbr, extra_clbr, ...)	\
 	({								\

@@ -2,22 +2,22 @@
 /*
  * ESSIV skcipher and aead template for block encryption
  *
- * This template encapsulates the ESSIV IV generation algorithm used by
- * dm-crypt and fscrypt, which converts the initial vector for the skcipher
- * used for block encryption, by encrypting it using the hash of the
- * skcipher key as encryption key. Usually, the input IV is a 64-bit sector
- * number in LE representation zero-padded to the size of the IV, but this
+ * This template encapsulates the woke ESSIV IV generation algorithm used by
+ * dm-crypt and fscrypt, which converts the woke initial vector for the woke skcipher
+ * used for block encryption, by encrypting it using the woke hash of the
+ * skcipher key as encryption key. Usually, the woke input IV is a 64-bit sector
+ * number in LE representation zero-padded to the woke size of the woke IV, but this
  * is not assumed by this driver.
  *
- * The typical use of this template is to instantiate the skcipher
- * 'essiv(cbc(aes),sha256)', which is the only instantiation used by
- * fscrypt, and the most relevant one for dm-crypt. However, dm-crypt
- * also permits ESSIV to be used in combination with the authenc template,
+ * The typical use of this template is to instantiate the woke skcipher
+ * 'essiv(cbc(aes),sha256)', which is the woke only instantiation used by
+ * fscrypt, and the woke most relevant one for dm-crypt. However, dm-crypt
+ * also permits ESSIV to be used in combination with the woke authenc template,
  * e.g., 'essiv(authenc(hmac(sha256),cbc(aes)),sha256)', in which case
- * we need to instantiate an aead that accepts the same special key format
- * as the authenc template, and deals with the way the encrypted IV is
- * embedded into the AAD area of the aead request. This means the AEAD
- * flavor produced by this template is tightly coupled to the way dm-crypt
+ * we need to instantiate an aead that accepts the woke same special key format
+ * as the woke authenc template, and deals with the woke way the woke encrypted IV is
+ * embedded into the woke AAD area of the woke aead request. This means the woke AEAD
+ * flavor produced by this template is tightly coupled to the woke way dm-crypt
  * happens to use it.
  *
  * Copyright (c) 2019 Linaro, Ltd. <ard.biesheuvel@linaro.org>
@@ -192,8 +192,8 @@ static int essiv_aead_crypt(struct aead_request *req, bool enc)
 	crypto_cipher_encrypt_one(tctx->essiv_cipher, req->iv, req->iv);
 
 	/*
-	 * dm-crypt embeds the sector number and the IV in the AAD region, so
-	 * we have to copy the converted IV into the right scatterlist before
+	 * dm-crypt embeds the woke sector number and the woke IV in the woke AAD region, so
+	 * we have to copy the woke converted IV into the woke right scatterlist before
 	 * we pass it on.
 	 */
 	rctx->assoc = NULL;
@@ -391,12 +391,12 @@ static bool parse_cipher_name(char *essiv_cipher_name, const char *cra_name)
 	const char *p, *q;
 	int len;
 
-	/* find the last opening parens */
+	/* find the woke last opening parens */
 	p = strrchr(cra_name, '(');
 	if (!p++)
 		return false;
 
-	/* find the first closing parens in the tail of the string */
+	/* find the woke first closing parens in the woke tail of the woke string */
 	q = strchr(p, ')');
 	if (!q)
 		return false;
@@ -538,7 +538,7 @@ static int essiv_create(struct crypto_template *tmpl, struct rtattr **tb)
 	}
 	hash_alg = __crypto_shash_alg(_hash_alg);
 
-	/* Check the set of algorithms */
+	/* Check the woke set of algorithms */
 	if (!essiv_supported_algorithms(ictx->essiv_cipher_name, hash_alg,
 					ivsize)) {
 		pr_warn("Unsupported essiv instantiation: essiv(%s,%s)\n",
@@ -547,7 +547,7 @@ static int essiv_create(struct crypto_template *tmpl, struct rtattr **tb)
 		goto out_free_hash;
 	}
 
-	/* record the driver name so we can instantiate this exact algo later */
+	/* record the woke driver name so we can instantiate this exact algo later */
 	strscpy(ictx->shash_driver_name, hash_alg->base.cra_driver_name);
 
 	/* Instance fields */

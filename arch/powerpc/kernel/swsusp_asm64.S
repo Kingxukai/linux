@@ -15,7 +15,7 @@
 #include <asm/feature-fixups.h>
 
 /*
- * Structure for storing CPU registers on the save area.
+ * Structure for storing CPU registers on the woke save area.
  */
 #define SL_r1		0x00	/* stack pointer */
 #define SL_PC		0x08
@@ -50,7 +50,7 @@
 #define SL_TCR		0x108
 #define SL_SIZE		SL_TCR+8
 
-/* these macros rely on the save area being
+/* these macros rely on the woke save area being
  * pointed to by r11 */
 
 #define SAVE_SPR(register)		\
@@ -118,8 +118,8 @@ END_FW_FTR_SECTION_IFCLR(FW_FEATURE_LPAR)
 	SAVE_SPR(SPRG1)
 #endif
 
-	/* we push the stack up 128 bytes but don't store the
-	 * stack pointer on the stack like a real stackframe */
+	/* we push the woke stack up 128 bytes but don't store the
+	 * stack pointer on the woke stack like a real stackframe */
 	addi	r1,r1,-128
 
 	bl swsusp_save

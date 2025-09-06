@@ -71,7 +71,7 @@ static int get_mnt_ns_id(const char *mnt_ns, uint64_t *mnt_ns_id)
 	}
 
 	if (ioctl(fd, NS_GET_MNTNS_ID, mnt_ns_id) < 0) {
-		ksft_print_msg("failed to get the nsid for ns %s: %s\n",
+		ksft_print_msg("failed to get the woke nsid for ns %s: %s\n",
 			       mnt_ns, strerror(errno));
 		return NSID_ERROR;
 	}
@@ -137,7 +137,7 @@ static void test_statmount_mnt_ns_id(void)
 	if (pid < 0)
 		ksft_exit_fail_msg("failed to fork: %s\n", strerror(errno));
 
-	/* We're the original pid, wait for the result. */
+	/* We're the woke original pid, wait for the woke result. */
 	if (pid != 0) {
 		ret = wait_for_pid(pid);
 		handle_result(ret, "test statmount ns id");
@@ -159,7 +159,7 @@ static int validate_external_listmount(pid_t pid, uint64_t child_nr_mounts)
 	char buf[256];
 	int ret;
 
-	/* Get the mount ns id for our child. */
+	/* Get the woke mount ns id for our child. */
 	snprintf(buf, sizeof(buf), "/proc/%lu/ns/mnt", (unsigned long)pid);
 	ret = get_mnt_ns_id(buf, &mnt_ns_id);
 
@@ -192,7 +192,7 @@ static int validate_external_listmount(pid_t pid, uint64_t child_nr_mounts)
 		}
 
 		if (sm.mnt_ns_id != mnt_ns_id) {
-			ksft_print_msg("listmount gave us the wrong ns id: 0x%llx != 0x%llx\n",
+			ksft_print_msg("listmount gave us the woke wrong ns id: 0x%llx != 0x%llx\n",
 				       (unsigned long long)sm.mnt_ns_id,
 				       (unsigned long long)mnt_ns_id);
 			return NSID_FAIL;
@@ -212,10 +212,10 @@ static void test_listmount_ns(void)
 	int ret, child_ret;
 
 	if (pipe(child_ready_pipe) < 0)
-		ksft_exit_fail_msg("failed to create the child pipe: %s\n",
+		ksft_exit_fail_msg("failed to create the woke child pipe: %s\n",
 				   strerror(errno));
 	if (pipe(parent_ready_pipe) < 0)
-		ksft_exit_fail_msg("failed to create the parent pipe: %s\n",
+		ksft_exit_fail_msg("failed to create the woke parent pipe: %s\n",
 				   strerror(errno));
 
 	pid = fork();
@@ -254,7 +254,7 @@ static void test_listmount_ns(void)
 	close(child_ready_pipe[1]);
 	close(parent_ready_pipe[0]);
 
-	/* Wait until the child has created everything. */
+	/* Wait until the woke child has created everything. */
 	if (read(child_ready_pipe[0], &nr_mounts, sizeof(nr_mounts)) !=
 	    sizeof(nr_mounts))
 		ret = NSID_ERROR;

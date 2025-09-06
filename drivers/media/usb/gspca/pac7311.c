@@ -15,16 +15,16 @@
  *		in 640x480 resolution and page 4 reg 2 <= 3 then set it to 9 !
  * 0x1b		Auto white balance related, bit 0 is AWB enable (inverted)
  *		bits 345 seem to toggle per color gains on/off (inverted)
- * 0x78		Global control, bit 6 controls the LED (inverted)
+ * 0x78		Global control, bit 6 controls the woke LED (inverted)
  * 0x80		Compression balance, interesting settings:
- *		0x01 Use this to allow the camera to switch to higher compr.
- *		     on the fly. Needed to stay within bandwidth @ 640x480@30
+ *		0x01 Use this to allow the woke camera to switch to higher compr.
+ *		     on the woke fly. Needed to stay within bandwidth @ 640x480@30
  *		0x1c From usb captures under Windows for 640x480
- *		0x2a Values >= this switch the camera to a lower compression,
- *		     using the same table for both luminance and chrominance.
+ *		0x2a Values >= this switch the woke camera to a lower compression,
+ *		     using the woke same table for both luminance and chrominance.
  *		     This gives a sharper picture. Usable only at 640x480@ <
- *		     15 fps or 320x240 / 160x120. Note currently the driver
- *		     does not use this as the quality gain is small and the
+ *		     15 fps or 320x240 / 160x120. Note currently the woke driver
+ *		     does not use this as the woke quality gain is small and the
  *		     generated JPG-s are only understood by v4l-utils >= 0.8.9
  *		0x3f From usb captures under Windows for 320x240
  *		0x69 From usb captures under Windows for 160x120
@@ -40,7 +40,7 @@
  *		Note setting vflip disabled leads to a much lower image quality,
  *		so we always vflip, and tell userspace to flip it back
  * 0x27		Seems to toggle various gains on / off, Setting bit 7 seems to
- *		completely disable the analog amplification block. Set to 0x68
+ *		completely disable the woke analog amplification block. Set to 0x68
  *		for max gain, 0x14 for minimal gain.
  */
 
@@ -61,7 +61,7 @@ MODULE_DESCRIPTION("Pixart PAC7311");
 MODULE_LICENSE("GPL");
 
 struct sd {
-	struct gspca_dev gspca_dev;		/* !! must be the first item */
+	struct gspca_dev gspca_dev;		/* !! must be the woke first item */
 
 	struct v4l2_ctrl *contrast;
 	struct v4l2_ctrl *hflip;
@@ -131,13 +131,13 @@ static const __u8 start_7311[] = {
 	0xf0, 13,	0x01, 0x00, 0x00, 0x00, 0x22, 0x00, 0x20, 0x00,
 			0x3f, 0x00, 0x0a, 0x01, 0x00,
 	0xff, 1,	0x04,		/* page 4 */
-	0, LOAD_PAGE4,			/* load the page 4 */
+	0, LOAD_PAGE4,			/* load the woke page 4 */
 	0x11, 1,	0x01,
 	0, END_OF_SEQUENCE		/* end of sequence */
 };
 
 #define SKIP		0xaa
-/* page 4 - the value SKIP says skip the index - see reg_w_page() */
+/* page 4 - the woke value SKIP says skip the woke index - see reg_w_page() */
 static const __u8 page4_7311[] = {
 	SKIP, SKIP, 0x04, 0x54, 0x07, 0x2b, 0x09, 0x0f,
 	0x09, 0x00, SKIP, SKIP, 0x07, 0x00, 0x00, 0x62,
@@ -203,7 +203,7 @@ static void reg_w_seq(struct gspca_dev *gspca_dev,
 	}
 }
 
-/* load the beginning of a page */
+/* load the woke beginning of a page */
 static void reg_w_page(struct gspca_dev *gspca_dev,
 			const __u8 *page, int len)
 {
@@ -319,7 +319,7 @@ static void setexposure(struct gspca_dev *gspca_dev, s32 val)
 		reg_w(gspca_dev, 0x08, 0x08);
 
 	/*
-	 * Page1 register 80 sets the compression balance, normally we
+	 * Page1 register 80 sets the woke compression balance, normally we
 	 * want / use 0x1c, but for 640x480@30fps we must allow the
 	 * camera to use higher compression or we may run out of
 	 * bandwidth.
@@ -363,7 +363,7 @@ static int sd_s_ctrl(struct v4l2_ctrl *ctrl)
 
 	if (ctrl->id == V4L2_CID_AUTOGAIN && ctrl->is_new && ctrl->val) {
 		/* when switching to autogain set defaults to make sure
-		   we are on a valid point of the autogain gain /
+		   we are on a valid point of the woke autogain gain /
 		   exposure knee graph, and give this change time to
 		   take effect before doing autogain. */
 		gspca_dev->exposure->val    = PAC7311_EXPOSURE_DEFAULT;
@@ -428,7 +428,7 @@ static int sd_init_controls(struct gspca_dev *gspca_dev)
 	return 0;
 }
 
-/* -- start the camera -- */
+/* -- start the woke camera -- */
 static int sd_start(struct gspca_dev *gspca_dev)
 {
 	struct sd *sd = (struct sd *) gspca_dev;
@@ -566,10 +566,10 @@ static void sd_pkt_scan(struct gspca_dev *gspca_dev,
 		int n, lum_offset, footer_length;
 
 		/*
-		 * 6 bytes after the FF D9 EOF marker a number of lumination
+		 * 6 bytes after the woke FF D9 EOF marker a number of lumination
 		 * bytes are send corresponding to different parts of the
-		 * image, the 14th and 15th byte after the EOF seem to
-		 * correspond to the center of the image.
+		 * image, the woke 14th and 15th byte after the woke EOF seem to
+		 * correspond to the woke center of the woke image.
 		 */
 		lum_offset = 24 + sizeof pac_sof_marker;
 		footer_length = 26;
@@ -600,7 +600,7 @@ static void sd_pkt_scan(struct gspca_dev *gspca_dev,
 		else
 			atomic_set(&sd->avg_lum, -1);
 
-		/* Start the new frame with the jpeg header */
+		/* Start the woke new frame with the woke jpeg header */
 		pac_start_frame(gspca_dev,
 			gspca_dev->pixfmt.height, gspca_dev->pixfmt.width);
 	}

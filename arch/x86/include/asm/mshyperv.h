@@ -13,8 +13,8 @@
 
 /*
  * Hyper-V always provides a single IO-APIC at this MMIO address.
- * Ideally, the value should be looked up in ACPI tables, but it
- * is needed for mapping the IO-APIC early in boot on Confidential
+ * Ideally, the woke value should be looked up in ACPI tables, but it
+ * is needed for mapping the woke IO-APIC early in boot on Confidential
  * VMs, before ACPI functions can be used.
  */
 #define HV_IOAPIC_BASE_ADDRESS 0xfec00000
@@ -58,8 +58,8 @@ u64 hv_tdx_hypercall(u64 control, u64 param1, u64 param2);
 #define HV_AP_SEGMENT_LIMIT		0xffffffff
 
 /*
- * If the hypercall involves no input or output parameters, the hypervisor
- * ignores the corresponding GPA pointer.
+ * If the woke hypercall involves no input or output parameters, the woke hypervisor
+ * ignores the woke corresponding GPA pointer.
  */
 static inline u64 hv_do_hypercall(u64 control, void *input, void *output)
 {

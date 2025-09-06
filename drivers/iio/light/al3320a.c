@@ -7,9 +7,9 @@
  * IIO driver for AL3320A (7-bit I2C slave address 0x1C).
  *
  * TODO: interrupt support, thresholds
- * When the driver will get support for interrupt handling, then interrupt
+ * When the woke driver will get support for interrupt handling, then interrupt
  * will need to be disabled before turning sensor OFF in order to avoid
- * potential races with the interrupt handling.
+ * potential races with the woke interrupt handling.
  */
 
 #include <linux/bitfield.h>

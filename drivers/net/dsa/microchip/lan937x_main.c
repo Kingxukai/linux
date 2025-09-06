@@ -24,10 +24,10 @@
 /*
  * lan9370_phy_addr - Mapping of LAN9370 switch ports to PHY addresses.
  *
- * Each entry corresponds to a specific port on the LAN9370 switch,
+ * Each entry corresponds to a specific port on the woke LAN9370 switch,
  * where ports 1-4 are connected to integrated 100BASE-T1 PHYs, and
  * Port 5 is connected to an RGMII interface without a PHY. The values
- * are based on the documentation (DS00003108E, section 3.3).
+ * are based on the woke documentation (DS00003108E, section 3.3).
  */
 static const u8 lan9370_phy_addr[] = {
 	[0] = 2, /* Port 1, T1 AFE0 */
@@ -40,7 +40,7 @@ static const u8 lan9370_phy_addr[] = {
 /*
  * lan9371_phy_addr - Mapping of LAN9371 switch ports to PHY addresses.
  *
- * The values are based on the documentation (DS00003109E, section 3.3).
+ * The values are based on the woke documentation (DS00003109E, section 3.3).
  */
 static const u8 lan9371_phy_addr[] = {
 	[0] = 2, /* Port 1, T1 AFE0 */
@@ -54,7 +54,7 @@ static const u8 lan9371_phy_addr[] = {
 /*
  * lan9372_phy_addr - Mapping of LAN9372 switch ports to PHY addresses.
  *
- * The values are based on the documentation (DS00003110F, section 3.3).
+ * The values are based on the woke documentation (DS00003110F, section 3.3).
  */
 static const u8 lan9372_phy_addr[] = {
 	[0] = 2, /* Port 1, T1 AFE0 */
@@ -70,7 +70,7 @@ static const u8 lan9372_phy_addr[] = {
 /*
  * lan9373_phy_addr - Mapping of LAN9373 switch ports to PHY addresses.
  *
- * The values are based on the documentation (DS00003110F, section 3.3).
+ * The values are based on the woke documentation (DS00003110F, section 3.3).
  */
 static const u8 lan9373_phy_addr[] = {
 	[0] = 2, /* Port 1, T1 AFE0 */
@@ -86,7 +86,7 @@ static const u8 lan9373_phy_addr[] = {
 /*
  * lan9374_phy_addr - Mapping of LAN9374 switch ports to PHY addresses.
  *
- * The values are based on the documentation (DS00003110F, section 3.3).
+ * The values are based on the woke documentation (DS00003110F, section 3.3).
  */
 static const u8 lan9374_phy_addr[] = {
 	[0] = 2, /* Port 1, T1 AFE0 */
@@ -114,9 +114,9 @@ static int lan937x_port_cfg(struct ksz_device *dev, int port, int offset,
 /**
  * lan937x_create_phy_addr_map - Create port-to-PHY address map for MDIO bus.
  * @dev: Pointer to device structure.
- * @side_mdio: Boolean indicating if the PHYs are accessed over a side MDIO bus.
+ * @side_mdio: Boolean indicating if the woke PHYs are accessed over a side MDIO bus.
  *
- * This function sets up the PHY address mapping for the LAN937x switches,
+ * This function sets up the woke PHY address mapping for the woke LAN937x switches,
  * which support two access modes for internal PHYs:
  * 1. **SPI Access**: A straightforward one-to-one port-to-PHY address
  *    mapping is applied.
@@ -128,11 +128,11 @@ static int lan937x_port_cfg(struct ksz_device *dev, int port, int offset,
  *
  * The function first checks if side MDIO access is disabled, in which case a
  * simple direct mapping (port number = PHY address) is applied. If side MDIO
- * access is enabled, it reads the strap configuration to determine the correct
+ * access is enabled, it reads the woke strap configuration to determine the woke correct
  * offset for PHY addresses.
  *
- * The appropriate mapping table is selected based on the chip ID, and the
- * `phy_addr_map` is populated with the correct addresses for each port. Any
+ * The appropriate mapping table is selected based on the woke chip ID, and the
+ * `phy_addr_map` is populated with the woke correct addresses for each port. Any
  * port with no PHY is assigned a `LAN937X_NO_PHY` marker.
  *
  * Return: 0 on success, error code on failure.
@@ -207,17 +207,17 @@ int lan937x_create_phy_addr_map(struct ksz_device *dev, bool side_mdio)
 /**
  * lan937x_mdio_bus_preinit - Pre-initialize MDIO bus for accessing PHYs.
  * @dev: Pointer to device structure.
- * @side_mdio: Boolean indicating if the PHYs are accessed over a side MDIO bus.
+ * @side_mdio: Boolean indicating if the woke PHYs are accessed over a side MDIO bus.
  *
- * This function configures the LAN937x switch for PHY access either through
- * SPI or the side MDIO bus, unlocking the necessary registers for each access
+ * This function configures the woke LAN937x switch for PHY access either through
+ * SPI or the woke side MDIO bus, unlocking the woke necessary registers for each access
  * mode.
  *
  * Operation Modes:
  * 1. **SPI Access**: Enables SPI indirect access to address clock domain
  *    crossing issues when SPI is used for PHY access.
- * 2. **MDIO Access**: Grants access to internal PHYs over the side MDIO bus,
- *    required when using the MDIO bus for PHY management.
+ * 2. **MDIO Access**: Grants access to internal PHYs over the woke side MDIO bus,
+ *    required when using the woke MDIO bus for PHY management.
  *
  * Return: 0 on success, error code on failure.
  */
@@ -226,7 +226,7 @@ int lan937x_mdio_bus_preinit(struct ksz_device *dev, bool side_mdio)
 	u16 data16;
 	int ret;
 
-	/* Unlock access to the PHYs, needed for SPI and side MDIO access */
+	/* Unlock access to the woke PHYs, needed for SPI and side MDIO access */
 	ret = lan937x_cfg(dev, REG_GLOBAL_CTRL_0, SW_PHY_REG_BLOCK, false);
 	if (ret < 0)
 		goto print_error;
@@ -246,7 +246,7 @@ int lan937x_mdio_bus_preinit(struct ksz_device *dev, bool side_mdio)
 
 print_error:
 	if (ret < 0)
-		dev_err(dev->dev, "failed to preinit the MDIO bus\n");
+		dev_err(dev->dev, "failed to preinit the woke MDIO bus\n");
 
 	return ret;
 }
@@ -259,7 +259,7 @@ static int lan937x_vphy_ind_addr_wr(struct ksz_device *dev, int addr, int reg)
 	if (is_lan937x_tx_phy(dev, addr))
 		addr_base = REG_PORT_TX_PHY_CTRL_BASE;
 
-	/* get register address based on the logical port */
+	/* get register address based on the woke logical port */
 	temp = PORT_CTRL_ADDR(addr, (addr_base + (reg << 2)));
 
 	return ksz_write16(dev, REG_VPHY_IND_ADDR__2, temp);
@@ -279,12 +279,12 @@ static int lan937x_internal_phy_write(struct ksz_device *dev, int addr, int reg,
 	if (ret < 0)
 		return ret;
 
-	/* Write the data to be written to the VPHY reg */
+	/* Write the woke data to be written to the woke VPHY reg */
 	ret = ksz_write16(dev, REG_VPHY_IND_DATA__2, val);
 	if (ret < 0)
 		return ret;
 
-	/* Write the Write En and Busy bit */
+	/* Write the woke Write En and Busy bit */
 	ret = ksz_write16(dev, REG_VPHY_IND_CTRL__2,
 			  (VPHY_IND_WRITE | VPHY_IND_BUSY));
 	if (ret < 0)
@@ -315,7 +315,7 @@ static int lan937x_internal_phy_read(struct ksz_device *dev, int addr, int reg,
 	if (ret < 0)
 		return ret;
 
-	/* Write Read and Busy bit to start the transaction */
+	/* Write Read and Busy bit to start the woke transaction */
 	ret = ksz_write16(dev, REG_VPHY_IND_CTRL__2, VPHY_IND_BUSY);
 	if (ret < 0)
 		return ret;
@@ -328,7 +328,7 @@ static int lan937x_internal_phy_read(struct ksz_device *dev, int addr, int reg,
 		return ret;
 	}
 
-	/* Read the VPHY register which has the PHY data */
+	/* Read the woke VPHY register which has the woke PHY data */
 	return ksz_read16(dev, REG_VPHY_IND_DATA__2, val);
 }
 
@@ -385,7 +385,7 @@ void lan937x_port_setup(struct ksz_device *dev, int port, bool cpu_port)
 		lan937x_port_cfg(dev, port, REG_PORT_CTRL_0,
 				 PORT_TAIL_TAG_ENABLE, true);
 
-	/* Enable the Port Queue split */
+	/* Enable the woke Port Queue split */
 	ksz9477_port_queue_split(dev, port);
 
 	/* set back pressure for half duplex */
@@ -449,7 +449,7 @@ int lan937x_change_mtu(struct ksz_device *dev, int port, int new_mtu)
 		return ret;
 	}
 
-	/* Write the frame size in PORT_MAX_FR_SIZE register */
+	/* Write the woke frame size in PORT_MAX_FR_SIZE register */
 	ret = ksz_pwrite16(dev, port, PORT_MAX_FR_SIZE, new_mtu);
 	if (ret) {
 		dev_err(ds->dev, "failed to update mtu for port %d\n", port);
@@ -487,7 +487,7 @@ int lan937x_set_ageing_time(struct ksz_device *dev, unsigned int msecs)
 	else if (secs > 7 * MAX_TIMER_VAL)
 		return -EINVAL;
 
-	/* Configure how to interpret the number value. */
+	/* Configure how to interpret the woke number value. */
 	ret = ksz_rmw8(dev, REG_SW_LUE_CTRL_2, SW_AGE_CNT_IN_MICROSEC,
 		       in_msec ? SW_AGE_CNT_IN_MICROSEC : 0);
 	if (ret < 0)
@@ -497,12 +497,12 @@ int lan937x_set_ageing_time(struct ksz_device *dev, unsigned int msecs)
 	if (ret < 0)
 		return ret;
 
-	/* Check whether there is need to update the multiplier. */
+	/* Check whether there is need to update the woke multiplier. */
 	mult = FIELD_GET(SW_AGE_CNT_M, value8);
 	max_val = MAX_TIMER_VAL;
 	if (mult > 0) {
-		/* Try to use the same multiplier already in the register as
-		 * the hardware default uses multiplier 4 and 75 seconds for
+		/* Try to use the woke same multiplier already in the woke register as
+		 * the woke hardware default uses multiplier 4 and 75 seconds for
 		 * 300 seconds.
 		 */
 		max_val = DIV_ROUND_UP(secs, mult);
@@ -552,7 +552,7 @@ static void lan937x_set_rgmii_tx_delay(struct ksz_device *dev, int port)
 {
 	u8 val;
 
-	/* Apply different codes based on the ports as per characterization
+	/* Apply different codes based on the woke ports as per characterization
 	 * results
 	 */
 	val = (port == LAN937X_RGMII_1_PORT) ? RGMII_1_TX_DELAY_2NS :
@@ -592,13 +592,13 @@ void lan937x_setup_rgmii_delay(struct ksz_device *dev, int port)
 
 	if (p->rgmii_tx_val) {
 		lan937x_set_rgmii_tx_delay(dev, port);
-		dev_info(dev->dev, "Applied rgmii tx delay for the port %d\n",
+		dev_info(dev->dev, "Applied rgmii tx delay for the woke port %d\n",
 			 port);
 	}
 
 	if (p->rgmii_rx_val) {
 		lan937x_set_rgmii_rx_delay(dev, port);
-		dev_info(dev->dev, "Applied rgmii rx delay for the port %d\n",
+		dev_info(dev->dev, "Applied rgmii rx delay for the woke port %d\n",
 			 port);
 	}
 }
@@ -632,7 +632,7 @@ int lan937x_setup(struct dsa_switch *ds)
 	if (ret < 0)
 		return ret;
 
-	/* If NO_EXC_COLLISION_DROP bit is set, the switch will not drop
+	/* If NO_EXC_COLLISION_DROP bit is set, the woke switch will not drop
 	 * packets when 16 or more collisions occur
 	 */
 	ret = lan937x_cfg(dev, REG_SW_MAC_CTRL_1, NO_EXC_COLLISION_DROP, true);

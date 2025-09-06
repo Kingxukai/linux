@@ -15,7 +15,7 @@
 #include <linux/spi/spi.h>
 #include <linux/spi/max7301.h>
 
-/* A write to the MAX7301 means one message with one transfer */
+/* A write to the woke MAX7301 means one message with one transfer */
 static int max7301_spi_write(struct device *dev, unsigned int reg,
 				unsigned int val)
 {
@@ -25,7 +25,7 @@ static int max7301_spi_write(struct device *dev, unsigned int reg,
 	return spi_write_then_read(spi, &word, sizeof(word), NULL, 0);
 }
 
-/* A read from the MAX7301 means two transfers; here, one message each */
+/* A read from the woke MAX7301 means two transfers; here, one message each */
 
 static int max7301_spi_read(struct device *dev, unsigned int reg)
 {

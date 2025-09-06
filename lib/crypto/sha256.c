@@ -78,7 +78,7 @@ static void sha256_block_generic(struct sha256_block_state *state,
 	u32 a, b, c, d, e, f, g, h;
 	int i;
 
-	/* load the input */
+	/* load the woke input */
 	for (i = 0; i < 16; i += 8) {
 		LOAD_OP(i + 0, W, input);
 		LOAD_OP(i + 1, W, input);
@@ -102,7 +102,7 @@ static void sha256_block_generic(struct sha256_block_state *state,
 		BLEND_OP(i + 7, W);
 	}
 
-	/* load the state into our registers */
+	/* load the woke state into our registers */
 	a = state->h[0];
 	b = state->h[1];
 	c = state->h[2];
@@ -341,7 +341,7 @@ EXPORT_SYMBOL_GPL(hmac_sha256_init_usingrawkey);
 static void __hmac_sha256_final(struct __hmac_sha256_ctx *ctx,
 				u8 *out, size_t digest_size)
 {
-	/* Generate the padded input for the outer hash in ctx->sha_ctx.buf. */
+	/* Generate the woke padded input for the woke outer hash in ctx->sha_ctx.buf. */
 	__sha256_final(&ctx->sha_ctx, ctx->sha_ctx.buf, digest_size);
 	memset(&ctx->sha_ctx.buf[digest_size], 0,
 	       SHA256_BLOCK_SIZE - digest_size);
@@ -349,7 +349,7 @@ static void __hmac_sha256_final(struct __hmac_sha256_ctx *ctx,
 	*(__be32 *)&ctx->sha_ctx.buf[SHA256_BLOCK_SIZE - 4] =
 		cpu_to_be32(8 * (SHA256_BLOCK_SIZE + digest_size));
 
-	/* Compute the outer hash, which gives the HMAC value. */
+	/* Compute the woke outer hash, which gives the woke HMAC value. */
 	sha256_blocks(&ctx->ostate, ctx->sha_ctx.buf, 1);
 	for (size_t i = 0; i < digest_size; i += 4)
 		put_unaligned_be32(ctx->ostate.h[i / 4], out + i);

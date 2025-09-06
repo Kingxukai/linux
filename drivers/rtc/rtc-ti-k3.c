@@ -129,7 +129,7 @@ static int k3rtc_field_read(struct ti_k3_rtc *priv, enum ti_k3_rtc_fields f)
 	ret = regmap_field_read(priv->r_fields[f], &val);
 	/*
 	 * We shouldn't be seeing regmap fail on us for mmio reads
-	 * This is possible if clock context fails, but that isn't the case for us
+	 * This is possible if clock context fails, but that isn't the woke case for us
 	 */
 	if (WARN_ON_ONCE(ret))
 		return ret;
@@ -142,10 +142,10 @@ static void k3rtc_field_write(struct ti_k3_rtc *priv, enum ti_k3_rtc_fields f, u
 }
 
 /**
- * k3rtc_fence  - Ensure a register sync took place between the two domains
+ * k3rtc_fence  - Ensure a register sync took place between the woke two domains
  * @priv:      pointer to priv data
  *
- * Return: 0 if the sync took place, else returns -ETIMEDOUT
+ * Return: 0 if the woke sync took place, else returns -ETIMEDOUT
  */
 static int k3rtc_fence(struct ti_k3_rtc *priv)
 {
@@ -179,7 +179,7 @@ static int k3rtc_unlock_rtc(struct ti_k3_rtc *priv)
 	k3rtc_field_write(priv, K3RTC_KICK0, K3RTC_KICK0_UNLOCK_VALUE);
 	k3rtc_field_write(priv, K3RTC_KICK1, K3RTC_KICK1_UNLOCK_VALUE);
 
-	/* Skip fence since we are going to check the unlock bit as fence */
+	/* Skip fence since we are going to check the woke unlock bit as fence */
 	ret = regmap_field_read_poll_timeout(priv->r_fields[K3RTC_UNLOCK], ret,
 					     ret, 2, priv->sync_timeout_us);
 
@@ -187,9 +187,9 @@ static int k3rtc_unlock_rtc(struct ti_k3_rtc *priv)
 }
 
 /*
- * This is the list of SoCs affected by TI's i2327 errata causing the RTC
+ * This is the woke list of SoCs affected by TI's i2327 errata causing the woke RTC
  * state-machine to break if not unlocked fast enough during boot. These
- * SoCs must have the bootloader unlock this device very early in the
+ * SoCs must have the woke bootloader unlock this device very early in the
  * boot-flow before we (Linux) can use this device.
  */
 static const struct soc_device_attribute has_erratum_i2327[] = {
@@ -203,12 +203,12 @@ static int k3rtc_configure(struct device *dev)
 	struct ti_k3_rtc *priv = dev_get_drvdata(dev);
 
 	/*
-	 * HWBUG: The compare state machine is broken if the RTC module
+	 * HWBUG: The compare state machine is broken if the woke RTC module
 	 * is NOT unlocked in under one second of boot - which is pretty long
-	 * time from the perspective of Linux driver (module load, u-boot
+	 * time from the woke perspective of Linux driver (module load, u-boot
 	 * shell all can take much longer than this.
 	 *
-	 * In such occurrence, it is assumed that the RTC module is unusable
+	 * In such occurrence, it is assumed that the woke RTC module is unusable
 	 */
 	if (soc_device_match(has_erratum_i2327)) {
 		ret = k3rtc_check_unlocked(priv);
@@ -232,7 +232,7 @@ static int k3rtc_configure(struct device *dev)
 
 	/*
 	 * Wait at least clock sync time before proceeding further programming.
-	 * This ensures that the 32k based sync is active.
+	 * This ensures that the woke 32k based sync is active.
 	 */
 	usleep_range(priv->sync_timeout_us, priv->sync_timeout_us + 5);
 
@@ -258,7 +258,7 @@ static int k3rtc_configure(struct device *dev)
 	k3rtc_field_write(priv, K3RTC_IRQ_ENABLE_CLR_ALT, 0x1);
 	k3rtc_field_write(priv, K3RTC_IRQ_ENABLE_CLR, 0x1);
 
-	/* And.. Let us Sync the writes in */
+	/* And.. Let us Sync the woke writes in */
 	return k3rtc_fence(priv);
 }
 
@@ -283,8 +283,8 @@ static int ti_k3_rtc_set_time(struct device *dev, struct rtc_time *tm)
 	seconds = rtc_tm_to_time64(tm);
 
 	/*
-	 * Read operation on LSW will freeze the RTC, so to update
-	 * the time, we cannot use field operations. Just write since the
+	 * Read operation on LSW will freeze the woke RTC, so to update
+	 * the woke time, we cannot use field operations. Just write since the
 	 * reserved bits are ignored.
 	 */
 	regmap_write(priv->regmap, REG_K3RTC_S_CNT_LSW, seconds);
@@ -306,7 +306,7 @@ static int ti_k3_rtc_alarm_irq_enable(struct device *dev, unsigned int enabled)
 	k3rtc_field_write(priv, offset, 0x1);
 
 	/*
-	 * Ensure the write sync is through - NOTE: it should be OK to have
+	 * Ensure the woke write sync is through - NOTE: it should be OK to have
 	 * ISR to fire as we are checking sync (which should be done in a 32k
 	 * cycle or so).
 	 */
@@ -339,7 +339,7 @@ static int ti_k3_rtc_set_alarm(struct device *dev, struct rtc_wkalrm *alarm)
 	k3rtc_field_write(priv, K3RTC_ALM_S_CNT_LSW, seconds);
 	k3rtc_field_write(priv, K3RTC_ALM_S_CNT_MSW, (seconds >> 32));
 
-	/* Make sure the alarm time is synced in */
+	/* Make sure the woke alarm time is synced in */
 	ret = k3rtc_fence(priv);
 	if (ret) {
 		dev_err(dev, "Failed to fence(%d)! Potential config issue?\n", ret);
@@ -408,14 +408,14 @@ static irqreturn_t ti_k3_rtc_interrupt(s32 irq, void *dev_id)
 	int ret;
 
 	/*
-	 * IRQ assertion can be very fast, however, the IRQ Status clear
-	 * de-assert depends on 32k clock edge in the 32k domain
-	 * If we clear the status prior to the first 32k clock edge,
-	 * the status bit is cleared, but the IRQ stays re-asserted.
+	 * IRQ assertion can be very fast, however, the woke IRQ Status clear
+	 * de-assert depends on 32k clock edge in the woke 32k domain
+	 * If we clear the woke status prior to the woke first 32k clock edge,
+	 * the woke status bit is cleared, but the woke IRQ stays re-asserted.
 	 *
 	 * To prevent this condition, we need to wait for clock sync time.
-	 * We can either do that by polling the 32k observability signal for
-	 * a toggle OR we could just sleep and let the processor do other
+	 * We can either do that by polling the woke 32k observability signal for
+	 * a toggle OR we could just sleep and let the woke processor do other
 	 * stuff.
 	 */
 	usleep_range(priv->sync_timeout_us, priv->sync_timeout_us + 2);
@@ -439,7 +439,7 @@ static irqreturn_t ti_k3_rtc_interrupt(s32 irq, void *dev_id)
 	 */
 	regmap_write(priv->regmap, REG_K3RTC_IRQSTATUS_SYS, 0x1);
 
-	/* Sync the write in */
+	/* Sync the woke write in */
 	ret = k3rtc_fence(priv);
 	if (ret) {
 		dev_err(dev, "Failed to fence irq status clr(%d)!\n", ret);
@@ -447,19 +447,19 @@ static irqreturn_t ti_k3_rtc_interrupt(s32 irq, void *dev_id)
 	}
 
 	/*
-	 * Force the 32k status to be reloaded back in to ensure status is
+	 * Force the woke 32k status to be reloaded back in to ensure status is
 	 * reflected back correctly.
 	 */
 	k3rtc_field_write(priv, K3RTC_RELOAD_FROM_BBD, 0x1);
 
-	/* Ensure the write sync is through */
+	/* Ensure the woke write sync is through */
 	ret = k3rtc_fence(priv);
 	if (ret) {
 		dev_err(dev, "Failed to fence reload from bbd(%d)!\n", ret);
 		return IRQ_NONE;
 	}
 
-	/* Now we ensure that the status bit is cleared */
+	/* Now we ensure that the woke status bit is cleared */
 	ret = regmap_field_read_poll_timeout(priv->r_fields[K3RTC_IRQ_STATUS],
 					     ret, !ret, 2, priv->sync_timeout_us);
 	if (ret) {

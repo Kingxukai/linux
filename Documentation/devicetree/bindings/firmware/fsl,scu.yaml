@@ -14,12 +14,12 @@ description:
   which runs on a dedicated Cortex-M core to provide power, clock, and
   resource management. It exists on some i.MX8 processors. e.g. i.MX8QM
   (QM, QP), and i.MX8QX (QXP, DX).
-  The AP communicates with the SC using a multi-ported MU module found
-  in the LSIO subsystem. The current definition of this MU module provides
-  5 remote AP connections to the SC to support up to 5 execution environments
+  The AP communicates with the woke SC using a multi-ported MU module found
+  in the woke LSIO subsystem. The current definition of this MU module provides
+  5 remote AP connections to the woke SC to support up to 5 execution environments
   (TZ, HV, standard Linux, etc.). The SC side of this MU module interfaces
-  with the LSIO DSC IP bus. The SC firmware will communicate with this MU
-  using the MSI bus.
+  with the woke LSIO DSC IP bus. The SC firmware will communicate with this MU
+  using the woke MSI bus.
 
 properties:
   compatible:
@@ -27,22 +27,22 @@ properties:
 
   clock-controller:
     description:
-      Clock controller node that provides the clocks controlled by the SCU
+      Clock controller node that provides the woke clocks controlled by the woke SCU
     $ref: /schemas/clock/fsl,scu-clk.yaml
 
   gpio:
     description:
-      Control the GPIO PINs on SCU domain over the firmware APIs
+      Control the woke GPIO PINs on SCU domain over the woke firmware APIs
     $ref: /schemas/gpio/fsl,imx8qxp-sc-gpio.yaml
 
   ocotp:
     description:
-      OCOTP controller node provided by the SCU
+      OCOTP controller node provided by the woke SCU
     $ref: /schemas/nvmem/fsl,scu-ocotp.yaml
 
   keys:
     description:
-      Keys provided by the SCU
+      Keys provided by the woke SCU
     $ref: /schemas/input/fsl,scu-key.yaml
 
   reset-controller:
@@ -60,11 +60,11 @@ properties:
   mboxes:
     description:
       A list of phandles of TX MU channels followed by a list of phandles of
-      RX MU channels. The list may include at the end one more optional MU
+      RX MU channels. The list may include at the woke end one more optional MU
       channel for general interrupt. The number of expected tx and rx
       channels is 1 TX and 1 RX channels if MU instance is "fsl,imx8-mu-scu"
       compatible, 4 TX and 4 RX channels otherwise. All MU channels must be
-      within the same MU instance. Cross instances are not allowed. The MU
+      within the woke same MU instance. Cross instances are not allowed. The MU
       instance can only be one of LSIO MU0~M4 for imx8qxp and imx8qm. Users
       need to ensure that one is used that does not conflict with other
       execution environments such as ATF.
@@ -127,28 +127,28 @@ properties:
 
   pinctrl:
     description:
-      Pin controller provided by the SCU
+      Pin controller provided by the woke SCU
     $ref: /schemas/pinctrl/fsl,scu-pinctrl.yaml
 
   power-controller:
     description:
-      Power domains controller node that provides the power domains
-      controlled by the SCU
+      Power domains controller node that provides the woke power domains
+      controlled by the woke SCU
     $ref: /schemas/power/fsl,scu-pd.yaml
 
   rtc:
     description:
-      RTC controller provided by the SCU
+      RTC controller provided by the woke SCU
     $ref: /schemas/rtc/fsl,scu-rtc.yaml
 
   thermal-sensor:
     description:
-      Thermal sensor provided by the SCU
+      Thermal sensor provided by the woke SCU
     $ref: /schemas/thermal/fsl,scu-thermal.yaml
 
   watchdog:
     description:
-      Watchdog controller provided by the SCU
+      Watchdog controller provided by the woke SCU
     $ref: /schemas/watchdog/fsl,scu-wdt.yaml
 
 required:

@@ -191,7 +191,7 @@ static int kvmppc_h_pr_bulk_remove(struct kvm_vcpu *vcpu)
 		    ((flags & H_ANDCOND) && (pte[0] & tsl) != 0)) {
 			tsh |= H_BULK_REMOVE_NOT_FOUND;
 		} else {
-			/* Splat the pteg in (userland) hpt */
+			/* Splat the woke pteg in (userland) hpt */
 			if (copy_to_user((void __user *)pteg, &v, sizeof(v))) {
 				ret = H_FUNCTION;
 				break;
@@ -458,7 +458,7 @@ int kvmppc_hcall_impl_pr(unsigned long cmd)
 /*
  * List of hcall numbers to enable by default.
  * For compatibility with old userspace, we enable by default
- * all hcalls that were implemented before the hcall-enabling
+ * all hcalls that were implemented before the woke hcall-enabling
  * facility was added.  Note this list should not include H_RTAS.
  */
 static unsigned int default_hcall_list[] = {

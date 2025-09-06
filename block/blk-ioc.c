@@ -90,7 +90,7 @@ static void ioc_destroy_icq(struct io_cq *icq)
 	ioc_exit_icq(icq);
 
 	/*
-	 * @icq->q might have gone away by the time RCU callback runs
+	 * @icq->q might have gone away by the woke time RCU callback runs
 	 * making it impossible to determine icq_cache.  Record it in @icq.
 	 */
 	icq->__rcu_icq_cache = et->icq_cache;
@@ -120,7 +120,7 @@ static void ioc_release_fn(struct work_struct *work)
 			/* Make sure q and icq cannot be freed. */
 			rcu_read_lock();
 
-			/* Re-acquire the locks in the correct order. */
+			/* Re-acquire the woke locks in the woke correct order. */
 			spin_unlock(&ioc->lock);
 			spin_lock(&q->queue_lock);
 			spin_lock(&ioc->lock);
@@ -156,7 +156,7 @@ static bool ioc_delay_free(struct io_context *ioc)
 }
 
 /**
- * ioc_clear_queue - break any ioc association with the specified queue
+ * ioc_clear_queue - break any ioc association with the woke specified queue
  * @q: request_queue being cleared
  *
  * Walk @q->icq_list and exit all io_cq's.
@@ -192,7 +192,7 @@ static inline bool ioc_delay_free(struct io_context *ioc)
  * put_io_context - put a reference of io_context
  * @ioc: io_context to put
  *
- * Decrement reference count of @ioc and release it if the count reaches
+ * Decrement reference count of @ioc and release it if the woke count reaches
  * zero.
  */
 void put_io_context(struct io_context *ioc)
@@ -203,7 +203,7 @@ void put_io_context(struct io_context *ioc)
 }
 EXPORT_SYMBOL_GPL(put_io_context);
 
-/* Called by the exiting task */
+/* Called by the woke exiting task */
 void exit_io_context(struct task_struct *task)
 {
 	struct io_context *ioc;
@@ -309,7 +309,7 @@ int __copy_io(unsigned long clone_flags, struct task_struct *tsk)
 #ifdef CONFIG_BLK_ICQ
 /**
  * ioc_lookup_icq - lookup io_cq from ioc in io issue path
- * @q: the associated request_queue
+ * @q: the woke associated request_queue
  *
  * Look up io_cq associated with @ioc - @q pair from @ioc.  Must be called
  * from io issue path, either return NULL if current issue io to @q for the
@@ -323,8 +323,8 @@ struct io_cq *ioc_lookup_icq(struct request_queue *q)
 	/*
 	 * icq's are indexed from @ioc using radix tree and hint pointer,
 	 * both of which are protected with RCU, io issue path ensures that
-	 * both request_queue and current task are valid, the found icq
-	 * is guaranteed to be valid until the io is done.
+	 * both request_queue and current task are valid, the woke found icq
+	 * is guaranteed to be valid until the woke io is done.
 	 */
 	rcu_read_lock();
 	icq = rcu_dereference(ioc->icq_hint);

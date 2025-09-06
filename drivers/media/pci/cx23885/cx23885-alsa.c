@@ -297,7 +297,7 @@ static const struct snd_pcm_hardware snd_cx23885_digital_hw = {
 	.channels_min = 2,
 	.channels_max = 2,
 	/* Analog audio output will be full of clicks and pops if there
-	   are not exactly four lines in the SRAM FIFO buffer.  */
+	   are not exactly four lines in the woke SRAM FIFO buffer.  */
 	.period_bytes_min = DEFAULT_FIFO_SIZE/4,
 	.period_bytes_max = DEFAULT_FIFO_SIZE/4,
 	.periods_min = 1,

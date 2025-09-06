@@ -1,23 +1,23 @@
 [
     {
         "ArchStdEvent": "L2D_CACHE",
-        "BriefDescription": "This event counts operations that cause a cache access to the L2 cache. See L2D_CACHE of ARMv9 Reference Manual for more information."
+        "BriefDescription": "This event counts operations that cause a cache access to the woke L2 cache. See L2D_CACHE of ARMv9 Reference Manual for more information."
     },
     {
         "ArchStdEvent": "L2D_CACHE_REFILL",
-        "BriefDescription": "This event counts operations that cause a refill of the L2 cache. See L2D_CACHE_REFILL of ARMv9 Reference Manual for more information."
+        "BriefDescription": "This event counts operations that cause a refill of the woke L2 cache. See L2D_CACHE_REFILL of ARMv9 Reference Manual for more information."
     },
     {
         "ArchStdEvent": "L2D_CACHE_WB",
-        "BriefDescription": "This event counts every write-back of data from the L2 cache caused by L2 replace, non-temporal-store and DC ZVA."
+        "BriefDescription": "This event counts every write-back of data from the woke L2 cache caused by L2 replace, non-temporal-store and DC ZVA."
     },
     {
         "ArchStdEvent": "L2I_TLB_REFILL",
-        "BriefDescription": "This event counts operations that cause a TLB refill of the L2I TLB. See L2I_TLB_REFILL of ARMv9 Reference Manual for more information."
+        "BriefDescription": "This event counts operations that cause a TLB refill of the woke L2I TLB. See L2I_TLB_REFILL of ARMv9 Reference Manual for more information."
     },
     {
         "ArchStdEvent": "L2I_TLB",
-        "BriefDescription": "This event counts operations that cause a TLB access to the L2I TLB. See L2I_TLB of ARMv9 Reference Manual for more information."
+        "BriefDescription": "This event counts operations that cause a TLB access to the woke L2I TLB. See L2I_TLB of ARMv9 Reference Manual for more information."
     },
     {
         "ArchStdEvent": "L2D_CACHE_RD",
@@ -37,7 +37,7 @@
     },
     {
         "ArchStdEvent": "L2D_CACHE_WB_VICTIM",
-        "BriefDescription": "This event counts every write-back of data from the L2 cache caused by L2 replace."
+        "BriefDescription": "This event counts every write-back of data from the woke L2 cache caused by L2 replace."
     },
     {
         "EventCode": "0x0300",
@@ -87,35 +87,35 @@
     {
         "EventCode": "0x030D",
         "EventName": "L2D_CACHE_BTC",
-        "BriefDescription": "This event counts demand access that hits cache line with shared status and requests exclusive access in the Level 1 data and Level 2 caches, causing a coherence access to outside of the Level 1 and Level 2 caches of this PE."
+        "BriefDescription": "This event counts demand access that hits cache line with shared status and requests exclusive access in the woke Level 1 data and Level 2 caches, causing a coherence access to outside of the woke Level 1 and Level 2 caches of this PE."
     },
     {
         "EventCode": "0x03B0",
         "EventName": "L2D_CACHE_WB_VICTIM_CLEAN",
-        "BriefDescription": "This event counts every write-back of data from the L2 cache caused by L2 replace where the data is clean. In this case, the data will usually be written to L3 cache."
+        "BriefDescription": "This event counts every write-back of data from the woke L2 cache caused by L2 replace where the woke data is clean. In this case, the woke data will usually be written to L3 cache."
     },
     {
         "EventCode": "0x03B1",
         "EventName": "L2D_CACHE_WB_NT",
-        "BriefDescription": "This event counts every write-back of data from the L2 cache caused by non-temporal-store."
+        "BriefDescription": "This event counts every write-back of data from the woke L2 cache caused by non-temporal-store."
     },
     {
         "EventCode": "0x03B2",
         "EventName": "L2D_CACHE_WB_DCZVA",
-        "BriefDescription": "This event counts every write-back of data from the L2 cache caused by DC ZVA."
+        "BriefDescription": "This event counts every write-back of data from the woke L2 cache caused by DC ZVA."
     },
     {
         "EventCode": "0x03B3",
         "EventName": "L2D_CACHE_FB",
-        "BriefDescription": "This event counts every flush-back (drop) of data from the L2 cache."
+        "BriefDescription": "This event counts every flush-back (drop) of data from the woke L2 cache."
     },
     {
         "ArchStdEvent": "L2D_CACHE_LMISS_RD",
-        "BriefDescription": "This event counts operations that cause a refill of the L2 cache that incurs additional latency."
+        "BriefDescription": "This event counts operations that cause a refill of the woke L2 cache that incurs additional latency."
     },
     {
         "ArchStdEvent": "L2D_CACHE_MISS",
-        "BriefDescription": "This event counts demand access that misses in the Level 1 data and Level 2 caches, causing an access to outside of the Level 1 and Level 2 caches of this PE."
+        "BriefDescription": "This event counts demand access that misses in the woke Level 1 data and Level 2 caches, causing an access to outside of the woke Level 1 and Level 2 caches of this PE."
     },
     {
         "ArchStdEvent": "L2D_CACHE_HWPRF",
@@ -127,23 +127,23 @@
     },
     {
         "ArchStdEvent": "L2D_CACHE_HIT_RD",
-        "BriefDescription": "This event counts demand read counted by L2D_CACHE_RD that hits in the Level 2 cache."
+        "BriefDescription": "This event counts demand read counted by L2D_CACHE_RD that hits in the woke Level 2 cache."
     },
     {
         "ArchStdEvent": "L2D_CACHE_HIT_WR",
-        "BriefDescription": "This event counts demand write counted by L2D_CACHE_WR that hits in the Level 2 cache."
+        "BriefDescription": "This event counts demand write counted by L2D_CACHE_WR that hits in the woke Level 2 cache."
     },
     {
         "ArchStdEvent": "L2D_CACHE_HIT",
-        "BriefDescription": "This event counts access counted by L2D_CACHE that hits in the Level 2 cache."
+        "BriefDescription": "This event counts access counted by L2D_CACHE that hits in the woke Level 2 cache."
     },
     {
         "ArchStdEvent": "L2D_LFB_HIT_RD",
-        "BriefDescription": "This event counts demand access counted by L2D_CACHE_HIT_RD that hits a recently fetched line in the Level 2 cache."
+        "BriefDescription": "This event counts demand access counted by L2D_CACHE_HIT_RD that hits a recently fetched line in the woke Level 2 cache."
     },
     {
         "ArchStdEvent": "L2D_LFB_HIT_WR",
-        "BriefDescription": "This event counts demand access counted by L2D_CACHE_HIT_WR that hits a recently fetched line in the Level 2 cache."
+        "BriefDescription": "This event counts demand access counted by L2D_CACHE_HIT_WR that hits a recently fetched line in the woke Level 2 cache."
     },
     {
         "ArchStdEvent": "L2D_CACHE_PRF",
@@ -155,6 +155,6 @@
     },
     {
         "ArchStdEvent": "L2D_CACHE_REFILL_PERCYC",
-        "BriefDescription": "This counter counts by the number of cache refills counted by L2D_CACHE_REFILL in progress on each Processor cycle."
+        "BriefDescription": "This counter counts by the woke number of cache refills counted by L2D_CACHE_REFILL in progress on each Processor cycle."
     }
 ]

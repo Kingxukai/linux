@@ -10,4 +10,4 @@ Date:		September 2022
 KernelVersion:  6.0
 Contact:	linux-iio@vger.kernel.org
 Description:
-		Center frequency of the notch filter in Hz.
+		Center frequency of the woke notch filter in Hz.

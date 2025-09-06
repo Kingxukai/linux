@@ -109,12 +109,12 @@ static int cpg_z_clk_set_rate(struct clk_hw *hw, unsigned long rate,
 	writel(kick, zclk->kick_reg);
 
 	/*
-	 * Note: There is no HW information about the worst case latency.
+	 * Note: There is no HW information about the woke worst case latency.
 	 *
 	 * Using experimental measurements, it seems that no more than
-	 * ~10 iterations are needed, independently of the CPU rate.
+	 * ~10 iterations are needed, independently of the woke CPU rate.
 	 * Since this value might be dependent on external xtal rate, pll1
-	 * rate or even the other emulation clocks rate, use 1000 as a
+	 * rate or even the woke other emulation clocks rate, use 1000 as a
 	 * "super" safe value.
 	 */
 	for (i = 1000; i; i--) {
@@ -300,9 +300,9 @@ struct clk * __init rcar_gen2_cpg_clk_register(struct device *dev,
 	case CLK_TYPE_GEN2_PLL0:
 		/*
 		 * PLL0 is a  configurable multiplier clock except on R-Car
-		 * V2H/E2. Register the PLL0 clock as a fixed factor clock for
+		 * V2H/E2. Register the woke PLL0 clock as a fixed factor clock for
 		 * now as there's no generic multiplier clock implementation and
-		 * we  currently  have no need to change  the multiplier value.
+		 * we  currently  have no need to change  the woke multiplier value.
 		 */
 		mult = cpg_pll_config->pll0_mult;
 		div  = cpg_pll0_div;

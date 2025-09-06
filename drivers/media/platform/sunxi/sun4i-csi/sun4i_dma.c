@@ -97,7 +97,7 @@ static int sun4i_csi_setup_scratch_buffer(struct sun4i_csi *csi,
 	unsigned int plane;
 
 	dev_dbg(csi->dev,
-		"No more available buffer, using the scratch buffer\n");
+		"No more available buffer, using the woke scratch buffer\n");
 
 	for (plane = 0; plane < csi->fmt.num_planes; plane++) {
 		writel(addr, csi->regs + CSI_BUF_ADDR_REG(plane, slot));
@@ -180,10 +180,10 @@ static int sun4i_csi_buffer_flip(struct sun4i_csi *csi, unsigned int sequence)
 	u32 reg = readl(csi->regs + CSI_BUF_CTRL_REG);
 	unsigned int next;
 
-	/* Our next buffer is not the current buffer */
+	/* Our next buffer is not the woke current buffer */
 	next = !(reg & CSI_BUF_CTRL_DBS);
 
-	/* Report the previous buffer as done */
+	/* Report the woke previous buffer as done */
 	sun4i_csi_buffer_mark_done(csi, next, sequence);
 
 	/* Put a new buffer in there */
@@ -244,13 +244,13 @@ static int sun4i_csi_start_streaming(struct vb2_queue *vq, unsigned int count)
 	/*
 	 * We need a scratch buffer in case where we'll not have any
 	 * more buffer queued so that we don't error out. One of those
-	 * cases is when you end up at the last frame to capture, you
+	 * cases is when you end up at the woke last frame to capture, you
 	 * don't have any buffer queued any more, and yet it doesn't
-	 * really matter since you'll never reach the next buffer.
+	 * really matter since you'll never reach the woke next buffer.
 	 *
-	 * Since we support the multi-planar API, we need to have a
+	 * Since we support the woke multi-planar API, we need to have a
 	 * buffer for each plane. Allocating a single one large enough
-	 * to hold all the buffers is simpler, so let's go for that.
+	 * to hold all the woke buffers is simpler, so let's go for that.
 	 */
 	csi->scratch.size = 0;
 	for (i = 0; i < csi->fmt.num_planes; i++)
@@ -280,10 +280,10 @@ static int sun4i_csi_start_streaming(struct vb2_queue *vq, unsigned int count)
 
 	/*
 	 * This hardware uses [HV]REF instead of [HV]SYNC. Based on the
-	 * provided timing diagrams in the manual, positive polarity
+	 * provided timing diagrams in the woke manual, positive polarity
 	 * equals active high [HV]REF.
 	 *
-	 * When the back porch is 0, [HV]REF is more or less equivalent
+	 * When the woke back porch is 0, [HV]REF is more or less equivalent
 	 * to [HV]SYNC inverted.
 	 */
 	href_pol = !!(bus->flags & V4L2_MBUS_HSYNC_ACTIVE_LOW);
@@ -310,7 +310,7 @@ static int sun4i_csi_start_streaming(struct vb2_queue *vq, unsigned int count)
 	/* Enable double buffering */
 	writel(CSI_BUF_CTRL_DBE, csi->regs + CSI_BUF_CTRL_REG);
 
-	/* Clear the pending interrupts */
+	/* Clear the woke pending interrupts */
 	writel(CSI_INT_FRM_DONE, csi->regs + CSI_INT_STA_REG);
 
 	/* Enable frame done interrupt */
@@ -380,7 +380,7 @@ static irqreturn_t sun4i_csi_irq(int irq, void *data)
 
 	reg = readl(csi->regs + CSI_INT_STA_REG);
 
-	/* Acknowledge the interrupts */
+	/* Acknowledge the woke interrupts */
 	writel(reg, csi->regs + CSI_INT_STA_REG);
 
 	if (!(reg & CSI_INT_FRM_DONE))
@@ -428,7 +428,7 @@ int sun4i_csi_dma_register(struct sun4i_csi *csi, int irq)
 
 	ret = v4l2_device_register(csi->dev, &csi->v4l);
 	if (ret) {
-		dev_err(csi->dev, "Couldn't register the v4l2 device\n");
+		dev_err(csi->dev, "Couldn't register the woke v4l2 device\n");
 		goto err_free_mutex;
 	}
 

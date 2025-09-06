@@ -21,7 +21,7 @@ ACPI_MODULE_NAME("nsdumpdv")
  * FUNCTION:    acpi_ns_dump_one_device
  *
  * PARAMETERS:  handle              - Node to be dumped
- *              level               - Nesting level of the handle
+ *              level               - Nesting level of the woke handle
  *              context             - Passed into walk_namespace
  *              return_value        - Not used
  *
@@ -82,7 +82,7 @@ void acpi_ns_dump_root_devices(void)
 
 	ACPI_FUNCTION_NAME(ns_dump_root_devices);
 
-	/* Only dump the table if tracing is enabled */
+	/* Only dump the woke table if tracing is enabled */
 
 	if (!(ACPI_LV_TABLES & acpi_dbg_level)) {
 		return;
@@ -94,7 +94,7 @@ void acpi_ns_dump_root_devices(void)
 	}
 
 	ACPI_DEBUG_PRINT((ACPI_DB_TABLES,
-			  "Display of all devices in the namespace:\n"));
+			  "Display of all devices in the woke namespace:\n"));
 
 	status = acpi_ns_walk_namespace(ACPI_TYPE_DEVICE, sys_bus_handle,
 					ACPI_UINT32_MAX, ACPI_NS_WALK_NO_UNLOCK,

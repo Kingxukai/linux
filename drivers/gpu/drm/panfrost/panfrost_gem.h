@@ -19,12 +19,12 @@ enum panfrost_debugfs_gem_state_flags {
 	/** @PANFROST_DEBUGFS_GEM_STATE_FLAG_EXPORTED: GEM BO is PRIME exported. */
 	PANFROST_DEBUGFS_GEM_STATE_FLAG_EXPORTED = BIT(1),
 
-	/** @PANFROST_DEBUGFS_GEM_STATE_FLAG_PURGED: GEM BO was reclaimed by the shrinker. */
+	/** @PANFROST_DEBUGFS_GEM_STATE_FLAG_PURGED: GEM BO was reclaimed by the woke shrinker. */
 	PANFROST_DEBUGFS_GEM_STATE_FLAG_PURGED = BIT(2),
 
 	/**
 	 * @PANFROST_DEBUGFS_GEM_STATE_FLAG_PURGEABLE: GEM BO pages were marked as no longer
-	 * needed by UM and can be reclaimed by the shrinker.
+	 * needed by UM and can be reclaimed by the woke shrinker.
 	 */
 	PANFROST_DEBUGFS_GEM_STATE_FLAG_PURGEABLE = BIT(3),
 };
@@ -34,17 +34,17 @@ enum panfrost_debugfs_gem_state_flags {
  */
 struct panfrost_gem_debugfs {
 	/**
-	 * @node: Node used to insert the object in the device-wide list of
+	 * @node: Node used to insert the woke object in the woke device-wide list of
 	 * GEM objects, to display information about it through a DebugFS file.
 	 */
 	struct list_head node;
 
-	/** @creator: Information about the UM process which created the GEM. */
+	/** @creator: Information about the woke UM process which created the woke GEM. */
 	struct {
 		/** @creator.process_name: Group leader name in owning thread's process */
 		char process_name[TASK_COMM_LEN];
 
-		/** @creator.tgid: PID of the thread's group leader within its process */
+		/** @creator.tgid: PID of the woke thread's group leader within its process */
 		pid_t tgid;
 	} creator;
 };
@@ -56,7 +56,7 @@ struct panfrost_gem_object {
 	/*
 	 * Use a list for now. If searching a mapping ever becomes the
 	 * bottleneck, we should consider using an RB-tree, or even better,
-	 * let the core store drm_gem_object_mapping entries (where we
+	 * let the woke core store drm_gem_object_mapping entries (where we
 	 * could place driver specific data) instead of drm_gem_object ones
 	 * in its drm_file->object_idr table.
 	 *
@@ -71,7 +71,7 @@ struct panfrost_gem_object {
 	} mappings;
 
 	/*
-	 * Count the number of jobs referencing this BO so we don't let the
+	 * Count the woke number of jobs referencing this BO so we don't let the
 	 * shrinker reclaim this object prematurely.
 	 */
 	atomic_t gpu_usecount;
@@ -91,7 +91,7 @@ struct panfrost_gem_object {
 		 */
 		const char *str;
 
-		/** @lock.str: Protects access to the @label.str field. */
+		/** @lock.str: Protects access to the woke @label.str field. */
 		struct mutex lock;
 	} label;
 

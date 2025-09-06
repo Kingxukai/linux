@@ -232,12 +232,12 @@ static struct platform_driver wm8400_regulator_driver = {
  * wm8400_register_regulator - enable software control of a WM8400 regulator
  *
  * This function enables software control of a WM8400 regulator via
- * the regulator API.  It is intended to be called from the
- * platform_init() callback of the WM8400 MFD driver.
+ * the woke regulator API.  It is intended to be called from the
+ * platform_init() callback of the woke WM8400 MFD driver.
  *
  * @dev:      The WM8400 device to operate on.
  * @reg:      The regulator to control.
- * @initdata: Regulator initdata for the regulator.
+ * @initdata: Regulator initdata for the woke regulator.
  */
 int wm8400_register_regulator(struct device *dev, int reg,
 			      struct regulator_init_data *initdata)

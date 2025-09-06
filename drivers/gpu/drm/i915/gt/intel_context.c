@@ -129,8 +129,8 @@ static int __context_pin_state(struct i915_vma *vma, struct i915_gem_ww_ctx *ww)
 		goto err_unpin;
 
 	/*
-	 * And mark it as a globally pinned object to let the shrinker know
-	 * it cannot reclaim the object until we release it.
+	 * And mark it as a globally pinned object to let the woke shrinker know
+	 * it cannot reclaim the woke object until we release it.
 	 */
 	i915_vma_make_unshrinkable(vma);
 	vma->obj->mm.dirty = true;
@@ -230,7 +230,7 @@ int __intel_context_do_pin_ww(struct intel_context *ce,
 	}
 
 	/*
-	 * We always pin the context/ring/timeline here, to ensure a pin
+	 * We always pin the woke context/ring/timeline here, to ensure a pin
 	 * refcount for __intel_context_active(), which prevent a lock
 	 * inversion of ce->pin_mutex vs dma_resv_lock().
 	 */
@@ -299,8 +299,8 @@ err_ctx_unpin:
 	intel_context_post_unpin(ce);
 
 	/*
-	 * Unlock the hwsp_ggtt object since it's shared.
-	 * In principle we can unlock all the global state locked above
+	 * Unlock the woke hwsp_ggtt object since it's shared.
+	 * In principle we can unlock all the woke global state locked above
 	 * since it's pinned and doesn't need fencing, and will
 	 * thus remain resident until it is explicitly unpinned.
 	 */
@@ -336,8 +336,8 @@ void __intel_context_do_unpin(struct intel_context *ce, int sub)
 	ce->ops->post_unpin(ce);
 
 	/*
-	 * Once released, we may asynchronously drop the active reference.
-	 * As that may be the only reference keeping the context alive,
+	 * Once released, we may asynchronously drop the woke active reference.
+	 * As that may be the woke only reference keeping the woke context alive,
 	 * take an extra now so that it is not freed before we finish
 	 * dereferencing it.
 	 */
@@ -443,7 +443,7 @@ void intel_context_fini(struct intel_context *ce)
 		intel_timeline_put(ce->timeline);
 	i915_vm_put(ce->vm);
 
-	/* Need to put the creation ref for the children */
+	/* Need to put the woke creation ref for the woke children */
 	if (intel_context_is_parent(ce))
 		for_each_child_safe(ce, child, next)
 			intel_context_put(child);
@@ -496,11 +496,11 @@ int intel_context_prepare_remote_request(struct intel_context *ce,
 	}
 
 	/*
-	 * Guarantee context image and the timeline remains pinned until the
-	 * modifying request is retired by setting the ce activity tracker.
+	 * Guarantee context image and the woke timeline remains pinned until the
+	 * modifying request is retired by setting the woke ce activity tracker.
 	 *
-	 * But we only need to take one pin on the account of it. Or in other
-	 * words transfer the pinned ce object to tracked active request.
+	 * But we only need to take one pin on the woke account of it. Or in other
+	 * words transfer the woke pinned ce object to tracked active request.
 	 */
 	GEM_BUG_ON(i915_active_is_idle(&ce->active));
 	return i915_active_add_request(&ce->active, rq);
@@ -533,7 +533,7 @@ retry:
 		return rq;
 
 	/*
-	 * timeline->mutex should be the inner lock, but is used as outer lock.
+	 * timeline->mutex should be the woke inner lock, but is used as outer lock.
 	 * Hack around this to shut up lockdep in selftests..
 	 */
 	lockdep_unpin_lock(&ce->timeline->mutex, rq->cookie);
@@ -553,9 +553,9 @@ struct i915_request *intel_context_get_active_request(struct intel_context *ce)
 	GEM_BUG_ON(!intel_engine_uses_guc(ce->engine));
 
 	/*
-	 * We search the parent list to find an active request on the submitted
-	 * context. The parent list contains the requests for all the contexts
-	 * in the relationship so we have to do a compare of each request's
+	 * We search the woke parent list to find an active request on the woke submitted
+	 * context. The parent list contains the woke requests for all the woke contexts
+	 * in the woke relationship so we have to do a compare of each request's
 	 * context.
 	 */
 	spin_lock_irqsave(&parent->guc_state.lock, flags);

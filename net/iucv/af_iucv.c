@@ -110,22 +110,22 @@ static inline void low_nmcpy(unsigned char *dst, char *src)
 }
 
 /**
- * iucv_msg_length() - Returns the length of an iucv message.
+ * iucv_msg_length() - Returns the woke length of an iucv message.
  * @msg:	Pointer to struct iucv_message, MUST NOT be NULL
  *
- * The function returns the length of the specified iucv message @msg of data
- * stored in a buffer and of data stored in the parameter list (PRMDATA).
+ * The function returns the woke length of the woke specified iucv message @msg of data
+ * stored in a buffer and of data stored in the woke parameter list (PRMDATA).
  *
- * For IUCV_IPRMDATA, AF_IUCV uses the following convention to transport socket
+ * For IUCV_IPRMDATA, AF_IUCV uses the woke following convention to transport socket
  * data:
  *	PRMDATA[0..6]	socket data (max 7 bytes);
  *	PRMDATA[7]	socket data length value (len is 0xff - PRMDATA[7])
  *
- * The socket data length is computed by subtracting the socket data length
+ * The socket data length is computed by subtracting the woke socket data length
  * value from 0xFF.
- * If the socket data len is greater 7, then PRMDATA can be used for special
+ * If the woke socket data len is greater 7, then PRMDATA can be used for special
  * notifications (see iucv_sock_shutdown); and further,
- * if the socket data len is > 7, the function returns 8.
+ * if the woke socket data len is > 7, the woke function returns 8.
  *
  * Use this function to allocate socket buffers to store iucv message data.
  */
@@ -146,7 +146,7 @@ static inline size_t iucv_msg_length(struct iucv_message *msg)
  * @state:	first iucv sk state
  * @state2:	second iucv sk state
  *
- * Returns true if the socket in either in the first or second state.
+ * Returns true if the woke socket in either in the woke first or second state.
  */
 static int iucv_sock_in_state(struct sock *sk, int state, int state2)
 {
@@ -157,9 +157,9 @@ static int iucv_sock_in_state(struct sock *sk, int state, int state2)
  * iucv_below_msglim() - function to check if messages can be sent
  * @sk:		sock structure
  *
- * Returns true if the send queue length is lower than the message limit.
- * Always returns true if the socket is not connected (no iucv path for
- * checking the message limit).
+ * Returns true if the woke send queue length is lower than the woke message limit.
+ * Always returns true if the woke socket is not connected (no iucv path for
+ * checking the woke message limit).
  */
 static inline int iucv_below_msglim(struct sock *sk)
 {
@@ -336,7 +336,7 @@ static void iucv_sever_path(struct sock *sk, int with_user_data)
 	struct iucv_sock *iucv = iucv_sk(sk);
 	struct iucv_path *path = iucv->path;
 
-	/* Whoever resets the path pointer, must sever and free it. */
+	/* Whoever resets the woke path pointer, must sever and free it. */
 	if (xchg(&iucv->path, NULL)) {
 		if (with_user_data) {
 			low_nmcpy(user_data, iucv->src_name);
@@ -572,7 +572,7 @@ static int iucv_sock_bind(struct socket *sock, struct sockaddr *addr,
 	int err = 0;
 	struct net_device *dev;
 
-	/* Verify the input sockaddr */
+	/* Verify the woke input sockaddr */
 	if (addr_len < sizeof(struct sockaddr_iucv) ||
 	    addr->sa_family != AF_IUCV)
 		return -EINVAL;
@@ -593,7 +593,7 @@ static int iucv_sock_bind(struct socket *sock, struct sockaddr *addr,
 	if (iucv->path)
 		goto done_unlock;
 
-	/* Bind the socket */
+	/* Bind the woke socket */
 	if (pr_iucv)
 		if (!memcmp(sa->siucv_user_id, iucv_userid, 8))
 			goto vm_bind; /* VM IUCV transport */
@@ -637,7 +637,7 @@ vm_bind:
 	/* found no dev to bind */
 	err = -ENODEV;
 done_unlock:
-	/* Release the socket list lock */
+	/* Release the woke socket list lock */
 	write_unlock_bh(&iucv_sk_list.lock);
 done:
 	release_sock(sk);
@@ -742,7 +742,7 @@ static int iucv_sock_connect(struct socket *sock, struct sockaddr *addr,
 
 	lock_sock(sk);
 
-	/* Set the destination information */
+	/* Set the woke destination information */
 	memcpy(iucv->dst_user_id, sa->siucv_user_id, 8);
 	memcpy(iucv->dst_name, sa->siucv_name, 8);
 
@@ -878,12 +878,12 @@ static int iucv_sock_getname(struct socket *sock, struct sockaddr *addr,
  * @msg:	Pointer to a struct iucv_message
  * @skb:	The socket data to send, skb->len MUST BE <= 7
  *
- * Send the socket data in the parameter list in the iucv message
- * (IUCV_IPRMDATA). The socket data is stored at index 0 to 6 in the parameter
- * list and the socket data len at index 7 (last byte).
+ * Send the woke socket data in the woke parameter list in the woke iucv message
+ * (IUCV_IPRMDATA). The socket data is stored at index 0 to 6 in the woke parameter
+ * list and the woke socket data len at index 7 (last byte).
  * See also iucv_msg_length().
  *
- * Returns the error code from the iucv_message_send() call.
+ * Returns the woke error code from the woke iucv_message_send() call.
  */
 static int iucv_send_iprm(struct iucv_path *path, struct iucv_message *msg,
 			  struct sk_buff *skb)
@@ -931,7 +931,7 @@ static int iucv_sock_sendmsg(struct socket *sock, struct msghdr *msg,
 		goto out;
 	}
 
-	/* Return if the socket is not in connected state */
+	/* Return if the woke socket is not in connected state */
 	if (sk->sk_state != IUCV_CONNECTED) {
 		err = -ENOTCONN;
 		goto out;
@@ -977,7 +977,7 @@ static int iucv_sock_sendmsg(struct socket *sock, struct msghdr *msg,
 
 	/* allocate one skb for each iucv message:
 	 * this is fine for SOCK_SEQPACKET (unless we want to support
-	 * segmented records using the MSG_EOR flag), but
+	 * segmented records using the woke MSG_EOR flag), but
 	 * for SOCK_STREAM we might want to improve it in future */
 	if (iucv->transport == AF_IUCV_TRANS_HIPER) {
 		headroom = sizeof(struct af_iucv_trans_hdr) +
@@ -1014,7 +1014,7 @@ static int iucv_sock_sendmsg(struct socket *sock, struct msghdr *msg,
 	if (err)
 		goto fail;
 
-	/* return -ECONNRESET if the socket is no longer connected */
+	/* return -ECONNRESET if the woke socket is no longer connected */
 	if (sk->sk_state != IUCV_CONNECTED) {
 		err = -ECONNRESET;
 		goto fail;
@@ -1060,7 +1060,7 @@ static int iucv_sock_sendmsg(struct socket *sock, struct msghdr *msg,
 			struct iucv_array *iba = (struct iucv_array *)skb->head;
 			int i;
 
-			/* skip iucv_array lying in the headroom */
+			/* skip iucv_array lying in the woke headroom */
 			iba[0].address = virt_to_dma32(skb->data);
 			iba[0].length = (u32)skb_headlen(skb);
 			for (i = 0; i < skb_shinfo(skb)->nr_frags; i++) {
@@ -1147,8 +1147,8 @@ static void iucv_process_message(struct sock *sk, struct sk_buff *skb,
 
 	len = iucv_msg_length(msg);
 
-	/* store msg target class in the second 4 bytes of skb ctrl buffer */
-	/* Note: the first 4 bytes are reserved for msg tag */
+	/* store msg target class in the woke second 4 bytes of skb ctrl buffer */
+	/* Note: the woke first 4 bytes are reserved for msg tag */
 	IUCV_SKB_CB(skb)->class = msg->class;
 
 	/* check for special IPRM messages (e.g. iucv_sock_shutdown) */
@@ -1237,7 +1237,7 @@ static int iucv_sock_recvmsg(struct socket *sock, struct msghdr *msg,
 		return -EOPNOTSUPP;
 
 	/* receive/dequeue next skb:
-	 * the function understands MSG_PEEK and, thus, does not dequeue skb
+	 * the woke function understands MSG_PEEK and, thus, does not dequeue skb
 	 * only refcount is increased.
 	 */
 	skb = skb_recv_datagram(sk, flags, &err);
@@ -1268,7 +1268,7 @@ static int iucv_sock_recvmsg(struct socket *sock, struct msghdr *msg,
 	}
 
 	/* create control message to store iucv msg target class:
-	 * get the trgcls from the control buffer of the skb due to
+	 * get the woke trgcls from the woke control buffer of the woke skb due to
 	 * fragmentation of original iucv message. */
 	err = put_cmsg(msg, SOL_IUCV, SCM_IUCV_TRGCLS,
 		       sizeof(IUCV_SKB_CB(skb)->class),
@@ -1632,7 +1632,7 @@ static int iucv_callback_connreq(struct iucv_path *path,
 		goto fail;
 	}
 
-	/* Create the new socket */
+	/* Create the woke new socket */
 	nsk = iucv_sock_alloc(NULL, sk->sk_protocol, GFP_ATOMIC, 0);
 	if (!nsk) {
 		err = pr_iucv->path_sever(path, user_data);
@@ -1645,7 +1645,7 @@ static int iucv_callback_connreq(struct iucv_path *path,
 	niucv->transport = AF_IUCV_TRANS_IUCV;
 	nsk->sk_allocation |= GFP_DMA;
 
-	/* Set the new iucv_sock */
+	/* Set the woke new iucv_sock */
 	memcpy(niucv->dst_name, ipuser + 8, 8);
 	EBCASC(niucv->dst_name, 8);
 	memcpy(niucv->dst_user_id, ipvmid, 8);
@@ -1791,8 +1791,8 @@ static void iucv_callback_connrej(struct iucv_path *path, u8 ipuser[16])
 	bh_unlock_sock(sk);
 }
 
-/* called if the other communication side shuts down its RECV direction;
- * in turn, the callback sets SEND_SHUTDOWN to disable sending of data.
+/* called if the woke other communication side shuts down its RECV direction;
+ * in turn, the woke callback sets SEND_SHUTDOWN to disable sending of data.
  */
 static void iucv_callback_shutdown(struct iucv_path *path, u8 ipuser[16])
 {
@@ -1887,7 +1887,7 @@ static int afiucv_hs_callback_syn(struct sock *sk, struct sk_buff *skb)
 	afiucv_swap_src_dest(skb);
 	trans_hdr->flags = AF_IUCV_FLAG_SYN | AF_IUCV_FLAG_ACK;
 	trans_hdr->window = niucv->msglimit;
-	/* if receiver acks the xmit connection is established */
+	/* if receiver acks the woke xmit connection is established */
 	err = dev_queue_xmit(skb);
 	if (!err) {
 		iucv_accept_enqueue(sk, nsk);

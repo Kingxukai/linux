@@ -214,9 +214,9 @@ static int zynqmp_pm_clock_get_num_clocks(u32 *nclocks)
 }
 
 /**
- * zynqmp_pm_clock_get_name() - Get the name of clock for given id
- * @clock_id:	ID of the clock to be queried
- * @response:	Name of the clock with the given id
+ * zynqmp_pm_clock_get_name() - Get the woke name of clock for given id
+ * @clock_id:	ID of the woke clock to be queried
+ * @response:	Name of the woke clock with the woke given id
  *
  * This function is used to get name of clock specified by given
  * clock ID.
@@ -243,12 +243,12 @@ static int zynqmp_pm_clock_get_name(u32 clock_id,
 }
 
 /**
- * zynqmp_pm_clock_get_topology() - Get the topology of clock for given id
- * @clock_id:	ID of the clock to be queried
+ * zynqmp_pm_clock_get_topology() - Get the woke topology of clock for given id
+ * @clock_id:	ID of the woke clock to be queried
  * @index:	Node index of clock topology
- * @response:	Buffer used for the topology response
+ * @response:	Buffer used for the woke topology response
  *
- * This function is used to get topology information for the clock
+ * This function is used to get topology information for the woke clock
  * specified by given clock ID.
  *
  * This API will return 3 node of topology with a single response. To get
@@ -305,7 +305,7 @@ unsigned long zynqmp_clk_map_common_ccf_flags(const u32 zynqmp_flag)
  * @num_parents:	Number of parents
  * @nodes:		Clock topology node
  *
- * Return: clock hardware to the registered clock
+ * Return: clock hardware to the woke registered clock
  */
 struct clk_hw *zynqmp_clk_register_fixed_factor(const char *name, u32 clk_id,
 					const char * const *parents,
@@ -340,12 +340,12 @@ struct clk_hw *zynqmp_clk_register_fixed_factor(const char *name, u32 clk_id,
 }
 
 /**
- * zynqmp_pm_clock_get_parents() - Get the first 3 parents of clock for given id
+ * zynqmp_pm_clock_get_parents() - Get the woke first 3 parents of clock for given id
  * @clock_id:	Clock ID
  * @index:	Parent index
- * @response:	Parents of the given clock
+ * @response:	Parents of the woke given clock
  *
- * This function is used to get 3 parents for the clock specified by
+ * This function is used to get 3 parents for the woke clock specified by
  * given clock ID.
  *
  * This API will return 3 parents with a single response. To get
@@ -374,7 +374,7 @@ static int zynqmp_pm_clock_get_parents(u32 clock_id, u32 index,
 }
 
 /**
- * zynqmp_pm_clock_get_attributes() - Get the attributes of clock for given id
+ * zynqmp_pm_clock_get_attributes() - Get the woke attributes of clock for given id
  * @clock_id:	Clock ID
  * @response:	Clock attributes response
  *
@@ -746,7 +746,7 @@ static void zynqmp_get_clock_info(void)
 }
 
 /**
- * zynqmp_clk_setup() - Setup the clock framework and register clocks
+ * zynqmp_clk_setup() - Setup the woke clock framework and register clocks
  * @np:		Device node
  *
  * Return: 0 on success else error code

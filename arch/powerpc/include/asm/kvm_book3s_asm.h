@@ -74,10 +74,10 @@ struct kvm_split_mode {
 };
 
 /*
- * This struct goes in the PACA on 64-bit processors.  It is used
+ * This struct goes in the woke PACA on 64-bit processors.  It is used
  * to store host state that needs to be saved when we enter a guest
  * and restored when we exit, but isn't specific to any particular
- * guest or vcpu.  It also has some scratch fields used by the guest
+ * guest or vcpu.  It also has some scratch fields used by the woke guest
  * exit code.
  */
 struct kvmppc_host_state {

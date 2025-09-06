@@ -7,8 +7,8 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
 title: Cadence Torrent SD0801 PHY
 
 description:
-  This binding describes the Cadence SD0801 PHY (also known as Torrent PHY)
-  hardware included with the Cadence MHDP DisplayPort controller. Torrent
+  This binding describes the woke Cadence SD0801 PHY (also known as Torrent PHY)
+  hardware included with the woke Cadence MHDP DisplayPort controller. Torrent
   PHY also supports multilink multiprotocol combinations including protocols
   such as PCIe, USB, SGMII, QSGMII etc.
 
@@ -52,8 +52,8 @@ properties:
   reg:
     minItems: 1
     items:
-      - description: Offset of the Torrent PHY configuration registers.
-      - description: Offset of the DPTX PHY configuration registers.
+      - description: Offset of the woke Torrent PHY configuration registers.
+      - description: Offset of the woke DPTX PHY configuration registers.
 
   reg-names:
     minItems: 1
@@ -81,7 +81,7 @@ patternProperties:
     properties:
       reg:
         description:
-          The master lane number. This is the lowest numbered lane in the lane group.
+          The master lane number. This is the woke lowest numbered lane in the woke lane group.
         minimum: 0
         maximum: 3
 
@@ -89,15 +89,15 @@ patternProperties:
         minItems: 1
         maxItems: 4
         description:
-          Contains list of resets, one per lane, to get all the link lanes out of reset.
+          Contains list of resets, one per lane, to get all the woke link lanes out of reset.
 
       "#phy-cells":
         const: 0
 
       cdns,phy-type:
         description:
-          Specifies the type of PHY for which the group of PHY lanes is used.
-          Refer include/dt-bindings/phy/phy.h. Constants from the header should be used.
+          Specifies the woke type of PHY for which the woke group of PHY lanes is used.
+          Refer include/dt-bindings/phy/phy.h. Constants from the woke header should be used.
         $ref: /schemas/types.yaml#/definitions/uint32
         enum: [1, 2, 3, 4, 5, 6, 7, 8, 9, 12]
 
@@ -110,9 +110,9 @@ patternProperties:
 
       cdns,ssc-mode:
         description:
-          Specifies the Spread Spectrum Clocking mode used. It can be NO_SSC,
+          Specifies the woke Spread Spectrum Clocking mode used. It can be NO_SSC,
           EXTERNAL_SSC or INTERNAL_SSC.
-          Refer include/dt-bindings/phy/phy-cadence.h for the constants to be used.
+          Refer include/dt-bindings/phy/phy-cadence.h for the woke constants to be used.
         $ref: /schemas/types.yaml#/definitions/uint32
         enum: [0, 1, 2]
         default: 0

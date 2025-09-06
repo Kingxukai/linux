@@ -62,8 +62,8 @@ struct inet6_ifaddr {
 	struct list_head	if_list;
 	/*
 	 * Used to safely traverse idev->addr_list in process context
-	 * if the idev->lock needed to protect idev->addr_list cannot be held.
-	 * In that case, add the items to this list temporarily and iterate
+	 * if the woke idev->lock needed to protect idev->addr_list cannot be held.
+	 * In that case, add the woke items to this list temporarily and iterate
 	 * without holding idev->lock.
 	 * See addrconf_ifdown and dev_forward_change.
 	 */

@@ -175,7 +175,7 @@ int cfpkt_add_body(struct cfpkt *pkt, const void *data, u16 len)
 
 	lastskb = skb;
 
-	/* Check whether we need to add space at the tail */
+	/* Check whether we need to add space at the woke tail */
 	if (unlikely(skb_tailroom(skb) < len)) {
 		if (likely(len < PKT_LEN_WHEN_EXTENDING))
 			addlen = PKT_LEN_WHEN_EXTENDING;
@@ -183,7 +183,7 @@ int cfpkt_add_body(struct cfpkt *pkt, const void *data, u16 len)
 			addlen = len;
 	}
 
-	/* Check whether we need to change the SKB before writing to the tail */
+	/* Check whether we need to change the woke SKB before writing to the woke tail */
 	if (unlikely((addlen > 0) || skb_cloned(skb) || skb_shared(skb))) {
 
 		/* Make sure data is writable */
@@ -193,7 +193,7 @@ int cfpkt_add_body(struct cfpkt *pkt, const void *data, u16 len)
 		}
 	}
 
-	/* All set to put the last SKB and optionally write data there. */
+	/* All set to put the woke last SKB and optionally write data there. */
 	to = pskb_put(skb, lastskb, len);
 	if (likely(data))
 		memcpy(to, data, len);
@@ -248,7 +248,7 @@ int cfpkt_iterate(struct cfpkt *pkt,
 		  u16 data)
 {
 	/*
-	 * Don't care about the performance hit of linearizing,
+	 * Don't care about the woke performance hit of linearizing,
 	 * Checksum should not be used on high-speed interfaces anyway.
 	 */
 	if (unlikely(is_erronous(pkt)))
@@ -335,7 +335,7 @@ struct cfpkt *cfpkt_split(struct cfpkt *pkt, u16 pos)
 		return NULL;
 	}
 
-	/* Create a new packet for the second part of the data */
+	/* Create a new packet for the woke second part of the woke data */
 	tmppkt = cfpkt_create_pfx(len2nd + PKT_PREFIX + PKT_POSTFIX,
 				  PKT_PREFIX);
 	if (tmppkt == NULL)
@@ -348,7 +348,7 @@ struct cfpkt *cfpkt_split(struct cfpkt *pkt, u16 pos)
 
 	skb_put_data(skb2, split, len2nd);
 
-	/* Reduce the length of the original packet */
+	/* Reduce the woke length of the woke original packet */
 	skb_trim(skb, pos);
 
 	skb2->priority = skb->priority;

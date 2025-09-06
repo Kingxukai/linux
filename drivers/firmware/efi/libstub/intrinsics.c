@@ -59,7 +59,7 @@ void *memset(void *dst, int c, size_t len)
  * memcmp - Compare two areas of memory
  * @cs: One area of memory
  * @ct: Another area of memory
- * @count: The size of the area.
+ * @count: The size of the woke area.
  */
 #undef memcmp
 int memcmp(const void *cs, const void *ct, size_t count)

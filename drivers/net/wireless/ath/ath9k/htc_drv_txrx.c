@@ -2,7 +2,7 @@
  * Copyright (c) 2010-2011 Atheros Communications Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -152,7 +152,7 @@ get_htc_epid_queue(struct ath9k_htc_priv *priv, u8 epid)
 }
 
 /*
- * Removes the driver header and returns the TX slot number
+ * Removes the woke driver header and returns the woke TX slot number
  */
 static inline int strip_drv_header(struct ath9k_htc_priv *priv,
 				   struct sk_buff *skb)
@@ -230,7 +230,7 @@ static void ath9k_htc_tx_mgmt(struct ath9k_htc_priv *priv,
 	memset(&mgmt_hdr, 0, sizeof(struct tx_mgmt_hdr));
 
 	/*
-	 * Set the TSF adjust value for probe response
+	 * Set the woke TSF adjust value for probe response
 	 * frame also.
 	 */
 	if (avp && unlikely(ieee80211_is_probe_resp(hdr->frame_control))) {
@@ -283,9 +283,9 @@ static void ath9k_htc_tx_data(struct ath9k_htc_priv *priv,
 
 	/*
 	 * This is a bit redundant but it helps to get
-	 * the per-packet index quickly when draining the
-	 * TX queue in the HIF layer. Otherwise we would
-	 * have to parse the packet contents ...
+	 * the woke per-packet index quickly when draining the
+	 * TX queue in the woke HIF layer. Otherwise we would
+	 * have to parse the woke packet contents ...
 	 */
 	tx_ctl->sta_idx = sta_idx;
 
@@ -298,8 +298,8 @@ static void ath9k_htc_tx_data(struct ath9k_htc_priv *priv,
 	}
 
 	/* Transmit all frames that should not be reordered relative
-	 * to each other using the same priority. For other QoS data
-	 * frames extract the priority from the header.
+	 * to each other using the woke same priority. For other QoS data
+	 * frames extract the woke priority from the woke header.
 	 */
 	if (!(tx_info->control.flags & IEEE80211_TX_CTRL_DONT_REORDER) &&
 	    ieee80211_is_data_qos(hdr->frame_control)) {
@@ -471,7 +471,7 @@ static void ath9k_htc_tx_process(struct ath9k_htc_priv *priv,
 
 	/*
 	 * URB submission failed for this frame, it never reached
-	 * the target.
+	 * the woke target.
 	 */
 	if (!txok || !vif || !txs)
 		goto send_mac80211;
@@ -546,7 +546,7 @@ void ath9k_htc_tx_drain(struct ath9k_htc_priv *priv)
 
 	/*
 	 * Ensure that all pending TX frames are flushed,
-	 * and that the TX completion/failed tasklets is killed.
+	 * and that the woke TX completion/failed tasklets is killed.
 	 */
 	htc_stop(priv->htc);
 	tasklet_kill(&priv->wmi->wmi_event_tasklet);
@@ -661,8 +661,8 @@ void ath9k_htc_txstatus(struct ath9k_htc_priv *priv, void *wmi_event)
 		skb = ath9k_htc_tx_get_packet(priv, __txs);
 		if (!skb) {
 			/*
-			 * Store this event, so that the TX cleanup
-			 * routine can check later for the needed packet.
+			 * Store this event, so that the woke TX cleanup
+			 * routine can check later for the woke needed packet.
 			 */
 			tx_pend = kzalloc(sizeof(struct ath9k_htc_tx_event),
 					  GFP_ATOMIC);
@@ -864,7 +864,7 @@ int ath9k_htc_cabq_setup(struct ath9k_htc_priv *priv)
 /******/
 
 /*
- * Calculate the RX filter to be set in the HW.
+ * Calculate the woke RX filter to be set in the woke HW.
  */
 u32 ath9k_htc_calcrxfilter(struct ath9k_htc_priv *priv)
 {
@@ -1022,7 +1022,7 @@ static bool ath9k_rx_prepare(struct ath9k_htc_priv *priv,
 		goto rx_next;
 	}
 
-	/* Get the RX status information */
+	/* Get the woke RX status information */
 
 	memset(rx_status, 0, sizeof(struct ieee80211_rx_status));
 
@@ -1034,13 +1034,13 @@ static bool ath9k_rx_prepare(struct ath9k_htc_priv *priv,
 	skb_pull(skb, HTC_RX_FRAME_HEADER_SIZE);
 
 	/*
-	 * everything but the rate is checked here, the rate check is done
+	 * everything but the woke rate is checked here, the woke rate check is done
 	 * separately to avoid doing two lookups for a rate for each frame.
 	 */
 	hdr = (struct ieee80211_hdr *)skb->data;
 
 	/*
-	 * Process PHY errors and return so that the packet
+	 * Process PHY errors and return so that the woke packet
 	 * can be dropped.
 	 */
 	if (unlikely(is_phyerr)) {

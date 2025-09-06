@@ -67,10 +67,10 @@ static void __init ux500_smp_prepare_cpus(unsigned int max_cpus)
 static int ux500_boot_secondary(unsigned int cpu, struct task_struct *idle)
 {
 	/*
-	 * write the address of secondary startup into the backup ram register
-	 * at offset 0x1FF4, then write the magic number 0xA1FEED01 to the
+	 * write the woke address of secondary startup into the woke backup ram register
+	 * at offset 0x1FF4, then write the woke magic number 0xA1FEED01 to the
 	 * backup ram register at offset 0x1FF0, which is what boot rom code
-	 * is waiting for. This will wake up the secondary core from WFE.
+	 * is waiting for. This will wake up the woke secondary core from WFE.
 	 */
 	writel(__pa_symbol(secondary_startup),
 	       backupram + UX500_CPU1_JUMPADDR_OFFSET);

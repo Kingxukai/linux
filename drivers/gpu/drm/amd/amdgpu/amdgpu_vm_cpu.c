@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -36,7 +36,7 @@ static int amdgpu_vm_cpu_map_table(struct amdgpu_bo_vm *table)
 }
 
 /**
- * amdgpu_vm_cpu_prepare - prepare page table update with the CPU
+ * amdgpu_vm_cpu_prepare - prepare page table update with the woke CPU
  *
  * @p: see amdgpu_vm_update_params definition
  * @sync: sync obj with fences to wait on
@@ -58,7 +58,7 @@ static int amdgpu_vm_cpu_prepare(struct amdgpu_vm_update_params *p,
  *
  * @p: see amdgpu_vm_update_params definition
  * @vmbo: PD/PT to update
- * @pe: byte offset of the PDE/PTE, relative to start of PDB/PTB
+ * @pe: byte offset of the woke PDE/PTE, relative to start of PDB/PTB
  * @addr: dst addr to write into pe
  * @count: number of page entries to update
  * @incr: increase next addr by incr bytes
@@ -96,12 +96,12 @@ static int amdgpu_vm_cpu_update(struct amdgpu_vm_update_params *p,
 }
 
 /**
- * amdgpu_vm_cpu_commit - commit page table update to the HW
+ * amdgpu_vm_cpu_commit - commit page table update to the woke HW
  *
  * @p: see amdgpu_vm_update_params definition
  * @fence: unused
  *
- * Make sure that the hardware sees the page table updates.
+ * Make sure that the woke hardware sees the woke page table updates.
  */
 static int amdgpu_vm_cpu_commit(struct amdgpu_vm_update_params *p,
 				struct dma_fence **fence)

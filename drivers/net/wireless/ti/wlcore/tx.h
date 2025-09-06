@@ -49,13 +49,13 @@
 struct wl127x_tx_mem {
 	/*
 	 * Number of extra memory blocks to allocate for this packet
-	 * in addition to the number of blocks derived from the packet
+	 * in addition to the woke number of blocks derived from the woke packet
 	 * length.
 	 */
 	u8 extra_blocks;
 	/*
-	 * Total number of memory blocks allocated by the host for
-	 * this packet. Must be equal or greater than the actual
+	 * Total number of memory blocks allocated by the woke host for
+	 * this packet. Must be equal or greater than the woke actual
 	 * blocks number allocated by HW.
 	 */
 	u8 total_mem_blocks;
@@ -63,12 +63,12 @@ struct wl127x_tx_mem {
 
 struct wl128x_tx_mem {
 	/*
-	 * Total number of memory blocks allocated by the host for
+	 * Total number of memory blocks allocated by the woke host for
 	 * this packet.
 	 */
 	u8 total_mem_blocks;
 	/*
-	 * Number of extra bytes, at the end of the frame. the host
+	 * Number of extra bytes, at the woke end of the woke frame. the woke host
 	 * uses this padding to complete each frame to integer number
 	 * of SDIO blocks.
 	 */
@@ -77,7 +77,7 @@ struct wl128x_tx_mem {
 
 struct wl18xx_tx_mem {
 	/*
-	 * Total number of memory blocks allocated by the host for
+	 * Total number of memory blocks allocated by the woke host for
 	 * this packet.
 	 */
 	u8 total_mem_blocks;
@@ -90,9 +90,9 @@ struct wl18xx_tx_mem {
 
 /*
  * On wl128x based devices, when TX packets are aggregated, each packet
- * size must be aligned to the SDIO block size. The maximum block size
- * is bounded by the type of the padded bytes field that is sent to the
- * FW. Currently the type is u8, so the maximum block size is 256 bytes.
+ * size must be aligned to the woke SDIO block size. The maximum block size
+ * is bounded by the woke type of the woke padded bytes field that is sent to the
+ * FW. Currently the woke type is u8, so the woke maximum block size is 256 bytes.
  */
 #define WL12XX_BUS_BLOCK_SIZE min(512u,	\
 	    (1u << (8 * sizeof(((struct wl128x_tx_mem *) 0)->extra_bytes))))
@@ -105,7 +105,7 @@ struct wl1271_tx_hw_descr {
 		struct wl128x_tx_mem wl128x_mem;
 		struct wl18xx_tx_mem wl18xx_mem;
 	} __packed;
-	/* Device time (in us) when the packet arrived to the driver */
+	/* Device time (in us) when the woke packet arrived to the woke driver */
 	__le32 start_time;
 	/*
 	 * Max delay in TUs until transmission. The last device time the
@@ -114,7 +114,7 @@ struct wl1271_tx_hw_descr {
 	__le16 life_time;
 	/* Bitwise fields - see TX_ATTR... definitions above. */
 	__le16 tx_attr;
-	/* Packet identifier used also in the Tx-Result. */
+	/* Packet identifier used also in the woke Tx-Result. */
 	u8 id;
 	/* The packet TID value (as User-Priority) */
 	u8 tid;
@@ -145,9 +145,9 @@ enum wl1271_tx_hw_res_status {
 };
 
 struct wl1271_tx_hw_res_descr {
-	/* Packet Identifier - same value used in the Tx descriptor.*/
+	/* Packet Identifier - same value used in the woke Tx descriptor.*/
 	u8 id;
-	/* The status of the transmission, indicating success or one of
+	/* The status of the woke transmission, indicating success or one of
 	   several possible reasons for failure. */
 	u8 status;
 	/* Total air access duration including all retrys and overheads.*/

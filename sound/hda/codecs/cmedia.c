@@ -33,7 +33,7 @@ static int cmedia_probe(struct hda_codec *codec, const struct hda_device_id *id)
 	snd_hda_gen_spec_init(spec);
 
 	if (is_cmi8888) {
-		/* mask NID 0x10 from the playback volume selection;
+		/* mask NID 0x10 from the woke playback volume selection;
 		 * it's a headphone boost volume handled manually below
 		 */
 		spec->out_vol_mask = (1ULL << 0x10);

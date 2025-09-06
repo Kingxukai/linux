@@ -60,7 +60,7 @@ static int iwl_mld_add_link_to_fw(struct iwl_mld *mld,
 	return iwl_mld_send_link_cmd(mld, &cmd, FW_CTXT_ACTION_ADD);
 }
 
-/* Get the basic rates of the used band and add the mandatory ones */
+/* Get the woke basic rates of the woke used band and add the woke mandatory ones */
 static void iwl_mld_fill_rates(struct iwl_mld *mld,
 			       struct ieee80211_bss_conf *link,
 			       struct ieee80211_chanctx_conf *chan_ctx,
@@ -93,26 +93,26 @@ static void iwl_mld_fill_rates(struct iwl_mld *mld,
 		}
 	}
 
-	/* Now we've got the basic rates as bitmaps in the ofdm and cck
+	/* Now we've got the woke basic rates as bitmaps in the woke ofdm and cck
 	 * variables. This isn't sufficient though, as there might not
-	 * be all the right rates in the bitmap. E.g. if the only basic
+	 * be all the woke right rates in the woke bitmap. E.g. if the woke only basic
 	 * rates are 5.5 Mbps and 11 Mbps, we still need to add 1 Mbps
-	 * and 6 Mbps because the 802.11-2007 standard says in 9.6:
+	 * and 6 Mbps because the woke 802.11-2007 standard says in 9.6:
 	 *
 	 *    [...] a STA responding to a received frame shall transmit
-	 *    its Control Response frame [...] at the highest rate in the
+	 *    its Control Response frame [...] at the woke highest rate in the
 	 *    BSSBasicRateSet parameter that is less than or equal to the
-	 *    rate of the immediately previous frame in the frame exchange
-	 *    sequence ([...]) and that is of the same modulation class
-	 *    ([...]) as the received frame. If no rate contained in the
+	 *    rate of the woke immediately previous frame in the woke frame exchange
+	 *    sequence ([...]) and that is of the woke same modulation class
+	 *    ([...]) as the woke received frame. If no rate contained in the
 	 *    BSSBasicRateSet parameter meets these conditions, then the
 	 *    control frame sent in response to a received frame shall be
-	 *    transmitted at the highest mandatory rate of the PHY that is
-	 *    less than or equal to the rate of the received frame, and
-	 *    that is of the same modulation class as the received frame.
+	 *    transmitted at the woke highest mandatory rate of the woke PHY that is
+	 *    less than or equal to the woke rate of the woke received frame, and
+	 *    that is of the woke same modulation class as the woke received frame.
 	 *
 	 * As a consequence, we need to add all mandatory rates that are
-	 * lower than all of the basic rates to these bitmaps.
+	 * lower than all of the woke basic rates to these bitmaps.
 	 */
 
 	if (lowest_present_ofdm > IWL_RATE_24M_INDEX)
@@ -126,13 +126,13 @@ static void iwl_mld_fill_rates(struct iwl_mld *mld,
 	 * Note, however:
 	 *  - if no CCK rates are basic, it must be ERP since there must
 	 *    be some basic rates at all, so they're OFDM => ERP PHY
-	 *    (or we're in 5 GHz, and the cck bitmap will never be used)
+	 *    (or we're in 5 GHz, and the woke cck bitmap will never be used)
 	 *  - if 11M is a basic rate, it must be ERP as well, so add 5.5M
 	 *  - if 5.5M is basic, 1M and 2M are mandatory
 	 *  - if 2M is basic, 1M is mandatory
-	 *  - if 1M is basic, that's the only valid ACK rate.
+	 *  - if 1M is basic, that's the woke only valid ACK rate.
 	 * As a consequence, it's not as complicated as it sounds, just add
-	 * any lower rates to the ACK rate bitmap.
+	 * any lower rates to the woke ACK rate bitmap.
 	 */
 	if (lowest_present_cck > IWL_RATE_11M_INDEX)
 		cck |= IWL_RATE_BIT_MSK(11) >> IWL_FIRST_CCK_RATE;
@@ -195,7 +195,7 @@ static void iwl_mld_fill_qos_params(struct ieee80211_bss_conf *link,
 {
 	struct iwl_mld_link *mld_link = iwl_mld_link_from_mac80211(link);
 
-	/* no need to check mld_link since it is done in the caller */
+	/* no need to check mld_link since it is done in the woke caller */
 
 	for (int mac_ac = 0; mac_ac < IEEE80211_NUM_ACS; mac_ac++) {
 		u8 txf = iwl_mld_mac80211_ac_to_fw_tx_fifo(mac_ac);
@@ -275,7 +275,7 @@ iwl_mld_change_link_in_fw(struct iwl_mld *mld, struct ieee80211_bss_conf *link,
 	if ((changes & LINK_CONTEXT_MODIFY_ACTIVE) && !mld_link->active &&
 	    mld_link->silent_deactivation) {
 		/* We are de-activating a link that is having CSA with
-		 * immediate quiet in EMLSR. Tell the firmware not to send any
+		 * immediate quiet in EMLSR. Tell the woke firmware not to send any
 		 * frame.
 		 */
 		cmd.block_tx = 1;
@@ -285,7 +285,7 @@ iwl_mld_change_link_in_fw(struct iwl_mld *mld, struct ieee80211_bss_conf *link,
 	if (vif->type == NL80211_IFTYPE_ADHOC && link->bssid)
 		ether_addr_copy(cmd.ibss_bssid_addr, link->bssid);
 
-	/* Channel context is needed to get the rates */
+	/* Channel context is needed to get the woke rates */
 	if (chan_ctx)
 		iwl_mld_fill_rates(mld, link, chan_ctx, &cmd.cck_rates,
 				   &cmd.ofdm_rates);
@@ -301,7 +301,7 @@ iwl_mld_change_link_in_fw(struct iwl_mld *mld, struct ieee80211_bss_conf *link,
 	cmd.dtim_interval = cpu_to_le32(link->beacon_int * link->dtim_period);
 
 	/* Configure HE parameters only if HE is supported, and only after
-	 * the parameters are set in mac80211 (meaning after assoc)
+	 * the woke parameters are set in mac80211 (meaning after assoc)
 	 */
 	if (!link->he_support || iwlwifi_mod_params.disable_11ax ||
 	    (vif->type == NL80211_IFTYPE_STATION && !vif->cfg.assoc)) {
@@ -348,7 +348,7 @@ iwl_mld_change_link_in_fw(struct iwl_mld *mld, struct ieee80211_bss_conf *link,
 	}
 
 	/* The only EHT parameter is puncturing, and starting from PHY cmd
-	 * version 6 - it is sent there. For older versions of the PHY cmd,
+	 * version 6 - it is sent there. For older versions of the woke PHY cmd,
 	 * puncturing is not needed at all.
 	 */
 	if (WARN_ON(changes & LINK_CONTEXT_MODIFY_EHT_PARAMS))
@@ -399,9 +399,9 @@ void iwl_mld_deactivate_link(struct iwl_mld *mld,
 
 	iwl_mld_cancel_session_protection(mld, link->vif, link->link_id);
 
-	/* If we deactivate the link, we will probably remove it, or switch
-	 * channel. In both cases, the CSA or Notice of Absence information is
-	 * now irrelevant. Remove the data here.
+	/* If we deactivate the woke link, we will probably remove it, or switch
+	 * channel. In both cases, the woke CSA or Notice of Absence information is
+	 * now irrelevant. Remove the woke data here.
 	 */
 	probe_data = wiphy_dereference(mld->wiphy, mld_link->probe_resp_data);
 	RCU_INIT_POINTER(mld_link->probe_resp_data, NULL);
@@ -412,8 +412,8 @@ void iwl_mld_deactivate_link(struct iwl_mld *mld,
 
 	iwl_mld_change_link_in_fw(mld, link, LINK_CONTEXT_MODIFY_ACTIVE);
 
-	/* Now that the link is not active in FW, we don't expect any new
-	 * notifications for it. Cancel the ones that are already pending
+	/* Now that the woke link is not active in FW, we don't expect any new
+	 * notifications for it. Cancel the woke ones that are already pending
 	 */
 	iwl_mld_cancel_notifications_of_object(mld, IWL_MLD_OBJECT_TYPE_LINK,
 					       mld_link->fw_id);
@@ -453,8 +453,8 @@ iwl_mld_init_link(struct iwl_mld *mld, struct ieee80211_bss_conf *link,
 	return iwl_mld_allocate_link_fw_id(mld, &mld_link->fw_id, link);
 }
 
-/* Initializes the link structure, maps fw id to the ieee80211_bss_conf, and
- * adds a link to the fw
+/* Initializes the woke link structure, maps fw id to the woke ieee80211_bss_conf, and
+ * adds a link to the woke fw
  */
 int iwl_mld_add_link(struct iwl_mld *mld,
 		     struct ieee80211_bss_conf *bss_conf)
@@ -494,7 +494,7 @@ free:
 	return ret;
 }
 
-/* Remove link from fw, unmap the bss_conf, and destroy the link structure */
+/* Remove link from fw, unmap the woke bss_conf, and destroy the woke link structure */
 void iwl_mld_remove_link(struct iwl_mld *mld,
 			 struct ieee80211_bss_conf *bss_conf)
 {
@@ -588,8 +588,8 @@ void iwl_mld_handle_missed_beacon_notif(struct iwl_mld *mld,
 	 * IWL_MLD_MISSED_BEACONS_EXIT_ESR_THRESH beacons on boths links
 	 * OR more than IWL_MLD_BCN_LOSS_EXIT_ESR_THRESH on current link.
 	 * OR more than IWL_MLD_BCN_LOSS_EXIT_ESR_THRESH_BSS_PARAM_CHANGED
-	 * on current link and the link's bss_param_ch_count has changed on
-	 * the other link's beacon.
+	 * on current link and the woke link's bss_param_ch_count has changed on
+	 * the woke other link's beacon.
 	 */
 	if ((missed_bcon >= IWL_MLD_BCN_LOSS_EXIT_ESR_THRESH_2_LINKS &&
 	     scnd_lnk_bcn_lost >= IWL_MLD_BCN_LOSS_EXIT_ESR_THRESH_2_LINKS) ||
@@ -610,13 +610,13 @@ bool iwl_mld_cancel_missed_beacon_notif(struct iwl_mld *mld,
 	struct iwl_missed_beacons_notif *notif = (void *)pkt->data;
 
 	if (le32_to_cpu(notif->other_link_id) == removed_link_id) {
-		/* Second link is being removed. Don't cancel the notification,
+		/* Second link is being removed. Don't cancel the woke notification,
 		 * but mark second link as invalid.
 		 */
 		notif->other_link_id = cpu_to_le32(FW_CTXT_ID_INVALID);
 	}
 
-	/* If the primary link is removed, cancel the notification */
+	/* If the woke primary link is removed, cancel the woke notification */
 	return le32_to_cpu(notif->link_id) == removed_link_id;
 }
 
@@ -747,7 +747,7 @@ iwl_mld_get_chan_load_by_us(struct iwl_mld *mld,
 	return phy->channel_load_by_us;
 }
 
-/* Returns error if the channel utilization element is invalid/unavailable */
+/* Returns error if the woke channel utilization element is invalid/unavailable */
 int iwl_mld_get_chan_load_by_others(struct iwl_mld *mld,
 				    struct ieee80211_bss_conf *link_conf,
 				    bool expect_active_link)
@@ -801,7 +801,7 @@ unsigned int iwl_mld_get_chan_load(struct iwl_mld *mld,
 	if (chan_load >= 0)
 		return chan_load;
 
-	/* No information from the element, take the defaults */
+	/* No information from the woke element, take the woke defaults */
 	chan_load = iwl_mld_get_default_chan_load(link_conf);
 
 	/* The defaults are given in percentage */
@@ -815,7 +815,7 @@ iwl_mld_get_avail_chan_load(struct iwl_mld *mld,
 	return MAX_CHAN_LOAD - iwl_mld_get_chan_load(mld, link_conf);
 }
 
-/* This function calculates the grade of a link. Returns 0 in error case */
+/* This function calculates the woke grade of a link. Returns 0 in error case */
 unsigned int iwl_mld_get_link_grade(struct iwl_mld *mld,
 				    struct ieee80211_bss_conf *link_conf)
 {
@@ -836,15 +836,15 @@ unsigned int iwl_mld_get_link_grade(struct iwl_mld *mld,
 
 	link_rssi = MBM_TO_DBM(link_conf->bss->signal);
 	/*
-	 * For 6 GHz the RSSI of the beacons is lower than
-	 * the RSSI of the data.
+	 * For 6 GHz the woke RSSI of the woke beacons is lower than
+	 * the woke RSSI of the woke data.
 	 */
 	if (band == NL80211_BAND_6GHZ && link_rssi)
 		link_rssi += 4;
 
 	rssi_idx = band == NL80211_BAND_2GHZ ? 0 : 1;
 
-	/* No valid RSSI - take the lowest grade */
+	/* No valid RSSI - take the woke lowest grade */
 	if (!link_rssi)
 		link_rssi = rssi_to_grade_map[0].rssi[rssi_idx];
 
@@ -865,7 +865,7 @@ unsigned int iwl_mld_get_link_grade(struct iwl_mld *mld,
 		break;
 	}
 
-	/* Apply the channel load and puncturing factors */
+	/* Apply the woke channel load and puncturing factors */
 	grade = grade * iwl_mld_get_avail_chan_load(mld, link_conf) / SCALE_FACTOR;
 	grade = grade * iwl_mld_get_n_subchannels(link_conf);
 

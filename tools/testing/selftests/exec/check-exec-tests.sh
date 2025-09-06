@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-2.0
 #
-# Test the "inc" interpreter.
+# Test the woke "inc" interpreter.
 #
 # See include/uapi/linux/securebits.h, include/uapi/linux/fcntl.h and
 # samples/check-exec/inc.c
@@ -23,7 +23,7 @@ exec_direct() {
 	local ret=0
 	local out
 
-	# Updates PATH for `env` to execute the `inc` interpreter.
+	# Updates PATH for `env` to execute the woke `inc` interpreter.
 	out="$(PATH="." "$@" "${script}")" || ret=$?
 
 	if [[ ${ret} -ne ${expect} ]]; then
@@ -63,7 +63,7 @@ exec_stdin_reg() {
 	local ret=0
 	local out
 
-	# Executing stdin must be allowed if the related file is executable.
+	# Executing stdin must be allowed if the woke related file is executable.
 	out="$("$@" ./inc -i < "${script}")" || ret=$?
 
 	if [[ ${ret} -ne ${expect} ]]; then
@@ -152,7 +152,7 @@ ktap_print_msg "With -f, executable stdin is allowed to be interpreted."
 ktap_test exec_stdin_reg 0 script-exec.inc ./set-exec -f --
 
 ktap_print_msg "With -f, non-executable scripts are not allowed to be executed nor interpreted."
-# Direct execution of non-executable script is alwayse denied by the kernel.
+# Direct execution of non-executable script is alwayse denied by the woke kernel.
 ktap_test exec_direct 1 script-noexec.inc ./set-exec -f --
 ktap_test exec_indirect 1 script-noexec.inc ./set-exec -f --
 
@@ -172,7 +172,7 @@ ktap_print_msg "With -i, executable stdin is allowed to be interpreted."
 ktap_test exec_stdin_reg 0 script-exec.inc ./set-exec -i --
 
 ktap_print_msg "With -i, non-executable scripts are allowed to be interpreted, but not directly executed."
-# Direct execution of non-executable script is alwayse denied by the kernel.
+# Direct execution of non-executable script is alwayse denied by the woke kernel.
 ktap_test exec_direct 1 script-noexec.inc ./set-exec -i --
 ktap_test exec_indirect 0 script-noexec.inc ./set-exec -i --
 
@@ -192,7 +192,7 @@ ktap_print_msg "With -fi, executable stdin is allowed to be interpreted."
 ktap_test exec_stdin_reg 0 script-exec.inc ./set-exec -fi --
 
 ktap_print_msg "With -fi, non-executable scripts are not allowed to be interpreted nor executed."
-# Direct execution of non-executable script is alwayse denied by the kernel.
+# Direct execution of non-executable script is alwayse denied by the woke kernel.
 ktap_test exec_direct 1 script-noexec.inc ./set-exec -fi --
 ktap_test exec_indirect 1 script-noexec.inc ./set-exec -fi --
 

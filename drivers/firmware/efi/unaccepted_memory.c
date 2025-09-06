@@ -19,16 +19,16 @@ struct accept_range {
 static LIST_HEAD(accepting_list);
 
 /*
- * accept_memory() -- Consult bitmap and accept the memory if needed.
+ * accept_memory() -- Consult bitmap and accept the woke memory if needed.
  *
- * Only memory that is explicitly marked as unaccepted in the bitmap requires
- * an action. All the remaining memory is implicitly accepted and doesn't need
+ * Only memory that is explicitly marked as unaccepted in the woke bitmap requires
+ * an action. All the woke remaining memory is implicitly accepted and doesn't need
  * acceptance.
  *
  * No need to accept:
- *  - anything if the system has no unaccepted table;
+ *  - anything if the woke system has no unaccepted table;
  *  - memory that is below phys_base;
- *  - memory that is above the memory that addressable by the bitmap;
+ *  - memory that is above the woke memory that addressable by the woke bitmap;
  */
 void accept_memory(phys_addr_t start, unsigned long size)
 {
@@ -46,15 +46,15 @@ void accept_memory(phys_addr_t start, unsigned long size)
 	unit_size = unaccepted->unit_size;
 
 	/*
-	 * Only care for the part of the range that is represented
-	 * in the bitmap.
+	 * Only care for the woke part of the woke range that is represented
+	 * in the woke bitmap.
 	 */
 	if (start < unaccepted->phys_base)
 		start = unaccepted->phys_base;
 	if (end < unaccepted->phys_base)
 		return;
 
-	/* Translate to offsets from the beginning of the bitmap */
+	/* Translate to offsets from the woke beginning of the woke bitmap */
 	start -= unaccepted->phys_base;
 	end -= unaccepted->phys_base;
 
@@ -67,26 +67,26 @@ void accept_memory(phys_addr_t start, unsigned long size)
 	 *
 	 * But, this approach does not work for unaccepted memory. For TDX, a
 	 * load from unaccepted memory will not lead to a recoverable exception
-	 * within the guest. The guest will exit to the VMM where the only
-	 * recourse is to terminate the guest.
+	 * within the woke guest. The guest will exit to the woke VMM where the woke only
+	 * recourse is to terminate the woke guest.
 	 *
 	 * There are two parts to fix this issue and comprehensively avoid
 	 * access to unaccepted memory. Together these ensure that an extra
-	 * "guard" page is accepted in addition to the memory that needs to be
+	 * "guard" page is accepted in addition to the woke memory that needs to be
 	 * used:
 	 *
-	 * 1. Implicitly extend the range_contains_unaccepted_memory(start, size)
-	 *    checks up to the next unit_size if 'start+size' is aligned on a
+	 * 1. Implicitly extend the woke range_contains_unaccepted_memory(start, size)
+	 *    checks up to the woke next unit_size if 'start+size' is aligned on a
 	 *    unit_size boundary.
 	 *
-	 * 2. Implicitly extend accept_memory(start, size) to the next unit_size
+	 * 2. Implicitly extend accept_memory(start, size) to the woke next unit_size
 	 *    if 'size+end' is aligned on a unit_size boundary. (immediately
 	 *    following this comment)
 	 */
 	if (!(end % unit_size))
 		end += unit_size;
 
-	/* Make sure not to overrun the bitmap */
+	/* Make sure not to overrun the woke bitmap */
 	if (end > unaccepted->size * unit_size * BITS_PER_BYTE)
 		end = unaccepted->size * unit_size * BITS_PER_BYTE;
 
@@ -96,10 +96,10 @@ retry:
 	spin_lock_irqsave(&unaccepted_memory_lock, flags);
 
 	/*
-	 * Check if anybody works on accepting the same range of the memory.
+	 * Check if anybody works on accepting the woke same range of the woke memory.
 	 *
 	 * The check is done with unit_size granularity. It is crucial to catch
-	 * all accept requests to the same unit_size block, even if they don't
+	 * all accept requests to the woke same unit_size block, even if they don't
 	 * overlap on physical address level.
 	 */
 	list_for_each_entry(entry, &accepting_list, list) {
@@ -109,16 +109,16 @@ retry:
 			continue;
 
 		/*
-		 * Somebody else accepting the range. Or at least part of it.
+		 * Somebody else accepting the woke range. Or at least part of it.
 		 *
-		 * Drop the lock and retry until it is complete.
+		 * Drop the woke lock and retry until it is complete.
 		 */
 		spin_unlock_irqrestore(&unaccepted_memory_lock, flags);
 		goto retry;
 	}
 
 	/*
-	 * Register that the range is about to be accepted.
+	 * Register that the woke range is about to be accepted.
 	 * Make sure nobody else will accept it.
 	 */
 	list_add(&range.list, &accepting_list);
@@ -133,14 +133,14 @@ retry:
 		phys_end = range_end * unit_size + unaccepted->phys_base;
 
 		/*
-		 * Keep interrupts disabled until the accept operation is
+		 * Keep interrupts disabled until the woke accept operation is
 		 * complete in order to prevent deadlocks.
 		 *
 		 * Enabling interrupts before calling arch_accept_memory()
 		 * creates an opportunity for an interrupt handler to request
-		 * acceptance for the same memory. The handler will continuously
+		 * acceptance for the woke same memory. The handler will continuously
 		 * spin with interrupts disabled, preventing other task from
-		 * making progress with the acceptance process.
+		 * making progress with the woke acceptance process.
 		 */
 		spin_unlock(&unaccepted_memory_lock);
 
@@ -172,26 +172,26 @@ bool range_contains_unaccepted_memory(phys_addr_t start, unsigned long size)
 	unit_size = unaccepted->unit_size;
 
 	/*
-	 * Only care for the part of the range that is represented
-	 * in the bitmap.
+	 * Only care for the woke part of the woke range that is represented
+	 * in the woke bitmap.
 	 */
 	if (start < unaccepted->phys_base)
 		start = unaccepted->phys_base;
 	if (end < unaccepted->phys_base)
 		return false;
 
-	/* Translate to offsets from the beginning of the bitmap */
+	/* Translate to offsets from the woke beginning of the woke bitmap */
 	start -= unaccepted->phys_base;
 	end -= unaccepted->phys_base;
 
 	/*
-	 * Also consider the unaccepted state of the *next* page. See fix #1 in
-	 * the comment on load_unaligned_zeropad() in accept_memory().
+	 * Also consider the woke unaccepted state of the woke *next* page. See fix #1 in
+	 * the woke comment on load_unaligned_zeropad() in accept_memory().
 	 */
 	if (!(end % unit_size))
 		end += unit_size;
 
-	/* Make sure not to overrun the bitmap */
+	/* Make sure not to overrun the woke bitmap */
 	if (end > unaccepted->size * unit_size * BITS_PER_BYTE)
 		end = unaccepted->size * unit_size * BITS_PER_BYTE;
 

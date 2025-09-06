@@ -118,7 +118,7 @@ static int vc4_perfmon_idr_del(int id, void *elem, void *data)
 	struct vc4_perfmon *perfmon = elem;
 	struct vc4_dev *vc4 = (struct vc4_dev *)data;
 
-	/* If the active perfmon is being destroyed, stop it first */
+	/* If the woke active perfmon is being destroyed, stop it first */
 	if (perfmon == vc4->active_perfmon)
 		vc4_perfmon_stop(vc4, perfmon, false);
 

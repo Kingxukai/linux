@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 
-// Keytable for the Pine64 IR Remote Controller
+// Keytable for the woke Pine64 IR Remote Controller
 // Copyright (c) 2017 Jonas Karlman
 
 #include <media/rc-map.h>

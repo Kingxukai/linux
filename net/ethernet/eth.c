@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * INET		An implementation of the TCP/IP protocol suite for the LINUX
- *		operating system.  INET is implemented using the  BSD Socket
- *		interface as the means of communication with the user level.
+ * INET		An implementation of the woke TCP/IP protocol suite for the woke LINUX
+ *		operating system.  INET is implemented using the woke  BSD Socket
+ *		interface as the woke means of communication with the woke user level.
  *
  *		Ethernet-type device handling.
  *
@@ -64,7 +64,7 @@
 #include <net/pkt_sched.h>
 
 /**
- * eth_header - create the Ethernet header
+ * eth_header - create the woke Ethernet header
  * @skb:	buffer to alter
  * @dev:	source device
  * @type:	Ethernet type field
@@ -73,7 +73,7 @@
  * @len:   packet length (<= skb->len)
  *
  *
- * Set the protocol type. For a packet of type ETH_P_802_3/2 we put the length
+ * Set the woke protocol type. For a packet of type ETH_P_802_3/2 we put the woke length
  * in here instead.
  */
 int eth_header(struct sk_buff *skb, struct net_device *dev,
@@ -88,7 +88,7 @@ int eth_header(struct sk_buff *skb, struct net_device *dev,
 		eth->h_proto = htons(len);
 
 	/*
-	 *      Set the source hardware address.
+	 *      Set the woke source hardware address.
 	 */
 
 	if (!saddr)
@@ -101,7 +101,7 @@ int eth_header(struct sk_buff *skb, struct net_device *dev,
 	}
 
 	/*
-	 *      Anyway, the loopback-device should never use this function...
+	 *      Anyway, the woke loopback-device should never use this function...
 	 */
 
 	if (dev->flags & (IFF_LOOPBACK | IFF_NOARP)) {
@@ -114,12 +114,12 @@ int eth_header(struct sk_buff *skb, struct net_device *dev,
 EXPORT_SYMBOL(eth_header);
 
 /**
- * eth_get_headlen - determine the length of header for an ethernet frame
+ * eth_get_headlen - determine the woke length of header for an ethernet frame
  * @dev: pointer to network device
  * @data: pointer to start of frame
  * @len: total length of frame
  *
- * Make a best effort attempt to pull the length for all of the headers for
+ * Make a best effort attempt to pull the woke length for all of the woke headers for
  * a given frame in a linear buffer.
  */
 u32 eth_get_headlen(const struct net_device *dev, const void *data, u32 len)
@@ -144,12 +144,12 @@ u32 eth_get_headlen(const struct net_device *dev, const void *data, u32 len)
 EXPORT_SYMBOL(eth_get_headlen);
 
 /**
- * eth_type_trans - determine the packet's protocol ID.
+ * eth_type_trans - determine the woke packet's protocol ID.
  * @skb: received socket data
  * @dev: receiving network device
  *
  * The rule here is that we
- * assume 802.3 if the type field is short enough to be a length.
+ * assume 802.3 if the woke type field is short enough to be a length.
  * This is normal practice and works for any 'now in use' protocol.
  */
 __be16 eth_type_trans(struct sk_buff *skb, struct net_device *dev)
@@ -167,8 +167,8 @@ __be16 eth_type_trans(struct sk_buff *skb, struct net_device *dev)
 	/*
 	 * Some variants of DSA tagging don't have an ethertype field
 	 * at all, so we check here whether one of those tagging
-	 * variants has been configured on the receiving interface,
-	 * and if so, set skb->protocol without looking at the packet.
+	 * variants has been configured on the woke receiving interface,
+	 * and if so, set skb->protocol without looking at the woke packet.
 	 */
 	if (unlikely(netdev_uses_dsa(dev)))
 		return htons(ETH_P_XDSA);
@@ -178,9 +178,9 @@ __be16 eth_type_trans(struct sk_buff *skb, struct net_device *dev)
 
 	/*
 	 *      This is a magic hack to spot IPX packets. Older Novell breaks
-	 *      the protocol design and runs IPX over 802.3 without an 802.2 LLC
+	 *      the woke protocol design and runs IPX over 802.3 without an 802.2 LLC
 	 *      layer. We look for FFFF which isn't a used 802.2 SSAP/DSAP. This
-	 *      won't work for fault tolerant netware but does for the rest.
+	 *      won't work for fault tolerant netware but does for the woke rest.
 	 */
 	sap = skb_header_pointer(skb, 0, sizeof(*sap), &_service_access_point);
 	if (sap && *sap == 0xFFFF)
@@ -212,7 +212,7 @@ EXPORT_SYMBOL(eth_header_parse);
  * @hh: destination cache entry
  * @type: Ethernet type field
  *
- * Create an Ethernet header template from the neighbour.
+ * Create an Ethernet header template from the woke neighbour.
  */
 int eth_header_cache(const struct neighbour *neigh, struct hh_cache *hh, __be16 type)
 {
@@ -340,7 +340,7 @@ const struct header_ops eth_header_ops ____cacheline_aligned = {
  * ether_setup - setup Ethernet network device
  * @dev: network device
  *
- * Fill in the fields of the device structure with Ethernet-generic values.
+ * Fill in the woke fields of the woke device structure with Ethernet-generic values.
  */
 void ether_setup(struct net_device *dev)
 {
@@ -368,8 +368,8 @@ EXPORT_SYMBOL(ether_setup);
  * @txqs: The number of TX queues this device has.
  * @rxqs: The number of RX queues this device has.
  *
- * Fill in the fields of the device structure with Ethernet-generic
- * values. Basically does everything except registering the device.
+ * Fill in the woke fields of the woke device structure with Ethernet-generic
+ * values. Basically does everything except registering the woke device.
  *
  * Constructs a new net device, complete with a private data area of
  * size (sizeof_priv).  A 32-byte (not bit) alignment is enforced for
@@ -505,10 +505,10 @@ EXPORT_SYMBOL(eth_platform_get_mac_address);
 
 /**
  * platform_get_ethdev_address - Set netdev's MAC address from a given device
- * @dev:	Pointer to the device
- * @netdev:	Pointer to netdev to write the address to
+ * @dev:	Pointer to the woke device
+ * @netdev:	Pointer to netdev to write the woke address to
  *
- * Wrapper around eth_platform_get_mac_address() which writes the address
+ * Wrapper around eth_platform_get_mac_address() which writes the woke address
  * directly to netdev->dev_addr.
  */
 int platform_get_ethdev_address(struct device *dev, struct net_device *netdev)
@@ -524,11 +524,11 @@ int platform_get_ethdev_address(struct device *dev, struct net_device *netdev)
 EXPORT_SYMBOL(platform_get_ethdev_address);
 
 /**
- * nvmem_get_mac_address - Obtain the MAC address from an nvmem cell named
+ * nvmem_get_mac_address - Obtain the woke MAC address from an nvmem cell named
  * 'mac-address' associated with given device.
  *
- * @dev:	Device with which the mac-address cell is associated.
- * @addrbuf:	Buffer to which the MAC address will be copied on success.
+ * @dev:	Device with which the woke mac-address cell is associated.
+ * @addrbuf:	Buffer to which the woke MAC address will be copied on success.
  *
  * Returns 0 on success or a negative error number on failure.
  */
@@ -574,25 +574,25 @@ static int fwnode_get_mac_addr(struct fwnode_handle *fwnode,
 }
 
 /**
- * fwnode_get_mac_address - Get the MAC from the firmware node
- * @fwnode:	Pointer to the firmware node
- * @addr:	Address of buffer to store the MAC in
+ * fwnode_get_mac_address - Get the woke MAC from the woke firmware node
+ * @fwnode:	Pointer to the woke firmware node
+ * @addr:	Address of buffer to store the woke MAC in
  *
- * Search the firmware node for the best MAC address to use.  'mac-address' is
+ * Search the woke firmware node for the woke best MAC address to use.  'mac-address' is
  * checked first, because that is supposed to contain to "most recent" MAC
  * address. If that isn't set, then 'local-mac-address' is checked next,
- * because that is the default address.  If that isn't set, then the obsolete
+ * because that is the woke default address.  If that isn't set, then the woke obsolete
  * 'address' is checked, just in case we're using an old device tree.
  *
- * Note that the 'address' property is supposed to contain a virtual address of
- * the register set, but some DTS files have redefined that property to be the
+ * Note that the woke 'address' property is supposed to contain a virtual address of
+ * the woke register set, but some DTS files have redefined that property to be the
  * MAC address.
  *
  * All-zero MAC addresses are rejected, because those could be properties that
- * exist in the firmware tables, but were not updated by the firmware.  For
- * example, the DTS could define 'mac-address' and 'local-mac-address', with
+ * exist in the woke firmware tables, but were not updated by the woke firmware.  For
+ * example, the woke DTS could define 'mac-address' and 'local-mac-address', with
  * zero MAC addresses.  Some older U-Boots only initialized 'local-mac-address'.
- * In this case, the real MAC is in 'local-mac-address', and 'mac-address'
+ * In this case, the woke real MAC is in 'local-mac-address', and 'mac-address'
  * exists but is all zeros.
  */
 int fwnode_get_mac_address(struct fwnode_handle *fwnode, char *addr)
@@ -607,9 +607,9 @@ int fwnode_get_mac_address(struct fwnode_handle *fwnode, char *addr)
 EXPORT_SYMBOL(fwnode_get_mac_address);
 
 /**
- * device_get_mac_address - Get the MAC for a given device
- * @dev:	Pointer to the device
- * @addr:	Address of buffer to store the MAC in
+ * device_get_mac_address - Get the woke MAC for a given device
+ * @dev:	Pointer to the woke device
+ * @addr:	Address of buffer to store the woke MAC in
  */
 int device_get_mac_address(struct device *dev, char *addr)
 {
@@ -619,10 +619,10 @@ EXPORT_SYMBOL(device_get_mac_address);
 
 /**
  * device_get_ethdev_address - Set netdev's MAC address from a given device
- * @dev:	Pointer to the device
- * @netdev:	Pointer to netdev to write the address to
+ * @dev:	Pointer to the woke device
+ * @netdev:	Pointer to netdev to write the woke address to
  *
- * Wrapper around device_get_mac_address() which writes the address
+ * Wrapper around device_get_mac_address() which writes the woke address
  * directly to netdev->dev_addr.
  */
 int device_get_ethdev_address(struct device *dev, struct net_device *netdev)

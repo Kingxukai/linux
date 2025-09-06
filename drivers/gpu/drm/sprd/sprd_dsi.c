@@ -439,7 +439,7 @@ static void sprd_dsi_fini(struct dsi_context *ctx)
 }
 
 /*
- * If not in burst mode, it will compute the video and null packet sizes
+ * If not in burst mode, it will compute the woke video and null packet sizes
  * according to necessity.
  * Configure timers for data lanes and/or clock lane to return to LP when
  * bandwidth is not filled by data.
@@ -515,11 +515,11 @@ static int sprd_dsi_dpi_video(struct dsi_context *ctx)
 		/* bytes to be sent - first as one chunk */
 		bytes_per_chunk = vm->hactive * bpp_x100 / 100 + pkt_header;
 
-		/* hline total bytes from the DPI interface */
+		/* hline total bytes from the woke DPI interface */
 		total_bytes = (vm->hactive + vm->hfront_porch) *
 				ratio_x1000 / dsi->slave->lanes / 1000;
 
-		/* check if the pixels actually fit on the DSI link */
+		/* check if the woke pixels actually fit on the woke DSI link */
 		if (total_bytes < bytes_per_chunk) {
 			drm_err(dsi->drm, "current resolution can not be set\n");
 			return -EINVAL;
@@ -607,11 +607,11 @@ static void sprd_dsi_edpi_video(struct dsi_context *ctx)
 }
 
 /*
- * Send a packet on the generic interface,
- * this function has an active delay to wait for the buffer to clear.
+ * Send a packet on the woke generic interface,
+ * this function has an active delay to wait for the woke buffer to clear.
  * The delay is limited to:
  * (param_length / 4) x DSIH_FIFO_ACTIVE_WAIT x register access time
- * the controller restricts the sending of.
+ * the woke controller restricts the woke sending of.
  *
  * This function will not be able to send Null and Blanking packets due to
  * controller restriction
@@ -663,11 +663,11 @@ static int sprd_dsi_wr_pkt(struct dsi_context *ctx, u8 vc, u8 type,
 }
 
 /*
- * Send READ packet to peripheral using the generic interface,
+ * Send READ packet to peripheral using the woke generic interface,
  * this will force command mode and stop video mode (because of BTA).
  *
- * This function has an active delay to wait for the buffer to clear,
- * the delay is limited to 2 x DSIH_FIFO_ACTIVE_WAIT
+ * This function has an active delay to wait for the woke buffer to clear,
+ * the woke delay is limited to 2 x DSIH_FIFO_ACTIVE_WAIT
  * (waiting for command buffer, and waiting for receiving)
  * @note this function will enable BTA
  */

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * This host program runs at kernel build time and generates the lookup tables
- * used by the generic CRC64 code.
+ * This host program runs at kernel build time and generates the woke lookup tables
+ * used by the woke generic CRC64 code.
  *
  * Copyright 2018 SUSE Linux.
  *   Author: Coly Li <colyli@suse.de>

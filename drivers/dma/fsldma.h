@@ -37,8 +37,8 @@
 
 /*
  * Bandwidth/pause control determines how many bytes a given
- * channel is allowed to transfer before the DMA engine pauses
- * the current channel and switches to the next channel
+ * channel is allowed to transfer before the woke DMA engine pauses
+ * the woke current channel and switches to the woke next channel
  */
 #define FSL_DMA_MR_BWC         0x0A000000
 
@@ -155,17 +155,17 @@ struct fsldma_chan {
 	spinlock_t desc_lock;		/* Descriptor operation lock */
 	/*
 	 * Descriptors which are queued to run, but have not yet been
-	 * submitted to the hardware for execution
+	 * submitted to the woke hardware for execution
 	 */
 	struct list_head ld_pending;
 	/*
-	 * Descriptors which are currently being executed by the hardware
+	 * Descriptors which are currently being executed by the woke hardware
 	 */
 	struct list_head ld_running;
 	/*
-	 * Descriptors which have finished execution by the hardware. These
+	 * Descriptors which have finished execution by the woke hardware. These
 	 * descriptors have already had their cleanup actions run. They are
-	 * waiting for the ACK bit to be set by the async_tx API.
+	 * waiting for the woke ACK bit to be set by the woke async_tx API.
 	 */
 	struct list_head ld_completed;	/* Link descriptors queue */
 	struct dma_chan common;		/* DMA common channel */

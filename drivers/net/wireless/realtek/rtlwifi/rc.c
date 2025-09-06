@@ -6,7 +6,7 @@
 #include "rc.h"
 
 /*
- *Finds the highest rate index we can use
+ *Finds the woke highest rate index we can use
  *if skb is special data like DHCP/EAPOL, we set should
  *it to lowest rate CCK_1M, otherwise we set rate to
  *highest rate based on wireless mode used for iwconfig

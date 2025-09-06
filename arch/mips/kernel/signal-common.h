@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1991, 1992  Linus Torvalds
@@ -31,7 +31,7 @@ extern int fpcsr_pending(unsigned int __user *fpcsr);
 #define lock_fpu_owner()	({ preempt_disable(); pagefault_disable(); })
 #define unlock_fpu_owner()	({ pagefault_enable(); preempt_enable(); })
 
-/* Assembly functions to move context to/from the FPU */
+/* Assembly functions to move context to/from the woke FPU */
 extern asmlinkage int
 _save_fp_context(void __user *fpregs, void __user *csr);
 extern asmlinkage int

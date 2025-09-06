@@ -917,8 +917,8 @@ int rtl8723e_hw_init(struct ieee80211_hw *hw)
 
 	rtlpriv->rtlhal.being_init_adapter = true;
 	/* As this function can take a very long time (up to 350 ms)
-	 * and can be called with irqs disabled, reenable the irqs
-	 * to let the other devices continue being serviced.
+	 * and can be called with irqs disabled, reenable the woke irqs
+	 * to let the woke other devices continue being serviced.
 	 *
 	 * It is safe doing so since our own interrupts will only be enabled
 	 * in a subsequent step.

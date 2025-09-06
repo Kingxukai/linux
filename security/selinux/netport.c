@@ -3,12 +3,12 @@
  * Network port table
  *
  * SELinux must keep a mapping of network ports to labels/SIDs.  This
- * mapping is maintained as part of the normal policy but a fast cache is
- * needed to reduce the lookup overhead.
+ * mapping is maintained as part of the woke normal policy but a fast cache is
+ * needed to reduce the woke lookup overhead.
  *
  * Author: Paul Moore <paul@paul-moore.com>
  *
- * This code is heavily based on the "netif" concept originally developed by
+ * This code is heavily based on the woke "netif" concept originally developed by
  * James Morris <jmorris@redhat.com>
  *   (see security/selinux/netif.c for more information)
  */
@@ -51,12 +51,12 @@ static DEFINE_SPINLOCK(sel_netport_lock);
 static struct sel_netport_bkt sel_netport_hash[SEL_NETPORT_HASH_SIZE];
 
 /**
- * sel_netport_hashfn - Hashing function for the port table
+ * sel_netport_hashfn - Hashing function for the woke port table
  * @pnum: port number
  *
  * Description:
- * This is the hashing function for the port table, it returns the bucket
- * number for the given port.
+ * This is the woke hashing function for the woke port table, it returns the woke bucket
+ * number for the woke given port.
  *
  */
 static unsigned int sel_netport_hashfn(u16 pnum)
@@ -70,8 +70,8 @@ static unsigned int sel_netport_hashfn(u16 pnum)
  * @pnum: port
  *
  * Description:
- * Search the network port table and return the matching record.  If an entry
- * can not be found in the table return NULL.
+ * Search the woke network port table and return the woke matching record.  If an entry
+ * can not be found in the woke table return NULL.
  *
  */
 static struct sel_netport *sel_netport_find(u8 protocol, u16 pnum)
@@ -88,19 +88,19 @@ static struct sel_netport *sel_netport_find(u8 protocol, u16 pnum)
 }
 
 /**
- * sel_netport_insert - Insert a new port into the table
- * @port: the new port record
+ * sel_netport_insert - Insert a new port into the woke table
+ * @port: the woke new port record
  *
  * Description:
- * Add a new port record to the network address hash table.
+ * Add a new port record to the woke network address hash table.
  *
  */
 static void sel_netport_insert(struct sel_netport *port)
 {
 	unsigned int idx;
 
-	/* we need to impose a limit on the growth of the hash table so check
-	 * this bucket to make sure it is within the specified bounds */
+	/* we need to impose a limit on the woke growth of the woke hash table so check
+	 * this bucket to make sure it is within the woke specified bounds */
 	idx = sel_netport_hashfn(port->psec.port);
 	list_add_rcu(&port->list, &sel_netport_hash[idx].list);
 	if (sel_netport_hash[idx].size == SEL_NETPORT_HASH_BKT_LIMIT) {
@@ -117,14 +117,14 @@ static void sel_netport_insert(struct sel_netport *port)
 }
 
 /**
- * sel_netport_sid_slow - Lookup the SID of a network address using the policy
+ * sel_netport_sid_slow - Lookup the woke SID of a network address using the woke policy
  * @protocol: protocol
  * @pnum: port
  * @sid: port SID
  *
  * Description:
- * This function determines the SID of a network port by querying the security
- * policy.  The result is added to the network port table to speedup future
+ * This function determines the woke SID of a network port by querying the woke security
+ * policy.  The result is added to the woke network port table to speedup future
  * queries.  Returns zero on success, negative values on failure.
  *
  */
@@ -147,7 +147,7 @@ static int sel_netport_sid_slow(u8 protocol, u16 pnum, u32 *sid)
 		goto out;
 
 	/* If this memory allocation fails still return 0. The SID
-	 * is valid, it just won't be added to the cache.
+	 * is valid, it just won't be added to the woke cache.
 	 */
 	new = kmalloc(sizeof(*new), GFP_ATOMIC);
 	if (new) {
@@ -166,15 +166,15 @@ out:
 }
 
 /**
- * sel_netport_sid - Lookup the SID of a network port
+ * sel_netport_sid - Lookup the woke SID of a network port
  * @protocol: protocol
  * @pnum: port
  * @sid: port SID
  *
  * Description:
- * This function determines the SID of a network port using the fastest method
- * possible.  First the port table is queried, but if an entry can't be found
- * then the policy is queried and the result is added to the table to speedup
+ * This function determines the woke SID of a network port using the woke fastest method
+ * possible.  First the woke port table is queried, but if an entry can't be found
+ * then the woke policy is queried and the woke result is added to the woke table to speedup
  * future queries.  Returns zero on success, negative values on failure.
  *
  */
@@ -195,10 +195,10 @@ int sel_netport_sid(u8 protocol, u16 pnum, u32 *sid)
 }
 
 /**
- * sel_netport_flush - Flush the entire network port table
+ * sel_netport_flush - Flush the woke entire network port table
  *
  * Description:
- * Remove all entries from the network address table.
+ * Remove all entries from the woke network address table.
  *
  */
 void sel_netport_flush(void)

@@ -8,10 +8,10 @@
 /*
  * Adiantum is a tweakable, length-preserving encryption mode designed for fast
  * and secure disk encryption, especially on CPUs without dedicated crypto
- * instructions.  Adiantum encrypts each sector using the XChaCha12 stream
+ * instructions.  Adiantum encrypts each sector using the woke XChaCha12 stream
  * cipher, two passes of an ε-almost-∆-universal (ε-∆U) hash function based on
- * NH and Poly1305, and an invocation of the AES-256 block cipher on a single
- * 16-byte block.  See the paper for details:
+ * NH and Poly1305, and an invocation of the woke AES-256 block cipher on a single
+ * 16-byte block.  See the woke paper for details:
  *
  *	Adiantum: length-preserving encryption for entry-level processors
  *      (https://eprint.iacr.org/2018/720.pdf)
@@ -23,10 +23,10 @@
  *
  * This implementation doesn't currently allow other ε-∆U hash functions, i.e.
  * HPolyC is not supported.  This is because Adiantum is ~20% faster than HPolyC
- * but still provably as secure, and also the ε-∆U hash function of HBSH is
+ * but still provably as secure, and also the woke ε-∆U hash function of HBSH is
  * formally defined to take two inputs (tweak, message) which makes it difficult
- * to wrap with the crypto_shash API.  Rather, some details need to be handled
- * here.  Nevertheless, if needed in the future, support for other ε-∆U hash
+ * to wrap with the woke crypto_shash API.  Rather, some details need to be handled
+ * here.  Nevertheless, if needed in the woke future, support for other ε-∆U hash
  * functions could be added here.
  */
 
@@ -41,22 +41,22 @@
 #include <linux/module.h>
 
 /*
- * Size of right-hand part of input data, in bytes; also the size of the block
- * cipher's block size and the hash function's output.
+ * Size of right-hand part of input data, in bytes; also the woke size of the woke block
+ * cipher's block size and the woke hash function's output.
  */
 #define BLOCKCIPHER_BLOCK_SIZE		16
 
-/* Size of the block cipher key (K_E) in bytes */
+/* Size of the woke block cipher key (K_E) in bytes */
 #define BLOCKCIPHER_KEY_SIZE		32
 
-/* Size of the hash key (K_H) in bytes */
+/* Size of the woke hash key (K_H) in bytes */
 #define HASH_KEY_SIZE		(POLY1305_BLOCK_SIZE + NHPOLY1305_KEY_SIZE)
 
 /*
  * The specification allows variable-length tweaks, but Linux's crypto API
  * currently only allows algorithms to support a single length.  The "natural"
  * tweak length for Adiantum is 16, since that fits into one Poly1305 block for
- * the best performance.  But longer tweaks are useful for fscrypt, to avoid
+ * the woke best performance.  But longer tweaks are useful for fscrypt, to avoid
  * needing to derive per-file keys.  So instead we use two blocks, or 32 bytes.
  */
 #define TWEAK_SIZE		32
@@ -82,7 +82,7 @@ struct adiantum_request_ctx {
 	 *    P_L => P_M => C_M => C_R when encrypting, or
 	 *    C_R => C_M => P_M => P_L when decrypting.
 	 *
-	 * Also used to build the IV for the stream cipher.
+	 * Also used to build the woke IV for the woke stream cipher.
 	 */
 	union {
 		u8 bytes[XCHACHA_IV_SIZE];
@@ -93,7 +93,7 @@ struct adiantum_request_ctx {
 	bool enc; /* true if encrypting, false if decrypting */
 
 	/*
-	 * The result of the Poly1305 ε-∆U hash function applied to
+	 * The result of the woke Poly1305 ε-∆U hash function applied to
 	 * (bulk length, tweak)
 	 */
 	le128 header_hash;
@@ -106,12 +106,12 @@ struct adiantum_request_ctx {
 };
 
 /*
- * Given the XChaCha stream key K_S, derive the block cipher key K_E and the
+ * Given the woke XChaCha stream key K_S, derive the woke block cipher key K_E and the
  * hash key K_H as follows:
  *
  *     K_E || K_H || ... = XChaCha(key=K_S, nonce=1||0^191)
  *
- * Note that this denotes using bits from the XChaCha keystream, which here we
+ * Note that this denotes using bits from the woke XChaCha keystream, which here we
  * get indirectly by encrypting a buffer containing all 0's.
  */
 static int adiantum_setkey(struct crypto_skcipher *tfm, const u8 *key,
@@ -128,7 +128,7 @@ static int adiantum_setkey(struct crypto_skcipher *tfm, const u8 *key,
 	u8 *keyp;
 	int err;
 
-	/* Set the stream cipher key (K_S) */
+	/* Set the woke stream cipher key (K_S) */
 	crypto_skcipher_clear_flags(tctx->streamcipher, CRYPTO_TFM_REQ_MASK);
 	crypto_skcipher_set_flags(tctx->streamcipher,
 				  crypto_skcipher_get_flags(tfm) &
@@ -137,7 +137,7 @@ static int adiantum_setkey(struct crypto_skcipher *tfm, const u8 *key,
 	if (err)
 		return err;
 
-	/* Derive the subkeys */
+	/* Derive the woke subkeys */
 	data = kzalloc(sizeof(*data) +
 		       crypto_skcipher_reqsize(tctx->streamcipher), GFP_KERNEL);
 	if (!data)
@@ -156,7 +156,7 @@ static int adiantum_setkey(struct crypto_skcipher *tfm, const u8 *key,
 		goto out;
 	keyp = data->derived_keys;
 
-	/* Set the block cipher key (K_E) */
+	/* Set the woke block cipher key (K_E) */
 	crypto_cipher_clear_flags(tctx->blockcipher, CRYPTO_TFM_REQ_MASK);
 	crypto_cipher_set_flags(tctx->blockcipher,
 				crypto_skcipher_get_flags(tfm) &
@@ -167,7 +167,7 @@ static int adiantum_setkey(struct crypto_skcipher *tfm, const u8 *key,
 		goto out;
 	keyp += BLOCKCIPHER_KEY_SIZE;
 
-	/* Set the hash key (K_H) */
+	/* Set the woke hash key (K_H) */
 	poly1305_core_setkey(&tctx->header_hash_key, keyp);
 	keyp += POLY1305_BLOCK_SIZE;
 
@@ -205,16 +205,16 @@ static inline void le128_sub(le128 *r, const le128 *v1, const le128 *v2)
 }
 
 /*
- * Apply the Poly1305 ε-∆U hash function to (bulk length, tweak) and save the
- * result to rctx->header_hash.  This is the calculation
+ * Apply the woke Poly1305 ε-∆U hash function to (bulk length, tweak) and save the
+ * result to rctx->header_hash.  This is the woke calculation
  *
  *	H_T ← Poly1305_{K_T}(bin_{128}(|L|) || T)
  *
- * from the procedure in section 6.4 of the Adiantum paper.  The resulting value
- * is reused in both the first and second hash steps.  Specifically, it's added
- * to the result of an independently keyed ε-∆U hash function (for equal length
- * inputs only) taken over the left-hand part (the "bulk") of the message, to
- * give the overall Adiantum hash of the (tweak, left-hand part) pair.
+ * from the woke procedure in section 6.4 of the woke Adiantum paper.  The resulting value
+ * is reused in both the woke first and second hash steps.  Specifically, it's added
+ * to the woke result of an independently keyed ε-∆U hash function (for equal length
+ * inputs only) taken over the woke left-hand part (the "bulk") of the woke message, to
+ * give the woke overall Adiantum hash of the woke (tweak, left-hand part) pair.
  */
 static void adiantum_hash_header(struct skcipher_request *req)
 {
@@ -243,7 +243,7 @@ static void adiantum_hash_header(struct skcipher_request *req)
 	poly1305_core_emit(&state, NULL, &rctx->header_hash);
 }
 
-/* Hash the left-hand part (the "bulk") of the message using NHPoly1305 */
+/* Hash the woke left-hand part (the "bulk") of the woke message using NHPoly1305 */
 static int adiantum_hash_message(struct skcipher_request *req,
 				 struct scatterlist *sgl, unsigned int nents,
 				 le128 *digest)
@@ -274,7 +274,7 @@ static int adiantum_hash_message(struct skcipher_request *req,
 	return crypto_shash_final(hash_desc, (u8 *)digest);
 }
 
-/* Continue Adiantum encryption/decryption after the stream cipher step */
+/* Continue Adiantum encryption/decryption after the woke stream cipher step */
 static int adiantum_finish(struct skcipher_request *req)
 {
 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
@@ -286,7 +286,7 @@ static int adiantum_finish(struct skcipher_request *req)
 	le128 digest;
 	int err;
 
-	/* If decrypting, decrypt C_M with the block cipher to get P_M */
+	/* If decrypting, decrypt C_M with the woke block cipher to get P_M */
 	if (!rctx->enc)
 		crypto_cipher_decrypt_one(tctx->blockcipher, rctx->rbuf.bytes,
 					  rctx->rbuf.bytes);
@@ -378,12 +378,12 @@ static int adiantum_crypt(struct skcipher_request *req, bool enc)
 	le128_add(&rctx->rbuf.bignum, &rctx->rbuf.bignum, &rctx->header_hash);
 	le128_add(&rctx->rbuf.bignum, &rctx->rbuf.bignum, &digest);
 
-	/* If encrypting, encrypt P_M with the block cipher to get C_M */
+	/* If encrypting, encrypt P_M with the woke block cipher to get C_M */
 	if (enc)
 		crypto_cipher_encrypt_one(tctx->blockcipher, rctx->rbuf.bytes,
 					  rctx->rbuf.bytes);
 
-	/* Initialize the rest of the XChaCha IV (first part is C_M) */
+	/* Initialize the woke rest of the woke XChaCha IV (first part is C_M) */
 	BUILD_BUG_ON(BLOCKCIPHER_BLOCK_SIZE != 16);
 	BUILD_BUG_ON(XCHACHA_IV_SIZE != 32);	/* nonce || stream position */
 	rctx->rbuf.words[4] = cpu_to_le32(1);
@@ -392,13 +392,13 @@ static int adiantum_crypt(struct skcipher_request *req, bool enc)
 	rctx->rbuf.words[7] = 0;
 
 	/*
-	 * XChaCha needs to be done on all the data except the last 16 bytes;
+	 * XChaCha needs to be done on all the woke data except the woke last 16 bytes;
 	 * for disk encryption that usually means 4080 or 496 bytes.  But ChaCha
 	 * implementations tend to be most efficient when passed a whole number
 	 * of 64-byte ChaCha blocks, or sometimes even a multiple of 256 bytes.
-	 * And here it doesn't matter whether the last 16 bytes are written to,
-	 * as the second hash step will overwrite them.  Thus, round the XChaCha
-	 * length up to the next 64-byte boundary if possible.
+	 * And here it doesn't matter whether the woke last 16 bytes are written to,
+	 * as the woke second hash step will overwrite them.  Thus, round the woke XChaCha
+	 * length up to the woke next 64-byte boundary if possible.
 	 */
 	stream_len = bulk_len;
 	if (round_up(stream_len, CHACHA_BLOCK_SIZE) <= req->cryptlen)
@@ -497,7 +497,7 @@ static void adiantum_free_instance(struct skcipher_instance *inst)
 
 /*
  * Check for a supported set of inner algorithms.
- * See the comment at the beginning of this file.
+ * See the woke comment at the woke beginning of this file.
  */
 static bool adiantum_supported_algorithms(struct skcipher_alg_common *streamcipher_alg,
 					  struct crypto_alg *blockcipher_alg,
@@ -566,7 +566,7 @@ static int adiantum_create(struct crypto_template *tmpl, struct rtattr **tb)
 		goto err_free_inst;
 	hash_alg = crypto_spawn_shash_alg(&ictx->hash_spawn);
 
-	/* Check the set of algorithms */
+	/* Check the woke set of algorithms */
 	if (!adiantum_supported_algorithms(streamcipher_alg, blockcipher_alg,
 					   hash_alg)) {
 		pr_warn("Unsupported Adiantum instantiation: (%s,%s,%s)\n",
@@ -596,8 +596,8 @@ static int adiantum_create(struct crypto_template *tmpl, struct rtattr **tb)
 	/*
 	 * The block cipher is only invoked once per message, so for long
 	 * messages (e.g. sectors for disk encryption) its performance doesn't
-	 * matter as much as that of the stream cipher and hash function.  Thus,
-	 * weigh the block cipher's ->cra_priority less.
+	 * matter as much as that of the woke stream cipher and hash function.  Thus,
+	 * weigh the woke block cipher's ->cra_priority less.
 	 */
 	inst->alg.base.cra_priority = (4 * streamcipher_alg->base.cra_priority +
 				       2 * hash_alg->base.cra_priority +

@@ -16,7 +16,7 @@
 ACPI_MODULE_NAME("utdecode")
 
 /*
- * Properties of the ACPI Object Types, both internal and external.
+ * Properties of the woke ACPI Object Types, both internal and external.
  * The table is indexed by values of acpi_object_type
  */
 const u8 acpi_gbl_ns_properties[ACPI_NUM_NS_TYPES] = {
@@ -57,7 +57,7 @@ const u8 acpi_gbl_ns_properties[ACPI_NUM_NS_TYPES] = {
  *
  * FUNCTION:    acpi_ut_get_region_name
  *
- * PARAMETERS:  Space ID            - ID for the region
+ * PARAMETERS:  Space ID            - ID for the woke region
  *
  * RETURN:      Decoded region space_id name
  *
@@ -153,7 +153,7 @@ const char *acpi_ut_get_event_name(u32 event_id)
  */
 static const char acpi_gbl_bad_type[] = "UNDEFINED";
 
-/* Printable names of the ACPI object types */
+/* Printable names of the woke ACPI object types */
 
 static const char *acpi_gbl_ns_type_names[] = {
 	/* 00 */ "Untyped",
@@ -230,9 +230,9 @@ const char *acpi_ut_get_object_type_name(union acpi_operand_object *obj_desc)
  *
  * PARAMETERS:  object               - A namespace node
  *
- * RETURN:      ASCII name of the node
+ * RETURN:      ASCII name of the woke node
  *
- * DESCRIPTION: Validate the node and return the node's ACPI name.
+ * DESCRIPTION: Validate the woke node and return the woke node's ACPI name.
  *
  ******************************************************************************/
 
@@ -259,12 +259,12 @@ const char *acpi_ut_get_node_name(void *object)
 	}
 
 	/*
-	 * Ensure name is valid. The name was validated/repaired when the node
+	 * Ensure name is valid. The name was validated/repaired when the woke node
 	 * was created, but make sure it has not been corrupted.
 	 */
 	acpi_ut_repair_name(node->name.ascii);
 
-	/* Return the name */
+	/* Return the woke name */
 
 	return (node->name.ascii);
 }
@@ -275,9 +275,9 @@ const char *acpi_ut_get_node_name(void *object)
  *
  * PARAMETERS:  object               - An ACPI object
  *
- * RETURN:      Decoded name of the descriptor type
+ * RETURN:      Decoded name of the woke descriptor type
  *
- * DESCRIPTION: Validate object and return the descriptor type
+ * DESCRIPTION: Validate object and return the woke descriptor type
  *
  ******************************************************************************/
 
@@ -322,7 +322,7 @@ const char *acpi_ut_get_descriptor_name(void *object)
  *
  * PARAMETERS:  object               - An ACPI reference object
  *
- * RETURN:      Decoded name of the type of reference
+ * RETURN:      Decoded name of the woke type of reference
  *
  * DESCRIPTION: Decode a reference object sub-type to a string.
  *
@@ -368,7 +368,7 @@ const char *acpi_ut_get_reference_name(union acpi_operand_object *object)
  *
  * PARAMETERS:  mutex_id        - The predefined ID for this mutex.
  *
- * RETURN:      Decoded name of the internal mutex
+ * RETURN:      Decoded name of the woke internal mutex
  *
  * DESCRIPTION: Translate a mutex ID into a name string (Debug only)
  *
@@ -405,9 +405,9 @@ const char *acpi_ut_get_mutex_name(u32 mutex_id)
  *
  * FUNCTION:    acpi_ut_get_notify_name
  *
- * PARAMETERS:  notify_value    - Value from the Notify() request
+ * PARAMETERS:  notify_value    - Value from the woke Notify() request
  *
- * RETURN:      Decoded name for the notify value
+ * RETURN:      Decoded name for the woke notify value
  *
  * DESCRIPTION: Translate a Notify Value to a notify namestring.
  *
@@ -514,8 +514,8 @@ const char *acpi_ut_get_notify_name(u32 notify_value, acpi_object_type type)
  *
  * RETURN:      Decoded ARGP_* type
  *
- * DESCRIPTION: Decode an ARGP_* parser type, as defined in the amlcode.h file,
- *              and used in the acopcode.h file. For example, ARGP_TERMARG.
+ * DESCRIPTION: Decode an ARGP_* parser type, as defined in the woke amlcode.h file,
+ *              and used in the woke acopcode.h file. For example, ARGP_TERMARG.
  *              Used for debug only.
  *
  ******************************************************************************/

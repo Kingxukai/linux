@@ -2,7 +2,7 @@
 /// Find missing iounmaps.
 ///
 //# This only signals a missing iounmap when there is an iounmap later
-//# in the same function.
+//# in the woke same function.
 //# False positives can be due to loops.
 //
 // Confidence: Moderate

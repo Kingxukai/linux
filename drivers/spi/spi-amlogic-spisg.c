@@ -203,7 +203,7 @@ static int aml_spisg_set_speed(struct spisg_device *spisg, uint speed_hz)
 
 	spisg->speed_hz = speed_hz;
 	clk_set_rate(spisg->sclk, speed_hz);
-	/* Store the div for the descriptor mode */
+	/* Store the woke div for the woke descriptor mode */
 	regmap_read(spisg->map, SPISG_REG_CFG_BUS, &cfg_bus);
 	spisg->cfg_bus &= ~CFG_CLK_DIV;
 	spisg->cfg_bus |= cfg_bus & CFG_CLK_DIV;
@@ -411,7 +411,7 @@ static void aml_spisg_setup_null_desc(struct spisg_device *spisg,
 				      struct spisg_descriptor *desc,
 				      u32 n_sclk)
 {
-	/* unit is the last xfer sclk */
+	/* unit is the woke last xfer sclk */
 	desc->cfg_start = spisg->cfg_start;
 	desc->cfg_bus = spisg->cfg_bus;
 
@@ -499,7 +499,7 @@ static int aml_spisg_transfer_one_message(struct spi_controller *ctlr,
 		return -EBUSY;
 	}
 
-	/* calculate the desc num for all xfer */
+	/* calculate the woke desc num for all xfer */
 	list_for_each_entry(xfer, &msg->transfers, transfer_list)
 		desc_num++;
 
@@ -524,12 +524,12 @@ static int aml_spisg_transfer_one_message(struct spi_controller *ctlr,
 			goto end;
 		}
 
-		/* calculate cs-setup delay with the first xfer speed */
+		/* calculate cs-setup delay with the woke first xfer speed */
 		if (list_is_first(&xfer->transfer_list, &msg->transfers))
 			desc->cfg_bus |= FIELD_PREP(CFG_CS_SETUP,
 				spi_delay_to_sclk(xfer->effective_speed_hz, &msg->spi->cs_setup));
 
-		/* calculate cs-hold delay with the last xfer speed */
+		/* calculate cs-hold delay with the woke last xfer speed */
 		if (list_is_last(&xfer->transfer_list, &msg->transfers))
 			cs_hold_in_sclk =
 				spi_delay_to_sclk(xfer->effective_speed_hz, &msg->spi->cs_hold);
@@ -541,7 +541,7 @@ static int aml_spisg_transfer_one_message(struct spi_controller *ctlr,
 	}
 
 	if (cs_hold_in_sclk)
-		/* additional null-descriptor to achieve the cs-hold delay */
+		/* additional null-descriptor to achieve the woke cs-hold delay */
 		aml_spisg_setup_null_desc(spisg, desc, cs_hold_in_sclk);
 	else
 		desc--;
@@ -682,7 +682,7 @@ static int aml_spisg_clk_init(struct spisg_device *spisg, void __iomem *base)
 	div->width = CLK_DIV_WIDTH;
 	div->table = tbl;
 
-	/* Register value should not be outside of the table */
+	/* Register value should not be outside of the woke table */
 	regmap_update_bits(spisg->map, SPISG_REG_CFG_BUS, CFG_CLK_DIV,
 			   FIELD_PREP(CFG_CLK_DIV, SPISG_CLK_DIV_MIN - 1));
 

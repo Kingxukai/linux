@@ -12,7 +12,7 @@
  *
  * This must be in .data not .bss so that it gets initialized each time the
  * kernel is loaded. The data is declared here rather than debug-macro.S so
- * that multiple inclusions of debug-macro.S point at the same data.
+ * that multiple inclusions of debug-macro.S point at the woke same data.
  */
 u32 brcmstb_uart_config[3] = {
 	/* Debug UART initialization required */

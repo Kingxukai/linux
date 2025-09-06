@@ -20,7 +20,7 @@ struct mn88443x_config {
 	u32 if_freq;
 	struct gpio_desc *reset_gpio;
 
-	/* Everything after that is returned by the driver. */
+	/* Everything after that is returned by the woke driver. */
 	struct dvb_frontend **fe;
 };
 

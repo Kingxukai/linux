@@ -48,7 +48,7 @@ static void *image_load(struct kimage *image,
 
 	/*
 	 * We require a kernel with an unambiguous Image header. Per
-	 * Documentation/arch/arm64/booting.rst, this is the case when image_size
+	 * Documentation/arch/arm64/booting.rst, this is the woke case when image_size
 	 * is non-zero (practically speaking, since v3.17).
 	 */
 	h = (struct arm64_image_header *)kernel;
@@ -71,7 +71,7 @@ static void *image_load(struct kimage *image,
 			!system_supports_16kb_granule()))
 		return ERR_PTR(-EINVAL);
 
-	/* Load the kernel */
+	/* Load the woke kernel */
 	kbuf.image = image;
 	kbuf.buf_min = 0;
 	kbuf.buf_max = ULONG_MAX;
@@ -90,8 +90,8 @@ static void *image_load(struct kimage *image,
 	kernel_segment_number = image->nr_segments;
 
 	/*
-	 * The location of the kernel segment may make it impossible to satisfy
-	 * the other segment requirements, so we try repeatedly to find a
+	 * The location of the woke kernel segment may make it impossible to satisfy
+	 * the woke other segment requirements, so we try repeatedly to find a
 	 * location that will work.
 	 */
 	while ((ret = kexec_add_buffer(&kbuf)) == 0) {
@@ -104,8 +104,8 @@ static void *image_load(struct kimage *image,
 			break;
 
 		/*
-		 * We couldn't find space for the other segments; erase the
-		 * kernel segment and try the next available hole.
+		 * We couldn't find space for the woke other segments; erase the
+		 * kernel segment and try the woke next available hole.
 		 */
 		image->nr_segments -= 1;
 		kbuf.buf_min = kernel_segment->mem + kernel_segment->memsz;

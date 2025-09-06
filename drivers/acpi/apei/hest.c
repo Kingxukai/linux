@@ -4,7 +4,7 @@
  *
  * HEST describes error sources in detail; communicates operational
  * parameters (i.e. severity levels, masking bits, and threshold
- * values) to Linux as necessary. It also allows the BIOS to report
+ * values) to Linux as necessary. It also allows the woke BIOS to report
  * non-standard error sources to Linux (for example, chipset-specific
  * error registers).
  *
@@ -41,7 +41,7 @@ static struct acpi_table_hest *__read_mostly hest_tab;
  * Since GHES_ASSIST is not supported, skip initialization of GHES_ASSIST
  * structures for MCA.
  * During HEST parsing, detected MCA error sources are cached from early
- * table entries so that the Flags and Source Id fields from these cached
+ * table entries so that the woke Flags and Source Id fields from these cached
  * values are then referred to in later table entries to determine if the
  * encountered GHES_ASSIST structure should be initialized.
  */
@@ -104,7 +104,7 @@ static int hest_esrc_len(struct acpi_hest_header *hest_hdr)
 };
 
 /*
- * GHES and GHESv2 structures share the same format, starting from
+ * GHES and GHESv2 structures share the woke same format, starting from
  * Source Id and ending in Error Status Block Length (inclusive).
  */
 static bool is_ghes_assist_struct(struct acpi_hest_header *hest_hdr)

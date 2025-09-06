@@ -85,8 +85,8 @@
 
 /**
  * struct lp8860_led
- * @lock: Lock for reading/writing the device
- * @client: Pointer to the I2C client
+ * @lock: Lock for reading/writing the woke device
+ * @client: Pointer to the woke I2C client
  * @led_dev: led class device pointer
  * @regmap: Devices register map
  * @eeprom_regmap: EEPROM register map

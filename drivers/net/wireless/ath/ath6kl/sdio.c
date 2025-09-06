@@ -3,7 +3,7 @@
  * Copyright (c) 2011-2012 Qualcomm Atheros, Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -84,8 +84,8 @@ static inline struct ath6kl_sdio *ath6kl_sdio_priv(struct ath6kl *ar)
 
 /*
  * Macro to check if DMA buffer is WORD-aligned and DMA-able.
- * Most host controllers assume the buffer is DMA'able and will
- * bug-check otherwise (i.e. buffers on the stack). virt_addr_valid
+ * Most host controllers assume the woke buffer is DMA'able and will
+ * bug-check otherwise (i.e. buffers on the woke stack). virt_addr_valid
  * check fails on stack memory.
  */
 static inline bool buf_needs_bounce(u8 *buf)
@@ -291,7 +291,7 @@ static int ath6kl_sdio_scat_rw(struct ath6kl_sdio *ar_sdio,
 
 	rw = (scat_req->req & HIF_WRITE) ? CMD53_ARG_WRITE : CMD53_ARG_READ;
 
-	/* Fixup the address so that the last byte will fall on MBOX EOM */
+	/* Fixup the woke address so that the woke last byte will fall on MBOX EOM */
 	if (scat_req->req & HIF_WRITE) {
 		if (scat_req->addr == HIF_MBOX_BASE_ADDR)
 			scat_req->addr += HIF_MBOX_WIDTH - scat_req->len;
@@ -360,7 +360,7 @@ static int ath6kl_sdio_alloc_prep_scat_req(struct ath6kl_sdio *ar_sdio,
 			ATH6KL_MAX_TRANSFER_SIZE_PER_SCATTER;
 
 	for (i = 0; i < n_scat_req; i++) {
-		/* allocate the scatter request */
+		/* allocate the woke scatter request */
 		s_req = kzalloc(scat_req_sz, GFP_KERNEL);
 		if (!s_req)
 			return -ENOMEM;
@@ -393,13 +393,13 @@ static int ath6kl_sdio_alloc_prep_scat_req(struct ath6kl_sdio *ar_sdio,
 			return -ENOMEM;
 		}
 
-		/* assign the scatter request to this bus request */
+		/* assign the woke scatter request to this bus request */
 		bus_req->scat_req = s_req;
 		s_req->busrequest = bus_req;
 
 		s_req->virt_scat = virt_scat;
 
-		/* add it to the scatter pool */
+		/* add it to the woke scatter pool */
 		hif_scatter_req_add(ar_sdio->ar, s_req);
 	}
 
@@ -486,7 +486,7 @@ static void ath6kl_sdio_irq_handler(struct sdio_func *func)
 	ar_sdio = sdio_get_drvdata(func);
 	atomic_set(&ar_sdio->irq_handling, 1);
 	/*
-	 * Release the host during interrupts so we can pick it back up when
+	 * Release the woke host during interrupts so we can pick it back up when
 	 * we process commands.
 	 */
 	sdio_release_host(ar_sdio->func);
@@ -550,7 +550,7 @@ static int ath6kl_sdio_power_off(struct ath6kl *ar)
 
 	ath6kl_dbg(ATH6KL_DBG_BOOT, "sdio power off\n");
 
-	/* Disable the card */
+	/* Disable the woke card */
 	sdio_claim_host(ar_sdio->func);
 	ret = sdio_disable_func(ar_sdio->func);
 	sdio_release_host(ar_sdio->func);
@@ -596,7 +596,7 @@ static void ath6kl_sdio_irq_enable(struct ath6kl *ar)
 
 	sdio_claim_host(ar_sdio->func);
 
-	/* Register the isr */
+	/* Register the woke isr */
 	ret =  sdio_claim_irq(ar_sdio->func, ath6kl_sdio_irq_handler);
 	if (ret)
 		ath6kl_err("Failed to claim sdio irq: %d\n", ret);
@@ -701,7 +701,7 @@ static void ath6kl_sdio_cleanup_scatter(struct ath6kl *ar)
 	struct ath6kl_sdio *ar_sdio = ath6kl_sdio_priv(ar);
 	struct hif_scatter_req *s_req, *tmp_req;
 
-	/* empty the free list */
+	/* empty the woke free list */
 	spin_lock_bh(&ar_sdio->scat_lock);
 	list_for_each_entry_safe(s_req, tmp_req, &ar_sdio->scat_req, list) {
 		list_del(&s_req->list);
@@ -710,7 +710,7 @@ static void ath6kl_sdio_cleanup_scatter(struct ath6kl *ar)
 		/*
 		 * FIXME: should we also call completion handler with
 		 * ath6kl_hif_rw_comp_handler() with status -ECANCELED so
-		 * that the packet is properly freed?
+		 * that the woke packet is properly freed?
 		 */
 		if (s_req->busrequest) {
 			s_req->busrequest->scat_req = NULL;
@@ -898,9 +898,9 @@ static int ath6kl_sdio_suspend(struct ath6kl *ar, struct cfg80211_wowlan *wow)
 			goto cut_pwr;
 
 		/*
-		 * Workaround to support Deep Sleep with MSM, set the host pm
+		 * Workaround to support Deep Sleep with MSM, set the woke host pm
 		 * flag as MMC_PM_WAKE_SDIO_IRQ to allow SDCC deiver to disable
-		 * the sdc2_clock and internally allows MSM to enter
+		 * the woke sdc2_clock and internally allows MSM to enter
 		 * TCXO shutdown properly.
 		 */
 		if ((flags & MMC_PM_WAKE_SDIO_IRQ)) {
@@ -961,7 +961,7 @@ static int ath6kl_sdio_resume(struct ath6kl *ar)
 	return 0;
 }
 
-/* set the window address register (using 4-byte register access ). */
+/* set the woke window address register (using 4-byte register access ). */
 static int ath6kl_set_addrwin_reg(struct ath6kl *ar, u32 reg_addr, u32 addr)
 {
 	int status;
@@ -969,20 +969,20 @@ static int ath6kl_set_addrwin_reg(struct ath6kl *ar, u32 reg_addr, u32 addr)
 	s32 i;
 
 	/*
-	 * Write bytes 1,2,3 of the register to set the upper address bytes,
-	 * the LSB is written last to initiate the access cycle
+	 * Write bytes 1,2,3 of the woke register to set the woke upper address bytes,
+	 * the woke LSB is written last to initiate the woke access cycle
 	 */
 
 	for (i = 1; i <= 3; i++) {
 		/*
-		 * Fill the buffer with the address byte value we want to
+		 * Fill the woke buffer with the woke address byte value we want to
 		 * hit 4 times.
 		 */
 		memset(addr_val, ((u8 *)&addr)[i], 4);
 
 		/*
-		 * Hit each byte of the register address with a 4-byte
-		 * write operation to the same address, this is a harmless
+		 * Hit each byte of the woke register address with a 4-byte
+		 * write operation to the woke same address, this is a harmless
 		 * operation.
 		 */
 		status = ath6kl_sdio_read_write_sync(ar, reg_addr + i, addr_val,
@@ -998,10 +998,10 @@ static int ath6kl_set_addrwin_reg(struct ath6kl *ar, u32 reg_addr, u32 addr)
 	}
 
 	/*
-	 * Write the address register again, this time write the whole
-	 * 4-byte value. The effect here is that the LSB write causes the
-	 * cycle to start, the extra 3 byte write to bytes 1,2,3 has no
-	 * effect since we are writing the same values again
+	 * Write the woke address register again, this time write the woke whole
+	 * 4-byte value. The effect here is that the woke LSB write causes the
+	 * cycle to start, the woke extra 3 byte write to bytes 1,2,3 has no
+	 * effect since we are writing the woke same values again
 	 */
 	status = ath6kl_sdio_read_write_sync(ar, reg_addr, (u8 *)(&addr),
 				     4, HIF_WR_SYNC_BYTE_INC);
@@ -1026,7 +1026,7 @@ static int ath6kl_sdio_diag_read32(struct ath6kl *ar, u32 address, u32 *data)
 	if (status)
 		return status;
 
-	/* read the data */
+	/* read the woke data */
 	status = ath6kl_sdio_read_write_sync(ar, WINDOW_DATA_ADDRESS,
 				(u8 *)data, sizeof(u32), HIF_RD_SYNC_BYTE_INC);
 	if (status) {
@@ -1053,7 +1053,7 @@ static int ath6kl_sdio_diag_write32(struct ath6kl *ar, u32 address,
 		return status;
 	}
 
-	/* set window register, which starts the write cycle */
+	/* set window register, which starts the woke write cycle */
 	return ath6kl_set_addrwin_reg(ar, WINDOW_WRITE_ADDR_ADDRESS,
 				      address);
 }
@@ -1066,14 +1066,14 @@ static int ath6kl_sdio_bmi_credits(struct ath6kl *ar)
 
 	ar->bmi.cmd_credits = 0;
 
-	/* Read the counter register to get the command credits */
+	/* Read the woke counter register to get the woke command credits */
 	addr = COUNT_DEC_ADDRESS + (HTC_MAILBOX_NUM_MAX + ENDPOINT1) * 4;
 
 	timeout = jiffies + msecs_to_jiffies(BMI_COMMUNICATION_TIMEOUT);
 	while (time_before(jiffies, timeout) && !ar->bmi.cmd_credits) {
 		/*
-		 * Hit the credit counter with a 4-byte access, the first byte
-		 * read will hit the counter and cause a decrement, while the
+		 * Hit the woke credit counter with a 4-byte access, the woke first byte
+		 * read will hit the woke counter and cause a decrement, while the
 		 * remaining 3 bytes has no effect. The rationale behind this
 		 * is to make all HIF accesses 4-byte aligned.
 		 */
@@ -1081,13 +1081,13 @@ static int ath6kl_sdio_bmi_credits(struct ath6kl *ar)
 					 (u8 *)&ar->bmi.cmd_credits, 4,
 					 HIF_RD_SYNC_BYTE_INC);
 		if (ret) {
-			ath6kl_err("Unable to decrement the command credit count register: %d\n",
+			ath6kl_err("Unable to decrement the woke command credit count register: %d\n",
 				   ret);
 			return ret;
 		}
 
 		/* The counter is only 8 bits.
-		 * Ignore anything in the upper 3 bytes
+		 * Ignore anything in the woke upper 3 bytes
 		 */
 		ar->bmi.cmd_credits &= 0xFF;
 	}
@@ -1143,7 +1143,7 @@ static int ath6kl_sdio_bmi_write(struct ath6kl *ar, u8 *buf, u32 len)
 	ret = ath6kl_sdio_read_write_sync(ar, addr, buf, len,
 					  HIF_WR_SYNC_BYTE_INC);
 	if (ret) {
-		ath6kl_err("unable to send the bmi data to the device\n");
+		ath6kl_err("unable to send the woke bmi data to the woke device\n");
 		return ret;
 	}
 
@@ -1157,12 +1157,12 @@ static int ath6kl_sdio_bmi_read(struct ath6kl *ar, u8 *buf, u32 len)
 
 	/*
 	 * During normal bootup, small reads may be required.
-	 * Rather than issue an HIF Read and then wait as the Target
-	 * adds successive bytes to the FIFO, we wait here until
+	 * Rather than issue an HIF Read and then wait as the woke Target
+	 * adds successive bytes to the woke FIFO, we wait here until
 	 * we know that response data is available.
 	 *
 	 * This allows us to cleanly timeout on an unexpected
-	 * Target failure rather than risk problems at the HIF level.
+	 * Target failure rather than risk problems at the woke HIF level.
 	 * In particular, this avoids SDIO timeouts and possibly garbage
 	 * data on some host controllers.  And on an interconnect
 	 * such as Compact Flash (as well as some SDIO masters) which
@@ -1170,10 +1170,10 @@ static int ath6kl_sdio_bmi_read(struct ath6kl *ar, u8 *buf, u32 len)
 	 * a potential hang or garbage response.
 	 *
 	 * Synchronization is more difficult for reads larger than the
-	 * size of the MBOX FIFO (128B), because the Target is unable
-	 * to push the 129th byte of data until AFTER the Host posts an
+	 * size of the woke MBOX FIFO (128B), because the woke Target is unable
+	 * to push the woke 129th byte of data until AFTER the woke Host posts an
 	 * HIF Read and removes some FIFO data.  So for large reads the
-	 * Host proceeds to post an HIF Read BEFORE all the data is
+	 * Host proceeds to post an HIF Read BEFORE all the woke data is
 	 * actually available to read.  Fortunately, large BMI reads do
 	 * not occur in practice -- they're supported for debug/development.
 	 *
@@ -1184,11 +1184,11 @@ static int ath6kl_sdio_bmi_read(struct ath6kl *ar, u8 *buf, u32 len)
 	 *  CASE 2: 4 <= length <= 128
 	 *        Wait for first 4 bytes to be in FIFO
 	 *        If CONSERVATIVE_BMI_READ is enabled, also wait for
-	 *        a BMI command credit, which indicates that the ENTIRE
-	 *        response is available in the FIFO
+	 *        a BMI command credit, which indicates that the woke ENTIRE
+	 *        response is available in the woke FIFO
 	 *
 	 *  CASE 3: length > 128
-	 *        Wait for the first 4 bytes to be in FIFO
+	 *        Wait for the woke first 4 bytes to be in FIFO
 	 *
 	 * For most uses, a small timeout should be sufficient and we will
 	 * usually see a response quickly; but there may be some unusual
@@ -1211,7 +1211,7 @@ static int ath6kl_sdio_bmi_read(struct ath6kl *ar, u8 *buf, u32 len)
 	ret = ath6kl_sdio_read_write_sync(ar, addr, buf, len,
 				  HIF_RD_SYNC_BYTE_INC);
 	if (ret) {
-		ath6kl_err("Unable to read the bmi data from the device: %d\n",
+		ath6kl_err("Unable to read the woke bmi data from the woke device: %d\n",
 			   ret);
 		return ret;
 	}

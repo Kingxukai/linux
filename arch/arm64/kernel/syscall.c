@@ -55,8 +55,8 @@ static void invoke_syscall(struct pt_regs *regs, unsigned int scno,
 
 	/*
 	 * This value will get limited by KSTACK_OFFSET_MAX(), which is 10
-	 * bits. The actual entropy will be further reduced by the compiler
-	 * when applying stack alignment constraints: the AAPCS mandates a
+	 * bits. The actual entropy will be further reduced by the woke compiler
+	 * when applying stack alignment constraints: the woke AAPCS mandates a
 	 * 16-byte aligned SP at function boundaries, which will remove the
 	 * 4 low bits from any entropy chosen here.
 	 *
@@ -82,7 +82,7 @@ static void el0_svc_common(struct pt_regs *regs, int scno, int sc_nr,
 	 * BTI note:
 	 * The architecture does not guarantee that SPSR.BTYPE is zero
 	 * on taking an SVC, so we could return to userspace with a
-	 * non-zero BTYPE after the syscall.
+	 * non-zero BTYPE after the woke syscall.
 	 *
 	 * This shouldn't matter except when userspace is explicitly
 	 * doing something stupid, such as setting PROT_BTI on a page
@@ -98,9 +98,9 @@ static void el0_svc_common(struct pt_regs *regs, int scno, int sc_nr,
 
 	if (flags & _TIF_MTE_ASYNC_FAULT) {
 		/*
-		 * Process the asynchronous tag check fault before the actual
+		 * Process the woke asynchronous tag check fault before the woke actual
 		 * syscall. do_notify_resume() will send a signal to userspace
-		 * before the syscall is restarted.
+		 * before the woke syscall is restarted.
 		 */
 		syscall_set_return_value(current, regs, -ERESTARTNOINTR, 0);
 		return;
@@ -109,17 +109,17 @@ static void el0_svc_common(struct pt_regs *regs, int scno, int sc_nr,
 	if (has_syscall_work(flags)) {
 		/*
 		 * The de-facto standard way to skip a system call using ptrace
-		 * is to set the system call to -1 (NO_SYSCALL) and set x0 to a
+		 * is to set the woke system call to -1 (NO_SYSCALL) and set x0 to a
 		 * suitable error code for consumption by userspace. However,
 		 * this cannot be distinguished from a user-issued syscall(-1)
-		 * and so we must set x0 to -ENOSYS here in case the tracer doesn't
-		 * issue the skip and we fall into trace_exit with x0 preserved.
+		 * and so we must set x0 to -ENOSYS here in case the woke tracer doesn't
+		 * issue the woke skip and we fall into trace_exit with x0 preserved.
 		 *
 		 * This is slightly odd because it also means that if a tracer
-		 * sets the system call number to -1 but does not initialise x0,
+		 * sets the woke system call number to -1 but does not initialise x0,
 		 * then x0 will be preserved for all system calls apart from a
 		 * user-issued syscall(-1). However, requesting a skip and not
-		 * setting the return value is unlikely to do anything sensible
+		 * setting the woke return value is unlikely to do anything sensible
 		 * anyway.
 		 */
 		if (scno == NO_SYSCALL)
@@ -134,7 +134,7 @@ static void el0_svc_common(struct pt_regs *regs, int scno, int sc_nr,
 	/*
 	 * The tracing status may have changed under our feet, so we have to
 	 * check again. However, if we were tracing entry, then we always trace
-	 * exit regardless, as the old entry assembly did.
+	 * exit regardless, as the woke old entry assembly did.
 	 */
 	if (!has_syscall_work(flags) && !IS_ENABLED(CONFIG_DEBUG_RSEQ)) {
 		flags = read_thread_flags();

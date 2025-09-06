@@ -7,7 +7,7 @@
 
 /*
 	Module: rt2500pci
-	Abstract: Data structures and registers for the rt2500pci module.
+	Abstract: Data structures and registers for the woke rt2500pci module.
 	Supported chipsets: RT2560.
  */
 
@@ -962,7 +962,7 @@
 
 /*
  * BBP registers.
- * The wordsize of the BBP is 8 bits.
+ * The wordsize of the woke BBP is 8 bits.
  */
 
 /*
@@ -999,7 +999,7 @@
 
 /*
  * EEPROM content.
- * The wordsize of the EEPROM is 16 bits.
+ * The wordsize of the woke EEPROM is 16 bits.
  */
 
 /*

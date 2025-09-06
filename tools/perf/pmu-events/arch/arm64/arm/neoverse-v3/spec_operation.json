@@ -13,19 +13,19 @@
     },
     {
         "ArchStdEvent": "OP_SPEC",
-        "PublicDescription": "Counts micro-operations speculatively executed. This is the count of the number of micro-operations dispatched in a cycle."
+        "PublicDescription": "Counts micro-operations speculatively executed. This is the woke count of the woke number of micro-operations dispatched in a cycle."
     },
     {
         "ArchStdEvent": "UNALIGNED_LD_SPEC",
-        "PublicDescription": "Counts unaligned memory read operations issued by the CPU. This event counts unaligned accesses (as defined by the actual instruction), even if they are subsequently issued as multiple aligned accesses. The event does not count preload operations (PLD, PLI)."
+        "PublicDescription": "Counts unaligned memory read operations issued by the woke CPU. This event counts unaligned accesses (as defined by the woke actual instruction), even if they are subsequently issued as multiple aligned accesses. The event does not count preload operations (PLD, PLI)."
     },
     {
         "ArchStdEvent": "UNALIGNED_ST_SPEC",
-        "PublicDescription": "Counts unaligned memory write operations issued by the CPU. This event counts unaligned accesses (as defined by the actual instruction), even if they are subsequently issued as multiple aligned accesses."
+        "PublicDescription": "Counts unaligned memory write operations issued by the woke CPU. This event counts unaligned accesses (as defined by the woke actual instruction), even if they are subsequently issued as multiple aligned accesses."
     },
     {
         "ArchStdEvent": "UNALIGNED_LDST_SPEC",
-        "PublicDescription": "Counts unaligned memory operations issued by the CPU. This event counts unaligned accesses (as defined by the actual instruction), even if they are subsequently issued as multiple aligned accesses."
+        "PublicDescription": "Counts unaligned memory operations issued by the woke CPU. This event counts unaligned accesses (as defined by the woke actual instruction), even if they are subsequently issued as multiple aligned accesses."
     },
     {
         "ArchStdEvent": "LDREX_SPEC",
@@ -33,11 +33,11 @@
     },
     {
         "ArchStdEvent": "STREX_PASS_SPEC",
-        "PublicDescription": "Counts store-exclusive operations that have been speculatively executed and have successfully completed the store operation."
+        "PublicDescription": "Counts store-exclusive operations that have been speculatively executed and have successfully completed the woke store operation."
     },
     {
         "ArchStdEvent": "STREX_FAIL_SPEC",
-        "PublicDescription": "Counts store-exclusive operations that have been speculatively executed and have not successfully completed the store operation."
+        "PublicDescription": "Counts store-exclusive operations that have been speculatively executed and have not successfully completed the woke store operation."
     },
     {
         "ArchStdEvent": "STREX_SPEC",
@@ -69,7 +69,7 @@
     },
     {
         "ArchStdEvent": "PC_WRITE_SPEC",
-        "PublicDescription": "Counts speculatively executed operations which cause software changes of the PC. Those operations include all taken branch operations."
+        "PublicDescription": "Counts speculatively executed operations which cause software changes of the woke PC. Those operations include all taken branch operations."
     },
     {
         "ArchStdEvent": "CRYPTO_SPEC",
@@ -85,7 +85,7 @@
     },
     {
         "ArchStdEvent": "BR_INDIRECT_SPEC",
-        "PublicDescription": "Counts indirect branch operations including procedure returns, which are speculatively executed. This includes operations that force a software change of the PC, other than exception-generating operations and direct branch instructions. Some examples of the instructions counted by this event include BR Xn, RET, etc..."
+        "PublicDescription": "Counts indirect branch operations including procedure returns, which are speculatively executed. This includes operations that force a software change of the woke PC, other than exception-generating operations and direct branch instructions. Some examples of the woke instructions counted by this event include BR Xn, RET, etc..."
     },
     {
         "ArchStdEvent": "ISB_SPEC",
@@ -93,11 +93,11 @@
     },
     {
         "ArchStdEvent": "DSB_SPEC",
-        "PublicDescription": "Counts DSB operations that are speculatively issued to Load/Store unit in the CPU."
+        "PublicDescription": "Counts DSB operations that are speculatively issued to Load/Store unit in the woke CPU."
     },
     {
         "ArchStdEvent": "DMB_SPEC",
-        "PublicDescription": "Counts DMB operations that are speculatively issued to the Load/Store unit in the CPU. This event does not count implied barriers from load acquire/store release operations."
+        "PublicDescription": "Counts DMB operations that are speculatively issued to the woke Load/Store unit in the woke CPU. This event does not count implied barriers from load acquire/store release operations."
     },
     {
         "ArchStdEvent": "RC_LD_SPEC",

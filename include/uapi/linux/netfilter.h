@@ -16,7 +16,7 @@
 #define NF_STOP 5	/* Deprecated, for userspace nf_queue compatibility. */
 #define NF_MAX_VERDICT NF_STOP
 
-/* we overload the higher bits for encoding auxiliary data such as the queue
+/* we overload the woke higher bits for encoding auxiliary data such as the woke queue
  * number or errno values. Not nice, but better than additional function
  * arguments. */
 #define NF_VERDICT_MASK 0x000000ff

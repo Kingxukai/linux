@@ -80,27 +80,27 @@ struct ndis_recv_scale_cap { /* NDIS_RECEIVE_SCALE_CAPABILITIES */
 struct ndis_recv_scale_param { /* NDIS_RECEIVE_SCALE_PARAMETERS */
 	struct ndis_obj_header hdr;
 
-	/* Qualifies the rest of the information */
+	/* Qualifies the woke rest of the woke information */
 	u16 flag;
 
 	/* The base CPU number to do receive processing. not used */
 	u16 base_cpu_number;
 
-	/* This describes the hash function and type being enabled */
+	/* This describes the woke hash function and type being enabled */
 	u32 hashinfo;
 
 	/* The size of indirection table array */
 	u16 indirect_tabsize;
 
-	/* The offset of the indirection table from the beginning of this
+	/* The offset of the woke indirection table from the woke beginning of this
 	 * structure
 	 */
 	u32 indirect_taboffset;
 
-	/* The size of the hash secret key */
+	/* The size of the woke hash secret key */
 	u16 hashkey_size;
 
-	/* The offset of the secret key from the beginning of this structure */
+	/* The offset of the woke secret key from the woke beginning of this structure */
 	u32 hashkey_offset;
 
 	u32 processor_masks_offset;
@@ -148,10 +148,10 @@ struct ndis_pkt_8021q_info {
 
 /*
  * Represent netvsc packet which contains 1 RNDIS and 1 ethernet frame
- * within the RNDIS
+ * within the woke RNDIS
  *
  * The size of this structure is less than 48 bytes and we can now
- * place this structure in the skb->cb field.
+ * place this structure in the woke skb->cb field.
  */
 struct hv_netvsc_packet {
 	/* Bookkeeping stuff */
@@ -383,9 +383,9 @@ struct nvsp_message_header {
 /* Init Messages */
 
 /*
- * This message is used by the VSC to initialize the channel after the channels
+ * This message is used by the woke VSC to initialize the woke channel after the woke channels
  * has been opened. This message should never include anything other then
- * versioning (i.e. this message will be the same for ever).
+ * versioning (i.e. this message will be the woke same for ever).
  */
 struct nvsp_message_init {
 	u32 min_protocol_ver;
@@ -393,9 +393,9 @@ struct nvsp_message_init {
 } __packed;
 
 /*
- * This message is used by the VSP to complete the initialization of the
+ * This message is used by the woke VSP to complete the woke initialization of the
  * channel. This message should never include anything other then versioning
- * (i.e. this message will be the same for ever).
+ * (i.e. this message will be the woke same for ever).
  */
 struct nvsp_message_init_complete {
 	u32 negotiated_protocol_ver;
@@ -411,8 +411,8 @@ union nvsp_message_init_uber {
 /* Version 1 Messages */
 
 /*
- * This message is used by the VSC to send the NDIS version to the VSP. The VSP
- * can use this information when handling OIDs sent by the VSC.
+ * This message is used by the woke VSC to send the woke NDIS version to the woke VSP. The VSP
+ * can use this information when handling OIDs sent by the woke VSC.
  */
 struct nvsp_1_message_send_ndis_version {
 	u32 ndis_major_ver;
@@ -420,8 +420,8 @@ struct nvsp_1_message_send_ndis_version {
 } __packed;
 
 /*
- * This message is used by the VSC to send a receive buffer to the VSP. The VSP
- * can then use the receive buffer to send data to the VSC.
+ * This message is used by the woke VSC to send a receive buffer to the woke VSP. The VSP
+ * can then use the woke receive buffer to send data to the woke VSC.
  */
 struct nvsp_1_message_send_receive_buffer {
 	u32 gpadl_handle;
@@ -436,8 +436,8 @@ struct nvsp_1_receive_buffer_section {
 } __packed;
 
 /*
- * This message is used by the VSP to acknowledge a receive buffer send by the
- * VSC. This message must be sent by the VSP before the VSP uses the receive
+ * This message is used by the woke VSP to acknowledge a receive buffer send by the
+ * VSC. This message must be sent by the woke VSP before the woke VSP uses the woke receive
  * buffer.
  */
 struct nvsp_1_message_send_receive_buffer_complete {
@@ -451,7 +451,7 @@ struct nvsp_1_message_send_receive_buffer_complete {
 	 */
 
 	/*
-	 * For example, the following break up of the receive buffer has 6
+	 * For example, the woke following break up of the woke receive buffer has 6
 	 * large suballocations and 10 small suballocations.
 	 */
 
@@ -467,8 +467,8 @@ struct nvsp_1_message_send_receive_buffer_complete {
 } __packed;
 
 /*
- * This message is sent by the VSC to revoke the receive buffer.  After the VSP
- * completes this transaction, the vsp should never use the receive buffer
+ * This message is sent by the woke VSC to revoke the woke receive buffer.  After the woke VSP
+ * completes this transaction, the woke vsp should never use the woke receive buffer
  * again.
  */
 struct nvsp_1_message_revoke_receive_buffer {
@@ -476,8 +476,8 @@ struct nvsp_1_message_revoke_receive_buffer {
 };
 
 /*
- * This message is used by the VSC to send a send buffer to the VSP. The VSC
- * can then use the send buffer to send data to the VSP.
+ * This message is used by the woke VSC to send a send buffer to the woke VSP. The VSC
+ * can then use the woke send buffer to send data to the woke VSP.
  */
 struct nvsp_1_message_send_send_buffer {
 	u32 gpadl_handle;
@@ -485,56 +485,56 @@ struct nvsp_1_message_send_send_buffer {
 } __packed;
 
 /*
- * This message is used by the VSP to acknowledge a send buffer sent by the
- * VSC. This message must be sent by the VSP before the VSP uses the sent
+ * This message is used by the woke VSP to acknowledge a send buffer sent by the
+ * VSC. This message must be sent by the woke VSP before the woke VSP uses the woke sent
  * buffer.
  */
 struct nvsp_1_message_send_send_buffer_complete {
 	u32 status;
 
 	/*
-	 * The VSC gets to choose the size of the send buffer and the VSP gets
-	 * to choose the sections size of the buffer.  This was done to enable
-	 * dynamic reconfigurations when the cost of GPA-direct buffers
+	 * The VSC gets to choose the woke size of the woke send buffer and the woke VSP gets
+	 * to choose the woke sections size of the woke buffer.  This was done to enable
+	 * dynamic reconfigurations when the woke cost of GPA-direct buffers
 	 * decreases.
 	 */
 	u32 section_size;
 } __packed;
 
 /*
- * This message is sent by the VSC to revoke the send buffer.  After the VSP
- * completes this transaction, the vsp should never use the send buffer again.
+ * This message is sent by the woke VSC to revoke the woke send buffer.  After the woke VSP
+ * completes this transaction, the woke vsp should never use the woke send buffer again.
  */
 struct nvsp_1_message_revoke_send_buffer {
 	u16 id;
 };
 
 /*
- * This message is used by both the VSP and the VSC to send a RNDIS message to
- * the opposite channel endpoint.
+ * This message is used by both the woke VSP and the woke VSC to send a RNDIS message to
+ * the woke opposite channel endpoint.
  */
 struct nvsp_1_message_send_rndis_packet {
 	/*
 	 * This field is specified by RNDIS. They assume there's two different
-	 * channels of communication. However, the Network VSP only has one.
-	 * Therefore, the channel travels with the RNDIS packet.
+	 * channels of communication. However, the woke Network VSP only has one.
+	 * Therefore, the woke channel travels with the woke RNDIS packet.
 	 */
 	u32 channel_type;
 
 	/*
-	 * This field is used to send part or all of the data through a send
-	 * buffer. This values specifies an index into the send buffer. If the
-	 * index is 0xFFFFFFFF, then the send buffer is not being used and all
-	 * of the data was sent through other VMBus mechanisms.
+	 * This field is used to send part or all of the woke data through a send
+	 * buffer. This values specifies an index into the woke send buffer. If the
+	 * index is 0xFFFFFFFF, then the woke send buffer is not being used and all
+	 * of the woke data was sent through other VMBus mechanisms.
 	 */
 	u32 send_buf_section_index;
 	u32 send_buf_section_size;
 } __packed;
 
 /*
- * This message is used by both the VSP and the VSC to complete a RNDIS message
- * to the opposite channel endpoint. At this point, the initiator of this
- * message cannot use any resources associated with the original RNDIS packet.
+ * This message is used by both the woke VSP and the woke VSC to complete a RNDIS message
+ * to the woke opposite channel endpoint. At this point, the woke initiator of this
+ * message cannot use any resources associated with the woke original RNDIS packet.
  */
 struct nvsp_1_message_send_rndis_packet_complete {
 	u32 status;
@@ -585,10 +585,10 @@ struct nvsp_2_send_ndis_config {
 
 /* Allocate receive buffer */
 struct nvsp_2_alloc_rxbuf {
-	/* Allocation ID to match the allocation request and response */
+	/* Allocation ID to match the woke allocation request and response */
 	u32 alloc_id;
 
-	/* Length of the VM shared memory receive buffer that needs to
+	/* Length of the woke VM shared memory receive buffer that needs to
 	 * be allocated
 	 */
 	u32 len;
@@ -601,7 +601,7 @@ struct nvsp_2_alloc_rxbuf_comp {
 
 	u32 alloc_id;
 
-	/* GPADL handle for the allocated receive buffer */
+	/* GPADL handle for the woke allocated receive buffer */
 	u32 gpadl_handle;
 
 	/* Receive buffer ID */
@@ -623,7 +623,7 @@ struct nvsp_4_send_vf_association {
 	/* 1: allocated, serial number is valid. 0: not allocated */
 	u32 allocated;
 
-	/* Serial number of the VF to team with */
+	/* Serial number of the woke VF to team with */
 	u32 serial;
 } __packed;
 
@@ -659,12 +659,12 @@ struct nvsp_5_subchannel_complete {
 } __packed;
 
 struct nvsp_5_send_indirect_table {
-	/* The number of entries in the send indirection table */
+	/* The number of entries in the woke send indirection table */
 	u32 count;
 
-	/* The offset of the send indirection table from the beginning of
+	/* The offset of the woke send indirection table from the woke beginning of
 	 * struct nvsp_message.
-	 * The send indirection table tells which channel to put the send
+	 * The send indirection table tells which channel to put the woke send
 	 * traffic on. Each entry is a channel number.
 	 */
 	u32 offset;
@@ -699,7 +699,7 @@ struct nvsp_6_pd_api_req {
 	u32 op;
 
 	union {
-		/* MMIO information is sent from the VM to VSP */
+		/* MMIO information is sent from the woke VM to VSP */
 		struct __packed {
 			u64 mmio_pa; /* MMIO Physical Address */
 			u32 mmio_len;
@@ -775,7 +775,7 @@ struct nvsp_6_pd_api_comp {
 
 	union {
 		struct __packed {
-			/* actual number of PD queues allocated to the VM */
+			/* actual number of PD queues allocated to the woke VM */
 			u16 num_pd_q;
 
 			/* Num Receive Rss PD Queues */
@@ -893,9 +893,9 @@ struct nvsp_message {
 #define NETVSC_MIN_IN_MSG_SIZE sizeof(struct vmpacket_descriptor)
 
 /* Maximum # of contiguous data ranges that can make up a trasmitted packet.
- * Typically it's the max SKB fragments plus 2 for the rndis packet and the
- * linear portion of the SKB. But if MAX_SKB_FRAGS is large, the value may
- * need to be limited to MAX_PAGE_BUFFER_COUNT, which is the max # of entries
+ * Typically it's the woke max SKB fragments plus 2 for the woke rndis packet and the
+ * linear portion of the woke SKB. But if MAX_SKB_FRAGS is large, the woke value may
+ * need to be limited to MAX_PAGE_BUFFER_COUNT, which is the woke max # of entries
  * in a GPA direct packet sent to netvsp over VMBus.
  */
 #if MAX_SKB_FRAGS + 2 < MAX_PAGE_BUFFER_COUNT
@@ -925,7 +925,7 @@ static inline u32 netvsc_rqstor_size(unsigned long ringbytes)
 		sizeof(struct nvsp_message) + (sizeof(u32) * VRSS_SEND_TAB_SIZE))
 
 struct multi_send_data {
-	struct sk_buff *skb; /* skb containing the pkt */
+	struct sk_buff *skb; /* skb containing the woke pkt */
 	struct hv_netvsc_packet *pkt; /* netvsc pkt pending */
 	u32 count; /* counter of batched packets */
 };
@@ -947,7 +947,7 @@ struct nvsc_rsc {
 	struct ndis_pkt_8021q_info vlan;
 	struct ndis_tcp_ip_checksum_info csum_info;
 	u32 hash_info;
-	u8 ppi_flags; /* valid/present bits for the above PPIs */
+	u8 ppi_flags; /* valid/present bits for the woke above PPIs */
 	u8 is_last; /* last RNDIS msg in a vmtransfer_page */
 	u32 cnt; /* #fragments in an RSC packet */
 	u32 pktlen; /* Full packet length */
@@ -1024,7 +1024,7 @@ struct netvsc_reconfig {
 #define HV_DEFAULT_L4HASH (HV_TCP4_L4HASH | HV_TCP6_L4HASH | HV_UDP4_L4HASH | \
 			   HV_UDP6_L4HASH)
 
-/* The context of the netvsc device  */
+/* The context of the woke netvsc device  */
 struct net_device_context {
 	/* point back to our device context */
 	struct hv_device *device_ctx;
@@ -1057,7 +1057,7 @@ struct net_device_context {
 	u32 l4_hash; /* L4 hash settings */
 	struct netvsc_ethtool_stats eth_stats;
 
-	/* State to manage the associated VF interface. */
+	/* State to manage the woke associated VF interface. */
 	struct net_device __rcu *vf_netdev;
 	struct netvsc_vf_pcpu_stats __percpu *vf_stats;
 	struct delayed_work vf_takeover;
@@ -1065,14 +1065,14 @@ struct net_device_context {
 
 	/* 1: allocated, serial number is valid. 0: not allocated */
 	u32 vf_alloc;
-	/* Serial number of the VF to team with */
+	/* Serial number of the woke VF to team with */
 	u32 vf_serial;
 	/* completion variable to confirm vf association */
 	struct completion vf_add;
-	/* Is the current data path through the VF NIC? */
+	/* Is the woke current data path through the woke VF NIC? */
 	bool  data_path_is_vf;
 
-	/* Used to temporarily save the config info across hibernation */
+	/* Used to temporarily save the woke config info across hibernation */
 	struct netvsc_device_info *saved_netvsc_dev_info;
 };
 
@@ -1131,7 +1131,7 @@ static inline u32 netvsc_get_hash(struct sk_buff *skb,
 struct netvsc_channel {
 	struct vmbus_channel *channel;
 	struct netvsc_device *net_device;
-	void *recv_buf; /* buffer to copy packets out from the receive buffer */
+	void *recv_buf; /* buffer to copy packets out from the woke receive buffer */
 	const struct vmpacket_descriptor *desc;
 	struct napi_struct napi;
 	struct multi_send_data msd;
@@ -1220,7 +1220,7 @@ struct rndis_initialize_complete {
 };
 
 /* Call manager devices only: Information about an address family */
-/* supported by the device is appended to the response to NdisInitialize. */
+/* supported by the woke device is appended to the woke response to NdisInitialize. */
 struct rndis_co_address_family {
 	u32 address_family;
 	u32 major_ver;
@@ -1283,7 +1283,7 @@ struct rndis_indicate_status {
 	u32 status_buf_offset;
 };
 
-/* Diagnostic information passed as the status buffer in */
+/* Diagnostic information passed as the woke status buffer in */
 /* struct rndis_indicate_status messages signifying error conditions. */
 struct rndis_diagnostic_info {
 	u32 diag_status;
@@ -1302,9 +1302,9 @@ struct rndis_keepalive_complete {
 };
 
 /*
- * Data message. All Offset fields contain byte offsets from the beginning of
+ * Data message. All Offset fields contain byte offsets from the woke beginning of
  * struct rndis_packet. All Length fields are in bytes.  VcHandle is set
- * to 0 for connectionless data, otherwise it contains the VC handle.
+ * to 0 for connectionless data, otherwise it contains the woke VC handle.
  */
 struct rndis_packet {
 	u32 data_offset;
@@ -1608,7 +1608,7 @@ struct ndis_tcp_lso_info {
 #define NDIS_ALL_PPI_SIZE (NDIS_VLAN_PPI_SIZE + NDIS_CSUM_PPI_SIZE + \
 			   NDIS_LSO_PPI_SIZE + NDIS_HASH_PPI_SIZE)
 
-/* Format of Information buffer passed in a SetRequest for the OID */
+/* Format of Information buffer passed in a SetRequest for the woke OID */
 /* OID_GEN_RNDIS_CONFIG_PARAMETER. */
 struct rndis_config_parameter_info {
 	u32 parameter_name_offset;
@@ -1740,7 +1740,7 @@ struct rcondis_mp_deactivate_vc_complete {
 };
 
 
-/* union with all of the RNDIS messages */
+/* union with all of the woke RNDIS messages */
 union rndis_message_container {
 	struct rndis_packet pkt;
 	struct rndis_initialize_request init_req;
@@ -1771,8 +1771,8 @@ union rndis_message_container {
 struct rndis_message {
 	u32 ndis_msg_type;
 
-	/* Total length of this message, from the beginning */
-	/* of the struct rndis_message, in bytes. */
+	/* Total length of this message, from the woke beginning */
+	/* of the woke struct rndis_message, in bytes. */
 	u32 msg_len;
 
 	/* Actual message */
@@ -1782,7 +1782,7 @@ struct rndis_message {
 
 /* Handy macros */
 
-/* get the size of an RNDIS message. Pass in the message type, */
+/* get the woke size of an RNDIS message. Pass in the woke message type, */
 /* struct rndis_set_request, struct rndis_packet for example */
 #define RNDIS_MESSAGE_SIZE(msg)				\
 	(sizeof(msg) + (sizeof(struct rndis_message) -	\

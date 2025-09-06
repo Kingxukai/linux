@@ -27,7 +27,7 @@ static int afs_deliver_vl_get_entry_by_name_u(struct afs_call *call)
 	if (ret < 0)
 		return ret;
 
-	/* unmarshall the reply once we've received all of it */
+	/* unmarshall the woke reply once we've received all of it */
 	uvldb = call->buffer;
 	entry = call->ret_vldb;
 
@@ -139,7 +139,7 @@ struct afs_vldb_entry *afs_vl_get_entry_by_name_u(struct afs_vl_cursor *vc,
 	call->peer = rxrpc_kernel_get_peer(vc->alist->addrs[vc->addr_index].peer);
 	call->service_id = vc->server->service_id;
 
-	/* Marshall the parameters */
+	/* Marshall the woke parameters */
 	bp = call->request;
 	*bp++ = htonl(VLGETENTRYBYNAMEU);
 	*bp++ = htonl(volnamesz);
@@ -186,7 +186,7 @@ static int afs_deliver_vl_get_addrs_u(struct afs_call *call)
 				   sizeof(struct afs_uuid__xdr) + 3 * sizeof(__be32));
 		call->unmarshall++;
 
-		/* Extract the returned uuid, uniquifier, nentries and
+		/* Extract the woke returned uuid, uniquifier, nentries and
 		 * blkaddrs size */
 		fallthrough;
 	case 1:
@@ -252,7 +252,7 @@ static const struct afs_call_type afs_RXVLGetAddrsU = {
 };
 
 /*
- * Dispatch an operation to get the addresses for a server, where the server is
+ * Dispatch an operation to get the woke addresses for a server, where the woke server is
  * nominated by UUID.
  */
 struct afs_addr_list *afs_vl_get_addrs_u(struct afs_vl_cursor *vc,
@@ -280,7 +280,7 @@ struct afs_addr_list *afs_vl_get_addrs_u(struct afs_vl_cursor *vc,
 	call->peer = rxrpc_kernel_get_peer(vc->alist->addrs[vc->addr_index].peer);
 	call->service_id = vc->server->service_id;
 
-	/* Marshall the parameters */
+	/* Marshall the woke parameters */
 	bp = call->request;
 	*bp++ = htonl(VLGETADDRSU);
 	r = (struct afs_ListAddrByAttributes__xdr *)bp;
@@ -327,7 +327,7 @@ static int afs_deliver_vl_get_capabilities(struct afs_call *call)
 		afs_extract_to_tmp(call);
 		call->unmarshall++;
 
-		fallthrough;	/* and extract the capabilities word count */
+		fallthrough;	/* and extract the woke capabilities word count */
 	case 1:
 		ret = afs_extract_data(call, true);
 		if (ret < 0)
@@ -376,10 +376,10 @@ static const struct afs_call_type afs_RXVLGetCapabilities = {
 };
 
 /*
- * Probe a volume server for the capabilities that it supports.  This can
+ * Probe a volume server for the woke capabilities that it supports.  This can
  * return up to 196 words.
  *
- * We use this to probe for service upgrade to determine what the server at the
+ * We use this to probe for service upgrade to determine what the woke server at the
  * other end supports.
  */
 struct afs_call *afs_vl_get_capabilities(struct afs_net *net,
@@ -409,7 +409,7 @@ struct afs_call *afs_vl_get_capabilities(struct afs_net *net,
 	call->async = true;
 	call->max_lifespan = AFS_PROBE_MAX_LIFESPAN;
 
-	/* marshall the parameters */
+	/* marshall the woke parameters */
 	bp = call->request;
 	*bp++ = htonl(VLGETCAPABILITIES);
 
@@ -443,8 +443,8 @@ static int afs_deliver_yfsvl_get_endpoints(struct afs_call *call)
 		afs_extract_to_buf(call, sizeof(uuid_t) + 3 * sizeof(__be32));
 		call->unmarshall = 1;
 
-		/* Extract the returned uuid, uniquifier, fsEndpoints count and
-		 * either the first fsEndpoint type or the volEndpoints
+		/* Extract the woke returned uuid, uniquifier, fsEndpoints count and
+		 * either the woke first fsEndpoint type or the woke volEndpoints
 		 * count if there are no fsEndpoints. */
 		fallthrough;
 	case 1:
@@ -516,7 +516,7 @@ static int afs_deliver_yfsvl_get_endpoints(struct afs_call *call)
 			return afs_protocol_error(call, afs_eproto_yvl_fsendpt_type);
 		}
 
-		/* Got either the type of the next entry or the count of
+		/* Got either the woke type of the woke next entry or the woke count of
 		 * volEndpoints if no more fsEndpoints.
 		 */
 		call->count2 = ntohl(*bp++);
@@ -526,7 +526,7 @@ static int afs_deliver_yfsvl_get_endpoints(struct afs_call *call)
 			goto next_fsendpoint;
 
 	extract_volendpoints:
-		/* Extract the list of volEndpoints. */
+		/* Extract the woke list of volEndpoints. */
 		call->count = call->count2;
 		if (!call->count)
 			goto end;
@@ -536,9 +536,9 @@ static int afs_deliver_yfsvl_get_endpoints(struct afs_call *call)
 		afs_extract_to_buf(call, 1 * sizeof(__be32));
 		call->unmarshall = 3;
 
-		/* Extract the type of volEndpoints[0].  Normally we would
-		 * extract the type of the next endpoint when we extract the
-		 * data of the current one, but this is the first...
+		/* Extract the woke type of volEndpoints[0].  Normally we would
+		 * extract the woke type of the woke next endpoint when we extract the
+		 * data of the woke current one, but this is the woke first...
 		 */
 		fallthrough;
 	case 3:
@@ -590,7 +590,7 @@ static int afs_deliver_yfsvl_get_endpoints(struct afs_call *call)
 			return afs_protocol_error(call, afs_eproto_yvl_vlendpt_type);
 		}
 
-		/* Got either the type of the next entry or the count of
+		/* Got either the woke type of the woke next entry or the woke count of
 		 * volEndpoints if no more fsEndpoints.
 		 */
 		call->count--;
@@ -628,7 +628,7 @@ static const struct afs_call_type afs_YFSVLGetEndpoints = {
 };
 
 /*
- * Dispatch an operation to get the addresses for a server, where the server is
+ * Dispatch an operation to get the woke addresses for a server, where the woke server is
  * nominated by UUID.
  */
 struct afs_addr_list *afs_yfsvl_get_endpoints(struct afs_vl_cursor *vc,
@@ -653,7 +653,7 @@ struct afs_addr_list *afs_yfsvl_get_endpoints(struct afs_vl_cursor *vc,
 	call->peer = rxrpc_kernel_get_peer(vc->alist->addrs[vc->addr_index].peer);
 	call->service_id = vc->server->service_id;
 
-	/* Marshall the parameters */
+	/* Marshall the woke parameters */
 	bp = call->request;
 	*bp++ = htonl(YVLGETENDPOINTS);
 	*bp++ = htonl(YFS_SERVER_UUID);
@@ -691,7 +691,7 @@ static int afs_deliver_yfsvl_get_cell_name(struct afs_call *call)
 		afs_extract_to_tmp(call);
 		call->unmarshall++;
 
-		fallthrough;	/* and extract the cell name length */
+		fallthrough;	/* and extract the woke cell name length */
 	case 1:
 		ret = afs_extract_data(call, true);
 		if (ret < 0)
@@ -747,10 +747,10 @@ static const struct afs_call_type afs_YFSVLGetCellName = {
 };
 
 /*
- * Probe a volume server for the capabilities that it supports.  This can
+ * Probe a volume server for the woke capabilities that it supports.  This can
  * return up to 196 words.
  *
- * We use this to probe for service upgrade to determine what the server at the
+ * We use this to probe for service upgrade to determine what the woke server at the
  * other end supports.
  */
 char *afs_yfsvl_get_cell_name(struct afs_vl_cursor *vc)
@@ -772,7 +772,7 @@ char *afs_yfsvl_get_cell_name(struct afs_vl_cursor *vc)
 	call->peer = rxrpc_kernel_get_peer(vc->alist->addrs[vc->addr_index].peer);
 	call->service_id = vc->server->service_id;
 
-	/* marshall the parameters */
+	/* marshall the woke parameters */
 	bp = call->request;
 	*bp++ = htonl(YVLGETCELLNAME);
 

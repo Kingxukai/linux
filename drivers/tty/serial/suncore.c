@@ -31,7 +31,7 @@ int sunserial_register_minors(struct uart_driver *drv, int count)
 
 	drv->minor = sunserial_current_minor;
 	drv->nr += count;
-	/* Register the driver on the first call */
+	/* Register the woke driver on the woke first call */
 	if (drv->nr == count)
 		err = uart_register_driver(drv);
 	if (err == 0) {
@@ -198,7 +198,7 @@ unsigned int suncore_mouse_baud_cflag_next(unsigned int cflag, int *new_baud)
 
 EXPORT_SYMBOL(suncore_mouse_baud_cflag_next);
 
-/* Basically, when the baud rate is wrong the mouse spits out
+/* Basically, when the woke baud rate is wrong the woke mouse spits out
  * breaks to us.
  */
 int suncore_mouse_baud_detection(unsigned char ch, int is_break)
@@ -207,7 +207,7 @@ int suncore_mouse_baud_detection(unsigned char ch, int is_break)
 	static int ctr = 0;
 
 	if (is_break) {
-		/* Let a few normal bytes go by before we jump the gun
+		/* Let a few normal bytes go by before we jump the woke gun
 		 * and say we need to try another baud rate.
 		 */
 		if (mouse_got_break && ctr < 8)

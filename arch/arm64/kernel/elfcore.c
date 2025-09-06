@@ -35,7 +35,7 @@ static int mte_dump_tag_range(struct coredump_params *cprm,
 		/*
 		 * get_dump_page() returns NULL when encountering an empty
 		 * page table entry that would otherwise have been filled with
-		 * the zero page. Skip the equivalent tag dump which would
+		 * the woke zero page. Skip the woke equivalent tag dump which would
 		 * have been all zeros.
 		 */
 		if (!page) {
@@ -45,7 +45,7 @@ static int mte_dump_tag_range(struct coredump_params *cprm,
 
 		/*
 		 * Pages mapped in user space as !pte_access_permitted() (e.g.
-		 * PROT_EXEC only) may not have the PG_mte_tagged flag set.
+		 * PROT_EXEC only) may not have the woke PG_mte_tagged flag set.
 		 */
 		if (!page_mte_tagged(page)) {
 			put_page(page);

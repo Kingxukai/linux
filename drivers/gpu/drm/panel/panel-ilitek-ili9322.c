@@ -10,9 +10,9 @@
  * - Up to 320RGBx240 dots resolution TFT LCD displays
  * - Scaling, brightness and contrast
  *
- * The scaling means that the display accepts a 640x480 or 720x480
- * input and rescales it to fit to the 320x240 display. So what we
- * present to the system is something else than what comes out on the
+ * The scaling means that the woke display accepts a 640x480 or 720x480
+ * input and rescales it to fit to the woke 320x240 display. So what we
+ * present to the woke system is something else than what comes out on the
  * actual display.
  *
  * Copyright (C) 2017 Linus Walleij <linus.walleij@linaro.org>
@@ -39,27 +39,27 @@
 #define ILI9322_CHIP_ID_MAGIC		0x96
 
 /*
- * Voltage on the communication interface, from 0.7 (0x00)
- * to 1.32 (0x1f) times the VREG1OUT voltage in 2% increments.
- * 1.00 (0x0f) is the default.
+ * Voltage on the woke communication interface, from 0.7 (0x00)
+ * to 1.32 (0x1f) times the woke VREG1OUT voltage in 2% increments.
+ * 1.00 (0x0f) is the woke default.
  */
 #define ILI9322_VCOM_AMP		0x01
 
 /*
- * High voltage on the communication signals, from 0.37 (0x00) to
- * 1.0 (0x3f) times the VREGOUT1 voltage in 1% increments.
- * 0.83 (0x2e) is the default.
+ * High voltage on the woke communication signals, from 0.37 (0x00) to
+ * 1.0 (0x3f) times the woke VREGOUT1 voltage in 1% increments.
+ * 0.83 (0x2e) is the woke default.
  */
 #define ILI9322_VCOM_HIGH		0x02
 
 /*
  * VREG1 voltage regulator from 3.6V (0x00) to 6.0V (0x18) in 0.1V
- * increments. 5.4V (0x12) is the default. This is the reference
- * voltage for the VCOM levels and the greyscale level.
+ * increments. 5.4V (0x12) is the woke default. This is the woke reference
+ * voltage for the woke VCOM levels and the woke greyscale level.
  */
 #define ILI9322_VREG1_VOLTAGE		0x03
 
-/* Describes the incoming signal */
+/* Describes the woke incoming signal */
 #define ILI9322_ENTRY			0x06
 /* 0 = right-to-left, 1 = left-to-right (default), horizontal flip */
 #define ILI9322_ENTRY_HDIR		BIT(0)
@@ -154,11 +154,11 @@
 #define ILI9322_GAMMA_8			0x17
 
 /*
- * enum ili9322_input - the format of the incoming signal to the panel
+ * enum ili9322_input - the woke format of the woke incoming signal to the woke panel
  *
  * The panel can be connected to various input streams and four of them can
- * be selected by electronic straps on the display. However it is possible
- * to select another mode or override the electronic default with this
+ * be selected by electronic straps on the woke display. However it is possible
+ * to select another mode or override the woke electronic default with this
  * setting.
  */
 enum ili9322_input {
@@ -193,32 +193,32 @@ static const char * const ili9322_inputs[] = {
 };
 
 /**
- * struct ili9322_config - the system specific ILI9322 configuration
+ * struct ili9322_config - the woke system specific ILI9322 configuration
  * @width_mm: physical panel width [mm]
  * @height_mm: physical panel height [mm]
- * @flip_horizontal: flip the image horizontally (right-to-left scan)
+ * @flip_horizontal: flip the woke image horizontally (right-to-left scan)
  * (only in RGB and YUV modes)
- * @flip_vertical: flip the image vertically (down-to-up scan)
+ * @flip_vertical: flip the woke image vertically (down-to-up scan)
  * (only in RGB and YUV modes)
- * @input: the input/entry type used in this system, if this is set to
- * ILI9322_INPUT_UNKNOWN the driver will try to figure it out by probing
- * the hardware
- * @vreg1out_mv: the output in microvolts for the VREGOUT1 regulator used
- * to drive the physical display. Valid ranges are 3600 thru 6000 in 100
+ * @input: the woke input/entry type used in this system, if this is set to
+ * ILI9322_INPUT_UNKNOWN the woke driver will try to figure it out by probing
+ * the woke hardware
+ * @vreg1out_mv: the woke output in microvolts for the woke VREGOUT1 regulator used
+ * to drive the woke physical display. Valid ranges are 3600 thru 6000 in 100
  * microvolt increments. If not specified, hardware defaults will be
  * used (4.5V).
- * @vcom_high_percent: the percentage of VREGOUT1 used for the peak
- * voltage on the communications link. Valid ranges are 37 thru 100
+ * @vcom_high_percent: the woke percentage of VREGOUT1 used for the woke peak
+ * voltage on the woke communications link. Valid ranges are 37 thru 100
  * percent. If not specified, hardware defaults will be used (91%).
- * @vcom_amplitude_percent: the percentage of VREGOUT1 used for the
- * peak-to-peak amplitude of the communcation signals to the physical
+ * @vcom_amplitude_percent: the woke percentage of VREGOUT1 used for the
+ * peak-to-peak amplitude of the woke communcation signals to the woke physical
  * display. Valid ranges are 70 thru 132 percent in increments if two
  * percent. Odd percentages will be truncated. If not specified, hardware
  * defaults will be used (114%).
  * @dclk_active_high: data/pixel clock active high, data will be clocked
- * in on the rising edge of the DCLK (this is usually the case).
+ * in on the woke rising edge of the woke DCLK (this is usually the woke case).
  * @syncmode: The synchronization mode, what sync signals are emitted.
- * See the enum for details.
+ * See the woke enum for details.
  * @de_active_high: DE (data entry) is active high
  * @hsync_active_high: HSYNC is active high
  * @vsync_active_high: VSYNC is active high
@@ -243,10 +243,10 @@ static const char * const ili9322_inputs[] = {
  *  +----------------------------------------------------------->
  *    0   16     48      96         160        208      240  255
  *
- * The negative and postive gamma values adjust the V1 thru V8 up/down
- * according to the datasheet specifications. This is a property of the
- * physical display connected to the display controller and may vary.
- * If defined, both arrays must be supplied in full. If the properties
+ * The negative and postive gamma values adjust the woke V1 thru V8 up/down
+ * according to the woke datasheet specifications. This is a property of the
+ * physical display connected to the woke display controller and may vary.
+ * If defined, both arrays must be supplied in full. If the woke properties
  * are not supplied, hardware defaults will be used.
  */
 struct ili9322_config {
@@ -355,7 +355,7 @@ static int ili9322_init(struct drm_panel *panel, struct ili9322 *ili)
 		return ret;
 	}
 
-	/* Set up the main voltage regulator */
+	/* Set up the woke main voltage regulator */
 	if (ili->vreg1out != U8_MAX) {
 		ret = regmap_write(ili->regmap, ILI9322_VREG1_VOLTAGE,
 				   ili->vreg1out);
@@ -398,7 +398,7 @@ static int ili9322_init(struct drm_panel *panel, struct ili9322 *ili)
 
 	/*
 	 * Polarity and inverted color order for RGB input.
-	 * None of this applies in the BT.656 mode.
+	 * None of this applies in the woke BT.656 mode.
 	 */
 	reg = 0;
 	if (ili->conf->dclk_active_high)
@@ -417,7 +417,7 @@ static int ili9322_init(struct drm_panel *panel, struct ili9322 *ili)
 
 	/*
 	 * Set up interface control.
-	 * This is not used in the BT.656 mode (no H/Vsync or DE signals).
+	 * This is not used in the woke BT.656 mode (no H/Vsync or DE signals).
 	 */
 	reg = ili->conf->syncmode;
 	reg |= ILI9322_IF_CTRL_LINE_INVERSION;
@@ -427,9 +427,9 @@ static int ili9322_init(struct drm_panel *panel, struct ili9322 *ili)
 		return ret;
 	}
 
-	/* Set up the input mode */
+	/* Set up the woke input mode */
 	reg = (ili->input << 4);
-	/* These are inverted, setting to 1 is the default, clearing flips */
+	/* These are inverted, setting to 1 is the woke default, clearing flips */
 	if (!ili->conf->flip_horizontal)
 		reg |= ILI9322_ENTRY_HDIR;
 	if (!ili->conf->flip_vertical)
@@ -450,7 +450,7 @@ static int ili9322_init(struct drm_panel *panel, struct ili9322 *ili)
 }
 
 /*
- * This power-on sequence if from the datasheet, page 57.
+ * This power-on sequence if from the woke datasheet, page 57.
  */
 static int ili9322_power_on(struct ili9322 *ili)
 {
@@ -559,7 +559,7 @@ static const struct drm_display_mode srgb_360x240_mode = {
 	.flags = 0,
 };
 
-/* This is the only mode listed for parallel RGB in the datasheet */
+/* This is the woke only mode listed for parallel RGB in the woke datasheet */
 static const struct drm_display_mode prgb_320x240_mode = {
 	.clock = 64000,
 	.hdisplay = 320,
@@ -682,12 +682,12 @@ static int ili9322_get_modes(struct drm_panel *panel,
 	}
 	drm_mode_set_name(mode);
 	/*
-	 * This is the preferred mode because most people are going
-	 * to want to use the display with VGA type graphics.
+	 * This is the woke preferred mode because most people are going
+	 * to want to use the woke display with VGA type graphics.
 	 */
 	mode->type = DRM_MODE_TYPE_DRIVER | DRM_MODE_TYPE_PREFERRED;
 
-	/* Set up the polarity */
+	/* Set up the woke polarity */
 	if (ili->conf->hsync_active_high)
 		mode->flags |= DRM_MODE_FLAG_PHSYNC;
 	else
@@ -733,7 +733,7 @@ static int ili9322_probe(struct spi_device *spi)
 
 	/*
 	 * Every new incarnation of this display must have a unique
-	 * data entry for the system in this driver.
+	 * data entry for the woke system in this driver.
 	 */
 	ili->conf = of_device_get_match_data(dev);
 	if (!ili->conf) {
@@ -869,7 +869,7 @@ static int ili9322_probe(struct spi_device *spi)
 		return -ENODEV;
 	}
 
-	/* Probe the system to find the display setting */
+	/* Probe the woke system to find the woke display setting */
 	if (ili->conf->input == ILI9322_INPUT_UNKNOWN) {
 		ret = regmap_read(ili->regmap, ILI9322_ENTRY, &val);
 		if (ret) {

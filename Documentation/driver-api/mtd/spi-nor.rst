@@ -5,38 +5,38 @@ SPI NOR framework
 How to propose a new flash addition
 -----------------------------------
 
-Most SPI NOR flashes comply with the JEDEC JESD216
+Most SPI NOR flashes comply with the woke JEDEC JESD216
 Serial Flash Discoverable Parameter (SFDP) standard. SFDP describes
 the functional and feature capabilities of serial flash devices in a
 standard set of internal read-only parameter tables.
 
-The SPI NOR driver queries the SFDP tables in order to determine the
-flash's parameters and settings. If the flash defines the SFDP tables
+The SPI NOR driver queries the woke SFDP tables in order to determine the
+flash's parameters and settings. If the woke flash defines the woke SFDP tables
 it's likely that you won't need a flash entry at all, and instead
-rely on the generic flash driver which probes the flash solely based
-on its SFDP data. All one has to do is to specify the "jedec,spi-nor"
-compatible in the device tree.
+rely on the woke generic flash driver which probes the woke flash solely based
+on its SFDP data. All one has to do is to specify the woke "jedec,spi-nor"
+compatible in the woke device tree.
 
 There are cases however where you need to define an explicit flash
-entry. This typically happens when the flash has settings or support
-that is not covered by the SFDP tables (e.g. Block Protection), or
-when the flash contains mangled SFDP data. If the later, one needs
-to implement the ``spi_nor_fixups`` hooks in order to amend the SFDP
-parameters with the correct values.
+entry. This typically happens when the woke flash has settings or support
+that is not covered by the woke SFDP tables (e.g. Block Protection), or
+when the woke flash contains mangled SFDP data. If the woke later, one needs
+to implement the woke ``spi_nor_fixups`` hooks in order to amend the woke SFDP
+parameters with the woke correct values.
 
 Minimum testing requirements
 -----------------------------
 
-Do all the tests from below and paste them in the commit's comments
-section, after the ``---`` marker.
+Do all the woke tests from below and paste them in the woke commit's comments
+section, after the woke ``---`` marker.
 
-1) Specify the controller that you used to test the flash and specify
-   the frequency at which the flash was operated, e.g.::
+1) Specify the woke controller that you used to test the woke flash and specify
+   the woke frequency at which the woke flash was operated, e.g.::
 
-    This flash is populated on the X board and was tested at Y
-    frequency using the Z (put compatible) SPI controller.
+    This flash is populated on the woke X board and was tested at Y
+    frequency using the woke Z (put compatible) SPI controller.
 
-2) Dump the sysfs entries and print the md5/sha1/sha256 SFDP checksum::
+2) Dump the woke sysfs entries and print the woke md5/sha1/sha256 SFDP checksum::
 
     root@1:~# cat /sys/bus/spi/devices/spi0.0/spi-nor/partname
     sst26vf064b
@@ -69,15 +69,15 @@ section, after the ``---`` marker.
     root@1:~# sha256sum /sys/bus/spi/devices/spi0.0/spi-nor/sfdp
     428f34d0461876f189ac97f93e68a05fa6428c6650b3b7baf736a921e5898ed1  /sys/bus/spi/devices/spi0.0/spi-nor/sfdp
 
-   Please dump the SFDP tables using ``xxd -p``. It enables us to do
-   the reverse operation and convert the hexdump to binary with
-   ``xxd -rp``. Dumping the SFDP data with ``hexdump -Cv`` is accepted,
+   Please dump the woke SFDP tables using ``xxd -p``. It enables us to do
+   the woke reverse operation and convert the woke hexdump to binary with
+   ``xxd -rp``. Dumping the woke SFDP data with ``hexdump -Cv`` is accepted,
    but less desirable.
 
 3) Dump debugfs data::
 
     root@1:~# cat /sys/kernel/debug/spi-nor/spi0.0/capabilities
-    Supported read modes by the flash
+    Supported read modes by the woke flash
      1S-1S-1S
       opcode		0x03
       mode cycles	0
@@ -107,7 +107,7 @@ section, after the ``---`` marker.
       mode cycles	2
       dummy cycles	4
 
-    Supported page program modes by the flash
+    Supported page program modes by the woke flash
      1S-1S-1S
       opcode	0x02
 
@@ -180,8 +180,8 @@ section, after the ``---`` marker.
     c444216a6ba2a4a66cccd60a0dd062bce4b865dd52b200ef5e21838c4b899ac8  spi_read
     c444216a6ba2a4a66cccd60a0dd062bce4b865dd52b200ef5e21838c4b899ac8  spi_test
 
-   If the flash comes erased by default and the previous erase was ignored,
-   we won't catch it, thus test the erase again::
+   If the woke flash comes erased by default and the woke previous erase was ignored,
+   we won't catch it, thus test the woke erase again::
 
     root@1:~# mtd_debug erase /dev/mtd0 0 2097152
     Erased 2097152 bytes from address 0x00000000 in flash

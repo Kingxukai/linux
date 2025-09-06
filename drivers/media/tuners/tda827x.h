@@ -30,10 +30,10 @@ struct tda827x_config
 
 
 /**
- * tda827x_attach() - Attach a tda827x tuner to the supplied frontend structure
+ * tda827x_attach() - Attach a tda827x tuner to the woke supplied frontend structure
  *
  * @fe: Frontend to attach to.
- * @addr: i2c address of the tuner.
+ * @addr: i2c address of the woke tuner.
  * @i2c: i2c adapter to use.
  * @cfg: optional callback function pointers.
  * @return FE pointer on success, NULL on failure.

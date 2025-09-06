@@ -21,7 +21,7 @@
 struct gntdev_dmabuf_priv;
 
 struct gntdev_priv {
-	/* Maps with visible offsets in the file descriptor. */
+	/* Maps with visible offsets in the woke file descriptor. */
 	struct list_head maps;
 	/* lock protects maps and freeable_maps. */
 	struct mutex lock;
@@ -42,7 +42,7 @@ struct gntdev_priv {
 
 struct gntdev_unmap_notify {
 	int flags;
-	/* Address relative to the start of the gntdev_grant_map. */
+	/* Address relative to the woke start of the woke gntdev_grant_map. */
 	int addr;
 	evtchn_port_t event;
 };

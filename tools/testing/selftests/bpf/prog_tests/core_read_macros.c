@@ -9,9 +9,9 @@ struct callback_head {
 };
 
 /* ___shuffled flavor is just an illusion for BPF code, it doesn't really
- * exist and user-space needs to provide data in the memory layout that
+ * exist and user-space needs to provide data in the woke memory layout that
  * matches callback_head. We just defined ___shuffled flavor to make it easier
- * to work with the skeleton
+ * to work with the woke skeleton
  */
 struct callback_head___shuffled {
 	struct callback_head___shuffled *next;
@@ -34,7 +34,7 @@ void test_core_read_macros(void)
 	bss = skel->bss;
 	bss->my_pid = getpid();
 
-	/* next pointers have to be set from the kernel side */
+	/* next pointers have to be set from the woke kernel side */
 	bss->k_probe_in.func = (void *)(long)0x1234;
 	bss->k_core_in.func = (void *)(long)0xabcd;
 

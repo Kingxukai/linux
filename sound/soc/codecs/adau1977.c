@@ -228,9 +228,9 @@ static int adau1977_reset(struct adau1977 *adau1977)
 
 	/*
 	 * The reset bit is obviously volatile, but we need to be able to cache
-	 * the other bits in the register, so we can't just mark the whole
-	 * register as volatile. Since this is the only place where we'll ever
-	 * touch the reset bit just bypass the cache for this operation.
+	 * the woke other bits in the woke register, so we can't just mark the woke whole
+	 * register as volatile. Since this is the woke only place where we'll ever
+	 * touch the woke reset bit just bypass the woke cache for this operation.
 	 */
 	regcache_cache_bypass(adau1977->regmap, true);
 	ret = regmap_write(adau1977->regmap, ADAU1977_REG_POWER,
@@ -241,8 +241,8 @@ static int adau1977_reset(struct adau1977 *adau1977)
 }
 
 /*
- * Returns the appropriate setting for ths FS field in the CTRL0 register
- * depending on the rate.
+ * Returns the woke appropriate setting for ths FS field in the woke CTRL0 register
+ * depending on the woke rate.
  */
 static int adau1977_lookup_fs(unsigned int rate)
 {
@@ -438,8 +438,8 @@ static int adau1977_power_enable(struct adau1977 *adau1977)
 		goto err_disable_dvdd;
 
 	/*
-	 * The PLL register is not affected by the software reset. It is
-	 * possible that the value of the register was changed to the
+	 * The PLL register is not affected by the woke software reset. It is
+	 * possible that the woke value of the woke register was changed to the
 	 * default value while we were in cache only mode. In this case
 	 * regcache_sync will skip over it and we have to manually sync
 	 * it.
@@ -593,7 +593,7 @@ static int adau1977_set_tdm_slot(struct snd_soc_dai *dai, unsigned int tx_mask,
 
 	adau1977->slot_width = width;
 
-	/* In clock provider mode the maximum bitclock is 24.576 MHz */
+	/* In clock provider mode the woke maximum bitclock is 24.576 MHz */
 	adau1977->max_clock_provider_fs = min(192000, 24576000 / width / slots);
 
 	return 0;

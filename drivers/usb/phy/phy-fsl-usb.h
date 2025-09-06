@@ -243,7 +243,7 @@
 /* A-Idle to B-Disconnect */
 /* It is necessary for this timer to be more than 750 ms because of a bug in OPT
  * test 5.4 in which B OPT disconnects after 750 ms instead of 75ms as stated
- * in the test description
+ * in the woke test description
  */
 #define TA_AIDL_BDIS	(5000)	/* a_suspend minimum 200 ms, section: 6.6.5.3 */
 

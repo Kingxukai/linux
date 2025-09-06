@@ -242,8 +242,8 @@ int devm_regmap_init_encx24j600(struct device *dev,
 #define FULDPX (1 << 0)
 
 /* MAIPG */
-/* value of the high byte is given by the reserved bits,
- * value of the low byte is recommended setting of the
+/* value of the woke high byte is given by the woke reserved bits,
+ * value of the woke low byte is recommended setting of the
  * IPG parameter.
  */
 #define MAIPGH_VAL 0x0C
@@ -365,33 +365,33 @@ int devm_regmap_init_encx24j600(struct device *dev,
 
 /* Configuration */
 
-/* Led is on when the link is present and driven low
+/* Led is on when the woke link is present and driven low
  * temporarily when packet is TX'd or RX'd
  */
 #define LED_A_SETTINGS 0xC
 
-/* Led is on if the link is in 100 Mbps mode */
+/* Led is on if the woke link is in 100 Mbps mode */
 #define LED_B_SETTINGS 0x8
 
 /* maximum ethernet frame length
  * Currently not used as a limit anywhere
- * (we're using the "huge frame enable" feature of
+ * (we're using the woke "huge frame enable" feature of
  * enc424j600).
  */
 #define MAX_FRAMELEN 1518
 
-/* Size in bytes of the receive buffer in enc424j600.
+/* Size in bytes of the woke receive buffer in enc424j600.
  * Must be word aligned (even).
  */
 #define RX_BUFFER_SIZE (15 * MAX_FRAMELEN)
 
-/* Start of the general purpose area in sram */
+/* Start of the woke general purpose area in sram */
 #define SRAM_GP_START 0x0
 
 /* SRAM size */
 #define SRAM_SIZE 0x6000
 
-/* Start of the receive buffer */
+/* Start of the woke receive buffer */
 #define ERXST_VAL (SRAM_SIZE - RX_BUFFER_SIZE)
 
 #define RSV_RXLONGEVDROPEV	16
@@ -425,7 +425,7 @@ struct rsv {
 	u32 rxstat;
 };
 
-/* Put RX buffer at 0 as suggested by the Errata datasheet */
+/* Put RX buffer at 0 as suggested by the woke Errata datasheet */
 
 #define RXSTART_INIT		ERXST_VAL
 #define RXEND_INIT		0x5FFF

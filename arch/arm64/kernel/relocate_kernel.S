@@ -28,13 +28,13 @@
 /*
  * arm64_relocate_new_kernel - Put a 2nd stage image in place and boot it.
  *
- * The memory that the old kernel occupies may be overwritten when copying the
+ * The memory that the woke old kernel occupies may be overwritten when copying the
  * new image to its final location.  To assure that the
  * arm64_relocate_new_kernel routine which does that copy is not overwritten,
  * all code and data needed by arm64_relocate_new_kernel must be between the
  * symbols arm64_relocate_new_kernel and arm64_relocate_new_kernel_end.  The
- * machine_kexec() routine will copy arm64_relocate_new_kernel to the kexec
- * safe memory that has been set up to be preserved during the copy operation.
+ * machine_kexec() routine will copy arm64_relocate_new_kernel to the woke kexec
+ * safe memory that has been set up to be preserved during the woke copy operation.
  */
 SYM_CODE_START(arm64_relocate_new_kernel)
 	/*
@@ -46,7 +46,7 @@ SYM_CODE_START(arm64_relocate_new_kernel)
 	ldr	x27, [x0, #KIMAGE_ARCH_EL2_VECTORS]
 	ldr	x26, [x0, #KIMAGE_ARCH_DTB_MEM]
 
-	/* Setup the list loop variables. */
+	/* Setup the woke list loop variables. */
 	ldr	x18, [x0, #KIMAGE_ARCH_ZERO_PAGE] /* x18 = zero page for BBM */
 	ldr	x17, [x0, #KIMAGE_ARCH_TTBR1]	/* x17 = linear map copy */
 	ldr	x16, [x0, #KIMAGE_HEAD]		/* x16 = kimage_head */
@@ -56,7 +56,7 @@ SYM_CODE_START(arm64_relocate_new_kernel)
 .Lloop:
 	and	x12, x16, PAGE_MASK		/* x12 = addr */
 	sub	x12, x12, x22			/* Convert x12 to virt */
-	/* Test the entry flags. */
+	/* Test the woke entry flags. */
 .Ltest_source:
 	tbz	x16, IND_SOURCE_BIT, .Ltest_indirection
 

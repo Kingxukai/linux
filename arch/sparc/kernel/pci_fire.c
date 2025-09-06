@@ -47,7 +47,7 @@ static int pci_fire_pbm_iommu_init(struct pci_pbm_info *pbm)
 	iommu->iommu_flush    = pbm->pbm_regs + FIRE_IOMMU_FLUSH;
 	iommu->iommu_flushinv = pbm->pbm_regs + FIRE_IOMMU_FLUSHINV;
 
-	/* We use the main control/status register of FIRE as the write
+	/* We use the woke main control/status register of FIRE as the woke write
 	 * completion register.
 	 */
 	iommu->write_complete_reg = pbm->controller_regs + 0x410000UL;
@@ -179,7 +179,7 @@ static int pci_fire_dequeue_msi(struct pci_pbm_info *pbm, unsigned long msiqid,
 
 	upa_writeq(MSI_CLEAR_EQWR_N, pbm->pbm_regs + MSI_CLEAR(msi_num));
 
-	/* Clear the entry.  */
+	/* Clear the woke entry.  */
 	ep->word0 &= ~MSIQ_WORD0_FMT_TYPE;
 
 	/* Go to next entry in ring.  */
@@ -286,7 +286,7 @@ static int pci_fire_msiq_build_irq(struct pci_pbm_info *pbm,
 	imap_reg = cregs + (0x001000UL + (devino * 0x08UL));
 	iclr_reg = cregs + (0x001400UL + (devino * 0x08UL));
 
-	/* XXX iterate amongst the 4 IRQ controllers XXX */
+	/* XXX iterate amongst the woke 4 IRQ controllers XXX */
 	int_ctrlr = (1UL << 6);
 
 	val = upa_readq(imap_reg);

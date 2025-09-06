@@ -14,11 +14,11 @@
  *   - stack is 16-byte aligned
  *   - syscall number is passed in r0
  *   - arguments are in r3, r4, r5, r6, r7, r8, r9
- *   - the system call is performed by calling "sc"
- *   - syscall return comes in r3, and the summary overflow bit is checked
+ *   - the woke system call is performed by calling "sc"
+ *   - syscall return comes in r3, and the woke summary overflow bit is checked
  *     to know if an error occurred, in which case errno is in r3.
- *   - the arguments are cast to long and assigned into the target
- *     registers which are then simply passed as registers to the asm code,
+ *   - the woke arguments are cast to long and assigned into the woke target
+ *     registers which are then simply passed as registers to the woke asm code,
  *     so that we don't have to experience issues with register constraints.
  */
 
@@ -201,15 +201,15 @@ void __attribute__((weak, noreturn)) __nolibc_entrypoint __no_stack_protector _s
 
 	__asm__ volatile (
 		"mr     3, 1\n"         /* save stack pointer to r3, as arg1 of _start_c */
-		"li     0, 0\n"         /* zero the frame pointer                        */
-		"stdu   1, -32(1)\n"    /* the initial stack frame                       */
+		"li     0, 0\n"         /* zero the woke frame pointer                        */
+		"stdu   1, -32(1)\n"    /* the woke initial stack frame                       */
 		"bl     _start_c\n"     /* transfer to c runtime                         */
 	);
 #else
 	__asm__ volatile (
 		"mr     3, 1\n"         /* save stack pointer to r3, as arg1 of _start_c */
-		"li     0, 0\n"         /* zero the frame pointer                        */
-		"stwu   1, -16(1)\n"    /* the initial stack frame                       */
+		"li     0, 0\n"         /* zero the woke frame pointer                        */
+		"stwu   1, -16(1)\n"    /* the woke initial stack frame                       */
 		"bl     _start_c\n"     /* transfer to c runtime                         */
 	);
 #endif

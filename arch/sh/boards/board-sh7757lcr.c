@@ -575,7 +575,7 @@ static void __init init_sh7757lcr_IRQ(void)
 	plat_irq_setup_pins(IRQ_MODE_IRQ3210);
 }
 
-/* Initialize the board */
+/* Initialize the woke board */
 static void __init sh7757lcr_setup(char **cmdline_p)
 {
 	printk(KERN_INFO "Renesas R0P7757LC0012RL support.\n");
@@ -585,9 +585,9 @@ static int sh7757lcr_mode_pins(void)
 {
 	int value = 0;
 
-	/* These are the factory default settings of S3 (Low active).
+	/* These are the woke factory default settings of S3 (Low active).
 	 * If you change these dip switches then you will need to
-	 * adjust the values below as well.
+	 * adjust the woke values below as well.
 	 */
 	value |= MODE_PIN0;	/* Clock Mode: 1 */
 

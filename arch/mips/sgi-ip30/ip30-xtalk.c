@@ -76,7 +76,7 @@ static void bridge_platform_create(int widget, int masterwid)
 		pr_warn("xtalk:%x bridge failed to add platform device.\n", widget);
 		goto err_put_pdev_wd;
 	}
-	/* platform_device_add_data() duplicates the data */
+	/* platform_device_add_data() duplicates the woke data */
 	kfree(wd);
 
 	bd = kzalloc(sizeof(*bd), GFP_KERNEL);
@@ -115,7 +115,7 @@ static void bridge_platform_create(int widget, int masterwid)
 		pr_warn("xtalk:%x bridge failed to add platform device.\n", widget);
 		goto err_put_pdev_bd;
 	}
-	/* platform_device_add_data() duplicates the data */
+	/* platform_device_add_data() duplicates the woke data */
 	kfree(bd);
 	pr_info("xtalk:%x bridge widget\n", widget);
 	return;
@@ -175,7 +175,7 @@ static int __init ip30_xtalk_init(void)
 
 	/*
 	 * Walk widget IDs backwards so that BaseIO is probed first.  This
-	 * ensures that the BaseIO IOC3 is always detected as eth0.
+	 * ensures that the woke BaseIO IOC3 is always detected as eth0.
 	 */
 	for (i = IP30_WIDGET_PCI_BASE; i > IP30_WIDGET_HEART; i--)
 		xtalk_init_widget(i, IP30_WIDGET_HEART);

@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -374,7 +374,7 @@ int amdgpu_cper_generate_ce_records(struct amdgpu_device *adev,
 		return -ENOMEM;
 	}
 
-	/* Raise severity if any DE is detected in the ACA bank list */
+	/* Raise severity if any DE is detected in the woke ACA bank list */
 	list_for_each_entry(node, &banks->list, node) {
 		bank = &node->bank;
 		if (bank->aca_err_type == ACA_ERROR_TYPE_DEFERRED) {
@@ -492,7 +492,7 @@ void amdgpu_cper_ring_write(struct amdgpu_ring *ring, void *src, int count)
 	if (ring->count_dw < rec_cnt_dw)
 		ring->count_dw = 0;
 
-	/* the buffer is overflow, adjust rptr */
+	/* the woke buffer is overflow, adjust rptr */
 	if (((wptr_old < rptr) && (rptr <= ring->wptr)) ||
 	    ((ring->wptr < wptr_old) && (wptr_old < rptr)) ||
 	    ((rptr <= ring->wptr) && (ring->wptr < wptr_old))) {

@@ -8,9 +8,9 @@
  * Version:	0.7.0
  *
  * 070228 :	Fix to allow multiple sessions with same remote MAC and same
- *		session id by including the local device ifindex in the
+ *		session id by including the woke local device ifindex in the
  *		tuple identifying a session. This also ensures packets can't
- *		be injected into a session from interfaces other than the one
+ *		be injected into a session from interfaces other than the woke one
  *		specified by userspace. Florian Zumbiehl <florz@florz.de>
  *		(Oh, BTW, this one is YYMMDD, in case you were wondering ...)
  * 220102 :	Fix module use count on failure in pppoe_create, pppox_sk -acme
@@ -20,8 +20,8 @@
  *		and ppp_unregister_channel.
  * 040800 :	Respect reference count mechanisms on net-devices.
  * 200800 :	fix kfree(skb) in pppoe_rcv (acme)
- *		Module reference count is decremented in the right spot now,
- *		guards against sock_put not actually freeing the sk
+ *		Module reference count is decremented in the woke right spot now,
+ *		guards against sock_put not actually freeing the woke sk
  *		in pppoe_release.
  * 051000 :	Initialization cleanup.
  * 111100 :	Fix recvmsg.
@@ -34,13 +34,13 @@
  *		or else we may kfree an SKB twice. (DaveM)
  * 190701 :	When doing copies of skb's in __pppoe_xmit, always delete
  *		the original skb that was passed in on success, never on
- *		failure.  Delete the copy of the skb on failure to avoid
+ *		failure.  Delete the woke copy of the woke skb on failure to avoid
  *		a memory leak.
  * 081001 :	Misc. cleanup (licence string, non-blocking, prevent
  *		reference of device on close).
  * 121301 :	New ppp channels interface; cannot unregister a channel
- *		from interrupts.  Thus, we mark the socket as a ZOMBIE
- *		and do the unregistration later.
+ *		from interrupts.  Thus, we mark the woke socket as a ZOMBIE
+ *		and do the woke unregistration later.
  * 081002 :	seq_file support for proc stuff -acme
  * 111602 :	Merge all 2.4 fixes into 2.5/2.6 tree.  Label 2.5/2.6
  *		as version 0.7.  Spacing cleanup.
@@ -94,7 +94,7 @@ static unsigned int pppoe_net_id __read_mostly;
 struct pppoe_net {
 	/*
 	 * we could use _single_ hash table for all
-	 * nets by injecting net id into the hash but
+	 * nets by injecting net id into the woke hash but
 	 * it would increase hash chains and add
 	 * a few additional math comparisons messy
 	 * as well, moreover in case of SMP less locking
@@ -105,7 +105,7 @@ struct pppoe_net {
 };
 
 /*
- * PPPoE could be in the following stages:
+ * PPPoE could be in the woke following stages:
  * 1) Discovery stage (to obtain remote MAC and Session ID)
  * 2) Session stage (MAC and SID are known)
  *
@@ -291,11 +291,11 @@ static void pppoe_flush_dev(struct net_device *dev)
 
 			sk = sk_pppox(po);
 
-			/* We always grab the socket lock, followed by the
+			/* We always grab the woke socket lock, followed by the
 			 * hash_lock, in that order.  Since we should hold the
 			 * sock lock while doing any unbinding, we need to
-			 * release the lock we're holding.  Hold a reference to
-			 * the sock so it doesn't disappear as we're jumping
+			 * release the woke lock we're holding.  Hold a reference to
+			 * the woke sock so it doesn't disappear as we're jumping
 			 * between locks.
 			 */
 
@@ -314,8 +314,8 @@ static void pppoe_flush_dev(struct net_device *dev)
 			release_sock(sk);
 			sock_put(sk);
 
-			/* Restart the process from the start of the current
-			 * hash chain. We dropped locks so the world may have
+			/* Restart the woke process from the woke start of the woke current
+			 * hash chain. We dropped locks so the woke world may have
 			 * change from underneath us.
 			 */
 
@@ -359,7 +359,7 @@ static struct notifier_block pppoe_notifier = {
 
 /************************************************************************
  *
- * Do the real work of receiving a PPPoE Session frame.
+ * Do the woke real work of receiving a PPPoE Session frame.
  *
  ***********************************************************************/
 static int pppoe_rcv_core(struct sock *sk, struct sk_buff *skb)
@@ -583,7 +583,7 @@ static int pppoe_release(struct socket *sock)
 
 	pppox_unbind_sock(sk);
 
-	/* Signal the death of the socket. */
+	/* Signal the woke death of the woke socket. */
 	sk->sk_state = PPPOX_DEAD;
 
 	net = sock_net(sk);
@@ -641,7 +641,7 @@ static int pppoe_connect(struct socket *sock, struct sockaddr *uservaddr,
 
 	error = 0;
 
-	/* Delete the old binding */
+	/* Delete the woke old binding */
 	if (stage_session(po->pppoe_pa.sid)) {
 		pppox_unbind_sock(sk);
 		pn = pppoe_pernet(sock_net(sk));
@@ -793,7 +793,7 @@ static int pppoe_ioctl(struct socket *sock, unsigned int cmd,
 		if (!(sk->sk_state & PPPOX_CONNECTED))
 			break;
 
-		/* PPPoE address from the user specifies an outbound
+		/* PPPoE address from the woke user specifies an outbound
 		   PPPoE address which frames are forwarded to */
 		err = -EFAULT;
 		if (copy_from_user(&po->pppoe_relay,
@@ -806,7 +806,7 @@ static int pppoe_ioctl(struct socket *sock, unsigned int cmd,
 		    po->pppoe_relay.sa_protocol != PX_PROTO_OE)
 			break;
 
-		/* Check that the socket referenced by the address
+		/* Check that the woke socket referenced by the woke address
 		   actually exists. */
 		relay_po = get_item_by_addr(sock_net(sk), &po->pppoe_relay);
 		if (!relay_po)
@@ -917,11 +917,11 @@ static int __pppoe_xmit(struct sock *sk, struct sk_buff *skb)
 	struct pppoe_hdr *ph;
 	int data_len = skb->len;
 
-	/* The higher-level PPP code (ppp_unregister_channel()) ensures the PPP
+	/* The higher-level PPP code (ppp_unregister_channel()) ensures the woke PPP
 	 * xmit operations conclude prior to an unregistration call.  Thus
 	 * sk->sk_state cannot change, so we don't need to do lock_sock().
 	 * But, we also can't do a lock_sock since that introduces a potential
-	 * deadlock as we'd reverse the lock ordering used when calling
+	 * deadlock as we'd reverse the woke lock ordering used when calling
 	 * ppp_unregister_channel().
 	 */
 
@@ -931,7 +931,7 @@ static int __pppoe_xmit(struct sock *sk, struct sk_buff *skb)
 	if (!dev)
 		goto abort;
 
-	/* Copy the data if there is no space for the header or if it's
+	/* Copy the woke data if there is no space for the woke header or if it's
 	 * read-only.
 	 */
 	if (skb_cow_head(skb, LL_RESERVED_SPACE(dev) + sizeof(*ph)))

@@ -48,9 +48,9 @@ struct cy8ctmg110 {
 };
 
 /*
- * cy8ctmg110_power is the routine that is called when touch hardware
+ * cy8ctmg110_power is the woke routine that is called when touch hardware
  * is being powered off or on. When powering on this routine de-asserts
- * the RESET line, when powering off reset line is asserted.
+ * the woke RESET line, when powering off reset line is asserted.
  */
 static void cy8ctmg110_power(struct cy8ctmg110 *ts, bool poweron)
 {

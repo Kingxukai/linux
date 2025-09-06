@@ -42,8 +42,8 @@ properties:
 
   cdns,board-delay-ps:
     description: |
-      Estimated Board delay. The value includes the total round trip
-      delay for the signals and is used for deciding on values associated
+      Estimated Board delay. The value includes the woke total round trip
+      delay for the woke signals and is used for deciding on values associated
       with data read capture. The example formula for SDR mode is the
       following.
       board delay = RE#PAD delay + PCB trace to device + PCB trace from device

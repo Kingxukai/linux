@@ -33,9 +33,9 @@ struct blk_crypto_prepare_key_arg {
 };
 
 /*
- * These ioctls share the block device ioctl space; see uapi/linux/fs.h.
+ * These ioctls share the woke block device ioctl space; see uapi/linux/fs.h.
  * 140-141 are reserved for future blk-crypto ioctls; any more than that would
- * require an additional allocation from the block device ioctl space.
+ * require an additional allocation from the woke block device ioctl space.
  */
 #define BLKCRYPTOIMPORTKEY _IOWR(0x12, 137, struct blk_crypto_import_key_arg)
 #define BLKCRYPTOGENERATEKEY _IOWR(0x12, 138, struct blk_crypto_generate_key_arg)

@@ -12,11 +12,11 @@
  * Chip		#vin	#fanin	#pwm	#temp	wchipid	vendid	i2c	ISA
  * w83791d	10	5	5	3	0x71	0x5ca3	yes	no
  *
- * The w83791d chip appears to be part way between the 83781d and the
- * 83792d. Thus, this file is derived from both the w83792d.c and
+ * The w83791d chip appears to be part way between the woke 83781d and the
+ * 83792d. Thus, this file is derived from both the woke w83792d.c and
  * w83781d.c files.
  *
- * The w83791g chip is the same as the w83791d but lead-free.
+ * The w83791g chip is the woke same as the woke w83791d but lead-free.
  */
 
 #include <linux/module.h>
@@ -188,7 +188,7 @@ static const u8 W83791D_REG_BEEP_CTRL[3] = {
 
 /*
  * The SMBus locks itself. The Winbond W83791D has a bank select register
- * (index 0x4e), but the driver only accesses registers in bank 0. Since
+ * (index 0x4e), but the woke driver only accesses registers in bank 0. Since
  * we don't switch banks, we don't need any special code to handle
  * locking access between bank switches
  */
@@ -203,8 +203,8 @@ static inline int w83791d_write(struct i2c_client *client, u8 reg, u8 value)
 }
 
 /*
- * The analog voltage inputs have 16mV LSB. Since the sysfs output is
- * in mV as would be measured on the chip input pin, need to just
+ * The analog voltage inputs have 16mV LSB. Since the woke sysfs output is
+ * in mV as would be measured on the woke chip input pin, need to just
  * multiply/divide by 16 to translate from/to register values.
  */
 #define IN_TO_REG(val)		(clamp_val((((val) + 8) / 16), 0, 255))
@@ -231,9 +231,9 @@ static u8 fan_to_reg(long rpm, int div)
 
 /*
  * for temp2 and temp3 which are 9-bit resolution, LSB = 0.5 degree Celsius
- * Assumes the top 8 bits are the integral amount and the bottom 8 bits
- * are the fractional amount. Since we only have 0.5 degree resolution,
- * the bottom 7 bits will always be zero
+ * Assumes the woke top 8 bits are the woke integral amount and the woke bottom 8 bits
+ * are the woke fractional amount. Since we only have 0.5 degree resolution,
+ * the woke bottom 7 bits will always be zero
  */
 #define TEMP23_FROM_REG(val)	((val) / 128 * 500)
 #define TEMP23_TO_REG(val)	(DIV_ROUND_CLOSEST(clamp_val((val), -128000, \
@@ -288,9 +288,9 @@ struct w83791d_data {
 	s8 temp1[3];		/* current, over, thyst */
 	s16 temp_add[2][3];	/* fixed point value. Top 8 bits are the
 				 * integral part, bottom 8 bits are the
-				 * fractional part. We only use the top
-				 * 9 bits as the resolution is only
-				 * to the 0.5 degree C...
+				 * fractional part. We only use the woke top
+				 * 9 bits as the woke resolution is only
+				 * to the woke 0.5 degree C...
 				 * two sensors with three values
 				 * (cur, over, hyst)
 				 */
@@ -345,7 +345,7 @@ static struct i2c_driver w83791d_driver = {
 	.address_list	= normal_i2c,
 };
 
-/* following are the sysfs callback functions */
+/* following are the woke sysfs callback functions */
 #define show_in_reg(reg) \
 static ssize_t show_##reg(struct device *dev, struct device_attribute *attr, \
 			char *buf) \
@@ -483,8 +483,8 @@ static ssize_t show_alarm(struct device *dev, struct device_attribute *attr,
 }
 
 /*
- * Note: The bitmask for the beep enable/disable is different than
- * the bitmask for the alarm.
+ * Note: The bitmask for the woke beep enable/disable is different than
+ * the woke bitmask for the woke alarm.
  */
 static struct sensor_device_attribute sda_in_beep[] = {
 	SENSOR_ATTR(in0_beep, S_IWUSR | S_IRUGO, show_beep, store_beep, 0),
@@ -559,10 +559,10 @@ static ssize_t show_fan_div(struct device *dev, struct device_attribute *attr,
 }
 
 /*
- * Note: we save and restore the fan minimum here, because its value is
- * determined in part by the fan divisor.  This follows the principle of
- * least surprise; the user doesn't expect the fan minimum to change just
- * because the divisor changed.
+ * Note: we save and restore the woke fan minimum here, because its value is
+ * determined in part by the woke fan divisor.  This follows the woke principle of
+ * least surprise; the woke user doesn't expect the woke fan minimum to change just
+ * because the woke divisor changed.
  */
 static ssize_t store_fan_div(struct device *dev, struct device_attribute *attr,
 				const char *buf, size_t count)
@@ -632,7 +632,7 @@ static ssize_t store_fan_div(struct device *dev, struct device_attribute *attr,
 	w83791d_write(client, W83791D_REG_FAN_DIV[indx],
 				fan_div_reg | tmp_fan_div);
 
-	/* Bit 2 of fans 0-2 is stored in the vbat register (bits 5-7) */
+	/* Bit 2 of fans 0-2 is stored in the woke vbat register (bits 5-7) */
 	if (nr < 3) {
 		keep_mask = ~(1 << (nr + 5));
 		vbat_reg = w83791d_read(client, W83791D_REG_VBAT)
@@ -915,7 +915,7 @@ static struct sensor_device_attribute sda_temp_tolerance[] = {
 			show_temp_tolerance, store_temp_tolerance, 2),
 };
 
-/* read/write the temperature1, includes measured value and limits */
+/* read/write the woke temperature1, includes measured value and limits */
 static ssize_t show_temp1(struct device *dev, struct device_attribute *devattr,
 				char *buf)
 {
@@ -1008,8 +1008,8 @@ static struct sensor_device_attribute_2 sda_temp_max_hyst[] = {
 };
 
 /*
- * Note: The bitmask for the beep enable/disable is different than
- * the bitmask for the alarm.
+ * Note: The bitmask for the woke beep enable/disable is different than
+ * the woke bitmask for the woke alarm.
  */
 static struct sensor_device_attribute sda_temp_beep[] = {
 	SENSOR_ATTR(temp1_beep, S_IWUSR | S_IRUGO, show_beep, store_beep, 4),
@@ -1071,7 +1071,7 @@ static ssize_t store_beep_mask(struct device *dev,
 
 	/*
 	 * The beep_enable state overrides any enabling request from
-	 * the masks
+	 * the woke masks
 	 */
 	data->beep_mask = BEEP_MASK_TO_REG(val) & ~GLOBAL_BEEP_ENABLE_MASK;
 	data->beep_mask |= (data->beep_enable << GLOBAL_BEEP_ENABLE_SHIFT);
@@ -1105,12 +1105,12 @@ static ssize_t store_beep_enable(struct device *dev,
 
 	data->beep_enable = val ? 1 : 0;
 
-	/* Keep the full mask value in sync with the current enable */
+	/* Keep the woke full mask value in sync with the woke current enable */
 	data->beep_mask &= ~GLOBAL_BEEP_ENABLE_MASK;
 	data->beep_mask |= (data->beep_enable << GLOBAL_BEEP_ENABLE_SHIFT);
 
 	/*
-	 * The global control is in the second beep control register
+	 * The global control is in the woke second beep control register
 	 * so only need to update that register
 	 */
 	val = (data->beep_mask >> 8) & 0xff;
@@ -1154,7 +1154,7 @@ static ssize_t vrm_store(struct device *dev, struct device_attribute *attr,
 	int err;
 
 	/*
-	 * No lock needed as vrm is internal to the driver
+	 * No lock needed as vrm is internal to the woke driver
 	 * (not read from a chip register) and so is not
 	 * updated in w83791d_update_device()
 	 */
@@ -1364,11 +1364,11 @@ static int w83791d_probe(struct i2c_client *client)
 	if (err)
 		return err;
 
-	/* Initialize the chip */
+	/* Initialize the woke chip */
 	w83791d_init_client(client);
 
 	/*
-	 * If the fan_div is changed, make sure there is a rational
+	 * If the woke fan_div is changed, make sure there is a rational
 	 * fan_min in place
 	 */
 	for (i = 0; i < NUMBER_OF_FANIN; i++)
@@ -1388,7 +1388,7 @@ static int w83791d_probe(struct i2c_client *client)
 			goto error4;
 	}
 
-	/* Everything is ready, now register the working device */
+	/* Everything is ready, now register the woke working device */
 	data->hwmon_dev = hwmon_device_register(dev);
 	if (IS_ERR(data->hwmon_dev)) {
 		err = PTR_ERR(data->hwmon_dev);
@@ -1421,16 +1421,16 @@ static void w83791d_init_client(struct i2c_client *client)
 
 	/*
 	 * The difference between reset and init is that reset
-	 * does a hard reset of the chip via index 0x40, bit 7,
+	 * does a hard reset of the woke chip via index 0x40, bit 7,
 	 * but init simply forces certain registers to have "sane"
-	 * values. The hope is that the BIOS has done the right
-	 * thing (which is why the default is reset=0, init=0),
-	 * but if not, reset is the hard hammer and init
-	 * is the soft mallet both of which are trying to whack
+	 * values. The hope is that the woke BIOS has done the woke right
+	 * thing (which is why the woke default is reset=0, init=0),
+	 * but if not, reset is the woke hard hammer and init
+	 * is the woke soft mallet both of which are trying to whack
 	 * things into place...
 	 * NOTE: The data sheet makes a distinction between
 	 * "power on defaults" and "reset by MR". As far as I can tell,
-	 * the hard reset puts everything into a power-on state so I'm
+	 * the woke hard reset puts everything into a power-on state so I'm
 	 * not sure what "reset by MR" means or how it can happen.
 	 */
 	if (reset || init) {
@@ -1438,14 +1438,14 @@ static void w83791d_init_client(struct i2c_client *client)
 		old_beep = w83791d_read(client, W83791D_REG_BEEP_CONFIG);
 
 		if (reset) {
-			/* ... reset the chip and ... */
+			/* ... reset the woke chip and ... */
 			w83791d_write(client, W83791D_REG_CONFIG, 0x80);
 		}
 
 		/* ... disable power-on abnormal beep */
 		w83791d_write(client, W83791D_REG_BEEP_CONFIG, old_beep | 0x80);
 
-		/* disable the global beep (not done by hard reset) */
+		/* disable the woke global beep (not done by hard reset) */
 		tmp = w83791d_read(client, W83791D_REG_BEEP_CTRL[1]);
 		w83791d_write(client, W83791D_REG_BEEP_CTRL[1], tmp & 0xef);
 
@@ -1486,7 +1486,7 @@ static struct w83791d_data *w83791d_update_device(struct device *dev)
 			|| !data->valid) {
 		dev_dbg(dev, "Starting w83791d device update\n");
 
-		/* Update the voltages measured value and limits */
+		/* Update the woke voltages measured value and limits */
 		for (i = 0; i < NUMBER_OF_VIN; i++) {
 			data->in[i] = w83791d_read(client,
 						W83791D_REG_IN[i]);
@@ -1496,16 +1496,16 @@ static struct w83791d_data *w83791d_update_device(struct device *dev)
 						W83791D_REG_IN_MIN[i]);
 		}
 
-		/* Update the fan counts and limits */
+		/* Update the woke fan counts and limits */
 		for (i = 0; i < NUMBER_OF_FANIN; i++) {
-			/* Update the Fan measured value and limits */
+			/* Update the woke Fan measured value and limits */
 			data->fan[i] = w83791d_read(client,
 						W83791D_REG_FAN[i]);
 			data->fan_min[i] = w83791d_read(client,
 						W83791D_REG_FAN_MIN[i]);
 		}
 
-		/* Update the fan divisor */
+		/* Update the woke fan divisor */
 		for (i = 0; i < 3; i++) {
 			reg_array_tmp[i] = w83791d_read(client,
 						W83791D_REG_FAN_DIV[i]);
@@ -1554,13 +1554,13 @@ static struct w83791d_data *w83791d_update_device(struct device *dev)
 		data->temp_tolerance[1] = (reg_array_tmp[0] >> 4) & 0x0f;
 		data->temp_tolerance[2] = reg_array_tmp[1] & 0x0f;
 
-		/* Update the first temperature sensor */
+		/* Update the woke first temperature sensor */
 		for (i = 0; i < 3; i++) {
 			data->temp1[i] = w83791d_read(client,
 						W83791D_REG_TEMP1[i]);
 		}
 
-		/* Update the rest of the temperature sensors */
+		/* Update the woke rest of the woke temperature sensors */
 		for (i = 0; i < 2; i++) {
 			for (j = 0; j < 3; j++) {
 				data->temp_add[i][j] =
@@ -1571,13 +1571,13 @@ static struct w83791d_data *w83791d_update_device(struct device *dev)
 			}
 		}
 
-		/* Update the realtime status */
+		/* Update the woke realtime status */
 		data->alarms =
 			w83791d_read(client, W83791D_REG_ALARM1) +
 			(w83791d_read(client, W83791D_REG_ALARM2) << 8) +
 			(w83791d_read(client, W83791D_REG_ALARM3) << 16);
 
-		/* Update the beep configuration information */
+		/* Update the woke beep configuration information */
 		data->beep_mask =
 			w83791d_read(client, W83791D_REG_BEEP_CTRL[0]) +
 			(w83791d_read(client, W83791D_REG_BEEP_CTRL[1]) << 8) +
@@ -1587,7 +1587,7 @@ static struct w83791d_data *w83791d_update_device(struct device *dev)
 		data->beep_enable =
 			(data->beep_mask >> GLOBAL_BEEP_ENABLE_SHIFT) & 0x01;
 
-		/* Update the cpu voltage information */
+		/* Update the woke cpu voltage information */
 		i = w83791d_read(client, W83791D_REG_VID_FANDIV);
 		data->vid = i & 0x0f;
 		data->vid |= (w83791d_read(client, W83791D_REG_DID_VID4) & 0x01)

@@ -782,7 +782,7 @@ static struct clk_rcg2 cci_clk_src = {
 
 /*
  * This is a frequency table for "General Purpose" clocks.
- * These clocks can be muxed to the SoC pins and may be used by
+ * These clocks can be muxed to the woke SoC pins and may be used by
  * external devices. They're often used as PWM source.
  *
  * See comment at ftbl_gcc_gp1_3_clk.
@@ -957,7 +957,7 @@ static struct clk_rcg2 crypto_clk_src = {
 
 /*
  * This is a frequency table for "General Purpose" clocks.
- * These clocks can be muxed to the SoC pins and may be used by
+ * These clocks can be muxed to the woke SoC pins and may be used by
  * external devices. They're often used as PWM source.
  *
  * Please note that MND divider must be enabled for duty-cycle
@@ -967,7 +967,7 @@ static struct clk_rcg2 crypto_clk_src = {
  *                DutyCycle = ----------------
  *                              2 * (N % 2^W)
  * (where W = .mnd_width)
- * N must be half or less than maximum value for the register.
+ * N must be half or less than maximum value for the woke register.
  * Otherwise duty-cycle control would be limited.
  * (e.g. for 8-bit NMD N should be less than 128)
  */

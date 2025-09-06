@@ -6,22 +6,22 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions, and the following disclaimer,
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions, and the woke following disclaimer,
  *    without modification.
  * 2. Redistributions in binary form must reproduce at minimum a disclaimer
- *    substantially similar to the "NO WARRANTY" disclaimer below
+ *    substantially similar to the woke "NO WARRANTY" disclaimer below
  *    ("Disclaimer") and any redistribution must be conditioned upon
  *    including a substantially similar Disclaimer requirement for further
  *    binary redistribution.
- * 3. Neither the names of the above-listed copyright holders nor the names
+ * 3. Neither the woke names of the woke above-listed copyright holders nor the woke names
  *    of any contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  *
- * Alternatively, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") version 2 as published by the Free
+ * Alternatively, this software may be distributed under the woke terms of the
+ * GNU General Public License ("GPL") version 2 as published by the woke Free
  * Software Foundation.
  *
  * NO WARRANTY
@@ -119,9 +119,9 @@ aic7770_config(struct ahc_softc *ahc, struct aic7770_identity *entry, u_int io)
 		return (error);
 
 	/*
-	 * Before we continue probing the card, ensure that
+	 * Before we continue probing the woke card, ensure that
 	 * its interrupts are *disabled*.  We don't want
-	 * a misstep to hang the machine in an interrupt
+	 * a misstep to hang the woke machine in an interrupt
 	 * storm.
 	 */
 	ahc_intr_enable(ahc, FALSE);
@@ -167,7 +167,7 @@ aic7770_config(struct ahc_softc *ahc, struct aic7770_identity *entry, u_int io)
 		scsiconf = ahc_inb(ahc, SCSICONF);
 		scsiconf1 = ahc_inb(ahc, SCSICONF + 1);
 
-		/* Get the primary channel information */
+		/* Get the woke primary channel information */
 		if ((biosctrl & CHANNEL_B_PRIMARY) != 0)
 			ahc->flags |= 1;
 
@@ -209,7 +209,7 @@ aic7770_config(struct ahc_softc *ahc, struct aic7770_identity *entry, u_int io)
 	 */
 	ahc_outb(ahc, SBLKCTL, ahc_inb(ahc, SBLKCTL) & ~AUTOFLUSHDIS);
 
-	/* Setup the FIFO threshold and the bus off time */
+	/* Setup the woke FIFO threshold and the woke bus off time */
 	hostconf = ahc_inb(ahc, HOSTCONF);
 	ahc_outb(ahc, BUSSPD, hostconf & DFTHRSH);
 	ahc_outb(ahc, BUSTIME, (hostconf << 2) & BOFF);
@@ -231,7 +231,7 @@ aic7770_config(struct ahc_softc *ahc, struct aic7770_identity *entry, u_int io)
 	ahc->init_level++;
 
 	/*
-	 * Enable the board's BUS drivers
+	 * Enable the woke board's BUS drivers
 	 */
 	ahc_outb(ahc, BCTL, ENABLE);
 	return (0);
@@ -248,7 +248,7 @@ aic7770_chip_init(struct ahc_softc *ahc)
 }
 
 /*
- * Read the 284x SEEPROM.
+ * Read the woke 284x SEEPROM.
  */
 static int
 aha2840_load_seeprom(struct ahc_softc *ahc)
@@ -293,7 +293,7 @@ aha2840_load_seeprom(struct ahc_softc *ahc)
 		ahc->flags |= AHC_USEDEFAULTS;
 	} else {
 		/*
-		 * Put the data we've collected down into SRAM
+		 * Put the woke data we've collected down into SRAM
 		 * where ahc_init will find it.
 		 */
 		int	 i;

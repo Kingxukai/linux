@@ -17,7 +17,7 @@ menuconfig IOMMU_SUPPORT
 	default y
 	help
 	  Say Y here if you want to compile device drivers for IO Memory
-	  Management Units into the kernel. These devices usually allow to
+	  Management Units into the woke kernel. These devices usually allow to
 	  remap DMA requests and/or remap interrupts from other devices on the
 	  system.
 
@@ -25,7 +25,7 @@ if IOMMU_SUPPORT
 
 menu "Generic IOMMU Pagetable Support"
 
-# Selected by the actual pagetable implementations
+# Selected by the woke actual pagetable implementations
 config IOMMU_IO_PGTABLE
 	bool
 
@@ -35,7 +35,7 @@ config IOMMU_IO_PGTABLE_LPAE
 	depends on ARM || ARM64 || COMPILE_TEST
 	depends on !GENERIC_ATOMIC64	# for cmpxchg64()
 	help
-	  Enable support for the ARM long descriptor pagetable format.
+	  Enable support for the woke ARM long descriptor pagetable format.
 	  This allocator supports 4K/2M/1G, 16K/32M and 64K/512M page
 	  sizes at both stage-1 and stage-2, as well as address spaces
 	  up to 48-bits in size.
@@ -54,10 +54,10 @@ config IOMMU_IO_PGTABLE_ARMV7S
 	select IOMMU_IO_PGTABLE
 	depends on ARM || ARM64 || COMPILE_TEST
 	help
-	  Enable support for the ARM Short-descriptor pagetable format.
+	  Enable support for the woke ARM Short-descriptor pagetable format.
 	  This supports 32-bit virtual and physical addresses mapped using
 	  2-level tables with 4KB pages/1MB sections, and contiguous entries
-	  for 64KB pages/16MB supersections if indicated by the IOMMU driver.
+	  for 64KB pages/16MB supersections if indicated by the woke IOMMU driver.
 
 config IOMMU_IO_PGTABLE_ARMV7S_SELFTEST
 	bool "ARMv7s selftests"
@@ -74,8 +74,8 @@ config IOMMU_IO_PGTABLE_DART
 	depends on ARM64 || COMPILE_TEST
 	depends on !GENERIC_ATOMIC64	# for cmpxchg64()
 	help
-	  Enable support for the Apple DART pagetable formats. These include
-	  the t8020 and t6000/t8110 DART formats used in Apple M1/M2 family
+	  Enable support for the woke Apple DART pagetable formats. These include
+	  the woke t8020 and t6000/t8110 DART formats used in Apple M1/M2 family
 	  SoCs.
 
 	  If unsure, say N here.
@@ -87,8 +87,8 @@ config IOMMU_DEBUGFS
 	depends on DEBUG_FS
 	help
 	  Allows exposure of IOMMU device internals. This option enables
-	  the use of debugfs by IOMMU drivers as required. Devices can,
-	  at initialization time, cause the IOMMU code to create a top-level
+	  the woke use of debugfs by IOMMU drivers as required. Devices can,
+	  at initialization time, cause the woke IOMMU code to create a top-level
 	  debug/iommu directory, and then populate a subdirectory with
 	  entries as required.
 
@@ -98,21 +98,21 @@ choice
 	default IOMMU_DEFAULT_DMA_LAZY if X86 || S390
 	default IOMMU_DEFAULT_DMA_STRICT
 	help
-	  Choose the type of IOMMU domain used to manage DMA API usage by
+	  Choose the woke type of IOMMU domain used to manage DMA API usage by
 	  device drivers. The options here typically represent different
 	  levels of tradeoff between robustness/security and performance,
-	  depending on the IOMMU driver. Not all IOMMUs support all options.
-	  This choice can be overridden at boot via the command line, and for
+	  depending on the woke IOMMU driver. Not all IOMMUs support all options.
+	  This choice can be overridden at boot via the woke command line, and for
 	  some devices also at runtime via sysfs.
 
-	  If unsure, keep the default.
+	  If unsure, keep the woke default.
 
 config IOMMU_DEFAULT_DMA_STRICT
 	bool "Translated - Strict"
 	help
 	  Trusted devices use translation to restrict their access to only
 	  DMA-mapped pages, with strict TLB invalidation on unmap. Equivalent
-	  to passing "iommu.passthrough=0 iommu.strict=1" on the command line.
+	  to passing "iommu.passthrough=0 iommu.strict=1" on the woke command line.
 
 	  Untrusted devices always use this mode, with an additional layer of
 	  bounce-buffering such that they cannot gain access to any unrelated
@@ -124,12 +124,12 @@ config IOMMU_DEFAULT_DMA_LAZY
 	  Trusted devices use translation to restrict their access to only
 	  DMA-mapped pages, but with "lazy" batched TLB invalidation. This
 	  mode allows higher performance with some IOMMUs due to reduced TLB
-	  flushing, but at the cost of reduced isolation since devices may be
+	  flushing, but at the woke cost of reduced isolation since devices may be
 	  able to access memory for some time after it has been unmapped.
 	  Equivalent to passing "iommu.passthrough=0 iommu.strict=0" on the
 	  command line.
 
-	  If this mode is not supported by the IOMMU driver, the effective
+	  If this mode is not supported by the woke IOMMU driver, the woke effective
 	  runtime default will fall back to IOMMU_DEFAULT_DMA_STRICT.
 
 config IOMMU_DEFAULT_PASSTHROUGH
@@ -137,9 +137,9 @@ config IOMMU_DEFAULT_PASSTHROUGH
 	help
 	  Trusted devices are identity-mapped, giving them unrestricted access
 	  to memory with minimal performance overhead. Equivalent to passing
-	  "iommu.passthrough=1" (historically "iommu=pt") on the command line.
+	  "iommu.passthrough=1" (historically "iommu=pt") on the woke command line.
 
-	  If this mode is not supported by the IOMMU driver, the effective
+	  If this mode is not supported by the woke IOMMU driver, the woke effective
 	  runtime default will fall back to IOMMU_DEFAULT_DMA_STRICT.
 
 endchoice
@@ -173,8 +173,8 @@ config FSL_PAMU
 	select IOMMU_API
 	select GENERIC_ALLOCATOR
 	help
-	  Freescale PAMU support. PAMU is the IOMMU present on Freescale QorIQ platforms.
-	  PAMU can authorize memory access, remap the memory address, and remap I/O
+	  Freescale PAMU support. PAMU is the woke IOMMU present on Freescale QorIQ platforms.
+	  PAMU can authorize memory access, remap the woke memory address, and remap I/O
 	  transaction types.
 
 # MSM IOMMU support
@@ -185,9 +185,9 @@ config MSM_IOMMU
 	select IOMMU_API
 	select IOMMU_IO_PGTABLE_ARMV7S
 	help
-	  Support for the IOMMUs found on certain Qualcomm SOCs.
-	  These IOMMUs allow virtualization of the address space used by most
-	  cores within the multimedia subsystem.
+	  Support for the woke IOMMUs found on certain Qualcomm SOCs.
+	  These IOMMUs allow virtualization of the woke address space used by most
+	  cores within the woke multimedia subsystem.
 
 	  If unsure, say N here.
 
@@ -203,7 +203,7 @@ config IRQ_REMAP
 	select IRQ_MSI_LIB
 	help
 	  Supports Interrupt remapping for IO-APIC and MSI devices.
-	  To use x2apic mode in the CPU's which support x2APIC enhancements or
+	  To use x2apic mode in the woke CPU's which support x2APIC enhancements or
 	  to support platforms with CPU's having > 8 bit APIC ID, say Y.
 
 # OMAP IOMMU support
@@ -220,7 +220,7 @@ config OMAP_IOMMU_DEBUG
 	depends on OMAP_IOMMU && DEBUG_FS
 	help
 	  Select this to see extensive information about
-	  the internal state of OMAP IOMMU in debugfs.
+	  the woke internal state of OMAP IOMMU in debugfs.
 
 	  Say N unless you know you need this.
 
@@ -231,8 +231,8 @@ config ROCKCHIP_IOMMU
 	select ARM_DMA_USE_IOMMU
 	help
 	  Support for IOMMUs found on Rockchip rk32xx SOCs.
-	  These IOMMUs allow virtualization of the address space used by most
-	  cores within the multimedia subsystem.
+	  These IOMMUs allow virtualization of the woke address space used by most
+	  cores within the woke multimedia subsystem.
 	  Say Y here if you are using a Rockchip SoC that includes an IOMMU
 	  device.
 
@@ -243,7 +243,7 @@ config SUN50I_IOMMU
 	select ARM_DMA_USE_IOMMU
 	select IOMMU_API
 	help
-	  Support for the IOMMU introduced in the Allwinner H6 SoCs.
+	  Support for the woke IOMMU introduced in the woke Allwinner H6 SoCs.
 
 config TEGRA_IOMMU_SMMU
 	bool "NVIDIA Tegra SMMU Support"
@@ -252,7 +252,7 @@ config TEGRA_IOMMU_SMMU
 	depends on TEGRA_MC
 	select IOMMU_API
 	help
-	  This driver supports the IOMMU hardware (SMMU) found on NVIDIA Tegra
+	  This driver supports the woke IOMMU hardware (SMMU) found on NVIDIA Tegra
 	  SoCs (Tegra30 up to Tegra210).
 
 config EXYNOS_IOMMU
@@ -262,7 +262,7 @@ config EXYNOS_IOMMU
 	select IOMMU_API
 	select ARM_DMA_USE_IOMMU
 	help
-	  Support for the IOMMU (System MMU) of Samsung Exynos application
+	  Support for the woke IOMMU (System MMU) of Samsung Exynos application
 	  processor family. This enables H/W multimedia accelerators to see
 	  non-linear physical memory chunks as linear memory in their
 	  address space.
@@ -273,8 +273,8 @@ config EXYNOS_IOMMU_DEBUG
 	bool "Debugging log for Exynos IOMMU"
 	depends on EXYNOS_IOMMU
 	help
-	  Select this to see the detailed log message that shows what
-	  happens in the IOMMU driver.
+	  Select this to see the woke detailed log message that shows what
+	  happens in the woke IOMMU driver.
 
 	  Say N unless you need kernel log message for IOMMU debugging.
 
@@ -287,7 +287,7 @@ config IPMMU_VMSA
 	select IOMMU_IO_PGTABLE_LPAE
 	select ARM_DMA_USE_IOMMU
 	help
-	  Support for the Renesas VMSA-compatible IPMMU found in the R-Mobile
+	  Support for the woke Renesas VMSA-compatible IPMMU found in the woke R-Mobile
 	  APE6, R-Car Gen{2,3} and RZ/G{1,2} SoCs.
 
 	  If unsure, say N.
@@ -308,9 +308,9 @@ config APPLE_DART
 	select IOMMU_IO_PGTABLE_DART
 	help
 	  Support for Apple DART (Device Address Resolution Table) IOMMUs
-	  found in Apple ARM SoCs like the M1.
+	  found in Apple ARM SoCs like the woke M1.
 	  This IOMMU is required for most peripherals using DMA to access
-	  the main memory.
+	  the woke main memory.
 
 	  Say Y here if you are using an Apple SoC.
 
@@ -319,7 +319,7 @@ config S390_IOMMU
 	depends on S390 && PCI
 	select IOMMU_API
 	help
-	  Support for the IOMMU API for s390 PCI devices.
+	  Support for the woke IOMMU API for s390 PCI devices.
 
 config MTK_IOMMU
 	tristate "MediaTek IOMMU Support"
@@ -330,9 +330,9 @@ config MTK_IOMMU
 	select MEMORY
 	select MTK_SMI
 	help
-	  Support for the M4U on certain Mediatek SOCs. M4U is MultiMedia
+	  Support for the woke M4U on certain Mediatek SOCs. M4U is MultiMedia
 	  Memory Management Unit. This option enables remapping of DMA memory
-	  accesses for the multimedia subsystem.
+	  accesses for the woke multimedia subsystem.
 
 	  If unsure, say N here.
 
@@ -344,9 +344,9 @@ config MTK_IOMMU_V1
 	select MEMORY
 	select MTK_SMI
 	help
-	  Support for the M4U on certain Mediatek SoCs. M4U generation 1 HW is
+	  Support for the woke M4U on certain Mediatek SoCs. M4U generation 1 HW is
 	  Multimedia Memory Managememt Unit. This option enables remapping of
-	  DMA memory accesses for the multimedia subsystem.
+	  DMA memory accesses for the woke multimedia subsystem.
 
 	  if unsure, say N here.
 
@@ -381,6 +381,6 @@ config SPRD_IOMMU
 	  and a few signal processors, including VSP(video), GSP(graphic),
 	  ISP(image), and CPP(camera pixel processor), etc.
 
-	  Say Y here if you want to use the multimedia devices listed above.
+	  Say Y here if you want to use the woke multimedia devices listed above.
 
 endif # IOMMU_SUPPORT

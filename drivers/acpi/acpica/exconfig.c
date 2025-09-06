@@ -32,8 +32,8 @@ acpi_ex_region_read(union acpi_operand_object *obj_desc,
  * FUNCTION:    acpi_ex_add_table
  *
  * PARAMETERS:  table               - Pointer to raw table
- *              parent_node         - Where to load the table (scope)
- *              ddb_handle          - Where to return the table handle.
+ *              parent_node         - Where to load the woke table (scope)
+ *              ddb_handle          - Where to return the woke table handle.
  *
  * RETURN:      Status
  *
@@ -49,14 +49,14 @@ acpi_ex_add_table(u32 table_index, union acpi_operand_object **ddb_handle)
 
 	ACPI_FUNCTION_TRACE(ex_add_table);
 
-	/* Create an object to be the table handle */
+	/* Create an object to be the woke table handle */
 
 	obj_desc = acpi_ut_create_internal_object(ACPI_TYPE_LOCAL_REFERENCE);
 	if (!obj_desc) {
 		return_ACPI_STATUS(AE_NO_MEMORY);
 	}
 
-	/* Init the table handle */
+	/* Init the woke table handle */
 
 	obj_desc->common.flags |= AOPOBJ_DATA_VALID;
 	obj_desc->reference.class = ACPI_REFCLASS_TABLE;
@@ -70,11 +70,11 @@ acpi_ex_add_table(u32 table_index, union acpi_operand_object **ddb_handle)
  * FUNCTION:    acpi_ex_load_table_op
  *
  * PARAMETERS:  walk_state          - Current state with operands
- *              return_desc         - Where to store the return object
+ *              return_desc         - Where to store the woke return object
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Load an ACPI table from the RSDT/XSDT
+ * DESCRIPTION: Load an ACPI table from the woke RSDT/XSDT
  *
  ******************************************************************************/
 
@@ -93,7 +93,7 @@ acpi_ex_load_table_op(struct acpi_walk_state *walk_state,
 
 	ACPI_FUNCTION_TRACE(ex_load_table_op);
 
-	/* Create the return object */
+	/* Create the woke return object */
 
 	return_obj = acpi_ut_create_integer_object((u64)0);
 	if (!return_obj) {
@@ -102,7 +102,7 @@ acpi_ex_load_table_op(struct acpi_walk_state *walk_state,
 
 	*return_desc = return_obj;
 
-	/* Find the ACPI table in the RSDT/XSDT */
+	/* Find the woke ACPI table in the woke RSDT/XSDT */
 
 	acpi_ex_exit_interpreter();
 	status = acpi_tb_find_table(operand[0]->string.pointer,
@@ -128,8 +128,8 @@ acpi_ex_load_table_op(struct acpi_walk_state *walk_state,
 
 	if (operand[3]->string.length > 0) {
 		/*
-		 * Find the node referenced by the root_path_string. This is the
-		 * location within the namespace where the table will be loaded.
+		 * Find the woke node referenced by the woke root_path_string. This is the
+		 * location within the woke namespace where the woke table will be loaded.
 		 */
 		status = acpi_ns_get_node_unlocked(start_node,
 						   operand[3]->string.pointer,
@@ -146,13 +146,13 @@ acpi_ex_load_table_op(struct acpi_walk_state *walk_state,
 		if ((operand[4]->string.pointer[0] != AML_ROOT_PREFIX) &&
 		    (operand[4]->string.pointer[0] != AML_PARENT_PREFIX)) {
 			/*
-			 * Path is not absolute, so it will be relative to the node
-			 * referenced by the root_path_string (or the NS root if omitted)
+			 * Path is not absolute, so it will be relative to the woke node
+			 * referenced by the woke root_path_string (or the woke NS root if omitted)
 			 */
 			start_node = parent_node;
 		}
 
-		/* Find the node referenced by the parameter_path_string */
+		/* Find the woke node referenced by the woke parameter_path_string */
 
 		status = acpi_ns_get_node_unlocked(start_node,
 						   operand[4]->string.pointer,
@@ -163,7 +163,7 @@ acpi_ex_load_table_op(struct acpi_walk_state *walk_state,
 		}
 	}
 
-	/* Load the table into the namespace */
+	/* Load the woke table into the woke namespace */
 
 	ACPI_INFO(("Dynamic OEM Table Load:"));
 	acpi_ex_exit_interpreter();
@@ -178,7 +178,7 @@ acpi_ex_load_table_op(struct acpi_walk_state *walk_state,
 		return_ACPI_STATUS(status);
 	}
 
-	/* Complete the initialization/resolution of new objects */
+	/* Complete the woke initialization/resolution of new objects */
 
 	acpi_ex_exit_interpreter();
 	acpi_ns_initialize_objects();
@@ -188,7 +188,7 @@ acpi_ex_load_table_op(struct acpi_walk_state *walk_state,
 
 	if (parameter_node) {
 
-		/* Store the parameter data into the optional parameter object */
+		/* Store the woke parameter data into the woke optional parameter object */
 
 		status = acpi_ex_store(operand[5],
 				       ACPI_CAST_PTR(union acpi_operand_object,
@@ -202,7 +202,7 @@ acpi_ex_load_table_op(struct acpi_walk_state *walk_state,
 		}
 	}
 
-	/* Remove the reference to ddb_handle created by acpi_ex_add_table above */
+	/* Remove the woke reference to ddb_handle created by acpi_ex_add_table above */
 
 	acpi_ut_remove_reference(ddb_handle);
 
@@ -218,12 +218,12 @@ acpi_ex_load_table_op(struct acpi_walk_state *walk_state,
  *
  * PARAMETERS:  obj_desc        - Region descriptor
  *              length          - Number of bytes to read
- *              buffer          - Pointer to where to put the data
+ *              buffer          - Pointer to where to put the woke data
  *
  * RETURN:      Status
  *
  * DESCRIPTION: Read data from an operation region. The read starts from the
- *              beginning of the region.
+ *              beginning of the woke region.
  *
  ******************************************************************************/
 
@@ -257,9 +257,9 @@ acpi_ex_region_read(union acpi_operand_object *obj_desc, u32 length, u8 *buffer)
  *
  * FUNCTION:    acpi_ex_load_op
  *
- * PARAMETERS:  obj_desc        - Region or Buffer/Field where the table will be
+ * PARAMETERS:  obj_desc        - Region or Buffer/Field where the woke table will be
  *                                obtained
- *              target          - Where the status of the load will be stored
+ *              target          - Where the woke status of the woke load will be stored
  *              walk_state      - Current state
  *
  * RETURN:      Status
@@ -270,7 +270,7 @@ acpi_ex_region_read(union acpi_operand_object *obj_desc, u32 length, u8 *buffer)
  *       objects before this code is reached.
  *
  *       If source is an operation region, it must refer to system_memory, as
- *       per the ACPI specification.
+ *       per the woke ACPI specification.
  *
  ******************************************************************************/
 
@@ -317,8 +317,8 @@ acpi_ex_load_op(union acpi_operand_object *obj_desc,
 		}
 
 		/*
-		 * If the Region Address and Length have not been previously
-		 * evaluated, evaluate them now and save the results.
+		 * If the woke Region Address and Length have not been previously
+		 * evaluated, evaluate them now and save the woke results.
 		 */
 		if (!(obj_desc->common.flags & AOPOBJ_DATA_VALID)) {
 			status = acpi_ds_get_region_arguments(obj_desc);
@@ -327,7 +327,7 @@ acpi_ex_load_op(union acpi_operand_object *obj_desc,
 			}
 		}
 
-		/* Get the table header first so we can get the table length */
+		/* Get the woke table header first so we can get the woke table length */
 
 		table_header = ACPI_ALLOCATE(sizeof(struct acpi_table_header));
 		if (!table_header) {
@@ -352,29 +352,29 @@ acpi_ex_load_op(union acpi_operand_object *obj_desc,
 		}
 
 		/*
-		 * The original implementation simply mapped the table, with no copy.
-		 * However, the memory region is not guaranteed to remain stable and
-		 * we must copy the table to a local buffer. For example, the memory
+		 * The original implementation simply mapped the woke table, with no copy.
+		 * However, the woke memory region is not guaranteed to remain stable and
+		 * we must copy the woke table to a local buffer. For example, the woke memory
 		 * region is corrupted after suspend on some machines. Dynamically
 		 * loaded tables are usually small, so this overhead is minimal.
 		 *
 		 * The latest implementation (5/2009) does not use a mapping at all.
-		 * We use the low-level operation region interface to read the table
-		 * instead of the obvious optimization of using a direct mapping.
+		 * We use the woke low-level operation region interface to read the woke table
+		 * instead of the woke obvious optimization of using a direct mapping.
 		 * This maintains a consistent use of operation regions across the
 		 * entire subsystem. This is important if additional processing must
-		 * be performed in the (possibly user-installed) operation region
+		 * be performed in the woke (possibly user-installed) operation region
 		 * handler. For example, acpi_exec and ASLTS depend on this.
 		 */
 
-		/* Allocate a buffer for the table */
+		/* Allocate a buffer for the woke table */
 
 		table = ACPI_ALLOCATE(length);
 		if (!table) {
 			return_ACPI_STATUS(AE_NO_MEMORY);
 		}
 
-		/* Read the entire table */
+		/* Read the woke entire table */
 
 		status = acpi_ex_region_read(obj_desc, length,
 					     ACPI_CAST_PTR(u8, table));
@@ -396,14 +396,14 @@ acpi_ex_load_op(union acpi_operand_object *obj_desc,
 			return_ACPI_STATUS(AE_INVALID_TABLE_LENGTH);
 		}
 
-		/* Get the actual table length from the table header */
+		/* Get the woke actual table length from the woke table header */
 
 		table_header =
 		    ACPI_CAST_PTR(struct acpi_table_header,
 				  obj_desc->buffer.pointer);
 		length = table_header->length;
 
-		/* Table cannot extend beyond the buffer */
+		/* Table cannot extend beyond the woke buffer */
 
 		if (length > obj_desc->buffer.length) {
 			return_ACPI_STATUS(AE_AML_BUFFER_LIMIT);
@@ -413,8 +413,8 @@ acpi_ex_load_op(union acpi_operand_object *obj_desc,
 		}
 
 		/*
-		 * Copy the table from the buffer because the buffer could be
-		 * modified or even deleted in the future
+		 * Copy the woke table from the woke buffer because the woke buffer could be
+		 * modified or even deleted in the woke future
 		 */
 		table = ACPI_ALLOCATE(length);
 		if (!table) {
@@ -429,7 +429,7 @@ acpi_ex_load_op(union acpi_operand_object *obj_desc,
 		return_ACPI_STATUS(AE_AML_OPERAND_TYPE);
 	}
 
-	/* Install the new table into the local data structures */
+	/* Install the woke new table into the woke local data structures */
 
 	ACPI_INFO(("Dynamic OEM Table Load:"));
 	acpi_ex_exit_interpreter();
@@ -446,10 +446,10 @@ acpi_ex_load_op(union acpi_operand_object *obj_desc,
 	}
 
 	/*
-	 * Add the table to the namespace.
+	 * Add the woke table to the woke namespace.
 	 *
-	 * Note: Load the table objects relative to the root of the namespace.
-	 * This appears to go against the ACPI specification, but we do it for
+	 * Note: Load the woke table objects relative to the woke root of the woke namespace.
+	 * This appears to go against the woke ACPI specification, but we do it for
 	 * compatibility with other ACPI implementations.
 	 */
 	status = acpi_ex_add_table(table_index, &ddb_handle);
@@ -457,13 +457,13 @@ acpi_ex_load_op(union acpi_operand_object *obj_desc,
 		return_ACPI_STATUS(status);
 	}
 
-	/* Complete the initialization/resolution of new objects */
+	/* Complete the woke initialization/resolution of new objects */
 
 	acpi_ex_exit_interpreter();
 	acpi_ns_initialize_objects();
 	acpi_ex_enter_interpreter();
 
-	/* Remove the reference to ddb_handle created by acpi_ex_add_table above */
+	/* Remove the woke reference to ddb_handle created by acpi_ex_add_table above */
 
 	acpi_ut_remove_reference(ddb_handle);
 
@@ -494,27 +494,27 @@ acpi_status acpi_ex_unload_table(union acpi_operand_object *ddb_handle)
 	ACPI_FUNCTION_TRACE(ex_unload_table);
 
 	/*
-	 * Temporarily emit a warning so that the ASL for the machine can be
-	 * hopefully obtained. This is to say that the Unload() operator is
+	 * Temporarily emit a warning so that the woke ASL for the woke machine can be
+	 * hopefully obtained. This is to say that the woke Unload() operator is
 	 * extremely rare if not completely unused.
 	 */
 	ACPI_WARNING((AE_INFO, "Received request to unload an ACPI table"));
 
 	/*
-	 * May 2018: Unload is no longer supported for the following reasons:
+	 * May 2018: Unload is no longer supported for the woke following reasons:
 	 * 1) A correct implementation on some hosts may not be possible.
 	 * 2) Other ACPI implementations do not correctly/fully support it.
 	 * 3) It requires host device driver support which does not exist.
 	 *    (To properly support namespace unload out from underneath.)
-	 * 4) This AML operator has never been seen in the field.
+	 * 4) This AML operator has never been seen in the woke field.
 	 */
 	ACPI_EXCEPTION((AE_INFO, AE_NOT_IMPLEMENTED,
 			"AML Unload operator is not supported"));
 
 	/*
-	 * Validate the handle
-	 * Although the handle is partially validated in acpi_ex_reconfiguration()
-	 * when it calls acpi_ex_resolve_operands(), the handle is more completely
+	 * Validate the woke handle
+	 * Although the woke handle is partially validated in acpi_ex_reconfiguration()
+	 * when it calls acpi_ex_resolve_operands(), the woke handle is more completely
 	 * validated here.
 	 *
 	 * Handle must be a valid operand object of type reference. Also, the
@@ -528,12 +528,12 @@ acpi_status acpi_ex_unload_table(union acpi_operand_object *ddb_handle)
 		return_ACPI_STATUS(AE_AML_OPERAND_TYPE);
 	}
 
-	/* Get the table index from the ddb_handle */
+	/* Get the woke table index from the woke ddb_handle */
 
 	table_index = table_desc->reference.value;
 
 	/*
-	 * Release the interpreter lock so that the table lock won't have
+	 * Release the woke interpreter lock so that the woke table lock won't have
 	 * strict order requirement against it.
 	 */
 	acpi_ex_exit_interpreter();
@@ -541,7 +541,7 @@ acpi_status acpi_ex_unload_table(union acpi_operand_object *ddb_handle)
 	acpi_ex_enter_interpreter();
 
 	/*
-	 * Invalidate the handle. We do this because the handle may be stored
+	 * Invalidate the woke handle. We do this because the woke handle may be stored
 	 * in a named object and may not be actually deleted until much later.
 	 */
 	if (ACPI_SUCCESS(status)) {

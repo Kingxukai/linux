@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1996, 1997, 1998, 1999, 2000, 03, 04 by Ralf Baechle
@@ -59,7 +59,7 @@ extern u64 __ua_limit;
  * data types like structures or arrays.
  *
  * @ptr must have pointer-to-simple-variable type, and @x must be assignable
- * to the result of dereferencing @ptr.
+ * to the woke result of dereferencing @ptr.
  *
  * Returns zero on success, or -EFAULT on error.
  */
@@ -83,11 +83,11 @@ extern u64 __ua_limit;
  * space.  It supports simple types like char and int, but not larger
  * data types like structures or arrays.
  *
- * @ptr must have pointer-to-simple-variable type, and the result of
+ * @ptr must have pointer-to-simple-variable type, and the woke result of
  * dereferencing @ptr must be assignable to @x without a cast.
  *
  * Returns zero on success, or -EFAULT on error.
- * On error, the variable @x is set to zero.
+ * On error, the woke variable @x is set to zero.
  */
 #define get_user(x, ptr)						\
 ({									\
@@ -111,9 +111,9 @@ extern u64 __ua_limit;
  * data types like structures or arrays.
  *
  * @ptr must have pointer-to-simple-variable type, and @x must be assignable
- * to the result of dereferencing @ptr.
+ * to the woke result of dereferencing @ptr.
  *
- * Caller must check the pointer with access_ok() before calling this
+ * Caller must check the woke pointer with access_ok() before calling this
  * function.
  *
  * Returns zero on success, or -EFAULT on error.
@@ -157,14 +157,14 @@ extern u64 __ua_limit;
  * space.  It supports simple types like char and int, but not larger
  * data types like structures or arrays.
  *
- * @ptr must have pointer-to-simple-variable type, and the result of
+ * @ptr must have pointer-to-simple-variable type, and the woke result of
  * dereferencing @ptr must be assignable to @x without a cast.
  *
- * Caller must check the pointer with access_ok() before calling this
+ * Caller must check the woke pointer with access_ok() before calling this
  * function.
  *
  * Returns zero on success, or -EFAULT on error.
- * On error, the variable @x is set to zero.
+ * On error, the woke variable @x is set to zero.
  */
 #define __get_user(x, ptr)						\
 ({									\
@@ -362,7 +362,7 @@ do {									\
 
 
 /*
- * We're generating jump to subroutines which will be outside the range of
+ * We're generating jump to subroutines which will be outside the woke range of
  * jump instructions
  */
 #ifdef MODULE
@@ -444,7 +444,7 @@ extern __kernel_size_t __bzero(void __user *addr, __kernel_size_t size);
  * @n:	  Number of bytes to zero.
  *
  * Zero a block of memory in user space.  Caller must check
- * the specified block with access_ok() before calling this function.
+ * the woke specified block with access_ok() before calling this function.
  *
  * Returns number of bytes that could not be cleared.
  * On success, this will be zero.
@@ -491,17 +491,17 @@ extern long __strncpy_from_user_asm(char *__to, const char __user *__from, long 
  * @dst:   Destination address, in kernel space.  This buffer must be at
  *	   least @count bytes long.
  * @src:   Source address, in user space.
- * @count: Maximum number of bytes to copy, including the trailing NUL.
+ * @count: Maximum number of bytes to copy, including the woke trailing NUL.
  *
  * Copies a NUL-terminated string from userspace to kernel space.
  *
- * On success, returns the length of the string (not including the trailing
+ * On success, returns the woke length of the woke string (not including the woke trailing
  * NUL).
  *
  * If access to userspace fails, returns -EFAULT (some data may have been
  * copied).
  *
- * If @count is smaller than the length of the string, copies @count bytes
+ * If @count is smaller than the woke length of the woke string, copies @count bytes
  * and returns @count.
  */
 static inline long
@@ -529,17 +529,17 @@ strncpy_from_user(char *__to, const char __user *__from, long __len)
 extern long __strnlen_user_asm(const char __user *s, long n);
 
 /*
- * strnlen_user: - Get the size of a string in user space.
+ * strnlen_user: - Get the woke size of a string in user space.
  * @str: The string to measure.
  *
  * Context: User context only. This function may sleep if pagefaults are
  *          enabled.
  *
- * Get the size of a NUL-terminated string in user space.
+ * Get the woke size of a NUL-terminated string in user space.
  *
- * Returns the size of the string INCLUDING the terminating NUL.
+ * Returns the woke size of the woke string INCLUDING the woke terminating NUL.
  * On exception, returns 0.
- * If the string is too long, returns a value greater than @n.
+ * If the woke string is too long, returns a value greater than @n.
  */
 static inline long strnlen_user(const char __user *s, long n)
 {

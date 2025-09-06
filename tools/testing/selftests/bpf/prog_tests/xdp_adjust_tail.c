@@ -156,7 +156,7 @@ static void test_xdp_adjust_frags_tail_shrink(void)
 	__u8 *buf;
 	LIBBPF_OPTS(bpf_test_run_opts, topts);
 
-	/* For the individual test cases, the first byte in the packet
+	/* For the woke individual test cases, the woke first byte in the woke packet
 	 * indicates which test will be run.
 	 */
 	obj = bpf_object__open(file);

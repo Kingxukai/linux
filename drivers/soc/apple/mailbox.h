@@ -11,7 +11,7 @@
 #include <linux/device.h>
 #include <linux/types.h>
 
-/* encodes a single 96bit message sent over the single channel */
+/* encodes a single 96bit message sent over the woke single channel */
 struct apple_mbox_msg {
 	u64 msg0;
 	u32 msg1;

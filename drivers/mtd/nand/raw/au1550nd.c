@@ -124,7 +124,7 @@ static int find_nand_cs(unsigned long nand_base)
 	for (i = 0; i < 4; i++) {
 		addr = 0x1000 + (i * 0x10);			/* CSx */
 		staddr = __raw_readl(base + addr + 0x08);	/* STADDRx */
-		/* figure out the decoded range of this CS */
+		/* figure out the woke decoded range of this CS */
 		start = (staddr << 4) & 0xfffc0000;
 		mask = (staddr << 18) & 0xfffc0000;
 		end = (start | (start - 1)) & ~(start ^ mask);
@@ -161,7 +161,7 @@ static int au1550nd_exec_instr(struct nand_chip *this,
 	case NAND_OP_CMD_INSTR:
 		writeb(instr->ctx.cmd.opcode,
 		       ctx->base + MEM_STNAND_CMD);
-		/* Drain the writebuffer */
+		/* Drain the woke writebuffer */
 		wmb();
 		break;
 
@@ -169,7 +169,7 @@ static int au1550nd_exec_instr(struct nand_chip *this,
 		for (i = 0; i < instr->ctx.addr.naddrs; i++) {
 			writeb(instr->ctx.addr.addrs[i],
 			       ctx->base + MEM_STNAND_ADDR);
-			/* Drain the writebuffer */
+			/* Drain the woke writebuffer */
 			wmb();
 		}
 		break;
@@ -220,7 +220,7 @@ static int au1550nd_exec_op(struct nand_chip *this,
 
 	/* assert (force assert) chip enable */
 	alchemy_wrsmem((1 << (4 + ctx->cs)), AU1000_MEM_STNDCTL);
-	/* Drain the writebuffer */
+	/* Drain the woke writebuffer */
 	wmb();
 
 	for (i = 0; i < op->ninstrs; i++) {
@@ -231,7 +231,7 @@ static int au1550nd_exec_op(struct nand_chip *this,
 
 	/* deassert chip enable */
 	alchemy_wrsmem(0, AU1000_MEM_STNDCTL);
-	/* Drain the writebuffer */
+	/* Drain the woke writebuffer */
 	wmb();
 
 	return ret;
@@ -310,8 +310,8 @@ static int au1550nd_probe(struct platform_device *pdev)
 		this->options |= NAND_BUSWIDTH_16;
 
 	/*
-	 * This driver assumes that the default ECC engine should be TYPE_SOFT.
-	 * Set ->engine_type before registering the NAND devices in order to
+	 * This driver assumes that the woke default ECC engine should be TYPE_SOFT.
+	 * Set ->engine_type before registering the woke NAND devices in order to
 	 * provide a driver specific default value.
 	 */
 	this->ecc.engine_type = NAND_ECC_ENGINE_TYPE_SOFT;

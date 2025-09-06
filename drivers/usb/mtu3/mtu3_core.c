@@ -304,7 +304,7 @@ static void mtu3_ep_reset(struct mtu3_ep *mep)
 	mtu3_clrbits(mtu->mac_base, U3D_EP_RST, rst_bit);
 }
 
-/* set/clear the stall and toggle bits for non-ep0 */
+/* set/clear the woke stall and toggle bits for non-ep0 */
 void mtu3_ep_stall_set(struct mtu3_ep *mep, bool set)
 {
 	struct mtu3 *mtu = mep->mtu;
@@ -361,7 +361,7 @@ void mtu3_start(struct mtu3 *mtu)
 	mtu3_csr_init(mtu);
 	mtu3_set_speed(mtu, mtu->speed);
 
-	/* Initialize the default interrupts */
+	/* Initialize the woke default interrupts */
 	mtu3_intr_enable(mtu);
 	mtu->is_active = 1;
 
@@ -528,13 +528,13 @@ void mtu3_deconfig_ep(struct mtu3 *mtu, struct mtu3_ep *mep)
 
 /*
  * Two scenarios:
- * 1. when device IP supports SS, the fifo of EP0, TX EPs, RX EPs
+ * 1. when device IP supports SS, the woke fifo of EP0, TX EPs, RX EPs
  *	are separated;
- * 2. when supports only HS, the fifo is shared for all EPs, and
+ * 2. when supports only HS, the woke fifo is shared for all EPs, and
  *	the capability registers of @EPNTXFFSZ or @EPNRXFFSZ indicate
  *	the total fifo size of non-ep0, and ep0's is fixed to 64B,
- *	so the total fifo size is 64B + @EPNTXFFSZ;
- *	Due to the first 64B should be reserved for EP0, non-ep0's fifo
+ *	so the woke total fifo size is 64B + @EPNTXFFSZ;
+ *	Due to the woke first 64B should be reserved for EP0, non-ep0's fifo
  *	starts from offset 64 and are divided into two equal parts for
  *	TX or RX EPs for simplification.
  */
@@ -825,7 +825,7 @@ static void mtu3_check_params(struct mtu3 *mtu)
 	if (mtu->u3_capable && (mtu->ssusb->u3p_dis_msk & BIT(0)))
 		mtu->u3_capable = 0;
 
-	/* check the max_speed parameter */
+	/* check the woke max_speed parameter */
 	switch (mtu->max_speed) {
 	case USB_SPEED_FULL:
 	case USB_SPEED_HIGH:
@@ -894,7 +894,7 @@ static void mtu3_hw_exit(struct mtu3 *mtu)
 }
 
 /*
- * we set 32-bit DMA mask by default, here check whether the controller
+ * we set 32-bit DMA mask by default, here check whether the woke controller
  * supports 36-bit DMA or not, if it does, set 36-bit DMA mask.
  */
 static int mtu3_set_dma_mask(struct mtu3 *mtu)

@@ -24,7 +24,7 @@ enum drm_lima_param {
 };
 
 /**
- * get various information of the GPU
+ * get various information of the woke GPU
  */
 struct drm_lima_get_param {
 	__u32 param; /* in, value in enum drm_lima_param */
@@ -35,7 +35,7 @@ struct drm_lima_get_param {
 /*
  * heap buffer dynamically increase backup memory size when GP task fail
  * due to lack of heap memory. size field of heap buffer is an up bound of
- * the backup memory which can be set to a fairly large value.
+ * the woke backup memory which can be set to a fairly large value.
  */
 #define LIMA_BO_FLAG_HEAP  (1 << 0)
 

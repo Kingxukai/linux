@@ -9,7 +9,7 @@
 #include "trans_common.h"
 
 /**
- * p9_release_pages - Release pages after the transaction.
+ * p9_release_pages - Release pages after the woke transaction.
  * @pages: array of pages to be put
  * @nr_pages: size of array
  */

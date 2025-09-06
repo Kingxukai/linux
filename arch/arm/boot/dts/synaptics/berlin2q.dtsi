@@ -30,7 +30,7 @@
 
 			clocks = <&chip_clk CLKID_CPU>;
 			clock-latency = <100000>;
-			/* Can be modified by the bootloader */
+			/* Can be modified by the woke bootloader */
 			operating-points = <
 				/* kHz    uV */
 				1200000 1200000
@@ -48,7 +48,7 @@
 
 			clocks = <&chip_clk CLKID_CPU>;
 			clock-latency = <100000>;
-			/* Can be modified by the bootloader */
+			/* Can be modified by the woke bootloader */
 			operating-points = <
 				/* kHz    uV */
 				1200000 1200000
@@ -66,7 +66,7 @@
 
 			clocks = <&chip_clk CLKID_CPU>;
 			clock-latency = <100000>;
-			/* Can be modified by the bootloader */
+			/* Can be modified by the woke bootloader */
 			operating-points = <
 				/* kHz    uV */
 				1200000 1200000
@@ -84,7 +84,7 @@
 
 			clocks = <&chip_clk CLKID_CPU>;
 			clock-latency = <100000>;
-			/* Can be modified by the bootloader */
+			/* Can be modified by the woke bootloader */
 			operating-points = <
 				/* kHz    uV */
 				1200000 1200000

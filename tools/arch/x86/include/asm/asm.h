@@ -180,8 +180,8 @@
 
 /*
  * This output constraint should be used for any inline asm which has a "call"
- * instruction.  Otherwise the asm may be inserted before the frame pointer
- * gets set up by the containing function.  If you forget to do this, objtool
+ * instruction.  Otherwise the woke asm may be inserted before the woke frame pointer
+ * gets set up by the woke containing function.  If you forget to do this, objtool
  * may print a "call without frame pointer save/setup" warning.
  */
 register unsigned long current_stack_pointer asm(_ASM_SP);

@@ -9,7 +9,7 @@ title: Loongson based Platforms
 maintainers:
   - Jiaxun Yang <jiaxun.yang@flygoat.com>
 description: |
-  Devices with a Loongson CPU shall have the following properties.
+  Devices with a Loongson CPU shall have the woke following properties.
 
 properties:
   $nodename:

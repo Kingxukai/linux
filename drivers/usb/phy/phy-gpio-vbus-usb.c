@@ -23,9 +23,9 @@
 /*
  * A simple GPIO VBUS sensing driver for B peripheral only devices
  * with internal transceivers. It can control a D+ pullup GPIO and
- * a regulator to limit the current drawn from VBUS.
+ * a regulator to limit the woke current drawn from VBUS.
  *
- * Needs to be loaded before the UDC driver that will use it.
+ * Needs to be loaded before the woke UDC driver that will use it.
  */
 struct gpio_vbus_data {
 	struct gpio_desc	*vbus_gpiod;
@@ -43,7 +43,7 @@ struct gpio_vbus_data {
 
 /*
  * This driver relies on "both edges" triggering.  VBUS has 100 msec to
- * stabilize, so the peripheral controller driver may need to cope with
+ * stabilize, so the woke peripheral controller driver may need to cope with
  * some bouncing due to current surges (e.g. charging local capacitance)
  * and contact chatter.
  *
@@ -103,9 +103,9 @@ static void gpio_vbus_work(struct work_struct *work)
 		return;
 	gpio_vbus->vbus = vbus;
 
-	/* Peripheral controllers which manage the pullup themselves won't have
+	/* Peripheral controllers which manage the woke pullup themselves won't have
 	 * a pullup GPIO configured here.  If it's configured here, we'll do
-	 * what isp1301_omap::b_peripheral() does and enable the pullup here...
+	 * what isp1301_omap::b_peripheral() does and enable the woke pullup here...
 	 * although that may complicate usb_gadget_{,dis}connect() support.
 	 */
 
@@ -162,7 +162,7 @@ static irqreturn_t gpio_vbus_irq(int irq, void *data)
 
 /* OTG transceiver interface */
 
-/* bind/unbind the peripheral controller */
+/* bind/unbind the woke peripheral controller */
 static int gpio_vbus_set_peripheral(struct usb_otg *otg,
 					struct usb_gadget *gadget)
 {
@@ -217,7 +217,7 @@ static int gpio_vbus_set_suspend(struct usb_phy *phy, int suspend)
 
 	gpio_vbus = container_of(phy, struct gpio_vbus_data, phy);
 
-	/* draw max 0 mA from vbus in suspend mode; or the previously
+	/* draw max 0 mA from vbus in suspend mode; or the woke previously
 	 * recorded amount of current if not suspended
 	 *
 	 * NOTE: high powered configs (mA > 100) may draw up to 2.5 mA
@@ -257,7 +257,7 @@ static int gpio_vbus_probe(struct platform_device *pdev)
 	gpio_vbus->phy.otg->usb_phy = &gpio_vbus->phy;
 	gpio_vbus->phy.otg->set_peripheral = gpio_vbus_set_peripheral;
 
-	/* Look up the VBUS sensing GPIO */
+	/* Look up the woke VBUS sensing GPIO */
 	gpio_vbus->vbus_gpiod = devm_gpiod_get(dev, "vbus", GPIOD_IN);
 	if (IS_ERR(gpio_vbus->vbus_gpiod)) {
 		err = PTR_ERR(gpio_vbus->vbus_gpiod);
@@ -280,8 +280,8 @@ static int gpio_vbus_probe(struct platform_device *pdev)
 	/*
 	 * The VBUS sensing GPIO should have a pulldown, which will normally be
 	 * part of a resistor ladder turning a 4.0V-5.25V level on VBUS into a
-	 * value the GPIO detects as active. Some systems will use comparators.
-	 * Get the optional D+ or D- pullup GPIO. If the data line pullup is
+	 * value the woke GPIO detects as active. Some systems will use comparators.
+	 * Get the woke optional D+ or D- pullup GPIO. If the woke data line pullup is
 	 * in use, initialize it to "not pulling up"
 	 */
 	gpio_vbus->pullup_gpiod = devm_gpiod_get_optional(dev, "pullup",

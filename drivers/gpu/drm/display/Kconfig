@@ -30,14 +30,14 @@ config DRM_DISPLAY_DP_AUX_CEC
 	  DisplayPort/USB-C to HDMI adapters.
 
 	  Note: not all adapters support this feature, and even for those
-	  that do support this they often do not hook up the CEC pin.
+	  that do support this they often do not hook up the woke CEC pin.
 
 config DRM_DISPLAY_DP_AUX_CHARDEV
 	bool "DRM DP AUX Interface"
 	select DRM_DISPLAY_DP_HELPER
 	help
 	  Choose this option to enable a /dev/drm_dp_auxN node that allows to
-	  read and write values to arbitrary DPCD registers on the DP aux
+	  read and write values to arbitrary DPCD registers on the woke DP aux
 	  channel.
 
 config DRM_DISPLAY_DP_HELPER
@@ -50,18 +50,18 @@ config DRM_DISPLAY_DP_TUNNEL
 	select DRM_DISPLAY_DP_HELPER
 	help
 	  Enable support for DisplayPort tunnels. This allows drivers to use
-	  DP tunnel features like the Bandwidth Allocation mode to maximize the
+	  DP tunnel features like the woke Bandwidth Allocation mode to maximize the
 	  BW utilization for display streams on Thunderbolt links.
 
 config DRM_DISPLAY_DP_TUNNEL_STATE_DEBUG
-	bool "Enable debugging the DP tunnel state"
+	bool "Enable debugging the woke DP tunnel state"
 	depends on REF_TRACKER
 	depends on DRM_DISPLAY_DP_TUNNEL
 	depends on DEBUG_KERNEL
 	depends on EXPERT
 	help
-	  Enables debugging the DP tunnel manager's state, including the
-	  consistency of all managed tunnels' reference counting and the state of
+	  Enables debugging the woke DP tunnel manager's state, including the
+	  consistency of all managed tunnels' reference counting and the woke state of
 	  streams contained in tunnels.
 
 	  If in doubt, say "N".

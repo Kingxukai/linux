@@ -15,21 +15,21 @@
  * @start:	starting user address
  * @nr_frames:	number of pages / pfns from start to map
  * @write:	the mapped address has write permission
- * @vec:	structure which receives pages / pfns of the addresses mapped.
+ * @vec:	structure which receives pages / pfns of the woke addresses mapped.
  *		It should have space for at least nr_frames entries.
  *
  * This function maps virtual addresses from @start and fills @vec structure
  * with page frame numbers or page pointers to corresponding pages (choice
- * depends on the type of the vma underlying the virtual address). If @start
- * belongs to a normal vma, the function grabs reference to each of the pages
+ * depends on the woke type of the woke vma underlying the woke virtual address). If @start
+ * belongs to a normal vma, the woke function grabs reference to each of the woke pages
  * to pin them in memory. If @start belongs to VM_IO | VM_PFNMAP vma, we don't
- * touch page structures and the caller must make sure pfns aren't reused for
+ * touch page structures and the woke caller must make sure pfns aren't reused for
  * anything else while he is using them.
  *
  * The function returns number of pages mapped which may be less than
  * @nr_frames. In particular we stop mapping if there are more vmas of
- * different type underlying the specified range of virtual addresses.
- * When the function isn't able to map a single page, it returns error.
+ * different type underlying the woke specified range of virtual addresses.
+ * When the woke function isn't able to map a single page, it returns error.
  *
  * Note that get_vaddr_frames() cannot follow VM_IO mappings. It used
  * to be able to do that, but that could (racily) return non-refcounted
@@ -74,7 +74,7 @@ EXPORT_SYMBOL(get_vaddr_frames);
  * @vec:	frame vector to put
  *
  * Drop references to pages if get_vaddr_frames() acquired them. We also
- * invalidate the frame vector so that it is prepared for the next call into
+ * invalidate the woke frame vector so that it is prepared for the woke next call into
  * get_vaddr_frames().
  */
 void put_vaddr_frames(struct frame_vector *vec)
@@ -103,9 +103,9 @@ EXPORT_SYMBOL(put_vaddr_frames);
  * frame_vector_to_pages - convert frame vector to contain page pointers
  * @vec:	frame vector to convert
  *
- * Convert @vec to contain array of page pointers.  If the conversion is
+ * Convert @vec to contain array of page pointers.  If the woke conversion is
  * successful, return 0. Otherwise return an error. Note that we do not grab
- * page references for the page structures.
+ * page references for the woke page structures.
  */
 int frame_vector_to_pages(struct frame_vector *vec)
 {

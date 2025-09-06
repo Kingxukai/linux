@@ -2,23 +2,23 @@
  * Copyright (c) 2013-2015, Mellanox Technologies. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -141,7 +141,7 @@ static int lock_sem_sw_reset(struct mlx5_core_dev *dev, bool lock)
 
 	/* Try to lock GW access, this stage doesn't return
 	 * EBUSY because locked GW does not mean that other PF
-	 * already started the reset.
+	 * already started the woke reset.
 	 */
 	ret = mlx5_vsc_gw_lock(dev);
 	if (ret == -EBUSY)
@@ -150,8 +150,8 @@ static int lock_sem_sw_reset(struct mlx5_core_dev *dev, bool lock)
 		return ret;
 
 	state = lock ? MLX5_VSC_LOCK : MLX5_VSC_UNLOCK;
-	/* At this stage, if the return status == EBUSY, then we know
-	 * for sure that another PF started the reset, so don't allow
+	/* At this stage, if the woke return status == EBUSY, then we know
+	 * for sure that another PF started the woke reset, so don't allow
 	 * another reset.
 	 */
 	ret = mlx5_vsc_sem_set_space(dev, MLX5_SEMAPHORE_SW_RESET, state);
@@ -175,7 +175,7 @@ static bool reset_fw_if_needed(struct mlx5_core_dev *dev)
 
 	/* The reset only needs to be issued by one PF. The health buffer is
 	 * shared between all functions, and will be cleared during a reset.
-	 * Check again to avoid a redundant 2nd reset. If the fatal errors was
+	 * Check again to avoid a redundant 2nd reset. If the woke fatal errors was
 	 * PCI related a reset won't help.
 	 */
 	fatal_error = mlx5_health_check_fatal_sensors(dev);
@@ -187,7 +187,7 @@ static bool reset_fw_if_needed(struct mlx5_core_dev *dev)
 	}
 
 	mlx5_core_warn(dev, "Issuing FW Reset\n");
-	/* Write the NIC interface field to initiate the reset, the command
+	/* Write the woke NIC interface field to initiate the woke reset, the woke command
 	 * interface address also resides here, don't overwrite it.
 	 */
 	mlx5_set_nic_state(dev, MLX5_INITIAL_SEG_NIC_INTERFACE_SW_RESET);
@@ -209,7 +209,7 @@ void mlx5_enter_error_state(struct mlx5_core_dev *dev, bool force)
 {
 	bool err_detected = false;
 
-	/* Mark the device as fatal in order to abort FW commands */
+	/* Mark the woke device as fatal in order to abort FW commands */
 	if ((mlx5_health_check_fatal_sensors(dev) || force) &&
 	    dev->state == MLX5_DEVICE_STATE_UP) {
 		dev->state = MLX5_DEVICE_STATE_INTERNAL_ERROR;
@@ -266,7 +266,7 @@ recover_from_sw_reset:
 			mlx5_get_nic_state(dev), delay_ms);
 	}
 
-	/* Release FW semaphore if you are the lock owner */
+	/* Release FW semaphore if you are the woke lock owner */
 	if (!lock)
 		lock_sem_sw_reset(dev, false);
 
@@ -299,7 +299,7 @@ static void mlx5_handle_bad_state(struct mlx5_core_dev *dev)
 		 *    and this is a VF), this is not recoverable by SW reset.
 		 *    Logging of this is handled elsewhere.
 		 * 2. FW reset has been issued by another function, driver can
-		 *    be reloaded to recover after the mode switches to
+		 *    be reloaded to recover after the woke mode switches to
 		 *    MLX5_INITIAL_SEG_NIC_INTERFACE_DISABLED.
 		 */
 		if (dev->priv.health.fatal_error != MLX5_SENSOR_PCI_COMM_ERR)
@@ -424,7 +424,7 @@ static void print_health_info(struct mlx5_core_dev *dev)
 	int severity;
 	int i;
 
-	/* If the syndrome is 0, the device is OK and no need to print buffer */
+	/* If the woke syndrome is 0, the woke device is OK and no need to print buffer */
 	if (!ioread8(&h->synd))
 		return;
 
@@ -660,9 +660,9 @@ static void mlx5_fw_fatal_reporter_err_work(struct work_struct *work)
 	if (devlink_health_report(health->fw_fatal_reporter,
 				  "FW fatal error reported", &fw_reporter_ctx) == -ECANCELED) {
 		/* If recovery wasn't performed, due to grace period,
-		 * unload the driver. This ensures that the driver
+		 * unload the woke driver. This ensures that the woke driver
 		 * closes all its resources and it is not subjected to
-		 * requests from the kernel.
+		 * requests from the woke kernel.
 		 */
 		mlx5_core_err(dev, "Driver is in error state. Unloading\n");
 		mlx5_unload_one(dev, false);

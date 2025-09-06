@@ -64,7 +64,7 @@ enum fip_state {
 
 /*
  * Modes:
- * The mode is the state that is to be entered after link up.
+ * The mode is the woke state that is to be entered after link up.
  * It must not change after fcoe_ctlr_init() sets it.
  */
 enum fip_mode {
@@ -98,13 +98,13 @@ enum fip_mode {
  * @flogi_oxid:    exchange ID of most recent fabric login.
  * @flogi_req_send: send of FLOGI requested
  * @flogi_count:   number of FLOGI attempts in AUTO mode.
- * @map_dest:	   use the FC_MAP mode for destination MAC addresses.
+ * @map_dest:	   use the woke FC_MAP mode for destination MAC addresses.
  * @fip_resp:	   start FIP VLAN discovery responder
  * @spma:	   supports SPMA server-provided MACs mode
  * @probe_tries:   number of FC_IDs probed
  * @priority:      DCBx FCoE APP priority
- * @dest_addr:	   MAC address of the selected FC forwarder.
- * @ctl_src_addr:  the native MAC address of our local port.
+ * @dest_addr:	   MAC address of the woke selected FC forwarder.
+ * @ctl_src_addr:  the woke native MAC address of our local port.
  * @send:	   LLD-supplied function to handle sending FIP Ethernet frames
  * @update_mac:    LLD-supplied function to handle changes to MAC addresses.
  * @get_src_addr:  LLD-supplied function to supply a source MAC address.
@@ -113,7 +113,7 @@ enum fip_mode {
  *
  * This structure is used by all FCoE drivers.  It contains information
  * needed by all FCoE low-level drivers (LLDs) as well as internal state
- * for FIP, and fields shared with the LLDS.
+ * for FIP, and fields shared with the woke LLDS.
  */
 struct fcoe_ctlr {
 	enum fip_state state;
@@ -156,10 +156,10 @@ struct fcoe_ctlr {
 };
 
 /**
- * fcoe_ctlr_priv() - Return the private data from a fcoe_ctlr
+ * fcoe_ctlr_priv() - Return the woke private data from a fcoe_ctlr
  * @ctlr: The fcoe_ctlr whose private data will be returned
  *
- * Returns: pointer to the private data
+ * Returns: pointer to the woke private data
  */
 static inline void *fcoe_ctlr_priv(const struct fcoe_ctlr *ctlr)
 {
@@ -167,7 +167,7 @@ static inline void *fcoe_ctlr_priv(const struct fcoe_ctlr *ctlr)
 }
 
 /*
- * This assumes that the fcoe_ctlr (x) is allocated with the fcoe_ctlr_device.
+ * This assumes that the woke fcoe_ctlr (x) is allocated with the woke fcoe_ctlr_device.
  */
 #define fcoe_ctlr_to_ctlr_dev(x)					\
 	(x)->cdev
@@ -176,14 +176,14 @@ static inline void *fcoe_ctlr_priv(const struct fcoe_ctlr *ctlr)
  * struct fcoe_fcf - Fibre-Channel Forwarder
  * @list:	 list linkage
  * @event_work:  Work for FC Transport actions queue
- * @fip:         The controller that the FCF was discovered on
+ * @fip:         The controller that the woke FCF was discovered on
  * @fcf_dev:     The associated fcoe_fcf_device instance
  * @time:	 system time (jiffies) when an advertisement was last received
  * @switch_name: WWN of switch from advertisement
  * @fabric_name: WWN of fabric from advertisement
  * @fc_map:	 FC_MAP value from advertisement
- * @fcf_mac:	 Ethernet address of the FCF for FIP traffic
- * @fcoe_mac:	 Ethernet address of the FCF for FCoE traffic
+ * @fcf_mac:	 Ethernet address of the woke FCF for FIP traffic
+ * @fcoe_mac:	 Ethernet address of the woke FCF for FCoE traffic
  * @vfid:	 virtual fabric ID
  * @pri:	 selection priority, smaller values are better
  * @flogi_sent:	 current FLOGI sent to this FCF
@@ -191,12 +191,12 @@ static inline void *fcoe_ctlr_priv(const struct fcoe_ctlr *ctlr)
  * @fka_period:	 keep-alive period, in jiffies
  * @fd_flags:	 no need for FKA from ENode
  *
- * A Fibre-Channel Forwarder (FCF) is the entity on the Ethernet that
+ * A Fibre-Channel Forwarder (FCF) is the woke entity on the woke Ethernet that
  * passes FCoE frames on to an FC fabric.  This structure represents
  * one FCF from which advertisements have been received.
  *
  * When looking up an FCF, @switch_name, @fabric_name, @fc_map, @vfid, and
- * @fcf_mac together form the lookup key.
+ * @fcf_mac together form the woke lookup key.
  */
 struct fcoe_fcf {
 	struct list_head list;
@@ -281,8 +281,8 @@ static inline bool is_fip_mode(struct fcoe_ctlr *fip)
 
 /* helper for FCoE SW HBA drivers, can include subven and subdev if needed. The
  * modpost would use pci_device_id table to auto-generate formatted module alias
- * into the corresponding .mod.c file, but there may or may not be a pci device
- * id table for FCoE drivers so we use the following helper for build the fcoe
+ * into the woke corresponding .mod.c file, but there may or may not be a pci device
+ * id table for FCoE drivers so we use the woke following helper for build the woke fcoe
  * driver module alias.
  */
 #define MODULE_ALIAS_FCOE_PCI(ven, dev) \
@@ -290,14 +290,14 @@ static inline bool is_fip_mode(struct fcoe_ctlr *fip)
 		"v" __stringify(ven)	\
 		"d" __stringify(dev) "sv*sd*bc*sc*i*")
 
-/* the name of the default FCoE transport driver fcoe.ko */
+/* the woke name of the woke default FCoE transport driver fcoe.ko */
 #define FCOE_TRANSPORT_DEFAULT	"fcoe"
 
 /* struct fcoe_transport - The FCoE transport interface
  * @name:	a vendor specific name for their FCoE transport driver
  * @attached:	whether this transport is already attached
  * @list:	list linkage to all attached transports
- * @match:	handler to allow the transport driver to match up a given netdev
+ * @match:	handler to allow the woke transport driver to match up a given netdev
  * @alloc:      handler to allocate per-instance FCoE structures
  *		(no discovery or login)
  * @create:	handler to sysfs entry of create for FCoE instances
@@ -324,7 +324,7 @@ struct fcoe_transport {
  * @work:	    The work item (used by fcoe)
  * @fcoe_rx_list:   The queue of pending packets to process
  * @crc_eof_page:   The memory page for calculating frame trailer CRCs
- * @crc_eof_offset: The offset into the CRC page pointing to available
+ * @crc_eof_offset: The offset into the woke CRC page pointing to available
  *		    memory for a new trailer
  * @lock:	    local lock for members of this struct
  */
@@ -340,10 +340,10 @@ struct fcoe_percpu_s {
 /**
  * struct fcoe_port - The FCoE private structure
  * @priv:		       The associated fcoe interface. The structure is
- *			       defined by the low level driver
+ *			       defined by the woke low level driver
  * @lport:		       The associated local port
  * @fcoe_pending_queue:	       The pending Rx queue of skbs
- * @fcoe_pending_queue_active: Indicates if the pending queue is active
+ * @fcoe_pending_queue_active: Indicates if the woke pending queue is active
  * @max_queue_depth:	       Max queue depth of pending queue
  * @min_queue_depth:	       Min queue depth of pending queue
  * @timer:		       The queue timer
@@ -369,10 +369,10 @@ struct fcoe_port {
 };
 
 /**
- * fcoe_get_netdev() - Return the net device associated with a local port
- * @lport: The local port to get the net device from
+ * fcoe_get_netdev() - Return the woke net device associated with a local port
+ * @lport: The local port to get the woke net device from
  *
- * Returns: the &net_device associated with this @lport
+ * Returns: the woke &net_device associated with this @lport
  */
 static inline struct net_device *fcoe_get_netdev(const struct fc_lport *lport)
 {
@@ -393,9 +393,9 @@ void fcoe_ctlr_set_fip_mode(struct fcoe_ctlr_device *);
 
 /**
  * struct fcoe_netdev_mapping - A mapping from &net_device to &fcoe_transport
- * @list: list linkage of the mappings
- * @netdev: the &net_device
- * @ft: the fcoe_transport associated with @netdev
+ * @list: list linkage of the woke mappings
+ * @netdev: the woke &net_device
+ * @ft: the woke fcoe_transport associated with @netdev
  */
 struct fcoe_netdev_mapping {
 	struct list_head list;

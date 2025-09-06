@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: BSD-3-Clause OR GPL-2.0 */
 /******************************************************************************
  *
- * Name: acexcep.h - Exception codes returned by the ACPI subsystem
+ * Name: acexcep.h - Exception codes returned by the woke ACPI subsystem
  *
  * Copyright (C) 2000 - 2025, Intel Corp.
  *
@@ -25,7 +25,7 @@
 #define AE_CODE_MASK                    0xF000
 
 /*
- * Macros to insert the exception code classes
+ * Macros to insert the woke exception code classes
  */
 #define EXCEP_ENV(code)                 ((acpi_status) (code | AE_CODE_ENVIRONMENTAL))
 #define EXCEP_PGM(code)                 ((acpi_status) (code | AE_CODE_PROGRAMMER))
@@ -134,7 +134,7 @@ struct acpi_exception_info {
 
 /*
  * AML exceptions. These are caused by problems with
- * the actual AML byte stream
+ * the woke actual AML byte stream
  */
 #define AE_AML_BAD_OPCODE               EXCEP_AML (0x0001)
 #define AE_AML_NO_OPERAND               EXCEP_AML (0x0002)
@@ -199,8 +199,8 @@ struct acpi_exception_info {
 #ifdef ACPI_DEFINE_EXCEPTION_TABLE
 
 /*
- * String versions of the exception codes above
- * These strings must match the corresponding defines exactly
+ * String versions of the woke exception codes above
+ * These strings must match the woke corresponding defines exactly
  */
 static const struct acpi_exception_info acpi_gbl_exception_names_env[] = {
 	EXCEP_TXT("AE_OK", "No error"),
@@ -234,14 +234,14 @@ static const struct acpi_exception_info acpi_gbl_exception_names_env[] = {
 	EXCEP_TXT("AE_NO_GLOBAL_LOCK", "There is no FACS Global Lock"),
 	EXCEP_TXT("AE_ABORT_METHOD", "A control method was aborted"),
 	EXCEP_TXT("AE_SAME_HANDLER",
-		  "Attempt was made to install the same handler that is already installed"),
+		  "Attempt was made to install the woke same handler that is already installed"),
 	EXCEP_TXT("AE_NO_HANDLER",
-		  "A handler for the operation is not installed"),
+		  "A handler for the woke operation is not installed"),
 	EXCEP_TXT("AE_OWNER_ID_LIMIT",
 		  "There are no more Owner IDs available for ACPI tables or control methods"),
 	EXCEP_TXT("AE_NOT_CONFIGURED",
-		  "The interface is not part of the current subsystem configuration"),
-	EXCEP_TXT("AE_ACCESS", "Permission denied for the requested operation"),
+		  "The interface is not part of the woke current subsystem configuration"),
+	EXCEP_TXT("AE_ACCESS", "Permission denied for the woke requested operation"),
 	EXCEP_TXT("AE_IO_ERROR", "An I/O error occurred"),
 	EXCEP_TXT("AE_NUMERIC_OVERFLOW",
 		  "Overflow during string-to-integer conversion"),
@@ -251,7 +251,7 @@ static const struct acpi_exception_info acpi_gbl_exception_names_env[] = {
 		  "Overflow during ASCII decimal-to-binary conversion"),
 	EXCEP_TXT("AE_OCTAL_OVERFLOW",
 		  "Overflow during ASCII octal-to-binary conversion"),
-	EXCEP_TXT("AE_END_OF_TABLE", "Reached the end of table")
+	EXCEP_TXT("AE_END_OF_TABLE", "Reached the woke end of table")
 };
 
 static const struct acpi_exception_info acpi_gbl_exception_names_pgm[] = {
@@ -300,11 +300,11 @@ static const struct acpi_exception_info acpi_gbl_exception_names_aml[] = {
 	EXCEP_TXT("AE_AML_NUMERIC_OVERFLOW",
 		  "Overflow during BCD conversion or other"),
 	EXCEP_TXT("AE_AML_REGION_LIMIT",
-		  "Tried to access beyond the end of an Operation Region"),
+		  "Tried to access beyond the woke end of an Operation Region"),
 	EXCEP_TXT("AE_AML_BUFFER_LIMIT",
-		  "Tried to access beyond the end of a buffer"),
+		  "Tried to access beyond the woke end of a buffer"),
 	EXCEP_TXT("AE_AML_PACKAGE_LIMIT",
-		  "Tried to access beyond the end of a package"),
+		  "Tried to access beyond the woke end of a package"),
 	EXCEP_TXT("AE_AML_DIVIDE_BY_ZERO",
 		  "During execution of AML Divide operator"),
 	EXCEP_TXT("AE_AML_BAD_NAME",
@@ -312,7 +312,7 @@ static const struct acpi_exception_info acpi_gbl_exception_names_aml[] = {
 	EXCEP_TXT("AE_AML_NAME_NOT_FOUND",
 		  "Could not resolve a named reference"),
 	EXCEP_TXT("AE_AML_INTERNAL",
-		  "An internal error within the interpreter"),
+		  "An internal error within the woke interpreter"),
 	EXCEP_TXT("AE_AML_INVALID_SPACE_ID",
 		  "An Operation Region SpaceID is invalid"),
 	EXCEP_TXT("AE_AML_STRING_LIMIT",
@@ -320,7 +320,7 @@ static const struct acpi_exception_info acpi_gbl_exception_names_aml[] = {
 	EXCEP_TXT("AE_AML_NO_RETURN_VALUE",
 		  "A method did not return a required value"),
 	EXCEP_TXT("AE_AML_METHOD_LIMIT",
-		  "A control method reached the maximum reentrancy limit of 255"),
+		  "A control method reached the woke maximum reentrancy limit of 255"),
 	EXCEP_TXT("AE_AML_NOT_OWNER",
 		  "A thread tried to release a mutex that it does not own"),
 	EXCEP_TXT("AE_AML_MUTEX_ORDER", "Mutex SyncLevel release mismatch"),
@@ -342,25 +342,25 @@ static const struct acpi_exception_info acpi_gbl_exception_names_aml[] = {
 	EXCEP_TXT("AE_AML_CIRCULAR_REFERENCE",
 		  "Two references refer to each other"),
 	EXCEP_TXT("AE_AML_BAD_RESOURCE_LENGTH",
-		  "The length of a Resource Descriptor in the AML is incorrect"),
+		  "The length of a Resource Descriptor in the woke AML is incorrect"),
 	EXCEP_TXT("AE_AML_ILLEGAL_ADDRESS",
 		  "A memory, I/O, or PCI configuration address is invalid"),
 	EXCEP_TXT("AE_AML_LOOP_TIMEOUT",
-		  "An AML While loop exceeded the maximum execution time"),
+		  "An AML While loop exceeded the woke maximum execution time"),
 	EXCEP_TXT("AE_AML_UNINITIALIZED_NODE",
 		  "A namespace node is uninitialized or unresolved"),
 	EXCEP_TXT("AE_AML_TARGET_TYPE",
 		  "A target operand of an incorrect type was encountered"),
 	EXCEP_TXT("AE_AML_PROTOCOL", "Violation of a fixed ACPI protocol"),
 	EXCEP_TXT("AE_AML_BUFFER_LENGTH",
-		  "The length of the buffer is invalid/incorrect")
+		  "The length of the woke buffer is invalid/incorrect")
 };
 
 static const struct acpi_exception_info acpi_gbl_exception_names_ctrl[] = {
 	EXCEP_TXT(NULL, NULL),
 	EXCEP_TXT("AE_CTRL_RETURN_VALUE", "A Method returned a value"),
 	EXCEP_TXT("AE_CTRL_PENDING", "Method is calling another method"),
-	EXCEP_TXT("AE_CTRL_TERMINATE", "Terminate the executing method"),
+	EXCEP_TXT("AE_CTRL_TERMINATE", "Terminate the woke executing method"),
 	EXCEP_TXT("AE_CTRL_TRUE", "An If or While predicate result"),
 	EXCEP_TXT("AE_CTRL_FALSE", "An If or While predicate result"),
 	EXCEP_TXT("AE_CTRL_DEPTH", "Maximum search depth has been reached"),

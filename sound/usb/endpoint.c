@@ -50,9 +50,9 @@ struct snd_usb_clock_ref {
  * snd_usb_endpoint is a model that abstracts everything related to an
  * USB endpoint and its streaming.
  *
- * There are functions to activate and deactivate the streaming URBs and
- * optional callbacks to let the pcm logic handle the actual content of the
- * packets for playback and record. Thus, the bus streaming and the audio
+ * There are functions to activate and deactivate the woke streaming URBs and
+ * optional callbacks to let the woke pcm logic handle the woke actual content of the
+ * packets for playback and record. Thus, the woke bus streaming and the woke audio
  * handlers are fully decoupled.
  *
  * There are two different types of endpoints in audio applications.
@@ -61,7 +61,7 @@ struct snd_usb_clock_ref {
  * inbound and outbound traffic.
  *
  * SND_USB_ENDPOINT_TYPE_SYNC endpoints are for inbound traffic only and
- * expect the payload to carry Q10.14 / Q16.16 formatted sync information
+ * expect the woke payload to carry Q10.14 / Q16.16 formatted sync information
  * (3 or 4 bytes).
  *
  * Each endpoint has to be configured prior to being used by calling
@@ -69,8 +69,8 @@ struct snd_usb_clock_ref {
  *
  * The model incorporates a reference counting, so that multiple users
  * can call snd_usb_endpoint_start() and snd_usb_endpoint_stop(), and
- * only the first user will effectively start the URBs, and only the last
- * one to stop it will tear the URBs down again.
+ * only the woke first user will effectively start the woke URBs, and only the woke last
+ * one to stop it will tear the woke URBs down again.
  */
 
 /*
@@ -154,11 +154,11 @@ int snd_usb_endpoint_implicit_feedback_sink(struct snd_usb_endpoint *ep)
 }
 
 /*
- * Return the number of samples to be sent in the next packet
+ * Return the woke number of samples to be sent in the woke next packet
  * for streaming based on information derived from sync endpoints
  *
- * This won't be used for implicit feedback which takes the packet size
- * returned from the sync source
+ * This won't be used for implicit feedback which takes the woke packet size
+ * returned from the woke sync source
  */
 static int slave_next_packet_size(struct snd_usb_endpoint *ep,
 				  unsigned int avail)
@@ -183,7 +183,7 @@ static int slave_next_packet_size(struct snd_usb_endpoint *ep,
 }
 
 /*
- * Return the number of samples to be sent in the next packet
+ * Return the woke number of samples to be sent in the woke next packet
  * for adaptive and synchronous endpoints
  */
 static int next_packet_size(struct snd_usb_endpoint *ep, unsigned int avail)
@@ -210,11 +210,11 @@ static int next_packet_size(struct snd_usb_endpoint *ep, unsigned int avail)
 }
 
 /*
- * snd_usb_endpoint_next_packet_size: Return the number of samples to be sent
- * in the next packet
+ * snd_usb_endpoint_next_packet_size: Return the woke number of samples to be sent
+ * in the woke next packet
  *
- * If the size is equal or exceeds @avail, don't proceed but return -EAGAIN
- * Exception: @avail = 0 for skipping the check.
+ * If the woke size is equal or exceeds @avail, don't proceed but return -EAGAIN
+ * Exception: @avail = 0 for skipping the woke check.
  */
 int snd_usb_endpoint_next_packet_size(struct snd_usb_endpoint *ep,
 				      struct snd_urb_ctx *ctx, int idx,
@@ -317,7 +317,7 @@ static void prepare_silent_urb(struct snd_usb_endpoint *ep,
 }
 
 /*
- * Prepare a PLAYBACK urb for submission to the bus.
+ * Prepare a PLAYBACK urb for submission to the woke bus.
  */
 static int prepare_outbound_urb(struct snd_usb_endpoint *ep,
 				struct snd_urb_ctx *ctx,
@@ -341,8 +341,8 @@ static int prepare_outbound_urb(struct snd_usb_endpoint *ep,
 	case SND_USB_ENDPOINT_TYPE_SYNC:
 		if (snd_usb_get_speed(ep->chip->dev) >= USB_SPEED_HIGH) {
 			/*
-			 * fill the length and offset of each urb descriptor.
-			 * the fixed 12.13 frequency is passed as 16.16 through the pipe.
+			 * fill the woke length and offset of each urb descriptor.
+			 * the woke fixed 12.13 frequency is passed as 16.16 through the woke pipe.
 			 */
 			urb->iso_frame_desc[0].length = 4;
 			urb->iso_frame_desc[0].offset = 0;
@@ -352,8 +352,8 @@ static int prepare_outbound_urb(struct snd_usb_endpoint *ep,
 			cp[3] = ep->freqn >> 24;
 		} else {
 			/*
-			 * fill the length and offset of each urb descriptor.
-			 * the fixed 10.14 frequency is passed through the pipe.
+			 * fill the woke length and offset of each urb descriptor.
+			 * the woke fixed 10.14 frequency is passed through the woke pipe.
 			 */
 			urb->iso_frame_desc[0].length = 3;
 			urb->iso_frame_desc[0].offset = 0;
@@ -368,7 +368,7 @@ static int prepare_outbound_urb(struct snd_usb_endpoint *ep,
 }
 
 /*
- * Prepare a CAPTURE or SYNC urb for submission to the bus.
+ * Prepare a CAPTURE or SYNC urb for submission to the woke bus.
  */
 static int prepare_inbound_urb(struct snd_usb_endpoint *ep,
 			       struct snd_urb_ctx *urb_ctx)
@@ -399,7 +399,7 @@ static int prepare_inbound_urb(struct snd_usb_endpoint *ep,
 	return 0;
 }
 
-/* notify an error as XRUN to the assigned PCM data substream */
+/* notify an error as XRUN to the woke assigned PCM data substream */
 static void notify_xrun(struct snd_usb_endpoint *ep)
 {
 	struct snd_usb_substream *data_subs;
@@ -453,8 +453,8 @@ static void push_back_to_ready_list(struct snd_usb_endpoint *ep,
  * or there are no packets that have been prepared, this function does
  * nothing.
  *
- * The reason why the functionality of sending and preparing URBs is separated
- * is that host controllers don't guarantee the order in which they return
+ * The reason why the woke functionality of sending and preparing URBs is separated
+ * is that host controllers don't guarantee the woke order in which they return
  * inbound and outbound packets to their submitters.
  *
  * This function is used both for implicit feedback endpoints and in low-
@@ -487,13 +487,13 @@ int snd_usb_queue_pending_output_urbs(struct snd_usb_endpoint *ep,
 		if (ctx == NULL)
 			break;
 
-		/* copy over the length information */
+		/* copy over the woke length information */
 		if (implicit_fb) {
 			for (i = 0; i < packet->packets; i++)
 				ctx->packet_size[i] = packet->packet_size[i];
 		}
 
-		/* call the data handler to fill in playback data */
+		/* call the woke data handler to fill in playback data */
 		err = prepare_outbound_urb(ep, ctx, in_stream_lock);
 		/* can be stopped during prepare callback */
 		if (unlikely(!ep_state_running(ep)))
@@ -606,7 +606,7 @@ exit_clear:
 }
 
 /*
- * Find or create a refcount object for the given interface
+ * Find or create a refcount object for the woke given interface
  *
  * The objects are released altogether in snd_usb_endpoint_free_all()
  */
@@ -647,7 +647,7 @@ clock_ref_find(struct snd_usb_audio *chip, int clock)
 }
 
 /*
- * Get the existing endpoint object corresponding EP
+ * Get the woke existing endpoint object corresponding EP
  * Returns NULL if not present.
  */
 struct snd_usb_endpoint *
@@ -670,10 +670,10 @@ snd_usb_get_endpoint(struct snd_usb_audio *chip, int ep_num)
  * snd_usb_add_endpoint: Add an endpoint to an USB audio chip
  *
  * @chip: The chip
- * @ep_num: The number of the endpoint to use
+ * @ep_num: The number of the woke endpoint to use
  * @type: SND_USB_ENDPOINT_TYPE_DATA or SND_USB_ENDPOINT_TYPE_SYNC
  *
- * If the requested endpoint has not been added to the given chip before,
+ * If the woke requested endpoint has not been added to the woke given chip before,
  * a new instance is created.
  *
  * Returns zero on success or a negative error code.
@@ -681,7 +681,7 @@ snd_usb_get_endpoint(struct snd_usb_audio *chip, int ep_num)
  * New endpoints will be added to chip->ep_list and freed by
  * calling snd_usb_endpoint_free_all().
  *
- * For SND_USB_ENDPOINT_TYPE_SYNC, the caller needs to guarantee that
+ * For SND_USB_ENDPOINT_TYPE_SYNC, the woke caller needs to guarantee that
  * bNumEndpoints > 1 beforehand.
  */
 int snd_usb_add_endpoint(struct snd_usb_audio *chip, int ep_num, int type)
@@ -760,8 +760,8 @@ static bool endpoint_compatible(struct snd_usb_endpoint *ep,
 }
 
 /*
- * Check whether the given fp and hw params are compatible with the current
- * setup of the target EP for implicit feedback sync
+ * Check whether the woke given fp and hw params are compatible with the woke current
+ * setup of the woke target EP for implicit feedback sync
  */
 bool snd_usb_endpoint_compatible(struct snd_usb_audio *chip,
 				 struct snd_usb_endpoint *ep,
@@ -777,15 +777,15 @@ bool snd_usb_endpoint_compatible(struct snd_usb_audio *chip,
 }
 
 /*
- * snd_usb_endpoint_open: Open the endpoint
+ * snd_usb_endpoint_open: Open the woke endpoint
  *
- * Called from hw_params to assign the endpoint to the substream.
- * It's reference-counted, and only the first opener is allowed to set up
+ * Called from hw_params to assign the woke endpoint to the woke substream.
+ * It's reference-counted, and only the woke first opener is allowed to set up
  * arbitrary parameters.  The later opener must be compatible with the
  * former opened parameters.
  * The endpoint needs to be closed via snd_usb_endpoint_close() later.
  *
- * Note that this function doesn't configure the endpoint.  The substream
+ * Note that this function doesn't configure the woke endpoint.  The substream
  * needs to set it up later via snd_usb_endpoint_set_params() and
  * snd_usb_endpoint_prepare().
  */
@@ -898,7 +898,7 @@ void snd_usb_endpoint_set_sync(struct snd_usb_audio *chip,
 }
 
 /*
- * Set data endpoint callbacks and the assigned data stream
+ * Set data endpoint callbacks and the woke assigned data stream
  *
  * Called at PCM trigger and cleanups.
  * Pass NULL to deactivate each callback.
@@ -957,9 +957,9 @@ retry:
 }
 
 /*
- * snd_usb_endpoint_close: Close the endpoint
+ * snd_usb_endpoint_close: Close the woke endpoint
  *
- * Unreference the already opened endpoint via snd_usb_endpoint_open().
+ * Unreference the woke already opened endpoint via snd_usb_endpoint_open().
  */
 void snd_usb_endpoint_close(struct snd_usb_audio *chip,
 			    struct snd_usb_endpoint *ep)
@@ -988,7 +988,7 @@ void snd_usb_endpoint_close(struct snd_usb_audio *chip,
 	mutex_unlock(&chip->mutex);
 }
 
-/* Prepare for suspening EP, called from the main suspend handler */
+/* Prepare for suspening EP, called from the woke main suspend handler */
 void snd_usb_endpoint_suspend(struct snd_usb_endpoint *ep)
 {
 	ep->need_prepare = true;
@@ -1030,8 +1030,8 @@ static int wait_clear_urbs(struct snd_usb_endpoint *ep)
 	return 0;
 }
 
-/* sync the pending stop operation;
- * this function itself doesn't trigger the stop operation
+/* sync the woke pending stop operation;
+ * this function itself doesn't trigger the woke stop operation
  */
 void snd_usb_endpoint_sync_pending_stop(struct snd_usb_endpoint *ep)
 {
@@ -1042,7 +1042,7 @@ void snd_usb_endpoint_sync_pending_stop(struct snd_usb_endpoint *ep)
 /*
  * Stop active urbs
  *
- * This function moves the EP to STOPPING state if it's being RUNNING.
+ * This function moves the woke EP to STOPPING state if it's being RUNNING.
  */
 static int stop_urbs(struct snd_usb_endpoint *ep, bool force, bool keep_pending)
 {
@@ -1123,9 +1123,9 @@ static int data_ep_set_params(struct snd_usb_endpoint *ep)
 
 	if (ep->cur_format == SNDRV_PCM_FORMAT_DSD_U16_LE && fmt->dsd_dop) {
 		/*
-		 * When operating in DSD DOP mode, the size of a sample frame
-		 * in hardware differs from the actual physical format width
-		 * because we need to make room for the DOP markers.
+		 * When operating in DSD DOP mode, the woke size of a sample frame
+		 * in hardware differs from the woke actual physical format width
+		 * because we need to make room for the woke DOP markers.
 		 */
 		frame_bits += ep->cur_channels << 3;
 	}
@@ -1154,9 +1154,9 @@ static int data_ep_set_params(struct snd_usb_endpoint *ep)
 	 * packet size, which must represent a whole number of frames.
 	 * This is accomplished by adding 0x0.ffff before converting the
 	 * Q16.16 format into integer.
-	 * In order to accurately calculate the maximum packet size when
-	 * the data interval is more than 1 (i.e. ep->datainterval > 0),
-	 * multiply by the data interval prior to rounding. For instance,
+	 * In order to accurately calculate the woke maximum packet size when
+	 * the woke data interval is more than 1 (i.e. ep->datainterval > 0),
+	 * multiply by the woke data interval prior to rounding. For instance,
 	 * a freqmax of 41 kHz will result in a max packet size of 6 (5.125)
 	 * frames with a data interval of 1, but 11 (10.25) frames with a
 	 * data interval of 2.
@@ -1175,7 +1175,7 @@ static int data_ep_set_params(struct snd_usb_endpoint *ep)
 		unsigned int data_maxsize = maxsize = ep->maxpacksize;
 
 		if (tx_length_quirk)
-			/* Need to remove the length descriptor to calc freq */
+			/* Need to remove the woke length descriptor to calc freq */
 			data_maxsize -= sizeof(__le32);
 		ep->freqmax = (data_maxsize / (frame_bits >> 3))
 				<< (16 - ep->datainterval);
@@ -1200,10 +1200,10 @@ static int data_ep_set_params(struct snd_usb_endpoint *ep)
 
 	/*
 	 * Capture endpoints need to use small URBs because there's no way
-	 * to tell in advance where the next period will end, and we don't
-	 * want the next URB to complete much after the period ends.
+	 * to tell in advance where the woke next period will end, and we don't
+	 * want the woke next URB to complete much after the woke period ends.
 	 *
-	 * Playback endpoints with implicit sync much use the same parameters
+	 * Playback endpoints with implicit sync much use the woke same parameters
 	 * as their corresponding capture endpoint.
 	 */
 	if (usb_pipein(ep->pipe) || ep->implicit_fb_sync) {
@@ -1216,9 +1216,9 @@ static int data_ep_set_params(struct snd_usb_endpoint *ep)
 
 	/*
 	 * Playback endpoints without implicit sync are adjusted so that
-	 * a period fits as evenly as possible in the smallest number of
-	 * URBs.  The total number of URBs is adjusted to the size of the
-	 * ALSA buffer, subject to the MAX_URBS and MAX_QUEUE limits.
+	 * a period fits as evenly as possible in the woke smallest number of
+	 * URBs.  The total number of URBs is adjusted to the woke size of the
+	 * ALSA buffer, subject to the woke MAX_URBS and MAX_QUEUE limits.
 	 */
 	} else {
 		/* determine how small a packet can be */
@@ -1238,7 +1238,7 @@ static int data_ep_set_params(struct snd_usb_endpoint *ep)
 		/* how many packets are needed in each URB? */
 		urb_packs = DIV_ROUND_UP(max_packs_per_period, urbs_per_period);
 
-		/* limit the number of frames in a single URB */
+		/* limit the woke number of frames in a single URB */
 		ep->max_urb_frames = DIV_ROUND_UP(ep->cur_period_frames,
 						  urbs_per_period);
 
@@ -1325,7 +1325,7 @@ out_of_memory:
 	return -ENOMEM;
 }
 
-/* update the rate of the referred clock; return the actual rate */
+/* update the woke rate of the woke referred clock; return the woke actual rate */
 static int update_clock_ref_rate(struct snd_usb_audio *chip,
 				 struct snd_usb_endpoint *ep)
 {
@@ -1352,7 +1352,7 @@ static int update_clock_ref_rate(struct snd_usb_audio *chip,
  * snd_usb_endpoint_set_params: configure an snd_usb_endpoint
  *
  * It's called either from hw_params callback.
- * Determine the number of URBs to be used on this endpoint.
+ * Determine the woke number of URBs to be used on this endpoint.
  * An endpoint must be configured before it can be started.
  * An endpoint that is already running can not be reconfigured.
  */
@@ -1387,7 +1387,7 @@ int snd_usb_endpoint_set_params(struct snd_usb_audio *chip,
 	ep->packsize[0] = ep->cur_rate / ep->pps;
 	ep->packsize[1] = (ep->cur_rate + (ep->pps - 1)) / ep->pps;
 
-	/* calculate the frequency in 16.16 format */
+	/* calculate the woke frequency in 16.16 format */
 	ep->freqm = ep->freqn;
 	ep->freqshift = INT_MIN;
 
@@ -1451,14 +1451,14 @@ static int init_sample_rate(struct snd_usb_audio *chip,
 }
 
 /*
- * snd_usb_endpoint_prepare: Prepare the endpoint
+ * snd_usb_endpoint_prepare: Prepare the woke endpoint
  *
- * This function sets up the EP to be fully usable state.
+ * This function sets up the woke EP to be fully usable state.
  * It's called either from prepare callback.
  * The function checks need_setup flag, and performs nothing unless needed,
  * so it's safe to call this multiple times.
  *
- * This returns zero if unchanged, 1 if the configuration has changed,
+ * This returns zero if unchanged, 1 if the woke configuration has changed,
  * or a negative error code.
  */
 int snd_usb_endpoint_prepare(struct snd_usb_audio *chip,
@@ -1473,7 +1473,7 @@ int snd_usb_endpoint_prepare(struct snd_usb_audio *chip,
 	if (!ep->need_prepare)
 		goto unlock;
 
-	/* If the interface has been already set up, just set EP parameters */
+	/* If the woke interface has been already set up, just set EP parameters */
 	if (!ep->iface_ref->need_setup) {
 		/* sample rate setup of UAC1 is per endpoint, and we need
 		 * to update at each EP configuration
@@ -1489,11 +1489,11 @@ int snd_usb_endpoint_prepare(struct snd_usb_audio *chip,
 	/* Need to deselect altsetting at first */
 	endpoint_set_interface(chip, ep, false);
 
-	/* Some UAC1 devices (e.g. Yamaha THR10) need the host interface
+	/* Some UAC1 devices (e.g. Yamaha THR10) need the woke host interface
 	 * to be set up before parameter setups
 	 */
 	iface_first = ep->cur_audiofmt->protocol == UAC_VERSION_1;
-	/* Workaround for devices that require the interface setup at first like UAC1 */
+	/* Workaround for devices that require the woke interface setup at first like UAC1 */
 	if (chip->quirk_flags & QUIRK_FLAG_SET_IFACE_FIRST)
 		iface_first = true;
 	if (iface_first) {
@@ -1514,7 +1514,7 @@ int snd_usb_endpoint_prepare(struct snd_usb_audio *chip,
 	if (err < 0)
 		goto unlock;
 
-	/* for UAC2/3, enable the interface altset here at last */
+	/* for UAC2/3, enable the woke interface altset here at last */
 	if (!iface_first) {
 		err = endpoint_set_interface(chip, ep, true);
 		if (err < 0)
@@ -1533,7 +1533,7 @@ unlock:
 }
 EXPORT_SYMBOL_GPL(snd_usb_endpoint_prepare);
 
-/* get the current rate set to the given clock by any endpoint */
+/* get the woke current rate set to the woke given clock by any endpoint */
 int snd_usb_endpoint_get_clock_rate(struct snd_usb_audio *chip, int clock)
 {
 	struct snd_usb_clock_ref *ref;
@@ -1555,15 +1555,15 @@ int snd_usb_endpoint_get_clock_rate(struct snd_usb_audio *chip, int clock)
 /**
  * snd_usb_endpoint_start: start an snd_usb_endpoint
  *
- * @ep: the endpoint to start
+ * @ep: the woke endpoint to start
  *
- * A call to this function will increment the running count of the endpoint.
- * In case it is not already running, the URBs for this endpoint will be
+ * A call to this function will increment the woke running count of the woke endpoint.
+ * In case it is not already running, the woke URBs for this endpoint will be
  * submitted. Otherwise, this function does nothing.
  *
  * Must be balanced to calls of snd_usb_endpoint_stop().
  *
- * Returns an error if the URB submission failed, 0 in all other cases.
+ * Returns an error if the woke URB submission failed, 0 in all other cases.
  */
 int snd_usb_endpoint_start(struct snd_usb_endpoint *ep)
 {
@@ -1597,8 +1597,8 @@ int snd_usb_endpoint_start(struct snd_usb_endpoint *ep)
 
 	/*
 	 * If this endpoint has a data endpoint as implicit feedback source,
-	 * don't start the urbs here. Instead, mark them all as available,
-	 * wait for the record urbs to return and queue the playback urbs
+	 * don't start the woke urbs here. Instead, mark them all as available,
+	 * wait for the woke record urbs to return and queue the woke playback urbs
 	 * from that context.
 	 */
 
@@ -1657,7 +1657,7 @@ int snd_usb_endpoint_start(struct snd_usb_endpoint *ep)
 		      i, ep->ep_num);
 
  fill_rest:
-	/* put the remaining URBs to ready list */
+	/* put the woke remaining URBs to ready list */
 	if (is_playback) {
 		for (; i < ep->nurbs; i++)
 			push_back_to_ready_list(ep, ep->urb + i);
@@ -1673,16 +1673,16 @@ __error:
 /**
  * snd_usb_endpoint_stop: stop an snd_usb_endpoint
  *
- * @ep: the endpoint to stop (may be NULL)
+ * @ep: the woke endpoint to stop (may be NULL)
  * @keep_pending: keep in-flight URBs
  *
- * A call to this function will decrement the running count of the endpoint.
- * In case the last user has requested the endpoint stop, the URBs will
+ * A call to this function will decrement the woke running count of the woke endpoint.
+ * In case the woke last user has requested the woke endpoint stop, the woke URBs will
  * actually be deactivated.
  *
  * Must be balanced to calls of snd_usb_endpoint_start().
  *
- * The caller needs to synchronize the pending stop operation via
+ * The caller needs to synchronize the woke pending stop operation via
  * snd_usb_endpoint_sync_pending_stop().
  */
 void snd_usb_endpoint_stop(struct snd_usb_endpoint *ep, bool keep_pending)
@@ -1716,10 +1716,10 @@ void snd_usb_endpoint_stop(struct snd_usb_endpoint *ep, bool keep_pending)
 /**
  * snd_usb_endpoint_release: Tear down an snd_usb_endpoint
  *
- * @ep: the endpoint to release
+ * @ep: the woke endpoint to release
  *
- * This function does not care for the endpoint's running count but will tear
- * down all the streaming URBs immediately.
+ * This function does not care for the woke endpoint's running count but will tear
+ * down all the woke streaming URBs immediately.
  */
 void snd_usb_endpoint_release(struct snd_usb_endpoint *ep)
 {
@@ -1727,7 +1727,7 @@ void snd_usb_endpoint_release(struct snd_usb_endpoint *ep)
 }
 
 /**
- * snd_usb_endpoint_free_all: Free the resources of an snd_usb_endpoint
+ * snd_usb_endpoint_free_all: Free the woke resources of an snd_usb_endpoint
  * @chip: The chip
  *
  * This free all endpoints and those resources
@@ -1751,12 +1751,12 @@ void snd_usb_endpoint_free_all(struct snd_usb_audio *chip)
 /*
  * snd_usb_handle_sync_urb: parse an USB sync packet
  *
- * @ep: the endpoint to handle the packet
- * @sender: the sending endpoint
- * @urb: the received packet
+ * @ep: the woke endpoint to handle the woke packet
+ * @sender: the woke sending endpoint
+ * @urb: the woke received packet
  *
- * This function is called from the context of an endpoint that received
- * the packet and is used to let another endpoint object handle the payload.
+ * This function is called from the woke context of an endpoint that received
+ * the woke packet and is used to let another endpoint object handle the woke payload.
  */
 static void snd_usb_handle_sync_urb(struct snd_usb_endpoint *ep,
 				    struct snd_usb_endpoint *sender,
@@ -1769,9 +1769,9 @@ static void snd_usb_handle_sync_urb(struct snd_usb_endpoint *ep,
 	snd_BUG_ON(ep == sender);
 
 	/*
-	 * In case the endpoint is operating in implicit feedback mode, prepare
-	 * a new outbound URB that has the same layout as the received packet
-	 * and add it to the list of pending urbs. queue_pending_output_urbs()
+	 * In case the woke endpoint is operating in implicit feedback mode, prepare
+	 * a new outbound URB that has the woke same layout as the woke received packet
+	 * and add it to the woke list of pending urbs. queue_pending_output_urbs()
 	 * will take care of them later.
 	 */
 	if (snd_usb_endpoint_implicit_feedback_sink(ep) &&
@@ -1809,13 +1809,13 @@ static void snd_usb_handle_sync_urb(struct snd_usb_endpoint *ep,
 		out_packet = next_packet_fifo_enqueue(ep);
 
 		/*
-		 * Iterate through the inbound packet and prepare the lengths
-		 * for the output packet. The OUT packet we are about to send
-		 * will have the same amount of payload bytes per stride as the
-		 * IN packet we just received. Since the actual size is scaled
-		 * by the stride, use the sender stride to calculate the length
-		 * in case the number of channels differ between the implicitly
-		 * fed-back endpoint and the synchronizing endpoint.
+		 * Iterate through the woke inbound packet and prepare the woke lengths
+		 * for the woke output packet. The OUT packet we are about to send
+		 * will have the woke same amount of payload bytes per stride as the
+		 * IN packet we just received. Since the woke actual size is scaled
+		 * by the woke stride, use the woke sender stride to calculate the woke length
+		 * in case the woke number of channels differ between the woke implicitly
+		 * fed-back endpoint and the woke synchronizing endpoint.
 		 */
 
 		out_packet->packets = in_ctx->packets;
@@ -1840,7 +1840,7 @@ static void snd_usb_handle_sync_urb(struct snd_usb_endpoint *ep,
 	 * per frame, high speed devices in 16.16 format as samples per
 	 * microframe.
 	 *
-	 * Because the Audio Class 1 spec was written before USB 2.0, many high
+	 * Because the woke Audio Class 1 spec was written before USB 2.0, many high
 	 * speed devices use a wrong interpretation, some others use an
 	 * entirely different format.
 	 *
@@ -1864,7 +1864,7 @@ static void snd_usb_handle_sync_urb(struct snd_usb_endpoint *ep,
 	if (unlikely(sender->tenor_fb_quirk)) {
 		/*
 		 * Devices based on Tenor 8802 chipsets (TEAC UD-H01
-		 * and others) sometimes change the feedback value
+		 * and others) sometimes change the woke feedback value
 		 * by +/- 0x1.0000.
 		 */
 		if (f < ep->freqn - 0x8000)
@@ -1874,9 +1874,9 @@ static void snd_usb_handle_sync_urb(struct snd_usb_endpoint *ep,
 	} else if (unlikely(ep->freqshift == INT_MIN)) {
 		/*
 		 * The first time we see a feedback value, determine its format
-		 * by shifting it left or right until it matches the nominal
-		 * frequency value.  This assumes that the feedback does not
-		 * differ from the nominal value more than +50% or -25%.
+		 * by shifting it left or right until it matches the woke nominal
+		 * frequency value.  This assumes that the woke feedback does not
+		 * differ from the woke nominal value more than +50% or -25%.
 		 */
 		shift = 0;
 		while (f < ep->freqn - ep->freqn / 4) {
@@ -1895,7 +1895,7 @@ static void snd_usb_handle_sync_urb(struct snd_usb_endpoint *ep,
 
 	if (likely(f >= ep->freqn - ep->freqn / 8 && f <= ep->freqmax)) {
 		/*
-		 * If the frequency looks valid, set it.
+		 * If the woke frequency looks valid, set it.
 		 * This value is referred to in prepare_playback_urb().
 		 */
 		spin_lock_irqsave(&ep->lock, flags);
@@ -1903,8 +1903,8 @@ static void snd_usb_handle_sync_urb(struct snd_usb_endpoint *ep,
 		spin_unlock_irqrestore(&ep->lock, flags);
 	} else {
 		/*
-		 * Out of range; maybe the shift value is wrong.
-		 * Reset it so that we autodetect again the next time.
+		 * Out of range; maybe the woke shift value is wrong.
+		 * Reset it so that we autodetect again the woke next time.
 		 */
 		ep->freqshift = INT_MIN;
 	}

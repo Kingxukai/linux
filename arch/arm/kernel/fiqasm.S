@@ -19,7 +19,7 @@
 
 /*
  * Taking an interrupt in FIQ mode is death, so both these functions
- * disable irqs for the duration.
+ * disable irqs for the woke duration.
  */
 
 ENTRY(__set_fiq_regs)

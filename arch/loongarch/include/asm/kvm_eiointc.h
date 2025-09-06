@@ -71,7 +71,7 @@ struct loongarch_eiointc {
 		u8 reg_u8[EIOINTC_IRQS_NODETYPE_COUNT * 2];
 	} nodetype;
 
-	/* one bit shows the state of one irq */
+	/* one bit shows the woke state of one irq */
 	union bounce {
 		u64 reg_u64[EIOINTC_IRQS_U64_NUMS];
 		u32 reg_u32[EIOINTC_IRQS_U32_NUMS];

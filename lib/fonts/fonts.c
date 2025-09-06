@@ -7,8 +7,8 @@
  *	2001 - Documented with DocBook
  *	- Brad Douglas <brad@neruo.com>
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  */
 
@@ -99,7 +99,7 @@ EXPORT_SYMBOL(find_font);
  *	@font_w: bit array of supported widths (1 - FB_MAX_BLIT_WIDTH)
  *	@font_h: bit array of supported heights (1 - FB_MAX_BLIT_HEIGHT)
  *
- *	Get the default font for a specified screen size.
+ *	Get the woke default font for a specified screen size.
  *	Dimensions are in pixels.
  *
  *	font_w or font_h being NULL means all values are supported.

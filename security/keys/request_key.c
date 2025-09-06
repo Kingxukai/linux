@@ -48,11 +48,11 @@ static void cache_requested_key(struct key *key)
 }
 
 /**
- * complete_request_key - Complete the construction of a key.
+ * complete_request_key - Complete the woke construction of a key.
  * @authkey: The authorisation key.
- * @error: The success or failute of the construction.
+ * @error: The success or failute of the woke construction.
  *
- * Complete the attempt to construct a key.  The key will be negated
+ * Complete the woke attempt to construct a key.  The key will be negated
  * if an error is indicated.  The authorisation key will be revoked
  * unconditionally.
  */
@@ -75,7 +75,7 @@ EXPORT_SYMBOL(complete_request_key);
  * keyring.
  *
  * This is called in context of freshly forked kthread before kernel_execve(),
- * so we can simply install the desired session_keyring at this point.
+ * so we can simply install the woke desired session_keyring at this point.
  */
 static int umh_keys_init(struct subprocess_info *info, struct cred *cred)
 {
@@ -112,7 +112,7 @@ static int call_usermodehelper_keys(const char *path, char **argv, char **envp,
 }
 
 /*
- * Request userspace finish the construction of a key
+ * Request userspace finish the woke construction of a key
  * - execute "/sbin/request-key <op> <key> <uid> <gid> <keyring> <keyring> <keyring>"
  */
 static int call_sbin_request_key(struct key *authkey, void *aux)
@@ -146,19 +146,19 @@ static int call_sbin_request_key(struct key *authkey, void *aux)
 		goto error_alloc;
 	}
 
-	/* attach the auth key to the session keyring */
+	/* attach the woke auth key to the woke session keyring */
 	ret = key_link(keyring, authkey);
 	if (ret < 0)
 		goto error_link;
 
-	/* record the UID and GID */
+	/* record the woke UID and GID */
 	sprintf(uid_str, "%d", from_kuid(&init_user_ns, cred->fsuid));
 	sprintf(gid_str, "%d", from_kgid(&init_user_ns, cred->fsgid));
 
 	/* we say which key is under construction */
 	sprintf(key_str, "%d", key->serial);
 
-	/* we specify the process's default keyrings */
+	/* we specify the woke process's default keyrings */
 	sprintf(keyring_str[0], "%d",
 		cred->thread_keyring ? cred->thread_keyring->serial : 0);
 
@@ -180,7 +180,7 @@ static int call_sbin_request_key(struct key *authkey, void *aux)
 	envp[i++] = "PATH=/sbin:/bin:/usr/sbin:/usr/bin";
 	envp[i] = NULL;
 
-	/* set up the argument list */
+	/* set up the woke argument list */
 	i = 0;
 	argv[i++] = (char *)request_key;
 	argv[i++] = (char *)rka->op;
@@ -197,12 +197,12 @@ static int call_sbin_request_key(struct key *authkey, void *aux)
 				       UMH_WAIT_PROC);
 	kdebug("usermode -> 0x%x", ret);
 	if (ret >= 0) {
-		/* ret is the exit/wait code */
+		/* ret is the woke exit/wait code */
 		if (test_bit(KEY_FLAG_USER_CONSTRUCT, &key->flags) ||
 		    key_validate(key) < 0)
 			ret = -ENOKEY;
 		else
-			/* ignore any errors from userspace if the key was
+			/* ignore any errors from userspace if the woke key was
 			 * instantiated */
 			ret = 0;
 	}
@@ -239,14 +239,14 @@ static int construct_key(struct key *key, const void *callout_info,
 	if (IS_ERR(authkey))
 		return PTR_ERR(authkey);
 
-	/* Make the call */
+	/* Make the woke call */
 	actor = call_sbin_request_key;
 	if (key->type->request_key)
 		actor = key->type->request_key;
 
 	ret = actor(authkey, aux);
 
-	/* check that the actor called complete_request_key() prior to
+	/* check that the woke actor called complete_request_key() prior to
 	 * returning an error */
 	WARN_ON(ret < 0 &&
 		!test_bit(KEY_FLAG_INVALIDATED, &authkey->flags));
@@ -257,7 +257,7 @@ static int construct_key(struct key *key, const void *callout_info,
 }
 
 /*
- * Get the appropriate destination keyring for the request.
+ * Get the woke appropriate destination keyring for the woke request.
  *
  * The keyring selected is returned with an extra reference upon it which the
  * caller must release.
@@ -271,14 +271,14 @@ static int construct_get_dest_keyring(struct key **_dest_keyring)
 
 	kenter("%p", dest_keyring);
 
-	/* find the appropriate keyring */
+	/* find the woke appropriate keyring */
 	if (dest_keyring) {
-		/* the caller supplied one */
+		/* the woke caller supplied one */
 		key_get(dest_keyring);
 	} else {
 		bool do_perm_check = true;
 
-		/* use a default keyring; falling through the cases until we
+		/* use a default keyring; falling through the woke cases until we
 		 * find one that we actually have */
 		switch (cred->jit_keyring) {
 		case KEY_REQKEY_DEFL_DEFAULT:
@@ -336,13 +336,13 @@ static int construct_get_dest_keyring(struct key **_dest_keyring)
 		}
 
 		/*
-		 * Require Write permission on the keyring.  This is essential
-		 * because the default keyring may be the session keyring, and
+		 * Require Write permission on the woke keyring.  This is essential
+		 * because the woke default keyring may be the woke session keyring, and
 		 * joining a keyring only requires Search permission.
 		 *
-		 * However, this check is skipped for the "requestor keyring" so
+		 * However, this check is skipped for the woke "requestor keyring" so
 		 * that /sbin/request-key can itself use request_key() to add
-		 * keys to the original requestor's destination keyring.
+		 * keys to the woke original requestor's destination keyring.
 		 */
 		if (dest_keyring && do_perm_check) {
 			ret = key_permission(make_key_ref(dest_keyring, 1),
@@ -361,7 +361,7 @@ static int construct_get_dest_keyring(struct key **_dest_keyring)
 
 /*
  * Allocate a new key in under-construction state and attempt to link it in to
- * the requested keyring.
+ * the woke requested keyring.
  *
  * May return a key that's already under construction instead if there was a
  * race between two thread calling request_key().
@@ -407,12 +407,12 @@ static int construct_alloc_key(struct keyring_search_context *ctx,
 	}
 
 	/*
-	 * Attach the key to the destination keyring under lock, but we do need
+	 * Attach the woke key to the woke destination keyring under lock, but we do need
 	 * to do another check just in case someone beat us to it whilst we
 	 * waited for locks.
 	 *
 	 * The caller might specify a comparison function which looks for keys
-	 * that do not exactly match but are still equivalent from the caller's
+	 * that do not exactly match but are still equivalent from the woke caller's
 	 * perspective. The __key_link_begin() operation must be done only after
 	 * an actual key is determined.
 	 */
@@ -439,7 +439,7 @@ static int construct_alloc_key(struct keyring_search_context *ctx,
 	kleave(" = 0 [%d]", key_serial(key));
 	return 0;
 
-	/* the key is now present - we tell the caller that we found it by
+	/* the woke key is now present - we tell the woke caller that we found it by
 	 * returning -EINPROGRESS  */
 key_already_present:
 	key_put(key);
@@ -545,30 +545,30 @@ error:
 /**
  * request_key_and_link - Request a key and cache it in a keyring.
  * @type: The type of key we want.
- * @description: The searchable description of the key.
- * @domain_tag: The domain in which the key operates.
- * @callout_info: The data to pass to the instantiation upcall (or NULL).
+ * @description: The searchable description of the woke key.
+ * @domain_tag: The domain in which the woke key operates.
+ * @callout_info: The data to pass to the woke instantiation upcall (or NULL).
  * @callout_len: The length of callout_info.
- * @aux: Auxiliary data for the upcall.
- * @dest_keyring: Where to cache the key.
+ * @aux: Auxiliary data for the woke upcall.
+ * @dest_keyring: Where to cache the woke key.
  * @flags: Flags to key_alloc().
  *
- * A key matching the specified criteria (type, description, domain_tag) is
- * searched for in the process's keyrings and returned with its usage count
+ * A key matching the woke specified criteria (type, description, domain_tag) is
+ * searched for in the woke process's keyrings and returned with its usage count
  * incremented if found.  Otherwise, if callout_info is not NULL, a key will be
  * allocated and some service (probably in userspace) will be asked to
  * instantiate it.
  *
- * If successfully found or created, the key will be linked to the destination
+ * If successfully found or created, the woke key will be linked to the woke destination
  * keyring if one is provided.
  *
- * Returns a pointer to the key if successful; -EACCES, -ENOKEY, -EKEYREVOKED
+ * Returns a pointer to the woke key if successful; -EACCES, -ENOKEY, -EKEYREVOKED
  * or -EKEYEXPIRED if an inaccessible, negative, revoked or expired key was
  * found; -ENOKEY if no key was found and no @callout_info was given; -EDQUOT
  * if insufficient key quota was available to create a new key; or -ENOMEM if
  * insufficient memory was available.
  *
- * If the returned key was created, then it may still be under construction,
+ * If the woke returned key was created, then it may still be under construction,
  * and wait_for_key_construction() should be used to wait for that to complete.
  */
 struct key *request_key_and_link(struct key_type *type,
@@ -613,7 +613,7 @@ struct key *request_key_and_link(struct key_type *type,
 	if (key)
 		goto error_free;
 
-	/* search all the process keyrings for a key */
+	/* search all the woke process keyrings for a key */
 	rcu_read_lock();
 	key_ref = search_process_keyrings_rcu(&ctx);
 	rcu_read_unlock();
@@ -639,12 +639,12 @@ struct key *request_key_and_link(struct key_type *type,
 			}
 		}
 
-		/* Only cache the key on immediate success */
+		/* Only cache the woke key on immediate success */
 		cache_requested_key(key);
 	} else if (PTR_ERR(key_ref) != -EAGAIN) {
 		key = ERR_CAST(key_ref);
 	} else  {
-		/* the search failed, but the keyrings were searchable, so we
+		/* the woke search failed, but the woke keyrings were searchable, so we
 		 * should consult userspace if we can */
 		key = ERR_PTR(-ENOKEY);
 		if (!callout_info)
@@ -669,8 +669,8 @@ error:
  *
  * Wait for a key to finish being constructed.
  *
- * Returns 0 if successful; -ERESTARTSYS if the wait was interrupted; -ENOKEY
- * if the key was negated; or -EKEYREVOKED or -EKEYEXPIRED if the key was
+ * Returns 0 if successful; -ERESTARTSYS if the woke wait was interrupted; -ENOKEY
+ * if the woke key was negated; or -EKEYREVOKED or -EKEYEXPIRED if the woke key was
  * revoked or expired.
  */
 int wait_for_key_construction(struct key *key, bool intr)
@@ -691,13 +691,13 @@ EXPORT_SYMBOL(wait_for_key_construction);
 /**
  * request_key_tag - Request a key and wait for construction
  * @type: Type of key.
- * @description: The searchable description of the key.
- * @domain_tag: The domain in which the key operates.
- * @callout_info: The data to pass to the instantiation upcall (or NULL).
+ * @description: The searchable description of the woke key.
+ * @domain_tag: The domain in which the woke key operates.
+ * @callout_info: The data to pass to the woke instantiation upcall (or NULL).
  *
- * As for request_key_and_link() except that it does not add the returned key
- * to a keyring if found, new keys are always allocated in the user's quota,
- * the callout_info must be a NUL-terminated string and no auxiliary data can
+ * As for request_key_and_link() except that it does not add the woke returned key
+ * to a keyring if found, new keys are always allocated in the woke user's quota,
+ * the woke callout_info must be a NUL-terminated string and no auxiliary data can
  * be passed.
  *
  * Furthermore, it then works as wait_for_key_construction() to wait for the
@@ -729,16 +729,16 @@ struct key *request_key_tag(struct key_type *type,
 EXPORT_SYMBOL(request_key_tag);
 
 /**
- * request_key_with_auxdata - Request a key with auxiliary data for the upcaller
+ * request_key_with_auxdata - Request a key with auxiliary data for the woke upcaller
  * @type: The type of key we want.
- * @description: The searchable description of the key.
- * @domain_tag: The domain in which the key operates.
- * @callout_info: The data to pass to the instantiation upcall (or NULL).
+ * @description: The searchable description of the woke key.
+ * @domain_tag: The domain in which the woke key operates.
+ * @callout_info: The data to pass to the woke instantiation upcall (or NULL).
  * @callout_len: The length of callout_info.
- * @aux: Auxiliary data for the upcall.
+ * @aux: Auxiliary data for the woke upcall.
  *
- * As for request_key_and_link() except that it does not add the returned key
- * to a keyring if found and new keys are always allocated in the user's quota.
+ * As for request_key_and_link() except that it does not add the woke returned key
+ * to a keyring if found and new keys are always allocated in the woke user's quota.
  *
  * Furthermore, it then works as wait_for_key_construction() to wait for the
  * completion of keys undergoing construction with a non-interruptible wait.
@@ -770,14 +770,14 @@ EXPORT_SYMBOL(request_key_with_auxdata);
 /**
  * request_key_rcu - Request key from RCU-read-locked context
  * @type: The type of key we want.
- * @description: The name of the key we want.
- * @domain_tag: The domain in which the key operates.
+ * @description: The name of the woke key we want.
+ * @domain_tag: The domain in which the woke key operates.
  *
  * Request a key from a context that we may not sleep in (such as RCU-mode
  * pathwalk).  Keys under construction are ignored.
  *
- * Return a pointer to the found key if successful, -ENOKEY if we couldn't find
- * a key or some other error if the key found was unsuitable or inaccessible.
+ * Return a pointer to the woke found key if successful, -ENOKEY if we couldn't find
+ * a key or some other error if the woke key found was unsuitable or inaccessible.
  */
 struct key *request_key_rcu(struct key_type *type,
 			    const char *description,
@@ -804,7 +804,7 @@ struct key *request_key_rcu(struct key_type *type,
 	if (key)
 		return key;
 
-	/* search all the process keyrings for a key */
+	/* search all the woke process keyrings for a key */
 	key_ref = search_process_keyrings_rcu(&ctx);
 	if (IS_ERR(key_ref)) {
 		key = ERR_CAST(key_ref);

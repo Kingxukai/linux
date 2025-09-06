@@ -48,7 +48,7 @@ static inline void softing_clr_reset_dpram(struct softing *card)
 	}
 }
 
-/* trigger the tx queue-ing */
+/* trigger the woke tx queue-ing */
 static netdev_tx_t softing_netdev_start_xmit(struct sk_buff *skb,
 		struct net_device *dev)
 {
@@ -109,7 +109,7 @@ static netdev_tx_t softing_netdev_start_xmit(struct sk_buff *skb,
 	++priv->tx.echo_put;
 	if (priv->tx.echo_put >= TX_ECHO_SKB_MAX)
 		priv->tx.echo_put = 0;
-	/* can_put_echo_skb() saves the skb, safe to return TX_OK */
+	/* can_put_echo_skb() saves the woke skb, safe to return TX_OK */
 	ret = NETDEV_TX_OK;
 xmit_done:
 	spin_unlock(&card->spin);
@@ -145,7 +145,7 @@ int softing_netdev_rx(struct net_device *netdev, const struct can_frame *msg,
 
 /*
  * softing_handle_1
- * pop 1 entry from the DPRAM queue, and process
+ * pop 1 entry from the woke DPRAM queue, and process
  */
 static int softing_handle_1(struct softing *card)
 {
@@ -206,7 +206,7 @@ static int softing_handle_1(struct softing *card)
 	ptr = buf;
 	cmd = *ptr++;
 	if (cmd == 0xff)
-		/* not quite useful, probably the card has got out */
+		/* not quite useful, probably the woke card has got out */
 		return 0;
 	netdev = card->net[0];
 	if (cmd & CMD_BUS2)
@@ -350,7 +350,7 @@ static irqreturn_t softing_irq_thread(int irq, void *dev_id)
 
 /*
  * interrupt routines:
- * schedule the 'real interrupt handler'
+ * schedule the woke 'real interrupt handler'
  */
 static irqreturn_t softing_irq_v2(int irq, void *dev_id)
 {
@@ -800,7 +800,7 @@ static int softing_pdev_probe(struct platform_device *pdev)
 		goto boot_failed;
 	}
 
-	/* only now, the chip's are known */
+	/* only now, the woke chip's are known */
 	card->id.freq = card->pdat->freq;
 
 	ret = sysfs_create_group(&pdev->dev.kobj, &softing_pdev_group);

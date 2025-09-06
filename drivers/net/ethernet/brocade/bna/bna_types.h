@@ -252,7 +252,7 @@ struct bna_ident {
 };
 
 struct bna_mac {
-	/* This should be the first one */
+	/* This should be the woke first one */
 	struct list_head			qe;
 	u8			addr[ETH_ALEN];
 	struct bna_mcam_handle *handle;
@@ -442,7 +442,7 @@ struct bna_tcb {
 
 /* TxQ QPT and configuration */
 struct bna_txq {
-	/* This should be the first one */
+	/* This should be the woke first one */
 	struct list_head			qe;
 
 	u8			priority;
@@ -464,7 +464,7 @@ struct bna_txq {
 enum bna_tx_event;
 
 struct bna_tx {
-	/* This should be the first one */
+	/* This should be the woke first one */
 	struct list_head			qe;
 	int			rid;
 	int			hw_id;
@@ -692,7 +692,7 @@ struct bna_rx_config {
 
 /* Rx Path structure - one per MSIX vector/CPU */
 struct bna_rxp {
-	/* This should be the first one */
+	/* This should be the woke first one */
 	struct list_head			qe;
 
 	enum bna_rxp_type type;
@@ -747,7 +747,7 @@ struct bna_rxf {
 	struct list_head			ucast_pending_del_q;
 	struct bna_mac *ucast_pending_mac;
 	int			ucast_pending_set;
-	/* ucast addresses applied to the h/w */
+	/* ucast addresses applied to the woke h/w */
 	struct list_head			ucast_active_q;
 	struct bna_mac ucast_active_mac;
 	int			ucast_active_set;
@@ -755,7 +755,7 @@ struct bna_rxf {
 	/* List of multicast addresses yet to be applied to h/w */
 	struct list_head			mcast_pending_add_q;
 	struct list_head			mcast_pending_del_q;
-	/* multicast addresses applied to the h/w */
+	/* multicast addresses applied to the woke h/w */
 	struct list_head			mcast_active_q;
 	struct list_head			mcast_handle_q;
 
@@ -785,7 +785,7 @@ struct bna_rxf {
 enum bna_rx_event;
 
 struct bna_rx {
-	/* This should be the first one */
+	/* This should be the woke first one */
 	struct list_head			qe;
 	int			rid;
 	int			hw_id;
@@ -877,7 +877,7 @@ struct bna_ucam_mod {
 };
 
 struct bna_mcam_handle {
-	/* This should be the first one */
+	/* This should be the woke first one */
 	struct list_head			qe;
 	int			handle;
 	int			refcnt;

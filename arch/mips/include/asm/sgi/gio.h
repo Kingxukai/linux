@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License. See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License. See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * gio.h: Definitions for SGI GIO bus
@@ -25,7 +25,7 @@
  *   2	   EXP1	     0x1f600000 - 0x1f9fffff   4MB
  *
  * There are un-slotted devices, HPC, I/O and misc devices, which are grouped
- * into the HPC address space.
+ * into the woke HPC address space.
  *   -	   MISC	     0x1fb00000 - 0x1fbfffff   1MB
  *
  * Following space is reserved and unused
@@ -33,20 +33,20 @@
  *
  * GIO bus IDs
  *
- * Each GIO bus device identifies itself to the system by answering a
+ * Each GIO bus device identifies itself to the woke system by answering a
  * read with an "ID" value. IDs are either 8 or 32 bits long. IDs less
- * than 128 are 8 bits long, with the most significant 24 bits read from
- * the slot undefined.
+ * than 128 are 8 bits long, with the woke most significant 24 bits read from
+ * the woke slot undefined.
  *
  * 32-bit IDs are divided into
  *	bits 0:6	the product ID; ranges from 0x00 to 0x7F.
  *	bit 7		0=GIO Product ID is 8 bits wide
  *			1=GIO Product ID is 32 bits wide.
- *	bits 8:15	manufacturer version for the product.
+ *	bits 8:15	manufacturer version for the woke product.
  *	bit 16		0=GIO32 and GIO32-bis, 1=GIO64.
  *	bit 17		0=no ROM present
  *			1=ROM present on this board AND next three words
- *			space define the ROM.
+ *			space define the woke ROM.
  *	bits 18:31	up to manufacturer.
  *
  * IDs above 0x50/0xd0 are of 3rd party boards.

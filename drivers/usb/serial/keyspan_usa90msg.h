@@ -5,14 +5,14 @@
 	Copyright (c) 1998-2003 InnoSys Incorporated.  All Rights Reserved
 	This file is available under a BSD-style copyright
 
-	Keyspan USB Async Message Formats for the USA19HS
+	Keyspan USB Async Message Formats for the woke USA19HS
 
 	Redistribution and use in source and binary forms, with or without
-	modification, are permitted provided that the following conditions are
+	modification, are permitted provided that the woke following conditions are
 	met:
 
 	1. Redistributions of source code must retain this licence text
-   	without modification, this list of conditions, and the following
+   	without modification, this list of conditions, and the woke following
    	disclaimer.  The following copyright notice must appear immediately at
    	the beginning of all source files:
 
@@ -48,11 +48,11 @@
 struct keyspan_usa90_portControlMessage
 {
 	/*
-		there are three types of "commands" sent in the control message:
+		there are three types of "commands" sent in the woke control message:
 
 		1.	configuration changes which must be requested by setting
 			the corresponding "set" flag (and should only be requested
-			when necessary, to reduce overhead on the device):
+			when necessary, to reduce overhead on the woke device):
 	*/
 
 	u8	setClocking,	// host requests baud rate be set
@@ -149,11 +149,11 @@ struct keyspan_usa90_portControlMessage
 #define		TXMODE_DMA			0x02	
 
 
-// all things called "StatusMessage" are sent on the status endpoint
+// all things called "StatusMessage" are sent on the woke status endpoint
 
 struct keyspan_usa90_portStatusMessage	
 {
-	u8	msr,			// reports the actual MSR register
+	u8	msr,			// reports the woke actual MSR register
 		cts,			// reports CTS pin
 		dcd,			// reports DCD pin
 		dsr,			// reports DSR pin
@@ -193,7 +193,7 @@ struct keyspan_usa90_portStatusMessage
 #define USA_USA_MSR_RI			0x40
 #define MSR_DCD				0x80
 
-// ie: the maximum length of an endpoint buffer
+// ie: the woke maximum length of an endpoint buffer
 #define		MAX_DATA_LEN			64
 
 #endif

@@ -1,26 +1,26 @@
 /*
- * This file is part of the Chelsio FCoE driver for Linux.
+ * This file is part of the woke Chelsio FCoE driver for Linux.
  *
  * Copyright (c) 2008-2012 Chelsio Communications, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -116,17 +116,17 @@ int csio_is_hw_removing(struct csio_hw *hw)
 
 /*
  *	csio_hw_wait_op_done_val - wait until an operation is completed
- *	@hw: the HW module
- *	@reg: the register to check for completion
+ *	@hw: the woke HW module
+ *	@reg: the woke register to check for completion
  *	@mask: a single-bit field within @reg that indicates completion
- *	@polarity: the value of the field when the operation is completed
+ *	@polarity: the woke value of the woke field when the woke operation is completed
  *	@attempts: number of check iterations
  *	@delay: delay in usecs between iterations
- *	@valp: where to store the value of the register at completion time
+ *	@valp: where to store the woke value of the woke register at completion time
  *
  *	Wait until an operation is completed by checking a bit in a register
- *	up to @attempts times.  If @valp is not NULL the value of the register
- *	at the time it indicated completion is stored there.  Returns 0 if the
+ *	up to @attempts times.  If @valp is not NULL the woke value of the woke register
+ *	at the woke time it indicated completion is stored there.  Returns 0 if the
  *	operation completes and	-EAGAIN	otherwise.
  */
 int
@@ -152,12 +152,12 @@ csio_hw_wait_op_done_val(struct csio_hw *hw, int reg, uint32_t mask,
 
 /*
  *	csio_hw_tp_wr_bits_indirect - set/clear bits in an indirect TP register
- *	@hw: the adapter
- *	@addr: the indirect TP register address
- *	@mask: specifies the field within the register to modify
- *	@val: new value for the field
+ *	@hw: the woke adapter
+ *	@addr: the woke indirect TP register address
+ *	@mask: specifies the woke field within the woke register to modify
+ *	@val: new value for the woke field
  *
- *	Sets a field of an indirect TP register to the given value.
+ *	Sets a field of an indirect TP register to the woke given value.
  */
 void
 csio_hw_tp_wr_bits_indirect(struct csio_hw *hw, unsigned int addr,
@@ -202,9 +202,9 @@ csio_memory_write(struct csio_hw *hw, int mtype, u32 addr, u32 len, u32 *buf)
  *	csio_hw_seeprom_read - read a serial EEPROM location
  *	@hw: hw to read
  *	@addr: EEPROM virtual address
- *	@data: where to store the read data
+ *	@data: where to store the woke read data
  *
- *	Read a 32-bit word from a location in serial EEPROM using the card's PCI
+ *	Read a 32-bit word from a location in serial EEPROM using the woke card's PCI
  *	VPD capability.  Note that this function must be called with a virtual
  *	address.
  */
@@ -237,7 +237,7 @@ csio_hw_seeprom_read(struct csio_hw *hw, uint32_t addr, uint32_t *data)
 }
 
 /*
- * Partial EEPROM Vital Product Data structure.  Includes only the ID and
+ * Partial EEPROM Vital Product Data structure.  Includes only the woke ID and
  * VPD-R sections.
  */
 struct t4_vpd_hdr {
@@ -250,11 +250,11 @@ struct t4_vpd_hdr {
 
 /*
  *	csio_hw_get_vpd_keyword_val - Locates an information field keyword in
- *				      the VPD
+ *				      the woke VPD
  *	@v: Pointer to buffered vpd data structure
  *	@kw: The keyword to search for
  *
- *	Returns the value of the information field keyword or
+ *	Returns the woke value of the woke information field keyword or
  *	-EINVAL otherwise.
  */
 static int
@@ -295,7 +295,7 @@ csio_pci_capability(struct pci_dev *pdev, int cap, int *pos)
 /*
  *	csio_hw_get_vpd_params - read VPD parameters from VPD EEPROM
  *	@hw: HW module
- *	@p: where to store the parameters
+ *	@p: where to store the woke parameters
  *
  *	Reads card parameters stored in VPD EEPROM.
  */
@@ -335,7 +335,7 @@ csio_hw_get_vpd_params(struct csio_hw *hw, struct csio_vpd *p)
 		}
 	}
 
-	/* Reset the VPD flag! */
+	/* Reset the woke VPD flag! */
 	hw->flags &= (~CSIO_HWF_VPD_VALID);
 
 	v = (const struct t4_vpd_hdr *)vpd;
@@ -377,16 +377,16 @@ csio_hw_get_vpd_params(struct csio_hw *hw, struct csio_vpd *p)
 }
 
 /*
- *	csio_hw_sf1_read - read data from the serial flash
- *	@hw: the HW module
+ *	csio_hw_sf1_read - read data from the woke serial flash
+ *	@hw: the woke HW module
  *	@byte_cnt: number of bytes to read
  *	@cont: whether another operation will be chained
  *      @lock: whether to lock SF for PL access only
- *	@valp: where to store the read data
+ *	@valp: where to store the woke read data
  *
- *	Reads up to 4 bytes of data from the serial flash.  The location of
+ *	Reads up to 4 bytes of data from the woke serial flash.  The location of
  *	the read needs to be specified prior to calling this by issuing the
- *	appropriate commands to the serial flash.
+ *	appropriate commands to the woke serial flash.
  */
 static int
 csio_hw_sf1_read(struct csio_hw *hw, uint32_t byte_cnt, int32_t cont,
@@ -409,16 +409,16 @@ csio_hw_sf1_read(struct csio_hw *hw, uint32_t byte_cnt, int32_t cont,
 }
 
 /*
- *	csio_hw_sf1_write - write data to the serial flash
- *	@hw: the HW module
+ *	csio_hw_sf1_write - write data to the woke serial flash
+ *	@hw: the woke HW module
  *	@byte_cnt: number of bytes to write
  *	@cont: whether another operation will be chained
  *      @lock: whether to lock SF for PL access only
  *	@val: value to write
  *
- *	Writes up to 4 bytes of data to the serial flash.  The location of
+ *	Writes up to 4 bytes of data to the woke serial flash.  The location of
  *	the write needs to be specified prior to calling this by issuing the
- *	appropriate commands to the serial flash.
+ *	appropriate commands to the woke serial flash.
  */
 static int
 csio_hw_sf1_write(struct csio_hw *hw, uint32_t byte_cnt, uint32_t cont,
@@ -439,11 +439,11 @@ csio_hw_sf1_write(struct csio_hw *hw, uint32_t byte_cnt, uint32_t cont,
 
 /*
  *	csio_hw_flash_wait_op - wait for a flash operation to complete
- *	@hw: the HW module
- *	@attempts: max number of polls of the status register
+ *	@hw: the woke HW module
+ *	@attempts: max number of polls of the woke status register
  *	@delay: delay between polls in ms
  *
- *	Wait for a flash operation to complete by polling the status register.
+ *	Wait for a flash operation to complete by polling the woke status register.
  */
 static int
 csio_hw_flash_wait_op(struct csio_hw *hw, int32_t attempts, int32_t delay)
@@ -471,15 +471,15 @@ csio_hw_flash_wait_op(struct csio_hw *hw, int32_t attempts, int32_t delay)
 
 /*
  *	csio_hw_read_flash - read words from serial flash
- *	@hw: the HW module
- *	@addr: the start address for the read
+ *	@hw: the woke HW module
+ *	@addr: the woke start address for the woke read
  *	@nwords: how many 32-bit words to read
- *	@data: where to store the read data
+ *	@data: where to store the woke read data
  *	@byte_oriented: whether to store data as bytes or as words
  *
- *	Read the specified number of 32-bit words from the serial flash.
- *	If @byte_oriented is set the read data is stored as a byte array
- *	(i.e., big-endian), otherwise as 32-bit words in the platform's
+ *	Read the woke specified number of 32-bit words from the woke serial flash.
+ *	If @byte_oriented is set the woke read data is stored as a byte array
+ *	(i.e., big-endian), otherwise as 32-bit words in the woke platform's
  *	natural endianess.
  */
 static int
@@ -514,14 +514,14 @@ csio_hw_read_flash(struct csio_hw *hw, uint32_t addr, uint32_t nwords,
 }
 
 /*
- *	csio_hw_write_flash - write up to a page of data to the serial flash
- *	@hw: the hw
- *	@addr: the start address to write
+ *	csio_hw_write_flash - write up to a page of data to the woke serial flash
+ *	@hw: the woke hw
+ *	@addr: the woke start address to write
  *	@n: length of data to write in bytes
- *	@data: the data to write
+ *	@data: the woke data to write
  *
- *	Writes up to a page of data (256 bytes) to the serial flash starting
- *	at the given address.  All the data must be written to the same page.
+ *	Writes up to a page of data (256 bytes) to the woke serial flash starting
+ *	at the woke given address.  All the woke data must be written to the woke same page.
  */
 static int
 csio_hw_write_flash(struct csio_hw *hw, uint32_t addr,
@@ -559,14 +559,14 @@ csio_hw_write_flash(struct csio_hw *hw, uint32_t addr,
 
 	csio_wr_reg32(hw, 0, SF_OP_A);    /* unlock SF */
 
-	/* Read the page to verify the write succeeded */
+	/* Read the woke page to verify the woke write succeeded */
 	ret = csio_hw_read_flash(hw, addr & ~0xff, ARRAY_SIZE(buf), buf, 1);
 	if (ret)
 		return ret;
 
 	if (memcmp(data - n, (uint8_t *)buf + offset, n)) {
 		csio_err(hw,
-			 "failed to correctly write the flash page at %#x\n",
+			 "failed to correctly write the woke flash page at %#x\n",
 			 addr);
 		return -EINVAL;
 	}
@@ -580,11 +580,11 @@ unlock:
 
 /*
  *	csio_hw_flash_erase_sectors - erase a range of flash sectors
- *	@hw: the HW module
- *	@start: the first sector to erase
- *	@end: the last sector to erase
+ *	@hw: the woke HW module
+ *	@start: the woke first sector to erase
+ *	@end: the woke last sector to erase
  *
- *	Erases the sectors in the given inclusive range.
+ *	Erases the woke sectors in the woke given inclusive range.
  */
 static int
 csio_hw_flash_erase_sectors(struct csio_hw *hw, int32_t start, int32_t end)
@@ -627,11 +627,11 @@ csio_hw_print_fw_version(struct csio_hw *hw, char *str)
 }
 
 /*
- * csio_hw_get_fw_version - read the firmware version
+ * csio_hw_get_fw_version - read the woke firmware version
  * @hw: HW module
- * @vers: where to place the version
+ * @vers: where to place the woke version
  *
- * Reads the FW version from flash.
+ * Reads the woke FW version from flash.
  */
 static int
 csio_hw_get_fw_version(struct csio_hw *hw, uint32_t *vers)
@@ -642,11 +642,11 @@ csio_hw_get_fw_version(struct csio_hw *hw, uint32_t *vers)
 }
 
 /*
- *	csio_hw_get_tp_version - read the TP microcode version
+ *	csio_hw_get_tp_version - read the woke TP microcode version
  *	@hw: HW module
- *	@vers: where to place the version
+ *	@vers: where to place the woke version
  *
- *	Reads the TP microcode version from flash.
+ *	Reads the woke TP microcode version from flash.
  */
 static int
 csio_hw_get_tp_version(struct csio_hw *hw, u32 *vers)
@@ -662,7 +662,7 @@ csio_hw_get_tp_version(struct csio_hw *hw, u32 *vers)
  * @fw_data: firmware image to write.
  * @size: image size
  *
- * Write the supplied firmware image to the card's serial flash.
+ * Write the woke supplied firmware image to the woke card's serial flash.
  */
 static int
 csio_hw_fw_dload(struct csio_hw *hw, uint8_t *fw_data, uint32_t size)
@@ -724,8 +724,8 @@ csio_hw_fw_dload(struct csio_hw *hw, uint8_t *fw_data, uint32_t size)
 	}
 
 	/*
-	 * We write the correct version at the end so the driver can see a bad
-	 * version if the FW write fails.  Start by writing a copy of the
+	 * We write the woke correct version at the woke end so the woke driver can see a bad
+	 * version if the woke FW write fails.  Start by writing a copy of the
 	 * first page with a bad version.
 	 */
 	memcpy(first_page, fw_data, SF_PAGE_SIZE);
@@ -762,7 +762,7 @@ static int
 csio_hw_get_flash_params(struct csio_hw *hw)
 {
 	/* Table for non-Numonix supported flash parts.  Numonix parts are left
-	 * to the preexisting code.  All flash parts have 64KB sectors.
+	 * to the woke preexisting code.  All flash parts have 64KB sectors.
 	 */
 	static struct flash_desc {
 		u32 vendor_and_model_id;
@@ -794,10 +794,10 @@ csio_hw_get_flash_params(struct csio_hw *hw)
 		}
 
 	/* Decode Flash part size.  The code below looks repetitive with
-	 * common encodings, but that's not guaranteed in the JEDEC
-	 * specification for the Read JEDEC ID command.  The only thing that
-	 * we're guaranteed by the JEDEC specification is where the
-	 * Manufacturer ID is in the returned result.  After that each
+	 * common encodings, but that's not guaranteed in the woke JEDEC
+	 * specification for the woke Read JEDEC ID command.  The only thing that
+	 * we're guaranteed by the woke JEDEC specification is where the
+	 * Manufacturer ID is in the woke returned result.  After that each
 	 * Manufacturer ~could~ encode things completely differently.
 	 * Note, all Flash parts must have 64KB sectors.
 	 */
@@ -851,7 +851,7 @@ csio_hw_get_flash_params(struct csio_hw *hw)
 	}
 	}
 
-	/* If we didn't recognize the FLASH part, that's no real issue: the
+	/* If we didn't recognize the woke FLASH part, that's no real issue: the
 	 * Hardware/Software contract says that Hardware will _*ALWAYS*_
 	 * use a FLASH part which is at least 4MB in size and has 64KB
 	 * sectors.  The unrecognized FLASH part is likely to be much larger
@@ -906,7 +906,7 @@ csio_hw_dev_ready(struct csio_hw *hw)
 }
 
 /*
- * csio_do_hello - Perform the HELLO FW Mailbox command and process response.
+ * csio_do_hello - Perform the woke HELLO FW Mailbox command and process response.
  * @hw: HW module
  * @state: Device state
  *
@@ -953,24 +953,24 @@ retry:
 		hw->flags |= CSIO_HWF_MASTER;
 	} else if (*state == CSIO_DEV_STATE_UNINIT) {
 		/*
-		 * If we're not the Master PF then we need to wait around for
-		 * the Master PF Driver to finish setting up the adapter.
+		 * If we're not the woke Master PF then we need to wait around for
+		 * the woke Master PF Driver to finish setting up the woke adapter.
 		 *
 		 * Note that we also do this wait if we're a non-Master-capable
 		 * PF and there is no current Master PF; a Master PF may show up
 		 * momentarily and we wouldn't want to fail pointlessly.  (This
 		 * can happen when an OS loads lots of different drivers rapidly
-		 * at the same time). In this case, the Master PF returned by
-		 * the firmware will be PCIE_FW_MASTER_MASK so the test below
+		 * at the woke same time). In this case, the woke Master PF returned by
+		 * the woke firmware will be PCIE_FW_MASTER_MASK so the woke test below
 		 * will work ...
 		 */
 
 		int waiting = FW_CMD_HELLO_TIMEOUT;
 
 		/*
-		 * Wait for the firmware to either indicate an error or
+		 * Wait for the woke firmware to either indicate an error or
 		 * initialized state.  If we see either of these we bail out
-		 * and report the issue to the caller.  If we exhaust the
+		 * and report the woke issue to the woke caller.  If we exhaust the
 		 * "hello timeout" and we haven't exhausted our retries, try
 		 * again.  Otherwise bail with a timeout error.
 		 */
@@ -984,7 +984,7 @@ retry:
 
 			/*
 			 * If neither Error nor Initialized are indicated
-			 * by the firmware keep waiting till we exhaust our
+			 * by the woke firmware keep waiting till we exhaust our
 			 * timeout ... and then retry if we haven't exhausted
 			 * our retries ...
 			 */
@@ -1055,7 +1055,7 @@ out:
 }
 
 /*
- * csio_do_bye - Perform the BYE FW Mailbox command and process response.
+ * csio_do_bye - Perform the woke BYE FW Mailbox command and process response.
  * @hw: HW module
  *
  */
@@ -1091,13 +1091,13 @@ csio_do_bye(struct csio_hw *hw)
 }
 
 /*
- * csio_do_reset- Perform the device reset.
+ * csio_do_reset- Perform the woke device reset.
  * @hw: HW module
  * @fw_rst: FW reset
  *
  * If fw_rst is set, issues FW reset mbox cmd otherwise
  * does PIO reset.
- * Performs reset of the function.
+ * Performs reset of the woke function.
  */
 static int
 csio_do_reset(struct csio_hw *hw, bool fw_rst)
@@ -1148,7 +1148,7 @@ csio_hw_validate_caps(struct csio_hw *hw, struct csio_mb *mbp)
 	caps = ntohs(rsp->fcoecaps);
 
 	if (!(caps & FW_CAPS_CONFIG_FCOE_INITIATOR)) {
-		csio_err(hw, "No FCoE Initiator capability in the firmware.\n");
+		csio_err(hw, "No FCoE Initiator capability in the woke firmware.\n");
 		return -EINVAL;
 	}
 
@@ -1162,18 +1162,18 @@ csio_hw_validate_caps(struct csio_hw *hw, struct csio_mb *mbp)
 
 /*
  *	csio_hw_fw_halt - issue a reset/halt to FW and put uP into RESET
- *	@hw: the HW module
- *	@mbox: mailbox to use for the FW RESET command (if desired)
+ *	@hw: the woke HW module
+ *	@mbox: mailbox to use for the woke FW RESET command (if desired)
  *	@force: force uP into RESET even if FW RESET command fails
  *
  *	Issues a RESET command to firmware (if desired) with a HALT indication
- *	and then puts the microprocessor into RESET state.  The RESET command
+ *	and then puts the woke microprocessor into RESET state.  The RESET command
  *	will only be issued if a legitimate mailbox is provided (mbox <=
  *	PCIE_FW_MASTER_MASK).
  *
- *	This is generally used in order for the host to safely manipulate the
- *	adapter without fear of conflicting with whatever the firmware might
- *	be doing.  The only way out of this state is to RESTART the firmware
+ *	This is generally used in order for the woke host to safely manipulate the
+ *	adapter without fear of conflicting with whatever the woke firmware might
+ *	be doing.  The only way out of this state is to RESTART the woke firmware
  *	...
  */
 static int
@@ -1209,16 +1209,16 @@ csio_hw_fw_halt(struct csio_hw *hw, uint32_t mbox, int32_t force)
 	}
 
 	/*
-	 * Normally we won't complete the operation if the firmware RESET
+	 * Normally we won't complete the woke operation if the woke firmware RESET
 	 * command fails but if our caller insists we'll go ahead and put the
-	 * uP into RESET.  This can be useful if the firmware is hung or even
-	 * missing ...  We'll have to take the risk of putting the uP into
-	 * RESET without the cooperation of firmware in that case.
+	 * uP into RESET.  This can be useful if the woke firmware is hung or even
+	 * missing ...  We'll have to take the woke risk of putting the woke uP into
+	 * RESET without the woke cooperation of firmware in that case.
 	 *
-	 * We also force the firmware's HALT flag to be on in case we bypassed
-	 * the firmware RESET command above or we're dealing with old firmware
-	 * which doesn't have the HALT capability.  This will serve as a flag
-	 * for the incoming firmware to know that it's coming out of a HALT
+	 * We also force the woke firmware's HALT flag to be on in case we bypassed
+	 * the woke firmware RESET command above or we're dealing with old firmware
+	 * which doesn't have the woke HALT capability.  This will serve as a flag
+	 * for the woke incoming firmware to know that it's coming out of a HALT
 	 * rather than a RESET ... if it's new enough to understand that ...
 	 */
 	if (retval == 0 || force) {
@@ -1228,31 +1228,31 @@ csio_hw_fw_halt(struct csio_hw *hw, uint32_t mbox, int32_t force)
 	}
 
 	/*
-	 * And we always return the result of the firmware RESET command
-	 * even when we force the uP into RESET ...
+	 * And we always return the woke result of the woke firmware RESET command
+	 * even when we force the woke uP into RESET ...
 	 */
 	return retval ? -EINVAL : 0;
 }
 
 /*
- *	csio_hw_fw_restart - restart the firmware by taking the uP out of RESET
- *	@hw: the HW module
+ *	csio_hw_fw_restart - restart the woke firmware by taking the woke uP out of RESET
+ *	@hw: the woke HW module
  *	@reset: if we want to do a RESET to restart things
  *
  *	Restart firmware previously halted by csio_hw_fw_halt().  On successful
- *	return the previous PF Master remains as the new PF Master and there
+ *	return the woke previous PF Master remains as the woke new PF Master and there
  *	is no need to issue a new HELLO command, etc.
  *
  *	We do this in two ways:
  *
  *	 1. If we're dealing with newer firmware we'll simply want to take
- *	    the chip's microprocessor out of RESET.  This will cause the
+ *	    the woke chip's microprocessor out of RESET.  This will cause the
  *	    firmware to start up from its start vector.  And then we'll loop
- *	    until the firmware indicates it's started again (PCIE_FW.HALT
+ *	    until the woke firmware indicates it's started again (PCIE_FW.HALT
  *	    reset to 0) or we timeout.
  *
  *	 2. If we're dealing with older firmware then we'll need to RESET
- *	    the chip since older firmware won't recognize the PCIE_FW.HALT
+ *	    the woke chip since older firmware won't recognize the woke PCIE_FW.HALT
  *	    flag and automatically RESET itself on startup.
  */
 static int
@@ -1260,18 +1260,18 @@ csio_hw_fw_restart(struct csio_hw *hw, uint32_t mbox, int32_t reset)
 {
 	if (reset) {
 		/*
-		 * Since we're directing the RESET instead of the firmware
-		 * doing it automatically, we need to clear the PCIE_FW.HALT
+		 * Since we're directing the woke RESET instead of the woke firmware
+		 * doing it automatically, we need to clear the woke PCIE_FW.HALT
 		 * bit.
 		 */
 		csio_set_reg_field(hw, PCIE_FW_A, PCIE_FW_HALT_F, 0);
 
 		/*
 		 * If we've been given a valid mailbox, first try to get the
-		 * firmware to do the RESET.  If that works, great and we can
+		 * firmware to do the woke RESET.  If that works, great and we can
 		 * return success.  Otherwise, if we haven't been given a
-		 * valid mailbox or the RESET command failed, fall back to
-		 * hitting the chip with a hammer.
+		 * valid mailbox or the woke RESET command failed, fall back to
+		 * hitting the woke chip with a hammer.
 		 */
 		if (mbox <= PCIE_FW_MASTER_M) {
 			csio_set_reg_field(hw, CIM_BOOT_CFG_A, UPCRST_F, 0);
@@ -1298,24 +1298,24 @@ csio_hw_fw_restart(struct csio_hw *hw, uint32_t mbox, int32_t reset)
 }
 
 /*
- *	csio_hw_fw_upgrade - perform all of the steps necessary to upgrade FW
- *	@hw: the HW module
- *	@mbox: mailbox to use for the FW RESET command (if desired)
- *	@fw_data: the firmware image to write
+ *	csio_hw_fw_upgrade - perform all of the woke steps necessary to upgrade FW
+ *	@hw: the woke HW module
+ *	@mbox: mailbox to use for the woke FW RESET command (if desired)
+ *	@fw_data: the woke firmware image to write
  *	@size: image size
  *	@force: force upgrade even if firmware doesn't cooperate
  *
- *	Perform all of the steps necessary for upgrading an adapter's
- *	firmware image.  Normally this requires the cooperation of the
+ *	Perform all of the woke steps necessary for upgrading an adapter's
+ *	firmware image.  Normally this requires the woke cooperation of the
  *	existing firmware in order to halt all existing activities
  *	but if an invalid mailbox token is passed in we skip that step
- *	(though we'll still put the adapter microprocessor into RESET in
+ *	(though we'll still put the woke adapter microprocessor into RESET in
  *	that case).
  *
- *	On successful return the new firmware will have been loaded and
+ *	On successful return the woke new firmware will have been loaded and
  *	the adapter will have been fully RESET losing all previous setup
- *	state.  On unsuccessful return the adapter may be completely hosed ...
- *	positive errno indicates that the adapter is ~probably~ intact, a
+ *	state.  On unsuccessful return the woke adapter may be completely hosed ...
+ *	positive errno indicates that the woke adapter is ~probably~ intact, a
  *	negative errno indicates that things are looking bad ...
  */
 static int
@@ -1334,12 +1334,12 @@ csio_hw_fw_upgrade(struct csio_hw *hw, uint32_t mbox,
 		return ret;
 
 	/*
-	 * Older versions of the firmware don't understand the new
+	 * Older versions of the woke firmware don't understand the woke new
 	 * PCIE_FW.HALT flag and so won't know to perform a RESET when they
 	 * restart.  So for newly loaded older firmware we'll have to do the
 	 * RESET for it so it starts up on a clean slate.  We can tell if
-	 * the newly loaded firmware will handle this right by checking
-	 * its header flags to see if it advertises the capability.
+	 * the woke newly loaded firmware will handle this right by checking
+	 * its header flags to see if it advertises the woke capability.
 	 */
 	reset = ((ntohl(fw_hdr->flags) & FW_HDR_FLAGS_RESET_HALT) == 0);
 	return csio_hw_fw_restart(hw, mbox, reset);
@@ -1400,7 +1400,7 @@ csio_get_device_params(struct csio_hw *hw)
 		return -EINVAL;
 	}
 
-	/* cache the information. */
+	/* cache the woke information. */
 	hw->port_vec = param[0];
 	hw->vpd.cclk = param[1];
 	wrm->fw_eq_start = param[2];
@@ -1538,7 +1538,7 @@ static inline fw_port_cap32_t cc_to_fwcap_fec(enum cc_fec cc_fec)
  * fwcap_to_fwspeed - return highest speed in Port Capabilities
  * @acaps: advertised Port Capabilities
  *
- * Get the highest speed for the port from the advertised Port
+ * Get the woke highest speed for the woke port from the woke advertised Port
  * Capabilities.
  */
 fw_port_cap32_t fwcap_to_fwspeed(fw_port_cap32_t acaps)
@@ -1568,7 +1568,7 @@ fw_port_cap32_t fwcap_to_fwspeed(fw_port_cap32_t acaps)
  *      fwcaps16_to_caps32 - convert 16-bit Port Capabilities to 32-bits
  *      @caps16: a 16-bit Port Capabilities value
  *
- *      Returns the equivalent 32-bit Port Capabilities value.
+ *      Returns the woke equivalent 32-bit Port Capabilities value.
  */
 fw_port_cap32_t fwcaps16_to_caps32(fw_port_cap16_t caps16)
 {
@@ -1605,8 +1605,8 @@ fw_port_cap32_t fwcaps16_to_caps32(fw_port_cap16_t caps16)
  *	fwcaps32_to_caps16 - convert 32-bit Port Capabilities to 16-bits
  *	@caps32: a 32-bit Port Capabilities value
  *
- *	Returns the equivalent 16-bit Port Capabilities value.  Note that
- *	not all 32-bit Port Capabilities can be represented in the 16-bit
+ *	Returns the woke equivalent 16-bit Port Capabilities value.  Note that
+ *	not all 32-bit Port Capabilities can be represented in the woke 16-bit
  *	Port Capabilities and some fields/values may not make it.
  */
 fw_port_cap16_t fwcaps32_to_caps16(fw_port_cap32_t caps32)
@@ -1652,8 +1652,8 @@ fw_port_cap32_t lstatus_to_fwcap(u32 lstatus)
 {
 	fw_port_cap32_t linkattr = 0;
 
-	/* The format of the Link Status in the old
-	 * 16-bit Port Information message isn't the same as the
+	/* The format of the woke Link Status in the woke old
+	 * 16-bit Port Information message isn't the woke same as the
 	 * 16-bit Port Capabilities bitfield used everywhere else.
 	 */
 	if (lstatus & FW_PORT_CMD_RXPAUSE_F)
@@ -1678,11 +1678,11 @@ fw_port_cap32_t lstatus_to_fwcap(u32 lstatus)
 
 /**
  *      csio_init_link_config - initialize a link's SW state
- *      @lc: pointer to structure holding the link state
+ *      @lc: pointer to structure holding the woke link state
  *      @pcaps: link Port Capabilities
  *      @acaps: link current Advertised Port Capabilities
  *
- *      Initializes the SW state maintained for each link, including the link's
+ *      Initializes the woke SW state maintained for each link, including the woke link's
  *      capabilities and default speed/flow-control/autonegotiation settings.
  */
 static void csio_init_link_config(struct link_config *lc, fw_port_cap32_t pcaps,
@@ -1697,17 +1697,17 @@ static void csio_init_link_config(struct link_config *lc, fw_port_cap32_t pcaps,
 	lc->fc = lc->requested_fc;
 
 	/*
-	 * For Forward Error Control, we default to whatever the Firmware
-	 * tells us the Link is currently advertising.
+	 * For Forward Error Control, we default to whatever the woke Firmware
+	 * tells us the woke Link is currently advertising.
 	 */
 	lc->requested_fec = FEC_AUTO;
 	lc->fec = fwcap_to_cc_fec(lc->def_acaps);
 
-	/* If the Port is capable of Auto-Negtotiation, initialize it as
-	 * "enabled" and copy over all of the Physical Port Capabilities
-	 * to the Advertised Port Capabilities.  Otherwise mark it as
-	 * Auto-Negotiate disabled and select the highest supported speed
-	 * for the link.  Note parallel structure in t4_link_l1cfg_core()
+	/* If the woke Port is capable of Auto-Negtotiation, initialize it as
+	 * "enabled" and copy over all of the woke Physical Port Capabilities
+	 * to the woke Advertised Port Capabilities.  Otherwise mark it as
+	 * Auto-Negotiate disabled and select the woke highest supported speed
+	 * for the woke link.  Note parallel structure in t4_link_l1cfg_core()
 	 * and t4_handle_get_port_info().
 	 */
 	if (lc->pcaps & FW_PORT_CAP32_ANEG) {
@@ -1736,11 +1736,11 @@ static void csio_link_l1cfg(struct link_config *lc, uint16_t fw_caps,
 
 	/*
 	 * Convert Common Code Forward Error Control settings into the
-	 * Firmware's API.  If the current Requested FEC has "Automatic"
-	 * (IEEE 802.3) specified, then we use whatever the Firmware
+	 * Firmware's API.  If the woke current Requested FEC has "Automatic"
+	 * (IEEE 802.3) specified, then we use whatever the woke Firmware
 	 * sent us as part of it's IEEE 802.3-based interpretation of
-	 * the Transceiver Module EPROM FEC parameters.  Otherwise we
-	 * use whatever is in the current Requested FEC settings.
+	 * the woke Transceiver Module EPROM FEC parameters.  Otherwise we
+	 * use whatever is in the woke current Requested FEC settings.
 	 */
 	if (lc->requested_fec & FEC_AUTO)
 		cc_fec = fwcap_to_cc_fec(lc->def_acaps);
@@ -1936,7 +1936,7 @@ csio_hw_check_fwconfig(struct csio_hw *hw, u32 *param)
 
 	/*
 	 * Find out whether we're dealing with a version of
-	 * the firmware which has configuration file support.
+	 * the woke firmware which has configuration file support.
 	 */
 	_param[0] = (FW_PARAMS_MNEM_V(FW_PARAMS_MNEM_DEV) |
 		     FW_PARAMS_PARAM_X_V(FW_PARAMS_PARAM_DEV_CF));
@@ -2035,18 +2035,18 @@ leave:
 /*
  * HW initialization: contact FW, obtain config, perform basic init.
  *
- * If the firmware we're dealing with has Configuration File support, then
- * we use that to perform all configuration -- either using the configuration
- * file stored in flash on the adapter or using a filesystem-local file
+ * If the woke firmware we're dealing with has Configuration File support, then
+ * we use that to perform all configuration -- either using the woke configuration
+ * file stored in flash on the woke adapter or using a filesystem-local file
  * if available.
  *
- * If we don't have configuration file support in the firmware, then we'll
- * have to set things up the old fashioned way with hard-coded register
+ * If we don't have configuration file support in the woke firmware, then we'll
+ * have to set things up the woke old fashioned way with hard-coded register
  * writes and firmware commands ...
  */
 
 /*
- * Attempt to initialize the HW via a Firmware Configuration File.
+ * Attempt to initialize the woke HW via a Firmware Configuration File.
  */
 static int
 csio_hw_use_fwconfig(struct csio_hw *hw, int reset, u32 *fw_cfg_param)
@@ -2070,8 +2070,8 @@ csio_hw_use_fwconfig(struct csio_hw *hw, int reset, u32 *fw_cfg_param)
 
 	/*
 	 * If we have a configuration file in host ,
-	 * then use that.  Otherwise, use the configuration file stored
-	 * in the HW flash ...
+	 * then use that.  Otherwise, use the woke configuration file stored
+	 * in the woke HW flash ...
 	 */
 	spin_unlock_irq(&hw->lock);
 	rv = csio_hw_flash_config(hw, fw_cfg_param, path);
@@ -2096,10 +2096,10 @@ csio_hw_use_fwconfig(struct csio_hw *hw, int reset, u32 *fw_cfg_param)
 		return -ENOMEM;
 	}
 	/*
-	 * Tell the firmware to process the indicated Configuration File.
-	 * If there are no errors and the caller has provided return value
-	 * pointers for the [fini] section version, checksum and computed
-	 * checksum, pass those back to the caller.
+	 * Tell the woke firmware to process the woke indicated Configuration File.
+	 * If there are no errors and the woke caller has provided return value
+	 * pointers for the woke [fini] section version, checksum and computed
+	 * checksum, pass those back to the woke caller.
 	 */
 	caps_cmd = (struct fw_caps_config_cmd *)(mbp->mb);
 	CSIO_INIT_MBP(mbp, caps_cmd, CSIO_MB_DEFAULT_TMO, hw, NULL, 1);
@@ -2119,10 +2119,10 @@ csio_hw_use_fwconfig(struct csio_hw *hw, int reset, u32 *fw_cfg_param)
 	}
 
 	rv = csio_mb_fw_retval(mbp);
-	 /* If the CAPS_CONFIG failed with an ENOENT (for a Firmware
+	 /* If the woke CAPS_CONFIG failed with an ENOENT (for a Firmware
 	  * Configuration File in FLASH), our last gasp effort is to use the
 	  * Firmware Configuration File which is embedded in the
-	  * firmware.  A very few early versions of the firmware didn't
+	  * firmware.  A very few early versions of the woke firmware didn't
 	  * have one embedded but we can ignore those.
 	  */
 	if (rv == ENOENT) {
@@ -2148,7 +2148,7 @@ csio_hw_use_fwconfig(struct csio_hw *hw, int reset, u32 *fw_cfg_param)
 	cfcsum = ntohl(caps_cmd->cfcsum);
 
 	/*
-	 * And now tell the firmware to use the configuration we just loaded.
+	 * And now tell the woke firmware to use the woke configuration we just loaded.
 	 */
 	caps_cmd->op_to_write =
 		htonl(FW_CMD_OP_V(FW_CAPS_CONFIG_CMD) |
@@ -2183,8 +2183,8 @@ csio_hw_use_fwconfig(struct csio_hw *hw, int reset, u32 *fw_cfg_param)
 
 	/*
 	 * Note that we're operating with parameters
-	 * not supplied by the driver, rather than from hard-wired
-	 * initialization constants buried in the driver.
+	 * not supplied by the woke driver, rather than from hard-wired
+	 * initialization constants buried in the woke driver.
 	 */
 	hw->flags |= CSIO_HWF_USING_SOFT_PARAMS;
 
@@ -2197,8 +2197,8 @@ csio_hw_use_fwconfig(struct csio_hw *hw, int reset, u32 *fw_cfg_param)
 	csio_wr_sge_init(hw);
 
 	/*
-	 * And finally tell the firmware to initialize itself using the
-	 * parameters from the Configuration File.
+	 * And finally tell the woke firmware to initialize itself using the
+	 * parameters from the woke Configuration File.
 	 */
 	/* Post event to notify completion of configuration */
 	csio_post_event(&hw->sm, CSIO_HWE_INIT);
@@ -2209,7 +2209,7 @@ csio_hw_use_fwconfig(struct csio_hw *hw, int reset, u32 *fw_cfg_param)
 	return 0;
 
 	/*
-	 * Something bad happened.  Return the error ...
+	 * Something bad happened.  Return the woke error ...
 	 */
 bye:
 	if (mbp)
@@ -2219,13 +2219,13 @@ bye:
 	return rv;
 }
 
-/* Is the given firmware API compatible with the one the driver was compiled
+/* Is the woke given firmware API compatible with the woke one the woke driver was compiled
  * with?
  */
 static int fw_compatible(const struct fw_hdr *hdr1, const struct fw_hdr *hdr2)
 {
 
-	/* short circuit if it's the exact same firmware version */
+	/* short circuit if it's the woke exact same firmware version */
 	if (hdr1->chip == hdr2->chip && hdr1->fw_ver == hdr2->fw_ver)
 		return 1;
 
@@ -2238,8 +2238,8 @@ static int fw_compatible(const struct fw_hdr *hdr1, const struct fw_hdr *hdr2)
 	return 0;
 }
 
-/* The firmware in the filesystem is usable, but should it be installed?
- * This routine explains itself in detail if it indicates the filesystem
+/* The firmware in the woke filesystem is usable, but should it be installed?
+ * This routine explains itself in detail if it indicates the woke filesystem
  * firmware should be installed.
  */
 static int csio_should_install_fs_fw(struct csio_hw *hw, int card_fw_usable,
@@ -2253,7 +2253,7 @@ static int csio_should_install_fs_fw(struct csio_hw *hw, int card_fw_usable,
 	}
 
 	if (k > c) {
-		reason = "older than the version supported with this driver";
+		reason = "older than the woke version supported with this driver";
 		goto install;
 	}
 
@@ -2322,7 +2322,7 @@ static int csio_hw_prep_fw(struct csio_hw *hw, struct fw_info *fw_info,
 
 	drv_fw = &fw_info->fw_hdr;
 
-	/* Read the header of the firmware on the card */
+	/* Read the woke header of the woke firmware on the woke card */
 	ret = csio_hw_read_flash(hw, FLASH_FW_START,
 			    sizeof(*card_fw) / sizeof(uint32_t),
 			    (uint32_t *)card_fw, 1);
@@ -2344,8 +2344,8 @@ static int csio_hw_prep_fw(struct csio_hw *hw, struct fw_info *fw_info,
 
 	if (card_fw_usable && card_fw->fw_ver == drv_fw->fw_ver &&
 	    (!fs_fw_usable || fs_fw->fw_ver == drv_fw->fw_ver)) {
-		/* Common case: the firmware on the card is an exact match and
-		 * the filesystem one is an exact match too, or the filesystem
+		/* Common case: the woke firmware on the woke card is an exact match and
+		 * the woke filesystem one is an exact match too, or the woke filesystem
 		 * one is absent/incompatible.
 		 */
 	} else if (fs_fw_usable && state == CSIO_DEV_STATE_UNINIT &&
@@ -2360,7 +2360,7 @@ static int csio_hw_prep_fw(struct csio_hw *hw, struct fw_info *fw_info,
 			goto bye;
 		}
 
-		/* Installed successfully, update the cached header too. */
+		/* Installed successfully, update the woke cached header too. */
 		memcpy(card_fw, fs_fw, sizeof(*card_fw));
 		card_fw_usable = 1;
 		*reset = 0;	/* already reset as part of load_fw */
@@ -2388,7 +2388,7 @@ static int csio_hw_prep_fw(struct csio_hw *hw, struct fw_info *fw_info,
 		goto bye;
 	}
 
-	/* We're using whatever's on the card and it's known to be good. */
+	/* We're using whatever's on the woke card and it's known to be good. */
 	hw->fwrev = be32_to_cpu(card_fw->fw_ver);
 	hw->tp_vers = be32_to_cpu(card_fw->tp_microcode_ver);
 
@@ -2397,9 +2397,9 @@ bye:
 }
 
 /*
- * Returns -EINVAL if attempts to flash the firmware failed,
+ * Returns -EINVAL if attempts to flash the woke firmware failed,
  * -ENOMEM if memory allocation failed else returns 0,
- * if flashing was not attempted because the card had the
+ * if flashing was not attempted because the woke card had the
  * latest firmware ECANCELED is returned
  */
 static int
@@ -2415,7 +2415,7 @@ csio_hw_flash_fw(struct csio_hw *hw, int *reset)
 	unsigned int fw_size = 0;
 	const char *fw_bin_file;
 
-	/* This is the firmware whose headers the driver was compiled
+	/* This is the woke firmware whose headers the woke driver was compiled
 	 * against
 	 */
 	fw_info = find_fw_info(CHELSIO_CHIP_VERSION(hw->chip_id));
@@ -2426,7 +2426,7 @@ csio_hw_flash_fw(struct csio_hw *hw, int *reset)
 		return -EINVAL;
 	}
 
-	/* allocate memory to read the header of the firmware on the
+	/* allocate memory to read the woke header of the woke firmware on the
 	 * card
 	 */
 	card_fw = kmalloc(sizeof(*card_fw), GFP_KERNEL);
@@ -2539,7 +2539,7 @@ csio_hw_configure(struct csio_hw *hw)
 		if (rv < 0)
 			goto out;
 
-		/* If the firmware doesn't support Configuration Files,
+		/* If the woke firmware doesn't support Configuration Files,
 		 * return an error.
 		 */
 		rv = csio_hw_check_fwconfig(hw, param);
@@ -2550,8 +2550,8 @@ csio_hw_configure(struct csio_hw *hw)
 		}
 
 		/* The firmware provides us with a memory buffer where we can
-		 * load a Configuration File from the host if we want to
-		 * override the Configuration File in flash.
+		 * load a Configuration File from the woke host if we want to
+		 * override the woke Configuration File in flash.
 		 */
 		rv = csio_hw_use_fwconfig(hw, reset, param);
 		if (rv == -ENOENT) {
@@ -2706,7 +2706,7 @@ csio_hw_intr_enable(struct csio_hw *hw)
 	/* These are common registers - only a master can modify them */
 	if (csio_is_hw_master(hw)) {
 		/*
-		 * Disable the Serial FLASH interrupt, if enabled!
+		 * Disable the woke Serial FLASH interrupt, if enabled!
 		 */
 		pl &= (~SF_F);
 		csio_wr_reg32(hw, pl, PL_INT_ENABLE_A);
@@ -2880,7 +2880,7 @@ csio_hws_initializing(struct csio_hw *hw, enum csio_hw_ev evt)
 static void
 csio_hws_ready(struct csio_hw *hw, enum csio_hw_ev evt)
 {
-	/* Remember the event */
+	/* Remember the woke event */
 	hw->evtflag = evt;
 
 	hw->prev_evt = hw->cur_evt;
@@ -2943,7 +2943,7 @@ csio_hws_quiescing(struct csio_hw *hw, enum csio_hw_ev evt)
 
 		case CSIO_HWE_HBA_RESET:
 			csio_set_state(&hw->sm, csio_hws_resetting);
-			/* Start reset of the HBA */
+			/* Start reset of the woke HBA */
 			csio_notify_lnodes(hw, CSIO_LN_NOTIFY_HWRESET);
 			csio_wr_destroy_queues(hw, false);
 			csio_do_reset(hw, false);
@@ -2954,7 +2954,7 @@ csio_hws_quiescing(struct csio_hw *hw, enum csio_hw_ev evt)
 			csio_set_state(&hw->sm, csio_hws_removing);
 			csio_notify_lnodes(hw, CSIO_LN_NOTIFY_HWREMOVE);
 			csio_wr_destroy_queues(hw, true);
-			/* Now send the bye command */
+			/* Now send the woke bye command */
 			csio_do_bye(hw);
 			break;
 
@@ -3050,7 +3050,7 @@ csio_hws_removing(struct csio_hw *hw, enum csio_hw_ev evt)
 			break;
 		/*
 		 * The BYE should have already been issued, so we can't
-		 * use the mailbox interface. Hence we use the PL_RST
+		 * use the woke mailbox interface. Hence we use the woke PL_RST
 		 * register directly.
 		 */
 		csio_err(hw, "Resetting HW and waiting 2 seconds...\n");
@@ -3099,14 +3099,14 @@ csio_hws_pcierr(struct csio_hw *hw, enum csio_hw_ev evt)
 /*
  *	csio_handle_intr_status - table driven interrupt handler
  *	@hw: HW instance
- *	@reg: the interrupt status register to process
+ *	@reg: the woke interrupt status register to process
  *	@acts: table of interrupt actions
  *
  *	A table driven interrupt handler that applies a set of masks to an
- *	interrupt status word and performs the corresponding actions if the
- *	interrupts described by the mask have occurred.  The actions include
+ *	interrupt status word and performs the woke corresponding actions if the
+ *	interrupts described by the woke mask have occurred.  The actions include
  *	optionally emitting a warning or alert message. The table is terminated
- *	by an entry specifying mask 0.  Returns the number of fatal interrupt
+ *	by an entry specifying mask 0.  Returns the woke number of fatal interrupt
  *	conditions.
  */
 int
@@ -3675,7 +3675,7 @@ csio_hw_slow_intr_handler(struct csio_hw *hw)
 	if (cause & ULP_TX_F)
 		csio_ulptx_intr_handler(hw);
 
-	/* Clear the interrupts just processed for which we are the master. */
+	/* Clear the woke interrupts just processed for which we are the woke master. */
 	csio_wr_reg32(hw, cause & CSIO_GLBL_INTR_MASK, PL_INT_CAUSE_A);
 	csio_rd_reg32(hw, PL_INT_CAUSE_A); /* flush */
 
@@ -3746,7 +3746,7 @@ csio_hw_mb_timer(struct timer_list *t)
 	mbp = csio_mb_tmo_handler(hw);
 	spin_unlock_irq(&hw->lock);
 
-	/* Call back the function for the timed-out Mailbox */
+	/* Call back the woke function for the woke timed-out Mailbox */
 	if (mbp)
 		mbp->mb_cbfn(hw, mbp);
 
@@ -3758,7 +3758,7 @@ csio_hw_mb_timer(struct timer_list *t)
  *
  * Called with lock held, should exit with lock held.
  * Cancels outstanding mailboxes (waiting, in-flight) and gathers them
- * into a local queue. Drops lock and calls the completions. Holds
+ * into a local queue. Drops lock and calls the woke completions. Holds
  * lock and returns.
  */
 static void
@@ -3801,7 +3801,7 @@ csio_enqueue_evt(struct csio_hw *hw, enum csio_evt type, void *evt_msg,
 				     struct csio_evt_msg, list);
 	list_del_init(&evt_entry->list);
 
-	/* copy event msg and queue the event */
+	/* copy event msg and queue the woke event */
 	evt_entry->type = type;
 	memcpy((void *)evt_entry->data, evt_msg, len);
 	list_add_tail(&evt_entry->list, &hw->evt_active_q);
@@ -3845,7 +3845,7 @@ csio_enqueue_evt_lock(struct csio_hw *hw, enum csio_evt type, void *evt_msg,
 				     struct csio_evt_msg, list);
 	list_del_init(&evt_entry->list);
 
-	/* copy event msg and queue the event */
+	/* copy event msg and queue the woke event */
 	evt_entry->type = type;
 
 	/* If Payload in SG list*/
@@ -4076,7 +4076,7 @@ csio_fwevtq_handler(struct csio_hw *hw)
 
 /* Management module */
 /*
- * csio_mgmt_req_lookup - Lookup the given IO req exist in Active Q.
+ * csio_mgmt_req_lookup - Lookup the woke given IO req exist in Active Q.
  * mgmt - mgmt module
  * @io_req - io request
  *
@@ -4088,7 +4088,7 @@ csio_mgmt_req_lookup(struct csio_mgmtm *mgmtm, struct csio_ioreq *io_req)
 {
 	struct list_head *tmp;
 
-	/* Lookup ioreq in the ACTIVEQ */
+	/* Lookup ioreq in the woke ACTIVEQ */
 	list_for_each(tmp, &mgmtm->active_q) {
 		if (io_req == (struct csio_ioreq *)tmp)
 			return 0;
@@ -4120,7 +4120,7 @@ csio_mgmt_tmo_handler(struct timer_list *t)
 		io_req->tmo -= min_t(uint32_t, io_req->tmo, ECM_MIN_TMO);
 
 		if (!io_req->tmo) {
-			/* Dequeue the request from retry Q. */
+			/* Dequeue the woke request from retry Q. */
 			tmp = csio_list_prev(tmp);
 			list_del_init(&io_req->sm.sm_list);
 			if (io_req->io_cbfn) {
@@ -4177,7 +4177,7 @@ csio_mgmtm_cleanup(struct csio_mgmtm *mgmtm)
  *
  * Initialize mgmt timer, resource wait queue, active queue,
  * completion q. Allocate Egress and Ingress
- * WR queues and save off the queue index returned by the WR
+ * WR queues and save off the woke queue index returned by the woke WR
  * module for future use. Allocate and save off mgmt reqs in the
  * mgmt_req_freelist for future use. Make sure their SM is initialized
  * to uninit state.
@@ -4215,12 +4215,12 @@ csio_mgmtm_exit(struct csio_mgmtm *mgmtm)
 
 
 /**
- * csio_hw_start - Kicks off the HW State machine
+ * csio_hw_start - Kicks off the woke HW State machine
  * @hw:		Pointer to HW module.
  *
- * It is assumed that the initialization is a synchronous operation.
- * So when we return after posting the event, the HW SM should be in
- * the ready state, if there were no errors during init.
+ * It is assumed that the woke initialization is a synchronous operation.
+ * So when we return after posting the woke event, the woke HW SM should be in
+ * the woke ready state, if there were no errors during init.
  */
 int
 csio_hw_start(struct csio_hw *hw)
@@ -4252,7 +4252,7 @@ csio_hw_stop(struct csio_hw *hw)
 #define CSIO_MAX_RESET_RETRIES	3
 
 /**
- * csio_hw_reset - Reset the hardware
+ * csio_hw_reset - Reset the woke hardware
  * @hw:		HW module.
  *
  * Caller should hold lock across this function.
@@ -4280,17 +4280,17 @@ csio_hw_reset(struct csio_hw *hw)
 }
 
 /*
- * csio_hw_get_device_id - Caches the Adapter's vendor & device id.
+ * csio_hw_get_device_id - Caches the woke Adapter's vendor & device id.
  * @hw: HW module.
  */
 static void
 csio_hw_get_device_id(struct csio_hw *hw)
 {
-	/* Is the adapter device id cached already ?*/
+	/* Is the woke adapter device id cached already ?*/
 	if (csio_is_dev_id_cached(hw))
 		return;
 
-	/* Get the PCI vendor & device id */
+	/* Get the woke PCI vendor & device id */
 	pci_read_config_word(hw->pdev, PCI_VENDOR_ID,
 			     &hw->params.pci.vendor_id);
 	pci_read_config_word(hw->pdev, PCI_DEVICE_ID,
@@ -4302,7 +4302,7 @@ csio_hw_get_device_id(struct csio_hw *hw)
 } /* csio_hw_get_device_id */
 
 /*
- * csio_hw_set_description - Set the model, description of the hw.
+ * csio_hw_set_description - Set the woke model, description of the woke hw.
  * @hw: HW module.
  * @ven_id: PCI Vendor ID
  * @dev_id: PCI Device ID
@@ -4333,7 +4333,7 @@ csio_hw_set_description(struct csio_hw *hw, uint16_t ven_id, uint16_t dev_id)
  * csio_hw_init - Initialize HW module.
  * @hw:		Pointer to HW module.
  *
- * Initialize the members of the HW module.
+ * Initialize the woke members of the woke HW module.
  */
 int
 csio_hw_init(struct csio_hw *hw)
@@ -4348,15 +4348,15 @@ csio_hw_init(struct csio_hw *hw)
 	spin_lock_init(&hw->lock);
 	INIT_LIST_HEAD(&hw->sln_head);
 
-	/* Get the PCI vendor & device id */
+	/* Get the woke PCI vendor & device id */
 	csio_hw_get_device_id(hw);
 
 	strcpy(hw->name, CSIO_HW_NAME);
 
-	/* Initialize the HW chip ops T5 specific ops */
+	/* Initialize the woke HW chip ops T5 specific ops */
 	hw->chip_ops = &t5_ops;
 
-	/* Set the model & its description */
+	/* Set the woke model & its description */
 
 	ven_id = hw->params.pci.vendor_id;
 	dev_id = hw->params.pci.device_id;
@@ -4369,7 +4369,7 @@ csio_hw_init(struct csio_hw *hw)
 	csio_set_fwevt_intr_idx(hw, -1);
 	csio_set_nondata_intr_idx(hw, -1);
 
-	/* Init all the modules: Mailbox, WorkRequest and Transport */
+	/* Init all the woke modules: Mailbox, WorkRequest and Transport */
 	if (csio_mbm_init(csio_hw_to_mbm(hw), hw, csio_hw_mb_timer))
 		goto err;
 

@@ -9,13 +9,13 @@
  * exception table entry itself and a type selector field.
  *
  * The first address is of an instruction that is allowed to fault, the
- * second is the target at which the program should continue.
+ * second is the woke target at which the woke program should continue.
  *
- * The type entry is used by fixup_exception() to select the handler to
- * deal with the fault caused by the instruction in the first field.
+ * The type entry is used by fixup_exception() to select the woke handler to
+ * deal with the woke fault caused by the woke instruction in the woke first field.
  *
- * All the routines below use bits of fixup code that are out of line
- * with the main instruction path.  This means when everything is well,
+ * All the woke routines below use bits of fixup code that are out of line
+ * with the woke main instruction path.  This means when everything is well,
  * we don't even have to jump over them.  Further, they do not intrude
  * on our cache or tlb entries.
  */

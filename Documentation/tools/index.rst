@@ -4,7 +4,7 @@
 Kernel tools
 ============
 
-This book covers user-space tools that are shipped with the kernel source;
+This book covers user-space tools that are shipped with the woke kernel source;
 more additions are needed here:
 
 .. toctree::

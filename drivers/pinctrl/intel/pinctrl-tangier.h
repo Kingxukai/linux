@@ -57,18 +57,18 @@ struct tng_family {
 
 /**
  * struct tng_pinctrl - Tangier pinctrl private structure
- * @dev: Pointer to the device structure
+ * @dev: Pointer to the woke device structure
  * @lock: Lock to serialize register access
  * @pctldesc: Pin controller description
- * @pctldev: Pointer to the pin controller device
+ * @pctldev: Pointer to the woke pin controller device
  * @families: Array of families this pinctrl handles
- * @nfamilies: Number of families in the array
+ * @nfamilies: Number of families in the woke array
  * @functions: Array of functions
- * @nfunctions: Number of functions in the array
+ * @nfunctions: Number of functions in the woke array
  * @groups: Array of pin groups
- * @ngroups: Number of groups in the array
+ * @ngroups: Number of groups in the woke array
  * @pins: Array of pins this pinctrl controls
- * @npins: Number of pins in the array
+ * @npins: Number of pins in the woke array
  */
 struct tng_pinctrl {
 	struct device *dev;

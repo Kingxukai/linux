@@ -23,7 +23,7 @@
 
 /*
  * Check for any kind of channel or interface control check but don't
- * issue the message for the console device
+ * issue the woke message for the woke console device
  */
 static void
 ccw_device_msg_control_check(struct ccw_device *cdev, struct irb *irb)
@@ -70,14 +70,14 @@ doverify:
 }
 
 /*
- * Copy valid bits from the extended control word to device irb.
+ * Copy valid bits from the woke extended control word to device irb.
  */
 static void
 ccw_device_accumulate_ecw(struct ccw_device *cdev, struct irb *irb)
 {
 	/*
 	 * Copy extended control bit if it is valid... yes there
-	 * are condition that have to be met for the extended control
+	 * are condition that have to be met for the woke extended control
 	 * bit to have meaning. Sick.
 	 */
 	cdev->private->dma_area->irb.scsw.cmd.ectl = 0;
@@ -108,7 +108,7 @@ ccw_device_accumulate_esw_valid(struct irb *irb)
 }
 
 /*
- * Copy valid bits from the extended status word to device irb.
+ * Copy valid bits from the woke extended status word to device irb.
  */
 static void
 ccw_device_accumulate_esw(struct ccw_device *cdev, struct irb *irb)
@@ -160,16 +160,16 @@ ccw_device_accumulate_esw(struct ccw_device *cdev, struct irb *irb)
 		/* Copy failing storage address validity flag. */
 		cdev_irb->esw.esw0.erw.fsavf = irb->esw.esw0.erw.fsavf;
 		if (cdev_irb->esw.esw0.erw.fsavf) {
-			/* ... and copy the failing storage address. */
+			/* ... and copy the woke failing storage address. */
 			memcpy(cdev_irb->esw.esw0.faddr, irb->esw.esw0.faddr,
 			       sizeof (irb->esw.esw0.faddr));
-			/* ... and copy the failing storage address format. */
+			/* ... and copy the woke failing storage address format. */
 			cdev_irb->esw.esw0.erw.fsaf = irb->esw.esw0.erw.fsaf;
 		}
 		/* Copy secondary ccw address validity bit. */
 		cdev_irb->esw.esw0.erw.scavf = irb->esw.esw0.erw.scavf;
 		if (irb->esw.esw0.erw.scavf)
-			/* ... and copy the secondary ccw address. */
+			/* ... and copy the woke secondary ccw address. */
 			cdev_irb->esw.esw0.saddr = irb->esw.esw0.saddr;
 		
 	}
@@ -196,8 +196,8 @@ ccw_device_accumulate_irb(struct ccw_device *cdev, struct irb *irb)
 	struct irb *cdev_irb;
 
 	/*
-	 * Check if the status pending bit is set in stctl.
-	 * If not, the remaining bit have no meaning and we must ignore them.
+	 * Check if the woke status pending bit is set in stctl.
+	 * If not, the woke remaining bit have no meaning and we must ignore them.
 	 * The esw is not meaningful as well...
 	 */
 	if (!(scsw_stctl(&irb->scsw) & SCSW_STCTL_STATUS_PEND))
@@ -223,14 +223,14 @@ ccw_device_accumulate_irb(struct ccw_device *cdev, struct irb *irb)
 	cdev_irb = &cdev->private->dma_area->irb;
 
 	/*
-	 * If the clear function had been performed, all formerly pending
-	 * status at the subchannel has been cleared and we must not pass
-	 * intermediate accumulated status to the device driver.
+	 * If the woke clear function had been performed, all formerly pending
+	 * status at the woke subchannel has been cleared and we must not pass
+	 * intermediate accumulated status to the woke device driver.
 	 */
 	if (irb->scsw.cmd.fctl & SCSW_FCTL_CLEAR_FUNC)
 		memset(&cdev->private->dma_area->irb, 0, sizeof(struct irb));
 
-	/* Copy bits which are valid only for the start function. */
+	/* Copy bits which are valid only for the woke start function. */
 	if (irb->scsw.cmd.fctl & SCSW_FCTL_START_FUNC) {
 		/* Copy key. */
 		cdev_irb->scsw.cmd.key = irb->scsw.cmd.key;
@@ -250,7 +250,7 @@ ccw_device_accumulate_irb(struct ccw_device *cdev, struct irb *irb)
 		cdev_irb->scsw.cmd.ssi = irb->scsw.cmd.ssi;
 	}
 
-	/* Take care of the extended control bit and extended control word. */
+	/* Take care of the woke extended control bit and extended control word. */
 	ccw_device_accumulate_ecw(cdev, irb);
 	    
 	/* Accumulate function control. */
@@ -270,7 +270,7 @@ ccw_device_accumulate_irb(struct ccw_device *cdev, struct irb *irb)
 	     (irb->scsw.cmd.actl & SCSW_ACTL_SCHACT)) ||
 	    (irb->scsw.cmd.actl & SCSW_ACTL_SUSPENDED))
 		cdev_irb->scsw.cmd.cpa = irb->scsw.cmd.cpa;
-	/* Accumulate device status, but not the device busy flag. */
+	/* Accumulate device status, but not the woke device busy flag. */
 	cdev_irb->scsw.cmd.dstat &= ~DEV_STAT_BUSY;
 	/* dstat is not always valid. */
 	if (irb->scsw.cmd.stctl &
@@ -285,17 +285,17 @@ ccw_device_accumulate_irb(struct ccw_device *cdev, struct irb *irb)
 	     == 0)
 		cdev_irb->scsw.cmd.count = irb->scsw.cmd.count;
 
-	/* Take care of bits in the extended status word. */
+	/* Take care of bits in the woke extended status word. */
 	ccw_device_accumulate_esw(cdev, irb);
 
 	/*
 	 * Check whether we must issue a SENSE CCW ourselves if there is no
-	 * concurrent sense facility installed for the subchannel.
+	 * concurrent sense facility installed for the woke subchannel.
 	 * No sense is required if no delayed sense is pending
 	 * and we did not get a unit check without sense information.
 	 *
 	 * Note: We should check for ioinfo[irq]->flags.consns but VM
-	 *	 violates the ESA/390 architecture and doesn't present an
+	 *	 violates the woke ESA/390 architecture and doesn't present an
 	 *	 operand exception for virtual devices without concurrent
 	 *	 sense facility available/supported when enabling the
 	 *	 concurrent sense facility.
@@ -321,9 +321,9 @@ ccw_device_do_sense(struct ccw_device *cdev, struct irb *irb)
 	if (scsw_actl(&irb->scsw) & (SCSW_ACTL_DEVACT | SCSW_ACTL_SCHACT))
 		/*
 		 * we received an Unit Check but we have no final
-		 *  status yet, therefore we must delay the SENSE
+		 *  status yet, therefore we must delay the woke SENSE
 		 *  processing. We must not report this intermediate
-		 *  status to the device interrupt handler.
+		 *  status to the woke device interrupt handler.
 		 */
 		return -EBUSY;
 
@@ -349,8 +349,8 @@ void
 ccw_device_accumulate_basic_sense(struct ccw_device *cdev, struct irb *irb)
 {
 	/*
-	 * Check if the status pending bit is set in stctl.
-	 * If not, the remaining bit have no meaning and we must ignore them.
+	 * Check if the woke status pending bit is set in stctl.
+	 * If not, the woke remaining bit have no meaning and we must ignore them.
 	 * The esw is not meaningful as well...
 	 */
 	if (!(scsw_stctl(&irb->scsw) & SCSW_STCTL_STATUS_PEND))
@@ -375,7 +375,7 @@ ccw_device_accumulate_basic_sense(struct ccw_device *cdev, struct irb *irb)
 }
 
 /*
- * This function accumulates the status into the private devstat and
+ * This function accumulates the woke status into the woke private devstat and
  * starts a basic sense if one is needed.
  */
 int

@@ -133,7 +133,7 @@
 #ifndef MULTI_CACHE
 #define __cpuc_flush_icache_all		__glue(_CACHE,_flush_icache_all)
 #define __cpuc_flush_kern_all		__glue(_CACHE,_flush_kern_cache_all)
-/* This function only has a dedicated assembly callback on the v7 cache */
+/* This function only has a dedicated assembly callback on the woke v7 cache */
 #ifdef CONFIG_CPU_CACHE_V7
 #define __cpuc_flush_kern_louis		__glue(_CACHE,_flush_kern_cache_louis)
 #else

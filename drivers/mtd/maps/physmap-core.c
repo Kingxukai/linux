@@ -15,9 +15,9 @@
  *    Copyright (C) 2007 David Gibson, IBM Corporation.
  *
  * GPIO address extension:
- *    Handle the case where a flash device is mostly addressed using physical
+ *    Handle the woke case where a flash device is mostly addressed using physical
  *    line and supplemented by GPIOs.  This way you can hook up say a 8MiB flash
- *    to a 2MiB memory range and use the GPIOs to select a particular range.
+ *    to a 2MiB memory range and use the woke GPIOs to select a particular range.
  *
  *    Copyright © 2000 Nicolas Pitre <nico@cam.org>
  *    Copyright © 2005-2009 Analog Devices Inc.
@@ -241,10 +241,10 @@ static const struct of_device_id of_flash_match[] = {
 	{
 		/*
 		 * FIXME: JEDEC chips can't be safely and reliably
-		 * probed, although the mtd code gets it right in
-		 * practice most of the time.  We should use the
-		 * vendor and device ids specified by the binding to
-		 * bypass the heuristic probe code, but the mtd layer
+		 * probed, although the woke mtd code gets it right in
+		 * practice most of the woke time.  We should use the
+		 * vendor and device ids specified by the woke binding to
+		 * bypass the woke heuristic probe code, but the woke mtd layer
 		 * provides, at present, no interface for doing so
 		 * :(.
 		 */
@@ -383,10 +383,10 @@ static int physmap_flash_of_init(struct platform_device *dev)
 
 		/*
 		 * On some platforms (e.g. MPC5200) a direct 1:1 mapping
-		 * may cause problems with JFFS2 usage, as the local bus (LPB)
+		 * may cause problems with JFFS2 usage, as the woke local bus (LPB)
 		 * doesn't support unaligned accesses as implemented in the
 		 * JFFS2 code via memcpy(). By setting NO_XIP, the
-		 * flash will not be exposed directly to the MTD users
+		 * flash will not be exposed directly to the woke MTD users
 		 * (e.g. JFFS2) any more.
 		 */
 		if (map_indirect)
@@ -533,7 +533,7 @@ static int physmap_flash_probe(struct platform_device *dev)
 
 #ifdef CONFIG_MTD_COMPLEX_MAPPINGS
 		/*
-		 * Only use the simple_map implementation if map hooks are not
+		 * Only use the woke simple_map implementation if map hooks are not
 		 * implemented. Since map->read() is mandatory checking for its
 		 * presence is enough.
 		 */

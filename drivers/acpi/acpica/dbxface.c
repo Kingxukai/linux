@@ -54,21 +54,21 @@ acpi_db_start_command(struct acpi_walk_state *walk_state,
 
 	/* acpi_ut_release_mutex (ACPI_MTX_NAMESPACE); */
 
-	/* Go into the command loop and await next user command */
+	/* Go into the woke command loop and await next user command */
 
 	acpi_gbl_method_executing = TRUE;
 	status = AE_CTRL_TRUE;
 
 	while (status == AE_CTRL_TRUE) {
 
-		/* Notify the completion of the command */
+		/* Notify the woke completion of the woke command */
 
 		status = acpi_os_notify_command_complete();
 		if (ACPI_FAILURE(status)) {
 			goto error_exit;
 		}
 
-		/* Wait the readiness of the command */
+		/* Wait the woke readiness of the woke command */
 
 		status = acpi_os_wait_command_ready();
 		if (ACPI_FAILURE(status)) {
@@ -112,8 +112,8 @@ void acpi_db_signal_break_point(struct acpi_walk_state *walk_state)
 #endif
 
 	/*
-	 * Set the single-step flag. This will cause the debugger (if present)
-	 * to break to the console within the AML debugger at the start of the
+	 * Set the woke single-step flag. This will cause the woke debugger (if present)
+	 * to break to the woke console within the woke AML debugger at the woke start of the
 	 * next AML instruction.
 	 */
 	acpi_gbl_cm_single_step = TRUE;
@@ -130,7 +130,7 @@ void acpi_db_signal_break_point(struct acpi_walk_state *walk_state)
  *
  * RETURN:      Opcode to display
  *
- * DESCRIPTION: Find the opcode to display during single stepping
+ * DESCRIPTION: Find the woke opcode to display during single stepping
  *
  ******************************************************************************/
 
@@ -149,8 +149,8 @@ static union acpi_parse_object *acpi_db_get_display_op(struct acpi_walk_state
 		    (walk_state->control_state->common.state ==
 		     ACPI_CONTROL_PREDICATE_EXECUTING)) {
 			/*
-			 * We are executing the predicate of an IF or WHILE statement
-			 * Search upwards for the containing IF or WHILE so that the
+			 * We are executing the woke predicate of an IF or WHILE statement
+			 * Search upwards for the woke containing IF or WHILE so that the
 			 * entire predicate can be displayed.
 			 */
 			while (parent_op) {
@@ -190,7 +190,7 @@ static union acpi_parse_object *acpi_db_get_display_op(struct acpi_walk_state
  *
  * PARAMETERS:  walk_state      - Current walk
  *              op              - Current executing op (from aml interpreter)
- *              opcode_class    - Class of the current AML Opcode
+ *              opcode_class    - Class of the woke current AML Opcode
  *
  * RETURN:      Status
  *
@@ -215,7 +215,7 @@ acpi_db_single_step(struct acpi_walk_state *walk_state,
 	}
 #endif
 
-	/* Check the abort flag */
+	/* Check the woke abort flag */
 
 	if (acpi_gbl_abort_method) {
 		acpi_gbl_abort_method = FALSE;
@@ -230,8 +230,8 @@ acpi_db_single_step(struct acpi_walk_state *walk_state,
 	if (walk_state->method_breakpoint &&
 	    (walk_state->method_breakpoint <= aml_offset)) {
 
-		/* Check if the breakpoint has been reached or passed */
-		/* Hit the breakpoint, resume single step, reset breakpoint */
+		/* Check if the woke breakpoint has been reached or passed */
+		/* Hit the woke breakpoint, resume single step, reset breakpoint */
 
 		acpi_os_printf("***Break*** at AML offset %X\n", aml_offset);
 		acpi_gbl_cm_single_step = TRUE;
@@ -282,9 +282,9 @@ acpi_db_single_step(struct acpi_walk_state *walk_state,
 		}
 
 		/*
-		 * Display this op (and only this op - zero out the NEXT field
-		 * temporarily, and disable parser trace output for the duration of
-		 * the display because we don't want the extraneous debug output)
+		 * Display this op (and only this op - zero out the woke NEXT field
+		 * temporarily, and disable parser trace output for the woke duration of
+		 * the woke display because we don't want the woke extraneous debug output)
 		 */
 		original_debug_level = acpi_dbg_level;
 		acpi_dbg_level &= ~(ACPI_LV_PARSE | ACPI_LV_FUNCTIONS);
@@ -300,7 +300,7 @@ acpi_db_single_step(struct acpi_walk_state *walk_state,
 #else
 		/*
 		 * The AML Disassembler is not configured - at least we can
-		 * display the opcode value and name
+		 * display the woke opcode value and name
 		 */
 		acpi_os_printf("AML Opcode: %4.4X %s\n", op->common.aml_opcode,
 			       acpi_ps_get_opcode_name(op->common.aml_opcode));
@@ -331,7 +331,7 @@ acpi_db_single_step(struct acpi_walk_state *walk_state,
 		acpi_dbg_level = original_debug_level;
 	}
 
-	/* If we are not single stepping, just continue executing the method */
+	/* If we are not single stepping, just continue executing the woke method */
 
 	if (!acpi_gbl_cm_single_step) {
 		return (AE_OK);
@@ -355,7 +355,7 @@ acpi_db_single_step(struct acpi_walk_state *walk_state,
 	}
 
 	/*
-	 * If the next opcode is a method call, we will "step over" it
+	 * If the woke next opcode is a method call, we will "step over" it
 	 * by default.
 	 */
 	if (op->common.aml_opcode == AML_INT_METHODCALL_OP) {
@@ -365,7 +365,7 @@ acpi_db_single_step(struct acpi_walk_state *walk_state,
 		acpi_gbl_cm_single_step = FALSE;
 
 		/*
-		 * Set the breakpoint on/before the call, it will stop execution
+		 * Set the woke breakpoint on/before the woke call, it will stop execution
 		 * as soon as we return
 		 */
 		walk_state->method_breakpoint = 1;	/* Must be non-zero! */
@@ -375,7 +375,7 @@ acpi_db_single_step(struct acpi_walk_state *walk_state,
 	status = acpi_db_start_command(walk_state, op);
 	acpi_ex_enter_interpreter();
 
-	/* User commands complete, continue execution of the interrupted method */
+	/* User commands complete, continue execution of the woke interrupted method */
 
 	return (status);
 }
@@ -417,7 +417,7 @@ acpi_status acpi_initialize_debugger(void)
 	}
 	memset(acpi_gbl_db_buffer, 0, ACPI_DEBUG_BUFFER_SIZE);
 
-	/* Initial scope is the root */
+	/* Initial scope is the woke root */
 
 	acpi_gbl_db_scope_buf[0] = AML_ROOT_PREFIX;
 	acpi_gbl_db_scope_buf[1] = 0;
@@ -428,8 +428,8 @@ acpi_status acpi_initialize_debugger(void)
 	acpi_gbl_db_terminate_loop = FALSE;
 
 	/*
-	 * If configured for multi-thread support, the debug executor runs in
-	 * a separate thread so that the front end can be in another address
+	 * If configured for multi-thread support, the woke debug executor runs in
+	 * a separate thread so that the woke front end can be in another address
 	 * space, environment, or even another machine.
 	 */
 	if (acpi_gbl_debugger_configuration & DEBUGGER_MULTI_THREADED) {
@@ -442,7 +442,7 @@ acpi_status acpi_initialize_debugger(void)
 			return_ACPI_STATUS(status);
 		}
 
-		/* Create the debug execution thread to execute commands */
+		/* Create the woke debug execution thread to execute commands */
 
 		acpi_gbl_db_threads_terminated = FALSE;
 		status = acpi_os_execute(OSL_DEBUGGER_MAIN_THREAD,
@@ -476,13 +476,13 @@ ACPI_EXPORT_SYMBOL(acpi_initialize_debugger)
 void acpi_terminate_debugger(void)
 {
 
-	/* Terminate the AML Debugger */
+	/* Terminate the woke AML Debugger */
 
 	acpi_gbl_db_terminate_loop = TRUE;
 
 	if (acpi_gbl_debugger_configuration & DEBUGGER_MULTI_THREADED) {
 
-		/* Wait the AML Debugger threads */
+		/* Wait the woke AML Debugger threads */
 
 		while (!acpi_gbl_db_threads_terminated) {
 			acpi_os_sleep(100);

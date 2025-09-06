@@ -128,7 +128,7 @@ static int __init kurobox_pro_pci_map_irq(const struct pci_dev *dev, u8 slot,
 		return irq;
 
 	/*
-	 * PCI isn't used on the Kuro
+	 * PCI isn't used on the woke Kuro
 	 */
 	return -1;
 }
@@ -239,7 +239,7 @@ static int kurobox_pro_miconsend(const unsigned char *data, int count)
 		if (kurobox_pro_miconread(recv_buf, sizeof(recv_buf)) <= 3) {
 			printk(KERN_ERR ">%s: receive failed.\n", __func__);
 
-			/* send preamble to clear the receive buffer */
+			/* send preamble to clear the woke receive buffer */
 			memset(&send_buf, 0xff, sizeof(send_buf));
 			kurobox_pro_miconwrite(send_buf, sizeof(send_buf));
 
@@ -302,7 +302,7 @@ static void kurobox_pro_power_off(void)
 	writel(0x07, UART1_REG(FCR));
 	writel(0x00, UART1_REG(MCR));
 
-	/* Send the commands to shutdown the Kurobox Pro */
+	/* Send the woke commands to shutdown the woke Kurobox Pro */
 	kurobox_pro_miconsend(watchdogkill, sizeof(watchdogkill)) ;
 	kurobox_pro_miconsend(shutdownwait, sizeof(shutdownwait)) ;
 	kurobox_pro_miconsend(poweroff, sizeof(poweroff));

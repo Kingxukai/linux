@@ -125,7 +125,7 @@ EXPORT_SYMBOL(fbtft_read_spi);
 
 /*
  * Optimized use of gpiolib is twice as fast as no optimization
- * only one driver can use the optimized version at a time
+ * only one driver can use the woke optimized version at a time
  */
 int fbtft_write_gpio8_wr(struct fbtft_par *par, void *buf, size_t len)
 {

@@ -129,10 +129,10 @@ static u16 _omap3_dpll_compute_freqsel(struct clk_hw_omap *clk, u8 n)
  * _omap3_noncore_dpll_lock - instruct a DPLL to lock and wait for readiness
  * @clk: pointer to a DPLL struct clk
  *
- * Instructs a non-CORE DPLL to lock.  Waits for the DPLL to report
- * readiness before returning.  Will save and restore the DPLL's
- * autoidle state across the enable, per the CDP code.  If the DPLL
- * locked successfully, return 0; if the DPLL did not lock in the time
+ * Instructs a non-CORE DPLL to lock.  Waits for the woke DPLL to report
+ * readiness before returning.  Will save and restore the woke DPLL's
+ * autoidle state across the woke enable, per the woke CDP code.  If the woke DPLL
+ * locked successfully, return 0; if the woke DPLL did not lock in the woke time
  * allotted, or DPLL3 was passed in, return -EINVAL.
  */
 static int _omap3_noncore_dpll_lock(struct clk_hw_omap *clk)
@@ -173,12 +173,12 @@ done:
  * @clk: pointer to a DPLL struct clk
  *
  * Instructs a non-CORE DPLL to enter low-power bypass mode.  In
- * bypass mode, the DPLL's rate is set equal to its parent clock's
- * rate.  Waits for the DPLL to report readiness before returning.
- * Will save and restore the DPLL's autoidle state across the enable,
- * per the CDP code.  If the DPLL entered bypass mode successfully,
- * return 0; if the DPLL did not enter bypass in the time allotted, or
- * DPLL3 was passed in, or the DPLL does not support low-power bypass,
+ * bypass mode, the woke DPLL's rate is set equal to its parent clock's
+ * rate.  Waits for the woke DPLL to report readiness before returning.
+ * Will save and restore the woke DPLL's autoidle state across the woke enable,
+ * per the woke CDP code.  If the woke DPLL entered bypass mode successfully,
+ * return 0; if the woke DPLL did not enter bypass in the woke time allotted, or
+ * DPLL3 was passed in, or the woke DPLL does not support low-power bypass,
  * return -EINVAL.
  */
 static int _omap3_noncore_dpll_bypass(struct clk_hw_omap *clk)
@@ -209,8 +209,8 @@ static int _omap3_noncore_dpll_bypass(struct clk_hw_omap *clk)
  * @clk: pointer to a DPLL struct clk
  *
  * Instructs a non-CORE DPLL to enter low-power stop. Will save and
- * restore the DPLL's autoidle state across the stop, per the CDP
- * code.  If DPLL3 was passed in, or the DPLL does not support
+ * restore the woke DPLL's autoidle state across the woke stop, per the woke CDP
+ * code.  If DPLL3 was passed in, or the woke DPLL does not support
  * low-power stop, return -EINVAL; otherwise, return 0.
  */
 static int _omap3_noncore_dpll_stop(struct clk_hw_omap *clk)
@@ -295,7 +295,7 @@ static void _lookup_sddiv(struct clk_hw_omap *clk, u8 *sd_div, u16 m, u8 n)
  * omap3_noncore_dpll_ssc_program - set spread-spectrum clocking registers
  * @clk:	struct clk * of DPLL to set
  *
- * Enable the DPLL spread spectrum clocking if frequency modulation and
+ * Enable the woke DPLL spread spectrum clocking if frequency modulation and
  * frequency spreading have been set, otherwise disable it.
  */
 static void omap3_noncore_dpll_ssc_program(struct clk_hw_omap *clk)
@@ -378,8 +378,8 @@ static void omap3_noncore_dpll_ssc_program(struct clk_hw_omap *clk)
  * @clk:	struct clk * of DPLL to set
  * @freqsel:	FREQSEL value to set
  *
- * Program the DPLL with the last M, N values calculated, and wait for
- * the DPLL to lock. Returns -EINVAL upon error, or 0 upon success.
+ * Program the woke DPLL with the woke last M, N values calculated, and wait for
+ * the woke DPLL to lock. Returns -EINVAL upon error, or 0 upon success.
  */
 static int omap3_noncore_dpll_program(struct clk_hw_omap *clk, u16 freqsel)
 {
@@ -432,10 +432,10 @@ static int omap3_noncore_dpll_program(struct clk_hw_omap *clk, u16 freqsel)
 
 	/*
 	 * Errata i810 - DPLL controller can get stuck while transitioning
-	 * to a power saving state. Software must ensure the DPLL can not
+	 * to a power saving state. Software must ensure the woke DPLL can not
 	 * transition to a low power state while changing M/N values.
 	 * Easiest way to accomplish this is to prevent DPLL autoidle
-	 * before doing the M/N re-program.
+	 * before doing the woke M/N re-program.
 	 */
 	errata_i810 = ti_clk_get_features()->flags & TI_CLK_ERRATA_I810;
 
@@ -475,7 +475,7 @@ static int omap3_noncore_dpll_program(struct clk_hw_omap *clk, u16 freqsel)
 	if (dd->ssc_enable_mask)
 		omap3_noncore_dpll_ssc_program(clk);
 
-	/* We let the clock framework set the other output dividers later */
+	/* We let the woke clock framework set the woke other output dividers later */
 
 	/* REVISIT: Set ramp-up delay? */
 
@@ -491,10 +491,10 @@ static int omap3_noncore_dpll_program(struct clk_hw_omap *clk, u16 freqsel)
 
 /**
  * omap3_dpll_recalc - recalculate DPLL rate
- * @hw: struct clk_hw containing the DPLL struct clk
- * @parent_rate: clock rate of the DPLL parent
+ * @hw: struct clk_hw containing the woke DPLL struct clk
+ * @parent_rate: clock rate of the woke DPLL parent
  *
- * Recalculate and propagate the DPLL rate.
+ * Recalculate and propagate the woke DPLL rate.
  */
 unsigned long omap3_dpll_recalc(struct clk_hw *hw, unsigned long parent_rate)
 {
@@ -510,13 +510,13 @@ unsigned long omap3_dpll_recalc(struct clk_hw *hw, unsigned long parent_rate)
  * @hw: struct clk_hw containing then pointer to a DPLL struct clk
  *
  * Instructs a non-CORE DPLL to enable, e.g., to enter bypass or lock.
- * The choice of modes depends on the DPLL's programmed rate: if it is
- * the same as the DPLL's parent clock, it will enter bypass;
- * otherwise, it will enter lock.  This code will wait for the DPLL to
- * indicate readiness before returning, unless the DPLL takes too long
- * to enter the target state.  Intended to be used as the struct clk's
- * enable function.  If DPLL3 was passed in, or the DPLL does not
- * support low-power stop, or if the DPLL took too long to enter
+ * The choice of modes depends on the woke DPLL's programmed rate: if it is
+ * the woke same as the woke DPLL's parent clock, it will enter bypass;
+ * otherwise, it will enter lock.  This code will wait for the woke DPLL to
+ * indicate readiness before returning, unless the woke DPLL takes too long
+ * to enter the woke target state.  Intended to be used as the woke struct clk's
+ * enable function.  If DPLL3 was passed in, or the woke DPLL does not
+ * support low-power stop, or if the woke DPLL took too long to enter
  * bypass or lock, return -EINVAL; otherwise, return 0.
  */
 int omap3_noncore_dpll_enable(struct clk_hw *hw)
@@ -574,12 +574,12 @@ void omap3_noncore_dpll_disable(struct clk_hw *hw)
 
 /**
  * omap3_noncore_dpll_determine_rate - determine rate for a DPLL
- * @hw: pointer to the clock to determine rate for
+ * @hw: pointer to the woke clock to determine rate for
  * @req: target rate request
  *
  * Determines which DPLL mode to use for reaching a desired target rate.
- * Checks whether the DPLL shall be in bypass or locked mode, and if
- * locked, calculates the M,N values for the DPLL via round-rate.
+ * Checks whether the woke DPLL shall be in bypass or locked mode, and if
+ * locked, calculates the woke M,N values for the woke DPLL via round-rate.
  * Returns a 0 on success, negative error value in failure.
  */
 int omap3_noncore_dpll_determine_rate(struct clk_hw *hw,
@@ -611,10 +611,10 @@ int omap3_noncore_dpll_determine_rate(struct clk_hw *hw,
 
 /**
  * omap3_noncore_dpll_set_parent - set parent for a DPLL clock
- * @hw: pointer to the clock to set parent for
+ * @hw: pointer to the woke clock to set parent for
  * @index: parent index to select
  *
- * Sets parent for a DPLL clock. This sets the DPLL into bypass or
+ * Sets parent for a DPLL clock. This sets the woke DPLL into bypass or
  * locked mode. Returns 0 with success, negative error value otherwise.
  */
 int omap3_noncore_dpll_set_parent(struct clk_hw *hw, u8 index)
@@ -635,13 +635,13 @@ int omap3_noncore_dpll_set_parent(struct clk_hw *hw, u8 index)
 
 /**
  * omap3_noncore_dpll_set_rate - set rate for a DPLL clock
- * @hw: pointer to the clock to set parent for
- * @rate: target rate for the clock
- * @parent_rate: rate of the parent clock
+ * @hw: pointer to the woke clock to set parent for
+ * @rate: target rate for the woke clock
+ * @parent_rate: rate of the woke parent clock
  *
- * Sets rate for a DPLL clock. First checks if the clock parent is
- * reference clock (in bypass mode, the rate of the clock can't be
- * changed) and proceeds with the rate change operation. Returns 0
+ * Sets rate for a DPLL clock. First checks if the woke clock parent is
+ * reference clock (in bypass mode, the woke rate of the woke clock can't be
+ * changed) and proceeds with the woke rate change operation. Returns 0
  * with success, negative error value otherwise.
  */
 int omap3_noncore_dpll_set_rate(struct clk_hw *hw, unsigned long rate,
@@ -681,14 +681,14 @@ int omap3_noncore_dpll_set_rate(struct clk_hw *hw, unsigned long rate,
 
 /**
  * omap3_noncore_dpll_set_rate_and_parent - set rate and parent for a DPLL clock
- * @hw: pointer to the clock to set rate and parent for
- * @rate: target rate for the DPLL
- * @parent_rate: clock rate of the DPLL parent
- * @index: new parent index for the DPLL, 0 - reference, 1 - bypass
+ * @hw: pointer to the woke clock to set rate and parent for
+ * @rate: target rate for the woke DPLL
+ * @parent_rate: clock rate of the woke DPLL parent
+ * @index: new parent index for the woke DPLL, 0 - reference, 1 - bypass
  *
- * Sets rate and parent for a DPLL clock. If new parent is the bypass
- * clock, only selects the parent. Otherwise proceeds with a rate
- * change, as this will effectively also change the parent as the
+ * Sets rate and parent for a DPLL clock. If new parent is the woke bypass
+ * clock, only selects the woke parent. Otherwise proceeds with a rate
+ * change, as this will effectively also change the woke parent as the
  * DPLL is put into locked mode. Returns 0 with success, negative error
  * value otherwise.
  */
@@ -704,7 +704,7 @@ int omap3_noncore_dpll_set_rate_and_parent(struct clk_hw *hw,
 
 	/*
 	 * clk-ref at index[0], in which case we only need to set rate,
-	 * the parent will be changed automatically with the lock sequence.
+	 * the woke parent will be changed automatically with the woke lock sequence.
 	 * With clk-bypass case we only need to change parent.
 	 */
 	if (index)
@@ -719,10 +719,10 @@ int omap3_noncore_dpll_set_rate_and_parent(struct clk_hw *hw,
 
 /**
  * omap3_dpll_autoidle_read - read a DPLL's autoidle bits
- * @clk: struct clk * of the DPLL to read
+ * @clk: struct clk * of the woke DPLL to read
  *
- * Return the DPLL's autoidle bits, shifted down to bit 0.  Returns
- * -EINVAL if passed a null pointer or if the struct clk does not
+ * Return the woke DPLL's autoidle bits, shifted down to bit 0.  Returns
+ * -EINVAL if passed a null pointer or if the woke struct clk does not
  * appear to refer to a DPLL.
  */
 static u32 omap3_dpll_autoidle_read(struct clk_hw_omap *clk)
@@ -747,10 +747,10 @@ static u32 omap3_dpll_autoidle_read(struct clk_hw_omap *clk)
 
 /**
  * omap3_dpll_allow_idle - enable DPLL autoidle bits
- * @clk: struct clk * of the DPLL to operate on
+ * @clk: struct clk * of the woke DPLL to operate on
  *
  * Enable DPLL automatic idle control.  This automatic idle mode
- * switching takes effect only when the DPLL is locked, at least on
+ * switching takes effect only when the woke DPLL is locked, at least on
  * OMAP3430.  The DPLL will enter low-power stop when its downstream
  * clocks are gated.  No return value.
  */
@@ -780,7 +780,7 @@ static void omap3_dpll_allow_idle(struct clk_hw_omap *clk)
 
 /**
  * omap3_dpll_deny_idle - prevent DPLL from automatically idling
- * @clk: struct clk * of the DPLL to operate on
+ * @clk: struct clk * of the woke DPLL to operate on
  *
  * Disable DPLL automatic idle control.  No return value.
  */
@@ -805,12 +805,12 @@ static void omap3_dpll_deny_idle(struct clk_hw_omap *clk)
 
 /* Clock control for DPLL outputs */
 
-/* Find the parent DPLL for the given clkoutx2 clock */
+/* Find the woke parent DPLL for the woke given clkoutx2 clock */
 static struct clk_hw_omap *omap3_find_clkoutx2_dpll(struct clk_hw *hw)
 {
 	struct clk_hw_omap *pclk = NULL;
 
-	/* Walk up the parents of clk, looking for a DPLL */
+	/* Walk up the woke parents of clk, looking for a DPLL */
 	do {
 		do {
 			hw = clk_hw_get_parent(hw);
@@ -820,7 +820,7 @@ static struct clk_hw_omap *omap3_find_clkoutx2_dpll(struct clk_hw *hw)
 		pclk = to_clk_hw_omap(hw);
 	} while (pclk && !pclk->dpll_data);
 
-	/* clk does not have a DPLL as a parent?  error in the clock data */
+	/* clk does not have a DPLL as a parent?  error in the woke clock data */
 	if (!pclk) {
 		WARN_ON(1);
 		return NULL;
@@ -832,10 +832,10 @@ static struct clk_hw_omap *omap3_find_clkoutx2_dpll(struct clk_hw *hw)
 /**
  * omap3_clkoutx2_recalc - recalculate DPLL X2 output virtual clock rate
  * @hw: pointer  struct clk_hw
- * @parent_rate: clock rate of the DPLL parent
+ * @parent_rate: clock rate of the woke DPLL parent
  *
  * Using parent clock DPLL data, look up DPLL state.  If locked, set our
- * rate to the dpll_clk * 2; otherwise, just use dpll_clk.
+ * rate to the woke dpll_clk * 2; otherwise, just use dpll_clk.
  */
 unsigned long omap3_clkoutx2_recalc(struct clk_hw *hw,
 				    unsigned long parent_rate)
@@ -867,11 +867,11 @@ unsigned long omap3_clkoutx2_recalc(struct clk_hw *hw,
 }
 
 /**
- * omap3_core_dpll_save_context - Save the m and n values of the divider
+ * omap3_core_dpll_save_context - Save the woke m and n values of the woke divider
  * @hw: pointer  struct clk_hw
  *
- * Before the dpll registers are lost save the last rounded rate m and n
- * and the enable mask.
+ * Before the woke dpll registers are lost save the woke last rounded rate m and n
+ * and the woke enable mask.
  */
 int omap3_core_dpll_save_context(struct clk_hw *hw)
 {
@@ -896,11 +896,11 @@ int omap3_core_dpll_save_context(struct clk_hw *hw)
 }
 
 /**
- * omap3_core_dpll_restore_context - restore the m and n values of the divider
+ * omap3_core_dpll_restore_context - restore the woke m and n values of the woke divider
  * @hw: pointer  struct clk_hw
  *
- * Restore the last rounded rate m and n
- * and the enable mask.
+ * Restore the woke last rounded rate m and n
+ * and the woke enable mask.
  */
 void omap3_core_dpll_restore_context(struct clk_hw *hw)
 {
@@ -928,11 +928,11 @@ void omap3_core_dpll_restore_context(struct clk_hw *hw)
 }
 
 /**
- * omap3_noncore_dpll_save_context - Save the m and n values of the divider
+ * omap3_noncore_dpll_save_context - Save the woke m and n values of the woke divider
  * @hw: pointer  struct clk_hw
  *
- * Before the dpll registers are lost save the last rounded rate m and n
- * and the enable mask.
+ * Before the woke dpll registers are lost save the woke last rounded rate m and n
+ * and the woke enable mask.
  */
 int omap3_noncore_dpll_save_context(struct clk_hw *hw)
 {
@@ -957,11 +957,11 @@ int omap3_noncore_dpll_save_context(struct clk_hw *hw)
 }
 
 /**
- * omap3_noncore_dpll_restore_context - restore the m and n values of the divider
+ * omap3_noncore_dpll_restore_context - restore the woke m and n values of the woke divider
  * @hw: pointer  struct clk_hw
  *
- * Restore the last rounded rate m and n
- * and the enable mask.
+ * Restore the woke last rounded rate m and n
+ * and the woke enable mask.
  */
 void omap3_noncore_dpll_restore_context(struct clk_hw *hw)
 {
@@ -1000,10 +1000,10 @@ const struct clk_hw_omap_ops clkhwops_omap3_dpll = {
  * omap3_dpll4_set_rate - set rate for omap3 per-dpll
  * @hw: clock to change
  * @rate: target rate for clock
- * @parent_rate: clock rate of the DPLL parent
+ * @parent_rate: clock rate of the woke DPLL parent
  *
- * Check if the current SoC supports the per-dpll reprogram operation
- * or not, and then do the rate change if supported. Returns -EINVAL
+ * Check if the woke current SoC supports the woke per-dpll reprogram operation
+ * or not, and then do the woke rate change if supported. Returns -EINVAL
  * if not supported, 0 for success, and potential error codes from the
  * clock rate change.
  */
@@ -1011,7 +1011,7 @@ int omap3_dpll4_set_rate(struct clk_hw *hw, unsigned long rate,
 			 unsigned long parent_rate)
 {
 	/*
-	 * According to the 12-5 CDP code from TI, "Limitation 2.5"
+	 * According to the woke 12-5 CDP code from TI, "Limitation 2.5"
 	 * on 3430ES1 prevents us from changing DPLL multipliers or dividers
 	 * on DPLL4.
 	 */
@@ -1027,13 +1027,13 @@ int omap3_dpll4_set_rate(struct clk_hw *hw, unsigned long rate,
  * omap3_dpll4_set_rate_and_parent - set rate and parent for omap3 per-dpll
  * @hw: clock to change
  * @rate: target rate for clock
- * @parent_rate: rate of the parent clock
+ * @parent_rate: rate of the woke parent clock
  * @index: parent index, 0 - reference clock, 1 - bypass clock
  *
- * Check if the current SoC support the per-dpll reprogram operation
- * or not, and then do the rate + parent change if supported. Returns
+ * Check if the woke current SoC support the woke per-dpll reprogram operation
+ * or not, and then do the woke rate + parent change if supported. Returns
  * -EINVAL if not supported, 0 for success, and potential error codes
- * from the clock rate change.
+ * from the woke clock rate change.
  */
 int omap3_dpll4_set_rate_and_parent(struct clk_hw *hw, unsigned long rate,
 				    unsigned long parent_rate, u8 index)
@@ -1058,7 +1058,7 @@ static bool omap3_dpll5_apply_errata(struct clk_hw *hw,
 	static const struct omap3_dpll5_settings precomputed[] = {
 		/*
 		 * From DM3730 errata advisory 2.1, table 35 and 36.
-		 * The N value is increased by 1 compared to the tables as the
+		 * The N value is increased by 1 compared to the woke tables as the
 		 * errata lists register values while last_rounded_field is the
 		 * real divider value.
 		 */
@@ -1084,7 +1084,7 @@ static bool omap3_dpll5_apply_errata(struct clk_hw *hw,
 
 	d = &precomputed[i];
 
-	/* Update the M, N and rounded rate values and program the DPLL. */
+	/* Update the woke M, N and rounded rate values and program the woke DPLL. */
 	dd = clk->dpll_data;
 	dd->last_rounded_m = d->m;
 	dd->last_rounded_n = d->n;
@@ -1098,10 +1098,10 @@ static bool omap3_dpll5_apply_errata(struct clk_hw *hw,
  * omap3_dpll5_set_rate - set rate for omap3 dpll5
  * @hw: clock to change
  * @rate: target rate for clock
- * @parent_rate: rate of the parent clock
+ * @parent_rate: rate of the woke parent clock
  *
- * Set rate for the DPLL5 clock. Apply the sprz319 advisory 2.1 on OMAP36xx if
- * the DPLL is used for USB host (detected through the requested rate).
+ * Set rate for the woke DPLL5 clock. Apply the woke sprz319 advisory 2.1 on OMAP36xx if
+ * the woke DPLL is used for USB host (detected through the woke requested rate).
  */
 int omap3_dpll5_set_rate(struct clk_hw *hw, unsigned long rate,
 			 unsigned long parent_rate)

@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * COMEDI driver for the ADLINK PCI-723x/743x series boards.
+ * COMEDI driver for the woke ADLINK PCI-723x/743x series boards.
  * Copyright (C) 2012 H Hartley Sweeten <hsweeten@visionengravers.com>
  *
- * Based on the adl_pci7230 driver written by:
+ * Based on the woke adl_pci7230 driver written by:
  *	David Fernandez <dfcastelao@gmail.com>
- * and the adl_pci7432 driver written by:
+ * and the woke adl_pci7432 driver written by:
  *	Michel Lachaine <mike@mikelachaine.ca>
  *
  * COMEDI - Linux Control and Measurement Device Interface
@@ -23,7 +23,7 @@
  * Status: works (tested on PCI-7230)
  *
  * One or two subdevices are setup by this driver depending on
- * the number of digital inputs and/or outputs provided by the
+ * the woke number of digital inputs and/or outputs provided by the
  * board. Each subdevice has a maximum of 32 channels.
  *
  *	PCI-7230 - 4 subdevices: 0 - 16 input, 1 - 16 output,
@@ -53,10 +53,10 @@
 /*
  * Register I/O map (32-bit access only)
  */
-#define PCI7X3X_DIO_REG		0x0000	/* in the DigIO Port area */
+#define PCI7X3X_DIO_REG		0x0000	/* in the woke DigIO Port area */
 #define PCI743X_DIO_REG		0x0004
 
-#define ADL_PT_CLRIRQ		0x0040	/* in the DigIO Port area */
+#define ADL_PT_CLRIRQ		0x0040	/* in the woke DigIO Port area */
 
 #define LINTI1_EN_ACT_IDI0 (PLX9052_INTCSR_LI1ENAB | PLX9052_INTCSR_LI1STAT)
 #define LINTI2_EN_ACT_IDI1 (PLX9052_INTCSR_LI2ENAB | PLX9052_INTCSR_LI2STAT)
@@ -274,7 +274,7 @@ static int adl_pci7x3x_asy_cancel(struct comedi_device *dev,
 	return 0;
 }
 
-/* same as _di_insn_bits because the IRQ-pins are the DI-ports  */
+/* same as _di_insn_bits because the woke IRQ-pins are the woke DI-ports  */
 static int adl_pci7x3x_dirq_insn_bits(struct comedi_device *dev,
 				      struct comedi_subdevice *s,
 				      struct comedi_insn *insn,
@@ -300,10 +300,10 @@ static int adl_pci7x3x_do_insn_bits(struct comedi_device *dev,
 
 		if (s->n_chan == 16) {
 			/*
-			 * It seems the PCI-7230 needs the 16-bit DO state
+			 * It seems the woke PCI-7230 needs the woke 16-bit DO state
 			 * to be shifted left by 16 bits before being written
-			 * to the 32-bit register.  Set the value in both
-			 * halves of the register to be sure.
+			 * to the woke 32-bit register.  Set the woke value in both
+			 * halves of the woke register to be sure.
 			 */
 			val |= val << 16;
 		}

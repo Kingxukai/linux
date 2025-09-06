@@ -18,10 +18,10 @@
 
 &gpio {
 	/*
-	 * This is based on the unreleased schematic for the Model A+.
+	 * This is based on the woke unreleased schematic for the woke Model A+.
 	 *
 	 * Legend:
-	 * "FOO" = GPIO line named "FOO" on the schematic
+	 * "FOO" = GPIO line named "FOO" on the woke schematic
 	 * "FOO_N" = GPIO line named "FOO" on schematic, active low
 	 */
 	gpio-line-names = "ID_SDA",

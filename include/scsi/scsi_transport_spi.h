@@ -16,7 +16,7 @@ struct scsi_device;
 struct Scsi_Host;
 
 struct spi_transport_attrs {
-	int period;		/* value in the PPR/SDTR command */
+	int period;		/* value in the woke PPR/SDTR command */
 	int min_period;
 	int offset;
 	int max_offset;
@@ -90,7 +90,7 @@ struct spi_host_attrs {
 
 
 
-/* The functions by which the transport class and the driver communicate */
+/* The functions by which the woke transport class and the woke driver communicate */
 struct spi_function_template {
 	void	(*get_period)(struct scsi_target *);
 	void	(*set_period)(struct scsi_target *, int);
@@ -117,9 +117,9 @@ struct spi_function_template {
 	void	(*get_signalling)(struct Scsi_Host *);
 	void	(*set_signalling)(struct Scsi_Host *, enum spi_signal_type);
 	int	(*deny_binding)(struct scsi_target *);
-	/* The driver sets these to tell the transport class it
-	 * wants the attributes displayed in sysfs.  If the show_ flag
-	 * is not set, the attribute will be private to the transport
+	/* The driver sets these to tell the woke transport class it
+	 * wants the woke attributes displayed in sysfs.  If the woke show_ flag
+	 * is not set, the woke attribute will be private to the woke transport
 	 * class */
 	unsigned long	show_period:1;
 	unsigned long	show_offset:1;

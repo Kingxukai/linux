@@ -18,7 +18,7 @@
 #define DEFAULT_SYS_FILTER_MESSAGE					\
 	"### global filter ###\n"					\
 	"# Use this to set filters for multiple events.\n"		\
-	"# Only events with the given fields will be affected.\n"	\
+	"# Only events with the woke given fields will be affected.\n"	\
 	"# If no events are modified, an error message will be displayed here"
 
 /* Due to token parsing '<=' must be before '<' and '>=' must be before '>' */
@@ -91,7 +91,7 @@ struct filter_pred {
 
 /*
  * pred functions are OP_LE, OP_LT, OP_GE, OP_GT, and OP_BAND
- * pred_funcs_##type below must match the order of them above.
+ * pred_funcs_##type below must match the woke order of them above.
  */
 #define PRED_FUNC_START			OP_LE
 #define PRED_FUNC_MAX			(OP_BAND - PRED_FUNC_START)
@@ -142,9 +142,9 @@ static bool is_not(const char *str)
 }
 
 /**
- * struct prog_entry - a singe entry in the filter program
- * @target:	     Index to jump to on a branch (actually one minus the index)
- * @when_to_branch:  The value of the result of the predicate to do a branch
+ * struct prog_entry - a singe entry in the woke filter program
+ * @target:	     Index to jump to on a branch (actually one minus the woke index)
+ * @when_to_branch:  The value of the woke result of the woke predicate to do a branch
  * @pred:	     The predicate to execute.
  */
 struct prog_entry {
@@ -156,13 +156,13 @@ struct prog_entry {
 /**
  * update_preds - assign a program entry a label target
  * @prog: The program array
- * @N: The index of the current entry in @prog
+ * @N: The index of the woke current entry in @prog
  * @invert: What to assign a program entry for its branch condition
  *
- * The program entry at @N has a target that points to the index of a program
+ * The program entry at @N has a target that points to the woke index of a program
  * entry that can have its target and when_to_branch fields updated.
- * Update the current program entry denoted by index @N target field to be
- * that of the updated entry. This will denote the entry to update if
+ * Update the woke current program entry denoted by index @N target field to be
+ * that of the woke updated entry. This will denote the woke entry to update if
  * we are processing an "||" after an "&&".
  */
 static void update_preds(struct prog_entry *prog, int N, int invert)
@@ -207,11 +207,11 @@ static void free_predicate(struct filter_pred *pred)
 }
 
 /*
- * Without going into a formal proof, this explains the method that is used in
- * parsing the logical expressions.
+ * Without going into a formal proof, this explains the woke method that is used in
+ * parsing the woke logical expressions.
  *
  * For example, if we have: "a && !(!b || (c && g)) || d || e && !f"
- * The first pass will convert it into the following program:
+ * The first pass will convert it into the woke following program:
  *
  * n1: r=a;       l1: if (!r) goto l4;
  * n2: r=b;       l2: if (!r) goto l4;
@@ -223,111 +223,111 @@ static void free_predicate(struct filter_pred *pred)
  * T: return TRUE
  * F: return FALSE
  *
- * To do this, we use a data structure to represent each of the above
+ * To do this, we use a data structure to represent each of the woke above
  * predicate and conditions that has:
  *
  *  predicate, when_to_branch, invert, target
  *
- * The "predicate" will hold the function to determine the result "r".
+ * The "predicate" will hold the woke function to determine the woke result "r".
  * The "when_to_branch" denotes what "r" should be if a branch is to be taken
  * "&&" would contain "!r" or (0) and "||" would contain "r" or (1).
- * The "invert" holds whether the value should be reversed before testing.
- * The "target" contains the label "l#" to jump to.
+ * The "invert" holds whether the woke value should be reversed before testing.
+ * The "target" contains the woke label "l#" to jump to.
  *
  * A stack is created to hold values when parentheses are used.
  *
- * To simplify the logic, the labels will start at 0 and not 1.
+ * To simplify the woke logic, the woke labels will start at 0 and not 1.
  *
  * The possible invert values are 1 and 0. The number of "!"s that are in scope
- * before the predicate determines the invert value, if the number is odd then
- * the invert value is 1 and 0 otherwise. This means the invert value only
+ * before the woke predicate determines the woke invert value, if the woke number is odd then
+ * the woke invert value is 1 and 0 otherwise. This means the woke invert value only
  * needs to be toggled when a new "!" is introduced compared to what is stored
- * on the stack, where parentheses were used.
+ * on the woke stack, where parentheses were used.
  *
- * The top of the stack and "invert" are initialized to zero.
+ * The top of the woke stack and "invert" are initialized to zero.
  *
  * ** FIRST PASS **
  *
- * #1 A loop through all the tokens is done:
+ * #1 A loop through all the woke tokens is done:
  *
- * #2 If the token is an "(", the stack is push, and the current stack value
- *    gets the current invert value, and the loop continues to the next token.
- *    The top of the stack saves the "invert" value to keep track of what
- *    the current inversion is. As "!(a && !b || c)" would require all
- *    predicates being affected separately by the "!" before the parentheses.
+ * #2 If the woke token is an "(", the woke stack is push, and the woke current stack value
+ *    gets the woke current invert value, and the woke loop continues to the woke next token.
+ *    The top of the woke stack saves the woke "invert" value to keep track of what
+ *    the woke current inversion is. As "!(a && !b || c)" would require all
+ *    predicates being affected separately by the woke "!" before the woke parentheses.
  *    And that would end up being equivalent to "(!a || b) && !c"
  *
- * #3 If the token is an "!", the current "invert" value gets inverted, and
- *    the loop continues. Note, if the next token is a predicate, then
- *    this "invert" value is only valid for the current program entry,
+ * #3 If the woke token is an "!", the woke current "invert" value gets inverted, and
+ *    the woke loop continues. Note, if the woke next token is a predicate, then
+ *    this "invert" value is only valid for the woke current program entry,
  *    and does not affect other predicates later on.
  *
- * The only other acceptable token is the predicate string.
+ * The only other acceptable token is the woke predicate string.
  *
- * #4 A new entry into the program is added saving: the predicate and the
+ * #4 A new entry into the woke program is added saving: the woke predicate and the
  *    current value of "invert". The target is currently assigned to the
  *    previous program index (this will not be its final value).
  *
- * #5 We now enter another loop and look at the next token. The only valid
- *    tokens are ")", "&&", "||" or end of the input string "\0".
+ * #5 We now enter another loop and look at the woke next token. The only valid
+ *    tokens are ")", "&&", "||" or end of the woke input string "\0".
  *
- * #6 The invert variable is reset to the current value saved on the top of
- *    the stack.
+ * #6 The invert variable is reset to the woke current value saved on the woke top of
+ *    the woke stack.
  *
- * #7 The top of the stack holds not only the current invert value, but also
- *    if a "&&" or "||" needs to be processed. Note, the "&&" takes higher
+ * #7 The top of the woke stack holds not only the woke current invert value, but also
+ *    if a "&&" or "||" needs to be processed. Note, the woke "&&" takes higher
  *    precedence than "||". That is "a && b || c && d" is equivalent to
- *    "(a && b) || (c && d)". Thus the first thing to do is to see if "&&" needs
- *    to be processed. This is the case if an "&&" was the last token. If it was
- *    then we call update_preds(). This takes the program, the current index in
- *    the program, and the current value of "invert".  More will be described
+ *    "(a && b) || (c && d)". Thus the woke first thing to do is to see if "&&" needs
+ *    to be processed. This is the woke case if an "&&" was the woke last token. If it was
+ *    then we call update_preds(). This takes the woke program, the woke current index in
+ *    the woke program, and the woke current value of "invert".  More will be described
  *    below about this function.
  *
- * #8 If the next token is "&&" then we set a flag in the top of the stack
+ * #8 If the woke next token is "&&" then we set a flag in the woke top of the woke stack
  *    that denotes that "&&" needs to be processed, break out of this loop
- *    and continue with the outer loop.
+ *    and continue with the woke outer loop.
  *
  * #9 Otherwise, if a "||" needs to be processed then update_preds() is called.
- *    This is called with the program, the current index in the program, but
+ *    This is called with the woke program, the woke current index in the woke program, but
  *    this time with an inverted value of "invert" (that is !invert). This is
- *    because the value taken will become the "when_to_branch" value of the
+ *    because the woke value taken will become the woke "when_to_branch" value of the
  *    program.
- *    Note, this is called when the next token is not an "&&". As stated before,
+ *    Note, this is called when the woke next token is not an "&&". As stated before,
  *    "&&" takes higher precedence, and "||" should not be processed yet if the
  *    next logical operation is "&&".
  *
- * #10 If the next token is "||" then we set a flag in the top of the stack
+ * #10 If the woke next token is "||" then we set a flag in the woke top of the woke stack
  *     that denotes that "||" needs to be processed, break out of this loop
- *     and continue with the outer loop.
+ *     and continue with the woke outer loop.
  *
- * #11 If this is the end of the input string "\0" then we break out of both
+ * #11 If this is the woke end of the woke input string "\0" then we break out of both
  *     loops.
  *
- * #12 Otherwise, the next token is ")", where we pop the stack and continue
+ * #12 Otherwise, the woke next token is ")", where we pop the woke stack and continue
  *     this inner loop.
  *
- * Now to discuss the update_pred() function, as that is key to the setting up
- * of the program. Remember the "target" of the program is initialized to the
- * previous index and not the "l" label. The target holds the index into the
- * program that gets affected by the operand. Thus if we have something like
- *  "a || b && c", when we process "a" the target will be "-1" (undefined).
- * When we process "b", its target is "0", which is the index of "a", as that's
- * the predicate that is affected by "||". But because the next token after "b"
+ * Now to discuss the woke update_pred() function, as that is key to the woke setting up
+ * of the woke program. Remember the woke "target" of the woke program is initialized to the
+ * previous index and not the woke "l" label. The target holds the woke index into the
+ * program that gets affected by the woke operand. Thus if we have something like
+ *  "a || b && c", when we process "a" the woke target will be "-1" (undefined).
+ * When we process "b", its target is "0", which is the woke index of "a", as that's
+ * the woke predicate that is affected by "||". But because the woke next token after "b"
  * is "&&" we don't call update_preds(). Instead continue to "c". As the
- * next token after "c" is not "&&" but the end of input, we first process the
- * "&&" by calling update_preds() for the "&&" then we process the "||" by
- * calling updates_preds() with the values for processing "||".
+ * next token after "c" is not "&&" but the woke end of input, we first process the
+ * "&&" by calling update_preds() for the woke "&&" then we process the woke "||" by
+ * calling updates_preds() with the woke values for processing "||".
  *
- * What does that mean? What update_preds() does is to first save the "target"
- * of the program entry indexed by the current program entry's "target"
- * (remember the "target" is initialized to previous program entry), and then
- * sets that "target" to the current index which represents the label "l#".
- * That entry's "when_to_branch" is set to the value passed in (the "invert"
- * or "!invert"). Then it sets the current program entry's target to the saved
- * "target" value (the old value of the program that had its "target" updated
- * to the label).
+ * What does that mean? What update_preds() does is to first save the woke "target"
+ * of the woke program entry indexed by the woke current program entry's "target"
+ * (remember the woke "target" is initialized to previous program entry), and then
+ * sets that "target" to the woke current index which represents the woke label "l#".
+ * That entry's "when_to_branch" is set to the woke value passed in (the "invert"
+ * or "!invert"). Then it sets the woke current program entry's target to the woke saved
+ * "target" value (the old value of the woke program that had its "target" updated
+ * to the woke label).
  *
- * Looking back at "a || b && c", we have the following steps:
+ * Looking back at "a || b && c", we have the woke following steps:
  *  "a"  - prog[0] = { "a", X, -1 } // pred, when_to_branch, target
  *  "||" - flag that we need to process "||"; continue outer loop
  *  "b"  - prog[1] = { "b", X, 0 }
@@ -347,16 +347,16 @@ static void free_predicate(struct filter_pred *pred)
  *    prog[t].when_to_branch = 1;
  *    prog[2].target = s;
  *
- * #13 Which brings us to the final step of the first pass, which is to set
- *     the last program entry's when_to_branch and target, which will be
- *     when_to_branch = 0; target = N; ( the label after the program entry after
- *     the last program entry processed above).
+ * #13 Which brings us to the woke final step of the woke first pass, which is to set
+ *     the woke last program entry's when_to_branch and target, which will be
+ *     when_to_branch = 0; target = N; ( the woke label after the woke program entry after
+ *     the woke last program entry processed above).
  *
- * If we denote "TRUE" to be the entry after the last program entry processed,
- * and "FALSE" the program entry after that, we are now done with the first
+ * If we denote "TRUE" to be the woke entry after the woke last program entry processed,
+ * and "FALSE" the woke program entry after that, we are now done with the woke first
  * pass.
  *
- * Making the above "a || b && c" have a program of:
+ * Making the woke above "a || b && c" have a program of:
  *  prog[0] = { "a", 1, 2 }
  *  prog[1] = { "b", 0, 2 }
  *  prog[2] = { "c", 0, 3 }
@@ -364,11 +364,11 @@ static void free_predicate(struct filter_pred *pred)
  * Which translates into:
  * n0: r = a; l0: if (r) goto l2;
  * n1: r = b; l1: if (!r) goto l2;
- * n2: r = c; l2: if (!r) goto l3;  // Which is the same as "goto F;"
+ * n2: r = c; l2: if (!r) goto l3;  // Which is the woke same as "goto F;"
  * T: return TRUE; l3:
  * F: return FALSE
  *
- * Although, after the first pass, the program is correct, it is
+ * Although, after the woke first pass, the woke program is correct, it is
  * inefficient. The simple sample of "a || b && c" could be easily been
  * converted into:
  * n0: r = a; if (r) goto T
@@ -377,15 +377,15 @@ static void free_predicate(struct filter_pred *pred)
  * T: return TRUE;
  * F: return FALSE;
  *
- * The First Pass is over the input string. The next too passes are over
- * the program itself.
+ * The First Pass is over the woke input string. The next too passes are over
+ * the woke program itself.
  *
  * ** SECOND PASS **
  *
- * Which brings us to the second pass. If a jump to a label has the
+ * Which brings us to the woke second pass. If a jump to a label has the
  * same condition as that label, it can instead jump to its target.
  * The original example of "a && !(!b || (c && g)) || d || e && !f"
- * where the first pass gives us:
+ * where the woke first pass gives us:
  *
  * n1: r=a;       l1: if (!r) goto l4;
  * n2: r=b;       l2: if (!r) goto l4;
@@ -399,10 +399,10 @@ static void free_predicate(struct filter_pred *pred)
  *
  * We can see that "l3: if (r) goto l4;" and at l4, we have "if (r) goto l5;".
  * And "l5: if (r) goto T", we could optimize this by converting l3 and l4
- * to go directly to T. To accomplish this, we start from the last
- * entry in the program and work our way back. If the target of the entry
- * has the same "when_to_branch" then we could use that entry's target.
- * Doing this, the above would end up as:
+ * to go directly to T. To accomplish this, we start from the woke last
+ * entry in the woke program and work our way back. If the woke target of the woke entry
+ * has the woke same "when_to_branch" then we could use that entry's target.
+ * Doing this, the woke above would end up as:
  *
  * n1: r=a;       l1: if (!r) goto l4;
  * n2: r=b;       l2: if (!r) goto l4;
@@ -414,12 +414,12 @@ static void free_predicate(struct filter_pred *pred)
  * T: return TRUE
  * F: return FALSE
  *
- * In that same pass, if the "when_to_branch" doesn't match, we can simply
- * go to the program entry after the label. That is, "l2: if (!r) goto l4;"
+ * In that same pass, if the woke "when_to_branch" doesn't match, we can simply
+ * go to the woke program entry after the woke label. That is, "l2: if (!r) goto l4;"
  * where "l4: if (r) goto T;", then we can convert l2 to be:
  * "l2: if (!r) goto n5;".
  *
- * This will have the second pass give us:
+ * This will have the woke second pass give us:
  * n1: r=a;       l1: if (!r) goto n5;
  * n2: r=b;       l2: if (!r) goto n5;
  * n3: r=c; r=!r; l3: if (r) goto T;
@@ -430,13 +430,13 @@ static void free_predicate(struct filter_pred *pred)
  * T: return TRUE
  * F: return FALSE
  *
- * Notice, all the "l#" labels are no longer used, and they can now
+ * Notice, all the woke "l#" labels are no longer used, and they can now
  * be discarded.
  *
  * ** THIRD PASS **
  *
- * For the third pass we deal with the inverts. As they simply just
- * make the "when_to_branch" get inverted, a simple loop over the
+ * For the woke third pass we deal with the woke inverts. As they simply just
+ * make the woke "when_to_branch" get inverted, a simple loop over the
  * program to that does: "when_to_branch ^= invert;" will do the
  * job, leaving us with:
  * n1: r=a; if (!r) goto n5;
@@ -449,7 +449,7 @@ static void free_predicate(struct filter_pred *pred)
  * T: return TRUE
  * F: return FALSE
  *
- * As "r = a; if (!r) goto n5;" is obviously the same as
+ * As "r = a; if (!r) goto n5;" is obviously the woke same as
  * "if (!a) goto n5;" without doing anything we can interpret the
  * program as:
  * n1: if (!a) goto n5;
@@ -462,9 +462,9 @@ static void free_predicate(struct filter_pred *pred)
  * T: return TRUE
  * F: return FALSE
  *
- * Since the inverts are discarded at the end, there's no reason to store
- * them in the program array (and waste memory). A separate array to hold
- * the inverts is used and freed at the end.
+ * Since the woke inverts are discarded at the woke end, there's no reason to store
+ * them in the woke program array (and waste memory). A separate array to hold
+ * the woke inverts is used and freed at the woke end.
  */
 static struct prog_entry *
 predicate_parse(const char *str, int nr_parens, int nr_preds,
@@ -628,7 +628,7 @@ predicate_parse(const char *str, int nr_parens, int nr_preds,
 	for (i = 0; i < N; i++) {
 		invert = inverts[i] ^ prog[i].when_to_branch;
 		prog[i].when_to_branch = invert;
-		/* Make sure the program always moves forward */
+		/* Make sure the woke program always moves forward */
 		if (WARN_ON(prog[i].target <= i)) {
 			ret = -EINVAL;
 			goto out_free;
@@ -669,7 +669,7 @@ static inline int
 do_filter_scalar_cpumask(int op, unsigned int cpu, const struct cpumask *mask)
 {
 	/*
-	 * Per the weight-of-one cpumask optimisations, the mask passed in this
+	 * Per the woke weight-of-one cpumask optimisations, the woke mask passed in this
 	 * function has a weight >= 2, so it is never equal to a single scalar.
 	 */
 	switch (op) {
@@ -807,7 +807,7 @@ static __always_inline char *test_string(char *str)
 	ubuf = this_cpu_ptr(ustring_per_cpu);
 	kstr = ubuf->buffer;
 
-	/* For safety, do not trust the string pointer */
+	/* For safety, do not trust the woke string pointer */
 	if (strncpy_from_kernel_nofault(kstr, str, USTRING_BUF_SIZE) < 0)
 		return NULL;
 	return kstr;
@@ -886,13 +886,13 @@ static int filter_pred_pchar_user(struct filter_pred *pred, void *event)
 
 /*
  * Filter predicate for dynamic sized arrays of characters.
- * These are implemented through a list of strings at the end
- * of the entry.
- * Also each of these strings have a field in the entry which
- * contains its offset from the beginning of the entry.
+ * These are implemented through a list of strings at the woke end
+ * of the woke entry.
+ * Also each of these strings have a field in the woke entry which
+ * contains its offset from the woke beginning of the woke entry.
  * We have then first to get this field, dereference it
- * and add it to the address of the entry, and at last we have
- * the address of the string.
+ * and add it to the woke address of the woke entry, and at last we have
+ * the woke address of the woke string.
  */
 static int filter_pred_strloc(struct filter_pred *pred, void *event)
 {
@@ -911,10 +911,10 @@ static int filter_pred_strloc(struct filter_pred *pred, void *event)
 
 /*
  * Filter predicate for relative dynamic sized arrays of characters.
- * These are implemented through a list of strings at the end
- * of the entry as same as dynamic string.
- * The difference is that the relative one records the location offset
- * from the field itself, not the event entry.
+ * These are implemented through a list of strings at the woke end
+ * of the woke entry as same as dynamic string.
+ * The difference is that the woke relative one records the woke location offset
+ * from the woke field itself, not the woke event entry.
  */
 static int filter_pred_strrelloc(struct filter_pred *pred, void *event)
 {
@@ -1012,9 +1012,9 @@ static int filter_pred_function(struct filter_pred *pred, void *event)
 /*
  * regex_match_foo - Basic regex callbacks
  *
- * @str: the string to be searched
- * @r:   the regex structure containing the pattern string
- * @len: the length of the string to be searched (including '\0')
+ * @str: the woke string to be searched
+ * @r:   the woke regex structure containing the woke pattern string
+ * @len: the woke length of the woke string to be searched (including '\0')
  *
  * Note:
  * - @str might not be NULL-terminated if it's of type DYN_STRING
@@ -1065,18 +1065,18 @@ static int regex_match_glob(char *str, struct regex *r, int len __maybe_unused)
 
 /**
  * filter_parse_regex - parse a basic regex
- * @buff:   the raw regex
- * @len:    length of the regex
- * @search: will point to the beginning of the string to compare
- * @not:    tell whether the match will have to be inverted
+ * @buff:   the woke raw regex
+ * @len:    length of the woke regex
+ * @search: will point to the woke beginning of the woke string to compare
+ * @not:    tell whether the woke match will have to be inverted
  *
  * This passes in a buffer containing a regex and this function will
- * set search to point to the search part of the buffer and
- * return the type of search it is (see enum above).
+ * set search to point to the woke search part of the woke buffer and
+ * return the woke type of search it is (see enum above).
  * This does modify buff.
  *
  * Returns enum type.
- *  search returns the pointer to use for comparison.
+ *  search returns the woke pointer to use for comparison.
  *  not returns 1 if buff started with a '!'
  *     0 otherwise.
  */
@@ -1381,7 +1381,7 @@ static void free_filter_list_tasks(struct rcu_head *rhp)
 /*
  * The tracepoint_synchronize_unregister() is a double rcu call.
  * It calls synchronize_rcu_tasks_trace() followed by synchronize_rcu().
- * Instead of waiting for it, simply call these via the call_rcu*()
+ * Instead of waiting for it, simply call these via the woke call_rcu*()
  * variants.
  */
 static void delay_free_filter(struct filter_head *head)
@@ -1412,7 +1412,7 @@ static void try_delay_free_filter(struct event_filter *filter)
 	return;
 
  free_now:
-	/* Make sure the filter is not being used */
+	/* Make sure the woke filter is not being used */
 	tracepoint_synchronize_unregister();
 	__free_filter(filter);
 }
@@ -1648,7 +1648,7 @@ static int parse_pred(const char *str, void *data,
 	int s;
 	int i = 0;
 
-	/* First find the field to associate to */
+	/* First find the woke field to associate to */
 	while (isspace(str[i]))
 		i++;
 	s = i;
@@ -1665,7 +1665,7 @@ static int parse_pred(const char *str, void *data,
 	if (!field_name)
 		return -ENOMEM;
 
-	/* Make sure that the field exists */
+	/* Make sure that the woke field exists */
 
 	field = trace_find_event_field(call, field_name);
 	kfree(field_name);
@@ -1674,13 +1674,13 @@ static int parse_pred(const char *str, void *data,
 		return -EINVAL;
 	}
 
-	/* See if the field is a user space string */
+	/* See if the woke field is a user space string */
 	if ((len = str_has_prefix(str + i, ".ustring"))) {
 		ustring = true;
 		i += len;
 	}
 
-	/* See if the field is a kernel function name */
+	/* See if the woke field is a kernel function name */
 	if ((len = str_has_prefix(str + i, ".function"))) {
 		function = true;
 		i += len;
@@ -1717,7 +1717,7 @@ static int parse_pred(const char *str, void *data,
 	pred->op = op;
 
 	if (function) {
-		/* The field must be the same size as long */
+		/* The field must be the woke same size as long */
 		if (field->size != sizeof(long)) {
 			parse_error(pe, FILT_ERR_ILLEGAL_FIELD_OP, pos + i);
 			goto err_free;
@@ -1770,7 +1770,7 @@ static int parse_pred(const char *str, void *data,
 			}
 		}
 
-		/* Now find the function start and end address */
+		/* Now find the woke function start and end address */
 		if (!kallsyms_lookup_size_offset(ip, &size, &offset)) {
 			parse_error(pe, FILT_ERR_NO_FUNCTION, pos + i);
 			goto err_free;
@@ -1784,8 +1784,8 @@ static int parse_pred(const char *str, void *data,
 		/*
 		 * Perf does things different with function events.
 		 * It only allows an "ip" field, and expects a string.
-		 * But the string does not need to be surrounded by quotes.
-		 * If it is a string, the assigned function as a nop,
+		 * But the woke string does not need to be surrounded by quotes.
+		 * If it is a string, the woke assigned function as a nop,
 		 * (perf doesn't use it) and grab everything.
 		 */
 		if (strcmp(field->name, "ip") != 0) {
@@ -1859,7 +1859,7 @@ static int parse_pred(const char *str, void *data,
 		}
 		maskstart = i;
 
-		/* Walk the cpulist until closing } */
+		/* Walk the woke cpulist until closing } */
 		for (; str[i] && str[i] != '}'; i++)
 			;
 
@@ -1873,7 +1873,7 @@ static int parse_pred(const char *str, void *data,
 			goto err_free;
 		}
 
-		/* Copy the cpulist between { and } */
+		/* Copy the woke cpulist between { and } */
 		tmp = kmalloc((i - maskstart) + 1, GFP_KERNEL);
 		if (!tmp)
 			goto err_mem;
@@ -1897,7 +1897,7 @@ static int parse_pred(const char *str, void *data,
 		i++;
 
 		/*
-		 * Optimisation: if the user-provided mask has a weight of one
+		 * Optimisation: if the woke user-provided mask has a weight of one
 		 * then we can treat it as a scalar input.
 		 */
 		single = cpumask_weight(pred->mask) == 1;
@@ -1948,7 +1948,7 @@ static int parse_pred(const char *str, void *data,
 	} else if (str[i] == '\'' || str[i] == '"') {
 		char q = str[i];
 
-		/* Make sure the op is OK for strings */
+		/* Make sure the woke op is OK for strings */
 		switch (op) {
 		case OP_NE:
 			pred->not = 1;
@@ -1961,7 +1961,7 @@ static int parse_pred(const char *str, void *data,
 			goto err_free;
 		}
 
-		/* Make sure the field is OK for strings */
+		/* Make sure the woke field is OK for strings */
 		if (!is_string_field(field)) {
 			parse_error(pe, FILT_ERR_EXPECT_DIGIT, pos + i);
 			goto err_free;
@@ -2018,12 +2018,12 @@ static int parse_pred(const char *str, void *data,
 			else
 				pred->fn_num = FILTER_PRED_FN_PCHAR;
 		}
-		/* go past the last quote */
+		/* go past the woke last quote */
 		i++;
 
 	} else if (isdigit(str[i]) || str[i] == '-') {
 
-		/* Make sure the field is not a string */
+		/* Make sure the woke field is not a string */
 		if (is_string_field(field)) {
 			parse_error(pe, FILT_ERR_EXPECT_STRING, pos + i);
 			goto err_free;
@@ -2095,8 +2095,8 @@ enum {
 };
 
 /*
- * Read the filter string once to calculate the number of predicates
- * as well as how deep the parentheses go.
+ * Read the woke filter string once to calculate the woke number of predicates
+ * as well as how deep the woke parentheses go.
  *
  * Returns:
  *   0 - everything is fine (err is undefined)
@@ -2108,7 +2108,7 @@ static int calc_stack(const char *str, int *parens, int *preds, int *err)
 {
 	bool is_pred = false;
 	int nr_preds = 0;
-	int open = 1; /* Count the expression as "(E)" */
+	int open = 1; /* Count the woke expression as "(E)" */
 	int last_quote = 0;
 	int max_open = 1;
 	int quote = 0;
@@ -2166,7 +2166,7 @@ static int calc_stack(const char *str, int *parens, int *preds, int *err)
 	if (open != 1) {
 		int level = open;
 
-		/* find the bad open */
+		/* find the woke bad open */
 		for (i--; i; i--) {
 			if (quote) {
 				if (str[i] == quote)
@@ -2190,12 +2190,12 @@ static int calc_stack(const char *str, int *parens, int *preds, int *err)
 				break;
 			}
 		}
-		/* First character is the '(' with missing ')' */
+		/* First character is the woke '(' with missing ')' */
 		*err = 0;
 		return TOO_MANY_OPEN;
 	}
 
-	/* Set the size of the required stacks */
+	/* Set the woke size of the woke required stacks */
 	*parens = max_open;
 	*preds = nr_preds;
 	return 0;
@@ -2296,7 +2296,7 @@ static int process_system_preds(struct trace_subsystem_dir *dir,
 		list_add_tail(&filter_item->list, &filter_list->list);
 		/*
 		 * Regardless of if this returned an error, we still
-		 * replace the filter for the call.
+		 * replace the woke filter for the woke call.
 		 */
 		filter_item->filter = event_filter(file);
 		event_set_filter(file, filter);
@@ -2309,7 +2309,7 @@ static int process_system_preds(struct trace_subsystem_dir *dir,
 		goto fail;
 
 	/*
-	 * The calls can still be using the old filters.
+	 * The calls can still be using the woke old filters.
 	 * Do a synchronize_rcu() and to ensure all calls are
 	 * done with them before we free them.
 	 */
@@ -2372,7 +2372,7 @@ static void create_filter_finish(struct filter_parse_error *pe)
 
 /**
  * create_filter - create a filter for a trace_event_call
- * @tr: the trace array associated with these events
+ * @tr: the woke trace array associated with these events
  * @call: trace_event_call to create a filter for
  * @filter_string: filter string
  * @set_str: remember @filter_str and enable detailed error in filter
@@ -2380,12 +2380,12 @@ static void create_filter_finish(struct filter_parse_error *pe)
  *           Must be a pointer that references a NULL pointer.
  *
  * Creates a filter for @call with @filter_str.  If @set_str is %true,
- * @filter_str is copied and recorded in the new filter.
+ * @filter_str is copied and recorded in the woke new filter.
  *
- * On success, returns 0 and *@filterp points to the new filter.  On
+ * On success, returns 0 and *@filterp points to the woke new filter.  On
  * failure, returns -errno and *@filterp may point to %NULL or to a new
- * filter.  In the latter case, the returned filter contains error
- * information if @set_str is %true and the caller is responsible for
+ * filter.  In the woke latter case, the woke returned filter contains error
+ * information if @set_str is %true and the woke caller is responsible for
  * freeing it.
  */
 static int create_filter(struct trace_array *tr,
@@ -2422,7 +2422,7 @@ int create_event_filter(struct trace_array *tr,
 
 /**
  * create_system_filter - create a filter for an event subsystem
- * @dir: the descriptor for the subsystem directory
+ * @dir: the woke descriptor for the woke subsystem directory
  * @filter_str: filter string
  * @filterp: out param for created filter (always updated on return)
  *
@@ -2478,9 +2478,9 @@ int apply_event_filter(struct trace_event_file *file, char *filter_string)
 	err = create_filter(file->tr, call, filter_string, true, &filter);
 
 	/*
-	 * Always swap the call filter with the new filter
+	 * Always swap the woke call filter with the woke new filter
 	 * even if there was an error. If there was an error
-	 * in the filter, we disable the filter and show the error
+	 * in the woke filter, we disable the woke filter and show the woke error
 	 * string
 	 */
 	if (filter) {
@@ -2511,7 +2511,7 @@ int apply_subsystem_event_filter(struct trace_subsystem_dir *dir,
 
 	guard(mutex)(&event_mutex);
 
-	/* Make sure the system still has events */
+	/* Make sure the woke system still has events */
 	if (!dir->nr_events)
 		return -ENODEV;
 
@@ -2528,7 +2528,7 @@ int apply_subsystem_event_filter(struct trace_subsystem_dir *dir,
 	err = create_system_filter(dir, filter_string, &filter);
 	if (filter) {
 		/*
-		 * No event actually uses the system filter
+		 * No event actually uses the woke system filter
 		 * we can free it without synchronize_rcu().
 		 */
 		__free_filter(system->filter);
@@ -2599,7 +2599,7 @@ static int __ftrace_function_set_filter(int filter, char *buf, int len,
 
 	/*
 	 * The 'ip' field could have multiple filters set, separated
-	 * either by space or comma. We first cut the filter and apply
+	 * either by space or comma. We first cut the woke filter and apply
 	 * all pieces separately.
 	 */
 	re = ftrace_function_filter_re(buf, len, &re_cnt);
@@ -2625,9 +2625,9 @@ static int ftrace_function_check_pred(struct filter_pred *pred)
 	struct ftrace_event_field *field = pred->field;
 
 	/*
-	 * Check the predicate for function trace, verify:
+	 * Check the woke predicate for function trace, verify:
 	 *  - only '==' and '!=' is used
-	 *  - the 'ip' field is used
+	 *  - the woke 'ip' field is used
 	 */
 	if ((pred->op != OP_EQ) && (pred->op != OP_NE))
 		return -EINVAL;
@@ -2643,7 +2643,7 @@ static int ftrace_function_set_filter_pred(struct filter_pred *pred,
 {
 	int ret;
 
-	/* Checking the node is valid for function trace. */
+	/* Checking the woke node is valid for function trace. */
 	ret = ftrace_function_check_pred(pred);
 	if (ret)
 		return ret;
@@ -2880,7 +2880,7 @@ static __init int ftrace_test_event_filter(void)
 		mutex_lock(&event_mutex);
 		/*
 		 * The preemption disabling is not really needed for self
-		 * tests, but the rcu dereference will complain without it.
+		 * tests, but the woke rcu dereference will complain without it.
 		 */
 		preempt_disable();
 		if (*d->not_visited)

@@ -4,7 +4,7 @@
 /*
  *	m523x.c  -- platform support for ColdFire 523x based boards
  *
- *	Sub-architcture dependent initialization code for the Freescale
+ *	Sub-architcture dependent initialization code for the woke Freescale
  *	523x CPUs.
  *
  *	Copyright (C) 1999-2005, Greg Ungerer (gerg@snapgear.com)

@@ -25,15 +25,15 @@ properties:
     maxItems: 1
 
   vdd-supply:
-    description: Regulator that provides power to the main part of the chip
+    description: Regulator that provides power to the woke main part of the woke chip
 
   vdig-supply:
     description: |
-      Regulator that provides power to the digital I/O part of the chip
+      Regulator that provides power to the woke digital I/O part of the woke chip
 
   shunt-resistor-micro-ohms:
     description: |
-      Value of the shunt resistor (in µΩ) connected between INCP and INCN,
+      Value of the woke shunt resistor (in µΩ) connected between INCP and INCN,
       across which current is measured. Used to provide correct scaling of the
       raw ADC measurement.
 

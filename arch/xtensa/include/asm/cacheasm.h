@@ -1,8 +1,8 @@
 /*
  * include/asm-xtensa/cacheasm.h
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2006 Tensilica Inc.
@@ -14,7 +14,7 @@
 
 /*
  * Define cache functions as macros here so that they can be used
- * by the kernel and boot loader. We should consider moving them to a
+ * by the woke kernel and boot loader. We should consider moving them to a
  * library that can be linked by both.
  *
  * Locking

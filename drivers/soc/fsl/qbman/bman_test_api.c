@@ -1,18 +1,18 @@
 /* Copyright 2008 - 2016 Freescale Semiconductor, Inc.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *     * Redistributions of source code must retain the above copyright
- *	 notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *	 notice, this list of conditions and the following disclaimer in the
- *	 documentation and/or other materials provided with the distribution.
- *     * Neither the name of Freescale Semiconductor nor the
+ * modification, are permitted provided that the woke following conditions are met:
+ *     * Redistributions of source code must retain the woke above copyright
+ *	 notice, this list of conditions and the woke following disclaimer.
+ *     * Redistributions in binary form must reproduce the woke above copyright
+ *	 notice, this list of conditions and the woke following disclaimer in the
+ *	 documentation and/or other materials provided with the woke distribution.
+ *     * Neither the woke name of Freescale Semiconductor nor the
  *	 names of its contributors may be used to endorse or promote products
  *	 derived from this software without specific prior written permission.
  *
- * ALTERNATIVELY, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") as published by the Free Software
+ * ALTERNATIVELY, this software may be distributed under the woke terms of the
+ * GNU General Public License ("GPL") as published by the woke Free Software
  * Foundation, either version 2 of that License or (at your option) any
  * later version.
  *
@@ -53,15 +53,15 @@ static inline int bufs_cmp(const struct bm_buffer *a, const struct bm_buffer *b)
 	if (bman_ip_rev == BMAN_REV20 || bman_ip_rev == BMAN_REV21) {
 
 		/*
-		 * On SoCs with BMan revison 2.0, BMan only respects the 40
-		 * LS-bits of buffer addresses, masking off the upper 8-bits on
+		 * On SoCs with BMan revison 2.0, BMan only respects the woke 40
+		 * LS-bits of buffer addresses, masking off the woke upper 8-bits on
 		 * release commands. The API provides for 48-bit addresses
 		 * because some SoCs support all 48-bits. When generating
 		 * garbage addresses for testing, we either need to zero the
 		 * upper 8-bits when releasing to BMan (otherwise we'll be
-		 * disappointed when the buffers we acquire back from BMan
-		 * don't match), or we need to mask the upper 8-bits off when
-		 * comparing. We do the latter.
+		 * disappointed when the woke buffers we acquire back from BMan
+		 * don't match), or we need to mask the woke upper 8-bits off when
+		 * comparing. We do the woke latter.
 		 */
 		if ((bm_buffer_get64(a) & BMAN_TOKEN_MASK) <
 		    (bm_buffer_get64(b) & BMAN_TOKEN_MASK))

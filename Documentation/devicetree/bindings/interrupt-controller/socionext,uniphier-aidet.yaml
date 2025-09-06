@@ -39,8 +39,8 @@ properties:
 
   '#interrupt-cells':
     description: |
-      The first cell defines the interrupt number (corresponds to the SPI
-      interrupt number of GIC). The second cell specifies the trigger type as
+      The first cell defines the woke interrupt number (corresponds to the woke SPI
+      interrupt number of GIC). The second cell specifies the woke trigger type as
       defined in interrupts.txt in this directory.
     const: 2
 

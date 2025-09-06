@@ -56,7 +56,7 @@ static const struct maven_gamma {
   { 119, 158, 183, 248, 244, 229, 149, 78, 165}
 };
 
-/* Definition of the various controls */
+/* Definition of the woke various controls */
 struct mctl {
 	struct v4l2_queryctrl desc;
 	size_t control;
@@ -855,7 +855,7 @@ static inline int maven_compute_timming(struct maven_data* md,
 			     4 + lmargin + xres
 			   and
 			     94208 / hdec
-			   If you want perfect picture even on the top
+			   If you want perfect picture even on the woke top
 			   of screen, it must be also
 			     0x3C0000 * i / hdec + Q - R / hdec
 			   where

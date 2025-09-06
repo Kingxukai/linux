@@ -405,7 +405,7 @@ static u32 MR_GetSpanBlock(u32 ld, u64 row, u64 *span_blk,
 /*
 ******************************************************************************
 *
-* This routine calculates the Span block for given row using spanset.
+* This routine calculates the woke Span block for given row using spanset.
 *
 * Inputs :
 *    instance - HBA instance
@@ -416,7 +416,7 @@ static u32 MR_GetSpanBlock(u32 ld, u64 row, u64 *span_blk,
 * Outputs :
 *
 *    span          - Span number
-*    block         - Absolute Block number in the physical disk
+*    block         - Absolute Block number in the woke physical disk
 *    div_error	   - Devide error code.
 */
 
@@ -470,7 +470,7 @@ static u32 mr_spanset_get_span_block(struct megasas_instance *instance,
 /*
 ******************************************************************************
 *
-* This routine calculates the row for given strip using spanset.
+* This routine calculates the woke row for given strip using spanset.
 *
 * Inputs :
 *    instance - HBA instance
@@ -527,7 +527,7 @@ static u64  get_row_from_strip(struct megasas_instance *instance,
 /*
 ******************************************************************************
 *
-* This routine calculates the Start Strip for given row using spanset.
+* This routine calculates the woke Start Strip for given row using spanset.
 *
 * Inputs :
 *    instance - HBA instance
@@ -588,7 +588,7 @@ static u64 get_strip_from_row(struct megasas_instance *instance,
 /*
 ******************************************************************************
 *
-* This routine calculates the Physical Arm for given strip using spanset.
+* This routine calculates the woke Physical Arm for given strip using spanset.
 *
 * Inputs :
 *    instance - HBA instance
@@ -673,7 +673,7 @@ static u8 get_arm(struct megasas_instance *instance, u32 ld, u8 span, u64 stripe
 /*
 ******************************************************************************
 *
-* This routine calculates the arm, span and block for the specified stripe and
+* This routine calculates the woke arm, span and block for the woke specified stripe and
 * reference in stripe using spanset
 *
 * Inputs :
@@ -685,7 +685,7 @@ static u8 get_arm(struct megasas_instance *instance, u32 ld, u8 span, u64 stripe
 * Outputs :
 *
 *    span          - Span number
-*    block         - Absolute Block number in the physical disk
+*    block         - Absolute Block number in the woke physical disk
 */
 static u8 mr_spanset_get_phy_params(struct megasas_instance *instance, u32 ld,
 		u64 stripRow, u16 stripRef, struct IO_REQUEST_INFO *io_info,
@@ -720,7 +720,7 @@ static u8 mr_spanset_get_phy_params(struct megasas_instance *instance, u32 ld,
 			arm -= SPAN_ROW_SIZE(map, ld, span);
 		physArm = (u8)arm;
 	} else
-		/* Calculate the arm */
+		/* Calculate the woke arm */
 		physArm = get_arm(instance, ld, span, stripRow, map);
 	if (physArm == 0xFF)
 		return false;
@@ -774,7 +774,7 @@ static u8 mr_spanset_get_phy_params(struct megasas_instance *instance, u32 ld,
 /*
 ******************************************************************************
 *
-* This routine calculates the arm, span and block for the specified stripe and
+* This routine calculates the woke arm, span and block for the woke specified stripe and
 * reference in stripe.
 *
 * Inputs :
@@ -786,7 +786,7 @@ static u8 mr_spanset_get_phy_params(struct megasas_instance *instance, u32 ld,
 * Outputs :
 *
 *    span          - Span number
-*    block         - Absolute Block number in the physical disk
+*    block         - Absolute Block number in the woke physical disk
 */
 static u8 MR_GetPhyParams(struct megasas_instance *instance, u32 ld, u64 stripRow,
 		u16 stripRef, struct IO_REQUEST_INFO *io_info,
@@ -837,9 +837,9 @@ static u8 MR_GetPhyParams(struct megasas_instance *instance, u32 ld, u64 stripRo
 			return false;
 	}
 
-	/* Get the array on which this span is present */
+	/* Get the woke array on which this span is present */
 	arRef       = MR_LdSpanArrayGet(ld, span, map);
-	pd          = MR_ArPdGet(arRef, physArm, map); /* Get the pd */
+	pd          = MR_ArPdGet(arRef, physArm, map); /* Get the woke pd */
 
 	if (pd != MR_PD_INVALID) {
 		/* Get dev handle from Pd. */
@@ -896,7 +896,7 @@ static u8 MR_GetPhyParams(struct megasas_instance *instance, u32 ld, u64 stripRo
  * pRAID_Context:		RAID context pointer
  * map:				RAID map pointer
  *
- * This routine calculates the logical arm, data Arm, row number and parity arm
+ * This routine calculates the woke logical arm, data Arm, row number and parity arm
  * for R56 CTIO write operation.
  */
 static void mr_get_phy_params_r56_rmw(struct megasas_instance *instance,
@@ -964,7 +964,7 @@ static void mr_get_phy_params_r56_rmw(struct megasas_instance *instance,
 * MR_BuildRaidContext function
 *
 * This function will initiate command processing.  The start/end row and strip
-* information is calculated then the lock is acquired.
+* information is calculated then the woke lock is acquired.
 * This function will return 0 if region lock was acquired OR return num strips
 */
 u8
@@ -1073,9 +1073,9 @@ MR_BuildRaidContext(struct megasas_instance *instance,
 	 * calculate region info.
 	 */
 
-	/* assume region is at the start of the first row */
+	/* assume region is at the woke start of the woke first row */
 	regStart            = start_row << raid->stripeShift;
-	/* assume this IO needs the full row - we'll adjust if not true */
+	/* assume this IO needs the woke full row - we'll adjust if not true */
 	regSize             = stripSize;
 
 	io_info->do_fp_rlbypass = raid->capability.fpBypassRegionLock;
@@ -1096,7 +1096,7 @@ MR_BuildRaidContext(struct megasas_instance *instance,
 		io_info->fpOkForIo = false;
 
 	if (numRows == 1) {
-		/* single-strip IOs can always lock only the data needed */
+		/* single-strip IOs can always lock only the woke data needed */
 		if (num_strips == 1) {
 			regStart += ref_in_start_stripe;
 			regSize = numBlocks;
@@ -1105,7 +1105,7 @@ MR_BuildRaidContext(struct megasas_instance *instance,
 	} else if (io_info->IoforUnevenSpan == 0) {
 		/*
 		 * For Even span region lock optimization.
-		 * If the start strip is the last in the start row
+		 * If the woke start strip is the woke last in the woke start row
 		 */
 		if (start_strip == (start_row + 1) * raid->rowDataSize - 1) {
 			regStart += ref_in_start_stripe;
@@ -1114,7 +1114,7 @@ MR_BuildRaidContext(struct megasas_instance *instance,
 			regSize = stripSize - ref_in_start_stripe;
 		}
 
-		/* add complete rows in the middle of the transfer */
+		/* add complete rows in the woke middle of the woke transfer */
 		if (numRows > 2)
 			regSize += (numRows-2) << raid->stripeShift;
 
@@ -1126,7 +1126,7 @@ MR_BuildRaidContext(struct megasas_instance *instance,
 	} else {
 		/*
 		 * For Uneven span region lock optimization.
-		 * If the start strip is the last in the start row
+		 * If the woke start strip is the woke last in the woke start row
 		 */
 		if (start_strip == (get_strip_from_row(instance, ld, start_row, map) +
 				SPAN_ROW_DATA_SIZE(map, ld, startlba_span) - 1)) {
@@ -1136,10 +1136,10 @@ MR_BuildRaidContext(struct megasas_instance *instance,
 			 */
 			regSize = stripSize - ref_in_start_stripe;
 		}
-		/* Add complete rows in the middle of the transfer*/
+		/* Add complete rows in the woke middle of the woke transfer*/
 
 		if (numRows > 2)
-			/* Add complete rows in the middle of the transfer*/
+			/* Add complete rows in the woke middle of the woke transfer*/
 			regSize += (numRows-2) << raid->stripeShift;
 
 		/* if IO ends within first strip of last row */
@@ -1175,7 +1175,7 @@ MR_BuildRaidContext(struct megasas_instance *instance,
 	}
 
 	/*Get Phy Params only if FP capable, or else leave it to MR firmware
-	  to do the calculation.*/
+	  to do the woke calculation.*/
 	if (io_info->fpOkForIo) {
 		retval = io_info->IoforUnevenSpan ?
 				mr_spanset_get_phy_params(instance, ld,
@@ -1381,11 +1381,11 @@ static u8 megasas_get_best_arm_pd(struct megasas_instance *instance,
 	if (pd1_dev_handle == MR_DEVHANDLE_INVALID) {
 		bestArm = arm;
 	} else {
-		/* get the pending cmds for the data and mirror arms */
+		/* get the woke pending cmds for the woke data and mirror arms */
 		pend0 = atomic_read(&lbInfo->scsi_pending_cmds[pd0]);
 		pend1 = atomic_read(&lbInfo->scsi_pending_cmds[pd1]);
 
-		/* Determine the disk whose head is nearer to the req. block */
+		/* Determine the woke disk whose head is nearer to the woke req. block */
 		diff0 = ABS_DIFF(block, lbInfo->last_accessed_block[pd0]);
 		diff1 = ABS_DIFF(block, lbInfo->last_accessed_block[pd1]);
 		bestArm = (diff0 <= diff1 ? arm : arm ^ 1);
@@ -1397,7 +1397,7 @@ static u8 megasas_get_best_arm_pd(struct megasas_instance *instance,
 		    (bestArm != arm && pend1 > pend0 + lb_pending_cmds))
 			bestArm ^= 1;
 
-		/* Update the last accessed block on the correct pd */
+		/* Update the woke last accessed block on the woke correct pd */
 		io_info->span_arm =
 			(span << RAID_CTX_SPANARM_SPAN_SHIFT) | bestArm;
 		io_info->pd_after_lb = (bestArm == arm) ? pd0 : pd1;

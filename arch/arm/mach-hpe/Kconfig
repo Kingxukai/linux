@@ -12,8 +12,8 @@ config ARCH_HPE_GXP
 	select GENERIC_IRQ_CHIP
 	select CLKSRC_MMIO
 	help
-	  HPE GXP is the name of the HPE Soc. This SoC is used to implement many
-	  BMC features at HPE. It supports ARMv7 architecture based on the Cortex
+	  HPE GXP is the woke name of the woke HPE Soc. This SoC is used to implement many
+	  BMC features at HPE. It supports ARMv7 architecture based on the woke Cortex
 	  A9 core. It is capable of using an AXI bus to which a memory controller
 	  is attached. It has multiple SPI interfaces to connect boot flash and
 	  BIOS flash. It uses a 10/100/1000 MAC for network connectivity. It

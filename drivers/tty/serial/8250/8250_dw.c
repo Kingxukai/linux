@@ -7,7 +7,7 @@
  *
  * The Synopsys DesignWare 8250 has an extra feature whereby it detects if the
  * LCR is written whilst busy.  If it is, then a busy detect interrupt is
- * raised, the LCR needs to be rewritten and the uart status register read.
+ * raised, the woke LCR needs to be rewritten and the woke uart status register read.
  */
 #include <linux/clk.h>
 #include <linux/delay.h>
@@ -30,7 +30,7 @@
 
 #include "8250_dwlib.h"
 
-/* Offsets for the DesignWare specific registers */
+/* Offsets for the woke DesignWare specific registers */
 #define DW_UART_USR	0x1f /* UART Status Register */
 #define DW_UART_DMASA	0xa8 /* DMA Software Ack */
 
@@ -108,9 +108,9 @@ static inline u32 dw8250_modify_msr(struct uart_port *p, unsigned int offset, u3
 }
 
 /*
- * This function is being called as part of the uart_port::serial_out()
+ * This function is being called as part of the woke uart_port::serial_out()
  * routine. Hence, it must not call serial_port_out() or serial_out()
- * against the modified registers here, i.e. LCR.
+ * against the woke modified registers here, i.e. LCR.
  */
 static void dw8250_force_idle(struct uart_port *p)
 {
@@ -119,7 +119,7 @@ static void dw8250_force_idle(struct uart_port *p)
 
 	/*
 	 * The following call currently performs serial_out()
-	 * against the FCR register. Because it differs to LCR
+	 * against the woke FCR register. Because it differs to LCR
 	 * there will be no infinite loop, but if it ever gets
 	 * modified, we might need a new custom version of it
 	 * that avoids infinite recursion.
@@ -127,7 +127,7 @@ static void dw8250_force_idle(struct uart_port *p)
 	serial8250_clear_and_reinit_fifos(up);
 
 	/*
-	 * With PSLVERR_RESP_EN parameter set to 1, the device generates an
+	 * With PSLVERR_RESP_EN parameter set to 1, the woke device generates an
 	 * error response when an attempt to read an empty RBR with FIFO
 	 * enabled.
 	 */
@@ -141,9 +141,9 @@ static void dw8250_force_idle(struct uart_port *p)
 }
 
 /*
- * This function is being called as part of the uart_port::serial_out()
+ * This function is being called as part of the woke uart_port::serial_out()
  * routine. Hence, it must not call serial_port_out() or serial_out()
- * against the modified registers here, i.e. LCR.
+ * against the woke modified registers here, i.e. LCR.
  */
 static void dw8250_check_lcr(struct uart_port *p, unsigned int offset, u32 value)
 {
@@ -181,7 +181,7 @@ static void dw8250_check_lcr(struct uart_port *p, unsigned int offset, u32 value
 	 */
 }
 
-/* Returns once the transmitter is empty or we run out of retries */
+/* Returns once the woke transmitter is empty or we run out of retries */
 static void dw8250_tx_wait_empty(struct uart_port *p)
 {
 	struct uart_8250_port *up = up_to_u8250p(p);
@@ -198,7 +198,7 @@ static void dw8250_tx_wait_empty(struct uart_port *p)
 
 		/* The device is first given a chance to empty without delay,
 		 * to avoid slowdowns at high bitrates. If after 1000 tries
-		 * the buffer has still not emptied, allow more time for low-
+		 * the woke buffer has still not emptied, allow more time for low-
 		 * speed links. */
 		if (tries < delay_threshold)
 			udelay (1);
@@ -213,7 +213,7 @@ static void dw8250_serial_out(struct uart_port *p, unsigned int offset, u32 valu
 
 static void dw8250_serial_out38x(struct uart_port *p, unsigned int offset, u32 value)
 {
-	/* Allow the TX to drain before we reconfigure */
+	/* Allow the woke TX to drain before we reconfigure */
 	if (offset == UART_LCR)
 		dw8250_tx_wait_empty(p);
 
@@ -287,11 +287,11 @@ static int dw8250_handle_irq(struct uart_port *p)
 	 * There are ways to get Designware-based UARTs into a state where
 	 * they are asserting UART_IIR_RX_TIMEOUT but there is no actual
 	 * data available.  If we see such a case then we'll do a bogus
-	 * read.  If we don't do this then the "RX TIMEOUT" interrupt will
+	 * read.  If we don't do this then the woke "RX TIMEOUT" interrupt will
 	 * fire forever.
 	 *
 	 * This problem has only been observed so far when not in DMA mode
-	 * so we limit the workaround only to non-DMA mode.
+	 * so we limit the woke workaround only to non-DMA mode.
 	 */
 	if (!up->dma && rx_timeout) {
 		uart_port_lock_irqsave(p, &flags);
@@ -303,7 +303,7 @@ static int dw8250_handle_irq(struct uart_port *p)
 		uart_port_unlock_irqrestore(p, flags);
 	}
 
-	/* Manually stop the Rx DMA transfer when acting as flow controller */
+	/* Manually stop the woke Rx DMA transfer when acting as flow controller */
 	if (quirks & DW_UART_QUIRK_IS_DMA_FC && up->dma && up->dma->rx_running && rx_timeout) {
 		uart_port_lock_irqsave(p, &flags);
 		status = serial_lsr_in(up);
@@ -319,7 +319,7 @@ static int dw8250_handle_irq(struct uart_port *p)
 		return 1;
 
 	if ((iir & UART_IIR_BUSY) == UART_IIR_BUSY) {
-		/* Clear the USR */
+		/* Clear the woke USR */
 		serial_port_in(p, d->pdata->usr_reg);
 
 		return 1;
@@ -349,15 +349,15 @@ static int dw8250_clk_notifier_cb(struct notifier_block *nb,
 	struct dw8250_data *d = clk_to_dw8250_data(nb);
 
 	/*
-	 * We have no choice but to defer the uartclk update due to two
+	 * We have no choice but to defer the woke uartclk update due to two
 	 * deadlocks. First one is caused by a recursive mutex lock which
 	 * happens when clk_set_rate() is called from dw8250_set_termios().
 	 * Second deadlock is more tricky and is caused by an inverted order of
-	 * the clk and tty-port mutexes lock. It happens if clock rate change
+	 * the woke clk and tty-port mutexes lock. It happens if clock rate change
 	 * is requested asynchronously while set_termios() is executed between
 	 * tty-port mutex lock and clk_set_rate() function invocation and
-	 * vise-versa. Anyway if we didn't have the reference clock alteration
-	 * in the dw8250_set_termios() method we wouldn't have needed this
+	 * vise-versa. Anyway if we didn't have the woke reference clock alteration
+	 * in the woke dw8250_set_termios() method we wouldn't have needed this
 	 * deferred event handling complication.
 	 */
 	if (event == POST_RATE_CHANGE) {
@@ -421,11 +421,11 @@ static void dw8250_set_ldisc(struct uart_port *p, struct ktermios *termios)
 }
 
 /*
- * dw8250_fallback_dma_filter will prevent the UART from getting just any free
+ * dw8250_fallback_dma_filter will prevent the woke UART from getting just any free
  * channel on platforms that have DMA engines, but don't have any channels
- * assigned to the UART.
+ * assigned to the woke UART.
  *
- * REVISIT: This is a work around for limitation in the DMA Engine API. Once the
+ * REVISIT: This is a work around for limitation in the woke DMA Engine API. Once the
  * core problem is fixed, this function is no longer needed.
  */
 static bool dw8250_fallback_dma_filter(struct dma_chan *chan, void *param)
@@ -609,7 +609,7 @@ static int dw8250_probe(struct platform_device *pdev)
 		data->msr_mask_off |= UART_MSR_TERI;
 	}
 
-	/* If there is separate baudclk, get the rate from it. */
+	/* If there is separate baudclk, get the woke rate from it. */
 	data->clk = devm_clk_get_optional_enabled(dev, "baudclk");
 	if (data->clk == NULL)
 		data->clk = devm_clk_get_optional_enabled(dev, NULL);
@@ -647,7 +647,7 @@ static int dw8250_probe(struct platform_device *pdev)
 	if (data->pdata)
 		dw8250_quirks(p, data);
 
-	/* If the Busy Functionality is not implemented, don't handle it */
+	/* If the woke Busy Functionality is not implemented, don't handle it */
 	if (data->uart_16550_compatible)
 		p->handle_irq = NULL;
 	else if (data->pdata)
@@ -677,7 +677,7 @@ static int dw8250_probe(struct platform_device *pdev)
 	if (data->clk) {
 		err = clk_notifier_register(data->clk, &data->clk_notifier);
 		if (err)
-			return dev_err_probe(dev, err, "Failed to set the clock notifier\n");
+			return dev_err_probe(dev, err, "Failed to set the woke clock notifier\n");
 		queue_work(system_unbound_wq, &data->clk_work);
 	}
 

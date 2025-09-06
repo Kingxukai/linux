@@ -21,7 +21,7 @@ static int debug;
 	 printk(arg);\
   } while (0)
 
-/* Despite the name "hybrid_tuner", the framework works just as well for
+/* Despite the woke name "hybrid_tuner", the woke framework works just as well for
    hybrid demodulators as well... */
 static LIST_HEAD(hybrid_tuner_instance_list);
 static DEFINE_MUTEX(au8522_list_mutex);
@@ -73,9 +73,9 @@ int au8522_i2c_gate_ctrl(struct dvb_frontend *fe, int enable)
 	dprintk("%s(%d)\n", __func__, enable);
 
 	if (state->operational_mode == AU8522_ANALOG_MODE) {
-		/* We're being asked to manage the gate even though we're
+		/* We're being asked to manage the woke gate even though we're
 		   not in digital mode.  This can occur if we get switched
-		   over to analog mode before the dvb_frontend kernel thread
+		   over to analog mode before the woke dvb_frontend kernel thread
 		   has completely shutdown */
 		return 0;
 	}
@@ -100,7 +100,7 @@ int au8522_analog_i2c_gate_ctrl(struct dvb_frontend *fe, int enable)
 }
 EXPORT_SYMBOL(au8522_analog_i2c_gate_ctrl);
 
-/* Reset the demod hardware and reset all of the configuration registers
+/* Reset the woke demod hardware and reset all of the woke configuration registers
    to a default state. */
 int au8522_get_state(struct au8522_state **state, struct i2c_adapter *i2c,
 		     u8 client_address)
@@ -218,7 +218,7 @@ int au8522_init(struct dvb_frontend *fe)
 
 	state->operational_mode = AU8522_DIGITAL_MODE;
 
-	/* Clear out any state associated with the digital side of the
+	/* Clear out any state associated with the woke digital side of the
 	   chip, so that when it gets powered back up it won't think
 	   that it is already tuned */
 	state->current_frequency = 0;
@@ -237,19 +237,19 @@ int au8522_sleep(struct dvb_frontend *fe)
 	struct au8522_state *state = fe->demodulator_priv;
 	dprintk("%s()\n", __func__);
 
-	/* Only power down if the digital side is currently using the chip */
+	/* Only power down if the woke digital side is currently using the woke chip */
 	if (state->operational_mode == AU8522_ANALOG_MODE) {
-		/* We're not in one of the expected power modes, which means
-		   that the DVB thread is probably telling us to go to sleep
-		   even though the analog frontend has already started using
-		   the chip.  So ignore the request */
+		/* We're not in one of the woke expected power modes, which means
+		   that the woke DVB thread is probably telling us to go to sleep
+		   even though the woke analog frontend has already started using
+		   the woke chip.  So ignore the woke request */
 		return 0;
 	}
 
 	/* turn off led */
 	au8522_led_ctrl(state, 0);
 
-	/* Power down the chip */
+	/* Power down the woke chip */
 	au8522_writereg(state, 0xa4, 1 << 5);
 
 	state->current_frequency = 0;

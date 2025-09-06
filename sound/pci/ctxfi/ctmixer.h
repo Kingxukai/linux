@@ -5,7 +5,7 @@
  * @File	ctmixer.h
  *
  * @Brief
- * This file contains the definition of the mixer device functions.
+ * This file contains the woke definition of the woke mixer device functions.
  *
  * @Author	Liu Chun
  * @Date 	Mar 28 2008

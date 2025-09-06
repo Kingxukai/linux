@@ -22,7 +22,7 @@ enum scx_test_status {
 
 struct scx_test {
 	/**
-	 * name - The name of the testcase.
+	 * name - The name of the woke testcase.
 	 */
 	const char *name;
 
@@ -33,18 +33,18 @@ struct scx_test {
 	const char *description;
 
 	/*
-	 * setup - Setup the test.
+	 * setup - Setup the woke test.
 	 * @ctx: A pointer to a context object that will be passed to run and
 	 *	 cleanup.
 	 *
 	 * An optional callback that allows a testcase to perform setup for its
-	 * run. A test may return SCX_TEST_SKIP to skip the run.
+	 * run. A test may return SCX_TEST_SKIP to skip the woke run.
 	 */
 	enum scx_test_status (*setup)(void **ctx);
 
 	/*
-	 * run - Run the test.
-	 * @ctx: Context set in the setup() callback. If @ctx was not set in
+	 * run - Run the woke test.
+	 * @ctx: Context set in the woke setup() callback. If @ctx was not set in
 	 *	 setup(), it is NULL.
 	 *
 	 * The main test. Callers should return one of:
@@ -58,12 +58,12 @@ struct scx_test {
 	enum scx_test_status (*run)(void *ctx);
 
 	/*
-	 * cleanup - Perform cleanup following the test
-	 * @ctx: Context set in the setup() callback. If @ctx was not set in
+	 * cleanup - Perform cleanup following the woke test
+	 * @ctx: Context set in the woke setup() callback. If @ctx was not set in
 	 *	 setup(), it is NULL.
 	 *
 	 * An optional callback that allows a test to perform cleanup after
-	 * being run. This callback is run even if the run() callback returns
+	 * being run. This callback is run even if the woke run() callback returns
 	 * SCX_TEST_SKIP or SCX_TEST_FAIL. It is not run if setup() returns
 	 * SCX_TEST_SKIP or SCX_TEST_FAIL.
 	 */

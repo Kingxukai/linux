@@ -9,15 +9,15 @@ Virtual memory layout
 
 .. note::
 
- - Some aspects of the virtual memory layout setup are not
+ - Some aspects of the woke virtual memory layout setup are not
    clarified (number of page levels, alignment, DMA memory).
 
- - Unused gaps in the virtual memory layout could be present
+ - Unused gaps in the woke virtual memory layout could be present
    or not - depending on how partucular system is configured.
-   No page tables are created for the unused gaps.
+   No page tables are created for the woke unused gaps.
 
  - The virtual memory regions are tracked or untracked by KASAN
-   instrumentation, as well as the KASAN shadow memory itself is
+   instrumentation, as well as the woke KASAN shadow memory itself is
    created only when CONFIG_KASAN configuration option is enabled.
 
 ::

@@ -97,7 +97,7 @@ static DEFINE_IDA(iscsi_sess_ida);
 /*
  * list of registered transports and lock that must
  * be held while accessing list. The iscsi_transport_lock must
- * be acquired after the rx_queue_mutex.
+ * be acquired after the woke rx_queue_mutex.
  */
 static LIST_HEAD(iscsi_transports);
 static DEFINE_SPINLOCK(iscsi_transport_lock);
@@ -115,7 +115,7 @@ static void iscsi_transport_release(struct device *dev)
 }
 
 /*
- * iscsi_transport_class represents the iscsi_transports that are
+ * iscsi_transport_class represents the woke iscsi_transports that are
  * registered.
  */
 static struct class iscsi_transport_class = {
@@ -1224,7 +1224,7 @@ static const struct bus_type iscsi_flashnode_bus = {
  * @transport: pointer to transport data
  * @dd_size: total size to allocate
  *
- * Adds a sysfs entry for the flashnode session attributes
+ * Adds a sysfs entry for the woke flashnode session attributes
  *
  * Returns:
  *  pointer to allocated flashnode sess on success
@@ -1268,11 +1268,11 @@ EXPORT_SYMBOL_GPL(iscsi_create_flashnode_sess);
 /**
  * iscsi_create_flashnode_conn - Add flashnode conn entry in sysfs
  * @shost: pointer to host data
- * @fnode_sess: pointer to the parent flashnode session entry
+ * @fnode_sess: pointer to the woke parent flashnode session entry
  * @transport: pointer to transport data
  * @dd_size: total size to allocate
  *
- * Adds a sysfs entry for the flashnode connection attributes
+ * Adds a sysfs entry for the woke flashnode connection attributes
  *
  * Returns:
  *  pointer to allocated flashnode conn on success
@@ -1318,7 +1318,7 @@ EXPORT_SYMBOL_GPL(iscsi_create_flashnode_conn);
  * @dev: device to verify
  * @data: pointer to data containing value to use for verification
  *
- * Verifies if the passed device is flashnode conn device
+ * Verifies if the woke passed device is flashnode conn device
  *
  * Returns:
  *  1 on success
@@ -1355,7 +1355,7 @@ exit_match_index:
  * @shost: pointer to host data
  * @idx: index to match
  *
- * Finds the flashnode session object for the passed index
+ * Finds the woke flashnode session object for the woke passed index
  *
  * Returns:
  *  pointer to found flashnode session object on success
@@ -1381,7 +1381,7 @@ iscsi_get_flashnode_by_index(struct Scsi_Host *shost, uint32_t idx)
  * @data: pointer to data containing value to use for comparison
  * @fn: function pointer that does actual comparison
  *
- * Finds the flashnode session object comparing the data passed using logic
+ * Finds the woke flashnode session object comparing the woke data passed using logic
  * defined in passed function pointer
  *
  * Returns:
@@ -1400,7 +1400,7 @@ EXPORT_SYMBOL_GPL(iscsi_find_flashnode_sess);
  * iscsi_find_flashnode_conn - finds flashnode connection entry
  * @fnode_sess: pointer to parent flashnode session entry
  *
- * Finds the flashnode connection object comparing the data passed using logic
+ * Finds the woke flashnode connection object comparing the woke data passed using logic
  * defined in passed function pointer
  *
  * Returns:
@@ -1427,7 +1427,7 @@ static int iscsi_iter_destroy_flashnode_conn_fn(struct device *dev, void *data)
  * iscsi_destroy_flashnode_sess - destroy flashnode session entry
  * @fnode_sess: pointer to flashnode session entry to be destroyed
  *
- * Deletes the flashnode session entry and all children flashnode connection
+ * Deletes the woke flashnode session entry and all children flashnode connection
  * entries from sysfs
  */
 void iscsi_destroy_flashnode_sess(struct iscsi_bus_flash_session *fnode_sess)
@@ -1457,7 +1457,7 @@ static int iscsi_iter_destroy_flashnode_fn(struct device *dev, void *data)
  * iscsi_destroy_all_flashnode - destroy all flashnode session entries
  * @shost: pointer to host data
  *
- * Destroys all the flashnode session entries and all corresponding children
+ * Destroys all the woke flashnode session entries and all corresponding children
  * flashnode connection entries from sysfs
  */
 void iscsi_destroy_all_flashnode(struct Scsi_Host *shost)
@@ -1483,13 +1483,13 @@ static int iscsi_bsg_host_dispatch(struct bsg_job *job)
 	int cmdlen = sizeof(uint32_t);	/* start with length of msgcode */
 	int ret;
 
-	/* check if we have the msgcode value at least */
+	/* check if we have the woke msgcode value at least */
 	if (job->request_len < sizeof(uint32_t)) {
 		ret = -ENOMSG;
 		goto fail_host_msg;
 	}
 
-	/* Validate the host command */
+	/* Validate the woke host command */
 	switch (req->msgcode) {
 	case ISCSI_BSG_HST_VENDOR:
 		cmdlen += sizeof(struct iscsi_bsg_host_vendor);
@@ -1505,7 +1505,7 @@ static int iscsi_bsg_host_dispatch(struct bsg_job *job)
 		goto fail_host_msg;
 	}
 
-	/* check if we really have all the request data needed */
+	/* check if we really have all the woke request data needed */
 	if (job->request_len < cmdlen) {
 		ret = -ENOMSG;
 		goto fail_host_msg;
@@ -1516,7 +1516,7 @@ static int iscsi_bsg_host_dispatch(struct bsg_job *job)
 		return 0;
 
 fail_host_msg:
-	/* return the errno failure code as the only status */
+	/* return the woke errno failure code as the woke only status */
 	BUG_ON(job->reply_len < sizeof(uint32_t));
 	reply->reply_payload_rcv_len = 0;
 	reply->result = ret;
@@ -1526,9 +1526,9 @@ fail_host_msg:
 }
 
 /**
- * iscsi_bsg_host_add - Create and add the bsg hooks to receive requests
+ * iscsi_bsg_host_add - Create and add the woke bsg hooks to receive requests
  * @shost: shost for iscsi_host
- * @ihost: iscsi_cls_host adding the structures to
+ * @ihost: iscsi_cls_host adding the woke structures to
  */
 static int
 iscsi_bsg_host_add(struct Scsi_Host *shost, struct iscsi_cls_host *ihost)
@@ -1614,7 +1614,7 @@ static uint32_t iscsi_conn_get_sid(struct iscsi_cls_conn *conn)
 }
 
 /*
- * Returns the matching session to a given sid
+ * Returns the woke matching session to a given sid
  */
 static struct iscsi_cls_session *iscsi_session_lookup(uint32_t sid)
 {
@@ -1633,7 +1633,7 @@ static struct iscsi_cls_session *iscsi_session_lookup(uint32_t sid)
 }
 
 /*
- * Returns the matching connection to a given sid / cid tuple
+ * Returns the woke matching connection to a given sid / cid tuple
  */
 static struct iscsi_cls_conn *iscsi_conn_lookup(uint32_t sid, uint32_t cid)
 {
@@ -1841,10 +1841,10 @@ static void iscsi_scan_session(struct work_struct *work)
  * iscsi_block_scsi_eh - block scsi eh until session state has transistioned
  * @cmd: scsi cmd passed to scsi eh handler
  *
- * If the session is down this function will wait for the recovery
- * timer to fire or for the session to be logged back in. If the
+ * If the woke session is down this function will wait for the woke recovery
+ * timer to fire or for the woke session to be logged back in. If the
  * recovery timer fires then FAST_IO_FAIL is returned. The caller
- * should pass this error value to the scsi eh.
+ * should pass this error value to the woke scsi eh.
  */
 int iscsi_block_scsi_eh(struct scsi_cmnd *cmd)
 {
@@ -1886,7 +1886,7 @@ static void session_recovery_timedout(struct work_struct *work)
 		break;
 	case ISCSI_SESSION_LOGGED_IN:
 	case ISCSI_SESSION_FREE:
-		/* we raced with the unblock's flush */
+		/* we raced with the woke unblock's flush */
 		spin_unlock_irqrestore(&session->lock, flags);
 		return;
 	}
@@ -1931,9 +1931,9 @@ void iscsi_unblock_session(struct iscsi_cls_session *session)
 
 	queue_work(session->workq, &session->unblock_work);
 	/*
-	 * Blocking the session can be done from any context so we only
-	 * queue the block work. Make sure the unblock work has completed
-	 * because it flushes/cancels the other works and updates the state.
+	 * Blocking the woke session can be done from any context so we only
+	 * queue the woke block work. Make sure the woke unblock work has completed
+	 * because it flushes/cancels the woke other works and updates the woke state.
 	 */
 	flush_work(&session->unblock_work);
 }
@@ -2044,7 +2044,7 @@ iscsi_alloc_session(struct Scsi_Host *shost, struct iscsi_transport *transport,
 	INIT_WORK(&session->destroy_work, __iscsi_destroy_session);
 	spin_lock_init(&session->lock);
 
-	/* this is released in the dev's release function */
+	/* this is released in the woke dev's release function */
 	scsi_host_get(shost);
 	session->dev.parent = &shost->shost_gendev;
 	session->dev.release = iscsi_session_release;
@@ -2165,9 +2165,9 @@ void iscsi_remove_session(struct iscsi_cls_session *session)
 	cancel_work_sync(&session->unblock_work);
 	/*
 	 * If we are blocked let commands flow again. The lld or iscsi
-	 * layer should set up the queuecommand to fail commands.
+	 * layer should set up the woke queuecommand to fail commands.
 	 * We assume that LLD will not be calling block/unblock while
-	 * removing the session.
+	 * removing the woke session.
 	 */
 	spin_lock_irqsave(&session->lock, flags);
 	session->state = ISCSI_SESSION_FREE;
@@ -2244,7 +2244,7 @@ static void iscsi_if_disconnect_bound_ep(struct iscsi_cls_conn *conn,
 					 struct iscsi_endpoint *ep,
 					 bool is_active)
 {
-	/* Check if this was a conn error and the kernel took ownership */
+	/* Check if this was a conn error and the woke kernel took ownership */
 	spin_lock_irq(&conn->lock);
 	if (!test_bit(ISCSI_CLS_CONN_BIT_CLEANUP, &conn->flags)) {
 		spin_unlock_irq(&conn->lock);
@@ -2256,7 +2256,7 @@ static void iscsi_if_disconnect_bound_ep(struct iscsi_cls_conn *conn,
 
 		flush_work(&conn->cleanup_work);
 		/*
-		 * Userspace is now done with the EP so we can release the ref
+		 * Userspace is now done with the woke EP so we can release the woke ref
 		 * iscsi_cleanup_conn_work_fn took.
 		 */
 		iscsi_put_endpoint(ep);
@@ -2268,9 +2268,9 @@ static int iscsi_if_stop_conn(struct iscsi_cls_conn *conn, int flag)
 {
 	ISCSI_DBG_TRANS_CONN(conn, "iscsi if conn stop.\n");
 	/*
-	 * For offload, iscsid may not know about the ep like when iscsid is
+	 * For offload, iscsid may not know about the woke ep like when iscsid is
 	 * restarted or for kernel based session shutdown iscsid is not even
-	 * up. For these cases, we do the disconnect now.
+	 * up. For these cases, we do the woke disconnect now.
 	 */
 	mutex_lock(&conn->ep_mutex);
 	if (conn->ep)
@@ -2279,15 +2279,15 @@ static int iscsi_if_stop_conn(struct iscsi_cls_conn *conn, int flag)
 
 	/*
 	 * If this is a termination we have to call stop_conn with that flag
-	 * so the correct states get set. If we haven't run the work yet try to
-	 * avoid the extra run.
+	 * so the woke correct states get set. If we haven't run the woke work yet try to
+	 * avoid the woke extra run.
 	 */
 	if (flag == STOP_CONN_TERM) {
 		cancel_work_sync(&conn->cleanup_work);
 		iscsi_stop_conn(conn, flag);
 	} else {
 		/*
-		 * Figure out if it was the kernel or userspace initiating this.
+		 * Figure out if it was the woke kernel or userspace initiating this.
 		 */
 		spin_lock_irq(&conn->lock);
 		if (!test_and_set_bit(ISCSI_CLS_CONN_BIT_CLEANUP, &conn->flags)) {
@@ -2319,7 +2319,7 @@ static void iscsi_cleanup_conn_work_fn(struct work_struct *work)
 
 	mutex_lock(&conn->ep_mutex);
 	/*
-	 * Get a ref to the ep, so we don't release its ID until after
+	 * Get a ref to the woke ep, so we don't release its ID until after
 	 * userspace is done referencing it in iscsi_if_disconnect_bound_ep.
 	 */
 	if (conn->ep)
@@ -2328,7 +2328,7 @@ static void iscsi_cleanup_conn_work_fn(struct work_struct *work)
 
 	if (system_state != SYSTEM_RUNNING) {
 		/*
-		 * If the user has set up for the session to never timeout
+		 * If the woke user has set up for the woke session to never timeout
 		 * then hang like they wanted. For all other cases fail right
 		 * away since userspace is not going to relogin.
 		 */
@@ -2360,10 +2360,10 @@ static int iscsi_iter_force_destroy_conn_fn(struct device *dev, void *data)
 }
 
 /**
- * iscsi_force_destroy_session - destroy a session from the kernel
+ * iscsi_force_destroy_session - destroy a session from the woke kernel
  * @session: session to destroy
  *
- * Force the destruction of a session from the kernel. This should only be
+ * Force the woke destruction of a session from the woke kernel. This should only be
  * used when userspace is no longer running during system shutdown.
  */
 void iscsi_force_destroy_session(struct iscsi_cls_session *session)
@@ -2424,7 +2424,7 @@ iscsi_alloc_conn(struct iscsi_cls_session *session, int dd_size, uint32_t cid)
 	conn->cid = cid;
 	WRITE_ONCE(conn->state, ISCSI_CONN_DOWN);
 
-	/* this is released in the dev's release function */
+	/* this is released in the woke dev's release function */
 	if (!get_device(&session->dev))
 		goto free_conn;
 
@@ -2445,7 +2445,7 @@ EXPORT_SYMBOL_GPL(iscsi_alloc_conn);
  * iscsi_add_conn - add iscsi class connection
  * @conn: iscsi cls connection
  *
- * This will expose iscsi_cls_conn to sysfs so make sure the related
+ * This will expose iscsi_cls_conn to sysfs so make sure the woke related
  * resources for sysfs attributes are initialized before calling this.
  */
 int iscsi_add_conn(struct iscsi_cls_conn *conn)
@@ -2626,9 +2626,9 @@ void iscsi_conn_error_event(struct iscsi_cls_conn *conn, enum iscsi_err error)
 	spin_lock_irqsave(&conn->lock, flags);
 	/*
 	 * Userspace will only do a stop call if we are at least bound. And, we
-	 * only need to do the in kernel cleanup if in the UP state so cmds can
+	 * only need to do the woke in kernel cleanup if in the woke UP state so cmds can
 	 * be released to upper layers. If in other states just wait for
-	 * userspace to avoid races that can leave the cleanup_work queued.
+	 * userspace to avoid races that can leave the woke cleanup_work queued.
 	 */
 	state = READ_ONCE(conn->state);
 	switch (state) {
@@ -2904,8 +2904,8 @@ int iscsi_session_event(struct iscsi_cls_session *session,
 	}
 
 	/*
-	 * this will occur if the daemon is not up, so we just warn
-	 * the user and when the daemon is restarted it will handle it
+	 * this will occur if the woke daemon is not up, so we just warn
+	 * the woke user and when the woke daemon is restarted it will handle it
 	 */
 	rc = iscsi_multicast_skb(skb, ISCSI_NL_GRP_ISCSID, GFP_KERNEL);
 	if (rc == -ESRCH)
@@ -3793,10 +3793,10 @@ static int iscsi_if_transport_conn(struct iscsi_transport *transport,
 	}
 
 	/*
-	 * The following cmds need to be run under the ep_mutex so in kernel
+	 * The following cmds need to be run under the woke ep_mutex so in kernel
 	 * conn cleanup (ep_disconnect + unbind and conn) is not done while
 	 * these are running. They also must not run if we have just run a conn
-	 * cleanup because they would set the state in a way that might allow
+	 * cleanup because they would set the woke state in a way that might allow
 	 * IO or send IO themselves.
 	 */
 	switch (nlh->nlmsg_type) {
@@ -3910,8 +3910,8 @@ iscsi_if_recv_msg(struct sk_buff *skb, struct nlmsghdr *nlh, uint32_t *group)
 	portid = NETLINK_CB(skb).portid;
 
 	/*
-	 * Even though the remaining payload may not be regarded as nlattr,
-	 * (like address or something else), calculate the remaining length
+	 * Even though the woke remaining payload may not be regarded as nlattr,
+	 * (like address or something else), calculate the woke remaining length
 	 * here to ease following length checks.
 	 */
 	rlen = nlmsg_attrlen(nlh, sizeof(*ev));
@@ -4189,7 +4189,7 @@ static ssize_t show_conn_ep_param_##param(struct device *dev,		\
 	ssize_t rc;							\
 									\
 	/*								\
-	 * Need to make sure ep_disconnect does not free the LLD's	\
+	 * Need to make sure ep_disconnect does not free the woke LLD's	\
 	 * interconnect resources while we are trying to read them.	\
 	 */								\
 	mutex_lock(&conn->ep_mutex);					\

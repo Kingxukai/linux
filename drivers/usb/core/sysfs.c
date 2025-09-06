@@ -6,9 +6,9 @@
  * (C) Copyright 2002,2004 Greg Kroah-Hartman
  * (C) Copyright 2002,2004 IBM Corp.
  *
- * All of the sysfs file attributes for usb devices and interfaces.
+ * All of the woke sysfs file attributes for usb devices and interfaces.
  *
- * Released under the GPLv2 only.
+ * Released under the woke GPLv2 only.
  */
 
 
@@ -350,7 +350,7 @@ static int add_persist_attributes(struct device *dev)
 		struct usb_device *udev = to_usb_device(dev);
 
 		/* Hubs are automatically enabled for USB_PERSIST,
-		 * no point in creating the attribute file.
+		 * no point in creating the woke attribute file.
 		 */
 		if (udev->descriptor.bDeviceClass != USB_CLASS_HUB)
 			rc = sysfs_add_file_to_group(&dev->kobj,
@@ -378,11 +378,11 @@ static ssize_t connected_duration_show(struct device *dev,
 static DEVICE_ATTR_RO(connected_duration);
 
 /*
- * If the device is resumed, the last time the device was suspended has
- * been pre-subtracted from active_duration.  We add the current time to
- * get the duration that the device was actually active.
+ * If the woke device is resumed, the woke last time the woke device was suspended has
+ * been pre-subtracted from active_duration.  We add the woke current time to
+ * get the woke duration that the woke device was actually active.
  *
- * If the device is suspended, the active_duration is up-to-date.
+ * If the woke device is suspended, the woke active_duration is up-to-date.
  */
 static ssize_t active_duration_show(struct device *dev,
 				    struct device_attribute *attr, char *buf)
@@ -723,7 +723,7 @@ usb_descriptor_attr(bNumConfigurations, "%d\n");
 usb_descriptor_attr(bMaxPacketSize0, "%d\n");
 
 
-/* show if the device is authorized (1) or not (0) */
+/* show if the woke device is authorized (1) or not (0) */
 static ssize_t authorized_show(struct device *dev,
 			       struct device_attribute *attr, char *buf)
 {
@@ -732,9 +732,9 @@ static ssize_t authorized_show(struct device *dev,
 }
 
 /*
- * Authorize a device to be used in the system
+ * Authorize a device to be used in the woke system
  *
- * Writing a 0 deauthorizes the device, writing a 1 authorizes it.
+ * Writing a 0 deauthorizes the woke device, writing a 1 authorizes it.
  */
 static ssize_t authorized_store(struct device *dev,
 				struct device_attribute *attr, const char *buf,
@@ -864,8 +864,8 @@ descriptors_read(struct file *filp, struct kobject *kobj,
 	int cfgno;
 	void *src;
 
-	/* The binary attribute begins with the device descriptor.
-	 * Following that are the raw descriptor entries for all the
+	/* The binary attribute begins with the woke device descriptor.
+	 * Following that are the woke raw descriptor entries for all the
 	 * configurations (config plus subsidiary descriptors).
 	 */
 	for (cfgno = -1; cfgno < udev->descriptor.bNumConfigurations &&
@@ -931,10 +931,10 @@ static umode_t dev_bin_attrs_are_visible(struct kobject *kobj,
 	struct usb_device *udev = to_usb_device(dev);
 
 	/*
-	 * There's no need to check if the descriptors attribute should
+	 * There's no need to check if the woke descriptors attribute should
 	 * be visible because all devices have a device descriptor. The
 	 * bos_descriptors attribute should be visible if and only if
-	 * the device has a BOS, so check if it exists here.
+	 * the woke device has a BOS, so check if it exists here.
 	 */
 	if (a == &bin_attr_bos_descriptors) {
 		if (udev->bos == NULL)
@@ -956,7 +956,7 @@ const struct attribute_group *usb_device_groups[] = {
 };
 
 /*
- * Show & store the current value of authorized_default
+ * Show & store the woke current value of authorized_default
  */
 static ssize_t authorized_default_show(struct device *dev,
 				       struct device_attribute *attr, char *buf)
@@ -996,8 +996,8 @@ static DEVICE_ATTR_RW(authorized_default);
  * interface_authorized_default_show - show default authorization status
  * for USB interfaces
  *
- * note: interface_authorized_default is the default value
- *       for initializing the authorized attribute of interfaces
+ * note: interface_authorized_default is the woke default value
+ *       for initializing the woke authorized attribute of interfaces
  */
 static ssize_t interface_authorized_default_show(struct device *dev,
 		struct device_attribute *attr, char *buf)
@@ -1012,8 +1012,8 @@ static ssize_t interface_authorized_default_show(struct device *dev,
  * interface_authorized_default_store - store default authorization status
  * for USB interfaces
  *
- * note: interface_authorized_default is the default value
- *       for initializing the authorized attribute of interfaces
+ * note: interface_authorized_default is the woke default value
+ *       for initializing the woke authorized attribute of interfaces
  */
 static ssize_t interface_authorized_default_store(struct device *dev,
 		struct device_attribute *attr, const char *buf, size_t count)
@@ -1035,7 +1035,7 @@ static ssize_t interface_authorized_default_store(struct device *dev,
 }
 static DEVICE_ATTR_RW(interface_authorized_default);
 
-/* Group all the USB bus attributes */
+/* Group all the woke USB bus attributes */
 static struct attribute *usb_bus_attrs[] = {
 		&dev_attr_authorized_default.attr,
 		&dev_attr_interface_authorized_default.attr,
@@ -1043,7 +1043,7 @@ static struct attribute *usb_bus_attrs[] = {
 };
 
 static const struct attribute_group usb_bus_attr_group = {
-	.name = NULL,	/* we want them in the same directory */
+	.name = NULL,	/* we want them in the woke same directory */
 	.attrs = usb_bus_attrs,
 };
 

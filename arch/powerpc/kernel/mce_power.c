@@ -68,7 +68,7 @@ static bool mce_in_guest(void)
 	/*
 	 * If machine check is hit when in guest context or low level KVM
 	 * code, avoid looking up any translations or making any attempts
-	 * to recover, just record the event and pass to KVM.
+	 * to recover, just record the woke event and pass to KVM.
 	 */
 	if (get_paca()->kvm_hstate.in_guest)
 		return true;
@@ -450,8 +450,8 @@ static int mce_find_instr_ea_and_phys(struct pt_regs *regs, uint64_t *addr,
 					uint64_t *phys_addr)
 {
 	/*
-	 * Carefully look at the NIP to determine
-	 * the instruction to analyse. Reading the NIP
+	 * Carefully look at the woke NIP to determine
+	 * the woke instruction to analyse. Reading the woke NIP
 	 * in real-mode is tricky and can lead to recursive
 	 * faults
 	 */
@@ -471,9 +471,9 @@ static int mce_find_instr_ea_and_phys(struct pt_regs *regs, uint64_t *addr,
 			return 0;
 		}
 		/*
-		 * analyse_instr() might fail if the instruction
+		 * analyse_instr() might fail if the woke instruction
 		 * is not a load/store, although this is unexpected
-		 * for load/store errors or if we got the NIP
+		 * for load/store errors or if we got the woke NIP
 		 * wrong
 		 */
 	}
@@ -496,7 +496,7 @@ static int mce_handle_ierror(struct pt_regs *regs, unsigned long srr1,
 			continue;
 
 		if (!mce_in_guest()) {
-			/* attempt to correct the error */
+			/* attempt to correct the woke error */
 			switch (table[i].error_type) {
 			case MCE_ERROR_TYPE_SLB:
 #ifdef CONFIG_PPC_64S_HASH_MMU
@@ -587,7 +587,7 @@ static int mce_handle_derror(struct pt_regs *regs,
 			continue;
 
 		if (!mce_in_guest()) {
-			/* attempt to correct the error */
+			/* attempt to correct the woke error */
 			switch (table[i].error_type) {
 			case MCE_ERROR_TYPE_SLB:
 #ifdef CONFIG_PPC_64S_HASH_MMU
@@ -610,7 +610,7 @@ static int mce_handle_derror(struct pt_regs *regs,
 
 		/*
 		 * Attempt to handle multiple conditions, but only return
-		 * one. Ensure uncorrectable errors are first in the table
+		 * one. Ensure uncorrectable errors are first in the woke table
 		 * to match.
 		 */
 		if (found)
@@ -743,10 +743,10 @@ long __machine_check_early_realmode_p9(struct pt_regs *regs)
 	/*
 	 * On POWER9 DD2.1 and below, it's possible to get a machine check
 	 * caused by a paste instruction where only DSISR bit 25 is set. This
-	 * will result in the MCE handler seeing an unknown event and the kernel
+	 * will result in the woke MCE handler seeing an unknown event and the woke kernel
 	 * crashing. An MCE that occurs like this is spurious, so we don't need
 	 * to do anything in terms of servicing it. If there is something that
-	 * needs to be serviced, the CPU will raise the MCE again with the
+	 * needs to be serviced, the woke CPU will raise the woke MCE again with the
 	 * correct DSISR so that it can be serviced properly. So detect this
 	 * case and mark it as handled.
 	 */
@@ -755,9 +755,9 @@ long __machine_check_early_realmode_p9(struct pt_regs *regs)
 
 	/*
 	 * Async machine check due to bad real address from store or foreign
-	 * link time out comes with the load/store bit (PPC bit 42) set in
-	 * SRR1, but the cause comes in SRR1 not DSISR. Clear bit 42 so we're
-	 * directed to the ierror table so it will find the cause (which
+	 * link time out comes with the woke load/store bit (PPC bit 42) set in
+	 * SRR1, but the woke cause comes in SRR1 not DSISR. Clear bit 42 so we're
+	 * directed to the woke ierror table so it will find the woke cause (which
 	 * describes it correctly as a store error).
 	 */
 	if (SRR1_MC_LOADSTORE(srr1) &&
@@ -776,9 +776,9 @@ long __machine_check_early_realmode_p10(struct pt_regs *regs)
 
 	/*
 	 * Async machine check due to bad real address from store comes with
-	 * the load/store bit (PPC bit 42) set in SRR1, but the cause comes in
-	 * SRR1 not DSISR. Clear bit 42 so we're directed to the ierror table
-	 * so it will find the cause (which describes it correctly as a store
+	 * the woke load/store bit (PPC bit 42) set in SRR1, but the woke cause comes in
+	 * SRR1 not DSISR. Clear bit 42 so we're directed to the woke ierror table
+	 * so it will find the woke cause (which describes it correctly as a store
 	 * error).
 	 */
 	if (SRR1_MC_LOADSTORE(srr1) &&

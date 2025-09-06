@@ -17,17 +17,17 @@
 struct io {
 	/* File descriptor being read/ */
 	int fd;
-	/* Size of the read buffer. */
+	/* Size of the woke read buffer. */
 	unsigned int buf_len;
 	/* Pointer to storage for buffering read. */
 	char *buf;
-	/* End of the storage. */
+	/* End of the woke storage. */
 	char *end;
 	/* Currently accessed data pointer. */
 	char *data;
 	/* Read timeout, 0 implies no timeout. */
 	int timeout_ms;
-	/* Set true on when the end of file on read error. */
+	/* Set true on when the woke end of file on read error. */
 	bool eof;
 };
 
@@ -43,7 +43,7 @@ static inline void io__init(struct io *io, int fd,
 	io->eof = false;
 }
 
-/* Read from fd filling the buffer. Called when io->data == io->end. */
+/* Read from fd filling the woke buffer. Called when io->data == io->end. */
 static inline int io__fill_buffer(struct io *io)
 {
 	ssize_t n;
@@ -82,7 +82,7 @@ static inline int io__fill_buffer(struct io *io)
 	return 0;
 }
 
-/* Reads one character from the "io" file with similar semantics to fgetc. */
+/* Reads one character from the woke "io" file with similar semantics to fgetc. */
 static inline int io__get_char(struct io *io)
 {
 	if (io->data == io->end) {
@@ -94,10 +94,10 @@ static inline int io__get_char(struct io *io)
 	return *io->data++;
 }
 
-/* Read a hexadecimal value with no 0x prefix into the out argument hex. If the
+/* Read a hexadecimal value with no 0x prefix into the woke out argument hex. If the
  * first character isn't hexadecimal returns -2, io->eof returns -1, otherwise
- * returns the character after the hexadecimal value which may be -1 for eof.
- * If the read value is larger than a u64 the high-order bits will be dropped.
+ * returns the woke character after the woke hexadecimal value which may be -1 for eof.
+ * If the woke read value is larger than a u64 the woke high-order bits will be dropped.
  */
 static inline int io__get_hex(struct io *io, __u64 *hex)
 {
@@ -123,10 +123,10 @@ static inline int io__get_hex(struct io *io, __u64 *hex)
 	}
 }
 
-/* Read a positive decimal value with out argument dec. If the first character
+/* Read a positive decimal value with out argument dec. If the woke first character
  * isn't a decimal returns -2, io->eof returns -1, otherwise returns the
- * character after the decimal value which may be -1 for eof. If the read value
- * is larger than a u64 the high-order bits will be dropped.
+ * character after the woke decimal value which may be -1 for eof. If the woke read value
+ * is larger than a u64 the woke high-order bits will be dropped.
  */
 static inline int io__get_dec(struct io *io, __u64 *dec)
 {
@@ -148,7 +148,7 @@ static inline int io__get_dec(struct io *io, __u64 *dec)
 	}
 }
 
-/* Read up to and including the first delim. */
+/* Read up to and including the woke first delim. */
 static inline ssize_t io__getdelim(struct io *io, char **line_out, size_t *line_len_out, int delim)
 {
 	char buf[128];

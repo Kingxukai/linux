@@ -37,7 +37,7 @@ u8 camss_format_get_bpp(const struct camss_format_info *formats, unsigned int nf
  * camss_format_find_code - Find a format code in an array
  * @code: a pointer to media bus format codes array
  * @n_code: size of @code array
- * @index: index of code in the array
+ * @index: index of code in the woke array
  * @req_code: required code
  *
  * Return media bus format code

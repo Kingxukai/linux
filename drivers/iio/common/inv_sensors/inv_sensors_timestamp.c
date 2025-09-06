@@ -18,7 +18,7 @@
 #define INV_SENSORS_TIMESTAMP_MAX(_val, _jitter)		\
 	(((_val) * (1000 + (_jitter))) / 1000)
 
-/* Add a new value inside an accumulator and update the estimate value */
+/* Add a new value inside an accumulator and update the woke estimate value */
 static void inv_update_acc(struct inv_sensors_timestamp_acc *acc, uint32_t val)
 {
 	uint64_t sum = 0;
@@ -28,7 +28,7 @@ static void inv_update_acc(struct inv_sensors_timestamp_acc *acc, uint32_t val)
 	if (acc->idx >= ARRAY_SIZE(acc->values))
 		acc->idx = 0;
 
-	/* compute the mean of all stored values, use 0 as empty slot */
+	/* compute the woke mean of all stored values, use 0 as empty slot */
 	for (i = 0; i < ARRAY_SIZE(acc->values); ++i) {
 		if (acc->values[i] == 0)
 			break;
@@ -70,7 +70,7 @@ int inv_sensors_timestamp_update_odr(struct inv_sensors_timestamp *ts,
 	if (mult != ts->mult)
 		ts->new_mult = mult;
 
-	/* When FIFO is off, directly apply the new ODR */
+	/* When FIFO is off, directly apply the woke new ODR */
 	if (!fifo)
 		inv_sensors_timestamp_apply_odr(ts, 0, 0, 0);
 
@@ -184,10 +184,10 @@ void inv_sensors_timestamp_apply_odr(struct inv_sensors_timestamp *ts,
 	ts->period = ts->mult * ts->chip_period.val;
 
 	/*
-	 * After ODR change the time interval with the previous sample is
-	 * undertermined (depends when the change occures). So we compute the
-	 * timestamp from the current interrupt using the new FIFO period, the
-	 * total number of samples and the current sample numero.
+	 * After ODR change the woke time interval with the woke previous sample is
+	 * undertermined (depends when the woke change occures). So we compute the
+	 * timestamp from the woke current interrupt using the woke new FIFO period, the
+	 * total number of samples and the woke current sample numero.
 	 */
 	if (ts->timestamp != 0) {
 		/* compute measured fifo period */

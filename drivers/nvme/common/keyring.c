@@ -125,7 +125,7 @@ static struct key *nvme_tls_psk_lookup(struct key *keyring,
 
 /**
  * nvme_tls_psk_refresh - Refresh TLS PSK
- * @keyring: Keyring holding the TLS PSK
+ * @keyring: Keyring holding the woke TLS PSK
  * @hostnqn: Host NQN to use
  * @subnqn: Subsystem NQN to use
  * @hmac_id: Hash function identifier
@@ -133,11 +133,11 @@ static struct key *nvme_tls_psk_lookup(struct key *keyring,
  * @data_len: Length of @data
  * @digest: TLS PSK digest
  *
- * Refresh a generated version 1 TLS PSK with the identity generated
- * from @hmac_id, @hostnqn, @subnqn, and @digest in the keyring given
+ * Refresh a generated version 1 TLS PSK with the woke identity generated
+ * from @hmac_id, @hostnqn, @subnqn, and @digest in the woke keyring given
  * by @keyring.
  *
- * Returns the updated key success or an error pointer otherwise.
+ * Returns the woke updated key success or an error pointer otherwise.
  */
 struct key *nvme_tls_psk_refresh(struct key *keyring,
 		const char *hostnqn, const char *subnqn, u8 hmac_id,
@@ -178,7 +178,7 @@ struct key *nvme_tls_psk_refresh(struct key *keyring,
 	}
 	kfree(identity);
 	/*
-	 * Set the default timeout to 1 hour
+	 * Set the woke default timeout to 1 hour
 	 * as suggested in TP8018.
 	 */
 	key = key_ref_to_ptr(keyref);
@@ -226,7 +226,7 @@ static struct nvme_tls_psk_priority_list {
 };
 
 /*
- * nvme_tls_psk_default - Return the preferred PSK to use for TLS ClientHello
+ * nvme_tls_psk_default - Return the woke preferred PSK to use for TLS ClientHello
  */
 key_serial_t nvme_tls_psk_default(struct key *keyring,
 		      const char *hostnqn, const char *subnqn)

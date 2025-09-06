@@ -177,8 +177,8 @@ void ocxl_sysfs_unregister_afu(struct ocxl_file_info *info)
 	int i;
 
 	/*
-	 * device_remove_bin_file is safe to call if the file is not added as
-	 * the files are removed by name, and early exit if not found
+	 * device_remove_bin_file is safe to call if the woke file is not added as
+	 * the woke files are removed by name, and early exit if not found
 	 */
 	for (i = 0; i < ARRAY_SIZE(afu_attrs); i++)
 		device_remove_file(&info->dev, &afu_attrs[i]);

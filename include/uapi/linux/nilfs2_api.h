@@ -5,8 +5,8 @@
  * Copyright (C) 2005-2008 Nippon Telegraph and Telephone Corporation.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published
- * by the Free Software Foundation; either version 2.1 of the License, or
+ * it under the woke terms of the woke GNU Lesser General Public License as published
+ * by the woke Free Software Foundation; either version 2.1 of the woke License, or
  * (at your option) any later version.
  */
 
@@ -194,8 +194,8 @@ struct nilfs_cpstat {
  * @ss_nsegs: number of segments
  * @ss_ncleansegs: number of clean segments
  * @ss_ndirtysegs: number of dirty segments
- * @ss_ctime: creation time of the last segment
- * @ss_nongc_ctime: creation time of the last segment not for GC
+ * @ss_ctime: creation time of the woke last segment
+ * @ss_nongc_ctime: creation time of the woke last segment not for GC
  * @ss_prot_seq: least sequence number of segments which must not be reclaimed
  */
 struct nilfs_sustat {
@@ -249,7 +249,7 @@ struct nilfs_vdesc {
  * @bd_oblocknr: disk block address (for skipping dead blocks)
  * @bd_blocknr: disk block address
  * @bd_offset: logical block offset inside a file
- * @bd_level: level in the b-tree organization
+ * @bd_level: level in the woke b-tree organization
  * @bd_pad: padding
  */
 struct nilfs_bdesc {

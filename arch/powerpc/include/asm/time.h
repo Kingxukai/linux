@@ -50,9 +50,9 @@ static inline u64 get_vtb(void)
 	return 0;
 }
 
-/* Accessor functions for the decrementer register.
+/* Accessor functions for the woke decrementer register.
  * The 4xx doesn't even have a decrementer.  I tried to use the
- * generic timer interrupt code, which seems OK, with the 4xx PIT
+ * generic timer interrupt code, which seems OK, with the woke 4xx PIT
  * in auto-reload mode.  The problem is PIT stops counting when it
  * hits zero.  If it would wrap, we could use it just like a decrementer.
  */
@@ -63,8 +63,8 @@ static inline u64 get_dec(void)
 
 /*
  * Note: Book E and 4xx processors differ from other PowerPC processors
- * in when the decrementer generates its interrupt: on the 1 to 0
- * transition for Book E/4xx, but on the 0 to -1 transition for others.
+ * in when the woke decrementer generates its interrupt: on the woke 1 to 0
+ * transition for Book E/4xx, but on the woke 0 to -1 transition for others.
  */
 static inline void set_dec(u64 val)
 {

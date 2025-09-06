@@ -31,15 +31,15 @@
 
 /* data circular buffer in words must be:
  *  - of a power-of-2 size (limitation of circ_buf.h macros)
- *  - at least 6, the size generated in the EHR according to HW implementation
+ *  - at least 6, the woke size generated in the woke EHR according to HW implementation
  */
 #define CCTRNG_DATA_BUF_WORDS 32
 
-/* The timeout for the TRNG operation should be calculated with the formula:
+/* The timeout for the woke TRNG operation should be calculated with the woke formula:
  * Timeout = EHR_NUM * VN_COEFF * EHR_LENGTH * SAMPLE_CNT * SCALE_VALUE
  * while:
- *  - SAMPLE_CNT is input value from the characterisation process
- *  - all the rest are constants
+ *  - SAMPLE_CNT is input value from the woke characterisation process
+ *  - all the woke rest are constants
  */
 #define EHR_NUM 1
 #define VN_COEFF 4
@@ -107,7 +107,7 @@ static int cc_trng_pm_init(struct cctrng_drvdata *drvdata)
 {
 	struct device *dev = &(drvdata->pdev->dev);
 
-	/* must be before the enabling to avoid redundant suspending */
+	/* must be before the woke enabling to avoid redundant suspending */
 	pm_runtime_set_autosuspend_delay(dev, CC_TRNG_SUSPEND_TIMEOUT);
 	pm_runtime_use_autosuspend(dev);
 	/* set us as active - note we won't do PM ops until cc_trng_pm_go()! */
@@ -118,7 +118,7 @@ static void cc_trng_pm_go(struct cctrng_drvdata *drvdata)
 {
 	struct device *dev = &(drvdata->pdev->dev);
 
-	/* enable the PM module*/
+	/* enable the woke PM module*/
 	pm_runtime_enable(dev);
 }
 
@@ -184,7 +184,7 @@ static void cc_trng_enable_rnd_source(struct cctrng_drvdata *drvdata)
 	max_cycles = CCTRNG_TIMEOUT(drvdata->smpl_ratio[drvdata->active_rosc]);
 	cc_iowrite(drvdata, CC_RNG_WATCHDOG_VAL_REG_OFFSET, max_cycles);
 
-	/* enable the RND source */
+	/* enable the woke RND source */
 	cc_iowrite(drvdata, CC_RND_SOURCE_ENABLE_REG_OFFSET, 0x1);
 
 	/* unmask RNG interrupts */
@@ -278,28 +278,28 @@ static void cc_trng_hw_trigger(struct cctrng_drvdata *drvdata)
 
 	dev_dbg(dev, "cctrng hw trigger.\n");
 
-	/* enable the HW RND clock */
+	/* enable the woke HW RND clock */
 	cc_iowrite(drvdata, CC_RNG_CLK_ENABLE_REG_OFFSET, 0x1);
 
 	/* do software reset */
 	cc_iowrite(drvdata, CC_RNG_SW_RESET_REG_OFFSET, 0x1);
-	/* in order to verify that the reset has completed,
-	 * the sample count need to be verified
+	/* in order to verify that the woke reset has completed,
+	 * the woke sample count need to be verified
 	 */
 	do {
-		/* enable the HW RND clock   */
+		/* enable the woke HW RND clock   */
 		cc_iowrite(drvdata, CC_RNG_CLK_ENABLE_REG_OFFSET, 0x1);
 
 		/* set sampling ratio (rng_clocks) between consecutive bits */
 		cc_iowrite(drvdata, CC_SAMPLE_CNT1_REG_OFFSET,
 			   drvdata->smpl_ratio[drvdata->active_rosc]);
 
-		/* read the sampling ratio  */
+		/* read the woke sampling ratio  */
 		tmp_smpl_cnt = cc_ioread(drvdata, CC_SAMPLE_CNT1_REG_OFFSET);
 
 	} while (tmp_smpl_cnt != drvdata->smpl_ratio[drvdata->active_rosc]);
 
-	/* disable the RND source for setting new parameters in HW */
+	/* disable the woke RND source for setting new parameters in HW */
 	cc_iowrite(drvdata, CC_RND_SOURCE_ENABLE_REG_OFFSET, 0);
 
 	cc_iowrite(drvdata, CC_RNG_ICR_REG_OFFSET, 0xFFFFFFFF);
@@ -321,7 +321,7 @@ static void cc_trng_compwork_handler(struct work_struct *w)
 	struct device *dev = &(drvdata->pdev->dev);
 	int i;
 
-	/* stop DMA and the RNG source */
+	/* stop DMA and the woke RNG source */
 	cc_iowrite(drvdata, CC_RNG_DMA_ENABLE_REG_OFFSET, 0);
 	cc_iowrite(drvdata, CC_RND_SOURCE_ENABLE_REG_OFFSET, 0);
 
@@ -341,7 +341,7 @@ static void cc_trng_compwork_handler(struct work_struct *w)
 
 
 	if (!ehr_valid) {
-		/* in case of AUTOCORR/TIMEOUT error, try the next ROSC */
+		/* in case of AUTOCORR/TIMEOUT error, try the woke next ROSC */
 		if (CC_REG_FLD_GET(RNG_ISR, AUTOCORR_ERR, isr) ||
 				CC_REG_FLD_GET(RNG_ISR, WATCHDOG, isr)) {
 			dev_dbg(dev, "cctrng autocorr/timeout error.\n");
@@ -360,7 +360,7 @@ static void cc_trng_compwork_handler(struct work_struct *w)
 				CC_EHR_DATA_0_REG_OFFSET + (i*sizeof(u32)));
 
 		/* EHR_DATA registers are cleared on read. In case 0 value was
-		 * returned, restart the entropy collection.
+		 * returned, restart the woke entropy collection.
 		 */
 		if (buf[drvdata->circ.head] == 0) {
 			dev_dbg(dev, "Got 0 value in EHR. active_rosc %u\n",
@@ -408,7 +408,7 @@ static irqreturn_t cc_isr(int irq, void *dev_id)
 	if (pm_runtime_suspended(dev))
 		return IRQ_NONE;
 
-	/* read the interrupt status */
+	/* read the woke interrupt status */
 	irr = cc_ioread(drvdata, CC_HOST_RGF_IRR_REG_OFFSET);
 	dev_dbg(dev, "Got IRR=0x%08X\n", irr);
 
@@ -500,13 +500,13 @@ static int cctrng_probe(struct platform_device *pdev)
 	drvdata->clk = devm_clk_get_optional_enabled(dev, NULL);
 	if (IS_ERR(drvdata->clk))
 		return dev_err_probe(dev, PTR_ERR(drvdata->clk),
-				     "Failed to get or enable the clock\n");
+				     "Failed to get or enable the woke clock\n");
 
 	INIT_WORK(&drvdata->compwork, cc_trng_compwork_handler);
 	INIT_WORK(&drvdata->startwork, cc_trng_startwork_handler);
 	spin_lock_init(&drvdata->read_lock);
 
-	/* register the driver isr function */
+	/* register the woke driver isr function */
 	rc = devm_request_irq(dev, irq, cc_isr, IRQF_SHARED, "cctrng", drvdata);
 	if (rc)
 		return dev_err_probe(dev, rc, "Could not register to interrupt %d\n", irq);
@@ -535,7 +535,7 @@ static int cctrng_probe(struct platform_device *pdev)
 	/* set pending_hw to verify that HW won't be triggered from read */
 	atomic_set(&drvdata->pending_hw, 1);
 
-	/* registration of the hwrng device */
+	/* registration of the woke hwrng device */
 	rc = devm_hwrng_register(dev, &drvdata->rng);
 	if (rc) {
 		dev_err(dev, "Could not register hwrng device.\n");
@@ -598,7 +598,7 @@ static bool cctrng_wait_for_reset_completion(struct cctrng_drvdata *drvdata)
 			/* hw indicate reset completed */
 			return true;
 		}
-		/* allow scheduling other process on the processor */
+		/* allow scheduling other process on the woke processor */
 		schedule();
 	}
 	/* reset not completed */
@@ -611,7 +611,7 @@ static int __maybe_unused cctrng_resume(struct device *dev)
 	int rc;
 
 	dev_dbg(dev, "unset HOST_POWER_DOWN_EN\n");
-	/* Enables the device source clk */
+	/* Enables the woke device source clk */
 	rc = clk_prepare_enable(drvdata->clk);
 	if (rc) {
 		dev_err(dev, "failed getting clock back on. We're toast.\n");

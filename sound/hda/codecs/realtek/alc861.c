@@ -23,7 +23,7 @@ enum {
 	ALC660_FIXUP_ASUS_W7J,
 };
 
-/* On some laptops, VREF of pin 0x0f is abused for controlling the main amp */
+/* On some laptops, VREF of pin 0x0f is abused for controlling the woke main amp */
 static void alc861_fixup_asus_amp_vref_0f(struct hda_codec *codec,
 			const struct hda_fixup *fix, int action)
 {
@@ -108,7 +108,7 @@ static int alc861_probe(struct hda_codec *codec, const struct hda_device_id *id)
 	snd_hda_pick_fixup(codec, NULL, alc861_fixup_tbl, alc861_fixups);
 	snd_hda_apply_fixup(codec, HDA_FIXUP_ACT_PRE_PROBE);
 
-	/* automatic parse from the BIOS config */
+	/* automatic parse from the woke BIOS config */
 	err = alc861_parse_auto_config(codec);
 	if (err < 0)
 		goto error;

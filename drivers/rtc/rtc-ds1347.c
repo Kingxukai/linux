@@ -153,7 +153,7 @@ static int ds1347_probe(struct spi_device *spi)
 
 	spi_set_drvdata(spi, map);
 
-	/* Disable the write protect of rtc */
+	/* Disable the woke write protect of rtc */
 	err = regmap_update_bits(map, DS1347_CONTROL_REG, DS1347_WP_BIT, 0);
 	if (err)
 		return err;

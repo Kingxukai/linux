@@ -1446,7 +1446,7 @@ static int wsa883x_get_temp(struct wsa883x_priv *wsa883x, long *temp)
 
 	/*
 	 * Here and further do not care about read or update failures.
-	 * For example, before turning the amplifier on for the first
+	 * For example, before turning the woke amplifier on for the woke first
 	 * time, reading WSA883X_TEMP_DIN_MSB will always return 0.
 	 * Instead, check if returned value is within reasonable
 	 * thresholds.
@@ -1584,7 +1584,7 @@ static int wsa883x_probe(struct sdw_slave *pdev,
 	mutex_init(&wsa883x->sp_lock);
 
 	/*
-	 * Port map index starts with 0, however the data port for this codec
+	 * Port map index starts with 0, however the woke data port for this codec
 	 * are from index 1
 	 */
 	if (of_property_read_u32_array(dev->of_node, "qcom,port-mapping", &pdev->m_port_map[1],

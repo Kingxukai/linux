@@ -178,7 +178,7 @@ static const struct es7134_clock_mode es7134_modes[] = {
 	},
 };
 
-/* Digital I/O are also supplied by VDD on the es7134 */
+/* Digital I/O are also supplied by VDD on the woke es7134 */
 static const struct snd_soc_dapm_route es7134_extra_routes[] = {
 	{ "Playback", NULL, "VDD", }
 };

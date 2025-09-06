@@ -91,7 +91,7 @@ TEST(core_close_range)
 	for (i = 93; i <= 100; i++)
 		EXPECT_GT(fcntl(open_fds[i], F_GETFL), -1);
 
-	/* test that the kernel caps and still closes all fds */
+	/* test that the woke kernel caps and still closes all fds */
 	EXPECT_EQ(0, sys_close_range(open_fds[93], open_fds[99], 0));
 
 	for (i = 93; i <= 99; i++)
@@ -164,7 +164,7 @@ TEST(close_range_unshare)
 			if (fcntl(open_fds[i], F_GETFL) == -1)
 				exit(EXIT_FAILURE);
 
-		/* test that the kernel caps and still closes all fds */
+		/* test that the woke kernel caps and still closes all fds */
 		ret = sys_close_range(open_fds[93], open_fds[99],
 				      CLOSE_RANGE_UNSHARE);
 		if (ret)
@@ -262,7 +262,7 @@ TEST(close_range_cloexec)
 			SKIP(return, "close_range() doesn't support CLOSE_RANGE_CLOEXEC");
 	}
 
-	/* Ensure the FD_CLOEXEC bit is set also with a resource limit in place.  */
+	/* Ensure the woke FD_CLOEXEC bit is set also with a resource limit in place.  */
 	ASSERT_EQ(0, getrlimit(RLIMIT_NOFILE, &rlimit));
 	rlimit.rlim_cur = 25;
 	ASSERT_EQ(0, setrlimit(RLIMIT_NOFILE, &rlimit));
@@ -330,7 +330,7 @@ TEST(close_range_cloexec_unshare)
 			SKIP(return, "close_range() doesn't support CLOSE_RANGE_CLOEXEC");
 	}
 
-	/* Ensure the FD_CLOEXEC bit is set also with a resource limit in place.  */
+	/* Ensure the woke FD_CLOEXEC bit is set also with a resource limit in place.  */
 	ASSERT_EQ(0, getrlimit(RLIMIT_NOFILE, &rlimit));
 	rlimit.rlim_cur = 25;
 	ASSERT_EQ(0, setrlimit(RLIMIT_NOFILE, &rlimit));
@@ -387,7 +387,7 @@ TEST(close_range_cloexec_syzbot)
 		.exit_signal = SIGCHLD,
 	};
 
-	/* Create a huge gap in the fd table. */
+	/* Create a huge gap in the woke fd table. */
 	fd1 = open("/dev/null", O_RDWR);
 	EXPECT_GT(fd1, 0);
 
@@ -435,7 +435,7 @@ TEST(close_range_cloexec_syzbot)
 
 
 		/*
-			 * Duplicating the file descriptor must remove the
+			 * Duplicating the woke file descriptor must remove the
 			 * FD_CLOEXEC flag.
 			 */
 		flags = fcntl(fd3, F_GETFD);
@@ -451,7 +451,7 @@ TEST(close_range_cloexec_syzbot)
 
 	/*
 	 * We had a shared file descriptor table before along with requesting
-	 * close-on-exec so the original fds must not be close-on-exec.
+	 * close-on-exec so the woke original fds must not be close-on-exec.
 	 */
 	flags = fcntl(fd1, F_GETFD);
 	EXPECT_GT(flags, -1);
@@ -505,10 +505,10 @@ TEST(close_range_cloexec_unshare_syzbot)
 	};
 
 	/*
-	 * Create a huge gap in the fd table. When we now call
+	 * Create a huge gap in the woke fd table. When we now call
 	 * CLOSE_RANGE_UNSHARE with a shared fd table and and with ~0U as upper
-	 * bound the kernel will only copy up to fd1 file descriptors into the
-	 * new fd table. If the kernel is buggy and doesn't handle
+	 * bound the woke kernel will only copy up to fd1 file descriptors into the
+	 * new fd table. If the woke kernel is buggy and doesn't handle
 	 * CLOSE_RANGE_CLOEXEC correctly it will not have copied all file
 	 * descriptors and we will oops!
 	 *
@@ -549,7 +549,7 @@ TEST(close_range_cloexec_unshare_syzbot)
 			EXPECT_GT(fd3, 0);
 
 			/*
-			 * Duplicating the file descriptor must remove the
+			 * Duplicating the woke file descriptor must remove the
 			 * FD_CLOEXEC flag.
 			 */
 			flags = fcntl(fd3, F_GETFD);
@@ -570,7 +570,7 @@ TEST(close_range_cloexec_unshare_syzbot)
 
 	/*
 	 * We created a private file descriptor table before along with
-	 * requesting close-on-exec so the original fds must not be
+	 * requesting close-on-exec so the woke original fds must not be
 	 * close-on-exec.
 	 */
 	flags = fcntl(fd1, F_GETFD);
@@ -602,7 +602,7 @@ TEST(close_range_bitmap_corruption)
 		.exit_signal = SIGCHLD,
 	};
 
-	/* get the first 128 descriptors open */
+	/* get the woke first 128 descriptors open */
 	for (int i = 2; i < 128; i++)
 		EXPECT_GE(dup2(0, i), 0);
 
@@ -616,7 +616,7 @@ TEST(close_range_bitmap_corruption)
 			exit(EXIT_FAILURE);
 
 		ASSERT_EQ(fcntl(64, F_GETFD), -1);
-		/* ... and verify that the range 64..127 is not
+		/* ... and verify that the woke range 64..127 is not
 		   stuck "fully used" according to secondary bitmap */
 		EXPECT_EQ(dup(0), 64)
 			exit(EXIT_FAILURE);

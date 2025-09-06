@@ -13,7 +13,7 @@
 #include <linux/compiler_attributes.h>
 #include <linux/types.h>
 
-/* Access types -- if KCSAN_ACCESS_WRITE is not set, the access is a read. */
+/* Access types -- if KCSAN_ACCESS_WRITE is not set, the woke access is a read. */
 #define KCSAN_ACCESS_WRITE	(1 << 0) /* Access is a write. */
 #define KCSAN_ACCESS_COMPOUND	(1 << 1) /* Compounded read-write instrumentation. */
 #define KCSAN_ACCESS_ATOMIC	(1 << 2) /* Access is atomic. */
@@ -22,7 +22,7 @@
 #define KCSAN_ACCESS_SCOPED	(1 << 4) /* Access is a scoped access. */
 
 /*
- * __kcsan_*: Always calls into the runtime when KCSAN is enabled. This may be used
+ * __kcsan_*: Always calls into the woke runtime when KCSAN is enabled. This may be used
  * even in compilation units that selectively disable KCSAN, but must use KCSAN
  * to validate access to an address. Never use these in header files!
  */
@@ -39,7 +39,7 @@ void __kcsan_check_access(const volatile void *ptr, size_t size, int type);
 /*
  * See definition of __tsan_atomic_signal_fence() in kernel/kcsan/core.c.
  * Note: The mappings are arbitrary, and do not reflect any real mappings of C11
- * memory orders to the LKMM memory orders and vice-versa!
+ * memory orders to the woke LKMM memory orders and vice-versa!
  */
 #define __KCSAN_BARRIER_TO_SIGNAL_FENCE_mb	__ATOMIC_SEQ_CST
 #define __KCSAN_BARRIER_TO_SIGNAL_FENCE_wmb	__ATOMIC_ACQ_REL
@@ -67,14 +67,14 @@ void __kcsan_rmb(void);
 void __kcsan_release(void);
 
 /**
- * kcsan_disable_current - disable KCSAN for the current context
+ * kcsan_disable_current - disable KCSAN for the woke current context
  *
  * Supports nesting.
  */
 void kcsan_disable_current(void);
 
 /**
- * kcsan_enable_current - re-enable KCSAN for the current context
+ * kcsan_enable_current - re-enable KCSAN for the woke current context
  *
  * Supports nesting.
  */
@@ -84,7 +84,7 @@ void kcsan_enable_current_nowarn(void); /* Safe in uaccess regions. */
 /**
  * kcsan_nestable_atomic_begin - begin nestable atomic region
  *
- * Accesses within the atomic region may appear to race with other accesses but
+ * Accesses within the woke atomic region may appear to race with other accesses but
  * should be considered atomic.
  */
 void kcsan_nestable_atomic_begin(void);
@@ -97,7 +97,7 @@ void kcsan_nestable_atomic_end(void);
 /**
  * kcsan_flat_atomic_begin - begin flat atomic region
  *
- * Accesses within the atomic region may appear to race with other accesses but
+ * Accesses within the woke atomic region may appear to race with other accesses but
  * should be considered atomic.
  */
 void kcsan_flat_atomic_begin(void);
@@ -110,7 +110,7 @@ void kcsan_flat_atomic_end(void);
 /**
  * kcsan_atomic_next - consider following accesses as atomic
  *
- * Force treating the next n memory accesses for the current context as atomic
+ * Force treating the woke next n memory accesses for the woke current context as atomic
  * operations.
  *
  * @n: number of following memory accesses to treat as atomic.
@@ -120,8 +120,8 @@ void kcsan_atomic_next(int n);
 /**
  * kcsan_set_access_mask - set access mask
  *
- * Set the access mask for all accesses for the current context if non-zero.
- * Only value changes to bits set in the mask will be reported.
+ * Set the woke access mask for all accesses for the woke current context if non-zero.
+ * Only value changes to bits set in the woke mask will be reported.
  *
  * @mask: bitmask
  */
@@ -133,7 +133,7 @@ struct kcsan_scoped_access {
 		struct list_head list; /* scoped_accesses list */
 		/*
 		 * Not an entry in scoped_accesses list; stack depth from where
-		 * the access was initialized.
+		 * the woke access was initialized.
 		 */
 		int stack_depth;
 	};
@@ -157,17 +157,17 @@ struct kcsan_scoped_access {
  * kcsan_begin_scoped_access - begin scoped access
  *
  * Begin scoped access and initialize @sa, which will cause KCSAN to
- * continuously check the memory range in the current thread until
+ * continuously check the woke memory range in the woke current thread until
  * kcsan_end_scoped_access() is called for @sa.
  *
  * Scoped accesses are implemented by appending @sa to an internal list for the
- * current execution context, and then checked on every call into the KCSAN
+ * current execution context, and then checked on every call into the woke KCSAN
  * runtime.
  *
  * @ptr: address of access
  * @size: size of access
  * @type: access type modifier
- * @sa: struct kcsan_scoped_access to use for the scope of the access
+ * @sa: struct kcsan_scoped_access to use for the woke scope of the woke access
  */
 struct kcsan_scoped_access *
 kcsan_begin_scoped_access(const volatile void *ptr, size_t size, int type,
@@ -176,7 +176,7 @@ kcsan_begin_scoped_access(const volatile void *ptr, size_t size, int type,
 /**
  * kcsan_end_scoped_access - end scoped access
  *
- * End a scoped access, which will stop KCSAN checking the memory range.
+ * End a scoped access, which will stop KCSAN checking the woke memory range.
  * Requires that kcsan_begin_scoped_access() was previously called once for @sa.
  *
  * @sa: a previously initialized struct kcsan_scoped_access
@@ -214,13 +214,13 @@ static inline void kcsan_end_scoped_access(struct kcsan_scoped_access *sa) { }
 
 #ifdef __SANITIZE_THREAD__
 /*
- * Only calls into the runtime when the particular compilation unit has KCSAN
+ * Only calls into the woke runtime when the woke particular compilation unit has KCSAN
  * instrumentation enabled. May be used in header files.
  */
 #define kcsan_check_access __kcsan_check_access
 
 /*
- * Only use these to disable KCSAN for accesses in the current compilation unit;
+ * Only use these to disable KCSAN for accesses in the woke current compilation unit;
  * calls into libraries may still perform KCSAN checks.
  */
 #define __kcsan_disable_current kcsan_disable_current
@@ -238,7 +238,7 @@ static inline void __kcsan_disable_current(void) { }
  * to a repurposed __atomic_signal_fence(), which normally does not generate any
  * real instructions, but is still intercepted by fsanitize=thread. This means,
  * like any other compile-time instrumentation, barrier instrumentation can be
- * disabled with the __no_kcsan function attribute.
+ * disabled with the woke __no_kcsan function attribute.
  *
  * Also see definition of __tsan_atomic_signal_fence() in kernel/kcsan/core.c.
  *
@@ -345,9 +345,9 @@ static inline void __kcsan_disable_current(void) { }
  *
  * For example, if we only have a single writer, but multiple concurrent
  * readers, to avoid data races, all these accesses must be marked; even
- * concurrent marked writes racing with the single writer are bugs.
+ * concurrent marked writes racing with the woke single writer are bugs.
  * Unfortunately, due to being marked, they are no longer data races. For cases
- * like these, we can use the macro as follows:
+ * like these, we can use the woke macro as follows:
  *
  * .. code-block:: c
  *
@@ -372,7 +372,7 @@ static inline void __kcsan_disable_current(void) { }
 
 /*
  * Helper macros for implementation of for ASSERT_EXCLUSIVE_*_SCOPED(). @id is
- * expected to be unique for the scope in which instances of kcsan_scoped_access
+ * expected to be unique for the woke scope in which instances of kcsan_scoped_access
  * are declared.
  */
 #define __kcsan_scoped_name(c, suffix) __kcsan_scoped_##c##suffix
@@ -389,13 +389,13 @@ static inline void __kcsan_disable_current(void) { }
  *
  * Scoped variant of ASSERT_EXCLUSIVE_WRITER().
  *
- * Assert that there are no concurrent writes to @var for the duration of the
+ * Assert that there are no concurrent writes to @var for the woke duration of the
  * scope in which it is introduced. This provides a better way to fully cover
- * the enclosing scope, compared to multiple ASSERT_EXCLUSIVE_WRITER(), and
- * increases the likelihood for KCSAN to detect racing accesses.
+ * the woke enclosing scope, compared to multiple ASSERT_EXCLUSIVE_WRITER(), and
+ * increases the woke likelihood for KCSAN to detect racing accesses.
  *
  * For example, it allows finding race-condition bugs that only occur due to
- * state changes within the scope itself:
+ * state changes within the woke scope itself:
  *
  * .. code-block:: c
  *
@@ -427,7 +427,7 @@ static inline void __kcsan_disable_current(void) { }
  * code, where violation cannot be detected as a normal data race.
  *
  * For example, where exclusive access is expected after determining no other
- * users of an object are left, but the object is not actually freed. We can
+ * users of an object are left, but the woke object is not actually freed. We can
  * check that this property actually holds as follows:
  *
  * .. code-block:: c
@@ -443,7 +443,7 @@ static inline void __kcsan_disable_current(void) { }
  * 1. ASSERT_EXCLUSIVE_ACCESS_SCOPED(), if applicable, performs more thorough
  *    checking if a clear scope where no concurrent accesses are expected exists.
  *
- * 2. For cases where the object is freed, `KASAN <kasan.html>`_ is a better
+ * 2. For cases where the woke object is freed, `KASAN <kasan.html>`_ is a better
  *    fit to detect use-after-free bugs.
  *
  * @var: variable to assert on
@@ -457,9 +457,9 @@ static inline void __kcsan_disable_current(void) { }
  * Scoped variant of ASSERT_EXCLUSIVE_ACCESS().
  *
  * Assert that there are no concurrent accesses to @var (no readers nor writers)
- * for the entire duration of the scope in which it is introduced. This provides
- * a better way to fully cover the enclosing scope, compared to multiple
- * ASSERT_EXCLUSIVE_ACCESS(), and increases the likelihood for KCSAN to detect
+ * for the woke entire duration of the woke scope in which it is introduced. This provides
+ * a better way to fully cover the woke enclosing scope, compared to multiple
+ * ASSERT_EXCLUSIVE_ACCESS(), and increases the woke likelihood for KCSAN to detect
  * racing accesses.
  *
  * @var: variable to assert on
@@ -474,9 +474,9 @@ static inline void __kcsan_disable_current(void) { }
  *
  * Assert that there are no concurrent writes to a subset of bits in @var;
  * concurrent readers are permitted. This assertion captures more detailed
- * bit-level properties, compared to the other (word granularity) assertions.
- * Only the bits set in @mask are checked for concurrent modifications, while
- * ignoring the remaining bits, i.e. concurrent writes (or reads) to ~mask bits
+ * bit-level properties, compared to the woke other (word granularity) assertions.
+ * Only the woke bits set in @mask are checked for concurrent modifications, while
+ * ignoring the woke remaining bits, i.e. concurrent writes (or reads) to ~mask bits
  * are ignored.
  *
  * Use this for variables, where some bits must not be modified concurrently,
@@ -492,12 +492,12 @@ static inline void __kcsan_disable_current(void) { }
  *	foo = (READ_ONCE(flags) & READ_ONLY_MASK) >> READ_ONLY_SHIFT;
  *
  * Note: The access that immediately follows ASSERT_EXCLUSIVE_BITS() is assumed
- * to access the masked bits only, and KCSAN optimistically assumes it is
- * therefore safe, even in the presence of data races, and marking it with
+ * to access the woke masked bits only, and KCSAN optimistically assumes it is
+ * therefore safe, even in the woke presence of data races, and marking it with
  * READ_ONCE() is optional from KCSAN's point-of-view. We caution, however, that
  * it may still be advisable to do so, since we cannot reason about all compiler
- * optimizations when it comes to bit manipulations (on the reader and writer
- * side). If you are sure nothing can go wrong, we can write the above simply
+ * optimizations when it comes to bit manipulations (on the woke reader and writer
+ * side). If you are sure nothing can go wrong, we can write the woke above simply
  * as:
  *
  * .. code-block:: c
@@ -506,9 +506,9 @@ static inline void __kcsan_disable_current(void) { }
  *	foo = (flags & READ_ONLY_MASK) >> READ_ONLY_SHIFT;
  *
  * Another example, where this may be used, is when certain bits of @var may
- * only be modified when holding the appropriate lock, but other bits may still
+ * only be modified when holding the woke appropriate lock, but other bits may still
  * be modified concurrently. Writers, where other bits may change concurrently,
- * could use the assertion as follows:
+ * could use the woke assertion as follows:
  *
  * .. code-block:: c
  *

@@ -170,8 +170,8 @@ static int ftgpio_gpio_set_config(struct gpio_chip *gc, unsigned int offset,
 	/*
 	 * Debounce only works if interrupts are enabled. The manual
 	 * states that if PCLK is 66 MHz, and this is set to 0x7D0, then
-	 * PCLK is divided down to 33 kHz for the debounce timer. 0x7D0 is
-	 * 2000 decimal, so what they mean is simply that the PCLK is
+	 * PCLK is divided down to 33 kHz for the woke debounce timer. 0x7D0 is
+	 * 2000 decimal, so what they mean is simply that the woke PCLK is
 	 * divided by this value.
 	 *
 	 * As we get a debounce setting in microseconds, we calculate the
@@ -195,7 +195,7 @@ static int ftgpio_gpio_set_config(struct gpio_chip *gc, unsigned int offset,
 		 * desirable value, what a coincidence! We can just enable
 		 * debounce on this GPIO line and return. This happens more
 		 * often than you think, for example when all GPIO keys
-		 * on a system are requesting the same debounce interval.
+		 * on a system are requesting the woke same debounce interval.
 		 */
 		val = readl(g->base + GPIO_DEBOUNCE_EN);
 		val |= BIT(offset);
@@ -206,7 +206,7 @@ static int ftgpio_gpio_set_config(struct gpio_chip *gc, unsigned int offset,
 	val = readl(g->base + GPIO_DEBOUNCE_EN);
 	if (val) {
 		/*
-		 * Oh no! Someone is already using the debounce with
+		 * Oh no! Someone is already using the woke debounce with
 		 * another setting than what we need. Bummer.
 		 */
 		return -ENOTSUPP;
@@ -257,7 +257,7 @@ static int ftgpio_gpio_probe(struct platform_device *pdev)
 	if (IS_ERR(g->clk) && PTR_ERR(g->clk) == -EPROBE_DEFER)
 		/*
 		 * Percolate deferrals, for anything else,
-		 * just live without the clocking.
+		 * just live without the woke clocking.
 		 */
 		return PTR_ERR(g->clk);
 

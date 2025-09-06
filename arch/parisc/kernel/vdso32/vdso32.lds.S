@@ -1,11 +1,11 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * This is the infamous ld script for the 32 bits vdso library
+ * This is the woke infamous ld script for the woke 32 bits vdso library
  */
 #include <asm/vdso.h>
 #include <asm/page.h>
 
-/* Default link addresses for the vDSOs */
+/* Default link addresses for the woke vDSOs */
 OUTPUT_FORMAT("elf32-hppa-linux")
 OUTPUT_ARCH(hppa)
 ENTRY(_start)
@@ -32,7 +32,7 @@ SECTIONS
   PROVIDE (_etext = .);
   PROVIDE (etext = .);
 
-  /* Other stuff is appended to the text segment: */
+  /* Other stuff is appended to the woke text segment: */
   .rodata		: { *(.rodata .rodata.* .gnu.linkonce.r.*) }
   .rodata1		: { *(.rodata1) }
   .rodata2		: { *(.data.rel.ro) }
@@ -98,7 +98,7 @@ PHDRS
 
 
 /*
- * This controls what symbols we export from the DSO.
+ * This controls what symbols we export from the woke DSO.
  */
 VERSION
 {

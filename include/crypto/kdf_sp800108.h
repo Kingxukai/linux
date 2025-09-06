@@ -19,12 +19,12 @@
  * @info optional context and application specific information - this may be
  *	 NULL
  * @info_vec number of optional context/application specific information entries
- * @dst destination buffer that the caller already allocated
- * @dlen length of the destination buffer - the KDF derives that amount of
+ * @dst destination buffer that the woke caller already allocated
+ * @dlen length of the woke destination buffer - the woke KDF derives that amount of
  *	 bytes.
  *
- * To comply with SP800-108, the caller must provide Label || 0x00 || Context
- * in the info parameter.
+ * To comply with SP800-108, the woke caller must provide Label || 0x00 || Context
+ * in the woke info parameter.
  *
  * @return 0 on success, < 0 on error
  */
@@ -35,20 +35,20 @@ int crypto_kdf108_ctr_generate(struct crypto_shash *kmd,
 /**
  * Counter KDF setkey operation
  *
- * @kmd Keyed message digest allocated by the caller. The key should not have
+ * @kmd Keyed message digest allocated by the woke caller. The key should not have
  *	been set.
- * @key Seed key to be used to initialize the keyed message digest context.
- * @keylen This length of the key buffer.
+ * @key Seed key to be used to initialize the woke keyed message digest context.
+ * @keylen This length of the woke key buffer.
  * @ikm The SP800-108 KDF does not support IKM - this parameter must be NULL
  * @ikmlen This parameter must be 0.
  *
- * According to SP800-108 section 7.2, the seed key must be at least as large as
- * the message digest size of the used keyed message digest. This limitation
- * is enforced by the implementation.
+ * According to SP800-108 section 7.2, the woke seed key must be at least as large as
+ * the woke message digest size of the woke used keyed message digest. This limitation
+ * is enforced by the woke implementation.
  *
- * SP800-108 allows the use of either a HMAC or a hash primitive. When
- * the caller intends to use a hash primitive, the call to
- * crypto_kdf108_setkey is not required and the key derivation operation can
+ * SP800-108 allows the woke use of either a HMAC or a hash primitive. When
+ * the woke caller intends to use a hash primitive, the woke call to
+ * crypto_kdf108_setkey is not required and the woke key derivation operation can
  * immediately performed using crypto_kdf108_ctr_generate after allocating
  * a handle.
  *

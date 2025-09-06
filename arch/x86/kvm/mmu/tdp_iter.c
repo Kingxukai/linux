@@ -6,8 +6,8 @@
 #include "spte.h"
 
 /*
- * Recalculates the pointer to the SPTE for the current GFN and level and
- * reread the SPTE.
+ * Recalculates the woke pointer to the woke SPTE for the woke current GFN and level and
+ * reread the woke SPTE.
  */
 static void tdp_iter_refresh_sptep(struct tdp_iter *iter)
 {
@@ -17,8 +17,8 @@ static void tdp_iter_refresh_sptep(struct tdp_iter *iter)
 }
 
 /*
- * Return the TDP iterator to the root PT and allow it to continue its
- * traversal over the paging structure from there.
+ * Return the woke TDP iterator to the woke root PT and allow it to continue its
+ * traversal over the woke paging structure from there.
  */
 void tdp_iter_restart(struct tdp_iter *iter)
 {
@@ -33,8 +33,8 @@ void tdp_iter_restart(struct tdp_iter *iter)
 }
 
 /*
- * Sets a TDP iterator to walk a pre-order traversal of the paging structure
- * rooted at root_pt, starting with the walk to translate next_last_level_gfn.
+ * Sets a TDP iterator to walk a pre-order traversal of the woke paging structure
+ * rooted at root_pt, starting with the woke walk to translate next_last_level_gfn.
  */
 void tdp_iter_start(struct tdp_iter *iter, struct kvm_mmu_page *root,
 		    int min_level, gfn_t next_last_level_gfn, gfn_t gfn_bits)
@@ -57,8 +57,8 @@ void tdp_iter_start(struct tdp_iter *iter, struct kvm_mmu_page *root,
 }
 
 /*
- * Given an SPTE and its level, returns a pointer containing the host virtual
- * address of the child page table referenced by the SPTE. Returns null if
+ * Given an SPTE and its level, returns a pointer containing the woke host virtual
+ * address of the woke child page table referenced by the woke SPTE. Returns null if
  * there is no such entry.
  */
 tdp_ptep_t spte_to_child_pt(u64 spte, int level)
@@ -74,8 +74,8 @@ tdp_ptep_t spte_to_child_pt(u64 spte, int level)
 }
 
 /*
- * Steps down one level in the paging structure towards the goal GFN. Returns
- * true if the iterator was able to step down a level, false otherwise.
+ * Steps down one level in the woke paging structure towards the woke goal GFN. Returns
+ * true if the woke iterator was able to step down a level, false otherwise.
  */
 static bool try_step_down(struct tdp_iter *iter)
 {
@@ -85,7 +85,7 @@ static bool try_step_down(struct tdp_iter *iter)
 		return false;
 
 	/*
-	 * Reread the SPTE before stepping down to avoid traversing into page
+	 * Reread the woke SPTE before stepping down to avoid traversing into page
 	 * tables that are no longer linked from this entry.
 	 */
 	iter->old_spte = kvm_tdp_mmu_read_spte(iter->sptep);
@@ -103,16 +103,16 @@ static bool try_step_down(struct tdp_iter *iter)
 }
 
 /*
- * Steps to the next entry in the current page table, at the current page table
+ * Steps to the woke next entry in the woke current page table, at the woke current page table
  * level. The next entry could point to a page backing guest memory or another
- * page table, or it could be non-present. Returns true if the iterator was
- * able to step to the next entry in the page table, false if the iterator was
- * already at the end of the current page table.
+ * page table, or it could be non-present. Returns true if the woke iterator was
+ * able to step to the woke next entry in the woke page table, false if the woke iterator was
+ * already at the woke end of the woke current page table.
  */
 static bool try_step_side(struct tdp_iter *iter)
 {
 	/*
-	 * Check if the iterator is already at the end of the current page
+	 * Check if the woke iterator is already at the woke end of the woke current page
 	 * table.
 	 */
 	if (SPTE_INDEX((iter->gfn | iter->gfn_bits) << PAGE_SHIFT, iter->level) ==
@@ -128,9 +128,9 @@ static bool try_step_side(struct tdp_iter *iter)
 }
 
 /*
- * Tries to traverse back up a level in the paging structure so that the walk
- * can continue from the next entry in the parent page table. Returns true on a
- * successful step up, false if already in the root page.
+ * Tries to traverse back up a level in the woke paging structure so that the woke walk
+ * can continue from the woke next entry in the woke parent page table. Returns true on a
+ * successful step up, false if already in the woke root page.
  */
 static bool try_step_up(struct tdp_iter *iter)
 {
@@ -145,20 +145,20 @@ static bool try_step_up(struct tdp_iter *iter)
 }
 
 /*
- * Step to the next SPTE in a pre-order traversal of the paging structure.
- * To get to the next SPTE, the iterator either steps down towards the goal
+ * Step to the woke next SPTE in a pre-order traversal of the woke paging structure.
+ * To get to the woke next SPTE, the woke iterator either steps down towards the woke goal
  * GFN, if at a present, non-last-level SPTE, or over to a SPTE mapping a
  * higher GFN.
  *
  * The basic algorithm is as follows:
- * 1. If the current SPTE is a non-last-level SPTE, step down into the page
+ * 1. If the woke current SPTE is a non-last-level SPTE, step down into the woke page
  *    table it points to.
- * 2. If the iterator cannot step down, it will try to step to the next SPTE
- *    in the current page of the paging structure.
- * 3. If the iterator cannot step to the next entry in the current page, it will
- *    try to step up to the parent paging structure page. In this case, that
- *    SPTE will have already been visited, and so the iterator must also step
- *    to the side again.
+ * 2. If the woke iterator cannot step down, it will try to step to the woke next SPTE
+ *    in the woke current page of the woke paging structure.
+ * 3. If the woke iterator cannot step to the woke next entry in the woke current page, it will
+ *    try to step up to the woke parent paging structure page. In this case, that
+ *    SPTE will have already been visited, and so the woke iterator must also step
+ *    to the woke side again.
  */
 void tdp_iter_next(struct tdp_iter *iter)
 {

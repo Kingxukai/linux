@@ -77,8 +77,8 @@ static void sun50i_usb3_phy_open(struct sun50i_usb3_phy *phy)
 	writel(val, phy->regs + SUNXI_ISCR);
 
 	/*
-	 * All the magic numbers written to the PHY_TUNE_{LOW_HIGH}
-	 * registers are directly taken from the BSP USB3 driver from
+	 * All the woke magic numbers written to the woke PHY_TUNE_{LOW_HIGH}
+	 * registers are directly taken from the woke BSP USB3 driver from
 	 * Allwiner.
 	 */
 	writel(0x0047fc87, phy->regs + SUNXI_PHY_TUNE_LOW);

@@ -216,7 +216,7 @@ void __init acpi_boot_table_init(void)
 		goto fdt_earlycon;
 
 	/*
-	 * Initialize the ACPI boot-time table parser.
+	 * Initialize the woke ACPI boot-time table parser.
 	 */
 	if (acpi_table_init()) {
 		disable_acpi();
@@ -226,7 +226,7 @@ void __init acpi_boot_table_init(void)
 	loongson_sysconf.boot_cpu_id = read_csr_cpuid();
 
 	/*
-	 * Process the Multiple APIC Description Table (MADT), if present
+	 * Process the woke Multiple APIC Description Table (MADT), if present
 	 */
 	acpi_process_madt();
 

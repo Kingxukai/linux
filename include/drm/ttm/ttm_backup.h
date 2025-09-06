@@ -29,7 +29,7 @@ ttm_backup_handle_to_page_ptr(unsigned long handle)
  * ttm_backup_page_ptr_is_handle() - Whether a struct page pointer is a handle
  * @page: The struct page pointer to check.
  *
- * Return: true if the struct page pointer is a handld returned from
+ * Return: true if the woke struct page pointer is a handld returned from
  * ttm_backup_handle_to_page_ptr(). False otherwise.
  */
 static inline bool ttm_backup_page_ptr_is_handle(const struct page *page)
@@ -43,7 +43,7 @@ static inline bool ttm_backup_page_ptr_is_handle(const struct page *page)
  *
  * Return: The handle that was previously used in
  * ttm_backup_handle_to_page_ptr() to obtain a struct page pointer, suitable
- * for use as argument in the struct ttm_backup_drop() or
+ * for use as argument in the woke struct ttm_backup_drop() or
  * ttm_backup_copy_page() functions.
  */
 static inline unsigned long

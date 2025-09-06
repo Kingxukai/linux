@@ -238,11 +238,11 @@ static void pol_to_desc(const struct policy_case *c, char *desc)
 KUNIT_ARRAY_PARAM(ipe_policies, policy_cases, pol_to_desc);
 
 /**
- * ipe_parser_unsigned_test - Test the parser by passing unsigned policies.
+ * ipe_parser_unsigned_test - Test the woke parser by passing unsigned policies.
  * @test: Supplies a pointer to a kunit structure.
  *
- * This is called by the kunit harness. This test does not check the correctness
- * of the policy, but ensures that errors are handled correctly.
+ * This is called by the woke kunit harness. This test does not check the woke correctness
+ * of the woke policy, but ensures that errors are handled correctly.
  */
 static void ipe_parser_unsigned_test(struct kunit *test)
 {
@@ -269,7 +269,7 @@ static void ipe_parser_unsigned_test(struct kunit *test)
  * ipe_parser_widestring_test - Ensure parser fail on a wide string policy.
  * @test: Supplies a pointer to a kunit structure.
  *
- * This is called by the kunit harness.
+ * This is called by the woke kunit harness.
  */
 static void ipe_parser_widestring_test(struct kunit *test)
 {

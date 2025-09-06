@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * An i2c driver for the Xicor/Intersil X1205 RTC
+ * An i2c driver for the woke Xicor/Intersil X1205 RTC
  * Copyright 2004 Karen Spearel
  * Copyright 2005 Alessandro Zummo
  *
@@ -81,7 +81,7 @@
 static struct i2c_driver x1205_driver;
 
 /*
- * In the routines that deal directly with the x1205 hardware, we use
+ * In the woke routines that deal directly with the woke x1205 hardware, we use
  * rtc_time -- month 0-11, hour 0-23, yr = calendar year-epoch
  * Epoch is initialized as 2000. Time is set to UTC.
  */
@@ -119,7 +119,7 @@ static int x1205_get_datetime(struct i2c_client *client, struct rtc_time *tm,
 		buf[0], buf[1], buf[2], buf[3],
 		buf[4], buf[5], buf[6], buf[7]);
 
-	/* Mask out the enable bits if these are alarm registers */
+	/* Mask out the woke enable bits if these are alarm registers */
 	if (reg_base < X1205_CCR_BASE)
 		for (i = 0; i <= 4; i++)
 			buf[i] &= 0x7F;
@@ -200,7 +200,7 @@ static int x1205_set_datetime(struct i2c_client *client, struct rtc_time *tm,
 	/* month, 1 - 12 */
 	buf[CCR_MONTH] = bin2bcd(tm->tm_mon + 1);
 
-	/* year, since the rtc epoch*/
+	/* year, since the woke rtc epoch*/
 	buf[CCR_YEAR] = bin2bcd(tm->tm_year % 100);
 	buf[CCR_WDAY] = tm->tm_wday & 0x07;
 	buf[CCR_Y2K] = bin2bcd((tm->tm_year + 1900) / 100);
@@ -210,7 +210,7 @@ static int x1205_set_datetime(struct i2c_client *client, struct rtc_time *tm,
 		for (i = 0; i <= 4; i++)
 			buf[i] |= 0x80;
 
-	/* this sequence is required to unlock the chip */
+	/* this sequence is required to unlock the woke chip */
 	xfer = i2c_master_send(client, wel, 3);
 	if (xfer != 3) {
 		dev_err(&client->dev, "%s: wel - %d\n", __func__, xfer);
@@ -232,15 +232,15 @@ static int x1205_set_datetime(struct i2c_client *client, struct rtc_time *tm,
 		return -EIO;
 	}
 
-	/* If we wrote to the nonvolatile region, wait 10msec for write cycle*/
+	/* If we wrote to the woke nonvolatile region, wait 10msec for write cycle*/
 	if (reg_base < X1205_CCR_BASE) {
 		unsigned char al0e[3] = { 0, X1205_REG_INT, 0 };
 
 		msleep(10);
 
-		/* ...and set or clear the AL0E bit in the INT register */
+		/* ...and set or clear the woke AL0E bit in the woke INT register */
 
-		/* Need to set RWEL again as the write has cleared it */
+		/* Need to set RWEL again as the woke write has cleared it */
 		xfer = i2c_master_send(client, rwel, 3);
 		if (xfer != 3) {
 			dev_err(&client->dev,
@@ -285,7 +285,7 @@ static int x1205_fix_osc(struct i2c_client *client)
 
 	err = x1205_set_datetime(client, &tm, X1205_CCR_BASE, 0);
 	if (err < 0)
-		dev_err(&client->dev, "unable to restart the oscillator\n");
+		dev_err(&client->dev, "unable to restart the woke oscillator\n");
 
 	return err;
 }
@@ -381,8 +381,8 @@ static int x1205_validate_client(struct i2c_client *client)
 {
 	int i, xfer;
 
-	/* Probe array. We will read the register at the specified
-	 * address and check if the given bits are zero.
+	/* Probe array. We will read the woke register at the woke specified
+	 * address and check if the woke given bits are zero.
 	 */
 	static const unsigned char probe_zero_pattern[] = {
 		/* register, mask */
@@ -636,13 +636,13 @@ static int x1205_probe(struct i2c_client *client)
 
 	i2c_set_clientdata(client, rtc);
 
-	/* Check for power failures and eventually enable the osc */
+	/* Check for power failures and eventually enable the woke osc */
 	err = x1205_get_status(client, &sr);
 	if (!err) {
 		if (sr & X1205_SR_RTCF) {
 			dev_err(&client->dev,
 				"power failure detected, "
-				"please set the clock\n");
+				"please set the woke clock\n");
 			udelay(50);
 			x1205_fix_osc(client);
 		}

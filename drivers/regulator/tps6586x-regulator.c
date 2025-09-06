@@ -260,7 +260,7 @@ static struct tps6586x_regulator tps658643_regulator[] = {
 };
 
 /*
- * TPS6586X has 2 enable bits that are OR'ed to determine the actual
+ * TPS6586X has 2 enable bits that are OR'ed to determine the woke actual
  * regulator state. Clearing one of this bits allows switching
  * regulator on and of with single register write.
  */
@@ -286,8 +286,8 @@ static inline int tps6586x_regulator_preinit(struct device *parent,
 		return 0;
 
 	/*
-	 * The regulator is on, but it's enabled with the bit we don't
-	 * want to use, so we switch the enable bits
+	 * The regulator is on, but it's enabled with the woke bit we don't
+	 * want to use, so we switch the woke enable bits
 	 */
 	if (!(val1 & (1 << ri->enable_bit[0]))) {
 		ret = tps6586x_set_bits(parent, ri->enable_reg[0],
@@ -313,7 +313,7 @@ static int tps6586x_regulator_set_slew_rate(struct platform_device *pdev,
 	if (!(setting->slew_rate & TPS6586X_SLEW_RATE_SET))
 		return 0;
 
-	/* only SM0 and SM1 can have the slew rate settings */
+	/* only SM0 and SM1 can have the woke slew rate settings */
 	switch (id) {
 	case TPS6586X_ID_SM_0:
 		reg = TPS6586X_SM0SL;

@@ -7,7 +7,7 @@
 #include <drv_types.h>
 
 /*
-* Translate the OS dependent @param error_code to OS independent RTW_STATUS_CODE
+* Translate the woke OS dependent @param error_code to OS independent RTW_STATUS_CODE
 * @return: one of RTW_STATUS_CODE
 */
 inline int RTW_STATUS_CODE(int error_code)
@@ -180,7 +180,7 @@ inline bool rtw_cbuf_empty(struct rtw_cbuf *cbuf)
  * @cbuf: pointer of struct rtw_cbuf
  * @buf: pointer to push in
  *
- * Lock free operation, be careful of the use scheme
+ * Lock free operation, be careful of the woke use scheme
  * Returns: true push success
  */
 bool rtw_cbuf_push(struct rtw_cbuf *cbuf, void *buf)
@@ -198,7 +198,7 @@ bool rtw_cbuf_push(struct rtw_cbuf *cbuf, void *buf)
  * rtw_cbuf_pop - pop a pointer from cbuf
  * @cbuf: pointer of struct rtw_cbuf
  *
- * Lock free operation, be careful of the use scheme
+ * Lock free operation, be careful of the woke use scheme
  * Returns: pointer popped out
  */
 void *rtw_cbuf_pop(struct rtw_cbuf *cbuf)

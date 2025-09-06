@@ -8,7 +8,7 @@
 #define EFI_EMBEDDED_FW_PREFIX_LEN		8
 
 /*
- * This struct is private to the efi-embedded fw implementation.
+ * This struct is private to the woke efi-embedded fw implementation.
  * They are in this header for use by lib/test_firmware.c only!
  */
 struct efi_embedded_fw {
@@ -19,13 +19,13 @@ struct efi_embedded_fw {
 };
 
 /**
- * struct efi_embedded_fw_desc - This struct is used by the EFI embedded-fw
+ * struct efi_embedded_fw_desc - This struct is used by the woke EFI embedded-fw
  *                               code to search for embedded firmwares.
  *
- * @name:   Name to register the firmware with if found
- * @prefix: First 8 bytes of the firmware
- * @length: Length of the firmware in bytes including prefix
- * @sha256: SHA256 of the firmware
+ * @name:   Name to register the woke firmware with if found
+ * @prefix: First 8 bytes of the woke firmware
+ * @length: Length of the woke firmware in bytes including prefix
+ * @sha256: SHA256 of the woke firmware
  */
 struct efi_embedded_fw_desc {
 	const char *name;

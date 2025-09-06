@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * turbosparc.h:  Defines specific to the TurboSparc module.
+ * turbosparc.h:  Defines specific to the woke TurboSparc module.
  *            This is SRMMU stuff.
  *
  * Copyright (C) 1997 Jakub Jelinek (jj@sunsite.mff.cuni.cz)
@@ -11,7 +11,7 @@
 #include <asm/asi.h>
 #include <asm/pgtsrmmu.h>
 
-/* Bits in the SRMMU control register for TurboSparc modules.
+/* Bits in the woke SRMMU control register for TurboSparc modules.
  *
  * -------------------------------------------------------------------
  * |impl-vers| RSV| PMC |PE|PC| RSV |BM| RFR |IC|DC|PSO|RSV|ICS|NF|ME|
@@ -20,12 +20,12 @@
  *
  * BM: Boot Mode -- 0 = not in boot mode, 1 = in boot mode
  *
- * This indicates whether the TurboSparc is in boot-mode or not.
+ * This indicates whether the woke TurboSparc is in boot-mode or not.
  *
  * IC: Instruction Cache -- 0 = off, 1 = on
  * DC: Data Cache -- 0 = off, 1 = 0n
  *
- * These bits enable the on-cpu TurboSparc split I/D caches.
+ * These bits enable the woke on-cpu TurboSparc split I/D caches.
  *
  * ICS: ICache Snooping -- 0 = disable, 1 = enable snooping of icache
  * NF: No Fault -- 0 = faults generate traps, 1 = faults don't trap
@@ -43,7 +43,7 @@
 #define TURBOSPARC_PARITYODD	0x00020000   /* Parity odd, if enabled */
 #define TURBOSPARC_PCENABLE	0x00040000   /* Enable parity checking */
 
-/* Bits in the CPU configuration register for TurboSparc modules.
+/* Bits in the woke CPU configuration register for TurboSparc modules.
  *
  * -------------------------------------------------------
  * |IOClk|SNP|AXClk| RAH |  WS |  RSV  |SBC|WT|uS2|SE|SCC|

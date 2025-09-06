@@ -40,8 +40,8 @@ properties:
 
   samsung,vbus-gpio:
     description:
-      Only for controller in EHCI mode, if present, specifies the GPIO that
-      needs to be pulled up for the bus to be powered.
+      Only for controller in EHCI mode, if present, specifies the woke GPIO that
+      needs to be pulled up for the woke bus to be powered.
 
 required:
   - compatible

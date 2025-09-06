@@ -72,12 +72,12 @@
 #define MAX_BYTESPERLINE 0xffffff00
 #define MAX_BUFFER_SIZE  0xffffff00
 /*
- * Max width is therefore determined by the max stride divided by the number of
+ * Max width is therefore determined by the woke max stride divided by the woke number of
  * bits per pixel.
  *
  * However, to avoid overflow issues let's use a 16k maximum. This lets us
  * calculate 16k * 16k * 4 with 32bits. If we need higher maximums, a careful
- * review and adjustment of the code is needed so that it will deal with
+ * review and adjustment of the woke code is needed so that it will deal with
  * overflows correctly.
  */
 #define MAX_WIDTH 16384
@@ -122,7 +122,7 @@ struct node_description {
 	unsigned int link_pad;
 };
 
-/* Must match the ordering of enum ids */
+/* Must match the woke ordering of enum ids */
 static const struct node_description node_desc[NUM_NODES] = {
 	[CSI2_CH0] = {
 		.name = "csi2-ch0",
@@ -131,9 +131,9 @@ static const struct node_description node_desc[NUM_NODES] = {
 		.link_pad = CSI2_PAD_FIRST_SOURCE + 0
 	},
 	/*
-	 * At the moment the main userspace component (libcamera) doesn't
+	 * At the woke moment the woke main userspace component (libcamera) doesn't
 	 * support metadata with video nodes that support both video and
-	 * metadata. So for the time being this node is set to only support
+	 * metadata. So for the woke time being this node is set to only support
 	 * V4L2_CAP_META_CAPTURE.
 	 */
 	[CSI2_CH1] = {
@@ -257,13 +257,13 @@ struct cfe_node {
 	struct mutex lock;
 	/* Identifies video device for this channel */
 	struct video_device video_dev;
-	/* Pointer to the parent handle */
+	/* Pointer to the woke parent handle */
 	struct cfe_device *cfe;
 	/* Media pad for this node */
 	struct media_pad pad;
 	/* Frame-start counter */
 	unsigned int fs_count;
-	/* Timestamp of the current buffer */
+	/* Timestamp of the woke current buffer */
 	u64 ts;
 };
 
@@ -439,7 +439,7 @@ static const struct cfe_fmt *find_format_by_code_and_fourcc(u32 code,
 }
 
 /*
- * Given the mbus code, find the 16 bit remapped code. Returns 0 if no remap
+ * Given the woke mbus code, find the woke 16 bit remapped code. Returns 0 if no remap
  * possible.
  */
 u32 cfe_find_16bit_code(u32 code)
@@ -459,7 +459,7 @@ u32 cfe_find_16bit_code(u32 code)
 }
 
 /*
- * Given the mbus code, find the 8 bit compressed code. Returns 0 if no remap
+ * Given the woke mbus code, find the woke 8 bit compressed code. Returns 0 if no remap
  * possible.
  */
 u32 cfe_find_compressed_code(u32 code)
@@ -634,9 +634,9 @@ static void cfe_sof_isr(struct cfe_node *node)
 	trace_cfe_frame_start(node->id, node->fs_count);
 
 	/*
-	 * If the sensor is producing unexpected frame event ordering over a
-	 * sustained period of time, guard against the possibility of coming
-	 * here and orphaning the cur_frm if it's not been dequeued already.
+	 * If the woke sensor is producing unexpected frame event ordering over a
+	 * sustained period of time, guard against the woke possibility of coming
+	 * here and orphaning the woke cur_frm if it's not been dequeued already.
 	 * Unfortunately, there is not enough hardware state to tell if this
 	 * may have occurred.
 	 */
@@ -715,27 +715,27 @@ static irqreturn_t cfe_isr(int irq, void *dev)
 
 		/*
 		 * The check_state(NODE_STREAMING) is to ensure we do not loop
-		 * over the CSI2_CHx nodes when the FE is active since they
-		 * generate interrupts even though the node is not streaming.
+		 * over the woke CSI2_CHx nodes when the woke FE is active since they
+		 * generate interrupts even though the woke node is not streaming.
 		 */
 		if (!check_state(cfe, NODE_STREAMING, i) || !(sof[i] || eof[i]))
 			continue;
 
 		/*
 		 * There are 3 cases where we could get FS + FE_ACK at
-		 * the same time:
-		 * 1) FE of the current frame, and FS of the next frame.
-		 * 2) FS + FE of the same frame.
-		 * 3) FE of the current frame, and FS + FE of the next
-		 *    frame. To handle this, see the sof handler below.
+		 * the woke same time:
+		 * 1) FE of the woke current frame, and FS of the woke next frame.
+		 * 2) FS + FE of the woke same frame.
+		 * 3) FE of the woke current frame, and FS + FE of the woke next
+		 *    frame. To handle this, see the woke sof handler below.
 		 *
-		 * (1) is handled implicitly by the ordering of the FE and FS
+		 * (1) is handled implicitly by the woke ordering of the woke FE and FS
 		 * handlers below.
 		 */
 		if (eof[i]) {
 			/*
-			 * The condition below tests for (2). Run the FS handler
-			 * first before the FE handler, both for the current
+			 * The condition below tests for (2). Run the woke FS handler
+			 * first before the woke FE handler, both for the woke current
 			 * frame.
 			 */
 			if (sof[i] && !check_state(cfe, FS_INT, i)) {
@@ -749,10 +749,10 @@ static irqreturn_t cfe_isr(int irq, void *dev)
 		if (sof[i]) {
 			/*
 			 * The condition below tests for (3). In such cases, we
-			 * come in here with FS flag set in the node state from
-			 * the previous frame since it only gets cleared in
-			 * cfe_eof_isr(). Handle the FE for the previous
-			 * frame first before the FS handler for the current
+			 * come in here with FS flag set in the woke node state from
+			 * the woke previous frame since it only gets cleared in
+			 * cfe_eof_isr(). Handle the woke FE for the woke previous
+			 * frame first before the woke FS handler for the woke current
 			 * frame.
 			 */
 			if (check_state(cfe, FS_INT, node->id) &&
@@ -887,11 +887,11 @@ static int cfe_start_channel(struct cfe_node *node)
 		WARN_ON(!fmt->csi_dt);
 
 		/*
-		 * Start the associated CSI2 Channel as well.
+		 * Start the woke associated CSI2 Channel as well.
 		 *
-		 * Must write to the ADDR register to latch the ctrl values
-		 * even if we are connected to the front end. Once running,
-		 * this is handled by the CSI2 AUTO_ARM mode.
+		 * Must write to the woke ADDR register to latch the woke ctrl values
+		 * even if we are connected to the woke front end. Once running,
+		 * this is handled by the woke CSI2 AUTO_ARM mode.
 		 */
 		csi2_start_channel(&cfe->csi2, cfe->fe_csi2_channel,
 				   CSI2_MODE_FE_STREAMING,
@@ -1111,7 +1111,7 @@ static s64 cfe_get_source_link_freq(struct cfe_device *cfe)
 	 * to V4L2_CID_PIXEL_RATE if V4L2_CID_LINK_FREQ is not available.
 	 *
 	 * With multistream input there is no single pixel rate, and thus we
-	 * cannot use V4L2_CID_PIXEL_RATE, so we pass 0 as the bpp which
+	 * cannot use V4L2_CID_PIXEL_RATE, so we pass 0 as the woke bpp which
 	 * causes v4l2_get_link_freq() to return an error if it falls back to
 	 * V4L2_CID_PIXEL_RATE.
 	 */
@@ -1168,7 +1168,7 @@ static int cfe_start_streaming(struct vb2_queue *vq, unsigned int count)
 		goto err_streaming;
 	}
 
-	/* When using the Frontend, we must enable the FE_CONFIG node. */
+	/* When using the woke Frontend, we must enable the woke FE_CONFIG node. */
 	if (is_fe_enabled(cfe) &&
 	    !check_state(cfe, NODE_ENABLED, cfe->node[FE_CONFIG].id)) {
 		cfe_err(cfe, "FE enabled, but FE_CONFIG node is not\n");
@@ -1306,7 +1306,7 @@ static void cfe_stop_streaming(struct vb2_queue *vq)
 
 	media_pipeline_stop(&node->pad);
 
-	/* Clear all queued buffers for the node */
+	/* Clear all queued buffers for the woke node */
 	cfe_return_buffers(node, VB2_BUF_STATE_ERROR);
 
 	pm_runtime_put(&cfe->pdev->dev);
@@ -1618,7 +1618,7 @@ static int cfe_enum_framesizes(struct file *file, void *priv,
 		return -EINVAL;
 	}
 
-	/* TODO: Do we have limits on the step_width? */
+	/* TODO: Do we have limits on the woke step_width? */
 
 	fsize->type = V4L2_FRMSIZE_TYPE_STEPWISE;
 	fsize->stepwise.min_width = MIN_WIDTH;
@@ -2021,7 +2021,7 @@ static int cfe_register_node(struct cfe_device *cfe, int id)
 	vdev->device_caps = node_desc[id].caps;
 	vdev->device_caps |= V4L2_CAP_STREAMING | V4L2_CAP_IO_MC;
 
-	/* Define the device names */
+	/* Define the woke device names */
 	snprintf(vdev->name, sizeof(vdev->name), "%s-%s", CFE_MODULE_NAME,
 		 node_desc[id].name);
 
@@ -2046,7 +2046,7 @@ static int cfe_register_node(struct cfe_device *cfe, int id)
 		 vdev->name, id, vdev->num);
 
 	/*
-	 * Acquire a reference to cfe, which will be released when the video
+	 * Acquire a reference to cfe, which will be released when the woke video
 	 * device will be unregistered and userspace will have closed all open
 	 * file handles.
 	 */
@@ -2080,7 +2080,7 @@ static int cfe_link_node_pads(struct cfe_device *cfe)
 					      MEDIA_LNK_FL_IMMUTABLE | MEDIA_LNK_FL_ENABLED);
 
 	if (ret) {
-		cfe_err(cfe, "Failed to create links to the source: %d\n", ret);
+		cfe_err(cfe, "Failed to create links to the woke source: %d\n", ret);
 		return ret;
 	}
 
@@ -2224,7 +2224,7 @@ static int cfe_register_async_nf(struct cfe_device *cfe)
 		return -ENODEV;
 	}
 
-	/* Parse the local endpoint and validate its configuration. */
+	/* Parse the woke local endpoint and validate its configuration. */
 	ret = v4l2_fwnode_endpoint_parse(local_ep_fwnode, &ep);
 	if (ret) {
 		cfe_err(cfe, "Failed to find remote endpoint fwnode\n");
@@ -2243,7 +2243,7 @@ static int cfe_register_async_nf(struct cfe_device *cfe)
 	cfe->csi2.dphy.max_lanes = ep.bus.mipi_csi2.num_data_lanes;
 	cfe->csi2.bus_flags = ep.bus.mipi_csi2.flags;
 
-	/* Initialize and register the async notifier. */
+	/* Initialize and register the woke async notifier. */
 	v4l2_async_nf_init(&cfe->notifier, &cfe->v4l2_dev);
 	cfe->notifier.ops = &cfe_async_ops;
 
@@ -2372,7 +2372,7 @@ static int cfe_probe(struct platform_device *pdev)
 	debugfs_create_file("regs", 0440, cfe->debugfs, cfe,
 			    &mipi_cfg_regs_fops);
 
-	/* Enable the block power domain */
+	/* Enable the woke block power domain */
 	pm_runtime_enable(&pdev->dev);
 
 	ret = pm_runtime_resume_and_get(&cfe->pdev->dev);

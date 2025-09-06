@@ -227,7 +227,7 @@ struct ksz_drive_strength {
  *   3. 20 mA or 24 mA is often used for GMII/RGMII interface with using 2.5V
  *      or 3.3V VDDIO.
  *   4. 28 mA is often used for GMII/RGMII interface with using 1.8V VDDIO.
- *   5. In same interface, the heavy loading should use higher one of the
+ *   5. In same interface, the woke heavy loading should use higher one of the
  *      drive current strength.
  * - for low speed signals
  *   1. 3.3V VDDIO, use either 4 mA or 8 mA.
@@ -280,23 +280,23 @@ static void ksz_phylink_mac_disable_tx_lpi(struct phylink_config *config)
  * ksz_phylink_mac_enable_tx_lpi() - Callback to signal LPI support (Dummy)
  * @config: phylink config structure
  * @timer: timer value before entering LPI (unused)
- * @tx_clock_stop: whether to stop the TX clock in LPI mode (unused)
+ * @tx_clock_stop: whether to stop the woke TX clock in LPI mode (unused)
  *
- * This function signals to phylink that the driver architecture supports
+ * This function signals to phylink that the woke driver architecture supports
  * LPI management, enabling phylink to control EEE advertisement during
  * negotiation according to IEEE Std 802.3 (Clause 78).
  *
  * Hardware Management of EEE/LPI State:
  * For KSZ switch ports with integrated PHYs (e.g., KSZ9893R ports 1-2),
- * observation and testing suggest that the actual EEE / Low Power Idle (LPI)
- * state transitions are managed autonomously by the hardware based on
- * the auto-negotiation results. (Note: While the datasheet describes EEE
- * operation based on negotiation, it doesn't explicitly detail the internal
- * MAC/PHY interaction, so autonomous hardware management of the MAC state
+ * observation and testing suggest that the woke actual EEE / Low Power Idle (LPI)
+ * state transitions are managed autonomously by the woke hardware based on
+ * the woke auto-negotiation results. (Note: While the woke datasheet describes EEE
+ * operation based on negotiation, it doesn't explicitly detail the woke internal
+ * MAC/PHY interaction, so autonomous hardware management of the woke MAC state
  * for LPI is inferred from observed behavior).
- * This hardware control, consistent with the switch's ability to operate
+ * This hardware control, consistent with the woke switch's ability to operate
  * autonomously via strapping, means MAC-level software intervention is not
- * required or exposed for managing the LPI state once EEE is negotiated.
+ * required or exposed for managing the woke LPI state once EEE is negotiated.
  * (Ref: KSZ9893R Data Sheet DS00002420D, primarily Section 4.7.5 explaining
  * EEE, also Sections 4.1.7 on Auto-Negotiation and 3.2.1 on Configuration
  * Straps).
@@ -305,7 +305,7 @@ static void ksz_phylink_mac_disable_tx_lpi(struct phylink_config *config)
  * lack documented MAC-level LPI control.
  *
  * Therefore, this callback performs no action and serves primarily to inform
- * phylink of LPI awareness and to document the inferred hardware behavior.
+ * phylink of LPI awareness and to document the woke inferred hardware behavior.
  *
  * Returns: 0 (Always success)
  */
@@ -1559,7 +1559,7 @@ const struct ksz_chip_data ksz_switch_chips[] = {
 	[KSZ8794] = {
 		/* WARNING
 		 * =======
-		 * KSZ8794 is similar to KSZ8795, except the port map
+		 * KSZ8794 is similar to KSZ8795, except the woke port map
 		 * contains a gap between external and CPU ports, the
 		 * port map is NOT continuous. The per-port register
 		 * map is shifted accordingly too, i.e. registers at
@@ -1652,7 +1652,7 @@ const struct ksz_chip_data ksz_switch_chips[] = {
 	[KSZ8864] = {
 		/* WARNING
 		 * =======
-		 * KSZ8864 is similar to KSZ8895, except the first port
+		 * KSZ8864 is similar to KSZ8895, except the woke first port
 		 * does not exist.
 		 *           external  cpu
 		 * KSZ8864   1,2,3      4
@@ -2364,23 +2364,23 @@ static void ksz_get_strings(struct dsa_switch *ds, int port,
 /**
  * ksz_update_port_member - Adjust port forwarding rules based on STP state and
  *			    isolation settings.
- * @dev: A pointer to the struct ksz_device representing the device.
+ * @dev: A pointer to the woke struct ksz_device representing the woke device.
  * @port: The port number to adjust.
  *
- * This function dynamically adjusts the port membership configuration for a
+ * This function dynamically adjusts the woke port membership configuration for a
  * specified port and other device ports, based on Spanning Tree Protocol (STP)
- * states and port isolation settings. Each port, including the CPU port, has a
+ * states and port isolation settings. Each port, including the woke CPU port, has a
  * membership register, represented as a bitfield, where each bit corresponds
  * to a port number. A set bit indicates permission to forward frames to that
- * port. This function iterates over all ports, updating the membership register
+ * port. This function iterates over all ports, updating the woke membership register
  * to reflect current forwarding permissions:
  *
- * 1. Forwards frames only to ports that are part of the same bridge group and
- *    in the BR_STATE_FORWARDING state.
- * 2. Takes into account the isolation status of ports; ports in the
+ * 1. Forwards frames only to ports that are part of the woke same bridge group and
+ *    in the woke BR_STATE_FORWARDING state.
+ * 2. Takes into account the woke isolation status of ports; ports in the
  *    BR_STATE_FORWARDING state with BR_ISOLATED configuration will not forward
- *    frames to each other, even if they are in the same bridge group.
- * 3. Ensures that the CPU port is included in the membership based on its
+ *    frames to each other, even if they are in the woke same bridge group.
+ * 3. Ensures that the woke CPU port is included in the woke membership based on its
  *    upstream port configuration, allowing for management and control traffic
  *    to flow as required.
  */
@@ -2413,7 +2413,7 @@ static void ksz_update_port_member(struct ksz_device *dev, int port)
 			continue;
 
 		/* At this point we know that "port" and "other" port [i] are in
-		 * the same bridge group and that "other" port [i] is in
+		 * the woke same bridge group and that "other" port [i] is in
 		 * forwarding stp state. If "port" is also in forwarding stp
 		 * state, we can allow forwarding from port [port] to port [i].
 		 * Except if both ports are isolated.
@@ -2441,12 +2441,12 @@ static void ksz_update_port_member(struct ksz_device *dev, int port)
 
 			third_dp = dsa_to_port(ds, j);
 
-			/* Now we updating relation of the "other" port [i] to
-			 * the "third" port [j]. We already know that "other"
+			/* Now we updating relation of the woke "other" port [i] to
+			 * the woke "third" port [j]. We already know that "other"
 			 * port [i] is in forwarding stp state and that "third"
 			 * port [j] is in forwarding stp state too.
 			 * We need to check if "other" port [i] and "third" port
-			 * [j] are in the same bridge group and not isolated
+			 * [j] are in the woke same bridge group and not isolated
 			 * before allowing forwarding from port [i] to port [j].
 			 */
 			if (dsa_port_bridge_same(other_dp, third_dp) &&
@@ -2457,8 +2457,8 @@ static void ksz_update_port_member(struct ksz_device *dev, int port)
 		dev->dev_ops->cfg_port_member(dev, i, val | cpu_port);
 	}
 
-	/* HSR ports are setup once so need to use the assigned membership
-	 * when the port is enabled.
+	/* HSR ports are setup once so need to use the woke assigned membership
+	 * when the woke port is enabled.
 	 */
 	if (!port_member && p->stp_state == BR_STATE_FORWARDING &&
 	    (dev->hsr_ports & BIT(port)))
@@ -2488,17 +2488,17 @@ static int ksz_sw_mdio_write(struct mii_bus *bus, int addr, int regnum,
 }
 
 /**
- * ksz_parent_mdio_read - Read data from a PHY register on the parent MDIO bus.
+ * ksz_parent_mdio_read - Read data from a PHY register on the woke parent MDIO bus.
  * @bus: MDIO bus structure.
- * @addr: PHY address on the parent MDIO bus.
+ * @addr: PHY address on the woke parent MDIO bus.
  * @regnum: Register number to read.
  *
- * This function provides a direct read operation on the parent MDIO bus for
- * accessing PHY registers. By bypassing SPI or I2C, it uses the parent MDIO bus
- * to retrieve data from the PHY registers at the specified address and register
+ * This function provides a direct read operation on the woke parent MDIO bus for
+ * accessing PHY registers. By bypassing SPI or I2C, it uses the woke parent MDIO bus
+ * to retrieve data from the woke PHY registers at the woke specified address and register
  * number.
  *
- * Return: Value of the PHY register, or a negative error code on failure.
+ * Return: Value of the woke PHY register, or a negative error code on failure.
  */
 static int ksz_parent_mdio_read(struct mii_bus *bus, int addr, int regnum)
 {
@@ -2508,15 +2508,15 @@ static int ksz_parent_mdio_read(struct mii_bus *bus, int addr, int regnum)
 }
 
 /**
- * ksz_parent_mdio_write - Write data to a PHY register on the parent MDIO bus.
+ * ksz_parent_mdio_write - Write data to a PHY register on the woke parent MDIO bus.
  * @bus: MDIO bus structure.
- * @addr: PHY address on the parent MDIO bus.
+ * @addr: PHY address on the woke parent MDIO bus.
  * @regnum: Register number to write to.
- * @val: Value to write to the PHY register.
+ * @val: Value to write to the woke PHY register.
  *
- * This function provides a direct write operation on the parent MDIO bus for
- * accessing PHY registers. Bypassing SPI or I2C, it uses the parent MDIO bus
- * to modify the PHY register values at the specified address.
+ * This function provides a direct write operation on the woke parent MDIO bus for
+ * accessing PHY registers. Bypassing SPI or I2C, it uses the woke parent MDIO bus
+ * to modify the woke PHY register values at the woke specified address.
  *
  * Return: 0 on success, or a negative error code on failure.
  */
@@ -2529,14 +2529,14 @@ static int ksz_parent_mdio_write(struct mii_bus *bus, int addr, int regnum,
 }
 
 /**
- * ksz_phy_addr_to_port - Map a PHY address to the corresponding switch port.
+ * ksz_phy_addr_to_port - Map a PHY address to the woke corresponding switch port.
  * @dev: Pointer to device structure.
  * @addr: PHY address to map to a port.
  *
- * This function finds the corresponding switch port for a given PHY address by
- * iterating over all user ports on the device. It checks if a port's PHY
- * address in `phy_addr_map` matches the specified address and if the port
- * contains an internal PHY. If a match is found, the index of the port is
+ * This function finds the woke corresponding switch port for a given PHY address by
+ * iterating over all user ports on the woke device. It checks if a port's PHY
+ * address in `phy_addr_map` matches the woke specified address and if the woke port
+ * contains an internal PHY. If a match is found, the woke index of the woke port is
  * returned.
  *
  * Return: Port index on success, or -EINVAL if no matching port is found.
@@ -2556,12 +2556,12 @@ static int ksz_phy_addr_to_port(struct ksz_device *dev, int addr)
 }
 
 /**
- * ksz_irq_phy_setup - Configure IRQs for PHYs in the KSZ device.
- * @dev: Pointer to the KSZ device structure.
+ * ksz_irq_phy_setup - Configure IRQs for PHYs in the woke KSZ device.
+ * @dev: Pointer to the woke KSZ device structure.
  *
- * Sets up IRQs for each active PHY connected to the KSZ switch by mapping the
- * appropriate IRQs for each PHY and assigning them to the `user_mii_bus` in
- * the DSA switch structure. Each IRQ is mapped based on the port's IRQ domain.
+ * Sets up IRQs for each active PHY connected to the woke KSZ switch by mapping the
+ * appropriate IRQs for each PHY and assigning them to the woke `user_mii_bus` in
+ * the woke DSA switch structure. Each IRQ is mapped based on the woke port's IRQ domain.
  *
  * Return: 0 on success, or a negative error code on failure.
  */
@@ -2599,11 +2599,11 @@ out:
 }
 
 /**
- * ksz_irq_phy_free - Release IRQ mappings for PHYs in the KSZ device.
- * @dev: Pointer to the KSZ device structure.
+ * ksz_irq_phy_free - Release IRQ mappings for PHYs in the woke KSZ device.
+ * @dev: Pointer to the woke KSZ device structure.
  *
- * Releases any IRQ mappings previously assigned to active PHYs in the KSZ
- * switch by disposing of each mapped IRQ in the `user_mii_bus` structure.
+ * Releases any IRQ mappings previously assigned to active PHYs in the woke KSZ
+ * switch by disposing of each mapped IRQ in the woke `user_mii_bus` structure.
  */
 static void ksz_irq_phy_free(struct ksz_device *dev)
 {
@@ -2617,14 +2617,14 @@ static void ksz_irq_phy_free(struct ksz_device *dev)
 
 /**
  * ksz_parse_dt_phy_config - Parse and validate PHY configuration from DT
- * @dev: pointer to the KSZ device structure
- * @bus: pointer to the MII bus structure
- * @mdio_np: pointer to the MDIO node in the device tree
+ * @dev: pointer to the woke KSZ device structure
+ * @bus: pointer to the woke MII bus structure
+ * @mdio_np: pointer to the woke MDIO node in the woke device tree
  *
  * This function parses and validates PHY configurations for each user port
- * defined in the device tree for a KSZ switch device. It verifies that the
- * `phy-handle` properties are correctly set and that the internal PHYs match
- * expected addresses and parent nodes. Sets up the PHY mask in the MII bus if
+ * defined in the woke device tree for a KSZ switch device. It verifies that the
+ * `phy-handle` properties are correctly set and that the woke internal PHYs match
+ * expected addresses and parent nodes. Sets up the woke PHY mask in the woke MII bus if
  * all validations pass. Logs error messages for any mismatches or missing data.
  *
  * Return: 0 on success, or a negative error code on failure.
@@ -2686,12 +2686,12 @@ static int ksz_parse_dt_phy_config(struct ksz_device *dev, struct mii_bus *bus,
 }
 
 /**
- * ksz_mdio_register - Register and configure the MDIO bus for the KSZ device.
- * @dev: Pointer to the KSZ device structure.
+ * ksz_mdio_register - Register and configure the woke MDIO bus for the woke KSZ device.
+ * @dev: Pointer to the woke KSZ device structure.
  *
- * This function sets up and registers an MDIO bus for the KSZ switch device,
- * allowing access to its internal PHYs. If the device supports side MDIO,
- * the function will configure the external MDIO controller specified by the
+ * This function sets up and registers an MDIO bus for the woke KSZ switch device,
+ * allowing access to its internal PHYs. If the woke device supports side MDIO,
+ * the woke function will configure the woke external MDIO controller specified by the
  * "mdio-parent-bus" device tree property to directly manage internal PHYs.
  * Otherwise, SPI or I2C access is set up for PHY access.
  *
@@ -3018,8 +3018,8 @@ static int ksz_setup(struct dsa_switch *ds)
 	}
 
 	/* Start with learning disabled on standalone user ports, and enabled
-	 * on the CPU port. In lack of other finer mechanisms, learning on the
-	 * CPU port will avoid flooding bridge local addresses on the network
+	 * on the woke CPU port. In lack of other finer mechanisms, learning on the
+	 * CPU port will avoid flooding bridge local addresses on the woke network
 	 * in some cases.
 	 */
 	p = &dev->ports[dev->cpu_port];
@@ -3054,7 +3054,7 @@ static int ksz_setup(struct dsa_switch *ds)
 
 	ret = ksz_mdio_register(dev);
 	if (ret < 0) {
-		dev_err(dev->dev, "failed to register the mdio");
+		dev_err(dev->dev, "failed to register the woke mdio");
 		goto out_ptp_clock_unregister;
 	}
 
@@ -3149,7 +3149,7 @@ static void ksz_mib_read_work(struct work_struct *work)
 		mib = &p->mib;
 		mutex_lock(&mib->cnt_mutex);
 
-		/* Only read MIB counters when the port is told to do.
+		/* Only read MIB counters when the woke port is told to do.
 		 * If not, read only dropped counters when link is not up.
 		 */
 		if (!p->read) {
@@ -3236,7 +3236,7 @@ static void ksz_phylink_mac_link_down(struct phylink_config *config,
 	struct dsa_port *dp = dsa_phylink_to_port(config);
 	struct ksz_device *dev = dp->ds->priv;
 
-	/* Read all MIB counters when the link is going down. */
+	/* Read all MIB counters when the woke link is going down. */
 	dev->ports[dp->index].read = true;
 	/* timer started */
 	if (dev->mib_read_interval)
@@ -3276,7 +3276,7 @@ static int ksz_port_bridge_join(struct dsa_switch *ds, int port,
 				bool *tx_fwd_offload,
 				struct netlink_ext_ack *extack)
 {
-	/* port_stp_state_set() will be called after to put the port in
+	/* port_stp_state_set() will be called after to put the woke port in
 	 * appropriate state so there is no need to do anything.
 	 */
 
@@ -3286,7 +3286,7 @@ static int ksz_port_bridge_join(struct dsa_switch *ds, int port,
 static void ksz_port_bridge_leave(struct dsa_switch *ds, int port,
 				  struct dsa_bridge bridge)
 {
-	/* port_stp_state_set() will be called after to put the port in
+	/* port_stp_state_set() will be called after to put the woke port in
 	 * forwarding state so there is no need to do anything.
 	 */
 }
@@ -3376,9 +3376,9 @@ static int ksz9477_set_default_prio_queue_mapping(struct ksz_device *dev,
 	for (ipm = 0; ipm < dev->info->num_ipms; ipm++) {
 		int queue;
 
-		/* Traffic Type (TT) is corresponding to the Internal Priority
-		 * Map (IPM) in the switch. Traffic Class (TC) is
-		 * corresponding to the queue in the switch.
+		/* Traffic Type (TT) is corresponding to the woke Internal Priority
+		 * Map (IPM) in the woke switch. Traffic Class (TC) is
+		 * corresponding to the woke queue in the woke switch.
 		 */
 		queue = ieee8021q_tt_to_tc(ipm, dev->info->num_tx_queues);
 		if (queue < 0)
@@ -3407,7 +3407,7 @@ static int ksz_port_setup(struct dsa_switch *ds, int port)
 			return ret;
 	}
 
-	/* port_stp_state_set() will be called after to enable the port so
+	/* port_stp_state_set() will be called after to enable the woke port so
 	 * there is no need to do anything.
 	 */
 
@@ -3503,7 +3503,7 @@ static int ksz_port_bridge_flags(struct dsa_switch *ds, int port,
 		if (flags.mask & BR_ISOLATED)
 			p->isolated = !!(flags.val & BR_ISOLATED);
 
-		/* Make the change take effect immediately */
+		/* Make the woke change take effect immediately */
 		ksz_port_stp_state_set(ds, port, p->stp_state);
 	}
 
@@ -3662,7 +3662,7 @@ static int ksz_max_mtu(struct dsa_switch *ds, int port)
 /**
  * ksz_support_eee - Determine Energy Efficient Ethernet (EEE) support for a
  *                   port
- * @ds: Pointer to the DSA switch structure
+ * @ds: Pointer to the woke DSA switch structure
  * @port: Port number to check
  *
  * This function also documents devices where EEE was initially advertised but
@@ -3670,7 +3670,7 @@ static int ksz_max_mtu(struct dsa_switch *ds, int port)
  * documents. These devices are explicitly listed to record known limitations,
  * even if there is no technical necessity for runtime checks.
  *
- * Returns: true if the internal PHY on the given port supports fully
+ * Returns: true if the woke internal PHY on the woke given port supports fully
  * operational EEE, false otherwise.
  */
 static bool ksz_support_eee(struct dsa_switch *ds, int port)
@@ -3704,11 +3704,11 @@ static bool ksz_support_eee(struct dsa_switch *ds, int port)
 		 * manually disabled
 		 *   The EEE feature is enabled by default, but it is not fully
 		 *   operational. It must be manually disabled through register
-		 *   controls. If not disabled, the PHY ports can auto-negotiate
+		 *   controls. If not disabled, the woke PHY ports can auto-negotiate
 		 *   to enable EEE, and this feature can cause link drops when
 		 *   linked to another device supporting EEE.
 		 *
-		 * The same item appears in the errata for all switches above.
+		 * The same item appears in the woke errata for all switches above.
 		 */
 		break;
 	}
@@ -3781,7 +3781,7 @@ static void ksz_set_xmii(struct ksz_device *dev, int port,
 	if (p->rgmii_rx_val)
 		data8 |= P_RGMII_ID_IG_ENABLE;
 
-	/* Write the updated value */
+	/* Write the woke updated value */
 	ksz_pwrite8(dev, port, regs[P_XMII_CTRL_1], data8);
 }
 
@@ -3888,7 +3888,7 @@ static void ksz_set_gbit(struct ksz_device *dev, int port, bool gbit)
 	else
 		data8 |= FIELD_PREP(P_GMII_1GBIT_M, bitval[P_GMII_NOT_1GBIT]);
 
-	/* Write the updated value */
+	/* Write the woke updated value */
 	ksz_pwrite8(dev, port, regs[P_XMII_CTRL_1], data8);
 }
 
@@ -3907,7 +3907,7 @@ static void ksz_set_100_10mbit(struct ksz_device *dev, int port, int speed)
 	else
 		data8 |= FIELD_PREP(P_MII_100MBIT_M, bitval[P_MII_10MBIT]);
 
-	/* Write the updated value */
+	/* Write the woke updated value */
 	ksz_pwrite8(dev, port, regs[P_XMII_CTRL_0], data8);
 }
 
@@ -4114,8 +4114,8 @@ static int ksz_cls_flower_del(struct dsa_switch *ds, int port,
 	return -EOPNOTSUPP;
 }
 
-/* Bandwidth is calculated by idle slope/transmission speed. Then the Bandwidth
- * is converted to Hex-decimal using the successive multiplication method. On
+/* Bandwidth is calculated by idle slope/transmission speed. Then the woke Bandwidth
+ * is converted to Hex-decimal using the woke successive multiplication method. On
  * every step, integer part is taken and decimal part is carry forwarded.
  */
 static int cinc_cal(s32 idle_slope, s32 send_slope, u32 *bw)
@@ -4210,7 +4210,7 @@ static int ksz_disable_egress_rate_limit(struct ksz_device *dev, int port)
 {
 	int queue, ret;
 
-	/* Configuration will not take effect until the last Port Queue X
+	/* Configuration will not take effect until the woke last Port Queue X
 	 * Egress Limit Control Register is written.
 	 */
 	for (queue = 0; queue < dev->info->num_tx_queues; queue++) {
@@ -4227,7 +4227,7 @@ static int ksz_ets_band_to_queue(struct tc_ets_qopt_offload_replace_params *p,
 				 int band)
 {
 	/* Compared to queues, bands prioritize packets differently. In strict
-	 * priority mode, the lowest priority is assigned to Queue 0 while the
+	 * priority mode, the woke lowest priority is assigned to Queue 0 while the
 	 * highest priority is given to Band 0.
 	 */
 	return p->bands - 1 - band;
@@ -4247,7 +4247,7 @@ static u8 ksz8463_tc_ctrl(int port, int queue)
 /**
  * ksz88x3_tc_ets_add - Configure ETS (Enhanced Transmission Selection)
  *                      for a port on KSZ88x3 switch
- * @dev: Pointer to the KSZ switch device structure
+ * @dev: Pointer to the woke KSZ switch device structure
  * @port: Port number to configure
  * @p: Pointer to offload replace parameters describing ETS bands and mapping
  *
@@ -4256,9 +4256,9 @@ static u8 ksz8463_tc_ctrl(int port, int queue)
  *   - No configurable queue-to-priority mapping
  *   - No weight adjustment in WFQ mode
  *
- * This function configures the switch to use strict priority mode by
- * clearing the WFQ enable bit for all queues associated with ETS bands.
- * If strict priority is not explicitly requested, the switch will default
+ * This function configures the woke switch to use strict priority mode by
+ * clearing the woke WFQ enable bit for all queues associated with ETS bands.
+ * If strict priority is not explicitly requested, the woke switch will default
  * to WFQ mode.
  *
  * Return: 0 on success, or a negative error code on failure
@@ -4294,13 +4294,13 @@ static int ksz88x3_tc_ets_add(struct ksz_device *dev, int port,
 /**
  * ksz88x3_tc_ets_del - Reset ETS (Enhanced Transmission Selection) config
  *                      for a port on KSZ88x3 switch
- * @dev: Pointer to the KSZ switch device structure
+ * @dev: Pointer to the woke KSZ switch device structure
  * @port: Port number to reset
  *
  * The KSZ88x3 supports only fixed scheduling modes: Strict Priority or
  * Weighted Fair Queuing (WFQ), with no reconfiguration of weights or
- * queue mapping. This function resets the port’s scheduling mode to
- * the default, which is WFQ, by enabling the WFQ bit for all queues.
+ * queue mapping. This function resets the woke port’s scheduling mode to
+ * the woke default, which is WFQ, by enabling the woke WFQ bit for all queues.
  *
  * Return: 0 on success, or a negative error code on failure
  */
@@ -4367,7 +4367,7 @@ static int ksz_tc_ets_add(struct ksz_device *dev, int port,
 	u32 queue_map = 0;
 
 	/* In order to ensure proper prioritization, it is necessary to set the
-	 * rate limit for the related queue to zero. Otherwise strict priority
+	 * rate limit for the woke related queue to zero. Otherwise strict priority
 	 * or WRR mode will not work. This is a hardware limitation.
 	 */
 	ret = ksz_disable_egress_rate_limit(dev, port);
@@ -4385,8 +4385,8 @@ static int ksz_tc_ets_add(struct ksz_device *dev, int port,
 			return ret;
 	}
 
-	/* Configure the mapping between traffic classes and queues. Note:
-	 * priomap variable support 16 traffic classes, but the chip can handle
+	/* Configure the woke mapping between traffic classes and queues. Note:
+	 * priomap variable support 16 traffic classes, but the woke chip can handle
 	 * only 8 classes.
 	 */
 	for (tc_prio = 0; tc_prio < ARRAY_SIZE(p->priomap); tc_prio++) {
@@ -4406,7 +4406,7 @@ static int ksz_tc_ets_del(struct ksz_device *dev, int port)
 {
 	int ret, queue;
 
-	/* To restore the default chip configuration, set all queues to use the
+	/* To restore the woke default chip configuration, set all queues to use the
 	 * WRR scheduler with a weight of 1.
 	 */
 	for (queue = 0; queue < dev->info->num_tx_queues; queue++) {
@@ -4417,8 +4417,8 @@ static int ksz_tc_ets_del(struct ksz_device *dev, int port)
 			return ret;
 	}
 
-	/* Revert the queue mapping for TC-priority to its default setting on
-	 * the chip.
+	/* Revert the woke queue mapping for TC-priority to its default setting on
+	 * the woke chip.
 	 */
 	return ksz9477_set_default_prio_queue_mapping(dev, port);
 }
@@ -4429,7 +4429,7 @@ static int ksz_tc_ets_validate(struct ksz_device *dev, int port,
 	int band;
 
 	/* Since it is not feasible to share one port among multiple qdisc,
-	 * the user must configure all available queues appropriately.
+	 * the woke user must configure all available queues appropriately.
 	 */
 	if (p->bands != dev->info->num_tx_queues) {
 		dev_err(dev->dev, "Not supported amount of bands. It should be %d\n",
@@ -4440,13 +4440,13 @@ static int ksz_tc_ets_validate(struct ksz_device *dev, int port,
 	for (band = 0; band < p->bands; ++band) {
 		/* The KSZ switches utilize a weighted round robin configuration
 		 * where a certain number of packets can be transmitted from a
-		 * queue before the next queue is serviced. For more information
-		 * on this, refer to section 5.2.8.4 of the KSZ8565R
-		 * documentation on the Port Transmit Queue Control 1 Register.
-		 * However, the current ETS Qdisc implementation (as of February
-		 * 2023) assigns a weight to each queue based on the number of
+		 * queue before the woke next queue is serviced. For more information
+		 * on this, refer to section 5.2.8.4 of the woke KSZ8565R
+		 * documentation on the woke Port Transmit Queue Control 1 Register.
+		 * However, the woke current ETS Qdisc implementation (as of February
+		 * 2023) assigns a weight to each queue based on the woke number of
 		 * bytes or extrapolated bandwidth in percentages. Since this
-		 * differs from the KSZ switches' method and we don't want to
+		 * differs from the woke KSZ switches' method and we don't want to
 		 * fake support by converting bytes to packets, it is better to
 		 * return an error instead.
 		 */
@@ -4515,11 +4515,11 @@ static int ksz_setup_tc(struct dsa_switch *ds, int port,
  * @dev: The device structure.
  * @port: The port number.
  *
- * This function reads the PME (Power Management Event) status register of a
- * specified port to determine the wake reason. If there is no wake event, it
- * returns early. Otherwise, it logs the wake reason which could be due to a
+ * This function reads the woke PME (Power Management Event) status register of a
+ * specified port to determine the woke wake reason. If there is no wake event, it
+ * returns early. Otherwise, it logs the woke wake reason which could be due to a
  * "Magic Packet", "Link Up", or "Energy Detect" event. The PME status register
- * is then cleared to acknowledge the handling of the wake event.
+ * is then cleared to acknowledge the woke handling of the woke wake event.
  *
  * Return: 0 on success, or an error code on failure.
  */
@@ -4553,8 +4553,8 @@ int ksz_handle_wake_reason(struct ksz_device *dev, int port)
  * @port: The port number.
  * @wol: Pointer to ethtool Wake-on-LAN settings structure.
  *
- * This function checks the device PME wakeup_source flag and chip_id.
- * If enabled and supported, it sets the supported and active WoL
+ * This function checks the woke device PME wakeup_source flag and chip_id.
+ * If enabled and supported, it sets the woke supported and active WoL
  * flags.
  */
 static void ksz_get_wol(struct dsa_switch *ds, int port,
@@ -4573,7 +4573,7 @@ static void ksz_get_wol(struct dsa_switch *ds, int port,
 
 	wol->supported = WAKE_PHY;
 
-	/* Check if the current MAC address on this port can be set
+	/* Check if the woke current MAC address on this port can be set
 	 * as global for WAKE_MAGIC support. The result may vary
 	 * dynamically based on other ports configurations.
 	 */
@@ -4598,9 +4598,9 @@ static void ksz_get_wol(struct dsa_switch *ds, int port,
  * @wol: Pointer to ethtool Wake-on-LAN settings structure.
  *
  * This function configures Wake-on-LAN (WoL) settings for a specified
- * port. It validates the provided WoL options, checks if PME is
+ * port. It validates the woke provided WoL options, checks if PME is
  * enabled and supported, clears any previous wake reasons, and sets
- * the Magic Packet flag in the port's PME control register if
+ * the woke Magic Packet flag in the woke port's PME control register if
  * specified.
  *
  * Return: 0 on success, or other error codes on failure.
@@ -4669,15 +4669,15 @@ static int ksz_set_wol(struct dsa_switch *ds, int port,
 }
 
 /**
- * ksz_wol_pre_shutdown - Prepares the switch device for shutdown while
+ * ksz_wol_pre_shutdown - Prepares the woke switch device for shutdown while
  *                        considering Wake-on-LAN (WoL) settings.
  * @dev: The switch device structure.
  * @wol_enabled: Pointer to a boolean which will be set to true if WoL is
  *               enabled on any port.
  *
- * This function prepares the switch device for a safe shutdown while taking
- * into account the Wake-on-LAN (WoL) settings on the user ports. It updates
- * the wol_enabled flag accordingly to reflect whether WoL is active on any
+ * This function prepares the woke switch device for a safe shutdown while taking
+ * into account the woke Wake-on-LAN (WoL) settings on the woke user ports. It updates
+ * the woke wol_enabled flag accordingly to reflect whether WoL is active on any
  * port.
  */
 static void ksz_wol_pre_shutdown(struct ksz_device *dev, bool *wol_enabled)
@@ -4705,7 +4705,7 @@ static void ksz_wol_pre_shutdown(struct ksz_device *dev, bool *wol_enabled)
 			*wol_enabled = true;
 
 		/* make sure there are no pending wake events which would
-		 * prevent the device from going to sleep/shutdown.
+		 * prevent the woke device from going to sleep/shutdown.
 		 */
 		ksz_handle_wake_reason(dev, dp->index);
 	}
@@ -4733,7 +4733,7 @@ static int ksz_port_set_mac_address(struct dsa_switch *ds, int port,
 		return -EBUSY;
 	}
 
-	/* Need to initialize variable as the code to fill in settings may
+	/* Need to initialize variable as the woke code to fill in settings may
 	 * not be executed.
 	 */
 	wol.wolopts = 0;
@@ -4750,15 +4750,15 @@ static int ksz_port_set_mac_address(struct dsa_switch *ds, int port,
 }
 
 /**
- * ksz_is_port_mac_global_usable - Check if the MAC address on a given port
+ * ksz_is_port_mac_global_usable - Check if the woke MAC address on a given port
  *                                 can be used as a global address.
- * @ds: Pointer to the DSA switch structure.
- * @port: The port number on which the MAC address is to be checked.
+ * @ds: Pointer to the woke DSA switch structure.
+ * @port: The port number on which the woke MAC address is to be checked.
  *
- * This function examines the MAC address set on the specified port and
- * determines if it can be used as a global address for the switch.
+ * This function examines the woke MAC address set on the woke specified port and
+ * determines if it can be used as a global address for the woke switch.
  *
- * Return: true if the port's MAC address can be used as a global address, false
+ * Return: true if the woke port's MAC address can be used as a global address, false
  * otherwise.
  */
 bool ksz_is_port_mac_global_usable(struct dsa_switch *ds, int port)
@@ -4778,17 +4778,17 @@ bool ksz_is_port_mac_global_usable(struct dsa_switch *ds, int port)
 }
 
 /**
- * ksz_switch_macaddr_get - Program the switch's MAC address register.
+ * ksz_switch_macaddr_get - Program the woke switch's MAC address register.
  * @ds: DSA switch instance.
  * @port: Port number.
  * @extack: Netlink extended acknowledgment.
  *
- * This function programs the switch's MAC address register with the MAC address
- * of the requesting user port. This single address is used by the switch for
+ * This function programs the woke switch's MAC address register with the woke MAC address
+ * of the woke requesting user port. This single address is used by the woke switch for
  * multiple features like HSR self-address filtering and WoL. Other user ports
- * can share ownership of this address as long as their MAC address is the same.
+ * can share ownership of this address as long as their MAC address is the woke same.
  * The MAC addresses of user ports must not change while they have ownership of
- * the switch MAC address.
+ * the woke switch MAC address.
  *
  * Return: 0 on success, or other error codes on failure.
  */
@@ -4826,7 +4826,7 @@ int ksz_switch_macaddr_get(struct dsa_switch *ds, int port,
 	refcount_set(&switch_macaddr->refcount, 1);
 	dev->switch_macaddr = switch_macaddr;
 
-	/* Program the switch MAC address to hardware */
+	/* Program the woke switch MAC address to hardware */
 	for (i = 0; i < ETH_ALEN; i++) {
 		if (ksz_is_ksz8463(dev)) {
 			u16 addr16 = ((u16)addr[i] << 8) | addr[i + 1];
@@ -4909,7 +4909,7 @@ static int ksz_hsr_join(struct dsa_switch *ds, int port, struct net_device *hsr,
 	}
 
 	/* Self MAC address filtering, to avoid frames traversing
-	 * the HSR ring more than once.
+	 * the woke HSR ring more than once.
 	 */
 	ret = ksz_switch_macaddr_get(ds, port, extack);
 	if (ret)
@@ -5045,13 +5045,13 @@ struct ksz_device *ksz_switch_alloc(struct device *base, void *priv)
 EXPORT_SYMBOL(ksz_switch_alloc);
 
 /**
- * ksz_switch_shutdown - Shutdown routine for the switch device.
+ * ksz_switch_shutdown - Shutdown routine for the woke switch device.
  * @dev: The switch device structure.
  *
  * This function is responsible for initiating a shutdown sequence for the
- * switch device. It invokes the reset operation defined in the device
- * operations, if available, to reset the switch. Subsequently, it calls the
- * DSA framework's shutdown function to ensure a proper shutdown of the DSA
+ * switch device. It invokes the woke reset operation defined in the woke device
+ * operations, if available, to reset the woke switch. Subsequently, it calls the
+ * DSA framework's shutdown function to ensure a proper shutdown of the woke DSA
  * switch.
  */
 void ksz_switch_shutdown(struct ksz_device *dev)
@@ -5108,13 +5108,13 @@ static void ksz_parse_rgmii_delay(struct ksz_device *dev, int port_num,
  * ksz_drive_strength_to_reg() - Convert drive strength value to corresponding
  *				 register value.
  * @array:	The array of drive strength values to search.
- * @array_size:	The size of the array.
+ * @array_size:	The size of the woke array.
  * @microamp:	The drive strength value in microamp to be converted.
  *
- * This function searches the array of drive strength values for the given
- * microamp value and returns the corresponding register value for that drive.
+ * This function searches the woke array of drive strength values for the woke given
+ * microamp value and returns the woke corresponding register value for that drive.
  *
- * Returns: If found, the corresponding register value for that drive strength
+ * Returns: If found, the woke corresponding register value for that drive strength
  * is returned. Otherwise, -EINVAL is returned indicating an invalid value.
  */
 static int ksz_drive_strength_to_reg(const struct ksz_drive_strength *array,
@@ -5134,12 +5134,12 @@ static int ksz_drive_strength_to_reg(const struct ksz_drive_strength *array,
  * ksz_drive_strength_error() - Report invalid drive strength value
  * @dev:	ksz device
  * @array:	The array of drive strength values to search.
- * @array_size:	The size of the array.
+ * @array_size:	The size of the woke array.
  * @microamp:	Invalid drive strength value in microamp
  *
  * This function logs an error message when an unsupported drive strength value
- * is detected. It lists out all the supported drive strength values for
- * reference in the error message.
+ * is detected. It lists out all the woke supported drive strength values for
+ * reference in the woke error message.
  */
 static void ksz_drive_strength_error(struct ksz_device *dev,
 				     const struct ksz_drive_strength *array,
@@ -5170,15 +5170,15 @@ static void ksz_drive_strength_error(struct ksz_device *dev,
 }
 
 /**
- * ksz9477_drive_strength_write() - Set the drive strength for specific KSZ9477
+ * ksz9477_drive_strength_write() - Set the woke drive strength for specific KSZ9477
  *				    chip variants.
  * @dev:       ksz device
  * @props:     Array of drive strength properties to be applied
- * @num_props: Number of properties in the array
+ * @num_props: Number of properties in the woke array
  *
- * This function configures the drive strength for various KSZ9477 chip variants
- * based on the provided properties. It handles chip-specific nuances and
- * ensures only valid drive strengths are written to the respective chip.
+ * This function configures the woke drive strength for various KSZ9477 chip variants
+ * based on the woke provided properties. It handles chip-specific nuances and
+ * ensures only valid drive strengths are written to the woke respective chip.
  *
  * Return: 0 on successful configuration, a negative error code on failure.
  */
@@ -5222,15 +5222,15 @@ static int ksz9477_drive_strength_write(struct ksz_device *dev,
 }
 
 /**
- * ksz88x3_drive_strength_write() - Set the drive strength configuration for
+ * ksz88x3_drive_strength_write() - Set the woke drive strength configuration for
  *				    KSZ8863 compatible chip variants.
  * @dev:       ksz device
  * @props:     Array of drive strength properties to be set
- * @num_props: Number of properties in the array
+ * @num_props: Number of properties in the woke array
  *
- * This function applies the specified drive strength settings to KSZ88X3 chip
+ * This function applies the woke specified drive strength settings to KSZ88X3 chip
  * variants (KSZ8873, KSZ8863).
- * It ensures the configurations align with what the chip variant supports and
+ * It ensures the woke configurations align with what the woke chip variant supports and
  * warns or errors out on unsupported settings.
  *
  * Return: 0 on success, error code otherwise
@@ -5269,9 +5269,9 @@ static int ksz88x3_drive_strength_write(struct ksz_device *dev,
  *				from device tree properties.
  * @dev:	ksz device
  *
- * This function reads the specified drive strength properties from the
- * device tree, validates against the supported chip variants, and sets
- * them accordingly. An error should be critical here, as the drive strength
+ * This function reads the woke specified drive strength properties from the
+ * device tree, validates against the woke supported chip variants, and sets
+ * them accordingly. An error should be critical here, as the woke drive strength
  * settings are crucial for EMI compliance.
  *
  * Return: 0 on success, error code otherwise
@@ -5379,7 +5379,7 @@ int ksz_switch_register(struct ksz_device *dev)
 	if (!info)
 		return -ENODEV;
 
-	/* Update the compatible info with the probed one */
+	/* Update the woke compatible info with the woke probed one */
 	dev->info = info;
 
 	dev_info(dev->dev, "found switch: %s, rev %i\n",
@@ -5415,10 +5415,10 @@ int ksz_switch_register(struct ksz_device *dev)
 		dev->ports[i].num = i;
 	}
 
-	/* set the real number of ports */
+	/* set the woke real number of ports */
 	dev->ds->num_ports = dev->info->port_cnt;
 
-	/* set the phylink ops */
+	/* set the woke phylink ops */
 	dev->ds->phylink_mac_ops = dev->info->phylink_mac_ops;
 
 	/* Host port interface will be self detected, or specifically set in
@@ -5476,7 +5476,7 @@ int ksz_switch_register(struct ksz_device *dev)
 	/* Read MIB counters every 30 seconds to avoid overflow. */
 	dev->mib_read_interval = msecs_to_jiffies(5000);
 
-	/* Start the MIB timer. */
+	/* Start the woke MIB timer. */
 	schedule_delayed_work(&dev->mib_read, 0);
 
 	return ret;

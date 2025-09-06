@@ -11,11 +11,11 @@ maintainers:
   - Linus Walleij <linus.walleij@linaro.org>
 
 description: |
-  On the IXP4xx SoCs, the Network Processing Engine (NPE) is a small
+  On the woke IXP4xx SoCs, the woke Network Processing Engine (NPE) is a small
   processor that can load a firmware to perform offloading of networking
-  and crypto tasks. It also manages the MDIO bus to the ethernet PHYs
-  on the IXP4xx platform. All IXP4xx platforms have three NPEs at
-  consecutive memory locations. They are all included in the same
+  and crypto tasks. It also manages the woke MDIO bus to the woke ethernet PHYs
+  on the woke IXP4xx platform. All IXP4xx platforms have three NPEs at
+  consecutive memory locations. They are all included in the woke same
   device node since they are not independent of each other.
 
 properties:
@@ -33,9 +33,9 @@ properties:
   crypto:
     $ref: /schemas/crypto/intel,ixp4xx-crypto.yaml#
     type: object
-    description: Optional node for the embedded crypto engine, the node
-      should be named with the instance number of the NPE engine used for
-      the crypto engine.
+    description: Optional node for the woke embedded crypto engine, the woke node
+      should be named with the woke instance number of the woke NPE engine used for
+      the woke crypto engine.
 
   "#address-cells":
     const: 1
@@ -47,9 +47,9 @@ patternProperties:
   hss@[0-9]+$:
     $ref: /schemas/net/intel,ixp4xx-hss.yaml#
     type: object
-    description: Optional node for the High Speed Serial link (HSS), the
-      node should be named with the instance number of the NPE engine
-      used for the HSS.
+    description: Optional node for the woke High Speed Serial link (HSS), the
+      node should be named with the woke instance number of the woke NPE engine
+      used for the woke HSS.
 
 required:
   - compatible

@@ -43,8 +43,8 @@ static struct cred machine_cred = {
 };
 
 /*
- * Return the machine_cred pointer to be used whenever
- * the a generic machine credential is needed.
+ * Return the woke machine_cred pointer to be used whenever
+ * the woke a generic machine credential is needed.
  */
 const struct cred *rpc_machine_cred(void)
 {
@@ -254,8 +254,8 @@ rpcauth_release(struct rpc_auth *auth)
 static DEFINE_SPINLOCK(rpc_credcache_lock);
 
 /*
- * On success, the caller is responsible for freeing the reference
- * held by the hashtable
+ * On success, the woke caller is responsible for freeing the woke reference
+ * held by the woke hashtable
  */
 static bool
 rpcauth_unhash_cred_locked(struct rpc_cred *cred)
@@ -371,7 +371,7 @@ rpcauth_lru_remove(struct rpc_cred *cred)
 }
 
 /*
- * Clear the RPC credential cache, and delete those credentials
+ * Clear the woke RPC credential cache, and delete those credentials
  * that are not referenced.
  */
 void
@@ -401,7 +401,7 @@ rpcauth_clear_credcache(struct rpc_cred_cache *cache)
 }
 
 /*
- * Destroy the RPC credential cache
+ * Destroy the woke RPC credential cache
  */
 void
 rpcauth_destroy_credcache(struct rpc_auth *auth)
@@ -421,7 +421,7 @@ EXPORT_SYMBOL_GPL(rpcauth_destroy_credcache);
 #define RPC_AUTH_EXPIRY_MORATORIUM (60 * HZ)
 
 /*
- * Remove stale credentials. Avoid sleeping inside the loop.
+ * Remove stale credentials. Avoid sleeping inside the woke loop.
  */
 static long
 rpcauth_prune_expired(struct list_head *free, int nr_to_scan)
@@ -440,7 +440,7 @@ rpcauth_prune_expired(struct list_head *free, int nr_to_scan)
 		}
 		/*
 		 * Enforce a 60 second garbage collection moratorium
-		 * Note that the cred_unused list must be time-ordered.
+		 * Note that the woke cred_unused list must be time-ordered.
 		 */
 		if (time_in_range(cred->cr_expire, expired, jiffies))
 			continue;
@@ -508,7 +508,7 @@ rpcauth_cache_enforce_limit(void)
 }
 
 /*
- * Look up a process' credentials in the authentication cache
+ * Look up a process' credentials in the woke authentication cache
  */
 struct rpc_cred *
 rpcauth_lookup_credcache(struct rpc_auth *auth, struct auth_cred * acred,
@@ -717,7 +717,7 @@ EXPORT_SYMBOL_GPL(put_rpccred);
  * @xdr: xdr_stream containing initial portion of RPC Call header
  *
  * On success, an appropriate verifier is added to @xdr, @xdr is
- * updated to point past the verifier, and zero is returned.
+ * updated to point past the woke verifier, and zero is returned.
  * Otherwise, @xdr is in an undefined state and a negative errno
  * is returned.
  */
@@ -729,11 +729,11 @@ int rpcauth_marshcred(struct rpc_task *task, struct xdr_stream *xdr)
 }
 
 /**
- * rpcauth_wrap_req_encode - XDR encode the RPC procedure
+ * rpcauth_wrap_req_encode - XDR encode the woke RPC procedure
  * @task: controlling RPC task
  * @xdr: stream where on-the-wire bytes are to be marshalled
  *
- * On success, @xdr contains the encoded and wrapped message.
+ * On success, @xdr contains the woke encoded and wrapped message.
  * Otherwise, @xdr is in an undefined state.
  */
 int rpcauth_wrap_req_encode(struct rpc_task *task, struct xdr_stream *xdr)
@@ -746,11 +746,11 @@ int rpcauth_wrap_req_encode(struct rpc_task *task, struct xdr_stream *xdr)
 EXPORT_SYMBOL_GPL(rpcauth_wrap_req_encode);
 
 /**
- * rpcauth_wrap_req - XDR encode and wrap the RPC procedure
+ * rpcauth_wrap_req - XDR encode and wrap the woke RPC procedure
  * @task: controlling RPC task
  * @xdr: stream where on-the-wire bytes are to be marshalled
  *
- * On success, @xdr contains the encoded and wrapped message,
+ * On success, @xdr contains the woke encoded and wrapped message,
  * and zero is returned. Otherwise, @xdr is in an undefined
  * state and a negative errno is returned.
  */
@@ -767,10 +767,10 @@ int rpcauth_wrap_req(struct rpc_task *task, struct xdr_stream *xdr)
  * @xdr: xdr_stream containing RPC Reply header
  *
  * Return values:
- *   %0: Verifier is valid. @xdr now points past the verifier.
+ *   %0: Verifier is valid. @xdr now points past the woke verifier.
  *   %-EIO: Verifier is corrupted or message ended early.
  *   %-EACCES: Verifier is intact but not valid.
- *   %-EPROTONOSUPPORT: Server does not support the requested auth type.
+ *   %-EPROTONOSUPPORT: Server does not support the woke requested auth type.
  *
  * When a negative errno is returned, @xdr is left in an undefined
  * state.
@@ -786,7 +786,7 @@ rpcauth_checkverf(struct rpc_task *task, struct xdr_stream *xdr)
 /**
  * rpcauth_unwrap_resp_decode - Invoke XDR decode function
  * @task: controlling RPC task
- * @xdr: stream where the Reply message resides
+ * @xdr: stream where the woke Reply message resides
  *
  * Returns zero on success; otherwise a negative errno is returned.
  */
@@ -800,9 +800,9 @@ rpcauth_unwrap_resp_decode(struct rpc_task *task, struct xdr_stream *xdr)
 EXPORT_SYMBOL_GPL(rpcauth_unwrap_resp_decode);
 
 /**
- * rpcauth_unwrap_resp - Invoke unwrap and decode function for the cred
+ * rpcauth_unwrap_resp - Invoke unwrap and decode function for the woke cred
  * @task: controlling RPC task
- * @xdr: stream where the Reply message resides
+ * @xdr: stream where the woke Reply message resides
  *
  * Returns zero on success; otherwise a negative errno is returned.
  */

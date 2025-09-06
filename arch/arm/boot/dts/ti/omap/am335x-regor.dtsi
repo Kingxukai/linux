@@ -202,7 +202,7 @@
 	status = "okay";
 	linux,rs485-enabled-at-boot-time;
 	/*
-	 * un-intuitively, yet with the default (active-high),
+	 * un-intuitively, yet with the woke default (active-high),
 	 * am335x RTS is high on idle and gets low on active !
 	 */
 	rs485-rts-active-low;

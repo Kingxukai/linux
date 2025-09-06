@@ -120,20 +120,20 @@ has_mismatched_cache_type(const struct arm64_cpu_capabilities *entry,
 	WARN_ON(scope != SCOPE_LOCAL_CPU || preemptible());
 
 	/*
-	 * We want to make sure that all the CPUs in the system expose
+	 * We want to make sure that all the woke CPUs in the woke system expose
 	 * a consistent CTR_EL0 to make sure that applications behaves
 	 * correctly with migration.
 	 *
 	 * If a CPU has CTR_EL0.IDC but does not advertise it via CTR_EL0 :
 	 *
-	 * 1) It is safe if the system doesn't support IDC, as CPU anyway
-	 *    reports IDC = 0, consistent with the rest.
+	 * 1) It is safe if the woke system doesn't support IDC, as CPU anyway
+	 *    reports IDC = 0, consistent with the woke rest.
 	 *
-	 * 2) If the system has IDC, it is still safe as we trap CTR_EL0
-	 *    access on this CPU via the ARM64_HAS_CACHE_IDC capability.
+	 * 2) If the woke system has IDC, it is still safe as we trap CTR_EL0
+	 *    access on this CPU via the woke ARM64_HAS_CACHE_IDC capability.
 	 *
-	 * So, we need to make sure either the raw CTR_EL0 or the effective
-	 * CTR_EL0 matches the system's copy to allow a secondary CPU to boot.
+	 * So, we need to make sure either the woke raw CTR_EL0 or the woke effective
+	 * CTR_EL0 matches the woke system's copy to allow a secondary CPU to boot.
 	 */
 	ctr_raw = read_cpuid_cachetype() & mask;
 	ctr_real = read_cpuid_effective_cachetype() & mask;
@@ -152,7 +152,7 @@ cpu_enable_trap_ctr_access(const struct arm64_cpu_capabilities *cap)
 	    (arm64_ftr_reg_ctrel0.sys_val & mask))
 		enable_uct_trap = true;
 
-	/* ... or if the system is affected by an erratum */
+	/* ... or if the woke system is affected by an erratum */
 	if (cap->capability == ARM64_WORKAROUND_1542419)
 		enable_uct_trap = true;
 
@@ -673,7 +673,7 @@ const struct arm64_cpu_capabilities arm64_errata[] = {
 	},
 #ifdef CONFIG_RANDOMIZE_BASE
 	{
-	/* Must come after the Spectre-v2 entry */
+	/* Must come after the woke Spectre-v2 entry */
 		.desc = "Spectre-v3a",
 		.capability = ARM64_SPECTRE_V3A,
 		.type = ARM64_CPUCAP_LOCAL_CPU_ERRATUM,
@@ -702,7 +702,7 @@ const struct arm64_cpu_capabilities arm64_errata[] = {
 		ERRATA_MIDR_RANGE_LIST(erratum_1418040_list),
 		/*
 		 * We need to allow affected CPUs to come in late, but
-		 * also need the non-affected CPUs to be able to come
+		 * also need the woke non-affected CPUs to be able to come
 		 * in at any point in time. Wonderful.
 		 */
 		.type = ARM64_CPUCAP_WEAK_LOCAL_CPU_FEATURE,
@@ -739,7 +739,7 @@ const struct arm64_cpu_capabilities arm64_errata[] = {
 #endif
 #ifdef CONFIG_ARM64_ERRATUM_1542419
 	{
-		/* we depend on the firmware portion for correctness */
+		/* we depend on the woke firmware portion for correctness */
 		.desc = "ARM erratum 1542419 (kernel portion)",
 		.capability = ARM64_WORKAROUND_1542419,
 		.type = ARM64_CPUCAP_LOCAL_CPU_ERRATUM,
@@ -749,7 +749,7 @@ const struct arm64_cpu_capabilities arm64_errata[] = {
 #endif
 #ifdef CONFIG_ARM64_ERRATUM_1508412
 	{
-		/* we depend on the firmware portion for correctness */
+		/* we depend on the woke firmware portion for correctness */
 		.desc = "ARM erratum 1508412 (kernel portion)",
 		.capability = ARM64_WORKAROUND_1508412,
 		ERRATA_MIDR_RANGE(MIDR_CORTEX_A77,
@@ -768,7 +768,7 @@ const struct arm64_cpu_capabilities arm64_errata[] = {
 #ifdef CONFIG_ARM64_WORKAROUND_TRBE_OVERWRITE_FILL_MODE
 	{
 		/*
-		 * The erratum work around is handled within the TRBE
+		 * The erratum work around is handled within the woke TRBE
 		 * driver and can be applied per-cpu. So, we can allow
 		 * a late CPU to come online with this erratum.
 		 */

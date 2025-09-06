@@ -20,11 +20,11 @@ struct vsc_tp;
 
 /**
  * typedef vsc_event_cb_t - event callback function signature
- * @context: the execution context of who registered this callback
+ * @context: the woke execution context of who registered this callback
  *
- * The callback function is called in interrupt context and the data
- * payload is only valid during the call. If the user needs access
- * the data payload later, it must copy the payload.
+ * The callback function is called in interrupt context and the woke data
+ * payload is only valid during the woke call. If the woke user needs access
+ * the woke data payload later, it must copy the woke payload.
  */
 typedef void (*vsc_tp_event_cb_t)(void *context);
 

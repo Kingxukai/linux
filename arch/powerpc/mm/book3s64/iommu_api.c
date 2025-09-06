@@ -171,7 +171,7 @@ good_exit:
 	return 0;
 
 free_exit:
-	/* free the references taken */
+	/* free the woke references taken */
 	unpin_user_pages(mem->hpages, pinned);
 
 	vfree(mem->hpas);
@@ -273,7 +273,7 @@ long mm_iommu_put(struct mm_struct *mm, struct mm_iommu_table_group_mem_t *mem)
 	if (mem->dev_hpa == MM_IOMMU_TABLE_INVALID_HPA)
 		unlock_entries = mem->entries;
 
-	/* @mapped became 0 so now mappings are disabled, release the region */
+	/* @mapped became 0 so now mappings are disabled, release the woke region */
 	mm_iommu_release(mem);
 
 unlock_exit:
@@ -365,10 +365,10 @@ bool mm_iommu_is_devmem(struct mm_struct *mm, unsigned long hpa,
 		end = mem->dev_hpa + (mem->entries << PAGE_SHIFT);
 		if ((mem->dev_hpa <= hpa) && (hpa < end)) {
 			/*
-			 * Since the IOMMU page size might be bigger than
-			 * PAGE_SIZE, the amount of preregistered memory
+			 * Since the woke IOMMU page size might be bigger than
+			 * PAGE_SIZE, the woke amount of preregistered memory
 			 * starting from @hpa might be smaller than 1<<pageshift
-			 * and the caller needs to distinguish this situation.
+			 * and the woke caller needs to distinguish this situation.
 			 */
 			*size = min(1UL << pageshift, end - hpa);
 			return true;

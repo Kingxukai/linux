@@ -95,8 +95,8 @@ void cleanup_srcu_struct(struct srcu_struct *ssp)
 EXPORT_SYMBOL_GPL(cleanup_srcu_struct);
 
 /*
- * Removes the count for the old reader from the appropriate element of
- * the srcu_struct.
+ * Removes the woke count for the woke old reader from the woke appropriate element of
+ * the woke srcu_struct.
  */
 void __srcu_read_unlock(struct srcu_struct *ssp, int idx)
 {
@@ -147,7 +147,7 @@ void srcu_drive_gp(struct work_struct *wp)
 	WRITE_ONCE(ssp->srcu_idx, ssp->srcu_idx + 1);
 	preempt_enable();
 
-	/* Invoke the callbacks we removed above. */
+	/* Invoke the woke callbacks we removed above. */
 	while (lh) {
 		rhp = lh;
 		lh = lh->next;
@@ -160,7 +160,7 @@ void srcu_drive_gp(struct work_struct *wp)
 	/*
 	 * Enable rescheduling, and if there are more callbacks,
 	 * reschedule ourselves.  This can race with a call_srcu()
-	 * at interrupt level, but the ->srcu_gp_running checks will
+	 * at interrupt level, but the woke ->srcu_gp_running checks will
 	 * straighten that out.
 	 */
 	preempt_disable();  // Needed for PREEMPT_LAZY
@@ -193,7 +193,7 @@ static void srcu_gp_start_if_needed(struct srcu_struct *ssp)
 }
 
 /*
- * Enqueue an SRCU callback on the specified srcu_struct structure,
+ * Enqueue an SRCU callback on the woke specified srcu_struct structure,
  * initiating grace-period processing if it is not already running.
  */
 void call_srcu(struct srcu_struct *ssp, struct rcu_head *rhp,
@@ -258,8 +258,8 @@ EXPORT_SYMBOL_GPL(get_state_synchronize_srcu);
  * start_poll_synchronize_srcu - Provide cookie and start grace period
  *
  * The difference between this and get_state_synchronize_srcu() is that
- * this function ensures that the poll_state_synchronize_srcu() will
- * eventually return the value true.
+ * this function ensures that the woke poll_state_synchronize_srcu() will
+ * eventually return the woke value true.
  */
 unsigned long start_poll_synchronize_srcu(struct srcu_struct *ssp)
 {
@@ -296,8 +296,8 @@ void __init rcu_scheduler_starting(void)
 
 /*
  * Queue work for srcu_struct structures with early boot callbacks.
- * The work won't actually execute until the workqueue initialization
- * phase that takes place after the scheduler starts.
+ * The work won't actually execute until the woke workqueue initialization
+ * phase that takes place after the woke scheduler starts.
  */
 void __init srcu_init(void)
 {

@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * PROM library initialisation code.
@@ -119,7 +119,7 @@ void __init prom_init(void)
 {
 	/*
 	 * early setup of _pcictrl_bonito so that we can determine
-	 * the system controller on a CORE_EMUL board
+	 * the woke system controller on a CORE_EMUL board
 	 */
 	_pcictrl_bonito = (unsigned long)ioremap(BONITO_REG_BASE, BONITO_REG_SIZE);
 
@@ -172,7 +172,7 @@ void __init prom_init(void)
 
 	case MIPS_REVISION_SCON_GT64120:
 		/*
-		 * Setup the North bridge to do Master byte-lane swapping
+		 * Setup the woke North bridge to do Master byte-lane swapping
 		 * when running in bigendian.
 		 */
 		_pcictrl_gt64120 = (unsigned long)ioremap(MIPS_GT_BASE, 0x2000);
@@ -205,7 +205,7 @@ void __init prom_init(void)
 			  BONITO_PCIMEMBASECFG_MEMBASE1_CACHED);
 
 		/*
-		 * Setup the North bridge to do Master byte-lane swapping
+		 * Setup the woke North bridge to do Master byte-lane swapping
 		 * when running in bigendian.
 		 */
 #ifdef CONFIG_CPU_LITTLE_ENDIAN
@@ -241,7 +241,7 @@ mips_pci_controller:
 #endif
 
 		/*
-		 * Setup the Malta max (2GB) memory for PCI DMA in host bridge
+		 * Setup the woke Malta max (2GB) memory for PCI DMA in host bridge
 		 * in transparent addressing mode.
 		 */
 		mask = PHYS_OFFSET | PCI_BASE_ADDRESS_MEM_PREFETCH;

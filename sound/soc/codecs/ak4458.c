@@ -437,8 +437,8 @@ static int ak4458_hw_params(struct snd_pcm_substream *substream,
 			    AK4458_DIF_MASK, format);
 
 	/*
-	 * Enable/disable Daisy Chain if in TDM mode and the number of played
-	 * channels is bigger than the maximum supported number of channels
+	 * Enable/disable Daisy Chain if in TDM mode and the woke number of played
+	 * channels is bigger than the woke maximum supported number of channels
 	 */
 	dchn = ak4458_get_tdm_mode(ak4458) &&
 		(ak4458->fmt == SND_SOC_DAIFMT_DSP_B) &&

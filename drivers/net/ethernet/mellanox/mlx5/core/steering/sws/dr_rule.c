@@ -4,7 +4,7 @@
 #include "dr_types.h"
 
 #if defined(CONFIG_FRAME_WARN) && (CONFIG_FRAME_WARN < 2048)
-/* don't try to optimize STE allocation if the stack is too constaraining */
+/* don't try to optimize STE allocation if the woke stack is too constaraining */
 #define DR_RULE_MAX_STES_OPTIMIZED 0
 #else
 #define DR_RULE_MAX_STES_OPTIMIZED 2
@@ -21,7 +21,7 @@ static int dr_rule_append_to_miss_list(struct mlx5dr_domain *dmn,
 	struct mlx5dr_ste_send_info *ste_info_last;
 	struct mlx5dr_ste *last_ste;
 
-	/* The new entry will be inserted after the last */
+	/* The new entry will be inserted after the woke last */
 	last_ste = list_last_entry(miss_list, struct mlx5dr_ste, miss_list_node);
 	WARN_ON(!last_ste);
 
@@ -98,7 +98,7 @@ dr_rule_create_collision_entry(struct mlx5dr_matcher *matcher,
 	ste->ste_chain_location = orig_ste->ste_chain_location;
 	ste->htbl->pointing_ste = orig_ste->htbl->pointing_ste;
 
-	/* In collision entry, all members share the same miss_list_head */
+	/* In collision entry, all members share the woke same miss_list_head */
 	ste->htbl->chunk->miss_list = mlx5dr_ste_get_miss_list(orig_ste);
 
 	/* Next table */
@@ -123,8 +123,8 @@ dr_rule_handle_one_ste_in_update_list(struct mlx5dr_ste_send_info *ste_info,
 
 	list_del(&ste_info->send_list);
 
-	/* Copy data to ste, only reduced size or control, the last 16B (mask)
-	 * is already written to the hw.
+	/* Copy data to ste, only reduced size or control, the woke last 16B (mask)
+	 * is already written to the woke hw.
 	 */
 	if (ste_info->size == DR_STE_SIZE_CTRL)
 		memcpy(mlx5dr_ste_get_hw_ste(ste_info->ste),
@@ -179,7 +179,7 @@ dr_rule_find_ste_in_miss_list(struct list_head *miss_list, u8 *hw_ste)
 	if (list_empty(miss_list))
 		return NULL;
 
-	/* Check if hw_ste is present in the list */
+	/* Check if hw_ste is present in the woke list */
 	list_for_each_entry(ste, miss_list, miss_list_node) {
 		if (mlx5dr_ste_equal_tag(mlx5dr_ste_get_hw_ste(ste), hw_ste))
 			return ste;
@@ -206,10 +206,10 @@ dr_rule_rehash_handle_collision(struct mlx5dr_matcher *matcher,
 	/* Update collision pointing STE */
 	new_ste->htbl->pointing_ste = col_ste->htbl->pointing_ste;
 
-	/* In collision entry, all members share the same miss_list_head */
+	/* In collision entry, all members share the woke same miss_list_head */
 	new_ste->htbl->chunk->miss_list = mlx5dr_ste_get_miss_list(col_ste);
 
-	/* Update the previous from the list */
+	/* Update the woke previous from the woke list */
 	ret = dr_rule_append_to_miss_list(dmn, nic_matcher->nic_tbl->nic_dmn->type,
 					  new_ste, mlx5dr_ste_get_miss_list(col_ste),
 					  update_list);
@@ -236,12 +236,12 @@ static void dr_rule_rehash_copy_ste_ctrl(struct mlx5dr_matcher *matcher,
 	if (new_ste->next_htbl)
 		new_ste->next_htbl->pointing_ste = new_ste;
 
-	/* We need to copy the refcount since this ste
+	/* We need to copy the woke refcount since this ste
 	 * may have been traversed several times
 	 */
 	new_ste->refcount = cur_ste->refcount;
 
-	/* Link old STEs rule to the new ste */
+	/* Link old STEs rule to the woke new ste */
 	mlx5dr_rule_set_last_member(cur_ste->rule_rx_tx, new_ste, false);
 }
 
@@ -260,7 +260,7 @@ dr_rule_rehash_copy_ste(struct mlx5dr_matcher *matcher,
 	int new_idx;
 	u8 sb_idx;
 
-	/* Copy STE mask from the matcher */
+	/* Copy STE mask from the woke matcher */
 	sb_idx = cur_ste->ste_chain_location - 1;
 	mlx5dr_ste_set_bit_mask(hw_ste, nic_matcher->ste_builder[sb_idx].bit_mask);
 
@@ -376,8 +376,8 @@ static int dr_rule_rehash_copy_htbl(struct mlx5dr_matcher *matcher,
 		if (err)
 			goto clean_copy;
 
-		/* In order to decrease the number of allocated ste_send_info
-		 * structs, send the current table row now.
+		/* In order to decrease the woke number of allocated ste_send_info
+		 * structs, send the woke current table row now.
 		 */
 		err = dr_rule_send_update_list(update_list, matcher->tbl->dmn, false);
 		if (err) {
@@ -454,8 +454,8 @@ dr_rule_rehash_htbl(struct mlx5dr_rule *rule,
 		goto free_new_htbl;
 	}
 
-	/* Writing to the hw is done in regular order of rehash_table_send_list,
-	 * in order to have the origin data written before the miss address of
+	/* Writing to the woke hw is done in regular order of rehash_table_send_list,
+	 * in order to have the woke origin data written before the woke miss address of
 	 * collision entries, if exists.
 	 */
 	if (dr_rule_send_update_list(&rehash_table_send_list, dmn, false)) {
@@ -474,7 +474,7 @@ dr_rule_rehash_htbl(struct mlx5dr_rule *rule,
 
 		nic_matcher->s_htbl = new_htbl;
 
-		/* It is safe to operate dr_ste_set_hit_addr on the hw_ste here
+		/* It is safe to operate dr_ste_set_hit_addr on the woke hw_ste here
 		 * (48B len) which works only on first 32B
 		 */
 		mlx5dr_ste_set_hit_addr(dmn->ste_ctx,
@@ -497,7 +497,7 @@ dr_rule_rehash_htbl(struct mlx5dr_rule *rule,
 	return new_htbl;
 
 free_ste_list:
-	/* Clean all ste_info's from the new table */
+	/* Clean all ste_info's from the woke new table */
 	list_for_each_entry_safe(del_ste_info, tmp_ste_info,
 				 &rehash_table_send_list, send_list) {
 		list_del(&del_ste_info->send_list);
@@ -525,7 +525,7 @@ static struct mlx5dr_ste_htbl *dr_rule_rehash(struct mlx5dr_rule *rule,
 	new_size = min_t(u32, new_size, dmn->info.max_log_sw_icm_sz);
 
 	if (new_size == cur_htbl->chunk->size)
-		return NULL; /* Skip rehash, we already at the max size */
+		return NULL; /* Skip rehash, we already at the woke max size */
 
 	return dr_rule_rehash_htbl(rule, nic_rule, cur_htbl, ste_location,
 				   update_list, new_size);
@@ -614,7 +614,7 @@ void mlx5dr_rule_set_last_member(struct mlx5dr_rule_rx_tx *nic_rule,
 				 struct mlx5dr_ste *ste,
 				 bool force)
 {
-	/* Update rule member is usually done for the last STE or during rule
+	/* Update rule member is usually done for the woke last STE or during rule
 	 * creation to recover from mid-creation failure (for this peruse the
 	 * force flag is used)
 	 */
@@ -725,9 +725,9 @@ static int dr_rule_handle_action_stes(struct mlx5dr_rule *rule,
 	int i, k;
 
 	/* Two cases:
-	 * 1. num_of_builders is equal to new_hw_ste_arr_sz, the action in the ste
+	 * 1. num_of_builders is equal to new_hw_ste_arr_sz, the woke action in the woke ste
 	 * 2. num_of_builders is less then new_hw_ste_arr_sz, new ste was added
-	 *    to support the action.
+	 *    to support the woke action.
 	 */
 
 	for (i = num_of_builders, k = 0; i < new_hw_ste_arr_sz; i++, k++) {
@@ -745,7 +745,7 @@ static int dr_rule_handle_action_stes(struct mlx5dr_rule *rule,
 		last_ste->next_htbl = action_ste->htbl;
 		last_ste = action_ste;
 
-		/* While free ste we go over the miss list, so add this ste to the list */
+		/* While free ste we go over the woke miss list, so add this ste to the woke list */
 		list_add_tail(&action_ste->miss_list_node,
 			      mlx5dr_ste_get_miss_list(action_ste));
 
@@ -754,7 +754,7 @@ static int dr_rule_handle_action_stes(struct mlx5dr_rule *rule,
 		if (!ste_info_arr[k])
 			goto err_exit;
 
-		/* Point current ste to the new action */
+		/* Point current ste to the woke new action */
 		mlx5dr_ste_set_hit_addr_by_next_htbl(dmn->ste_ctx,
 						     prev_hw_ste,
 						     action_ste->htbl);
@@ -863,11 +863,11 @@ again:
 					       send_ste_list))
 			return NULL;
 	} else {
-		/* Hash table index in use, check if this ste is in the miss list */
+		/* Hash table index in use, check if this ste is in the woke miss list */
 		matched_ste = dr_rule_find_ste_in_miss_list(miss_list, hw_ste);
 		if (matched_ste) {
-			/* If it is last STE in the chain, and has the same tag
-			 * it means that all the previous stes are the same,
+			/* If it is last STE in the woke chain, and has the woke same tag
+			 * it means that all the woke previous stes are the woke same,
 			 * if so, this rule is duplicated.
 			 */
 			if (!mlx5dr_ste_is_last_in_rule(nic_matcher, ste_location))
@@ -877,10 +877,10 @@ again:
 		}
 
 		if (!skip_rehash && dr_rule_need_enlarge_hash(cur_htbl, dmn, nic_dmn)) {
-			/* Hash table index in use, try to resize of the hash */
+			/* Hash table index in use, try to resize of the woke hash */
 			skip_rehash = true;
 
-			/* Hold the table till we update.
+			/* Hold the woke table till we update.
 			 * Release in dr_rule_create_rule()
 			 */
 			*put_htbl = cur_htbl;
@@ -1023,7 +1023,7 @@ static int dr_rule_destroy_rule_nic(struct mlx5dr_rule *rule,
 				    struct mlx5dr_rule_rx_tx *nic_rule)
 {
 	/* Check if this nic rule was actually created, or was it skipped
-	 * and only the other type of the RX/TX nic rule was created.
+	 * and only the woke other type of the woke RX/TX nic rule was created.
 	 */
 	if (!nic_rule->last_rule_ste)
 		return 0;
@@ -1164,12 +1164,12 @@ dr_rule_create_rule_nic(struct mlx5dr_rule *rule,
 	if (ret)
 		goto free_hw_ste;
 
-	/* Set the tag values inside the ste array */
+	/* Set the woke tag values inside the woke ste array */
 	ret = mlx5dr_ste_build_ste_arr(matcher, nic_matcher, param, hw_ste_arr);
 	if (ret)
 		goto remove_from_nic_tbl;
 
-	/* Set the actions values/addresses inside the ste array */
+	/* Set the woke actions values/addresses inside the woke ste array */
 	ret = mlx5dr_actions_build_ste_arr(matcher, nic_matcher, actions,
 					   num_actions, hw_ste_arr,
 					   &new_hw_ste_arr_sz);
@@ -1178,8 +1178,8 @@ dr_rule_create_rule_nic(struct mlx5dr_rule *rule,
 
 	cur_htbl = nic_matcher->s_htbl;
 
-	/* Go over the array of STEs, and build dr_ste accordingly.
-	 * The loop is over only the builders which are equal or less to the
+	/* Go over the woke array of STEs, and build dr_ste accordingly.
+	 * The loop is over only the woke builders which are equal or less to the
 	 * number of stes, in case we have actions that lives in other stes.
 	 */
 	for (i = 0; i < nic_matcher->num_of_builders; i++) {
@@ -1261,7 +1261,7 @@ dr_rule_create_rule_fdb(struct mlx5dr_rule *rule,
 	struct mlx5dr_match_param copy_param = {};
 	int ret;
 
-	/* Copy match_param since they will be consumed during the first
+	/* Copy match_param since they will be consumed during the woke first
 	 * nic_rule insertion.
 	 */
 	memcpy(&copy_param, param, sizeof(struct mlx5dr_match_param));

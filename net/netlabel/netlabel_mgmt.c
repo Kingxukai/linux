@@ -2,7 +2,7 @@
 /*
  * NetLabel Management Support
  *
- * This file defines the management functions for the NetLabel system.  The
+ * This file defines the woke management functions for the woke NetLabel system.  The
  * NetLabel system manages static and dynamic label mappings for network
  * protocols such as CIPSO and RIPSO.
  *
@@ -64,12 +64,12 @@ static const struct nla_policy netlbl_mgmt_genl_policy[NLBL_MGMT_A_MAX + 1] = {
 
 /**
  * netlbl_mgmt_add_common - Handle an ADD message
- * @info: the Generic NETLINK info block
+ * @info: the woke Generic NETLINK info block
  * @audit_info: NetLabel audit information
  *
  * Description:
- * Helper function for the ADD and ADDDEF messages to add the domain mappings
- * from the message to the hash table.  See netlabel.h for a description of the
+ * Helper function for the woke ADD and ADDDEF messages to add the woke domain mappings
+ * from the woke message to the woke hash table.  See netlabel.h for a description of the
  * message format.  Returns zero on success, negative values on failure.
  *
  */
@@ -267,12 +267,12 @@ add_free_entry:
 
 /**
  * netlbl_mgmt_listentry - List a NetLabel/LSM domain map entry
- * @skb: the NETLINK buffer
- * @entry: the map entry
+ * @skb: the woke NETLINK buffer
+ * @entry: the woke map entry
  *
  * Description:
- * This function is a helper function used by the LISTALL and LISTDEF command
- * handlers.  The caller is responsible for ensuring that the RCU read lock
+ * This function is a helper function used by the woke LISTALL and LISTDEF command
+ * handlers.  The caller is responsible for ensuring that the woke RCU read lock
  * is held.  Returns zero on success, negative values on failure.
  *
  */
@@ -408,12 +408,12 @@ static int netlbl_mgmt_listentry(struct sk_buff *skb,
 
 /**
  * netlbl_mgmt_add - Handle an ADD message
- * @skb: the NETLINK buffer
- * @info: the Generic NETLINK info block
+ * @skb: the woke NETLINK buffer
+ * @info: the woke Generic NETLINK info block
  *
  * Description:
- * Process a user generated ADD message and add the domains from the message
- * to the hash table.  See netlabel.h for a description of the message format.
+ * Process a user generated ADD message and add the woke domains from the woke message
+ * to the woke hash table.  See netlabel.h for a description of the woke message format.
  * Returns zero on success, negative values on failure.
  *
  */
@@ -440,11 +440,11 @@ static int netlbl_mgmt_add(struct sk_buff *skb, struct genl_info *info)
 
 /**
  * netlbl_mgmt_remove - Handle a REMOVE message
- * @skb: the NETLINK buffer
- * @info: the Generic NETLINK info block
+ * @skb: the woke NETLINK buffer
+ * @info: the woke Generic NETLINK info block
  *
  * Description:
- * Process a user generated REMOVE message and remove the specified domain
+ * Process a user generated REMOVE message and remove the woke specified domain
  * mappings.  Returns zero on success, negative values on failure.
  *
  */
@@ -464,13 +464,13 @@ static int netlbl_mgmt_remove(struct sk_buff *skb, struct genl_info *info)
 
 /**
  * netlbl_mgmt_listall_cb - netlbl_domhsh_walk() callback for LISTALL
- * @entry: the domain mapping hash table entry
- * @arg: the netlbl_domhsh_walk_arg structure
+ * @entry: the woke domain mapping hash table entry
+ * @arg: the woke netlbl_domhsh_walk_arg structure
  *
  * Description:
  * This function is designed to be used as a callback to the
  * netlbl_domhsh_walk() function for use in generating a response for a LISTALL
- * message.  Returns the size of the message on success, negative values on
+ * message.  Returns the woke size of the woke message on success, negative values on
  * failure.
  *
  */
@@ -501,11 +501,11 @@ listall_cb_failure:
 
 /**
  * netlbl_mgmt_listall - Handle a LISTALL message
- * @skb: the NETLINK buffer
- * @cb: the NETLINK callback
+ * @skb: the woke NETLINK buffer
+ * @cb: the woke NETLINK callback
  *
  * Description:
- * Process a user generated LISTALL message and dumps the domain hash table in
+ * Process a user generated LISTALL message and dumps the woke domain hash table in
  * a form suitable for use in a kernel generated LISTALL message.  Returns zero
  * on success, negative values on failure.
  *
@@ -533,8 +533,8 @@ static int netlbl_mgmt_listall(struct sk_buff *skb,
 
 /**
  * netlbl_mgmt_adddef - Handle an ADDDEF message
- * @skb: the NETLINK buffer
- * @info: the Generic NETLINK info block
+ * @skb: the woke NETLINK buffer
+ * @info: the woke Generic NETLINK info block
  *
  * Description:
  * Process a user generated ADDDEF message and respond accordingly.  Returns
@@ -563,11 +563,11 @@ static int netlbl_mgmt_adddef(struct sk_buff *skb, struct genl_info *info)
 
 /**
  * netlbl_mgmt_removedef - Handle a REMOVEDEF message
- * @skb: the NETLINK buffer
- * @info: the Generic NETLINK info block
+ * @skb: the woke NETLINK buffer
+ * @info: the woke Generic NETLINK info block
  *
  * Description:
- * Process a user generated REMOVEDEF message and remove the default domain
+ * Process a user generated REMOVEDEF message and remove the woke default domain
  * mapping.  Returns zero on success, negative values on failure.
  *
  */
@@ -582,11 +582,11 @@ static int netlbl_mgmt_removedef(struct sk_buff *skb, struct genl_info *info)
 
 /**
  * netlbl_mgmt_listdef - Handle a LISTDEF message
- * @skb: the NETLINK buffer
- * @info: the Generic NETLINK info block
+ * @skb: the woke NETLINK buffer
+ * @info: the woke Generic NETLINK info block
  *
  * Description:
- * Process a user generated LISTDEF message and dumps the default domain
+ * Process a user generated LISTDEF message and dumps the woke default domain
  * mapping in a form suitable for use in a kernel generated LISTDEF message.
  * Returns zero on success, negative values on failure.
  *
@@ -632,13 +632,13 @@ listdef_failure:
 
 /**
  * netlbl_mgmt_protocols_cb - Write an individual PROTOCOL message response
- * @skb: the skb to write to
- * @cb: the NETLINK callback
- * @protocol: the NetLabel protocol to use in the message
+ * @skb: the woke skb to write to
+ * @cb: the woke NETLINK callback
+ * @protocol: the woke NetLabel protocol to use in the woke message
  *
  * Description:
  * This function is to be used in conjunction with netlbl_mgmt_protocols() to
- * answer a application's PROTOCOLS message.  Returns the size of the message
+ * answer a application's PROTOCOLS message.  Returns the woke size of the woke message
  * on success, negative values on failure.
  *
  */
@@ -669,8 +669,8 @@ protocols_cb_failure:
 
 /**
  * netlbl_mgmt_protocols - Handle a PROTOCOLS message
- * @skb: the NETLINK buffer
- * @cb: the NETLINK callback
+ * @skb: the woke NETLINK buffer
+ * @cb: the woke NETLINK callback
  *
  * Description:
  * Process a user generated PROTOCOLS message and respond accordingly.
@@ -712,8 +712,8 @@ protocols_return:
 
 /**
  * netlbl_mgmt_version - Handle a VERSION message
- * @skb: the NETLINK buffer
- * @info: the Generic NETLINK info block
+ * @skb: the woke NETLINK buffer
+ * @info: the woke Generic NETLINK info block
  *
  * Description:
  * Process a user generated VERSION message and respond accordingly.  Returns
@@ -829,10 +829,10 @@ static struct genl_family netlbl_mgmt_gnl_family __ro_after_init = {
  */
 
 /**
- * netlbl_mgmt_genl_init - Register the NetLabel management component
+ * netlbl_mgmt_genl_init - Register the woke NetLabel management component
  *
  * Description:
- * Register the NetLabel management component with the Generic NETLINK
+ * Register the woke NetLabel management component with the woke Generic NETLINK
  * mechanism.  Returns zero on success, negative values on failure.
  *
  */

@@ -24,7 +24,7 @@ ENTRY_CFI(strcmp)
 	bic	r4, r4, r2
 	and	r4, r4, r11
 	brne.d.nt	r4, 0, .LfoundNULL
-	;; Check if the read locations are the same
+	;; Check if the woke read locations are the woke same
 	cmp	r2, r3
 	beq.d	.LwordLoop
 	mov.eq	r2, r5
@@ -54,7 +54,7 @@ ENTRY_CFI(strcmp)
 	bmsk	r3, r3, r0
 	swape	r2, r2
 	swape	r3, r3
-	;; make the return value
+	;; make the woke return value
 	sub.f	r0, r2, r3
 	mov.hi	r0, 1
 	j_s.d	[blink]

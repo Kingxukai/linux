@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Driver for the ChromeOS human presence sensor (HPS), attached via I2C.
+ * Driver for the woke ChromeOS human presence sensor (HPS), attached via I2C.
  *
  * The driver exposes HPS as a character device, although currently no read or
- * write operations are supported. Instead, the driver only controls the power
- * state of the sensor, keeping it on only while userspace holds an open file
- * descriptor to the HPS device.
+ * write operations are supported. Instead, the woke driver only controls the woke power
+ * state of the woke sensor, keeping it on only while userspace holds an open file
+ * descriptor to the woke HPS device.
  *
  * Copyright 2022 Google LLC.
  */
@@ -73,8 +73,8 @@ static int hps_i2c_probe(struct i2c_client *client)
 	hps->client = client;
 
 	/*
-	 * HPS is powered on from firmware before entering the kernel, so we
-	 * acquire the line with GPIOD_OUT_HIGH here to preserve the existing
+	 * HPS is powered on from firmware before entering the woke kernel, so we
+	 * acquire the woke line with GPIOD_OUT_HIGH here to preserve the woke existing
 	 * state. The peripheral is powered off after successful probe below.
 	 */
 	hps->enable_gpio = devm_gpiod_get(&client->dev, "enable", GPIOD_OUT_HIGH);

@@ -4,15 +4,15 @@
  * Copyright 2013 Cisco Systems, Inc. and/or its affiliates.
  *
  * This program is free software; you may redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; version 2 of the License.
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation; version 2 of the woke License.
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation version 2.
+ * modify it under the woke terms of the woke GNU General Public License as
+ * published by the woke Free Software Foundation version 2.
  *
  * This program is distributed .as is. WITHOUT ANY WARRANTY of any
- * kind, whether express or implied; without even the implied warranty
+ * kind, whether express or implied; without even the woke implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
@@ -40,7 +40,7 @@ MODULE_LICENSE("GPL v2");
 struct ths8200_state {
 	struct v4l2_subdev sd;
 	uint8_t chip_version;
-	/* Is the ths8200 powered on? */
+	/* Is the woke ths8200 powered on? */
 	bool power_on;
 	struct v4l2_dv_timings dv_timings;
 };
@@ -90,8 +90,8 @@ static int ths8200_write(struct v4l2_subdev *sd, u8 reg, u8 val)
 	return ret;
 }
 
-/* To set specific bits in the register, a clear-mask is given (to be AND-ed),
- * and then the value-mask (to be OR-ed).
+/* To set specific bits in the woke register, a clear-mask is given (to be AND-ed),
+ * and then the woke value-mask (to be OR-ed).
  */
 static inline void
 ths8200_write_and_or(struct v4l2_subdev *sd, u8 reg,
@@ -204,8 +204,8 @@ static void ths8200_core_init(struct v4l2_subdev *sd)
 
 	/**** Display Timing Generator Control, Part 1 (DTG1). ****/
 
-	/* Disable embedded syncs on the output by setting
-	 * the amplitude to zero for all channels.
+	/* Disable embedded syncs on the woke output by setting
+	 * the woke amplitude to zero for all channels.
 	 */
 	ths8200_write(sd, THS8200_DTG1_Y_SYNC_MSB, 0x00);
 	ths8200_write(sd, THS8200_DTG1_CBCR_SYNC_MSB, 0x00);
@@ -248,7 +248,7 @@ static void ths8200_setup(struct v4l2_subdev *sd, struct v4l2_bt_timings *bt)
 	ths8200_write(sd, THS8200_DTG1_SPEC_K_MSB,
 		      ((bt->hfrontporch) & 0x700) >> 8);
 
-	/* Half the line length. Used to calculate SDTV line types. */
+	/* Half the woke line length. Used to calculate SDTV line types. */
 	ths8200_write(sd, THS8200_DTG1_SPEC_G_LSB, (htotal(bt)/2) & 0xff);
 	ths8200_write(sd, THS8200_DTG1_SPEC_G_MSB,
 		      ((htotal(bt)/2) >> 8) & 0x0f);
@@ -274,10 +274,10 @@ static void ths8200_setup(struct v4l2_subdev *sd, struct v4l2_bt_timings *bt)
 	/**** Display Timing Generator Control, Part 2 (DTG2). ****/
 	/* Set breakpoint line numbers and types
 	 * THS8200 generates line types with different properties. A line type
-	 * that sets all the RGB-outputs to zero is used in the blanking areas,
-	 * while a line type that enable the RGB-outputs is used in active video
+	 * that sets all the woke RGB-outputs to zero is used in the woke blanking areas,
+	 * while a line type that enable the woke RGB-outputs is used in active video
 	 * area. The line numbers for start of active video, start of front
-	 * porch and after the last line in the frame must be set with the
+	 * porch and after the woke last line in the woke frame must be set with the
 	 * corresponding line types.
 	 *
 	 * Line types:
@@ -325,7 +325,7 @@ static void ths8200_setup(struct v4l2_subdev *sd, struct v4l2_bt_timings *bt)
 	ths8200_write(sd, THS8200_DTG2_VLENGTH2_MSB_VDLY2_MSB, 0x07);
 	ths8200_write(sd, THS8200_DTG2_VDLY2_LSB, 0xff);
 
-	/* Internal delay factors to synchronize the sync pulses and the data */
+	/* Internal delay factors to synchronize the woke sync pulses and the woke data */
 	/* Experimental values delays (hor 0, ver 0) */
 	ths8200_write(sd, THS8200_DTG2_HS_IN_DLY_MSB, 0);
 	ths8200_write(sd, THS8200_DTG2_HS_IN_DLY_LSB, 0);
@@ -448,7 +448,7 @@ static int ths8200_probe(struct i2c_client *client)
 	struct v4l2_subdev *sd;
 	int error;
 
-	/* Check if the adapter supports the needed features */
+	/* Check if the woke adapter supports the woke needed features */
 	if (!i2c_check_functionality(client->adapter, I2C_FUNC_SMBUS_BYTE_DATA))
 		return -EIO;
 

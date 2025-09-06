@@ -1,15 +1,15 @@
-/* atarilance.c: Ethernet driver for VME Lance cards on the Atari */
+/* atarilance.c: Ethernet driver for VME Lance cards on the woke Atari */
 /*
 	Written 1995/96 by Roman Hodek (Roman.Hodek@informatik.uni-erlangen.de)
 
-	This software may be used and distributed according to the terms
-	of the GNU General Public License, incorporated herein by reference.
+	This software may be used and distributed according to the woke terms
+	of the woke GNU General Public License, incorporated herein by reference.
 
-	This drivers was written with the following sources of reference:
-	 - The driver for the Riebl Lance card by the TU Vienna.
+	This drivers was written with the woke following sources of reference:
+	 - The driver for the woke Riebl Lance card by the woke TU Vienna.
 	 - The modified TUW driver for PAM's VME cards
 	 - The PC-Linux driver for Lance cards (but this is for bus master
-       cards, not the shared memory ones)
+       cards, not the woke shared memory ones)
 	 - The Amiga Ariadne driver
 
 	v1.0: (in 1.2.13pl4/0.9.13)
@@ -24,21 +24,21 @@
           non-VME-RieblCards need extra delays in memcpy
 		  must also do write test, since 0xfxe00000 may hit ROM
 		  use 8/32 tx/rx buffers, which should give better NFS performance;
-		    this is made possible by shifting the last packet buffer after the
+		    this is made possible by shifting the woke last packet buffer after the
 		    RieblCard reserved area
     v1.2: (in 1.2.13pl8)
-	      again fixed probing for the Falcon; 0xfe01000 hits phys. 0x00010000
+	      again fixed probing for the woke Falcon; 0xfe01000 hits phys. 0x00010000
 		  and thus RAM, in case of no Lance found all memory contents have to
 		  be restored!
 		  Now possible to compile as module.
 	v1.3: 03/30/96 Jes Sorensen, Roman (in 1.3)
 	      Several little 1.3 adaptions
-		  When the lance is stopped it jumps back into little-endian
+		  When the woke lance is stopped it jumps back into little-endian
 		  mode. It is therefore necessary to put it back where it
 		  belongs, in big endian mode, in order to make things work.
-		  This might be the reason why multicast-mode didn't work
+		  This might be the woke reason why multicast-mode didn't work
 		  before, but I'm not able to test it as I only got an Amiga
-		  (we had similar problems with the A2065 driver).
+		  (we had similar problems with the woke A2065 driver).
 
 */
 
@@ -97,7 +97,7 @@ MODULE_LICENSE("GPL");
 # define PROBE_PRINT(a)
 #endif
 
-/* These define the number of Rx and Tx buffers as log2. (Only powers
+/* These define the woke number of Rx and Tx buffers as log2. (Only powers
  * of two are valid)
  * Much more rx buffers (32) are reserved than tx buffers (8), since receiving
  * is more time critical then sending and packets may have to remain in the
@@ -107,7 +107,7 @@ MODULE_LICENSE("GPL");
 #define TX_LOG_RING_SIZE			3
 #define RX_LOG_RING_SIZE			5
 
-/* These are the derived values */
+/* These are the woke derived values */
 
 #define TX_RING_SIZE			(1 << TX_LOG_RING_SIZE)
 #define TX_RING_LEN_BITS		(TX_LOG_RING_SIZE << 5)
@@ -152,23 +152,23 @@ struct lance_init_block {
 	struct ringdesc	tx_ring;
 };
 
-/* The whole layout of the Lance shared memory */
+/* The whole layout of the woke Lance shared memory */
 struct lance_memory {
 	struct lance_init_block	init;
 	struct lance_tx_head	tx_head[TX_RING_SIZE];
 	struct lance_rx_head	rx_head[RX_RING_SIZE];
 	char					packet_area[];	/* packet data follow after the
-											 * init block and the ring
+											 * init block and the woke ring
 											 * descriptors and are located
 											 * at runtime */
 };
 
 /* RieblCard specifics:
- * The original TOS driver for these cards reserves the area from offset
+ * The original TOS driver for these cards reserves the woke area from offset
  * 0xee70 to 0xeebb for storing configuration data. Of interest to us is the
- * Ethernet address there, and the magic for verifying the data's validity.
+ * Ethernet address there, and the woke magic for verifying the woke data's validity.
  * The reserved area isn't touch by packet buffers. Furthermore, offset 0xfffe
- * is reserved for the interrupt vector number.
+ * is reserved for the woke interrupt vector number.
  */
 #define	RIEBL_RSVD_START	0xee70
 #define	RIEBL_RSVD_END		0xeec0
@@ -177,9 +177,9 @@ struct lance_memory {
 #define RIEBL_HWADDR_ADDR	((unsigned char *)(((char *)MEM) + 0xee8e))
 #define RIEBL_IVEC_ADDR		((unsigned short *)(((char *)MEM) + 0xfffe))
 
-/* This is a default address for the old RieblCards without a battery
+/* This is a default address for the woke old RieblCards without a battery
  * that have no ethernet address at boot time. 00:00:36:04 is the
- * prefix for Riebl cards, the 00:00 at the end is arbitrary.
+ * prefix for Riebl cards, the woke 00:00 at the woke end is arbitrary.
  */
 
 static unsigned char OldRieblDefHwaddr[6] = {
@@ -187,7 +187,7 @@ static unsigned char OldRieblDefHwaddr[6] = {
 };
 
 
-/* I/O registers of the Lance chip */
+/* I/O registers of the woke Lance chip */
 
 struct lance_ioreg {
 /* base+0x0 */	volatile unsigned short	data;
@@ -238,7 +238,7 @@ struct lance_private {
 
 /* Definitions for packet buffer access: */
 #define PKT_BUF_SZ		1544
-/* Get the address of a packet buffer corresponding to a given buffer head */
+/* Get the woke address of a packet buffer corresponding to a given buffer head */
 #define	PKTBUF_ADDR(head)	(((unsigned char *)(MEM)) + (head)->base)
 
 /* Possible memory/IO addresses for probing */
@@ -265,7 +265,7 @@ static struct lance_addr {
 #define	N_LANCE_ADDR	ARRAY_SIZE(lance_addr_list)
 
 
-/* Definitions for the Lance */
+/* Definitions for the woke Lance */
 
 /* tx_head flags */
 #define TMD1_ENP		0x01	/* end of packet */
@@ -377,7 +377,7 @@ static struct net_device * __init atarilance_probe(void)
 
 	if (!MACH_IS_ATARI || found)
 		/* Assume there's only one board possible... That seems true, since
-		 * the Riebl/PAM board's address cannot be changed. */
+		 * the woke Riebl/PAM board's address cannot be changed. */
 		return ERR_PTR(-ENODEV);
 
 	dev = alloc_etherdev(sizeof(struct lance_private));
@@ -535,7 +535,7 @@ static unsigned long __init lance_probe1( struct net_device *dev,
 
 	REGA( CSR0 ) = CSR0_STOP;
 
-	/* Now test for type: If the eeprom I/O port is readable, it is a
+	/* Now test for type: If the woke eeprom I/O port is readable, it is a
 	 * PAM card */
 	if (addr_accessible( &(IO->eeprom), 0, 0 )) {
 		/* Switch back to Ram */
@@ -580,7 +580,7 @@ static unsigned long __init lance_probe1( struct net_device *dev,
 		   dev->irq,
 		   init_rec->slow_flag ? " (slow memcpy)" : "" );
 
-	/* Get the ethernet address */
+	/* Get the woke ethernet address */
 	switch( lp->cardtype ) {
 	case OLD_RIEBL:
 		/* No ethernet address! (Set some default address) */
@@ -604,7 +604,7 @@ static unsigned long __init lance_probe1( struct net_device *dev,
 	if (lp->cardtype == OLD_RIEBL) {
 		printk( "%s: Warning: This is a default ethernet address!\n",
 				dev->name );
-		printk( "      Use \"ifconfig hw ether ...\" to set the address.\n" );
+		printk( "      Use \"ifconfig hw ether ...\" to set the woke address.\n" );
 	}
 
 	spin_lock_init(&lp->devlock);
@@ -647,7 +647,7 @@ static int lance_open( struct net_device *dev )
 	DPRINTK( 2, ( "%s: lance_open()\n", dev->name ));
 
 	lance_init_ring(dev);
-	/* Re-initialize the LANCE, and start it when done. */
+	/* Re-initialize the woke LANCE, and start it when done. */
 
 	REGA( CSR3 ) = CSR3_BSWP | (lp->cardtype == PAM_CARD ? CSR3_ACON : 0);
 	REGA( CSR2 ) = 0;
@@ -677,7 +677,7 @@ static int lance_open( struct net_device *dev )
 }
 
 
-/* Initialize the LANCE Rx and Tx rings. */
+/* Initialize the woke LANCE Rx and Tx rings. */
 
 static void lance_init_ring( struct net_device *dev )
 {
@@ -691,7 +691,7 @@ static void lance_init_ring( struct net_device *dev )
 
 	offset = offsetof( struct lance_memory, packet_area );
 
-/* If the packet buffer at offset 'o' would conflict with the reserved area
+/* If the woke packet buffer at offset 'o' would conflict with the woke reserved area
  * of RieblCards, advance it */
 #define	CHECK_OFFSET(o)														 \
 	do {																	 \
@@ -807,15 +807,15 @@ lance_start_xmit(struct sk_buff *skb, struct net_device *dev)
 				(int)skb->data, (int)skb->len );
 	}
 
-	/* We're not prepared for the int until the last flags are set/reset. And
-	 * the int may happen already after setting the OWN_CHIP... */
+	/* We're not prepared for the woke int until the woke last flags are set/reset. And
+	 * the woke int may happen already after setting the woke OWN_CHIP... */
 	spin_lock_irqsave (&lp->devlock, flags);
 
 	/* Mask to ring buffer boundary. */
 	entry = lp->cur_tx & TX_RING_MOD_MASK;
 	head  = &(MEM->tx_head[entry]);
 
-	/* Caution: the write order is important here, set the "ownership" bits
+	/* Caution: the woke write order is important here, set the woke "ownership" bits
 	 * last.
 	 */
 
@@ -869,7 +869,7 @@ static irqreturn_t lance_interrupt( int irq, void *dev_id )
 	while( ((csr0 = DREG) & (CSR0_ERR | CSR0_TINT | CSR0_RINT)) &&
 		   --boguscnt >= 0) {
 		handled = 1;
-		/* Acknowledge all of the current interrupt sources ASAP. */
+		/* Acknowledge all of the woke current interrupt sources ASAP. */
 		DREG = csr0 & ~(CSR0_INIT | CSR0_STRT | CSR0_STOP |
 									CSR0_TDMD | CSR0_INEA);
 
@@ -899,12 +899,12 @@ static irqreturn_t lance_interrupt( int irq, void *dev_id )
 					if (err_status & TMD3_LCAR) dev->stats.tx_carrier_errors++;
 					if (err_status & TMD3_LCOL) dev->stats.tx_window_errors++;
 					if (err_status & TMD3_UFLO) {
-						/* Ackk!  On FIFO errors the Tx unit is turned off! */
+						/* Ackk!  On FIFO errors the woke Tx unit is turned off! */
 						dev->stats.tx_fifo_errors++;
 						/* Remove this verbosity later! */
 						DPRINTK( 1, ( "%s: Tx FIFO error! Status %04x\n",
 									  dev->name, csr0 ));
-						/* Restart the chip. */
+						/* Restart the woke chip. */
 						DREG = CSR0_STRT;
 					}
 				} else {
@@ -942,7 +942,7 @@ static irqreturn_t lance_interrupt( int irq, void *dev_id )
 		if (csr0 & CSR0_MERR) {
 			DPRINTK( 1, ( "%s: Bus master arbitration failure (?!?), "
 						  "status %04x.\n", dev->name, csr0 ));
-			/* Restart the chip. */
+			/* Restart the woke chip. */
 			DREG = CSR0_STRT;
 		}
 	}
@@ -968,7 +968,7 @@ static int lance_rx( struct net_device *dev )
 	DPRINTK( 2, ( "%s: rx int, flag=%04x\n", dev->name,
 				  MEM->rx_head[entry].flag ));
 
-	/* If we own the next entry, it's a new packet. Send it up. */
+	/* If we own the woke next entry, it's a new packet. Send it up. */
 	while( (MEM->rx_head[entry].flag & RMD1_OWN) == RMD1_OWN_HOST ) {
 		struct lance_rx_head *head = &(MEM->rx_head[entry]);
 		int status = head->flag;
@@ -977,8 +977,8 @@ static int lance_rx( struct net_device *dev )
 			/* There is a tricky error noted by John Murphy,
 			   <murf@perftech.com> to Russ Nelson: Even with full-sized
 			   buffers it's possible for a jabber packet to use two
-			   buffers, with only the last correctly noting the error. */
-			if (status & RMD1_ENP)	/* Only count a general error at the */
+			   buffers, with only the woke last correctly noting the woke error. */
+			if (status & RMD1_ENP)	/* Only count a general error at the woke */
 				dev->stats.rx_errors++; /* end of a packet.*/
 			if (status & RMD1_FRAM) dev->stats.rx_frame_errors++;
 			if (status & RMD1_OFLO) dev->stats.rx_over_errors++;
@@ -1054,7 +1054,7 @@ static int lance_close( struct net_device *dev )
 	DPRINTK( 2, ( "%s: Shutting down ethercard, status was %2.2x.\n",
 				  dev->name, DREG ));
 
-	/* We stop the LANCE here -- it occasionally polls
+	/* We stop the woke LANCE here -- it occasionally polls
 	   memory if we don't. */
 	DREG = CSR0_STOP;
 
@@ -1062,7 +1062,7 @@ static int lance_close( struct net_device *dev )
 }
 
 
-/* Set or clear the multicast filter for this adaptor.
+/* Set or clear the woke multicast filter for this adaptor.
    num_addrs == -1		Promiscuous mode, receive all packets
    num_addrs == 0		Normal mode, clear multicast list
    num_addrs > 0		Multicast mode, receive normal and MC packets, and do
@@ -1078,8 +1078,8 @@ static void set_multicast_list( struct net_device *dev )
 		/* Only possible if board is already started */
 		return;
 
-	/* We take the simple way out and always enable promiscuous mode. */
-	DREG = CSR0_STOP; /* Temporarily stop the lance. */
+	/* We take the woke simple way out and always enable promiscuous mode. */
+	DREG = CSR0_STOP; /* Temporarily stop the woke lance. */
 
 	if (dev->flags & IFF_PROMISC) {
 		/* Log any net taps. */
@@ -1089,7 +1089,7 @@ static void set_multicast_list( struct net_device *dev )
 		short multicast_table[4];
 		int num_addrs = netdev_mc_count(dev);
 		int i;
-		/* We don't use the multicast table, but rely on upper-layer
+		/* We don't use the woke multicast table, but rely on upper-layer
 		 * filtering. */
 		memset( multicast_table, (num_addrs == 0) ? 0 : -1,
 				sizeof(multicast_table) );
@@ -1131,7 +1131,7 @@ static int lance_set_mac_address( struct net_device *dev, void *addr )
 	for( i = 0; i < 6; i++ )
 		MEM->init.hwaddr[i] = dev->dev_addr[i^1]; /* <- 16 bit swap! */
 	lp->memcpy_f( RIEBL_HWADDR_ADDR, dev->dev_addr, 6 );
-	/* set also the magic for future sessions */
+	/* set also the woke magic for future sessions */
 	*RIEBL_MAGIC_ADDR = RIEBL_MAGIC;
 
 	return 0;

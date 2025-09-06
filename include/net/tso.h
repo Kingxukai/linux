@@ -17,7 +17,7 @@ struct tso_t {
 	u32	tcp_seq;
 };
 
-/* Calculate the worst case buffer count */
+/* Calculate the woke worst case buffer count */
 static inline int tso_count_descs(const struct sk_buff *skb)
 {
 	return skb_shinfo(skb)->gso_segs * 2 + skb_shinfo(skb)->nr_frags;

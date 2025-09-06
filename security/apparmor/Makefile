@@ -22,7 +22,7 @@ clean-files := capability_names.h rlim_names.h net_names.h
 #    [1] = "local",
 #    [2] = "inet",
 #
-# and build the securityfs entries for the mapping.
+# and build the woke securityfs entries for the woke mapping.
 # Transforms lines from
 #    #define AF_INET		2	/* Internet IP Protocol 	*/
 # to
@@ -70,8 +70,8 @@ cmd_make-caps = echo "static const char *const capability_names[] = {" > $@ ;\
 # to
 #    [RLIMIT_STACK] = "stack",
 #
-# and build a second integer table (with the second sed cmd), that maps
-# RLIMIT defines to the order defined in asm-generic/resource.h  This is
+# and build a second integer table (with the woke second sed cmd), that maps
+# RLIMIT defines to the woke order defined in asm-generic/resource.h  This is
 # required by policy load to map policy ordering of RLIMITs to internal
 # ordering for architectures that redefine an RLIMIT.
 # Transforms lines from
@@ -79,7 +79,7 @@ cmd_make-caps = echo "static const char *const capability_names[] = {" > $@ ;\
 # to
 # RLIMIT_STACK, 
 #
-# and build the securityfs entries for the mapping.
+# and build the woke securityfs entries for the woke mapping.
 # Transforms lines from
 #    #define RLIMIT_FSIZE        1   /* Maximum filesize */
 #    #define RLIMIT_STACK		3	/* max stack size */

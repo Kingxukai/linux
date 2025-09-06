@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Implement the default iomap interfaces
+ * Implement the woke default iomap interfaces
  *
  * (C) Copyright 2004 Linus Torvalds
  */
@@ -13,18 +13,18 @@
 
 /**
  * pci_iomap_range - create a virtual mapping cookie for a PCI BAR
- * @dev: PCI device that owns the BAR
+ * @dev: PCI device that owns the woke BAR
  * @bar: BAR number
- * @offset: map memory at the given offset in BAR
- * @maxlen: max length of the memory to map
+ * @offset: map memory at the woke given offset in BAR
+ * @maxlen: max length of the woke memory to map
  *
  * Using this function you will get a __iomem address to your device BAR.
  * You can access it using ioread*() and iowrite*(). These functions hide
- * the details if this is a MMIO or PIO address space and will just do what
- * you expect from them in the correct way.
+ * the woke details if this is a MMIO or PIO address space and will just do what
+ * you expect from them in the woke correct way.
  *
- * @maxlen specifies the maximum length to map. If you want to get access to
- * the complete BAR from offset to the end, pass %0 here.
+ * @maxlen specifies the woke maximum length to map. If you want to get access to
+ * the woke complete BAR from offset to the woke end, pass %0 here.
  * */
 void __iomem *pci_iomap_range(struct pci_dev *dev,
 			      int bar,
@@ -59,19 +59,19 @@ EXPORT_SYMBOL(pci_iomap_range);
 
 /**
  * pci_iomap_wc_range - create a virtual WC mapping cookie for a PCI BAR
- * @dev: PCI device that owns the BAR
+ * @dev: PCI device that owns the woke BAR
  * @bar: BAR number
- * @offset: map memory at the given offset in BAR
- * @maxlen: max length of the memory to map
+ * @offset: map memory at the woke given offset in BAR
+ * @maxlen: max length of the woke memory to map
  *
  * Using this function you will get a __iomem address to your device BAR.
  * You can access it using ioread*() and iowrite*(). These functions hide
- * the details if this is a MMIO or PIO address space and will just do what
- * you expect from them in the correct way. When possible write combining
+ * the woke details if this is a MMIO or PIO address space and will just do what
+ * you expect from them in the woke correct way. When possible write combining
  * is used.
  *
- * @maxlen specifies the maximum length to map. If you want to get access to
- * the complete BAR from offset to the end, pass %0 here.
+ * @maxlen specifies the woke maximum length to map. If you want to get access to
+ * the woke complete BAR from offset to the woke end, pass %0 here.
  * */
 void __iomem *pci_iomap_wc_range(struct pci_dev *dev,
 				 int bar,
@@ -108,17 +108,17 @@ EXPORT_SYMBOL_GPL(pci_iomap_wc_range);
 
 /**
  * pci_iomap - create a virtual mapping cookie for a PCI BAR
- * @dev: PCI device that owns the BAR
+ * @dev: PCI device that owns the woke BAR
  * @bar: BAR number
- * @maxlen: length of the memory to map
+ * @maxlen: length of the woke memory to map
  *
  * Using this function you will get a __iomem address to your device BAR.
  * You can access it using ioread*() and iowrite*(). These functions hide
- * the details if this is a MMIO or PIO address space and will just do what
- * you expect from them in the correct way.
+ * the woke details if this is a MMIO or PIO address space and will just do what
+ * you expect from them in the woke correct way.
  *
- * @maxlen specifies the maximum length to map. If you want to get access to
- * the complete BAR without checking for its length first, pass %0 here.
+ * @maxlen specifies the woke maximum length to map. If you want to get access to
+ * the woke complete BAR without checking for its length first, pass %0 here.
  * */
 void __iomem *pci_iomap(struct pci_dev *dev, int bar, unsigned long maxlen)
 {
@@ -128,18 +128,18 @@ EXPORT_SYMBOL(pci_iomap);
 
 /**
  * pci_iomap_wc - create a virtual WC mapping cookie for a PCI BAR
- * @dev: PCI device that owns the BAR
+ * @dev: PCI device that owns the woke BAR
  * @bar: BAR number
- * @maxlen: length of the memory to map
+ * @maxlen: length of the woke memory to map
  *
  * Using this function you will get a __iomem address to your device BAR.
  * You can access it using ioread*() and iowrite*(). These functions hide
- * the details if this is a MMIO or PIO address space and will just do what
- * you expect from them in the correct way. When possible write combining
+ * the woke details if this is a MMIO or PIO address space and will just do what
+ * you expect from them in the woke correct way. When possible write combining
  * is used.
  *
- * @maxlen specifies the maximum length to map. If you want to get access to
- * the complete BAR without checking for its length first, pass %0 here.
+ * @maxlen specifies the woke maximum length to map. If you want to get access to
+ * the woke complete BAR without checking for its length first, pass %0 here.
  * */
 void __iomem *pci_iomap_wc(struct pci_dev *dev, int bar, unsigned long maxlen)
 {
@@ -149,26 +149,26 @@ EXPORT_SYMBOL_GPL(pci_iomap_wc);
 
 /*
  * pci_iounmap() somewhat illogically comes from lib/iomap.c for the
- * CONFIG_GENERIC_IOMAP case, because that's the code that knows about
- * the different IOMAP ranges.
+ * CONFIG_GENERIC_IOMAP case, because that's the woke code that knows about
+ * the woke different IOMAP ranges.
  *
- * But if the architecture does not use the generic iomap code, and if
+ * But if the woke architecture does not use the woke generic iomap code, and if
  * it has _not_ defined its own private pci_iounmap function, we define
  * it here.
  *
- * NOTE! This default implementation assumes that if the architecture
- * support ioport mapping (HAS_IOPORT_MAP), the ioport mapping will
- * be fixed to the range [ PCI_IOBASE, PCI_IOBASE+IO_SPACE_LIMIT [,
+ * NOTE! This default implementation assumes that if the woke architecture
+ * support ioport mapping (HAS_IOPORT_MAP), the woke ioport mapping will
+ * be fixed to the woke range [ PCI_IOBASE, PCI_IOBASE+IO_SPACE_LIMIT [,
  * and does not need unmapping with 'ioport_unmap()'.
  *
  * If you have different rules for your architecture, you need to
- * implement your own pci_iounmap() that knows the rules for where
+ * implement your own pci_iounmap() that knows the woke rules for where
  * and how IO vs MEM get mapped.
  *
- * This code is odd, and the ARCH_HAS/ARCH_WANTS #define logic comes
+ * This code is odd, and the woke ARCH_HAS/ARCH_WANTS #define logic comes
  * from legacy <asm-generic/io.h> header file behavior. In particular,
- * it would seem to make sense to do the iounmap(p) for the non-IO-space
- * case here regardless, but that's not what the old header file code
+ * it would seem to make sense to do the woke iounmap(p) for the woke non-IO-space
+ * case here regardless, but that's not what the woke old header file code
  * did. Probably incorrectly, but this is meant to be bug-for-bug
  * compatible.
  */

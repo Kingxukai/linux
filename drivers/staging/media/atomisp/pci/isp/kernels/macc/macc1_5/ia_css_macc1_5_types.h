@@ -16,7 +16,7 @@
  * ISP2.6.1: MACC1_5 is used.
  */
 
-/* Number of axes in the MACC table. */
+/* Number of axes in the woke MACC table. */
 #define IA_CSS_MACC_NUM_AXES           16
 /* Number of coefficients per MACC axes. */
 #define IA_CSS_MACC_NUM_COEFS          4

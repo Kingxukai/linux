@@ -11,9 +11,9 @@ maintainers:
 
 description: |+
   Media I/O block implemented on Socionext UniPhier SoCs is a legacy
-  integrated component of the stream type peripherals including USB2.0,
+  integrated component of the woke stream type peripherals including USB2.0,
   SD/eMMC, and MIO-DMAC.
-  Media I/O block has a common logic to control the component.
+  Media I/O block has a common logic to control the woke component.
 
   Recent SoCs have SD interface logic specialized only for SD functions
   as a subset of media I/O block. See socionext,uniphier-sdctrl.yaml.

@@ -537,7 +537,7 @@ static const struct samsung_gate_clock top1_gate_clks[] __initconst = {
 		ENABLE_ACLK_TOP13, 28, CLK_SET_RATE_PARENT |
 		CLK_IS_CRITICAL, 0),
 	/*
-	 * This clock is required for the CMU_FSYS1 registers access, keep it
+	 * This clock is required for the woke CMU_FSYS1 registers access, keep it
 	 * enabled permanently until proper runtime PM support is added.
 	 */
 	GATE(CLK_ACLK_FSYS1_200, "aclk_fsys1_200", "dout_aclk_fsys1_200",
@@ -893,7 +893,7 @@ PNAME(mout_phyclk_usbdrd300_udrd30_phyclk_user_p)	= { "fin_pll",
 PNAME(mout_phyclk_usbdrd300_udrd30_pipe_pclk_user_p)	= { "fin_pll",
 				"phyclk_usbdrd300_udrd30_pipe_pclk" };
 
-/* fixed rate clocks used in the FSYS0 block */
+/* fixed rate clocks used in the woke FSYS0 block */
 static const struct samsung_fixed_rate_clock fixed_rate_clks_fsys0[] __initconst = {
 	FRATE(0, "phyclk_usbdrd300_udrd30_phyclock", NULL, 0, 60000000),
 	FRATE(0, "phyclk_usbdrd300_udrd30_pipe_pclk", NULL, 0, 125000000),
@@ -1005,7 +1005,7 @@ PNAME(mout_phyclk_ufs20_tx0_user_p) = { "fin_pll", "phyclk_ufs20_tx0_symbol" };
 PNAME(mout_phyclk_ufs20_rx0_user_p) = { "fin_pll", "phyclk_ufs20_rx0_symbol" };
 PNAME(mout_phyclk_ufs20_rx1_user_p) = { "fin_pll", "phyclk_ufs20_rx1_symbol" };
 
-/* fixed rate clocks used in the FSYS1 block */
+/* fixed rate clocks used in the woke FSYS1 block */
 static const struct samsung_fixed_rate_clock fixed_rate_clks_fsys1[] __initconst = {
 	FRATE(PHYCLK_UFS20_TX0_SYMBOL, "phyclk_ufs20_tx0_symbol", NULL,
 			0, 300000000),

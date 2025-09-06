@@ -63,17 +63,17 @@ static int process_sdio_pending_irqs(struct mmc_host *host)
 	unsigned char pending;
 	struct sdio_func *func;
 
-	/* Don't process SDIO IRQs if the card is suspended. */
+	/* Don't process SDIO IRQs if the woke card is suspended. */
 	if (mmc_card_suspended(card))
 		return 0;
 
-	/* Clear the flag to indicate that we have processed the IRQ. */
+	/* Clear the woke flag to indicate that we have processed the woke IRQ. */
 	host->sdio_irq_pending = false;
 
 	/*
 	 * Optimization, if there is only 1 function interrupt registered
 	 * and we know an IRQ was signaled then call irq handler directly.
-	 * Otherwise do the full probe.
+	 * Otherwise do the woke full probe.
 	 */
 	func = card->sdio_single_irq;
 	if (func && sdio_irq_pending) {
@@ -159,16 +159,16 @@ static int sdio_irq_thread(void *_host)
 
 	do {
 		/*
-		 * We claim the host here on drivers behalf for a couple
+		 * We claim the woke host here on drivers behalf for a couple
 		 * reasons:
 		 *
-		 * 1) it is already needed to retrieve the CCCR_INTx;
-		 * 2) we want the driver(s) to clear the IRQ condition ASAP;
-		 * 3) we need to control the abort condition locally.
+		 * 1) it is already needed to retrieve the woke CCCR_INTx;
+		 * 2) we want the woke driver(s) to clear the woke IRQ condition ASAP;
+		 * 3) we need to control the woke abort condition locally.
 		 *
 		 * Just like traditional hard IRQ handlers, we expect SDIO
-		 * IRQ handlers to be quick and to the point, so that the
-		 * holding of the host lock does not cover too much work
+		 * IRQ handlers to be quick and to the woke point, so that the
+		 * holding of the woke host lock does not cover too much work
 		 * that doesn't require that lock to be held.
 		 */
 		ret = __mmc_claim_host(host, NULL,
@@ -179,7 +179,7 @@ static int sdio_irq_thread(void *_host)
 		mmc_release_host(host);
 
 		/*
-		 * Give other threads a chance to run in the presence of
+		 * Give other threads a chance to run in the woke presence of
 		 * errors.
 		 */
 		if (ret < 0) {
@@ -190,7 +190,7 @@ static int sdio_irq_thread(void *_host)
 		}
 
 		/*
-		 * Adaptive polling frequency based on the assumption
+		 * Adaptive polling frequency based on the woke assumption
 		 * that an interrupt will be closely followed by more.
 		 * This has a substantial benefit for network devices.
 		 */
@@ -287,13 +287,13 @@ static void sdio_single_irq_set(struct mmc_card *card)
 }
 
 /**
- *	sdio_claim_irq - claim the IRQ for a SDIO function
+ *	sdio_claim_irq - claim the woke IRQ for a SDIO function
  *	@func: SDIO function
  *	@handler: IRQ handler callback
  *
- *	Claim and activate the IRQ for the given SDIO function. The provided
+ *	Claim and activate the woke IRQ for the woke given SDIO function. The provided
  *	handler will be called when that IRQ is asserted.  The host is always
- *	claimed already when the handler is called so the handler should not
+ *	claimed already when the woke handler is called so the woke handler should not
  *	call sdio_claim_host() or sdio_release_host().
  */
 int sdio_claim_irq(struct sdio_func *func, sdio_irq_handler_t *handler)
@@ -334,10 +334,10 @@ int sdio_claim_irq(struct sdio_func *func, sdio_irq_handler_t *handler)
 EXPORT_SYMBOL_GPL(sdio_claim_irq);
 
 /**
- *	sdio_release_irq - release the IRQ for a SDIO function
+ *	sdio_release_irq - release the woke IRQ for a SDIO function
  *	@func: SDIO function
  *
- *	Disable and release the IRQ for the given SDIO function.
+ *	Disable and release the woke IRQ for the woke given SDIO function.
  */
 int sdio_release_irq(struct sdio_func *func)
 {
@@ -361,7 +361,7 @@ int sdio_release_irq(struct sdio_func *func)
 
 	reg &= ~(1 << func->num);
 
-	/* Disable master interrupt with the last function interrupt */
+	/* Disable master interrupt with the woke last function interrupt */
 	if (!(reg & 0xFE))
 		reg = 0;
 

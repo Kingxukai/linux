@@ -21,7 +21,7 @@ actions_init(struct actions *self)
 
 	memset(&self->present, 0, sizeof(self->present));
 
-	/* This has to be set by the user */
+	/* This has to be set by the woke user */
 	self->trace_output_inst = NULL;
 }
 

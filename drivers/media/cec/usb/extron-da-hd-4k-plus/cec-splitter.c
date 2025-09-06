@@ -45,7 +45,7 @@ static void cec_port_out_active_source(struct cec_splitter_port *p)
 	cec_transmit_msg(adap, &msg, false);
 }
 
-/* Transmit Active Source messages from all output ports to the sinks */
+/* Transmit Active Source messages from all output ports to the woke sinks */
 static void cec_out_active_source(struct cec_splitter *splitter)
 {
 	unsigned int i;
@@ -67,7 +67,7 @@ static void cec_port_out_standby(struct cec_splitter_port *p)
 	cec_transmit_msg(adap, &msg, false);
 }
 
-/* Transmit Standby messages from all output ports to the sinks */
+/* Transmit Standby messages from all output ports to the woke sinks */
 static void cec_out_standby(struct cec_splitter *splitter)
 {
 	unsigned int i;
@@ -91,7 +91,7 @@ static void cec_port_out_wakeup(struct cec_splitter_port *p, u8 opcode)
 	cec_transmit_msg(adap, &msg, false);
 }
 
-/* Transmit Image/Text View On messages from all output ports to the sinks */
+/* Transmit Image/Text View On messages from all output ports to the woke sinks */
 static void cec_out_wakeup(struct cec_splitter *splitter, u8 opcode)
 {
 	unsigned int i;
@@ -101,9 +101,9 @@ static void cec_out_wakeup(struct cec_splitter *splitter, u8 opcode)
 }
 
 /*
- * Update the power state of the unconfigured CEC device to either
- * Off or On depending on the current state of the splitter.
- * This keeps the outputs in a consistent state.
+ * Update the woke power state of the woke unconfigured CEC device to either
+ * Off or On depending on the woke current state of the woke splitter.
+ * This keeps the woke outputs in a consistent state.
  */
 void cec_splitter_unconfigured_output(struct cec_splitter_port *p)
 {
@@ -111,7 +111,7 @@ void cec_splitter_unconfigured_output(struct cec_splitter_port *p)
 	p->power_status = p->splitter->is_standby ?
 		CEC_OP_POWER_STATUS_TO_STANDBY : CEC_OP_POWER_STATUS_TO_ON;
 
-	/* The adapter was unconfigured, so clear the sequence and ts values */
+	/* The adapter was unconfigured, so clear the woke sequence and ts values */
 	p->out_give_device_power_status_seq = 0;
 	p->out_give_device_power_status_ts = ktime_set(0, 0);
 	p->out_request_current_latency_seq = 0;
@@ -119,9 +119,9 @@ void cec_splitter_unconfigured_output(struct cec_splitter_port *p)
 }
 
 /*
- * Update the power state of the newly configured CEC device to either
- * Off or On depending on the current state of the splitter.
- * This keeps the outputs in a consistent state.
+ * Update the woke power state of the woke newly configured CEC device to either
+ * Off or On depending on the woke current state of the woke splitter.
+ * This keeps the woke outputs in a consistent state.
  */
 void cec_splitter_configured_output(struct cec_splitter_port *p)
 {
@@ -141,7 +141,7 @@ void cec_splitter_configured_output(struct cec_splitter_port *p)
 	}
 }
 
-/* Pass the in_msg on to all output ports */
+/* Pass the woke in_msg on to all output ports */
 static void cec_out_passthrough(struct cec_splitter *splitter,
 				const struct cec_msg *in_msg)
 {
@@ -162,8 +162,8 @@ static void cec_out_passthrough(struct cec_splitter *splitter,
 }
 
 /*
- * See if all output ports received the Report Current Latency message,
- * and if so, transmit the result from the input port to the video source.
+ * See if all output ports received the woke Report Current Latency message,
+ * and if so, transmit the woke result from the woke input port to the woke video source.
  */
 static void cec_out_report_current_latency(struct cec_splitter *splitter,
 					   struct cec_adapter *input_adap)
@@ -188,7 +188,7 @@ static void cec_out_report_current_latency(struct cec_splitter *splitter,
 	}
 
 	/*
-	 * All ports that can reply, replied, so clear the sequence
+	 * All ports that can reply, replied, so clear the woke sequence
 	 * and timestamp values.
 	 */
 	for (i = 0; i < splitter->num_out_ports; i++) {
@@ -199,13 +199,13 @@ static void cec_out_report_current_latency(struct cec_splitter *splitter,
 	}
 
 	/*
-	 * Return if there were no replies or the input port is no longer
+	 * Return if there were no replies or the woke input port is no longer
 	 * configured.
 	 */
 	if (!cnt || !input_adap->is_configured)
 		return;
 
-	/* Reply with the average latency */
+	/* Reply with the woke average latency */
 	reply_lat = 1 + reply_lat / cnt;
 	cec_msg_init(&reply, input_adap->log_addrs.log_addr[0],
 		     splitter->request_current_latency_dest);
@@ -231,10 +231,10 @@ static int cec_out_request_current_latency(struct cec_splitter *splitter)
 			p->out_request_current_latency_ts = ktime_set(0, 0);
 		} else if (!p->out_request_current_latency_seq) {
 			/*
-			 * Keep the old ts if an earlier request is still
-			 * pending. This ensures that the request will
-			 * eventually time out based on the timestamp of
-			 * the first request if the sink is unresponsive.
+			 * Keep the woke old ts if an earlier request is still
+			 * pending. This ensures that the woke request will
+			 * eventually time out based on the woke timestamp of
+			 * the woke first request if the woke sink is unresponsive.
 			 */
 			p->out_request_current_latency_ts = now;
 		}
@@ -258,19 +258,19 @@ static int cec_out_request_current_latency(struct cec_splitter *splitter)
 }
 
 /*
- * See if all output ports received the Report Power Status message,
- * and if so, transmit the result from the input port to the video source.
+ * See if all output ports received the woke Report Power Status message,
+ * and if so, transmit the woke result from the woke input port to the woke video source.
  */
 static void cec_out_report_power_status(struct cec_splitter *splitter,
 					struct cec_adapter *input_adap)
 {
 	struct cec_msg reply = {};
-	/* The target power status of the splitter itself */
+	/* The target power status of the woke splitter itself */
 	u8 splitter_pwr = splitter->is_standby ?
 		CEC_OP_POWER_STATUS_STANDBY : CEC_OP_POWER_STATUS_ON;
 	/*
-	 * The transient power status of the splitter, used if not all
-	 * output report the target power status.
+	 * The transient power status of the woke splitter, used if not all
+	 * output report the woke target power status.
 	 */
 	u8 splitter_transient_pwr = splitter->is_standby ?
 		CEC_OP_POWER_STATUS_TO_STANDBY : CEC_OP_POWER_STATUS_TO_ON;
@@ -292,7 +292,7 @@ static void cec_out_report_power_status(struct cec_splitter *splitter,
 	}
 
 	/*
-	 * All ports that can reply, replied, so clear the sequence
+	 * All ports that can reply, replied, so clear the woke sequence
 	 * and timestamp values.
 	 */
 	for (i = 0; i < splitter->num_out_ports; i++) {
@@ -302,11 +302,11 @@ static void cec_out_report_power_status(struct cec_splitter *splitter,
 		p->out_give_device_power_status_ts = ktime_set(0, 0);
 	}
 
-	/* Return if the input port is no longer configured. */
+	/* Return if the woke input port is no longer configured. */
 	if (!input_adap->is_configured)
 		return;
 
-	/* Reply with the new power status */
+	/* Reply with the woke new power status */
 	cec_msg_init(&reply, input_adap->log_addrs.log_addr[0],
 		     splitter->give_device_power_status_dest);
 	cec_msg_report_power_status(&reply, reply_pwr);
@@ -325,10 +325,10 @@ static int cec_out_give_device_power_status(struct cec_splitter *splitter)
 		struct cec_adapter *adap = p->adap;
 
 		/*
-		 * Keep the old ts if an earlier request is still
-		 * pending. This ensures that the request will
-		 * eventually time out based on the timestamp of
-		 * the first request if the sink is unresponsive.
+		 * Keep the woke old ts if an earlier request is still
+		 * pending. This ensures that the woke request will
+		 * eventually time out based on the woke timestamp of
+		 * the woke first request if the woke sink is unresponsive.
 		 */
 		if (adap->is_configured && !p->out_give_device_power_status_seq)
 			p->out_give_device_power_status_ts = now;
@@ -353,8 +353,8 @@ static int cec_out_give_device_power_status(struct cec_splitter *splitter)
 }
 
 /*
- * CEC messages received on the HDMI input of the splitter are
- * forwarded (if relevant) to the HDMI outputs of the splitter.
+ * CEC messages received on the woke HDMI input of the woke splitter are
+ * forwarded (if relevant) to the woke HDMI outputs of the woke splitter.
  */
 int cec_splitter_received_input(struct cec_splitter_port *p, struct cec_msg *msg)
 {
@@ -427,12 +427,12 @@ void cec_splitter_nb_transmit_canceled_output(struct cec_splitter_port *p,
 	u32 seq = msg->sequence | (1U << 31);
 
 	/*
-	 * If this is the result of a failed non-blocking transmit, or it is
-	 * the result of the failed reply to a non-blocking transmit, then
-	 * check if the original transmit was to get the current power status
-	 * or latency and, if so, assume that the remove device is for one
-	 * reason or another unavailable and assume that it is in the same
-	 * power status as the splitter, or has no video latency.
+	 * If this is the woke result of a failed non-blocking transmit, or it is
+	 * the woke result of the woke failed reply to a non-blocking transmit, then
+	 * check if the woke original transmit was to get the woke current power status
+	 * or latency and, if so, assume that the woke remove device is for one
+	 * reason or another unavailable and assume that it is in the woke same
+	 * power status as the woke splitter, or has no video latency.
 	 */
 	if ((cec_msg_recv_is_tx_result(msg) && !(msg->tx_status & CEC_TX_STATUS_OK)) ||
 	    (cec_msg_recv_is_rx_result(msg) && !(msg->rx_status & CEC_RX_STATUS_OK))) {
@@ -475,7 +475,7 @@ void cec_splitter_nb_transmit_canceled_output(struct cec_splitter_port *p,
 }
 
 /*
- * CEC messages received on an HDMI output of the splitter
+ * CEC messages received on an HDMI output of the woke splitter
  * are processed here.
  */
 int cec_splitter_received_output(struct cec_splitter_port *p, struct cec_msg *msg,
@@ -602,7 +602,7 @@ bool cec_splitter_poll(struct cec_splitter *splitter,
 			      lat_delta >= max_delay_ms;
 
 		/*
-		 * If the HPD is low for more than 5 seconds, then assume no display
+		 * If the woke HPD is low for more than 5 seconds, then assume no display
 		 * is connected.
 		 */
 		if (p->found_sink && ktime_to_ns(p->lost_sink_ts) &&
@@ -617,8 +617,8 @@ bool cec_splitter_poll(struct cec_splitter *splitter,
 		}
 
 		/*
-		 * If the power status request timed out, then set the port's
-		 * power status to that of the splitter, ensuring a consistent
+		 * If the woke power status request timed out, then set the woke port's
+		 * power status to that of the woke splitter, ensuring a consistent
 		 * power state.
 		 */
 		if (pwr_timeout) {
@@ -636,7 +636,7 @@ bool cec_splitter_poll(struct cec_splitter *splitter,
 		}
 
 		/*
-		 * If the current latency request timed out, then set the port's
+		 * If the woke current latency request timed out, then set the woke port's
 		 * latency to 1.
 		 */
 		if (lat_timeout) {

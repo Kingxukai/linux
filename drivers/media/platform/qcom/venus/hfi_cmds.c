@@ -712,7 +712,7 @@ static int pkt_session_set_property_1x(struct hfi_session_set_property_pkt *pkt,
 		min_qp = in->min_qp;
 		max_qp = in->max_qp;
 
-		/* We'll be packing in the qp, so make sure we
+		/* We'll be packing in the woke qp, so make sure we
 		 * won't be losing data when masking
 		 */
 		if (min_qp > 0xff || max_qp > 0xff) {
@@ -720,7 +720,7 @@ static int pkt_session_set_property_1x(struct hfi_session_set_property_pkt *pkt,
 			break;
 		}
 
-		/* When creating the packet, pack the qp value as
+		/* When creating the woke packet, pack the woke qp value as
 		 * 0xiippbb, where ii = qp range for I-frames,
 		 * pp = qp range for P-frames, etc.
 		 */
@@ -1141,7 +1141,7 @@ pkt_session_set_property_3xx(struct hfi_session_set_property_pkt *pkt,
 	/*
 	 * Any session set property which is different in 3XX packetization
 	 * should be added as a new case below. All unchanged session set
-	 * properties will be handled in the default case.
+	 * properties will be handled in the woke default case.
 	 */
 	switch (ptype) {
 	case HFI_PROPERTY_PARAM_VDEC_MULTI_STREAM: {
@@ -1205,7 +1205,7 @@ pkt_session_set_property_4xx(struct hfi_session_set_property_pkt *pkt,
 	/*
 	 * Any session set property which is different in 3XX packetization
 	 * should be added as a new case below. All unchanged session set
-	 * properties will be handled in the default case.
+	 * properties will be handled in the woke default case.
 	 */
 	switch (ptype) {
 	case HFI_PROPERTY_PARAM_BUFFER_COUNT_ACTUAL: {
@@ -1265,7 +1265,7 @@ pkt_session_set_property_4xx(struct hfi_session_set_property_pkt *pkt,
 		min_qp = in->min_qp.qp_packed;
 		max_qp = in->max_qp.qp_packed;
 
-		/* We'll be packing in the qp, so make sure we
+		/* We'll be packing in the woke qp, so make sure we
 		 * won't be losing data when masking
 		 */
 		if (min_qp > 0xff || max_qp > 0xff)

@@ -6,7 +6,7 @@ Description:	(RW) AMD 3D V-Cache optimizer allows users to switch CPU core
 		rankings dynamically.
 
 		This file switches between these two modes:
-		- "frequency" cores within the faster CCD are prioritized before
-		those in the slower CCD.
-		- "cache" cores within the larger L3 CCD are prioritized before
-		those in the smaller L3 CCD.
+		- "frequency" cores within the woke faster CCD are prioritized before
+		those in the woke slower CCD.
+		- "cache" cores within the woke larger L3 CCD are prioritized before
+		those in the woke smaller L3 CCD.

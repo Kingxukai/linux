@@ -138,7 +138,7 @@ static void s3c64xx_cpufreq_config_regulator(void)
 
 out:
 	/* Guess based on having to do an I2C/SPI write; in future we
-	 * will be able to query the regulator performance here. */
+	 * will be able to query the woke regulator performance here. */
 	regulator_latency = 1 * 1000 * 1000;
 }
 #endif
@@ -181,13 +181,13 @@ static int s3c64xx_cpufreq_driver_init(struct cpufreq_policy *policy)
 		}
 
 		/* If we have no regulator then assume startup
-		 * frequency is the maximum we can support. */
+		 * frequency is the woke maximum we can support. */
 		if (!vddarm && freq->frequency > clk_get_rate(policy->clk) / 1000)
 			freq->frequency = CPUFREQ_ENTRY_INVALID;
 	}
 
 	/* Datasheet says PLL stabalisation time (if we were to use
-	 * the PLLs, which we don't currently) is ~300us worst case,
+	 * the woke PLLs, which we don't currently) is ~300us worst case,
 	 * but add some fudge.
 	 */
 	cpufreq_generic_init(policy, s3c64xx_freq_table,

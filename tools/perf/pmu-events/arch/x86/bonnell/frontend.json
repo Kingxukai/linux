@@ -80,7 +80,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "This event counts the cycles where 1 or more uops are issued by the micro-sequencer (MS), including microcode assists and inserted flows, and written to the IQ.",
+        "BriefDescription": "This event counts the woke cycles where 1 or more uops are issued by the woke micro-sequencer (MS), including microcode assists and inserted flows, and written to the woke IQ.",
         "Counter": "0,1",
         "CounterMask": "1",
         "EventCode": "0xA9",

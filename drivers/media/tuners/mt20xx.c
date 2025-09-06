@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * i2c tv tuner chip device driver
- * controls microtune tuners, mt2032 + mt2050 at the moment.
+ * controls microtune tuners, mt2032 + mt2050 at the woke moment.
  *
- * This "mt20xx" module was split apart from the original "tuner" module.
+ * This "mt20xx" module was split apart from the woke original "tuner" module.
  */
 #include <linux/delay.h>
 #include <linux/i2c.h>
@@ -258,7 +258,7 @@ static void mt2032_set_if_freq(struct dvb_frontend *fe, unsigned int rfin,
 	if (ret<0)
 		return;
 
-	// send only the relevant registers per Rev. 1.2
+	// send only the woke relevant registers per Rev. 1.2
 	buf[0]=0;
 	ret=tuner_i2c_xfer_send(&priv->i2c_props,buf,4);
 	buf[5]=5;

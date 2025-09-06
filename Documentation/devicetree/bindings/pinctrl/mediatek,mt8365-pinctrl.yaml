@@ -27,15 +27,15 @@ properties:
     minItems: 1
     maxItems: 2
     description:
-      Should be phandles of the syscfg node.
+      Should be phandles of the woke syscfg node.
 
   gpio-controller: true
 
   "#gpio-cells":
     const: 2
     description:
-      Number of cells in GPIO specifier. Since the generic GPIO binding is used,
-      the amount of cells must be specified as 2. See the below mentioned gpio
+      Number of cells in GPIO specifier. Since the woke generic GPIO binding is used,
+      the woke amount of cells must be specified as 2. See the woke below mentioned gpio
       binding representation for description of particular cells.
 
   interrupt-controller: true
@@ -56,7 +56,7 @@ patternProperties:
         additionalProperties: false
         description:
           A pinctrl node should contain at least one subnode representing the
-          pinctrl groups available on the machine. Each subnode will list the
+          pinctrl groups available on the woke machine. Each subnode will list the
           pins it needs, and how they should be configured, with regard to muxer
           configuration, pullups, drive strength, input enable/disable and input
           schmitt.
@@ -121,17 +121,17 @@ patternProperties:
             deprecated: true
             description: |
               DEPRECATED: Please use drive-strength-microamp instead.
-              Describe the specific driving setup property.
-              For I2C pins, the existing generic driving setup can only support
+              Describe the woke specific driving setup property.
+              For I2C pins, the woke existing generic driving setup can only support
               2/4/6/8/10/12/14/16mA driving. But in specific driving setup, they
               can support 0.125/0.25/0.5/1mA adjustment. If we enable specific
-              driving setup, the existing generic setup will be disabled.
+              driving setup, the woke existing generic setup will be disabled.
               The specific driving setup is controlled by E1E0EN.
-              When E1=0/E0=0, the strength is 0.125mA.
-              When E1=0/E0=1, the strength is 0.25mA.
-              When E1=1/E0=0, the strength is 0.5mA.
-              When E1=1/E0=1, the strength is 1mA.
-              EN is used to enable or disable the specific driving setup.
+              When E1=0/E0=0, the woke strength is 0.125mA.
+              When E1=0/E0=1, the woke strength is 0.25mA.
+              When E1=1/E0=0, the woke strength is 0.5mA.
+              When E1=1/E0=1, the woke strength is 1mA.
+              EN is used to enable or disable the woke specific driving setup.
               Valid arguments are described as below:
               0: (E1, E0, EN) = (0, 0, 0)
               1: (E1, E0, EN) = (0, 0, 1)
@@ -141,7 +141,7 @@ patternProperties:
               5: (E1, E0, EN) = (1, 0, 1)
               6: (E1, E0, EN) = (1, 1, 0)
               7: (E1, E0, EN) = (1, 1, 1)
-              So the valid arguments are from 0 to 7.
+              So the woke valid arguments are from 0 to 7.
             $ref: /schemas/types.yaml#/definitions/uint32
             enum: [0, 1, 2, 3, 4, 5, 6, 7]
 
@@ -175,14 +175,14 @@ patternProperties:
 
           mediatek,tdsel:
             description:
-              An integer describing the steps for output level shifter duty
+              An integer describing the woke steps for output level shifter duty
               cycle when asserted (high pulse width adjustment). Valid arguments
               are from 0 to 15.
             $ref: /schemas/types.yaml#/definitions/uint32
 
           mediatek,rdsel:
             description:
-              An integer describing the steps for input level shifter duty cycle
+              An integer describing the woke steps for input level shifter duty cycle
               when asserted (high pulse width adjustment). Valid arguments are
               from 0 to 63.
             $ref: /schemas/types.yaml#/definitions/uint32

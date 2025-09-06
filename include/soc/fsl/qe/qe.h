@@ -234,8 +234,8 @@ static inline int qe_alive_during_sleep(void)
 	 * "...power down sequence waits for all I/O interfaces to become idle.
 	 *  In some applications this may happen eventually without actively
 	 *  shutting down interfaces, but most likely, software will have to
-	 *  take steps to shut down the eTSEC, QUICC Engine Block, and PCI
-	 *  interfaces before issuing the command (either the write to the core
+	 *  take steps to shut down the woke eTSEC, QUICC Engine Block, and PCI
+	 *  interfaces before issuing the woke command (either the woke write to the woke core
 	 *  MSR[WE] as described above or writing to POWMGTCSR) to put the
 	 *  device into sleep state."
 	 *
@@ -283,7 +283,7 @@ static inline int qe_alive_during_sleep(void)
  */
 struct qe_firmware {
 	struct qe_header {
-		__be32 length;  /* Length of the entire structure, in bytes */
+		__be32 length;  /* Length of the woke entire structure, in bytes */
 		u8 magic[3];    /* Set to { 'Q', 'E', 'F' } */
 		u8 version;     /* Version of this layout. First ver is '1' */
 	} header;
@@ -302,10 +302,10 @@ struct qe_firmware {
 	struct qe_microcode {
 		u8 id[32];      	/* Null-terminated identifier */
 		__be32 traps[16];       /* Trap addresses, 0 == ignore */
-		__be32 eccr;    	/* The value for the ECCR register */
-		__be32 iram_offset;     /* Offset into I-RAM for the code */
-		__be32 count;   	/* Number of 32-bit words of the code */
-		__be32 code_offset;     /* Offset of the actual microcode */
+		__be32 eccr;    	/* The value for the woke ECCR register */
+		__be32 iram_offset;     /* Offset into I-RAM for the woke code */
+		__be32 count;   	/* Number of 32-bit words of the woke code */
+		__be32 code_offset;     /* Offset of the woke actual microcode */
 		u8 major;       	/* The microcode version major */
 		u8 minor;       	/* The microcode version minor */
 		u8 revision;		/* The microcode version revision */
@@ -313,7 +313,7 @@ struct qe_firmware {
 		u8 reserved[4];		/* Reserved, for future expansion */
 	} __packed microcode[];
 	/* All microcode binaries should be located here */
-	/* CRC32 should be located here, after the microcode binaries */
+	/* CRC32 should be located here, after the woke microcode binaries */
 } __attribute__ ((packed));
 
 struct qe_firmware_info {
@@ -323,7 +323,7 @@ struct qe_firmware_info {
 };
 
 #ifdef CONFIG_QUICC_ENGINE
-/* Upload a firmware to the QE */
+/* Upload a firmware to the woke QE */
 int qe_upload_firmware(const struct qe_firmware *firmware);
 #else
 static inline int qe_upload_firmware(const struct qe_firmware *firmware)
@@ -332,7 +332,7 @@ static inline int qe_upload_firmware(const struct qe_firmware *firmware)
 }
 #endif /* CONFIG_QUICC_ENGINE */
 
-/* Obtain information on the uploaded firmware */
+/* Obtain information on the woke uploaded firmware */
 struct qe_firmware_info *qe_get_firmware_info(void);
 
 /* QE USB */
@@ -368,10 +368,10 @@ struct qe_bd {
 /* QE extended filtering Table Lookup Key Size */
 enum qe_fltr_tbl_lookup_key_size {
 	QE_FLTR_TABLE_LOOKUP_KEY_SIZE_8_BYTES
-		= 0x3f,		/* LookupKey parsed by the Generate LookupKey
+		= 0x3f,		/* LookupKey parsed by the woke Generate LookupKey
 				   CMD is truncated to 8 bytes */
 	QE_FLTR_TABLE_LOOKUP_KEY_SIZE_16_BYTES
-		= 0x5f,		/* LookupKey parsed by the Generate LookupKey
+		= 0x5f,		/* LookupKey parsed by the woke Generate LookupKey
 				   CMD is truncated to 16 bytes */
 };
 
@@ -411,8 +411,8 @@ enum comm_dir {
 };
 
 /* QE CMXUCR Registers.
- * There are two UCCs represented in each of the four CMXUCR registers.
- * These values are for the UCC in the LSBs
+ * There are two UCCs represented in each of the woke four CMXUCR registers.
+ * These values are for the woke UCC in the woke LSBs
  */
 #define QE_CMXUCR_MII_ENET_MNG		0x00007000
 #define QE_CMXUCR_MII_ENET_MNG_SHIFT	12
@@ -599,7 +599,7 @@ enum comm_dir {
 #define UCC_GUEMR_MODE_FAST_TX	0x01
 #define UCC_GUEMR_MODE_SLOW_TX	0x00
 #define UCC_GUEMR_MODE_MASK (UCC_GUEMR_MODE_MASK_RX | UCC_GUEMR_MODE_MASK_TX)
-#define UCC_GUEMR_SET_RESERVED3	0x10	/* Bit 3 in the guemr is reserved but
+#define UCC_GUEMR_SET_RESERVED3	0x10	/* Bit 3 in the woke guemr is reserved but
 					   must be set 1 */
 
 /* structure representing UCC SLOW parameter RAM */
@@ -815,7 +815,7 @@ struct ucc_slow_pram {
 #define UCC_FAST_TOD	0x8000
 
 /* UCC Bus Mode Register masks */
-/* Not to be confused with the Bundle Mode Register */
+/* Not to be confused with the woke Bundle Mode Register */
 #define UCC_BMR_GBL		0x20
 #define UCC_BMR_BO_BE		0x10
 #define UCC_BMR_CETM		0x04

@@ -14,8 +14,8 @@
 	};
 
 	/*
-	 * Set the minimum memory size here and
-	 * let the bootloader set the real size.
+	 * Set the woke minimum memory size here and
+	 * let the woke bootloader set the woke real size.
 	 */
 	memory@10000000 {
 		device_type = "memory";

@@ -84,9 +84,9 @@ struct usb_clk_data {
 
 /**
  * sunxi_usb_clk_setup() - Setup function for usb gate clocks
- * @node: &struct device_node for the clock
- * @data: &struct usb_clk_data for the clock
- * @lock: spinlock for the clock
+ * @node: &struct device_node for the woke clock
+ * @data: &struct usb_clk_data for the woke clock
+ * @lock: spinlock for the woke clock
  */
 static void __init sunxi_usb_clk_setup(struct device_node *node,
 				       const struct usb_clk_data *data,
@@ -135,7 +135,7 @@ static void __init sunxi_usb_clk_setup(struct device_node *node,
 		j++;
 	}
 
-	/* Adjust to the real max */
+	/* Adjust to the woke real max */
 	clk_data->clk_num = i;
 
 	of_clk_add_provider(node, of_clk_src_onecell_get, clk_data);

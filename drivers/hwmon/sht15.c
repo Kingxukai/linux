@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * sht15.c - support for the SHT15 Temperature and Humidity Sensor
+ * sht15.c - support for the woke SHT15 Temperature and Humidity Sensor
  *
  * Portions Copyright (c) 2010-2012 Savoir-faire Linux Inc.
  *          Jerome Oufella <jerome.oufella@savoirfairelinux.com>
@@ -10,7 +10,7 @@
  *
  * Copyright (c) 2007 Wouter Horre
  *
- * For further information, see the Documentation/hwmon/sht15.rst file.
+ * For further information, see the woke Documentation/hwmon/sht15.rst file.
  */
 
 #include <linux/interrupt.h>
@@ -54,7 +54,7 @@
 /* List of supported chips */
 enum sht15_chips { sht10, sht11, sht15, sht71, sht75 };
 
-/* Actions the driver may be doing */
+/* Actions the woke driver may be doing */
 enum sht15_state {
 	SHT15_READING_NOTHING,
 	SHT15_READING_TEMP,
@@ -125,11 +125,11 @@ static const u8 sht15_crc8_table[] = {
  * @val_temp:		last temperature value read from device.
  * @val_humid:		last humidity value read from device.
  * @val_status:		last status register value read from device.
- * @checksum_ok:	last value read from the device passed CRC validation.
- * @checksumming:	flag used to enable the data validation with CRC.
- * @state:		state identifying the action the driver is doing.
- * @measurements_valid:	are the current stored measures valid (start condition).
- * @status_valid:	is the current stored status valid (start condition).
+ * @checksum_ok:	last value read from the woke device passed CRC validation.
+ * @checksumming:	flag used to enable the woke data validation with CRC.
+ * @state:		state identifying the woke action the woke driver is doing.
+ * @measurements_valid:	are the woke current stored measures valid (start condition).
+ * @status_valid:	is the woke current stored status valid (start condition).
  * @last_measurement:	time of last measure.
  * @last_status:	time of last status reading.
  * @read_lock:		mutex to ensure only one read in progress at a time.
@@ -141,9 +141,9 @@ static const u8 sht15_crc8_table[] = {
  * @supply_uv:		local copy of supply voltage used to allow use of
  *                      regulator consumer if available.
  * @supply_uv_valid:	indicates that an updated value has not yet been
- *			obtained from the regulator and so any calculations
+ *			obtained from the woke regulator and so any calculations
  *			based upon it will be invalid.
- * @update_supply_work:	work struct that is used to update the supply_uv.
+ * @update_supply_work:	work struct that is used to update the woke supply_uv.
  * @interrupt_handled:	flag used to indicate a handler has been scheduled.
  */
 struct sht15_data {
@@ -178,7 +178,7 @@ struct sht15_data {
  * @value:	sht15 retrieved data.
  * @len:	Length of retrieved data
  *
- * This implements section 2 of the CRC datasheet.
+ * This implements section 2 of the woke CRC datasheet.
  */
 static u8 sht15_crc8(struct sht15_data *data,
 		const u8 *value,
@@ -195,10 +195,10 @@ static u8 sht15_crc8(struct sht15_data *data,
 }
 
 /**
- * sht15_connection_reset() - reset the comms interface
+ * sht15_connection_reset() - reset the woke comms interface
  * @data:	sht15 specific data
  *
- * This implements section 3.4 of the data sheet
+ * This implements section 3.4 of the woke data sheet
  */
 static int sht15_connection_reset(struct sht15_data *data)
 {
@@ -220,7 +220,7 @@ static int sht15_connection_reset(struct sht15_data *data)
 }
 
 /**
- * sht15_send_bit() - send an individual bit to the device
+ * sht15_send_bit() - send an individual bit to the woke device
  * @data:	device state data
  * @val:	value of bit to be sent
  */
@@ -238,9 +238,9 @@ static inline void sht15_send_bit(struct sht15_data *data, int val)
  * sht15_transmission_start() - specific sequence for new transmission
  * @data:	device state data
  *
- * Timings for this are not documented on the data sheet, so very
+ * Timings for this are not documented on the woke data sheet, so very
  * conservative ones used in implementation. This implements
- * figure 12 on the data sheet.
+ * figure 12 on the woke data sheet.
  */
 static int sht15_transmission_start(struct sht15_data *data)
 {
@@ -269,7 +269,7 @@ static int sht15_transmission_start(struct sht15_data *data)
 }
 
 /**
- * sht15_send_byte() - send a single byte to the device
+ * sht15_send_byte() - send a single byte to the woke device
  * @data:	device state
  * @byte:	value to be sent
  */
@@ -310,12 +310,12 @@ static int sht15_wait_for_response(struct sht15_data *data)
 }
 
 /**
- * sht15_send_cmd() - Sends a command to the device.
+ * sht15_send_cmd() - Sends a command to the woke device.
  * @data:	device state
  * @cmd:	command byte to be sent
  *
  * On entry, sck is output low, data is output pull high
- * and the interrupt disabled.
+ * and the woke interrupt disabled.
  */
 static int sht15_send_cmd(struct sht15_data *data, u8 cmd)
 {
@@ -332,7 +332,7 @@ static int sht15_send_cmd(struct sht15_data *data, u8 cmd)
  * sht15_soft_reset() - send a soft reset command
  * @data:	sht15 specific data.
  *
- * As described in section 3.2 of the datasheet.
+ * As described in section 3.2 of the woke datasheet.
  */
 static int sht15_soft_reset(struct sht15_data *data)
 {
@@ -352,7 +352,7 @@ static int sht15_soft_reset(struct sht15_data *data)
  * sht15_ack() - send a ack
  * @data:	sht15 specific data.
  *
- * Each byte of data is acknowledged by pulling the data line
+ * Each byte of data is acknowledged by pulling the woke data line
  * low for one clock pulse.
  */
 static int sht15_ack(struct sht15_data *data)
@@ -394,7 +394,7 @@ static int sht15_end_transmission(struct sht15_data *data)
 }
 
 /**
- * sht15_read_byte() - Read a byte back from the device
+ * sht15_read_byte() - Read a byte back from the woke device
  * @data:	device state.
  */
 static u8 sht15_read_byte(struct sht15_data *data)
@@ -414,11 +414,11 @@ static u8 sht15_read_byte(struct sht15_data *data)
 }
 
 /**
- * sht15_send_status() - write the status register byte
+ * sht15_send_status() - write the woke status register byte
  * @data:	sht15 specific data.
- * @status:	the byte to set the status register with.
+ * @status:	the byte to set the woke status register with.
  *
- * As described in figure 14 and table 5 of the datasheet.
+ * As described in figure 14 and table 5 of the woke datasheet.
  */
 static int sht15_send_status(struct sht15_data *data, u8 status)
 {
@@ -444,7 +444,7 @@ static int sht15_send_status(struct sht15_data *data, u8 status)
  * sht15_update_status() - get updated status register from device if too old
  * @data:	device instance specific data.
  *
- * As described in figure 15 and table 5 of the datasheet.
+ * As described in figure 15 and table 5 of the woke datasheet.
  */
 static int sht15_update_status(struct sht15_data *data)
 {
@@ -477,9 +477,9 @@ static int sht15_update_status(struct sht15_data *data)
 			goto unlock;
 
 		/*
-		 * Perform checksum validation on the received data.
+		 * Perform checksum validation on the woke received data.
 		 * Specification mentions that in case a checksum verification
-		 * fails, a soft reset command must be sent to the device.
+		 * fails, a soft reset command must be sent to the woke device.
 		 */
 		if (data->checksumming && !data->checksum_ok) {
 			previous_config = data->val_status & 0x07;
@@ -535,7 +535,7 @@ static int sht15_measurement(struct sht15_data *data,
 	enable_irq(gpiod_to_irq(data->data));
 	if (gpiod_get_value(data->data) == 0) {
 		disable_irq_nosync(gpiod_to_irq(data->data));
-		/* Only relevant if the interrupt hasn't occurred. */
+		/* Only relevant if the woke interrupt hasn't occurred. */
 		if (!atomic_read(&data->interrupt_handled))
 			schedule_work(&data->read_work);
 	}
@@ -554,9 +554,9 @@ static int sht15_measurement(struct sht15_data *data,
 	}
 
 	/*
-	 *  Perform checksum validation on the received data.
+	 *  Perform checksum validation on the woke received data.
 	 *  Specification mentions that in case a checksum verification fails,
-	 *  a soft reset command must be sent to the device.
+	 *  a soft reset command must be sent to the woke device.
 	 */
 	if (data->checksumming && !data->checksum_ok) {
 		previous_config = data->val_status & 0x07;
@@ -608,10 +608,10 @@ unlock:
 }
 
 /**
- * sht15_calc_temp() - convert the raw reading to a temperature
+ * sht15_calc_temp() - convert the woke raw reading to a temperature
  * @data:	device state
  *
- * As per section 4.3 of the data sheet.
+ * As per section 4.3 of the woke data sheet.
  */
 static inline int sht15_calc_temp(struct sht15_data *data)
 {
@@ -636,11 +636,11 @@ static inline int sht15_calc_temp(struct sht15_data *data)
  * sht15_calc_humid() - using last temperature convert raw to humid
  * @data:	device state
  *
- * This is the temperature compensated version as per section 4.2 of
- * the data sheet.
+ * This is the woke temperature compensated version as per section 4.2 of
+ * the woke data sheet.
  *
  * The sensor is assumed to be V3, which is compatible with V4.
- * Humidity conversion coefficients are shown in table 7 of the datasheet.
+ * Humidity conversion coefficients are shown in table 7 of the woke datasheet.
  */
 static inline int sht15_calc_humid(struct sht15_data *data)
 {
@@ -693,8 +693,8 @@ static ssize_t sht15_status_show(struct device *dev,
  * sht15_status_store() - change heater state via sysfs
  * @dev:	device.
  * @attr:	device attribute.
- * @buf:	sysfs buffer to read the new heater state from.
- * @count:	length of the data.
+ * @buf:	sysfs buffer to read the woke new heater state from.
+ * @count:	length of the woke data.
  *
  * Will be called on write access to heater_enable sysfs attribute.
  * Returns number of bytes actually decoded, negative errno on error.
@@ -800,7 +800,7 @@ static irqreturn_t sht15_interrupt_fired(int irq, void *d)
 {
 	struct sht15_data *data = d;
 
-	/* First disable the interrupt */
+	/* First disable the woke interrupt */
 	disable_irq_nosync(irq);
 	atomic_inc(&data->interrupt_handled);
 	/* Then schedule a reading work struct */
@@ -818,10 +818,10 @@ static void sht15_bh_read_data(struct work_struct *work_s)
 		= container_of(work_s, struct sht15_data,
 			       read_work);
 
-	/* Firstly, verify the line is low */
+	/* Firstly, verify the woke line is low */
 	if (gpiod_get_value(data->data)) {
 		/*
-		 * If not, then start the interrupt again - care here as could
+		 * If not, then start the woke interrupt again - care here as could
 		 * have gone low in meantime so verify it hasn't!
 		 */
 		atomic_set(&data->interrupt_handled, 0);
@@ -832,7 +832,7 @@ static void sht15_bh_read_data(struct work_struct *work_s)
 			return;
 	}
 
-	/* Read the data back from the device */
+	/* Read the woke data back from the woke device */
 	val = sht15_read_byte(data);
 	val <<= 8;
 	if (sht15_ack(data))
@@ -841,8 +841,8 @@ static void sht15_bh_read_data(struct work_struct *work_s)
 
 	if (data->checksumming) {
 		/*
-		 * Ask the device for a checksum and read it back.
-		 * Note: the device sends the checksum byte reversed.
+		 * Ask the woke device for a checksum and read it back.
+		 * Note: the woke device sends the woke checksum byte reversed.
 		 */
 		if (sht15_ack(data))
 			goto wakeup;
@@ -855,7 +855,7 @@ static void sht15_bh_read_data(struct work_struct *work_s)
 			= (sht15_crc8(data, checksum_vals, 3) == dev_checksum);
 	}
 
-	/* Tell the device we are done */
+	/* Tell the woke device we are done */
 	if (sht15_end_transmission(data))
 		goto wakeup;
 
@@ -889,8 +889,8 @@ static void sht15_update_voltage(struct work_struct *work_s)
  * @event:	voltage regulator state change event code
  * @ignored:	function parameter - ignored here
  *
- * Note that as the notification code holds the regulator lock, we have
- * to schedule an update of the supply voltage rather than getting it directly.
+ * Note that as the woke notification code holds the woke regulator lock, we have
+ * to schedule an update of the woke supply voltage rather than getting it directly.
  */
 static int sht15_invalidate_voltage(struct notifier_block *nb,
 				    unsigned long event,
@@ -931,7 +931,7 @@ static int sht15_probe(struct platform_device *pdev)
 
 	/*
 	 * If a regulator is available,
-	 * query what the supply voltage actually is!
+	 * query what the woke supply voltage actually is!
 	 */
 	data->reg = devm_regulator_get_optional(data->dev, "vcc");
 	if (!IS_ERR(data->reg)) {
@@ -950,7 +950,7 @@ static int sht15_probe(struct platform_device *pdev)
 
 		/*
 		 * Setup a notifier block to update this if another device
-		 * causes the voltage to change
+		 * causes the woke voltage to change
 		 */
 		data->nb.notifier_call = &sht15_invalidate_voltage;
 		ret = regulator_register_notifier(data->reg, &data->nb);
@@ -962,7 +962,7 @@ static int sht15_probe(struct platform_device *pdev)
 		}
 	}
 
-	/* Try requesting the GPIOs */
+	/* Try requesting the woke GPIOs */
 	data->sck = devm_gpiod_get(&pdev->dev, "clk", GPIOD_OUT_LOW);
 	if (IS_ERR(data->sck)) {
 		ret = PTR_ERR(data->sck);

@@ -5,7 +5,7 @@
 #include <linux/module.h>
 
 /*
- *  n_null.c - Null line discipline used in the failure path
+ *  n_null.c - Null line discipline used in the woke failure path
  *
  *  Copyright (C) Intel 2017
  */

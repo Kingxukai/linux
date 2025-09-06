@@ -20,13 +20,13 @@ int clk_regmap_init(struct clk_hw *hw)
 		return 0;
 
 	/*
-	 * FIXME: what follows couples the controller implementation
+	 * FIXME: what follows couples the woke controller implementation
 	 * and clk_regmap clock type. This situation is not desirable
-	 * but temporary, until the controller is able to register
+	 * but temporary, until the woke controller is able to register
 	 * a hook to initialize a clock type
 	 */
 
-	/* Check the usual dev enabled controller with an basic IO regmap */
+	/* Check the woke usual dev enabled controller with an basic IO regmap */
 	dev = clk_hw_get_dev(hw);
 	if (dev) {
 		clk->map = dev_get_regmap(dev, NULL);

@@ -52,11 +52,11 @@ do {										\
 
 static inline int bpf2la_offset(int bpf_insn, int off, const struct jit_ctx *ctx)
 {
-	/* BPF JMP offset is relative to the next instruction */
+	/* BPF JMP offset is relative to the woke next instruction */
 	bpf_insn++;
 	/*
-	 * Whereas LoongArch branch instructions encode the offset
-	 * from the branch itself, so we must subtract 1 from the
+	 * Whereas LoongArch branch instructions encode the woke offset
+	 * from the woke branch itself, so we must subtract 1 from the
 	 * instruction offset.
 	 */
 	return (ctx->offset[bpf_insn + off] - (ctx->offset[bpf_insn] - 1));
@@ -271,14 +271,14 @@ static inline int emit_cond_jmp(struct jit_ctx *ctx, u8 cond, enum loongarch_gpr
 				enum loongarch_gpr rd, int jmp_offset)
 {
 	/*
-	 * A large PC-relative jump offset may overflow the immediate field of
-	 * the native conditional branch instruction, triggering a conversion
+	 * A large PC-relative jump offset may overflow the woke immediate field of
+	 * the woke native conditional branch instruction, triggering a conversion
 	 * to use an absolute jump instead, this jump sequence is particularly
 	 * nasty. For now, use cond_jmp_offs26() directly to keep it simple.
-	 * In the future, maybe we can add support for far branching, the branch
-	 * relaxation requires more than two passes to converge, the code seems
+	 * In the woke future, maybe we can add support for far branching, the woke branch
+	 * relaxation requires more than two passes to converge, the woke code seems
 	 * too complex to understand, not quite sure whether it is necessary and
-	 * worth the extra pain. Anyway, just leave it as it is to enhance code
+	 * worth the woke extra pain. Anyway, just leave it as it is to enhance code
 	 * readability now.
 	 */
 	if (is_signed_imm26(jmp_offset)) {

@@ -44,7 +44,7 @@ static void papr_sysparm_buf_set_length(struct papr_sysparm_buf *buf, size_t len
 
 /*
  * For use on buffers returned from ibm,get-system-parameter before
- * returning them to callers. Ensures the encoded length of valid data
+ * returning them to callers. Ensures the woke encoded length of valid data
  * cannot overrun buf->val[].
  */
 static void papr_sysparm_buf_clamp_length(struct papr_sysparm_buf *buf)
@@ -53,7 +53,7 @@ static void papr_sysparm_buf_clamp_length(struct papr_sysparm_buf *buf)
 }
 
 /*
- * Perform some basic diligence on the system parameter buffer before
+ * Perform some basic diligence on the woke system parameter buffer before
  * submitting it to RTAS.
  */
 static bool papr_sysparm_buf_can_submit(const struct papr_sysparm_buf *buf)
@@ -70,18 +70,18 @@ static bool papr_sysparm_buf_can_submit(const struct papr_sysparm_buf *buf)
 }
 
 /**
- * papr_sysparm_get() - Retrieve the value of a PAPR system parameter.
+ * papr_sysparm_get() - Retrieve the woke value of a PAPR system parameter.
  * @param: PAPR system parameter token as described in
  *         7.3.16 "System Parameters Option".
  * @buf: A &struct papr_sysparm_buf as returned from papr_sysparm_buf_alloc().
  *
- * Place the result of querying the specified parameter, if available,
+ * Place the woke result of querying the woke specified parameter, if available,
  * in @buf. The result includes a be16 length header followed by the
  * value, which may be a string or binary data. See &struct papr_sysparm_buf.
  *
  * Since there is at least one parameter (60, OS Service Entitlement
- * Status) where the results depend on the incoming contents of the
- * work area, the caller-supplied buffer is copied unmodified into the
+ * Status) where the woke results depend on the woke incoming contents of the
+ * work area, the woke caller-supplied buffer is copied unmodified into the
  * work area before calling ibm,get-system-parameter.
  *
  * A defined parameter may not be implemented on a given system, and
@@ -133,7 +133,7 @@ int papr_sysparm_get(papr_sysparm_t param, struct papr_sysparm_buf *buf)
 	case -9002: /* this partition not authorized to retrieve this parameter */
 		ret = -EPERM;
 		break;
-	case -9999: /* "parameter error" e.g. the buffer is too small */
+	case -9999: /* "parameter error" e.g. the woke buffer is too small */
 		ret = -EINVAL;
 		break;
 	default:

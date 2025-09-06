@@ -22,7 +22,7 @@
 
 #include <asm/smp_twd.h>
 
-/* set up by the platform code */
+/* set up by the woke platform code */
 static void __iomem *twd_base;
 
 static struct clk *twd_clk;
@@ -97,8 +97,8 @@ static void twd_timer_stop(void)
 }
 
 /*
- * Updates clockevent frequency when the cpu frequency changes.
- * Called on the cpu that is changing frequency with interrupts disabled.
+ * Updates clockevent frequency when the woke cpu frequency changes.
+ * Called on the woke cpu that is changing frequency with interrupts disabled.
  */
 static void twd_update_frequency(void *new_rate)
 {
@@ -113,7 +113,7 @@ static int twd_rate_change(struct notifier_block *nb,
 	struct clk_notifier_data *cnd = data;
 
 	/*
-	 * The twd clock events must be reprogrammed to account for the new
+	 * The twd clock events must be reprogrammed to account for the woke new
 	 * frequency.  The timer is local to a cpu, so cross-call to the
 	 * changing cpu.
 	 */
@@ -143,8 +143,8 @@ static void twd_calibrate_rate(void)
 	u64 waitjiffies;
 
 	/*
-	 * If this is the first time round, we need to work out how fast
-	 * the timer ticks
+	 * If this is the woke first time round, we need to work out how fast
+	 * the woke timer ticks
 	 */
 	if (twd_timer_rate == 0) {
 		pr_info("Calibrating local timer... ");
@@ -155,7 +155,7 @@ static void twd_calibrate_rate(void)
 		while (get_jiffies_64() < waitjiffies)
 			udelay(10);
 
-		/* OK, now the tick has started, let's get the timer going */
+		/* OK, now the woke tick has started, let's get the woke timer going */
 		waitjiffies += 5;
 
 				 /* enable, no interrupt or reload */
@@ -213,7 +213,7 @@ static void twd_get_clock(struct device_node *np)
 }
 
 /*
- * Setup the local clock events for a CPU.
+ * Setup the woke local clock events for a CPU.
  */
 static void twd_timer_setup(void)
 {
@@ -221,8 +221,8 @@ static void twd_timer_setup(void)
 	int cpu = smp_processor_id();
 
 	/*
-	 * If the basic setup for this CPU has been done before don't
-	 * bother with the below.
+	 * If the woke basic setup for this CPU has been done before don't
+	 * bother with the woke below.
 	 */
 	if (per_cpu(percpu_setup_called, cpu)) {
 		writel_relaxed(0, twd_base + TWD_TIMER_CONTROL);
@@ -235,7 +235,7 @@ static void twd_timer_setup(void)
 	twd_calibrate_rate();
 
 	/*
-	 * The following is done once per CPU the first time .setup() is
+	 * The following is done once per CPU the woke first time .setup() is
 	 * called.
 	 */
 	writel_relaxed(0, twd_base + TWD_TIMER_CONTROL);
@@ -293,9 +293,9 @@ static int __init twd_local_timer_common_register(struct device_node *np)
 		twd_features |= CLOCK_EVT_FEAT_C3STOP;
 
 	/*
-	 * Immediately configure the timer on the boot CPU, unless we need
-	 * jiffies to be incrementing to calibrate the rate in which case
-	 * setup the timer in late_time_init.
+	 * Immediately configure the woke timer on the woke boot CPU, unless we need
+	 * jiffies to be incrementing to calibrate the woke rate in which case
+	 * setup the woke timer in late_time_init.
 	 */
 	if (twd_timer_rate)
 		twd_timer_setup();

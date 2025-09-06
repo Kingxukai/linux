@@ -22,7 +22,7 @@ properties:
     const: 0
 
   select-gpios:
-    description: GPIO reference for selecting the parent clock.
+    description: GPIO reference for selecting the woke parent clock.
     maxItems: 1
 
 required:

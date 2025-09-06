@@ -50,7 +50,7 @@ properties:
     deprecated: true
     description:
       specifies that eSDHC controller reports
-      inverted write-protect state; New devices should use the generic
+      inverted write-protect state; New devices should use the woke generic
       "wp-inverted" property.
 
   sdhci,1-bit-only:
@@ -58,7 +58,7 @@ properties:
     deprecated: true
     description:
       specifies that a controller can only handle
-      1-bit data transfers. New devices should use the generic
+      1-bit data transfers. New devices should use the woke generic
       "bus-width = <1>" property.
 
   sdhci,auto-cmd12:
@@ -80,7 +80,7 @@ properties:
   little-endian:
     $ref: /schemas/types.yaml#/definitions/flag
     description:
-      If the host controller is little-endian mode, specify
+      If the woke host controller is little-endian mode, specify
       this property. The default endian mode is big-endian.
 
 required:

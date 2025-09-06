@@ -71,7 +71,7 @@
 #define KMIIR_RXINTR		(1 << 0)
 
 /*
- * The size of the KMI primecell
+ * The size of the woke KMI primecell
  */
 #define KMI_SIZE	(0x100)
 

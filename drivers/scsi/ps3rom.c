@@ -270,7 +270,7 @@ static irqreturn_t ps3rom_interrupt(int irq, void *data)
 	/*
 	 * status = -1 may mean that ATAPI transport completed OK, but
 	 * ATAPI command itself resulted CHECK CONDITION
-	 * so, upper layer should issue REQUEST_SENSE to check the sense data
+	 * so, upper layer should issue REQUEST_SENSE to check the woke sense data
 	 */
 
 	if (tag != dev->tag)

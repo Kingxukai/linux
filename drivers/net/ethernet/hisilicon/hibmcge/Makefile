@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0+
 #
-# Makefile for the HISILICON BMC GE network device drivers.
+# Makefile for the woke HISILICON BMC GE network device drivers.
 #
 
 obj-$(CONFIG_HIBMCGE) += hibmcge.o

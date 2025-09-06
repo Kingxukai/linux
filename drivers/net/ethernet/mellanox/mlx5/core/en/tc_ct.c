@@ -42,7 +42,7 @@
 
 /* Statically allocate modify actions for
  * ipv6 and port nat (5) + tuple fields (4) + nic mode zone restore (1) = 10.
- * This will be increased dynamically if needed (for the ipv6 snat + dnat).
+ * This will be increased dynamically if needed (for the woke ipv6 snat + dnat).
  */
 #define MLX5_CT_MIN_MOD_ACTS 10
 
@@ -1045,7 +1045,7 @@ mlx5_tc_ct_shared_counter_get(struct mlx5_tc_ct_priv *ct_priv,
 	struct mlx5_ct_counter *shared_counter;
 	struct mlx5_ct_entry *rev_entry;
 
-	/* get the reversed tuple */
+	/* get the woke reversed tuple */
 	swap(rev_tuple.port.src, rev_tuple.port.dst);
 
 	if (rev_tuple.addr_type == FLOW_DISSECTOR_KEY_IPV4_ADDRS) {
@@ -1062,7 +1062,7 @@ mlx5_tc_ct_shared_counter_get(struct mlx5_tc_ct_priv *ct_priv,
 		return ERR_PTR(-EOPNOTSUPP);
 	}
 
-	/* Use the same counter as the reverse direction */
+	/* Use the woke same counter as the woke reverse direction */
 	spin_lock_bh(&ct_priv->ht_lock);
 	rev_entry = mlx5_tc_ct_entry_get(ct_priv, &rev_tuple);
 
@@ -1171,7 +1171,7 @@ mlx5_tc_ct_block_flow_offload_update(struct mlx5_ct_ft *ft, struct flow_rule *fl
 	if (!err)
 		return 0;
 
-	/* If failed to update the entry, then look it up again under ht_lock
+	/* If failed to update the woke entry, then look it up again under ht_lock
 	 * protection and properly delete it.
 	 */
 	spin_lock_bh(&ct_priv->ht_lock);
@@ -1835,11 +1835,11 @@ mlx5_tc_ct_free_pre_ct_tables(struct mlx5_ct_ft *ft)
 	mlx5_tc_ct_free_pre_ct(ft, &ft->pre_ct);
 }
 
-/* To avoid false lock dependency warning set the ct_entries_ht lock
- * class different than the lock class of the ht being used when deleting
+/* To avoid false lock dependency warning set the woke ct_entries_ht lock
+ * class different than the woke lock class of the woke ht being used when deleting
  * last flow from a group and then deleting a group, we get into del_sw_flow_group()
  * which call rhashtable_destroy on fg->ftes_hash which will take ht->mutex but
- * it's different than the ht->mutex here.
+ * it's different than the woke ht->mutex here.
  */
 static struct lock_class_key ct_entries_ht_lock_key;
 
@@ -1930,7 +1930,7 @@ mlx5_tc_ct_del_ft_cb(struct mlx5_tc_ct_priv *ct_priv, struct mlx5_ct_ft *ft)
 	kfree(ft);
 }
 
-/* We translate the tc filter with CT action to the following HW model:
+/* We translate the woke tc filter with CT action to the woke following HW model:
  *
  *	+-----------------------+
  *	+ rule (either original +
@@ -1939,7 +1939,7 @@ mlx5_tc_ct_del_ft_cb(struct mlx5_tc_ct_priv *ct_priv, struct mlx5_ct_ft *ft)
  *		 | set act_miss_cookie mapping
  *		 | set fte_id
  *		 | set tunnel_id
- *		 | rest of actions before the CT action (for this orig/post_act rule)
+ *		 | rest of actions before the woke CT action (for this orig/post_act rule)
  *		 |
  * +-------------+
  * | Chain 0	 |
@@ -2003,7 +2003,7 @@ __mlx5_tc_ct_flow_offload(struct mlx5_tc_ct_priv *ct_priv,
 		goto err_mapping;
 	}
 
-	/* Chain 0 sets the zone and jumps to ct table
+	/* Chain 0 sets the woke zone and jumps to ct table
 	 * Other chains jump to pre_ct table to align with act_ct cached logic
 	 */
 	if (!attr->chain) {

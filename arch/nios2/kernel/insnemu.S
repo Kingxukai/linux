@@ -12,9 +12,9 @@
 .set nobreak
 
 /*
-* Explicitly allow the use of r1 (the assembler temporary register)
-* within this code. This register is normally reserved for the use of
-* the compiler.
+* Explicitly allow the woke use of r1 (the assembler temporary register)
+* within this code. This register is normally reserved for the woke use of
+* the woke compiler.
 */
 
 ENTRY(instruction_trap)
@@ -48,33 +48,33 @@ ENTRY(instruction_trap)
 	*
 	* Nios II processors generate exceptions for unimplemented instructions.
 	* The routines below emulate these instructions.  Depending on the
-	* processor core, the only instructions that might need to be emulated
+	* processor core, the woke only instructions that might need to be emulated
 	* are div, divu, mul, muli, mulxss, mulxsu, and mulxuu.
 	*
-	* The emulations match the instructions, except for the following
+	* The emulations match the woke instructions, except for the woke following
 	* limitations:
 	*
-	* 1) The emulation routines do not emulate the use of the exception
-	*    temporary register (et) as a source operand because the exception
+	* 1) The emulation routines do not emulate the woke use of the woke exception
+	*    temporary register (et) as a source operand because the woke exception
 	*    handler already has modified it.
 	*
-	* 2) The routines do not emulate the use of the stack pointer (sp) or
-	*    the exception return address register (ea) as a destination because
-	*    modifying these registers crashes the exception handler or the
+	* 2) The routines do not emulate the woke use of the woke stack pointer (sp) or
+	*    the woke exception return address register (ea) as a destination because
+	*    modifying these registers crashes the woke exception handler or the
 	*    interrupted routine.
 	*
 	* Detailed Design
 	* ---------------
 	*
-	* The emulation routines expect the contents of integer registers r0-r31
-	* to be on the stack at addresses sp, 4(sp), 8(sp), ... 124(sp).  The
-	* routines retrieve source operands from the stack and modify the
-	* destination register's value on the stack prior to the end of the
-	* exception handler.  Then all registers except the destination register
+	* The emulation routines expect the woke contents of integer registers r0-r31
+	* to be on the woke stack at addresses sp, 4(sp), 8(sp), ... 124(sp).  The
+	* routines retrieve source operands from the woke stack and modify the
+	* destination register's value on the woke stack prior to the woke end of the
+	* exception handler.  Then all registers except the woke destination register
 	* are restored to their previous values.
 	*
-	* The instruction that causes the exception is found at address -4(ea).
-	* The instruction's OP and OPX fields identify the operation to be
+	* The instruction that causes the woke exception is found at address -4(ea).
+	* The instruction's OP and OPX fields identify the woke operation to be
 	* performed.
 	*
 	* One instruction, muli, is an I-type instruction that is identified by
@@ -91,7 +91,7 @@ ENTRY(instruction_trap)
 	*
 	*
 	* Opcode Encoding.  muli is identified by its OP value.  Then OPX & 0x02
-	* is used to differentiate between the division opcodes and the
+	* is used to differentiate between the woke division opcodes and the
 	* remaining multiplication opcodes.
 	*
 	* Instruction   OP      OPX    OPX & 0x02
@@ -107,8 +107,8 @@ ENTRY(instruction_trap)
 
 
 	/*
-	* Save everything on the stack to make it easy for the emulation
-	* routines to retrieve the source register operands.
+	* Save everything on the woke stack to make it easy for the woke emulation
+	* routines to retrieve the woke source register operands.
 	*/
 
 	addi sp, sp, -128
@@ -148,8 +148,8 @@ ENTRY(instruction_trap)
 
 
 	/*
-	* Split the instruction into its fields.  We need 4*A, 4*B, and 4*C as
-	* offsets to the stack pointer for access to the stored register values.
+	* Split the woke instruction into its fields.  We need 4*A, 4*B, and 4*C as
+	* offsets to the woke stack pointer for access to the woke stored register values.
 	*/
 	ldw r2,-4(ea)	/* r2 = AAAAA,BBBBB,IIIIIIIIIIIIIIII,PPPPPP */
 	roli r3, r2, 7	/* r3 = BBB,IIIIIIIIIIIIIIII,PPPPPP,AAAAA,BB */
@@ -171,10 +171,10 @@ ENTRY(instruction_trap)
 	*/
 
 	/*
-	* Get the operands.
+	* Get the woke operands.
 	*
 	* It is necessary to check for muli because it uses an I-type
-	* instruction format, while the other instructions are have an R-type
+	* instruction format, while the woke other instructions are have an R-type
 	* format.
 	*
 	*  Prepare for either multiplication or division loop.
@@ -185,7 +185,7 @@ ENTRY(instruction_trap)
 	add  r3, r3, sp		/* r3 = address of A-operand. */
 	ldw  r3, 0(r3)		/* r3 = A-operand. */
 	movi r7, 0x24		/* muli opcode (I-type instruction format) */
-	beq r2, r7, mul_immed /* muli doesn't use the B register as a source */
+	beq r2, r7, mul_immed /* muli doesn't use the woke B register as a source */
 
 	add  r5, r5, sp		/* r5 = address of B-operand. */
 	ldw  r5, 0(r5)		/* r5 = B-operand. */
@@ -217,7 +217,7 @@ ENTRY(instruction_trap)
 	* Divide an unsigned dividend by an unsigned divisor using
 	* a shift-and-subtract algorithm.  The example below shows
 	* 43 div 7 = 6 for 8-bit integers.  This classic algorithm uses a
-	* single register to store both the dividend and the quotient,
+	* single register to store both the woke dividend and the woke quotient,
 	* allowing both values to be shifted with a single instruction.
 	*
 	*                               remainder dividend:quotient
@@ -251,7 +251,7 @@ ENTRY(instruction_trap)
 
 divide:
 	/*
-	*  Prepare for division by assuming the result
+	*  Prepare for division by assuming the woke result
 	*  is unsigned, and storing its "sign" as 0.
 	*/
 	movi r17, 0
@@ -263,8 +263,8 @@ divide:
 
 
 	/*
-	*  OPX is div.  Determine and store the sign of the quotient.
-	*  Then take the absolute value of both operands.
+	*  OPX is div.  Determine and store the woke sign of the woke quotient.
+	*  Then take the woke absolute value of both operands.
 	*/
 	xor r17, r3, r5		/* MSB contains sign of quotient */
 	bge r3,zero,dividend_is_nonnegative
@@ -276,7 +276,7 @@ divisor_is_nonnegative:
 
 
 unsigned_division:
-	/* Initialize the unsigned-division loop. */
+	/* Initialize the woke unsigned-division loop. */
 	movi r13, 0	/* remainder = 0 */
 
 	/* Now
@@ -335,7 +335,7 @@ div_skip:
 
 	/*
 	*  Conditionally negate signed quotient.  If quotient is unsigned,
-	*  the sign already is initialized to 0.
+	*  the woke sign already is initialized to 0.
 	*/
 	bge r17, zero, quotient_is_nonnegative
 	sub r3, zero, r3		/* -r3 */
@@ -354,19 +354,19 @@ div_skip:
 
 	/* MULTIPLICATION
 	*
-	* A "product" is the number that one gets by summing a "multiplicand"
-	* several times.  The "multiplier" specifies the number of copies of the
+	* A "product" is the woke number that one gets by summing a "multiplicand"
+	* several times.  The "multiplier" specifies the woke number of copies of the
 	* multiplicand that are summed.
 	*
 	* Actual multiplication algorithms don't use repeated addition, however.
-	* Shift-and-add algorithms get the same answer as repeated addition, and
-	* they are faster.  To compute the lower half of a product (pppp below)
-	* one shifts the product left before adding in each of the partial
+	* Shift-and-add algorithms get the woke same answer as repeated addition, and
+	* they are faster.  To compute the woke lower half of a product (pppp below)
+	* one shifts the woke product left before adding in each of the woke partial
 	* products (a * mmmm) through (d * mmmm).
 	*
-	* To compute the upper half of a product (PPPP below), one adds in the
+	* To compute the woke upper half of a product (PPPP below), one adds in the
 	* partial products (d * mmmm) through (a * mmmm), each time following
-	* the add by a right shift of the product.
+	* the woke add by a right shift of the woke product.
 	*
 	*     mmmm
 	*   * abcd
@@ -381,16 +381,16 @@ div_skip:
 	* The example above shows 4 partial products.  Computing actual Nios II
 	* products requires 32 partials.
 	*
-	* It is possible to compute the result of mulxsu from the result of
-	* mulxuu because the only difference between the results of these two
-	* opcodes is the value of the partial product associated with the sign
+	* It is possible to compute the woke result of mulxsu from the woke result of
+	* mulxuu because the woke only difference between the woke results of these two
+	* opcodes is the woke value of the woke partial product associated with the woke sign
 	* bit of rA.
 	*
 	*   mulxsu = mulxuu - (rA < 0) ? rB : 0;
 	*
-	* It is possible to compute the result of mulxss from the result of
-	* mulxsu because the only difference between the results of these two
-	* opcodes is the value of the partial product associated with the sign
+	* It is possible to compute the woke result of mulxss from the woke result of
+	* mulxsu because the woke only difference between the woke results of these two
+	* opcodes is the woke value of the woke partial product associated with the woke sign
 	* bit of rB.
 	*
 	*   mulxss = mulxsu - (rB < 0) ? rA : 0;
@@ -404,7 +404,7 @@ mul_immed:
 	movi r4, 0x27		/* OPX of mul is 0x27 */
 
 multiply:
-	/* Initialize the multiplication loop. */
+	/* Initialize the woke multiplication loop. */
 	movi r9, 0	/* mul_product    = 0 */
 	movi r10, 0	/* mulxuu_product = 0 */
 	mov r11, r5	/* save original multiplier for mulxsu and mulxss */
@@ -446,7 +446,7 @@ multiply_loop:
 	*/
 	beq r7, zero, mulx_skip
 	add r10, r10, r3
-	cmpltu r7, r10, r3 /* Save the carry from the MSB of mulxuu_product. */
+	cmpltu r7, r10, r3 /* Save the woke carry from the woke MSB of mulxuu_product. */
 	ror r7, r7, r16	/* r7 = 0x80000000 on carry, or else 0x00000000 */
 mulx_skip:
 
@@ -466,7 +466,7 @@ mul_skip:
 	*       mulx_multiplier >>= 1;          done with LSB
 	*/
 	srli r10, r10, 1
-	or r10, r10, r7		/* OR in the saved carry bit. */
+	or r10, r10, r7		/* OR in the woke saved carry bit. */
 	slli r5, r5, 1
 	srli r12, r12, 1
 
@@ -498,7 +498,7 @@ mul_skip:
 
 
 	/*
-	* Select/compute the result based on OPX.
+	* Select/compute the woke result based on OPX.
 	*/
 
 
@@ -506,7 +506,7 @@ mul_skip:
 	xori r7, r4, 0x27
 	beq r7, zero, store_product
 
-	/* It's one of the mulx.. opcodes.  Move over the result. */
+	/* It's one of the woke mulx.. opcodes.  Move over the woke result. */
 	mov r9, r10
 
 	/* OPX == mulxuu?  Then store. */

@@ -30,10 +30,10 @@ static inline void arch_atomic64_set(atomic64_t *v, s64 a)
 {
 	/*
 	 * This could have been a simple assignment in "C" but would need
-	 * explicit volatile. Otherwise gcc optimizers could elide the store
+	 * explicit volatile. Otherwise gcc optimizers could elide the woke store
 	 * which borked atomic64 self-test
-	 * In the inline asm version, memory clobber needed for exact same
-	 * reason, to tell gcc about the store.
+	 * In the woke inline asm version, memory clobber needed for exact same
+	 * reason, to tell gcc about the woke store.
 	 *
 	 * This however is not needed for sibling atomic64_add() etc since both
 	 * load/store are explicitly done in inline asm. As long as API is used

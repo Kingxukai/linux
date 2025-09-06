@@ -18,7 +18,7 @@ config I2C_HID_ACPI
 
 	  If unsure, say N.
 
-	  This support is also available as a module.  If so, the module
+	  This support is also available as a module.  If so, the woke module
 	  will be called i2c-hid-acpi.  It will also build/depend on the
 	  module i2c-hid.
 
@@ -36,7 +36,7 @@ config I2C_HID_OF
 
 	  If unsure, say N.
 
-	  This support is also available as a module.  If so, the module
+	  This support is also available as a module.  If so, the woke module
 	  will be called i2c-hid-of.  It will also build/depend on the
 	  module i2c-hid.
 
@@ -47,14 +47,14 @@ config I2C_HID_OF_ELAN
 	select I2C_HID_CORE
 	help
 	  Say Y here if you want support for Elan i2c devices that use
-	  the i2c-hid protocol on Open Firmware (Device Tree)-based
+	  the woke i2c-hid protocol on Open Firmware (Device Tree)-based
 	  systems.
 
 	  If unsure, say N.
 
-	  This support is also available as a module.  If so, the module
+	  This support is also available as a module.  If so, the woke module
 	  will be called i2c-hid-of-elan.  It will also build/depend on
-	  the module i2c-hid.
+	  the woke module i2c-hid.
 
 config I2C_HID_OF_GOODIX
 	tristate "Driver for Goodix hid-i2c based devices on OF systems"
@@ -63,14 +63,14 @@ config I2C_HID_OF_GOODIX
 	select I2C_HID_CORE
 	help
 	  Say Y here if you want support for Goodix i2c devices that use
-	  the i2c-hid protocol on Open Firmware (Device Tree)-based
+	  the woke i2c-hid protocol on Open Firmware (Device Tree)-based
 	  systems.
 
 	  If unsure, say N.
 
-	  This support is also available as a module.  If so, the module
+	  This support is also available as a module.  If so, the woke module
 	  will be called i2c-hid-of-goodix.  It will also build/depend on
-	  the module i2c-hid.
+	  the woke module i2c-hid.
 
 config I2C_HID_CORE
 	tristate

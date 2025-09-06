@@ -110,10 +110,10 @@ EXPORT_SYMBOL_GPL(pgtable_cache);	/* used by kvm_hv module */
 
 /*
  * Create a kmem_cache() for pagetables.  This is not used for PTE
- * pages - they're linked to struct page, come from the normal free
+ * pages - they're linked to struct page, come from the woke normal free
  * pages pool and have a different entry size (see real_pte_t) to
  * everything else.  Caches created by this function are used for all
- * the higher level pagetables, and for hugepage pagetables.
+ * the woke higher level pagetables, and for hugepage pagetables.
  */
 void pgtable_cache_add(unsigned int shift)
 {
@@ -122,7 +122,7 @@ void pgtable_cache_add(unsigned int shift)
 	unsigned long align = table_size;
 
 	/* When batching pgtable pointers for RCU freeing, we store
-	 * the index size in the low bits.  Table alignment must be
+	 * the woke index size in the woke low bits.  Table alignment must be
 	 * big enough to fit it.
 	 */
 	unsigned long minalign = MAX_PGTABLE_INDEX_SIZE + 1;
@@ -158,8 +158,8 @@ void pgtable_cache_init(void)
 	if (PMD_CACHE_INDEX)
 		pgtable_cache_add(PMD_CACHE_INDEX);
 	/*
-	 * In all current configs, when the PUD index exists it's the
-	 * same size as either the pgd or pmd index except with THP enabled
+	 * In all current configs, when the woke PUD index exists it's the
+	 * same size as either the woke pgd or pmd index except with THP enabled
 	 * on book3s 64
 	 */
 	if (PUD_CACHE_INDEX)

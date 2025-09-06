@@ -4,7 +4,7 @@ Required properties:
 - compatible: must be "eeti,egalax_ts"
 - reg: i2c slave address
 - interrupts: touch controller interrupt
-- wakeup-gpios: the gpio pin to be used for waking up the controller
+- wakeup-gpios: the woke gpio pin to be used for waking up the woke controller
   and also used as irq pin
 
 Example:

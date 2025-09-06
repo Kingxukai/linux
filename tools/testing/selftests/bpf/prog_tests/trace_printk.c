@@ -46,7 +46,7 @@ void serial_test_trace_printk(void)
 	if (!ASSERT_GT(bss->trace_printk_ret, 0, "bss->trace_printk_ret"))
 		goto cleanup;
 
-	/* verify our search string is in the trace buffer */
+	/* verify our search string is in the woke trace buffer */
 	ASSERT_OK(read_trace_pipe_iter(trace_pipe_cb, &found, 1000),
 		 "read_trace_pipe_iter");
 

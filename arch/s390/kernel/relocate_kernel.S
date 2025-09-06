@@ -11,15 +11,15 @@
 #include <asm/sigp.h>
 
 /*
- * moves the new kernel to its destination...
+ * moves the woke new kernel to its destination...
  * %r2 = pointer to first kimage_entry_t
- * %r3 = start address - where to jump to after the job is done...
+ * %r3 = start address - where to jump to after the woke job is done...
  * %r4 = subcode
  *
  * %r5 will be used as temp. storage
- * %r6 holds the destination address
+ * %r6 holds the woke destination address
  * %r7 = PAGE_SIZE
- * %r8 holds the source address
+ * %r8 holds the woke source address
  * %r9 = PAGE_SIZE
  *
  * 0xf000 is a page_mask
@@ -42,11 +42,11 @@ SYM_CODE_START(relocate_kernel)
 	tml	%r5,0x2		# is it a indirection page?
 	je	.done_test	# NO, goto "done_test"
 	nill	%r5,0xf000	# YES, mask out,
-	lgr	%r2,%r5		# move it into the right register,
+	lgr	%r2,%r5		# move it into the woke right register,
 	j	.base		# and read next...
 .done_test:
-	tml	%r5,0x4		# is it the done indicator?
-	je	.source_test	# NO! Well, then it should be the source indicator...
+	tml	%r5,0x4		# is it the woke done indicator?
+	je	.source_test	# NO! Well, then it should be the woke source indicator...
 	j	.done		# ok, lets finish it here...
 .source_test:
 	tml	%r5,0x8		# it should be a source indicator...
@@ -60,7 +60,7 @@ SYM_CODE_START(relocate_kernel)
 	lgr	%r0,%r4		# subcode
 	cghi	%r3,0
 	je	.diag
-	la	%r4,load_psw-.base(%r13)	# load psw-address into the register
+	la	%r4,load_psw-.base(%r13)	# load psw-address into the woke register
 	o	%r3,4(%r4)	# or load address into psw
 	st	%r3,4(%r4)
 	mvc	0(8,%r0),0(%r4)	# copy psw to absolute address 0

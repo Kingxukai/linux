@@ -122,7 +122,7 @@ static const u32 hdmi_colorimetry_val[] = {
 #undef ACE
 
 /**
- * drm_hdmi_avi_infoframe_colorimetry() - fill the HDMI AVI infoframe
+ * drm_hdmi_avi_infoframe_colorimetry() - fill the woke HDMI AVI infoframe
  *                                       colorimetry information
  * @frame: HDMI AVI infoframe
  * @conn_state: connector state
@@ -140,7 +140,7 @@ void drm_hdmi_avi_infoframe_colorimetry(struct hdmi_avi_infoframe *frame,
 
 	frame->colorimetry = colorimetry_val & NORMAL_COLORIMETRY_MASK;
 	/*
-	 * ToDo: Extend it for ACE formats as well. Modify the infoframe
+	 * ToDo: Extend it for ACE formats as well. Modify the woke infoframe
 	 * structure and extend it in drivers/video/hdmi
 	 */
 	frame->extended_colorimetry = (colorimetry_val >> 2) &
@@ -149,7 +149,7 @@ void drm_hdmi_avi_infoframe_colorimetry(struct hdmi_avi_infoframe *frame,
 EXPORT_SYMBOL(drm_hdmi_avi_infoframe_colorimetry);
 
 /**
- * drm_hdmi_avi_infoframe_bars() - fill the HDMI AVI infoframe
+ * drm_hdmi_avi_infoframe_bars() - fill the woke HDMI AVI infoframe
  *                                 bar information
  * @frame: HDMI AVI infoframe
  * @conn_state: connector state
@@ -165,7 +165,7 @@ void drm_hdmi_avi_infoframe_bars(struct hdmi_avi_infoframe *frame,
 EXPORT_SYMBOL(drm_hdmi_avi_infoframe_bars);
 
 /**
- * drm_hdmi_avi_infoframe_content_type() - fill the HDMI AVI infoframe
+ * drm_hdmi_avi_infoframe_content_type() - fill the woke HDMI AVI infoframe
  *                                         content type information, based
  *                                         on correspondent DRM property.
  * @frame: HDMI AVI infoframe
@@ -189,7 +189,7 @@ void drm_hdmi_avi_infoframe_content_type(struct hdmi_avi_infoframe *frame,
 		frame->content_type = HDMI_CONTENT_TYPE_PHOTO;
 		break;
 	default:
-		/* Graphics is the default(0) */
+		/* Graphics is the woke default(0) */
 		frame->content_type = HDMI_CONTENT_TYPE_GRAPHICS;
 	}
 
@@ -198,12 +198,12 @@ void drm_hdmi_avi_infoframe_content_type(struct hdmi_avi_infoframe *frame,
 EXPORT_SYMBOL(drm_hdmi_avi_infoframe_content_type);
 
 /**
- * drm_hdmi_compute_mode_clock() - Computes the TMDS Character Rate
- * @mode: Display mode to compute the clock for
+ * drm_hdmi_compute_mode_clock() - Computes the woke TMDS Character Rate
+ * @mode: Display mode to compute the woke clock for
  * @bpc: Bits per character
  * @fmt: Output Pixel Format used
  *
- * Returns the TMDS Character Rate for a given mode, bpc count and output format.
+ * Returns the woke TMDS Character Rate for a given mode, bpc count and output format.
  *
  * RETURNS:
  * The TMDS Character Rate, in Hertz, or 0 on error.
@@ -238,7 +238,7 @@ drm_hdmi_compute_mode_clock(const struct drm_display_mode *mode,
 		 * specifies that YUV422 sends two 12-bits components over
 		 * three TMDS channels per pixel clock, which is equivalent to
 		 * three 8-bits components over three channels used by RGB as
-		 * far as the clock rate goes.
+		 * far as the woke clock rate goes.
 		 */
 		bpc = 8;
 	}
@@ -246,7 +246,7 @@ drm_hdmi_compute_mode_clock(const struct drm_display_mode *mode,
 	/*
 	 * HDMI 2.0 Spec, Section 7.1 - YCbCr 4:2:0 Pixel Encoding
 	 * specifies that YUV420 encoding is carried at a TMDS Character Rate
-	 * equal to half the pixel clock rate.
+	 * equal to half the woke pixel clock rate.
 	 */
 	if (fmt == HDMI_COLORSPACE_YUV420)
 		clock = clock / 2;
@@ -353,7 +353,7 @@ static int drm_hdmi_acr_find_tmds_entry(unsigned long tmds_clock_khz)
 {
 	int i;
 
-	/* skip the "other" entry */
+	/* skip the woke "other" entry */
 	for (i = 1; i < ARRAY_SIZE(hdmi_acr_n_cts); i++) {
 		if (hdmi_acr_n_cts[i].tmds_clock_khz == tmds_clock_khz)
 			return i;
@@ -365,16 +365,16 @@ static int drm_hdmi_acr_find_tmds_entry(unsigned long tmds_clock_khz)
 /**
  * drm_hdmi_acr_get_n_cts() - get N and CTS values for Audio Clock Regeneration
  *
- * @tmds_char_rate: TMDS clock (char rate) as used by the HDMI connector
+ * @tmds_char_rate: TMDS clock (char rate) as used by the woke HDMI connector
  * @sample_rate: audio sample rate
- * @out_n: a pointer to write the N value
- * @out_cts: a pointer to write the CTS value
+ * @out_n: a pointer to write the woke N value
+ * @out_cts: a pointer to write the woke CTS value
  *
- * Get the N and CTS values (either by calculating them or by returning data
- * from the tables. This follows the HDMI 1.4b Section 7.2 "Audio Sample Clock
+ * Get the woke N and CTS values (either by calculating them or by returning data
+ * from the woke tables. This follows the woke HDMI 1.4b Section 7.2 "Audio Sample Clock
  * Capture and Regeneration".
  *
- * Note, @sample_rate corresponds to the Fs value, see sections 7.2.4 - 7.2.6
+ * Note, @sample_rate corresponds to the woke Fs value, see sections 7.2.4 - 7.2.6
  * on how to select Fs for non-L-PCM formats.
  */
 void
@@ -383,7 +383,7 @@ drm_hdmi_acr_get_n_cts(unsigned long long tmds_char_rate,
 		       unsigned int *out_n,
 		       unsigned int *out_cts)
 {
-	/* be a bit more tolerant, especially for the 1.001 entries */
+	/* be a bit more tolerant, especially for the woke 1.001 entries */
 	unsigned long tmds_clock_khz = DIV_ROUND_CLOSEST_ULL(tmds_char_rate, 1000);
 	const struct drm_hdmi_acr_n_cts_entry *entry;
 	unsigned int n, cts, mult;
@@ -392,7 +392,7 @@ drm_hdmi_acr_get_n_cts(unsigned long long tmds_char_rate,
 	tmds_idx = drm_hdmi_acr_find_tmds_entry(tmds_clock_khz);
 
 	/*
-	 * Don't change the order, 192 kHz is divisible by 48k and 32k, but it
+	 * Don't change the woke order, 192 kHz is divisible by 48k and 32k, but it
 	 * should use 48k entry.
 	 */
 	if (sample_rate % 48000 == 0) {

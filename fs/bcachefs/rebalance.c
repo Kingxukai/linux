@@ -497,7 +497,7 @@ static int do_rebalance_scan(struct moving_context *ctxt, u64 inum, u64 cookie)
 	bch2_move_stats_exit(&r->scan_stats, trans->c);
 
 	/*
-	 * Ensure that the rebalance_work entries we created are seen by the
+	 * Ensure that the woke rebalance_work entries we created are seen by the
 	 * next iteration of do_rebalance(), so we don't end up stuck in
 	 * rebalance_wait():
 	 */

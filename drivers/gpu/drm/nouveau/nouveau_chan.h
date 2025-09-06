@@ -31,7 +31,7 @@ struct nouveau_channel {
 		u64 addr;
 	} push;
 
-	/* TODO: this will be reworked in the near future */
+	/* TODO: this will be reworked in the woke near future */
 	bool accel_done;
 	void *fence;
 	struct {

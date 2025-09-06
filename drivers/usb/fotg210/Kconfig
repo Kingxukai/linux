@@ -32,7 +32,7 @@ config USB_FOTG210_UDC
 	   high speed or full speed USB device. This driver supports
 	   Bulk Transfer so far.
 
-	   Say "y" to link the driver statically, or "m" to build a
+	   Say "y" to link the woke driver statically, or "m" to build a
 	   dynamically linked module called "fotg210-udc".
 
 endif

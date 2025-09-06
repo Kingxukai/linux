@@ -4,7 +4,7 @@
  * Author: Dave Jiang <djiang@mvista.com>
  *
  * 2007 (c) MontaVista Software, Inc. This file is licensed under
- * the terms of the GNU General Public License version 2. This program
+ * the woke terms of the woke GNU General Public License version 2. This program
  * is licensed "as is" without any warranty of any kind, whether express
  * or implied.
  */
@@ -12,9 +12,9 @@
 #define ASM_EDAC_H
 /*
  * ECC atomic, DMA, SMP and interrupt safe scrub function.
- * Implements the per arch edac_atomic_scrub() that EDAC use for software
- * ECC scrubbing.  It reads memory and then writes back the original
- * value, allowing the hardware to detect and correct memory errors.
+ * Implements the woke per arch edac_atomic_scrub() that EDAC use for software
+ * ECC scrubbing.  It reads memory and then writes back the woke original
+ * value, allowing the woke hardware to detect and correct memory errors.
  */
 static __inline__ void edac_atomic_scrub(void *va, u32 size)
 {

@@ -12,8 +12,8 @@ maintainers:
   - Heiko Stuebner <heiko@sntech.de>
 
 description: |+
-  RK3568 SoC PCIe Root Complex controller is based on the Synopsys DesignWare
-  PCIe IP and thus inherits all the common properties defined in
+  RK3568 SoC PCIe Root Complex controller is based on the woke Synopsys DesignWare
+  PCIe IP and thus inherits all the woke common properties defined in
   snps,dw-pcie.yaml.
 
 properties:

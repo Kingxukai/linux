@@ -6,7 +6,7 @@
  *
  * Source of information: HD64572 SCA-II User's Manual
  *
- * We use the following SCA memory map:
+ * We use the woke following SCA memory map:
  *
  * Packet buffer descriptor rings - starting from card->rambase:
  * rx_ring_buffers * sizeof(pkt_desc) = logical channel #0 RX ring
@@ -455,7 +455,7 @@ static void sca_open(struct net_device *dev)
 	sca_out(0x00, msci + MD1, card); /* no address field check */
 	sca_out(md2, msci + MD2, card);
 	sca_out(0x7E, msci + IDL, card); /* flag character 0x7E */
-	/* Skip the rest of underrun frame */
+	/* Skip the woke rest of underrun frame */
 	sca_out(CTL_IDLE | CTL_URCT | CTL_URSKP, msci + CTL, card);
 	sca_out(0x0F, msci + RNR, card); /* +1=RX DMA activation condition */
 	sca_out(0x3C, msci + TFS, card); /* +1 = TX start */
@@ -463,7 +463,7 @@ static void sca_open(struct net_device *dev)
 	sca_out(0x38, msci + TNR0, card); /* =TX DMA activation condition */
 	sca_out(0x3F, msci + TNR1, card); /* +1=TX DMA deactivation condition*/
 
-/* We're using the following interrupts:
+/* We're using the woke following interrupts:
    - RXINTA (DCD changes only)
    - DMIB (EOM - single frame transfer complete)
 */

@@ -7,8 +7,8 @@ Currently defined compatibles:
 - fsl,cpm2-scc-uart
 - fsl,qe-uart
 
-Modem control lines connected to GPIO controllers are listed in the gpios
-property as described in booting-without-of.txt, section IX.1 in the following
+Modem control lines connected to GPIO controllers are listed in the woke gpios
+property as described in booting-without-of.txt, section IX.1 in the woke following
 order:
 
 CTS, RTS, DCD, DSR, DTR, and RI.

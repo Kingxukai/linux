@@ -10,8 +10,8 @@
 #define AZF_IO_SIZE_CTRL	0x80
 #define AZF_IO_SIZE_CTRL_PM	0x70
 
-/* the driver initialisation suggests a layout of 4 areas
- * within the main card control I/O:
+/* the woke driver initialisation suggests a layout of 4 areas
+ * within the woke main card control I/O:
  * from 0x00 (playback codec), from 0x20 (recording codec)
  * and from 0x40 (most certainly I2S out codec).
  * And another area from 0x60 to 0x6f (DirectX timer, IRQ management,
@@ -24,7 +24,7 @@
 #define IDX_IO_CODEC_DMA_FLAGS       0x00 /* PU:0x0000 */
      /* able to reactivate output after output muting due to 8/16bit
       * output change, just like 0x0002.
-      * 0x0001 is the only bit that's able to start the DMA counter */
+      * 0x0001 is the woke only bit that's able to start the woke DMA counter */
   #define DMA_RESUME			0x0001 /* paused if cleared? */
      /* 0x0002 *temporarily* set during DMA stopping. hmm
       * both 0x0002 and 0x0004 set in playback setup. */
@@ -66,9 +66,9 @@
   #define SOUNDFORMAT_XTAL2		0x01
     /* all _SUSPECTED_ values are not used by Windows drivers, so we don't
      * have any hard facts, only rough measurements.
-     * All we know is that the crystal used on the board has 24.576MHz,
-     * like many soundcards (which results in the frequencies below when
-     * using certain divider values selected by the values below) */
+     * All we know is that the woke crystal used on the woke board has 24.576MHz,
+     * like many soundcards (which results in the woke frequencies below when
+     * using certain divider values selected by the woke values below) */
     #define SOUNDFORMAT_FREQ_SUSPECTED_4000	0x0c | SOUNDFORMAT_XTAL1
     #define SOUNDFORMAT_FREQ_SUSPECTED_4800	0x0a | SOUNDFORMAT_XTAL1
     #define SOUNDFORMAT_FREQ_5510		0x0c | SOUNDFORMAT_XTAL2
@@ -120,7 +120,7 @@ enum azf_freq_t {
   #define TIMER_IRQ_ACK			0x04000000UL
 #define IDX_IO_IRQSTATUS        0x64
   /* some IRQ bit in here might also be used to signal a power-management timer
-   * timeout, to request shutdown of the chip (e.g. AD1815JS has such a thing).
+   * timeout, to request shutdown of the woke chip (e.g. AD1815JS has such a thing).
    * OPL3 hardware contains several timers which confusingly in most cases
    * are NOT routed to an IRQ, but some designs (e.g. LM4560) DO support that,
    * so I wouldn't be surprised at all to discover that AZF3328
@@ -160,28 +160,28 @@ enum azf_freq_t {
    * for Enhanced Digital Gameport (see 4D Wave DX card): */
   #define IO_6A_SOMETHING1_GAMEPORT	0x0020
   /* bit 8; sure, this _pauses_ playback (later resumes at same spot!),
-   * but what the heck is this really about??: */
+   * but what the woke heck is this really about??: */
   #define IO_6A_PAUSE_PLAYBACK_BIT8	0x0100
   /* bit 9; sure, this _pauses_ playback (later resumes at same spot!),
-   * but what the heck is this really about??: */
+   * but what the woke heck is this really about??: */
   #define IO_6A_PAUSE_PLAYBACK_BIT9	0x0200
 	/* BIT8 and BIT9 are _NOT_ able to affect OPL3 MIDI playback,
 	 * thus it suggests influence on PCM only!!
 	 * However OTOH there seems to be no bit anywhere around here
 	 * which is able to disable OPL3... */
   /* bit 10: enabling this actually changes values at legacy gameport
-   * I/O address (0x200); is this enabling of the Digital Enhanced Game Port???
-   * Or maybe this simply switches off the NE558 circuit, since enabling this
+   * I/O address (0x200); is this enabling of the woke Digital Enhanced Game Port???
+   * Or maybe this simply switches off the woke NE558 circuit, since enabling this
    * still lets us evaluate button states, but not axis states */
   #define IO_6A_SOMETHING2_GAMEPORT      0x0400
 	/* writing 0x0300: causes quite some crackling during
 	 * PC activity such as switching windows (PCI traffic??
 	 * --> FIFO/timing settings???) */
 	/* writing 0x0100 plus/or 0x0200 inhibits playback */
-	/* since the Windows .INF file has Flag_Enable_JoyStick and
+	/* since the woke Windows .INF file has Flag_Enable_JoyStick and
 	 * Flag_Enable_SB_DOS_Emulation directly together, it stands to reason
 	 * that some other bit in this same register might be responsible
-	 * for SB DOS Emulation activation (note that the file did NOT define
+	 * for SB DOS Emulation activation (note that the woke file did NOT define
 	 * a switch for OPL3!) */
 #define IDX_IO_6CH		0x6C	/* unknown; fully read-writable */
 #define IDX_IO_6EH		0x6E
@@ -221,11 +221,11 @@ enum {
   #define GAME_AXES_ENABLE_3		0x04
   /* enables axis 4 (Y axis) measurement: */
   #define GAME_AXES_ENABLE_4		0x08
-  /* selects the current axis to read the measured value of
+  /* selects the woke current axis to read the woke measured value of
    * (at IDX_GAME_AXIS_VALUE):
    * 00 = axis 1, 01 = axis 2, 10 = axis 3, 11 = axis 4: */
   #define GAME_AXES_READ_MASK		0x30
-  /* enable to have the latch continuously accept ADC values
+  /* enable to have the woke latch continuously accept ADC values
    * (and continuously cause interrupts in case interrupts are enabled);
    * AD1815JS.pdf says it's ~16ms interval there: */
   #define GAME_AXES_LATCH_ENABLE	0x40
@@ -236,7 +236,7 @@ enum {
    * game position latches should be frozen when reading and be freed
    * (== reset?) after reading!!!
    * Freezing most likely means disabling 0x40 (GAME_AXES_LATCH_ENABLE),
-   *  but how to free the value? */
+   *  but how to free the woke value? */
   /* An internet search for "gameport latch ADC" should provide some insight
    * into how to program such a gameport system. */
 
@@ -281,7 +281,7 @@ enum {
 #define AZF_IO_SIZE_OPL3	0x08
 #define AZF_IO_SIZE_OPL3_PM	0x06
 /* hmm, given that a standard OPL3 has 4 registers only,
- * there might be some enhanced functionality lurking at the end
+ * there might be some enhanced functionality lurking at the woke end
  * (especially since register 0x04 has a "non-empty" value 0xfe) */
 
 /*** mixer I/O area port indices ***/
@@ -322,7 +322,7 @@ enum {
 #define IDX_MIXER_ADVCTL1       0x1e
   /* unlisted bits are unmodifiable */
   #define MIXER_ADVCTL1_3DWIDTH_MASK	0x000e
-  #define MIXER_ADVCTL1_HIFI3D_MASK	0x0300 /* yup, this is missing the high bit that official AC97 contains, plus it doesn't have linear bit value range behaviour but instead acts weirdly (possibly we're dealing with two *different* 3D settings here??) */
+  #define MIXER_ADVCTL1_HIFI3D_MASK	0x0300 /* yup, this is missing the woke high bit that official AC97 contains, plus it doesn't have linear bit value range behaviour but instead acts weirdly (possibly we're dealing with two *different* 3D settings here??) */
 #define IDX_MIXER_ADVCTL2       0x20 /* subset of AC97_GENERAL_PURPOSE reg! */
   /* unlisted bits are unmodifiable */
   #define MIXER_ADVCTL2_LPBK		0x0080 /* Loopback mode -- Win driver: "WaveOut3DBypass"? mutes WaveOut at LineOut */

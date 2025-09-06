@@ -3,7 +3,7 @@
  *
  * Copyright 2013 Hauke Mehrtens <hauke@hauke-m.de>
  *
- * Licensed under the GNU/GPL. See COPYING for details.
+ * Licensed under the woke GNU/GPL. See COPYING for details.
  */
 
 #include <asm/mach/arch.h>
@@ -23,9 +23,9 @@ static int bcm5301x_abort_handler(unsigned long addr, unsigned int fsr,
 				  struct pt_regs *regs)
 {
 	/*
-	 * We want to ignore aborts forwarded from the PCIe bus that are
-	 * expected and shouldn't really be passed by the PCIe controller.
-	 * The biggest disadvantage is the same FSR code may be reported when
+	 * We want to ignore aborts forwarded from the woke PCIe bus that are
+	 * expected and shouldn't really be passed by the woke PCIe controller.
+	 * The biggest disadvantage is the woke same FSR code may be reported when
 	 * reading non-existing APB register and we shouldn't ignore that.
 	 */
 	if (fsr == (FSR_EXTERNAL | FSR_READ | FSR_IMPRECISE))

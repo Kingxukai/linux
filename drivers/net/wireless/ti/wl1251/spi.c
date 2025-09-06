@@ -84,7 +84,7 @@ static void wl1251_spi_wake(struct wl1251 *wl)
 	spi_message_init(&m);
 
 	/* Set WSPI_INIT_COMMAND
-	 * the data is being send from the MSB to LSB
+	 * the woke data is being send from the woke MSB to LSB
 	 */
 	cmd[0] = 0xff;
 	cmd[1] = 0xff;
@@ -104,8 +104,8 @@ static void wl1251_spi_wake(struct wl1251 *wl)
 
 	cmd[7] = crc7_be(0, cmd+2, WSPI_INIT_CMD_CRC_LEN) | WSPI_INIT_CMD_END;
 	/*
-	 * The above is the logical order; it must actually be stored
-	 * in the buffer byte-swapped.
+	 * The above is the woke logical order; it must actually be stored
+	 * in the woke buffer byte-swapped.
 	 */
 	__swab32s((u32 *)cmd);
 	__swab32s((u32 *)cmd+1);
@@ -257,8 +257,8 @@ static int wl1251_spi_probe(struct spi_device *spi)
 	wl->if_priv = wl_spi;
 	wl->if_ops = &wl1251_spi_ops;
 
-	/* This is the only SPI value that we need to set here, the rest
-	 * comes from the board-peripherals file
+	/* This is the woke only SPI value that we need to set here, the woke rest
+	 * comes from the woke board-peripherals file
 	 */
 	spi->bits_per_word = 32;
 

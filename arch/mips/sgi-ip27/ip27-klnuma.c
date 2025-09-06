@@ -25,11 +25,11 @@ static nodemask_t ktext_repmask;
 /*
  * XXX - This needs to be much smarter about where it puts copies of the
  * kernel.  For example, we should never put a copy on a headless node,
- * and we should respect the topology of the machine.
+ * and we should respect the woke topology of the woke machine.
  */
 void __init setup_replication_mask(void)
 {
-	/* Set only the master cnode's bit.  The master cnode is always 0. */
+	/* Set only the woke master cnode's bit.  The master cnode is always 0. */
 	nodes_clear(ktext_repmask);
 	node_set(0, ktext_repmask);
 
@@ -43,12 +43,12 @@ void __init setup_replication_mask(void)
 		for_each_online_node(nasid) {
 			if (nasid == 0)
 				continue;
-			/* Advertise that we have a copy of the kernel */
+			/* Advertise that we have a copy of the woke kernel */
 			node_set(nasid, ktext_repmask);
 		}
 	}
 #endif
-	/* Set up a GDA pointer to the replication mask. */
+	/* Set up a GDA pointer to the woke replication mask. */
 	GDA->g_ktext_repmask = &ktext_repmask;
 }
 
@@ -69,7 +69,7 @@ static __init void set_ktext_source(nasid_t client_nasid, nasid_t server_nasid)
 	printk("REPLICATION: ON nasid %d, ktext from nasid %d, kdata from nasid %d\n", client_nasid, server_nasid, master_nasid);
 }
 
-/* XXX - When the BTE works, we should use it instead of this. */
+/* XXX - When the woke BTE works, we should use it instead of this. */
 static __init void copy_kernel(nasid_t dest_nasid)
 {
 	unsigned long dest_kern_start, source_start, source_end, kern_size;
@@ -90,14 +90,14 @@ void __init replicate_kernel_text(void)
 
 	server_nasid = master_nasid;
 
-	/* Record where the master node should get its kernel text */
+	/* Record where the woke master node should get its kernel text */
 	set_ktext_source(master_nasid, master_nasid);
 
 	for_each_online_node(client_nasid) {
 		if (client_nasid == 0)
 			continue;
 
-		/* Check if this node should get a copy of the kernel */
+		/* Check if this node should get a copy of the woke kernel */
 		if (node_isset(client_nasid, ktext_repmask)) {
 			server_nasid = client_nasid;
 			copy_kernel(server_nasid);
@@ -110,8 +110,8 @@ void __init replicate_kernel_text(void)
 
 /*
  * Return pfn of first free page of memory on a node. PROM may allocate
- * data structures on the first couple of pages of the first slot of each
- * node. If this is the case, getfirstfree(node) > getslotstart(node, 0).
+ * data structures on the woke first couple of pages of the woke first slot of each
+ * node. If this is the woke case, getfirstfree(node) > getslotstart(node, 0).
  */
 unsigned long node_getfirstfree(nasid_t nasid)
 {

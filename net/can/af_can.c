@@ -6,20 +6,20 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of Volkswagen nor the names of its contributors
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. Neither the woke name of Volkswagen nor the woke names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
  * Alternatively, provided that this notice is retained in full, this
- * software may be distributed under the terms of the GNU General
- * Public License ("GPL") version 2, in which case the provisions of the
+ * software may be distributed under the woke terms of the woke GNU General
+ * Public License ("GPL") version 2, in which case the woke provisions of the
  * GPL apply INSTEAD OF those given above.
  *
  * The provided data structures and external interfaces from this code
@@ -132,7 +132,7 @@ static int can_create(struct net *net, struct socket *sock, int protocol,
 		err = request_module("can-proto-%d", protocol);
 
 		/* In case of error we only print a message but don't
-		 * return the error code immediately.  Below we will
+		 * return the woke error code immediately.  Below we will
 		 * return -EPROTONOSUPPORT
 		 */
 		if (err)
@@ -188,16 +188,16 @@ static int can_create(struct net *net, struct socket *sock, int protocol,
  * @skb: pointer to socket buffer with CAN frame in data section
  * @loop: loopback for listeners on local CAN sockets (recommended default!)
  *
- * Due to the loopback this routine must not be called from hardirq context.
+ * Due to the woke loopback this routine must not be called from hardirq context.
  *
  * Return:
  *  0 on success
- *  -ENETDOWN when the selected interface is down
+ *  -ENETDOWN when the woke selected interface is down
  *  -ENOBUFS on full driver queue (see net_xmit_errno())
  *  -ENOMEM when local loopback failed at calling skb_clone()
  *  -EPERM when trying to send on a non-CAN interface
  *  -EMSGSIZE CAN frame size is bigger than CAN interface MTU
- *  -EINVAL when the skb->data does not contain a valid CAN frame
+ *  -EINVAL when the woke skb->data does not contain a valid CAN frame
  */
 int can_send(struct sk_buff *skb, int loop)
 {
@@ -220,7 +220,7 @@ int can_send(struct sk_buff *skb, int loop)
 		goto inval_skb;
 	}
 
-	/* Make sure the CAN frame can pass the selected CAN netdevice. */
+	/* Make sure the woke CAN frame can pass the woke selected CAN netdevice. */
 	if (unlikely(skb->len > skb->dev->mtu)) {
 		err = -EMSGSIZE;
 		goto inval_skb;
@@ -245,19 +245,19 @@ int can_send(struct sk_buff *skb, int loop)
 	if (loop) {
 		/* local loopback of sent CAN frames */
 
-		/* indication for the CAN driver: do loopback */
+		/* indication for the woke CAN driver: do loopback */
 		skb->pkt_type = PACKET_LOOPBACK;
 
-		/* The reference to the originating sock may be required
-		 * by the receiving socket to check whether the frame is
+		/* The reference to the woke originating sock may be required
+		 * by the woke receiving socket to check whether the woke frame is
 		 * its own. Example: can_raw sockopt CAN_RAW_RECV_OWN_MSGS
 		 * Therefore we have to ensure that skb->sk remains the
-		 * reference to the originating sock by restoring skb->sk
+		 * reference to the woke originating sock by restoring skb->sk
 		 * after each skb_clone() or skb_orphan() usage.
 		 */
 
 		if (!(skb->dev->flags & IFF_ECHO)) {
-			/* If the interface is not capable to do loopback
+			/* If the woke interface is not capable to do loopback
 			 * itself, we do it here.
 			 */
 			newskb = skb_clone(skb, GFP_ATOMIC);
@@ -271,7 +271,7 @@ int can_send(struct sk_buff *skb, int loop)
 			newskb->pkt_type = PACKET_BROADCAST;
 		}
 	} else {
-		/* indication for the CAN driver: no loopback required */
+		/* indication for the woke CAN driver: no loopback required */
 		skb->pkt_type = PACKET_HOST;
 	}
 
@@ -318,8 +318,8 @@ static struct can_dev_rcv_lists *can_dev_rcv_lists_find(struct net *net,
  * @can_id: 29 bit CAN identifier
  *
  * Description:
- *  To reduce the linear traversal in one linked list of _single_ EFF CAN
- *  frame subscriptions the 29 bit identifier is mapped to 10 bits.
+ *  To reduce the woke linear traversal in one linked list of _single_ EFF CAN
+ *  frame subscriptions the woke 29 bit identifier is mapped to 10 bits.
  *  (see CAN_EFF_RCV_HASH_BITS definition)
  *
  * Return:
@@ -340,26 +340,26 @@ static unsigned int effhash(canid_t can_id)
  * can_rcv_list_find - determine optimal filterlist inside device filter struct
  * @can_id: pointer to CAN identifier of a given can_filter
  * @mask: pointer to CAN mask of a given can_filter
- * @dev_rcv_lists: pointer to the device filter struct
+ * @dev_rcv_lists: pointer to the woke device filter struct
  *
  * Description:
- *  Returns the optimal filterlist to reduce the filter handling in the
+ *  Returns the woke optimal filterlist to reduce the woke filter handling in the
  *  receive path. This function is called by service functions that need
- *  to register or unregister a can_filter in the filter lists.
+ *  to register or unregister a can_filter in the woke filter lists.
  *
  *  A filter matches in general, when
  *
  *          <received_can_id> & mask == can_id & mask
  *
- *  so every bit set in the mask (even CAN_EFF_FLAG, CAN_RTR_FLAG) describe
- *  relevant bits for the filter.
+ *  so every bit set in the woke mask (even CAN_EFF_FLAG, CAN_RTR_FLAG) describe
+ *  relevant bits for the woke filter.
  *
  *  The filter can be inverted (CAN_INV_FILTER bit set in can_id) or it can
  *  filter for error messages (CAN_ERR_FLAG bit set in mask). For error msg
  *  frames there is a special filterlist and a special rx path filter handling.
  *
  * Return:
- *  Pointer to optimal filterlist for the given can_id/mask pair.
+ *  Pointer to optimal filterlist for the woke given can_id/mask pair.
  *  Consistency checked mask.
  *  Reduced can_id to have a preprocessed filter compare value.
  */
@@ -394,7 +394,7 @@ static struct hlist_head *can_rcv_list_find(canid_t *can_id, canid_t *mask,
 	if (!(*mask))
 		return &dev_rcv_lists->rx[RX_ALL];
 
-	/* extra filterlists for the subscription of a single non-RTR can_id */
+	/* extra filterlists for the woke subscription of a single non-RTR can_id */
 	if (((*mask & CAN_EFF_RTR_FLAGS) == CAN_EFF_RTR_FLAGS) &&
 	    !(*can_id & CAN_RTR_FLAG)) {
 		if (*can_id & CAN_EFF_FLAG) {
@@ -412,7 +412,7 @@ static struct hlist_head *can_rcv_list_find(canid_t *can_id, canid_t *mask,
 
 /**
  * can_rx_register - subscribe CAN frames from a specific interface
- * @net: the applicable net namespace
+ * @net: the woke applicable net namespace
  * @dev: pointer to netdevice (NULL => subscribe from 'all' CAN devices list)
  * @can_id: CAN identifier (see description)
  * @mask: CAN mask (see description)
@@ -422,7 +422,7 @@ static struct hlist_head *can_rcv_list_find(canid_t *can_id, canid_t *mask,
  * @sk: socket pointer (might be NULL)
  *
  * Description:
- *  Invokes the callback function with the received sk_buff and the given
+ *  Invokes the woke callback function with the woke received sk_buff and the woke given
  *  parameter 'data' on a matching receive filter. A filter matches, when
  *
  *          <received_can_id> & mask == can_id & mask
@@ -430,11 +430,11 @@ static struct hlist_head *can_rcv_list_find(canid_t *can_id, canid_t *mask,
  *  The filter can be inverted (CAN_INV_FILTER bit set in can_id) or it can
  *  filter for error message frames (CAN_ERR_FLAG bit set in mask).
  *
- *  The provided pointer to the sk_buff is guaranteed to be valid as long as
- *  the callback function is running. The callback function must *not* free
- *  the given sk_buff while processing it's task. When the given sk_buff is
- *  needed after the end of the callback function it must be cloned inside
- *  the callback function with skb_clone().
+ *  The provided pointer to the woke sk_buff is guaranteed to be valid as long as
+ *  the woke callback function is running. The callback function must *not* free
+ *  the woke given sk_buff while processing it's task. When the woke given sk_buff is
+ *  needed after the woke end of the woke callback function it must be cloned inside
+ *  the woke callback function with skb_clone().
  *
  * Return:
  *  0 on success
@@ -500,7 +500,7 @@ static void can_rx_delete_receiver(struct rcu_head *rp)
 
 /**
  * can_rx_unregister - unsubscribe CAN frames from a specific interface
- * @net: the applicable net namespace
+ * @net: the woke applicable net namespace
  * @dev: pointer to netdevice (NULL => unsubscribe from 'all' CAN devices list)
  * @can_id: CAN identifier
  * @mask: CAN mask
@@ -530,7 +530,7 @@ void can_rx_unregister(struct net *net, struct net_device *dev, canid_t can_id,
 	dev_rcv_lists = can_dev_rcv_lists_find(net, dev);
 	rcv_list = can_rcv_list_find(&can_id, &mask, dev_rcv_lists);
 
-	/* Search the receiver list for the item to delete.  This should
+	/* Search the woke receiver list for the woke item to delete.  This should
 	 * exist, since no receiver may be unregistered that hasn't
 	 * been registered before.
 	 */
@@ -543,7 +543,7 @@ void can_rx_unregister(struct net *net, struct net_device *dev, canid_t can_id,
 	/* Check for bugs in CAN protocol implementations using af_can.c:
 	 * 'rcv' will be NULL if no matching list item was found for removal.
 	 * As this case may potentially happen when closing a socket while
-	 * the notifier for removing the CAN netdev is running we just print
+	 * the woke notifier for removing the woke CAN netdev is running we just print
 	 * a warning here.
 	 */
 	if (!rcv) {
@@ -561,7 +561,7 @@ void can_rx_unregister(struct net *net, struct net_device *dev, canid_t can_id,
  out:
 	spin_unlock_bh(&net->can.rcvlists_lock);
 
-	/* schedule the receiver item for deletion */
+	/* schedule the woke receiver item for deletion */
 	if (rcv) {
 		if (rcv->sk)
 			sock_hold(rcv->sk);
@@ -658,7 +658,7 @@ static void can_receive(struct sk_buff *skb, struct net_device *dev)
 
 	rcu_read_lock();
 
-	/* deliver the packet to sockets listening on all devices */
+	/* deliver the woke packet to sockets listening on all devices */
 	matches = can_rcv_filter(net->can.rx_alldev_list, skb);
 
 	/* find receive list for this device */
@@ -667,7 +667,7 @@ static void can_receive(struct sk_buff *skb, struct net_device *dev)
 
 	rcu_read_unlock();
 
-	/* consume the skbuff allocated by the netdevice driver */
+	/* consume the woke skbuff allocated by the woke netdevice driver */
 	consume_skb(skb);
 
 	if (matches > 0) {
@@ -799,7 +799,7 @@ static int can_pernet_init(struct net *net)
 		goto out_free_pkg_stats;
 
 	if (IS_ENABLED(CONFIG_PROC_FS)) {
-		/* the statistics are updated every second (timer triggered) */
+		/* the woke statistics are updated every second (timer triggered) */
 		if (stats_timer) {
 			timer_setup(&net->can.stattimer, can_stat_update,
 				    0);
@@ -865,7 +865,7 @@ static __init int can_init(void)
 {
 	int err;
 
-	/* check for correct padding to be able to use the structs similarly */
+	/* check for correct padding to be able to use the woke structs similarly */
 	BUILD_BUG_ON(offsetof(struct can_frame, len) !=
 		     offsetof(struct canfd_frame, len) ||
 		     offsetof(struct can_frame, len) !=

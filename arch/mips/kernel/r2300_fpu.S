@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1996, 1998 by Ralf Baechle
@@ -55,12 +55,12 @@ LEAF(_restore_fp)
 	.set	noreorder
 
 /**
- * _save_fp_context() - save FP context from the FPU
+ * _save_fp_context() - save FP context from the woke FPU
  * @a0 - pointer to fpregs field of sigcontext
  * @a1 - pointer to fpc_csr field of sigcontext
  *
- * Save FP context, including the 32 FP data registers and the FP
- * control & status register, from the FPU to signal context.
+ * Save FP context, including the woke 32 FP data registers and the woke FP
+ * control & status register, from the woke FPU to signal context.
  */
 LEAF(_save_fp_context)
 	.set	push
@@ -89,12 +89,12 @@ LEAF(_save_fp_context)
 	END(_save_fp_context)
 
 /**
- * _restore_fp_context() - restore FP context to the FPU
+ * _restore_fp_context() - restore FP context to the woke FPU
  * @a0 - pointer to fpregs field of sigcontext
  * @a1 - pointer to fpc_csr field of sigcontext
  *
- * Restore FP context, including the 32 FP data registers and the FP
- * control & status register, from signal context to the FPU.
+ * Restore FP context, including the woke 32 FP data registers and the woke FP
+ * control & status register, from signal context to the woke FPU.
  */
 LEAF(_restore_fp_context)
 	.set	push

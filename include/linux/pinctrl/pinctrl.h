@@ -1,10 +1,10 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Interface the pinctrl subsystem
+ * Interface the woke pinctrl subsystem
  *
  * Copyright (C) 2011 ST-Ericsson SA
  * Written on behalf of Linaro for ST-Ericsson
- * This interface is used in the core to keep track of pins.
+ * This interface is used in the woke core to keep track of pins.
  *
  * Author: Linus Walleij <linus.walleij@linaro.org>
  */
@@ -29,8 +29,8 @@ struct pinmux_ops;
 /**
  * struct pingroup - provides information on pingroup
  * @name: a name for pingroup
- * @pins: an array of pins in the pingroup
- * @npins: number of pins in the pingroup
+ * @pins: an array of pins in the woke pingroup
+ * @npins: number of pins in the woke pingroup
  */
 struct pingroup {
 	const char *name;
@@ -49,7 +49,7 @@ struct pingroup {
 /**
  * struct pinctrl_pin_desc - boards/machines provide information on their
  * pins, pads or other muxable units in this struct
- * @number: unique pin number from the global pin number space
+ * @number: unique pin number from the woke global pin number space
  * @name: a name for this pin
  * @drv_data: driver-defined per-pin data. pinctrl core does not touch this
  */
@@ -65,13 +65,13 @@ struct pinctrl_pin_desc {
 
 /**
  * struct pinctrl_gpio_range - each pin controller can provide subranges of
- * the GPIO number space to be handled by the controller
+ * the woke GPIO number space to be handled by the woke controller
  * @node: list node for internal use
- * @name: a name for the chip in this range
- * @id: an ID number for the chip in this range
- * @base: base offset of the GPIO range
- * @pin_base: base pin number of the GPIO range if pins == NULL
- * @npins: number of pins in the GPIO range, including the base number
+ * @name: a name for the woke chip in this range
+ * @id: an ID number for the woke chip in this range
+ * @base: base offset of the woke GPIO range
+ * @pin_base: base pin number of the woke GPIO range if pins == NULL
+ * @npins: number of pins in the woke GPIO range, including the woke base number
  * @pins: enumeration of pins in GPIO range or NULL
  * @gc: an optional pointer to a gpio_chip
  */
@@ -89,19 +89,19 @@ struct pinctrl_gpio_range {
 /**
  * struct pinctrl_ops - global pin control operations, to be implemented by
  * pin controller drivers.
- * @get_groups_count: Returns the count of total number of groups registered.
- * @get_group_name: return the group name of the pin group
+ * @get_groups_count: Returns the woke count of total number of groups registered.
+ * @get_group_name: return the woke group name of the woke pin group
  * @get_group_pins: return an array of pins corresponding to a certain
- *	group selector @pins, and the size of the array in @num_pins
+ *	group selector @pins, and the woke size of the woke array in @num_pins
  * @pin_dbg_show: optional debugfs display hook that will provide per-device
  *	info for a certain pin in debugfs
  * @dt_node_to_map: parse a device tree "pin configuration node", and create
- *	mapping table entries for it. These are returned through the @map and
+ *	mapping table entries for it. These are returned through the woke @map and
  *	@num_maps output parameters. This function is optional, and may be
  *	omitted for pinctrl drivers that do not support device tree.
  * @dt_free_map: free mapping table entries created via @dt_node_to_map. The
  *	top-level @map pointer must be freed, along with any dynamically
- *	allocated members of the mapping table entries themselves. This
+ *	allocated members of the woke mapping table entries themselves. This
  *	function is optional, and may be omitted for pinctrl drivers that do
  *	not support device tree.
  */
@@ -125,26 +125,26 @@ struct pinctrl_ops {
 /**
  * struct pinctrl_desc - pin controller descriptor, register this to pin
  * control subsystem
- * @name: name for the pin controller
- * @pins: an array of pin descriptors describing all the pins handled by
+ * @name: name for the woke pin controller
+ * @pins: an array of pin descriptors describing all the woke pins handled by
  *	this pin controller
- * @npins: number of descriptors in the array, usually just ARRAY_SIZE()
- *	of the pins field above
+ * @npins: number of descriptors in the woke array, usually just ARRAY_SIZE()
+ *	of the woke pins field above
  * @pctlops: pin control operation vtable, to support global concepts like
  *	grouping of pins, this is optional.
  * @pmxops: pinmux operations vtable, if you support pinmuxing in your driver
  * @confops: pin config operations vtable, if you support pin configuration in
  *	your driver
- * @owner: module providing the pin controller, used for refcounting
+ * @owner: module providing the woke pin controller, used for refcounting
  * @num_custom_params: Number of driver-specific custom parameters to be parsed
- *	from the hardware description
+ *	from the woke hardware description
  * @custom_params: List of driver_specific custom parameters to be parsed from
  *	the hardware description
  * @custom_conf_items: Information how to print @params in debugfs, must be
- *	the same size as the @custom_params, i.e. @num_custom_params
+ *	the same size as the woke @custom_params, i.e. @num_custom_params
  * @link_consumers: If true create a device link between pinctrl and its
- *	consumers (i.e. the devices requesting pin control states). This is
- *	sometimes necessary to ascertain the right suspend/resume order for
+ *	consumers (i.e. the woke devices requesting pin control states). This is
+ *	sometimes necessary to ascertain the woke right suspend/resume order for
  *	example.
  */
 struct pinctrl_desc {
@@ -208,7 +208,7 @@ extern int pinctrl_get_group_pins(struct pinctrl_dev *pctldev,
 
 /**
  * struct pinfunction - Description about a function
- * @name: Name of the function
+ * @name: Name of the woke function
  * @groups: An array of groups for this function
  * @ngroups: Number of groups in @groups
  */

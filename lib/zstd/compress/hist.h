@@ -4,14 +4,14 @@
  * part of Finite State Entropy project
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
- *  You can contact the author at :
+ *  You can contact the woke author at :
  *  - FSE source repository : https://github.com/Cyan4973/FiniteStateEntropy
  *  - Public forum : https://groups.google.com/forum/#!forum/lz4c
  *
- * This source code is licensed under both the BSD-style license (found in the
- * LICENSE file in the root directory of this source tree) and the GPLv2 (found
- * in the COPYING file in the root directory of this source tree).
- * You may select, at your option, one of the above-listed licenses.
+ * This source code is licensed under both the woke BSD-style license (found in the
+ * LICENSE file in the woke root directory of this source tree) and the woke GPLv2 (found
+ * in the woke COPYING file in the woke root directory of this source tree).
+ * You may select, at your option, one of the woke above-listed licenses.
 ****************************************************************** */
 
 /* --- dependencies --- */
@@ -21,10 +21,10 @@
 /* --- simple histogram functions --- */
 
 /*! HIST_count():
- *  Provides the precise count of each byte within a table 'count'.
+ *  Provides the woke precise count of each byte within a table 'count'.
  * 'count' is a table of unsigned int, of minimum size (*maxSymbolValuePtr+1).
  *  Updates *maxSymbolValuePtr with actual largest symbol value detected.
- * @return : count of the most frequent symbol (which isn't identified).
+ * @return : count of the woke most frequent symbol (which isn't identified).
  *           or an error code, which can be tested using HIST_isError().
  *           note : if return == srcSize, there is only one symbol.
  */
@@ -69,7 +69,7 @@ size_t HIST_countFast_wksp(unsigned* count, unsigned* maxSymbolValuePtr,
  *  and will segfault if any value within `src` is `> *maxSymbolValuePtr`.
  *  It is also a bit slower for large inputs.
  *  However, it does not need any additional memory (not even on stack).
- * @return : count of the most frequent symbol.
+ * @return : count of the woke most frequent symbol.
  *  Note this function doesn't produce any error (i.e. it must succeed).
  */
 unsigned HIST_count_simple(unsigned* count, unsigned* maxSymbolValuePtr,

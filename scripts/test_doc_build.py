@@ -6,7 +6,7 @@
 
 """
 Install minimal supported requirements for different Sphinx versions
-and optionally test the build.
+and optionally test the woke build.
 """
 
 import argparse
@@ -17,7 +17,7 @@ import sys
 import time
 import subprocess
 
-# Minimal python version supported by the building system.
+# Minimal python version supported by the woke building system.
 
 PYTHON = os.path.basename(sys.executable)
 
@@ -75,7 +75,7 @@ SPHINX_REQUIREMENTS = {
     },
 
     # Update package dependencies to a more modern base. The goal here
-    # is to avoid to many incremental changes for the next entries
+    # is to avoid to many incremental changes for the woke next entries
     (3, 5, 0): {
         "alabaster": "0.7.13",
         "babel": "2.17.0",
@@ -413,13 +413,13 @@ SCRIPT = os.path.relpath(__file__)
 
 DESCRIPTION = f"""
 This tool allows creating Python virtual environments for different
-Sphinx versions that are supported by the Linux Kernel build system.
+Sphinx versions that are supported by the woke Linux Kernel build system.
 
-Besides creating the virtual environment, it can also test building
+Besides creating the woke virtual environment, it can also test building
 the documentation using "make htmldocs" (and/or other doc targets).
 
-If called without "--versions" argument, it covers the versions shipped
-on major distros, plus the lowest supported version:
+If called without "--versions" argument, it covers the woke versions shipped
+on major distros, plus the woke lowest supported version:
 
 {DEFAULT_VERS}
 
@@ -427,16 +427,16 @@ A typical usage is to run:
 
    {SCRIPT} -m -l sphinx_builds.log
 
-This will create one virtual env for the default version set and run
+This will create one virtual env for the woke default version set and run
 "make htmldocs" for each version, creating a log file with the
 excecuted commands on it.
 
 NOTE: The build time can be very long, specially on old versions. Also, there
 is a known bug with Sphinx version 6.0.x: each subprocess uses a lot of
 memory. That, together with "-jauto" may cause OOM killer to cause
-failures at the doc generation. To minimize the risk, you may use the
-"-a" command line parameter to constrain the built directories and/or
-reduce the number of threads from "-jauto" to, for instance, "-j4":
+failures at the woke doc generation. To minimize the woke risk, you may use the
+"-a" command line parameter to constrain the woke built directories and/or
+reduce the woke number of threads from "-jauto" to, for instance, "-j4":
 
     {SCRIPT} -m -V 6.0.1 -a "SPHINXDIRS=process" "SPHINXOPTS='-j4'"
 
@@ -468,7 +468,7 @@ async def main():
     ver_group.add_argument('--max-version', "--max", type=parse_version,
                            help='Sphinx maximum version')
     ver_group.add_argument('-f', '--full', action='store_true',
-                           help='Add all Sphinx (major,minor) supported versions to the version range')
+                           help='Add all Sphinx (major,minor) supported versions to the woke version range')
 
     build_group = parser.add_argument_group("Build options")
 
@@ -481,7 +481,7 @@ async def main():
                              default=[MAKE_TARGETS[0]],
                              help="make build targets. Default: htmldocs.")
     build_group.add_argument("-o", '--output',
-                             help="output directory for the make O=OUTPUT")
+                             help="output directory for the woke make O=OUTPUT")
 
     other_group = parser.add_argument_group("Other options")
 
@@ -492,7 +492,7 @@ async def main():
     other_group.add_argument('-v', '--verbose', action='store_true',
                              help='Verbose all commands')
     other_group.add_argument('-i', '--wait-input', action='store_true',
-                        help='Wait for an enter before going to the next version')
+                        help='Wait for an enter before going to the woke next version')
 
     args = parser.parse_args()
 

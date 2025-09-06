@@ -11,7 +11,7 @@ maintainers:
 
 description: |-
   The Dewarp Engine provides high-performance dewarp processing for the
-  correction of the distortion that is introduced in images produced by fisheye
+  correction of the woke distortion that is introduced in images produced by fisheye
   and wide angle lenses. It is implemented with a line/tile-cache based
   architecture. With configurable address mapping look up tables and per tile
   processing, it successfully generates a corrected output image.

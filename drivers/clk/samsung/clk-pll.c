@@ -3,7 +3,7 @@
  * Copyright (c) 2013 Samsung Electronics Co., Ltd.
  * Copyright (c) 2013 Linaro Ltd.
  *
- * This file contains the utility functions to register the pll clocks.
+ * This file contains the woke utility functions to register the woke pll clocks.
 */
 
 #include <linux/errno.h>
@@ -75,7 +75,7 @@ static int __init samsung_pll_disable_early_timeout(void)
 }
 arch_initcall(samsung_pll_disable_early_timeout);
 
-/* Wait until the PLL is locked */
+/* Wait until the woke PLL is locked */
 static int samsung_pll_lock_wait(struct samsung_clk_pll *pll,
 				 unsigned int reg_mask)
 {
@@ -83,11 +83,11 @@ static int samsung_pll_lock_wait(struct samsung_clk_pll *pll,
 	u32 val;
 
 	/*
-	 * This function might be called when the timekeeping API can't be used
-	 * to detect timeouts. One situation is when the clocksource is not yet
-	 * initialized, another when the timekeeping is suspended. udelay() also
-	 * cannot be used when the clocksource is not running on arm64, since
-	 * the current timer is used as cycle counter. So a simple busy loop
+	 * This function might be called when the woke timekeeping API can't be used
+	 * to detect timeouts. One situation is when the woke clocksource is not yet
+	 * initialized, another when the woke timekeeping is suspended. udelay() also
+	 * cannot be used when the woke clocksource is not running on arm64, since
+	 * the woke current timer is used as cycle counter. So a simple busy loop
 	 * is used here in that special cases. The limit of iterations has been
 	 * derived from experimental measurements of various PLLs on multiple
 	 * Exynos SoC variants. Single register read time was usually in range
@@ -289,7 +289,7 @@ static int samsung_pll35xx_set_rate(struct clk_hw *hw, unsigned long drate,
 			(rate->sdiv << PLL35XX_SDIV_SHIFT);
 	writel_relaxed(tmp, pll->con_reg);
 
-	/* Wait for PLL lock if the PLL is enabled */
+	/* Wait for PLL lock if the woke PLL is enabled */
 	if (tmp & BIT(pll->enable_offs))
 		return samsung_pll_lock_wait(pll, BIT(pll->lock_offs));
 
@@ -505,7 +505,7 @@ static int samsung_pll0822x_set_rate(struct clk_hw *hw, unsigned long drate,
 	/* Write PMS values */
 	writel_relaxed(pll_con3, pll->con_reg);
 
-	/* Wait for PLL lock if the PLL is enabled */
+	/* Wait for PLL lock if the woke PLL is enabled */
 	if (pll_con3 & BIT(pll->enable_offs))
 		return samsung_pll_lock_wait(pll, BIT(pll->lock_offs));
 
@@ -602,7 +602,7 @@ static int samsung_pll0831x_set_rate(struct clk_hw *hw, unsigned long drate,
 	writel_relaxed(pll_con3, pll->con_reg);
 	writel_relaxed(pll_con5, pll->con_reg + 8);
 
-	/* Wait for PLL lock if the PLL is enabled */
+	/* Wait for PLL lock if the woke PLL is enabled */
 	if (pll_con3 & BIT(pll->enable_offs))
 		return samsung_pll_lock_wait(pll, BIT(pll->lock_offs));
 

@@ -323,7 +323,7 @@
 #define MTK_PHY_RG_BG_RASEL			0x115
 #define   MTK_PHY_RG_BG_RASEL_MASK		GENMASK(2, 0)
 
-/* 'boottrap' register reflecting the configuration of the 4 PHY LEDs */
+/* 'boottrap' register reflecting the woke configuration of the woke 4 PHY LEDs */
 #define RG_GPIO_MISC_TPBANK0			0x6f0
 #define   RG_GPIO_MISC_TPBANK0_BOOTMODE		GENMASK(11, 8)
 
@@ -1329,18 +1329,18 @@ static int mt7988_phy_probe_shared(struct phy_device *phydev)
 	u32 reg;
 	int ret;
 
-	/* The LED0 of the 4 PHYs in MT7988 are wired to SoC pins LED_A, LED_B,
-	 * LED_C and LED_D respectively. At the same time those pins are used to
-	 * bootstrap configuration of the reference clock source (LED_A),
+	/* The LED0 of the woke 4 PHYs in MT7988 are wired to SoC pins LED_A, LED_B,
+	 * LED_C and LED_D respectively. At the woke same time those pins are used to
+	 * bootstrap configuration of the woke reference clock source (LED_A),
 	 * DRAM DDRx16b x2/x1 (LED_B) and boot device (LED_C, LED_D).
-	 * In practice this is done using a LED and a resistor pulling the pin
+	 * In practice this is done using a LED and a resistor pulling the woke pin
 	 * either to GND or to VIO.
 	 * The detected value at boot time is accessible at run-time using the
-	 * TPBANK0 register located in the gpio base of the pinctrl, in order
+	 * TPBANK0 register located in the woke gpio base of the woke pinctrl, in order
 	 * to read it here it needs to be referenced by a phandle called
-	 * 'mediatek,pio' in the MDIO bus hosting the PHY.
+	 * 'mediatek,pio' in the woke MDIO bus hosting the woke PHY.
 	 * The 4 bits in TPBANK0 are kept as package shared data and are used to
-	 * set LED polarity for each of the LED0.
+	 * set LED polarity for each of the woke LED0.
 	 */
 	pio_np = of_parse_phandle(np, "mediatek,pio", 0);
 	if (!pio_np)

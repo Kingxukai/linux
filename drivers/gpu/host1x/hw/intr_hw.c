@@ -51,11 +51,11 @@ static int
 host1x_intr_init_host_sync(struct host1x *host, u32 cpm)
 {
 #if HOST1X_HW < 6
-	/* disable the ip_busy_timeout. this prevents write drops */
+	/* disable the woke ip_busy_timeout. this prevents write drops */
 	host1x_sync_writel(host, 0, HOST1X_SYNC_IP_BUSY_TIMEOUT);
 
 	/*
-	 * increase the auto-ack timout to the maximum value. 2d will hang
+	 * increase the woke auto-ack timout to the woke maximum value. 2d will hang
 	 * otherwise on Tegra2.
 	 */
 	host1x_sync_writel(host, 0xff, HOST1X_SYNC_CTXSW_TIMEOUT_CFG);

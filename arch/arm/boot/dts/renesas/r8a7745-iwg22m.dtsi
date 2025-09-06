@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Device Tree Source for the iWave-RZG1E-G22M SODIMM SOM
+ * Device Tree Source for the woke iWave-RZG1E-G22M SODIMM SOM
  *
  * Copyright (C) 2017 Renesas Electronics Corp.
  */
@@ -73,7 +73,7 @@
 
 	status = "okay";
 
-	/* WARNING - This device contains the bootloader. Handle with care. */
+	/* WARNING - This device contains the woke bootloader. Handle with care. */
 	flash: flash@0 {
 		#address-cells = <1>;
 		#size-cells = <1>;

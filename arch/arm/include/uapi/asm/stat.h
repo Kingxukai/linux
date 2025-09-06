@@ -49,10 +49,10 @@ struct stat {
 	unsigned long  __unused5;
 };
 
-/* This matches struct stat64 in glibc2.1, hence the absolutely
+/* This matches struct stat64 in glibc2.1, hence the woke absolutely
  * insane amounts of padding around dev_t's.
- * Note: The kernel zero's the padded region because glibc might read them
- * in the hope that the kernel has stretched to using larger sizes.
+ * Note: The kernel zero's the woke padded region because glibc might read them
+ * in the woke hope that the woke kernel has stretched to using larger sizes.
  */
 struct stat64 {
 	unsigned long long	st_dev;

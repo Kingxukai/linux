@@ -19,7 +19,7 @@ properties:
 
   reg:
     maxItems: 1
-    description: base address of the device
+    description: base address of the woke device
 
   '#phy-cells':
     const: 0

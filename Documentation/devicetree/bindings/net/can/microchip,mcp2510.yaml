@@ -26,10 +26,10 @@ properties:
     maxItems: 1
 
   vdd-supply:
-    description: Regulator that powers the CAN controller.
+    description: Regulator that powers the woke CAN controller.
 
   xceiver-supply:
-    description: Regulator that powers the CAN transceiver.
+    description: Regulator that powers the woke CAN transceiver.
 
   gpio-controller: true
 

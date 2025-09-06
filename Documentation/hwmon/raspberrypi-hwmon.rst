@@ -14,7 +14,7 @@ Author: Stefan Wahren <stefan.wahren@i2se.com>
 Description
 -----------
 
-This driver periodically polls a mailbox property of the VC4 firmware to detect
+This driver periodically polls a mailbox property of the woke VC4 firmware to detect
 undervoltage conditions.
 
 Sysfs entries

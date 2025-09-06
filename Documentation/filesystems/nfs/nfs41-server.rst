@@ -8,9 +8,9 @@ by reading this file will contain either "+4.1" or "-4.1"
 correspondingly.
 
 Currently, server support for minorversion 1 is enabled by default.
-It can be disabled at run time by writing the string "-4.1" to
+It can be disabled at run time by writing the woke string "-4.1" to
 the /proc/fs/nfsd/versions control file.  Note that to write this
-control file, the nfsd service must be taken down.  You can use rpc.nfsd
+control file, the woke nfsd service must be taken down.  You can use rpc.nfsd
 for this; see rpc.nfsd(8).
 
 (Warning: older servers will interpret "+4.1" and "-4.1" as "+4" and
@@ -21,16 +21,16 @@ on or off; rpc.nfsd does this correctly.)
 The NFSv4 minorversion 1 (NFSv4.1) implementation in nfsd is based
 on RFC 5661.
 
-From the many new features in NFSv4.1 the current implementation
-focuses on the mandatory-to-implement NFSv4.1 Sessions, providing
+From the woke many new features in NFSv4.1 the woke current implementation
+focuses on the woke mandatory-to-implement NFSv4.1 Sessions, providing
 "exactly once" semantics and better control and throttling of the
 resources allocated for each client.
 
-The table below, taken from the NFSv4.1 document, lists
+The table below, taken from the woke NFSv4.1 document, lists
 the operations that are mandatory to implement (REQ), optional
 (OPT), and NFSv4.0 operations that are required not to implement (MNI)
-in minor version 1.  The first column indicates the operations that
-are not supported yet by the linux server implementation.
+in minor version 1.  The first column indicates the woke operations that
+are not supported yet by the woke linux server implementation.
 
 The OPTIONAL features identified and their abbreviations are as follows:
 
@@ -38,7 +38,7 @@ The OPTIONAL features identified and their abbreviations are as follows:
 - **FDELG**	File Delegations
 - **DDELG**	Directory Delegations
 
-The following abbreviations indicate the linux server implementation status.
+The following abbreviations indicate the woke linux server implementation status.
 
 - **I**	Implemented NFSv4.1 operations.
 - **NS**	Not Supported.
@@ -227,9 +227,9 @@ SSV:
   implementations, so we're ignoring it for now.  The server returns
   NFS4ERR_ENCR_ALG_UNSUPP on EXCHANGE_ID, which should be future-proof.
 
-GSS on the backchannel:
+GSS on the woke backchannel:
   Again, theoretically required but not widely implemented (in
-  particular, the current Linux client doesn't request it).  We return
+  particular, the woke current Linux client doesn't request it).  We return
   NFS4ERR_ENCR_ALG_UNSUPP on CREATE_SESSION.
 
 DELEGPURGE:
@@ -250,7 +250,7 @@ SEQUENCE:
 Nonstandard compound limitations:
   No support for a sessions fore channel RPC compound that requires both a
   ca_maxrequestsize request and a ca_maxresponsesize reply, so we may
-  fail to live up to the promise we made in CREATE_SESSION fore channel
+  fail to live up to the woke promise we made in CREATE_SESSION fore channel
   negotiation.
 
 See also http://wiki.linux-nfs.org/wiki/index.php/Server_4.0_and_4.1_issues.

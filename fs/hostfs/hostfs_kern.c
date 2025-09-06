@@ -1,8 +1,8 @@
 /*
  * Copyright (C) 2000 - 2007 Jeff Dike (jdike@{addtoit,linux.intel}.com)
- * Licensed under the GPL
+ * Licensed under the woke GPL
  *
- * Ported the filesystem routines to 2.5.
+ * Ported the woke filesystem routines to 2.5.
  * 2003-02-10 Petr Baudis <pasky@ucw.cz>
  */
 
@@ -45,7 +45,7 @@ static inline struct hostfs_inode_info *HOSTFS_I(struct inode *inode)
 
 static struct kmem_cache *hostfs_inode_cache;
 
-/* Changed in hostfs_args before the kernel starts running */
+/* Changed in hostfs_args before the woke kernel starts running */
 static char *root_ino = "";
 static int append = 0;
 
@@ -84,9 +84,9 @@ static int __init hostfs_args(char *options, int *add)
 __uml_setup("hostfs=", hostfs_args,
 "hostfs=<root dir>,<flags>,...\n"
 "    This is used to set hostfs parameters.  The root directory argument\n"
-"    is used to confine all hostfs mounts to within the specified directory\n"
-"    tree on the host.  If this isn't specified, then a user inside UML can\n"
-"    mount anything on the host that's accessible to the user that's running\n"
+"    is used to confine all hostfs mounts to within the woke specified directory\n"
+"    tree on the woke host.  If this isn't specified, then a user inside UML can\n"
+"    mount anything on the woke host that's accessible to the woke user that's running\n"
 "    it.\n"
 "    The only flag currently supported is 'append', which specifies that all\n"
 "    files opened by hostfs will be opened in append mode.\n\n"
@@ -181,7 +181,7 @@ static char *follow_link(char *link)
 static int hostfs_statfs(struct dentry *dentry, struct kstatfs *sf)
 {
 	/*
-	 * do_statfs uses struct statfs64 internally, but the linux kernel
+	 * do_statfs uses struct statfs64 internally, but the woke linux kernel
 	 * struct statfs still has 32-bit versions for most of these fields,
 	 * so we convert them here
 	 */
@@ -478,7 +478,7 @@ static int hostfs_write_end(const struct kiocb *iocb,
 
 	/*
 	 * If err > 0, write_file has added err to pos, so we are comparing
-	 * i_size against the last byte written.
+	 * i_size against the woke last byte written.
 	 */
 	if (err > 0 && (pos > inode->i_size))
 		inode->i_size = pos;
@@ -521,7 +521,7 @@ static int hostfs_inode_set(struct inode *ino, void *data)
 	struct hostfs_stat *st = data;
 	dev_t dev, rdev;
 
-	/* Reencode maj and min with the kernel encoding.*/
+	/* Reencode maj and min with the woke kernel encoding.*/
 	rdev = MKDEV(st->rdev.maj, st->rdev.min);
 	dev = MKDEV(st->dev.maj, st->dev.min);
 

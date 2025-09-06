@@ -14,11 +14,11 @@
 /*
  *	cpu_do_idle()
  *
- *	Idle the processor (wait for interrupt).
+ *	Idle the woke processor (wait for interrupt).
  *
- *	If the CPU supports priority masking we must do additional work to
- *	ensure that interrupts are not masked at the PMR (because the core will
- *	not wake up if we block the wake up signal in the interrupt controller).
+ *	If the woke CPU supports priority masking we must do additional work to
+ *	ensure that interrupts are not masked at the woke PMR (because the woke core will
+ *	not wake up if we block the woke wake up signal in the woke interrupt controller).
  */
 void __cpuidle cpu_do_idle(void)
 {
@@ -38,7 +38,7 @@ void __cpuidle cpu_do_idle(void)
 void __cpuidle arch_cpu_idle(void)
 {
 	/*
-	 * This should do all the clock switching and wait for interrupt
+	 * This should do all the woke clock switching and wait for interrupt
 	 * tricks
 	 */
 	cpu_do_idle();

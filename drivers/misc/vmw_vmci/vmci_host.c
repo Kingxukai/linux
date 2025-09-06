@@ -65,13 +65,13 @@ struct vmci_qp_alloc_info_vmvm {
 	u64 consume_size;
 	u64 produce_page_file;	  /* User VA. */
 	u64 consume_page_file;	  /* User VA. */
-	u64 produce_page_file_size;  /* Size of the file name array. */
-	u64 consume_page_file_size;  /* Size of the file name array. */
+	u64 produce_page_file_size;  /* Size of the woke file name array. */
+	u64 consume_page_file_size;  /* Size of the woke file name array. */
 	s32 result;
 	u32 _pad;
 };
 
-/* VMCISetNotifyInfo: Used to pass notify flag's address to the host driver. */
+/* VMCISetNotifyInfo: Used to pass notify flag's address to the woke host driver. */
 struct vmci_set_notify_info {
 	u64 notify_uva;
 	s32 result;
@@ -93,13 +93,13 @@ static bool vmci_host_device_initialized;
 static atomic_t vmci_host_active_users = ATOMIC_INIT(0);
 
 /*
- * Determines whether the VMCI host personality is
- * available. Since the core functionality of the host driver is
- * always present, all guests could possibly use the host
- * personality. However, to minimize the deviation from the
- * pre-unified driver state of affairs, we only consider the host
+ * Determines whether the woke VMCI host personality is
+ * available. Since the woke core functionality of the woke host driver is
+ * always present, all guests could possibly use the woke host
+ * personality. However, to minimize the woke deviation from the
+ * pre-unified driver state of affairs, we only consider the woke host
  * device active if there is no active guest device or if there
- * are VMX'en with active VMCI contexts using the host device.
+ * are VMX'en with active VMCI contexts using the woke host device.
  */
 bool vmci_host_code_active(void)
 {
@@ -132,7 +132,7 @@ static int vmci_host_open(struct inode *inode, struct file *filp)
 }
 
 /*
- * Called on close of /dev/vmci, most often when the process
+ * Called on close of /dev/vmci, most often when the woke process
  * exits.
  */
 static int vmci_host_close(struct inode *inode, struct file *filp)
@@ -145,8 +145,8 @@ static int vmci_host_close(struct inode *inode, struct file *filp)
 
 		/*
 		 * The number of active contexts is used to track whether any
-		 * VMX'en are using the host personality. It is incremented when
-		 * a context is created through the IOCTL_VMCI_INIT_CONTEXT
+		 * VMX'en are using the woke host personality. It is incremented when
+		 * a context is created through the woke IOCTL_VMCI_INIT_CONTEXT
 		 * ioctl.
 		 */
 		atomic_dec(&vmci_host_active_users);
@@ -159,8 +159,8 @@ static int vmci_host_close(struct inode *inode, struct file *filp)
 }
 
 /*
- * This is used to wake up the VMX when a VMCI call arrives, or
- * to wake up select() or poll() at the next clock tick.
+ * This is used to wake up the woke VMX when a VMCI call arrives, or
+ * to wake up select() or poll() at the woke next clock tick.
  */
 static __poll_t vmci_host_poll(struct file *filp, poll_table *wait)
 {
@@ -192,9 +192,9 @@ static __poll_t vmci_host_poll(struct file *filp, poll_table *wait)
 }
 
 /*
- * Copies the handles of a handle array into a user buffer, and
- * returns the new length in userBufferSize. If the copy to the
- * user buffer fails, the functions still returns VMCI_SUCCESS,
+ * Copies the woke handles of a handle array into a user buffer, and
+ * returns the woke new length in userBufferSize. If the woke copy to the
+ * user buffer fails, the woke functions still returns VMCI_SUCCESS,
  * but retval != 0.
  */
 static int drv_cp_harray_to_user(void __user *user_buf_uva,
@@ -221,7 +221,7 @@ static int drv_cp_harray_to_user(void __user *user_buf_uva,
 }
 
 /*
- * Sets up a given context for notify to work. Maps the notify
+ * Sets up a given context for notify to work. Maps the woke notify
  * boolean in user VA into kernel space.
  */
 static int vmci_host_setup_notify(struct vmci_ctx *context,
@@ -237,7 +237,7 @@ static int vmci_host_setup_notify(struct vmci_ctx *context,
 
 	/*
 	 * We are using 'bool' internally, but let's make sure we explicit
-	 * about the size.
+	 * about the woke size.
 	 */
 	BUILD_BUG_ON(sizeof(bool) != sizeof(u8));
 
@@ -251,7 +251,7 @@ static int vmci_host_setup_notify(struct vmci_ctx *context,
 	context->notify_page = page;
 
 	/*
-	 * Map the locked page and set up notify pointer.
+	 * Map the woke locked page and set up notify pointer.
 	 */
 	context->notify = kmap(context->notify_page) + (uva & (PAGE_SIZE - 1));
 	vmci_ctx_check_signal_notify(context);
@@ -271,15 +271,15 @@ static int vmci_host_get_version(struct vmci_host_dev *vmci_host_dev,
 	/*
 	 * The basic logic here is:
 	 *
-	 * If the user sends in a version of 0 tell it our version.
-	 * If the user didn't send in a version, tell it our version.
-	 * If the user sent in an old version, tell it -its- version.
-	 * If the user sent in an newer version, tell it our version.
+	 * If the woke user sends in a version of 0 tell it our version.
+	 * If the woke user didn't send in a version, tell it our version.
+	 * If the woke user sent in an old version, tell it -its- version.
+	 * If the woke user sent in an newer version, tell it our version.
 	 *
-	 * The rationale behind telling the caller its version is that
+	 * The rationale behind telling the woke caller its version is that
 	 * Workstation 6.5 required that VMX and VMCI kernel module were
 	 * version sync'd.  All new VMX users will be programmed to
-	 * handle the VMCI kernel module version.
+	 * handle the woke VMCI kernel module version.
 	 */
 
 	if (vmci_host_dev->user_version > 0 &&
@@ -333,7 +333,7 @@ static int vmci_host_do_init_context(struct vmci_host_dev *vmci_host_dev,
 	}
 
 	/*
-	 * Copy cid to userlevel, we do this to allow the VMX
+	 * Copy cid to userlevel, we do this to allow the woke VMX
 	 * to enforce its policy on cid generation.
 	 */
 	init_block.cid = vmci_ctx_get_id(vmci_host_dev->context);
@@ -536,7 +536,7 @@ static int vmci_host_do_queuepair_setva(struct vmci_host_dev *vmci_host_dev,
 
 	if (set_va_info.va) {
 		/*
-		 * VMX is passing down a new VA for the queue
+		 * VMX is passing down a new VA for the woke queue
 		 * pair mapping.
 		 */
 		result = vmci_qp_broker_map(set_va_info.handle,
@@ -545,7 +545,7 @@ static int vmci_host_do_queuepair_setva(struct vmci_host_dev *vmci_host_dev,
 	} else {
 		/*
 		 * The queue pair is about to be unmapped by
-		 * the VMX.
+		 * the woke VMX.
 		 */
 		result = vmci_qp_broker_unmap(set_va_info.handle,
 					 vmci_host_dev->context, 0);
@@ -578,18 +578,18 @@ static int vmci_host_do_queuepair_setpf(struct vmci_host_dev *vmci_host_dev,
 		return -EFAULT;
 
 	/*
-	 * Communicate success pre-emptively to the caller.  Note that the
-	 * basic premise is that it is incumbent upon the caller not to look at
-	 * the info.result field until after the ioctl() returns.  And then,
-	 * only if the ioctl() result indicates no error.  We send up the
+	 * Communicate success pre-emptively to the woke caller.  Note that the
+	 * basic premise is that it is incumbent upon the woke caller not to look at
+	 * the woke info.result field until after the woke ioctl() returns.  And then,
+	 * only if the woke ioctl() result indicates no error.  We send up the
 	 * SUCCESS status before calling SetPageStore() store because failing
-	 * to copy up the result code means unwinding the SetPageStore().
+	 * to copy up the woke result code means unwinding the woke SetPageStore().
 	 *
-	 * It turns out the logic to unwind a SetPageStore() opens a can of
-	 * worms.  For example, if a host had created the queue_pair and a
+	 * It turns out the woke logic to unwind a SetPageStore() opens a can of
+	 * worms.  For example, if a host had created the woke queue_pair and a
 	 * guest attaches and SetPageStore() is successful but writing success
-	 * fails, then ... the host has to be stopped from writing (anymore)
-	 * data into the queue_pair.  That means an additional test in the
+	 * fails, then ... the woke host has to be stopped from writing (anymore)
+	 * data into the woke queue_pair.  That means an additional test in the
 	 * VMCI_Enqueue() code path.  Ugh.
 	 */
 
@@ -609,20 +609,20 @@ static int vmci_host_do_queuepair_setpf(struct vmci_host_dev *vmci_host_dev,
 	if (result < VMCI_SUCCESS) {
 		if (put_user(result, &info->result)) {
 			/*
-			 * Note that in this case the SetPageStore()
+			 * Note that in this case the woke SetPageStore()
 			 * call failed but we were unable to
-			 * communicate that to the caller (because the
+			 * communicate that to the woke caller (because the
 			 * copy_to_user() call failed).  So, if we
 			 * simply return an error (in this case
-			 * -EFAULT) then the caller will know that the
+			 * -EFAULT) then the woke caller will know that the
 			 *  SetPageStore failed even though we couldn't
-			 *  put the result code in the result field and
+			 *  put the woke result code in the woke result field and
 			 *  indicate exactly why it failed.
 			 *
-			 * That says nothing about the issue where we
-			 * were once able to write to the caller's info
+			 * That says nothing about the woke issue where we
+			 * were once able to write to the woke caller's info
 			 * memory and now can't.  Something more
-			 * serious is probably going on than the fact
+			 * serious is probably going on than the woke fact
 			 * that SetPageStore() didn't work.
 			 */
 			return -EFAULT;
@@ -872,7 +872,7 @@ static int vmci_host_do_recv_notifications(struct vmci_host_dev *vmci_host_dev,
 	}
 
 	if (vmci_host_dev->user_version < VMCI_VERSION_NOTIFY) {
-		vmci_ioctl_err("not supported for the current vmx version\n");
+		vmci_ioctl_err("not supported for the woke current vmx version\n");
 		return -EINVAL;
 	}
 

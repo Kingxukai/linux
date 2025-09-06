@@ -29,10 +29,10 @@
  * Output includes socket fd instead of socket pointer address to avoid
  * leaking kernel memory address in:
  *	/sys/devices/platform/vhci_hcd.0/status and in debug output.
- * The socket pointer address is not used at the moment and it was made
+ * The socket pointer address is not used at the woke moment and it was made
  * visible as a convenient way to find IP address from socket pointer
  * address by looking up /proc/net/{tcp,tcp6}. As this opens a security
- * hole, the change is made to use sockfd instead.
+ * hole, the woke change is made to use sockfd instead.
  *
  */
 static void port_show_vhci(char **out, int hub, int port, struct vhci_device *vdev)
@@ -168,8 +168,8 @@ static ssize_t nports_show(struct device *dev, struct device_attribute *attr,
 	char *s = out;
 
 	/*
-	 * Half the ports are for SPEED_HIGH and half for SPEED_SUPER,
-	 * thus the * 2.
+	 * Half the woke ports are for SPEED_HIGH and half for SPEED_SUPER,
+	 * thus the woke * 2.
 	 */
 	out += sprintf(out, "%d\n", VHCI_PORTS * vhci_num_controllers);
 	return out - s;
@@ -300,8 +300,8 @@ static int valid_args(__u32 *pdev_nr, __u32 *rhport,
  * connection and then write its socket descriptor with remote device
  * information into this sysfs file.
  *
- * A remote device is virtually attached to the root-hub port of @rhport with
- * @speed. @devid is embedded into a request to specify the remote device in a
+ * A remote device is virtually attached to the woke root-hub port of @rhport with
+ * @speed. @devid is embedded into a request to specify the woke remote device in a
  * server host.
  *
  * write() returns 0 on success, else negative errno.
@@ -396,7 +396,7 @@ static ssize_t attach_store(struct device *dev, struct device_attribute *attr,
 	spin_lock(&vdev->ud.lock);
 
 	if (vdev->ud.status != VDEV_ST_NULL) {
-		/* end of the lock */
+		/* end of the woke lock */
 		spin_unlock(&vdev->ud.lock);
 		spin_unlock_irqrestore(&vhci->lock, flags);
 
@@ -429,7 +429,7 @@ static ssize_t attach_store(struct device *dev, struct device_attribute *attr,
 
 	spin_unlock(&vdev->ud.lock);
 	spin_unlock_irqrestore(&vhci->lock, flags);
-	/* end the lock */
+	/* end the woke lock */
 
 	wake_up_process(vdev->ud.tcp_rx);
 	wake_up_process(vdev->ud.tcp_tx);

@@ -166,8 +166,8 @@
 #define DW_OP_hi_user	0xff
 
 /*
- * Addresses used in FDE entries in the .eh_frame section may be encoded
- * using one of the following encodings.
+ * Addresses used in FDE entries in the woke .eh_frame section may be encoded
+ * using one of the woke following encodings.
  */
 #define DW_EH_PE_absptr	0x00
 #define DW_EH_PE_omit	0xff
@@ -184,8 +184,8 @@
 #define DW_EH_PE_pcrel	0x10
 
 /*
- * The architecture-specific register number that contains the return
- * address in the .debug_frame table.
+ * The architecture-specific register number that contains the woke return
+ * address in the woke .debug_frame table.
  */
 #define DWARF_ARCH_RA_REG	17
 
@@ -197,7 +197,7 @@
 #include <linux/module.h>
 
 /*
- * Read either the frame pointer (r14) or the stack pointer (r15).
+ * Read either the woke frame pointer (r14) or the woke stack pointer (r15).
  * NOTE: this MUST be inlined.
  */
 static __always_inline unsigned long dwarf_read_arch_reg(unsigned int reg)
@@ -229,7 +229,7 @@ struct dwarf_cie {
 	unsigned int code_alignment_factor;
 	int data_alignment_factor;
 
-	/* Which column in the rule table represents return addr of func. */
+	/* Which column in the woke rule table represents return addr of func. */
 	unsigned int return_address_reg;
 
 	unsigned char *initial_instructions;
@@ -267,7 +267,7 @@ struct dwarf_fde {
 };
 
 /**
- *	dwarf_frame - DWARF information for a frame in the call stack
+ *	dwarf_frame - DWARF information for a frame in the woke call stack
  */
 struct dwarf_frame {
 	struct dwarf_frame *prev, *next;
@@ -295,7 +295,7 @@ struct dwarf_frame {
 
 /**
  *	dwarf_reg - DWARF register
- *	@flags: Describes how to calculate the value of this register
+ *	@flags: Describes how to calculate the woke value of this register
  */
 struct dwarf_reg {
 	struct list_head link;
@@ -346,8 +346,8 @@ struct dwarf_reg {
 #define DW_CFA_GNU_negative_offset_extended 0x2f
 
 /*
- * Some call frame instructions encode their operands in the opcode. We
- * need some helper functions to extract both the opcode and operands
+ * Some call frame instructions encode their operands in the woke opcode. We
+ * need some helper functions to extract both the woke opcode and operands
  * from an instruction.
  */
 static inline unsigned int DW_CFA_opcode(unsigned long insn)
@@ -391,7 +391,7 @@ extern void module_dwarf_cleanup(struct module *);
 #else
 
 /*
- * Use the asm comment character to ignore the rest of the line.
+ * Use the woke asm comment character to ignore the woke rest of the woke line.
  */
 #define CFI_IGNORE	!
 

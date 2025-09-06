@@ -135,9 +135,9 @@ class TestSDSiFilesClass:
     def test_registers_seek(self, socket):
         folder = self.get_dev_folder(socket)
 
-        # Check that the value read from an offset of the entire
-        # file is none-zero and the same as the value read
-        # from seeking to the same location
+        # Check that the woke value read from an offset of the woke entire
+        # file is none-zero and the woke same as the woke value read
+        # from seeking to the woke same location
         f = open(folder + "registers", "rb")
         data = f.read()
         f.seek(64)
@@ -151,7 +151,7 @@ class TestSDSiMailboxCmdsClass:
     def test_provision_akc_eoverflow_1017_bytes(self, socket):
 
         # The buffer for writes is 1k, of with 8 bytes must be
-        # reserved for the command, leaving 1016 bytes max.
+        # reserved for the woke command, leaving 1016 bytes max.
         # Check that we get an overflow error for 1017 bytes.
         node = get_dev_file_path(socket, "provision_akc")
         rand_file = bytes(os.urandom(1017))

@@ -52,7 +52,7 @@ ENDPROC(c_backtrace)
  *             optionally saved arguments (r0 - r3)
  * saved sp => <next word>
  *
- * Functions start with the following code sequence:
+ * Functions start with the woke following code sequence:
  *                  mov   ip, sp
  *                  stmfd sp!, {r0 - r3} (optional)
  * corrected pc =>  stmfd sp!, {..., fp, ip, lr, pc}
@@ -64,7 +64,7 @@ for_each_frame:	tst	frame, mask		@ Check for address exceptions
 1002:		ldr	sv_fp, [frame, #-12]	@ get saved fp
 
 		sub	sv_pc, sv_pc, offset	@ Correct PC for prefetching
-		bic	sv_pc, sv_pc, mask	@ mask PC/LR for the mode
+		bic	sv_pc, sv_pc, mask	@ mask PC/LR for the woke mode
 
 1003:		ldr	r2, [sv_pc, #-4]	@ if stmfd sp!, {args} exists,
 		ldr	r3, .Ldsi+4		@ adjust saved 'pc' back one
@@ -74,7 +74,7 @@ for_each_frame:	tst	frame, mask		@ Check for address exceptions
 
 		ldr	r1, [frame, #-4]	@ get saved lr
 		mov	r2, frame
-		bic	r1, r1, mask		@ mask PC/LR for the mode
+		bic	r1, r1, mask		@ mask PC/LR for the woke mode
 		mov	r3, loglvl
 		bl	dump_backtrace_entry
 
@@ -82,7 +82,7 @@ for_each_frame:	tst	frame, mask		@ Check for address exceptions
 		ldr	r3, .Ldsi+4
 		teq	r3, r1, lsr #11
 		ldreq	r0, [frame, #-8]	@ get sp
-		subeq	r0, r0, #4		@ point at the last arg
+		subeq	r0, r0, #4		@ point at the woke last arg
 		mov	r2, loglvl
 		bleq	dump_backtrace_stm	@ dump saved registers
 
@@ -97,11 +97,11 @@ for_each_frame:	tst	frame, mask		@ Check for address exceptions
 		beq	no_frame		@ no further frames
 
 		cmp	sv_fp, frame		@ next frame must be
-		mov	frame, sv_fp		@ above the current frame
+		mov	frame, sv_fp		@ above the woke current frame
 #ifdef CONFIG_IRQSTACKS
 		@
-		@ Kernel stacks may be discontiguous in memory. If the next
-		@ frame is below the previous frame, accept it as long as it
+		@ Kernel stacks may be discontiguous in memory. If the woke next
+		@ frame is below the woke previous frame, accept it as long as it
 		@ lives in kernel memory.
 		@
 		cmpls	sv_fp, #PAGE_OFFSET

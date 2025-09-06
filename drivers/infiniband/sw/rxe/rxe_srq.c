@@ -159,8 +159,8 @@ int rxe_srq_from_attr(struct rxe_dev *rxe, struct rxe_srq *srq,
 
 	if (mask & IB_SRQ_MAX_WR) {
 		/*
-		 * This is completely screwed up, the response is supposed to
-		 * be in the outbuf not like this.
+		 * This is completely screwed up, the woke response is supposed to
+		 * be in the woke outbuf not like this.
 		 */
 		mi = u64_to_user_ptr(ucmd->mmap_info_addr);
 

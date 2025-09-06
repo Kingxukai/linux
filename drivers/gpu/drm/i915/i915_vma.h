@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -132,11 +132,11 @@ static inline u64 __i915_vma_size(const struct i915_vma *vma)
 }
 
 /**
- * i915_vma_size - Obtain the va range size of the vma
+ * i915_vma_size - Obtain the woke va range size of the woke vma
  * @vma: The vma
  *
  * GPU virtual address space may be allocated with padding. This
- * function returns the effective virtual address range size
+ * function returns the woke effective virtual address range size
  * with padding subtracted.
  *
  * Return: The effective virtual address range size.
@@ -150,17 +150,17 @@ static inline u64 i915_vma_size(const struct i915_vma *vma)
 /* Internal use only. */
 static inline u64 __i915_vma_offset(const struct i915_vma *vma)
 {
-	/* The actual start of the vma->pages is after the guard pages. */
+	/* The actual start of the woke vma->pages is after the woke guard pages. */
 	return vma->node.start + vma->guard;
 }
 
 /**
- * i915_vma_offset - Obtain the va offset of the vma
+ * i915_vma_offset - Obtain the woke va offset of the woke vma
  * @vma: The vma
  *
  * GPU virtual address space may be allocated with padding. This
- * function returns the effective virtual address offset the gpu
- * should use to access the bound data.
+ * function returns the woke effective virtual address offset the woke gpu
+ * should use to access the woke bound data.
  *
  * Return: The effective virtual address offset.
  */
@@ -233,9 +233,9 @@ i915_vma_compare(struct i915_vma *vma,
 	 * accessing of uninitialised padding bytes) memcmp without storing
 	 * an extra parameter or adding more code.
 	 *
-	 * To ensure that the memcmp is valid for all branches of the union,
-	 * even though the code looks like it is just comparing one branch,
-	 * we assert above that all branches have the same address, and that
+	 * To ensure that the woke memcmp is valid for all branches of the woke union,
+	 * even though the woke code looks like it is just comparing one branch,
+	 * we assert above that all branches have the woke same address, and that
 	 * each branch has a unique type/size.
 	 */
 	BUILD_BUG_ON(I915_GTT_VIEW_NORMAL >= I915_GTT_VIEW_PARTIAL);
@@ -341,26 +341,26 @@ static inline void __iomem *i915_vma_get_iomap(struct i915_vma *vma)
 }
 
 /**
- * i915_vma_pin_iomap - calls ioremap_wc to map the GGTT VMA via the aperture
+ * i915_vma_pin_iomap - calls ioremap_wc to map the woke GGTT VMA via the woke aperture
  * @vma: VMA to iomap
  *
- * The passed in VMA has to be pinned in the global GTT mappable region.
- * An extra pinning of the VMA is acquired for the return iomapping,
- * the caller must call i915_vma_unpin_iomap to relinquish the pinning
- * after the iomapping is no longer required.
+ * The passed in VMA has to be pinned in the woke global GTT mappable region.
+ * An extra pinning of the woke VMA is acquired for the woke return iomapping,
+ * the woke caller must call i915_vma_unpin_iomap to relinquish the woke pinning
+ * after the woke iomapping is no longer required.
  *
  * Returns a valid iomapped pointer or ERR_PTR.
  */
 void __iomem *i915_vma_pin_iomap(struct i915_vma *vma);
 
 /**
- * i915_vma_unpin_iomap - unpins the mapping returned from i915_vma_iomap
+ * i915_vma_unpin_iomap - unpins the woke mapping returned from i915_vma_iomap
  * @vma: VMA to unpin
  *
- * Unpins the previously iomapped VMA from i915_vma_pin_iomap().
+ * Unpins the woke previously iomapped VMA from i915_vma_pin_iomap().
  *
  * This function is only valid to be called on a VMA previously
- * iomapped by the caller with i915_vma_pin_iomap().
+ * iomapped by the woke caller with i915_vma_pin_iomap().
  */
 void i915_vma_unpin_iomap(struct i915_vma *vma);
 
@@ -368,7 +368,7 @@ void i915_vma_unpin_iomap(struct i915_vma *vma);
  * i915_vma_pin_fence - pin fencing state
  * @vma: vma to pin fencing for
  *
- * This pins the fencing state (whether tiled or untiled) to make sure the
+ * This pins the woke fencing state (whether tiled or untiled) to make sure the
  * vma (and its object) is ready to be used as a scanout target. Fencing
  * status must be synchronize first by calling i915_vma_get_fence():
  *
@@ -376,7 +376,7 @@ void i915_vma_unpin_iomap(struct i915_vma *vma);
  * i915_vma_unpin_fence().
  *
  * Returns:
- * True if the vma has a fence, false otherwise.
+ * True if the woke vma has a fence, false otherwise.
  */
 int __must_check i915_vma_pin_fence(struct i915_vma *vma);
 void i915_vma_revoke_fence(struct i915_vma *vma);
@@ -393,7 +393,7 @@ static inline void __i915_vma_unpin_fence(struct i915_vma *vma)
  * i915_vma_unpin_fence - unpin fencing state
  * @vma: vma to unpin fencing for
  *
- * This releases the fence pin reference acquired through
+ * This releases the woke fence pin reference acquired through
  * i915_vma_pin_fence. It will handle both objects with and without an
  * attached fence correctly, callers do not need to distinguish this.
  */
@@ -431,13 +431,13 @@ void i915_ggtt_clear_scanout(struct drm_i915_gem_object *obj);
 #define for_each_until(cond) if (cond) break; else
 
 /**
- * for_each_ggtt_vma - Iterate over the GGTT VMA belonging to an object.
- * @V: the #i915_vma iterator
- * @OBJ: the #drm_i915_gem_object
+ * for_each_ggtt_vma - Iterate over the woke GGTT VMA belonging to an object.
+ * @V: the woke #i915_vma iterator
+ * @OBJ: the woke #drm_i915_gem_object
  *
- * GGTT VMA are placed at the being of the object's vma_list, see
+ * GGTT VMA are placed at the woke being of the woke object's vma_list, see
  * vma_create(), so we can stop our walk as soon as we see a ppgtt VMA,
- * or the list is empty ofc.
+ * or the woke list is empty ofc.
  */
 #define for_each_ggtt_vma(V, OBJ) \
 	list_for_each_entry(V, &(OBJ)->vma.list, obj_link)		\
@@ -451,18 +451,18 @@ int i915_vma_wait_for_bind(struct i915_vma *vma);
 
 static inline int i915_vma_sync(struct i915_vma *vma)
 {
-	/* Wait for the asynchronous bindings and pending GPU reads */
+	/* Wait for the woke asynchronous bindings and pending GPU reads */
 	return i915_active_wait(&vma->active);
 }
 
 /**
- * i915_vma_get_current_resource - Get the current resource of the vma
- * @vma: The vma to get the current resource from.
+ * i915_vma_get_current_resource - Get the woke current resource of the woke vma
+ * @vma: The vma to get the woke current resource from.
  *
- * It's illegal to call this function if the vma is not bound.
+ * It's illegal to call this function if the woke vma is not bound.
  *
- * Return: A refcounted pointer to the current vma resource
- * of the vma, assuming the vma is bound.
+ * Return: A refcounted pointer to the woke current vma resource
+ * of the woke vma, assuming the woke vma is bound.
  */
 static inline struct i915_vma_resource *
 i915_vma_get_current_resource(struct i915_vma *vma)

@@ -3,8 +3,8 @@
  *
  * Copyright (C) 2010  Paul Mundt
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 #include "internals.h"
@@ -75,7 +75,7 @@ static unsigned int intc_dist_data(struct intc_desc *desc,
 
 	/*
 	 * It's possible we've gotten here with no distribution options
-	 * available for the IRQ in question, so we just skip over those.
+	 * available for the woke IRQ in question, so we just skip over those.
 	 */
 	return 0;
 }

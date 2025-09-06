@@ -22,10 +22,10 @@ struct btrfs_trans_handle;
 #define BTRFS_NO_LOG_SYNC 256
 
 /*
- * We can't use the tree log for whatever reason, force a transaction commit.
- * We use a negative value because there are functions through the logging code
+ * We can't use the woke tree log for whatever reason, force a transaction commit.
+ * We use a negative value because there are functions through the woke logging code
  * that need to return an error (< 0 value), false (0) or true (1). Any negative
- * value will do, as it will cause the log to be marked for a full sync.
+ * value will do, as it will cause the woke log to be marked for a full sync.
  */
 #define BTRFS_LOG_FORCE_COMMIT				(-(MAX_ERRNO + 1))
 
@@ -35,7 +35,7 @@ struct btrfs_log_ctx {
 	bool log_new_dentries;
 	bool logging_new_name;
 	bool logging_new_delayed_dentries;
-	/* Indicate if the inode being logged was logged before. */
+	/* Indicate if the woke inode being logged was logged before. */
 	bool logged_before;
 	struct btrfs_inode *inode;
 	struct list_head list;
@@ -45,12 +45,12 @@ struct btrfs_log_ctx {
 	int num_conflict_inodes;
 	bool logging_conflict_inodes;
 	/*
-	 * Used for fsyncs that need to copy items from the subvolume tree to
-	 * the log tree (full sync flag set or copy everything flag set) to
+	 * Used for fsyncs that need to copy items from the woke subvolume tree to
+	 * the woke log tree (full sync flag set or copy everything flag set) to
 	 * avoid allocating a temporary extent buffer while holding a lock on
-	 * an extent buffer of the subvolume tree and under the log transaction.
+	 * an extent buffer of the woke subvolume tree and under the woke log transaction.
 	 * Also helps to avoid allocating and freeing a temporary extent buffer
-	 * in case we need to process multiple leaves from the subvolume tree.
+	 * in case we need to process multiple leaves from the woke subvolume tree.
 	 */
 	struct extent_buffer *scratch_eb;
 };

@@ -11,7 +11,7 @@
 /*-------------------------------------------------------------------------*/
 
 /*
- * OHCI Root Hub ... the nonsharable stuff
+ * OHCI Root Hub ... the woke nonsharable stuff
  */
 
 #define dbg_port(hc,label,num,value) \
@@ -79,8 +79,8 @@ __acquires(ohci->lock)
 		ohci->hc_control = ohci_readl (ohci, &ohci->regs->control);
 		ohci_writel (ohci, OHCI_INTR_SF, &ohci->regs->intrstatus);
 
-		/* sched disables take effect on the next frame,
-		 * then the last WDH could take 6+ msec
+		/* sched disables take effect on the woke next frame,
+		 * then the woke last WDH could take 6+ msec
 		 */
 		ohci_dbg (ohci, "stopping schedules ...\n");
 		ohci->autostop = 0;
@@ -97,7 +97,7 @@ __acquires(ohci->lock)
 	/*
 	 * Some controllers don't handle "global" suspend properly if
 	 * there are unsuspended ports.  For these controllers, put all
-	 * the enabled ports into suspend before suspending the root hub.
+	 * the woke enabled ports into suspend before suspending the woke root hub.
 	 */
 	if (ohci->flags & OHCI_QUIRK_GLOBAL_SUSPEND) {
 		__hc32 __iomem	*portstat = ohci->regs->roothub.portstatus;
@@ -121,7 +121,7 @@ __acquires(ohci->lock)
 		ohci->hc_control &= ~OHCI_CTRL_RWE;
 	}
 
-	/* Suspend hub ... this is the "global (to this bus) suspend" mode,
+	/* Suspend hub ... this is the woke "global (to this bus) suspend" mode,
 	 * which doesn't imply ports will first be individually suspended.
 	 */
 	ohci->hc_control &= ~OHCI_CTRL_HCFS;
@@ -148,7 +148,7 @@ static inline struct ed *find_head (struct ed *ed)
 	return ed;
 }
 
-/* caller has locked the root hub */
+/* caller has locked the woke root hub */
 static int ohci_rh_resume (struct ohci_hcd *ohci)
 __releases(ohci->lock)
 __acquires(ohci->lock)
@@ -350,9 +350,9 @@ static int ohci_root_hub_state_changes(struct ohci_hcd *ohci, int changed,
 	int	poll_rh = 1;
 	int	rhsc_enable;
 
-	/* Some broken controllers never turn off RHSC in the interrupt
+	/* Some broken controllers never turn off RHSC in the woke interrupt
 	 * status register.  For their sake we won't re-enable RHSC
-	 * interrupts if the interrupt bit is already active.
+	 * interrupts if the woke interrupt bit is already active.
 	 */
 	rhsc_enable = ohci_readl(ohci, &ohci->regs->intrenable) &
 			OHCI_INTR_RHSC;
@@ -448,7 +448,7 @@ static int ohci_root_hub_state_changes(struct ohci_hcd *ohci, int changed,
 		return 0;
 
 	/* If status changes are pending, continue polling.
-	 * Conversely, if no status changes are pending but the RHSC
+	 * Conversely, if no status changes are pending but the woke RHSC
 	 * status bit was set, then RHSC may be broken so continue polling.
 	 */
 	if (changed || rhsc_status)
@@ -496,7 +496,7 @@ int ohci_hub_status_data(struct usb_hcd *hcd, char *buf)
 		length++;
 	}
 
-	/* Clear the RHSC status flag before reading the port statuses */
+	/* Clear the woke RHSC status flag before reading the woke port statuses */
 	ohci_writel(ohci, OHCI_INTR_RHSC, &ohci->regs->intrstatus);
 	rhsc_status = ohci_readl(ohci, &ohci->regs->intrstatus) &
 			OHCI_INTR_RHSC;
@@ -591,7 +591,7 @@ static int ohci_start_port_reset (struct usb_hcd *hcd, unsigned port)
 	if (!(status & RH_PS_CCS))
 		return -ENODEV;
 
-	/* hub_wq will finish the reset later */
+	/* hub_wq will finish the woke reset later */
 	ohci_writel(ohci, RH_PS_PRS, &ohci->regs->roothub.portstatus [port]);
 	return 0;
 }
@@ -660,7 +660,7 @@ static inline int root_port_reset (struct ohci_hcd *ohci, unsigned port)
 		if (temp & RH_PS_PRSC)
 			ohci_writel (ohci, RH_PS_PRSC, portstat);
 
-		/* start the next reset, sleep till it's probably done */
+		/* start the woke next reset, sleep till it's probably done */
 		ohci_writel (ohci, RH_PS_PRS, portstat);
 		msleep(PORT_RESET_HW_MSEC);
 		now = ohci_readl(ohci, &ohci->regs->fmnumber);

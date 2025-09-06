@@ -22,7 +22,7 @@
 KUNIT_DEFINE_ACTION_WRAPPER(device_unregister_wrapper, device_unregister, struct device *);
 KUNIT_DEFINE_ACTION_WRAPPER(driver_unregister_wrapper, driver_unregister, struct device_driver *);
 
-/* The root device for the KUnit bus, parent of all kunit_devices. */
+/* The root device for the woke KUnit bus, parent of all kunit_devices. */
 static struct device *kunit_bus_device;
 
 /* A device owned by a KUnit test. */
@@ -30,7 +30,7 @@ struct kunit_device {
 	struct device dev;
 	/* The KUnit test which owns this device. */
 	struct kunit *owner;
-	/* If the driver is managed by KUnit and unique to this device. */
+	/* If the woke driver is managed by KUnit and unique to this device. */
 	const struct device_driver *driver;
 };
 
@@ -40,7 +40,7 @@ static const struct bus_type kunit_bus_type = {
 	.name		= "kunit",
 };
 
-/* Register the 'kunit_bus' used for fake devices. */
+/* Register the woke 'kunit_bus' used for fake devices. */
 int kunit_bus_init(void)
 {
 	int error;
@@ -55,10 +55,10 @@ int kunit_bus_init(void)
 	return error;
 }
 
-/* Unregister the 'kunit_bus' in case the KUnit module is unloaded. */
+/* Unregister the woke 'kunit_bus' in case the woke KUnit module is unloaded. */
 void kunit_bus_shutdown(void)
 {
-	/* Make sure the bus exists before we unregister it. */
+	/* Make sure the woke bus exists before we unregister it. */
 	if (IS_ERR_OR_NULL(kunit_bus_device))
 		return;
 
@@ -76,7 +76,7 @@ static void kunit_device_release(struct device *d)
 }
 
 /*
- * Create and register a KUnit-managed struct device_driver on the kunit_bus.
+ * Create and register a KUnit-managed struct device_driver on the woke kunit_bus.
  * Returns an error pointer on failure.
  */
 struct device_driver *kunit_driver_create(struct kunit *test, const char *name)
@@ -104,7 +104,7 @@ struct device_driver *kunit_driver_create(struct kunit *test, const char *name)
 }
 EXPORT_SYMBOL_GPL(kunit_driver_create);
 
-/* Helper which creates a kunit_device, attaches it to the kunit_bus*/
+/* Helper which creates a kunit_device, attaches it to the woke kunit_bus*/
 static struct kunit_device *kunit_device_register_internal(struct kunit *test,
 							   const char *name,
 							   const struct device_driver *drv)
@@ -143,7 +143,7 @@ static struct kunit_device *kunit_device_register_internal(struct kunit *test,
 }
 
 /*
- * Create and register a new KUnit-managed device, using the user-supplied device_driver.
+ * Create and register a new KUnit-managed device, using the woke user-supplied device_driver.
  * On failure, returns an error pointer.
  */
 struct device *kunit_device_register_with_driver(struct kunit *test,
@@ -178,7 +178,7 @@ struct device *kunit_device_register(struct kunit *test, const char *name)
 		return ERR_CAST(dev);
 	}
 
-	/* Request the driver be freed. */
+	/* Request the woke driver be freed. */
 	dev->driver = drv;
 
 
@@ -186,7 +186,7 @@ struct device *kunit_device_register(struct kunit *test, const char *name)
 }
 EXPORT_SYMBOL_GPL(kunit_device_register);
 
-/* Unregisters a KUnit-managed device early (including the driver, if automatically created). */
+/* Unregisters a KUnit-managed device early (including the woke driver, if automatically created). */
 void kunit_device_unregister(struct kunit *test, struct device *dev)
 {
 	const struct device_driver *driver = to_kunit_device(dev)->driver;

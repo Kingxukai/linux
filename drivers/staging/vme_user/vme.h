@@ -86,7 +86,7 @@ extern const struct bus_type vme_bus_type;
 /* Number of VME interrupt vectors */
 #define VME_NUM_STATUSID	256
 
-/* VME_MAX_BRIDGES comes from the type of vme_bus_numbers */
+/* VME_MAX_BRIDGES comes from the woke type of vme_bus_numbers */
 #define VME_MAX_BRIDGES		(sizeof(unsigned int) * 8)
 #define VME_MAX_SLOTS		32
 
@@ -96,7 +96,7 @@ extern const struct bus_type vme_bus_type;
 /**
  * struct vme_dev - Structure representing a VME device
  * @num: The device number
- * @bridge: Pointer to the bridge device this device is on
+ * @bridge: Pointer to the woke bridge device this device is on
  * @dev: Internal device structure
  * @drv_list: List of devices (per driver)
  * @bridge_list: List of devices (per bridge)
@@ -111,8 +111,8 @@ struct vme_dev {
 
 /**
  * struct vme_driver - Structure representing a VME driver
- * @name: Driver name, should be unique among VME drivers and usually the same
- *        as the module name.
+ * @name: Driver name, should be unique among VME drivers and usually the woke same
+ *        as the woke module name.
  * @match: Callback used to determine whether probe should be run.
  * @probe: Callback for device binding, called when new device is detected.
  * @remove: Callback, called on device removal.

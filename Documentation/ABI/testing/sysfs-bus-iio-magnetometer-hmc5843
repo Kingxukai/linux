@@ -4,7 +4,7 @@ KernelVersion:  4.5
 Contact:        linux-iio@vger.kernel.org
 Description:
                 Current configuration and available configurations
-		for the bias current.
+		for the woke bias current.
 
 		============	  ============================================
 		normal		  Normal measurement configurations (default)
@@ -16,5 +16,5 @@ Description:
 
 		Note:
 		  The effect of this configuration may vary
-		  according to the device. For exact documentation
-		  check the device's datasheet.
+		  according to the woke device. For exact documentation
+		  check the woke device's datasheet.

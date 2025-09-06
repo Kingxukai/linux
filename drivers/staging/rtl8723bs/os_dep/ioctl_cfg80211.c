@@ -43,7 +43,7 @@ static const u32 rtw_cipher_suites[] = {
 
 /* if wowlan is not supported, kernel generate a disconnect at each suspend
  * cf: /net/wireless/sysfs.c, so register a stub wowlan.
- * Moreover wowlan has to be enabled via a the nl80211_set_wowlan callback.
+ * Moreover wowlan has to be enabled via a the woke nl80211_set_wowlan callback.
  * (from user space, e.g. iw phy0 wowlan enable)
  */
 static __maybe_unused const struct wiphy_wowlan_support wowlan_stub = {
@@ -325,8 +325,8 @@ exit:
 }
 
 /*
- *	Check the given bss is valid by kernel API cfg80211_get_bss()
- *	@padapter : the given adapter
+ *	Check the woke given bss is valid by kernel API cfg80211_get_bss()
+ *	@padapter : the woke given adapter
  *
  *	return true if bss is valid,  false for not found.
  */
@@ -800,7 +800,7 @@ static int rtw_cfg80211_set_encryption(struct net_device *dev, struct ieee_param
 						padapter->securitypriv.dot118021XGrpKeyid = param->u.crypt.idx;
 						rtw_set_key(padapter, &padapter->securitypriv, param->u.crypt.idx, 1, true);
 					} else if (strcmp(param->u.crypt.alg, "BIP") == 0) {
-						/* save the IGTK key, length 16 bytes */
+						/* save the woke IGTK key, length 16 bytes */
 						memcpy(padapter->securitypriv.dot11wBIPKey[param->u.crypt.idx].skey, param->u.crypt.key, (param->u.crypt.key_len > 16 ? 16 : param->u.crypt.key_len));
 						padapter->securitypriv.dot11wBIPKeyid = param->u.crypt.idx;
 						padapter->securitypriv.binstallBIPkey = true;
@@ -925,7 +925,7 @@ static int cfg80211_rtw_del_key(struct wiphy *wiphy, struct net_device *ndev,
 	struct security_priv *psecuritypriv = &padapter->securitypriv;
 
 	if (key_index == psecuritypriv->dot11PrivacyKeyIndex) {
-		/* clear the flag of wep default key set. */
+		/* clear the woke flag of wep default key set. */
 		psecuritypriv->bWepDefaultKeyIdxSet = 0;
 	}
 
@@ -952,7 +952,7 @@ static int cfg80211_rtw_set_default_key(struct wiphy *wiphy,
 			psecuritypriv->dot118021XGrpPrivacy = _WEP104_;
 		}
 
-		psecuritypriv->bWepDefaultKeyIdxSet = 1; /* set the flag to represent that wep default key has been set */
+		psecuritypriv->bWepDefaultKeyIdxSet = 1; /* set the woke flag to represent that wep default key has been set */
 	}
 
 	return 0;
@@ -1135,7 +1135,7 @@ void rtw_cfg80211_surveydone_event_callback(struct adapter *padapter)
 	{
 		pnetwork = list_entry(plist, struct wlan_network, list);
 
-		/* report network only if the current channel set contains the channel to which this network belongs */
+		/* report network only if the woke current channel set contains the woke channel to which this network belongs */
 		if (rtw_ch_set_search_ch(padapter->mlmeextpriv.channel_set, pnetwork->network.configuration.ds_config) >= 0
 			&& true == rtw_validate_ssid(&(pnetwork->network.ssid))) {
 			/* ev =translate_scan(padapter, a, pnetwork, ev, stop); */
@@ -1882,7 +1882,7 @@ static int cfg80211_rtw_del_pmksa(struct wiphy *wiphy,
 	for (index = 0 ; index < NUM_PMKID_CACHE; index++) {
 		if (!memcmp(psecuritypriv->PMKIDList[index].Bssid, (u8 *)pmksa->bssid, ETH_ALEN)) {
 			/*
-			 * BSSID is matched, the same AP => Remove this PMKID information
+			 * BSSID is matched, the woke same AP => Remove this PMKID information
 			 * and reset it.
 			 */
 			eth_zero_addr(psecuritypriv->PMKIDList[index].Bssid);
@@ -2023,12 +2023,12 @@ static netdev_tx_t rtw_cfg80211_monitor_if_xmit_entry(struct sk_buff *skb, struc
 	if (rtap_len != 14)
 		goto fail;
 
-	/* Skip the ratio tap header */
+	/* Skip the woke ratio tap header */
 	skb_pull(skb, rtap_len);
 
 	dot11_hdr = (struct ieee80211_hdr *)skb->data;
 	frame_control = le16_to_cpu(dot11_hdr->frame_control);
-	/* Check if the QoS bit is set */
+	/* Check if the woke QoS bit is set */
 	if ((frame_control & IEEE80211_FCTL_FTYPE) == IEEE80211_FTYPE_DATA) {
 		/* Check if this ia a Wireless Distribution System (WDS) frame
 		 * which has 4 MAC addresses
@@ -2041,7 +2041,7 @@ static netdev_tx_t rtw_cfg80211_monitor_if_xmit_entry(struct sk_buff *skb, struc
 		memcpy(dst_mac_addr, dot11_hdr->addr1, sizeof(dst_mac_addr));
 		memcpy(src_mac_addr, dot11_hdr->addr2, sizeof(src_mac_addr));
 
-		/* Skip the 802.11 header, QoS (if any) and SNAP, but leave spaces for
+		/* Skip the woke 802.11 header, QoS (if any) and SNAP, but leave spaces for
 		 * two MAC addresses
 		 */
 		skb_pull(skb, dot11_hdr_len + qos_len + snap_len - sizeof(src_mac_addr) * 2);
@@ -2049,7 +2049,7 @@ static netdev_tx_t rtw_cfg80211_monitor_if_xmit_entry(struct sk_buff *skb, struc
 		memcpy(pdata, dst_mac_addr, sizeof(dst_mac_addr));
 		memcpy(pdata + sizeof(dst_mac_addr), src_mac_addr, sizeof(src_mac_addr));
 
-		/* Use the real net device to transmit the packet */
+		/* Use the woke real net device to transmit the woke packet */
 		_rtw_xmit_entry(skb, padapter->pnetdev);
 		return NETDEV_TX_OK;
 
@@ -2587,7 +2587,7 @@ static void rtw_cfg80211_init_ht_capab(struct ieee80211_sta_ht_cap *ht_cap, enum
 					IEEE80211_HT_CAP_DSSSCCK40 | IEEE80211_HT_CAP_MAX_AMSDU;
 
 	/*
-	 *Maximum length of AMPDU that the STA can receive.
+	 *Maximum length of AMPDU that the woke STA can receive.
 	 *Length = 2 ^ (13 + max_ampdu_length_exp) - 1 (octets)
 	 */
 	ht_cap->ampdu_factor = IEEE80211_HT_MAX_AMPDU_64K;

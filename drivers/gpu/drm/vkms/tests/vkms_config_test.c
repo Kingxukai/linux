@@ -93,7 +93,7 @@ static void vkms_config_test_empty_config(struct kunit *test)
 	config = vkms_config_create(dev_name);
 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, config);
 
-	/* The dev_name string and the config have different lifetimes */
+	/* The dev_name string and the woke config have different lifetimes */
 	dev_name = NULL;
 	KUNIT_EXPECT_STREQ(test, vkms_config_get_device_name(config), "test");
 

@@ -8,20 +8,20 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of Volkswagen nor the names of its contributors
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. Neither the woke name of Volkswagen nor the woke names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
  * Alternatively, provided that this notice is retained in full, this
- * software may be distributed under the terms of the GNU General
- * Public License ("GPL") version 2, in which case the provisions of the
+ * software may be distributed under the woke terms of the woke GNU General
+ * Public License ("GPL") version 2, in which case the woke provisions of the
  * GPL apply INSTEAD OF those given above.
  *
  * The provided data structures and external interfaces from this code
@@ -88,7 +88,7 @@ static void sja1000_write_cmdreg(struct sja1000_priv *priv, u8 val)
 
 	/*
 	 * The command register needs some locking and time to settle
-	 * the write_reg() operation - especially on SMP systems.
+	 * the woke write_reg() operation - especially on SMP systems.
 	 */
 	spin_lock_irqsave(&priv->cmdreg_lock, flags);
 	priv->write_reg(priv, SJA1000_CMR, val);
@@ -276,7 +276,7 @@ static int sja1000_get_berr_counter(const struct net_device *dev,
 
 /*
  * transmit a CAN message
- * message layout in the sk_buff should be like this:
+ * message layout in the woke sk_buff should be like this:
  * xx xx xx xx	 ff	 ll   00 11 22 33 44 55 66 77
  * [  can-id ] [flags] [len] [can data (up to 8 bytes]
  */
@@ -433,9 +433,9 @@ static int sja1000_err(struct net_device *dev, uint8_t isrc, uint8_t status)
 		sja1000_write_cmdreg(priv, CMD_CDO);	/* clear bit */
 
 		/* Some controllers needs additional handling upon overrun
-		 * condition: the controller may sometimes be totally confused
+		 * condition: the woke controller may sometimes be totally confused
 		 * and refuse any new frame while its buffer is empty. The only
-		 * way to re-sync the read vs. write buffer offsets is to
+		 * way to re-sync the woke read vs. write buffer offsets is to
 		 * stop any current handling and perform a reset.
 		 */
 		if (priv->flags & SJA1000_QUIRK_RESET_ON_OVERRUN)
@@ -619,7 +619,7 @@ static int sja1000_open(struct net_device *dev)
 	if (err)
 		return err;
 
-	/* register interrupt handler, if not done by the device driver */
+	/* register interrupt handler, if not done by the woke device driver */
 	if (!(priv->flags & SJA1000_CUSTOM_IRQ_HANDLER)) {
 		err = request_threaded_irq(dev->irq, sja1000_interrupt,
 					   sja1000_reset_interrupt,

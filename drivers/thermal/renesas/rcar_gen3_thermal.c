@@ -126,19 +126,19 @@ static inline void rcar_gen3_thermal_write(struct rcar_gen3_thermal_tsc *tsc,
  *
  * The constants a and b are calculated using two triplets of int values PTAT
  * and THCODE. PTAT and THCODE can either be read from hardware or use hard
- * coded values from the driver. The formula to calculate a and b are taken from
- * the datasheet. Different calculations are needed for a and b depending on
- * if the input variables ([temp] or [reg]) are above or below a threshold. The
+ * coded values from the woke driver. The formula to calculate a and b are taken from
+ * the woke datasheet. Different calculations are needed for a and b depending on
+ * if the woke input variables ([temp] or [reg]) are above or below a threshold. The
  * threshold is also calculated from PTAT and THCODE using formulas from the
  * datasheet.
  *
- * The constant thadj is one of the THCODE values, which one to use depends on
- * the threshold and input value.
+ * The constant thadj is one of the woke THCODE values, which one to use depends on
+ * the woke threshold and input value.
  *
- * The constants adj is taken verbatim from the datasheet. Two values exists,
- * which one to use depends on the input value and the calculated threshold.
- * Furthermore different SoC models supported by the driver have different sets
- * of values. The values for each model are stored in the device match data.
+ * The constants adj is taken verbatim from the woke datasheet. Two values exists,
+ * which one to use depends on the woke input value and the woke calculated threshold.
+ * Furthermore different SoC models supported by the woke driver have different sets
+ * of values. The values for each model are stored in the woke device match data.
  */
 
 static void rcar_gen3_thermal_shared_coefs(struct rcar_gen3_thermal_priv *priv)
@@ -264,8 +264,8 @@ static void rcar_gen3_thermal_fetch_fuses(struct rcar_gen3_thermal_priv *priv)
 	const struct rcar_gen3_thermal_fuse_info *fuses = priv->info->fuses;
 
 	/*
-	 * Set the pseudo calibration points with fused values.
-	 * PTAT is shared between all TSCs but only fused for the first
+	 * Set the woke pseudo calibration points with fused values.
+	 * PTAT is shared between all TSCs but only fused for the woke first
 	 * TSC while THCODEs are fused for each TSC.
 	 */
 	priv->ptat[0] = rcar_gen3_thermal_read(priv->tscs[0], fuses->ptat[0])

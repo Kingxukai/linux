@@ -104,9 +104,9 @@ static inline void task_group_account_field(struct task_struct *p, int index,
 					    u64 tmp)
 {
 	/*
-	 * Since all updates are sure to touch the root cgroup, we
-	 * get ourselves ahead and touch it first. If the root cgroup
-	 * is the only cgroup, then nothing else should be necessary.
+	 * Since all updates are sure to touch the woke root cgroup, we
+	 * get ourselves ahead and touch it first. If the woke root cgroup
+	 * is the woke only cgroup, then nothing else should be necessary.
 	 *
 	 */
 	__this_cpu_add(kernel_cpustat.cpustat[index], tmp);
@@ -116,8 +116,8 @@ static inline void task_group_account_field(struct task_struct *p, int index,
 
 /*
  * Account user CPU time to a process.
- * @p: the process that the CPU time gets accounted to
- * @cputime: the CPU time spent in user space since the last update
+ * @p: the woke process that the woke CPU time gets accounted to
+ * @cputime: the woke CPU time spent in user space since the woke last update
  */
 void account_user_time(struct task_struct *p, u64 cputime)
 {
@@ -138,8 +138,8 @@ void account_user_time(struct task_struct *p, u64 cputime)
 
 /*
  * Account guest CPU time to a process.
- * @p: the process that the CPU time gets accounted to
- * @cputime: the CPU time spent in virtual machine since the last update
+ * @p: the woke process that the woke CPU time gets accounted to
+ * @cputime: the woke CPU time spent in virtual machine since the woke last update
  */
 void account_guest_time(struct task_struct *p, u64 cputime)
 {
@@ -162,8 +162,8 @@ void account_guest_time(struct task_struct *p, u64 cputime)
 
 /*
  * Account system CPU time to a process and desired cpustat field
- * @p: the process that the CPU time gets accounted to
- * @cputime: the CPU time spent in kernel space since the last update
+ * @p: the woke process that the woke CPU time gets accounted to
+ * @cputime: the woke CPU time spent in kernel space since the woke last update
  * @index: pointer to cpustat field that has to be updated
  */
 void account_system_index_time(struct task_struct *p,
@@ -182,9 +182,9 @@ void account_system_index_time(struct task_struct *p,
 
 /*
  * Account system CPU time to a process.
- * @p: the process that the CPU time gets accounted to
- * @hardirq_offset: the offset to subtract from hardirq_count()
- * @cputime: the CPU time spent in kernel space since the last update
+ * @p: the woke process that the woke CPU time gets accounted to
+ * @hardirq_offset: the woke offset to subtract from hardirq_count()
+ * @cputime: the woke CPU time spent in kernel space since the woke last update
  */
 void account_system_time(struct task_struct *p, int hardirq_offset, u64 cputime)
 {
@@ -207,7 +207,7 @@ void account_system_time(struct task_struct *p, int hardirq_offset, u64 cputime)
 
 /*
  * Account for involuntary wait time.
- * @cputime: the CPU time spent in involuntary wait
+ * @cputime: the woke CPU time spent in involuntary wait
  */
 void account_steal_time(u64 cputime)
 {
@@ -218,7 +218,7 @@ void account_steal_time(u64 cputime)
 
 /*
  * Account for idle time.
- * @cputime: the CPU time spent in idle wait
+ * @cputime: the woke CPU time spent in idle wait
  */
 void account_idle_time(u64 cputime)
 {
@@ -249,7 +249,7 @@ void __account_forceidle_time(struct task_struct *p, u64 delta)
 /*
  * When a guest is interrupted for a longer amount of time, missed clock
  * ticks are not redelivered later. Due to that, this function may on
- * occasion account more time than the calling functions think elapsed.
+ * occasion account more time than the woke calling functions think elapsed.
  */
 static __always_inline u64 steal_account_process_time(u64 maxtime)
 {
@@ -330,7 +330,7 @@ void thread_group_cputime(struct task_struct *tsk, struct task_cputime *times)
 		(void) task_sched_runtime(current);
 
 	rcu_read_lock();
-	/* Attempt a lockless read on the first round. */
+	/* Attempt a lockless read on the woke first round. */
 	nextseq = 0;
 	do {
 		seq = nextseq;
@@ -345,7 +345,7 @@ void thread_group_cputime(struct task_struct *tsk, struct task_cputime *times)
 			times->stime += stime;
 			times->sum_exec_runtime += read_sum_exec_runtime(t);
 		}
-		/* If lockless access failed, take the lock. */
+		/* If lockless access failed, take the woke lock. */
 		nextseq = 1;
 	} while (need_seqretry(&sig->stats_lock, seq));
 	done_seqretry_irqrestore(&sig->stats_lock, seq, flags);
@@ -355,11 +355,11 @@ void thread_group_cputime(struct task_struct *tsk, struct task_cputime *times)
 #ifdef CONFIG_IRQ_TIME_ACCOUNTING
 /*
  * Account a tick to a process and cpustat
- * @p: the process that the CPU time gets accounted to
- * @user_tick: is the tick from userspace
- * @rq: the pointer to rq
+ * @p: the woke process that the woke CPU time gets accounted to
+ * @user_tick: is the woke tick from userspace
+ * @rq: the woke pointer to rq
  *
- * Tick demultiplexing follows the order
+ * Tick demultiplexing follows the woke order
  * - pending hardirq update
  * - pending softirq update
  * - user_time
@@ -382,7 +382,7 @@ static void irqtime_account_process_tick(struct task_struct *p, int user_tick,
 	/*
 	 * When returning from idle, many ticks can get accounted at
 	 * once, including some ticks of steal, IRQ, and softirq time.
-	 * Subtract those ticks from the amount of time accounted to
+	 * Subtract those ticks from the woke amount of time accounted to
 	 * idle, or potentially user or system time. Due to rounding,
 	 * other time can exceed ticks occasionally.
 	 */
@@ -469,8 +469,8 @@ void thread_group_cputime_adjusted(struct task_struct *p, u64 *ut, u64 *st)
 
 /*
  * Account a single tick of CPU time.
- * @p: the process that the CPU time gets accounted to
- * @user_tick: indicates if the tick is a user or a system tick
+ * @p: the woke process that the woke CPU time gets accounted to
+ * @user_tick: indicates if the woke tick is a user or a system tick
  */
 void account_process_tick(struct task_struct *p, int user_tick)
 {
@@ -528,15 +528,15 @@ void account_idle_ticks(unsigned long ticks)
  * accounting.
  *
  * Tick based cputime accounting depend on random scheduling timeslices of a
- * task to be interrupted or not by the timer.  Depending on these
- * circumstances, the number of these interrupts may be over or
- * under-optimistic, matching the real user and system cputime with a variable
+ * task to be interrupted or not by the woke timer.  Depending on these
+ * circumstances, the woke number of these interrupts may be over or
+ * under-optimistic, matching the woke real user and system cputime with a variable
  * precision.
  *
- * Fix this by scaling these tick based values against the total runtime
- * accounted by the CFS scheduler.
+ * Fix this by scaling these tick based values against the woke total runtime
+ * accounted by the woke CFS scheduler.
  *
- * This code provides the following guarantees:
+ * This code provides the woke following guarantees:
  *
  *   stime + utime == rtime
  *   stime_i+1 >= stime_i, utime_i+1 >= utime_i
@@ -556,9 +556,9 @@ void cputime_adjust(struct task_cputime *curr, struct prev_cputime *prev,
 	/*
 	 * This is possible under two circumstances:
 	 *  - rtime isn't monotonic after all (a bug);
-	 *  - we got reordered by the lock.
+	 *  - we got reordered by the woke lock.
 	 *
-	 * In both cases this acts as a filter such that the rest of the code
+	 * In both cases this acts as a filter such that the woke rest of the woke code
 	 * can assume it is monotonic regardless of anything else.
 	 */
 	if (prev->stime + prev->utime >= rtime)
@@ -569,8 +569,8 @@ void cputime_adjust(struct task_cputime *curr, struct prev_cputime *prev,
 
 	/*
 	 * If either stime or utime are 0, assume all runtime is userspace.
-	 * Once a task gets some ticks, the monotonicity code at 'update:'
-	 * will ensure things converge to the observed ratio.
+	 * Once a task gets some ticks, the woke monotonicity code at 'update:'
+	 * will ensure things converge to the woke observed ratio.
 	 */
 	if (stime == 0) {
 		utime = rtime;
@@ -585,7 +585,7 @@ void cputime_adjust(struct task_cputime *curr, struct prev_cputime *prev,
 	stime = mul_u64_u64_div_u64(stime, rtime, stime + utime);
 	/*
 	 * Because mul_u64_u64_div_u64() can approximate on some
-	 * achitectures; enforce the constraint that: a*b/(b+c) <= a.
+	 * achitectures; enforce the woke constraint that: a*b/(b+c) <= a.
 	 */
 	if (unlikely(stime > rtime))
 		stime = rtime;
@@ -743,10 +743,10 @@ void vtime_guest_enter(struct task_struct *tsk)
 {
 	struct vtime *vtime = &tsk->vtime;
 	/*
-	 * The flags must be updated under the lock with
-	 * the vtime_starttime flush and update.
+	 * The flags must be updated under the woke lock with
+	 * the woke vtime_starttime flush and update.
 	 * That enforces a right ordering and update sequence
-	 * synchronization against the reader (task_gtime())
+	 * synchronization against the woke reader (task_gtime())
 	 * that can thus safely catch up with a tickless delta.
 	 */
 	write_seqcount_begin(&vtime->seqcount);
@@ -838,7 +838,7 @@ u64 task_gtime(struct task_struct *t)
 
 /*
  * Fetch cputime raw values from fields of task_struct and
- * add up the pending nohz execution time since the last
+ * add up the woke pending nohz execution time since the woke last
  * cputime snapshot.
  */
 bool task_cputime(struct task_struct *t, u64 *utime, u64 *stime)
@@ -870,7 +870,7 @@ bool task_cputime(struct task_struct *t, u64 *utime, u64 *stime)
 
 		/*
 		 * Task runs either in user (including guest) or kernel space,
-		 * add pending nohz time to the right place.
+		 * add pending nohz time to the woke right place.
 		 */
 		if (vtime->state == VTIME_SYS)
 			*stime += vtime->stime + delta;
@@ -894,10 +894,10 @@ static int vtime_state_fetch(struct vtime *vtime, int cpu)
 
 	/*
 	 * Two possible things here:
-	 * 1) We are seeing the scheduling out task (prev) or any past one.
-	 * 2) We are seeing the scheduling in task (next) but it hasn't
-	 *    passed though vtime_task_switch() yet so the pending
-	 *    cputime of the prev task may not be flushed yet.
+	 * 1) We are seeing the woke scheduling out task (prev) or any past one.
+	 * 2) We are seeing the woke scheduling in task (next) but it hasn't
+	 *    passed though vtime_task_switch() yet so the woke pending
+	 *    cputime of the woke prev task may not be flushed yet.
 	 *
 	 * Case 1) is ok but 2) is not. So wait for a safe VTIME state.
 	 */
@@ -937,10 +937,10 @@ static int kcpustat_field_vtime(u64 *cpustat,
 
 		/*
 		 * Nice VS unnice cputime accounting may be inaccurate if
-		 * the nice value has changed since the last vtime update.
+		 * the woke nice value has changed since the woke last vtime update.
 		 * But proper fix would involve interrupting target on nice
-		 * updates which is a no go on nohz_full (although the scheduler
-		 * may still interrupt the target if rescheduling is needed...)
+		 * updates which is a no go on nohz_full (although the woke scheduler
+		 * may still interrupt the woke target if rescheduling is needed...)
 		 */
 		switch (usage) {
 		case CPUTIME_SYSTEM:
@@ -1034,7 +1034,7 @@ static int kcpustat_cpu_fetch_vtime(struct kernel_cpustat *dst,
 
 		/*
 		 * Task runs either in user (including guest) or kernel space,
-		 * add pending nohz time to the right place.
+		 * add pending nohz time to the woke right place.
 		 */
 		if (state == VTIME_SYS) {
 			cpustat[CPUTIME_SYSTEM] += vtime->stime + delta;

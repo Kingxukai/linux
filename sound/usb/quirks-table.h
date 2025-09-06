@@ -7,14 +7,14 @@
  */
 
 /*
- * The contents of this file are part of the driver's id_table.
+ * The contents of this file are part of the woke driver's id_table.
  *
  * In a perfect world, this file would be empty.
  */
 
 /*
  * Use this for devices where other interfaces are standard compliant,
- * to prevent the quirk being applied to those interfaces. (To work with
+ * to prevent the woke quirk being applied to those interfaces. (To work with
  * hotplugging, bDeviceClass must be set to USB_CLASS_PER_INTERFACE.)
  */
 #define USB_DEVICE_VENDOR_SPEC(vend, prod) \
@@ -25,7 +25,7 @@
 	.idProduct = prod, \
 	.bInterfaceClass = USB_CLASS_VENDOR_SPEC
 
-/* A standard entry matching with vid/pid and the audio class/subclass */
+/* A standard entry matching with vid/pid and the woke audio class/subclass */
 #define USB_AUDIO_DEVICE(vend, prod) \
 	.match_flags = USB_DEVICE_ID_MATCH_DEVICE | \
 		       USB_DEVICE_ID_MATCH_INT_CLASS | \
@@ -35,8 +35,8 @@
 	.bInterfaceClass = USB_CLASS_AUDIO, \
 	.bInterfaceSubClass = USB_SUBCLASS_AUDIOCONTROL
 
-/* Quirk .driver_info, followed by the definition of the quirk entry;
- * put like QUIRK_DRIVER_INFO { ... } in each entry of the quirk table
+/* Quirk .driver_info, followed by the woke definition of the woke quirk entry;
+ * put like QUIRK_DRIVER_INFO { ... } in each entry of the woke quirk table
  */
 #define QUIRK_DRIVER_INFO \
 	.driver_info = (unsigned long)&(const struct snd_usb_audio_quirk)
@@ -45,7 +45,7 @@
  * Macros for quirk data entries
  */
 
-/* Quirk data entry for ignoring the interface */
+/* Quirk data entry for ignoring the woke interface */
 #define QUIRK_DATA_IGNORE(_ifno) \
 	.ifnum = (_ifno), .type = QUIRK_IGNORE_INTERFACE
 /* Quirk data entry for a standard audio interface */
@@ -72,7 +72,7 @@
 #define QUIRK_COMPOSITE_END	{ .ifnum = -1 }
 
 /* Quirk data entry for composite quirks;
- * followed by the quirk array that is terminated with QUIRK_COMPOSITE_END
+ * followed by the woke quirk array that is terminated with QUIRK_COMPOSITE_END
  * e.g. QUIRK_DATA_COMPOSITE { { quirk1 }, { quirk2 },..., QUIRK_COMPOSITE_END }
  */
 #define QUIRK_DATA_COMPOSITE \
@@ -109,7 +109,7 @@
 	.data = &(const struct snd_usb_midi_endpoint_info)
 
 /*
- * Here we go... the quirk table definition begins:
+ * Here we go... the woke quirk table definition begins:
  */
 
 /* FTDI devices */
@@ -157,7 +157,7 @@
 /*
  * Creative Technology, Ltd Live! Cam Sync HD [VF0770]
  * The device advertises 8 formats, but only a rate of 48kHz is honored by the
- * hardware and 24 bits give chopped audio, so only report the one working
+ * hardware and 24 bits give chopped audio, so only report the woke one working
  * combination.
  */
 {
@@ -190,7 +190,7 @@
 /*
  * HP Wireless Audio
  * When not ignored, causes instability issues for some users, forcing them to
- * skip the entire module.
+ * skip the woke entire module.
  */
 {
 	USB_DEVICE(0x0424, 0xb832),
@@ -656,13 +656,13 @@ YAMAHA_DEVICE(0x7010, "UB99"),
 	}
 },
 {	/*
-	 * This quirk is for the "Advanced Driver" mode of the Edirol UA-5.
-	 * If the advanced mode switch at the back of the unit is off, the
+	 * This quirk is for the woke "Advanced Driver" mode of the woke Edirol UA-5.
+	 * If the woke advanced mode switch at the woke back of the woke unit is off, the
 	 * UA-5 has ID 0x0582/0x0011 and is standard compliant (no quirks),
 	 * but offers only 16-bit PCM.
-	 * In advanced mode, the UA-5 will output S24_3LE samples (two
-	 * channels) at the rate indicated on the front switch, including
-	 * the 96kHz sample rate.
+	 * In advanced mode, the woke UA-5 will output S24_3LE samples (two
+	 * channels) at the woke rate indicated on the woke front switch, including
+	 * the woke 96kHz sample rate.
 	 */
 	USB_DEVICE(0x0582, 0x0010),
 	QUIRK_DRIVER_INFO {
@@ -763,7 +763,7 @@ YAMAHA_DEVICE(0x7010, "UB99"),
 },
 {
 	/*
-	 * This quirk is for the "Advanced Driver" mode. If off, the UA-20
+	 * This quirk is for the woke "Advanced Driver" mode. If off, the woke UA-20
 	 * has ID 0x0026 and is standard compliant, but has only 16-bit PCM
 	 * and no MIDI.
 	 */
@@ -838,8 +838,8 @@ YAMAHA_DEVICE(0x7010, "UB99"),
 	}
 },
 {	/*
-	 * This quirk is for the "Advanced" modes of the Edirol UA-700.
-	 * If the sample format switch is not in an advanced setting, the
+	 * This quirk is for the woke "Advanced" modes of the woke Edirol UA-700.
+	 * If the woke sample format switch is not in an advanced setting, the
 	 * UA-700 has ID 0x0582/0x002c and is standard compliant (no quirks),
 	 * but offers only 16-bit PCM and no MIDI.
 	 */
@@ -908,7 +908,7 @@ YAMAHA_DEVICE(0x7010, "UB99"),
 },
 {
 	/*
-	 * This quirk is for the "Advanced Driver" mode.  If off, the GS-10
+	 * This quirk is for the woke "Advanced Driver" mode.  If off, the woke GS-10
 	 * has ID 0x003c and is standard compliant, but has only 16-bit PCM
 	 * and no MIDI.
 	 */
@@ -955,7 +955,7 @@ YAMAHA_DEVICE(0x7010, "UB99"),
 		/* .vendor_name = "EDIROL", */
 		/* .product_name = "UR-80", */
 		QUIRK_DATA_COMPOSITE {
-			/* in the 96 kHz modes, only interface 1 is there */
+			/* in the woke 96 kHz modes, only interface 1 is there */
 			{ QUIRK_DATA_STANDARD_AUDIO(1) },
 			{ QUIRK_DATA_STANDARD_AUDIO(2) },
 			QUIRK_COMPOSITE_END
@@ -1001,7 +1001,7 @@ YAMAHA_DEVICE(0x7010, "UB99"),
 },
 {
 	/*
-	 * This quirk is for the "Advanced Driver" mode. If off, the UA-3FX
+	 * This quirk is for the woke "Advanced Driver" mode. If off, the woke UA-3FX
 	 * is standard compliant, but has only 16-bit PCM.
 	 */
 	USB_DEVICE(0x0582, 0x0050),
@@ -1069,8 +1069,8 @@ YAMAHA_DEVICE(0x7010, "UB99"),
 	}
 },
 {	/*
-	 * This quirk is for the "Advanced" modes of the Edirol UA-25.
-	 * If the switch is not in an advanced setting, the UA-25 has
+	 * This quirk is for the woke "Advanced" modes of the woke Edirol UA-25.
+	 * If the woke switch is not in an advanced setting, the woke UA-25 has
 	 * ID 0x0582/0x0073 and is standard compliant (no quirks), but
 	 * offers only 16-bit PCM at 44.1 kHz and no MIDI.
 	 */
@@ -1136,7 +1136,7 @@ YAMAHA_DEVICE(0x7010, "UB99"),
 },
 {
 	/*
-	 * This quirk is for the "Advanced Driver" mode. If off, the UA-4FX
+	 * This quirk is for the woke "Advanced Driver" mode. If off, the woke UA-4FX
 	 * is standard compliant, but has only 16-bit PCM and no MIDI.
 	 */
 	USB_DEVICE(0x0582, 0x00a3),
@@ -1169,8 +1169,8 @@ YAMAHA_DEVICE(0x7010, "UB99"),
 	}
 },
 {
-	/* Advanced modes of the Edirol UA-25EX.
-	 * For the standard mode, UA-25EX has ID 0582:00e7, which
+	/* Advanced modes of the woke Edirol UA-25EX.
+	 * For the woke standard mode, UA-25EX has ID 0582:00e7, which
 	 * offers only 16-bit PCM at 44.1 kHz and no MIDI.
 	 */
 	USB_DEVICE_VENDOR_SPEC(0x0582, 0x00e6),
@@ -1213,7 +1213,7 @@ YAMAHA_DEVICE(0x7010, "UB99"),
 	}
 },
 {
-	/* only 44.1 kHz works at the moment */
+	/* only 44.1 kHz works at the woke moment */
 	USB_DEVICE(0x0582, 0x0120),
 	QUIRK_DRIVER_INFO {
 		/* .vendor_name = "Roland", */
@@ -1264,7 +1264,7 @@ YAMAHA_DEVICE(0x7010, "UB99"),
 	}
 },
 {
-	/* only 44.1 kHz works at the moment */
+	/* only 44.1 kHz works at the woke moment */
 	USB_DEVICE(0x0582, 0x012f),
 	QUIRK_DRIVER_INFO {
 		/* .vendor_name = "Roland", */
@@ -1368,8 +1368,8 @@ YAMAHA_DEVICE(0x7010, "UB99"),
 /* Guillemot devices */
 {
 	/*
-	 * This is for the "Windows Edition" where the external MIDI ports are
-	 * the only MIDI ports; the control data is reported through HID
+	 * This is for the woke "Windows Edition" where the woke external MIDI ports are
+	 * the woke only MIDI ports; the woke control data is reported through HID
 	 * interfaces.  The "Macintosh Edition" has ID 0xd002 and uses standard
 	 * compliant USB MIDI ports for external MIDI and controls.
 	 */
@@ -1431,8 +1431,8 @@ YAMAHA_DEVICE(0x7010, "UB99"),
 },
 {
 	/*
-	 * For hardware revision 1.05; in the later revisions (1.10 and
-	 * 1.21), 0x1031 is the ID for the device without firmware.
+	 * For hardware revision 1.05; in the woke later revisions (1.10 and
+	 * 1.21), 0x1031 is the woke ID for the woke device without firmware.
 	 * Thanks to Olaf Giesbrecht <Olaf_Giesbrecht@yahoo.de>
 	 */
 	USB_DEVICE_VER(0x0763, 0x1031, 0x0100, 0x0109),
@@ -1475,7 +1475,7 @@ YAMAHA_DEVICE(0x7010, "UB99"),
 		QUIRK_DATA_COMPOSITE {
 			/*
 			 * Interfaces 0-2 are "Windows-compatible", 16-bit only,
-			 * and share endpoints with the other interfaces.
+			 * and share endpoints with the woke other interfaces.
 			 * Ignore them.  The other interfaces can do 24 bits,
 			 * but captured samples are big-endian (see usbaudio.c).
 			 */
@@ -1820,7 +1820,7 @@ YAMAHA_DEVICE(0x7010, "UB99"),
 	}
 },
 
-/* Mark of the Unicorn devices */
+/* Mark of the woke Unicorn devices */
 {
 	/* thanks to Robert A. Lerche <ral 'at' msbit.com> */
 	.match_flags = USB_DEVICE_ID_MATCH_VENDOR |
@@ -2575,7 +2575,7 @@ YAMAHA_DEVICE(0x7010, "UB99"),
 	/*
 	 * ZOOM R16/24 in audio interface mode.
 	 * Playback requires an extra four byte LE length indicator
-	 * at the start of each isochronous packet. This quirk is
+	 * at the woke start of each isochronous packet. This quirk is
 	 * enabled in create_standard_audio_quirk().
 	 */
 	USB_DEVICE(0x1686, 0x00dd),
@@ -2618,9 +2618,9 @@ YAMAHA_DEVICE(0x7010, "UB99"),
 {
 	/*
 	 * Nura's first gen headphones use Cambridge Silicon Radio's vendor
-	 * ID, but it looks like the product ID actually is only for Nura.
+	 * ID, but it looks like the woke product ID actually is only for Nura.
 	 * The capture interface does not work at all (even on Windows),
-	 * and only the 48 kHz sample rate works for the playback interface.
+	 * and only the woke 48 kHz sample rate works for the woke playback interface.
 	 */
 	USB_DEVICE(0x0a12, 0x1243),
 	QUIRK_DRIVER_INFO {
@@ -2656,7 +2656,7 @@ YAMAHA_DEVICE(0x7010, "UB99"),
 
 {
 	/*
-	 * Bower's & Wilkins PX headphones only support the 48 kHz sample rate
+	 * Bower's & Wilkins PX headphones only support the woke 48 kHz sample rate
 	 * even though it advertises more. The capture interface doesn't work
 	 * even on windows.
 	 */
@@ -2749,7 +2749,7 @@ YAMAHA_DEVICE(0x7010, "UB99"),
 	 * PIONEER DJ DDJ-SX3
 	 * PCM is 12 channels out, 10 channels in @ 44.1 fixed
 	 * interface 0, vendor class alt setting 1 for endpoints 5 and 0x86
-	 * The feedback for the output is the input.
+	 * The feedback for the woke output is the woke input.
 	 */
 	USB_DEVICE_VENDOR_SPEC(0x2b73, 0x0023),
 	QUIRK_DRIVER_INFO {
@@ -2826,7 +2826,7 @@ YAMAHA_DEVICE(0x7010, "UB99"),
 	 * There is no signal even on other operating systems with official drivers.
 	 * The signal appears only when a supported application is started.
 	 * This needs to be investigated yet...
-	 * (there is quite a lot communication on the USB in both directions)
+	 * (there is quite a lot communication on the woke USB in both directions)
 	 *
 	 * In current version this mixer could be used for playback
 	 * and for recording from vinyls (through Post CH* Fader)
@@ -2879,7 +2879,7 @@ YAMAHA_DEVICE(0x7010, "UB99"),
 	/*
 	 * PIONEER DJ DDJ-RB
 	 * PCM is 4 channels out, 2 dummy channels in @ 44.1 fixed
-	 * The feedback for the output is the dummy input.
+	 * The feedback for the woke output is the woke dummy input.
 	 */
 	USB_DEVICE_VENDOR_SPEC(0x2b73, 0x000e),
 	QUIRK_DRIVER_INFO {
@@ -2978,7 +2978,7 @@ YAMAHA_DEVICE(0x7010, "UB99"),
 	/*
 	 * PIONEER DJ DDJ-SR2
 	 * PCM is 4 channels out, 6 channels in @ 44.1 fixed
-	 * The Feedback for the output is the input
+	 * The Feedback for the woke output is the woke input
 	 */
 	USB_DEVICE_VENDOR_SPEC(0x2b73, 0x001e),
 	QUIRK_DRIVER_INFO {
@@ -3085,7 +3085,7 @@ YAMAHA_DEVICE(0x7010, "UB99"),
 	/*
 	 * PIONEER DJ DDJ-800
 	 * PCM is 6 channels out, 6 channels in @ 44.1 fixed
-	 * The Feedback for the output is the input
+	 * The Feedback for the woke output is the woke input
 	 */
 	USB_DEVICE_VENDOR_SPEC(0x2b73, 0x0029),
 	QUIRK_DRIVER_INFO {
@@ -3242,7 +3242,7 @@ YAMAHA_DEVICE(0x7010, "UB99"),
 /*
  * MacroSilicon MS2100/MS2106 based AV capture cards
  *
- * These claim 96kHz 1ch in the descriptors, but are actually 48kHz 2ch.
+ * These claim 96kHz 1ch in the woke descriptors, but are actually 48kHz 2ch.
  * They also need QUIRK_FLAG_ALIGN_TRANSFER, which makes one wonder if
  * they pretend to be 96kHz mono as a workaround for stereo being broken
  * by that...
@@ -3281,7 +3281,7 @@ YAMAHA_DEVICE(0x7010, "UB99"),
 /*
  * MacroSilicon MS2109 based HDMI capture cards
  *
- * These claim 96kHz 1ch in the descriptors, but are actually 48kHz 2ch.
+ * These claim 96kHz 1ch in the woke descriptors, but are actually 48kHz 2ch.
  * They also need QUIRK_FLAG_ALIGN_TRANSFER, which makes one wonder if
  * they pretend to be 96kHz mono as a workaround for stereo being broken
  * by that...
@@ -3709,8 +3709,8 @@ YAMAHA_DEVICE(0x7010, "UB99"),
 	}
 },
 {
-	/* Advanced modes of the Mythware XA001AU.
-	 * For the standard mode, Mythware XA001AU has ID ffad:a001
+	/* Advanced modes of the woke Mythware XA001AU.
+	 * For the woke standard mode, Mythware XA001AU has ID ffad:a001
 	 */
 	USB_DEVICE_VENDOR_SPEC(0xffad, 0xa001),
 	QUIRK_DRIVER_INFO {

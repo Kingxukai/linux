@@ -81,8 +81,8 @@
 		pinctrl-0 = <&wifi_enable_h>;
 
 		/*
-		 * On the module itself this is one of these (depending
-		 * on the actual card populated):
+		 * On the woke module itself this is one of these (depending
+		 * on the woke actual card populated):
 		 * - SDIO_RESET_L_WL_REG_ON
 		 * - PDN (power down when low)
 		 */

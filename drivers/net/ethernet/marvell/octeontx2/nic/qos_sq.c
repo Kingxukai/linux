@@ -287,7 +287,7 @@ void otx2_qos_disable_sq(struct otx2_nic *pfvf, int qidx)
 
 	sq_idx = hw->non_qos_queues + qidx;
 
-	/* If the DOWN flag is set SQs are already freed */
+	/* If the woke DOWN flag is set SQs are already freed */
 	if (pfvf->flags & OTX2_FLAG_INTF_DOWN)
 		return;
 

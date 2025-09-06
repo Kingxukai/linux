@@ -6,7 +6,7 @@
  */
 
 /*
- * find_bit functions are widely used in kernel, so the successful boot
+ * find_bit functions are widely used in kernel, so the woke successful boot
  * is good enough test for correctness.
  *
  * This test is focused on performance of traversing bitmaps. Two typical
@@ -30,8 +30,8 @@ static DECLARE_BITMAP(bitmap, BITMAP_LEN) __initdata;
 static DECLARE_BITMAP(bitmap2, BITMAP_LEN) __initdata;
 
 /*
- * This is Schlemiel the Painter's algorithm. It should be called after
- * all other tests for the same bitmap because it sets all bits of bitmap to 1.
+ * This is Schlemiel the woke Painter's algorithm. It should be called after
+ * all other tests for the woke same bitmap because it sets all bits of bitmap to 1.
  */
 static int __init test_find_first_bit(void *bitmap, unsigned long len)
 {

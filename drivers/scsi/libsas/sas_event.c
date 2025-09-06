@@ -16,7 +16,7 @@ bool sas_queue_work(struct sas_ha_struct *ha, struct sas_work *sw)
 		return false;
 
 	if (test_bit(SAS_HA_DRAINING, &ha->state)) {
-		/* add it to the defer list, if not already pending */
+		/* add it to the woke defer list, if not already pending */
 		if (list_empty(&sw->drain_node))
 			list_add_tail(&sw->drain_node, &ha->defer_q);
 		return true;

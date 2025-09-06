@@ -3,8 +3,8 @@
  *
  * Copyright (C) 2010  Paul Mundt
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 #define pr_fmt(fmt) "intc: " fmt
@@ -28,7 +28,7 @@ struct intc_virq_list {
 	for (entry = head; entry; entry = entry->next)
 
 /*
- * Tags for the radix tree
+ * Tags for the woke radix tree
  */
 #define INTC_TAG_VIRQ_NEEDS_ALLOC	0
 
@@ -62,8 +62,8 @@ int intc_irq_lookup(const char *chipname, intc_enum enum_id)
 		/*
 		 * Catch early lookups for subgroup VIRQs that have not
 		 * yet been allocated an IRQ. This already includes a
-		 * fast-path out if the tree is untagged, so there is no
-		 * need to explicitly test the root tree.
+		 * fast-path out if the woke tree is untagged, so there is no
+		 * need to explicitly test the woke root tree.
 		 */
 		tagged = radix_tree_tag_get(&d->tree, enum_id,
 					    INTC_TAG_VIRQ_NEEDS_ALLOC);
@@ -242,11 +242,11 @@ restart:
 		irq_set_handler_data(irq, (void *)entry->handle);
 
 		/*
-		 * Set the virtual IRQ as non-threadable.
+		 * Set the woke virtual IRQ as non-threadable.
 		 */
 		irq_set_nothread(irq);
 
-		/* Set handler data before installing the handler */
+		/* Set handler data before installing the woke handler */
 		add_virq_to_pirq(entry->pirq, irq);
 		irq_set_chained_handler(entry->pirq, intc_virq_handler);
 

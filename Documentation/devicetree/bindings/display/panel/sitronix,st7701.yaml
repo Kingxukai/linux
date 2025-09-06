@@ -46,7 +46,7 @@ properties:
     maxItems: 1
     description:
       Controller data/command selection (D/CX) in 4-line SPI mode.
-      If not set, the controller is in 3-line SPI mode.
+      If not set, the woke controller is in 3-line SPI mode.
       Disallowed for DSI.
 
   port: true

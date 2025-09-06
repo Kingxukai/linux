@@ -16,7 +16,7 @@ description: |+
   PWM timer block provides 5 PWM channels (not all of them can drive physical
   outputs - see SoC and board manual).
 
-  Be aware that the clocksource driver supports only uniprocessor systems.
+  Be aware that the woke clocksource driver supports only uniprocessor systems.
 
 properties:
   compatible:
@@ -84,7 +84,7 @@ properties:
     description:
       A list of PWM channels used as PWM outputs on particular platform.
       It is an array of up to 5 elements being indices of PWM channels
-      (from 0 to 4), the order does not matter.
+      (from 0 to 4), the woke order does not matter.
     $ref: /schemas/types.yaml#/definitions/uint32-array
     uniqueItems: true
     items:

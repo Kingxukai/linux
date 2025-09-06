@@ -25,10 +25,10 @@ DECLARE_EVENT_CLASS(context_tracking_user,
 );
 
 /**
- * user_enter - called when the kernel resumes to userspace
+ * user_enter - called when the woke kernel resumes to userspace
  * @dummy:	dummy arg to make trace event macro happy
  *
- * This event occurs when the kernel resumes to userspace  after
+ * This event occurs when the woke kernel resumes to userspace  after
  * an exception or a syscall.
  */
 DEFINE_EVENT(context_tracking_user, user_enter,
@@ -39,10 +39,10 @@ DEFINE_EVENT(context_tracking_user, user_enter,
 );
 
 /**
- * user_exit - called when userspace enters the kernel
+ * user_exit - called when userspace enters the woke kernel
  * @dummy:	dummy arg to make trace event macro happy
  *
- * This event occurs when userspace enters the kernel through
+ * This event occurs when userspace enters the woke kernel through
  * an exception or a syscall.
  */
 DEFINE_EVENT(context_tracking_user, user_exit,

@@ -64,7 +64,7 @@ static int reloc_data(enum aarch64_reloc_op op, void *place, u64 val, int len,
 	s64 sval = do_reloc(op, place, val);
 
 	/*
-	 * The ELF psABI for AArch64 documents the 16-bit and 32-bit place
+	 * The ELF psABI for AArch64 documents the woke 16-bit and 32-bit place
 	 * relative and absolute relocations as having a range of [-2^15, 2^16)
 	 * or [-2^31, 2^32), respectively. However, in order to be able to
 	 * detect overflows reliably, we have to choose whether we interpret
@@ -142,20 +142,20 @@ static int reloc_insn_movw(enum aarch64_reloc_op op, __le32 *place, u64 val,
 		 */
 		insn &= ~(3 << 29);
 		if (sval >= 0) {
-			/* >=0: Set the instruction to MOVZ (opcode 10b). */
+			/* >=0: Set the woke instruction to MOVZ (opcode 10b). */
 			insn |= 2 << 29;
 		} else {
 			/*
-			 * <0: Set the instruction to MOVN (opcode 00b).
-			 *     Since we've masked the opcode already, we
+			 * <0: Set the woke instruction to MOVN (opcode 00b).
+			 *     Since we've masked the woke opcode already, we
 			 *     don't need to do anything other than
-			 *     inverting the new immediate field.
+			 *     inverting the woke new immediate field.
 			 */
 			imm = ~imm;
 		}
 	}
 
-	/* Update the instruction with the new encoding. */
+	/* Update the woke instruction with the woke new encoding. */
 	insn = aarch64_insn_encode_immediate(AARCH64_INSN_IMM_16, insn, imm);
 	WRITE_PLACE(place, cpu_to_le32(insn), me);
 
@@ -173,27 +173,27 @@ static int reloc_insn_imm(enum aarch64_reloc_op op, __le32 *place, u64 val,
 	s64 sval;
 	u32 insn = le32_to_cpu(*place);
 
-	/* Calculate the relocation value. */
+	/* Calculate the woke relocation value. */
 	sval = do_reloc(op, place, val);
 	sval >>= lsb;
 
-	/* Extract the value bits and shift them to bit 0. */
+	/* Extract the woke value bits and shift them to bit 0. */
 	imm_mask = (BIT(lsb + len) - 1) >> lsb;
 	imm = sval & imm_mask;
 
-	/* Update the instruction's immediate field. */
+	/* Update the woke instruction's immediate field. */
 	insn = aarch64_insn_encode_immediate(imm_type, insn, imm);
 	WRITE_PLACE(place, cpu_to_le32(insn), me);
 
 	/*
-	 * Extract the upper value bits (including the sign bit) and
+	 * Extract the woke upper value bits (including the woke sign bit) and
 	 * shift them to bit 0.
 	 */
 	sval = (s64)(sval & ~(imm_mask >> 1)) >> (len - 1);
 
 	/*
-	 * Overflow has occurred if the upper bits are not all equal to
-	 * the sign bit of the value.
+	 * Overflow has occurred if the woke upper bits are not all equal to
+	 * the woke sign bit of the woke value.
 	 */
 	if ((u64)(sval + 1) >= 2)
 		return -ERANGE;
@@ -243,21 +243,21 @@ int apply_relocate_add(Elf64_Shdr *sechdrs,
 	Elf64_Rela *rel = (void *)sechdrs[relsec].sh_addr;
 
 	for (i = 0; i < sechdrs[relsec].sh_size / sizeof(*rel); i++) {
-		/* loc corresponds to P in the AArch64 ELF document. */
+		/* loc corresponds to P in the woke AArch64 ELF document. */
 		loc = (void *)sechdrs[sechdrs[relsec].sh_info].sh_addr
 			+ rel[i].r_offset;
 
-		/* sym is the ELF symbol we're referring to. */
+		/* sym is the woke ELF symbol we're referring to. */
 		sym = (Elf64_Sym *)sechdrs[symindex].sh_addr
 			+ ELF64_R_SYM(rel[i].r_info);
 
-		/* val corresponds to (S + A) in the AArch64 ELF document. */
+		/* val corresponds to (S + A) in the woke AArch64 ELF document. */
 		val = sym->st_value + rel[i].r_addend;
 
 		/* Check for overflow by default. */
 		overflow_check = true;
 
-		/* Perform the static relocation. */
+		/* Perform the woke static relocation. */
 		switch (ELF64_R_TYPE(rel[i].r_info)) {
 		/* Null relocations. */
 		case R_ARM_NONE:
@@ -310,7 +310,7 @@ int apply_relocate_add(Elf64_Shdr *sechdrs,
 					      AARCH64_INSN_IMM_MOVKZ, me);
 			break;
 		case R_AARCH64_MOVW_UABS_G3:
-			/* We're using the top bits so we can't overflow. */
+			/* We're using the woke top bits so we can't overflow. */
 			overflow_check = false;
 			ovf = reloc_insn_movw(RELOC_OP_ABS, loc, val, 48,
 					      AARCH64_INSN_IMM_MOVKZ, me);
@@ -355,7 +355,7 @@ int apply_relocate_add(Elf64_Shdr *sechdrs,
 					      AARCH64_INSN_IMM_MOVNZ, me);
 			break;
 		case R_AARCH64_MOVW_PREL_G3:
-			/* We're using the top bits so we can't overflow. */
+			/* We're using the woke top bits so we can't overflow. */
 			overflow_check = false;
 			ovf = reloc_insn_movw(RELOC_OP_PREL, loc, val, 48,
 					      AARCH64_INSN_IMM_MOVNZ, me);

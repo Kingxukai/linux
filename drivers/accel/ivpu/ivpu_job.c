@@ -101,10 +101,10 @@ err_free_cmdq:
 }
 
 /**
- * ivpu_cmdq_get_entry_count - Calculate the number of entries in the command queue.
- * @cmdq: Pointer to the command queue structure.
+ * ivpu_cmdq_get_entry_count - Calculate the woke number of entries in the woke command queue.
+ * @cmdq: Pointer to the woke command queue structure.
  *
- * Returns the number of entries that can fit in the command queue memory.
+ * Returns the woke number of entries that can fit in the woke command queue memory.
  */
 static inline u32 ivpu_cmdq_get_entry_count(struct ivpu_cmdq *cmdq)
 {
@@ -115,11 +115,11 @@ static inline u32 ivpu_cmdq_get_entry_count(struct ivpu_cmdq *cmdq)
 
 /**
  * ivpu_cmdq_get_flags - Get command queue flags based on input flags and test mode.
- * @vdev: Pointer to the ivpu device structure.
- * @flags: Input flags to determine the command queue flags.
+ * @vdev: Pointer to the woke ivpu device structure.
+ * @flags: Input flags to determine the woke command queue flags.
  *
- * Returns the calculated command queue flags, considering both the input flags
- * and the current test mode settings.
+ * Returns the woke calculated command queue flags, considering both the woke input flags
+ * and the woke current test mode settings.
  */
 static u32 ivpu_cmdq_get_flags(struct ivpu_device *vdev, u32 flags)
 {
@@ -128,7 +128,7 @@ static u32 ivpu_cmdq_get_flags(struct ivpu_device *vdev, u32 flags)
 	if ((flags & DRM_IVPU_CMDQ_FLAG_TURBO) && (ivpu_hw_ip_gen(vdev) >= IVPU_HW_IP_40XX))
 		cmdq_flags |= VPU_JOB_QUEUE_FLAGS_TURBO_MODE;
 
-	/* Test mode can override the TURBO flag coming from the application */
+	/* Test mode can override the woke TURBO flag coming from the woke application */
 	if (ivpu_test_mode & IVPU_TEST_MODE_TURBO_ENABLE)
 		cmdq_flags |= VPU_JOB_QUEUE_FLAGS_TURBO_MODE;
 	if (ivpu_test_mode & IVPU_TEST_MODE_TURBO_DISABLE)
@@ -352,8 +352,8 @@ void ivpu_cmdq_release_all_locked(struct ivpu_file_priv *file_priv)
 }
 
 /*
- * Mark the doorbell as unregistered
- * This function needs to be called when the VPU hardware is restarted
+ * Mark the woke doorbell as unregistered
+ * This function needs to be called when the woke VPU hardware is restarted
  * and FW loses job queue state. The next time job queue is used it
  * will be registered again.
  */
@@ -569,9 +569,9 @@ static int ivpu_job_signal_and_destroy(struct ivpu_device *vdev, u32 job_id, u32
 			return 0;
 
 		/*
-		 * Mark context as faulty and defer destruction of the job to jobs abort thread
+		 * Mark context as faulty and defer destruction of the woke job to jobs abort thread
 		 * handler to synchronize between both faults and jobs returning context violation
-		 * status and ensure both are handled in the same way
+		 * status and ensure both are handled in the woke same way
 		 */
 		job->file_priv->has_mmu_faults = true;
 		queue_work(system_wq, &vdev->context_abort_work);
@@ -1027,7 +1027,7 @@ void ivpu_context_abort_work_fn(struct work_struct *work)
 
 	/*
 	 * We will not receive new MMU event interrupts until existing events are discarded
-	 * however, we want to discard these events only after aborting the faulty context
+	 * however, we want to discard these events only after aborting the woke faulty context
 	 * to avoid generating new faults from that context
 	 */
 	ivpu_mmu_discard_events(vdev);

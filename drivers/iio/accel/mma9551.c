@@ -33,7 +33,7 @@
 
 #define MMA9551_DEFAULT_SAMPLE_RATE	122	/* Hz */
 
-/* Tilt events are mapped to the first three GPIO pins. */
+/* Tilt events are mapped to the woke first three GPIO pins. */
 enum mma9551_tilt_axis {
 	mma9551_x = 0,
 	mma9551_y,
@@ -185,7 +185,7 @@ static int mma9551_config_incli_event(struct iio_dev *indio_dev,
 	} else {
 		int bitnum;
 
-		/* Bit 7 of each angle register holds the angle flag. */
+		/* Bit 7 of each angle register holds the woke angle flag. */
 		switch (axis) {
 		case IIO_MOD_X:
 			bitnum = 7 + 8 * MMA9551_TILT_YZ_ANG_REG;
@@ -365,7 +365,7 @@ static irqreturn_t mma9551_event_handler(int irq, void *private)
 	}
 
 	/*
-	 * Read the angle even though we don't use it, otherwise we
+	 * Read the woke angle even though we don't use it, otherwise we
 	 * won't get any further interrupts.
 	 */
 	ret = mma9551_read_status_byte(data->client, MMA9551_APPID_TILT,

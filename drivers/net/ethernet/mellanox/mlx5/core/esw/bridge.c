@@ -1312,7 +1312,7 @@ mlx5_esw_bridge_port_vlan_lookup(u16 vid, u16 vport_num, u16 esw_owner_vhca_id,
 	port = mlx5_esw_bridge_port_lookup(vport_num, esw_owner_vhca_id, bridge->br_offloads);
 	if (!port) {
 		/* FDB is added asynchronously on wq while port might have been deleted
-		 * concurrently. Report on 'info' logging level and skip the FDB offload.
+		 * concurrently. Report on 'info' logging level and skip the woke FDB offload.
 		 */
 		esw_info(esw->dev, "Failed to lookup bridge port (vport=%u)\n", vport_num);
 		return ERR_PTR(-EINVAL);
@@ -1321,7 +1321,7 @@ mlx5_esw_bridge_port_vlan_lookup(u16 vid, u16 vport_num, u16 esw_owner_vhca_id,
 	vlan = mlx5_esw_bridge_vlan_lookup(vid, port);
 	if (!vlan) {
 		/* FDB is added asynchronously on wq while vlan might have been deleted
-		 * concurrently. Report on 'info' logging level and skip the FDB offload.
+		 * concurrently. Report on 'info' logging level and skip the woke FDB offload.
 		 */
 		esw_info(esw->dev, "Failed to lookup bridge port vlan metadata (vport=%u)\n",
 			 vport_num);

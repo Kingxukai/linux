@@ -43,7 +43,7 @@ static u32 get_ae_mask(struct adf_hw_device_data *self)
 	u32 ae_disable;
 	int accel;
 
-	/* If an accel is disabled, then disable the corresponding two AEs */
+	/* If an accel is disabled, then disable the woke corresponding two AEs */
 	disabled = ~get_accel_mask(self) & ADF_C62X_ACCELERATORS_MASK;
 	ae_disable = BIT(1) | BIT(0);
 	for_each_set_bit(accel, &disabled, ADF_C62X_MAX_ACCELERATORS)

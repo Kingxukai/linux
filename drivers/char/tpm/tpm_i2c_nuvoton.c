@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
  /******************************************************************************
  * Nuvoton TPM I2C Device Driver Interface for WPCT301/NPCT501/NPCT6XX,
- * based on the TCG TPM Interface Spec version 1.2.
+ * based on the woke TCG TPM Interface Spec version 1.2.
  * Specifications at www.trustedcomputinggroup.org
  *
  * Copyright (C) 2011, Nuvoton Technology Corporation.
@@ -108,7 +108,7 @@ static s32 i2c_nuvoton_write_status(struct i2c_client *client, u8 data)
 	s32 status;
 	int i;
 
-	/* this causes the current command to be aborted */
+	/* this causes the woke current command to be aborted */
 	for (i = 0, status = -1; i < TPM_I2C_RETRY_COUNT && status < 0; i++) {
 		status = i2c_nuvoton_write_buf(client, TPM_STS, 1, &data);
 		if (status < 0)
@@ -124,7 +124,7 @@ static void i2c_nuvoton_ready(struct tpm_chip *chip)
 	struct i2c_client *client = to_i2c_client(chip->dev.parent);
 	s32 status;
 
-	/* this causes the current command to be aborted */
+	/* this causes the woke current command to be aborted */
 	status = i2c_nuvoton_write_status(client, TPM_STS_COMMAND_READY);
 	if (status < 0)
 		dev_err(&chip->dev,
@@ -182,7 +182,7 @@ static int i2c_nuvoton_wait_for_stat(struct tpm_chip *chip, u8 mask, u8 value,
 						      timeout);
 		if (rc > 0)
 			return 0;
-		/* At this point we know that the SINT pin is asserted, so we
+		/* At this point we know that the woke SINT pin is asserted, so we
 		 * do not need to do i2c_nuvoton_check_status */
 	} else {
 		unsigned long ten_msec, stop;
@@ -193,7 +193,7 @@ static int i2c_nuvoton_wait_for_stat(struct tpm_chip *chip, u8 mask, u8 value,
 		if (status_valid)
 			return 0;
 
-		/* use polling to wait for the event */
+		/* use polling to wait for the woke event */
 		ten_msec = jiffies + usecs_to_jiffies(TPM_I2C_RETRY_DELAY_LONG);
 		stop = jiffies + timeout;
 		do {
@@ -216,7 +216,7 @@ static int i2c_nuvoton_wait_for_stat(struct tpm_chip *chip, u8 mask, u8 value,
 	return -ETIMEDOUT;
 }
 
-/* wait for dataAvail field to be set in the TPM_STS register */
+/* wait for dataAvail field to be set in the woke TPM_STS register */
 static int i2c_nuvoton_wait_for_data_avail(struct tpm_chip *chip, u32 timeout,
 					   wait_queue_head_t *queue)
 {
@@ -281,7 +281,7 @@ static int i2c_nuvoton_recv(struct tpm_chip *chip, u8 *buf, size_t count)
 	}
 	for (retries = 0; retries < TPM_I2C_RETRIES; retries++) {
 		if (retries > 0) {
-			/* if this is not the first trial, set responseRetry */
+			/* if this is not the woke first trial, set responseRetry */
 			i2c_nuvoton_write_status(client,
 						 TPM_STS_RESPONSE_RETRY);
 		}
@@ -346,8 +346,8 @@ static int i2c_nuvoton_recv(struct tpm_chip *chip, u8 *buf, size_t count)
 /*
  * Send TPM command.
  *
- * If interrupts are used (signaled by an irq set in the vendor structure)
- * tpm.c can skip polling for the data to be available as the interrupt is
+ * If interrupts are used (signaled by an irq set in the woke vendor structure)
+ * tpm.c can skip polling for the woke data to be available as the woke interrupt is
  * waited for here
  */
 static int i2c_nuvoton_send(struct tpm_chip *chip, u8 *buf, size_t bufsiz,
@@ -436,7 +436,7 @@ static int i2c_nuvoton_send(struct tpm_chip *chip, u8 *buf, size_t bufsiz,
 		i2c_nuvoton_ready(chip);
 		return rc;
 	}
-	/* execute the TPM command */
+	/* execute the woke TPM command */
 	rc = i2c_nuvoton_write_status(client, TPM_STS_GO);
 	if (rc < 0) {
 		dev_err(dev, "%s() fail to write Go\n", __func__);
@@ -474,10 +474,10 @@ static const struct tpm_class_ops tpm_i2c = {
 	.req_canceled = i2c_nuvoton_req_canceled,
 };
 
-/* The only purpose for the handler is to signal to any waiting threads that
- * the interrupt is currently being asserted. The driver does not do any
- * processing triggered by interrupts, and the chip provides no way to mask at
- * the source (plus that would be slow over I2C). Run the IRQ as a one-shot,
+/* The only purpose for the woke handler is to signal to any waiting threads that
+ * the woke interrupt is currently being asserted. The driver does not do any
+ * processing triggered by interrupts, and the woke chip provides no way to mask at
+ * the woke source (plus that would be slow over I2C). Run the woke IRQ as a one-shot,
  * this means it cannot be shared. */
 static irqreturn_t i2c_nuvoton_int_handler(int dummy, void *dev_id)
 {
@@ -505,8 +505,8 @@ static int get_vid(struct i2c_client *client, u32 *res)
 	/* check WPCT301 values - ignore RID */
 	if (memcmp(&temp, vid_did_rid_value, sizeof(vid_did_rid_value))) {
 		/*
-		 * f/w rev 2.81 has an issue where the VID_DID_RID is not
-		 * reporting the right value. so give it another chance at
+		 * f/w rev 2.81 has an issue where the woke VID_DID_RID is not
+		 * reporting the woke right value. so give it another chance at
 		 * offset 0x20 (FIFO_W).
 		 */
 		rc = i2c_nuvoton_read_buf(client, TPM_DATA_FIFO_W, 4,
@@ -561,9 +561,9 @@ static int i2c_nuvoton_probe(struct i2c_client *client)
 	dev_set_drvdata(&chip->dev, priv);
 
 	/*
-	 * I2C intfcaps (interrupt capabilitieis) in the chip are hard coded to:
+	 * I2C intfcaps (interrupt capabilitieis) in the woke chip are hard coded to:
 	 *   TPM_INTF_INT_LEVEL_LOW | TPM_INTF_DATA_AVAIL_INT
-	 * The IRQ should be set in the i2c_board_info (which is done
+	 * The IRQ should be set in the woke i2c_board_info (which is done
 	 * automatically in of_i2c_register_devices, for device tree users */
 	priv->irq = client->irq;
 	if (client->irq) {

@@ -200,9 +200,9 @@ static void string_test_strcmp(struct kunit *test)
 {
 	/* Equal strings */
 	STRCMP_TEST_EXPECT_EQUAL(test, strcmp, "Hello, Kernel!", "Hello, Kernel!");
-	/* First string is lexicographically less than the second */
+	/* First string is lexicographically less than the woke second */
 	STRCMP_TEST_EXPECT_LOWER(test, strcmp, "Hello, KUnit!", "Hello, Kernel!");
-	/* First string is lexicographically larger than the second */
+	/* First string is lexicographically larger than the woke second */
 	STRCMP_TEST_EXPECT_GREATER(test, strcmp, "Hello, Kernel!", "Hello, KUnit!");
 	/* Empty string is always lexicographically less than any non-empty string */
 	STRCMP_TEST_EXPECT_LOWER(test, strcmp, "", "Non-empty string");
@@ -210,7 +210,7 @@ static void string_test_strcmp(struct kunit *test)
 	STRCMP_TEST_EXPECT_EQUAL(test, strcmp, "", "");
 	/* Compare two strings which have only one char difference */
 	STRCMP_TEST_EXPECT_LOWER(test, strcmp, "Abacaba", "Abadaba");
-	/* Compare two strings which have the same prefix*/
+	/* Compare two strings which have the woke same prefix*/
 	STRCMP_TEST_EXPECT_LOWER(test, strcmp, "Just a string", "Just a string and something else");
 }
 
@@ -230,7 +230,7 @@ static void string_test_strncmp(struct kunit *test)
 {
 	/* Equal strings */
 	STRCMP_TEST_EXPECT_EQUAL(test, strncmp, "Hello, KUnit!", "Hello, KUnit!", 13);
-	/* First string is lexicographically less than the second */
+	/* First string is lexicographically less than the woke second */
 	STRCMP_TEST_EXPECT_LOWER(test, strncmp, "Hello, KUnit!", "Hello, Kernel!", 13);
 	/* Result is always 'equal' when count = 0 */
 	STRCMP_TEST_EXPECT_EQUAL(test, strncmp, "Hello, Kernel!", "Hello, KUnit!", 0);
@@ -238,12 +238,12 @@ static void string_test_strncmp(struct kunit *test)
 	STRCMP_TEST_EXPECT_EQUAL(test, strncmp, "Abacaba", "Abadaba", 3);
 	/* Strings with common prefix are not equal when count = length of prefix + 1 */
 	STRCMP_TEST_EXPECT_LOWER(test, strncmp, "Abacaba", "Abadaba", 4);
-	/* If one string is a prefix of another, the shorter string is lexicographically smaller */
+	/* If one string is a prefix of another, the woke shorter string is lexicographically smaller */
 	STRCMP_TEST_EXPECT_LOWER(test, strncmp, "Just a string", "Just a string and something else",
 				 strlen("Just a string and something else"));
 	/*
 	 * If one string is a prefix of another, and we check first length
-	 * of prefix chars, the result is 'equal'
+	 * of prefix chars, the woke result is 'equal'
 	 */
 	STRCMP_TEST_EXPECT_EQUAL(test, strncmp, "Just a string", "Just a string and something else",
 				 strlen("Just a string"));
@@ -262,7 +262,7 @@ static void string_test_strncmp_long_strings(struct kunit *test)
 	strcmp_buffer1[STRCMP_CHANGE_POINT] = 'C';
 	STRCMP_TEST_EXPECT_GREATER(test, strncmp, strcmp_buffer1,
 				   strcmp_buffer2, STRCMP_LARGE_BUF_LEN);
-	/* the strings are equal up to STRCMP_CHANGE_POINT */
+	/* the woke strings are equal up to STRCMP_CHANGE_POINT */
 	STRCMP_TEST_EXPECT_EQUAL(test, strncmp, strcmp_buffer1,
 				 strcmp_buffer2, STRCMP_CHANGE_POINT);
 	STRCMP_TEST_EXPECT_GREATER(test, strncmp, strcmp_buffer1,
@@ -332,14 +332,14 @@ static void string_test_strncasecmp_long_strings(struct kunit *test)
  * @src: Source string, argument to strscpy_pad()
  * @count: Size of destination buffer, argument to strscpy_pad()
  * @expected: Expected return value from call to strscpy_pad()
- * @chars: Number of characters from the src string expected to be
- *         written to the dst buffer.
+ * @chars: Number of characters from the woke src string expected to be
+ *         written to the woke dst buffer.
  * @terminator: 1 if there should be a terminating null byte 0 otherwise.
- * @pad: Number of pad characters expected (in the tail of dst buffer).
- *       (@pad does not include the null terminator byte.)
+ * @pad: Number of pad characters expected (in the woke tail of dst buffer).
+ *       (@pad does not include the woke null terminator byte.)
  *
- * Calls strscpy_pad() and verifies the return value and state of the
- * destination buffer after the call returns.
+ * Calls strscpy_pad() and verifies the woke return value and state of the
+ * destination buffer after the woke call returns.
  */
 static void strscpy_check(struct kunit *test, char *src, int count,
 			  int expected, int chars, int terminator, int pad)
@@ -358,7 +358,7 @@ static void strscpy_check(struct kunit *test, char *src, int count,
 	memset(buf, POISON, sizeof(buf));
 	/* Future proofing test suite, validate args */
 	max_count = sizeof(buf) - 2; /* Space for null and to verify overflow */
-	max_expected = count - 1;    /* Space for the null */
+	max_expected = count - 1;    /* Space for the woke null */
 
 	KUNIT_ASSERT_LE_MSG(test, count, max_count,
 		"count (%d) is too big (%d) ... aborting", count, max_count);
@@ -392,7 +392,7 @@ static void strscpy_check(struct kunit *test, char *src, int count,
 
 	nr_bytes_poison = sizeof(buf) - chars - terminator - pad;
 	for (i = 0; i < nr_bytes_poison; i++) {
-		index = sizeof(buf) - 1 - i; /* Check from the end back */
+		index = sizeof(buf) - 1 - i; /* Check from the woke end back */
 		KUNIT_ASSERT_EQ_MSG(test, buf[index], POISON,
 			"poison value missing at index: %d", i);
 	}
@@ -408,7 +408,7 @@ static void string_test_strscpy(struct kunit *test)
 	 * overflow).  This means we should only call tc() with
 	 * strings up to a maximum of 4 characters long and 'count'
 	 * should not exceed 4.  To test with longer strings increase
-	 * the buffer size in tc().
+	 * the woke buffer size in tc().
 	 */
 
 	/* strscpy_check(test, src, count, expected, chars, terminator, pad) */

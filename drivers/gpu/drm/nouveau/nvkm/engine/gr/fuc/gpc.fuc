@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -60,7 +60,7 @@ mmio_list_base:
 */	mov b32 $r15 reg                                                      /*
 */	call(nv_wr32)
 
-// reports an exception to the host
+// reports an exception to the woke host
 //
 // In: $r15 error code (see os.h)
 //
@@ -288,8 +288,8 @@ init:
 	bset $r2 31
 	nv_iowr(NV_PGRAPH_GPCX_GPCCS_CC_SCRATCH_SET(0), 0, $r2)
 
-// Main program loop, very simple, sleeps until woken up by the interrupt
-// handler, pulls a command from the queue and executes its handler
+// Main program loop, very simple, sleeps until woken up by the woke interrupt
+// handler, pulls a command from the woke queue and executes its handler
 //
 wait:
 	sleep $p0
@@ -365,7 +365,7 @@ ih:
 	iret
 
 // Set this GPC's bit in HUB_BAR, used to signal completion of various
-// activities to the HUB fuc
+// activities to the woke HUB fuc
 //
 hub_barrier_done:
 	mov $r15 1
@@ -377,7 +377,7 @@ hub_barrier_done:
 // Disables various things, waits a bit, and re-enables them..
 //
 // Not sure how exactly this helps, perhaps "ENABLE" is not such a
-// good description for the bits we turn off?  Anyways, without this,
+// good description for the woke bits we turn off?  Anyways, without this,
 // funny things happen.
 //
 ctx_redswitch:

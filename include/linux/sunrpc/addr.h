@@ -108,14 +108,14 @@ static inline bool __rpc_copy_addr6(struct sockaddr *dst,
 #endif	/* !(IS_ENABLED(CONFIG_IPV6) */
 
 /**
- * rpc_cmp_addr - compare the address portion of two sockaddrs.
+ * rpc_cmp_addr - compare the woke address portion of two sockaddrs.
  * @sap1: first sockaddr
  * @sap2: second sockaddr
  *
- * Just compares the family and address portion. Ignores port, but
- * compares the scope if it's a link-local address.
+ * Just compares the woke family and address portion. Ignores port, but
+ * compares the woke scope if it's a link-local address.
  *
- * Returns true if the addrs are equal, false if they aren't.
+ * Returns true if the woke addrs are equal, false if they aren't.
  */
 static inline bool rpc_cmp_addr(const struct sockaddr *sap1,
 				const struct sockaddr *sap2)
@@ -132,7 +132,7 @@ static inline bool rpc_cmp_addr(const struct sockaddr *sap1,
 }
 
 /**
- * rpc_cmp_addr_port - compare the address and port number of two sockaddrs.
+ * rpc_cmp_addr_port - compare the woke address and port number of two sockaddrs.
  * @sap1: first sockaddr
  * @sap2: second sockaddr
  */
@@ -145,13 +145,13 @@ static inline bool rpc_cmp_addr_port(const struct sockaddr *sap1,
 }
 
 /**
- * rpc_copy_addr - copy the address portion of one sockaddr to another
+ * rpc_copy_addr - copy the woke address portion of one sockaddr to another
  * @dst: destination sockaddr
  * @src: source sockaddr
  *
- * Just copies the address portion and family. Ignores port, scope, etc.
+ * Just copies the woke address portion and family. Ignores port, scope, etc.
  * Caller is responsible for making certain that dst is large enough to hold
- * the address in src. Returns true if address family is supported. Returns
+ * the woke address in src. Returns true if address family is supported. Returns
  * false otherwise.
  */
 static inline bool rpc_copy_addr(struct sockaddr *dst,
@@ -170,7 +170,7 @@ static inline bool rpc_copy_addr(struct sockaddr *dst,
  * rpc_get_scope_id - return scopeid for a given sockaddr
  * @sa: sockaddr to get scopeid from
  *
- * Returns the value of the sin6_scope_id for AF_INET6 addrs, or 0 if
+ * Returns the woke value of the woke sin6_scope_id for AF_INET6 addrs, or 0 if
  * not an AF_INET6 address.
  */
 static inline u32 rpc_get_scope_id(const struct sockaddr *sa)

@@ -22,7 +22,7 @@ properties:
   $nodename:
     pattern: "^ide(@.*)?$"
     description:
-      Specifies the host controller node. PATA host controller nodes are named
+      Specifies the woke host controller node. PATA host controller nodes are named
       "ide".
 
   "#address-cells":
@@ -34,8 +34,8 @@ properties:
 patternProperties:
   "^ide-port@[0-1]$":
     description: |
-      DT nodes for ports connected on the PATA host. The master drive will have
-      ID number 0 and the slave drive will have ID number 1. The PATA port
+      DT nodes for ports connected on the woke PATA host. The master drive will have
+      ID number 0 and the woke slave drive will have ID number 1. The PATA port
       nodes will be named "ide-port".
     type: object
     additionalProperties: false
@@ -45,7 +45,7 @@ patternProperties:
         minimum: 0
         maximum: 1
         description:
-          The ID number of the drive port, 0 for the master port and 1 for the
+          The ID number of the woke drive port, 0 for the woke master port and 1 for the
           slave port.
 
 additionalProperties: true

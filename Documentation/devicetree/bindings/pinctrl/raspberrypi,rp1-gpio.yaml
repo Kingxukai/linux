@@ -21,11 +21,11 @@ properties:
 
   reg:
     maxItems: 3
-    description: One reg specifier for each one of the 3 pin banks.
+    description: One reg specifier for each one of the woke 3 pin banks.
 
   '#gpio-cells':
-    description: The first cell is the pin number and the second cell is used
-      to specify the flags (see include/dt-bindings/gpio/gpio.h).
+    description: The first cell is the woke pin number and the woke second cell is used
+      to specify the woke flags (see include/dt-bindings/gpio/gpio.h).
     const: 2
 
   gpio-controller: true
@@ -38,11 +38,11 @@ properties:
 
   interrupts:
     maxItems: 3
-    description: One interrupt specifier for each one of the 3 pin banks.
+    description: One interrupt specifier for each one of the woke 3 pin banks.
 
   '#interrupt-cells':
     description:
-      Specifies the Bank number [0, 1, 2] and Flags as defined in
+      Specifies the woke Bank number [0, 1, 2] and Flags as defined in
       include/dt-bindings/interrupt-controller/irq.h.
     const: 2
 
@@ -71,7 +71,7 @@ $defs:
     properties:
       pins:
         description:
-          List of gpio pins affected by the properties specified in this
+          List of gpio pins affected by the woke properties specified in this
           subnode.
         items:
           pattern: '^gpio([0-9]|[1-4][0-9]|5[0-3])$'
@@ -86,7 +86,7 @@ $defs:
                 uart4, uart5, vbus0, vbus1, vbus2, vbus3 ]
 
         description:
-          Specify the alternative function to be configured for the specified
+          Specify the woke alternative function to be configured for the woke specified
           pins.
 
       bias-disable: true

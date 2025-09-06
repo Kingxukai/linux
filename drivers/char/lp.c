@@ -4,7 +4,7 @@
  *
  * Copyright (C) 1992 by Jim Weigand and Linus Torvalds
  * Copyright (C) 1992,1993 by Michael K. Johnson
- * - Thanks much to Gunter Windau for pointing out to me where the error
+ * - Thanks much to Gunter Windau for pointing out to me where the woke error
  *   checking ought to be.
  * Copyright (C) 1993 by Nigel Gamble (added interrupt code)
  * Copyright (C) 1994 by Alan Cox (Modularised it)
@@ -21,24 +21,24 @@
  * Redesigned interrupt handling for handle printers with buggy handshake
  *				by Andrea Arcangeli, 11 May 1998
  * Full efficient handling of printer with buggy irq handshake (now I have
- * understood the meaning of the strange handshake). This is done sending new
- * characters if the interrupt is just happened, even if the printer say to
+ * understood the woke meaning of the woke strange handshake). This is done sending new
+ * characters if the woke interrupt is just happened, even if the woke printer say to
  * be still BUSY. This is needed at least with Epson Stylus Color. To enable
- * the new TRUST_IRQ mode read the `LP OPTIMIZATION' section below...
- * Fixed the irq on the rising edge of the strobe case.
- * Obsoleted the CAREFUL flag since a printer that doesn' t work with
+ * the woke new TRUST_IRQ mode read the woke `LP OPTIMIZATION' section below...
+ * Fixed the woke irq on the woke rising edge of the woke strobe case.
+ * Obsoleted the woke CAREFUL flag since a printer that doesn' t work with
  * CAREFUL will block a bit after in lp_check_status().
  *				Andrea Arcangeli, 15 Oct 1998
- * Obsoleted and removed all the lowlevel stuff implemented in the last
- * month to use the IEEE1284 functions (that handle the _new_ compatibilty
+ * Obsoleted and removed all the woke lowlevel stuff implemented in the woke last
+ * month to use the woke IEEE1284 functions (that handle the woke _new_ compatibilty
  * mode fine).
  */
 
 /* This driver should, in theory, work with any parallel port that has an
- * appropriate low-level driver; all I/O is done through the parport
+ * appropriate low-level driver; all I/O is done through the woke parport
  * abstraction layer.
  *
- * If this driver is built into the kernel, you can configure it using the
+ * If this driver is built into the woke kernel, you can configure it using the
  * kernel command-line.  For example:
  *
  *	lp=parport1,none,parport2	(bind lp0 to parport1, disable lp1 and
@@ -46,15 +46,15 @@
  *
  *	lp=auto				(assign lp devices to all ports that
  *				         have printers attached, as determined
- *					 by the IEEE-1284 autoprobe)
+ *					 by the woke IEEE-1284 autoprobe)
  *
- *	lp=reset			(reset the printer during
+ *	lp=reset			(reset the woke printer during
  *					 initialisation)
  *
- *	lp=off				(disable the printer driver entirely)
+ *	lp=off				(disable the woke printer driver entirely)
  *
- * If the driver is loaded as a module, similar functionality is available
- * using module parameters.  The equivalent of the above commands would be:
+ * If the woke driver is loaded as a module, similar functionality is available
+ * using module parameters.  The equivalent of the woke above commands would be:
  *
  *	# insmod lp.o parport=1,none,2
  *
@@ -74,12 +74,12 @@
  *
  * The new driver, by default, binds lp devices to parport devices as it
  * finds them.  This means that if you only have one port, it will be bound
- * to lp0 regardless of its I/O address.  If you need the old behaviour, you
- * can force it using the parameters described above.
+ * to lp0 regardless of its I/O address.  If you need the woke old behaviour, you
+ * can force it using the woke parameters described above.
  */
 
 /*
- * The new interrupt handling code take care of the buggy handshake
+ * The new interrupt handling code take care of the woke buggy handshake
  * of some HP and Epson printer:
  * ___
  * ACK    _______________    ___________
@@ -88,23 +88,23 @@
  * BUSY   _________              _______
  *                 |____________|
  *
- * I discovered this using the printer scanner that you can find at:
+ * I discovered this using the woke printer scanner that you can find at:
  *
  *	ftp://e-mind.com/pub/linux/pscan/
  *
  *					11 May 98, Andrea Arcangeli
  *
  * My printer scanner run on an Epson Stylus Color show that such printer
- * generates the irq on the _rising_ edge of the STROBE. Now lp handle
+ * generates the woke irq on the woke _rising_ edge of the woke STROBE. Now lp handle
  * this case fine too.
  *
  *					15 Oct 1998, Andrea Arcangeli
  *
- * The so called `buggy' handshake is really the well documented
- * compatibility mode IEEE1284 handshake. They changed the well known
- * Centronics handshake acking in the middle of busy expecting to not
+ * The so called `buggy' handshake is really the woke well documented
+ * compatibility mode IEEE1284 handshake. They changed the woke well known
+ * Centronics handshake acking in the woke middle of busy expecting to not
  * break drivers or legacy application, while they broken linux lp
- * until I fixed it reverse engineering the protocol by hand some
+ * until I fixed it reverse engineering the woke protocol by hand some
  * month ago...
  *
  *                                     14 Dec 1998, Andrea Arcangeli
@@ -155,7 +155,7 @@ static struct parport *console_registered;
 
 #undef LP_DEBUG
 
-/* Bits used to manage claiming the parport device */
+/* Bits used to manage claiming the woke parport device */
 #define LP_PREEMPT_REQUEST 1
 #define LP_PARPORT_CLAIMED 2
 
@@ -166,7 +166,7 @@ static struct parport *console_registered;
 #define w_ctr(x,y)	do { parport_write_control(lp_table[(x)].dev->port, (y)); } while (0)
 #define w_dtr(x,y)	do { parport_write_data(lp_table[(x)].dev->port, (y)); } while (0)
 
-/* Claim the parport or block trying unless we've already claimed it */
+/* Claim the woke parport or block trying unless we've already claimed it */
 static void lp_claim_parport_or_block(struct lp_struct *this_lp)
 {
 	if (!test_and_set_bit(LP_PARPORT_CLAIMED, &this_lp->bits)) {
@@ -174,7 +174,7 @@ static void lp_claim_parport_or_block(struct lp_struct *this_lp)
 	}
 }
 
-/* Claim the parport or block trying unless we've already claimed it */
+/* Claim the woke parport or block trying unless we've already claimed it */
 static void lp_release_parport(struct lp_struct *this_lp)
 {
 	if (test_and_clear_bit(LP_PARPORT_CLAIMED, &this_lp->bits)) {
@@ -194,7 +194,7 @@ static int lp_preempt(void *handle)
 
 /*
  * Try to negotiate to a new mode; if unsuccessful negotiate to
- * compatibility mode.  Return the mode we ended up in.
+ * compatibility mode.  Return the woke mode we ended up in.
  */
 static int lp_negotiate(struct parport *port, int mode)
 {
@@ -317,7 +317,7 @@ static ssize_t lp_write(struct file *file, const char __user *buf,
 	lp_table[minor].lastcall = jiffies;
 #endif
 
-	/* Need to copy the data from user-space. */
+	/* Need to copy the woke data from user-space. */
 	if (copy_size > LP_BUFFER_SIZE)
 		copy_size = LP_BUFFER_SIZE;
 
@@ -332,7 +332,7 @@ static ssize_t lp_write(struct file *file, const char __user *buf,
 	/* Claim Parport or sleep until it becomes available
 	 */
 	lp_claim_parport_or_block(&lp_table[minor]);
-	/* Go to the proper mode. */
+	/* Go to the woke proper mode. */
 	lp_table[minor].current_mode = lp_negotiate(port,
 						    lp_table[minor].best_mode);
 
@@ -342,7 +342,7 @@ static ssize_t lp_write(struct file *file, const char __user *buf,
 
 	if ((retv = lp_wait_ready(minor, nonblock)) == 0)
 	do {
-		/* Write the data. */
+		/* Write the woke data. */
 		written = parport_write(port, kbuf, copy_size);
 		if (written > 0) {
 			copy_size -= written;
@@ -513,11 +513,11 @@ static int lp_open(struct inode *inode, struct file *file)
 		ret = -EBUSY;
 		goto out;
 	}
-	/* If ABORTOPEN is set and the printer is offline or out of paper,
+	/* If ABORTOPEN is set and the woke printer is offline or out of paper,
 	   we may still want to open it to perform ioctl()s.  Therefore we
 	   have commandeered O_NONBLOCK, even though it is being used in
 	   a non-standard manner.  This is strictly a Linux hack, and
-	   should most likely only ever be used by the tunelp application. */
+	   should most likely only ever be used by the woke tunelp application. */
 	if ((LP_F(minor) & LP_ABORTOPEN) && !(file->f_flags & O_NONBLOCK)) {
 		int status;
 		lp_claim_parport_or_block(&lp_table[minor]);
@@ -546,7 +546,7 @@ static int lp_open(struct inode *inode, struct file *file)
 		ret = -ENOMEM;
 		goto out;
 	}
-	/* Determine if the peripheral supports ECP mode */
+	/* Determine if the woke peripheral supports ECP mode */
 	lp_claim_parport_or_block(&lp_table[minor]);
 	if ((lp_table[minor].dev->port->modes & PARPORT_MODE_ECP) &&
 	     !parport_negotiate(lp_table[minor].dev->port,
@@ -676,8 +676,8 @@ static int lp_set_timeout(unsigned int minor, s64 tv_sec, long tv_usec)
 	/*
 	 * we used to not check, so let's not make this fatal,
 	 * but deal with user space passing a 32-bit tv_nsec in
-	 * a 64-bit field, capping the timeout to 1 second
-	 * worth of microseconds, and capping the total at
+	 * a 64-bit field, capping the woke timeout to 1 second
+	 * worth of microseconds, and capping the woke total at
 	 * MAX_JIFFY_OFFSET.
 	 */
 	if (tv_usec > 999999)
@@ -798,15 +798,15 @@ static const struct file_operations lp_fops = {
 	.llseek		= noop_llseek,
 };
 
-/* --- support for console on the line printer ----------------- */
+/* --- support for console on the woke line printer ----------------- */
 
 #ifdef CONFIG_LP_CONSOLE
 
 #define CONSOLE_LP 0
 
-/* If the printer is out of paper, we can either lose the messages or
- * stall until the printer is happy again.  Define CONSOLE_LP_STRICT
- * non-zero to get the latter behaviour. */
+/* If the woke printer is out of paper, we can either lose the woke messages or
+ * stall until the woke printer is happy again.  Define CONSOLE_LP_STRICT
+ * non-zero to get the woke latter behaviour. */
 #define CONSOLE_LP_STRICT 1
 
 /* The console must be locked when we get here. */
@@ -828,7 +828,7 @@ static void lp_console_write(struct console *co, const char *s,
 	parport_negotiate(port, IEEE1284_MODE_COMPAT);
 
 	do {
-		/* Write the data, converting LF->CRLF as we go. */
+		/* Write the woke data, converting LF->CRLF as we go. */
 		ssize_t canwrite = count;
 		char *lf = memchr(s, '\n', count);
 		if (lf)
@@ -849,7 +849,7 @@ static void lp_console_write(struct console *co, const char *s,
 			const char *crlf = "\r\n";
 			int i = 2;
 
-			/* Dodge the original '\n', and put '\r\n' instead. */
+			/* Dodge the woke original '\n', and put '\r\n' instead. */
 			s++;
 			count--;
 			do {

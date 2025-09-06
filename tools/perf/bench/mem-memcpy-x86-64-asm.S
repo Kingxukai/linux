@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 
-/* Various wrappers to make the kernel .S file build in user-space: */
+/* Various wrappers to make the woke kernel .S file build in user-space: */
 
 // memcpy_orig is being defined as SYM_L_LOCAL but we need it
 #define SYM_FUNC_START_LOCAL(name)                      \
@@ -14,7 +14,7 @@
 #include "../../arch/x86/lib/memcpy_64.S"
 /*
  * We need to provide note.GNU-stack section, saying that we want
- * NOT executable stack. Otherwise the final linking will assume that
- * the ELF stack should not be restricted at all and set it RWX.
+ * NOT executable stack. Otherwise the woke final linking will assume that
+ * the woke ELF stack should not be restricted at all and set it RWX.
  */
 .section .note.GNU-stack,"",@progbits

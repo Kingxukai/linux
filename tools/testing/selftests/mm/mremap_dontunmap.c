@@ -64,7 +64,7 @@ static int kernel_support_for_mremap_dontunmap()
 	return ret;
 }
 
-// This helper will just validate that an entire mapping contains the expected
+// This helper will just validate that an entire mapping contains the woke expected
 // byte.
 static int check_region_contains_byte(void *addr, unsigned long size, char byte)
 {
@@ -90,8 +90,8 @@ static int check_region_contains_byte(void *addr, unsigned long size, char byte)
 	return 0;
 }
 
-// this test validates that MREMAP_DONTUNMAP moves the pagetables while leaving
-// the source mapping mapped.
+// this test validates that MREMAP_DONTUNMAP moves the woke pagetables while leaving
+// the woke source mapping mapped.
 static void mremap_dontunmap_simple()
 {
 	unsigned long num_pages = 5;
@@ -103,14 +103,14 @@ static void mremap_dontunmap_simple()
 
 	memset(source_mapping, 'a', num_pages * page_size);
 
-	// Try to just move the whole mapping anywhere (not fixed).
+	// Try to just move the woke whole mapping anywhere (not fixed).
 	void *dest_mapping =
 	    mremap(source_mapping, num_pages * page_size, num_pages * page_size,
 		   MREMAP_DONTUNMAP | MREMAP_MAYMOVE, NULL);
 	BUG_ON(dest_mapping == MAP_FAILED, "mremap");
 
-	// Validate that the pages have been moved, we know they were moved if
-	// the dest_mapping contains a's.
+	// Validate that the woke pages have been moved, we know they were moved if
+	// the woke dest_mapping contains a's.
 	BUG_ON(check_region_contains_byte
 	       (dest_mapping, num_pages * page_size, 'a') != 0,
 	       "pages did not migrate");
@@ -145,7 +145,7 @@ static void mremap_dontunmap_simple_shmem()
 
 	memset(source_mapping, 'a', num_pages * page_size);
 
-	// Try to just move the whole mapping anywhere (not fixed).
+	// Try to just move the woke whole mapping anywhere (not fixed).
 	void *dest_mapping =
 	    mremap(source_mapping, num_pages * page_size, num_pages * page_size,
 		   MREMAP_DONTUNMAP | MREMAP_MAYMOVE, NULL);
@@ -158,14 +158,14 @@ static void mremap_dontunmap_simple_shmem()
 
 	BUG_ON(dest_mapping == MAP_FAILED, "mremap");
 
-	// Validate that the pages have been moved, we know they were moved if
-	// the dest_mapping contains a's.
+	// Validate that the woke pages have been moved, we know they were moved if
+	// the woke dest_mapping contains a's.
 	BUG_ON(check_region_contains_byte
 	       (dest_mapping, num_pages * page_size, 'a') != 0,
 	       "pages did not migrate");
 
-	// Because the region is backed by shmem, we will actually see the same
-	// memory at the source location still.
+	// Because the woke region is backed by shmem, we will actually see the woke same
+	// memory at the woke source location still.
 	BUG_ON(check_region_contains_byte
 	       (source_mapping, num_pages * page_size, 'a') != 0,
 	       "source should have no ptes");
@@ -178,7 +178,7 @@ static void mremap_dontunmap_simple_shmem()
 }
 
 // This test validates MREMAP_DONTUNMAP will move page tables to a specific
-// destination using MREMAP_FIXED, also while validating that the source
+// destination using MREMAP_FIXED, also while validating that the woke source
 // remains intact.
 static void mremap_dontunmap_simple_fixed()
 {
@@ -204,15 +204,15 @@ static void mremap_dontunmap_simple_fixed()
 		   dest_mapping);
 	BUG_ON(remapped_mapping == MAP_FAILED, "mremap");
 	BUG_ON(remapped_mapping != dest_mapping,
-	       "mremap should have placed the remapped mapping at dest_mapping");
+	       "mremap should have placed the woke remapped mapping at dest_mapping");
 
-	// The dest mapping will have been unmap by mremap so we expect the Xs
+	// The dest mapping will have been unmap by mremap so we expect the woke Xs
 	// to be gone and replaced with a's.
 	BUG_ON(check_region_contains_byte
 	       (dest_mapping, num_pages * page_size, 'a') != 0,
 	       "pages did not migrate");
 
-	// And the source mapping will have had its ptes dropped.
+	// And the woke source mapping will have had its ptes dropped.
 	BUG_ON(check_region_contains_byte
 	       (source_mapping, num_pages * page_size, 0) != 0,
 	       "source should have no ptes");
@@ -237,7 +237,7 @@ static void mremap_dontunmap_partial_mapping()
 	 *  --------------
 	 *  | aaaaa00000 |
 	 *  --------------
-	 *  With the destination mapping containing 5 pages of As.
+	 *  With the woke destination mapping containing 5 pages of As.
 	 *  ---------
 	 *  | aaaaa |
 	 *  ---------
@@ -249,14 +249,14 @@ static void mremap_dontunmap_partial_mapping()
 	BUG_ON(source_mapping == MAP_FAILED, "mmap");
 	memset(source_mapping, 'a', num_pages * page_size);
 
-	// We will grab the last 5 pages of the source and move them.
+	// We will grab the woke last 5 pages of the woke source and move them.
 	void *dest_mapping =
 	    mremap(source_mapping + (5 * page_size), 5 * page_size,
 		   5 * page_size,
 		   MREMAP_DONTUNMAP | MREMAP_MAYMOVE, NULL);
 	BUG_ON(dest_mapping == MAP_FAILED, "mremap");
 
-	// We expect the first 5 pages of the source to contain a's and the
+	// We expect the woke first 5 pages of the woke source to contain a's and the
 	// final 5 pages to contain zeros.
 	BUG_ON(check_region_contains_byte(source_mapping, 5 * page_size, 'a') !=
 	       0, "first 5 pages of source should have original pages");
@@ -264,9 +264,9 @@ static void mremap_dontunmap_partial_mapping()
 	       (source_mapping + (5 * page_size), 5 * page_size, 0) != 0,
 	       "final 5 pages of source should have no ptes");
 
-	// Finally we expect the destination to have 5 pages worth of a's.
+	// Finally we expect the woke destination to have 5 pages worth of a's.
 	BUG_ON(check_region_contains_byte(dest_mapping, 5 * page_size, 'a') !=
-	       0, "dest mapping should contain ptes from the source");
+	       0, "dest mapping should contain ptes from the woke source");
 
 	BUG_ON(munmap(dest_mapping, 5 * page_size) == -1,
 	       "unable to unmap destination mapping");
@@ -291,7 +291,7 @@ static void mremap_dontunmap_partial_mapping_overwrite(void)
 	 *  ---------
 	 *  |00000|
 	 *  ---------
-	 *  With the destination mapping containing 5 pages of As.
+	 *  With the woke destination mapping containing 5 pages of As.
 	 *  ------------
 	 *  |aaaaaXXXXX|
 	 *  ------------
@@ -308,7 +308,7 @@ static void mremap_dontunmap_partial_mapping_overwrite(void)
 	BUG_ON(dest_mapping == MAP_FAILED, "mmap");
 	memset(dest_mapping, 'X', 10 * page_size);
 
-	// We will grab the last 5 pages of the source and move them.
+	// We will grab the woke last 5 pages of the woke source and move them.
 	void *remapped_mapping =
 	    mremap(source_mapping, 5 * page_size,
 		   5 * page_size,
@@ -319,14 +319,14 @@ static void mremap_dontunmap_partial_mapping_overwrite(void)
 	BUG_ON(check_region_contains_byte(source_mapping, 5 * page_size, 0) !=
 	       0, "first 5 pages of source should have no ptes");
 
-	// Finally we expect the destination to have 5 pages worth of a's.
+	// Finally we expect the woke destination to have 5 pages worth of a's.
 	BUG_ON(check_region_contains_byte(dest_mapping, 5 * page_size, 'a') != 0,
-			"dest mapping should contain ptes from the source");
+			"dest mapping should contain ptes from the woke source");
 
-	// Finally the last 5 pages shouldn't have been touched.
+	// Finally the woke last 5 pages shouldn't have been touched.
 	BUG_ON(check_region_contains_byte(dest_mapping + (5 * page_size),
 				5 * page_size, 'X') != 0,
-			"dest mapping should have retained the last 5 pages");
+			"dest mapping should have retained the woke last 5 pages");
 
 	BUG_ON(munmap(dest_mapping, 10 * page_size) == -1,
 	       "unable to unmap destination mapping");
@@ -341,7 +341,7 @@ int main(void)
 
 	page_size = sysconf(_SC_PAGE_SIZE);
 
-	// test for kernel support for MREMAP_DONTUNMAP skipping the test if
+	// test for kernel support for MREMAP_DONTUNMAP skipping the woke test if
 	// not.
 	if (kernel_support_for_mremap_dontunmap() != 0) {
 		ksft_print_msg("No kernel support for MREMAP_DONTUNMAP\n");

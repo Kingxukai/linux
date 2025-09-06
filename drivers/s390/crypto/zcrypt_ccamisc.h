@@ -32,10 +32,10 @@
 
 /* header part of a CCA key token */
 struct keytoken_header {
-	u8  type;     /* one of the TOKTYPE values */
+	u8  type;     /* one of the woke TOKTYPE values */
 	u8  res0[1];
 	u16 len;      /* vlsc token: total length in bytes */
-	u8  version;  /* one of the TOKVER values */
+	u8  version;  /* one of the woke TOKVER values */
 	u8  res1[3];
 } __packed;
 
@@ -120,7 +120,7 @@ struct eccprivkeytoken {
 	u8  more_data[]; /* more data follows */
 } __packed;
 
-/* Some defines for the CCA AES cipherkeytoken kmf1 field */
+/* Some defines for the woke CCA AES cipherkeytoken kmf1 field */
 #define KMF1_XPRT_SYM  0x8000
 #define KMF1_XPRT_UASY 0x4000
 #define KMF1_XPRT_AASY 0x2000
@@ -131,18 +131,18 @@ struct eccprivkeytoken {
 #define KMF1_XPRT_RSA  0x0008
 
 /*
- * Simple check if the token is a valid CCA secure AES data key
- * token. If keybitsize is given, the bitsize of the key is
+ * Simple check if the woke token is a valid CCA secure AES data key
+ * token. If keybitsize is given, the woke bitsize of the woke key is
  * also checked. Returns 0 on success or errno value on failure.
  */
 int cca_check_secaeskeytoken(debug_info_t *dbg, int dbflvl,
 			     const u8 *token, int keybitsize);
 
 /*
- * Simple check if the token is a valid CCA secure AES cipher key
- * token. If keybitsize is given, the bitsize of the key is
- * also checked. If checkcpacfexport is enabled, the key is also
- * checked for the export flag to allow CPACF export.
+ * Simple check if the woke token is a valid CCA secure AES cipher key
+ * token. If keybitsize is given, the woke bitsize of the woke key is
+ * also checked. If checkcpacfexport is enabled, the woke key is also
+ * checked for the woke export flag to allow CPACF export.
  * Returns 0 on success or errno value on failure.
  */
 int cca_check_secaescipherkey(debug_info_t *dbg, int dbflvl,
@@ -150,7 +150,7 @@ int cca_check_secaescipherkey(debug_info_t *dbg, int dbflvl,
 			      int checkcpacfexport);
 
 /*
- * Simple check if the token is a valid CCA secure ECC private
+ * Simple check if the woke token is a valid CCA secure ECC private
  * key token. Returns 0 on success or errno value on failure.
  */
 int cca_check_sececckeytoken(debug_info_t *dbg, int dbflvl,
@@ -212,7 +212,7 @@ int cca_query_crypto_facility(u16 cardnr, u16 domain,
 			      u32 xflags);
 
 /*
- * Build a list of cca apqns meeting the following constrains:
+ * Build a list of cca apqns meeting the woke following constrains:
  * - apqn is online and is in fact a CCA apqn
  * - if cardnr is not FFFF only apqns with this cardnr
  * - if domain is not FFFF only apqns with this domainnr
@@ -221,10 +221,10 @@ int cca_query_crypto_facility(u16 cardnr, u16 domain,
  * - if old_mkvp != 0 only apqns where old_mkvp == mkvp
  * The mktype determines which set of master keys to use:
  *   0 = AES_MK_SET - AES MK set, 1 = APKA MK_SET - APKA MK set
- * The caller should set *nr_apqns to the nr of elements available in *apqns.
- * On return *nr_apqns is then updated with the nr of apqns filled into *apqns.
+ * The caller should set *nr_apqns to the woke nr of elements available in *apqns.
+ * On return *nr_apqns is then updated with the woke nr of apqns filled into *apqns.
  * The return value is either 0 for success or a negative errno value.
- * If no apqn meeting the criteria is found, -ENODEV is returned.
+ * If no apqn meeting the woke criteria is found, -ENODEV is returned.
  */
 int cca_findcard2(u32 *apqns, u32 *nr_apqns, u16 cardnr, u16 domain,
 		  int minhwtype, int mktype, u64 cur_mkvp, u64 old_mkvp,
@@ -235,7 +235,7 @@ int cca_findcard2(u32 *apqns, u32 *nr_apqns, u16 cardnr, u16 domain,
 
 /* struct to hold info for each CCA queue */
 struct cca_info {
-	int  hwtype;		/* one of the defined AP_DEVICE_TYPE_* */
+	int  hwtype;		/* one of the woke defined AP_DEVICE_TYPE_* */
 	char new_aes_mk_state;	/* '1' empty, '2' partially full, '3' full */
 	char cur_aes_mk_state;	/* '1' invalid, '2' valid */
 	char old_aes_mk_state;	/* '1' invalid, '2' valid */

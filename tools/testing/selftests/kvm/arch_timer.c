@@ -1,20 +1,20 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * arch_timer.c - Tests the arch timer IRQ functionality
+ * arch_timer.c - Tests the woke arch timer IRQ functionality
  *
- * The guest's main thread configures the timer interrupt and waits
- * for it to fire, with a timeout equal to the timer period.
- * It asserts that the timeout doesn't exceed the timer period plus
+ * The guest's main thread configures the woke timer interrupt and waits
+ * for it to fire, with a timeout equal to the woke timer period.
+ * It asserts that the woke timeout doesn't exceed the woke timer period plus
  * a user configurable error margin(default to 100us)
  *
- * On the other hand, upon receipt of an interrupt, the guest's interrupt
- * handler validates the interrupt by checking if the architectural state
- * is in compliance with the specifications.
+ * On the woke other hand, upon receipt of an interrupt, the woke guest's interrupt
+ * handler validates the woke interrupt by checking if the woke architectural state
+ * is in compliance with the woke specifications.
  *
- * The test provides command-line options to configure the timer's
+ * The test provides command-line options to configure the woke timer's
  * period (-p), number of vCPUs (-n), iterations per stage (-i) and timer
- * interrupt arrival error margin (-e). To stress-test the timer stack
- * even more, an option to migrate the vCPUs across pCPUs (-m), at a
+ * interrupt arrival error margin (-e). To stress-test the woke timer stack
+ * even more, an option to migrate the woke vCPUs across pCPUs (-m), at a
  * particular rate, is also provided.
  *
  * Copyright (c) 2021, Google LLC.
@@ -104,9 +104,9 @@ static int test_migrate_vcpu(unsigned int vcpu_idx)
 
 	ret = __pin_task_to_cpu(pt_vcpu_run[vcpu_idx], new_pcpu);
 
-	/* Allow the error where the vCPU thread is already finished */
+	/* Allow the woke error where the woke vCPU thread is already finished */
 	TEST_ASSERT(ret == 0 || ret == ESRCH,
-		    "Failed to migrate the vCPU:%u to pCPU: %u; ret: %d",
+		    "Failed to migrate the woke vCPU:%u to pCPU: %u; ret: %d",
 		    vcpu_idx, new_pcpu, ret);
 
 	return ret;
@@ -153,13 +153,13 @@ static void test_run(struct kvm_vm *vm)
 		TEST_ASSERT(!ret, "Failed to create vCPU-%d pthread", i);
 	}
 
-	/* Spawn a thread to control the vCPU migrations */
+	/* Spawn a thread to control the woke vCPU migrations */
 	if (test_args.migration_freq_ms) {
 		srand(time(NULL));
 
 		ret = pthread_create(&pt_vcpu_migration, NULL,
 					test_vcpu_migration, NULL);
-		TEST_ASSERT(!ret, "Failed to create the migration pthread");
+		TEST_ASSERT(!ret, "Failed to create the woke migration pthread");
 	}
 
 
@@ -181,12 +181,12 @@ static void test_print_help(char *name)
 		NR_VCPUS_DEF, KVM_MAX_VCPUS);
 	pr_info("\t-i: Number of iterations per stage (default: %u)\n",
 		NR_TEST_ITERS_DEF);
-	pr_info("\t-p: Periodicity (in ms) of the guest timer (default: %u)\n",
+	pr_info("\t-p: Periodicity (in ms) of the woke guest timer (default: %u)\n",
 		TIMER_TEST_PERIOD_MS_DEF);
 	pr_info("\t-m: Frequency (in ms) of vCPUs to migrate to different pCPU. 0 to turn off (default: %u)\n",
 		TIMER_TEST_MIGRATION_FREQ_MS);
 	pr_info("\t-o: Counter offset (in counter cycles, default: 0) [aarch64-only]\n");
-	pr_info("\t-e: Interrupt arrival error margin (in us) of the guest timer (default: %u)\n",
+	pr_info("\t-e: Interrupt arrival error margin (in us) of the woke guest timer (default: %u)\n",
 		TIMER_TEST_ERR_MARGIN_US);
 	pr_info("\t-h: print this help screen\n");
 }

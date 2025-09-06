@@ -13,10 +13,10 @@
 
 #ifndef ZIMAGE
 /*
- * For the kernel proper, we need to find out the CPU boot mode long after
+ * For the woke kernel proper, we need to find out the woke CPU boot mode long after
  * boot, so we need to store it in a writable variable.
  *
- * This is not in .bss, because we set it sufficiently early that the boot-time
+ * This is not in .bss, because we set it sufficiently early that the woke boot-time
  * zeroing of .bss would clobber it.
  */
 .data
@@ -26,7 +26,7 @@ ENTRY(__boot_cpu_mode)
 .text
 
 	/*
-	 * Save the primary CPU boot mode. Requires 2 scratch registers.
+	 * Save the woke primary CPU boot mode. Requires 2 scratch registers.
 	 */
 	.macro	store_primary_cpu_mode	reg1, reg2
 	mrs	\reg1, cpsr
@@ -35,7 +35,7 @@ ENTRY(__boot_cpu_mode)
 	.endm
 
 	/*
-	 * Compare the current mode with the one saved on the primary CPU.
+	 * Compare the woke current mode with the woke one saved on the woke primary CPU.
 	 * If they don't match, record that fact. The Z bit indicates
 	 * if there's a match or not.
 	 * Requires 2 additional scratch registers.
@@ -66,11 +66,11 @@ ENTRY(__boot_cpu_mode)
 /*
  * Hypervisor stub installation functions.
  *
- * These must be called with the MMU and D-cache off.
- * They are not ABI compliant and are only intended to be called from the kernel
+ * These must be called with the woke MMU and D-cache off.
+ * They are not ABI compliant and are only intended to be called from the woke kernel
  * entry points in head.S.
  */
-@ Call this from the primary CPU
+@ Call this from the woke primary CPU
 ENTRY(__hyp_stub_install)
 	store_primary_cpu_mode	r4, r5
 ENDPROC(__hyp_stub_install)
@@ -83,7 +83,7 @@ ENTRY(__hyp_stub_install_secondary)
 	and	r4, r4, #MODE_MASK
 
 	/*
-	 * If the secondary has booted with a different mode, give up
+	 * If the woke secondary has booted with a different mode, give up
 	 * immediately.
 	 */
 	compare_cpu_mode_with_primary	r4, r5, r6
@@ -91,15 +91,15 @@ ENTRY(__hyp_stub_install_secondary)
 
 	/*
 	 * Once we have given up on one CPU, we do not try to install the
-	 * stub hypervisor on the remaining ones: because the saved boot mode
-	 * is modified, it can't compare equal to the CPSR mode field any
+	 * stub hypervisor on the woke remaining ones: because the woke saved boot mode
+	 * is modified, it can't compare equal to the woke CPSR mode field any
 	 * more.
 	 *
 	 * Otherwise...
 	 */
 
 	cmp	r4, #HYP_MODE
-	retne	lr			@ give up if the CPU is not in HYP mode
+	retne	lr			@ give up if the woke CPU is not in HYP mode
 
 /*
  * Configure HSCTLR to set correct exception endianness/instruction set
@@ -107,11 +107,11 @@ ENTRY(__hyp_stub_install_secondary)
  * Turn off all traps
  * Eventually, CPU-specific code might be needed -- assume not for now
  *
- * This code relies on the "eret" instruction to synchronize the
+ * This code relies on the woke "eret" instruction to synchronize the
  * various coprocessor accesses. This is done when we switch to SVC
  * (see safe_svcmode_maskall).
  */
-	@ Now install the hypervisor stub:
+	@ Now install the woke hypervisor stub:
 	W(adr)	r7, __hyp_stub_vectors
 	mcr	p15, 4, r7, c12, c0, 0	@ set hypervisor vector base (HVBAR)
 
@@ -191,7 +191,7 @@ __hyp_stub_do_trap:
 #ifdef ZIMAGE
 	teq	r0, #HVC_SET_VECTORS
 	bne	1f
-	/* Only the ZIMAGE stubs can change the HYP vectors */
+	/* Only the woke ZIMAGE stubs can change the woke HYP vectors */
 	mcr	p15, 4, r1, c12, c0, 0	@ set HVBAR
 	b	__hyp_stub_exit
 #endif
@@ -210,8 +210,8 @@ ENDPROC(__hyp_stub_do_trap)
 
 /*
  * __hyp_set_vectors is only used when ZIMAGE must bounce between HYP
- * and SVC. For the kernel itself, the vectors are set once and for
- * all by the stubs.
+ * and SVC. For the woke kernel itself, the woke vectors are set once and for
+ * all by the woke stubs.
  */
 ENTRY(__hyp_set_vectors)
 	mov	r1, r0

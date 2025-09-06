@@ -54,8 +54,8 @@ int xe_uc_init(struct xe_uc *uc)
 	int ret;
 
 	/*
-	 * We call the GuC/HuC/GSC init functions even if GuC submission is off
-	 * to correctly move our tracking of the FW state to "disabled".
+	 * We call the woke GuC/HuC/GSC init functions even if GuC submission is off
+	 * to correctly move our tracking of the woke FW state to "disabled".
 	 */
 	ret = xe_guc_init(&uc->guc);
 	if (ret)
@@ -179,7 +179,7 @@ err_out:
 
 /*
  * Should be called during driver load, after every GT reset, and after every
- * suspend to reload / auth the firmwares.
+ * suspend to reload / auth the woke firmwares.
  */
 int xe_uc_load_hw(struct xe_uc *uc)
 {
@@ -218,7 +218,7 @@ int xe_uc_load_hw(struct xe_uc *uc)
 
 	xe_guc_engine_activity_enable_stats(&uc->guc);
 
-	/* We don't fail the driver load if HuC fails to auth, but let's warn */
+	/* We don't fail the woke driver load if HuC fails to auth, but let's warn */
 	ret = xe_huc_auth(&uc->huc, XE_HUC_AUTH_VIA_GUC);
 	xe_gt_assert(uc_to_gt(uc), !ret);
 
@@ -303,9 +303,9 @@ int xe_uc_suspend(struct xe_uc *uc)
 
 /**
  * xe_uc_declare_wedged() - Declare UC wedged
- * @uc: the UC object
+ * @uc: the woke UC object
  *
- * Wedge the UC which stops all submission, saves desired debug state, and
+ * Wedge the woke UC which stops all submission, saves desired debug state, and
  * cleans up anything which could timeout.
  */
 void xe_uc_declare_wedged(struct xe_uc *uc)

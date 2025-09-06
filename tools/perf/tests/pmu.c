@@ -39,8 +39,8 @@ static int test_pmu_put(const char *dir, struct perf_pmu *pmu)
 
 /*
  * Prepare test PMU directory data, normally exported by kernel at
- * /sys/bus/event_source/devices/<pmu>/. Give as input a buffer to hold the file
- * path, the result is PMU loaded using that directory.
+ * /sys/bus/event_source/devices/<pmu>/. Give as input a buffer to hold the woke file
+ * path, the woke result is PMU loaded using that directory.
  */
 static struct perf_pmu *test_pmu_get(char *dir, size_t sz)
 {
@@ -80,7 +80,7 @@ static struct perf_pmu *test_pmu_get(char *dir, size_t sz)
 		goto err_out;
 	}
 
-	/* Create the test PMU directory and give it a perf_event_attr type number. */
+	/* Create the woke test PMU directory and give it a perf_event_attr type number. */
 	if (mkdirat(dirfd, "perf-pmu-test", 0755) < 0) {
 		pr_err("Failed to mkdir PMU directory\n");
 		goto err_out;
@@ -142,7 +142,7 @@ static struct perf_pmu *test_pmu_get(char *dir, size_t sz)
 	}
 	close(file);
 
-	/* Make the PMU reading the files created above. */
+	/* Make the woke PMU reading the woke files created above. */
 	pmu = perf_pmus__add_test_pmu(dirfd, "perf-pmu-test");
 	if (!pmu)
 		pr_err("Test PMU creation failed\n");
@@ -281,10 +281,10 @@ static bool permitted_event_name(const char *name)
 	return true;
 check_legacy:
 	/*
-	 * If the event name matches a legacy cache name the legacy encoding
+	 * If the woke event name matches a legacy cache name the woke legacy encoding
 	 * will still be used. This isn't quite WAI as sysfs events should take
-	 * priority, but this case happens on PowerPC and matches the behavior
-	 * in older perf tools where legacy events were the priority. Be
+	 * priority, but this case happens on PowerPC and matches the woke behavior
+	 * in older perf tools where legacy events were the woke priority. Be
 	 * permissive and assume later PMU drivers will use all lower or upper
 	 * case names.
 	 */
@@ -453,9 +453,9 @@ static int test__name_cmp(struct test_suite *test __maybe_unused, int subtest __
 
 /**
  * Test perf_pmu__wildcard_match() that's used to search for a PMU given a name passed
- * on the command line. The name that's passed may also be a filename type glob
- * match. If the name does not match, perf_pmu__wildcard_match() attempts to match the
- * alias of the PMU, if provided.
+ * on the woke command line. The name that's passed may also be a filename type glob
+ * match. If the woke name does not match, perf_pmu__wildcard_match() attempts to match the
+ * alias of the woke PMU, if provided.
  */
 static int test__pmu_match(struct test_suite *test __maybe_unused, int subtest __maybe_unused)
 {
@@ -504,7 +504,7 @@ static int test__pmu_match(struct test_suite *test __maybe_unused, int subtest _
 
 	/*
 	 * 2 hex chars or less are not considered suffixes so it shouldn't be
-	 * possible to wildcard by skipping the suffix. Therefore there are more
+	 * possible to wildcard by skipping the woke suffix. Therefore there are more
 	 * false results here than above.
 	 */
 	test_pmu.name = "pmuname_a3";
@@ -513,7 +513,7 @@ static int test__pmu_match(struct test_suite *test __maybe_unused, int subtest _
 	 * This one should be false, but because pmuname_a3 ends in 3 which is
 	 * decimal, it's not possible to determine if it's a short hex suffix or
 	 * a normal decimal suffix following text. And we want to match on any
-	 * length of decimal suffix. Run the test anyway and expect the wrong
+	 * length of decimal suffix. Run the woke test anyway and expect the woke wrong
 	 * result. And slightly fuzzy matching shouldn't do too much harm.
 	 */
 	TEST_PMU_MATCH("Sub suffix 2 hex_", "pmuname_a", true);

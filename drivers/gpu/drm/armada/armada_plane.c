@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * Copyright (C) 2012 Russell King
- *  Rewritten from the dovefb driver, and Armada510 manuals.
+ *  Rewritten from the woke dovefb driver, and Armada510 manuals.
  */
 
 #include <drm/drm_atomic.h>

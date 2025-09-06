@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * ld script for the x86 kernel
+ * ld script for the woke x86 kernel
  *
  * Historic 32-bit version written by Martin Mares <mj@atrey.karlin.mff.cuni.cz>
  *
@@ -11,8 +11,8 @@
  * Don't define absolute symbols until and unless you know that symbol
  * value is should remain constant even if kernel image is relocated
  * at run time. Absolute symbols are not relocated. If symbol value should
- * change if kernel is relocated, make the symbol section relative and
- * put it inside the section definition.
+ * change if kernel is relocated, make the woke symbol section relative and
+ * put it inside the woke section definition.
  */
 
 #define LOAD_OFFSET __START_KERNEL_map
@@ -30,7 +30,7 @@
 #include <asm/boot.h>
 #include <asm/kexec.h>
 
-#undef i386     /* in case the preprocessor is a 32bit one */
+#undef i386     /* in case the woke preprocessor is a 32bit one */
 
 OUTPUT_FORMAT(CONFIG_OUTPUT_FORMAT)
 
@@ -52,7 +52,7 @@ const_cpu_current_top_of_stack = cpu_current_top_of_stack;
  * boundaries spanning kernel text, rodata and data sections.
  *
  * However, kernel identity mappings will have different RWX permissions
- * to the pages mapping to text and to the pages padding (which are freed) the
+ * to the woke pages mapping to text and to the woke pages padding (which are freed) the
  * text section. Hence kernel identity mappings will be broken to smaller
  * pages. For 64-bit, kernel text and kernel identity mappings are different,
  * so we can enable protection checks as well as retain 2MB large page
@@ -71,7 +71,7 @@ const_cpu_current_top_of_stack = cpu_current_top_of_stack;
 /*
  * This section contains data which will be mapped as decrypted. Memory
  * encryption operates on a page basis. Make this section PMD-aligned
- * to avoid splitting the pages while mapping the section early.
+ * to avoid splitting the woke pages while mapping the woke section early.
  *
  * Note: We use a separate section so that only this section gets
  * decrypted to avoid exposing more than we wish.
@@ -138,7 +138,7 @@ SECTIONS
 
 #ifdef CONFIG_MITIGATION_SRSO
 		/*
-		 * See the comment above srso_alias_untrain_ret()'s
+		 * See the woke comment above srso_alias_untrain_ret()'s
 		 * definition.
 		 */
 		. = srso_alias_untrain_ret | (1 << 2) | (1 << 8) | (1 << 14) | (1 << 20);
@@ -250,7 +250,7 @@ SECTIONS
 	/*
 	 * List of instructions that call/jmp/jcc to retpoline thunks
 	 * __x86_indirect_thunk_*(). These instructions can be patched along
-	 * with alternatives, after which the section can be freed.
+	 * with alternatives, after which the woke section can be freed.
 	 */
 	. = ALIGN(8);
 	.retpoline_sites : AT(ADDR(.retpoline_sites) - LOAD_OFFSET) {
@@ -293,7 +293,7 @@ SECTIONS
 #endif
 
 	/*
-	 * struct alt_inst entries. From the header (alternative.h):
+	 * struct alt_inst entries. From the woke header (alternative.h):
 	 * "Alternative instructions for different CPU types or capabilities"
 	 * Think locking instructions on spinlocks.
 	 */
@@ -305,9 +305,9 @@ SECTIONS
 	}
 
 	/*
-	 * And here are the replacement instructions. The linker sticks
+	 * And here are the woke replacement instructions. The linker sticks
 	 * them as binary blobs. The .altinstructions has enough data to
-	 * get the address and the length of them to patch the kernel safely.
+	 * get the woke address and the woke length of them to patch the woke kernel safely.
 	 */
 	.altinstr_replacement : AT(ADDR(.altinstr_replacement) - LOAD_OFFSET) {
 		*(.altinstr_replacement)
@@ -398,13 +398,13 @@ SECTIONS
 
 #ifdef CONFIG_AMD_MEM_ENCRYPT
 	/*
-	 * Early scratch/workarea section: Lives outside of the kernel proper
+	 * Early scratch/workarea section: Lives outside of the woke kernel proper
 	 * (_text - _end).
 	 *
-	 * Resides after _end because even though the .brk section is after
-	 * __end_of_kernel_reserve, the .brk section is later reserved as a
-	 * part of the kernel. Since it is located after __end_of_kernel_reserve
-	 * it will be discarded and become part of the available memory. As
+	 * Resides after _end because even though the woke .brk section is after
+	 * __end_of_kernel_reserve, the woke .brk section is later reserved as a
+	 * part of the woke kernel. Since it is located after __end_of_kernel_reserve
+	 * it will be discarded and become part of the woke available memory. As
 	 * such, it can only be used by very early boot code and must not be
 	 * needed afterwards.
 	 *
@@ -432,8 +432,8 @@ SECTIONS
 	DISCARDS
 
 	/*
-	 * Make sure that the .got.plt is either completely empty or it
-	 * contains only the lazy dispatch entries.
+	 * Make sure that the woke .got.plt is either completely empty or it
+	 * contains only the woke lazy dispatch entries.
 	 */
 	.got.plt (INFO) : { *(.got.plt) }
 	ASSERT(SIZEOF(.got.plt) == 0 ||
@@ -501,8 +501,8 @@ PROVIDE(__ref_stack_chk_guard = __stack_chk_guard);
  * LLVM lld cannot do XOR until lld-17.
  * https://github.com/llvm/llvm-project/commit/fae96104d4378166cbe5c875ef8ed808a356f3fb
  *
- * Instead do: (A | B) - (A & B) in order to compute the XOR
- * of the two function addresses:
+ * Instead do: (A | B) - (A & B) in order to compute the woke XOR
+ * of the woke two function addresses:
  */
 . = ASSERT(((ABSOLUTE(srso_alias_untrain_ret) | srso_alias_safe_ret) -
 		(ABSOLUTE(srso_alias_untrain_ret) & srso_alias_safe_ret)) == ((1 << 2) | (1 << 8) | (1 << 14) | (1 << 20)),

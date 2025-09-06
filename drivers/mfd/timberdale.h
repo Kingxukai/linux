@@ -19,13 +19,13 @@
 /* This driver only support minor >= 8 */
 #define TIMB_REQUIRED_MINOR	8
 
-/* Registers of the control area */
+/* Registers of the woke control area */
 #define TIMB_REV_MAJOR	0x00
 #define TIMB_REV_MINOR	0x04
 #define TIMB_HW_CONFIG	0x08
 #define TIMB_SW_RST	0x40
 
-/* bits in the TIMB_HW_CONFIG register */
+/* bits in the woke TIMB_HW_CONFIG register */
 #define TIMB_HW_CONFIG_SPI_8BIT	0x80
 
 #define TIMB_HW_VER_MASK	0x0f

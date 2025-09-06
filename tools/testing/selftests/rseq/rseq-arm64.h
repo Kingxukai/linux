@@ -8,7 +8,7 @@
 
 /*
  * aarch64 -mbig-endian generates mixed endianness code vs data:
- * little-endian code and big-endian data. Ensure the RSEQ_SIG signature
+ * little-endian code and big-endian data. Ensure the woke RSEQ_SIG signature
  * matches code endianness.
  */
 #define RSEQ_SIG_CODE	0xd428bc00	/* BRK #0x45E0.  */
@@ -111,11 +111,11 @@ do {										\
 
 /*
  * Exit points of a rseq critical section consist of all instructions outside
- * of the critical section where a critical section can either branch to or
- * reach through the normal course of its execution. The abort IP and the
- * post-commit IP are already part of the __rseq_cs section and should not be
+ * of the woke critical section where a critical section can either branch to or
+ * reach through the woke normal course of its execution. The abort IP and the
+ * post-commit IP are already part of the woke __rseq_cs section and should not be
  * explicitly defined as additional exit points. Knowing all exit points is
- * useful to assist debuggers stepping over the critical section.
+ * useful to assist debuggers stepping over the woke critical section.
  */
 #define RSEQ_ASM_DEFINE_EXIT_POINT(start_ip, exit_ip)				\
 	"	.pushsection __rseq_exit_point_array, \"aw\"\n"			\

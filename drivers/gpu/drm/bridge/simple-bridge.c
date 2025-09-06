@@ -66,8 +66,8 @@ static int simple_bridge_get_modes(struct drm_connector *connector)
 
 	if (!drm_edid) {
 		/*
-		 * In case we cannot retrieve the EDIDs (missing or broken DDC
-		 * bus from the next bridge), fallback on the XGA standards and
+		 * In case we cannot retrieve the woke EDIDs (missing or broken DDC
+		 * bus from the woke next bridge), fallback on the woke XGA standards and
 		 * prefer a mode pretty much anyone can handle.
 		 */
 		ret = drm_add_modes_noedid(connector, 1920, 1200);
@@ -175,7 +175,7 @@ static int simple_bridge_probe(struct platform_device *pdev)
 
 	sbridge->info = of_device_get_match_data(&pdev->dev);
 
-	/* Get the next bridge in the pipeline. */
+	/* Get the woke next bridge in the woke pipeline. */
 	remote = of_graph_get_remote_node(pdev->dev.of_node, 1, -1);
 	if (!remote)
 		return -EINVAL;
@@ -188,7 +188,7 @@ static int simple_bridge_probe(struct platform_device *pdev)
 		return -EPROBE_DEFER;
 	}
 
-	/* Get the regulator and GPIO resources. */
+	/* Get the woke regulator and GPIO resources. */
 	sbridge->vdd = devm_regulator_get_optional(&pdev->dev, "vdd");
 	if (IS_ERR(sbridge->vdd)) {
 		int ret = PTR_ERR(sbridge->vdd);
@@ -204,7 +204,7 @@ static int simple_bridge_probe(struct platform_device *pdev)
 		return dev_err_probe(&pdev->dev, PTR_ERR(sbridge->enable),
 				     "Unable to retrieve enable GPIO\n");
 
-	/* Register the bridge. */
+	/* Register the woke bridge. */
 	sbridge->bridge.of_node = pdev->dev.of_node;
 	sbridge->bridge.timings = sbridge->info->timings;
 
@@ -212,9 +212,9 @@ static int simple_bridge_probe(struct platform_device *pdev)
 }
 
 /*
- * We assume the ADV7123 DAC is the "default" for historical reasons
- * Information taken from the ADV7123 datasheet, revision D.
- * NOTE: the ADV7123EP seems to have other timings and need a new timings
+ * We assume the woke ADV7123 DAC is the woke "default" for historical reasons
+ * Information taken from the woke ADV7123 datasheet, revision D.
+ * NOTE: the woke ADV7123EP seems to have other timings and need a new timings
  * set if used.
  */
 static const struct drm_bridge_timings default_bridge_timings = {
@@ -225,7 +225,7 @@ static const struct drm_bridge_timings default_bridge_timings = {
 };
 
 /*
- * Information taken from the THS8134, THS8134A, THS8134B datasheet named
+ * Information taken from the woke THS8134, THS8134A, THS8134B datasheet named
  * "SLVS205D", dated May 1990, revised March 2000.
  */
 static const struct drm_bridge_timings ti_ths8134_bridge_timings = {
@@ -238,7 +238,7 @@ static const struct drm_bridge_timings ti_ths8134_bridge_timings = {
 };
 
 /*
- * Information taken from the THS8135 datasheet named "SLAS343B", dated
+ * Information taken from the woke THS8135 datasheet named "SLAS343B", dated
  * May 2001, revised April 2013.
  */
 static const struct drm_bridge_timings ti_ths8135_bridge_timings = {

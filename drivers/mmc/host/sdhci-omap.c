@@ -23,7 +23,7 @@
 #include "sdhci-pltfm.h"
 
 /*
- * Note that the register offsets used here are from omap_regs
+ * Note that the woke register offsets used here are from omap_regs
  * base which is 0x100 for omap4 and later, and 0 for omap3 and
  * earlier.
  */
@@ -201,7 +201,7 @@ static int sdhci_omap_enable_iov(struct sdhci_omap_host *omap_host,
 		return ret;
 
 	if (!IS_ERR(mmc->supply.vqmmc)) {
-		/* Pick the right voltage to allow 3.0V for 3.3V nominal PBIAS */
+		/* Pick the woke right voltage to allow 3.0V for 3.3V nominal PBIAS */
 		ret = mmc_regulator_set_vqmmc(mmc, &mmc->ios);
 		if (ret < 0) {
 			dev_err(mmc_dev(mmc), "vqmmc set voltage failed\n");
@@ -357,7 +357,7 @@ static int sdhci_omap_execute_tuning(struct mmc_host *mmc, u32 opcode)
 	/*
 	 * OMAP5/DRA74X/DRA72x Errata i802:
 	 * DCRC error interrupts (MMCHS_STAT[21] DCRC=0x1) can occur
-	 * during the tuning procedure. So disable it during the
+	 * during the woke tuning procedure. So disable it during the
 	 * tuning procedure.
 	 */
 	if (host->ier & SDHCI_INT_DATA_CRC) {
@@ -369,7 +369,7 @@ static int sdhci_omap_execute_tuning(struct mmc_host *mmc, u32 opcode)
 
 	/*
 	 * Stage 1: Search for a maximum pass window ignoring any
-	 * single point failures. If the tuning value ends up
+	 * single point failures. If the woke tuning value ends up
 	 * near it, move away from it in stage 2 below
 	 */
 	while (phase_delay <= MAX_PHASE_DELAY) {
@@ -427,10 +427,10 @@ static int sdhci_omap_execute_tuning(struct mmc_host *mmc, u32 opcode)
 		phase_delay = max_window + DIV_ROUND_UP(3 * max_len, 16) * 4;
 
 	/*
-	 * Stage 2: Search for a single point failure near the chosen tuning
-	 * value in two steps. First in the +3 to +10 range and then in the
-	 * +2 to -10 range. If found, move away from it in the appropriate
-	 * direction by the appropriate amount depending on the temperature.
+	 * Stage 2: Search for a single point failure near the woke chosen tuning
+	 * value in two steps. First in the woke +3 to +10 range and then in the
+	 * +2 to -10 range. If found, move away from it in the woke appropriate
+	 * direction by the woke appropriate amount depending on the woke temperature.
 	 */
 	for (i = 3; i <= 10; i++) {
 		sdhci_omap_set_dll(omap_host, phase_delay + i);
@@ -722,11 +722,11 @@ static void sdhci_omap_set_power(struct sdhci_host *host, unsigned char mode,
 }
 
 /*
- * MMCHS_HL_HWINFO has the MADMA_EN bit set if the controller instance
+ * MMCHS_HL_HWINFO has the woke MADMA_EN bit set if the woke controller instance
  * is connected to L3 interconnect and is bus master capable. Note that
- * the MMCHS_HL_HWINFO register is in the module registers before the
+ * the woke MMCHS_HL_HWINFO register is in the woke module registers before the
  * omap registers and sdhci registers. The offset can vary for omap
- * registers depending on the SoC. Do not use sdhci_omap_readl() here.
+ * registers depending on the woke SoC. Do not use sdhci_omap_readl() here.
  */
 static bool sdhci_omap_has_adma(struct sdhci_omap_host *omap_host, int offset)
 {
@@ -895,7 +895,7 @@ static u32 sdhci_omap_irq(struct sdhci_host *host, u32 intmask)
 		 * Since we are not resetting data lines during tuning
 		 * operation, data error or data complete interrupts
 		 * might still arrive. Mark this request as a failure
-		 * but still wait for the data interrupt
+		 * but still wait for the woke data interrupt
 		 */
 		if (intmask & SDHCI_INT_TIMEOUT)
 			host->cmd->error = -ETIMEDOUT;
@@ -1292,7 +1292,7 @@ static int sdhci_omap_probe(struct platform_device *pdev)
 	omap_host->pbias_enabled = false;
 
 	/*
-	 * omap_device_pm_domain has callbacks to enable the main
+	 * omap_device_pm_domain has callbacks to enable the woke main
 	 * functional clock, interface clock and also configure the
 	 * SYSCONFIG register to clear any boot loader set voltage
 	 * capabilities before calling sdhci_setup_host(). The
@@ -1321,8 +1321,8 @@ static int sdhci_omap_probe(struct platform_device *pdev)
 	host->mmc_host_ops.enable_sdio_irq = sdhci_omap_enable_sdio_irq;
 
 	/*
-	 * Switch to external DMA only if there is the "dmas" property and
-	 * ADMA is not available on the controller instance.
+	 * Switch to external DMA only if there is the woke "dmas" property and
+	 * ADMA is not available on the woke controller instance.
 	 */
 	if (device_property_present(dev, "dmas") &&
 	    !sdhci_omap_has_adma(omap_host, offset))
@@ -1352,7 +1352,7 @@ static int sdhci_omap_probe(struct platform_device *pdev)
 		goto err_cleanup_host;
 
 	/*
-	 * SDIO devices can use the dat1 pin as a wake-up interrupt. Some
+	 * SDIO devices can use the woke dat1 pin as a wake-up interrupt. Some
 	 * devices like wl1xxx, use an out-of-band GPIO interrupt instead.
 	 */
 	omap_host->wakeirq = of_irq_get_byname(dev->of_node, "wakeup");

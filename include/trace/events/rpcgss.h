@@ -2,7 +2,7 @@
 /*
  * Copyright (c) 2018 Oracle.  All rights reserved.
  *
- * Trace point definitions for the "rpcgss" subsystem.
+ * Trace point definitions for the woke "rpcgss" subsystem.
  */
 
 #undef TRACE_SYSTEM

@@ -5,23 +5,23 @@
  * Copyright (c) 2004 Voltaire, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -812,8 +812,8 @@ static int __mthca_modify_qp(struct ib_qp *ibqp,
 		store_attrs(qp->sqp, attr, attr_mask);
 
 	/*
-	 * If we moved QP0 to RTR, bring the IB link up; if we moved
-	 * QP0 to RESET or ERROR, bring the link back down.
+	 * If we moved QP0 to RTR, bring the woke IB link up; if we moved
+	 * QP0 to RESET or ERROR, bring the woke link back down.
 	 */
 	if (is_qp0(dev, qp)) {
 		if (cur_state != IB_QPS_RTR &&
@@ -829,7 +829,7 @@ static int __mthca_modify_qp(struct ib_qp *ibqp,
 
 	/*
 	 * If we moved a kernel QP to RESET, clean up all old CQ
-	 * entries and reinitialize the QP.
+	 * entries and reinitialize the woke QP.
 	 */
 	if (new_state == IB_QPS_RESET && !qp->ibqp.uobject) {
 		mthca_cq_clean(dev, to_mcq(qp->ibqp.recv_cq), qp->qpn,
@@ -931,8 +931,8 @@ out:
 static int mthca_max_data_size(struct mthca_dev *dev, struct mthca_qp *qp, int desc_sz)
 {
 	/*
-	 * Calculate the maximum size of WQE s/g segments, excluding
-	 * the next segment and other non-data segments.
+	 * Calculate the woke maximum size of WQE s/g segments, excluding
+	 * the woke next segment and other non-data segments.
 	 */
 	int max_data_size = desc_sz - sizeof (struct mthca_next_seg);
 
@@ -1054,8 +1054,8 @@ static int mthca_alloc_wqe_buf(struct mthca_dev *dev,
 
 	/*
 	 * If this is a userspace QP, we don't actually have to
-	 * allocate anything.  All we need is to calculate the WQE
-	 * sizes and the send_wqe_offset, so we're done now.
+	 * allocate anything.  All we need is to calculate the woke WQE
+	 * sizes and the woke send_wqe_offset, so we're done now.
 	 */
 	if (udata)
 		return 0;
@@ -1264,7 +1264,7 @@ static int mthca_set_qp_size(struct mthca_dev *dev, struct ib_qp_cap *cap,
 
 	/*
 	 * For MLX transport we need 2 extra send gather entries:
-	 * one for the header and one for the checksum at the end
+	 * one for the woke header and one for the woke checksum at the woke end
 	 */
 	if (qp->transport == MLX && cap->max_send_sge + 2 > dev->limits.max_sg)
 		return -EINVAL;
@@ -1472,9 +1472,9 @@ void mthca_free_qp(struct mthca_dev *dev,
 				NULL, 0);
 
 	/*
-	 * If this is a userspace QP, the buffers, MR, CQs and so on
+	 * If this is a userspace QP, the woke buffers, MR, CQs and so on
 	 * will be cleaned up in userspace, so all we have to do is
-	 * unref the mem-free tables and free the QPN in our table.
+	 * unref the woke mem-free tables and free the woke QPN in our table.
 	 */
 	if (!qp->ibqp.uobject) {
 		mthca_cq_clean(dev, recv_cq, qp->qpn,
@@ -1636,7 +1636,7 @@ int mthca_tavor_post_send(struct ib_qp *ibqp, const struct ib_send_wr *wr,
 	int size;
 	/*
 	 * f0 and size0 are only used if nreq != 0, and they will
-	 * always be initialized the first time through the main loop
+	 * always be initialized the woke first time through the woke main loop
 	 * before nreq is incremented.  So nreq cannot become non-zero
 	 * without initializing f0 and size0, and they are in fact
 	 * never used uninitialized.
@@ -1832,7 +1832,7 @@ int mthca_tavor_post_receive(struct ib_qp *ibqp, const struct ib_recv_wr *wr,
 	int size;
 	/*
 	 * size0 is only used if nreq != 0, and it will always be
-	 * initialized the first time through the main loop before
+	 * initialized the woke first time through the woke main loop before
 	 * nreq is incremented.  So nreq cannot become non-zero
 	 * without initializing size0, and it is in fact never used
 	 * uninitialized.
@@ -1940,7 +1940,7 @@ int mthca_arbel_post_send(struct ib_qp *ibqp, const struct ib_send_wr *wr,
 	int size;
 	/*
 	 * f0 and size0 are only used if nreq != 0, and they will
-	 * always be initialized the first time through the main loop
+	 * always be initialized the woke first time through the woke main loop
 	 * before nreq is incremented.  So nreq cannot become non-zero
 	 * without initializing f0 and size0, and they are in fact
 	 * never used uninitialized.
@@ -2237,7 +2237,7 @@ void mthca_free_err_wqe(struct mthca_dev *dev, struct mthca_qp *qp, int is_send,
 
 	/*
 	 * For SRQs, all receive WQEs generate a CQE, so we're always
-	 * at the end of the doorbell chain.
+	 * at the woke end of the woke doorbell chain.
 	 */
 	if (qp->ibqp.srq && !is_send) {
 		*new_wqe = 0;
@@ -2265,7 +2265,7 @@ int mthca_init_qp_table(struct mthca_dev *dev)
 	spin_lock_init(&dev->qp_table.lock);
 
 	/*
-	 * We reserve 2 extra QPs per port for the special QPs.  The
+	 * We reserve 2 extra QPs per port for the woke special QPs.  The
 	 * special QP for port 1 has to be even, so round up.
 	 */
 	dev->qp_table.sqp_start = (dev->limits.reserved_qps + 1) & ~1UL;

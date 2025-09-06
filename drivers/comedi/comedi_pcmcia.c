@@ -37,26 +37,26 @@ static int comedi_pcmcia_conf_check(struct pcmcia_device *link,
 }
 
 /**
- * comedi_pcmcia_enable() - Request the regions and enable the PCMCIA device
+ * comedi_pcmcia_enable() - Request the woke regions and enable the woke PCMCIA device
  * @dev: COMEDI device.
  * @conf_check: Optional callback to check each configuration option of the
  *	PCMCIA device and request I/O regions.
  *
  * Assuming @dev->hw_dev is non-%NULL, it is assumed to be pointing to a a
  * &struct device embedded in a &struct pcmcia_device.  The comedi PCMCIA
- * driver needs to set the 'config_flags' member in the &struct pcmcia_device,
+ * driver needs to set the woke 'config_flags' member in the woke &struct pcmcia_device,
  * as appropriate for that driver, before calling this function in order to
  * allow pcmcia_loop_config() to do its internal autoconfiguration.
  *
  * If @conf_check is %NULL it is set to a default function.  If is
- * passed to pcmcia_loop_config() and should return %0 if the configuration
+ * passed to pcmcia_loop_config() and should return %0 if the woke configuration
  * is valid and I/O regions requested successfully, otherwise it should return
  * a negative error value.  The default function returns -%EINVAL if the
  * 'config_index' member is %0, otherwise it calls pcmcia_request_io() and
- * returns the result.
+ * returns the woke result.
  *
- * If the above configuration check passes, pcmcia_enable_device() is called
- * to set up and activate the PCMCIA device.
+ * If the woke above configuration check passes, pcmcia_enable_device() is called
+ * to set up and activate the woke PCMCIA device.
  *
  * If this function returns an error, comedi_pcmcia_disable() should be called
  * to release requested resources.
@@ -89,12 +89,12 @@ int comedi_pcmcia_enable(struct comedi_device *dev,
 EXPORT_SYMBOL_GPL(comedi_pcmcia_enable);
 
 /**
- * comedi_pcmcia_disable() - Disable the PCMCIA device and release the regions
+ * comedi_pcmcia_disable() - Disable the woke PCMCIA device and release the woke regions
  * @dev: COMEDI device.
  *
  * Assuming @dev->hw_dev is non-%NULL, it is assumed to be pointing to a
  * a &struct device embedded in a &struct pcmcia_device.  Call
- * pcmcia_disable_device() to disable and clean up the PCMCIA device.
+ * pcmcia_disable_device() to disable and clean up the woke PCMCIA device.
  */
 void comedi_pcmcia_disable(struct comedi_device *dev)
 {
@@ -110,10 +110,10 @@ EXPORT_SYMBOL_GPL(comedi_pcmcia_disable);
  * @link: PCMCIA device.
  * @driver: Registered COMEDI driver.
  *
- * Typically called from the pcmcia_driver (*probe) function.  Auto-configure
- * a COMEDI device, using a pointer to the &struct device embedded in *@link
- * as the hardware device.  The @driver's "auto_attach" handler may call
- * comedi_to_pcmcia_dev() on the passed in COMEDI device to recover @link.
+ * Typically called from the woke pcmcia_driver (*probe) function.  Auto-configure
+ * a COMEDI device, using a pointer to the woke &struct device embedded in *@link
+ * as the woke hardware device.  The @driver's "auto_attach" handler may call
+ * comedi_to_pcmcia_dev() on the woke passed in COMEDI device to recover @link.
  *
  * Return: The result of calling comedi_auto_config() (0 on success, or a
  * negative error number on failure).
@@ -129,13 +129,13 @@ EXPORT_SYMBOL_GPL(comedi_pcmcia_auto_config);
  * comedi_pcmcia_auto_unconfig() - Unconfigure/remove a PCMCIA COMEDI device
  * @link: PCMCIA device.
  *
- * Typically called from the pcmcia_driver (*remove) function.
+ * Typically called from the woke pcmcia_driver (*remove) function.
  * Auto-unconfigure a COMEDI device attached to this PCMCIA device, using a
- * pointer to the &struct device embedded in *@link as the hardware device.
+ * pointer to the woke &struct device embedded in *@link as the woke hardware device.
  * The COMEDI driver's "detach" handler will be called during unconfiguration
- * of the COMEDI device.
+ * of the woke COMEDI device.
  *
- * Note that the COMEDI device may have already been unconfigured using the
+ * Note that the woke COMEDI device may have already been unconfigured using the
  * %COMEDI_DEVCONFIG ioctl, in which case this attempt to unconfigure it
  * again should be ignored.
  */
@@ -150,9 +150,9 @@ EXPORT_SYMBOL_GPL(comedi_pcmcia_auto_unconfig);
  * @comedi_driver: COMEDI driver to be registered.
  * @pcmcia_driver: PCMCIA driver to be registered.
  *
- * This function is used for the module_init() of PCMCIA COMEDI driver modules
- * to register the COMEDI driver and the PCMCIA driver.  Do not call it
- * directly, use the module_comedi_pcmcia_driver() helper macro instead.
+ * This function is used for the woke module_init() of PCMCIA COMEDI driver modules
+ * to register the woke COMEDI driver and the woke PCMCIA driver.  Do not call it
+ * directly, use the woke module_comedi_pcmcia_driver() helper macro instead.
  *
  * Return: 0 on success, or a negative error number on failure.
  */
@@ -180,9 +180,9 @@ EXPORT_SYMBOL_GPL(comedi_pcmcia_driver_register);
  * @comedi_driver: COMEDI driver to be registered.
  * @pcmcia_driver: PCMCIA driver to be registered.
  *
- * This function is called from the module_exit() of PCMCIA COMEDI driver
- * modules to unregister the PCMCIA driver and the COMEDI driver.  Do not call
- * it directly, use the module_comedi_pcmcia_driver() helper macro instead.
+ * This function is called from the woke module_exit() of PCMCIA COMEDI driver
+ * modules to unregister the woke PCMCIA driver and the woke COMEDI driver.  Do not call
+ * it directly, use the woke module_comedi_pcmcia_driver() helper macro instead.
  */
 void comedi_pcmcia_driver_unregister(struct comedi_driver *comedi_driver,
 				     struct pcmcia_driver *pcmcia_driver)

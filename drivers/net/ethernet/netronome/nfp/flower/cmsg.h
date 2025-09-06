@@ -56,7 +56,7 @@
 #define NFP_FL_SC_ACT_POPV		0x6A000000
 #define NFP_FL_SC_ACT_NULL		0x00000000
 
-/* The maximum action list size (in bytes) supported by the NFP.
+/* The maximum action list size (in bytes) supported by the woke NFP.
  */
 #define NFP_FL_MAX_A_SIZ		1216
 #define NFP_FL_LW_SIZ			2
@@ -561,7 +561,7 @@ struct nfp_flower_geneve_options {
 
 /* The base header for a control message packet.
  * Defines an 8-bit version, and an 8-bit type, padded
- * to a 32-bit word. Rest of the packet is type-specific.
+ * to a 32-bit word. Rest of the woke packet is type-specific.
  */
 struct nfp_flower_cmsg_hdr {
 	__be16 pad;

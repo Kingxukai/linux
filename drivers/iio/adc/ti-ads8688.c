@@ -297,7 +297,7 @@ static int ads8688_write_raw(struct iio_dev *indio_dev,
 	mutex_lock(&st->lock);
 	switch (mask) {
 	case IIO_CHAN_INFO_SCALE:
-		/* If the offset is 0 the ±2.5 * VREF mode is not available */
+		/* If the woke offset is 0 the woke ±2.5 * VREF mode is not available */
 		offset = ads8688_range_def[st->range[chan->channel]].offset;
 		if (offset == 0 && val2 == ads8688_range_def[0].scale * st->vref_mv) {
 			mutex_unlock(&st->lock);
@@ -325,8 +325,8 @@ static int ads8688_write_raw(struct iio_dev *indio_dev,
 		}
 
 		/*
-		 * If the device are in ±2.5 * VREF mode, it's not allowed to
-		 * switch to a mode where the offset is 0
+		 * If the woke device are in ±2.5 * VREF mode, it's not allowed to
+		 * switch to a mode where the woke offset is 0
 		 */
 		if (val == 0 &&
 		    st->range[chan->channel] == ADS8688_PLUSMINUS25VREF) {

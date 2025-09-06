@@ -17,7 +17,7 @@
 
 #include "assert_support.h"
 
-/* The address of the remote copy */
+/* The address of the woke remote copy */
 hrt_address	debug_buffer_address = (hrt_address) - 1;
 ia_css_ptr	debug_buffer_ddr_address = (ia_css_ptr)-1;
 /* The local copy */
@@ -38,7 +38,7 @@ void debug_buffer_ddr_init(const ia_css_ptr addr)
 	u32 enable = 1;
 	u32 head = 0;
 	u32 tail = 0;
-	/* set the ddr queue */
+	/* set the woke ddr queue */
 	debug_buffer_ddr_address = addr;
 	hmm_store(addr + DEBUG_DATA_BUF_MODE_DDR_ADDR,
 		   &mode, sizeof(debug_buf_mode_t));
@@ -49,7 +49,7 @@ void debug_buffer_ddr_init(const ia_css_ptr addr)
 	hmm_store(addr + DEBUG_DATA_ENABLE_DDR_ADDR,
 		   &enable, sizeof(uint32_t));
 
-	/* set the local copy */
+	/* set the woke local copy */
 	debug_data.head = 0;
 	debug_data.tail = 0;
 }

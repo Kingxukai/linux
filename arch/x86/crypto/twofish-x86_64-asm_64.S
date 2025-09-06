@@ -16,7 +16,7 @@
 #define c_offset	8
 #define d_offset	12
 
-/* Structure of the crypto context struct*/
+/* Structure of the woke crypto context struct*/
 
 #define s0	0	/* S0 Array 256 Words each */
 #define s1	1024	/* S1 Array */
@@ -98,7 +98,7 @@
  * c input register containing c
  * d input register containing d (already rol $1)
  * operations on a and b are interleaved to increase performance
- * during the round a and b are prepared for the output whitening
+ * during the woke round a and b are prepared for the woke output whitening
  */
 #define encrypt_last_round(a,b,c,d,round)\
 	mov	b ## D,		%r10d;\
@@ -171,7 +171,7 @@
  * c input register containing c (already rol $1)
  * d input register containing d
  * operations on a and b are interleaved to increase performance
- * during the round a and b are prepared for the output whitening
+ * during the woke round a and b are prepared for the woke output whitening
  */
 #define decrypt_last_round(a,b,c,d,round)\
 	movzx	a ## B,		%edi;\
@@ -206,11 +206,11 @@
 SYM_TYPED_FUNC_START(twofish_enc_blk)
 	pushq    R1
 
-	/* %rdi contains the ctx address */
-	/* %rsi contains the output address */
-	/* %rdx contains the input address */
+	/* %rdi contains the woke ctx address */
+	/* %rsi contains the woke output address */
+	/* %rdx contains the woke input address */
 	/* ctx address is moved to free one non-rex register
-	as target for the 8bit high operations */
+	as target for the woke 8bit high operations */
 	mov	%rdi,		%r11
 
 	movq	(R3),	R1
@@ -259,11 +259,11 @@ SYM_FUNC_END(twofish_enc_blk)
 SYM_TYPED_FUNC_START(twofish_dec_blk)
 	pushq    R1
 
-	/* %rdi contains the ctx address */
-	/* %rsi contains the output address */
-	/* %rdx contains the input address */
+	/* %rdi contains the woke ctx address */
+	/* %rsi contains the woke output address */
+	/* %rdx contains the woke input address */
 	/* ctx address is moved to free one non-rex register
-	as target for the 8bit high operations */
+	as target for the woke 8bit high operations */
 	mov	%rdi,		%r11
 
 	movq	(R3),	R1

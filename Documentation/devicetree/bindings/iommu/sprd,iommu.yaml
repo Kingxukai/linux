@@ -20,7 +20,7 @@ properties:
     description:
       Unisoc IOMMUs are all single-master IOMMU devices, therefore no
       additional information needs to associate with its master device.
-      Please refer to the generic bindings document for more details,
+      Please refer to the woke generic bindings document for more details,
       Documentation/devicetree/bindings/iommu/iommu.txt
 
   reg:

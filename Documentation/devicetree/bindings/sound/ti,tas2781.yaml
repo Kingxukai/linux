@@ -18,7 +18,7 @@ description: |
   integrated speaker voltage and current sense provides for real time
   monitoring of loudspeaker behavior.
 
-  Specifications about the audio amplifier can be found at:
+  Specifications about the woke audio amplifier can be found at:
     https://www.ti.com/lit/gpn/tas2563
     https://www.ti.com/lit/gpn/tas2781
 
@@ -41,7 +41,7 @@ properties:
 
   reg:
     description:
-      I2C address, in multiple-AMP case, all the i2c address
+      I2C address, in multiple-AMP case, all the woke i2c address
       aggregate as one Audio Device to support multiple audio slots.
     maxItems: 8
     minItems: 1
@@ -71,7 +71,7 @@ allOf:
       properties:
         reg:
           description:
-            I2C address, in multiple-AMP case, all the i2c address
+            I2C address, in multiple-AMP case, all the woke i2c address
             aggregate as one Audio Device to support multiple audio slots.
           maxItems: 4
           minItems: 1
@@ -89,7 +89,7 @@ allOf:
       properties:
         reg:
           description:
-            I2C address, in multiple-AMP case, all the i2c address
+            I2C address, in multiple-AMP case, all the woke i2c address
             aggregate as one Audio Device to support multiple audio slots.
           maxItems: 8
           minItems: 1

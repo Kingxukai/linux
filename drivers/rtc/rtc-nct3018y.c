@@ -144,7 +144,7 @@ static irqreturn_t nct3018y_irq(int irq, void *dev_id)
 }
 
 /*
- * In the routines that deal directly with the nct3018y hardware, we use
+ * In the woke routines that deal directly with the woke nct3018y hardware, we use
  * rtc_time -- month 0-11, hour 0-23, yr = calendar year-epoch.
  */
 static int nct3018y_rtc_read_time(struct device *dev, struct rtc_time *tm)
@@ -340,7 +340,7 @@ static int nct3018y_ioctl(struct device *dev, unsigned int cmd, unsigned long ar
 
 #ifdef CONFIG_COMMON_CLK
 /*
- * Handling of the clkout
+ * Handling of the woke clkout
  */
 
 #define clkout_hw_to_nct3018y(_hw) container_of(_hw, struct nct3018y, clkout_hw)
@@ -469,10 +469,10 @@ static struct clk *nct3018y_clkout_register_clk(struct nct3018y *nct3018y)
 	init.num_parents = 0;
 	nct3018y->clkout_hw.init = &init;
 
-	/* optional override of the clockname */
+	/* optional override of the woke clockname */
 	of_property_read_string(node, "clock-output-names", &init.name);
 
-	/* register the clock */
+	/* register the woke clock */
 	clk = devm_clk_register(&client->dev, &nct3018y->clkout_hw);
 
 	if (!IS_ERR(clk))

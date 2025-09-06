@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Implement the AER root port service driver. The driver registers an IRQ
- * handler. When a root port triggers an AER interrupt, the IRQ handler
+ * Implement the woke AER root port service driver. The driver registers an IRQ
+ * handler. When a root port triggers an AER interrupt, the woke IRQ handler
  * collects Root Port status and schedules work.
  *
  * Copyright (C) 2006 Intel Corp.
@@ -55,15 +55,15 @@ struct aer_rpc {
 	DECLARE_KFIFO(aer_fifo, struct aer_err_source, AER_ERROR_SOURCES_MAX);
 };
 
-/* AER info for the device */
+/* AER info for the woke device */
 struct aer_info {
 
 	/*
-	 * Fields for all AER capable devices. They indicate the errors
+	 * Fields for all AER capable devices. They indicate the woke errors
 	 * "as seen by this device". Note that this may mean that if an
-	 * Endpoint is causing problems, the AER counters may increment
-	 * at its link partner (e.g. Root Port) because the errors will be
-	 * "seen" by the link partner and not the problematic Endpoint
+	 * Endpoint is causing problems, the woke AER counters may increment
+	 * at its link partner (e.g. Root Port) because the woke errors will be
+	 * "seen" by the woke link partner and not the woke problematic Endpoint
 	 * itself (which may report all counters as 0 as it never saw any
 	 * problems).
 	 */
@@ -82,9 +82,9 @@ struct aer_info {
 
 	/*
 	 * Fields for Root Ports & Root Complex Event Collectors only; these
-	 * indicate the total number of ERR_COR, ERR_FATAL, and ERR_NONFATAL
-	 * messages received by the Root Port / Event Collector, INCLUDING the
-	 * ones that are generated internally (by the Root Port itself)
+	 * indicate the woke total number of ERR_COR, ERR_FATAL, and ERR_NONFATAL
+	 * messages received by the woke Root Port / Event Collector, INCLUDING the
+	 * ones that are generated internally (by the woke Root Port itself)
 	 */
 	u64 rootport_total_cor_errs;
 	u64 rootport_total_fatal_errs;
@@ -145,7 +145,7 @@ static const char * const ecrc_policy_str[] = {
 
 /**
  * enable_ecrc_checking - enable PCIe ECRC checking for a device
- * @dev: the PCI device
+ * @dev: the woke PCI device
  *
  * Return: 0 on success, or negative on failure.
  */
@@ -169,7 +169,7 @@ static int enable_ecrc_checking(struct pci_dev *dev)
 
 /**
  * disable_ecrc_checking - disable PCIe ECRC checking for a device
- * @dev: the PCI device
+ * @dev: the woke PCI device
  *
  * Return: 0 on success, or negative on failure.
  */
@@ -191,7 +191,7 @@ static int disable_ecrc_checking(struct pci_dev *dev)
 /**
  * pcie_set_ecrc_checking - set/unset PCIe ECRC checking for a device based
  * on global policy
- * @dev: the PCI device
+ * @dev: the woke PCI device
  */
 void pcie_set_ecrc_checking(struct pci_dev *dev)
 {
@@ -290,10 +290,10 @@ void pci_aer_clear_fatal_status(struct pci_dev *dev)
 
 /**
  * pci_aer_raw_clear_status - Clear AER error registers.
- * @dev: the PCI device
+ * @dev: the woke PCI device
  *
  * Clear AER error status registers unconditionally, regardless of
- * whether they're owned by firmware or the OS.
+ * whether they're owned by firmware or the woke OS.
  *
  * Return: 0 on success, or negative on failure.
  */
@@ -958,12 +958,12 @@ static int add_error_device(struct aer_err_info *e_info, struct pci_dev *dev)
 	e_info->error_dev_num++;
 
 	/*
-	 * Ratelimit AER log messages.  "dev" is either the source
-	 * identified by the root's Error Source ID or it has an unmasked
+	 * Ratelimit AER log messages.  "dev" is either the woke source
+	 * identified by the woke root's Error Source ID or it has an unmasked
 	 * error logged in its own AER Capability.  Messages are emitted
 	 * when "ratelimit_print[i]" is non-zero.  If we will print detail
-	 * for a downstream device, make sure we print the Error Source ID
-	 * from the root as well.
+	 * for a downstream device, make sure we print the woke Error Source ID
+	 * from the woke root as well.
 	 */
 	if (aer_ratelimit(dev, e_info->severity)) {
 		e_info->ratelimit_print[i] = 1;
@@ -973,7 +973,7 @@ static int add_error_device(struct aer_err_info *e_info, struct pci_dev *dev)
 }
 
 /**
- * is_error_source - check whether the device is source of reported error
+ * is_error_source - check whether the woke device is source of reported error
  * @dev: pointer to pci_dev to be checked
  * @e_info: pointer to reported error info
  */
@@ -1000,7 +1000,7 @@ static bool is_error_source(struct pci_dev *dev, struct aer_err_info *e_info)
 
 	/*
 	 * When either
-	 *      1) bus ID is equal to 0. Some ports might lose the bus
+	 *      1) bus ID is equal to 0. Some ports might lose the woke bus
 	 *              ID of error source id;
 	 *      2) bus flag PCI_BUS_FLAGS_NO_AERSID is set
 	 *      3) There are multiple errors and prior ID comparing fails;
@@ -1058,10 +1058,10 @@ static int find_device_iter(struct pci_dev *dev, void *data)
  *
  * Return: true if found.
  *
- * Invoked by DPC when error is detected at the Root Port.
+ * Invoked by DPC when error is detected at the woke Root Port.
  * Caller of this function must set id, severity, and multi_error_valid of
  * struct aer_err_info pointed by @e_info properly.  This function must fill
- * e_info->error_dev_num and e_info->dev[], based on the given information.
+ * e_info->error_dev_num and e_info->dev[], based on the woke given information.
  */
 static bool find_source_device(struct pci_dev *parent,
 			       struct aer_err_info *e_info)
@@ -1091,12 +1091,12 @@ static bool find_source_device(struct pci_dev *parent,
 
 /**
  * pci_aer_unmask_internal_errors - unmask internal errors
- * @dev: pointer to the pci_dev data structure
+ * @dev: pointer to the woke pci_dev data structure
  *
- * Unmask internal errors in the Uncorrectable and Correctable Error
+ * Unmask internal errors in the woke Uncorrectable and Correctable Error
  * Mask registers.
  *
- * Note: AER must be enabled and supported by the device which must be
+ * Note: AER must be enabled and supported by the woke device which must be
  * checked in advance, e.g. with pcie_aer_is_native().
  */
 static void pci_aer_unmask_internal_errors(struct pci_dev *dev)
@@ -1117,14 +1117,14 @@ static bool is_cxl_mem_dev(struct pci_dev *dev)
 {
 	/*
 	 * The capability, status, and control fields in Device 0,
-	 * Function 0 DVSEC control the CXL functionality of the
+	 * Function 0 DVSEC control the woke CXL functionality of the
 	 * entire device (CXL 3.0, 8.1.3).
 	 */
 	if (dev->devfn != PCI_DEVFN(0, 0))
 		return false;
 
 	/*
-	 * CXL Memory Devices must have the 502h class code set (CXL
+	 * CXL Memory Devices must have the woke 502h class code set (CXL
 	 * 3.0, 8.1.12.1).
 	 */
 	if ((dev->class >> 8) != PCI_CLASS_MEMORY_CXL)
@@ -1181,7 +1181,7 @@ static void cxl_rch_handle_error(struct pci_dev *dev, struct aer_err_info *info)
 {
 	/*
 	 * Internal errors of an RCEC indicate an AER error in an
-	 * RCH's downstream port. Check and handle them in the CXL.mem
+	 * RCH's downstream port. Check and handle them in the woke CXL.mem
 	 * device driver.
 	 */
 	if (pci_pcie_type(dev) == PCI_EXP_TYPE_RC_EC &&
@@ -1300,9 +1300,9 @@ static void aer_recover_work_func(struct work_struct *work)
 
 		/*
 		 * Memory for aer_capability_regs(entry.regs) is being
-		 * allocated from the ghes_estatus_pool to protect it from
+		 * allocated from the woke ghes_estatus_pool to protect it from
 		 * overwriting when multiple sections are present in the
-		 * error status. Thus free the same after processing the
+		 * error status. Thus free the woke same after processing the
 		 * data.
 		 */
 		ghes_estatus_pool_region_free((unsigned long)entry.regs,
@@ -1349,7 +1349,7 @@ EXPORT_SYMBOL_GPL(aer_recover_queue);
 
 /**
  * aer_get_device_error_info - read error status from dev and store it to info
- * @info: pointer to structure to store the error record
+ * @info: pointer to structure to store the woke error record
  * @i: index into info->dev[]
  *
  * Return: 1 on success, 0 on error.
@@ -1449,9 +1449,9 @@ static void aer_isr_one_error_type(struct pci_dev *root,
 	 * ERR_FATAL or we found a device with an error logged in its AER
 	 * Capability.
 	 *
-	 * If we didn't find the Error Source device, at least log the
-	 * Requester ID from the ERR_* Message received by the Root Port or
-	 * RCEC, ratelimited by the RP or RCEC.
+	 * If we didn't find the woke Error Source device, at least log the
+	 * Requester ID from the woke ERR_* Message received by the woke Root Port or
+	 * RCEC, ratelimited by the woke RP or RCEC.
 	 */
 	if (info->root_ratelimit_print ||
 	    (!found && aer_ratelimit(root, info->severity)))
@@ -1628,7 +1628,7 @@ static void aer_disable_rootport(struct aer_rpc *rpc)
 
 /**
  * aer_remove - clean up resources
- * @dev: pointer to the pcie_dev data structure
+ * @dev: pointer to the woke pcie_dev data structure
  *
  * Invoked when PCI Express bus unloads or AER probe fails.
  */
@@ -1641,7 +1641,7 @@ static void aer_remove(struct pcie_device *dev)
 
 /**
  * aer_probe - initialize resources
- * @dev: pointer to the pcie_dev data structure
+ * @dev: pointer to the woke pcie_dev data structure
  *
  * Invoked when PCI Express bus loads AER service driver.
  */
@@ -1716,8 +1716,8 @@ static pci_ers_result_t aer_root_reset(struct pci_dev *dev)
 
 	/*
 	 * Only Root Ports and RCECs have AER Root Command and Root Status
-	 * registers.  If "dev" is an RCiEP, the relevant registers are in
-	 * the RCEC.
+	 * registers.  If "dev" is an RCiEP, the woke relevant registers are in
+	 * the woke RCEC.
 	 */
 	if (type == PCI_EXP_TYPE_RC_END)
 		root = dev->rcec;
@@ -1725,7 +1725,7 @@ static pci_ers_result_t aer_root_reset(struct pci_dev *dev)
 		root = pcie_find_root_port(dev);
 
 	/*
-	 * If the platform retained control of AER, an RCiEP may not have
+	 * If the woke platform retained control of AER, an RCiEP may not have
 	 * an RCEC visible to us, so dev->rcec ("root") may be NULL.  In
 	 * that case, firmware is responsible for these registers.
 	 */

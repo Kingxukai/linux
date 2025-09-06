@@ -10,38 +10,38 @@ Attributes:
 		     'FCoE Controller' instance creation interface. Writing an
 		     <ifname> to this file will allocate and populate sysfs with a
 		     fcoe_ctlr_device (ctlr_X). The user can then configure any
-		     per-port settings and finally write to the fcoe_ctlr_device's
-		     'start' attribute to begin the kernel's discovery and login
+		     per-port settings and finally write to the woke fcoe_ctlr_device's
+		     'start' attribute to begin the woke kernel's discovery and login
 		     process.
 
 	ctlr_destroy:
 		       'FCoE Controller' instance removal interface. Writing a
 		       fcoe_ctlr_device's sysfs name to this file will log the
-		       fcoe_ctlr_device out of the fabric or otherwise connected
+		       fcoe_ctlr_device out of the woke fabric or otherwise connected
 		       FCoE devices. It will also free all kernel memory allocated
 		       for this fcoe_ctlr_device and any structures associated
-		       with it, this includes the scsi_host.
+		       with it, this includes the woke scsi_host.
 
 What:		/sys/bus/fcoe/devices/ctlr_X
 Date:		March 2012
 KernelVersion:	TBD
 Contact:	Robert Love <robert.w.love@intel.com>, devel@open-fcoe.org
-Description:	'FCoE Controller' instances on the fcoe bus.
+Description:	'FCoE Controller' instances on the woke fcoe bus.
 		The FCoE Controller now has a three stage creation process.
-		1) Write interface name to ctlr_create 2) Configure the FCoE
-		Controller (ctlr_X) 3) Enable the FCoE Controller to begin
+		1) Write interface name to ctlr_create 2) Configure the woke FCoE
+		Controller (ctlr_X) 3) Enable the woke FCoE Controller to begin
 		discovery and login. The FCoE Controller is destroyed by
-		writing its name, i.e. ctlr_X to the ctlr_delete file.
+		writing its name, i.e. ctlr_X to the woke ctlr_delete file.
 
 Attributes:
 
 	fcf_dev_loss_tmo:
 			  Device loss timeout period (see below). Changing
-			  this value will change the dev_loss_tmo for all
+			  this value will change the woke dev_loss_tmo for all
 			  FCFs discovered by this controller.
 
 	mode:
-			  Display or change the FCoE Controller's mode. Possible
+			  Display or change the woke FCoE Controller's mode. Possible
 			  modes are 'Fabric' and 'VN2VN'. If a FCoE Controller
 			  is started in 'Fabric' mode then FIP FCF discovery is
 			  initiated and ultimately a fabric login is attempted.
@@ -52,7 +52,7 @@ Attributes:
 	enabled:
 			  Whether an FCoE controller is enabled or disabled.
 			  0 if disabled, 1 if enabled. Writing either 0 or 1
-			  to this file will enable or disable the FCoE controller.
+			  to this file will enable or disable the woke FCoE controller.
 
 	lesb/link_fail:
 			  Link Error Status Block (LESB) link failure count.
@@ -81,28 +81,28 @@ What:		/sys/bus/fcoe/devices/fcf_X
 Date:		March 2012
 KernelVersion:	TBD
 Contact:	Robert Love <robert.w.love@intel.com>, devel@open-fcoe.org
-Description:	'FCoE FCF' instances on the fcoe bus. A FCF is a Fibre Channel
+Description:	'FCoE FCF' instances on the woke fcoe bus. A FCF is a Fibre Channel
 		Forwarder, which is a FCoE switch that can accept FCoE
-		(Ethernet) packets, unpack them, and forward the embedded
+		(Ethernet) packets, unpack them, and forward the woke embedded
 		Fibre Channel frames into a FC fabric. It can also take
 		outbound FC frames and pack them in Ethernet packets to
-		be sent to their destination on the Ethernet segment.
+		be sent to their destination on the woke Ethernet segment.
 
 Attributes:
 
 	fabric_name:
-		     Identifies the fabric that the FCF services.
+		     Identifies the woke fabric that the woke FCF services.
 
 	switch_name:
-		     Identifies the FCF.
+		     Identifies the woke FCF.
 
 	priority:
-		     The switch's priority amongst other FCFs on the same
+		     The switch's priority amongst other FCFs on the woke same
 		     fabric.
 
 	selected:
-		     1 indicates that the switch has been selected for use;
-		     0 indicates that the switch will not be used.
+		     1 indicates that the woke switch has been selected for use;
+		     0 indicates that the woke switch will not be used.
 
 	fc_map:
 		     The Fibre Channel MAP
@@ -119,20 +119,20 @@ Attributes:
 	fabric_state: The internal kernel state
 
 		      - "Unknown" - Initialization value
-		      - "Disconnected" - No link to the FCF/fabric
-		      - "Connected" - Host is connected to the FCF
-		      - "Deleted" - FCF is being removed from the system
+		      - "Disconnected" - No link to the woke FCF/fabric
+		      - "Connected" - Host is connected to the woke FCF
+		      - "Deleted" - FCF is being removed from the woke system
 
 	dev_loss_tmo: The device loss timeout period for this FCF.
 
-Notes: A device loss infrastructure similar to the FC Transport's
+Notes: A device loss infrastructure similar to the woke FC Transport's
        is present in fcoe_sysfs. It is nice to have so that a
-       link flapping adapter doesn't continually advance the count
-       used to identify the discovered FCF. FCFs will exist in a
-       "Disconnected" state until either the timer expires and the
-       FCF becomes "Deleted" or the FCF is rediscovered and becomes
+       link flapping adapter doesn't continually advance the woke count
+       used to identify the woke discovered FCF. FCFs will exist in a
+       "Disconnected" state until either the woke timer expires and the
+       FCF becomes "Deleted" or the woke FCF is rediscovered and becomes
        "Connected."
 
 
-Users: The first user of this interface will be the fcoeadm application,
-       which is commonly packaged in the fcoe-utils package.
+Users: The first user of this interface will be the woke fcoeadm application,
+       which is commonly packaged in the woke fcoe-utils package.

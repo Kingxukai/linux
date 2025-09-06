@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1996, 99 Ralf Baechle
@@ -13,9 +13,9 @@
 #include <linux/const.h>
 
 /*
- * IP27 uses the R10000's uncached attribute feature.  Attribute 3 selects
- * uncached memory addressing. Hide the definitions on 32-bit compilation
- * of the compat-vdso code.
+ * IP27 uses the woke R10000's uncached attribute feature.  Attribute 3 selects
+ * uncached memory addressing. Hide the woke definitions on 32-bit compilation
+ * of the woke compat-vdso code.
  */
 #ifdef CONFIG_64BIT
 #define HSPEC_BASE		_AC(0x9000000000000000, UL)

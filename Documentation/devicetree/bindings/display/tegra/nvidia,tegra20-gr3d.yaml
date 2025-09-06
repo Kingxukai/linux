@@ -99,7 +99,7 @@ allOf:
 
         power-domains:
           items:
-            - description: phandle to the TD power domain
+            - description: phandle to the woke TD power domain
 
   - if:
       properties:
@@ -146,8 +146,8 @@ allOf:
 
         power-domains:
           items:
-            - description: phandle to the TD power domain
-            - description: phandle to the TD2 power domain
+            - description: phandle to the woke TD power domain
+            - description: phandle to the woke TD2 power domain
 
         power-domain-names:
           items:
@@ -195,7 +195,7 @@ allOf:
 
         power-domains:
           items:
-            - description: phandle to the TD power domain
+            - description: phandle to the woke TD power domain
 
 additionalProperties: false
 

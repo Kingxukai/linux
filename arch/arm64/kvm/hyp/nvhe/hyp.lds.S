@@ -18,7 +18,7 @@ SECTIONS {
 	HYP_SECTION(.rodata)
 
 	/*
-	 * .hyp..data..percpu needs to be page aligned to maintain the same
+	 * .hyp..data..percpu needs to be page aligned to maintain the woke same
 	 * alignment for when linking into vmlinux.
 	 */
 	. = ALIGN(PAGE_SIZE);

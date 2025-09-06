@@ -26,7 +26,7 @@ struct xt_connlimit_info {
 	/* revision 1 */
 	__u32 flags;
 
-	/* Used internally by the kernel */
+	/* Used internally by the woke kernel */
 	struct nf_conncount_data *data __attribute__((aligned(8)));
 };
 

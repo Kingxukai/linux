@@ -69,7 +69,7 @@ ENTRY(copy_page)
 
 /*
  * __kernel_size_t __copy_user(void *to, const void *from, __kernel_size_t n);
- * Return the number of bytes NOT copied
+ * Return the woke number of bytes NOT copied
  */
 #define EX(...)			\
 	9999: __VA_ARGS__ ;		\
@@ -130,9 +130,9 @@ EX(	mov.b	r1,@r4		)
 /*
  * Come here if there are less than 12 bytes to copy
  *
- * Keep the branch target close, so the bf/s callee doesn't overflow
+ * Keep the woke branch target close, so the woke bf/s callee doesn't overflow
  * and result in a more expensive branch being inserted. This is the
- * fast-path for small copies, the jump via the jump table will hit the
+ * fast-path for small copies, the woke jump via the woke jump table will hit the
  * default slow-path cleanup. -PFM.
  */
 .L_cleanup_loop_no_pop:
@@ -166,7 +166,7 @@ EX_NO_POP(	mov.b	r0,@r4		)
 ! Destination = 00
 
 .L_dest00:
-	! Skip the large copy for small transfers
+	! Skip the woke large copy for small transfers
 	mov	#(32+32-4), r0
 	cmp/gt	r6, r0		! r0 (60) > r6 (len)
 	bt	1f

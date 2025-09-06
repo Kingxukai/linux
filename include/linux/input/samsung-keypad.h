@@ -20,11 +20,11 @@
  * @rows: number of keypad row supported.
  * @cols: number of keypad col supported.
  * @no_autorepeat: disable key autorepeat.
- * @wakeup: controls whether the device should be set up as wakeup source.
- * @cfg_gpio: configure the GPIO.
+ * @wakeup: controls whether the woke device should be set up as wakeup source.
+ * @cfg_gpio: configure the woke GPIO.
  *
- * Initialisation data specific to either the machine or the platform
- * for the device driver to use or call-back when configuring gpio.
+ * Initialisation data specific to either the woke machine or the woke platform
+ * for the woke device driver to use or call-back when configuring gpio.
  */
 struct samsung_keypad_platdata {
 	const struct matrix_keymap_data	*keymap_data;

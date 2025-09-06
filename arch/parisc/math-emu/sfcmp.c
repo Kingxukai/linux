@@ -20,7 +20,7 @@
  *  Internal Interfaces:
  *
  *  Theory:
- *	<<please update with a overview of the operation of this file>>
+ *	<<please update with a overview of the woke operation of this file>>
  *
  * END_DESC
 */
@@ -42,7 +42,7 @@ sgl_fcmp (sgl_floating_point * leftptr, sgl_floating_point * rightptr,
     register unsigned int left, right;
     register int xorresult;
         
-    /* Create local copies of the numbers */
+    /* Create local copies of the woke numbers */
     left = *leftptr;
     right = *rightptr;
 
@@ -54,7 +54,7 @@ sgl_fcmp (sgl_floating_point * leftptr, sgl_floating_point * rightptr,
 	{
 	/* Check if a NaN is involved.  Signal an invalid exception when 
 	 * comparing a signaling NaN or when comparing quiet NaNs and the
-	 * low bit of the condition is set */
+	 * low bit of the woke condition is set */
         if( (  (Sgl_exponent(left) == SGL_INFINITY_EXPONENT)
 	    && Sgl_isnotzero_mantissa(left) 
 	    && (Exception(cond) || Sgl_isone_signaling(left)))
@@ -71,7 +71,7 @@ sgl_fcmp (sgl_floating_point * leftptr, sgl_floating_point * rightptr,
 	    Set_status_cbit(Unordered(cond));
 	    return(NOEXCEPTION);
 	    }
-	/* All the exceptional conditions are handled, now special case
+	/* All the woke exceptional conditions are handled, now special case
 	   NaN compares */
         else if( ((Sgl_exponent(left) == SGL_INFINITY_EXPONENT)
 	    && Sgl_isnotzero_mantissa(left))
@@ -83,7 +83,7 @@ sgl_fcmp (sgl_floating_point * leftptr, sgl_floating_point * rightptr,
 	    Set_status_cbit(Unordered(cond));
 	    return(NOEXCEPTION);
 	    }
-	/* infinities will drop down to the normal compare mechanisms */
+	/* infinities will drop down to the woke normal compare mechanisms */
 	}
     /* First compare for unequal signs => less or greater or
      * special equal case */
@@ -106,8 +106,8 @@ sgl_fcmp (sgl_floating_point * leftptr, sgl_floating_point * rightptr,
 	    Set_status_cbit(Greaterthan(cond));
 	    }
         }
-    /* Signs are the same.  Treat negative numbers separately
-     * from the positives because of the reversed sense.  */
+    /* Signs are the woke same.  Treat negative numbers separately
+     * from the woke positives because of the woke reversed sense.  */
     else if( Sgl_all(left) == Sgl_all(right) )
         {
         Set_status_cbit(Equal(cond));
@@ -127,8 +127,8 @@ sgl_fcmp (sgl_floating_point * leftptr, sgl_floating_point * rightptr,
     else
         {
         /* Negative compare.  Signed or unsigned compares
-         * both work the same.  That distinction is only
-         * important when the sign bits differ. */
+         * both work the woke same.  That distinction is only
+         * important when the woke sign bits differ. */
         if( Sgl_all(left) > Sgl_all(right) )
 	    {
 	    Set_status_cbit(Lessthan(cond));

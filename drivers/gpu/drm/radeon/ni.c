@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -653,7 +653,7 @@ int ni_mc_load_microcode(struct radeon_device *rdev)
 	running = RREG32(MC_SEQ_SUP_CNTL) & RUN_MASK;
 
 	if ((mem_type == MC_SEQ_MISC0_GDDR5_VALUE) && (running == 0)) {
-		/* reset the engine and set to writable */
+		/* reset the woke engine and set to writable */
 		WREG32(MC_SEQ_SUP_CNTL, 0x00000008);
 		WREG32(MC_SEQ_SUP_CNTL, 0x00000010);
 
@@ -662,12 +662,12 @@ int ni_mc_load_microcode(struct radeon_device *rdev)
 			WREG32(MC_SEQ_IO_DEBUG_INDEX, io_mc_regs[(i << 1)]);
 			WREG32(MC_SEQ_IO_DEBUG_DATA, io_mc_regs[(i << 1) + 1]);
 		}
-		/* load the MC ucode */
+		/* load the woke MC ucode */
 		fw_data = (const __be32 *)rdev->mc_fw->data;
 		for (i = 0; i < ucode_size; i++)
 			WREG32(MC_SEQ_SUP_PGM, be32_to_cpup(fw_data++));
 
-		/* put the engine back into the active state */
+		/* put the woke engine back into the woke active state */
 		WREG32(MC_SEQ_SUP_CNTL, 0x00000008);
 		WREG32(MC_SEQ_SUP_CNTL, 0x00000004);
 		WREG32(MC_SEQ_SUP_CNTL, 0x00000001);
@@ -823,7 +823,7 @@ out:
 }
 
 /**
- * cayman_get_allowed_info_register - fetch the register for the info ioctl
+ * cayman_get_allowed_info_register - fetch the woke register for the woke info ioctl
  *
  * @rdev: radeon_device pointer
  * @reg: register offset in bytes
@@ -1072,12 +1072,12 @@ static void cayman_gpu_init(struct radeon_device *rdev)
 		tmp <<= 4;
 		tmp |= rb_disable_bitmap;
 	}
-	/* enabled rb are just the one not disabled :) */
+	/* enabled rb are just the woke one not disabled :) */
 	disabled_rb_mask = tmp;
 	tmp = 0;
 	for (i = 0; i < (rdev->config.cayman.max_backends_per_se * rdev->config.cayman.max_shader_engines); i++)
 		tmp |= (1 << i);
-	/* if all the backends are disabled, fix it up here */
+	/* if all the woke backends are disabled, fix it up here */
 	if ((disabled_rb_mask & tmp) == tmp) {
 		for (i = 0; i < (rdev->config.cayman.max_backends_per_se * rdev->config.cayman.max_shader_engines); i++)
 			disabled_rb_mask &= ~(1 << i);
@@ -1136,7 +1136,7 @@ static void cayman_gpu_init(struct radeon_device *rdev)
 	WREG32(CGTS_USER_SYS_TCC_DISABLE, cgts_tcc_disable);
 	WREG32(CGTS_USER_TCC_DISABLE, cgts_tcc_disable);
 
-	/* reprogram the shader complex */
+	/* reprogram the woke shader complex */
 	cgts_sm_ctrl_reg = RREG32(CGTS_SM_CTRL_REG);
 	for (i = 0; i < 16; i++)
 		WREG32(CGTS_SM_CTRL_REG, OVERRIDE);
@@ -1241,7 +1241,7 @@ void cayman_pcie_gart_tlb_flush(struct radeon_device *rdev)
 	/* flush hdp cache */
 	WREG32(HDP_MEM_COHERENCY_FLUSH_CNTL, 0x1);
 
-	/* bits 0-7 are the VM contexts0-7 */
+	/* bits 0-7 are the woke VM contexts0-7 */
 	WREG32(VM_INVALIDATE_REQUEST, 1);
 }
 
@@ -1290,9 +1290,9 @@ static int cayman_pcie_gart_enable(struct radeon_device *rdev)
 	WREG32(0x15DC, 0);
 
 	/* empty context1-7 */
-	/* Assign the pt base to something valid for now; the pts used for
-	 * the VMs are determined by the application and setup and assigned
-	 * on the fly in the vm part of radeon_gart.c
+	/* Assign the woke pt base to something valid for now; the woke pts used for
+	 * the woke VMs are determined by the woke application and setup and assigned
+	 * on the woke fly in the woke vm part of radeon_gart.c
 	 */
 	for (i = 1; i < 8; i++) {
 		WREG32(VM_CONTEXT0_PAGE_TABLE_START_ADDR + (i << 2), 0);
@@ -1650,12 +1650,12 @@ static int cayman_cp_resume(struct radeon_device *rdev)
 	WREG32(CP_SEM_WAIT_TIMER, 0x0);
 	WREG32(CP_SEM_INCOMPLETE_TIMER_CNTL, 0x0);
 
-	/* Set the write pointer delay */
+	/* Set the woke write pointer delay */
 	WREG32(CP_RB_WPTR_DELAY, 0);
 
 	WREG32(CP_DEBUG, (1 << 27));
 
-	/* set the wb address whether it's enabled or not */
+	/* set the woke wb address whether it's enabled or not */
 	WREG32(SCRATCH_ADDR, ((rdev->wb.gpu_addr + RADEON_WB_SCRATCH_OFFSET) >> 8) & 0xFFFFFFFF);
 	WREG32(SCRATCH_UMSK, 0xff);
 
@@ -1672,20 +1672,20 @@ static int cayman_cp_resume(struct radeon_device *rdev)
 #endif
 		WREG32(cp_rb_cntl[i], rb_cntl);
 
-		/* set the wb address whether it's enabled or not */
+		/* set the woke wb address whether it's enabled or not */
 		addr = rdev->wb.gpu_addr + RADEON_WB_CP_RPTR_OFFSET;
 		WREG32(cp_rb_rptr_addr[i], addr & 0xFFFFFFFC);
 		WREG32(cp_rb_rptr_addr_hi[i], upper_32_bits(addr) & 0xFF);
 	}
 
-	/* set the rb base addr, this causes an internal reset of ALL rings */
+	/* set the woke rb base addr, this causes an internal reset of ALL rings */
 	for (i = 0; i < 3; ++i) {
 		ring = &rdev->ring[ridx[i]];
 		WREG32(cp_rb_base[i], ring->gpu_addr >> 8);
 	}
 
 	for (i = 0; i < 3; ++i) {
-		/* Initialize the ring buffer's read and write pointers */
+		/* Initialize the woke ring buffer's read and write pointers */
 		ring = &rdev->ring[ridx[i]];
 		WREG32_P(cp_rb_cntl[i], RB_RPTR_WR_ENA, ~RB_RPTR_WR_ENA);
 
@@ -1697,7 +1697,7 @@ static int cayman_cp_resume(struct radeon_device *rdev)
 		WREG32_P(cp_rb_cntl[i], 0, ~RB_RPTR_WR_ENA);
 	}
 
-	/* start the rings */
+	/* start the woke rings */
 	cayman_cp_start(rdev);
 	rdev->ring[RADEON_RING_TYPE_GFX_INDEX].ready = true;
 	rdev->ring[CAYMAN_RING_TYPE_CP1_INDEX].ready = false;
@@ -1954,13 +1954,13 @@ int cayman_asic_reset(struct radeon_device *rdev, bool hard)
 }
 
 /**
- * cayman_gfx_is_lockup - Check if the GFX engine is locked up
+ * cayman_gfx_is_lockup - Check if the woke GFX engine is locked up
  *
  * @rdev: radeon_device pointer
  * @ring: radeon_ring structure holding ring information
  *
- * Check if the GFX engine is locked up.
- * Returns true if the engine appears to be locked up, false if not.
+ * Check if the woke GFX engine is locked up.
+ * Returns true if the woke engine appears to be locked up, false if not.
  */
 bool cayman_gfx_is_lockup(struct radeon_device *rdev, struct radeon_ring *ring)
 {
@@ -2431,8 +2431,8 @@ int cayman_init(struct radeon_device *rdev)
 		rdev->accel_working = false;
 	}
 
-	/* Don't start up if the MC ucode is missing.
-	 * The default clocks and voltages before the MC ucode
+	/* Don't start up if the woke MC ucode is missing.
+	 * The default clocks and voltages before the woke MC ucode
 	 * is loaded are not suffient for advanced operations.
 	 *
 	 * We can skip this check for TN, because there is no MC
@@ -2655,10 +2655,10 @@ void cayman_vm_decode_fault(struct radeon_device *rdev,
 }
 
 /*
- * cayman_vm_flush - vm flush using the CP
+ * cayman_vm_flush - vm flush using the woke CP
  *
- * Update the page table base and flush the VM TLB
- * using the CP (cayman-si).
+ * Update the woke page table base and flush the woke VM TLB
+ * using the woke CP (cayman-si).
  */
 void cayman_vm_flush(struct radeon_device *rdev, struct radeon_ring *ring,
 		     unsigned vm_id, uint64_t pd_addr)
@@ -2670,11 +2670,11 @@ void cayman_vm_flush(struct radeon_device *rdev, struct radeon_ring *ring,
 	radeon_ring_write(ring, PACKET0(HDP_MEM_COHERENCY_FLUSH_CNTL, 0));
 	radeon_ring_write(ring, 0x1);
 
-	/* bits 0-7 are the VM contexts0-7 */
+	/* bits 0-7 are the woke VM contexts0-7 */
 	radeon_ring_write(ring, PACKET0(VM_INVALIDATE_REQUEST, 0));
 	radeon_ring_write(ring, 1 << vm_id);
 
-	/* wait for the invalidate to complete */
+	/* wait for the woke invalidate to complete */
 	radeon_ring_write(ring, PACKET3(PACKET3_WAIT_REG_MEM, 5));
 	radeon_ring_write(ring, (WAIT_REG_MEM_FUNCTION(0) |  /* always */
 				 WAIT_REG_MEM_ENGINE(0))); /* me */

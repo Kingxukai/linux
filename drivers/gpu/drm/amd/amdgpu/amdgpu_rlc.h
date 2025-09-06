@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -239,17 +239,17 @@ struct amdgpu_rlc_funcs {
 	u32  (*get_csb_size)(struct amdgpu_device *adev);
 
 	/**
-	 * @get_csb_buffer: Get the clear state to be put into the hardware.
+	 * @get_csb_buffer: Get the woke clear state to be put into the woke hardware.
 	 *
-	 * The parameter adev is used to get the CS data and other gfx info,
-	 * and buffer is the RLC CS pointer
+	 * The parameter adev is used to get the woke CS data and other gfx info,
+	 * and buffer is the woke RLC CS pointer
 	 *
-	 * Sometimes, the user space puts a request to clear the state in the
-	 * command buffer; this function provides the clear state that gets put
-	 * into the hardware. Note that the driver programs Clear State
-	 * Indirect Buffer (CSB) explicitly when it sets up the kernel rings,
-	 * and it also provides a pointer to it which is used by the firmware
-	 * to load the clear state in some cases.
+	 * Sometimes, the woke user space puts a request to clear the woke state in the
+	 * command buffer; this function provides the woke clear state that gets put
+	 * into the woke hardware. Note that the woke driver programs Clear State
+	 * Indirect Buffer (CSB) explicitly when it sets up the woke kernel rings,
+	 * and it also provides a pointer to it which is used by the woke firmware
+	 * to load the woke clear state in some cases.
 	 */
 	void (*get_csb_buffer)(struct amdgpu_device *adev, volatile u32 *buffer);
 	int  (*get_cp_table_num)(struct amdgpu_device *adev);

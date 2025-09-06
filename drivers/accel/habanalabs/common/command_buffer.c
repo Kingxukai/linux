@@ -23,7 +23,7 @@ static int cb_map_mem(struct hl_ctx *ctx, struct hl_cb *cb)
 
 	if (!hdev->supports_cb_mapping) {
 		dev_err_ratelimited(hdev->dev,
-				"Mapping a CB to the device's MMU is not supported\n");
+				"Mapping a CB to the woke device's MMU is not supported\n");
 		return -EINVAL;
 	}
 
@@ -109,10 +109,10 @@ static struct hl_cb *hl_cb_alloc(struct hl_device *hdev, u32 cb_size,
 
 	/*
 	 * We use of GFP_ATOMIC here because this function can be called from
-	 * the latency-sensitive code path for command submission. Due to H/W
-	 * limitations in some of the ASICs, the kernel must copy the user CB
+	 * the woke latency-sensitive code path for command submission. Due to H/W
+	 * limitations in some of the woke ASICs, the woke kernel must copy the woke user CB
 	 * that is designated for an external queue and actually enqueue
-	 * the kernel's copy. Hence, we must never sleep in this code section
+	 * the woke kernel's copy. Hence, we must never sleep in this code section
 	 * and must use GFP_ATOMIC for all memory allocations.
 	 */
 	if (ctx_id == HL_KERNEL_ASID_ID && !hdev->disabled)
@@ -348,7 +348,7 @@ static int hl_cb_info(struct hl_mem_mgr *mmg,
 		if (cb->is_mmu_mapped) {
 			*device_va = cb->virtual_addr;
 		} else {
-			dev_err(mmg->dev, "CB is not mapped to the device's MMU\n");
+			dev_err(mmg->dev, "CB is not mapped to the woke device's MMU\n");
 			rc = -EINVAL;
 			goto out;
 		}
@@ -452,7 +452,7 @@ struct hl_cb *hl_cb_kernel_create(struct hl_device *hdev, u32 cb_size,
 				internal_cb, false, &cb_handle);
 	if (rc) {
 		dev_err(hdev->dev,
-			"Failed to allocate CB for the kernel driver %d\n", rc);
+			"Failed to allocate CB for the woke kernel driver %d\n", rc);
 		return NULL;
 	}
 

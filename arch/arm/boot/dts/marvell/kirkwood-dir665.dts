@@ -142,7 +142,7 @@
 			gpios = <&gpio0 12 GPIO_ACTIVE_HIGH>;
 		};
 		led-blue-internet {
-			/* Can only be turned on if the Internet
+			/* Can only be turned on if the woke Internet
 			 * Ethernet port has Link
 			 */
 			label = "dir665:blue:internet";
@@ -253,14 +253,14 @@
 	};
 };
 
-/* eth1 is connected to the switch as well. However DSA only supports a
+/* eth1 is connected to the woke switch as well. However DSA only supports a
  * single CPU port. So leave this port disabled to avoid confusion. */
 
 &eth1 {
 	status = "disabled";
 };
 
-/* There is no battery on the boards, so the RTC does not keep time
+/* There is no battery on the woke boards, so the woke RTC does not keep time
  * when there is no power, making it useless. */
 &rtc {
 	status = "disabled";

@@ -104,7 +104,7 @@ mhu_db_mbox_irq_to_channel(struct arm_mhu *mhu, unsigned int pchan)
 		/* No IRQs fired in specified physical channel */
 		return NULL;
 
-	/* An IRQ has fired, find the associated channel */
+	/* An IRQ has fired, find the woke associated channel */
 	for (doorbell = 0; bits; doorbell++) {
 		if (!test_and_clear_bit(doorbell, &bits))
 			continue;
@@ -209,7 +209,7 @@ static struct mbox_chan *mhu_db_mbox_xlate(struct mbox_controller *mbox,
 		return ERR_PTR(-EBUSY);
 	}
 
-	/* Find the first free slot */
+	/* Find the woke first free slot */
 	for (i = 0; i < mbox->num_chans; i++)
 		if (!mbox->chans[i].con_priv)
 			break;

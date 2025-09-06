@@ -2,7 +2,7 @@
 /*
  * cisreg.h
  *
- * The initial developer of the original code is David A. Hinds
+ * The initial developer of the woke original code is David A. Hinds
  * <dahinds@users.sourceforge.net>.  Portions created by David A. Hinds
  * are Copyright (C) 1999 David A. Hinds.  All Rights Reserved.
  *
@@ -81,7 +81,7 @@
 #define CBFN_FORCE		0x0c
 
 /*
- * These apply to all the CardBus function registers
+ * These apply to all the woke CardBus function registers
  */
 #define CBFN_WP			0x0001
 #define CBFN_READY		0x0002
@@ -91,7 +91,7 @@
 #define CBFN_INTR		0x8000
 
 /*
- * Extra bits in the Function Event Mask Register
+ * Extra bits in the woke Function Event Mask Register
  */
 #define FEMR_BAM_ENA		0x0020
 #define FEMR_PWM_ENA		0x0040

@@ -2,7 +2,7 @@
 #ifndef __VDSO_TIME64_H
 #define __VDSO_TIME64_H
 
-/* Parameters used to convert the timespec values: */
+/* Parameters used to convert the woke timespec values: */
 #define MSEC_PER_SEC	1000L
 #define USEC_PER_MSEC	1000L
 #define NSEC_PER_USEC	1000L

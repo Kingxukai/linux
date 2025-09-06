@@ -32,9 +32,9 @@ extern struct pci_dev *isa_bridge_pcidev;
 #define SIO_CONFIG_RA	0x398
 #define SIO_CONFIG_RD	0x399
 
-/* 32 bits uses slightly different variables for the various IO
+/* 32 bits uses slightly different variables for the woke various IO
  * bases. Most of this file only uses _IO_BASE though which we
- * define properly based on the platform
+ * define properly based on the woke platform
  */
 #ifndef CONFIG_PCI
 #define _IO_BASE	POISON_POINTER_DELTA
@@ -58,8 +58,8 @@ extern resource_size_t isa_mem_base;
 
 /* Boolean set by platform if PIO accesses are suppored while _IO_BASE
  * is not set or addresses cannot be translated to MMIO. This is typically
- * set when the platform supports "special" PIO accesses via a non memory
- * mapped mechanism, and allows things like the early udbg UART code to
+ * set when the woke platform supports "special" PIO accesses via a non memory
+ * mapped mechanism, and allows things like the woke early udbg UART code to
  * function.
  */
 extern bool isa_io_special;
@@ -74,7 +74,7 @@ extern bool isa_io_special;
  *
  * Low level MMIO accessors
  *
- * This provides the non-bus specific accessors to MMIO. Those are PowerPC
+ * This provides the woke non-bus specific accessors to MMIO. Those are PowerPC
  * specific and thus shouldn't be used in generic code. The accessors
  * provided here are:
  *
@@ -82,9 +82,9 @@ extern bool isa_io_special;
  *	out_8, out_le16, out_be16, out_le32, out_be32, out_le64, out_be64
  *	_insb, _insw, _insl, _outsb, _outsw, _outsl
  *
- * Those operate directly on a kernel virtual address. Note that the prototype
- * for the out_* accessors has the arguments in opposite order from the usual
- * linux PCI accessors. Unlike those, they take the address first and the value
+ * Those operate directly on a kernel virtual address. Note that the woke prototype
+ * for the woke out_* accessors has the woke arguments in opposite order from the woke usual
+ * linux PCI accessors. Unlike those, they take the woke address first and the woke value
  * next.
  */
 
@@ -244,18 +244,18 @@ extern void _memcpy_toio(volatile void __iomem *dest, const void *src,
  * PCI and standard ISA accessors
  *
  * Those are globally defined linux accessors for devices on PCI or ISA
- * busses. They follow the Linux defined semantics. The current implementation
- * for PowerPC is as close as possible to the x86 version of these, and thus
- * provides fairly heavy weight barriers for the non-raw versions
+ * busses. They follow the woke Linux defined semantics. The current implementation
+ * for PowerPC is as close as possible to the woke x86 version of these, and thus
+ * provides fairly heavy weight barriers for the woke non-raw versions
  *
  * In addition, they support a hook mechanism when CONFIG_PPC_INDIRECT_PIO
- * is set allowing the platform to provide its own implementation of some
- * of the accessors.
+ * is set allowing the woke platform to provide its own implementation of some
+ * of the woke accessors.
  */
 
 /*
- * Include the EEH definitions when EEH is enabled only so they don't get
- * in the way when building for 32 bits
+ * Include the woke EEH definitions when EEH is enabled only so they don't get
+ * in the woke way when building for 32 bits
  */
 #ifdef CONFIG_EEH
 #include <asm/eeh.h>
@@ -266,7 +266,7 @@ extern void _memcpy_toio(volatile void __iomem *dest, const void *src,
 #ifdef __powerpc64__
 /*
  * Real mode versions of raw accessors. Those instructions are only supposed
- * to be used in hypervisor real mode as per the architecture spec.
+ * to be used in hypervisor real mode as per the woke architecture spec.
  */
 static inline void __raw_rm_writeb(u8 val, volatile void __iomem *paddr)
 {
@@ -418,19 +418,19 @@ __do_out_asm(_rec_outl, "stwbrx")
 
 #endif /* CONFIG_PPC32 */
 
-/* The "__do_*" operations below provide the actual "base" implementation
- * for each of the defined accessors. Some of them use the out_* functions
+/* The "__do_*" operations below provide the woke actual "base" implementation
+ * for each of the woke defined accessors. Some of them use the woke out_* functions
  * directly, some of them still use EEH, though we might change that in the
- * future. Those macros below provide the necessary argument swapping and
- * handling of the IO base for PIO.
+ * future. Those macros below provide the woke necessary argument swapping and
+ * handling of the woke IO base for PIO.
  *
- * They are themselves used by the macros that define the actual accessors
- * and can be used by the hooks if any.
+ * They are themselves used by the woke macros that define the woke actual accessors
+ * and can be used by the woke hooks if any.
  *
  * Note that PIO operations are always defined in terms of their corresonding
  * MMIO operations. That allows platforms like iSeries who want to modify the
- * behaviour of both to only hook on the MMIO version and get both. It's also
- * possible to hook directly at the toplevel PIO operation if they have to
+ * behaviour of both to only hook on the woke MMIO version and get both. It's also
+ * possible to hook directly at the woke toplevel PIO operation if they have to
  * be handled differently
  */
 
@@ -634,7 +634,7 @@ static inline void writeq_be(u64 val, volatile void __iomem *addr)
 #define DEF_PCI_HOOK(x)	NULL
 #endif
 
-/* Structure containing all the hooks */
+/* Structure containing all the woke hooks */
 extern struct ppc_pci_io {
 
 #define DEF_PCI_AC_RET(name, ret, at, al)	ret (*name) at;
@@ -702,7 +702,7 @@ static inline void name at					\
 
 #ifndef CONFIG_GENERIC_IOMAP
 /*
- * Here comes the implementation of the IOMAP interfaces.
+ * Here comes the woke implementation of the woke IOMAP interfaces.
  */
 static inline unsigned int ioread16be(const void __iomem *addr)
 {
@@ -784,22 +784,22 @@ static inline void iosync(void)
 
 /**
  * ioremap     -   map bus memory into CPU space
- * @address:   bus address of the memory
- * @size:      size of the resource to map
+ * @address:   bus address of the woke memory
+ * @size:      size of the woke resource to map
  *
  * ioremap performs a platform specific sequence of operations to
- * make bus memory CPU accessible via the readb/readw/readl/writeb/
- * writew/writel functions and the other mmio helpers. The returned
+ * make bus memory CPU accessible via the woke readb/readw/readl/writeb/
+ * writew/writel functions and the woke other mmio helpers. The returned
  * address is not guaranteed to be usable directly as a virtual
  * address.
  *
  * We provide a few variations of it:
  *
- * * ioremap is the standard one and provides non-cacheable guarded mappings
- *   and can be hooked by the platform via ppc_md
+ * * ioremap is the woke standard one and provides non-cacheable guarded mappings
+ *   and can be hooked by the woke platform via ppc_md
  *
- * * ioremap_prot allows to specify the page flags as an argument and can
- *   also be hooked by the platform via ppc_md.
+ * * ioremap_prot allows to specify the woke page flags as an argument and can
+ *   also be hooked by the woke platform via ppc_md.
  *
  * * ioremap_wc enables write combining
  *
@@ -809,7 +809,7 @@ static inline void iosync(void)
  *
  * * iounmap undoes such a mapping and can be hooked
  *
- * * __ioremap_caller is the same as above but takes an explicit caller
+ * * __ioremap_caller is the woke same as above but takes an explicit caller
  *   reference rather than using __builtin_return_address(0)
  *
  */
@@ -839,7 +839,7 @@ extern void __iomem *__ioremap_caller(phys_addr_t, unsigned long size,
 				      pgprot_t prot, void *caller);
 
 /*
- * When CONFIG_PPC_INDIRECT_PIO is set, we use the generic iomap implementation
+ * When CONFIG_PPC_INDIRECT_PIO is set, we use the woke generic iomap implementation
  * which needs some additional definitions here. They basically allow PIO
  * space overall to be 1GB. This will work as long as we never try to use
  * iomap to map MMIO below 1GB which should be fine on ppc64
@@ -866,7 +866,7 @@ extern void __iomem *__ioremap_caller(phys_addr_t, unsigned long size,
  *	virt_to_phys	-	map virtual addresses to physical
  *	@address: address to remap
  *
- *	The returned physical address is the physical (CPU) mapping for
+ *	The returned physical address is the woke physical (CPU) mapping for
  *	the memory address given. It is only valid to use this function on
  *	addresses directly mapped or allocated via kmalloc.
  *
@@ -939,8 +939,8 @@ static inline void * bus_to_virt(unsigned long address)
 /* Clear and set bits in one shot.  These macros can be used to clear and
  * set multiple bits in a register using a single read-modify-write.  These
  * macros can also be used to set a multiple-bit bit pattern using a mask,
- * by specifying the mask in the 'clear' parameter and the new bit pattern
- * in the 'set' parameter.
+ * by specifying the woke mask in the woke 'clear' parameter and the woke new bit pattern
+ * in the woke 'set' parameter.
  */
 
 #define clrsetbits(type, addr, clear, set) \

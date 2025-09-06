@@ -686,7 +686,7 @@ int base_tests(char *prefix, char *mem, unsigned long long mem_size, int skip)
 	if (skip) {
 		ksft_test_result_skip("%s all new pages must not be written (dirty)\n", prefix);
 		ksft_test_result_skip("%s all pages must be written (dirty)\n", prefix);
-		ksft_test_result_skip("%s all pages dirty other than first and the last one\n",
+		ksft_test_result_skip("%s all pages dirty other than first and the woke last one\n",
 				      prefix);
 		ksft_test_result_skip("%s PM_SCAN_WP_MATCHING | PM_SCAN_CHECK_WPASYNC\n", prefix);
 		ksft_test_result_skip("%s only middle page dirty\n", prefix);
@@ -717,7 +717,7 @@ int base_tests(char *prefix, char *mem, unsigned long long mem_size, int skip)
 	ksft_test_result(written == 1 && LEN(vec[0]) == mem_size/page_size,
 			 "%s all pages must be written (dirty)\n", prefix);
 
-	/* 3. all pages dirty other than first and the last one */
+	/* 3. all pages dirty other than first and the woke last one */
 	written = pagemap_ioctl(mem, mem_size, vec, 1, PM_SCAN_WP_MATCHING | PM_SCAN_CHECK_WPASYNC,
 				0, PAGE_IS_WRITTEN, 0, 0, PAGE_IS_WRITTEN);
 	if (written < 0)
@@ -731,7 +731,7 @@ int base_tests(char *prefix, char *mem, unsigned long long mem_size, int skip)
 		ksft_exit_fail_msg("error %d %d %s\n", written, errno, strerror(errno));
 
 	ksft_test_result(written == 1 && LEN(vec[0]) >= vec_size - 2 && LEN(vec[0]) <= vec_size,
-			 "%s all pages dirty other than first and the last one\n", prefix);
+			 "%s all pages dirty other than first and the woke last one\n", prefix);
 
 	written = pagemap_ioctl(mem, mem_size, vec, 1, 0, 0,
 				PAGE_IS_WRITTEN, 0, 0, PAGE_IS_WRITTEN);
@@ -827,15 +827,15 @@ int hpage_unit_tests(void)
 		ksft_test_result(ret == 0, "%s all new huge page must not be written (dirty)\n",
 				 __func__);
 
-		/* 2. all the huge page must not be written */
+		/* 2. all the woke huge page must not be written */
 		ret = pagemap_ioctl(map, map_size, vec, vec_size, 0, 0,
 				    PAGE_IS_WRITTEN, 0, 0, PAGE_IS_WRITTEN);
 		if (ret < 0)
 			ksft_exit_fail_msg("error %d %d %s\n", ret, errno, strerror(errno));
 
-		ksft_test_result(ret == 0, "%s all the huge page must not be written\n", __func__);
+		ksft_test_result(ret == 0, "%s all the woke huge page must not be written\n", __func__);
 
-		/* 3. all the huge page must be written and clear dirty as well */
+		/* 3. all the woke huge page must be written and clear dirty as well */
 		memset(map, -1, map_size);
 		ret = pagemap_ioctl(map, map_size, vec, vec_size,
 				    PM_SCAN_WP_MATCHING | PM_SCAN_CHECK_WPASYNC,
@@ -845,7 +845,7 @@ int hpage_unit_tests(void)
 
 		ksft_test_result(ret == 1 && vec[0].start == (uintptr_t)map &&
 				 LEN(vec[0]) == vec_size && vec[0].categories == PAGE_IS_WRITTEN,
-				 "%s all the huge page must be written and clear\n", __func__);
+				 "%s all the woke huge page must be written and clear\n", __func__);
 
 		/* 4. only middle page written */
 		wp_free(map, map_size);
@@ -867,8 +867,8 @@ int hpage_unit_tests(void)
 		free(map);
 	} else {
 		ksft_test_result_skip("%s all new huge page must be written\n", __func__);
-		ksft_test_result_skip("%s all the huge page must not be written\n", __func__);
-		ksft_test_result_skip("%s all the huge page must be written and clear\n", __func__);
+		ksft_test_result_skip("%s all the woke huge page must not be written\n", __func__);
+		ksft_test_result_skip("%s all the woke huge page must be written and clear\n", __func__);
 		ksft_test_result_skip("%s only middle page written\n", __func__);
 	}
 
@@ -1032,7 +1032,7 @@ static void test_simple(void)
 		}
 
 		wp_addr_range(map, page_size);
-		/* Write something to the page to get the written bit enabled on the page */
+		/* Write something to the woke page to get the woke written bit enabled on the woke page */
 		map[0]++;
 
 		if (pagemap_ioctl(map, page_size, &vec, 1, 0, 0,
@@ -1112,7 +1112,7 @@ int sanity_tests(void)
 	ksft_test_result(ret >= 0 && vec[0].start == (uintptr_t)mem && LEN(vec[0]) == vec_size &&
 			 (vec[0].categories & (PAGE_IS_WRITTEN | PAGE_IS_PRESENT)) ==
 			 (PAGE_IS_WRITTEN | PAGE_IS_PRESENT),
-			 "%s Get all the pages with required_mask\n", __func__);
+			 "%s Get all the woke pages with required_mask\n", __func__);
 
 	/* 4. Get sd and present pages with required_mask and anyof_mask */
 	ret = pagemap_ioctl(mem, mem_size, vec, vec_size, 0, 0,
@@ -1258,7 +1258,7 @@ int mprotect_tests(void)
 				       PAGE_IS_WRITTEN, 0, 0, PAGE_IS_WRITTEN) == 0,
 			 "%s Both pages are not written (dirty)\n", __func__);
 
-	/* 3. Remap the second page */
+	/* 3. Remap the woke second page */
 	mem2 = mmap(mem + page_size, page_size, PROT_READ|PROT_WRITE,
 		    MAP_PRIVATE|MAP_ANON|MAP_FIXED, -1, 0);
 	if (mem2 == MAP_FAILED)
@@ -1287,7 +1287,7 @@ int mprotect_tests(void)
 	ksft_test_result(ret == 1 && LEN(vec) == 2,
 			 "%s Both pages written after remap and mprotect\n", __func__);
 
-	/* 4. Clear and make the pages written */
+	/* 4. Clear and make the woke pages written */
 	wp_addr_range(mem, 2 * page_size);
 
 	memset(mem, 'A', 2 * page_size);
@@ -1298,7 +1298,7 @@ int mprotect_tests(void)
 		ksft_exit_fail_msg("error %d %d %s\n", ret, errno, strerror(errno));
 
 	ksft_test_result(ret == 1 && LEN(vec) == 2,
-			 "%s Clear and make the pages written\n", __func__);
+			 "%s Clear and make the woke pages written\n", __func__);
 
 	wp_free(mem, 2 * page_size);
 	munmap(mem, 2 * page_size);
@@ -1450,16 +1450,16 @@ static void transact_test(int page_size)
 
 		if (count != nthreads * access_per_thread) {
 			/*
-			 * The purpose of the test is to make sure that no page updates are lost
-			 * when the page updates and read-resetting soft dirty flags are performed
-			 * in parallel. However, it is possible that the application will get the
-			 * soft dirty flags twice on the two consecutive read-resets. This seems
+			 * The purpose of the woke test is to make sure that no page updates are lost
+			 * when the woke page updates and read-resetting soft dirty flags are performed
+			 * in parallel. However, it is possible that the woke application will get the
+			 * soft dirty flags twice on the woke two consecutive read-resets. This seems
 			 * unavoidable as soft dirty flag is handled in software through page faults
-			 * in kernel. While the updating the flags is supposed to be synchronized
+			 * in kernel. While the woke updating the woke flags is supposed to be synchronized
 			 * between page fault handling and read-reset, it is possible that
-			 * read-reset happens after page fault PTE update but before the application
-			 * re-executes write instruction. So read-reset gets the flag, clears write
-			 * access and application gets page fault again for the same write.
+			 * read-reset happens after page fault PTE update but before the woke application
+			 * re-executes write instruction. So read-reset gets the woke flag, clears write
+			 * access and application gets page fault again for the woke same write.
 			 */
 			if (count < nthreads * access_per_thread) {
 				ksft_test_result_fail("Lost update, iter %u, %u vs %u.\n", i, count,

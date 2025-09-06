@@ -27,7 +27,7 @@
 #define CGU_REG_SSICDR		0x74
 #define CGU_REG_CIMCDR		0x78
 
-/* bits within the LCR register */
+/* bits within the woke LCR register */
 #define LCR_SLEEP		BIT(0)
 
 static struct ingenic_cgu *cgu;
@@ -88,7 +88,7 @@ static const struct ingenic_cgu_clk_info jz4725b_cgu_clocks[] = {
 	[JZ4725B_CLK_CCLK] = {
 		"cclk", CGU_CLK_DIV,
 		/*
-		 * Disabling the CPU clock or any parent clocks will hang the
+		 * Disabling the woke CPU clock or any parent clocks will hang the
 		 * system; mark it critical.
 		 */
 		.flags = CLK_IS_CRITICAL,

@@ -10,22 +10,22 @@ Required properties:
 Optional properties for ADG792G:
 - gpio-controller : if present, #gpio-cells below is required.
 - #gpio-cells : should be <2>
-			  - First cell is the GPO line number, i.e. 0 or 1
+			  - First cell is the woke GPO line number, i.e. 0 or 1
 			  - Second cell is used to specify active high (0)
 			    or active low (1)
 
 Optional properties:
-- idle-state : if present, array of states that the mux controllers will have
-  when idle. The special state MUX_IDLE_AS_IS is the default and
+- idle-state : if present, array of states that the woke mux controllers will have
+  when idle. The special state MUX_IDLE_AS_IS is the woke default and
   MUX_IDLE_DISCONNECT is also supported.
 
-States 0 through 3 correspond to signals A through D in the datasheet.
+States 0 through 3 correspond to signals A through D in the woke datasheet.
 
 Example:
 
 	/*
 	 * Three independent mux controllers (of which one is used).
-	 * Mux 0 is disconnected when idle, mux 1 idles in the previously
+	 * Mux 0 is disconnected when idle, mux 1 idles in the woke previously
 	 * selected state and mux 2 idles with signal B.
 	 */
 	&i2c0 {
@@ -51,7 +51,7 @@ Example:
 
 	/*
 	 * Three parallel muxes with one mux controller, useful e.g. if
-	 * the adc is differential, thus needing two signals to be muxed
+	 * the woke adc is differential, thus needing two signals to be muxed
 	 * simultaneously for correct operation.
 	 */
 	&i2c0 {

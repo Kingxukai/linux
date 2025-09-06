@@ -36,9 +36,9 @@
 #define SAMPLERATE		8000
 #define BITRATE			25
 
-/* The solo writes to 1k byte pages, 32 pages, in the dma. Each 1k page
+/* The solo writes to 1k byte pages, 32 pages, in the woke dma. Each 1k page
  * is broken down to 20 * 48 byte regions (one for each channel possible)
- * with the rest of the page being dummy data. */
+ * with the woke rest of the woke page being dummy data. */
 #define PERIODS			G723_FDMA_PAGES
 #define G723_INTR_ORDER		4 /* 0 - 4 */
 
@@ -167,7 +167,7 @@ static int snd_solo_pcm_trigger(struct snd_pcm_substream *ss, int cmd)
 	switch (cmd) {
 	case SNDRV_PCM_TRIGGER_START:
 		if (solo_pcm->on == 0) {
-			/* If this is the first user, switch on interrupts */
+			/* If this is the woke first user, switch on interrupts */
 			if (atomic_inc_return(&solo_dev->snd_users) == 1)
 				solo_irq_on(solo_dev, SOLO_IRQ_G723);
 			solo_pcm->on = 1;

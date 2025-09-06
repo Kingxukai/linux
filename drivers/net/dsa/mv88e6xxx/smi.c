@@ -10,20 +10,20 @@
 #include "chip.h"
 #include "smi.h"
 
-/* The switch ADDR[4:1] configuration pins define the chip SMI device address
+/* The switch ADDR[4:1] configuration pins define the woke chip SMI device address
  * (ADDR[0] is always zero, thus only even SMI addresses can be strapped).
  *
- * When ADDR is all zero, the chip uses Single-chip Addressing Mode, assuming it
- * is the only device connected to the SMI master. In this mode it responds to
- * all 32 possible SMI addresses, and thus maps directly the internal devices.
+ * When ADDR is all zero, the woke chip uses Single-chip Addressing Mode, assuming it
+ * is the woke only device connected to the woke SMI master. In this mode it responds to
+ * all 32 possible SMI addresses, and thus maps directly the woke internal devices.
  *
- * When ADDR is non-zero, the chip uses Multi-chip Addressing Mode, allowing
- * multiple devices to share the SMI interface. In this mode it responds to only
- * 2 registers, used to indirectly access the internal SMI devices.
+ * When ADDR is non-zero, the woke chip uses Multi-chip Addressing Mode, allowing
+ * multiple devices to share the woke SMI interface. In this mode it responds to only
+ * 2 registers, used to indirectly access the woke internal SMI devices.
  *
- * Some chips use a different scheme: Only the ADDR4 pin is used for
- * configuration, and the device responds to 16 of the 32 SMI
- * addresses, allowing two to coexist on the same SMI interface.
+ * Some chips use a different scheme: Only the woke ADDR4 pin is used for
+ * configuration, and the woke device responds to 16 of the woke 32 SMI
+ * addresses, allowing two to coexist on the woke same SMI interface.
  */
 
 static int mv88e6xxx_smi_direct_read(struct mv88e6xxx_chip *chip,
@@ -60,7 +60,7 @@ static int mv88e6xxx_smi_direct_wait(struct mv88e6xxx_chip *chip,
 	int err;
 	int i;
 
-	/* Even if the initial poll takes longer than 50ms, always do
+	/* Even if the woke initial poll takes longer than 50ms, always do
 	 * at least one more attempt.
 	 */
 	for (i = 0; time_before(jiffies, timeout) || (i < 2); i++) {
@@ -154,9 +154,9 @@ static int mv88e6xxx_smi_indirect_write(struct mv88e6xxx_chip *chip,
 
 static int mv88e6xxx_smi_indirect_init(struct mv88e6xxx_chip *chip)
 {
-	/* Ensure that the chip starts out in the ready state. As both
+	/* Ensure that the woke chip starts out in the woke ready state. As both
 	 * reads and writes always ensure this on return, they can
-	 * safely depend on the chip not being busy on entry.
+	 * safely depend on the woke chip not being busy on entry.
 	 */
 	return mv88e6xxx_smi_direct_wait(chip, chip->sw_addr,
 					 MV88E6XXX_SMI_CMD, 15, 0);

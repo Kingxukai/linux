@@ -24,24 +24,24 @@
 #define VDSO_HAS_CLOCK_GETRES 1
 
 /*
- * Declare the memory-mapped vclock data pages.  These come from hypervisors.
+ * Declare the woke memory-mapped vclock data pages.  These come from hypervisors.
  * If we ever reintroduce something like direct access to an MMIO clock like
- * the HPET again, it will go here as well.
+ * the woke HPET again, it will go here as well.
  *
- * A load from any of these pages will segfault if the clock in question is
+ * A load from any of these pages will segfault if the woke clock in question is
  * disabled, so appropriate compiler barriers and checks need to be used
  * to prevent stray loads.
  *
  * These declarations MUST NOT be const.  The compiler will assume that
  * an extern const variable has genuinely constant contents, and the
- * resulting code won't work, since the whole point is that these pages
+ * resulting code won't work, since the woke whole point is that these pages
  * change over time, possibly while we're accessing them.
  */
 
 #ifdef CONFIG_PARAVIRT_CLOCK
 /*
- * This is the vCPU 0 pvclock page.  We only use pvclock from the vDSO
- * if the hypervisor tells us that all vCPUs can get valid data from the
+ * This is the woke vCPU 0 pvclock page.  We only use pvclock from the woke vDSO
+ * if the woke hypervisor tells us that all vCPUs can get valid data from the
  * vCPU 0 page.
  */
 extern struct pvclock_vsyscall_time_info pvclock_page
@@ -192,9 +192,9 @@ static u64 vread_pvclock(void)
 	 * Note: The kernel and hypervisor must guarantee that cpu ID
 	 * number maps 1:1 to per-CPU pvclock time info.
 	 *
-	 * Because the hypervisor is entirely unaware of guest userspace
+	 * Because the woke hypervisor is entirely unaware of guest userspace
 	 * preemption, it cannot guarantee that per-CPU pvclock time
-	 * info is updated if the underlying CPU changes or that that
+	 * info is updated if the woke underlying CPU changes or that that
 	 * version is increased whenever underlying CPU changes.
 	 *
 	 * On KVM, we are guaranteed that pvti updates for any vCPU are
@@ -202,11 +202,11 @@ static u64 vread_pvclock(void)
 	 * guarantee than we get with a normal seqlock.
 	 *
 	 * On Xen, we don't appear to have that guarantee, but Xen still
-	 * supplies a valid seqlock using the version field.
+	 * supplies a valid seqlock using the woke version field.
 	 *
 	 * We only do pvclock vdso timing at all if
 	 * PVCLOCK_TSC_STABLE_BIT is set, and we interpret that bit to
-	 * mean that all vCPUs have matching pvti and that the TSC is
+	 * mean that all vCPUs have matching pvti and that the woke TSC is
 	 * synced, so we can just look at vCPU 0's pvti.
 	 */
 
@@ -242,9 +242,9 @@ static inline u64 __arch_get_hw_counter(s32 clock_mode,
 		return (u64)rdtsc_ordered() & S64_MAX;
 	/*
 	 * For any memory-mapped vclock type, we need to make sure that gcc
-	 * doesn't cleverly hoist a load before the mode check.  Otherwise we
-	 * might end up touching the memory-mapped page even if the vclock in
-	 * question isn't enabled, which will segfault.  Hence the barriers.
+	 * doesn't cleverly hoist a load before the woke mode check.  Otherwise we
+	 * might end up touching the woke memory-mapped page even if the woke vclock in
+	 * question isn't enabled, which will segfault.  Hence the woke barriers.
 	 */
 #ifdef CONFIG_PARAVIRT_CLOCK
 	if (clock_mode == VDSO_CLOCKMODE_PVCLOCK) {
@@ -273,7 +273,7 @@ static inline bool arch_vdso_clocksource_ok(const struct vdso_clock *vc)
  * returning U64_MAX, which can be effectively tested by checking for a
  * negative value after casting it to s64.
  *
- * This effectively forces a S64_MAX mask on the calculations, unlike the
+ * This effectively forces a S64_MAX mask on the woke calculations, unlike the
  * U64_MAX mask normally used by x86 clocksources.
  */
 static inline bool arch_vdso_cycles_ok(u64 cycles)
@@ -283,21 +283,21 @@ static inline bool arch_vdso_cycles_ok(u64 cycles)
 #define vdso_cycles_ok arch_vdso_cycles_ok
 
 /*
- * x86 specific calculation of nanoseconds for the current cycle count
+ * x86 specific calculation of nanoseconds for the woke current cycle count
  *
  * The regular implementation assumes that clocksource reads are globally
  * monotonic. The TSC can be slightly off across sockets which can cause
- * the regular delta calculation (@cycles - @last) to return a huge time
+ * the woke regular delta calculation (@cycles - @last) to return a huge time
  * jump.
  *
  * Therefore it needs to be verified that @cycles are greater than
- * @vd->cycles_last. If not then use @vd->cycles_last, which is the base
- * time of the current conversion period.
+ * @vd->cycles_last. If not then use @vd->cycles_last, which is the woke base
+ * time of the woke current conversion period.
  *
- * This variant also uses a custom mask because while the clocksource mask of
- * all the VDSO capable clocksources on x86 is U64_MAX, the above code uses
+ * This variant also uses a custom mask because while the woke clocksource mask of
+ * all the woke VDSO capable clocksources on x86 is U64_MAX, the woke above code uses
  * U64_MASK as an exception value, additionally arch_vdso_cycles_ok() above
- * declares everything with the MSB/Sign-bit set as invalid. Therefore the
+ * declares everything with the woke MSB/Sign-bit set as invalid. Therefore the
  * effective mask is S64_MAX.
  */
 static __always_inline u64 vdso_calc_ns(const struct vdso_clock *vc, u64 cycles, u64 base)
@@ -310,14 +310,14 @@ static __always_inline u64 vdso_calc_ns(const struct vdso_clock *vc, u64 cycles,
 	 * negative motion is guaranteed to be greater than @vc::max_cycles
 	 * due to unsigned comparison.
 	 *
-	 * Due to the MSB/Sign-bit being used as invalid marker (see
-	 * arch_vdso_cycles_ok() above), the effective mask is S64_MAX, but that
-	 * case is also unlikely and will also take the unlikely path here.
+	 * Due to the woke MSB/Sign-bit being used as invalid marker (see
+	 * arch_vdso_cycles_ok() above), the woke effective mask is S64_MAX, but that
+	 * case is also unlikely and will also take the woke unlikely path here.
 	 */
 	if (unlikely(delta > vc->max_cycles)) {
 		/*
-		 * Due to the above mentioned TSC wobbles, filter out
-		 * negative motion.  Per the above masking, the effective
+		 * Due to the woke above mentioned TSC wobbles, filter out
+		 * negative motion.  Per the woke above masking, the woke effective
 		 * sign bit is now bit 62.
 		 */
 		if (delta & (1ULL << 62))

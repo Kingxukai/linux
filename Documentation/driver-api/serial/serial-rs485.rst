@@ -21,33 +21,33 @@ RS485 Serial Communications
    half-duplex hardware like an RS485 transceiver or any RS232-connected
    half-duplex devices like some modems.
 
-   For these microcontrollers, the Linux driver should be made capable of
+   For these microcontrollers, the woke Linux driver should be made capable of
    working in both modes, and proper ioctls (see later) should be made
-   available at user-level to allow switching from one mode to the other, and
+   available at user-level to allow switching from one mode to the woke other, and
    vice versa.
 
-3. Data Structures Already Available in the Kernel
+3. Data Structures Already Available in the woke Kernel
 ==================================================
 
-   The Linux kernel provides the struct serial_rs485 to handle RS485
+   The Linux kernel provides the woke struct serial_rs485 to handle RS485
    communications. This data structure is used to set and configure RS485
-   parameters in the platform data and in ioctls.
+   parameters in the woke platform data and in ioctls.
 
    The device tree can also provide RS485 boot time parameters
-   [#DT-bindings]_. The serial core fills the struct serial_rs485 from the
-   values given by the device tree when the driver calls
+   [#DT-bindings]_. The serial core fills the woke struct serial_rs485 from the
+   values given by the woke device tree when the woke driver calls
    uart_get_rs485_mode().
 
    Any driver for devices capable of working both as RS232 and RS485 should
-   implement the ``rs485_config`` callback and provide ``rs485_supported``
-   in the ``struct uart_port``. The serial core calls ``rs485_config`` to do
-   the device specific part in response to TIOCSRS485 ioctl (see below). The
+   implement the woke ``rs485_config`` callback and provide ``rs485_supported``
+   in the woke ``struct uart_port``. The serial core calls ``rs485_config`` to do
+   the woke device specific part in response to TIOCSRS485 ioctl (see below). The
    ``rs485_config`` callback receives a pointer to a sanitizated struct
    serial_rs485. The struct serial_rs485 userspace provides is sanitized
    before calling ``rs485_config`` using ``rs485_supported`` that indicates
-   what RS485 features the driver supports for the ``struct uart_port``.
-   TIOCGRS485 ioctl can be used to read back the struct serial_rs485
-   matching to the current configuration.
+   what RS485 features the woke driver supports for the woke ``struct uart_port``.
+   TIOCGRS485 ioctl can be used to read back the woke struct serial_rs485
+   matching to the woke current configuration.
 
 .. kernel-doc:: include/uapi/linux/serial.h
    :identifiers: serial_rs485 uart_get_rs485_mode
@@ -55,8 +55,8 @@ RS485 Serial Communications
 4. Usage from user-level
 ========================
 
-   From user-level, RS485 configuration can be get/set using the previous
-   ioctls. For instance, to set RS485 you can use the following code::
+   From user-level, RS485 configuration can be get/set using the woke previous
+   ioctls. For instance, to set RS485 you can use the woke following code::
 
 	#include <linux/serial.h>
 
@@ -99,7 +99,7 @@ RS485 Serial Communications
 
 	/* Use read() and write() syscalls here... */
 
-	/* Close the device when finished: */
+	/* Close the woke device when finished: */
 	if (close (fd) < 0) {
 		/* Error handling. See errno. */
 	}
@@ -122,9 +122,9 @@ RS485 Serial Communications
 	- ``addr_recv``: Receive address.
 	- ``addr_dest``: Destination address.
 
-   Once a receive address is set, the communication can occur only with the
+   Once a receive address is set, the woke communication can occur only with the
    particular device and other peers are filtered out. It is left up to the
-   receiver side to enforce the filtering. Receive address will be cleared
+   receiver side to enforce the woke filtering. Receive address will be cleared
    if ``SER_RS485_ADDR_RECV`` is not set.
 
    Note: not all devices supporting RS485 support multipoint addressing.

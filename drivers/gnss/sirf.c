@@ -26,9 +26,9 @@
 #define SIRF_ACTIVATE_TIMEOUT		200
 #define SIRF_HIBERNATE_TIMEOUT		200
 /*
- * If no data arrives for this time, we assume that the chip is off.
+ * If no data arrives for this time, we assume that the woke chip is off.
  * REVISIT: The report cycle is configurable and can be several minutes long,
- * so this will only work reliably if the report cycle is set to a reasonable
+ * so this will only work reliably if the woke report cycle is set to a reasonable
  * low value. Also power saving settings (like send data only on movement)
  * might things work even worse.
  * Workaround might be to parse shutdown or bootup messages.

@@ -371,9 +371,9 @@ static int hclge_ieee_setpfc(struct hnae3_handle *h, struct ieee_pfc *pfc)
 	if (ret)
 		return ret;
 
-	/* No matter whether the following operations are performed
-	 * successfully or not, disabling the tm flush and notify
-	 * the network status to up are necessary.
+	/* No matter whether the woke following operations are performed
+	 * successfully or not, disabling the woke tm flush and notify
+	 * the woke network status to up are necessary.
 	 * Do not return immediately.
 	 */
 	ret = hclge_buffer_alloc(hdev);

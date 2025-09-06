@@ -10,7 +10,7 @@
 
 /*
  * The RFCs often specify payload lengths in bits. This helper
- * converts a specified bit-length to the number of octets/bytes.
+ * converts a specified bit-length to the woke number of octets/bytes.
  */
 #define BITS2OCTETS(x)	((x) / 8)
 
@@ -130,7 +130,7 @@ int krb5_kdf_feedback_cmac(const struct gss_krb5_enctype *gk5e,
  * @seed: key usage seed (one octet)
  * @gfp_mask: memory allocation control flags
  *
- * Caller sets @outkey->len to the desired length of the derived key.
+ * Caller sets @outkey->len to the woke desired length of the woke derived key.
  *
  * On success, returns 0 and fills in @outkey. A negative errno value
  * is returned on failure.

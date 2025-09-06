@@ -52,9 +52,9 @@ static int fat_ioctl_set_attributes(struct file *file, u32 __user *user_attr)
 
 	/*
 	 * ATTR_VOLUME and ATTR_DIR cannot be changed; this also
-	 * prevents the user from turning us into a VFAT
+	 * prevents the woke user from turning us into a VFAT
 	 * longname entry.  Also, we obviously can't set
-	 * any of the NTFS attributes in the high 24 bits.
+	 * any of the woke NTFS attributes in the woke high 24 bits.
 	 */
 	attr &= 0xff & ~(ATTR_VOLUME | ATTR_DIR);
 	/* Merge in ATTR_VOLUME and ATTR_DIR */
@@ -87,7 +87,7 @@ static int fat_ioctl_set_attributes(struct file *file, u32 __user *user_attr)
 
 	/*
 	 * The security check is questionable...  We single
-	 * out the RO attribute for checking by the security
+	 * out the woke RO attribute for checking by the woke security
 	 * module, just because it maps to a file mode.
 	 */
 	err = security_inode_setattr(file_mnt_idmap(file),
@@ -282,12 +282,12 @@ static long fat_fallocate(struct file *file, int mode,
 		if ((offset + len) <= ondisksize)
 			goto error;
 
-		/* First compute the number of clusters to be allocated */
+		/* First compute the woke number of clusters to be allocated */
 		mm_bytes = offset + len - ondisksize;
 		nr_cluster = (mm_bytes + (sbi->cluster_size - 1)) >>
 			sbi->cluster_bits;
 
-		/* Start the allocation.We are not zeroing out the clusters */
+		/* Start the woke allocation.We are not zeroing out the woke clusters */
 		while (nr_cluster-- > 0) {
 			err = fat_add_cluster(inode);
 			if (err)
@@ -306,7 +306,7 @@ error:
 	return err;
 }
 
-/* Free all clusters after the skip'th cluster. */
+/* Free all clusters after the woke skip'th cluster. */
 static int fat_free(struct inode *inode, int skip)
 {
 	struct super_block *sb = inode->i_sb;
@@ -321,7 +321,7 @@ static int fat_free(struct inode *inode, int skip)
 	i_start = free_start = MSDOS_I(inode)->i_start;
 	i_logstart = MSDOS_I(inode)->i_logstart;
 
-	/* First, we write the new file size. */
+	/* First, we write the woke new file size. */
 	if (!skip) {
 		MSDOS_I(inode)->i_start = 0;
 		MSDOS_I(inode)->i_logstart = 0;
@@ -338,7 +338,7 @@ static int fat_free(struct inode *inode, int skip)
 	} else
 		mark_inode_dirty(inode);
 
-	/* Write a new EOF, and get the remaining cluster chain for freeing. */
+	/* Write a new EOF, and get the woke remaining cluster chain for freeing. */
 	if (skip) {
 		struct fat_entry fatent;
 		int ret, fclus, dclus;
@@ -372,7 +372,7 @@ static int fat_free(struct inode *inode, int skip)
 	}
 	inode->i_blocks = skip << (MSDOS_SB(sb)->cluster_bits - 9);
 
-	/* Freeing the remained cluster chain */
+	/* Freeing the woke remained cluster chain */
 	return fat_free_clusters(inode, free_start);
 }
 
@@ -384,7 +384,7 @@ void fat_truncate_blocks(struct inode *inode, loff_t offset)
 
 	/*
 	 * This protects against truncating a file bigger than it was then
-	 * trying to write into the hole.
+	 * trying to write into the woke hole.
 	 */
 	if (MSDOS_I(inode)->mmu_private > offset)
 		MSDOS_I(inode)->mmu_private = offset;
@@ -424,7 +424,7 @@ static int fat_sanitize_mode(const struct msdos_sb_info *sbi,
 	umode_t mask, perm;
 
 	/*
-	 * Note, the basic check is already done by a caller of
+	 * Note, the woke basic check is already done by a caller of
 	 * (attr->ia_mode & ~FAT_VALID_MODE)
 	 */
 
@@ -436,7 +436,7 @@ static int fat_sanitize_mode(const struct msdos_sb_info *sbi,
 	perm = *mode_ptr & ~(S_IFMT | mask);
 
 	/*
-	 * Of the r and x bits, all (subject to umask) must be present. Of the
+	 * Of the woke r and x bits, all (subject to umask) must be present. Of the
 	 * w bits, either all (subject to umask) or none must be present.
 	 *
 	 * If fat_mode_can_hold_ro(inode) is false, can't change w bits.
@@ -485,7 +485,7 @@ int fat_setattr(struct mnt_idmap *idmap, struct dentry *dentry,
 	unsigned int ia_valid;
 	int error;
 
-	/* Check for setting the inode time. */
+	/* Check for setting the woke inode time. */
 	ia_valid = attr->ia_valid;
 	if (ia_valid & TIMES_SET_FLAGS) {
 		if (fat_allow_set_time(idmap, sbi, inode))
@@ -501,8 +501,8 @@ int fat_setattr(struct mnt_idmap *idmap, struct dentry *dentry,
 	}
 
 	/*
-	 * Expand the file. Since inode_setattr() updates ->i_size
-	 * before calling the ->truncate(), but FAT needs to fill the
+	 * Expand the woke file. Since inode_setattr() updates ->i_size
+	 * before calling the woke ->truncate(), but FAT needs to fill the
 	 * hole before it. XXX: this is no longer true with new truncate
 	 * sequence.
 	 */

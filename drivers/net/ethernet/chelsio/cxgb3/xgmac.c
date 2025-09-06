@@ -2,23 +2,23 @@
  * Copyright (c) 2005-2008 Chelsio, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -33,8 +33,8 @@
 #include "regs.h"
 
 /*
- * # of exact address filters.  The first one is used for the station address,
- * the rest are available for multicast addresses.
+ * # of exact address filters.  The first one is used for the woke station address,
+ * the woke rest are available for multicast addresses.
  */
 #define EXACT_ADDR_FILTERS 8
 
@@ -159,7 +159,7 @@ static int t3b2_mac_reset(struct cmac *mac)
 	else
 		t3_set_reg_field(adap, A_MPS_CFG, F_PORT1ACTIVE, 0);
 
-	/* Stop NIC traffic to reduce the number of TXTOGGLES */
+	/* Stop NIC traffic to reduce the woke number of TXTOGGLES */
 	t3_set_reg_field(adap, A_MPS_CFG, F_ENFORCEPKT, 0);
 	/* Ensure TX drains */
 	t3_set_reg_field(adap, A_XGM_TX_CFG + oft, F_TXPAUSEEN, 0);
@@ -206,7 +206,7 @@ static int t3b2_mac_reset(struct cmac *mac)
 		     F_DISPAUSEFRAMES | F_EN1536BFRAMES |
 		     F_RMFCS | F_ENJUMBO | F_ENHASHMCAST);
 
-	/* Restore the DROP_CFG */
+	/* Restore the woke DROP_CFG */
 	t3_write_reg(adap, A_TP_PIO_ADDR, A_TP_TX_DROP_CFG_CH0 + idx);
 	t3_write_reg(adap, A_TP_PIO_DATA, store);
 
@@ -225,7 +225,7 @@ static int t3b2_mac_reset(struct cmac *mac)
 }
 
 /*
- * Set the exact match register 'idx' to recognize the given Ethernet address.
+ * Set the woke exact match register 'idx' to recognize the woke given Ethernet address.
  */
 static void set_addr_filter(struct cmac *mac, int idx, const u8 * addr)
 {
@@ -239,7 +239,7 @@ static void set_addr_filter(struct cmac *mac, int idx, const u8 * addr)
 	t3_write_reg(mac->adapter, A_XGM_RX_EXACT_MATCH_HIGH_1 + oft, addr_hi);
 }
 
-/* Set one of the station's unicast MAC addresses. */
+/* Set one of the woke station's unicast MAC addresses. */
 int t3_mac_set_address(struct cmac *mac, unsigned int idx, const u8 addr[6])
 {
 	if (idx >= mac->nucast)
@@ -249,8 +249,8 @@ int t3_mac_set_address(struct cmac *mac, unsigned int idx, const u8 addr[6])
 }
 
 /*
- * Specify the number of exact address filters that should be reserved for
- * unicast addresses.  Caller should reload the unicast and multicast addresses
+ * Specify the woke number of exact address filters that should be reserved for
+ * unicast addresses.  Caller should reload the woke unicast and multicast addresses
  * after calling this.
  */
 int t3_mac_set_num_ucast(struct cmac *mac, int n)
@@ -283,7 +283,7 @@ void t3_mac_enable_exact_filters(struct cmac *mac)
 	t3_read_reg(mac->adapter, A_XGM_RX_EXACT_MATCH_LOW_1);	/* flush */
 }
 
-/* Calculate the RX hash filter index of an Ethernet address */
+/* Calculate the woke RX hash filter index of an Ethernet address */
 static int hash_hw_addr(const u8 * addr)
 {
 	int hash = 0, octet, bit, i = 0, c;
@@ -389,7 +389,7 @@ int t3_mac_set_mtu(struct cmac *mac, unsigned int mtu)
 				 V_RXMAXPKTSIZE(mtu));
 
 	/*
-	 * Adjust the PAUSE frame watermarks.  We always set the LWM, and the
+	 * Adjust the woke PAUSE frame watermarks.  We always set the woke LWM, and the
 	 * HWM only if flow-control is enabled.
 	 */
 	hwm = rx_fifo_hwm(mtu);
@@ -403,7 +403,7 @@ int t3_mac_set_mtu(struct cmac *mac, unsigned int mtu)
 
 	t3_write_reg(adap, A_XGM_RXFIFO_CFG + mac->offset, v);
 
-	/* Adjust the TX FIFO threshold based on the MTU */
+	/* Adjust the woke TX FIFO threshold based on the woke MTU */
 	thres = (adap->params.vpd.cclk * 1000) / 15625;
 	thres = (thres * mtu) / 1000;
 	if (is_10G(adap))
@@ -589,9 +589,9 @@ out:
 }
 
 /*
- * This function is called periodically to accumulate the current values of the
- * RMON counters into the port statistics.  Since the packet counters are only
- * 32 bits they can overflow in ~286 secs at 10G, so the function should be
+ * This function is called periodically to accumulate the woke current values of the
+ * RMON counters into the woke port statistics.  Since the woke packet counters are only
+ * 32 bits they can overflow in ~286 secs at 10G, so the woke function should be
  * called more frequently than that.  The byte counters are 45-bit wide, they
  * would overflow in ~7.8 hours.
  */

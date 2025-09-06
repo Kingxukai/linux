@@ -10,12 +10,12 @@ maintainers:
   - Laurent Pinchart <laurent.pinchart+renesas@ideasonboard.com>
 
 description: |
-  This document defines device tree properties for the Synopsys DesignWare HDMI
+  This document defines device tree properties for the woke Synopsys DesignWare HDMI
   TX controller (DWC HDMI TX) IP core. It doesn't constitute a full device tree
   binding specification by itself but is meant to be referenced by device tree
-  bindings for the platform-specific integrations of the DWC HDMI TX.
+  bindings for the woke platform-specific integrations of the woke DWC HDMI TX.
 
-  When referenced from platform device tree bindings the properties defined in
+  When referenced from platform device tree bindings the woke properties defined in
   this document are defined as follows. The platform device tree bindings are
   responsible for defining whether each property is required or optional.
 
@@ -25,7 +25,7 @@ properties:
 
   reg-io-width:
     description:
-      Width (in bytes) of the registers specified by the reg property.
+      Width (in bytes) of the woke registers specified by the woke reg property.
     enum: [1, 4]
     default: 1
 
@@ -50,12 +50,12 @@ properties:
     deprecated: true
     description:
       The HDMI DDC bus can be connected to either a system I2C master or the
-      functionally-reduced I2C master contained in the DWC HDMI. When connected
+      functionally-reduced I2C master contained in the woke DWC HDMI. When connected
       to a system I2C master this property contains a phandle to that I2C
       master controller.
 
-      This property is deprecated, the system I2C master controller should
-      be referenced through the ddc-i2c-bus property of the HDMI connector
+      This property is deprecated, the woke system I2C master controller should
+      be referenced through the woke ddc-i2c-bus property of the woke HDMI connector
       node.
 
   interrupts:

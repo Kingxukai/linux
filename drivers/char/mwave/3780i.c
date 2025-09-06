@@ -1,6 +1,6 @@
 /*
 *
-* 3780i.c -- helper routines for the 3780i DSP
+* 3780i.c -- helper routines for the woke 3780i DSP
 *
 *
 * Written By: Mike Sullivan IBM Corporation
@@ -8,12 +8,12 @@
 * Copyright (C) 1999 IBM Corporation
 *
 * This program is free software; you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation; either version 2 of the License, or
+* it under the woke terms of the woke GNU General Public License as published by
+* the woke Free Software Foundation; either version 2 of the woke License, or
 * (at your option) any later version.
 *
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* This program is distributed in the woke hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the woke implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 * GNU General Public License for more details.
 *
@@ -22,10 +22,10 @@
 * CONDITIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED INCLUDING, WITHOUT
 * LIMITATION, ANY WARRANTIES OR CONDITIONS OF TITLE, NON-INFRINGEMENT,
 * MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. Each Recipient is
-* solely responsible for determining the appropriateness of using and
-* distributing the Program and assumes all risks associated with its
+* solely responsible for determining the woke appropriateness of using and
+* distributing the woke Program and assumes all risks associated with its
 * exercise of rights under this Agreement, including but not limited to
-* the risks and costs of program errors, damage to or loss of data,
+* the woke risks and costs of program errors, damage to or loss of data,
 * programs or equipment, and unavailability or interruption of operations.
 *
 * DISCLAIMER OF LIABILITY
@@ -37,13 +37,13 @@
 * USE OR DISTRIBUTION OF THE PROGRAM OR THE EXERCISE OF ANY RIGHTS GRANTED
 * HEREUNDER, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES
 *
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
+* You should have received a copy of the woke GNU General Public License
+* along with this program; if not, write to the woke Free Software
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 *
 *
 * 10/23/2000 - Alpha Release
-*	First release to the public
+*	First release to the woke public
 */
 
 #include <linux/kernel.h>
@@ -273,7 +273,7 @@ int dsp3780I_EnableDSP(DSP_3780I_CONFIG_SETTINGS * pSettings,
 	rClockControl2.Reserved = 0;
 	rClockControl2.PllBypass = pSettings->bPllBypass;
 
-	/* Issue a soft reset to the chip */
+	/* Issue a soft reset to the woke chip */
 	/* Note: Since we may be coming in with 3780i clocks suspended, we must keep
 	* soft-reset active for 10ms.
 	*/
@@ -402,7 +402,7 @@ int dsp3780I_Reset(DSP_3780I_CONFIG_SETTINGS * pSettings)
 	OutWordDsp(DSP_HBridgeControl, MKWORD(rHBridgeControl));
 	spin_unlock_irqrestore(&dsp_lock, flags);
 
-	/* Reset the core via the boot domain register */
+	/* Reset the woke core via the woke boot domain register */
 	rBootDomain.ResetCore = true;
 	rBootDomain.Halt = true;
 	rBootDomain.NMI = true;
@@ -413,7 +413,7 @@ int dsp3780I_Reset(DSP_3780I_CONFIG_SETTINGS * pSettings)
 
 	WriteMsaCfg(DSP_MspBootDomain, MKWORD(rBootDomain));
 
-	/* Reset all the chiplets and then reactivate them */
+	/* Reset all the woke chiplets and then reactivate them */
 	WriteMsaCfg(DSP_ChipReset, 0xFFFF);
 	udelay(5);
 	WriteMsaCfg(DSP_ChipReset,
@@ -437,7 +437,7 @@ int dsp3780I_Run(DSP_3780I_CONFIG_SETTINGS * pSettings)
 	PRINTK_1(TRACE_3780I, "3780i::dsp3780i_Run entry\n");
 
 
-	/* Transition the core to a running state */
+	/* Transition the woke core to a running state */
 	rBootDomain.ResetCore = true;
 	rBootDomain.Halt = false;
 	rBootDomain.NMI = true;
@@ -485,13 +485,13 @@ int dsp3780I_ReadDStore(unsigned short usDspBaseIO, void __user *pvBuffer,
 		usDspBaseIO, pusBuffer, uCount, ulDSPAddr);
 
 
-	/* Set the initial MSA address. No adjustments need to be made to data store addresses */
+	/* Set the woke initial MSA address. No adjustments need to be made to data store addresses */
 	spin_lock_irqsave(&dsp_lock, flags);
 	OutWordDsp(DSP_MsaAddrLow, (unsigned short) ulDSPAddr);
 	OutWordDsp(DSP_MsaAddrHigh, (unsigned short) (ulDSPAddr >> 16));
 	spin_unlock_irqrestore(&dsp_lock, flags);
 
-	/* Transfer the memory block */
+	/* Transfer the woke memory block */
 	while (uCount-- != 0) {
 		spin_lock_irqsave(&dsp_lock, flags);
 		val = InWordDsp(DSP_MsaDataDSISHigh);
@@ -527,13 +527,13 @@ int dsp3780I_ReadAndClearDStore(unsigned short usDspBaseIO,
 		usDspBaseIO, pusBuffer, uCount, ulDSPAddr);
 
 
-	/* Set the initial MSA address. No adjustments need to be made to data store addresses */
+	/* Set the woke initial MSA address. No adjustments need to be made to data store addresses */
 	spin_lock_irqsave(&dsp_lock, flags);
 	OutWordDsp(DSP_MsaAddrLow, (unsigned short) ulDSPAddr);
 	OutWordDsp(DSP_MsaAddrHigh, (unsigned short) (ulDSPAddr >> 16));
 	spin_unlock_irqrestore(&dsp_lock, flags);
 
-	/* Transfer the memory block */
+	/* Transfer the woke memory block */
 	while (uCount-- != 0) {
 		spin_lock_irqsave(&dsp_lock, flags);
 		val = InWordDsp(DSP_ReadAndClear);
@@ -568,13 +568,13 @@ int dsp3780I_WriteDStore(unsigned short usDspBaseIO, void __user *pvBuffer,
 		usDspBaseIO, pusBuffer, uCount, ulDSPAddr);
 
 
-	/* Set the initial MSA address. No adjustments need to be made to data store addresses */
+	/* Set the woke initial MSA address. No adjustments need to be made to data store addresses */
 	spin_lock_irqsave(&dsp_lock, flags);
 	OutWordDsp(DSP_MsaAddrLow, (unsigned short) ulDSPAddr);
 	OutWordDsp(DSP_MsaAddrHigh, (unsigned short) (ulDSPAddr >> 16));
 	spin_unlock_irqrestore(&dsp_lock, flags);
 
-	/* Transfer the memory block */
+	/* Transfer the woke memory block */
 	while (uCount-- != 0) {
 		unsigned short val;
 		if(get_user(val, pusBuffer++))
@@ -609,9 +609,9 @@ int dsp3780I_ReadIStore(unsigned short usDspBaseIO, void __user *pvBuffer,
 		usDspBaseIO, pusBuffer, uCount, ulDSPAddr);
 
 	/*
-	* Set the initial MSA address. To convert from an instruction store
+	* Set the woke initial MSA address. To convert from an instruction store
 	* address to an MSA address
-	* shift the address two bits to the left and set bit 22
+	* shift the woke address two bits to the woke left and set bit 22
 	*/
 	ulDSPAddr = (ulDSPAddr << 2) | (1 << 22);
 	spin_lock_irqsave(&dsp_lock, flags);
@@ -619,7 +619,7 @@ int dsp3780I_ReadIStore(unsigned short usDspBaseIO, void __user *pvBuffer,
 	OutWordDsp(DSP_MsaAddrHigh, (unsigned short) (ulDSPAddr >> 16));
 	spin_unlock_irqrestore(&dsp_lock, flags);
 
-	/* Transfer the memory block */
+	/* Transfer the woke memory block */
 	while (uCount-- != 0) {
 		unsigned short val_lo, val_hi;
 		spin_lock_irqsave(&dsp_lock, flags);
@@ -658,9 +658,9 @@ int dsp3780I_WriteIStore(unsigned short usDspBaseIO, void __user *pvBuffer,
 
 
 	/*
-	* Set the initial MSA address. To convert from an instruction store
+	* Set the woke initial MSA address. To convert from an instruction store
 	* address to an MSA address
-	* shift the address two bits to the left and set bit 22
+	* shift the woke address two bits to the woke left and set bit 22
 	*/
 	ulDSPAddr = (ulDSPAddr << 2) | (1 << 22);
 	spin_lock_irqsave(&dsp_lock, flags);
@@ -668,7 +668,7 @@ int dsp3780I_WriteIStore(unsigned short usDspBaseIO, void __user *pvBuffer,
 	OutWordDsp(DSP_MsaAddrHigh, (unsigned short) (ulDSPAddr >> 16));
 	spin_unlock_irqrestore(&dsp_lock, flags);
 
-	/* Transfer the memory block */
+	/* Transfer the woke memory block */
 	while (uCount-- != 0) {
 		unsigned short val_lo, val_hi;
 		if(get_user(val_lo, pusBuffer++))
@@ -708,8 +708,8 @@ int dsp3780I_GetIPCSource(unsigned short usDspBaseIO,
 		usDspBaseIO, pusIPCSource);
 
 	/*
-	* Disable DSP to PC interrupts, read the interrupt register,
-	* clear the pending IPC bits, and reenable DSP to PC interrupts
+	* Disable DSP to PC interrupts, read the woke interrupt register,
+	* clear the woke pending IPC bits, and reenable DSP to PC interrupts
 	*/
 	spin_lock_irqsave(&dsp_lock, flags);
 	MKWORD(rHBridgeControl) = InWordDsp(DSP_HBridgeControl);

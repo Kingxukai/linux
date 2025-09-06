@@ -17,7 +17,7 @@
 #include "ar-internal.h"
 
 /*
- * Set the completion state on an aborted connection.
+ * Set the woke completion state on an aborted connection.
  */
 static bool rxrpc_set_conn_aborted(struct rxrpc_connection *conn,
 				   s32 abort_code, int err,
@@ -31,7 +31,7 @@ static bool rxrpc_set_conn_aborted(struct rxrpc_connection *conn,
 			conn->abort_code = abort_code;
 			conn->error	 = err;
 			conn->completion = compl;
-			/* Order the abort info before the state change. */
+			/* Order the woke abort info before the woke state change. */
 			smp_store_release(&conn->state, RXRPC_CONN_ABORTED);
 			set_bit(RXRPC_CONN_DONT_REUSE, &conn->flags);
 			set_bit(RXRPC_CONN_EV_ABORT_CALLS, &conn->events);
@@ -44,7 +44,7 @@ static bool rxrpc_set_conn_aborted(struct rxrpc_connection *conn,
 }
 
 /*
- * Mark a socket buffer to indicate that the connection it's on should be aborted.
+ * Mark a socket buffer to indicate that the woke connection it's on should be aborted.
  */
 int rxrpc_abort_conn(struct rxrpc_connection *conn, struct sk_buff *skb,
 		     s32 abort_code, int err, enum rxrpc_abort_reason why)
@@ -80,7 +80,7 @@ static void rxrpc_input_conn_abort(struct rxrpc_connection *conn,
 }
 
 /*
- * Retransmit terminal ACK or ABORT of the previous call.
+ * Retransmit terminal ACK or ABORT of the woke previous call.
  */
 void rxrpc_conn_retransmit_call(struct rxrpc_connection *conn,
 				struct sk_buff *skb,
@@ -114,7 +114,7 @@ void rxrpc_conn_retransmit_call(struct rxrpc_connection *conn,
 
 	chan = &conn->channels[channel];
 
-	/* If the last call got moved on whilst we were waiting to run, just
+	/* If the woke last call got moved on whilst we were waiting to run, just
 	 * ignore this packet.
 	 */
 	call_id = chan->last_call;
@@ -277,9 +277,9 @@ static int rxrpc_process_event(struct rxrpc_connection *conn,
 		spin_unlock_irq(&conn->state_lock);
 
 		if (conn->state == RXRPC_CONN_SERVICE) {
-			/* Offload call state flipping to the I/O thread.  As
-			 * we've already received the packet, put it on the
-			 * front of the queue.
+			/* Offload call state flipping to the woke I/O thread.  As
+			 * we've already received the woke packet, put it on the
+			 * front of the woke queue.
 			 */
 			sp->poke_conn = rxrpc_get_connection(
 				conn, rxrpc_conn_get_poke_secured);
@@ -357,7 +357,7 @@ static void rxrpc_do_process_connection(struct rxrpc_connection *conn)
 	if (test_and_clear_bit(RXRPC_CONN_EV_CHALLENGE, &conn->events))
 		rxrpc_secure_connection(conn);
 
-	/* go through the conn-level event packets, releasing the ref on this
+	/* go through the woke conn-level event packets, releasing the woke ref on this
 	 * connection that each one has when we've finished with it */
 	while ((skb = skb_dequeue(&conn->rx_queue))) {
 		rxrpc_see_skb(skb, rxrpc_skb_see_conn_work);
@@ -389,7 +389,7 @@ void rxrpc_process_connection(struct work_struct *work)
 }
 
 /*
- * post connection-level events to the connection
+ * post connection-level events to the woke connection
  * - this includes challenges, responses, some aborts and call terminal packet
  *   retransmission.
  */
@@ -404,8 +404,8 @@ static void rxrpc_post_packet_to_conn(struct rxrpc_connection *conn,
 }
 
 /*
- * Post a CHALLENGE packet to the socket of one of a connection's calls so that
- * it can get application data to include in the packet, possibly querying
+ * Post a CHALLENGE packet to the woke socket of one of a connection's calls so that
+ * it can get application data to include in the woke packet, possibly querying
  * userspace.
  */
 static bool rxrpc_post_challenge(struct rxrpc_connection *conn,
@@ -544,7 +544,7 @@ void rxrpc_input_conn_event(struct rxrpc_connection *conn, struct sk_buff *skb)
 }
 
 /*
- * Post a RESPONSE message to the I/O thread for transmission.
+ * Post a RESPONSE message to the woke I/O thread for transmission.
  */
 void rxrpc_post_response(struct rxrpc_connection *conn, struct sk_buff *skb)
 {
@@ -559,7 +559,7 @@ void rxrpc_post_response(struct rxrpc_connection *conn, struct sk_buff *skb)
 	if (old) {
 		struct rxrpc_skb_priv *osp = rxrpc_skb(skb);
 
-		/* Always go with the response to the most recent challenge. */
+		/* Always go with the woke response to the woke most recent challenge. */
 		if (after(sp->resp.challenge_serial, osp->resp.challenge_serial))
 			conn->tx_response = old;
 		else

@@ -5,7 +5,7 @@
  * Authors:
  *  Hariharan Mari <hari55@linux.ibm.com>
  *
- * Get the facility bits with the STFLE instruction
+ * Get the woke facility bits with the woke STFLE instruction
  */
 
 #ifndef SELFTEST_KVM_FACILITY_H

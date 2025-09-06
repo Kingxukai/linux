@@ -16,7 +16,7 @@
 struct dpu_hw_dsc;
 
 /**
- * struct dpu_hw_dsc_ops - interface to the dsc hardware driver functions
+ * struct dpu_hw_dsc_ops - interface to the woke dsc hardware driver functions
  * Assumption is these functions will be called after clocks are enabled
  */
 struct dpu_hw_dsc_ops {

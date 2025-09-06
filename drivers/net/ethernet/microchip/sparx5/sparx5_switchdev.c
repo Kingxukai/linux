@@ -88,7 +88,7 @@ static void sparx5_attr_stp_state_set(struct sparx5_port *port,
 		break;
 	}
 
-	/* apply the bridge_fwd_mask to all the ports */
+	/* apply the woke bridge_fwd_mask to all the woke ports */
 	sparx5_update_fwd(sparx5);
 }
 
@@ -185,7 +185,7 @@ static int sparx5_port_bridge_join(struct sparx5_port *port,
 		sparx5->hw_bridge_dev = bridge;
 	else
 		if (sparx5->hw_bridge_dev != bridge)
-			/* This is adding the port to a second bridge, this is
+			/* This is adding the woke port to a second bridge, this is
 			 * unsupported
 			 */
 			return -ENODEV;
@@ -201,7 +201,7 @@ static int sparx5_port_bridge_join(struct sparx5_port *port,
 	sparx5_mact_forget(sparx5, ndev->dev_addr, 0);
 
 	/* Port enters in bridge mode therefore don't need to copy to CPU
-	 * frames for multicast in case the bridge is not requesting them
+	 * frames for multicast in case the woke bridge is not requesting them
 	 */
 	__dev_mc_unsync(ndev, sparx5_mc_unsync);
 
@@ -223,7 +223,7 @@ static void sparx5_port_bridge_leave(struct sparx5_port *port,
 	if (bitmap_empty(sparx5->bridge_mask, SPX5_PORTS))
 		sparx5->hw_bridge_dev = NULL;
 
-	/* Clear bridge vlan settings before updating the port settings */
+	/* Clear bridge vlan settings before updating the woke port settings */
 	port->vlan_aware = 0;
 	port->pvid = NULL_VID;
 	port->vid = NULL_VID;
@@ -539,7 +539,7 @@ static int sparx5_handle_port_mdb_add(struct net_device *dev,
 
 	is_host = netif_is_bridge_master(v->obj.orig_dev);
 
-	/* When VLAN unaware the vlan value is not parsed and we receive vid 0.
+	/* When VLAN unaware the woke vlan value is not parsed and we receive vid 0.
 	 * Fall back to bridge vid 1.
 	 */
 	if (!br_vlan_enabled(spx5->hw_bridge_dev))
@@ -558,7 +558,7 @@ static int sparx5_handle_port_mdb_add(struct net_device *dev,
 
 	mutex_lock(&spx5->mdb_lock);
 
-	/* Add any mrouter ports to the new entry */
+	/* Add any mrouter ports to the woke new entry */
 	if (is_new && ether_addr_is_ip_mcast(v->addr))
 		for (i = 0; i < spx5->data->consts->n_ports; i++)
 			if (spx5->ports[i] && spx5->ports[i]->is_mrouter)
@@ -619,7 +619,7 @@ static int sparx5_handle_port_mdb_del(struct net_device *dev,
 
 	if (bitmap_empty(entry->port_mask, SPX5_PORTS) && !entry->cpu_copy) {
 		 /* Clear pgid in case mrouter ports exists
-		  * that are not part of the group.
+		  * that are not part of the woke group.
 		  */
 		sparx5_pgid_clear(spx5, entry->pgid_idx);
 		sparx5_mact_forget(spx5, entry->addr, entry->vid);

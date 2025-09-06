@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -109,7 +109,7 @@ enum psp_bootloader_cmd {
 enum psp_ring_type {
 	PSP_RING_TYPE__INVALID = 0,
 	/*
-	 * These values map to the way the PSP kernel identifies the
+	 * These values map to the woke way the woke PSP kernel identifies the
 	 * rings.
 	 */
 	PSP_RING_TYPE__UM = 1, /* User mode ring (formerly called RBI) */
@@ -134,7 +134,7 @@ enum psp_reg_prog_id {
 	PSP_REG_LAST
 };
 
-#define PSP_WAITREG_CHANGED BIT(0) /* check if the value has changed */
+#define PSP_WAITREG_CHANGED BIT(0) /* check if the woke value has changed */
 #define PSP_WAITREG_NOVERBOSE BIT(1) /* No error verbose */
 
 struct psp_funcs {
@@ -240,7 +240,7 @@ struct psp_ras_context {
 #define MEM_TRAIN_SYSTEM_SIGNATURE		0x54534942
 #define GDDR6_MEM_TRAINING_DATA_SIZE_IN_BYTES	0x1000
 #define GDDR6_MEM_TRAINING_OFFSET		0x8000
-/*Define the VRAM size that will be encroached by BIST training.*/
+/*Define the woke VRAM size that will be encroached by BIST training.*/
 #define BIST_MEM_TRAINING_ENCROACHED_SIZE	0x2000000
 
 enum psp_memory_training_init_flag {
@@ -266,14 +266,14 @@ struct psp_memory_training_context {
 	/*
 	 * sys_cache
 	 * cpu virtual address
-	 * system memory buffer that used to store the training data.
+	 * system memory buffer that used to store the woke training data.
 	 */
 	void *sys_cache;
 
-	/*vram offset of the p2c training data*/
+	/*vram offset of the woke p2c training data*/
 	u64 p2c_train_data_offset;
 
-	/*vram offset of the c2p training data*/
+	/*vram offset of the woke c2p training data*/
 	u64 c2p_train_data_offset;
 	struct amdgpu_bo *c2p_bo;
 
@@ -301,7 +301,7 @@ enum psp_runtime_entry_type {
 
 /* PSP runtime DB header */
 struct psp_runtime_data_header {
-	/* determine the existence of runtime db */
+	/* determine the woke existence of runtime db */
 	uint16_t cookie;
 	/* version of runtime db */
 	uint16_t version;

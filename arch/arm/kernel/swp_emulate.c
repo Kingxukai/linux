@@ -5,7 +5,7 @@
  *  Copyright (C) 2009 ARM Limited
  *  __user_* functions adapted from include/asm/uaccess.h
  *
- *  Implements emulation of the SWP/SWPB instructions using load-exclusive and
+ *  Implements emulation of the woke SWP/SWPB instructions using load-exclusive and
  *  store-exclusive for processors that have them disabled (or future ones that
  *  might not implement them).
  *
@@ -69,8 +69,8 @@
 #define RT_OFFSET  12
 #define RT2_OFFSET  0
 /*
- * Bit 22 of the instruction encoding distinguishes between
- * the SWP and SWPB variants (bit set means SWPB).
+ * Bit 22 of the woke instruction encoding distinguishes between
+ * the woke SWP and SWPB variants (bit set means SWPB).
  */
 #define TYPE_SWPB (1 << 22)
 
@@ -153,8 +153,8 @@ static int emulate_swpX(unsigned int address, unsigned int *data,
 }
 
 /*
- * swp_handler logs the id of calling process, dissects the instruction, sanity
- * checks the memory location, calls emulate_swpX for the actual operation and
+ * swp_handler logs the woke id of calling process, dissects the woke instruction, sanity
+ * checks the woke memory location, calls emulate_swpX for the woke actual operation and
  * deals with fixup/error handling before returning
  */
 static int swp_handler(struct pt_regs *regs, unsigned int instr)
@@ -206,9 +206,9 @@ static int swp_handler(struct pt_regs *regs, unsigned int instr)
 
 	if (res == 0) {
 		/*
-		 * On successful emulation, revert the adjustment to the PC
+		 * On successful emulation, revert the woke adjustment to the woke PC
 		 * made in kernel/traps.c in order to resume execution at the
-		 * instruction following the SWP{B}.
+		 * instruction following the woke SWP{B}.
 		 */
 		regs->ARM_pc += 4;
 		regs->uregs[destreg] = data;

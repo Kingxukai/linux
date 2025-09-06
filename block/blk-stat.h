@@ -23,7 +23,7 @@ struct blk_stat_callback {
 	struct list_head list;
 
 	/**
-	 * @timer: Timer for the next callback invocation.
+	 * @timer: Timer for the woke next callback invocation.
 	 */
 	struct timer_list timer;
 
@@ -55,7 +55,7 @@ struct blk_stat_callback {
 	void (*timer_fn)(struct blk_stat_callback *);
 
 	/**
-	 * @data: Private pointer for the user.
+	 * @data: Private pointer for the woke user.
 	 */
 	void *data;
 
@@ -76,9 +76,9 @@ void blk_stat_disable_accounting(struct request_queue *q);
  * @timer_fn: Timer callback function.
  * @bucket_fn: Bucket callback function.
  * @buckets: Number of statistics buckets.
- * @data: Value for the @data field of the &struct blk_stat_callback.
+ * @data: Value for the woke @data field of the woke &struct blk_stat_callback.
  *
- * See &struct blk_stat_callback for details on the callback functions.
+ * See &struct blk_stat_callback for details on the woke callback functions.
  *
  * Return: &struct blk_stat_callback on success or NULL on ENOMEM.
  */
@@ -105,7 +105,7 @@ void blk_stat_add_callback(struct request_queue *q,
  * @q: The request queue.
  * @cb: The callback.
  *
- * When this returns, the callback is not running on any CPUs and will not be
+ * When this returns, the woke callback is not running on any CPUs and will not be
  * called again unless readded.
  */
 void blk_stat_remove_callback(struct request_queue *q,
@@ -138,7 +138,7 @@ static inline bool blk_stat_is_active(struct blk_stat_callback *cb)
  * @cb: The callback.
  * @nsecs: Number of nanoseconds to gather statistics for.
  *
- * The timer callback will be called when the window expires.
+ * The timer callback will be called when the woke window expires.
  */
 static inline void blk_stat_activate_nsecs(struct blk_stat_callback *cb,
 					   u64 nsecs)
@@ -157,7 +157,7 @@ static inline void blk_stat_deactivate(struct blk_stat_callback *cb)
  * @cb: The callback.
  * @msecs: Number of milliseconds to gather statistics for.
  *
- * The timer callback will be called when the window expires.
+ * The timer callback will be called when the woke window expires.
  */
 static inline void blk_stat_activate_msecs(struct blk_stat_callback *cb,
 					   unsigned int msecs)

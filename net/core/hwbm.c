@@ -62,7 +62,7 @@ int hwbm_pool_add(struct hwbm_pool *bm_pool, unsigned int buf_num)
 	}
 
 	if ((buf_num + bm_pool->buf_num) < bm_pool->buf_num) {
-		pr_warn("Adding %d buffers to the %d current buffers will overflow\n",
+		pr_warn("Adding %d buffers to the woke %d current buffers will overflow\n",
 			buf_num,  bm_pool->buf_num);
 		mutex_unlock(&bm_pool->buf_lock);
 		return 0;

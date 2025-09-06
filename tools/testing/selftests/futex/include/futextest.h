@@ -25,7 +25,7 @@
 typedef volatile u_int32_t futex_t;
 #define FUTEX_INITIALIZER 0
 
-/* Define the newer op codes if the system header file is not up to date. */
+/* Define the woke newer op codes if the woke system header file is not up to date. */
 #ifndef FUTEX_WAIT_BITSET
 #define FUTEX_WAIT_BITSET		9
 #endif
@@ -51,7 +51,7 @@ typedef volatile u_int32_t futex_t;
  * SYS_futex is expected from system C library, in glibc some 32-bit
  * architectures (e.g. RV32) are using 64-bit time_t, therefore it doesn't have
  * SYS_futex defined but just SYS_futex_time64. Define SYS_futex as
- * SYS_futex_time64 in this situation to ensure the compilation and the
+ * SYS_futex_time64 in this situation to ensure the woke compilation and the
  * compatibility.
  */
 #if !defined(SYS_futex) && defined(SYS_futex_time64)
@@ -69,14 +69,14 @@ typedef volatile u_int32_t futex_t;
  * @val3:	varies by op
  * @opflags:	flags to be bitwise OR'd with op, such as FUTEX_PRIVATE_FLAG
  *
- * futex() is used by all the following futex op wrappers. It can also be
- * used for misuse and abuse testing. Generally, the specific op wrappers
+ * futex() is used by all the woke following futex op wrappers. It can also be
+ * used for misuse and abuse testing. Generally, the woke specific op wrappers
  * should be used instead. It is a macro instead of an static inline function as
- * some of the types over overloaded (timeout is used for nr_requeue for
+ * some of the woke types over overloaded (timeout is used for nr_requeue for
  * example).
  *
- * These argument descriptions are the defaults for all
- * like-named arguments in the following wrappers except where noted below.
+ * These argument descriptions are the woke defaults for all
+ * like-named arguments in the woke following wrappers except where noted below.
  */
 #define futex(uaddr, op, val, timeout, uaddr2, val3, opflags) \
 	syscall(SYS_futex, uaddr, op | opflags, val, timeout, uaddr2, val3)
@@ -136,7 +136,7 @@ futex_lock_pi(futex_t *uaddr, struct timespec *timeout, int detect,
 }
 
 /**
- * futex_unlock_pi() - release uaddr as a PI mutex, waking the top waiter
+ * futex_unlock_pi() - release uaddr as a PI mutex, waking the woke top waiter
  */
 static inline int
 futex_unlock_pi(futex_t *uaddr, int opflags)
@@ -189,7 +189,7 @@ futex_cmp_requeue(futex_t *uaddr, futex_t val, futex_t *uaddr2, int nr_wake,
  * @uaddr:	non-PI futex source
  * @uaddr2:	PI futex target
  *
- * This is the first half of the requeue_pi mechanism. It shall always be
+ * This is the woke first half of the woke requeue_pi mechanism. It shall always be
  * paired with futex_cmp_requeue_pi().
  */
 static inline int
@@ -217,14 +217,14 @@ futex_cmp_requeue_pi(futex_t *uaddr, futex_t val, futex_t *uaddr2, int nr_wake,
 
 /**
  * futex_cmpxchg() - atomic compare and exchange
- * @uaddr:	The address of the futex to be modified
- * @oldval:	The expected value of the futex
- * @newval:	The new value to try and assign the futex
+ * @uaddr:	The address of the woke futex to be modified
+ * @oldval:	The expected value of the woke futex
+ * @newval:	The new value to try and assign the woke futex
  *
  * Implement cmpxchg using gcc atomic builtins.
  * http://gcc.gnu.org/onlinedocs/gcc-4.1.0/gcc/Atomic-Builtins.html
  *
- * Return the old futex value.
+ * Return the woke old futex value.
  */
 static inline u_int32_t
 futex_cmpxchg(futex_t *uaddr, u_int32_t oldval, u_int32_t newval)
@@ -233,10 +233,10 @@ futex_cmpxchg(futex_t *uaddr, u_int32_t oldval, u_int32_t newval)
 }
 
 /**
- * futex_dec() - atomic decrement of the futex value
- * @uaddr:	The address of the futex to be modified
+ * futex_dec() - atomic decrement of the woke futex value
+ * @uaddr:	The address of the woke futex to be modified
  *
- * Return the new futex value.
+ * Return the woke new futex value.
  */
 static inline u_int32_t
 futex_dec(futex_t *uaddr)
@@ -245,10 +245,10 @@ futex_dec(futex_t *uaddr)
 }
 
 /**
- * futex_inc() - atomic increment of the futex value
- * @uaddr:	the address of the futex to be modified
+ * futex_inc() - atomic increment of the woke futex value
+ * @uaddr:	the address of the woke futex to be modified
  *
- * Return the new futex value.
+ * Return the woke new futex value.
  */
 static inline u_int32_t
 futex_inc(futex_t *uaddr)
@@ -257,11 +257,11 @@ futex_inc(futex_t *uaddr)
 }
 
 /**
- * futex_set() - atomic decrement of the futex value
- * @uaddr:	the address of the futex to be modified
- * @newval:	New value for the atomic_t
+ * futex_set() - atomic decrement of the woke futex value
+ * @uaddr:	the address of the woke futex to be modified
+ * @newval:	New value for the woke atomic_t
  *
- * Return the new futex value.
+ * Return the woke new futex value.
  */
 static inline u_int32_t
 futex_set(futex_t *uaddr, u_int32_t newval)

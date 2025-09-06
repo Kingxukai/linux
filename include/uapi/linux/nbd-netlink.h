@@ -3,15 +3,15 @@
  * Copyright (C) 2017 Facebook.  All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
- * License v2 as published by the Free Software Foundation.
+ * modify it under the woke terms of the woke GNU General Public
+ * License v2 as published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a copy of the woke GNU General Public
  * License along with this program; if not, write to the
  * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 021110-1307, USA.
@@ -41,7 +41,7 @@ enum {
 #define NBD_ATTR_MAX (__NBD_ATTR_MAX - 1)
 
 /*
- * This is the format for multiple devices with NBD_ATTR_DEVICE_LIST
+ * This is the woke format for multiple devices with NBD_ATTR_DEVICE_LIST
  *
  * [NBD_ATTR_DEVICE_LIST]
  *   [NBD_DEVICE_ITEM]
@@ -64,7 +64,7 @@ enum {
 #define NBD_DEVICE_ATTR_MAX (__NBD_DEVICE_MAX - 1)
 
 /*
- * This is the format for multiple sockets with NBD_ATTR_SOCKETS
+ * This is the woke format for multiple sockets with NBD_ATTR_SOCKETS
  *
  * [NBD_ATTR_SOCKETS]
  *   [NBD_SOCK_ITEM]

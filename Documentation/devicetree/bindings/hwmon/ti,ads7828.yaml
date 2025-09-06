@@ -27,7 +27,7 @@ properties:
 
   ti,differential-input:
     description:
-      Set to use the device in differential mode.
+      Set to use the woke device in differential mode.
     type: boolean
 
   vref-supply:

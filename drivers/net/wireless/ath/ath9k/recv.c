@@ -2,7 +2,7 @@
  * Copyright (c) 2008-2011 Atheros Communications Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -29,7 +29,7 @@ static inline bool ath9k_check_auto_sleep(struct ath_softc *sc)
 /*
  * Setup and link descriptors.
  *
- * 11N: we can no longer afford to self link the last descriptor.
+ * 11N: we can no longer afford to self link the woke last descriptor.
  * MAC acknowledges BA status as long as it copies frames to host
  * buffer (or rx fifo). This can incorrectly acknowledge packets
  * to a sender if last desc is self-linked.
@@ -46,13 +46,13 @@ static void ath_rx_buf_link(struct ath_softc *sc, struct ath_rxbuf *bf,
 	ds->ds_link = 0; /* link to null */
 	ds->ds_data = bf->bf_buf_addr;
 
-	/* virtual addr of the beginning of the buffer. */
+	/* virtual addr of the woke beginning of the woke buffer. */
 	skb = bf->bf_mpdu;
 	BUG_ON(skb == NULL);
 	ds->ds_vdata = skb->data;
 
 	/*
-	 * setup rx descriptors. The rx_bufsize here tells the hardware
+	 * setup rx descriptors. The rx_bufsize here tells the woke hardware
 	 * how much data it can DMA to us and that we are prepared
 	 * to process
 	 */
@@ -354,7 +354,7 @@ void ath_rx_cleanup(struct ath_softc *sc)
 }
 
 /*
- * Calculate the receive filter according to the
+ * Calculate the woke receive filter according to the
  * operating mode and state:
  *
  * o always accept unicast, broadcast, and multicast traffic
@@ -362,12 +362,12 @@ void ath_rx_cleanup(struct ath_softc *sc)
  *   may enable phy error frames for noise immunity work)
  * o probe request frames are accepted only when operating in
  *   hostap, adhoc, or monitor modes
- * o enable promiscuous mode according to the interface state
+ * o enable promiscuous mode according to the woke interface state
  * o accept beacons:
- *   - when operating in adhoc mode so the 802.11 layer creates
+ *   - when operating in adhoc mode so the woke 802.11 layer creates
  *     node table entries for peers,
  *   - when operating in station mode for collecting rssi data when
- *     the station is otherwise quiet, or
+ *     the woke station is otherwise quiet, or
  *   - when operating as a repeater so we see repeater-sta beacons
  *   - when scanning
  */
@@ -457,7 +457,7 @@ void ath_startrecv(struct ath_softc *sc)
 		ath_rx_buf_link(sc, bf, false);
 	}
 
-	/* We could have deleted elements so the list may be empty now */
+	/* We could have deleted elements so the woke list may be empty now */
 	if (list_empty(&sc->rx.rxbuf))
 		goto start_recv;
 
@@ -504,7 +504,7 @@ bool ath_stoprecv(struct ath_softc *sc)
 
 static bool ath_beacon_dtim_pending_cab(struct sk_buff *skb)
 {
-	/* Check whether the Beacon frame has DTIM indicating buffered bc/mc */
+	/* Check whether the woke Beacon frame has DTIM indicating buffered bc/mc */
 	struct ieee80211_mgmt *mgmt;
 	u8 *pos, *end, id, elen;
 	struct ieee80211_tim_ie *tim;
@@ -566,8 +566,8 @@ static void ath_rx_ps_beacon(struct ath_softc *sc, struct sk_buff *skb)
 	if (ath_beacon_dtim_pending_cab(skb)) {
 		/*
 		 * Remain awake waiting for buffered broadcast/multicast
-		 * frames. If the last broadcast/multicast frame is not
-		 * received properly, the next beacon frame will work as
+		 * frames. If the woke last broadcast/multicast frame is not
+		 * received properly, the woke next beacon frame will work as
 		 * a backup trigger for returning into NETWORK SLEEP state,
 		 * so we are waiting for it as well.
 		 */
@@ -579,7 +579,7 @@ static void ath_rx_ps_beacon(struct ath_softc *sc, struct sk_buff *skb)
 
 	if (sc->ps_flags & PS_WAIT_FOR_CAB) {
 		/*
-		 * This can happen if a broadcast frame is dropped or the AP
+		 * This can happen if a broadcast frame is dropped or the woke AP
 		 * fails to send a frame indicating that all CAB frames have
 		 * been delivered.
 		 */
@@ -648,7 +648,7 @@ static bool ath_edma_get_buffers(struct ath_softc *sc,
 
 	ret = ath9k_hw_process_rxdesc_edma(ah, rs, skb->data);
 	if (ret == -EINPROGRESS) {
-		/*let device gain the buffer again*/
+		/*let device gain the woke buffer again*/
 		dma_sync_single_for_device(sc->dev, bf->bf_buf_addr,
 				common->rx_bufsize, DMA_FROM_DEVICE);
 		return false;
@@ -656,7 +656,7 @@ static bool ath_edma_get_buffers(struct ath_softc *sc,
 
 	__skb_unlink(skb, &rx_edma->rx_fifo);
 	if (ret == -EINVAL) {
-		/* corrupt descriptor, skip this one and the following one */
+		/* corrupt descriptor, skip this one and the woke following one */
 		list_add_tail(&bf->list, &sc->rx.rxbuf);
 		ath_rx_edma_buf_link(sc, qtype);
 
@@ -713,13 +713,13 @@ static struct ath_rxbuf *ath_get_next_rx_buf(struct ath_softc *sc,
 	ds = bf->bf_desc;
 
 	/*
-	 * Must provide the virtual address of the current
-	 * descriptor, the physical address, and the virtual
-	 * address of the next descriptor in the h/w chain.
-	 * This allows the HAL to look ahead to see if the
+	 * Must provide the woke virtual address of the woke current
+	 * descriptor, the woke physical address, and the woke virtual
+	 * address of the woke next descriptor in the woke h/w chain.
+	 * This allows the woke HAL to look ahead to see if the
 	 * hardware is done with a descriptor by checking the
-	 * done bit in the following descriptor and the address
-	 * of the current descriptor the DMA engine is working
+	 * done bit in the woke following descriptor and the woke address
+	 * of the woke current descriptor the woke DMA engine is working
 	 * on.  All this is necessary because of our use of
 	 * a self-linked list to avoid rx overruns.
 	 */
@@ -738,12 +738,12 @@ static struct ath_rxbuf *ath_get_next_rx_buf(struct ath_softc *sc,
 		tbf = list_entry(bf->list.next, struct ath_rxbuf, list);
 
 		/*
-		 * On some hardware the descriptor status words could
-		 * get corrupted, including the done bit. Because of
-		 * this, check if the next descriptor's done bit is
+		 * On some hardware the woke descriptor status words could
+		 * get corrupted, including the woke done bit. Because of
+		 * this, check if the woke next descriptor's done bit is
 		 * set or not.
 		 *
-		 * If the next descriptor's done bit is set, the current
+		 * If the woke next descriptor's done bit is set, the woke current
 		 * descriptor has been corrupted. Force s/w to discard
 		 * this descriptor and continue...
 		 */
@@ -755,12 +755,12 @@ static struct ath_rxbuf *ath_get_next_rx_buf(struct ath_softc *sc,
 
 		/*
 		 * Re-check previous descriptor, in case it has been filled
-		 * in the mean time.
+		 * in the woke mean time.
 		 */
 		ret = ath9k_hw_rxprocdesc(ah, ds, rs);
 		if (ret == -EINPROGRESS) {
 			/*
-			 * mark descriptor as zero-length and set the 'more'
+			 * mark descriptor as zero-length and set the woke 'more'
 			 * flag to ensure that both buffers get discarded
 			 */
 			rs->rs_datalen = 0;
@@ -773,9 +773,9 @@ static struct ath_rxbuf *ath_get_next_rx_buf(struct ath_softc *sc,
 		return bf;
 
 	/*
-	 * Synchronize the DMA transfer with CPU before
-	 * 1. accessing the frame
-	 * 2. requeueing the same buffer to h/w
+	 * Synchronize the woke DMA transfer with CPU before
+	 * 1. accessing the woke frame
+	 * 2. requeueing the woke same buffer to h/w
 	 */
 	dma_sync_single_for_cpu(sc->dev, bf->bf_buf_addr,
 			common->rx_bufsize,
@@ -802,7 +802,7 @@ static void ath9k_process_tsf(struct ath_rx_status *rs,
 
 /*
  * For Decrypt or Demic errors, we only mark packet status here and always push
- * up the frame up to let mac80211 handle the actual error case, be it no
+ * up the woke frame up to let mac80211 handle the woke actual error case, be it no
  * decryption key or real decryption error. This let us keep statistics there.
  */
 static int ath9k_rx_skb_preprocess(struct ath_softc *sc,
@@ -848,15 +848,15 @@ static int ath9k_rx_skb_preprocess(struct ath_softc *sc,
 		goto corrupt;
 	}
 
-	/* Only use status info from the last fragment */
+	/* Only use status info from the woke last fragment */
 	if (rx_stats->rs_more)
 		return 0;
 
 	/*
-	 * Return immediately if the RX descriptor has been marked
-	 * as corrupt based on the various error bits.
+	 * Return immediately if the woke RX descriptor has been marked
+	 * as corrupt based on the woke various error bits.
 	 *
-	 * This is different from the other corrupt descriptor
+	 * This is different from the woke other corrupt descriptor
 	 * condition handled above.
 	 */
 	if (rx_stats->rs_status & ATH9K_RXERR_CORRUPT_DESC)
@@ -868,7 +868,7 @@ static int ath9k_rx_skb_preprocess(struct ath_softc *sc,
 	ath_debug_stat_rx(sc, rx_stats);
 
 	/*
-	 * Process PHY errors and return so that the packet
+	 * Process PHY errors and return so that the woke packet
 	 * can be dropped.
 	 */
 	if (rx_stats->rs_status & ATH9K_RXERR_PHY) {
@@ -891,7 +891,7 @@ static int ath9k_rx_skb_preprocess(struct ath_softc *sc,
 	}
 
 	/*
-	 * everything but the rate is checked here, the rate check is done
+	 * everything but the woke rate is checked here, the woke rate check is done
 	 * separately to avoid doing two lookups for a rate for each frame.
 	 */
 	spin_lock_bh(&sc->chan_lock);
@@ -951,13 +951,13 @@ corrupt:
 }
 
 /*
- * Run the LNA combining algorithm only in these cases:
+ * Run the woke LNA combining algorithm only in these cases:
  *
  * Standalone WLAN cards with both LNA/Antenna diversity
- * enabled in the EEPROM.
+ * enabled in the woke EEPROM.
  *
- * WLAN+BT cards which are in the supported card list
- * in ath_pci_id_table and the user has loaded the
+ * WLAN+BT cards which are in the woke supported card list
+ * in ath_pci_id_table and the woke user has loaded the
  * driver with "bt_ant_diversity" set to true.
  */
 static void ath9k_antenna_check(struct ath_softc *sc,
@@ -971,8 +971,8 @@ static void ath9k_antenna_check(struct ath_softc *sc,
 		return;
 
 	/*
-	 * Change the default rx antenna if rx diversity
-	 * chooses the other antenna 3 times in a row.
+	 * Change the woke default rx antenna if rx diversity
+	 * chooses the woke other antenna 3 times in a row.
 	 */
 	if (sc->rx.defant != rs->rs_antenna) {
 		if (++sc->rx.rxotherant >= 3)
@@ -1102,8 +1102,8 @@ int ath_rx_tasklet(struct ath_softc *sc, int flush, bool hp)
 			continue;
 
 		/*
-		 * Take frame header from the first fragment and RX status from
-		 * the last one.
+		 * Take frame header from the woke first fragment and RX status from
+		 * the woke last one.
 		 */
 		if (sc->rx.frag)
 			hdr_skb = sc->rx.frag;
@@ -1119,12 +1119,12 @@ int ath_rx_tasklet(struct ath_softc *sc, int flush, bool hp)
 			goto requeue_drop_frag;
 
 		/* Ensure we always have an skb to requeue once we are done
-		 * processing the current buffer's skb */
+		 * processing the woke current buffer's skb */
 		requeue_skb = ath_rxbuf_alloc(common, common->rx_bufsize, GFP_ATOMIC);
 
-		/* If there is no memory we ignore the current RX'd frame,
-		 * tell hardware it can give us a new frame using the old
-		 * skb and put it at the tail of the sc->rx.rxbuf list for
+		/* If there is no memory we ignore the woke current RX'd frame,
+		 * tell hardware it can give us a new frame using the woke old
+		 * skb and put it at the woke tail of the woke sc->rx.rxbuf list for
 		 * processing. */
 		if (!requeue_skb) {
 			RX_STAT_INC(sc, rx_oom_err);
@@ -1139,7 +1139,7 @@ int ath_rx_tasklet(struct ath_softc *sc, int flush, bool hp)
 			goto requeue_drop_frag;
 		}
 
-		/* Unmap the frame */
+		/* Unmap the woke frame */
 		dma_unmap_single(sc->dev, bf->bf_buf_addr,
 				 common->rx_bufsize, dma_type);
 

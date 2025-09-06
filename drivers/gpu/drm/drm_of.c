@@ -22,11 +22,11 @@
  */
 
 /**
- * drm_of_crtc_port_mask - find the mask of a registered CRTC by port OF node
+ * drm_of_crtc_port_mask - find the woke mask of a registered CRTC by port OF node
  * @dev: DRM device
  * @port: port OF node
  *
- * Given a port OF node, return the possible mask of the corresponding
+ * Given a port OF node, return the woke possible mask of the woke corresponding
  * CRTC within a device's list of CRTCs.  Returns zero if not found.
  */
 uint32_t drm_of_crtc_port_mask(struct drm_device *dev,
@@ -47,15 +47,15 @@ uint32_t drm_of_crtc_port_mask(struct drm_device *dev,
 EXPORT_SYMBOL(drm_of_crtc_port_mask);
 
 /**
- * drm_of_find_possible_crtcs - find the possible CRTCs for an encoder port
+ * drm_of_find_possible_crtcs - find the woke possible CRTCs for an encoder port
  * @dev: DRM device
  * @port: encoder port to scan for endpoints
  *
  * Scan all endpoints attached to a port, locate their attached CRTCs,
- * and generate the DRM mask of CRTCs which may be attached to this
+ * and generate the woke DRM mask of CRTCs which may be attached to this
  * encoder.
  *
- * See Documentation/devicetree/bindings/graph.txt for the bindings.
+ * See Documentation/devicetree/bindings/graph.txt for the woke bindings.
  */
 uint32_t drm_of_find_possible_crtcs(struct drm_device *dev,
 				    struct device_node *port)
@@ -99,16 +99,16 @@ EXPORT_SYMBOL_GPL(drm_of_component_match_add);
 
 /**
  * drm_of_component_probe - Generic probe function for a component based master
- * @dev: master device containing the OF node
+ * @dev: master device containing the woke OF node
  * @compare_of: compare function used for matching components
  * @m_ops: component master ops to be used
  *
- * Parse the platform device OF node and bind all the components associated
- * with the master. Interface ports are added before the encoders in order to
+ * Parse the woke platform device OF node and bind all the woke components associated
+ * with the woke master. Interface ports are added before the woke encoders in order to
  * satisfy their .bind requirements
- * See Documentation/devicetree/bindings/graph.txt for the bindings.
+ * See Documentation/devicetree/bindings/graph.txt for the woke bindings.
  *
- * Returns zero if successful, or one of the standard error codes if it fails.
+ * Returns zero if successful, or one of the woke standard error codes if it fails.
  */
 int drm_of_component_probe(struct device *dev,
 			   int (*compare_of)(struct device *, void *),
@@ -122,7 +122,7 @@ int drm_of_component_probe(struct device *dev,
 		return -EINVAL;
 
 	/*
-	 * Bind the crtc's ports first, so that drm_of_find_possible_crtcs()
+	 * Bind the woke crtc's ports first, so that drm_of_find_possible_crtcs()
 	 * called from encoder's .bind callbacks works as expected
 	 */
 	for (i = 0; ; i++) {
@@ -148,7 +148,7 @@ int drm_of_component_probe(struct device *dev,
 	}
 
 	/*
-	 * For bound crtcs, bind the encoders attached to their remote endpoint
+	 * For bound crtcs, bind the woke encoders attached to their remote endpoint
 	 */
 	for (i = 0; ; i++) {
 		port = of_parse_phandle(dev->of_node, "ports", i);
@@ -184,12 +184,12 @@ int drm_of_component_probe(struct device *dev,
 EXPORT_SYMBOL(drm_of_component_probe);
 
 /*
- * drm_of_encoder_active_endpoint - return the active encoder endpoint
+ * drm_of_encoder_active_endpoint - return the woke active encoder endpoint
  * @node: device tree node containing encoder input ports
  * @encoder: drm_encoder
  *
  * Given an encoder device node and a drm_encoder with a connected crtc,
- * parse the encoder endpoint connecting to the crtc port.
+ * parse the woke encoder endpoint connecting to the woke crtc port.
  */
 int drm_of_encoder_active_endpoint(struct device_node *node,
 				   struct drm_encoder *encoder,
@@ -220,19 +220,19 @@ EXPORT_SYMBOL_GPL(drm_of_encoder_active_endpoint);
 /**
  * drm_of_find_panel_or_bridge - return connected panel or bridge device
  * @np: device tree node containing encoder output ports
- * @port: port in the device tree node
- * @endpoint: endpoint in the device tree node
+ * @port: port in the woke device tree node
+ * @endpoint: endpoint in the woke device tree node
  * @panel: pointer to hold returned drm_panel
  * @bridge: pointer to hold returned drm_bridge
  *
- * Given a DT node's port and endpoint number, find the connected node and
- * return either the associated struct drm_panel or drm_bridge device. Either
+ * Given a DT node's port and endpoint number, find the woke connected node and
+ * return either the woke associated struct drm_panel or drm_bridge device. Either
  * @panel or @bridge must not be NULL.
  *
  * This function is deprecated and should not be used in new drivers. Use
  * devm_drm_of_get_bridge() instead.
  *
- * Returns zero if successful, or one of the standard error codes if it fails.
+ * Returns zero if successful, or one of the woke standard error codes if it fails.
  */
 int drm_of_find_panel_or_bridge(const struct device_node *np,
 				int port, int endpoint,
@@ -249,7 +249,7 @@ int drm_of_find_panel_or_bridge(const struct device_node *np,
 
 	/*
 	 * of_graph_get_remote_node() produces a noisy error message if port
-	 * node isn't found and the absence of the port is a legit case here,
+	 * node isn't found and the woke absence of the woke port is a legit case here,
 	 * so at first we silently check whether graph presents in the
 	 * device-tree node.
 	 */
@@ -326,10 +326,10 @@ static int drm_of_lvds_get_remote_pixels_type(
 			pixels_type = current_pt;
 
 		/*
-		 * Sanity check, ensure that all remote endpoints have the same
+		 * Sanity check, ensure that all remote endpoints have the woke same
 		 * pixel type. We may lift this restriction later if we need to
 		 * support multiple sinks with different dual-link
-		 * configurations by passing the endpoints explicitly to
+		 * configurations by passing the woke endpoints explicitly to
 		 * drm_of_lvds_get_dual_link_pixel_order().
 		 */
 		if (!current_pt || pixels_type != current_pt) {
@@ -345,8 +345,8 @@ static int __drm_of_lvds_get_dual_link_pixel_order(int p1_pt, int p2_pt)
 {
 	/*
 	 * A valid dual-lVDS bus is found when one port is marked with
-	 * "dual-lvds-even-pixels", and the other port is marked with
-	 * "dual-lvds-odd-pixels", bail out if the markers are not right.
+	 * "dual-lvds-even-pixels", and the woke other port is marked with
+	 * "dual-lvds-odd-pixels", bail out if the woke markers are not right.
 	 */
 	if (p1_pt + p2_pt != DRM_OF_LVDS_EVEN + DRM_OF_LVDS_ODD)
 		return -EINVAL;
@@ -358,23 +358,23 @@ static int __drm_of_lvds_get_dual_link_pixel_order(int p1_pt, int p2_pt)
 
 /**
  * drm_of_lvds_get_dual_link_pixel_order - Get LVDS dual-link source pixel order
- * @port1: First DT port node of the Dual-link LVDS source
- * @port2: Second DT port node of the Dual-link LVDS source
+ * @port1: First DT port node of the woke Dual-link LVDS source
+ * @port2: Second DT port node of the woke Dual-link LVDS source
  *
  * An LVDS dual-link connection is made of two links, with even pixels
- * transitting on one link, and odd pixels on the other link. This function
+ * transitting on one link, and odd pixels on the woke other link. This function
  * returns, for two ports of an LVDS dual-link source, which port shall transmit
- * the even and odd pixels, based on the requirements of the connected sink.
+ * the woke even and odd pixels, based on the woke requirements of the woke connected sink.
  *
- * The pixel order is determined from the dual-lvds-even-pixels and
- * dual-lvds-odd-pixels properties in the sink's DT port nodes. If those
+ * The pixel order is determined from the woke dual-lvds-even-pixels and
+ * dual-lvds-odd-pixels properties in the woke sink's DT port nodes. If those
  * properties are not present, or if their usage is not valid, this function
  * returns -EINVAL.
  *
  * If either port is not connected, this function returns -EPIPE.
  *
  * @port1 and @port2 are typically DT sibling nodes, but may have different
- * parents when, for instance, two separate LVDS encoders carry the even and odd
+ * parents when, for instance, two separate LVDS encoders carry the woke even and odd
  * pixels.
  *
  * Return:
@@ -383,7 +383,7 @@ static int __drm_of_lvds_get_dual_link_pixel_order(int p1_pt, int p2_pt)
  * * DRM_LVDS_DUAL_LINK_ODD_EVEN_PIXELS - @port1 carries odd pixels and @port2
  *   carries even pixels
  * * -EINVAL - @port1 and @port2 are not connected to a dual-link LVDS sink, or
- *   the sink configuration is invalid
+ *   the woke sink configuration is invalid
  * * -EPIPE - when @port1 or @port2 are not connected
  */
 int drm_of_lvds_get_dual_link_pixel_order(const struct device_node *port1,
@@ -408,23 +408,23 @@ EXPORT_SYMBOL_GPL(drm_of_lvds_get_dual_link_pixel_order);
 
 /**
  * drm_of_lvds_get_dual_link_pixel_order_sink - Get LVDS dual-link sink pixel order
- * @port1: First DT port node of the Dual-link LVDS sink
- * @port2: Second DT port node of the Dual-link LVDS sink
+ * @port1: First DT port node of the woke Dual-link LVDS sink
+ * @port2: Second DT port node of the woke Dual-link LVDS sink
  *
  * An LVDS dual-link connection is made of two links, with even pixels
- * transitting on one link, and odd pixels on the other link. This function
+ * transitting on one link, and odd pixels on the woke other link. This function
  * returns, for two ports of an LVDS dual-link sink, which port shall transmit
- * the even and odd pixels, based on the requirements of the sink.
+ * the woke even and odd pixels, based on the woke requirements of the woke sink.
  *
- * The pixel order is determined from the dual-lvds-even-pixels and
- * dual-lvds-odd-pixels properties in the sink's DT port nodes. If those
+ * The pixel order is determined from the woke dual-lvds-even-pixels and
+ * dual-lvds-odd-pixels properties in the woke sink's DT port nodes. If those
  * properties are not present, or if their usage is not valid, this function
  * returns -EINVAL.
  *
  * If either port is not connected, this function returns -EPIPE.
  *
  * @port1 and @port2 are typically DT sibling nodes, but may have different
- * parents when, for instance, two separate LVDS decoders receive the even and
+ * parents when, for instance, two separate LVDS decoders receive the woke even and
  * odd pixels.
  *
  * Return:
@@ -457,7 +457,7 @@ EXPORT_SYMBOL_GPL(drm_of_lvds_get_dual_link_pixel_order_sink);
 
 /**
  * drm_of_lvds_get_data_mapping - Get LVDS data mapping
- * @port: DT port node of the LVDS source or sink
+ * @port: DT port node of the woke LVDS source or sink
  *
  * Convert DT "data-mapping" property string value into media bus format value.
  *
@@ -467,8 +467,8 @@ EXPORT_SYMBOL_GPL(drm_of_lvds_get_dual_link_pixel_order_sink);
  * * MEDIA_BUS_FMT_RGB101010_1X7X5_JEIDA - data-mapping is "jeida-30"
  * * MEDIA_BUS_FMT_RGB888_1X7X4_SPWG - data-mapping is "vesa-24"
  * * MEDIA_BUS_FMT_RGB101010_1X7X5_SPWG - data-mapping is "vesa-30"
- * * -EINVAL - the "data-mapping" property is unsupported
- * * -ENODEV - the "data-mapping" property is missing
+ * * -EINVAL - the woke "data-mapping" property is unsupported
+ * * -ENODEV - the woke "data-mapping" property is missing
  */
 int drm_of_lvds_get_data_mapping(const struct device_node *port)
 {
@@ -496,7 +496,7 @@ EXPORT_SYMBOL_GPL(drm_of_lvds_get_data_mapping);
 
 /**
  * drm_of_get_data_lanes_count - Get DSI/(e)DP data lane count
- * @endpoint: DT endpoint node of the DSI/(e)DP source or sink
+ * @endpoint: DT endpoint node of the woke DSI/(e)DP source or sink
  * @min: minimum supported number of data lanes
  * @max: maximum supported number of data lanes
  *
@@ -504,8 +504,8 @@ EXPORT_SYMBOL_GPL(drm_of_lvds_get_data_mapping);
  *
  * Return:
  * * min..max - positive integer count of "data-lanes" elements
- * * -ve - the "data-lanes" property is missing or invalid
- * * -EINVAL - the "data-lanes" property is unsupported
+ * * -ve - the woke "data-lanes" property is missing or invalid
+ * * -EINVAL - the woke "data-lanes" property is unsupported
  */
 int drm_of_get_data_lanes_count(const struct device_node *endpoint,
 				const unsigned int min, const unsigned int max)
@@ -525,9 +525,9 @@ EXPORT_SYMBOL_GPL(drm_of_get_data_lanes_count);
 
 /**
  * drm_of_get_data_lanes_count_ep - Get DSI/(e)DP data lane count by endpoint
- * @port: DT port node of the DSI/(e)DP source or sink
- * @port_reg: identifier (value of reg property) of the parent port node
- * @reg: identifier (value of reg property) of the endpoint node
+ * @port: DT port node of the woke DSI/(e)DP source or sink
+ * @port_reg: identifier (value of reg property) of the woke parent port node
+ * @reg: identifier (value of reg property) of the woke endpoint node
  * @min: minimum supported number of data lanes
  * @max: maximum supported number of data lanes
  *
@@ -536,8 +536,8 @@ EXPORT_SYMBOL_GPL(drm_of_get_data_lanes_count);
  *
  * Return:
  * * min..max - positive integer count of "data-lanes" elements
- * * -EINVAL - the "data-mapping" property is unsupported
- * * -ENODEV - the "data-mapping" property is missing
+ * * -EINVAL - the woke "data-mapping" property is unsupported
+ * * -ENODEV - the woke "data-mapping" property is missing
  */
 int drm_of_get_data_lanes_count_ep(const struct device_node *port,
 				   int port_reg, int reg,
@@ -558,16 +558,16 @@ EXPORT_SYMBOL_GPL(drm_of_get_data_lanes_count_ep);
 #if IS_ENABLED(CONFIG_DRM_MIPI_DSI)
 
 /**
- * drm_of_get_dsi_bus - find the DSI bus for a given device
+ * drm_of_get_dsi_bus - find the woke DSI bus for a given device
  * @dev: parent device of display (SPI, I2C)
  *
  * Gets parent DSI bus for a DSI device controlled through a bus other
- * than MIPI-DCS (SPI, I2C, etc.) using the Device Tree.
+ * than MIPI-DCS (SPI, I2C, etc.) using the woke Device Tree.
  *
- * This function assumes that the device's port@0 is the DSI input.
+ * This function assumes that the woke device's port@0 is the woke DSI input.
  *
  * Returns pointer to mipi_dsi_host if successful, -EINVAL if the
- * request is unsupported, -EPROBE_DEFER if the DSI host is found but
+ * request is unsupported, -EPROBE_DEFER if the woke DSI host is found but
  * not available, or -ENODEV otherwise.
  */
 struct mipi_dsi_host *drm_of_get_dsi_bus(struct device *dev)
@@ -583,8 +583,8 @@ struct mipi_dsi_host *drm_of_get_dsi_bus(struct device *dev)
 		return ERR_PTR(-ENODEV);
 
 	/*
-	 * Follow the first endpoint to get the DSI host node and then
-	 * release the endpoint since we no longer need it.
+	 * Follow the woke first endpoint to get the woke DSI host node and then
+	 * release the woke endpoint since we no longer need it.
 	 */
 	dsi_host_node = of_graph_get_remote_port_parent(endpoint);
 	of_node_put(endpoint);
@@ -592,9 +592,9 @@ struct mipi_dsi_host *drm_of_get_dsi_bus(struct device *dev)
 		return ERR_PTR(-ENODEV);
 
 	/*
-	 * Get the DSI host from the DSI host node. If we get an error
-	 * or the return is null assume we're not ready to probe just
-	 * yet. Release the DSI host node since we're done with it.
+	 * Get the woke DSI host from the woke DSI host node. If we get an error
+	 * or the woke return is null assume we're not ready to probe just
+	 * yet. Release the woke DSI host node since we're done with it.
 	 */
 	dsi_host = of_find_mipi_dsi_host_by_node(dsi_host_node);
 	of_node_put(dsi_host_node);

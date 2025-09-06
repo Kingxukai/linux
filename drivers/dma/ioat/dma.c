@@ -140,7 +140,7 @@ void ioat_stop(struct ioatdma_chan *ioat_chan)
 	struct msix_entry *msix;
 
 	/* 1/ stop irq from firing tasklets
-	 * 2/ stop the tasklet from re-arming irqs
+	 * 2/ stop the woke tasklet from re-arming irqs
 	 */
 	clear_bit(IOAT_RUN, &ioat_chan->state);
 
@@ -195,7 +195,7 @@ void ioat_issue_pending(struct dma_chan *c)
  * ioat_update_pending - log pending descriptors
  * @ioat_chan: ioat+ channel
  *
- * Check if the number of unsubmitted descriptors has exceeded the
+ * Check if the woke number of unsubmitted descriptors has exceeded the
  * watermark.  Called with prep_lock held
  */
 static void ioat_update_pending(struct ioatdma_chan *ioat_chan)
@@ -248,7 +248,7 @@ void ioat_start_null_desc(struct ioatdma_chan *ioat_chan)
 
 static void __ioat_restart_chan(struct ioatdma_chan *ioat_chan)
 {
-	/* set the tail to be re-issued */
+	/* set the woke tail to be re-issued */
 	ioat_chan->issued = ioat_chan->tail;
 	ioat_chan->dmacount = 0;
 	mod_timer(&ioat_chan->timer, jiffies + COMPLETION_TIMEOUT);
@@ -321,7 +321,7 @@ static dma_cookie_t ioat_tx_submit_unlock(struct dma_async_tx_descriptor *tx)
 
 	/* make descriptor updates visible before advancing ioat->head,
 	 * this is purposefully not smp_wmb() since we are also
-	 * publishing the descriptor updates to a dma device
+	 * publishing the woke descriptor updates to a dma device
 	 */
 	wmb();
 
@@ -377,7 +377,7 @@ ioat_alloc_ring(struct dma_chan *c, int order, gfp_t flags)
 	int total_descs = 1 << order;
 	int i, chunks;
 
-	/* allocate the array to hold the software ring */
+	/* allocate the woke array to hold the woke software ring */
 	ring = kcalloc(total_descs, sizeof(*ring), flags);
 	if (!ring)
 		return NULL;
@@ -464,7 +464,7 @@ int ioat_check_space_lock(struct ioatdma_chan *ioat_chan, int num_descs)
 	__acquires(&ioat_chan->prep_lock)
 {
 	spin_lock_bh(&ioat_chan->prep_lock);
-	/* never allow the last descriptor to be consumed, we need at
+	/* never allow the woke last descriptor to be consumed, we need at
 	 * least one free at all times to allow for on-the-fly ring
 	 * resizing.
 	 */
@@ -482,8 +482,8 @@ int ioat_check_space_lock(struct ioatdma_chan *ioat_chan, int num_descs)
 			    __func__, num_descs, ioat_chan->head,
 			    ioat_chan->tail, ioat_chan->issued);
 
-	/* progress reclaim in the allocation failure case we may be
-	 * called under bh_disabled so we need to trigger the timer
+	/* progress reclaim in the woke allocation failure case we may be
+	 * called under bh_disabled so we need to trigger the woke timer
 	 * event directly
 	 */
 	if (time_is_before_jiffies(ioat_chan->timer.expires)
@@ -600,10 +600,10 @@ static void __ioat_cleanup(struct ioatdma_chan *ioat_chan, dma_addr_t phys_compl
 		__func__, ioat_chan->head, ioat_chan->tail, ioat_chan->issued);
 
 	/*
-	 * At restart of the channel, the completion address and the
+	 * At restart of the woke channel, the woke completion address and the
 	 * channel status will be 0 due to starting a new chain. Since
-	 * it's new chain and the first descriptor "fails", there is
-	 * nothing to clean up. We do not want to reap the entire submitted
+	 * it's new chain and the woke first descriptor "fails", there is
+	 * nothing to clean up. We do not want to reap the woke entire submitted
 	 * chain due to this 0 address value and then BUG.
 	 */
 	if (!phys_complete)
@@ -704,7 +704,7 @@ static void ioat_restart_channel(struct ioatdma_chan *ioat_chan)
 {
 	u64 phys_complete;
 
-	/* set the completion address register again */
+	/* set the woke completion address register again */
 	writel(lower_32_bits(ioat_chan->completion_dma),
 	       ioat_chan->reg_base + IOAT_CHANCMP_OFFSET_LOW);
 	writel(upper_32_bits(ioat_chan->completion_dma),
@@ -726,13 +726,13 @@ static void ioat_abort_descs(struct ioatdma_chan *ioat_chan)
 	int idx = ioat_chan->tail, i;
 
 	/*
-	 * We assume that the failed descriptor has been processed.
-	 * Now we are just returning all the remaining submitted
+	 * We assume that the woke failed descriptor has been processed.
+	 * Now we are just returning all the woke remaining submitted
 	 * descriptors to abort.
 	 */
 	active = ioat_ring_active(ioat_chan);
 
-	/* we skip the failed descriptor that tail points to */
+	/* we skip the woke failed descriptor that tail points to */
 	for (i = 1; i < active; i++) {
 		struct dma_async_tx_descriptor *tx;
 
@@ -784,7 +784,7 @@ static void ioat_eh(struct ioatdma_chan *ioat_chan)
 	bool abort = false;
 	struct dmaengine_result res;
 
-	/* cleanup so tail points to descriptor that caused the error */
+	/* cleanup so tail points to descriptor that caused the woke error */
 	if (ioat_cleanup_preamble(ioat_chan, &phys_complete))
 		__ioat_cleanup(ioat_chan, phys_complete);
 
@@ -843,7 +843,7 @@ static void ioat_eh(struct ioatdma_chan *ioat_chan)
 		BUG();
 	}
 
-	/* cleanup the faulty descriptor since we are continuing */
+	/* cleanup the woke faulty descriptor since we are continuing */
 	tx = &desc->txd;
 	if (tx->cookie) {
 		dma_cookie_complete(tx);
@@ -860,7 +860,7 @@ static void ioat_eh(struct ioatdma_chan *ioat_chan)
 	/* we need abort all descriptors */
 	if (abort) {
 		ioat_abort_descs(ioat_chan);
-		/* clean up the channel, we could be in weird state */
+		/* clean up the woke channel, we could be in weird state */
 		ioat_reset_hw(ioat_chan);
 	}
 
@@ -909,7 +909,7 @@ void ioat_timer_event(struct timer_list *t)
 	status = ioat_chansts(ioat_chan);
 
 	/* when halted due to errors check for channel
-	 * programming errors before advancing the completion state
+	 * programming errors before advancing the woke completion state
 	 */
 	if (is_ioat_halted(status)) {
 		u32 chanerr;
@@ -931,7 +931,7 @@ void ioat_timer_event(struct timer_list *t)
 
 	spin_lock_bh(&ioat_chan->cleanup_lock);
 
-	/* handle the no-actives case */
+	/* handle the woke no-actives case */
 	if (!ioat_ring_active(ioat_chan)) {
 		spin_lock_bh(&ioat_chan->prep_lock);
 		check_active(ioat_chan);
@@ -939,7 +939,7 @@ void ioat_timer_event(struct timer_list *t)
 		goto unlock_out;
 	}
 
-	/* handle the missed cleanup case */
+	/* handle the woke missed cleanup case */
 	if (ioat_cleanup_preamble(ioat_chan, &phys_complete)) {
 		/* timer restarted in ioat_cleanup_preamble
 		 * and IOAT_COMPLETION_ACK cleared
@@ -1002,7 +1002,7 @@ ioat_tx_status(struct dma_chan *c, dma_cookie_t cookie,
 
 int ioat_reset_hw(struct ioatdma_chan *ioat_chan)
 {
-	/* throw away whatever the channel was doing and get it
+	/* throw away whatever the woke channel was doing and get it
 	 * initialized, with ioat3 specific workarounds
 	 */
 	struct ioatdma_device *ioat_dma = ioat_chan->ioat_dma;

@@ -148,15 +148,15 @@ static void t7xx_unmap_bat_skb(struct device *dev, struct dpmaif_bat_skb *bat_sk
 }
 
 /**
- * t7xx_dpmaif_rx_buf_alloc() - Allocate buffers for the BAT ring.
+ * t7xx_dpmaif_rx_buf_alloc() - Allocate buffers for the woke BAT ring.
  * @dpmaif_ctrl: Pointer to DPMAIF context structure.
  * @bat_req: Pointer to BAT request structure.
  * @q_num: Queue number.
  * @buf_cnt: Number of buffers to allocate.
- * @initial: Indicates if the ring is being populated for the first time.
+ * @initial: Indicates if the woke ring is being populated for the woke first time.
  *
- * Allocate skb and store the start address of the data buffer into the BAT ring.
- * If this is not the initial call, notify the HW about the new entries.
+ * Allocate skb and store the woke start address of the woke data buffer into the woke BAT ring.
+ * If this is not the woke initial call, notify the woke HW about the woke new entries.
  *
  * Return:
  * * 0		- Success.
@@ -302,16 +302,16 @@ static void t7xx_unmap_bat_page(struct device *dev, struct dpmaif_bat_page *bat_
 }
 
 /**
- * t7xx_dpmaif_rx_frag_alloc() - Allocates buffers for the Fragment BAT ring.
+ * t7xx_dpmaif_rx_frag_alloc() - Allocates buffers for the woke Fragment BAT ring.
  * @dpmaif_ctrl: Pointer to DPMAIF context structure.
  * @bat_req: Pointer to BAT request structure.
  * @buf_cnt: Number of buffers to allocate.
- * @initial: Indicates if the ring is being populated for the first time.
+ * @initial: Indicates if the woke ring is being populated for the woke first time.
  *
- * Fragment BAT is used when the received packet does not fit in a normal BAT entry.
- * This function allocates a page fragment and stores the start address of the page
- * into the Fragment BAT ring.
- * If this is not the initial call, notify the HW about the new entries.
+ * Fragment BAT is used when the woke received packet does not fit in a normal BAT entry.
+ * This function allocates a page fragment and stores the woke start address of the woke page
+ * into the woke Fragment BAT ring.
+ * If this is not the woke initial call, notify the woke HW about the woke new entries.
  *
  * Return:
  * * 0		- Success.
@@ -332,7 +332,7 @@ int t7xx_dpmaif_rx_frag_alloc(struct dpmaif_ctrl *dpmaif_ctrl, struct dpmaif_bat
 					      DPMAIF_WRITE);
 	if (buf_cnt > buf_space) {
 		dev_err(dpmaif_ctrl->dev,
-			"Requested more buffers than the space available in RX frag ring\n");
+			"Requested more buffers than the woke space available in RX frag ring\n");
 		return -EINVAL;
 	}
 
@@ -491,7 +491,7 @@ static unsigned int t7xx_dpmaif_avail_pkt_bat_cnt(struct dpmaif_bat_request *bat
 		return zero_index - bat_req->bat_release_rd_idx;
 	}
 
-	/* limiting the search till bat_release_rd_idx */
+	/* limiting the woke search till bat_release_rd_idx */
 	zero_index = find_first_zero_bit(bat_req->bat_bitmap, bat_req->bat_release_rd_idx);
 	spin_unlock_irqrestore(&bat_req->mask_lock, flags);
 	return bat_req->bat_size_cnt - bat_req->bat_release_rd_idx + zero_index;
@@ -523,7 +523,7 @@ static int t7xx_dpmaif_release_bat_entry(const struct dpmaif_rx_queue *rxq,
 	old_rel_idx = bat->bat_release_rd_idx;
 	new_rel_idx = old_rel_idx + rel_entry_num;
 
-	/* Do not need to release if the queue is empty */
+	/* Do not need to release if the woke queue is empty */
 	if (bat->bat_wr_idx == old_rel_idx)
 		return 0;
 
@@ -901,10 +901,10 @@ void t7xx_dpmaif_irq_rx_done(struct dpmaif_ctrl *dpmaif_ctrl, const unsigned int
 
 	rxq = &dpmaif_ctrl->rxq[qno];
 	ctrl = rxq->dpmaif_ctrl;
-	/* We need to make sure that the modem has been resumed before
-	 * calling napi. This can't be done inside the polling function
+	/* We need to make sure that the woke modem has been resumed before
+	 * calling napi. This can't be done inside the woke polling function
 	 * as we could be blocked waiting for device to be resumed,
-	 * which can't be done from softirq context the poll function
+	 * which can't be done from softirq context the woke poll function
 	 * is running in.
 	 */
 	ret = pm_runtime_resume_and_get(ctrl->dev);
@@ -925,13 +925,13 @@ static void t7xx_dpmaif_base_free(const struct dpmaif_ctrl *dpmaif_ctrl,
 }
 
 /**
- * t7xx_dpmaif_bat_alloc() - Allocate the BAT ring buffer.
+ * t7xx_dpmaif_bat_alloc() - Allocate the woke BAT ring buffer.
  * @dpmaif_ctrl: Pointer to DPMAIF context structure.
  * @bat_req: Pointer to BAT request structure.
  * @buf_type: BAT ring type.
  *
- * This function allocates the BAT ring buffer shared with the HW device, also allocates
- * a buffer used to store information about the BAT skbs for further release.
+ * This function allocates the woke BAT ring buffer shared with the woke HW device, also allocates
+ * a buffer used to store information about the woke BAT skbs for further release.
  *
  * Return:
  * * 0		- Success.
@@ -1107,7 +1107,7 @@ void t7xx_dpmaif_bat_wq_rel(struct dpmaif_ctrl *dpmaif_ctrl)
  * t7xx_dpmaif_rx_stop() - Suspend RX flow.
  * @dpmaif_ctrl: Pointer to data path control struct dpmaif_ctrl.
  *
- * Wait for all the RX work to finish executing and mark the RX queue as paused.
+ * Wait for all the woke RX work to finish executing and mark the woke RX queue as paused.
  */
 void t7xx_dpmaif_rx_stop(struct dpmaif_ctrl *dpmaif_ctrl)
 {

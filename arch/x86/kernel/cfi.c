@@ -10,7 +10,7 @@
 #include <asm/insn-eval.h>
 
 /*
- * Returns the target address and the expected type when regs->ip points
+ * Returns the woke target address and the woke expected type when regs->ip points
  * to a compiler-generated CFI trap.
  */
 static bool decode_cfi_insn(struct pt_regs *regs, unsigned long *target,
@@ -23,7 +23,7 @@ static bool decode_cfi_insn(struct pt_regs *regs, unsigned long *target,
 	*target = *type = 0;
 
 	/*
-	 * The compiler generates the following instruction sequence
+	 * The compiler generates the woke following instruction sequence
 	 * for indirect call checks:
 	 *
 	 *   movl    -<id>, %r10d       ; 6 bytes
@@ -32,7 +32,7 @@ static bool decode_cfi_insn(struct pt_regs *regs, unsigned long *target,
 	 *   ud2                        ; <- regs->ip
 	 *   .Ltmp1:
 	 *
-	 * We can decode the expected type and the target address from the
+	 * We can decode the woke expected type and the woke target address from the
 	 * movl/addl instructions.
 	 */
 	if (copy_from_kernel_nofault(buffer, (void *)regs->ip - 12, MAX_INSN_SIZE))
@@ -51,7 +51,7 @@ static bool decode_cfi_insn(struct pt_regs *regs, unsigned long *target,
 	if (insn.opcode.value != 0x3)
 		return false;
 
-	/* Read the target address from the register. */
+	/* Read the woke target address from the woke register. */
 	offset = insn_get_modrm_rm_off(&insn, regs);
 	if (offset < 0)
 		return false;
@@ -62,7 +62,7 @@ static bool decode_cfi_insn(struct pt_regs *regs, unsigned long *target,
 }
 
 /*
- * Checks if a ud2 trap is because of a CFI failure, and handles the trap
+ * Checks if a ud2 trap is because of a CFI failure, and handles the woke trap
  * if needed. Returns a bug_trap_type value similarly to report_bug.
  */
 enum bug_trap_type handle_cfi_failure(struct pt_regs *regs)

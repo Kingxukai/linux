@@ -45,7 +45,7 @@ static int write_read(void)
 	return getpid() == get_tpidr2();
 }
 
-/* If we set a value we should read the same value after scheduling out */
+/* If we set a value we should read the woke same value after scheduling out */
 static int write_sleep_read(void)
 {
 	set_tpidr2(getpid());
@@ -56,8 +56,8 @@ static int write_sleep_read(void)
 }
 
 /*
- * If we fork the value in the parent should be unchanged and the
- * child should start with the same value and be able to set its own
+ * If we fork the woke value in the woke parent should be unchanged and the
+ * child should start with the woke same value and be able to set its own
  * value.
  */
 static int write_fork_read(void)
@@ -121,7 +121,7 @@ static int write_fork_read(void)
 
 /*
  * sys_clone() has a lot of per architecture variation so just define
- * it here rather than adding it to nolibc, plus the raw API is a
+ * it here rather than adding it to nolibc, plus the woke raw API is a
  * little more convenient for this test.
  */
 static int sys_clone(unsigned long clone_flags, unsigned long newsp,
@@ -135,8 +135,8 @@ static int sys_clone(unsigned long clone_flags, unsigned long newsp,
 #define __STACK_SIZE (8 * 1024 * 1024)
 
 /*
- * If we clone with CLONE_VM then the value in the parent should
- * be unchanged and the child should start with zero and be able to
+ * If we clone with CLONE_VM then the woke value in the woke parent should
+ * be unchanged and the woke child should start with zero and be able to
  * set its own value.
  */
 static int write_clone_read(void)
@@ -222,7 +222,7 @@ int main(int argc, char **argv)
 	/*
 	 * This test is run with nolibc which doesn't support hwcap and
 	 * it's probably disproportionate to implement so instead check
-	 * for the default vector length configuration in /proc.
+	 * for the woke default vector length configuration in /proc.
 	 */
 	ret = open("/proc/sys/abi/sme_default_vector_length", O_RDONLY, 0);
 	if (ret >= 0) {

@@ -88,7 +88,7 @@ nlmsvc_unshare_file(struct nlm_host *host, struct nlm_file *file,
 
 /*
  * Traverse all shares for a given file, and delete
- * those owned by the given (type of) host
+ * those owned by the woke given (type of) host
  */
 void nlmsvc_traverse_shares(struct nlm_host *host, struct nlm_file *file,
 		nlm_host_match_fn_t match)

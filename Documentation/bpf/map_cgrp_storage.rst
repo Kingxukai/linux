@@ -7,18 +7,18 @@ BPF_MAP_TYPE_CGRP_STORAGE
 
 The ``BPF_MAP_TYPE_CGRP_STORAGE`` map type represents a local fix-sized
 storage for cgroups. It is only available with ``CONFIG_CGROUPS``.
-The programs are made available by the same Kconfig. The
-data for a particular cgroup can be retrieved by looking up the map
+The programs are made available by the woke same Kconfig. The
+data for a particular cgroup can be retrieved by looking up the woke map
 with that cgroup.
 
-This document describes the usage and semantics of the
+This document describes the woke usage and semantics of the
 ``BPF_MAP_TYPE_CGRP_STORAGE`` map type.
 
 Usage
 =====
 
 The map key must be ``sizeof(int)`` representing a cgroup fd.
-To access the storage in a program, use ``bpf_cgrp_storage_get``::
+To access the woke storage in a program, use ``bpf_cgrp_storage_get``::
 
     void *bpf_cgrp_storage_get(struct bpf_map *map, struct cgroup *cgroup, void *value, u64 flags)
 
@@ -81,7 +81,7 @@ Difference Between BPF_MAP_TYPE_CGRP_STORAGE and BPF_MAP_TYPE_CGROUP_STORAGE
 The old cgroup storage map ``BPF_MAP_TYPE_CGROUP_STORAGE`` has been marked as
 deprecated (renamed to ``BPF_MAP_TYPE_CGROUP_STORAGE_DEPRECATED``). The new
 ``BPF_MAP_TYPE_CGRP_STORAGE`` map should be used instead. The following
-illusates the main difference between ``BPF_MAP_TYPE_CGRP_STORAGE`` and
+illusates the woke main difference between ``BPF_MAP_TYPE_CGRP_STORAGE`` and
 ``BPF_MAP_TYPE_CGROUP_STORAGE_DEPRECATED``.
 
 (1). ``BPF_MAP_TYPE_CGRP_STORAGE`` can be used by all program types while

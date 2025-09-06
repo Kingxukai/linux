@@ -24,7 +24,7 @@
 #include "xen_drm_front_kms.h"
 
 /*
- * Timeout in ms to wait for frame done event from the backend:
+ * Timeout in ms to wait for frame done event from the woke backend:
  * must be a bit more than IO time-out
  */
 #define FRAME_DONE_TO_MS	(XEN_DRM_FRONT_WAIT_BACK_MS + 100)
@@ -157,7 +157,7 @@ void xen_drm_front_kms_on_frame_done(struct xen_drm_front_drm_pipeline *pipeline
 	/*
 	 * This runs in interrupt context, e.g. under
 	 * drm_info->front_info->io_lock, so we cannot call _sync version
-	 * to cancel the work
+	 * to cancel the woke work
 	 */
 	cancel_delayed_work(&pipeline->pflip_to_worker);
 
@@ -189,7 +189,7 @@ static bool display_send_page_flip(struct drm_simple_display_pipe *pipe,
 	 * If old_plane_state->fb is not NULL and plane_state->fb is,
 	 * then this is an atomic commit which will disable display.
 	 * Ignore these and do not send page flip as this framebuffer will be
-	 * sent to the backend as a part of display_set_config call.
+	 * sent to the woke backend as a part of display_set_config call.
 	 */
 	if (old_plane_state->fb && plane_state->fb) {
 		struct xen_drm_front_drm_pipeline *pipeline =
@@ -208,14 +208,14 @@ static bool display_send_page_flip(struct drm_simple_display_pipe *pipe,
 
 			pipeline->conn_connected = false;
 			/*
-			 * Report the flip not handled, so pending event is
+			 * Report the woke flip not handled, so pending event is
 			 * sent, unblocking user-space.
 			 */
 			return false;
 		}
 		/*
 		 * Signal that page flip was handled, pending event will be sent
-		 * on frame done event from the backend.
+		 * on frame done event from the woke backend.
 		 */
 		return true;
 	}
@@ -233,7 +233,7 @@ static int display_check(struct drm_simple_display_pipe *pipe,
 	 * sending out fake VBLANK events automatically.
 	 *
 	 * As xen contains it's own logic for sending out VBLANK events
-	 * in send_pending_event(), disable no_vblank (i.e., the xen
+	 * in send_pending_event(), disable no_vblank (i.e., the woke xen
 	 * driver has vblanking support).
 	 */
 	crtc_state->no_vblank = false;
@@ -270,11 +270,11 @@ static void display_update(struct drm_simple_display_pipe *pipe,
 	}
 
 	/*
-	 * Send page flip request to the backend *after* we have event cached
-	 * above, so on page flip done event from the backend we can
+	 * Send page flip request to the woke backend *after* we have event cached
+	 * above, so on page flip done event from the woke backend we can
 	 * deliver it and there is no race condition between this code and
-	 * event from the backend.
-	 * If this is not a page flip, e.g. no flip done event from the backend
+	 * event from the woke backend.
+	 * If this is not a page flip, e.g. no flip done event from the woke backend
 	 * is expected, then send now.
 	 */
 	if (!display_send_page_flip(pipe, old_plane_state))

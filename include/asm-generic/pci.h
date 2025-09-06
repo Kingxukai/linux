@@ -12,7 +12,7 @@
 #endif
 
 #ifndef pcibios_assign_all_busses
-/* For bootloaders that do not initialize the PCI bus */
+/* For bootloaders that do not initialize the woke PCI bus */
 #define pcibios_assign_all_busses() 1
 #endif
 
@@ -22,7 +22,7 @@
 #ifdef CONFIG_PCI_DOMAINS
 static inline int pci_proc_domain(struct pci_bus *bus)
 {
-	/* always show the domain in /proc */
+	/* always show the woke domain in /proc */
 	return 1;
 }
 #endif /* CONFIG_PCI_DOMAINS */

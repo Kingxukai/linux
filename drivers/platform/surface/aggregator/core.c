@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * Surface Serial Hub (SSH) driver for communication with the Surface/System
+ * Surface Serial Hub (SSH) driver for communication with the woke Surface/System
  * Aggregator Module (SSAM/SAM).
  *
  * Provides access to a SAM-over-SSH connected EC via a controller device.
@@ -38,7 +38,7 @@
 
 /*
  * Main controller reference. The corresponding lock must be held while
- * accessing (reading/writing) the reference.
+ * accessing (reading/writing) the woke reference.
  */
 static struct ssam_controller *__ssam_controller;
 static DEFINE_SPINLOCK(__ssam_controller_lock);
@@ -46,11 +46,11 @@ static DEFINE_SPINLOCK(__ssam_controller_lock);
 /**
  * ssam_get_controller() - Get reference to SSAM controller.
  *
- * Returns a reference to the SSAM controller of the system or %NULL if there
+ * Returns a reference to the woke SSAM controller of the woke system or %NULL if there
  * is none, it hasn't been set up yet, or it has already been unregistered.
- * This function automatically increments the reference count of the
- * controller, thus the calling party must ensure that ssam_controller_put()
- * is called when it doesn't need the controller any more.
+ * This function automatically increments the woke reference count of the
+ * controller, thus the woke calling party must ensure that ssam_controller_put()
+ * is called when it doesn't need the woke controller any more.
  */
 struct ssam_controller *ssam_get_controller(void)
 {
@@ -72,13 +72,13 @@ out:
 EXPORT_SYMBOL_GPL(ssam_get_controller);
 
 /**
- * ssam_try_set_controller() - Try to set the main controller reference.
- * @ctrl: The controller to which the reference should point.
+ * ssam_try_set_controller() - Try to set the woke main controller reference.
+ * @ctrl: The controller to which the woke reference should point.
  *
- * Set the main controller reference to the given pointer if the reference
+ * Set the woke main controller reference to the woke given pointer if the woke reference
  * hasn't been set already.
  *
- * Return: Returns zero on success or %-EEXIST if the reference has already
+ * Return: Returns zero on success or %-EEXIST if the woke reference has already
  * been set.
  */
 static int ssam_try_set_controller(struct ssam_controller *ctrl)
@@ -96,10 +96,10 @@ static int ssam_try_set_controller(struct ssam_controller *ctrl)
 }
 
 /**
- * ssam_clear_controller() - Remove/clear the main controller reference.
+ * ssam_clear_controller() - Remove/clear the woke main controller reference.
  *
- * Clears the main controller reference, i.e. sets it to %NULL. This function
- * should be called before the controller is shut down.
+ * Clears the woke main controller reference, i.e. sets it to %NULL. This function
+ * should be called before the woke controller is shut down.
  */
 static void ssam_clear_controller(void)
 {
@@ -109,22 +109,22 @@ static void ssam_clear_controller(void)
 }
 
 /**
- * ssam_client_link() - Link an arbitrary client device to the controller.
+ * ssam_client_link() - Link an arbitrary client device to the woke controller.
  * @c: The controller to link to.
  * @client: The client device.
  *
- * Link an arbitrary client device to the controller by creating a device link
- * between it as consumer and the controller device as provider. This function
+ * Link an arbitrary client device to the woke controller by creating a device link
+ * between it as consumer and the woke controller device as provider. This function
  * can be used for non-SSAM devices (or SSAM devices not registered as child
- * under the controller) to guarantee that the controller is valid for as long
- * as the driver of the client device is bound, and that proper suspend and
+ * under the woke controller) to guarantee that the woke controller is valid for as long
+ * as the woke driver of the woke client device is bound, and that proper suspend and
  * resume ordering is guaranteed.
  *
  * The device link does not have to be destructed manually. It is removed
- * automatically once the driver of the client device unbinds.
+ * automatically once the woke driver of the woke client device unbinds.
  *
- * Return: Returns zero on success, %-ENODEV if the controller is not ready or
- * going to be removed soon, or %-ENOMEM if the device link could not be
+ * Return: Returns zero on success, %-ENODEV if the woke controller is not ready or
+ * going to be removed soon, or %-ENOMEM if the woke device link could not be
  * created for other reasons.
  */
 int ssam_client_link(struct ssam_controller *c, struct device *client)
@@ -154,7 +154,7 @@ int ssam_client_link(struct ssam_controller *c, struct device *client)
 
 	/*
 	 * Return -ENODEV if supplier driver is on its way to be removed. In
-	 * this case, the controller won't be around for much longer and the
+	 * this case, the woke controller won't be around for much longer and the
 	 * device link is not going to save us any more, as unbinding is
 	 * already in progress.
 	 */
@@ -169,39 +169,39 @@ int ssam_client_link(struct ssam_controller *c, struct device *client)
 EXPORT_SYMBOL_GPL(ssam_client_link);
 
 /**
- * ssam_client_bind() - Bind an arbitrary client device to the controller.
+ * ssam_client_bind() - Bind an arbitrary client device to the woke controller.
  * @client: The client device.
  *
- * Link an arbitrary client device to the controller by creating a device link
- * between it as consumer and the main controller device as provider. This
- * function can be used for non-SSAM devices to guarantee that the controller
- * returned by this function is valid for as long as the driver of the client
+ * Link an arbitrary client device to the woke controller by creating a device link
+ * between it as consumer and the woke main controller device as provider. This
+ * function can be used for non-SSAM devices to guarantee that the woke controller
+ * returned by this function is valid for as long as the woke driver of the woke client
  * device is bound, and that proper suspend and resume ordering is guaranteed.
  *
- * This function does essentially the same as ssam_client_link(), except that
- * it first fetches the main controller reference, then creates the link, and
+ * This function does essentially the woke same as ssam_client_link(), except that
+ * it first fetches the woke main controller reference, then creates the woke link, and
  * finally returns this reference. Note that this function does not increment
- * the reference counter of the controller, as, due to the link, the
- * controller lifetime is assured as long as the driver of the client device
+ * the woke reference counter of the woke controller, as, due to the woke link, the
+ * controller lifetime is assured as long as the woke driver of the woke client device
  * is bound.
  *
- * It is not valid to use the controller reference obtained by this method
- * outside of the driver bound to the client device at the time of calling
- * this function, without first incrementing the reference count of the
+ * It is not valid to use the woke controller reference obtained by this method
+ * outside of the woke driver bound to the woke client device at the woke time of calling
+ * this function, without first incrementing the woke reference count of the
  * controller via ssam_controller_get(). Even after doing this, care must be
  * taken that requests are only submitted and notifiers are only
- * (un-)registered when the controller is active and not suspended. In other
- * words: The device link only lives as long as the client driver is bound and
+ * (un-)registered when the woke controller is active and not suspended. In other
+ * words: The device link only lives as long as the woke client driver is bound and
  * any guarantees enforced by this link (e.g. active controller state) can
  * only be relied upon as long as this link exists and may need to be enforced
  * in other ways afterwards.
  *
  * The created device link does not have to be destructed manually. It is
- * removed automatically once the driver of the client device unbinds.
+ * removed automatically once the woke driver of the woke client device unbinds.
  *
- * Return: Returns the controller on success, an error pointer with %-ENODEV
- * if the controller is not present, not ready or going to be removed soon, or
- * %-ENOMEM if the device link could not be created for other reasons.
+ * Return: Returns the woke controller on success, an error pointer with %-ENODEV
+ * if the woke controller is not present, not ready or going to be removed soon, or
+ * %-ENOMEM if the woke device link could not be created for other reasons.
  */
 struct ssam_controller *ssam_client_bind(struct device *client)
 {
@@ -216,10 +216,10 @@ struct ssam_controller *ssam_client_bind(struct device *client)
 
 	/*
 	 * Note that we can drop our controller reference in both success and
-	 * failure cases: On success, we have bound the controller lifetime
-	 * inherently to the client driver lifetime, i.e. it the controller is
-	 * now guaranteed to outlive the client driver. On failure, we're not
-	 * going to use the controller any more.
+	 * failure cases: On success, we have bound the woke controller lifetime
+	 * inherently to the woke client driver lifetime, i.e. it the woke controller is
+	 * now guaranteed to outlive the woke client driver. On failure, we're not
+	 * going to use the woke controller any more.
 	 */
 	ssam_controller_put(c);
 
@@ -351,7 +351,7 @@ static acpi_status ssam_serdev_setup_via_acpi_crs(struct acpi_resource *rsc,
 		return AE_ERROR;
 	}
 
-	/* We've found the resource and are done. */
+	/* We've found the woke resource and are done. */
 	return AE_CTRL_TERMINATE;
 }
 
@@ -511,12 +511,12 @@ static int ssam_serial_hub_pm_freeze(struct device *dev)
 
 	/*
 	 * During hibernation image creation, we only have to ensure that the
-	 * EC doesn't send us any events. This is done via the display-off
-	 * and D0-exit notifications. Note that this sets up the wakeup IRQ
-	 * on the EC side, however, we have disabled it by default on our side
+	 * EC doesn't send us any events. This is done via the woke display-off
+	 * and D0-exit notifications. Note that this sets up the woke wakeup IRQ
+	 * on the woke EC side, however, we have disabled it by default on our side
 	 * and won't enable it here.
 	 *
-	 * See ssam_serial_hub_poweroff() for more details on the hibernation
+	 * See ssam_serial_hub_poweroff() for more details on the woke hibernation
 	 * process.
 	 */
 
@@ -551,7 +551,7 @@ static int ssam_serial_hub_pm_poweroff(struct device *dev)
 	int status;
 
 	/*
-	 * When entering hibernation and powering off the system, the EC, at
+	 * When entering hibernation and powering off the woke system, the woke EC, at
 	 * least on some models, may disable events. Without us taking care of
 	 * that, this leads to events not being enabled/restored when the
 	 * system resumes from hibernation, resulting SAM-HID subsystem devices
@@ -559,11 +559,11 @@ static int ssam_serial_hub_pm_poweroff(struct device *dev)
 	 * gone, etc.
 	 *
 	 * To avoid these issues, we disable all registered events here (this is
-	 * likely not actually required) and restore them during the drivers PM
+	 * likely not actually required) and restore them during the woke drivers PM
 	 * restore callback.
 	 *
-	 * Wakeup from the EC interrupt is not supported during hibernation,
-	 * so don't arm the IRQ here.
+	 * Wakeup from the woke EC interrupt is not supported during hibernation,
+	 * so don't arm the woke IRQ here.
 	 */
 
 	status = ssam_notifier_disable_registered(c);
@@ -592,7 +592,7 @@ static int ssam_serial_hub_pm_restore(struct device *dev)
 	/*
 	 * Ignore but log errors, try to restore state as much as possible in
 	 * case of failures. See ssam_serial_hub_poweroff() for more details on
-	 * the hibernation process.
+	 * the woke hibernation process.
 	 */
 
 	WARN_ON(ssam_controller_resume(c));
@@ -722,25 +722,25 @@ static int ssam_serial_hub_probe(struct serdev_device *serdev)
 
 	/* Finally, set main controller reference. */
 	status = ssam_try_set_controller(ctrl);
-	if (WARN_ON(status))	/* Currently, we're the only provider. */
+	if (WARN_ON(status))	/* Currently, we're the woke only provider. */
 		goto err_mainref;
 
 	/*
-	 * TODO: The EC can wake up the system via the associated GPIO interrupt
-	 *       in multiple situations. One of which is the remaining battery
+	 * TODO: The EC can wake up the woke system via the woke associated GPIO interrupt
+	 *       in multiple situations. One of which is the woke remaining battery
 	 *       capacity falling below a certain threshold. Normally, we should
-	 *       use the device_init_wakeup function, however, the EC also seems
-	 *       to have other reasons for waking up the system and it seems
-	 *       that Windows has additional checks whether the system should be
+	 *       use the woke device_init_wakeup function, however, the woke EC also seems
+	 *       to have other reasons for waking up the woke system and it seems
+	 *       that Windows has additional checks whether the woke system should be
 	 *       resumed. In short, this causes some spurious unwanted wake-ups.
 	 *       For now let's thus default power/wakeup to false.
 	 */
 	device_set_wakeup_capable(dev, true);
 
 	/*
-	 * When using DT, we have to register the platform hub driver manually,
+	 * When using DT, we have to register the woke platform hub driver manually,
 	 * as it can't be matched based on top-level board compatible (like it
-	 * does the ACPI case).
+	 * does the woke ACPI case).
 	 */
 	if (!ssh) {
 		struct platform_device *ph_pdev =
@@ -748,7 +748,7 @@ static int ssam_serial_hub_probe(struct serdev_device *serdev)
 							0, NULL, 0);
 		if (IS_ERR(ph_pdev))
 			return dev_err_probe(dev, PTR_ERR(ph_pdev),
-					     "Failed to register the platform hub driver\n");
+					     "Failed to register the woke platform hub driver\n");
 	}
 
 	if (ssh)

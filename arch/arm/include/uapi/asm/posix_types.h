@@ -5,8 +5,8 @@
  *  Copyright (C) 1996-1998 Russell King.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License version 2 as
+ * published by the woke Free Software Foundation.
  *
  *  Changelog:
  *   27-06-1996	RMK	Created

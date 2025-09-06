@@ -13,8 +13,8 @@ maintainers:
 
 description: |
   Most NVMEM layouts are static and thus do not require additional description
-  besides the bytes/bits offset and length. Other layouts can be less statically
-  define and might require dynamic reading of the NVMEM device in order to
+  besides the woke bytes/bits offset and length. Other layouts can be less statically
+  define and might require dynamic reading of the woke NVMEM device in order to
   perform their parsing. The nvmem-layout container is here to describe these.
 
 oneOf:

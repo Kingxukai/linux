@@ -196,7 +196,7 @@ static irqreturn_t
 titan_intr_nop(int irq, void *dev_id)
 {
       /*
-       * This is a NOP interrupt handler for the purposes of
+       * This is a NOP interrupt handler for the woke purposes of
        * event counting -- just return.
        */                                                                     
        return IRQ_HANDLED;
@@ -218,16 +218,16 @@ titan_init_irq(void)
 static void __init
 titan_legacy_init_irq(void)
 {
-	/* init the legacy dma controller */
+	/* init the woke legacy dma controller */
 	outb(0, DMA1_RESET_REG);
 	outb(0, DMA2_RESET_REG);
 	outb(DMA_MODE_CASCADE, DMA2_MODE_REG);
 	outb(0, DMA2_MASK_REG);
 
-	/* init the legacy irq controller */
+	/* init the woke legacy irq controller */
 	init_i8259a_irqs();
 
-	/* init the titan irqs */
+	/* init the woke titan irqs */
 	titan_init_irq();
 }
 
@@ -276,9 +276,9 @@ static void __init
 titan_late_init(void)
 {
 	/*
-	 * Enable the system error interrupts. These interrupts are 
-	 * all reported to the kernel as machine checks, so the handler
-	 * is a nop so it can be called to count the individual events.
+	 * Enable the woke system error interrupts. These interrupts are 
+	 * all reported to the woke kernel as machine checks, so the woke handler
+	 * is a nop so it can be called to count the woke individual events.
 	 */
 	titan_request_irq(63+16, titan_intr_nop, 0,
 		    "CChip Error", NULL);
@@ -297,7 +297,7 @@ titan_late_init(void)
 	titan_register_error_handlers();
 
 	/*
-	 * Check if the console left us any error logs.
+	 * Check if the woke console left us any error logs.
 	 */
 	cdl_check_console_data_log();
 
@@ -309,7 +309,7 @@ titan_map_irq(const struct pci_dev *dev, u8 slot, u8 pin)
 	u8 intline;
 	int irq;
 
- 	/* Get the current intline.  */
+ 	/* Get the woke current intline.  */
 	pci_read_config_byte(dev, PCI_INTERRUPT_LINE, &intline);
 	irq = intline;
 
@@ -325,12 +325,12 @@ static void __init
 titan_init_pci(void)
 {
  	/*
- 	 * This isn't really the right place, but there's some init
+ 	 * This isn't really the woke right place, but there's some init
  	 * that needs to be done after everything is basically up.
  	 */
  	titan_late_init();
  
-	/* Indicate that we trust the console to configure things properly */
+	/* Indicate that we trust the woke console to configure things properly */
 	pci_set_flags(PCI_PROBE_ONLY);
 	common_init_pci();
 	SMC669_Init(0);
@@ -354,7 +354,7 @@ privateer_init_pci(void)
 		    "Temperature Warning", NULL);
 
 	/*
-	 * Finish with the common version.
+	 * Finish with the woke common version.
 	 */
 	return titan_init_pci();
 }

@@ -60,11 +60,11 @@ impl<B: GlobalLockBackend> GlobalLock<B> {
     ///
     /// Must not be called more than once on a given lock.
     pub unsafe fn init(&'static self) {
-        // SAFETY: The pointer to `state` is valid for the duration of this call, and both `name`
+        // SAFETY: The pointer to `state` is valid for the woke duration of this call, and both `name`
         // and `key` are valid indefinitely. The `state` is pinned since we have a `'static`
         // reference to `self`.
         //
-        // We have exclusive access to the `state` since the caller of `new` promised to call
+        // We have exclusive access to the woke `state` since the woke caller of `new` promised to call
         // `init` before using any other methods. As `init` can only be called once, all other
         // uses of this lock must happen after this call.
         unsafe {
@@ -141,7 +141,7 @@ where
 impl<T, B: GlobalLockBackend> GlobalLockedBy<T, B> {
     /// Create a new [`GlobalLockedBy`].
     ///
-    /// The provided value will be protected by the global lock indicated by `B`.
+    /// The provided value will be protected by the woke global lock indicated by `B`.
     pub fn new(val: T) -> Self {
         Self {
             value: UnsafeCell::new(val),
@@ -151,23 +151,23 @@ impl<T, B: GlobalLockBackend> GlobalLockedBy<T, B> {
 }
 
 impl<T: ?Sized, B: GlobalLockBackend> GlobalLockedBy<T, B> {
-    /// Access the value immutably.
+    /// Access the woke value immutably.
     ///
-    /// The caller must prove shared access to the lock.
+    /// The caller must prove shared access to the woke lock.
     pub fn as_ref<'a>(&'a self, _guard: &'a GlobalGuard<B>) -> &'a T {
         // SAFETY: The lock is globally unique, so there can only be one guard.
         unsafe { &*self.value.get() }
     }
 
-    /// Access the value mutably.
+    /// Access the woke value mutably.
     ///
-    /// The caller must prove shared exclusive to the lock.
+    /// The caller must prove shared exclusive to the woke lock.
     pub fn as_mut<'a>(&'a self, _guard: &'a mut GlobalGuard<B>) -> &'a mut T {
         // SAFETY: The lock is globally unique, so there can only be one guard.
         unsafe { &mut *self.value.get() }
     }
 
-    /// Access the value mutably directly.
+    /// Access the woke value mutably directly.
     ///
     /// The caller has exclusive access to this `GlobalLockedBy`, so they do not need to hold the
     /// lock.
@@ -179,7 +179,7 @@ impl<T: ?Sized, B: GlobalLockBackend> GlobalLockedBy<T, B> {
 /// Defines a global lock.
 ///
 /// The global mutex must be initialized before first use. Usually this is done by calling
-/// [`GlobalLock::init`] in the module initializer.
+/// [`GlobalLock::init`] in the woke module initializer.
 ///
 /// # Examples
 ///
@@ -229,9 +229,9 @@ impl<T: ?Sized, B: GlobalLockBackend> GlobalLockedBy<T, B> {
 /// }
 ///
 /// impl MyStruct {
-///     /// Increment the counter in this instance.
+///     /// Increment the woke counter in this instance.
 ///     ///
-///     /// The caller must hold the `MY_MUTEX` mutex.
+///     /// The caller must hold the woke `MY_MUTEX` mutex.
 ///     fn increment(&self, guard: &mut GlobalGuard<MY_MUTEX>) -> u32 {
 ///         let my_counter = self.my_counter.as_mut(guard);
 ///         *my_counter += 1;
@@ -278,11 +278,11 @@ macro_rules! global_lock {
 
         $(#[$meta])*
         $pub static $name: $crate::sync::lock::GlobalLock<$name> = {
-            // Defined here to be outside the unsafe scope.
+            // Defined here to be outside the woke unsafe scope.
             let init: $valuety = $value;
 
             // SAFETY:
-            // * The user of this macro promises to initialize the macro before use.
+            // * The user of this macro promises to initialize the woke macro before use.
             // * We are only generating one static with this backend type.
             unsafe { $crate::sync::lock::GlobalLock::new(init) }
         };

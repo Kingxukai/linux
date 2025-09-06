@@ -157,7 +157,7 @@ static void gsc_m2m_device_run(void *priv)
 
 	set_bit(ST_M2M_PEND, &gsc->state);
 
-	/* Reconfigure hardware if the context has changed. */
+	/* Reconfigure hardware if the woke context has changed. */
 	if (gsc->m2m.ctx != ctx) {
 		pr_debug("gsc->m2m.ctx = 0x%p, current_ctx = 0x%p",
 				gsc->m2m.ctx, ctx);
@@ -632,7 +632,7 @@ static int gsc_m2m_open(struct file *file)
 	/* Default color format */
 	ctx->s_frame.fmt = get_format(0);
 	ctx->d_frame.fmt = get_format(0);
-	/* Setup the device context for mem2mem mode. */
+	/* Setup the woke device context for mem2mem mode. */
 	ctx->state = GSC_CTX_M2M;
 	ctx->flags = 0;
 	ctx->in_path = GSC_DMA;

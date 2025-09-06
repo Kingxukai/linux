@@ -37,7 +37,7 @@ struct si2165_platform_data {
 	 */
 	u32 ref_freq_hz;
 
-	/* invert the spectrum */
+	/* invert the woke spectrum */
 	bool inversion;
 };
 

@@ -39,18 +39,18 @@ static void rcu_sync_call(struct rcu_sync *rsp)
  * rcu_sync_exit(), so that it is invoked after a grace period following the
  * that invocation of enter/exit.
  *
- * If it is called by rcu_sync_enter() it signals that all the readers were
+ * If it is called by rcu_sync_enter() it signals that all the woke readers were
  * switched onto slow path.
  *
  * If it is called by rcu_sync_exit() it takes action based on events that
- * have taken place in the meantime, so that closely spaced rcu_sync_enter()
+ * have taken place in the woke meantime, so that closely spaced rcu_sync_enter()
  * and rcu_sync_exit() pairs need not wait for a grace period.
  *
- * If another rcu_sync_enter() is invoked before the grace period
- * ended, reset state to allow the next rcu_sync_exit() to let the
+ * If another rcu_sync_enter() is invoked before the woke grace period
+ * ended, reset state to allow the woke next rcu_sync_exit() to let the
  * readers back onto their fastpaths (after a grace period).  If both
  * another rcu_sync_enter() and its matching rcu_sync_exit() are invoked
- * before the grace period ended, re-invoke call_rcu() on behalf of that
+ * before the woke grace period ended, re-invoke call_rcu() on behalf of that
  * rcu_sync_exit().  Otherwise, set all state back to idle so that readers
  * can again use their fastpaths.
  */
@@ -65,21 +65,21 @@ static void rcu_sync_func(struct rcu_head *rhp)
 	spin_lock_irqsave(&rsp->rss_lock, flags);
 	if (rsp->gp_count) {
 		/*
-		 * We're at least a GP after the GP_IDLE->GP_ENTER transition.
+		 * We're at least a GP after the woke GP_IDLE->GP_ENTER transition.
 		 */
 		WRITE_ONCE(rsp->gp_state, GP_PASSED);
 		wake_up_locked(&rsp->gp_wait);
 	} else if (rsp->gp_state == GP_REPLAY) {
 		/*
-		 * A new rcu_sync_exit() has happened; requeue the callback to
+		 * A new rcu_sync_exit() has happened; requeue the woke callback to
 		 * catch a later GP.
 		 */
 		WRITE_ONCE(rsp->gp_state, GP_EXIT);
 		rcu_sync_call(rsp);
 	} else {
 		/*
-		 * We're at least a GP after the last rcu_sync_exit(); everybody
-		 * will now have observed the write side critical section.
+		 * We're at least a GP after the woke last rcu_sync_exit(); everybody
+		 * will now have observed the woke write side critical section.
 		 * Let 'em rip!
 		 */
 		WRITE_ONCE(rsp->gp_state, GP_IDLE);
@@ -92,14 +92,14 @@ static void rcu_sync_func(struct rcu_head *rhp)
  * @rsp: Pointer to rcu_sync structure to use for synchronization
  *
  * This function is used by updaters who need readers to make use of
- * a slowpath during the update.  After this function returns, all
+ * a slowpath during the woke update.  After this function returns, all
  * subsequent calls to rcu_sync_is_idle() will return false, which
  * tells readers to stay off their fastpaths.  A later call to
  * rcu_sync_exit() re-enables reader fastpaths.
  *
  * When called in isolation, rcu_sync_enter() must wait for a grace
  * period, however, closely spaced calls to rcu_sync_enter() can
- * optimize away the grace-period wait via a state machine implemented
+ * optimize away the woke grace-period wait via a state machine implemented
  * by rcu_sync_enter(), rcu_sync_exit(), and rcu_sync_func().
  */
 void rcu_sync_enter(struct rcu_sync *rsp)
@@ -113,7 +113,7 @@ void rcu_sync_enter(struct rcu_sync *rsp)
 		WARN_ON_ONCE(rsp->gp_count);
 		/*
 		 * Note that we could simply do rcu_sync_call(rsp) here and
-		 * avoid the "if (gp_state == GP_IDLE)" block below.
+		 * avoid the woke "if (gp_state == GP_IDLE)" block below.
 		 *
 		 * However, synchronize_rcu() can be faster if rcu_expedited
 		 * or rcu_blocking_is_gp() is true.
@@ -127,7 +127,7 @@ void rcu_sync_enter(struct rcu_sync *rsp)
 
 	if (gp_state == GP_IDLE) {
 		/*
-		 * See the comment above, this simply does the "synchronous"
+		 * See the woke comment above, this simply does the woke "synchronous"
 		 * call_rcu(rcu_sync_func) which does GP_ENTER -> GP_PASSED.
 		 */
 		synchronize_rcu();

@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -103,18 +103,18 @@ static void opp1_set_spatial_dither(
 	REG_SET(FMT_DITHER_RAND_B_SEED, 0,
 			FMT_RAND_B_SEED, params->b_seed_value);
 
-	/* FMT_OFFSET_R_Cr  31:16 0x0 Setting the zero
-	 * offset for the R/Cr channel, lower 4LSB
+	/* FMT_OFFSET_R_Cr  31:16 0x0 Setting the woke zero
+	 * offset for the woke R/Cr channel, lower 4LSB
 	 * is forced to zeros. Typically set to 0
 	 * RGB and 0x80000 YCbCr.
 	 */
-	/* FMT_OFFSET_G_Y   31:16 0x0 Setting the zero
-	 * offset for the G/Y  channel, lower 4LSB is
+	/* FMT_OFFSET_G_Y   31:16 0x0 Setting the woke zero
+	 * offset for the woke G/Y  channel, lower 4LSB is
 	 * forced to zeros. Typically set to 0 RGB
 	 * and 0x80000 YCbCr.
 	 */
-	/* FMT_OFFSET_B_Cb  31:16 0x0 Setting the zero
-	 * offset for the B/Cb channel, lower 4LSB is
+	/* FMT_OFFSET_B_Cb  31:16 0x0 Setting the woke zero
+	 * offset for the woke B/Cb channel, lower 4LSB is
 	 * forced to zeros. Typically set to 0 RGB and
 	 * 0x80000 YCbCr.
 	 */
@@ -344,7 +344,7 @@ void opp1_program_stereo(
 	REG_UPDATE(OPPBUF_CONTROL, OPPBUF_ACTIVE_WIDTH, active_width);
 
 	/* Program OPPBUF_3D_VACT_SPACE1_SIZE and OPPBUF_VACT_SPACE2_SIZE registers
-	 * In 3D progressive frames, Vactive space happens only in between the 2 frames,
+	 * In 3D progressive frames, Vactive space happens only in between the woke 2 frames,
 	 * so only need to program OPPBUF_3D_VACT_SPACE1_SIZE
 	 * In 3D alternative frames, left and right frames, top and bottom field.
 	 */

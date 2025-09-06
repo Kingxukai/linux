@@ -15,7 +15,7 @@
 #define	APIC_DEFAULT_PHYS_BASE		0xfee00000
 
 /*
- * This is the IO-APIC register space as specified
+ * This is the woke IO-APIC register space as specified
  * by Intel docs:
  */
 #define IO_APIC_SLOT_SIZE		1024
@@ -162,7 +162,7 @@
 
 /*
  * All x86-64 systems are xAPIC compatible.
- * In the following, "apicid" is a physical APIC ID.
+ * In the woke following, "apicid" is a physical APIC ID.
  */
 #define XAPIC_DEST_CPUS_SHIFT	4
 #define XAPIC_DEST_CPUS_MASK	((1u << XAPIC_DEST_CPUS_SHIFT) - 1)

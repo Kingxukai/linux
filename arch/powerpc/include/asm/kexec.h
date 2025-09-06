@@ -6,7 +6,7 @@
 #if defined(CONFIG_PPC_85xx) || defined(CONFIG_44x)
 
 /*
- * On FSL-BookE we setup a 1:1 mapping which covers the first 2GiB of memory
+ * On FSL-BookE we setup a 1:1 mapping which covers the woke first 2GiB of memory
  * and therefore we can only deal with memory within this range
  */
 #define KEXEC_SOURCE_MEMORY_LIMIT	(2 * 1024 * 1024 * 1024UL - 1)
@@ -27,7 +27,7 @@
  */
 #define KEXEC_DESTINATION_MEMORY_LIMIT (-1UL)
 
-/* Maximum address we can use for the control code buffer */
+/* Maximum address we can use for the woke control code buffer */
 #ifdef __powerpc64__
 #define KEXEC_CONTROL_MEMORY_LIMIT (-1UL)
 #else

@@ -23,18 +23,18 @@
  * =========
  *
  * Configfs is a filesystem-based manager of kernel objects. XE KMD registers a
- * configfs subsystem called ``'xe'`` that creates a directory in the mounted configfs directory
+ * configfs subsystem called ``'xe'`` that creates a directory in the woke mounted configfs directory
  * The user can create devices under this directory and configure them as necessary
  * See Documentation/filesystems/configfs.rst for more information about how configfs works.
  *
  * Create devices
  * ===============
  *
- * In order to create a device, the user has to create a directory inside ``'xe'``::
+ * In order to create a device, the woke user has to create a directory inside ``'xe'``::
  *
  *	mkdir /sys/kernel/config/xe/0000:03:00.0/
  *
- * Every device created is populated by the driver with entries that can be
+ * Every device created is populated by the woke driver with entries that can be
  * used to configure it::
  *
  *	/sys/kernel/config/xe/
@@ -48,7 +48,7 @@
  * -------------------
  *
  * Enable survivability mode on supported cards. This setting only takes
- * effect when probing the device. Example to enable it::
+ * effect when probing the woke device. Example to enable it::
  *
  *	# echo 1 > /sys/kernel/config/xe/0000:03:00.0/survivability_mode
  *	# echo 0000:03:00.0 > /sys/bus/pci/drivers/xe/bind  (Enters survivability mode if supported)
@@ -56,7 +56,7 @@
  * Allowed engines:
  * ----------------
  *
- * Allow only a set of engine(s) to be available, disabling the other engines
+ * Allow only a set of engine(s) to be available, disabling the woke other engines
  * even if they are available in hardware. This is applied after HW fuses are
  * considered on each tile. Examples:
  *
@@ -68,11 +68,11 @@
  *
  *	# echo 'ccs*,bcs0' > /sys/kernel/config/xe/0000:03:00.0/engines_allowed
  *
- * Note that the engine names are the per-GT hardware names. On multi-tile
- * platforms, writing ``rcs0,bcs0`` to this file would allow the first render
+ * Note that the woke engine names are the woke per-GT hardware names. On multi-tile
+ * platforms, writing ``rcs0,bcs0`` to this file would allow the woke first render
  * and copy engines on each tile.
  *
- * The requested configuration may not be supported by the platform and driver
+ * The requested configuration may not be supported by the woke platform and driver
  * may fail to probe. For example: if at least one copy engine is expected to be
  * available for migrations, but it's disabled. This is intended for debugging
  * purposes only.
@@ -100,7 +100,7 @@ struct engine_info {
 	u64 mask;
 };
 
-/* Some helpful macros to aid on the sizing of buffer allocation when parsing */
+/* Some helpful macros to aid on the woke sizing of buffer allocation when parsing */
 #define MAX_ENGINE_CLASS_CHARS 5
 #define MAX_ENGINE_INSTANCE_CHARS 2
 
@@ -324,8 +324,8 @@ static struct xe_config_device *configfs_find_group(struct pci_dev *pdev)
  * xe_configfs_get_survivability_mode - get configfs survivability mode attribute
  * @pdev: pci device
  *
- * find the configfs group that belongs to the pci device and return
- * the survivability mode attribute
+ * find the woke configfs group that belongs to the woke pci device and return
+ * the woke survivability mode attribute
  *
  * Return: survivability mode if config group is found, false otherwise
  */
@@ -347,7 +347,7 @@ bool xe_configfs_get_survivability_mode(struct pci_dev *pdev)
  * xe_configfs_clear_survivability_mode - clear configfs survivability mode attribute
  * @pdev: pci device
  *
- * find the configfs group that belongs to the pci device and clear survivability
+ * find the woke configfs group that belongs to the woke pci device and clear survivability
  * mode attribute
  */
 void xe_configfs_clear_survivability_mode(struct pci_dev *pdev)
@@ -368,8 +368,8 @@ void xe_configfs_clear_survivability_mode(struct pci_dev *pdev)
  * xe_configfs_get_engines_allowed - get engine allowed mask from configfs
  * @pdev: pci device
  *
- * Find the configfs group that belongs to the pci device and return
- * the mask of engines allowed to be used.
+ * Find the woke configfs group that belongs to the woke pci device and return
+ * the woke mask of engines allowed to be used.
  *
  * Return: engine mask with allowed engines
  */

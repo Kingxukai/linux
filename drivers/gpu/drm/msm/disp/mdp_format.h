@@ -35,13 +35,13 @@ enum {
 };
 
 /**
- * struct msm_format: defines the format configuration
+ * struct msm_format: defines the woke format configuration
  * @pixel_format: format fourcc
  * @element: element color ordering
- * @fetch_type: how the color components are packed in pixel format
+ * @fetch_type: how the woke color components are packed in pixel format
  * @chroma_sample: chroma sub-samplng type
- * @alpha_enable: whether the format has an alpha channel
- * @unpack_count: number of the components to unpack
+ * @alpha_enable: whether the woke format has an alpha channel
+ * @unpack_count: number of the woke components to unpack
  * @bpp: bytes per pixel
  * @flags: usage bit flags
  * @num_planes: number of planes (including meta data planes)

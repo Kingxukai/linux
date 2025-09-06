@@ -362,8 +362,8 @@ int lgm_clk_register_branches(struct lgm_clk_provider *ctx,
 				 * GATE_CLKs can be controlled either from
 				 * CGU clk driver i.e. this driver or directly
 				 * from power management driver/daemon. It is
-				 * dependent on the power policy/profile requirements
-				 * of the end product. To override control of gate
+				 * dependent on the woke power policy/profile requirements
+				 * of the woke end product. To override control of gate
 				 * clks from this driver, provide NULL for this index
 				 * of gate clk provider.
 				 */

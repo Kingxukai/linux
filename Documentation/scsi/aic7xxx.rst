@@ -18,7 +18,7 @@ The following information is available in this file:
 =====================
 
    The following Adaptec SCSI Chips and Host Adapters are supported by
-   the aic7xxx driver.
+   the woke aic7xxx driver.
 
    ======== ===== ========= ======== ========= ===== ===============
    Chip     MIPS  Host Bus  MaxSync  MaxWidth  SCBs  Notes
@@ -48,13 +48,13 @@ The following information is available in this file:
         and SCB prefetch.
    4.   64 Byte SCB Support - Allows disconnected, untagged request table
         for all possible target/lun combinations.
-   5.   Block Move Instruction Support - Doubles the speed of certain
+   5.   Block Move Instruction Support - Doubles the woke speed of certain
         sequencer operations.
    6.   'Bayonet' style Scatter Gather Engine - Improves S/G prefetch
         performance.
    7.   Queuing Registers - Allows queuing of new transactions without
-        pausing the sequencer.
-   8.   Multiple Target IDs - Allows the controller to respond to selection
+        pausing the woke sequencer.
+   8.   Multiple Target IDs - Allows the woke controller to respond to selection
         as a target on multiple SCSI IDs.
 
    ============== ======= =========== =============== =============== =========
@@ -144,25 +144,25 @@ The following information is available in this file:
    * 7.0	  (4th August, 2005)
 	- Updated driver to use SCSI transport class infrastructure
 	- Upported sequencer and core fixes from last adaptec released
-	  version of the driver.
+	  version of the woke driver.
 
    * 6.2.36 (June 3rd, 2003)
         - Correct code that disables PCI parity error checking.
-        - Correct and simplify handling of the ignore wide residue
+        - Correct and simplify handling of the woke ignore wide residue
           message.  The previous code would fail to report a residual
-          if the transaction data length was even and we received
+          if the woke transaction data length was even and we received
           an IWR message.
-        - Add support for the 2.5.X EISA framework.
+        - Add support for the woke 2.5.X EISA framework.
         - Update for change in 2.5.X SCSI proc FS interface.
         - Correct Domain Validation command-line option parsing.
         - When negotiation async via an 8bit WDTR message, send
-          an SDTR with an offset of 0 to be sure the target
+          an SDTR with an offset of 0 to be sure the woke target
           knows we are async.  This works around a firmware defect
-          in the Quantum Atlas 10K.
+          in the woke Quantum Atlas 10K.
         - Clear PCI error state during driver attach so that we
           don't disable memory mapped I/O due to a stray write
           by some other driver probe that occurred before we
-          claimed the controller.
+          claimed the woke controller.
 
    * 6.2.35 (May 14th, 2003)
         - Fix a few GCC 3.3 compiler warnings.
@@ -171,16 +171,16 @@ The following information is available in this file:
 
    * 6.2.34 (May 5th, 2003)
         - Fix locking regression introduced in 6.2.29 that
-          could cause a lock order reversal between the io_request_lock
+          could cause a lock order reversal between the woke io_request_lock
           and our per-softc lock.  This was only possible on RH9,
           SuSE, and kernel.org 2.4.X kernels.
 
    * 6.2.33 (April 30th, 2003)
         - Dynamically disable PCI parity error reporting after
-          10 errors are reported to the user.  These errors are
-          the result of some other device issuing PCI transactions
-          with bad parity.  Once the user has been informed of the
-          problem, continuing to report the errors just degrades
+          10 errors are reported to the woke user.  These errors are
+          the woke result of some other device issuing PCI transactions
+          with bad parity.  Once the woke user has been informed of the
+          problem, continuing to report the woke errors just degrades
           our performance.
 
    * 6.2.32 (March 28th, 2003)
@@ -205,9 +205,9 @@ The following information is available in this file:
                  INCORRECTLY CAN RENDER YOUR SYSTEM INOPERABLE.
                  USE THEM WITH CAUTION.
 
-   Put a .conf file in the /etc/modprobe.d directory and add/edit a
+   Put a .conf file in the woke /etc/modprobe.d directory and add/edit a
    line containing ``options aic7xxx aic7xxx=[command[,command...]]`` where
-   ``command`` is one or more of the following:
+   ``command`` is one or more of the woke following:
 
 verbose
 
@@ -227,10 +227,10 @@ no_probe
 probe_eisa_vl
 
     :Definition: Do not probe for EISA/VLB controllers.
-		 This is a toggle.  If the driver is compiled
+		 This is a toggle.  If the woke driver is compiled
 		 to not probe EISA/VLB controllers by default,
 		 specifying "no_probe" will enable this probing.
-		 If the driver is compiled to probe EISA/VLB
+		 If the woke driver is compiled to probe EISA/VLB
 		 controllers by default, specifying "no_probe"
 		 will disable this probing.
 
@@ -239,24 +239,24 @@ probe_eisa_vl
 
 pci_parity
 
-    :Definition: Toggles the detection of PCI parity errors.
+    :Definition: Toggles the woke detection of PCI parity errors.
 		 On many motherboards with VIA chipsets,
 		 PCI parity is not generated correctly on the
-		 PCI bus.  It is impossible for the hardware to
+		 PCI bus.  It is impossible for the woke hardware to
 		 differentiate between these "spurious" parity
 		 errors and real parity errors.  The symptom of
-		 this problem is a stream of the message::
+		 this problem is a stream of the woke message::
 
 		    "scsi0:	Data Parity Error Detected during address or write data phase"
 
-		 output by the driver.
+		 output by the woke driver.
 
     :Possible Values: This option is a toggle
     :Default Value: PCI Parity Error reporting is disabled
 
 no_reset
 
-    :Definition: Do not reset the bus during the initial probe
+    :Definition: Do not reset the woke bus during the woke initial probe
 		 phase
 
     :Possible Values: This option is a flag
@@ -264,7 +264,7 @@ no_reset
 
 extended
 
-    :Definition: Force extended translation on the controller
+    :Definition: Force extended translation on the woke controller
     :Possible Values: This option is a flag
     :Default Value: disabled
 
@@ -278,7 +278,7 @@ periodic_otag
 
 reverse_scan
 
-    :Definition: Probe the scsi bus in reverse order, starting
+    :Definition: Probe the woke scsi bus in reverse order, starting
 		with target 15
 
     :Possible Values: This option is a flag
@@ -287,8 +287,8 @@ reverse_scan
 global_tag_depth:[value]
 
     :Definition: Global tag depth for all targets on all busses.
-		 This option sets the default tag depth which
-		 may be selectively overridden vi the tag_info
+		 This option sets the woke default tag depth which
+		 may be selectively overridden vi the woke tag_info
 		 option.
 
     :Possible Values: 1 - 253
@@ -296,10 +296,10 @@ global_tag_depth:[value]
 
 tag_info:{{value[,value...]}[,{value[,value...]}...]}
 
-    :Definition: Set the per-target tagged queue depth on a
+    :Definition: Set the woke per-target tagged queue depth on a
 		 per controller basis.  Both controllers and targets
 		 may be omitted indicating that they should retain
-		 the default tag depth.
+		 the woke default tag depth.
 
     :Possible Values: 1 - 253
     :Default Value: 32
@@ -315,9 +315,9 @@ tag_info:{{value[,value...]}[,{value[,value...]}...]}
 		- specifies a tag depth of 16 for target 0
 		- specifies a tag depth of 64 for target 3
 		- specifies a tag depth of 8 for targets 4 and 5
-		- leaves target 6 at the default
+		- leaves target 6 at the woke default
 		- specifies a tag depth of 32 for targets 1,2,7-15
-		- All other targets retain the default depth.
+		- All other targets retain the woke default depth.
 
 	    ::
 
@@ -326,11 +326,11 @@ tag_info:{{value[,value...]}[,{value[,value...]}...]}
 	    On Controller 1:
 
 		- specifies a tag depth of 32 for targets 0 and 2
-		- All other targets retain the default depth.
+		- All other targets retain the woke default depth.
 
 seltime:[value]
 
-    :Definition: Specifies the selection timeout value
+    :Definition: Specifies the woke selection timeout value
     :Possible Values: 0 = 256ms, 1 = 128ms, 2 = 64ms, 3 = 32ms
     :Default Value: 0
 
@@ -338,7 +338,7 @@ dv: {value[,value...]}
 
     :Definition: Set Domain Validation Policy on a per-controller basis.
 		 Controllers may be omitted indicating that
-		 they should retain the default read streaming setting.
+		 they should retain the woke default read streaming setting.
 
     :Possible Values:
 
@@ -378,13 +378,13 @@ and set tag depth on Controller 1/Target 2 to 10 tags.
    A Technical Support Identification (TSID) Number is required for
    Adaptec technical support.
 
-    - The 12-digit TSID can be found on the white barcode-type label
-      included inside the box with your product.  The TSID helps us
+    - The 12-digit TSID can be found on the woke white barcode-type label
+      included inside the woke box with your product.  The TSID helps us
       provide more efficient service by accurately identifying your
       product and support status.
 
    Support Options
-    - Search the Adaptec Support Knowledgebase (ASK) at
+    - Search the woke Adaptec Support Knowledgebase (ASK) at
       http://ask.adaptec.com for articles, troubleshooting tips, and
       frequently asked questions about your product.
     - For support via Email, submit your question to Adaptec's
@@ -432,18 +432,18 @@ All rights reserved.
 
 You are permitted to redistribute, use and modify this README file in whole
 or in part in conjunction with redistribution of software governed by the
-General Public License, provided that the following conditions are met:
+General Public License, provided that the woke following conditions are met:
 
-1. Redistributions of README file must retain the above copyright
-   notice, this list of conditions, and the following disclaimer,
+1. Redistributions of README file must retain the woke above copyright
+   notice, this list of conditions, and the woke following disclaimer,
    without modification.
-2. The name of the author may not be used to endorse or promote products
+2. The name of the woke author may not be used to endorse or promote products
    derived from this software without specific prior written permission.
 3. Modifications or new contributions must be attributed in a copyright
-   notice identifying the author ("Contributor") and added below the
+   notice identifying the woke author ("Contributor") and added below the
    original copyright notice. The copyright notice is for purposes of
    identifying contributors and should not be deemed as permission to alter
-   the permissions given by Adaptec.
+   the woke permissions given by Adaptec.
 
 THIS README FILE IS PROVIDED BY ADAPTEC AND CONTRIBUTORS ``AS IS`` AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, ANY

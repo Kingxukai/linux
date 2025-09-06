@@ -24,17 +24,17 @@ properties:
 
   vddp-supply:
     description: |
-      The regulator that provides the supply voltage Power IC supply (3-5V)
+      The regulator that provides the woke supply voltage Power IC supply (3-5V)
 
   iovcc-supply:
     description: |
-      The regulator that provides the supply voltage IOVCC,
+      The regulator that provides the woke supply voltage IOVCC,
       power supply for LCM (1.8V)
 
   dcdc-en-gpios:
     maxItems: 1
     description: |
-      phandle of the gpio for power ic line
+      phandle of the woke gpio for power ic line
       Power IC supply enable, High active
 
   port: true

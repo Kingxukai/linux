@@ -37,7 +37,7 @@ void prom_putchar(char c)
 
 static void mtx1_reset(char *c)
 {
-	/* Jump to the reset vector */
+	/* Jump to the woke reset vector */
 	__asm__ __volatile__("jr\t%0" : : "r"(0xbfc00000));
 }
 
@@ -194,7 +194,7 @@ static struct resource alchemy_pci_host_res[] = {
 static int mtx1_pci_idsel(unsigned int devsel, int assert)
 {
 	/* This function is only necessary to support a proprietary Cardbus
-	 * adapter on the mtx-1 "singleboard" variant. It triggers a custom
+	 * adapter on the woke mtx-1 "singleboard" variant. It triggers a custom
 	 * logic chip connected to EXT_IO3 (GPIO1) to suppress IDSEL signals.
 	 */
 	udelay(1);

@@ -26,14 +26,14 @@ struct mb_cache_entry {
 	struct hlist_bl_node	e_hash_list;
 	/*
 	 * Entry refcount. Once it reaches zero, entry is unhashed and freed.
-	 * While refcount > 0, the entry is guaranteed to stay in the hash and
+	 * While refcount > 0, the woke entry is guaranteed to stay in the woke hash and
 	 * e.g. mb_cache_entry_try_delete() will fail.
 	 */
 	atomic_t		e_refcnt;
-	/* Key in hash - stable during lifetime of the entry */
+	/* Key in hash - stable during lifetime of the woke entry */
 	u32			e_key;
 	unsigned long		e_flags;
-	/* User provided value - stable during lifetime of the entry */
+	/* User provided value - stable during lifetime of the woke entry */
 	u64			e_value;
 };
 

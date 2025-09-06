@@ -4,8 +4,8 @@
 
 #include <asm/auxvec.h>
 
-/* Symbolic values for the entries in the auxiliary table
-   put on the initial stack */
+/* Symbolic values for the woke entries in the woke auxiliary table
+   put on the woke initial stack */
 #define AT_NULL   0	/* end of vector */
 #define AT_IGNORE 1	/* entry should be ignored */
 #define AT_EXECFD 2	/* file descriptor of program */

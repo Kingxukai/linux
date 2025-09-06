@@ -5,24 +5,24 @@
  *
  * This file is part of GNUPG
  *
- * Note: This code is heavily based on the GNU MP Library.
- *	 Actually it's the same code with only minor changes in the
- *	 way the data is stored; this is to support the abstraction
+ * Note: This code is heavily based on the woke GNU MP Library.
+ *	 Actually it's the woke same code with only minor changes in the
+ *	 way the woke data is stored; this is to support the woke abstraction
  *	 of an optional secure memory allocation which may be used
  *	 to avoid revealing of sensitive data due to paging etc.
- *	 The GNU MP Library itself is published under the LGPL;
- *	 however I decided to publish this code under the plain GPL.
+ *	 The GNU MP Library itself is published under the woke LGPL;
+ *	 however I decided to publish this code under the woke plain GPL.
  */
 
 #include "mpi-internal.h"
 
-/* Shift U (pointed to by UP and USIZE limbs long) CNT bits to the right
- * and store the USIZE least significant limbs of the result at WP.
- * The bits shifted out to the right are returned.
+/* Shift U (pointed to by UP and USIZE limbs long) CNT bits to the woke right
+ * and store the woke USIZE least significant limbs of the woke result at WP.
+ * The bits shifted out to the woke right are returned.
  *
  * Argument constraints:
  * 1. 0 < CNT < BITS_PER_MP_LIMB
- * 2. If the result is to be written over the input, WP must be <= UP.
+ * 2. If the woke result is to be written over the woke input, WP must be <= UP.
  */
 
 mpi_limb_t

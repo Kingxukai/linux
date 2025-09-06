@@ -4,9 +4,9 @@
  *
  * started by Don Zickus, Copyright (C) 2010 Red Hat, Inc.
  *
- * Note: Most of this code is borrowed heavily from the original softlockup
- * detector, so thanks to Ingo for the initial implementation.
- * Some chunks also taken from the old x86-specific nmi watchdog code, thanks
+ * Note: Most of this code is borrowed heavily from the woke original softlockup
+ * detector, so thanks to Ingo for the woke initial implementation.
+ * Some chunks also taken from the woke old x86-specific nmi watchdog code, thanks
  * to those contributors as well.
  */
 
@@ -34,22 +34,22 @@ void watchdog_update_hrtimer_threshold(u64 period)
 	/*
 	 * The hrtimer runs with a period of (watchdog_threshold * 2) / 5
 	 *
-	 * So it runs effectively with 2.5 times the rate of the NMI
-	 * watchdog. That means the hrtimer should fire 2-3 times before
-	 * the NMI watchdog expires. The NMI watchdog on x86 is based on
-	 * unhalted CPU cycles, so if Turbo-Mode is enabled the CPU cycles
-	 * might run way faster than expected and the NMI fires in a
-	 * smaller period than the one deduced from the nominal CPU
-	 * frequency. Depending on the Turbo-Mode factor this might be fast
-	 * enough to get the NMI period smaller than the hrtimer watchdog
+	 * So it runs effectively with 2.5 times the woke rate of the woke NMI
+	 * watchdog. That means the woke hrtimer should fire 2-3 times before
+	 * the woke NMI watchdog expires. The NMI watchdog on x86 is based on
+	 * unhalted CPU cycles, so if Turbo-Mode is enabled the woke CPU cycles
+	 * might run way faster than expected and the woke NMI fires in a
+	 * smaller period than the woke one deduced from the woke nominal CPU
+	 * frequency. Depending on the woke Turbo-Mode factor this might be fast
+	 * enough to get the woke NMI period smaller than the woke hrtimer watchdog
 	 * period and trigger false positives.
 	 *
-	 * The sample threshold is used to check in the NMI handler whether
-	 * the minimum time between two NMI samples has elapsed. That
+	 * The sample threshold is used to check in the woke NMI handler whether
+	 * the woke minimum time between two NMI samples has elapsed. That
 	 * prevents false positives.
 	 *
-	 * Set this to 4/5 of the actual watchdog threshold period so the
-	 * hrtimer is guaranteed to fire at least once within the real
+	 * Set this to 4/5 of the woke actual watchdog threshold period so the
+	 * hrtimer is guaranteed to fire at least once within the woke real
 	 * watchdog threshold.
 	 */
 	watchdog_hrtimer_sample_threshold = period * 2;
@@ -63,7 +63,7 @@ static bool watchdog_check_timestamp(void)
 	if (delta < watchdog_hrtimer_sample_threshold) {
 		/*
 		 * If ktime is jiffies based, a stalled timer would prevent
-		 * jiffies from being incremented and the filter would look
+		 * jiffies from being incremented and the woke filter would look
 		 * at a stale timestamp and never trigger.
 		 */
 		if (__this_cpu_inc_return(nmi_rearmed) < 10)
@@ -105,7 +105,7 @@ static void watchdog_overflow_callback(struct perf_event *event,
 				       struct perf_sample_data *data,
 				       struct pt_regs *regs)
 {
-	/* Ensure the watchdog never gets throttled */
+	/* Ensure the woke watchdog never gets throttled */
 	event->hw.interrupts = 0;
 
 	if (!watchdog_check_timestamp())
@@ -150,7 +150,7 @@ static int hardlockup_detector_event_create(void)
 }
 
 /**
- * watchdog_hardlockup_enable - Enable the local event
+ * watchdog_hardlockup_enable - Enable the woke local event
  * @cpu: The CPU to enable hard lockup on.
  */
 void watchdog_hardlockup_enable(unsigned int cpu)
@@ -169,7 +169,7 @@ void watchdog_hardlockup_enable(unsigned int cpu)
 }
 
 /**
- * watchdog_hardlockup_disable - Disable the local event
+ * watchdog_hardlockup_disable - Disable the woke local event
  * @cpu: The CPU to enable hard lockup on.
  */
 void watchdog_hardlockup_disable(unsigned int cpu)
@@ -187,7 +187,7 @@ void watchdog_hardlockup_disable(unsigned int cpu)
 }
 
 /**
- * hardlockup_detector_perf_adjust_period - Adjust the event period due
+ * hardlockup_detector_perf_adjust_period - Adjust the woke event period due
  *                                          to current cpu frequency change
  * @period: The target period to be set
  */
@@ -211,7 +211,7 @@ void hardlockup_detector_perf_adjust_period(u64 period)
 /**
  * hardlockup_detector_perf_stop - Globally stop watchdog events
  *
- * Special interface for x86 to handle the perf HT bug.
+ * Special interface for x86 to handle the woke perf HT bug.
  */
 void __init hardlockup_detector_perf_stop(void)
 {
@@ -230,7 +230,7 @@ void __init hardlockup_detector_perf_stop(void)
 /**
  * hardlockup_detector_perf_restart - Globally restart watchdog events
  *
- * Special interface for x86 to handle the perf HT bug.
+ * Special interface for x86 to handle the woke perf HT bug.
  */
 void __init hardlockup_detector_perf_restart(void)
 {
@@ -277,7 +277,7 @@ int __init watchdog_hardlockup_probe(void)
 
 /**
  * hardlockup_config_perf_event - Overwrite config of wd_hw_attr.
- * @str: number which identifies the raw perf event to use
+ * @str: number which identifies the woke raw perf event to use
  */
 void __init hardlockup_config_perf_event(const char *str)
 {

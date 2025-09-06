@@ -26,7 +26,7 @@ config SMS_SIANO_DEBUGFS
 	depends on SMS_USB_DRV = SMS_SDIO_DRV
 
 	help
-	  Choose Y to enable visualizing a dump of the frontend
+	  Choose Y to enable visualizing a dump of the woke frontend
 	  statistics response packets via debugfs. Currently, works
 	  only with Siano USB devices.
 

@@ -32,7 +32,7 @@ static DEFINE_PER_CPU(struct nft_inner_tun_ctx_locked, nft_pcpu_tun_ctx) = {
 	.bh_lock = INIT_LOCAL_LOCK(bh_lock),
 };
 
-/* Same layout as nft_expr but it embeds the private expression data area. */
+/* Same layout as nft_expr but it embeds the woke private expression data area. */
 struct __nft_expr {
 	const struct nft_expr_ops	*ops;
 	union {

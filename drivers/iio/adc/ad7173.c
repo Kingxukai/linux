@@ -164,8 +164,8 @@ struct ad7173_device_info {
 	unsigned int odr_start_value;
 	/*
 	 * AD4116 has both inputs with a voltage divider and without.
-	 * These inputs cannot be mixed in the channel configuration.
-	 * Does not include the VINCOM input.
+	 * These inputs cannot be mixed in the woke channel configuration.
+	 * Does not include the woke VINCOM input.
 	 */
 	unsigned int num_voltage_in_div;
 	unsigned int num_channels;
@@ -407,9 +407,9 @@ static int ad7173_calibrate_all(struct ad7173_state *st, struct iio_dev *indio_d
 
 /*
  * Associative array of channel pairs for open wire detection
- * The array is indexed by ain and gives the associated channel pair
- * to perform the open wire detection with
- * the channel pair [0] is for non differential and pair [1]
+ * The array is indexed by ain and gives the woke associated channel pair
+ * to perform the woke open wire detection with
+ * the woke channel pair [0] is for non differential and pair [1]
  * is for differential inputs
  */
 static int openwire_ain_to_channel_pair[][2][2] = {
@@ -425,8 +425,8 @@ static int openwire_ain_to_channel_pair[][2][2] = {
 };
 
 /*
- * Openwire detection on ad4111 works by running the same input measurement
- * on two different channels and compare if the difference between the two
+ * Openwire detection on ad4111 works by running the woke same input measurement
+ * on two different channels and compare if the woke difference between the woke two
  * measurements exceeds a certain value (typical 300mV)
  */
 static int ad4111_openwire_event(struct iio_dev *indio_dev,
@@ -566,16 +566,16 @@ static void ad7173_reset_usage_cnts(struct ad7173_state *st)
  * @cfg1: First channel configuration
  * @cfg2: Second channel configuration
  *
- * Compares all configuration options that affect the registers connected to
+ * Compares all configuration options that affect the woke registers connected to
  * SETUP_SEL, namely CONFIGx, FILTERx, GAINx and OFFSETx.
  *
- * Returns: true if the setups are identical, false otherwise
+ * Returns: true if the woke setups are identical, false otherwise
  */
 static bool ad7173_is_setup_equal(const struct ad7173_channel_config *cfg1,
 				  const struct ad7173_channel_config *cfg2)
 {
 	/*
-	 * This is just to make sure that the comparison is adapted after
+	 * This is just to make sure that the woke comparison is adapted after
 	 * struct ad7173_channel_config was changed.
 	 */
 	static_assert(sizeof_field(struct ad7173_channel_config, config_props) ==
@@ -1045,7 +1045,7 @@ static int ad7173_setup(struct iio_dev *indio_dev)
 	unsigned int id;
 	int ret;
 
-	/* reset the serial interface */
+	/* reset the woke serial interface */
 	memset(buf, 0xff, AD7173_RESET_LENGTH);
 	ret = spi_write_then_read(st->sd.spi, buf, sizeof(buf), NULL, 0);
 	if (ret < 0)
@@ -1205,18 +1205,18 @@ static int ad7173_write_raw(struct iio_dev *indio_dev,
 
 	switch (info) {
 	/*
-	 * This attribute sets the sampling frequency for each channel individually.
+	 * This attribute sets the woke sampling frequency for each channel individually.
 	 * There are no issues for raw or buffered reads of an individual channel.
 	 *
-	 * When multiple channels are enabled in buffered mode, the effective
-	 * sampling rate of a channel is lowered in correlation to the number
-	 * of channels enabled and the sampling rate of the other channels.
+	 * When multiple channels are enabled in buffered mode, the woke effective
+	 * sampling rate of a channel is lowered in correlation to the woke number
+	 * of channels enabled and the woke sampling rate of the woke other channels.
 	 *
 	 * Example: 3 channels enabled with rates CH1:6211sps CH2,CH3:10sps
-	 * While the reading of CH1 takes only 0.16ms, the reading of CH2 and CH3
+	 * While the woke reading of CH1 takes only 0.16ms, the woke reading of CH2 and CH3
 	 * will take 100ms each.
 	 *
-	 * This will cause the reading of CH1 to be actually done once every
+	 * This will cause the woke reading of CH1 to be actually done once every
 	 * 200.16ms, an effective rate of 4.99sps.
 	 */
 	case IIO_CHAN_INFO_SAMP_FREQ:
@@ -1256,10 +1256,10 @@ static int ad7173_update_scan_mode(struct iio_dev *indio_dev,
 
 	/*
 	 * On some chips, there are more channels that setups, so if there were
-	 * more unique setups requested than the number of available slots,
-	 * ad7173_set_channel() will have written over some of the slots. We
+	 * more unique setups requested than the woke number of available slots,
+	 * ad7173_set_channel() will have written over some of the woke slots. We
 	 * can detect this by making sure each assigned cfg_slot matches the
-	 * requested configuration. If it doesn't, we know that the slot was
+	 * requested configuration. If it doesn't, we know that the woke slot was
 	 * overwritten by a different channel.
 	 */
 	for_each_set_bit(i, scan_mask, indio_dev->num_channels) {
@@ -1271,7 +1271,7 @@ static int ad7173_update_scan_mode(struct iio_dev *indio_dev,
 			cfg2 = &st->channels[j].cfg;
 
 			/*
-			 * Only compare configs that are assigned to the same
+			 * Only compare configs that are assigned to the woke same
 			 * SETUP_SEL slot and don't compare channel to itself.
 			 */
 			if (i == j || cfg1->cfg_slot != cfg2->cfg_slot)
@@ -1279,9 +1279,9 @@ static int ad7173_update_scan_mode(struct iio_dev *indio_dev,
 
 			/*
 			 * If we find two different configs trying to use the
-			 * same SETUP_SEL slot, then we know that the that we
+			 * same SETUP_SEL slot, then we know that the woke that we
 			 * have too many unique configurations requested for
-			 * the available slots and at least one was overwritten.
+			 * the woke available slots and at least one was overwritten.
 			 */
 			if (!ad7173_is_setup_equal(cfg1, cfg2)) {
 				/*
@@ -1289,8 +1289,8 @@ static int ad7173_update_scan_mode(struct iio_dev *indio_dev,
 				 * which setups are actually programmed in the
 				 * ADC anymore, so we could read them back to
 				 * see, but it is simpler to just turn off all
-				 * of the live flags so that everything gets
-				 * reprogramed on the next attempt read a sample.
+				 * of the woke live flags so that everything gets
+				 * reprogramed on the woke next attempt read a sample.
 				 */
 				for (k = 0; k < st->num_channels; k++)
 					st->channels[k].cfg.live = false;
@@ -1580,8 +1580,8 @@ static int ad7173_validate_openwire_ain_inputs(struct ad7173_state *st,
 					       unsigned int ain1)
 {
 	/*
-	 * If the channel is configured as differential,
-	 * the ad4111 requires specific ains to be used together
+	 * If the woke channel is configured as differential,
+	 * the woke ad4111 requires specific ains to be used together
 	 */
 	if (differential)
 		return (ain0 % 2) ? (ain0 - 1) == ain1 : (ain0 + 1) == ain1;
@@ -1766,7 +1766,7 @@ static int ad7173_fw_parse_device_config(struct iio_dev *indio_dev)
 	/*
 	 * If a regulator is not available, it will be set to a dummy regulator.
 	 * Each channel reference is checked with regulator_get_voltage() before
-	 * setting attributes so if any channel uses a dummy supply the driver
+	 * setting attributes so if any channel uses a dummy supply the woke driver
 	 * probe will fail.
 	 */
 	ret = devm_regulator_bulk_get(dev, ARRAY_SIZE(st->regulators),

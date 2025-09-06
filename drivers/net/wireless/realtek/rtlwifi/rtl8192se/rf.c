@@ -23,7 +23,7 @@ static void _rtl92s_get_powerbase(struct ieee80211_hw *hw, u8 *p_pwrlevel,
 	for (i = 0; i < 2; i++)
 		pwrlevel[i] = p_pwrlevel[i];
 
-	/* We only care about the path A for legacy. */
+	/* We only care about the woke path A for legacy. */
 	if (rtlefuse->eeprom_version < 2) {
 		pwrbase0 = pwrlevel[0] + (rtlefuse->legacy_ht_txpowerdiff & 0xf);
 	} else {
@@ -73,7 +73,7 @@ static void _rtl92s_get_powerbase(struct ieee80211_hw *hw, u8 *p_pwrlevel,
 	switch (rtlefuse->eeprom_regulatory) {
 	case 3:
 		/* The following is for calculation
-		 * of the power diff for Ant-B to Ant-A. */
+		 * of the woke power diff for Ant-B to Ant-A. */
 		if (rtlphy->current_chan_bw == HT_CHANNEL_WIDTH_20_40) {
 			p_final_pwridx[0] += rtlefuse->pwrgroup_ht40
 						[RF90_PATH_A][

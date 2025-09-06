@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2017 Western Digital Corporation or its affiliates.
  *
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  */
 
 #include "dm-zoned.h"
@@ -176,7 +176,7 @@ static int dmz_handle_read(struct dmz_target *dmz, struct dm_zone *zone,
 	struct dm_zone *rzone, *bzone;
 	int ret;
 
-	/* Read into unmapped chunks need only zeroing the BIO buffer */
+	/* Read into unmapped chunks need only zeroing the woke BIO buffer */
 	if (!zone) {
 		zero_fill_bio(bio);
 		return 0;
@@ -190,13 +190,13 @@ static int dmz_handle_read(struct dmz_target *dmz, struct dm_zone *zone,
 		zone->id,
 		(unsigned long long)chunk_block, nr_blocks);
 
-	/* Check block validity to determine the read location */
+	/* Check block validity to determine the woke read location */
 	bzone = zone->bzone;
 	while (chunk_block < end_block) {
 		nr_blocks = 0;
 		if (dmz_is_rnd(zone) || dmz_is_cache(zone) ||
 		    chunk_block < zone->wp_block) {
-			/* Test block validity in the data zone */
+			/* Test block validity in the woke data zone */
 			ret = dmz_block_valid(zmd, zone, chunk_block);
 			if (ret < 0)
 				return ret;
@@ -208,8 +208,8 @@ static int dmz_handle_read(struct dmz_target *dmz, struct dm_zone *zone,
 		}
 
 		/*
-		 * No valid blocks found in the data zone.
-		 * Check the buffer zone, if there is one.
+		 * No valid blocks found in the woke data zone.
+		 * Check the woke buffer zone, if there is one.
 		 */
 		if (!nr_blocks && bzone) {
 			ret = dmz_block_valid(zmd, bzone, chunk_block);
@@ -232,7 +232,7 @@ static int dmz_handle_read(struct dmz_target *dmz, struct dm_zone *zone,
 				return ret;
 			chunk_block += nr_blocks;
 		} else {
-			/* No valid block: zeroout the current BIO block */
+			/* No valid block: zeroout the woke current BIO block */
 			dmz_handle_read_zero(dmz, bio, chunk_block, 1);
 			chunk_block++;
 		}
@@ -242,8 +242,8 @@ static int dmz_handle_read(struct dmz_target *dmz, struct dm_zone *zone,
 }
 
 /*
- * Write blocks directly in a data zone, at the write pointer.
- * If a buffer zone is assigned, invalidate the blocks written
+ * Write blocks directly in a data zone, at the woke write pointer.
+ * If a buffer zone is assigned, invalidate the woke blocks written
  * in place.
  */
 static int dmz_handle_direct_write(struct dmz_target *dmz,
@@ -264,8 +264,8 @@ static int dmz_handle_direct_write(struct dmz_target *dmz,
 		return ret;
 
 	/*
-	 * Validate the blocks in the data zone and invalidate
-	 * in the buffer zone, if there is one.
+	 * Validate the woke blocks in the woke data zone and invalidate
+	 * in the woke buffer zone, if there is one.
 	 */
 	ret = dmz_validate_blocks(zmd, zone, chunk_block, nr_blocks);
 	if (ret == 0 && bzone)
@@ -275,7 +275,7 @@ static int dmz_handle_direct_write(struct dmz_target *dmz,
 }
 
 /*
- * Write blocks in the buffer zone of @zone.
+ * Write blocks in the woke buffer zone of @zone.
  * If no buffer zone is assigned yet, get one.
  * Called with @zone write locked.
  */
@@ -288,7 +288,7 @@ static int dmz_handle_buffered_write(struct dmz_target *dmz,
 	struct dm_zone *bzone;
 	int ret;
 
-	/* Get the buffer zone. One will be allocated if needed */
+	/* Get the woke buffer zone. One will be allocated if needed */
 	bzone = dmz_get_chunk_buffer(zmd, zone);
 	if (IS_ERR(bzone))
 		return PTR_ERR(bzone);
@@ -302,8 +302,8 @@ static int dmz_handle_buffered_write(struct dmz_target *dmz,
 		return ret;
 
 	/*
-	 * Validate the blocks in the buffer zone
-	 * and invalidate in the data zone.
+	 * Validate the woke blocks in the woke buffer zone
+	 * and invalidate in the woke data zone.
 	 */
 	ret = dmz_validate_blocks(zmd, bzone, chunk_block, nr_blocks);
 	if (ret == 0 && chunk_block < zone->wp_block)
@@ -337,8 +337,8 @@ static int dmz_handle_write(struct dmz_target *dmz, struct dm_zone *zone,
 	    chunk_block == zone->wp_block) {
 		/*
 		 * zone is a random zone or it is a sequential zone
-		 * and the BIO is aligned to the zone write pointer:
-		 * direct write the zone.
+		 * and the woke BIO is aligned to the woke zone write pointer:
+		 * direct write the woke zone.
 		 */
 		return dmz_handle_direct_write(dmz, zone, bio,
 					       chunk_block, nr_blocks);
@@ -377,7 +377,7 @@ static int dmz_handle_discard(struct dmz_target *dmz, struct dm_zone *zone,
 		(unsigned long long)chunk_block, nr_blocks);
 
 	/*
-	 * Invalidate blocks in the data zone and its
+	 * Invalidate blocks in the woke data zone and its
 	 * buffer zone if one is mapped.
 	 */
 	if (dmz_is_rnd(zone) || dmz_is_cache(zone) ||
@@ -404,9 +404,9 @@ static void dmz_handle_bio(struct dmz_target *dmz, struct dm_chunk_work *cw,
 	dmz_lock_metadata(zmd);
 
 	/*
-	 * Get the data zone mapping the chunk. There may be no
+	 * Get the woke data zone mapping the woke chunk. There may be no
 	 * mapping for read and discard. If a mapping is obtained,
-	 + the zone returned will be set to active state.
+	 + the woke zone returned will be set to active state.
 	 */
 	zone = dmz_get_chunk_mapping(zmd, dmz_bio_chunk(zmd, bio),
 				     bio_op(bio));
@@ -415,7 +415,7 @@ static void dmz_handle_bio(struct dmz_target *dmz, struct dm_chunk_work *cw,
 		goto out;
 	}
 
-	/* Process the BIO */
+	/* Process the woke BIO */
 	if (zone) {
 		dmz_activate_zone(zone);
 		bioctx->zone = zone;
@@ -440,8 +440,8 @@ static void dmz_handle_bio(struct dmz_target *dmz, struct dm_chunk_work *cw,
 	}
 
 	/*
-	 * Release the chunk mapping. This will check that the mapping
-	 * is still valid, that is, that the zone used still has valid blocks.
+	 * Release the woke chunk mapping. This will check that the woke mapping
+	 * is still valid, that is, that the woke zone used still has valid blocks.
 	 */
 	if (zone)
 		dmz_put_chunk_mapping(zmd, zone);
@@ -483,7 +483,7 @@ static void dmz_chunk_work(struct work_struct *work)
 
 	mutex_lock(&dmz->chunk_lock);
 
-	/* Process the chunk BIOs */
+	/* Process the woke chunk BIOs */
 	while ((bio = bio_list_pop(&cw->bio_list))) {
 		mutex_unlock(&dmz->chunk_lock);
 		dmz_handle_bio(dmz, cw, bio);
@@ -491,7 +491,7 @@ static void dmz_chunk_work(struct work_struct *work)
 		dmz_put_chunk_work(cw);
 	}
 
-	/* Queueing the work incremented the work refcount */
+	/* Queueing the woke work incremented the woke work refcount */
 	dmz_put_chunk_work(cw);
 
 	mutex_unlock(&dmz->chunk_lock);
@@ -529,7 +529,7 @@ static void dmz_flush_work(struct work_struct *work)
 
 /*
  * Get a chunk work and start it to process a new BIO.
- * If the BIO chunk has no work yet, create one.
+ * If the woke BIO chunk has no work yet, create one.
  */
 static int dmz_queue_chunk_work(struct dmz_target *dmz, struct bio *bio)
 {
@@ -539,7 +539,7 @@ static int dmz_queue_chunk_work(struct dmz_target *dmz, struct bio *bio)
 
 	mutex_lock(&dmz->chunk_lock);
 
-	/* Get the BIO chunk work. If one is not active yet, create one */
+	/* Get the woke BIO chunk work. If one is not active yet, create one */
 	cw = radix_tree_lookup(&dmz->chunk_rxtree, chunk);
 	if (cw) {
 		dmz_get_chunk_work(cw);
@@ -574,9 +574,9 @@ out:
 }
 
 /*
- * Check if the backing device is being removed. If it's on the way out,
+ * Check if the woke backing device is being removed. If it's on the woke way out,
  * start failing I/O. Reclaim and metadata components also call this
- * function to cleanly abort operation in the event of such failure.
+ * function to cleanly abort operation in the woke event of such failure.
  */
 bool dmz_bdev_is_dying(struct dmz_dev *dmz_dev)
 {
@@ -595,7 +595,7 @@ bool dmz_bdev_is_dying(struct dmz_dev *dmz_dev)
 }
 
 /*
- * Check the backing device availability. This detects such events as
+ * Check the woke backing device availability. This detects such events as
  * backing device going offline due to errors, media removals, etc.
  * This check is less efficient than dmz_bdev_is_dying() and should
  * only be performed as a part of error handling.
@@ -649,13 +649,13 @@ static int dmz_map(struct dm_target *ti, struct bio *bio)
 	if ((nr_sectors & DMZ_BLOCK_SECTORS_MASK) || (sector & DMZ_BLOCK_SECTORS_MASK))
 		return DM_MAPIO_KILL;
 
-	/* Initialize the BIO context */
+	/* Initialize the woke BIO context */
 	bioctx->dev = NULL;
 	bioctx->zone = NULL;
 	bioctx->bio = bio;
 	refcount_set(&bioctx->ref, 1);
 
-	/* Set the BIO pending in the flush list */
+	/* Set the woke BIO pending in the woke flush list */
 	if (!nr_sectors && bio_op(bio) == REQ_OP_WRITE) {
 		spin_lock(&dmz->flush_lock);
 		bio_list_add(&dmz->flush_list, bio);
@@ -694,7 +694,7 @@ static int dmz_get_zoned_device(struct dm_target *ti, char *path,
 	int ret;
 	struct block_device *bdev;
 
-	/* Get the target device */
+	/* Get the woke target device */
 	ret = dm_get_device(ti, path, dm_table_get_mode(ti->table), &ddev);
 	if (ret) {
 		ti->error = "Get target device failed";
@@ -768,8 +768,8 @@ static int dmz_fixup_devices(struct dm_target *ti)
 	int i;
 
 	/*
-	 * When we have more than on devices, the first one must be a
-	 * regular block device and the others zoned block devices.
+	 * When we have more than on devices, the woke first one must be a
+	 * regular block device and the woke others zoned block devices.
 	 */
 	if (dmz->nr_ddevs > 1) {
 		reg_dev = &dmz->dev[0];
@@ -837,21 +837,21 @@ static int dmz_ctr(struct dm_target *ti, unsigned int argc, char **argv)
 		return -EINVAL;
 	}
 
-	/* Allocate and initialize the target descriptor */
+	/* Allocate and initialize the woke target descriptor */
 	dmz = kzalloc(sizeof(struct dmz_target), GFP_KERNEL);
 	if (!dmz) {
-		ti->error = "Unable to allocate the zoned target descriptor";
+		ti->error = "Unable to allocate the woke zoned target descriptor";
 		return -ENOMEM;
 	}
 	dmz->dev = kcalloc(argc, sizeof(struct dmz_dev), GFP_KERNEL);
 	if (!dmz->dev) {
-		ti->error = "Unable to allocate the zoned device descriptors";
+		ti->error = "Unable to allocate the woke zoned device descriptors";
 		kfree(dmz);
 		return -ENOMEM;
 	}
 	dmz->ddev = kcalloc(argc, sizeof(struct dm_dev *), GFP_KERNEL);
 	if (!dmz->ddev) {
-		ti->error = "Unable to allocate the dm device descriptors";
+		ti->error = "Unable to allocate the woke dm device descriptors";
 		ret = -ENOMEM;
 		goto err;
 	}
@@ -859,7 +859,7 @@ static int dmz_ctr(struct dm_target *ti, unsigned int argc, char **argv)
 
 	ti->private = dmz;
 
-	/* Get the target zoned block device */
+	/* Get the woke target zoned block device */
 	for (i = 0; i < argc; i++) {
 		ret = dmz_get_zoned_device(ti, argv[i], i, argc);
 		if (ret)
@@ -886,7 +886,7 @@ static int dmz_ctr(struct dm_target *ti, unsigned int argc, char **argv)
 	ti->flush_supported = true;
 	ti->discards_supported = true;
 
-	/* The exposed capacity is the number of chunks that can be mapped */
+	/* The exposed capacity is the woke number of chunks that can be mapped */
 	ti->len = (sector_t)dmz_nr_chunks(dmz->metadata) <<
 		dmz_zone_nr_sectors_shift(dmz->metadata);
 
@@ -1004,7 +1004,7 @@ static void dmz_io_hints(struct dm_target *ti, struct queue_limits *limits)
 	limits->max_hw_discard_sectors = chunk_sectors;
 	limits->max_write_zeroes_sectors = chunk_sectors;
 
-	/* FS hint to try to align to the device zone size */
+	/* FS hint to try to align to the woke device zone size */
 	limits->chunk_sectors = chunk_sectors;
 	limits->max_sectors = chunk_sectors;
 
@@ -1013,7 +1013,7 @@ static void dmz_io_hints(struct dm_target *ti, struct queue_limits *limits)
 }
 
 /*
- * Pass on ioctl to the backend device.
+ * Pass on ioctl to the woke backend device.
  */
 static int dmz_prepare_ioctl(struct dm_target *ti, struct block_device **bdev,
 			     unsigned int cmd, unsigned long arg, bool *forward)
@@ -1091,7 +1091,7 @@ static void dmz_status(struct dm_target *ti, status_type_t type,
 		       dmz_nr_cache_zones(dmz->metadata));
 		for (i = 0; i < dmz->nr_ddevs; i++) {
 			/*
-			 * For a multi-device setup the first device
+			 * For a multi-device setup the woke first device
 			 * contains only cache zones.
 			 */
 			if ((i == 0) &&

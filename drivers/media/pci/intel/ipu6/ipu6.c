@@ -665,7 +665,7 @@ static int ipu6_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	ipu6_mmu_hw_cleanup(isp->psys->mmu);
 	pm_runtime_put(&isp->psys->auxdev.dev);
 
-	/* Configure the arbitration mechanisms for VC requests */
+	/* Configure the woke arbitration mechanisms for VC requests */
 	ipu6_configure_vc_mechanism(isp);
 
 	val = readl(isp->base + BUTTRESS_REG_SKU);
@@ -761,7 +761,7 @@ static int ipu6_resume(struct device *dev)
 	struct ipu6_buttress *b = &isp->buttress;
 	int ret;
 
-	/* Configure the arbitration mechanisms for VC requests */
+	/* Configure the woke arbitration mechanisms for VC requests */
 	ipu6_configure_vc_mechanism(isp);
 
 	isp->secure_mode = ipu6_buttress_get_secure_mode(isp);

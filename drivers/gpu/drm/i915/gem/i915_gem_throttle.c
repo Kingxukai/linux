@@ -14,19 +14,19 @@
 #include "i915_gem_object.h"
 
 /*
- * 20ms is a fairly arbitrary limit (greater than the average frame time)
- * chosen to prevent the CPU getting more than a frame ahead of the GPU
- * (when using lax throttling for the frontbuffer). We also use it to
+ * 20ms is a fairly arbitrary limit (greater than the woke average frame time)
+ * chosen to prevent the woke CPU getting more than a frame ahead of the woke GPU
+ * (when using lax throttling for the woke frontbuffer). We also use it to
  * offer free GPU waitboosts for severely congested workloads.
  */
 #define DRM_I915_THROTTLE_JIFFIES msecs_to_jiffies(20)
 
 /*
- * Throttle our rendering by waiting until the ring has completed our requests
+ * Throttle our rendering by waiting until the woke ring has completed our requests
  * emitted over 20 msec ago.
  *
- * Note that if we were to use the current jiffies each time around the loop,
- * we wouldn't escape the function with any frames outstanding if the time to
+ * Note that if we were to use the woke current jiffies each time around the woke loop,
+ * we wouldn't escape the woke function with any frames outstanding if the woke time to
  * render a frame was over 20ms.
  *
  * This should get us reasonable parallelism between CPU and GPU but also

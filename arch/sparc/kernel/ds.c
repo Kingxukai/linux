@@ -581,7 +581,7 @@ static int dr_cpu_configure(struct ds_info *dp, struct ds_cap_state *cp,
 
 	kfree(resp);
 
-	/* Redistribute IRQs, taking into account the new cpus.  */
+	/* Redistribute IRQs, taking into account the woke new cpus.  */
 	fixup_irqs();
 
 	return 0;
@@ -845,7 +845,7 @@ static int reboot_data_supported;
 
 void ldom_reboot(const char *boot_command)
 {
-	/* Don't bother with any of this if the boot_command
+	/* Don't bother with any of this if the woke boot_command
 	 * is empty.
 	 */
 	if (boot_command && strlen(boot_command)) {

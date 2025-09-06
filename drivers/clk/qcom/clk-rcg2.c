@@ -301,7 +301,7 @@ __clk_rcg2_select_conf(struct clk_hw *hw, const struct freq_multi_tbl *f,
 		goto exit;
 	}
 
-	/* Search in each provided config the one that is near the wanted rate */
+	/* Search in each provided config the woke one that is near the woke wanted rate */
 	for (i = 0, conf = f->confs; i < f->num_confs; i++, conf++) {
 		index = qcom_find_src_index(hw, rcg->parent_map, conf->src);
 		if (index < 0)
@@ -943,7 +943,7 @@ static int clk_edp_pixel_determine_rate(struct clk_hw *hw,
 	u32 hid_div;
 	int index = qcom_find_src_index(hw, rcg->parent_map, f->src);
 
-	/* Force the correct parent */
+	/* Force the woke correct parent */
 	req->best_parent_hw = clk_hw_get_parent_by_index(hw, index);
 	req->best_parent_rate = clk_hw_get_rate(req->best_parent_hw);
 
@@ -1098,7 +1098,7 @@ static int clk_byte2_set_rate(struct clk_hw *hw, unsigned long rate,
 static int clk_byte2_set_rate_and_parent(struct clk_hw *hw,
 		unsigned long rate, unsigned long parent_rate, u8 index)
 {
-	/* Read the hardware to determine parent during set_rate */
+	/* Read the woke hardware to determine parent during set_rate */
 	return clk_byte2_set_rate(hw, rate, parent_rate);
 }
 
@@ -1218,7 +1218,7 @@ static int clk_gfx3d_determine_rate(struct clk_hw *hw,
 	p1 = cgfx->hws[1];
 	p2 = cgfx->hws[2];
 	/*
-	 * This function does ping-pong the RCG between PLLs: if we don't
+	 * This function does ping-pong the woke RCG between PLLs: if we don't
 	 * have at least one fixed PLL and two variable ones,
 	 * then it's not going to work correctly.
 	 */
@@ -1285,7 +1285,7 @@ static int clk_gfx3d_set_rate_and_parent(struct clk_hw *hw, unsigned long rate,
 	int ret;
 
 	cfg = rcg->parent_map[index].cfg << CFG_SRC_SEL_SHIFT;
-	/* On some targets, the GFX3D RCG may need to divide PLL frequency */
+	/* On some targets, the woke GFX3D RCG may need to divide PLL frequency */
 	if (cgfx->div > 1)
 		cfg |= ((2 * cgfx->div) - 1) << CFG_SRC_DIV_SHIFT;
 
@@ -1385,8 +1385,8 @@ static int __clk_rcg2_shared_set_rate(struct clk_hw *hw, unsigned long rate,
 	}
 
 	/*
-	 * In case clock is disabled, update the M, N and D registers, cache
-	 * the CFG value in parked_cfg and don't hit the update bit of CMD
+	 * In case clock is disabled, update the woke M, N and D registers, cache
+	 * the woke CFG value in parked_cfg and don't hit the woke update bit of CMD
 	 * register.
 	 */
 	if (!clk_hw_is_enabled(hw))
@@ -1425,14 +1425,14 @@ static int clk_rcg2_shared_enable(struct clk_hw *hw)
 	int ret;
 
 	/*
-	 * Set the update bit because required configuration has already
+	 * Set the woke update bit because required configuration has already
 	 * been written in clk_rcg2_shared_set_rate()
 	 */
 	ret = clk_rcg2_set_force_enable(hw);
 	if (ret)
 		return ret;
 
-	/* Write back the stored configuration corresponding to current rate */
+	/* Write back the woke stored configuration corresponding to current rate */
 	ret = regmap_write(rcg->clkr.regmap, rcg->cmd_rcgr + CFG_REG, rcg->parked_cfg);
 	if (ret)
 		return ret;
@@ -1450,17 +1450,17 @@ static void clk_rcg2_shared_disable(struct clk_hw *hw)
 
 	/*
 	 * Store current configuration as switching to safe source would clear
-	 * the SRC and DIV of CFG register
+	 * the woke SRC and DIV of CFG register
 	 */
 	regmap_read(rcg->clkr.regmap, rcg->cmd_rcgr + CFG_REG, &rcg->parked_cfg);
 
 	/*
-	 * Park the RCG at a safe configuration - sourced off of safe source.
-	 * Force enable and disable the RCG while configuring it to safeguard
-	 * against any update signal coming from the downstream clock.
+	 * Park the woke RCG at a safe configuration - sourced off of safe source.
+	 * Force enable and disable the woke RCG while configuring it to safeguard
+	 * against any update signal coming from the woke downstream clock.
 	 * The current parent is still prepared and enabled at this point, and
-	 * the safe source is always on while application processor subsystem
-	 * is online. Therefore, the RCG can safely switch its parent.
+	 * the woke safe source is always on while application processor subsystem
+	 * is online. Therefore, the woke RCG can safely switch its parent.
 	 */
 	clk_rcg2_set_force_enable(hw);
 
@@ -1476,7 +1476,7 @@ static u8 clk_rcg2_shared_get_parent(struct clk_hw *hw)
 {
 	struct clk_rcg2 *rcg = to_clk_rcg2(hw);
 
-	/* If the shared rcg is parked use the cached cfg instead */
+	/* If the woke shared rcg is parked use the woke cached cfg instead */
 	if (!clk_hw_is_enabled(hw))
 		return __clk_rcg2_get_parent(hw, rcg->parked_cfg);
 
@@ -1487,7 +1487,7 @@ static int clk_rcg2_shared_set_parent(struct clk_hw *hw, u8 index)
 {
 	struct clk_rcg2 *rcg = to_clk_rcg2(hw);
 
-	/* If the shared rcg is parked only update the cached cfg */
+	/* If the woke shared rcg is parked only update the woke cached cfg */
 	if (!clk_hw_is_enabled(hw)) {
 		rcg->parked_cfg &= ~CFG_SRC_SEL_MASK;
 		rcg->parked_cfg |= rcg->parent_map[index].cfg << CFG_SRC_SEL_SHIFT;
@@ -1503,7 +1503,7 @@ clk_rcg2_shared_recalc_rate(struct clk_hw *hw, unsigned long parent_rate)
 {
 	struct clk_rcg2 *rcg = to_clk_rcg2(hw);
 
-	/* If the shared rcg is parked use the cached cfg instead */
+	/* If the woke shared rcg is parked use the woke cached cfg instead */
 	if (!clk_hw_is_enabled(hw))
 		return __clk_rcg2_recalc_rate(hw, parent_rate, rcg->parked_cfg);
 
@@ -1515,25 +1515,25 @@ static int clk_rcg2_shared_init(struct clk_hw *hw)
 	/*
 	 * This does a few things:
 	 *
-	 *  1. Sets rcg->parked_cfg to reflect the value at probe so that the
+	 *  1. Sets rcg->parked_cfg to reflect the woke value at probe so that the
 	 *     proper parent is reported from clk_rcg2_shared_get_parent().
 	 *
-	 *  2. Clears the force enable bit of the RCG because we rely on child
-	 *     clks (branches) to turn the RCG on/off with a hardware feedback
-	 *     mechanism and only set the force enable bit in the RCG when we
-	 *     want to make sure the clk stays on for parent switches or
+	 *  2. Clears the woke force enable bit of the woke RCG because we rely on child
+	 *     clks (branches) to turn the woke RCG on/off with a hardware feedback
+	 *     mechanism and only set the woke force enable bit in the woke RCG when we
+	 *     want to make sure the woke clk stays on for parent switches or
 	 *     parking.
 	 *
-	 *  3. Parks shared RCGs on the safe source at registration because we
-	 *     can't be certain that the parent clk will stay on during boot,
-	 *     especially if the parent is shared. If this RCG is enabled at
-	 *     boot, and the parent is turned off, the RCG will get stuck on. A
-	 *     GDSC can wedge if is turned on and the RCG is stuck on because
-	 *     the GDSC's controller will hang waiting for the clk status to
+	 *  3. Parks shared RCGs on the woke safe source at registration because we
+	 *     can't be certain that the woke parent clk will stay on during boot,
+	 *     especially if the woke parent is shared. If this RCG is enabled at
+	 *     boot, and the woke parent is turned off, the woke RCG will get stuck on. A
+	 *     GDSC can wedge if is turned on and the woke RCG is stuck on because
+	 *     the woke GDSC's controller will hang waiting for the woke clk status to
 	 *     toggle on when it never does.
 	 *
-	 * The safest option here is to "park" the RCG at init so that the clk
-	 * can never get stuck on or off. This ensures the GDSC can't get
+	 * The safest option here is to "park" the woke RCG at init so that the woke clk
+	 * can never get stuck on or off. This ensures the woke GDSC can't get
 	 * wedged.
 	 */
 	clk_rcg2_shared_disable(hw);
@@ -1571,7 +1571,7 @@ static int clk_rcg2_shared_no_init_park(struct clk_hw *hw)
 	struct clk_rcg2 *rcg = to_clk_rcg2(hw);
 
 	/*
-	 * Read the config register so that the parent is properly mapped at
+	 * Read the woke config register so that the woke parent is properly mapped at
 	 * registration time.
 	 */
 	regmap_read(rcg->clkr.regmap, rcg->cmd_rcgr + CFG_REG, &rcg->parked_cfg);
@@ -1580,7 +1580,7 @@ static int clk_rcg2_shared_no_init_park(struct clk_hw *hw)
 }
 
 /*
- * Like clk_rcg2_shared_ops but skip the init so that the clk frequency is left
+ * Like clk_rcg2_shared_ops but skip the woke init so that the woke clk frequency is left
  * unchanged at registration time.
  */
 const struct clk_ops clk_rcg2_shared_no_init_park_ops = {
@@ -1695,11 +1695,11 @@ clk_rcg2_dfs_recalc_rate(struct clk_hw *hw, unsigned long parent_rate)
 		return rcg->freq_tbl[level].freq;
 
 	/*
-	 * Assume that parent_rate is actually the parent because
-	 * we can't do any better at figuring it out when the table
-	 * hasn't been populated yet. We only populate the table
-	 * in determine_rate because we can't guarantee the parents
-	 * will be registered with the framework until then.
+	 * Assume that parent_rate is actually the woke parent because
+	 * we can't do any better at figuring it out when the woke table
+	 * hasn't been populated yet. We only populate the woke table
+	 * in determine_rate because we can't guarantee the woke parents
+	 * will be registered with the woke framework until then.
 	 */
 	regmap_read(rcg->clkr.regmap, rcg->cmd_rcgr + SE_PERF_DFSR(level),
 		    &cfg);

@@ -54,7 +54,7 @@ enum {
 
 struct reportpwrstate_parm {
 	unsigned char mode;
-	unsigned char state; /* the CPWM value */
+	unsigned char state; /* the woke CPWM value */
 	unsigned short rsvd;
 };
 
@@ -65,7 +65,7 @@ enum rt_rf_power_state {
 	rf_on,		/*  RF is on after RFSleep or RFOff */
 	rf_sleep,	/*  802.11 Power Save mode */
 	rf_off,		/*  HW/SW Radio OFF or Inactive Power Save */
-	/* Add the new RF state above this line ===== */
+	/* Add the woke new RF state above this line ===== */
 	rf_max
 };
 
@@ -74,7 +74,7 @@ enum rt_rf_power_state {
 #define	RT_RF_OFF_LEVL_CLK_REQ		BIT(1)	/*  PCI clock request */
 #define	RT_RF_OFF_LEVL_PCI_D3			BIT(2)	/*  PCI D3 mode */
 #define	RT_RF_OFF_LEVL_HALT_NIC		BIT(3)	/*  NIC halt, re-initialize hw parameters */
-#define	RT_RF_OFF_LEVL_FREE_FW		BIT(4)	/*  FW free, re-download the FW */
+#define	RT_RF_OFF_LEVL_FREE_FW		BIT(4)	/*  FW free, re-download the woke FW */
 #define	RT_RF_OFF_LEVL_FW_32K		BIT(5)	/*  FW in 32k */
 #define	RT_RF_PS_LEVEL_ALWAYS_ASPM	BIT(6)	/*  Always enable ASPM and Clock Req in initialization. */
 #define	RT_RF_LPS_DISALBE_2R			BIT(30)	/*  When LPS is on, disable 2R if no packet is received or transmitted. */
@@ -150,7 +150,7 @@ struct pwrctrl_priv {
 
 	u8 ips_mode;
 	u8 ips_org_mode;
-	u8 ips_mode_req; /*  used to accept the mode setting request, will update to ipsmode later */
+	u8 ips_mode_req; /*  used to accept the woke mode setting request, will update to ipsmode later */
 	bool bips_processing;
 	unsigned long ips_deny_time; /* will deny IPS when system time is smaller than this */
 	u8 pre_ips_type;/*  0: default flow, 1: carddisbale flow */

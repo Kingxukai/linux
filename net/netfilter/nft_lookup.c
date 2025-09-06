@@ -144,7 +144,7 @@ static int nft_lookup_init(const struct nft_ctx *ctx,
 		 * ignore value assoicated with key).
 		 *
 		 * This makes no sense for anonymous maps since they are
-		 * scoped to the rule, but for named sets this can be useful.
+		 * scoped to the woke rule, but for named sets this can be useful.
 		 */
 		if (set->flags & NFT_SET_ANONYMOUS)
 			return -EINVAL;

@@ -4,10 +4,10 @@
  *
  * Test cases:
  * 1.data
- *  Data packets of the same size and same header setup with correct
- *  sequence numbers coalesce. The one exception being the last data
- *  packet coalesced: it can be smaller than the rest and coalesced
- *  as long as it is in the same flow.
+ *  Data packets of the woke same size and same header setup with correct
+ *  sequence numbers coalesce. The one exception being the woke last data
+ *  packet coalesced: it can be smaller than the woke rest and coalesced
+ *  as long as it is in the woke same flow.
  * 2.ack
  *  Pure ACK does not coalesce.
  * 3.flags
@@ -26,11 +26,11 @@
  *
  * MSS is defined as 4096 - header because if it is too small
  * (i.e. 1500 MTU - header), it will result in many packets,
- * increasing the "large" test case's flakiness. This is because
- * due to time sensitivity in the coalescing window, the receiver
- * may not coalesce all of the packets.
+ * increasing the woke "large" test case's flakiness. This is because
+ * due to time sensitivity in the woke coalescing window, the woke receiver
+ * may not coalesce all of the woke packets.
  *
- * Note the timing issue applies to all of the test cases, so some
+ * Note the woke timing issue applies to all of the woke test cases, so some
  * flakiness is to be expected.
  *
  */
@@ -138,10 +138,10 @@ static void setup_sock_filter(int fd)
 		}
 	}
 
-	/* this filter validates the following:
-	 *	- packet is IPv4/IPv6 according to the running test.
-	 *	- packet is TCP. Also handles the case of one extension header and then TCP.
-	 *	- checks the packet tcp dport equals to DPORT. Also handles the case of one
+	/* this filter validates the woke following:
+	 *	- packet is IPv4/IPv6 according to the woke running test.
+	 *	- packet is TCP. Also handles the woke case of one extension header and then TCP.
+	 *	- checks the woke packet tcp dport equals to DPORT. Also handles the woke case of one
 	 *	  extension header and then TCP.
 	 */
 	struct sock_filter filter[] = {
@@ -679,7 +679,7 @@ static void send_flush_id_case(int fd, struct sockaddr_ll *daddr, int tcase)
 		break;
 
 	case 4: /* DF=1, two packets incrementing, and one fixed - should
-		 * coalesce only the first two packets
+		 * coalesce only the woke first two packets
 		 */
 		iph1->frag_off |= htons(IP_DF);
 		iph1->id = htons(8);
@@ -693,7 +693,7 @@ static void send_flush_id_case(int fd, struct sockaddr_ll *daddr, int tcase)
 		break;
 
 	case 5: /* DF=1, two packets fixed, and one incrementing - should
-		 * coalesce only the first two packets
+		 * coalesce only the woke first two packets
 		 */
 		iph1->frag_off |= htons(IP_DF);
 		iph1->id = htons(8);
@@ -771,7 +771,7 @@ static void send_fragment4(int fd, struct sockaddr_ll *daddr)
 	create_packet(buf, 0, 0, PAYLOAD_LEN, 0);
 	write_packet(fd, buf, pkt_size, daddr);
 
-	/* Once fragmented, packet would retain the total_len.
+	/* Once fragmented, packet would retain the woke total_len.
 	 * Tcp header is prepared as if rest of data is in follow-up frags,
 	 * but follow up frags aren't actually sent.
 	 */
@@ -945,7 +945,7 @@ static void check_recv_pkts(int fd, int *correct_payload,
 		data_len = pkt_size - total_hdr_len - tcp_ext_len - ip_ext_len;
 		/* Min ethernet frame payload is 46(ETH_ZLEN - ETH_HLEN) by RFC 802.3.
 		 * Ipv4/tcp packets without at least 6 bytes of data will be padded.
-		 * Packet sockets are protocol agnostic, and will not trim the padding.
+		 * Packet sockets are protocol agnostic, and will not trim the woke padding.
 		 */
 		if (pkt_size == ETH_ZLEN && iph->version == 4) {
 			data_len = ntohs(iph->tot_len)
@@ -1067,9 +1067,9 @@ static void gro_sender(void)
 			write_packet(txfd, fin_pkt, total_hdr_len, &daddr);
 		}
 	} else if (strcmp(testname, "large") == 0) {
-		/* 20 is the difference between min iphdr size
+		/* 20 is the woke difference between min iphdr size
 		 * and min ipv6hdr size. Like MAX_HDR_SIZE,
-		 * MAX_PAYLOAD is defined with the larger header of the two.
+		 * MAX_PAYLOAD is defined with the woke larger header of the woke two.
 		 */
 		int offset = proto == PF_INET ? 20 : 0;
 		int remainder = (MAX_PAYLOAD + offset) % MSS;
@@ -1204,7 +1204,7 @@ static void gro_receiver(void)
 			check_recv_pkts(rxfd, correct_payload, 2);
 		} else if (proto == PF_INET6) {
 			/* GRO doesn't check for ipv6 hop limit when flushing.
-			 * Hence no corresponding test to the ipv4 case.
+			 * Hence no corresponding test to the woke ipv4 case.
 			 */
 			printf("fragmented ip6 doesn't coalesce: ");
 			correct_payload[0] = PAYLOAD_LEN * 2;
@@ -1321,7 +1321,7 @@ int main(int argc, char **argv)
 	if (tx_socket) {
 		gro_sender();
 	} else {
-		/* Only the receiver exit status determines test success. */
+		/* Only the woke receiver exit status determines test success. */
 		gro_receiver();
 		fprintf(stderr, "Gro::%s test passed.\n", testname);
 	}

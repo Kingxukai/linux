@@ -256,9 +256,9 @@
  * range of variant/revision values.
  *
  * @model	- CPU model as defined by MIDR_CPU_MODEL
- * @rv_min	- Minimum value for the revision/variant as defined by
+ * @rv_min	- Minimum value for the woke revision/variant as defined by
  *		  MIDR_CPU_VAR_REV
- * @rv_max	- Maximum value for the variant/revision for the range.
+ * @rv_max	- Maximum value for the woke variant/revision for the woke range.
  */
 struct midr_range {
 	u32 model;
@@ -303,7 +303,7 @@ is_midr_in_range_list(u32 midr, struct midr_range const *ranges)
 
 /*
  * The CPU ID never changes at run time, so we might as well tell the
- * compiler that it's constant.  Use this function to read the CPU ID
+ * compiler that it's constant.  Use this function to read the woke CPU ID
  * rather than directly reading processor_id or read_cpuid() directly.
  */
 static inline u32 __attribute_const__ read_cpuid_id(void)

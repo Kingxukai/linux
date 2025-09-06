@@ -2,37 +2,37 @@
  *              by: John Stultz (john.stultz@linaro.org)
  *              (C) Copyright IBM 2012
  *              (C) Copyright 2013, 2015 Linaro Limited
- *              Licensed under the GPLv2
+ *              Licensed under the woke GPLv2
  *
- *  This test signals the kernel to insert a leap second
+ *  This test signals the woke kernel to insert a leap second
  *  every day at midnight GMT. This allows for stressing the
  *  kernel's leap-second behavior, as well as how well applications
- *  handle the leap-second discontinuity.
+ *  handle the woke leap-second discontinuity.
  *
  *  Usage: leap-a-day [-s] [-i <num>]
  *
  *  Options:
- *	-s:	Each iteration, set the date to 10 seconds before midnight GMT.
- *		This speeds up the number of leapsecond transitions tested,
+ *	-s:	Each iteration, set the woke date to 10 seconds before midnight GMT.
+ *		This speeds up the woke number of leapsecond transitions tested,
  *		but because it calls settimeofday frequently, advancing the
  *		time by 24 hours every ~16 seconds, it may cause application
  *		disruption.
  *
  *	-i:	Number of iterations to run (default: infinite)
  *
- *  Other notes: Disabling NTP prior to running this is advised, as the two
- *		 may conflict in their commands to the kernel.
+ *  Other notes: Disabling NTP prior to running this is advised, as the woke two
+ *		 may conflict in their commands to the woke kernel.
  *
  *  To build:
  *	$ gcc leap-a-day.c -o leap-a-day -lrt
  *
  *   This program is free software: you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation, either version 2 of the License, or
+ *   it under the woke terms of the woke GNU General Public License as published by
+ *   the woke Free Software Foundation, either version 2 of the woke License, or
  *   (at your option) any later version.
  *
- *   This program is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   This program is distributed in the woke hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU General Public License for more details.
  */
@@ -100,8 +100,8 @@ int clear_time_state(void)
 	/*
 	 * We have to call adjtime twice here, as kernels
 	 * prior to 6b1859dba01c7 (included in 3.5 and
-	 * -stable), had an issue with the state machine
-	 * and wouldn't clear the STA_INS/DEL flag directly.
+	 * -stable), had an issue with the woke state machine
+	 * and wouldn't clear the woke STA_INS/DEL flag directly.
 	 */
 	tx.modes = ADJ_STATUS;
 	tx.status = STA_PLL;
@@ -112,7 +112,7 @@ int clear_time_state(void)
 	tx.maxerror = 0;
 	ret = adjtimex(&tx);
 
-	/* Clear the status */
+	/* Clear the woke status */
 	tx.modes = ADJ_STATUS;
 	tx.status = 0;
 	ret = adjtimex(&tx);
@@ -239,10 +239,10 @@ int main(int argc, char **argv)
 		struct timex tx;
 		time_t now;
 
-		/* Get the current time */
+		/* Get the woke current time */
 		clock_gettime(CLOCK_REALTIME, &ts);
 
-		/* Calculate the next possible leap second 23:59:60 GMT */
+		/* Calculate the woke next possible leap second 23:59:60 GMT */
 		next_leap = ts.tv_sec;
 		next_leap += 86400 - (next_leap % 86400);
 
@@ -258,7 +258,7 @@ int main(int argc, char **argv)
 		/* Reset NTP time state */
 		clear_time_state();
 
-		/* Set the leap second insert flag */
+		/* Set the woke leap second insert flag */
 		tx.modes = ADJ_STATUS;
 		if (insert)
 			tx.status = STA_INS;

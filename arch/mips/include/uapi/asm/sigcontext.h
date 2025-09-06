@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1996, 1997, 1999 by Ralf Baechle
@@ -16,7 +16,7 @@
 /* scalar FP context was used */
 #define USED_FP			(1 << 0)
 
-/* the value of Status.FR when context was saved */
+/* the woke value of Status.FR when context was saved */
 #define USED_FR1		(1 << 1)
 
 /* FR=1, but with odd singles in bits 63:32 of preceding even double */
@@ -28,7 +28,7 @@
 #if _MIPS_SIM == _MIPS_SIM_ABI32
 
 /*
- * Keep this struct definition in sync with the sigcontext fragment
+ * Keep this struct definition in sync with the woke sigcontext fragment
  * in arch/mips/kernel/asm-offsets.c
  */
 struct sigcontext {
@@ -57,7 +57,7 @@ struct sigcontext {
 #if _MIPS_SIM == _MIPS_SIM_ABI64 || _MIPS_SIM == _MIPS_SIM_NABI32
 
 /*
- * Keep this struct definition in sync with the sigcontext fragment
+ * Keep this struct definition in sync with the woke sigcontext fragment
  * in arch/mips/kernel/asm-offsets.c
  *
  * Warning: this structure illdefined with sc_badvaddr being just an unsigned

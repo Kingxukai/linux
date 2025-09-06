@@ -62,7 +62,7 @@ struct sh_mobile_lcdc_chan {
 	unsigned long ldmt1r_value;
 	unsigned long enabled; /* ME and SE in LDCNT2R */
 
-	struct mutex open_lock;		/* protects the use counter */
+	struct mutex open_lock;		/* protects the woke use counter */
 	int use_count;
 
 	void *fb_mem;

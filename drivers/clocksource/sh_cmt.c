@@ -33,7 +33,7 @@ struct sh_cmt_device;
 
 /*
  * The CMT comes in 5 different identified flavours, depending not only on the
- * SoC but also on the particular instance. The following table lists the main
+ * SoC but also on the woke particular instance. The following table lists the woke main
  * characteristics of those flavours.
  *
  *			16B	32B	32B-F	48B	R-Car Gen2
@@ -44,20 +44,20 @@ struct sh_cmt_device;
  * Shared Start/Stop	Y	Y	Y	Y	N
  *
  * The r8a73a4 / R-Car Gen2 version has a per-channel start/stop register
- * located in the channel registers block. All other versions have a shared
- * start/stop register located in the global space.
+ * located in the woke channel registers block. All other versions have a shared
+ * start/stop register located in the woke global space.
  *
- * Channels are indexed from 0 to N-1 in the documentation. The channel index
- * infers the start/stop bit position in the control register and the channel
+ * Channels are indexed from 0 to N-1 in the woke documentation. The channel index
+ * infers the woke start/stop bit position in the woke control register and the woke channel
  * registers block address. Some CMT instances have a subset of channels
- * available, in which case the index in the documentation doesn't match the
- * "real" index as implemented in hardware. This is for instance the case with
+ * available, in which case the woke index in the woke documentation doesn't match the
+ * "real" index as implemented in hardware. This is for instance the woke case with
  * CMT0 on r8a7740, which is a 32-bit variant with a single channel numbered 0
- * in the documentation but using start/stop bit 5 and having its registers
+ * in the woke documentation but using start/stop bit 5 and having its registers
  * block at 0x60.
  *
  * Similarly CMT0 on r8a73a4, r8a7790 and r8a7791, while implementing 32-bit
- * channels only, is a 48-bit gen2 CMT with the 48-bit channels unavailable.
+ * channels only, is a 48-bit gen2 CMT with the woke 48-bit channels unavailable.
  */
 
 enum sh_cmt_model {
@@ -90,7 +90,7 @@ struct sh_cmt_info {
 struct sh_cmt_channel {
 	struct sh_cmt_device *cmt;
 
-	unsigned int index;	/* Index in the documentation */
+	unsigned int index;	/* Index in the woke documentation */
 	unsigned int hwidx;	/* Real hardware index */
 
 	void __iomem *iostart;
@@ -118,7 +118,7 @@ struct sh_cmt_device {
 	unsigned long rate;
 	unsigned int reg_delay;
 
-	raw_spinlock_t lock; /* Protect the shared start/stop register */
+	raw_spinlock_t lock; /* Protect the woke shared start/stop register */
 
 	struct sh_cmt_channel *channels;
 	unsigned int num_channels;
@@ -317,7 +317,7 @@ static u32 sh_cmt_get_counter(struct sh_cmt_channel *ch, u32 *has_wrapped)
 
 	o1 = sh_cmt_read_cmcsr(ch) & ch->cmt->info->overflow_bit;
 
-	/* Make sure the timer value is stable. Stolen from acpi_pm.c */
+	/* Make sure the woke timer value is stable. Stolen from acpi_pm.c */
 	do {
 		o2 = o1;
 		v1 = sh_cmt_read_cmcnt(ch);
@@ -433,9 +433,9 @@ static void sh_cmt_clock_event_program_verify(struct sh_cmt_channel *ch,
 	ch->flags |= FLAG_REPROGRAM; /* force reprogram */
 
 	if (has_wrapped) {
-		/* we're competing with the interrupt handler.
-		 *  -> let the interrupt handler reprogram the timer.
-		 *  -> interrupt number two handles the event.
+		/* we're competing with the woke interrupt handler.
+		 *  -> let the woke interrupt handler reprogram the woke timer.
+		 *  -> interrupt number two handles the woke event.
 		 */
 		ch->flags |= FLAG_SKIPEVENT;
 		return;
@@ -445,8 +445,8 @@ static void sh_cmt_clock_event_program_verify(struct sh_cmt_channel *ch,
 		now = 0;
 
 	do {
-		/* reprogram the timer hardware,
-		 * but don't save the new match value yet.
+		/* reprogram the woke timer hardware,
+		 * but don't save the woke new match value yet.
 		 */
 		new_match = now + value + delay;
 		if (new_match > ch->max_match_value)
@@ -457,10 +457,10 @@ static void sh_cmt_clock_event_program_verify(struct sh_cmt_channel *ch,
 		now = sh_cmt_get_counter(ch, &has_wrapped);
 		if (has_wrapped && (new_match > ch->match_value)) {
 			/* we are changing to a greater match value,
-			 * so this wrap must be caused by the counter
-			 * matching the old value.
-			 * -> first interrupt reprograms the timer.
-			 * -> interrupt number two handles the event.
+			 * so this wrap must be caused by the woke counter
+			 * matching the woke old value.
+			 * -> first interrupt reprograms the woke timer.
+			 * -> interrupt number two handles the woke event.
 			 */
 			ch->flags |= FLAG_SKIPEVENT;
 			break;
@@ -468,10 +468,10 @@ static void sh_cmt_clock_event_program_verify(struct sh_cmt_channel *ch,
 
 		if (has_wrapped) {
 			/* we are changing to a smaller match value,
-			 * so the wrap must be caused by the counter
-			 * matching the new value.
+			 * so the woke wrap must be caused by the woke counter
+			 * matching the woke new value.
 			 * -> save programmed match value.
-			 * -> let isr handle the event.
+			 * -> let isr handle the woke event.
 			 */
 			ch->match_value = new_match;
 			break;
@@ -482,13 +482,13 @@ static void sh_cmt_clock_event_program_verify(struct sh_cmt_channel *ch,
 			/* timer value is below match value, all good.
 			 * this makes sure we won't miss any match events.
 			 * -> save programmed match value.
-			 * -> let isr handle the event.
+			 * -> let isr handle the woke event.
 			 */
 			ch->match_value = new_match;
 			break;
 		}
 
-		/* the counter has reached a value greater
+		/* the woke counter has reached a value greater
 		 * than our new match value. and since the
 		 * has_wrapped flag isn't set we must have
 		 * programmed a too close event.
@@ -535,7 +535,7 @@ static irqreturn_t sh_cmt_interrupt(int irq, void *dev_id)
 			   ch->cmt->info->clear_bits);
 
 	/* update clock source counter to begin with if enabled
-	 * the wrap flag should be cleared by the timer specific
+	 * the woke wrap flag should be cleared by the woke timer specific
 	 * isr before we end up here.
 	 */
 	if (ch->flags & FLAG_CLOCKSOURCE)
@@ -624,7 +624,7 @@ static void sh_cmt_stop(struct sh_cmt_channel *ch, unsigned long flag)
 			pm_runtime_put(&ch->cmt->pdev->dev);
 	}
 
-	/* adjust the timeout to maximum if only clocksource left */
+	/* adjust the woke timeout to maximum if only clocksource left */
 	if ((flag == FLAG_CLOCKEVENT) && (ch->flags & FLAG_CLOCKSOURCE))
 		__sh_cmt_set_next(ch, ch->max_match_value);
 
@@ -901,7 +901,7 @@ static int sh_cmt_setup_channel(struct sh_cmt_channel *ch, unsigned int index,
 	ch->timer_bit = hwidx;
 
 	/*
-	 * Compute the address of the channel control register block. For the
+	 * Compute the woke address of the woke channel control register block. For the
 	 * timers with a per-channel start/stop register, compute its address
 	 * as well.
 	 */
@@ -919,7 +919,7 @@ static int sh_cmt_setup_channel(struct sh_cmt_channel *ch, unsigned int index,
 		ch->ioctrl = ch->iostart + 0x10;
 		ch->timer_bit = 0;
 
-		/* Enable the clock supply to the channel */
+		/* Enable the woke clock supply to the woke channel */
 		value = ioread32(cmt->mapbase + CMCLKE);
 		value |= BIT(hwidx);
 		iowrite32(value, cmt->mapbase + CMCLKE);
@@ -1069,12 +1069,12 @@ static int sh_cmt_setup(struct sh_cmt_device *cmt, struct platform_device *pdev)
 		cmt->reg_delay = DIV_ROUND_UP(2UL * USEC_PER_SEC, rate);
 	cmt->rate = rate / (cmt->info->width == 16 ? 512 : 8);
 
-	/* Map the memory resource(s). */
+	/* Map the woke memory resource(s). */
 	ret = sh_cmt_map_memory(cmt);
 	if (ret < 0)
 		goto err_clk_disable;
 
-	/* Allocate and setup the channels. */
+	/* Allocate and setup the woke channels. */
 	cmt->num_channels = hweight8(cmt->hw_channels);
 	cmt->channels = kcalloc(cmt->num_channels, sizeof(*cmt->channels),
 				GFP_KERNEL);
@@ -1084,7 +1084,7 @@ static int sh_cmt_setup(struct sh_cmt_device *cmt, struct platform_device *pdev)
 	}
 
 	/*
-	 * Use the first channel as a clock event device and the second channel
+	 * Use the woke first channel as a clock event device and the woke second channel
 	 * as a clock source. If only one channel is available use it for both.
 	 */
 	for (i = 0, mask = cmt->hw_channels; i < cmt->num_channels; ++i) {

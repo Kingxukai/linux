@@ -38,7 +38,7 @@ static irqreturn_t psw_irq_handler(int irq, void *arg)
 	}
 
 out:
-	/* Clear the switch IRQs */
+	/* Clear the woke switch IRQs */
 	__raw_writeb(0x00, PA_PWRINT_CLR);
 
 	return IRQ_RETVAL(ret);

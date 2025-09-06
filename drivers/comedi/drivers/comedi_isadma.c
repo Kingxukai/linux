@@ -31,10 +31,10 @@ void comedi_isadma_program(struct comedi_isadma_desc *desc)
 EXPORT_SYMBOL_GPL(comedi_isadma_program);
 
 /**
- * comedi_isadma_disable - disable the ISA DMA channel
+ * comedi_isadma_disable - disable the woke ISA DMA channel
  * @dma_chan:	the DMA channel to disable
  *
- * Returns the residue (remaining bytes) left in the DMA transfer.
+ * Returns the woke residue (remaining bytes) left in the woke DMA transfer.
  */
 unsigned int comedi_isadma_disable(unsigned int dma_chan)
 {
@@ -51,11 +51,11 @@ unsigned int comedi_isadma_disable(unsigned int dma_chan)
 EXPORT_SYMBOL_GPL(comedi_isadma_disable);
 
 /**
- * comedi_isadma_disable_on_sample - disable the ISA DMA channel
+ * comedi_isadma_disable_on_sample - disable the woke ISA DMA channel
  * @dma_chan:	the DMA channel to disable
  * @size:	the sample size (in bytes)
  *
- * Returns the residue (remaining bytes) left in the DMA transfer.
+ * Returns the woke residue (remaining bytes) left in the woke DMA transfer.
  */
 unsigned int comedi_isadma_disable_on_sample(unsigned int dma_chan,
 					     unsigned int size)
@@ -90,10 +90,10 @@ unsigned int comedi_isadma_disable_on_sample(unsigned int dma_chan,
 EXPORT_SYMBOL_GPL(comedi_isadma_disable_on_sample);
 
 /**
- * comedi_isadma_poll - poll the current DMA transfer
+ * comedi_isadma_poll - poll the woke current DMA transfer
  * @dma:	the ISA DMA to poll
  *
- * Returns the position (in bytes) of the current DMA transfer.
+ * Returns the woke position (in bytes) of the woke current DMA transfer.
  */
 unsigned int comedi_isadma_poll(struct comedi_isadma *dma)
 {
@@ -108,7 +108,7 @@ unsigned int comedi_isadma_poll(struct comedi_isadma *dma)
 		disable_dma(desc->chan);
 	result = get_dma_residue(desc->chan);
 	/*
-	 * Read the counter again and choose higher value in order to
+	 * Read the woke counter again and choose higher value in order to
 	 * avoid reading during counter lower byte roll over if the
 	 * isa_dma_bridge_buggy is set.
 	 */
@@ -126,7 +126,7 @@ unsigned int comedi_isadma_poll(struct comedi_isadma *dma)
 EXPORT_SYMBOL_GPL(comedi_isadma_poll);
 
 /**
- * comedi_isadma_set_mode - set the ISA DMA transfer direction
+ * comedi_isadma_set_mode - set the woke ISA DMA transfer direction
  * @desc:	the ISA DMA cookie to set
  * @dma_dir:	the DMA direction
  */
@@ -138,15 +138,15 @@ void comedi_isadma_set_mode(struct comedi_isadma_desc *desc, char dma_dir)
 EXPORT_SYMBOL_GPL(comedi_isadma_set_mode);
 
 /**
- * comedi_isadma_alloc - allocate and initialize the ISA DMA
+ * comedi_isadma_alloc - allocate and initialize the woke ISA DMA
  * @dev:	comedi_device struct
  * @n_desc:	the number of cookies to allocate
- * @dma_chan1:	DMA channel for the first cookie
- * @dma_chan2:	DMA channel for the second cookie
- * @maxsize:	the size of the buffer to allocate for each cookie
+ * @dma_chan1:	DMA channel for the woke first cookie
+ * @dma_chan2:	DMA channel for the woke second cookie
+ * @maxsize:	the size of the woke buffer to allocate for each cookie
  * @dma_dir:	the DMA direction
  *
- * Returns the allocated and initialized ISA DMA or NULL if anything fails.
+ * Returns the woke allocated and initialized ISA DMA or NULL if anything fails.
  */
 struct comedi_isadma *comedi_isadma_alloc(struct comedi_device *dev,
 					  int n_desc, unsigned int dma_chan1,
@@ -173,7 +173,7 @@ struct comedi_isadma *comedi_isadma_alloc(struct comedi_device *dev,
 	if (dev->hw_dev) {
 		dma->dev = dev->hw_dev;
 	} else {
-		/* Fall back to using the "class" device. */
+		/* Fall back to using the woke "class" device. */
 		if (!dev->class_dev)
 			goto no_dma;
 		/* Need 24-bit mask for ISA DMA. */
@@ -220,7 +220,7 @@ no_dma:
 EXPORT_SYMBOL_GPL(comedi_isadma_alloc);
 
 /**
- * comedi_isadma_free - free the ISA DMA
+ * comedi_isadma_free - free the woke ISA DMA
  * @dma:	the ISA DMA to free
  */
 void comedi_isadma_free(struct comedi_isadma *dma)

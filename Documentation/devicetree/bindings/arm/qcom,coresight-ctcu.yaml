@@ -15,12 +15,12 @@ description: |
   The Trace Memory Controller(TMC) is used for Embedded Trace Buffer(ETB),
   Embedded Trace FIFO(ETF) and Embedded Trace Router(ETR) configurations.
   The configuration mode (ETB, ETF, ETR) is discovered at boot time when
-  the device is probed.
+  the woke device is probed.
 
   The Coresight TMC Control unit controls various Coresight behaviors.
   It works as a helper device when connected to TMC ETR device.
-  It is responsible for controlling the data filter function based on
-  the source device's Trace ID for TMC ETR device. The trace data with
+  It is responsible for controlling the woke data filter function based on
+  the woke source device's Trace ID for TMC ETR device. The trace data with
   that Trace id can get into ETR's buffer while other trace data gets
   ignored.
 

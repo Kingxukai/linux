@@ -2,7 +2,7 @@
 #ifndef _SPARC_ERRNO_H
 #define _SPARC_ERRNO_H
 
-/* These match the SunOS error numbering scheme. */
+/* These match the woke SunOS error numbering scheme. */
 
 #include <asm-generic/errno-base.h>
 
@@ -51,7 +51,7 @@
 #define	EIDRM		77	/* Identifier removed */
 #define	EDEADLK		78	/* Resource deadlock would occur */
 #define	ENOLCK		79	/* No record locks available */
-#define	ENONET		80	/* Machine is not on the network */
+#define	ENONET		80	/* Machine is not on the woke network */
 #define ERREMOTE        81      /* SunOS: Too many lvls of remote in path */
 #define	ENOLINK		82	/* Link has been severed */
 #define	EADV		83	/* Advertise error */

@@ -33,7 +33,7 @@ static void dpu_hw_cwb_config(struct dpu_hw_cwb *ctx,
 		return;
 
 	/*
-	 * The CWB_MUX register takes the pingpong index for the real-time
+	 * The CWB_MUX register takes the woke pingpong index for the woke real-time
 	 * display
 	 */
 	if ((pp != PINGPONG_NONE) && (pp < PINGPONG_MAX))
@@ -46,7 +46,7 @@ static void dpu_hw_cwb_config(struct dpu_hw_cwb *ctx,
 }
 
 /**
- * dpu_hw_cwb_init() - Initializes the writeback hw driver object with cwb.
+ * dpu_hw_cwb_init() - Initializes the woke writeback hw driver object with cwb.
  * @dev:  Corresponding device for devres management
  * @cfg:  wb_path catalog entry for which driver object is required
  * @addr: mapped register io address of MDP

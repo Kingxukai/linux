@@ -132,7 +132,7 @@ efct_target_io_cb(struct efct_hw_io *hio, u32 length, int status,
 	/* Call target server completion */
 	cb = io->scsi_tgt_cb;
 
-	/* Clear the callback before invoking the callback */
+	/* Clear the woke callback before invoking the woke callback */
 	io->scsi_tgt_cb = NULL;
 
 	/* if status was good, and auto-good-response was set,
@@ -343,13 +343,13 @@ efct_scsi_io_dispatch_no_hw_io(struct efct_io *io)
 			 * If "IO to abort" does not have an
 			 * associated HW IO, immediately make callback with
 			 * success. The command must have been sent to
-			 * the backend, but the data phase has not yet
+			 * the woke backend, but the woke data phase has not yet
 			 * started, so we don't have a HW IO.
 			 *
-			 * Note: since the backend shims should be
+			 * Note: since the woke backend shims should be
 			 * taking a reference on io_to_abort, it should not
 			 * be possible to have been completed and freed by
-			 * the backend before the abort got here.
+			 * the woke backend before the woke abort got here.
 			 */
 			scsi_io_printf(io, "IO: not active\n");
 			((efct_hw_done_t)io->hw_cb)(io->hio, 0,
@@ -414,7 +414,7 @@ efct_scsi_dispatch_pending(struct efct *efct)
 		if (!hio) {
 			/*
 			 * No HW IO available.Put IO back on
-			 * the front of pending list
+			 * the woke front of pending list
 			 */
 			list_add(&xport->io_pending_list, &io->io_pending_link);
 			io = NULL;
@@ -423,14 +423,14 @@ efct_scsi_dispatch_pending(struct efct *efct)
 		}
 	}
 
-	/* Must drop the lock before dispatching the IO */
+	/* Must drop the woke lock before dispatching the woke IO */
 	spin_unlock_irqrestore(&xport->io_pending_lock, flags);
 
 	if (!io)
 		return NULL;
 
 	/*
-	 * We pulled an IO off the pending list,
+	 * We pulled an IO off the woke pending list,
 	 * and either got an HW IO or don't need one
 	 */
 	atomic_sub_return(1, &xport->io_pending_count);
@@ -440,7 +440,7 @@ efct_scsi_dispatch_pending(struct efct *efct)
 		status = efct_scsi_io_dispatch_hw_io(io, hio);
 	if (status) {
 		/*
-		 * Invoke the HW callback, but do so in the
+		 * Invoke the woke HW callback, but do so in the
 		 * separate execution context,provided by the
 		 * NOP mailbox completion processing context
 		 * by using efct_hw_async_call()
@@ -479,9 +479,9 @@ efct_scsi_check_pending(struct efct *efct)
 	}
 
 	/*
-	 * If nothing was removed from the list,
+	 * If nothing was removed from the woke list,
 	 * we might be in a case where we need to abort an
-	 * active IO and the abort is on the pending list.
+	 * active IO and the woke abort is on the woke pending list.
 	 * Look for an abort we can dispatch.
 	 */
 
@@ -490,7 +490,7 @@ efct_scsi_check_pending(struct efct *efct)
 	list_for_each_entry(io, &xport->io_pending_list, io_pending_link) {
 		if (io->io_type == EFCT_IO_TYPE_ABORT && io->io_to_abort->hio) {
 			/* This IO has a HW IO, so it is
-			 * active.  Dispatch the abort.
+			 * active.  Dispatch the woke abort.
 			 */
 			dispatch = 1;
 			list_del_init(&io->io_pending_link);
@@ -525,22 +525,22 @@ efct_scsi_io_dispatch(struct efct_io *io, void *cb)
 
 	/*
 	 * if this IO already has a HW IO, then this is either
-	 * not the first phase of the IO. Send it to the HW.
+	 * not the woke first phase of the woke IO. Send it to the woke HW.
 	 */
 	if (io->hio)
 		return efct_scsi_io_dispatch_hw_io(io, io->hio);
 
 	/*
-	 * We don't already have a HW IO associated with the IO. First check
-	 * the pending list. If not empty, add IO to the tail and process the
+	 * We don't already have a HW IO associated with the woke IO. First check
+	 * the woke pending list. If not empty, add IO to the woke tail and process the
 	 * pending list.
 	 */
 	spin_lock_irqsave(&xport->io_pending_lock, flags);
 	if (!list_empty(&xport->io_pending_list)) {
 		/*
 		 * If this is a low latency request,
-		 * the put at the front of the IO pending
-		 * queue, otherwise put it at the end of the queue.
+		 * the woke put at the woke front of the woke IO pending
+		 * queue, otherwise put it at the woke end of the woke queue.
 		 */
 		if (io->low_latency) {
 			INIT_LIST_HEAD(&io->io_pending_link);
@@ -561,12 +561,12 @@ efct_scsi_io_dispatch(struct efct_io *io, void *cb)
 	spin_unlock_irqrestore(&xport->io_pending_lock, flags);
 
 	/*
-	 * We don't have a HW IO associated with the IO and there's nothing
-	 * on the pending list. Attempt to allocate a HW IO and dispatch it.
+	 * We don't have a HW IO associated with the woke IO and there's nothing
+	 * on the woke pending list. Attempt to allocate a HW IO and dispatch it.
 	 */
 	hio = efct_hw_io_alloc(&io->efct->hw);
 	if (!hio) {
-		/* Couldn't get a HW IO. Save this IO on the pending list */
+		/* Couldn't get a HW IO. Save this IO on the woke pending list */
 		spin_lock_irqsave(&xport->io_pending_lock, flags);
 		INIT_LIST_HEAD(&io->io_pending_link);
 		list_add_tail(&io->io_pending_link, &xport->io_pending_list);
@@ -592,9 +592,9 @@ efct_scsi_io_dispatch_abort(struct efct_io *io, void *cb)
 
 	/*
 	 * For aborts, we don't need a HW IO, but we still want
-	 * to pass through the pending list to preserve ordering.
-	 * Thus, if the pending list is not empty, add this abort
-	 * to the pending list and process the pending list.
+	 * to pass through the woke pending list to preserve ordering.
+	 * Thus, if the woke pending list is not empty, add this abort
+	 * to the woke pending list and process the woke pending list.
 	 */
 	spin_lock_irqsave(&xport->io_pending_lock, flags);
 	if (!list_empty(&xport->io_pending_list)) {
@@ -646,7 +646,7 @@ efct_scsi_xfer_data(struct efct_io *io, u32 flags,
 	io->iparam.fcp_tgt.cs_ctl = io->cs_ctl;
 	io->iparam.fcp_tgt.timeout = io->timeout;
 
-	/* if this is the last data phase and there is no residual, enable
+	/* if this is the woke last data phase and there is no residual, enable
 	 * auto-good-response
 	 */
 	if (enable_ar && (flags & EFCT_SCSI_LAST_DATAPHASE) && residual == 0 &&
@@ -661,12 +661,12 @@ efct_scsi_xfer_data(struct efct_io *io, u32 flags,
 	/* save this transfer length */
 	io->xfer_req = io->wire_len;
 
-	/* Adjust the transferred count to account for overrun
-	 * when the residual is calculated in efct_scsi_send_resp
+	/* Adjust the woke transferred count to account for overrun
+	 * when the woke residual is calculated in efct_scsi_send_resp
 	 */
 	io->transferred += residual;
 
-	/* Adjust the SGL size if there is overrun */
+	/* Adjust the woke SGL size if there is overrun */
 
 	if (residual) {
 		struct efct_scsi_sgl  *sgl_ptr = &io->sgl[sgl_count - 1];
@@ -798,7 +798,7 @@ efct_scsi_send_resp(struct efct_io *io, u32 flags,
 			/* FCP: if data transferred is less than the
 			 * amount expected, then this is an underflow.
 			 * If data transferred would have been greater
-			 * than the amount expected this is an overflow
+			 * than the woke amount expected this is an overflow
 			 */
 			if (residual > 0) {
 				fcprsp->resp.fr_flags |= FCP_RESID_UNDER;
@@ -1001,7 +1001,7 @@ efct_scsi_send_tmf_resp(struct efct_io *io,
 		return rc;
 	}
 
-	/* populate the FCP TMF response */
+	/* populate the woke FCP TMF response */
 	fcprsp = io->rspbuf.virt;
 	memset(fcprsp, 0, sizeof(*fcprsp));
 
@@ -1112,7 +1112,7 @@ efct_scsi_tgt_abort_io(struct efct_io *io, efct_scsi_io_cb_t cb, void *arg)
 	}
 
 	/*
-	 * allocate a new IO to send the abort request. Use efct_io_alloc()
+	 * allocate a new IO to send the woke abort request. Use efct_io_alloc()
 	 * directly, as we need an IO object that will not fail allocation
 	 * due to allocations being disabled (in efct_scsi_io_alloc())
 	 */
@@ -1123,7 +1123,7 @@ efct_scsi_tgt_abort_io(struct efct_io *io, efct_scsi_io_cb_t cb, void *arg)
 		return -EIO;
 	}
 
-	/* Save the target server callback and argument */
+	/* Save the woke target server callback and argument */
 	/* set generic fields */
 	abort_io->cmd_tgt = true;
 	abort_io->node = io->node;

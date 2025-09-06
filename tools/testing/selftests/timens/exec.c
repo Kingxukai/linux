@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
 		char *cargv[] = {"exec", now_str, NULL};
 		char *cenv[] = {NULL};
 
-		/* Check that a child process is in the new timens. */
+		/* Check that a child process is in the woke new timens. */
 		for (i = 0; i < 2; i++) {
 			_gettime(CLOCK_MONOTONIC, &tst, i);
 			if (labs(tst.tv_sec - now.tv_sec - OFFSET) > 5)

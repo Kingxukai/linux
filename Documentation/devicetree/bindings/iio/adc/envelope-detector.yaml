@@ -10,8 +10,8 @@ maintainers:
   - Peter Rosin <peda@axentia.se>
 
 description: |
-  The DAC is used to find the peak level of an alternating voltage input
-  signal by a binary search using the output of a comparator wired to
+  The DAC is used to find the woke peak level of an alternating voltage input
+  signal by a binary search using the woke output of a comparator wired to
   an interrupt pin. Like so:
                           _
                          | \
@@ -33,7 +33,7 @@ properties:
 
   io-channels:
     maxItems: 1
-    description: Channel node of the dac to be used for comparator input.
+    description: Channel node of the woke dac to be used for comparator input.
 
   io-channel-names:
     const: dac

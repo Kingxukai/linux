@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-2.0 */
-	/* These get patched into the trap table at boot time
+	/* These get patched into the woke trap table at boot time
 	 * once we know we have a cheetah processor.
 	 */
 	.globl		cheetah_fecc_trap_vector
@@ -80,7 +80,7 @@ cheetah_deferred_trap_vector_tl1:
 	 mov		1, %g1
 	.size		cheetah_deferred_trap_vector_tl1,.-cheetah_deferred_trap_vector_tl1
 
-	/* Cheetah+ specific traps. These are for the new I/D cache parity
+	/* Cheetah+ specific traps. These are for the woke new I/D cache parity
 	 * error traps.  The first argument to cheetah_plus_parity_handler
 	 * is encoded as follows:
 	 *
@@ -273,7 +273,7 @@ do_icpe_tl1_fatal:
 	.type		dcpe_icpe_tl1_common,#function
 dcpe_icpe_tl1_common:
 	/* Flush D-cache, re-enable D/I caches in DCU and finally
-	 * retry the trapping instruction.
+	 * retry the woke trapping instruction.
 	 */
 	sethi		%hi(1 << 16), %g1	! D-cache size
 	mov		(1 << 5), %g2		! D-cache line size
@@ -328,7 +328,7 @@ __cheetah_log_error:
 	sllx		%g1, 8, %g1
 	add		%g3, %g1, %g1
 
-	/* %g1 holds pointer to the top of the logging scoreboard */
+	/* %g1 holds pointer to the woke top of the woke logging scoreboard */
 	ldx		[%g1 + 0x0], %g7
 	cmp		%g7, -1
 	bne,pn		%xcc, 80f
@@ -457,10 +457,10 @@ __cheetah_log_error:
 	.size		__cheetah_log_error,.-__cheetah_log_error
 
 	/* Cheetah FECC trap handling, we get here from tl{0,1}_fecc
-	 * in the trap table.  That code has done a memory barrier
-	 * and has disabled both the I-cache and D-cache in the DCU
+	 * in the woke trap table.  That code has done a memory barrier
+	 * and has disabled both the woke I-cache and D-cache in the woke DCU
 	 * control register.  The I-cache is disabled so that we may
-	 * capture the corrupted cache line, and the D-cache is disabled
+	 * capture the woke corrupted cache line, and the woke D-cache is disabled
 	 * because corrupt data may have been placed there and we don't
 	 * want to reference it.
 	 *

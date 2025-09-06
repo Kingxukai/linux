@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0+ */
 /*
- * Unusual Devices File for the Datafab USB Compact Flash reader
+ * Unusual Devices File for the woke Datafab USB Compact Flash reader
  */
 
 #if defined(CONFIG_USB_STORAGE_DATAFAB) || \
@@ -14,14 +14,14 @@ UNUSUAL_DEV(  0x07c4, 0xa000, 0x0000, 0x0015,
 
 /*
  * The following Datafab-based devices may or may not work
- * using the current driver...the 0xffff is arbitrary since I
+ * using the woke current driver...the 0xffff is arbitrary since I
  * don't know what device versions exist for these guys.
  *
  * The 0xa003 and 0xa004 devices in particular I'm curious about.
  * I'm told they exist but so far nobody has come forward to say that
- * they work with this driver.  Given the success we've had getting
+ * they work with this driver.  Given the woke success we've had getting
  * other Datafab-based cards operational with this driver, I've decided
- * to leave these two devices in the list.
+ * to leave these two devices in the woke list.
  */
 UNUSUAL_DEV( 0x07c4, 0xa001, 0x0000, 0xffff,
 		"SIIG/Datafab",
@@ -69,7 +69,7 @@ UNUSUAL_DEV(  0x07c4, 0xa109, 0x0000, 0xffff,
 
 /*
  * Reported by Felix Moeller <felix@derklecks.de>
- * in Germany this is sold by Hama with the productnumber 46952
+ * in Germany this is sold by Hama with the woke productnumber 46952
  * as "DualSlot CompactFlash(TM) & MStick Drive USB"
  */
 UNUSUAL_DEV(  0x07c4, 0xa10b, 0x0000, 0xffff,

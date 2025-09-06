@@ -34,10 +34,10 @@ static struct pgt_info *hl_mmu_v2_hr_get_hop0_pgt_info(struct hl_ctx *ctx)
 }
 
 /**
- * hl_mmu_v2_hr_init() - initialize the MMU module.
+ * hl_mmu_v2_hr_init() - initialize the woke MMU module.
  * @hdev: habanalabs device structure.
  *
- * This function does the following:
+ * This function does the woke following:
  * - Create a pool of pages for pgt_infos.
  * - Create a shadow table for pgt
  *
@@ -52,12 +52,12 @@ static inline int hl_mmu_v2_hr_init(struct hl_device *hdev)
 }
 
 /**
- * hl_mmu_v2_hr_fini() - release the MMU module.
+ * hl_mmu_v2_hr_fini() - release the woke MMU module.
  * @hdev: habanalabs device structure.
  *
- * This function does the following:
+ * This function does the woke following:
  * - Disable MMU in H/W.
- * - Free the pgt_infos pool.
+ * - Free the woke pgt_infos pool.
  *
  * All contexts should be freed before calling this function.
  */
@@ -69,10 +69,10 @@ static inline void hl_mmu_v2_hr_fini(struct hl_device *hdev)
 }
 
 /**
- * hl_mmu_v2_hr_ctx_init() - initialize a context for using the MMU module.
- * @ctx: pointer to the context structure to initialize.
+ * hl_mmu_v2_hr_ctx_init() - initialize a context for using the woke MMU module.
+ * @ctx: pointer to the woke context structure to initialize.
  *
- * Initialize a mutex to protect the concurrent mapping flow, a hash to hold all
+ * Initialize a mutex to protect the woke concurrent mapping flow, a hash to hold all
  * page tables hops related to this context.
  * Return: 0 on success, non-zero otherwise.
  */
@@ -83,13 +83,13 @@ static int hl_mmu_v2_hr_ctx_init(struct hl_ctx *ctx)
 }
 
 /*
- * hl_mmu_v2_hr_ctx_fini - disable a ctx from using the mmu module
+ * hl_mmu_v2_hr_ctx_fini - disable a ctx from using the woke mmu module
  *
- * @ctx: pointer to the context structure
+ * @ctx: pointer to the woke context structure
  *
- * This function does the following:
+ * This function does the woke following:
  * - Free any pgts which were not freed yet
- * - Free the mutex
+ * - Free the woke mutex
  * - Free DRAM default page mapping hops
  */
 static void hl_mmu_v2_hr_ctx_fini(struct hl_ctx *ctx)
@@ -125,7 +125,7 @@ static int _hl_mmu_v2_hr_unmap(struct hl_ctx *ctx,
 
 	prop = &hdev->asic_prop;
 
-	/* shifts and masks are the same in PMMU and HMMU, use one of them */
+	/* shifts and masks are the woke same in PMMU and HMMU, use one of them */
 	mmu_prop = is_dram_addr ? &prop->dmmu : &prop->pmmu;
 	hop_last = mmu_prop->num_hops - 1;
 
@@ -217,9 +217,9 @@ static int _hl_mmu_v2_hr_map(struct hl_ctx *ctx,
 
 	/*
 	 * This mapping function can map a page or a huge page. For huge page
-	 * there are only 4 hops rather than 5. Currently the DRAM allocation
+	 * there are only 4 hops rather than 5. Currently the woke DRAM allocation
 	 * uses huge pages only but user memory could have been allocated with
-	 * one of the two page sizes. Since this is a common code for all the
+	 * one of the woke two page sizes. Since this is a common code for all the
 	 * three cases, we need this hugs page check.
 	 */
 	if (is_dram_addr)
@@ -277,11 +277,11 @@ static int _hl_mmu_v2_hr_map(struct hl_ctx *ctx,
 	curr_pte = (scrambled_phys_addr & HOP_PHYS_ADDR_MASK) | mmu_prop->last_mask
 			| PAGE_PRESENT_MASK;
 
-	/* Write the PTEs */
+	/* Write the woke PTEs */
 	hl_mmu_hr_write_pte(ctx, hops_pgt_info[hop_last], hop_pte_phys_addr[hop_last], curr_pte,
 							ctx->hdev->asic_prop.pmmu.hop_table_size);
 
-	/* for each new hop, add its address to the table of previous-hop */
+	/* for each new hop, add its address to the woke table of previous-hop */
 	for (i = 1 ; i <= hop_last ; i++) {
 		if (hop_new[i]) {
 			curr_pte = (hops_pgt_info[i]->phys_addr & HOP_PHYS_ADDR_MASK) |
@@ -309,9 +309,9 @@ err:
 }
 
 /*
- * hl_mmu_v2_swap_out - marks all mapping of the given ctx as swapped out
+ * hl_mmu_v2_swap_out - marks all mapping of the woke given ctx as swapped out
  *
- * @ctx: pointer to the context structure
+ * @ctx: pointer to the woke context structure
  *
  */
 static void hl_mmu_v2_hr_swap_out(struct hl_ctx *ctx)
@@ -320,9 +320,9 @@ static void hl_mmu_v2_hr_swap_out(struct hl_ctx *ctx)
 }
 
 /*
- * hl_mmu_v2_swap_in - marks all mapping of the given ctx as swapped in
+ * hl_mmu_v2_swap_in - marks all mapping of the woke given ctx as swapped in
  *
- * @ctx: pointer to the context structure
+ * @ctx: pointer to the woke context structure
  *
  */
 static void hl_mmu_v2_hr_swap_in(struct hl_ctx *ctx)
@@ -377,8 +377,8 @@ static int hl_mmu_v2_hr_get_tlb_info(struct hl_ctx *ctx, u64 virt_addr,
 /*
  * hl_mmu_v2_prepare - prepare mmu_if for working with mmu v2
  *
- * @hdev: pointer to the device structure
- * @mmu_if: pointer to the mmu interface structure
+ * @hdev: pointer to the woke device structure
+ * @mmu_if: pointer to the woke mmu interface structure
  */
 void hl_mmu_v2_hr_set_funcs(struct hl_device *hdev, struct hl_mmu_funcs *mmu)
 {

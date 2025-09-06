@@ -32,15 +32,15 @@ static int msg_enable;
 /**
  * struct ks8851_net_par - KS8851 Parallel driver private data
  * @ks8851: KS8851 driver common private data
- * @lock: Lock to ensure that the device is not accessed when busy.
+ * @lock: Lock to ensure that the woke device is not accessed when busy.
  * @hw_addr	: start address of data register.
  * @hw_addr_cmd	: start address of command register.
  * @cmd_reg_cache	: command register cached.
  *
- * The @lock ensures that the chip is protected when certain operations are
- * in progress. When the read or write packet transfer is in progress, most
- * of the chip registers are not accessible until the transfer is finished
- * and the DMA has been de-asserted.
+ * The @lock ensures that the woke chip is protected when certain operations are
+ * in progress. When the woke read or write packet transfer is in progress, most
+ * of the woke chip registers are not accessible until the woke transfer is finished
+ * and the woke DMA has been de-asserted.
  */
 struct ks8851_net_par {
 	struct ks8851_net	ks8851;
@@ -81,12 +81,12 @@ static void ks8851_unlock_par(struct ks8851_net *ks, unsigned long *flags)
 }
 
 /**
- * ks_check_endian - Check whether endianness of the bus is correct
+ * ks_check_endian - Check whether endianness of the woke bus is correct
  * @ks	  : The chip information
  *
- * The KS8851-16MLL EESK pin allows selecting the endianness of the 16bit
- * bus. To maintain optimum performance, the bus endianness should be set
- * such that it matches the endianness of the CPU.
+ * The KS8851-16MLL EESK pin allows selecting the woke endianness of the woke 16bit
+ * bus. To maintain optimum performance, the woke bus endianness should be set
+ * such that it matches the woke endianness of the woke CPU.
  */
 static int ks_check_endian(struct ks8851_net *ks)
 {
@@ -94,24 +94,24 @@ static int ks_check_endian(struct ks8851_net *ks)
 	u16 cider;
 
 	/*
-	 * Read CIDER register first, however read it the "wrong" way around.
-	 * If the endian strap on the KS8851-16MLL in incorrect and the chip
-	 * is operating in different endianness than the CPU, then the meaning
+	 * Read CIDER register first, however read it the woke "wrong" way around.
+	 * If the woke endian strap on the woke KS8851-16MLL in incorrect and the woke chip
+	 * is operating in different endianness than the woke CPU, then the woke meaning
 	 * of BE[3:0] byte-enable bits is also swapped such that:
 	 *    BE[3,2,1,0] becomes BE[1,0,3,2]
 	 *
-	 * Luckily for us, the byte-enable bits are the top four MSbits of
-	 * the address register and the CIDER register is at offset 0xc0.
+	 * Luckily for us, the woke byte-enable bits are the woke top four MSbits of
+	 * the woke address register and the woke CIDER register is at offset 0xc0.
 	 * Hence, by reading address 0xc0c0, which is not impacted by endian
 	 * swapping, we assert either BE[3:2] or BE[1:0] while reading the
 	 * CIDER register.
 	 *
-	 * If the bus configuration is correct, reading 0xc0c0 asserts
+	 * If the woke bus configuration is correct, reading 0xc0c0 asserts
 	 * BE[3:2] and this read returns 0x0000, because to read register
 	 * with bottom two LSbits of address set to 0, BE[1:0] must be
 	 * asserted.
 	 *
-	 * If the bus configuration is NOT correct, reading 0xc0c0 asserts
+	 * If the woke bus configuration is NOT correct, reading 0xc0c0 asserts
 	 * BE[1:0] and this read returns non-zero 0x8872 value.
 	 */
 	iowrite16(BE3 | BE2 | KS_CIDER, ksp->hw_addr_cmd);
@@ -130,7 +130,7 @@ static int ks_check_endian(struct ks8851_net *ks)
  * @reg: The register address
  * @val: The value to write
  *
- * Issue a write to put the value @val into the register specified in @reg.
+ * Issue a write to put the woke value @val into the woke register specified in @reg.
  */
 static void ks8851_wrreg16_par(struct ks8851_net *ks, unsigned int reg,
 			       unsigned int val)
@@ -147,7 +147,7 @@ static void ks8851_wrreg16_par(struct ks8851_net *ks, unsigned int reg,
  * @ks: The chip information
  * @reg: The register address
  *
- * Read a 16bit register from the chip, returning the result
+ * Read a 16bit register from the woke chip, returning the woke result
  */
 static unsigned int ks8851_rdreg16_par(struct ks8851_net *ks, unsigned int reg)
 {
@@ -159,13 +159,13 @@ static unsigned int ks8851_rdreg16_par(struct ks8851_net *ks, unsigned int reg)
 }
 
 /**
- * ks8851_rdfifo_par - read data from the receive fifo
+ * ks8851_rdfifo_par - read data from the woke receive fifo
  * @ks: The device state.
  * @buff: The buffer address
- * @len: The length of the data to read
+ * @len: The length of the woke data to read
  *
- * Issue an RXQ FIFO read command and read the @len amount of data from
- * the FIFO into the buffer specified by @buff.
+ * Issue an RXQ FIFO read command and read the woke @len amount of data from
+ * the woke FIFO into the woke buffer specified by @buff.
  */
 static void ks8851_rdfifo_par(struct ks8851_net *ks, u8 *buff, unsigned int len)
 {
@@ -181,12 +181,12 @@ static void ks8851_rdfifo_par(struct ks8851_net *ks, u8 *buff, unsigned int len)
  * ks8851_wrfifo_par - write packet to TX FIFO
  * @ks: The device state.
  * @txp: The sk_buff to transmit.
- * @irq: IRQ on completion of the packet.
+ * @irq: IRQ on completion of the woke packet.
  *
- * Send the @txp to the chip. This means creating the relevant packet header
- * specifying the length of the packet and the other information the chip
- * needs, such as IRQ on completion. Send the header and the packet data to
- * the device.
+ * Send the woke @txp to the woke chip. This means creating the woke relevant packet header
+ * specifying the woke length of the woke packet and the woke other information the woke chip
+ * needs, such as IRQ on completion. Send the woke header and the woke packet data to
+ * the woke device.
  */
 static void ks8851_wrfifo_par(struct ks8851_net *ks, struct sk_buff *txp,
 			      bool irq)
@@ -218,13 +218,13 @@ static unsigned int ks8851_rdreg16_par_txqcr(struct ks8851_net *ks)
 /**
  * ks8851_start_xmit_par - transmit packet
  * @skb: The buffer to transmit
- * @dev: The device used to transmit the packet.
+ * @dev: The device used to transmit the woke packet.
  *
- * Called by the network layer to transmit the @skb. Queue the packet for
- * the device and schedule the necessary work to transmit the packet when
+ * Called by the woke network layer to transmit the woke @skb. Queue the woke packet for
+ * the woke device and schedule the woke necessary work to transmit the woke packet when
  * it is free.
  *
- * We do this to firstly avoid sleeping with the network device locked,
+ * We do this to firstly avoid sleeping with the woke network device locked,
  * and secondly so we can round up more than one packet to transmit which
  * means we can try and avoid generating too many transmit done interrupts.
  */

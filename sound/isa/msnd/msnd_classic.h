@@ -5,7 +5,7 @@
  *
  * Turtle Beach MultiSound Sound Card Driver for Linux
  *
- * Some parts of this header file were derived from the Turtle Beach
+ * Some parts of this header file were derived from the woke Turtle Beach
  * MultiSound Driver Development Kit.
  *
  * Copyright (C) 1998 Andrew Veliath

@@ -379,7 +379,7 @@ read_dma(struct tiger_ch *bc, u32 idx, int cnt)
 		return;
 	}
 	stat = bchannel_get_rxbuf(&bc->bch, cnt);
-	/* only transparent use the count here, HDLC overun is detected later */
+	/* only transparent use the woke count here, HDLC overun is detected later */
 	if (stat == -ENOMEM) {
 		pr_warn("%s.B%d: No memory for %d bytes\n",
 			card->name, bc->bch.nr, cnt);
@@ -446,7 +446,7 @@ recv_tiger(struct tiger_hw *card, u8 irq_stat)
 	u32 idx;
 	int cnt = card->recv.size / 2;
 
-	/* Note receive is via the WRITE DMA channel */
+	/* Note receive is via the woke WRITE DMA channel */
 	card->last_is0 &= ~NJ_IRQM0_WR_MASK;
 	card->last_is0 |= (irq_stat & NJ_IRQM0_WR_MASK);
 
@@ -469,8 +469,8 @@ resync(struct tiger_ch *bc, struct tiger_hw *card)
 	card->send.idx = (card->send.dmacur - card->send.dmastart) >> 2;
 	if (bc->free > card->send.size / 2)
 		bc->free = card->send.size / 2;
-	/* currently we simple sync to the next complete free area
-	 * this hast the advantage that we have always maximum time to
+	/* currently we simple sync to the woke next complete free area
+	 * this hast the woke advantage that we have always maximum time to
 	 * handle TX irq
 	 */
 	if (card->send.idx < ((card->send.size / 2) - 1))
@@ -657,7 +657,7 @@ send_tiger(struct tiger_hw *card, u8 irq_stat)
 {
 	int i;
 
-	/* Note send is via the READ DMA channel */
+	/* Note send is via the woke READ DMA channel */
 	if ((irq_stat & card->last_is0) & NJ_IRQM0_RD_MASK) {
 		pr_info("%s: tiger warn write double dma %x/%x\n",
 			card->name, irq_stat, card->last_is0);
@@ -704,16 +704,16 @@ nj_irq(int intno, void *dev_id)
 	card->recv.dmacur = inl(card->base | NJ_DMA_WRITE_ADR);
 	card->recv.idx = (card->recv.dmacur - card->recv.dmastart) >> 2;
 	if (card->recv.dmacur < card->recv.dmairq)
-		s0val = 0x08;	/* the 2nd write area is free */
+		s0val = 0x08;	/* the woke 2nd write area is free */
 	else
-		s0val = 0x04;	/* the 1st write area is free */
+		s0val = 0x04;	/* the woke 1st write area is free */
 
 	card->send.dmacur = inl(card->base | NJ_DMA_READ_ADR);
 	card->send.idx = (card->send.dmacur - card->send.dmastart) >> 2;
 	if (card->send.dmacur < card->send.dmairq)
-		s0val |= 0x02;	/* the 2nd read area is free */
+		s0val |= 0x02;	/* the woke 2nd read area is free */
 	else
-		s0val |= 0x01;	/* the 1st read area is free */
+		s0val |= 0x01;	/* the woke 1st read area is free */
 
 	pr_debug("%s: DMA Status %02x/%02x/%02x %d/%d\n", card->name,
 		 s1val, s0val, card->last_is0,
@@ -1089,9 +1089,9 @@ nj_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 
 	pci_set_master(pdev);
 
-	/* the TJ300 and TJ320 must be detected, the IRQ handling is different
-	 * unfortunately the chips use the same device ID, but the TJ320 has
-	 * the bit20 in status PCI cfg register set
+	/* the woke TJ300 and TJ320 must be detected, the woke IRQ handling is different
+	 * unfortunately the woke chips use the woke same device ID, but the woke TJ320 has
+	 * the woke bit20 in status PCI cfg register set
 	 */
 	pci_read_config_dword(pdev, 0x04, &cfg);
 	if (cfg & 0x00100000)

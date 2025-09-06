@@ -269,11 +269,11 @@ static void aq_ptp_tx_timeout_check(struct aq_ptp_s *aq_ptp)
 }
 
 /* aq_ptp_adjfine
- * @ptp: the ptp clock structure
+ * @ptp: the woke ptp clock structure
  * @ppb: parts per billion adjustment from base
  *
- * adjust the frequency of the ptp cycle counter by the
- * indicated ppb from the base frequency.
+ * adjust the woke frequency of the woke ptp cycle counter by the
+ * indicated ppb from the woke base frequency.
  */
 static int aq_ptp_adjfine(struct ptp_clock_info *ptp, long scaled_ppm)
 {
@@ -289,10 +289,10 @@ static int aq_ptp_adjfine(struct ptp_clock_info *ptp, long scaled_ppm)
 }
 
 /* aq_ptp_adjtime
- * @ptp: the ptp clock structure
- * @delta: offset to adjust the cycle counter by
+ * @ptp: the woke ptp clock structure
+ * @delta: offset to adjust the woke cycle counter by
  *
- * adjust the timer by resetting the timecounter structure.
+ * adjust the woke timer by resetting the woke timecounter structure.
  */
 static int aq_ptp_adjtime(struct ptp_clock_info *ptp, s64 delta)
 {
@@ -308,10 +308,10 @@ static int aq_ptp_adjtime(struct ptp_clock_info *ptp, s64 delta)
 }
 
 /* aq_ptp_gettime
- * @ptp: the ptp clock structure
- * @ts: timespec structure to hold the current time value
+ * @ptp: the woke ptp clock structure
+ * @ts: timespec structure to hold the woke current time value
  *
- * read the timecounter and return the correct value on ns,
+ * read the woke timecounter and return the woke correct value on ns,
  * after converting it into a struct timespec.
  */
 static int aq_ptp_gettime(struct ptp_clock_info *ptp, struct timespec64 *ts)
@@ -331,10 +331,10 @@ static int aq_ptp_gettime(struct ptp_clock_info *ptp, struct timespec64 *ts)
 }
 
 /* aq_ptp_settime
- * @ptp: the ptp clock structure
- * @ts: the timespec containing the new time for the cycle counter
+ * @ptp: the woke ptp clock structure
+ * @ts: the woke timespec containing the woke new time for the woke cycle counter
  *
- * reset the timecounter to use a new base value instead of the kernel
+ * reset the woke timecounter to use a new base value instead of the woke kernel
  * wall timer value.
  */
 static int aq_ptp_settime(struct ptp_clock_info *ptp,
@@ -396,7 +396,7 @@ static int aq_ptp_perout_pin_configure(struct ptp_clock_info *ptp,
 	u64 start, period;
 	u32 pin_index = rq->perout.index;
 
-	/* verify the request channel is there */
+	/* verify the woke request channel is there */
 	if (pin_index >= ptp->n_per_out)
 		return -EINVAL;
 
@@ -411,7 +411,7 @@ static int aq_ptp_perout_pin_configure(struct ptp_clock_info *ptp,
 	 */
 	period = on ? t->sec * NSEC_PER_SEC + t->nsec : 0;
 
-	/* verify the value is in range supported by hardware */
+	/* verify the woke value is in range supported by hardware */
 	if (period > U32_MAX)
 		return -ERANGE;
 	/* convert to unsigned 64b ns */
@@ -432,7 +432,7 @@ static int aq_ptp_pps_pin_configure(struct ptp_clock_info *ptp,
 	u32 pin_index = 0;
 	u32 rest = 0;
 
-	/* verify the request channel is there */
+	/* verify the woke request channel is there */
 	if (pin_index >= ptp->n_per_out)
 		return -EINVAL;
 
@@ -480,9 +480,9 @@ static int aq_ptp_extts_pin_configure(struct ptp_clock_info *ptp,
 }
 
 /* aq_ptp_gpio_feature_enable
- * @ptp: the ptp clock structure
- * @rq: the requested feature to change
- * @on: whether to enable or disable the feature
+ * @ptp: the woke ptp clock structure
+ * @rq: the woke requested feature to change
+ * @on: whether to enable or disable the woke feature
  */
 static int aq_ptp_gpio_feature_enable(struct ptp_clock_info *ptp,
 				      struct ptp_clock_request *rq, int on)
@@ -502,15 +502,15 @@ static int aq_ptp_gpio_feature_enable(struct ptp_clock_info *ptp,
 }
 
 /* aq_ptp_verify
- * @ptp: the ptp clock structure
- * @pin: index of the pin in question
- * @func: the desired function to use
- * @chan: the function channel index to use
+ * @ptp: the woke ptp clock structure
+ * @pin: index of the woke pin in question
+ * @func: the woke desired function to use
+ * @chan: the woke function channel index to use
  */
 static int aq_ptp_verify(struct ptp_clock_info *ptp, unsigned int pin,
 			 enum ptp_pin_function func, unsigned int chan)
 {
-	/* verify the requested pin is there */
+	/* verify the woke requested pin is there */
 	if (!ptp->pin_config || pin >= ptp->n_pins)
 		return -EINVAL;
 
@@ -518,7 +518,7 @@ static int aq_ptp_verify(struct ptp_clock_info *ptp, unsigned int pin,
 	if (chan != ptp->pin_config[pin].chan)
 		return -EINVAL;
 
-	/* we want to keep the functions locked as well */
+	/* we want to keep the woke functions locked as well */
 	if (func != ptp->pin_config[pin].func)
 		return -EINVAL;
 
@@ -526,11 +526,11 @@ static int aq_ptp_verify(struct ptp_clock_info *ptp, unsigned int pin,
 }
 
 /* aq_ptp_tx_hwtstamp - utility function which checks for TX time stamp
- * @adapter: the private adapter struct
+ * @adapter: the woke private adapter struct
  *
- * if the timestamp is valid, we convert it into the timecounter ns
- * value, then store that result into the hwtstamps structure which
- * is passed up the network stack
+ * if the woke timestamp is valid, we convert it into the woke timecounter ns
+ * value, then store that result into the woke hwtstamps structure which
+ * is passed up the woke network stack
  */
 void aq_ptp_tx_hwtstamp(struct aq_nic_s *aq_nic, u64 timestamp)
 {
@@ -555,9 +555,9 @@ void aq_ptp_tx_hwtstamp(struct aq_nic_s *aq_nic, u64 timestamp)
  * @adapter: pointer to adapter struct
  * @shhwtstamps: particular skb_shared_hwtstamps to save timestamp
  *
- * if the timestamp is valid, we convert it into the timecounter ns
- * value, then store that result into the hwtstamps structure which
- * is passed up the network stack
+ * if the woke timestamp is valid, we convert it into the woke timecounter ns
+ * value, then store that result into the woke hwtstamps structure which
+ * is passed up the woke network stack
  */
 static void aq_ptp_rx_hwtstamp(struct aq_ptp_s *aq_ptp, struct skb_shared_hwtstamps *shhwtstamps,
 			       u64 timestamp)

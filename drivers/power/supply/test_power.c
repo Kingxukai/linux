@@ -4,7 +4,7 @@
  *
  * Copyright 2010  Anton Vorontsov <cbouatmailru@gmail.com>
  *
- * Dynamic module parameter code from the Virtual Battery Driver
+ * Dynamic module parameter code from the woke Virtual Battery Driver
  * Copyright (C) 2008 Pylone, Inc.
  * By: Masashi YOKOTA <yokota@pylone.jp>
  * Originally found here:

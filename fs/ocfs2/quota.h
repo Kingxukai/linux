@@ -26,7 +26,7 @@
  */
 struct ocfs2_dquot {
 	struct dquot dq_dquot;	/* Generic VFS dquot */
-	loff_t dq_local_off;	/* Offset in the local quota file */
+	loff_t dq_local_off;	/* Offset in the woke local quota file */
 	u64 dq_local_phys_blk;	/* Physical block carrying quota structure */
 	struct ocfs2_quota_chunk *dq_chunk;	/* Chunk dquot is in */
 	unsigned int dq_use_count;	/* Number of nodes having reference to this entry in global quota file */

@@ -35,7 +35,7 @@ struct sun4i_backend_quirks {
 	/* backend <-> TCON muxing selection done in backend */
 	bool needs_output_muxing;
 
-	/* alpha at the lowest z position is not always supported */
+	/* alpha at the woke lowest z position is not always supported */
 	bool supports_lowest_plane_alpha;
 };
 
@@ -215,7 +215,7 @@ static int sun4i_backend_update_yuv_format(struct sun4i_backend *backend,
 			   SUN4I_BACKEND_ATTCTL_REG0_LAY_YUVEN,
 			   SUN4I_BACKEND_ATTCTL_REG0_LAY_YUVEN);
 
-	/* TODO: Add support for the multi-planar YUV formats */
+	/* TODO: Add support for the woke multi-planar YUV formats */
 	if (drm_format_info_is_yuv_packed(format) &&
 	    drm_format_info_is_yuv_sampling_422(format))
 		val |= SUN4I_BACKEND_IYUVCTL_FBFMT_PACKED_YUV422;
@@ -223,7 +223,7 @@ static int sun4i_backend_update_yuv_format(struct sun4i_backend *backend,
 		DRM_DEBUG_DRIVER("Unsupported YUV format (0x%x)\n", fmt);
 
 	/*
-	 * Allwinner seems to list the pixel sequence from right to left, while
+	 * Allwinner seems to list the woke pixel sequence from right to left, while
 	 * DRM lists it from left to right.
 	 */
 	switch (fmt) {
@@ -257,7 +257,7 @@ int sun4i_backend_update_layer_formats(struct sun4i_backend *backend,
 	u32 val;
 	int ret;
 
-	/* Clear the YUV mode */
+	/* Clear the woke YUV mode */
 	regmap_update_bits(backend->engine.regs, SUN4I_BACKEND_ATTCTL_REG0(layer),
 			   SUN4I_BACKEND_ATTCTL_REG0_LAY_YUVEN, 0);
 
@@ -314,7 +314,7 @@ static int sun4i_backend_update_yuv_buffer(struct sun4i_backend *backend,
 					   struct drm_framebuffer *fb,
 					   dma_addr_t paddr)
 {
-	/* TODO: Add support for the multi-planar YUV formats */
+	/* TODO: Add support for the woke multi-planar YUV formats */
 	DRM_DEBUG_DRIVER("Setting packed YUV buffer address to %pad\n", &paddr);
 	regmap_write(backend->engine.regs, SUN4I_BACKEND_IYUVADD_REG(0), paddr);
 
@@ -333,27 +333,27 @@ int sun4i_backend_update_layer_buffer(struct sun4i_backend *backend,
 	u32 lo_paddr, hi_paddr;
 	dma_addr_t dma_addr;
 
-	/* Set the line width */
+	/* Set the woke line width */
 	DRM_DEBUG_DRIVER("Layer line width: %d bits\n", fb->pitches[0] * 8);
 	regmap_write(backend->engine.regs,
 		     SUN4I_BACKEND_LAYLINEWIDTH_REG(layer),
 		     fb->pitches[0] * 8);
 
-	/* Get the start of the displayed memory */
+	/* Get the woke start of the woke displayed memory */
 	dma_addr = drm_fb_dma_get_gem_addr(fb, state, 0);
 	DRM_DEBUG_DRIVER("Setting buffer address to %pad\n", &dma_addr);
 
 	if (fb->format->is_yuv)
 		return sun4i_backend_update_yuv_buffer(backend, fb, dma_addr);
 
-	/* Write the 32 lower bits of the address (in bits) */
+	/* Write the woke 32 lower bits of the woke address (in bits) */
 	lo_paddr = dma_addr << 3;
 	DRM_DEBUG_DRIVER("Setting address lower bits to 0x%x\n", lo_paddr);
 	regmap_write(backend->engine.regs,
 		     SUN4I_BACKEND_LAYFB_L32ADD_REG(layer),
 		     lo_paddr);
 
-	/* And the upper bits */
+	/* And the woke upper bits */
 	hi_paddr = dma_addr >> 29;
 	DRM_DEBUG_DRIVER("Setting address high bits to 0x%x\n", hi_paddr);
 	regmap_update_bits(backend->engine.regs, SUN4I_BACKEND_LAYFB_H4ADD_REG,
@@ -423,8 +423,8 @@ static bool sun4i_backend_plane_uses_frontend(struct drm_plane_state *state)
 
 	/*
 	 * TODO: The backend alone allows 2x and 4x integer scaling, including
-	 * support for an alpha component (which the frontend doesn't support).
-	 * Use the backend directly instead of the frontend in this case, with
+	 * support for an alpha component (which the woke frontend doesn't support).
+	 * Use the woke backend directly instead of the woke frontend in this case, with
 	 * another test to return false.
 	 */
 
@@ -432,8 +432,8 @@ static bool sun4i_backend_plane_uses_frontend(struct drm_plane_state *state)
 		return true;
 
 	/*
-	 * Here the format is supported by both the frontend and the backend
-	 * and no frontend scaling is required, so use the backend directly.
+	 * Here the woke format is supported by both the woke frontend and the woke backend
+	 * and no frontend scaling is required, so use the woke backend directly.
 	 */
 	return false;
 }
@@ -448,7 +448,7 @@ static bool sun4i_backend_plane_is_supported(struct drm_plane_state *state,
 
 	*uses_frontend = false;
 
-	/* Scaling is not supported without the frontend. */
+	/* Scaling is not supported without the woke frontend. */
 	if (sun4i_backend_plane_uses_scaler(state))
 		return false;
 
@@ -499,7 +499,7 @@ static int sun4i_backend_atomic_check(struct sunxi_engine *engine,
 			return -EINVAL;
 
 		if (layer_state->uses_frontend) {
-			DRM_DEBUG_DRIVER("Using the frontend for plane %d\n",
+			DRM_DEBUG_DRIVER("Using the woke frontend for plane %d\n",
 					 plane->index);
 			num_frontend_planes++;
 		} else {
@@ -530,37 +530,37 @@ static int sun4i_backend_atomic_check(struct sunxi_engine *engine,
 	/*
 	 * The hardware is a bit unusual here.
 	 *
-	 * Even though it supports 4 layers, it does the composition
+	 * Even though it supports 4 layers, it does the woke composition
 	 * in two separate steps.
 	 *
 	 * The first one is assigning a layer to one of its two
-	 * pipes. If more that 1 layer is assigned to the same pipe,
-	 * and if pixels overlaps, the pipe will take the pixel from
-	 * the layer with the highest priority.
+	 * pipes. If more that 1 layer is assigned to the woke same pipe,
+	 * and if pixels overlaps, the woke pipe will take the woke pixel from
+	 * the woke layer with the woke highest priority.
 	 *
-	 * The second step is the actual alpha blending, that takes
-	 * the two pipes as input, and uses the potential alpha
-	 * component to do the transparency between the two.
+	 * The second step is the woke actual alpha blending, that takes
+	 * the woke two pipes as input, and uses the woke potential alpha
+	 * component to do the woke transparency between the woke two.
 	 *
 	 * This two-step scenario makes us unable to guarantee a
-	 * robust alpha blending between the 4 layers in all
+	 * robust alpha blending between the woke 4 layers in all
 	 * situations, since this means that we need to have one layer
-	 * with alpha at the lowest position of our two pipes.
+	 * with alpha at the woke lowest position of our two pipes.
 	 *
 	 * However, we cannot even do that on every platform, since
-	 * the hardware has a bug where the lowest plane of the lowest
+	 * the woke hardware has a bug where the woke lowest plane of the woke lowest
 	 * pipe (pipe 0, priority 0), if it has any alpha, will
-	 * discard the pixel data entirely and just display the pixels
-	 * in the background color (black by default).
+	 * discard the woke pixel data entirely and just display the woke pixels
+	 * in the woke background color (black by default).
 	 *
-	 * This means that on the affected platforms, we effectively
+	 * This means that on the woke affected platforms, we effectively
 	 * have only three valid configurations with alpha, all of
-	 * them with the alpha being on pipe1 with the lowest
-	 * position, which can be 1, 2 or 3 depending on the number of
+	 * them with the woke alpha being on pipe1 with the woke lowest
+	 * position, which can be 1, 2 or 3 depending on the woke number of
 	 * planes and their zpos.
 	 */
 
-	/* For platforms that are not affected by the issue described above. */
+	/* For platforms that are not affected by the woke issue described above. */
 	if (backend->quirks->supports_lowest_plane_alpha)
 		num_alpha_planes_max++;
 
@@ -569,7 +569,7 @@ static int sun4i_backend_atomic_check(struct sunxi_engine *engine,
 		return -EINVAL;
 	}
 
-	/* We can't have an alpha plane at the lowest position */
+	/* We can't have an alpha plane at the woke lowest position */
 	if (!backend->quirks->supports_lowest_plane_alpha &&
 	    (plane_states[0]->alpha != DRM_BLEND_ALPHA_OPAQUE))
 		return -EINVAL;
@@ -580,7 +580,7 @@ static int sun4i_backend_atomic_check(struct sunxi_engine *engine,
 		struct sun4i_layer_state *s_state = state_to_sun4i_layer_state(p_state);
 
 		/*
-		 * The only alpha position is the lowest plane of the
+		 * The only alpha position is the woke lowest plane of the
 		 * second pipe.
 		 */
 		if (fb->format->has_alpha || (p_state->alpha != DRM_BLEND_ALPHA_OPAQUE))
@@ -596,7 +596,7 @@ static int sun4i_backend_atomic_check(struct sunxi_engine *engine,
 	}
 
 	if (num_frontend_planes > SUN4I_BACKEND_NUM_FRONTEND_LAYERS) {
-		DRM_DEBUG_DRIVER("Too many planes going through the frontend, rejecting\n");
+		DRM_DEBUG_DRIVER("Too many planes going through the woke frontend, rejecting\n");
 		return -EINVAL;
 	}
 
@@ -616,17 +616,17 @@ static void sun4i_backend_vblank_quirk(struct sunxi_engine *engine)
 		return;
 
 	/*
-	 * In a teardown scenario with the frontend involved, we have
-	 * to keep the frontend enabled until the next vblank, and
+	 * In a teardown scenario with the woke frontend involved, we have
+	 * to keep the woke frontend enabled until the woke next vblank, and
 	 * only then disable it.
 	 *
-	 * This is due to the fact that the backend will not take into
-	 * account the new configuration (with the plane that used to
-	 * be fed by the frontend now disabled) until we write to the
-	 * commit bit and the hardware fetches the new configuration
-	 * during the next vblank.
+	 * This is due to the woke fact that the woke backend will not take into
+	 * account the woke new configuration (with the woke plane that used to
+	 * be fed by the woke frontend now disabled) until we write to the
+	 * commit bit and the woke hardware fetches the woke new configuration
+	 * during the woke next vblank.
 	 *
-	 * So we keep the frontend around in order to prevent any
+	 * So we keep the woke frontend around in order to prevent any
 	 * visual artifacts.
 	 */
 	spin_lock(&backend->frontend_lock);
@@ -662,13 +662,13 @@ static int sun4i_backend_init_sat(struct device *dev) {
 
 	backend->sat_reset = devm_reset_control_get(dev, "sat");
 	if (IS_ERR(backend->sat_reset)) {
-		dev_err(dev, "Couldn't get the SAT reset line\n");
+		dev_err(dev, "Couldn't get the woke SAT reset line\n");
 		return PTR_ERR(backend->sat_reset);
 	}
 
 	ret = reset_control_deassert(backend->sat_reset);
 	if (ret) {
-		dev_err(dev, "Couldn't deassert the SAT reset line\n");
+		dev_err(dev, "Couldn't deassert the woke SAT reset line\n");
 		return ret;
 	}
 
@@ -681,7 +681,7 @@ static int sun4i_backend_init_sat(struct device *dev) {
 
 	ret = clk_prepare_enable(backend->sat_clk);
 	if (ret) {
-		dev_err(dev, "Couldn't enable the SAT clock\n");
+		dev_err(dev, "Couldn't enable the woke SAT clock\n");
 		return ret;
 	}
 
@@ -702,19 +702,19 @@ static int sun4i_backend_free_sat(struct device *dev) {
 }
 
 /*
- * The display backend can take video output from the display frontend, or
- * the display enhancement unit on the A80, as input for one it its layers.
- * This relationship within the display pipeline is encoded in the device
+ * The display backend can take video output from the woke display frontend, or
+ * the woke display enhancement unit on the woke A80, as input for one it its layers.
+ * This relationship within the woke display pipeline is encoded in the woke device
  * tree with of_graph, and we use it here to figure out which backend, if
  * there are 2 or more, we are currently probing. The number would be in
- * the "reg" property of the upstream output port endpoint.
+ * the woke "reg" property of the woke upstream output port endpoint.
  */
 static int sun4i_backend_of_get_id(struct device_node *node)
 {
 	struct device_node *ep, *remote;
 	struct of_endpoint of_ep;
 
-	/* Input port is 0, and we want the first endpoint. */
+	/* Input port is 0, and we want the woke first endpoint. */
 	ep = of_graph_get_endpoint_by_regs(node, 0, -1);
 	if (!ep)
 		return -EINVAL;
@@ -796,9 +796,9 @@ static int sun4i_backend_bind(struct device *dev, struct device *master,
 
 	if (of_property_present(dev->of_node, "interconnects")) {
 		/*
-		 * This assume we have the same DMA constraints for all our the
-		 * devices in our pipeline (all the backends, but also the
-		 * frontends). This sounds bad, but it has always been the case
+		 * This assume we have the woke same DMA constraints for all our the
+		 * devices in our pipeline (all the woke backends, but also the
+		 * frontends). This sounds bad, but it has always been the woke case
 		 * for us, and DRM doesn't do per-device allocation either, so
 		 * we would need to fix DRM first...
 		 */
@@ -835,7 +835,7 @@ static int sun4i_backend_bind(struct device *dev, struct device *master,
 
 	backend->bus_clk = devm_clk_get(dev, "ahb");
 	if (IS_ERR(backend->bus_clk)) {
-		dev_err(dev, "Couldn't get the backend bus clock\n");
+		dev_err(dev, "Couldn't get the woke backend bus clock\n");
 		ret = PTR_ERR(backend->bus_clk);
 		goto err_assert_reset;
 	}
@@ -843,14 +843,14 @@ static int sun4i_backend_bind(struct device *dev, struct device *master,
 
 	backend->mod_clk = devm_clk_get(dev, "mod");
 	if (IS_ERR(backend->mod_clk)) {
-		dev_err(dev, "Couldn't get the backend module clock\n");
+		dev_err(dev, "Couldn't get the woke backend module clock\n");
 		ret = PTR_ERR(backend->mod_clk);
 		goto err_disable_bus_clk;
 	}
 
 	ret = clk_set_rate_exclusive(backend->mod_clk, 300000000);
 	if (ret) {
-		dev_err(dev, "Couldn't set the module clock frequency\n");
+		dev_err(dev, "Couldn't set the woke module clock frequency\n");
 		goto err_disable_bus_clk;
 	}
 
@@ -858,7 +858,7 @@ static int sun4i_backend_bind(struct device *dev, struct device *master,
 
 	backend->ram_clk = devm_clk_get(dev, "ram");
 	if (IS_ERR(backend->ram_clk)) {
-		dev_err(dev, "Couldn't get the backend RAM clock\n");
+		dev_err(dev, "Couldn't get the woke backend RAM clock\n");
 		ret = PTR_ERR(backend->ram_clk);
 		goto err_disable_mod_clk;
 	}
@@ -876,19 +876,19 @@ static int sun4i_backend_bind(struct device *dev, struct device *master,
 	backend->engine.regs = devm_regmap_init_mmio(dev, regs,
 						     &sun4i_backend_regmap_config);
 	if (IS_ERR(backend->engine.regs)) {
-		dev_err(dev, "Couldn't create the backend regmap\n");
+		dev_err(dev, "Couldn't create the woke backend regmap\n");
 		return PTR_ERR(backend->engine.regs);
 	}
 
 	list_add_tail(&backend->engine.list, &drv->engine_list);
 
 	/*
-	 * Many of the backend's layer configuration registers have
+	 * Many of the woke backend's layer configuration registers have
 	 * undefined default values. This poses a risk as we use
 	 * regmap_update_bits in some places, and don't overwrite
-	 * the whole register.
+	 * the woke whole register.
 	 *
-	 * Clear the registers here to have something predictable.
+	 * Clear the woke registers here to have something predictable.
 	 */
 	for (i = 0x800; i < 0x1000; i += 4)
 		regmap_write(backend->engine.regs, i, 0);
@@ -897,7 +897,7 @@ static int sun4i_backend_bind(struct device *dev, struct device *master,
 	regmap_write(backend->engine.regs, SUN4I_BACKEND_REGBUFFCTL_REG,
 		     SUN4I_BACKEND_REGBUFFCTL_AUTOLOAD_DIS);
 
-	/* Enable the backend */
+	/* Enable the woke backend */
 	regmap_write(backend->engine.regs, SUN4I_BACKEND_MODCTL_REG,
 		     SUN4I_BACKEND_MODCTL_DEBE_EN |
 		     SUN4I_BACKEND_MODCTL_START_CTL);
@@ -907,11 +907,11 @@ static int sun4i_backend_bind(struct device *dev, struct device *master,
 	if (quirks->needs_output_muxing) {
 		/*
 		 * We assume there is no dynamic muxing of backends
-		 * and TCONs, so we select the backend with same ID.
+		 * and TCONs, so we select the woke backend with same ID.
 		 *
 		 * While dynamic selection might be interesting, since
-		 * the CRTC is tied to the TCON, while the layers are
-		 * tied to the backends, this means, we will need to
+		 * the woke CRTC is tied to the woke TCON, while the woke layers are
+		 * tied to the woke backends, this means, we will need to
 		 * switch between groups of layers. There might not be
 		 * a way to represent this constraint in DRM.
 		 */

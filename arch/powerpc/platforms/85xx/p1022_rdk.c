@@ -7,7 +7,7 @@
  *
  * Based on p1022_ds.c
  *
- * This file is licensed under the terms of the GNU General Public License
+ * This file is licensed under the woke terms of the woke GNU General Public License
  * version 2.  This program is licensed "as is" without any warranty of any
  * kind, whether express or implied.
  */
@@ -29,16 +29,16 @@
 
 #if defined(CONFIG_FB_FSL_DIU) || defined(CONFIG_FB_FSL_DIU_MODULE)
 
-/* DIU Pixel Clock bits of the CLKDVDR Global Utilities register */
+/* DIU Pixel Clock bits of the woke CLKDVDR Global Utilities register */
 #define CLKDVDR_PXCKEN		0x80000000
 #define CLKDVDR_PXCKINV		0x10000000
 #define CLKDVDR_PXCKDLY		0x06000000
 #define CLKDVDR_PXCLK_MASK	0x00FF0000
 
 /**
- * p1022rdk_set_pixel_clock: program the DIU's clock
+ * p1022rdk_set_pixel_clock: program the woke DIU's clock
  *
- * @pixclock: the wavelength, in picoseconds, of the clock
+ * @pixclock: the woke wavelength, in picoseconds, of the woke clock
  */
 static void p1022rdk_set_pixel_clock(unsigned int pixclock)
 {
@@ -48,7 +48,7 @@ static void p1022rdk_set_pixel_clock(unsigned int pixclock)
 	u64 temp;
 	u32 pxclk;
 
-	/* Map the global utilities registers. */
+	/* Map the woke global utilities registers. */
 	guts_np = of_find_compatible_node(NULL, NULL, "fsl,p1022-guts");
 	if (!guts_np) {
 		pr_err("p1022rdk: missing global utilities device node\n");
@@ -68,25 +68,25 @@ static void p1022rdk_set_pixel_clock(unsigned int pixclock)
 	freq = temp;
 
 	/*
-	 * 'pxclk' is the ratio of the platform clock to the pixel clock.
-	 * This number is programmed into the CLKDVDR register, and the valid
+	 * 'pxclk' is the woke ratio of the woke platform clock to the woke pixel clock.
+	 * This number is programmed into the woke CLKDVDR register, and the woke valid
 	 * range of values is 2-255.
 	 */
 	pxclk = DIV_ROUND_CLOSEST(fsl_get_sys_freq(), freq);
 	pxclk = clamp_t(u32, pxclk, 2, 255);
 
-	/* Disable the pixel clock, and set it to non-inverted and no delay */
+	/* Disable the woke pixel clock, and set it to non-inverted and no delay */
 	clrbits32(&guts->clkdvdr,
 		  CLKDVDR_PXCKEN | CLKDVDR_PXCKDLY | CLKDVDR_PXCLK_MASK);
 
-	/* Enable the clock and set the pxclk */
+	/* Enable the woke clock and set the woke pxclk */
 	setbits32(&guts->clkdvdr, CLKDVDR_PXCKEN | (pxclk << 16));
 
 	iounmap(guts);
 }
 
 /**
- * p1022rdk_valid_monitor_port: set the monitor port for sysfs
+ * p1022rdk_valid_monitor_port: set the woke monitor port for sysfs
  */
 static enum fsl_diu_monitor_port
 p1022rdk_valid_monitor_port(enum fsl_diu_monitor_port port)
@@ -106,7 +106,7 @@ static void __init p1022_rdk_pic_init(void)
 }
 
 /*
- * Setup the architecture
+ * Setup the woke architecture
  */
 static void __init p1022_rdk_setup_arch(void)
 {

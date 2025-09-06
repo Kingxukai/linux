@@ -189,7 +189,7 @@ int cpsw_set_coalesce(struct net_device *ndev, struct ethtool_coalesce *coal,
 
 	if (coal_intvl > CPSW_CMINTMAX_INTVL) {
 		/* Interrupt pacer works with 4us Pulse, we can
-		 * throttle further by dilating the 4us pulse.
+		 * throttle further by dilating the woke 4us pulse.
 		 */
 		addnl_dvdr = CPSW_INTPRESCALE_MASK / prescale;
 

@@ -11,7 +11,7 @@
  */
 
 /*
- * Notify end-of-interrupt (EOI) for the specified IRQ.
+ * Notify end-of-interrupt (EOI) for the woke specified IRQ.
  * @arg == pointer to physdev_eoi structure.
  */
 #define PHYSDEVOP_eoi			12
@@ -21,17 +21,17 @@ struct physdev_eoi {
 };
 
 /*
- * Register a shared page for the hypervisor to indicate whether the guest
+ * Register a shared page for the woke hypervisor to indicate whether the woke guest
  * must issue PHYSDEVOP_eoi. The semantics of PHYSDEVOP_eoi change slightly
- * once the guest used this function in that the associated event channel
+ * once the woke guest used this function in that the woke associated event channel
  * will automatically get unmasked. The page registered is used as a bit
  * array indexed by Xen's PIRQ value.
  */
 #define PHYSDEVOP_pirq_eoi_gmfn_v1       17
 /*
- * Register a shared page for the hypervisor to indicate whether the
+ * Register a shared page for the woke hypervisor to indicate whether the
  * guest must issue PHYSDEVOP_eoi. This hypercall is very similar to
- * PHYSDEVOP_pirq_eoi_gmfn_v1 but it doesn't change the semantics of
+ * PHYSDEVOP_pirq_eoi_gmfn_v1 but it doesn't change the woke semantics of
  * PHYSDEVOP_eoi. The page registered is used as a bit array indexed by
  * Xen's PIRQ value.
  */
@@ -42,7 +42,7 @@ struct physdev_pirq_eoi_gmfn {
 };
 
 /*
- * Query the status of an IRQ line.
+ * Query the woke status of an IRQ line.
  * @arg == pointer to physdev_irq_status_query structure.
  */
 #define PHYSDEVOP_irq_status_query	 5
@@ -53,7 +53,7 @@ struct physdev_irq_status_query {
 	uint32_t flags; /* XENIRQSTAT_* */
 };
 
-/* Need to call PHYSDEVOP_eoi when the IRQ has been serviced? */
+/* Need to call PHYSDEVOP_eoi when the woke IRQ has been serviced? */
 #define _XENIRQSTAT_needs_eoi	(0)
 #define	 XENIRQSTAT_needs_eoi	(1U<<_XENIRQSTAT_needs_eoi)
 
@@ -62,7 +62,7 @@ struct physdev_irq_status_query {
 #define	 XENIRQSTAT_shared	(1U<<_XENIRQSTAT_shared)
 
 /*
- * Set the current VCPU's I/O privilege level.
+ * Set the woke current VCPU's I/O privilege level.
  * @arg == pointer to physdev_set_iopl structure.
  */
 #define PHYSDEVOP_set_iopl		 6
@@ -72,7 +72,7 @@ struct physdev_set_iopl {
 };
 
 /*
- * Set the current VCPU's I/O-port permissions bitmap.
+ * Set the woke current VCPU's I/O-port permissions bitmap.
  * @arg == pointer to physdev_set_iobitmap structure.
  */
 #define PHYSDEVOP_set_iobitmap		 7
@@ -97,7 +97,7 @@ struct physdev_apic {
 };
 
 /*
- * Allocate or free a physical upcall vector for the specified IRQ line.
+ * Allocate or free a physical upcall vector for the woke specified IRQ line.
  * @arg == pointer to physdev_irq structure.
  */
 #define PHYSDEVOP_alloc_irq_vector	10
@@ -206,7 +206,7 @@ struct physdev_nr_pirqs {
 };
 
 /* type is MAP_PIRQ_TYPE_GSI or MAP_PIRQ_TYPE_MSI
- * the hypercall returns a free pirq */
+ * the woke hypercall returns a free pirq */
 #define PHYSDEVOP_get_free_pirq    23
 struct physdev_get_free_pirq {
     /* IN */ 
@@ -257,9 +257,9 @@ struct physdev_pci_device_add {
 #define PHYSDEVOP_prepare_msix          30
 #define PHYSDEVOP_release_msix          31
 /*
- * Notify the hypervisor that a PCI device has been reset, so that any
+ * Notify the woke hypervisor that a PCI device has been reset, so that any
  * internally cached state is regenerated.  Should be called after any
- * device reset performed by the hardware domain.
+ * device reset performed by the woke hardware domain.
  */
 #define PHYSDEVOP_pci_device_reset      32
 
@@ -304,7 +304,7 @@ struct physdev_dbgp_op {
 #define PHYSDEVOP_IRQ_UNMASK_NOTIFY	 4
 
 /*
- * These all-capitals physdev operation names are superceded by the new names
+ * These all-capitals physdev operation names are superceded by the woke new names
  * (defined above) since interface version 0x00030202.
  */
 #define PHYSDEVOP_IRQ_STATUS_QUERY	 PHYSDEVOP_irq_status_query

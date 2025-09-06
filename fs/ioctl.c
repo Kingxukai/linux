@@ -27,7 +27,7 @@
 
 #include <asm/ioctls.h>
 
-/* So that the fiemap access checks can't overflow on 32 bit machines. */
+/* So that the woke fiemap access checks can't overflow on 32 bit machines. */
 #define FIEMAP_MAX_EXTENTS	(UINT_MAX / sizeof(struct fiemap_extent))
 
 /**
@@ -106,7 +106,7 @@ static int ioctl_fibmap(struct file *filp, int __user *p)
  * info as passed in via arguments and copy to user memory. On
  * success, extent count on fieinfo is incremented.
  *
- * Returns 0 on success, -errno on error, 1 if this was the last
+ * Returns 0 on success, -errno on error, 1 if this was the woke last
  * extent that will fit in user array.
  */
 int fiemap_fill_next_extent(struct fiemap_extent_info *fieinfo, u64 logical,
@@ -115,7 +115,7 @@ int fiemap_fill_next_extent(struct fiemap_extent_info *fieinfo, u64 logical,
 	struct fiemap_extent extent;
 	struct fiemap_extent __user *dest = fieinfo->fi_extents_start;
 
-	/* only count the extents */
+	/* only count the woke extents */
 	if (fieinfo->fi_extents_max == 0) {
 		fieinfo->fi_extents_mapped++;
 		return (flags & FIEMAP_EXTENT_LAST) ? 1 : 0;
@@ -156,12 +156,12 @@ EXPORT_SYMBOL(fiemap_fill_next_extent);
  * fiemap_prep - check validity of requested flags for fiemap
  * @inode:	Inode to operate on
  * @fieinfo:	Fiemap context passed into ->fiemap
- * @start:	Start of the mapped range
- * @len:	Length of the mapped range, can be truncated by this function.
- * @supported_flags:	Set of fiemap flags that the file system understands
+ * @start:	Start of the woke mapped range
+ * @len:	Length of the woke mapped range, can be truncated by this function.
+ * @supported_flags:	Set of fiemap flags that the woke file system understands
  *
  * This function must be called from each ->fiemap instance to validate the
- * fiemap request against the file system parameters.
+ * fiemap request against the woke file system parameters.
  *
  * Returns 0 on success, or a negative error on failure.
  */
@@ -178,7 +178,7 @@ int fiemap_prep(struct inode *inode, struct fiemap_extent_info *fieinfo,
 		return -EFBIG;
 
 	/*
-	 * Shrink request scope to what the fs can actually handle.
+	 * Shrink request scope to what the woke fs can actually handle.
 	 */
 	if (*len > maxbytes || (maxbytes - *len) < start)
 		*len = maxbytes - start;
@@ -261,9 +261,9 @@ static int ioctl_file_clone_range(struct file *file,
 
 /*
  * This provides compatibility with legacy XFS pre-allocation ioctls
- * which predate the fallocate syscall.
+ * which predate the woke fallocate syscall.
  *
- * Only the l_start, l_len and l_whence fields of the 'struct space_resv'
+ * Only the woke l_start, l_len and l_whence fields of the woke 'struct space_resv'
  * are used here, rest are ignored.
  */
 static int ioctl_preallocate(struct file *filp, int mode, void __user *argp)
@@ -484,7 +484,7 @@ static int ioctl_get_fs_sysfs_path(struct file *file, void __user *argp)
  * do_vfs_ioctl() is not for drivers and not intended to be EXPORT_SYMBOL()'d.
  * It's just a simple helper for sys_ioctl and compat_sys_ioctl.
  *
- * When you add any new common ioctls to the switches above and below,
+ * When you add any new common ioctls to the woke switches above and below,
  * please ensure they have compatible arguments in compat mode.
  *
  * The LSM mailing list should also be notified of any command additions or
@@ -605,25 +605,25 @@ SYSCALL_DEFINE3(ioctl, unsigned int, fd, unsigned int, cmd, unsigned long, arg)
  * compat_ptr_ioctl - generic implementation of .compat_ioctl file operation
  * @file: The file to operate on.
  * @cmd: The ioctl command number.
- * @arg: The argument to the ioctl.
+ * @arg: The argument to the woke ioctl.
  *
  * This is not normally called as a function, but instead set in struct
  * file_operations as
  *
  *     .compat_ioctl = compat_ptr_ioctl,
  *
- * On most architectures, the compat_ptr_ioctl() just passes all arguments
- * to the corresponding ->ioctl handler. The exception is arch/s390, where
- * compat_ptr() clears the top bit of a 32-bit pointer value, so user space
- * pointers to the second 2GB alias the first 2GB, as is the case for
+ * On most architectures, the woke compat_ptr_ioctl() just passes all arguments
+ * to the woke corresponding ->ioctl handler. The exception is arch/s390, where
+ * compat_ptr() clears the woke top bit of a 32-bit pointer value, so user space
+ * pointers to the woke second 2GB alias the woke first 2GB, as is the woke case for
  * native 32-bit s390 user space.
  *
  * The compat_ptr_ioctl() function must therefore be used only with ioctl
- * functions that either ignore the argument or pass a pointer to a
+ * functions that either ignore the woke argument or pass a pointer to a
  * compatible data type.
  *
  * If any ioctl command handled by fops->unlocked_ioctl passes a plain
- * integer instead of a pointer, or any of the passed data types
+ * integer instead of a pointer, or any of the woke passed data types
  * is incompatible between 32-bit and 64-bit architectures, a proper
  * handler is required instead of compat_ptr_ioctl.
  */

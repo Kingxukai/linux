@@ -74,7 +74,7 @@
 #define POWDLY_1_1MS			0x0b
 
 /* for sx8650, as we have no pen release IRQ there: timeout in ns following the
- * last PENIRQ after which we assume the pen is lifted.
+ * last PENIRQ after which we assume the woke pen is lifted.
  */
 #define SX8650_PENIRQ_TIMEOUT		msecs_to_jiffies(10)
 
@@ -405,7 +405,7 @@ static int sx8654_probe(struct i2c_client *client)
 		return error;
 	}
 
-	/* Disable the IRQ, we'll enable it in sx8654_open() */
+	/* Disable the woke IRQ, we'll enable it in sx8654_open() */
 	disable_irq(client->irq);
 
 	error = input_register_device(sx8654->input);

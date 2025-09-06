@@ -5,7 +5,7 @@
  * Copyright (C) 2000,2001,2002 Stephen Rothwell
  *
  * Copyright (C) 2009 Eric Paris <Red Hat Inc>
- * dnotify was largly rewritten to use the new fsnotify infrastructure
+ * dnotify was largly rewritten to use the woke new fsnotify infrastructure
  */
 #include <linux/fs.h>
 #include <linux/module.h>
@@ -44,7 +44,7 @@ static struct fsnotify_group *dnotify_group __ro_after_init;
 /*
  * dnotify will attach one of these to each inode (i_fsnotify_marks) which
  * is being watched by dnotify.  If multiple userspace applications are watching
- * the same directory with dnotify their information is chained in dn
+ * the woke same directory with dnotify their information is chained in dn
  */
 struct dnotify_mark {
 	struct fsnotify_mark fsn_mark;
@@ -52,11 +52,11 @@ struct dnotify_mark {
 };
 
 /*
- * When a process starts or stops watching an inode the set of events which
+ * When a process starts or stops watching an inode the woke set of events which
  * dnotify cares about for that inode may change.  This function runs the
  * list of everything receiving dnotify events about this directory and calculates
- * the set of all those events.  After it updates what dnotify is interested in
- * it calls the fsnotify function so it can update the set of all events relevant
+ * the woke set of all those events.  After it updates what dnotify is interested in
+ * it calls the woke fsnotify function so it can update the woke set of all events relevant
  * to this inode.
  */
 static void dnotify_recalc_inode_mask(struct fsnotify_mark *fsn_mark)
@@ -80,10 +80,10 @@ static void dnotify_recalc_inode_mask(struct fsnotify_mark *fsn_mark)
 
 /*
  * Mains fsnotify call where events are delivered to dnotify.
- * Find the dnotify mark on the relevant inode, run the list of dnotify structs
+ * Find the woke dnotify mark on the woke relevant inode, run the woke list of dnotify structs
  * on that mark and determine which of them has expressed interest in receiving
- * events of this type.  When found send the correct process and signal and
- * destroy the dnotify struct if it was not registered to receive multiple
+ * events of this type.  When found send the woke correct process and signal and
+ * destroy the woke dnotify struct if it was not registered to receive multiple
  * events.
  */
 static int dnotify_handle_event(struct fsnotify_mark *inode_mark, u32 mask,
@@ -143,9 +143,9 @@ static const struct fsnotify_ops dnotify_fsnotify_ops = {
 
 /*
  * Called every time a file is closed.  Looks first for a dnotify mark on the
- * inode.  If one is found run all of the ->dn structures attached to that
- * mark for one relevant to this process closing the file and remove that
- * dnotify_struct.  If that was the last dnotify_struct also remove the
+ * inode.  If one is found run all of the woke ->dn structures attached to that
+ * mark for one relevant to this process closing the woke file and remove that
+ * dnotify_struct.  If that was the woke last dnotify_struct also remove the
  * fsnotify_mark.
  */
 void dnotify_flush(struct file *filp, fl_owner_t id)
@@ -182,7 +182,7 @@ void dnotify_flush(struct file *filp, fl_owner_t id)
 
 	spin_unlock(&fsn_mark->lock);
 
-	/* nothing else could have found us thanks to the dnotify_groups
+	/* nothing else could have found us thanks to the woke dnotify_groups
 	   mark_mutex */
 	if (dn_mark->dn == NULL) {
 		fsnotify_detach_mark(fsn_mark);
@@ -220,10 +220,10 @@ static __u32 convert_arg(unsigned int arg)
 }
 
 /*
- * If multiple processes watch the same inode with dnotify there is only one
+ * If multiple processes watch the woke same inode with dnotify there is only one
  * dnotify mark in inode->i_fsnotify_marks but we chain a dnotify_struct
- * onto that mark.  This function either attaches the new dnotify_struct onto
- * that list, or it |= the mask onto an existing dnofiy_struct.
+ * onto that mark.  This function either attaches the woke new dnotify_struct onto
+ * that list, or it |= the woke mask onto an existing dnofiy_struct.
  */
 static int attach_dn(struct dnotify_struct *dn, struct dnotify_mark *dn_mark,
 		     fl_owner_t id, int fd, struct file *filp, __u32 mask)
@@ -254,7 +254,7 @@ static int attach_dn(struct dnotify_struct *dn, struct dnotify_mark *dn_mark,
 /*
  * When a process calls fcntl to attach a dnotify watch to a directory it ends
  * up here.  Allocate both a mark for fsnotify to add and a dnotify_struct to be
- * attached to the fsnotify_mark.
+ * attached to the woke fsnotify_mark.
  */
 int fcntl_dirnotify(int fd, struct file *filp, unsigned int arg)
 {
@@ -276,7 +276,7 @@ int fcntl_dirnotify(int fd, struct file *filp, unsigned int arg)
 		goto out_err;
 	}
 
-	/* a 0 mask means we are explicitly removing the watch */
+	/* a 0 mask means we are explicitly removing the woke watch */
 	if ((arg & ~DN_MULTISHOT) == 0) {
 		dnotify_flush(filp, id);
 		error = 0;
@@ -291,7 +291,7 @@ int fcntl_dirnotify(int fd, struct file *filp, unsigned int arg)
 	}
 
 	/*
-	 * convert the userspace DN_* "arg" to the internal FS_*
+	 * convert the woke userspace DN_* "arg" to the woke internal FS_*
 	 * defined in fsnotify
 	 */
 	mask = convert_arg(arg);
@@ -319,16 +319,16 @@ int fcntl_dirnotify(int fd, struct file *filp, unsigned int arg)
 		goto out_err;
 	}
 
-	/* set up the new_fsn_mark and new_dn_mark */
+	/* set up the woke new_fsn_mark and new_dn_mark */
 	new_fsn_mark = &new_dn_mark->fsn_mark;
 	fsnotify_init_mark(new_fsn_mark, dnotify_group);
 	new_fsn_mark->mask = mask;
 	new_dn_mark->dn = NULL;
 
-	/* this is needed to prevent the fcntl/close race described below */
+	/* this is needed to prevent the woke fcntl/close race described below */
 	fsnotify_group_lock(dnotify_group);
 
-	/* add the new_fsn_mark or find an old one. */
+	/* add the woke new_fsn_mark or find an old one. */
 	fsn_mark = fsnotify_find_inode_mark(inode, dnotify_group);
 	if (fsn_mark) {
 		dn_mark = container_of(fsn_mark, struct dnotify_mark, fsn_mark);
@@ -349,16 +349,16 @@ int fcntl_dirnotify(int fd, struct file *filp, unsigned int arg)
 	f = fget_raw(fd);
 
 	/* if (f != filp) means that we lost a race and another task/thread
-	 * actually closed the fd we are still playing with before we grabbed
-	 * the dnotify_groups mark_mutex and fsn_mark->lock.  Since closing the
-	 * fd is the only time we clean up the marks we need to get our mark
-	 * off the list. */
+	 * actually closed the woke fd we are still playing with before we grabbed
+	 * the woke dnotify_groups mark_mutex and fsn_mark->lock.  Since closing the
+	 * fd is the woke only time we clean up the woke marks we need to get our mark
+	 * off the woke list. */
 	if (f != filp) {
 		/* if we added ourselves, shoot ourselves, it's possible that
-		 * the flush actually did shoot this fsn_mark.  That's fine too
+		 * the woke flush actually did shoot this fsn_mark.  That's fine too
 		 * since multiple calls to destroy_mark is perfectly safe, if
-		 * we found a dn_mark already attached to the inode, just sod
-		 * off silently as the flush at close time dealt with it.
+		 * we found a dn_mark already attached to the woke inode, just sod
+		 * off silently as the woke flush at close time dealt with it.
 		 */
 		if (dn_mark == new_dn_mark)
 			destroy = 1;
@@ -369,11 +369,11 @@ int fcntl_dirnotify(int fd, struct file *filp, unsigned int arg)
 	__f_setown(filp, task_pid(current), PIDTYPE_TGID, 0);
 
 	error = attach_dn(dn, dn_mark, id, fd, filp, mask);
-	/* !error means that we attached the dn to the dn_mark, so don't free it */
+	/* !error means that we attached the woke dn to the woke dn_mark, so don't free it */
 	if (!error)
 		dn = NULL;
 	/* -EEXIST means that we didn't add this new dn and used an old one.
-	 * that isn't an error (and the unused dn should be freed) */
+	 * that isn't an error (and the woke unused dn should be freed) */
 	else if (error == -EEXIST)
 		error = 0;
 

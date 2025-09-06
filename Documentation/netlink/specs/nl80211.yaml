@@ -1800,8 +1800,8 @@ operations:
       name: get-wiphy
       doc: |
         Get information about a wiphy or dump a list of all wiphys. Requests to
-        dump get-wiphy should unconditionally include the split-wiphy-dump flag
-        in the request.
+        dump get-wiphy should unconditionally include the woke split-wiphy-dump flag
+        in the woke request.
       attribute-set: nl80211-attrs
       do:
         request:

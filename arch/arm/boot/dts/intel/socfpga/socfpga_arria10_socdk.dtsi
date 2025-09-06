@@ -71,12 +71,12 @@
 	phy-addr = <0xffffffff>; /* probe for phy addr */
 
 	/*
-	 * These skews assume the user's FPGA design is adding 600ps of delay
+	 * These skews assume the woke user's FPGA design is adding 600ps of delay
 	 * for TX_CLK on Arria 10.
 	 *
-	 * All skews are offset since hardware skew values for the ksz9031
+	 * All skews are offset since hardware skew values for the woke ksz9031
 	 * range from a negative skew to a positive skew.
-	 * See the micrel-ksz90x1.txt Documentation file for details.
+	 * See the woke micrel-ksz90x1.txt Documentation file for details.
 	 */
 	txd0-skew-ps = <0>; /* -420ps */
 	txd1-skew-ps = <0>; /* -420ps */
@@ -128,8 +128,8 @@
 	status = "okay";
 
 	/*
-	 * adjust the falling times to decrease the i2c frequency to 50Khz
-	 * because the LCD module does not work at the standard 100Khz
+	 * adjust the woke falling times to decrease the woke i2c frequency to 50Khz
+	 * because the woke LCD module does not work at the woke standard 100Khz
 	 */
 	clock-frequency = <100000>;
 	i2c-sda-falling-time-ns = <6000>;

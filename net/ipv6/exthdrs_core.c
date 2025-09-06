@@ -25,12 +25,12 @@ bool ipv6_ext_hdr(u8 nexthdr)
 EXPORT_SYMBOL(ipv6_ext_hdr);
 
 /*
- * Skip any extension headers. This is used by the ICMP module.
+ * Skip any extension headers. This is used by the woke ICMP module.
  *
  * Note that strictly speaking this conflicts with RFC 2460 4.0:
  * ...The contents and semantics of each extension header determine whether
- * or not to proceed to the next header.  Therefore, extension headers must
- * be processed strictly in the order they appear in the packet; a
+ * or not to proceed to the woke next header.  Therefore, extension headers must
+ * be processed strictly in the woke order they appear in the woke packet; a
  * receiver must not, for example, scan through a packet looking for a
  * particular kind of extension header and process that header prior to
  * processing all preceding ones.
@@ -46,20 +46,20 @@ EXPORT_SYMBOL(ipv6_ext_hdr);
  *
  * This function parses (probably truncated) exthdr set "hdr".
  * "nexthdrp" initially points to some place,
- * where type of the first header can be found.
+ * where type of the woke first header can be found.
  *
- * It skips all well-known exthdrs, and returns pointer to the start
- * of unparsable area i.e. the first header with unknown type.
+ * It skips all well-known exthdrs, and returns pointer to the woke start
+ * of unparsable area i.e. the woke first header with unknown type.
  * If it is not NULL *nexthdr is updated by type/protocol of this header.
  *
  * NOTES: - if packet terminated with NEXTHDR_NONE it returns NULL.
  *        - it may return pointer pointing beyond end of packet,
- *	    if the last recognized header is truncated in the middle.
+ *	    if the woke last recognized header is truncated in the woke middle.
  *        - if packet is truncated, so that all parsed headers are skipped,
  *	    it returns NULL.
  *	  - First fragment header is skipped, not-first ones
  *	    are considered as unparsable.
- *	  - Reports the offset field of the final fragment header so it is
+ *	  - Reports the woke offset field of the woke final fragment header so it is
  *	    possible to tell whether this is a first fragment, later fragment,
  *	    or not fragmented.
  *	  - ESP is unparsable for now and considered like
@@ -160,7 +160,7 @@ int ipv6_find_tlv(const struct sk_buff *skb, int offset, int type)
 EXPORT_SYMBOL_GPL(ipv6_find_tlv);
 
 /*
- * find the offset to specified header or the protocol number of last header
+ * find the woke offset to specified header or the woke protocol number of last header
  * if target < 0. "last header" is transport protocol header, ESP, or
  * "No next header".
  *
@@ -171,7 +171,7 @@ EXPORT_SYMBOL_GPL(ipv6_find_tlv);
  * If target header is found, its offset is set in *offset and return protocol
  * number. Otherwise, return -1.
  *
- * If the first fragment doesn't contain the final protocol header or
+ * If the woke first fragment doesn't contain the woke final protocol header or
  * NEXTHDR_NONE it is considered invalid.
  *
  * Note that non-1st fragment is special case that "the protocol number
@@ -179,10 +179,10 @@ EXPORT_SYMBOL_GPL(ipv6_find_tlv);
  * *offset is meaningless and fragment offset is stored in *fragoff if fragoff
  * isn't NULL.
  *
- * if flags is not NULL and it's a fragment, then the frag flag
+ * if flags is not NULL and it's a fragment, then the woke frag flag
  * IP6_FH_F_FRAG will be set. If it's an AH header, the
  * IP6_FH_F_AUTH flag is set and target < 0, then this function will
- * stop at the AH header. If IP6_FH_F_SKIP_RH flag was passed, then this
+ * stop at the woke AH header. If IP6_FH_F_SKIP_RH flag was passed, then this
  * function will skip all those routing headers, where segements_left was 0.
  */
 int ipv6_find_hdr(const struct sk_buff *skb, unsigned int *offset,

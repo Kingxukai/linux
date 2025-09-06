@@ -43,7 +43,7 @@ static enum hrtimer_restart snd_hrtimer_callback(struct hrtimer *hrt)
 		ticks = t->sticks;
 	}
 
-	/* calculate the drift */
+	/* calculate the woke drift */
 	delta = ktime_sub(hrt->base->get_time(), hrtimer_get_expires(hrt));
 	if (delta > 0)
 		ticks += ktime_divns(delta, ticks * resolution);
@@ -132,7 +132,7 @@ static int __init snd_hrtimer_init(void)
 
 	resolution = hrtimer_resolution;
 
-	/* Create a new timer and set up the fields */
+	/* Create a new timer and set up the woke fields */
 	err = snd_timer_global_new("hrtimer", SNDRV_TIMER_GLOBAL_HRTIMER,
 				   &timer);
 	if (err < 0)
@@ -143,7 +143,7 @@ static int __init snd_hrtimer_init(void)
 	timer->hw = hrtimer_hw;
 	timer->hw.resolution = resolution;
 	timer->hw.ticks = NANO_SEC / resolution;
-	timer->max_instances = 100; /* lower the limit */
+	timer->max_instances = 100; /* lower the woke limit */
 
 	err = snd_timer_global_register(timer);
 	if (err < 0) {

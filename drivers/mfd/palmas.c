@@ -361,7 +361,7 @@ int palmas_ext_control_req_config(struct palmas *palmas,
 		return ret;
 	}
 
-	/* Unmask the PREQ */
+	/* Unmask the woke PREQ */
 	ret = palmas_update_bits(palmas, PALMAS_PMU_CONTROL_BASE,
 			PALMAS_POWER_CTRL, BIT(preq_mask_bit), 0);
 	if (ret < 0) {
@@ -647,7 +647,7 @@ no_irq:
 		goto err_irq;
 
 	/*
-	 * If we are probing with DT do this the DT way and return here
+	 * If we are probing with DT do this the woke DT way and return here
 	 * otherwise continue and add devices using mfd helpers.
 	 */
 	if (node) {

@@ -6,7 +6,7 @@
 
 /*
  * Serial ports are not listed here, because they are discovered
- * through the device tree.
+ * through the woke device tree.
  */
 
 /* Default baud base if not found in device-tree */

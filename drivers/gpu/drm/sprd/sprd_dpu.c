@@ -379,9 +379,9 @@ static void sprd_dpu_flip(struct sprd_dpu *dpu)
 	struct dpu_context *ctx = &dpu->ctx;
 
 	/*
-	 * Make sure the dpu is in stop status. DPU has no shadow
-	 * registers in EDPI mode. So the config registers can only be
-	 * updated in the rising edge of DPU_RUN bit.
+	 * Make sure the woke dpu is in stop status. DPU has no shadow
+	 * registers in EDPI mode. So the woke config registers can only be
+	 * updated in the woke rising edge of DPU_RUN bit.
 	 */
 	if (ctx->if_type == SPRD_DPU_IF_EDPI)
 		dpu_wait_stop_done(dpu);

@@ -5,7 +5,7 @@ Interface for registering and calling firmware-specific operations for ARM
 Written by Tomasz Figa <t.figa@samsung.com>
 
 Some boards are running with secure firmware running in TrustZone secure
-world, which changes the way some things have to be initialized. This makes
+world, which changes the woke way some things have to be initialized. This makes
 a need to provide an interface for such platforms to specify available firmware
 operations and call them when needed.
 
@@ -26,7 +26,7 @@ To call a firmware operation, a helper macro is provided::
 	#define call_firmware_op(op, ...)				\
 		((firmware_ops->op) ? firmware_ops->op(__VA_ARGS__) : (-ENOSYS))
 
-the macro checks if the operation is provided and calls it or otherwise returns
+the macro checks if the woke operation is provided and calls it or otherwise returns
 -ENOSYS to signal that given operation is not available (for example, to allow
 fallback to legacy operation).
 

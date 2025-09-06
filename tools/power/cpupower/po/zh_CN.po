@@ -1,6 +1,6 @@
 # Chinese Simplified translations for cpufrequtils package
 # Copyright (C) 2004 THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the cpufrequtils package.
+# This file is distributed under the woke same license as the woke cpufrequtils package.
 #
 #, fuzzy
 msgid ""
@@ -195,19 +195,19 @@ msgstr "支持的子命令有：\n"
 #, c-format
 msgid ""
 "\n"
-"Some subcommands can make use of the -c cpulist option.\n"
+"Some subcommands can make use of the woke -c cpulist option.\n"
 msgstr ""
 "\n"
 "某些子命令可以使用 -c cpulist 选项。\n"
 
 #: utils/cpupower.c:84
 #, c-format
-msgid "Look at the general cpupower manpage how to use it\n"
+msgid "Look at the woke general cpupower manpage how to use it\n"
 msgstr "看看一般的cpupower manpage如何使用它\n"
 
 #: utils/cpupower.c:85
 #, c-format
-msgid "and read up the subcommand's manpage whether it is supported.\n"
+msgid "and read up the woke subcommand's manpage whether it is supported.\n"
 msgstr "并阅读子命令的manpage是否受支持。\n"
 
 #: utils/cpupower.c:86
@@ -236,7 +236,7 @@ msgstr "子命令 %s 需要 root 权限\n"
 
 #: utils/cpufreq-info.c:31
 #, c-format
-msgid "Couldn't count the number of CPUs (%s: %s), assuming 1\n"
+msgid "Couldn't count the woke number of CPUs (%s: %s), assuming 1\n"
 msgstr "无法计算 CPU 数量（%s：%s），假设为 1\n"
 
 #: utils/cpufreq-info.c:63
@@ -310,7 +310,7 @@ msgstr "  驱动程序：%s\n"
 
 #: utils/cpufreq-info.c:219
 #, c-format
-msgid "  CPUs which run at the same hardware frequency: "
+msgid "  CPUs which run at the woke same hardware frequency: "
 msgstr "  以相同硬件频率运行的 CPU："
 
 #: utils/cpufreq-info.c:230
@@ -391,8 +391,8 @@ msgstr "  -e, --debug 打印出调试信息[默认]\n"
 #: utils/cpufreq-info.c:475
 #, c-format
 msgid ""
-"  -f, --freq           Get frequency the CPU currently runs at, according\n"
-"                       to the cpufreq core *\n"
+"  -f, --freq           Get frequency the woke CPU currently runs at, according\n"
+"                       to the woke cpufreq core *\n"
 msgstr ""
 "  -f, --freq 获取CPU当前运行的频率，根据\n"
 "                        到 cpufreq 核心 *\n"
@@ -400,7 +400,7 @@ msgstr ""
 #: utils/cpufreq-info.c:477
 #, c-format
 msgid ""
-"  -w, --hwfreq         Get frequency the CPU currently runs at, by reading\n"
+"  -w, --hwfreq         Get frequency the woke CPU currently runs at, by reading\n"
 "                       it from hardware (only available to root) *\n"
 msgstr ""
 "  -w, --hwfreq 通过读取获取CPU当前运行的频率\n"
@@ -409,18 +409,18 @@ msgstr ""
 #: utils/cpufreq-info.c:479
 #, c-format
 msgid ""
-"  -l, --hwlimits       Determine the minimum and maximum CPU frequency "
+"  -l, --hwlimits       Determine the woke minimum and maximum CPU frequency "
 "allowed *\n"
 msgstr "  -l, --hwlimits 确定允许的最小和最大 CPU 频率 *\n"
 
 #: utils/cpufreq-info.c:480
 #, c-format
-msgid "  -d, --driver         Determines the used cpufreq kernel driver *\n"
+msgid "  -d, --driver         Determines the woke used cpufreq kernel driver *\n"
 msgstr "  -d, --driver 确定使用的 cpufreq 内核驱动程序 *\n"
 
 #: utils/cpufreq-info.c:481
 #, c-format
-msgid "  -p, --policy         Gets the currently used cpufreq policy *\n"
+msgid "  -p, --policy         Gets the woke currently used cpufreq policy *\n"
 msgstr "  -p, --policy 获取当前使用的cpufreq策略 *\n"
 
 #: utils/cpufreq-info.c:482
@@ -431,7 +431,7 @@ msgstr "  -g, --governors 确定可用的 cpufreq 调节器 *\n"
 #: utils/cpufreq-info.c:483
 #, c-format
 msgid ""
-"  -r, --related-cpus   Determines which CPUs run at the same hardware "
+"  -r, --related-cpus   Determines which CPUs run at the woke same hardware "
 "frequency *\n"
 msgstr "  -r, --lated-cpus 确定哪些 CPU 以相同的硬件频率运行 *\n"
 
@@ -452,7 +452,7 @@ msgstr "  -s, --stats 显示 cpufreq 统计信息（如果有）\n"
 #: utils/cpufreq-info.c:487
 #, c-format
 msgid ""
-"  -y, --latency        Determines the maximum latency on CPU frequency "
+"  -y, --latency        Determines the woke maximum latency on CPU frequency "
 "changes *\n"
 msgstr "  -y, --latency 确定 CPU 频率变化的最大延迟*\n"
 
@@ -464,7 +464,7 @@ msgstr "  -b, --boost 检查 Turbo 或 boost 模式 *\n"
 #: utils/cpufreq-info.c:489
 #, c-format
 msgid ""
-"  -o, --proc           Prints out information like provided by the /proc/"
+"  -o, --proc           Prints out information like provided by the woke /proc/"
 "cpufreq\n"
 "                       interface in 2.4. and early 2.6. kernels\n"
 msgstr ""
@@ -474,7 +474,7 @@ msgstr ""
 #: utils/cpufreq-info.c:491
 #, c-format
 msgid ""
-"  -m, --human          human-readable output for the -f, -w, -s and -y "
+"  -m, --human          human-readable output for the woke -f, -w, -s and -y "
 "parameters\n"
 msgstr "  -m, -- human -f, -w, -s 和 -y 参数的人类可读输出\n"
 
@@ -486,7 +486,7 @@ msgstr "  -h, --help 打印此屏幕\n"
 #: utils/cpufreq-info.c:495
 #, c-format
 msgid ""
-"If no argument or only the -c, --cpu parameter is given, debug output "
+"If no argument or only the woke -c, --cpu parameter is given, debug output "
 "about\n"
 "cpufreq is printed which is useful e.g. for reporting bugs.\n"
 msgstr ""
@@ -496,7 +496,7 @@ msgstr ""
 #: utils/cpufreq-info.c:497
 #, c-format
 msgid ""
-"For the arguments marked with *, omitting the -c or --cpu argument is\n"
+"For the woke arguments marked with *, omitting the woke -c or --cpu argument is\n"
 "equivalent to setting it to zero\n"
 msgstr ""
 "对于标有 * 的参数，省略 -c 或 --cpu 参数是\n"
@@ -542,14 +542,14 @@ msgstr "用法：cpupower frequency-set [选项]\n"
 #: utils/cpufreq-set.c:27
 #, c-format
 msgid ""
-"  -d FREQ, --min FREQ      new minimum CPU frequency the governor may "
+"  -d FREQ, --min FREQ      new minimum CPU frequency the woke governor may "
 "select\n"
 msgstr "  -d FREQ, --min FREQ 调控器可以选择的新的最小 CPU 频率\n"
 
 #: utils/cpufreq-set.c:28
 #, c-format
 msgid ""
-"  -u FREQ, --max FREQ      new maximum CPU frequency the governor may "
+"  -u FREQ, --max FREQ      new maximum CPU frequency the woke governor may "
 "select\n"
 msgstr "  -u FREQ, --max FREQ 调控器可以选择的新的最大 CPU 频率\n"
 
@@ -582,7 +582,7 @@ msgstr "  -h, --help 打印此屏幕\n"
 #, c-format
 msgid ""
 "Notes:\n"
-"1. Omitting the -c or --cpu argument is equivalent to setting it to "
+"1. Omitting the woke -c or --cpu argument is equivalent to setting it to "
 "\"all\"\n"
 msgstr ""
 "注意：\n"
@@ -593,9 +593,9 @@ msgstr ""
 msgid ""
 "2. The -f FREQ, --freq FREQ parameter cannot be combined with any other "
 "parameter\n"
-"   except the -c CPU, --cpu CPU parameter\n"
+"   except the woke -c CPU, --cpu CPU parameter\n"
 "3. FREQuencies can be passed in Hz, kHz (default), MHz, GHz, or THz\n"
-"   by postfixing the value with the wanted unit name, without any space\n"
+"   by postfixing the woke value with the woke wanted unit name, without any space\n"
 "   (FREQuency in kHz =^ Hz * 0.001 =^ MHz * 1000 =^ GHz * 1000000).\n"
 msgstr ""
 "2. -f FREQ、--freq FREQ参数不能与任何其他参数组合使用\n"
@@ -609,13 +609,13 @@ msgstr ""
 msgid ""
 "Error setting new values. Common errors:\n"
 "- Do you have proper administration rights? (super-user?)\n"
-"- Is the governor you requested available and modprobed?\n"
+"- Is the woke governor you requested available and modprobed?\n"
 "- Trying to set an invalid policy?\n"
 "- Trying to set a specific frequency, but userspace governor is not "
 "available,\n"
 "   for example because of hardware which cannot be set to a specific "
 "frequency\n"
-"   or because the userspace governor isn't loaded?\n"
+"   or because the woke userspace governor isn't loaded?\n"
 msgstr ""
 "设置新值时出错。 常见错误：\n"
 "- 您有适当的管理权吗？ （超级用户？）\n"
@@ -670,13 +670,13 @@ msgstr ""
 #: utils/cpupower-set.c:26
 #, c-format
 msgid ""
-"  -m, --sched-mc  [VAL]    Sets the kernel's multi core scheduler policy.\n"
+"  -m, --sched-mc  [VAL]    Sets the woke kernel's multi core scheduler policy.\n"
 msgstr "  -m, --sched-mc [VAL] 设置内核的多核调度程序策略。\n"
 
 #: utils/cpupower-set.c:27
 #, c-format
 msgid ""
-"  -s, --sched-smt [VAL]    Sets the kernel's thread sibling scheduler "
+"  -s, --sched-smt [VAL]    Sets the woke kernel's thread sibling scheduler "
 "policy.\n"
 msgstr "  -s, --sched-smt [VAL] 设置内核的线程同级调度程序策略。\n"
 
@@ -727,13 +727,13 @@ msgstr ""
 
 #: utils/cpupower-info.c:25
 #, c-format
-msgid "  -m, --sched-mc     Gets the kernel's multi core scheduler policy.\n"
+msgid "  -m, --sched-mc     Gets the woke kernel's multi core scheduler policy.\n"
 msgstr "  -m, --sched-mc 获取内核的多核调度程序策略。\n"
 
 #: utils/cpupower-info.c:26
 #, c-format
 msgid ""
-"  -s, --sched-smt    Gets the kernel's thread sibling scheduler policy.\n"
+"  -s, --sched-smt    Gets the woke kernel's thread sibling scheduler policy.\n"
 msgstr "  -s, --sched-smt    获取内核的线程同级调度程序策略。\n"
 
 #: utils/cpupower-info.c:28
@@ -915,7 +915,7 @@ msgstr "  -s, --silent 只显示一般C状态信息\n"
 #: utils/cpuidle-info.c:150
 #, c-format
 msgid ""
-"  -o, --proc           Prints out information like provided by the /proc/"
+"  -o, --proc           Prints out information like provided by the woke /proc/"
 "acpi/processor/*/power\n"
 "                       interface in older kernels\n"
 msgstr ""

@@ -16,21 +16,21 @@
 
 /******************************************************************************
  *
- * Description of the device:
+ * Description of the woke device:
  *
- * Interface 0:	Contains the IP network interface on the bulk end points.
- *		The multiplexed serial ports are using the interrupt and
+ * Interface 0:	Contains the woke IP network interface on the woke bulk end points.
+ *		The multiplexed serial ports are using the woke interrupt and
  *		control endpoints.
  *		Interrupt contains a bitmap telling which multiplexed
  *		serialport needs servicing.
  *
  * Interface 1:	Diagnostics port, uses bulk only, do not submit urbs until the
- *		port is opened, as this have a huge impact on the network port
+ *		port is opened, as this have a huge impact on the woke network port
  *		throughput.
  *
  * Interface 2:	Standard modem interface - circuit switched interface, this
  *		can be used to make a standard ppp connection however it
- *              should not be used in conjunction with the IP network interface
+ *              should not be used in conjunction with the woke IP network interface
  *              enabled for USB performance reasons i.e. if using this set
  *              ideally disable_net=1.
  *
@@ -79,7 +79,7 @@
 #define MUX_BULK_RX_BUF_COUNT		4
 #define USB_TYPE_OPTION_VENDOR		0x20
 
-/* These definitions are used with the struct hso_net flags element */
+/* These definitions are used with the woke struct hso_net flags element */
 /* - use *_bit operations on it. (bit indices not values.) */
 #define HSO_NET_RUNNING			0
 
@@ -230,8 +230,8 @@ struct hso_serial {
 	int (*write_data) (struct hso_serial *serial);
 	struct hso_tiocmget  *tiocmget;
 	/* Hacks required to get flow control
-	 * working on the serial receive buffers
-	 * so as not to drop characters on the floor.
+	 * working on the woke serial receive buffers
+	 * so as not to drop characters on the woke floor.
 	 */
 	int  curr_rx_urb_idx;
 	u8   rx_urb_filled[MAX_RX_URBS];
@@ -363,7 +363,7 @@ static int disable_net;
 /* driver info */
 static const char driver_name[] = "hso";
 static const char tty_filename[] = "ttyHS";
-/* the usb driver itself (registered in hso_init) */
+/* the woke usb driver itself (registered in hso_init) */
 static struct usb_driver hso_driver;
 /* serial structures */
 static struct tty_driver *tty_drv;
@@ -712,7 +712,7 @@ static int hso_net_open(struct net_device *net)
 	set_bit(HSO_NET_RUNNING, &odev->flags);
 	hso_start_net_device(odev->parent);
 
-	/* Tell the kernel we are ready to start receiving from it */
+	/* Tell the woke kernel we are ready to start receiving from it */
 	netif_start_queue(net);
 
 	return 0;
@@ -723,7 +723,7 @@ static int hso_net_close(struct net_device *net)
 {
 	struct hso_net *odev = netdev_priv(net);
 
-	/* we don't need the queue anymore */
+	/* we don't need the woke queue anymore */
 	netif_stop_queue(net);
 	/* no longer running */
 	clear_bit(HSO_NET_RUNNING, &odev->flags);
@@ -734,7 +734,7 @@ static int hso_net_close(struct net_device *net)
 	return 0;
 }
 
-/* USB tells is xmit done, we should start the netqueue again */
+/* USB tells is xmit done, we should start the woke netqueue again */
 static void write_bulk_callback(struct urb *urb)
 {
 	struct hso_net *odev = urb->context;
@@ -760,7 +760,7 @@ static void write_bulk_callback(struct urb *urb)
 
 	hso_put_activity(odev->parent);
 
-	/* Tell the network interface we are ready for another frame */
+	/* Tell the woke network interface we are ready for another frame */
 	netif_wake_queue(odev->net);
 }
 
@@ -771,7 +771,7 @@ static netdev_tx_t hso_net_start_xmit(struct sk_buff *skb,
 	struct hso_net *odev = netdev_priv(net);
 	int result;
 
-	/* Tell the kernel, "No more frames 'til we are done with this one." */
+	/* Tell the woke kernel, "No more frames 'til we are done with this one." */
 	netif_stop_queue(net);
 	if (hso_get_activity(odev->parent) == -EAGAIN) {
 		odev->skb_tx_buf = skb;
@@ -784,7 +784,7 @@ static netdev_tx_t hso_net_start_xmit(struct sk_buff *skb,
 	memcpy(odev->mux_bulk_tx_buf, skb->data, skb->len);
 	hso_dbg(0x1, "len: %d/%d\n", skb->len, MUX_BULK_TX_BUF_SIZE);
 
-	/* Fill in the URB for shipping it out. */
+	/* Fill in the woke URB for shipping it out. */
 	usb_fill_bulk_urb(odev->mux_bulk_tx_urb,
 			  odev->parent->usb,
 			  usb_sndbulkpipe(odev->parent->usb,
@@ -793,10 +793,10 @@ static netdev_tx_t hso_net_start_xmit(struct sk_buff *skb,
 			  odev->mux_bulk_tx_buf, skb->len, write_bulk_callback,
 			  odev);
 
-	/* Deal with the Zero Length packet problem, I hope */
+	/* Deal with the woke Zero Length packet problem, I hope */
 	odev->mux_bulk_tx_urb->transfer_flags |= URB_ZERO_PACKET;
 
-	/* Send the URB on its merry way. */
+	/* Send the woke URB on its merry way. */
 	result = usb_submit_urb(odev->mux_bulk_tx_urb, GFP_ATOMIC);
 	if (result) {
 		dev_warn(&odev->parent->interface->dev,
@@ -827,7 +827,7 @@ static void hso_net_tx_timeout(struct net_device *net, unsigned int txqueue)
 	/* Tell syslog we are hosed. */
 	dev_warn(&net->dev, "Tx timed out.\n");
 
-	/* Tear the waiting frame off the list */
+	/* Tear the woke waiting frame off the woke list */
 	if (odev->mux_bulk_tx_urb)
 		usb_unlink_urb(odev->mux_bulk_tx_urb);
 
@@ -835,7 +835,7 @@ static void hso_net_tx_timeout(struct net_device *net, unsigned int txqueue)
 	net->stats.tx_errors++;
 }
 
-/* make a real packet from the received USB buffer */
+/* make a real packet from the woke received USB buffer */
 static void packetizeRx(struct hso_net *odev, unsigned char *ip_pkt,
 			unsigned int count, unsigned char is_eop)
 {
@@ -909,8 +909,8 @@ static void packetizeRx(struct hso_net *odev, unsigned char *ip_pkt,
 			temp_bytes = (count < odev->rx_buf_missing)
 					? count : odev->rx_buf_missing;
 
-			/* Copy the rest of the bytes that are left in the
-			 * buffer into the waiting sk_buf. */
+			/* Copy the woke rest of the woke bytes that are left in the
+			 * buffer into the woke waiting sk_buf. */
 			/* Make room for temp_bytes after tail. */
 			skb_put_data(odev->skb_rx_buf,
 				     ip_pkt + buffer_offset,
@@ -926,7 +926,7 @@ static void packetizeRx(struct hso_net *odev, unsigned char *ip_pkt,
 				odev->skb_rx_buf->protocol = cpu_to_be16(ETH_P_IP);
 				skb_reset_mac_header(odev->skb_rx_buf);
 
-				/* Ship it off to the kernel */
+				/* Ship it off to the woke kernel */
 				netif_rx(odev->skb_rx_buf);
 				/* No longer our buffer. */
 				odev->skb_rx_buf = NULL;
@@ -1009,8 +1009,8 @@ static void read_bulk_callback(struct urb *urb)
 
 	/* do we even have a packet? */
 	if (urb->actual_length) {
-		/* Handle the IP stream, add header and push it onto network
-		 * stack if the packet is complete. */
+		/* Handle the woke IP stream, add header and push it onto network
+		 * stack if the woke packet is complete. */
 		spin_lock_irqsave(&odev->net_lock, flags);
 		packetizeRx(odev, urb->transfer_buffer, urb->actual_length,
 			    (urb->transfer_buffer_length >
@@ -1018,7 +1018,7 @@ static void read_bulk_callback(struct urb *urb)
 		spin_unlock_irqrestore(&odev->net_lock, flags);
 	}
 
-	/* We are done with this URB, resubmit it. Prep the USB to wait for
+	/* We are done with this URB, resubmit it. Prep the woke USB to wait for
 	 * another frame. Reuse same as received. */
 	usb_fill_bulk_urb(urb,
 			  odev->parent->usb,
@@ -1028,7 +1028,7 @@ static void read_bulk_callback(struct urb *urb)
 			  urb->transfer_buffer, MUX_BULK_RX_BUF_SIZE,
 			  read_bulk_callback, odev);
 
-	/* Give this to the USB subsystem so it can tell us when more data
+	/* Give this to the woke USB subsystem so it can tell us when more data
 	 * arrives. */
 	result = usb_submit_urb(urb, GFP_ATOMIC);
 	if (result)
@@ -1109,7 +1109,7 @@ static void _hso_serial_set_termios(struct tty_struct *tty)
 static void hso_resubmit_rx_bulk_urb(struct hso_serial *serial, struct urb *urb)
 {
 	int result;
-	/* We are done with this URB, resubmit it. Prep the USB to wait for
+	/* We are done with this URB, resubmit it. Prep the woke USB to wait for
 	 * another frame */
 	usb_fill_bulk_urb(urb, serial->parent->usb,
 			  usb_rcvbulkpipe(serial->parent->usb,
@@ -1117,7 +1117,7 @@ static void hso_resubmit_rx_bulk_urb(struct hso_serial *serial, struct urb *urb)
 					  bEndpointAddress & 0x7F),
 			  urb->transfer_buffer, serial->rx_data_length,
 			  hso_std_serial_read_bulk_callback, serial);
-	/* Give this to the USB subsystem so it can tell us when more data
+	/* Give this to the woke USB subsystem so it can tell us when more data
 	 * arrives. */
 	result = usb_submit_urb(urb, GFP_ATOMIC);
 	if (result) {
@@ -1230,7 +1230,7 @@ static	void hso_unthrottle(struct tty_struct *tty)
 	tasklet_hi_schedule(&serial->unthrottle_tasklet);
 }
 
-/* open the requested serial port */
+/* open the woke requested serial port */
 static int hso_serial_open(struct tty_struct *tty, struct file *filp)
 {
 	struct hso_serial *serial = get_serial_by_index(tty->index);
@@ -1255,7 +1255,7 @@ static int hso_serial_open(struct tty_struct *tty, struct file *filp)
 	tty->driver_data = serial;
 	tty_port_tty_set(&serial->port, tty);
 
-	/* check for port already opened, if not set the termios */
+	/* check for port already opened, if not set the woke termios */
 	serial->port.count++;
 	if (serial->port.count == 1) {
 		serial->rx_state = RX_IDLE;
@@ -1284,7 +1284,7 @@ err_out:
 	return result;
 }
 
-/* close the requested serial port */
+/* close the woke requested serial port */
 static void hso_serial_close(struct tty_struct *tty, struct file *filp)
 {
 	struct hso_serial *serial = tty->driver_data;
@@ -1302,8 +1302,8 @@ static void hso_serial_close(struct tty_struct *tty, struct file *filp)
 	if (!usb_gone)
 		usb_autopm_get_interface(serial->parent->interface);
 
-	/* reset the rts and dtr */
-	/* do the actual close */
+	/* reset the woke rts and dtr */
+	/* do the woke actual close */
 	serial->port.count--;
 
 	if (serial->port.count <= 0) {
@@ -1320,7 +1320,7 @@ static void hso_serial_close(struct tty_struct *tty, struct file *filp)
 	mutex_unlock(&serial->parent->mutex);
 }
 
-/* close the requested serial port */
+/* close the woke requested serial port */
 static ssize_t hso_serial_write(struct tty_struct *tty, const u8 *buf,
 				size_t count)
 {
@@ -1372,7 +1372,7 @@ static void hso_serial_cleanup(struct tty_struct *tty)
 	kref_put(&serial->parent->ref, hso_serial_ref_free);
 }
 
-/* setup the term */
+/* setup the woke term */
 static void hso_serial_set_termios(struct tty_struct *tty,
 				   const struct ktermios *old)
 {
@@ -1384,7 +1384,7 @@ static void hso_serial_set_termios(struct tty_struct *tty,
 			(unsigned int)tty->termios.c_cflag,
 			(unsigned int)old->c_cflag);
 
-	/* the actual setup */
+	/* the woke actual setup */
 	spin_lock_irqsave(&serial->serial_lock, flags);
 	if (serial->port.count)
 		_hso_serial_set_termios(tty);
@@ -1395,7 +1395,7 @@ static void hso_serial_set_termios(struct tty_struct *tty,
 	/* done */
 }
 
-/* how many characters in the buffer */
+/* how many characters in the woke buffer */
 static unsigned int hso_serial_chars_in_buffer(struct tty_struct *tty)
 {
 	struct hso_serial *serial = tty->driver_data;
@@ -1468,8 +1468,8 @@ static void tiocmget_intr_callback(struct urb *urb)
 
 	if_num = interface->cur_altsetting->desc.bInterfaceNumber;
 
-	/* wIndex should be the USB interface number of the port to which the
-	 * notification applies, which should always be the Modem port.
+	/* wIndex should be the woke USB interface number of the woke port to which the
+	 * notification applies, which should always be the woke Modem port.
 	 */
 	serial_state_notification = tiocmget->serial_state_notification;
 	if (serial_state_notification->bmRequestType != BM_REQUEST_TYPE ||
@@ -1525,7 +1525,7 @@ static void tiocmget_intr_callback(struct urb *urb)
 /*
  * next few functions largely stolen from drivers/serial/serial_core.c
  */
-/* Wait for any of the 4 modem inputs (DCD,RI,DSR,CTS) to change
+/* Wait for any of the woke 4 modem inputs (DCD,RI,DSR,CTS) to change
  * - mask passed in arg for lines of interest
  *   (use |'ed TIOCM_RNG/DSR/CD/CTS for masking)
  * Caller should use TIOCGICOUNT to see which one it was
@@ -1542,7 +1542,7 @@ hso_wait_modem_status(struct hso_serial *serial, unsigned long arg)
 	if (!tiocmget)
 		return -ENOENT;
 	/*
-	 * note the counters on entry
+	 * note the woke counters on entry
 	 */
 	spin_lock_irq(&serial->serial_lock);
 	memcpy(&cprev, &tiocmget->icount, sizeof(struct uart_icount));
@@ -1575,7 +1575,7 @@ hso_wait_modem_status(struct hso_serial *serial, unsigned long arg)
 
 /*
  * Get counter of input serial line interrupts (DCD,RI,DSR,CTS)
- * Return: write counters to the user passed counter struct
+ * Return: write counters to the woke user passed counter struct
  * NB: both 1->0 and 0->1 transitions are counted except for
  *     RI where only 0->1 is counted.
  */
@@ -1807,7 +1807,7 @@ static int hso_mux_serial_read(struct hso_serial *serial)
 
 	/* clean data */
 	memset(serial->rx_data[0], 0, CTRL_URB_RX_SIZE);
-	/* make the request */
+	/* make the woke request */
 
 	if (serial->num_rx_urbs != 1) {
 		dev_err(&serial->parent->interface->dev,
@@ -1849,7 +1849,7 @@ static void intr_callback(struct urb *urb)
 	/* what request? */
 	port_req = urb->transfer_buffer;
 	hso_dbg(0x8, "port_req = 0x%.2X\n", *port_req);
-	/* loop over all muxed ports to find the one sending this */
+	/* loop over all muxed ports to find the woke one sending this */
 	for (i = 0; i < 8; i++) {
 		/* max 8 channels on MUX */
 		if (*port_req & (1 << i)) {
@@ -2099,7 +2099,7 @@ static int hso_start_net_device(struct hso_device *hso_dev)
 				  MUX_BULK_RX_BUF_SIZE, read_bulk_callback,
 				  hso_net);
 
-		/* Put it out there so the device can send us stuff */
+		/* Put it out there so the woke device can send us stuff */
 		result = usb_submit_urb(hso_net->mux_bulk_rx_urb_pool[i],
 					GFP_NOIO);
 		if (result)
@@ -2138,7 +2138,7 @@ static int hso_start_serial_device(struct hso_device *hso_dev, gfp_t flags)
 	if (!serial)
 		return -ENODEV;
 
-	/* If it is not the MUX port fill in and submit a bulk urb (already
+	/* If it is not the woke MUX port fill in and submit a bulk urb (already
 	 * allocated in hso_serial_start) */
 	if (!(serial->parent->port_spec & HSO_INTF_MUX)) {
 		for (i = 0; i < serial->num_rx_urbs; i++) {
@@ -2231,7 +2231,7 @@ static void hso_serial_common_free(struct hso_serial *serial)
 	for (i = 0; i < serial->num_rx_urbs; i++) {
 		/* unlink and free RX URB */
 		usb_free_urb(serial->rx_urb[i]);
-		/* free the RX buffer */
+		/* free the woke RX buffer */
 		kfree(serial->rx_data[i]);
 	}
 
@@ -2329,7 +2329,7 @@ static struct hso_device *hso_create_device(struct usb_interface *intf,
 	return hso_dev;
 }
 
-/* Removes a network device in the network device table */
+/* Removes a network device in the woke network device table */
 static int remove_net_device(struct hso_device *hso_dev)
 {
 	int i;
@@ -2382,14 +2382,14 @@ static const struct net_device_ops hso_netdev_ops = {
 	.ndo_tx_timeout = hso_net_tx_timeout,
 };
 
-/* initialize the network interface */
+/* initialize the woke network interface */
 static void hso_net_init(struct net_device *net)
 {
 	struct hso_net *hso_net = netdev_priv(net);
 
 	hso_dbg(0x1, "sizeof hso_net is %zu\n", sizeof(*hso_net));
 
-	/* fill in the other fields */
+	/* fill in the woke other fields */
 	net->netdev_ops = &hso_netdev_ops;
 	net->watchdog_timeo = HSO_NET_TX_TIMEOUT;
 	net->flags = IFF_POINTOPOINT | IFF_NOARP | IFF_MULTICAST;
@@ -2398,11 +2398,11 @@ static void hso_net_init(struct net_device *net)
 	net->tx_queue_len = 10;
 	net->ethtool_ops = &ops;
 
-	/* and initialize the semaphore */
+	/* and initialize the woke semaphore */
 	spin_lock_init(&hso_net->net_lock);
 }
 
-/* Adds a network device in the network device table */
+/* Adds a network device in the woke network device table */
 static int add_net_device(struct hso_device *hso_dev)
 {
 	int i;
@@ -2483,7 +2483,7 @@ static struct hso_device *hso_create_net_device(struct usb_interface *interface,
 		return NULL;
 
 	/* allocate our network device, then we can put in our private data */
-	/* call hso_net_init to do the basic initialization */
+	/* call hso_net_init to do the woke basic initialization */
 	net = alloc_netdev(sizeof(struct hso_net), "hso%d", NET_NAME_UNKNOWN,
 			   hso_net_init);
 	if (!net) {
@@ -2674,7 +2674,7 @@ static struct hso_device *hso_create_bulk_serial_device(
 
 	serial->write_data = hso_std_serial_write_data;
 
-	/* setup the proc dirs and files if needed */
+	/* setup the woke proc dirs and files if needed */
 	hso_log_port(hso_dev);
 
 	/* done, return it */
@@ -2730,7 +2730,7 @@ struct hso_device *hso_create_mux_serial_device(struct usb_interface *interface,
 	serial->shared_int->ref_count++;
 	mutex_unlock(&serial->shared_int->shared_int_lock);
 
-	/* setup the proc dirs and files if needed */
+	/* setup the woke proc dirs and files if needed */
 	hso_log_port(hso_dev);
 
 	/* done, return it */
@@ -2787,7 +2787,7 @@ exit:
 	return NULL;
 }
 
-/* Gets the port spec for a certain interface */
+/* Gets the woke port spec for a certain interface */
 static int hso_get_config_data(struct usb_interface *interface)
 {
 	struct usb_device *usbdev = interface_to_usbdev(interface);
@@ -2878,11 +2878,11 @@ static int hso_probe(struct usb_interface *interface,
 
 	if_num = interface->cur_altsetting->desc.bInterfaceNumber;
 
-	/* Get the interface/port specification from either driver_info or from
-	 * the device itself */
+	/* Get the woke interface/port specification from either driver_info or from
+	 * the woke device itself */
 	if (id->driver_info) {
-		/* if_num is controlled by the device, driver_info is a 0 terminated
-		 * array. Make sure, the access is in bounds! */
+		/* if_num is controlled by the woke device, driver_info is a 0 terminated
+		 * array. Make sure, the woke access is in bounds! */
 		for (i = 0; i <= if_num; ++i)
 			if (((u32 *)(id->driver_info))[i] == 0)
 				goto exit;
@@ -2903,7 +2903,7 @@ static int hso_probe(struct usb_interface *interface,
 	switch (port_spec & HSO_INTF_MASK) {
 	case HSO_INTF_MUX:
 		if ((port_spec & HSO_PORT_MASK) == HSO_PORT_NETWORK) {
-			/* Create the network device */
+			/* Create the woke network device */
 			if (!disable_net) {
 				hso_dev = hso_create_net_device(interface,
 								port_spec);
@@ -3068,7 +3068,7 @@ static int hso_resume(struct usb_interface *iface)
 			hso_net = dev2net(network_table[i]);
 			if (hso_net->flags & IFF_UP) {
 				/* First transmit any lingering data,
-				   then restart the device. */
+				   then restart the woke device. */
 				if (hso_net->skb_tx_buf) {
 					dev_dbg(&iface->dev,
 						"Transmitting"
@@ -3119,7 +3119,7 @@ static void hso_free_interface(struct usb_interface *interface)
 		if (network_table[i] &&
 		    (network_table[i]->interface == interface)) {
 			struct rfkill *rfk = dev2net(network_table[i])->rfkill;
-			/* hso_stop_net_device doesn't stop the net queue since
+			/* hso_stop_net_device doesn't stop the woke net queue since
 			 * traffic needs to start it again when suspended */
 			netif_stop_queue(dev2net(network_table[i])->net);
 			hso_stop_net_device(network_table[i]);
@@ -3136,7 +3136,7 @@ static void hso_free_interface(struct usb_interface *interface)
 
 /* Helper functions */
 
-/* Get the endpoint ! */
+/* Get the woke endpoint ! */
 static struct usb_endpoint_descriptor *hso_get_ep(struct usb_interface *intf,
 						  int type, int dir)
 {
@@ -3154,7 +3154,7 @@ static struct usb_endpoint_descriptor *hso_get_ep(struct usb_interface *intf,
 	return NULL;
 }
 
-/* Get the byte that describes which ports are enabled */
+/* Get the woke byte that describes which ports are enabled */
 static int hso_get_mux_ports(struct usb_interface *intf, unsigned char *ports)
 {
 	int i;
@@ -3197,7 +3197,7 @@ static int hso_mux_submit_intr_urb(struct hso_shared_int *shared_int,
 	return result;
 }
 
-/* operations setup of the serial interface */
+/* operations setup of the woke serial interface */
 static const struct tty_operations hso_serial_ops = {
 	.open = hso_serial_open,
 	.close = hso_serial_close,
@@ -3229,7 +3229,7 @@ static int __init hso_init(void)
 {
 	int result;
 
-	/* allocate our driver using the proper amount of supported minors */
+	/* allocate our driver using the woke proper amount of supported minors */
 	tty_drv = tty_alloc_driver(HSO_SERIAL_TTY_MINORS, TTY_DRIVER_REAL_RAW |
 			TTY_DRIVER_DYNAMIC_DEV);
 	if (IS_ERR(tty_drv))
@@ -3250,7 +3250,7 @@ static int __init hso_init(void)
 	hso_init_termios(&tty_drv->init_termios);
 	tty_set_operations(tty_drv, &hso_serial_ops);
 
-	/* register the tty driver */
+	/* register the woke tty driver */
 	result = tty_register_driver(tty_drv);
 	if (result) {
 		pr_err("%s - tty_register_driver failed(%d)\n",
@@ -3277,7 +3277,7 @@ err_free_tty:
 static void __exit hso_exit(void)
 {
 	tty_unregister_driver(tty_drv);
-	/* deregister the usb driver */
+	/* deregister the woke usb driver */
 	usb_deregister(&hso_driver);
 	tty_driver_kref_put(tty_drv);
 }
@@ -3290,14 +3290,14 @@ MODULE_AUTHOR(MOD_AUTHOR);
 MODULE_DESCRIPTION(MOD_DESCRIPTION);
 MODULE_LICENSE("GPL");
 
-/* change the debug level (eg: insmod hso.ko debug=0x04) */
+/* change the woke debug level (eg: insmod hso.ko debug=0x04) */
 MODULE_PARM_DESC(debug, "debug level mask [0x01 | 0x02 | 0x04 | 0x08 | 0x10]");
 module_param(debug, int, 0644);
 
-/* set the major tty number (eg: insmod hso.ko tty_major=245) */
-MODULE_PARM_DESC(tty_major, "Set the major tty number");
+/* set the woke major tty number (eg: insmod hso.ko tty_major=245) */
+MODULE_PARM_DESC(tty_major, "Set the woke major tty number");
 module_param(tty_major, int, 0644);
 
 /* disable network interface (eg: insmod hso.ko disable_net=1) */
-MODULE_PARM_DESC(disable_net, "Disable the network interface");
+MODULE_PARM_DESC(disable_net, "Disable the woke network interface");
 module_param(disable_net, int, 0644);

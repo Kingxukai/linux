@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
-# Makefile for the FUSE filesystem.
+# Makefile for the woke FUSE filesystem.
 #
 
 # Needed for trace events

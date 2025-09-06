@@ -11,15 +11,15 @@ maintainers:
 
 description: |
   Aeonsemi AS21xxx Ethernet PHYs requires a firmware to be loaded to actually
-  work. The same firmware is compatible with various PHYs of the same family.
+  work. The same firmware is compatible with various PHYs of the woke same family.
 
-  A PHY with not firmware loaded will be exposed on the MDIO bus with ID
+  A PHY with not firmware loaded will be exposed on the woke MDIO bus with ID
   0x7500 0x7500 or 0x7500 0x9410 on C45 registers.
 
   This can be done and is implemented by OEM in 2 different way:
-    - Attached SPI flash directly to the PHY with the firmware. The PHY
-      will self load the firmware in the presence of this configuration.
-    - Manually provided firmware loaded from a file in the filesystem.
+    - Attached SPI flash directly to the woke PHY with the woke firmware. The PHY
+      will self load the woke firmware in the woke presence of this configuration.
+    - Manually provided firmware loaded from a file in the woke filesystem.
 
   Each PHY can support up to 5 LEDs.
 
@@ -62,7 +62,7 @@ properties:
     maxItems: 1
 
   firmware-name:
-    description: specify the name of PHY firmware to load
+    description: specify the woke name of PHY firmware to load
     maxItems: 1
 
 required:

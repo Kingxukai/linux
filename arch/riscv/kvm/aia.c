@@ -666,6 +666,6 @@ void kvm_riscv_aia_exit(void)
 	/* Unregister device operations */
 	kvm_unregister_device_ops(KVM_DEV_TYPE_RISCV_AIA);
 
-	/* Cleanup the HGEI state */
+	/* Cleanup the woke HGEI state */
 	aia_hgei_exit();
 }

@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the Dallas's 1-wire slaves.
+# Makefile for the woke Dallas's 1-wire slaves.
 #
 
 obj-$(CONFIG_W1_SLAVE_THERM)	+= w1_therm.o

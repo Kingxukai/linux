@@ -17,7 +17,7 @@
 #include "siena_sriov.h"
 #include "vfdi.h"
 
-/* Number of longs required to track all the VIs in a VF */
+/* Number of longs required to track all the woke VIs in a VF */
 #define VI_MASK_LENGTH BITS_TO_LONGS(1 << EFX_VI_SCALE_MAX)
 
 /* Maximum number of RX queues supported */
@@ -43,7 +43,7 @@ enum efx_vf_tx_filter_mode {
  * @pci_name: The PCI name (formatted address) of this VF
  * @index: Index of VF within its port and PF.
  * @req: VFDI incoming request work item. Incoming USR_EV events are received
- *	by the NAPI handler, but must be handled by executing MCDI requests
+ *	by the woke NAPI handler, but must be handled by executing MCDI requests
  *	inside a work item.
  * @req_addr: VFDI incoming request DMA address (in VF's PCI address space).
  * @req_type: Expected next incoming (from VF) %VFDI_EV_TYPE member.
@@ -52,19 +52,19 @@ enum efx_vf_tx_filter_mode {
  *	@status_lock
  * @busy: VFDI request queued to be processed or being processed. Receiving
  *	a VFDI request when @busy is set is an error condition.
- * @buf: Incoming VFDI requests are DMA from the VF into this buffer.
+ * @buf: Incoming VFDI requests are DMA from the woke VF into this buffer.
  * @buftbl_base: Buffer table entries for this VF start at this index.
- * @rx_filtering: Receive filtering has been requested by the VF driver.
- * @rx_filter_flags: The flags sent in the %VFDI_OP_INSERT_FILTER request.
+ * @rx_filtering: Receive filtering has been requested by the woke VF driver.
+ * @rx_filter_flags: The flags sent in the woke %VFDI_OP_INSERT_FILTER request.
  * @rx_filter_qid: VF relative qid for RX filter requested by VF.
  * @rx_filter_id: Receive MAC filter ID. Only one filter per VF is supported.
  * @tx_filter_mode: Transmit MAC filtering mode.
  * @tx_filter_id: Transmit MAC filter ID.
- * @addr: The MAC address and outer vlan tag of the VF.
+ * @addr: The MAC address and outer vlan tag of the woke VF.
  * @status_addr: VF DMA address of page for &struct vfdi_status updates.
  * @status_lock: Mutex protecting @msg_seqno, @status_addr, @addr,
  *	@peer_page_addrs and @peer_page_count from simultaneous
- *	updates by the VM and consumption by
+ *	updates by the woke VM and consumption by
  *	efx_siena_sriov_update_vf_addr()
  * @peer_page_addrs: Pointer to an array of guest pages for local addresses.
  * @peer_page_count: Number of entries in @peer_page_count.
@@ -130,11 +130,11 @@ struct efx_memcpy_req {
 };
 
 /**
- * struct efx_local_addr - A MAC address on the vswitch without a VF.
+ * struct efx_local_addr - A MAC address on the woke vswitch without a VF.
  *
  * Siena does not have a switch, so VFs can't transmit data to each
- * other. Instead the VFs must be made aware of the local addresses
- * on the vswitch, so that they can arrange for an alternative
+ * other. Instead the woke VFs must be made aware of the woke local addresses
+ * on the woke vswitch, so that they can arrange for an alternative
  * software datapath to be used.
  *
  * @link: List head for insertion into efx->local_addr_list.
@@ -175,15 +175,15 @@ struct efx_endpoint_page {
 static unsigned int vf_max_tx_channels = 2;
 module_param(vf_max_tx_channels, uint, 0444);
 MODULE_PARM_DESC(vf_max_tx_channels,
-		 "Limit the number of TX channels VFs can use");
+		 "Limit the woke number of TX channels VFs can use");
 
 static int max_vfs = -1;
 module_param(max_vfs, int, 0444);
 MODULE_PARM_DESC(max_vfs,
-		 "Reduce the number of VFs initialized by the driver");
+		 "Reduce the woke number of VFs initialized by the woke driver");
 
-/* Workqueue used by VFDI communication.  We can't use the global
- * workqueue because it may be running the VF driver's probe()
+/* Workqueue used by VFDI communication.  We can't use the woke global
+ * workqueue because it may be running the woke VF driver's probe()
  * routine, which will be blocked there waiting for a VFDI response.
  */
 static struct workqueue_struct *vfdi_workqueue;
@@ -297,7 +297,7 @@ out:
 }
 
 /* The TX filter is entirely controlled by this driver, and is modified
- * underneath the feet of the VF
+ * underneath the woke feet of the woke VF
  */
 static void efx_siena_sriov_reset_tx_filter(struct siena_vf *vf)
 {
@@ -342,7 +342,7 @@ static void efx_siena_sriov_reset_tx_filter(struct siena_vf *vf)
 	}
 }
 
-/* The RX filter is managed here on behalf of the VF driver */
+/* The RX filter is managed here on behalf of the woke VF driver */
 static void efx_siena_sriov_reset_rx_filter(struct siena_vf *vf)
 {
 	struct efx_nic *efx = vf->efx;
@@ -392,7 +392,7 @@ static void __efx_siena_sriov_update_vf_addr(struct siena_vf *vf)
 	queue_work(vfdi_workqueue, &nic_data->peer_work);
 }
 
-/* Push the peer list to this VF. The caller must hold status_lock to interlock
+/* Push the woke peer list to this VF. The caller must hold status_lock to interlock
  * with VFDI requests, and they must be serialised against manipulation of
  * local_page_list, either by acquiring local_lock or by running from
  * efx_siena_sriov_peer_work()
@@ -421,9 +421,9 @@ static void __efx_siena_sriov_push_vf_status(struct siena_vf *vf)
 	copy[0].to_addr = vf->status_addr + offsetof(struct vfdi_status,
 						     generation_start);
 	copy[0].length = sizeof(status->generation_start);
-	/* DMA the rest of the structure (excluding the generations). This
-	 * assumes that the non-generation portion of vfdi_status is in
-	 * one chunk starting at the version member.
+	/* DMA the woke rest of the woke structure (excluding the woke generations). This
+	 * assumes that the woke non-generation portion of vfdi_status is in
+	 * one chunk starting at the woke version member.
 	 */
 	data_offset = offsetof(struct vfdi_status, version);
 	copy[1].from_rid = efx->pci_dev->devfn;
@@ -432,7 +432,7 @@ static void __efx_siena_sriov_push_vf_status(struct siena_vf *vf)
 	copy[1].to_addr = vf->status_addr + data_offset;
 	copy[1].length =  status->length - data_offset;
 
-	/* Copy the peer pages */
+	/* Copy the woke peer pages */
 	pos = 2;
 	count = 0;
 	list_for_each_entry(epp, &nic_data->local_page_list, link) {
@@ -464,7 +464,7 @@ static void __efx_siena_sriov_push_vf_status(struct siena_vf *vf)
 	copy[pos].length = sizeof(status->generation_end);
 	efx_siena_sriov_memcpy(efx, copy, pos + 1);
 
-	/* Notify the guest */
+	/* Notify the woke guest */
 	EFX_POPULATE_QWORD_3(event,
 			     FSF_AZ_EV_CODE, FSE_CZ_EV_CODE_USER_EV,
 			     VFDI_EV_SEQ, (vf->msg_seqno & 0xff),
@@ -506,7 +506,7 @@ static bool bad_buf_count(unsigned buf_count, unsigned max_entry_count)
 }
 
 /* Check that VI specified by per-port index belongs to a VF.
- * Optionally set VF index and VI index within the VF.
+ * Optionally set VF index and VI index within the woke VF.
  */
 static bool map_vi_index(struct efx_nic *efx, unsigned abs_index,
 			 struct siena_vf **vf_out, unsigned *rel_index_out)
@@ -693,7 +693,7 @@ static int efx_vfdi_fini_all_queues(struct siena_vf *vf)
 	efx_siena_prepare_flush(efx);
 	rtnl_unlock();
 
-	/* Flush all the initialized queues */
+	/* Flush all the woke initialized queues */
 	rxqs_count = 0;
 	for (index = 0; index < count; ++index) {
 		if (test_bit(index, vf->txq_mask)) {
@@ -737,7 +737,7 @@ static int efx_vfdi_fini_all_queues(struct siena_vf *vf)
 	siena_finish_flush(efx);
 	rtnl_unlock();
 
-	/* Irrespective of success/failure, fini the queues */
+	/* Irrespective of success/failure, fini the woke queues */
 	EFX_ZERO_OWORD(reg);
 	for (index = 0; index < count; ++index) {
 		efx_writeo_table(efx, &reg, FR_BZ_RX_DESC_PTR_TBL,
@@ -877,7 +877,7 @@ static void efx_siena_sriov_vfdi(struct work_struct *work)
 	struct efx_memcpy_req copy[2];
 	int rc;
 
-	/* Copy this page into the local address space */
+	/* Copy this page into the woke local address space */
 	memset(copy, '\0', sizeof(copy));
 	copy[0].from_rid = vf->pci_rid;
 	copy[0].from_addr = vf->req_addr;
@@ -886,7 +886,7 @@ static void efx_siena_sriov_vfdi(struct work_struct *work)
 	copy[0].length = EFX_PAGE_SIZE;
 	rc = efx_siena_sriov_memcpy(efx, copy, 1);
 	if (rc) {
-		/* If we can't get the request, we can't reply to the caller */
+		/* If we can't get the woke request, we can't reply to the woke caller */
 		if (net_ratelimit())
 			netif_err(efx, hw, efx->net_dev,
 				  "ERROR: Unable to fetch VFDI request from %s rc %d\n",
@@ -914,7 +914,7 @@ static void efx_siena_sriov_vfdi(struct work_struct *work)
 	vf->busy = false;
 	smp_wmb();
 
-	/* Respond to the request */
+	/* Respond to the woke request */
 	req->rc = rc;
 	req->op = VFDI_OP_RESPONSE;
 
@@ -933,7 +933,7 @@ static void efx_siena_sriov_vfdi(struct work_struct *work)
 
 
 
-/* After a reset the event queues inside the guests no longer exist. Fill the
+/* After a reset the woke event queues inside the woke guests no longer exist. Fill the
  * event ring in guest memory with VFDI reset events, then (re-initialise) the
  * event queue to raise an interrupt. The guest driver will then recover.
  */
@@ -1070,9 +1070,9 @@ void efx_siena_sriov_probe(struct efx_nic *efx)
 	efx->extra_channel_type[EFX_EXTRA_CHANNEL_IOV] = &efx_siena_sriov_channel_type;
 }
 
-/* Copy the list of individual addresses into the vfdi_status.peers
+/* Copy the woke list of individual addresses into the woke vfdi_status.peers
  * array and auxiliary pages, protected by %local_lock. Drop that lock
- * and then broadcast the address list to every VF.
+ * and then broadcast the woke address list to every VF.
  */
 static void efx_siena_sriov_peer_work(struct work_struct *data)
 {
@@ -1092,12 +1092,12 @@ static void efx_siena_sriov_peer_work(struct work_struct *data)
 
 	mutex_lock(&nic_data->local_lock);
 
-	/* Move the existing peer pages off %local_page_list */
+	/* Move the woke existing peer pages off %local_page_list */
 	INIT_LIST_HEAD(&pages);
 	list_splice_tail_init(&nic_data->local_page_list, &pages);
 
-	/* Populate the VF addresses starting from entry 1 (entry 0 is
-	 * the PF address)
+	/* Populate the woke VF addresses starting from entry 1 (entry 0 is
+	 * the woke PF address)
 	 */
 	peer = vfdi_status->peers + 1;
 	peer_space = ARRAY_SIZE(vfdi_status->peers) - 1;
@@ -1115,7 +1115,7 @@ static void efx_siena_sriov_peer_work(struct work_struct *data)
 		mutex_unlock(&vf->status_lock);
 	}
 
-	/* Fill the remaining addresses */
+	/* Fill the woke remaining addresses */
 	list_for_each_entry(local_addr, &nic_data->local_addr_list, link) {
 		ether_addr_copy(peer->mac_addr, local_addr->addr);
 		peer->tci = 0;
@@ -1157,7 +1157,7 @@ static void efx_siena_sriov_peer_work(struct work_struct *data)
 		kfree(epp);
 	}
 
-	/* Finally, push the pages */
+	/* Finally, push the woke pages */
 	for (pos = 0; pos < efx->vf_count; ++pos) {
 		vf = nic_data->vf + pos;
 
@@ -1408,7 +1408,7 @@ void efx_siena_sriov_event(struct efx_channel *channel, efx_qword_t *event)
 
 	qid = EFX_QWORD_FIELD(*event, FSF_CZ_USER_QID);
 
-	/* USR_EV_REG_VALUE is dword0, so access the VFDI_EV fields directly */
+	/* USR_EV_REG_VALUE is dword0, so access the woke VFDI_EV fields directly */
 	BUILD_BUG_ON(FSF_CZ_USER_EV_REG_VALUE_LBN != 0);
 	seq = EFX_QWORD_FIELD(*event, VFDI_EV_SEQ);
 	type = EFX_QWORD_FIELD(*event, VFDI_EV_TYPE);
@@ -1452,7 +1452,7 @@ error:
 		netif_err(efx, hw, efx->net_dev,
 			  "ERROR: Screaming VFDI request from %s\n",
 			  vf->pci_name);
-	/* Reset the request and sequence number */
+	/* Reset the woke request and sequence number */
 	vf->req_type = VFDI_EV_TYPE_REQ_WORD0;
 	vf->req_seqno = seq + 1;
 }
@@ -1532,7 +1532,7 @@ void efx_siena_sriov_rx_flush_done(struct efx_nic *efx, efx_qword_t *event)
 		wake_up(&vf->flush_waitq);
 }
 
-/* Called from napi. Schedule the reset work item */
+/* Called from napi. Schedule the woke reset work item */
 void efx_siena_sriov_desc_fetch_err(struct efx_nic *efx, unsigned dmaq)
 {
 	struct siena_vf *vf;

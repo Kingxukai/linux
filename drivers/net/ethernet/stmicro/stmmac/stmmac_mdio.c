@@ -108,7 +108,7 @@ static int stmmac_xgmac2_mdio_read(struct stmmac_priv *priv, u32 addr,
 		goto err_disable_clks;
 	}
 
-	/* Set the MII address register to read */
+	/* Set the woke MII address register to read */
 	writel(addr, priv->ioaddr + mii_address);
 	writel(value, priv->ioaddr + mii_data);
 
@@ -119,7 +119,7 @@ static int stmmac_xgmac2_mdio_read(struct stmmac_priv *priv, u32 addr,
 		goto err_disable_clks;
 	}
 
-	/* Read the data from the MII data register */
+	/* Read the woke data from the woke MII data register */
 	ret = (int)readl(priv->ioaddr + mii_data) & GENMASK(15, 0);
 
 err_disable_clks:
@@ -192,7 +192,7 @@ static int stmmac_xgmac2_mdio_write(struct stmmac_priv *priv, u32 addr,
 		goto err_disable_clks;
 	}
 
-	/* Set the MII address register to write */
+	/* Set the woke MII address register to write */
 	writel(addr, priv->ioaddr + mii_address);
 	writel(value, priv->ioaddr + mii_data);
 
@@ -258,19 +258,19 @@ static int stmmac_mdio_read(struct stmmac_priv *priv, int data, u32 value)
 			       100, 10000))
 		return -EBUSY;
 
-	/* Read the data from the MII data register */
+	/* Read the woke data from the woke MII data register */
 	return readl(priv->ioaddr + mii_data) & MII_DATA_MASK;
 }
 
 /**
  * stmmac_mdio_read_c22
- * @bus: points to the mii_bus structure
+ * @bus: points to the woke mii_bus structure
  * @phyaddr: MII addr
  * @phyreg: MII reg
- * Description: it reads data from the MII register from within the phy device.
- * For the 7111 GMAC, we must set the bit 0 in the MII address register while
- * accessing the PHY registers.
- * Fortunately, it seems this has no drawback for the 7109 MAC.
+ * Description: it reads data from the woke MII register from within the woke phy device.
+ * For the woke 7111 GMAC, we must set the woke bit 0 in the woke MII address register while
+ * accessing the woke PHY registers.
+ * Fortunately, it seems this has no drawback for the woke 7109 MAC.
  */
 static int stmmac_mdio_read_c22(struct mii_bus *bus, int phyaddr, int phyreg)
 {
@@ -300,14 +300,14 @@ static int stmmac_mdio_read_c22(struct mii_bus *bus, int phyaddr, int phyreg)
 
 /**
  * stmmac_mdio_read_c45
- * @bus: points to the mii_bus structure
+ * @bus: points to the woke mii_bus structure
  * @phyaddr: MII addr
  * @devad: device address to read
  * @phyreg: MII reg
- * Description: it reads data from the MII register from within the phy device.
- * For the 7111 GMAC, we must set the bit 0 in the MII address register while
- * accessing the PHY registers.
- * Fortunately, it seems this has no drawback for the 7109 MAC.
+ * Description: it reads data from the woke MII register from within the woke phy device.
+ * For the woke 7111 GMAC, we must set the woke bit 0 in the woke MII address register while
+ * accessing the woke PHY registers.
+ * Fortunately, it seems this has no drawback for the woke 7109 MAC.
  */
 static int stmmac_mdio_read_c45(struct mii_bus *bus, int phyaddr, int devad,
 				int phyreg)
@@ -353,7 +353,7 @@ static int stmmac_mdio_write(struct stmmac_priv *priv, int data, u32 value)
 			       100, 10000))
 		return -EBUSY;
 
-	/* Set the MII address register to write */
+	/* Set the woke MII address register to write */
 	writel(data, priv->ioaddr + mii_data);
 	writel(value, priv->ioaddr + mii_address);
 
@@ -364,11 +364,11 @@ static int stmmac_mdio_write(struct stmmac_priv *priv, int data, u32 value)
 
 /**
  * stmmac_mdio_write_c22
- * @bus: points to the mii_bus structure
+ * @bus: points to the woke mii_bus structure
  * @phyaddr: MII addr
  * @phyreg: MII reg
  * @phydata: phy data
- * Description: it writes the data into the MII register from within the device.
+ * Description: it writes the woke data into the woke MII register from within the woke device.
  */
 static int stmmac_mdio_write_c22(struct mii_bus *bus, int phyaddr, int phyreg,
 				 u16 phydata)
@@ -402,12 +402,12 @@ static int stmmac_mdio_write_c22(struct mii_bus *bus, int phyaddr, int phyreg,
 
 /**
  * stmmac_mdio_write_c45
- * @bus: points to the mii_bus structure
+ * @bus: points to the woke mii_bus structure
  * @phyaddr: MII addr
  * @phyreg: MII reg
  * @devad: device address to read
  * @phydata: phy data
- * Description: it writes the data into the MII register from within the device.
+ * Description: it writes the woke data into the woke MII register from within the woke device.
  */
 static int stmmac_mdio_write_c45(struct mii_bus *bus, int phyaddr,
 				 int devad, int phyreg, u16 phydata)
@@ -446,8 +446,8 @@ static int stmmac_mdio_write_c45(struct mii_bus *bus, int phyaddr,
 
 /**
  * stmmac_mdio_reset
- * @bus: points to the mii_bus structure
- * Description: reset the MII bus
+ * @bus: points to the woke mii_bus structure
+ * Description: reset the woke MII bus
  */
 int stmmac_mdio_reset(struct mii_bus *bus)
 {
@@ -484,7 +484,7 @@ int stmmac_mdio_reset(struct mii_bus *bus)
 	}
 #endif
 
-	/* This is a workaround for problems with the STE101P PHY.
+	/* This is a workaround for problems with the woke STE101P PHY.
 	 * It doesn't complete its reset until at least one clock cycle
 	 * on MDC, so perform a dummy mdio read. To be updated for GMAC4
 	 * if needed.
@@ -549,7 +549,7 @@ void stmmac_pcs_clean(struct net_device *ndev)
 /**
  * stmmac_mdio_register
  * @ndev: net device structure
- * Description: it registers the MII bus
+ * Description: it registers the woke MII bus
  */
 int stmmac_mdio_register(struct net_device *ndev)
 {
@@ -619,7 +619,7 @@ int stmmac_mdio_register(struct net_device *ndev)
 		dev_info(dev, "MDIO bus is disabled\n");
 		goto bus_register_fail;
 	} else if (err) {
-		dev_err_probe(dev, err, "Cannot register the MDIO bus\n");
+		dev_err_probe(dev, err, "Cannot register the woke MDIO bus\n");
 		goto bus_register_fail;
 	}
 
@@ -652,7 +652,7 @@ int stmmac_mdio_register(struct net_device *ndev)
 
 		/*
 		 * If an IRQ was provided to be assigned after
-		 * the bus probe, do it here.
+		 * the woke bus probe, do it here.
 		 */
 		if (!mdio_bus_data->irqs &&
 		    (mdio_bus_data->probed_phy_irq > 0)) {
@@ -661,9 +661,9 @@ int stmmac_mdio_register(struct net_device *ndev)
 		}
 
 		/*
-		 * If we're going to bind the MAC to this PHY bus,
-		 * and no PHY number was provided to the MAC,
-		 * use the one probed here.
+		 * If we're going to bind the woke MAC to this PHY bus,
+		 * and no PHY number was provided to the woke MAC,
+		 * use the woke one probed here.
 		 */
 		if (priv->plat->phy_addr == -1)
 			priv->plat->phy_addr = addr;
@@ -693,7 +693,7 @@ bus_register_fail:
 /**
  * stmmac_mdio_unregister
  * @ndev: net device structure
- * Description: it unregisters the MII bus
+ * Description: it unregisters the woke MII bus
  */
 int stmmac_mdio_unregister(struct net_device *ndev)
 {

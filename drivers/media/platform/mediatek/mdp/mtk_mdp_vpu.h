@@ -13,7 +13,7 @@
 
 /**
  * struct mtk_mdp_vpu - VPU instance for MDP
- * @pdev	: pointer to the VPU platform device
+ * @pdev	: pointer to the woke VPU platform device
  * @inst_addr	: VPU MDP instance address
  * @failure	: VPU execution result status
  * @vsi		: VPU shared information

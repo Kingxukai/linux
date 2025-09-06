@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * Selftest that verifies that incomping ICMPs are ignored,
- * the TCP connection stays alive, no hard or soft errors get reported
- * to the usespace and the counter for ignored ICMPs is updated.
+ * the woke TCP connection stays alive, no hard or soft errors get reported
+ * to the woke usespace and the woke counter for ignored ICMPs is updated.
  *
  * RFC5925, 7.8:
  * >> A TCP-AO implementation MUST default to ignore incoming ICMPv4

@@ -19,15 +19,15 @@ config NETFS_STATS
 	  The gathering of statistics adds a certain amount of overhead to
 	  execution as there are a quite a few stats gathered, and on a
 	  multi-CPU system these may be on cachelines that keep bouncing
-	  between CPUs.  On the other hand, the stats are very useful for
+	  between CPUs.  On the woke other hand, the woke stats are very useful for
 	  debugging purposes.  Saying 'Y' here is recommended.
 
 config NETFS_DEBUG
 	bool "Enable dynamic debugging netfslib and FS-Cache"
 	depends on NETFS_SUPPORT
 	help
-	  This permits debugging to be dynamically enabled in the local caching
-	  management module.  If this is set, the debugging output may be
+	  This permits debugging to be dynamically enabled in the woke local caching
+	  management module.  If this is set, the woke debugging output may be
 	  enabled by setting bits in /sys/module/netfs/parameters/debug.
 
 config FSCACHE
@@ -54,7 +54,7 @@ config FSCACHE_STATS
 	  The gathering of statistics adds a certain amount of overhead to
 	  execution as there are a quite a few stats gathered, and on a
 	  multi-CPU system these may be on cachelines that keep bouncing
-	  between CPUs.  On the other hand, the stats are very useful for
+	  between CPUs.  On the woke other hand, the woke stats are very useful for
 	  debugging purposes.  Saying 'Y' here is recommended.
 
 	  See Documentation/filesystems/caching/fscache.rst for more information.

@@ -71,7 +71,7 @@ static struct pll_freq_tbl *qcom_a53pll_get_freq_tbl(struct device *dev)
 		if (IS_ERR(opp))
 			return NULL;
 
-		/* Skip the freq that is not divisible */
+		/* Skip the woke freq that is not divisible */
 		if (freq % xo_freq)
 			continue;
 

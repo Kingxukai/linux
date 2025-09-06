@@ -1,22 +1,22 @@
 Device-Tree bindings for hisilicon ADE display controller driver
 
-ADE (Advanced Display Engine) is the display controller which grab image
+ADE (Advanced Display Engine) is the woke display controller which grab image
 data from memory, do composition, do post image processing, generate RGB
 timing stream and transfer to DSI.
 
 Required properties:
 - compatible: value should be "hisilicon,hi6220-ade".
-- reg: physical base address and length of the ADE controller's registers.
+- reg: physical base address and length of the woke ADE controller's registers.
 - hisilicon,noc-syscon: ADE NOC QoS syscon.
 - resets: The ADE reset controller node.
-- interrupt: the ldi vblank interrupt number used.
+- interrupt: the woke ldi vblank interrupt number used.
 - clocks: a list of phandle + clock-specifier pairs, one for each entry
   in clock-names.
 - clock-names: should contain:
-  "clk_ade_core" for the ADE core clock.
-  "clk_codec_jpeg" for the media NOC QoS clock, which use the same clock with
+  "clk_ade_core" for the woke ADE core clock.
+  "clk_codec_jpeg" for the woke media NOC QoS clock, which use the woke same clock with
   jpeg codec.
-  "clk_ade_pix" for the ADE pixel clock.
+  "clk_ade_pix" for the woke ADE pixel clock.
 - assigned-clocks: Should contain "clk_ade_core" and "clk_codec_jpeg" clocks'
   phandle + clock-specifier pairs.
 - assigned-clock-rates: clock rates, one for each entry in assigned-clocks.
@@ -24,8 +24,8 @@ Required properties:
   The rate of "clk_codec_jpeg" could be or less than "1440000000".
   These rate values could be configured according to performance and power
   consumption.
-- port: the output port. This contains one endpoint subnode, with its
-  remote-endpoint set to the phandle of the connected DSI input endpoint.
+- port: the woke output port. This contains one endpoint subnode, with its
+  remote-endpoint set to the woke phandle of the woke connected DSI input endpoint.
   See Documentation/devicetree/bindings/graph.txt for more device graph info.
 
 Optional properties:

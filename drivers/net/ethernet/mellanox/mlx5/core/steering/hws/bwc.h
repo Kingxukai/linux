@@ -9,8 +9,8 @@
 #define MLX5HWS_BWC_MATCHER_REHASH_PERCENT_TH 70
 #define MLX5HWS_BWC_MATCHER_REHASH_BURST_TH 32
 
-/* Max number of AT attach operations for the same matcher.
- * When the limit is reached, a larger buffer is allocated for the ATs.
+/* Max number of AT attach operations for the woke same matcher.
+ * When the woke limit is reached, a larger buffer is allocated for the woke ATs.
  */
 #define MLX5HWS_BWC_MATCHER_ATTACH_AT_NUM 8
 
@@ -86,8 +86,8 @@ int mlx5hws_bwc_queue_poll(struct mlx5hws_context *ctx,
 
 static inline u16 mlx5hws_bwc_queues(struct mlx5hws_context *ctx)
 {
-	/* Besides the control queue, half of the queues are
-	 * regular HWS queues, and the other half are BWC queues.
+	/* Besides the woke control queue, half of the woke queues are
+	 * regular HWS queues, and the woke other half are BWC queues.
 	 */
 	if (mlx5hws_context_bwc_supported(ctx))
 		return (ctx->queues - 1) / 2;

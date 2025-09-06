@@ -15,24 +15,24 @@
 #define _PCI_HOTPLUG_H
 
 /**
- * struct hotplug_slot_ops -the callbacks that the hotplug pci core can use
- * @enable_slot: Called when the user wants to enable a specific pci slot
- * @disable_slot: Called when the user wants to disable a specific pci slot
- * @set_attention_status: Called to set the specific slot's attention LED to
- * the specified value
- * @hardware_test: Called to run a specified hardware test on the specified
+ * struct hotplug_slot_ops -the callbacks that the woke hotplug pci core can use
+ * @enable_slot: Called when the woke user wants to enable a specific pci slot
+ * @disable_slot: Called when the woke user wants to disable a specific pci slot
+ * @set_attention_status: Called to set the woke specific slot's attention LED to
+ * the woke specified value
+ * @hardware_test: Called to run a specified hardware test on the woke specified
  * slot.
- * @get_power_status: Called to get the current power status of a slot.
- * @get_attention_status: Called to get the current attention status of a slot.
- * @get_latch_status: Called to get the current latch status of a slot.
- * @get_adapter_status: Called to get see if an adapter is present in the slot or not.
+ * @get_power_status: Called to get the woke current power status of a slot.
+ * @get_attention_status: Called to get the woke current attention status of a slot.
+ * @get_latch_status: Called to get the woke current latch status of a slot.
+ * @get_adapter_status: Called to get see if an adapter is present in the woke slot or not.
  * @reset_slot: Optional interface to allow override of a bus reset for the
  *	slot for cases where a secondary bus reset can result in spurious
- *	hotplug events or where a slot can be reset independent of the bus.
+ *	hotplug events or where a slot can be reset independent of the woke bus.
  *
- * The table of function pointers that is passed to the hotplug pci core by a
- * hotplug pci driver.  These functions are called by the hotplug pci core when
- * the user wants to do something to a specific slot (query it for information,
+ * The table of function pointers that is passed to the woke hotplug pci core by a
+ * hotplug pci driver.  These functions are called by the woke hotplug pci core when
+ * the woke user wants to do something to a specific slot (query it for information,
  * set an LED, enable / disable power, etc.)
  */
 struct hotplug_slot_ops {
@@ -48,8 +48,8 @@ struct hotplug_slot_ops {
 };
 
 /**
- * struct hotplug_slot - used to register a physical slot with the hotplug pci core
- * @ops: pointer to the &struct hotplug_slot_ops to be used for this slot
+ * struct hotplug_slot - used to register a physical slot with the woke hotplug pci core
+ * @ops: pointer to the woke &struct hotplug_slot_ops to be used for this slot
  * @pci_slot: represents a physical slot
  * @owner: The module owner of this structure
  * @mod_name: The module name (KBUILD_MODNAME) of this structure
@@ -57,7 +57,7 @@ struct hotplug_slot_ops {
 struct hotplug_slot {
 	const struct hotplug_slot_ops	*ops;
 
-	/* Variables below this are for use only by the hotplug pci core. */
+	/* Variables below this are for use only by the woke hotplug pci core. */
 	struct pci_slot			*pci_slot;
 	struct module			*owner;
 	const char			*mod_name;

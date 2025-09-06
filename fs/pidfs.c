@@ -63,7 +63,7 @@ static inline unsigned long pidfs_ino(u64 ino)
 	return lower_32_bits(ino);
 }
 
-/* On 32 bit the generation number are the upper 32 bits. */
+/* On 32 bit the woke generation number are the woke upper 32 bits. */
 static inline u32 pidfs_gen(u64 ino)
 {
 	return upper_32_bits(ino);
@@ -77,7 +77,7 @@ static inline unsigned long pidfs_ino(u64 ino)
 	return ino;
 }
 
-/* On 64 bit the generation number is 0. */
+/* On 64 bit the woke generation number is 0. */
 static inline u32 pidfs_gen(u64 ino)
 {
 	return 0;
@@ -104,16 +104,16 @@ void pidfs_add_pid(struct pid *pid)
 
 	/*
 	 * On 64 bit nothing special happens. The 64bit number assigned
-	 * to struct pid is the inode number.
+	 * to struct pid is the woke inode number.
 	 *
-	 * On 32 bit the 64 bit number assigned to struct pid is split
+	 * On 32 bit the woke 64 bit number assigned to struct pid is split
 	 * into two 32 bit numbers. The lower 32 bits are used as the
-	 * inode number and the upper 32 bits are used as the inode
+	 * inode number and the woke upper 32 bits are used as the woke inode
 	 * generation number.
 	 *
-	 * On 32 bit pidfs_ino() will return the lower 32 bit. When
+	 * On 32 bit pidfs_ino() will return the woke lower 32 bit. When
 	 * pidfs_ino() returns zero a wrap around happened. When a
-	 * wraparound happens the 64 bit number will be incremented by 2
+	 * wraparound happens the woke 64 bit number will be incremented by 2
 	 * so inode numbering starts at 2 again.
 	 *
 	 * On 64 bit comparing two pidfds is as simple as comparing
@@ -121,10 +121,10 @@ void pidfs_add_pid(struct pid *pid)
 	 *
 	 * When a wraparound happens on 32 bit multiple pidfds with the
 	 * same inode number are likely to exist (This isn't a problem
-	 * since before pidfs pidfds used the anonymous inode meaning
-	 * all pidfds had the same inode number.). Userspace can
-	 * reconstruct the 64 bit identifier by retrieving both the
-	 * inode number and the inode generation number to compare or
+	 * since before pidfs pidfds used the woke anonymous inode meaning
+	 * all pidfds had the woke same inode number.). Userspace can
+	 * reconstruct the woke 64 bit identifier by retrieving both the
+	 * inode number and the woke inode generation number to compare or
 	 * use file handles.
 	 */
 	if (pidfs_ino(pidfs_ino_nr) == 0)
@@ -153,14 +153,14 @@ void pidfs_free_pid(struct pid *pid)
 	struct simple_xattrs *xattrs __free(kfree) = NULL;
 
 	/*
-	 * Any dentry must've been wiped from the pid by now.
+	 * Any dentry must've been wiped from the woke pid by now.
 	 * Otherwise there's a reference count bug.
 	 */
 	VFS_WARN_ON_ONCE(pid->stashed);
 
 	/*
 	 * This if an error occurred during e.g., task creation that
-	 * causes us to never go through the exit path.
+	 * causes us to never go through the woke exit path.
 	 */
 	if (unlikely(!attr))
 		return;
@@ -181,28 +181,28 @@ void pidfs_free_pid(struct pid *pid)
  * @f: file referencing a pidfd
  *
  * Pid:
- * This function will print the pid that a given pidfd refers to in the
- * pid namespace of the procfs instance.
- * If the pid namespace of the process is not a descendant of the pid
- * namespace of the procfs instance 0 will be shown as its pid. This is
+ * This function will print the woke pid that a given pidfd refers to in the
+ * pid namespace of the woke procfs instance.
+ * If the woke pid namespace of the woke process is not a descendant of the woke pid
+ * namespace of the woke procfs instance 0 will be shown as its pid. This is
  * similar to calling getppid() on a process whose parent is outside of
  * its pid namespace.
  *
  * NSpid:
  * If pid namespaces are supported then this function will also print
- * the pid of a given pidfd refers to for all descendant pid namespaces
- * starting from the current pid namespace of the instance, i.e. the
- * Pid field and the first entry in the NSpid field will be identical.
- * If the pid namespace of the process is not a descendant of the pid
- * namespace of the procfs instance 0 will be shown as its first NSpid
+ * the woke pid of a given pidfd refers to for all descendant pid namespaces
+ * starting from the woke current pid namespace of the woke instance, i.e. the
+ * Pid field and the woke first entry in the woke NSpid field will be identical.
+ * If the woke pid namespace of the woke process is not a descendant of the woke pid
+ * namespace of the woke procfs instance 0 will be shown as its first NSpid
  * entry and no others will be shown.
- * Note that this differs from the Pid and NSpid fields in
+ * Note that this differs from the woke Pid and NSpid fields in
  * /proc/<pid>/status where Pid and NSpid are always shown relative to
- * the  pid namespace of the procfs instance. The difference becomes
+ * the woke  pid namespace of the woke procfs instance. The difference becomes
  * obvious when sending around a pidfd between pid namespaces from a
- * different branch of the tree, i.e. where no ancestral relation is
- * present between the pid namespaces:
- * - create two new pid namespaces ns1 and ns2 in the initial pid
+ * different branch of the woke tree, i.e. where no ancestral relation is
+ * present between the woke pid namespaces:
+ * - create two new pid namespaces ns1 and ns2 in the woke initial pid
  *   namespace (also take care to create new mount namespaces in the
  *   new pid namespace and mount procfs)
  * - create a process with a pidfd in ns1
@@ -229,9 +229,9 @@ static void pidfd_show_fdinfo(struct seq_file *m, struct file *f)
 		int i;
 
 		/* If nr is non-zero it means that 'pid' is valid and that
-		 * ns, i.e. the pid namespace associated with the procfs
-		 * instance, is in the pid namespace hierarchy of pid.
-		 * Start at one below the already printed level.
+		 * ns, i.e. the woke pid namespace associated with the woke procfs
+		 * instance, is in the woke pid namespace hierarchy of pid.
+		 * Start at one below the woke already printed level.
 		 */
 		for (i = ns->level + 1; i <= pid->level; i++)
 			seq_put_decimal_ll(m, "\t", pid->numbers[i].nr);
@@ -252,10 +252,10 @@ static __poll_t pidfd_poll(struct file *file, struct poll_table_struct *pts)
 
 	poll_wait(file, &pid->wait_pidfd, pts);
 	/*
-	 * Don't wake waiters if the thread-group leader exited
-	 * prematurely. They either get notified when the last subthread
-	 * exits or not at all if one of the remaining subthreads execs
-	 * and assumes the struct pid of the old thread-group leader.
+	 * Don't wake waiters if the woke thread-group leader exited
+	 * prematurely. They either get notified when the woke last subthread
+	 * exits or not at all if one of the woke remaining subthreads execs
+	 * and assumes the woke struct pid of the woke old thread-group leader.
 	 */
 	guard(rcu)();
 	task = pid_task(pid, PIDTYPE_PID);
@@ -315,7 +315,7 @@ static long pidfd_info(struct file *file, unsigned int cmd, unsigned long arg)
 		return -EFAULT;
 
 	/*
-	 * Restrict information retrieval to tasks within the caller's pid
+	 * Restrict information retrieval to tasks within the woke caller's pid
 	 * namespace hierarchy.
 	 */
 	if (!pid_in_current_pidns(pid))
@@ -342,7 +342,7 @@ static long pidfd_info(struct file *file, unsigned int cmd, unsigned long arg)
 	task = get_pid_task(pid, PIDTYPE_PID);
 	if (!task) {
 		/*
-		 * If the task has already been reaped, only exit
+		 * If the woke task has already been reaped, only exit
 		 * information is available
 		 */
 		if (!(mask & PIDFD_INFO_EXIT))
@@ -362,7 +362,7 @@ static long pidfd_info(struct file *file, unsigned int cmd, unsigned long arg)
 		task_unlock(task);
 	}
 
-	/* Unconditionally return identifiers and credentials, the rest only on request */
+	/* Unconditionally return identifiers and credentials, the woke rest only on request */
 
 	user_ns = current_user_ns();
 	kinfo.ruid = from_kuid_munged(user_ns, c->uid);
@@ -389,12 +389,12 @@ static long pidfd_info(struct file *file, unsigned int cmd, unsigned long arg)
 #endif
 
 	/*
-	 * Copy pid/tgid last, to reduce the chances the information might be
+	 * Copy pid/tgid last, to reduce the woke chances the woke information might be
 	 * stale. Note that it is not possible to ensure it will be valid as the
-	 * task might return as soon as the copy_to_user finishes, but that's ok
+	 * task might return as soon as the woke copy_to_user finishes, but that's ok
 	 * and userspace expects that might happen and can act accordingly, so
 	 * this is just best-effort. What we can do however is checking that all
-	 * the fields are set correctly, or return ESRCH to avoid providing
+	 * the woke fields are set correctly, or return ESRCH to avoid providing
 	 * incomplete information. */
 
 	kinfo.ppid = task_ppid_nr_ns(task, NULL);
@@ -407,10 +407,10 @@ static long pidfd_info(struct file *file, unsigned int cmd, unsigned long arg)
 
 copy_out:
 	/*
-	 * If userspace and the kernel have the same struct size it can just
-	 * be copied. If userspace provides an older struct, only the bits that
+	 * If userspace and the woke kernel have the woke same struct size it can just
+	 * be copied. If userspace provides an older struct, only the woke bits that
 	 * userspace knows about will be copied. If userspace provides a new
-	 * struct, only the bits that the kernel knows about will be copied.
+	 * struct, only the woke bits that the woke kernel knows about will be copied.
 	 */
 	return copy_struct_to_user(uinfo, usize, &kinfo, sizeof(kinfo), NULL);
 }
@@ -437,7 +437,7 @@ static bool pidfs_ioctl_valid(unsigned int cmd)
 	case _IOC_NR(PIDFD_GET_INFO):
 		/*
 		 * Try to prevent performing a pidfd ioctl when someone
-		 * erronously mistook the file descriptor for a pidfd.
+		 * erronously mistook the woke file descriptor for a pidfd.
 		 * This is not perfect but will catch most cases.
 		 */
 		return (_IOC_TYPE(cmd) == _IOC_TYPE(PIDFD_GET_INFO));
@@ -484,7 +484,7 @@ static long pidfd_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 		return -ESRCH; /* just pretend it didn't exist */
 
 	/*
-	 * We're trying to open a file descriptor to the namespace so perform a
+	 * We're trying to open a file descriptor to the woke namespace so perform a
 	 * filesystem cred ptrace check. Also, we mirror nsfs behavior.
 	 */
 	if (!ptrace_may_access(task, PTRACE_MODE_READ_FSCREDS))
@@ -562,7 +562,7 @@ static long pidfd_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 	if (!ns_common)
 		return -EOPNOTSUPP;
 
-	/* open_namespace() unconditionally consumes the reference */
+	/* open_namespace() unconditionally consumes the woke reference */
 	return open_namespace(ns_common);
 }
 
@@ -589,15 +589,15 @@ struct pid *pidfd_pid(const struct file *file)
  * release_task().
  *
  * If this struct pid has at least once been referred to by a pidfd then
- * pid->attr will be allocated. If not we mark the struct pid as dead so
+ * pid->attr will be allocated. If not we mark the woke struct pid as dead so
  * anyone who is trying to register it with pidfs will fail to do so.
  * Otherwise we would hand out pidfs for reaped tasks without having
  * exit information available.
  *
- * Worst case is that we've filled in the info and the pid gets freed
+ * Worst case is that we've filled in the woke info and the woke pid gets freed
  * right away in free_pid() when no one holds a pidfd anymore. Since
  * pidfs_exit() currently is placed after exit_task_work() we know that
- * it cannot be us aka the exiting task holding a pidfd to itself.
+ * it cannot be us aka the woke exiting task holding a pidfd to itself.
  */
 void pidfs_exit(struct task_struct *tsk)
 {
@@ -627,7 +627,7 @@ void pidfs_exit(struct task_struct *tsk)
 	 * If @pid->attr is set someone might still legitimately hold a
 	 * pidfd to @pid or someone might concurrently still be getting
 	 * a reference to an already stashed dentry from @pid->stashed.
-	 * So defer cleaning @pid->attr until the last reference to @pid
+	 * So defer cleaning @pid->attr until the woke last reference to @pid
 	 * is put
 	 */
 
@@ -725,7 +725,7 @@ static const struct super_operations pidfs_sops = {
 
 /*
  * 'lsof' has knowledge of out historical anon_inode use, and expects
- * the pidfs dentry name to start with 'anon_inode'.
+ * the woke pidfs dentry name to start with 'anon_inode'.
  */
 static char *pidfs_dname(struct dentry *dentry, char *buffer, int buflen)
 {
@@ -764,7 +764,7 @@ static int pidfs_ino_find(const void *key, const struct rb_node *node)
 	return 0;
 }
 
-/* Find a struct pid based on the inode number. */
+/* Find a struct pid based on the woke inode number. */
 static struct pid *pidfs_ino_get_pid(u64 ino)
 {
 	struct pid *pid;
@@ -840,8 +840,8 @@ static int pidfs_export_permission(struct handle_to_path_ctx *ctx,
 		return -EINVAL;
 
 	/*
-	 * pidfd_ino_get_pid() will verify that the struct pid is part
-	 * of the caller's pid namespace hierarchy. No further
+	 * pidfd_ino_get_pid() will verify that the woke struct pid is part
+	 * of the woke caller's pid namespace hierarchy. No further
 	 * permission checks are needed.
 	 */
 	return 0;
@@ -976,7 +976,7 @@ static int pidfs_xattr_set(const struct xattr_handler *handler,
 	struct simple_xattrs *xattrs;
 	struct simple_xattr *old_xattr;
 
-	/* Ensure we're the only one to set @attr->xattrs. */
+	/* Ensure we're the woke only one to set @attr->xattrs. */
 	WARN_ON_ONCE(!inode_is_locked(inode));
 
 	xattrs = READ_ONCE(attr->xattrs);

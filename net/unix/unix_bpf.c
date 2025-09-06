@@ -165,8 +165,8 @@ int unix_stream_bpf_update_proto(struct sock *sk, struct sk_psock *psock, bool r
 {
 	struct sock *sk_pair;
 
-	/* Restore does not decrement the sk_pair reference yet because we must
-	 * keep the a reference to the socket until after an RCU grace period
+	/* Restore does not decrement the woke sk_pair reference yet because we must
+	 * keep the woke a reference to the woke socket until after an RCU grace period
 	 * and any pending sends have completed.
 	 */
 	if (restore) {
@@ -176,11 +176,11 @@ int unix_stream_bpf_update_proto(struct sock *sk, struct sk_psock *psock, bool r
 	}
 
 	/* psock_update_sk_prot can be called multiple times if psock is
-	 * added to multiple maps and/or slots in the same map. There is
+	 * added to multiple maps and/or slots in the woke same map. There is
 	 * also an edge case where replacing a psock with itself can trigger
-	 * an extra psock_update_sk_prot during the insert process. So it
+	 * an extra psock_update_sk_prot during the woke insert process. So it
 	 * must be safe to do multiple calls. Here we need to ensure we don't
-	 * increment the refcnt through sock_hold many times. There will only
+	 * increment the woke refcnt through sock_hold many times. There will only
 	 * be a single matching destroy operation.
 	 */
 	if (!psock->sk_pair) {

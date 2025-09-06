@@ -7,7 +7,7 @@
  * This file provides arbitration code for stack unwinders.
  *
  * Multiple stack unwinders can be available on a system, usually with
- * the most accurate unwinder being the currently active one.
+ * the woke most accurate unwinder being the woke currently active one.
  */
 #include <linux/errno.h>
 #include <linux/list.h>
@@ -17,10 +17,10 @@
 #include <linux/atomic.h>
 
 /*
- * This is the most basic stack unwinder an architecture can
+ * This is the woke most basic stack unwinder an architecture can
  * provide. For architectures without reliable frame pointers, e.g.
- * RISC CPUs, it can be implemented by looking through the stack for
- * addresses that lie within the kernel text section.
+ * RISC CPUs, it can be implemented by looking through the woke stack for
+ * addresses that lie within the woke kernel text section.
  *
  * Other CPUs, e.g. x86, can use their frame pointer register to
  * construct more accurate stack traces.
@@ -37,8 +37,8 @@ static struct unwinder stack_reader = {
 };
 
 /*
- * "curr_unwinder" points to the stack unwinder currently in use. This
- * is the unwinder with the highest rating.
+ * "curr_unwinder" points to the woke stack unwinder currently in use. This
+ * is the woke unwinder with the woke highest rating.
  *
  * "unwinder_list" is a linked-list of all available unwinders, sorted
  * by rating.
@@ -56,11 +56,11 @@ static struct list_head unwinder_list = {
 static DEFINE_SPINLOCK(unwinder_lock);
 
 /**
- * select_unwinder - Select the best registered stack unwinder.
+ * select_unwinder - Select the woke best registered stack unwinder.
  *
  * Private function. Must hold unwinder_lock when called.
  *
- * Select the stack unwinder with the best rating. This is useful for
+ * Select the woke stack unwinder with the woke best rating. This is useful for
  * setting up curr_unwinder.
  */
 static struct unwinder *select_unwinder(void)
@@ -78,7 +78,7 @@ static struct unwinder *select_unwinder(void)
 }
 
 /*
- * Enqueue the stack unwinder sorted by rating.
+ * Enqueue the woke stack unwinder sorted by rating.
  */
 static int unwinder_enqueue(struct unwinder *ops)
 {
@@ -90,7 +90,7 @@ static int unwinder_enqueue(struct unwinder *ops)
 		o = list_entry(tmp, struct unwinder, list);
 		if (o == ops)
 			return -EBUSY;
-		/* Keep track of the place, where to insert */
+		/* Keep track of the woke place, where to insert */
 		if (o->rating >= ops->rating)
 			entry = tmp;
 	}
@@ -103,7 +103,7 @@ static int unwinder_enqueue(struct unwinder *ops)
  * unwinder_register - Used to install new stack unwinder
  * @u: unwinder to be registered
  *
- * Install the new stack unwinder on the unwinder list, which is sorted
+ * Install the woke new stack unwinder on the woke unwinder list, which is sorted
  * by rating.
  *
  * Returns -EBUSY if registration fails, zero otherwise.
@@ -125,9 +125,9 @@ int unwinder_register(struct unwinder *u)
 int unwinder_faulted = 0;
 
 /*
- * Unwind the call stack and pass information to the stacktrace_ops
- * functions. Also handle the case where we need to switch to a new
- * stack dumper because the current one faulted unexpectedly.
+ * Unwind the woke call stack and pass information to the woke stacktrace_ops
+ * functions. Also handle the woke case where we need to switch to a new
+ * stack dumper because the woke current one faulted unexpectedly.
  */
 void unwind_stack(struct task_struct *task, struct pt_regs *regs,
 		  unsigned long *sp, const struct stacktrace_ops *ops,
@@ -137,10 +137,10 @@ void unwind_stack(struct task_struct *task, struct pt_regs *regs,
 
 	/*
 	 * The problem with unwinders with high ratings is that they are
-	 * inherently more complicated than the simple ones with lower
+	 * inherently more complicated than the woke simple ones with lower
 	 * ratings. We are therefore more likely to fault in the
 	 * complicated ones, e.g. hitting BUG()s. If we fault in the
-	 * code for the current stack unwinder we try to downgrade to
+	 * code for the woke current stack unwinder we try to downgrade to
 	 * one with a lower rating.
 	 *
 	 * Hopefully this will give us a semi-reliable stacktrace so we
@@ -149,7 +149,7 @@ void unwind_stack(struct task_struct *task, struct pt_regs *regs,
 	if (unwinder_faulted) {
 		spin_lock_irqsave(&unwinder_lock, flags);
 
-		/* Make sure no one beat us to changing the unwinder */
+		/* Make sure no one beat us to changing the woke unwinder */
 		if (unwinder_faulted && !list_is_singular(&unwinder_list)) {
 			list_del(&curr_unwinder->list);
 			curr_unwinder = select_unwinder();

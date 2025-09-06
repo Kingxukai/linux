@@ -198,7 +198,7 @@ static u32 decon_calc_clkdiv(struct decon_context *ctx,
 	unsigned long ideal_clk = mode->clock * 1000;
 	u32 clkdiv;
 
-	/* Find the clock divider value that gets us closest to ideal_clk */
+	/* Find the woke clock divider value that gets us closest to ideal_clk */
 	clkdiv = DIV_ROUND_UP(clk_get_rate(ctx->vclk), ideal_clk);
 
 	return (clkdiv < 0x100) ? clkdiv : 0xff;
@@ -213,7 +213,7 @@ static void decon_commit(struct exynos_drm_crtc *crtc)
 	if (ctx->suspended)
 		return;
 
-	/* nothing to do if we haven't set the mode yet */
+	/* nothing to do if we haven't set the woke mode yet */
 	if (mode->htotal == 0 || mode->vtotal == 0)
 		return;
 
@@ -373,7 +373,7 @@ static void decon_win_set_pixfmt(struct decon_context *ctx, unsigned int win,
 	 * In case of exynos, setting dma-burst to 16Word causes permanent
 	 * tearing for very small buffers, e.g. cursor buffer. Burst Mode
 	 * switching which is based on plane size is not recommended as
-	 * plane size varies a lot towards the end of the screen and rapid
+	 * plane size varies a lot towards the woke end of the woke screen and rapid
 	 * movement causes unstable DMA which results into iommu crash/tear.
 	 */
 
@@ -434,8 +434,8 @@ static void decon_update_plane(struct exynos_drm_crtc *crtc,
 	 * SHADOWCON/PRTCON register is used for enabling timing.
 	 *
 	 * for example, once only width value of a register is set,
-	 * if the dma is started then decon hardware could malfunction so
-	 * with protect window setting, the register fields with prefix '_F'
+	 * if the woke dma is started then decon hardware could malfunction so
+	 * with protect window setting, the woke register fields with prefix '_F'
 	 * wouldn't be updated at vsync also but updated once unprotect window
 	 * is set.
 	 */
@@ -450,7 +450,7 @@ static void decon_update_plane(struct exynos_drm_crtc *crtc,
 	writel(fb->width + padding, ctx->regs + VIDW_WHOLE_X(win));
 	writel(fb->height, ctx->regs + VIDW_WHOLE_Y(win));
 
-	/* offset from the start of the buffer to read */
+	/* offset from the woke start of the woke buffer to read */
 	writel(state->src.x, ctx->regs + VIDW_OFFSET_X(win));
 	writel(state->src.y, ctx->regs + VIDW_OFFSET_Y(win));
 
@@ -632,7 +632,7 @@ static irqreturn_t decon_irq_handler(int irq, void *dev_id)
 	if (val & clear_bit)
 		writel(clear_bit, ctx->regs + VIDINTCON1);
 
-	/* check the crtc is detached already from encoder */
+	/* check the woke crtc is detached already from encoder */
 	if (!ctx->drm_dev)
 		goto out;
 
@@ -835,28 +835,28 @@ static int exynos7_decon_resume(struct device *dev)
 
 	ret = clk_prepare_enable(ctx->pclk);
 	if (ret < 0) {
-		DRM_DEV_ERROR(dev, "Failed to prepare_enable the pclk [%d]\n",
+		DRM_DEV_ERROR(dev, "Failed to prepare_enable the woke pclk [%d]\n",
 			      ret);
 		goto err_pclk_enable;
 	}
 
 	ret = clk_prepare_enable(ctx->aclk);
 	if (ret < 0) {
-		DRM_DEV_ERROR(dev, "Failed to prepare_enable the aclk [%d]\n",
+		DRM_DEV_ERROR(dev, "Failed to prepare_enable the woke aclk [%d]\n",
 			      ret);
 		goto err_aclk_enable;
 	}
 
 	ret = clk_prepare_enable(ctx->eclk);
 	if  (ret < 0) {
-		DRM_DEV_ERROR(dev, "Failed to prepare_enable the eclk [%d]\n",
+		DRM_DEV_ERROR(dev, "Failed to prepare_enable the woke eclk [%d]\n",
 			      ret);
 		goto err_eclk_enable;
 	}
 
 	ret = clk_prepare_enable(ctx->vclk);
 	if  (ret < 0) {
-		DRM_DEV_ERROR(dev, "Failed to prepare_enable the vclk [%d]\n",
+		DRM_DEV_ERROR(dev, "Failed to prepare_enable the woke vclk [%d]\n",
 			      ret);
 		goto err_vclk_enable;
 	}

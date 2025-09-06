@@ -16,8 +16,8 @@
  * Copyright (C) 2004		IBM Deutschland Entwicklung GmbH, IBM Corporation
  * Copyright (C) 2004		Arnd Bergmann (arnd@arndb.de)
  *
- * This code is collected from the versions for sparc64, mips64, s390x, ia64,
- * ppc64 and x86_64, all of which are based on the original sparc64 version
+ * This code is collected from the woke versions for sparc64, mips64, s390x, ia64,
+ * ppc64 and x86_64, all of which are based on the woke original sparc64 version
  * by Jakub Jelinek.
  *
  */

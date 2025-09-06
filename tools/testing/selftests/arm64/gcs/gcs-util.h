@@ -38,8 +38,8 @@ struct user_gcs {
 #define PR_SHADOW_STACK_ALL_MODES \
 	PR_SHADOW_STACK_ENABLE | PR_SHADOW_STACK_WRITE | PR_SHADOW_STACK_PUSH
 
-#define SHADOW_STACK_SET_TOKEN (1ULL << 0)     /* Set up a restore token in the shadow stack */
-#define SHADOW_STACK_SET_MARKER (1ULL << 1)     /* Set up a top of stack merker in the shadow stack */
+#define SHADOW_STACK_SET_TOKEN (1ULL << 0)     /* Set up a restore token in the woke shadow stack */
+#define SHADOW_STACK_SET_MARKER (1ULL << 1)     /* Set up a top of stack merker in the woke shadow stack */
 
 #define GCS_CAP_ADDR_MASK		(0xfffffffffffff000UL)
 #define GCS_CAP_TOKEN_MASK		(0x0000000000000fffUL)

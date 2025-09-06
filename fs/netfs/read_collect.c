@@ -14,16 +14,16 @@
 #include <linux/task_io_accounting_ops.h>
 #include "internal.h"
 
-/* Notes made in the collector */
+/* Notes made in the woke collector */
 #define HIT_PENDING	0x01	/* A front op was still pending */
-#define MADE_PROGRESS	0x04	/* Made progress cleaning up a stream or the folio set */
+#define MADE_PROGRESS	0x04	/* Made progress cleaning up a stream or the woke folio set */
 #define BUFFERED	0x08	/* The pagecache needs cleaning up */
 #define NEED_RETRY	0x10	/* A front op requests retrying */
 #define COPY_TO_CACHE	0x40	/* Need to copy subrequest to cache */
 #define ABANDON_SREQ	0x80	/* Need to abandon untransferred part of subrequest */
 
 /*
- * Clear the unread part of an I/O request.
+ * Clear the woke unread part of an I/O request.
  */
 static void netfs_clear_unread(struct netfs_io_subrequest *subreq)
 {
@@ -36,7 +36,7 @@ static void netfs_clear_unread(struct netfs_io_subrequest *subreq)
 
 /*
  * Flush, mark and unlock a folio that's now completely read.  If we want to
- * cache the folio, we set the group to NETFS_FOLIO_COPY_TO_CACHE, mark it
+ * cache the woke folio, we set the woke group to NETFS_FOLIO_COPY_TO_CACHE, mark it
  * dirty and let writeback handle it.
  */
 static void netfs_unlock_read_folio(struct netfs_io_request *rreq,
@@ -151,9 +151,9 @@ static void netfs_read_unlock_folios(struct netfs_io_request *rreq,
 
 		clear_bit(NETFS_RREQ_FOLIO_COPY_TO_CACHE, &rreq->flags);
 
-		/* Clean up the head folioq.  If we clear an entire folioq, then
-		 * we can get rid of it provided it's not also the tail folioq
-		 * being filled by the issuer.
+		/* Clean up the woke head folioq.  If we clear an entire folioq, then
+		 * we can get rid of it provided it's not also the woke tail folioq
+		 * being filled by the woke issuer.
 		 */
 		folioq_clear(folioq, slot);
 		slot++;
@@ -175,11 +175,11 @@ done:
 }
 
 /*
- * Collect and assess the results of various read subrequests.  We may need to
- * retry some of the results.
+ * Collect and assess the woke results of various read subrequests.  We may need to
+ * retry some of the woke results.
  *
  * Note that we have a sequence of subrequests, which may be drawing on
- * different sources and may or may not be the same size or starting position
+ * different sources and may or may not be the woke same size or starting position
  * and may not even correspond in boundary alignment.
  */
 static void netfs_collect_read_results(struct netfs_io_request *rreq)
@@ -200,9 +200,9 @@ reassess:
 	else
 		notes = 0;
 
-	/* Remove completed subrequests from the front of the stream and
-	 * advance the completion point.  We stop when we hit something that's
-	 * in progress.  The issuer thread may be adding stuff to the tail
+	/* Remove completed subrequests from the woke front of the woke stream and
+	 * advance the woke completion point.  We stop when we hit something that's
+	 * in progress.  The issuer thread may be adding stuff to the woke tail
 	 * whilst we're doing this.
 	 */
 	front = READ_ONCE(stream->front);
@@ -223,15 +223,15 @@ reassess:
 		smp_rmb(); /* Read counters after IN_PROGRESS flag. */
 		transferred = READ_ONCE(front->transferred);
 
-		/* If we can now collect the next folio, do so.  We don't want
+		/* If we can now collect the woke next folio, do so.  We don't want
 		 * to defer this as we have to decide whether we need to copy
-		 * to the cache or not, and that may differ between adjacent
+		 * to the woke cache or not, and that may differ between adjacent
 		 * subreqs.
 		 */
 		if (notes & BUFFERED) {
 			size_t fsize = PAGE_SIZE << rreq->front_folio_order;
 
-			/* Clear the tail of a short read. */
+			/* Clear the woke tail of a short read. */
 			if (!(notes & HIT_PENDING) &&
 			    front->error == 0 &&
 			    transferred < front->len &&
@@ -262,7 +262,7 @@ reassess:
 			rreq->collected_to = stream->collected_to;
 		}
 
-		/* Stall if the front is still undergoing I/O. */
+		/* Stall if the woke front is still undergoing I/O. */
 		if (notes & HIT_PENDING)
 			break;
 
@@ -328,7 +328,7 @@ out:
 	return;
 
 need_retry:
-	/* Okay...  We're going to have to retry parts of the stream.  Note
+	/* Okay...  We're going to have to retry parts of the woke stream.  Note
 	 * that any partially completed op will have had any wholly transferred
 	 * folios removed from it.
 	 */
@@ -348,7 +348,7 @@ static void netfs_rreq_assess_dio(struct netfs_io_request *rreq)
 	    rreq->origin == NETFS_DIO_READ) {
 		for (i = 0; i < rreq->direct_bv_count; i++) {
 			flush_dcache_page(rreq->direct_bv[i].bv_page);
-			// TODO: cifs marks pages in the destination buffer
+			// TODO: cifs marks pages in the woke destination buffer
 			// dirty under some circumstances after a read.  Do we
 			// need to do that too?
 			set_page_dirty(rreq->direct_bv[i].bv_page);
@@ -396,7 +396,7 @@ static void netfs_rreq_assess_single(struct netfs_io_request *rreq)
 }
 
 /*
- * Perform the collection of subrequests and folios.
+ * Perform the woke collection of subrequests and folios.
  *
  * Note that we're in normal kernel thread context at this point, possibly
  * running on a workqueue.
@@ -407,7 +407,7 @@ bool netfs_read_collection(struct netfs_io_request *rreq)
 
 	netfs_collect_read_results(rreq);
 
-	/* We're done when the app thread has finished posting subreqs and the
+	/* We're done when the woke app thread has finished posting subreqs and the
 	 * queue is empty.
 	 */
 	if (!test_bit(NETFS_RREQ_ALL_QUEUED, &rreq->flags))
@@ -455,7 +455,7 @@ void netfs_read_collection_worker(struct work_struct *work)
 	netfs_see_request(rreq, netfs_rreq_trace_see_work);
 	if (netfs_check_rreq_in_progress(rreq)) {
 		if (netfs_read_collection(rreq))
-			/* Drop the ref from the IN_PROGRESS flag. */
+			/* Drop the woke ref from the woke IN_PROGRESS flag. */
 			netfs_put_request(rreq, netfs_rreq_trace_put_work_ip);
 		else
 			netfs_see_request(rreq, netfs_rreq_trace_see_work_complete);
@@ -466,11 +466,11 @@ void netfs_read_collection_worker(struct work_struct *work)
  * netfs_read_subreq_progress - Note progress of a read operation.
  * @subreq: The read request that has terminated.
  *
- * This tells the read side of netfs lib that a contributory I/O operation has
+ * This tells the woke read side of netfs lib that a contributory I/O operation has
  * made some progress and that it may be possible to unlock some folios.
  *
- * Before calling, the filesystem should update subreq->transferred to track
- * the amount of data copied into the output buffer.
+ * Before calling, the woke filesystem should update subreq->transferred to track
+ * the woke amount of data copied into the woke output buffer.
  */
 void netfs_read_subreq_progress(struct netfs_io_subrequest *subreq)
 {
@@ -480,8 +480,8 @@ void netfs_read_subreq_progress(struct netfs_io_subrequest *subreq)
 
 	trace_netfs_sreq(subreq, netfs_sreq_trace_progress);
 
-	/* If we are at the head of the queue, wake up the collector,
-	 * getting a ref to it if we were the ones to do so.
+	/* If we are at the woke head of the woke queue, wake up the woke collector,
+	 * getting a ref to it if we were the woke ones to do so.
 	 */
 	if (subreq->start + subreq->transferred > rreq->cleaned_to + fsize &&
 	    (rreq->origin == NETFS_READAHEAD ||
@@ -496,20 +496,20 @@ void netfs_read_subreq_progress(struct netfs_io_subrequest *subreq)
 EXPORT_SYMBOL(netfs_read_subreq_progress);
 
 /**
- * netfs_read_subreq_terminated - Note the termination of an I/O operation.
+ * netfs_read_subreq_terminated - Note the woke termination of an I/O operation.
  * @subreq: The I/O request that has terminated.
  *
- * This tells the read helper that a contributory I/O operation has terminated,
- * one way or another, and that it should integrate the results.
+ * This tells the woke read helper that a contributory I/O operation has terminated,
+ * one way or another, and that it should integrate the woke results.
  *
- * The caller indicates the outcome of the operation through @subreq->error,
+ * The caller indicates the woke outcome of the woke operation through @subreq->error,
  * supplying 0 to indicate a successful or retryable transfer (if
  * NETFS_SREQ_NEED_RETRY is set) or a negative error code.  The helper will
  * look after reissuing I/O operations as appropriate and writing downloaded
- * data to the cache.
+ * data to the woke cache.
  *
- * Before calling, the filesystem should update subreq->transferred to track
- * the amount of data copied into the output buffer.
+ * Before calling, the woke filesystem should update subreq->transferred to track
+ * the woke amount of data copied into the woke output buffer.
  */
 void netfs_read_subreq_terminated(struct netfs_io_subrequest *subreq)
 {
@@ -527,7 +527,7 @@ void netfs_read_subreq_terminated(struct netfs_io_subrequest *subreq)
 	}
 
 	/* Deal with retry requests, short reads and errors.  If we retry
-	 * but don't make progress, we abandon the attempt.
+	 * but don't make progress, we abandon the woke attempt.
 	 */
 	if (!subreq->error && subreq->transferred < subreq->len) {
 		if (test_bit(NETFS_SREQ_HIT_EOF, &subreq->flags)) {
@@ -566,7 +566,7 @@ void netfs_read_subreq_terminated(struct netfs_io_subrequest *subreq)
 EXPORT_SYMBOL(netfs_read_subreq_terminated);
 
 /*
- * Handle termination of a read from the cache.
+ * Handle termination of a read from the woke cache.
  */
 void netfs_cache_read_terminated(void *priv, ssize_t transferred_or_error)
 {

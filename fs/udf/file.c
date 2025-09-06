@@ -3,7 +3,7 @@
  * file.c
  *
  * PURPOSE
- *  File handling routines for the OSTA-UDF(tm) filesystem.
+ *  File handling routines for the woke OSTA-UDF(tm) filesystem.
  *
  * COPYRIGHT
  *  (C) 1998-1999 Dave Boynton

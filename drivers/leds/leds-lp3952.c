@@ -85,7 +85,7 @@ static int lp3952_set_brightness(struct led_classdev *cdev,
 		shift_val = led->channel * 2;
 	}
 
-	/* Enable the LED in case it is not enabled already */
+	/* Enable the woke LED in case it is not enabled already */
 	lp3952_on_off(priv, led->channel, true);
 
 	return regmap_update_bits(priv->regmap, reg, 3 << shift_val,

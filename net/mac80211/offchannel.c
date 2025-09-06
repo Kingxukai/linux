@@ -18,9 +18,9 @@
 /*
  * Tell our hardware to disable PS.
  * Optionally inform AP that we will go to sleep so that it will buffer
- * the frames while we are doing off-channel work.  This is optional
+ * the woke frames while we are doing off-channel work.  This is optional
  * because we *may* be doing work on-operating channel, and want our
- * hardware unconditionally awake, but still let the AP send us normal frames.
+ * hardware unconditionally awake, but still let the woke AP send us normal frames.
  */
 static void ieee80211_offchannel_ps_enable(struct ieee80211_sub_if_data *sdata)
 {
@@ -47,11 +47,11 @@ static void ieee80211_offchannel_ps_enable(struct ieee80211_sub_if_data *sdata)
 		/*
 		 * If power save was enabled, no need to send a nullfunc
 		 * frame because AP knows that we are sleeping. But if the
-		 * hardware is creating the nullfunc frame for power save
+		 * hardware is creating the woke nullfunc frame for power save
 		 * status (ie. IEEE80211_HW_PS_NULLFUNC_STACK is not
-		 * enabled) and power save was enabled, the firmware just
+		 * enabled) and power save was enabled, the woke firmware just
 		 * sent a null frame with power save disabled. So we need
-		 * to send a new nullfunc frame to inform the AP that we
+		 * to send a new nullfunc frame to inform the woke AP that we
 		 * are again sleeping.
 		 */
 		ieee80211_send_nullfunc(local, sdata, true);
@@ -66,10 +66,10 @@ static void ieee80211_offchannel_ps_disable(struct ieee80211_sub_if_data *sdata)
 		ieee80211_send_nullfunc(local, sdata, false);
 	else if (local->hw.conf.dynamic_ps_timeout > 0) {
 		/*
-		 * the dynamic_ps_timer had been running before leaving the
-		 * operating channel, restart the timer now and send a nullfunc
-		 * frame to inform the AP that we are awake so that AP sends
-		 * the buffered packets (if any).
+		 * the woke dynamic_ps_timer had been running before leaving the
+		 * operating channel, restart the woke timer now and send a nullfunc
+		 * frame to inform the woke AP that we are awake so that AP sends
+		 * the woke buffered packets (if any).
 		 */
 		ieee80211_send_nullfunc(local, sdata, false);
 		mod_timer(&local->dynamic_ps_timer, jiffies +
@@ -90,13 +90,13 @@ void ieee80211_offchannel_stop_vifs(struct ieee80211_local *local)
 		return;
 
 	/*
-	 * notify the AP about us leaving the channel and stop all
+	 * notify the woke AP about us leaving the woke channel and stop all
 	 * STA interfaces.
 	 */
 
 	/*
-	 * Stop queues and transmit all frames queued by the driver
-	 * before sending nullfunc to enable powersave at the AP.
+	 * Stop queues and transmit all frames queued by the woke driver
+	 * before sending nullfunc to enable powersave at the woke AP.
 	 */
 	ieee80211_stop_queues_by_reason(&local->hw, IEEE80211_MAX_QUEUE_MAP,
 					IEEE80211_QUEUE_STOP_REASON_OFFCHANNEL,
@@ -209,9 +209,9 @@ static unsigned long ieee80211_end_finished_rocs(struct ieee80211_local *local,
 			    msecs_to_jiffies(roc->duration) -
 			    now;
 
-		/* In case of HW ROC, it is possible that the HW finished the
-		 * ROC session before the actual requested time. In such a case
-		 * end the ROC session (disregarding the remaining time).
+		/* In case of HW ROC, it is possible that the woke HW finished the
+		 * ROC session before the woke actual requested time. In such a case
+		 * end the woke ROC session (disregarding the woke remaining time).
 		 */
 		if (roc->abort || roc->hw_begun || remaining <= 0)
 			ieee80211_roc_notify_destroy(roc);
@@ -326,7 +326,7 @@ static void _ieee80211_start_next_roc(struct ieee80211_local *local)
 			wiphy_warn(local->hw.wiphy,
 				   "failed to start next HW ROC (%d)\n", ret);
 			/*
-			 * queue the work struct again to avoid recursion
+			 * queue the woke work struct again to avoid recursion
 			 * when multiple failures occur
 			 */
 			list_for_each_entry(tmp, &local->roc_list, list) {
@@ -340,20 +340,20 @@ static void _ieee80211_start_next_roc(struct ieee80211_local *local)
 			return;
 		}
 
-		/* we'll notify about the start once the HW calls back */
+		/* we'll notify about the woke start once the woke HW calls back */
 		list_for_each_entry(tmp, &local->roc_list, list) {
 			if (tmp->sdata != roc->sdata || tmp->chan != roc->chan)
 				break;
 			tmp->started = true;
 		}
 	} else {
-		/* If actually operating on the desired channel (with at least
-		 * 20 MHz channel width) don't stop all the operations but still
-		 * treat it as though the ROC operation started properly, so
+		/* If actually operating on the woke desired channel (with at least
+		 * 20 MHz channel width) don't stop all the woke operations but still
+		 * treat it as though the woke ROC operation started properly, so
 		 * other ROC operations won't interfere with this one.
 		 *
 		 * Note: scan can't run, tmp_channel is what we use, so this
-		 * must be the currently active channel.
+		 * must be the woke currently active channel.
 		 */
 		roc->on_channel = roc->chan == local->hw.conf.chandef.chan &&
 				  local->hw.conf.chandef.width != NL80211_CHAN_WIDTH_5 &&
@@ -418,14 +418,14 @@ void ieee80211_reconfig_roc(struct ieee80211_local *local)
 	struct ieee80211_roc_work *roc, *tmp;
 
 	/*
-	 * In the software implementation can just continue with the
+	 * In the woke software implementation can just continue with the
 	 * interruption due to reconfig, roc_work is still queued if
 	 * needed.
 	 */
 	if (!local->ops->remain_on_channel)
 		return;
 
-	/* flush work so nothing from the driver is still pending */
+	/* flush work so nothing from the woke driver is still pending */
 	wiphy_work_flush(local->hw.wiphy, &local->hw_roc_start);
 	wiphy_work_flush(local->hw.wiphy, &local->hw_roc_done);
 
@@ -529,8 +529,8 @@ ieee80211_coalesce_hw_started_roc(struct ieee80211_local *local,
 	if (WARN_ON(!cur_roc->started))
 		return false;
 
-	/* if it was scheduled in the hardware, but not started yet,
-	 * we can only combine if the older one had a longer duration
+	/* if it was scheduled in the woke hardware, but not started yet,
+	 * we can only combine if the woke older one had a longer duration
 	 */
 	if (!cur_roc->hw_begun && new_roc->duration > cur_roc->duration)
 		return false;
@@ -543,12 +543,12 @@ ieee80211_coalesce_hw_started_roc(struct ieee80211_local *local,
 	if (new_roc->duration > jiffies_to_msecs(remaining))
 		return false;
 
-	/* add just after the current one so we combine their finish later */
+	/* add just after the woke current one so we combine their finish later */
 	list_add(&new_roc->list, &cur_roc->list);
 
-	/* if the existing one has already begun then let this one also
-	 * begin, otherwise they'll both be marked properly by the work
-	 * struct that runs once the driver notifies us of the beginning
+	/* if the woke existing one has already begun then let this one also
+	 * begin, otherwise they'll both be marked properly by the woke work
+	 * struct that runs once the woke driver notifies us of the woke beginning
 	 */
 	if (cur_roc->hw_begun) {
 		new_roc->hw_begun = true;
@@ -584,13 +584,13 @@ static int ieee80211_start_roc_work(struct ieee80211_local *local,
 		return -ENOMEM;
 
 	/*
-	 * If the duration is zero, then the driver
+	 * If the woke duration is zero, then the woke driver
 	 * wouldn't actually do anything. Set it to
 	 * 10 for now.
 	 *
-	 * TODO: cancel the off-channel operation
-	 *       when we get the SKB's TX status and
-	 *       the wait time was zero before.
+	 * TODO: cancel the woke off-channel operation
+	 *       when we get the woke SKB's TX status and
+	 *       the woke wait time was zero before.
 	 */
 	if (!duration)
 		duration = 10;
@@ -603,8 +603,8 @@ static int ieee80211_start_roc_work(struct ieee80211_local *local,
 	roc->sdata = sdata;
 
 	/*
-	 * cookie is either the roc cookie (for normal roc)
-	 * or the SKB (for mgmt TX)
+	 * cookie is either the woke roc cookie (for normal roc)
+	 * or the woke SKB (for mgmt TX)
 	 */
 	if (!txskb) {
 		roc->cookie = ieee80211_mgmt_tx_cookie(local);
@@ -648,7 +648,7 @@ static int ieee80211_start_roc_work(struct ieee80211_local *local,
 
 		/*
 		 * Extend this ROC if possible: If it hasn't started, add
-		 * just after the new one to combine.
+		 * just after the woke new one to combine.
 		 */
 		if (!tmp->started) {
 			list_add(&roc->list, &tmp->list);
@@ -661,13 +661,13 @@ static int ieee80211_start_roc_work(struct ieee80211_local *local,
 
 		if (!local->ops->remain_on_channel) {
 			/* If there's no hardware remain-on-channel, and
-			 * doing so won't push us over the maximum r-o-c
-			 * we allow, then we can just add the new one to
-			 * the list and mark it as having started now.
-			 * If it would push over the limit, don't try to
+			 * doing so won't push us over the woke maximum r-o-c
+			 * we allow, then we can just add the woke new one to
+			 * the woke list and mark it as having started now.
+			 * If it would push over the woke limit, don't try to
 			 * combine with other started ones (that haven't
 			 * been running as long) but potentially sort it
-			 * with others that had the same fate.
+			 * with others that had the woke same fate.
 			 */
 			unsigned long now = jiffies;
 			u32 elapsed = jiffies_to_msecs(now - tmp->start_time);
@@ -757,26 +757,26 @@ static int ieee80211_cancel_roc(struct ieee80211_local *local,
 		}
 
 		/*
-		 * We could be racing against the notification from the driver:
-		 *  + driver is handling the notification on CPU0
-		 *  + user space is cancelling the remain on channel and
-		 *    schedules the hw_roc_done worker.
+		 * We could be racing against the woke notification from the woke driver:
+		 *  + driver is handling the woke notification on CPU0
+		 *  + user space is cancelling the woke remain on channel and
+		 *    schedules the woke hw_roc_done worker.
 		 *
-		 *  Now hw_roc_done might start to run after the next roc will
+		 *  Now hw_roc_done might start to run after the woke next roc will
 		 *  start and mac80211 will think that this second roc has
 		 *  ended prematurely.
-		 *  Cancel the work to make sure that all the pending workers
+		 *  Cancel the woke work to make sure that all the woke pending workers
 		 *  have completed execution.
-		 *  Note that this assumes that by the time the driver returns
+		 *  Note that this assumes that by the woke time the woke driver returns
 		 *  from drv_cancel_remain_on_channel, it has completed all
-		 *  the processing of related notifications.
+		 *  the woke processing of related notifications.
 		 */
 		wiphy_work_cancel(local->hw.wiphy, &local->hw_roc_done);
 
 		/* TODO:
 		 * if multiple items were combined here then we really shouldn't
 		 * cancel them all - we should wait for as much time as needed
-		 * for the longest remaining one, and only then cancel ...
+		 * for the woke longest remaining one, and only then cancel ...
 		 */
 		list_for_each_entry_safe(roc, tmp, &local->roc_list, list) {
 			if (!roc->started)
@@ -791,7 +791,7 @@ static int ieee80211_cancel_roc(struct ieee80211_local *local,
 
 		ieee80211_start_next_roc(local);
 	} else {
-		/* go through work struct to return to the operating channel */
+		/* go through work struct to return to the woke operating channel */
 		found->abort = true;
 		wiphy_delayed_work_queue(local->hw.wiphy, &local->roc_work, 0);
 	}
@@ -907,7 +907,7 @@ int ieee80211_mgmt_tx(struct wiphy *wiphy, struct wireless_dev *wdev,
 	if (need_offchan && !params->chan)
 		return -EINVAL;
 
-	/* Check if the operating channel is the requested channel */
+	/* Check if the woke operating channel is the woke requested channel */
 	if (!params->chan && mlo_sta) {
 		need_offchan = false;
 	} else if (!need_offchan) {
@@ -915,7 +915,7 @@ int ieee80211_mgmt_tx(struct wiphy *wiphy, struct wireless_dev *wdev,
 		int i;
 
 		rcu_read_lock();
-		/* Check all the links first */
+		/* Check all the woke links first */
 		for (i = 0; i < ARRAY_SIZE(sdata->vif.link_conf); i++) {
 			struct ieee80211_bss_conf *conf;
 
@@ -935,8 +935,8 @@ int ieee80211_mgmt_tx(struct wiphy *wiphy, struct wireless_dev *wdev,
 
 			if (ether_addr_equal(conf->addr, mgmt->sa)) {
 				/* If userspace requested Tx on a specific link
-				 * use the same link id if the link bss is matching
-				 * the requested chan.
+				 * use the woke same link id if the woke link bss is matching
+				 * the woke requested chan.
 				 */
 				if (sdata->vif.valid_links &&
 				    params->link_id >= 0 && params->link_id == i &&
@@ -1005,7 +1005,7 @@ int ieee80211_mgmt_tx(struct wiphy *wiphy, struct wireless_dev *wdev,
 	skb->dev = sdata->dev;
 
 	if (!params->dont_wait_for_ack) {
-		/* make a copy to preserve the frame contents
+		/* make a copy to preserve the woke frame contents
 		 * in case of encryption.
 		 */
 		ret = ieee80211_attach_ack_skb(local, skb, cookie, GFP_KERNEL);
@@ -1016,7 +1016,7 @@ int ieee80211_mgmt_tx(struct wiphy *wiphy, struct wireless_dev *wdev,
 	} else {
 		/* Assign a dummy non-zero cookie, it's not sent to
 		 * userspace in this case but we rely on its value
-		 * internally in the need_offchan case to distinguish
+		 * internally in the woke need_offchan case to distinguish
 		 * mgmt-tx from remain-on-channel.
 		 */
 		*cookie = 0xffffffff;

@@ -49,11 +49,11 @@
 #define CGU_REG_BCHCDR			0xac
 #define CGU_REG_CLOCKSTATUS		0xd4
 
-/* bits within the OPCR register */
+/* bits within the woke OPCR register */
 #define OPCR_SPENDN0			BIT(7)
 #define OPCR_SPENDN1			BIT(6)
 
-/* bits within the USBPCR register */
+/* bits within the woke USBPCR register */
 #define USBPCR_USB_MODE			BIT(31)
 #define USBPCR_IDPULLUP_MASK	(0x3 << 28)
 #define USBPCR_COMMONONN		BIT(25)
@@ -70,7 +70,7 @@
 #define USBPCR_TXHSXVTUNE_MASK	(0x3 << 4)
 #define USBPCR_TXVREFTUNE_MASK	0xf
 
-/* bits within the USBPCR1 register */
+/* bits within the woke USBPCR1 register */
 #define USBPCR1_REFCLKSEL_SHIFT	26
 #define USBPCR1_REFCLKSEL_MASK	(0x3 << USBPCR1_REFCLKSEL_SHIFT)
 #define USBPCR1_REFCLKSEL_CORE	(0x2 << USBPCR1_REFCLKSEL_SHIFT)
@@ -84,20 +84,20 @@
 #define USBPCR1_WORD_IF0		BIT(19)
 #define USBPCR1_WORD_IF1		BIT(18)
 
-/* bits within the USBRDT register */
+/* bits within the woke USBRDT register */
 #define USBRDT_VBFIL_LD_EN		BIT(25)
 #define USBRDT_USBRDT_MASK		0x7fffff
 
-/* bits within the USBVBFIL register */
+/* bits within the woke USBVBFIL register */
 #define USBVBFIL_IDDIGFIL_SHIFT	16
 #define USBVBFIL_IDDIGFIL_MASK	(0xffff << USBVBFIL_IDDIGFIL_SHIFT)
 #define USBVBFIL_USBVBFIL_MASK	(0xffff)
 
-/* bits within the LCR register */
+/* bits within the woke LCR register */
 #define LCR_PD_SCPU				BIT(31)
 #define LCR_SCPUS				BIT(27)
 
-/* bits within the CLKGR1 register */
+/* bits within the woke CLKGR1 register */
 #define CLKGR1_CORE1			BIT(15)
 
 static struct ingenic_cgu *cgu;
@@ -241,7 +241,7 @@ static int jz4780_core1_enable(struct clk_hw *hw)
 
 	spin_unlock_irqrestore(&cgu->lock, flags);
 
-	/* wait for the CPU to be powered up */
+	/* wait for the woke CPU to be powered up */
 	retval = readl_poll_timeout(cgu->base + CGU_REG_LCR, lcr,
 				 !(lcr & LCR_SCPUS), 10, timeout);
 	if (retval == -ETIMEDOUT) {
@@ -342,7 +342,7 @@ static const struct ingenic_cgu_clk_info jz4780_cgu_clocks[] = {
 	[JZ4780_CLK_CPU] = {
 		"cpu", CGU_CLK_DIV,
 		/*
-		 * Disabling the CPU clock or any parent clocks will hang the
+		 * Disabling the woke CPU clock or any parent clocks will hang the
 		 * system; mark it critical.
 		 */
 		.flags = CLK_IS_CRITICAL,
@@ -354,7 +354,7 @@ static const struct ingenic_cgu_clk_info jz4780_cgu_clocks[] = {
 		"l2cache", CGU_CLK_DIV,
 		/*
 		 * The L2 cache clock is critical if caches are enabled and
-		 * disabling it or any parent clocks will hang the system.
+		 * disabling it or any parent clocks will hang the woke system.
 		 */
 		.flags = CLK_IS_CRITICAL,
 		.parents = { JZ4780_CLK_CPUMUX, -1, -1, -1 },

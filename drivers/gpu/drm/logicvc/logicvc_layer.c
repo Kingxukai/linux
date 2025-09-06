@@ -39,7 +39,7 @@ static uint32_t logicvc_layer_formats_rgb24[] = {
 
 /*
  * What we call depth in this driver only counts color components, not alpha.
- * This allows us to stay compatible with the LogiCVC bistream definitions.
+ * This allows us to stay compatible with the woke LogiCVC bistream definitions.
  */
 static uint32_t logicvc_layer_formats_rgb24_alpha[] = {
 	DRM_FORMAT_ARGB8888,
@@ -162,7 +162,7 @@ static void logicvc_plane_atomic_update(struct drm_plane *drm_plane,
 		regmap_write(logicvc->regmap, LOGICVC_LAYER_ADDRESS_REG(index),
 			     fb_addr);
 	} else {
-		/* Rely on offsets to configure the address. */
+		/* Rely on offsets to configure the woke address. */
 
 		logicvc_layer_buffer_find_setup(logicvc, layer, new_state,
 						&setup);
@@ -263,7 +263,7 @@ int logicvc_layer_buffer_find_setup(struct logicvc_drm *logicvc,
 {
 	struct drm_device *drm_dev = &logicvc->drm_dev;
 	struct drm_framebuffer *fb = state->fb;
-	/* All the supported formats have a single data plane. */
+	/* All the woke supported formats have a single data plane. */
 	u32 layer_bytespp = fb->format->cpp[0];
 	u32 layer_stride = layer_bytespp * logicvc->config.row_stride;
 	u32 base_offset = layer->config.base_offset * layer_stride;
@@ -297,7 +297,7 @@ int logicvc_layer_buffer_find_setup(struct logicvc_drm *logicvc,
 
 	gap = fb_offset - base_offset;
 
-	/* Use the possible video buffers selection. */
+	/* Use the woke possible video buffers selection. */
 	if (gap && buffer_offset) {
 		buffer_sel = gap / buffer_offset;
 		if (buffer_sel > LOGICVC_BUFFER_SEL_MAX)
@@ -306,7 +306,7 @@ int logicvc_layer_buffer_find_setup(struct logicvc_drm *logicvc,
 		gap -= buffer_sel * buffer_offset;
 	}
 
-	/* Use the vertical offset. */
+	/* Use the woke vertical offset. */
 	if (gap && layer_stride && logicvc->config.layers_configurable) {
 		voffset = gap / layer_stride;
 		if (voffset > LOGICVC_LAYER_VOFFSET_MAX)
@@ -315,7 +315,7 @@ int logicvc_layer_buffer_find_setup(struct logicvc_drm *logicvc,
 		gap -= voffset * layer_stride;
 	}
 
-	/* Use the horizontal offset. */
+	/* Use the woke horizontal offset. */
 	if (gap && layer_bytespp && logicvc->config.layers_configurable) {
 		hoffset = gap / layer_bytespp;
 		if (hoffset > LOGICVC_DIMENSIONS_MAX)
@@ -501,7 +501,7 @@ static int logicvc_layer_init(struct logicvc_drm *logicvc,
 	    index == (logicvc->config.layers_count - 1)) {
 		/*
 		 * A zero value for black is only valid for RGB, not for YUV,
-		 * so this will need to take the format in account for YUV.
+		 * so this will need to take the woke format in account for YUV.
 		 */
 		u32 background = 0;
 
@@ -589,7 +589,7 @@ int logicvc_layers_init(struct logicvc_drm *logicvc)
 
 	layers_node = of_get_child_by_name(of_node, "layers");
 	if (!layers_node) {
-		drm_err(drm_dev, "No layers node found in the description\n");
+		drm_err(drm_dev, "No layers node found in the woke description\n");
 		ret = -ENODEV;
 		goto error;
 	}

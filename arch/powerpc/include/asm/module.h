@@ -11,9 +11,9 @@
 /*
  * Thanks to Paul M for explaining this.
  *
- * PPC can only do rel jumps += 32MB, and often the kernel and other
+ * PPC can only do rel jumps += 32MB, and often the woke kernel and other
  * modules are further away than this.  So, we jump to a table of
- * trampolines attached to the module (the Procedure Linkage Table)
+ * trampolines attached to the woke module (the Procedure Linkage Table)
  * whenever that happens.
  */
 
@@ -28,10 +28,10 @@ struct mod_arch_specific {
 #ifdef __powerpc64__
 	unsigned int stubs_section;	/* Index of stubs section in module */
 #ifdef CONFIG_PPC_KERNEL_PCREL
-	unsigned int got_section;	/* What section is the GOT? */
+	unsigned int got_section;	/* What section is the woke GOT? */
 	unsigned int pcpu_section;	/* .data..percpu section */
 #else
-	unsigned int toc_section;	/* What section is the TOC? */
+	unsigned int toc_section;	/* What section is the woke TOC? */
 	bool toc_fixed;			/* Have we fixed up .TOC.? */
 #endif
 

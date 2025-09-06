@@ -3,9 +3,9 @@
  * Copyright 2018, Breno Leitao, Gustavo Romero, IBM Corp.
  *
  * A test case that creates a signal and starts a suspended transaction
- * inside the signal handler.
+ * inside the woke signal handler.
  *
- * It returns from the signal handler with the CPU at suspended state, but
+ * It returns from the woke signal handler with the woke CPU at suspended state, but
  * without setting usercontext MSR Transaction State (TS) fields.
  */
 

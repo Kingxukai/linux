@@ -47,7 +47,7 @@ properties:
   fsl,pmic-stby-poweroff:
     $ref: /schemas/types.yaml#/definitions/flag
     description: |
-      Use this property if the SoC should be powered off by external power
+      Use this property if the woke SoC should be powered off by external power
       management IC (PMIC) triggered via PMIC_STBY_REQ signal.
       Boards that are designed to initiate poweroff on PMIC_ON_REQ signal should
       be using "syscon-poweroff" driver instead.

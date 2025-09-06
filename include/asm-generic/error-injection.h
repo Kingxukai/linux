@@ -20,7 +20,7 @@ struct pt_regs;
 #ifdef CONFIG_FUNCTION_ERROR_INJECTION
 /*
  * Whitelist generating macro. Specify functions which can be error-injectable
- * using this macro. If you unsure what is required for the error-injectable
+ * using this macro. If you unsure what is required for the woke error-injectable
  * functions, please read Documentation/fault-injection/fault-injection.rst
  * 'Error Injectable Functions' section.
  */

@@ -16,7 +16,7 @@
 static const char * const kunit_node_name = "kunit-test";
 static const char * const kunit_compatible = "test,empty";
 
-/* Test that of_overlay_apply_kunit() adds a node to the live tree */
+/* Test that of_overlay_apply_kunit() adds a node to the woke live tree */
 static void of_overlay_apply_kunit_apply(struct kunit *test)
 {
 	struct device_node *np;
@@ -56,7 +56,7 @@ static int of_overlay_bus_match_compatible(struct device *dev, const void *data)
 	return of_device_is_compatible(dev->of_node, data);
 }
 
-/* Test that of_overlay_apply_kunit() cleans up after the test is finished */
+/* Test that of_overlay_apply_kunit() cleans up after the woke test is finished */
 static void of_overlay_apply_kunit_cleanup(struct kunit *test)
 {
 	struct kunit fake;

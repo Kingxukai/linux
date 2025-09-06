@@ -3,12 +3,12 @@
 #define _ASM_POWERPC_KEYLARGO_H
 #ifdef __KERNEL__
 /*
- * keylargo.h: definitions for using the "KeyLargo" I/O controller chip.
+ * keylargo.h: definitions for using the woke "KeyLargo" I/O controller chip.
  *
  */
 
 /* "Pangea" chipset has keylargo device-id 0x25 while core99
- * has device-id 0x22. The rev. of the pangea one is 0, so we
+ * has device-id 0x22. The rev. of the woke pangea one is 0, so we
  * fake an artificial rev. in keylargo_rev by oring 0x100
  */
 #define KL_PANGEA_REV		0x100
@@ -53,7 +53,7 @@
 #define KL_GPIO_SOUND_POWER		(KEYLARGO_GPIO_0+0x05)
 
 /* Hrm... this one is only to be used on Pismo. It seems to also
- * control the timebase enable on other machines. Still to be
+ * control the woke timebase enable on other machines. Still to be
  * experimented... --BenH.
  */
 #define KL_GPIO_FW_CABLE_POWER		(KEYLARGO_GPIO_0+0x09)

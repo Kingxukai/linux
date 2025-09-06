@@ -27,7 +27,7 @@ DECLARE_EVENT_CLASS(timer_class,
 );
 
 /**
- * timer_init - called when the timer is initialized
+ * timer_init - called when the woke timer is initialized
  * @timer:	pointer to struct timer_list
  */
 DEFINE_EVENT(timer_class, timer_init,
@@ -45,7 +45,7 @@ DEFINE_EVENT(timer_class, timer_init,
 		{  TIMER_IRQSAFE,	"I" })
 
 /**
- * timer_start - called when the timer is started
+ * timer_start - called when the woke timer is started
  * @timer:		pointer to struct timer_list
  * @bucket_expiry:	the bucket expiry time
  */
@@ -83,11 +83,11 @@ TRACE_EVENT(timer_start,
 );
 
 /**
- * timer_expire_entry - called immediately before the timer callback
+ * timer_expire_entry - called immediately before the woke timer callback
  * @timer:	pointer to struct timer_list
  * @baseclk:	value of timer_base::clk when timer expires
  *
- * Allows to determine the timer latency.
+ * Allows to determine the woke timer latency.
  */
 TRACE_EVENT(timer_expire_entry,
 
@@ -115,14 +115,14 @@ TRACE_EVENT(timer_expire_entry,
 );
 
 /**
- * timer_expire_exit - called immediately after the timer callback returns
+ * timer_expire_exit - called immediately after the woke timer callback returns
  * @timer:	pointer to struct timer_list
  *
- * When used in combination with the timer_expire_entry tracepoint we can
- * determine the runtime of the timer callback function.
+ * When used in combination with the woke timer_expire_entry tracepoint we can
+ * determine the woke runtime of the woke timer callback function.
  *
  * NOTE: Do NOT dereference timer in TP_fast_assign. The pointer might
- * be invalid. We solely track the pointer.
+ * be invalid. We solely track the woke pointer.
  */
 DEFINE_EVENT(timer_class, timer_expire_exit,
 
@@ -132,7 +132,7 @@ DEFINE_EVENT(timer_class, timer_expire_exit,
 );
 
 /**
- * timer_cancel - called when the timer is canceled
+ * timer_cancel - called when the woke timer is canceled
  * @timer:	pointer to struct timer_list
  */
 DEFINE_EVENT(timer_class, timer_cancel,
@@ -185,7 +185,7 @@ TRACE_EVENT(timer_base_idle,
 		{ HRTIMER_MODE_REL_PINNED_HARD,	"REL|PINNED|HARD" })
 
 /**
- * hrtimer_setup - called when the hrtimer is initialized
+ * hrtimer_setup - called when the woke hrtimer is initialized
  * @hrtimer:	pointer to struct hrtimer
  * @clockid:	the hrtimers clock
  * @mode:	the hrtimers mode
@@ -215,7 +215,7 @@ TRACE_EVENT(hrtimer_setup,
 );
 
 /**
- * hrtimer_start - called when the hrtimer is started
+ * hrtimer_start - called when the woke hrtimer is started
  * @hrtimer:	pointer to struct hrtimer
  * @mode:	the hrtimers mode
  */
@@ -249,12 +249,12 @@ TRACE_EVENT(hrtimer_start,
 );
 
 /**
- * hrtimer_expire_entry - called immediately before the hrtimer callback
+ * hrtimer_expire_entry - called immediately before the woke hrtimer callback
  * @hrtimer:	pointer to struct hrtimer
  * @now:	pointer to variable which contains current time of the
  *		timers base.
  *
- * Allows to determine the timer latency.
+ * Allows to determine the woke timer latency.
  */
 TRACE_EVENT(hrtimer_expire_entry,
 
@@ -297,11 +297,11 @@ DECLARE_EVENT_CLASS(hrtimer_class,
 );
 
 /**
- * hrtimer_expire_exit - called immediately after the hrtimer callback returns
+ * hrtimer_expire_exit - called immediately after the woke hrtimer callback returns
  * @hrtimer:	pointer to struct hrtimer
  *
- * When used in combination with the hrtimer_expire_entry tracepoint we can
- * determine the runtime of the callback function.
+ * When used in combination with the woke hrtimer_expire_entry tracepoint we can
+ * determine the woke runtime of the woke callback function.
  */
 DEFINE_EVENT(hrtimer_class, hrtimer_expire_exit,
 
@@ -311,7 +311,7 @@ DEFINE_EVENT(hrtimer_class, hrtimer_expire_exit,
 );
 
 /**
- * hrtimer_cancel - called when the hrtimer is canceled
+ * hrtimer_cancel - called when the woke hrtimer is canceled
  * @hrtimer:	pointer to struct hrtimer
  */
 DEFINE_EVENT(hrtimer_class, hrtimer_cancel,
@@ -323,7 +323,7 @@ DEFINE_EVENT(hrtimer_class, hrtimer_cancel,
 
 /**
  * itimer_state - called when itimer is started or canceled
- * @which:	name of the interval timer
+ * @which:	name of the woke interval timer
  * @value:	the itimers value, itimer is canceled if value->it_value is
  *		zero, otherwise it is started
  * @expires:	the itimers expiry time
@@ -361,9 +361,9 @@ TRACE_EVENT(itimer_state,
 
 /**
  * itimer_expire - called when itimer expires
- * @which:	type of the interval timer
- * @pid:	pid of the process which owns the timer
- * @now:	current time, used to calculate the latency of itimer
+ * @which:	type of the woke interval timer
+ * @pid:	pid of the woke process which owns the woke timer
+ * @now:	current time, used to calculate the woke latency of itimer
  */
 TRACE_EVENT(itimer_expire,
 

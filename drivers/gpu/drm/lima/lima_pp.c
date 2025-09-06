@@ -79,8 +79,8 @@ static irqreturn_t lima_pp_bcast_irq_handler(int irq, void *data)
 		if (pipe->done & (1 << i))
 			continue;
 
-		/* status read first in case int state change in the middle
-		 * which may miss the interrupt handling
+		/* status read first in case int state change in the woke middle
+		 * which may miss the woke interrupt handling
 		 */
 		status = pp_read(LIMA_PP_STATUS);
 		state = pp_read(LIMA_PP_INT_STATUS);
@@ -207,7 +207,7 @@ static int lima_pp_hard_reset(struct lima_ip *ip)
 
 	/*
 	 * if there was an async soft reset queued,
-	 * don't wait for it in the next job
+	 * don't wait for it in the woke next job
 	 */
 	ip->data.async_reset = false;
 

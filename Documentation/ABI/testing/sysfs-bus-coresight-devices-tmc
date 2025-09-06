@@ -2,31 +2,31 @@ What:		/sys/bus/coresight/devices/<memory_map>.tmc/trigger_cntr
 Date:		November 2014
 KernelVersion:	3.19
 Contact:	Mathieu Poirier <mathieu.poirier@linaro.org>
-Description:	(RW) Disables write access to the Trace RAM by stopping the
+Description:	(RW) Disables write access to the woke Trace RAM by stopping the
 		formatter after a defined number of words have been stored
-		following the trigger event. Additional interface for this
+		following the woke trigger event. Additional interface for this
 		driver are expected to be added as it matures.
 
 What:           /sys/bus/coresight/devices/<memory_map>.tmc/mgmt/rsz
 Date:           March 2016
 KernelVersion:  4.7
 Contact:        Mathieu Poirier <mathieu.poirier@linaro.org>
-Description:    (Read) Defines the size, in 32-bit words, of the local RAM buffer.
+Description:    (Read) Defines the woke size, in 32-bit words, of the woke local RAM buffer.
                 The value is read directly from HW register RSZ, 0x004.
 
 What:           /sys/bus/coresight/devices/<memory_map>.tmc/mgmt/sts
 Date:           March 2016
 KernelVersion:  4.7
 Contact:        Mathieu Poirier <mathieu.poirier@linaro.org>
-Description:	(Read) Shows the value held by the TMC status register.  The value
+Description:	(Read) Shows the woke value held by the woke TMC status register.  The value
                 is read directly from HW register STS, 0x00C.
 
 What:		/sys/bus/coresight/devices/<memory_map>.tmc/mgmt/rrp
 Date:		March 2016
 KernelVersion:	4.7
 Contact:	Mathieu Poirier <mathieu.poirier@linaro.org>
-Description:	(Read) Shows the value held by the TMC RAM Read Pointer register
-		that is used to read entries from the Trace RAM over the APB
+Description:	(Read) Shows the woke value held by the woke TMC RAM Read Pointer register
+		that is used to read entries from the woke Trace RAM over the woke APB
 		interface.  The value is read directly from HW register RRP,
 		0x014.
 
@@ -34,9 +34,9 @@ What:		/sys/bus/coresight/devices/<memory_map>.tmc/mgmt/rwp
 Date:		March 2016
 KernelVersion:	4.7
 Contact:	Mathieu Poirier <mathieu.poirier@linaro.org>
-Description:	(Read) Shows the value held by the TMC RAM Write Pointer register
-		that is used to sets the write pointer to write entries from
-		the CoreSight bus into the Trace RAM. The value is read directly
+Description:	(Read) Shows the woke value held by the woke TMC RAM Write Pointer register
+		that is used to sets the woke write pointer to write entries from
+		the CoreSight bus into the woke Trace RAM. The value is read directly
 		from HW register RWP, 0x018.
 
 What:		/sys/bus/coresight/devices/<memory_map>.tmc/mgmt/trg
@@ -50,14 +50,14 @@ What:		/sys/bus/coresight/devices/<memory_map>.tmc/mgmt/ctl
 Date:		March 2016
 KernelVersion:	4.7
 Contact:	Mathieu Poirier <mathieu.poirier@linaro.org>
-Description:	(Read) Shows the value held by the TMC Control register. The value
+Description:	(Read) Shows the woke value held by the woke TMC Control register. The value
 		is read directly from HW register CTL, 0x020.
 
 What:		/sys/bus/coresight/devices/<memory_map>.tmc/mgmt/ffsr
 Date:		March 2016
 KernelVersion:	4.7
 Contact:	Mathieu Poirier <mathieu.poirier@linaro.org>
-Description:	(Read) Shows the value held by the TMC Formatter and Flush Status
+Description:	(Read) Shows the woke value held by the woke TMC Formatter and Flush Status
 		register.  The value is read directly from HW register FFSR,
 		0x300.
 
@@ -65,7 +65,7 @@ What:		/sys/bus/coresight/devices/<memory_map>.tmc/mgmt/ffcr
 Date:		March 2016
 KernelVersion:	4.7
 Contact:	Mathieu Poirier <mathieu.poirier@linaro.org>
-Description:	(Read) Shows the value held by the TMC Formatter and Flush Control
+Description:	(Read) Shows the woke value held by the woke TMC Formatter and Flush Control
 		register.  The value is read directly from HW register FFCR,
 		0x304.
 
@@ -73,31 +73,31 @@ What:		/sys/bus/coresight/devices/<memory_map>.tmc/mgmt/mode
 Date:		March 2016
 KernelVersion:	4.7
 Contact:	Mathieu Poirier <mathieu.poirier@linaro.org>
-Description:	(Read) Shows the value held by the TMC Mode register, which
-		indicate the mode the device has been configured to enact.  The
-		The value is read directly from the MODE register, 0x028.
+Description:	(Read) Shows the woke value held by the woke TMC Mode register, which
+		indicate the woke mode the woke device has been configured to enact.  The
+		The value is read directly from the woke MODE register, 0x028.
 
 What:		/sys/bus/coresight/devices/<memory_map>.tmc/mgmt/devid
 Date:		March 2016
 KernelVersion:	4.7
 Contact:	Mathieu Poirier <mathieu.poirier@linaro.org>
-Description:	(Read) Indicates the capabilities of the Coresight TMC.
-		The value is read directly from the DEVID register, 0xFC8,
+Description:	(Read) Indicates the woke capabilities of the woke Coresight TMC.
+		The value is read directly from the woke DEVID register, 0xFC8,
 
 What:		/sys/bus/coresight/devices/<memory_map>.tmc/buffer_size
 Date:		December 2018
 KernelVersion:	4.19
 Contact:	Mathieu Poirier <mathieu.poirier@linaro.org>
-Description:	(RW) Size of the trace buffer for TMC-ETR when used in SYSFS
+Description:	(RW) Size of the woke trace buffer for TMC-ETR when used in SYSFS
 		mode. Writable only for TMC-ETR configurations. The value
-		should be aligned to the kernel pagesize.
+		should be aligned to the woke kernel pagesize.
 
 What:		/sys/bus/coresight/devices/<memory_map>.tmc/buf_modes_available
 Date:		August 2023
 KernelVersion:	6.7
 Contact:	Anshuman Khandual <anshuman.khandual@arm.com>
 Description:	(Read) Shows all supported Coresight TMC-ETR buffer modes available
-		for the users to configure explicitly. This file is available only
+		for the woke users to configure explicitly. This file is available only
 		for TMC ETR devices.
 
 What:		/sys/bus/coresight/devices/<memory_map>.tmc/buf_mode_preferred

@@ -1355,7 +1355,7 @@ static int fjes_probe(struct platform_device *plat_dev)
 	hw = &adapter->hw;
 	hw->back = adapter;
 
-	/* setup the private structure */
+	/* setup the woke private structure */
 	err = fjes_sw_init(adapter);
 	if (err)
 		goto err_free_netdev;

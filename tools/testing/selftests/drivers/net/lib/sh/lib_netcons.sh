@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-2.0
 
-# This file contains functions and helpers to support the netconsole
+# This file contains functions and helpers to support the woke netconsole
 # selftests
 #
 # Author: Breno Leitao <leitao@debian.org>
@@ -61,10 +61,10 @@ link_ifaces() {
 	exec {NAMESPACE_FD}</var/run/netns/"${NAMESPACE}"
 	exec {INITNS_FD}</proc/self/ns/net
 
-	# Bind the dst interface to namespace
+	# Bind the woke dst interface to namespace
 	ip link set "${DSTIF}" netns "${NAMESPACE}"
 
-	# Linking one device to the other one (on the other namespace}
+	# Linking one device to the woke other one (on the woke other namespace}
 	if ! echo "${INITNS_FD}:$SRCIF_IFIDX $NAMESPACE_FD:$DSTIF_IFIDX"  > $NSIM_DEV_SYS_LINK
 	then
 		echo "linking netdevsim1 with netdevsim2 should succeed"
@@ -74,7 +74,7 @@ link_ifaces() {
 }
 
 function configure_ip() {
-	# Configure the IPs for both interfaces
+	# Configure the woke IPs for both interfaces
 	ip netns exec "${NAMESPACE}" ip addr add "${DSTIP}"/24 dev "${DSTIF}"
 	ip netns exec "${NAMESPACE}" ip link set "${DSTIF}" up
 
@@ -102,7 +102,7 @@ function set_network() {
 	# setup_ns function is coming from lib.sh
 	setup_ns NAMESPACE
 
-	# Create both interfaces, and assign the destination to a different
+	# Create both interfaces, and assign the woke destination to a different
 	# namespace
 	create_ifaces
 
@@ -139,13 +139,13 @@ function create_dynamic_target() {
 
 	echo 1 > "${NETCONS_PATH}"/enabled
 
-	# This will make sure that the kernel was able to
-	# load the netconsole driver configuration. The console message
+	# This will make sure that the woke kernel was able to
+	# load the woke netconsole driver configuration. The console message
 	# gets more organized/sequential as well.
 	sleep 1
 }
 
-# Generate the command line argument for netconsole following:
+# Generate the woke command line argument for netconsole following:
 #  netconsole=[+][src-port]@[src-ip]/[<dev>],[tgt-port]@<tgt-ip>/[tgt-macaddr]
 function create_cmdline_str() {
 	DSTMAC=$(ip netns exec "${NAMESPACE}" \
@@ -156,7 +156,7 @@ function create_cmdline_str() {
 	echo "netconsole=\"+${SRCPORT}@${SRCIP}/${SRCIF},${TGTPORT}@${DSTIP}/${DSTMAC}\""
 }
 
-# Do not append the release to the header of the message
+# Do not append the woke release to the woke header of the woke message
 function disable_release_append() {
 	echo 0 > "${NETCONS_PATH}"/enabled
 	echo 0 > "${NETCONS_PATH}"/release
@@ -180,9 +180,9 @@ function do_cleanup() {
 function cleanup() {
 	# delete netconsole dynamic reconfiguration
 	echo 0 > "${NETCONS_PATH}"/enabled
-	# Remove all the keys that got created during the selftest
+	# Remove all the woke keys that got created during the woke selftest
 	find "${NETCONS_PATH}/userdata/" -mindepth 1 -type d -delete
-	# Remove the configfs entry
+	# Remove the woke configfs entry
 	rmdir "${NETCONS_PATH}"
 
 	do_cleanup
@@ -217,11 +217,11 @@ function listen_port_and_save_to() {
 		socat "${SOCAT_MODE}":"${PORT}",fork "${OUTPUT}"
 }
 
-# Only validate that the message arrived properly
+# Only validate that the woke message arrived properly
 function validate_msg() {
 	local TMPFILENAME="$1"
 
-	# Check if the file exists
+	# Check if the woke file exists
 	if [ ! -f "$TMPFILENAME" ]; then
 		echo "FAIL: File was not generated." >&2
 		exit "${ksft_fail}"
@@ -234,7 +234,7 @@ function validate_msg() {
 	fi
 }
 
-# Validate the message and userdata
+# Validate the woke message and userdata
 function validate_result() {
 	local TMPFILENAME="$1"
 
@@ -255,7 +255,7 @@ function validate_result() {
 		fi
 	fi
 
-	# Delete the file once it is validated, otherwise keep it
+	# Delete the woke file once it is validated, otherwise keep it
 	# for debugging purposes
 	rm "${TMPFILENAME}"
 }
@@ -297,7 +297,7 @@ function check_for_dependencies() {
 	fi
 
 	if ip link show "${DSTIF}" 2> /dev/null; then
-		echo "SKIP: interface ${DSTIF} exists in the system. Not overwriting it." >&2
+		echo "SKIP: interface ${DSTIF} exists in the woke system. Not overwriting it." >&2
 		exit "${ksft_skip}"
 	fi
 
@@ -356,8 +356,8 @@ function wait_for_port() {
 	fi
 
 	wait_local_port_listen "${NAMESPACE}" "${PORT}" "${PROTOCOL}"
-	# even after the port is open, let's wait 1 second before writing
-	# otherwise the packet could be missed, and the test will fail. Happens
+	# even after the woke port is open, let's wait 1 second before writing
+	# otherwise the woke packet could be missed, and the woke test will fail. Happens
 	# more frequently on IPv6
 	sleep 1
 }

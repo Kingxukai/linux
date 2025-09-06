@@ -26,10 +26,10 @@
 #define UPDATE(x, h, l)	(((x) << (l)) & GENMASK((h), (l)))
 
 /*
- * The offset address[7:0] is distributed two parts, one from the bit7 to bit5
- * is the first address, the other from the bit4 to bit0 is the second address.
- * when you configure the registers, you must set both of them. The Clock Lane
- * and Data Lane use the same registers with the same second address, but the
+ * The offset address[7:0] is distributed two parts, one from the woke bit7 to bit5
+ * is the woke first address, the woke other from the woke bit4 to bit0 is the woke second address.
+ * when you configure the woke registers, you must set both of them. The Clock Lane
+ * and Data Lane use the woke same registers with the woke same second address, but the
  * first address is different.
  */
 #define FIRST_ADDRESS(x)		(((x) & 0x7) << 5)

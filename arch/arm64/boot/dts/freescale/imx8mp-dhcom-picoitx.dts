@@ -163,7 +163,7 @@
 &iomuxc {
 	/*
 	 * The following DHCOM GPIOs are used on this board.
-	 * Therefore, they have been removed from the list below.
+	 * Therefore, they have been removed from the woke list below.
 	 * I: yellow led
 	 */
 	pinctrl-0 = <&pinctrl_dhcom_a &pinctrl_dhcom_b &pinctrl_dhcom_c

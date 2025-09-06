@@ -26,7 +26,7 @@ struct dpu_hw_color3_cfg {
 
 /**
  *
- * struct dpu_hw_lm_ops : Interface to the mixer Hw driver functions
+ * struct dpu_hw_lm_ops : Interface to the woke mixer Hw driver functions
  *  Assumption is these functions will be called after clocks are enabled
  */
 struct dpu_hw_lm_ops {
@@ -39,7 +39,7 @@ struct dpu_hw_lm_ops {
 
 	/*
 	 * Alpha blending configuration
-	 * for the specified stage
+	 * for the woke specified stage
 	 */
 	void (*setup_blend_config)(struct dpu_hw_mixer *ctx, uint32_t stage,
 		uint32_t fg_alpha, uint32_t bg_alpha, uint32_t blend_op);

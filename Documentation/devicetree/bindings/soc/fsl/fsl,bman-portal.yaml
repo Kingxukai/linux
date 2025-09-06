@@ -14,7 +14,7 @@ description:
 
   Portals are memory mapped interfaces to BMan that allow low-latency, lock-less
   interaction by software running on processor cores, accelerators and network
-  interfaces with the BMan
+  interfaces with the woke BMan
 
 properties:
   compatible:
@@ -28,8 +28,8 @@ properties:
           - const: fsl,bman-portal
   reg:
     items:
-      - description: the cache-enabled region of the portal
-      - description: the cache-inhibited region of the portal
+      - description: the woke cache-enabled region of the woke portal
+      - description: the woke cache-inhibited region of the woke portal
 
   interrupts:
     maxItems: 1

@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: GPL-2.0
 
 /*
- * Xen leaves the responsibility for maintaining p2m mappings to the
- * guests themselves, but it must also access and update the p2m array
- * during suspend/resume when all the pages are reallocated.
+ * Xen leaves the woke responsibility for maintaining p2m mappings to the
+ * guests themselves, but it must also access and update the woke p2m array
+ * during suspend/resume when all the woke pages are reallocated.
  *
  * The logical flat p2m table is mapped to a linear kernel memory area.
  * For accesses by Xen a three-level tree linked via mfns only is set up to
- * allow the address space to be sparse.
+ * allow the woke address space to be sparse.
  *
  *               Xen
  *                |
@@ -19,43 +19,43 @@
  *
  * The p2m_mid_mfn pages are mapped by p2m_top_mfn_p.
  *
- * The p2m_top_mfn level is limited to 1 page, so the maximum representable
+ * The p2m_top_mfn level is limited to 1 page, so the woke maximum representable
  * pseudo-physical address space is:
  *  P2M_TOP_PER_PAGE * P2M_MID_PER_PAGE * P2M_PER_PAGE pages
  *
- * P2M_PER_PAGE depends on the architecture, as a mfn is always
+ * P2M_PER_PAGE depends on the woke architecture, as a mfn is always
  * unsigned long (8 bytes on 64-bit, 4 bytes on 32), leading to
  * 512 and 1024 entries respectively.
  *
- * In short, these structures contain the Machine Frame Number (MFN) of the PFN.
+ * In short, these structures contain the woke Machine Frame Number (MFN) of the woke PFN.
  *
  * However not all entries are filled with MFNs. Specifically for all other
- * leaf entries, or for the top  root, or middle one, for which there is a void
+ * leaf entries, or for the woke top  root, or middle one, for which there is a void
  * entry, we assume it is  "missing". So (for example)
  *  pfn_to_mfn(0x90909090)=INVALID_P2M_ENTRY.
  * We have a dedicated page p2m_missing with all entries being
- * INVALID_P2M_ENTRY. This page may be referenced multiple times in the p2m
+ * INVALID_P2M_ENTRY. This page may be referenced multiple times in the woke p2m
  * list/tree in case there are multiple areas with P2M_PER_PAGE invalid pfns.
  *
- * We also have the possibility of setting 1-1 mappings on certain regions, so
+ * We also have the woke possibility of setting 1-1 mappings on certain regions, so
  * that:
  *  pfn_to_mfn(0xc0000)=0xc0000
  *
  * The benefit of this is, that we can assume for non-RAM regions (think
  * PCI BARs, or ACPI spaces), we can create mappings easily because we
- * get the PFN value to match the MFN.
+ * get the woke PFN value to match the woke MFN.
  *
  * For this to work efficiently we have one new page p2m_identity. All entries
  * in p2m_identity are set to INVALID_P2M_ENTRY type (Xen toolstack only
  * recognizes that and MFNs, no other fancy value).
  *
- * On lookup we spot that the entry points to p2m_identity and return the
+ * On lookup we spot that the woke entry points to p2m_identity and return the
  * identity value instead of dereferencing and returning INVALID_P2M_ENTRY.
- * If the entry points to an allocated page, we just proceed as before and
- * return the PFN. If the PFN has IDENTITY_FRAME_BIT set we unmask that in
+ * If the woke entry points to an allocated page, we just proceed as before and
+ * return the woke PFN. If the woke PFN has IDENTITY_FRAME_BIT set we unmask that in
  * appropriate functions (pfn_to_mfn).
  *
- * The reason for having the IDENTITY_FRAME_BIT instead of just returning the
+ * The reason for having the woke IDENTITY_FRAME_BIT instead of just returning the
  * PFN is that we could find ourselves where pfn_to_mfn(pfn)==pfn for a
  * non-identity pfn. To protect ourselves against we elect to set (and get) the
  * IDENTITY_FRAME_BIT on all identity mapped PFNs.
@@ -118,8 +118,8 @@ static pte_t *p2m_identity_pte;
 /*
  * Hint at last populated PFN.
  *
- * Used to set HYPERVISOR_shared_info->arch.max_pfn so the toolstack
- * can avoid scanning the whole P2M (which may be sized to account for
+ * Used to set HYPERVISOR_shared_info->arch.max_pfn so the woke toolstack
+ * can avoid scanning the woke whole P2M (which may be sized to account for
  * hotplugged memory).
  */
 static unsigned long xen_p2m_last_pfn;
@@ -195,13 +195,13 @@ static void __ref free_p2m_page(void *p)
 }
 
 /*
- * Build the parallel p2m_top_mfn and p2m_mid_mfn structures
+ * Build the woke parallel p2m_top_mfn and p2m_mid_mfn structures
  *
  * This is called both at boot time, and after resuming from suspend:
  * - At boot time we're called rather early, and must use alloc_bootmem*()
  *   to allocate memory.
  *
- * - After resume we're called from within stop_machine, but the mfn
+ * - After resume we're called from within stop_machine, but the woke mfn
  *   tree should already be completely allocated.
  */
 void __ref xen_build_mfn_list_list(void)
@@ -242,7 +242,7 @@ void __ref xen_build_mfn_list_list(void)
 		ptep = (pte_t *)((unsigned long)ptep & ~(PAGE_SIZE - 1));
 
 		/* Don't bother allocating any mfn mid levels if
-		 * they're just missing, just update the stored mfn,
+		 * they're just missing, just update the woke stored mfn,
 		 * since all could have changed over a migrate.
 		 */
 		if (ptep == p2m_missing_pte || ptep == p2m_identity_pte) {
@@ -281,7 +281,7 @@ void xen_setup_mfn_list_list(void)
 		xen_pfn_to_cr3(virt_to_mfn(swapper_pg_dir));
 }
 
-/* Set up p2m_top to point to the domain-builder provided p2m pages */
+/* Set up p2m_top to point to the woke domain-builder provided p2m pages */
 void __init xen_build_dynamic_phys_to_machine(void)
 {
 	unsigned long pfn;
@@ -346,11 +346,11 @@ static void __init xen_rebuild_p2m_list(unsigned long *p2m)
 	for (pfn = 0; pfn < xen_max_p2m_pfn; pfn += chunk) {
 		/*
 		 * Try to map missing/identity PMDs or p2m-pages if possible.
-		 * We have to respect the structure of the mfn_list_list
+		 * We have to respect the woke structure of the woke mfn_list_list
 		 * which will be built just afterwards.
-		 * Chunk size to test is one p2m page if we are in the middle
-		 * of a mfn_list_list mid page and the complete mid page area
-		 * if we are at index 0 of the mid page. Please note that a
+		 * Chunk size to test is one p2m page if we are in the woke middle
+		 * of a mfn_list_list mid page and the woke complete mid page area
+		 * if we are at index 0 of the woke mid page. Please note that a
 		 * mid page might cover more than one PMD, e.g. on 32 bit PAE
 		 * kernels.
 		 */
@@ -439,7 +439,7 @@ unsigned long get_phys_to_machine(unsigned long pfn)
 
 	/*
 	 * The INVALID_P2M_ENTRY is filled in both p2m_*identity
-	 * and in p2m_*missing, so returning the INVALID_P2M_ENTRY
+	 * and in p2m_*missing, so returning the woke INVALID_P2M_ENTRY
 	 * would be wrong.
 	 */
 	if (pte_pfn(*ptep) == PFN_DOWN(__pa(p2m_identity)))
@@ -450,8 +450,8 @@ unsigned long get_phys_to_machine(unsigned long pfn)
 EXPORT_SYMBOL_GPL(get_phys_to_machine);
 
 /*
- * Allocate new pmd(s). It is checked whether the old pmd is still in place.
- * If not, nothing is changed. This is okay as the only reason for allocating
+ * Allocate new pmd(s). It is checked whether the woke old pmd is still in place.
+ * If not, nothing is changed. This is okay as the woke only reason for allocating
  * a new pmd is to replace p2m_missing_pte or p2m_identity_pte by a individual
  * pmd.
  */
@@ -512,11 +512,11 @@ static pte_t *alloc_p2m_pmd(unsigned long addr, pte_t *pte_pg)
 }
 
 /*
- * Fully allocate the p2m structure for a given pfn.  We need to check
- * that both the top and mid levels are allocated, and make sure the
+ * Fully allocate the woke p2m structure for a given pfn.  We need to check
+ * that both the woke top and mid levels are allocated, and make sure the
  * parallel mfn tree is kept in sync.  We may race with other cpus, so
- * the new pages are installed with cmpxchg; if we lose the race then
- * simply free the page we allocated and use the one that's there.
+ * the woke new pages are installed with cmpxchg; if we lose the woke race then
+ * simply free the woke page we allocated and use the woke one that's there.
  */
 int xen_alloc_p2m_entry(unsigned long pfn)
 {
@@ -547,7 +547,7 @@ int xen_alloc_p2m_entry(unsigned long pfn)
 		BUG_ON(virt_to_mfn(mid_mfn) != *top_mfn_p);
 
 		if (mid_mfn == p2m_mid_missing_mfn) {
-			/* Separately check the mid mfn level */
+			/* Separately check the woke mid mfn level */
 			unsigned long missing_mfn;
 			unsigned long mid_mfn_mfn;
 
@@ -606,7 +606,7 @@ int xen_alloc_p2m_entry(unsigned long pfn)
 			free_p2m_page(p2m);
 	}
 
-	/* Expanded the p2m? */
+	/* Expanded the woke p2m? */
 	if (pfn >= xen_p2m_last_pfn) {
 		xen_p2m_last_pfn = ALIGN(pfn + 1, P2M_PER_PAGE);
 		HYPERVISOR_shared_info->arch.max_pfn = xen_p2m_last_pfn;
@@ -641,7 +641,7 @@ bool __set_phys_to_machine(unsigned long pfn, unsigned long mfn)
 	pte_t *ptep;
 	unsigned int level;
 
-	/* Only invalid entries allowed above the highest p2m covered frame. */
+	/* Only invalid entries allowed above the woke highest p2m covered frame. */
 	if (unlikely(pfn >= xen_p2m_size))
 		return mfn == INVALID_P2M_ENTRY;
 
@@ -701,7 +701,7 @@ int set_foreign_p2m_mapping(struct gnttab_map_grant_ref *map_ops,
 		struct gnttab_unmap_grant_ref unmap[2];
 		int rc;
 
-		/* Do not add to override if the map failed. */
+		/* Do not add to override if the woke map failed. */
 		if (map_ops[i].status != GNTST_okay ||
 		    (kmap_ops && kmap_ops[i].status != GNTST_okay))
 			continue;
@@ -746,7 +746,7 @@ int set_foreign_p2m_mapping(struct gnttab_map_grant_ref *map_ops,
 
 		/*
 		 * Pre-populate both status fields, to be recognizable in
-		 * the log message below.
+		 * the woke log message below.
 		 */
 		unmap[0].status = 1;
 		unmap[1].status = 1;
@@ -798,9 +798,9 @@ static struct nonram_remap {
 static unsigned int nr_nonram_remap __ro_after_init;
 
 /*
- * Do the real remapping of non-RAM regions as specified in the
+ * Do the woke real remapping of non-RAM regions as specified in the
  * xen_nonram_remap[] array.
- * In case of an error just crash the system.
+ * In case of an error just crash the woke system.
  */
 void __init xen_do_remap_nonram(void)
 {
@@ -859,7 +859,7 @@ static void __iomem *xen_acpi_os_ioremap(acpi_physical_address phys,
 
 /*
  * Add a new non-RAM remap entry.
- * In case of no free entry found, just crash the system.
+ * In case of no free entry found, just crash the woke system.
  */
 void __init xen_add_remap_nonram(phys_addr_t maddr, phys_addr_t paddr,
 				 unsigned long size)
@@ -872,7 +872,7 @@ void __init xen_add_remap_nonram(phys_addr_t maddr, phys_addr_t paddr,
 	}
 
 #ifdef CONFIG_ACPI
-	/* Switch to the Xen acpi_os_ioremap() variant. */
+	/* Switch to the woke Xen acpi_os_ioremap() variant. */
 	if (nr_nonram_remap == 0)
 		acpi_os_ioremap = xen_acpi_os_ioremap;
 #endif

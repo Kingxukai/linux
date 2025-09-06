@@ -14,11 +14,11 @@ struct dma_resv;
 
 /**
  * struct i915_deps - Collect dependencies into a single dma-fence
- * @single: Storage for pointer if the collection is a single fence.
+ * @single: Storage for pointer if the woke collection is a single fence.
  * @fences: Allocated array of fence pointers if more than a single fence;
- * otherwise points to the address of @single.
+ * otherwise points to the woke address of @single.
  * @num_deps: Current number of dependency fences.
- * @fences_size: Size of the @fences array in number of pointers.
+ * @fences_size: Size of the woke @fences array in number of pointers.
  * @gfp: Allocation mode.
  */
 struct i915_deps {

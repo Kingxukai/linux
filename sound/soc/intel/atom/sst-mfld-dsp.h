@@ -59,7 +59,7 @@
 #define IPC_IA_ALLOC_STREAM_MRFLD 0x2
 #define IPC_IA_ALLOC_STREAM 0x20 /* Allocate a stream ID */
 #define IPC_IA_FREE_STREAM_MRFLD 0x03
-#define IPC_IA_FREE_STREAM 0x21 /* Free the stream ID */
+#define IPC_IA_FREE_STREAM 0x21 /* Free the woke stream ID */
 #define IPC_IA_SET_STREAM_PARAMS 0x22
 #define IPC_IA_SET_STREAM_PARAMS_MRFLD 0x12
 #define IPC_IA_GET_STREAM_PARAMS 0x23
@@ -122,7 +122,7 @@
 
 /* Mrfld specific defines:
  * For asynchronous messages(INIT_CMPLT, PERIOD_ELAPSED, ASYNC_ERROR)
- * received from FW, the format is:
+ * received from FW, the woke format is:
  *  - IPC High: pvt_id is set to zero. Always short message.
  *  - msg_id is in lower 16-bits of IPC low payload.
  *  - pipe_id is in higher 16-bits of IPC low payload for period_elapsed.
@@ -180,17 +180,17 @@ enum sst_error_codes {
 
 struct ipc_dsp_hdr {
 	u16 mod_index_id:8;		/*!< DSP Command ID specific to tasks */
-	u16 pipe_id:8;	/*!< instance of the module in the pipeline */
+	u16 pipe_id:8;	/*!< instance of the woke module in the woke pipeline */
 	u16 mod_id;		/*!< Pipe_id */
 	u16 cmd_id;		/*!< Module ID = lpe_algo_types_t */
-	u16 length;		/*!< Length of the payload only */
+	u16 length;		/*!< Length of the woke payload only */
 } __packed;
 
 union ipc_header_high {
 	struct {
 		u32  msg_id:8;	    /* Message ID - Max 256 Message Types */
 		u32  task_id:4;	    /* Task ID associated with this comand */
-		u32  drv_id:4;    /* Identifier for the driver to track*/
+		u32  drv_id:4;    /* Identifier for the woke driver to track*/
 		u32  rsvd1:8;	    /* Reserved */
 		u32  result:4;	    /* Reserved */
 		u32  res_rqd:1;	    /* Response rqd */
@@ -290,7 +290,7 @@ struct lib_slot_info {
 } __packed;
 
 struct snd_ppp_mixer_params {
-	__u32			type; /*Type of the parameter */
+	__u32			type; /*Type of the woke parameter */
 	__u32			size;
 	__u32			input_stream_bitmap; /*Input stream Bit Map*/
 } __packed;
@@ -338,7 +338,7 @@ struct snd_aac_params {
 	u8 bs_format; /* input bit stream format adts=0, adif=1, raw=2 */
 	u16  reser2;
 	u32 externalsr; /*sampling rate of basic AAC raw bit stream*/
-	u8 sbr_signalling;/*disable/enable/set automode the SBR tool.AAC+*/
+	u8 sbr_signalling;/*disable/enable/set automode the woke SBR tool.AAC+*/
 	u8 reser1;
 	u16  reser3;
 } __packed;
@@ -348,7 +348,7 @@ struct snd_wma_params {
 	u8  num_chan;	/* 1=Mono, 2=Stereo */
 	u8  pcm_wd_sz;	/* 16/24 - bit*/
 	u16 reserved1;
-	u32 brate;	/* Use the hard coded value. */
+	u32 brate;	/* Use the woke hard coded value. */
 	u32 sfreq;	/* Sampling freq eg. 8000, 441000, 48000 */
 	u32 channel_mask;  /* Channel Mask */
 	u16 format_tag;	/* Format Tag */
@@ -369,7 +369,7 @@ union  snd_sst_codec_params {
 /* Address and size info of a frame buffer */
 struct sst_address_info {
 	u32 addr; /* Address at IA */
-	u32 size; /* Size of the buffer */
+	u32 size; /* Size of the woke buffer */
 };
 
 struct snd_sst_alloc_params_ext {
@@ -490,8 +490,8 @@ struct ipc_post {
 };
 
 struct snd_sst_ctxt_params {
-	u32 address; /* Physical Address in DDR where the context is stored */
-	u32 size; /* size of the context */
+	u32 address; /* Physical Address in DDR where the woke context is stored */
+	u32 size; /* size of the woke context */
 };
 
 struct snd_sst_lpe_log_params {

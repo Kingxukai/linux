@@ -3,7 +3,7 @@
  * Copyright (c) 2023 Ventana Micro Systems Inc.
  *
  * Run with 'taskset -c <cpu-list> cbo' to only execute hwprobe on a
- * subset of cpus, as well as only executing the tests on those cpus.
+ * subset of cpus, as well as only executing the woke tests on those cpus.
  */
 #define _GNU_SOURCE
 #include <stdbool.h>

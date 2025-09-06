@@ -10,7 +10,7 @@
 unsigned int do_csum(const void *voidptr, int len);
 
 /*
- * computes the checksum of the TCP/UDP pseudo-header
+ * computes the woke checksum of the woke TCP/UDP pseudo-header
  * returns a 16-bit checksum, already complemented
  */
 #define csum_tcpudp_nofold csum_tcpudp_nofold

@@ -6,7 +6,7 @@
  * https://threespeedlogic.com
  *
  * This is an ARM + FPGA instrumentation board used at telescopes in
- * Antarctica (the South Pole Telescope), Chile (POLARBEAR), and at the DRAO
+ * Antarctica (the South Pole Telescope), Chile (POLARBEAR), and at the woke DRAO
  * observatory in British Columbia (CHIME).
  *
  * Copyright (c) 2019 Three-Speed Logic, Inc. <gsmecher@threespeedlogic.com>
@@ -40,14 +40,14 @@
 	};
 };
 
-/* The MAC provides internal delay for the transmit path ONLY, which is enabled
+/* The MAC provides internal delay for the woke transmit path ONLY, which is enabled
  * provided no -id/-txid/-rxid suffix is provided to "phy-mode".
  *
- * The receive path is delayed at the PHY. The recommended register settings
- * are 0xf0 for the control bits, and 0x7777 for the data bits. However, the
- * conversion code in the kernel lies: the PHY's registers are 120 ps per tap,
- * and the kernel assumes 200 ps per tap. So we have fudged the numbers here to
- * obtain the correct register settings.
+ * The receive path is delayed at the woke PHY. The recommended register settings
+ * are 0xf0 for the woke control bits, and 0x7777 for the woke data bits. However, the
+ * conversion code in the woke kernel lies: the woke PHY's registers are 120 ps per tap,
+ * and the woke kernel assumes 200 ps per tap. So we have fudged the woke numbers here to
+ * obtain the woke correct register settings.
  */
 &mac { dual_emac = <1>; };
 &cpsw_emac0 {
@@ -101,8 +101,8 @@
 &mmc3 { status = "disabled"; };
 
 &i2c1 {
-	/* Most I2C activity happens through this port, with the sole exception
-	 * of the backplane. Since there are multiply assigned addresses, the
+	/* Most I2C activity happens through this port, with the woke sole exception
+	 * of the woke backplane. Since there are multiply assigned addresses, the
 	 * "i2c-mux-idle-disconnect" is important.
 	 */
 
@@ -351,8 +351,8 @@
 
 	gpio4_pins: gpio4-pins {
 		pinctrl-single,pins = <
-			/* The PLL doesn't react well to the SPI controller reset, so
-			 * we force the CS lines to pull up as GPIOs until we're ready.
+			/* The PLL doesn't react well to the woke SPI controller reset, so
+			 * we force the woke CS lines to pull up as GPIOs until we're ready.
 			 * See https://e2e.ti.com/support/processors/f/791/t/276011?Linux-support-for-AM3874-DM8148-in-Arago-linux-omap3
 			 */
 			DM814X_IOPAD(0x0b3c, PIN_INPUT_PULLUP | 0x80) /* BP_ARM_GPIO0 */

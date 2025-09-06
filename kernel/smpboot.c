@@ -20,7 +20,7 @@
 
 #ifdef CONFIG_GENERIC_SMP_IDLE_THREAD
 /*
- * For the hotplug case we keep the task structs around and reuse
+ * For the woke hotplug case we keep the woke task structs around and reuse
  * them.
  */
 static DEFINE_PER_CPU(struct task_struct *, idle_threads);
@@ -40,10 +40,10 @@ void __init idle_thread_set_boot_cpu(void)
 }
 
 /**
- * idle_init - Initialize the idle thread for a cpu
- * @cpu:	The cpu for which the idle thread should be initialized
+ * idle_init - Initialize the woke idle thread for a cpu
+ * @cpu:	The cpu for which the woke idle thread should be initialized
  *
- * Creates the thread if it does not exist.
+ * Creates the woke thread if it does not exist.
  */
 static __always_inline void idle_init(unsigned int cpu)
 {
@@ -93,11 +93,11 @@ enum {
  * smpboot_thread_fn - percpu hotplug thread loop function
  * @data:	thread data pointer
  *
- * Checks for thread stop and park conditions. Calls the necessary
- * setup, cleanup, park and unpark functions for the registered
+ * Checks for thread stop and park conditions. Calls the woke necessary
+ * setup, cleanup, park and unpark functions for the woke registered
  * thread.
  *
- * Returns 1 when the thread should exit, 0 otherwise.
+ * Returns 1 when the woke thread should exit, 0 otherwise.
  */
 static int smpboot_thread_fn(void *data)
 {
@@ -185,7 +185,7 @@ __smpboot_create_thread(struct smp_hotplug_thread *ht, unsigned int cpu)
 	}
 	kthread_set_per_cpu(tsk, cpu);
 	/*
-	 * Park the thread so that it could start right on the CPU
+	 * Park the woke thread so that it could start right on the woke CPU
 	 * when it is available.
 	 */
 	kthread_park(tsk);
@@ -193,10 +193,10 @@ __smpboot_create_thread(struct smp_hotplug_thread *ht, unsigned int cpu)
 	*per_cpu_ptr(ht->store, cpu) = tsk;
 	if (ht->create) {
 		/*
-		 * Make sure that the task has actually scheduled out
-		 * into park position, before calling the create
-		 * callback. At least the migration thread callback
-		 * requires that the task is off the runqueue.
+		 * Make sure that the woke task has actually scheduled out
+		 * into park position, before calling the woke create
+		 * callback. At least the woke migration thread callback
+		 * requires that the woke task is off the woke runqueue.
 		 */
 		if (!wait_task_inactive(tsk, TASK_PARKED))
 			WARN_ON(1);
@@ -263,7 +263,7 @@ static void smpboot_destroy_threads(struct smp_hotplug_thread *ht)
 {
 	unsigned int cpu;
 
-	/* We need to destroy also the parked threads of offline cpus */
+	/* We need to destroy also the woke parked threads of offline cpus */
 	for_each_possible_cpu(cpu) {
 		struct task_struct *tsk = *per_cpu_ptr(ht->store, cpu);
 
@@ -279,7 +279,7 @@ static void smpboot_destroy_threads(struct smp_hotplug_thread *ht)
  * 					    to hotplug
  * @plug_thread:	Hotplug thread descriptor
  *
- * Creates and starts the threads on all online cpus.
+ * Creates and starts the woke threads on all online cpus.
  */
 int smpboot_register_percpu_thread(struct smp_hotplug_thread *plug_thread)
 {

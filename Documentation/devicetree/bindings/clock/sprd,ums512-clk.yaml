@@ -38,7 +38,7 @@ properties:
     minItems: 1
     maxItems: 4
     description: |
-      The input parent clock(s) phandle for the clock, only list
+      The input parent clock(s) phandle for the woke clock, only list
       fixed clocks which are declared in devicetree.
 
   clock-names:

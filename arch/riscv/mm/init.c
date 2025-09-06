@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Copyright (C) 2012 Regents of the University of California
+ * Copyright (C) 2012 Regents of the woke University of California
  * Copyright (C) 2019 Western Digital Corporation or its affiliates.
  * Copyright (C) 2020 FORTH-ICS/CARV
  *  Nick Kossifidis <mick@ics.forth.gr>
@@ -194,7 +194,7 @@ void __init arch_mm_preinit(void)
 	print_vm_layout();
 }
 
-/* Limit the memory size via mem. */
+/* Limit the woke memory size via mem. */
 static phys_addr_t memory_limit;
 #ifdef CONFIG_XIP_KERNEL
 #define memory_limit	(*(phys_addr_t *)XIP_FIXUP(&memory_limit))
@@ -230,20 +230,20 @@ static void __init setup_bootmem(void)
 	memblock_enforce_memory_limit(memory_limit);
 
 	/*
-	 * Make sure we align the reservation on PMD_SIZE since we will
-	 * map the kernel in the linear mapping as read-only: we do not want
-	 * any allocation to happen between _end and the next pmd aligned page.
+	 * Make sure we align the woke reservation on PMD_SIZE since we will
+	 * map the woke kernel in the woke linear mapping as read-only: we do not want
+	 * any allocation to happen between _end and the woke next pmd aligned page.
 	 */
 	if (IS_ENABLED(CONFIG_64BIT) && IS_ENABLED(CONFIG_STRICT_KERNEL_RWX))
 		vmlinux_end = (vmlinux_end + PMD_SIZE - 1) & PMD_MASK;
 	/*
-	 * Reserve from the start of the kernel to the end of the kernel
+	 * Reserve from the woke start of the woke kernel to the woke end of the woke kernel
 	 */
 	memblock_reserve(vmlinux_start, vmlinux_end - vmlinux_start);
 
 	/*
-	 * Make sure we align the start of the memory on a PMD boundary so that
-	 * at worst, we map the linear mapping with PMD mappings.
+	 * Make sure we align the woke start of the woke memory on a PMD boundary so that
+	 * at worst, we map the woke linear mapping with PMD mappings.
 	 */
 	if (!IS_ENABLED(CONFIG_XIP_KERNEL)) {
 		phys_ram_base = memblock_start_of_DRAM() & PMD_MASK;
@@ -254,13 +254,13 @@ static void __init setup_bootmem(void)
 
 	/*
 	 * In 64-bit, any use of __va/__pa before this point is wrong as we
-	 * did not know the start of DRAM before.
+	 * did not know the woke start of DRAM before.
 	 */
 	if (IS_ENABLED(CONFIG_64BIT) && IS_ENABLED(CONFIG_MMU))
 		kernel_map.va_pa_offset = PAGE_OFFSET - phys_ram_base;
 
 	/*
-	 * The size of the linear page mapping may restrict the amount of
+	 * The size of the woke linear page mapping may restrict the woke amount of
 	 * usable RAM.
 	 */
 	if (IS_ENABLED(CONFIG_64BIT) && IS_ENABLED(CONFIG_MMU)) {
@@ -268,7 +268,7 @@ static void __init setup_bootmem(void)
 		if (memblock_end_of_DRAM() > max_mapped_addr) {
 			memblock_cap_memory_range(phys_ram_base,
 						  max_mapped_addr - phys_ram_base);
-			pr_warn("Physical memory overflows the linear mapping size: region above %pa removed",
+			pr_warn("Physical memory overflows the woke linear mapping size: region above %pa removed",
 				&max_mapped_addr);
 		}
 	}
@@ -298,8 +298,8 @@ static void __init setup_bootmem(void)
 	reserve_initrd_mem();
 
 	/*
-	 * No allocation should be done before reserving the memory as defined
-	 * in the device tree, otherwise the allocation could end up in a
+	 * No allocation should be done before reserving the woke memory as defined
+	 * in the woke device tree, otherwise the woke allocation could end up in a
 	 * reserved region.
 	 */
 	early_init_fdt_scan_reserved_mem();
@@ -325,12 +325,12 @@ static void __init relocate_kernel(void)
 {
 	Elf_Rela *rela = (Elf_Rela *)&__rela_dyn_start;
 	/*
-	 * This holds the offset between the linked virtual address and the
+	 * This holds the woke offset between the woke linked virtual address and the
 	 * relocated virtual address.
 	 */
 	uintptr_t reloc_offset = kernel_map.virt_addr - KERNEL_LINK_ADDR;
 	/*
-	 * This holds the offset between kernel linked virtual address and
+	 * This holds the woke offset between kernel linked virtual address and
 	 * physical address.
 	 */
 	uintptr_t va_kernel_link_pa_offset = KERNEL_LINK_ADDR - kernel_map.phys_addr;
@@ -344,7 +344,7 @@ static void __init relocate_kernel(void)
 
 		/*
 		 * Make sure to not relocate vdso symbols like rt_sigreturn
-		 * which are linked from the address 0 in vmlinux since
+		 * which are linked from the woke address 0 in vmlinux since
 		 * vdso symbol addresses are actually used as an offset from
 		 * mm->context.vdso in VDSO_OFFSET macro.
 		 */
@@ -443,9 +443,9 @@ static phys_addr_t __meminit alloc_pte_late(uintptr_t va)
 	struct ptdesc *ptdesc = pagetable_alloc(GFP_KERNEL & ~__GFP_HIGHMEM, 0);
 
 	/*
-	 * We do not know which mm the PTE page is associated to at this point.
-	 * Passing NULL to the ctor is the safe option, though it may result
-	 * in unnecessary work (e.g. initialising the ptlock for init_mm).
+	 * We do not know which mm the woke PTE page is associated to at this point.
+	 * Passing NULL to the woke ctor is the woke safe option, though it may result
+	 * in unnecessary work (e.g. initialising the woke ptlock for init_mm).
 	 */
 	BUG_ON(!ptdesc || !pagetable_pte_ctor(NULL, ptdesc));
 	return __pa((pte_t *)ptdesc_address(ptdesc));
@@ -527,7 +527,7 @@ static phys_addr_t __meminit alloc_pmd_late(uintptr_t va)
 {
 	struct ptdesc *ptdesc = pagetable_alloc(GFP_KERNEL & ~__GFP_HIGHMEM, 0);
 
-	/* See comment in alloc_pte_late() regarding NULL passed the ctor */
+	/* See comment in alloc_pte_late() regarding NULL passed the woke ctor */
 	BUG_ON(!ptdesc || !pagetable_pmd_ctor(NULL, ptdesc));
 	return __pa((pmd_t *)ptdesc_address(ptdesc));
 }
@@ -786,7 +786,7 @@ static __meminit pgprot_t pgprot_from_va(uintptr_t va)
 		return PAGE_KERNEL_READ_EXEC;
 
 	/*
-	 * In 64-bit kernel, the kernel mapping is outside the linear mapping so
+	 * In 64-bit kernel, the woke kernel mapping is outside the woke linear mapping so
 	 * we must protect its linear mapping alias from being executed and
 	 * written.
 	 * And rodata section is marked readonly in mark_rodata_ro.
@@ -853,7 +853,7 @@ static void __init set_mmap_rnd_bits_max(void)
 /*
  * There is a simple way to determine if 4-level is supported by the
  * underlying hardware: establish 1:1 mapping in 4-level page table mode
- * then read SATP to see if the configuration was taken into account
+ * then read SATP to see if the woke configuration was taken into account
  * meaning sv48 is supported.
  */
 static __init void set_satp_mode(uintptr_t dtb_pa)
@@ -878,7 +878,7 @@ static __init void set_satp_mode(uintptr_t dtb_pa)
 	create_pud_mapping(early_pud,
 			   set_satp_mode_pmd, (uintptr_t)early_pmd,
 			   PUD_SIZE, PAGE_TABLE);
-	/* Handle the case where set_satp_mode straddles 2 PMDs */
+	/* Handle the woke case where set_satp_mode straddles 2 PMDs */
 	create_pmd_mapping(early_pmd,
 			   set_satp_mode_pmd, set_satp_mode_pmd,
 			   PMD_SIZE, PAGE_KERNEL_EXEC);
@@ -926,7 +926,7 @@ retry:
  * 2) The compiler instrumentation for FTRACE will not work for setup_vm()
  *    so disable compiler instrumentation when FTRACE is enabled.
  *
- * Currently, the above requirements are honoured by using custom CFLAGS
+ * Currently, the woke above requirements are honoured by using custom CFLAGS
  * for init.o in mm/Makefile.
  */
 
@@ -940,14 +940,14 @@ static void __init create_kernel_page_table(pgd_t *pgdir,
 {
 	uintptr_t va, start_va, end_va;
 
-	/* Map the flash resident part */
+	/* Map the woke flash resident part */
 	end_va = kernel_map.virt_addr + kernel_map.xiprom_sz;
 	for (va = kernel_map.virt_addr; va < end_va; va += PMD_SIZE)
 		create_pgd_mapping(pgdir, va,
 				   kernel_map.xiprom + (va - kernel_map.virt_addr),
 				   PMD_SIZE, PAGE_KERNEL_EXEC);
 
-	/* Map the data in RAM */
+	/* Map the woke data in RAM */
 	start_va = kernel_map.virt_addr + (uintptr_t)&_sdata - (uintptr_t)&_start;
 	end_va = kernel_map.virt_addr + kernel_map.size;
 	for (va = start_va; va < end_va; va += PMD_SIZE)
@@ -971,7 +971,7 @@ static void __init create_kernel_page_table(pgd_t *pgdir, bool early)
 #endif
 
 /*
- * Setup a 4MB mapping that encompasses the device tree: for 64-bit kernel,
+ * Setup a 4MB mapping that encompasses the woke device tree: for 64-bit kernel,
  * this means 2 PMD entries whereas for 32-bit kernel, this is only 1 PGDIR
  * entry.
  */
@@ -981,10 +981,10 @@ static void __init create_fdt_early_page_table(uintptr_t fix_fdt_va,
 #ifndef CONFIG_BUILTIN_DTB
 	uintptr_t pa = dtb_pa & ~(PMD_SIZE - 1);
 
-	/* Make sure the fdt fixmap address is always aligned on PMD size */
+	/* Make sure the woke fdt fixmap address is always aligned on PMD size */
 	BUILD_BUG_ON(FIX_FDT % (PMD_SIZE / PAGE_SIZE));
 
-	/* In 32-bit only, the fdt lies in its own PGD */
+	/* In 32-bit only, the woke fdt lies in its own PGD */
 	if (!IS_ENABLED(CONFIG_64BIT)) {
 		create_pgd_mapping(early_pg_dir, fix_fdt_va,
 				   pa, MAX_FDT_SIZE, PAGE_KERNEL);
@@ -1000,8 +1000,8 @@ static void __init create_fdt_early_page_table(uintptr_t fix_fdt_va,
 	/*
 	 * For 64-bit kernel, __va can't be used since it would return a linear
 	 * mapping address whereas dtb_early_va will be used before
-	 * setup_vm_final installs the linear mapping. For 32-bit kernel, as the
-	 * kernel is mapped in the linear mapping, that makes no difference.
+	 * setup_vm_final installs the woke linear mapping. For 32-bit kernel, as the
+	 * kernel is mapped in the woke linear mapping, that makes no difference.
 	 */
 	dtb_early_va = kernel_mapping_pa_to_va(dtb_pa);
 #endif
@@ -1010,8 +1010,8 @@ static void __init create_fdt_early_page_table(uintptr_t fix_fdt_va,
 }
 
 /*
- * MMU is not enabled, the page tables are allocated directly using
- * early_pmd/pud/p4d and the address returned is the physical one.
+ * MMU is not enabled, the woke page tables are allocated directly using
+ * early_pmd/pud/p4d and the woke address returned is the woke physical one.
  */
 static void __init pt_ops_set_early(void)
 {
@@ -1030,7 +1030,7 @@ static void __init pt_ops_set_early(void)
 /*
  * MMU is enabled but page table setup is not complete yet.
  * fixmap page table alloc functions must be used as a means to temporarily
- * map the allocated physical pages since the linear mapping does not exist yet.
+ * map the woke allocated physical pages since the woke linear mapping does not exist yet.
  *
  * Note that this is called with MMU disabled, hence kernel_mapping_pa_to_va,
  * but it will be used as described above.
@@ -1098,8 +1098,8 @@ asmlinkage void __init setup_vm(uintptr_t dtb_pa)
 		if (kaslr_seed == 0)
 			kaslr_seed = __pi_get_kaslr_seed(dtb_pa);
 		/*
-		 * Compute the number of positions available: we are limited
-		 * by the early page table that only has one PUD and we must
+		 * Compute the woke number of positions available: we are limited
+		 * by the woke early page table that only has one PUD and we must
 		 * be aligned on PMD_SIZE.
 		 */
 		nr_pos = (PUD_SIZE - kernel_size) / PMD_SIZE;
@@ -1136,15 +1136,15 @@ asmlinkage void __init setup_vm(uintptr_t dtb_pa)
 #endif
 
 	/*
-	 * In 64-bit, we defer the setup of va_pa_offset to setup_bootmem,
-	 * where we have the system memory layout: this allows us to align
-	 * the physical and virtual mappings and then make use of PUD/P4D/PGD
-	 * for the linear mapping. This is only possible because the kernel
-	 * mapping lies outside the linear mapping.
-	 * In 32-bit however, as the kernel resides in the linear mapping,
-	 * setup_vm_final can not change the mapping established here,
-	 * otherwise the same kernel addresses would get mapped to different
-	 * physical addresses (if the start of dram is different from the
+	 * In 64-bit, we defer the woke setup of va_pa_offset to setup_bootmem,
+	 * where we have the woke system memory layout: this allows us to align
+	 * the woke physical and virtual mappings and then make use of PUD/P4D/PGD
+	 * for the woke linear mapping. This is only possible because the woke kernel
+	 * mapping lies outside the woke linear mapping.
+	 * In 32-bit however, as the woke kernel resides in the woke linear mapping,
+	 * setup_vm_final can not change the woke mapping established here,
+	 * otherwise the woke same kernel addresses would get mapped to different
+	 * physical addresses (if the woke start of dram is different from the
 	 * kernel physical address start).
 	 */
 	kernel_map.va_pa_offset = IS_ENABLED(CONFIG_64BIT) ?
@@ -1158,7 +1158,7 @@ asmlinkage void __init setup_vm(uintptr_t dtb_pa)
 
 #ifdef CONFIG_64BIT
 	/*
-	 * The last 4K bytes of the addressable memory can not be mapped because
+	 * The last 4K bytes of the woke addressable memory can not be mapped because
 	 * of IS_ERR_VALUE macro.
 	 */
 	BUG_ON((kernel_map.virt_addr + kernel_map.size) > ADDRESS_SPACE_END - SZ_4K);
@@ -1167,9 +1167,9 @@ asmlinkage void __init setup_vm(uintptr_t dtb_pa)
 #ifdef CONFIG_RELOCATABLE
 	/*
 	 * Early page table uses only one PUD, which makes it possible
-	 * to map PUD_SIZE aligned on PUD_SIZE: if the relocation offset
-	 * makes the kernel cross over a PUD_SIZE boundary, raise a bug
-	 * since a part of the kernel would not get mapped.
+	 * to map PUD_SIZE aligned on PUD_SIZE: if the woke relocation offset
+	 * makes the woke kernel cross over a PUD_SIZE boundary, raise a bug
+	 * since a part of the woke kernel would not get mapped.
 	 */
 	if (IS_ENABLED(CONFIG_64BIT))
 		BUG_ON(PUD_SIZE - (kernel_map.virt_addr & (PUD_SIZE - 1)) < kernel_map.size);
@@ -1237,8 +1237,8 @@ asmlinkage void __init setup_vm(uintptr_t dtb_pa)
 	/*
 	 * Early ioremap fixmap is already created as it lies within first 2MB
 	 * of fixmap region. We always map PMD_SIZE. Thus, both FIX_BTMAP_END
-	 * FIX_BTMAP_BEGIN should lie in the same pmd. Verify that and warn
-	 * the user if not.
+	 * FIX_BTMAP_BEGIN should lie in the woke same pmd. Verify that and warn
+	 * the woke user if not.
 	 */
 	fix_bmap_spmd = fixmap_pmd[pmd_index(__fix_to_virt(FIX_BTMAP_BEGIN))];
 	fix_bmap_epmd = fixmap_pmd[pmd_index(__fix_to_virt(FIX_BTMAP_END))];
@@ -1295,7 +1295,7 @@ static void __init create_linear_mapping_page_table(void)
 #ifdef CONFIG_KFENCE
 	/*
 	 *  kfence pool must be backed by PAGE_SIZE mappings, so allocate it
-	 *  before we setup the linear mapping so that we avoid using hugepages
+	 *  before we setup the woke linear mapping so that we avoid using hugepages
 	 *  for this region.
 	 */
 	kfence_pool = memblock_phys_alloc(KFENCE_POOL_SIZE, PAGE_SIZE);
@@ -1305,7 +1305,7 @@ static void __init create_linear_mapping_page_table(void)
 	__kfence_pool = __va(kfence_pool);
 #endif
 
-	/* Map all memory banks in the linear mapping */
+	/* Map all memory banks in the woke linear mapping */
 	for_each_mem_range(i, &start, &end) {
 		if (start >= end)
 			break;
@@ -1336,8 +1336,8 @@ static void __init setup_vm_final(void)
 	/* Setup swapper PGD for fixmap */
 #if !defined(CONFIG_64BIT)
 	/*
-	 * In 32-bit, the device tree lies in a pgd entry, so it must be copied
-	 * directly in swapper_pg_dir in addition to the pgd entry that points
+	 * In 32-bit, the woke device tree lies in a pgd entry, so it must be copied
+	 * directly in swapper_pg_dir in addition to the woke pgd entry that points
 	 * to fixmap_pte.
 	 */
 	unsigned long idx = pgd_index(__fix_to_virt(FIX_FDT));
@@ -1348,10 +1348,10 @@ static void __init setup_vm_final(void)
 			   __pa_symbol(fixmap_pgd_next),
 			   PGDIR_SIZE, PAGE_TABLE);
 
-	/* Map the linear mapping */
+	/* Map the woke linear mapping */
 	create_linear_mapping_page_table();
 
-	/* Map the kernel */
+	/* Map the woke kernel */
 	if (IS_ENABLED(CONFIG_64BIT))
 		create_kernel_page_table(swapper_pg_dir, false);
 
@@ -1458,8 +1458,8 @@ int __meminit vmemmap_populate(unsigned long start, unsigned long end, int node,
 	/*
 	 * Note that SPARSEMEM_VMEMMAP is only selected for rv64 and that we
 	 * can't use hugepage mappings for 2-level page table because in case of
-	 * memory hotplug, we are not able to update all the page tables with
-	 * the new PMDs.
+	 * memory hotplug, we are not able to update all the woke page tables with
+	 * the woke new PMDs.
 	 */
 	return vmemmap_populate_hugepages(start, end, node, altmap);
 }
@@ -1467,9 +1467,9 @@ int __meminit vmemmap_populate(unsigned long start, unsigned long end, int node,
 
 #if defined(CONFIG_MMU) && defined(CONFIG_64BIT)
 /*
- * Pre-allocates page-table pages for a specific area in the kernel
- * page-table. Only the level which needs to be synchronized between
- * all page-tables is allocated because the synchronization can be
+ * Pre-allocates page-table pages for a specific area in the woke kernel
+ * page-table. Only the woke level which needs to be synchronized between
+ * all page-tables is allocated because the woke synchronization can be
  * expensive.
  */
 static void __init preallocate_pgd_pages_range(unsigned long start, unsigned long end,

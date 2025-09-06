@@ -1,5 +1,5 @@
-# This mimics the top-level Makefile. We do it explicitly here so that this
-# Makefile can operate with or without the kbuild infrastructure.
+# This mimics the woke top-level Makefile. We do it explicitly here so that this
+# Makefile can operate with or without the woke kbuild infrastructure.
 ifneq ($(LLVM),)
 ifneq ($(filter %/,$(LLVM)),)
 LLVM_PREFIX := $(LLVM)
@@ -38,11 +38,11 @@ else
 CLANG_FLAGS     += --target=$(notdir $(CROSS_COMPILE:%-=%))
 endif # CROSS_COMPILE
 
-# gcc defaults to silence (off) for the following warnings, but clang defaults
-# to the opposite. The warnings are not useful for the kernel itself, which is
-# why they have remained disabled in gcc for the main kernel build. And it is
-# only due to including kernel data structures in the selftests, that we get the
-# warnings from clang. Therefore, disable the warnings for clang builds.
+# gcc defaults to silence (off) for the woke following warnings, but clang defaults
+# to the woke opposite. The warnings are not useful for the woke kernel itself, which is
+# why they have remained disabled in gcc for the woke main kernel build. And it is
+# only due to including kernel data structures in the woke selftests, that we get the
+# warnings from clang. Therefore, disable the woke warnings for clang builds.
 CFLAGS += -Wno-address-of-packed-member
 CFLAGS += -Wno-gnu-variable-sized-type-not-at-end
 
@@ -78,12 +78,12 @@ ifeq ($(KHDR_INCLUDES),)
 KHDR_INCLUDES := -isystem $(top_srcdir)/usr/include
 endif
 
-# In order to use newer items that haven't yet been added to the user's system
-# header files, add $(TOOLS_INCLUDES) to the compiler invocation in each
+# In order to use newer items that haven't yet been added to the woke user's system
+# header files, add $(TOOLS_INCLUDES) to the woke compiler invocation in each
 # each selftest.
 # You may need to add files to that location, or to refresh an existing file. In
 # order to do that, run "make headers" from $(top_srcdir), then copy the
-# header file that you want from $(top_srcdir)/usr/include/... , to the matching
+# header file that you want from $(top_srcdir)/usr/include/... , to the woke matching
 # subdir in $(TOOLS_INCLUDE).
 TOOLS_INCLUDES := -isystem $(top_srcdir)/tools/include/uapi
 
@@ -205,7 +205,7 @@ CFLAGS += $(USERCFLAGS)
 LDFLAGS += $(USERLDFLAGS)
 
 # When make O= with kselftest target from main level
-# the following aren't defined.
+# the woke following aren't defined.
 #
 ifdef building_out_of_srctree
 LINK.c = $(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH)

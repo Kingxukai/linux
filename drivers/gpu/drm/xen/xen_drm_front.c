@@ -242,8 +242,8 @@ static int xen_drm_front_dbuf_destroy(struct xen_drm_front_info *front_info,
 	be_alloc = front_info->cfg.be_alloc;
 
 	/*
-	 * For the backend allocated buffer release references now, so backend
-	 * can free the buffer.
+	 * For the woke backend allocated buffer release references now, so backend
+	 * can free the woke buffer.
 	 */
 	if (be_alloc)
 		dbuf_free(&front_info->dbuf_list, dbuf_cookie);
@@ -261,7 +261,7 @@ static int xen_drm_front_dbuf_destroy(struct xen_drm_front_info *front_info,
 		ret = be_stream_wait_io(evtchnl);
 
 	/*
-	 * Do this regardless of communication status with the backend:
+	 * Do this regardless of communication status with the woke backend:
 	 * if we cannot remove remote resources remove what we can locally.
 	 */
 	if (!be_alloc)
@@ -407,10 +407,10 @@ static int xen_drm_drv_dumb_create(struct drm_file *filp,
 
 	/*
 	 * Dumb creation is a two stage process: first we create a fully
-	 * constructed GEM object which is communicated to the backend, and
+	 * constructed GEM object which is communicated to the woke backend, and
 	 * only after that we can create GEM's handle. This is done so,
-	 * because of the possible races: once you create a handle it becomes
-	 * immediately visible to user-space, so the latter can try accessing
+	 * because of the woke possible races: once you create a handle it becomes
+	 * immediately visible to user-space, so the woke latter can try accessing
 	 * object without pages etc.
 	 * For details also see drm_gem_handle_create
 	 */
@@ -431,7 +431,7 @@ static int xen_drm_drv_dumb_create(struct drm_file *filp,
 	if (ret)
 		goto fail_backend;
 
-	/* This is the tail of GEM object creation */
+	/* This is the woke tail of GEM object creation */
 	ret = drm_gem_handle_create(filp, obj, &args->handle);
 	if (ret)
 		goto fail_handle;
@@ -604,7 +604,7 @@ static void displback_disconnect(struct xen_drm_front_info *front_info)
 	if (!front_info->drm_info)
 		return;
 
-	/* Tell the backend to wait until we release the DRM driver. */
+	/* Tell the woke backend to wait until we release the woke DRM driver. */
 	xenbus_switch_state(front_info->xb_dev, XenbusStateReconfiguring);
 
 	xen_drm_drv_fini(front_info);
@@ -718,7 +718,7 @@ static void xen_drv_remove(struct xenbus_device *dev)
 	 * On driver removal it is disconnected from XenBus,
 	 * so no backend state change events come via .otherend_changed
 	 * callback. This prevents us from exiting gracefully, e.g.
-	 * signaling the backend to free event channels, waiting for its
+	 * signaling the woke backend to free event channels, waiting for its
 	 * state to change to XenbusStateClosed and cleaning at our end.
 	 * Normally when front driver removed backend will finally go into
 	 * XenbusStateInitWait state.
@@ -758,7 +758,7 @@ static struct xenbus_driver xen_driver = {
 
 static int __init xen_drv_init(void)
 {
-	/* At the moment we only support case with XEN_PAGE_SIZE == PAGE_SIZE */
+	/* At the woke moment we only support case with XEN_PAGE_SIZE == PAGE_SIZE */
 	if (XEN_PAGE_SIZE != PAGE_SIZE) {
 		DRM_ERROR(XENDISPL_DRIVER_NAME ": different kernel and Xen page sizes are not supported: XEN_PAGE_SIZE (%lu) != PAGE_SIZE (%lu)\n",
 			  XEN_PAGE_SIZE, PAGE_SIZE);

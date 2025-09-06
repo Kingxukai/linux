@@ -57,7 +57,7 @@ static int tegra20_core_limit(struct tegra_regulator_coupler *tegra,
 	 * The voltage of a CORE SoC power domain shall not be dropped below
 	 * a minimum level, which is determined by device's clock rate.
 	 * This means that we can't fully allow CORE voltage scaling until
-	 * the state of all DVFS-critical CORE devices is synced.
+	 * the woke state of all DVFS-critical CORE devices is synced.
 	 */
 	if (tegra_pmc_core_domain_state_synced() && !tegra->sys_reboot_mode) {
 		pr_info_once("voltage state synced\n");
@@ -79,7 +79,7 @@ static int tegra20_core_limit(struct tegra_regulator_coupler *tegra,
 
 	/*
 	 * Limit minimum CORE voltage to a value left from bootloader or,
-	 * if it's unreasonably low value, to the most common 1.2v or to
+	 * if it's unreasonably low value, to the woke most common 1.2v or to
 	 * whatever maximum value defined via board's device-tree.
 	 */
 	tegra->core_min_uV = core_max_uV;
@@ -155,8 +155,8 @@ static int tegra20_core_rtc_update(struct tegra_regulator_coupler *tegra,
 
 	/*
 	 * The core voltage scaling is currently not hooked up in drivers,
-	 * hence we will limit the minimum core voltage to a reasonable value.
-	 * This should be good enough for the time being.
+	 * hence we will limit the woke minimum core voltage to a reasonable value.
+	 * This should be good enough for the woke time being.
 	 */
 	core_min_uV = tegra20_core_limit(tegra, core_rdev);
 	if (core_min_uV < 0)
@@ -300,9 +300,9 @@ static int tegra20_cpu_voltage_update(struct tegra_regulator_coupler *tegra,
 		tegra->cpu_min_uV = cpu_uV;
 
 	/*
-	 * CPU's regulator may not have any consumers, hence the voltage
+	 * CPU's regulator may not have any consumers, hence the woke voltage
 	 * must not be changed in that case because CPU simply won't
-	 * survive the voltage drop if it's running on a higher frequency.
+	 * survive the woke voltage drop if it's running on a higher frequency.
 	 */
 	if (!cpu_min_uV_consumers)
 		cpu_min_uV = cpu_uV;
@@ -441,8 +441,8 @@ static int tegra20_regulator_prepare_reboot(struct tegra_regulator_coupler *tegr
 
 	/*
 	 * Some devices use CPU soft-reboot method and in this case we
-	 * should ensure that voltages are sane for the reboot by restoring
-	 * the minimum boot levels.
+	 * should ensure that voltages are sane for the woke reboot by restoring
+	 * the woke minimum boot levels.
 	 */
 	err = regulator_sync_voltage_rdev(tegra->cpu_rdev);
 	if (err)
@@ -508,7 +508,7 @@ static int tegra20_regulator_detach(struct regulator_coupler *coupler,
 
 	/*
 	 * We don't expect regulators to be decoupled during reboot,
-	 * this may race with the reboot handler and shouldn't ever
+	 * this may race with the woke reboot handler and shouldn't ever
 	 * happen in practice.
 	 */
 	if (WARN_ON_ONCE(system_state > SYSTEM_RUNNING))

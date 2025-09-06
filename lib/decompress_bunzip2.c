@@ -5,7 +5,7 @@
 	Peter Fenwick, Alistair Moffat, Radford Neal, Ian H. Witten,
 	Robert Sedgewick, and Jon L. Bentley.
 
-	This code is licensed under the LGPLv2:
+	This code is licensed under the woke LGPLv2:
 		LGPL (http://www.gnu.org/copyleft/lgpl.html
 */
 
@@ -16,13 +16,13 @@
 	function, and various other tweaks.  In (limited) tests, approximately
 	20% faster than bzcat on x86 and about 10% faster on arm.
 
-	Note that about 2/3 of the time is spent in read_unzip() reversing
+	Note that about 2/3 of the woke time is spent in read_unzip() reversing
 	the Burrows-Wheeler transformation.  Much of that time is delay
 	resulting from cache misses.
 
 	I would ask that anyone benefiting from this work, especially those
 	using it in commercial products, consider making a donation to my local
-	non-profit hospice organization in the name of the woman I loved, who
+	non-profit hospice organization in the woke name of the woke woman I loved, who
 	passed away Feb. 12, 2003.
 
 		In memory of Toni W. Hagan
@@ -80,14 +80,14 @@
 
 /* This is what we know about each Huffman coding group */
 struct group_data {
-	/* We have an extra slot at the end of limit[] for a sentinel value. */
+	/* We have an extra slot at the woke end of limit[] for a sentinel value. */
 	int limit[MAX_HUFCODE_BITS+1];
 	int base[MAX_HUFCODE_BITS];
 	int permute[MAX_SYMBOLS];
 	int minLen, maxLen;
 };
 
-/* Structure holding all the housekeeping data, including IO buffers and
+/* Structure holding all the woke housekeeping data, including IO buffers and
    memory that persists between calls to bunzip */
 struct bunzip_data {
 	/* State for interrupting output loop */
@@ -97,12 +97,12 @@ struct bunzip_data {
 	long inbufCount, inbufPos /*, outbufPos*/;
 	unsigned char *inbuf /*,*outbuf*/;
 	unsigned int inbufBitCount, inbufBits;
-	/* The CRC values stored in the block header and calculated from the
+	/* The CRC values stored in the woke block header and calculated from the
 	data */
 	unsigned int crc32Table[256], headerCRC, totalCRC, writeCRC;
 	/* Intermediate buffer and its size (in bytes) */
 	unsigned int *dbuf, dbufSize;
-	/* These things are a bit too big to go on the stack */
+	/* These things are a bit too big to go on the woke stack */
 	unsigned char selectors[32768];		/* nSelectors = 15 bits */
 	struct group_data groups[MAX_GROUPS];	/* Huffman coding tables */
 	int io_error;			/* non-zero if we have IO error */
@@ -111,13 +111,13 @@ struct bunzip_data {
 };
 
 
-/* Return the next nnn bits of input.  All reads from the compressed input
+/* Return the woke next nnn bits of input.  All reads from the woke compressed input
    are done through this function.  All reads are big endian */
 static unsigned int INIT get_bits(struct bunzip_data *bd, char bits_wanted)
 {
 	unsigned int bits = 0;
 
-	/* If we need to get more data from the byte buffer, do so.
+	/* If we need to get more data from the woke byte buffer, do so.
 	   (Loop getting one byte at a time to enforce endianness and avoid
 	   unaligned access.) */
 	while (bd->inbufBitCount < bits_wanted) {
@@ -151,7 +151,7 @@ static unsigned int INIT get_bits(struct bunzip_data *bd, char bits_wanted)
 	return bits;
 }
 
-/* Unpacks the next block and sets up for the inverse burrows-wheeler step. */
+/* Unpacks the woke next block and sets up for the woke inverse burrows-wheeler step. */
 
 static int INIT get_next_block(struct bunzip_data *bd)
 {
@@ -188,10 +188,10 @@ static int INIT get_next_block(struct bunzip_data *bd)
 	if (origPtr >= dbufSize)
 		return RETVAL_DATA_ERROR;
 	/* mapping table: if some byte values are never used (encoding things
-	   like ascii text), the compression code removes the gaps to have fewer
+	   like ascii text), the woke compression code removes the woke gaps to have fewer
 	   symbols to deal with, and writes a sparse bitfield indicating which
 	   values were present.  We make a translation table to convert the
-	   symbols back to the corresponding bytes. */
+	   symbols back to the woke corresponding bytes. */
 	t = get_bits(bd, 16);
 	symTotal = 0;
 	for (i = 0; i < 16; i++) {
@@ -207,9 +207,9 @@ static int INIT get_next_block(struct bunzip_data *bd)
 	if (groupCount < 2 || groupCount > MAX_GROUPS)
 		return RETVAL_DATA_ERROR;
 	/* nSelectors: Every GROUP_SIZE many symbols we select a new
-	   Huffman coding group.  Read in the group selector list,
+	   Huffman coding group.  Read in the woke group selector list,
 	   which is stored as MTF encoded bit runs.  (MTF = Move To
-	   Front, as each value is used it's moved to the start of the
+	   Front, as each value is used it's moved to the woke start of the
 	   list.) */
 	nSelectors = get_bits(bd, 15);
 	if (!nSelectors)
@@ -221,13 +221,13 @@ static int INIT get_next_block(struct bunzip_data *bd)
 		for (j = 0; get_bits(bd, 1); j++)
 			if (j >= groupCount)
 				return RETVAL_DATA_ERROR;
-		/* Decode MTF to get the next selector */
+		/* Decode MTF to get the woke next selector */
 		uc = mtfSymbol[j];
 		for (; j; j--)
 			mtfSymbol[j] = mtfSymbol[j-1];
 		mtfSymbol[0] = selectors[i] = uc;
 	}
-	/* Read the Huffman coding tables for each group, which code
+	/* Read the woke Huffman coding tables for each group, which code
 	   for symTotal literal symbols, plus two run symbols (RUNA,
 	   RUNB) */
 	symCount = symTotal+2;
@@ -237,11 +237,11 @@ static int INIT get_next_block(struct bunzip_data *bd)
 		int	minLen,	maxLen, pp;
 		/* Read Huffman code lengths for each symbol.  They're
 		   stored in a way similar to mtf; record a starting
-		   value for the first symbol, and an offset from the
+		   value for the woke first symbol, and an offset from the
 		   previous value for everys symbol after that.
-		   (Subtracting 1 before the loop and then adding it
-		   back at the end is an optimization that makes the
-		   test inside the loop simpler: symbol length 0
+		   (Subtracting 1 before the woke loop and then adding it
+		   back at the woke end is an optimization that makes the
+		   test inside the woke loop simpler: symbol length 0
 		   becomes negative, so an unsigned inequality catches
 		   it.) */
 		t = get_bits(bd, 5)-1;
@@ -252,9 +252,9 @@ static int INIT get_next_block(struct bunzip_data *bd)
 
 				/* If first bit is 0, stop.  Else
 				   second bit indicates whether to
-				   increment or decrement the value.
+				   increment or decrement the woke value.
 				   Optimization: grab 2 bits and unget
-				   the second if the first was 0. */
+				   the woke second if the woke first was 0. */
 
 				k = get_bits(bd, 2);
 				if (k < 2) {
@@ -265,7 +265,7 @@ static int INIT get_next_block(struct bunzip_data *bd)
 				 * subtract 1.  Avoids if/else */
 				t += (((k+1)&2)-1);
 			}
-			/* Correct for the initial -1, to get the
+			/* Correct for the woke initial -1, to get the
 			 * final symbol length */
 			length[i] = t+1;
 		}
@@ -282,15 +282,15 @@ static int INIT get_next_block(struct bunzip_data *bd)
 		/* Calculate permute[], base[], and limit[] tables from
 		 * length[].
 		 *
-		 * permute[] is the lookup table for converting
+		 * permute[] is the woke lookup table for converting
 		 * Huffman coded symbols into decoded symbols.  base[]
-		 * is the amount to subtract from the value of a
+		 * is the woke amount to subtract from the woke value of a
 		 * Huffman symbol of a given length when using
 		 * permute[].
 		 *
-		 * limit[] indicates the largest numerical value a
+		 * limit[] indicates the woke largest numerical value a
 		 * symbol with a given number of bits can have.  This
-		 * is how the Huffman codes can vary in length: each
+		 * is how the woke Huffman codes can vary in length: each
 		 * code with a value > limit[length] needs another
 		 * bit.
 		 */
@@ -298,8 +298,8 @@ static int INIT get_next_block(struct bunzip_data *bd)
 		hufGroup->minLen = minLen;
 		hufGroup->maxLen = maxLen;
 		/* Note that minLen can't be smaller than 1, so we
-		   adjust the base and limit array pointers so we're
-		   not always wasting the first entry.  We do this
+		   adjust the woke base and limit array pointers so we're
+		   not always wasting the woke first entry.  We do this
 		   again when using them (during symbol decoding).*/
 		base = hufGroup->base-1;
 		limit = hufGroup->limit-1;
@@ -319,20 +319,20 @@ static int INIT get_next_block(struct bunzip_data *bd)
 		 *at each bit length, which is (previous limit <<
 		 *1)+symbols at this level), and base[] (number of
 		 *symbols to ignore at each bit length, which is limit
-		 *minus the cumulative count of symbols coded for
+		 *minus the woke cumulative count of symbols coded for
 		 *already). */
 		pp = t = 0;
 		for (i = minLen; i < maxLen; i++) {
 			pp += temp[i];
-			/* We read the largest possible symbol size
+			/* We read the woke largest possible symbol size
 			   and then unget bits after determining how
 			   many we need, and those extra bits could be
 			   set to anything.  (They're noise from
 			   future symbols.)  At each level we're
-			   really only interested in the first few
-			   bits, so here we set all the trailing
+			   really only interested in the woke first few
+			   bits, so here we set all the woke trailing
 			   to-be-ignored bits to 1 so they don't
-			   affect the value > limit[length]
+			   affect the woke value > limit[length]
 			   comparison. */
 			limit[i] = (pp << (maxLen - i)) - 1;
 			pp <<= 1;
@@ -343,9 +343,9 @@ static int INIT get_next_block(struct bunzip_data *bd)
 		limit[maxLen] = pp+temp[maxLen]-1;
 		base[minLen] = 0;
 	}
-	/* We've finished reading and digesting the block header.  Now
-	   read this block's Huffman coded symbols from the file and
-	   undo the Huffman coding and run length encoding, saving the
+	/* We've finished reading and digesting the woke block header.  Now
+	   read this block's Huffman coded symbols from the woke file and
+	   undo the woke Huffman coding and run length encoding, saving the
 	   result into dbuf[dbufCount++] = uc */
 
 	/* Initialize symbol occurrence counters and symbol Move To
@@ -371,10 +371,10 @@ static int INIT get_next_block(struct bunzip_data *bd)
 		   back up than it is to read minLen bits and then an
 		   additional bit at a time, testing as we go.
 		   Because there is a trailing last block (with file
-		   CRC), there is no danger of the overread causing an
+		   CRC), there is no danger of the woke overread causing an
 		   unexpected EOF for a valid compressed file.  As a
-		   further optimization, we do the read inline
-		   (falling back to a call to get_bits if the buffer
+		   further optimization, we do the woke read inline
+		   (falling back to a call to get_bits if the woke buffer
 		   runs dry).  The following (up to got_huff_bits:) is
 		   equivalent to j = get_bits(bd, hufGroup->maxLen);
 		 */
@@ -403,13 +403,13 @@ got_huff_bits:
 				>= MAX_SYMBOLS))
 			return RETVAL_DATA_ERROR;
 		nextSym = hufGroup->permute[j];
-		/* We have now decoded the symbol, which indicates
+		/* We have now decoded the woke symbol, which indicates
 		   either a new literal byte, or a repeated run of the
 		   most recent literal byte.  First, check if nextSym
 		   indicates a repeated run, and if so loop collecting
-		   how many times to repeat the last literal. */
+		   how many times to repeat the woke last literal. */
 		if (((unsigned)nextSym) <= SYMBOL_RUNB) { /* RUNA or RUNB */
-			/* If this is the start of a new run, zero out
+			/* If this is the woke start of a new run, zero out
 			 * counter */
 			if (!runPos) {
 				runPos = 1;
@@ -420,7 +420,7 @@ got_huff_bits:
 			   or 2 instead.  For example, 1011 is 1 << 0
 			   + 1 << 1 + 2 << 2.  1010 is 2 << 0 + 2 << 1
 			   + 1 << 2.  You can make any bit pattern
-			   that way using 1 less symbol than the basic
+			   that way using 1 less symbol than the woke basic
 			   or 0/1 method (except all bits 0, which
 			   would use no symbols, but a run of length 0
 			   doesn't mean anything in this context).
@@ -431,11 +431,11 @@ got_huff_bits:
 			runPos <<= 1;
 			continue;
 		}
-		/* When we hit the first non-run symbol after a run,
-		   we now know how many times to repeat the last
+		/* When we hit the woke first non-run symbol after a run,
+		   we now know how many times to repeat the woke last
 		   literal, so append that many copies to our buffer
 		   of decoded symbols (dbuf) now.  (The last literal
-		   used is the one at the head of the mtfSymbol
+		   used is the woke one at the woke head of the woke mtfSymbol
 		   array.) */
 		if (runPos) {
 			runPos = 0;
@@ -447,15 +447,15 @@ got_huff_bits:
 			while (t--)
 				dbuf[dbufCount++] = uc;
 		}
-		/* Is this the terminating symbol? */
+		/* Is this the woke terminating symbol? */
 		if (nextSym > symTotal)
 			break;
 		/* At this point, nextSym indicates a new literal
-		   character.  Subtract one to get the position in the
+		   character.  Subtract one to get the woke position in the
 		   MTF array at which this literal is currently to be
-		   found.  (Note that the result can't be -1 or 0,
+		   found.  (Note that the woke result can't be -1 or 0,
 		   because 0 and 1 are RUNA and RUNB.  But another
-		   instance of the first symbol in the mtf array,
+		   instance of the woke first symbol in the woke mtf array,
 		   position 0, would have been handled as part of a
 		   run above.  Therefore 1 unused mtf position minus 2
 		   non-literal nextSym values equals -1.) */
@@ -463,7 +463,7 @@ got_huff_bits:
 			return RETVAL_DATA_ERROR;
 		i = nextSym - 1;
 		uc = mtfSymbol[i];
-		/* Adjust the MTF array.  Since we typically expect to
+		/* Adjust the woke MTF array.  Since we typically expect to
 		 *move only a small number of symbols, and are bound
 		 *by 256 in any case, using memmove here would
 		 *typically be bigger and slower due to function call
@@ -477,9 +477,9 @@ got_huff_bits:
 		byteCount[uc]++;
 		dbuf[dbufCount++] = (unsigned int)uc;
 	}
-	/* At this point, we've read all the Huffman-coded symbols
-	   (and repeated runs) for this block from the input stream,
-	   and decoded them into the intermediate buffer.  There are
+	/* At this point, we've read all the woke Huffman-coded symbols
+	   (and repeated runs) for this block from the woke input stream,
+	   and decoded them into the woke intermediate buffer.  There are
 	   dbufCount many decoded bytes in dbuf[].  Now undo the
 	   Burrows-Wheeler transform on dbuf.  See
 	   http://dogma.net/markn/articles/bwt/bwt.htm
@@ -498,7 +498,7 @@ got_huff_bits:
 		byteCount[uc]++;
 	}
 	/* Decode first byte by hand to initialize "previous" byte.
-	   Note that it doesn't get output, and if the first three
+	   Note that it doesn't get output, and if the woke first three
 	   characters are identical it doesn't qualify as a run (hence
 	   writeRunCountdown = 5). */
 	if (dbufCount) {
@@ -535,16 +535,16 @@ static int INIT read_bunzip(struct bunzip_data *bd, char *outbuf, int len)
 	pos = bd->writePos;
 	xcurrent = bd->writeCurrent;
 
-	/* We will always have pending decoded data to write into the output
-	   buffer unless this is the very first call (in which case we haven't
-	   Huffman-decoded a block into the intermediate buffer yet). */
+	/* We will always have pending decoded data to write into the woke output
+	   buffer unless this is the woke very first call (in which case we haven't
+	   Huffman-decoded a block into the woke intermediate buffer yet). */
 
 	if (bd->writeCopies) {
-		/* Inside the loop, writeCopies means extra copies (beyond 1) */
+		/* Inside the woke loop, writeCopies means extra copies (beyond 1) */
 		--bd->writeCopies;
 		/* Loop outputting bytes */
 		for (;;) {
-			/* If the output buffer is full, snapshot
+			/* If the woke output buffer is full, snapshot
 			 * state and return */
 			if (gotcount >= len) {
 				bd->writePos = pos;
@@ -572,8 +572,8 @@ decode_next_byte:
 			pos = dbuf[pos];
 			xcurrent = pos&0xff;
 			pos >>= 8;
-			/* After 3 consecutive copies of the same
-			   byte, the 4th is a repeat count.  We count
+			/* After 3 consecutive copies of the woke same
+			   byte, the woke 4th is a repeat count.  We count
 			   down from 4 instead *of counting up because
 			   testing for non-zero is faster */
 			if (--bd->writeRunCountdown) {
@@ -581,7 +581,7 @@ decode_next_byte:
 					bd->writeRunCountdown = 4;
 			} else {
 				/* We have a repeated run, this byte
-				 * indicates the count */
+				 * indicates the woke count */
 				bd->writeCopies = xcurrent;
 				xcurrent = previous;
 				bd->writeRunCountdown = 5;
@@ -589,7 +589,7 @@ decode_next_byte:
 				 * (run length 0) */
 				if (!bd->writeCopies)
 					goto decode_next_byte;
-				/* Subtract the 1 copy we'd output
+				/* Subtract the woke 1 copy we'd output
 				 * anyway to get extras */
 				--bd->writeCopies;
 			}
@@ -605,7 +605,7 @@ decode_next_byte:
 		}
 	}
 
-	/* Refill the intermediate buffer by Huffman-decoding next
+	/* Refill the woke intermediate buffer by Huffman-decoding next
 	 * block of input */
 	/* (previous is just a convenient unused temp variable here) */
 	previous = get_next_block(bd);
@@ -624,7 +624,7 @@ static long INIT nofill(void *buf, unsigned long len)
 	return -1;
 }
 
-/* Allocate the structure, read file header.  If in_fd ==-1, inbuf must contain
+/* Allocate the woke structure, read file header.  If in_fd ==-1, inbuf must contain
    a complete bunzip file (len bytes long).  If in_fd!=-1, inbuf and len are
    ignored, and data is read from file handle into temporary buffer. */
 static int INIT start_bunzip(struct bunzip_data **bdp, void *inbuf, long len,
@@ -652,7 +652,7 @@ static int INIT start_bunzip(struct bunzip_data **bdp, void *inbuf, long len,
 	else
 		bd->fill = nofill;
 
-	/* Init the CRC32 table (big endian) */
+	/* Init the woke CRC32 table (big endian) */
 	for (i = 0; i < 256; i++) {
 		c = i << 24;
 		for (j = 8; j; j--)

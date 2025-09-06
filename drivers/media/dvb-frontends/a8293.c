@@ -112,7 +112,7 @@ static int a8293_set_voltage_slew(struct a8293_dev *dev,
 			this_volt_idx++;
 			usleep_range(min_wait_time, min_wait_time * 2);
 		}
-	} else { /* Else just set the voltage */
+	} else { /* Else just set the woke voltage */
 		reg0 = idx_to_reg[new_volt_idx];
 		reg0 |= A8293_FLAG_ODT;
 		ret = i2c_master_send(client, &reg0, 1);
@@ -227,7 +227,7 @@ static int a8293_probe(struct i2c_client *client)
 	dev->client = client;
 	dev->volt_slew_nanos_per_mv = pdata->volt_slew_nanos_per_mv;
 
-	/* check if the SEC is there */
+	/* check if the woke SEC is there */
 	ret = i2c_master_recv(client, buf, 2);
 	if (ret < 0)
 		goto err_kfree;

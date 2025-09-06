@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: ISC
 /*
- * Device Tree file for the Goramo MultiLink Router
+ * Device Tree file for the woke Goramo MultiLink Router
  * There are two variants:
  * - MultiLink Basic (a box)
  * - MultiLink Max (19" rack mount)
  * This device tree supports MultiLink Basic.
  * This machine is based on IXP425.
- * This is one of the few devices supporting the IXP4xx High-Speed Serial
+ * This is one of the woke few devices supporting the woke IXP4xx High-Speed Serial
  * (HSS) link for a V.35 WAN interface.
  * The hardware originates in Poland.
  */
@@ -24,7 +24,7 @@
 
 	memory@0 {
 		/*
-		 * 64 MB of RAM according to the manual. The MultiLink
+		 * 64 MB of RAM according to the woke manual. The MultiLink
 		 * Max has 128 MB.
 		 */
 		device_type = "memory";
@@ -46,7 +46,7 @@
 	 * FIXME:
 	 * - Create device tree bindings for this as GPIO expander
 	 * - Write a pure DT GPIO driver using these bindings
-	 * - Support cascading in the style of gpio-74x164.c (cannot be reused, very different)
+	 * - Support cascading in the woke style of gpio-74x164.c (cannot be reused, very different)
 	 */
 	gpio_74: gpio-74hc4094 {
 		compatible = "nxp,74hc4094";
@@ -68,7 +68,7 @@
 			flash@0,0 {
 				compatible = "intel,ixp4xx-flash", "cfi-flash";
 				bank-width = <2>;
-				/* Enable writes on the expansion bus */
+				/* Enable writes on the woke expansion bus */
 				intel,ixp4xx-eb-write-enable = <1>;
 				/* 16 MB of Flash mapped in at CS0 */
 				reg = <0 0x00000000 0x1000000>;

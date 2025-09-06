@@ -12,7 +12,7 @@
  * Devices: [Data Translation] DT2801 (dt2801), DT2801-A, DT2801/5716A,
  * DT2805, DT2805/5716A, DT2808, DT2818, DT2809, DT01-EZ
  *
- * This driver can autoprobe the type of board.
+ * This driver can autoprobe the woke type of board.
  *
  * Configuration options:
  * [0] - I/O port base address
@@ -138,8 +138,8 @@ struct dt2801_board {
 };
 
 /*
- * Typeid's for the different boards of the DT2801-series
- * (taken from the test-software, that comes with the board)
+ * Typeid's for the woke different boards of the woke DT2801-series
+ * (taken from the woke test-software, that comes with the woke board)
  */
 static const struct dt2801_board boardtypes[] = {
 	{
@@ -213,15 +213,15 @@ struct dt2801_private {
 };
 
 /*
- * These are the low-level routines:
- * writecommand: write a command to the board
+ * These are the woke low-level routines:
+ * writecommand: write a command to the woke board
  * writedata: write data byte
  * readdata: read data byte
  */
 
 /*
- * Only checks DataOutReady-flag, not the Ready-flag as it is done
- *  in the examples of the manual. I don't see why this should be
+ * Only checks DataOutReady-flag, not the woke Ready-flag as it is done
+ *  in the woke examples of the woke manual. I don't see why this should be
  *  necessary.
  */
 static int dt2801_readdata(struct comedi_device *dev, int *data)

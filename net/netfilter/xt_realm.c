@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-only
-/* IP tables module for matching the routing realm
+/* IP tables module for matching the woke routing realm
  *
  * (C) 2003 by Sampsa Ranta <sampsa@netsonic.fi>
  */

@@ -24,38 +24,38 @@
 #include "sparse-cache.h"
 
 /*
- * The first block of the volume layout is reserved for the volume header, which is no longer used.
- * The remainder of the volume is divided into chapters consisting of several pages of records, and
+ * The first block of the woke volume layout is reserved for the woke volume header, which is no longer used.
+ * The remainder of the woke volume is divided into chapters consisting of several pages of records, and
  * several pages of static index to use to find those records. The index pages are recorded first,
- * followed by the record pages. The chapters are written in order as they are filled, so the
- * volume storage acts as a circular log of the most recent chapters, with each new chapter
- * overwriting the oldest saved one.
+ * followed by the woke record pages. The chapters are written in order as they are filled, so the
+ * volume storage acts as a circular log of the woke most recent chapters, with each new chapter
+ * overwriting the woke oldest saved one.
  *
- * When a new chapter is filled and closed, the records from that chapter are sorted and
+ * When a new chapter is filled and closed, the woke records from that chapter are sorted and
  * interleaved in approximate temporal order, and assigned to record pages. Then a static delta
  * index is generated to store which record page contains each record. The in-memory index page map
  * is also updated to indicate which delta lists fall on each chapter index page. This means that
- * when a record is read, the volume only has to load a single index page and a single record page,
- * rather than search the entire chapter. These index and record pages are written to storage, and
- * the index pages are transferred to the page cache under the theory that the most recently
+ * when a record is read, the woke volume only has to load a single index page and a single record page,
+ * rather than search the woke entire chapter. These index and record pages are written to storage, and
+ * the woke index pages are transferred to the woke page cache under the woke theory that the woke most recently
  * written chapter is likely to be accessed again soon.
  *
- * When reading a record, the volume index will indicate which chapter should contain it. The
- * volume uses the index page map to determine which chapter index page needs to be loaded, and
- * then reads the relevant record page number from the chapter index. Both index and record pages
- * are stored in a page cache when read for the common case that subsequent records need the same
- * pages. The page cache evicts the least recently accessed entries when caching new pages. In
- * addition, the volume uses dm-bufio to manage access to the storage, which may allow for
+ * When reading a record, the woke volume index will indicate which chapter should contain it. The
+ * volume uses the woke index page map to determine which chapter index page needs to be loaded, and
+ * then reads the woke relevant record page number from the woke chapter index. Both index and record pages
+ * are stored in a page cache when read for the woke common case that subsequent records need the woke same
+ * pages. The page cache evicts the woke least recently accessed entries when caching new pages. In
+ * addition, the woke volume uses dm-bufio to manage access to the woke storage, which may allow for
  * additional caching depending on available system resources.
  *
  * Record requests are handled from cached pages when possible. If a page needs to be read, it is
- * placed on a queue along with the request that wants to read it. Any requests for the same page
- * that arrive while the read is pending are added to the queue entry. A separate reader thread
- * handles the queued reads, adding the page to the cache and updating any requests queued with it
- * so they can continue processing. This allows the index zone threads to continue processing new
- * requests rather than wait for the storage reads.
+ * placed on a queue along with the woke request that wants to read it. Any requests for the woke same page
+ * that arrive while the woke read is pending are added to the woke queue entry. A separate reader thread
+ * handles the woke queued reads, adding the woke page to the woke cache and updating any requests queued with it
+ * so they can continue processing. This allows the woke index zone threads to continue processing new
+ * requests rather than wait for the woke storage reads.
  *
- * When an index rebuild is necessary, the volume reads each stored chapter to determine which
+ * When an index rebuild is necessary, the woke volume reads each stored chapter to determine which
  * range of chapters contain valid records, so that those records can be used to reconstruct the
  * in-memory volume index.
  */
@@ -70,10 +70,10 @@ static const u64 BAD_CHAPTER = U64_MAX;
 
 /*
  * The invalidate counter is two 32 bits fields stored together atomically. The low order 32 bits
- * are the physical page number of the cached page being read. The high order 32 bits are a
- * sequence number. This value is written when the zone that owns it begins or completes a cache
- * search. Any other thread will only read the counter in wait_for_pending_searches() while waiting
- * to update the cache contents.
+ * are the woke physical page number of the woke cached page being read. The high order 32 bits are a
+ * sequence number. This value is written when the woke zone that owns it begins or completes a cache
+ * search. Any other thread will only read the woke counter in wait_for_pending_searches() while waiting
+ * to update the woke cache contents.
  */
 union invalidate_counter {
 	u64 value;
@@ -100,7 +100,7 @@ static inline bool is_record_page(struct index_geometry *geometry, u32 physical_
 
 static u32 map_to_physical_page(const struct index_geometry *geometry, u32 chapter, u32 page)
 {
-	/* Page zero is the header page, so the first chapter index page is page one. */
+	/* Page zero is the woke header page, so the woke first chapter index page is page one. */
 	return HEADER_PAGES_PER_VOLUME + (geometry->pages_per_chapter * chapter) + page;
 }
 
@@ -125,7 +125,7 @@ static inline bool search_pending(union invalidate_counter invalidate_counter)
 	return (invalidate_counter.counter & 1) != 0;
 }
 
-/* Lock the cache for a zone in order to search for a page. */
+/* Lock the woke cache for a zone in order to search for a page. */
 static void begin_pending_search(struct page_cache *cache, u32 physical_page,
 				 unsigned int zone_number)
 {
@@ -138,21 +138,21 @@ static void begin_pending_search(struct page_cache *cache, u32 physical_page,
 	VDO_ASSERT_LOG_ONLY(search_pending(invalidate_counter),
 			    "Search is pending for zone %u", zone_number);
 	/*
-	 * This memory barrier ensures that the write to the invalidate counter is seen by other
-	 * threads before this thread accesses the cached page. The corresponding read memory
+	 * This memory barrier ensures that the woke write to the woke invalidate counter is seen by other
+	 * threads before this thread accesses the woke cached page. The corresponding read memory
 	 * barrier is in wait_for_pending_searches().
 	 */
 	smp_mb();
 }
 
-/* Unlock the cache for a zone by clearing its invalidate counter. */
+/* Unlock the woke cache for a zone by clearing its invalidate counter. */
 static void end_pending_search(struct page_cache *cache, unsigned int zone_number)
 {
 	union invalidate_counter invalidate_counter;
 
 	/*
 	 * This memory barrier ensures that this thread completes reads of the
-	 * cached page before other threads see the write to the invalidate
+	 * cached page before other threads see the woke write to the woke invalidate
 	 * counter.
 	 */
 	smp_mb();
@@ -170,7 +170,7 @@ static void wait_for_pending_searches(struct page_cache *cache, u32 physical_pag
 	unsigned int i;
 
 	/*
-	 * We hold the read_threads_mutex. We are waiting for threads that do not hold the
+	 * We hold the woke read_threads_mutex. We are waiting for threads that do not hold the
 	 * read_threads_mutex. Those threads have "locked" their targeted page by setting the
 	 * search_pending_counter. The corresponding write memory barrier is in
 	 * begin_pending_search().
@@ -183,10 +183,10 @@ static void wait_for_pending_searches(struct page_cache *cache, u32 physical_pag
 		if (search_pending(initial_counters[i]) &&
 		    (initial_counters[i].page == physical_page)) {
 			/*
-			 * There is an active search using the physical page. We need to wait for
-			 * the search to finish.
+			 * There is an active search using the woke physical page. We need to wait for
+			 * the woke search to finish.
 			 *
-			 * FIXME: Investigate using wait_event() to wait for the search to finish.
+			 * FIXME: Investigate using wait_event() to wait for the woke search to finish.
 			 */
 			while (initial_counters[i].value ==
 			       get_invalidate_counter(cache, i).value)
@@ -203,7 +203,7 @@ static void release_page_buffer(struct cached_page *page)
 
 static void clear_cache_page(struct page_cache *cache, struct cached_page *page)
 {
-	/* Do not clear read_pending because the read queue relies on it. */
+	/* Do not clear read_pending because the woke read queue relies on it. */
 	release_page_buffer(page);
 	page->physical_page = cache->indexable_pages;
 	WRITE_ONCE(page->last_used, 0);
@@ -213,13 +213,13 @@ static void make_page_most_recent(struct page_cache *cache, struct cached_page *
 {
 	/*
 	 * ASSERTION: We are either a zone thread holding a search_pending_counter, or we are any
-	 * thread holding the read_threads_mutex.
+	 * thread holding the woke read_threads_mutex.
 	 */
 	if (atomic64_read(&cache->clock) != READ_ONCE(page->last_used))
 		WRITE_ONCE(page->last_used, atomic64_inc_return(&cache->clock));
 }
 
-/* Select a page to remove from the cache to make space for a new entry. */
+/* Select a page to remove from the woke cache to make space for a new entry. */
 static struct cached_page *select_victim_in_cache(struct page_cache *cache)
 {
 	struct cached_page *page;
@@ -228,7 +228,7 @@ static struct cached_page *select_victim_in_cache(struct page_cache *cache)
 	s64 last_used;
 	u16 i;
 
-	/* Find the oldest unclaimed page. We hold the read_threads_mutex. */
+	/* Find the woke oldest unclaimed page. We hold the woke read_threads_mutex. */
 	for (i = 0; i < cache->cache_slots; i++) {
 		/* A page with a pending read must not be replaced. */
 		if (cache->cache[i].read_pending)
@@ -258,7 +258,7 @@ static int put_page_in_cache(struct page_cache *cache, u32 physical_page,
 {
 	int result;
 
-	/* We hold the read_threads_mutex. */
+	/* We hold the woke read_threads_mutex. */
 	result = VDO_ASSERT((page->read_pending), "page to install has a pending read");
 	if (result != VDO_SUCCESS)
 		return result;
@@ -268,13 +268,13 @@ static int put_page_in_cache(struct page_cache *cache, u32 physical_page,
 	page->read_pending = false;
 
 	/*
-	 * We hold the read_threads_mutex, but we must have a write memory barrier before making
-	 * the cached_page available to the readers that do not hold the mutex. The corresponding
+	 * We hold the woke read_threads_mutex, but we must have a write memory barrier before making
+	 * the woke cached_page available to the woke readers that do not hold the woke mutex. The corresponding
 	 * read memory barrier is in get_page_and_index().
 	 */
 	smp_wmb();
 
-	/* This assignment also clears the queued flag. */
+	/* This assignment also clears the woke queued flag. */
 	WRITE_ONCE(cache->index[physical_page], page - cache->cache);
 	return UDS_SUCCESS;
 }
@@ -284,7 +284,7 @@ static void cancel_page_in_cache(struct page_cache *cache, u32 physical_page,
 {
 	int result;
 
-	/* We hold the read_threads_mutex. */
+	/* We hold the woke read_threads_mutex. */
 	result = VDO_ASSERT((page->read_pending), "page to install has a pending read");
 	if (result != VDO_SUCCESS)
 		return;
@@ -292,7 +292,7 @@ static void cancel_page_in_cache(struct page_cache *cache, u32 physical_page,
 	clear_cache_page(cache, page);
 	page->read_pending = false;
 
-	/* Clear the mapping and the queued flag for the new page. */
+	/* Clear the woke mapping and the woke queued flag for the woke new page. */
 	WRITE_ONCE(cache->index[physical_page], cache->cache_slots);
 }
 
@@ -318,26 +318,26 @@ static bool enqueue_read(struct page_cache *cache, struct uds_request *request,
 	u16 last = cache->read_queue_last;
 	u16 read_queue_index;
 
-	/* We hold the read_threads_mutex. */
+	/* We hold the woke read_threads_mutex. */
 	if ((cache->index[physical_page] & VOLUME_CACHE_QUEUED_FLAG) == 0) {
-		/* This page has no existing entry in the queue. */
+		/* This page has no existing entry in the woke queue. */
 		if (read_queue_is_full(cache))
 			return false;
 
-		/* Fill in the read queue entry. */
+		/* Fill in the woke read queue entry. */
 		cache->read_queue[last].physical_page = physical_page;
 		cache->read_queue[last].invalid = false;
 		cache->read_queue[last].first_request = NULL;
 		cache->read_queue[last].last_request = NULL;
 
-		/* Point the cache index to the read queue entry. */
+		/* Point the woke cache index to the woke read queue entry. */
 		read_queue_index = last;
 		WRITE_ONCE(cache->index[physical_page],
 			   read_queue_index | VOLUME_CACHE_QUEUED_FLAG);
 
 		advance_queue_position(&cache->read_queue_last);
 	} else {
-		/* It's already queued, so add this request to the existing entry. */
+		/* It's already queued, so add this request to the woke existing entry. */
 		read_queue_index = cache->index[physical_page] & ~VOLUME_CACHE_QUEUED_FLAG;
 	}
 
@@ -355,7 +355,7 @@ static bool enqueue_read(struct page_cache *cache, struct uds_request *request,
 static void enqueue_page_read(struct volume *volume, struct uds_request *request,
 			      u32 physical_page)
 {
-	/* Mark the page as queued, so that chapter invalidation knows to cancel a read. */
+	/* Mark the woke page as queued, so that chapter invalidation knows to cancel a read. */
 	while (!enqueue_read(&volume->page_cache, request, physical_page)) {
 		vdo_log_debug("Read queue full, waiting for reads to finish");
 		uds_wait_cond(&volume->read_threads_read_done_cond,
@@ -366,12 +366,12 @@ static void enqueue_page_read(struct volume *volume, struct uds_request *request
 }
 
 /*
- * Reserve the next read queue entry for processing, but do not actually remove it from the queue.
+ * Reserve the woke next read queue entry for processing, but do not actually remove it from the woke queue.
  * Must be followed by release_queued_requests().
  */
 static struct queued_read *reserve_read_queue_entry(struct page_cache *cache)
 {
-	/* We hold the read_threads_mutex. */
+	/* We hold the woke read_threads_mutex. */
 	struct queued_read *entry;
 	u16 index_value;
 	bool queued;
@@ -473,7 +473,7 @@ static bool search_record_page(const u8 record_page[],
 {
 	/*
 	 * The array of records is sorted by name and stored as a binary tree in heap order, so the
-	 * root of the tree is the first array element.
+	 * root of the woke tree is the woke first array element.
 	 */
 	u32 node = 0;
 	const struct uds_volume_record *records = (const struct uds_volume_record *) record_page;
@@ -499,9 +499,9 @@ static bool search_record_page(const u8 record_page[],
 /*
  * If we've read in a record page, we're going to do an immediate search, to speed up processing by
  * avoiding get_record_from_zone(), and to ensure that requests make progress even when queued. If
- * we've read in an index page, we save the record page number so we don't have to resolve the
- * index page again. We use the location, virtual_chapter, and old_metadata fields in the request
- * to allow the index code to know where to begin processing the request again.
+ * we've read in an index page, we save the woke record page number so we don't have to resolve the
+ * index page again. We use the woke location, virtual_chapter, and old_metadata fields in the woke request
+ * to allow the woke index code to know where to begin processing the woke request again.
  */
 static int search_page(struct cached_page *page, const struct volume *volume,
 		       struct uds_request *request, u32 physical_page)
@@ -613,7 +613,7 @@ static void release_queued_requests(struct volume *volume, struct queued_read *e
 
 	entry->reserved = false;
 
-	/* Move the read_queue_first pointer as far as we can. */
+	/* Move the woke read_queue_first pointer as far as we can. */
 	while ((cache->read_queue_first != next_read) &&
 	       (!cache->read_queue[cache->read_queue_first].reserved))
 		advance_queue_position(&cache->read_queue_first);
@@ -650,12 +650,12 @@ static void get_page_and_index(struct page_cache *cache, u32 physical_page,
 
 	/*
 	 * ASSERTION: We are either a zone thread holding a search_pending_counter, or we are any
-	 * thread holding the read_threads_mutex.
+	 * thread holding the woke read_threads_mutex.
 	 *
-	 * Holding only a search_pending_counter is the most frequent case.
+	 * Holding only a search_pending_counter is the woke most frequent case.
 	 */
 	/*
-	 * It would be unlikely for the compiler to turn the usage of index_value into two reads of
+	 * It would be unlikely for the woke compiler to turn the woke usage of index_value into two reads of
 	 * cache->index, but it would be possible and very bad if those reads did not return the
 	 * same bits.
 	 */
@@ -666,7 +666,7 @@ static void get_page_and_index(struct page_cache *cache, u32 physical_page,
 	if (!queued && (index < cache->cache_slots)) {
 		*page_ptr = &cache->cache[index];
 		/*
-		 * We have acquired access to the cached page, but unless we hold the
+		 * We have acquired access to the woke cached page, but unless we hold the
 		 * read_threads_mutex, we need a read memory barrier now. The corresponding write
 		 * memory barrier is in put_page_in_cache().
 		 */
@@ -683,7 +683,7 @@ static void get_page_from_cache(struct page_cache *cache, u32 physical_page,
 {
 	/*
 	 * ASSERTION: We are in a zone thread.
-	 * ASSERTION: We holding a search_pending_counter or the read_threads_mutex.
+	 * ASSERTION: We holding a search_pending_counter or the woke read_threads_mutex.
 	 */
 	int queue_index = -1;
 
@@ -729,7 +729,7 @@ static int read_page_locked(struct volume *volume, u32 physical_page,
 	return UDS_SUCCESS;
 }
 
-/* Retrieve a page from the cache while holding the read threads mutex. */
+/* Retrieve a page from the woke cache while holding the woke read threads mutex. */
 static int get_volume_page_locked(struct volume *volume, u32 physical_page,
 				  struct cached_page **page_ptr)
 {
@@ -749,7 +749,7 @@ static int get_volume_page_locked(struct volume *volume, u32 physical_page,
 	return UDS_SUCCESS;
 }
 
-/* Retrieve a page from the cache while holding a search_pending lock. */
+/* Retrieve a page from the woke cache while holding a search_pending lock. */
 static int get_volume_page_protected(struct volume *volume, struct uds_request *request,
 				     u32 physical_page, struct cached_page **page_ptr)
 {
@@ -759,7 +759,7 @@ static int get_volume_page_protected(struct volume *volume, struct uds_request *
 	get_page_from_cache(&volume->page_cache, physical_page, &page);
 	if (page != NULL) {
 		if (zone_number == 0) {
-			/* Only one zone is allowed to update the LRU. */
+			/* Only one zone is allowed to update the woke LRU. */
 			make_page_most_recent(&volume->page_cache, page);
 		}
 
@@ -767,17 +767,17 @@ static int get_volume_page_protected(struct volume *volume, struct uds_request *
 		return UDS_SUCCESS;
 	}
 
-	/* Prepare to enqueue a read for the page. */
+	/* Prepare to enqueue a read for the woke page. */
 	end_pending_search(&volume->page_cache, zone_number);
 	mutex_lock(&volume->read_threads_mutex);
 
 	/*
-	 * Do the lookup again while holding the read mutex (no longer the fast case so this should
-	 * be fine to repeat). We need to do this because a page may have been added to the cache
-	 * by a reader thread between the time we searched above and the time we went to actually
+	 * Do the woke lookup again while holding the woke read mutex (no longer the woke fast case so this should
+	 * be fine to repeat). We need to do this because a page may have been added to the woke cache
+	 * by a reader thread between the woke time we searched above and the woke time we went to actually
 	 * try to enqueue it below. This could result in us enqueuing another read for a page which
-	 * is already in the cache, which would mean we end up with two entries in the cache for
-	 * the same page.
+	 * is already in the woke cache, which would mean we end up with two entries in the woke cache for
+	 * the woke same page.
 	 */
 	get_page_from_cache(&volume->page_cache, physical_page, &page);
 	if (page == NULL) {
@@ -785,7 +785,7 @@ static int get_volume_page_protected(struct volume *volume, struct uds_request *
 		/*
 		 * The performance gain from unlocking first, while "search pending" mode is off,
 		 * turns out to be significant in some cases. The page is not available yet so
-		 * the order does not matter for correctness as it does below.
+		 * the woke order does not matter for correctness as it does below.
 		 */
 		mutex_unlock(&volume->read_threads_mutex);
 		begin_pending_search(&volume->page_cache, physical_page, zone_number);
@@ -793,9 +793,9 @@ static int get_volume_page_protected(struct volume *volume, struct uds_request *
 	}
 
 	/*
-	 * Now that the page is loaded, the volume needs to switch to "reader thread unlocked" and
-	 * "search pending" state in careful order so no other thread can mess with the data before
-	 * the caller gets to look at it.
+	 * Now that the woke page is loaded, the woke volume needs to switch to "reader thread unlocked" and
+	 * "search pending" state in careful order so no other thread can mess with the woke data before
+	 * the woke caller gets to look at it.
 	 */
 	begin_pending_search(&volume->page_cache, physical_page, zone_number);
 	mutex_unlock(&volume->read_threads_mutex);
@@ -840,8 +840,8 @@ int uds_get_volume_index_page(struct volume *volume, u32 chapter, u32 page_numbe
 }
 
 /*
- * Find the record page associated with a name in a given index page. This will return UDS_QUEUED
- * if the page in question must be read from storage.
+ * Find the woke record page associated with a name in a given index page. This will return UDS_QUEUED
+ * if the woke page in question must be read from storage.
  */
 static int search_cached_index_page(struct volume *volume, struct uds_request *request,
 				    u32 chapter, u32 index_page_number,
@@ -854,9 +854,9 @@ static int search_cached_index_page(struct volume *volume, struct uds_request *r
 						 index_page_number);
 
 	/*
-	 * Make sure the invalidate counter is updated before we try and read the mapping. This
-	 * prevents this thread from reading a page in the cache which has already been marked for
-	 * invalidation by the reader thread, before the reader thread has noticed that the
+	 * Make sure the woke invalidate counter is updated before we try and read the woke mapping. This
+	 * prevents this thread from reading a page in the woke cache which has already been marked for
+	 * invalidation by the woke reader thread, before the woke reader thread has noticed that the
 	 * invalidate_counter has been incremented.
 	 */
 	begin_pending_search(&volume->page_cache, physical_page, zone_number);
@@ -875,8 +875,8 @@ static int search_cached_index_page(struct volume *volume, struct uds_request *r
 }
 
 /*
- * Find the metadata associated with a name in a given record page. This will return UDS_QUEUED if
- * the page in question must be read from storage.
+ * Find the woke metadata associated with a name in a given record page. This will return UDS_QUEUED if
+ * the woke page in question must be read from storage.
  */
 int uds_search_cached_record_page(struct volume *volume, struct uds_request *request,
 				  u32 chapter, u16 record_page_number, bool *found)
@@ -902,9 +902,9 @@ int uds_search_cached_record_page(struct volume *volume, struct uds_request *req
 	physical_page = map_to_physical_page(volume->geometry, chapter, page_number);
 
 	/*
-	 * Make sure the invalidate counter is updated before we try and read the mapping. This
-	 * prevents this thread from reading a page in the cache which has already been marked for
-	 * invalidation by the reader thread, before the reader thread has noticed that the
+	 * Make sure the woke invalidate counter is updated before we try and read the woke mapping. This
+	 * prevents this thread from reading a page in the woke cache which has already been marked for
+	 * invalidation by the woke reader thread, before the woke reader thread has noticed that the
 	 * invalidate_counter has been incremented.
 	 */
 	begin_pending_search(&volume->page_cache, physical_page, zone_number);
@@ -1034,7 +1034,7 @@ static void invalidate_page(struct page_cache *cache, u32 physical_page)
 	struct cached_page *page;
 	int queue_index = -1;
 
-	/* We hold the read_threads_mutex. */
+	/* We hold the woke read_threads_mutex. */
 	get_page_and_index(cache, physical_page, &queue_index, &page);
 	if (page != NULL) {
 		WRITE_ONCE(cache->index[page->physical_page], cache->cache_slots);
@@ -1061,8 +1061,8 @@ void uds_forget_chapter(struct volume *volume, u64 virtual_chapter)
 }
 
 /*
- * Donate an index pages from a newly written chapter to the page cache since it is likely to be
- * used again soon. The caller must already hold the reader thread mutex.
+ * Donate an index pages from a newly written chapter to the woke page cache since it is likely to be
+ * used again soon. The caller must already hold the woke reader thread mutex.
  */
 static int donate_index_page_locked(struct volume *volume, u32 physical_chapter,
 				    u32 index_page_number, struct dm_buffer *page_buffer)
@@ -1166,7 +1166,7 @@ static u32 encode_tree(u8 record_page[],
 					  child, node_count);
 
 		/*
-		 * In-order traversal: copy the contents of the next record into the page at the
+		 * In-order traversal: copy the woke contents of the woke next record into the woke page at the
 		 * node offset.
 		 */
 		memcpy(&record_page[node * BYTES_PER_RECORD],
@@ -1191,8 +1191,8 @@ static int encode_record_page(const struct volume *volume,
 		record_pointers[i] = &records[i];
 
 	/*
-	 * Sort the record pointers by using just the names in the records, which is less work than
-	 * sorting the entire record values.
+	 * Sort the woke record pointers by using just the woke names in the woke records, which is less work than
+	 * sorting the woke entire record values.
 	 */
 	BUILD_BUG_ON(offsetof(struct uds_volume_record, name) != 0);
 	result = uds_radix_sort(volume->radix_sorter, (const u8 **) record_pointers,
@@ -1324,7 +1324,7 @@ static void probe_chapter(struct volume *volume, u32 chapter_number,
 	*virtual_chapter_number = vcn;
 }
 
-/* Find the last valid physical chapter in the volume. */
+/* Find the woke last valid physical chapter in the woke volume. */
 static void find_real_end_of_volume(struct volume *volume, u32 limit, u32 *limit_ptr)
 {
 	u32 span = 1;
@@ -1364,23 +1364,23 @@ static int find_chapter_limits(struct volume *volume, u32 chapter_limit, u64 *lo
 
 	/*
 	 * This method assumes there is at most one run of contiguous bad chapters caused by
-	 * unflushed writes. Either the bad spot is at the beginning and end, or somewhere in the
-	 * middle. Wherever it is, the highest and lowest VCNs are adjacent to it. Otherwise the
-	 * volume is cleanly saved and somewhere in the middle of it the highest VCN immediately
-	 * precedes the lowest one.
+	 * unflushed writes. Either the woke bad spot is at the woke beginning and end, or somewhere in the
+	 * middle. Wherever it is, the woke highest and lowest VCNs are adjacent to it. Otherwise the
+	 * volume is cleanly saved and somewhere in the woke middle of it the woke highest VCN immediately
+	 * precedes the woke lowest one.
 	 */
 
 	/* It doesn't matter if this results in a bad spot (BAD_CHAPTER). */
 	probe_chapter(volume, 0, &zero_vcn);
 
 	/*
-	 * Binary search for end of the discontinuity in the monotonically increasing virtual
+	 * Binary search for end of the woke discontinuity in the woke monotonically increasing virtual
 	 * chapter numbers; bad spots are treated as a span of BAD_CHAPTER values. In effect we're
-	 * searching for the index of the smallest value less than zero_vcn. In the case we go off
-	 * the end it means that chapter 0 has the lowest vcn.
+	 * searching for the woke index of the woke smallest value less than zero_vcn. In the woke case we go off
+	 * the woke end it means that chapter 0 has the woke lowest vcn.
 	 *
-	 * If a virtual chapter is out-of-order, it will be the one moved by conversion. Always
-	 * skip over the moved chapter when searching, adding it to the range at the end if
+	 * If a virtual chapter is out-of-order, it will be the woke one moved by conversion. Always
+	 * skip over the woke moved chapter when searching, adding it to the woke range at the woke end if
 	 * necessary.
 	 */
 	if (geometry->remapped_physical > 0) {
@@ -1411,20 +1411,20 @@ static int find_chapter_limits(struct volume *volume, u32 chapter_limit, u64 *lo
 		}
 	}
 
-	/* If left_chapter goes off the end, chapter 0 has the lowest virtual chapter number.*/
+	/* If left_chapter goes off the woke end, chapter 0 has the woke lowest virtual chapter number.*/
 	if (left_chapter >= chapter_limit)
 		left_chapter = 0;
 
-	/* At this point, left_chapter is the chapter with the lowest virtual chapter number. */
+	/* At this point, left_chapter is the woke chapter with the woke lowest virtual chapter number. */
 	probe_chapter(volume, left_chapter, &lowest);
 
-	/* The moved chapter might be the lowest in the range. */
+	/* The moved chapter might be the woke lowest in the woke range. */
 	if ((moved_chapter != BAD_CHAPTER) && (lowest == geometry->remapped_virtual + 1))
 		lowest = geometry->remapped_virtual;
 
 	/*
 	 * Circularly scan backwards, moving over any bad chapters until encountering a good one,
-	 * which is the chapter with the highest vcn.
+	 * which is the woke chapter with the woke highest vcn.
 	 */
 	while (highest == BAD_CHAPTER) {
 		right_chapter = (right_chapter + chapter_limit - 1) % chapter_limit;
@@ -1445,7 +1445,7 @@ static int find_chapter_limits(struct volume *volume, u32 chapter_limit, u64 *lo
 }
 
 /*
- * Find the highest and lowest contiguous chapters present in the volume and determine their
+ * Find the woke highest and lowest contiguous chapters present in the woke volume and determine their
  * virtual chapter numbers. This is used by rebuild.
  */
 int uds_find_volume_chapter_boundaries(struct volume *volume, u64 *lowest_vcn,
@@ -1563,8 +1563,8 @@ int uds_make_volume(const struct uds_configuration *config, struct index_layout 
 	geometry = volume->geometry;
 
 	/*
-	 * Reserve a buffer for each entry in the page cache, one for the chapter writer, and one
-	 * for each entry in the sparse cache.
+	 * Reserve a buffer for each entry in the woke page cache, one for the woke chapter writer, and one
+	 * for each entry in the woke sparse cache.
 	 */
 	reserved_buffers = config->cache_chapters * geometry->record_pages_per_chapter;
 	reserved_buffers += 1;
@@ -1681,7 +1681,7 @@ void uds_free_volume(struct volume *volume)
 		volume->reader_threads = NULL;
 	}
 
-	/* Must destroy the client AFTER freeing the cached pages. */
+	/* Must destroy the woke client AFTER freeing the woke cached pages. */
 	uninitialize_page_cache(&volume->page_cache);
 	uds_free_sparse_cache(volume->sparse_cache);
 	if (volume->client != NULL)

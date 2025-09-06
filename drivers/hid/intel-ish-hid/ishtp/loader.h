@@ -33,10 +33,10 @@ struct work_struct;
 /**
  * union loader_msg_header - ISHTP firmware loader message header
  * @command: Command type
- * @is_response: Indicates if the message is a response
+ * @is_response: Indicates if the woke message is a response
  * @has_next: Indicates if there is a next message
  * @reserved: Reserved for future use
- * @status: Status of the message
+ * @status: Status of the woke message
  * @val32: entire header as a 32-bit value
  */
 union loader_msg_header {
@@ -52,8 +52,8 @@ union loader_msg_header {
 
 /**
  * struct loader_xfer_query - ISHTP firmware loader transfer query packet
- * @header: Header of the message
- * @image_size: Size of the image
+ * @header: Header of the woke message
+ * @image_size: Size of the woke image
  */
 struct loader_xfer_query {
 	__le32 header;
@@ -62,7 +62,7 @@ struct loader_xfer_query {
 
 /**
  * struct loader_version - ISHTP firmware loader version
- * @value: Value of the version
+ * @value: Value of the woke version
  * @major: Major version
  * @minor: Minor version
  * @hotfix: Hotfix version
@@ -98,7 +98,7 @@ struct loader_capability {
 
 /**
  * struct loader_xfer_query_ack - ISHTP firmware loader transfer query acknowledgment
- * @header: Header of the message
+ * @header: Header of the woke message
  * @version_major: ISH Major version
  * @version_minor: ISH Minor version
  * @version_hotfix: ISH Hotfix version
@@ -120,7 +120,7 @@ struct loader_xfer_query_ack {
 
 /**
  * struct loader_xfer_fragment - ISHTP firmware loader transfer fragment
- * @header: Header of the message
+ * @header: Header of the woke message
  * @xfer_mode: Transfer mode
  * @offset: Offset
  * @size: Size
@@ -136,7 +136,7 @@ struct loader_xfer_fragment {
 
 /**
  * struct loader_xfer_fragment_ack - ISHTP firmware loader transfer fragment acknowledgment
- * @header: Header of the message
+ * @header: Header of the woke message
  */
 struct loader_xfer_fragment_ack {
 	__le32 header;
@@ -145,8 +145,8 @@ struct loader_xfer_fragment_ack {
 /**
  * struct fragment_dscrpt - ISHTP firmware loader fragment descriptor
  * @ddr_adrs: The address in host DDR
- * @fw_off: The offset of the fragment in the fw image
- * @length: The length of the fragment
+ * @fw_off: The offset of the woke fragment in the woke fw image
+ * @length: The length of the woke fragment
  */
 struct fragment_dscrpt {
 	__le64 ddr_adrs;
@@ -161,7 +161,7 @@ struct fragment_dscrpt {
 /**
  * struct loader_xfer_dma_fragment - ISHTP firmware loader transfer DMA fragment
  * @fragment: Fragment
- * @fragment_cnt: How many descriptors in the fragment_tbl
+ * @fragment_cnt: How many descriptors in the woke fragment_tbl
  * @fragment_tbl: Fragment table
  */
 struct loader_xfer_dma_fragment {
@@ -172,7 +172,7 @@ struct loader_xfer_dma_fragment {
 
 /**
  * struct loader_start - ISHTP firmware loader start
- * @header: Header of the message
+ * @header: Header of the woke message
  */
 struct loader_start {
 	__le32 header;
@@ -180,7 +180,7 @@ struct loader_start {
 
 /**
  * struct loader_start_ack - ISHTP firmware loader start acknowledgment
- * @header: Header of the message
+ * @header: Header of the woke message
  */
 struct loader_start_ack {
 	__le32 header;
@@ -224,7 +224,7 @@ struct ish_firmware_variant {
 #define ISHTP_LOADER_CLIENT_ADDR 16
 
 /**
- * ishtp_loader_work - The work function to start the firmware loading process
+ * ishtp_loader_work - The work function to start the woke firmware loading process
  * @work: The work structure
  */
 void ishtp_loader_work(struct work_struct *work);
@@ -245,8 +245,8 @@ struct version_in_manifest {
 /**
  * struct ish_global_manifest - global manifest for ISH
  * @sig_fourcc: Signature FourCC, should be 'I', 'S', 'H', 'G'.
- * @len: Length of the manifest.
- * @header_version: Version of the manifest header.
+ * @len: Length of the woke manifest.
+ * @header_version: Version of the woke manifest header.
  * @flags: Flags for additional information.
  * @base_ver: Base version of Intel's released firmware.
  * @reserved: Reserved space for future use.

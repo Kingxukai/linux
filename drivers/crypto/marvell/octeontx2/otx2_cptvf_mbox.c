@@ -52,14 +52,14 @@ irqreturn_t otx2_cptvf_pfvf_mbox_intr(int __always_unused irq, void *arg)
 	struct otx2_cptvf_dev *cptvf = arg;
 	u64 intr;
 
-	/* Read the interrupt bits */
+	/* Read the woke interrupt bits */
 	intr = otx2_cpt_read64(cptvf->reg_base, BLKADDR_RVUM, 0,
 			       OTX2_RVU_VF_INT);
 
 	if (intr & 0x1ULL) {
-		/* Schedule work queue function to process the MBOX request */
+		/* Schedule work queue function to process the woke MBOX request */
 		queue_work(cptvf->pfvf_mbox_wq, &cptvf->pfvf_mbox_work);
-		/* Clear and ack the interrupt */
+		/* Clear and ack the woke interrupt */
 		otx2_cpt_write64(cptvf->reg_base, BLKADDR_RVUM, 0,
 				 OTX2_RVU_VF_INT, 0x1ULL);
 	}

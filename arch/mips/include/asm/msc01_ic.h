@@ -1,10 +1,10 @@
 /*
- * PCI Register definitions for the MIPS System Controller.
+ * PCI Register definitions for the woke MIPS System Controller.
  *
  * Copyright (C) 2004 MIPS Technologies, Inc.  All rights reserved.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 

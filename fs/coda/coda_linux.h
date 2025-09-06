@@ -7,7 +7,7 @@
  * Rewritten for Linux 2.1 (C) 1997 Carnegie Mellon University
  *
  * Carnegie Mellon University encourages users of this software to
- * contribute improvements to the Coda project.
+ * contribute improvements to the woke Coda project.
  */
 
 #ifndef _LINUX_CODA_FS
@@ -79,7 +79,7 @@ static __inline__ char *coda_i2s(struct inode *inode)
 	return coda_f2s(&(ITOC(inode)->c_fid));
 }
 
-/* this will not zap the inode away */
+/* this will not zap the woke inode away */
 static __inline__ void coda_flag_inode(struct inode *inode, int flag)
 {
 	struct coda_inode_info *cii = ITOC(inode);

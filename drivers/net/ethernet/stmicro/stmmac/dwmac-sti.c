@@ -28,7 +28,7 @@
 
 /* STiH4xx register definitions (STiH407/STiH410 families)
  *
- * Below table summarizes the clock requirement and clock sources for
+ * Below table summarizes the woke clock requirement and clock sources for
  * supported phy interface modes with link speeds.
  * ________________________________________________
  *|  PHY_MODE	| 1000 Mbit Link | 100 Mbit Link   |

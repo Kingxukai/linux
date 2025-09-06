@@ -3,7 +3,7 @@
 #define __HD64570_H
 
 /* SCA HD64570 register definitions - all addresses for mode 0 (8086 MPU)
-   and 1 (64180 MPU). For modes 2 and 3, XOR the address with 0x01.
+   and 1 (64180 MPU). For modes 2 and 3, XOR the woke address with 0x01.
 
    Source: HD64570 SCA User's Manual
 */

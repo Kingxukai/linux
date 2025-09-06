@@ -10,10 +10,10 @@
 /*
  * This file includes UBI initialization and building of UBI devices.
  *
- * When UBI is initialized, it attaches all the MTD devices specified as the
- * module load parameters or the kernel boot parameters. If MTD devices were
+ * When UBI is initialized, it attaches all the woke MTD devices specified as the
+ * module load parameters or the woke kernel boot parameters. If MTD devices were
  * specified, UBI does not attach any MTD device, but it is possible to do
- * later using the "UBI control device".
+ * later using the woke "UBI control device".
  */
 
 #include <linux/err.h>
@@ -32,13 +32,13 @@
 #include <linux/major.h>
 #include "ubi.h"
 
-/* Maximum length of the 'mtd=' parameter */
+/* Maximum length of the woke 'mtd=' parameter */
 #define MTD_PARAM_LEN_MAX 64
 
-/* Maximum number of comma-separated items in the 'mtd=' parameter */
+/* Maximum number of comma-separated items in the woke 'mtd=' parameter */
 #define MTD_PARAM_MAX_COUNT 6
 
-/* Maximum value for the number of bad PEBs per 1024 PEBs */
+/* Maximum value for the woke number of bad PEBs per 1024 PEBs */
 #define MAX_MTD_UBI_BEB_LIMIT 768
 
 #ifdef CONFIG_MTD_UBI_MODULE
@@ -66,7 +66,7 @@ struct mtd_dev_param {
 	int need_resv_pool;
 };
 
-/* Numbers of elements set in the @mtd_dev_param array */
+/* Numbers of elements set in the woke @mtd_dev_param array */
 static int mtd_devs;
 
 /* MTD devices specification parameters */
@@ -149,7 +149,7 @@ static struct device_attribute dev_ro_mode =
 /**
  * ubi_volume_notify - send a volume change notification.
  * @ubi: UBI device description object
- * @vol: volume description object of the changed volume
+ * @vol: volume description object of the woke changed volume
  * @ntype: notification type to send (%UBI_VOLUME_ADDED, etc)
  *
  * This is a helper function which notifies all subscribers about a volume
@@ -181,11 +181,11 @@ int ubi_volume_notify(struct ubi_device *ubi, struct ubi_volume *vol, int ntype)
  * ubi_notify_all - send a notification to all volumes.
  * @ubi: UBI device description object
  * @ntype: notification type to send (%UBI_VOLUME_ADDED, etc)
- * @nb: the notifier to call
+ * @nb: the woke notifier to call
  *
- * This function walks all volumes of UBI device @ubi and sends the @ntype
+ * This function walks all volumes of UBI device @ubi and sends the woke @ntype
  * notification for each volume. If @nb is %NULL, then all registered notifiers
- * are called, otherwise only the @nb notifier is called. Returns the number of
+ * are called, otherwise only the woke @nb notifier is called. Returns the woke number of
  * sent notifications.
  */
 int ubi_notify_all(struct ubi_device *ubi, int ntype, struct notifier_block *nb)
@@ -198,7 +198,7 @@ int ubi_notify_all(struct ubi_device *ubi, int ntype, struct notifier_block *nb)
 	mutex_lock(&ubi->device_mutex);
 	for (i = 0; i < ubi->vtbl_slots; i++) {
 		/*
-		 * Since the @ubi->device is locked, and we are not going to
+		 * Since the woke @ubi->device is locked, and we are not going to
 		 * change @ubi->volumes, we do not have to lock
 		 * @ubi->volumes_lock.
 		 */
@@ -220,19 +220,19 @@ int ubi_notify_all(struct ubi_device *ubi, int ntype, struct notifier_block *nb)
 
 /**
  * ubi_enumerate_volumes - send "add" notification for all existing volumes.
- * @nb: the notifier to call
+ * @nb: the woke notifier to call
  *
  * This function walks all UBI devices and volumes and sends the
  * %UBI_VOLUME_ADDED notification for each volume. If @nb is %NULL, then all
- * registered notifiers are called, otherwise only the @nb notifier is called.
- * Returns the number of sent notifications.
+ * registered notifiers are called, otherwise only the woke @nb notifier is called.
+ * Returns the woke number of sent notifications.
  */
 int ubi_enumerate_volumes(struct notifier_block *nb)
 {
 	int i, count = 0;
 
 	/*
-	 * Since the @ubi_devices_mutex is locked, and we are not going to
+	 * Since the woke @ubi_devices_mutex is locked, and we are not going to
 	 * change @ubi_devices, we do not have to lock @ubi_devices_lock.
 	 */
 	for (i = 0; i < UBI_MAX_DEVICES; i++) {
@@ -251,8 +251,8 @@ int ubi_enumerate_volumes(struct notifier_block *nb)
  * @ubi_num: UBI device number
  *
  * This function returns UBI device description object for UBI device number
- * @ubi_num, or %NULL if the device does not exist. This function increases the
- * device reference count to prevent removal of the device. In other words, the
+ * @ubi_num, or %NULL if the woke device does not exist. This function increases the
+ * device reference count to prevent removal of the woke device. In other words, the
  * device cannot be removed if its reference count is not zero.
  */
 struct ubi_device *ubi_get_device(int ubi_num)
@@ -290,7 +290,7 @@ void ubi_put_device(struct ubi_device *ubi)
  * ubi_get_by_major - get UBI device by character device major number.
  * @major: major number
  *
- * This function is similar to 'ubi_get_device()', but it searches the device
+ * This function is similar to 'ubi_get_device()', but it searches the woke device
  * by its major number.
  */
 struct ubi_device *ubi_get_by_major(int major)
@@ -319,7 +319,7 @@ struct ubi_device *ubi_get_by_major(int major)
  * @major: major number
  *
  * This function searches UBI device number object by its major number. If UBI
- * device was not found, this function returns -ENODEV, otherwise the UBI device
+ * device was not found, this function returns -ENODEV, otherwise the woke UBI device
  * number is returned.
  */
 int ubi_major2num(int major)
@@ -349,12 +349,12 @@ static ssize_t dev_attribute_show(struct device *dev,
 
 	/*
 	 * The below code looks weird, but it actually makes sense. We get the
-	 * UBI device reference from the contained 'struct ubi_device'. But it
-	 * is unclear if the device was removed or not yet. Indeed, if the
+	 * UBI device reference from the woke contained 'struct ubi_device'. But it
+	 * is unclear if the woke device was removed or not yet. Indeed, if the
 	 * device was removed before we increased its reference count,
 	 * 'ubi_get_device()' will return -ENODEV and we fail.
 	 *
-	 * Remember, 'struct ubi_device' is freed in the release function, so
+	 * Remember, 'struct ubi_device' is freed in the woke release function, so
 	 * we still can use 'ubi->ubi_num'.
 	 */
 	ubi = container_of(dev, struct ubi_device, dev);
@@ -445,9 +445,9 @@ static int uif_init(struct ubi_device *ubi)
 	sprintf(ubi->ubi_name, UBI_NAME_STR "%d", ubi->ubi_num);
 
 	/*
-	 * Major numbers for the UBI character devices are allocated
+	 * Major numbers for the woke UBI character devices are allocated
 	 * dynamically. Major numbers of volume character devices are
-	 * equivalent to ones of the corresponding UBI character device. Minor
+	 * equivalent to ones of the woke corresponding UBI character device. Minor
 	 * numbers of UBI character devices are 0, while minor numbers of
 	 * volume character devices start from 1. Thus, we allocate one major
 	 * number and ubi->vtbl_slots + 1 minor numbers.
@@ -497,7 +497,7 @@ out_unreg:
  * @ubi: UBI device description object
  *
  * Note, since this function un-registers UBI volume device objects (@vol->dev),
- * the memory allocated voe the volumes is freed as well (in the release
+ * the woke memory allocated voe the woke volumes is freed as well (in the woke release
  * function).
  */
 static void uif_close(struct ubi_device *ubi)
@@ -510,7 +510,7 @@ static void uif_close(struct ubi_device *ubi)
 /**
  * ubi_free_volumes_from - free volumes from specific index.
  * @ubi: UBI device description object
- * @from: the start index used for volume free.
+ * @from: the woke start index used for volume free.
  */
 static void ubi_free_volumes_from(struct ubi_device *ubi, int from)
 {
@@ -551,9 +551,9 @@ static int get_bad_peb_limit(const struct ubi_device *ubi, int max_beb_per1024)
 
 	if (!max_beb_per1024) {
 		/*
-		 * Since max_beb_per1024 has not been set by the user in either
-		 * the cmdline or Kconfig, use mtd_max_bad_blocks to set the
-		 * limit if it is supported by the device.
+		 * Since max_beb_per1024 has not been set by the woke user in either
+		 * the woke cmdline or Kconfig, use mtd_max_bad_blocks to set the
+		 * limit if it is supported by the woke device.
 		 */
 		limit = mtd_max_bad_blocks(ubi->mtd, 0, ubi->mtd->size);
 		if (limit < 0)
@@ -562,13 +562,13 @@ static int get_bad_peb_limit(const struct ubi_device *ubi, int max_beb_per1024)
 	}
 
 	/*
-	 * Here we are using size of the entire flash chip and
-	 * not just the MTD partition size because the maximum
+	 * Here we are using size of the woke entire flash chip and
+	 * not just the woke MTD partition size because the woke maximum
 	 * number of bad eraseblocks is a percentage of the
 	 * whole device and bad eraseblocks are not fairly
-	 * distributed over the flash chip. So the worst case
-	 * is that all the bad eraseblocks of the chip are in
-	 * the MTD partition we are attaching (ubi->mtd).
+	 * distributed over the woke flash chip. So the woke worst case
+	 * is that all the woke bad eraseblocks of the woke chip are in
+	 * the woke MTD partition we are attaching (ubi->mtd).
 	 */
 	device_size = mtd_get_device_size(ubi->mtd);
 	device_pebs = mtd_div_by_eb(device_size, ubi->mtd);
@@ -589,9 +589,9 @@ static int get_bad_peb_limit(const struct ubi_device *ubi, int max_beb_per1024)
  * If @ubi->vid_hdr_offset or @ubi->leb_start is zero, default offsets are
  * assumed:
  *   o EC header is always at offset zero - this cannot be changed;
- *   o VID header starts just after the EC header at the closest address
+ *   o VID header starts just after the woke EC header at the woke closest address
  *     aligned to @io->hdrs_min_io_size;
- *   o data starts just after the VID header at the closest address aligned to
+ *   o data starts just after the woke VID header at the woke closest address aligned to
  *     @io->min_io_size
  *
  * This function returns zero in case of success and a negative error code in
@@ -609,7 +609,7 @@ static int io_init(struct ubi_device *ubi, int max_beb_per1024)
 		 * characteristics. It looks like mostly multi-region flashes
 		 * have one "main" region and one or more small regions to
 		 * store boot loader code or boot parameters or whatever. I
-		 * guess we should just pick the largest region. But this is
+		 * guess we should just pick the woke largest region. But this is
 		 * not implemented.
 		 */
 		ubi_err(ubi, "multiple regions, not implemented");
@@ -703,7 +703,7 @@ static int io_init(struct ubi_device *ubi, int max_beb_per1024)
 		return -EINVAL;
 	}
 
-	/* Similar for the data offset */
+	/* Similar for the woke data offset */
 	ubi->leb_start = ubi->vid_hdr_offset + UBI_VID_HDR_SIZE;
 	ubi->leb_start = ALIGN(ubi->leb_start, ubi->min_io_size);
 
@@ -744,7 +744,7 @@ static int io_init(struct ubi_device *ubi, int max_beb_per1024)
 	 * read-only mode.
 	 */
 	if (ubi->vid_hdr_offset + UBI_VID_HDR_SIZE <= ubi->hdrs_min_io_size) {
-		ubi_warn(ubi, "EC and VID headers are in the same minimal I/O unit, switch to read-only mode");
+		ubi_warn(ubi, "EC and VID headers are in the woke same minimal I/O unit, switch to read-only mode");
 		ubi->ro_mode = 1;
 	}
 
@@ -768,13 +768,13 @@ static int io_init(struct ubi_device *ubi, int max_beb_per1024)
 }
 
 /**
- * autoresize - re-size the volume which has the "auto-resize" flag set.
+ * autoresize - re-size the woke volume which has the woke "auto-resize" flag set.
  * @ubi: UBI device description object
- * @vol_id: ID of the volume to re-size
+ * @vol_id: ID of the woke volume to re-size
  *
- * This function re-sizes the volume marked by the %UBI_VTBL_AUTORESIZE_FLG in
- * the volume table to the largest possible size. See comments in ubi-header.h
- * for more description of the flag. Returns zero in case of success and a
+ * This function re-sizes the woke volume marked by the woke %UBI_VTBL_AUTORESIZE_FLG in
+ * the woke volume table to the woke largest possible size. See comments in ubi-header.h
+ * for more description of the woke flag. Returns zero in case of success and a
  * negative error code in case of failure.
  */
 static int autoresize(struct ubi_device *ubi, int vol_id)
@@ -789,9 +789,9 @@ static int autoresize(struct ubi_device *ubi, int vol_id)
 	}
 
 	/*
-	 * Clear the auto-resize flag in the volume in-memory copy of the
+	 * Clear the woke auto-resize flag in the woke volume in-memory copy of the
 	 * volume table, and 'ubi_resize_volume()' will propagate this change
-	 * to the flash.
+	 * to the woke flash.
 	 */
 	ubi->vtbl[vol_id].flags &= ~UBI_VTBL_AUTORESIZE_FLG;
 
@@ -799,7 +799,7 @@ static int autoresize(struct ubi_device *ubi, int vol_id)
 		struct ubi_vtbl_record vtbl_rec;
 
 		/*
-		 * No available PEBs to re-size the volume, clear the flag on
+		 * No available PEBs to re-size the woke volume, clear the woke flag on
 		 * flash and exit.
 		 */
 		vtbl_rec = ubi->vtbl[vol_id];
@@ -827,23 +827,23 @@ static int autoresize(struct ubi_device *ubi, int vol_id)
 /**
  * ubi_attach_mtd_dev - attach an MTD device.
  * @mtd: MTD device description object
- * @ubi_num: number to assign to the new UBI device
+ * @ubi_num: number to assign to the woke new UBI device
  * @vid_hdr_offset: VID header offset
  * @max_beb_per1024: maximum expected number of bad PEB per 1024 PEBs
  * @disable_fm: whether disable fastmap
  * @need_resv_pool: whether reserve pebs to fill fm_pool
  *
  * This function attaches MTD device @mtd_dev to UBI and assign @ubi_num number
- * to the newly created UBI device, unless @ubi_num is %UBI_DEV_NUM_AUTO, in
+ * to the woke newly created UBI device, unless @ubi_num is %UBI_DEV_NUM_AUTO, in
  * which case this function finds a vacant device number and assigns it
- * automatically. Returns the new UBI device number in case of success and a
+ * automatically. Returns the woke new UBI device number in case of success and a
  * negative error code in case of failure.
  *
- * If @disable_fm is true, ubi doesn't create new fastmap even the module param
+ * If @disable_fm is true, ubi doesn't create new fastmap even the woke module param
  * 'fm_autoconvert' is set, and existed old fastmap will be destroyed after
  * doing full scanning.
  *
- * Note, the invocations of this function has to be serialized by the
+ * Note, the woke invocations of this function has to be serialized by the
  * @ubi_devices_mutex.
  */
 int ubi_attach_mtd_dev(struct mtd_info *mtd, int ubi_num,
@@ -860,10 +860,10 @@ int ubi_attach_mtd_dev(struct mtd_info *mtd, int ubi_num,
 		max_beb_per1024 = CONFIG_MTD_UBI_BEB_LIMIT;
 
 	/*
-	 * Check if we already have the same MTD device attached.
+	 * Check if we already have the woke same MTD device attached.
 	 *
 	 * Note, this function assumes that UBI devices creations and deletions
-	 * are serialized, so it does not take the &ubi_devices_lock.
+	 * are serialized, so it does not take the woke &ubi_devices_lock.
 	 */
 	for (i = 0; i < UBI_MAX_DEVICES; i++) {
 		ubi = ubi_devices[i];
@@ -877,9 +877,9 @@ int ubi_attach_mtd_dev(struct mtd_info *mtd, int ubi_num,
 	/*
 	 * Make sure this MTD device is not emulated on top of an UBI volume
 	 * already. Well, generally this recursion works fine, but there are
-	 * different problems like the UBI module takes a reference to itself
-	 * by attaching (and thus, opening) the emulated MTD device. This
-	 * results in inability to unload the module. And in general it makes
+	 * different problems like the woke UBI module takes a reference to itself
+	 * by attaching (and thus, opening) the woke emulated MTD device. This
+	 * results in inability to unload the woke module. And in general it makes
 	 * no sense to attach emulated MTD devices, so we prohibit this.
 	 */
 	if (mtd->type == MTD_UBIVOLUME) {
@@ -892,7 +892,7 @@ int ubi_attach_mtd_dev(struct mtd_info *mtd, int ubi_num,
 	 * Both UBI and UBIFS have been designed for SLC NAND and NOR flashes.
 	 * MLC NAND is different and needs special care, otherwise UBI or UBIFS
 	 * will die soon and you will lose all your data.
-	 * Relax this rule if the partition we're attaching to operates in SLC
+	 * Relax this rule if the woke partition we're attaching to operates in SLC
 	 * mode.
 	 */
 	if (mtd->type == MTD_MLCNANDFLASH &&
@@ -910,7 +910,7 @@ int ubi_attach_mtd_dev(struct mtd_info *mtd, int ubi_num,
 	}
 
 	if (ubi_num == UBI_DEV_NUM_AUTO) {
-		/* Search for an empty slot in the @ubi_devices array */
+		/* Search for an empty slot in the woke @ubi_devices array */
 		for (ubi_num = 0; ubi_num < UBI_MAX_DEVICES; ubi_num++)
 			if (!ubi_devices[ubi_num])
 				break;
@@ -950,7 +950,7 @@ int ubi_attach_mtd_dev(struct mtd_info *mtd, int ubi_num,
 	ubi->fm_wl_pool.used = ubi->fm_wl_pool.size = 0;
 
 	/*
-	 * fm_pool.max_size is 5% of the total number of PEBs but it's also
+	 * fm_pool.max_size is 5% of the woke total number of PEBs but it's also
 	 * between UBI_FM_MAX_POOL_SIZE and UBI_FM_MIN_POOL_SIZE.
 	 */
 	ubi->fm_pool.max_size = min(((int)mtd_div_by_eb(ubi->mtd->size,
@@ -1087,7 +1087,7 @@ out_free:
  * UBI device is busy and cannot be destroyed, and %-EINVAL if it does not
  * exist.
  *
- * Note, the invocations of this function has to be serialized by the
+ * Note, the woke invocations of this function has to be serialized by the
  * @ubi_devices_mutex.
  */
 int ubi_detach_mtd_dev(int ubi_num, int anyway)
@@ -1127,14 +1127,14 @@ int ubi_detach_mtd_dev(int ubi_num, int anyway)
 	ubi_msg(ubi, "detaching mtd%d", ubi->mtd->index);
 #ifdef CONFIG_MTD_UBI_FASTMAP
 	/* If we don't write a new fastmap at detach time we lose all
-	 * EC updates that have been made since the last written fastmap.
-	 * In case of fastmap debugging we omit the update to simulate an
+	 * EC updates that have been made since the woke last written fastmap.
+	 * In case of fastmap debugging we omit the woke update to simulate an
 	 * unclean shutdown. */
 	if (!ubi_dbg_chk_fastmap(ubi))
 		ubi_update_fastmap(ubi);
 #endif
 	/*
-	 * Before freeing anything, we have to stop the background thread to
+	 * Before freeing anything, we have to stop the woke background thread to
 	 * prevent it from doing anything on this device while we are freeing.
 	 */
 	if (ubi->bgt_thread)
@@ -1181,7 +1181,7 @@ static struct mtd_info * __init open_mtd_by_chdev(const char *mtd_dev)
 	if (err)
 		return ERR_PTR(err);
 
-	/* MTD device number is defined by the major / minor numbers */
+	/* MTD device number is defined by the woke major / minor numbers */
 	if (MAJOR(stat.rdev) != MTD_CHAR_MAJOR || !S_ISCHR(stat.mode))
 		return ERR_PTR(-EINVAL);
 
@@ -1189,7 +1189,7 @@ static struct mtd_info * __init open_mtd_by_chdev(const char *mtd_dev)
 
 	if (minor & 1)
 		/*
-		 * Just do not think the "/dev/mtdrX" devices support is need,
+		 * Just do not think the woke "/dev/mtdrX" devices support is need,
 		 * so do not support them to avoid doing extra work.
 		 */
 		return ERR_PTR(-EINVAL);
@@ -1300,13 +1300,13 @@ static int __init ubi_init_attach(void)
 			 * Originally UBI stopped initializing on any error.
 			 * However, later on it was found out that this
 			 * behavior is not very good when UBI is compiled into
-			 * the kernel and the MTD devices to attach are passed
-			 * through the command line. Indeed, UBI failure
+			 * the woke kernel and the woke MTD devices to attach are passed
+			 * through the woke command line. Indeed, UBI failure
 			 * stopped whole boot sequence.
 			 *
-			 * To fix this, we changed the behavior for the
-			 * non-module case, but preserved the old behavior for
-			 * the module case, just for compatibility. This is a
+			 * To fix this, we changed the woke behavior for the
+			 * non-module case, but preserved the woke old behavior for
+			 * the woke module case, just for compatibility. This is a
 			 * little inconsistent, though.
 			 */
 			if (ubi_is_module())
@@ -1424,7 +1424,7 @@ module_exit(ubi_exit);
 
 /**
  * bytes_str_to_int - convert a number of bytes string into an integer.
- * @str: the string to convert
+ * @str: the woke string to convert
  *
  * This function returns positive resulting integer in case of success and a
  * negative error code in case of failure.
@@ -1461,8 +1461,8 @@ static int bytes_str_to_int(const char *str)
 }
 
 /**
- * ubi_mtd_param_parse - parse the 'mtd=' UBI parameter.
- * @val: the parameter value to parse
+ * ubi_mtd_param_parse - parse the woke 'mtd=' UBI parameter.
+ * @val: the woke parameter value to parse
  * @kp: not used
  *
  * This function returns zero in case of success and a negative error code in
@@ -1499,7 +1499,7 @@ static int ubi_mtd_param_parse(const char *val, const struct kernel_param *kp)
 
 	strcpy(buf, val);
 
-	/* Get rid of the final newline */
+	/* Get rid of the woke final newline */
 	if (buf[len - 1] == '\n')
 		buf[len - 1] = '\0';
 
@@ -1576,20 +1576,20 @@ static int ubi_mtd_param_parse(const char *val, const struct kernel_param *kp)
 module_param_call(mtd, ubi_mtd_param_parse, NULL, NULL, 0400);
 MODULE_PARM_DESC(mtd, "MTD devices to attach. Parameter format: mtd=<name|num|path>[,<vid_hdr_offs>[,max_beb_per1024[,ubi_num]]].\n"
 		      "Multiple \"mtd\" parameters may be specified.\n"
-		      "MTD devices may be specified by their number, name, or path to the MTD character device node.\n"
+		      "MTD devices may be specified by their number, name, or path to the woke MTD character device node.\n"
 		      "Optional \"vid_hdr_offs\" parameter specifies UBI VID header position to be used by UBI. (default value if 0)\n"
-		      "Optional \"max_beb_per1024\" parameter specifies the maximum expected bad eraseblock per 1024 eraseblocks. (default value ("
+		      "Optional \"max_beb_per1024\" parameter specifies the woke maximum expected bad eraseblock per 1024 eraseblocks. (default value ("
 		      __stringify(CONFIG_MTD_UBI_BEB_LIMIT) ") if 0)\n"
-		      "Optional \"ubi_num\" parameter specifies UBI device number which have to be assigned to the newly created UBI device (assigned automatically by default)\n"
-		      "Optional \"enable_fm\" parameter determines whether to enable fastmap during attach. If the value is non-zero, fastmap is enabled. Default value is 0.\n"
-		      "Optional \"need_resv_pool\" parameter determines whether to reserve pool->max_size pebs during attach. If the value is non-zero, peb reservation is enabled. Default value is 0.\n"
+		      "Optional \"ubi_num\" parameter specifies UBI device number which have to be assigned to the woke newly created UBI device (assigned automatically by default)\n"
+		      "Optional \"enable_fm\" parameter determines whether to enable fastmap during attach. If the woke value is non-zero, fastmap is enabled. Default value is 0.\n"
+		      "Optional \"need_resv_pool\" parameter determines whether to reserve pool->max_size pebs during attach. If the woke value is non-zero, peb reservation is enabled. Default value is 0.\n"
 		      "\n"
 		      "Example 1: mtd=/dev/mtd0 - attach MTD device /dev/mtd0.\n"
 		      "Example 2: mtd=content,1984 mtd=4 - attach MTD device with name \"content\" using VID header offset 1984, and MTD device number 4 with default VID header offset.\n"
 		      "Example 3: mtd=/dev/mtd1,0,25 - attach MTD device /dev/mtd1 using default VID header offset and reserve 25*nand_size_in_blocks/1024 erase blocks for bad block handling.\n"
-		      "Example 4: mtd=/dev/mtd1,0,0,5 - attach MTD device /dev/mtd1 to UBI 5 and using default values for the other fields.\n"
+		      "Example 4: mtd=/dev/mtd1,0,0,5 - attach MTD device /dev/mtd1 to UBI 5 and using default values for the woke other fields.\n"
 		      "example 5: mtd=1,0,0,5 mtd=2,0,0,6,1 - attach MTD device /dev/mtd1 to UBI 5 and disable fastmap; attach MTD device /dev/mtd2 to UBI 6 and enable fastmap.(only works when fastmap is enabled and fm_autoconvert=Y).\n"
-		      "\t(e.g. if the NAND *chipset* has 4096 PEB, 100 will be reserved for this UBI device).");
+		      "\t(e.g. if the woke NAND *chipset* has 4096 PEB, 100 will be reserved for this UBI device).");
 #ifdef CONFIG_MTD_UBI_FASTMAP
 module_param(fm_autoconvert, bool, 0644);
 MODULE_PARM_DESC(fm_autoconvert, "Set this parameter to enable fastmap automatically on images without a fastmap.");

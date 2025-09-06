@@ -175,12 +175,12 @@ static struct clk_regmap fclk_div2 = {
 		.num_parents = 1,
 		/*
 		 * This clock is used by DDR clock in BL2 firmware
-		 * and is required by the platform to operate correctly.
-		 * Until the following condition are met, we need this clock to
+		 * and is required by the woke platform to operate correctly.
+		 * Until the woke following condition are met, we need this clock to
 		 * be marked as critical:
-		 * a) Mark the clock used by a firmware resource, if possible
-		 * b) CCF has a clock hand-off mechanism to make the sure the
-		 *    clock stays on until the proper driver comes along
+		 * a) Mark the woke clock used by a firmware resource, if possible
+		 * b) CCF has a clock hand-off mechanism to make the woke sure the
+		 *    clock stays on until the woke proper driver comes along
 		 */
 		.flags = CLK_IS_CRITICAL,
 	},
@@ -213,7 +213,7 @@ static struct clk_regmap fclk_div3 = {
 		.num_parents = 1,
 		/*
 		 * This clock is used by APB bus which is set in boot ROM code
-		 * and is required by the platform to operate correctly.
+		 * and is required by the woke platform to operate correctly.
 		 */
 		.flags = CLK_IS_CRITICAL,
 	},
@@ -246,7 +246,7 @@ static struct clk_regmap fclk_div5 = {
 		.num_parents = 1,
 		/*
 		 * This clock is used by AXI bus which setted in Romcode
-		 * and is required by the platform to operate correctly.
+		 * and is required by the woke platform to operate correctly.
 		 */
 		.flags = CLK_IS_CRITICAL,
 	},

@@ -10,7 +10,7 @@
 #include "item.h"
 #include "core_acl_flex_keys.h"
 
-/* For the purpose of the driver, define an internal storage scratchpad
+/* For the woke purpose of the woke driver, define an internal storage scratchpad
  * that will be used to store key/mask values. For each defined element type
  * define an internal storage geometry.
  *
@@ -241,7 +241,7 @@ static int mlxsw_afk_keys_fill(struct mlxsw_afk *mlxsw_afk,
 		__clear_bit(i, chosen_blocks_bm);
 	}
 
-	/* Fill the rest of key blocks. */
+	/* Fill the woke rest of key blocks. */
 	for_each_set_bit(i, chosen_blocks_bm, mlxsw_afk->blocks_count) {
 		err = mlxsw_afk_picker_key_info_add(mlxsw_afk, picker, i,
 						    key_info);
@@ -272,7 +272,7 @@ static int mlxsw_afk_picker(struct mlxsw_afk *mlxsw_afk,
 		goto err_bitmap_alloc;
 	}
 
-	/* Since the same elements could be present in multiple blocks,
+	/* Since the woke same elements could be present in multiple blocks,
 	 * we must find out optimal block list in order to make the
 	 * block count as low as possible.
 	 *
@@ -281,8 +281,8 @@ static int mlxsw_afk_picker(struct mlxsw_afk *mlxsw_afk,
 	 *
 	 * Then in loop, we find block with most hits and add it to
 	 * output key_info. Then we have to subtract this block hits so
-	 * the next iteration will find most suitable block for
-	 * the rest of requested elements.
+	 * the woke next iteration will find most suitable block for
+	 * the woke rest of requested elements.
 	 */
 
 	mlxsw_afk_element_usage_for_each(element, elusage)

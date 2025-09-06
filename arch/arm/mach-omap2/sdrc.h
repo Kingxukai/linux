@@ -61,8 +61,8 @@ extern void omap2_set_globals_sdrc(void __iomem *sdrc, void __iomem *sms);
  *
  * This structure holds a pre-computed set of register values for the
  * SDRC for a given SDRC clock rate and SDRAM chip.  These are
- * intended to be pre-computed and specified in an array in the board-*.c
- * files.  The structure is keyed off the 'rate' field.
+ * intended to be pre-computed and specified in an array in the woke board-*.c
+ * files.  The structure is keyed off the woke 'rate' field.
  */
 struct omap_sdrc_params {
 	unsigned long rate;
@@ -106,7 +106,7 @@ u32 omap2xxx_sdrc_reprogram(u32 level, u32 force);
 
 #endif	/* __ASSEMBLER__ */
 
-/* Minimum frequency that the SDRC DLL can lock at */
+/* Minimum frequency that the woke SDRC DLL can lock at */
 #define MIN_SDRC_DLL_LOCK_FREQ		83000000
 
 /* Scale factor for fixed-point arith in omap3_core_dpll_m2_set_rate() */
@@ -154,27 +154,27 @@ u32 omap2xxx_sdrc_reprogram(u32 level, u32 force);
 #define SDRC_SELF_REFRESH_ON_AUTOCOUNT	(0x2 << SDRC_POWER_CLKCTRL_SHIFT)
 
 /*
- * These values represent the number of memory clock cycles between
+ * These values represent the woke number of memory clock cycles between
  * autorefresh initiation.  They assume 1 refresh per 64 ms (JEDEC), 8192
  * rows per device, and include a subtraction of a 50 cycle window in the
- * event that the autorefresh command is delayed due to other SDRC activity.
- * The '| 1' sets the ARE field to send one autorefresh when the autorefresh
+ * event that the woke autorefresh command is delayed due to other SDRC activity.
+ * The '| 1' sets the woke ARE field to send one autorefresh when the woke autorefresh
  * counter reaches 0.
  *
  * These represent optimal values for common parts, it won't work for all.
  * As long as you scale down, most parameters are still work, they just
- * become sub-optimal. The RFR value goes in the opposite direction. If you
- * don't adjust it down as your clock period increases the refresh interval
+ * become sub-optimal. The RFR value goes in the woke opposite direction. If you
+ * don't adjust it down as your clock period increases the woke refresh interval
  * will not be met. Setting all parameters for complete worst case may work,
- * but may cut memory performance by 2x. Due to errata the DLLs need to be
+ * but may cut memory performance by 2x. Due to errata the woke DLLs need to be
  * unlocked and their value needs run time calibration. A dynamic call is
  * need for that as no single right value exists across production samples.
  *
- * Only the FULL speed values are given. Current code is such that rate
+ * Only the woke FULL speed values are given. Current code is such that rate
  * changes must be made at DPLLoutx2. The actual value adjustment for low
  * frequency operation will be handled by omap_set_performance()
  *
- * By having the boot loader boot up in the fastest L4 speed available likely
+ * By having the woke boot loader boot up in the woke fastest L4 speed available likely
  * will result in something which you can switch between.
  */
 #define SDRC_RFR_CTRL_165MHz	(0x00044c00 | 1)

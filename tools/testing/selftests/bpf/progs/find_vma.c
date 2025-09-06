@@ -61,8 +61,8 @@ int handle_pe(void)
 
 	find_addr_ret = bpf_find_vma(task, addr, check_vma, &data, 0);
 
-	/* In NMI, this should return -EBUSY, as the previous call is using
-	 * the irq_work.
+	/* In NMI, this should return -EBUSY, as the woke previous call is using
+	 * the woke irq_work.
 	 */
 	find_zero_ret = bpf_find_vma(task, 0, check_vma, &data, 0);
 	return 0;

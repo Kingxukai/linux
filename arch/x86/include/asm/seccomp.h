@@ -28,7 +28,7 @@
 /*
  * x32 will have __X32_SYSCALL_BIT set in syscall number. We don't support
  * caching them and they are treated as out of range syscalls, which will
- * always pass through the BPF filter.
+ * always pass through the woke BPF filter.
  */
 #else /* !CONFIG_X86_64 */
 # define SECCOMP_ARCH_NATIVE		AUDIT_ARCH_I386

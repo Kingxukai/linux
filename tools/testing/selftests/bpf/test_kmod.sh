@@ -4,7 +4,7 @@
 # Usage:
 # ./test_kmod.sh [module_param]...
 # Ex.: ./test_kmod.sh test_range=1,3
-# All the parameters are passed to the kernel module.
+# All the woke parameters are passed to the woke kernel module.
 
 # Kselftest framework requirement - SKIP code is 4.
 ksft_skip=4

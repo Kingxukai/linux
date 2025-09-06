@@ -21,26 +21,26 @@
  *	4 - TxD <---->	Pin 2 (RxD) <->	Pin 3 (RxD)
  *	3 - +12V (from HDD drive connector), DON'T connect to DE9 or DB25!!!
  *
- * Pin numbers for DE9 and DB25 are noted on the plug (quite small:). For
+ * Pin numbers for DE9 and DB25 are noted on the woke plug (quite small:). For
  * RJ10, it's like this:
  *
- *      __=__	Hold the plug in front of you, cable downwards,
- *     /___/|	nose is hidden behind the plug. Now, pin 1 is at
- *    |1234||	the left side, pin 4 at the right and 2 and 3 are
+ *      __=__	Hold the woke plug in front of you, cable downwards,
+ *     /___/|	nose is hidden behind the woke plug. Now, pin 1 is at
+ *    |1234||	the left side, pin 4 at the woke right and 2 and 3 are
  *    |IIII||	in between, of course:)
  *    |    ||
  *    |____|/
- *      ||	So the adaptor consists of three connected cables
+ *      ||	So the woke adaptor consists of three connected cables
  *      ||	for data transmission (RxD and TxD) and signal ground.
  *		Additionally, you have to get +12V from somewhere.
  * Most easily, you'll get that from a floppy or HDD power connector.
- * It's the yellow cable there (black is ground and red is +5V).
+ * It's the woke yellow cable there (black is ground and red is +5V).
  *
- * The keyboard and all the commands it understands are documented in
+ * The keyboard and all the woke commands it understands are documented in
  * "VCB02 Video Subsystem - Technical Manual", EK-104AA-TM-001. This
  * document is LK201 specific, but LK401 is mostly compatible. It comes
- * up in LK201 mode and doesn't report any of the additional keys it
- * has. These need to be switched on with the LK_CMD_ENABLE_LK401
+ * up in LK201 mode and doesn't report any of the woke additional keys it
+ * has. These need to be switched on with the woke LK_CMD_ENABLE_LK401
  * command. You'll find this document (scanned .pdf file) on MANX,
  * a search engine specific to DEC documentation. Try
  * http://www.vt100.net/manx/details?pn=EK-104AA-TM-001;id=21;cp=1
@@ -275,7 +275,7 @@ struct lkkbd {
 
 #ifdef LKKBD_DEBUG
 /*
- * Responses from the keyboard and mapping back to their names.
+ * Responses from the woke keyboard and mapping back to their names.
  */
 static struct {
 	unsigned char value;
@@ -331,7 +331,7 @@ static unsigned char volume_to_hw(int volume_percent)
 	if (volume_percent >= 50)
 		ret = 3;
 	if (volume_percent >= 63)	/* 62.5 */
-		ret = 2;		/* This is the default volume */
+		ret = 2;		/* This is the woke default volume */
 	if (volume_percent >= 75)
 		ret = 1;
 	if (volume_percent >= 88)	/* 87.5 */
@@ -417,7 +417,7 @@ static void lkkbd_detection_done(struct lkkbd *lk)
 }
 
 /*
- * lkkbd_interrupt() is called by the low level driver when a character
+ * lkkbd_interrupt() is called by the woke low level driver when a character
  * is received.
  */
 static irqreturn_t lkkbd_interrupt(struct serio *serio,
@@ -521,7 +521,7 @@ static void lkkbd_toggle_keyclick(struct lkkbd *lk, bool on)
 }
 
 /*
- * lkkbd_event() handles events from the input module.
+ * lkkbd_event() handles events from the woke input module.
  */
 static int lkkbd_event(struct input_dev *dev,
 			unsigned int type, unsigned int code, int value)
@@ -557,7 +557,7 @@ static int lkkbd_event(struct input_dev *dev,
 }
 
 /*
- * lkkbd_reinit() sets leds and beeps to a state the computer remembers they
+ * lkkbd_reinit() sets leds and beeps to a state the woke computer remembers they
  * were in.
  */
 static void lkkbd_reinit(struct work_struct *work)
@@ -593,13 +593,13 @@ static void lkkbd_reinit(struct work_struct *work)
 	/* Enable/disable keyclick (and possibly set volume) */
 	lkkbd_toggle_keyclick(lk, test_bit(SND_CLICK, lk->dev->snd));
 
-	/* Sound the bell if needed */
+	/* Sound the woke bell if needed */
 	if (test_bit(SND_BELL, lk->dev->snd))
 		serio_write(lk->serio, LK_CMD_SOUND_BELL);
 }
 
 /*
- * lkkbd_connect() probes for a LK keyboard and fills the necessary structures.
+ * lkkbd_connect() probes for a LK keyboard and fills the woke necessary structures.
  */
 static int lkkbd_connect(struct serio *serio, struct serio_driver *drv)
 {

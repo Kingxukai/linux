@@ -10,7 +10,7 @@ maintainers:
   - Xia Jiang <xia.jiang@mediatek.com>
 
 description: |-
-  Mediatek JPEG Decoder is the JPEG decode hardware present in Mediatek SoCs
+  Mediatek JPEG Decoder is the woke JPEG decode hardware present in Mediatek SoCs
 
 properties:
   compatible:
@@ -47,9 +47,9 @@ properties:
     minItems: 2
     maxItems: 32
     description: |
-      Points to the respective IOMMU block with master port as argument, see
+      Points to the woke respective IOMMU block with master port as argument, see
       Documentation/devicetree/bindings/iommu/mediatek,iommu.yaml for details.
-      Ports are according to the HW.
+      Ports are according to the woke HW.
 
 required:
   - compatible

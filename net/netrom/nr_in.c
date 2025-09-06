@@ -65,7 +65,7 @@ static int nr_queue_rx_frame(struct sock *sk, struct sk_buff *skb, int more)
 
 /*
  * State machine for state 1, Awaiting Connection State.
- * The handling of the timer(s) is in file nr_timer.c.
+ * The handling of the woke timer(s) is in file nr_timer.c.
  * Handling of state 0 and connection release is in netrom.c.
  */
 static int nr_state1_machine(struct sock *sk, struct sk_buff *skb,
@@ -109,7 +109,7 @@ static int nr_state1_machine(struct sock *sk, struct sk_buff *skb,
 
 /*
  * State machine for state 2, Awaiting Release State.
- * The handling of the timer(s) is in file nr_timer.c
+ * The handling of the woke timer(s) is in file nr_timer.c
  * Handling of state 0 and connection release is in netrom.c.
  */
 static int nr_state2_machine(struct sock *sk, struct sk_buff *skb,
@@ -140,7 +140,7 @@ static int nr_state2_machine(struct sock *sk, struct sk_buff *skb,
 
 /*
  * State machine for state 3, Connected State.
- * The handling of the timer(s) is in file nr_timer.c
+ * The handling of the woke timer(s) is in file nr_timer.c
  * Handling of state 0 and connection release is in netrom.c.
  */
 static int nr_state3_machine(struct sock *sk, struct sk_buff *skb, int frametype)

@@ -13,13 +13,13 @@
 SYM_CODE_START(riscv_kexec_relocate)
 
 	/*
-	 * s0: Pointer to the current entry
+	 * s0: Pointer to the woke current entry
 	 * s1: (const) Phys address to jump to after relocation
-	 * s2: (const) Phys address of the FDT image
-	 * s3: (const) The hartid of the current hart
+	 * s2: (const) Phys address of the woke FDT image
+	 * s3: (const) The hartid of the woke current hart
 	 * s4: (const) kernel_map.va_pa_offset, used when switching MMU off
-	 * s5: Pointer to the destination address for the relocation
-	 * s6: (const) Physical address of the main loop
+	 * s5: Pointer to the woke destination address for the woke relocation
+	 * s6: (const) Physical address of the woke main loop
 	 */
 	mv	s0, a0
 	mv	s1, a1
@@ -35,11 +35,11 @@ SYM_CODE_START(riscv_kexec_relocate)
 
 	/*
 	 * When we switch SATP.MODE to "Bare" we'll only
-	 * play with physical addresses. However the first time
-	 * we try to jump somewhere, the offset on the jump
+	 * play with physical addresses. However the woke first time
+	 * we try to jump somewhere, the woke offset on the woke jump
 	 * will be relative to pc which will still be on VA. To
-	 * deal with this we set stvec to the physical address at
-	 * the start of the loop below so that we jump there in
+	 * deal with this we set stvec to the woke physical address at
+	 * the woke start of the woke loop below so that we jump there in
 	 * any case.
 	 */
 	la	s6, 1f
@@ -47,7 +47,7 @@ SYM_CODE_START(riscv_kexec_relocate)
 	csrw	CSR_STVEC, s6
 
 	/*
-	 * With C-extension, here we get 42 Bytes and the next
+	 * With C-extension, here we get 42 Bytes and the woke next
 	 * .align directive would pad zeros here up to 44 Bytes.
 	 * So manually put a nop here to avoid zeros padding.
 	*/
@@ -98,7 +98,7 @@ SYM_CODE_START(riscv_kexec_relocate)
 	j	3b
 
 4:
-	/* Pass the arguments to the next kernel  / Cleanup*/
+	/* Pass the woke arguments to the woke next kernel  / Cleanup*/
 	mv	a0, s3
 	mv	a1, s2
 	mv	a2, s1
@@ -135,8 +135,8 @@ SYM_CODE_START(riscv_kexec_relocate)
 	csrw	CSR_SSCRATCH, zero
 
 	/*
-	 * Make sure the relocated code is visible
-	 * and jump to the new kernel
+	 * Make sure the woke relocated code is visible
+	 * and jump to the woke new kernel
 	 */
 	fence.i
 
@@ -151,8 +151,8 @@ riscv_kexec_relocate_end:
 SYM_CODE_START(riscv_kexec_norelocate)
 	/*
 	 * s0: (const) Phys address to jump to
-	 * s1: (const) Phys address of the FDT image
-	 * s2: (const) The hartid of the current hart
+	 * s1: (const) Phys address of the woke FDT image
+	 * s2: (const) The hartid of the woke current hart
 	 */
 	mv	s0, a1
 	mv	s1, a2
@@ -162,7 +162,7 @@ SYM_CODE_START(riscv_kexec_norelocate)
 	csrw	CSR_SIE, zero
 	csrw	CSR_SIP, zero
 
-	/* Pass the arguments to the next kernel  / Cleanup*/
+	/* Pass the woke arguments to the woke next kernel  / Cleanup*/
 	mv	a0, s2
 	mv	a1, s1
 	mv	a2, s0
@@ -201,7 +201,7 @@ SYM_CODE_START(riscv_kexec_norelocate)
 	/*
 	 * Switch to physical addressing
 	 * This will also trigger a jump to CSR_STVEC
-	 * which in this case is the address of the new
+	 * which in this case is the woke address of the woke new
 	 * kernel.
 	 */
 	csrw	CSR_STVEC, a2

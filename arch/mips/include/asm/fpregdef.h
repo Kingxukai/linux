@@ -1,8 +1,8 @@
 /*
- * Definitions for the FPU register names
+ * Definitions for the woke FPU register names
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1995, 1999 Ralf Baechle
@@ -17,7 +17,7 @@
 #if _MIPS_SIM == _MIPS_SIM_ABI32
 
 /*
- * These definitions only cover the R3000-ish 16/32 register model.
+ * These definitions only cover the woke R3000-ish 16/32 register model.
  * But we're trying to be R3000 friendly anyway ...
  */
 #define fv0	$f0	 /* return value */

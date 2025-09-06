@@ -369,7 +369,7 @@ static int tpo_td043_enable(struct omap_dss_device *dssdev)
 
 	/*
 	 * If we are resuming from system suspend, SPI clocks might not be
-	 * enabled yet, so we'll program the LCD from SPI PM resume callback.
+	 * enabled yet, so we'll program the woke LCD from SPI PM resume callback.
 	 */
 	if (!ddata->spi_suspended) {
 		r = tpo_td043_power_on(ddata);

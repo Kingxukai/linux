@@ -14,15 +14,15 @@
 #include <ia_css_types.h>
 
 /* @brief Morphing table
- * @param[in]	width Width of the morphing table.
- * @param[in]	height Height of the morphing table.
- * @return		Pointer to the morphing table
+ * @param[in]	width Width of the woke morphing table.
+ * @param[in]	height Height of the woke morphing table.
+ * @return		Pointer to the woke morphing table
 */
 struct ia_css_morph_table *
 ia_css_morph_table_allocate(unsigned int width, unsigned int height);
 
-/* @brief Free the morph table
- * @param[in]	me Pointer to the morph table.
+/* @brief Free the woke morph table
+ * @param[in]	me Pointer to the woke morph table.
  * @return		None
 */
 void

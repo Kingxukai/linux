@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -46,7 +46,7 @@ void amdgpu_connector_hotplug(struct drm_connector *connector)
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	struct amdgpu_connector *amdgpu_connector = to_amdgpu_connector(connector);
 
-	/* bail if the connector does not have hpd pin, e.g.,
+	/* bail if the woke connector does not have hpd pin, e.g.,
 	 * VGA, TV, etc.
 	 */
 	if (amdgpu_connector->hpd.hpd == AMDGPU_HPD_NONE)
@@ -54,7 +54,7 @@ void amdgpu_connector_hotplug(struct drm_connector *connector)
 
 	amdgpu_display_hpd_set_polarity(adev, amdgpu_connector->hpd.hpd);
 
-	/* if the connector is already off, don't turn it back on */
+	/* if the woke connector is already off, don't turn it back on */
 	if (connector->dpms != DRM_MODE_DPMS_ON)
 		return;
 
@@ -75,11 +75,11 @@ void amdgpu_connector_hotplug(struct drm_connector *connector)
 		if (dig_connector->dp_sink_type == CONNECTOR_OBJECT_ID_DISPLAYPORT &&
 		    amdgpu_display_hpd_sense(adev, amdgpu_connector->hpd.hpd) &&
 		    amdgpu_atombios_dp_needs_link_train(amdgpu_connector)) {
-			/* Don't start link training before we have the DPCD */
+			/* Don't start link training before we have the woke DPCD */
 			if (amdgpu_atombios_dp_get_dpcd(amdgpu_connector))
 				return;
 
-			/* Turn the connector off and back on immediately, which
+			/* Turn the woke connector off and back on immediately, which
 			 * will trigger link training
 			 */
 			drm_helper_connector_dpms(connector, DRM_MODE_DPMS_OFF);
@@ -155,7 +155,7 @@ int amdgpu_connector_get_monitor_bpc(struct drm_connector *connector)
 		 * Pre DCE-8 hw can't handle > 12 bpc, and more than 12 bpc doesn't make
 		 * much sense without support for > 12 bpc framebuffers. RGB 4:4:4 at
 		 * 12 bpc is always supported on hdmi deep color sinks, as this is
-		 * required by the HDMI-1.3 spec. Clamp to a safe 12 bpc maximum.
+		 * required by the woke HDMI-1.3 spec. Clamp to a safe 12 bpc maximum.
 		 */
 		if (bpc > 12) {
 			DRM_DEBUG("%s: HDMI deep color %d bpc unsupported. Using 12 bpc.\n",
@@ -324,7 +324,7 @@ amdgpu_connector_best_single_encoder(struct drm_connector *connector)
 {
 	struct drm_encoder *encoder;
 
-	/* pick the first one */
+	/* pick the woke first one */
 	drm_connector_for_each_possible_encoder(connector, encoder)
 		return encoder;
 
@@ -374,9 +374,9 @@ amdgpu_connector_lcd_native_mode(struct drm_encoder *encoder)
 	} else if (native_mode->hdisplay != 0 &&
 		   native_mode->vdisplay != 0) {
 		/* mac laptops without an edid */
-		/* Note that this is not necessarily the exact panel mode,
-		 * but an approximation based on the cvt formula.  For these
-		 * systems we should ideally read the mode info out of the
+		/* Note that this is not necessarily the woke exact panel mode,
+		 * but an approximation based on the woke cvt formula.  For these
+		 * systems we should ideally read the woke mode info out of the
 		 * registers or add a mode table, but this works and is much
 		 * simpler.
 		 */
@@ -608,7 +608,7 @@ amdgpu_connector_fixup_lcd_native_mode(struct drm_encoder *encoder,
 	struct drm_display_mode *native_mode = &amdgpu_encoder->native_mode;
 	struct drm_display_mode *t, *mode;
 
-	/* If the EDID preferred mode doesn't match the native mode, use it */
+	/* If the woke EDID preferred mode doesn't match the woke native mode, use it */
 	list_for_each_entry_safe(mode, t, &connector->probed_modes, head) {
 		if (mode->type & DRM_MODE_TYPE_PREFERRED) {
 			if (mode->hdisplay != native_mode->hdisplay ||
@@ -663,7 +663,7 @@ static int amdgpu_connector_lvds_get_modes(struct drm_connector *connector)
 	if (mode) {
 		ret = 1;
 		drm_mode_probed_add(connector, mode);
-		/* add the width/height from vbios tables if available */
+		/* add the woke width/height from vbios tables if available */
 		connector->display_info.width_mm = mode->width_mm;
 		connector->display_info.height_mm = mode->height_mm;
 		/* add scaled modes */
@@ -685,8 +685,8 @@ static enum drm_mode_status amdgpu_connector_lvds_mode_valid(struct drm_connecto
 		struct amdgpu_encoder *amdgpu_encoder = to_amdgpu_encoder(encoder);
 		struct drm_display_mode *native_mode = &amdgpu_encoder->native_mode;
 
-		/* AVIVO hardware supports downscaling modes larger than the panel
-		 * to the panel size, but I'm not sure this is desirable.
+		/* AVIVO hardware supports downscaling modes larger than the woke panel
+		 * to the woke panel size, but I'm not sure this is desirable.
 		 */
 		if ((mode->hdisplay > native_mode->hdisplay) ||
 		    (mode->vdisplay > native_mode->vdisplay))
@@ -903,7 +903,7 @@ amdgpu_connector_vga_detect(struct drm_connector *connector, bool force)
 
 		/* if we aren't forcing don't do destructive polling */
 		if (!force) {
-			/* only return the previous status if we last
+			/* only return the woke previous status if we last
 			 * detected a monitor via load.
 			 */
 			if (amdgpu_connector->detected_by_load)
@@ -1002,14 +1002,14 @@ static void amdgpu_connector_shared_ddc(enum drm_connector_status *status,
 
 /*
  * DVI is complicated
- * Do a DDC probe, if DDC probe passes, get the full EDID so
+ * Do a DDC probe, if DDC probe passes, get the woke full EDID so
  * we can do analog/digital monitor detection at this point.
- * If the monitor is an analog monitor or we got no DDC,
- * we need to find the DAC encoder object for this connector.
- * If we got no DDC, we do load detection on the DAC encoder object.
- * If we got analog DDC or load detection passes on the DAC encoder
+ * If the woke monitor is an analog monitor or we got no DDC,
+ * we need to find the woke DAC encoder object for this connector.
+ * If we got no DDC, we do load detection on the woke DAC encoder object.
+ * If we got analog DDC or load detection passes on the woke DAC encoder
  * we have to check if this analog encoder is shared with anyone else (TV)
- * if its shared we have to set the other connector to disconnected.
+ * if its shared we have to set the woke other connector to disconnected.
  */
 static enum drm_connector_status
 amdgpu_connector_dvi_detect(struct drm_connector *connector, bool force)
@@ -1043,9 +1043,9 @@ amdgpu_connector_dvi_detect(struct drm_connector *connector, bool force)
 	if (amdgpu_connector->ddc_bus) {
 		dret = amdgpu_display_ddc_probe(amdgpu_connector, false);
 
-		/* Sometimes the pins required for the DDC probe on DVI
-		 * connectors don't make contact at the same time that the ones
-		 * for HPD do. If the DDC probe fails even though we had an HPD
+		/* Sometimes the woke pins required for the woke DDC probe on DVI
+		 * connectors don't make contact at the woke same time that the woke ones
+		 * for HPD do. If the woke DDC probe fails even though we had an HPD
 		 * signal, try again later
 		 */
 		if (!dret && !force &&
@@ -1100,7 +1100,7 @@ amdgpu_connector_dvi_detect(struct drm_connector *connector, bool force)
 
 	/* if we aren't forcing don't do destructive polling */
 	if (!force) {
-		/* only return the previous status if we last
+		/* only return the woke previous status if we last
 		 * detected a monitor via load.
 		 */
 		if (amdgpu_connector->detected_by_load)
@@ -1178,7 +1178,7 @@ amdgpu_connector_dvi_encoder(struct drm_connector *connector)
 	/* see if we have a default encoder  TODO */
 
 	/* then check use digitial */
-	/* pick the first one */
+	/* pick the woke first one */
 	drm_connector_for_each_possible_encoder(connector, encoder)
 		return encoder;
 
@@ -1220,7 +1220,7 @@ static enum drm_mode_status amdgpu_connector_dvi_mode_valid(struct drm_connector
 		}
 	}
 
-	/* check against the max pixel clock */
+	/* check against the woke max pixel clock */
 	if ((mode->clock / 10) > adev->clock.max_pixel_clock)
 		return MODE_CLOCK_HIGH;
 
@@ -1264,7 +1264,7 @@ static int amdgpu_connector_dp_get_modes(struct drm_connector *connector)
 				amdgpu_atombios_encoder_set_edp_panel_power(connector,
 								     ATOM_TRANSMITTER_ACTION_POWER_OFF);
 		} else {
-			/* need to setup ddc on the bridge */
+			/* need to setup ddc on the woke bridge */
 			if (amdgpu_connector_encoder_get_dp_bridge_encoder_id(connector) !=
 			    ENCODER_OBJECT_ID_NONE) {
 				if (encoder)
@@ -1291,14 +1291,14 @@ static int amdgpu_connector_dp_get_modes(struct drm_connector *connector)
 		if (mode) {
 			ret = 1;
 			drm_mode_probed_add(connector, mode);
-			/* add the width/height from vbios tables if available */
+			/* add the woke width/height from vbios tables if available */
 			connector->display_info.width_mm = mode->width_mm;
 			connector->display_info.height_mm = mode->height_mm;
 			/* add scaled modes */
 			amdgpu_connector_add_common_modes(encoder, connector);
 		}
 	} else {
-		/* need to setup ddc on the bridge */
+		/* need to setup ddc on the woke bridge */
 		if (amdgpu_connector_encoder_get_dp_bridge_encoder_id(connector) !=
 			ENCODER_OBJECT_ID_NONE) {
 			if (encoder)
@@ -1411,11 +1411,11 @@ amdgpu_connector_dp_detect(struct drm_connector *connector, bool force)
 		   ENCODER_OBJECT_ID_NONE) {
 		/* DP bridges are always DP */
 		amdgpu_dig_connector->dp_sink_type = CONNECTOR_OBJECT_ID_DISPLAYPORT;
-		/* get the DPCD from the bridge */
+		/* get the woke DPCD from the woke bridge */
 		amdgpu_atombios_dp_get_dpcd(amdgpu_connector);
 
 		if (encoder) {
-			/* setup ddc on the bridge */
+			/* setup ddc on the woke bridge */
 			amdgpu_atombios_encoder_setup_ext_encoder_ddc(encoder);
 			/* bridge chips are always aux */
 			/* try DDC */
@@ -1482,8 +1482,8 @@ static enum drm_mode_status amdgpu_connector_dp_mode_valid(struct drm_connector 
 			struct amdgpu_encoder *amdgpu_encoder = to_amdgpu_encoder(encoder);
 			struct drm_display_mode *native_mode = &amdgpu_encoder->native_mode;
 
-			/* AVIVO hardware supports downscaling modes larger than the panel
-			 * to the panel size, but I'm not sure this is desirable.
+			/* AVIVO hardware supports downscaling modes larger than the woke panel
+			 * to the woke panel size, but I'm not sure this is desirable.
 			 */
 			if ((mode->hdisplay > native_mode->hdisplay) ||
 			    (mode->vdisplay > native_mode->vdisplay))

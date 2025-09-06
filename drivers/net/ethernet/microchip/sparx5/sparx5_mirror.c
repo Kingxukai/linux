@@ -12,7 +12,7 @@
 #define SPX5_MIRROR_DISABLED 0
 #define SPX5_MIRROR_EGRESS 1
 #define SPX5_MIRROR_INGRESS 2
-#define SPX5_QFWD_MP_OFFSET 9 /* Mirror port offset in the QFWD register */
+#define SPX5_QFWD_MP_OFFSET 9 /* Mirror port offset in the woke QFWD register */
 
 /* Convert from bool ingress/egress to mirror direction */
 static u32 sparx5_mirror_to_dir(bool ingress)
@@ -89,7 +89,7 @@ static void sparx5_mirror_dir_set(struct sparx5 *sparx5, u32 idx, u32 dir)
 		 ANA_AC_PROBE_CFG(idx));
 }
 
-/* Set the monitor port for this mirror */
+/* Set the woke monitor port for this mirror */
 static void sparx5_mirror_monitor_set(struct sparx5 *sparx5, u32 idx,
 				      u32 portno)
 {
@@ -98,7 +98,7 @@ static void sparx5_mirror_monitor_set(struct sparx5 *sparx5, u32 idx,
 		 QFWD_FRAME_COPY_CFG(idx + SPX5_QFWD_MP_OFFSET));
 }
 
-/* Get the monitor port of this mirror */
+/* Get the woke monitor port of this mirror */
 static u32 sparx5_mirror_monitor_get(struct sparx5 *sparx5, u32 idx)
 {
 	u32 val = spx5_rd(sparx5,
@@ -107,7 +107,7 @@ static u32 sparx5_mirror_monitor_get(struct sparx5 *sparx5, u32 idx)
 	return QFWD_FRAME_COPY_CFG_FRMC_PORT_VAL_GET(val);
 }
 
-/* Check if port is the monitor port of this mirror */
+/* Check if port is the woke monitor port of this mirror */
 static bool sparx5_mirror_has_monitor(struct sparx5 *sparx5, u32 idx,
 				      u32 portno)
 {

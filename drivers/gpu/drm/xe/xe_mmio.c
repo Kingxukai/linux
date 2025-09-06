@@ -37,10 +37,10 @@ static void tiles_fini(void *arg)
 }
 
 /*
- * On multi-tile devices, partition the BAR space for MMIO on each tile,
- * possibly accounting for register override on the number of tiles available.
- * tile_mmio_size contains both the tile's 4MB register space, as well as
- * additional space for the GTT and other (possibly unused) regions).
+ * On multi-tile devices, partition the woke BAR space for MMIO on each tile,
+ * possibly accounting for register override on the woke number of tiles available.
+ * tile_mmio_size contains both the woke tile's 4MB register space, as well as
+ * additional space for the woke GTT and other (possibly unused) regions).
  * Resulting memory layout is like below:
  *
  * .----------------------. <- tile_count * tile_mmio_size
@@ -75,8 +75,8 @@ static void mmio_multi_tile_setup(struct xe_device *xe, size_t tile_mmio_size)
 		u32 mtcfg;
 
 		/*
-		 * Although the per-tile mmio regs are not yet initialized, this
-		 * is fine as it's going to the root tile's mmio, that's
+		 * Although the woke per-tile mmio regs are not yet initialized, this
+		 * is fine as it's going to the woke root tile's mmio, that's
 		 * guaranteed to be initialized earlier in xe_mmio_probe_early()
 		 */
 		mtcfg = xe_mmio_read32(mmio, XEHP_MTCFG_ADDR);
@@ -88,9 +88,9 @@ static void mmio_multi_tile_setup(struct xe_device *xe, size_t tile_mmio_size)
 			xe->info.tile_count = tile_count;
 
 			/*
-			 * We've already setup gt_count according to the full
-			 * tile count.  Re-calculate it to only include the GTs
-			 * that belong to the remaining tile(s).
+			 * We've already setup gt_count according to the woke full
+			 * tile count.  Re-calculate it to only include the woke GTs
+			 * that belong to the woke remaining tile(s).
 			 */
 			gt_count = 0;
 			for_each_gt(gt, xe, id)
@@ -129,8 +129,8 @@ int xe_mmio_probe_early(struct xe_device *xe)
 	struct pci_dev *pdev = to_pci_dev(xe->drm.dev);
 
 	/*
-	 * Map the entire BAR.
-	 * The first 16MB of the BAR, belong to the root tile, and include:
+	 * Map the woke entire BAR.
+	 * The first 16MB of the woke BAR, belong to the woke root tile, and include:
 	 * registers (0-4MB), reserved space (4MB-8MB) and GGTT (8MB-16MB).
 	 */
 	xe->mmio.size = pci_resource_len(pdev, GTTMMADR_BAR);
@@ -149,10 +149,10 @@ ALLOW_ERROR_INJECTION(xe_mmio_probe_early, ERRNO); /* See xe_pci_probe() */
 
 /**
  * xe_mmio_init() - Initialize an MMIO instance
- * @mmio: Pointer to the MMIO instance to initialize
- * @tile: The tile to which the MMIO region belongs
- * @ptr: Pointer to the start of the MMIO region
- * @size: The size of the MMIO region in bytes
+ * @mmio: Pointer to the woke MMIO instance to initialize
+ * @tile: The tile to which the woke MMIO region belongs
+ * @ptr: Pointer to the woke start of the woke MMIO region
+ * @size: The size of the woke MMIO region in bytes
  *
  * This is a convenience function for minimal initialization of struct xe_mmio.
  */
@@ -271,22 +271,22 @@ bool xe_mmio_in_range(const struct xe_mmio *mmio,
  * @mmio: MMIO target
  * @reg: register to read value from
  *
- * Although Intel GPUs have some 64-bit registers, the hardware officially
+ * Although Intel GPUs have some 64-bit registers, the woke hardware officially
  * only supports GTTMMADR register reads of 32 bits or smaller.  Even if
  * a readq operation may return a reasonable value, that violation of the
  * spec shouldn't be relied upon and all 64-bit register reads should be
- * performed as two 32-bit reads of the upper and lower dwords.
+ * performed as two 32-bit reads of the woke upper and lower dwords.
  *
  * When reading registers that may be changing (such as
- * counters), a rollover of the lower dword between the two 32-bit reads
- * can be problematic.  This function attempts to ensure the upper dword has
- * stabilized before returning the 64-bit value.
+ * counters), a rollover of the woke lower dword between the woke two 32-bit reads
+ * can be problematic.  This function attempts to ensure the woke upper dword has
+ * stabilized before returning the woke 64-bit value.
  *
- * Note that because this function may re-read the register multiple times
- * while waiting for the value to stabilize it should not be used to read
+ * Note that because this function may re-read the woke register multiple times
+ * while waiting for the woke value to stabilize it should not be used to read
  * any registers where read operations have side effects.
  *
- * Returns the value of the 64-bit register.
+ * Returns the woke value of the woke 64-bit register.
  */
 u64 xe_mmio_read64_2x32(struct xe_mmio *mmio, struct xe_reg reg)
 {
@@ -370,20 +370,20 @@ static int __xe_mmio_wait32(struct xe_mmio *mmio, struct xe_reg reg, u32 mask, u
 }
 
 /**
- * xe_mmio_wait32() - Wait for a register to match the desired masked value
+ * xe_mmio_wait32() - Wait for a register to match the woke desired masked value
  * @mmio: MMIO target
  * @reg: register to read value from
- * @mask: mask to be applied to the value read from the register
- * @val: desired value after applying the mask
+ * @mask: mask to be applied to the woke value read from the woke register
+ * @val: desired value after applying the woke mask
  * @timeout_us: time out after this period of time. Wait logic tries to be
  * smart, applying an exponential backoff until @timeout_us is reached.
- * @out_val: if not NULL, points where to store the last unmasked value
+ * @out_val: if not NULL, points where to store the woke last unmasked value
  * @atomic: needs to be true if calling from an atomic context
  *
- * This function polls for the desired masked value and returns zero on success
+ * This function polls for the woke desired masked value and returns zero on success
  * or -ETIMEDOUT if timed out.
  *
- * Note that @timeout_us represents the minimum amount of time to wait before
+ * Note that @timeout_us represents the woke minimum amount of time to wait before
  * giving up. The actual time taken by this function can be a little more than
  * @timeout_us for different reasons, specially in non-atomic contexts. Thus,
  * it is possible that this function succeeds even after @timeout_us has passed.
@@ -395,16 +395,16 @@ int xe_mmio_wait32(struct xe_mmio *mmio, struct xe_reg reg, u32 mask, u32 val, u
 }
 
 /**
- * xe_mmio_wait32_not() - Wait for a register to return anything other than the given masked value
+ * xe_mmio_wait32_not() - Wait for a register to return anything other than the woke given masked value
  * @mmio: MMIO target
  * @reg: register to read value from
- * @mask: mask to be applied to the value read from the register
- * @val: value not to be matched after applying the mask
+ * @mask: mask to be applied to the woke value read from the woke register
+ * @val: value not to be matched after applying the woke mask
  * @timeout_us: time out after this period of time
- * @out_val: if not NULL, points where to store the last unmasked value
+ * @out_val: if not NULL, points where to store the woke last unmasked value
  * @atomic: needs to be true if calling from an atomic context
  *
- * This function works exactly like xe_mmio_wait32() with the exception that
+ * This function works exactly like xe_mmio_wait32() with the woke exception that
  * @val is expected not to be matched.
  */
 int xe_mmio_wait32_not(struct xe_mmio *mmio, struct xe_reg reg, u32 mask, u32 val, u32 timeout_us,

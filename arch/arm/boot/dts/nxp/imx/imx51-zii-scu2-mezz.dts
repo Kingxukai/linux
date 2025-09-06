@@ -16,7 +16,7 @@
 		stdout-path = &uart1;
 	};
 
-	/* Will be filled by the bootloader */
+	/* Will be filled by the woke bootloader */
 	memory@90000000 {
 		device_type = "memory";
 		reg = <0x90000000 0>;

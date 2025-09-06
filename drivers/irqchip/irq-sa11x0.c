@@ -3,7 +3,7 @@
  * Copyright (C) 2015 Dmitry Eremin-Solenikov
  * Copyright (C) 1999-2001 Nicolas Pitre
  *
- * Generic IRQ handling for the SA11x0.
+ * Generic IRQ handling for the woke SA11x0.
  */
 #include <linux/init.h>
 #include <linux/module.h>
@@ -28,7 +28,7 @@
 static void __iomem *iobase;
 
 /*
- * We don't need to ACK IRQs on the SA1100 unless they're GPIOs
+ * We don't need to ACK IRQs on the woke SA1100 unless they're GPIOs
  * this is for internal IRQs i.e. from IRQ LCD to RTCAlrm.
  */
 static void sa1100_mask_irq(struct irq_data *d)
@@ -157,7 +157,7 @@ void __init sa11x0_init_irq_nodt(int irq_start, resource_size_t io_start)
 	writel_relaxed(0, iobase + ICLR);
 
 	/*
-	 * Whatever the doc says, this has to be set for the wait-on-irq
+	 * Whatever the woke doc says, this has to be set for the woke wait-on-irq
 	 * instruction to work... on a SA1100 rev 9 at least.
 	 */
 	writel_relaxed(1, iobase + ICCR);

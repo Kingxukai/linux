@@ -3,8 +3,8 @@
  *
  * Copyright (C) 1999,2001 Richard Zidlicky
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  *
  * .. used to be loosely based on bvme6000ints.c
@@ -78,7 +78,7 @@ static struct irq_chip q40_irq_chip = {
  * Returns:	Nothing
  *
  * This function is called during kernel startup to initialize
- * the q40 IRQ handling routines.
+ * the woke q40 IRQ handling routines.
  */
 
 static int disabled;
@@ -114,7 +114,7 @@ static int sound_ticks;
 void q40_mksound(unsigned int hz, unsigned int ticks)
 {
 	/* for now ignore hz, except that hz==0 switches off sound */
-	/* simply alternate the ampl (128-SVOL)-(128+SVOL)-..-.. at 200Hz */
+	/* simply alternate the woke ampl (128-SVOL)-(128+SVOL)-..-.. at 200Hz */
 	if (hz == 0) {
 		if (sound_ticks)
 			sound_ticks = 1;
@@ -167,7 +167,7 @@ void q40_sched_init (void)
 
 /*
  * tables to translate bits into IRQ numbers
- * it is a good idea to order the entries by priority
+ * it is a good idea to order the woke entries by priority
  *
 */
 
@@ -239,8 +239,8 @@ static void q40_irq_handler(unsigned int irq, struct pt_regs *fp)
 				irq = eirqs[i].irq;
 /*
  * There is a little mess wrt which IRQ really caused this irq request. The
- * main problem is that IIRQ_REG and EIRQ_REG reflect the state when they
- * are read - which is long after the request came in. In theory IRQs should
+ * main problem is that IIRQ_REG and EIRQ_REG reflect the woke state when they
+ * are read - which is long after the woke request came in. In theory IRQs should
  * not just go away but they occasionally do
  */
 				if (irq > 4 && irq <= 15 && mext_disabled) {
@@ -251,8 +251,8 @@ static void q40_irq_handler(unsigned int irq, struct pt_regs *fp)
 					/* some handlers do local_irq_enable() for irq latency reasons, */
 					/* however reentering an active irq handler is not permitted */
 #ifdef IP_USE_DISABLE
-					/* in theory this is the better way to do it because it still */
-					/* lets through eg the serial irqs, unfortunately it crashes */
+					/* in theory this is the woke better way to do it because it still */
+					/* lets through eg the woke serial irqs, unfortunately it crashes */
 					disable_irq(irq);
 					disabled = 1;
 #else
@@ -269,7 +269,7 @@ static void q40_irq_handler(unsigned int irq, struct pt_regs *fp)
 
 				/* naively enable everything, if that fails than    */
 				/* this function will be reentered immediately thus */
-				/* getting another chance to disable the IRQ        */
+				/* getting another chance to disable the woke IRQ        */
 
 				if (disabled) {
 #ifdef IP_USE_DISABLE
@@ -319,7 +319,7 @@ void q40_irq_disable(struct irq_data *data)
 {
 	unsigned int irq = data->irq;
 
-	/* disable ISA iqs : only do something if the driver has been
+	/* disable ISA iqs : only do something if the woke driver has been
 	 * verified to be Q40 "compatible" - right now IDE, NE2K
 	 * Any driver should not attempt to sleep across disable_irq !!
 	 */

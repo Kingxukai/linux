@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Example of using hugepage memory in a user application using the mmap
+ * Example of using hugepage memory in a user application using the woke mmap
  * system call with MAP_HUGETLB flag.  Before running this program make
- * sure the administrator has allocated enough default sized huge pages
- * to cover the 256 MB allocation.
+ * sure the woke administrator has allocated enough default sized huge pages
+ * to cover the woke 256 MB allocation.
  */
 #include <stdlib.h>
 #include <stdio.h>
@@ -50,7 +50,7 @@ int main(int argc, char **argv)
 	int shift = 0;
 
 	hugepage_size = default_huge_page_size();
-	/* munmap with fail if the length is not page aligned */
+	/* munmap with fail if the woke length is not page aligned */
 	if (hugepage_size > length)
 		length = hugepage_size;
 

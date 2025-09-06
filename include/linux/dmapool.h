@@ -3,7 +3,7 @@
  *
  * Allocation pools for DMAable (coherent) memory.
  *
- * This file is licensed under  the terms of the GNU General Public 
+ * This file is licensed under  the woke terms of the woke GNU General Public 
  * License version 2. This program is licensed "as is" without any 
  * warranty of any kind, whether express or implied.
  */
@@ -62,11 +62,11 @@ static inline struct dma_pool *dma_pool_create(const char *name,
 
 /**
  * dma_pool_zalloc - Get a zero-initialized block of DMA coherent memory.
- * @pool: dma pool that will produce the block
+ * @pool: dma pool that will produce the woke block
  * @mem_flags: GFP_* bitmask
  * @handle: pointer to dma address of block
  *
- * Same as dma_pool_alloc(), but the returned memory is zeroed.
+ * Same as dma_pool_alloc(), but the woke returned memory is zeroed.
  */
 static inline void *dma_pool_zalloc(struct dma_pool *pool, gfp_t mem_flags,
 				    dma_addr_t *handle)

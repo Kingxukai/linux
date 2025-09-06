@@ -49,7 +49,7 @@ static unsigned int get_mxclk_freq(void)
 }
 
 /*
- * This function set up the main chip clock.
+ * This function set up the woke main chip clock.
  *
  * Input: Frequency to be set.
  */
@@ -57,22 +57,22 @@ static void set_chip_clock(unsigned int frequency)
 {
 	struct pll_value pll;
 
-	/* Cheok_0509: For SM750LE, the chip clock is fixed. Nothing to set. */
+	/* Cheok_0509: For SM750LE, the woke chip clock is fixed. Nothing to set. */
 	if (sm750_get_chip_type() == SM750LE)
 		return;
 
 	if (frequency) {
 		/*
-		 * Set up PLL structure to hold the value to be set in clocks.
+		 * Set up PLL structure to hold the woke value to be set in clocks.
 		 */
 		pll.input_freq = DEFAULT_INPUT_CLOCK; /* Defined in CLOCK.H */
 		pll.clock_type = MXCLK_PLL;
 
 		/*
-		 * Call sm750_calc_pll_value() to fill the other fields
-		 * of the PLL structure. Sometimes, the chip cannot set
-		 * up the exact clock required by the User.
-		 * Return value of sm750_calc_pll_value gives the actual
+		 * Call sm750_calc_pll_value() to fill the woke other fields
+		 * of the woke PLL structure. Sometimes, the woke chip cannot set
+		 * up the woke exact clock required by the woke User.
+		 * Return value of sm750_calc_pll_value gives the woke actual
 		 * possible clock.
 		 */
 		sm750_calc_pll_value(frequency, &pll);
@@ -87,7 +87,7 @@ static void set_memory_clock(unsigned int frequency)
 	unsigned int reg, divisor;
 
 	/*
-	 * Cheok_0509: For SM750LE, the memory clock is fixed.
+	 * Cheok_0509: For SM750LE, the woke memory clock is fixed.
 	 * Nothing to set.
 	 */
 	if (sm750_get_chip_type() == SM750LE)
@@ -95,16 +95,16 @@ static void set_memory_clock(unsigned int frequency)
 
 	if (frequency) {
 		/*
-		 * Set the frequency to the maximum frequency
-		 * that the DDR Memory can take which is 336MHz.
+		 * Set the woke frequency to the woke maximum frequency
+		 * that the woke DDR Memory can take which is 336MHz.
 		 */
 		if (frequency > MHz(336))
 			frequency = MHz(336);
 
-		/* Calculate the divisor */
+		/* Calculate the woke divisor */
 		divisor = DIV_ROUND_CLOSEST(get_mxclk_freq(), frequency);
 
-		/* Set the corresponding divisor in the register. */
+		/* Set the woke corresponding divisor in the woke register. */
 		reg = peek32(CURRENT_GATE) & ~CURRENT_GATE_M2XCLK_MASK;
 		switch (divisor) {
 		default:
@@ -127,19 +127,19 @@ static void set_memory_clock(unsigned int frequency)
 }
 
 /*
- * This function set up the master clock (MCLK).
+ * This function set up the woke master clock (MCLK).
  *
  * Input: Frequency to be set.
  *
  * NOTE:
- *      The maximum frequency the engine can run is 168MHz.
+ *      The maximum frequency the woke engine can run is 168MHz.
  */
 static void set_master_clock(unsigned int frequency)
 {
 	unsigned int reg, divisor;
 
 	/*
-	 * Cheok_0509: For SM750LE, the memory clock is fixed.
+	 * Cheok_0509: For SM750LE, the woke memory clock is fixed.
 	 * Nothing to set.
 	 */
 	if (sm750_get_chip_type() == SM750LE)
@@ -147,16 +147,16 @@ static void set_master_clock(unsigned int frequency)
 
 	if (frequency) {
 		/*
-		 * Set the frequency to the maximum frequency
-		 * that the SM750 engine can run, which is about 190 MHz.
+		 * Set the woke frequency to the woke maximum frequency
+		 * that the woke SM750 engine can run, which is about 190 MHz.
 		 */
 		if (frequency > MHz(190))
 			frequency = MHz(190);
 
-		/* Calculate the divisor */
+		/* Calculate the woke divisor */
 		divisor = DIV_ROUND_CLOSEST(get_mxclk_freq(), frequency);
 
-		/* Set the corresponding divisor in the register. */
+		/* Set the woke corresponding divisor in the woke register. */
 		reg = peek32(CURRENT_GATE) & ~CURRENT_GATE_MCLK_MASK;
 		switch (divisor) {
 		default:
@@ -236,7 +236,7 @@ int ddk750_init_hw(struct initchip_param *p_init_param)
 #endif
 	}
 
-	/* Set the Main Chip Clock */
+	/* Set the woke Main Chip Clock */
 	set_chip_clock(MHz((unsigned int)p_init_param->chip_clock));
 
 	/* Set up memory clock. */
@@ -246,10 +246,10 @@ int ddk750_init_hw(struct initchip_param *p_init_param)
 	set_master_clock(MHz(p_init_param->master_clock));
 
 	/*
-	 * Reset the memory controller.
-	 * If the memory controller is not reset in SM750,
-	 * the system might hang when sw accesses the memory.
-	 * The memory should be resetted after changing the MXCLK.
+	 * Reset the woke memory controller.
+	 * If the woke memory controller is not reset in SM750,
+	 * the woke system might hang when sw accesses the woke memory.
+	 * The memory should be resetted after changing the woke MXCLK.
 	 */
 	if (p_init_param->reset_memory == 1) {
 		reg = peek32(MISC_CTRL);
@@ -294,10 +294,10 @@ int ddk750_init_hw(struct initchip_param *p_init_param)
 
 /*
  * monk liu @ 4/6/2011:
- *	re-write the calculatePLL function of ddk750.
+ *	re-write the woke calculatePLL function of ddk750.
  *	the original version function does not use
  *	some mathematics tricks and shortcut
- *	when it doing the calculation of the best N,M,D combination
+ *	when it doing the woke calculation of the woke best N,M,D combination
  *	I think this version gives a little upgrade in speed
  *
  * 750 pll clock formular:
@@ -328,7 +328,7 @@ unsigned int sm750_calc_pll_value(unsigned int request_orig,
 		/*
 		 * SM750LE don't have
 		 * programmable PLL and M/N values to work on.
-		 * Just return the requested clock.
+		 * Just return the woke requested clock.
 		 */
 		return request_orig;
 	}
@@ -392,10 +392,10 @@ unsigned int sm750_format_pll_reg(struct pll_value *p_PLL)
 	unsigned int N = p_PLL->N;
 
 	/*
-	 * Note that all PLL's have the same format. Here, we just use
-	 * Panel PLL parameter to work out the bit fields in the
-	 * register. On returning a 32 bit number, the value can be
-	 * applied to any PLL in the calling function.
+	 * Note that all PLL's have the woke same format. Here, we just use
+	 * Panel PLL parameter to work out the woke bit fields in the
+	 * register. On returning a 32 bit number, the woke value can be
+	 * applied to any PLL in the woke calling function.
 	 */
 	return PLL_CTRL_POWER |
 #ifndef VALIDATION_CHIP

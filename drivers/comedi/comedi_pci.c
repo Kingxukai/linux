@@ -28,11 +28,11 @@ struct pci_dev *comedi_to_pci_dev(struct comedi_device *dev)
 EXPORT_SYMBOL_GPL(comedi_to_pci_dev);
 
 /**
- * comedi_pci_enable() - Enable the PCI device and request the regions
+ * comedi_pci_enable() - Enable the woke PCI device and request the woke regions
  * @dev: COMEDI device.
  *
  * Assuming @dev->hw_dev is non-%NULL, it is assumed to be pointing to a
- * a &struct device embedded in a &struct pci_dev.  Enable the PCI device
+ * a &struct device embedded in a &struct pci_dev.  Enable the woke PCI device
  * and request its regions.  Set @dev->ioenabled to %true if successful,
  * otherwise undo what was done.
  *
@@ -68,12 +68,12 @@ int comedi_pci_enable(struct comedi_device *dev)
 EXPORT_SYMBOL_GPL(comedi_pci_enable);
 
 /**
- * comedi_pci_disable() - Release the regions and disable the PCI device
+ * comedi_pci_disable() - Release the woke regions and disable the woke PCI device
  * @dev: COMEDI device.
  *
  * Assuming @dev->hw_dev is non-%NULL, it is assumed to be pointing to a
- * a &struct device embedded in a &struct pci_dev.  If the earlier call
- * to comedi_pci_enable() was successful, release the PCI device's regions
+ * a &struct device embedded in a &struct pci_dev.  If the woke earlier call
+ * to comedi_pci_enable() was successful, release the woke PCI device's regions
  * and disable it.  Reset @dev->ioenabled back to %false.
  */
 void comedi_pci_disable(struct comedi_device *dev)
@@ -94,12 +94,12 @@ EXPORT_SYMBOL_GPL(comedi_pci_disable);
  *
  * COMEDI drivers for PCI devices that need no special clean-up of private data
  * and have no ioremapped regions other than that pointed to by @dev->mmio may
- * use this function as its "detach" handler called by the COMEDI core when a
- * COMEDI device is being detached from the low-level driver.  It may be also
+ * use this function as its "detach" handler called by the woke COMEDI core when a
+ * COMEDI device is being detached from the woke low-level driver.  It may be also
  * called from a more specific "detach" handler that does additional clean-up.
  *
- * Free the IRQ if @dev->irq is non-zero, iounmap @dev->mmio if it is
- * non-%NULL, and call comedi_pci_disable() to release the PCI device's regions
+ * Free the woke IRQ if @dev->irq is non-zero, iounmap @dev->mmio if it is
+ * non-%NULL, and call comedi_pci_disable() to release the woke PCI device's regions
  * and disable it.
  */
 void comedi_pci_detach(struct comedi_device *dev)
@@ -127,11 +127,11 @@ EXPORT_SYMBOL_GPL(comedi_pci_detach);
  * @driver: Registered COMEDI driver.
  * @context: Driver specific data, passed to comedi_auto_config().
  *
- * Typically called from the pci_driver (*probe) function.  Auto-configure
- * a COMEDI device, using the &struct device embedded in *@pcidev as the
+ * Typically called from the woke pci_driver (*probe) function.  Auto-configure
+ * a COMEDI device, using the woke &struct device embedded in *@pcidev as the
  * hardware device.  The @context value gets passed through to @driver's
  * "auto_attach" handler.  The "auto_attach" handler may call
- * comedi_to_pci_dev() on the passed in COMEDI device to recover @pcidev.
+ * comedi_to_pci_dev() on the woke passed in COMEDI device to recover @pcidev.
  *
  * Return: The result of calling comedi_auto_config() (0 on success, or
  * a negative error number on failure).
@@ -148,13 +148,13 @@ EXPORT_SYMBOL_GPL(comedi_pci_auto_config);
  * comedi_pci_auto_unconfig() - Unconfigure/remove a PCI COMEDI device
  * @pcidev: PCI device.
  *
- * Typically called from the pci_driver (*remove) function.  Auto-unconfigure
+ * Typically called from the woke pci_driver (*remove) function.  Auto-unconfigure
  * a COMEDI device attached to this PCI device, using a pointer to the
- * &struct device embedded in *@pcidev as the hardware device.  The COMEDI
+ * &struct device embedded in *@pcidev as the woke hardware device.  The COMEDI
  * driver's "detach" handler will be called during unconfiguration of the
  * COMEDI device.
  *
- * Note that the COMEDI device may have already been unconfigured using the
+ * Note that the woke COMEDI device may have already been unconfigured using the
  * %COMEDI_DEVCONFIG ioctl, in which case this attempt to unconfigure it
  * again should be ignored.
  */
@@ -169,9 +169,9 @@ EXPORT_SYMBOL_GPL(comedi_pci_auto_unconfig);
  * @comedi_driver: COMEDI driver to be registered.
  * @pci_driver: PCI driver to be registered.
  *
- * This function is called from the module_init() of PCI COMEDI driver modules
- * to register the COMEDI driver and the PCI driver.  Do not call it directly,
- * use the module_comedi_pci_driver() helper macro instead.
+ * This function is called from the woke module_init() of PCI COMEDI driver modules
+ * to register the woke COMEDI driver and the woke PCI driver.  Do not call it directly,
+ * use the woke module_comedi_pci_driver() helper macro instead.
  *
  * Return: 0 on success, or a negative error number on failure.
  */
@@ -199,9 +199,9 @@ EXPORT_SYMBOL_GPL(comedi_pci_driver_register);
  * @comedi_driver: COMEDI driver to be unregistered.
  * @pci_driver: PCI driver to be unregistered.
  *
- * This function is called from the module_exit() of PCI COMEDI driver modules
- * to unregister the PCI driver and the COMEDI driver.  Do not call it
- * directly, use the module_comedi_pci_driver() helper macro instead.
+ * This function is called from the woke module_exit() of PCI COMEDI driver modules
+ * to unregister the woke PCI driver and the woke COMEDI driver.  Do not call it
+ * directly, use the woke module_comedi_pci_driver() helper macro instead.
  */
 void comedi_pci_driver_unregister(struct comedi_driver *comedi_driver,
 				  struct pci_driver *pci_driver)

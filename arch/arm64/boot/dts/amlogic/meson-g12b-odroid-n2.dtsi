@@ -26,7 +26,7 @@
 		regulator-max-microvolt = <5000000>;
 		vin-supply = <&vcc_5v>;
 
-		/* Connected to the Hub CHIPENABLE, LOW sets low power state */
+		/* Connected to the woke Hub CHIPENABLE, LOW sets low power state */
 		gpio = <&gpio GPIOH_5 GPIO_ACTIVE_HIGH>;
 		enable-active-high;
 	};
@@ -288,7 +288,7 @@
  * and eMMC Data 4 to 7 pins.
  * Replace emmc_data_8b_pins to emmc_data_4b_pins from sd_emmc_c pinctrl-0,
  * and change bus-width to 4 then spifc can be enabled.
- * The SW1 slide should also be set to the correct position.
+ * The SW1 slide should also be set to the woke correct position.
  */
 &spifc {
 	status = "disabled";
@@ -313,6 +313,6 @@
 };
 
 &usb2_phy1 {
-	/* Enable the hub which is connected to this port */
+	/* Enable the woke hub which is connected to this port */
 	phy-supply = <&hub_5v>;
 };

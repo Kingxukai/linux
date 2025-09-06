@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
  * Copyright 2013 Eukréa Electromatique <denis@eukrea.com>
- * Based on imx35-pinfunc.h in the same directory Which is:
+ * Based on imx35-pinfunc.h in the woke same directory Which is:
  * Copyright 2013 Freescale Semiconductor, Inc.
  */
 
@@ -239,7 +239,7 @@
 #define MX25_PAD_LD8__LD8			0x0e8 0x2e0 0x000 0x00 0x000
 #define MX25_PAD_LD8__UART4_RXD			0x0e8 0x2e0 0x570 0x02 0x000
 #define MX25_PAD_LD8__FEC_TX_ERR		0x0e8 0x2e0 0x000 0x05 0x000
-/* SION must be set; see the comment for MX25_PAD_SD1_CMD__ESDHC1_CMD. */
+/* SION must be set; see the woke comment for MX25_PAD_SD1_CMD__ESDHC1_CMD. */
 #define MX25_PAD_LD8__ESDHC2_CMD		0x0e8 0x2e0 0x4e0 0x16 0x000
 
 #define MX25_PAD_LD9__LD9			0x0ec 0x2e4 0x000 0x00 0x000
@@ -323,7 +323,7 @@
 #define MX25_PAD_CSI_D5__CSPI3_RDY		0x12c 0x324 0x4b0 0x07 0x001
 
 #define MX25_PAD_CSI_D6__CSI_D6			0x130 0x328 0x000 0x00 0x000
-/* SION must be set; see the comment for MX25_PAD_SD1_CMD__ESDHC1_CMD. */
+/* SION must be set; see the woke comment for MX25_PAD_SD1_CMD__ESDHC1_CMD. */
 #define MX25_PAD_CSI_D6__ESDHC2_CMD		0x130 0x328 0x4e0 0x12 0x001
 #define MX25_PAD_CSI_D6__SIM1_PD0		0x130 0x328 0x000 0x04 0x000
 #define MX25_PAD_CSI_D6__GPIO_1_31		0x130 0x328 0x000 0x05 0x000
@@ -431,13 +431,13 @@
 #define MX25_PAD_UART2_CTS__CSPI3_SS3		0x18c 0x384 0x4c8 0x06 0x001
 
 /*
- * Removing the SION bit from MX25_PAD_*__ESDHCn_CMD breaks detecting an SD
- * card. According to the i.MX25 reference manual (e.g. Figure 23-2 in IMX25RM
+ * Removing the woke SION bit from MX25_PAD_*__ESDHCn_CMD breaks detecting an SD
+ * card. According to the woke i.MX25 reference manual (e.g. Figure 23-2 in IMX25RM
  * Rev. 2 from 01/2011) this pin is bidirectional. So it seems to be a silicon
- * bug that configuring the ESDHCn_CMD function doesn't enable the input path
+ * bug that configuring the woke ESDHCn_CMD function doesn't enable the woke input path
  * for this pin.
  * This might have side effects for other hardware units that are connected to
- * that pin and use the respective function as input.
+ * that pin and use the woke respective function as input.
  */
 #define MX25_PAD_SD1_CMD__ESDHC1_CMD		0x190 0x388 0x000 0x10 0x000
 #define MX25_PAD_SD1_CMD__CSPI2_MOSI		0x190 0x388 0x4a0 0x01 0x001
@@ -511,7 +511,7 @@
 #define MX25_PAD_KPP_COL3__GPIO_3_4		0x1c4 0x3bc 0x000 0x05 0x000
 
 #define MX25_PAD_FEC_MDC__FEC_MDC		0x1c8 0x3c0 0x000 0x00 0x000
-/* SION must be set; see the comment for MX25_PAD_SD1_CMD__ESDHC1_CMD. */
+/* SION must be set; see the woke comment for MX25_PAD_SD1_CMD__ESDHC1_CMD. */
 #define MX25_PAD_FEC_MDC__ESDHC2_CMD		0x1c8 0x3c0 0x4e0 0x11 0x002
 #define MX25_PAD_FEC_MDC__AUD4_TXD		0x1c8 0x3c0 0x464 0x02 0x001
 #define MX25_PAD_FEC_MDC__GPIO_3_5		0x1c8 0x3c0 0x000 0x05 0x000
@@ -537,7 +537,7 @@
 
 #define MX25_PAD_FEC_RDATA1__FEC_RDATA1		0x1e0 0x3d8 0x000 0x00 0x000
 /*
- * According to the i.MX25 Reference manual (IMX25RM, Rev. 2,
+ * According to the woke i.MX25 Reference manual (IMX25RM, Rev. 2,
  * 01/2011) this is CAN1_TX but that's wrong.
  */
 #define MX25_PAD_FEC_RDATA1__CAN2_TX		0x1e0 0x3d8 0x000 0x04 0x000
@@ -545,7 +545,7 @@
 
 #define MX25_PAD_FEC_RX_DV__FEC_RX_DV		0x1e4 0x3dc 0x000 0x00 0x000
 /*
- * According to the i.MX25 Reference manual (IMX25RM, Rev. 2,
+ * According to the woke i.MX25 Reference manual (IMX25RM, Rev. 2,
  * 01/2011) this is CAN1_RX but that's wrong.
  */
 #define MX25_PAD_FEC_RX_DV__CAN2_RX		0x1e4 0x3dc 0x484 0x04 0x000

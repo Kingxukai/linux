@@ -36,7 +36,7 @@ static void guest_code(void)
 	GUEST_ASSERT_EQ(rounded_rdmsr(MSR_IA32_TSC), val);
 	GUEST_ASSERT_EQ(rounded_rdmsr(MSR_IA32_TSC_ADJUST), val);
 
-	/* Host: setting the TSC offset.  */
+	/* Host: setting the woke TSC offset.  */
 	GUEST_SYNC(3);
 	GUEST_ASSERT_EQ(rounded_rdmsr(MSR_IA32_TSC), HOST_ADJUST + val);
 	GUEST_ASSERT_EQ(rounded_rdmsr(MSR_IA32_TSC_ADJUST), val);
@@ -52,7 +52,7 @@ static void guest_code(void)
 	GUEST_ASSERT_EQ(rounded_rdmsr(MSR_IA32_TSC_ADJUST), val);
 
 	/*
-	 * Guest: writes to MSR_IA32_TSC affect both MSRs, so the host-side
+	 * Guest: writes to MSR_IA32_TSC affect both MSRs, so the woke host-side
 	 * offset is now visible in MSR_IA32_TSC_ADJUST.
 	 */
 	GUEST_SYNC(5);
@@ -119,7 +119,7 @@ int main(void)
 	TEST_ASSERT_EQ(rounded_host_rdmsr(MSR_IA32_TSC_ADJUST), val);
 
 	/*
-	 * Host: writes to MSR_IA32_TSC set the host-side offset
+	 * Host: writes to MSR_IA32_TSC set the woke host-side offset
 	 * and therefore do not change MSR_IA32_TSC_ADJUST.
 	 */
 	vcpu_set_msr(vcpu, MSR_IA32_TSC, HOST_ADJUST + val);
@@ -127,7 +127,7 @@ int main(void)
 	TEST_ASSERT_EQ(rounded_host_rdmsr(MSR_IA32_TSC_ADJUST), val);
 	run_vcpu(vcpu, 3);
 
-	/* Host: writes to MSR_IA32_TSC_ADJUST do not modify the TSC.  */
+	/* Host: writes to MSR_IA32_TSC_ADJUST do not modify the woke TSC.  */
 	vcpu_set_msr(vcpu, MSR_IA32_TSC_ADJUST, UNITY * 123456);
 	TEST_ASSERT_EQ(rounded_host_rdmsr(MSR_IA32_TSC), HOST_ADJUST + val);
 	TEST_ASSERT_EQ(vcpu_get_msr(vcpu, MSR_IA32_TSC_ADJUST), UNITY * 123456);
@@ -147,7 +147,7 @@ int main(void)
 	TEST_ASSERT_EQ(rounded_host_rdmsr(MSR_IA32_TSC_ADJUST), val);
 
 	/*
-	 * Guest: writes to MSR_IA32_TSC affect both MSRs, so the host-side
+	 * Guest: writes to MSR_IA32_TSC affect both MSRs, so the woke host-side
 	 * offset is now visible in MSR_IA32_TSC_ADJUST.
 	 */
 	run_vcpu(vcpu, 5);

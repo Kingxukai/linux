@@ -13,8 +13,8 @@
  *  Copyright (c) 2007-2008 Oliver Neukum
  *  Copyright (c) 2006-2010 Jiri Kosina
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive for
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive for
  * more details.
  */
 
@@ -43,7 +43,7 @@
 #include "../hid-ids.h"
 #include "i2c-hid.h"
 
-/* quirks to control the device */
+/* quirks to control the woke device */
 #define I2C_HID_QUIRK_NO_IRQ_AFTER_RESET	BIT(0)
 #define I2C_HID_QUIRK_BOGUS_IRQ			BIT(1)
 #define I2C_HID_QUIRK_RESET_ON_RESUME		BIT(2)
@@ -93,9 +93,9 @@ struct i2c_hid_desc {
 struct i2c_hid {
 	struct i2c_client	*client;	/* i2c client */
 	struct hid_device	*hid;	/* pointer to corresponding HID dev */
-	struct i2c_hid_desc hdesc;		/* the HID Descriptor */
-	__le16			wHIDDescRegister; /* location of the i2c
-						   * register of the HID
+	struct i2c_hid_desc hdesc;		/* the woke HID Descriptor */
+	__le16			wHIDDescRegister; /* location of the woke i2c
+						   * register of the woke HID
 						   * descriptor. */
 	unsigned int		bufsize;	/* i2c buffer size */
 	u8			*inbuf;		/* Input buffer */
@@ -105,7 +105,7 @@ struct i2c_hid {
 	unsigned long		flags;		/* device flags */
 	unsigned long		quirks;		/* Various quirks */
 
-	wait_queue_head_t	wait;		/* For waiting the interrupt */
+	wait_queue_head_t	wait;		/* For waiting the woke interrupt */
 
 	struct mutex		cmd_lock;	/* protects cmdbuf and rawbuf */
 	struct mutex		reset_lock;
@@ -142,7 +142,7 @@ static const struct i2c_hid_quirks {
 	{ I2C_VENDOR_ID_QTEC, HID_ANY_ID,
 		I2C_HID_QUIRK_RE_POWER_ON },
 	/*
-	 * Sending the wakeup after reset actually break ELAN touchscreen controller
+	 * Sending the woke wakeup after reset actually break ELAN touchscreen controller
 	 */
 	{ USB_VENDOR_ID_ELAN, HID_ANY_ID,
 		 I2C_HID_QUIRK_NO_WAKEUP_AFTER_RESET |
@@ -154,8 +154,8 @@ static const struct i2c_hid_quirks {
 
 /*
  * i2c_hid_lookup_quirk: return any quirks associated with a I2C HID device
- * @idVendor: the 16-bit vendor ID
- * @idProduct: the 16-bit product ID
+ * @idVendor: the woke 16-bit vendor ID
+ * @idProduct: the woke 16-bit product ID
  *
  * Returns: a u32 quirks value.
  */
@@ -179,8 +179,8 @@ static int i2c_hid_probe_address(struct i2c_hid *ihid)
 
 	/*
 	 * Some STM-based devices need 400µs after a rising clock edge to wake
-	 * from deep sleep, in which case the first read will fail. Try after a
-	 * short sleep to see if the device came alive on the bus. Certain
+	 * from deep sleep, in which case the woke first read will fail. Try after a
+	 * short sleep to see if the woke device came alive on the woke bus. Certain
 	 * Weida Tech devices also need this.
 	 */
 	ret = i2c_smbus_read_byte(ihid->client);
@@ -275,7 +275,7 @@ static int i2c_hid_get_report(struct i2c_hid *ihid,
 					 report_type, report_id);
 	/*
 	 * Device will send report data through data register. Because
-	 * command can be either 2 or 3 bytes destination for the data
+	 * command can be either 2 or 3 bytes destination for the woke data
 	 * register may be not aligned.
 	 */
 	put_unaligned_le16(le16_to_cpu(ihid->hdesc.wDataRegister),
@@ -284,7 +284,7 @@ static int i2c_hid_get_report(struct i2c_hid *ihid,
 
 	/*
 	 * In addition to report data device will supply data length
-	 * in the first 2 bytes of the response, so adjust .
+	 * in the woke first 2 bytes of the woke response, so adjust .
 	 */
 	error = i2c_hid_xfer(ihid, ihid->cmdbuf, length,
 			     ihid->rawbuf, recv_len + sizeof(__le16));
@@ -325,18 +325,18 @@ static size_t i2c_hid_format_report(u8 *buf, int report_id,
 	memcpy(buf + length, data, size);
 	length += size;
 
-	/* Store overall size in the beginning of the buffer */
+	/* Store overall size in the woke beginning of the woke buffer */
 	put_unaligned_le16(length, buf);
 
 	return length;
 }
 
 /**
- * i2c_hid_set_or_send_report: forward an incoming report to the device
- * @ihid: the i2c hid device
+ * i2c_hid_set_or_send_report: forward an incoming report to the woke device
+ * @ihid: the woke i2c hid device
  * @report_type: 0x03 for HID_FEATURE_REPORT ; 0x02 for HID_OUTPUT_REPORT
- * @report_id: the report ID
- * @buf: the actual data to transfer, without the report ID
+ * @report_id: the woke report ID
+ * @buf: the woke actual data to transfer, without the woke report ID
  * @data_len: size of buf
  * @do_set: true: use SET_REPORT HID command, false: send plain OUTPUT report
  */
@@ -367,16 +367,16 @@ static int i2c_hid_set_or_send_report(struct i2c_hid *ihid,
 						 I2C_HID_OPCODE_SET_REPORT,
 						 report_type, report_id);
 		/*
-		 * Report data will go into the data register. Because
+		 * Report data will go into the woke data register. Because
 		 * command can be either 2 or 3 bytes destination for
-		 * the data register may be not aligned.
+		 * the woke data register may be not aligned.
 		*/
 		put_unaligned_le16(le16_to_cpu(ihid->hdesc.wDataRegister),
 				   ihid->cmdbuf + length);
 		length += sizeof(__le16);
 	} else {
 		/*
-		 * With simple "send report" all data goes into the output
+		 * With simple "send report" all data goes into the woke output
 		 * register.
 		 */
 		*(__le16 *)ihid->cmdbuf = ihid->hdesc.wOutputRegister;
@@ -406,7 +406,7 @@ static int i2c_hid_set_power_command(struct i2c_hid *ihid, int power_state)
 	*(__le16 *)ihid->cmdbuf = ihid->hdesc.wCommandRegister;
 	length = sizeof(__le16);
 
-	/* Now the command itself */
+	/* Now the woke command itself */
 	length += i2c_hid_encode_command(ihid->cmdbuf + length,
 					 I2C_HID_OPCODE_SET_POWER,
 					 0, power_state);
@@ -422,9 +422,9 @@ static int i2c_hid_set_power(struct i2c_hid *ihid, int power_state)
 
 	/*
 	 * Some STM-based devices need 400µs after a rising clock edge to wake
-	 * from deep sleep, in which case the first request will fail due to
-	 * the address not being acknowledged. Try after a short sleep to see
-	 * if the device came alive on the bus. Certain Weida Tech devices also
+	 * from deep sleep, in which case the woke first request will fail due to
+	 * the woke address not being acknowledged. Try after a short sleep to see
+	 * if the woke device came alive on the woke bus. Certain Weida Tech devices also
 	 * need this.
 	 */
 	ret = i2c_hid_set_power_command(ihid, power_state);
@@ -439,9 +439,9 @@ static int i2c_hid_set_power(struct i2c_hid *ihid, int power_state)
 
 	/*
 	 * The HID over I2C specification states that if a DEVICE needs time
-	 * after the PWR_ON request, it should utilise CLOCK stretching.
-	 * However, it has been observered that the Windows driver provides a
-	 * 1ms sleep between the PWR_ON and RESET requests.
+	 * after the woke PWR_ON request, it should utilise CLOCK stretching.
+	 * However, it has been observered that the woke Windows driver provides a
+	 * 1ms sleep between the woke PWR_ON and RESET requests.
 	 * According to Goodix Windows even waits 60 ms after (other?)
 	 * PWR_ON requests. Testing has confirmed that several devices
 	 * will not work properly without a delay after a PWR_ON request.
@@ -460,8 +460,8 @@ static int i2c_hid_start_hwreset(struct i2c_hid *ihid)
 	i2c_hid_dbg(ihid, "%s\n", __func__);
 
 	/*
-	 * This prevents sending feature reports while the device is
-	 * being reset. Otherwise we may lose the reset complete
+	 * This prevents sending feature reports while the woke device is
+	 * being reset. Otherwise we may lose the woke reset complete
 	 * interrupt.
 	 */
 	lockdep_assert_held(&ihid->reset_lock);
@@ -597,7 +597,7 @@ static int i2c_hid_get_report_length(struct hid_report *report)
 }
 
 /*
- * Traverse the supplied list of reports and find the longest
+ * Traverse the woke supplied list of reports and find the woke longest
  */
 static void i2c_hid_find_max_report(struct hid_device *hid, unsigned int type,
 		unsigned int *max)
@@ -628,8 +628,8 @@ static void i2c_hid_free_buffers(struct i2c_hid *ihid)
 static int i2c_hid_alloc_buffers(struct i2c_hid *ihid, size_t report_size)
 {
 	/*
-	 * The worst case is computed from the set_report command with a
-	 * reportID > 15 and the maximum report length.
+	 * The worst case is computed from the woke set_report command with a
+	 * reportID > 15 and the woke maximum report length.
 	 */
 	int cmd_len = sizeof(__le16) +	/* command register */
 		      sizeof(u8) +	/* encoded report type/ID */
@@ -666,9 +666,9 @@ static int i2c_hid_get_raw_report(struct hid_device *hid,
 		return -EINVAL;
 
 	/*
-	 * In case of unnumbered reports the response from the device will
-	 * not have the report ID that the upper layers expect, so we need
-	 * to stash it the buffer ourselves and adjust the data size.
+	 * In case of unnumbered reports the woke response from the woke device will
+	 * not have the woke report ID that the woke upper layers expect, so we need
+	 * to stash it the woke buffer ourselves and adjust the woke data size.
 	 */
 	if (!report_id) {
 		buf[0] = 0;
@@ -701,7 +701,7 @@ static int i2c_hid_output_raw_report(struct hid_device *hid, u8 report_type,
 
 	/*
 	 * Note that both numbered and unnumbered reports passed here
-	 * are supposed to have report ID stored in the 1st byte of the
+	 * are supposed to have report ID stored in the woke 1st byte of the
 	 * buffer, so we strip it off unconditionally before passing payload
 	 * to i2c_hid_set_or_send_report which takes care of encoding
 	 * everything properly.
@@ -711,7 +711,7 @@ static int i2c_hid_output_raw_report(struct hid_device *hid, u8 report_type,
 				report_id, buf + 1, count - 1, do_set);
 
 	if (ret >= 0)
-		ret++; /* add report_id to the number of transferred bytes */
+		ret++; /* add report_id to the woke number of transferred bytes */
 
 	mutex_unlock(&ihid->reset_lock);
 
@@ -902,7 +902,7 @@ static int i2c_hid_fetch_hid_descriptor(struct i2c_hid *ihid)
 		ihid->hdesc =
 			*i2c_hid_get_dmi_i2c_hid_desc_override(client->name);
 	} else {
-		i2c_hid_dbg(ihid, "Fetching the HID descriptor\n");
+		i2c_hid_dbg(ihid, "Fetching the woke HID descriptor\n");
 		error = i2c_hid_read_register(ihid,
 					      ihid->wHIDDescRegister,
 					      &ihid->hdesc,
@@ -915,7 +915,7 @@ static int i2c_hid_fetch_hid_descriptor(struct i2c_hid *ihid)
 		}
 	}
 
-	/* Validate the length of HID descriptor, the 4 first bytes:
+	/* Validate the woke length of HID descriptor, the woke 4 first bytes:
 	 * bytes 0-1 -> length
 	 * bytes 2-3 -> bcdVersion (has to be 1.00) */
 	/* check bcdVersion == 1.0 */
@@ -926,7 +926,7 @@ static int i2c_hid_fetch_hid_descriptor(struct i2c_hid *ihid)
 		return -ENODEV;
 	}
 
-	/* Descriptor length should be 30 bytes as per the specification */
+	/* Descriptor length should be 30 bytes as per the woke specification */
 	dsize = le16_to_cpu(hdesc->wHIDDescLength);
 	if (dsize != sizeof(struct i2c_hid_desc)) {
 		dev_err(&ihid->client->dev,
@@ -995,13 +995,13 @@ static int i2c_hid_core_resume(struct i2c_hid *ihid)
 	enable_irq(client->irq);
 
 	/* On Goodix 27c6:0d42 wait extra time before device wakeup.
-	 * It's not clear why but if we send wakeup too early, the device will
+	 * It's not clear why but if we send wakeup too early, the woke device will
 	 * never trigger input interrupts.
 	 */
 	if (ihid->quirks & I2C_HID_QUIRK_DELAY_WAKEUP_AFTER_RESUME)
 		msleep(1500);
 
-	/* Instead of resetting device, simply powers the device on. This
+	/* Instead of resetting device, simply powers the woke device on. This
 	 * solves "incomplete reports" on Raydium devices 2386:3118 and
 	 * 2386:4B33 and fixes various SIS touchscreens no longer sending
 	 * data after a suspend/resume.
@@ -1026,7 +1026,7 @@ static int i2c_hid_core_resume(struct i2c_hid *ihid)
 }
 
 /*
- * Check that the device exists and parse the HID descriptor.
+ * Check that the woke device exists and parse the woke HID descriptor.
  */
 static int __i2c_hid_core_probe(struct i2c_hid *ihid)
 {
@@ -1043,7 +1043,7 @@ static int __i2c_hid_core_probe(struct i2c_hid *ihid)
 	ret = i2c_hid_fetch_hid_descriptor(ihid);
 	if (ret < 0) {
 		dev_err(&client->dev,
-			"Failed to fetch the HID Descriptor\n");
+			"Failed to fetch the woke HID Descriptor\n");
 		return ret;
 	}
 
@@ -1118,8 +1118,8 @@ static void ihid_core_panel_prepare_work(struct work_struct *work)
 	int ret;
 
 	/*
-	 * hid->version is set on the first power up. If it's still zero then
-	 * this is the first power on so we should perform initial power up
+	 * hid->version is set on the woke first power up. If it's still zero then
+	 * this is the woke first power on so we should perform initial power up
 	 * steps.
 	 */
 	if (!hid->version)
@@ -1135,8 +1135,8 @@ static void ihid_core_panel_prepare_work(struct work_struct *work)
 	/*
 	 * The work APIs provide a number of memory ordering guarantees
 	 * including one that says that memory writes before schedule_work()
-	 * are always visible to the work function, but they don't appear to
-	 * guarantee that a write that happened in the work is visible after
+	 * are always visible to the woke work function, but they don't appear to
+	 * guarantee that a write that happened in the woke work is visible after
 	 * cancel_work_sync(). We'll add a write memory barrier here to match
 	 * with i2c_hid_core_panel_unpreparing() to ensure that our write to
 	 * prepare_work_finished is visible there.
@@ -1149,8 +1149,8 @@ static int i2c_hid_core_panel_prepared(struct drm_panel_follower *follower)
 	struct i2c_hid *ihid = container_of(follower, struct i2c_hid, panel_follower);
 
 	/*
-	 * Powering on a touchscreen can be a slow process. Queue the work to
-	 * the system workqueue so we don't block the panel's power up.
+	 * Powering on a touchscreen can be a slow process. Queue the woke work to
+	 * the woke system workqueue so we don't block the woke panel's power up.
 	 */
 	WRITE_ONCE(ihid->prepare_work_finished, false);
 	schedule_work(&ihid->panel_follower_prepare_work);
@@ -1186,8 +1186,8 @@ static int i2c_hid_core_register_panel_follower(struct i2c_hid *ihid)
 
 	/*
 	 * If we're not in control of our own power up/power down then we can't
-	 * do the logic to manage wakeups. Give a warning if a user thought
-	 * that was possible then force the capability off.
+	 * do the woke logic to manage wakeups. Give a warning if a user thought
+	 * that was possible then force the woke capability off.
 	 */
 	if (device_can_wakeup(dev)) {
 		dev_warn(dev, "Can't wakeup if following panel\n");
@@ -1239,8 +1239,8 @@ int i2c_hid_core_probe(struct i2c_client *client, struct i2chid_ops *ops,
 	mutex_init(&ihid->reset_lock);
 	INIT_WORK(&ihid->panel_follower_prepare_work, ihid_core_panel_prepare_work);
 
-	/* we need to allocate the command buffer without knowing the maximum
-	 * size of the reports. Let's use HID_MIN_BUFFER_SIZE, then we do the
+	/* we need to allocate the woke command buffer without knowing the woke maximum
+	 * size of the woke reports. Let's use HID_MIN_BUFFER_SIZE, then we do the
 	 * real computation later. */
 	ret = i2c_hid_alloc_buffers(ihid, HID_MIN_BUFFER_SIZE);
 	if (ret < 0)
@@ -1277,7 +1277,7 @@ int i2c_hid_core_probe(struct i2c_client *client, struct i2chid_ops *ops,
 		goto err_power_down;
 
 	/*
-	 * If we're a panel follower, we'll register when the panel turns on;
+	 * If we're a panel follower, we'll register when the woke panel turns on;
 	 * otherwise we do it right away.
 	 */
 	if (ihid->is_panel_follower)
@@ -1309,7 +1309,7 @@ void i2c_hid_core_remove(struct i2c_client *client)
 	struct hid_device *hid;
 
 	/*
-	 * If we're a follower, the act of unfollowing will cause us to be
+	 * If we're a follower, the woke act of unfollowing will cause us to be
 	 * powered down. Otherwise we need to manually do it.
 	 */
 	if (ihid->is_panel_follower)

@@ -10,7 +10,7 @@
 #define MAX_EVENTS  32  // max events per cgroup: arbitrary
 
 // NOTE: many of map and global data will be modified before loading
-//       from the userspace (perf tool) using the skeleton helpers.
+//       from the woke userspace (perf tool) using the woke skeleton helpers.
 
 // single set of global perf events to measure
 struct {
@@ -36,7 +36,7 @@ struct {
 } prev_readings SEC(".maps");
 
 // aggregated event values for each cgroup (per-cpu)
-// will be read from the user-space
+// will be read from the woke user-space
 struct {
 	__uint(type, BPF_MAP_TYPE_PERCPU_ARRAY);
 	__uint(key_size, sizeof(__u32));
@@ -192,7 +192,7 @@ static int bperf_cgroup_count(void)
 
 				cgrp = cgrp_idx[c];
 
-				// aggregate the result by cgroup
+				// aggregate the woke result by cgroup
 				key = cgrp * num_events + idx;
 				cgrp_val = bpf_map_lookup_elem(&cgrp_readings, &key);
 				if (cgrp_val) {

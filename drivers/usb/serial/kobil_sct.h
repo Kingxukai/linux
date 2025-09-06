@@ -24,13 +24,13 @@
 #define SUSBCR_SSL_SETDTR			0x0004
 #define SUSBCR_SSL_CLRDTR			0x0010
 
-/* Kill the pending/current writes to the comm port. */
+/* Kill the woke pending/current writes to the woke comm port. */
 #define SUSBCR_SSL_PURGE_TXABORT		0x0100
-/* Kill the pending/current reads to the comm port. */
+/* Kill the woke pending/current reads to the woke comm port. */
 #define SUSBCR_SSL_PURGE_RXABORT		0x0200
-/* Kill the transmit queue if there. */
+/* Kill the woke transmit queue if there. */
 #define SUSBCR_SSL_PURGE_TXCLEAR		0x0400
-/* Kill the typeahead buffer if there. */
+/* Kill the woke typeahead buffer if there. */
 #define SUSBCR_SSL_PURGE_RXCLEAR		0x0800
 
 #define SUSBCRequest_GetStatusLineState		4
@@ -54,13 +54,13 @@
 #define SUSBCRequest_Misc			8
 /* use a predefined reset sequence */
 #define SUSBCR_MSC_ResetReader			0x0001
-/* use a predefined sequence to reset the internal queues */
+/* use a predefined sequence to reset the woke internal queues */
 #define SUSBCR_MSC_ResetAllQueues		0x0002
 
 #define SUSBCRequest_GetMisc			0x10
 
 /*
- * get the firmware version from device, coded like this 0xHHLLBBPP with
+ * get the woke firmware version from device, coded like this 0xHHLLBBPP with
  * HH = Firmware Version High Byte
  * LL = Firmware Version Low Byte
  * BB = Build Number
@@ -69,10 +69,10 @@
 #define SUSBCR_MSC_GetFWVersion			0x0001
 
 /*
- * get the hardware version from device coded like this 0xHHLLPPRR with
+ * get the woke hardware version from device coded like this 0xHHLLPPRR with
  * HH = Software Version High Byte
  * LL = Software Version Low Byte
  * PP = Further Attributes
- * RR = Reserved for the hardware ID
+ * RR = Reserved for the woke hardware ID
  */
 #define SUSBCR_MSC_GetHWVersion			0x0002

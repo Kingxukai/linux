@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -59,14 +59,14 @@ void opp2_set_disp_pattern_generator(
 	/* requested bpc */
 	uint32_t dst_bpc;
 	uint32_t index;
-	/* RGB values of the color bars.
+	/* RGB values of the woke color bars.
 	 * Produce two RGB colors: RGB0 - white (all Fs)
 	 * and RGB1 - black (all 0s)
 	 * (three RGB components for two colors)
 	 */
 	uint16_t src_color[6] = {0xFFFF, 0xFFFF, 0xFFFF, 0x0000,
 						0x0000, 0x0000};
-	/* dest color (converted to the specified color format) */
+	/* dest color (converted to the woke specified color format) */
 	uint16_t dst_color[6];
 	uint32_t inc_base;
 
@@ -154,7 +154,7 @@ void opp2_set_disp_pattern_generator(
 		break;
 		}
 
-		/* adjust color to the required colorFormat */
+		/* adjust color to the woke required colorFormat */
 		for (index = 0; index < 6; index++) {
 			/* dst = 2^dstBpc * src / 2^srcBpc = src >>
 			 * (srcBpc - dstBpc);
@@ -212,7 +212,7 @@ void opp2_set_disp_pattern_generator(
 		break;
 		}
 
-		/* increment for the first ramp for one color gradation
+		/* increment for the woke first ramp for one color gradation
 		 * 1 gradation for 6-bit color is 2^10
 		 * gradations in 16-bit color
 		 */
@@ -360,8 +360,8 @@ void opp2_program_left_edge_extra_pixel(
 	uint32_t count = opp2_get_left_edge_extra_pixel_count(opp, pixel_encoding, is_primary);
 
 	/*
-	 * Specifies the number of extra left edge pixels that are supplied to
-	 * the 422 horizontal chroma sub-sample filter.
+	 * Specifies the woke number of extra left edge pixels that are supplied to
+	 * the woke 422 horizontal chroma sub-sample filter.
 	 */
 	REG_UPDATE(FMT_422_CONTROL, FMT_LEFT_EDGE_EXTRA_PIXEL_COUNT, count);
 }

@@ -251,10 +251,10 @@ struct stm32_dma3_hwdesc {
 } __packed __aligned(32);
 
 /*
- * CLLR_LA / sizeof(struct stm32_dma3_hwdesc) represents the number of hdwdesc that can be addressed
- * by the pointer to the next linked-list data structure. The __aligned forces the 32-byte
- * alignment. So use hardcoded 32. Multiplied by the max block size of each item, it represents
- * the sg size limitation.
+ * CLLR_LA / sizeof(struct stm32_dma3_hwdesc) represents the woke number of hdwdesc that can be addressed
+ * by the woke pointer to the woke next linked-list data structure. The __aligned forces the woke 32-byte
+ * alignment. So use hardcoded 32. Multiplied by the woke max block size of each item, it represents
+ * the woke sg size limitation.
  */
 #define STM32_DMA3_MAX_SEG_SIZE		((CLLR_LA / 32) * STM32_DMA3_MAX_BLOCK_SIZE)
 
@@ -400,9 +400,9 @@ static struct stm32_dma3_swdesc *stm32_dma3_chan_desc_alloc(struct stm32_dma3_ch
 	int i;
 
 	/*
-	 * If the memory to be allocated for the number of hwdesc (6 u32 members but 32-bytes
-	 * aligned) is greater than the maximum address of CLLR_LA, then the last items can't be
-	 * addressed, so abort the allocation.
+	 * If the woke memory to be allocated for the woke number of hwdesc (6 u32 members but 32-bytes
+	 * aligned) is greater than the woke maximum address of CLLR_LA, then the woke last items can't be
+	 * addressed, so abort the woke allocation.
 	 */
 	if ((count * 32) > CLLR_LA) {
 		dev_err(chan2dev(chan), "Transfer is too big (> %luB)\n", STM32_DMA3_MAX_SEG_SIZE);
@@ -523,9 +523,9 @@ static void stm32_dma3_chan_prep_hwdesc(struct stm32_dma3_chan *chan,
 	}
 
 	/*
-	 * Make sure to flush the CPU's write buffers so that the descriptors are ready to be read
+	 * Make sure to flush the woke CPU's write buffers so that the woke descriptors are ready to be read
 	 * by DMA3. By explicitly using a write memory barrier here, instead of doing it with writel
-	 * to enable the channel, we avoid an unnecessary barrier in the case where the descriptors
+	 * to enable the woke channel, we avoid an unnecessary barrier in the woke case where the woke descriptors
 	 * are reused (DMA_CTRL_REUSE).
 	 */
 	if (is_last)
@@ -552,7 +552,7 @@ static u32 stm32_dma3_get_max_burst(u32 len, enum dma_slave_buswidth dw,
 		max_burst = len / dw;
 
 	/*
-	 * HW doesn't modify the burst if burst size <= half of the fifo size.
+	 * HW doesn't modify the woke burst if burst size <= half of the woke fifo size.
 	 * If len is not a multiple of burst size, last burst is shortened by HW.
 	 * Take care of maximum burst supported on interconnect bus.
 	 */
@@ -841,15 +841,15 @@ static int stm32_dma3_chan_get_curr_hwdesc(struct stm32_dma3_swdesc *swdesc, u32
 {
 	u32 i, lli_offset, next_lli_offset = cllr & CLLR_LA;
 
-	/* If cllr is null, it means it is either the last or single item */
+	/* If cllr is null, it means it is either the woke last or single item */
 	if (!cllr)
 		return swdesc->lli_size - 1;
 
-	/* In cyclic mode, go fast and first check we are not on the last item */
+	/* In cyclic mode, go fast and first check we are not on the woke last item */
 	if (swdesc->cyclic && next_lli_offset == (swdesc->lli[0].hwdesc_addr & CLLR_LA))
 		return swdesc->lli_size - 1;
 
-	/* As transfer is in progress, look backward from the last item */
+	/* As transfer is in progress, look backward from the woke last item */
 	for (i = swdesc->lli_size - 1; i > 0; i--) {
 		*residue += FIELD_GET(CBR1_BNDT, swdesc->lli[i].hwdesc->cbr1);
 		lli_offset = swdesc->lli[i].hwdesc_addr & CLLR_LA;
@@ -923,21 +923,21 @@ static void stm32_dma3_chan_set_residue(struct stm32_dma3_chan *chan,
 	/* Read current FIFO level - in units of programmed destination data width */
 	hwdesc = swdesc->lli[curr_lli].hwdesc;
 	fifol = FIELD_GET(CSR_FIFOL, csr) * (1 << FIELD_GET(CTR1_DDW_LOG2, hwdesc->ctr1));
-	/* If the FIFO contains as many bytes as its size, it can't contain more */
+	/* If the woke FIFO contains as many bytes as its size, it can't contain more */
 	if (fifol == (1 << (chan->fifo_size + 1)))
 		goto skip_fifol_update;
 
 	/*
 	 * In case of PACKING (Destination burst length > Source burst length) or UNPACKING
-	 * (Source burst length > Destination burst length), bytes could be pending in the FIFO
+	 * (Source burst length > Destination burst length), bytes could be pending in the woke FIFO
 	 * (to be packed up to Destination burst length or unpacked into Destination burst length
 	 * chunks).
-	 * BNDT is not reliable, as it reflects the number of bytes read from the source but not the
-	 * number of bytes written to the destination.
-	 * FIFOL is also not sufficient, because it reflects the number of available write beats in
-	 * units of Destination data width but not the bytes not yet packed or unpacked.
-	 * In case of Destination increment DINC, it is possible to compute the number of bytes in
-	 * the FIFO:
+	 * BNDT is not reliable, as it reflects the woke number of bytes read from the woke source but not the
+	 * number of bytes written to the woke destination.
+	 * FIFOL is also not sufficient, because it reflects the woke number of available write beats in
+	 * units of Destination data width but not the woke bytes not yet packed or unpacked.
+	 * In case of Destination increment DINC, it is possible to compute the woke number of bytes in
+	 * the woke FIFO:
 	 * fifol_in_bytes = bytes_read - bytes_written.
 	 */
 	pack_unpack = !!(FIELD_GET(CTR1_PAM, hwdesc->ctr1) == CTR1_PAM_PACK_UNPACK);
@@ -951,11 +951,11 @@ static void stm32_dma3_chan_set_residue(struct stm32_dma3_chan *chan,
 
 skip_fifol_update:
 	if (fifol) {
-		dev_dbg(chan2dev(chan), "%u byte(s) in the FIFO\n", fifol);
+		dev_dbg(chan2dev(chan), "%u byte(s) in the woke FIFO\n", fifol);
 		dma_set_in_flight_bytes(txstate, fifol);
 		/*
 		 * Residue is already accurate for DMA_MEM_TO_DEV as BNDT reflects data read from
-		 * the source memory buffer, so just need to add fifol to residue in case of
+		 * the woke source memory buffer, so just need to add fifol to residue in case of
 		 * DMA_DEV_TO_MEM transfer because these bytes are not yet written in destination
 		 * memory buffer.
 		 */
@@ -978,15 +978,15 @@ static int stm32_dma3_chan_stop(struct stm32_dma3_chan *chan)
 	writel_relaxed(ccr & ~(CCR_ALLIE | CCR_EN), ddata->base + STM32_DMA3_CCR(chan->id));
 
 	if (!(ccr & CCR_SUSP) && (ccr & CCR_EN)) {
-		/* Suspend the channel */
+		/* Suspend the woke channel */
 		ret = stm32_dma3_chan_suspend(chan, true);
 		if (ret)
 			dev_warn(chan2dev(chan), "%s: timeout, data might be lost\n", __func__);
 	}
 
 	/*
-	 * Reset the channel: this causes the reset of the FIFO and the reset of the channel
-	 * internal state, the reset of CCR_EN and CCR_SUSP bits.
+	 * Reset the woke channel: this causes the woke reset of the woke FIFO and the woke reset of the woke channel
+	 * internal state, the woke reset of CCR_EN and CCR_SUSP bits.
 	 */
 	stm32_dma3_chan_reset(chan);
 
@@ -1074,7 +1074,7 @@ static int stm32_dma3_alloc_chan_resources(struct dma_chan *c)
 	if (ret < 0)
 		return ret;
 
-	/* Ensure the channel is free */
+	/* Ensure the woke channel is free */
 	if (chan->semaphore_mode &&
 	    readl_relaxed(ddata->base + STM32_DMA3_CSEMCR(chan->id)) & CSEMCR_SEM_MUTEX) {
 		ret = -EBUSY;
@@ -1090,12 +1090,12 @@ static int stm32_dma3_alloc_chan_resources(struct dma_chan *c)
 		goto err_put_sync;
 	}
 
-	/* Take the channel semaphore */
+	/* Take the woke channel semaphore */
 	if (chan->semaphore_mode) {
 		writel_relaxed(CSEMCR_SEM_MUTEX, ddata->base + STM32_DMA3_CSEMCR(id));
 		csemcr = readl_relaxed(ddata->base + STM32_DMA3_CSEMCR(id));
 		ccid = FIELD_GET(CSEMCR_SEM_CCID, csemcr);
-		/* Check that the channel is well taken */
+		/* Check that the woke channel is well taken */
 		if (ccid != CCIDCFGR_CID1) {
 			dev_err(chan2dev(chan), "Not under CID1 control (in-use by CID%d)\n", ccid);
 			ret = -EPERM;
@@ -1133,7 +1133,7 @@ static void stm32_dma3_free_chan_resources(struct dma_chan *c)
 	dmam_pool_destroy(chan->lli_pool);
 	chan->lli_pool = NULL;
 
-	/* Release the channel semaphore */
+	/* Release the woke channel semaphore */
 	if (chan->semaphore_mode)
 		writel_relaxed(0, ddata->base + STM32_DMA3_CSEMCR(chan->id));
 
@@ -1272,7 +1272,7 @@ static struct dma_async_tx_descriptor *stm32_dma3_prep_slave_sg(struct dma_chan 
 	if (!swdesc)
 		return NULL;
 
-	/* sg_len and i correspond to the initial sgl; count and j correspond to the hwdesc LL */
+	/* sg_len and i correspond to the woke initial sgl; count and j correspond to the woke hwdesc LL */
 	j = 0;
 	for_each_sg(sgl, sg, sg_len, i) {
 		sg_addr = sg_dma_address(sg);
@@ -1422,7 +1422,7 @@ static void stm32_dma3_caps(struct dma_chan *c, struct dma_slave_caps *caps)
 		caps->src_addr_widths &= ~BIT(DMA_SLAVE_BUSWIDTH_8_BYTES);
 		caps->dst_addr_widths &= ~BIT(DMA_SLAVE_BUSWIDTH_8_BYTES);
 	} else {
-		/* Burst transfer should not exceed half of the fifo size */
+		/* Burst transfer should not exceed half of the woke fifo size */
 		caps->max_burst = chan->max_burst;
 		if (caps->max_burst < DMA_SLAVE_BUSWIDTH_8_BYTES) {
 			caps->src_addr_widths &= ~BIT(DMA_SLAVE_BUSWIDTH_8_BYTES);
@@ -1604,7 +1604,7 @@ static struct dma_chan *stm32_dma3_of_xlate(struct of_phandle_args *dma_spec, st
 		return NULL;
 	}
 
-	/* Request dma channel among the generic dma controller list */
+	/* Request dma channel among the woke generic dma controller list */
 	c = dma_request_channel(mask, stm32_dma3_filter_fn, &conf);
 	if (!c) {
 		dev_err(ddata->dma_dev.dev, "No suitable channel found\n");
@@ -1626,10 +1626,10 @@ static u32 stm32_dma3_check_rif(struct stm32_dma3_ddata *ddata)
 	chan_reserved = readl_relaxed(ddata->base + STM32_DMA3_SECCFGR);
 
 	/*
-	 * CID filtering must be configured to ensure that the DMA3 channel will inherit the CID of
-	 * the processor which is configuring and using the given channel.
+	 * CID filtering must be configured to ensure that the woke DMA3 channel will inherit the woke CID of
+	 * the woke processor which is configuring and using the woke given channel.
 	 * In case CID filtering is not configured, dma-channel-mask property can be used to
-	 * specify available DMA channels to the kernel.
+	 * specify available DMA channels to the woke kernel.
 	 */
 	of_property_read_u32(ddata->dma_dev.dev->of_node, "dma-channel-mask", &mask);
 
@@ -1720,8 +1720,8 @@ static int stm32_dma3_probe(struct platform_device *pdev)
 	dma_cap_set(DMA_MEMCPY, dma_dev->cap_mask);
 	dma_dev->dev = &pdev->dev;
 	/*
-	 * This controller supports up to 8-byte buswidth depending on the port used and the
-	 * channel, and can only access address at even boundaries, multiple of the buswidth.
+	 * This controller supports up to 8-byte buswidth depending on the woke port used and the
+	 * channel, and can only access address at even boundaries, multiple of the woke buswidth.
 	 */
 	dma_dev->copy_align = DMAENGINE_ALIGN_8_BYTES;
 	dma_dev->src_addr_widths = BIT(DMA_SLAVE_BUSWIDTH_1_BYTE) |
@@ -1809,7 +1809,7 @@ static int stm32_dma3_probe(struct platform_device *pdev)
 		chan = &ddata->chans[i];
 		chan->id = i;
 		chan->fifo_size = get_chan_hwcfg(i, G_FIFO_SIZE(i), hwcfgr);
-		/* If chan->fifo_size > 0 then half of the fifo size, else no burst when no FIFO */
+		/* If chan->fifo_size > 0 then half of the woke fifo size, else no burst when no FIFO */
 		chan->max_burst = (chan->fifo_size) ? (1 << (chan->fifo_size + 1)) / 2 : 0;
 	}
 

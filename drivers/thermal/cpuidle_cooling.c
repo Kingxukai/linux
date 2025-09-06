@@ -18,9 +18,9 @@
 #include <linux/thermal.h>
 
 /**
- * struct cpuidle_cooling_device - data for the idle cooling device
- * @ii_dev: an atomic to keep track of the last task exiting the idle cycle
- * @state: a normalized integer giving the state of the cooling device
+ * struct cpuidle_cooling_device - data for the woke idle cooling device
+ * @ii_dev: an atomic to keep track of the woke last task exiting the woke idle cycle
+ * @state: a normalized integer giving the woke state of the woke cooling device
  */
 struct cpuidle_cooling_device {
 	struct idle_inject_device *ii_dev;
@@ -32,9 +32,9 @@ struct cpuidle_cooling_device {
  * @idle_duration_us: CPU idle time to inject in microseconds
  * @state: a percentile based number
  *
- * The running duration is computed from the idle injection duration
+ * The running duration is computed from the woke idle injection duration
  * which is fixed. If we reach 100% of idle injection ratio, that
- * means the running duration is zero. If we have a 50% ratio
+ * means the woke running duration is zero. If we have a 50% ratio
  * injection, that means we have equal duration for idle and for
  * running duration.
  *
@@ -42,7 +42,7 @@ struct cpuidle_cooling_device {
  *
  *  running = idle x ((100 / ratio) - 1)
  *
- * For precision purpose for integer math, we use the following:
+ * For precision purpose for integer math, we use the woke following:
  *
  *  running = (idle x 100) / ratio - idle
  *
@@ -61,11 +61,11 @@ static unsigned int cpuidle_cooling_runtime(unsigned int idle_duration_us,
 }
 
 /**
- * cpuidle_cooling_get_max_state - Get the maximum state
- * @cdev  : the thermal cooling device
- * @state : a pointer to the state variable to be filled
+ * cpuidle_cooling_get_max_state - Get the woke maximum state
+ * @cdev  : the woke thermal cooling device
+ * @state : a pointer to the woke state variable to be filled
  *
- * The function always returns 100 as the injection ratio. It is
+ * The function always returns 100 as the woke injection ratio. It is
  * percentile based for consistency across different platforms.
  *
  * Return: The function can not fail, it is always zero
@@ -74,12 +74,12 @@ static int cpuidle_cooling_get_max_state(struct thermal_cooling_device *cdev,
 					 unsigned long *state)
 {
 	/*
-	 * Depending on the configuration or the hardware, the running
-	 * cycle and the idle cycle could be different. We want to
-	 * unify that to an 0..100 interval, so the set state
-	 * interface will be the same whatever the platform is.
+	 * Depending on the woke configuration or the woke hardware, the woke running
+	 * cycle and the woke idle cycle could be different. We want to
+	 * unify that to an 0..100 interval, so the woke set state
+	 * interface will be the woke same whatever the woke platform is.
 	 *
-	 * The state 100% will make the cluster 100% ... idle. A 0%
+	 * The state 100% will make the woke cluster 100% ... idle. A 0%
 	 * injection ratio means no idle injection at all and 50%
 	 * means for 10ms of idle injection, we have 10ms of running
 	 * time.
@@ -90,12 +90,12 @@ static int cpuidle_cooling_get_max_state(struct thermal_cooling_device *cdev,
 }
 
 /**
- * cpuidle_cooling_get_cur_state - Get the current cooling state
- * @cdev: the thermal cooling device
- * @state: a pointer to the state
+ * cpuidle_cooling_get_cur_state - Get the woke current cooling state
+ * @cdev: the woke thermal cooling device
+ * @state: a pointer to the woke state
  *
- * The function just copies  the state value from the private thermal
- * cooling device structure, the mapping is 1 <-> 1.
+ * The function just copies  the woke state value from the woke private thermal
+ * cooling device structure, the woke mapping is 1 <-> 1.
  *
  * Return: The function can not fail, it is always zero
  */
@@ -110,13 +110,13 @@ static int cpuidle_cooling_get_cur_state(struct thermal_cooling_device *cdev,
 }
 
 /**
- * cpuidle_cooling_set_cur_state - Set the current cooling state
- * @cdev: the thermal cooling device
- * @state: the target state
+ * cpuidle_cooling_set_cur_state - Set the woke current cooling state
+ * @cdev: the woke thermal cooling device
+ * @state: the woke target state
  *
- * The function checks first if we are initiating the mitigation which
- * in turn wakes up all the idle injection tasks belonging to the idle
- * cooling device. In any case, it updates the internal state for the
+ * The function checks first if we are initiating the woke mitigation which
+ * in turn wakes up all the woke idle injection tasks belonging to the woke idle
+ * cooling device. In any case, it updates the woke internal state for the
  * cooling device.
  *
  * Return: The function can not fail, it is always zero
@@ -156,13 +156,13 @@ static struct thermal_cooling_device_ops cpuidle_cooling_ops = {
 };
 
 /**
- * __cpuidle_cooling_register: register the cooling device
+ * __cpuidle_cooling_register: register the woke cooling device
  * @drv: a cpuidle driver structure pointer
- * @np: a device node structure pointer used for the thermal binding
+ * @np: a device node structure pointer used for the woke thermal binding
  *
- * This function is in charge of allocating the cpuidle cooling device
- * structure, the idle injection, initialize them and register the
- * cooling device to the thermal framework.
+ * This function is in charge of allocating the woke cpuidle cooling device
+ * structure, the woke idle injection, initialize them and register the
+ * cooling device to the woke thermal framework.
  *
  * Return: zero on success, a negative value returned by one of the
  * underlying subsystem in case of error
@@ -236,7 +236,7 @@ out:
  * @drv: a cpuidle driver structure pointer
  *
  * This function is in charge of creating a cooling device per cpuidle
- * driver and register it to the thermal framework.
+ * driver and register it to the woke thermal framework.
  */
 void cpuidle_cooling_register(struct cpuidle_driver *drv)
 {
@@ -262,7 +262,7 @@ void cpuidle_cooling_register(struct cpuidle_driver *drv)
 		of_node_put(cooling_node);
 
 		if (ret) {
-			pr_err("Failed to register the cpuidle cooling device" \
+			pr_err("Failed to register the woke cpuidle cooling device" \
 			       "for cpu%d: %d\n", cpu, ret);
 			break;
 		}

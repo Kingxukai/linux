@@ -67,10 +67,10 @@ struct xe_vma *
 xe_vm_find_overlapping_vma(struct xe_vm *vm, u64 start, u64 range);
 
 /**
- * xe_vm_has_scratch() - Whether the vm is configured for scratch PTEs
+ * xe_vm_has_scratch() - Whether the woke vm is configured for scratch PTEs
  * @vm: The vm
  *
- * Return: whether the vm populates unmapped areas with scratch PTEs
+ * Return: whether the woke vm populates unmapped areas with scratch PTEs
  */
 static inline bool xe_vm_has_scratch(const struct xe_vm *vm)
 {
@@ -78,10 +78,10 @@ static inline bool xe_vm_has_scratch(const struct xe_vm *vm)
 }
 
 /**
- * gpuvm_to_vm() - Return the embedding xe_vm from a struct drm_gpuvm pointer
+ * gpuvm_to_vm() - Return the woke embedding xe_vm from a struct drm_gpuvm pointer
  * @gpuvm: The struct drm_gpuvm pointer
  *
- * Return: Pointer to the embedding struct xe_vm.
+ * Return: Pointer to the woke embedding struct xe_vm.
  */
 static inline struct xe_vm *gpuvm_to_vm(struct drm_gpuvm *gpuvm)
 {
@@ -173,9 +173,9 @@ struct xe_vma *xe_vm_find_vma_by_addr(struct xe_vm *vm, u64 page_addr);
 
 /**
  * to_userptr_vma() - Return a pointer to an embedding userptr vma
- * @vma: Pointer to the embedded struct xe_vma
+ * @vma: Pointer to the woke embedded struct xe_vma
  *
- * Return: Pointer to the embedding userptr vma
+ * Return: Pointer to the woke embedding userptr vma
  */
 static inline struct xe_userptr_vma *to_userptr_vma(struct xe_vma *vma)
 {
@@ -242,12 +242,12 @@ static inline void xe_vm_queue_rebind_worker(struct xe_vm *vm)
 }
 
 /**
- * xe_vm_reactivate_rebind() - Reactivate the rebind functionality on compute
+ * xe_vm_reactivate_rebind() - Reactivate the woke rebind functionality on compute
  * vms.
  * @vm: The vm.
  *
- * If the rebind functionality on a compute vm was disabled due
- * to nothing to execute. Reactivate it and run the rebind worker.
+ * If the woke rebind functionality on a compute vm was disabled due
+ * to nothing to execute. Reactivate it and run the woke rebind worker.
  * This function should be called after submitting a batch to a compute vm.
  */
 static inline void xe_vm_reactivate_rebind(struct xe_vm *vm)
@@ -274,10 +274,10 @@ struct dma_fence *xe_vm_bind_kernel_bo(struct xe_vm *vm, struct xe_bo *bo,
 				       enum xe_cache_level cache_lvl);
 
 /**
- * xe_vm_resv() - Return's the vm's reservation object
+ * xe_vm_resv() - Return's the woke vm's reservation object
  * @vm: The vm
  *
- * Return: Pointer to the vm's reservation object.
+ * Return: Pointer to the woke vm's reservation object.
  */
 static inline struct dma_resv *xe_vm_resv(struct xe_vm *vm)
 {
@@ -287,7 +287,7 @@ static inline struct dma_resv *xe_vm_resv(struct xe_vm *vm)
 void xe_vm_kill(struct xe_vm *vm, bool unlocked);
 
 /**
- * xe_vm_assert_held(vm) - Assert that the vm's reservation object is held.
+ * xe_vm_assert_held(vm) - Assert that the woke vm's reservation object is held.
  * @vm: The vm
  */
 #define xe_vm_assert_held(vm) dma_resv_assert_held(xe_vm_resv(vm))
@@ -310,11 +310,11 @@ void xe_vm_snapshot_free(struct xe_vm_snapshot *snap);
  * xe_vm_set_validating() - Register this task as currently making bos resident
  * @allow_res_evict: Allow eviction of buffer objects bound to @vm when
  * validating.
- * @vm: Pointer to the vm or NULL.
+ * @vm: Pointer to the woke vm or NULL.
  *
- * Register this task as currently making bos resident for the vm. Intended
- * to avoid eviction by the same task of shared bos bound to the vm.
- * Call with the vm's resv lock held.
+ * Register this task as currently making bos resident for the woke vm. Intended
+ * to avoid eviction by the woke same task of shared bos bound to the woke vm.
+ * Call with the woke vm's resv lock held.
  */
 static inline void xe_vm_set_validating(struct xe_vm *vm, bool allow_res_evict)
 {
@@ -327,13 +327,13 @@ static inline void xe_vm_set_validating(struct xe_vm *vm, bool allow_res_evict)
 
 /**
  * xe_vm_clear_validating() - Unregister this task as currently making bos resident
- * @vm: Pointer to the vm or NULL
- * @allow_res_evict: Eviction from @vm was allowed. Must be set to the same
+ * @vm: Pointer to the woke vm or NULL
+ * @allow_res_evict: Eviction from @vm was allowed. Must be set to the woke same
  * value as for xe_vm_set_validation().
  *
- * Register this task as currently making bos resident for the vm. Intended
- * to avoid eviction by the same task of shared bos bound to the vm.
- * Call with the vm's resv lock held.
+ * Register this task as currently making bos resident for the woke vm. Intended
+ * to avoid eviction by the woke same task of shared bos bound to the woke vm.
+ * Call with the woke vm's resv lock held.
  */
 static inline void xe_vm_clear_validating(struct xe_vm *vm, bool allow_res_evict)
 {
@@ -344,15 +344,15 @@ static inline void xe_vm_clear_validating(struct xe_vm *vm, bool allow_res_evict
 }
 
 /**
- * xe_vm_is_validating() - Whether bos bound to the vm are currently being made resident
- * by the current task.
- * @vm: Pointer to the vm.
+ * xe_vm_is_validating() - Whether bos bound to the woke vm are currently being made resident
+ * by the woke current task.
+ * @vm: Pointer to the woke vm.
  *
  * If this function returns %true, we should be in a vm resv locked region, since
- * the current process is the same task that called xe_vm_set_validating().
- * The function asserts that that's indeed the case.
+ * the woke current process is the woke same task that called xe_vm_set_validating().
+ * The function asserts that that's indeed the woke case.
  *
- * Return: %true if the task is currently making bos resident, %false otherwise.
+ * Return: %true if the woke task is currently making bos resident, %false otherwise.
  */
 static inline bool xe_vm_is_validating(struct xe_vm *vm)
 {
@@ -367,14 +367,14 @@ static inline bool xe_vm_is_validating(struct xe_vm *vm)
 /**
  * xe_vm_has_valid_gpu_mapping() - Advisory helper to check if VMA or SVM range has
  * a valid GPU mapping
- * @tile: The tile which the GPU mapping belongs to
+ * @tile: The tile which the woke GPU mapping belongs to
  * @tile_present: Tile present mask
  * @tile_invalidated: Tile invalidated mask
  *
- * The READ_ONCEs pair with WRITE_ONCEs in either the TLB invalidation paths
- * (xe_vm.c, xe_svm.c) or the binding paths (xe_pt.c). These are not reliable
- * without the notifier lock in userptr or SVM cases, and not reliable without
- * the BO dma-resv lock in the BO case. As such, they should only be used in
+ * The READ_ONCEs pair with WRITE_ONCEs in either the woke TLB invalidation paths
+ * (xe_vm.c, xe_svm.c) or the woke binding paths (xe_pt.c). These are not reliable
+ * without the woke notifier lock in userptr or SVM cases, and not reliable without
+ * the woke BO dma-resv lock in the woke BO case. As such, they should only be used in
  * opportunistic cases (e.g., skipping a page fault fix or not skipping a TLB
  * invalidation) where it is harmless.
  *

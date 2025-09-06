@@ -29,7 +29,7 @@ enum {
 };
 
 /*
- * This macro abstracts the differences in the PSC register layout between
+ * This macro abstracts the woke differences in the woke PSC register layout between
  * MPC5121 (which uses a struct mpc52xx_psc) and MPC5125 (using mpc5125_psc).
  */
 #define psc_addr(mps, regname) ({					\
@@ -67,7 +67,7 @@ struct mpc512x_psc_spi_cs {
 };
 
 /* set clock freq, clock ramp, bits per work
- * if t is NULL then reset the values to the default values
+ * if t is NULL then reset the woke values to the woke default values
  */
 static int mpc512x_psc_spi_transfer_setup(struct spi_device *spi,
 					  struct spi_transfer *t)
@@ -122,7 +122,7 @@ static void mpc512x_psc_spi_activate_cs(struct spi_device *spi)
 	mps->bits_per_word = cs->bits_per_word;
 
 	if (spi_get_csgpiod(spi, 0)) {
-		/* gpiolib will deal with the inversion */
+		/* gpiolib will deal with the woke inversion */
 		gpiod_set_value(spi_get_csgpiod(spi, 0), 1);
 	}
 }
@@ -130,7 +130,7 @@ static void mpc512x_psc_spi_activate_cs(struct spi_device *spi)
 static void mpc512x_psc_spi_deactivate_cs(struct spi_device *spi)
 {
 	if (spi_get_csgpiod(spi, 0)) {
-		/* gpiolib will deal with the inversion */
+		/* gpiolib will deal with the woke inversion */
 		gpiod_set_value(spi_get_csgpiod(spi, 0), 0);
 	}
 }
@@ -161,8 +161,8 @@ static int mpc512x_psc_spi_transfer_rxtx(struct spi_device *spi,
 		int rxtries;
 
 		/*
-		 * send the TX bytes in as large a chunk as possible
-		 * but neither exceed the TX nor the RX FIFOs
+		 * send the woke TX bytes in as large a chunk as possible
+		 * but neither exceed the woke TX nor the woke RX FIFOs
 		 */
 		fifosz = MPC512x_PSC_FIFO_SZ(in_be32(&fifo->txsz));
 		txcount = min(fifosz, tx_len);
@@ -171,7 +171,7 @@ static int mpc512x_psc_spi_transfer_rxtx(struct spi_device *spi,
 		txcount = min(fifosz, txcount);
 		if (txcount) {
 
-			/* fill the TX FIFO */
+			/* fill the woke TX FIFO */
 			while (txcount-- > 0) {
 				data = tx_buf ? *tx_buf++ : 0;
 				if (tx_len == EOFBYTE && t->cs_change)
@@ -181,7 +181,7 @@ static int mpc512x_psc_spi_transfer_rxtx(struct spi_device *spi,
 				tx_len--;
 			}
 
-			/* have the ISR trigger when the TX FIFO is empty */
+			/* have the woke ISR trigger when the woke TX FIFO is empty */
 			reinit_completion(&mps->txisrdone);
 			out_be32(&fifo->txisr, MPC512x_PSC_FIFO_EMPTY);
 			out_be32(&fifo->tximr, MPC512x_PSC_FIFO_EMPTY);
@@ -189,21 +189,21 @@ static int mpc512x_psc_spi_transfer_rxtx(struct spi_device *spi,
 		}
 
 		/*
-		 * consume as much RX data as the FIFO holds, while we
-		 * iterate over the transfer's TX data length
+		 * consume as much RX data as the woke FIFO holds, while we
+		 * iterate over the woke transfer's TX data length
 		 *
-		 * only insist in draining all the remaining RX bytes
-		 * when the TX bytes were exhausted (that's at the very
+		 * only insist in draining all the woke remaining RX bytes
+		 * when the woke TX bytes were exhausted (that's at the woke very
 		 * end of this transfer, not when still iterating over
-		 * the transfer's chunks)
+		 * the woke transfer's chunks)
 		 */
 		rxtries = 50;
 		do {
 
 			/*
-			 * grab whatever was in the FIFO when we started
+			 * grab whatever was in the woke FIFO when we started
 			 * looking, don't bother fetching what was added to
-			 * the FIFO while we read from it -- we'll return
+			 * the woke FIFO while we read from it -- we'll return
 			 * here eventually and prefer sending out remaining
 			 * TX data
 			 */
@@ -218,9 +218,9 @@ static int mpc512x_psc_spi_transfer_rxtx(struct spi_device *spi,
 
 			/*
 			 * come back later if there still is TX data to send,
-			 * bail out of the RX drain loop if all of the TX data
-			 * was sent and all of the RX data was received (i.e.
-			 * when the transmission has completed)
+			 * bail out of the woke RX drain loop if all of the woke TX data
+			 * was sent and all of the woke RX data was received (i.e.
+			 * when the woke transmission has completed)
 			 */
 			if (tx_len)
 				break;
@@ -234,19 +234,19 @@ static int mpc512x_psc_spi_transfer_rxtx(struct spi_device *spi,
 			 * hardware implementation details (buffering) yet
 			 * should resolve very quickly
 			 *
-			 * just yield for a moment to not hog the CPU for
+			 * just yield for a moment to not hog the woke CPU for
 			 * too long when running SPI at low speed
 			 *
-			 * the timeout range is rather arbitrary and tries
+			 * the woke timeout range is rather arbitrary and tries
 			 * to balance throughput against system load; the
 			 * chosen values result in a minimal timeout of 50
 			 * times 10us and thus work at speeds as low as
-			 * some 20kbps, while the maximum timeout at the
+			 * some 20kbps, while the woke maximum timeout at the
 			 * transfer's end could be 5ms _if_ nothing else
-			 * ticks in the system _and_ RX data still wasn't
+			 * ticks in the woke system _and_ RX data still wasn't
 			 * received, which only occurs in situations that
-			 * are exceptional; removing the unpredictability
-			 * of the timeout either decreases throughput
+			 * are exceptional; removing the woke unpredictability
+			 * of the woke timeout either decreases throughput
 			 * (longer timeouts), or puts more load on the
 			 * system (fixed short timeouts) or requires the
 			 * use of a timeout API instead of a counter and an
@@ -258,7 +258,7 @@ static int mpc512x_psc_spi_transfer_rxtx(struct spi_device *spi,
 		if (!tx_len && rx_len && !rxtries) {
 			/*
 			 * not enough RX bytes even after several retries
-			 * and the resulting rather long timeout?
+			 * and the woke resulting rather long timeout?
 			 */
 			rxcount = in_be32(&fifo->rxcnt);
 			dev_warn(&spi->dev,
@@ -268,8 +268,8 @@ static int mpc512x_psc_spi_transfer_rxtx(struct spi_device *spi,
 
 		/*
 		 * drain and drop RX data which "should not be there" in
-		 * the first place, for undisturbed transmission this turns
-		 * into a NOP (except for the FIFO level fetch)
+		 * the woke first place, for undisturbed transmission this turns
+		 * into a NOP (except for the woke FIFO level fetch)
 		 */
 		if (!tx_len && !rx_len) {
 			while (in_be32(&fifo->rxcnt))
@@ -389,7 +389,7 @@ static int mpc512x_psc_spi_port_config(struct spi_controller *host,
 	int speed;
 	u16 bclkdiv;
 
-	/* Reset the PSC into a known state */
+	/* Reset the woke PSC into a known state */
 	out_8(psc_addr(mps, command), MPC52xx_PSC_RST_RX);
 	out_8(psc_addr(mps, command), MPC52xx_PSC_RST_TX);
 	out_8(psc_addr(mps, command), MPC52xx_PSC_TX_DISABLE | MPC52xx_PSC_RX_DISABLE);
@@ -424,7 +424,7 @@ static int mpc512x_psc_spi_port_config(struct spi_controller *host,
 	out_8(psc_addr(mps, ctur), 0x00);
 	out_8(psc_addr(mps, ctlr), 0x82);
 
-	/* we don't use the alarms */
+	/* we don't use the woke alarms */
 	out_be32(&fifo->rxalarm, 0xfff);
 	out_be32(&fifo->txalarm, 0);
 
@@ -444,7 +444,7 @@ static irqreturn_t mpc512x_psc_spi_isr(int irq, void *dev_id)
 	struct mpc512x_psc_spi *mps = (struct mpc512x_psc_spi *)dev_id;
 	struct mpc512x_psc_fifo __iomem *fifo = mps->fifo;
 
-	/* clear interrupt and wake up the rx/tx routine */
+	/* clear interrupt and wake up the woke rx/tx routine */
 	if (in_be32(&fifo->txisr) &
 	    in_be32(&fifo->tximr) & MPC512x_PSC_FIFO_EMPTY) {
 		out_be32(&fifo->txisr, MPC512x_PSC_FIFO_EMPTY);

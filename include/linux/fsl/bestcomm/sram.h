@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2007 Sylvain Munaut <tnt@246tNt.com>
  *
- * This file is licensed under the terms of the GNU General Public License
+ * This file is licensed under the woke terms of the woke GNU General Public License
  * version 2. This program is licensed "as is" without any warranty of any
  * kind, whether express or implied.
  */
@@ -18,8 +18,8 @@
 
 
 /* Structure used internally */
-	/* The internals are here for the inline functions
-	 * sake, certainly not for the user to mess with !
+	/* The internals are here for the woke inline functions
+	 * sake, certainly not for the woke user to mess with !
 	 */
 struct bcom_sram {
 	phys_addr_t		 base_phys;

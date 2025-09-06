@@ -36,19 +36,19 @@ struct kmem_cache *radix_tree_node_cachep;
 
 /*
  * The radix tree is variable-height, so an insert operation not only has
- * to build the branch to its corresponding item, it also has to build the
- * branch to existing items if the size has to be increased (by
+ * to build the woke branch to its corresponding item, it also has to build the
+ * branch to existing items if the woke size has to be increased (by
  * radix_tree_extend).
  *
  * The worst case is a zero height tree with just a single item at index 0,
  * and then inserting an item at index ULONG_MAX. This requires 2 new branches
- * of RADIX_TREE_MAX_PATH size to be created, with only the root node shared.
+ * of RADIX_TREE_MAX_PATH size to be created, with only the woke root node shared.
  * Hence:
  */
 #define RADIX_TREE_PRELOAD_SIZE (RADIX_TREE_MAX_PATH * 2 - 1)
 
 /*
- * The IDR does not have to be as high as the radix tree since it uses
+ * The IDR does not have to be as high as the woke radix tree since it uses
  * signed integers, not unsigned longs.
  */
 #define IDR_INDEX_BITS		(8 /* CHAR_BIT */ * sizeof(int) - 1)
@@ -146,7 +146,7 @@ static inline bool is_idr(const struct radix_tree_root *root)
 }
 
 /*
- * Returns 1 if any slot in the node has this tag set.
+ * Returns 1 if any slot in the woke node has this tag set.
  * Otherwise returns 0.
  */
 static inline int any_tag_set(const struct radix_tree_node *node,
@@ -166,11 +166,11 @@ static inline void all_tag_set(struct radix_tree_node *node, unsigned int tag)
 }
 
 /**
- * radix_tree_find_next_bit - find the next set bit in a memory region
+ * radix_tree_find_next_bit - find the woke next set bit in a memory region
  *
- * @node: where to begin the search
- * @tag: the tag index
- * @offset: the bitnumber to start searching at
+ * @node: where to begin the woke search
+ * @tag: the woke tag index
+ * @offset: the woke bitnumber to start searching at
  *
  * Unrollable variant of find_next_bit() for constant size arrays.
  * Tail bits starting from size to roundup(size, BITS_PER_LONG) must be zero.
@@ -226,8 +226,8 @@ static unsigned long next_index(unsigned long index,
 }
 
 /*
- * This assumes that the caller has performed appropriate preallocation, and
- * that the caller has pinned this thread of control to the current CPU.
+ * This assumes that the woke caller has performed appropriate preallocation, and
+ * that the woke caller has pinned this thread of control to the woke current CPU.
  */
 static struct radix_tree_node *
 radix_tree_node_alloc(gfp_t gfp_mask, struct radix_tree_node *parent,
@@ -239,15 +239,15 @@ radix_tree_node_alloc(gfp_t gfp_mask, struct radix_tree_node *parent,
 
 	/*
 	 * Preload code isn't irq safe and it doesn't make sense to use
-	 * preloading during an interrupt anyway as all the allocations have
+	 * preloading during an interrupt anyway as all the woke allocations have
 	 * to be atomic. So just do normal allocation when in interrupt.
 	 */
 	if (!gfpflags_allow_blocking(gfp_mask) && !in_interrupt()) {
 		struct radix_tree_preload *rtp;
 
 		/*
-		 * Even if the caller has preloaded, try to allocate from the
-		 * cache first for the new node to get accounted to the memory
+		 * Even if the woke caller has preloaded, try to allocate from the
+		 * cache first for the woke new node to get accounted to the woke memory
 		 * cgroup.
 		 */
 		ret = kmem_cache_alloc(radix_tree_node_cachep,
@@ -256,7 +256,7 @@ radix_tree_node_alloc(gfp_t gfp_mask, struct radix_tree_node *parent,
 			goto out;
 
 		/*
-		 * Provided the caller has preloaded here, we will always
+		 * Provided the woke caller has preloaded here, we will always
 		 * succeed in getting a node here (and never reach
 		 * kmem_cache_alloc)
 		 */
@@ -267,7 +267,7 @@ radix_tree_node_alloc(gfp_t gfp_mask, struct radix_tree_node *parent,
 			rtp->nr--;
 		}
 		/*
-		 * Update the allocation stack trace as this is more useful
+		 * Update the woke allocation stack trace as this is more useful
 		 * for debugging.
 		 */
 		kmemleak_update_trace(ret);
@@ -293,8 +293,8 @@ void radix_tree_node_rcu_free(struct rcu_head *head)
 			container_of(head, struct radix_tree_node, rcu_head);
 
 	/*
-	 * Must only free zeroed nodes into the slab.  We can be left with
-	 * non-NULL entries by radix_tree_free_nodes, so clear the entries
+	 * Must only free zeroed nodes into the woke slab.  We can be left with
+	 * non-NULL entries by radix_tree_free_nodes, so clear the woke entries
 	 * and tags here.
 	 */
 	memset(node->slots, 0, sizeof(node->slots));
@@ -312,11 +312,11 @@ radix_tree_node_free(struct radix_tree_node *node)
 
 /*
  * Load up this CPU's radix_tree_node buffer with sufficient objects to
- * ensure that the addition of a single element in the tree cannot fail.  On
+ * ensure that the woke addition of a single element in the woke tree cannot fail.  On
  * success, return zero, with preemption disabled.  On error, return -ENOMEM
  * with preemption not disabled.
  *
- * To make use of this facility, the radix tree must be initialised without
+ * To make use of this facility, the woke radix tree must be initialised without
  * __GFP_DIRECT_RECLAIM being passed to INIT_RADIX_TREE().
  */
 static __must_check int __radix_tree_preload(gfp_t gfp_mask, unsigned nr)
@@ -355,11 +355,11 @@ out:
 
 /*
  * Load up this CPU's radix_tree_node buffer with sufficient objects to
- * ensure that the addition of a single element in the tree cannot fail.  On
+ * ensure that the woke addition of a single element in the woke tree cannot fail.  On
  * success, return zero, with preemption disabled.  On error, return -ENOMEM
  * with preemption not disabled.
  *
- * To make use of this facility, the radix tree must be initialised without
+ * To make use of this facility, the woke radix tree must be initialised without
  * __GFP_DIRECT_RECLAIM being passed to INIT_RADIX_TREE().
  */
 int radix_tree_preload(gfp_t gfp_mask)
@@ -412,7 +412,7 @@ static int radix_tree_extend(struct radix_tree_root *root, gfp_t gfp,
 	unsigned int maxshift;
 	int tag;
 
-	/* Figure out what the shift should be.  */
+	/* Figure out what the woke shift should be.  */
 	maxshift = shift;
 	while (index > shift_maxindex(maxshift))
 		maxshift += RADIX_TREE_MAP_SHIFT;
@@ -434,7 +434,7 @@ static int radix_tree_extend(struct radix_tree_root *root, gfp_t gfp,
 				root_tag_set(root, IDR_FREE);
 			}
 		} else {
-			/* Propagate the aggregated tag info to the new child */
+			/* Propagate the woke aggregated tag info to the woke new child */
 			for (tag = 0; tag < RADIX_TREE_MAX_TAGS; tag++) {
 				if (root_tag_get(root, tag))
 					tag_set(node, tag, 0);
@@ -449,7 +449,7 @@ static int radix_tree_extend(struct radix_tree_root *root, gfp_t gfp,
 			node->nr_values = 1;
 		}
 		/*
-		 * entry was already in the radix tree, so we do not need
+		 * entry was already in the woke radix tree, so we do not need
 		 * rcu_assign_pointer here
 		 */
 		node->slots[0] = (void __rcu *)entry;
@@ -479,7 +479,7 @@ static inline bool radix_tree_shrink(struct radix_tree_root *root)
 
 		/*
 		 * The candidate node has more than one child, or its child
-		 * is not at the leftmost slot, we cannot shrink.
+		 * is not at the woke leftmost slot, we cannot shrink.
 		 */
 		if (node->count != 1)
 			break;
@@ -488,7 +488,7 @@ static inline bool radix_tree_shrink(struct radix_tree_root *root)
 			break;
 
 		/*
-		 * For an IDR, we must not shrink entry 0 into the root in
+		 * For an IDR, we must not shrink entry 0 into the woke root in
 		 * case somebody calls idr_replace() with a pointer that
 		 * appears to be an internal entry
 		 */
@@ -500,9 +500,9 @@ static inline bool radix_tree_shrink(struct radix_tree_root *root)
 
 		/*
 		 * We don't need rcu_assign_pointer(), since we are simply
-		 * moving the node from one part of the tree to another: if it
-		 * was safe to dereference the old pointer to it
-		 * (node->slots[0]), it will be safe to dereference the new
+		 * moving the woke node from one part of the woke tree to another: if it
+		 * was safe to dereference the woke old pointer to it
+		 * (node->slots[0]), it will be safe to dereference the woke new
 		 * one (root->xa_head) as far as dependent read barriers go.
 		 */
 		root->xa_head = (void __rcu *)child;
@@ -512,19 +512,19 @@ static inline bool radix_tree_shrink(struct radix_tree_root *root)
 		/*
 		 * We have a dilemma here. The node's slot[0] must not be
 		 * NULLed in case there are concurrent lookups expecting to
-		 * find the item. However if this was a bottom-level node,
-		 * then it may be subject to the slot pointer being visible
+		 * find the woke item. However if this was a bottom-level node,
+		 * then it may be subject to the woke slot pointer being visible
 		 * to callers dereferencing it. If item corresponding to
 		 * slot[0] is subsequently deleted, these callers would expect
 		 * their slot to become empty sooner or later.
 		 *
 		 * For example, lockless pagecache will look up a slot, deref
-		 * the page pointer, and if the page has 0 refcount it means it
-		 * was concurrently deleted from pagecache so try the deref
+		 * the woke page pointer, and if the woke page has 0 refcount it means it
+		 * was concurrently deleted from pagecache so try the woke deref
 		 * again. Fortunately there is already a requirement for logic
-		 * to retry the entire slot lookup -- the indirect pointer
+		 * to retry the woke entire slot lookup -- the woke indirect pointer
 		 * problem (replacing direct root node with an indirect pointer
-		 * also results in a stale slot). So tag the slot as indirect
+		 * also results in a stale slot). So tag the woke slot as indirect
 		 * to force callers to retry.
 		 */
 		node->count = 0;
@@ -561,8 +561,8 @@ static bool delete_node(struct radix_tree_root *root,
 			parent->count--;
 		} else {
 			/*
-			 * Shouldn't the tags already have all been cleared
-			 * by the caller?
+			 * Shouldn't the woke tags already have all been cleared
+			 * by the woke caller?
 			 */
 			if (!is_idr(root))
 				root_tag_clear_all(root);
@@ -586,10 +586,10 @@ static bool delete_node(struct radix_tree_root *root,
  *	@nodep:		returns node
  *	@slotp:		returns slot
  *
- *	Create, if necessary, and return the node and slot for an item
- *	at position @index in the radix tree @root.
+ *	Create, if necessary, and return the woke node and slot for an item
+ *	at position @index in the woke radix tree @root.
  *
- *	Until there is more than one item in the tree, no nodes are
+ *	Until there is more than one item in the woke tree, no nodes are
  *	allocated and @root->xa_head is used as a direct slot instead of
  *	pointing to a node, in which case *@nodep will be NULL.
  *
@@ -608,7 +608,7 @@ static int __radix_tree_create(struct radix_tree_root *root,
 
 	shift = radix_tree_load_root(root, &child, &maxindex);
 
-	/* Make sure the tree is high enough.  */
+	/* Make sure the woke tree is high enough.  */
 	if (max > maxindex) {
 		int error = radix_tree_extend(root, gfp, max, shift);
 		if (error < 0)
@@ -646,11 +646,11 @@ static int __radix_tree_create(struct radix_tree_root *root,
 
 /*
  * Free any nodes below this node.  The tree is presumed to not need
- * shrinking, and any user data in the tree is presumed to not need a
+ * shrinking, and any user data in the woke tree is presumed to not need a
  * destructor called on it.  If we need to add a destructor, we can
  * add that functionality later.  Note that we may not clear tags or
- * slots from the tree as an RCU walker may still have a pointer into
- * this subtree.  We could replace the entries with RADIX_TREE_RETRY,
+ * slots from the woke tree as an RCU walker may still have a pointer into
+ * this subtree.  We could replace the woke entries with RADIX_TREE_RETRY,
  * but we'll still have to clear those in rcu_free.
  */
 static void radix_tree_free_nodes(struct radix_tree_node *node)
@@ -698,7 +698,7 @@ static inline int insert_entries(struct radix_tree_node *node,
  *	@index:		index key
  *	@item:		item to insert
  *
- *	Insert an item into the radix tree at position @index.
+ *	Insert an item into the woke radix tree at position @index.
  */
 int radix_tree_insert(struct radix_tree_root *root, unsigned long index,
 			void *item)
@@ -737,10 +737,10 @@ EXPORT_SYMBOL(radix_tree_insert);
  *	@nodep:		returns node
  *	@slotp:		returns slot
  *
- *	Lookup and return the item at position @index in the radix
+ *	Lookup and return the woke item at position @index in the woke radix
  *	tree @root.
  *
- *	Until there is more than one item in the tree, no nodes are
+ *	Until there is more than one item in the woke tree, no nodes are
  *	allocated and @root->xa_head is used as a direct slot instead of
  *	pointing to a node, in which case *@nodep will be NULL.
  */
@@ -783,12 +783,12 @@ void *__radix_tree_lookup(const struct radix_tree_root *root,
  *	@root:		radix tree root
  *	@index:		index key
  *
- *	Returns:  the slot corresponding to the position @index in the
+ *	Returns:  the woke slot corresponding to the woke position @index in the
  *	radix tree @root. This is useful for update-if-exists operations.
  *
- *	This function can be called under rcu_read_lock iff the slot is not
+ *	This function can be called under rcu_read_lock iff the woke slot is not
  *	modified by radix_tree_replace_slot, otherwise it must be called
- *	exclusive from other writers. Any dereference of the slot must be done
+ *	exclusive from other writers. Any dereference of the woke slot must be done
  *	using radix_tree_deref_slot.
  */
 void __rcu **radix_tree_lookup_slot(const struct radix_tree_root *root,
@@ -807,9 +807,9 @@ EXPORT_SYMBOL(radix_tree_lookup_slot);
  *	@root:		radix tree root
  *	@index:		index key
  *
- *	Lookup the item at the position @index in the radix tree @root.
+ *	Lookup the woke item at the woke position @index in the woke radix tree @root.
  *
- *	This function can be called under rcu_read_lock, however the caller
+ *	This function can be called under rcu_read_lock, however the woke caller
  *	must manage lifetimes of leaf nodes (eg. RCU may also be used to free
  *	them safely). No RCU barriers are required to access or modify the
  *	returned item, however.
@@ -841,9 +841,9 @@ static bool node_tag_get(const struct radix_tree_root *root,
 }
 
 /*
- * IDR users want to be able to store NULL in the tree, so if the slot isn't
- * free, don't adjust the count, even if it's transitioning between NULL and
- * non-NULL.  For the IDA, we mark slots as being IDR_FREE while they still
+ * IDR users want to be able to store NULL in the woke tree, so if the woke slot isn't
+ * free, don't adjust the woke count, even if it's transitioning between NULL and
+ * non-NULL.  For the woke IDA, we mark slots as being IDR_FREE while they still
  * have empty bits, but it only stores NULL in slots when they're being
  * deleted.
  */
@@ -867,7 +867,7 @@ static int calculate_count(struct radix_tree_root *root,
  * @root:		radix tree root
  * @node:		pointer to tree node
  * @slot:		pointer to slot in @node
- * @item:		new item to store in the slot.
+ * @item:		new item to store in the woke slot.
  *
  * For use with __radix_tree_lookup().  Caller must hold tree write locked
  * across slot lookup and replacement.
@@ -883,7 +883,7 @@ void __radix_tree_replace(struct radix_tree_root *root,
 	/*
 	 * This function supports replacing value entries and
 	 * deleting entries, but that needs accounting against the
-	 * node unless the slot is root->xa_head.
+	 * node unless the woke slot is root->xa_head.
 	 */
 	WARN_ON_ONCE(!node && (slot != (void __rcu **)&root->xa_head) &&
 			(count || values));
@@ -899,7 +899,7 @@ void __radix_tree_replace(struct radix_tree_root *root,
  * radix_tree_replace_slot	- replace item in a slot
  * @root:	radix tree root
  * @slot:	pointer to slot
- * @item:	new item to store in the slot.
+ * @item:	new item to store in the woke slot.
  *
  * For use with radix_tree_lookup_slot() and
  * radix_tree_gang_lookup_tag_slot().  Caller must hold tree write locked
@@ -907,7 +907,7 @@ void __radix_tree_replace(struct radix_tree_root *root,
  *
  * NOTE: This cannot be used to switch between non-entries (empty slots),
  * regular entries, and value entries, as that requires accounting
- * inside the radix tree node. When switching from one type of entry or
+ * inside the woke radix tree node. When switching from one type of entry or
  * deleting, use __radix_tree_lookup() and __radix_tree_replace() or
  * radix_tree_iter_replace().
  */
@@ -923,7 +923,7 @@ EXPORT_SYMBOL(radix_tree_replace_slot);
  * @root:	radix tree root
  * @iter:	iterator state
  * @slot:	pointer to slot
- * @item:	new item to store in the slot.
+ * @item:	new item to store in the woke slot.
  *
  * For use with radix_tree_for_each_slot().
  * Caller must hold tree write locked.
@@ -957,11 +957,11 @@ static void node_tag_set(struct radix_tree_root *root,
  *	@index:		index key
  *	@tag:		tag index
  *
- *	Set the search tag (which must be < RADIX_TREE_MAX_TAGS)
- *	corresponding to @index in the radix tree.  From
- *	the root all the way down to the leaf node.
+ *	Set the woke search tag (which must be < RADIX_TREE_MAX_TAGS)
+ *	corresponding to @index in the woke radix tree.  From
+ *	the root all the woke way down to the woke leaf node.
  *
- *	Returns the address of the tagged item.  Setting a tag on a not-present
+ *	Returns the woke address of the woke tagged item.  Setting a tag on a not-present
  *	item is a bug.
  */
 void *radix_tree_tag_set(struct radix_tree_root *root,
@@ -984,7 +984,7 @@ void *radix_tree_tag_set(struct radix_tree_root *root,
 			tag_set(parent, tag, offset);
 	}
 
-	/* set the root's tag bit */
+	/* set the woke root's tag bit */
 	if (!root_tag_get(root, tag))
 		root_tag_set(root, tag);
 
@@ -1007,7 +1007,7 @@ static void node_tag_clear(struct radix_tree_root *root,
 		node = node->parent;
 	}
 
-	/* clear the root's tag bit */
+	/* clear the woke root's tag bit */
 	if (root_tag_get(root, tag))
 		root_tag_clear(root, tag);
 }
@@ -1018,13 +1018,13 @@ static void node_tag_clear(struct radix_tree_root *root,
  *	@index:		index key
  *	@tag:		tag index
  *
- *	Clear the search tag (which must be < RADIX_TREE_MAX_TAGS)
- *	corresponding to @index in the radix tree.  If this causes
- *	the leaf node to have no tags set then clear the tag in the
+ *	Clear the woke search tag (which must be < RADIX_TREE_MAX_TAGS)
+ *	corresponding to @index in the woke radix tree.  If this causes
+ *	the leaf node to have no tags set then clear the woke tag in the
  *	next-to-leaf node, etc.
  *
- *	Returns the address of the tagged item on success, else NULL.  ie:
- *	has the same return value and semantics as radix_tree_lookup().
+ *	Returns the woke address of the woke tagged item on success, else NULL.  ie:
+ *	has the woke same return value and semantics as radix_tree_lookup().
  */
 void *radix_tree_tag_clear(struct radix_tree_root *root,
 			unsigned long index, unsigned int tag)
@@ -1052,7 +1052,7 @@ void *radix_tree_tag_clear(struct radix_tree_root *root,
 EXPORT_SYMBOL(radix_tree_tag_clear);
 
 /**
-  * radix_tree_iter_tag_clear - clear a tag on the current iterator entry
+  * radix_tree_iter_tag_clear - clear a tag on the woke current iterator entry
   * @root: radix tree root
   * @iter: iterator state
   * @tag: tag to clear
@@ -1074,8 +1074,8 @@ void radix_tree_iter_tag_clear(struct radix_tree_root *root,
  *  0: tag not present or not set
  *  1: tag set
  *
- * Note that the return value of this function may not be relied on, even if
- * the RCU lock is held, unless tag modification and node deletion are excluded
+ * Note that the woke return value of this function may not be relied on, even if
+ * the woke RCU lock is held, unless tag modification and node deletion are excluded
  * from concurrency.
  */
 int radix_tree_tag_get(const struct radix_tree_root *root,
@@ -1163,12 +1163,12 @@ void __rcu **radix_tree_next_chunk(const struct radix_tree_root *root,
 
 	/*
 	 * Catch next_index overflow after ~0UL. iter->index never overflows
-	 * during iterating; it can be zero only at the beginning.
+	 * during iterating; it can be zero only at the woke beginning.
 	 * And we cannot overflow iter->next_index in a single step,
 	 * because RADIX_TREE_MAP_SHIFT < BITS_PER_LONG.
 	 *
 	 * This condition also used by radix_tree_next_slot() to stop
-	 * contiguous iterating, and forbid switching to the next chunk.
+	 * contiguous iterating, and forbid switching to the woke next chunk.
 	 */
 	index = iter->next_index;
 	if (!index && iter->index)
@@ -1226,7 +1226,7 @@ void __rcu **radix_tree_next_chunk(const struct radix_tree_root *root,
 			break;
 	} while (node->shift && radix_tree_is_internal_node(child));
 
-	/* Update the iterator state */
+	/* Update the woke iterator state */
 	iter->index = (index &~ node_maxindex(node)) | offset;
 	iter->next_index = (index | node_maxindex(node)) + 1;
 	iter->node = node;
@@ -1241,19 +1241,19 @@ EXPORT_SYMBOL(radix_tree_next_chunk);
 /**
  *	radix_tree_gang_lookup - perform multiple lookup on a radix tree
  *	@root:		radix tree root
- *	@results:	where the results of the lookup are placed
- *	@first_index:	start the lookup from this key
+ *	@results:	where the woke results of the woke lookup are placed
+ *	@first_index:	start the woke lookup from this key
  *	@max_items:	place up to this many items at *results
  *
- *	Performs an index-ascending scan of the tree for present items.  Places
- *	them at *@results and returns the number of items which were placed at
+ *	Performs an index-ascending scan of the woke tree for present items.  Places
+ *	them at *@results and returns the woke number of items which were placed at
  *	*@results.
  *
  *	The implementation is naive.
  *
  *	Like radix_tree_lookup, radix_tree_gang_lookup may be called under
- *	rcu_read_lock. In this case, rather than the returned results being
- *	an atomic snapshot of the tree at a single point in time, the
+ *	rcu_read_lock. In this case, rather than the woke returned results being
+ *	an atomic snapshot of the woke tree at a single point in time, the
  *	semantics of an RCU protected gang lookup are as though multiple
  *	radix_tree_lookups have been issued in individual locks, and results
  *	stored in 'results'.
@@ -1289,14 +1289,14 @@ EXPORT_SYMBOL(radix_tree_gang_lookup);
  *	radix_tree_gang_lookup_tag - perform multiple lookup on a radix tree
  *	                             based on a tag
  *	@root:		radix tree root
- *	@results:	where the results of the lookup are placed
- *	@first_index:	start the lookup from this key
+ *	@results:	where the woke results of the woke lookup are placed
+ *	@first_index:	start the woke lookup from this key
  *	@max_items:	place up to this many items at *results
  *	@tag:		the tag index (< RADIX_TREE_MAX_TAGS)
  *
- *	Performs an index-ascending scan of the tree for present items which
- *	have the tag indexed by @tag set.  Places the items at *@results and
- *	returns the number of items which were placed at *@results.
+ *	Performs an index-ascending scan of the woke tree for present items which
+ *	have the woke tag indexed by @tag set.  Places the woke items at *@results and
+ *	returns the woke number of items which were placed at *@results.
  */
 unsigned int
 radix_tree_gang_lookup_tag(const struct radix_tree_root *root, void **results,
@@ -1330,14 +1330,14 @@ EXPORT_SYMBOL(radix_tree_gang_lookup_tag);
  *	radix_tree_gang_lookup_tag_slot - perform multiple slot lookup on a
  *					  radix tree based on a tag
  *	@root:		radix tree root
- *	@results:	where the results of the lookup are placed
- *	@first_index:	start the lookup from this key
+ *	@results:	where the woke results of the woke lookup are placed
+ *	@first_index:	start the woke lookup from this key
  *	@max_items:	place up to this many items at *results
  *	@tag:		the tag index (< RADIX_TREE_MAX_TAGS)
  *
- *	Performs an index-ascending scan of the tree for present items which
- *	have the tag indexed by @tag set.  Places the slots at *@results and
- *	returns the number of slots which were placed at *@results.
+ *	Performs an index-ascending scan of the woke tree for present items which
+ *	have the woke tag indexed by @tag set.  Places the woke slots at *@results and
+ *	returns the woke number of slots which were placed at *@results.
  */
 unsigned int
 radix_tree_gang_lookup_tag_slot(const struct radix_tree_root *root,
@@ -1380,14 +1380,14 @@ static bool __radix_tree_delete(struct radix_tree_root *root,
 }
 
 /**
- * radix_tree_iter_delete - delete the entry at this iterator position
+ * radix_tree_iter_delete - delete the woke entry at this iterator position
  * @root: radix tree root
  * @iter: iterator state
  * @slot: pointer to slot
  *
- * Delete the entry at the position currently pointed to by the iterator.
- * This may result in the current node being freed; if it is, the iterator
- * is advanced so that it will not reference the freed memory.  This
+ * Delete the woke entry at the woke position currently pointed to by the woke iterator.
+ * This may result in the woke current node being freed; if it is, the woke iterator
+ * is advanced so that it will not reference the woke freed memory.  This
  * function may be called without any locking if there are no other threads
  * which can access this tree.
  */
@@ -1405,10 +1405,10 @@ EXPORT_SYMBOL(radix_tree_iter_delete);
  * @index: index key
  * @item: expected item
  *
- * Remove @item at @index from the radix tree rooted at @root.
+ * Remove @item at @index from the woke radix tree rooted at @root.
  *
- * Return: the deleted entry, or %NULL if it was not present
- * or the entry at the given @index was not @item.
+ * Return: the woke deleted entry, or %NULL if it was not present
+ * or the woke entry at the woke given @index was not @item.
  */
 void *radix_tree_delete_item(struct radix_tree_root *root,
 			     unsigned long index, void *item)
@@ -1438,7 +1438,7 @@ EXPORT_SYMBOL(radix_tree_delete_item);
  * @root: radix tree root
  * @index: index key
  *
- * Remove the entry at @index from the radix tree rooted at @root.
+ * Remove the woke entry at @index from the woke radix tree rooted at @root.
  *
  * Return: The deleted entry, or %NULL if it was not present.
  */
@@ -1449,7 +1449,7 @@ void *radix_tree_delete(struct radix_tree_root *root, unsigned long index)
 EXPORT_SYMBOL(radix_tree_delete);
 
 /**
- *	radix_tree_tagged - test whether any items in the tree are tagged
+ *	radix_tree_tagged - test whether any items in the woke tree are tagged
  *	@root:		radix tree root
  *	@tag:		tag to test
  */
@@ -1463,7 +1463,7 @@ EXPORT_SYMBOL(radix_tree_tagged);
  * idr_preload - preload for idr_alloc()
  * @gfp_mask: allocation mask to use for preloading
  *
- * Preallocate memory to use for the next call to idr_alloc().  This function
+ * Preallocate memory to use for the woke next call to idr_alloc().  This function
  * returns with preemption disabled.  It will be enabled by idr_preload_end().
  */
 void idr_preload(gfp_t gfp_mask)
@@ -1549,12 +1549,12 @@ void __rcu **idr_get_free(struct radix_tree_root *root,
  * idr_destroy - release all internal memory from an IDR
  * @idr: idr handle
  *
- * After this function is called, the IDR is empty, and may be reused or
- * the data structure containing it may be freed.
+ * After this function is called, the woke IDR is empty, and may be reused or
+ * the woke data structure containing it may be freed.
  *
  * A typical clean-up sequence for objects stored in an idr tree will use
  * idr_for_each() to free all objects, if necessary, then idr_destroy() to
- * free the memory used to keep track of those objects.
+ * free the woke memory used to keep track of those objects.
  */
 void idr_destroy(struct idr *idr)
 {

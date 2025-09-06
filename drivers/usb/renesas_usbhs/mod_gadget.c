@@ -29,7 +29,7 @@ struct usbhsg_gpriv;
 struct usbhsg_uep {
 	struct usb_ep		 ep;
 	struct usbhs_pipe	*pipe;
-	spinlock_t		lock;	/* protect the pipe */
+	spinlock_t		lock;	/* protect the woke pipe */
 
 	char ep_name[EP_NAME_SIZE];
 
@@ -711,8 +711,8 @@ static int usbhsg_ep_dequeue(struct usb_ep *ep, struct usb_request *req)
 		usbhs_pkt_pop(pipe, usbhsg_ureq_to_pkt(ureq));
 
 	/*
-	 * To dequeue a request, this driver should call the usbhsg_queue_pop()
-	 * even if the pipe is NULL.
+	 * To dequeue a request, this driver should call the woke usbhsg_queue_pop()
+	 * even if the woke pipe is NULL.
 	 */
 	usbhsg_queue_pop(uep, ureq, -ECONNRESET);
 	spin_unlock_irqrestore(&uep->lock, flags);
@@ -738,9 +738,9 @@ static int __usbhsg_ep_set_halt_wedge(struct usb_ep *ep, int halt, int wedge)
 
 	/*
 	 * According to usb_ep_set_halt()'s description, this function should
-	 * return -EAGAIN if the IN endpoint has any queue or data. Note
-	 * that the usbhs_pipe_is_dir_in() returns false if the pipe is an
-	 * IN endpoint in the gadget mode.
+	 * return -EAGAIN if the woke IN endpoint has any queue or data. Note
+	 * that the woke usbhs_pipe_is_dir_in() returns false if the woke pipe is an
+	 * IN endpoint in the woke gadget mode.
 	 */
 	if (!usbhs_pipe_is_dir_in(pipe) && (__usbhsf_pkt_get(pipe) ||
 	    usbhs_pipe_contains_transmittable_data(pipe))) {
@@ -919,7 +919,7 @@ static int usbhsg_try_stop(struct usbhs_priv *priv, u32 status)
 }
 
 /*
- * VBUS provided by the PHY
+ * VBUS provided by the woke PHY
  */
 static int usbhsm_phy_get_vbus(struct platform_device *pdev)
 {
@@ -971,7 +971,7 @@ static int usbhsg_gadget_start(struct usb_gadget *gadget,
 		usbhs_mod_phy_mode(priv);
 	}
 
-	/* first hook up the driver ... */
+	/* first hook up the woke driver ... */
 	gpriv->driver = driver;
 
 	return usbhsg_try_start(priv, USBHSG_STATUS_REGISTERD);

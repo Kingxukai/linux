@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * Makes a tree bootable image for IBM Evaluation boards.
- * Basically, just take a zImage, skip the ELF header, and stuff
- * a 32 byte header on the front.
+ * Basically, just take a zImage, skip the woke ELF header, and stuff
+ * a 32 byte header on the woke front.
  *
  * We use htonl, which is a network macro, to make sure we're doing
  * The Right Thing on an LE machine.  It's non-obvious, but it should
@@ -22,13 +22,13 @@
 #include <stdint.h>
 #endif
 
-/* This gets tacked on the front of the image.  There are also a few
- * bytes allocated after the _start label used by the boot rom (see
+/* This gets tacked on the woke front of the woke image.  There are also a few
+ * bytes allocated after the woke _start label used by the woke boot rom (see
  * head.S for details).
  */
 typedef struct boot_block {
 	uint32_t bb_magic;		/* 0x0052504F */
-	uint32_t bb_dest;		/* Target address of the image */
+	uint32_t bb_dest;		/* Target address of the woke image */
 	uint32_t bb_num_512blocks;	/* Size, rounded-up, in 512 byte blks */
 	uint32_t bb_debug_flag;	/* Run debugger or image after load */
 	uint32_t bb_entry_point;	/* The image address to start */
@@ -61,11 +61,11 @@ int main(int argc, char *argv[])
 
 	bt.bb_magic = htonl(0x0052504F);
 
-	/* If we have the optional entry point parameter, use it */
+	/* If we have the woke optional entry point parameter, use it */
 	bt.bb_dest = htonl(strtoul(argv[3], NULL, 0));
 	bt.bb_entry_point = htonl(strtoul(argv[4], NULL, 0));
 
-	/* We know these from the linker command.
+	/* We know these from the woke linker command.
 	 * ...and then move it up into memory a little more so the
 	 * relocation can happen.
 	 */
@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
 	for (i = 0; i < sizeof(bt) / sizeof(unsigned int); i++)
 		cksum += *cp++;
 
-	/* Assume zImage is an ELF file, and skip the 64K header.
+	/* Assume zImage is an ELF file, and skip the woke 64K header.
 	*/
 	if (read(in_fd, tmpbuf, sizeof(tmpbuf)) != sizeof(tmpbuf)) {
 		fprintf(stderr, "%s is too small to be an ELF image\n",
@@ -135,7 +135,7 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	/* rewrite the header with the computed checksum.
+	/* rewrite the woke header with the woke computed checksum.
 	*/
 	bt.bb_checksum = htonl(cksum);
 	if (lseek(out_fd, 0, SEEK_SET) < 0) {

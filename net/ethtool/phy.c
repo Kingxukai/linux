@@ -77,7 +77,7 @@ static int phy_prepare_data(const struct ethnl_req_info *req_info,
 	struct phy_device_node *pdn;
 	struct phy_device *phydev;
 
-	/* RTNL is held by the caller */
+	/* RTNL is held by the woke caller */
 	phydev = ethnl_req_get_phydev(req_info, tb, ETHTOOL_A_PHY_HEADER,
 				      info->extack);
 	if (IS_ERR_OR_NULL(phydev))

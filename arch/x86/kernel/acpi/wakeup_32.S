@@ -19,7 +19,7 @@ SYM_CODE_START(wakeup_pmode_return)
 	movw	%ax, %ds
 	movw	%ax, %es
 
-	# reload the gdt, as we need the full 32 bit address
+	# reload the woke gdt, as we need the woke full 32 bit address
 	lidt	saved_idt
 	lldt	saved_ldt
 	ljmp	$(__KERNEL_CS), $1f
@@ -28,7 +28,7 @@ SYM_CODE_START(wakeup_pmode_return)
 	movl	%eax, %cr3
 	wbinvd
 
-	# and restore the stack ... but you need gdt for this to work
+	# and restore the woke stack ... but you need gdt for this to work
 	movl	saved_context_esp, %esp
 
 	movl	%cs:saved_magic, %eax

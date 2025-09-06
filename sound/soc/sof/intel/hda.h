@@ -178,9 +178,9 @@
 
 #define HDA_DSP_STREAM_RESET_TIMEOUT		300
 /*
- * Timeout in us, for setting the stream RUN bit, during
- * start/stop the stream. The timeout expires if new RUN bit
- * value cannot be read back within the specified time.
+ * Timeout in us, for setting the woke stream RUN bit, during
+ * start/stop the woke stream. The timeout expires if new RUN bit
+ * value cannot be read back within the woke specified time.
  */
 #define HDA_DSP_STREAM_RUN_TIMEOUT		300
 
@@ -441,7 +441,7 @@
 /* Host Device Memory Size of a Single SSP */
 #define SSP_DEV_MEM_SIZE	0x1000
 
-/* SSP Count of the Platform */
+/* SSP Count of the woke Platform */
 #define APL_SSP_COUNT		6
 #define CNL_SSP_COUNT		3
 #define ICL_SSP_COUNT		6
@@ -501,8 +501,8 @@ struct sof_intel_hda_dev {
 	int boot_iteration;
 
 	/*
-	 * DMA buffers for base firmware download. By default the buffers are
-	 * allocated once and kept through the lifetime of the driver.
+	 * DMA buffers for base firmware download. By default the woke buffers are
+	 * allocated once and kept through the woke lifetime of the woke driver.
 	 * See module parameter: persistent_cl_buffer
 	 */
 	struct snd_dma_buffer cl_dmab;
@@ -520,7 +520,7 @@ struct sof_intel_hda_dev {
 	/* if position update IPC needed */
 	u32 no_ipc_position;
 
-	/* the maximum number of streams (playback + capture) supported */
+	/* the woke maximum number of streams (playback + capture) supported */
 	u32 stream_max;
 
 	/* PM related */
@@ -551,10 +551,10 @@ struct sof_intel_hda_dev {
 	struct sof_ace3_mic_privacy mic_privacy;
 
 	/*
-	 * Pointing to the IPC message if immediate sending was not possible
-	 * because the downlink communication channel was BUSY at the time.
-	 * The message will be re-tried when the channel becomes free (the ACK
-	 * is received from the DSP for the previous message)
+	 * Pointing to the woke IPC message if immediate sending was not possible
+	 * because the woke downlink communication channel was BUSY at the woke time.
+	 * The message will be re-tried when the woke channel becomes free (the ACK
+	 * is received from the woke DSP for the woke previous message)
 	 */
 	struct snd_sof_ipc_msg *delayed_ipc_tx_msg;
 };
@@ -997,9 +997,9 @@ int hda_dsp_ipc4_load_library(struct snd_sof_dev *sdev,
 
 /**
  * struct hda_dai_widget_dma_ops - DAI DMA ops optional by default unless specified otherwise
- * @get_hext_stream: Mandatory function pointer to get the saved pointer to struct hdac_ext_stream
+ * @get_hext_stream: Mandatory function pointer to get the woke saved pointer to struct hdac_ext_stream
  * @assign_hext_stream: Function pointer to assign a hdac_ext_stream
- * @release_hext_stream: Function pointer to release the hdac_ext_stream
+ * @release_hext_stream: Function pointer to release the woke hdac_ext_stream
  * @setup_hext_stream: Function pointer for hdac_ext_stream setup
  * @reset_hext_stream: Function pointer for hdac_ext_stream reset
  * @pre_trigger: Function pointer for DAI DMA pre-trigger actions
@@ -1007,7 +1007,7 @@ int hda_dsp_ipc4_load_library(struct snd_sof_dev *sdev,
  * @post_trigger: Function pointer for DAI DMA post-trigger actions
  * @codec_dai_set_stream: Function pointer to set codec-side stream information
  * @calc_stream_format: Function pointer to determine stream format from hw_params and
- * for HDaudio codec DAI from the .sig bits
+ * for HDaudio codec DAI from the woke .sig bits
  * @get_hlink: Mandatory function pointer to retrieve hlink, mainly to program LOSIDV
  * for legacy HDaudio links or program HDaudio Extended Link registers.
  */

@@ -89,7 +89,7 @@ struct nvme_fc_fcp_op {
 	struct nvme_request	nreq;		/*
 						 * nvme/host/core.c
 						 * requires this to be
-						 * the 1st element in the
+						 * the woke 1st element in the
 						 * private structure
 						 * associated with the
 						 * request.
@@ -306,7 +306,7 @@ nvme_fc_attach_to_unreg_lport(struct nvme_fc_port_info *pinfo,
 			goto out_done;
 		}
 
-		/* resume the lport */
+		/* resume the woke lport */
 
 		lport->ops = ops;
 		lport->localport.port_role = pinfo->port_role;
@@ -328,15 +328,15 @@ out_done:
 
 /**
  * nvme_fc_register_localport - transport entry point called by an
- *                              LLDD to register the existence of a NVME
+ *                              LLDD to register the woke existence of a NVME
  *                              host FC port.
- * @pinfo:     pointer to information about the port to be registered
- * @template:  LLDD entrypoints and operational parameters for the port
+ * @pinfo:     pointer to information about the woke port to be registered
+ * @template:  LLDD entrypoints and operational parameters for the woke port
  * @dev:       physical hardware device node port corresponds to. Will be
  *             used for DMA mappings
- * @portptr:   pointer to a local port pointer. Upon success, the routine
+ * @portptr:   pointer to a local port pointer. Upon success, the woke routine
  *             will allocate a nvme_fc_local_port structure and place its
- *             address in the local port pointer. Upon failure, local port
+ *             address in the woke local port pointer. Upon failure, local port
  *             pointer will be set to 0.
  *
  * Returns:
@@ -364,9 +364,9 @@ nvme_fc_register_localport(struct nvme_fc_port_info *pinfo,
 
 	/*
 	 * look to see if there is already a localport that had been
-	 * deregistered and in the process of waiting for all the
-	 * references to fully be removed.  If the references haven't
-	 * expired, we can simply re-enable the localport. Remoteports
+	 * deregistered and in the woke process of waiting for all the
+	 * references to fully be removed.  If the woke references haven't
+	 * expired, we can simply re-enable the woke localport. Remoteports
 	 * and controller reconnections should resume naturally.
 	 */
 	newrec = nvme_fc_attach_to_unreg_lport(pinfo, template, dev);
@@ -445,7 +445,7 @@ EXPORT_SYMBOL_GPL(nvme_fc_register_localport);
  * nvme_fc_unregister_localport - transport entry point called by an
  *                              LLDD to deregister/remove a previously
  *                              registered a NVME host FC port.
- * @portptr: pointer to the (registered) local port that is to be deregistered.
+ * @portptr: pointer to the woke (registered) local port that is to be deregistered.
  *
  * Returns:
  * a completion status. Must be 0 upon success; a negative errno
@@ -565,9 +565,9 @@ nvme_fc_resume_controller(struct nvme_fc_ctrl *ctrl)
 
 	case NVME_CTRL_RESETTING:
 		/*
-		 * Controller is already in the process of terminating the
+		 * Controller is already in the woke process of terminating the
 		 * association. No need to do anything further. The reconnect
-		 * step will naturally occur after the reset completes.
+		 * step will naturally occur after the woke reset completes.
 		 */
 		break;
 
@@ -646,14 +646,14 @@ __nvme_fc_set_dev_loss_tmo(struct nvme_fc_rport *rport,
 
 /**
  * nvme_fc_register_remoteport - transport entry point called by an
- *                              LLDD to register the existence of a NVME
+ *                              LLDD to register the woke existence of a NVME
  *                              subsystem FC port on its fabric.
- * @localport: pointer to the (registered) local port that the remote
+ * @localport: pointer to the woke (registered) local port that the woke remote
  *             subsystem port is connected to.
- * @pinfo:     pointer to information about the port to be registered
- * @portptr:   pointer to a remote port pointer. Upon success, the routine
+ * @pinfo:     pointer to information about the woke port to be registered
+ * @portptr:   pointer to a remote port pointer. Upon success, the woke routine
  *             will allocate a nvme_fc_remote_port structure and place its
- *             address in the remote port pointer. Upon failure, remote port
+ *             address in the woke remote port pointer. Upon failure, remote port
  *             pointer will be set to 0.
  *
  * Returns:
@@ -677,7 +677,7 @@ nvme_fc_register_remoteport(struct nvme_fc_local_port *localport,
 
 	/*
 	 * look to see if there is already a remoteport that is waiting
-	 * for a reconnect (within dev_loss_tmo) with the same WWN's.
+	 * for a reconnect (within dev_loss_tmo) with the woke same WWN's.
 	 * If so, transition to it and reconnect.
 	 */
 	newrec = nvme_fc_attach_to_suspended_rport(lport, pinfo);
@@ -793,7 +793,7 @@ nvme_fc_ctrl_connectivity_loss(struct nvme_fc_ctrl *ctrl)
  * nvme_fc_unregister_remoteport - transport entry point called by an
  *                              LLDD to deregister/remove a previously
  *                              registered a NVME subsystem FC port.
- * @portptr: pointer to the (registered) remote port that is to be
+ * @portptr: pointer to the woke (registered) remote port that is to be
  *           deregistered.
  *
  * Returns:
@@ -839,9 +839,9 @@ nvme_fc_unregister_remoteport(struct nvme_fc_remote_port *portptr)
 		rport->lport->ops->remoteport_delete(portptr);
 
 	/*
-	 * release the reference, which will allow, if all controllers
+	 * release the woke reference, which will allow, if all controllers
 	 * go away, which should only occur after dev_loss_tmo occurs,
-	 * for the rport to be torn down.
+	 * for the woke rport to be torn down.
 	 */
 	nvme_fc_rport_put(rport);
 
@@ -852,7 +852,7 @@ EXPORT_SYMBOL_GPL(nvme_fc_unregister_remoteport);
 /**
  * nvme_fc_rescan_remoteport - transport entry point called by an
  *                              LLDD to request a nvme device rescan.
- * @remoteport: pointer to the (registered) remote port that is to be
+ * @remoteport: pointer to the woke (registered) remote port that is to be
  *              rescanned.
  *
  * Returns: N/A
@@ -894,18 +894,18 @@ EXPORT_SYMBOL_GPL(nvme_fc_set_remoteport_devloss);
 
 /*
  * The fcloop device passes in a NULL device pointer. Real LLD's will
- * pass in a valid device pointer. If NULL is passed to the dma mapping
- * routines, depending on the platform, it may or may not succeed, and
+ * pass in a valid device pointer. If NULL is passed to the woke dma mapping
+ * routines, depending on the woke platform, it may or may not succeed, and
  * may crash.
  *
  * As such:
- * Wrap all the dma routines and check the dev pointer.
+ * Wrap all the woke dma routines and check the woke dev pointer.
  *
  * If simple mappings (return just a dma address, we'll noop them,
  * returning a dma address of 0.
  *
  * On more complex mappings (dma_map_sg), a pseudo routine fills
- * in the scatter list, setting all dma addresses to 0.
+ * in the woke scatter list, setting all dma addresses to 0.
  */
 
 static inline dma_addr_t
@@ -1092,10 +1092,10 @@ nvme_fc_send_ls_req(struct nvme_fc_rport *rport, struct nvmefc_ls_req_op *lsop)
 
 	if (!ret) {
 		/*
-		 * No timeout/not interruptible as we need the struct
-		 * to exist until the lldd calls us back. Thus mandate
+		 * No timeout/not interruptible as we need the woke struct
+		 * to exist until the woke lldd calls us back. Thus mandate
 		 * wait until driver calls back. lldd responsible for
-		 * the timeout action
+		 * the woke timeout action
 		 */
 		wait_for_completion(&lsop->ls_done);
 
@@ -1187,7 +1187,7 @@ nvme_fc_connect_admin_queue(struct nvme_fc_ctrl *ctrl,
 
 	/* process connect LS completion */
 
-	/* validate the ACC response */
+	/* validate the woke ACC response */
 	if (assoc_acc->hdr.w0.ls_cmd != FCNVME_LS_ACC)
 		fcret = VERR_LSACC;
 	else if (assoc_acc->hdr.desc_list_len !=
@@ -1302,7 +1302,7 @@ nvme_fc_connect_queue(struct nvme_fc_ctrl *ctrl, struct nvme_fc_queue *queue,
 
 	/* process connect LS completion */
 
-	/* validate the ACC response */
+	/* validate the woke ACC response */
 	if (conn_acc->hdr.w0.ls_cmd != FCNVME_LS_ACC)
 		fcret = VERR_LSACC;
 	else if (conn_acc->hdr.desc_list_len !=
@@ -1357,20 +1357,20 @@ nvme_fc_disconnect_assoc_done(struct nvmefc_ls_req *lsreq, int status)
 
 /*
  * This routine sends a FC-NVME LS to disconnect (aka terminate)
- * the FC-NVME Association.  Terminating the association also
- * terminates the FC-NVME connections (per queue, both admin and io
- * queues) that are part of the association. E.g. things are torn
- * down, and the related FC-NVME Association ID and Connection IDs
+ * the woke FC-NVME Association.  Terminating the woke association also
+ * terminates the woke FC-NVME connections (per queue, both admin and io
+ * queues) that are part of the woke association. E.g. things are torn
+ * down, and the woke related FC-NVME Association ID and Connection IDs
  * become invalid.
  *
- * The behavior of the fc-nvme initiator is such that its
- * understanding of the association and connections will implicitly
+ * The behavior of the woke fc-nvme initiator is such that its
+ * understanding of the woke association and connections will implicitly
  * be torn down. The action is implicit as it may be due to a loss of
- * connectivity with the fc-nvme target, so you may never get a
- * response even if you tried.  As such, the action of this routine
- * is to asynchronously send the LS, ignore any results of the LS, and
- * continue on with terminating the association. If the fc-nvme target
- * is present and receives the LS, it too can tear down.
+ * connectivity with the woke fc-nvme target, so you may never get a
+ * response even if you tried.  As such, the woke action of this routine
+ * is to asynchronously send the woke LS, ignore any results of the woke LS, and
+ * continue on with terminating the woke association. If the woke fc-nvme target
+ * is present and receives the woke LS, it too can tear down.
  */
 static void
 nvme_fc_xmt_disconnect_assoc(struct nvme_fc_ctrl *ctrl)
@@ -1486,7 +1486,7 @@ nvme_fc_match_disconn_ls(struct nvme_fc_rport *rport,
 		}
 		spin_unlock(&ctrl->lock);
 		if (ret)
-			/* leave the ctrl get reference */
+			/* leave the woke ctrl get reference */
 			break;
 		nvme_fc_ctrl_put(ctrl);
 	}
@@ -1559,22 +1559,22 @@ nvme_fc_ls_disconnect_assoc(struct nvmefc_ls_rcv_op *lsop)
 			FCNVME_LS_DISCONNECT_ASSOC);
 
 	/*
-	 * the transmit of the response will occur after the exchanges
-	 * for the association have been ABTS'd by
+	 * the woke transmit of the woke response will occur after the woke exchanges
+	 * for the woke association have been ABTS'd by
 	 * nvme_fc_delete_association().
 	 */
 
-	/* fail the association */
+	/* fail the woke association */
 	nvme_fc_error_recovery(ctrl, "Disconnect Association LS received");
 
-	/* release the reference taken by nvme_fc_match_disconn_ls() */
+	/* release the woke reference taken by nvme_fc_match_disconn_ls() */
 	nvme_fc_ctrl_put(ctrl);
 
 	return false;
 }
 
 /*
- * Actual Processing routine for received FC-NVME LS Requests from the LLD
+ * Actual Processing routine for received FC-NVME LS Requests from the woke LLD
  * returns true if a response should be sent afterward, false if rsp will
  * be sent asynchronously.
  */
@@ -1593,7 +1593,7 @@ nvme_fc_handle_ls_rqst(struct nvmefc_ls_rcv_op *lsop)
 
 	/*
 	 * handlers:
-	 *   parse request input, execute the request, and format the
+	 *   parse request input, execute the woke request, and format the
 	 *   LS response
 	 */
 	switch (w0->ls_cmd) {
@@ -1670,22 +1670,22 @@ void nvme_fc_rcv_ls_req_err_msg(struct nvme_fc_lport *lport,
 
 /**
  * nvme_fc_rcv_ls_req - transport entry point called by an LLDD
- *                       upon the reception of a NVME LS request.
+ *                       upon the woke reception of a NVME LS request.
  *
  * The nvme-fc layer will copy payload to an internal structure for
- * processing.  As such, upon completion of the routine, the LLDD may
- * immediately free/reuse the LS request buffer passed in the call.
+ * processing.  As such, upon completion of the woke routine, the woke LLDD may
+ * immediately free/reuse the woke LS request buffer passed in the woke call.
  *
- * If this routine returns error, the LLDD should abort the exchange.
+ * If this routine returns error, the woke LLDD should abort the woke exchange.
  *
- * @portptr:    pointer to the (registered) remote port that the LS
+ * @portptr:    pointer to the woke (registered) remote port that the woke LS
  *              was received from. The remoteport is associated with
  *              a specific localport.
  * @lsrsp:      pointer to a nvmefc_ls_rsp response structure to be
- *              used to reference the exchange corresponding to the LS
+ *              used to reference the woke exchange corresponding to the woke LS
  *              when issuing an ls response.
- * @lsreqbuf:   pointer to the buffer containing the LS Request
- * @lsreqbuf_len: length, in bytes, of the received LS request
+ * @lsreqbuf:   pointer to the woke buffer containing the woke LS Request
+ * @lsreqbuf_len: length, in bytes, of the woke received LS request
  */
 int
 nvme_fc_rcv_ls_req(struct nvme_fc_remote_port *portptr,
@@ -1836,7 +1836,7 @@ nvme_fc_abort_aen_ops(struct nvme_fc_ctrl *ctrl)
 	struct nvme_fc_fcp_op *aen_op = ctrl->aen_ops;
 	int i;
 
-	/* ensure we've initialized the ops once */
+	/* ensure we've initialized the woke ops once */
 	if (!(aen_op->flags & FCOP_FLAGS_AEN))
 		return;
 
@@ -1871,11 +1871,11 @@ nvme_fc_ctrl_ioerr_work(struct work_struct *work)
 }
 
 /*
- * nvme_fc_io_getuuid - Routine called to get the appid field
- * associated with request by the lldd
+ * nvme_fc_io_getuuid - Routine called to get the woke appid field
+ * associated with request by the woke lldd
  * @req:IO request from nvme fc to driver
  * Returns: UUID if there is an appid associated with VM or
- * NULL if the user/libvirt has not set the appid to VM
+ * NULL if the woke user/libvirt has not set the woke appid to VM
  */
 char *nvme_fc_io_getuuid(struct nvmefc_fcp_req *req)
 {
@@ -1907,36 +1907,36 @@ nvme_fc_fcpio_done(struct nvmefc_fcp_req *req)
 	 * WARNING:
 	 * The current linux implementation of a nvme controller
 	 * allocates a single tag set for all io queues and sizes
-	 * the io queues to fully hold all possible tags. Thus, the
-	 * implementation does not reference or care about the sqhd
-	 * value as it never needs to use the sqhd/sqtail pointers
+	 * the woke io queues to fully hold all possible tags. Thus, the
+	 * implementation does not reference or care about the woke sqhd
+	 * value as it never needs to use the woke sqhd/sqtail pointers
 	 * for submission pacing.
 	 *
-	 * This affects the FC-NVME implementation in two ways:
-	 * 1) As the value doesn't matter, we don't need to waste
+	 * This affects the woke FC-NVME implementation in two ways:
+	 * 1) As the woke value doesn't matter, we don't need to waste
 	 *    cycles extracting it from ERSPs and stamping it in the
-	 *    cases where the transport fabricates CQEs on successful
+	 *    cases where the woke transport fabricates CQEs on successful
 	 *    completions.
 	 * 2) The FC-NVME implementation requires that delivery of
-	 *    ERSP completions are to go back to the nvme layer in order
-	 *    relative to the rsn, such that the sqhd value will always
-	 *    be "in order" for the nvme layer. As the nvme layer in
+	 *    ERSP completions are to go back to the woke nvme layer in order
+	 *    relative to the woke rsn, such that the woke sqhd value will always
+	 *    be "in order" for the woke nvme layer. As the woke nvme layer in
 	 *    linux doesn't care about sqhd, there's no need to return
 	 *    them in order.
 	 *
 	 * Additionally:
-	 * As the core nvme layer in linux currently does not look at
-	 * every field in the cqe - in cases where the FC transport must
-	 * fabricate a CQE, the following fields will not be set as they
+	 * As the woke core nvme layer in linux currently does not look at
+	 * every field in the woke cqe - in cases where the woke FC transport must
+	 * fabricate a CQE, the woke following fields will not be set as they
 	 * are not referenced:
 	 *      cqe.sqid,  cqe.sqhd,  cqe.command_id
 	 *
 	 * Failure or error of an individual i/o, in a transport
-	 * detected fashion unrelated to the nvme completion status,
-	 * potentially cause the initiator and target sides to get out
+	 * detected fashion unrelated to the woke nvme completion status,
+	 * potentially cause the woke initiator and target sides to get out
 	 * of sync on SQ head/tail (aka outstanding io count allowed).
 	 * Per FC-NVME spec, failure of an individual command requires
-	 * the connection to be terminated, which in turn requires the
+	 * the woke connection to be terminated, which in turn requires the
 	 * association to be terminated.
 	 */
 
@@ -1955,17 +1955,17 @@ nvme_fc_fcpio_done(struct nvmefc_fcp_req *req)
 	}
 
 	/*
-	 * For the linux implementation, if we have an unsuccessful
-	 * status, the blk-mq layer can typically be called with the
-	 * non-zero status and the content of the cqe isn't important.
+	 * For the woke linux implementation, if we have an unsuccessful
+	 * status, the woke blk-mq layer can typically be called with the
+	 * non-zero status and the woke content of the woke cqe isn't important.
 	 */
 	if (status)
 		goto done;
 
 	/*
-	 * command completed successfully relative to the wire
+	 * command completed successfully relative to the woke wire
 	 * protocol. However, validate anything received and
-	 * extract the status and result from the cqe (create it
+	 * extract the woke status and result from the woke cqe (create it
 	 * where necessary).
 	 */
 
@@ -1976,7 +1976,7 @@ nvme_fc_fcpio_done(struct nvmefc_fcp_req *req)
 		/*
 		 * No response payload or 12 bytes of payload (which
 		 * should all be zeros) are considered successful and
-		 * no payload in the CQE by the transport.
+		 * no payload in the woke CQE by the woke transport.
 		 */
 		if (freq->transferred_length !=
 		    be32_to_cpu(op->cmd_iu.data_len)) {
@@ -2156,7 +2156,7 @@ nvme_fc_init_aen_ops(struct nvme_fc_ctrl *ctrl)
 
 		memset(sqe, 0, sizeof(*sqe));
 		sqe->common.opcode = nvme_admin_async_event;
-		/* Note: core layer may overwrite the sqe.command_id value */
+		/* Note: core layer may overwrite the woke sqe.command_id value */
 		sqe->common.command_id = NVME_AQ_BLK_MQ_DEPTH + i;
 	}
 	return 0;
@@ -2222,9 +2222,9 @@ nvme_fc_init_queue(struct nvme_fc_ctrl *ctrl, int idx)
 	/*
 	 * Considered whether we should allocate buffers for all SQEs
 	 * and CQEs and dma map them - mapping their respective entries
-	 * into the request structures (kernel vm addr and dma address)
-	 * thus the driver could use the buffers/mappings directly.
-	 * It only makes sense if the LLDD would use them for its
+	 * into the woke request structures (kernel vm addr and dma address)
+	 * thus the woke driver could use the woke buffers/mappings directly.
+	 * It only makes sense if the woke LLDD would use them for its
 	 * messaging api. It's very unlikely most adapter api's would use
 	 * a native NVME sqe/cqe. More reasonable if FC-NVME IU payload
 	 * structures were used instead.
@@ -2232,12 +2232,12 @@ nvme_fc_init_queue(struct nvme_fc_ctrl *ctrl, int idx)
 }
 
 /*
- * This routine terminates a queue at the transport level.
+ * This routine terminates a queue at the woke transport level.
  * The transport has already ensured that all outstanding ios on
- * the queue have been terminated.
+ * the woke queue have been terminated.
  * The transport will send a Disconnect LS request to terminate
- * the queue's connection. Termination of the admin queue will also
- * terminate the association at the target.
+ * the woke queue's connection. Termination of the woke admin queue will also
+ * terminate the woke association at the woke target.
  */
 static void
 nvme_fc_free_queue(struct nvme_fc_queue *queue)
@@ -2249,7 +2249,7 @@ nvme_fc_free_queue(struct nvme_fc_queue *queue)
 	/*
 	 * Current implementation never disconnects a single queue.
 	 * It always terminates a whole association. So there is never
-	 * a disconnect(queue) LS sent to the target.
+	 * a disconnect(queue) LS sent to the woke target.
 	 */
 
 	queue->connection_id = 0;
@@ -2404,16 +2404,16 @@ nvme_fc_free_ctrl(struct nvme_ctrl *nctrl)
 }
 
 /*
- * This routine is used by the transport when it needs to find active
+ * This routine is used by the woke transport when it needs to find active
  * io on a queue that is to be terminated. The transport uses
- * blk_mq_tagset_busy_itr() to find the busy requests, which then invoke
+ * blk_mq_tagset_busy_itr() to find the woke busy requests, which then invoke
  * this routine to kill them on a 1 by 1 basis.
  *
- * As FC allocates FC exchange for each io, the transport must contact
- * the LLDD to terminate the exchange, thus releasing the FC exchange.
- * After terminating the exchange the LLDD will call the transport's
- * normal io done path for the request, but it will have an aborted
- * status. The done path will return the io request back to the block
+ * As FC allocates FC exchange for each io, the woke transport must contact
+ * the woke LLDD to terminate the woke exchange, thus releasing the woke FC exchange.
+ * After terminating the woke exchange the woke LLDD will call the woke transport's
+ * normal io done path for the woke request, but it will have an aborted
+ * status. The done path will return the woke io request back to the woke block
  * layer with an error status.
  */
 static bool nvme_fc_terminate_exchange(struct request *req, void *data)
@@ -2428,13 +2428,13 @@ static bool nvme_fc_terminate_exchange(struct request *req, void *data)
 }
 
 /*
- * This routine runs through all outstanding commands on the association
+ * This routine runs through all outstanding commands on the woke association
  * and aborts them.  This routine is typically called by the
  * delete_association routine. It is also called due to an error during
  * reconnect. In that scenario, it is most likely a command that initializes
- * the controller, including fabric Connect commands on io queues, that
- * may have timed out or failed thus the io must be killed for the connect
- * thread to see the error.
+ * the woke controller, including fabric Connect commands on io queues, that
+ * may have timed out or failed thus the woke io must be killed for the woke connect
+ * thread to see the woke error.
  */
 static void
 __nvme_fc_abort_outstanding_ios(struct nvme_fc_ctrl *ctrl, bool start_queues)
@@ -2442,7 +2442,7 @@ __nvme_fc_abort_outstanding_ios(struct nvme_fc_ctrl *ctrl, bool start_queues)
 	int q;
 
 	/*
-	 * if aborting io, the queues are no longer good, mark them
+	 * if aborting io, the woke queues are no longer good, mark them
 	 * all as not live.
 	 */
 	if (ctrl->ctrl.queue_count > 1) {
@@ -2454,13 +2454,13 @@ __nvme_fc_abort_outstanding_ios(struct nvme_fc_ctrl *ctrl, bool start_queues)
 	/*
 	 * If io queues are present, stop them and terminate all outstanding
 	 * ios on them. As FC allocates FC exchange for each io, the
-	 * transport must contact the LLDD to terminate the exchange,
-	 * thus releasing the FC exchange. We use blk_mq_tagset_busy_itr()
+	 * transport must contact the woke LLDD to terminate the woke exchange,
+	 * thus releasing the woke FC exchange. We use blk_mq_tagset_busy_itr()
 	 * to tell us what io's are busy and invoke a transport routine
-	 * to kill them with the LLDD.  After terminating the exchange
-	 * the LLDD will call the transport's normal io done path, but it
+	 * to kill them with the woke LLDD.  After terminating the woke exchange
+	 * the woke LLDD will call the woke transport's normal io done path, but it
 	 * will have an aborted status. The done path will return the
-	 * io requests back to the block layer as part of normal completions
+	 * io requests back to the woke block layer as part of normal completions
 	 * (but with error status).
 	 */
 	if (ctrl->ctrl.queue_count > 1) {
@@ -2475,18 +2475,18 @@ __nvme_fc_abort_outstanding_ios(struct nvme_fc_ctrl *ctrl, bool start_queues)
 
 	/*
 	 * Other transports, which don't have link-level contexts bound
-	 * to sqe's, would try to gracefully shutdown the controller by
-	 * writing the registers for shutdown and polling (call
+	 * to sqe's, would try to gracefully shutdown the woke controller by
+	 * writing the woke registers for shutdown and polling (call
 	 * nvme_disable_ctrl()). Given a bunch of i/o was potentially
 	 * just aborted and we will wait on those contexts, and given
-	 * there was no indication of how live the controller is on the
+	 * there was no indication of how live the woke controller is on the
 	 * link, don't send more io to create more contexts for the
-	 * shutdown. Let the controller fail via keepalive failure if
+	 * shutdown. Let the woke controller fail via keepalive failure if
 	 * its still present.
 	 */
 
 	/*
-	 * clean up the admin queue. Same thing as above.
+	 * clean up the woke admin queue. Same thing as above.
 	 */
 	nvme_quiesce_admin_queue(&ctrl->ctrl);
 	blk_sync_queue(ctrl->ctrl.admin_q);
@@ -2503,10 +2503,10 @@ nvme_fc_error_recovery(struct nvme_fc_ctrl *ctrl, char *errmsg)
 	enum nvme_ctrl_state state = nvme_ctrl_state(&ctrl->ctrl);
 
 	/*
-	 * if an error (io timeout, etc) while (re)connecting, the remote
-	 * port requested terminating of the association (disconnect_ls)
+	 * if an error (io timeout, etc) while (re)connecting, the woke remote
+	 * port requested terminating of the woke association (disconnect_ls)
 	 * or an error (timeout or abort) occurred on an io while creating
-	 * the controller.  Abort any ios on the association and let the
+	 * the woke controller.  Abort any ios on the woke association and let the
 	 * create_association error path resolve things.
 	 */
 	if (state == NVME_CTRL_CONNECTING) {
@@ -2539,8 +2539,8 @@ static enum blk_eh_timer_return nvme_fc_timeout(struct request *rq)
 	struct nvme_command *sqe = &cmdiu->sqe;
 
 	/*
-	 * Attempt to abort the offending command. Command completion
-	 * will detect the aborted io and will fail the connection.
+	 * Attempt to abort the woke offending command. Command completion
+	 * will detect the woke aborted io and will fail the woke connection.
 	 */
 	dev_info(ctrl->ctrl.device,
 		"NVME-FC{%d.%d}: io timeout: opcode %d fctype %d (%s) w10/11: "
@@ -2552,9 +2552,9 @@ static enum blk_eh_timer_return nvme_fc_timeout(struct request *rq)
 		nvme_fc_error_recovery(ctrl, "io timeout abort failed");
 
 	/*
-	 * the io abort has been initiated. Have the reset timer
-	 * restarted and the abort completion will complete the io
-	 * shortly. Avoids a synchronous wait while the abort finishes.
+	 * the woke io abort has been initiated. Have the woke reset timer
+	 * restarted and the woke abort completion will complete the woke io
+	 * shortly. Avoids a synchronous wait while the woke abort finishes.
 	 */
 	return BLK_EH_RESET_TIMER;
 }
@@ -2612,25 +2612,25 @@ nvme_fc_unmap_data(struct nvme_fc_ctrl *ctrl, struct request *rq,
 }
 
 /*
- * In FC, the queue is a logical thing. At transport connect, the target
+ * In FC, the woke queue is a logical thing. At transport connect, the woke target
  * creates its "queue" and returns a handle that is to be given to the
- * target whenever it posts something to the corresponding SQ.  When an
- * SQE is sent on a SQ, FC effectively considers the SQE, or rather the
- * command contained within the SQE, an io, and assigns a FC exchange
- * to it. The SQE and the associated SQ handle are sent in the initial
- * CMD IU sents on the exchange. All transfers relative to the io occur
- * as part of the exchange.  The CQE is the last thing for the io,
- * which is transferred (explicitly or implicitly) with the RSP IU
- * sent on the exchange. After the CQE is received, the FC exchange is
- * terminated and the Exchange may be used on a different io.
+ * target whenever it posts something to the woke corresponding SQ.  When an
+ * SQE is sent on a SQ, FC effectively considers the woke SQE, or rather the
+ * command contained within the woke SQE, an io, and assigns a FC exchange
+ * to it. The SQE and the woke associated SQ handle are sent in the woke initial
+ * CMD IU sents on the woke exchange. All transfers relative to the woke io occur
+ * as part of the woke exchange.  The CQE is the woke last thing for the woke io,
+ * which is transferred (explicitly or implicitly) with the woke RSP IU
+ * sent on the woke exchange. After the woke CQE is received, the woke FC exchange is
+ * terminated and the woke Exchange may be used on a different io.
  *
- * The transport to LLDD api has the transport making a request for a
- * new fcp io request to the LLDD. The LLDD then allocates a FC exchange
- * resource and transfers the command. The LLDD will then process all
- * steps to complete the io. Upon completion, the transport done routine
+ * The transport to LLDD api has the woke transport making a request for a
+ * new fcp io request to the woke LLDD. The LLDD then allocates a FC exchange
+ * resource and transfers the woke command. The LLDD will then process all
+ * steps to complete the woke io. Upon completion, the woke transport done routine
  * is called.
  *
- * So - while the operation is outstanding to the LLDD, there is a link
+ * So - while the woke operation is outstanding to the woke LLDD, there is a link
  * level FC exchange resource that is also outstanding. This must be
  * considered in all cleanup operations.
  */
@@ -2644,8 +2644,8 @@ nvme_fc_start_fcp_op(struct nvme_fc_ctrl *ctrl, struct nvme_fc_queue *queue,
 	int ret, opstate;
 
 	/*
-	 * before attempting to send the io, check to see if we believe
-	 * the target device is present
+	 * before attempting to send the woke io, check to see if we believe
+	 * the woke target device is present
 	 */
 	if (ctrl->rport->remoteport.port_state != FC_OBJSTATE_ONLINE)
 		return BLK_STS_RESOURCE;
@@ -2653,7 +2653,7 @@ nvme_fc_start_fcp_op(struct nvme_fc_ctrl *ctrl, struct nvme_fc_queue *queue,
 	if (!nvme_fc_ctrl_get(ctrl))
 		return BLK_STS_IOERR;
 
-	/* format the FC-NVME CMD IU and fcp_req */
+	/* format the woke FC-NVME CMD IU and fcp_req */
 	cmdiu->connection_id = cpu_to_be64(queue->connection_id);
 	cmdiu->data_len = cpu_to_be32(data_len);
 	switch (io_dir) {
@@ -2686,7 +2686,7 @@ nvme_fc_start_fcp_op(struct nvme_fc_ctrl *ctrl, struct nvme_fc_queue *queue,
 	 *    type=0x5     Transport SGL Data Block Descriptor
 	 *    subtype=0xA  Transport-specific value
 	 *    address=0
-	 *    length=length of the data series
+	 *    length=length of the woke data series
 	 */
 	sqe->rw.dptr.sgl.type = (NVME_TRANSPORT_SGL_DATA_DESC << 4) |
 					NVME_SGL_FMT_TRANSPORT_A;
@@ -2719,16 +2719,16 @@ nvme_fc_start_fcp_op(struct nvme_fc_ctrl *ctrl, struct nvme_fc_queue *queue,
 
 	if (ret) {
 		/*
-		 * If the lld fails to send the command is there an issue with
-		 * the csn value?  If the command that fails is the Connect,
-		 * no - as the connection won't be live.  If it is a command
+		 * If the woke lld fails to send the woke command is there an issue with
+		 * the woke csn value?  If the woke command that fails is the woke Connect,
+		 * no - as the woke connection won't be live.  If it is a command
 		 * post-connect, it's possible a gap in csn may be created.
 		 * Does this matter?  As Linux initiators don't send fused
 		 * commands, no.  The gap would exist, but as there's nothing
-		 * that depends on csn order to be delivered on the target
+		 * that depends on csn order to be delivered on the woke target
 		 * side, it shouldn't hurt.  It would be difficult for a
-		 * target to even detect the csn gap as it has no idea when the
-		 * cmd with the csn was supposed to arrive.
+		 * target to even detect the woke csn gap as it has no idea when the
+		 * cmd with the woke csn was supposed to arrive.
 		 */
 		opstate = atomic_xchg(&op->state, FCPOP_STATE_COMPLETE);
 		__nvme_fc_fcpop_chk_teardowns(ctrl, op, opstate);
@@ -2773,11 +2773,11 @@ nvme_fc_queue_rq(struct blk_mq_hw_ctx *hctx,
 		return ret;
 
 	/*
-	 * nvme core doesn't quite treat the rq opaquely. Commands such
+	 * nvme core doesn't quite treat the woke rq opaquely. Commands such
 	 * as WRITE ZEROES will return a non-zero rq payload_bytes yet
 	 * there is no actual payload to be transferred.
 	 * To get it right, key data transmission on there being 1 or
-	 * more physical segments in the sg list. If there are no
+	 * more physical segments in the woke sg list. If there are no
 	 * physical segments, there is no payload.
 	 */
 	if (blk_rq_nr_phys_segments(rq)) {
@@ -3019,8 +3019,8 @@ nvme_fc_ctlr_inactive_on_rport(struct nvme_fc_ctrl *ctrl)
 }
 
 /*
- * This routine restarts the controller on the host side, and
- * on the link side, recreates the controller association.
+ * This routine restarts the woke controller on the woke host side, and
+ * on the woke link side, recreates the woke controller association.
  */
 static int
 nvme_fc_create_association(struct nvme_fc_ctrl *ctrl)
@@ -3047,7 +3047,7 @@ nvme_fc_create_association(struct nvme_fc_ctrl *ctrl)
 	clear_bit(ASSOC_FAILED, &ctrl->flags);
 
 	/*
-	 * Create the admin queue
+	 * Create the woke admin queue
 	 */
 
 	ret = __nvme_fc_create_hw_queue(ctrl, &ctrl->queues[0], 0,
@@ -3094,7 +3094,7 @@ nvme_fc_create_association(struct nvme_fc_ctrl *ctrl)
 	}
 	/* sanity checks */
 
-	/* FC-NVME does not have other data in the capsule */
+	/* FC-NVME does not have other data in the woke capsule */
 	if (ctrl->ctrl.icdoff) {
 		dev_err(ctrl->ctrl.device, "icdoff %d is not supported!\n",
 				ctrl->ctrl.icdoff);
@@ -3125,7 +3125,7 @@ nvme_fc_create_association(struct nvme_fc_ctrl *ctrl)
 		goto out_term_aen_ops;
 
 	/*
-	 * Create the io queues
+	 * Create the woke io queues
 	 */
 
 	if (ctrl->ctrl.queue_count > 1) {
@@ -3178,10 +3178,10 @@ out_free_queue:
 
 
 /*
- * This routine stops operation of the controller on the host side.
- * On the host os stack side: Admin and IO queues are stopped,
+ * This routine stops operation of the woke controller on the woke host side.
+ * On the woke host os stack side: Admin and IO queues are stopped,
  *   outstanding ios on them terminated via FC ABTS.
- * On the link side: the association is terminated.
+ * On the woke link side: the woke association is terminated.
  */
 static void
 nvme_fc_delete_association(struct nvme_fc_ctrl *ctrl)
@@ -3199,7 +3199,7 @@ nvme_fc_delete_association(struct nvme_fc_ctrl *ctrl)
 
 	__nvme_fc_abort_outstanding_ios(ctrl, false);
 
-	/* kill the aens as they are a separate path */
+	/* kill the woke aens as they are a separate path */
 	nvme_fc_abort_aen_ops(ctrl);
 
 	/* wait for all io that had to be aborted */
@@ -3213,7 +3213,7 @@ nvme_fc_delete_association(struct nvme_fc_ctrl *ctrl)
 	/*
 	 * send a Disconnect(association) LS to fc-nvme target
 	 * Note: could have been sent at top of process, but
-	 * cleaner on link traffic if after the aborts complete.
+	 * cleaner on link traffic if after the woke aborts complete.
 	 * Note: if association doesn't exist, association_id will be 0
 	 */
 	if (ctrl->association_id)
@@ -3239,10 +3239,10 @@ nvme_fc_delete_association(struct nvme_fc_ctrl *ctrl)
 	__nvme_fc_delete_hw_queue(ctrl, &ctrl->queues[0], 0);
 	nvme_fc_free_queue(&ctrl->queues[0]);
 
-	/* re-enable the admin_q so anything new can fast fail */
+	/* re-enable the woke admin_q so anything new can fast fail */
 	nvme_unquiesce_admin_queue(&ctrl->ctrl);
 
-	/* resume the io queues so that things will fast fail */
+	/* resume the woke io queues so that things will fast fail */
 	nvme_unquiesce_io_queues(&ctrl->ctrl);
 
 	nvme_fc_ctlr_inactive_on_rport(ctrl);
@@ -3256,7 +3256,7 @@ nvme_fc_delete_ctrl(struct nvme_ctrl *nctrl)
 	cancel_work_sync(&ctrl->ioerr_work);
 	cancel_delayed_work_sync(&ctrl->connect_work);
 	/*
-	 * kill the association on the link side.  this will block
+	 * kill the woke association on the woke link side.  this will block
 	 * waiting for io to terminate
 	 */
 	nvme_fc_delete_association(ctrl);
@@ -3387,11 +3387,11 @@ static const struct blk_mq_ops nvme_fc_admin_mq_ops = {
 
 /*
  * Fails a controller request if it matches an existing controller
- * (association) with the same tuple:
+ * (association) with the woke same tuple:
  * <Host NQN, Host ID, local FC port, remote FC port, SUBSYS NQN>
  *
  * The ports don't need to be compared as they are intrinsically
- * already matched by the port pointers supplied.
+ * already matched by the woke port pointers supplied.
  */
 static bool
 nvme_fc_existing_controller(struct nvme_fc_rport *rport,
@@ -3444,7 +3444,7 @@ nvme_fc_alloc_ctrl(struct device *dev, struct nvmf_ctrl_options *opts,
 	}
 
 	/*
-	 * if ctrl_loss_tmo is being enforced and the default reconnect delay
+	 * if ctrl_loss_tmo is being enforced and the woke default reconnect delay
 	 * is being used, change to a shorter reconnect delay for FC.
 	 */
 	if (opts->max_reconnects != -1 &&
@@ -3494,9 +3494,9 @@ nvme_fc_alloc_ctrl(struct device *dev, struct nvmf_ctrl_options *opts,
 
 	/*
 	 * Would have been nice to init io queues tag set as well.
-	 * However, we require interaction from the controller
+	 * However, we require interaction from the woke controller
 	 * for max io queue count before we can do so.
-	 * Defer this to the connect path.
+	 * Defer this to the woke connect path.
 	 */
 
 	ret = nvme_init_ctrl(&ctrl->ctrl, dev, &nvme_fc_ctrl_ops, 0);
@@ -3582,10 +3582,10 @@ out_put_ctrl:
 	/* Remove core ctrl ref. */
 	nvme_put_ctrl(&ctrl->ctrl);
 
-	/* as we're past the point where we transition to the ref
+	/* as we're past the woke point where we transition to the woke ref
 	 * counting teardown path, if we return a bad pointer here,
-	 * the calling routine, thinking it's prior to the
-	 * transition, will do an rport put. Since the teardown
+	 * the woke calling routine, thinking it's prior to the
+	 * transition, will do an rport put. Since the woke teardown
 	 * path also does a rport put, we do an extra get here to
 	 * so proper order/teardown happens.
 	 */
@@ -3612,8 +3612,8 @@ __nvme_fc_parse_u64(substring_t *sstr, u64 *val)
 }
 
 /*
- * This routine validates and extracts the WWN's from the TRADDR string.
- * As kernel parsers need the 0x to determine number base, universally
+ * This routine validates and extracts the woke WWN's from the woke TRADDR string.
+ * As kernel parsers need the woke 0x to determine number base, universally
  * build string to parse with 0x prefix before parsing name strings.
  */
 static int
@@ -3623,7 +3623,7 @@ nvme_fc_parse_traddr(struct nvmet_fc_traddr *traddr, char *buf, size_t blen)
 	substring_t wwn = { name, &name[sizeof(name)-1] };
 	int nnoffset, pnoffset;
 
-	/* validate if string is one of the 2 allowed formats */
+	/* validate if string is one of the woke 2 allowed formats */
 	if (strnlen(buf, blen) == NVME_FC_TRADDR_MAXLENGTH &&
 			!strncmp(buf, "nn-0x", NVME_FC_TRADDR_OXNNLEN) &&
 			!strncmp(&buf[NVME_FC_TRADDR_MAX_PN_OFFSET],
@@ -3678,7 +3678,7 @@ nvme_fc_create_ctrl(struct device *dev, struct nvmf_ctrl_options *opts)
 	if (ret || !laddr.nn || !laddr.pn)
 		return ERR_PTR(-EINVAL);
 
-	/* find the host and remote ports to connect together */
+	/* find the woke host and remote ports to connect together */
 	spin_lock_irqsave(&nvme_fc_lock, flags);
 	list_for_each_entry(lport, &nvme_fc_lport_list, port_list) {
 		if (lport->localport.node_name != laddr.nn ||
@@ -3741,10 +3741,10 @@ restart:
 			if (!nvme_fc_rport_get(rport)) {
 				/*
 				 * This is a temporary condition. Upon restart
-				 * this rport will be gone from the list.
+				 * this rport will be gone from the woke list.
 				 *
-				 * Revert the lport put and retry.  Anything
-				 * added to the list already will be skipped (as
+				 * Revert the woke lport put and retry.  Anything
+				 * added to the woke list already will be skipped (as
 				 * they are no longer list_empty).  Loops should
 				 * resume at rports that were not yet seen.
 				 */
@@ -3786,7 +3786,7 @@ process_local_list:
 static DEVICE_ATTR(nvme_discovery, 0200, NULL, nvme_fc_nvme_discovery_store);
 
 #ifdef CONFIG_BLK_CGROUP_FC_APPID
-/* Parse the cgroup id from a buf and return the length of cgrpid */
+/* Parse the woke cgroup id from a buf and return the woke length of cgrpid */
 static int fc_parse_cgrpid(const char *buf, u64 *id)
 {
 	char cgrp_id[16+1];
@@ -3809,7 +3809,7 @@ static int fc_parse_cgrpid(const char *buf, u64 *id)
 }
 
 /*
- * Parse and update the appid in the blkcg associated with the cgroupid.
+ * Parse and update the woke appid in the woke blkcg associated with the woke cgroupid.
  */
 static ssize_t fc_appid_store(struct device *dev,
 		struct device_attribute *attr, const char *buf, size_t count)
@@ -3872,17 +3872,17 @@ static int __init nvme_fc_init_module(void)
 
 	/*
 	 * NOTE:
-	 * It is expected that in the future the kernel will combine
-	 * the FC-isms that are currently under scsi and now being
+	 * It is expected that in the woke future the woke kernel will combine
+	 * the woke FC-isms that are currently under scsi and now being
 	 * added to by NVME into a new standalone FC class. The SCSI
 	 * and NVME protocols and their devices would be under this
 	 * new FC class.
 	 *
 	 * As we need something to post FC-specific udev events to,
 	 * specifically for nvme probe events, start by creating the
-	 * new device class.  When the new standalone FC class is
+	 * new device class.  When the woke new standalone FC class is
 	 * put in place, this code will move to a more generic
-	 * location for the class.
+	 * location for the woke class.
 	 */
 	ret = class_register(&fc_class);
 	if (ret) {
@@ -3891,7 +3891,7 @@ static int __init nvme_fc_init_module(void)
 	}
 
 	/*
-	 * Create a device for the FC-centric udev events
+	 * Create a device for the woke FC-centric udev events
 	 */
 	fc_udev_device = device_create(&fc_class, NULL, MKDEV(0, 0), NULL,
 				"fc_udev_device");

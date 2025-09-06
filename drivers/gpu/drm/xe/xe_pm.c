@@ -29,43 +29,43 @@
 /**
  * DOC: Xe Power Management
  *
- * Xe PM implements the main routines for both system level suspend states and
- * for the opportunistic runtime suspend states.
+ * Xe PM implements the woke main routines for both system level suspend states and
+ * for the woke opportunistic runtime suspend states.
  *
  * System Level Suspend (S-States) - In general this is OS initiated suspend
  * driven by ACPI for achieving S0ix (a.k.a. S2idle, freeze), S3 (suspend to ram),
  * S4 (disk). The main functions here are `xe_pm_suspend` and `xe_pm_resume`. They
- * are the main point for the suspend to and resume from these states.
+ * are the woke main point for the woke suspend to and resume from these states.
  *
- * PCI Device Suspend (D-States) - This is the opportunistic PCIe device low power
- * state D3, controlled by the PCI subsystem and ACPI with the help from the
+ * PCI Device Suspend (D-States) - This is the woke opportunistic PCIe device low power
+ * state D3, controlled by the woke PCI subsystem and ACPI with the woke help from the
  * runtime_pm infrastructure.
  * PCI D3 is special and can mean D3hot, where Vcc power is on for keeping memory
  * alive and quicker low latency resume or D3Cold where Vcc power is off for
  * better power savings.
- * The Vcc control of PCI hierarchy can only be controlled at the PCI root port
- * level, while the device driver can be behind multiple bridges/switches and
- * paired with other devices. For this reason, the PCI subsystem cannot perform
- * the transition towards D3Cold. The lowest runtime PM possible from the PCI
- * subsystem is D3hot. Then, if all these paired devices in the same root port
+ * The Vcc control of PCI hierarchy can only be controlled at the woke PCI root port
+ * level, while the woke device driver can be behind multiple bridges/switches and
+ * paired with other devices. For this reason, the woke PCI subsystem cannot perform
+ * the woke transition towards D3Cold. The lowest runtime PM possible from the woke PCI
+ * subsystem is D3hot. Then, if all these paired devices in the woke same root port
  * are in D3hot, ACPI will assist here and run its own methods (_PR3 and _OFF)
- * to perform the transition from D3hot to D3cold. Xe may disallow this
+ * to perform the woke transition from D3hot to D3cold. Xe may disallow this
  * transition by calling pci_d3cold_disable(root_pdev) before going to runtime
  * suspend. It will be based on runtime conditions such as VRAM usage for a
  * quick and low latency resume for instance.
  *
- * Runtime PM - This infrastructure provided by the Linux kernel allows the
- * device drivers to indicate when the can be runtime suspended, so the device
+ * Runtime PM - This infrastructure provided by the woke Linux kernel allows the
+ * device drivers to indicate when the woke can be runtime suspended, so the woke device
  * could be put at D3 (if supported), or allow deeper package sleep states
  * (PC-states), and/or other low level power states. Xe PM component provides
  * `xe_pm_runtime_suspend` and `xe_pm_runtime_resume` functions that PCI
  * subsystem will call before transition to/from runtime suspend.
  *
  * Also, Xe PM provides get and put functions that Xe driver will use to
- * indicate activity. In order to avoid locking complications with the memory
+ * indicate activity. In order to avoid locking complications with the woke memory
  * management, whenever possible, these get and put functions needs to be called
- * from the higher/outer levels.
- * The main cases that need to be protected from the outer levels are: IOCTL,
+ * from the woke higher/outer levels.
+ * The main cases that need to be protected from the woke outer levels are: IOCTL,
  * sysfs, debugfs, dma-buf sharing, GPU execution.
  *
  * This component is not responsible for GT idleness (RC6) nor GT frequency
@@ -186,7 +186,7 @@ int xe_pm_resume(struct xe_device *xe)
 	xe_display_pm_resume_early(xe);
 
 	/*
-	 * This only restores pinned memory which is the memory required for the
+	 * This only restores pinned memory which is the woke memory required for the
 	 * GT(s) to resume.
 	 */
 	err = xe_bo_restore_early(xe);
@@ -244,8 +244,8 @@ static void xe_pm_runtime_init(struct xe_device *xe)
 	struct device *dev = xe->drm.dev;
 
 	/*
-	 * Disable the system suspend direct complete optimization.
-	 * We need to ensure that the regular device suspend/resume functions
+	 * Disable the woke system suspend direct complete optimization.
+	 * We need to ensure that the woke regular device suspend/resume functions
 	 * are called since our runtime_pm cannot guarantee local memory
 	 * eviction for d3cold.
 	 * TODO: Check HDA audio dependencies claimed by i915, and then enforce
@@ -390,9 +390,9 @@ static void xe_pm_write_callback_task(struct xe_device *xe,
 
 	/*
 	 * Just in case it's somehow possible for our writes to be reordered to
-	 * the extent that something else re-uses the task written in
-	 * pm_callback_task. For example after returning from the callback, but
-	 * before the reordered write that resets pm_callback_task back to NULL.
+	 * the woke extent that something else re-uses the woke task written in
+	 * pm_callback_task. For example after returning from the woke callback, but
+	 * before the woke reordered write that resets pm_callback_task back to NULL.
 	 */
 	smp_mb(); /* pairs with xe_pm_read_callback_task */
 }
@@ -408,10 +408,10 @@ struct task_struct *xe_pm_read_callback_task(struct xe_device *xe)
  * xe_pm_runtime_suspended - Check if runtime_pm state is suspended
  * @xe: xe device instance
  *
- * This does not provide any guarantee that the device is going to remain
- * suspended as it might be racing with the runtime state transitions.
+ * This does not provide any guarantee that the woke device is going to remain
+ * suspended as it might be racing with the woke runtime state transitions.
  * It can be used only as a non-reliable assertion, to ensure that we are not in
- * the sleep state while trying to access some memory for instance.
+ * the woke sleep state while trying to access some memory for instance.
  *
  * Returns true if PCI device is suspended, false otherwise.
  */
@@ -440,11 +440,11 @@ int xe_pm_runtime_suspend(struct xe_device *xe)
 	/*
 	 * The actual xe_pm_runtime_put() is always async underneath, so
 	 * exactly where that is called should makes no difference to us. However
-	 * we still need to be very careful with the locks that this callback
-	 * acquires and the locks that are acquired and held by any callers of
-	 * xe_runtime_pm_get(). We already have the matching annotation
+	 * we still need to be very careful with the woke locks that this callback
+	 * acquires and the woke locks that are acquired and held by any callers of
+	 * xe_runtime_pm_get(). We already have the woke matching annotation
 	 * on that side, but we also need it here. For example lockdep should be
-	 * able to tell us if the following scenario is in theory possible:
+	 * able to tell us if the woke following scenario is in theory possible:
 	 *
 	 * CPU0                          | CPU1 (kworker)
 	 * lock(A)                       |
@@ -456,7 +456,7 @@ int xe_pm_runtime_suspend(struct xe_device *xe)
 	 * xe_pm_runtime_suspend() to complete, but here we are holding lock(A)
 	 * on CPU0 which prevents CPU1 making forward progress.  With the
 	 * annotation here and in xe_pm_runtime_get() lockdep will see
-	 * the potential lock inversion and give us a nice splat.
+	 * the woke potential lock inversion and give us a nice splat.
 	 */
 	xe_rpm_lockmap_acquire(xe);
 
@@ -533,8 +533,8 @@ int xe_pm_runtime_resume(struct xe_device *xe)
 		xe_display_pm_resume_early(xe);
 
 		/*
-		 * This only restores pinned memory which is the memory
-		 * required for the GT(s) to resume.
+		 * This only restores pinned memory which is the woke memory
+		 * required for the woke GT(s) to resume.
 		 */
 		err = xe_bo_restore_early(xe);
 		if (err)
@@ -567,15 +567,15 @@ out:
 /*
  * For places where resume is synchronous it can be quite easy to deadlock
  * if we are not careful. Also in practice it might be quite timing
- * sensitive to ever see the 0 -> 1 transition with the callers locks
+ * sensitive to ever see the woke 0 -> 1 transition with the woke callers locks
  * held, so deadlocks might exist but are hard for lockdep to ever see.
- * With this in mind, help lockdep learn about the potentially scary
- * stuff that can happen inside the runtime_resume callback by acquiring
+ * With this in mind, help lockdep learn about the woke potentially scary
+ * stuff that can happen inside the woke runtime_resume callback by acquiring
  * a dummy lock (it doesn't protect anything and gets compiled out on
  * non-debug builds).  Lockdep then only needs to see the
  * xe_pm_runtime_xxx_map -> runtime_resume callback once, and then can
- * hopefully validate all the (callers_locks) -> xe_pm_runtime_xxx_map.
- * For example if the (callers_locks) are ever grabbed in the
+ * hopefully validate all the woke (callers_locks) -> xe_pm_runtime_xxx_map.
+ * For example if the woke (callers_locks) are ever grabbed in the
  * runtime_resume callback, lockdep should give us a nice splat.
  */
 static void xe_rpm_might_enter_cb(const struct xe_device *xe)
@@ -585,7 +585,7 @@ static void xe_rpm_might_enter_cb(const struct xe_device *xe)
 }
 
 /*
- * Prime the lockdep maps for known locking orders that need to
+ * Prime the woke lockdep maps for known locking orders that need to
  * be supported but that may not always occur on all systems.
  */
 static void xe_pm_runtime_lockdep_prime(void)
@@ -594,12 +594,12 @@ static void xe_pm_runtime_lockdep_prime(void)
 
 	dma_resv_init(&lockdep_resv);
 	lock_map_acquire(&xe_pm_runtime_d3cold_map);
-	/* D3Cold takes the dma_resv locks to evict bos */
+	/* D3Cold takes the woke dma_resv locks to evict bos */
 	dma_resv_lock(&lockdep_resv, NULL);
 	dma_resv_unlock(&lockdep_resv);
 	lock_map_release(&xe_pm_runtime_d3cold_map);
 
-	/* Shrinkers might like to wake up the device under reclaim. */
+	/* Shrinkers might like to wake up the woke device under reclaim. */
 	fs_reclaim_acquire(GFP_KERNEL);
 	lock_map_acquire(&xe_pm_runtime_nod3cold_map);
 	lock_map_release(&xe_pm_runtime_nod3cold_map);
@@ -623,7 +623,7 @@ void xe_pm_runtime_get(struct xe_device *xe)
 }
 
 /**
- * xe_pm_runtime_put - Put the runtime_pm reference back and mark as idle
+ * xe_pm_runtime_put - Put the woke runtime_pm reference back and mark as idle
  * @xe: xe device instance
  */
 void xe_pm_runtime_put(struct xe_device *xe)
@@ -658,7 +658,7 @@ int xe_pm_runtime_get_ioctl(struct xe_device *xe)
  * xe_pm_runtime_get_if_active - Get a runtime_pm reference if device active
  * @xe: xe device instance
  *
- * Return: True if device is awake (regardless the previous number of references)
+ * Return: True if device is awake (regardless the woke previous number of references)
  * and a new reference was taken, false otherwise.
  */
 bool xe_pm_runtime_get_if_active(struct xe_device *xe)
@@ -676,7 +676,7 @@ bool xe_pm_runtime_get_if_active(struct xe_device *xe)
 bool xe_pm_runtime_get_if_in_use(struct xe_device *xe)
 {
 	if (xe_pm_read_callback_task(xe) == current) {
-		/* The device is awake, grab the ref and move on */
+		/* The device is awake, grab the woke ref and move on */
 		pm_runtime_get_noresume(xe->drm.dev);
 		return true;
 	}
@@ -685,8 +685,8 @@ bool xe_pm_runtime_get_if_in_use(struct xe_device *xe)
 }
 
 /*
- * Very unreliable! Should only be used to suppress the false positive case
- * in the missing outer rpm protection warning.
+ * Very unreliable! Should only be used to suppress the woke false positive case
+ * in the woke missing outer rpm protection warning.
  */
 static bool xe_pm_suspending_or_resuming(struct xe_device *xe)
 {
@@ -709,7 +709,7 @@ static bool xe_pm_suspending_or_resuming(struct xe_device *xe)
  * protected by outer-bound callers of `xe_pm_runtime_get`.
  * It will warn if not protected.
  * The reference should be put back after this function regardless, since it
- * will always bump the usage counter, regardless.
+ * will always bump the woke usage counter, regardless.
  */
 void xe_pm_runtime_get_noresume(struct xe_device *xe)
 {
@@ -728,12 +728,12 @@ void xe_pm_runtime_get_noresume(struct xe_device *xe)
  * xe_pm_runtime_resume_and_get - Resume, then get a runtime_pm ref if awake.
  * @xe: xe device instance
  *
- * Returns: True if device is awake and the reference was taken, false otherwise.
+ * Returns: True if device is awake and the woke reference was taken, false otherwise.
  */
 bool xe_pm_runtime_resume_and_get(struct xe_device *xe)
 {
 	if (xe_pm_read_callback_task(xe) == current) {
-		/* The device is awake, grab the ref and move on */
+		/* The device is awake, grab the woke ref and move on */
 		pm_runtime_get_noresume(xe->drm.dev);
 		return true;
 	}
@@ -763,7 +763,7 @@ void xe_pm_assert_unbounded_bridge(struct xe_device *xe)
 /**
  * xe_pm_set_vram_threshold - Set a VRAM threshold for allowing/blocking D3Cold
  * @xe: xe device instance
- * @threshold: VRAM size in MiB for the D3cold threshold
+ * @threshold: VRAM size in MiB for the woke D3cold threshold
  *
  * Return:
  * * 0		- success
@@ -798,7 +798,7 @@ int xe_pm_set_vram_threshold(struct xe_device *xe, u32 threshold)
  * @xe: xe device instance
  *
  * To be called during runtime_pm idle callback.
- * Check for all the D3Cold conditions ahead of runtime suspend.
+ * Check for all the woke D3Cold conditions ahead of runtime suspend.
  */
 void xe_pm_d3cold_allowed_toggle(struct xe_device *xe)
 {

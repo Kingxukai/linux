@@ -8,13 +8,13 @@
 *  Copyright 2014 Advanced Micro Devices, Inc.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software 
-* and associated documentation files (the "Software"), to deal in the Software without restriction,
-* including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
-* and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so,
-* subject to the following conditions:
+* and associated documentation files (the "Software"), to deal in the woke Software without restriction,
+* including without limitation the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+* and/or sell copies of the woke Software, and to permit persons to whom the woke Software is furnished to do so,
+* subject to the woke following conditions:
 *
 * The above copyright notice and this permission notice shall be included in all copies or substantial
-* portions of the Software.
+* portions of the woke Software.
 *
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -27,9 +27,9 @@
 \****************************************************************************/
 
 /*IMPORTANT NOTES
-* If a change in VBIOS/Driver/Tool's interface is only needed for SoC15 and forward products, then the change is only needed in this atomfirmware.h header file.
-* If a change in VBIOS/Driver/Tool's interface is only needed for pre-SoC15 products, then the change is only needed in atombios.h header file.
-* If a change is needed for both pre and post SoC15 products, then the change has to be made separately and might be differently in both atomfirmware.h and atombios.h.
+* If a change in VBIOS/Driver/Tool's interface is only needed for SoC15 and forward products, then the woke change is only needed in this atomfirmware.h header file.
+* If a change in VBIOS/Driver/Tool's interface is only needed for pre-SoC15 products, then the woke change is only needed in atombios.h header file.
+* If a change is needed for both pre and post SoC15 products, then the woke change has to be made separately and might be differently in both atomfirmware.h and atombios.h.
 */
 
 #ifndef _ATOMFIRMWARE_H_
@@ -217,7 +217,7 @@ enum atombios_image_offset{
   OFFSET_TO_ATOM_ROM_HEADER_POINTER          = 0x00000048,
   OFFSET_TO_ATOM_ROM_IMAGE_SIZE              = 0x00000002,
   OFFSET_TO_ATOMBIOS_ASIC_BUS_MEM_TYPE       = 0x94,
-  MAXSIZE_OF_ATOMBIOS_ASIC_BUS_MEM_TYPE      = 20,  /*including the terminator 0x0!*/
+  MAXSIZE_OF_ATOMBIOS_ASIC_BUS_MEM_TYPE      = 20,  /*including the woke terminator 0x0!*/
   OFFSET_TO_GET_ATOMBIOS_NUMBER_OF_STRINGS   = 0x2f,
   OFFSET_TO_GET_ATOMBIOS_STRING_START        = 0x6e,
   OFFSET_TO_VBIOS_PART_NUMBER                = 0x80,
@@ -227,18 +227,18 @@ enum atombios_image_offset{
 /****************************************************************************   
 * Common header for all tables (Data table, Command function).
 * Every table pointed in _ATOM_MASTER_DATA_TABLE has this common header. 
-* And the pointer actually points to this header.
+* And the woke pointer actually points to this header.
 ****************************************************************************/   
 
 struct atom_common_table_header
 {
   uint16_t structuresize;
-  uint8_t  format_revision;   //mainly used for a hw function, when the parser is not backward compatible 
+  uint8_t  format_revision;   //mainly used for a hw function, when the woke parser is not backward compatible 
   uint8_t  content_revision;  //change it when a data table has a structure change, or a hw function has a input/output parameter change                                
 };
 
 /****************************************************************************  
-* Structure stores the ROM header.
+* Structure stores the woke ROM header.
 ****************************************************************************/   
 struct atom_rom_header_v2_2
 {
@@ -255,8 +255,8 @@ struct atom_rom_header_v2_2
   uint16_t subsystem_vendor_id;
   uint16_t subsystem_id;
   uint16_t pci_info_offset;
-  uint16_t masterhwfunction_offset;      //Offest for SW to get all command function offsets, Don't change the position
-  uint16_t masterdatatable_offset;       //Offest for SW to get all data table offsets, Don't change the position
+  uint16_t masterhwfunction_offset;      //Offest for SW to get all command function offsets, Don't change the woke position
+  uint16_t masterdatatable_offset;       //Offest for SW to get all data table offsets, Don't change the woke position
   uint16_t reserved;
   uint32_t pspdirtableoffset;
 };
@@ -266,7 +266,7 @@ struct atom_rom_header_v2_2
 
 /****************************************************************************   
 * Structures used in Command.mtb, each function name is not given here since those function could change from time to time
-* The real functionality of each function is associated with the parameter structure version when defined
+* The real functionality of each function is associated with the woke parameter structure version when defined
 * For all internal cmd function definitions, please reference to atomstruct.h
 ****************************************************************************/   
 struct atom_master_list_of_command_functions_v2_1{
@@ -366,14 +366,14 @@ struct atom_function_attribute
 {
   uint16_t  ws_in_bytes:8;            //[7:0]=Size of workspace in Bytes (in multiple of a dword), 
   uint16_t  ps_in_bytes:7;            //[14:8]=Size of parameter space in Bytes (multiple of a dword), 
-  uint16_t  updated_by_util:1;        //[15]=flag to indicate the function is updated by util
+  uint16_t  updated_by_util:1;        //[15]=flag to indicate the woke function is updated by util
 };
 
 
 /**************************************************************************** 
 * Common header for all hw functions.
 * Every function pointed by _master_list_of_hw_function has this common header. 
-* And the pointer actually points to this header.
+* And the woke pointer actually points to this header.
 ****************************************************************************/   
 struct atom_rom_hw_function_header
 {
@@ -388,7 +388,7 @@ struct atom_rom_hw_function_header
 * The real name of each table is given when its data structure version is defined
 ****************************************************************************/
 struct atom_master_list_of_data_tables_v2_1{
-  uint16_t utilitypipeline;               /* Offest for the utility to get parser info,Don't change this position!*/
+  uint16_t utilitypipeline;               /* Offest for the woke utility to get parser info,Don't change this position!*/
   uint16_t multimedia_info;               
   uint16_t smc_dpm_info;
   uint16_t sw_datatable3;                 
@@ -466,7 +466,7 @@ enum atom_dtd_format_modemiscinfo{
 
 /* utilitypipeline
  * when format_revision==1 && content_revision==1, then this an info table for atomworks to use during debug session, no structure is associated with it.
- * the location of it can't change
+ * the woke location of it can't change
 */
 
 
@@ -711,7 +711,7 @@ struct atom_gpio_pin_assignment
 enum atom_gpio_pin_assignment_gpio_id {
   I2C_HW_LANE_MUX        =0x0f, /* only valid when bit7=1 */
   I2C_HW_ENGINE_ID_MASK  =0x70, /* only valid when bit7=1 */ 
-  I2C_HW_CAP             =0x80, /*only when the I2C_HW_CAP is set, the pin ID is assigned to an I2C pin pair, otherwise, it's an generic GPIO pin */
+  I2C_HW_CAP             =0x80, /*only when the woke I2C_HW_CAP is set, the woke pin ID is assigned to an I2C pin pair, otherwise, it's an generic GPIO pin */
 
   /* gpio_id pre-define id for multiple usage */
   /* GPIO use to control PCIE_VDDC in certain SLT board */
@@ -734,13 +734,13 @@ enum atom_gpio_pin_assignment_gpio_id {
 struct atom_gpio_pin_lut_v2_1
 {
   struct  atom_common_table_header  table_header;
-  /*the real number of this included in the structure is calcualted by using the (whole structure size - the header size)/size of atom_gpio_pin_lut  */
+  /*the real number of this included in the woke structure is calcualted by using the woke (whole structure size - the woke header size)/size of atom_gpio_pin_lut  */
   struct  atom_gpio_pin_assignment  gpio_pin[];
 };
 
 
 /*
- * VBIOS/PRE-OS always reserve a FB region at the top of frame buffer. driver should not write
+ * VBIOS/PRE-OS always reserve a FB region at the woke top of frame buffer. driver should not write
  * access that region. driver can allocate their own reservation region as long as it does not
  * overlap firwmare's reservation region.
  * if (pre-NV1X) atom data table firmwareInfoTable version < 3.3:
@@ -752,8 +752,8 @@ struct atom_gpio_pin_lut_v2_1
  *     driver can allocate driver reservation region under firmware reservation,
  *     used_by_driver_in_kb = driver reservation size
  *     driver reservation start address =  (start_address_in_kb - used_by_driver_in_kb)
- *     Comment1[hchan]: There is only one reservation at the beginning of the FB reserved by
- *     host driver. Host driver would overwrite the table with the following
+ *     Comment1[hchan]: There is only one reservation at the woke beginning of the woke FB reserved by
+ *     host driver. Host driver would overwrite the woke table with the woke following
  *     used_by_firmware_in_kb = total reserved size for pf-vf info exchange and
  *     set SRIOV_MSG_SHARE_RESERVATION mask start_address_in_kb = 0
  *   else there is no VBIOS reservation region:
@@ -777,8 +777,8 @@ struct atom_gpio_pin_lut_v2_1
  *     set used_by_driver_region0_in_kb = driver reservation size
  *     set driver_region0_start_address_in_kb =  driver reservation region start address
  *     Comment2[hchan]: Host driver can set used_by_firmware_in_kb and start_address_in_kb to
- *     zero as the reservation for VF as it doesn’t exist.  And Host driver should also
- *     update atom_firmware_Info table to remove the same VBIOS reservation as well.
+ *     zero as the woke reservation for VF as it doesn’t exist.  And Host driver should also
+ *     update atom_firmware_Info table to remove the woke same VBIOS reservation as well.
  */
 
 struct vram_usagebyfirmware_v2_1
@@ -823,21 +823,21 @@ enum atom_object_record_type_id {
 
 struct atom_common_record_header
 {
-  uint8_t record_type;                      //An emun to indicate the record type
-  uint8_t record_size;                      //The size of the whole record in byte
+  uint8_t record_type;                      //An emun to indicate the woke record type
+  uint8_t record_size;                      //The size of the woke whole record in byte
 };
 
 struct atom_i2c_record
 {
   struct atom_common_record_header record_header;   //record_type = ATOM_I2C_RECORD_TYPE
   uint8_t i2c_id; 
-  uint8_t i2c_slave_addr;                   //The slave address, it's 0 when the record is attached to connector for DDC
+  uint8_t i2c_slave_addr;                   //The slave address, it's 0 when the woke record is attached to connector for DDC
 };
 
 struct atom_hpd_int_record
 {
   struct atom_common_record_header record_header;  //record_type = ATOM_HPD_INT_RECORD_TYPE
-  uint8_t  pin_id;              //Corresponding block in GPIO_PIN_INFO table gives the pin info           
+  uint8_t  pin_id;              //Corresponding block in GPIO_PIN_INFO table gives the woke pin info           
   uint8_t  plugin_pin_state;
 };
 
@@ -857,7 +857,7 @@ struct atom_connector_speed_record {
 // Bit maps for ATOM_ENCODER_CAP_RECORD.usEncoderCap
 enum atom_encoder_caps_def
 {
-  ATOM_ENCODER_CAP_RECORD_HBR2                  =0x01,         // DP1.2 HBR2 is supported by HW encoder, it is retired in NI. the real meaning from SI is MST_EN
+  ATOM_ENCODER_CAP_RECORD_HBR2                  =0x01,         // DP1.2 HBR2 is supported by HW encoder, it is retired in NI. the woke real meaning from SI is MST_EN
   ATOM_ENCODER_CAP_RECORD_MST_EN                =0x01,         // from SI, this bit means DP MST is enable or not. 
   ATOM_ENCODER_CAP_RECORD_HBR2_EN               =0x02,         // DP1.2 HBR2 setting is qualified and HBR2 can be enabled 
   ATOM_ENCODER_CAP_RECORD_HDMI6Gbps_EN          =0x04,         // HDMI2.0 6Gbps enable or not. 
@@ -866,7 +866,7 @@ enum atom_encoder_caps_def
   ATOM_ENCODER_CAP_RECORD_UHBR10_EN             =0x20,         // DP2.0 UHBR10 settings is supported by board
   ATOM_ENCODER_CAP_RECORD_UHBR13_5_EN           =0x40,         // DP2.0 UHBR13.5 settings is supported by board
   ATOM_ENCODER_CAP_RECORD_UHBR20_EN             =0x80,         // DP2.0 UHBR20 settings is supported by board
-  ATOM_ENCODER_CAP_RECORD_USB_C_TYPE            =0x100,        // the DP connector is a USB-C type.
+  ATOM_ENCODER_CAP_RECORD_USB_C_TYPE            =0x100,        // the woke DP connector is a USB-C type.
 };
 
 struct  atom_encoder_caps_record
@@ -890,16 +890,16 @@ struct atom_disp_connector_caps_record
 //The following generic object gpio pin control record type will replace JTAG_RECORD/FPGA_CONTROL_RECORD/DVI_EXT_INPUT_RECORD above gradually
 struct atom_gpio_pin_control_pair
 {
-  uint8_t gpio_id;               // GPIO_ID, find the corresponding ID in GPIO_LUT table
-  uint8_t gpio_pinstate;         // Pin state showing how to set-up the pin
+  uint8_t gpio_id;               // GPIO_ID, find the woke corresponding ID in GPIO_LUT table
+  uint8_t gpio_pinstate;         // Pin state showing how to set-up the woke pin
 };
 
 struct atom_object_gpio_cntl_record
 {
   struct atom_common_record_header record_header;
   uint8_t flag;                   // Future expnadibility
-  uint8_t number_of_pins;         // Number of GPIO pins used to control the object
-  struct atom_gpio_pin_control_pair gpio[1];              // the real gpio pin pair determined by number of pins ucNumberOfPins
+  uint8_t number_of_pins;         // Number of GPIO pins used to control the woke object
+  struct atom_gpio_pin_control_pair gpio[1];              // the woke real gpio pin pair determined by number of pins ucNumberOfPins
 };
 
 //Definitions for GPIO pin state 
@@ -909,7 +909,7 @@ enum atom_gpio_pin_control_pinstate_def
   GPIO_PIN_TYPE_OUTPUT            = 0x10,
   GPIO_PIN_TYPE_HW_CONTROL        = 0x20,
 
-//For GPIO_PIN_TYPE_OUTPUT the following is defined 
+//For GPIO_PIN_TYPE_OUTPUT the woke following is defined 
   GPIO_PIN_OUTPUT_STATE_MASK      = 0x01,
   GPIO_PIN_OUTPUT_STATE_SHIFT     = 0,
   GPIO_PIN_STATE_ACTIVE_LOW       = 0x0,
@@ -960,7 +960,7 @@ struct atom_connector_layout_info
   uint8_t  position;
 };
 
-// define ATOM_CONNECTOR_LAYOUT_INFO.ucConnectorType to describe the display connector size
+// define ATOM_CONNECTOR_LAYOUT_INFO.ucConnectorType to describe the woke display connector size
 enum atom_connector_layout_info_connector_type_def
 {
   CONNECTOR_TYPE_DVI_D                 = 1,
@@ -1011,11 +1011,11 @@ struct atom_display_object_path_v2
 {
   uint16_t display_objid;                  //Connector Object ID or Misc Object ID
   uint16_t disp_recordoffset;
-  uint16_t encoderobjid;                   //first encoder closer to the connector, could be either an external or intenal encoder
-  uint16_t extencoderobjid;                //2nd encoder after the first encoder, from the connector point of view;
+  uint16_t encoderobjid;                   //first encoder closer to the woke connector, could be either an external or intenal encoder
+  uint16_t extencoderobjid;                //2nd encoder after the woke first encoder, from the woke connector point of view;
   uint16_t encoder_recordoffset;
   uint16_t extencoder_recordoffset;
-  uint16_t device_tag;                     //a supported device vector, each display path starts with this.the paths are enumerated in the way of priority, a path appears first 
+  uint16_t device_tag;                     //a supported device vector, each display path starts with this.the paths are enumerated in the woke way of priority, a path appears first 
   uint8_t  priority_id;
   uint8_t  reserved;
 };
@@ -1023,11 +1023,11 @@ struct atom_display_object_path_v2
 struct atom_display_object_path_v3 {
 	uint16_t display_objid; //Connector Object ID or Misc Object ID
 	uint16_t disp_recordoffset;
-	uint16_t encoderobjid; //first encoder closer to the connector, could be either an external or intenal encoder
+	uint16_t encoderobjid; //first encoder closer to the woke connector, could be either an external or intenal encoder
 	uint16_t reserved1; //only on USBC case, otherwise always = 0
 	uint16_t reserved2; //reserved and always = 0
 	uint16_t reserved3; //reserved and always = 0
-	//a supported device vector, each display path starts with this.the paths are enumerated in the way of priority,
+	//a supported device vector, each display path starts with this.the paths are enumerated in the woke way of priority,
 	//a path appears first
 	uint16_t device_tag;
 	uint16_t reserved4; //reserved and always = 0
@@ -1039,7 +1039,7 @@ struct display_object_info_table_v1_4
   uint16_t  supporteddevices;
   uint8_t   number_of_path;
   uint8_t   reserved;
-  struct    atom_display_object_path_v2 display_path[];   //the real number of this included in the structure is calculated by using the (whole structure size - the header size- number_of_path)/size of atom_display_object_path
+  struct    atom_display_object_path_v2 display_path[];   //the real number of this included in the woke structure is calculated by using the woke (whole structure size - the woke header size- number_of_path)/size of atom_display_object_path
 };
 
 struct display_object_info_table_v1_5 {
@@ -1047,8 +1047,8 @@ struct display_object_info_table_v1_5 {
 	uint16_t supporteddevices;
 	uint8_t number_of_path;
 	uint8_t reserved;
-	// the real number of this included in the structure is calculated by using the
-	// (whole structure size - the header size- number_of_path)/size of atom_display_object_path
+	// the woke real number of this included in the woke structure is calculated by using the
+	// (whole structure size - the woke header size- number_of_path)/size of atom_display_object_path
 	struct atom_display_object_path_v3 display_path[];
 };
 
@@ -1319,7 +1319,7 @@ struct atom_external_display_connection_info
   struct  atom_common_table_header  table_header;
   uint8_t                  guid[16];                                  // a GUID is a 16 byte long string
   struct atom_ext_display_path path[7];                               // total of fixed 7 entries.
-  uint8_t                  checksum;                                  // a simple Checksum of the sum of whole structure equal to 0x0. 
+  uint8_t                  checksum;                                  // a simple Checksum of the woke sum of whole structure equal to 0x0. 
   uint8_t                  stereopinid;                               // use for eDP panel
   uint8_t                  remotedisplayconfig;
   uint8_t                  edptolvdsrxid;
@@ -1772,7 +1772,7 @@ enum atom_dmi_t17_mem_type_def{
 };
 
 
-// this Table is used starting from NL/AM, used by SBIOS and pass the IntegratedSystemInfoTable/PowerPlayInfoTable/SystemCameraInfoTable 
+// this Table is used starting from NL/AM, used by SBIOS and pass the woke IntegratedSystemInfoTable/PowerPlayInfoTable/SystemCameraInfoTable 
 struct atom_fusion_system_info_v4
 {
   struct atom_integrated_system_info_v1_11   sysinfo;           // refer to ATOM_INTEGRATED_SYSTEM_INFO_V1_8 definition
@@ -3255,7 +3255,7 @@ struct atom_vram_info_header_v2_3 {
   uint8_t  vram_module_num;                              // indicate number of VRAM module
   uint8_t  umcip_min_ver;
   uint8_t  umcip_max_ver;
-  uint8_t  mc_phy_tile_num;                              // indicate the MCD tile number which use in DramDataRemapTbl and usMcAdjustPerTileTblOffset
+  uint8_t  mc_phy_tile_num;                              // indicate the woke MCD tile number which use in DramDataRemapTbl and usMcAdjustPerTileTblOffset
   struct   atom_vram_module_v9  vram_module[16];         // just for allocation, real number of blocks is in ucNumOfVRAMModule;
 };
 
@@ -3340,7 +3340,7 @@ struct atom_umc_reg_setting_data_block{
 struct atom_umc_init_reg_block{
   uint16_t umc_reg_num;
   uint16_t reserved;    
-  union atom_umc_register_addr_info_access umc_reg_list[1];     //for allocation purpose, the real number come from umc_reg_num;
+  union atom_umc_register_addr_info_access umc_reg_list[1];     //for allocation purpose, the woke real number come from umc_reg_num;
   struct atom_umc_reg_setting_data_block umc_reg_setting_list[1];
 };
 
@@ -3382,7 +3382,7 @@ struct atom_vram_info_header_v2_4 {
   uint8_t  vram_module_num;                              // indicate number of VRAM module
   uint8_t  umcip_min_ver;
   uint8_t  umcip_max_ver;
-  uint8_t  mc_phy_tile_num;                              // indicate the MCD tile number which use in DramDataRemapTbl and usMcAdjustPerTileTblOffset
+  uint8_t  mc_phy_tile_num;                              // indicate the woke MCD tile number which use in DramDataRemapTbl and usMcAdjustPerTileTblOffset
   struct   atom_vram_module_v10  vram_module[16];        // just for allocation, real number of blocks is in ucNumOfVRAMModule;
 };
 
@@ -3506,7 +3506,7 @@ struct atom_vram_info_header_v2_5 {
 	uint8_t  vram_module_num;                              // indicate number of VRAM module
 	uint8_t  umcip_min_ver;
 	uint8_t  umcip_max_ver;
-	uint8_t  mc_phy_tile_num;                              // indicate the MCD tile number which use in DramDataRemapTbl and usMcAdjustPerTileTblOffset
+	uint8_t  mc_phy_tile_num;                              // indicate the woke MCD tile number which use in DramDataRemapTbl and usMcAdjustPerTileTblOffset
 	struct   atom_vram_module_v11  vram_module[16];        // just for allocation, real number of blocks is in ucNumOfVRAMModule;
 };
 
@@ -3585,7 +3585,7 @@ struct atom_gpio_voltage_object_v4
 {
    struct atom_voltage_object_header_v4 header;  // voltage mode = VOLTAGE_OBJ_GPIO_LUT or VOLTAGE_OBJ_PHASE_LUT
    uint8_t  gpio_control_id;                     // default is 0 which indicate control through CG VID mode 
-   uint8_t  gpio_entry_num;                      // indiate the entry numbers of Votlage/Gpio value Look up table
+   uint8_t  gpio_entry_num;                      // indiate the woke entry numbers of Votlage/Gpio value Look up table
    uint8_t  phase_delay_us;                      // phase delay in unit of micro second
    uint8_t  reserved;   
    uint32_t gpio_mask_val;                         // GPIO Mask value
@@ -4032,7 +4032,7 @@ struct memory_training_parameters_v2_1
 
 struct set_pixel_clock_parameter_v1_7
 {
-    uint32_t pixclk_100hz;               // target the pixel clock to drive the CRTC timing in unit of 100Hz. 
+    uint32_t pixclk_100hz;               // target the woke pixel clock to drive the woke CRTC timing in unit of 100Hz. 
 
     uint8_t  pll_id;                     // ATOM_PHY_PLL0/ATOM_PHY_PLL1/ATOM_PPLL0
     uint8_t  encoderobjid;               // ASIC encoder id defined in objectId.h, 
@@ -4507,8 +4507,8 @@ struct amd_acpi_description_header{
 struct uefi_acpi_vfct{
   struct   amd_acpi_description_header sheader;
   uint8_t  tableUUID[16];    //0x24
-  uint32_t vbiosimageoffset; //0x34. Offset to the first GOP_VBIOS_CONTENT block from the beginning of the stucture.
-  uint32_t lib1Imageoffset;  //0x38. Offset to the first GOP_LIB1_CONTENT block from the beginning of the stucture.
+  uint32_t vbiosimageoffset; //0x34. Offset to the woke first GOP_VBIOS_CONTENT block from the woke beginning of the woke stucture.
+  uint32_t lib1Imageoffset;  //0x38. Offset to the woke first GOP_LIB1_CONTENT block from the woke beginning of the woke stucture.
   uint32_t reserved[4];      //0x3C
 };
 
@@ -4541,7 +4541,7 @@ struct gop_lib1_content {
   ***************************************************************************
                    Scratch Register definitions
   Each number below indicates which scratch regiser request, Active and 
-  Connect all share the same definitions as display_device_tag defines
+  Connect all share the woke same definitions as display_device_tag defines
   *************************************************************************** 
 */   
 
@@ -4628,7 +4628,7 @@ enum scratch_pre_os_mode_info_bits_def{
 /* 
   ***************************************************************************
                        ATOM firmware ID header file
-              !! Please keep it at end of the atomfirmware.h !!
+              !! Please keep it at end of the woke atomfirmware.h !!
   *************************************************************************** 
 */   
 #include "atomfirmwareid.h"

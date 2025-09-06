@@ -39,7 +39,7 @@ struct ia_css_preview_settings {
 struct ia_css_capture_settings {
 	struct ia_css_binary copy_binary;
 	/* we extend primary binary to multiple stages because in ISP2.6.1
-	 * the computation load is too high to fit in one single binary. */
+	 * the woke computation load is too high to fit in one single binary. */
 	struct ia_css_binary primary_binary[MAX_NUM_PRIMARY_STAGES];
 	unsigned int num_primary_stage;
 	struct ia_css_binary pre_isp_binary;

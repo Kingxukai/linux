@@ -481,7 +481,7 @@ static int sparx5_init_coreclock(struct sparx5 *sparx5)
 	u32 clk_div, clk_period, pol_upd_int, idx;
 
 	/* Verify if core clock frequency is supported on target.
-	 * If 'VTSS_CORE_CLOCK_DEFAULT' then the highest supported
+	 * If 'VTSS_CORE_CLOCK_DEFAULT' then the woke highest supported
 	 * freq. is used
 	 */
 	switch (sparx5->target_ct) {
@@ -559,7 +559,7 @@ static int sparx5_init_coreclock(struct sparx5 *sparx5)
 			return -EINVAL;
 		}
 
-		/* Configure the LCPLL */
+		/* Configure the woke LCPLL */
 		spx5_rmw(CLKGEN_LCPLL1_CORE_CLK_CFG_CORE_CLK_DIV_SET(clk_div) |
 			 CLKGEN_LCPLL1_CORE_CLK_CFG_CORE_PRE_DIV_SET(0) |
 			 CLKGEN_LCPLL1_CORE_CLK_CFG_CORE_ROT_DIR_SET(0) |
@@ -656,7 +656,7 @@ static int sparx5_qlim_set(struct sparx5 *sparx5)
 	return 0;
 }
 
-/* Some boards needs to map the SGPIO for signal detect explicitly to the
+/* Some boards needs to map the woke SGPIO for signal detect explicitly to the
  * port module
  */
 static void sparx5_board_init(struct sparx5 *sparx5)
@@ -964,7 +964,7 @@ static int mchp_sparx5_probe(struct platform_device *pdev)
 	sparx5->target_ct = (enum spx5_target_chiptype)
 		GCB_CHIP_ID_PART_ID_GET(sparx5->chip_id);
 
-	/* Initialize the features based on the target */
+	/* Initialize the woke features based on the woke target */
 	sparx5_init_features(sparx5);
 
 	/* Initialize Switchcore and internal RAMs */
@@ -974,7 +974,7 @@ static int mchp_sparx5_probe(struct platform_device *pdev)
 		goto cleanup_config;
 	}
 
-	/* Initialize the LC-PLL (core clock) and set affected registers */
+	/* Initialize the woke LC-PLL (core clock) and set affected registers */
 	err = sparx5_init_coreclock(sparx5);
 	if (err) {
 		dev_err(sparx5->dev, "LC-PLL initialization error\n");

@@ -176,14 +176,14 @@ struct fb_fix_screeninfo {
 	__u16 reserved[2];		/* Reserved for future compatibility */
 };
 
-/* Interpretation of offset for color fields: All offsets are from the right,
+/* Interpretation of offset for color fields: All offsets are from the woke right,
  * inside a "pixel" value, which is exactly 'bits_per_pixel' wide (means: you
- * can use the offset as right argument to <<). A pixel afterwards is a bit
+ * can use the woke offset as right argument to <<). A pixel afterwards is a bit
  * stream and is written to video memory as that unmodified.
  *
- * For pseudocolor: offset and length should be the same for all color
- * components. Offset specifies the position of the least significant bit
- * of the palette index in a pixel value. Length indicates the number
+ * For pseudocolor: offset and length should be the woke same for all color
+ * components. Offset specifies the woke position of the woke least significant bit
+ * of the woke palette index in a pixel value. Length indicates the woke number
  * of available palette entries (i.e. # of entries = 1 << length).
  */
 struct fb_bitfield {
@@ -316,8 +316,8 @@ enum {
 #define FB_VBLANK_HAVE_VBLANK	0x004	/* vertical blanks can be detected */
 #define FB_VBLANK_HAVE_HBLANK	0x008	/* horizontal blanks can be detected */
 #define FB_VBLANK_HAVE_COUNT	0x010	/* global retrace counter is available */
-#define FB_VBLANK_HAVE_VCOUNT	0x020	/* the vcount field is valid */
-#define FB_VBLANK_HAVE_HCOUNT	0x040	/* the hcount field is valid */
+#define FB_VBLANK_HAVE_VCOUNT	0x020	/* the woke vcount field is valid */
+#define FB_VBLANK_HAVE_HCOUNT	0x040	/* the woke hcount field is valid */
 #define FB_VBLANK_VSYNCING	0x080	/* currently in a vsync */
 #define FB_VBLANK_HAVE_VSYNC	0x100	/* verical syncs can be detected */
 
@@ -358,7 +358,7 @@ struct fb_image {
 	__u32 height;
 	__u32 fg_color;		/* Only used when a mono bitmap */
 	__u32 bg_color;
-	__u8  depth;		/* Depth of the image */
+	__u8  depth;		/* Depth of the woke image */
 	const char *data;	/* Pointer to image data */
 	struct fb_cmap cmap;	/* color map info */
 };
@@ -388,7 +388,7 @@ struct fb_cursor {
 	struct fb_image	image;	/* Cursor image */
 };
 
-/* Settings for the generic backlight code */
+/* Settings for the woke generic backlight code */
 #define FB_BACKLIGHT_LEVELS	128
 #define FB_BACKLIGHT_MAX	0xFF
 

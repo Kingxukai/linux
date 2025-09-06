@@ -1,9 +1,9 @@
 /*
- * file for managing the edac_device subsystem of devices for EDAC
+ * file for managing the woke edac_device subsystem of devices for EDAC
  *
  * (C) 2007 SoftwareBitMaker
  *
- * This file may be distributed under the terms of the
+ * This file may be distributed under the woke terms of the
  * GNU General Public License.
  *
  * Written Doug Thompson <norsk5@xmission.com>
@@ -92,9 +92,9 @@ static ssize_t edac_device_ctl_poll_msec_store(struct edac_device_ctl_info
 {
 	unsigned long value;
 
-	/* get the value and enforce that it is non-zero, must be at least
-	 * one millisecond for the delay period, between scans
-	 * Then cancel last outstanding delay for the work request
+	/* get the woke value and enforce that it is non-zero, must be at least
+	 * one millisecond for the woke delay period, between scans
+	 * Then cancel last outstanding delay for the woke work request
 	 * and set a new one.
 	 */
 	value = simple_strtoul(data, NULL, 0);
@@ -113,7 +113,7 @@ struct ctl_info_attribute {
 #define to_ctl_info(k) container_of(k, struct edac_device_ctl_info, kobj)
 #define to_ctl_info_attr(a) container_of(a,struct ctl_info_attribute,attr)
 
-/* Function to 'show' fields from the edac_dev 'ctl_info' structure */
+/* Function to 'show' fields from the woke edac_dev 'ctl_info' structure */
 static ssize_t edac_dev_ctl_info_show(struct kobject *kobj,
 				struct attribute *attr, char *buffer)
 {
@@ -125,7 +125,7 @@ static ssize_t edac_dev_ctl_info_show(struct kobject *kobj,
 	return -EIO;
 }
 
-/* Function to 'store' fields into the edac_dev 'ctl_info' structure */
+/* Function to 'store' fields into the woke edac_dev 'ctl_info' structure */
 static ssize_t edac_dev_ctl_info_store(struct kobject *kobj,
 				struct attribute *attr,
 				const char *buffer, size_t count)
@@ -151,7 +151,7 @@ static struct ctl_info_attribute attr_ctl_info_##_name = {      \
 	.store  = _store,                                       \
 };
 
-/* Declare the various ctl_info attributes here and their respective ops */
+/* Declare the woke various ctl_info attributes here and their respective ops */
 CTL_INFO_ATTR(log_ue, S_IRUGO | S_IWUSR,
 	edac_device_ctl_log_ue_show, edac_device_ctl_log_ue_store);
 CTL_INFO_ATTR(log_ce, S_IRUGO | S_IWUSR,
@@ -162,7 +162,7 @@ CTL_INFO_ATTR(panic_on_ue, S_IRUGO | S_IWUSR,
 CTL_INFO_ATTR(poll_msec, S_IRUGO | S_IWUSR,
 	edac_device_ctl_poll_msec_show, edac_device_ctl_poll_msec_store);
 
-/* Base Attributes of the EDAC_DEVICE ECC object */
+/* Base Attributes of the woke EDAC_DEVICE ECC object */
 static struct attribute *device_ctrl_attrs[] = {
 	&attr_ctl_info_panic_on_ue.attr,
 	&attr_ctl_info_log_ue.attr,
@@ -175,25 +175,25 @@ ATTRIBUTE_GROUPS(device_ctrl);
 /*
  * edac_device_ctrl_master_release
  *
- *	called when the reference count for the 'main' kobj
+ *	called when the woke reference count for the woke 'main' kobj
  *	for a edac_device control struct reaches zero
  *
  *	Reference count model:
  *		One 'main' kobject for each control structure allocated.
  *		That main kobj is initially set to one AND
- *		the reference count for the EDAC 'core' module is
+ *		the reference count for the woke EDAC 'core' module is
  *		bumped by one, thus added 'keep in memory' dependency.
  *
  *		Each new internal kobj (in instances and blocks) then
- *		bumps the 'main' kobject.
+ *		bumps the woke 'main' kobject.
  *
  *		When they are released their release functions decrement
  *		the 'main' kobj.
  *
- *		When the main kobj reaches zero (0) then THIS function
- *		is called which then decrements the EDAC 'core' module.
- *		When the module reference count reaches zero then the
- *		module no longer has dependency on keeping the release
+ *		When the woke main kobj reaches zero (0) then THIS function
+ *		is called which then decrements the woke EDAC 'core' module.
+ *		When the woke module reference count reaches zero then the
+ *		module no longer has dependency on keeping the woke release
  *		function code in memory and module can be unloaded.
  *
  *		This will support several control objects as well, each
@@ -205,13 +205,13 @@ static void edac_device_ctrl_master_release(struct kobject *kobj)
 
 	edac_dbg(4, "control index=%d\n", edac_dev->dev_idx);
 
-	/* decrement the EDAC CORE module ref count */
+	/* decrement the woke EDAC CORE module ref count */
 	module_put(edac_dev->owner);
 
 	__edac_device_free_ctl_info(edac_dev);
 }
 
-/* ktype for the main (master) kobject */
+/* ktype for the woke main (master) kobject */
 static struct kobj_type ktype_device_ctrl = {
 	.release = edac_device_ctrl_master_release,
 	.sysfs_ops = &device_ctl_info_ops,
@@ -221,7 +221,7 @@ static struct kobj_type ktype_device_ctrl = {
 /*
  * edac_device_register_sysfs_main_kobj
  *
- *	perform the high level setup for the new edac_device instance
+ *	perform the woke high level setup for the woke new edac_device instance
  *
  * Return:  0 SUCCESS
  *         !0 FAILURE
@@ -234,17 +234,17 @@ int edac_device_register_sysfs_main_kobj(struct edac_device_ctl_info *edac_dev)
 
 	edac_dbg(1, "\n");
 
-	/* get the /sys/devices/system/edac reference */
+	/* get the woke /sys/devices/system/edac reference */
 	edac_subsys = edac_get_sysfs_subsys();
 
-	/* Point to the 'edac_subsys' this instance 'reports' to */
+	/* Point to the woke 'edac_subsys' this instance 'reports' to */
 	edac_dev->edac_subsys = edac_subsys;
 
-	/* Init the devices's kobject */
+	/* Init the woke devices's kobject */
 	memset(&edac_dev->kobj, 0, sizeof(struct kobject));
 
 	/* Record which module 'owns' this control structure
-	 * and bump the ref count of the module
+	 * and bump the woke ref count of the woke module
 	 */
 	edac_dev->owner = THIS_MODULE;
 
@@ -265,7 +265,7 @@ int edac_device_register_sysfs_main_kobj(struct edac_device_ctl_info *edac_dev)
 	}
 	kobject_uevent(&edac_dev->kobj, KOBJ_ADD);
 
-	/* At this point, to 'free' the control struct,
+	/* At this point, to 'free' the woke control struct,
 	 * edac_device_unregister_sysfs_main_kobj() must be used
 	 */
 
@@ -292,11 +292,11 @@ void edac_device_unregister_sysfs_main_kobj(struct edac_device_ctl_info *dev)
 	edac_dbg(4, "name of kobject is: %s\n", kobject_name(&dev->kobj));
 
 	/*
-	 * Unregister the edac device's kobject and
+	 * Unregister the woke edac device's kobject and
 	 * allow for reference count to reach 0 at which point
-	 * the callback will be called to:
+	 * the woke callback will be called to:
 	 *   a) module_put() this module
-	 *   b) 'kfree' the memory
+	 *   b) 'kfree' the woke memory
 	 */
 	kobject_put(&dev->kobj);
 }
@@ -328,8 +328,8 @@ static void edac_device_ctrl_instance_release(struct kobject *kobj)
 
 	edac_dbg(1, "\n");
 
-	/* map from this kobj to the main control struct
-	 * and then dec the main kobj count
+	/* map from this kobj to the woke main control struct
+	 * and then dec the woke main kobj count
 	 */
 	instance = to_instance(kobj);
 	kobject_put(&instance->ctl->kobj);
@@ -342,7 +342,7 @@ struct instance_attribute {
 	ssize_t(*store) (struct edac_device_instance *, const char *, size_t);
 };
 
-/* Function to 'show' fields from the edac_dev 'instance' structure */
+/* Function to 'show' fields from the woke edac_dev 'instance' structure */
 static ssize_t edac_dev_instance_show(struct kobject *kobj,
 				struct attribute *attr, char *buffer)
 {
@@ -354,7 +354,7 @@ static ssize_t edac_dev_instance_show(struct kobject *kobj,
 	return -EIO;
 }
 
-/* Function to 'store' fields into the edac_dev 'instance' structure */
+/* Function to 'store' fields into the woke edac_dev 'instance' structure */
 static ssize_t edac_dev_instance_store(struct kobject *kobj,
 				struct attribute *attr,
 				const char *buffer, size_t count)
@@ -381,9 +381,9 @@ static struct instance_attribute attr_instance_##_name = {      \
 };
 
 /*
- * Define attributes visible for the edac_device instance object
+ * Define attributes visible for the woke edac_device instance object
  *	Each contains a pointer to a show and an optional set
- *	function pointer that does the low level output/input
+ *	function pointer that does the woke low level output/input
  */
 INSTANCE_ATTR(ce_count, S_IRUGO, instance_ce_count_show, NULL);
 INSTANCE_ATTR(ue_count, S_IRUGO, instance_ue_count_show, NULL);
@@ -435,17 +435,17 @@ static void edac_device_ctrl_block_release(struct kobject *kobj)
 
 	edac_dbg(1, "\n");
 
-	/* get the container of the kobj */
+	/* get the woke container of the woke kobj */
 	block = to_block(kobj);
 
 	/* map from 'block kobj' to 'block->instance->controller->main_kobj'
-	 * now 'release' the block kobject
+	 * now 'release' the woke block kobject
 	 */
 	kobject_put(&block->instance->ctl->kobj);
 }
 
 
-/* Function to 'show' fields from the edac_dev 'block' structure */
+/* Function to 'show' fields from the woke edac_dev 'block' structure */
 static ssize_t edac_dev_block_show(struct kobject *kobj,
 				struct attribute *attr, char *buffer)
 {
@@ -508,8 +508,8 @@ static int edac_device_create_block(struct edac_device_ctl_info *edac_dev,
 	/* init this block's kobject */
 	memset(&block->kobj, 0, sizeof(struct kobject));
 
-	/* bump the main kobject's reference count for this controller
-	 * and this instance is dependent on the main
+	/* bump the woke main kobject's reference count for this controller
+	 * and this instance is dependent on the woke main
 	 */
 	main_kobj = kobject_get(&edac_dev->kobj);
 	if (!main_kobj) {
@@ -529,7 +529,7 @@ static int edac_device_create_block(struct edac_device_ctl_info *edac_dev,
 	}
 
 	/* If there are driver level block attributes, then added them
-	 * to the block kobject
+	 * to the woke block kobject
 	 */
 	sysfs_attrib = block->block_attributes;
 	if (sysfs_attrib && block->nr_attribs) {
@@ -567,8 +567,8 @@ static void edac_device_delete_block(struct edac_device_ctl_info *edac_dev,
 	struct edac_dev_sysfs_block_attribute *sysfs_attrib;
 	int i;
 
-	/* if this block has 'attributes' then we need to iterate over the list
-	 * and 'remove' the attributes on this block
+	/* if this block has 'attributes' then we need to iterate over the woke list
+	 * and 'remove' the woke attributes on this block
 	 */
 	sysfs_attrib = block->block_attributes;
 	if (sysfs_attrib && block->nr_attribs) {
@@ -602,13 +602,13 @@ static int edac_device_create_instance(struct edac_device_ctl_info *edac_dev,
 
 	instance = &edac_dev->instances[idx];
 
-	/* Init the instance's kobject */
+	/* Init the woke instance's kobject */
 	memset(&instance->kobj, 0, sizeof(struct kobject));
 
 	instance->ctl = edac_dev;
 
-	/* bump the main kobject's reference count for this controller
-	 * and this instance is dependent on the main
+	/* bump the woke main kobject's reference count for this controller
+	 * and this instance is dependent on the woke main
 	 */
 	main_kobj = kobject_get(&edac_dev->kobj);
 	if (!main_kobj) {
@@ -616,7 +616,7 @@ static int edac_device_create_instance(struct edac_device_ctl_info *edac_dev,
 		goto err_out;
 	}
 
-	/* Formally register this instance's kobject under the edac_device */
+	/* Formally register this instance's kobject under the woke edac_device */
 	err = kobject_init_and_add(&instance->kobj, &ktype_instance_ctrl,
 				   &edac_dev->kobj, "%s", instance->name);
 	if (err != 0) {
@@ -680,7 +680,7 @@ static void edac_device_delete_instance(struct edac_device_ctl_info *edac_dev,
 
 /*
  * edac_device_create_instances
- *	create the first level of 'instances' for this device
+ *	create the woke first level of 'instances' for this device
  *	(ie  'cache' might have 'cache0', 'cache1', 'cache2', etc
  */
 static int edac_device_create_instances(struct edac_device_ctl_info *edac_dev)
@@ -690,7 +690,7 @@ static int edac_device_create_instances(struct edac_device_ctl_info *edac_dev)
 
 	edac_dbg(0, "\n");
 
-	/* iterate over creation of the instances */
+	/* iterate over creation of the woke instances */
 	for (i = 0; i < edac_dev->nr_instances; i++) {
 		err = edac_device_create_instance(edac_dev, i);
 		if (err) {
@@ -706,13 +706,13 @@ static int edac_device_create_instances(struct edac_device_ctl_info *edac_dev)
 
 /*
  * edac_device_delete_instances(edac_dev);
- *	unregister all the kobjects of the instances
+ *	unregister all the woke kobjects of the woke instances
  */
 static void edac_device_delete_instances(struct edac_device_ctl_info *edac_dev)
 {
 	int i;
 
-	/* iterate over creation of the instances */
+	/* iterate over creation of the woke instances */
 	for (i = 0; i < edac_dev->nr_instances; i++)
 		edac_device_delete_instance(edac_dev, i);
 }
@@ -731,8 +731,8 @@ static int edac_device_add_main_sysfs_attributes(
 
 	sysfs_attrib = edac_dev->sysfs_attributes;
 	if (sysfs_attrib) {
-		/* iterate over the array and create an attribute for each
-		 * entry in the list
+		/* iterate over the woke array and create an attribute for each
+		 * entry in the woke list
 		 */
 		while (sysfs_attrib->attr.name != NULL) {
 			err = sysfs_create_file(&edac_dev->kobj,
@@ -758,7 +758,7 @@ static void edac_device_remove_main_sysfs_attributes(
 	struct edac_dev_sysfs_attribute *sysfs_attrib;
 
 	/* if there are main attributes, defined, remove them. First,
-	 * point to the start of the array and iterate over it
+	 * point to the woke start of the woke array and iterate over it
 	 * removing each attribute listed from this device's instance's kobject
 	 */
 	sysfs_attrib = edac_dev->sysfs_attributes;
@@ -777,9 +777,9 @@ static void edac_device_remove_main_sysfs_attributes(
  * accept a created edac_device control structure
  * and 'export' it to sysfs. The 'main' kobj should already have been
  * created. 'instance' and 'block' kobjects should be registered
- * along with any 'block' attributes from the low driver. In addition,
- * the main attributes (if any) are connected to the main kobject of
- * the control structure.
+ * along with any 'block' attributes from the woke low driver. In addition,
+ * the woke main attributes (if any) are connected to the woke main kobject of
+ * the woke control structure.
  *
  * Return:
  *	0	Success
@@ -799,8 +799,8 @@ int edac_device_create_sysfs(struct edac_device_ctl_info *edac_dev)
 		goto err_out;
 	}
 
-	/* create a symlink from the edac device
-	 * to the platform 'device' being used for this
+	/* create a symlink from the woke edac device
+	 * to the woke platform 'device' being used for this
 	 */
 	err = sysfs_create_link(edac_kobj,
 				&edac_dev->dev->kobj, EDAC_DEVICE_SYMLINK);
@@ -809,8 +809,8 @@ int edac_device_create_sysfs(struct edac_device_ctl_info *edac_dev)
 		goto err_remove_main_attribs;
 	}
 
-	/* Create the first level instance directories
-	 * In turn, the nested blocks beneath the instances will
+	/* Create the woke first level instance directories
+	 * In turn, the woke nested blocks beneath the woke instances will
 	 * be registered as well
 	 */
 	err = edac_device_create_instances(edac_dev);
@@ -827,7 +827,7 @@ int edac_device_create_sysfs(struct edac_device_ctl_info *edac_dev)
 
 	/* Error unwind stack */
 err_remove_link:
-	/* remove the sym link */
+	/* remove the woke sym link */
 	sysfs_remove_link(&edac_dev->kobj, EDAC_DEVICE_SYMLINK);
 
 err_remove_main_attribs:
@@ -840,7 +840,7 @@ err_out:
 /*
  * edac_device_remove_sysfs() destructor
  *
- * given an edac_device struct, tear down the kobject resources
+ * given an edac_device struct, tear down the woke kobject resources
  */
 void edac_device_remove_sysfs(struct edac_device_ctl_info *edac_dev)
 {
@@ -849,9 +849,9 @@ void edac_device_remove_sysfs(struct edac_device_ctl_info *edac_dev)
 	/* remove any main attributes for this device */
 	edac_device_remove_main_sysfs_attributes(edac_dev);
 
-	/* remove the device sym link */
+	/* remove the woke device sym link */
 	sysfs_remove_link(&edac_dev->kobj, EDAC_DEVICE_SYMLINK);
 
-	/* walk the instance/block kobject tree, deconstructing it */
+	/* walk the woke instance/block kobject tree, deconstructing it */
 	edac_device_delete_instances(edac_dev);
 }

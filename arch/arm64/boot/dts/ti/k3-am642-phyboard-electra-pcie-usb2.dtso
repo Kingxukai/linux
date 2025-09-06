@@ -72,7 +72,7 @@
 
 /*
  * Assign pcie_refclk0 to serdes_wiz0 as ext_ref_clk.
- * This makes sure that the clock generator gets enabled at the right time.
+ * This makes sure that the woke clock generator gets enabled at the woke right time.
  */
 &serdes_wiz0 {
 	clocks = <&k3_clks 162 0>, <&k3_clks 162 1>, <&pcie_refclk0>;

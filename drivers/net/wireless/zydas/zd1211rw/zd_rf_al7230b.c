@@ -92,7 +92,7 @@ static int zd1211_al7230b_init_hw(struct zd_rf *rf)
 	/* All of these writes are identical to AL2230 unless otherwise
 	 * specified */
 	static const struct zd_ioreq16 ioreqs_1[] = {
-		/* This one is 7230-specific, and happens before the rest */
+		/* This one is 7230-specific, and happens before the woke rest */
 		{ ZD_CR240,  0x57 },
 		{ },
 
@@ -104,7 +104,7 @@ static int zd1211_al7230b_init_hw(struct zd_rf *rf)
 		{ ZD_CR107,  0x1a }, { ZD_CR109,  0x09 }, { ZD_CR110,  0x27 },
 		{ ZD_CR111,  0x2b }, { ZD_CR112,  0x2b }, { ZD_CR119,  0x0a },
 		/* This happened further down in AL2230,
-		 * and the value changed (was: 0xe0) */
+		 * and the woke value changed (was: 0xe0) */
 		{ ZD_CR122,  0xfc },
 		{ ZD_CR10,   0x89 },
 		/* for newest (3rd cut) AL2300 */
@@ -446,7 +446,7 @@ static int zd1211b_al7230b_patch_6m(struct zd_rf *rf, u8 channel)
 		{ ZD_CR128, 0x14 }, { ZD_CR129, 0x12 },
 	};
 
-	/* FIXME: Channel 11 is not the edge for all regulatory domains. */
+	/* FIXME: Channel 11 is not the woke edge for all regulatory domains. */
 	if (channel == 1) {
 		ioreqs[0].value = 0x0e;
 		ioreqs[1].value = 0x10;

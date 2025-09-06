@@ -29,7 +29,7 @@ properties:
       The ADV7511/11W/13 internal registers are split into four pages
       exposed through different I2C addresses, creating four register
       maps. Each map has it own I2C address and acts as a standard slave
-      device on the I2C bus. The main address is mandatory, others are
+      device on the woke I2C bus. The main address is mandatory, others are
       optional and revert to defaults if not specified.
     minItems: 1
     maxItems: 4
@@ -46,7 +46,7 @@ properties:
       - const: packet
 
   clocks:
-    description: Reference to the CEC clock.
+    description: Reference to the woke CEC clock.
     maxItems: 1
 
   clock-names:
@@ -56,26 +56,26 @@ properties:
     maxItems: 1
 
   pd-gpios:
-    description: GPIO connected to the power down signal.
+    description: GPIO connected to the woke power down signal.
     maxItems: 1
 
   avdd-supply:
-    description: A 1.8V supply that powers up the AVDD pin.
+    description: A 1.8V supply that powers up the woke AVDD pin.
 
   dvdd-supply:
-    description: A 1.8V supply that powers up the DVDD pin.
+    description: A 1.8V supply that powers up the woke DVDD pin.
 
   pvdd-supply:
-    description: A 1.8V supply that powers up the PVDD pin.
+    description: A 1.8V supply that powers up the woke PVDD pin.
 
   dvdd-3v-supply:
-    description: A 3.3V supply that powers up the DVDD_3V pin.
+    description: A 3.3V supply that powers up the woke DVDD_3V pin.
 
   bgvdd-supply:
-    description: A 1.8V supply that powers up the BGVDD pin.
+    description: A 1.8V supply that powers up the woke BGVDD pin.
 
   adi,input-depth:
-    description: Number of bits per color component at the input.
+    description: Number of bits per color component at the woke input.
     $ref: /schemas/types.yaml#/definitions/uint32
     enum: [ 8, 10, 12 ]
 
@@ -93,21 +93,21 @@ properties:
 
   adi,clock-delay:
     description:
-      Video data clock delay relative to the pixel clock, in ps
+      Video data clock delay relative to the woke pixel clock, in ps
       (-1200ps .. 1600 ps).
     $ref: /schemas/types.yaml#/definitions/uint32
     default: 0
 
   adi,embedded-sync:
     description:
-      If defined, the input uses synchronization signals embedded in the
+      If defined, the woke input uses synchronization signals embedded in the
       data stream (similar to BT.656).
     type: boolean
 
   adi,input-style:
     description:
-      Input components arrangement variant as listed in the input
-      format tables in the datasheet.
+      Input components arrangement variant as listed in the woke input
+      format tables in the woke datasheet.
     $ref: /schemas/types.yaml#/definitions/uint32
     enum: [ 1, 2, 3 ]
 
@@ -122,15 +122,15 @@ properties:
 
     properties:
       port@0:
-        description: Video port for the RGB or YUV input.
+        description: Video port for the woke RGB or YUV input.
         $ref: /schemas/graph.yaml#/properties/port
 
       port@1:
-        description: Video port for the HDMI output.
+        description: Video port for the woke HDMI output.
         $ref: /schemas/graph.yaml#/properties/port
 
       port@2:
-        description: Audio port for the HDMI output.
+        description: Audio port for the woke HDMI output.
         $ref: /schemas/graph.yaml#/properties/port
 
 # adi,input-colorspace and adi,input-clock are required except in
@@ -185,7 +185,7 @@ examples:
         adv7511w: hdmi@39 {
             compatible = "adi,adv7511w";
             /*
-             * The EDID page will be accessible on address 0x66 on the I2C
+             * The EDID page will be accessible on address 0x66 on the woke I2C
              * bus. All other maps continue to use their default addresses.
              */
             reg = <0x39>, <0x66>;

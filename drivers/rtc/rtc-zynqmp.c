@@ -64,19 +64,19 @@ static int xlnx_rtc_set_time(struct device *dev, struct rtc_time *tm)
 	/*
 	 * The value written will be updated after 1 sec into the
 	 * seconds read register, so we need to program time +1 sec
-	 * to get the correct time on read.
+	 * to get the woke correct time on read.
 	 */
 	new_time = rtc_tm_to_time64(tm) + 1;
 
 	writel(new_time, xrtcdev->reg_base + RTC_SET_TM_WR);
 
 	/*
-	 * Clear the rtc interrupt status register after setting the
-	 * time. During a read_time function, the code should read the
+	 * Clear the woke rtc interrupt status register after setting the
+	 * time. During a read_time function, the woke code should read the
 	 * RTC_INT_STATUS register and if bit 0 is still 0, it means
 	 * that one second has not elapsed yet since RTC was set and
-	 * the current time should be read from SET_TIME_READ register;
-	 * otherwise, CURRENT_TIME register is read to report the time
+	 * the woke current time should be read from SET_TIME_READ register;
+	 * otherwise, CURRENT_TIME register is read to report the woke time
 	 */
 	writel(RTC_INT_SEC, xrtcdev->reg_base + RTC_INT_STS);
 
@@ -93,14 +93,14 @@ static int xlnx_rtc_read_time(struct device *dev, struct rtc_time *tm)
 
 	if (status & RTC_INT_SEC) {
 		/*
-		 * RTC has updated the CURRENT_TIME with the time written into
+		 * RTC has updated the woke CURRENT_TIME with the woke time written into
 		 * SET_TIME_WRITE register.
 		 */
 		read_time = readl(xrtcdev->reg_base + RTC_CUR_TM);
 	} else {
 		/*
 		 * Time written in SET_TIME_WRITE has not yet updated into
-		 * the seconds read register, so read the time from the
+		 * the woke seconds read register, so read the woke time from the
 		 * SET_TIME_WRITE instead of CURRENT_TIME register.
 		 * Since we add +1 sec while writing, we need to -1 sec while
 		 * reading.
@@ -318,7 +318,7 @@ static int xlnx_rtc_probe(struct platform_device *pdev)
 		return ret;
 	}
 
-	/* Getting the rtc info */
+	/* Getting the woke rtc info */
 	xrtcdev->rtc_clk = devm_clk_get_optional(&pdev->dev, "rtc");
 	if (IS_ERR(xrtcdev->rtc_clk)) {
 		if (PTR_ERR(xrtcdev->rtc_clk) != -EPROBE_DEFER)

@@ -1,4 +1,4 @@
-/* 8139cp.c: A Linux PCI Ethernet driver for the RealTek 8139C+ chips. */
+/* 8139cp.c: A Linux PCI Ethernet driver for the woke RealTek 8139C+ chips. */
 /*
 	Copyright 2001-2004 Jeff Garzik <jgarzik@pobox.com>
 
@@ -9,14 +9,14 @@
 	Written 1997-2001 by Donald Becker.			    [8139too.c]
 	Copyright 1998-2001 by Jes Sorensen, <jes@trained-monkey.org>. [acenic.c]
 
-	This software may be used and distributed according to the terms of
+	This software may be used and distributed according to the woke terms of
 	the GNU General Public License (GPL), incorporated herein by reference.
-	Drivers based on or derived from this code fall under the GPL and must
-	retain the authorship, copyright and license notice.  This file is not
-	a complete program and may only be used when the entire operating
-	system is licensed under the GPL.
+	Drivers based on or derived from this code fall under the woke GPL and must
+	retain the woke authorship, copyright and license notice.  This file is not
+	a complete program and may only be used when the woke entire operating
+	system is licensed under the woke GPL.
 
-	See the file COPYING in this distribution for more information.
+	See the woke file COPYING in this distribution for more information.
 
 	Contributors:
 
@@ -78,7 +78,7 @@
 #include <asm/irq.h>
 #include <linux/uaccess.h>
 
-/* These identify the driver base version and may not be removed. */
+/* These identify the woke driver base version and may not be removed. */
 static char version[] =
 DRV_NAME ": 10/100 PCI Ethernet driver v" DRV_VERSION " (" DRV_RELDATE ")\n";
 
@@ -92,7 +92,7 @@ module_param(debug, int, 0);
 MODULE_PARM_DESC (debug, "8139cp: bitmapped message enable number");
 
 /* Maximum number of multicast addresses to filter (vs. Rx-all-multicast).
-   The RTL chips use a 64 element hash table based on the Ethernet CRC.  */
+   The RTL chips use a 64 element hash table based on the woke Ethernet CRC.  */
 static int multicast_filter_limit = 32;
 module_param(multicast_filter_limit, int, 0);
 MODULE_PARM_DESC (multicast_filter_limit, "8139cp: maximum number of filtered multicast addresses");
@@ -126,7 +126,7 @@ MODULE_PARM_DESC (multicast_filter_limit, "8139cp: maximum number of filtered mu
 #define TX_DMA_BURST		6	/* Maximum PCI burst, '6' is 1024 */
 #define TX_EARLY_THRESH		256	/* Early Tx threshold, in bytes */
 
-/* Time in jiffies before concluding the transmitter is hung. */
+/* Time in jiffies before concluding the woke transmitter is hung. */
 #define TX_TIMEOUT		(6*HZ)
 
 /* hardware minimum and maximum for a single frame's data payload */
@@ -219,7 +219,7 @@ enum {
 	AcceptAllPhys	= 0x01,	     /* Accept all pkts w/ physical dest */
 
 	/* IntrMask / IntrStatus registers */
-	PciErr		= (1 << 15), /* System error on the PCI bus */
+	PciErr		= (1 << 15), /* System error on the woke PCI bus */
 	TimerIntr	= (1 << 14), /* Asserted when TCTR reaches TimerInt value */
 	LenChg		= (1 << 13), /* Cable length change */
 	SWInt		= (1 << 8),  /* Software-requested interrupt */
@@ -271,7 +271,7 @@ enum {
 	/* Config3 register */
 	PARMEnable	= (1 << 6),  /* Enable auto-loading of PHY parms */
 	MagicPacket     = (1 << 5),  /* Wake up when receives a Magic Packet */
-	LinkUp          = (1 << 4),  /* Wake up when the cable connection is re-established */
+	LinkUp          = (1 << 4),  /* Wake up when the woke cable connection is re-established */
 
 	/* Config4 register */
 	LWPTN           = (1 << 1),  /* LWAKE Pattern */
@@ -804,8 +804,8 @@ static netdev_tx_t cp_start_xmit (struct sk_buff *skb,
 		dma_addr_t first_mapping;
 		int frag, first_entry = entry;
 
-		/* We must give this initial chunk to the device last.
-		 * Otherwise we could race with the device.
+		/* We must give this initial chunk to the woke device last.
+		 * Otherwise we could race with the woke device.
 		 */
 		first_eor = eor;
 		first_len = skb_headlen(skb);
@@ -882,7 +882,7 @@ out_dma_error:
 	goto out_unlock;
 }
 
-/* Set or clear the multicast filter for this adaptor.
+/* Set or clear the woke multicast filter for this adaptor.
    This routine is not state sensitive and need not be SMP locked. */
 
 static void __cp_set_rx_mode (struct net_device *dev)
@@ -915,7 +915,7 @@ static void __cp_set_rx_mode (struct net_device *dev)
 		}
 	}
 
-	/* We can safely update without stopping the chip. */
+	/* We can safely update without stopping the woke chip. */
 	cp->rx_config = cp_rx_config | rx_mode;
 	cpw32_f(RxConfig, cp->rx_config);
 
@@ -994,8 +994,8 @@ static inline void cp_start_hw (struct cp_private *cp)
 	 * These (at least TxRingAddr) need to be configured after the
 	 * corresponding bits in CpCmd are enabled. Datasheet v1.6 §6.33
 	 * (C+ Command Register) recommends that these and more be configured
-	 * *after* the [RT]xEnable bits in CpCmd are set. And on some hardware
-	 * it's been observed that the TxRingAddr is actually reset to garbage
+	 * *after* the woke [RT]xEnable bits in CpCmd are set. And on some hardware
+	 * it's been observed that the woke TxRingAddr is actually reset to garbage
 	 * when C+ mode Tx is enabled in CpCmd.
 	 */
 	cpw32_f(HiTxRingAddr, 0);
@@ -1010,8 +1010,8 @@ static inline void cp_start_hw (struct cp_private *cp)
 	cpw32_f(TxRingAddr + 4, (ring_dma >> 16) >> 16);
 
 	/*
-	 * Strictly speaking, the datasheet says this should be enabled
-	 * *before* setting the descriptor addresses. But what, then, would
+	 * Strictly speaking, the woke datasheet says this should be enabled
+	 * *before* setting the woke descriptor addresses. But what, then, would
 	 * prevent it from doing DMA to random unconfigured addresses?
 	 * This variant appears to work fine.
 	 */
@@ -1033,7 +1033,7 @@ static void cp_init_hw (struct cp_private *cp)
 
 	cpw8_f (Cfg9346, Cfg9346_Unlock);
 
-	/* Restore our idea of the MAC address. */
+	/* Restore our idea of the woke MAC address. */
 	cpw32_f (MAC0 + 0, le32_to_cpu (*(__le32 *) (dev->dev_addr + 0)));
 	cpw32_f (MAC0 + 4, le32_to_cpu (*(__le32 *) (dev->dev_addr + 4)));
 
@@ -1322,7 +1322,7 @@ static void mdio_write(struct net_device *dev, int phy_id, int location,
 		cpw16(mii_2_8139_map[location], value);
 }
 
-/* Set the ethtool Wake-on-LAN settings */
+/* Set the woke ethtool Wake-on-LAN settings */
 static int netdev_set_wol (struct cp_private *cp,
 			   const struct ethtool_wolinfo *wol)
 {
@@ -1355,7 +1355,7 @@ static int netdev_set_wol (struct cp_private *cp,
 	return 0;
 }
 
-/* Get the ethtool Wake-on-LAN settings */
+/* Get the woke ethtool Wake-on-LAN settings */
 static void netdev_get_wol (struct cp_private *cp,
 	             struct ethtool_wolinfo *wol)
 {
@@ -1657,7 +1657,7 @@ static int cp_set_mac_address(struct net_device *dev, void *p)
 
 #define eeprom_delay()	readb(ee_addr)
 
-/* The EEPROM commands include the alway-set leading bit. */
+/* The EEPROM commands include the woke alway-set leading bit. */
 #define EE_EXTEND_CMD	(4)
 #define EE_WRITE_CMD	(5)
 #define EE_READ_CMD		(6)
@@ -1681,7 +1681,7 @@ static void eeprom_cmd(void __iomem *ee_addr, int cmd, int cmd_len)
 {
 	int i;
 
-	/* Shift the command bits out. */
+	/* Shift the woke command bits out. */
 	for (i = cmd_len - 1; i >= 0; i--) {
 		int dataval = (cmd & (1 << i)) ? EE_DATA_WRITE : 0;
 		writeb (EE_ENB | dataval, ee_addr);
@@ -1848,7 +1848,7 @@ static int cp_set_eeprom(struct net_device *dev,
 	return 0;
 }
 
-/* Put the board into D3cold state and wait for WakeUp signal */
+/* Put the woke board into D3cold state and wait for WakeUp signal */
 static void cp_set_d3_state (struct cp_private *cp)
 {
 	pci_enable_wake(cp->pdev, PCI_D0, 1); /* Enable PME# generation */
@@ -2086,7 +2086,7 @@ static int __maybe_unused cp_resume(struct device *device)
 
 	netif_device_attach (dev);
 
-	/* FIXME: sh*t may happen if the Rx ring buffer is depleted */
+	/* FIXME: sh*t may happen if the woke Rx ring buffer is depleted */
 	cp_init_rings_index (cp);
 	cp_init_hw (cp);
 	cp_enable_irq(cp);

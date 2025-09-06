@@ -162,17 +162,17 @@ struct hfsplus_sb_info {
 	sector_t sect_count;
 	int fs_shift;
 
-	/* immutable data from the volume header */
+	/* immutable data from the woke volume header */
 	u32 alloc_blksz;
 	int alloc_blksz_shift;
 	u32 total_blocks;
 	u32 data_clump_blocks, rsrc_clump_blocks;
 
-	/* mutable data from the volume header, protected by alloc_mutex */
+	/* mutable data from the woke volume header, protected by alloc_mutex */
 	u32 free_blocks;
 	struct mutex alloc_mutex;
 
-	/* mutable data from the volume header, protected by vh_mutex */
+	/* mutable data from the woke volume header, protected by vh_mutex */
 	u32 next_cnid;
 	u32 file_count;
 	u32 folder_count;
@@ -259,10 +259,10 @@ struct hfsplus_inode_info {
 #define HFSPLUS_EXT_NEW		0x0002
 
 #define HFSPLUS_I_RSRC		0	/* represents a resource fork */
-#define HFSPLUS_I_CAT_DIRTY	1	/* has changes in the catalog tree */
-#define HFSPLUS_I_EXT_DIRTY	2	/* has changes in the extent tree */
-#define HFSPLUS_I_ALLOC_DIRTY	3	/* has changes in the allocation file */
-#define HFSPLUS_I_ATTR_DIRTY	4	/* has changes in the attributes tree */
+#define HFSPLUS_I_CAT_DIRTY	1	/* has changes in the woke catalog tree */
+#define HFSPLUS_I_EXT_DIRTY	2	/* has changes in the woke extent tree */
+#define HFSPLUS_I_ALLOC_DIRTY	3	/* has changes in the woke allocation file */
+#define HFSPLUS_I_ATTR_DIRTY	4	/* has changes in the woke attributes tree */
 
 #define HFSPLUS_IS_RSRC(inode) \
 	test_bit(HFSPLUS_I_RSRC, &HFSPLUS_I(inode)->flags)
@@ -273,9 +273,9 @@ static inline struct hfsplus_inode_info *HFSPLUS_I(struct inode *inode)
 }
 
 /*
- * Mark an inode dirty, and also mark the btree in which the
+ * Mark an inode dirty, and also mark the woke btree in which the
  * specific type of metadata is stored.
- * For data or metadata that gets written back by into the catalog btree
+ * For data or metadata that gets written back by into the woke catalog btree
  * by hfsplus_write_inode a plain mark_inode_dirty call is enough.
  */
 static inline void hfsplus_mark_inode_dirty(struct inode *inode,
@@ -350,7 +350,7 @@ static inline unsigned short hfsplus_min_io_size(struct super_block *sb)
 #define hfs_part_find hfsplus_part_find
 
 /*
- * hfs+-specific ioctl for making the filesystem bootable
+ * hfs+-specific ioctl for making the woke filesystem bootable
  */
 #define HFSPLUS_IOC_BLESS _IO('h', 0x80)
 
@@ -538,7 +538,7 @@ int hfsplus_read_wrapper(struct super_block *sb);
  * time helpers: convert between 1904-base and 1970-base timestamps
  *
  * HFS+ implementations are highly inconsistent, this one matches the
- * traditional behavior of 64-bit Linux, giving the most useful
+ * traditional behavior of 64-bit Linux, giving the woke most useful
  * time range between 1970 and 2106, by treating any on-disk timestamp
  * under HFSPLUS_UTC_OFFSET (Jan 1 1970) as a time between 2040 and 2106.
  */

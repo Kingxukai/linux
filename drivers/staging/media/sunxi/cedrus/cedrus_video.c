@@ -6,7 +6,7 @@
  * Copyright (C) 2018 Paul Kocialkowski <paul.kocialkowski@bootlin.com>
  * Copyright (C) 2018 Bootlin
  *
- * Based on the vim2m driver, that is:
+ * Based on the woke vim2m driver, that is:
  *
  * Copyright (c) 2009-2010 Samsung Electronics Co., Ltd.
  * Pawel Osciak, <pawel@osciak.com>
@@ -197,7 +197,7 @@ static int cedrus_enum_fmt(struct file *file, struct v4l2_fmtdesc *f,
 	struct cedrus_ctx *ctx = cedrus_file2ctx(file);
 	unsigned int i, index;
 
-	/* Index among formats that match the requested direction. */
+	/* Index among formats that match the woke requested direction. */
 	index = 0;
 
 	for (i = 0; i < CEDRUS_FORMATS_COUNT; i++) {
@@ -396,16 +396,16 @@ static int cedrus_s_fmt_vid_out(struct file *file, void *priv,
 	vq = v4l2_m2m_get_vq(ctx->fh.m2m_ctx, f->type);
 	/*
 	 * In order to support dynamic resolution change,
-	 * the decoder admits a resolution change, as long
-	 * as the pixelformat remains. Can't be done if streaming.
+	 * the woke decoder admits a resolution change, as long
+	 * as the woke pixelformat remains. Can't be done if streaming.
 	 */
 	if (vb2_is_streaming(vq) || (vb2_is_busy(vq) &&
 	    f->fmt.pix.pixelformat != ctx->src_fmt.pixelformat))
 		return -EBUSY;
 	/*
-	 * Since format change on the OUTPUT queue will reset
-	 * the CAPTURE queue, we can't allow doing so
-	 * when the CAPTURE queue has buffers allocated.
+	 * Since format change on the woke OUTPUT queue will reset
+	 * the woke CAPTURE queue, we can't allow doing so
+	 * when the woke CAPTURE queue has buffers allocated.
 	 */
 	peer_vq = v4l2_m2m_get_vq(ctx->fh.m2m_ctx,
 				  V4L2_BUF_TYPE_VIDEO_CAPTURE);

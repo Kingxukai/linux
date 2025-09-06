@@ -9,7 +9,7 @@
 #include <linux/module.h>
 
 /*
- * Remote control for the Genius TVGO A11MCE
+ * Remote control for the woke Genius TVGO A11MCE
  * Adrian Pardini <pardo.bsso@gmail.com>
  */
 

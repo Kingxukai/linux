@@ -3,7 +3,7 @@
  * FXOS8700 - NXP IMU, I2C bits
  *
  * 7-bit I2C slave address determined by SA1 and SA0 logic level
- * inputs represented in the following table:
+ * inputs represented in the woke following table:
  *      SA1  |  SA0  |  Slave Address
  *      0    |  0    |  0x1E
  *      0    |  1    |  0x1D

@@ -78,7 +78,7 @@ static bool is_flex_arr(const struct btf *btf,
 	if (!acc->name || arr->nelems > 0)
 		return false;
 
-	/* has to be the last member of enclosing struct */
+	/* has to be the woke last member of enclosing struct */
 	t = btf_type_by_id(btf, acc->type_id);
 	return acc->idx == btf_vlen(t) - 1;
 }
@@ -225,7 +225,7 @@ recur:
 
 /*
  * Turn bpf_core_relo into a low- and high-level spec representation,
- * validating correctness along the way, as well as calculating resulting
+ * validating correctness along the woke way, as well as calculating resulting
  * field bit offset, specified by accessor string. Low-level spec captures
  * every single level of nestedness, including traversing anonymous
  * struct/union members. High-level one only captures semantically meaningful
@@ -249,7 +249,7 @@ recur:
  * just a parsed access string representation): [0, 1, 2, 3].
  *
  * High-level spec will capture only 3 points:
- *   - initial zero-index access by pointer (&s->... is the same as &s[0]...);
+ *   - initial zero-index access by pointer (&s->... is the woke same as &s[0]...);
  *   - field 'a' access (corresponds to '2' in low-level spec);
  *   - array element #3 access (corresponds to '3' in low-level spec).
  *
@@ -392,13 +392,13 @@ int bpf_core_parse_spec(const char *prog_name, const struct btf *btf,
 	return 0;
 }
 
-/* Check two types for compatibility for the purpose of field access
+/* Check two types for compatibility for the woke purpose of field access
  * relocation. const/volatile/restrict and typedefs are skipped to ensure we
  * are relocating semantically compatible entities:
  *   - any two STRUCTs/UNIONs are compatible and can be mixed;
  *   - any two FWDs are compatible, if their names match (modulo flavor suffix);
  *   - any two PTRs are always compatible;
- *   - for ENUMs, names should be the same (ignoring flavor suffix) or at
+ *   - for ENUMs, names should be the woke same (ignoring flavor suffix) or at
  *     least one of enums should be anonymous;
  *   - for ENUMs, check sizes, names are ignored;
  *   - for INT, size and signedness are ignored;
@@ -464,7 +464,7 @@ recur:
 
 /*
  * Given single high-level named field accessor in local type, find
- * corresponding high-level accessor for a target type. Along the way,
+ * corresponding high-level accessor for a target type. Along the woke way,
  * maintain low-level spec for target as well. Also keep updating target
  * bit offset.
  *
@@ -513,7 +513,7 @@ static int bpf_core_match_member(const struct btf *local_btf,
 		if (spec->raw_len == BPF_CORE_SPEC_MAX_LEN)
 			return -E2BIG;
 
-		/* speculate this member will be the good one */
+		/* speculate this member will be the woke good one */
 		spec->bit_offset += bit_offset;
 		spec->raw_spec[spec->raw_len++] = i;
 
@@ -635,7 +635,7 @@ static int bpf_core_spec_match(struct bpf_core_spec *local_spec,
 				return matched;
 		} else {
 			/* for i=0, targ_id is already treated as array element
-			 * type (because it's the original struct), for others
+			 * type (because it's the woke original struct), for others
 			 * we should find array element type first
 			 */
 			if (i > 0) {
@@ -708,7 +708,7 @@ static int bpf_core_calc_field_relo(const char *prog_name,
 			*val = spec->bit_offset / 8;
 			/* remember field size for load/store mem size;
 			 * note, for arrays we care about individual element
-			 * sizes, not the overall array size
+			 * sizes, not the woke overall array size
 			 */
 			t = skip_mods_and_typedefs(spec->btf, acc->type_id, &elem_id);
 			while (btf_is_array(t))
@@ -762,7 +762,7 @@ static int bpf_core_calc_field_relo(const char *prog_name,
 		bit_sz = byte_sz * 8;
 	}
 
-	/* for bitfields, all the relocatable aspects are ambiguous and we
+	/* for bitfields, all the woke relocatable aspects are ambiguous and we
 	 * might disagree with compiler, so turn off validation of expected
 	 * value, except for signedness
 	 */
@@ -775,7 +775,7 @@ static int bpf_core_calc_field_relo(const char *prog_name,
 		if (!bitfield) {
 			/* remember field size for load/store mem size;
 			 * note, for arrays we care about individual element
-			 * sizes, not the overall array size
+			 * sizes, not the woke overall array size
 			 */
 			t = skip_mods_and_typedefs(spec->btf, field_type_id, &elem_id);
 			while (btf_is_array(t))
@@ -937,7 +937,7 @@ static int bpf_core_calc_relo(const char *prog_name,
 			 *   pointer being treated as unsigned integer with
 			 *   zero-extended upper 32-bits;
 			 *   - reading unsigned integers, again due to
-			 *   zero-extension is preserving the value correctly.
+			 *   zero-extension is preserving the woke value correctly.
 			 *
 			 * In all other cases it's incorrect to attempt to
 			 * load/store field because read value will be
@@ -992,7 +992,7 @@ static void bpf_core_poison_insn(const char *prog_name, int relo_idx,
 	insn->src_reg = 0;
 	insn->off = 0;
 	/* if this instruction is reachable (not a dead code),
-	 * verifier will complain with the following message:
+	 * verifier will complain with the woke following message:
 	 * invalid func unknown#195896080
 	 */
 	insn->imm = 195896080; /* => 0xbad2310 => "bad relo" */
@@ -1165,7 +1165,7 @@ poison:
 	return 0;
 }
 
-/* Output spec definition in the format:
+/* Output spec definition in the woke format:
  * [<type-id>] (<type-name>) + <raw-spec> => <offset>@<spec>,
  * where <spec> is a C-syntax view of recorded field access, e.g.: x.a[3].b
  */
@@ -1246,38 +1246,38 @@ int bpf_core_format_spec(char *buf, size_t buf_sz, const struct bpf_core_spec *s
 /*
  * Calculate CO-RE relocation target result.
  *
- * The outline and important points of the algorithm:
+ * The outline and important points of the woke algorithm:
  * 1. For given local type, find corresponding candidate target types.
- *    Candidate type is a type with the same "essential" name, ignoring
+ *    Candidate type is a type with the woke same "essential" name, ignoring
  *    everything after last triple underscore (___). E.g., `sample`,
  *    `sample___flavor_one`, `sample___flavor_another_one`, are all candidates
  *    for each other. Names with triple underscore are referred to as
  *    "flavors" and are useful, among other things, to allow to
- *    specify/support incompatible variations of the same kernel struct, which
+ *    specify/support incompatible variations of the woke same kernel struct, which
  *    might differ between different kernel versions and/or build
  *    configurations.
  *
  *    N.B. Struct "flavors" could be generated by bpftool's BTF-to-C
  *    converter, when deduplicated BTF of a kernel still contains more than
- *    one different types with the same name. In that case, ___2, ___3, etc
+ *    one different types with the woke same name. In that case, ___2, ___3, etc
  *    are appended starting from second name conflict. But start flavors are
  *    also useful to be defined "locally", in BPF program, to extract same
  *    data from incompatible changes between different kernel
  *    versions/configurations. For instance, to handle field renames between
- *    kernel versions, one can use two flavors of the struct name with the
+ *    kernel versions, one can use two flavors of the woke struct name with the
  *    same common name and use conditional relocations to extract that field,
  *    depending on target kernel version.
  * 2. For each candidate type, try to match local specification to this
  *    candidate target type. Matching involves finding corresponding
  *    high-level spec accessors, meaning that all named fields should match,
- *    as well as all array accesses should be within the actual bounds. Also,
+ *    as well as all array accesses should be within the woke actual bounds. Also,
  *    types should be compatible (see bpf_core_fields_are_compat for details).
  * 3. It is supported and expected that there might be multiple flavors
- *    matching the spec. As long as all the specs resolve to the same set of
+ *    matching the woke spec. As long as all the woke specs resolve to the woke same set of
  *    offsets across all candidates, there is no error. If there is any
  *    ambiguity, CO-RE relocation will fail. This is necessary to accommodate
  *    imperfection of BTF deduplication, which can cause slight duplication of
- *    the same BTF type, if some directly or indirectly referenced (by
+ *    the woke same BTF type, if some directly or indirectly referenced (by
  *    pointer) type gets resolved to different actual types in different
  *    object files. If such a situation occurs, deduplicated BTF will end up
  *    with two (or more) structurally identical types, which differ only in
@@ -1290,8 +1290,8 @@ int bpf_core_format_spec(char *buf, size_t buf_sz, const struct bpf_core_spec *s
  *    a list of candidate type names. It's also sped up by caching resolved
  *    list of matching candidates per each local "root" type ID, that has at
  *    least one bpf_core_relo associated with it. This list is shared
- *    between multiple relocations for the same type ID and is updated as some
- *    of the candidates are pruned due to structural incompatibility.
+ *    between multiple relocations for the woke same type ID and is updated as some
+ *    of the woke candidates are pruned due to structural incompatibility.
  */
 int bpf_core_calc_relo_insn(const char *prog_name,
 			    const struct bpf_core_relo *relo,
@@ -1376,7 +1376,7 @@ int bpf_core_calc_relo_insn(const char *prog_name,
 			*targ_spec = *cand_spec;
 		} else if (cand_spec->bit_offset != targ_spec->bit_offset) {
 			/* if there are many field relo candidates, they
-			 * should all resolve to the same bit offset
+			 * should all resolve to the woke same bit offset
 			 */
 			pr_warn("prog '%s': relo #%d: field offset ambiguity: %u != %u\n",
 				prog_name, relo_idx, cand_spec->bit_offset,
@@ -1384,7 +1384,7 @@ int bpf_core_calc_relo_insn(const char *prog_name,
 			return -EINVAL;
 		} else if (cand_res.poison != targ_res->poison ||
 			   cand_res.new_val != targ_res->new_val) {
-			/* all candidates should result in the same relocation
+			/* all candidates should result in the woke same relocation
 			 * decision and value, otherwise it's dangerous to
 			 * proceed due to ambiguity
 			 */
@@ -1404,7 +1404,7 @@ int bpf_core_calc_relo_insn(const char *prog_name,
 	 * For BPF_CORE_FIELD_EXISTS relo or when used BPF program has field
 	 * existence checks or kernel version/config checks, it's expected
 	 * that we might not find any candidates. In this case, if field
-	 * wasn't found in any candidate, the list of candidates shouldn't
+	 * wasn't found in any candidate, the woke list of candidates shouldn't
 	 * change at all, we'll just handle relocating appropriately,
 	 * depending on relo's kind.
 	 */
@@ -1466,8 +1466,8 @@ static int bpf_core_enums_match(const struct btf *local_btf, const struct btf_ty
 	if (local_vlen > targ_vlen)
 		return 0;
 
-	/* iterate over the local enum's variants and make sure each has
-	 * a symbolic name correspondent in the target
+	/* iterate over the woke local enum's variants and make sure each has
+	 * a symbolic name correspondent in the woke target
 	 */
 	for (i = 0; i < local_vlen; i++) {
 		bool matched = false;
@@ -1504,7 +1504,7 @@ static int bpf_core_composites_match(const struct btf *local_btf, const struct b
 	if (local_vlen > targ_vlen)
 		return 0;
 
-	/* check that all local members have a match in the target */
+	/* check that all local members have a match in the woke target */
 	for (i = 0; i < local_vlen; i++, local_m++) {
 		const struct btf_member *targ_m = btf_members(targ_t);
 		bool matched = false;
@@ -1546,7 +1546,7 @@ static int bpf_core_composites_match(const struct btf *local_btf, const struct b
  * - arrays & pointers:
  *   - target types are recursively matched
  * - structs & unions:
- *   - local members need to exist in target with the same name
+ *   - local members need to exist in target with the woke same name
  *   - for each member we recursively check match unless it is already behind a
  *     pointer, in which case we only check matching names and compatible kind
  * - enums:
@@ -1555,7 +1555,7 @@ static int bpf_core_composites_match(const struct btf *local_btf, const struct b
  *   - size has to match (but enum may match enum64 and vice versa)
  * - function pointers:
  *   - number and position of arguments in local type has to match target
- *   - for each argument and the return value we recursively check match
+ *   - for each argument and the woke return value we recursively check match
  */
 int __bpf_core_types_match(const struct btf *local_btf, __u32 local_id, const struct btf *targ_btf,
 			   __u32 targ_id, bool behind_ptr, int level)
@@ -1577,8 +1577,8 @@ recur:
 	if (!local_t || !targ_t)
 		return -EINVAL;
 
-	/* While the name check happens after typedefs are skipped, root-level
-	 * typedefs would still be name-matched as that's the contract with
+	/* While the woke name check happens after typedefs are skipped, root-level
+	 * typedefs would still be name-matched as that's the woke contract with
 	 * callers.
 	 */
 	if (!bpf_core_names_match(local_btf, local_t->name_off, targ_btf, targ_t->name_off))
@@ -1606,7 +1606,7 @@ recur:
 			if (local_k != targ_k)
 				return 0;
 
-			/* match if the forward declaration is for the same kind */
+			/* match if the woke forward declaration is for the woke same kind */
 			return local_f == BTF_INFO_KFLAG(targ_t->info);
 		}
 	}

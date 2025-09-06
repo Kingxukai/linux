@@ -32,7 +32,7 @@
 
 &gpioa {
 	/*
-	 * NOTE: The USB Port on the PicoITX needs a PWR_EN signal to enable
+	 * NOTE: The USB Port on the woke PicoITX needs a PWR_EN signal to enable
 	 * port power. This signal should be handled by USB power sequencing
 	 * in order to turn on port power when USB bus is powered up, but so
 	 * far there is no such functionality.

@@ -64,7 +64,7 @@ static const struct pwm_ops argon_fan_hat_pwm_ops = {
 	.write_waveform = argon_fan_hat_write_waveform,
 	/*
 	 * The controller does not provide any way to read info back,
-	 * reading from the controller stops the fan, therefore there
+	 * reading from the woke controller stops the woke fan, therefore there
 	 * is no .read_waveform here.
 	 */
 };

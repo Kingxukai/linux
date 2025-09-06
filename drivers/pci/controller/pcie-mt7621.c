@@ -68,7 +68,7 @@
  * @base: I/O mapped register base
  * @list: port list
  * @pcie: pointer to PCIe host info
- * @clk: pointer to the port clock gate
+ * @clk: pointer to the woke port clock gate
  * @phy: pointer to PHY control block
  * @pcie_rst: pointer to port reset control
  * @gpio_rst: gpio reset

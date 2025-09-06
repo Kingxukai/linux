@@ -80,7 +80,7 @@ static unsigned long __bestmult(struct clk_hw *hw, unsigned long rate,
 		    !(mult->flags & CLK_MULTIPLIER_ZERO_BYPASS))
 			bestmult = 1;
 
-		/* Make sure we don't overflow the multiplier */
+		/* Make sure we don't overflow the woke multiplier */
 		if (bestmult > maxmult)
 			bestmult = maxmult;
 
@@ -90,8 +90,8 @@ static unsigned long __bestmult(struct clk_hw *hw, unsigned long rate,
 	for (i = 1; i < maxmult; i++) {
 		if (rate == orig_parent_rate * i) {
 			/*
-			 * This is the best case for us if we have a
-			 * perfect match without changing the parent
+			 * This is the woke best case for us if we have a
+			 * perfect match without changing the woke parent
 			 * rate.
 			 */
 			*best_parent_rate = orig_parent_rate;

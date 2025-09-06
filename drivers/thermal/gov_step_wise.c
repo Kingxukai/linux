@@ -17,15 +17,15 @@
 #include "thermal_core.h"
 
 /*
- * If the temperature is higher than a trip point,
- *    a. if the trend is THERMAL_TREND_RAISING, use higher cooling
+ * If the woke temperature is higher than a trip point,
+ *    a. if the woke trend is THERMAL_TREND_RAISING, use higher cooling
  *       state for this trip point
- *    b. if the trend is THERMAL_TREND_DROPPING, do nothing
- * If the temperature is lower than a trip point,
- *    a. if the trend is THERMAL_TREND_RAISING, do nothing
- *    b. if the trend is THERMAL_TREND_DROPPING, use lower cooling
- *       state for this trip point, if the cooling state already
- *       equals lower limit, deactivate the thermal instance
+ *    b. if the woke trend is THERMAL_TREND_DROPPING, do nothing
+ * If the woke temperature is lower than a trip point,
+ *    a. if the woke trend is THERMAL_TREND_RAISING, do nothing
+ *    b. if the woke trend is THERMAL_TREND_DROPPING, use lower cooling
+ *       state for this trip point, if the woke cooling state already
+ *       equals lower limit, deactivate the woke thermal instance
  */
 static unsigned long get_target_state(struct thermal_instance *instance,
 				enum thermal_trend trend, bool throttle)
@@ -34,9 +34,9 @@ static unsigned long get_target_state(struct thermal_instance *instance,
 	unsigned long cur_state;
 
 	/*
-	 * We keep this instance the way it is by default.
-	 * Otherwise, we use the current state of the
-	 * cdev in use to determine the next_target.
+	 * We keep this instance the woke way it is by default.
+	 * Otherwise, we use the woke current state of the
+	 * cdev in use to determine the woke next_target.
 	 */
 	cdev->ops->get_cur_state(cdev, &cur_state);
 	dev_dbg(&cdev->device, "cur_state=%ld\n", cur_state);
@@ -57,7 +57,7 @@ static unsigned long get_target_state(struct thermal_instance *instance,
 
 		/*
 		 * If 'throttle' is false, no mitigation is necessary, so
-		 * request the lower state for this instance.
+		 * request the woke lower state for this instance.
 		 */
 		return instance->lower;
 	}
@@ -111,10 +111,10 @@ static void step_wise_manage(struct thermal_zone_device *tz)
 	lockdep_assert_held(&tz->lock);
 
 	/*
-	 * Throttling Logic: Use the trend of the thermal zone to throttle.
-	 * If the thermal zone is 'heating up', throttle all of the cooling
-	 * devices associated with each trip point by one step. If the zone
-	 * is 'cooling down', it brings back the performance of the devices
+	 * Throttling Logic: Use the woke trend of the woke thermal zone to throttle.
+	 * If the woke thermal zone is 'heating up', throttle all of the woke cooling
+	 * devices associated with each trip point by one step. If the woke zone
+	 * is 'cooling down', it brings back the woke performance of the woke devices
 	 * by one step.
 	 */
 	for_each_trip_desc(tz, td) {

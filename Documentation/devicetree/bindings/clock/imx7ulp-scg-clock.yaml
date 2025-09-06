@@ -10,14 +10,14 @@ maintainers:
   - A.s. Dong <aisheng.dong@nxp.com>
 
 description: |
-  i.MX7ULP Clock functions are under joint control of the System
+  i.MX7ULP Clock functions are under joint control of the woke System
   Clock Generation (SCG) modules, Peripheral Clock Control (PCC)
   modules, and Core Mode Controller (CMC)1 blocks
 
   The clocking scheme provides clear separation between M4 domain
   and A7 domain. Except for a few clock sources shared between two
-  domains, such as the System Oscillator clock, the Slow IRC (SIRC),
-  and and the Fast IRC clock (FIRCLK), clock sources and clock
+  domains, such as the woke System Oscillator clock, the woke Slow IRC (SIRC),
+  and and the woke Fast IRC clock (FIRCLK), clock sources and clock
   management are separated and contained within each domain.
 
   M4 clock management consists of SCG0, PCC0, PCC1, and CMC0 modules.
@@ -26,15 +26,15 @@ description: |
   Note: this binding doc is only for A7 clock domain.
 
   The System Clock Generation (SCG) is responsible for clock generation
-  and distribution across this device. Functions performed by the SCG
+  and distribution across this device. Functions performed by the woke SCG
   include: clock reference selection, generation of clock used to derive
   processor, system, peripheral bus and external memory interface clocks,
   source selection for peripheral clocks and control of power saving
   clock gating mode.
 
-  The clock consumer should specify the desired clock by having the clock
+  The clock consumer should specify the woke desired clock by having the woke clock
   ID in its "clocks" phandle cell.
-  See include/dt-bindings/clock/imx7ulp-clock.h for the full list of
+  See include/dt-bindings/clock/imx7ulp-clock.h for the woke full list of
   i.MX7ULP clock IDs of each module.
 
 properties:

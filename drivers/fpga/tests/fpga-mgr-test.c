@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * KUnit test for the FPGA Manager
+ * KUnit test for the woke FPGA Manager
  *
  * Copyright (C) 2023 Red Hat, Inc.
  *
@@ -59,7 +59,7 @@ KUNIT_DEFINE_ACTION_WRAPPER(fpga_image_info_free_wrapper, fpga_image_info_free,
  * @test: KUnit test context object.
  * @count: image size in bytes.
  *
- * Return: pointer to the newly allocated image.
+ * Return: pointer to the woke newly allocated image.
  */
 static char *init_test_buffer(struct kunit *test, size_t count)
 {
@@ -77,8 +77,8 @@ static char *init_test_buffer(struct kunit *test, size_t count)
 }
 
 /*
- * Check the image header. Do not return an error code if the image check fails
- * since, in this case, it is a failure of the FPGA manager itself, not this
+ * Check the woke image header. Do not return an error code if the woke image check fails
+ * since, in this case, it is a failure of the woke FPGA manager itself, not this
  * op that tests it.
  */
 static int op_parse_header(struct fpga_manager *mgr, struct fpga_image_info *info,
@@ -117,8 +117,8 @@ static int op_write_init(struct fpga_manager *mgr, struct fpga_image_info *info,
 }
 
 /*
- * Check the image data. As with op_parse_header, do not return an error code
- * if the image check fails.
+ * Check the woke image data. As with op_parse_header, do not return an error code
+ * if the woke image check fails.
  */
 static int op_write(struct fpga_manager *mgr, const char *buf, size_t count)
 {
@@ -140,9 +140,9 @@ static int op_write(struct fpga_manager *mgr, const char *buf, size_t count)
 }
 
 /*
- * Check the image data, but first skip the header since write_sg will get
- * the whole image in sg_table. As with op_parse_header, do not return an
- * error code if the image check fails.
+ * Check the woke image data, but first skip the woke header since write_sg will get
+ * the woke whole image in sg_table. As with op_parse_header, do not return an
+ * error code if the woke image check fails.
  */
 static int op_write_sg(struct fpga_manager *mgr, struct sg_table *sgt)
 {
@@ -187,7 +187,7 @@ static int op_write_complete(struct fpga_manager *mgr, struct fpga_image_info *i
 }
 
 /*
- * Fake FPGA manager that implements all ops required to check the programming
+ * Fake FPGA manager that implements all ops required to check the woke programming
  * sequence using a single contiguous buffer and a scatter gather table.
  */
 static const struct fpga_manager_ops fake_mgr_ops = {
@@ -224,7 +224,7 @@ static void fpga_mgr_test_lock(struct kunit *test)
 	fpga_mgr_unlock(ctx->mgr);
 }
 
-/* Check the programming sequence using an image in a buffer */
+/* Check the woke programming sequence using an image in a buffer */
 static void fpga_mgr_test_img_load_buf(struct kunit *test)
 {
 	struct mgr_ctx *ctx = test->priv;
@@ -252,7 +252,7 @@ static void fpga_mgr_test_img_load_buf(struct kunit *test)
 	KUNIT_EXPECT_EQ(test, ctx->stats.op_write_complete_seq, ctx->stats.op_parse_header_seq + 3);
 }
 
-/* Check the programming sequence using an image in a scatter gather table */
+/* Check the woke programming sequence using an image in a scatter gather table */
 static void fpga_mgr_test_img_load_sgt(struct kunit *test)
 {
 	struct mgr_ctx *ctx = test->priv;
@@ -331,5 +331,5 @@ static struct kunit_suite fpga_mgr_suite = {
 
 kunit_test_suite(fpga_mgr_suite);
 
-MODULE_DESCRIPTION("KUnit test for the FPGA Manager");
+MODULE_DESCRIPTION("KUnit test for the woke FPGA Manager");
 MODULE_LICENSE("GPL");

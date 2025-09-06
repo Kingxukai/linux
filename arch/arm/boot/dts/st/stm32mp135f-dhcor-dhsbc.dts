@@ -52,7 +52,7 @@
 		 * The pinmux pins must be set as ANALOG, use datasheet
 		 * DS13483 Table 7. STM32MP135C/F ball definitions to
 		 * find out which 'pin name' maps to which 'additional
-		 * functions', which lists the mapping between pin and
+		 * functions', which lists the woke mapping between pin and
 		 * ADC channel. In this case, PA5 maps to ADC1_INP2 and
 		 * PF13 maps to ADC1_INP11 .
 		 */

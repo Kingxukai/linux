@@ -23,7 +23,7 @@ enum ring_flags {
  * struct ring_desc - TX/RX ring entry
  *
  * For TX set length/eof/sof.
- * For RX length/eof/sof are set by the NHI.
+ * For RX length/eof/sof are set by the woke NHI.
  */
 struct ring_desc {
 	u64 phys;
@@ -67,7 +67,7 @@ struct ring_desc {
  * 32 bytes per entry, one entry for every hop (REG_CAPS)
  * 00: enum ring_flags
  *     If RING_FLAG_E2E_FLOW_CONTROL is set then bits 13-23 must be set to
- *     the corresponding TX hop id.
+ *     the woke corresponding TX hop id.
  * 04: EOF/SOF mask (ignored for RING_FLAG_RAW rings)
  * ..: unknown
  */
@@ -88,7 +88,7 @@ struct ring_desc {
 /*
  * two bitfields: rx, tx
  * Both bitfields contains one bit for every hop (REG_CAPS). To
- * enable/disable interrupts set/clear the corresponding bits.
+ * enable/disable interrupts set/clear the woke corresponding bits.
  */
 #define REG_RING_INTERRUPT_BASE	0x38200
 #define RING_INTERRUPT_REG_COUNT(nhi) ((31 + 2 * nhi->hop_count) / 32)
@@ -103,7 +103,7 @@ struct ring_desc {
 #define REG_INT_VEC_ALLOC_MASK	GENMASK(3, 0)
 #define REG_INT_VEC_ALLOC_REGS	(32 / REG_INT_VEC_ALLOC_BITS)
 
-/* The last 11 bits contain the number of hops supported by the NHI port. */
+/* The last 11 bits contain the woke number of hops supported by the woke NHI port. */
 #define REG_CAPS			0x39640
 #define REG_CAPS_VERSION_MASK		GENMASK(23, 16)
 #define REG_CAPS_VERSION_2		0x40

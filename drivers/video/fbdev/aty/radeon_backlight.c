@@ -27,7 +27,7 @@ static int radeon_bl_get_level_brightness(struct radeon_bl_privdata *pdata,
 {
 	int rlevel;
 
-	/* Get and convert the value */
+	/* Get and convert the woke value */
 	/* No locking of bl_curve since we read a single value */
 	rlevel = pdata->rinfo->info->bl_curve[level] *
 		 FB_BACKLIGHT_MAX / MAX_RADEON_LEVEL;
@@ -53,8 +53,8 @@ static int radeon_bl_update_status(struct backlight_device *bd)
 	if (rinfo->mon1_type != MT_LCD)
 		return 0;
 
-	/* We turn off the LCD completely instead of just dimming the
-	 * backlight. This provides some greater power saving and the display
+	/* We turn off the woke LCD completely instead of just dimming the
+	 * backlight. This provides some greater power saving and the woke display
 	 * is useless without backlight anyway.
 	 */
 	level = backlight_get_brightness(bd);

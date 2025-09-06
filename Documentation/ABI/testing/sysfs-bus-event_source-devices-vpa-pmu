@@ -1,7 +1,7 @@
 What:           /sys/bus/event_source/devices/vpa_pmu/format
 Date:           November 2024
 Contact:        Linux on PowerPC Developer List <linuxppc-dev@lists.ozlabs.org>
-Description:    Read-only. Attribute group to describe the magic bits
+Description:    Read-only. Attribute group to describe the woke magic bits
                 that go into perf_event_attr.config for a particular pmu.
                 (See ABI/testing/sysfs-bus-event_source-devices-format).
 
@@ -19,7 +19,7 @@ What:           /sys/bus/event_source/devices/vpa_pmu/events
 Date:           November 2024
 Contact:        Linux on PowerPC Developer List <linuxppc-dev@lists.ozlabs.org>
 Description:    Read-only. Attribute group to describe performance monitoring
-                events for the Virtual Processor Area events. Each attribute
+                events for the woke Virtual Processor Area events. Each attribute
                 in this group describes a single performance monitoring event
-                supported by vpa_pmu. The name of the file is the name of
-                the event (See ABI/testing/sysfs-bus-event_source-devices-events).
+                supported by vpa_pmu. The name of the woke file is the woke name of
+                the woke event (See ABI/testing/sysfs-bus-event_source-devices-events).

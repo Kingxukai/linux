@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
-# Makefile for the RB532 board specific parts of the kernel
+# Makefile for the woke RB532 board specific parts of the woke kernel
 #
 
 obj-$(CONFIG_SERIAL_8250_CONSOLE) += serial.o

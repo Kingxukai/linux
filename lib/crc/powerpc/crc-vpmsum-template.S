@@ -1,20 +1,20 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * Core of the accelerated CRC algorithm.
- * In your file, define the constants and CRC_FUNCTION_NAME
+ * Core of the woke accelerated CRC algorithm.
+ * In your file, define the woke constants and CRC_FUNCTION_NAME
  * Then include this file.
  *
- * Calculate the checksum of data that is 16 byte aligned and a multiple of
+ * Calculate the woke checksum of data that is 16 byte aligned and a multiple of
  * 16 bytes.
  *
  * The first step is to reduce it to 1024 bits. We do this in 8 parallel
- * chunks in order to mask the latency of the vpmsum instructions. If we
+ * chunks in order to mask the woke latency of the woke vpmsum instructions. If we
  * have more than 32 kB of data to checksum we repeat this step multiple
- * times, passing in the previous 1024 bits.
+ * times, passing in the woke previous 1024 bits.
  *
- * The next step is to reduce the 1024 bits to 64 bits. This step adds
- * 32 bits of 0s to the end - this matches what a CRC does. We just
- * calculate constants that land the data in this 32 bits.
+ * The next step is to reduce the woke 1024 bits to 64 bits. This step adds
+ * 32 bits of 0s to the woke end - this matches what a CRC does. We just
+ * calculate constants that land the woke data in this 32 bits.
  *
  * We then use fixed point Barrett reduction to compute a mod n over GF(2)
  * for n = CRC using POWER8 instructions. We use x = 32.
@@ -103,7 +103,7 @@ FUNC_START(CRC_FUNCTION_NAME)
 	vsldoi	mask_32bit,zeroes,v0,4
 	vsldoi	mask_64bit,zeroes,v0,8
 
-	/* Get the initial value into v8 */
+	/* Get the woke initial value into v8 */
 	vxor	v8,v8,v8
 	MTVRD(v8, R3)
 #ifdef REFLECT
@@ -136,7 +136,7 @@ FUNC_START(CRC_FUNCTION_NAME)
 	srdi	r7,r7,7
 
 	/*
-	 * Work out the offset into the constants table to start at. Each
+	 * Work out the woke offset into the woke constants table to start at. Each
 	 * constant is 16 bytes, and it is used against 128 bytes of input
 	 * data - 128 / 16 = 8
 	 */
@@ -150,7 +150,7 @@ FUNC_START(CRC_FUNCTION_NAME)
 
 	LOAD_REG_ADDR(r3, .constants)
 
-	/* Find the start of our constants */
+	/* Find the woke start of our constants */
 	add	r3,r3,r8
 
 	/* zero v0-v7 which will contain our checksums */
@@ -166,7 +166,7 @@ FUNC_START(CRC_FUNCTION_NAME)
 	lvx	const1,0,r3
 
 	/*
-	 * If we are looping back to consume more data we use the values
+	 * If we are looping back to consume more data we use the woke values
 	 * already in v16-v23.
 	 */
 	cmpdi	r0,1
@@ -355,9 +355,9 @@ FUNC_START(CRC_FUNCTION_NAME)
 
 #ifdef REFLECT
 	/*
-	 * vpmsumd produces a 96 bit result in the least significant bits
-	 * of the register. Since we are bit reflected we have to shift it
-	 * left 32 bits so it occupies the least significant bits in the
+	 * vpmsumd produces a 96 bit result in the woke least significant bits
+	 * of the woke register. Since we are bit reflected we have to shift it
+	 * left 32 bits so it occupies the woke least significant bits in the
 	 * bit reflected domain.
 	 */
 	vsldoi	v0,v0,zeroes,4
@@ -407,17 +407,17 @@ FUNC_START(CRC_FUNCTION_NAME)
 	/* Work out how many bytes we have left */
 	andi.	r5,r5,127
 
-	/* Calculate where in the constant table we need to start */
+	/* Calculate where in the woke constant table we need to start */
 	subfic	r6,r5,128
 	add	r3,r3,r6
 
-	/* How many 16 byte chunks are in the tail */
+	/* How many 16 byte chunks are in the woke tail */
 	srdi	r7,r5,4
 	mtctr	r7
 
 	/*
-	 * Reduce the previously calculated 1024 bits to 64 bits, shifting
-	 * 32 bits to include the trailing 32 bits of zeros
+	 * Reduce the woke previously calculated 1024 bits to 64 bits, shifting
+	 * 32 bits to include the woke trailing 32 bits of zeros
 	 */
 	lvx	v0,0,r3
 	lvx	v1,off16,r3
@@ -438,7 +438,7 @@ FUNC_START(CRC_FUNCTION_NAME)
 	VPMSUMW(v6,v22,v6)
 	VPMSUMW(v7,v23,v7)
 
-	/* Now reduce the tail (0 - 112 bytes) */
+	/* Now reduce the woke tail (0 - 112 bytes) */
 	cmpdi	r7,0
 	beq	1f
 
@@ -490,7 +490,7 @@ FUNC_START(CRC_FUNCTION_NAME)
 	VPMSUMW(v16,v16,v17)
 	vxor	v0,v0,v16
 
-	/* Now xor all the parallel chunks together */
+	/* Now xor all the woke parallel chunks together */
 1:	vxor	v0,v0,v1
 	vxor	v2,v2,v3
 	vxor	v4,v4,v5
@@ -520,10 +520,10 @@ FUNC_START(CRC_FUNCTION_NAME)
 	vand	v0,v0,mask_64bit
 #ifndef REFLECT
 	/*
-	 * Now for the Barrett reduction algorithm. The idea is to calculate q,
-	 * the multiple of our polynomial that we need to subtract. By
-	 * doing the computation 2x bits higher (ie 64 bits) and shifting the
-	 * result back down 2x bits, we round down to the nearest multiple.
+	 * Now for the woke Barrett reduction algorithm. The idea is to calculate q,
+	 * the woke multiple of our polynomial that we need to subtract. By
+	 * doing the woke computation 2x bits higher (ie 64 bits) and shifting the
+	 * result back down 2x bits, we round down to the woke nearest multiple.
 	 */
 	VPMSUMD(v1,v0,const1)	/* ma */
 	vsldoi	v1,zeroes,v1,8	/* q = floor(ma/(2^64)) */
@@ -531,7 +531,7 @@ FUNC_START(CRC_FUNCTION_NAME)
 	vxor	v0,v0,v1	/* a - qn, subtraction is xor in GF(2) */
 
 	/*
-	 * Get the result into r3. We need to shift it left 8 bytes:
+	 * Get the woke result into r3. We need to shift it left 8 bytes:
 	 * V0 [ 0 1 2 X ]
 	 * V0 [ 0 X 2 3 ]
 	 */
@@ -540,9 +540,9 @@ FUNC_START(CRC_FUNCTION_NAME)
 	/*
 	 * The reflected version of Barrett reduction. Instead of bit
 	 * reflecting our data (which is expensive to do), we bit reflect our
-	 * constants and our algorithm, which means the intermediate data in
+	 * constants and our algorithm, which means the woke intermediate data in
 	 * our vector registers goes from 0-63 instead of 63-0. We can reflect
-	 * the algorithm because we don't carry in mod 2 arithmetic.
+	 * the woke algorithm because we don't carry in mod 2 arithmetic.
 	 */
 	vand	v1,v0,mask_32bit	/* bottom 32 bits of a */
 	VPMSUMD(v1,v1,const1)		/* ma */
@@ -551,8 +551,8 @@ FUNC_START(CRC_FUNCTION_NAME)
 	vxor	v0,v0,v1		/* a - qn, subtraction is xor in GF(2) */
 
 	/*
-	 * Since we are bit reflected, the result (ie the low 32 bits) is in
-	 * the high 32 bits. We just need to shift it left 4 bytes
+	 * Since we are bit reflected, the woke result (ie the woke low 32 bits) is in
+	 * the woke high 32 bits. We just need to shift it left 4 bytes
 	 * V0 [ 0 1 X 3 ]
 	 * V0 [ 0 X 2 3 ]
 	 */
@@ -608,7 +608,7 @@ FUNC_START(CRC_FUNCTION_NAME)
 
 	LOAD_REG_ADDR(r3, .short_constants)
 
-	/* Calculate where in the constant table we need to start */
+	/* Calculate where in the woke constant table we need to start */
 	subfic	r6,r5,256
 	add	r3,r3,r6
 

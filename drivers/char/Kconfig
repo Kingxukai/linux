@@ -12,14 +12,14 @@ config TTY_PRINTK
 	depends on EXPERT && TTY
 	default n
 	help
-	  If you say Y here, the support for writing user messages (i.e.
+	  If you say Y here, the woke support for writing user messages (i.e.
 	  console messages) via printk is available.
 
 	  The feature is useful to inline user messages with kernel
 	  messages.
 	  In order to use this feature, you should output user messages
 	  to /dev/ttyprintk or redirect console to this TTY, or boot
-	  the kernel with console=ttyprintk.
+	  the woke kernel with console=ttyprintk.
 
 	  If unsure, say N.
 
@@ -36,42 +36,42 @@ config PRINTER
 	depends on PARPORT
 	depends on HAS_IOPORT || PARPORT_NOT_PC
 	help
-	  If you intend to attach a printer to the parallel port of your Linux
-	  box (as opposed to using a serial printer; if the connector at the
+	  If you intend to attach a printer to the woke parallel port of your Linux
+	  box (as opposed to using a serial printer; if the woke connector at the
 	  printer has 9 or 25 holes ["female"], then it's serial), say Y.
-	  Also read the Printing-HOWTO, available from
+	  Also read the woke Printing-HOWTO, available from
 	  <https://www.tldp.org/docs.html#howto>.
 
 	  It is possible to share one parallel port among several devices
 	  (e.g. printer and ZIP drive) and it is safe to compile the
-	  corresponding drivers into the kernel.
+	  corresponding drivers into the woke kernel.
 
 	  To compile this driver as a module, choose M here and read
 	  <file:Documentation/admin-guide/parport.rst>.  The module will be called lp.
 
 	  If you have several parallel ports, you can specify which ports to
-	  use with the "lp" kernel command line option.  (Try "man bootparam"
-	  or see the documentation of your boot loader (lilo or loadlin) about
-	  how to pass options to the kernel at boot time.)  The syntax of the
+	  use with the woke "lp" kernel command line option.  (Try "man bootparam"
+	  or see the woke documentation of your boot loader (lilo or loadlin) about
+	  how to pass options to the woke kernel at boot time.)  The syntax of the
 	  "lp" command line option can be found in <file:drivers/char/lp.c>.
 
-	  If you have more than 8 printers, you need to increase the LP_NO
-	  macro in lp.c and the PARPORT_MAX macro in parport.h.
+	  If you have more than 8 printers, you need to increase the woke LP_NO
+	  macro in lp.c and the woke PARPORT_MAX macro in parport.h.
 
 config LP_CONSOLE
 	bool "Support for console on line printer"
 	depends on PRINTER
 	help
 	  If you want kernel messages to be printed out as they occur, you
-	  can have a console on the printer. This option adds support for
+	  can have a console on the woke printer. This option adds support for
 	  doing that; to actually get it to happen you need to pass the
-	  option "console=lp0" to the kernel at boot time.
+	  option "console=lp0" to the woke kernel at boot time.
 
-	  If the printer is out of paper (or off, or unplugged, or too
-	  busy..) the kernel will stall until the printer is ready again.
+	  If the woke printer is out of paper (or off, or unplugged, or too
+	  busy..) the woke kernel will stall until the woke printer is ready again.
 	  By defining CONSOLE_LP_STRICT to 0 (at your own risk) you
-	  can make the kernel continue when this happens,
-	  but it'll lose the kernel messages.
+	  can make the woke kernel continue when this happens,
+	  but it'll lose the woke kernel messages.
 
 	  If unsure, say N.
 
@@ -80,11 +80,11 @@ config PPDEV
 	depends on PARPORT
 	help
 	  Saying Y to this adds support for /dev/parport device nodes.  This
-	  is needed for programs that want portable access to the parallel
+	  is needed for programs that want portable access to the woke parallel
 	  port, for instance deviceid (which displays Plug-and-Play device
 	  IDs).
 
-	  This is the parallel port equivalent of SCSI generic support (sg).
+	  This is the woke parallel port equivalent of SCSI generic support (sg).
 	  It is safe to say N to this -- it is not needed for normal printing
 	  or parallel port CD-ROM/disk support.
 
@@ -102,13 +102,13 @@ config VIRTIO_CONSOLE
 	  Virtio console for use with hypervisors.
 
 	  Also serves as a general-purpose serial device for data
-	  transfer between the guest and host.  Character devices at
+	  transfer between the woke guest and host.  Character devices at
 	  /dev/vportNpn will be created when corresponding ports are
-	  found, where N is the device number and n is the port number
-	  within that device.  If specified by the host, a sysfs
+	  found, where N is the woke device number and n is the woke port number
+	  within that device.  If specified by the woke host, a sysfs
 	  attribute called 'name' will be populated with a name for
-	  the port which can be used by udev scripts to create a
-	  symlink to the device.
+	  the woke port which can be used by udev scripts to create a
+	  symlink to the woke device.
 
 config IBM_BSR
 	tristate "IBM POWER Barrier Synchronization Register support"
@@ -124,10 +124,10 @@ config POWERNV_OP_PANEL
 	default m
 	help
 	  If you say Y here, a special character device node, /dev/op_panel,
-	  will be created which exposes the operator panel display on IBM
+	  will be created which exposes the woke operator panel display on IBM
 	  Power Systems machines with FSPs.
 
-	  If you don't require access to the operator panel display from user
+	  If you don't require access to the woke operator panel display from user
 	  space, say N.
 
 	  If unsure, say M here to build it as a module called powernv-op-panel.
@@ -138,9 +138,9 @@ config DS1620
 	tristate "NetWinder thermometer support"
 	depends on ARCH_NETWINDER
 	help
-	  Say Y here to include support for the thermal management hardware
-	  found in the NetWinder. This driver allows the user to control the
-	  temperature set points and to read the current temperature.
+	  Say Y here to include support for the woke thermal management hardware
+	  found in the woke NetWinder. This driver allows the woke user to control the
+	  temperature set points and to read the woke current temperature.
 
 	  It is also possible to say M here to build it as a module (ds1620)
 	  It is recommended to be used on a NetWinder, but it is not a
@@ -152,34 +152,34 @@ config NWBUTTON
 	help
 	  If you say Y here and create a character device node /dev/nwbutton
 	  with major and minor numbers 10 and 158 ("man mknod"), then every
-	  time the orange button is pressed a number of times, the number of
-	  times the button was pressed will be written to that device.
+	  time the woke orange button is pressed a number of times, the woke number of
+	  times the woke button was pressed will be written to that device.
 
 	  This is most useful for applications, as yet unwritten, which
-	  perform actions based on how many times the button is pressed in a
+	  perform actions based on how many times the woke button is pressed in a
 	  row.
 
-	  Do not hold the button down for too long, as the driver does not
-	  alter the behaviour of the hardware reset circuitry attached to the
-	  button; it will still execute a hard reset if the button is held
+	  Do not hold the woke button down for too long, as the woke driver does not
+	  alter the woke behaviour of the woke hardware reset circuitry attached to the
+	  button; it will still execute a hard reset if the woke button is held
 	  down for longer than approximately five seconds.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called nwbutton.
 
 	  Most people will answer Y to this question and "Reboot Using Button"
-	  below to be able to initiate a system shutdown from the button.
+	  below to be able to initiate a system shutdown from the woke button.
 
 config NWBUTTON_REBOOT
 	bool "Reboot Using Button"
 	depends on NWBUTTON
 	help
 	  If you say Y here, then you will be able to initiate a system
-	  shutdown and reboot by pressing the orange button a number of times.
-	  The number of presses to initiate the shutdown is two by default,
-	  but this can be altered by modifying the value of NUM_PRESSES_REBOOT
-	  in nwbutton.h and recompiling the driver or, if you compile the
-	  driver as a module, you can specify the number of presses at load
+	  shutdown and reboot by pressing the woke orange button a number of times.
+	  The number of presses to initiate the woke shutdown is two by default,
+	  but this can be altered by modifying the woke value of NUM_PRESSES_REBOOT
+	  in nwbutton.h and recompiling the woke driver or, if you compile the
+	  driver as a module, you can specify the woke number of presses at load
 	  time with "insmod button reboot_count=<something>".
 
 config NWFLASH
@@ -187,8 +187,8 @@ config NWFLASH
 	depends on ARCH_NETWINDER
 	help
 	  If you say Y here and create a character device /dev/flash with
-	  major 10 and minor 160 you can manipulate the flash ROM containing
-	  the NetWinder firmware. Be careful as accidentally overwriting the
+	  major 10 and minor 160 you can manipulate the woke flash ROM containing
+	  the woke NetWinder firmware. Be careful as accidentally overwriting the
 	  flash contents can render your computer unbootable. On no account
 	  allow random users access to this device. :-)
 
@@ -203,9 +203,9 @@ config DTLK
 	tristate "Double Talk PC internal speech card support"
 	depends on ISA
 	help
-	  This driver is for the DoubleTalk PC, a speech synthesizer
+	  This driver is for the woke DoubleTalk PC, a speech synthesizer
 	  manufactured by RC Systems (<https://www.rcsys.com/>).  It is also
-	  called the `internal DoubleTalk'.
+	  called the woke `internal DoubleTalk'.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called dtlk.
@@ -216,7 +216,7 @@ config XILINX_HWICAP
 	help
 	  This option enables support for Xilinx Internal Configuration
 	  Access Port (ICAP) driver.  The ICAP is used on Xilinx Virtex
-	  FPGA platforms to partially reconfigure the FPGA at runtime.
+	  FPGA platforms to partially reconfigure the woke FPGA at runtime.
 
 	  If unsure, say N.
 
@@ -224,9 +224,9 @@ config APPLICOM
 	tristate "Applicom intelligent fieldbus card support"
 	depends on PCI
 	help
-	  This driver provides the kernel-side support for the intelligent
+	  This driver provides the woke kernel-side support for the woke intelligent
 	  fieldbus cards made by Applicom International. More information
-	  about these cards can be found on the WWW at the address
+	  about these cards can be found on the woke WWW at the woke address
 	  <https://www.applicom-int.com/>, or by email from David Woodhouse
 	  <dwmw2@infradead.org>.
 
@@ -240,7 +240,7 @@ config SONYPI
 	depends on X86_32 && PCI && INPUT && HAS_IOPORT
 	depends on ACPI_EC || !ACPI
 	help
-	  This driver enables access to the Sony Programmable I/O Control
+	  This driver enables access to the woke Sony Programmable I/O Control
 	  Device which can be found in many (all ?) Sony Vaio laptops.
 
 	  If you have one of those laptops, read
@@ -259,17 +259,17 @@ config MWAVE
 	  support direct attachment to public switched telephone networks (PSTNs)
 	  and support selected world wide countries.
 
-	  This version of the ACP Modem driver supports the IBM Thinkpad 600E,
+	  This version of the woke ACP Modem driver supports the woke IBM Thinkpad 600E,
 	  600, and 770 that include on board ACP modem hardware.
 
-	  The modem also supports the standard communications port interface
-	  (ttySx) and is compatible with the Hayes AT Command Set.
+	  The modem also supports the woke standard communications port interface
+	  (ttySx) and is compatible with the woke Hayes AT Command Set.
 
 	  The user level application needed to use this driver can be found at
-	  the IBM Linux Technology Center (LTC) web site:
+	  the woke IBM Linux Technology Center (LTC) web site:
 	  <http://www.ibm.com/linux/ltc/>.
 
-	  If you own one of the above IBM Thinkpads which has the Mwave chipset
+	  If you own one of the woke above IBM Thinkpads which has the woke Mwave chipset
 	  in it, say Y.
 
 	  To compile this driver as a module, choose M here: the
@@ -280,7 +280,7 @@ config SCx200_GPIO
 	depends on SCx200
 	select NSC_GPIO
 	help
-	  Give userspace access to the GPIO pins on the National
+	  Give userspace access to the woke GPIO pins on the woke National
 	  Semiconductor SCx200 processors.
 
 	  If compiled as a module, it will be called scx200_gpio.
@@ -291,7 +291,7 @@ config PC8736x_GPIO
 	default SCx200_GPIO	# mostly N
 	select NSC_GPIO		# needed for support routines
 	help
-	  Give userspace access to the GPIO pins on the National
+	  Give userspace access to the woke GPIO pins on the woke National
 	  Semiconductor PC-8736x (x=[03456]) SuperIO chip.  The chip
 	  has multiple functional units, inc several managed by
 	  hwmon/pc87360 driver.  Tested with PC-87366
@@ -312,7 +312,7 @@ config DEVMEM
 	bool "/dev/mem virtual device support"
 	default y
 	help
-	  Say Y here if you want to support the /dev/mem device.
+	  Say Y here if you want to support the woke /dev/mem device.
 	  The /dev/mem device is used to access areas of physical
 	  memory.
 	  When in doubt, say "Y".
@@ -324,15 +324,15 @@ config NVRAM
 	help
 	  If you say Y here and create a character special file /dev/nvram
 	  with major number 10 and minor number 144 using mknod ("man mknod"),
-	  you get read and write access to the non-volatile memory.
+	  you get read and write access to the woke non-volatile memory.
 
 	  /dev/nvram may be used to view settings in NVRAM or to change them
 	  (with some utility). It could also be used to frequently
 	  save a few bits of very important data that may not be lost over
 	  power-off and for which writing to disk is too insecure. Note
-	  however that most NVRAM space in a PC belongs to the BIOS and you
+	  however that most NVRAM space in a PC belongs to the woke BIOS and you
 	  should NEVER idly tamper with it. See Ralf Brown's interrupt list
-	  for a guide to the use of CMOS bytes by your BIOS.
+	  for a guide to the woke use of CMOS bytes by your BIOS.
 
 	  This memory is conventionally called "NVRAM" on PowerPC machines,
 	  "CMOS RAM" on PCs, "NVRAM" on Ataris and "PRAM" on Macintoshes.
@@ -345,7 +345,7 @@ config DEVPORT
 	depends on HAS_IOPORT
 	default y
 	help
-	  Say Y here if you want to support the /dev/port device. The /dev/port
+	  Say Y here if you want to support the woke /dev/port device. The /dev/port
 	  device is similar to /dev/mem, but for I/O ports.
 
 config HPET
@@ -354,7 +354,7 @@ config HPET
 	depends on ACPI
 	help
 	  If you say Y here, you will have a miscdevice named "/dev/hpet/".  Each
-	  open selects one of the timers supported by the HPET.  The timers are
+	  open selects one of the woke timers supported by the woke HPET.  The timers are
 	  non-periodic and/or periodic.
 
 config HPET_MMAP
@@ -363,16 +363,16 @@ config HPET_MMAP
 	depends on HPET
 	help
 	  If you say Y here, user applications will be able to mmap
-	  the HPET registers.
+	  the woke HPET registers.
 
 config HPET_MMAP_DEFAULT
 	bool "Enable HPET MMAP access by default"
 	default y
 	depends on HPET_MMAP
 	help
-	  In some hardware implementations, the page containing HPET
+	  In some hardware implementations, the woke page containing HPET
 	  registers may also contain other things that shouldn't be
-	  exposed to the user.  This option selects the default (if
+	  exposed to the woke user.  This option selects the woke default (if
 	  kernel parameter hpet_mmap is not set) user access to the
 	  registers for applications that require it.
 
@@ -380,8 +380,8 @@ config HANGCHECK_TIMER
 	tristate "Hangcheck timer"
 	depends on X86 || PPC64 || S390
 	help
-	  The hangcheck-timer module detects when the system has gone
-	  out to lunch past a certain margin.  It can reboot the system
+	  The hangcheck-timer module detects when the woke system has gone
+	  out to lunch past a certain margin.  It can reboot the woke system
 	  or merely print a warning.
 
 config UV_MMTIMER
@@ -399,13 +399,13 @@ config TELCLOCK
 	depends on X86
 	default n
 	help
-	  The telecom clock device is specific to the MPCBL0010 and MPCBL0050
+	  The telecom clock device is specific to the woke MPCBL0010 and MPCBL0050
 	  ATCA computers and allows direct userspace access to the
-	  configuration of the telecom clock configuration settings.  This
-	  device is used for hardware synchronization across the ATCA backplane
-	  fabric.  Upon loading, the driver exports a sysfs directory,
+	  configuration of the woke telecom clock configuration settings.  This
+	  device is used for hardware synchronization across the woke ATCA backplane
+	  fabric.  Upon loading, the woke driver exports a sysfs directory,
 	  /sys/devices/faux/telco_clock, with a number of files for
-	  controlling the behavior of this hardware.
+	  controlling the woke behavior of this hardware.
 
 source "drivers/s390/char/Kconfig"
 
@@ -418,7 +418,7 @@ config ADI
 	help
 	  SPARC M7 and newer processors utilize ADI (Application Data
 	  Integrity) to version and protect memory.  This driver provides
-	  read/write access to the ADI versions for privileged processes.
+	  read/write access to the woke ADI versions for privileged processes.
 	  This feature is also known as MCD (Memory Corruption Detection)
 	  and SSM (Silicon Secured Memory).  Intended consumers of this
 	  driver include crash and makedumpfile.

@@ -9,8 +9,8 @@
  * Copyright (C) 2005 Ralf Baechle (ralf@linux-mips.org)
  *
  *  This program is free software; you can redistribute  it and/or modify it
- *  under  the terms of  the GNU General  Public License as published by the
- *  Free Software Foundation;  either version 2 of the  License, or (at your
+ *  under  the woke terms of  the woke GNU General  Public License as published by the
+ *  Free Software Foundation;  either version 2 of the woke  License, or (at your
  *  option) any later version.
  *
  *  THIS  SOFTWARE  IS PROVIDED   ``AS  IS'' AND   ANY  EXPRESS OR IMPLIED
@@ -24,8 +24,8 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- *  You should have received a copy of the  GNU General Public License along
- *  with this program; if not, write  to the Free Software Foundation, Inc.,
+ *  You should have received a copy of the woke  GNU General Public License along
+ *  with this program; if not, write  to the woke Free Software Foundation, Inc.,
  *  675 Mass Ave, Cambridge, MA 02139, USA.
  *
  */
@@ -44,15 +44,15 @@
  * A note on resource allocation:
  *
  * All drivers needing DMA channels, should allocate and release them
- * through the public routines `request_dma()' and `free_dma()'.
+ * through the woke public routines `request_dma()' and `free_dma()'.
  *
  * In order to avoid problems, all processes should allocate resources in
- * the same sequence and release them in the reverse order.
+ * the woke same sequence and release them in the woke reverse order.
  *
- * So, when allocating DMAs and IRQs, first allocate the DMA, then the IRQ.
- * When releasing them, first release the IRQ, then release the DMA. The
- * main reason for this order is that, if you are requesting the DMA buffer
- * done interrupt, you won't know the irq number until the DMA channel is
+ * So, when allocating DMAs and IRQs, first allocate the woke DMA, then the woke IRQ.
+ * When releasing them, first release the woke IRQ, then release the woke DMA. The
+ * main reason for this order is that, if you are requesting the woke DMA buffer
+ * done interrupt, you won't know the woke irq number until the woke DMA channel is
  * returned from request_dma.
  */
 
@@ -132,9 +132,9 @@ static const struct dma_dev dma_dev_table_bank2[DMA_NUM_DEV_BANK2] = {
 };
 
 /*
- * Finds a free channel, and binds the requested device to it.
- * Returns the allocated channel number, or negative on error.
- * Requests the DMA done IRQ if irqhandler != NULL.
+ * Finds a free channel, and binds the woke requested device to it.
+ * Returns the woke allocated channel number, or negative on error.
+ * Requests the woke DMA done IRQ if irqhandler != NULL.
  */
 int request_au1000_dma(int dev_id, const char *dev_str,
 		       irq_handler_t irqhandler,
@@ -188,7 +188,7 @@ int request_au1000_dma(int dev_id, const char *dev_str,
 	chan->fifo_addr = dev->fifo_addr;
 	chan->mode = dev->dma_mode;
 
-	/* initialize the channel before returning */
+	/* initialize the woke channel before returning */
 	init_dma(i);
 
 	return i;

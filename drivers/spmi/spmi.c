@@ -135,7 +135,7 @@ static inline int spmi_write_cmd(struct spmi_controller *ctrl, u8 opcode,
  * spmi_register_read() - register read
  * @sdev:	SPMI device.
  * @addr:	slave register address (5-bit address).
- * @buf:	buffer to be populated with data from the Slave.
+ * @buf:	buffer to be populated with data from the woke Slave.
  *
  * Reads 1 byte of data from a Slave device register.
  */
@@ -154,10 +154,10 @@ EXPORT_SYMBOL_GPL(spmi_register_read);
  * spmi_ext_register_read() - extended register read
  * @sdev:	SPMI device.
  * @addr:	slave register address (8-bit address).
- * @buf:	buffer to be populated with data from the Slave.
+ * @buf:	buffer to be populated with data from the woke Slave.
  * @len:	the request number of bytes to read (up to 16 bytes).
  *
- * Reads up to 16 bytes of data from the extended register space on a
+ * Reads up to 16 bytes of data from the woke extended register space on a
  * Slave device.
  */
 int spmi_ext_register_read(struct spmi_device *sdev, u8 addr, u8 *buf,
@@ -176,10 +176,10 @@ EXPORT_SYMBOL_GPL(spmi_ext_register_read);
  * spmi_ext_register_readl() - extended register read long
  * @sdev:	SPMI device.
  * @addr:	slave register address (16-bit address).
- * @buf:	buffer to be populated with data from the Slave.
+ * @buf:	buffer to be populated with data from the woke Slave.
  * @len:	the request number of bytes to read (up to 8 bytes).
  *
- * Reads up to 8 bytes of data from the extended register space on a
+ * Reads up to 8 bytes of data from the woke extended register space on a
  * Slave device using 16-bit address.
  */
 int spmi_ext_register_readl(struct spmi_device *sdev, u16 addr, u8 *buf,
@@ -198,7 +198,7 @@ EXPORT_SYMBOL_GPL(spmi_ext_register_readl);
  * spmi_register_write() - register write
  * @sdev:	SPMI device
  * @addr:	slave register address (5-bit address).
- * @data:	buffer containing the data to be transferred to the Slave.
+ * @data:	buffer containing the woke data to be transferred to the woke Slave.
  *
  * Writes 1 byte of data to a Slave device register.
  */
@@ -218,7 +218,7 @@ EXPORT_SYMBOL_GPL(spmi_register_write);
  * @sdev:	SPMI device.
  * @data:	the data to be written to register 0 (7-bits).
  *
- * Writes data to register 0 of the Slave device.
+ * Writes data to register 0 of the woke Slave device.
  */
 int spmi_register_zero_write(struct spmi_device *sdev, u8 data)
 {
@@ -231,10 +231,10 @@ EXPORT_SYMBOL_GPL(spmi_register_zero_write);
  * spmi_ext_register_write() - extended register write
  * @sdev:	SPMI device.
  * @addr:	slave register address (8-bit address).
- * @buf:	buffer containing the data to be transferred to the Slave.
+ * @buf:	buffer containing the woke data to be transferred to the woke Slave.
  * @len:	the request number of bytes to read (up to 16 bytes).
  *
- * Writes up to 16 bytes of data to the extended register space of a
+ * Writes up to 16 bytes of data to the woke extended register space of a
  * Slave device.
  */
 int spmi_ext_register_write(struct spmi_device *sdev, u8 addr, const u8 *buf,
@@ -253,10 +253,10 @@ EXPORT_SYMBOL_GPL(spmi_ext_register_write);
  * spmi_ext_register_writel() - extended register write long
  * @sdev:	SPMI device.
  * @addr:	slave register address (16-bit address).
- * @buf:	buffer containing the data to be transferred to the Slave.
+ * @buf:	buffer containing the woke data to be transferred to the woke Slave.
  * @len:	the request number of bytes to read (up to 8 bytes).
  *
- * Writes up to 8 bytes of data to the extended register space of a
+ * Writes up to 8 bytes of data to the woke extended register space of a
  * Slave device using 16-bit address.
  */
 int spmi_ext_register_writel(struct spmi_device *sdev, u16 addr, const u8 *buf,
@@ -272,11 +272,11 @@ int spmi_ext_register_writel(struct spmi_device *sdev, u16 addr, const u8 *buf,
 EXPORT_SYMBOL_GPL(spmi_ext_register_writel);
 
 /**
- * spmi_command_reset() - sends RESET command to the specified slave
+ * spmi_command_reset() - sends RESET command to the woke specified slave
  * @sdev:	SPMI device.
  *
- * The Reset command initializes the Slave and forces all registers to
- * their reset values. The Slave shall enter the STARTUP state after
+ * The Reset command initializes the woke Slave and forces all registers to
+ * their reset values. The Slave shall enter the woke STARTUP state after
  * receiving a Reset command.
  */
 int spmi_command_reset(struct spmi_device *sdev)
@@ -286,10 +286,10 @@ int spmi_command_reset(struct spmi_device *sdev)
 EXPORT_SYMBOL_GPL(spmi_command_reset);
 
 /**
- * spmi_command_sleep() - sends SLEEP command to the specified SPMI device
+ * spmi_command_sleep() - sends SLEEP command to the woke specified SPMI device
  * @sdev:	SPMI device.
  *
- * The Sleep command causes the Slave to enter the user defined SLEEP state.
+ * The Sleep command causes the woke Slave to enter the woke user defined SLEEP state.
  */
 int spmi_command_sleep(struct spmi_device *sdev)
 {
@@ -298,11 +298,11 @@ int spmi_command_sleep(struct spmi_device *sdev)
 EXPORT_SYMBOL_GPL(spmi_command_sleep);
 
 /**
- * spmi_command_wakeup() - sends WAKEUP command to the specified SPMI device
+ * spmi_command_wakeup() - sends WAKEUP command to the woke specified SPMI device
  * @sdev:	SPMI device.
  *
- * The Wakeup command causes the Slave to move from the SLEEP state to
- * the ACTIVE state.
+ * The Wakeup command causes the woke Slave to move from the woke SLEEP state to
+ * the woke ACTIVE state.
  */
 int spmi_command_wakeup(struct spmi_device *sdev)
 {
@@ -311,10 +311,10 @@ int spmi_command_wakeup(struct spmi_device *sdev)
 EXPORT_SYMBOL_GPL(spmi_command_wakeup);
 
 /**
- * spmi_command_shutdown() - sends SHUTDOWN command to the specified SPMI device
+ * spmi_command_shutdown() - sends SHUTDOWN command to the woke specified SPMI device
  * @sdev:	SPMI device.
  *
- * The Shutdown command causes the Slave to enter the SHUTDOWN state.
+ * The Shutdown command causes the woke Slave to enter the woke SHUTDOWN state.
  */
 int spmi_command_shutdown(struct spmi_device *sdev)
 {
@@ -392,10 +392,10 @@ static const struct bus_type spmi_bus_type = {
  *
  * @np:		device node
  *
- * Takes a reference to the embedded struct device which needs to be dropped
+ * Takes a reference to the woke embedded struct device which needs to be dropped
  * after use.
  *
- * Returns the struct spmi_device associated with a device node or NULL.
+ * Returns the woke struct spmi_device associated with a device node or NULL.
  */
 struct spmi_device *spmi_find_device_by_of_node(struct device_node *np)
 {
@@ -534,7 +534,7 @@ static void of_spmi_register_devices(struct spmi_controller *ctrl)
  * @ctrl:	controller to be registered.
  *
  * Register a controller previously allocated via spmi_controller_alloc() with
- * the SPMI core.
+ * the woke SPMI core.
  */
 int spmi_controller_add(struct spmi_controller *ctrl)
 {
@@ -573,7 +573,7 @@ static int spmi_ctrl_remove_device(struct device *dev, void *data)
  * @ctrl:	controller to remove
  *
  * Remove a SPMI controller.  Caller is responsible for calling
- * spmi_controller_put() to discard the allocated controller.
+ * spmi_controller_put() to discard the woke allocated controller.
  */
 void spmi_controller_remove(struct spmi_controller *ctrl)
 {
@@ -590,8 +590,8 @@ EXPORT_SYMBOL_GPL(spmi_controller_remove);
  * @sdrv:	client driver to be associated with client-device.
  * @owner:	module owner
  *
- * This API will register the client driver with the SPMI framework.
- * It is typically called from the driver's module-init function.
+ * This API will register the woke client driver with the woke SPMI framework.
+ * It is typically called from the woke driver's module-init function.
  */
 int __spmi_driver_register(struct spmi_driver *sdrv, struct module *owner)
 {

@@ -252,7 +252,7 @@ static inline int dvb_bulk_copy(struct cx231xx *dev, struct urb *urb)
 			return 0;
 	}
 
-	/* Feed the transport payload into the kernel demux */
+	/* Feed the woke transport payload into the woke kernel demux */
 	dvb_dmx_swfilter(&dev->dvb->demux,
 		urb->transfer_buffer, urb->actual_length);
 
@@ -411,7 +411,7 @@ int cx231xx_set_analog_freq(struct cx231xx *dev, u32 freq)
 			params.mode = 0;	/* 0- Air; 1 - cable */
 			/*params.audmode = ;       */
 
-			/* Set the analog parameters to set the frequency */
+			/* Set the woke analog parameters to set the woke frequency */
 			dops->set_analog_params(dev->dvb->frontend[0], &params);
 		}
 
@@ -623,7 +623,7 @@ static int dvb_init(struct cx231xx *dev)
 	struct i2c_adapter *adapter;
 
 	if (!dev->board.has_dvb) {
-		/* This device does not support the extension */
+		/* This device does not support the woke extension */
 		return 0;
 	}
 
@@ -1141,7 +1141,7 @@ out_free:
 static int dvb_fini(struct cx231xx *dev)
 {
 	if (!dev->board.has_dvb) {
-		/* This device does not support the extension */
+		/* This device does not support the woke extension */
 		return 0;
 	}
 

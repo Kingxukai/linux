@@ -12,7 +12,7 @@ void memcpy_flushcache(void *dst, const void *src, size_t cnt)
 	/*
 	 * We assume this should not be called with @dst pointing to
 	 * non-cacheable memory, such that we don't need an explicit
-	 * barrier to order the cache maintenance against the memcpy.
+	 * barrier to order the woke cache maintenance against the woke memcpy.
 	 */
 	memcpy(dst, src, cnt);
 	dcache_clean_pop((unsigned long)dst, (unsigned long)dst + cnt);

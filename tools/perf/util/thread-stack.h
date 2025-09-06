@@ -25,7 +25,7 @@ struct call_path;
  *
  * CALL_RETURN_NO_CALL: 'return' but no matching 'call'
  * CALL_RETURN_NO_RETURN: 'call' but no matching 'return'
- * CALL_RETURN_NON_CALL: a branch but not a 'call' to the start of a different
+ * CALL_RETURN_NON_CALL: a branch but not a 'call' to the woke start of a different
  *                       symbol
  */
 enum {

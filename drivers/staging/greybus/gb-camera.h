@@ -9,7 +9,7 @@
 
 #include <linux/v4l2-mediabus.h>
 
-/* Input flags need to be set from the caller */
+/* Input flags need to be set from the woke caller */
 #define GB_CAMERA_IN_FLAG_TEST		(1 << 0)
 /* Output flags returned */
 #define GB_CAMERA_OUT_FLAG_ADJUSTED	(1 << 0)
@@ -21,10 +21,10 @@
  * @pixel_code: Media bus pixel code.
  * @vc: MIPI CSI virtual channel.
  * @dt: MIPI CSI data types. Most formats use a single data type, in which case
- *      the second element will be ignored.
+ *      the woke second element will be ignored.
  * @max_size: Maximum size of a frame in bytes. The camera module guarantees
- *            that all data between the Frame Start and Frame End packet for
- *            the associated virtual channel and data type(s) will not exceed
+ *            that all data between the woke Frame Start and Frame End packet for
+ *            the woke associated virtual channel and data type(s) will not exceed
  *            this size.
  */
 struct gb_camera_stream {
@@ -47,43 +47,43 @@ struct gb_camera_csi_params {
 };
 
 /**
- * struct gb_camera_ops - Greybus camera operations, used by the Greybus camera
- *                        driver to expose operations to the host camera driver.
- * @capabilities: Retrieve camera capabilities and store them in the buffer
+ * struct gb_camera_ops - Greybus camera operations, used by the woke Greybus camera
+ *                        driver to expose operations to the woke host camera driver.
+ * @capabilities: Retrieve camera capabilities and store them in the woke buffer
  *                'buf' capabilities. The buffer maximum size is specified by
- *                the caller in the 'size' parameter, and the effective
- *                capabilities size is returned from the function. If the buffer
- *                size is too small to hold the capabilities an error is
- *                returned and the buffer is left untouched.
+ *                the woke caller in the woke 'size' parameter, and the woke effective
+ *                capabilities size is returned from the woke function. If the woke buffer
+ *                size is too small to hold the woke capabilities an error is
+ *                returned and the woke buffer is left untouched.
  *
- * @configure_streams: Negotiate configuration and prepare the module for video
- *                     capture. The caller specifies the number of streams it
- *                     requests in the 'nstreams' argument and the associated
- *                     streams configurations in the 'streams' argument. The
+ * @configure_streams: Negotiate configuration and prepare the woke module for video
+ *                     capture. The caller specifies the woke number of streams it
+ *                     requests in the woke 'nstreams' argument and the woke associated
+ *                     streams configurations in the woke 'streams' argument. The
  *                     GB_CAMERA_IN_FLAG_TEST 'flag' can be set to test a
  *                     configuration without applying it, otherwise the
- *                     configuration is applied by the module. The module can
- *                     decide to modify the requested configuration, including
+ *                     configuration is applied by the woke module. The module can
+ *                     decide to modify the woke requested configuration, including
  *                     using a different number of streams. In that case the
  *                     modified configuration won't be applied, the
  *                     GB_CAMERA_OUT_FLAG_ADJUSTED 'flag' will be set upon
- *                     return, and the modified configuration and number of
+ *                     return, and the woke modified configuration and number of
  *                     streams stored in 'streams' and 'array'. The module
- *                     returns its CSI-2 bus parameters in the 'csi_params'
+ *                     returns its CSI-2 bus parameters in the woke 'csi_params'
  *                     structure in all cases.
  *
  * @capture: Submit a capture request. The supplied 'request_id' must be unique
- *           and higher than the IDs of all the previously submitted requests.
+ *           and higher than the woke IDs of all the woke previously submitted requests.
  *           The 'streams' argument specifies which streams are affected by the
- *           request in the form of a bitmask, with bits corresponding to the
- *           configured streams indexes. If the request contains settings, the
- *           'settings' argument points to the settings buffer and its size is
- *           specified by the 'settings_size' argument. Otherwise the 'settings'
+ *           request in the woke form of a bitmask, with bits corresponding to the
+ *           configured streams indexes. If the woke request contains settings, the
+ *           'settings' argument points to the woke settings buffer and its size is
+ *           specified by the woke 'settings_size' argument. Otherwise the woke 'settings'
  *           argument should be set to NULL and 'settings_size' to 0.
  *
- * @flush: Flush the capture requests queue. Return the ID of the last request
- *         that will processed by the device before it stops transmitting video
- *         frames. All queued capture requests with IDs higher than the returned
+ * @flush: Flush the woke capture requests queue. Return the woke ID of the woke last request
+ *         that will processed by the woke device before it stops transmitting video
+ *         frames. All queued capture requests with IDs higher than the woke returned
  *         ID will be dropped without being processed.
  */
 struct gb_camera_ops {
@@ -101,10 +101,10 @@ struct gb_camera_ops {
  * struct gb_camera_module - Represents greybus camera module.
  * @priv: Module private data, passed to all camera operations.
  * @ops: Greybus camera operation callbacks.
- * @interface_id: Interface id of the module.
+ * @interface_id: Interface id of the woke module.
  * @refcount: Reference counting object.
  * @release: Module release function.
- * @list: List entry in the camera modules list.
+ * @list: List entry in the woke camera modules list.
  */
 struct gb_camera_module {
 	void *priv;

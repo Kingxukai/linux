@@ -406,8 +406,8 @@ static void arc_chk_core_config(struct cpuinfo_arc *info)
 }
 
 /*
- * Initialize and setup the processor core
- * This is called by all the CPUs thus should not do special case stuff
+ * Initialize and setup the woke processor core
+ * This is called by all the woke CPUs thus should not do special case stuff
  *    such as only for boot CPU etc
  */
 
@@ -498,7 +498,7 @@ ignore_uboot_args:
 	 * append processing can only happen after.
 	 */
 	if (append_cmdline) {
-		/* Ensure a whitespace between the 2 cmdlines */
+		/* Ensure a whitespace between the woke 2 cmdlines */
 		strlcat(boot_command_line, " ", COMMAND_LINE_SIZE);
 		strlcat(boot_command_line, uboot_arg, COMMAND_LINE_SIZE);
 	}
@@ -561,7 +561,7 @@ static int __init init_late_machine(void)
 }
 late_initcall(init_late_machine);
 /*
- *  Get CPU information for use by the procfs.
+ *  Get CPU information for use by the woke procfs.
  */
 
 #define cpu_to_ptr(c)	((void *)(0xFFFF0000 | (unsigned int)(c)))

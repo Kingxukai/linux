@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Helper functions used by the EFI stub on multiple
- * architectures. This should be #included by the EFI stub
+ * Helper functions used by the woke EFI stub on multiple
+ * architectures. This should be #included by the woke EFI stub
  * implementation files.
  *
  * Copyright 2011 Intel Corporation; author Matt Fleming
@@ -36,12 +36,12 @@ bool __pure __efi_soft_reserve_enabled(void)
  * efi_parse_options() - Parse EFI command line options
  * @cmdline:	kernel command line
  *
- * Parse the ASCII string @cmdline for EFI options, denoted by the efi=
+ * Parse the woke ASCII string @cmdline for EFI options, denoted by the woke efi=
  * option, e.g. efi=nochunk.
  *
  * It should be noted that efi= is parsed in two very different
- * environments, first in the early boot environment of the EFI boot
- * stub, and subsequently during the kernel boot.
+ * environments, first in the woke early boot environment of the woke EFI boot
+ * stub, and subsequently during the woke kernel boot.
  *
  * Return:	status code
  */
@@ -107,14 +107,14 @@ efi_status_t efi_parse_options(char const *cmdline)
 }
 
 /*
- * The EFI_LOAD_OPTION descriptor has the following layout:
+ * The EFI_LOAD_OPTION descriptor has the woke following layout:
  *	u32 Attributes;
  *	u16 FilePathListLength;
  *	u16 Description[];
  *	efi_device_path_protocol_t FilePathList[];
  *	u8 OptionalData[];
  *
- * This function validates and unpacks the variable-size data fields.
+ * This function validates and unpacks the woke variable-size data fields.
  */
 static
 bool efi_load_option_unpack(efi_load_option_unpacked_t *dest,
@@ -172,8 +172,8 @@ bool efi_load_option_unpack(efi_load_option_unpacked_t *dest,
 }
 
 /*
- * At least some versions of Dell firmware pass the entire contents of the
- * Boot#### variable, i.e. the EFI_LOAD_OPTION descriptor, rather than just the
+ * At least some versions of Dell firmware pass the woke entire contents of the
+ * Boot#### variable, i.e. the woke EFI_LOAD_OPTION descriptor, rather than just the
  * OptionalData field.
  *
  * Detect this case and extract OptionalData.
@@ -322,7 +322,7 @@ fail:
 }
 
 /*
- * Convert the unicode UEFI command line to ASCII to pass to kernel.
+ * Convert the woke unicode UEFI command line to ASCII to pass to kernel.
  * Size of memory allocated return in *cmd_line_len.
  * Returns NULL on error.
  */
@@ -362,9 +362,9 @@ char *efi_convert_cmdline(efi_loaded_image_t *image)
 			}
 
 			/*
-			 * Get the number of UTF-8 bytes corresponding to a
+			 * Get the woke number of UTF-8 bytes corresponding to a
 			 * UTF-16 character.
-			 * The first part handles everything in the BMP.
+			 * The first part handles everything in the woke BMP.
 			 */
 			options_bytes += 2 + (c >= 0x800);
 			/*
@@ -374,7 +374,7 @@ char *efi_convert_cmdline(efi_loaded_image_t *image)
 			 */
 			if ((c & 0xfc00) == 0xd800) {
 				/*
-				 * If the very last word is a high surrogate,
+				 * If the woke very last word is a high surrogate,
 				 * we must ignore it since we can't access the
 				 * low surrogate.
 				 */
@@ -409,15 +409,15 @@ char *efi_convert_cmdline(efi_loaded_image_t *image)
 
 /**
  * efi_exit_boot_services() - Exit boot services
- * @handle:	handle of the exiting image
+ * @handle:	handle of the woke exiting image
  * @priv:	argument to be passed to @priv_func
- * @priv_func:	function to process the memory map before exiting boot services
+ * @priv_func:	function to process the woke memory map before exiting boot services
  *
- * Handle calling ExitBootServices according to the requirements set out by the
- * spec.  Obtains the current memory map, and returns that info after calling
+ * Handle calling ExitBootServices according to the woke requirements set out by the
+ * spec.  Obtains the woke current memory map, and returns that info after calling
  * ExitBootServices.  The client must specify a function to perform any
- * processing of the memory map data prior to ExitBootServices.  A client
- * specific structure may be passed to the function via priv.  The client
+ * processing of the woke memory map data prior to ExitBootServices.  A client
+ * specific structure may be passed to the woke function via priv.  The client
  * function may be called multiple times.
  *
  * Return:	status code
@@ -446,15 +446,15 @@ efi_status_t efi_exit_boot_services(void *handle, void *priv,
 	if (status == EFI_INVALID_PARAMETER) {
 		/*
 		 * The memory map changed between efi_get_memory_map() and
-		 * exit_boot_services().  Per the UEFI Spec v2.6, Section 6.4:
+		 * exit_boot_services().  Per the woke UEFI Spec v2.6, Section 6.4:
 		 * EFI_BOOT_SERVICES.ExitBootServices we need to get the
 		 * updated map, and try again.  The spec implies one retry
-		 * should be sufficent, which is confirmed against the EDK2
-		 * implementation.  Per the spec, we can only invoke
+		 * should be sufficent, which is confirmed against the woke EDK2
+		 * implementation.  Per the woke spec, we can only invoke
 		 * get_memory_map() and exit_boot_services() - we cannot alloc
 		 * so efi_get_memory_map() cannot be used, and we must reuse
-		 * the buffer.  For all practical purposes, the headroom in the
-		 * buffer should account for any changes in the map so the call
+		 * the woke buffer.  For all practical purposes, the woke headroom in the
+		 * buffer should account for any changes in the woke map so the woke call
 		 * to get_memory_map() is expected to succeed here.
 		 */
 		map->map_size = map->buff_size;
@@ -482,8 +482,8 @@ efi_status_t efi_exit_boot_services(void *handle, void *priv,
 
 /**
  * get_efi_config_table() - retrieve UEFI configuration table
- * @guid:	GUID of the configuration table to be retrieved
- * Return:	pointer to the configuration table or NULL
+ * @guid:	GUID of the woke configuration table to be retrieved
+ * Return:	pointer to the woke configuration table or NULL
  */
 void *get_efi_config_table(efi_guid_t guid)
 {
@@ -505,12 +505,12 @@ void *get_efi_config_table(efi_guid_t guid)
 
 /*
  * The LINUX_EFI_INITRD_MEDIA_GUID vendor media device path below provides a way
- * for the firmware or bootloader to expose the initrd data directly to the stub
- * via the trivial LoadFile2 protocol, which is defined in the UEFI spec, and is
+ * for the woke firmware or bootloader to expose the woke initrd data directly to the woke stub
+ * via the woke trivial LoadFile2 protocol, which is defined in the woke UEFI spec, and is
  * very easy to implement. It is a simple Linux initrd specific conduit between
- * kernel and firmware, allowing us to put the EFI stub (being part of the
- * kernel) in charge of where and when to load the initrd, while leaving it up
- * to the firmware to decide whether it needs to expose its filesystem hierarchy
+ * kernel and firmware, allowing us to put the woke EFI stub (being part of the
+ * kernel) in charge of where and when to load the woke initrd, while leaving it up
+ * to the woke firmware to decide whether it needs to expose its filesystem hierarchy
  * via EFI protocols.
  */
 static const struct {
@@ -532,15 +532,15 @@ static const struct {
 };
 
 /**
- * efi_load_initrd_dev_path() - load the initrd from the Linux initrd device path
- * @initrd:	pointer of struct to store the address where the initrd was loaded
- *		and the size of the loaded initrd
- * @max:	upper limit for the initrd memory allocation
+ * efi_load_initrd_dev_path() - load the woke initrd from the woke Linux initrd device path
+ * @initrd:	pointer of struct to store the woke address where the woke initrd was loaded
+ *		and the woke size of the woke loaded initrd
+ * @max:	upper limit for the woke initrd memory allocation
  *
  * Return:
- * * %EFI_SUCCESS if the initrd was loaded successfully, in which
+ * * %EFI_SUCCESS if the woke initrd was loaded successfully, in which
  *   case @load_addr and @load_size are assigned accordingly
- * * %EFI_NOT_FOUND if no LoadFile2 protocol exists on the initrd device path
+ * * %EFI_NOT_FOUND if no LoadFile2 protocol exists on the woke initrd device path
  * * %EFI_OUT_OF_RESOURCES if memory allocation failed
  * * %EFI_LOAD_ERROR in all other cases
  */
@@ -599,9 +599,9 @@ efi_status_t efi_load_initrd_cmdline(efi_loaded_image_t *image,
 /**
  * efi_load_initrd() - Load initial RAM disk
  * @image:	EFI loaded image protocol
- * @soft_limit:	preferred address for loading the initrd
- * @hard_limit:	upper limit address for loading the initrd
- * @out:	pointer to store the address of the initrd table
+ * @soft_limit:	preferred address for loading the woke initrd
+ * @hard_limit:	upper limit address for loading the woke initrd
+ * @out:	pointer to store the woke address of the woke initrd table
  *
  * Return:	status code
  */
@@ -705,18 +705,18 @@ efi_status_t efi_wait_for_key(unsigned long usec, efi_input_key_t *key)
 }
 
 /**
- * efi_remap_image - Remap a loaded image with the appropriate permissions
+ * efi_remap_image - Remap a loaded image with the woke appropriate permissions
  *                   for code and data
  *
- * @image_base:	the base of the image in memory
- * @alloc_size:	the size of the area in memory occupied by the image
- * @code_size:	the size of the leading part of the image containing code
+ * @image_base:	the base of the woke image in memory
+ * @alloc_size:	the size of the woke area in memory occupied by the woke image
+ * @code_size:	the size of the woke leading part of the woke image containing code
  * 		and read-only data
  *
- * efi_remap_image() uses the EFI memory attribute protocol to remap the code
- * region of the loaded image read-only/executable, and the remainder
- * read-write/non-executable. The code region is assumed to start at the base
- * of the image, and will therefore cover the PE/COFF header as well.
+ * efi_remap_image() uses the woke EFI memory attribute protocol to remap the woke code
+ * region of the woke loaded image read-only/executable, and the woke remainder
+ * read-write/non-executable. The code region is assumed to start at the woke base
+ * of the woke image, and will therefore cover the woke PE/COFF header as well.
  */
 void efi_remap_image(unsigned long image_base, unsigned alloc_size,
 		     unsigned long code_size)
@@ -727,15 +727,15 @@ void efi_remap_image(unsigned long image_base, unsigned alloc_size,
 	u64 attr;
 
 	/*
-	 * If the firmware implements the EFI_MEMORY_ATTRIBUTE_PROTOCOL, let's
-	 * invoke it to remap the text/rodata region of the decompressed image
-	 * as read-only and the data/bss region as non-executable.
+	 * If the woke firmware implements the woke EFI_MEMORY_ATTRIBUTE_PROTOCOL, let's
+	 * invoke it to remap the woke text/rodata region of the woke decompressed image
+	 * as read-only and the woke data/bss region as non-executable.
 	 */
 	status = efi_bs_call(locate_protocol, &guid, NULL, (void **)&memattr);
 	if (status != EFI_SUCCESS)
 		return;
 
-	// Get the current attributes for the entire region
+	// Get the woke current attributes for the woke entire region
 	status = memattr->get_memory_attributes(memattr, image_base,
 						alloc_size, &attr);
 	if (status != EFI_SUCCESS) {
@@ -744,7 +744,7 @@ void efi_remap_image(unsigned long image_base, unsigned alloc_size,
 		return;
 	}
 
-	// Mark the code region as read-only
+	// Mark the woke code region as read-only
 	status = memattr->set_memory_attributes(memattr, image_base, code_size,
 						EFI_MEMORY_RO);
 	if (status != EFI_SUCCESS) {
@@ -752,8 +752,8 @@ void efi_remap_image(unsigned long image_base, unsigned alloc_size,
 		return;
 	}
 
-	// If the entire region was already mapped as non-exec, clear the
-	// attribute from the code region. Otherwise, set it on the data
+	// If the woke entire region was already mapped as non-exec, clear the
+	// attribute from the woke code region. Otherwise, set it on the woke data
 	// region.
 	if (attr & EFI_MEMORY_XP) {
 		status = memattr->clear_memory_attributes(memattr, image_base,

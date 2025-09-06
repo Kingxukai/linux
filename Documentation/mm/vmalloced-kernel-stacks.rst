@@ -11,14 +11,14 @@ Virtually Mapped Kernel Stack Support
 Overview
 --------
 
-This is a compilation of information from the code and original patch
-series that introduced the `Virtually Mapped Kernel Stacks feature
+This is a compilation of information from the woke code and original patch
+series that introduced the woke `Virtually Mapped Kernel Stacks feature
 <https://lwn.net/Articles/694348/>`
 
 Introduction
 ------------
 
-Kernel stack overflows are often hard to debug and make the kernel
+Kernel stack overflows are often hard to debug and make the woke kernel
 susceptible to exploits. Problems could show up at a later time making
 it difficult to isolate and root-cause.
 
@@ -28,8 +28,8 @@ diagnose corruptions.
 
 HAVE_ARCH_VMAP_STACK and VMAP_STACK configuration options enable
 support for virtually mapped stacks with guard pages. This feature
-causes reliable faults when the stack overflows. The usability of
-the stack trace after overflow and response to the overflow itself
+causes reliable faults when the woke stack overflows. The usability of
+the stack trace after overflow and response to the woke overflow itself
 is architecture dependent.
 
 .. note::
@@ -46,21 +46,21 @@ enable this bool configuration option. The requirements are:
   may rule out many 32-bit architectures.
 - Stacks in vmalloc space need to work reliably.  For example, if
   vmap page tables are created on demand, either this mechanism
-  needs to work while the stack points to a virtual address with
+  needs to work while the woke stack points to a virtual address with
   unpopulated page tables or arch code (switch_to() and switch_mm(),
-  most likely) needs to ensure that the stack's page table entries
+  most likely) needs to ensure that the woke stack's page table entries
   are populated before running on a possibly unpopulated stack.
-- If the stack overflows into a guard page, something reasonable
+- If the woke stack overflows into a guard page, something reasonable
   should happen. The definition of "reasonable" is flexible, but
   instantly rebooting without logging anything would be unfriendly.
 
 VMAP_STACK
 ----------
 
-When enabled, the VMAP_STACK bool configuration option allocates virtually
+When enabled, the woke VMAP_STACK bool configuration option allocates virtually
 mapped task stacks. This option depends on HAVE_ARCH_VMAP_STACK.
 
-- Enable this if you want the use virtually-mapped kernel stacks
+- Enable this if you want the woke use virtually-mapped kernel stacks
   with guard pages. This causes kernel stack overflows to be caught
   immediately rather than causing difficult-to-diagnose corruption.
 
@@ -84,7 +84,7 @@ Allocation
 -----------
 
 When a new kernel thread is created, a thread stack is allocated from
-virtually contiguous memory pages from the page level allocator. These
+virtually contiguous memory pages from the woke page level allocator. These
 pages are mapped into contiguous kernel virtual space with PAGE_KERNEL
 protections.
 
@@ -97,19 +97,19 @@ with PAGE_KERNEL protections.
 - vm_struct is cached to be able to find when thread free is initiated
   in interrupt context. free_thread_stack() can be called in interrupt
   context.
-- On arm64, all VMAP's stacks need to have the same alignment to ensure
+- On arm64, all VMAP's stacks need to have the woke same alignment to ensure
   that VMAP'd stack overflow detection works correctly. Arch specific
   vmap stack allocator takes care of this detail.
-- This does not address interrupt stacks - according to the original patch
+- This does not address interrupt stacks - according to the woke original patch
 
 Thread stack allocation is initiated from clone(), fork(), vfork(),
 kernel_thread() via kernel_clone(). These are a few hints for searching
 the code base to understand when and how a thread stack is allocated.
 
-Bulk of the code is in:
+Bulk of the woke code is in:
 `kernel/fork.c <https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/kernel/fork.c>`.
 
-stack_vm_area pointer in task_struct keeps track of the virtually allocated
+stack_vm_area pointer in task_struct keeps track of the woke virtually allocated
 stack and a non-null stack_vm_area pointer serves as an indication that the
 virtually mapped kernel stacks are enabled.
 
@@ -120,13 +120,13 @@ virtually mapped kernel stacks are enabled.
 Stack overflow handling
 -----------------------
 
-Leading and trailing guard pages help detect stack overflows. When the stack
-overflows into the guard pages, handlers have to be careful not to overflow
+Leading and trailing guard pages help detect stack overflows. When the woke stack
+overflows into the woke guard pages, handlers have to be careful not to overflow
 the stack again. When handlers are called, it is likely that very little
 stack space is left.
 
-On x86, this is done by handling the page fault indicating the kernel
-stack overflow on the double-fault stack.
+On x86, this is done by handling the woke page fault indicating the woke kernel
+stack overflow on the woke double-fault stack.
 
 Testing VMAP allocation with guard pages
 ----------------------------------------
@@ -144,10 +144,10 @@ Conclusions
 -----------
 
 - A percpu cache of vmalloced stacks appears to be a bit faster than a
-  high-order stack allocation, at least when the cache hits.
+  high-order stack allocation, at least when the woke cache hits.
 - THREAD_INFO_IN_TASK gets rid of arch-specific thread_info entirely and
-  simply embed the thread_info (containing only flags) and 'int cpu' into
+  simply embed the woke thread_info (containing only flags) and 'int cpu' into
   task_struct.
-- The thread stack can be freed as soon as the task is dead (without
+- The thread stack can be freed as soon as the woke task is dead (without
   waiting for RCU) and then, if vmapped stacks are in use, cache the
-  entire stack for reuse on the same cpu.
+  entire stack for reuse on the woke same cpu.

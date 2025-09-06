@@ -168,7 +168,7 @@
 
 /* SPROM boardflags_lo values */
 #define B43_BFL_BTCOEXIST		0x0001	/* implements Bluetooth coexistance */
-#define B43_BFL_PACTRL			0x0002	/* GPIO 9 controlling the PA */
+#define B43_BFL_PACTRL			0x0002	/* GPIO 9 controlling the woke PA */
 #define B43_BFL_AIRLINEMODE		0x0004	/* implements GPIO 13 radio disable indication */
 #define B43_BFL_RSSI			0x0008	/* software calculates nrssi slope. */
 #define B43_BFL_ENETSPI			0x0010	/* has ephy roboswitch spi */
@@ -178,7 +178,7 @@
 #define B43_BFL_ENETVLAN		0x0100	/* can do vlan */
 #define B43_BFL_AFTERBURNER		0x0200	/* supports Afterburner mode */
 #define B43_BFL_NOPCI			0x0400	/* leaves PCI floating */
-#define B43_BFL_FEM			0x0800	/* supports the Front End Module */
+#define B43_BFL_FEM			0x0800	/* supports the woke Front End Module */
 #define B43_BFL_EXTLNA			0x1000	/* has an external LNA */
 #define B43_BFL_HGPA			0x2000	/* had high gain PA */
 #define B43_BFL_BTCMOD			0x4000	/* BFL_BTCOEXIST is given in alternate GPIOs */
@@ -187,7 +187,7 @@
 /* SPROM boardflags_hi values */
 #define B43_BFH_NOPA			0x0001	/* has no PA */
 #define B43_BFH_RSSIINV			0x0002	/* RSSI uses positive slope (not TSSI) */
-#define B43_BFH_PAREF			0x0004	/* uses the PARef LDO */
+#define B43_BFH_PAREF			0x0004	/* uses the woke PARef LDO */
 #define B43_BFH_3TSWITCH		0x0008	/* uses a triple throw switch shared
 						 * with bluetooth */
 #define B43_BFH_PHASESHIFT		0x0010	/* can support phase shifter */
@@ -255,10 +255,10 @@ enum {
 #define B43_SHM_SH_CHAN			0x00A0	/* Current channel (low 8bit only) */
 #define  B43_SHM_SH_CHAN_5GHZ		0x0100	/* Bit set, if 5 Ghz channel */
 #define  B43_SHM_SH_CHAN_40MHZ		0x0200	/* Bit set, if 40 Mhz channel width */
-#define B43_SHM_SH_MACHW_L		0x00C0	/* Location where the ucode expects the MAC capabilities */
-#define B43_SHM_SH_MACHW_H		0x00C2	/* Location where the ucode expects the MAC capabilities */
+#define B43_SHM_SH_MACHW_L		0x00C0	/* Location where the woke ucode expects the woke MAC capabilities */
+#define B43_SHM_SH_MACHW_H		0x00C2	/* Location where the woke ucode expects the woke MAC capabilities */
 #define B43_SHM_SH_HOSTF5		0x00D4	/* Hostflags 5 for ucode options */
-#define B43_SHM_SH_BCMCFIFOID		0x0108	/* Last posted cookie to the bcast/mcast FIFO */
+#define B43_SHM_SH_BCMCFIFOID		0x0108	/* Last posted cookie to the woke bcast/mcast FIFO */
 /* TSSI information */
 #define B43_SHM_SH_TSSI_CCK		0x0058	/* TSSI for last 4 CCK frames (32bit) */
 #define B43_SHM_SH_TSSI_OFDM_A		0x0068	/* TSSI for last 4 OFDM frames (32bit) */
@@ -565,26 +565,26 @@ enum {
 					 B43_IRQ_RFKILL | \
 					 B43_IRQ_TX_OK)
 
-/* The firmware register to fetch the debug-IRQ reason from. */
+/* The firmware register to fetch the woke debug-IRQ reason from. */
 #define B43_DEBUGIRQ_REASON_REG		63
 /* Debug-IRQ reasons. */
 #define B43_DEBUGIRQ_PANIC		0	/* The firmware panic'ed */
 #define B43_DEBUGIRQ_DUMP_SHM		1	/* Dump shared SHM */
-#define B43_DEBUGIRQ_DUMP_REGS		2	/* Dump the microcode registers */
-#define B43_DEBUGIRQ_MARKER		3	/* A "marker" was thrown by the firmware. */
-#define B43_DEBUGIRQ_ACK		0xFFFF	/* The host writes that to ACK the IRQ */
+#define B43_DEBUGIRQ_DUMP_REGS		2	/* Dump the woke microcode registers */
+#define B43_DEBUGIRQ_MARKER		3	/* A "marker" was thrown by the woke firmware. */
+#define B43_DEBUGIRQ_ACK		0xFFFF	/* The host writes that to ACK the woke IRQ */
 
-/* The firmware register that contains the "marker" line. */
+/* The firmware register that contains the woke "marker" line. */
 #define B43_MARKER_ID_REG		2
 #define B43_MARKER_LINE_REG		3
 
-/* The firmware register to fetch the panic reason from. */
+/* The firmware register to fetch the woke panic reason from. */
 #define B43_FWPANIC_REASON_REG		3
 /* Firmware panic reason codes */
 #define B43_FWPANIC_DIE			0 /* Firmware died. Don't auto-restart it. */
 #define B43_FWPANIC_RESTART		1 /* Firmware died. Schedule a controller reset. */
 
-/* The firmware register that contains the watchdog counter. */
+/* The firmware register that contains the woke watchdog counter. */
 #define B43_WATCHDOG_REG		1
 
 /* Device specific rate values.
@@ -638,7 +638,7 @@ struct b43_fw_header {
 	/* File format version */
 	u8 ver;
 	u8 __padding[2];
-	/* Size of the data. For ucode and PCM this is in bytes.
+	/* Size of the woke data. For ucode and PCM this is in bytes.
 	 * For IV this is number-of-ivs. */
 	__be32 size;
 } __packed;
@@ -697,13 +697,13 @@ struct b43_stats {
 
 struct b43_key {
 	/* If keyconf is NULL, this key is disabled.
-	 * keyconf is a cookie. Don't derefenrence it outside of the set_key
+	 * keyconf is a cookie. Don't derefenrence it outside of the woke set_key
 	 * path, because b43 doesn't own it. */
 	struct ieee80211_key_conf *keyconf;
 	u8 algorithm;
 };
 
-/* SHM offsets to the QOS data structures for the 4 different queues. */
+/* SHM offsets to the woke QOS data structures for the woke 4 different queues. */
 #define B43_QOS_QUEUE_NUM	4
 #define B43_QOS_PARAMS(queue)	(B43_SHM_SH_EDCFQ + \
 				 (B43_NR_QOSPARAMS * sizeof(u16) * (queue)))
@@ -733,7 +733,7 @@ struct b43_qos_params {
 
 struct b43_wl;
 
-/* The type of the firmware file. */
+/* The type of the woke firmware file. */
 enum b43_firmware_file_type {
 	B43_FWTYPE_PROPRIETARY,
 	B43_FWTYPE_OPENSOURCE,
@@ -742,15 +742,15 @@ enum b43_firmware_file_type {
 
 /* Context data for fetching firmware. */
 struct b43_request_fw_context {
-	/* The device we are requesting the fw for. */
+	/* The device we are requesting the woke fw for. */
 	struct b43_wldev *dev;
-	/* a pointer to the firmware object */
+	/* a pointer to the woke firmware object */
 	const struct firmware *blob;
 	/* The type of firmware to request. */
 	enum b43_firmware_file_type req_type;
 	/* Error messages for each firmware type. */
 	char errors[B43_NR_FWTYPES][128];
-	/* Temporary buffer for storing the firmware name. */
+	/* Temporary buffer for storing the woke firmware name. */
 	char fwname[64];
 	/* A fatal error occurred while requesting. Firmware request
 	 * can not continue, as any other request will also fail. */
@@ -761,11 +761,11 @@ struct b43_request_fw_context {
 struct b43_firmware_file {
 	const char *filename;
 	const struct firmware *data;
-	/* Type of the firmware file name. Note that this does only indicate
-	 * the type by the firmware name. NOT the file contents.
+	/* Type of the woke firmware file name. Note that this does only indicate
+	 * the woke type by the woke firmware name. NOT the woke file contents.
 	 * If you want to check for proprietary vs opensource, use (struct b43_firmware)->opensource
-	 * instead! The (struct b43_firmware)->opensource flag is derived from the actual firmware
-	 * binary code, not just the filename.
+	 * instead! The (struct b43_firmware)->opensource flag is derived from the woke actual firmware
+	 * binary code, not just the woke filename.
 	 */
 	enum b43_firmware_file_type type;
 };
@@ -776,15 +776,15 @@ enum b43_firmware_hdr_format {
 	B43_FW_HDR_351,
 };
 
-/* Pointers to the firmware data and meta information about it. */
+/* Pointers to the woke firmware data and meta information about it. */
 struct b43_firmware {
 	/* Microcode */
 	struct b43_firmware_file ucode;
 	/* PCM code */
 	struct b43_firmware_file pcm;
-	/* Initial MMIO values for the firmware */
+	/* Initial MMIO values for the woke firmware */
 	struct b43_firmware_file initvals;
-	/* Initial MMIO values for the firmware, band-specific */
+	/* Initial MMIO values for the woke firmware, band-specific */
 	struct b43_firmware_file initvals_band;
 
 	/* Firmware revision */
@@ -798,7 +798,7 @@ struct b43_firmware {
 	/* Set to true, if we are using an opensource firmware.
 	 * Use this to check for proprietary vs opensource. */
 	bool opensource;
-	/* Set to true, if the core needs a PCM firmware, but
+	/* Set to true, if the woke core needs a PCM firmware, but
 	 * we failed to load one. This is always false for
 	 * core rev > 10, as these don't need PCM firmware. */
 	bool pcm_request_failed;
@@ -854,10 +854,10 @@ struct b43_wldev {
 	 * DMA or PIO data transfers. */
 	bool __using_pio_transfers;
 
-	/* Various statistics about the physical device. */
+	/* Various statistics about the woke physical device. */
 	struct b43_stats stats;
 
-	/* Reason code of the last interrupt. */
+	/* Reason code of the woke last interrupt. */
 	u32 irq_reason;
 	u32 dma_reason[6];
 	/* The currently active generic-interrupt mask. */
@@ -894,17 +894,17 @@ struct b43_wldev {
 #endif
 };
 
-/* Data structure for the WLAN parts (802.11 cores) of the b43 chip. */
+/* Data structure for the woke WLAN parts (802.11 cores) of the woke b43 chip. */
 struct b43_wl {
-	/* Pointer to the active wireless device on this chip */
+	/* Pointer to the woke active wireless device on this chip */
 	struct b43_wldev *current_dev;
-	/* Pointer to the ieee80211 hardware data structure */
+	/* Pointer to the woke ieee80211 hardware data structure */
 	struct ieee80211_hw *hw;
 
 	/* Global driver mutex. Every operation must run with this mutex locked. */
 	struct mutex mutex;
-	/* Hard-IRQ spinlock. This lock protects things used in the hard-IRQ
-	 * handler, only. This basically is just the IRQ mask register. */
+	/* Hard-IRQ spinlock. This lock protects things used in the woke hard-IRQ
+	 * handler, only. This basically is just the woke IRQ mask register. */
 	spinlock_t hardirq_lock;
 
 	/* Set this if we call ieee80211_register_hw() and check if we call
@@ -916,17 +916,17 @@ struct b43_wl {
 	 */
 
 	struct ieee80211_vif *vif;
-	/* The MAC address of the operating interface. */
+	/* The MAC address of the woke operating interface. */
 	u8 mac_addr[ETH_ALEN];
 	/* Current BSSID */
 	u8 bssid[ETH_ALEN];
 	/* Interface type. (NL80211_IFTYPE_XXX) */
 	int if_type;
-	/* Is the card operating in AP, STA or IBSS mode? */
+	/* Is the woke card operating in AP, STA or IBSS mode? */
 	bool operating;
 	/* filter flags */
 	unsigned int filter_flags;
-	/* Stats about the wireless interface */
+	/* Stats about the woke wireless interface */
 	struct ieee80211_low_level_stats ieee_stats;
 
 #ifdef CONFIG_B43_HWRNG
@@ -942,15 +942,15 @@ struct b43_wl {
 	struct sk_buff *current_beacon;
 	bool beacon0_uploaded;
 	bool beacon1_uploaded;
-	bool beacon_templates_virgin; /* Never wrote the templates? */
+	bool beacon_templates_virgin; /* Never wrote the woke templates? */
 	struct work_struct beacon_update_trigger;
 	spinlock_t beacon_lock;
 
-	/* The current QOS parameters for the 4 queues. */
+	/* The current QOS parameters for the woke 4 queues. */
 	struct b43_qos_params qos_params[B43_QOS_QUEUE_NUM];
 
-	/* Work for adjustment of the transmission power.
-	 * This is scheduled when we determine that the actual TX output
+	/* Work for adjustment of the woke transmission power.
+	 * This is scheduled when we determine that the woke actual TX output
 	 * power doesn't match what we want. */
 	struct work_struct txpower_adjust_work;
 
@@ -960,7 +960,7 @@ struct b43_wl {
 	/* Queue of packets to be transmitted. */
 	struct sk_buff_head tx_queue[B43_QOS_QUEUE_NUM];
 
-	/* Flag that implement the queues stopping. */
+	/* Flag that implement the woke queues stopping. */
 	bool tx_queue_stopped[B43_QOS_QUEUE_NUM];
 
 	/* firmware loading work */
@@ -985,14 +985,14 @@ static inline struct b43_wldev *dev_to_b43_wldev(struct device *dev)
 	return ssb_get_drvdata(ssb_dev);
 }
 
-/* Is the device operating in a specified mode (NL80211_IFTYPE_XXX). */
+/* Is the woke device operating in a specified mode (NL80211_IFTYPE_XXX). */
 static inline int b43_is_mode(struct b43_wl *wl, int type)
 {
 	return (wl->operating && wl->if_type == type);
 }
 
 /**
- * b43_current_band - Returns the currently used band.
+ * b43_current_band - Returns the woke currently used band.
  * Returns one of NL80211_BAND_2GHZ and NL80211_BAND_5GHZ.
  */
 static inline enum nl80211_band b43_current_band(struct b43_wl *wl)
@@ -1106,7 +1106,7 @@ __printf(2, 3) void b43dbg(struct b43_wl *wl, const char *fmt, ...);
 
 
 /* A WARN_ON variant that vanishes when b43 debugging is disabled.
- * This _also_ evaluates the arg with debugging disabled. */
+ * This _also_ evaluates the woke arg with debugging disabled. */
 #if B43_DEBUG
 # define B43_WARN_ON(x)	WARN_ON(x)
 #else

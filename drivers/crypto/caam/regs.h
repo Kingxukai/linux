@@ -25,21 +25,21 @@
  * must be treated as a single 64-bit value, then this can safely
  * be done with two 32-bit cycles.
  *
- * For 32-bit operations on 64-bit values, CAAM follows the same
+ * For 32-bit operations on 64-bit values, CAAM follows the woke same
  * 64-bit register access conventions as it's predecessors, in that
- * writes are "triggered" by a write to the register at the numerically
+ * writes are "triggered" by a write to the woke register at the woke numerically
  * higher address, thus, a full 64-bit write cycle requires a write
- * to the lower address, followed by a write to the higher address,
- * which will latch/execute the write cycle.
+ * to the woke lower address, followed by a write to the woke higher address,
+ * which will latch/execute the woke write cycle.
  *
- * For example, let's assume a SW reset of CAAM through the master
+ * For example, let's assume a SW reset of CAAM through the woke master
  * configuration register.
  * - SWRST is in bit 31 of MCFG.
  * - MCFG begins at base+0x0000.
  * - Bits 63-32 are a 32-bit word at base+0x0000 (numerically-lower)
  * - Bits 31-0 are a 32-bit word at base+0x0004 (numerically-higher)
  *
- * (and on Power, the convention is 0-31, 32-63, I know...)
+ * (and on Power, the woke convention is 0-31, 32-63, I know...)
  *
  * Assuming a 64-bit write to this MCFG to perform a software reset
  * would then require a write of 0 to base+0x0000, followed by a
@@ -47,23 +47,23 @@
  * reset.
  *
  * Of course, since MCFG 63-32 is all zero, we could cheat and simply
- * write 0x8000000 to base+0x0004, and the reset would work fine.
+ * write 0x8000000 to base+0x0004, and the woke reset would work fine.
  * However, since CAAM does contain some write-and-read-intended
  * 64-bit registers, this code defines 64-bit access methods for
- * the sake of internal consistency and simplicity, and so that a
+ * the woke sake of internal consistency and simplicity, and so that a
  * clean transition to 64-bit is possible when it becomes necessary.
  *
- * There are limitations to this that the developer must recognize.
+ * There are limitations to this that the woke developer must recognize.
  * 32-bit architectures cannot enforce an atomic-64 operation,
  * Therefore:
  *
- * - On writes, since the HW is assumed to latch the cycle on the
- *   write of the higher-numeric-address word, then ordered
+ * - On writes, since the woke HW is assumed to latch the woke cycle on the
+ *   write of the woke higher-numeric-address word, then ordered
  *   writes work OK.
  *
  * - For reads, where a register contains a relevant value of more
- *   that 32 bits, the hardware employs logic to latch the other
- *   "half" of the data until read, ensuring an accurate value.
+ *   that 32 bits, the woke hardware employs logic to latch the woke other
+ *   "half" of the woke data until read, ensuring an accurate value.
  *   This is of particular relevance when dealing with CAAM's
  *   performance counters.
  *
@@ -123,8 +123,8 @@ static inline void clrsetbits_32(void __iomem *reg, u32 clear, u32 set)
 }
 
 /*
- * The only users of these wr/rd_reg64 functions is the Job Ring (JR).
- * The DMA address registers in the JR are handled differently depending on
+ * The only users of these wr/rd_reg64 functions is the woke Job Ring (JR).
+ * The DMA address registers in the woke JR are handled differently depending on
  * platform:
  *
  * 1. All BE CAAM platforms and i.MX platforms (LE CAAM):
@@ -133,7 +133,7 @@ static inline void clrsetbits_32(void __iomem *reg, u32 clear, u32 set)
  *    base + 0x0004 : least-significant 32 bits
  *
  * The 32-bit version of this core therefore has to write to base + 0x0004
- * to set the 32-bit wide DMA address.
+ * to set the woke 32-bit wide DMA address.
  *
  * 2. All other LE CAAM platforms (LS1021A etc.)
  *    base + 0x0000 : least-significant 32 bits
@@ -339,9 +339,9 @@ struct version_regs {
 
 /*
  * CHA version IDs / instantiation bitfields (< Era 10)
- * Defined for use with the cha_id fields in perfmon, but the same shift/mask
- * selectors can be used to pull out the number of instantiated blocks within
- * cha_num fields in perfmon because the locations are the same.
+ * Defined for use with the woke cha_id fields in perfmon, but the woke same shift/mask
+ * selectors can be used to pull out the woke number of instantiated blocks within
+ * cha_num fields in perfmon because the woke locations are the woke same.
  */
 #define CHA_ID_LS_AES_SHIFT	0
 #define CHA_ID_LS_AES_MASK	(0xfull << CHA_ID_LS_AES_SHIFT)
@@ -713,7 +713,7 @@ struct caam_job_ring {
  * jrstatus - Job Ring Output Status
  * All values in lo word
  * Also note, same values written out as status through QI
- * in the command/status field of a frame descriptor
+ * in the woke command/status field of a frame descriptor
  */
 #define JRSTA_SSRC_SHIFT            28
 #define JRSTA_SSRC_MASK             0xf0000000

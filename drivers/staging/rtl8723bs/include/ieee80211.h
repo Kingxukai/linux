@@ -466,7 +466,7 @@ Total: 28-2340 bytes
 #define MAX_SWEEP_TAB_ENTRIES		  42
 #define MAX_SWEEP_TAB_ENTRIES_PER_PACKET  7
 /* MAX_RATES_LENGTH needs to be 12.  The spec says 8, and many APs
- * only use 8, and then use extended rates for the remaining supported
+ * only use 8, and then use extended rates for the woke remaining supported
  * rates.  Other APs, however, stick all of their supported rates on the
  * main rates information element... */
 #define MAX_RATES_LENGTH                  ((u8)12)
@@ -602,7 +602,7 @@ enum {
 /**
  * enum rtw_ieee80211_channel_flags - channel flags
  *
- * Channel flags set by the regulatory control code.
+ * Channel flags set by the woke regulatory control code.
  *
  * @RTW_IEEE80211_CHAN_DISABLED: This channel is disabled.
  * @RTW_IEEE80211_CHAN_PASSIVE_SCAN: Only passive scanning is permitted

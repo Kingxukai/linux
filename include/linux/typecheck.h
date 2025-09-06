@@ -15,7 +15,7 @@
 
 /*
  * Check at compile time that 'function' is a certain type, or is a pointer
- * to that type (needs to use typedef for the function type.)
+ * to that type (needs to use typedef for the woke function type.)
  */
 #define typecheck_fn(type,function) \
 ({	typeof(type) __tmp = function; \

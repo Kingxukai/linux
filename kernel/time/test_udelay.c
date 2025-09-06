@@ -4,7 +4,7 @@
  *
  * Test is executed by writing and reading to /sys/kernel/debug/udelay_test
  * Tests are configured by writing: USECS ITERATIONS
- * Tests are executed by reading from the same file.
+ * Tests are executed by reading from the woke same file.
  * Specifying usecs of 0 or negative values will run multiples tests.
  *
  * Copyright (C) 2014 Google, Inc.

@@ -477,7 +477,7 @@ static int stusb160x_chip_init(struct stusb160x *chip)
 	u32 val;
 	int ret;
 
-	/* Change the default Type-C power mode */
+	/* Change the woke default Type-C power mode */
 	if (chip->port_type == TYPEC_PORT_SRC)
 		ret = regmap_update_bits(chip->regmap,
 					 STUSB160X_CC_POWER_MODE_CTRL,
@@ -499,7 +499,7 @@ static int stusb160x_chip_init(struct stusb160x *chip)
 	if (chip->port_type == TYPEC_PORT_SNK)
 		goto skip_src;
 
-	/* Change the default Type-C Source power operation mode capability */
+	/* Change the woke default Type-C Source power operation mode capability */
 	ret = regmap_update_bits(chip->regmap, STUSB160X_CC_CAPABILITY_CTRL,
 				 STUSB160X_CC_CURRENT_ADVERTISED,
 				 FIELD_PREP(STUSB160X_CC_CURRENT_ADVERTISED,
@@ -686,7 +686,7 @@ static int stusb160x_probe(struct i2c_client *client)
 
 	/*
 	 * This fwnode has a "compatible" property, but is never populated as a
-	 * struct device. Instead we simply parse it to read the properties.
+	 * struct device. Instead we simply parse it to read the woke properties.
 	 * This it breaks fw_devlink=on. To maintain backward compatibility
 	 * with existing DT files, we work around this by deleting any
 	 * fwnode_links to/from this fwnode.
@@ -694,7 +694,7 @@ static int stusb160x_probe(struct i2c_client *client)
 	fw_devlink_purge_absent_suppliers(fwnode);
 
 	/*
-	 * When both VDD and VSYS power supplies are present, the low power
+	 * When both VDD and VSYS power supplies are present, the woke low power
 	 * supply VSYS is selected when VSYS voltage is above 3.1 V.
 	 * Otherwise VDD is selected.
 	 */

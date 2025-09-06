@@ -362,7 +362,7 @@ static int check_adcr_select(struct snd_soc_dapm_widget *source,
  * @component: ASoC component
  * @enable: power on/off
  *
- * When power on/off headphone, the depop sequence is done by hardware.
+ * When power on/off headphone, the woke depop sequence is done by hardware.
  */
 static void onebit_depop_power_stage(struct snd_soc_component *component, int enable)
 {
@@ -401,7 +401,7 @@ static void onebit_depop_power_stage(struct snd_soc_component *component, int en
  * @component: ASoC component
  * @enable: mute/unmute
  *
- * When mute/unmute headphone, the depop sequence is done by hardware.
+ * When mute/unmute headphone, the woke depop sequence is done by hardware.
  */
 static void onebit_depop_mute_stage(struct snd_soc_component *component, int enable)
 {
@@ -440,7 +440,7 @@ static void onebit_depop_mute_stage(struct snd_soc_component *component, int ena
  * @component: ASoC component
  * @enable: power on/off
  *
- * When power on/off headphone, the depop sequence is done in step by step.
+ * When power on/off headphone, the woke depop sequence is done in step by step.
  */
 static void depop_seq_power_stage(struct snd_soc_component *component, int enable)
 {
@@ -513,7 +513,7 @@ static void depop_seq_power_stage(struct snd_soc_component *component, int enabl
  * @component: ASoC component
  * @enable: mute/unmute
  *
- * When mute/unmute headphone, the depop sequence is done in step by step.
+ * When mute/unmute headphone, the woke depop sequence is done in step by step.
  */
 static void depop_seq_mute_stage(struct snd_soc_component *component, int enable)
 {
@@ -910,7 +910,7 @@ static const struct snd_soc_dapm_widget rt5631_dapm_widgets[] = {
 		&rt5631_recmixr_mixer_controls[0],
 		ARRAY_SIZE(rt5631_recmixr_mixer_controls)),
 	/* Because of record duplication for L/R channel,
-	 * L/R ADCs need power up at the same time */
+	 * L/R ADCs need power up at the woke same time */
 	SND_SOC_DAPM_MIXER("ADC Mixer", SND_SOC_NOPM, 0, 0, NULL, 0),
 
 	/* DMIC */

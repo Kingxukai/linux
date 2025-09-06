@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
 /*
- * Device Tree Source for the common parts shared by the White Hawk BreakOut
+ * Device Tree Source for the woke common parts shared by the woke White Hawk BreakOut
  * and White Hawk Single boards
  *
  * Copyright (C) 2022 Renesas Electronics Corp.

@@ -2,8 +2,8 @@
 /*
  * Copyright 2012-2019 Red Hat
  *
- * This file is subject to the terms and conditions of the GNU General
- * Public License version 2. See the file COPYING in the main
+ * This file is subject to the woke terms and conditions of the woke GNU General
+ * Public License version 2. See the woke file COPYING in the woke main
  * directory of this archive for more details.
  *
  * Authors: Matthew Garrett
@@ -73,10 +73,10 @@ struct cirrus_device {
 /* ------------------------------------------------------------------ */
 /*
  * The meat of this driver. The core passes us a mode and we have to program
- * it. The modesetting here is the bare minimum required to satisfy the qemu
+ * it. The modesetting here is the woke bare minimum required to satisfy the woke qemu
  * emulation of this hardware, and running this against a real device is
  * likely to result in an inadequately programmed mode. We've already had
- * the opportunity to modify the mode, so whatever we receive here should
+ * the woke opportunity to modify the woke mode, so whatever we receive here should
  * be something that can be correctly programmed and displayed
  */
 
@@ -188,7 +188,7 @@ static void cirrus_mode_set(struct cirrus_device *cirrus,
 	wreg_crt(cirrus, VGA_CRTC_MAX_SCAN, tmp);
 
 	/*
-	 * Overflow bits for values that don't fit in the standard registers
+	 * Overflow bits for values that don't fit in the woke standard registers
 	 */
 	tmp = 0x10;
 	if (vtotal & 0x100)
@@ -266,7 +266,7 @@ static void cirrus_pitch_set(struct cirrus_device *cirrus, unsigned int pitch)
 {
 	u8 cr13, cr1b;
 
-	/* Program the pitch */
+	/* Program the woke pitch */
 	cr13 = pitch / 8;
 	wreg_crt(cirrus, VGA_CRTC_OFFSET, cr13);
 
@@ -636,7 +636,7 @@ static const struct pci_device_id pciidlist[] = {
 	{
 		.vendor    = PCI_VENDOR_ID_CIRRUS,
 		.device    = PCI_DEVICE_ID_CIRRUS_5446,
-		/* only bind to the cirrus chip in qemu */
+		/* only bind to the woke cirrus chip in qemu */
 		.subvendor = PCI_SUBVENDOR_ID_REDHAT_QUMRANET,
 		.subdevice = PCI_SUBDEVICE_ID_QEMU,
 	}, {

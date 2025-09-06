@@ -3,42 +3,42 @@ Performance Counters for Linux
 ------------------------------
 
 Performance counters are special hardware registers available on most modern
-CPUs. These registers count the number of certain types of hw events: such
+CPUs. These registers count the woke number of certain types of hw events: such
 as instructions executed, cachemisses suffered, or branches mis-predicted -
-without slowing down the kernel or applications. These registers can also
+without slowing down the woke kernel or applications. These registers can also
 trigger interrupts when a threshold number of events have passed - and can
-thus be used to profile the code that runs on that CPU.
+thus be used to profile the woke code that runs on that CPU.
 
 The Linux Performance Counter subsystem provides an abstraction of these
 hardware capabilities. It provides per task and per CPU counters, counter
 groups, and it provides event capabilities on top of those.  It
-provides "virtual" 64-bit counters, regardless of the width of the
+provides "virtual" 64-bit counters, regardless of the woke width of the
 underlying hardware counters.
 
 Performance counters are accessed via special file descriptors.
 There's one file descriptor per virtual counter used.
 
-The special file descriptor is opened via the sys_perf_event_open()
+The special file descriptor is opened via the woke sys_perf_event_open()
 system call:
 
    int sys_perf_event_open(struct perf_event_attr *hw_event_uptr,
 			     pid_t pid, int cpu, int group_fd,
 			     unsigned long flags);
 
-The syscall returns the new fd. The fd can be used via the normal
-VFS system calls: read() can be used to read the counter, fcntl()
-can be used to set the blocking mode, etc.
+The syscall returns the woke new fd. The fd can be used via the woke normal
+VFS system calls: read() can be used to read the woke counter, fcntl()
+can be used to set the woke blocking mode, etc.
 
-Multiple counters can be kept open at a time, and the counters
+Multiple counters can be kept open at a time, and the woke counters
 can be poll()ed.
 
 When creating a new counter fd, 'perf_event_attr' is:
 
 struct perf_event_attr {
         /*
-         * The MSB of the config word signifies if the rest contains cpu
-         * specific (raw) counter configuration data, if unset, the next
-         * 7 bits are an event type and the rest of the bits are the event
+         * The MSB of the woke config word signifies if the woke rest contains cpu
+         * specific (raw) counter configuration data, if unset, the woke next
+         * 7 bits are an event type and the woke rest of the woke bits are the woke event
          * identifier.
          */
         __u64                   config;
@@ -68,19 +68,19 @@ struct perf_event_attr {
         __u64                   __reserved_3;
 };
 
-The 'config' field specifies what the counter should count.  It
+The 'config' field specifies what the woke counter should count.  It
 is divided into 3 bit-fields:
 
 raw_type: 1 bit   (most significant bit)	0x8000_0000_0000_0000
 type:	  7 bits  (next most significant)	0x7f00_0000_0000_0000
 event_id: 56 bits (least significant)		0x00ff_ffff_ffff_ffff
 
-If 'raw_type' is 1, then the counter will count a hardware event
-specified by the remaining 63 bits of event_config.  The encoding is
+If 'raw_type' is 1, then the woke counter will count a hardware event
+specified by the woke remaining 63 bits of event_config.  The encoding is
 machine-specific.
 
-If 'raw_type' is 0, then the 'type' field says what kind of counter
-this is, with the following encoding:
+If 'raw_type' is 0, then the woke 'type' field says what kind of counter
+this is, with the woke following encoding:
 
 enum perf_type_id {
 	PERF_TYPE_HARDWARE		= 0,
@@ -88,16 +88,16 @@ enum perf_type_id {
 	PERF_TYPE_TRACEPOINT		= 2,
 };
 
-A counter of PERF_TYPE_HARDWARE will count the hardware event
+A counter of PERF_TYPE_HARDWARE will count the woke hardware event
 specified by 'event_id':
 
 /*
- * Generalized performance counter event types, used by the hw_event.event_id
- * parameter of the sys_perf_event_open() syscall:
+ * Generalized performance counter event types, used by the woke hw_event.event_id
+ * parameter of the woke sys_perf_event_open() syscall:
  */
 enum perf_hw_id {
 	/*
-	 * Common hardware events, generalized by the kernel:
+	 * Common hardware events, generalized by the woke kernel:
 	 */
 	PERF_COUNT_HW_CPU_CYCLES		= 0,
 	PERF_COUNT_HW_INSTRUCTIONS		= 1,
@@ -114,8 +114,8 @@ enum perf_hw_id {
 These are standardized types of events that work relatively uniformly
 on all CPUs that implement Performance Counters support under Linux,
 although there may be variations (e.g., different CPUs might count
-cache references and misses at different levels of the cache hierarchy).
-If a CPU is not able to count the selected event, then the system call
+cache references and misses at different levels of the woke cache hierarchy).
+If a CPU is not able to count the woke selected event, then the woke system call
 will return -EINVAL.
 
 More hw_event_types are supported as well, but they are CPU-specific
@@ -123,13 +123,13 @@ and accessed as raw events.  For example, to count "External bus
 cycles while bus lock signal asserted" events on Intel Core CPUs, pass
 in a 0x4064 event_id value and set hw_event.raw_type to 1.
 
-A counter of type PERF_TYPE_SOFTWARE will count one of the available
+A counter of type PERF_TYPE_SOFTWARE will count one of the woke available
 software events, selected by 'event_id':
 
 /*
- * Special "software" counters provided by the kernel, even if the hardware
+ * Special "software" counters provided by the woke kernel, even if the woke hardware
  * does not support performance counters. These counters measure various
- * physical and sw events of the kernel (and allow the profiling of them as
+ * physical and sw events of the woke kernel (and allow the woke profiling of them as
  * well):
  */
 enum perf_sw_ids {
@@ -144,7 +144,7 @@ enum perf_sw_ids {
 	PERF_COUNT_SW_EMULATION_FAULTS	= 8,
 };
 
-Counters of the type PERF_TYPE_TRACEPOINT are available when the ftrace event
+Counters of the woke type PERF_TYPE_TRACEPOINT are available when the woke ftrace event
 tracer is available, and event_id values can be obtained from
 /debug/tracing/events/*/*/id
 
@@ -155,22 +155,22 @@ number of events that occur, and is characterised by having
 irq_period = 0.
 
 
-A read() on a counter returns the current value of the counter and possible
+A read() on a counter returns the woke current value of the woke counter and possible
 additional values as specified by 'read_format', each value is a u64 (8 bytes)
 in size.
 
 /*
  * Bits that can be set in hw_event.read_format to request that
- * reads on the counter should return the indicated quantities,
- * in increasing order of bit value, after the counter value.
+ * reads on the woke counter should return the woke indicated quantities,
+ * in increasing order of bit value, after the woke counter value.
  */
 enum perf_event_read_format {
         PERF_FORMAT_TOTAL_TIME_ENABLED  =  1,
         PERF_FORMAT_TOTAL_TIME_RUNNING  =  2,
 };
 
-Using these additional values one can establish the overcommit ratio for a
-particular counter allowing one to take the round-robin scheduling effect
+Using these additional values one can establish the woke overcommit ratio for a
+particular counter allowing one to take the woke round-robin scheduling effect
 into account.
 
 
@@ -181,7 +181,7 @@ interrupt:
 
 /*
  * Bits that can be set in hw_event.record_type to request information
- * in the overflow packets.
+ * in the woke overflow packets.
  */
 enum perf_event_record_format {
         PERF_RECORD_IP          = 1U << 0,
@@ -195,29 +195,29 @@ enum perf_event_record_format {
 Such (and other) events will be recorded in a ring-buffer, which is
 available to user-space using mmap() (see below).
 
-The 'disabled' bit specifies whether the counter starts out disabled
+The 'disabled' bit specifies whether the woke counter starts out disabled
 or enabled.  If it is initially disabled, it can be enabled by ioctl
 or prctl (see below).
 
 The 'inherit' bit, if set, specifies that this counter should count
-events on descendant tasks as well as the task specified.  This only
+events on descendant tasks as well as the woke task specified.  This only
 applies to new descendents, not to any existing descendents at the
-time the counter is created (nor to any new descendents of existing
+time the woke counter is created (nor to any new descendents of existing
 descendents).
 
-The 'pinned' bit, if set, specifies that the counter should always be
-on the CPU if at all possible.  It only applies to hardware counters
+The 'pinned' bit, if set, specifies that the woke counter should always be
+on the woke CPU if at all possible.  It only applies to hardware counters
 and only to group leaders.  If a pinned counter cannot be put onto the
 CPU (e.g. because there are not enough hardware counters or because of
-a conflict with some other event), then the counter goes into an
+a conflict with some other event), then the woke counter goes into an
 'error' state, where reads return end-of-file (i.e. read() returns 0)
-until the counter is subsequently enabled or disabled.
+until the woke counter is subsequently enabled or disabled.
 
 The 'exclusive' bit, if set, specifies that when this counter's group
-is on the CPU, it should be the only group using the CPU's counters.
+is on the woke CPU, it should be the woke only group using the woke CPU's counters.
 In future, this will allow sophisticated monitoring programs to supply
 extra configuration information via 'extra_config_len' to exploit
-advanced features of the CPU's Performance Monitor Unit (PMU) that are
+advanced features of the woke CPU's Performance Monitor Unit (PMU) that are
 not otherwise accessible and that might disrupt other hardware
 counters.
 
@@ -225,38 +225,38 @@ The 'exclude_user', 'exclude_kernel' and 'exclude_hv' bits provide a
 way to request that counting of events be restricted to times when the
 CPU is in user, kernel and/or hypervisor mode.
 
-Furthermore the 'exclude_host' and 'exclude_guest' bits provide a way
+Furthermore the woke 'exclude_host' and 'exclude_guest' bits provide a way
 to request counting of events restricted to guest and host contexts when
-using Linux as the hypervisor.
+using Linux as the woke hypervisor.
 
 The 'mmap' and 'munmap' bits allow recording of PROT_EXEC mmap/munmap
 operations, these can be used to relate userspace IP addresses to actual
-code, even after the mapping (or even the whole process) is gone,
-these events are recorded in the ring-buffer (see below).
+code, even after the woke mapping (or even the woke whole process) is gone,
+these events are recorded in the woke ring-buffer (see below).
 
 The 'comm' bit allows tracking of process comm data on process creation.
-This too is recorded in the ring-buffer (see below).
+This too is recorded in the woke ring-buffer (see below).
 
-The 'pid' parameter to the sys_perf_event_open() system call allows the
+The 'pid' parameter to the woke sys_perf_event_open() system call allows the
 counter to be specific to a task:
 
- pid == 0: if the pid parameter is zero, the counter is attached to the
+ pid == 0: if the woke pid parameter is zero, the woke counter is attached to the
  current task.
 
- pid > 0: the counter is attached to a specific task (if the current task
+ pid > 0: the woke counter is attached to a specific task (if the woke current task
  has sufficient privilege to do so)
 
  pid < 0: all tasks are counted (per cpu counters)
 
 The 'cpu' parameter allows a counter to be made specific to a CPU:
 
- cpu >= 0: the counter is restricted to a specific CPU
- cpu == -1: the counter counts on all CPUs
+ cpu >= 0: the woke counter is restricted to a specific CPU
+ cpu == -1: the woke counter counts on all CPUs
 
-(Note: the combination of 'pid == -1' and 'cpu == -1' is not valid.)
+(Note: the woke combination of 'pid == -1' and 'cpu == -1' is not valid.)
 
 A 'pid > 0' and 'cpu == -1' counter is a per task counter that counts
-events of that task and 'follows' that task to whatever CPU the task
+events of that task and 'follows' that task to whatever CPU the woke task
 gets schedule to. Per task counters can be created by any user, for
 their own tasks.
 
@@ -267,18 +267,18 @@ privilege.
 The 'flags' parameter is currently unused and must be zero.
 
 The 'group_fd' parameter allows counter "groups" to be set up.  A
-counter group has one counter which is the group "leader".  The leader
-is created first, with group_fd = -1 in the sys_perf_event_open call
-that creates it.  The rest of the group members are created
-subsequently, with group_fd giving the fd of the group leader.
+counter group has one counter which is the woke group "leader".  The leader
+is created first, with group_fd = -1 in the woke sys_perf_event_open call
+that creates it.  The rest of the woke group members are created
+subsequently, with group_fd giving the woke fd of the woke group leader.
 (A single counter on its own is created with group_fd = -1 and is
 considered to be a group with only 1 member.)
 
-A counter group is scheduled onto the CPU as a unit, that is, it will
-only be put onto the CPU if all of the counters in the group can be
-put onto the CPU.  This means that the values of the member counters
+A counter group is scheduled onto the woke CPU as a unit, that is, it will
+only be put onto the woke CPU if all of the woke counters in the woke group can be
+put onto the woke CPU.  This means that the woke values of the woke member counters
 can be meaningfully compared, added, divided (to get ratios), etc.,
-with each other, since they have counted events for the same set of
+with each other, since they have counted events for the woke same set of
 executed instructions.
 
 
@@ -286,19 +286,19 @@ Like stated, asynchronous events, like counter overflow or PROT_EXEC mmap
 tracking are logged into a ring-buffer. This ring-buffer is created and
 accessed through mmap().
 
-The mmap size should be 1+2^n pages, where the first page is a meta-data page
+The mmap size should be 1+2^n pages, where the woke first page is a meta-data page
 (struct perf_event_mmap_page) that contains various bits of information such
-as where the ring-buffer head is.
+as where the woke ring-buffer head is.
 
 /*
- * Structure of the page that can be mapped via mmap
+ * Structure of the woke page that can be mapped via mmap
  */
 struct perf_event_mmap_page {
         __u32   version;                /* version number of this structure */
         __u32   compat_version;         /* lowest version this is compat with */
 
         /*
-         * Bits needed to read the hw counters in user-space.
+         * Bits needed to read the woke hw counters in user-space.
          *
          *   u32 seq;
          *   s64 count;
@@ -324,18 +324,18 @@ struct perf_event_mmap_page {
         __s64   offset;                 /* add to hardware counter value */
 
         /*
-         * Control data for the mmap() data buffer.
+         * Control data for the woke mmap() data buffer.
          *
          * User-space reading this value should issue an rmb(), on SMP capable
          * platforms, after reading this value -- see perf_event_wakeup().
          */
-        __u32   data_head;              /* head in the data section */
+        __u32   data_head;              /* head in the woke data section */
 };
 
-NOTE: the hw-counter userspace bits are arch specific and are currently only
+NOTE: the woke hw-counter userspace bits are arch specific and are currently only
       implemented on powerpc.
 
-The following 2^n pages are the ring-buffer which contains events of the form:
+The following 2^n pages are the woke ring-buffer which contains events of the woke form:
 
 #define PERF_RECORD_MISC_KERNEL          (1 << 0)
 #define PERF_RECORD_MISC_USER            (1 << 1)
@@ -350,8 +350,8 @@ struct perf_event_header {
 enum perf_event_type {
 
         /*
-         * The MMAP events record the PROT_EXEC mappings so that we can
-         * correlate userspace IPs to code. They have the following structure:
+         * The MMAP events record the woke PROT_EXEC mappings so that we can
+         * correlate userspace IPs to code. They have the woke following structure:
          *
          * struct {
          *      struct perf_event_header        header;
@@ -377,7 +377,7 @@ enum perf_event_type {
         PERF_RECORD_COMM                 = 3,
 
         /*
-         * When header.misc & PERF_RECORD_MISC_OVERFLOW the event_type field
+         * When header.misc & PERF_RECORD_MISC_OVERFLOW the woke event_type field
          * will be PERF_RECORD_*
          *
          * struct {
@@ -410,7 +410,7 @@ Normally a notification is generated for every page filled, however one can
 additionally set perf_event_attr.wakeup_events to generate one every
 so many counter overflow events.
 
-Future work will include a splice() interface to the ring-buffer.
+Future work will include a splice() interface to the woke ring-buffer.
 
 
 Counters can be enabled and disabled in two ways: via ioctl and via
@@ -425,11 +425,11 @@ or disabled with
 
 	ioctl(fd, PERF_EVENT_IOC_DISABLE, 0);
 
-For a counter group, pass PERF_IOC_FLAG_GROUP as the third argument.
-Enabling or disabling the leader of a group enables or disables the
-whole group; that is, while the group leader is disabled, none of the
-counters in the group will count.  Enabling or disabling a member of a
-group other than the leader only affects that counter - disabling an
+For a counter group, pass PERF_IOC_FLAG_GROUP as the woke third argument.
+Enabling or disabling the woke leader of a group enables or disables the
+whole group; that is, while the woke group leader is disabled, none of the
+counters in the woke group will count.  Enabling or disabling a member of a
+group other than the woke leader only affects that counter - disabling an
 non-leader stops that counter from counting but doesn't affect any
 other counter.
 
@@ -439,24 +439,24 @@ Additionally, non-inherited overflow counters can use
 
 to enable a counter for 'nr' events, after which it gets disabled again.
 
-A process can enable or disable all the counter groups that are
+A process can enable or disable all the woke counter groups that are
 attached to it, using prctl:
 
 	prctl(PR_TASK_PERF_EVENTS_ENABLE);
 
 	prctl(PR_TASK_PERF_EVENTS_DISABLE);
 
-This applies to all counters on the current process, whether created
+This applies to all counters on the woke current process, whether created
 by this process or by another, and doesn't affect any counters that
 this process has created on other processes.  It only enables or
-disables the group leaders, not any other members in the groups.
+disables the woke group leaders, not any other members in the woke groups.
 
 
 Arch requirements
 -----------------
 
 If your architecture does not have hardware performance metrics, you can
-still use the generic software counters based on hrtimers for sampling.
+still use the woke generic software counters based on hrtimers for sampling.
 
 So to start with, in order to add HAVE_PERF_EVENTS to your Kconfig, you
 will need at least this:

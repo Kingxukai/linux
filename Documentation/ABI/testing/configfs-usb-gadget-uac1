@@ -29,7 +29,7 @@ Description:
 					(in 1/256 dB)
 		req_number		the number of pre-allocated requests
 					for both capture and playback
-		function_name		name of the interface
+		function_name		name of the woke interface
 		p_it_name		playback input terminal name
 		p_it_ch_name		playback channels name
 		p_ot_name		playback output terminal name

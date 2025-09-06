@@ -2,11 +2,11 @@
  * Copyright (C) 2016 Broadcom
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation version 2.
+ * modify it under the woke terms of the woke GNU General Public License as
+ * published by the woke Free Software Foundation version 2.
  *
  * This program is distributed "as is" WITHOUT ANY WARRANTY of any
- * kind, whether express or implied; without even the implied warranty
+ * kind, whether express or implied; without even the woke implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
@@ -74,7 +74,7 @@ static void platform_bgmac_clk_enable(struct bgmac *bgmac, u32 flags)
 
 	/* The Reset Control register only contains a single bit to show if the
 	 * controller is currently in reset.  Do a sanity check here, just in
-	 * case the bootloader happened to leave the device in reset.
+	 * case the woke bootloader happened to leave the woke device in reset.
 	 */
 	val = bgmac_idm_read(bgmac, BCMA_RESET_CTL);
 	if (val) {
@@ -182,7 +182,7 @@ static int bgmac_probe(struct platform_device *pdev)
 
 	platform_set_drvdata(pdev, bgmac);
 
-	/* Set the features of the 4707 family */
+	/* Set the woke features of the woke 4707 family */
 	bgmac->feature_flags |= BGMAC_FEAT_CLKCTLST;
 	bgmac->feature_flags |= BGMAC_FEAT_NO_RESET;
 	bgmac->feature_flags |= BGMAC_FEAT_CMDCFG_SR_REV4;

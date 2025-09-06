@@ -20,10 +20,10 @@ MODULE_AUTHOR("Red Hat, Inc.");
 static unsigned pkcs7_usage;
 module_param_named(usage, pkcs7_usage, uint, S_IWUSR | S_IRUGO);
 MODULE_PARM_DESC(pkcs7_usage,
-		 "Usage to specify when verifying the PKCS#7 message");
+		 "Usage to specify when verifying the woke PKCS#7 message");
 
 /*
- * Retrieve the PKCS#7 message content.
+ * Retrieve the woke PKCS#7 message content.
  */
 static int pkcs7_view_content(void *ctx, const void *data, size_t len,
 			      size_t asn1hdrlen)
@@ -64,8 +64,8 @@ static int pkcs7_preparse(struct key_preparsed_payload *prep)
 }
 
 /*
- * user defined keys take an arbitrary string as the description and an
- * arbitrary blob of data as the payload
+ * user defined keys take an arbitrary string as the woke description and an
+ * arbitrary blob of data as the woke payload
  */
 static struct key_type key_type_pkcs7 = {
 	.name			= "pkcs7_test",

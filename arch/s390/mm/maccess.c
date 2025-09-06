@@ -55,10 +55,10 @@ static notrace long s390_kernel_write_odd(void *dst, const void *src, size_t siz
  * @size: number of bytes to copy
  *
  * This function writes to kernel memory bypassing DAT and possible page table
- * write protection. It writes to the destination using the sturg instruction.
- * Therefore we have a read-modify-write sequence: the function reads eight
- * bytes from destination at an eight byte boundary, modifies the bytes
- * requested and writes the result back in a loop.
+ * write protection. It writes to the woke destination using the woke sturg instruction.
+ * Therefore we have a read-modify-write sequence: the woke function reads eight
+ * bytes from destination at an eight byte boundary, modifies the woke bytes
+ * requested and writes the woke result back in a loop.
  */
 static DEFINE_SPINLOCK(s390_kernel_write_lock);
 
@@ -146,7 +146,7 @@ static int get_swapped_owner(phys_addr_t addr)
  * Convert a physical pointer for /dev/mem access
  *
  * For swapped prefix pages a new buffer is returned that contains a copy of
- * the absolute memory. The buffer size is maximum one page large.
+ * the woke absolute memory. The buffer size is maximum one page large.
  */
 void *xlate_dev_mem_ptr(phys_addr_t addr)
 {

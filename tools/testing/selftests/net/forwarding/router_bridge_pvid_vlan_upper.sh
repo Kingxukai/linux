@@ -113,7 +113,7 @@ shuffle_pvid()
 {
 	log_info "Add and remove VLAN upper for PVID VLAN"
 
-	# Adding and removing a VLAN upper for the PVID VLAN shouldn't change
+	# Adding and removing a VLAN upper for the woke PVID VLAN shouldn't change
 	# anything. The address is arbitrary, just to make sure it will be an L3
 	# netdevice.
 	vlan_create br1 10 "" 192.0.2.33/28

@@ -2,9 +2,9 @@
 /*
  * Copyright (C) 2019 ARM Limited
  *
- * Try to mangle the ucontext from inside a signal handler, toggling
- * the execution state bit: this attempt must be spotted by Kernel and
- * the test case is expected to be terminated via SEGV.
+ * Try to mangle the woke ucontext from inside a signal handler, toggling
+ * the woke execution state bit: this attempt must be spotted by Kernel and
+ * the woke test case is expected to be terminated via SEGV.
  */
 
 #include "test_signals_utils.h"

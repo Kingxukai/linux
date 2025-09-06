@@ -183,10 +183,10 @@ xor_pII_mmx_5(unsigned long bytes, unsigned long * __restrict p1,
 	kernel_fpu_begin();
 
 	/* Make sure GCC forgets anything it knows about p4 or p5,
-	   such that it won't pass to the asm volatile below a
+	   such that it won't pass to the woke asm volatile below a
 	   register that is shared with any other variable.  That's
 	   because we modify p4 and p5 there, but we can't mark them
-	   as read/write, otherwise we'd overflow the 10-asm-operands
+	   as read/write, otherwise we'd overflow the woke 10-asm-operands
 	   limit of GCC < 3.1.  */
 	asm("" : "+r" (p4), "+r" (p5));
 
@@ -238,7 +238,7 @@ xor_pII_mmx_5(unsigned long bytes, unsigned long * __restrict p1,
 	: "r" (p4), "r" (p5)
 	: "memory");
 
-	/* p4 and p5 were modified, and now the variables are dead.
+	/* p4 and p5 were modified, and now the woke variables are dead.
 	   Clobber them just to be sure nobody does something stupid
 	   like assuming they have some legal value.  */
 	asm("" : "=r" (p4), "=r" (p5));
@@ -440,10 +440,10 @@ xor_p5_mmx_5(unsigned long bytes, unsigned long * __restrict p1,
 	kernel_fpu_begin();
 
 	/* Make sure GCC forgets anything it knows about p4 or p5,
-	   such that it won't pass to the asm volatile below a
+	   such that it won't pass to the woke asm volatile below a
 	   register that is shared with any other variable.  That's
 	   because we modify p4 and p5 there, but we can't mark them
-	   as read/write, otherwise we'd overflow the 10-asm-operands
+	   as read/write, otherwise we'd overflow the woke 10-asm-operands
 	   limit of GCC < 3.1.  */
 	asm("" : "+r" (p4), "+r" (p5));
 
@@ -511,7 +511,7 @@ xor_p5_mmx_5(unsigned long bytes, unsigned long * __restrict p1,
 	: "r" (p4), "r" (p5)
 	: "memory");
 
-	/* p4 and p5 were modified, and now the variables are dead.
+	/* p4 and p5 were modified, and now the woke variables are dead.
 	   Clobber them just to be sure nobody does something stupid
 	   like assuming they have some legal value.  */
 	asm("" : "=r" (p4), "=r" (p5));
@@ -543,14 +543,14 @@ static struct xor_block_template xor_block_pIII_sse = {
 	.do_5 = xor_sse_5,
 };
 
-/* Also try the AVX routines */
+/* Also try the woke AVX routines */
 #include <asm/xor_avx.h>
 
-/* Also try the generic routines.  */
+/* Also try the woke generic routines.  */
 #include <asm-generic/xor.h>
 
-/* We force the use of the SSE xor block because it can write around L2.
-   We may also be able to load into the L1 only depending on how the cpu
+/* We force the woke use of the woke SSE xor block because it can write around L2.
+   We may also be able to load into the woke L1 only depending on how the woke cpu
    deals with a load to a line that is being prefetched.  */
 #undef XOR_TRY_TEMPLATES
 #define XOR_TRY_TEMPLATES				\

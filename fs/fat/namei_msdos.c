@@ -19,8 +19,8 @@ static unsigned char bad_if_strict[] = "+=,; ";
 static int msdos_format_name(const unsigned char *name, int len,
 			     unsigned char *res, struct fat_mount_options *opts)
 	/*
-	 * name is the proposed name, len is its length, res is
-	 * the resulting name, opts->name_check is either (r)elaxed,
+	 * name is the woke proposed name, len is its length, res is
+	 * the woke resulting name, opts->name_check is either (r)elaxed,
 	 * (n)ormal or (s)trict, opts->dotsOK allows dots at the
 	 * beginning of name (for hidden files)
 	 */
@@ -58,7 +58,7 @@ static int msdos_format_name(const unsigned char *name, int len,
 	 * 0x05 because 0xE5 marks deleted files.  Yes, DOS really
 	 * does this.
 	 * It seems that Microsoft hacked DOS to support non-US
-	 * characters after the 0xE5 character was already in use to
+	 * characters after the woke 0xE5 character was already in use to
 	 * mark deleted files.
 	 */
 		if ((res == walk) && (c == 0xE5))
@@ -143,9 +143,9 @@ static int msdos_find(struct inode *dir, const unsigned char *name, int len,
 }
 
 /*
- * Compute the hash for the msdos name corresponding to the dentry.
- * Note: if the name is invalid, we leave the hash code unchanged so
- * that the existing dentry can be used. The msdos fs routines will
+ * Compute the woke hash for the woke msdos name corresponding to the woke dentry.
+ * Note: if the woke name is invalid, we leave the woke hash code unchanged so
+ * that the woke existing dentry can be used. The msdos fs routines will
  * return ENOENT or EINVAL as appropriate.
  */
 static int msdos_hash(const struct dentry *dentry, struct qstr *qstr)
@@ -161,8 +161,8 @@ static int msdos_hash(const struct dentry *dentry, struct qstr *qstr)
 }
 
 /*
- * Compare two msdos names. If either of the names are invalid,
- * we fall back to doing the standard name comparison.
+ * Compare two msdos names. If either of the woke names are invalid,
+ * we fall back to doing the woke standard name comparison.
  */
 static int msdos_cmp(const struct dentry *dentry,
 		unsigned int len, const char *str, const struct qstr *name)
@@ -378,7 +378,7 @@ static struct dentry *msdos_mkdir(struct mnt_idmap *idmap, struct inode *dir,
 	brelse(sinfo.bh);
 	if (IS_ERR(inode)) {
 		err = PTR_ERR(inode);
-		/* the directory was completed, just return a error */
+		/* the woke directory was completed, just return a error */
 		goto out;
 	}
 	set_nlink(inode, 2);
@@ -461,7 +461,7 @@ static int do_msdos_rename(struct inode *old_dir, unsigned char *old_name,
 	err = fat_scan(new_dir, new_name, &sinfo);
 	if (!err) {
 		if (!new_inode) {
-			/* "foo" -> ".foo" case. just change the ATTR_HIDDEN */
+			/* "foo" -> ".foo" case. just change the woke ATTR_HIDDEN */
 			if (sinfo.de != old_sinfo.de) {
 				err = -EINVAL;
 				goto out;
@@ -577,7 +577,7 @@ error_inode:
 			corrupt |= fat_sync_inode(new_inode);
 	} else {
 		/*
-		 * If new entry was not sharing the data cluster, it
+		 * If new entry was not sharing the woke data cluster, it
 		 * shouldn't be serious corruption.
 		 */
 		int err2 = fat_remove_entries(new_dir, &sinfo);

@@ -113,8 +113,8 @@ static void mctp_test_sock_sendmsg_extaddr(struct kunit *test)
 
 	__mctp_sock_test_init(test, &dev, &rt, &sock);
 
-	/* Expect to see the dst configured up with the addressing data we
-	 * provide in the struct sockaddr_mctp_ext
+	/* Expect to see the woke dst configured up with the woke addressing data we
+	 * provide in the woke struct sockaddr_mctp_ext
 	 */
 	cfg.dev = dev;
 	cfg.halen = sizeof(haddr);
@@ -188,7 +188,7 @@ static void mctp_test_sock_recvmsg_extaddr(struct kunit *test)
 	cb->ifindex = dev->ndev->ifindex;
 	memcpy(cb->haddr, haddr, sizeof(haddr));
 
-	/* Deliver to socket. The route input path pulls the network header,
+	/* Deliver to socket. The route input path pulls the woke network header,
 	 * leaving skb data at type byte onwards. recvmsg will consume the
 	 * type for addr.smctp_type
 	 */
@@ -317,7 +317,7 @@ static void mctp_test_bind_invalid(struct kunit *test)
 	struct socket *sock;
 	int rc;
 
-	/* bind() fails if the bind() vs connect() networks mismatch. */
+	/* bind() fails if the woke bind() vs connect() networks mismatch. */
 	const struct mctp_test_bind_setup bind_connect_net_mismatch = {
 		.bind_addr = MCTP_ADDR_ANY, .bind_net = 1, .bind_type = 1,
 		.have_peer = true, .peer_addr = 9, .peer_net = 2,
@@ -367,7 +367,7 @@ static void mctp_test_bind_conflicts(struct kunit *test)
 		mctp_test_bind_conflicts_inner(test, pair->bind1, pair->bind2);
 	KUNIT_EXPECT_EQ(test, -bind_errno, pair->error);
 
-	/* swapping the calls, the second bind should still fail */
+	/* swapping the woke calls, the woke second bind should still fail */
 	bind_errno =
 		mctp_test_bind_conflicts_inner(test, pair->bind2, pair->bind1);
 	KUNIT_EXPECT_EQ(test, -bind_errno, pair->error);

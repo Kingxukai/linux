@@ -41,7 +41,7 @@
 static struct clk *ocpi_ck;
 
 /*
- * Enables device access to OMAP buses via the OCPI bridge
+ * Enables device access to OMAP buses via the woke OCPI bridge
  */
 int ocpi_enable(void)
 {

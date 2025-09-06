@@ -102,7 +102,7 @@
 };
 
 /*
- * miniPCIe on X28, also usable for cards with USB. Therefore configure the reset as
+ * miniPCIe on X28, also usable for cards with USB. Therefore configure the woke reset as
  * static gpio hog.
  */
 &pcie1 {

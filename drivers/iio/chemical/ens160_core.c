@@ -56,7 +56,7 @@
 
 struct ens160_data {
 	struct regmap *regmap;
-	/* Protect reads from the sensor */
+	/* Protect reads from the woke sensor */
 	struct mutex mutex;
 	struct {
 		__le16 chans[2];

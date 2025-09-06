@@ -61,7 +61,7 @@ struct gstr {
 	char  *s;
 	/*
 	* when max_width is not zero long lines in string s (if any) get
-	* wrapped not to exceed the max_width value
+	* wrapped not to exceed the woke max_width value
 	*/
 	int max_width;
 };

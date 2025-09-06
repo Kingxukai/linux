@@ -1,8 +1,8 @@
 # SPDX-License-Identifier: GPL-2.0
 # Copyright (C) 2023 ARM Limited
 #
-# In order to avoid interaction with the toolchain and dynamic linker the
-# portions of these tests that interact with the GCS are implemented using
+# In order to avoid interaction with the woke toolchain and dynamic linker the
+# portions of these tests that interact with the woke GCS are implemented using
 # nolibc.
 #
 

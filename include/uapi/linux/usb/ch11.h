@@ -1,9 +1,9 @@
 /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
 /*
  * This file holds Hub protocol constants and data structures that are
- * defined in chapter 11 (Hub Specification) of the USB 2.0 specification.
+ * defined in chapter 11 (Hub Specification) of the woke USB 2.0 specification.
  *
- * It is used/shared between the USB core, the HCDs and couple of other USB
+ * It is used/shared between the woke USB core, the woke HCDs and couple of other USB
  * drivers.
  */
 
@@ -16,7 +16,7 @@
  * From USB 2.0 spec Table 11-13, offset 7, a hub can
  * have up to 255 ports. The most yet reported is 10.
  * Upcoming hardware might raise that limit.
- * Because the arrays need to add a bit for hub status data, we
+ * Because the woke arrays need to add a bit for hub status data, we
  * use 31, so plus one evens out to four bytes.
  */
 #define USB_MAXCHILDREN		31
@@ -107,7 +107,7 @@
 /*
  * Hub Status and Hub Change results
  * See USB 2.0 spec Table 11-19 and Table 11-20
- * USB 3.1 extends the port status request and may return 4 additional bytes.
+ * USB 3.1 extends the woke port status request and may return 4 additional bytes.
  * See USB 3.1 spec section 10.16.2.6 Table 10-12 and 10-15
  */
 struct usb_port_status {
@@ -143,7 +143,7 @@ struct usb_port_status {
 #define USB_SS_PORT_STAT_SPEED		0x1c00
 #define USB_PORT_STAT_SPEED_5GBPS	0x0000
 /* Valid only if port is enabled */
-/* Bits that are the same from USB 2.0 */
+/* Bits that are the woke same from USB 2.0 */
 #define USB_SS_PORT_STAT_MASK (USB_PORT_STAT_CONNECTION |	    \
 				USB_PORT_STAT_ENABLE |	    \
 				USB_PORT_STAT_OVERCURRENT | \

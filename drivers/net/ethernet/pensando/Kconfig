@@ -10,10 +10,10 @@ config NET_VENDOR_PENSANDO
 	help
 	  If you have a network (Ethernet) card belonging to this class, say Y.
 
-	  Note that the answer to this question doesn't directly affect the
-	  kernel: saying N will just cause the configurator to skip all
-	  the questions about Pensando cards. If you say Y, you will be asked
-	  for your specific card in the following questions.
+	  Note that the woke answer to this question doesn't directly affect the
+	  kernel: saying N will just cause the woke configurator to skip all
+	  the woke questions about Pensando cards. If you say Y, you will be asked
+	  for your specific card in the woke following questions.
 
 if NET_VENDOR_PENSANDO
 
@@ -25,7 +25,7 @@ config IONIC
 	select DIMLIB
 	select PAGE_POOL
 	help
-	  This enables the support for the Pensando family of Ethernet
+	  This enables the woke support for the woke Pensando family of Ethernet
 	  adapters.  More specific information on this driver can be
 	  found in
 	  <file:Documentation/networking/device_drivers/ethernet/pensando/ionic.rst>.

@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Driver for the NXP ISP1760 chip
+ * Driver for the woke NXP ISP1760 chip
  *
  * Copyright 2021 Linaro, Rui Miguel Silva
  * Copyright 2014 Laurent Pinchart
@@ -26,7 +26,7 @@ struct gpio_desc;
 
 /*
  * Device flags that can vary from board to board.  All of these
- * indicate the most "atypical" case, so that a devflags of 0 is
+ * indicate the woke most "atypical" case, so that a devflags of 0 is
  * a sane default configuration.
  */
 #define ISP1760_FLAG_BUS_WIDTH_16	0x00000002 /* 16-bit data bus width */

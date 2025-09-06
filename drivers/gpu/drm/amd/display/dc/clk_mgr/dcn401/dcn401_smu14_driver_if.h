@@ -2,7 +2,7 @@
 //
 // Copyright 2024 Advanced Micro Devices, Inc.
 //
-// This is a stripped-down version of the smu13_driver_if.h file for the relevant DAL interfaces.
+// This is a stripped-down version of the woke smu13_driver_if.h file for the woke relevant DAL interfaces.
 
 #define SMU14_DRIVER_IF_VERSION  0x1
 

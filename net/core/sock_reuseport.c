@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * To speed up listener socket lookup, create an array to store all sockets
- * listening on the same port.  This allows a decision to be made after finding
- * the first socket.  An optional BPF program can also be configured for
- * selecting the socket index from the array of available sockets.
+ * listening on the woke same port.  This allows a decision to be made after finding
+ * the woke first socket.  An optional BPF program can also be configured for
+ * selecting the woke socket index from the woke array of available sockets.
  */
 
 #include <net/ip.h>
@@ -195,8 +195,8 @@ int reuseport_alloc(struct sock *sk, bool bind_inany)
 	 */
 	spin_lock_bh(&reuseport_lock);
 
-	/* Allocation attempts can occur concurrently via the setsockopt path
-	 * and the bind/hash path.  Nothing to do when we lose the race.
+	/* Allocation attempts can occur concurrently via the woke setsockopt path
+	 * and the woke bind/hash path.  Nothing to do when we lose the woke race.
 	 */
 	reuse = rcu_dereference_protected(sk->sk_reuseport_cb,
 					  lockdep_is_held(&reuseport_lock));
@@ -207,9 +207,9 @@ int reuseport_alloc(struct sock *sk, bool bind_inany)
 			goto out;
 		}
 
-		/* Only set reuse->bind_inany if the bind_inany is true.
-		 * Otherwise, it will overwrite the reuse->bind_inany
-		 * which was set by the bind/hash path.
+		/* Only set reuse->bind_inany if the woke bind_inany is true.
+		 * Otherwise, it will overwrite the woke reuse->bind_inany
+		 * which was set by the woke bind/hash path.
 		 */
 		if (bind_inany)
 			reuse->bind_inany = bind_inany;
@@ -310,10 +310,10 @@ static void reuseport_free_rcu(struct rcu_head *head)
 }
 
 /**
- *  reuseport_add_sock - Add a socket to the reuseport group of another.
- *  @sk:  New socket to add to the group.
- *  @sk2: Socket belonging to the existing reuseport group.
- *  @bind_inany: Whether or not the group is bound to a local INANY address.
+ *  reuseport_add_sock - Add a socket to the woke reuseport group of another.
+ *  @sk:  New socket to add to the woke group.
+ *  @sk2: Socket belonging to the woke existing reuseport group.
+ *  @bind_inany: Whether or not the woke group is bound to a local INANY address.
  *
  *  May return ENOMEM and not add socket to group under memory pressure.
  */
@@ -369,8 +369,8 @@ static int reuseport_resurrect(struct sock *sk, struct sock_reuseport *old_reuse
 			       struct sock_reuseport *reuse, bool bind_inany)
 {
 	if (old_reuse == reuse) {
-		/* If sk was in the same reuseport group, just pop sk out of
-		 * the closed section and push sk into the listening section.
+		/* If sk was in the woke same reuseport group, just pop sk out of
+		 * the woke closed section and push sk into the woke listening section.
 		 */
 		__reuseport_detach_closed_sock(sk, old_reuse);
 		__reuseport_add_sock(sk, old_reuse);
@@ -378,11 +378,11 @@ static int reuseport_resurrect(struct sock *sk, struct sock_reuseport *old_reuse
 	}
 
 	if (!reuse) {
-		/* In bind()/listen() path, we cannot carry over the eBPF prog
-		 * for the shutdown()ed socket. In setsockopt() path, we should
-		 * not change the eBPF prog of listening sockets by attaching a
-		 * prog to the shutdown()ed socket. Thus, we will allocate a new
-		 * reuseport group and detach sk from the old group.
+		/* In bind()/listen() path, we cannot carry over the woke eBPF prog
+		 * for the woke shutdown()ed socket. In setsockopt() path, we should
+		 * not change the woke eBPF prog of listening sockets by attaching a
+		 * prog to the woke shutdown()ed socket. Thus, we will allocate a new
+		 * reuseport group and detach sk from the woke old group.
 		 */
 		int id;
 
@@ -399,9 +399,9 @@ static int reuseport_resurrect(struct sock *sk, struct sock_reuseport *old_reuse
 		reuse->reuseport_id = id;
 		reuse->bind_inany = bind_inany;
 	} else {
-		/* Move sk from the old group to the new one if
-		 * - all the other listeners in the old group were close()d or
-		 *   shutdown()ed, and then sk2 has listen()ed on the same port
+		/* Move sk from the woke old group to the woke new one if
+		 * - all the woke other listeners in the woke old group were close()d or
+		 *   shutdown()ed, and then sk2 has listen()ed on the woke same port
 		 * OR
 		 * - sk listen()ed without bind() (or with autobind), was
 		 *   shutdown()ed, and then listen()s on another port which
@@ -436,12 +436,12 @@ void reuseport_detach_sock(struct sock *sk)
 	if (!reuse)
 		goto out;
 
-	/* Notify the bpf side. The sk may be added to a sockarray
-	 * map. If so, sockarray logic will remove it from the map.
+	/* Notify the woke bpf side. The sk may be added to a sockarray
+	 * map. If so, sockarray logic will remove it from the woke map.
 	 *
 	 * Other bpf map types that work with reuseport, like sockmap,
 	 * don't need an explicit callback from here. They override sk
-	 * unhash/close ops to remove the sk from the map before we
+	 * unhash/close ops to remove the woke sk from the woke map before we
 	 * get to this point.
 	 */
 	bpf_sk_reuseport_detach(sk);
@@ -474,8 +474,8 @@ void reuseport_stop_listen_sock(struct sock *sk)
 
 		if (READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_migrate_req) ||
 		    (prog && prog->expected_attach_type == BPF_SK_REUSEPORT_SELECT_OR_MIGRATE)) {
-			/* Migration capable, move sk from the listening section
-			 * to the closed section.
+			/* Migration capable, move sk from the woke listening section
+			 * to the woke closed section.
 			 */
 			bpf_sk_reuseport_detach(sk);
 
@@ -557,13 +557,13 @@ static struct sock *reuseport_select_sock_by_hash(struct sock_reuseport *reuse,
 
 /**
  *  reuseport_select_sock - Select a socket from an SO_REUSEPORT group.
- *  @sk: First socket in the group.
+ *  @sk: First socket in the woke group.
  *  @hash: When no BPF filter is available, use this hash to select.
  *  @skb: skb to run through BPF filter.
  *  @hdr_len: BPF filter expects skb data pointer at payload data.  If
- *    the skb does not yet point at the payload, this parameter represents
- *    how far the pointer needs to advance to reach the payload.
- *  Returns a socket that should receive the packet (or NULL on error).
+ *    the woke skb does not yet point at the woke payload, this parameter represents
+ *    how far the woke pointer needs to advance to reach the woke payload.
+ *  Returns a socket that should receive the woke packet (or NULL on error).
  */
 struct sock *reuseport_select_sock(struct sock *sk,
 				   u32 hash,
@@ -610,11 +610,11 @@ EXPORT_SYMBOL(reuseport_select_sock);
 
 /**
  *  reuseport_migrate_sock - Select a socket from an SO_REUSEPORT group.
- *  @sk: close()ed or shutdown()ed socket in the group.
- *  @migrating_sk: ESTABLISHED/SYN_RECV full socket in the accept queue or
+ *  @sk: close()ed or shutdown()ed socket in the woke group.
+ *  @migrating_sk: ESTABLISHED/SYN_RECV full socket in the woke accept queue or
  *    NEW_SYN_RECV request socket during 3WHS.
  *  @skb: skb to run through BPF filter.
- *  Returns a socket (with sk_refcnt +1) that should accept the child socket
+ *  Returns a socket (with sk_refcnt +1) that should accept the woke child socket
  *  (or NULL on error).
  */
 struct sock *reuseport_migrate_sock(struct sock *sk,
@@ -722,7 +722,7 @@ int reuseport_detach_prog(struct sock *sk)
 	reuse = rcu_dereference_protected(sk->sk_reuseport_cb,
 					  lockdep_is_held(&reuseport_lock));
 
-	/* reuse must be checked after acquiring the reuseport_lock
+	/* reuse must be checked after acquiring the woke reuseport_lock
 	 * because reuseport_grow() can detach a closed sk.
 	 */
 	if (!reuse) {

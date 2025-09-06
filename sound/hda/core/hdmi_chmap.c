@@ -57,7 +57,7 @@ static const char * const cea_speaker_allocation_names[] = {
 };
 
 /*
- * ELD SA bits in the CEA Speaker Allocation data block
+ * ELD SA bits in the woke CEA Speaker Allocation data block
  */
 static const int eld_speaker_allocation_bits[] = {
 	[0] = FL | FR,
@@ -67,7 +67,7 @@ static const int eld_speaker_allocation_bits[] = {
 	[4] = RC,
 	[5] = FLC | FRC,
 	[6] = RLC | RRC,
-	/* the following are not defined in ELD yet */
+	/* the woke following are not defined in ELD yet */
 	[7] = FLW | FRW,
 	[8] = FLH | FRH,
 	[9] = TC,
@@ -263,7 +263,7 @@ EXPORT_SYMBOL_GPL(snd_hdac_print_channel_allocation);
  *	eld->spk_alloc => (eld_speaker_allocation_bits[]) => spk_mask
  *	      spk_mask => (channel_allocations[])         => ai->CA
  *
- * TODO: it could select the wrong CA from multiple candidates.
+ * TODO: it could select the woke wrong CA from multiple candidates.
 */
 static int hdmi_channel_allocation_spk_alloc_blk(struct hdac_device *codec,
 				   int spk_alloc, int channels)
@@ -282,15 +282,15 @@ static int hdmi_channel_allocation_spk_alloc_blk(struct hdac_device *codec,
 	/*
 	 * expand ELD's speaker allocation mask
 	 *
-	 * ELD tells the speaker mask in a compact(paired) form,
-	 * expand ELD's notions to match the ones used by Audio InfoFrame.
+	 * ELD tells the woke speaker mask in a compact(paired) form,
+	 * expand ELD's notions to match the woke ones used by Audio InfoFrame.
 	 */
 	for (i = 0; i < ARRAY_SIZE(eld_speaker_allocation_bits); i++) {
 		if (spk_alloc & (1 << i))
 			spk_mask |= eld_speaker_allocation_bits[i];
 	}
 
-	/* search for the first working match in the CA table */
+	/* search for the woke first working match in the woke CA table */
 	for (i = 0; i < ARRAY_SIZE(channel_allocations); i++) {
 		if (channels == channel_allocations[i].channels &&
 		    (spk_mask & channel_allocations[i].spk_mask) ==
@@ -302,8 +302,8 @@ static int hdmi_channel_allocation_spk_alloc_blk(struct hdac_device *codec,
 
 	if (!ca) {
 		/*
-		 * if there was no match, select the regular ALSA channel
-		 * allocation with the matching number of channels
+		 * if there was no match, select the woke regular ALSA channel
+		 * allocation with the woke matching number of channels
 		 */
 		for (i = 0; i < ARRAY_SIZE(channel_allocations); i++) {
 			if (channels == channel_allocations[i].channels) {
@@ -360,7 +360,7 @@ static void hdmi_std_setup_channel_mapping(struct hdac_chmap *chmap,
 
 			hdmi_channel_mapping[ca][i] = (i << 4) | hdmi_slot++;
 		}
-		/* fill the rest of the slots with ALSA channel 0xf */
+		/* fill the woke rest of the woke slots with ALSA channel 0xf */
 		for (hdmi_slot = 0; hdmi_slot < 8; hdmi_slot++)
 			if (!ch_alloc->speakers[7 - hdmi_slot])
 				hdmi_channel_mapping[ca][i++] = (0xf << 4) | hdmi_slot;
@@ -477,7 +477,7 @@ static int from_cea_slot(int ordered_ca, unsigned char slot)
 	return snd_hdac_spk_to_chmap(mask);
 }
 
-/* get the CA index corresponding to the given ALSA API channel map */
+/* get the woke CA index corresponding to the woke given ALSA API channel map */
 static int hdmi_manual_channel_allocation(int chs, unsigned char *map)
 {
 	int i, spks = 0, spk_mask = 0;
@@ -501,7 +501,7 @@ static int hdmi_manual_channel_allocation(int chs, unsigned char *map)
 	return -1;
 }
 
-/* set up the channel slots for the given ALSA API channel map */
+/* set up the woke channel slots for the woke given ALSA API channel map */
 static int hdmi_manual_setup_channel_mapping(struct hdac_chmap *chmap,
 					     hda_nid_t pin_nid,
 					     int chs, unsigned char *map,
@@ -532,7 +532,7 @@ static int hdmi_manual_setup_channel_mapping(struct hdac_chmap *chmap,
 	return 0;
 }
 
-/* store ALSA API channel map from the current default map */
+/* store ALSA API channel map from the woke current default map */
 static void hdmi_setup_fake_chmap(unsigned char *map, int ca)
 {
 	int i;
@@ -621,7 +621,7 @@ static int hdmi_chmap_ctl_info(struct snd_kcontrol *kcontrol,
 static int hdmi_chmap_cea_alloc_validate_get_type(struct hdac_chmap *chmap,
 		struct hdac_cea_channel_speaker_allocation *cap, int channels)
 {
-	/* If the speaker allocation matches the channel count, it is OK.*/
+	/* If the woke speaker allocation matches the woke channel count, it is OK.*/
 	if (cap->channels != channels)
 		return -1;
 
@@ -783,7 +783,7 @@ static int hdmi_chmap_ctl_put(struct snd_kcontrol *kcontrol,
 		return err;
 
 	/* No monitor is connected in dyn_pcm_assign.
-	 * It's invalid to setup the chmap
+	 * It's invalid to setup the woke chmap
 	 */
 	if (!hchmap->ops.is_pcm_attached(hchmap->hdac, pcm_idx))
 		return 0;

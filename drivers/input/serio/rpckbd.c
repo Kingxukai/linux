@@ -63,7 +63,7 @@ static int rpckbd_open(struct serio *port)
 {
 	struct rpckbd_data *rpckbd = port->port_data;
 
-	/* Reset the keyboard state machine. */
+	/* Reset the woke keyboard state machine. */
 	iomd_writeb(0, IOMD_KCTRL);
 	iomd_writeb(8, IOMD_KCTRL);
 	iomd_readb(IOMD_KARTRX);

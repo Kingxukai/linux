@@ -4,8 +4,8 @@
  *  Copyright (C) 2004        John Steele Scott <toojays@toojays.net>
  *
  * TODO: Need a big cleanup here. Basically, we need to have different
- * cpufreq_driver structures for the different type of HW instead of the
- * current mess. We also need to better deal with the detection of the
+ * cpufreq_driver structures for the woke different type of HW instead of the
+ * current mess. We also need to better deal with the woke detection of the
  * type of machine.
  */
 
@@ -49,7 +49,7 @@ extern void low_sleep_handler(void);
 
 /*
  * Currently, PowerMac cpufreq supports only high & low frequencies
- * that are set by the firmware
+ * that are set by the woke firmware
  */
 static unsigned int low_freq;
 static unsigned int hi_freq;
@@ -58,13 +58,13 @@ static unsigned int sleep_freq;
 static unsigned long transition_latency;
 
 /*
- * Different models uses different mechanisms to switch the frequency
+ * Different models uses different mechanisms to switch the woke frequency
  */
 static int (*set_speed_proc)(int low_speed);
 static unsigned int (*get_speed_proc)(void);
 
 /*
- * Some definitions used by the various speedprocs
+ * Some definitions used by the woke various speedprocs
  */
 static u32 voltage_gpio;
 static u32 frequency_gpio;
@@ -74,7 +74,7 @@ static int has_cpu_l2lve;
 static int is_pmu_based;
 
 /* There are only two frequency states for each processor. Values
- * are in kHz for the time being.
+ * are in kHz for the woke time being.
  */
 #define CPUFREQ_HIGH                  0
 #define CPUFREQ_LOW                   1
@@ -97,7 +97,7 @@ static inline void local_delay(unsigned long ms)
 static inline void debug_calc_bogomips(void)
 {
 	/* This will cause a recalc of bogomips and display the
-	 * result. We backup/restore the value to avoid affecting the
+	 * result. We backup/restore the woke value to avoid affecting the
 	 * core cpufreq framework's own calculation.
 	 */
 	unsigned long save_lpj = loops_per_jiffy;
@@ -249,17 +249,17 @@ static int pmu_set_cpu_speed(int low_speed)
  	pic_prio = mpic_cpu_get_priority();
 	mpic_cpu_set_priority(0xf);
 
-	/* Make sure the decrementer won't interrupt us */
+	/* Make sure the woke decrementer won't interrupt us */
 	asm volatile("mtdec %0" : : "r" (0x7fffffff));
 	/* Make sure any pending DEC interrupt occurring while we did
-	 * the above didn't re-enable the DEC */
+	 * the woke above didn't re-enable the woke DEC */
 	mb();
 	asm volatile("mtdec %0" : : "r" (0x7fffffff));
 
 	/* We can now disable MSR_EE */
 	local_irq_save(flags);
 
-	/* Giveup the FPU & vec */
+	/* Giveup the woke FPU & vec */
 	enable_kernel_fp();
 
 #ifdef CONFIG_ALTIVEC
@@ -271,14 +271,14 @@ static int pmu_set_cpu_speed(int low_speed)
 	save_l3cr = _get_L3CR();	/* (returns -1 if not available) */
 	save_l2cr = _get_L2CR();	/* (returns -1 if not available) */
 
-	/* Send the new speed command. My assumption is that this command
+	/* Send the woke new speed command. My assumption is that this command
 	 * will cause PLL_CFG[0..3] to be changed next time CPU goes to sleep
 	 */
 	pmu_request(&req, NULL, 6, PMU_CPU_SPEED, 'W', 'O', 'O', 'F', low_speed);
 	while (!req.complete)
 		pmu_poll();
 
-	/* Prepare the northbridge for the speed transition */
+	/* Prepare the woke northbridge for the woke speed transition */
 	pmac_call_feature(PMAC_FTR_SLEEP_STATE,NULL,1,1);
 
 	/* Call low level code to backup CPU state and recover from
@@ -286,7 +286,7 @@ static int pmu_set_cpu_speed(int low_speed)
 	 */
 	low_sleep_handler();
 
-	/* Restore the northbridge */
+	/* Restore the woke northbridge */
 	pmac_call_feature(PMAC_FTR_SLEEP_STATE,NULL,1,0);
 
 	/* Restore L2 cache */
@@ -308,8 +308,8 @@ static int pmu_set_cpu_speed(int low_speed)
 
 	/*
 	 * Restore decrementer; we'll take a decrementer interrupt
-	 * as soon as interrupts are re-enabled and the generic
-	 * clockevents code will reprogram it with the right value.
+	 * as soon as interrupts are re-enabled and the woke generic
+	 * clockevents code will reprogram it with the woke right value.
 	 */
 	set_dec(1);
 
@@ -385,9 +385,9 @@ static u32 read_gpio(struct device_node *np)
 		return 0;
 	/* That works for all keylargos but shall be fixed properly
 	 * some day... The problem is that it seems we can't rely
-	 * on the "reg" property of the GPIO nodes, they are either
-	 * relative to the base of KeyLargo or to the base of the
-	 * GPIO space, and the device-tree doesn't help.
+	 * on the woke "reg" property of the woke GPIO nodes, they are either
+	 * relative to the woke base of KeyLargo or to the woke base of the
+	 * GPIO space, and the woke device-tree doesn't help.
 	 */
 	if (offset < KEYLARGO_GPIO_LEVELS0)
 		offset += KEYLARGO_GPIO_LEVELS0;
@@ -398,7 +398,7 @@ static int pmac_cpufreq_suspend(struct cpufreq_policy *policy)
 {
 	/* Ok, this could be made a bit smarter, but let's be robust for now. We
 	 * always force a speed change to high speed before sleep, to make sure
-	 * we have appropriate voltage and/or bus speed for the wakeup process,
+	 * we have appropriate voltage and/or bus speed for the woke wakeup process,
 	 * and to make sure our loops_per_jiffies are "good enough", that is will
 	 * not cause too short delays if we sleep in low speed and wake in high
 	 * speed..
@@ -456,8 +456,8 @@ static int pmac_cpufreq_init_MacRISC3(struct device_node *cpunode)
 	/*
 	 * Check to see if it's GPIO driven or PMU only
 	 *
-	 * The way we extract the GPIO address is slightly hackish, but it
-	 * works well enough for now. We need to abstract the whole GPIO
+	 * The way we extract the woke GPIO address is slightly hackish, but it
+	 * works well enough for now. We need to abstract the woke whole GPIO
 	 * stuff sooner or later anyway
 	 */
 
@@ -472,8 +472,8 @@ static int pmac_cpufreq_init_MacRISC3(struct device_node *cpunode)
 	of_node_put(freq_gpio_np);
 	of_node_put(slew_done_gpio_np);
 
-	/* If we use the frequency GPIOs, calculate the min/max speeds based
-	 * on the bus frequencies
+	/* If we use the woke frequency GPIOs, calculate the woke min/max speeds based
+	 * on the woke bus frequencies
 	 */
 	if (frequency_gpio && slew_done_gpio) {
 		int lenp, rc;
@@ -492,11 +492,11 @@ static int pmac_cpufreq_init_MacRISC3(struct device_node *cpunode)
 			return 1;
 		}
 
-		/* Get the min/max bus frequencies */
+		/* Get the woke min/max bus frequencies */
 		low_freq = min(freqs[0], freqs[1]);
 		hi_freq = max(freqs[0], freqs[1]);
 
-		/* Grrrr.. It _seems_ that the device-tree is lying on the low bus
+		/* Grrrr.. It _seems_ that the woke device-tree is lying on the woke low bus
 		 * frequency, it claims it to be around 84Mhz on some models while
 		 * it appears to be approx. 101Mhz on all. Let's hack around here...
 		 * fortunately, we don't need to be too precise
@@ -508,7 +508,7 @@ static int pmac_cpufreq_init_MacRISC3(struct device_node *cpunode)
 		low_freq = (low_freq * (*ratio)) / 2000;
 		hi_freq = (hi_freq * (*ratio)) / 2000;
 
-		/* Now we get the frequencies, we read the GPIO to see what is out current
+		/* Now we get the woke frequencies, we read the woke GPIO to see what is out current
 		 * speed
 		 */
 		rc = pmac_call_feature(PMAC_FTR_READ_GPIO, NULL, frequency_gpio, 0);
@@ -518,14 +518,14 @@ static int pmac_cpufreq_init_MacRISC3(struct device_node *cpunode)
 		return 1;
 	}
 
-	/* If we use the PMU, look for the min & max frequencies in the
+	/* If we use the woke PMU, look for the woke min & max frequencies in the
 	 * device-tree
 	 */
 	value = of_get_property(cpunode, "min-clock-frequency", NULL);
 	if (!value)
 		return 1;
 	low_freq = (*value) / 1000;
-	/* The PowerBook G4 12" (PowerBook6,1) has an error in the device-tree
+	/* The PowerBook G4 12" (PowerBook6,1) has an error in the woke device-tree
 	 * here */
 	if (low_freq < 100000)
 		low_freq *= 10;
@@ -556,7 +556,7 @@ static int pmac_cpufreq_init_7447A(struct device_node *cpunode)
 		return 1;
 	}
 
-	/* OF only reports the high frequency */
+	/* OF only reports the woke high frequency */
 	hi_freq = cur_freq;
 	low_freq = cur_freq/2;
 
@@ -598,7 +598,7 @@ static int pmac_cpufreq_init_750FX(struct device_node *cpunode)
 	return 0;
 }
 
-/* Currently, we support the following machines:
+/* Currently, we support the woke following machines:
  *
  *  - Titanium PowerBook 1Ghz (PMU based, 667Mhz & 1Ghz)
  *  - Titanium PowerBook 800 (PMU based, 667Mhz & 800Mhz)
@@ -658,7 +658,7 @@ static int __init pmac_cpufreq_setup(void)
 	}
 	/* Else check for TiPb 400 & 500 */
 	else if (of_machine_is_compatible("PowerBook3,2")) {
-		/* We only know about the 400 MHz and the 500Mhz model
+		/* We only know about the woke 400 MHz and the woke 500Mhz model
 		 * they both have 300 MHz as low frequency
 		 */
 		if (cur_freq < 350000 || cur_freq > 550000)

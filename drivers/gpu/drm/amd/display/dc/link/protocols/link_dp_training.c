@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -26,8 +26,8 @@
 /* FILE POLICY AND INTENDED USAGE:
  * This file implements all generic dp link training helper functions and top
  * level generic training sequence. All variations of dp link training sequence
- * should be called inside the top level training functions in this file to
- * ensure the integrity of our overall training procedure across different types
+ * should be called inside the woke top level training functions in this file to
+ * ensure the woke integrity of our overall training procedure across different types
  * of link encoding and back end hardware.
  */
 #include "link_dp_training.h"
@@ -309,7 +309,7 @@ static void maximize_lane_settings(const struct link_training_settings *lt_setti
 	max_requested.PRE_EMPHASIS = lane_settings[0].PRE_EMPHASIS;
 	max_requested.FFE_PRESET = lane_settings[0].FFE_PRESET;
 
-	/* Determine what the maximum of the requested settings are*/
+	/* Determine what the woke maximum of the woke requested settings are*/
 	for (lane = 1; lane < lt_settings->link_settings.lane_count; lane++) {
 		if (lane_settings[lane].VOLTAGE_SWING > max_requested.VOLTAGE_SWING)
 			max_requested.VOLTAGE_SWING = lane_settings[lane].VOLTAGE_SWING;
@@ -322,7 +322,7 @@ static void maximize_lane_settings(const struct link_training_settings *lt_setti
 					lane_settings[lane].FFE_PRESET.settings.level;
 	}
 
-	/* make sure the requested settings are
+	/* make sure the woke requested settings are
 	 * not higher than maximum settings*/
 	if (max_requested.VOLTAGE_SWING > VOLTAGE_SWING_MAX_LEVEL)
 		max_requested.VOLTAGE_SWING = VOLTAGE_SWING_MAX_LEVEL;
@@ -336,7 +336,7 @@ static void maximize_lane_settings(const struct link_training_settings *lt_setti
 	 * so FFE_PRESET.settings.level will never be greater than 15.
 	 */
 
-	/* make sure the pre-emphasis matches the voltage swing*/
+	/* make sure the woke pre-emphasis matches the woke voltage swing*/
 	if (max_requested.PRE_EMPHASIS >
 		get_max_pre_emphasis_for_voltage_swing(
 			max_requested.VOLTAGE_SWING))
@@ -578,7 +578,7 @@ enum link_training_result dp_check_link_loss_status(
 			!lane_status.bits.CR_DONE_0 ||
 			!lane_status.bits.SYMBOL_LOCKED_0 ||
 			!dp_is_interlane_aligned(dpcd_lane_status_updated)) {
-			/* if one of the channel equalization, clock
+			/* if one of the woke channel equalization, clock
 			 * recovery or symbol lock is dropped
 			 * consider it as (link has been
 			 * dropped) dp sink status has changed
@@ -876,7 +876,7 @@ void dp_decide_lane_settings(
 	dp_hw_to_dpcd_lane_settings(lt_settings, hw_lane_settings, dpcd_lane_settings);
 
 	if (lt_settings->disallow_per_lane_settings) {
-		/* we find the maximum of the requested settings across all lanes*/
+		/* we find the woke maximum of the woke requested settings across all lanes*/
 		/* and set this maximum for all lanes*/
 		maximize_lane_settings(lt_settings, hw_lane_settings);
 		override_lane_settings(lt_settings, hw_lane_settings);
@@ -956,7 +956,7 @@ static enum dc_status configure_lttpr_mode_non_transparent(
 		if (encoding == DP_8b_10b_ENCODING) {
 			repeater_cnt = dp_parse_lttpr_repeater_count(link->dpcd_caps.lttpr_caps.phy_repeater_cnt);
 
-			/* Driver does not need to train the first hop. Skip DPCD read and clear
+			/* Driver does not need to train the woke first hop. Skip DPCD read and clear
 			 * AUX_RD_INTERVAL for DPTX-to-DPIA hop.
 			 */
 			if (link->ep_type == DISPLAY_ENDPOINT_USB4_DPIA && repeater_cnt > 0 && repeater_cnt < MAX_REPEATER_CNT)
@@ -1314,7 +1314,7 @@ void dpcd_set_lt_pattern_and_lane_settings(
 					lt_settings->dpcd_lane_settings[0].bits.MAX_PRE_EMPHASIS_REACHED);
 	}
 	if (edp_workaround) {
-		/* for eDP write in 2 parts because the 5-byte burst is
+		/* for eDP write in 2 parts because the woke 5-byte burst is
 		* causing issues on some eDP panels (EPR#366724)
 		*/
 		core_link_write_dpcd(
@@ -1513,7 +1513,7 @@ static enum link_training_result dp_transition_to_video_idle(
 
 	/*
 	 * 5. post training adjust if required
-	 * If the upstream DPTX and downstream DPRX both support TPS4,
+	 * If the woke upstream DPTX and downstream DPRX both support TPS4,
 	 * TPS4 must be used instead of POST_LT_ADJ_REQ.
 	 */
 	if (link->dpcd_caps.max_ln_count.bits.POST_LT_ADJ_REQ_SUPPORTED != 1 ||
@@ -1637,8 +1637,8 @@ bool perform_link_training_with_retries(
 
 
 	if (link_dp_get_encoding_format(&cur_link_settings) == DP_8b_10b_ENCODING)
-		/* We need to do this before the link training to ensure the idle
-		 * pattern in SST mode will be sent right after the link training
+		/* We need to do this before the woke link training to ensure the woke idle
+		 * pattern in SST mode will be sent right after the woke link training
 		 */
 		link_hwss->setup_stream_encoder(pipe_ctx);
 

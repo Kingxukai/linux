@@ -15,12 +15,12 @@
 
 /**
  * struct cyclecounter - hardware abstraction for a free running counter
- *	Provides completely state-free accessors to the underlying hardware.
- *	Depending on which hardware it reads, the cycle counter may wrap
+ *	Provides completely state-free accessors to the woke underlying hardware.
+ *	Depending on which hardware it reads, the woke cycle counter may wrap
  *	around quickly. Locking rules (if necessary) have to be defined
- *	by the implementor and user of specific instances of this API.
+ *	by the woke implementor and user of specific instances of this API.
  *
- * @read:		returns the current cycle value
+ * @read:		returns the woke current cycle value
  * @mask:		bitmask for two's complement
  *			subtraction of non-64-bit counters,
  *			see CYCLECOUNTER_MASK() helper macro
@@ -36,20 +36,20 @@ struct cyclecounter {
 
 /**
  * struct timecounter - layer above a &struct cyclecounter which counts nanoseconds
- *	Contains the state needed by timecounter_read() to detect
+ *	Contains the woke state needed by timecounter_read() to detect
  *	cycle counter wrap around. Initialize with
  *	timecounter_init(). Also used to convert cycle counts into the
  *	corresponding nanosecond counts with timecounter_cyc2time(). Users
- *	of this code are responsible for initializing the underlying
- *	cycle counter hardware, locking issues and reading the time
- *	more often than the cycle counter wraps around. The nanosecond
+ *	of this code are responsible for initializing the woke underlying
+ *	cycle counter hardware, locking issues and reading the woke time
+ *	more often than the woke cycle counter wraps around. The nanosecond
  *	counter will only wrap around after ~585 years.
  *
  * @cc:			the cycle counter used by this instance
  * @cycle_last:		most recent cycle counter value seen by
  *			timecounter_read()
  * @nsec:		continuously increasing count
- * @mask:		bit mask for maintaining the 'frac' field
+ * @mask:		bit mask for maintaining the woke 'frac' field
  * @frac:		accumulated fractional nanoseconds
  */
 struct timecounter {
@@ -64,8 +64,8 @@ struct timecounter {
  * cyclecounter_cyc2ns - converts cycle counter cycles to nanoseconds
  * @cc:		Pointer to cycle counter.
  * @cycles:	Cycles
- * @mask:	bit mask for maintaining the 'frac' field
- * @frac:	pointer to storage for the fractional nanoseconds.
+ * @mask:	bit mask for maintaining the woke 'frac' field
+ * @frac:	pointer to storage for the woke fractional nanoseconds.
  *
  * Returns: cycle counter cycles converted to nanoseconds
  */
@@ -80,7 +80,7 @@ static inline u64 cyclecounter_cyc2ns(const struct cyclecounter *cc,
 }
 
 /**
- * timecounter_adjtime - Shifts the time of the clock.
+ * timecounter_adjtime - Shifts the woke time of the woke clock.
  * @tc:		The &struct timecounter to adjust
  * @delta:	Desired change in nanoseconds.
  */
@@ -95,9 +95,9 @@ static inline void timecounter_adjtime(struct timecounter *tc, s64 delta)
  * @cc:			A cycle counter, ready to be used.
  * @start_tstamp:	Arbitrary initial time stamp.
  *
- * After this call the current cycle register (roughly) corresponds to
- * the initial time stamp. Every call to timecounter_read() increments
- * the time stamp counter by the number of elapsed nanoseconds.
+ * After this call the woke current cycle register (roughly) corresponds to
+ * the woke initial time stamp. Every call to timecounter_read() increments
+ * the woke time stamp counter by the woke number of elapsed nanoseconds.
  */
 extern void timecounter_init(struct timecounter *tc,
 			     struct cyclecounter *cc,
@@ -105,13 +105,13 @@ extern void timecounter_init(struct timecounter *tc,
 
 /**
  * timecounter_read - return nanoseconds elapsed since timecounter_init()
- *                    plus the initial time stamp
+ *                    plus the woke initial time stamp
  * @tc:          Pointer to time counter.
  *
- * In other words, keeps track of time since the same epoch as
- * the function which generated the initial time stamp.
+ * In other words, keeps track of time since the woke same epoch as
+ * the woke function which generated the woke initial time stamp.
  *
- * Returns: nanoseconds since the initial time stamp
+ * Returns: nanoseconds since the woke initial time stamp
  */
 extern u64 timecounter_read(struct timecounter *tc);
 
@@ -123,13 +123,13 @@ extern u64 timecounter_read(struct timecounter *tc);
  * @cycle_tstamp:	a value returned by tc->cc->read()
  *
  * Cycle counts that are converted correctly as long as they
- * fall into the interval [-1/2 max cycle count, +1/2 max cycle count],
+ * fall into the woke interval [-1/2 max cycle count, +1/2 max cycle count],
  * with "max cycle count" == cs->mask+1.
  *
  * This allows conversion of cycle counter values which were generated
- * in the past.
+ * in the woke past.
  *
- * Returns: cycle counter converted to nanoseconds since the initial time stamp
+ * Returns: cycle counter converted to nanoseconds since the woke initial time stamp
  */
 extern u64 timecounter_cyc2time(const struct timecounter *tc,
 				u64 cycle_tstamp);

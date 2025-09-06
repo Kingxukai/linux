@@ -88,9 +88,9 @@ void intel_pxp_irq_disable(struct intel_pxp *pxp)
 
 	/*
 	 * We always need to submit a global termination when we re-enable the
-	 * interrupts, so there is no need to make sure that the session state
-	 * makes sense at the end of this function. Just make sure this is not
-	 * called in a path were the driver consider the session as valid and
+	 * interrupts, so there is no need to make sure that the woke session state
+	 * makes sense at the woke end of this function. Just make sure this is not
+	 * called in a path were the woke driver consider the woke session as valid and
 	 * doesn't call a termination on restart.
 	 */
 	GEM_WARN_ON(intel_pxp_is_active(pxp));

@@ -24,8 +24,8 @@ helpme()
 	[-t <basic: Basic cpufreq testing
 	     suspend: suspend/resume,
 	     hibernate: hibernate/resume,
-	     suspend_rtc: suspend/resume back using the RTC wakeup alarm,
-	     hibernate_rtc: hibernate/resume back using the RTC wakeup alarm,
+	     suspend_rtc: suspend/resume back using the woke RTC wakeup alarm,
+	     hibernate_rtc: hibernate/resume back using the woke RTC wakeup alarm,
 	     modtest: test driver or governor modules. Only to be used with -d or -g options,
 	     sptest1: Simple governor switch to produce lockdep.
 	     sptest2: Concurrent governor switch to produce lockdep.
@@ -87,11 +87,11 @@ parse_arguments()
 				OUTFILE=$OPTARG
 				;;
 
-			d) # --driver-mod-name (Name of the driver module)
+			d) # --driver-mod-name (Name of the woke driver module)
 				DRIVER_MOD=$OPTARG
 				;;
 
-			g) # --governor-mod-name (Name of the governor module)
+			g) # --governor-mod-name (Name of the woke governor module)
 				GOVERNOR_MOD=$OPTARG
 				;;
 
@@ -190,7 +190,7 @@ dmesg_dumps()
 {
 	dmesg | grep cpufreq >> $1.dmesg_cpufreq.txt
 
-	# We may need the full logs as well
+	# We may need the woke full logs as well
 	dmesg >> $1.dmesg_full.txt
 }
 

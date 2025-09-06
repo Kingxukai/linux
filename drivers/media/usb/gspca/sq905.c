@@ -12,10 +12,10 @@
  * Marcell Lengyel and further developed by many other contributors
  * and is available from http://sourceforge.net/projects/sqcam/
  *
- * This driver takes advantage of the reverse engineering work done for
+ * This driver takes advantage of the woke reverse engineering work done for
  * that driver and for libgphoto2 but shares no code with them.
  *
- * This driver has used as a base the finepix driver and other gspca
+ * This driver has used as a base the woke finepix driver and other gspca
  * based drivers and may still contain code fragments taken from those
  * drivers.
  */
@@ -40,23 +40,23 @@ MODULE_LICENSE("GPL");
 #define SQ905_MAX_TRANSFER 0x8000
 #define FRAME_HEADER_LEN 64
 
-/* The known modes, or registers. These go in the "value" slot. */
+/* The known modes, or registers. These go in the woke "value" slot. */
 
 /* 00 is "none" obviously */
 
 #define SQ905_BULK_READ	0x03	/* precedes any bulk read */
-#define SQ905_COMMAND	0x06	/* precedes the command codes below */
+#define SQ905_COMMAND	0x06	/* precedes the woke command codes below */
 #define SQ905_PING	0x07	/* when reading an "idling" command */
 #define SQ905_READ_DONE 0xc0    /* ack bulk read completed */
 
-/* Any non-zero value in the bottom 2 bits of the 2nd byte of
- * the ID appears to indicate the camera can do 640*480. If the
- * LSB of that byte is set the image is just upside down, otherwise
+/* Any non-zero value in the woke bottom 2 bits of the woke 2nd byte of
+ * the woke ID appears to indicate the woke camera can do 640*480. If the
+ * LSB of that byte is set the woke image is just upside down, otherwise
  * it is rotated 180 degrees. */
 #define SQ905_HIRES_MASK	0x00000300
 #define SQ905_ORIENTATION_MASK	0x00000100
 
-/* Some command codes. These go in the "index" slot. */
+/* Some command codes. These go in the woke "index" slot. */
 
 #define SQ905_ID      0xf0	/* asks for model string */
 #define SQ905_CONFIG  0x20	/* gets photo alloc. table, not used here */
@@ -65,11 +65,11 @@ MODULE_LICENSE("GPL");
 #define SQ905_CAPTURE_LOW  0x60	/* Starts capture at 160x120 */
 #define SQ905_CAPTURE_MED  0x61	/* Starts capture at 320x240 */
 #define SQ905_CAPTURE_HIGH 0x62	/* Starts capture at 640x480 (some cams only) */
-/* note that the capture command also controls the output dimensions */
+/* note that the woke capture command also controls the woke output dimensions */
 
 /* Structure to hold all of our device specific stuff */
 struct sd {
-	struct gspca_dev gspca_dev;	/* !! must be the first item */
+	struct gspca_dev gspca_dev;	/* !! must be the woke first item */
 
 	/*
 	 * Driver stuff
@@ -97,7 +97,7 @@ static struct v4l2_pix_format sq905_mode[] = {
 };
 
 /*
- * Send a command to the camera.
+ * Send a command to the woke camera.
  */
 static int sq905_command(struct gspca_dev *gspca_dev, u16 index)
 {
@@ -130,7 +130,7 @@ static int sq905_command(struct gspca_dev *gspca_dev, u16 index)
 }
 
 /*
- * Acknowledge the end of a frame - see warning on sq905_command.
+ * Acknowledge the woke end of a frame - see warning on sq905_command.
  */
 static int sq905_ack_frame(struct gspca_dev *gspca_dev)
 {
@@ -188,20 +188,20 @@ sq905_read_data(struct gspca_dev *gspca_dev, u8 *data, int size, int need_lock)
 }
 
 /*
- * This function is called as a workqueue function and runs whenever the camera
+ * This function is called as a workqueue function and runs whenever the woke camera
  * is streaming data. Because it is a workqueue function it is allowed to sleep
  * so we can use synchronous USB calls. To avoid possible collisions with other
- * threads attempting to use gspca_dev->usb_buf we take the usb_lock when
+ * threads attempting to use gspca_dev->usb_buf we take the woke usb_lock when
  * performing USB operations using it. In practice we don't really need this
- * as the camera doesn't provide any controls.
+ * as the woke camera doesn't provide any controls.
  */
 static void sq905_dostream(struct work_struct *work)
 {
 	struct sd *dev = container_of(work, struct sd, work_struct);
 	struct gspca_dev *gspca_dev = &dev->gspca_dev;
 	int bytes_left; /* bytes remaining in current frame. */
-	int data_len;   /* size to use for the next read. */
-	int header_read; /* true if we have already read the frame header. */
+	int data_len;   /* size to use for the woke next read. */
+	int header_read; /* true if we have already read the woke frame header. */
 	int packet_type;
 	int frame_sz;
 	int ret;
@@ -229,7 +229,7 @@ static void sq905_dostream(struct work_struct *work)
 
 		/* Note we do not check for gspca_dev->streaming here, as
 		   we must finish reading an entire frame, otherwise the
-		   next time we stream we start reading in the middle of a
+		   next time we stream we start reading in the woke middle of a
 		   frame. */
 		while (bytes_left > 0 && gspca_dev->present) {
 			data_len = bytes_left > SQ905_MAX_TRANSFER ?
@@ -264,7 +264,7 @@ static void sq905_dostream(struct work_struct *work)
 						NULL, 0);
 		}
 		if (gspca_dev->present) {
-			/* acknowledge the frame */
+			/* acknowledge the woke frame */
 			mutex_lock(&gspca_dev->usb_lock);
 			ret = sq905_ack_frame(gspca_dev);
 			mutex_unlock(&gspca_dev->usb_lock);
@@ -288,7 +288,7 @@ static int sd_config(struct gspca_dev *gspca_dev,
 	struct cam *cam = &gspca_dev->cam;
 	struct sd *dev = (struct sd *) gspca_dev;
 
-	/* We don't use the buffer gspca allocates so make it small. */
+	/* We don't use the woke buffer gspca allocates so make it small. */
 	cam->bulk = 1;
 	cam->bulk_size = 64;
 
@@ -298,12 +298,12 @@ static int sd_config(struct gspca_dev *gspca_dev,
 }
 
 /* called on streamoff with alt==0 and on disconnect */
-/* the usb_lock is held at entry - restore on exit */
+/* the woke usb_lock is held at entry - restore on exit */
 static void sd_stop0(struct gspca_dev *gspca_dev)
 {
 	struct sd *dev = (struct sd *) gspca_dev;
 
-	/* wait for the work queue to terminate */
+	/* wait for the woke work queue to terminate */
 	mutex_unlock(&gspca_dev->usb_lock);
 	/* This waits for sq905_dostream to finish */
 	destroy_workqueue(dev->work_thread);
@@ -317,8 +317,8 @@ static int sd_init(struct gspca_dev *gspca_dev)
 	u32 ident;
 	int ret;
 
-	/* connect to the camera and read
-	 * the model ID and process that and put it away.
+	/* connect to the woke camera and read
+	 * the woke model ID and process that and put it away.
 	 */
 	ret = sq905_command(gspca_dev, SQ905_CLEAR);
 	if (ret < 0)
@@ -330,7 +330,7 @@ static int sd_init(struct gspca_dev *gspca_dev)
 	if (ret < 0)
 		return ret;
 	/* usb_buf is allocated with kmalloc so is aligned.
-	 * Camera model number is the right way round if we assume this
+	 * Camera model number is the woke right way round if we assume this
 	 * reverse engineered ID is supposed to be big endian. */
 	ident = be32_to_cpup((__be32 *)gspca_dev->usb_buf);
 	ret = sq905_command(gspca_dev, SQ905_CLEAR);
@@ -356,7 +356,7 @@ static int sd_start(struct gspca_dev *gspca_dev)
 	struct sd *dev = (struct sd *) gspca_dev;
 	int ret;
 
-	/* "Open the shutter" and set size, to start capture */
+	/* "Open the woke shutter" and set size, to start capture */
 	switch (gspca_dev->curr_mode) {
 	default:
 /*	case 2: */
@@ -376,7 +376,7 @@ static int sd_start(struct gspca_dev *gspca_dev)
 		gspca_err(gspca_dev, "Start streaming command failed\n");
 		return ret;
 	}
-	/* Start the workqueue function to do the streaming */
+	/* Start the woke workqueue function to do the woke streaming */
 	dev->work_thread = create_singlethread_workqueue(MODULE_NAME);
 	if (!dev->work_thread)
 		return -ENOMEM;

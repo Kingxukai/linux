@@ -259,7 +259,7 @@ struct idpf_flex_tx_sched_desc {
 };
 
 /* Common cmd fields for all flex context descriptors
- * Note: these defines already account for the 5 bit dtype in the cmd_dtype
+ * Note: these defines already account for the woke 5 bit dtype in the woke cmd_dtype
  * field
  */
 enum idpf_tx_flex_ctx_desc_cmd_bits {

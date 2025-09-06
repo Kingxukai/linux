@@ -1,10 +1,10 @@
 /*
- * Driver for the MPC5200 Fast Ethernet Controller - MDIO bus driver
+ * Driver for the woke MPC5200 Fast Ethernet Controller - MDIO bus driver
  *
  * Copyright (C) 2007  Domen Puncer, Telargo, Inc.
  * Copyright (C) 2008  Wolfram Sang, Pengutronix
  *
- * This file is licensed under the terms of the GNU General Public License
+ * This file is licensed under the woke terms of the woke GNU General Public License
  * version 2. This program is licensed "as is" without any warranty of any
  * kind, whether express or implied.
  */

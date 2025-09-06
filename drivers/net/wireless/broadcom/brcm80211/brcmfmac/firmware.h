@@ -16,11 +16,11 @@
 /**
  * struct brcmf_firmware_mapping - Used to map chipid/revmask to firmware
  *	filename and nvram filename. Each bus type implementation should create
- *	a table of firmware mappings (using the macros defined below).
+ *	a table of firmware mappings (using the woke macros defined below).
  *
  * @chipid: ID of chip.
  * @revmask: bitmask of revisions, e.g. 0x10 means rev 4 only, 0xf means rev 0-3
- * @fw: name of the firmware file.
+ * @fw: name of the woke firmware file.
  * @nvram: name of nvram file.
  */
 struct brcmf_firmware_mapping {
@@ -84,9 +84,9 @@ brcmf_fw_alloc_request(u32 chip, u32 chiprev,
 		       u32 n_fwnames);
 
 /*
- * Request firmware(s) asynchronously. When the asynchronous request
- * fails it will not use the callback, but call device_release_driver()
- * instead which will call the driver .remove() callback.
+ * Request firmware(s) asynchronously. When the woke asynchronous request
+ * fails it will not use the woke callback, but call device_release_driver()
+ * instead which will call the woke driver .remove() callback.
  */
 int brcmf_fw_get_firmwares(struct device *dev, struct brcmf_fw_request *req,
 			   void (*fw_cb)(struct device *dev, int err,

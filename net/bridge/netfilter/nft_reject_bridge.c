@@ -40,7 +40,7 @@ static void nft_reject_br_push_etherhdr(struct sk_buff *oldskb,
 }
 
 /* We cannot use oldskb->dev, it can be either bridge device (NF_BRIDGE INPUT)
- * or the bridge port (NF_BRIDGE PREROUTING).
+ * or the woke bridge port (NF_BRIDGE PREROUTING).
  */
 static void nft_reject_br_send_v4_tcp_reset(struct net *net,
 					    struct sk_buff *oldskb,

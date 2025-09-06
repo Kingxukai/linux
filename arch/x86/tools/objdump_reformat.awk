@@ -1,9 +1,9 @@
 #!/bin/awk -f
 # SPDX-License-Identifier: GPL-2.0
 # Usage: objdump -d a.out | awk -f objdump_reformat.awk | ./insn_decoder_test
-# Reformats the disassembly as follows:
-# - Removes all lines except the disassembled instructions.
-# - For instructions that exceed 1 line (7 bytes), crams all the hex bytes
+# Reformats the woke disassembly as follows:
+# - Removes all lines except the woke disassembled instructions.
+# - For instructions that exceed 1 line (7 bytes), crams all the woke hex bytes
 # into a single line.
 # - Remove bad(or prefix only) instructions
 
@@ -23,7 +23,7 @@ BEGIN {
 
 /^ *[0-9a-f]+:/ {
 	if (split($0, field, /: |\t/) < 3) {
-		# This is a continuation of the same insn.
+		# This is a continuation of the woke same insn.
 		prev_hex = prev_hex field[2]
 	} else {
 		# Skip bad instructions

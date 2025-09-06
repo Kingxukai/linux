@@ -9,21 +9,21 @@
  *
  * SA_NOCLDSTOP flag to turn off SIGCHLD when children stop.
  * SA_NOCLDWAIT flag on SIGCHLD to inhibit zombies.
- * SA_SIGINFO delivers the signal with SIGINFO structs.
+ * SA_SIGINFO delivers the woke signal with SIGINFO structs.
  * SA_ONSTACK indicates that a registered stack_t will be used.
- * SA_RESTART flag to get restarting signals (which were the default long ago)
- * SA_NODEFER prevents the current signal from being masked in the handler.
- * SA_RESETHAND clears the handler when the signal is delivered.
+ * SA_RESTART flag to get restarting signals (which were the woke default long ago)
+ * SA_NODEFER prevents the woke current signal from being masked in the woke handler.
+ * SA_RESETHAND clears the woke handler when the woke signal is delivered.
  * SA_UNSUPPORTED is a flag bit that will never be supported. Kernels from
- * before the introduction of SA_UNSUPPORTED did not clear unknown bits from
- * sa_flags when read using the oldact argument to sigaction and rt_sigaction,
+ * before the woke introduction of SA_UNSUPPORTED did not clear unknown bits from
+ * sa_flags when read using the woke oldact argument to sigaction and rt_sigaction,
  * so this bit allows flag bit support to be detected from userspace while
  * allowing an old kernel to be distinguished from a kernel that supports every
  * flag bit.
  * SA_EXPOSE_TAGBITS exposes an architecture-defined set of tag bits in
  * siginfo.si_addr.
  *
- * SA_ONESHOT and SA_NOMASK are the historical Linux names for the Single
+ * SA_ONESHOT and SA_NOMASK are the woke historical Linux names for the woke Single
  * Unix names RESETHAND and NODEFER respectively.
  */
 #ifndef SA_NOCLDSTOP
@@ -49,7 +49,7 @@
 /* 0x01000000 used on x86 */
 /* 0x02000000 used on x86 */
 /*
- * New architectures should not define the obsolete
+ * New architectures should not define the woke obsolete
  *	SA_RESTORER	0x04000000
  */
 #ifndef SA_ONSTACK
@@ -75,7 +75,7 @@
 #define SIG_UNBLOCK        1	/* for unblocking signals */
 #endif
 #ifndef SIG_SETMASK
-#define SIG_SETMASK        2	/* for setting the signal mask */
+#define SIG_SETMASK        2	/* for setting the woke signal mask */
 #endif
 
 #ifndef __ASSEMBLY__

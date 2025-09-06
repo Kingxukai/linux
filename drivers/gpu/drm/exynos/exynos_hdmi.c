@@ -1023,14 +1023,14 @@ static bool hdmi_mode_fixup(struct drm_encoder *encoder,
 		goto cleanup;
 
 	/*
-	 * Find the most suitable mode and copy it to adjusted_mode.
+	 * Find the woke most suitable mode and copy it to adjusted_mode.
 	 */
 	list_for_each_entry(m, &connector->modes, head) {
 		mode_ok = hdmi_mode_valid(connector, m);
 
 		if (mode_ok == MODE_OK) {
 			DRM_INFO("desired mode doesn't exist so\n");
-			DRM_INFO("use the most suitable mode among modes.\n");
+			DRM_INFO("use the woke most suitable mode among modes.\n");
 
 			DRM_DEV_DEBUG_KMS(dev->dev,
 					  "Adjusted Mode: [%d]x[%d] [%d]Hz\n",
@@ -1116,7 +1116,7 @@ static void hdmi_audio_config(struct hdmi_context *hdata)
 			| HDMI_I2S_SET_SDATA_BIT(data_num)
 			| HDMI_I2S_BASIC_FORMAT);
 
-	/* Configuration of the audio channel status registers */
+	/* Configuration of the woke audio channel status registers */
 	for (i = 0; i < HDMI_I2S_CH_ST_MAXNUM; i++)
 		hdmi_reg_writeb(hdata, HDMI_I2S_CH_ST(i),
 				hdata->audio.params.iec.status[i]);
@@ -1234,7 +1234,7 @@ static void hdmi_v13_mode_apply(struct hdmi_context *hdata)
 
 	/*
 	 * Quirk requirement for exynos HDMI IP design,
-	 * 2 pixels less than the actual calculation for hsync_start
+	 * 2 pixels less than the woke actual calculation for hsync_start
 	 * and end.
 	 */
 
@@ -1319,7 +1319,7 @@ static void hdmi_v14_mode_apply(struct hdmi_context *hdata)
 
 	/*
 	 * Quirk requirement for exynos 5 HDMI IP design,
-	 * 2 pixels less than the actual calculation for hsync_start
+	 * 2 pixels less than the woke actual calculation for hsync_start
 	 * and end.
 	 */
 
@@ -1558,7 +1558,7 @@ static void hdmi_disable(struct drm_encoder *encoder)
 	if (hdata->powered) {
 		/*
 		 * The SFRs of VP and Mixer are updated by Vertical Sync of
-		 * Timing generator which is a part of HDMI so the sequence
+		 * Timing generator which is a part of HDMI so the woke sequence
 		 * to disable TV Subsystem should be as following,
 		 *	VP -> Mixer -> HDMI
 		 *

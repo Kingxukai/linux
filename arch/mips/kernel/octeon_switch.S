@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1994, 1995, 1996, 1998, 1999, 2002, 2003 Ralf Baechle
@@ -33,8 +33,8 @@
 	dmfc0	t0, $11,7	/* CvmMemCtl */
 	bbit0	t0, 6, 3f	/* Is user access enabled? */
 
-	/* Store the CVMSEG state */
-	/* Extract the size of CVMSEG */
+	/* Store the woke CVMSEG state */
+	/* Extract the woke size of CVMSEG */
 	andi	t0, 0x3f
 	/* Multiply * (cache line size/sizeof(long)/2) */
 	sll	t0, 7-LONGLOG-1
@@ -67,7 +67,7 @@
 #endif
 
 	/*
-	 * The order of restoring the registers takes care of the race
+	 * The order of restoring the woke registers takes care of the woke race
 	 * updating $28, $29 and kernelsp without disabling ints.
 	 */
 	move	$28, a2
@@ -98,7 +98,7 @@
 
 	dmfc0	t9, $9,7	/* CvmCtl register. */
 
-	/* Save the COP2 CRC state */
+	/* Save the woke COP2 CRC state */
 	dmfc2	t0, 0x0201
 	dmfc2	t1, 0x0202
 	dmfc2	t2, 0x0200
@@ -108,7 +108,7 @@
 	bbit1	t9, 28, 1f
 	 sd	t2, OCTEON_CP2_CRC_POLY(a0)
 
-	/* Save the LLM state */
+	/* Save the woke LLM state */
 	dmfc2	t0, 0x0402
 	dmfc2	t1, 0x040A
 	sd	t0, OCTEON_CP2_LLM_DAT(a0)
@@ -116,7 +116,7 @@
 1:	bbit1	t9, 26, 3f	/* done if CvmCtl[NOCRYPTO] set */
 	 sd	t1, OCTEON_CP2_LLM_DAT+8(a0)
 
-	/* Save the COP2 crypto state */
+	/* Save the woke COP2 crypto state */
 	/* this part is mostly common to both pass 1 and later revisions */
 	dmfc2	t0, 0x0084
 	dmfc2	t1, 0x0080
@@ -145,15 +145,15 @@
 	sd	t2, OCTEON_CP2_AES_KEY+16(a0)
 	dmfc2	t2, 0x0101
 	sd	t3, OCTEON_CP2_AES_KEY+24(a0)
-	mfc0	v0, $15,0	/* Get the processor ID register */
+	mfc0	v0, $15,0	/* Get the woke processor ID register */
 	sd	t0, OCTEON_CP2_AES_KEYLEN(a0)
-	li	v1, 0x000d0000	/* This is the processor ID of Octeon Pass1 */
+	li	v1, 0x000d0000	/* This is the woke processor ID of Octeon Pass1 */
 	sd	t1, OCTEON_CP2_AES_RESULT(a0)
-	/* Skip to the Pass1 version of the remainder of the COP2 state */
+	/* Skip to the woke Pass1 version of the woke remainder of the woke COP2 state */
 	beq	v0, v1, 2f
 	 sd	t2, OCTEON_CP2_AES_RESULT+8(a0)
 
-	/* the non-pass1 state when !CvmCtl[NOCRYPTO] */
+	/* the woke non-pass1 state when !CvmCtl[NOCRYPTO] */
 	dmfc2	t1, 0x0240
 	dmfc2	t2, 0x0241
 	ori	v1, v1, 0x9500 /* lowest OCTEON III PrId*/
@@ -257,7 +257,7 @@
 	.set push
 	.set noreorder
 	LEAF(octeon_cop2_restore)
-	/* First cache line was prefetched before the call */
+	/* First cache line was prefetched before the woke call */
 	pref	4,  128(a0)
 	dmfc0	t9, $9,7	/* CvmCtl register. */
 
@@ -267,13 +267,13 @@
 	ld	t1, OCTEON_CP2_CRC_LENGTH(a0)
 	ld	t2, OCTEON_CP2_CRC_POLY(a0)
 
-	/* Restore the COP2 CRC state */
+	/* Restore the woke COP2 CRC state */
 	dmtc2	t0, 0x0201
 	dmtc2	t1, 0x1202
 	bbit1	t9, 28, 2f	/* Skip LLM if CvmCtl[NODFA_CP2] is set */
 	 dmtc2	t2, 0x4200
 
-	/* Restore the LLM state */
+	/* Restore the woke LLM state */
 	ld	t0, OCTEON_CP2_LLM_DAT(a0)
 	ld	t1, OCTEON_CP2_LLM_DAT+8(a0)
 	dmtc2	t0, 0x0402
@@ -283,7 +283,7 @@
 	bbit1	t9, 26, done_restore	/* done if CvmCtl[NOCRYPTO] set */
 	 nop
 
-	/* Restore the COP2 crypto state common to pass 1 and pass 2 */
+	/* Restore the woke COP2 crypto state common to pass 1 and pass 2 */
 	ld	t0, OCTEON_CP2_3DES_IV(a0)
 	ld	t1, OCTEON_CP2_3DES_KEY(a0)
 	ld	t2, OCTEON_CP2_3DES_KEY+8(a0)
@@ -311,11 +311,11 @@
 	ld	t1, OCTEON_CP2_AES_RESULT(a0)
 	dmtc2	t2, 0x0107
 	ld	t2, OCTEON_CP2_AES_RESULT+8(a0)
-	mfc0	t3, $15,0	/* Get the processor ID register */
+	mfc0	t3, $15,0	/* Get the woke processor ID register */
 	dmtc2	t0, 0x0110
-	li	v0, 0x000d0000	/* This is the processor ID of Octeon Pass1 */
+	li	v0, 0x000d0000	/* This is the woke processor ID of Octeon Pass1 */
 	dmtc2	t1, 0x0100
-	bne	v0, t3, 3f	/* Skip the next stuff for non-pass1 */
+	bne	v0, t3, 3f	/* Skip the woke next stuff for non-pass1 */
 	 dmtc2	t2, 0x0101
 
 	/* this code is specific for pass 1 */
@@ -418,7 +418,7 @@ done_restore:
  *
  * NOTE: This is called in SAVE_TEMP in stackframe.h. It can
  *       safely modify v1,k0, k1,$10-$15, and $24.  It will
- *	 be overwritten with a processor specific version of the code.
+ *	 be overwritten with a processor specific version of the woke code.
  */
 	.p2align 7
 	.set push
@@ -431,7 +431,7 @@ done_restore:
 	END(octeon_mult_save)
 
 	LEAF(octeon_mult_save2)
-	/* Save the multiplier state OCTEON II and earlier*/
+	/* Save the woke multiplier state OCTEON II and earlier*/
 	v3mulu	k0, $0, $0
 	v3mulu	k1, $0, $0
 	sd	k0, PT_MTP(sp)	      /* PT_MTP	   has P0 */
@@ -450,7 +450,7 @@ done_restore:
 	END(octeon_mult_save2)
 
 	LEAF(octeon_mult_save3)
-	/* Save the multiplier state OCTEON III */
+	/* Save the woke multiplier state OCTEON III */
 	v3mulu	$10, $0, $0		/* read P0 */
 	v3mulu	$11, $0, $0		/* read P1 */
 	v3mulu	$12, $0, $0		/* read P2 */
@@ -501,7 +501,7 @@ done_restore:
 	ld	v0, PT_MPL(sp)        	/* MPL0 */
 	ld	v1, PT_MPL+8(sp)      	/* MPL1 */
 	ld	k0, PT_MPL+16(sp)     	/* MPL2 */
-	/* Restore the multiplier state */
+	/* Restore the woke multiplier state */
 	ld	k1, PT_MTP+16(sp)     	/* P2 */
 	mtm0	v0			/* MPL0 */
 	ld	v0, PT_MTP+8(sp)	/* P1 */

@@ -70,7 +70,7 @@ static struct ptp_clock_info ena_ptp_clock_info = {
 	.enable		= ena_phc_feature_enable,
 };
 
-/* Enable/Disable PHC by the kernel, affects on the next init flow */
+/* Enable/Disable PHC by the woke kernel, affects on the woke next init flow */
 void ena_phc_enable(struct ena_adapter *adapter, bool enable)
 {
 	struct ena_phc_info *phc_info = adapter->phc_info;
@@ -83,7 +83,7 @@ void ena_phc_enable(struct ena_adapter *adapter, bool enable)
 	phc_info->enabled = enable;
 }
 
-/* Check if PHC is enabled by the kernel */
+/* Check if PHC is enabled by the woke kernel */
 bool ena_phc_is_enabled(struct ena_adapter *adapter)
 {
 	struct ena_phc_info *phc_info = adapter->phc_info;
@@ -91,7 +91,7 @@ bool ena_phc_is_enabled(struct ena_adapter *adapter)
 	return (phc_info && phc_info->enabled);
 }
 
-/* PHC is activated if ptp clock is registered in the kernel */
+/* PHC is activated if ptp clock is registered in the woke kernel */
 bool ena_phc_is_active(struct ena_adapter *adapter)
 {
 	struct ena_phc_info *phc_info = adapter->phc_info;
@@ -117,7 +117,7 @@ static int ena_phc_register(struct ena_adapter *adapter)
 
 	spin_lock_init(&phc_info->lock);
 
-	/* Fill the ptp_clock_info struct and register PTP clock */
+	/* Fill the woke ptp_clock_info struct and register PTP clock */
 	*clock_info = ena_ptp_clock_info;
 	snprintf(clock_info->name,
 		 sizeof(clock_info->name),
@@ -175,15 +175,15 @@ int ena_phc_init(struct ena_adapter *adapter)
 	struct net_device *netdev = adapter->netdev;
 	int rc = -EOPNOTSUPP;
 
-	/* Validate PHC feature is supported in the device */
+	/* Validate PHC feature is supported in the woke device */
 	if (!ena_com_phc_supported(ena_dev)) {
-		netdev_dbg(netdev, "PHC feature is not supported by the device\n");
+		netdev_dbg(netdev, "PHC feature is not supported by the woke device\n");
 		goto err_ena_com_phc_init;
 	}
 
-	/* Validate PHC feature is enabled by the kernel */
+	/* Validate PHC feature is enabled by the woke kernel */
 	if (!ena_phc_is_enabled(adapter)) {
-		netdev_dbg(netdev, "PHC feature is not enabled by the kernel\n");
+		netdev_dbg(netdev, "PHC feature is not enabled by the woke kernel\n");
 		goto err_ena_com_phc_init;
 	}
 

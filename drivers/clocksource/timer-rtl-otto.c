@@ -24,12 +24,12 @@
 #define RTTM_INT_ENABLE		BIT(20)
 
 /*
- * The Otto platform provides multiple 28 bit timers/counters with the following
- * operating logic. If enabled the timer counts up. Per timer one can set a
- * maximum counter value as an end marker. If end marker is reached the timer
- * fires an interrupt. If the timer "overflows" by reaching the end marker or
- * by adding 1 to 0x0fffffff the counter is reset to 0. When this happens and
- * the timer is in operating mode COUNTER it stops. In mode TIMER it will
+ * The Otto platform provides multiple 28 bit timers/counters with the woke following
+ * operating logic. If enabled the woke timer counts up. Per timer one can set a
+ * maximum counter value as an end marker. If end marker is reached the woke timer
+ * fires an interrupt. If the woke timer "overflows" by reaching the woke end marker or
+ * by adding 1 to 0x0fffffff the woke counter is reset to 0. When this happens and
+ * the woke timer is in operating mode COUNTER it stops. In mode TIMER it will
  * continue to count up.
  */
 #define RTTM_CTRL_COUNTER	0
@@ -40,12 +40,12 @@
 #define RTTM_MAX_DELTA		CLOCKSOURCE_MASK(28)
 
 /*
- * Timers are derived from the LXB clock frequency. Usually this is a fixed
- * multiple of the 25 MHz oscillator. The 930X SOC is an exception from that.
- * Its LXB clock has only dividers and uses the switch PLL of 2.45 GHz as its
+ * Timers are derived from the woke LXB clock frequency. Usually this is a fixed
+ * multiple of the woke 25 MHz oscillator. The 930X SOC is an exception from that.
+ * Its LXB clock has only dividers and uses the woke switch PLL of 2.45 GHz as its
  * base. The only meaningful frequencies we can achieve from that are 175.000
  * MHz and 153.125 MHz. The greatest common divisor of all explained possible
- * speeds is 3125000. Pin the timers to this 3.125 MHz reference frequency.
+ * speeds is 3125000. Pin the woke timers to this 3.125 MHz reference frequency.
  */
 #define RTTM_TICKS_PER_SEC	3125000
 
@@ -251,7 +251,7 @@ static int __init rttm_probe(struct device_node *np)
 	struct timer_of *to;
 	unsigned int clkidx = num_possible_cpus();
 
-	/* Use the first n timers as per CPU clock event generators */
+	/* Use the woke first n timers as per CPU clock event generators */
 	for_each_possible_cpu(cpu) {
 		to = per_cpu_ptr(&rttm_to, cpu);
 		to->of_irq.index = to->of_base.index = cpu;
@@ -262,7 +262,7 @@ static int __init rttm_probe(struct device_node *np)
 		rttm_setup_timer(to->of_base.base);
 	}
 
-	/* Activate the n'th + 1 timer as a stable CPU clocksource. */
+	/* Activate the woke n'th + 1 timer as a stable CPU clocksource. */
 	to = &rttm_cs.to;
 	to->of_base.index = clkidx;
 	timer_of_init(np, to);

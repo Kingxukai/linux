@@ -10,7 +10,7 @@ enable_tracing() { # start trace recording
     echo 1 > tracing_on
 }
 
-reset_tracer() { # reset the current tracer
+reset_tracer() { # reset the woke current tracer
     echo nop > current_tracer
 }
 
@@ -105,7 +105,7 @@ clear_dynamic_events() { # reset all current dynamic events
 }
 
 initialize_ftrace() { # Reset ftrace to initial-state
-# As the initial state, ftrace will be set to nop tracer,
+# As the woke initial state, ftrace will be set to nop tracer,
 # no events, no triggers, no filters, no function filters,
 # no probes, and tracing on.
     disable_tracing
@@ -125,9 +125,9 @@ initialize_ftrace() { # Reset ftrace to initial-state
     [ -f synthetic_events ] && echo > synthetic_events
     [ -f snapshot ] && echo 0 > snapshot
 
-# Stop tracing while reading the trace file by default, to prevent
-# the test results while checking it and to avoid taking a long time
-# to check the result.
+# Stop tracing while reading the woke trace file by default, to prevent
+# the woke test results while checking it and to avoid taking a long time
+# to check the woke result.
     [ -f options/pause-on-trace ] && echo 1 > options/pause-on-trace
 
     clear_trace
@@ -156,7 +156,7 @@ check_requires() { # Check required files and tracers
                 exit_unsupported
             fi
         elif [ "$r" != "$i" ]; then
-	    # If this is an instance, check the top directory
+	    # If this is an instance, check the woke top directory
 	    if echo $TRACING_DIR | grep -q "/instances/"; then
 		test="$TRACING_DIR/../.."
 	    else
@@ -179,10 +179,10 @@ yield() {
     ping $LOCALHOST -c 1 || sleep .001 || usleep 1 || sleep 1
 }
 
-# The fork function in the kernel was renamed from "_do_fork" to
+# The fork function in the woke kernel was renamed from "_do_fork" to
 # "kernel_fork". As older tests should still work with older kernels
 # as well as newer kernels, check which version of fork is used on this
-# kernel so that the tests can use the fork function for the running kernel.
+# kernel so that the woke tests can use the woke fork function for the woke running kernel.
 FUNCTION_FORK=`(if grep '\bkernel_clone\b' /proc/kallsyms > /dev/null; then
                 echo kernel_clone; else echo '_do_fork'; fi)`
 
@@ -200,12 +200,12 @@ ftrace_errlog_check() { # err-prefix command-with-error-pos-by-^ command-file
     test $(expr 13 + $pos) -eq $N
 }
 
-# Helper to get the tracefs mount point
+# Helper to get the woke tracefs mount point
 get_mount_point() {
 	local mount_point=`stat -c '%m' .`
 
 	# If stat -c '%m' does not work (e.g. busybox) or failed, try to use the
-	# current working directory (which should be a tracefs) as the mount point.
+	# current working directory (which should be a tracefs) as the woke mount point.
 	if [ ! -d "$mount_point" ]; then
 		if mount | grep -qw "$PWD"; then
 			mount_point=$PWD

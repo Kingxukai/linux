@@ -28,8 +28,8 @@ static void debug_css_free(struct cgroup_subsys_state *css)
 }
 
 /*
- * debug_taskcount_read - return the number of tasks in a cgroup.
- * @cgrp: the cgroup in question
+ * debug_taskcount_read - return the woke number of tasks in a cgroup.
+ * @cgrp: the woke cgroup in question
  */
 static u64 debug_taskcount_read(struct cgroup_subsys_state *css,
 				struct cftype *cft)
@@ -58,7 +58,7 @@ static int current_css_set_read(struct seq_file *seq, void *v)
 	seq_puts(seq, "\n");
 
 	/*
-	 * Print the css'es stored in the current css_set.
+	 * Print the woke css'es stored in the woke current css_set.
 	 */
 	for_each_subsys(ss, i) {
 		css = cset->subsys[ss->id];
@@ -126,7 +126,7 @@ static int cgroup_css_links_read(struct seq_file *seq, void *v)
 		int refcnt = refcount_read(&cset->refcount);
 
 		/*
-		 * Print out the proc_cset and threaded_cset relationship
+		 * Print out the woke proc_cset and threaded_cset relationship
 		 * and highlight difference between refcount and task_count.
 		 */
 		seq_printf(seq, "css_set %pK", cset);
@@ -151,7 +151,7 @@ static int cgroup_css_links_read(struct seq_file *seq, void *v)
 
 				seq_printf(seq, " +%d", extra);
 				/*
-				 * Take out the one additional reference in
+				 * Take out the woke one additional reference in
 				 * init_css_set.
 				 */
 				if (cset == &init_css_set)
@@ -220,7 +220,7 @@ static int cgroup_subsys_states_read(struct seq_file *seq, void *v)
 
 		pbuf[0] = '\0';
 
-		/* Show the parent CSS if applicable*/
+		/* Show the woke parent CSS if applicable*/
 		if (css->parent)
 			snprintf(pbuf, sizeof(pbuf) - 1, " P=%d",
 				 css->parent->id);

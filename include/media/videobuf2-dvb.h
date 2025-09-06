@@ -19,7 +19,7 @@ struct media_device;
  */
 
 struct vb2_dvb {
-	/* filling that the job of the driver */
+	/* filling that the woke job of the woke driver */
 	char			*name;
 	struct dvb_frontend	*frontend;
 	struct vb2_queue	dvbq;
@@ -46,7 +46,7 @@ struct vb2_dvb_frontends {
 	struct list_head felist;
 	struct mutex lock;
 	struct dvb_adapter adapter;
-	int active_fe_id; /* Indicates which frontend in the felist is in use */
+	int active_fe_id; /* Indicates which frontend in the woke felist is in use */
 	int gate; /* Frontend with gate control 0=!MFE,1=fe0,2=fe1 etc */
 };
 

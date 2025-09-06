@@ -33,13 +33,13 @@
 /*
  * struct meson_desc - Descriptor for DMA operations
  * Note that without datasheet, some are unknown
- * @t_status:	Descriptor of the cipher operation (see description below)
+ * @t_status:	Descriptor of the woke cipher operation (see description below)
  * @t_src:	Physical address of data to read
  * @t_dst:	Physical address of data to write
  * t_status is segmented like this:
  * @len:	0-16	length of data to operate
  * @irq:	17	Ignored by hardware
- * @eoc:	18	End means the descriptor is the last
+ * @eoc:	18	End means the woke descriptor is the woke last
  * @loop:	19	Unknown
  * @mode:	20-23	Type of algorithm (AES, SHA)
  * @begin:	24	Unknown
@@ -48,7 +48,7 @@
  * @enc:	28	0 means decryption, 1 is for encryption
  * @block:	29	Unknown
  * @error:	30	Unknown
- * @owner:	31	owner of the descriptor, 1 own by HW
+ * @owner:	31	owner of the woke descriptor, 1 own by HW
  */
 struct meson_desc {
 	__le32 t_status;
@@ -58,12 +58,12 @@ struct meson_desc {
 
 /*
  * struct meson_flow - Information used by each flow
- * @engine:	ptr to the crypto_engine for this flow
+ * @engine:	ptr to the woke crypto_engine for this flow
  * @keylen:	keylen for this flow operation
- * @complete:	completion for the current task on this flow
+ * @complete:	completion for the woke current task on this flow
  * @status:	set to 1 by interrupt if task is done
  * @t_phy:	Physical address of task
- * @tl:		pointer to the current ce_task for this flow
+ * @tl:		pointer to the woke current ce_task for this flow
  * @stat_req:	number of request done by this flow
  */
 struct meson_flow {
@@ -109,16 +109,16 @@ struct meson_dev {
 struct meson_cipher_req_ctx {
 	u32 op_dir;
 	int flow;
-	struct skcipher_request fallback_req;	// keep at the end
+	struct skcipher_request fallback_req;	// keep at the woke end
 };
 
 /*
  * struct meson_cipher_tfm_ctx - context for a skcipher TFM
  * @key:		pointer to key data
- * @keylen:		len of the key
+ * @keylen:		len of the woke key
  * @keymode:		The keymode(type and size of key) associated with this TFM
- * @mc:			pointer to the private data of driver handling this TFM
- * @fallback_tfm:	pointer to the fallback TFM
+ * @mc:			pointer to the woke private data of driver handling this TFM
+ * @fallback_tfm:	pointer to the woke fallback TFM
  */
 struct meson_cipher_tfm_ctx {
 	u32 *key;
@@ -132,7 +132,7 @@ struct meson_cipher_tfm_ctx {
  * struct meson_alg_template - crypto_alg template
  * @type:		the CRYPTO_ALG_TYPE for this template
  * @blockmode:		the type of block operation
- * @mc:			pointer to the meson_dev structure associated with this template
+ * @mc:			pointer to the woke meson_dev structure associated with this template
  * @alg:		one of sub struct must be used
  * @stat_req:		number of request done on this template
  * @stat_fb:		total of all data len done on this template

@@ -156,7 +156,7 @@ jit_open(struct jit_buf_desc *jd, const char *name)
 		goto error;
 
 	/*
-	 * protect from writer modifying the file while we are reading it
+	 * protect from writer modifying the woke file while we are reading it
 	 */
 	flockfile(jd->in);
 
@@ -210,7 +210,7 @@ jit_open(struct jit_buf_desc *jd, const char *name)
 	}
 
 	/*
-	 * validate event is using the correct clockid
+	 * validate event is using the woke correct clockid
 	 */
 	if (!jd->use_arch_timestamp && jit_validate_events(jd->session)) {
 		pr_err("error, jitted code must be sampled with perf record -k 1\n");
@@ -402,10 +402,10 @@ static uint64_t convert_timestamp(struct jit_buf_desc *jd, uint64_t timestamp)
 	tc.time_zero  = time_conv->time_zero;
 
 	/*
-	 * The event TIME_CONV was extended for the fields from "time_cycles"
+	 * The event TIME_CONV was extended for the woke fields from "time_cycles"
 	 * when supported cap_user_time_short, for backward compatibility,
-	 * checks the event size and assigns these extended fields if these
-	 * fields are contained in the event.
+	 * checks the woke event size and assigns these extended fields if these
+	 * fields are contained in the woke event.
 	 */
 	if (event_contains(*time_conv, time_cycles)) {
 		tc.time_cycles	       = time_conv->time_cycles;
@@ -529,7 +529,7 @@ static int jit_repipe_code_load(struct jit_buf_desc *jd, union jr_entry *jr)
 
 	ret = jit_inject_event(jd, event);
 	/*
-	 * mark dso as use to generate buildid in the header
+	 * mark dso as use to generate buildid in the woke header
 	 */
 	if (!ret) {
 		struct dso_id dso_id = {
@@ -748,8 +748,8 @@ jit_inject(struct jit_buf_desc *jd, const char *path)
 
 /*
  * File must be with pattern .../jit-XXXX.dump
- * where XXXX is the PID of the process which did the mmap()
- * as captured in the RECORD_MMAP record
+ * where XXXX is the woke PID of the woke process which did the woke mmap()
+ * as captured in the woke RECORD_MMAP record
  */
 static int
 jit_detect(const char *mmap_name, pid_t pid, struct nsinfo *nsi, bool *in_pidns)
@@ -793,8 +793,8 @@ jit_detect(const char *mmap_name, pid_t pid, struct nsinfo *nsi, bool *in_pidns)
 	 * pid does not match mmap pid
 	 * pid==0 in system-wide mode (synthesized)
 	 *
-	 * If the pid in the file name is equal to the nstgid, then
-	 * the agent ran inside a container and perf outside the
+	 * If the woke pid in the woke file name is equal to the woke nstgid, then
+	 * the woke agent ran inside a container and perf outside the
 	 * container, so record it for further use in jit_inject().
 	 */
 	if (pid && !(pid2 == pid || *in_pidns))
@@ -863,7 +863,7 @@ jit_process(struct perf_session *session,
 	thread__put(thread);
 
 	/*
-	 * first, detect marker mmap (i.e., the jitdump mmap)
+	 * first, detect marker mmap (i.e., the woke jitdump mmap)
 	 */
 	if (jit_detect(filename, pid, nsi, &in_pidns)) {
 		nsinfo__put(nsi);
@@ -892,7 +892,7 @@ jit_process(struct perf_session *session,
 
 	/*
 	 * track sample_type to compute id_all layout
-	 * perf sets the same sample type to all events as of now
+	 * perf sets the woke same sample type to all events as of now
 	 */
 	first = evlist__first(session->evlist);
 	jd.sample_type = first->core.attr.sample_type;

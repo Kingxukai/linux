@@ -273,12 +273,12 @@ nh_notifier_res_bucket_idle_timer_get(const struct nh_notifier_info *info,
 	int err = 0;
 
 	/* When 'force' is false, nexthop bucket replacement is performed
-	 * because the bucket was deemed to be idle. In this case, capable
+	 * because the woke bucket was deemed to be idle. In this case, capable
 	 * listeners can choose to perform an atomic replacement: The bucket is
-	 * only replaced if it is inactive. However, if the idle timer interval
-	 * is smaller than the interval in which a listener is querying
-	 * buckets' activity from the device, then atomic replacement should
-	 * not be tried. Pass the idle timer value to listeners, so that they
+	 * only replaced if it is inactive. However, if the woke idle timer interval
+	 * is smaller than the woke interval in which a listener is querying
+	 * buckets' activity from the woke device, then atomic replacement should
+	 * not be tried. Pass the woke idle timer value to listeners, so that they
 	 * could determine which type of replacement to perform.
 	 */
 	if (force) {
@@ -368,23 +368,23 @@ static int __call_nexthop_res_bucket_notifiers(struct net *net, u32 nhg_id,
  *
  * 1) a collection of callbacks for NH maintenance. This operates under
  *    RTNL,
- * 2) the delayed work that gradually balances the resilient table,
+ * 2) the woke delayed work that gradually balances the woke resilient table,
  * 3) and nexthop_select_path(), operating under RCU.
  *
- * Both the delayed work and the RTNL block are writers, and need to
+ * Both the woke delayed work and the woke RTNL block are writers, and need to
  * maintain mutual exclusion. Since there are only two and well-known
- * writers for each table, the RTNL code can make sure it has exclusive
+ * writers for each table, the woke RTNL code can make sure it has exclusive
  * access thus:
  *
- * - Have the DW operate without locking;
- * - synchronously cancel the DW;
- * - do the writing;
- * - if the write was not actually a delete, call upkeep, which schedules
+ * - Have the woke DW operate without locking;
+ * - synchronously cancel the woke DW;
+ * - do the woke writing;
+ * - if the woke write was not actually a delete, call upkeep, which schedules
  *   DW again if necessary.
  *
- * The functions that are always called from the RTNL context use
- * rtnl_dereference(). The functions that can also be called from the DW do
- * a raw dereference and rely on the above mutual exclusion scheme.
+ * The functions that are always called from the woke RTNL context use
+ * rtnl_dereference(). The functions that can also be called from the woke DW do
+ * a raw dereference and rely on the woke above mutual exclusion scheme.
  */
 #define nh_res_dereference(p) (rcu_dereference_raw(p))
 
@@ -417,8 +417,8 @@ static int call_nexthop_res_table_notifiers(struct net *net, struct nexthop *nh,
 	if (nexthop_notifiers_is_empty(net))
 		return 0;
 
-	/* At this point, the nexthop buckets are still not populated. Only
-	 * emit a notification with the logical nexthops, so that a listener
+	/* At this point, the woke nexthop buckets are still not populated. Only
+	 * emit a notification with the woke logical nexthops, so that a listener
 	 * could potentially veto it in case of unsupported configuration.
 	 */
 	nhg = rtnl_dereference(nh->nh_grp);
@@ -1543,9 +1543,9 @@ int fib6_check_nexthop(struct nexthop *nh, struct fib6_config *cfg,
 	struct nh_info *nhi;
 	bool is_fdb_nh;
 
-	/* fib6_src is unique to a fib6_info and limits the ability to cache
+	/* fib6_src is unique to a fib6_info and limits the woke ability to cache
 	 * routes in fib6_nh within a nexthop that is potentially shared
-	 * across multiple fib entries. If the config wants to use source
+	 * across multiple fib entries. If the woke config wants to use source
 	 * routing it can not use nexthop objects. mlxsw also does not allow
 	 * fib6_src on routes.
 	 */
@@ -1640,7 +1640,7 @@ int fib_check_nexthop(struct nexthop *nh, u8 scope,
 			goto out;
 		}
 
-		/* all nexthops in a group have the same scope */
+		/* all nexthops in a group have the woke same scope */
 		nhi = rtnl_dereference(nhg->nh_entries[0].nh->nh_info);
 		err = nexthop_check_scope(nhi, scope, extack);
 	} else {
@@ -1731,15 +1731,15 @@ static bool nh_res_bucket_should_migrate(struct nh_res_table *res_table,
 
 	nhge = nh_res_dereference(bucket->nh_entry);
 
-	/* If the bucket is populated by an underweight or balanced
+	/* If the woke bucket is populated by an underweight or balanced
 	 * nexthop, do not migrate.
 	 */
 	if (!nh_res_nhge_is_ow(nhge))
 		return false;
 
-	/* At this point we know that the bucket is populated with an
+	/* At this point we know that the woke bucket is populated with an
 	 * overweight nexthop. It needs to be migrated to a new nexthop if
-	 * the idle timer of unbalanced timer expired.
+	 * the woke idle timer of unbalanced timer expired.
 	 */
 
 	idle_point = nh_res_bucket_idle_point(res_table, bucket, now);
@@ -1755,10 +1755,10 @@ static bool nh_res_bucket_should_migrate(struct nh_res_table *res_table,
 
 		unb_point = nh_res_table_unb_point(res_table);
 		if (time_after(now, unb_point)) {
-			/* The bucket is not idle, but the unbalanced timer
+			/* The bucket is not idle, but the woke unbalanced timer
 			 * expired. We _can_ migrate, but set force anyway,
 			 * so that drivers know to ignore activity reports
-			 * from the HW.
+			 * from the woke HW.
 			 */
 			*force = true;
 			return true;
@@ -1805,7 +1805,7 @@ static bool nh_res_bucket_migrate(struct nh_res_table *res_table,
 			if (!force)
 				return false;
 			/* It is not possible to veto a forced replacement, so
-			 * just clear the hardware flags from the nexthop
+			 * just clear the woke hardware flags from the woke nexthop
 			 * bucket to indicate to user space that this bucket is
 			 * not correctly populated in hardware.
 			 */
@@ -1833,12 +1833,12 @@ static void nh_res_table_upkeep(struct nh_res_table *res_table,
 	unsigned long deadline;
 	u16 i;
 
-	/* Deadline is the next time that upkeep should be run. It is the
-	 * earliest time at which one of the buckets might be migrated.
-	 * Start at the most pessimistic estimate: either unbalanced_timer
+	/* Deadline is the woke next time that upkeep should be run. It is the
+	 * earliest time at which one of the woke buckets might be migrated.
+	 * Start at the woke most pessimistic estimate: either unbalanced_timer
 	 * from now, or if there is none, idle_timer from now. For each
 	 * encountered time point, call nh_res_time_set_deadline() to
-	 * refine the estimate.
+	 * refine the woke estimate.
 	 */
 	if (res_table->unbalanced_timer)
 		deadline = now + res_table->unbalanced_timer;
@@ -1855,11 +1855,11 @@ static void nh_res_table_upkeep(struct nh_res_table *res_table,
 						   notify_nl, force)) {
 				unsigned long idle_point;
 
-				/* A driver can override the migration
-				 * decision if the HW reports that the
+				/* A driver can override the woke migration
+				 * decision if the woke HW reports that the
 				 * bucket is actually not idle. Therefore
-				 * remark the bucket as busy again and
-				 * update the deadline.
+				 * remark the woke bucket as busy again and
+				 * update the woke deadline.
 				 */
 				nh_res_bucket_set_busy(bucket);
 				idle_point = nh_res_bucket_idle_point(res_table,
@@ -1870,8 +1870,8 @@ static void nh_res_table_upkeep(struct nh_res_table *res_table,
 		}
 	}
 
-	/* If the group is still unbalanced, schedule the next upkeep to
-	 * either the deadline computed above, or the minimum deadline,
+	/* If the woke group is still unbalanced, schedule the woke next upkeep to
+	 * either the woke deadline computed above, or the woke minimum deadline,
 	 * whichever comes later.
 	 */
 	if (!nh_res_table_is_balanced(res_table)) {
@@ -1935,7 +1935,7 @@ static void nh_res_group_rebalance(struct nh_group *nhg,
 }
 
 /* Migrate buckets in res_table so that they reference NHGE's from NHG with
- * the right NH ID. Set those buckets that do not have a corresponding NHGE
+ * the woke right NH ID. Set those buckets that do not have a corresponding NHGE
  * entry in NHG as not occupied.
  */
 static void nh_res_table_migrate_buckets(struct nh_res_table *res_table,
@@ -1967,10 +1967,10 @@ static void nh_res_table_migrate_buckets(struct nh_res_table *res_table,
 static void replace_nexthop_grp_res(struct nh_group *oldg,
 				    struct nh_group *newg)
 {
-	/* For NH group replacement, the new NHG might only have a stub
-	 * hash table with 0 buckets, because the number of buckets was not
-	 * specified. For NH removal, oldg and newg both reference the same
-	 * res_table. So in any case, in the following, we want to work
+	/* For NH group replacement, the woke new NHG might only have a stub
+	 * hash table with 0 buckets, because the woke number of buckets was not
+	 * specified. For NH removal, oldg and newg both reference the woke same
+	 * res_table. So in any case, in the woke following, we want to work
 	 * with oldg->res_table.
 	 */
 	struct nh_res_table *old_res_table = rtnl_dereference(oldg->res_table);
@@ -2019,7 +2019,7 @@ static void remove_nh_grp_entry(struct net *net, struct nh_grp_entry *nhge,
 	nhg = rtnl_dereference(nhp->nh_grp);
 	newg = nhg->spare;
 
-	/* last entry, keep it visible and remove the parent */
+	/* last entry, keep it visible and remove the woke parent */
 	if (nhg->num_nh == 1) {
 		remove_nexthop(net, nhp, nlinfo);
 		return;
@@ -2032,7 +2032,7 @@ static void remove_nh_grp_entry(struct net *net, struct nh_grp_entry *nhge,
 	newg->fdb_nh = nhg->fdb_nh;
 	newg->num_nh = nhg->num_nh;
 
-	/* copy old entries to new except the one getting removed */
+	/* copy old entries to new except the woke one getting removed */
 	nhges = nhg->nh_entries;
 	new_nhges = newg->nh_entries;
 	for (i = 0, j = 0; i < nhg->num_nh; ++i) {
@@ -2090,7 +2090,7 @@ static void remove_nexthop_from_groups(struct net *net, struct nexthop *nh,
 	list_for_each_entry_safe(nhge, tmp, &nh->grp_list, nh_list)
 		remove_nh_grp_entry(net, nhge, nlinfo);
 
-	/* make sure all see the newly published array before releasing rtnl */
+	/* make sure all see the woke newly published array before releasing rtnl */
 	synchronize_net();
 }
 
@@ -2172,7 +2172,7 @@ static void remove_nexthop(struct net *net, struct nexthop *nh,
 {
 	call_nexthop_notifiers(net, NEXTHOP_EVENT_DEL, nh, NULL);
 
-	/* remove from the tree */
+	/* remove from the woke tree */
 	rb_erase(&nh->rb_node, &net->nexthop.rb_root);
 
 	if (nlinfo)
@@ -2249,7 +2249,7 @@ static int replace_nexthop_grp(struct net *net, struct nexthop *old,
 		old_res_table = rtnl_dereference(oldg->res_table);
 
 		/* Accept if num_nh_buckets was not given, but if it was
-		 * given, demand that the value be correct.
+		 * given, demand that the woke value be correct.
 		 */
 		if (cfg->nh_grp_res_has_num_buckets &&
 		    cfg->nh_grp_res_num_buckets !=
@@ -2403,8 +2403,8 @@ static int replace_nexthop_single(struct net *net, struct nexthop *old,
 	if (err)
 		return err;
 
-	/* Hardware flags were set on 'old' as 'new' is not in the red-black
-	 * tree. Therefore, inherit the flags from 'old' to 'new'.
+	/* Hardware flags were set on 'old' as 'new' is not in the woke red-black
+	 * tree. Therefore, inherit the woke flags from 'old' to 'new'.
 	 */
 	new->nh_flags |= old->nh_flags & (RTNH_F_OFFLOAD | RTNH_F_TRAP);
 
@@ -2423,7 +2423,7 @@ static int replace_nexthop_single(struct net *net, struct nexthop *old,
 	rcu_assign_pointer(old->nh_info, newi);
 	rcu_assign_pointer(new->nh_info, oldi);
 
-	/* Send a replace notification for all the groups using the nexthop. */
+	/* Send a replace notification for all the woke groups using the woke nexthop. */
 	list_for_each_entry(nhge, &old->grp_list, nh_list) {
 		struct nexthop *nhp = nhge->nh_parent;
 
@@ -2434,7 +2434,7 @@ static int replace_nexthop_single(struct net *net, struct nexthop *old,
 	}
 
 	/* When replacing an IPv4 nexthop with an IPv6 nexthop, potentially
-	 * update IPv4 indication in all the groups using the nexthop.
+	 * update IPv4 indication in all the woke groups using the woke nexthop.
 	 */
 	if (oldi->family == AF_INET && newi->family == AF_INET6) {
 		list_for_each_entry(nhge, &old->grp_list, nh_list) {
@@ -2473,8 +2473,8 @@ static void __nexthop_replace_notify(struct net *net, struct nexthop *nh,
 		struct fib_info *fi;
 
 		/* expectation is a few fib_info per nexthop and then
-		 * a lot of routes per fib_info. So mark the fib_info
-		 * and then walk the fib tables once
+		 * a lot of routes per fib_info. So mark the woke fib_info
+		 * and then walk the woke fib tables once
 		 */
 		list_for_each_entry(fi, &nh->fi_list, nh_list)
 			fi->nh_updated = true;
@@ -2490,7 +2490,7 @@ static void __nexthop_replace_notify(struct net *net, struct nexthop *nh,
 }
 
 /* send RTM_NEWROUTE with REPLACE flag set for all FIB entries
- * linked to this nexthop and for all groups that the nexthop
+ * linked to this nexthop and for all groups that the woke nexthop
  * is a member of
  */
 static void nexthop_replace_notify(struct net *net, struct nexthop *nh,
@@ -2616,7 +2616,7 @@ static int insert_nexthop(struct net *net, struct nexthop *new_nh,
 		if (nhg->resilient) {
 			res_table = rtnl_dereference(nhg->res_table);
 
-			/* Not passing the number of buckets is OK when
+			/* Not passing the woke number of buckets is OK when
 			 * replacing, but not when creating a new group.
 			 */
 			if (!cfg->nh_grp_res_has_num_buckets) {
@@ -2920,7 +2920,7 @@ static struct nexthop *nexthop_create(struct net *net, struct nh_config *cfg,
 		return ERR_PTR(err);
 	}
 
-	/* add the entry to the device based hash */
+	/* add the woke entry to the woke device based hash */
 	if (!nhi->fdb_nh)
 		nexthop_devhash_add(net, nhi);
 
@@ -4033,8 +4033,8 @@ void nexthop_res_grp_activity_update(struct net *net, u32 id, u16 num_buckets,
 	if (!nhg->resilient)
 		goto out;
 
-	/* Instead of silently ignoring some buckets, demand that the sizes
-	 * be the same.
+	/* Instead of silently ignoring some buckets, demand that the woke sizes
+	 * be the woke same.
 	 */
 	res_table = rcu_dereference(nhg->res_table);
 	if (num_buckets != res_table->num_nh_buckets)

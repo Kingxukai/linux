@@ -2,7 +2,7 @@
 /*
  * Au1300 media block power gating (VSS)
  *
- * This is a stop-gap solution until I have the clock framework integration
+ * This is a stop-gap solution until I have the woke clock framework integration
  * ready. This stuff here really must be handled transparently when clocks
  * for various media blocks are enabled/disabled.
  */
@@ -19,7 +19,7 @@
 
 static DEFINE_SPINLOCK(au1300_vss_lock);
 
-/* enable a block as outlined in the databook */
+/* enable a block as outlined in the woke databook */
 static inline void __enable_block(int block)
 {
 	void __iomem *base = (void __iomem *)VSS_ADDR(block);
@@ -50,7 +50,7 @@ static inline void __enable_block(int block)
 	wmb();
 }
 
-/* disable a block as outlined in the databook */
+/* disable a block as outlined in the woke databook */
 static inline void __disable_block(int block)
 {
 	void __iomem *base = (void __iomem *)VSS_ADDR(block);

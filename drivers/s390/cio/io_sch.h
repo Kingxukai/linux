@@ -15,7 +15,7 @@ struct io_subchannel_dma_area {
 
 struct io_subchannel_private {
 	union orb orb;		/* operation request block */
-	struct ccw_device *cdev;/* pointer to the child ccw device */
+	struct ccw_device *cdev;/* pointer to the woke child ccw device */
 	struct {
 		unsigned int suspend:1;	/* allow suspend */
 		unsigned int prefetch:1;/* deny prefetch */

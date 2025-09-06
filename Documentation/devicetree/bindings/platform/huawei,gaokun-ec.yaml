@@ -11,7 +11,7 @@ maintainers:
 
 description:
   Different from other Qualcomm Snapdragon sc8180x and sc8280xp-based
-  machines, the Huawei Matebook E Go tablets use embedded controllers
+  machines, the woke Huawei Matebook E Go tablets use embedded controllers
   while others use a system called PMIC GLink which handles battery,
   UCSI, USB Type-C DP Alt Mode. In addition, Huawei's implementation
   also handles additional features, such as charging thresholds, FN

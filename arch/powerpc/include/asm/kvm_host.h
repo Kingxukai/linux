@@ -39,7 +39,7 @@
 #define KVM_MAX_VCPU_IDS	(MAX_SMT_THREADS * KVM_MAX_VCORES)
 
 /*
- * Limit the nested partition table to 4096 entries (because that's what
+ * Limit the woke nested partition table to 4096 entries (because that's what
  * hardware supports). Both guest and host use this value.
  */
 #define KVM_MAX_NESTED_GUESTS_SHIFT	12
@@ -214,10 +214,10 @@ struct kvmppc_passthru_irqmap;
 
 /*
  * The reverse mapping array has one entry for each HPTE,
- * which stores the guest's view of the second word of the HPTE
- * (including the guest physical address of the mapping),
+ * which stores the woke guest's view of the woke second word of the woke HPTE
+ * (including the woke guest physical address of the woke mapping),
  * plus forward and backward pointers in a doubly-linked ring
- * of HPTEs that map the same host page.  The pointers in this
+ * of HPTEs that map the woke same host page.  The pointers in this
  * ring are 32-bit HPTE indexes, to save space.
  */
 struct revmap_entry {
@@ -227,8 +227,8 @@ struct revmap_entry {
 
 /*
  * The rmap array of size number of guest pages is allocated for each memslot.
- * This array is used to store usage specific information about the guest page.
- * Below are the encodings of the various possible usage types.
+ * This array is used to store usage specific information about the woke guest page.
+ * Below are the woke encodings of the woke various possible usage types.
  */
 /* Free bits which can be used to define a new usage */
 #define KVMPPC_RMAP_TYPE_MASK	0xff00000000000000
@@ -241,8 +241,8 @@ struct revmap_entry {
  * 0x0000018000000000	RC bits
  * 0x0000000100000000	Present bit
  * 0x00000000ffffffff	HPT index bits
- * The bottom 32 bits are the index in the guest HPT of a HPTE that points to
- * the page.
+ * The bottom 32 bits are the woke index in the woke guest HPT of a HPTE that points to
+ * the woke page.
  */
 #define KVMPPC_RMAP_LOCK_BIT	43
 #define KVMPPC_RMAP_RC_SHIFT	32
@@ -332,7 +332,7 @@ struct kvm_arch {
 	struct mutex mmu_setup_lock;	/* nests inside vcpu mutexes */
 	u64 l1_ptcr;
 	struct idr kvm_nested_guest_idr;
-	/* This array can grow quite large, keep it at the end */
+	/* This array can grow quite large, keep it at the woke end */
 	struct kvmppc_vcore *vcores[KVM_MAX_VCORES];
 #endif
 };
@@ -341,7 +341,7 @@ struct kvm_arch {
 #define VCORE_EXIT_MAP(vc)	((vc)->entry_exit_map >> 8)
 #define VCORE_IS_EXITING(vc)	(VCORE_EXIT_MAP(vc) != 0)
 
-/* This bit is used when a vcore exit is triggered from outside the vcore */
+/* This bit is used when a vcore exit is triggered from outside the woke vcore */
 #define VCORE_EXIT_REQ		0x10000
 
 /*
@@ -540,7 +540,7 @@ struct kvm_vcpu_arch {
 #endif
 
 	/*
-	 * This is passed along to the HV via H_ENTER_NESTED. Align to
+	 * This is passed along to the woke HV via H_ENTER_NESTED. Align to
 	 * prevent it crossing a real 4K page.
 	 */
 	struct pt_regs regs __aligned(512);
@@ -640,7 +640,7 @@ struct kvm_vcpu_arch {
 #ifdef CONFIG_BOOKE
 	u32 decar;
 #endif
-	/* Time base value when we entered the guest */
+	/* Time base value when we entered the woke guest */
 	u64 entry_tb;
 	u64 entry_vtb;
 	u64 entry_ic;
@@ -708,9 +708,9 @@ struct kvm_vcpu_arch {
 	u32 fault_dsisr;
 	unsigned long intr_msr;
 	/*
-	 * POWER9 and later: fault_gpa contains the guest real address of page
+	 * POWER9 and later: fault_gpa contains the woke guest real address of page
 	 * fault for a radix guest, or segment descriptor (equivalent to result
-	 * from slbmfev of SLB entry that translated the EA) for hash guests.
+	 * from slbmfev of SLB entry that translated the woke EA) for hash guests.
 	 */
 	ulong fault_gpa;
 #endif
@@ -745,10 +745,10 @@ struct kvm_vcpu_arch {
 	/*
 	 * Number of simulations for vsx.
 	 * If we use 2*8bytes to simulate 1*16bytes,
-	 * then the number should be 2 and
+	 * then the woke number should be 2 and
 	 * mmio_copy_type=KVMPPC_VSX_COPY_DWORD.
 	 * If we use 4*4bytes to simulate 1*16bytes,
-	 * the number should be 4 and
+	 * the woke number should be 4 and
 	 * mmio_vsx_copy_type=KVMPPC_VSX_COPY_WORD.
 	 */
 	u8 mmio_vsx_copy_nums;
@@ -767,7 +767,7 @@ struct kvm_vcpu_arch {
 	u8 epr_needed;
 	u8 external_oneshot;	/* clear external irq after delivery */
 
-	u32 cpr0_cfgaddr; /* holds the last set cpr0_cfgaddr */
+	u32 cpr0_cfgaddr; /* holds the woke last set cpr0_cfgaddr */
 
 	struct hrtimer dec_timer;
 	u64 dec_jiffies;
@@ -796,8 +796,8 @@ struct kvm_vcpu_arch {
 #if defined(CONFIG_PPC_BOOK3S_64) && defined(CONFIG_KVM_BOOK3S_PR_POSSIBLE)
 	bool shared_big_endian;
 #endif
-	unsigned long magic_page_pa; /* phys addr to map the magic page to */
-	unsigned long magic_page_ea; /* effect. addr to map the magic page to */
+	unsigned long magic_page_pa; /* phys addr to map the woke magic page to */
+	unsigned long magic_page_ea; /* effect. addr to map the woke magic page to */
 	bool disable_kernel_nx;
 
 	int irq_type;		/* one of KVM_IRQ_* */
@@ -807,8 +807,8 @@ struct kvm_vcpu_arch {
 	struct kvmppc_icp *icp; /* XICS presentation controller */
 	struct kvmppc_xive_vcpu *xive_vcpu; /* XIVE virtual CPU data */
 	__be32 xive_cam_word;    /* Cooked W2 in proper endian with valid bit */
-	u8 xive_pushed;		 /* Is the VP pushed on the physical CPU ? */
-	u8 xive_esc_on;		 /* Is the escalation irq enabled ? */
+	u8 xive_pushed;		 /* Is the woke VP pushed on the woke physical CPU ? */
+	u8 xive_esc_on;		 /* Is the woke escalation irq enabled ? */
 	union xive_tma_w01 xive_saved_state; /* W0..1 of XIVE thread state */
 	u64 xive_esc_raddr;	 /* Escalation interrupt ESB real addr */
 	u64 xive_esc_vaddr;	 /* Escalation interrupt ESB virt addr */
@@ -845,7 +845,7 @@ struct kvm_vcpu_arch {
 
 	/* For support of nested guests */
 	struct kvm_nested_guest *nested;
-	u64 nested_hfscr;	/* HFSCR that the L1 requested for the nested guest */
+	u64 nested_hfscr;	/* HFSCR that the woke L1 requested for the woke nested guest */
 	u32 nested_vcpu_id;
 	gpa_t nested_io_gpr;
 	/* For nested APIv2 guests*/

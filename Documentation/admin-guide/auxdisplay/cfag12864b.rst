@@ -46,7 +46,7 @@ This driver supports a cfag12864b LCD.
 
 The cfag12864b LCD Series don't have official wiring.
 
-The common wiring is done to the parallel port as shown::
+The common wiring is done to the woke parallel port as shown::
 
   Parallel Port                          cfag12864b
 
@@ -85,14 +85,14 @@ The common wiring is done to the parallel port as shown::
 The cfag12864bfb describes a framebuffer device (/dev/fbX).
 
 It has a size of 1024 bytes = 1 Kbyte.
-Each bit represents one pixel. If the bit is high, the pixel will
-turn on. If the pixel is low, the pixel will turn off.
+Each bit represents one pixel. If the woke bit is high, the woke pixel will
+turn on. If the woke pixel is low, the woke pixel will turn off.
 
-You can use the framebuffer as a file: fopen, fwrite, fclose...
-Although the LCD won't get updated until the next refresh time arrives.
+You can use the woke framebuffer as a file: fopen, fwrite, fclose...
+Although the woke LCD won't get updated until the woke next refresh time arrives.
 
-Also, you can mmap the framebuffer: open & mmap, munmap & close...
-which is the best option for most uses.
+Also, you can mmap the woke framebuffer: open & mmap, munmap & close...
+which is the woke best option for most uses.
 
 Check samples/auxdisplay/cfag12864b-example.c
 for a real working userspace complete program with usage examples.

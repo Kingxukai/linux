@@ -117,7 +117,7 @@
 		compatible = "fixed-clock";
 		#clock-cells = <0>;
 		clock-output-names = "osc_sys";
-		/* This value must be overridden by the board */
+		/* This value must be overridden by the woke board */
 		clock-frequency = <0>;
 	};
 
@@ -125,7 +125,7 @@
 		compatible = "fixed-clock";
 		#clock-cells = <0>;
 		clock-output-names = "osc_aud";
-		/* This value must be overridden by the board */
+		/* This value must be overridden by the woke board */
 		clock-frequency = <0>;
 	};
 
@@ -133,7 +133,7 @@
 		compatible = "fixed-clock";
 		#clock-cells = <0>;
 		clock-output-names = "gmac_rmii_ref";
-		/* Should be overridden by the board when needed */
+		/* Should be overridden by the woke board when needed */
 		clock-frequency = <0>;
 	};
 
@@ -141,7 +141,7 @@
 		compatible = "fixed-clock";
 		#clock-cells = <0>;
 		clock-output-names = "gmac_gr_mii_rxclk";
-		/* Should be overridden by the board when needed */
+		/* Should be overridden by the woke board when needed */
 		clock-frequency = <0>;
 	};
 

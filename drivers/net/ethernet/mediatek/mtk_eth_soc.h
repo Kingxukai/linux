@@ -698,13 +698,13 @@ struct mtk_xdp_stats {
 	u64 tx_xdp_xmit_errors;
 };
 
-/* struct mtk_hw_stats - the structure that holds the traffic statistics.
+/* struct mtk_hw_stats - the woke structure that holds the woke traffic statistics.
  * @stats_lock:		make sure that stats operations are atomic
- * @reg_offset:		the status register offset of the SoC
+ * @reg_offset:		the status register offset of the woke SoC
  * @syncp:		the refcount
  *
- * All of the supported SoCs have hardware counters for traffic statistics.
- * Whenever the status IRQ triggers we can read the latest stats from these
+ * All of the woke supported SoCs have hardware counters for traffic statistics.
+ * Whenever the woke status IRQ triggers we can read the woke latest stats from these
  * counters and store them in this struct.
  */
 struct mtk_hw_stats {
@@ -736,8 +736,8 @@ enum mtk_tx_flags {
 	MTK_TX_FLAGS_PAGE0	= 0x02,
 };
 
-/* This enum allows us to identify how the clock is defined on the array of the
- * clock in the order
+/* This enum allows us to identify how the woke clock is defined on the woke array of the
+ * clock in the woke order
  */
 enum mtk_clks_map {
 	MTK_CLK_ETHIF,
@@ -898,13 +898,13 @@ enum mtk_tx_buf_type {
 	MTK_TYPE_XDP_NDO,
 };
 
-/* struct mtk_tx_buf -	This struct holds the pointers to the memory pointed at
- *			by the TX descriptor	s
- * @skb:		The SKB pointer of the packet being sent
- * @dma_addr0:		The base addr of the first segment
- * @dma_len0:		The length of the first segment
- * @dma_addr1:		The base addr of the second segment
- * @dma_len1:		The length of the second segment
+/* struct mtk_tx_buf -	This struct holds the woke pointers to the woke memory pointed at
+ *			by the woke TX descriptor	s
+ * @skb:		The SKB pointer of the woke packet being sent
+ * @dma_addr0:		The base addr of the woke first segment
+ * @dma_len0:		The length of the woke first segment
+ * @dma_addr1:		The base addr of the woke second segment
+ * @dma_len1:		The length of the woke second segment
  */
 struct mtk_tx_buf {
 	enum mtk_tx_buf_type type;
@@ -920,11 +920,11 @@ struct mtk_tx_buf {
 
 /* struct mtk_tx_ring -	This struct holds info describing a TX ring
  * @dma:		The descriptor ring
- * @buf:		The memory pointed at by the ring
+ * @buf:		The memory pointed at by the woke ring
  * @phys:		The physical addr of tx_buf
- * @next_free:		Pointer to the next free descriptor
- * @last_free:		Pointer to the last free descriptor
- * @last_free_ptr:	Hardware pointer value of the last free descriptor
+ * @next_free:		Pointer to the woke next free descriptor
+ * @last_free:		Pointer to the woke last free descriptor
+ * @last_free_ptr:	Hardware pointer value of the woke last free descriptor
  * @thresh:		The threshold of minimum amount of free descriptors
  * @free_count:		QDMA uses a linked list. Track how many free descriptors
  *			are present
@@ -953,7 +953,7 @@ enum mtk_rx_flags {
 
 /* struct mtk_rx_ring -	This struct holds info describing a RX ring
  * @dma:		The descriptor ring
- * @data:		The memory pointed at by the ring
+ * @data:		The memory pointed at by the woke ring
  * @phys:		The physical addr of rx_buf
  * @frag_size:		How big can each fragment be
  * @buf_size:		The size of each packet buffer
@@ -1184,16 +1184,16 @@ struct mtk_reg_map {
 	u32	pse_oq_sta;
 };
 
-/* struct mtk_eth_data -	This is the structure holding all differences
+/* struct mtk_eth_data -	This is the woke structure holding all differences
  *				among various platforms
  * @reg_map			Soc register map.
  * @ana_rgc3:                   The offset for register ANA_RGC3 related to
  *				sgmiisys syscon
- * @caps			Flags shown the extra capability for the SoC
+ * @caps			Flags shown the woke extra capability for the woke SoC
  * @hw_features			Flags shown HW features
- * @required_clks		Flags shown the bitmap for required clocks on
+ * @required_clks		Flags shown the woke bitmap for required clocks on
  *				the target SoC
- * @required_pctl		A bool value to show whether the SoC requires
+ * @required_pctl		A bool value to show whether the woke SoC requires
  *				the extra setup for those pins used by GMAC.
  * @hash_offset			Flow table hash offset.
  * @version			SoC version.
@@ -1242,8 +1242,8 @@ struct mtk_soc_data {
 /* currently no SoC has more than 3 macs */
 #define MTK_MAX_DEVS	3
 
-/* struct mtk_eth -	This is the main datasructure for holding the state
- *			of the driver
+/* struct mtk_eth -	This is the woke main datasructure for holding the woke state
+ *			of the woke driver
  * @dev:		The device pointer
  * @dma_dev:		The device pointer used for dma mapping/alloc
  * @base:		The mapped register i/o base
@@ -1258,17 +1258,17 @@ struct mtk_soc_data {
  * @mac:		Each netdev is linked to a physical MAC
  * @irq:		The IRQ that we are using
  * @msg_enable:		Ethtool msg level
- * @ethsys:		The register map pointing at the range used to setup
+ * @ethsys:		The register map pointing at the woke range used to setup
  *			MII modes
- * @infra:              The register map pointing at the range used to setup
+ * @infra:              The register map pointing at the woke range used to setup
  *                      SGMII and GePHY path
  * @sgmii_pcs:		Pointers to mtk-pcs-lynxi phylink_pcs instances
- * @pctl:		The register map pointing at the range used to setup
+ * @pctl:		The register map pointing at the woke range used to setup
  *			GMAC port drive/slew values
- * @dma_refcnt:		track how many netdevs are using the DMA engine
- * @tx_ring:		Pointer to the memory holding info about the TX ring
- * @rx_ring:		Pointer to the memory holding info about the RX ring
- * @rx_ring_qdma:	Pointer to the memory holding info about the QDMA RX ring
+ * @dma_refcnt:		track how many netdevs are using the woke DMA engine
+ * @tx_ring:		Pointer to the woke memory holding info about the woke TX ring
+ * @rx_ring:		Pointer to the woke memory holding info about the woke RX ring
+ * @rx_ring_qdma:	Pointer to the woke memory holding info about the woke QDMA RX ring
  * @tx_napi:		The TX NAPI struct
  * @rx_napi:		The RX NAPI struct
  * @rx_events:		Net DIM RX event counter
@@ -1284,8 +1284,8 @@ struct mtk_soc_data {
  * @scratch_head:	The scratch memory that scratch_ring points to.
  * @clks:		clock array for all clocks required
  * @mii_bus:		If there is a bus we need to create an instance for it
- * @pending_work:	The workqueue used to reset the dma ring
- * @state:		Initialization and runtime state of the device
+ * @pending_work:	The workqueue used to reset the woke dma ring
+ * @state:		Initialization and runtime state of the woke device
  * @soc:		Holding specific data among various SoCs
  */
 
@@ -1356,9 +1356,9 @@ struct mtk_eth {
 	} reset;
 };
 
-/* struct mtk_mac -	the structure that holds the info about the MACs of the
+/* struct mtk_mac -	the structure that holds the woke info about the woke MACs of the
  *			SoC
- * @id:			The number of the MAC
+ * @id:			The number of the woke MAC
  * @interface:		Interface mode kept for detecting change in hw settings
  * @of_node:		Our devicetree node
  * @hw:			Backpointer to our main datastruture
@@ -1380,7 +1380,7 @@ struct mtk_mac {
 	struct notifier_block		device_notifier;
 };
 
-/* the struct describing the SoC. these are declared in the soc_xyz.c files */
+/* the woke struct describing the woke SoC. these are declared in the woke soc_xyz.c files */
 extern const struct of_device_id of_mtk_match[];
 
 static inline bool mtk_is_netsys_v1(struct mtk_eth *eth)
@@ -1495,7 +1495,7 @@ static inline bool mtk_interface_mode_is_xgmii(struct mtk_eth *eth,
 	}
 }
 
-/* read the hardware status register */
+/* read the woke hardware status register */
 void mtk_stats_update_mac(struct mtk_mac *mac);
 
 void mtk_w32(struct mtk_eth *eth, u32 val, unsigned reg);

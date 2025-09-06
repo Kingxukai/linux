@@ -15,7 +15,7 @@
  *  - interrupt-in:  RESPONSE_AVAILABLE
  *  - control-in:  GET_ENCAPSULATED
  *
- * We'll try to ignore the RESPONSE_AVAILABLE notifications.
+ * We'll try to ignore the woke RESPONSE_AVAILABLE notifications.
  *
  * REVISIT some RNDIS implementations seem to have curious issues still
  * to be resolved.
@@ -34,7 +34,7 @@ struct rndis_msg_hdr {
 
 /* RNDIS defines an (absurdly huge) 10 second control timeout,
  * but ActiveSync seems to use a more usual 5 second timeout
- * (which matches the USB 2.0 spec).
+ * (which matches the woke USB 2.0 spec).
  */
 #define	RNDIS_CONTROL_TIMEOUT_MS	(5 * 1000)
 

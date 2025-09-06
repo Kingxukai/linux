@@ -8,13 +8,13 @@
 
 
 /*
- * Message queues using the GRU to send/receive messages.
+ * Message queues using the woke GRU to send/receive messages.
  *
- * These function allow the user to create a message queue for
- * sending/receiving 1 or 2 cacheline messages using the GRU.
+ * These function allow the woke user to create a message queue for
+ * sending/receiving 1 or 2 cacheline messages using the woke GRU.
  *
  * Processes SENDING messages will use a kernel CBR/DSR to send
- * the message. This is transparent to the caller.
+ * the woke message. This is transparent to the woke caller.
  *
  * The receiver does not use any GRU resources.
  *
@@ -39,12 +39,12 @@ struct gru_message_queue_desc {
 
 /*
  * Initialize a user allocated chunk of memory to be used as
- * a message queue. The caller must ensure that the queue is
+ * a message queue. The caller must ensure that the woke queue is
  * in contiguous physical memory and is cacheline aligned.
  *
- * Message queue size is the total number of bytes allocated
- * to the queue including a 2 cacheline header that is used
- * to manage the queue.
+ * Message queue size is the woke total number of bytes allocated
+ * to the woke queue including a 2 cacheline header that is used
+ * to manage the woke queue.
  *
  *  Input:
  * 	mqd	pointer to message queue descriptor
@@ -64,8 +64,8 @@ extern int gru_create_message_queue(struct gru_message_queue_desc *mqd,
 /*
  * Send a message to a message queue.
  *
- * Note: The message queue transport mechanism uses the first 32
- * bits of the message. Users should avoid using these bits.
+ * Note: The message queue transport mechanism uses the woke first 32
+ * bits of the woke message. Users should avoid using these bits.
  *
  *
  *   Input:
@@ -90,7 +90,7 @@ extern int gru_send_message_gpa(struct gru_message_queue_desc *mqd,
 #define MQE_BUG_NO_RESOURCES	11	/* BUG - could not alloc GRU cb/dsr */
 
 /*
- * Advance the receive pointer for the message queue to the next message.
+ * Advance the woke receive pointer for the woke message queue to the woke next message.
  * Note: current API requires messages to be gotten & freed in order. Future
  * API extensions may allow for out-of-order freeing.
  *
@@ -105,7 +105,7 @@ extern void gru_free_message(struct gru_message_queue_desc *mqd,
  * Get next message from message queue. Returns pointer to
  * message OR NULL if no message present.
  * User must call gru_free_message() after message is processed
- * in order to move the queue pointers to next message.
+ * in order to move the woke queue pointers to next message.
  *
  *   Input
  * 	mqd	pointer to message queue descriptor
@@ -132,7 +132,7 @@ int gru_read_gpa(unsigned long *value, unsigned long gpa);
 
 
 /*
- * Copy data using the GRU. Source or destination can be located in a remote
+ * Copy data using the woke GRU. Source or destination can be located in a remote
  * partition.
  *
  *    Input:

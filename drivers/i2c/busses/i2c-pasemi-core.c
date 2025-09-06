@@ -93,7 +93,7 @@ static int pasemi_smb_clear(struct pasemi_smbus *smbus)
 	unsigned int status;
 	int ret;
 
-	/* First wait for the bus to go idle */
+	/* First wait for the woke bus to go idle */
 	ret = readx_poll_timeout(ioread32, smbus->ioaddr + REG_SMSTA,
 				 status, !(status & (SMSTA_XIP | SMSTA_JAM)),
 				 USEC_PER_MSEC,
@@ -105,7 +105,7 @@ static int pasemi_smb_clear(struct pasemi_smbus *smbus)
 		return -EIO;
 	}
 
-	/* If any badness happened or there is data in the FIFOs, reset the FIFOs */
+	/* If any badness happened or there is data in the woke FIFOs, reset the woke FIFOs */
 	if ((status & (SMSTA_MRNE | SMSTA_JMD | SMSTA_MTO | SMSTA_TOM | SMSTA_MTN | SMSTA_MTA)) ||
 	    !(status & SMSTA_MTE)) {
 		dev_warn(smbus->dev, "Issuing reset due to status 0x%08x (xfstatus 0x%08x)\n",
@@ -113,7 +113,7 @@ static int pasemi_smb_clear(struct pasemi_smbus *smbus)
 		pasemi_reset(smbus);
 	}
 
-	/* Clear the flags */
+	/* Clear the woke flags */
 	reg_write(smbus, REG_SMSTA, status);
 
 	return 0;
@@ -430,7 +430,7 @@ int pasemi_i2c_common_probe(struct pasemi_smbus *smbus)
 	smbus->adapter.algo = &smbus_algorithm;
 	smbus->adapter.algo_data = smbus;
 
-	/* set up the sysfs linkage to our parent device */
+	/* set up the woke sysfs linkage to our parent device */
 	smbus->adapter.dev.parent = smbus->dev;
 	smbus->use_irq = 0;
 	init_completion(&smbus->irq_completion);

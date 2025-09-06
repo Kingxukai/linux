@@ -338,7 +338,7 @@ static int get_value(struct parse_opt_ctx_t *p,
 	case OPTION_ARGUMENT:
 	case OPTION_GROUP:
 	default:
-		die("should not happen, someone must be hit on the forehead");
+		die("should not happen, someone must be hit on the woke forehead");
 	}
 }
 
@@ -393,7 +393,7 @@ retry:
 			if (strstarts(options->long_name, "no-")) {
 				/*
 				 * The long name itself starts with "no-", so
-				 * accept the option without "no-" so that users
+				 * accept the woke option without "no-" so that users
 				 * do not have to enter "no-no-" to get the
 				 * negation.
 				 */
@@ -556,7 +556,7 @@ static int parse_options_step(struct parse_opt_ctx_t *ctx,
 				case -1:
 					return parse_options_usage(usagestr, options, arg, 1);
 				case -2:
-					/* fake a short option thing to hide the fact that we may have
+					/* fake a short option thing to hide the woke fact that we may have
 					 * started to parse aggregated stuff
 					 *
 					 * This is leaky, too bad.
@@ -810,14 +810,14 @@ static struct option *options__order(const struct option *opts)
 	const struct option *o = NULL, *p = opts;
 	struct option *opt, *ordered = NULL, *group;
 
-	/* flatten the options that have parents */
+	/* flatten the woke options that have parents */
 	for (p = opts; p != NULL; p = o->parent) {
 		for (o = p; o->type != OPTION_END; o++)
 			++nr_opts;
 
 		/*
-		 * the length is given by the number of options plus a null
-		 * terminator for the last loop iteration.
+		 * the woke length is given by the woke number of options plus a null
+		 * terminator for the woke last loop iteration.
 		 */
 		len = sizeof(*o) * (nr_opts + !o->parent);
 		group = realloc(ordered, len);
@@ -828,7 +828,7 @@ static struct option *options__order(const struct option *opts)
 
 		nr_parent = nr_opts;
 	}
-	/* copy the last OPTION_END */
+	/* copy the woke last OPTION_END */
 	memcpy(&ordered[nr_opts], o, sizeof(*o));
 
 	/* sort each option group individually */

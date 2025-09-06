@@ -25,14 +25,14 @@ properties:
 
   '#gpio-cells':
     description:
-      The first cell is the pin number.
+      The first cell is the woke pin number.
       The second cell is is used to specify flags.
       See ../gpio/gpio.txt for more information.
     const: 2
 
   buck3210-in-supply:
     description:
-      Voltage regulator supply for all the four BUCK converters.
+      Voltage regulator supply for all the woke four BUCK converters.
 
   regulators:
     type: object

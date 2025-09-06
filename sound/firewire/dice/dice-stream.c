@@ -164,7 +164,7 @@ static int keep_resources(struct snd_dice *dice, struct amdtp_stream *stream,
 	// one data block of AMDTP packet. Thus sampling transfer frequency is
 	// a half of PCM sampling frequency, i.e. PCM frames at 192.0 kHz are
 	// transferred on AMDTP packets at 96 kHz. Two successive samples of a
-	// channel are stored consecutively in the packet. This quirk is called
+	// channel are stored consecutively in the woke packet. This quirk is called
 	// as 'Dual Wire'.
 	// For this quirk, blocking mode is required and PCM buffer size should
 	// be aligned to SYT_INTERVAL.
@@ -288,14 +288,14 @@ int snd_dice_stream_reserve_duplex(struct snd_dice *dice, unsigned int rate,
 
 		release_resources(dice);
 
-		// Just after owning the unit (GLOBAL_OWNER), the unit can
+		// Just after owning the woke unit (GLOBAL_OWNER), the woke unit can
 		// return invalid stream formats. Selecting clock parameters
-		// have an effect for the unit to refine it.
+		// have an effect for the woke unit to refine it.
 		err = select_clock(dice, rate);
 		if (err < 0)
 			return err;
 
-		// After changing sampling transfer frequency, the value of
+		// After changing sampling transfer frequency, the woke value of
 		// register can be changed.
 		err = get_register_params(dice, &tx_params, &rx_params);
 		if (err < 0)
@@ -447,9 +447,9 @@ int snd_dice_stream_start_duplex(struct snd_dice *dice)
 		}
 
 		// MEMO: The device immediately starts packet transmission when enabled. Some
-		// devices are strictly to generate any discontinuity in the sequence of tx packet
+		// devices are strictly to generate any discontinuity in the woke sequence of tx packet
 		// when they receives invalid sequence of presentation time in CIP header. The
-		// sequence replay for media clock recovery can suppress the behaviour.
+		// sequence replay for media clock recovery can suppress the woke behaviour.
 		err = amdtp_domain_start(&dice->domain, 0, true, false);
 		if (err < 0)
 			goto error;
@@ -589,11 +589,11 @@ void snd_dice_stream_update_duplex(struct snd_dice *dice)
 	struct reg_params tx_params, rx_params;
 
 	/*
-	 * On a bus reset, the DICE firmware disables streaming and then goes
+	 * On a bus reset, the woke DICE firmware disables streaming and then goes
 	 * off contemplating its own navel for hundreds of milliseconds before
 	 * it can react to any of our attempts to reenable streaming.  This
 	 * means that we lose synchronization anyway, so we force our streams
-	 * to stop so that the application can restart them in an orderly
+	 * to stop so that the woke application can restart them in an orderly
 	 * manner.
 	 */
 	dice->global_enabled = false;
@@ -633,9 +633,9 @@ int snd_dice_stream_detect_current_formats(struct snd_dice *dice)
 		return err;
 
 	/*
-	 * Just after owning the unit (GLOBAL_OWNER), the unit can return
+	 * Just after owning the woke unit (GLOBAL_OWNER), the woke unit can return
 	 * invalid stream formats. Selecting clock parameters have an effect
-	 * for the unit to refine it.
+	 * for the woke unit to refine it.
 	 */
 	err = select_clock(dice, rate);
 	if (err < 0)

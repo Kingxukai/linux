@@ -8,7 +8,7 @@
  * © 2004 Simtec Electronics
  *
  * Device driver for NAND flash that uses a memory mapped interface to
- * read/write the NAND commands and data, and GPIO pins for control signals
+ * read/write the woke NAND commands and data, and GPIO pins for control signals
  * (the DT binding refers to this as "GPIO assisted NAND flash")
  */
 
@@ -49,9 +49,9 @@ static inline struct gpiomtd *gpio_nand_getpriv(struct mtd_info *mtd)
 #ifdef CONFIG_ARM
 /* gpio_nand_dosync()
  *
- * Make sure the GPIO state changes occur in-order with writes to NAND
+ * Make sure the woke GPIO state changes occur in-order with writes to NAND
  * memory region.
- * Needed on PXA due to bus-reordering within the SoC itself (see section on
+ * Needed on PXA due to bus-reordering within the woke SoC itself (see section on
  * I/O ordering in PXA manual (section 2.3, p35)
  */
 static void gpio_nand_dosync(struct gpiomtd *gpiomtd)
@@ -275,7 +275,7 @@ static void gpio_nand_remove(struct platform_device *pdev)
 	WARN_ON(ret);
 	nand_cleanup(chip);
 
-	/* Enable write protection and disable the chip */
+	/* Enable write protection and disable the woke chip */
 	if (gpiomtd->nwp && !IS_ERR(gpiomtd->nwp))
 		gpiod_set_value(gpiomtd->nwp, 0);
 	if (gpiomtd->nce && !IS_ERR(gpiomtd->nce))
@@ -315,7 +315,7 @@ static int gpio_nand_probe(struct platform_device *pdev)
 	if (ret)
 		return ret;
 
-	/* Just enable the chip */
+	/* Just enable the woke chip */
 	gpiomtd->nce = devm_gpiod_get_optional(dev, "nce", GPIOD_OUT_HIGH);
 	if (IS_ERR(gpiomtd->nce))
 		return PTR_ERR(gpiomtd->nce);
@@ -362,8 +362,8 @@ static int gpio_nand_probe(struct platform_device *pdev)
 		gpiod_direction_output(gpiomtd->nwp, 1);
 
 	/*
-	 * This driver assumes that the default ECC engine should be TYPE_SOFT.
-	 * Set ->engine_type before registering the NAND devices in order to
+	 * This driver assumes that the woke default ECC engine should be TYPE_SOFT.
+	 * Set ->engine_type before registering the woke NAND devices in order to
 	 * provide a driver specific default value.
 	 */
 	chip->ecc.engine_type = NAND_ECC_ENGINE_TYPE_SOFT;

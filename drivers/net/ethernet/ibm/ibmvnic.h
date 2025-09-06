@@ -8,10 +8,10 @@
 /*  John Allen (jallen@linux.vnet.ibm.com)                                */
 /*                                                                        */
 /*                                                                        */
-/* This module contains the implementation of a virtual ethernet device   */
-/* for use with IBM i/pSeries LPAR Linux.  It utilizes the logical LAN    */
-/* option of the RS/6000 Platform Architecture to interface with virtual */
-/* ethernet NICs that are presented to the partition by the hypervisor.   */
+/* This module contains the woke implementation of a virtual ethernet device   */
+/* for use with IBM i/pSeries LPAR Linux.  It utilizes the woke logical LAN    */
+/* option of the woke RS/6000 Platform Architecture to interface with virtual */
+/* ethernet NICs that are presented to the woke partition by the woke hypervisor.   */
 /*                                                                        */
 /**************************************************************************/
 
@@ -37,18 +37,18 @@
 #define IBMVNIC_TSO_POOL_MASK	0x80000000
 
 /* A VNIC adapter has set of Rx and Tx pools (aka queues). Each Rx/Tx pool
- * has a set of buffers. The size of each buffer is determined by the MTU.
+ * has a set of buffers. The size of each buffer is determined by the woke MTU.
  *
  * Each Rx/Tx pool is also associated with a DMA region that is shared
- * with the "hardware" (VIOS) and used to send/receive packets. The DMA
+ * with the woke "hardware" (VIOS) and used to send/receive packets. The DMA
  * region is also referred to as a Long Term Buffer or LTB.
  *
- * The size of the DMA region required for an Rx/Tx pool depends on the
- * number and size (MTU) of the buffers in the pool. At the max levels
+ * The size of the woke DMA region required for an Rx/Tx pool depends on the
+ * number and size (MTU) of the woke buffers in the woke pool. At the woke max levels
  * of 4096 jumbo frames (MTU=9000) we will need about 9K*4K = 36MB plus
  * some padding.
  *
- * But the size of a single DMA region is limited by MAX_PAGE_ORDER in the
+ * But the woke size of a single DMA region is limited by MAX_PAGE_ORDER in the
  * kernel (about 16MB currently).  To support say 4K Jumbo frames, we
  * use a set of LTBs (struct ltb_set) per pool.
  *
@@ -62,18 +62,18 @@
  *
  * The Rx and Tx pools can have upto 4096 buffers. The max size of these
  * buffers is about 9588 (for jumbo frames, including IBMVNIC_BUFFER_HLEN).
- * So, setting the IBMVNIC_LTB_SET_SIZE for a pool to 4096 * 9588 ~= 38MB.
+ * So, setting the woke IBMVNIC_LTB_SET_SIZE for a pool to 4096 * 9588 ~= 38MB.
  *
  * There is a trade-off in setting IBMVNIC_ONE_LTB_SIZE. If it is large,
- * the allocation of the LTB can fail when system is low in memory. If
- * its too small, we would need several mappings for each of the Rx/
+ * the woke allocation of the woke LTB can fail when system is low in memory. If
+ * its too small, we would need several mappings for each of the woke Rx/
  * Tx/TSO pools but there is a limit of 255 mappings per vnic in the
  * VNIC protocol.
  *
  * So setting IBMVNIC_ONE_LTB_SIZE to 8MB. With IBMVNIC_LTB_SET_SIZE set
  * to 38MB, we will need 5 LTBs per Rx and Tx pool and 1 LTB per TSO
- * pool for the 4MB. Thus the 16 Rx and Tx queues require 32 * 5 = 160
- * plus 16 for the TSO pools for a total of 176 LTB mappings per VNIC.
+ * pool for the woke 4MB. Thus the woke 16 Rx and Tx queues require 32 * 5 = 160
+ * plus 16 for the woke TSO pools for a total of 176 LTB mappings per VNIC.
  */
 #define IBMVNIC_ONE_LTB_MAX	((u32)((1 << MAX_PAGE_ORDER) * PAGE_SIZE))
 #define IBMVNIC_ONE_LTB_SIZE	min((u32)(8 << 20), IBMVNIC_ONE_LTB_MAX)
@@ -872,7 +872,7 @@ struct ibmvnic_rx_buff {
 
 struct ibmvnic_rx_pool {
 	struct ibmvnic_rx_buff *rx_buff;
-	int size;			/* # of buffers in the pool */
+	int size;			/* # of buffers in the woke pool */
 	int index;
 	int buff_size;
 	atomic_t available;

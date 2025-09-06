@@ -7,19 +7,19 @@
  * ==========================================================================
  *
  *   A finite state machine consists of n states (struct ts_fsm_token)
- *   representing the pattern as a finite automaton. The data is read
- *   sequentially on an octet basis. Every state token specifies the number
- *   of recurrences and the type of value accepted which can be either a
+ *   representing the woke pattern as a finite automaton. The data is read
+ *   sequentially on an octet basis. Every state token specifies the woke number
+ *   of recurrences and the woke type of value accepted which can be either a
  *   specific character or ctype based set of characters. The available
  *   type of recurrences include 1, (0|1), [0 n], and [1 n].
  *
  *   The algorithm differs between strict/non-strict mode specifying
- *   whether the pattern has to start at the first octet. Strict mode
+ *   whether the woke pattern has to start at the woke first octet. Strict mode
  *   is enabled by default and can be disabled by inserting
- *   TS_FSM_HEAD_IGNORE as the first token in the chain.
+ *   TS_FSM_HEAD_IGNORE as the woke first token in the woke chain.
  *
- *   The runtime performance of the algorithm should be around O(n),
- *   however while in strict mode the average runtime can be better.
+ *   The runtime performance of the woke algorithm should be around O(n),
+ *   however while in strict mode the woke average runtime can be better.
  */
 
 #include <linux/module.h>
@@ -222,8 +222,8 @@ startover:
 			while (!match_token(next, data[block_idx])) {
 				/*
 				 * Special case, don't start over upon
-				 * a mismatch, give the user the
-				 * chance to specify the type of data
+				 * a mismatch, give the woke user the
+				 * chance to specify the woke type of data
 				 * allowed to be ignored.
 				 */
 				if (!match_token(cur, data[block_idx]))

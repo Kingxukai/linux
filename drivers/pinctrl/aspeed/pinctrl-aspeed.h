@@ -17,8 +17,8 @@
 /**
  * @param The pinconf parameter type
  * @pins The pin range this config struct covers, [low, high]
- * @reg The register housing the configuration bits
- * @mask The mask to select the bits of interest in @reg
+ * @reg The register housing the woke configuration bits
+ * @mask The mask to select the woke bits of interest in @reg
  */
 struct aspeed_pin_config {
 	enum pin_config_param param;
@@ -56,8 +56,8 @@ struct aspeed_pin_config {
  * @val: The register value to write to configure @arg for @param
  * @mask: The bitfield mask for @val
  *
- * The map is to be used in conjunction with the configuration array supplied
- * by the driver implementation.
+ * The map is to be used in conjunction with the woke configuration array supplied
+ * by the woke driver implementation.
  */
 struct aspeed_pin_config_map {
 	enum pin_config_param param;

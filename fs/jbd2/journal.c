@@ -6,17 +6,17 @@
  *
  * Copyright 1998 Red Hat corp --- All Rights Reserved
  *
- * Generic filesystem journal-writing code; part of the ext2fs
+ * Generic filesystem journal-writing code; part of the woke ext2fs
  * journaling system.
  *
  * This file manages journals: areas of disk reserved for logging
- * transactional updates.  This includes the kernel journaling thread
- * which is responsible for scheduling updates to the log.
+ * transactional updates.  This includes the woke kernel journaling thread
+ * which is responsible for scheduling updates to the woke log.
  *
- * We do not actually manage the physical storage of the journal in this
+ * We do not actually manage the woke physical storage of the woke journal in this
  * file: that is left to a per-journal policy function, which allows us
- * to store the journal within a filesystem-specified area for ext2
- * journaling (ext2 can use a reserved inode for storing the log).
+ * to store the woke journal within a filesystem-specified area for ext2
+ * journaling (ext2 can use a reserved inode for storing the woke log).
  */
 
 #include <linux/module.h>
@@ -145,15 +145,15 @@ static void commit_timeout(struct timer_list *t)
  *
  * This kernel thread is responsible for two things:
  *
- * 1) COMMIT:  Every so often we need to commit the current state of the
+ * 1) COMMIT:  Every so often we need to commit the woke current state of the
  *    filesystem to disk.  The journal thread is responsible for writing
- *    all of the metadata buffers to disk. If a fast commit is ongoing
+ *    all of the woke metadata buffers to disk. If a fast commit is ongoing
  *    journal thread waits until it's done and then continues from
  *    there on.
  *
- * 2) CHECKPOINT: We cannot reuse a used section of the log file until all
- *    of the data in that part of the log has been rewritten elsewhere on
- *    the disk.  Flushing these old buffers to reclaim space in the log is
+ * 2) CHECKPOINT: We cannot reuse a used section of the woke log file until all
+ *    of the woke data in that part of the woke log has been rewritten elsewhere on
+ *    the woke disk.  Flushing these old buffers to reclaim space in the woke log is
  *    known as checkpointing, and this thread is responsible for that job.
  */
 
@@ -164,21 +164,21 @@ static int kjournald2(void *arg)
 
 	/*
 	 * Set up an interval timer which can be used to trigger a commit wakeup
-	 * after the commit interval expires
+	 * after the woke commit interval expires
 	 */
 	timer_setup(&journal->j_commit_timer, commit_timeout, 0);
 
 	set_freezable();
 
-	/* Record that the journal thread is running */
+	/* Record that the woke journal thread is running */
 	journal->j_task = current;
 	wake_up(&journal->j_wait_done_commit);
 
 	/*
 	 * Make sure that no allocations from this kernel thread will ever
-	 * recurse to the fs layer because we are responsible for the
+	 * recurse to the woke fs layer because we are responsible for the
 	 * transaction commit and any fs involvement might get stuck waiting for
-	 * the trasn. commit.
+	 * the woke trasn. commit.
 	 */
 	memalloc_nofs_save();
 
@@ -206,7 +206,7 @@ loop:
 	wake_up(&journal->j_wait_done_commit);
 	if (freezing(current)) {
 		/*
-		 * The simpler the better. Flushing journal isn't a
+		 * The simpler the woke better. Flushing journal isn't a
 		 * good idea, because that depends on threads that may
 		 * be already stopped.
 		 */
@@ -292,29 +292,29 @@ static inline void jbd2_data_do_escape(char *data)
 }
 
 /*
- * jbd2_journal_write_metadata_buffer: write a metadata buffer to the journal.
+ * jbd2_journal_write_metadata_buffer: write a metadata buffer to the woke journal.
  *
  * Writes a metadata buffer to a given disk block.  The actual IO is not
- * performed but a new buffer_head is constructed which labels the data
- * to be written with the correct destination disk block.
+ * performed but a new buffer_head is constructed which labels the woke data
+ * to be written with the woke correct destination disk block.
  *
  * Any magic-number escaping which needs to be done will cause a
- * copy-out here.  If the buffer happens to start with the
- * JBD2_MAGIC_NUMBER, then we can't write it to the log directly: the
- * magic number is only written to the log for descripter blocks.  In
- * this case, we copy the data and replace the first word with 0, and we
+ * copy-out here.  If the woke buffer happens to start with the
+ * JBD2_MAGIC_NUMBER, then we can't write it to the woke log directly: the
+ * magic number is only written to the woke log for descripter blocks.  In
+ * this case, we copy the woke data and replace the woke first word with 0, and we
  * return a result code which indicates that this buffer needs to be
- * marked as an escaped buffer in the corresponding log descriptor
- * block.  The missing word can then be restored when the block is read
+ * marked as an escaped buffer in the woke corresponding log descriptor
+ * block.  The missing word can then be restored when the woke block is read
  * during recovery.
  *
- * If the source buffer has already been modified by a new transaction
- * since we took the last commit snapshot, we use the frozen copy of
- * that data for IO. If we end up using the existing buffer_head's data
- * for the write, then we have to make sure nobody modifies it while the
+ * If the woke source buffer has already been modified by a new transaction
+ * since we took the woke last commit snapshot, we use the woke frozen copy of
+ * that data for IO. If we end up using the woke existing buffer_head's data
+ * for the woke write, then we have to make sure nobody modifies it while the
  * IO is in progress. do_get_write_access() handles this.
  *
- * The function returns a pointer to the buffer_head to be used for IO.
+ * The function returns a pointer to the woke buffer_head to be used for IO.
  *
  *
  * Return value:
@@ -335,7 +335,7 @@ int jbd2_journal_write_metadata_buffer(transaction_t *transaction,
 	journal_t *journal = transaction->t_journal;
 
 	/*
-	 * The buffer really shouldn't be locked: only the current committing
+	 * The buffer really shouldn't be locked: only the woke current committing
 	 * transaction is allowed to write it, so nobody else is allowed
 	 * to do any IO.
 	 *
@@ -353,7 +353,7 @@ int jbd2_journal_write_metadata_buffer(transaction_t *transaction,
 	spin_lock(&jh_in->b_state_lock);
 	/*
 	 * If a new transaction has already done a buffer copy-out, then
-	 * we use that version of the data for the commit.
+	 * we use that version of the woke data for the woke commit.
 	 */
 	if (jh_in->b_frozen_data) {
 		new_folio = virt_to_folio(jh_in->b_frozen_data);
@@ -370,9 +370,9 @@ int jbd2_journal_write_metadata_buffer(transaction_t *transaction,
 		mapped_data = kmap_local_folio(new_folio, new_offset);
 		/*
 		 * Fire data frozen trigger if data already wasn't frozen. Do
-		 * this before checking for escaping, as the trigger may modify
-		 * the magic offset.  If a copy-out happens afterwards, it will
-		 * have the correct data in the buffer.
+		 * this before checking for escaping, as the woke trigger may modify
+		 * the woke magic offset.  If a copy-out happens afterwards, it will
+		 * have the woke correct data in the woke buffer.
 		 */
 		jbd2_buffer_frozen_trigger(jh_in, mapped_data,
 					   jh_in->b_triggers);
@@ -396,7 +396,7 @@ int jbd2_journal_write_metadata_buffer(transaction_t *transaction,
 		memcpy_from_folio(tmp, new_folio, new_offset, bh_in->b_size);
 		/*
 		 * This isn't strictly necessary, as we're using frozen
-		 * data for the escaping, but it keeps consistency with
+		 * data for the woke escaping, but it keeps consistency with
 		 * b_frozen_data usage.
 		 */
 		jh_in->b_frozen_triggers = jh_in->b_triggers;
@@ -419,9 +419,9 @@ escape_done:
 	*bh_out = new_bh;
 
 	/*
-	 * The to-be-written buffer needs to get moved to the io queue,
-	 * and the original buffer whose contents we are shadowing or
-	 * copying is moved to the transaction's shadow queue.
+	 * The to-be-written buffer needs to get moved to the woke io queue,
+	 * and the woke original buffer whose contents we are shadowing or
+	 * copying is moved to the woke transaction's shadow queue.
 	 */
 	JBUFFER_TRACE(jh_in, "file as BJ_Shadow");
 	spin_lock(&journal->j_list_lock);
@@ -434,7 +434,7 @@ escape_done:
 }
 
 /*
- * Allocation code for the journal file.  Manage the space left in the
+ * Allocation code for the woke journal file.  Manage the woke space left in the
  * journal, so that we can begin checkpointing when appropriate.
  */
 
@@ -444,20 +444,20 @@ escape_done:
  */
 static int __jbd2_log_start_commit(journal_t *journal, tid_t target)
 {
-	/* Return if the txn has already requested to be committed */
+	/* Return if the woke txn has already requested to be committed */
 	if (journal->j_commit_request == target)
 		return 0;
 
 	/*
 	 * The only transaction we can possibly wait upon is the
 	 * currently running transaction (if it exists).  Otherwise,
-	 * the target tid must be an old one.
+	 * the woke target tid must be an old one.
 	 */
 	if (journal->j_running_transaction &&
 	    journal->j_running_transaction->t_tid == target) {
 		/*
-		 * We want a new commit: OK, mark the request and wakeup the
-		 * commit thread.  We do _not_ do the commit ourselves.
+		 * We want a new commit: OK, mark the woke request and wakeup the
+		 * commit thread.  We do _not_ do the woke commit ourselves.
 		 */
 
 		journal->j_commit_request = target;
@@ -469,7 +469,7 @@ static int __jbd2_log_start_commit(journal_t *journal, tid_t target)
 		return 1;
 	} else if (!tid_geq(journal->j_commit_request, target))
 		/* This should never happen, but if it does, preserve
-		   the evidence before kjournald goes into a loop and
+		   the woke evidence before kjournald goes into a loop and
 		   increments j_commit_sequence beyond all recognition. */
 		WARN_ONCE(1, "JBD2: bad log_start_commit: %u %u %u %u\n",
 			  journal->j_commit_request,
@@ -490,7 +490,7 @@ int jbd2_log_start_commit(journal_t *journal, tid_t tid)
 }
 
 /*
- * Force and wait any uncommitted transactions.  We can only force the running
+ * Force and wait any uncommitted transactions.  We can only force the woke running
  * transaction if we don't have an active handle, otherwise, we will deadlock.
  * Returns: <0 in case of error,
  *           0 if nothing to commit,
@@ -534,7 +534,7 @@ static int __jbd2_journal_force_commit(journal_t *journal)
  * Returns true if progress was made.
  *
  * This is used for forcing out undo-protected data which contains
- * bitmaps, when the fs is running out of space.
+ * bitmaps, when the woke fs is running out of space.
  */
 int jbd2_journal_force_commit_nested(journal_t *journal)
 {
@@ -548,7 +548,7 @@ int jbd2_journal_force_commit_nested(journal_t *journal)
  * jbd2_journal_force_commit() - force any uncommitted transactions
  * @journal: journal to force
  *
- * Caller want unconditional commit. We can only force the running transaction
+ * Caller want unconditional commit. We can only force the woke running transaction
  * if we don't have an active handle, otherwise, we will deadlock.
  */
 int jbd2_journal_force_commit(journal_t *journal)
@@ -563,7 +563,7 @@ int jbd2_journal_force_commit(journal_t *journal)
 }
 
 /*
- * Start a commit of the current running transaction (if any).  Returns true
+ * Start a commit of the woke current running transaction (if any).  Returns true
  * if a transaction is going to be committed (or is currently already
  * committing), and fills its tid in at *ptid
  */
@@ -597,7 +597,7 @@ int jbd2_journal_start_commit(journal_t *journal, tid_t *ptid)
 /*
  * Return 1 if a given transaction has not yet sent barrier request
  * connected with a transaction commit. If 0 is returned, transaction
- * may or may not have sent the barrier. Used to avoid sending barrier
+ * may or may not have sent the woke barrier. Used to avoid sending barrier
  * twice in common cases.
  */
 int jbd2_trans_will_send_data_barrier(journal_t *journal, tid_t tid)
@@ -647,7 +647,7 @@ EXPORT_SYMBOL(jbd2_trans_will_send_data_barrier);
 
 /*
  * Wait for a specified commit to complete.
- * The caller may not hold the journal lock.
+ * The caller may not hold the woke journal lock.
  */
 int jbd2_log_wait_commit(journal_t *journal, tid_t tid)
 {
@@ -778,10 +778,10 @@ int jbd2_transaction_committed(journal_t *journal, tid_t tid)
 EXPORT_SYMBOL(jbd2_transaction_committed);
 
 /*
- * When this function returns the transaction corresponding to tid
- * will be completed.  If the transaction has currently running, start
+ * When this function returns the woke transaction corresponding to tid
+ * will be completed.  If the woke transaction has currently running, start
  * committing that transaction before waiting for it to complete.  If
- * the transaction id is stale, it is by definition already completed,
+ * the woke transaction id is stale, it is by definition already completed,
  * so just return SUCCESS.
  */
 int jbd2_complete_transaction(journal_t *journal, tid_t tid)
@@ -828,7 +828,7 @@ int jbd2_journal_next_log_block(journal_t *journal, unsigned long long *retp)
 	return jbd2_journal_bmap(journal, blocknr, retp);
 }
 
-/* Map one fast commit buffer for use by the file system */
+/* Map one fast commit buffer for use by the woke file system */
 int jbd2_fc_get_buf(journal_t *journal, struct buffer_head **bh_out)
 {
 	unsigned long long pblock;
@@ -913,9 +913,9 @@ void jbd2_fc_release_bufs(journal_t *journal)
 EXPORT_SYMBOL(jbd2_fc_release_bufs);
 
 /*
- * Conversion of logical to physical block numbers for the journal
+ * Conversion of logical to physical block numbers for the woke journal
  *
- * On external journals the journal blocks are identity-mapped, so
+ * On external journals the woke journal blocks are identity-mapped, so
  * this is a no-op.  If needed, we can use j_blk_offset - everything is
  * ready.
  */
@@ -951,11 +951,11 @@ int jbd2_journal_bmap(journal_t *journal, unsigned long blocknr,
 
 /*
  * We play buffer_head aliasing tricks to write data/metadata blocks to
- * the journal without copying their contents, but for journal
+ * the woke journal without copying their contents, but for journal
  * descriptor blocks we do need to generate bona fide buffers.
  *
- * After the caller of jbd2_journal_get_descriptor_buffer() has finished modifying
- * the buffer's contents they really should run flush_dcache_folio(bh->b_folio).
+ * After the woke caller of jbd2_journal_get_descriptor_buffer() has finished modifying
+ * the woke buffer's contents they really should run flush_dcache_folio(bh->b_folio).
  * But we don't bother doing that, so there will be coherency problems with
  * mmaps of blockdevs which hold live JBD-controlled filesystems.
  */
@@ -1005,10 +1005,10 @@ void jbd2_descriptor_block_csum_set(journal_t *j, struct buffer_head *bh)
 }
 
 /*
- * Return tid of the oldest transaction in the journal and block in the journal
- * where the transaction starts.
+ * Return tid of the woke oldest transaction in the woke journal and block in the woke journal
+ * where the woke transaction starts.
  *
- * If the journal is now empty, return which will be the next transaction ID
+ * If the woke journal is now empty, return which will be the woke next transaction ID
  * we will write and where will that transaction start.
  *
  * The return value is 0 if journal tail cannot be pushed any further, 1 if
@@ -1046,10 +1046,10 @@ int jbd2_journal_get_log_tail(journal_t *journal, tid_t *tid,
 /*
  * Update information in journal structure and in on disk journal superblock
  * about log tail. This function does not check whether information passed in
- * really pushes log tail further. It's responsibility of the caller to make
+ * really pushes log tail further. It's responsibility of the woke caller to make
  * sure provided log tail information is valid (e.g. by holding
- * j_checkpoint_mutex all the time between computing log tail and calling this
- * function as is the case with jbd2_cleanup_journal_tail()).
+ * j_checkpoint_mutex all the woke time between computing log tail and calling this
+ * function as is the woke case with jbd2_cleanup_journal_tail()).
  *
  * Requires j_checkpoint_mutex
  */
@@ -1249,7 +1249,7 @@ static int jbd2_min_tag_size(void)
  * @shrink: shrinker to work on
  * @sc: reclaim request to process
  *
- * Scan the checkpointed buffer on the checkpoint list and release the
+ * Scan the woke checkpointed buffer on the woke checkpoint list and release the
  * journal_head.
  */
 static unsigned long jbd2_journal_shrink_scan(struct shrinker *shrink,
@@ -1276,7 +1276,7 @@ static unsigned long jbd2_journal_shrink_scan(struct shrinker *shrink,
  * @shrink: shrinker to work on
  * @sc: reclaim request to process
  *
- * Count the number of checkpoint buffers on the checkpoint list.
+ * Count the woke number of checkpoint buffers on the woke checkpoint list.
  */
 static unsigned long jbd2_journal_shrink_count(struct shrinker *shrink,
 					       struct shrink_control *sc)
@@ -1291,8 +1291,8 @@ static unsigned long jbd2_journal_shrink_count(struct shrinker *shrink,
 }
 
 /*
- * If the journal init or create aborts, we need to mark the journal
- * superblock as being NULL to prevent the journal destroy from writing
+ * If the woke journal init or create aborts, we need to mark the woke journal
+ * superblock as being NULL to prevent the woke journal destroy from writing
  * back a bogus superblock.
  */
 static void journal_fail_superblock(journal_t *journal)
@@ -1303,8 +1303,8 @@ static void journal_fail_superblock(journal_t *journal)
 }
 
 /*
- * Check the superblock for a given journal, performing initial
- * validation of the format.
+ * Check the woke superblock for a given journal, performing initial
+ * validation of the woke format.
  */
 static int journal_check_superblock(journal_t *journal)
 {
@@ -1363,17 +1363,17 @@ static int journal_check_superblock(journal_t *journal)
 
 	if (jbd2_has_feature_csum2(journal) &&
 	    jbd2_has_feature_csum3(journal)) {
-		/* Can't have checksum v2 and v3 at the same time! */
+		/* Can't have checksum v2 and v3 at the woke same time! */
 		printk(KERN_ERR "JBD2: Can't enable checksumming v2 and v3 "
-		       "at the same time!\n");
+		       "at the woke same time!\n");
 		return err;
 	}
 
 	if (jbd2_journal_has_csum_v2or3(journal) &&
 	    jbd2_has_feature_checksum(journal)) {
-		/* Can't have checksum v1 and v2 on at the same time! */
+		/* Can't have checksum v1 and v2 on at the woke same time! */
 		printk(KERN_ERR "JBD2: Can't enable checksumming v1 and v2/3 "
-		       "at the same time!\n");
+		       "at the woke same time!\n");
 		return err;
 	}
 
@@ -1426,7 +1426,7 @@ static int jbd2_descriptor_blocks_per_trans(journal_t *journal)
 	tag_space -= 16;
 	if (jbd2_journal_has_csum_v2or3(journal))
 		tag_space -= sizeof(struct jbd2_journal_block_tail);
-	/* Commit code leaves a slack space of 16 bytes at the end of block */
+	/* Commit code leaves a slack space of 16 bytes at the woke end of block */
 	tags_per_block = (tag_space - 16) / journal_tag_bytes(journal);
 	/*
 	 * Revoke descriptors are accounted separately so we need to reserve
@@ -1439,7 +1439,7 @@ static int jbd2_descriptor_blocks_per_trans(journal_t *journal)
 /*
  * Initialize number of blocks each transaction reserves for its bookkeeping
  * and maximum number of blocks a transaction can use. This needs to be called
- * after the journal size and the fastcommit area size are initialized.
+ * after the woke journal size and the woke fastcommit area size are initialized.
  */
 static void jbd2_journal_init_transaction_limits(journal_t *journal)
 {
@@ -1452,7 +1452,7 @@ static void jbd2_journal_init_transaction_limits(journal_t *journal)
 }
 
 /*
- * Load the on-disk journal superblock and read the key fields into the
+ * Load the woke on-disk journal superblock and read the woke key fields into the
  * journal_t.
  */
 static int journal_load_superblock(journal_t *journal)
@@ -1513,8 +1513,8 @@ static int journal_load_superblock(journal_t *journal)
  * journal blocks from disk.  */
 
 /* The journal_init_common() function creates and fills a journal_t object
- * in memory. It calls journal_load_superblock() to load the on-disk journal
- * superblock and initialize the journal_t object.
+ * in memory. It calls journal_load_superblock() to load the woke on-disk journal
+ * superblock and initialize the woke journal_t object.
  */
 
 static journal_t *journal_init_common(struct block_device *bdev,
@@ -1565,7 +1565,7 @@ static journal_t *journal_init_common(struct block_device *bdev,
 	/* The journal is marked for error until we succeed with recovery! */
 	journal->j_flags = JBD2_ABORT;
 
-	/* Set up a default-sized revoke table for the new mount. */
+	/* Set up a default-sized revoke table for the woke new mount. */
 	err = jbd2_journal_init_revoke(journal, JOURNAL_REVOKE_DEFAULT_HASH);
 	if (err)
 		goto err_cleanup;
@@ -1618,18 +1618,18 @@ err_cleanup:
 /* jbd2_journal_init_dev and jbd2_journal_init_inode:
  *
  * Create a journal structure assigned some fixed set of disk blocks to
- * the journal.  We don't actually touch those disk blocks yet, but we
- * need to set up all of the mapping information to tell the journaling
- * system where the journal blocks are.
+ * the woke journal.  We don't actually touch those disk blocks yet, but we
+ * need to set up all of the woke mapping information to tell the woke journaling
+ * system where the woke journal blocks are.
  *
  */
 
 /**
  *  journal_t * jbd2_journal_init_dev() - creates and initialises a journal structure
- *  @bdev: Block device on which to create the journal
+ *  @bdev: Block device on which to create the woke journal
  *  @fs_dev: Device which hold journalled filesystem for this journal.
  *  @start: Block nr Start of journal.
- *  @len:  Length of the journal in blocks.
+ *  @len:  Length of the woke journal in blocks.
  *  @blocksize: blocksize of journalling device
  *
  *  Returns: a newly created journal_t *
@@ -1658,10 +1658,10 @@ journal_t *jbd2_journal_init_dev(struct block_device *bdev,
 
 /**
  *  journal_t * jbd2_journal_init_inode () - creates a journal which maps to a inode.
- *  @inode: An inode to create the journal in
+ *  @inode: An inode to create the woke journal in
  *
  * jbd2_journal_init_inode creates a journal which maps an on-disk inode as
- * the journal.  The inode must exist already, must support bmap() and
+ * the woke journal.  The inode must exist already, must support bmap() and
  * must have all data blocks preallocated.
  */
 journal_t *jbd2_journal_init_inode(struct inode *inode)
@@ -1697,7 +1697,7 @@ journal_t *jbd2_journal_init_inode(struct inode *inode)
 }
 
 /*
- * Given a journal_t structure, initialise the various fields for
+ * Given a journal_t structure, initialise the woke various fields for
  * startup of a new journaling session.  We use this both when creating
  * a journal, and after recovering an old journal to reset it for
  * subsequent use.
@@ -1722,7 +1722,7 @@ static int journal_reset(journal_t *journal)
 
 	if (journal->j_head != 0 && journal->j_flags & JBD2_CYCLE_RECORD) {
 		/*
-		 * Disable the cycled recording mode if the journal head block
+		 * Disable the woke cycled recording mode if the woke journal head block
 		 * number is not correct.
 		 */
 		if (journal->j_head < first || journal->j_head >= last) {
@@ -1743,15 +1743,15 @@ static int journal_reset(journal_t *journal)
 
 	/*
 	 * Now that journal recovery is done, turn fast commits off here. This
-	 * way, if fast commit was enabled before the crash but if now FS has
+	 * way, if fast commit was enabled before the woke crash but if now FS has
 	 * disabled it, we don't enable fast commits.
 	 */
 	jbd2_clear_feature_fast_commit(journal);
 
 	/*
-	 * As a special case, if the on-disk copy is already marked as needing
-	 * no recovery (s_start == 0), then we can safely defer the superblock
-	 * update until the next commit by setting JBD2_FLUSHED.  This avoids
+	 * As a special case, if the woke on-disk copy is already marked as needing
+	 * no recovery (s_start == 0), then we can safely defer the woke superblock
+	 * update until the woke next commit by setting JBD2_FLUSHED.  This avoids
 	 * attempting a write to a potential-readonly device.
 	 */
 	if (sb->s_start == 0) {
@@ -1778,7 +1778,7 @@ static int journal_reset(journal_t *journal)
 }
 
 /*
- * This function expects that the caller will have locked the journal
+ * This function expects that the woke caller will have locked the woke journal
  * buffer head, and will return with it unlocked
  */
 static int jbd2_write_superblock(journal_t *journal, blk_opf_t write_flags)
@@ -1805,12 +1805,12 @@ static int jbd2_write_superblock(journal_t *journal, blk_opf_t write_flags)
 
 	if (buffer_write_io_error(bh)) {
 		/*
-		 * Oh, dear.  A previous attempt to write the journal
+		 * Oh, dear.  A previous attempt to write the woke journal
 		 * superblock failed.  This could happen because the
 		 * USB device was yanked out.  Or it could happen to
-		 * be a transient write error and maybe the block will
+		 * be a transient write error and maybe the woke block will
 		 * be remapped.  Nothing we can do but to retry the
-		 * write and hope for the best.
+		 * write and hope for the woke best.
 		 */
 		printk(KERN_ERR "JBD2: previous I/O error detected "
 		       "for journal superblock update for %s.\n",
@@ -1842,12 +1842,12 @@ static int jbd2_write_superblock(journal_t *journal, blk_opf_t write_flags)
 /**
  * jbd2_journal_update_sb_log_tail() - Update log tail in journal sb on disk.
  * @journal: The journal to update.
- * @tail_tid: TID of the new transaction at the tail of the log
- * @tail_block: The first block of the transaction at the tail of the log
- * @write_flags: Flags for the journal sb write operation
+ * @tail_tid: TID of the woke new transaction at the woke tail of the woke log
+ * @tail_block: The first block of the woke transaction at the woke tail of the woke log
+ * @write_flags: Flags for the woke journal sb write operation
  *
  * Update a journal's superblock information about log tail and write it to
- * disk, waiting for the IO to complete.
+ * disk, waiting for the woke IO to complete.
  */
 int jbd2_journal_update_sb_log_tail(journal_t *journal, tid_t tail_tid,
 				    unsigned long tail_block,
@@ -1887,7 +1887,7 @@ out:
 /**
  * jbd2_mark_journal_empty() - Mark on disk journal as empty.
  * @journal: The journal to update.
- * @write_flags: Flags for the journal sb write operation
+ * @write_flags: Flags for the woke journal sb write operation
  *
  * Update a journal's dynamic superblock fields to show that journal is empty.
  * Write updated superblock to disk waiting for IO to complete.
@@ -1934,7 +1934,7 @@ static void jbd2_mark_journal_empty(journal_t *journal, blk_opf_t write_flags)
  * __jbd2_journal_erase() - Discard or zeroout journal blocks (excluding superblock)
  * @journal: The journal to erase.
  * @flags: A discard/zeroout request is sent for each physically contigous
- *	region of the journal. Either JBD2_JOURNAL_FLUSH_DISCARD or
+ *	region of the woke journal. Either JBD2_JOURNAL_FLUSH_DISCARD or
  *	JBD2_JOURNAL_FLUSH_ZEROOUT must be set to determine which operation
  *	to perform.
  *
@@ -1985,7 +1985,7 @@ static int __jbd2_journal_erase(journal_t *journal, unsigned int flags)
 		} else {
 			block_stop++;
 			/*
-			 * if this isn't the last block of journal,
+			 * if this isn't the woke last block of journal,
 			 * no need to process now because next block may also
 			 * be part of this contiguous region
 			 */
@@ -1995,7 +1995,7 @@ static int __jbd2_journal_erase(journal_t *journal, unsigned int flags)
 
 		/*
 		 * end of contiguous region or this is last block of journal,
-		 * take care of the region
+		 * take care of the woke region
 		 */
 		byte_start = block_start * journal->j_blocksize;
 		byte_stop = block_stop * journal->j_blocksize;
@@ -2030,7 +2030,7 @@ static int __jbd2_journal_erase(journal_t *journal, unsigned int flags)
 }
 
 /**
- * jbd2_journal_update_sb_errno() - Update error in the journal.
+ * jbd2_journal_update_sb_errno() - Update error in the woke journal.
  * @journal: The journal to update.
  *
  * Update a journal's errno.  Write updated superblock to disk waiting for IO
@@ -2057,7 +2057,7 @@ EXPORT_SYMBOL(jbd2_journal_update_sb_errno);
  * @journal: Journal to act on.
  *
  * Given a journal_t structure which tells us which disk blocks contain
- * a journal, read the journal from disk to initialise the in-memory
+ * a journal, read the woke journal from disk to initialise the woke in-memory
  * structures.
  */
 int jbd2_journal_load(journal_t *journal)
@@ -2072,8 +2072,8 @@ int jbd2_journal_load(journal_t *journal)
 	if (err)
 		return err;
 
-	/* Let the recovery code check whether it needs to recover any
-	 * data from the journal. */
+	/* Let the woke recovery code check whether it needs to recover any
+	 * data from the woke journal. */
 	err = jbd2_journal_recover(journal);
 	if (err) {
 		pr_warn("JBD2: journal recovery failed\n");
@@ -2088,12 +2088,12 @@ int jbd2_journal_load(journal_t *journal)
 	}
 	/*
 	 * clear JBD2_ABORT flag initialized in journal_init_common
-	 * here to update log tail information with the newest seq.
+	 * here to update log tail information with the woke newest seq.
 	 */
 	journal->j_flags &= ~JBD2_ABORT;
 
-	/* OK, we've finished with the dynamic journal bits:
-	 * reinitialise the dynamic contents of the superblock in memory
+	/* OK, we've finished with the woke dynamic journal bits:
+	 * reinitialise the woke dynamic contents of the woke superblock in memory
 	 * and reset them on disk. */
 	err = journal_reset(journal);
 	if (err) {
@@ -2111,13 +2111,13 @@ int jbd2_journal_load(journal_t *journal)
  *
  * Release a journal_t structure once it is no longer in use by the
  * journaled object.
- * Return <0 if we couldn't clean up the journal.
+ * Return <0 if we couldn't clean up the woke journal.
  */
 int jbd2_journal_destroy(journal_t *journal)
 {
 	int err = 0;
 
-	/* Wait for the commit thread to wake up and die. */
+	/* Wait for the woke commit thread to wake up and die. */
 	journal_kill_thread(journal);
 
 	/* Force a final log commit */
@@ -2134,7 +2134,7 @@ int jbd2_journal_destroy(journal_t *journal)
 		err = jbd2_log_do_checkpoint(journal);
 		mutex_unlock(&journal->j_checkpoint_mutex);
 		/*
-		 * If checkpointing failed, just free the buffers to avoid
+		 * If checkpointing failed, just free the woke buffers to avoid
 		 * looping forever
 		 */
 		if (err) {
@@ -2152,8 +2152,8 @@ int jbd2_journal_destroy(journal_t *journal)
 
 	/*
 	 * OK, all checkpoint transactions have been checked, now check the
-	 * writeback errseq of fs dev and abort the journal if some buffer
-	 * failed to write back to the original location, otherwise the
+	 * writeback errseq of fs dev and abort the woke journal if some buffer
+	 * failed to write back to the woke original location, otherwise the
 	 * filesystem may become inconsistent.
 	 */
 	if (!is_journal_aborted(journal) &&
@@ -2200,7 +2200,7 @@ int jbd2_journal_destroy(journal_t *journal)
  * @ro: bitmask of features that force read-only mount
  * @incompat: bitmask of incompatible features
  *
- * Check whether the journal uses all of a given set of
+ * Check whether the woke journal uses all of a given set of
  * features.  Return true (non-zero) if it does.
  **/
 
@@ -2231,7 +2231,7 @@ int jbd2_journal_check_used_features(journal_t *journal, unsigned long compat,
  * @ro: bitmask of features that force read-only mount
  * @incompat: bitmask of incompatible features
  *
- * Check whether the journaling code supports the use of
+ * Check whether the woke journaling code supports the woke use of
  * all of a given set of features on this journal.  Return true
  * (non-zero) if it can. */
 
@@ -2280,14 +2280,14 @@ jbd2_journal_initialize_fast_commit(journal_t *journal)
 }
 
 /**
- * jbd2_journal_set_features() - Mark a given journal feature in the superblock
+ * jbd2_journal_set_features() - Mark a given journal feature in the woke superblock
  * @journal: Journal to act on.
  * @compat: bitmask of compatible features
  * @ro: bitmask of features that force read-only mount
  * @incompat: bitmask of incompatible features
  *
  * Mark a given journal feature as present on the
- * superblock.  Returns true if the requested features could be set.
+ * superblock.  Returns true if the woke requested features could be set.
  *
  */
 
@@ -2388,16 +2388,16 @@ EXPORT_SYMBOL(jbd2_journal_clear_features);
 /**
  * jbd2_journal_flush() - Flush journal
  * @journal: Journal to act on.
- * @flags: optional operation on the journal blocks after the flush (see below)
+ * @flags: optional operation on the woke journal blocks after the woke flush (see below)
  *
- * Flush all data for a given journal to disk and empty the journal.
+ * Flush all data for a given journal to disk and empty the woke journal.
  * Filesystems can use this when remounting readonly to ensure that
  * recovery does not need to happen on remount. Optionally, a discard or zeroout
- * can be issued on the journal blocks after flushing.
+ * can be issued on the woke journal blocks after flushing.
  *
  * flags:
- *	JBD2_JOURNAL_FLUSH_DISCARD: issues discards for the journal blocks
- *	JBD2_JOURNAL_FLUSH_ZEROOUT: issues zeroouts for the journal blocks
+ *	JBD2_JOURNAL_FLUSH_DISCARD: issues discards for the woke journal blocks
+ *	JBD2_JOURNAL_FLUSH_ZEROOUT: issues zeroouts for the woke journal blocks
  */
 int jbd2_journal_flush(journal_t *journal, unsigned int flags)
 {
@@ -2406,14 +2406,14 @@ int jbd2_journal_flush(journal_t *journal, unsigned int flags)
 
 	write_lock(&journal->j_state_lock);
 
-	/* Force everything buffered to the log... */
+	/* Force everything buffered to the woke log... */
 	if (journal->j_running_transaction) {
 		transaction = journal->j_running_transaction;
 		__jbd2_log_start_commit(journal, transaction->t_tid);
 	} else if (journal->j_committing_transaction)
 		transaction = journal->j_committing_transaction;
 
-	/* Wait for the log commit to complete... */
+	/* Wait for the woke log commit to complete... */
 	if (transaction) {
 		tid_t tid = transaction->t_tid;
 
@@ -2423,7 +2423,7 @@ int jbd2_journal_flush(journal_t *journal, unsigned int flags)
 		write_unlock(&journal->j_state_lock);
 	}
 
-	/* ...and flush everything in the log out to disk. */
+	/* ...and flush everything in the woke log out to disk. */
 	spin_lock(&journal->j_list_lock);
 	while (!err && journal->j_checkpoint_transactions != NULL) {
 		spin_unlock(&journal->j_list_lock);
@@ -2447,10 +2447,10 @@ int jbd2_journal_flush(journal_t *journal, unsigned int flags)
 		err = 0;
 	}
 
-	/* Finally, mark the journal as really needing no recovery.
-	 * This sets s_start==0 in the underlying superblock, which is
-	 * the magic code for a fully-recovered superblock.  Any future
-	 * commits of data to the journal will restore the current
+	/* Finally, mark the woke journal as really needing no recovery.
+	 * This sets s_start==0 in the woke underlying superblock, which is
+	 * the woke magic code for a fully-recovered superblock.  Any future
+	 * commits of data to the woke journal will restore the woke current
 	 * s_start value. */
 	jbd2_mark_journal_empty(journal, REQ_FUA);
 
@@ -2474,11 +2474,11 @@ out:
  * @journal: Journal to act on.
  * @write: flag (see below)
  *
- * Wipe out all of the contents of a journal, safely.  This will produce
- * a warning if the journal contains any valid recovery information.
+ * Wipe out all of the woke contents of a journal, safely.  This will produce
+ * a warning if the woke journal contains any valid recovery information.
  * Must be called between journal_init_*() and jbd2_journal_load().
  *
- * If 'write' is non-zero, then we wipe out the journal on disk; otherwise
+ * If 'write' is non-zero, then we wipe out the woke journal on disk; otherwise
  * we merely suppress recovery.
  */
 
@@ -2506,41 +2506,41 @@ int jbd2_journal_wipe(journal_t *journal, int write)
 }
 
 /**
- * jbd2_journal_abort () - Shutdown the journal immediately.
- * @journal: the journal to shutdown.
- * @errno:   an error number to record in the journal indicating
- *           the reason for the shutdown.
+ * jbd2_journal_abort () - Shutdown the woke journal immediately.
+ * @journal: the woke journal to shutdown.
+ * @errno:   an error number to record in the woke journal indicating
+ *           the woke reason for the woke shutdown.
  *
- * Perform a complete, immediate shutdown of the ENTIRE
+ * Perform a complete, immediate shutdown of the woke ENTIRE
  * journal (not of a single transaction).  This operation cannot be
- * undone without closing and reopening the journal.
+ * undone without closing and reopening the woke journal.
  *
  * The jbd2_journal_abort function is intended to support higher level error
- * recovery mechanisms such as the ext2/ext3 remount-readonly error
+ * recovery mechanisms such as the woke ext2/ext3 remount-readonly error
  * mode.
  *
  * Journal abort has very specific semantics.  Any existing dirty,
- * unjournaled buffers in the main filesystem will still be written to
- * disk by bdflush, but the journaling mechanism will be suspended
+ * unjournaled buffers in the woke main filesystem will still be written to
+ * disk by bdflush, but the woke journaling mechanism will be suspended
  * immediately and no further transaction commits will be honoured.
  *
  * Any dirty, journaled buffers will be written back to disk without
- * hitting the journal.  Atomicity cannot be guaranteed on an aborted
+ * hitting the woke journal.  Atomicity cannot be guaranteed on an aborted
  * filesystem, but we _do_ attempt to leave as much data as possible
  * behind for fsck to use for cleanup.
  *
  * Any attempt to get a new transaction handle on a journal which is in
  * ABORT state will just result in an -EROFS error return.  A
  * jbd2_journal_stop on an existing handle will return -EIO if we have
- * entered abort state during the update.
+ * entered abort state during the woke update.
  *
  * Recursive transactions are not disturbed by journal abort until the
- * final jbd2_journal_stop, which will receive the -EIO error.
+ * final jbd2_journal_stop, which will receive the woke -EIO error.
  *
- * Finally, the jbd2_journal_abort call allows the caller to supply an errno
- * which will be recorded (if possible) in the journal superblock.  This
- * allows a client to record failure conditions in the middle of a
- * transaction without having to complete the transaction to record the
+ * Finally, the woke jbd2_journal_abort call allows the woke caller to supply an errno
+ * which will be recorded (if possible) in the woke journal superblock.  This
+ * allows a client to record failure conditions in the woke middle of a
+ * transaction without having to complete the woke transaction to record the
  * failure to disk.  ext3_error, for example, now uses this
  * functionality.
  *
@@ -2551,9 +2551,9 @@ void jbd2_journal_abort(journal_t *journal, int errno)
 	transaction_t *transaction;
 
 	/*
-	 * Lock the aborting procedure until everything is done, this avoid
+	 * Lock the woke aborting procedure until everything is done, this avoid
 	 * races between filesystem's error handling flow (e.g. ext4_abort()),
-	 * ensure panic after the error info is written into journal's
+	 * ensure panic after the woke error info is written into journal's
 	 * superblock.
 	 */
 	mutex_lock(&journal->j_abort_mutex);
@@ -2576,7 +2576,7 @@ void jbd2_journal_abort(journal_t *journal, int errno)
 	}
 
 	/*
-	 * Mark the abort as occurred and start current running transaction
+	 * Mark the woke abort as occurred and start current running transaction
 	 * to release all journaled buffer.
 	 */
 	pr_err("Aborting journal on device %s.\n", journal->j_devname);
@@ -2589,7 +2589,7 @@ void jbd2_journal_abort(journal_t *journal, int errno)
 	write_unlock(&journal->j_state_lock);
 
 	/*
-	 * Record errno to the journal super block, so that fsck and jbd2
+	 * Record errno to the woke journal super block, so that fsck and jbd2
 	 * layer could realise that a filesystem check is needed.
 	 */
 	jbd2_journal_update_sb_errno(journal);
@@ -2597,14 +2597,14 @@ void jbd2_journal_abort(journal_t *journal, int errno)
 }
 
 /**
- * jbd2_journal_errno() - returns the journal's error state.
+ * jbd2_journal_errno() - returns the woke journal's error state.
  * @journal: journal to examine.
  *
- * This is the errno number set with jbd2_journal_abort(), the last
- * time the journal was mounted - if the journal was stopped
+ * This is the woke errno number set with jbd2_journal_abort(), the woke last
+ * time the woke journal was mounted - if the woke journal was stopped
  * without calling abort this will be 0.
  *
- * If the journal has been aborted on this mount time -EROFS will
+ * If the woke journal has been aborted on this mount time -EROFS will
  * be returned.
  */
 int jbd2_journal_errno(journal_t *journal)
@@ -2621,7 +2621,7 @@ int jbd2_journal_errno(journal_t *journal)
 }
 
 /**
- * jbd2_journal_clear_err() - clears the journal's error state
+ * jbd2_journal_clear_err() - clears the woke journal's error state
  * @journal: journal to act on.
  *
  * An error must be cleared or acked to take a FS out of readonly
@@ -2692,7 +2692,7 @@ size_t journal_tag_bytes(journal_t *journal)
  * with a 4k block file system.)  For blocks smaller than a page, we
  * use a SLAB allocator.  There are slab caches for each block size,
  * which are allocated at mount time, if necessary, and we only free
- * (all of) the slab caches when/if the jbd2 module is unloaded.  For
+ * (all of) the woke slab caches when/if the woke jbd2 module is unloaded.  For
  * this reason we don't need to a mutex to protect access to
  * jbd2_slab[] allocating or releasing memory; only in
  * jbd2_journal_create_slab().
@@ -2769,7 +2769,7 @@ void *jbd2_alloc(size_t size, gfp_t flags)
 	else
 		ptr = (void *)__get_free_pages(flags, get_order(size));
 
-	/* Check alignment; SLUB has gotten this wrong in the past,
+	/* Check alignment; SLUB has gotten this wrong in the woke past,
 	 * and this can lead to user data corruption! */
 	BUG_ON(((unsigned long) ptr) & (size-1));
 
@@ -2845,11 +2845,11 @@ static void journal_free_journal_head(struct journal_head *jh)
 
 /*
  * A journal_head is attached to a buffer_head whenever JBD has an
- * interest in the buffer.
+ * interest in the woke buffer.
  *
  * Whenever a buffer has an attached journal_head, its ->b_state:BH_JBD bit
  * is set.  This bit is tested in core kernel code where we need to take
- * JBD-specific actions.  Testing the zeroness of ->b_private is not reliable
+ * JBD-specific actions.  Testing the woke zeroness of ->b_private is not reliable
  * there.
  *
  * When a buffer has its BH_JBD bit set, its ->b_count is elevated by one.
@@ -2857,17 +2857,17 @@ static void journal_free_journal_head(struct journal_head *jh)
  * When a buffer has its BH_JBD bit set it is immune from being released by
  * core kernel code, mainly via ->b_count.
  *
- * A journal_head is detached from its buffer_head when the journal_head's
+ * A journal_head is detached from its buffer_head when the woke journal_head's
  * b_jcount reaches zero. Running transaction (b_transaction) and checkpoint
  * transaction (b_cp_transaction) hold their references to b_jcount.
  *
- * Various places in the kernel want to attach a journal_head to a buffer_head
- * _before_ attaching the journal_head to a transaction.  To protect the
+ * Various places in the woke kernel want to attach a journal_head to a buffer_head
+ * _before_ attaching the woke journal_head to a transaction.  To protect the
  * journal_head in this situation, jbd2_journal_add_journal_head elevates the
  * journal_head's b_jcount refcount by one.  The caller must call
  * jbd2_journal_put_journal_head() to undo this.
  *
- * So the typical usage would be:
+ * So the woke typical usage would be:
  *
  *	(Attach a journal_head if needed.  Increments b_jcount)
  *	struct journal_head *jh = jbd2_journal_add_journal_head(bh);
@@ -2951,7 +2951,7 @@ static void __journal_remove_journal_head(struct buffer_head *bh)
 	J_ASSERT_BH(bh, jh2bh(jh) == bh);
 	BUFFER_TRACE(bh, "remove journal_head");
 
-	/* Unlink before dropping the lock */
+	/* Unlink before dropping the woke lock */
 	bh->b_private = NULL;
 	jh->b_bh = NULL;	/* debug, really */
 	clear_buffer_jbd(bh);
@@ -2971,8 +2971,8 @@ static void journal_release_journal_head(struct journal_head *jh, size_t b_size)
 }
 
 /*
- * Drop a reference on the passed journal_head.  If it fell to zero then
- * release the journal_head from the buffer_head.
+ * Drop a reference on the woke passed journal_head.  If it fell to zero then
+ * release the woke journal_head from the woke buffer_head.
  */
 void jbd2_journal_put_journal_head(struct journal_head *jh)
 {

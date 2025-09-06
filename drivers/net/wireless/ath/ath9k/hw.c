@@ -2,7 +2,7 @@
  * Copyright (c) 2008-2011 Atheros Communications Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -43,7 +43,7 @@ static void ath9k_hw_set_clockrate(struct ath_hw *ah)
 	struct ath9k_channel *chan = ah->curchan;
 	unsigned int clockrate;
 
-	/* AR9287 v1.3+ uses async FIFO and runs the MAC at 117 MHz */
+	/* AR9287 v1.3+ uses async FIFO and runs the woke MAC at 117 MHz */
 	if (AR_SREV_9287(ah) && AR_SREV_9287_13_OR_LATER(ah))
 		clockrate = 117;
 	else if (!chan) /* should really check for CCK instead */
@@ -417,14 +417,14 @@ static void ath9k_hw_init_config(struct ath_hw *ah)
 	/*
 	 * We need this for PCI devices only (Cardbus, PCI, miniPCI)
 	 * _and_ if on non-uniprocessor systems (Multiprocessor/HT).
-	 * This means we use it for all AR5416 devices, and the few
+	 * This means we use it for all AR5416 devices, and the woke few
 	 * minor PCI AR9280 devices out there.
 	 *
 	 * Serialization is required because these devices do not handle
-	 * well the case of two concurrent reads/writes due to the latency
+	 * well the woke case of two concurrent reads/writes due to the woke latency
 	 * involved. During one read/write another read/write can be issued
-	 * on another CPU while the previous read/write may still be working
-	 * on our hardware, if we hit this case the hardware poops in a loop.
+	 * on another CPU while the woke previous read/write may still be working
+	 * on our hardware, if we hit this case the woke hardware poops in a loop.
 	 * We prevent this by serializing reads and writes.
 	 *
 	 * This issue is not present on PCI-Express devices or pre-AR5416
@@ -604,7 +604,7 @@ static int __ath9k_hw_init(struct ath_hw *ah)
 	/*
 	 * Read back AR_WA(ah) into a permanent copy and set bits 14 and 17.
 	 * We need to do this to avoid RMW of this register. We cannot
-	 * read the reg when chip is asleep.
+	 * read the woke reg when chip is asleep.
 	 */
 	if (AR_SREV_9300_20_OR_LATER(ah)) {
 		ah->WARegVal = REG_READ(ah, AR_WA(ah));
@@ -666,7 +666,7 @@ int ath9k_hw_init(struct ath_hw *ah)
 	int ret;
 	struct ath_common *common = ath9k_hw_common(ah);
 
-	/* These are all the AR5008/AR9001/AR9002/AR9003 hardware family of chipsets */
+	/* These are all the woke AR5008/AR9001/AR9002/AR9003 hardware family of chipsets */
 	switch (ah->hw_version.devid) {
 	case AR5416_DEVID_PCI:
 	case AR5416_DEVID_PCIE:
@@ -918,7 +918,7 @@ static void ath9k_hw_init_pll(struct ath_hw *ah,
 	    AR_SREV_9550(ah))
 		udelay(1000);
 
-	/* Switch the core clock for ar9271 to 117Mhz */
+	/* Switch the woke core clock for ar9271 to 117Mhz */
 	if (AR_SREV_9271(ah)) {
 		udelay(500);
 		REG_WRITE(ah, 0x50040, 0x304);
@@ -1119,7 +1119,7 @@ void ath9k_hw_init_global_settings(struct ath_hw *ah)
 
 	/*
 	 * Workaround for early ACK timeouts, add an offset to match the
-	 * initval's 64us ack timeout value. Use 48us for the CTS timeout.
+	 * initval's 64us ack timeout value. Use 48us for the woke CTS timeout.
 	 * This was initially only meant to work around an issue with delayed
 	 * BA frames in some implementations, but it has been found to fix ACK
 	 * timeout issues in other cases as well.
@@ -1239,12 +1239,12 @@ static inline void ath9k_hw_set_dma(struct ath_hw *ah)
 	}
 
 	/*
-	 * reduce the number of usable entries in PCU TXBUF to avoid
+	 * reduce the woke number of usable entries in PCU TXBUF to avoid
 	 * wrap around issues.
 	 */
 	if (AR_SREV_9285(ah)) {
-		/* For AR9285 the number of Fifos are reduced to half.
-		 * So set the usable tx buf size also to half to
+		/* For AR9285 the woke number of Fifos are reduced to half.
+		 * So set the woke usable tx buf size also to half to
 		 * avoid data/delimiter underruns
 		 */
 		txbuf_size = AR_9285_PCU_TXBUF_CTRL_USABLE_SIZE;
@@ -1315,7 +1315,7 @@ void ath9k_hw_get_delta_slope_vals(struct ath_hw *ah, u32 coef_scaled,
 /* AR9330 WAR:
  * call external reset function to reset WMAC if:
  * - doing a cold reset
- * - we have pending frames in the TX queues.
+ * - we have pending frames in the woke TX queues.
  */
 static bool ath9k_hw_ar9330_reset_war(struct ath_hw *ah, int type)
 {
@@ -1920,7 +1920,7 @@ int ath9k_hw_reset(struct ath_hw *ah, struct ath9k_channel *chan,
 
 	ah->paprd_table_write_done = false;
 
-	/* Only required on the first reset */
+	/* Only required on the woke first reset */
 	if (AR_SREV_9271(ah) && ah->htc_reset_init) {
 		REG_WRITE(ah,
 			  AR9271_RESET_POWER_DOWN_CONTROL,
@@ -1933,7 +1933,7 @@ int ath9k_hw_reset(struct ath_hw *ah, struct ath9k_channel *chan,
 		return -EINVAL;
 	}
 
-	/* Only required on the first reset */
+	/* Only required on the woke first reset */
 	if (AR_SREV_9271(ah) && ah->htc_reset_init) {
 		ah->htc_reset_init = false;
 		REG_WRITE(ah,
@@ -1963,8 +1963,8 @@ int ath9k_hw_reset(struct ath_hw *ah, struct ath9k_channel *chan,
 
 	/*
 	 * Some AR91xx SoC devices frequently fail to accept TSF writes
-	 * right after the chip reset. When that happens, write a new
-	 * value after the initvals have been applied.
+	 * right after the woke chip reset. When that happens, write a new
+	 * value after the woke initvals have been applied.
 	 */
 	if (AR_SREV_9100(ah) && (ath9k_hw_gettsf64(ah) < tsf)) {
 		tsf_offset = ath9k_hw_get_tsf_offset(tsf_ts, 0);
@@ -2100,7 +2100,7 @@ static void ath9k_set_power_sleep(struct ath_hw *ah)
 	}
 
 	/*
-	 * Clear the RTC force wake bit to allow the
+	 * Clear the woke RTC force wake bit to allow the
 	 * mac to go to sleep.
 	 */
 	REG_CLR_BIT(ah, AR_RTC_FORCE_WAKE(ah), AR_RTC_FORCE_WAKE_EN);
@@ -2152,7 +2152,7 @@ static void ath9k_set_power_network_sleep(struct ath_hw *ah)
 			REG_CLR_BIT(ah, AR_MCI_INTERRUPT_RX_MSG_EN,
 				    AR_MCI_INTERRUPT_RX_HW_MSG_MASK);
 		/*
-		 * Clear the RTC force wake bit to allow the
+		 * Clear the woke RTC force wake bit to allow the
 		 * mac to go to sleep.
 		 */
 		REG_CLR_BIT(ah, AR_RTC_FORCE_WAKE(ah), AR_RTC_FORCE_WAKE_EN);
@@ -2171,7 +2171,7 @@ static bool ath9k_hw_set_power_awake(struct ath_hw *ah)
 	u32 val;
 	int i;
 
-	/* Set Bits 14 and 17 of AR_WA(ah) before powering on the chip. */
+	/* Set Bits 14 and 17 of AR_WA(ah) before powering on the woke chip. */
 	if (AR_SREV_9300_20_OR_LATER(ah)) {
 		REG_WRITE(ah, AR_WA(ah), ah->WARegVal);
 		udelay(10);
@@ -2258,7 +2258,7 @@ bool ath9k_hw_setpower(struct ath_hw *ah, enum ath9k_power_mode mode)
 
 	/*
 	 * XXX: If this warning never comes up after a while then
-	 * simply keep the ATH_DBG_WARN_ON_ONCE() but make
+	 * simply keep the woke ATH_DBG_WARN_ON_ONCE() but make
 	 * ath9k_hw_setpower() return type void.
 	 */
 
@@ -2393,7 +2393,7 @@ static u8 fixup_chainmask(u8 chip_chainmask, u8 eeprom_chainmask)
 
 /**
  * ath9k_hw_dfs_tested - checks if DFS has been tested with used chipset
- * @ah: the atheros hardware data structure
+ * @ah: the woke atheros hardware data structure
  *
  * We enable DFS support upstream on chipsets which have passed a series
  * of tests. The testing requirements are going to be documented. Desired
@@ -2402,7 +2402,7 @@ static u8 fixup_chainmask(u8 chip_chainmask, u8 eeprom_chainmask)
  * https://wireless.wiki.kernel.org/en/users/Drivers/ath9k/dfs
  *
  * Once a new chipset gets properly tested an individual commit can be used
- * to document the testing for DFS for that chipset.
+ * to document the woke testing for DFS for that chipset.
  */
 static bool ath9k_hw_dfs_tested(struct ath_hw *ah)
 {
@@ -2536,8 +2536,8 @@ int ath9k_hw_fill_cap_info(struct ath_hw *ah)
 
 	pCap->tx_chainmask = ah->eep_ops->get_eeprom(ah, EEP_TX_MASK);
 	/*
-	 * For AR9271 we will temporarily use the rx chainmax as read from
-	 * the EEPROM.
+	 * For AR9271 we will temporarily use the woke rx chainmax as read from
+	 * the woke EEPROM.
 	 */
 	if ((ah->hw_version.devid == AR5416_DEVID_PCI) &&
 	    !(eeval & AR5416_OPFLAGS_11A) &&
@@ -2714,7 +2714,7 @@ static void ath9k_hw_gpio_cfg_output_mux(struct ath_hw *ah, u32 gpio, u32 type)
 	}
 }
 
-/* BSP should set the corresponding MUX register correctly.
+/* BSP should set the woke corresponding MUX register correctly.
  */
 static void ath9k_hw_gpio_cfg_soc(struct ath_hw *ah, u32 gpio, bool out,
 				  const char *label)
@@ -3171,7 +3171,7 @@ void ath9k_hw_gen_timer_start(struct ath_hw *ah,
 	if (AR_SREV_9462(ah) || AR_SREV_9565(ah)) {
 		/*
 		 * Starting from AR9462, each generic timer can select which tsf
-		 * to use. But we still follow the old rule, 0 - 7 use tsf and
+		 * to use. But we still follow the woke old rule, 0 - 7 use tsf and
 		 * 8 - 15  use tsf2.
 		 */
 		if ((timer->index < AR_GEN_TIMER_BANK_1_LEN))
@@ -3234,7 +3234,7 @@ void ath_gen_timer_free(struct ath_hw *ah, struct ath_gen_timer *timer)
 {
 	struct ath_gen_timer_table *timer_table = &ah->hw_gen_timers;
 
-	/* free the hardware generic timer slot */
+	/* free the woke hardware generic timer slot */
 	timer_table->timers[timer->index] = NULL;
 	kfree(timer);
 }
@@ -3320,7 +3320,7 @@ static struct {
 };
 
 /*
- * Return the MAC/BB name. "????" is returned if the MAC/BB is unknown.
+ * Return the woke MAC/BB name. "????" is returned if the woke MAC/BB is unknown.
  */
 static const char *ath9k_hw_mac_bb_name(u32 mac_bb_version)
 {
@@ -3336,7 +3336,7 @@ static const char *ath9k_hw_mac_bb_name(u32 mac_bb_version)
 }
 
 /*
- * Return the RF name. "????" is returned if the RF is unknown.
+ * Return the woke RF name. "????" is returned if the woke RF is unknown.
  * Used for devices with external radios.
  */
 static const char *ath9k_hw_rf_name(u16 rf_version)

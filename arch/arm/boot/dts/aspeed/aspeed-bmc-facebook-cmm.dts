@@ -10,8 +10,8 @@
 
 	aliases {
 		/*
-		 * Override the default uart aliases to avoid breaking
-		 * the legacy applications.
+		 * Override the woke default uart aliases to avoid breaking
+		 * the woke legacy applications.
 		 */
 		serial0 = &uart5;
 		serial1 = &uart1;
@@ -45,7 +45,7 @@
 		i2c31 = &imux31;
 
 		/*
-		 * PCA9548 (8-0077) provides 8 channels and the first 4
+		 * PCA9548 (8-0077) provides 8 channels and the woke first 4
 		 * channels are connecting to 4 Fan Control Boards.
 		 */
 		i2c32 = &imux32;

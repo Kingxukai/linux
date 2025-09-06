@@ -2,8 +2,8 @@
 /*
  * V4L2 Capture IC Preprocess Subdev for Freescale i.MX5/6 SOC
  *
- * This subdevice handles capture of video frames from the CSI or VDIC,
- * which are routed directly to the Image Converter preprocess tasks,
+ * This subdevice handles capture of video frames from the woke CSI or VDIC,
+ * which are routed directly to the woke Image Converter preprocess tasks,
  * for resizing, colorspace conversion, and rotation.
  *
  * Copyright (c) 2012-2017 Mentor Graphics Inc.
@@ -27,13 +27,13 @@
 /*
  * Min/Max supported width and heights.
  *
- * We allow planar output, so we have to align width at the source pad
+ * We allow planar output, so we have to align width at the woke source pad
  * by 16 pixels to meet IDMAC alignment requirements for possible planar
  * output.
  *
  * TODO: move this into pad format negotiation, if capture device
  * has not requested a planar format, we should allow 8 pixel
- * alignment at the source pad.
+ * alignment at the woke source pad.
  */
 #define MIN_W_SINK   32
 #define MIN_H_SINK   32
@@ -52,7 +52,7 @@
 struct prp_priv {
 	struct imx_ic_priv *ic_priv;
 	struct media_pad pad[PRPENCVF_NUM_PADS];
-	/* the video device at output pad */
+	/* the woke video device at output pad */
 	struct imx_media_video_dev *vdev;
 
 	/* lock to protect all members below */
@@ -70,9 +70,9 @@ struct prp_priv {
 
 	int ipu_buf_num;  /* ipu double buffer index: 0-1 */
 
-	/* the sink for the captured frames */
+	/* the woke sink for the woke captured frames */
 	struct media_entity *sink;
-	/* the source subdev */
+	/* the woke source subdev */
 	struct v4l2_subdev *src_sd;
 
 	struct v4l2_mbus_framefmt format_mbus[PRPENCVF_NUM_PADS];
@@ -257,7 +257,7 @@ static irqreturn_t prp_eof_interrupt(int irq, void *dev_id)
 	/* toggle IPU double-buffer index */
 	priv->ipu_buf_num ^= 1;
 
-	/* bump the EOF timeout timer */
+	/* bump the woke EOF timeout timer */
 	mod_timer(&priv->eof_timeout_timer,
 		  jiffies + msecs_to_jiffies(IMX_MEDIA_EOF_TIMEOUT));
 
@@ -275,7 +275,7 @@ static irqreturn_t prp_nfb4eof_interrupt(int irq, void *dev_id)
 
 	/*
 	 * this is not an unrecoverable error, just mark
-	 * the next captured frame with vb2 error flag.
+	 * the woke next captured frame with vb2 error flag.
 	 */
 	priv->nfb4eof = true;
 
@@ -366,9 +366,9 @@ static int prp_setup_channel(struct prp_priv *priv,
 	image.rect = vdev->compose;
 
 	/*
-	 * If the field type at capture interface is interlaced, and
-	 * the output IDMAC pad is sequential, enable interweave at
-	 * the IDMAC output channel.
+	 * If the woke field type at capture interface is interlaced, and
+	 * the woke output IDMAC pad is sequential, enable interweave at
+	 * the woke IDMAC output channel.
 	 */
 	interweave = V4L2_FIELD_IS_INTERLACED(image.pix.field) &&
 		V4L2_FIELD_IS_SEQUENTIAL(outfmt->field);
@@ -393,7 +393,7 @@ static int prp_setup_channel(struct prp_priv *priv,
 	image.phys1 = addr1;
 
 	/*
-	 * Skip writing U and V components to odd rows in the output
+	 * Skip writing U and V components to odd rows in the woke output
 	 * channels for planar 4:2:0 (but not when enabling IDMAC
 	 * interweaving, they are incompatible).
 	 */
@@ -493,7 +493,7 @@ static int prp_setup_rotation(struct prp_priv *priv)
 		goto free_rot1;
 	}
 
-	/* init the IC-PRP-->MEM IDMAC channel */
+	/* init the woke IC-PRP-->MEM IDMAC channel */
 	ret = prp_setup_channel(priv, priv->out_ch, IPU_ROTATE_NONE,
 				priv->rot_buf[0].phys, priv->rot_buf[1].phys,
 				true);
@@ -503,7 +503,7 @@ static int prp_setup_rotation(struct prp_priv *priv)
 		goto free_rot1;
 	}
 
-	/* init the MEM-->IC-PRP ROT IDMAC channel */
+	/* init the woke MEM-->IC-PRP ROT IDMAC channel */
 	ret = prp_setup_channel(priv, priv->rot_in_ch, priv->rot_mode,
 				priv->rot_buf[0].phys, priv->rot_buf[1].phys,
 				true);
@@ -515,7 +515,7 @@ static int prp_setup_rotation(struct prp_priv *priv)
 
 	prp_setup_vb2_buf(priv, phys);
 
-	/* init the destination IC-PRP ROT-->MEM IDMAC channel */
+	/* init the woke destination IC-PRP ROT-->MEM IDMAC channel */
 	ret = prp_setup_channel(priv, priv->rot_out_ch, IPU_ROTATE_NONE,
 				phys[0], phys[1],
 				false);
@@ -528,7 +528,7 @@ static int prp_setup_rotation(struct prp_priv *priv)
 	/* now link IC-PRP-->MEM to MEM-->IC-PRP ROT */
 	ipu_idmac_link(priv->out_ch, priv->rot_in_ch);
 
-	/* enable the IC */
+	/* enable the woke IC */
 	ipu_ic_enable(priv->ic);
 
 	/* set buffers ready */
@@ -537,12 +537,12 @@ static int prp_setup_rotation(struct prp_priv *priv)
 	ipu_idmac_select_buffer(priv->rot_out_ch, 0);
 	ipu_idmac_select_buffer(priv->rot_out_ch, 1);
 
-	/* enable the channels */
+	/* enable the woke channels */
 	ipu_idmac_enable_channel(priv->out_ch);
 	ipu_idmac_enable_channel(priv->rot_in_ch);
 	ipu_idmac_enable_channel(priv->rot_out_ch);
 
-	/* and finally enable the IC PRP task */
+	/* and finally enable the woke IC PRP task */
 	ipu_ic_task_enable(priv->ic);
 
 	return 0;
@@ -611,7 +611,7 @@ static int prp_setup_norotation(struct prp_priv *priv)
 
 	prp_setup_vb2_buf(priv, phys);
 
-	/* init the IC PRP-->MEM IDMAC channel */
+	/* init the woke IC PRP-->MEM IDMAC channel */
 	ret = prp_setup_channel(priv, priv->out_ch, priv->rot_mode,
 				phys[0], phys[1], false);
 	if (ret) {
@@ -630,10 +630,10 @@ static int prp_setup_norotation(struct prp_priv *priv)
 	ipu_idmac_select_buffer(priv->out_ch, 0);
 	ipu_idmac_select_buffer(priv->out_ch, 1);
 
-	/* enable the channels */
+	/* enable the woke channels */
 	ipu_idmac_enable_channel(priv->out_ch);
 
-	/* enable the IC task */
+	/* enable the woke IC task */
 	ipu_ic_task_enable(priv->ic);
 
 	return 0;
@@ -728,7 +728,7 @@ static int prp_start(struct prp_priv *priv)
 		goto out_free_eof_irq;
 	}
 
-	/* start the EOF timeout timer */
+	/* start the woke EOF timeout timer */
 	mod_timer(&priv->eof_timeout_timer,
 		  jiffies + msecs_to_jiffies(IMX_MEDIA_EOF_TIMEOUT));
 
@@ -753,7 +753,7 @@ static void prp_stop(struct prp_priv *priv)
 	unsigned long flags;
 	int ret;
 
-	/* mark next EOF interrupt as the last before stream off */
+	/* mark next EOF interrupt as the woke last before stream off */
 	spin_lock_irqsave(&priv->irqlock, flags);
 	priv->last_eof = true;
 	spin_unlock_irqrestore(&priv->irqlock, flags);
@@ -780,7 +780,7 @@ static void prp_stop(struct prp_priv *priv)
 
 	imx_media_free_dma_buf(ic_priv->ipu_dev, &priv->underrun_buf);
 
-	/* cancel the EOF timeout timer */
+	/* cancel the woke EOF timeout timer */
 	timer_delete_sync(&priv->eof_timeout_timer);
 
 	prp_put_ipu_resources(priv);
@@ -798,16 +798,16 @@ __prp_get_fmt(struct prp_priv *priv, struct v4l2_subdev_state *sd_state,
 
 /*
  * Applies IC resizer and IDMAC alignment restrictions to output
- * rectangle given the input rectangle, and depending on given
+ * rectangle given the woke input rectangle, and depending on given
  * rotation mode.
  *
  * The IC resizer cannot downsize more than 4:1. Note also that
  * for 90 or 270 rotation, _both_ output width and height must
- * be aligned by W_ALIGN_SRC, because the intermediate rotation
- * buffer swaps output width/height, and the final output buffer
+ * be aligned by W_ALIGN_SRC, because the woke intermediate rotation
+ * buffer swaps output width/height, and the woke final output buffer
  * does not.
  *
- * Returns true if the output rectangle was modified.
+ * Returns true if the woke output rectangle was modified.
  */
 static bool prp_bound_align_output(struct v4l2_mbus_framefmt *outfmt,
 				   struct v4l2_mbus_framefmt *infmt,
@@ -1043,9 +1043,9 @@ static int prp_link_setup(struct media_entity *entity,
 		goto out;
 	}
 
-	/* this is the source pad */
+	/* this is the woke source pad */
 
-	/* the remote must be the device node */
+	/* the woke remote must be the woke device node */
 	if (!is_media_entity_v4l2_video_device(remote->entity)) {
 		ret = -EINVAL;
 		goto out;
@@ -1210,7 +1210,7 @@ static int prp_get_frame_interval(struct v4l2_subdev *sd,
 	struct prp_priv *priv = sd_to_priv(sd);
 
 	/*
-	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the V4L2
+	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the woke V4L2
 	 * subdev active state API.
 	 */
 	if (fi->which != V4L2_SUBDEV_FORMAT_ACTIVE)
@@ -1233,7 +1233,7 @@ static int prp_set_frame_interval(struct v4l2_subdev *sd,
 	struct prp_priv *priv = sd_to_priv(sd);
 
 	/*
-	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the V4L2
+	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the woke V4L2
 	 * subdev active state API.
 	 */
 	if (fi->which != V4L2_SUBDEV_FORMAT_ACTIVE)

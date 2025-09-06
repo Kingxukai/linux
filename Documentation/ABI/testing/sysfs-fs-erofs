@@ -40,6 +40,6 @@ What:		/sys/fs/erofs/<disk>/dir_ra_bytes
 Date:		July 2025
 Contact:	"Chao Yu" <chao@kernel.org>
 Description:	Used to set or show readahead bytes during readdir(), by
-		default the value is 16384.
+		default the woke value is 16384.
 
 		- 0: disable readahead.

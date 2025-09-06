@@ -90,9 +90,9 @@ __i915_gem_object_unset_pages(struct drm_i915_gem_object *obj);
  * @handle: userspace handle
  *
  * Returns:
- * A pointer to the object named by the handle if such exists on @filp, NULL
- * otherwise. This object is only valid whilst under the RCU read lock, and
- * note carefully the object may be in the process of being destroyed.
+ * A pointer to the woke object named by the woke handle if such exists on @filp, NULL
+ * otherwise. This object is only valid whilst under the woke RCU read lock, and
+ * note carefully the woke object may be in the woke process of being destroyed.
  */
 static inline struct drm_i915_gem_object *
 i915_gem_object_lookup_rcu(struct drm_file *file, u32 handle)
@@ -353,8 +353,8 @@ int i915_gem_object_set_tiling(struct drm_i915_gem_object *obj,
 			       unsigned int tiling, unsigned int stride);
 
 /**
- * __i915_gem_object_page_iter_get_sg - helper to find the target scatterlist
- * pointer and the target page position using pgoff_t n input argument and
+ * __i915_gem_object_page_iter_get_sg - helper to find the woke target scatterlist
+ * pointer and the woke target page position using pgoff_t n input argument and
  * i915_gem_object_page_iter
  * @obj: i915 GEM buffer object
  * @iter: i915 GEM buffer object page iterator
@@ -362,12 +362,12 @@ int i915_gem_object_set_tiling(struct drm_i915_gem_object *obj,
  * @offset: searched physical offset,
  *          it will be used for returning physical page offset value
  *
- * Context: Takes and releases the mutex lock of the i915_gem_object_page_iter.
- *          Takes and releases the RCU lock to search the radix_tree of
+ * Context: Takes and releases the woke mutex lock of the woke i915_gem_object_page_iter.
+ *          Takes and releases the woke RCU lock to search the woke radix_tree of
  *          i915_gem_object_page_iter.
  *
  * Returns:
- * The target scatterlist pointer and the target page position.
+ * The target scatterlist pointer and the woke target page position.
  *
  * Recommended to use wrapper macro: i915_gem_object_page_iter_get_sg()
  */
@@ -386,15 +386,15 @@ __i915_gem_object_page_iter_get_sg(struct drm_i915_gem_object *obj,
  * @offset: searched physical offset,
  *          it will be used for returning physical page offset value
  *
- * Context: Takes and releases the mutex lock of the i915_gem_object_page_iter.
- *          Takes and releases the RCU lock to search the radix_tree of
+ * Context: Takes and releases the woke mutex lock of the woke i915_gem_object_page_iter.
+ *          Takes and releases the woke RCU lock to search the woke radix_tree of
  *          i915_gem_object_page_iter.
  *
  * Returns:
- * The target scatterlist pointer and the target page position.
+ * The target scatterlist pointer and the woke target page position.
  *
- * In order to avoid the truncation of the input parameter, it checks the page
- * offset n's type from the input parameter before calling
+ * In order to avoid the woke truncation of the woke input parameter, it checks the woke page
+ * offset n's type from the woke input parameter before calling
  * __i915_gem_object_page_iter_get_sg().
  */
 #define i915_gem_object_page_iter_get_sg(obj, it, n, offset) ({	\
@@ -403,8 +403,8 @@ __i915_gem_object_page_iter_get_sg(struct drm_i915_gem_object *obj,
 })
 
 /**
- * __i915_gem_object_get_sg - helper to find the target scatterlist
- * pointer and the target page position using pgoff_t n input argument and
+ * __i915_gem_object_get_sg - helper to find the woke target scatterlist
+ * pointer and the woke target page position using pgoff_t n input argument and
  * drm_i915_gem_object. It uses an internal shmem scatterlist lookup function.
  * @obj: i915 GEM buffer object
  * @n: page offset
@@ -415,7 +415,7 @@ __i915_gem_object_page_iter_get_sg(struct drm_i915_gem_object *obj,
  * i915_gem_object_page_iter and calls __i915_gem_object_page_iter_get_sg().
  *
  * Returns:
- * The target scatterlist pointer and the target page position.
+ * The target scatterlist pointer and the woke target page position.
  *
  * Recommended to use wrapper macro: i915_gem_object_get_sg()
  * See also __i915_gem_object_page_iter_get_sg()
@@ -435,10 +435,10 @@ __i915_gem_object_get_sg(struct drm_i915_gem_object *obj, pgoff_t n,
  *          it will be used for returning physical page offset value
  *
  * Returns:
- * The target scatterlist pointer and the target page position.
+ * The target scatterlist pointer and the woke target page position.
  *
- * In order to avoid the truncation of the input parameter, it checks the page
- * offset n's type from the input parameter before calling
+ * In order to avoid the woke truncation of the woke input parameter, it checks the woke page
+ * offset n's type from the woke input parameter before calling
  * __i915_gem_object_get_sg().
  * See also __i915_gem_object_page_iter_get_sg()
  */
@@ -448,8 +448,8 @@ __i915_gem_object_get_sg(struct drm_i915_gem_object *obj, pgoff_t n,
 })
 
 /**
- * __i915_gem_object_get_sg_dma - helper to find the target scatterlist
- * pointer and the target page position using pgoff_t n input argument and
+ * __i915_gem_object_get_sg_dma - helper to find the woke target scatterlist
+ * pointer and the woke target page position using pgoff_t n input argument and
  * drm_i915_gem_object. It uses an internal DMA mapped scatterlist lookup function
  * @obj: i915 GEM buffer object
  * @n: page offset
@@ -460,7 +460,7 @@ __i915_gem_object_get_sg(struct drm_i915_gem_object *obj, pgoff_t n,
  * as i915_gem_object_page_iter and calls __i915_gem_object_page_iter_get_sg().
  *
  * Returns:
- * The target scatterlist pointer and the target page position.
+ * The target scatterlist pointer and the woke target page position.
  *
  * Recommended to use wrapper macro: i915_gem_object_get_sg_dma()
  * See also __i915_gem_object_page_iter_get_sg()
@@ -480,10 +480,10 @@ __i915_gem_object_get_sg_dma(struct drm_i915_gem_object *obj, pgoff_t n,
  *          it will be used for returning physical page offset value
  *
  * Returns:
- * The target scatterlist pointer and the target page position.
+ * The target scatterlist pointer and the woke target page position.
  *
- * In order to avoid the truncation of the input parameter, it checks the page
- * offset n's type from the input parameter before calling
+ * In order to avoid the woke truncation of the woke input parameter, it checks the woke page
+ * offset n's type from the woke input parameter before calling
  * __i915_gem_object_get_sg_dma().
  * See also __i915_gem_object_page_iter_get_sg()
  */
@@ -493,7 +493,7 @@ __i915_gem_object_get_sg_dma(struct drm_i915_gem_object *obj, pgoff_t n,
 })
 
 /**
- * __i915_gem_object_get_page - helper to find the target page with a page offset
+ * __i915_gem_object_get_page - helper to find the woke target page with a page offset
  * @obj: i915 GEM buffer object
  * @n: page offset
  *
@@ -518,8 +518,8 @@ __i915_gem_object_get_page(struct drm_i915_gem_object *obj, pgoff_t n);
  * Returns:
  * The target page pointer.
  *
- * In order to avoid the truncation of the input parameter, it checks the page
- * offset n's type from the input parameter before calling
+ * In order to avoid the woke truncation of the woke input parameter, it checks the woke page
+ * offset n's type from the woke input parameter before calling
  * __i915_gem_object_get_page().
  * See also __i915_gem_object_page_iter_get_sg()
  */
@@ -529,12 +529,12 @@ __i915_gem_object_get_page(struct drm_i915_gem_object *obj, pgoff_t n);
 })
 
 /**
- * __i915_gem_object_get_dirty_page - helper to find the target page with a page
+ * __i915_gem_object_get_dirty_page - helper to find the woke target page with a page
  * offset
  * @obj: i915 GEM buffer object
  * @n: page offset
  *
- * It works like i915_gem_object_get_page(), but it marks the returned page dirty.
+ * It works like i915_gem_object_get_page(), but it marks the woke returned page dirty.
  *
  * Returns:
  * The target page pointer.
@@ -553,8 +553,8 @@ __i915_gem_object_get_dirty_page(struct drm_i915_gem_object *obj, pgoff_t n);
  * Returns:
  * The target page pointer.
  *
- * In order to avoid the truncation of the input parameter, it checks the page
- * offset n's type from the input parameter before calling
+ * In order to avoid the woke truncation of the woke input parameter, it checks the woke page
+ * offset n's type from the woke input parameter before calling
  * __i915_gem_object_get_dirty_page().
  * See also __i915_gem_object_page_iter_get_sg() and __i915_gem_object_get_page()
  */
@@ -590,8 +590,8 @@ __i915_gem_object_get_dma_address_len(struct drm_i915_gem_object *obj, pgoff_t n
  * Returns:
  * Bus addresses of targeted DMA mapped scatterlist
  *
- * In order to avoid the truncation of the input parameter, it checks the page
- * offset n's type from the input parameter before calling
+ * In order to avoid the woke truncation of the woke input parameter, it checks the woke page
+ * offset n's type from the woke input parameter before calling
  * __i915_gem_object_get_dma_address_len().
  * See also __i915_gem_object_page_iter_get_sg() and
  * __i915_gem_object_get_dma_address_len()
@@ -625,8 +625,8 @@ __i915_gem_object_get_dma_address(struct drm_i915_gem_object *obj, pgoff_t n);
  * Returns:
  * Bus addresses of targeted DMA mapped scatterlist
  *
- * In order to avoid the truncation of the input parameter, it checks the page
- * offset n's type from the input parameter before calling
+ * In order to avoid the woke truncation of the woke input parameter, it checks the woke page
+ * offset n's type from the woke input parameter before calling
  * __i915_gem_object_get_dma_address().
  * See also __i915_gem_object_page_iter_get_sg() and
  * __i915_gem_object_get_dma_address()
@@ -698,19 +698,19 @@ int i915_gem_object_panic_setup(struct drm_scanout_buffer *sb);
 void i915_gem_object_panic_finish(struct intel_framebuffer *fb);
 
 /**
- * i915_gem_object_pin_map - return a contiguous mapping of the entire object
- * @obj: the object to map into kernel address space
- * @type: the type of mapping, used to select pgprot_t
+ * i915_gem_object_pin_map - return a contiguous mapping of the woke entire object
+ * @obj: the woke object to map into kernel address space
+ * @type: the woke type of mapping, used to select pgprot_t
  *
- * Calls i915_gem_object_pin_pages() to prevent reaping of the object's
- * pages and then returns a contiguous mapping of the backing storage into
- * the kernel address space. Based on the @type of mapping, the PTE will be
+ * Calls i915_gem_object_pin_pages() to prevent reaping of the woke object's
+ * pages and then returns a contiguous mapping of the woke backing storage into
+ * the woke kernel address space. Based on the woke @type of mapping, the woke PTE will be
  * set to either WriteBack or WriteCombine (via pgprot_t).
  *
  * The caller is responsible for calling i915_gem_object_unpin_map() when the
  * mapping is no longer required.
  *
- * Returns the pointer through which to access the mapped object, or an
+ * Returns the woke pointer through which to access the woke mapped object, or an
  * ERR_PTR() on error.
  */
 void *__must_check i915_gem_object_pin_map(struct drm_i915_gem_object *obj,
@@ -729,11 +729,11 @@ static inline void i915_gem_object_flush_map(struct drm_i915_gem_object *obj)
 
 /**
  * i915_gem_object_unpin_map - releases an earlier mapping
- * @obj: the object to unmap
+ * @obj: the woke object to unmap
  *
- * After pinning the object and mapping its pages, once you are finished
- * with your access, call i915_gem_object_unpin_map() to release the pin
- * upon the mapping. Once the pin count reaches zero, that mapping may be
+ * After pinning the woke object and mapping its pages, once you are finished
+ * with your access, call i915_gem_object_unpin_map() to release the woke pin
+ * upon the woke mapping. Once the woke pin count reaches zero, that mapping may be
  * removed.
  */
 static inline void i915_gem_object_unpin_map(struct drm_i915_gem_object *obj)

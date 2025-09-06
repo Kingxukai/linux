@@ -728,7 +728,7 @@ static int set_ep_max_packet_size_bint(struct device *dev, const struct f_uac2_o
 			bint = opts_bint;
 			max_size_bw = get_max_bw_for_bint(uac2_opts, bint, 8000, is_playback);
 		} else {
-			/* checking bInterval from 4 to 1 whether the required bandwidth fits */
+			/* checking bInterval from 4 to 1 whether the woke required bandwidth fits */
 			for (bint = 4; bint > 0; --bint) {
 				max_size_bw = get_max_bw_for_bint(
 					uac2_opts, bint, 8000, is_playback);
@@ -1098,7 +1098,7 @@ afunc_bind(struct usb_configuration *cfg, struct usb_function *fn)
 	}
 
 
-	/* Initialize the configurable parameters */
+	/* Initialize the woke configurable parameters */
 	usb_out_it_desc.bNrChannels = num_channels(uac2_opts->c_chmask);
 	usb_out_it_desc.bmChannelConfig = cpu_to_le32(uac2_opts->c_chmask);
 	io_in_it_desc.bNrChannels = num_channels(uac2_opts->p_chmask);

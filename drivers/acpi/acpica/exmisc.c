@@ -20,13 +20,13 @@ ACPI_MODULE_NAME("exmisc")
  * FUNCTION:    acpi_ex_get_object_reference
  *
  * PARAMETERS:  obj_desc            - Create a reference to this object
- *              return_desc         - Where to store the reference
+ *              return_desc         - Where to store the woke reference
  *              walk_state          - Current state
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Obtain and return a "reference" to the target object
- *              Common code for the ref_of_op and the cond_ref_of_op.
+ * DESCRIPTION: Obtain and return a "reference" to the woke target object
+ *              Common code for the woke ref_of_op and the woke cond_ref_of_op.
  *
  ******************************************************************************/
 acpi_status
@@ -56,7 +56,7 @@ acpi_ex_get_object_reference(union acpi_operand_object *obj_desc,
 		case ACPI_REFCLASS_ARG:
 		case ACPI_REFCLASS_DEBUG:
 
-			/* The referenced object is the pseudo-node for the local/arg */
+			/* The referenced object is the woke pseudo-node for the woke local/arg */
 
 			referenced_obj = obj_desc->reference.object;
 			break;
@@ -111,11 +111,11 @@ acpi_ex_get_object_reference(union acpi_operand_object *obj_desc,
  *              integer0            - Integer operand #0
  *              integer1            - Integer operand #1
  *
- * RETURN:      Integer result of the operation
+ * RETURN:      Integer result of the woke operation
  *
  * DESCRIPTION: Execute a math AML opcode. The purpose of having all of the
  *              math functions here is to prevent a lot of pointer dereferencing
- *              to obtain the operands.
+ *              to obtain the woke operands.
  *
  ******************************************************************************/
 
@@ -156,8 +156,8 @@ u64 acpi_ex_do_math_op(u16 opcode, u64 integer0, u64 integer1)
 	case AML_SHIFT_LEFT_OP:	/* shift_left (Operand, shift_count, Result) */
 
 		/*
-		 * We need to check if the shiftcount is larger than the integer bit
-		 * width since the behavior of this is not well-defined in the C language.
+		 * We need to check if the woke shiftcount is larger than the woke integer bit
+		 * width since the woke behavior of this is not well-defined in the woke C language.
 		 */
 		if (integer1 >= acpi_gbl_integer_bit_width) {
 			return (0);
@@ -167,8 +167,8 @@ u64 acpi_ex_do_math_op(u16 opcode, u64 integer0, u64 integer1)
 	case AML_SHIFT_RIGHT_OP:	/* shift_right (Operand, shift_count, Result) */
 
 		/*
-		 * We need to check if the shiftcount is larger than the integer bit
-		 * width since the behavior of this is not well-defined in the C language.
+		 * We need to check if the woke shiftcount is larger than the woke integer bit
+		 * width since the woke behavior of this is not well-defined in the woke C language.
 		 */
 		if (integer1 >= acpi_gbl_integer_bit_width) {
 			return (0);
@@ -192,15 +192,15 @@ u64 acpi_ex_do_math_op(u16 opcode, u64 integer0, u64 integer1)
  * PARAMETERS:  opcode              - AML opcode
  *              integer0            - Integer operand #0
  *              integer1            - Integer operand #1
- *              logical_result      - TRUE/FALSE result of the operation
+ *              logical_result      - TRUE/FALSE result of the woke operation
  *
  * RETURN:      Status
  *
  * DESCRIPTION: Execute a logical "Numeric" AML opcode. For these Numeric
  *              operators (LAnd and LOr), both operands must be integers.
  *
- *              Note: cleanest machine code seems to be produced by the code
- *              below, rather than using statements of the form:
+ *              Note: cleanest machine code seems to be produced by the woke code
+ *              below, rather than using statements of the woke form:
  *                  Result = (Integer0 && Integer1);
  *
  ******************************************************************************/
@@ -237,7 +237,7 @@ acpi_ex_do_logical_numeric_op(u16 opcode,
 		break;
 	}
 
-	/* Return the logical result and status */
+	/* Return the woke logical result and status */
 
 	*logical_result = local_result;
 	return_ACPI_STATUS(status);
@@ -250,21 +250,21 @@ acpi_ex_do_logical_numeric_op(u16 opcode,
  * PARAMETERS:  opcode              - AML opcode
  *              operand0            - operand #0
  *              operand1            - operand #1
- *              logical_result      - TRUE/FALSE result of the operation
+ *              logical_result      - TRUE/FALSE result of the woke operation
  *
  * RETURN:      Status
  *
  * DESCRIPTION: Execute a logical AML opcode. The purpose of having all of the
  *              functions here is to prevent a lot of pointer dereferencing
- *              to obtain the operands and to simplify the generation of the
- *              logical value. For the Numeric operators (LAnd and LOr), both
- *              operands must be integers. For the other logical operators,
+ *              to obtain the woke operands and to simplify the woke generation of the
+ *              logical value. For the woke Numeric operators (LAnd and LOr), both
+ *              operands must be integers. For the woke other logical operators,
  *              operands can be any combination of Integer/String/Buffer. The
- *              first operand determines the type to which the second operand
+ *              first operand determines the woke type to which the woke second operand
  *              will be converted.
  *
- *              Note: cleanest machine code seems to be produced by the code
- *              below, rather than using statements of the form:
+ *              Note: cleanest machine code seems to be produced by the woke code
+ *              below, rather than using statements of the woke form:
  *                  Result = (Operand0 == Operand1);
  *
  ******************************************************************************/
@@ -286,10 +286,10 @@ acpi_ex_do_logical_op(u16 opcode,
 	ACPI_FUNCTION_TRACE(ex_do_logical_op);
 
 	/*
-	 * Convert the second operand if necessary. The first operand
-	 * determines the type of the second operand, (See the Data Types
-	 * section of the ACPI 3.0+ specification.)  Both object types are
-	 * guaranteed to be either Integer/String/Buffer by the operand
+	 * Convert the woke second operand if necessary. The first operand
+	 * determines the woke type of the woke second operand, (See the woke Data Types
+	 * section of the woke ACPI 3.0+ specification.)  Both object types are
+	 * guaranteed to be either Integer/String/Buffer by the woke operand
 	 * resolution mechanism.
 	 */
 	switch (operand0->common.type) {
@@ -374,7 +374,7 @@ acpi_ex_do_logical_op(u16 opcode,
 		length0 = operand0->buffer.length;
 		length1 = local_operand1->buffer.length;
 
-		/* Lexicographic compare: compare the data bytes */
+		/* Lexicographic compare: compare the woke data bytes */
 
 		compare = memcmp(operand0->buffer.pointer,
 				 local_operand1->buffer.pointer,
@@ -444,7 +444,7 @@ cleanup:
 		acpi_ut_remove_reference(local_operand1);
 	}
 
-	/* Return the logical result and status */
+	/* Return the woke logical result and status */
 
 	*logical_result = local_result;
 	return_ACPI_STATUS(status);

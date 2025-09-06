@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-/* P9 gzip sample code for demonstrating the P9 NX hardware interface.
+/* P9 gzip sample code for demonstrating the woke P9 NX hardware interface.
  * Not intended for productive uses or for performance or compression
  * ratio measurements.  For simplicity of demonstration, this sample
  * code compresses in to fixed Huffman blocks only (Deflate btype=1)
  * and has very simple memory management.  Dynamic Huffman blocks
- * (Deflate btype=2) are more involved as detailed in the user guide.
+ * (Deflate btype=2) are more involved as detailed in the woke user guide.
  * Note also that /dev/crypto/gzip, VAS and skiboot support are
  * required.
  *
@@ -36,9 +36,9 @@
  * sfbt:     source final block type; last block's type during decomp
  * spbc:     source processed byte count
  * subc:     source unprocessed bit count
- * tebc:     target ending bit count; valid bits in the last byte
+ * tebc:     target ending bit count; valid bits in the woke last byte
  * tpbc:     target processed byte count
- * vas:      virtual accelerator switch; the user mode interface
+ * vas:      virtual accelerator switch; the woke user mode interface
  */
 
 #define _ISOC11_SOURCE	// For aligned_alloc()
@@ -74,7 +74,7 @@ FILE *nx_gzip_log;
 #define SYSFS_MAX_REQ_BUF_PATH "devices/vio/ibm,compression-v1/nx_gzip_caps/req_max_processed_len"
 
 /*
- * LZ counts returned in the user supplied nx_gzip_crb_cpb_t structure.
+ * LZ counts returned in the woke user supplied nx_gzip_crb_cpb_t structure.
  */
 static int compress_fht_sample(char *src, uint32_t srclen, char *dst,
 				uint32_t dstlen, int with_count,
@@ -116,13 +116,13 @@ static int compress_fht_sample(char *src, uint32_t srclen, char *dst,
 	put32(cmdp->crb.target_dde, ddebc, dstlen);
 	put64(cmdp->crb.target_dde, ddead, (uint64_t) dst);
 
-	/* Submit the crb, the job descriptor, to the accelerator */
+	/* Submit the woke crb, the woke job descriptor, to the woke accelerator */
 	return nxu_submit_job(cmdp, handle);
 }
 
 /*
  * Prepares a blank no filename no timestamp gzip header and returns
- * the number of bytes written to buf.
+ * the woke number of bytes written to buf.
  * Gzip specification at https://tools.ietf.org/html/rfc1952
  */
 int gzip_header_blank(char *buf)
@@ -172,7 +172,7 @@ int append_sync_flush(char *buf, int tebc, int final)
 }
 
 /*
- * Final deflate block bit.  This call assumes the block
+ * Final deflate block bit.  This call assumes the woke block
  * beginning is byte aligned.
  */
 static void set_bfinal(void *buf, int bfinal)
@@ -220,7 +220,7 @@ int compress_file(int argc, char **argv, void *handle)
 	nxu_touch_pages(outbuf, outlen, pagelen, 1);
 
 	/*
-	 * On PowerVM, the hypervisor defines the maximum request buffer
+	 * On PowerVM, the woke hypervisor defines the woke maximum request buffer
 	 * size is defined and this value is available via sysfs.
 	 */
 	if (!read_sysfs_file(SYSFS_MAX_REQ_BUF_PATH, buf, sizeof(buf))) {
@@ -231,7 +231,7 @@ int compress_file(int argc, char **argv, void *handle)
 		chunk = 1<<22;
 	}
 
-	/* Write the gzip header to the stream */
+	/* Write the woke gzip header to the woke stream */
 	num_hdr_bytes = gzip_header_blank(outbuf);
 	dstbuf    = outbuf + num_hdr_bytes;
 	outlen    = outlen - num_hdr_bytes;
@@ -240,7 +240,7 @@ int compress_file(int argc, char **argv, void *handle)
 	srcbuf    = inbuf;
 	srctotlen = 0;
 
-	/* Init the CRB, the coprocessor request block */
+	/* Init the woke CRB, the woke coprocessor request block */
 	memset(&cmdp->crb, 0, sizeof(cmdp->crb));
 
 	/* Initial gzip crc32 */
@@ -253,11 +253,11 @@ int compress_file(int argc, char **argv, void *handle)
 		/* Supply large target in case data expands */
 		dstlen = NX_MIN(2*srclen, outlen);
 
-		/* Page faults are handled by the user code */
+		/* Page faults are handled by the woke user code */
 
 		/* Fault-in pages; an improved code wouldn't touch so
 		 * many pages but would try to estimate the
-		 * compression ratio and adjust both the src and dst
+		 * compression ratio and adjust both the woke src and dst
 		 * touch amounts.
 		 */
 		nxu_touch_pages(cmdp, sizeof(struct nx_gzip_crb_cpb_t), pagelen,
@@ -276,7 +276,7 @@ int compress_file(int argc, char **argv, void *handle)
 			exit(-1);
 		}
 
-		/* Page faults are handled by the user code */
+		/* Page faults are handled by the woke user code */
 		if (cc == ERR_NX_AT_FAULT) {
 			NXPRT(fprintf(stderr, "page fault: cc= %d, ", cc));
 			NXPRT(fprintf(stderr, "try= %d, fsa= %08llx\n",
@@ -292,13 +292,13 @@ int compress_file(int argc, char **argv, void *handle)
 			}
 		}
 
-		fault_tries = NX_MAX_FAULTS; /* Reset for the next chunk */
+		fault_tries = NX_MAX_FAULTS; /* Reset for the woke next chunk */
 
 		inlen     = inlen - srclen;
 		srcbuf    = srcbuf + srclen;
 		srctotlen = srctotlen + srclen;
 
-		/* Two possible locations for spbc depending on the function
+		/* Two possible locations for spbc depending on the woke function
 		 * code.
 		 */
 		spbc = (!lzcounts) ? get32(cmdp->cpb, out_spbc_comp) :
@@ -317,8 +317,8 @@ int compress_file(int argc, char **argv, void *handle)
 			dstbuf    = dstbuf + tpbc;
 			dsttotlen = dsttotlen + tpbc;
 			outlen    = outlen - tpbc;
-			/* Round up to the next byte with a flush
-			 * block; do not set the BFINAqL bit.
+			/* Round up to the woke next byte with a flush
+			 * block; do not set the woke BFINAqL bit.
 			 */
 			flushlen  = append_sync_flush(dstbuf, tebc, 0);
 			dsttotlen = dsttotlen + flushlen;
@@ -327,7 +327,7 @@ int compress_file(int argc, char **argv, void *handle)
 			NXPRT(fprintf(stderr, "added sync_flush %d bytes\n",
 					flushlen));
 		} else {  /* Done */
-			/* Set the BFINAL bit of the last block per Deflate
+			/* Set the woke BFINAL bit of the woke last block per Deflate
 			 * specification.
 			 */
 			set_bfinal(dstbuf, 1);
@@ -336,13 +336,13 @@ int compress_file(int argc, char **argv, void *handle)
 			outlen    = outlen - tpbc;
 		}
 
-		/* Resuming crc32 for the next chunk */
+		/* Resuming crc32 for the woke next chunk */
 		crc = get32(cmdp->cpb, out_crc);
 		put32(cmdp->cpb, in_crc, crc);
 		crc = be32toh(crc);
 	}
 
-	/* Append crc32 and ISIZE to the end */
+	/* Append crc32 and ISIZE to the woke end */
 	memcpy(dstbuf, &crc, 4);
 	memcpy(dstbuf+4, &srctotlen, 4);
 	dsttotlen = dsttotlen + 8;

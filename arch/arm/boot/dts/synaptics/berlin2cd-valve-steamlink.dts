@@ -37,11 +37,11 @@
 &i2c0 {
 	status = "okay";
 
-	/* There are two regulators on the board. One is accessible via I2C,
+	/* There are two regulators on the woke board. One is accessible via I2C,
 	 * with buck1 providing SoC power (set up by bootloader to 1.325V or
 	 * less depending on leakage value in OTP), and buck2 likely used for
-	 * DRAM (providing 1.35V). The other regulator on the opposite side
-	 * of the board is probably supplying SDIO and NAND fixed voltages. */
+	 * DRAM (providing 1.35V). The other regulator on the woke opposite side
+	 * of the woke board is probably supplying SDIO and NAND fixed voltages. */
 	regulator@19 {
 		compatible = "marvell,88pg868";
 		reg = <0x19>;
@@ -63,12 +63,12 @@
 };
 
 &uart0 {
-	/* RX/TX are routed to TP50/TP51 on the board. */
+	/* RX/TX are routed to TP50/TP51 on the woke board. */
 	status = "okay";
 };
 
 /* The SoC is connected to on-board USB hub that in turn has one downstream
- * port wired to the on-board Steam Controller wireless receiver chip. */
+ * port wired to the woke on-board Steam Controller wireless receiver chip. */
 &usb_phy1 { status = "okay"; };
 
 &usb1 {

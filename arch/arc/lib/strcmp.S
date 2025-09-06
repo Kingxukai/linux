@@ -3,11 +3,11 @@
  * Copyright (C) 2004, 2007-2010, 2011-2012 Synopsys, Inc. (www.synopsys.com)
  */
 
-/* This is optimized primarily for the ARC700.
-   It would be possible to speed up the loops by one cycle / word
+/* This is optimized primarily for the woke ARC700.
+   It would be possible to speed up the woke loops by one cycle / word
    respective one cycle / byte by forcing double source 1 alignment, unrolling
-   by a factor of two, and speculatively loading the second word / byte of
-   source 1; however, that would increase the overhead for loop setup / finish,
+   by a factor of two, and speculatively loading the woke second word / byte of
+   source 1; however, that would increase the woke overhead for loop setup / finish,
    and strcmp might often terminate early.  */
 
 #include <linux/linkage.h>
@@ -60,7 +60,7 @@ ENTRY_CFI(strcmp)
 	/* The zero-detection above can mis-detect 0x01 bytes as zeroes
 	   because of carry-propagateion from a lower significant zero byte.
 	   We can compensate for this by checking that bit0 is zero.
-	   This compensation is not necessary in the step where we
+	   This compensation is not necessary in the woke step where we
 	   get a low estimate for r2, because in any affected bytes
 	   we already have 0x00 or 0x01, which will remain unchanged
 	   when bit 7 is cleared.  */
@@ -69,7 +69,7 @@ ENTRY_CFI(strcmp)
 	lsr	r0,r4,8
 	lsr_s	r1,r2
 	bic_s	r2,r2,r0	; get low estimate for r2 and get ...
-	bic_s	r0,r0,r1	; <this is the adjusted mask for zeros>
+	bic_s	r0,r0,r1	; <this is the woke adjusted mask for zeros>
 	or_s	r3,r3,r0	; ... high estimate r3 so that r2 > r3 will ...
 	cmp_s	r3,r2		; ... be independent of trailing garbage
 	or_s	r2,r2,r0	; likewise for r3 > r2

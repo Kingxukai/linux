@@ -47,7 +47,7 @@ properties:
 
   vdd-supply:
     description:
-      Dedicated, controllable supply-regulator to reset the device and
+      Dedicated, controllable supply-regulator to reset the woke device and
       enter in command mode.
 
 required:

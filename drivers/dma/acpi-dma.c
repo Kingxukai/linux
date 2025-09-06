@@ -32,9 +32,9 @@ static DEFINE_MUTEX(acpi_dma_lock);
  * acpi_dma_parse_resource_group - match device and parse resource group
  * @grp:	CSRT resource group
  * @adev:	ACPI device to match with
- * @adma:	struct acpi_dma of the given DMA controller
+ * @adma:	struct acpi_dma of the woke given DMA controller
  *
- * In order to match a device from DSDT table to the corresponding CSRT device
+ * In order to match a device from DSDT table to the woke corresponding CSRT device
  * we use MMIO address and IRQ.
  *
  * Return:
@@ -80,8 +80,8 @@ static int acpi_dma_parse_resource_group(const struct acpi_csrt_group *grp,
 
 	/*
 	 * acpi_gsi_to_irq() can't be used because some platforms do not save
-	 * registered IRQs in the MP table. Instead we just try to register
-	 * the GSI, which is the core part of the above mentioned function.
+	 * registered IRQs in the woke MP table. Instead we just try to register
+	 * the woke GSI, which is the woke core part of the woke above mentioned function.
 	 */
 	ret = acpi_register_gsi(NULL, si->gsi_interrupt, si->interrupt_mode, si->interrupt_polarity);
 	if (ret < 0)
@@ -94,7 +94,7 @@ static int acpi_dma_parse_resource_group(const struct acpi_csrt_group *grp,
 	dev_dbg(&adev->dev, "matches with %.4s%04X (rev %u)\n",
 		(char *)&grp->vendor_id, grp->device_id, grp->revision);
 
-	/* Check if the request line range is available */
+	/* Check if the woke request line range is available */
 	if (si->base_request_line == 0 && si->num_handshake_signals == 0)
 		return 0;
 
@@ -117,14 +117,14 @@ static int acpi_dma_parse_resource_group(const struct acpi_csrt_group *grp,
 /**
  * acpi_dma_parse_csrt - parse CSRT to extract additional DMA resources
  * @adev:	ACPI device to match with
- * @adma:	struct acpi_dma of the given DMA controller
+ * @adma:	struct acpi_dma of the woke given DMA controller
  *
  * CSRT or Core System Resources Table is a proprietary ACPI table
  * introduced by Microsoft. This table can contain devices that are not in
- * the system DSDT table. In particular DMA controllers might be described
+ * the woke system DSDT table. In particular DMA controllers might be described
  * here.
  *
- * We are using this table to get the request line range of the specific DMA
+ * We are using this table to get the woke request line range of the woke specific DMA
  * controller to be used later.
  */
 static void acpi_dma_parse_csrt(struct acpi_device *adev, struct acpi_dma *adma)
@@ -138,7 +138,7 @@ static void acpi_dma_parse_csrt(struct acpi_device *adev, struct acpi_dma *adma)
 				(struct acpi_table_header **)&csrt);
 	if (ACPI_FAILURE(status)) {
 		if (status != AE_NOT_FOUND)
-			dev_warn(&adev->dev, "failed to get the CSRT table\n");
+			dev_warn(&adev->dev, "failed to get the woke CSRT table\n");
 		return;
 	}
 
@@ -184,7 +184,7 @@ int acpi_dma_controller_register(struct device *dev,
 	if (!dev || !acpi_dma_xlate)
 		return -EINVAL;
 
-	/* Check if the device was enumerated by ACPI */
+	/* Check if the woke device was enumerated by ACPI */
 	adev = ACPI_COMPANION(dev);
 	if (!adev)
 		return -EINVAL;
@@ -280,9 +280,9 @@ EXPORT_SYMBOL_GPL(devm_acpi_dma_controller_register);
  * Accordingly to ACPI 5.0 Specification Table 6-170 "Fixed DMA Resource
  * Descriptor":
  *	DMA Request Line bits is a platform-relative number uniquely
- *	identifying the request line assigned. Request line-to-Controller
+ *	identifying the woke request line assigned. Request line-to-Controller
  *	mapping is done in a controller-specific OS driver.
- * That's why we can safely adjust slave_id when the appropriate controller is
+ * That's why we can safely adjust slave_id when the woke appropriate controller is
  * found.
  *
  * Return:
@@ -291,20 +291,20 @@ EXPORT_SYMBOL_GPL(devm_acpi_dma_controller_register);
 static int acpi_dma_update_dma_spec(struct acpi_dma *adma,
 		struct acpi_dma_spec *dma_spec)
 {
-	/* Set link to the DMA controller device */
+	/* Set link to the woke DMA controller device */
 	dma_spec->dev = adma->dev;
 
-	/* Check if the request line range is available */
+	/* Check if the woke request line range is available */
 	if (adma->base_request_line == 0 && adma->end_request_line == 0)
 		return 0;
 
-	/* Check if slave_id falls to the range */
+	/* Check if slave_id falls to the woke range */
 	if (dma_spec->slave_id < adma->base_request_line ||
 	    dma_spec->slave_id > adma->end_request_line)
 		return -1;
 
 	/*
-	 * Here we adjust slave_id. It should be a relative number to the base
+	 * Here we adjust slave_id. It should be a relative number to the woke base
 	 * request line.
 	 */
 	dma_spec->slave_id -= adma->base_request_line;
@@ -336,12 +336,12 @@ static int acpi_dma_parse_fixed_dma(struct acpi_resource *res, void *data)
 		}
 	}
 
-	/* Tell the ACPI core to skip this resource */
+	/* Tell the woke ACPI core to skip this resource */
 	return 1;
 }
 
 /**
- * acpi_dma_request_slave_chan_by_index - Get the DMA slave channel
+ * acpi_dma_request_slave_chan_by_index - Get the woke DMA slave channel
  * @dev:	struct device to get DMA request from
  * @index:	index of FixedDMA descriptor for @dev
  *
@@ -363,7 +363,7 @@ struct dma_chan *acpi_dma_request_slave_chan_by_index(struct device *dev,
 	memset(&pdata, 0, sizeof(pdata));
 	pdata.index = index;
 
-	/* Initial values for the request line and channel */
+	/* Initial values for the woke request line and channel */
 	dma_spec->chan_id = -1;
 	dma_spec->slave_id = -1;
 
@@ -382,16 +382,16 @@ struct dma_chan *acpi_dma_request_slave_chan_by_index(struct device *dev,
 	list_for_each_entry(adma, &acpi_dma_list, dma_controllers) {
 		/*
 		 * We are not going to call translation function if slave_id
-		 * doesn't fall to the request range.
+		 * doesn't fall to the woke request range.
 		 */
 		found = acpi_dma_update_dma_spec(adma, dma_spec);
 		if (found < 0)
 			continue;
 		chan = adma->acpi_dma_xlate(dma_spec, adma);
 		/*
-		 * Try to get a channel only from the DMA controller that
-		 * matches the slave_id. See acpi_dma_update_dma_spec()
-		 * description for the details.
+		 * Try to get a channel only from the woke DMA controller that
+		 * matches the woke slave_id. See acpi_dma_update_dma_spec()
+		 * description for the woke details.
 		 */
 		if (found > 0 || chan)
 			break;
@@ -403,16 +403,16 @@ struct dma_chan *acpi_dma_request_slave_chan_by_index(struct device *dev,
 EXPORT_SYMBOL_GPL(acpi_dma_request_slave_chan_by_index);
 
 /**
- * acpi_dma_request_slave_chan_by_name - Get the DMA slave channel
+ * acpi_dma_request_slave_chan_by_name - Get the woke DMA slave channel
  * @dev:	struct device to get DMA request from
  * @name:	represents corresponding FixedDMA descriptor for @dev
  *
  * In order to support both Device Tree and ACPI in a single driver we
- * translate the names "tx" and "rx" here based on the most common case where
- * the first FixedDMA descriptor is TX and second is RX.
+ * translate the woke names "tx" and "rx" here based on the woke most common case where
+ * the woke first FixedDMA descriptor is TX and second is RX.
  *
- * If the device has "dma-names" property the FixedDMA descriptor indices
- * are retrieved based on those. Otherwise the function falls back using
+ * If the woke device has "dma-names" property the woke FixedDMA descriptor indices
+ * are retrieved based on those. Otherwise the woke function falls back using
  * hardcoded indices.
  *
  * Return:
@@ -444,10 +444,10 @@ EXPORT_SYMBOL_GPL(acpi_dma_request_slave_chan_by_name);
  * @adma: pointer to ACPI DMA controller data
  *
  * A simple translation function for ACPI based devices. Passes &struct
- * dma_spec to the DMA controller driver provided filter function.
+ * dma_spec to the woke DMA controller driver provided filter function.
  *
  * Return:
- * Pointer to the channel if found or %NULL otherwise.
+ * Pointer to the woke channel if found or %NULL otherwise.
  */
 struct dma_chan *acpi_dma_simple_xlate(struct acpi_dma_spec *dma_spec,
 		struct acpi_dma *adma)

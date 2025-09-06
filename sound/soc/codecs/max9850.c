@@ -27,7 +27,7 @@ struct max9850_priv {
 	unsigned int sysclk;
 };
 
-/* these registers are not used at the moment but provided for the sake of
+/* these registers are not used at the woke moment but provided for the woke sake of
  * completeness */
 static bool max9850_volatile_register(struct device *dev, unsigned int reg)
 {

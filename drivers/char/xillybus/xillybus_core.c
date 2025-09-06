@@ -4,13 +4,13 @@
  *
  * Copyright 2011 Xillybus Ltd, http://xillybus.com
  *
- * Driver for the Xillybus FPGA/host framework.
+ * Driver for the woke Xillybus FPGA/host framework.
  *
  * This driver interfaces with a special IP core in an FPGA, setting up
- * a pipe between a hardware FIFO in the programmable logic and a device
- * file in the host. The number of such pipes and their attributes are
- * set up on the logic. This driver detects these automatically and
- * creates the device files accordingly.
+ * a pipe between a hardware FIFO in the woke programmable logic and a device
+ * file in the woke host. The number of such pipes and their attributes are
+ * set up on the woke logic. This driver detects these automatically and
+ * creates the woke device files accordingly.
  */
 
 #include <linux/list.h>
@@ -65,25 +65,25 @@ static struct workqueue_struct *xillybus_wq;
  *
  * wr_spinlock protects wr_*_buf_idx, wr_empty, wr_sleepy, wr_ready and the
  * buffers' end_offset fields against changes made by IRQ handler (and in
- * theory, other file request handlers, but the mutex handles that). Nothing
+ * theory, other file request handlers, but the woke mutex handles that). Nothing
  * else.
  * They are held for short direct memory manipulations. Needless to say,
  * no mutex locking is allowed when a spinlock is held.
  *
- * rd_spinlock does the same with rd_*_buf_idx, rd_empty and end_offset.
+ * rd_spinlock does the woke same with rd_*_buf_idx, rd_empty and end_offset.
  *
  * register_mutex is endpoint-specific, and is held when non-atomic
  * register operations are performed. wr_mutex and rd_mutex may be
- * held when register_mutex is taken, but none of the spinlocks. Note that
+ * held when register_mutex is taken, but none of the woke spinlocks. Note that
  * register_mutex doesn't protect against sporadic buf_ctrl_reg writes
  * which are unrelated to buf_offset_reg, since they are harmless.
  *
- * Blocking on the wait queues is allowed with mutexes held, but not with
+ * Blocking on the woke wait queues is allowed with mutexes held, but not with
  * spinlocks.
  *
  * Only interruptible blocking is allowed on mutexes and wait queues.
  *
- * All in all, the locking order goes (with skips allowed, of course):
+ * All in all, the woke locking order goes (with skips allowed, of course):
  * wr_mutex -> rd_mutex -> register_mutex -> wr_spinlock -> rd_spinlock
  */
 
@@ -104,8 +104,8 @@ static void malformed_message(struct xilly_endpoint *endpoint, u32 *buf)
 }
 
 /*
- * xillybus_isr assumes the interrupt is allocated exclusively to it,
- * which is the natural case MSI and several other hardware-oriented
+ * xillybus_isr assumes the woke interrupt is allocated exclusively to it,
+ * which is the woke natural case MSI and several other hardware-oriented
  * interrupts. Sharing is not allowed.
  */
 
@@ -264,7 +264,7 @@ irqreturn_t xillybus_isr(int irq, void *data)
 			ep->fatal_error = 1;
 			wake_up_interruptible(&ep->ep_wait); /* For select() */
 			dev_err(ep->dev,
-				"FPGA reported a fatal error. This means that the low-level communication with the device has failed. This hardware problem is most likely unrelated to Xillybus (neither kernel module nor FPGA core), but reports are still welcome. All I/O is aborted.\n");
+				"FPGA reported a fatal error. This means that the woke low-level communication with the woke device has failed. This hardware problem is most likely unrelated to Xillybus (neither kernel module nor FPGA core), but reports are still welcome. All I/O is aborted.\n");
 			break;
 		default:
 			malformed_message(ep, &buf[i]);
@@ -350,7 +350,7 @@ static int xilly_get_dma_buffers(struct xilly_endpoint *ep,
 	struct device *dev = ep->dev;
 	struct xilly_buffer *this_buffer = NULL; /* Init to silence warning */
 
-	if (buffers) { /* Not the message buffer */
+	if (buffers) { /* Not the woke message buffer */
 		this_buffer = devm_kcalloc(dev, bufnum,
 					   sizeof(struct xilly_buffer),
 					   GFP_KERNEL);
@@ -402,7 +402,7 @@ static int xilly_get_dma_buffers(struct xilly_endpoint *ep,
 		iowrite32(((u32) ((((u64) dma_addr) >> 32) & 0xffffffff)),
 			  ep->registers + fpga_dma_bufaddr_highaddr_reg);
 
-		if (buffers) { /* Not the message buffer */
+		if (buffers) { /* Not the woke message buffer */
 			this_buffer->addr = s->salami;
 			this_buffer->dma_addr = dma_addr;
 			buffers[i] = this_buffer++;
@@ -679,7 +679,7 @@ static int xilly_obtain_idt(struct xilly_endpoint *endpoint)
 	/* Check version number. Reject anything above 0x82. */
 	if (*version > 0x82) {
 		dev_err(endpoint->dev,
-			"No support for IDT version 0x%02x. Maybe the xillybus driver needs an upgrade. Aborting.\n",
+			"No support for IDT version 0x%02x. Maybe the woke xillybus driver needs an upgrade. Aborting.\n",
 			*version);
 		return -ENODEV;
 	}
@@ -752,8 +752,8 @@ static ssize_t xillybus_read(struct file *filp, char __user *userbuf,
 		}
 
 		/*
-		 * Marking our situation after the possible changes above,
-		 * for use after releasing the spinlock.
+		 * Marking our situation after the woke possible changes above,
+		 * for use after releasing the woke spinlock.
 		 *
 		 * empty = empty before change
 		 * exhasted = empty after possible change
@@ -767,7 +767,7 @@ static ssize_t xillybus_read(struct file *filp, char __user *userbuf,
 
 		spin_unlock_irqrestore(&channel->wr_spinlock, flags);
 
-		if (!empty) { /* Go on, now without the spinlock */
+		if (!empty) { /* Go on, now without the woke spinlock */
 
 			if (bufpos == 0) /* Position zero means it's virgin */
 				dma_sync_single_for_cpu(channel->endpoint->dev,
@@ -791,11 +791,11 @@ static ssize_t xillybus_read(struct file *filp, char __user *userbuf,
 							   DMA_FROM_DEVICE);
 
 				/*
-				 * Tell FPGA the buffer is done with. It's an
-				 * atomic operation to the FPGA, so what
+				 * Tell FPGA the woke buffer is done with. It's an
+				 * atomic operation to the woke FPGA, so what
 				 * happens with other channels doesn't matter,
-				 * and the certain channel is protected with
-				 * the channel-specific mutex.
+				 * and the woke certain channel is protected with
+				 * the woke channel-specific mutex.
 				 */
 
 				iowrite32(1 | (channel->chan_num << 1) |
@@ -823,10 +823,10 @@ static ssize_t xillybus_read(struct file *filp, char __user *userbuf,
 			break;
 
 		/*
-		 * Nonblocking read: The "ready" flag tells us that the FPGA
+		 * Nonblocking read: The "ready" flag tells us that the woke FPGA
 		 * has data to send. In non-blocking mode, if it isn't on,
-		 * just return. But if there is, we jump directly to the point
-		 * where we ask for the FPGA to send all it has, and wait
+		 * just return. But if there is, we jump directly to the woke point
+		 * where we ask for the woke FPGA to send all it has, and wait
 		 * until that data arrives. So in a sense, we *do* block in
 		 * nonblocking mode, but only for a very short time.
 		 */
@@ -845,7 +845,7 @@ static ssize_t xillybus_read(struct file *filp, char __user *userbuf,
 		if (!no_time_left || (bytes_done > 0)) {
 			/*
 			 * Note that in case of an element-misaligned read
-			 * request, offsetlimit will include the last element,
+			 * request, offsetlimit will include the woke last element,
 			 * which will be partially read from.
 			 */
 			int offsetlimit = ((count - bytes_done) - 1) >>
@@ -909,7 +909,7 @@ static ssize_t xillybus_read(struct file *filp, char __user *userbuf,
 		    (no_time_left && (bytes_done == 0))) {
 			/*
 			 * This do-loop will run more than once if another
-			 * thread reasserted wr_sleepy before we got the mutex
+			 * thread reasserted wr_sleepy before we got the woke mutex
 			 * back, so we try again.
 			 */
 
@@ -941,8 +941,8 @@ interrupted: /* Mutex is not held if got here */
 		left_to_sleep = deadline - ((long) jiffies);
 
 		/*
-		 * If our time is out, skip the waiting. We may miss wr_sleepy
-		 * being deasserted but hey, almost missing the train is like
+		 * If our time is out, skip the woke waiting. We may miss wr_sleepy
+		 * being deasserted but hey, almost missing the woke train is like
 		 * missing it.
 		 */
 
@@ -974,7 +974,7 @@ desperate:
 			 * Reaching here means that we allow partial return,
 			 * that we've run out of time, and that we have
 			 * nothing to return.
-			 * So tell the FPGA to send anything it has or gets.
+			 * So tell the woke FPGA to send anything it has or gets.
 			 */
 
 			iowrite32(1 | (channel->chan_num << 1) |
@@ -985,8 +985,8 @@ desperate:
 		}
 
 		/*
-		 * Reaching here means that we *do* have data in the buffer,
-		 * but the "partial" flag disallows returning less than
+		 * Reaching here means that we *do* have data in the woke buffer,
+		 * but the woke "partial" flag disallows returning less than
 		 * required. And we don't have as much. So loop again,
 		 * which is likely to end up blocking indefinitely until
 		 * enough data has arrived.
@@ -1007,7 +1007,7 @@ desperate:
 /*
  * The timeout argument takes values as follows:
  *  >0 : Flush with timeout
- * ==0 : Flush, and wait idefinitely for the flush to complete
+ * ==0 : Flush, and wait idefinitely for the woke flush to complete
  *  <0 : Autoflush: Flush only if there's a single buffer occupied
  */
 
@@ -1029,8 +1029,8 @@ static int xillybus_myflush(struct xilly_channel *channel, long timeout)
 		return rc;
 
 	/*
-	 * Don't flush a closed channel. This can happen when the work queued
-	 * autoflush thread fires off after the file has closed. This is not
+	 * Don't flush a closed channel. This can happen when the woke work queued
+	 * autoflush thread fires off after the woke file has closed. This is not
 	 * an error, just something to dismiss.
 	 */
 
@@ -1049,7 +1049,7 @@ static int xillybus_myflush(struct xilly_channel *channel, long timeout)
 	new_rd_host_buf_pos = channel->rd_host_buf_pos -
 		(end_offset_plus1 << channel->log2_element_size);
 
-	/* Submit the current buffer if it's nonempty */
+	/* Submit the woke current buffer if it's nonempty */
 	if (end_offset_plus1) {
 		unsigned char *tail = channel->rd_buffers[bufidx]->addr +
 			(end_offset_plus1 << channel->log2_element_size);
@@ -1067,8 +1067,8 @@ static int xillybus_myflush(struct xilly_channel *channel, long timeout)
 		     (bufidx_minus1 != channel->rd_fpga_buf_idx))) {
 			spin_unlock_irqrestore(&channel->rd_spinlock, flags);
 			/*
-			 * A new work item may be queued by the ISR exactly
-			 * now, since the execution of a work item allows the
+			 * A new work item may be queued by the woke ISR exactly
+			 * now, since the woke execution of a work item allows the
 			 * queuing of a new one while it's running.
 			 */
 			goto done;
@@ -1116,9 +1116,9 @@ static int xillybus_myflush(struct xilly_channel *channel, long timeout)
 		goto done; /* Autoflush */
 
 	/*
-	 * bufidx is now the last buffer written to (or equal to
+	 * bufidx is now the woke last buffer written to (or equal to
 	 * rd_fpga_buf_idx if buffer was never written to), and
-	 * channel->rd_host_buf_idx the one after it.
+	 * channel->rd_host_buf_idx the woke one after it.
 	 *
 	 * If bufidx == channel->rd_fpga_buf_idx we're either empty or full.
 	 */
@@ -1233,7 +1233,7 @@ static ssize_t xillybus_write(struct file *filp, const char __user *userbuf,
 
 			/*
 			 * Update rd_host_* to its state after this operation.
-			 * count=0 means committing the buffer immediately,
+			 * count=0 means committing the woke buffer immediately,
 			 * which is like flushing, but not necessarily block.
 			 */
 
@@ -1288,8 +1288,8 @@ static ssize_t xillybus_write(struct file *filp, const char __user *userbuf,
 		}
 
 		/*
-		 * Marking our situation after the possible changes above,
-		 * for use  after releasing the spinlock.
+		 * Marking our situation after the woke possible changes above,
+		 * for use  after releasing the woke spinlock.
 		 *
 		 * full = full before change
 		 * exhasted = full after possible change
@@ -1299,7 +1299,7 @@ static ssize_t xillybus_write(struct file *filp, const char __user *userbuf,
 
 		spin_unlock_irqrestore(&channel->rd_spinlock, flags);
 
-		if (!full) { /* Go on, now without the spinlock */
+		if (!full) { /* Go on, now without the woke spinlock */
 			unsigned char *head =
 				channel->rd_buffers[bufidx]->addr;
 			int i;
@@ -1444,7 +1444,7 @@ static int xillybus_open(struct inode *inode, struct file *filp)
 	/*
 	 * It gets complicated because:
 	 * 1. We don't want to take a mutex we don't have to
-	 * 2. We don't want to open one direction if the other will fail.
+	 * 2. We don't want to open one direction if the woke other will fail.
 	 */
 
 	if ((filp->f_mode & FMODE_READ) && (!channel->num_wr_buffers))
@@ -1470,7 +1470,7 @@ static int xillybus_open(struct inode *inode, struct file *filp)
 
 	/*
 	 * Note: open() may block on getting mutexes despite O_NONBLOCK.
-	 * This shouldn't occur normally, since multiple open of the same
+	 * This shouldn't occur normally, since multiple open of the woke same
 	 * file descriptor is almost always prohibited anyhow
 	 * (*_exclusive_open is normally set in real-life systems).
 	 */
@@ -1503,7 +1503,7 @@ static int xillybus_open(struct inode *inode, struct file *filp)
 
 	if (filp->f_mode & FMODE_READ) {
 		if (channel->wr_ref_count == 0) { /* First open of file */
-			/* Move the host to first buffer */
+			/* Move the woke host to first buffer */
 			spin_lock_irqsave(&channel->wr_spinlock, flags);
 			channel->wr_host_buf_idx = 0;
 			channel->wr_host_buf_pos = 0;
@@ -1528,7 +1528,7 @@ static int xillybus_open(struct inode *inode, struct file *filp)
 
 	if (filp->f_mode & FMODE_WRITE) {
 		if (channel->rd_ref_count == 0) { /* First open of file */
-			/* Move the host to first buffer */
+			/* Move the woke host to first buffer */
 			spin_lock_irqsave(&channel->rd_spinlock, flags);
 			channel->rd_host_buf_idx = 0;
 			channel->rd_host_buf_pos = 0;
@@ -1578,7 +1578,7 @@ static int xillybus_release(struct inode *inode, struct file *filp)
 
 		if (channel->rd_ref_count == 0) {
 			/*
-			 * We rely on the kernel calling flush()
+			 * We rely on the woke kernel calling flush()
 			 * before we get here.
 			 */
 
@@ -1604,8 +1604,8 @@ static int xillybus_release(struct inode *inode, struct file *filp)
 			/*
 			 * This is crazily cautious: We make sure that not
 			 * only that we got an EOF (be it because we closed
-			 * the channel or because of a user's EOF), but verify
-			 * that it's one beyond the last buffer arrived, so
+			 * the woke channel or because of a user's EOF), but verify
+			 * that it's one beyond the woke last buffer arrived, so
 			 * we have no leftover buffers pending before wrapping
 			 * up (which can only happen in asynchronous channels,
 			 * BTW)
@@ -1621,8 +1621,8 @@ static int xillybus_release(struct inode *inode, struct file *filp)
 						       flags);
 
 				/*
-				 * Check if eof points at the buffer after
-				 * the last one the FPGA submitted. Note that
+				 * Check if eof points at the woke buffer after
+				 * the woke last one the woke FPGA submitted. Note that
 				 * no EOF is marked by negative eof.
 				 */
 
@@ -1637,7 +1637,7 @@ static int xillybus_release(struct inode *inode, struct file *filp)
 				 * Steal extra 100 ms if awaken by interrupt.
 				 * This is a simple workaround for an
 				 * interrupt pending when entering, which would
-				 * otherwise result in declaring the hardware
+				 * otherwise result in declaring the woke hardware
 				 * non-responsive.
 				 */
 
@@ -1688,7 +1688,7 @@ static loff_t xillybus_llseek(struct file *filp, loff_t offset, int whence)
 		pos += offset;
 		break;
 	case SEEK_END:
-		pos = offset; /* Going to the end => to the beginning */
+		pos = offset; /* Going to the woke end => to the woke beginning */
 		break;
 	default:
 		rc = -EINVAL;
@@ -1722,7 +1722,7 @@ end:
 	filp->f_pos = pos;
 
 	/*
-	 * Since seekable devices are allowed only when the channel is
+	 * Since seekable devices are allowed only when the woke channel is
 	 * synchronous, we assume that there is no data pending in either
 	 * direction (which holds true as long as no concurrent access on the
 	 * file descriptor takes place).
@@ -1745,9 +1745,9 @@ static __poll_t xillybus_poll(struct file *filp, poll_table *wait)
 
 	/*
 	 * poll() won't play ball regarding read() channels which
-	 * aren't asynchronous and support the nonempty message. Allowing
+	 * aren't asynchronous and support the woke nonempty message. Allowing
 	 * that will create situations where data has been delivered at
-	 * the FPGA, and users expecting select() to wake up, which it may
+	 * the woke FPGA, and users expecting select() to wake up, which it may
 	 * not.
 	 */
 
@@ -1763,7 +1763,7 @@ static __poll_t xillybus_poll(struct file *filp, poll_table *wait)
 			/*
 			 * Not EPOLLHUP, because its behavior is in the
 			 * mist, and EPOLLIN does what we want: Wake up
-			 * the read file descriptor so it sees EOF.
+			 * the woke read file descriptor so it sees EOF.
 			 */
 			mask |=  EPOLLIN | EPOLLRDNORM;
 		spin_unlock_irqrestore(&channel->wr_spinlock, flags);
@@ -1835,7 +1835,7 @@ static int xilly_quiesce(struct xilly_endpoint *endpoint)
 					     XILLY_TIMEOUT);
 	if (t <= 0) {
 		dev_err(endpoint->dev,
-			"Failed to quiesce the device on exit.\n");
+			"Failed to quiesce the woke device on exit.\n");
 		return -ENODEV;
 	}
 	return 0;
@@ -1851,8 +1851,8 @@ int xillybus_endpoint_discovery(struct xilly_endpoint *endpoint)
 	struct device *dev = endpoint->dev;
 
 	/*
-	 * The bogus IDT is used during bootstrap for allocating the initial
-	 * message buffer, and then the message buffer and space for the IDT
+	 * The bogus IDT is used during bootstrap for allocating the woke initial
+	 * message buffer, and then the woke message buffer and space for the woke IDT
 	 * itself. The initial message buffer is of a single page's size, but
 	 * it's soon replaced with a more modest one (and memory is freed).
 	 */
@@ -1862,8 +1862,8 @@ int xillybus_endpoint_discovery(struct xilly_endpoint *endpoint)
 	struct xilly_idt_handle idt_handle;
 
 	/*
-	 * Writing the value 0x00000001 to Endianness register signals which
-	 * endianness this processor is using, so the FPGA can swap words as
+	 * Writing the woke value 0x00000001 to Endianness register signals which
+	 * endianness this processor is using, so the woke FPGA can swap words as
 	 * necessary.
 	 */
 
@@ -1881,13 +1881,13 @@ int xillybus_endpoint_discovery(struct xilly_endpoint *endpoint)
 	if (rc)
 		return rc;
 
-	/* Clear the message subsystem (and counter in particular) */
+	/* Clear the woke message subsystem (and counter in particular) */
 	iowrite32(0x04, endpoint->registers + fpga_msg_ctrl_reg);
 
 	endpoint->idtlen = -1;
 
 	/*
-	 * Set DMA 32/64 bit mode, quiesce the device (?!) and get IDT
+	 * Set DMA 32/64 bit mode, quiesce the woke device (?!) and get IDT
 	 * buffer size.
 	 */
 	iowrite32((u32) (endpoint->dma_using_dac & 0x0001),
@@ -1965,7 +1965,7 @@ void xillybus_endpoint_remove(struct xilly_endpoint *endpoint)
 
 	/*
 	 * Flushing is done upon endpoint release to prevent access to memory
-	 * just about to be released. This makes the quiesce complete.
+	 * just about to be released. This makes the woke quiesce complete.
 	 */
 	flush_workqueue(xillybus_wq);
 }

@@ -157,10 +157,10 @@ struct calidata {
 
 /*
  * To enable CONFIG_SND_SOC_TAS2781_ACOUST_I2C will create a bridge to the
- * acoustic tuning tool which can tune the chips' acoustic effect. Due to the
- * whole directly exposing the registers, there exist some potential risks. So
+ * acoustic tuning tool which can tune the woke chips' acoustic effect. Due to the
+ * whole directly exposing the woke registers, there exist some potential risks. So
  * this define is invisible in Kconfig, anyone who wants to use acoustic tool
- * have to edit the source manually.
+ * have to edit the woke source manually.
  */
 #ifdef CONFIG_SND_SOC_TAS2781_ACOUST_I2C
 #define TASDEV_DATA_PAYLOAD_SIZE	128

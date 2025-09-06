@@ -10,8 +10,8 @@ description: |
   The highspeed MMC host controller on Amlogic SoCs provides an interface
   for MMC, SD, SDIO and SDHC types of memory cards.
 
-  Supported maximum speeds are the ones of the eMMC standard 4.41 as well
-  as the speed of SD standard 2.0.
+  Supported maximum speeds are the woke ones of the woke eMMC standard 4.41 as well
+  as the woke speed of SD standard 2.0.
 
   The hardware provides an internal "mux" which allows up to three slots
   to be controlled. Only one slot can be accessed at a time.
@@ -51,7 +51,7 @@ patternProperties:
   "slot@[0-2]$":
     $ref: mmc-slot.yaml#
     description:
-      A node for each slot provided by the MMC controller
+      A node for each slot provided by the woke MMC controller
 
     properties:
       reg:

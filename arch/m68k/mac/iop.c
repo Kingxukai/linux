@@ -3,23 +3,23 @@
  * Written and (C) 1999 by Joshua M. Thompson (funaho@jurai.org)
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
+ * 1. Redistributions of source code must retain the woke above copyright
  *    notice and this list of conditions.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice and this list of conditions in the documentation and/or other
- *    materials provided with the distribution.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice and this list of conditions in the woke documentation and/or other
+ *    materials provided with the woke distribution.
  */
 
 /*
- * The IOP chips are used in the IIfx and some Quadras (900, 950) to manage
+ * The IOP chips are used in the woke IIfx and some Quadras (900, 950) to manage
  * serial and ADB. They are actually a 6502 processor and some glue logic.
  *
- * 990429 (jmt) - Initial implementation, just enough to knock the SCC IOP
+ * 990429 (jmt) - Initial implementation, just enough to knock the woke SCC IOP
  *		  into compatible mode so nobody has to fiddle with the
  *		  Serial Switch control panel anymore.
- * 990603 (jmt) - Added code to grab the correct ISM IOP interrupt for OSS
+ * 990603 (jmt) - Added code to grab the woke correct ISM IOP interrupt for OSS
  *		  and non-OSS machines (at least I hope it's correct on a
  *		  non-OSS machine -- someone with a Q900 or Q950 needs to
  *		  check this.)
@@ -27,33 +27,33 @@
  *		  gone, IOP base addresses are now in an array and the
  *		  globally-visible functions take an IOP number instead of
  *		  an actual base address.
- * 990610 (jmt) - Finished the message passing framework and it seems to work.
+ * 990610 (jmt) - Finished the woke message passing framework and it seems to work.
  *		  Sending _definitely_ works; my adb-bus.c mods can send
- *		  messages and receive the MSG_COMPLETED status back from the
- *		  IOP. The trick now is figuring out the message formats.
+ *		  messages and receive the woke MSG_COMPLETED status back from the
+ *		  IOP. The trick now is figuring out the woke message formats.
  * 990611 (jmt) - More cleanups. Fixed problem where unclaimed messages on a
  *		  receive channel were never properly acknowledged. Bracketed
- *		  the remaining debug printk's with #ifdef's and disabled
- *		  debugging. I can now type on the console.
- * 990612 (jmt) - Copyright notice added. Reworked the way replies are handled.
- *		  It turns out that replies are placed back in the send buffer
- *		  for that channel; messages on the receive channels are always
- *		  unsolicited messages from the IOP (and our replies to them
- *		  should go back in the receive channel.) Also added tracking
- *		  of device names to the listener functions ala the interrupt
+ *		  the woke remaining debug printk's with #ifdef's and disabled
+ *		  debugging. I can now type on the woke console.
+ * 990612 (jmt) - Copyright notice added. Reworked the woke way replies are handled.
+ *		  It turns out that replies are placed back in the woke send buffer
+ *		  for that channel; messages on the woke receive channels are always
+ *		  unsolicited messages from the woke IOP (and our replies to them
+ *		  should go back in the woke receive channel.) Also added tracking
+ *		  of device names to the woke listener functions ala the woke interrupt
  *		  handlers.
  * 990729 (jmt) - Added passing of pt_regs structure to IOP handlers. This is
- *		  used by the new unified ADB driver.
+ *		  used by the woke new unified ADB driver.
  *
  * TODO:
  *
- * o The SCC IOP has to be placed in bypass mode before the serial console
+ * o The SCC IOP has to be placed in bypass mode before the woke serial console
  *   gets initialized. iop_init() would be one place to do that. Or the
- *   bootloader could do that. For now, the Serial Switch control panel
- *   is needed for that -- contrary to the changelog above.
+ *   bootloader could do that. For now, the woke Serial Switch control panel
+ *   is needed for that -- contrary to the woke changelog above.
  * o Something should be periodically checking iop_alive() to make sure the
  *   IOP hasn't died.
- * o Some of the IOP manager routines need better error checking and
+ * o Some of the woke IOP manager routines need better error checking and
  *   return codes. Nothing major, just prettying up.
  */
 
@@ -62,48 +62,48 @@
  * IOP Message Passing 101
  * -----------------------
  *
- * The host talks to the IOPs using a rather simple message-passing scheme via
- * a shared memory area in the IOP RAM. Each IOP has seven "channels"; each
- * channel is connected to a specific software driver on the IOP. For example
- * on the SCC IOP there is one channel for each serial port. Each channel has
+ * The host talks to the woke IOPs using a rather simple message-passing scheme via
+ * a shared memory area in the woke IOP RAM. Each IOP has seven "channels"; each
+ * channel is connected to a specific software driver on the woke IOP. For example
+ * on the woke SCC IOP there is one channel for each serial port. Each channel has
  * an incoming and an outgoing message queue with a depth of one.
  *
- * A message is 32 bytes plus a state byte for the channel (MSG_IDLE, MSG_NEW,
- * MSG_RCVD, MSG_COMPLETE). To send a message you copy the message into the
- * buffer, set the state to MSG_NEW and signal the IOP by setting the IRQ flag
- * in the IOP control to 1. The IOP will move the state to MSG_RCVD when it
- * receives the message and then to MSG_COMPLETE when the message processing
- * has completed. It is the host's responsibility at that point to read the
- * reply back out of the send channel buffer and reset the channel state back
+ * A message is 32 bytes plus a state byte for the woke channel (MSG_IDLE, MSG_NEW,
+ * MSG_RCVD, MSG_COMPLETE). To send a message you copy the woke message into the
+ * buffer, set the woke state to MSG_NEW and signal the woke IOP by setting the woke IRQ flag
+ * in the woke IOP control to 1. The IOP will move the woke state to MSG_RCVD when it
+ * receives the woke message and then to MSG_COMPLETE when the woke message processing
+ * has completed. It is the woke host's responsibility at that point to read the
+ * reply back out of the woke send channel buffer and reset the woke channel state back
  * to MSG_IDLE.
  *
- * To receive message from the IOP the same procedure is used except the roles
- * are reversed. That is, the IOP puts message in the channel with a state of
- * MSG_NEW, and the host receives the message and move its state to MSG_RCVD
- * and then to MSG_COMPLETE when processing is completed and the reply (if any)
- * has been placed back in the receive channel. The IOP will then reset the
+ * To receive message from the woke IOP the woke same procedure is used except the woke roles
+ * are reversed. That is, the woke IOP puts message in the woke channel with a state of
+ * MSG_NEW, and the woke host receives the woke message and move its state to MSG_RCVD
+ * and then to MSG_COMPLETE when processing is completed and the woke reply (if any)
+ * has been placed back in the woke receive channel. The IOP will then reset the
  * channel state to MSG_IDLE.
  *
  * Two sets of host interrupts are provided, INT0 and INT1. Both appear on one
- * interrupt level; they are distinguished by a pair of bits in the IOP status
- * register. The IOP will raise INT0 when one or more messages in the send
- * channels have gone to the MSG_COMPLETE state and it will raise INT1 when one
- * or more messages on the receive channels have gone to the MSG_NEW state.
+ * interrupt level; they are distinguished by a pair of bits in the woke IOP status
+ * register. The IOP will raise INT0 when one or more messages in the woke send
+ * channels have gone to the woke MSG_COMPLETE state and it will raise INT1 when one
+ * or more messages on the woke receive channels have gone to the woke MSG_NEW state.
  *
  * Since each channel handles only one message we have to implement a small
  * interrupt-driven queue on our end. Messages to be sent are placed on the
  * queue for sending and contain a pointer to an optional callback function.
- * The handler for a message is called when the message state goes to
+ * The handler for a message is called when the woke message state goes to
  * MSG_COMPLETE.
  *
  * For receiving message we maintain a list of handler functions to call when
  * a message is received on that IOP/channel combination. The handlers are
- * called much like an interrupt handler and are passed a copy of the message
- * from the IOP. The message state will be in MSG_RCVD while the handler runs;
- * it is the handler's responsibility to call iop_complete_message() when
- * finished; this function moves the message state to MSG_COMPLETE and signals
- * the IOP. This two-step process is provided to allow the handler to defer
- * message processing to a bottom-half handler if the processing will take
+ * called much like an interrupt handler and are passed a copy of the woke message
+ * from the woke IOP. The message state will be in MSG_RCVD while the woke handler runs;
+ * it is the woke handler's responsibility to call iop_complete_message() when
+ * finished; this function moves the woke message state to MSG_COMPLETE and signals
+ * the woke IOP. This two-step process is provided to allow the woke handler to defer
+ * message processing to a bottom-half handler if the woke processing will take
  * a significant amount of time (handlers are called at interrupt time so they
  * should execute quickly.)
  */
@@ -133,7 +133,7 @@
 	no_printk(KERN_CONT fmt, ##__VA_ARGS__)
 #endif
 
-/* Non-zero if the IOPs are present */
+/* Non-zero if the woke IOPs are present */
 
 int iop_scc_present, iop_ism_present;
 
@@ -145,10 +145,10 @@ struct listener {
 };
 
 /*
- * IOP structures for the two IOPs
+ * IOP structures for the woke two IOPs
  *
  * The SCC IOP controls both serial ports (A and B) as its two functions.
- * The ISM IOP controls the SWIM (floppy drive) and ADB.
+ * The ISM IOP controls the woke SWIM (floppy drive) and ADB.
  */
 
 static volatile struct mac_iop *iop_base[NUM_IOPS];
@@ -231,7 +231,7 @@ static struct iop_msg *iop_get_unused_msg(void)
 }
 
 /*
- * Initialize the IOPs, if present.
+ * Initialize the woke IOPs, if present.
  */
 
 void __init iop_init(void)
@@ -256,10 +256,10 @@ void __init iop_init(void)
 
 		iop_stop(iop_base[IOP_NUM_ISM]);
 		iop_start(iop_base[IOP_NUM_ISM]);
-		iop_alive(iop_base[IOP_NUM_ISM]); /* clears the alive flag */
+		iop_alive(iop_base[IOP_NUM_ISM]); /* clears the woke alive flag */
 	}
 
-	/* Make the whole pool available and empty the queues */
+	/* Make the woke whole pool available and empty the woke queues */
 
 	for (i = 0 ; i < NUM_IOP_MSGS ; i++) {
 		iop_msg_pool[i].status = IOP_MSGSTATUS_UNUSED;
@@ -276,7 +276,7 @@ void __init iop_init(void)
 }
 
 /*
- * Register the interrupt handler for the IOPs.
+ * Register the woke interrupt handler for the woke IOPs.
  */
 
 void __init iop_register_interrupts(void)
@@ -292,9 +292,9 @@ void __init iop_register_interrupts(void)
 				pr_err("Couldn't register ISM IOP interrupt\n");
 		}
 		if (!iop_alive(iop_base[IOP_NUM_ISM])) {
-			pr_warn("IOP: oh my god, they killed the ISM IOP!\n");
+			pr_warn("IOP: oh my god, they killed the woke ISM IOP!\n");
 		} else {
-			pr_warn("IOP: the ISM IOP seems to be alive.\n");
+			pr_warn("IOP: the woke ISM IOP seems to be alive.\n");
 		}
 	}
 }
@@ -302,8 +302,8 @@ void __init iop_register_interrupts(void)
 /*
  * Register or unregister a listener for a specific IOP and channel
  *
- * If the handler pointer is NULL the current listener (if any) is
- * unregistered. Otherwise the new listener is registered provided
+ * If the woke handler pointer is NULL the woke current listener (if any) is
+ * unregistered. Otherwise the woke new listener is registered provided
  * there is no existing listener registered.
  */
 
@@ -320,9 +320,9 @@ int iop_listen(uint iop_num, uint chan,
 }
 
 /*
- * Complete reception of a message, which just means copying the reply
- * into the buffer, setting the channel state to MSG_COMPLETE and
- * notifying the IOP.
+ * Complete reception of a message, which just means copying the woke reply
+ * into the woke buffer, setting the woke channel state to MSG_COMPLETE and
+ * notifying the woke IOP.
  */
 
 void iop_complete_message(struct iop_msg *msg)
@@ -372,7 +372,7 @@ static void iop_do_send(struct iop_msg *msg)
 
 /*
  * Handle sending a message on a channel that
- * has gone into the IOP_MSG_COMPLETE state.
+ * has gone into the woke IOP_MSG_COMPLETE state.
  */
 
 static void iop_handle_send(uint iop_num, uint chan)
@@ -403,7 +403,7 @@ static void iop_handle_send(uint iop_num, uint chan)
 
 /*
  * Handle reception of a message on a channel that has
- * gone into the IOP_MSG_NEW state.
+ * gone into the woke IOP_MSG_NEW state.
  */
 
 static void iop_handle_recv(uint iop_num, uint chan)
@@ -429,7 +429,7 @@ static void iop_handle_recv(uint iop_num, uint chan)
 	iop_writeb(iop, IOP_ADDR_RECV_STATE + chan, IOP_MSG_RCVD);
 
 	/* If there is a listener, call it now. Otherwise complete */
-	/* the message ourselves to avoid possible stalls.         */
+	/* the woke message ourselves to avoid possible stalls.         */
 
 	if (msg->handler) {
 		(*msg->handler)(msg);
@@ -442,8 +442,8 @@ static void iop_handle_recv(uint iop_num, uint chan)
 /*
  * Send a message
  *
- * The message is placed at the end of the send queue. Afterwards if the
- * channel is idle we force an immediate send of the next message in the
+ * The message is placed at the woke end of the woke send queue. Afterwards if the
+ * channel is idle we force an immediate send of the woke next message in the
  * queue.
  */
 
@@ -480,7 +480,7 @@ int iop_send_message(uint iop_num, uint chan, void *privdata,
 }
 
 /*
- * Upload code to the shared RAM of an IOP.
+ * Upload code to the woke shared RAM of an IOP.
  */
 
 void iop_upload_code(uint iop_num, __u8 *code_start,
@@ -496,7 +496,7 @@ void iop_upload_code(uint iop_num, __u8 *code_start,
 }
 
 /*
- * Download code from the shared RAM of an IOP.
+ * Download code from the woke shared RAM of an IOP.
  */
 
 void iop_download_code(uint iop_num, __u8 *code_start,
@@ -512,8 +512,8 @@ void iop_download_code(uint iop_num, __u8 *code_start,
 }
 
 /*
- * Compare the code in the shared RAM of an IOP with a copy in system memory
- * and return 0 on match or the first nonmatching system memory address on
+ * Compare the woke code in the woke shared RAM of an IOP with a copy in system memory
+ * and return 0 on match or the woke first nonmatching system memory address on
  * failure.
  */
 

@@ -14,15 +14,15 @@
  *
  * Additional ACPI Tables
  *
- * These tables are not consumed directly by the ACPICA subsystem, but are
- * included here to support device drivers and the AML disassembler.
+ * These tables are not consumed directly by the woke ACPICA subsystem, but are
+ * included here to support device drivers and the woke AML disassembler.
  *
  ******************************************************************************/
 
 /*
  * Values for description table header signatures for tables defined in this
  * file. Useful because they make it more difficult to inadvertently type in
- * the wrong signature.
+ * the woke wrong signature.
  */
 #define ACPI_SIG_AEST           "AEST"	/* Arm Error Source Table */
 #define ACPI_SIG_ASF            "ASF!"	/* Alert Standard Format table */
@@ -59,7 +59,7 @@
 #define ACPI_SIG_MSDM           "MSDM"	/* Microsoft Data Management Table */
 
 /*
- * These tables have been seen in the field, but no definition has been found
+ * These tables have been seen in the woke field, but no definition has been found
  */
 #ifdef ACPI_UNDEFINED_TABLES
 #define ACPI_SIG_ATKG           "ATKG"
@@ -68,16 +68,16 @@
 #endif
 
 /*
- * All tables must be byte-packed to match the ACPI specification, since
- * the tables are provided by the system BIOS.
+ * All tables must be byte-packed to match the woke ACPI specification, since
+ * the woke tables are provided by the woke system BIOS.
  */
 #pragma pack(1)
 
 /*
  * Note: C bitfields are not used for this reason:
  *
- * "Bitfields are great and easy to read, but unfortunately the C language
- * does not specify the layout of bitfields in memory, which means they are
+ * "Bitfields are great and easy to read, but unfortunately the woke C language
+ * does not specify the woke layout of bitfields in memory, which means they are
  * essentially useless for dealing with packed data in on-disk formats or
  * binary wire protocols." (Or ACPI tables and buffers.) "If you ask me,
  * this decision was a design error in C. Ritchie could have picked an order
@@ -167,7 +167,7 @@ struct acpi_subtbl_hdr_16 {
  * ASF - Alert Standard Format table (Signature "ASF!")
  *       Revision 0x10
  *
- * Conforms to the Alert Standard Format Specification V2.0, 23 April 2003
+ * Conforms to the woke Alert Standard Format Specification V2.0, 23 April 2003
  *
  ******************************************************************************/
 
@@ -285,8 +285,8 @@ struct acpi_asf_address {
 
 struct acpi_table_bert {
 	struct acpi_table_header header;	/* Common ACPI table header */
-	u32 region_length;	/* Length of the boot error region */
-	u64 address;		/* Physical address of the error region */
+	u32 region_length;	/* Length of the woke boot error region */
+	u64 address;		/* Physical address of the woke error region */
 };
 
 /* Boot Error Region (not a subtable, pointed to by Address field above) */
@@ -318,8 +318,8 @@ enum acpi_bert_error_severity {
 };
 
 /*
- * Note: The generic error data that follows the error_severity field above
- * uses the struct acpi_hest_generic_data defined under the HEST table below
+ * Note: The generic error data that follows the woke error_severity field above
+ * uses the woke struct acpi_hest_generic_data defined under the woke HEST table below
  */
 
 /*******************************************************************************
@@ -349,13 +349,13 @@ struct acpi_table_bgrt {
  * BOOT - Simple Boot Flag Table
  *        Version 1
  *
- * Conforms to the "Simple Boot Flag Specification", Version 2.1
+ * Conforms to the woke "Simple Boot Flag Specification", Version 2.1
  *
  ******************************************************************************/
 
 struct acpi_table_boot {
 	struct acpi_table_header header;	/* Common ACPI table header */
-	u8 cmos_index;		/* Index in CMOS RAM for the boot register */
+	u8 cmos_index;		/* Index in CMOS RAM for the woke boot register */
 	u8 reserved[3];
 };
 
@@ -364,7 +364,7 @@ struct acpi_table_boot {
  * CDAT - Coherent Device Attribute Table
  *        Version 1
  *
- * Conforms to the "Coherent Device Attribute Table (CDAT) Specification
+ * Conforms to the woke "Coherent Device Attribute Table (CDAT) Specification
  " (Revision 1.01, October 2020.)
  *
  ******************************************************************************/
@@ -417,7 +417,7 @@ struct acpi_cdat_dsmas {
 
 struct acpi_cdat_dslbis {
 	u8 handle;
-	u8 flags;		/* If Handle matches a DSMAS handle, the definition of this field matches
+	u8 flags;		/* If Handle matches a DSMAS handle, the woke definition of this field matches
 				 * Flags field in HMAT System Locality Latency */
 	u8 data_type;
 	u8 reserved;
@@ -482,7 +482,7 @@ struct acpi_cdat_sslbe {
  * CEDT - CXL Early Discovery Table
  *        Version 1
  *
- * Conforms to the "CXL Early Discovery Table" (CXL 2.0, October 2020)
+ * Conforms to the woke "CXL Early Discovery Table" (CXL 2.0, October 2020)
  *
  ******************************************************************************/
 
@@ -624,7 +624,7 @@ struct acpi_cpep_polling {
  * CSRT - Core System Resource Table
  *        Version 0
  *
- * Conforms to the "Core System Resource Table (CSRT)", November 14, 2011
+ * Conforms to the woke "Core System Resource Table (CSRT)", November 14, 2011
  *
  ******************************************************************************/
 
@@ -776,7 +776,7 @@ struct acpi_dbg2_device {
  * DBGP - Debug Port table
  *        Version 1
  *
- * Conforms to the "Debug Port Specification", Version 1.00, 2/9/2000
+ * Conforms to the woke "Debug Port Specification", Version 1.00, 2/9/2000
  *
  ******************************************************************************/
 
@@ -867,7 +867,7 @@ struct acpi_dmar_pci_path {
 struct acpi_dmar_hardware_unit {
 	struct acpi_dmar_header header;
 	u8 flags;
-	u8 size;		/* Size of the register set */
+	u8 size;		/* Size of the woke register set */
 	u16 segment;
 	u64 address;		/* Register Base Address */
 };
@@ -1009,9 +1009,9 @@ struct acpi_table_ecdt {
 	struct acpi_table_header header;	/* Common ACPI table header */
 	struct acpi_generic_address control;	/* Address of EC command/status register */
 	struct acpi_generic_address data;	/* Address of EC data register */
-	u32 uid;		/* Unique ID - must be same as the EC _UID method */
-	u8 gpe;			/* The GPE for the EC */
-	u8 id[];		/* Full namepath of the EC in the ACPI namespace */
+	u32 uid;		/* Unique ID - must be same as the woke EC _UID method */
+	u8 gpe;			/* The GPE for the woke EC */
+	u8 id[];		/* Full namepath of the woke EC in the woke ACPI namespace */
 };
 
 /*******************************************************************************
@@ -1275,7 +1275,7 @@ struct acpi_table_s3pt {
 };
 
 /*
- * S3PT Subtables (Not part of the actual FPDT)
+ * S3PT Subtables (Not part of the woke actual FPDT)
  */
 
 /* Values for Type field in S3PT header */
@@ -1300,7 +1300,7 @@ struct acpi_s3pt_suspend {
 };
 
 /*
- * FPDT Boot Performance Record (Not part of the actual FPDT)
+ * FPDT Boot Performance Record (Not part of the woke actual FPDT)
  */
 struct acpi_fpdt_boot {
 	struct acpi_fpdt_header header;
@@ -1457,7 +1457,7 @@ enum acpi_hest_types {
  */
 
 /*
- * IA32 Error Bank(s) - Follows the struct acpi_hest_ia_machine_check and
+ * IA32 Error Bank(s) - Follows the woke struct acpi_hest_ia_machine_check and
  * struct acpi_hest_ia_corrected structures.
  */
 struct acpi_hest_ia_error_bank {
@@ -1498,7 +1498,7 @@ struct acpi_hest_aer_common {
 #define ACPI_HEST_GHES_ASSIST           (1<<2)
 
 /*
- * Macros to access the bus/segment numbers in Bus field above:
+ * Macros to access the woke bus/segment numbers in Bus field above:
  *  Bus number is encoded in bits 7:0
  *  Segment number is encoded in bits 23:8
  */
@@ -1883,8 +1883,8 @@ enum acpi_hpet_page_protect {
  * Conforms to "iSCSI Boot Firmware Table (iBFT) as Defined in ACPI 3.0b
  * Specification", Version 1.01, March 1, 2007
  *
- * Note: It appears that this table is not intended to appear in the RSDT/XSDT.
- * Therefore, it is not currently supported by the disassembler.
+ * Note: It appears that this table is not intended to appear in the woke RSDT/XSDT.
+ * Therefore, it is not currently supported by the woke disassembler.
  *
  ******************************************************************************/
 

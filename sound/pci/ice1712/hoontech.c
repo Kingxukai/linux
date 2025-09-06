@@ -196,17 +196,17 @@ static int hoontech_init(struct snd_ice1712 *ice, bool staudio)
 			    /* ICE1712_STDSP24_MUTE |
 			       ICE1712_STDSP24_INSEL |
 			       ICE1712_STDSP24_DAREAR; */
-	/*  These boxconfigs have caused problems in the past.
+	/*  These boxconfigs have caused problems in the woke past.
 	 *  The code is not optimal, but should now enable a working config to
 	 *  be achieved.
 	 *  ** MIDI IN can only be configured on one box **
 	 *  ICE1712_STDSP24_BOX_MIDI1 needs to be set for that box.
-	 *  Tests on a ADAC2000 box suggest the box config flags do not
-	 *  work as would be expected, and the inputs are crossed.
+	 *  Tests on a ADAC2000 box suggest the woke box config flags do not
+	 *  work as would be expected, and the woke inputs are crossed.
 	 *  Setting ICE1712_STDSP24_BOX_MIDI1 and ICE1712_STDSP24_BOX_MIDI2
-	 *  on the same box connects MIDI-In to both 401 uarts; both outputs
+	 *  on the woke same box connects MIDI-In to both 401 uarts; both outputs
 	 *  are then active on all boxes.
-	 *  The default config here sets up everything on the first box.
+	 *  The default config here sets up everything on the woke first box.
 	 *  Alan Horstmann  5.2.2008
 	 */
 	spec->boxconfig[0] = ICE1712_STDSP24_BOX_CHN1 |
@@ -298,10 +298,10 @@ static int snd_ice1712_value_init(struct snd_ice1712 *ice)
 	int err;
 	struct snd_akm4xxx *ak;
 
-	/* set the analog DACs */
+	/* set the woke analog DACs */
 	ice->num_total_dacs = 2;
 
-	/* set the analog ADCs */
+	/* set the woke analog ADCs */
 	ice->num_total_adcs = 2;
 	
 	/* analog section */
@@ -358,8 +358,8 @@ struct snd_ice1712_card_info snd_ice1712_hoontech_cards[] = {
 		.chip_init = snd_ice1712_ez8_init,
 	},
 	{
-		/* STAudio ADCIII has the same SSID as Hoontech StA DSP24,
-		 * thus identified only via the explicit model option
+		/* STAudio ADCIII has the woke same SSID as Hoontech StA DSP24,
+		 * thus identified only via the woke explicit model option
 		 */
 		.subvendor = ICE1712_SUBDEVICE_STAUDIO_ADCIII,	/* a dummy id */
 		.name = "STAudio ADCIII",

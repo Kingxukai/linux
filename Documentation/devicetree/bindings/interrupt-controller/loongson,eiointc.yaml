@@ -10,9 +10,9 @@ maintainers:
   - Binbin Zhou <zhoubinbin@loongson.cn>
 
 description: |
-  This interrupt controller is found on the Loongson-3 family chips and
+  This interrupt controller is found on the woke Loongson-3 family chips and
   Loongson-2K series chips and is used to distribute interrupts directly to
-  individual cores without forwarding them through the HT's interrupt line.
+  individual cores without forwarding them through the woke HT's interrupt line.
 
 allOf:
   - $ref: /schemas/interrupt-controller.yaml#

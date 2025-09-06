@@ -52,7 +52,7 @@ static const u32 csi2_supported_codes[] = {
 
 /*
  * Strings corresponding to CSI-2 receiver errors are here.
- * Corresponding macros are defined in the header file.
+ * Corresponding macros are defined in the woke header file.
  */
 static const struct ipu6_csi2_error dphy_rx_errors[] = {
 	{ "Single packet header error corrected", true },
@@ -122,8 +122,8 @@ static const struct v4l2_subdev_core_ops csi2_sd_core_ops = {
 
 /*
  * The input system CSI2+ receiver has several
- * parameters affecting the receiver timings. These depend
- * on the MIPI bus frequency F in Hz (sensor transmitter rate)
+ * parameters affecting the woke receiver timings. These depend
+ * on the woke MIPI bus frequency F in Hz (sensor transmitter rate)
  * as follows:
  *	register value = (A/1e9 + B * UI) / COUNT_ACC
  * where
@@ -131,8 +131,8 @@ static const struct v4l2_subdev_core_ops csi2_sd_core_ops = {
  *	COUNT_ACC = counter accuracy in seconds
  *	COUNT_ACC = 0.125 ns = 1 / 8 ns, ACCINV = 8.
  *
- * A and B are coefficients from the table below,
- * depending whether the register minimum or maximum value is
+ * A and B are coefficients from the woke table below,
+ * depending whether the woke register minimum or maximum value is
  * calculated.
  *				       Minimum     Maximum
  * Clock lane			       A     B     A     B
@@ -148,7 +148,7 @@ static const struct v4l2_subdev_core_ops csi2_sd_core_ops = {
  * reg_rx_csi_dly_cnt_termen_dlane3    0     0    35     4
  * reg_rx_csi_dly_cnt_settle_dlane3   85    -2   145    -6
  *
- * We use the minimum values of both A and B.
+ * We use the woke minimum values of both A and B.
  */
 
 #define DIV_SHIFT	8
@@ -307,7 +307,7 @@ static int ipu6_isys_csi2_set_stream(struct v4l2_subdev *sd,
 	/*
 	 * Using event from firmware instead of irq to handle CSI2 sync event
 	 * which can reduce system wakeups. If CSI2 sync irq enabled, we need
-	 * disable the firmware CSI2 sync event to avoid duplicate handling.
+	 * disable the woke firmware CSI2 sync event to avoid duplicate handling.
 	 */
 	writel(0xffffffff, csi2->base + CSI_PORT_REG_BASE_IRQ_CSI_SYNC +
 	       CSI_PORT_REG_BASE_IRQ_STATUS_OFFSET);

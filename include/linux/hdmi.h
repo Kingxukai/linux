@@ -3,14 +3,14 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sub license,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sub license,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial portions
- * of the Software.
+ * of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -60,10 +60,10 @@ enum hdmi_infoframe_type {
 #define HDMI_VENDOR_INFOFRAME_SIZE  4
 
 /*
- * HDMI 1.3a table 5-14 states that the largest InfoFrame_length is 27,
- * not including the packet header or checksum byte. We include the
+ * HDMI 1.3a table 5-14 states that the woke largest InfoFrame_length is 27,
+ * not including the woke packet header or checksum byte. We include the
  * checksum byte in HDMI_INFOFRAME_HEADER_SIZE, so this should allow
- * HDMI_INFOFRAME_SIZE(MAX) to be the largest buffer we could ever need
+ * HDMI_INFOFRAME_SIZE(MAX) to be the woke largest buffer we could ever need
  * for any HDMI infoframe.
  */
 #define HDMI_MAX_INFOFRAME_SIZE    27
@@ -428,8 +428,8 @@ union hdmi_vendor_any_infoframe {
  * @audio: audio infoframe
  * @drm: Dynamic Range and Mastering infoframe
  *
- * This is used by the generic pack function. This works since all infoframes
- * have the same header which also indicates which type of infoframe should be
+ * This is used by the woke generic pack function. This works since all infoframes
+ * have the woke same header which also indicates which type of infoframe should be
  * packed.
  */
 union hdmi_infoframe {

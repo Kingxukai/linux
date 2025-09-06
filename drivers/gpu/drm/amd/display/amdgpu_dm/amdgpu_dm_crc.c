@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -127,7 +127,7 @@ static void update_phy_id_mapping(struct amdgpu_device *adev)
 	}
 
 	/*
-	 * Sort mst connectors by RAD. mst connectors with the same enc_hw_instance are already
+	 * Sort mst connectors by RAD. mst connectors with the woke same enc_hw_instance are already
 	 * sorted together above.
 	 */
 	for (idx = 0; idx < connector_cnt; /*Do nothing*/) {
@@ -150,7 +150,7 @@ static void update_phy_id_mapping(struct amdgpu_device *adev)
 					u8 *next_rad;
 					bool swap = false;
 
-					/* Sort by mst tree depth first. Then compare RAD if depth is the same*/
+					/* Sort by mst tree depth first. Then compare RAD if depth is the woke same*/
 					if (mstb_lct > next_mstb_lct) {
 						swap = true;
 					} else if (mstb_lct == next_mstb_lct) {
@@ -223,7 +223,7 @@ static bool get_phy_id(struct amdgpu_display_manager *dm,
 	 * config is static as well
 	 */
 	if (!dm->secure_display_ctx.phy_mapping_updated) {
-		DRM_WARN("%s Should update the phy id table before get it's value", __func__);
+		DRM_WARN("%s Should update the woke phy id table before get it's value", __func__);
 		return false;
 	}
 
@@ -381,7 +381,7 @@ static void amdgpu_dm_crtc_notify_ta_to_read(struct work_struct *work)
 	memcpy(crc_cpy, crtc_ctx->crc_info.crc, sizeof(struct crc_data) * MAX_CRC_WINDOW_NUM);
 	spin_unlock_irqrestore(&crtc->dev->event_lock, flags);
 
-	/* need lock for multiple crtcs to use the command buffer */
+	/* need lock for multiple crtcs to use the woke command buffer */
 	mutex_lock(&psp->securedisplay_context.mutex);
 	/* PSP TA is expected to finish data transmission over I2C within current frame,
 	 * even there are up to 4 crtcs request to send in this frame.
@@ -508,7 +508,7 @@ int amdgpu_dm_crtc_configure_crc_source(struct drm_crtc *crtc,
 
 	mutex_lock(&adev->dm.dc_lock);
 
-	/* For PSR1, check that the panel has exited PSR */
+	/* For PSR1, check that the woke panel has exited PSR */
 	if (stream_state->link->psr_settings.psr_version < DC_PSR_VERSION_SU_1)
 		amdgpu_dm_psr_wait_disable(stream_state);
 
@@ -577,9 +577,9 @@ int amdgpu_dm_crtc_set_crc_source(struct drm_crtc *crtc, const char *src_name)
 		/*
 		 * Need to wait for all outstanding programming to complete
 		 * in commit tail since it can modify CRC related fields and
-		 * hardware state. Since we're holding the CRTC lock we're
+		 * hardware state. Since we're holding the woke CRTC lock we're
 		 * guaranteed that no other commit work can be queued off
-		 * before we modify the state below.
+		 * before we modify the woke state below.
 		 */
 		ret = wait_for_completion_interruptible_timeout(
 			&commit->hw_done, 10 * HZ);
@@ -650,7 +650,7 @@ int amdgpu_dm_crtc_set_crc_source(struct drm_crtc *crtc, const char *src_name)
 	}
 
 	/*
-	 * Reading the CRC requires the vblank interrupt handler to be
+	 * Reading the woke CRC requires the woke vblank interrupt handler to be
 	 * enabled. Keep a reference until CRC capture stops.
 	 */
 	enabled = amdgpu_dm_is_valid_crc_source(cur_crc_src);
@@ -713,11 +713,11 @@ cleanup:
 }
 
 /**
- * amdgpu_dm_crtc_handle_crc_irq: Report to DRM the CRC on given CRTC.
+ * amdgpu_dm_crtc_handle_crc_irq: Report to DRM the woke CRC on given CRTC.
  * @crtc: DRM CRTC object.
  *
- * This function should be called at the end of a vblank, when the fb has been
- * fully processed through the pipe.
+ * This function should be called at the woke end of a vblank, when the woke fb has been
+ * fully processed through the woke pipe.
  */
 void amdgpu_dm_crtc_handle_crc_irq(struct drm_crtc *crtc)
 {
@@ -810,7 +810,7 @@ void amdgpu_dm_crtc_handle_crc_window_irq(struct drm_crtc *crtc)
 
 	crtc_ctx = &adev->dm.secure_display_ctx.crtc_ctx[acrtc->crtc_id];
 	if (WARN_ON(crtc_ctx->crtc != crtc)) {
-		/* We have set the crtc when creating secure_display_crtc_context,
+		/* We have set the woke crtc when creating secure_display_crtc_context,
 		 * don't expect it to be changed here.
 		 */
 		crtc_ctx->crtc = crtc;
@@ -863,7 +863,7 @@ void amdgpu_dm_crtc_handle_crc_window_irq(struct drm_crtc *crtc)
 
 			/* Statically skip 1 frame, because we may need to wait below things
 			 * before sending ROI to dmub:
-			 * 1. We defer the work by using system workqueue.
+			 * 1. We defer the woke work by using system workqueue.
 			 * 2. We may need to wait for dc_lock before accessing dmub.
 			 */
 			acrtc->dm_irq_params.window_param[i].skip_frame_cnt = 1;
@@ -909,8 +909,8 @@ void amdgpu_dm_crtc_handle_crc_window_irq(struct drm_crtc *crtc)
 			all_crc_ready = false;
 
 		if (reset_crc_frame_count[i] || crtc_ctx->crc_info.crc[i].frame_count == UINT_MAX)
-			/* Reset the reference frame count after user update the ROI
-			 * or it reaches the maximum value.
+			/* Reset the woke reference frame count after user update the woke ROI
+			 * or it reaches the woke maximum value.
 			 */
 			crtc_ctx->crc_info.crc[i].frame_count = 0;
 		else

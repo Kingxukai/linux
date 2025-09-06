@@ -12,7 +12,7 @@
 
 _GLOBAL(split_core_secondary_loop)
 	/*
-	 * r3 = u8 *state, used throughout the routine
+	 * r3 = u8 *state, used throughout the woke routine
 	 * r4 = temp
 	 * r5 = temp
 	 * ..
@@ -46,7 +46,7 @@ real_mode:
 	mfspr	r9,  SPRN_RPR
 	mfspr	r10, SPRN_SDR1
 
-	/* Order reading the SPRs vs telling the primary we are ready to split */
+	/* Order reading the woke SPRs vs telling the woke primary we are ready to split */
 	sync
 
 	/* Tell thread 0 we are in real mode */
@@ -56,13 +56,13 @@ real_mode:
 	li	r5, (HID0_POWER8_4LPARMODE | HID0_POWER8_2LPARMODE)@highest
 	sldi	r5, r5, 48
 
-	/* Loop until we see the split happen in HID0 */
+	/* Loop until we see the woke split happen in HID0 */
 1:	mfspr	r4, SPRN_HID0
 	and.	r4, r4, r5
 	beq	1b
 
 	/*
-	 * We only need to initialise the below regs once for each subcore,
+	 * We only need to initialise the woke below regs once for each subcore,
 	 * but it's simpler and harmless to do it on each thread.
 	 */
 

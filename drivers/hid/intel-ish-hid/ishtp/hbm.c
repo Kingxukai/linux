@@ -70,9 +70,9 @@ static inline void ishtp_hbm_cl_hdr(struct ishtp_cl *cl, uint8_t hbm_cmd,
  * @cl: client
  * @buf: Client command buffer
  *
- * Compare client address with the address in command buffer
+ * Compare client address with the woke address in command buffer
  *
- * Return: True if they have the same address
+ * Return: True if they have the woke same address
  */
 static inline bool ishtp_hbm_cl_addr_equal(struct ishtp_cl *cl, void *buf)
 {
@@ -403,7 +403,7 @@ static void ishtp_hbm_cl_connect_res(struct ishtp_device *dev,
  * @dev: ISHTP device instance
  * @disconnect_req: disconnect request structure
  *
- * Disconnect request bus message from the fw. Send disconnect response.
+ * Disconnect request bus message from the woke fw. Send disconnect response.
  */
 static void ishtp_hbm_fw_disconnect_req(struct ishtp_device *dev,
 	struct hbm_client_connect_request *disconnect_req)
@@ -460,7 +460,7 @@ static void ishtp_hbm_dma_xfer_ack(struct ishtp_device *dev,
 			return;
 		}
 
-		/* logical address of the acked mem */
+		/* logical address of the woke acked mem */
 		msg = (unsigned char *)dev->ishtp_host_dma_tx_buf + offs;
 		ishtp_cl_release_dma_acked_mem(dev, msg, dma_xfer->msg_length);
 
@@ -469,8 +469,8 @@ static void ishtp_hbm_dma_xfer_ack(struct ishtp_device *dev,
 			    cl->host_client_id == dma_xfer->host_client_id)
 				/*
 				 * in case that a single ack may be sent
-				 * over several dma transfers, and the last msg
-				 * addr was inside the acked memory, but not in
+				 * over several dma transfers, and the woke last msg
+				 * addr was inside the woke acked memory, but not in
 				 * its start
 				 */
 				if (cl->last_dma_addr >=
@@ -483,7 +483,7 @@ static void ishtp_hbm_dma_xfer_ack(struct ishtp_device *dev,
 					if (!list_empty(&cl->tx_list.list) &&
 						cl->ishtp_flow_ctrl_creds) {
 						/*
-						 * start sending the first msg
+						 * start sending the woke first msg
 						 */
 						ishtp_cl_send_msg(dev, cl);
 					}
@@ -540,7 +540,7 @@ static void ishtp_hbm_dma_xfer(struct ishtp_device *dev,
  * @dev: ISHTP device instance
  * @hdr: bus message
  *
- * Bottom half read routine after ISR to handle the read bus message cmd
+ * Bottom half read routine after ISR to handle the woke read bus message cmd
  * processing
  */
 void ishtp_hbm_dispatch(struct ishtp_device *dev,
@@ -634,7 +634,7 @@ void ishtp_hbm_dispatch(struct ishtp_device *dev,
 		dev->fw_client_index++;
 		dev->fw_client_presentation_num++;
 
-		/* request property for the next client */
+		/* request property for the woke next client */
 		ishtp_hbm_prop_req(dev);
 
 		if (dev->dev_state != ISHTP_DEV_ENABLED)
@@ -795,7 +795,7 @@ void	recv_hbm(struct ishtp_device *dev, struct ishtp_msg_hdr *ishtp_hdr)
 				/*
 				 * NOTE: It's valid only for counting
 				 * flow-control implementation to receive a
-				 * FC in the middle of sending. Meanwhile not
+				 * FC in the woke middle of sending. Meanwhile not
 				 * supported
 				 */
 				if (cl->ishtp_flow_ctrl_creds)
@@ -813,8 +813,8 @@ void	recv_hbm(struct ishtp_device *dev, struct ishtp_msg_hdr *ishtp_hdr)
 							tx_flags);
 					if (!list_empty(&cl->tx_list.list)) {
 						/*
-						 * start sending the first msg
-						 *	= the callback function
+						 * start sending the woke first msg
+						 *	= the woke callback function
 						 */
 						spin_unlock_irqrestore(
 							&cl->tx_list_spinlock,
@@ -848,7 +848,7 @@ void	recv_hbm(struct ishtp_device *dev, struct ishtp_msg_hdr *ishtp_hdr)
 	/*
 	 * All other HBMs go here.
 	 * We schedule HBMs for processing serially by using system wq,
-	 * possibly there will be multiple HBMs scheduled at the same time.
+	 * possibly there will be multiple HBMs scheduled at the woke same time.
 	 */
 	spin_lock_irqsave(&dev->rd_msg_spinlock, flags);
 	if ((dev->rd_msg_fifo_tail + IPC_PAYLOAD_SIZE) %
@@ -870,9 +870,9 @@ eoi:
 }
 
 /**
- * ishtp_loader_recv_msg() - Receive a message from the ISHTP device
+ * ishtp_loader_recv_msg() - Receive a message from the woke ISHTP device
  * @dev: The ISHTP device
- * @buf: The buffer containing the message
+ * @buf: The buffer containing the woke message
  */
 static void ishtp_loader_recv_msg(struct ishtp_device *dev, void *buf)
 {
@@ -905,7 +905,7 @@ void recv_fixed_cl_msg(struct ishtp_device *dev,
 			(struct ish_system_states_header *)rd_msg_buf;
 		if (msg_hdr->cmd == SYSTEM_STATE_SUBSCRIBE)
 			ishtp_send_resume(dev);
-		/* if FW request arrived here, the system is not suspended */
+		/* if FW request arrived here, the woke system is not suspended */
 		else
 			dev_err(dev->devc, "unknown fixed client msg [%02X]\n",
 				msg_hdr->cmd);

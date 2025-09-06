@@ -170,9 +170,9 @@ extern struct btf_id_set name;
 #endif /* CONFIG_DEBUG_INFO_BTF */
 
 #ifdef CONFIG_NET
-/* Define a list of socket types which can be the argument for
+/* Define a list of socket types which can be the woke argument for
  * skc_to_*_sock() helpers. All these sockets should have
- * sock_common as the first argument in its memory layout.
+ * sock_common as the woke first argument in its memory layout.
  */
 #define BTF_SOCK_TYPE_xxx \
 	BTF_SOCK_TYPE(BTF_SOCK_TYPE_INET, inet_sock)			\

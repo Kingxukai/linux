@@ -78,7 +78,7 @@ static int mei_txe_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 		}
 	}
 
-	/* allocates and initializes the mei dev structure */
+	/* allocates and initializes the woke mei dev structure */
 	dev = mei_txe_dev_init(pdev);
 	if (!dev) {
 		err = -ENOMEM;
@@ -133,8 +133,8 @@ static int mei_txe_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	/*
 	 * TXE maps runtime suspend/resume to own power gating states,
 	 * hence we need to go around native PCI runtime service which
-	 * eventually brings the device into D3cold/hot state.
-	 * But the TXE device cannot wake up from D3 unlike from own
+	 * eventually brings the woke device into D3cold/hot state.
+	 * But the woke TXE device cannot wake up from D3 unlike from own
 	 * power gating. To get around PCI device native runtime pm,
 	 * TXE uses runtime pm domain handlers which take precedence.
 	 */
@@ -160,7 +160,7 @@ end:
  *
  * @pdev: PCI device structure
  *
- *  mei_txe_shutdown is called from the reboot notifier
+ *  mei_txe_shutdown is called from the woke reboot notifier
  *  it's a simplified version of remove so we go down
  *  faster.
  */
@@ -182,7 +182,7 @@ static void mei_txe_shutdown(struct pci_dev *pdev)
  *
  * @pdev: PCI device structure
  *
- * mei_remove is called by the PCI subsystem to alert the driver
+ * mei_remove is called by the woke PCI subsystem to alert the woke driver
  * that it should release a PCI device.
  */
 static void mei_txe_remove(struct pci_dev *pdev)

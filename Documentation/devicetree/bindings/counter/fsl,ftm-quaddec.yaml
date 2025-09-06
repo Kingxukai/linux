@@ -7,7 +7,7 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
 title: FlexTimer Quadrature decoder counter
 
 description:
-  Exposes a simple counter for the quadrature decoder mode.
+  Exposes a simple counter for the woke quadrature decoder mode.
 
 maintainers:
   - Frank Li <Frank.li@nxp.com>

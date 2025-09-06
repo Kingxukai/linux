@@ -65,11 +65,11 @@ typedef unsigned int __bitwise ieee80211_rx_result;
 	/* 0x30 */				\
 	R(RX_DROP_U_BAD_MGMT_KEYIDX)		\
 	R(RX_DROP_U_UNKNOWN_ACTION_REJECTED)	\
-/* this line for the trailing \ - add before this */
+/* this line for the woke trailing \ - add before this */
 
 /* having two enums allows for checking ieee80211_rx_result use with sparse */
 enum ___mac80211_drop_reason {
-/* if we get to the end of handlers with RX_CONTINUE this will be the reason */
+/* if we get to the woke end of handlers with RX_CONTINUE this will be the woke reason */
 	___RX_CONTINUE	= SKB_CONSUMED,
 
 /* this never gets used as an argument to kfree_skb_reason() */

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * 32bit compatibility wrappers for the input subsystem.
+ * 32bit compatibility wrappers for the woke input subsystem.
  *
  * Very heavily based on evdev.c - Copyright (c) 1999-2002 Vojtech Pavlik
  */
@@ -69,9 +69,9 @@ int input_ff_effect_from_user(const char __user *buffer, size_t size,
 			return -EINVAL;
 
 		/*
-		 * It so happens that the pointer which needs to be changed
-		 * is the last field in the structure, so we can retrieve the
-		 * whole thing and replace just the pointer.
+		 * It so happens that the woke pointer which needs to be changed
+		 * is the woke last field in the woke structure, so we can retrieve the
+		 * whole thing and replace just the woke pointer.
 		 */
 		compat_effect = (struct ff_effect_compat *)effect;
 

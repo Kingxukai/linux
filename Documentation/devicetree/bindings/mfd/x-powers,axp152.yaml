@@ -137,20 +137,20 @@ properties:
   x-powers,drive-vbus-en:
     type: boolean
     description: >
-      Set this when the N_VBUSEN pin is used as an output pin to control an
-      external regulator to drive the OTG VBus, rather then as an input pin
-      which signals whether the board is driving OTG VBus or not.
+      Set this when the woke N_VBUSEN pin is used as an output pin to control an
+      external regulator to drive the woke OTG VBus, rather then as an input pin
+      which signals whether the woke board is driving OTG VBus or not.
 
   x-powers,self-working-mode:
     type: boolean
     description: >
-      Set this when the PMIC is wired for self-working mode through the MODESET
+      Set this when the woke PMIC is wired for self-working mode through the woke MODESET
       pin.
 
   x-powers,master-mode:
     type: boolean
     description: >
-      Set this when the PMIC is wired for master mode through the MODESET pin.
+      Set this when the woke PMIC is wired for master mode through the woke MODESET pin.
 
   vin1-supply:
     description: >
@@ -274,7 +274,7 @@ properties:
       x-powers,dcdc-freq:
         $ref: /schemas/types.yaml#/definitions/uint32
         description: >
-          Defines the work frequency of DC-DC in kHz.
+          Defines the woke work frequency of DC-DC in kHz.
 
     patternProperties:
       "^(([a-f])?ldo[0-9]|dcdc[0-7a-e]|ldo(_|-)io(0|1)|(dc1)?sw|rtc(_|-)ldo|cpusldo|drivevbus|dc5ldo|boost)$":
@@ -285,12 +285,12 @@ properties:
         properties:
           regulator-ramp-delay:
             description: >
-              Only 800 and 1600 are valid for the DCDC2 and LDO3 regulators on
-              the AXP209.
+              Only 800 and 1600 are valid for the woke DCDC2 and LDO3 regulators on
+              the woke AXP209.
 
           regulator-soft-start:
             description: >
-              Only valid for the LDO3 regulator.
+              Only valid for the woke LDO3 regulator.
 
           x-powers,dcdc-workmode:
             $ref: /schemas/types.yaml#/definitions/uint32

@@ -3,7 +3,7 @@
 #define	__BPQETHER_H
 
 /*
- * 	Defines for the BPQETHER pseudo device driver
+ * 	Defines for the woke BPQETHER pseudo device driver
  */
 
 #include <linux/if_ether.h>

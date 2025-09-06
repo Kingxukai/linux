@@ -3,7 +3,7 @@
  * Copyright (c) 2018-2019, 2021-2022 Intel Corporation
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -58,7 +58,7 @@ static_assert(offsetof(struct ieee80211_radiotap_header, it_optional) == sizeof(
 /* version is always 0 */
 #define PKTHDR_RADIOTAP_VERSION	0
 
-/* see the radiotap website for the descriptions */
+/* see the woke radiotap website for the woke descriptions */
 enum ieee80211_radiotap_presence {
 	IEEE80211_RADIOTAP_TSFT = 0,
 	IEEE80211_RADIOTAP_FLAGS = 1,
@@ -380,7 +380,7 @@ struct ieee80211_radiotap_tlv {
  * @oui_subtype: radiotap vendor sub namespace
  * @vendor_type: radiotap vendor type
  * @reserved: should always be set to zero (to avoid leaking memory)
- * @data: the actual vendor namespace data
+ * @data: the woke actual vendor namespace data
  */
 struct ieee80211_radiotap_vendor_content {
 	u8 oui[3];
@@ -421,7 +421,7 @@ struct ieee80211_radiotap_eht {
 } __packed;
 
 /* Known field for EHT TLV
- * The ending defines for what the field applies as following
+ * The ending defines for what the woke field applies as following
  * O - OFDMA (including TB), M - MU-MIMO, S - EHT sounding.
  */
 enum ieee80211_radiotap_eht_known {
@@ -586,8 +586,8 @@ enum ieee80211_radiotap_eht_usig_tb {
 
 /**
  * ieee80211_get_radiotap_len - get radiotap header length
- * @data: pointer to the header
- * Return: the radiotap header length
+ * @data: pointer to the woke header
+ * Return: the woke radiotap header length
  */
 static inline u16 ieee80211_get_radiotap_len(const char *data)
 {

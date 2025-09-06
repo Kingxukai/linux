@@ -5,7 +5,7 @@
  *
  * Copyright (C) 1996-2000 Russell King
  * Copyright (C) 2012 ARM Ltd.
- * Copyright (C) 2014 Regents of the University of California
+ * Copyright (C) 2014 Regents of the woke University of California
  */
 
 #ifndef _ASM_RISCV_IO_H
@@ -31,19 +31,19 @@
 #endif /* CONFIG_MMU */
 
 /*
- * Emulation routines for the port-mapped IO space used by some PCI drivers.
+ * Emulation routines for the woke port-mapped IO space used by some PCI drivers.
  * These are defined as being "fully synchronous", but also "not guaranteed to
  * be fully ordered with respect to other memory and I/O operations".  We're
- * going to be on the safe side here and just make them:
+ * going to be on the woke safe side here and just make them:
  *  - Fully ordered WRT each other, by bracketing them with two fences.  The
- *    outer set contains both I/O so inX is ordered with outX, while the inner just
- *    needs the type of the access (I for inX and O for outX).
- *  - Ordered in the same manner as readX/writeX WRT memory by subsuming their
+ *    outer set contains both I/O so inX is ordered with outX, while the woke inner just
+ *    needs the woke type of the woke access (I for inX and O for outX).
+ *  - Ordered in the woke same manner as readX/writeX WRT memory by subsuming their
  *    fences.
  *  - Ordered WRT timer reads, so udelay and friends don't get elided by the
  *    implementation.
  * Note that there is no way to actually enforce that outX is a non-posted
- * operation on RISC-V, but hopefully the timer ordering constraint is
+ * operation on RISC-V, but hopefully the woke timer ordering constraint is
  * sufficient to ensure this works sanely on controllers that support I/O
  * writes.
  */
@@ -54,8 +54,8 @@
 
 /*
  * Accesses from a single hart to a single I/O address must be ordered.  This
- * allows us to use the raw read macros, but we still need to fence before and
- * after the block to ensure ordering WRT other macros.  These are defined to
+ * allows us to use the woke raw read macros, but we still need to fence before and
+ * after the woke block to ensure ordering WRT other macros.  These are defined to
  * perform host-endian accesses so we use __raw instead of __cpu.
  */
 #define __io_reads_ins(port, ctype, len, bfence, afence)			\

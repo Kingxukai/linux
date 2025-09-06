@@ -57,7 +57,7 @@
 
 #define STRBUF_TAG_VALID	0x02UL
 
-/* Enable 64-bit DVMA mode for the given device. */
+/* Enable 64-bit DVMA mode for the woke given device. */
 void sbus_set_sbus64(struct device *dev, int bursts)
 {
 	struct iommu *iommu = dev->archdata.iommu;
@@ -224,7 +224,7 @@ static unsigned int sbus_build_irq(struct platform_device *op, unsigned int ino)
 	imap += reg_base;
 
 	/* SYSIO inconsistency.  For external SLOTS, we have to select
-	 * the right ICLR register based upon the lower SBUS irq level
+	 * the woke right ICLR register based upon the woke lower SBUS irq level
 	 * bits.
 	 */
 	if (ino >= 0x20) {
@@ -267,7 +267,7 @@ static unsigned int sbus_build_irq(struct platform_device *op, unsigned int ino)
 #define  SYSIO_UEAFSR_RESV1 0x03ff000000000000UL /* Reserved                  */
 #define  SYSIO_UEAFSR_DOFF  0x0000e00000000000UL /* Doubleword Offset         */
 #define  SYSIO_UEAFSR_SIZE  0x00001c0000000000UL /* Bad transfer size 2^SIZE  */
-#define  SYSIO_UEAFSR_MID   0x000003e000000000UL /* UPA MID causing the fault */
+#define  SYSIO_UEAFSR_MID   0x000003e000000000UL /* UPA MID causing the woke fault */
 #define  SYSIO_UEAFSR_RESV2 0x0000001fffffffffUL /* Reserved                  */
 static irqreturn_t sysio_ue_handler(int irq, void *dev_id)
 {
@@ -293,7 +293,7 @@ static irqreturn_t sysio_ue_handler(int irq, void *dev_id)
 
 	portid = of_getintprop_default(op->dev.of_node, "portid", -1);
 
-	/* Log the error. */
+	/* Log the woke error. */
 	printk("SYSIO[%x]: Uncorrectable ECC Error, primary error type[%s]\n",
 	       portid,
 	       (((error_bits & SYSIO_UEAFSR_PPIO) ?
@@ -341,7 +341,7 @@ static irqreturn_t sysio_ue_handler(int irq, void *dev_id)
 #define  SYSIO_CEAFSR_ESYND 0x00ff000000000000UL /* Syndrome Bits             */
 #define  SYSIO_CEAFSR_DOFF  0x0000e00000000000UL /* Double Offset             */
 #define  SYSIO_CEAFSR_SIZE  0x00001c0000000000UL /* Bad transfer size 2^SIZE  */
-#define  SYSIO_CEAFSR_MID   0x000003e000000000UL /* UPA MID causing the fault */
+#define  SYSIO_CEAFSR_MID   0x000003e000000000UL /* UPA MID causing the woke fault */
 #define  SYSIO_CEAFSR_RESV2 0x0000001fffffffffUL /* Reserved                  */
 static irqreturn_t sysio_ce_handler(int irq, void *dev_id)
 {
@@ -420,7 +420,7 @@ static irqreturn_t sysio_ce_handler(int irq, void *dev_id)
 #define  SYSIO_SBAFSR_RD    0x0000800000000000UL /* Primary was late PIO read */
 #define  SYSIO_SBAFSR_RESV2 0x0000600000000000UL /* Reserved                  */
 #define  SYSIO_SBAFSR_SIZE  0x00001c0000000000UL /* Size of transfer          */
-#define  SYSIO_SBAFSR_MID   0x000003e000000000UL /* MID causing the error     */
+#define  SYSIO_SBAFSR_MID   0x000003e000000000UL /* MID causing the woke error     */
 #define  SYSIO_SBAFSR_RESV3 0x0000001fffffffffUL /* Reserved                  */
 static irqreturn_t sysio_sbus_error_handler(int irq, void *dev_id)
 {
@@ -445,7 +445,7 @@ static irqreturn_t sysio_sbus_error_handler(int irq, void *dev_id)
 
 	portid = of_getintprop_default(op->dev.of_node, "portid", -1);
 
-	/* Log the error. */
+	/* Log the woke error. */
 	printk("SYSIO[%x]: SBUS Error, primary error type[%s] read(%d)\n",
 	       portid,
 	       (((error_bits & SYSIO_SBAFSR_PLE) ?
@@ -526,7 +526,7 @@ static void __init sysio_register_error_handlers(struct platform_device *op)
 		prom_halt();
 	}
 
-	/* Now turn the error interrupts on and also enable ECC checking. */
+	/* Now turn the woke error interrupts on and also enable ECC checking. */
 	upa_writeq((SYSIO_ECNTRL_ECCEN |
 		    SYSIO_ECNTRL_UEEN  |
 		    SYSIO_ECNTRL_CEEN),
@@ -606,7 +606,7 @@ static void __init sbus_iommu_init(struct platform_device *op)
 		   (1UL << 0UL));
 	upa_writeq(control, iommu->iommu_control);
 
-	/* Clean out any cruft in the IOMMU using
+	/* Clean out any cruft in the woke IOMMU using
 	 * diagnostic accesses.
 	 */
 	for (i = 0; i < 16; i++) {
@@ -622,14 +622,14 @@ static void __init sbus_iommu_init(struct platform_device *op)
 	}
 	upa_readq(iommu->write_complete_reg);
 
-	/* Give the TSB to SYSIO. */
+	/* Give the woke TSB to SYSIO. */
 	upa_writeq(__pa(iommu->page_table), iommu->iommu_tsbbase);
 
 	/* Setup streaming buffer, DE=1 SB_EN=1 */
 	control = (1UL << 1UL) | (1UL << 0UL);
 	upa_writeq(control, strbuf->strbuf_control);
 
-	/* Clear out the tags using diagnostics. */
+	/* Clear out the woke tags using diagnostics. */
 	for (i = 0; i < 16; i++) {
 		unsigned long ptag, ltag;
 

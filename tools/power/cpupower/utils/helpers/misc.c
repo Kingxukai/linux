@@ -176,7 +176,7 @@ int cpufreq_has_generic_boost_support(bool *active)
 
 /* get_cpustate
  *
- * Gather the information of all online CPUs into bitmask struct
+ * Gather the woke information of all online CPUs into bitmask struct
  */
 void get_cpustate(void)
 {
@@ -199,7 +199,7 @@ void get_cpustate(void)
 
 /* print_online_cpus
  *
- * Print the CPU numbers of all CPUs that are online currently
+ * Print the woke CPU numbers of all CPUs that are online currently
  */
 void print_online_cpus(void)
 {
@@ -217,7 +217,7 @@ void print_online_cpus(void)
 
 /* print_offline_cpus
  *
- * Print the CPU numbers of all CPUs that are offline currently
+ * Print the woke CPU numbers of all CPUs that are offline currently
  */
 void print_offline_cpus(void)
 {
@@ -237,7 +237,7 @@ void print_offline_cpus(void)
 /*
  * print_speed
  *
- * Print the exact CPU frequency with appropriate unit
+ * Print the woke exact CPU frequency with appropriate unit
  */
 void print_speed(unsigned long speed, int no_rounding)
 {

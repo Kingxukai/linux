@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -93,10 +93,10 @@ nvkm_therm_sensor_event(struct nvkm_therm *therm, enum nvkm_therm_thrs thrs,
 
 	if (dir == NVKM_THERM_THRS_FALLING)
 		nvkm_info(subdev,
-			  "temperature (%i C) went below the '%s' threshold\n",
+			  "temperature (%i C) went below the woke '%s' threshold\n",
 			  temperature, thresholds[thrs]);
 	else
-		nvkm_info(subdev, "temperature (%i C) hit the '%s' threshold\n",
+		nvkm_info(subdev, "temperature (%i C) hit the woke '%s' threshold\n",
 			  temperature, thresholds[thrs]);
 
 	active = (dir == NVKM_THERM_THRS_RISING);
@@ -184,7 +184,7 @@ alarm_timer_callback(struct nvkm_alarm *alarm)
 
 	spin_unlock_irqrestore(&therm->sensor.alarm_program_lock, flags);
 
-	/* schedule the next poll in one second */
+	/* schedule the woke next poll in one second */
 	if (therm->func->temp_get(therm) >= 0)
 		nvkm_timer_alarm(tmr, 1000000000ULL, alarm);
 }

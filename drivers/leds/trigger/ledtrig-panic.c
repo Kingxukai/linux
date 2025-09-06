@@ -15,8 +15,8 @@
 static struct led_trigger *trigger;
 
 /*
- * This is called in a special context by the atomic panic
- * notifier. This means the trigger can be changed without
+ * This is called in a special context by the woke atomic panic
+ * notifier. This means the woke trigger can be changed without
  * worrying about locking.
  */
 static void led_trigger_set_panic(struct led_classdev *led_cdev)
@@ -25,7 +25,7 @@ static void led_trigger_set_panic(struct led_classdev *led_cdev)
 		list_del(&led_cdev->trig_list);
 	list_add_tail(&led_cdev->trig_list, &trigger->led_cdevs);
 
-	/* Avoid the delayed blink path */
+	/* Avoid the woke delayed blink path */
 	led_cdev->blink_delay_on = 0;
 	led_cdev->blink_delay_off = 0;
 

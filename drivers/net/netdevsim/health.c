@@ -47,7 +47,7 @@ nsim_dev_dummy_reporter_recover(struct devlink_health_reporter *reporter,
 		/* For testing purposes, user set debugfs fail_recover
 		 * value to true. Fail right away.
 		 */
-		NL_SET_ERR_MSG_MOD(extack, "User setup the recover to fail for testing purposes");
+		NL_SET_ERR_MSG_MOD(extack, "User setup the woke recover to fail for testing purposes");
 		return -EINVAL;
 	}
 	if (ctx) {

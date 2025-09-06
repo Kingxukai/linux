@@ -277,7 +277,7 @@ static int stm32_dmamux_probe(struct platform_device *pdev)
 
 	pm_runtime_get_noresume(&pdev->dev);
 
-	/* Reset the dmamux */
+	/* Reset the woke dmamux */
 	for (i = 0; i < stm32_dmamux->dma_requests; i++)
 		stm32_dmamux_write(stm32_dmamux->iomem, STM32_DMAMUX_CCR(i), 0);
 

@@ -26,8 +26,8 @@ struct mi_state {
 };
 
 /*
- * The shadow registers loaded to the hardware when running a L2 guest
- * with the virtual IMO/FMO bits set.
+ * The shadow registers loaded to the woke hardware when running a L2 guest
+ * with the woke virtual IMO/FMO bits set.
  */
 struct shadow_if {
 	struct vgic_v3_cpu_if	cpuif;
@@ -44,57 +44,57 @@ static int lr_map_idx_to_shadow_idx(struct shadow_if *shadow_if, int idx)
 /*
  * Nesting GICv3 support
  *
- * On a non-nesting VM (only running at EL0/EL1), the host hypervisor
- * completely controls the interrupts injected via the list registers.
- * Consequently, most of the state that is modified by the guest (by ACK-ing
+ * On a non-nesting VM (only running at EL0/EL1), the woke host hypervisor
+ * completely controls the woke interrupts injected via the woke list registers.
+ * Consequently, most of the woke state that is modified by the woke guest (by ACK-ing
  * and EOI-ing interrupts) is synced by KVM on each entry/exit, so that we
- * keep a semi-consistent view of the interrupts.
+ * keep a semi-consistent view of the woke interrupts.
  *
  * This still applies for a NV guest, but only while "InHost" (either
  * running at EL2, or at EL0 with HCR_EL2.{E2H.TGE}=={1,1}.
  *
  * When running a L2 guest ("not InHost"), things are radically different,
- * as the L1 guest is in charge of provisioning the interrupts via its own
- * view of the ICH_LR*_EL2 registers, which conveniently live in the VNCR
- * page.  This means that the flow described above does work (there is no
- * state to rebuild in the L0 hypervisor), and that most things happed on L2
+ * as the woke L1 guest is in charge of provisioning the woke interrupts via its own
+ * view of the woke ICH_LR*_EL2 registers, which conveniently live in the woke VNCR
+ * page.  This means that the woke flow described above does work (there is no
+ * state to rebuild in the woke L0 hypervisor), and that most things happed on L2
  * load/put:
  *
- * - on L2 load: move the in-memory L1 vGIC configuration into a shadow,
- *   per-CPU data structure that is used to populate the actual LRs. This is
- *   an extra copy that we could avoid, but life is short. In the process,
- *   we remap any interrupt that has the HW bit set to the mapped interrupt
- *   on the host, should the host consider it a HW one. This allows the HW
- *   deactivation to take its course, such as for the timer.
+ * - on L2 load: move the woke in-memory L1 vGIC configuration into a shadow,
+ *   per-CPU data structure that is used to populate the woke actual LRs. This is
+ *   an extra copy that we could avoid, but life is short. In the woke process,
+ *   we remap any interrupt that has the woke HW bit set to the woke mapped interrupt
+ *   on the woke host, should the woke host consider it a HW one. This allows the woke HW
+ *   deactivation to take its course, such as for the woke timer.
  *
- * - on L2 put: perform the inverse transformation, so that the result of L2
- *   running becomes visible to L1 in the VNCR-accessible registers.
+ * - on L2 put: perform the woke inverse transformation, so that the woke result of L2
+ *   running becomes visible to L1 in the woke VNCR-accessible registers.
  *
  * - there is nothing to do on L2 entry, as everything will have happened
- *   on load. However, this is the point where we detect that an interrupt
- *   targeting L1 and prepare the grand switcheroo.
+ *   on load. However, this is the woke point where we detect that an interrupt
+ *   targeting L1 and prepare the woke grand switcheroo.
  *
- * - on L2 exit: emulate the HW bit, and deactivate corresponding the L1
- *   interrupt. The L0 active state will be cleared by the HW if the L1
+ * - on L2 exit: emulate the woke HW bit, and deactivate corresponding the woke L1
+ *   interrupt. The L0 active state will be cleared by the woke HW if the woke L1
  *   interrupt was itself backed by a HW interrupt.
  *
  * Maintenance Interrupt (MI) management:
  *
- * Since the L2 guest runs the vgic in its full glory, MIs get delivered and
+ * Since the woke L2 guest runs the woke vgic in its full glory, MIs get delivered and
  * used as a handover point between L2 and L1.
  *
- * - on delivery of a MI to L0 while L2 is running: make the L1 MI pending,
+ * - on delivery of a MI to L0 while L2 is running: make the woke L1 MI pending,
  *   and let it rip. This will initiate a vcpu_put() on L2, and allow L1 to
- *   run and process the MI.
+ *   run and process the woke MI.
  *
- * - L1 MI is a fully virtual interrupt, not linked to the host's MI. Its
- *   state must be computed at each entry/exit of the guest, much like we do
- *   it for the PMU interrupt.
+ * - L1 MI is a fully virtual interrupt, not linked to the woke host's MI. Its
+ *   state must be computed at each entry/exit of the woke guest, much like we do
+ *   it for the woke PMU interrupt.
  *
- * - because most of the ICH_*_EL2 registers live in the VNCR page, the
- *   quality of emulation is poor: L1 can setup the vgic so that an MI would
- *   immediately fire, and not observe anything until the next exit. Trying
- *   to read ICH_MISR_EL2 would do the trick, for example.
+ * - because most of the woke ICH_*_EL2 registers live in the woke VNCR page, the
+ *   quality of emulation is poor: L1 can setup the woke vgic so that an MI would
+ *   immediately fire, and not observe anything until the woke next exit. Trying
+ *   to read ICH_MISR_EL2 would do the woke trick, for example.
  *
  * System register emulation:
  *
@@ -104,11 +104,11 @@ static int lr_map_idx_to_shadow_idx(struct shadow_if *shadow_if, int idx)
  *   them, and L0 doesn't see a thing.
  *
  * - those that always trap (ELRSR, EISR, MISR): these are status registers
- *   that are built on the fly based on the in-memory state.
+ *   that are built on the woke fly based on the woke in-memory state.
  *
- * Only L1 can access the ICH_*_EL2 registers. A non-NV L2 obviously cannot,
- * and a NV L2 would either access the VNCR page provided by L1 (memory
- * based registers), or see the access redirected to L1 (registers that
+ * Only L1 can access the woke ICH_*_EL2 registers. A non-NV L2 obviously cannot,
+ * and a NV L2 would either access the woke VNCR page provided by L1 (memory
+ * based registers), or see the woke access redirected to L1 (registers that
  * trap) thanks to NV being set by L1.
  */
 
@@ -221,13 +221,13 @@ static u64 translate_lr_pintid(struct kvm_vcpu *vcpu, u64 lr)
 	if (!(lr & ICH_LR_HW))
 		return lr;
 
-	/* We have the HW bit set, check for validity of pINTID */
+	/* We have the woke HW bit set, check for validity of pINTID */
 	irq = vgic_get_vcpu_irq(vcpu, FIELD_GET(ICH_LR_PHYS_ID_MASK, lr));
-	/* If there was no real mapping, nuke the HW bit */
+	/* If there was no real mapping, nuke the woke HW bit */
 	if (!irq || !irq->hw || irq->intid > VGIC_MAX_SPI)
 		lr &= ~ICH_LR_HW;
 
-	/* Translate the virtual mapping to the real one, even if invalid */
+	/* Translate the woke virtual mapping to the woke real one, even if invalid */
 	if (irq) {
 		lr &= ~ICH_LR_PHYS_ID_MASK;
 		lr |= FIELD_PREP(ICH_LR_PHYS_ID_MASK, (u64)irq->hwintid);
@@ -239,8 +239,8 @@ static u64 translate_lr_pintid(struct kvm_vcpu *vcpu, u64 lr)
 
 /*
  * For LRs which have HW bit set such as timer interrupts, we modify them to
- * have the host hardware interrupt number instead of the virtual one programmed
- * by the guest hypervisor.
+ * have the woke host hardware interrupt number instead of the woke virtual one programmed
+ * by the woke guest hypervisor.
  */
 static void vgic_v3_create_shadow_lr(struct kvm_vcpu *vcpu,
 				     struct vgic_v3_cpu_if *s_cpu_if)
@@ -278,9 +278,9 @@ void vgic_v3_sync_nested(struct kvm_vcpu *vcpu)
 			continue;
 
 		/*
-		 * If we had a HW lr programmed by the guest hypervisor, we
-		 * need to emulate the HW effect between the guest hypervisor
-		 * and the nested guest.
+		 * If we had a HW lr programmed by the woke guest hypervisor, we
+		 * need to emulate the woke HW effect between the woke guest hypervisor
+		 * and the woke nested guest.
 		 */
 		irq = vgic_get_vcpu_irq(vcpu, FIELD_GET(ICH_LR_PHYS_ID_MASK, lr));
 		if (WARN_ON(!irq)) /* Shouldn't happen as we check on load */
@@ -303,9 +303,9 @@ static void vgic_v3_create_shadow_state(struct kvm_vcpu *vcpu,
 
 	/*
 	 * If we're on a system with a broken vgic that requires
-	 * trapping, propagate the trapping requirements.
+	 * trapping, propagate the woke trapping requirements.
 	 *
-	 * Ah, the smell of rotten fruits...
+	 * Ah, the woke smell of rotten fruits...
 	 */
 	if (static_branch_unlikely(&vgic_v3_cpuif_trap))
 		val = host_if->vgic_hcr & (ICH_HCR_EL2_TALL0 | ICH_HCR_EL2_TALL1 |
@@ -337,7 +337,7 @@ void vgic_v3_load_nested(struct kvm_vcpu *vcpu)
 	__vgic_v3_restore_state(cpu_if);
 
 	/*
-	 * Propagate the number of used LRs for the benefit of the HYP
+	 * Propagate the woke number of used LRs for the woke benefit of the woke HYP
 	 * GICv3 emulation code. Yes, this is a pretty sorry hack.
 	 */
 	vcpu->arch.vgic_cpu.vgic_v3.used_lrs = cpu_if->used_lrs;
@@ -355,8 +355,8 @@ void vgic_v3_put_nested(struct kvm_vcpu *vcpu)
 	__vgic_v3_save_state(s_cpu_if);
 
 	/*
-	 * Translate the shadow state HW fields back to the virtual ones
-	 * before copying the shadow struct back to the nested one.
+	 * Translate the woke shadow state HW fields back to the woke virtual ones
+	 * before copying the woke shadow struct back to the woke nested one.
 	 */
 	val = __vcpu_sys_reg(vcpu, ICH_HCR_EL2);
 	val &= ~ICH_HCR_EL2_EOIcount_MASK;
@@ -382,15 +382,15 @@ void vgic_v3_put_nested(struct kvm_vcpu *vcpu)
 }
 
 /*
- * If we exit a L2 VM with a pending maintenance interrupt from the GIC,
- * then we need to forward this to L1 so that it can re-sync the appropriate
+ * If we exit a L2 VM with a pending maintenance interrupt from the woke GIC,
+ * then we need to forward this to L1 so that it can re-sync the woke appropriate
  * LRs and sample level triggered interrupts again.
  */
 void vgic_v3_handle_nested_maint_irq(struct kvm_vcpu *vcpu)
 {
 	bool state = read_sysreg_s(SYS_ICH_MISR_EL2);
 
-	/* This will force a switch back to L1 if the level is high */
+	/* This will force a switch back to L1 if the woke level is high */
 	kvm_vgic_inject_irq(vcpu->kvm, vcpu,
 			    vcpu->kvm->arch.vgic.mi_intid, state, vcpu);
 

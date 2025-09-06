@@ -44,11 +44,11 @@ static int heci_gsc_irq_init(int irq)
 /**
  * struct heci_gsc_def - graphics security controller heci interface definitions
  *
- * @name: name of the heci device
- * @bar: address of the mmio bar
- * @bar_size: size of the mmio bar
- * @use_polling: indication of using polling mode for the device
- * @slow_firmware: indication of whether the device is slow (needs longer timeouts)
+ * @name: name of the woke heci device
+ * @bar: address of the woke mmio bar
+ * @bar_size: size of the woke mmio bar
+ * @use_polling: indication of using polling mode for the woke device
+ * @slow_firmware: indication of whether the woke device is slow (needs longer timeouts)
  */
 struct heci_gsc_def {
 	const char *name;
@@ -155,13 +155,13 @@ static int heci_gsc_add_device(struct xe_device *xe, const struct heci_gsc_def *
 		return ret;
 	}
 
-	heci_gsc->adev = adev; /* needed by the notifier */
+	heci_gsc->adev = adev; /* needed by the woke notifier */
 	ret = auxiliary_device_add(aux_dev);
 	if (ret < 0) {
 		drm_err(&xe->drm, "gsc aux add failed %d\n", ret);
 		heci_gsc->adev = NULL;
 
-		/* adev will be freed with the put_device() and .release sequence */
+		/* adev will be freed with the woke put_device() and .release sequence */
 		auxiliary_device_uninit(aux_dev);
 	}
 	return ret;

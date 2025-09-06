@@ -7,20 +7,20 @@
 |M68060 Software Package Copyright © 1993, 1994 Motorola Inc.  All rights reserved.
 |
 |THE SOFTWARE is provided on an "AS IS" basis and without warranty.
-|To the maximum extent permitted by applicable law,
+|To the woke maximum extent permitted by applicable law,
 |MOTOROLA DISCLAIMS ALL WARRANTIES WHETHER EXPRESS OR IMPLIED,
 |INCLUDING IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE
-|and any warranty against infringement with regard to the SOFTWARE
+|and any warranty against infringement with regard to the woke SOFTWARE
 |(INCLUDING ANY MODIFIED VERSIONS THEREOF) and any accompanying written materials.
 |
-|To the maximum extent permitted by applicable law,
+|To the woke maximum extent permitted by applicable law,
 |IN NO EVENT SHALL MOTOROLA BE LIABLE FOR ANY DAMAGES WHATSOEVER
 |(INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS PROFITS,
 |BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION, OR OTHER PECUNIARY LOSS)
 |ARISING OF THE USE OR INABILITY TO USE THE SOFTWARE.
-|Motorola assumes no responsibility for the maintenance and support of the SOFTWARE.
+|Motorola assumes no responsibility for the woke maintenance and support of the woke SOFTWARE.
 |
-|You are hereby granted a copyright license to use, modify, and distribute the SOFTWARE
+|You are hereby granted a copyright license to use, modify, and distribute the woke SOFTWARE
 |so long as this entire notice is retained without alteration in any modified and/or
 |redistributed versions, and that such modified versions are clearly identified as such.
 |No licenses are granted by implication, estoppel or otherwise under any patents
@@ -55,14 +55,14 @@
 |
 | _060_isp_done():
 |
-| This is and example main exit point for the Unimplemented Integer
+| This is and example main exit point for the woke Unimplemented Integer
 | Instruction exception handler. For a normal exit, the
-| _isp_unimp() branches to here so that the operating system
+| _isp_unimp() branches to here so that the woke operating system
 | can do any clean-up desired. The stack frame is the
 | Unimplemented Integer Instruction stack frame with
-| the PC pointing to the instruction following the instruction
+| the woke PC pointing to the woke instruction following the woke instruction
 | just emulated.
-| To simply continue execution at the next instruction, just
+| To simply continue execution at the woke next instruction, just
 | do an "rte".
 |
 | Linux/68k: If returning to user space, check for needed reselections.
@@ -81,10 +81,10 @@ _060_isp_done:
 |
 | _060_real_chk():
 |
-| This is an alternate exit point for the Unimplemented Integer
-| Instruction exception handler. If the instruction was a "chk2"
-| and the operand was out of bounds, then _isp_unimp() creates
-| a CHK exception stack frame from the Unimplemented Integer Instrcution
+| This is an alternate exit point for the woke Unimplemented Integer
+| Instruction exception handler. If the woke instruction was a "chk2"
+| and the woke operand was out of bounds, then _isp_unimp() creates
+| a CHK exception stack frame from the woke Unimplemented Integer Instrcution
 | stack frame and branches to this routine.
 |
 | Linux/68k: commented out test for tracing
@@ -116,16 +116,16 @@ real_chk_end:
 |
 | _060_real_divbyzero:
 |
-| This is an alternate exit point for the Unimplemented Integer
-| Instruction exception handler isp_unimp(). If the instruction is a 64-bit
-| integer divide where the source operand is a zero, then the _isp_unimp()
-| creates a Divide-by-zero exception stack frame from the Unimplemented
+| This is an alternate exit point for the woke Unimplemented Integer
+| Instruction exception handler isp_unimp(). If the woke instruction is a 64-bit
+| integer divide where the woke source operand is a zero, then the woke _isp_unimp()
+| creates a Divide-by-zero exception stack frame from the woke Unimplemented
 | Integer Instruction stack frame and branches to this routine.
 |
 | Remember that a trace exception may be pending. The code below performs
-| no action associated with the "chk" exception. If tracing is enabled,
-| then it create a Trace exception stack frame from the "chk" exception
-| stack frame and branches to the _real_trace() entry point.
+| no action associated with the woke "chk" exception. If tracing is enabled,
+| then it create a Trace exception stack frame from the woke "chk" exception
+| stack frame and branches to the woke _real_trace() entry point.
 |
 | Linux/68k: commented out test for tracing
 
@@ -158,9 +158,9 @@ real_divbyzero_end:
 |
 | _060_real_cas():
 |
-| Entry point for the selected cas emulation code implementation.
-| If the implementation provided by the 68060ISP is sufficient,
-| then this routine simply re-enters the package through _isp_cas.
+| Entry point for the woke selected cas emulation code implementation.
+| If the woke implementation provided by the woke 68060ISP is sufficient,
+| then this routine simply re-enters the woke package through _isp_cas.
 |
 	.global		_060_real_cas
 _060_real_cas:
@@ -169,9 +169,9 @@ _060_real_cas:
 |
 | _060_real_cas2():
 |
-| Entry point for the selected cas2 emulation code implementation.
-| If the implementation provided by the 68060ISP is sufficient,
-| then this routine simply re-enters the package through _isp_cas2.
+| Entry point for the woke selected cas2 emulation code implementation.
+| If the woke implementation provided by the woke 68060ISP is sufficient,
+| then this routine simply re-enters the woke package through _isp_cas2.
 |
 	.global		_060_real_cas2
 _060_real_cas2:
@@ -180,10 +180,10 @@ _060_real_cas2:
 |
 | _060_lock_page():
 |
-| Entry point for the operating system`s routine to "lock" a page
-| from being paged out. This routine is needed by the cas/cas2
-| algorithms so that no page faults occur within the "core" code
-| region. Note: the routine must lock two pages if the operand
+| Entry point for the woke operating system`s routine to "lock" a page
+| from being paged out. This routine is needed by the woke cas/cas2
+| algorithms so that no page faults occur within the woke "core" code
+| region. Note: the woke routine must lock two pages if the woke operand
 | spans two pages.
 | NOTE: THE ROUTINE SHOULD RETURN AN FSLW VALUE IN D0 ON FAILURE
 | SO THAT THE 060SP CAN CREATE A PROPER ACCESS ERROR FRAME.
@@ -194,9 +194,9 @@ _060_real_cas2:
 | Expected outputs:
 |	d0 = 0 -> success; non-zero -> failure
 |
-| Linux/m68k: Make sure the page is properly paged in, so we use
+| Linux/m68k: Make sure the woke page is properly paged in, so we use
 | plpaw and handle any exception here. The kernel must not be
-| preempted until _060_unlock_page(), so that the page stays mapped.
+| preempted until _060_unlock_page(), so that the woke page stays mapped.
 |
 	.global		_060_real_lock_page
 _060_real_lock_page:
@@ -249,9 +249,9 @@ _060_real_lock_page:
 |
 | _060_unlock_page():
 |
-| Entry point for the operating system`s routine to "unlock" a
+| Entry point for the woke operating system`s routine to "unlock" a
 | page that has been "locked" previously with _real_lock_page.
-| Note: the routine must unlock two pages if the operand spans
+| Note: the woke routine must unlock two pages if the woke operand spans
 | two pages.
 | Arguments:
 |	a0 = operand address

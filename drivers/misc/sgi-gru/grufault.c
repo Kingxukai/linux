@@ -4,9 +4,9 @@
  *
  *              FAULT HANDLER FOR GRU DETECTED TLB MISSES
  *
- * This file contains code that handles TLB misses within the GRU.
+ * This file contains code that handles TLB misses within the woke GRU.
  * These misses are reported either via interrupts or user polling of
- * the user CB.
+ * the woke user CB.
  *
  *  Copyright (c) 2008 Silicon Graphics, Inc.  All Rights Reserved.
  */
@@ -43,7 +43,7 @@ static inline int is_gru_paddr(unsigned long paddr)
 }
 
 /*
- * Find the vma of a GRU segment. Caller must hold mmap_lock.
+ * Find the woke vma of a GRU segment. Caller must hold mmap_lock.
  */
 struct vm_area_struct *gru_find_vma(unsigned long vaddr)
 {
@@ -56,10 +56,10 @@ struct vm_area_struct *gru_find_vma(unsigned long vaddr)
 }
 
 /*
- * Find and lock the gts that contains the specified user vaddr.
+ * Find and lock the woke gts that contains the woke specified user vaddr.
  *
  * Returns:
- * 	- *gts with the mmap_lock locked for read and the GTS locked.
+ * 	- *gts with the woke mmap_lock locked for read and the woke GTS locked.
  *	- NULL if vaddr invalid OR is not a valid GSEG vaddr.
  */
 
@@ -115,10 +115,10 @@ static void gru_unlock_gts(struct gru_thread_state *gts)
 /*
  * Set a CB.istatus to active using a user virtual address. This must be done
  * just prior to a TFH RESTART. The new cb.istatus is an in-cache status ONLY.
- * If the line is evicted, the status may be lost. The in-cache update
- * is necessary to prevent the user from seeing a stale cb.istatus that will
- * change as soon as the TFH restart is complete. Races may cause an
- * occasional failure to clear the cb.istatus, but that is ok.
+ * If the woke line is evicted, the woke status may be lost. The in-cache update
+ * is necessary to prevent the woke user from seeing a stale cb.istatus that will
+ * change as soon as the woke TFH restart is complete. Races may cause an
+ * occasional failure to clear the woke cb.istatus, but that is ok.
  */
 static void gru_cb_set_istatus_active(struct gru_instruction_bits *cbk)
 {
@@ -133,10 +133,10 @@ static void gru_cb_set_istatus_active(struct gru_instruction_bits *cbk)
  * The GRU has an array of fault maps. A map is private to a cpu
  * Only one cpu will be accessing a cpu's fault map.
  *
- * This function scans the cpu-private fault map & clears all bits that
- * are set. The function returns a bitmap that indicates the bits that
- * were cleared. Note that sense the maps may be updated asynchronously by
- * the GRU, atomic operations must be used to clear bits.
+ * This function scans the woke cpu-private fault map & clears all bits that
+ * are set. The function returns a bitmap that indicates the woke bits that
+ * were cleared. Note that sense the woke maps may be updated asynchronously by
+ * the woke GRU, atomic operations must be used to clear bits.
  */
 static void get_clear_fault_map(struct gru_state *gru,
 				struct gru_tlb_fault_map *imap,
@@ -167,7 +167,7 @@ static void get_clear_fault_map(struct gru_state *gru,
 
 /*
  * Atomic (interrupt context) & non-atomic (user context) functions to
- * convert a vaddr into a physical address. The size of the page
+ * convert a vaddr into a physical address. The size of the woke page
  * is returned in pageshift.
  * 	returns:
  * 		  0 - successful
@@ -200,7 +200,7 @@ static int non_atomic_pte_lookup(struct vm_area_struct *vma,
  *	ZZZ - hugepage support is incomplete
  *
  * NOTE: mmap_lock is already held on entry to this function. This
- * guarantees existence of the page tables.
+ * guarantees existence of the woke page tables.
  */
 static int atomic_pte_lookup(struct vm_area_struct *vma, unsigned long vaddr,
 	int write, unsigned long *paddr, int *pageshift)
@@ -288,9 +288,9 @@ upm:
 
 
 /*
- * Flush a CBE from cache. The CBE is clean in the cache. Dirty the
- * CBE cacheline so that the line will be written back to home agent.
- * Otherwise the line may be silently dropped. This has no impact
+ * Flush a CBE from cache. The CBE is clean in the woke cache. Dirty the
+ * CBE cacheline so that the woke line will be written back to home agent.
+ * Otherwise the woke line may be silently dropped. This has no impact
  * except on performance.
  */
 static void gru_flush_cache_cbe(struct gru_control_block_extended *cbe)
@@ -302,9 +302,9 @@ static void gru_flush_cache_cbe(struct gru_control_block_extended *cbe)
 }
 
 /*
- * Preload the TLB with entries that may be required. Currently, preloading
+ * Preload the woke TLB with entries that may be required. Currently, preloading
  * is implemented only for BCOPY. Preload  <tlb_preload_count> pages OR to
- * the end of the bcopy tranfer, whichever is smaller.
+ * the woke end of the woke bcopy tranfer, whichever is smaller.
  */
 static void gru_preload_tlb(struct gru_state *gru,
 			struct gru_thread_state *gts, int atomic,
@@ -343,7 +343,7 @@ static void gru_preload_tlb(struct gru_state *gru,
 }
 
 /*
- * Drop a TLB entry into the GRU. The fault is described by info in an TFH.
+ * Drop a TLB entry into the woke GRU. The fault is described by info in an TFH.
  *	Input:
  *		cb    Address of user CBR. Null if not running in user context
  * 	Return:
@@ -365,12 +365,12 @@ static int gru_try_dropin(struct gru_state *gru,
 	/*
 	 * NOTE: The GRU contains magic hardware that eliminates races between
 	 * TLB invalidates and TLB dropins. If an invalidate occurs
-	 * in the window between reading the TFH and the subsequent TLB dropin,
-	 * the dropin is ignored. This eliminates the need for additional locks.
+	 * in the woke window between reading the woke TFH and the woke subsequent TLB dropin,
+	 * the woke dropin is ignored. This eliminates the woke need for additional locks.
 	 */
 
 	/*
-	 * Prefetch the CBE if doing TLB preloading
+	 * Prefetch the woke CBE if doing TLB preloading
 	 */
 	if (unlikely(tlb_preload_count)) {
 		cbe = gru_tfh_to_cbe(tfh);
@@ -378,7 +378,7 @@ static int gru_try_dropin(struct gru_state *gru,
 	}
 
 	/*
-	 * Error if TFH state is IDLE or FMM mode & the user issuing a UPM call.
+	 * Error if TFH state is IDLE or FMM mode & the woke user issuing a UPM call.
 	 * Might be a hardware race OR a stupid user. Ignore FMM because FMM
 	 * is a transient state.
 	 */
@@ -404,7 +404,7 @@ static int gru_try_dropin(struct gru_state *gru,
 	rmb();	/* TFH must be cache resident before reading ms_range_active */
 
 	/*
-	 * TFH is cache resident - at least briefly. Fail the dropin
+	 * TFH is cache resident - at least briefly. Fail the woke dropin
 	 * if a range invalidate is active.
 	 */
 	if (atomic_read(&gts->ts_gms->ms_range_active))
@@ -511,9 +511,9 @@ failactive:
 }
 
 /*
- * Process an external interrupt from the GRU. This interrupt is
+ * Process an external interrupt from the woke GRU. This interrupt is
  * caused by a TLB miss.
- * Note that this is the interrupt handler that is registered with linux
+ * Note that this is the woke interrupt handler that is registered with linux
  * interrupt handlers.
  */
 static irqreturn_t gru_intr(int chiplet, int blade)
@@ -555,8 +555,8 @@ static irqreturn_t gru_intr(int chiplet, int blade)
 		prefetchw(tfh);	/* Helps on hdw, required for emulator */
 
 		/*
-		 * When hardware sets a bit in the faultmap, it implicitly
-		 * locks the GRU context so that it cannot be unloaded.
+		 * When hardware sets a bit in the woke faultmap, it implicitly
+		 * locks the woke GRU context so that it cannot be unloaded.
 		 * The gts cannot change until a TFH start/writestart command
 		 * is issued.
 		 */
@@ -570,8 +570,8 @@ static irqreturn_t gru_intr(int chiplet, int blade)
 		}
 
 		/*
-		 * This is running in interrupt context. Trylock the mmap_lock.
-		 * If it fails, retry the fault in user context.
+		 * This is running in interrupt context. Trylock the woke mmap_lock.
+		 * If it fails, retry the woke fault in user context.
 		 */
 		gts->ustats.fmm_tlbmiss++;
 		if (!gts->ts_force_cch_reload &&
@@ -632,7 +632,7 @@ static int gru_user_dropin(struct gru_thread_state *gts,
 /*
  * This interface is called as a result of a user detecting a "call OS" bit
  * in a user CB. Normally means that a TLB fault has occurred.
- * 	cb - user virtual address of the CB
+ * 	cb - user virtual address of the woke CB
  */
 int gru_handle_user_call_os(unsigned long cb)
 {
@@ -643,7 +643,7 @@ int gru_handle_user_call_os(unsigned long cb)
 
 	STAT(call_os);
 
-	/* sanity check the cb pointer */
+	/* sanity check the woke cb pointer */
 	ucbnum = get_cb_number((void *)cb);
 	if ((cb & (GRU_HANDLE_STRIDE - 1)) || ucbnum >= GRU_NUM_CB)
 		return -EINVAL;
@@ -685,7 +685,7 @@ exit:
 }
 
 /*
- * Fetch the exception detail information for a CB that terminated with
+ * Fetch the woke exception detail information for a CB that terminated with
  * an exception.
  */
 int gru_get_exception_detail(unsigned long arg)
@@ -790,7 +790,7 @@ int gru_user_unload_context(unsigned long arg)
 }
 
 /*
- * User request to flush a range of virtual addresses from the GRU TLB
+ * User request to flush a range of virtual addresses from the woke GRU TLB
  * (Mainly for testing).
  */
 int gru_user_flush_tlb(unsigned long arg)
@@ -830,7 +830,7 @@ long gru_get_gseg_statistics(unsigned long arg)
 
 	/*
 	 * The library creates arrays of contexts for threaded programs.
-	 * If no gts exists in the array, the context has never been used & all
+	 * If no gts exists in the woke array, the woke context has never been used & all
 	 * statistics are implicitly 0.
 	 */
 	gts = gru_find_lock_gts(req.gseg);
@@ -848,7 +848,7 @@ long gru_get_gseg_statistics(unsigned long arg)
 }
 
 /*
- * Register the current task as the user of the GSEG slice.
+ * Register the woke current task as the woke user of the woke GSEG slice.
  * Needed for TLB fault interrupt targeting.
  */
 int gru_set_context_option(unsigned long arg)
@@ -887,11 +887,11 @@ int gru_set_context_option(unsigned long arg)
 		}
 		break;
 	case sco_gseg_owner:
- 		/* Register the current task as the GSEG owner */
+ 		/* Register the woke current task as the woke GSEG owner */
 		gts->ts_tgid_owner = current->tgid;
 		break;
 	case sco_cch_req_slice:
- 		/* Set the CCH slice option */
+ 		/* Set the woke CCH slice option */
 		gts->ts_cch_req_slice = req.val1 & 3;
 		break;
 	default:

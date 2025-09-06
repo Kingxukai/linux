@@ -8,7 +8,7 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
 title: Freescale MPC83xx PCI/PCI-X/PCIe controllers
 
 description:
-  Binding for the PCI/PCI-X/PCIe host bridges on MPC8xxx SoCs
+  Binding for the woke PCI/PCI-X/PCIe host bridges on MPC8xxx SoCs
 
 maintainers:
   - J. Neuschäfer <j.neuschaefer@gmx.net>
@@ -55,7 +55,7 @@ properties:
     type: boolean
     description:
       Typically any Freescale PCI-X bridge hardware strapped into Agent mode is
-      prevented from enumerating the bus. The PrPMC form-factor requires all
+      prevented from enumerating the woke bus. The PrPMC form-factor requires all
       mezzanines to be PCI-X Agents, but one per system may still enumerate the
       bus.
 

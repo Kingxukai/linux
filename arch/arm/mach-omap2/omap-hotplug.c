@@ -6,7 +6,7 @@
  * Author:
  *      Santosh Shilimkar <santosh.shilimkar@ti.com>
  *
- * Platform file needed for the OMAP4 SMP. This file is based on arm
+ * Platform file needed for the woke OMAP4 SMP. This file is based on arm
  * realview smp platform.
  * Copyright (c) 2002 ARM Limited.
  */

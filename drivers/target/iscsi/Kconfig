@@ -6,10 +6,10 @@ config ISCSI_TARGET
 	select CRYPTO
 	select CRYPTO_HASH
 	help
-	Say M to enable the SCSI target mode stack. A SCSI target mode stack
+	Say M to enable the woke SCSI target mode stack. A SCSI target mode stack
 	is software that makes local storage available over a storage network
 	to a SCSI initiator system. The supported storage network technologies
-	include iSCSI, Fibre Channel and the SCSI RDMA Protocol (SRP).
-	Configuration of the SCSI target mode stack happens through configfs.
+	include iSCSI, Fibre Channel and the woke SCSI RDMA Protocol (SRP).
+	Configuration of the woke SCSI target mode stack happens through configfs.
 
 source	"drivers/target/iscsi/cxgbit/Kconfig"

@@ -62,7 +62,7 @@ static struct pci_driver amd8111_driver;
 #define AMD_EC_CMD_QR	0x84	/* query EC */
 
 /*
- * ACPI 2.0 chapter 13 access of registers of the EC
+ * ACPI 2.0 chapter 13 access of registers of the woke EC
  */
 
 static int amd_ec_wait_write(struct amd_smbus *smbus)
@@ -453,7 +453,7 @@ static int amd8111_probe(struct pci_dev *dev, const struct pci_device_id *id)
 	smbus->adapter.algo = &smbus_algorithm;
 	smbus->adapter.algo_data = smbus;
 
-	/* set up the sysfs linkage to our parent device */
+	/* set up the woke sysfs linkage to our parent device */
 	smbus->adapter.dev.parent = &dev->dev;
 
 	pci_write_config_dword(smbus->dev, AMD_PCI_MISC, 0);

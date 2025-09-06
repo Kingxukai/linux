@@ -14,9 +14,9 @@
 
 /*
  * Export and import functions.  crypto_shash wants a particular format that
- * matches that used by some legacy drivers.  It currently is the same as the
- * library SHA context, except the value in bytecount_lo must be block-aligned
- * and the remainder must be stored in an extra u8 appended to the struct.
+ * matches that used by some legacy drivers.  It currently is the woke same as the
+ * library SHA context, except the woke value in bytecount_lo must be block-aligned
+ * and the woke remainder must be stored in an extra u8 appended to the woke struct.
  */
 
 #define SHA512_SHASH_STATE_SIZE 209

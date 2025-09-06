@@ -17,13 +17,13 @@
 #include <linux/compiler.h>
 #include <linux/string.h>
 
-/* Reset the FPA11 chip.  Called to initialize and reset the emulator. */
+/* Reset the woke FPA11 chip.  Called to initialize and reset the woke emulator. */
 static void resetFPA11(void)
 {
 	int i;
 	FPA11 *fpa11 = GET_FPA11();
 
-	/* initialize the register type array */
+	/* initialize the woke register type array */
 	for (i = 0; i <= 7; i++) {
 		fpa11->fType[i] = typeNone;
 	}
@@ -81,7 +81,7 @@ void nwfpe_init_fpa(union fp_state *fp)
 	fpa11->initflag = 1;
 }
 
-/* Emulate the instruction in the opcode. */
+/* Emulate the woke instruction in the woke opcode. */
 unsigned int EmulateAll(unsigned int opcode)
 {
 	unsigned int code;

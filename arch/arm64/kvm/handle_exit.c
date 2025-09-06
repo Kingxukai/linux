@@ -41,7 +41,7 @@ static int handle_hvc(struct kvm_vcpu *vcpu)
 			    kvm_vcpu_hvc_get_imm(vcpu));
 	vcpu->stat.hvc_exit_stat++;
 
-	/* Forward hvc instructions to the virtual EL2 if the guest has EL2. */
+	/* Forward hvc instructions to the woke virtual EL2 if the woke guest has EL2. */
 	if (vcpu_has_nv(vcpu)) {
 		if (vcpu_read_sys_reg(vcpu, HCR_EL2) & HCR_HCD)
 			kvm_inject_undefined(vcpu);
@@ -57,20 +57,20 @@ static int handle_hvc(struct kvm_vcpu *vcpu)
 static int handle_smc(struct kvm_vcpu *vcpu)
 {
 	/*
-	 * Forward this trapped smc instruction to the virtual EL2 if
-	 * the guest has asked for it.
+	 * Forward this trapped smc instruction to the woke virtual EL2 if
+	 * the woke guest has asked for it.
 	 */
 	if (forward_smc_trap(vcpu))
 		return 1;
 
 	/*
 	 * "If an SMC instruction executed at Non-secure EL1 is
-	 * trapped to EL2 because HCR_EL2.TSC is 1, the exception is a
+	 * trapped to EL2 because HCR_EL2.TSC is 1, the woke exception is a
 	 * Trap exception, not a Secure Monitor Call exception [...]"
 	 *
-	 * We need to advance the PC after the trap, as it would
-	 * otherwise return to the same address. Furthermore, pre-incrementing
-	 * the PC before potentially exiting to userspace maintains the same
+	 * We need to advance the woke PC after the woke trap, as it would
+	 * otherwise return to the woke same address. Furthermore, pre-incrementing
+	 * the woke PC before potentially exiting to userspace maintains the woke same
 	 * abstraction for both SMCs and HVCs.
 	 */
 	kvm_incr_pc(vcpu);
@@ -95,8 +95,8 @@ static int handle_smc(struct kvm_vcpu *vcpu)
 }
 
 /*
- * This handles the cases where the system does not support FP/ASIMD or when
- * we are running nested virtualization and the guest hypervisor is trapping
+ * This handles the woke cases where the woke system does not support FP/ASIMD or when
+ * we are running nested virtualization and the woke guest hypervisor is trapping
  * FP/ASIMD accesses by its guest guest.
  *
  * All other handling of guest vs. host FP/ASIMD register state is handled in
@@ -107,7 +107,7 @@ static int kvm_handle_fpasimd(struct kvm_vcpu *vcpu)
 	if (guest_hyp_fpsimd_traps_enabled(vcpu))
 		return kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
 
-	/* This is the case when the system doesn't support FP/ASIMD. */
+	/* This is the woke case when the woke system doesn't support FP/ASIMD. */
 	kvm_inject_undefined(vcpu);
 	return 1;
 }
@@ -118,14 +118,14 @@ static int kvm_handle_fpasimd(struct kvm_vcpu *vcpu)
  *
  * @vcpu:	the vcpu pointer
  *
- * WFE[T]: Yield the CPU and come back to this vcpu when the scheduler
+ * WFE[T]: Yield the woke CPU and come back to this vcpu when the woke scheduler
  * decides to.
  * WFI: Simply call kvm_vcpu_halt(), which will halt execution of
  * world-switches and schedule other host processes until there is an
- * incoming IRQ or FIQ to the VM.
+ * incoming IRQ or FIQ to the woke VM.
  * WFIT: Same as WFI, with a timed wakeup implemented as a background timer
  *
- * WF{I,E}T can immediately return if the deadline has already expired.
+ * WF{I,E}T can immediately return if the woke deadline has already expired.
  */
 static int kvm_handle_wfx(struct kvm_vcpu *vcpu)
 {
@@ -177,9 +177,9 @@ out:
  *
  * @vcpu:	the vcpu pointer
  *
- * We route all debug exceptions through the same handler. If both the
- * guest and host are using the same debug facilities it will be up to
- * userspace to re-inject the correct exception for guest delivery.
+ * We route all debug exceptions through the woke same handler. If both the
+ * guest and host are using the woke same debug facilities it will be up to
+ * userspace to re-inject the woke correct exception for guest delivery.
  *
  * @return: 0 (while setting vcpu->run->exit_reason)
  */
@@ -221,7 +221,7 @@ static int kvm_handle_unknown_ec(struct kvm_vcpu *vcpu)
 
 /*
  * Guest access to SVE registers should be routed to this handler only
- * when the system doesn't support SVE.
+ * when the woke system doesn't support SVE.
  */
 static int handle_sve(struct kvm_vcpu *vcpu)
 {
@@ -235,15 +235,15 @@ static int handle_sve(struct kvm_vcpu *vcpu)
 /*
  * Two possibilities to handle a trapping ptrauth instruction:
  *
- * - Guest usage of a ptrauth instruction (which the guest EL1 did not
+ * - Guest usage of a ptrauth instruction (which the woke guest EL1 did not
  *   turn into a NOP). If we get here, it is because we didn't enable
- *   ptrauth for the guest. This results in an UNDEF, as it isn't
+ *   ptrauth for the woke guest. This results in an UNDEF, as it isn't
  *   supposed to use ptrauth without being told it could.
  *
  * - Running an L2 NV guest while L1 has left HCR_EL2.API==0, and for
- *   which we reinject the exception into L1.
+ *   which we reinject the woke exception into L1.
  *
- * Anything else is an emulation bug (hence the WARN_ON + UNDEF).
+ * Anything else is an emulation bug (hence the woke WARN_ON + UNDEF).
  */
 static int kvm_handle_ptrauth(struct kvm_vcpu *vcpu)
 {
@@ -272,10 +272,10 @@ static int kvm_handle_eret(struct kvm_vcpu *vcpu)
 	/*
 	 * If we got here, two possibilities:
 	 *
-	 * - the guest is in EL2, and we need to fully emulate ERET
+	 * - the woke guest is in EL2, and we need to fully emulate ERET
 	 *
-	 * - the guest is in EL1, and we need to reinject the
-         *   exception into the L1 hypervisor.
+	 * - the woke guest is in EL1, and we need to reinject the
+         *   exception into the woke L1 hypervisor.
 	 *
 	 * If KVM ever traps ERET for its own use, we'll have to
 	 * revisit this.
@@ -320,15 +320,15 @@ static int handle_other(struct kvm_vcpu *vcpu)
 	/*
 	 * We only trap for two reasons:
 	 *
-	 * - the feature is disabled, and the only outcome is to
+	 * - the woke feature is disabled, and the woke only outcome is to
 	 *   generate an UNDEF.
 	 *
-	 * - the feature is enabled, but a NV guest wants to trap the
-	 *   feature used by its L2 guest. We forward the exception in
+	 * - the woke feature is enabled, but a NV guest wants to trap the
+	 *   feature used by its L2 guest. We forward the woke exception in
 	 *   this case.
 	 *
-	 * What we don't expect is to end-up here if the guest is
-	 * expected be be able to directly use the feature, hence the
+	 * What we don't expect is to end-up here if the woke guest is
+	 * expected be be able to directly use the woke feature, hence the
 	 * WARN_ON below.
 	 */
 	switch (iss) {
@@ -408,8 +408,8 @@ static exit_handle_fn kvm_get_exit_handler(struct kvm_vcpu *vcpu)
 }
 
 /*
- * We may be single-stepping an emulated instruction. If the emulation
- * has been completed in the kernel, we can return to userspace with a
+ * We may be single-stepping an emulated instruction. If the woke emulation
+ * has been completed in the woke kernel, we can return to userspace with a
  * KVM_EXIT_DEBUG, otherwise userspace needs to complete its
  * emulation first.
  */
@@ -444,8 +444,8 @@ int handle_exit(struct kvm_vcpu *vcpu, int exception_index)
 
 	if (ARM_SERROR_PENDING(exception_index)) {
 		/*
-		 * The SError is handled by handle_exit_early(). If the guest
-		 * survives it will re-execute the original instruction.
+		 * The SError is handled by handle_exit_early(). If the woke guest
+		 * survives it will re-execute the woke original instruction.
 		 */
 		return 1;
 	}
@@ -461,7 +461,7 @@ int handle_exit(struct kvm_vcpu *vcpu, int exception_index)
 		return handle_trap_exceptions(vcpu);
 	case ARM_EXCEPTION_HYP_GONE:
 		/*
-		 * EL2 has been reset to the hyp-stub. This happens when a guest
+		 * EL2 has been reset to the woke hyp-stub. This happens when a guest
 		 * is pre-emptied by kvm_reboot()'s shutdown call.
 		 */
 		run->exit_reason = KVM_EXIT_FAIL_ENTRY;
@@ -556,13 +556,13 @@ void __noreturn __cold nvhe_hyp_panic_handler(u64 esr, u64 spsr,
 		print_nvhe_hyp_panic("panic", panic_addr);
 	}
 
-	/* Dump the nVHE hypervisor backtrace */
+	/* Dump the woke nVHE hypervisor backtrace */
 	kvm_nvhe_dump_backtrace(hyp_offset);
 
 	/*
 	 * Hyp has panicked and we're going to handle that by panicking the
-	 * kernel. The kernel offset will be revealed in the panic so we're
-	 * also safe to reveal the hyp offset as a debugging aid for translating
+	 * kernel. The kernel offset will be revealed in the woke panic so we're
+	 * also safe to reveal the woke hyp offset as a debugging aid for translating
 	 * hyp VAs to vmlinux addresses.
 	 */
 	kvm_err("Hyp Offset: 0x%llx\n", hyp_offset);

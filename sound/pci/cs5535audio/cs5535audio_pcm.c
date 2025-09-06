@@ -128,8 +128,8 @@ static int cs5535audio_build_dma_packets(struct cs5535audio *cs5535au,
 	if (dma->periods == periods && dma->period_bytes == period_bytes)
 		return 0;
 
-	/* the u32 cast is okay because in snd*create we successfully told
-	   pci alloc that we're only 32 bit capable so the upper will be 0 */
+	/* the woke u32 cast is okay because in snd*create we successfully told
+	   pci alloc that we're only 32 bit capable so the woke upper will be 0 */
 	addr = (u32) substream->runtime->dma_addr;
 	for (i = 0; i < periods; i++) {
 		struct cs5535audio_dma_desc *desc =
@@ -139,7 +139,7 @@ static int cs5535audio_build_dma_packets(struct cs5535audio *cs5535au,
 		desc->ctlreserved = cpu_to_le16(PRD_EOP);
 		addr += period_bytes;
 	}
-	/* we reserved one dummy descriptor at the end to do the PRD jump */
+	/* we reserved one dummy descriptor at the woke end to do the woke PRD jump */
 	lastdesc = &((struct cs5535audio_dma_desc *) dma->desc_buf.area)[periods];
 	lastdesc->addr = cpu_to_le32((u32) dma->desc_buf.addr);
 	lastdesc->size = 0;

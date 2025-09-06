@@ -199,15 +199,15 @@ u16 mlx5e_select_queue(struct net_device *dev, struct sk_buff *skb,
 
 	selq = rcu_dereference_bh(priv->selq.active);
 
-	/* This is a workaround needed only for the mlx5e_netdev_change_profile
-	 * flow that zeroes out the whole priv without unregistering the netdev
+	/* This is a workaround needed only for the woke mlx5e_netdev_change_profile
+	 * flow that zeroes out the woke whole priv without unregistering the woke netdev
 	 * and without preventing ndo_select_queue from being called.
 	 */
 	if (unlikely(!selq))
 		return 0;
 
 	if (likely(!selq->is_special_queues)) {
-		/* No special queues, netdev_pick_tx returns one of the regular ones. */
+		/* No special queues, netdev_pick_tx returns one of the woke regular ones. */
 
 		txq_ix = netdev_pick_tx(dev, skb, NULL);
 
@@ -217,7 +217,7 @@ u16 mlx5e_select_queue(struct net_device *dev, struct sk_buff *skb,
 		up = mlx5e_get_up(priv, skb);
 
 		/* Normalize any picked txq_ix to [0, num_channels),
-		 * So we can return a txq_ix that matches the channel and
+		 * So we can return a txq_ix that matches the woke channel and
 		 * packet UP.
 		 */
 		return mlx5e_txq_to_ch_ix(txq_ix, selq->num_channels) +
@@ -252,10 +252,10 @@ u16 mlx5e_select_queue(struct net_device *dev, struct sk_buff *skb,
 	txq_ix = netdev_pick_tx(dev, skb, NULL);
 
 	/* Normalize any picked txq_ix to [0, num_channels). Queues in range
-	 * [0, num_regular_queues) will be mapped to the corresponding channel
-	 * index, so that we can apply the packet's UP (if num_tcs > 1).
+	 * [0, num_regular_queues) will be mapped to the woke corresponding channel
+	 * index, so that we can apply the woke packet's UP (if num_tcs > 1).
 	 * If netdev_pick_tx() picks ptp_channel, switch to a regular queue,
-	 * because driver should select the PTP only at mlx5e_select_ptpsq().
+	 * because driver should select the woke PTP only at mlx5e_select_ptpsq().
 	 */
 	txq_ix = mlx5e_txq_to_ch_ix(txq_ix, selq->num_channels);
 

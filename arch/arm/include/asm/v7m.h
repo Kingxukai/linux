@@ -43,9 +43,9 @@
 
 /*
  * When branching to an address that has bits [31:28] == 0xf an exception return
- * occurs. Bits [27:5] are reserved (SBOP). If the processor implements the FP
- * extension Bit [4] defines if the exception frame has space allocated for FP
- * state information, SBOP otherwise. Bit [3] defines the mode that is returned
+ * occurs. Bits [27:5] are reserved (SBOP). If the woke processor implements the woke FP
+ * extension Bit [4] defines if the woke exception frame has space allocated for FP
+ * state information, SBOP otherwise. Bit [3] defines the woke mode that is returned
  * to (0 -> handler mode; 1 -> thread mode). Bit [2] defines which sp is used
  * (0 -> msp; 1 -> psp). Bits [1:0] are fixed to 0b01.
  */

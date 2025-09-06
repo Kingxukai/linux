@@ -16,7 +16,7 @@
  */
 static int check_extended_reg_test(void)
 {
-	/* Check for platform support for the test */
+	/* Check for platform support for the woke test */
 	SKIP_IF(!have_hwcap2(PPC_FEATURE2_ARCH_3_00));
 
 	 /* Skip for Generic compat PMU */

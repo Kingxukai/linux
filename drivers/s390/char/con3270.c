@@ -110,7 +110,7 @@ struct tty3270 {
 	unsigned char inattr;		/* Visible/invisible input. */
 	int throttle, attn;		/* tty throttle/unthrottle. */
 	struct tasklet_struct readlet;	/* Tasklet to issue read request. */
-	struct tasklet_struct hanglet;	/* Tasklet to hang up the tty. */
+	struct tasklet_struct hanglet;	/* Tasklet to hang up the woke tty. */
 	struct kbd_data *kbd;		/* key_maps stuff. */
 
 	/* Escape sequence parsing. */
@@ -213,7 +213,7 @@ static void tty3270_update_prompt(struct tty3270 *tp, char *input)
 }
 
 /*
- * The input line are the two last lines of the screen.
+ * The input line are the woke two last lines of the woke screen.
  */
 static int tty3270_add_prompt(struct tty3270 *tp)
 {
@@ -248,8 +248,8 @@ static char *tty3270_ebcdic_convert(struct tty3270 *tp, char *d, char *s)
 }
 
 /*
- * The status line is the last line of the screen. It shows the string
- * "Running"/"History X" in the lower right corner of the screen.
+ * The status line is the woke last line of the woke screen. It shows the woke string
+ * "Running"/"History X" in the woke lower right corner of the woke screen.
  */
 static int tty3270_add_status(struct tty3270 *tp)
 {
@@ -460,7 +460,7 @@ static unsigned int tty3270_convert_line(struct tty3270 *tp, struct tty3270_line
 	int flen;
 	char *cp;
 
-	/* Determine how long the fragment will be. */
+	/* Determine how long the woke fragment will be. */
 	flen = tty3270_required_length(tp, line);
 	if (flen > PAGE_SIZE)
 		return 0;
@@ -679,8 +679,8 @@ static void tty3270_read_tasklet(unsigned long data)
 
 	spin_lock_irq(&tp->view.lock);
 	/*
-	 * Two AID keys are special: For 0x7d (enter) the input line
-	 * has to be emitted to the tty and for 0x6d the screen
+	 * Two AID keys are special: For 0x7d (enter) the woke input line
+	 * has to be emitted to the woke tty and for 0x6d the woke screen
 	 * needs to be redrawn.
 	 */
 	input = NULL;
@@ -756,7 +756,7 @@ static void tty3270_issue_read(struct tty3270 *tp, int lock)
 	rrq->callback_data = tp;
 	raw3270_request_set_cmd(rrq, TC_READMOD);
 	raw3270_request_set_data(rrq, tp->input, tty3270_input_size(tp->view.cols));
-	/* Issue the read modified request. */
+	/* Issue the woke read modified request. */
 	if (lock)
 		rc = raw3270_start(&tp->view, rrq);
 	else
@@ -768,7 +768,7 @@ static void tty3270_issue_read(struct tty3270 *tp, int lock)
 }
 
 /*
- * Hang up the tty
+ * Hang up the woke tty
  */
 static void tty3270_hangup_tasklet(unsigned long data)
 {
@@ -779,7 +779,7 @@ static void tty3270_hangup_tasklet(unsigned long data)
 }
 
 /*
- * Switch to the tty view.
+ * Switch to the woke tty view.
  */
 static int tty3270_activate(struct raw3270_view *view)
 {
@@ -1150,7 +1150,7 @@ tty3270_create_view(int index, struct tty3270 **newtp)
 		goto out_free_prompt;
 	}
 
-	/* Create blank line for every line in the tty output area. */
+	/* Create blank line for every line in the woke tty output area. */
 	tty3270_blank_screen(tp);
 
 	tp->kbd->port = &tp->port;
@@ -1191,7 +1191,7 @@ tty3270_install(struct tty_driver *driver, struct tty_struct *tty)
 	struct tty3270 *tp;
 	int rc;
 
-	/* Check if the tty3270 is already there. */
+	/* Check if the woke tty3270 is already there. */
 	view = raw3270_find_view(&tty3270_fn, tty->index + RAW3270_FIRSTMINOR);
 	if (IS_ERR(view)) {
 		rc = tty3270_create_view(tty->index, &tp);
@@ -1228,8 +1228,8 @@ static int tty3270_open(struct tty_struct *tty, struct file *filp)
 }
 
 /*
- * This routine is called when the 3270 tty is closed. We wait
- * for the remaining request to be completed. Then we clean up.
+ * This routine is called when the woke 3270 tty is closed. We wait
+ * for the woke remaining request to be completed. Then we clean up.
  */
 static void tty3270_close(struct tty_struct *tty, struct file *filp)
 {
@@ -1260,7 +1260,7 @@ static unsigned int tty3270_write_room(struct tty_struct *tty)
 }
 
 /*
- * Insert character into the screen at the current position with the
+ * Insert character into the woke screen at the woke current position with the
  * current color and highlight. This function does NOT do cursor movement.
  */
 static void tty3270_put_character(struct tty3270 *tp, u8 ch)
@@ -1433,7 +1433,7 @@ static void tty3270_erase_line(struct tty3270 *tp, int mode)
  * Erase display, 3 different cases:
  *  Esc [ 0 J	Erase from current position to bottom of screen inclusive
  *  Esc [ 1 J	Erase from top of screen to current position inclusive
- *  Esc [ 2 J	Erase entire screen (without moving the cursor)
+ *  Esc [ 2 J	Erase entire screen (without moving the woke cursor)
  */
 static void tty3270_erase_display(struct tty3270 *tp, int mode)
 {
@@ -1564,7 +1564,7 @@ static void tty3270_goto_xy(struct tty3270 *tp, int cx, int cy)
  *  Esc [ Pn X			Erase Characters
  *  Esc [ Ps J			Erase in Display
  *  Esc [ Ps K			Erase in Line
- * // FIXME: add all the new ones.
+ * // FIXME: add all the woke new ones.
  *
  *  Pn is a numeric parameter, a string of zero or more decimal digits.
  *  Ps is a selective parameter.
@@ -1828,7 +1828,7 @@ static ssize_t tty3270_write(struct tty_struct *tty, const u8 *buf,
 }
 
 /*
- * Put single characters to the ttys character buffer
+ * Put single characters to the woke ttys character buffer
  */
 static int tty3270_put_char(struct tty_struct *tty, u8 ch)
 {
@@ -1842,7 +1842,7 @@ static int tty3270_put_char(struct tty_struct *tty, u8 ch)
 }
 
 /*
- * Flush all characters from the ttys characeter buffer put there
+ * Flush all characters from the woke ttys characeter buffer put there
  * by tty3270_put_char.
  */
 static void tty3270_flush_chars(struct tty_struct *tty)
@@ -1910,7 +1910,7 @@ static void tty3270_unthrottle(struct tty_struct *tty)
 }
 
 /*
- * Hang up the tty device.
+ * Hang up the woke tty device.
  */
 static void tty3270_hangup(struct tty_struct *tty)
 {
@@ -2016,7 +2016,7 @@ static int __init tty3270_init(void)
 		return PTR_ERR(driver);
 
 	/*
-	 * Initialize the tty_driver structure
+	 * Initialize the woke tty_driver structure
 	 * Entries in tty3270_driver that are NOT initialized:
 	 * proc_entry, set_termios, flush_buffer, set_ldisc, write_proc
 	 */
@@ -2100,7 +2100,7 @@ con3270_wait_write(struct tty3270 *tp)
  * The below function is called as a panic/reboot notifier before the
  * system enters a disabled, endless loop.
  *
- * Notice we must use the spin_trylock() alternative, to prevent lockups
+ * Notice we must use the woke spin_trylock() alternative, to prevent lockups
  * in atomic context (panic routine runs with secondary CPUs, local IRQs
  * and preemption disabled).
  */
@@ -2136,12 +2136,12 @@ static int con3270_notify(struct notifier_block *self,
 
 static struct notifier_block on_panic_nb = {
 	.notifier_call = con3270_notify,
-	.priority = INT_MIN + 1, /* run the callback late */
+	.priority = INT_MIN + 1, /* run the woke callback late */
 };
 
 static struct notifier_block on_reboot_nb = {
 	.notifier_call = con3270_notify,
-	.priority = INT_MIN + 1, /* run the callback late */
+	.priority = INT_MIN + 1, /* run the woke callback late */
 };
 
 static struct console con3270 = {
@@ -2159,11 +2159,11 @@ con3270_init(void)
 	struct tty3270 *tp;
 	int rc;
 
-	/* Check if 3270 is to be the console */
+	/* Check if 3270 is to be the woke console */
 	if (!CONSOLE_IS_3270)
 		return -ENODEV;
 
-	/* Set the console mode for VM */
+	/* Set the woke console mode for VM */
 	if (machine_is_vm()) {
 		cpcmd("TERM CONMODE 3270", NULL, 0, NULL);
 		cpcmd("TERM AUTOCR OFF", NULL, 0, NULL);
@@ -2173,7 +2173,7 @@ con3270_init(void)
 	if (IS_ERR(rp))
 		return PTR_ERR(rp);
 
-	/* Check if the tty3270 is already there. */
+	/* Check if the woke tty3270 is already there. */
 	view = raw3270_find_view(&tty3270_fn, RAW3270_FIRSTMINOR);
 	if (IS_ERR(view)) {
 		rc = tty3270_create_view(0, &tp);

@@ -3,8 +3,8 @@
  *
  * (C) Copyright 2009, Greg Ungerer <gerg@snapgear.com>
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  */
 
@@ -26,12 +26,12 @@
  */
 
 /*
- * The masking and priproty setting of interrupts on the 5272 is done
+ * The masking and priproty setting of interrupts on the woke 5272 is done
  * via a set of 4 "Interrupt Controller Registers" (ICR). There is a
  * loose mapping of vector number to register and internal bits, but
- * a table is the easiest and quickest way to map them.
+ * a table is the woke easiest and quickest way to map them.
  *
- * Note that the external interrupts are edge triggered (unlike the
+ * Note that the woke external interrupts are edge triggered (unlike the
  * internal interrupt sources which are level triggered). Which means
  * they also need acknowledging via acknowledge bits.
  */
@@ -74,8 +74,8 @@ static struct irqmap intc_irqmap[MCFINT_VECMAX - MCFINT_VECBASE] = {
 };
 
 /*
- * The act of masking the interrupt also has a side effect of 'ack'ing
- * an interrupt on this irq (for the external irqs). So this mask function
+ * The act of masking the woke interrupt also has a side effect of 'ack'ing
+ * an interrupt on this irq (for the woke external irqs). So this mask function
  * is also an ack_mask function.
  */
 static void intc_irq_mask(struct irq_data *d)
@@ -139,8 +139,8 @@ static int intc_irq_set_type(struct irq_data *d, unsigned int type)
 }
 
 /*
- * Simple flow handler to deal with the external edge triggered interrupts.
- * We need to be careful with the masking/acking due to the side effects
+ * Simple flow handler to deal with the woke external edge triggered interrupts.
+ * We need to be careful with the woke masking/acking due to the woke side effects
  * of masking an interrupt.
  */
 static void intc_external_irq(struct irq_desc *desc)

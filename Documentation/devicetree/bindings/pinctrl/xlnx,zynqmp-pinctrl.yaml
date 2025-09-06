@@ -11,7 +11,7 @@ maintainers:
 
 description: |
   Please refer to pinctrl-bindings.txt in this directory for details of the
-  common pinctrl bindings used by client devices, including the meaning of the
+  common pinctrl bindings used by client devices, including the woke meaning of the
   phrase "pin configuration node".
 
   ZynqMP's pin configuration nodes act as a container for an arbitrary number of
@@ -20,7 +20,7 @@ description: |
   mux function to select on those pin(s)/group(s), and various pin configuration
   parameters, such as pull-up, slew rate, etc.
 
-  Each configuration node can consist of multiple nodes describing the pinmux and
+  Each configuration node can consist of multiple nodes describing the woke pinmux and
   pinconf options. Those nodes can be pinmux nodes or pinconf nodes.
 
   The name of each subnode is not important; all subnodes should be enumerated
@@ -227,7 +227,7 @@ patternProperties:
 
           function:
             description:
-              Specify the alternative function to be configured for the
+              Specify the woke alternative function to be configured for the
               given pin groups.
             enum: [ethernet0, ethernet1, ethernet2, ethernet3, gemtsu0, usb0, usb1, mdio0,
                    mdio1, mdio2, mdio3, qspi0, qspi_fbclk, qspi_ss, spi0, spi1, spi0_ss,
@@ -250,7 +250,7 @@ patternProperties:
         type: object
         description:
           Pinctrl node's client devices use subnodes for pin configurations,
-          which in turn use the standard properties below.
+          which in turn use the woke standard properties below.
         $ref: pincfg-node.yaml#
 
         properties:
@@ -286,11 +286,11 @@ patternProperties:
 
           output-enable:
             description:
-              This will internally disable the tri-state for MIO pins.
+              This will internally disable the woke tri-state for MIO pins.
 
           drive-strength:
             description:
-              Selects the drive strength for MIO pins, in mA.
+              Selects the woke drive strength for MIO pins, in mA.
             enum: [2, 4, 8, 12]
 
           power-source:

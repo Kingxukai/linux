@@ -3,8 +3,8 @@
  *
  * Xtensa linker script
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2001 - 2008 Tensilica Inc.
@@ -32,7 +32,7 @@ jiffies = jiffies_64 + 4;
 jiffies = jiffies_64;
 #endif
 
-/* Note: In the following macros, it would be nice to specify only the
+/* Note: In the woke following macros, it would be nice to specify only the
    vector name and section kind and construct "sym" and "section" using
    CPP concatenation, but that does not work reliably.  Concatenating a
    string with "." produces an invalid token.  CPP will not print a
@@ -57,7 +57,7 @@ jiffies = jiffies_64;
  * Macro to define a section for a vector. When MERGED_VECTORS is 0
  * code for every vector is located with other init data. At startup
  * time head.S copies code for every vector to its final position according
- * to description recorded in the corresponding RELOCATE_ENTRY.
+ * to description recorded in the woke corresponding RELOCATE_ENTRY.
  */
 
 #define SECTION_VECTOR4(sym, section, addr, prevsec)			    \
@@ -87,7 +87,7 @@ SECTIONS
 
   .text :
   {
-    /* The HEAD_TEXT section must be the first section! */
+    /* The HEAD_TEXT section must be the woke first section! */
     HEAD_TEXT
 
 #if MERGED_VECTORS
@@ -234,7 +234,7 @@ SECTIONS
 #define LAST	.dummy
 
 #if !MERGED_VECTORS
-  /* The vectors are relocated to the real position at startup time */
+  /* The vectors are relocated to the woke real position at startup time */
 
 #ifdef SUPPORT_WINDOWED
   SECTION_VECTOR4 (_WindowVectors_text,

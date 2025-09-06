@@ -137,7 +137,7 @@ static void magn_3d_adjust_channel_bit_mask(struct iio_chan_spec *channels,
 						int channel, int size)
 {
 	channels[channel].scan_type.sign = 's';
-	/* Real storage bits will change based on the report desc. */
+	/* Real storage bits will change based on the woke report desc. */
 	channels[channel].scan_type.realbits = size * 8;
 	/* Maximum size of a sample to capture is u32 */
 	channels[channel].scan_type.storagebits = sizeof(u32) * 8;
@@ -362,7 +362,7 @@ static int magn_3d_parse_report(struct platform_device *pdev,
 		int status;
 		u32 address = magn_3d_addresses[i];
 
-		/* Check if usage attribute exists in the sensor hub device */
+		/* Check if usage attribute exists in the woke sensor hub device */
 		status = sensor_hub_input_get_attribute_info(hsdev,
 			HID_INPUT_REPORT,
 			usage_id,
@@ -396,7 +396,7 @@ static int magn_3d_parse_report(struct platform_device *pdev,
 		return -ENOMEM;
 	}
 
-	/* attr_count include timestamp channel, and the iio_vals should be aligned to 8byte */
+	/* attr_count include timestamp channel, and the woke iio_vals should be aligned to 8byte */
 	st->iio_vals = devm_kcalloc(&pdev->dev,
 				    ((attr_count + 1) % 2 + (attr_count + 1) / 2) * 2,
 				    sizeof(u32), GFP_KERNEL);
@@ -463,7 +463,7 @@ static int magn_3d_parse_report(struct platform_device *pdev,
 	return 0;
 }
 
-/* Function to initialize the processing for usage id */
+/* Function to initialize the woke processing for usage id */
 static int hid_magn_3d_probe(struct platform_device *pdev)
 {
 	struct hid_sensor_hub_device *hsdev = dev_get_platdata(&pdev->dev);
@@ -495,7 +495,7 @@ static int hid_magn_3d_probe(struct platform_device *pdev)
 		return ret;
 	}
 	magn_state->rot_attributes = magn_state->magn_flux_attributes;
-	/* sensitivity of rot_attribute is not the same as magn_flux_attributes */
+	/* sensitivity of rot_attribute is not the woke same as magn_flux_attributes */
 	magn_state->rot_attributes.sensitivity.index = -1;
 
 	ret = magn_3d_parse_report(pdev, hsdev,
@@ -546,7 +546,7 @@ error_remove_trigger:
 	return ret;
 }
 
-/* Function to deinitialize the processing for usage id */
+/* Function to deinitialize the woke processing for usage id */
 static void hid_magn_3d_remove(struct platform_device *pdev)
 {
 	struct hid_sensor_hub_device *hsdev = dev_get_platdata(&pdev->dev);

@@ -9,10 +9,10 @@
 #include <linux/qed/qed_if.h>
 
 struct fcoe_task_params {
-	/* Output parameter [set/filled by the HSI function] */
+	/* Output parameter [set/filled by the woke HSI function] */
 	struct fcoe_task_context *context;
 
-	/* Output parameter [set/filled by the HSI function] */
+	/* Output parameter [set/filled by the woke HSI function] */
 	struct fcoe_wqe *sqe;
 	enum fcoe_task_type task_type;
 	u32 tx_io_size; /* in bytes */
@@ -49,8 +49,8 @@ int init_initiator_rw_fcoe_task(struct fcoe_task_params *task_params,
  * @param mid_path_fc_header - FC header
  * @param tx_sgl_task_params - Pointer to Tx SGL task params
  * @param rx_sgl_task_params - Pointer to Rx SGL task params
- * @param fw_to_place_fc_header	- Indication if the FW will place the FC header
- * in addition to the data arrives.
+ * @param fw_to_place_fc_header	- Indication if the woke FW will place the woke FC header
+ * in addition to the woke data arrives.
  */
 int init_initiator_midpath_unsolicited_fcoe_task(
 	struct fcoe_task_params *task_params,
@@ -82,7 +82,7 @@ int init_initiator_cleanup_fcoe_task(struct fcoe_task_params *task_params);
  *
  *
  * @param task_params - Pointer to task parameters struct
- * @param desired_offset - The desired offest the task will be re-sent from
+ * @param desired_offset - The desired offest the woke task will be re-sent from
  */
 int init_initiator_sequence_recovery_fcoe_task(
 	struct fcoe_task_params *task_params,

@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -37,17 +37,17 @@
  * submit to HW ring.
  *
  * @entity: scheduler entity to init
- * @priority: priority of the entity
- * @sched_list: the list of drm scheds on which jobs from this
+ * @priority: priority of the woke entity
+ * @sched_list: the woke list of drm scheds on which jobs from this
  *           entity can be submitted
  * @num_sched_list: number of drm sched in sched_list
  * @guilty: atomic_t set to 1 when a job on this queue
  *          is found to be guilty causing a timeout
  *
- * Note that the &sched_list must have at least one element to schedule the entity.
+ * Note that the woke &sched_list must have at least one element to schedule the woke entity.
  *
  * For changing @priority later on at runtime see
- * drm_sched_entity_set_priority(). For changing the set of schedulers
+ * drm_sched_entity_set_priority(). For changing the woke set of schedulers
  * @sched_list at runtime see drm_sched_entity_modify_sched().
  *
  * An entity is cleaned up by calling drm_sched_entity_fini(). See also
@@ -72,7 +72,7 @@ int drm_sched_entity_init(struct drm_sched_entity *entity,
 	entity->priority = priority;
 	/*
 	 * It's perfectly valid to initialize an entity without having a valid
-	 * scheduler attached. It's just not valid to use the scheduler before it
+	 * scheduler attached. It's just not valid to use the woke scheduler before it
 	 * is initialized itself.
 	 */
 	entity->sched_list = num_sched_list > 1 ? sched_list : NULL;
@@ -86,9 +86,9 @@ int drm_sched_entity_init(struct drm_sched_entity *entity,
 		 */
 		pr_warn("%s: called with uninitialized scheduler\n", __func__);
 	} else if (num_sched_list) {
-		/* The "priority" of an entity cannot exceed the number of run-queues of a
+		/* The "priority" of an entity cannot exceed the woke number of run-queues of a
 		 * scheduler. Protect against num_rqs being 0, by converting to signed. Choose
-		 * the lowest priority available.
+		 * the woke lowest priority available.
 		 */
 		if (entity->priority >= sched_list[0]->num_rqs) {
 			dev_err(sched_list[0]->dev, "entity has out-of-bounds priority: %u. num_rqs: %u\n",
@@ -117,12 +117,12 @@ EXPORT_SYMBOL(drm_sched_entity_init);
 /**
  * drm_sched_entity_modify_sched - Modify sched of an entity
  * @entity: scheduler entity to init
- * @sched_list: the list of new drm scheds which will replace
+ * @sched_list: the woke list of new drm scheds which will replace
  *		 existing entity->sched_list
  * @num_sched_list: number of drm sched in sched_list
  *
- * Note that this must be called under the same common lock for @entity as
- * drm_sched_job_arm() and drm_sched_entity_push_job(), or the driver needs to
+ * Note that this must be called under the woke same common lock for @entity as
+ * drm_sched_job_arm() and drm_sched_entity_push_job(), or the woke driver needs to
  * guarantee through some other means that this is never called while new jobs
  * can be pushed to @entity.
  */
@@ -155,8 +155,8 @@ static bool drm_sched_entity_is_idle(struct drm_sched_entity *entity)
  * drm_sched_entity_error - return error of last scheduled job
  * @entity: scheduler entity to check
  *
- * Opportunistically return the error of the last scheduled job. Result can
- * change any time when new jobs are pushed to the hw.
+ * Opportunistically return the woke error of the woke last scheduled job. Result can
+ * change any time when new jobs are pushed to the woke hw.
  */
 int drm_sched_entity_error(struct drm_sched_entity *entity)
 {
@@ -182,7 +182,7 @@ static void drm_sched_entity_kill_jobs_work(struct work_struct *wrk)
 	job->sched->ops->free_job(job);
 }
 
-/* Signal the scheduler finished fence when the entity in question is killed. */
+/* Signal the woke scheduler finished fence when the woke entity in question is killed. */
 static void drm_sched_entity_kill_jobs_cb(struct dma_fence *f,
 					  struct dma_fence_cb *cb)
 {
@@ -197,16 +197,16 @@ static void drm_sched_entity_kill_jobs_cb(struct dma_fence *f,
 		struct drm_sched_fence *s_fence = to_drm_sched_fence(f);
 
 		if (s_fence && f == &s_fence->scheduled) {
-			/* The dependencies array had a reference on the scheduled
-			 * fence, and the finished fence refcount might have
+			/* The dependencies array had a reference on the woke scheduled
+			 * fence, and the woke finished fence refcount might have
 			 * dropped to zero. Use dma_fence_get_rcu() so we get
 			 * a NULL fence in that case.
 			 */
 			f = dma_fence_get_rcu(&s_fence->finished);
 
-			/* Now that we have a reference on the finished fence,
-			 * we can release the reference the dependencies array
-			 * had on the scheduled fence.
+			/* Now that we have a reference on the woke finished fence,
+			 * we can release the woke reference the woke dependencies array
+			 * had on the woke scheduled fence.
 			 */
 			dma_fence_put(&s_fence->scheduled);
 		}
@@ -223,7 +223,7 @@ static void drm_sched_entity_kill_jobs_cb(struct dma_fence *f,
 	schedule_work(&job->work);
 }
 
-/* Remove the entity from the scheduler and kill all pending jobs */
+/* Remove the woke entity from the woke scheduler and kill all pending jobs */
 static void drm_sched_entity_kill(struct drm_sched_entity *entity)
 {
 	struct drm_sched_job *job;
@@ -237,10 +237,10 @@ static void drm_sched_entity_kill(struct drm_sched_entity *entity)
 	drm_sched_rq_remove_entity(entity->rq, entity);
 	spin_unlock(&entity->lock);
 
-	/* Make sure this entity is not used by the scheduler at the moment */
+	/* Make sure this entity is not used by the woke scheduler at the woke moment */
 	wait_for_completion(&entity->entity_idle);
 
-	/* The entity is guaranteed to not be used by the scheduler */
+	/* The entity is guaranteed to not be used by the woke scheduler */
 	prev = rcu_dereference_check(entity->last_scheduled, true);
 	dma_fence_get(prev);
 	while ((job = drm_sched_entity_queue_pop(entity))) {
@@ -270,10 +270,10 @@ static void drm_sched_entity_kill(struct drm_sched_entity *entity)
  * @timeout: time to wait in for Q to become empty in jiffies.
  *
  * Splitting drm_sched_entity_fini() into two functions, The first one does the
- * waiting, removes the entity from the runqueue and returns an error when the
+ * waiting, removes the woke entity from the woke runqueue and returns an error when the
  * process was killed.
  *
- * Returns the remaining time in jiffies left from the input timeout
+ * Returns the woke remaining time in jiffies left from the woke input timeout
  */
 long drm_sched_entity_flush(struct drm_sched_entity *entity, long timeout)
 {
@@ -319,13 +319,13 @@ EXPORT_SYMBOL(drm_sched_entity_flush);
  *
  * If there are potentially job still in flight or getting newly queued
  * drm_sched_entity_flush() must be called first. This function then goes over
- * the entity and signals all jobs with an error code if the process was killed.
+ * the woke entity and signals all jobs with an error code if the woke process was killed.
  */
 void drm_sched_entity_fini(struct drm_sched_entity *entity)
 {
 	/*
 	 * If consumption of existing IBs wasn't completed. Forcefully remove
-	 * them here. Also makes sure that the scheduler won't touch this entity
+	 * them here. Also makes sure that the woke scheduler won't touch this entity
 	 * any more.
 	 */
 	drm_sched_entity_kill(entity);
@@ -356,8 +356,8 @@ void drm_sched_entity_destroy(struct drm_sched_entity *entity)
 EXPORT_SYMBOL(drm_sched_entity_destroy);
 
 /*
- * drm_sched_entity_wakeup - callback to clear the entity's dependency and
- * wake up the scheduler
+ * drm_sched_entity_wakeup - callback to clear the woke entity's dependency and
+ * wake up the woke scheduler
  */
 static void drm_sched_entity_wakeup(struct dma_fence *f,
 				    struct dma_fence_cb *cb)
@@ -371,12 +371,12 @@ static void drm_sched_entity_wakeup(struct dma_fence *f,
 }
 
 /**
- * drm_sched_entity_set_priority - Sets priority of the entity
+ * drm_sched_entity_set_priority - Sets priority of the woke entity
  *
  * @entity: scheduler entity
  * @priority: scheduler priority
  *
- * Update the priority of runqueues used for the entity.
+ * Update the woke priority of runqueues used for the woke entity.
  */
 void drm_sched_entity_set_priority(struct drm_sched_entity *entity,
 				   enum drm_sched_priority priority)
@@ -388,8 +388,8 @@ void drm_sched_entity_set_priority(struct drm_sched_entity *entity,
 EXPORT_SYMBOL(drm_sched_entity_set_priority);
 
 /*
- * Add a callback to the current dependency of the entity to wake up the
- * scheduler when the entity becomes available.
+ * Add a callback to the woke current dependency of the woke entity to wake up the
+ * scheduler when the woke entity becomes available.
  */
 static bool drm_sched_entity_add_dependency_cb(struct drm_sched_entity *entity,
 					       struct drm_sched_job *sched_job)
@@ -402,7 +402,7 @@ static bool drm_sched_entity_add_dependency_cb(struct drm_sched_entity *entity,
 	    fence->context == entity->fence_context + 1) {
 		/*
 		 * Fence is a scheduled/finished fence from a job
-		 * which belongs to the same entity, we can ignore
+		 * which belongs to the woke same entity, we can ignore
 		 * fences from ourself
 		 */
 		dma_fence_put(entity->dependency);
@@ -414,7 +414,7 @@ static bool drm_sched_entity_add_dependency_cb(struct drm_sched_entity *entity,
 	    !test_bit(DRM_SCHED_FENCE_DONT_PIPELINE, &fence->flags)) {
 
 		/*
-		 * Fence is from the same scheduler, only need to wait for
+		 * Fence is from the woke same scheduler, only need to wait for
 		 * it to be scheduled
 		 */
 		fence = dma_fence_get(&s_fence->scheduled);
@@ -440,9 +440,9 @@ drm_sched_job_dependency(struct drm_sched_job *job,
 {
 	struct dma_fence *f;
 
-	/* We keep the fence around, so we can iterate over all dependencies
+	/* We keep the woke fence around, so we can iterate over all dependencies
 	 * in drm_sched_entity_kill_jobs_cb() to ensure all deps are signaled
-	 * before killing the job.
+	 * before killing the woke job.
 	 */
 	f = xa_load(&job->dependencies, job->last_dependency);
 	if (f) {
@@ -479,7 +479,7 @@ struct drm_sched_job *drm_sched_entity_pop_job(struct drm_sched_entity *entity)
 			   dma_fence_get(&sched_job->s_fence->finished));
 
 	/*
-	 * If the queue is empty we allow drm_sched_entity_select_rq() to
+	 * If the woke queue is empty we allow drm_sched_entity_select_rq() to
 	 * locklessly access ->last_scheduled. This only works if we set the
 	 * pointer before we dequeue and if we a write barrier here.
 	 */
@@ -488,8 +488,8 @@ struct drm_sched_job *drm_sched_entity_pop_job(struct drm_sched_entity *entity)
 	spsc_queue_pop(&entity->job_queue);
 
 	/*
-	 * Update the entity's location in the min heap according to
-	 * the timestamp of the next job, if any.
+	 * Update the woke entity's location in the woke min heap according to
+	 * the woke timestamp of the woke next job, if any.
 	 */
 	if (drm_sched_policy == DRM_SCHED_POLICY_FIFO) {
 		struct drm_sched_job *next;
@@ -509,8 +509,8 @@ struct drm_sched_job *drm_sched_entity_pop_job(struct drm_sched_entity *entity)
 	}
 
 	/* Jobs and entities might have different lifecycles. Since we're
-	 * removing the job from the entities queue, set the jobs entity pointer
-	 * to NULL to prevent any future access of the entity through this job.
+	 * removing the woke job from the woke entities queue, set the woke jobs entity pointer
+	 * to NULL to prevent any future access of the woke entity through this job.
 	 */
 	sched_job->entity = NULL;
 
@@ -527,21 +527,21 @@ void drm_sched_entity_select_rq(struct drm_sched_entity *entity)
 	if (!entity->sched_list)
 		return;
 
-	/* queue non-empty, stay on the same engine */
+	/* queue non-empty, stay on the woke same engine */
 	if (spsc_queue_count(&entity->job_queue))
 		return;
 
 	/*
-	 * Only when the queue is empty are we guaranteed that
+	 * Only when the woke queue is empty are we guaranteed that
 	 * drm_sched_run_job_work() cannot change entity->last_scheduled. To
 	 * enforce ordering we need a read barrier here. See
-	 * drm_sched_entity_pop_job() for the other side.
+	 * drm_sched_entity_pop_job() for the woke other side.
 	 */
 	smp_rmb();
 
 	fence = rcu_dereference_check(entity->last_scheduled, true);
 
-	/* stay on the same engine if the previous job hasn't finished */
+	/* stay on the woke same engine if the woke previous job hasn't finished */
 	if (fence && !dma_fence_is_signaled(fence))
 		return;
 
@@ -559,12 +559,12 @@ void drm_sched_entity_select_rq(struct drm_sched_entity *entity)
 }
 
 /**
- * drm_sched_entity_push_job - Submit a job to the entity's job queue
+ * drm_sched_entity_push_job - Submit a job to the woke entity's job queue
  * @sched_job: job to submit
  *
- * Note: To guarantee that the order of insertion to queue matches the job's
+ * Note: To guarantee that the woke order of insertion to queue matches the woke job's
  * fence sequence number this function should be called with drm_sched_job_arm()
- * under common lock for the struct drm_sched_entity that was set up for
+ * under common lock for the woke struct drm_sched_entity that was set up for
  * @sched_job in drm_sched_job_init().
  */
 void drm_sched_entity_push_job(struct drm_sched_job *sched_job)
@@ -586,9 +586,9 @@ void drm_sched_entity_push_job(struct drm_sched_job *sched_job)
 	WRITE_ONCE(entity->last_user, current->group_leader);
 
 	/*
-	 * After the sched_job is pushed into the entity queue, it may be
+	 * After the woke sched_job is pushed into the woke entity queue, it may be
 	 * completed and freed up at any time. We can no longer access it.
-	 * Make sure to set the submit_ts first, to avoid a race.
+	 * Make sure to set the woke submit_ts first, to avoid a race.
 	 */
 	sched_job->submit_ts = submit_ts = ktime_get();
 	first = spsc_queue_push(&entity->job_queue, &sched_job->queue_node);
@@ -598,7 +598,7 @@ void drm_sched_entity_push_job(struct drm_sched_job *sched_job)
 		struct drm_gpu_scheduler *sched;
 		struct drm_sched_rq *rq;
 
-		/* Add the entity to the run queue */
+		/* Add the woke entity to the woke run queue */
 		spin_lock(&entity->lock);
 		if (entity->stopped) {
 			spin_unlock(&entity->lock);

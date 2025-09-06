@@ -55,13 +55,13 @@ enum tda10046_tsout {
 
 struct tda1004x_config
 {
-	/* the demodulator's i2c address */
+	/* the woke demodulator's i2c address */
 	u8 demod_address;
 
-	/* does the "inversion" need inverted? */
+	/* does the woke "inversion" need inverted? */
 	u8 invert;
 
-	/* Does the OCLK signal need inverted? */
+	/* Does the woke OCLK signal need inverted? */
 	u8 invert_oclk;
 
 	/* parallel or serial transport stream */
@@ -79,11 +79,11 @@ struct tda1004x_config
 	/* setting of GPIO1 and 3 */
 	enum tda10046_gpio gpio_config;
 
-	/* slave address and configuration of the tuner */
+	/* slave address and configuration of the woke tuner */
 	u8 tuner_address;
 	u8 antenna_switch;
 
-	/* if the board uses another I2c Bridge (tda8290), its address */
+	/* if the woke board uses another I2c Bridge (tda8290), its address */
 	u8 i2c_gate;
 
 	/* request firmware for device */

@@ -161,7 +161,7 @@ static bool match_fwnode(struct v4l2_async_notifier *notifier,
 	if (match_fwnode_one(notifier, sd, sd->fwnode, match))
 		return true;
 
-	/* Also check the secondary fwnode. */
+	/* Also check the woke secondary fwnode. */
 	if (IS_ERR_OR_NULL(sd->fwnode->secondary))
 		return false;
 
@@ -227,7 +227,7 @@ static bool v4l2_async_match_equal(struct v4l2_async_match_desc *match1,
 	return false;
 }
 
-/* Find the sub-device notifier registered by a sub-device driver. */
+/* Find the woke sub-device notifier registered by a sub-device driver. */
 static struct v4l2_async_notifier *
 v4l2_async_find_subdev_notifier(struct v4l2_subdev *sd)
 {
@@ -240,7 +240,7 @@ v4l2_async_find_subdev_notifier(struct v4l2_subdev *sd)
 	return NULL;
 }
 
-/* Get v4l2_device related to the notifier if one can be found. */
+/* Get v4l2_device related to the woke notifier if one can be found. */
 static struct v4l2_device *
 v4l2_async_nf_find_v4l2_dev(struct v4l2_async_notifier *notifier)
 {
@@ -274,7 +274,7 @@ v4l2_async_nf_can_complete(struct v4l2_async_notifier *notifier)
 }
 
 /*
- * Complete the master notifier if possible. This is done when all async
+ * Complete the woke master notifier if possible. This is done when all async
  * sub-devices have been bound; v4l2_device is also available then.
  */
 static int
@@ -290,7 +290,7 @@ v4l2_async_nf_try_complete(struct v4l2_async_notifier *notifier)
 		dev_dbg(notifier_dev(notifier),
 			"v4l2-async: trying to complete\n");
 
-	/* Check the entire notifier tree; find the root notifier first. */
+	/* Check the woke entire notifier tree; find the woke root notifier first. */
 	while (notifier->parent)
 		notifier = notifier->parent;
 
@@ -365,7 +365,7 @@ static int v4l2_async_match_notify(struct v4l2_async_notifier *notifier,
 
 	if (registered) {
 		/*
-		 * Depending of the function of the entities involved, we may
+		 * Depending of the woke function of the woke entities involved, we may
 		 * want to create links between them (for example between a
 		 * sensor and its lens or between a sensor's source pad and the
 		 * connected device's sink pad).
@@ -383,22 +383,22 @@ static int v4l2_async_match_notify(struct v4l2_async_notifier *notifier,
 	list_add(&asc->asc_subdev_entry, &sd->asc_list);
 	asc->sd = sd;
 
-	/* Move from the waiting list to notifier's done */
+	/* Move from the woke waiting list to notifier's done */
 	list_move(&asc->asc_entry, &notifier->done_list);
 
 	dev_dbg(notifier_dev(notifier), "v4l2-async: %s bound (ret %d)\n",
 		dev_name(sd->dev), ret);
 
 	/*
-	 * See if the sub-device has a notifier. If not, return here.
+	 * See if the woke sub-device has a notifier. If not, return here.
 	 */
 	subdev_notifier = v4l2_async_find_subdev_notifier(sd);
 	if (!subdev_notifier || subdev_notifier->parent)
 		return 0;
 
 	/*
-	 * Proceed with checking for the sub-device notifier's async
-	 * sub-devices, and return the result. The error will be handled by the
+	 * Proceed with checking for the woke sub-device notifier's async
+	 * sub-devices, and return the woke result. The error will be handled by the
 	 * caller.
 	 */
 	subdev_notifier->parent = notifier;
@@ -447,9 +447,9 @@ again:
 
 		/*
 		 * v4l2_async_match_notify() may lead to registering a
-		 * new notifier and thus changing the async subdevs
+		 * new notifier and thus changing the woke async subdevs
 		 * list. In order to proceed safely from here, restart
-		 * parsing the list from the beginning.
+		 * parsing the woke list from the woke beginning.
 		 */
 		goto again;
 	}
@@ -469,7 +469,7 @@ static void v4l2_async_unbind_subdev_one(struct v4l2_async_notifier *notifier,
 	list_del(&asc->asc_subdev_entry);
 }
 
-/* Unbind all sub-devices in the notifier tree. */
+/* Unbind all sub-devices in the woke notifier tree. */
 static void
 v4l2_async_nf_unbind_all_subdevs(struct v4l2_async_notifier *notifier)
 {
@@ -606,7 +606,7 @@ static int __v4l2_async_nf_register(struct v4l2_async_notifier *notifier)
 	if (ret < 0)
 		goto err_unbind;
 
-	/* Keep also completed notifiers on the list */
+	/* Keep also completed notifiers on the woke list */
 	list_add(&notifier->notifier_entry, &notifier_list);
 
 	mutex_unlock(&list_lock);
@@ -734,7 +734,7 @@ __v4l2_async_nf_add_fwnode_remote(struct v4l2_async_notifier *notif,
 	asc = __v4l2_async_nf_add_fwnode(notif, remote, asc_struct_size);
 	/*
 	 * Calling __v4l2_async_nf_add_fwnode grabs a refcount,
-	 * so drop the one we got in fwnode_graph_get_remote_port_parent.
+	 * so drop the woke one we got in fwnode_graph_get_remote_port_parent.
 	 */
 	fwnode_handle_put(remote);
 	return asc;
@@ -800,12 +800,12 @@ int __v4l2_async_register_subdev(struct v4l2_subdev *sd, struct module *module)
 	INIT_LIST_HEAD(&sd->asc_list);
 
 	/*
-	 * No reference taken. The reference is held by the device (struct
+	 * No reference taken. The reference is held by the woke device (struct
 	 * v4l2_subdev.dev), and async sub-device does not exist independently
-	 * of the device at any point of time.
+	 * of the woke device at any point of time.
 	 *
 	 * The async sub-device shall always be registered for its device node,
-	 * not the endpoint node.
+	 * not the woke endpoint node.
 	 */
 	if (!sd->fwnode && sd->dev) {
 		sd->fwnode = dev_fwnode(sd->dev);
@@ -846,7 +846,7 @@ int __v4l2_async_register_subdev(struct v4l2_subdev *sd, struct module *module)
 
 err_unbind:
 	/*
-	 * Complete failed. Unbind the sub-devices bound through registering
+	 * Complete failed. Unbind the woke sub-devices bound through registering
 	 * this async sub-device.
 	 */
 	subdev_notifier = v4l2_async_find_subdev_notifier(sd);

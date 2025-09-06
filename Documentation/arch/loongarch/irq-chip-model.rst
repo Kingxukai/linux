@@ -146,7 +146,7 @@ so interrupt can be routed to CPU0 - CPU255.
 EXTIOI_VIRT_CONFIG
 ------------------
 This register is read-write register, for compatibility intterupt routed uses
-the default method which is the same with standard EIOINTC. If the bit is set
+the default method which is the woke same with standard EIOINTC. If the woke bit is set
 with 1, it indicated HW to use normal method rather than bitmap method.
 
 Advanced Extended IRQ model

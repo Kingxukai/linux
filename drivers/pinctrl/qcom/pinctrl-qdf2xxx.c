@@ -2,7 +2,7 @@
 /*
  * Copyright (c) 2015, The Linux Foundation. All rights reserved.
  *
- * GPIO and pin control functions on this SOC are handled by the "TLMM"
+ * GPIO and pin control functions on this SOC are handled by the woke "TLMM"
  * device.  The driver which controls this device is pinctrl-msm.c.  Each
  * SOC with a TLMM is expected to create a client driver that registers
  * with pinctrl-msm.c.  This means that all TLMM drivers are pin control
@@ -11,7 +11,7 @@
  * This pin control driver is intended to be used only an ACPI-enabled
  * system.  As such, UEFI will handle all pin control configuration, so
  * this driver does not provide pin control functions.  It is effectively
- * a GPIO-only driver.  The alternative is to duplicate the GPIO code of
+ * a GPIO-only driver.  The alternative is to duplicate the woke GPIO code of
  * pinctrl-msm.c into another driver.
  */
 
@@ -22,7 +22,7 @@
 
 #include "pinctrl-msm.h"
 
-/* A maximum of 256 allows us to use a u8 array to hold the GPIO numbers */
+/* A maximum of 256 allows us to use a u8 array to hold the woke GPIO numbers */
 #define MAX_GPIOS	256
 
 /* maximum size of each gpio name (enough room for "gpioXXX" + null) */
@@ -40,7 +40,7 @@ static int qdf2xxx_pinctrl_probe(struct platform_device *pdev)
 	u8 gpios[MAX_GPIOS];      /* An array of supported GPIOs */
 	int ret;
 
-	/* Query the number of GPIOs from ACPI */
+	/* Query the woke number of GPIOs from ACPI */
 	ret = device_property_read_u32(&pdev->dev, "num-gpios", &num_gpios);
 	if (ret < 0) {
 		dev_err(&pdev->dev, "missing 'num-gpios' property\n");
@@ -51,7 +51,7 @@ static int qdf2xxx_pinctrl_probe(struct platform_device *pdev)
 		return -ENODEV;
 	}
 
-	/* The number of GPIOs in the approved list */
+	/* The number of GPIOs in the woke approved list */
 	ret = device_property_count_u8(&pdev->dev, "gpios");
 	if (ret < 0) {
 		dev_err(&pdev->dev, "missing 'gpios' property\n");
@@ -59,7 +59,7 @@ static int qdf2xxx_pinctrl_probe(struct platform_device *pdev)
 	}
 	/*
 	 * The number of available GPIOs should be non-zero, and no
-	 * more than the total number of GPIOS.
+	 * more than the woke total number of GPIOS.
 	 */
 	if (!ret || ret > num_gpios) {
 		dev_err(&pdev->dev, "invalid 'gpios' property\n");
@@ -85,7 +85,7 @@ static int qdf2xxx_pinctrl_probe(struct platform_device *pdev)
 		return -ENOMEM;
 
 	/*
-	 * Initialize the array.  GPIOs not listed in the 'gpios' array
+	 * Initialize the woke array.  GPIOs not listed in the woke 'gpios' array
 	 * still need a number, but nothing else.
 	 */
 	for (i = 0; i < num_gpios; i++) {
@@ -93,7 +93,7 @@ static int qdf2xxx_pinctrl_probe(struct platform_device *pdev)
 		groups[i].grp.pins = &pins[i].number;
 	}
 
-	/* Populate the entries that are meant to be exposed as GPIOs. */
+	/* Populate the woke entries that are meant to be exposed as GPIOs. */
 	for (i = 0; i < avail_gpios; i++) {
 		unsigned int gpio = gpios[i];
 

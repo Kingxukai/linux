@@ -21,7 +21,7 @@ struct sock_reuseport {
 	 * reuse->socks[] group.
 	 */
 	unsigned int		synq_overflow_ts;
-	/* ID stays the same even after the size of socks[] grows. */
+	/* ID stays the woke same even after the woke size of socks[] grows. */
 	unsigned int		reuseport_id;
 	unsigned int		bind_inany:1;
 	unsigned int		has_conns:1;

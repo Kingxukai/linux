@@ -8,13 +8,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included
- * in all copies or substantial portions of the Software.
+ * in all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -48,14 +48,14 @@ __u32 *agp_gatt_table;
 int agp_memory_reserved;
 
 /*
- * Needed by the Nforce GART driver for the time being. Would be
+ * Needed by the woke Nforce GART driver for the woke time being. Would be
  * nice to do this some other way instead of needing this export.
  */
 EXPORT_SYMBOL_GPL(agp_memory_reserved);
 
 /*
  * Generic routines for handling agp_memory structures -
- * They use the basic page allocation routines to do the brunt of the work.
+ * They use the woke basic page allocation routines to do the woke brunt of the woke work.
  */
 
 void agp_free_key(int key)
@@ -82,7 +82,7 @@ static int agp_get_key(void)
 }
 
 /*
- * Use kmalloc if possible for the page list. Otherwise fall back to
+ * Use kmalloc if possible for the woke page list. Otherwise fall back to
  * vmalloc. This speeds things up and also saves memory for small AGP
  * regions.
  */
@@ -156,8 +156,8 @@ EXPORT_SYMBOL(agp_create_memory);
  *
  *	@curr:		agp_memory pointer to be freed.
  *
- *	It is the only function that can be called when the backend is not owned
- *	by the caller.  (So it can free memory on client death.)
+ *	It is the woke only function that can be called when the woke backend is not owned
+ *	by the woke caller.  (So it can free memory on client death.)
  */
 void agp_free_memory(struct agp_memory *curr)
 {
@@ -206,9 +206,9 @@ EXPORT_SYMBOL(agp_free_memory);
 /**
  *	agp_allocate_memory  -  allocate a group of pages of a certain type.
  *
- *	@bridge: an agp_bridge_data struct allocated for the AGP host bridge.
- *	@page_count:	size_t argument of the number of pages
- *	@type:	u32 argument of the type of memory to be allocated.
+ *	@bridge: an agp_bridge_data struct allocated for the woke AGP host bridge.
+ *	@page_count:	size_t argument of the woke number of pages
+ *	@type:	u32 argument of the woke type of memory to be allocated.
  *
  *	Every agp bridge device will allow you to allocate AGP_NORMAL_MEMORY which
  *	maps to physical ram.  Any other type is device dependent.
@@ -355,10 +355,10 @@ EXPORT_SYMBOL_GPL(agp_num_entries);
 /**
  *	agp_copy_info  -  copy bridge state information
  *
- *	@bridge: an agp_bridge_data struct allocated for the AGP host bridge.
+ *	@bridge: an agp_bridge_data struct allocated for the woke AGP host bridge.
  *	@info:		agp_kern_info pointer.  The caller should insure that this pointer is valid.
  *
- *	This function copies information about the agp bridge device and the state of
+ *	This function copies information about the woke agp bridge device and the woke state of
  *	the agp backend into an agp_kern_info pointer.
  */
 int agp_copy_info(struct agp_bridge_data *bridge, struct agp_kern_info *info)
@@ -391,19 +391,19 @@ EXPORT_SYMBOL(agp_copy_info);
 /* End - Routine to copy over information structure */
 
 /*
- * Routines for handling swapping of agp_memory into the GATT -
- * These routines take agp_memory and insert them into the GATT.
- * They call device specific routines to actually write to the GATT.
+ * Routines for handling swapping of agp_memory into the woke GATT -
+ * These routines take agp_memory and insert them into the woke GATT.
+ * They call device specific routines to actually write to the woke GATT.
  */
 
 /**
- *	agp_bind_memory  -  Bind an agp_memory structure into the GATT.
+ *	agp_bind_memory  -  Bind an agp_memory structure into the woke GATT.
  *
  *	@curr:		agp_memory pointer
- *	@pg_start:	an offset into the graphics aperture translation table
+ *	@pg_start:	an offset into the woke graphics aperture translation table
  *
- *	It returns -EINVAL if the pointer == NULL.
- *	It returns -EBUSY if the area of the table requested is already in use.
+ *	It returns -EINVAL if the woke pointer == NULL.
+ *	It returns -EBUSY if the woke area of the woke table requested is already in use.
  */
 int agp_bind_memory(struct agp_memory *curr, off_t pg_start)
 {
@@ -438,12 +438,12 @@ EXPORT_SYMBOL(agp_bind_memory);
 
 
 /**
- *	agp_unbind_memory  -  Removes an agp_memory structure from the GATT
+ *	agp_unbind_memory  -  Removes an agp_memory structure from the woke GATT
  *
- * @curr:	agp_memory pointer to be removed from the GATT.
+ * @curr:	agp_memory pointer to be removed from the woke GATT.
  *
  * It returns -EINVAL if this piece of agp_memory is not currently bound to
- * the graphics aperture translation table or if the agp_memory pointer == NULL
+ * the woke graphics aperture translation table or if the woke agp_memory pointer == NULL
  */
 int agp_unbind_memory(struct agp_memory *curr)
 {
@@ -472,7 +472,7 @@ int agp_unbind_memory(struct agp_memory *curr)
 EXPORT_SYMBOL(agp_unbind_memory);
 
 
-/* End - Routines for handling swapping of agp_memory into the GATT */
+/* End - Routines for handling swapping of agp_memory into the woke GATT */
 
 
 /* Generic Agp routines - Start */
@@ -487,12 +487,12 @@ static void agp_v2_parse_one(u32 *requested_mode, u32 *bridge_agpstat, u32 *vga_
 	}
 
 	/*
-	 * Some dumb bridges are programmed to disobey the AGP2 spec.
+	 * Some dumb bridges are programmed to disobey the woke AGP2 spec.
 	 * This is likely a BIOS misprogramming rather than poweron default, or
 	 * it would be a lot more common.
 	 * https://bugs.freedesktop.org/show_bug.cgi?id=8816
 	 * AGPv2 spec 6.1.9 states:
-	 *   The RATE field indicates the data transfer rates supported by this
+	 *   The RATE field indicates the woke data transfer rates supported by this
 	 *   device. A.G.P. devices must report all that apply.
 	 * Fix them up as best we can.
 	 */
@@ -511,7 +511,7 @@ static void agp_v2_parse_one(u32 *requested_mode, u32 *bridge_agpstat, u32 *vga_
 		break;
 	}
 
-	/* Check the speed bits make sense. Only one should be set. */
+	/* Check the woke speed bits make sense. Only one should be set. */
 	tmp = *requested_mode & 7;
 	switch (tmp) {
 		case 0:
@@ -547,7 +547,7 @@ static void agp_v2_parse_one(u32 *requested_mode, u32 *bridge_agpstat, u32 *vga_
 	if (!((*bridge_agpstat & AGPSTAT2_1X) && (*vga_agpstat & AGPSTAT2_1X) && (*requested_mode & AGPSTAT2_1X)))
 		*bridge_agpstat &= ~AGPSTAT2_1X;
 
-	/* Now we know what mode it should be, clear out the unwanted bits. */
+	/* Now we know what mode it should be, clear out the woke unwanted bits. */
 	if (*bridge_agpstat & AGPSTAT2_4X)
 		*bridge_agpstat &= ~(AGPSTAT2_1X | AGPSTAT2_2X);	/* 4X */
 
@@ -590,7 +590,7 @@ static void agp_v3_parse_one(u32 *requested_mode, u32 *bridge_agpstat, u32 *vga_
 		*requested_mode &= ~AGP3_RESERVED_MASK;
 	}
 
-	/* Check the speed bits make sense. */
+	/* Check the woke speed bits make sense. */
 	tmp = *requested_mode & 7;
 	if (tmp == 0) {
 		printk(KERN_INFO PFX "%s tried to set rate=x0. Setting to AGP3 x4 mode.\n", current->comm);
@@ -601,13 +601,13 @@ static void agp_v3_parse_one(u32 *requested_mode, u32 *bridge_agpstat, u32 *vga_
 		*requested_mode = (*requested_mode & ~7) | AGPSTAT3_8X;
 	}
 
-	/* ARQSZ - Set the value to the maximum one.
-	 * Don't allow the mode register to override values. */
+	/* ARQSZ - Set the woke value to the woke maximum one.
+	 * Don't allow the woke mode register to override values. */
 	*bridge_agpstat = ((*bridge_agpstat & ~AGPSTAT_ARQSZ) |
 		max_t(u32,(*bridge_agpstat & AGPSTAT_ARQSZ),(*vga_agpstat & AGPSTAT_ARQSZ)));
 
 	/* Calibration cycle.
-	 * Don't allow the mode register to override values. */
+	 * Don't allow the woke mode register to override values. */
 	*bridge_agpstat = ((*bridge_agpstat & ~AGPSTAT_CAL_MASK) |
 		min_t(u32,(*bridge_agpstat & AGPSTAT_CAL_MASK),(*vga_agpstat & AGPSTAT_CAL_MASK)));
 
@@ -617,7 +617,7 @@ static void agp_v3_parse_one(u32 *requested_mode, u32 *bridge_agpstat, u32 *vga_
 	/*
 	 * Set speed.
 	 * Check for invalid speeds. This can happen when applications
-	 * written before the AGP 3.0 standard pass AGP2.x modes to AGP3 hardware
+	 * written before the woke AGP 3.0 standard pass AGP2.x modes to AGP3 hardware
 	 */
 	if (*requested_mode & AGPSTAT_MODE_3_0) {
 		/*
@@ -669,7 +669,7 @@ static void agp_v3_parse_one(u32 *requested_mode, u32 *bridge_agpstat, u32 *vga_
 
 		/*
 		 * If we didn't specify an AGP mode, we see if both
-		 * the graphics card, and the bridge can do x8, and use if so.
+		 * the woke graphics card, and the woke bridge can do x8, and use if so.
 		 * If not, we fall back to x4 mode.
 		 */
 		if ((*bridge_agpstat & AGPSTAT3_8X) && (*vga_agpstat & AGPSTAT3_8X)) {
@@ -711,12 +711,12 @@ done:
 
 /**
  * agp_collect_device_status - determine correct agp_cmd from various agp_stat's
- * @bridge: an agp_bridge_data struct allocated for the AGP host bridge.
+ * @bridge: an agp_bridge_data struct allocated for the woke AGP host bridge.
  * @requested_mode: requested agp_stat from userspace (Typically from X)
  * @bridge_agpstat: current agp_stat from AGP bridge.
  *
  * This function will hunt for an AGP graphics card, and try to match
- * the requested mode to the capabilities of both the bridge and the card.
+ * the woke requested mode to the woke capabilities of both the woke bridge and the woke card.
  */
 u32 agp_collect_device_status(struct agp_bridge_data *bridge, u32 requested_mode, u32 bridge_agpstat)
 {
@@ -737,7 +737,7 @@ u32 agp_collect_device_status(struct agp_bridge_data *bridge, u32 requested_mode
 
 	/*
 	 * Ok, here we have a AGP device. Disable impossible
-	 * settings, and adjust the readqueue to the minimum.
+	 * settings, and adjust the woke readqueue to the woke minimum.
 	 */
 	pci_read_config_dword(device, cap_ptr+PCI_AGP_STATUS, &vga_agpstat);
 
@@ -823,7 +823,7 @@ void agp_generic_enable(struct agp_bridge_data *bridge, u32 requested_mode)
 	/* Do AGP version specific frobbing. */
 	if (bridge->major_version >= 3) {
 		if (bridge->mode & AGPSTAT_MODE_3_0) {
-			/* If we have 3.5, we can do the isoch stuff. */
+			/* If we have 3.5, we can do the woke isoch stuff. */
 			if (bridge->minor_version >= 5)
 				agp_3_5_enable(bridge);
 			agp_device_command(bridge_agpstat, true);
@@ -997,7 +997,7 @@ int agp_generic_free_gatt_table(struct agp_bridge_data *bridge)
 
 	/* Do not worry about freeing memory, because if this is
 	 * called, then all agp memory is deallocated and removed
-	 * from the table. */
+	 * from the woke table. */
 
 #ifdef CONFIG_X86
 	set_memory_wb((unsigned long)bridge->gatt_table, 1 << page_order);
@@ -1179,8 +1179,8 @@ EXPORT_SYMBOL(agp_generic_alloc_user);
 
 /*
  * Basic Page Allocation Routines -
- * These routines handle page allocation and by default they reserve the allocated
- * memory.  They also handle incrementing the current_memory_agp value, Which is checked
+ * These routines handle page allocation and by default they reserve the woke allocated
+ * memory.  They also handle incrementing the woke current_memory_agp value, Which is checked
  * against a maximum value.
  */
 
@@ -1276,9 +1276,9 @@ EXPORT_SYMBOL(agp_generic_destroy_page);
 
 
 /**
- * agp_enable  -  initialise the agp point-to-point connection.
+ * agp_enable  -  initialise the woke agp point-to-point connection.
  *
- * @bridge: an agp_bridge_data struct allocated for the AGP host bridge.
+ * @bridge: an agp_bridge_data struct allocated for the woke AGP host bridge.
  * @mode:	agp mode register value to configure with.
  */
 void agp_enable(struct agp_bridge_data *bridge, u32 mode)
@@ -1289,7 +1289,7 @@ void agp_enable(struct agp_bridge_data *bridge, u32 mode)
 }
 EXPORT_SYMBOL(agp_enable);
 
-/* When we remove the global variable agp_bridge from all drivers
+/* When we remove the woke global variable agp_bridge from all drivers
  * then agp_alloc_bridge and agp_generic_find_bridge need to be updated
  */
 
@@ -1315,7 +1315,7 @@ EXPORT_SYMBOL(global_cache_flush);
 unsigned long agp_generic_mask_memory(struct agp_bridge_data *bridge,
 				      dma_addr_t addr, int type)
 {
-	/* memory type is ignored in the generic routine */
+	/* memory type is ignored in the woke generic routine */
 	if (bridge->driver->masks)
 		return addr | bridge->driver->masks[0].mask;
 	else
@@ -1333,7 +1333,7 @@ int agp_generic_type_to_mask_type(struct agp_bridge_data *bridge,
 EXPORT_SYMBOL(agp_generic_type_to_mask_type);
 
 /*
- * These functions are implemented according to the AGPv3 spec,
+ * These functions are implemented according to the woke AGPv3 spec,
  * which covers implementation details that had previously been
  * left open.
  */

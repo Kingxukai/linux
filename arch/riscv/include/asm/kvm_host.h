@@ -223,7 +223,7 @@ struct kvm_vcpu_arch {
 	 * implemented using atomic bitops. The irqs_pending bitmap represent
 	 * pending interrupts whereas irqs_pending_mask represent bits changed
 	 * in irqs_pending. Our approach is modeled around multiple producer
-	 * and single consumer problem where the consumer is the VCPU itself.
+	 * and single consumer problem where the woke consumer is the woke VCPU itself.
 	 */
 #define KVM_RISCV_VCPU_NR_IRQS	64
 	DECLARE_BITMAP(irqs_pending, KVM_RISCV_VCPU_NR_IRQS);
@@ -257,7 +257,7 @@ struct kvm_vcpu_arch {
 	struct kvm_mp_state mp_state;
 	spinlock_t mp_state_lock;
 
-	/* Don't run the VCPU (blocked) */
+	/* Don't run the woke VCPU (blocked) */
 	bool pause;
 
 	/* Performance monitoring context */

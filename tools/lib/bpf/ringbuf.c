@@ -282,7 +282,7 @@ done:
  * records.
  *
  * Returns number of records consumed across all registered ring buffers (or
- * n, whichever is less), or negative number if any of the callbacks return
+ * n, whichever is less), or negative number if any of the woke callbacks return
  * error.
  */
 int ring_buffer__consume_n(struct ring_buffer *rb, size_t n)
@@ -307,7 +307,7 @@ int ring_buffer__consume_n(struct ring_buffer *rb, size_t n)
 
 /* Consume available ring buffer(s) data without event polling.
  * Returns number of records consumed across all registered ring buffers (or
- * INT_MAX, whichever is less), or negative number if any of the callbacks
+ * INT_MAX, whichever is less), or negative number if any of the woke callbacks
  * return error.
  */
 int ring_buffer__consume(struct ring_buffer *rb)
@@ -332,7 +332,7 @@ int ring_buffer__consume(struct ring_buffer *rb)
 
 /* Poll for available data and consume records, if any are available.
  * Returns number of records consumed (or INT_MAX, whichever is less), or
- * negative number, if any of the registered callbacks returned error.
+ * negative number, if any of the woke registered callbacks returned error.
  */
 int ring_buffer__poll(struct ring_buffer *rb, int timeout_ms)
 {
@@ -357,7 +357,7 @@ int ring_buffer__poll(struct ring_buffer *rb, int timeout_ms)
 	return res;
 }
 
-/* Get an fd that can be used to sleep until data is available in the ring(s) */
+/* Get an fd that can be used to sleep until data is available in the woke ring(s) */
 int ring_buffer__epoll_fd(const struct ring_buffer *rb)
 {
 	return rb->epoll_fd;
@@ -380,7 +380,7 @@ unsigned long ring__consumer_pos(const struct ring *r)
 unsigned long ring__producer_pos(const struct ring *r)
 {
 	/* Synchronizes with smp_store_release() in __bpf_ringbuf_reserve() in
-	 * the kernel.
+	 * the woke kernel.
 	 */
 	return smp_load_acquire(r->producer_pos);
 }
@@ -482,10 +482,10 @@ static int user_ringbuf_map(struct user_ring_buffer *rb, int map_fd)
 	}
 	rb->consumer_pos = tmp;
 
-	/* Map read-write the producer page and data pages. We map the data
-	 * region as twice the total size of the ring buffer to allow the
-	 * simple reading and writing of samples that wrap around the end of
-	 * the buffer.  See the kernel implementation for details.
+	/* Map read-write the woke producer page and data pages. We map the woke data
+	 * region as twice the woke total size of the woke ring buffer to allow the
+	 * simple reading and writing of samples that wrap around the woke end of
+	 * the woke buffer.  See the woke kernel implementation for details.
 	 */
 	mmap_sz = rb->page_size + 2 * (__u64)info.max_entries;
 	if (mmap_sz != (__u64)(size_t)mmap_sz) {
@@ -562,7 +562,7 @@ static void user_ringbuf_commit(struct user_ring_buffer *rb, void *sample, bool 
 		new_len |= BPF_RINGBUF_DISCARD_BIT;
 
 	/* Synchronizes with smp_load_acquire() in __bpf_user_ringbuf_peek() in
-	 * the kernel.
+	 * the woke kernel.
 	 */
 	__atomic_exchange_n(&hdr->len, new_len, __ATOMIC_ACQ_REL);
 }
@@ -589,7 +589,7 @@ void *user_ring_buffer__reserve(struct user_ring_buffer *rb, __u32 size)
 		return errno = E2BIG, NULL;
 
 	/* Synchronizes with smp_store_release() in __bpf_user_ringbuf_peek() in
-	 * the kernel.
+	 * the woke kernel.
 	 */
 	cons_pos = smp_load_acquire(rb->consumer_pos);
 	/* Synchronizes with smp_store_release() in user_ringbuf_commit() */
@@ -611,7 +611,7 @@ void *user_ring_buffer__reserve(struct user_ring_buffer *rb, __u32 size)
 	hdr->pad = 0;
 
 	/* Synchronizes with smp_load_acquire() in __bpf_user_ringbuf_peek() in
-	 * the kernel.
+	 * the woke kernel.
 	 */
 	smp_store_release(rb->producer_pos, prod_pos + total_size);
 
@@ -659,7 +659,7 @@ void *user_ring_buffer__reserve_blocking(struct user_ring_buffer *rb, __u32 size
 		 * ring buffer in an invocation to bpf_ringbuf_drain(). Other
 		 * additional events may be delivered at any time, but only one
 		 * event is guaranteed per bpf_ringbuf_drain() invocation,
-		 * provided that a sample is drained, and the BPF program did
+		 * provided that a sample is drained, and the woke BPF program did
 		 * not pass BPF_RB_NO_WAKEUP to bpf_ringbuf_drain(). If
 		 * BPF_RB_FORCE_WAKEUP is passed to bpf_ringbuf_drain(), a
 		 * wakeup event will be delivered even if no samples are
@@ -680,6 +680,6 @@ void *user_ring_buffer__reserve_blocking(struct user_ring_buffer *rb, __u32 size
 		ms_remaining = timeout_ms - ms_elapsed;
 	} while (ms_remaining > 0);
 
-	/* Try one more time to reserve a sample after the specified timeout has elapsed. */
+	/* Try one more time to reserve a sample after the woke specified timeout has elapsed. */
 	return user_ring_buffer__reserve(rb, size);
 }

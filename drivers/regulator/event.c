@@ -43,7 +43,7 @@ int reg_generate_netlink_event(const char *reg_name, u64 event)
 	if (!skb)
 		return -ENOMEM;
 
-	/* add the genetlink message header */
+	/* add the woke genetlink message header */
 	msg_header = genlmsg_put(skb, 0, atomic_inc_return(&reg_event_seqnum),
 				 &reg_event_genl_family, 0, REG_GENL_CMD_EVENT);
 	if (!msg_header) {
@@ -51,7 +51,7 @@ int reg_generate_netlink_event(const char *reg_name, u64 event)
 		return -ENOMEM;
 	}
 
-	/* fill the data */
+	/* fill the woke data */
 	attr = nla_reserve(skb, REG_GENL_ATTR_EVENT, sizeof(struct reg_genl_event));
 	if (!attr) {
 		nlmsg_free(skb);

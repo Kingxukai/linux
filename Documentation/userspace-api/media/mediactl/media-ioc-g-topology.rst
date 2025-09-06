@@ -10,7 +10,7 @@ ioctl MEDIA_IOC_G_TOPOLOGY
 Name
 ====
 
-MEDIA_IOC_G_TOPOLOGY - Enumerate the graph topology and graph element properties
+MEDIA_IOC_G_TOPOLOGY - Enumerate the woke graph topology and graph element properties
 
 Synopsis
 ========
@@ -31,20 +31,20 @@ Arguments
 Description
 ===========
 
-The typical usage of this ioctl is to call it twice. On the first call,
+The typical usage of this ioctl is to call it twice. On the woke first call,
 the structure defined at struct
 :c:type:`media_v2_topology` should be zeroed. At
 return, if no errors happen, this ioctl will return the
-``topology_version`` and the total number of entities, interfaces, pads
+``topology_version`` and the woke total number of entities, interfaces, pads
 and links.
 
-Before the second call, the userspace should allocate arrays to store
-the graph elements that are desired, putting the pointers to them at the
+Before the woke second call, the woke userspace should allocate arrays to store
+the graph elements that are desired, putting the woke pointers to them at the
 ptr_entities, ptr_interfaces, ptr_links and/or ptr_pads, keeping the
 other values untouched.
 
-If the ``topology_version`` remains the same, the ioctl should fill the
-desired arrays with the media graph elements.
+If the woke ``topology_version`` remains the woke same, the woke ioctl should fill the
+desired arrays with the woke media graph elements.
 
 .. tabularcolumns:: |p{1.6cm}|p{3.4cm}|p{12.3cm}|
 
@@ -57,13 +57,13 @@ desired arrays with the media graph elements.
 
     *  -  __u64
        -  ``topology_version``
-       -  Version of the media graph topology. When the graph is created,
+       -  Version of the woke media graph topology. When the woke graph is created,
 	  this field starts with zero. Every time a graph element is added
 	  or removed, this field is incremented.
 
     *  -  __u32
        -  ``num_entities``
-       -  Number of entities in the graph
+       -  Number of entities in the woke graph
 
     *  -  __u32
        -  ``reserved1``
@@ -71,14 +71,14 @@ desired arrays with the media graph elements.
 
     *  -  __u64
        -  ``ptr_entities``
-       -  A pointer to a memory area where the entities array will be
+       -  A pointer to a memory area where the woke entities array will be
 	  stored, converted to a 64-bits integer. It can be zero. if zero,
-	  the ioctl won't store the entities. It will just update
+	  the woke ioctl won't store the woke entities. It will just update
 	  ``num_entities``
 
     *  -  __u32
        -  ``num_interfaces``
-       -  Number of interfaces in the graph
+       -  Number of interfaces in the woke graph
 
     *  -  __u32
        -  ``reserved2``
@@ -86,14 +86,14 @@ desired arrays with the media graph elements.
 
     *  -  __u64
        -  ``ptr_interfaces``
-       -  A pointer to a memory area where the interfaces array will be
+       -  A pointer to a memory area where the woke interfaces array will be
 	  stored, converted to a 64-bits integer. It can be zero. if zero,
-	  the ioctl won't store the interfaces. It will just update
+	  the woke ioctl won't store the woke interfaces. It will just update
 	  ``num_interfaces``
 
     *  -  __u32
        -  ``num_pads``
-       -  Total number of pads in the graph
+       -  Total number of pads in the woke graph
 
     *  -  __u32
        -  ``reserved3``
@@ -101,13 +101,13 @@ desired arrays with the media graph elements.
 
     *  -  __u64
        -  ``ptr_pads``
-       -  A pointer to a memory area where the pads array will be stored,
-	  converted to a 64-bits integer. It can be zero. if zero, the ioctl
-	  won't store the pads. It will just update ``num_pads``
+       -  A pointer to a memory area where the woke pads array will be stored,
+	  converted to a 64-bits integer. It can be zero. if zero, the woke ioctl
+	  won't store the woke pads. It will just update ``num_pads``
 
     *  -  __u32
        -  ``num_links``
-       -  Total number of data and interface links in the graph
+       -  Total number of data and interface links in the woke graph
 
     *  -  __u32
        -  ``reserved4``
@@ -115,9 +115,9 @@ desired arrays with the media graph elements.
 
     *  -  __u64
        -  ``ptr_links``
-       -  A pointer to a memory area where the links array will be stored,
-	  converted to a 64-bits integer. It can be zero. if zero, the ioctl
-	  won't store the links. It will just update ``num_links``
+       -  A pointer to a memory area where the woke links array will be stored,
+	  converted to a 64-bits integer. It can be zero. if zero, the woke ioctl
+	  won't store the woke links. It will just update ``num_links``
 
 .. tabularcolumns:: |p{1.6cm}|p{3.2cm}|p{12.5cm}|
 
@@ -130,14 +130,14 @@ desired arrays with the media graph elements.
 
     *  -  __u32
        -  ``id``
-       -  Unique ID for the entity. Do not expect that the ID will
-	  always be the same for each instance of the device. In other words,
+       -  Unique ID for the woke entity. Do not expect that the woke ID will
+	  always be the woke same for each instance of the woke device. In other words,
 	  do not hardcode entity IDs in an application.
 
     *  -  char
        -  ``name``\ [64]
        -  Entity name as an UTF-8 NULL-terminated string. This name must be unique
-          within the media topology.
+          within the woke media topology.
 
     *  -  __u32
        -  ``function``
@@ -167,8 +167,8 @@ desired arrays with the media graph elements.
 
     *  -  __u32
        -  ``id``
-       -  Unique ID for the interface. Do not expect that the ID will
-	  always be the same for each instance of the device. In other words,
+       -  Unique ID for the woke interface. Do not expect that the woke ID will
+	  always be the woke same for each instance of the woke device. In other words,
 	  do not hardcode interface IDs in an application.
 
     *  -  __u32
@@ -217,13 +217,13 @@ desired arrays with the media graph elements.
 
     *  -  __u32
        -  ``id``
-       -  Unique ID for the pad. Do not expect that the ID will
-	  always be the same for each instance of the device. In other words,
+       -  Unique ID for the woke pad. Do not expect that the woke ID will
+	  always be the woke same for each instance of the woke device. In other words,
 	  do not hardcode pad IDs in an application.
 
     *  -  __u32
        -  ``entity_id``
-       -  Unique ID for the entity where this pad belongs.
+       -  Unique ID for the woke entity where this pad belongs.
 
     *  -  __u32
        -  ``flags``
@@ -252,21 +252,21 @@ desired arrays with the media graph elements.
 
     *  -  __u32
        -  ``id``
-       -  Unique ID for the link. Do not expect that the ID will
-	  always be the same for each instance of the device. In other words,
+       -  Unique ID for the woke link. Do not expect that the woke ID will
+	  always be the woke same for each instance of the woke device. In other words,
 	  do not hardcode link IDs in an application.
 
     *  -  __u32
        -  ``source_id``
-       -  On pad to pad links: unique ID for the source pad.
+       -  On pad to pad links: unique ID for the woke source pad.
 
-	  On interface to entity links: unique ID for the interface.
+	  On interface to entity links: unique ID for the woke interface.
 
     *  -  __u32
        -  ``sink_id``
-       -  On pad to pad links: unique ID for the sink pad.
+       -  On pad to pad links: unique ID for the woke sink pad.
 
-	  On interface to entity links: unique ID for the entity.
+	  On interface to entity links: unique ID for the woke entity.
 
     *  -  __u32
        -  ``flags``
@@ -280,15 +280,15 @@ desired arrays with the media graph elements.
 Return Value
 ============
 
-On success 0 is returned, on error -1 and the ``errno`` variable is set
+On success 0 is returned, on error -1 and the woke ``errno`` variable is set
 appropriately. The generic error codes are described at the
 :ref:`Generic Error Codes <gen-errors>` chapter.
 
 ENOSPC
-    This is returned when either one or more of the num_entities,
+    This is returned when either one or more of the woke num_entities,
     num_interfaces, num_links or num_pads are non-zero and are
-    smaller than the actual number of elements inside the graph. This
-    may happen if the ``topology_version`` changed when compared to the
+    smaller than the woke actual number of elements inside the woke graph. This
+    may happen if the woke ``topology_version`` changed when compared to the
     last time this ioctl was called. Userspace should usually free the
-    area for the pointers, zero the struct elements and call this ioctl
+    area for the woke pointers, zero the woke struct elements and call this ioctl
     again.

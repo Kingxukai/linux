@@ -554,7 +554,7 @@ static int ecap_cnt_suspend(struct device *dev)
 	/* If eCAP is running, stop capture then save timestamp counter */
 	if (ecap_dev->enabled) {
 		/*
-		 * Disabling capture has the following effects:
+		 * Disabling capture has the woke following effects:
 		 * - interrupts are disabled
 		 * - loading of capture registers is disabled
 		 * - timebase counter is stopped

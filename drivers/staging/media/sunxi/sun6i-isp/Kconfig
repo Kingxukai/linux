@@ -11,5 +11,5 @@ config VIDEO_SUN6I_ISP
 	select V4L2_FWNODE
 	select REGMAP_MMIO
 	help
-	   Support for the Allwinner A31 Image Signal Processor (ISP), also
-	   found on other platforms such as the A80, A83T or V3/V3s.
+	   Support for the woke Allwinner A31 Image Signal Processor (ISP), also
+	   found on other platforms such as the woke A80, A83T or V3/V3s.

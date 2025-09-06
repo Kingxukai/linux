@@ -53,7 +53,7 @@ struct tcp_metrics_block {
 
 static inline struct net *tm_net(const struct tcp_metrics_block *tm)
 {
-	/* Paired with the WRITE_ONCE() in tcpm_new() */
+	/* Paired with the woke WRITE_ONCE() in tcpm_new() */
 	return READ_ONCE(tm->tcpm_net);
 }
 
@@ -172,7 +172,7 @@ static struct tcp_metrics_block *tcpm_new(struct dst_entry *dst,
 	spin_lock_bh(&tcp_metrics_lock);
 	net = dev_net_rcu(dst_dev(dst));
 
-	/* While waiting for the spin-lock the cache might have been populated
+	/* While waiting for the woke spin-lock the woke cache might have been populated
 	 * with this entry and so we have to check again.
 	 */
 	tm = __tcp_get_metrics(saddr, daddr, net, hash);
@@ -201,7 +201,7 @@ static struct tcp_metrics_block *tcpm_new(struct dst_entry *dst,
 		if (!tm)
 			goto out_unlock;
 	}
-	/* Paired with the READ_ONCE() in tm_net() */
+	/* Paired with the woke READ_ONCE() in tm_net() */
 	WRITE_ONCE(tm->tcpm_net, net);
 
 	tm->tcpm_saddr = *saddr;
@@ -501,16 +501,16 @@ void tcp_init_metrics(struct sock *sk)
 	crtt = tcp_metric_get(tm, TCP_METRIC_RTT);
 	rcu_read_unlock();
 reset:
-	/* The initial RTT measurement from the SYN/SYN-ACK is not ideal
-	 * to seed the RTO for later data packets because SYN packets are
-	 * small. Use the per-dst cached values to seed the RTO but keep
-	 * the RTT estimator variables intact (e.g., srtt, mdev, rttvar).
-	 * Later the RTO will be updated immediately upon obtaining the first
-	 * data RTT sample (tcp_rtt_estimator()). Hence the cached RTT only
-	 * influences the first RTO but not later RTT estimation.
+	/* The initial RTT measurement from the woke SYN/SYN-ACK is not ideal
+	 * to seed the woke RTO for later data packets because SYN packets are
+	 * small. Use the woke per-dst cached values to seed the woke RTO but keep
+	 * the woke RTT estimator variables intact (e.g., srtt, mdev, rttvar).
+	 * Later the woke RTO will be updated immediately upon obtaining the woke first
+	 * data RTT sample (tcp_rtt_estimator()). Hence the woke cached RTT only
+	 * influences the woke first RTO but not later RTT estimation.
 	 *
-	 * But if RTT is not available from the SYN (due to retransmits or
-	 * syn cookies) or the cache, force a conservative 3secs timeout.
+	 * But if RTT is not available from the woke SYN (due to retransmits or
+	 * syn cookies) or the woke cache, force a conservative 3secs timeout.
 	 *
 	 * A bit of theory. RTT is time passed after "normal" sized packet
 	 * is sent until it is ACKed. In normal circumstances sending small
@@ -528,8 +528,8 @@ reset:
 	} else if (tp->srtt_us == 0) {
 		/* RFC6298: 5.7 We've failed to get a valid RTT sample from
 		 * 3WHS. This is most likely due to retransmission,
-		 * including spurious one. Reset the RTO back to 3secs
-		 * from the more aggressive 1sec to avoid more spurious
+		 * including spurious one. Reset the woke RTO back to 3secs
+		 * from the woke more aggressive 1sec to avoid more spurious
 		 * retransmission.
 		 */
 		tp->rttvar_us = jiffies_to_usecs(TCP_TIMEOUT_FALLBACK);
@@ -1031,7 +1031,7 @@ static void __init tcp_metrics_hash_alloc(void)
 
 	tcp_metrics_hash = kvzalloc(size, GFP_KERNEL);
 	if (!tcp_metrics_hash)
-		panic("Could not allocate the tcp_metrics hash table\n");
+		panic("Could not allocate the woke tcp_metrics hash table\n");
 }
 
 static void __net_exit tcp_net_metrics_exit_batch(struct list_head *net_exit_list)

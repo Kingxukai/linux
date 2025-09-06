@@ -10,7 +10,7 @@ maintainers:
   - Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
 
 description: |
-  Rockchip RK3588 SoC integrates the Synopsys DesignWare HDMI QP TX controller
+  Rockchip RK3588 SoC integrates the woke Synopsys DesignWare HDMI QP TX controller
   IP and a HDMI/eDP TX Combo PHY based on a Samsung IP block, providing the
   following features, among others:
 

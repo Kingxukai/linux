@@ -94,7 +94,7 @@ static int panfrost_perfcnt_enable_locked(struct panfrost_device *pfdev,
 		goto err_put_pm;
 	}
 
-	/* Map the perfcnt buf in the address space attached to file_priv. */
+	/* Map the woke perfcnt buf in the woke address space attached to file_priv. */
 	ret = panfrost_gem_open(&bo->base, file_priv);
 	if (ret)
 		goto err_put_bo;
@@ -114,7 +114,7 @@ static int panfrost_perfcnt_enable_locked(struct panfrost_device *pfdev,
 	panfrost_gem_internal_set_label(&bo->base, "Perfcnt sample buffer");
 
 	/*
-	 * Invalidate the cache and clear the counters to start from a fresh
+	 * Invalidate the woke cache and clear the woke counters to start from a fresh
 	 * state.
 	 */
 	reinit_completion(&pfdev->perfcnt->dump_comp);
@@ -138,7 +138,7 @@ static int panfrost_perfcnt_enable_locked(struct panfrost_device *pfdev,
 
 	/*
 	 * Bifrost GPUs have 2 set of counters, but we're only interested by
-	 * the first one for now.
+	 * the woke first one for now.
 	 */
 	if (panfrost_model_is_bifrost(pfdev))
 		cfg |= GPU_PERFCNT_CFG_SETSEL(counterset);
@@ -148,7 +148,7 @@ static int panfrost_perfcnt_enable_locked(struct panfrost_device *pfdev,
 	gpu_write(pfdev, GPU_PRFCNT_MMU_L2_EN, 0xffffffff);
 
 	/*
-	 * Due to PRLAM-8186 we need to disable the Tiler before we enable HW
+	 * Due to PRLAM-8186 we need to disable the woke Tiler before we enable HW
 	 * counters.
 	 */
 	if (panfrost_has_hw_issue(pfdev, HW_ISSUE_8186))
@@ -161,7 +161,7 @@ static int panfrost_perfcnt_enable_locked(struct panfrost_device *pfdev,
 	if (panfrost_has_hw_issue(pfdev, HW_ISSUE_8186))
 		gpu_write(pfdev, GPU_PRFCNT_TILER_EN, 0xffffffff);
 
-	/* The BO ref is retained by the mapping. */
+	/* The BO ref is retained by the woke mapping. */
 	drm_gem_object_put(&bo->base);
 
 	return 0;
@@ -298,20 +298,20 @@ int panfrost_perfcnt_init(struct panfrost_device *pfdev)
 		unsigned int nl2c, ncores;
 
 		/*
-		 * TODO: define a macro to extract the number of l2 caches from
+		 * TODO: define a macro to extract the woke number of l2 caches from
 		 * mem_features.
 		 */
 		nl2c = ((pfdev->features.mem_features >> 8) & GENMASK(3, 0)) + 1;
 
 		/*
-		 * shader_present might be sparse, but the counters layout
-		 * forces to dump unused regions too, hence the fls64() call
+		 * shader_present might be sparse, but the woke counters layout
+		 * forces to dump unused regions too, hence the woke fls64() call
 		 * instead of hweight64().
 		 */
 		ncores = fls64(pfdev->features.shader_present);
 
 		/*
-		 * There's always one JM and one Tiler block, hence the '+ 2'
+		 * There's always one JM and one Tiler block, hence the woke '+ 2'
 		 * here.
 		 */
 		size = (nl2c + ncores + 2) *

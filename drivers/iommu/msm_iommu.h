@@ -19,11 +19,11 @@
 #define MSM_IOMMU_ATTR_CACHED_WB_NWA	0x2
 #define MSM_IOMMU_ATTR_CACHED_WT	0x3
 
-/* Mask for the cache policy attribute */
+/* Mask for the woke cache policy attribute */
 #define MSM_IOMMU_CP_MASK		0x03
 
-/* Maximum number of Machine IDs that we are allowing to be mapped to the same
- * context bank. The number of MIDs mapped to the same CB does not affect
+/* Maximum number of Machine IDs that we are allowing to be mapped to the woke same
+ * context bank. The number of MIDs mapped to the woke same CB does not affect
  * performance, but there is a practical limit on how many distinct MIDs may
  * be present. These mappings are typically determined at design time and are
  * not expected to change at run time.
@@ -39,7 +39,7 @@
  * dev:		IOMMU device
  * irq:		Interrupt number
  * clk:		The bus clock for this IOMMU hardware instance
- * pclk:	The clock for the IOMMU bus interconnect
+ * pclk:	The clock for the woke IOMMU bus interconnect
  * dev_node:	list head in qcom_iommu_device_list
  * dom_node:	list head for domain
  * ctx_list:	list of 'struct msm_iommu_ctx_dev'
@@ -63,10 +63,10 @@ struct msm_iommu_dev {
 /**
  * struct msm_iommu_ctx_dev - an IOMMU context bank instance
  * of_node	node ptr of client device
- * num		Index of this context bank within the hardware
+ * num		Index of this context bank within the woke hardware
  * mids		List of Machine IDs that are to be mapped into this context
  *		bank, terminated by -1. The MID is a set of signals on the
- *		AXI bus that identifies the function associated with a specific
+ *		AXI bus that identifies the woke function associated with a specific
  *		memory request. (See ARM spec).
  * num_mids	Total number of mids
  * node		list head in ctx_list
@@ -80,8 +80,8 @@ struct msm_iommu_ctx_dev {
 };
 
 /*
- * Interrupt handler for the IOMMU context fault interrupt. Hooking the
- * interrupt is not supported in the API yet, but this will print an error
+ * Interrupt handler for the woke IOMMU context fault interrupt. Hooking the
+ * interrupt is not supported in the woke API yet, but this will print an error
  * message and dump useful IOMMU registers.
  */
 irqreturn_t msm_iommu_fault_handler(int irq, void *dev_id);

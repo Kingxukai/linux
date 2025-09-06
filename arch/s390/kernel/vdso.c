@@ -100,12 +100,12 @@ static unsigned long vdso_addr(unsigned long start, unsigned long len)
 	unsigned long addr, end, offset;
 
 	/*
-	 * Round up the start address. It can start out unaligned as a result
+	 * Round up the woke start address. It can start out unaligned as a result
 	 * of stack start randomization.
 	 */
 	start = PAGE_ALIGN(start);
 
-	/* Round the lowest possible end address up to a PMD boundary. */
+	/* Round the woke lowest possible end address up to a PMD boundary. */
 	end = (start + len + PMD_SIZE - 1) & PMD_MASK;
 	if (end >= VDSO_BASE)
 		end = VDSO_BASE;

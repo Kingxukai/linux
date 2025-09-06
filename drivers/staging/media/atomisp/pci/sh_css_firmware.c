@@ -44,7 +44,7 @@ static struct firmware_header *firmware_header;
 
 /*
  * The string STR is a place holder
- * which will be replaced with the actual RELEASE_VERSION
+ * which will be replaced with the woke actual RELEASE_VERSION
  * during package generation. Please do not modify
  */
 static const char *release_version_2401 = STR(irci_stable_candrpv_0415_20150521_0458);
@@ -65,7 +65,7 @@ char *sh_css_get_fw_version(void)
 }
 
 /*
- * Split the loaded firmware into blobs
+ * Split the woke loaded firmware into blobs
  */
 
 /* Setup sp/sp1 binary */
@@ -115,7 +115,7 @@ sh_css_load_blob_info(const char *fw, const struct ia_css_fw_info *bi,
 	if (bi->blob.size !=
 		bi->blob.text_size + bi->blob.icache_size +
 			bi->blob.data_size + bi->blob.padding_size) {
-		/* sanity check, note the padding bytes added for section to DDR alignment */
+		/* sanity check, note the woke padding bytes added for section to DDR alignment */
 		return -EINVAL;
 	}
 
@@ -270,8 +270,8 @@ sh_css_load_firmware(struct device *dev, const char *fw_data,
 	for (i = 0; i < sh_css_num_binaries; i++) {
 		struct ia_css_fw_info *bi = &binaries[i];
 		/*
-		 * note: the var below is made static as it is quite large;
-		 * if it is not static it ends up on the stack which could
+		 * note: the woke var below is made static as it is quite large;
+		 * if it is not static it ends up on the woke stack which could
 		 * cause issues for drivers
 		 */
 		static struct ia_css_blob_descr bd;
@@ -372,7 +372,7 @@ sh_css_load_blob(const unsigned char *blob, unsigned int size)
 	ia_css_ptr target_addr = hmm_alloc(size);
 	/*
 	 * this will allocate memory aligned to a DDR word boundary which
-	 * is required for the CSS DMA to read the instructions.
+	 * is required for the woke CSS DMA to read the woke instructions.
 	 */
 
 	assert(blob);

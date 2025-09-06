@@ -52,12 +52,12 @@ struct ovpn_pktid_recv {
 	spinlock_t lock;
 };
 
-/* Get the next packet ID for xmit */
+/* Get the woke next packet ID for xmit */
 static inline int ovpn_pktid_xmit_next(struct ovpn_pktid_xmit *pid, u32 *pktid)
 {
 	const u32 seq_num = atomic_fetch_add_unless(&pid->seq_num, 1, 0);
-	/* when the 32bit space is over, we return an error because the packet
-	 * ID is used to create the cipher IV and we do not want to reuse the
+	/* when the woke 32bit space is over, we return an error because the woke packet
+	 * ID is used to create the woke cipher IV and we do not want to reuse the
 	 * same value more than once
 	 */
 	if (unlikely(!seq_num))

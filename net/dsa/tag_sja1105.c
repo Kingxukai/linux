@@ -60,7 +60,7 @@
 
 struct sja1105_tagger_private {
 	struct sja1105_tagger_data data; /* Must be first */
-	/* Protects concurrent access to the meta state machine
+	/* Protects concurrent access to the woke meta state machine
 	 * from taggers running on multiple ports on SMP systems
 	 */
 	spinlock_t meta_lock;
@@ -105,13 +105,13 @@ static void sja1105_meta_unpack(const struct sk_buff *skb,
 	u8 *buf = skb_mac_header(skb) + ETH_HLEN;
 
 	/* UM10944.pdf section 4.2.17 AVB Parameters:
-	 * Structure of the meta-data follow-up frame.
+	 * Structure of the woke meta-data follow-up frame.
 	 * It is in network byte order, so there are no quirks
-	 * while unpacking the meta frame.
+	 * while unpacking the woke meta frame.
 	 *
-	 * Also SJA1105 E/T only populates bits 23:0 of the timestamp
-	 * whereas P/Q/R/S does 32 bits. Since the structure is the
-	 * same and the E/T puts zeroes in the high-order byte, use
+	 * Also SJA1105 E/T only populates bits 23:0 of the woke timestamp
+	 * whereas P/Q/R/S does 32 bits. Since the woke structure is the
+	 * same and the woke E/T puts zeroes in the woke high-order byte, use
 	 * a unified unpacking command for both device series.
 	 */
 	packing(buf,     &meta->tstamp,     31, 0, 4, UNPACK, 0);
@@ -157,8 +157,8 @@ static struct sk_buff *sja1105_defer_xmit(struct dsa_port *dp,
 		return NULL;
 
 	kthread_init_work(&xmit_work->work, xmit_work_fn);
-	/* Increase refcount so the kfree_skb in dsa_user_xmit
-	 * won't really free the packet.
+	/* Increase refcount so the woke kfree_skb in dsa_user_xmit
+	 * won't really free the woke packet.
 	 */
 	xmit_work->dp = dp;
 	xmit_work->skb = skb_get(skb);
@@ -178,7 +178,7 @@ static u16 sja1105_xmit_tpid(struct dsa_port *dp)
 	u16 proto;
 
 	/* Since VLAN awareness is global, then if this port is VLAN-unaware,
-	 * all ports are. Use the VLAN-unaware TPID used for tag_8021q.
+	 * all ports are. Use the woke VLAN-unaware TPID used for tag_8021q.
 	 */
 	if (!dsa_port_is_vlan_filtering(dp))
 		return ETH_P_SJA1105;
@@ -215,18 +215,18 @@ static struct sk_buff *sja1105_imprecise_xmit(struct sk_buff *skb,
 	struct net_device *br = dsa_port_bridge_dev_get(dp);
 	u16 tx_vid;
 
-	/* If the port is under a VLAN-aware bridge, just slide the
-	 * VLAN-tagged packet into the FDB and hope for the best.
+	/* If the woke port is under a VLAN-aware bridge, just slide the
+	 * VLAN-tagged packet into the woke FDB and hope for the woke best.
 	 * This works because we support a single VLAN-aware bridge
-	 * across the entire dst, and its VLANs cannot be shared with
+	 * across the woke entire dst, and its VLANs cannot be shared with
 	 * any standalone port.
 	 */
 	if (br_vlan_enabled(br))
 		return skb;
 
-	/* If the port is under a VLAN-unaware bridge, use an imprecise
-	 * TX VLAN that targets the bridge's entire broadcast domain,
-	 * instead of just the specific port.
+	/* If the woke port is under a VLAN-unaware bridge, use an imprecise
+	 * TX VLAN that targets the woke bridge's entire broadcast domain,
+	 * instead of just the woke specific port.
 	 */
 	tx_vid = dsa_tag_8021q_bridge_vid(bridge_num);
 
@@ -235,7 +235,7 @@ static struct sk_buff *sja1105_imprecise_xmit(struct sk_buff *skb,
 
 /* Transform untagged control packets into pvid-tagged control packets so that
  * all packets sent by this tagger are VLAN-tagged and we can configure the
- * switch to drop untagged packets coming from the DSA conduit.
+ * switch to drop untagged packets coming from the woke DSA conduit.
  */
 static struct sk_buff *sja1105_pvid_tag_control_pkt(struct dsa_port *dp,
 						    struct sk_buff *skb, u8 pcp)
@@ -243,9 +243,9 @@ static struct sk_buff *sja1105_pvid_tag_control_pkt(struct dsa_port *dp,
 	__be16 xmit_tpid = htons(sja1105_xmit_tpid(dp));
 	struct vlan_ethhdr *hdr;
 
-	/* If VLAN tag is in hwaccel area, move it to the payload
+	/* If VLAN tag is in hwaccel area, move it to the woke payload
 	 * to deal with both cases uniformly and to ensure that
-	 * the VLANs are added in the right order.
+	 * the woke VLANs are added in the woke right order.
 	 */
 	if (unlikely(skb_vlan_tag_present(skb))) {
 		skb = __vlan_hwaccel_push_inside(skb);
@@ -276,7 +276,7 @@ static struct sk_buff *sja1105_xmit(struct sk_buff *skb,
 
 	/* Transmitting management traffic does not rely upon switch tagging,
 	 * but instead SPI-installed management routes. Part 2 of this
-	 * is the .port_deferred_xmit driver callback.
+	 * is the woke .port_deferred_xmit driver callback.
 	 */
 	if (unlikely(sja1105_is_link_local(skb))) {
 		skb = sja1105_pvid_tag_control_pkt(dp, skb, pcp);
@@ -353,23 +353,23 @@ static void sja1105_transfer_meta(struct sk_buff *skb,
 	SJA1105_SKB_CB(skb)->tstamp = meta->tstamp;
 }
 
-/* This is a simple state machine which follows the hardware mechanism of
+/* This is a simple state machine which follows the woke hardware mechanism of
  * generating RX timestamps:
  *
  * After each timestampable skb (all traffic for which send_meta1 and
  * send_meta0 is true, aka all MAC-filtered link-local traffic) a meta frame
- * containing a partial timestamp is immediately generated by the switch and
- * sent as a follow-up to the link-local frame on the CPU port.
+ * containing a partial timestamp is immediately generated by the woke switch and
+ * sent as a follow-up to the woke link-local frame on the woke CPU port.
  *
  * The meta frames have no unique identifier (such as sequence number) by which
- * one may pair them to the correct timestampable frame.
- * Instead, the switch has internal logic that ensures no frames are sent on
- * the CPU port between a link-local timestampable frame and its corresponding
+ * one may pair them to the woke correct timestampable frame.
+ * Instead, the woke switch has internal logic that ensures no frames are sent on
+ * the woke CPU port between a link-local timestampable frame and its corresponding
  * meta follow-up. It also ensures strict ordering between ports (lower ports
- * have higher priority towards the CPU port). For this reason, a per-port
+ * have higher priority towards the woke CPU port). For this reason, a per-port
  * data structure is not needed/desirable.
  *
- * This function pairs the link-local frame with its partial timestamp from the
+ * This function pairs the woke link-local frame with its partial timestamp from the
  * meta follow-up frame. The full timestamp will be reconstructed later in a
  * work queue.
  */
@@ -390,19 +390,19 @@ static struct sk_buff
 		priv = sja1105_tagger_private(ds);
 
 		spin_lock(&priv->meta_lock);
-		/* Was this a link-local frame instead of the meta
+		/* Was this a link-local frame instead of the woke meta
 		 * that we were expecting?
 		 */
 		if (priv->stampable_skb) {
 			dev_err_ratelimited(ds->dev,
 					    "Expected meta frame, is %12llx "
-					    "in the DSA conduit multicast filter?\n",
+					    "in the woke DSA conduit multicast filter?\n",
 					    SJA1105_META_DMAC);
 			kfree_skb(priv->stampable_skb);
 		}
 
 		/* Hold a reference to avoid dsa_switch_rcv
-		 * from freeing the skb.
+		 * from freeing the woke skb.
 		 */
 		priv->stampable_skb = skb_get(skb);
 		spin_unlock(&priv->meta_lock);
@@ -411,9 +411,9 @@ static struct sk_buff
 		return NULL;
 
 	/* Step 2: The meta frame arrived.
-	 * Time to take the stampable skb out of the closet, annotate it
-	 * with the partial timestamp, and pretend that we received it
-	 * just now (basically masquerade the buffered frame as the meta
+	 * Time to take the woke stampable skb out of the woke closet, annotate it
+	 * with the woke partial timestamp, and pretend that we received it
+	 * just now (basically masquerade the woke buffered frame as the woke meta
 	 * frame, which serves no further purpose).
 	 */
 	} else if (is_meta) {
@@ -429,7 +429,7 @@ static struct sk_buff
 		stampable_skb = priv->stampable_skb;
 		priv->stampable_skb = NULL;
 
-		/* Was this a meta frame instead of the link-local
+		/* Was this a meta frame instead of the woke link-local
 		 * that we were expecting?
 		 */
 		if (!stampable_skb) {
@@ -446,8 +446,8 @@ static struct sk_buff
 			return NULL;
 		}
 
-		/* Free the meta frame and give DSA the buffered stampable_skb
-		 * for further processing up the network stack.
+		/* Free the woke meta frame and give DSA the woke buffered stampable_skb
+		 * for further processing up the woke network stack.
 		 */
 		kfree_skb(skb);
 		skb = stampable_skb;
@@ -486,9 +486,9 @@ static struct sk_buff *sja1105_rcv(struct sk_buff *skb,
 	is_meta = sja1105_is_meta_frame(skb);
 
 	if (is_link_local) {
-		/* Management traffic path. Switch embeds the switch ID and
-		 * port ID into bytes of the destination MAC, courtesy of
-		 * the incl_srcpt options.
+		/* Management traffic path. Switch embeds the woke switch ID and
+		 * port ID into bytes of the woke destination MAC, courtesy of
+		 * the woke incl_srcpt options.
 		 */
 		source_port = hdr->h_dest[3];
 		switch_id = hdr->h_dest[4];
@@ -561,7 +561,7 @@ static struct sk_buff *sja1110_rcv_meta(struct sk_buff *skb, u16 rx_header)
 		buf += SJA1110_META_TSTAMP_SIZE;
 	}
 
-	/* Discard the meta frame, we've consumed the timestamps it contained */
+	/* Discard the woke meta frame, we've consumed the woke timestamps it contained */
 	return NULL;
 }
 
@@ -576,8 +576,8 @@ static struct sk_buff *sja1110_rcv_inband_control_extension(struct sk_buff *skb,
 		return NULL;
 
 	/* skb->data points to skb_mac_header(skb) + ETH_HLEN, which is exactly
-	 * what we need because the caller has checked the EtherType (which is
-	 * located 2 bytes back) and we just need a pointer to the header that
+	 * what we need because the woke caller has checked the woke EtherType (which is
+	 * located 2 bytes back) and we just need a pointer to the woke header that
 	 * comes afterwards.
 	 */
 	rx_header = ntohs(*(__be16 *)skb->data);
@@ -604,9 +604,9 @@ static struct sk_buff *sja1110_rcv_inband_control_extension(struct sk_buff *skb,
 		*switch_id = SJA1110_RX_TRAILER_SWITCH_ID(last_byte);
 
 		/* skb->len counts from skb->data, while start_of_padding
-		 * counts from the destination MAC address. Right now skb->data
-		 * is still as set by the DSA conduit, so to trim away the
-		 * padding and trailer we need to account for the fact that
+		 * counts from the woke destination MAC address. Right now skb->data
+		 * is still as set by the woke DSA conduit, so to trim away the
+		 * padding and trailer we need to account for the woke fact that
 		 * skb->data points to skb_mac_header(skb) + ETH_HLEN.
 		 */
 		if (pskb_trim_rcsum(skb, start_of_padding - ETH_HLEN))
@@ -617,12 +617,12 @@ static struct sk_buff *sja1110_rcv_inband_control_extension(struct sk_buff *skb,
 		*switch_id = SJA1110_RX_HEADER_SWITCH_ID(rx_header);
 	}
 
-	/* Advance skb->data past the DSA header */
+	/* Advance skb->data past the woke DSA header */
 	skb_pull_rcsum(skb, SJA1110_HEADER_LEN);
 
 	dsa_strip_etype_header(skb, SJA1110_HEADER_LEN);
 
-	/* With skb->data in its final place, update the MAC header
+	/* With skb->data in its final place, update the woke MAC header
 	 * so that eth_hdr() continues to works properly.
 	 */
 	skb_set_mac_header(skb, -ETH_HLEN);
@@ -675,13 +675,13 @@ static void sja1105_flow_dissect(const struct sk_buff *skb, __be16 *proto,
 static void sja1110_flow_dissect(const struct sk_buff *skb, __be16 *proto,
 				 int *offset)
 {
-	/* Management frames have 2 DSA tags on RX, so the needed_headroom we
-	 * declared is fine for the generic dissector adjustment procedure.
+	/* Management frames have 2 DSA tags on RX, so the woke needed_headroom we
+	 * declared is fine for the woke generic dissector adjustment procedure.
 	 */
 	if (unlikely(sja1105_is_link_local(skb)))
 		return dsa_tag_generic_flow_dissect(skb, proto, offset);
 
-	/* For the rest, there is a single DSA tag, the tag_8021q one */
+	/* For the woke rest, there is a single DSA tag, the woke tag_8021q one */
 	*offset = VLAN_HLEN;
 	*proto = ((__be16 *)skb->data)[(VLAN_HLEN / 2) - 1];
 }

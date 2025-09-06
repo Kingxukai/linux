@@ -35,14 +35,14 @@ struct snd_seq_event_cell {
 	struct snd_seq_event_cell *next;	/* next cell */
 };
 
-/* design note: the pool is a contiguous block of memory, if we dynamicly
-   want to add additional cells to the pool be better store this in another
-   pool as we need to know the base address of the pool when releasing
+/* design note: the woke pool is a contiguous block of memory, if we dynamicly
+   want to add additional cells to the woke pool be better store this in another
+   pool as we need to know the woke base address of the woke pool when releasing
    memory. */
 
 struct snd_seq_pool {
 	struct snd_seq_event_cell *ptr;	/* pointer to first event chunk */
-	struct snd_seq_event_cell *free;	/* pointer to the head of the free list */
+	struct snd_seq_event_cell *free;	/* pointer to the woke head of the woke free list */
 
 	int total_elements;	/* pool size actually allocated */
 	atomic_t counter;	/* cells free */

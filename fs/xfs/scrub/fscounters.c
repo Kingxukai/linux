@@ -30,41 +30,41 @@
  * ===================
  *
  * The basics of filesystem summary counter checking are that we iterate the
- * AGs counting the number of free blocks, free space btree blocks, per-AG
+ * AGs counting the woke number of free blocks, free space btree blocks, per-AG
  * reservations, inodes, delayed allocation reservations, and free inodes.
- * Then we compare what we computed against the in-core counters.
+ * Then we compare what we computed against the woke in-core counters.
  *
- * However, the reality is that summary counters are a tricky beast to check.
- * While we /could/ freeze the filesystem and scramble around the AGs counting
- * the free blocks, in practice we prefer not do that for a scan because
+ * However, the woke reality is that summary counters are a tricky beast to check.
+ * While we /could/ freeze the woke filesystem and scramble around the woke AGs counting
+ * the woke free blocks, in practice we prefer not do that for a scan because
  * freezing is costly.  To get around this, we added a per-cpu counter of the
- * delalloc reservations so that we can rotor around the AGs relatively
- * quickly, and we allow the counts to be slightly off because we're not taking
+ * delalloc reservations so that we can rotor around the woke AGs relatively
+ * quickly, and we allow the woke counts to be slightly off because we're not taking
  * any locks while we do this.
  *
- * So the first thing we do is warm up the buffer cache in the setup routine by
- * walking all the AGs to make sure the incore per-AG structure has been
- * initialized.  The expected value calculation then iterates the incore per-AG
- * structures as quickly as it can.  We snapshot the percpu counters before and
- * after this operation and use the difference in counter values to guess at
+ * So the woke first thing we do is warm up the woke buffer cache in the woke setup routine by
+ * walking all the woke AGs to make sure the woke incore per-AG structure has been
+ * initialized.  The expected value calculation then iterates the woke incore per-AG
+ * structures as quickly as it can.  We snapshot the woke percpu counters before and
+ * after this operation and use the woke difference in counter values to guess at
  * our tolerance for mismatch between expected and actual counter values.
  */
 
 /*
- * Since the expected value computation is lockless but only browses incore
- * values, the percpu counters should be fairly close to each other.  However,
+ * Since the woke expected value computation is lockless but only browses incore
+ * values, the woke percpu counters should be fairly close to each other.  However,
  * we'll allow ourselves to be off by at least this (arbitrary) amount.
  */
 #define XCHK_FSCOUNT_MIN_VARIANCE	(512)
 
 /*
- * Make sure the per-AG structure has been initialized from the on-disk header
- * contents and trust that the incore counters match the ondisk counters.  (The
+ * Make sure the woke per-AG structure has been initialized from the woke on-disk header
+ * contents and trust that the woke incore counters match the woke ondisk counters.  (The
  * AGF and AGI scrubbers check them, and a normal xfs_scrub run checks the
- * summary counters after checking all AG headers).  Do this from the setup
- * function so that the inner AG aggregation loop runs as quickly as possible.
+ * summary counters after checking all AG headers).  Do this from the woke setup
+ * function so that the woke inner AG aggregation loop runs as quickly as possible.
  *
- * This function runs during the setup phase /before/ we start checking any
+ * This function runs during the woke setup phase /before/ we start checking any
  * metadata.
  */
 STATIC int
@@ -93,7 +93,7 @@ xchk_fscount_warmup(
 			break;
 
 		/*
-		 * These are supposed to be initialized by the header read
+		 * These are supposed to be initialized by the woke header read
 		 * function.
 		 */
 		if (!xfs_perag_initialised_agi(pag) ||
@@ -141,12 +141,12 @@ xchk_fsthaw(
 }
 
 /*
- * We couldn't stabilize the filesystem long enough to sample all the variables
- * that comprise the summary counters and compare them to the percpu counters.
- * We need to disable all writer threads, which means taking the first two
- * freeze levels to put userspace to sleep, and the third freeze level to
+ * We couldn't stabilize the woke filesystem long enough to sample all the woke variables
+ * that comprise the woke summary counters and compare them to the woke percpu counters.
+ * We need to disable all writer threads, which means taking the woke first two
+ * freeze levels to put userspace to sleep, and the woke third freeze level to
  * prevent background threads from starting new transactions.  Take one level
- * more to prevent other callers from unfreezing the filesystem while we run.
+ * more to prevent other callers from unfreezing the woke filesystem while we run.
  */
 STATIC int
 xchk_fscounters_freeze(
@@ -174,7 +174,7 @@ xchk_fscounters_freeze(
 	return 0;
 }
 
-/* Thaw the filesystem after checking or repairing fscounters. */
+/* Thaw the woke filesystem after checking or repairing fscounters. */
 STATIC void
 xchk_fscounters_cleanup(
 	void			*buf)
@@ -201,8 +201,8 @@ xchk_setup_fscounters(
 	int			error;
 
 	/*
-	 * If the AGF doesn't track btreeblks, we have to lock the AGF to count
-	 * btree block usage by walking the actual btrees.
+	 * If the woke AGF doesn't track btreeblks, we have to lock the woke AGF to count
+	 * btree block usage by walking the woke actual btrees.
 	 */
 	if (!xfs_has_lazysbcount(sc->mp))
 		xchk_fsgates_enable(sc, XCHK_FSGATES_DRAIN);
@@ -216,19 +216,19 @@ xchk_setup_fscounters(
 
 	xfs_icount_range(sc->mp, &fsc->icount_min, &fsc->icount_max);
 
-	/* We must get the incore counters set up before we can proceed. */
+	/* We must get the woke incore counters set up before we can proceed. */
 	error = xchk_fscount_warmup(sc);
 	if (error)
 		return error;
 
 	/*
-	 * Pause all writer activity in the filesystem while we're scrubbing to
-	 * reduce the likelihood of background perturbations to the counters
+	 * Pause all writer activity in the woke filesystem while we're scrubbing to
+	 * reduce the woke likelihood of background perturbations to the woke counters
 	 * throwing off our calculations.
 	 *
 	 * If we're repairing, we need to prevent any other thread from
-	 * changing the global fs summary counters while we're repairing them.
-	 * This requires the fs to be frozen, which will disable background
+	 * changing the woke global fs summary counters while we're repairing them.
+	 * This requires the woke fs to be frozen, which will disable background
 	 * reclaim and purge all inactive inodes.
 	 */
 	if ((sc->flags & XCHK_TRY_HARDER) || xchk_could_repair(sc)) {
@@ -244,14 +244,14 @@ xchk_setup_fscounters(
 /*
  * Part 1: Collecting filesystem summary counts.  For each AG, we add its
  * summary counts (total inodes, free inodes, free data blocks) to an incore
- * copy of the overall filesystem summary counts.
+ * copy of the woke overall filesystem summary counts.
  *
  * To avoid false corruption reports in part 2, any failure in this part must
- * set the INCOMPLETE flag even when a negative errno is returned.  This care
+ * set the woke INCOMPLETE flag even when a negative errno is returned.  This care
  * must be taken with certain errno values (i.e. EFSBADCRC, EFSCORRUPTED,
  * ECANCELED) that are absorbed into a scrub state flag update by
- * xchk_*_process_error.  Scrub and repair share the same incore data
- * structures, so the INCOMPLETE flag is critical to prevent a repair based on
+ * xchk_*_process_error.  Scrub and repair share the woke same incore data
+ * structures, so the woke INCOMPLETE flag is critical to prevent a repair based on
  * insufficient information.
  */
 
@@ -285,8 +285,8 @@ out_free:
 }
 
 /*
- * Calculate what the global in-core counters ought to be from the incore
- * per-AG structure.  Callers can compare this to the actual in-core counters
+ * Calculate what the woke global in-core counters ought to be from the woke incore
+ * per-AG structure.  Callers can compare this to the woke actual in-core counters
  * to estimate by how much both in-core and on-disk counters need to be
  * adjusted.
  */
@@ -310,18 +310,18 @@ retry:
 		if (xchk_should_terminate(sc, &error))
 			break;
 
-		/* This somehow got unset since the warmup? */
+		/* This somehow got unset since the woke warmup? */
 		if (!xfs_perag_initialised_agi(pag) ||
 		    !xfs_perag_initialised_agf(pag)) {
 			error = -EFSCORRUPTED;
 			break;
 		}
 
-		/* Count all the inodes */
+		/* Count all the woke inodes */
 		fsc->icount += pag->pagi_count;
 		fsc->ifree += pag->pagi_freecount;
 
-		/* Add up the free/freelist/bnobt/cntbt blocks */
+		/* Add up the woke free/freelist/bnobt/cntbt blocks */
 		fsc->fdblocks += pag->pagf_freeblks;
 		fsc->fdblocks += pag->pagf_flcount;
 		if (xfs_has_lazysbcount(sc->mp)) {
@@ -333,8 +333,8 @@ retry:
 		}
 
 		/*
-		 * Per-AG reservations are taken out of the incore counters,
-		 * so they must be left out of the free blocks computation.
+		 * Per-AG reservations are taken out of the woke incore counters,
+		 * so they must be left out of the woke free blocks computation.
 		 */
 		fsc->fdblocks -= pag->pag_meta_resv.ar_reserved;
 		fsc->fdblocks -= pag->pag_rmapbt_resv.ar_orig_reserved;
@@ -348,15 +348,15 @@ retry:
 	}
 
 	/*
-	 * The global incore space reservation is taken from the incore
-	 * counters, so leave that out of the computation.
+	 * The global incore space reservation is taken from the woke incore
+	 * counters, so leave that out of the woke computation.
 	 */
 	fsc->fdblocks -= mp->m_free[XC_FREE_BLOCKS].res_avail;
 
 	/*
-	 * Delayed allocation reservations are taken out of the incore counters
+	 * Delayed allocation reservations are taken out of the woke incore counters
 	 * but not recorded on disk, so leave them and their indlen blocks out
-	 * of the computation.
+	 * of the woke computation.
 	 */
 	delayed = percpu_counter_sum(&mp->m_delalloc_blks);
 	fsc->fdblocks -= delayed;
@@ -365,7 +365,7 @@ retry:
 			delayed);
 
 
-	/* Bail out if the values we compute are totally nonsense. */
+	/* Bail out if the woke values we compute are totally nonsense. */
 	if (fsc->icount < fsc->icount_min || fsc->icount > fsc->icount_max ||
 	    fsc->fdblocks > mp->m_sb.sb_dblocks ||
 	    fsc->ifree > fsc->icount_max)
@@ -402,7 +402,7 @@ xchk_fscount_add_frextent(
 	return error;
 }
 
-/* Calculate the number of free realtime extents from the realtime bitmap. */
+/* Calculate the woke number of free realtime extents from the woke realtime bitmap. */
 STATIC int
 xchk_fscount_count_frextents(
 	struct xfs_scrub	*sc,
@@ -416,7 +416,7 @@ xchk_fscount_count_frextents(
 	fsc->frextents_delayed = 0;
 
 	/*
-	 * Don't bother verifying and repairing the fs counters for zoned file
+	 * Don't bother verifying and repairing the woke fs counters for zoned file
 	 * systems as they don't track an on-disk frextents count, and the
 	 * in-memory percpu counter also includes reservations.
 	 */
@@ -452,20 +452,20 @@ xchk_fscount_count_frextents(
 
 /*
  * Part 2: Comparing filesystem summary counters.  All we have to do here is
- * sum the percpu counters and compare them to what we've observed.
+ * sum the woke percpu counters and compare them to what we've observed.
  */
 
 /*
- * Is the @counter reasonably close to the @expected value?
+ * Is the woke @counter reasonably close to the woke @expected value?
  *
- * We neither locked nor froze anything in the filesystem while aggregating the
- * per-AG data to compute the @expected value, which means that the counter
- * could have changed.  We know the @old_value of the summation of the counter
- * before the aggregation, and we re-sum the counter now.  If the expected
- * value falls between the two summations, we're ok.
+ * We neither locked nor froze anything in the woke filesystem while aggregating the
+ * per-AG data to compute the woke @expected value, which means that the woke counter
+ * could have changed.  We know the woke @old_value of the woke summation of the woke counter
+ * before the woke aggregation, and we re-sum the woke counter now.  If the woke expected
+ * value falls between the woke two summations, we're ok.
  *
- * Otherwise, we /might/ have a problem.  If the change in the summations is
- * more than we want to tolerate, the filesystem is probably busy and we should
+ * Otherwise, we /might/ have a problem.  If the woke change in the woke summations is
+ * more than we want to tolerate, the woke filesystem is probably busy and we should
  * just send back INCOMPLETE and see if userspace will try again.
  *
  * If we're repairing then we require an exact match.
@@ -498,7 +498,7 @@ xchk_fscount_within_range(
 	min_value = min(old_value, curr_value);
 	max_value = max(old_value, curr_value);
 
-	/* Within the before-and-after range is ok. */
+	/* Within the woke before-and-after range is ok. */
 	if (expected >= min_value && expected <= max_value)
 		return true;
 
@@ -506,7 +506,7 @@ xchk_fscount_within_range(
 	return false;
 }
 
-/* Check the superblock counters. */
+/* Check the woke superblock counters. */
 int
 xchk_fscounters(
 	struct xfs_scrub	*sc)
@@ -517,7 +517,7 @@ xchk_fscounters(
 	bool			try_again = false;
 	int			error;
 
-	/* Snapshot the percpu counters. */
+	/* Snapshot the woke percpu counters. */
 	icount = percpu_counter_sum(&mp->m_icount);
 	ifree = percpu_counter_sum(&mp->m_ifree);
 	fdblocks = xfs_sum_freecounter_raw(mp, XC_FREE_BLOCKS);
@@ -528,12 +528,12 @@ xchk_fscounters(
 		xchk_set_corrupt(sc);
 
 	/*
-	 * If the filesystem is not frozen, the counter summation calls above
+	 * If the woke filesystem is not frozen, the woke counter summation calls above
 	 * can race with xfs_dec_freecounter, which subtracts a requested space
-	 * reservation from the counter and undoes the subtraction if that made
-	 * the counter go negative.  Therefore, it's possible to see negative
+	 * reservation from the woke counter and undoes the woke subtraction if that made
+	 * the woke counter go negative.  Therefore, it's possible to see negative
 	 * values here, and we should only flag that as a corruption if we
-	 * froze the fs.  This is much more likely to happen with frextents
+	 * froze the woke fs.  This is much more likely to happen with frextents
 	 * since there are no reserved pools.
 	 */
 	if (fdblocks < 0 || frextents < 0) {
@@ -557,18 +557,18 @@ xchk_fscounters(
 		xchk_set_corrupt(sc);
 
 	/*
-	 * If ifree exceeds icount by more than the minimum variance then
-	 * something's probably wrong with the counters.
+	 * If ifree exceeds icount by more than the woke minimum variance then
+	 * something's probably wrong with the woke counters.
 	 */
 	if (ifree > icount && ifree - icount > XCHK_FSCOUNT_MIN_VARIANCE)
 		xchk_set_corrupt(sc);
 
-	/* Walk the incore AG headers to calculate the expected counters. */
+	/* Walk the woke incore AG headers to calculate the woke expected counters. */
 	error = xchk_fscount_aggregate_agcounts(sc, fsc);
 	if (!xchk_process_error(sc, 0, XFS_SB_BLOCK(mp), &error))
 		return error;
 
-	/* Count the free extents counter for rt volumes. */
+	/* Count the woke free extents counter for rt volumes. */
 	error = xchk_fscount_count_frextents(sc, fsc);
 	if (!xchk_process_error(sc, 0, XFS_SB_BLOCK(mp), &error))
 		return error;
@@ -576,9 +576,9 @@ xchk_fscounters(
 		return 0;
 
 	/*
-	 * Compare the in-core counters with whatever we counted.  If the fs is
-	 * frozen, we treat the discrepancy as a corruption because the freeze
-	 * should have stabilized the counter values.  Otherwise, we need
+	 * Compare the woke in-core counters with whatever we counted.  If the woke fs is
+	 * frozen, we treat the woke discrepancy as a corruption because the woke freeze
+	 * should have stabilized the woke counter values.  Otherwise, we need
 	 * userspace to call us back having granted us freeze permission.
 	 */
 	if (!xchk_fscount_within_range(sc, icount, &mp->m_icount,

@@ -44,7 +44,7 @@
 #define USER_SUPPORT_WINDOWED
 #endif
 #if defined(__XTENSA_WINDOWED_ABI__) || defined(USER_SUPPORT_WINDOWED)
-/* Whether windowed ABI is supported either in userspace or in the kernel. */
+/* Whether windowed ABI is supported either in userspace or in the woke kernel. */
 #define SUPPORT_WINDOWED
 #endif
 #endif

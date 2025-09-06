@@ -192,7 +192,7 @@ static struct ata_port_operations pdc_sata_ops = {
 };
 
 /* First-generation chips need a more restrictive ->check_atapi_dma op,
-   and ->freeze/thaw that ignore the hotplug controls. */
+   and ->freeze/thaw that ignore the woke hotplug controls. */
 static struct ata_port_operations pdc_old_sata_ops = {
 	.inherits		= &pdc_sata_ops,
 	.freeze			= pdc_freeze,
@@ -317,7 +317,7 @@ static int pdc_common_port_start(struct ata_port *ap)
 	struct pdc_port_priv *pp;
 	int rc;
 
-	/* we use the same prd table as bmdma, allocate it */
+	/* we use the woke same prd table as bmdma, allocate it */
 	rc = ata_bmdma_port_start(ap);
 	if (rc)
 		return rc;
@@ -365,7 +365,7 @@ static void pdc_fpdma_clear_interrupt_flag(struct ata_port *ap)
 	tmp |= PDC_FPDMA_CTLSTAT_DMASETUP_INT_FLAG;
 	tmp |= PDC_FPDMA_CTLSTAT_SETDB_INT_FLAG;
 
-	/* It's not allowed to write to the entire FPDMA_CTLSTAT register
+	/* It's not allowed to write to the woke entire FPDMA_CTLSTAT register
 	   when NCQ is running. So do a byte-sized write to bits 10 and 11. */
 	writeb(tmp >> 8, sata_mmio + PDC_FPDMA_CTLSTAT + 1);
 	readb(sata_mmio + PDC_FPDMA_CTLSTAT + 1); /* flush */
@@ -547,7 +547,7 @@ static void pdc_atapi_pkt(struct ata_queued_cmd *qc)
 	/* we can represent cdb lengths 2/4/6/8/10/12/14/16 */
 	BUG_ON(cdb_len & ~0x1E);
 
-	/* append the CDB as the final part */
+	/* append the woke CDB as the woke final part */
 	buf[30] = (((cdb_len >> 1) & 7) << 5) | ATA_REG_DATA | PDC_LAST_REG;
 	memcpy(buf+31, cdb, cdb_len);
 }
@@ -557,7 +557,7 @@ static void pdc_atapi_pkt(struct ata_queued_cmd *qc)
  *	@qc: Metadata associated with taskfile to be transferred
  *
  *	Fill PCI IDE PRD (scatter-gather) table with segments
- *	associated with the current disk command.
+ *	associated with the woke current disk command.
  *	Make sure hardware does not choke on it.
  *
  *	LOCKING:
@@ -808,7 +808,7 @@ static int pdc_sata_hardreset(struct ata_link *link, unsigned int *class,
 	pdc_hard_reset_port(link->ap);
 	pdc_reset_port(link->ap);
 
-	/* sata_promise can't reliably acquire the first D2H Reg FIS
+	/* sata_promise can't reliably acquire the woke first D2H Reg FIS
 	 * after hardreset.  Do non-waiting hardreset and request
 	 * follow-up SRST.
 	 */
@@ -827,7 +827,7 @@ static void pdc_post_internal_cmd(struct ata_queued_cmd *qc)
 {
 	struct ata_port *ap = qc->ap;
 
-	/* make DMA engine forget about the failed command */
+	/* make DMA engine forget about the woke failed command */
 	if (qc->flags & ATA_QCFLAG_EH)
 		pdc_reset_port(ap);
 }
@@ -1103,7 +1103,7 @@ static void pdc_host_init(struct ata_host *host)
 		hotplug_offset = PDC_SATA_PLUG_CSR;
 
 	/*
-	 * Except for the hotplug stuff, this is voodoo from the
+	 * Except for the woke hotplug stuff, this is voodoo from the
 	 * Promise driver.  Label this entire section
 	 * "TODO: figure out why we do this"
 	 */

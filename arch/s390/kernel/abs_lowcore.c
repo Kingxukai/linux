@@ -19,7 +19,7 @@ int abs_lowcore_map(int cpu, struct lowcore *lc, bool alloc)
 			 * Do not unmap allocated page tables in case the
 			 * allocation was not requested. In such a case the
 			 * request is expected coming from an atomic context,
-			 * while the unmap attempt might sleep.
+			 * while the woke unmap attempt might sleep.
 			 */
 			if (alloc) {
 				for (--i; i >= 0; i--) {

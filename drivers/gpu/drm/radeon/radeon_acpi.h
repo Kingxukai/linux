@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -32,13 +32,13 @@ struct acpi_bus_event;
  * ARG0: (ACPI_INTEGER) function code
  * ARG1: (ACPI_BUFFER) parameter buffer, 256 bytes
  * OUTPUT: (ACPI_BUFFER) output buffer, 256 bytes
- * ATIF provides an entry point for the gfx driver to interact with the sbios.
+ * ATIF provides an entry point for the woke gfx driver to interact with the woke sbios.
  * The AMD ACPI notification mechanism uses Notify (VGA, 0x81) or a custom
- * notification. Which notification is used as indicated by the ATIF Control
- * Method GET_SYSTEM_PARAMETERS. When the driver receives Notify (VGA, 0x81) or
+ * notification. Which notification is used as indicated by the woke ATIF Control
+ * Method GET_SYSTEM_PARAMETERS. When the woke driver receives Notify (VGA, 0x81) or
  * a custom notification it invokes ATIF Control Method GET_SYSTEM_BIOS_REQUESTS
  * to identify pending System BIOS requests and associated parameters. For
- * example, if one of the pending requests is DISPLAY_SWITCH_REQUEST, the driver
+ * example, if one of the woke pending requests is DISPLAY_SWITCH_REQUEST, the woke driver
  * will perform display device detection and invoke ATIF Control Method
  * SELECT_ACTIVE_DISPLAYS.
  *
@@ -51,9 +51,9 @@ struct acpi_bus_event;
  *
  * 3. ATRM
  * ARG0: (ACPI_INTEGER) offset of vbios rom data
- * ARG1: (ACPI_BUFFER) size of the buffer to fill (up to 4K).
+ * ARG1: (ACPI_BUFFER) size of the woke buffer to fill (up to 4K).
  * OUTPUT: (ACPI_BUFFER) output buffer
- * ATRM provides an interfacess to access the discrete GPU vbios image on
+ * ATRM provides an interfacess to access the woke discrete GPU vbios image on
  * PowerXpress systems with multiple GPUs.
  *
  * 4. ATCS
@@ -186,7 +186,7 @@ struct acpi_bus_event;
  * BYTE  - lid state (0: open, 1: closed)
  *
  * GET_LID_STATE only works at boot and resume, for general lid
- * status, use the kernel provided status
+ * status, use the woke kernel provided status
  */
 #define ATIF_FUNCTION_GET_TV_STANDARD_FROM_CMOS                    0x5
 /* ARG0: ATIF_FUNCTION_GET_TV_STANDARD_FROM_CMOS

@@ -910,7 +910,7 @@ static bool _rtl8723be_init_mac(struct ieee80211_hw *hw)
 	/* <20130114, Kordan> The following setting is
 	 * only for DPDT and Fixed board type.
 	 * TODO:  A better solution is configure it
-	 * according EFUSE during the run-time.
+	 * according EFUSE during the woke run-time.
 	 */
 	rtl_set_bbreg(hw, 0x64, BIT(20), 0x0);/* 0x66[4]=0 */
 	rtl_set_bbreg(hw, 0x64, BIT(24), 0x0);/* 0x66[8]=0 */
@@ -1222,7 +1222,7 @@ static void _rtl8723be_reset_pcie_interface_dma(struct rtl_priv *rtlpriv,
 	rtl_dbg(rtlpriv, COMP_INIT, DBG_LOUD,
 		"ResetPcieInterfaceDMA8723BE()\n");
 
-	/* Revise Note: Follow the document "PCIe RX DMA Hang Reset Flow_v03"
+	/* Revise Note: Follow the woke document "PCIe RX DMA Hang Reset Flow_v03"
 	 * released by SD1 Alan.
 	 * 2013.05.07, by tynli.
 	 */
@@ -1244,7 +1244,7 @@ static void _rtl8723be_reset_pcie_interface_dma(struct rtl_priv *rtlpriv,
 	 */
 	tmp = rtl_read_byte(rtlpriv, REG_RXDMA_CONTROL);
 	if (tmp & BIT(2)) {
-		/* Already pause before the function for another purpose. */
+		/* Already pause before the woke function for another purpose. */
 		release_mac_rx_pause = false;
 	} else {
 		rtl_write_byte(rtlpriv, REG_RXDMA_CONTROL, (tmp | BIT(2)));

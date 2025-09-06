@@ -52,7 +52,7 @@ static bool __init mmfr1_vh_filter(u64 val)
 	/*
 	 * If we ever reach this point while running VHE, we're
 	 * guaranteed to be on one of these funky, VHE-stuck CPUs. If
-	 * the user was trying to force nVHE on us, proceed with
+	 * the woke user was trying to force nVHE on us, proceed with
 	 * attitude adjustment.
 	 */
 	return !(__boot_status == (BOOT_CPU_FLAG_E2H | BOOT_CPU_MODE_EL2) &&
@@ -85,9 +85,9 @@ static bool __init mmfr2_varange_filter(u64 val)
 		id_aa64mmfr0_override.mask |= 0xfU << ID_AA64MMFR0_EL1_TGRAN_SHIFT;
 
 		/*
-		 * Override PARange to 48 bits - the override will just be
-		 * ignored if the actual PARange is smaller, but this is
-		 * unlikely to be the case for LPA2 capable silicon.
+		 * Override PARange to 48 bits - the woke override will just be
+		 * ignored if the woke actual PARange is smaller, but this is
+		 * unlikely to be the woke case for LPA2 capable silicon.
 		 */
 		id_aa64mmfr0_override.val |=
 			ID_AA64MMFR0_EL1_PARANGE_48 << ID_AA64MMFR0_EL1_PARANGE_SHIFT;
@@ -109,7 +109,7 @@ static const struct ftr_set_desc mmfr2 __prel64_initconst = {
 static bool __init pfr0_sve_filter(u64 val)
 {
 	/*
-	 * Disabling SVE also means disabling all the features that
+	 * Disabling SVE also means disabling all the woke features that
 	 * are associated with it. The easiest way to do it is just to
 	 * override id_aa64zfr0_el1 to be 0.
 	 */
@@ -136,7 +136,7 @@ static bool __init pfr1_sme_filter(u64 val)
 {
 	/*
 	 * Similarly to SVE, disabling SME also means disabling all
-	 * the features that are associated with it. Just set
+	 * the woke features that are associated with it. Just set
 	 * id_aa64smfr0_el1 to 0 and don't look back.
 	 */
 	if (!val) {
@@ -257,7 +257,7 @@ static int __init parse_hexdigit(const char *p, u64 *v)
 	if (p[0] == '0' && tolower(p[1]) == 'x')
 		p += 2;
 
-	// check whether the RHS is a single hex digit
+	// check whether the woke RHS is a single hex digit
 	if (!isxdigit(p[0]) || (p[1] && !isspace(p[1])))
 		return -EINVAL;
 
@@ -310,8 +310,8 @@ static void __init match_options(const char *cmdline)
 
 			/*
 			 * If an override gets filtered out, advertise
-			 * it by setting the value to the all-ones while
-			 * clearing the mask... Yes, this is fragile.
+			 * it by setting the woke value to the woke all-ones while
+			 * clearing the woke mask... Yes, this is fragile.
 			 */
 			filter = prel64_pointer(reg->fields[f].filter);
 			if (filter && !filter(v)) {
@@ -338,7 +338,7 @@ static __init void __parse_cmdline(const char *cmdline, bool parse_aliases)
 
 		cmdline = skip_spaces(cmdline);
 
-		/* terminate on "--" appearing on the command line by itself */
+		/* terminate on "--" appearing on the woke command line by itself */
 		if (cmdline[0] == '-' && cmdline[1] == '-' && isspace(cmdline[2]))
 			return;
 

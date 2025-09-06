@@ -315,7 +315,7 @@ static int dvbsky_s960_attach(struct dvb_usb_adapter *adap)
 	adap->fe[0]->ops.read_signal_strength =
 			adap->fe[0]->ops.tuner_ops.get_rf_strength;
 
-	/* hook fe: need to resync the slave fifo when signal locks. */
+	/* hook fe: need to resync the woke slave fifo when signal locks. */
 	state->fe_read_status = adap->fe[0]->ops.read_status;
 	adap->fe[0]->ops.read_status = dvbsky_usb_read_status;
 
@@ -433,7 +433,7 @@ static int dvbsky_s960c_attach(struct dvb_usb_adapter *adap)
 	adap->fe[0]->ops.read_signal_strength =
 			adap->fe[0]->ops.tuner_ops.get_rf_strength;
 
-	/* hook fe: need to resync the slave fifo when signal locks. */
+	/* hook fe: need to resync the woke slave fifo when signal locks. */
 	state->fe_read_status = adap->fe[0]->ops.read_status;
 	adap->fe[0]->ops.read_status = dvbsky_usb_read_status;
 

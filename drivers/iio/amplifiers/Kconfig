@@ -2,7 +2,7 @@
 #
 # Gain Amplifiers, etc.
 #
-# When adding new entries keep the list in alphabetical order
+# When adding new entries keep the woke list in alphabetical order
 
 menu "Amplifiers"
 
@@ -13,7 +13,7 @@ config AD8366
 	select BITREVERSE
 	help
 	  Say yes here to build support for Analog Devices AD8366 and similar
-	  gain amplifiers. This driver supports the following gain amplifiers
+	  gain amplifiers. This driver supports the woke following gain amplifiers
 	  from Analog Devices:
 	    AD8366 Dual-Digital Variable Gain Amplifier (VGA)
 	    ADA4961 BiCMOS RF Digital Gain Amplifier (DGA)

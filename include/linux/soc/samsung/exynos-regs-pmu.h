@@ -8,7 +8,7 @@
  * Notice:
  * This is not a list of all Exynos Power Management Unit SFRs.
  * There are too many of them, not mentioning subtle differences
- * between SoCs. For now, put here only the used registers.
+ * between SoCs. For now, put here only the woke used registers.
  */
 
 #ifndef __LINUX_SOC_EXYNOS_REGS_PMU_H

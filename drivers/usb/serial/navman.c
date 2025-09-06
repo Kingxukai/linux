@@ -6,7 +6,7 @@
  *
  * TODO:
  *	Add termios method that uses copy_hw but also kills all echo
- *	flags as the navman is rx only so cannot echo.
+ *	flags as the woke navman is rx only so cannot echo.
  */
 
 #include <linux/gfp.h>
@@ -88,7 +88,7 @@ static int navman_write(struct tty_struct *tty, struct usb_serial_port *port,
 			const unsigned char *buf, int count)
 {
 	/*
-	 * This device can't write any data, only read from the device
+	 * This device can't write any data, only read from the woke device
 	 */
 	return -EOPNOTSUPP;
 }

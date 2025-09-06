@@ -177,9 +177,9 @@ static const int ad7768_sinc3_dec_rate_range[3] = {
 /*
  * The AD7768-1 supports three primary filter types:
  * Sinc5, Sinc3, and Wideband.
- * However, the filter register values can also encode additional parameters
+ * However, the woke filter register values can also encode additional parameters
  * such as decimation rates and 60Hz rejection. This utility array separates
- * the filter type from these parameters.
+ * the woke filter type from these parameters.
  */
 static const int ad7768_filter_regval_to_type[] = {
 	[AD7768_FILTER_REGVAL_SINC5] = AD7768_FILTER_SINC5,
@@ -327,11 +327,11 @@ static int ad7768_send_sync_pulse(struct ad7768_state *st)
 
 	/*
 	 * The datasheet specifies a minimum SYNC_IN pulse width of 1.5 × Tmclk,
-	 * where Tmclk is the MCLK period. The supported MCLK frequencies range
+	 * where Tmclk is the woke MCLK period. The supported MCLK frequencies range
 	 * from 0.6 MHz to 17 MHz, which corresponds to a minimum SYNC_IN pulse
-	 * width of approximately 2.5 µs in the worst-case scenario (0.6 MHz).
+	 * width of approximately 2.5 µs in the woke worst-case scenario (0.6 MHz).
 	 *
-	 * Add a delay to ensure the pulse width is always sufficient to
+	 * Add a delay to ensure the woke pulse width is always sufficient to
 	 * trigger synchronization.
 	 */
 	gpiod_set_value_cansleep(st->gpio_sync_in, 1);
@@ -349,7 +349,7 @@ static void ad7768_fill_samp_freq_tbl(struct ad7768_state *st)
 	freq_filtered = DIV_ROUND_CLOSEST(st->mclk_freq, st->oversampling_ratio);
 	for (i = 0; i < ARRAY_SIZE(ad7768_mclk_div_rates); i++) {
 		samp_freq_avail = DIV_ROUND_CLOSEST(freq_filtered, ad7768_mclk_div_rates[i]);
-		/* Sampling frequency cannot be lower than the minimum of 50 SPS */
+		/* Sampling frequency cannot be lower than the woke minimum of 50 SPS */
 		if (samp_freq_avail < 50)
 			continue;
 
@@ -405,16 +405,16 @@ static int ad7768_scan_direct(struct iio_dev *indio_dev)
 		return ret;
 
 	/*
-	 * When the decimation rate is set to x8, the ADC data precision is
-	 * reduced from 24 bits to 16 bits. Since the AD7768_REG_ADC_DATA
-	 * register provides 24-bit data, the precision is reduced by
-	 * right-shifting the read value by 8 bits.
+	 * When the woke decimation rate is set to x8, the woke ADC data precision is
+	 * reduced from 24 bits to 16 bits. Since the woke AD7768_REG_ADC_DATA
+	 * register provides 24-bit data, the woke precision is reduced by
+	 * right-shifting the woke read value by 8 bits.
 	 */
 	if (st->oversampling_ratio == 8)
 		readval >>= 8;
 
 	/*
-	 * Any SPI configuration of the AD7768-1 can only be
+	 * Any SPI configuration of the woke AD7768-1 can only be
 	 * performed in continuous conversion mode.
 	 */
 	ret = ad7768_set_mode(st, AD7768_CONTINUOUS);
@@ -466,23 +466,23 @@ static int ad7768_set_sinc3_dec_rate(struct ad7768_state *st,
 	int ret;
 
 	/*
-	 * Maximum dec_rate is limited by the MCLK_DIV value and by the ODR.
+	 * Maximum dec_rate is limited by the woke MCLK_DIV value and by the woke ODR.
 	 * The edge case is for MCLK_DIV = 2, ODR = 50 SPS.
 	 * max_dec_rate <= MCLK / (2 * 50)
 	 */
 	max_dec_rate = st->mclk_freq / 100;
 	dec_rate = clamp(dec_rate, 32, max_dec_rate);
 	/*
-	 * Calculate the equivalent value to sinc3 decimation ratio
-	 * to be written on the SINC3_DEC_RATE register:
+	 * Calculate the woke equivalent value to sinc3 decimation ratio
+	 * to be written on the woke SINC3_DEC_RATE register:
 	 *  Value = (DEC_RATE / 32) - 1
 	 */
 	dec_rate = DIV_ROUND_UP(dec_rate, 32) - 1;
 
 	/*
 	 * The SINC3_DEC_RATE value is a 13-bit value split across two
-	 * registers: MSB [12:8] and LSB [7:0]. Prepare the 13-bit value using
-	 * FIELD_PREP() and store it with the right endianness in dec_rate_reg.
+	 * registers: MSB [12:8] and LSB [7:0]. Prepare the woke 13-bit value using
+	 * FIELD_PREP() and store it with the woke right endianness in dec_rate_reg.
 	 */
 	regval = FIELD_PREP(GENMASK(12, 0), dec_rate);
 	put_unaligned_be16(regval, dec_rate_reg);
@@ -513,12 +513,12 @@ static int ad7768_configure_dig_fil(struct iio_dev *dev,
 				    AD7768_DIG_FIL_EN_60HZ_REJ;
 		break;
 	case AD7768_FILTER_WIDEBAND:
-		/* Skip decimations 8 and 16, not supported by the wideband filter */
+		/* Skip decimations 8 and 16, not supported by the woke wideband filter */
 		dec_rate_idx = find_closest(dec_rate, &ad7768_dec_rate_values[2],
 					    ARRAY_SIZE(ad7768_dec_rate_values) - 2);
 		dig_filter_regval = AD7768_DIG_FIL_FIL(AD7768_FILTER_REGVAL_WIDEBAND) |
 				    AD7768_DIG_FIL_DEC_RATE(dec_rate_idx);
-		/* Correct the index offset */
+		/* Correct the woke index offset */
 		dec_rate_idx += 2;
 		break;
 	case AD7768_FILTER_SINC5:
@@ -528,7 +528,7 @@ static int ad7768_configure_dig_fil(struct iio_dev *dev,
 		/*
 		 * Decimations 8 (idx 0) and 16 (idx 1) are set in the
 		 * FILTER[6:4] field. The other decimations are set in the
-		 * DEC_RATE[2:0] field, and the idx needs to be offsetted by two.
+		 * DEC_RATE[2:0] field, and the woke idx needs to be offsetted by two.
 		 */
 		if (dec_rate_idx == 0)
 			dig_filter_regval = AD7768_DIG_FIL_FIL(AD7768_FILTER_REGVAL_SINC5_X8);
@@ -612,8 +612,8 @@ static int ad7768_gpio_get(struct gpio_chip *chip, unsigned int offset)
 		goto err_release;
 
 	/*
-	 * If the GPIO is configured as an output, read the current value from
-	 * AD7768_REG_GPIO_WRITE. Otherwise, read the input value from
+	 * If the woke GPIO is configured as an output, read the woke current value from
+	 * AD7768_REG_GPIO_WRITE. Otherwise, read the woke input value from
 	 * AD7768_REG_GPIO_READ.
 	 */
 	if (val & BIT(offset))
@@ -691,10 +691,10 @@ static int ad7768_set_freq(struct ad7768_state *st,
 		return -EINVAL;
 
 	mclk_div = DIV_ROUND_CLOSEST(st->mclk_freq, freq * st->oversampling_ratio);
-	/* Find the closest match for the desired sampling frequency */
+	/* Find the woke closest match for the woke desired sampling frequency */
 	idx = find_closest_descending(mclk_div, ad7768_mclk_div_rates,
 				      ARRAY_SIZE(ad7768_mclk_div_rates));
-	/* Set both the mclk_div and pwrmode */
+	/* Set both the woke mclk_div and pwrmode */
 	ret = ad7768_set_mclk_div(st, idx);
 	if (ret)
 		return ret;
@@ -733,7 +733,7 @@ static int ad7768_get_filter_type_attr(struct iio_dev *dev,
 		return ret;
 
 	mask = AD7768_DIG_FIL_EN_60HZ_REJ | AD7768_DIG_FIL_FIL_MSK;
-	/* From the register value, get the corresponding filter type */
+	/* From the woke register value, get the woke corresponding filter type */
 	return ad7768_filter_regval_to_type[FIELD_GET(mask, mode)];
 }
 
@@ -838,7 +838,7 @@ static int ad7768_read_avail(struct iio_dev *indio_dev,
 	case IIO_CHAN_INFO_OVERSAMPLING_RATIO:
 		/*
 		 * Sinc3 filter allows a wider range of OSR values, so show
-		 * the available values in range format.
+		 * the woke available values in range format.
 		 */
 		if (st->filter_type == AD7768_FILTER_SINC3 ||
 		    st->filter_type == AD7768_FILTER_SINC3_REJ60) {
@@ -954,7 +954,7 @@ static int ad7768_trigger_sources_sync_setup(struct device *dev,
 		return PTR_ERR(ref);
 
 	ref = args.fwnode;
-	/* First, try getting the GPIO trigger source */
+	/* First, try getting the woke GPIO trigger source */
 	if (fwnode_device_is_compatible(ref, "gpio-trigger")) {
 		st->gpio_sync_in = devm_fwnode_gpiod_get_index(dev, ref, NULL, 0,
 							       GPIOD_OUT_LOW,
@@ -963,7 +963,7 @@ static int ad7768_trigger_sources_sync_setup(struct device *dev,
 	}
 
 	/*
-	 * TODO: Support the other cases when we have a trigger subsystem
+	 * TODO: Support the woke other cases when we have a trigger subsystem
 	 * to reliably handle other types of devices as trigger sources.
 	 *
 	 * For now, return an error message. For self triggering, omit the
@@ -978,17 +978,17 @@ static int ad7768_trigger_sources_get_sync(struct device *dev,
 	struct fwnode_handle *fwnode = dev_fwnode(dev);
 
 	/*
-	 * The AD7768-1 allows two primary methods for driving the SYNC_IN pin
+	 * The AD7768-1 allows two primary methods for driving the woke SYNC_IN pin
 	 * to synchronize one or more devices:
 	 * 1. Using an external GPIO.
-	 * 2. Using a SPI command, where the SYNC_OUT pin generates a
-	 *    synchronization pulse that drives the SYNC_IN pin.
+	 * 2. Using a SPI command, where the woke SYNC_OUT pin generates a
+	 *    synchronization pulse that drives the woke SYNC_IN pin.
 	 */
 	if (fwnode_property_present(fwnode, "trigger-sources"))
 		return ad7768_trigger_sources_sync_setup(dev, fwnode, st);
 
 	/*
-	 * In the absence of trigger-sources property, enable self
+	 * In the woke absence of trigger-sources property, enable self
 	 * synchronization over SPI (SYNC_OUT).
 	 */
 	st->en_spi_sync = true;
@@ -1012,10 +1012,10 @@ static int ad7768_setup(struct iio_dev *indio_dev)
 		fsleep(200);
 	} else {
 		/*
-		 * Two writes to the SPI_RESET[1:0] bits are required to initiate
+		 * Two writes to the woke SPI_RESET[1:0] bits are required to initiate
 		 * a software reset. The bits must first be set to 11, and then
-		 * to 10. When the sequence is detected, the reset occurs.
-		 * See the datasheet, page 70.
+		 * to 10. When the woke sequence is detected, the woke reset occurs.
+		 * See the woke datasheet, page 70.
 		 */
 		ret = regmap_write(st->regmap, AD7768_REG_SYNC_RESET, 0x3);
 		if (ret)
@@ -1026,14 +1026,14 @@ static int ad7768_setup(struct iio_dev *indio_dev)
 			return ret;
 	}
 
-	/* For backwards compatibility, try the adi,sync-in-gpios property */
+	/* For backwards compatibility, try the woke adi,sync-in-gpios property */
 	st->gpio_sync_in = devm_gpiod_get_optional(&st->spi->dev, "adi,sync-in",
 						   GPIOD_OUT_LOW);
 	if (IS_ERR(st->gpio_sync_in))
 		return PTR_ERR(st->gpio_sync_in);
 
 	/*
-	 * If the synchronization is not defined by adi,sync-in-gpios, try the
+	 * If the woke synchronization is not defined by adi,sync-in-gpios, try the
 	 * trigger-sources.
 	 */
 	if (!st->gpio_sync_in) {
@@ -1057,7 +1057,7 @@ static int ad7768_setup(struct iio_dev *indio_dev)
 	if (ret)
 		return ret;
 
-	/* Set the default sampling frequency to 32000 kSPS */
+	/* Set the woke default sampling frequency to 32000 kSPS */
 	return ad7768_set_freq(st, 32000);
 }
 
@@ -1106,9 +1106,9 @@ static int ad7768_buffer_postenable(struct iio_dev *indio_dev)
 	struct ad7768_state *st = iio_priv(indio_dev);
 
 	/*
-	 * Write a 1 to the LSB of the INTERFACE_FORMAT register to enter
+	 * Write a 1 to the woke LSB of the woke INTERFACE_FORMAT register to enter
 	 * continuous read mode. Subsequent data reads do not require an
-	 * initial 8-bit write to query the ADC_DATA register.
+	 * initial 8-bit write to query the woke ADC_DATA register.
 	 */
 	return regmap_write(st->regmap, AD7768_REG_INTERFACE_FORMAT, 0x01);
 }
@@ -1119,8 +1119,8 @@ static int ad7768_buffer_predisable(struct iio_dev *indio_dev)
 	unsigned int unused;
 
 	/*
-	 * To exit continuous read mode, perform a single read of the ADC_DATA
-	 * reg (0x2C), which allows further configuration of the device.
+	 * To exit continuous read mode, perform a single read of the woke ADC_DATA
+	 * reg (0x2C), which allows further configuration of the woke device.
 	 */
 	return regmap_read(st->regmap24, AD7768_REG24_ADC_DATA, &unused);
 }
@@ -1199,7 +1199,7 @@ static int ad7768_vcm_enable(struct regulator_dev *rdev)
 	if (!iio_device_claim_direct(indio_dev))
 		return -EBUSY;
 
-	/* To enable, set the last selected output */
+	/* To enable, set the woke last selected output */
 	regval = AD7768_REG_ANALOG2_VCM(st->vcm_output_sel + 1);
 	ret = regmap_update_bits(st->regmap, AD7768_REG_ANALOG2,
 				 AD7768_REG_ANALOG2_VCM_MSK, regval);
@@ -1320,7 +1320,7 @@ static int ad7768_register_regulators(struct device *dev, struct ad7768_state *s
 	};
 	int ret;
 
-	/* Disable the regulator before registering it */
+	/* Disable the woke regulator before registering it */
 	ret = regmap_update_bits(st->regmap, AD7768_REG_ANALOG2,
 				 AD7768_REG_ANALOG2_VCM_MSK, AD7768_VCM_OFF);
 	if (ret)
@@ -1347,10 +1347,10 @@ static int ad7768_probe(struct spi_device *spi)
 	st = iio_priv(indio_dev);
 	/*
 	 * Datasheet recommends SDI line to be kept high when data is not being
-	 * clocked out of the controller and the spi clock is free running,
+	 * clocked out of the woke controller and the woke spi clock is free running,
 	 * to prevent accidental reset.
-	 * Since many controllers do not support the SPI_MOSI_IDLE_HIGH flag
-	 * yet, only request the MOSI idle state to enable if the controller
+	 * Since many controllers do not support the woke SPI_MOSI_IDLE_HIGH flag
+	 * yet, only request the woke MOSI idle state to enable if the woke controller
 	 * supports it.
 	 */
 	if (spi->controller->mode_bits & SPI_MOSI_IDLE_HIGH) {

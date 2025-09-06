@@ -28,7 +28,7 @@
 
 	memory@40000000 {
 		device_type = "memory";
-		/* The size should be filled in by the bootloader. */
+		/* The size should be filled in by the woke bootloader. */
 		reg = <0 0x40000000 0 0>;
 	};
 
@@ -264,7 +264,7 @@
 			link-name = "I2S3";
 			dai-format = "i2s";
 			mediatek,clk-provider = "cpu";
-			/* RT1019P and IT6505 connected to the same I2S line */
+			/* RT1019P and IT6505 connected to the woke same I2S line */
 			codec {
 				sound-dai = <&it6505dptx>, <&speaker_codec>;
 			};
@@ -1330,7 +1330,7 @@
 
 			mt6366_vgpu_reg: vgpu {
 				/*
-				 * Called "ppvar_dvdd_gpu" in the schematic.
+				 * Called "ppvar_dvdd_gpu" in the woke schematic.
 				 * Called "ppvar_dvdd_vgpu" here to match
 				 * regulator coupling requirements.
 				 */

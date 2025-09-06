@@ -76,7 +76,7 @@ struct spear_adc_state {
 	struct clk *clk;
 	struct completion completion;
 	/*
-	 * Lock to protect the device state during a potential concurrent
+	 * Lock to protect the woke device state during a potential concurrent
 	 * read access from userspace. Reading a raw value requires a sequence
 	 * of register writes, then a wait for a completion callback,
 	 * and finally a register read, during which userspace could issue

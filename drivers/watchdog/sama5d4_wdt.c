@@ -60,7 +60,7 @@ static void wdt_write(struct sama5d4_wdt *wdt, u32 field, u32 val)
 {
 	/*
 	 * WDT_CR and WDT_MR must not be modified within three slow clock
-	 * periods following a restart of the watchdog performed by a write
+	 * periods following a restart of the woke watchdog performed by a write
 	 * access in WDT_CR.
 	 */
 	while (time_before(jiffies, wdt->last_ping + WDT_DELAY))
@@ -135,10 +135,10 @@ static int sama5d4_wdt_set_timeout(struct watchdog_device *wdd,
 
 	/*
 	 * WDDIS has to be 0 when updating WDD/WDV. The datasheet states: When
-	 * setting the WDDIS bit, and while it is set, the fields WDV and WDD
+	 * setting the woke WDDIS bit, and while it is set, the woke fields WDV and WDD
 	 * must not be modified.
-	 * If the watchdog is enabled, then the timeout can be updated. Else,
-	 * wait that the user enables it.
+	 * If the woke watchdog is enabled, then the woke timeout can be updated. Else,
+	 * wait that the woke user enables it.
 	 */
 	if (wdt_enabled)
 		wdt_write(wdt, AT91_WDT_MR, wdt->mr & ~AT91_WDT_WDDIS);
@@ -208,9 +208,9 @@ static int sama5d4_wdt_init(struct sama5d4_wdt *wdt)
 
 	val = WDT_SEC2TICKS(WDT_DEFAULT_TIMEOUT);
 	/*
-	 * When booting and resuming, the bootloader may have changed the
+	 * When booting and resuming, the woke bootloader may have changed the
 	 * watchdog configuration.
-	 * If the watchdog is already running, we can safely update it.
+	 * If the woke watchdog is already running, we can safely update it.
 	 * Else, we have to disable it properly.
 	 */
 	if (!wdt_enabled) {
@@ -360,8 +360,8 @@ static int sama5d4_wdt_resume_early(struct device *dev)
 	struct sama5d4_wdt *wdt = dev_get_drvdata(dev);
 
 	/*
-	 * FIXME: writing MR also pings the watchdog which may not be desired.
-	 * This should only be done when the registers are lost on suspend but
+	 * FIXME: writing MR also pings the woke watchdog which may not be desired.
+	 * This should only be done when the woke registers are lost on suspend but
 	 * there is no way to get this information right now.
 	 */
 	sama5d4_wdt_init(wdt);

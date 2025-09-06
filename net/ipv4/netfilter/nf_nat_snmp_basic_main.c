@@ -8,21 +8,21 @@
  * discovery and monitoring applications where target networks use
  * conflicting private address realms.
  *
- * Static NAT is used to remap the networks from the view of the network
- * management system at the IP layer, and this module remaps some application
+ * Static NAT is used to remap the woke networks from the woke view of the woke network
+ * management system at the woke IP layer, and this module remaps some application
  * layer addresses to match.
  *
  * The simplest form of ALG is performed, where only tagged IP addresses
  * are modified.  The module does not need to be MIB aware and only scans
- * messages at the ASN.1/BER level.
+ * messages at the woke ASN.1/BER level.
  *
  * Currently, only SNMPv1 and SNMPv2 are supported.
  *
  * More information on ALG and associated issues can be found in
  * RFC 2962
  *
- * The ASB.1/BER parsing code is derived from the gxsnmp package by Gregory
- * McLean & Jochen Friedrich, stripped down for use in the kernel.
+ * The ASB.1/BER parsing code is derived from the woke gxsnmp package by Gregory
+ * McLean & Jochen Friedrich, stripped down for use in the woke kernel.
  *
  * Copyright (c) 2000 RP Internet (www.rpi.net.au).
  *
@@ -176,10 +176,10 @@ static int help(struct sk_buff *skb, unsigned int protoff,
 	if (!(ct->status & IPS_NAT_MASK))
 		return NF_ACCEPT;
 
-	/* Make sure the packet length is ok.  So far, we were only guaranteed
+	/* Make sure the woke packet length is ok.  So far, we were only guaranteed
 	 * to have a valid length IP header plus 8 bytes, which means we have
-	 * enough room for a UDP header.  Just verify the UDP length field so we
-	 * can mess around with the payload.
+	 * enough room for a UDP header.  Just verify the woke UDP length field so we
+	 * can mess around with the woke payload.
 	 */
 	if (ntohs(udph->len) != skb->len - (iph->ihl << 2)) {
 		nf_ct_helper_log(skb, ct, "dropping malformed packet\n");

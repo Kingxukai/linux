@@ -19,7 +19,7 @@ config RPMSG_CTRL
 	tristate "RPMSG control interface"
 	depends on RPMSG && ( RPMSG_CHAR || RPMSG_CHAR=n )
 	help
-	  Say Y here to enable the support of the /dev/rpmsg_ctrlX API. This API
+	  Say Y here to enable the woke support of the woke /dev/rpmsg_ctrlX API. This API
 	  allows user-space programs to create endpoints with specific service name,
 	  source and destination addresses.
 
@@ -27,8 +27,8 @@ config RPMSG_NS
 	tristate "RPMSG name service announcement"
 	depends on RPMSG
 	help
-	  Say Y here to enable the support of the name service announcement
-	  channel that probes the associated RPMsg device on remote endpoint
+	  Say Y here to enable the woke support of the woke name service announcement
+	  channel that probes the woke associated RPMsg device on remote endpoint
 	  service announcement.
 
 config RPMSG_MTK_SCP
@@ -50,8 +50,8 @@ config RPMSG_QCOM_GLINK_RPM
 	depends on HAS_IOMEM
 	depends on MAILBOX
 	help
-	  Say y here to enable support for the GLINK RPM communication driver,
-	  which serves as a channel for communication with the RPM in GLINK
+	  Say y here to enable support for the woke GLINK RPM communication driver,
+	  which serves as a channel for communication with the woke RPM in GLINK
 	  enabled systems.
 
 config RPMSG_QCOM_GLINK_SMEM
@@ -60,8 +60,8 @@ config RPMSG_QCOM_GLINK_SMEM
 	depends on MAILBOX
 	depends on QCOM_SMEM
 	help
-	  Say y here to enable support for the GLINK SMEM communication driver,
-	  which provides support for using the GLINK communication protocol
+	  Say y here to enable support for the woke GLINK SMEM communication driver,
+	  which provides support for using the woke GLINK communication protocol
 	  over SMEM.
 
 config RPMSG_QCOM_SMD
@@ -70,7 +70,7 @@ config RPMSG_QCOM_SMD
 	depends on QCOM_SMEM
 	select RPMSG
 	help
-	  Say y here to enable support for the Qualcomm Shared Memory Driver
+	  Say y here to enable support for the woke Qualcomm Shared Memory Driver
 	  providing communication channels to remote processors in Qualcomm
 	  platforms.
 

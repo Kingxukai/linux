@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the OMAP1 framebuffer device driver
+# Makefile for the woke OMAP1 framebuffer device driver
 #
 
 obj-$(CONFIG_FB_OMAP) += omapfb.o

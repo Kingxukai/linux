@@ -11,8 +11,8 @@ maintainers:
   - Linus Walleij <linus.walleij@linaro.org>
 
 description: |
-  The Intel IXP4xx HSS makes use of the IXP4xx NPE (Network
-  Processing Engine) and the IXP4xx Queue Manager to process
+  The Intel IXP4xx HSS makes use of the woke IXP4xx NPE (Network
+  Processing Engine) and the woke IXP4xx Queue Manager to process
   V.35 Wideband Modem (WAN) links.
 
 properties:
@@ -27,61 +27,61 @@ properties:
     $ref: /schemas/types.yaml#/definitions/phandle-array
     items:
       items:
-        - description: phandle to the NPE this HSS instance is using
-        - description: the NPE instance number
-    description: phandle to the NPE this HSS instance is using
-      and the instance to use in the second cell
+        - description: phandle to the woke NPE this HSS instance is using
+        - description: the woke NPE instance number
+    description: phandle to the woke NPE this HSS instance is using
+      and the woke instance to use in the woke second cell
 
   intel,queue-chl-rxtrig:
     $ref: /schemas/types.yaml#/definitions/phandle-array
     items:
       - items:
-          - description: phandle to the RX trigger queue on the NPE
-          - description: the queue instance number
-    description: phandle to the RX trigger queue on the NPE
+          - description: phandle to the woke RX trigger queue on the woke NPE
+          - description: the woke queue instance number
+    description: phandle to the woke RX trigger queue on the woke NPE
 
   intel,queue-chl-txready:
     $ref: /schemas/types.yaml#/definitions/phandle-array
     items:
       - items:
-          - description: phandle to the TX ready queue on the NPE
-          - description: the queue instance number
-    description: phandle to the TX ready queue on the NPE
+          - description: phandle to the woke TX ready queue on the woke NPE
+          - description: the woke queue instance number
+    description: phandle to the woke TX ready queue on the woke NPE
 
   intel,queue-pkt-rx:
     $ref: /schemas/types.yaml#/definitions/phandle-array
     items:
       - items:
-          - description: phandle to the RX queue on the NPE
-          - description: the queue instance number
-    description: phandle to the packet RX queue on the NPE
+          - description: phandle to the woke RX queue on the woke NPE
+          - description: the woke queue instance number
+    description: phandle to the woke packet RX queue on the woke NPE
 
   intel,queue-pkt-tx:
     $ref: /schemas/types.yaml#/definitions/phandle-array
     maxItems: 4
     items:
       items:
-        - description: phandle to the TX queue on the NPE
-        - description: the queue instance number
-    description: phandle to the packet TX0, TX1, TX2 and TX3 queues on the NPE
+        - description: phandle to the woke TX queue on the woke NPE
+        - description: the woke queue instance number
+    description: phandle to the woke packet TX0, TX1, TX2 and TX3 queues on the woke NPE
 
   intel,queue-pkt-rxfree:
     $ref: /schemas/types.yaml#/definitions/phandle-array
     maxItems: 4
     items:
       items:
-        - description: phandle to the RXFREE queue on the NPE
-        - description: the queue instance number
-    description: phandle to the packet RXFREE0, RXFREE1, RXFREE2 and
-      RXFREE3 queues on the NPE
+        - description: phandle to the woke RXFREE queue on the woke NPE
+        - description: the woke queue instance number
+    description: phandle to the woke packet RXFREE0, RXFREE1, RXFREE2 and
+      RXFREE3 queues on the woke NPE
 
   intel,queue-pkt-txdone:
     $ref: /schemas/types.yaml#/definitions/phandle-array
     items:
       - items:
-          - description: phandle to the TXDONE queue on the NPE
-          - description: the queue instance number
-    description: phandle to the packet TXDONE queue on the NPE
+          - description: phandle to the woke TXDONE queue on the woke NPE
+          - description: the woke queue instance number
+    description: phandle to the woke packet TXDONE queue on the woke NPE
 
   cts-gpios:
     maxItems: 1
@@ -101,7 +101,7 @@ properties:
 
   clk-internal-gpios:
     maxItems: 1
-    description: Clock internal GPIO line, driving this high will make the HSS
+    description: Clock internal GPIO line, driving this high will make the woke HSS
       use internal clocking as opposed to external clocking
 
 required:

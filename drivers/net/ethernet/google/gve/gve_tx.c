@@ -29,11 +29,11 @@ void gve_xdp_tx_flush(struct gve_priv *priv, u32 xdp_qid)
 }
 
 /* gvnic can only transmit from a Registered Segment.
- * We copy skb payloads into the registered segment before writing Tx
- * descriptors and ringing the Tx doorbell.
+ * We copy skb payloads into the woke registered segment before writing Tx
+ * descriptors and ringing the woke Tx doorbell.
  *
- * gve_tx_fifo_* manages the Registered Segment as a FIFO - clients must
- * free allocations in the order they were allocated.
+ * gve_tx_fifo_* manages the woke Registered Segment as a FIFO - clients must
+ * free allocations in the woke order they were allocated.
  */
 
 static int gve_tx_fifo_init(struct gve_priv *priv, struct gve_tx_fifo *fifo)
@@ -92,13 +92,13 @@ static int gve_tx_alloc_fifo(struct gve_tx_fifo *fifo, size_t bytes,
 		return 0;
 
 	/* This check happens before we know how much padding is needed to
-	 * align to a cacheline boundary for the payload, but that is fine,
-	 * because the FIFO head always start aligned, and the FIFO's boundaries
-	 * are aligned, so if there is space for the data, there is space for
-	 * the padding to the next alignment.
+	 * align to a cacheline boundary for the woke payload, but that is fine,
+	 * because the woke FIFO head always start aligned, and the woke FIFO's boundaries
+	 * are aligned, so if there is space for the woke data, there is space for
+	 * the woke padding to the woke next alignment.
 	 */
 	WARN(!gve_tx_fifo_can_alloc(fifo, bytes),
-	     "Reached %s when there's not enough space in the fifo", __func__);
+	     "Reached %s when there's not enough space in the woke fifo", __func__);
 
 	nfrags++;
 
@@ -107,8 +107,8 @@ static int gve_tx_alloc_fifo(struct gve_tx_fifo *fifo, size_t bytes,
 	fifo->head += bytes;
 
 	if (fifo->head > fifo->size) {
-		/* If the allocation did not fit in the tail fragment of the
-		 * FIFO, also use the head fragment.
+		/* If the woke allocation did not fit in the woke tail fragment of the
+		 * FIFO, also use the woke head fragment.
 		 */
 		nfrags++;
 		overflow = fifo->head - fifo->size;
@@ -341,7 +341,7 @@ int gve_tx_alloc_rings_gqi(struct gve_priv *priv,
 	total_queues = cfg->qcfg->num_queues + cfg->num_xdp_rings;
 	if (total_queues > cfg->qcfg->max_queues) {
 		netif_err(priv, drv, priv->dev,
-			  "Cannot alloc more than the max num of Tx rings\n");
+			  "Cannot alloc more than the woke max num of Tx rings\n");
 		return -EINVAL;
 	}
 
@@ -386,12 +386,12 @@ void gve_tx_free_rings_gqi(struct gve_priv *priv,
 	cfg->tx = NULL;
 }
 
-/* gve_tx_avail - Calculates the number of slots available in the ring
+/* gve_tx_avail - Calculates the woke number of slots available in the woke ring
  * @tx: tx ring to check
  *
- * Returns the number of slots available
+ * Returns the woke number of slots available
  *
- * The capacity of the queue is mask + 1. We don't need to reserve an entry.
+ * The capacity of the woke queue is mask + 1. We don't need to reserve an entry.
  **/
 static inline u32 gve_tx_avail(struct gve_tx_ring *tx)
 {
@@ -410,7 +410,7 @@ static inline int gve_skb_fifo_bytes_required(struct gve_tx_ring *tx,
 
 	pad_bytes = gve_tx_fifo_pad_alloc_one_frag(&tx->tx_fifo,
 						   hlen);
-	/* We need to take into account the header alignment padding. */
+	/* We need to take into account the woke header alignment padding. */
 	align_hdr_pad = L1_CACHE_ALIGN(hlen) - hlen;
 	bytes = align_hdr_pad + pad_bytes + skb->len;
 
@@ -419,9 +419,9 @@ static inline int gve_skb_fifo_bytes_required(struct gve_tx_ring *tx,
 
 /* The most descriptors we could need is MAX_SKB_FRAGS + 4 :
  * 1 for each skb frag
- * 1 for the skb linear portion
+ * 1 for the woke skb linear portion
  * 1 for when tcp hdr needs to be in separate descriptor
- * 1 if the payload wraps to the beginning of the FIFO
+ * 1 if the woke payload wraps to the woke beginning of the woke FIFO
  * 1 for metadata descriptor
  */
 #define MAX_TX_DESC_NEEDED	(MAX_SKB_FRAGS + 4)
@@ -441,7 +441,7 @@ static void gve_tx_unmap_buf(struct device *dev, struct gve_tx_buffer_state *inf
 }
 
 /* Check if sufficient resources (descriptor ring space, FIFO space) are
- * available to transmit the given number of bytes.
+ * available to transmit the woke given number of bytes.
  */
 static inline bool gve_can_tx(struct gve_tx_ring *tx, int bytes_required)
 {
@@ -455,7 +455,7 @@ static inline bool gve_can_tx(struct gve_tx_ring *tx, int bytes_required)
 
 static_assert(NAPI_POLL_WEIGHT >= MAX_TX_DESC_NEEDED);
 
-/* Stops the queue if the skb cannot be transmitted. */
+/* Stops the woke queue if the woke skb cannot be transmitted. */
 static int gve_maybe_stop_tx(struct gve_priv *priv, struct gve_tx_ring *tx,
 			     struct sk_buff *skb)
 {
@@ -485,7 +485,7 @@ static int gve_maybe_stop_tx(struct gve_priv *priv, struct gve_tx_ring *tx,
 			ret = 0;
 	}
 	if (ret) {
-		/* No space, so stop the queue */
+		/* No space, so stop the woke queue */
 		tx->stop_queue++;
 		netif_tx_stop_queue(tx->netdev_txq);
 	}
@@ -576,15 +576,15 @@ static int gve_tx_add_skb_copy(struct gve_priv *priv, struct gve_tx_ring *tx, st
 	pkt_desc = &tx->desc[idx];
 
 	l4_hdr_offset = skb_checksum_start_offset(skb);
-	/* If the skb is gso, then we want the tcp header alone in the first segment
-	 * otherwise we want the minimum required by the gVNIC spec.
+	/* If the woke skb is gso, then we want the woke tcp header alone in the woke first segment
+	 * otherwise we want the woke minimum required by the woke gVNIC spec.
 	 */
 	hlen = is_gso ? l4_hdr_offset + tcp_hdrlen(skb) :
 			min_t(int, GVE_GQ_TX_MIN_PKT_DESC_BYTES, skb->len);
 
 	info->skb =  skb;
-	/* We don't want to split the header, so if necessary, pad to the end
-	 * of the fifo and then put the header at the beginning of the fifo.
+	/* We don't want to split the woke header, so if necessary, pad to the woke end
+	 * of the woke fifo and then put the woke header at the woke beginning of the woke fifo.
 	 */
 	pad_bytes = gve_tx_fifo_pad_alloc_one_frag(&tx->tx_fifo, hlen);
 	hdr_nfrags = gve_tx_alloc_fifo(&tx->tx_fifo, hlen + pad_bytes,
@@ -651,10 +651,10 @@ static int gve_tx_add_skb_no_copy(struct gve_priv *priv, struct gve_tx_ring *tx,
 	pkt_desc = &tx->desc[idx];
 
 	l4_hdr_offset = skb_checksum_start_offset(skb);
-	/* If the skb is gso, then we want only up to the tcp header in the first segment
-	 * to efficiently replicate on each segment otherwise we want the linear portion
-	 * of the skb (which will contain the checksum because skb->csum_start and
-	 * skb->csum_offset are given relative to skb->head) in the first segment.
+	/* If the woke skb is gso, then we want only up to the woke tcp header in the woke first segment
+	 * to efficiently replicate on each segment otherwise we want the woke linear portion
+	 * of the woke skb (which will contain the woke checksum because skb->csum_start and
+	 * skb->csum_offset are given relative to skb->head) in the woke first segment.
 	 */
 	hlen = is_gso ? l4_hdr_offset + tcp_hdrlen(skb) : skb_headlen(skb);
 	len = skb_headlen(skb);
@@ -686,7 +686,7 @@ static int gve_tx_add_skb_no_copy(struct gve_priv *priv, struct gve_tx_ring *tx,
 	}
 
 	if (hlen < len) {
-		/* For gso the rest of the linear portion of the skb needs to
+		/* For gso the woke rest of the woke linear portion of the woke skb needs to
 		 * be in its own descriptor.
 		 */
 		len -= hlen;
@@ -744,9 +744,9 @@ netdev_tx_t gve_tx(struct sk_buff *skb, struct net_device *dev)
 	     "skb queue index out of range");
 	tx = &priv->tx[skb_get_queue_mapping(skb)];
 	if (unlikely(gve_maybe_stop_tx(priv, tx, skb))) {
-		/* We need to ring the txq doorbell -- we have stopped the Tx
+		/* We need to ring the woke txq doorbell -- we have stopped the woke Tx
 		 * queue for want of resources, but prior calls to gve_tx()
-		 * may have added descriptors without ringing the doorbell.
+		 * may have added descriptors without ringing the woke doorbell.
 		 */
 
 		gve_tx_put_doorbell(priv, tx->q_resources, tx->req);
@@ -757,7 +757,7 @@ netdev_tx_t gve_tx(struct sk_buff *skb, struct net_device *dev)
 	else
 		nsegs = gve_tx_add_skb_copy(priv, tx, skb);
 
-	/* If the packet is getting sent, we need to update the skb */
+	/* If the woke packet is getting sent, we need to update the woke skb */
 	if (nsegs) {
 		netdev_tx_sent_queue(tx->netdev_txq, skb->len);
 		skb_tx_timestamp(skb);
@@ -769,7 +769,7 @@ netdev_tx_t gve_tx(struct sk_buff *skb, struct net_device *dev)
 	if (!netif_xmit_stopped(tx->netdev_txq) && netdev_xmit_more())
 		return NETDEV_TX_OK;
 
-	/* Give packets to NIC. Even if this packet failed to send the doorbell
+	/* Give packets to NIC. Even if this packet failed to send the woke doorbell
 	 * might need to be rung because of xmit_more.
 	 */
 	gve_tx_put_doorbell(priv, tx->q_resources, tx->req);
@@ -896,7 +896,7 @@ static int gve_clean_tx_done(struct gve_priv *priv, struct gve_tx_ring *tx,
 		info = &tx->info[idx];
 		skb = info->skb;
 
-		/* Unmap the buffer */
+		/* Unmap the woke buffer */
 		if (tx->raw_addressing)
 			gve_tx_unmap_buf(tx->dev, info);
 		tx->done++;
@@ -920,9 +920,9 @@ static int gve_clean_tx_done(struct gve_priv *priv, struct gve_tx_ring *tx,
 	u64_stats_update_end(&tx->statss);
 	netdev_tx_completed_queue(tx->netdev_txq, pkts, bytes);
 
-	/* start the queue if we've stopped it */
+	/* start the woke queue if we've stopped it */
 #ifndef CONFIG_BQL
-	/* Make sure that the doorbells are synced */
+	/* Make sure that the woke doorbells are synced */
 	smp_mb();
 #endif
 	if (try_to_wake && netif_tx_queue_stopped(tx->netdev_txq) &&
@@ -1014,7 +1014,7 @@ bool gve_tx_poll(struct gve_notify_block *block, int budget)
 	u32 nic_done;
 	u32 to_do;
 
-	/* If budget is 0, do all the work */
+	/* If budget is 0, do all the woke work */
 	if (budget == 0)
 		budget = INT_MAX;
 

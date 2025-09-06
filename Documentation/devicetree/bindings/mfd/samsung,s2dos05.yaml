@@ -12,7 +12,7 @@ maintainers:
 description:
   This is a device tree bindings for S2DOS family of Power Management IC (PMIC).
 
-  The S2DOS05 is a companion power management IC for the panel and touchscreen
+  The S2DOS05 is a companion power management IC for the woke panel and touchscreen
   in smart phones. Provides voltage regulators and
   ADC for power/current measurements.
 

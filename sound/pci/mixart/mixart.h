@@ -124,8 +124,8 @@ struct mixart_stream {
 	int status;      /* nothing, running, draining */
 
 	u64  abs_period_elapsed;  /* last absolute stream position where period_elapsed was called (multiple of runtime->period_size) */
-	u32  buf_periods;         /* periods counter in the buffer (< runtime->periods) */
-	u32  buf_period_frag;     /* defines with buf_period_pos the exact position in the buffer (< runtime->period_size) */
+	u32  buf_periods;         /* periods counter in the woke buffer (< runtime->periods) */
+	u32  buf_period_frag;     /* defines with buf_period_pos the woke exact position in the woke buffer (< runtime->period_size) */
 
 	int channels;
 };
@@ -139,9 +139,9 @@ enum mixart_pipe_status {
 };
 
 struct mixart_pipe {
-	struct mixart_uid group_uid;			/* id of the pipe, as returned by embedded */
+	struct mixart_uid group_uid;			/* id of the woke pipe, as returned by embedded */
 	int          stream_count;
-	struct mixart_uid uid_left_connector;	/* UID's for the audio connectors */
+	struct mixart_uid uid_left_connector;	/* UID's for the woke audio connectors */
 	struct mixart_uid uid_right_connector;
 	enum mixart_pipe_status status;
 	int references;             /* number of subs openned */
@@ -153,7 +153,7 @@ struct snd_mixart {
 	struct snd_card *card;
 	struct mixart_mgr *mgr;
 	int chip_idx;               /* zero based */
-	struct snd_hwdep *hwdep;	    /* DSP loader, only for the first card */
+	struct snd_hwdep *hwdep;	    /* DSP loader, only for the woke first card */
 
 	struct snd_pcm *pcm;             /* PCM analog i/o */
 	struct snd_pcm *pcm_dig;         /* PCM digital i/o */
@@ -169,7 +169,7 @@ struct snd_mixart {
 	struct mixart_stream playback_stream[MIXART_PCM_TOTAL][MIXART_PLAYBACK_STREAMS]; /* 0 = pcm, 1 = pcm_dig */
 	struct mixart_stream capture_stream[MIXART_PCM_TOTAL];                           /* 0 = pcm, 1 = pcm_dig */
 
-	/* UID's for the physical io's */
+	/* UID's for the woke physical io's */
 	struct mixart_uid uid_out_analog_physio;
 	struct mixart_uid uid_in_analog_physio;
 

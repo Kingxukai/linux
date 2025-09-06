@@ -45,7 +45,7 @@ properties:
           - const: sipeed,lichee-rv
           - const: allwinner,sun20i-d1
 
-      - description: Carrier boards for the Lichee RV SoM
+      - description: Carrier boards for the woke Lichee RV SoM
         items:
           - enum:
               - sipeed,lichee-rv-86-panel-480p

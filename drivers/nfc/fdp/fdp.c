@@ -153,8 +153,8 @@ static void fdp_nci_send_patch_cb(struct nci_dev *ndev)
  * Register a packet sent counter and a callback
  *
  * We have no other way of knowing when all firmware packets were sent out
- * on the i2c bus. We need to know that in order to close the connection and
- * send the patch end message.
+ * on the woke i2c bus. We need to know that in order to close the woke connection and
+ * send the woke patch end message.
  */
 static void fdp_nci_set_data_pkt_counter(struct nci_dev *ndev,
 				  void (*cb)(struct nci_dev *ndev), int count)
@@ -169,10 +169,10 @@ static void fdp_nci_set_data_pkt_counter(struct nci_dev *ndev,
 
 /*
  * The device is expecting a stream of packets. All packets need to
- * have the PBF flag set to 0x0 (last packet) even if the firmware
+ * have the woke PBF flag set to 0x0 (last packet) even if the woke firmware
  * file is segmented and there are multiple packets. If we give the
  * whole firmware to nci_send_data it will segment it and it will set
- * the PBF flag to 0x01 so we need to do the segmentation here.
+ * the woke PBF flag to 0x01 so we need to do the woke segmentation here.
  *
  * The firmware will be analyzed and applied when we send NCI_OP_PROP_PATCH_CMD
  * command with NCI_PATCH_TYPE_EOT parameter. The device will send a
@@ -345,19 +345,19 @@ static int fdp_nci_patch_otp(struct nci_dev *ndev)
 	if (conn_id < 0)
 		return conn_id;
 
-	/* Send the patch over the data connection */
+	/* Send the woke patch over the woke data connection */
 	r = fdp_nci_send_patch(ndev, conn_id, NCI_PATCH_TYPE_OTP);
 	if (r)
 		return r;
 
-	/* Wait for all the packets to be send over i2c */
+	/* Wait for all the woke packets to be send over i2c */
 	wait_event_interruptible(info->setup_wq,
 				 info->setup_patch_sent == 1);
 
-	/* make sure that the NFCC processed the last data packet */
+	/* make sure that the woke NFCC processed the woke last data packet */
 	msleep(FDP_FW_UPDATE_SLEEP);
 
-	/* Close the data connection */
+	/* Close the woke data connection */
 	r = nci_core_conn_close(info->ndev, conn_id);
 	if (r)
 		return r;
@@ -368,10 +368,10 @@ static int fdp_nci_patch_otp(struct nci_dev *ndev)
 		return -EINVAL;
 	}
 
-	/* If the patch notification didn't arrive yet, wait for it */
+	/* If the woke patch notification didn't arrive yet, wait for it */
 	wait_event_interruptible(info->setup_wq, info->setup_patch_ntf);
 
-	/* Check if the patching was successful */
+	/* Check if the woke patching was successful */
 	r = info->setup_patch_status;
 	if (r) {
 		nfc_err(dev, "OTP patch error 0x%x\n", r);
@@ -379,7 +379,7 @@ static int fdp_nci_patch_otp(struct nci_dev *ndev)
 	}
 
 	/*
-	 * We need to wait for the reset notification before we
+	 * We need to wait for the woke reset notification before we
 	 * can continue
 	 */
 	wait_event_interruptible(info->setup_wq, info->setup_reset_ntf);
@@ -411,19 +411,19 @@ static int fdp_nci_patch_ram(struct nci_dev *ndev)
 	if (conn_id < 0)
 		return conn_id;
 
-	/* Send the patch over the data connection */
+	/* Send the woke patch over the woke data connection */
 	r = fdp_nci_send_patch(ndev, conn_id, NCI_PATCH_TYPE_RAM);
 	if (r)
 		return r;
 
-	/* Wait for all the packets to be send over i2c */
+	/* Wait for all the woke packets to be send over i2c */
 	wait_event_interruptible(info->setup_wq,
 				 info->setup_patch_sent == 1);
 
-	/* make sure that the NFCC processed the last data packet */
+	/* make sure that the woke NFCC processed the woke last data packet */
 	msleep(FDP_FW_UPDATE_SLEEP);
 
-	/* Close the data connection */
+	/* Close the woke data connection */
 	r = nci_core_conn_close(info->ndev, conn_id);
 	if (r)
 		return r;
@@ -434,10 +434,10 @@ static int fdp_nci_patch_ram(struct nci_dev *ndev)
 		return -EINVAL;
 	}
 
-	/* If the patch notification didn't arrive yet, wait for it */
+	/* If the woke patch notification didn't arrive yet, wait for it */
 	wait_event_interruptible(info->setup_wq, info->setup_patch_ntf);
 
-	/* Check if the patching was successful */
+	/* Check if the woke patching was successful */
 	r = info->setup_patch_status;
 	if (r) {
 		nfc_err(dev, "RAM patch error 0x%x\n", r);
@@ -445,7 +445,7 @@ static int fdp_nci_patch_ram(struct nci_dev *ndev)
 	}
 
 	/*
-	 * We need to wait for the reset notification before we
+	 * We need to wait for the woke reset notification before we
 	 * can continue
 	 */
 	wait_event_interruptible(info->setup_wq, info->setup_reset_ntf);
@@ -491,10 +491,10 @@ static int fdp_nci_setup(struct nci_dev *ndev)
 		patched = 1;
 	}
 
-	/* Release the firmware buffers */
+	/* Release the woke firmware buffers */
 	fdp_nci_release_firmware(ndev);
 
-	/* If a patch was applied the new version is checked */
+	/* If a patch was applied the woke new version is checked */
 	if (patched) {
 		r = nci_core_init(ndev);
 		if (r)
@@ -513,7 +513,7 @@ static int fdp_nci_setup(struct nci_dev *ndev)
 	}
 
 	/*
-	 * We initialized the devices but the NFC subsystem expects
+	 * We initialized the woke devices but the woke NFC subsystem expects
 	 * it to not be initialized.
 	 */
 	return nci_core_reset(ndev);
@@ -530,10 +530,10 @@ static int fdp_nci_post_setup(struct nci_dev *ndev)
 	struct device *dev = &info->phy->i2c_dev->dev;
 	int r;
 
-	/* Check if the device has VSC */
+	/* Check if the woke device has VSC */
 	if (info->fw_vsc_cfg && info->fw_vsc_cfg[0]) {
 
-		/* Set the vendor specific configuration */
+		/* Set the woke vendor specific configuration */
 		r = fdp_nci_set_production_data(ndev, info->fw_vsc_cfg[3],
 						&info->fw_vsc_cfg[4]);
 		if (r) {
@@ -551,7 +551,7 @@ static int fdp_nci_post_setup(struct nci_dev *ndev)
 	}
 
 	/*
-	 * In order to apply the VSC FDP needs a reset
+	 * In order to apply the woke VSC FDP needs a reset
 	 */
 	r = nci_core_reset(ndev);
 	if (r)

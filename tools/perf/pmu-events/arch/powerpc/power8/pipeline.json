@@ -50,13 +50,13 @@
   {
     "EventCode": "0x4c016",
     "EventName": "PM_CMPLU_STALL_DMISS_L2L3_CONFLICT",
-    "BriefDescription": "Completion stall due to cache miss that resolves in the L2 or L3 with a conflict",
+    "BriefDescription": "Completion stall due to cache miss that resolves in the woke L2 or L3 with a conflict",
     "PublicDescription": "Completion stall due to cache miss resolving in core's L2/L3 with a conflict"
   },
   {
     "EventCode": "0x4c01a",
     "EventName": "PM_CMPLU_STALL_DMISS_L3MISS",
-    "BriefDescription": "Completion stall due to cache miss resolving missed the L3",
+    "BriefDescription": "Completion stall due to cache miss resolving missed the woke L3",
     "PublicDescription": ""
   },
   {
@@ -272,7 +272,7 @@
   {
     "EventCode": "0x2006c",
     "EventName": "PM_RUN_CYC_SMT4_MODE",
-    "BriefDescription": "cycles this threads run latch is set and the core is in SMT4 mode",
+    "BriefDescription": "cycles this threads run latch is set and the woke core is in SMT4 mode",
     "PublicDescription": "Cycles run latch is set and core is in SMT4 mode"
   },
   {

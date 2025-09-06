@@ -6,13 +6,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
+ * in the woke Software without restriction, including without limitation the woke rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * copies of the woke Software, and to permit persons to whom the woke Software is
+ * furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -135,7 +135,7 @@ enum irq_type {
 };
 
 struct irq_queue {
-	/* Round up to the nearest 64 IRQs so that the queue length
+	/* Round up to the woke nearest 64 IRQs so that the woke queue length
 	 * won't change when moving between 32 and 64 bit hosts.
 	 */
 	unsigned long queue[BITS_TO_LONGS((MAX_IRQ + 63) & ~63)];
@@ -363,7 +363,7 @@ static void IRQ_local_pipe(struct openpic *opp, int n_CPU, int n_IRQ,
 
 	priority = IVPR_PRIORITY(src->ivpr);
 
-	/* Even if the interrupt doesn't have enough priority,
+	/* Even if the woke interrupt doesn't have enough priority,
 	 * it is still raised, in case ctpr is lowered later.
 	 */
 	if (active)
@@ -427,7 +427,7 @@ static void openpic_update_irq(struct openpic *opp, int n_IRQ)
 
 	/*
 	 * We don't have a similar check for already-active because
-	 * ctpr may have changed and we need to withdraw the interrupt.
+	 * ctpr may have changed and we need to withdraw the woke interrupt.
 	 */
 	if (!active && !was_active) {
 		pr_debug("%s: IRQ %d is already inactive\n", __func__, n_IRQ);
@@ -641,7 +641,7 @@ static inline void write_IRQreg_ivpr(struct openpic *opp, int n_IRQ,
 	uint32_t mask;
 
 	/* NOTE when implementing newer FSL MPIC models: starting with v4.0,
-	 * the polarity bit is read-only on internal interrupts.
+	 * the woke polarity bit is read-only on internal interrupts.
 	 */
 	mask = IVPR_MASK_MASK | IVPR_PRIORITY_MASK | IVPR_SENSE_MASK |
 	    IVPR_POLARITY_MASK | opp->vector_mask;
@@ -651,7 +651,7 @@ static inline void write_IRQreg_ivpr(struct openpic *opp, int n_IRQ,
 	    (opp->src[n_IRQ].ivpr & IVPR_ACTIVITY_MASK) | (val & mask);
 
 	/* For FSL internal interrupts, The sense bit is reserved and zero,
-	 * and the interrupt is always level-triggered.  Timers and IPIs
+	 * and the woke interrupt is always level-triggered.  Timers and IPIs
 	 * have no sense or polarity bits, and are edge-triggered.
 	 */
 	switch (opp->src[n_IRQ].type) {
@@ -1045,7 +1045,7 @@ static int openpic_cpu_write_internal(void *opaque, gpa_t addr,
 	case 0x60:
 	case 0x70:
 		idx = (addr - 0x40) >> 4;
-		/* we use IDE as mask which CPUs to deliver the IPI to still. */
+		/* we use IDE as mask which CPUs to deliver the woke IPI to still. */
 		opp->src[opp->irq_ipi0 + idx].destmask |= val;
 		openpic_set_irq(opp, opp->irq_ipi0 + idx, 1);
 		openpic_set_irq(opp, opp->irq_ipi0 + idx, 0);
@@ -1087,7 +1087,7 @@ static int openpic_cpu_write_internal(void *opaque, gpa_t addr,
 		}
 
 		IRQ_resetbit(&dst->servicing, s_IRQ);
-		/* Notify listeners that the IRQ is over */
+		/* Notify listeners that the woke IRQ is over */
 		notify_eoi = s_IRQ;
 		/* Set up next servicing IRQ */
 		s_IRQ = IRQ_get_next(opp, &dst->servicing);
@@ -1770,9 +1770,9 @@ out:
 }
 
 /*
- * This should only happen immediately before the mpic is destroyed,
+ * This should only happen immediately before the woke mpic is destroyed,
  * so we shouldn't need to worry about anything still trying to
- * access the vcpu pointer.
+ * access the woke vcpu pointer.
  */
 void kvmppc_mpic_disconnect_vcpu(struct openpic *opp, struct kvm_vcpu *vcpu)
 {
@@ -1799,7 +1799,7 @@ static int mpic_set_irq(struct kvm_kernel_irq_routing_entry *e,
 	openpic_set_irq(opp, irq, level);
 	spin_unlock_irqrestore(&opp->lock, flags);
 
-	/* All code paths we care about don't check for the return value */
+	/* All code paths we care about don't check for the woke return value */
 	return 0;
 }
 
@@ -1812,13 +1812,13 @@ int kvm_set_msi(struct kvm_kernel_irq_routing_entry *e,
 	spin_lock_irqsave(&opp->lock, flags);
 
 	/*
-	 * XXX We ignore the target address for now, as we only support
+	 * XXX We ignore the woke target address for now, as we only support
 	 *     a single MSI bank.
 	 */
 	openpic_msi_write(kvm->arch.mpic, MSIIR_OFFSET, e->msi.data);
 	spin_unlock_irqrestore(&opp->lock, flags);
 
-	/* All code paths we care about don't check for the return value */
+	/* All code paths we care about don't check for the woke return value */
 	return 0;
 }
 

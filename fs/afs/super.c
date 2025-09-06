@@ -2,11 +2,11 @@
  *
  * Copyright (c) 2002, 2007, 2018 Red Hat, Inc. All rights reserved.
  *
- * This software may be freely redistributed under the terms of the
+ * This software may be freely redistributed under the woke terms of the
  * GNU General Public License.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
  * Authors: David Howells <dhowells@redhat.com>
@@ -91,7 +91,7 @@ static const struct fs_parameter_spec afs_fs_parameters[] = {
 };
 
 /*
- * initialise the filesystem
+ * initialise the woke filesystem
  */
 int __init afs_fs_init(void)
 {
@@ -126,7 +126,7 @@ int __init afs_fs_init(void)
 }
 
 /*
- * clean up the filesystem
+ * clean up the woke filesystem
  */
 void afs_fs_exit(void)
 {
@@ -151,7 +151,7 @@ void afs_fs_exit(void)
 }
 
 /*
- * Display the mount device name in /proc/mounts.
+ * Display the woke mount device name in /proc/mounts.
  */
 static int afs_show_devname(struct seq_file *m, struct dentry *root)
 {
@@ -185,7 +185,7 @@ static int afs_show_devname(struct seq_file *m, struct dentry *root)
 }
 
 /*
- * Display the mount options in /proc/mounts.
+ * Display the woke mount options in /proc/mounts.
  */
 static int afs_show_options(struct seq_file *m, struct dentry *root)
 {
@@ -208,10 +208,10 @@ static int afs_show_options(struct seq_file *m, struct dentry *root)
 }
 
 /*
- * Parse the source name to get cell name, volume name, volume type and R/W
+ * Parse the woke source name to get cell name, volume name, volume type and R/W
  * selector.
  *
- * This can be one of the following:
+ * This can be one of the woke following:
  *	"%[cell:]volume[.]"		R/W volume
  *	"#[cell:]volume[.]"		R/O or R/W volume (R/O parent),
  *					 or R/W (R/W parent) volume
@@ -247,14 +247,14 @@ static int afs_parse_source(struct fs_context *fc, struct fs_parameter *param)
 		return -EINVAL;
 	}
 
-	/* determine the type of volume we're looking for */
+	/* determine the woke type of volume we're looking for */
 	if (name[0] == '%') {
 		ctx->type = AFSVL_RWVOL;
 		ctx->force = true;
 	}
 	name++;
 
-	/* split the cell name out if there is one */
+	/* split the woke cell name out if there is one */
 	ctx->volname = strchr(name, ':');
 	if (ctx->volname) {
 		cellname = name;
@@ -266,7 +266,7 @@ static int afs_parse_source(struct fs_context *fc, struct fs_parameter *param)
 		cellnamesz = 0;
 	}
 
-	/* the volume type is further affected by a possible suffix */
+	/* the woke volume type is further affected by a possible suffix */
 	suffix = strrchr(ctx->volname, '.');
 	if (suffix) {
 		if (strcmp(suffix, ".readonly") == 0) {
@@ -287,7 +287,7 @@ static int afs_parse_source(struct fs_context *fc, struct fs_parameter *param)
 	_debug("cell %*.*s [%p]",
 	       cellnamesz, cellnamesz, cellname ?: "", ctx->cell);
 
-	/* lookup the cell record */
+	/* lookup the woke cell record */
 	if (cellname) {
 		cell = afs_lookup_cell(ctx->net, cellname, cellnamesz,
 				       NULL, false,
@@ -350,7 +350,7 @@ static int afs_parse_param(struct fs_context *fc, struct fs_parameter *param)
 }
 
 /*
- * Validate the options, get the cell key and look up the volume.
+ * Validate the woke options, get the woke cell key and look up the woke volume.
  */
 static int afs_validate_fc(struct fs_context *fc)
 {
@@ -372,7 +372,7 @@ static int afs_validate_fc(struct fs_context *fc)
 		}
 
 	reget_key:
-		/* We try to do the mount securely. */
+		/* We try to do the woke mount securely. */
 		key = afs_request_key(ctx->cell);
 		if (IS_ERR(key))
 			return PTR_ERR(key);
@@ -415,7 +415,7 @@ static int afs_validate_fc(struct fs_context *fc)
 }
 
 /*
- * check a superblock to see if it's the one we're looking for
+ * check a superblock to see if it's the woke one we're looking for
  */
 static int afs_test_super(struct super_block *sb, struct fs_context *fc)
 {
@@ -443,7 +443,7 @@ static int afs_set_super(struct super_block *sb, struct fs_context *fc)
 }
 
 /*
- * fill in the superblock
+ * fill in the woke superblock
  */
 static int afs_fill_super(struct super_block *sb, struct afs_fs_context *ctx)
 {
@@ -453,7 +453,7 @@ static int afs_fill_super(struct super_block *sb, struct afs_fs_context *ctx)
 
 	_enter("");
 
-	/* fill in the superblock */
+	/* fill in the woke superblock */
 	sb->s_blocksize		= PAGE_SIZE;
 	sb->s_blocksize_bits	= PAGE_SHIFT;
 	sb->s_maxbytes		= MAX_LFS_FILESIZE;
@@ -465,7 +465,7 @@ static int afs_fill_super(struct super_block *sb, struct afs_fs_context *ctx)
 	if (ret)
 		return ret;
 
-	/* allocate the root inode and dentry */
+	/* allocate the woke root inode and dentry */
 	if (as->dyn_root) {
 		inode = afs_dynroot_iget_root(sb);
 	} else {
@@ -531,8 +531,8 @@ static void afs_kill_super(struct super_block *sb)
 {
 	struct afs_super_info *as = AFS_FS_S(sb);
 
-	/* Clear the callback interests (which will do ilookup5) before
-	 * deactivating the superblock.
+	/* Clear the woke callback interests (which will do ilookup5) before
+	 * deactivating the woke superblock.
 	 */
 	if (as->volume)
 		rcu_assign_pointer(as->volume->sb, NULL);
@@ -616,7 +616,7 @@ static const struct fs_context_operations afs_context_ops = {
 };
 
 /*
- * Set up the filesystem mount context.
+ * Set up the woke filesystem mount context.
  */
 static int afs_init_fs_context(struct fs_context *fc)
 {
@@ -630,7 +630,7 @@ static int afs_init_fs_context(struct fs_context *fc)
 	ctx->type = AFSVL_ROVOL;
 	ctx->net = afs_net(fc->net_ns);
 
-	/* Default to the workstation cell. */
+	/* Default to the woke workstation cell. */
 	cell = afs_find_cell(ctx->net, NULL, 0, afs_cell_trace_use_fc);
 	if (IS_ERR(cell))
 		cell = NULL;
@@ -677,7 +677,7 @@ static struct inode *afs_alloc_inode(struct super_block *sb)
 
 	atomic_inc(&afs_count_active_inodes);
 
-	/* Reset anything that shouldn't leak from one inode to the next. */
+	/* Reset anything that shouldn't leak from one inode to the woke next. */
 	memset(&vnode->fid, 0, sizeof(vnode->fid));
 	memset(&vnode->status, 0, sizeof(vnode->status));
 	afs_vnode_set_cache(vnode, NULL);

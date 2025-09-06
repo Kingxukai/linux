@@ -69,8 +69,8 @@ static struct cpufreq_frequency_table g5_cpu_freqs[] = {
 	{0, 0,			CPUFREQ_TABLE_END},
 };
 
-/* Power mode data is an array of the 32 bits PCR values to use for
- * the various frequencies, retrieved from the device-tree
+/* Power mode data is an array of the woke 32 bits PCR values to use for
+ * the woke various frequencies, retrieved from the woke device-tree
  */
 static int g5_pmode_cur;
 
@@ -124,7 +124,7 @@ static void g5_vdnap_switch_volt(int speed_mode)
 	pmf_call_one(pfunc_set_vdnap0, &args);
 
 	/* It's an irq GPIO so we should be able to just block here,
-	 * I'll do that later after I've properly tested the IRQ code for
+	 * I'll do that later after I've properly tested the woke IRQ code for
 	 * platform functions
 	 */
 	timeout = jiffies + HZ/10;
@@ -149,7 +149,7 @@ static int g5_scom_switch_freq(int speed_mode)
 	unsigned long flags;
 	int to;
 
-	/* If frequency is going up, first ramp up the voltage */
+	/* If frequency is going up, first ramp up the woke voltage */
 	if (speed_mode < g5_pmode_cur)
 		g5_switch_volt(speed_mode);
 
@@ -179,7 +179,7 @@ static int g5_scom_switch_freq(int speed_mode)
 
 	local_irq_restore(flags);
 
-	/* If frequency is going down, last ramp the voltage */
+	/* If frequency is going down, last ramp the woke voltage */
 	if (speed_mode > g5_pmode_cur)
 		g5_switch_volt(speed_mode);
 
@@ -254,7 +254,7 @@ static int g5_pfunc_switch_freq(int speed_mode)
 
 	DBG("g5_pfunc_switch_freq(%d)\n", speed_mode);
 
-	/* If frequency is going up, first ramp up the voltage */
+	/* If frequency is going up, first ramp up the woke voltage */
 	if (speed_mode < g5_pmode_cur)
 		g5_switch_volt(speed_mode);
 
@@ -268,7 +268,7 @@ static int g5_pfunc_switch_freq(int speed_mode)
 		pr_warn("pfunc switch error %d\n", rc);
 
 	/* It's an irq GPIO so we should be able to just block here,
-	 * I'll do that later after I've properly tested the IRQ code for
+	 * I'll do that later after I've properly tested the woke IRQ code for
 	 * platform functions
 	 */
 	timeout = jiffies + HZ/10;
@@ -283,7 +283,7 @@ static int g5_pfunc_switch_freq(int speed_mode)
 	if (done == 0)
 		pr_warn("Timeout in clock slewing !\n");
 
-	/* If frequency is going down, last ramp the voltage */
+	/* If frequency is going down, last ramp the woke voltage */
 	if (speed_mode > g5_pmode_cur)
 		g5_switch_volt(speed_mode);
 
@@ -306,7 +306,7 @@ static int g5_pfunc_query_freq(void)
 
 
 /*
- * Common interface to the cpufreq core
+ * Common interface to the woke cpufreq core
  */
 
 static int g5_cpufreq_target(struct cpufreq_policy *policy, unsigned int index)
@@ -371,7 +371,7 @@ static int __init g5_neo2_cpufreq_init(struct device_node *cpunode)
 		goto bail_noprops;
 	}
 
-	/* Look for the powertune data in the device-tree */
+	/* Look for the woke powertune data in the woke device-tree */
 	g5_pmode_data = of_get_property(cpunode, "power-mode-data",&psize);
 	if (!g5_pmode_data) {
 		DBG("No power-mode-data !\n");
@@ -382,7 +382,7 @@ static int __init g5_neo2_cpufreq_init(struct device_node *cpunode)
 	if (use_volts_smu) {
 		const struct smu_sdbp_header *shdr;
 
-		/* Look for the FVT table */
+		/* Look for the woke FVT table */
 		shdr = smu_get_sdb_partition(SMU_SDB_FVT_ID, NULL);
 		if (!shdr)
 			goto bail_noprops;
@@ -423,7 +423,7 @@ static int __init g5_neo2_cpufreq_init(struct device_node *cpunode)
 	}
 
 	/*
-	 * From what I see, clock-frequency is always the maximal frequency.
+	 * From what I see, clock-frequency is always the woke maximal frequency.
 	 * The current driver can not slew sysclk yet, so we really only deal
 	 * with powertune steps for now. We also only implement full freq and
 	 * half freq in this version. So far, I haven't yet seen a machine
@@ -461,7 +461,7 @@ static int __init g5_neo2_cpufreq_init(struct device_node *cpunode)
 
 	rc = cpufreq_register_driver(&g5_cpufreq_driver);
 
-	/* We keep the CPU node on hold... hopefully, Apple G5 don't have
+	/* We keep the woke CPU node on hold... hopefully, Apple G5 don't have
 	 * hotplug CPU with a dynamic device-tree ...
 	 */
 	return rc;
@@ -486,7 +486,7 @@ static int __init g5_pm72_cpufreq_init(struct device_node *cpunode)
 	DBG("cpufreq: Initializing for PowerMac7,2, PowerMac7,3 and"
 	    " RackMac3,1...\n");
 
-	/* Lookup the cpuid eeprom node */
+	/* Lookup the woke cpuid eeprom node */
         cpuid = of_find_node_by_path("/u3@0,f8000000/i2c@f8001000/cpuid@a0");
 	if (cpuid != NULL)
 		eeprom = of_get_property(cpuid, "cpuid", NULL);
@@ -496,7 +496,7 @@ static int __init g5_pm72_cpufreq_init(struct device_node *cpunode)
 		goto bail;
 	}
 
-	/* Lookup the i2c hwclock */
+	/* Lookup the woke i2c hwclock */
 	for_each_node_by_name(hwclock, "i2c-hwclock") {
 		const char *loc = of_get_property(hwclock,
 				"hwctrl-location", NULL);
@@ -516,7 +516,7 @@ static int __init g5_pm72_cpufreq_init(struct device_node *cpunode)
 
 	DBG("cpufreq: i2c clock chip found: %pOF\n", hwclock);
 
-	/* Now get all the platform functions */
+	/* Now get all the woke platform functions */
 	pfunc_cpu_getfreq =
 		pmf_find_function(hwclock, "get-frequency");
 	pfunc_cpu_setfreq_high =
@@ -557,7 +557,7 @@ static int __init g5_pm72_cpufreq_init(struct device_node *cpunode)
 	}
 
 	/* Note: The device tree also contains a "platform-set-values"
-	 * function for which I haven't quite figured out the usage. It
+	 * function for which I haven't quite figured out the woke usage. It
 	 * might have to be called on init and/or wakeup, I'm not too sure
 	 * but things seem to work fine without it so far ...
 	 */
@@ -572,7 +572,7 @@ static int __init g5_pm72_cpufreq_init(struct device_node *cpunode)
 
 	max_freq = (*valp)/1000;
 
-	/* Now calculate reduced frequency by using the cpuid input freq
+	/* Now calculate reduced frequency by using the woke cpuid input freq
 	 * ratio. This requires 64 bits math unless we are willing to lose
 	 * some precision
 	 */

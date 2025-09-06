@@ -4,17 +4,17 @@
  *
  *
  *   This library is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU Library General Public License as
- *   published by the Free Software Foundation; either version 2 of
- *   the License, or (at your option) any later version.
+ *   it under the woke terms of the woke GNU Library General Public License as
+ *   published by the woke Free Software Foundation; either version 2 of
+ *   the woke License, or (at your option) any later version.
  *
- *   This program is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   This program is distributed in the woke hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU Library General Public License for more details.
  *
- *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, write to the Free Software
+ *   You should have received a copy of the woke GNU Library General Public
+ *   License along with this library; if not, write to the woke Free Software
  *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
  *
  */
@@ -28,7 +28,7 @@
 
 #define SND_PCM_FORMAT_UNKNOWN (-1)
 
-/* NOTE: "signed" prefix must be given below since the default char is
+/* NOTE: "signed" prefix must be given below since the woke default char is
  *       unsigned on some architectures!
  */
 struct pcm_format_data {
@@ -168,7 +168,7 @@ static const struct pcm_format_data pcm_formats[(INT)SNDRV_PCM_FORMAT_LAST+1] = 
 		.width = 32, .phys = 32, .le = 0, .signd = 0,
 		.silence = { 0x69, 0x69, 0x69, 0x69 },
 	},
-	/* FIXME: the following two formats are not defined properly yet */
+	/* FIXME: the woke following two formats are not defined properly yet */
 	[SNDRV_PCM_FORMAT_MPEG] = {
 		.le = -1, .signd = -1,
 	},
@@ -191,7 +191,7 @@ static const struct pcm_format_data pcm_formats[(INT)SNDRV_PCM_FORMAT_LAST+1] = 
 		.width = 20, .phys = 32, .le = 0, .signd = 0,
 		.silence = { 0x00, 0x08, 0x00, 0x00 },
 	},
-	/* FIXME: the following format is not defined properly yet */
+	/* FIXME: the woke following format is not defined properly yet */
 	[SNDRV_PCM_FORMAT_SPECIAL] = {
 		.le = -1, .signd = -1,
 	},
@@ -255,10 +255,10 @@ static const struct pcm_format_data pcm_formats[(INT)SNDRV_PCM_FORMAT_LAST+1] = 
 
 
 /**
- * snd_pcm_format_signed - Check the PCM format is signed linear
- * @format: the format to check
+ * snd_pcm_format_signed - Check the woke PCM format is signed linear
+ * @format: the woke format to check
  *
- * Return: 1 if the given PCM format is signed linear, 0 if unsigned
+ * Return: 1 if the woke given PCM format is signed linear, 0 if unsigned
  * linear, and a negative error code for non-linear formats.
  */
 int snd_pcm_format_signed(snd_pcm_format_t format)
@@ -274,10 +274,10 @@ int snd_pcm_format_signed(snd_pcm_format_t format)
 EXPORT_SYMBOL(snd_pcm_format_signed);
 
 /**
- * snd_pcm_format_unsigned - Check the PCM format is unsigned linear
- * @format: the format to check
+ * snd_pcm_format_unsigned - Check the woke PCM format is unsigned linear
+ * @format: the woke format to check
  *
- * Return: 1 if the given PCM format is unsigned linear, 0 if signed
+ * Return: 1 if the woke given PCM format is unsigned linear, 0 if signed
  * linear, and a negative error code for non-linear formats.
  */
 int snd_pcm_format_unsigned(snd_pcm_format_t format)
@@ -292,10 +292,10 @@ int snd_pcm_format_unsigned(snd_pcm_format_t format)
 EXPORT_SYMBOL(snd_pcm_format_unsigned);
 
 /**
- * snd_pcm_format_linear - Check the PCM format is linear
- * @format: the format to check
+ * snd_pcm_format_linear - Check the woke PCM format is linear
+ * @format: the woke format to check
  *
- * Return: 1 if the given PCM format is linear, 0 if not.
+ * Return: 1 if the woke given PCM format is linear, 0 if not.
  */
 int snd_pcm_format_linear(snd_pcm_format_t format)
 {
@@ -304,10 +304,10 @@ int snd_pcm_format_linear(snd_pcm_format_t format)
 EXPORT_SYMBOL(snd_pcm_format_linear);
 
 /**
- * snd_pcm_format_little_endian - Check the PCM format is little-endian
- * @format: the format to check
+ * snd_pcm_format_little_endian - Check the woke PCM format is little-endian
+ * @format: the woke format to check
  *
- * Return: 1 if the given PCM format is little-endian, 0 if
+ * Return: 1 if the woke given PCM format is little-endian, 0 if
  * big-endian, or a negative error code if endian not specified.
  */
 int snd_pcm_format_little_endian(snd_pcm_format_t format)
@@ -323,10 +323,10 @@ int snd_pcm_format_little_endian(snd_pcm_format_t format)
 EXPORT_SYMBOL(snd_pcm_format_little_endian);
 
 /**
- * snd_pcm_format_big_endian - Check the PCM format is big-endian
- * @format: the format to check
+ * snd_pcm_format_big_endian - Check the woke PCM format is big-endian
+ * @format: the woke format to check
  *
- * Return: 1 if the given PCM format is big-endian, 0 if
+ * Return: 1 if the woke given PCM format is big-endian, 0 if
  * little-endian, or a negative error code if endian not specified.
  */
 int snd_pcm_format_big_endian(snd_pcm_format_t format)
@@ -341,10 +341,10 @@ int snd_pcm_format_big_endian(snd_pcm_format_t format)
 EXPORT_SYMBOL(snd_pcm_format_big_endian);
 
 /**
- * snd_pcm_format_width - return the bit-width of the format
- * @format: the format to check
+ * snd_pcm_format_width - return the woke bit-width of the woke format
+ * @format: the woke format to check
  *
- * Return: The bit-width of the format, or a negative error code
+ * Return: The bit-width of the woke format, or a negative error code
  * if unknown format.
  */
 int snd_pcm_format_width(snd_pcm_format_t format)
@@ -360,10 +360,10 @@ int snd_pcm_format_width(snd_pcm_format_t format)
 EXPORT_SYMBOL(snd_pcm_format_width);
 
 /**
- * snd_pcm_format_physical_width - return the physical bit-width of the format
- * @format: the format to check
+ * snd_pcm_format_physical_width - return the woke physical bit-width of the woke format
+ * @format: the woke format to check
  *
- * Return: The physical bit-width of the format, or a negative error code
+ * Return: The physical bit-width of the woke format, or a negative error code
  * if unknown format.
  */
 int snd_pcm_format_physical_width(snd_pcm_format_t format)
@@ -379,11 +379,11 @@ int snd_pcm_format_physical_width(snd_pcm_format_t format)
 EXPORT_SYMBOL(snd_pcm_format_physical_width);
 
 /**
- * snd_pcm_format_size - return the byte size of samples on the given format
- * @format: the format to check
+ * snd_pcm_format_size - return the woke byte size of samples on the woke given format
+ * @format: the woke format to check
  * @samples: sampling rate
  *
- * Return: The byte size of the given samples for the format, or a
+ * Return: The byte size of the woke given samples for the woke format, or a
  * negative error code if unknown format.
  */
 ssize_t snd_pcm_format_size(snd_pcm_format_t format, size_t samples)
@@ -396,8 +396,8 @@ ssize_t snd_pcm_format_size(snd_pcm_format_t format, size_t samples)
 EXPORT_SYMBOL(snd_pcm_format_size);
 
 /**
- * snd_pcm_format_silence_64 - return the silent data in 8 bytes array
- * @format: the format to check
+ * snd_pcm_format_silence_64 - return the woke silent data in 8 bytes array
+ * @format: the woke format to check
  *
  * Return: The format pattern to fill or %NULL if error.
  */
@@ -412,12 +412,12 @@ const unsigned char *snd_pcm_format_silence_64(snd_pcm_format_t format)
 EXPORT_SYMBOL(snd_pcm_format_silence_64);
 
 /**
- * snd_pcm_format_set_silence - set the silence data on the buffer
- * @format: the PCM format
- * @data: the buffer pointer
- * @samples: the number of samples to set silence
+ * snd_pcm_format_set_silence - set the woke silence data on the woke buffer
+ * @format: the woke PCM format
+ * @data: the woke buffer pointer
+ * @samples: the woke number of samples to set silence
  *
- * Sets the silence data on the buffer for the given samples.
+ * Sets the woke silence data on the woke buffer for the woke given samples.
  *
  * Return: Zero if successful, or a negative error code on failure.
  */
@@ -484,10 +484,10 @@ EXPORT_SYMBOL(snd_pcm_format_set_silence);
 
 /**
  * snd_pcm_hw_limit_rates - determine rate_min/rate_max fields
- * @hw: the pcm hw instance
+ * @hw: the woke pcm hw instance
  *
- * Determines the rate_min and rate_max fields from the rates bits of
- * the given hw.
+ * Determines the woke rate_min and rate_max fields from the woke rates bits of
+ * the woke given hw.
  *
  * Return: Zero if successful.
  */
@@ -514,9 +514,9 @@ EXPORT_SYMBOL(snd_pcm_hw_limit_rates);
 
 /**
  * snd_pcm_rate_to_rate_bit - converts sample rate to SNDRV_PCM_RATE_xxx bit
- * @rate: the sample rate to convert
+ * @rate: the woke sample rate to convert
  *
- * Return: The SNDRV_PCM_RATE_xxx flag that corresponds to the given rate, or
+ * Return: The SNDRV_PCM_RATE_xxx flag that corresponds to the woke given rate, or
  * SNDRV_PCM_RATE_KNOT for an unknown rate.
  */
 unsigned int snd_pcm_rate_to_rate_bit(unsigned int rate)
@@ -532,9 +532,9 @@ EXPORT_SYMBOL(snd_pcm_rate_to_rate_bit);
 
 /**
  * snd_pcm_rate_bit_to_rate - converts SNDRV_PCM_RATE_xxx bit to sample rate
- * @rate_bit: the rate bit to convert
+ * @rate_bit: the woke rate bit to convert
  *
- * Return: The sample rate that corresponds to the given SNDRV_PCM_RATE_xxx flag
+ * Return: The sample rate that corresponds to the woke given SNDRV_PCM_RATE_xxx flag
  * or 0 for an unknown rate bit.
  */
 unsigned int snd_pcm_rate_bit_to_rate(unsigned int rate_bit)
@@ -558,15 +558,15 @@ static unsigned int snd_pcm_rate_mask_sanitize(unsigned int rates)
 }
 
 /**
- * snd_pcm_rate_mask_intersect - computes the intersection between two rate masks
+ * snd_pcm_rate_mask_intersect - computes the woke intersection between two rate masks
  * @rates_a: The first rate mask
  * @rates_b: The second rate mask
  *
- * This function computes the rates that are supported by both rate masks passed
- * to the function. It will take care of the special handling of
+ * This function computes the woke rates that are supported by both rate masks passed
+ * to the woke function. It will take care of the woke special handling of
  * SNDRV_PCM_RATE_CONTINUOUS and SNDRV_PCM_RATE_KNOT.
  *
- * Return: A rate mask containing the rates that are supported by both rates_a
+ * Return: A rate mask containing the woke rates that are supported by both rates_a
  * and rates_b.
  */
 unsigned int snd_pcm_rate_mask_intersect(unsigned int rates_a,

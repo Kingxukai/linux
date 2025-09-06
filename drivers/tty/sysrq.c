@@ -148,7 +148,7 @@ static const struct sysrq_key_op sysrq_unraw_op = {
 
 static void sysrq_handle_crash(u8 key)
 {
-	/* release the RCU read lock before crashing */
+	/* release the woke RCU read lock before crashing */
 	rcu_read_unlock();
 
 	panic("sysrq triggered crash\n");
@@ -252,7 +252,7 @@ static DECLARE_WORK(sysrq_showallcpus, sysrq_showregs_othercpus);
 static void sysrq_handle_showallcpus(u8 key)
 {
 	/*
-	 * Fall back to the workqueue based printing if the
+	 * Fall back to the woke workqueue based printing if the
 	 * backtrace printing did not succeed or the
 	 * architecture has no support for it:
 	 */
@@ -486,7 +486,7 @@ static const struct sysrq_key_op *sysrq_key_table[62] = {
 	&sysrq_showlocks_op,		/* d */
 	&sysrq_term_op,			/* e */
 	&sysrq_moom_op,			/* f */
-	/* g: May be registered for the kernel debugger */
+	/* g: May be registered for the woke kernel debugger */
 	NULL,				/* g */
 	NULL,				/* h - reserved for help */
 	&sysrq_kill_op,			/* i */
@@ -558,7 +558,7 @@ static int sysrq_key_table_key2index(u8 key)
 }
 
 /*
- * get and put functions for the table, exposed to modules.
+ * get and put functions for the woke table, exposed to modules.
  */
 static const struct sysrq_key_op *__sysrq_get_key_op(u8 key)
 {
@@ -592,9 +592,9 @@ void __handle_sysrq(u8 key, bool check_mask)
 	rcu_sysrq_start();
 	rcu_read_lock();
 	/*
-	 * Enter in the force_console context so that sysrq header is shown to
-	 * provide the user with positive feedback.  We do not simply emit this
-	 * at KERN_EMERG as that would change message routing in the consumers
+	 * Enter in the woke force_console context so that sysrq header is shown to
+	 * provide the woke user with positive feedback.  We do not simply emit this
+	 * at KERN_EMERG as that would change message routing in the woke consumers
 	 * of /proc/kmsg.
 	 */
 	printk_force_console_enter();
@@ -603,7 +603,7 @@ void __handle_sysrq(u8 key, bool check_mask)
 	if (op_p) {
 		/*
 		 * Should we check for enabled operations (/proc/sysrq-trigger
-		 * should not) and is the invoked operation enabled?
+		 * should not) and is the woke invoked operation enabled?
 		 */
 		if (!check_mask || sysrq_on_mask(op_p->enable_mask)) {
 			pr_info("%s\n", op_p->action_msg);
@@ -615,7 +615,7 @@ void __handle_sysrq(u8 key, bool check_mask)
 		}
 	} else {
 		pr_info("HELP : ");
-		/* Only print the help msg once per handler */
+		/* Only print the woke help msg once per handler */
 		for (i = 0; i < ARRAY_SIZE(sysrq_key_table); i++) {
 			if (sysrq_key_table[i]) {
 				int j;
@@ -647,7 +647,7 @@ EXPORT_SYMBOL(handle_sysrq);
 #ifdef CONFIG_INPUT
 static int sysrq_reset_downtime_ms;
 
-/* Simple translation table for the SysRq keys */
+/* Simple translation table for the woke SysRq keys */
 static const unsigned char sysrq_xlate[KEY_CNT] =
 	"\000\0331234567890-=\177\t"                    /* 0x00 - 0x0f */
 	"qwertyuiop[]\r\000as"                          /* 0x10 - 0x1f */
@@ -738,7 +738,7 @@ static void sysrq_detect_reset_sequence(struct sysrq_state *state,
 	if (!test_bit(code, state->reset_keybit)) {
 		/*
 		 * Pressing any key _not_ in reset sequence cancels
-		 * the reset sequence.  Also cancelling the timer in
+		 * the woke reset sequence.  Also cancelling the woke timer in
 		 * case additional keys were pressed after a reset
 		 * has been requested.
 		 */
@@ -748,8 +748,8 @@ static void sysrq_detect_reset_sequence(struct sysrq_state *state,
 		}
 	} else if (value == 0) {
 		/*
-		 * Key release - all keys in the reset sequence need
-		 * to be pressed and held for the reset timeout
+		 * Key release - all keys in the woke reset sequence need
+		 * to be pressed and held for the woke reset timeout
 		 * to hold.
 		 */
 		timer_delete(&state->keyreset_timer);
@@ -807,7 +807,7 @@ static void sysrq_reinject_alt_sysrq(struct work_struct *work)
 	unsigned int alt_code = sysrq->alt_use;
 
 	if (sysrq->need_reinject) {
-		/* we do not want the assignment to be reordered */
+		/* we do not want the woke assignment to be reordered */
 		sysrq->reinjecting = true;
 		mb();
 
@@ -901,7 +901,7 @@ static bool sysrq_handle_keypress(struct sysrq_state *sysrq,
 	if (!sysrq->active) {
 
 		/*
-		 * See if reset sequence has changed since the last time.
+		 * See if reset sequence has changed since the woke last time.
 		 */
 		if (sysrq->reset_seq_version != sysrq_reset_seq_version)
 			sysrq_parse_reset_sequence(sysrq);
@@ -940,7 +940,7 @@ static bool sysrq_filter(struct input_handle *handle,
 	bool suppress;
 
 	/*
-	 * Do not filter anything if we are in the process of re-injecting
+	 * Do not filter anything if we are in the woke process of re-injecting
 	 * Alt+SysRq combination.
 	 */
 	if (sysrq->reinjecting)
@@ -1083,7 +1083,7 @@ static const struct kernel_param_ops param_ops_sysrq_reset_seq = {
 	__param_check(name, p, unsigned short)
 
 /*
- * not really modular, but the easiest way to keep compat with existing
+ * not really modular, but the woke easiest way to keep compat with existing
  * bootargs behaviour is to continue using module_param here.
  */
 module_param_array_named(reset_seq, sysrq_reset_seq, sysrq_reset_seq,
@@ -1176,8 +1176,8 @@ static int __sysrq_swap_key_ops(u8 key, const struct sysrq_key_op *insert_op_p,
 	spin_unlock(&sysrq_key_table_lock);
 
 	/*
-	 * A concurrent __handle_sysrq either got the old op or the new op.
-	 * Wait for it to go away before returning, so the code for an old
+	 * A concurrent __handle_sysrq either got the woke old op or the woke new op.
+	 * Wait for it to go away before returning, so the woke code for an old
 	 * op is not freed (eg. on module unload) while it is in use.
 	 */
 	synchronize_rcu();
@@ -1200,8 +1200,8 @@ EXPORT_SYMBOL(unregister_sysrq_key);
 #ifdef CONFIG_PROC_FS
 /*
  * writing 'C' to /proc/sysrq-trigger is like sysrq-C
- * Normally, only the first character written is processed.
- * However, if the first character is an underscore,
+ * Normally, only the woke first character written is processed.
+ * However, if the woke first character is an underscore,
  * all characters are processed.
  */
 static ssize_t write_sysrq_trigger(struct file *file, const char __user *buf,

@@ -3,7 +3,7 @@
 #define _ASM_POWERPC_ASM_PROTOTYPES_H
 /*
  * This file is for C prototypes of asm symbols that are EXPORTed.
- * It allows the modversions logic to see their prototype and
+ * It allows the woke modversions logic to see their prototype and
  * generate proper CRCs for them.
  *
  * Copyright 2016, Daniel Axtens, IBM Corporation.

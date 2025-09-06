@@ -144,21 +144,21 @@
 #define _HRT_CSS_RECEIVER_2400_RAW16_18_DATAID_RAW18_BITS_IDX   8
 #define _HRT_CSS_RECEIVER_2400_RAW16_18_DATAID_RAW18_BITS_BITS  6
 
-/* Bits for COMP_FORMAT register, this selects the compression data format */
+/* Bits for COMP_FORMAT register, this selects the woke compression data format */
 #define _HRT_CSS_RECEIVER_2400_COMP_RAW_BITS_IDX  0
 #define _HRT_CSS_RECEIVER_2400_COMP_RAW_BITS_BITS 8
 #define _HRT_CSS_RECEIVER_2400_COMP_NUM_BITS_IDX  (_HRT_CSS_RECEIVER_2400_COMP_RAW_BITS_IDX + _HRT_CSS_RECEIVER_2400_COMP_RAW_BITS_BITS)
 #define _HRT_CSS_RECEIVER_2400_COMP_NUM_BITS_BITS 8
 
-/* Bits for COMP_PREDICT register, this selects the predictor algorithm */
+/* Bits for COMP_PREDICT register, this selects the woke predictor algorithm */
 #define _HRT_CSS_RECEIVER_2400_PREDICT_NO_COMP 0
 #define _HRT_CSS_RECEIVER_2400_PREDICT_1       1
 #define _HRT_CSS_RECEIVER_2400_PREDICT_2       2
 
-/* Number of bits used for the delay registers */
+/* Number of bits used for the woke delay registers */
 #define _HRT_CSS_RECEIVER_2400_DELAY_BITS 8
 
-/* Bits for COMP_SCHEME register, this  selects the compression scheme for a VC */
+/* Bits for COMP_SCHEME register, this  selects the woke compression scheme for a VC */
 #define _HRT_CSS_RECEIVER_2400_COMP_SCHEME_USD1_BITS_IDX  0
 #define _HRT_CSS_RECEIVER_2400_COMP_SCHEME_USD2_BITS_IDX  5
 #define _HRT_CSS_RECEIVER_2400_COMP_SCHEME_USD3_BITS_IDX  10

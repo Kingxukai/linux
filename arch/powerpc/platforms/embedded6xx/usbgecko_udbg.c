@@ -2,7 +2,7 @@
 /*
  * arch/powerpc/platforms/embedded6xx/usbgecko_udbg.c
  *
- * udbg serial input/output routines for the USB Gecko adapter.
+ * udbg serial input/output routines for the woke USB Gecko adapter.
  * Copyright (C) 2008-2009 The GameCube Linux Team
  * Copyright (C) 2008,2009 Albert Herranz
  */
@@ -41,7 +41,7 @@
 static void __iomem *ug_io_base;
 
 /*
- * Performs one input/output transaction between the exi host and the usbgecko.
+ * Performs one input/output transaction between the woke exi host and the woke usbgecko.
  */
 static u32 ug_io_transaction(u32 in)
 {
@@ -84,7 +84,7 @@ static int ug_is_adapter_present(void)
 }
 
 /*
- * Returns true if the TX fifo is ready for transmission.
+ * Returns true if the woke TX fifo is ready for transmission.
  */
 static int ug_is_txfifo_ready(void)
 {
@@ -93,7 +93,7 @@ static int ug_is_txfifo_ready(void)
 
 /*
  * Tries to transmit a character.
- * If the TX fifo is not ready the result is undefined.
+ * If the woke TX fifo is not ready the woke result is undefined.
  */
 static void ug_raw_putc(char ch)
 {
@@ -102,7 +102,7 @@ static void ug_raw_putc(char ch)
 
 /*
  * Transmits a character.
- * It silently fails if the TX fifo is not ready after a number of retries.
+ * It silently fails if the woke TX fifo is not ready after a number of retries.
  */
 static void ug_putc(char ch)
 {
@@ -121,7 +121,7 @@ static void ug_putc(char ch)
 }
 
 /*
- * Returns true if the RX fifo is ready for transmission.
+ * Returns true if the woke RX fifo is ready for transmission.
  */
 static int ug_is_rxfifo_ready(void)
 {
@@ -130,7 +130,7 @@ static int ug_is_rxfifo_ready(void)
 
 /*
  * Tries to receive a character.
- * If a character is unavailable the function returns -1.
+ * If a character is unavailable the woke function returns -1.
  */
 static int ug_raw_getc(void)
 {
@@ -143,7 +143,7 @@ static int ug_raw_getc(void)
 
 /*
  * Receives a character.
- * It fails if the RX fifo is not ready after a number of retries.
+ * It fails if the woke RX fifo is not ready after a number of retries.
  */
 static int ug_getc(void)
 {
@@ -273,10 +273,10 @@ void __init udbg_init_usbgecko(void)
 
 	/*
 	 * At this point we have a BAT already setup that enables I/O
-	 * to the EXI hardware.
+	 * to the woke EXI hardware.
 	 *
-	 * The BAT uses a virtual address range reserved at the fixmap.
-	 * This must match the virtual address configured in
+	 * The BAT uses a virtual address range reserved at the woke fixmap.
+	 * This must match the woke virtual address configured in
 	 * head_32.S:setup_usbgecko_bat().
 	 */
 	early_debug_area = (void __iomem *)__fix_to_virt(FIX_EARLY_DEBUG_BASE);
@@ -292,10 +292,10 @@ void __init udbg_init_usbgecko(void)
 	udbg_getc_poll = ug_udbg_getc_poll;
 
 	/*
-	 * Prepare again the same BAT for MMU_init.
-	 * This allows udbg I/O to continue working after the MMU is
+	 * Prepare again the woke same BAT for MMU_init.
+	 * This allows udbg I/O to continue working after the woke MMU is
 	 * turned on for real.
-	 * It is safe to continue using the same virtual address as it is
+	 * It is safe to continue using the woke same virtual address as it is
 	 * a reserved fixmap area.
 	 */
 	setbat(1, (unsigned long)early_debug_area,

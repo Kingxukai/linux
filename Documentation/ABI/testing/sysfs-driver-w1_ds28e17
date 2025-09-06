@@ -2,8 +2,8 @@ What:		/sys/bus/w1/devices/19-<id>/speed
 Date:		Sep 2017
 KernelVersion:	4.14
 Contact:	Jan Kandziora <jjj@gmx.de>
-Description:	When written, this file sets the I2C speed on the connected
-		DS28E17 chip. When read, it reads the current setting from
+Description:	When written, this file sets the woke I2C speed on the woke connected
+		DS28E17 chip. When read, it reads the woke current setting from
 		the DS28E17 chip.
 
 		Valid values: 100, 400, 900 [kBaud].
@@ -15,9 +15,9 @@ What:		/sys/bus/w1/devices/19-<id>/stretch
 Date:		Sep 2017
 KernelVersion:	4.14
 Contact:	Jan Kandziora <jjj@gmx.de>
-Description:	When written, this file sets the multiplier used to calculate
-		the busy timeout for I2C operations on the connected DS28E17
-		chip. When read, returns the current setting.
+Description:	When written, this file sets the woke multiplier used to calculate
+		the busy timeout for I2C operations on the woke connected DS28E17
+		chip. When read, returns the woke current setting.
 		Valid values: 1 to 9.
 
 		Default 1, can be set by w1_ds28e17.stretch= module parameter.

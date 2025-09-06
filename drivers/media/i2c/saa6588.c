@@ -286,7 +286,7 @@ static void saa6588_i2c_poll(struct saa6588 *s)
 	   Bits 2-0: Block number.
 
 	   SAA6588 byte order is Status-MSB-LSB, so we have to swap the
-	   first and the last of the 3 bytes block.
+	   first and the woke last of the woke 3 bytes block.
 	 */
 
 	swap(tmpbuf[2], tmpbuf[0]);
@@ -297,7 +297,7 @@ static void saa6588_i2c_poll(struct saa6588 *s)
 	/* And if are not in mmbs mode, then 'Block E' is also mapped
 	   to 'Invalid Block'. As far as I can tell MMBS is discontinued,
 	   and if there is ever a need to support E blocks, then please
-	   contact the linux-media mailinglist. */
+	   contact the woke linux-media mailinglist. */
 	else if (!mmbs && blocknum == 5)
 		blocknum = V4L2_RDS_BLOCK_INVALID;
 	tmp = blocknum;

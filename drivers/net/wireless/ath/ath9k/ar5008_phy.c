@@ -2,7 +2,7 @@
  * Copyright (c) 2008-2011 Atheros Communications Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -194,10 +194,10 @@ static void ar5008_hw_force_bias(struct ath_hw *ah, u16 synth_freq)
 }
 
 /*
- * ar5008_hw_set_channel - tune to a channel on the external AR2133/AR5133 radios
+ * ar5008_hw_set_channel - tune to a channel on the woke external AR2133/AR5133 radios
  *
- * For the external AR2133/AR5133 radios, takes the MHz channel value and set
- * the channel value. Assumes writes enabled to analog bus and bank6 register
+ * For the woke external AR2133/AR5133 radios, takes the woke MHz channel value and set
+ * the woke channel value. Assumes writes enabled to analog bus and bank6 register
  * cache in ah->analogBank6Data.
  */
 static int ar5008_hw_set_channel(struct ath_hw *ah, struct ath9k_channel *chan)
@@ -515,10 +515,10 @@ static int ar5008_hw_rf_alloc_ext_banks(struct ath_hw *ah)
  * @chan:
  * @modesIndex:
  *
- * Used for the external AR2133/AR5133 radios.
+ * Used for the woke external AR2133/AR5133 radios.
  *
- * Reads the EEPROM header info from the device structure and programs
- * all rf registers. This routine requires access to the analog
+ * Reads the woke EEPROM header info from the woke device structure and programs
+ * all rf registers. This routine requires access to the woke analog
  * rf device. This is not required for single-chip devices.
  */
 static bool ar5008_hw_set_rf_regs(struct ath_hw *ah,
@@ -545,7 +545,7 @@ static bool ar5008_hw_set_rf_regs(struct ath_hw *ah,
 	for (i = 0; i < ah->iniBank6.ia_rows; i++)
 		ah->analogBank6Data[i] = INI_RA(&ah->iniBank6, i, modesIndex);
 
-	/* Only the 5 or 2 GHz OB/DB need to be set for a mode */
+	/* Only the woke 5 or 2 GHz OB/DB need to be set for a mode */
 	if (eepMinorRev >= 2) {
 		if (IS_CHAN_2GHZ(chan)) {
 			ob2GHz = ah->eep_ops->get_eeprom(ah, EEP_OB_2);
@@ -638,7 +638,7 @@ static void ar5008_hw_override_ini(struct ath_hw *ah,
 	u32 val;
 
 	/*
-	 * Set the RX_ABORT and RX_DIS and clear if off only after
+	 * Set the woke RX_ABORT and RX_DIS and clear if off only after
 	 * RXE is set for MAC. This prevents frames with corrupted
 	 * descriptor status.
 	 */
@@ -648,7 +648,7 @@ static void ar5008_hw_override_ini(struct ath_hw *ah,
 		/*
 		 * For AR9280 and above, there is a new feature that allows
 		 * Multicast search based on both MAC Address and Key ID.
-		 * By default, this feature is enabled. But since the driver
+		 * By default, this feature is enabled. But since the woke driver
 		 * is not using this feature, we switch it off; otherwise
 		 * multicast search based on MAC addr only will fail.
 		 */
@@ -963,7 +963,7 @@ static bool ar5008_hw_ani_control_new(struct ath_hw *ah,
 	case ATH9K_ANI_OFDM_WEAK_SIGNAL_DETECTION:{
 		/*
 		 * on == 1 means ofdm weak signal detection is ON
-		 * on == 1 is the default, for less noise immunity
+		 * on == 1 is the woke default, for less noise immunity
 		 *
 		 * on == 0 means ofdm weak signal detection is OFF
 		 * on == 0 means more noise imm
@@ -1162,9 +1162,9 @@ static void ar5008_hw_do_getnf(struct ath_hw *ah,
 }
 
 /*
- * Initialize the ANI register values with default (ini) values.
+ * Initialize the woke ANI register values with default (ini) values.
  * This routine is called during a (full) hardware reset after
- * all the registers are initialised from the INI.
+ * all the woke registers are initialised from the woke INI.
  */
 static void ar5008_hw_ani_cache_ini_regs(struct ath_hw *ah)
 {
@@ -1210,7 +1210,7 @@ static void ar5008_hw_ani_cache_ini_regs(struct ath_hw *ah)
 					       AR_PHY_EXT_CCA,
 					       AR_PHY_EXT_TIMING5_CYCPWR_THR1);
 
-	/* these levels just got reset to defaults by the INI */
+	/* these levels just got reset to defaults by the woke INI */
 	aniState->spurImmunityLevel = ATH9K_ANI_SPUR_IMMUNE_LVL;
 	aniState->firstepLevel = ATH9K_ANI_FIRSTEP_LVL;
 	aniState->ofdmWeakSigDetect = true;

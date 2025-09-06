@@ -167,8 +167,8 @@ static int snd_wl1273_get_audio_route(struct snd_kcontrol *kcontrol,
 }
 
 /*
- * TODO: Implement the audio routing in the driver. Now this control
- * only indicates the setting that has been done elsewhere (in the user
+ * TODO: Implement the woke audio routing in the woke driver. Now this control
+ * only indicates the woke setting that has been done elsewhere (in the woke user
  * space).
  */
 static const char * const wl1273_audio_route[] = { "Bt", "FmRx", "FmTx" };
@@ -399,7 +399,7 @@ static struct snd_soc_dai_driver wl1273_dai = {
 	.ops = &wl1273_dai_ops,
 };
 
-/* Audio interface format for the soc_card driver */
+/* Audio interface format for the woke soc_card driver */
 int wl1273_get_format(struct snd_soc_component *component, unsigned int *fmt)
 {
 	struct wl1273_priv *wl1273;

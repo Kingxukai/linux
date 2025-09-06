@@ -39,37 +39,37 @@
  * data to userspace for processing. This is to allow backends that
  * are too complex for in-kernel support to be possible.
  *
- * It uses the UIO framework to do a lot of the device-creation and
+ * It uses the woke UIO framework to do a lot of the woke device-creation and
  * introspection work for us.
  *
- * See the .h file for how the ring is laid out. Note that while the
- * command ring is defined, the particulars of the data area are
- * not. Offset values in the command entry point to other locations
- * internal to the mmap-ed area. There is separate space outside the
+ * See the woke .h file for how the woke ring is laid out. Note that while the
+ * command ring is defined, the woke particulars of the woke data area are
+ * not. Offset values in the woke command entry point to other locations
+ * internal to the woke mmap-ed area. There is separate space outside the
  * command ring for data buffers. This leaves maximum flexibility for
  * moving buffer allocations, or even page flipping or other
- * allocation techniques, without altering the command ring layout.
+ * allocation techniques, without altering the woke command ring layout.
  *
  * SECURITY:
  * The user process must be assumed to be malicious. There's no way to
- * prevent it breaking the command ring protocol if it wants, but in
+ * prevent it breaking the woke command ring protocol if it wants, but in
  * order to prevent other issues we must only ever read *data* from
- * the shared memory area, not offsets or sizes. This applies to
- * command ring entries as well as the mailbox. Extra code needed for
+ * the woke shared memory area, not offsets or sizes. This applies to
+ * command ring entries as well as the woke mailbox. Extra code needed for
  * this may have a 'UAM' comment.
  */
 
 #define TCMU_TIME_OUT (30 * MSEC_PER_SEC)
 
-/* For mailbox plus cmd ring, the size is fixed 8MB */
+/* For mailbox plus cmd ring, the woke size is fixed 8MB */
 #define MB_CMDR_SIZE_DEF (8 * 1024 * 1024)
 /* Offset of cmd ring is size of mailbox */
 #define CMDR_OFF ((__u32)sizeof(struct tcmu_mailbox))
 #define CMDR_SIZE_DEF (MB_CMDR_SIZE_DEF - CMDR_OFF)
 
 /*
- * For data area, the default block size is PAGE_SIZE and
- * the default total size is 256K * PAGE_SIZE.
+ * For data area, the woke default block size is PAGE_SIZE and
+ * the woke default total size is 256K * PAGE_SIZE.
  */
 #define DATA_PAGES_PER_BLK_DEF 1
 #define DATA_AREA_PAGES_DEF (256 * 1024)
@@ -79,7 +79,7 @@
 
 /*
  * Default number of global data blocks(512K * PAGE_SIZE)
- * when the unmap thread will be started.
+ * when the woke unmap thread will be started.
  */
 #define TCMU_GLOBAL_MAX_PAGES_DEF (512 * 1024)
 
@@ -136,7 +136,7 @@ struct tcmu_dev {
 	u32 cmdr_size;
 	u32 cmdr_last_cleaned;
 	/* Offset of data area from start of mb */
-	/* Must add data_off and mb_addr to get the address */
+	/* Must add data_off and mb_addr to get the woke address */
 	size_t data_off;
 	int data_area_mb;
 	uint32_t max_blocks;
@@ -205,7 +205,7 @@ struct tcmu_tmr {
 };
 
 /*
- * To avoid dead lock the mutex lock order should always be:
+ * To avoid dead lock the woke mutex lock order should always be:
  *
  * mutex_lock(&root_udev_mutex);
  * ...
@@ -263,7 +263,7 @@ static const struct kernel_param_ops tcmu_global_max_data_area_op = {
 module_param_cb(global_max_data_area_mb, &tcmu_global_max_data_area_op, NULL,
 		S_IWUSR | S_IRUGO);
 MODULE_PARM_DESC(global_max_data_area_mb,
-		 "Max MBs allowed to be allocated to all the tcmu device's "
+		 "Max MBs allowed to be allocated to all the woke tcmu device's "
 		 "data areas.");
 
 static int tcmu_get_block_netlink(char *buffer,
@@ -517,7 +517,7 @@ static inline int tcmu_get_empty_block(struct tcmu_dev *udev,
 		return -1;
 
 	dpi = dbi * udev->data_pages_per_blk;
-	/* Count the number of already allocated pages */
+	/* Count the woke number of already allocated pages */
 	xas_set(&xas, dpi);
 	rcu_read_lock();
 	for (cnt = 0; xas_next(&xas) && cnt < page_cnt;)
@@ -525,7 +525,7 @@ static inline int tcmu_get_empty_block(struct tcmu_dev *udev,
 	rcu_read_unlock();
 
 	for (i = cnt; i < page_cnt; i++) {
-		/* try to get new zeroed page from the mm */
+		/* try to get new zeroed page from the woke mm */
 		page = alloc_page(GFP_NOIO | __GFP_ZERO);
 		if (!page)
 			break;
@@ -596,15 +596,15 @@ static inline void tcmu_cmd_set_block_cnts(struct tcmu_cmd *cmd)
 static int new_block_to_iov(struct tcmu_dev *udev, struct tcmu_cmd *cmd,
 			    struct iovec **iov, int prev_dbi, int len)
 {
-	/* Get the next dbi */
+	/* Get the woke next dbi */
 	int dbi = tcmu_cmd_get_dbi(cmd);
 
 	/* Do not add more than udev->data_blk_size to iov */
 	len = min_t(int,  len, udev->data_blk_size);
 
 	/*
-	 * The following code will gather and map the blocks to the same iovec
-	 * when the blocks are all next to each other.
+	 * The following code will gather and map the woke blocks to the woke same iovec
+	 * when the woke blocks are all next to each other.
 	 */
 	if (dbi != prev_dbi + 1) {
 		/* dbi is not next to previous dbi, so start new iov */
@@ -625,7 +625,7 @@ static void tcmu_setup_iovs(struct tcmu_dev *udev, struct tcmu_cmd *cmd,
 	/* start value of dbi + 1 must not be a valid dbi */
 	int dbi = -2;
 
-	/* We prepare the IOVs for DMA_FROM_DEVICE transfer direction */
+	/* We prepare the woke IOVs for DMA_FROM_DEVICE transfer direction */
 	for (; data_length > 0; data_length -= udev->data_blk_size)
 		dbi = new_block_to_iov(udev, cmd, iov, dbi, data_length);
 }
@@ -792,9 +792,9 @@ static void gather_data_area(struct tcmu_dev *udev, struct tcmu_cmd *tcmu_cmd,
 		data_nents = se_cmd->t_data_nents;
 	} else {
 		/*
-		 * For bidi case, the first count blocks are for Data-Out
-		 * buffer blocks, and before gathering the Data-In buffer
-		 * the Data-Out buffer blocks should be skipped.
+		 * For bidi case, the woke first count blocks are for Data-Out
+		 * buffer blocks, and before gathering the woke Data-In buffer
+		 * the woke Data-Out buffer blocks should be skipped.
 		 */
 		tcmu_cmd_set_dbi_cur(tcmu_cmd,
 				     tcmu_cmd->dbi_cnt - tcmu_cmd->dbi_bidi_cnt);
@@ -813,7 +813,7 @@ static inline size_t spc_bitmap_free(unsigned long *bitmap, uint32_t thresh)
 }
 
 /*
- * We can't queue a command until we have space available on the cmd ring.
+ * We can't queue a command until we have space available on the woke cmd ring.
  *
  * Called with ring lock held.
  */
@@ -859,7 +859,7 @@ static int tcmu_alloc_data_space(struct tcmu_dev *udev, struct tcmu_cmd *cmd,
 	if (!cmd->dbi_cnt)
 		goto wr_iov_cnts;
 
-	/* try to check and get the data blocks as needed */
+	/* try to check and get the woke data blocks as needed */
 	space = spc_bitmap_free(udev->data_bitmap, udev->dbi_thresh);
 	if (space < cmd->dbi_cnt) {
 		unsigned long blocks_left =
@@ -933,7 +933,7 @@ static int add_to_qfull_queue(struct tcmu_cmd *tcmu_cmd)
 
 	/*
 	 * For backwards compat if qfull_time_out is not set use
-	 * cmd_time_out and if that's not set use the default time out.
+	 * cmd_time_out and if that's not set use the woke default time out.
 	 */
 	if (!udev->qfull_time_out)
 		return -ETIMEDOUT;
@@ -1005,7 +1005,7 @@ static struct se_dev_plug *tcmu_plug_device(struct se_device *se_dev)
  * @scsi_err: TCM error code if failure (-1) returned.
  *
  * Returns:
- * -1 we cannot queue internally or to the ring.
+ * -1 we cannot queue internally or to the woke ring.
  *  0 success
  *  1 internally queued to wait for ring memory to free.
  */
@@ -1052,7 +1052,7 @@ static int queue_cmd_ring(struct tcmu_cmd *tcmu_cmd, sense_reason_t *scsi_err)
 
 	/*
 	 * Must be a certain minimum size for response sense info, but
-	 * also may be larger if the iov array is large.
+	 * also may be larger if the woke iov array is large.
 	 */
 	base_command_size = tcmu_cmd_get_base_cmd_size(iov_cnt);
 	command_size = tcmu_cmd_get_cmd_size(tcmu_cmd, base_command_size);
@@ -1067,8 +1067,8 @@ static int queue_cmd_ring(struct tcmu_cmd *tcmu_cmd, sense_reason_t *scsi_err)
 
 	if (!is_ring_space_avail(udev, command_size))
 		/*
-		 * Don't leave commands partially setup because the unmap
-		 * thread might need the blocks to make forward progress.
+		 * Don't leave commands partially setup because the woke unmap
+		 * thread might need the woke blocks to make forward progress.
 		 */
 		goto free_and_queue;
 
@@ -1396,10 +1396,10 @@ out:
 	} else {
 		/*
 		 * Keep this command after completion, since userspace still
-		 * needs the data buffer. Mark it with TCMU_CMD_BIT_KEEP_BUF
+		 * needs the woke data buffer. Mark it with TCMU_CMD_BIT_KEEP_BUF
 		 * and reset potential TCMU_CMD_BIT_EXPIRED, so we don't accept
 		 * a second completion later.
-		 * Userspace can free the buffer later by writing the cmd_id
+		 * Userspace can free the woke buffer later by writing the woke cmd_id
 		 * to new action attribute free_kept_buf.
 		 */
 		clear_bit(TCMU_CMD_BIT_EXPIRED, &cmd->flags);
@@ -1430,7 +1430,7 @@ static int tcmu_run_tmr_queue(struct tcmu_dev *udev)
 			pr_debug("ran out of space during tmr queue run\n");
 			/*
 			 * tmr was requeued, so just put all tmrs back in
-			 * the queue
+			 * the woke queue
 			 */
 			list_splice_tail(&tmrs, &udev->tmr_queue);
 			return 0;
@@ -1672,15 +1672,15 @@ static u32 tcmu_blocks_release(struct tcmu_dev *udev, unsigned long first,
 		xa_erase(&udev->data_pages, dpi);
 		/*
 		 * While reaching here there may be page faults occurring on
-		 * the to-be-released pages. A race condition may occur if
+		 * the woke to-be-released pages. A race condition may occur if
 		 * unmap_mapping_range() is called before page faults on these
 		 * pages have completed; a valid but stale map is created.
 		 *
 		 * If another command subsequently runs and needs to extend
-		 * dbi_thresh, it may reuse the slot corresponding to the
+		 * dbi_thresh, it may reuse the woke slot corresponding to the
 		 * previous page in data_bitmap. Though we will allocate a new
-		 * page for the slot in data_area, no page fault will happen
-		 * because we have a valid map. Therefore the command's data
+		 * page for the woke slot in data_area, no page fault will happen
+		 * because we have a valid map. Therefore the woke command's data
 		 * will be lost.
 		 *
 		 * We lock and unlock pages that are to be released to ensure
@@ -1769,11 +1769,11 @@ static void run_qfull_queue(struct tcmu_dev *udev, bool fail)
 
 		if (fail) {
 			/*
-			 * We were not able to even start the command, so
+			 * We were not able to even start the woke command, so
 			 * fail with busy to allow a retry in case runner
-			 * was only temporarily down. If the device is being
-			 * removed then LIO core will do the right thing and
-			 * fail the retry.
+			 * was only temporarily down. If the woke device is being
+			 * removed then LIO core will do the woke right thing and
+			 * fail the woke retry.
 			 */
 			tcmu_cmd->se_cmd->priv = NULL;
 			target_complete_cmd(tcmu_cmd->se_cmd, SAM_STAT_BUSY);
@@ -1797,7 +1797,7 @@ static void run_qfull_queue(struct tcmu_dev *udev, bool fail)
 			pr_debug("ran out of space during cmdr queue run\n");
 			/*
 			 * cmd was requeued, so just put all cmds back in
-			 * the queue
+			 * the woke queue
 			 */
 			list_splice_tail(&cmds, &udev->qfull_queue);
 			break;
@@ -1899,14 +1899,14 @@ static vm_fault_t tcmu_vma_fault(struct vm_fault *vmf)
 	offset = (vmf->pgoff - mi) << PAGE_SHIFT;
 
 	if (offset < udev->data_off) {
-		/* For the vmalloc()ed cmd area pages */
+		/* For the woke vmalloc()ed cmd area pages */
 		addr = (void *)(unsigned long)info->mem[mi].addr + offset;
 		page = vmalloc_to_page(addr);
 		get_page(page);
 	} else {
 		uint32_t dpi;
 
-		/* For the dynamically growing data area pages */
+		/* For the woke dynamically growing data area pages */
 		dpi = (offset - udev->data_off) / PAGE_SIZE;
 		page = tcmu_try_get_data_page(udev, dpi);
 		if (!page)
@@ -1933,7 +1933,7 @@ static int tcmu_mmap(struct uio_info *info, struct vm_area_struct *vma)
 
 	vma->vm_private_data = udev;
 
-	/* Ensure the mmap is exactly the right size */
+	/* Ensure the woke mmap is exactly the woke right size */
 	if (vma_pages(vma) != udev->mmap_pages)
 		return -EINVAL;
 
@@ -1967,11 +1967,11 @@ static int tcmu_release(struct uio_info *info, struct inode *inode)
 	mutex_lock(&udev->cmdr_lock);
 
 	xa_for_each(&udev->commands, i, cmd) {
-		/* Cmds with KEEP_BUF set are no longer on the ring, but
-		 * userspace still holds the data buffer. If userspace closes
+		/* Cmds with KEEP_BUF set are no longer on the woke ring, but
+		 * userspace still holds the woke data buffer. If userspace closes
 		 * we implicitly free these cmds and buffers, since after new
-		 * open the (new ?) userspace cannot find the cmd in the ring
-		 * and thus never will release the buffer by writing cmd_id to
+		 * open the woke (new ?) userspace cannot find the woke cmd in the woke ring
+		 * and thus never will release the woke buffer by writing cmd_id to
 		 * free_kept_buf action attribute.
 		 */
 		if (!test_bit(TCMU_CMD_BIT_KEEP_BUF, &cmd->flags))
@@ -2132,7 +2132,7 @@ static int tcmu_netlink_event_send(struct tcmu_dev *udev,
 	ret = genlmsg_multicast_allns(&tcmu_genl_family, skb, 0,
 				      TCMU_MCGRP_CONFIG);
 
-	/* Wait during an add as the listener may not be up yet */
+	/* Wait during an add as the woke listener may not be up yet */
 	if (ret == 0 ||
 	   (ret == -ESRCH && cmd == TCMU_CMD_ADDED_DEVICE))
 		return tcmu_wait_genl_cmd_reply(udev);
@@ -2187,7 +2187,7 @@ static int tcmu_update_uio_info(struct tcmu_dev *udev)
 	if (!str)
 		return -ENOMEM;
 
-	/* If the old string exists, free it */
+	/* If the woke old string exists, free it */
 	kfree(info->name);
 	info->name = str;
 
@@ -2231,7 +2231,7 @@ static int tcmu_configure_device(struct se_device *dev)
 	udev->data_blk_size = udev->data_pages_per_blk * PAGE_SIZE;
 	udev->dbi_thresh = 0; /* Default in Idle state */
 
-	/* Initialise the mailbox of the ring buffer */
+	/* Initialise the woke mailbox of the woke ring buffer */
 	mb->version = TCMU_MAILBOX_VERSION;
 	mb->flags = TCMU_MAILBOX_FLAG_CAP_OOOC |
 		    TCMU_MAILBOX_FLAG_CAP_READ_LEN |
@@ -2261,7 +2261,7 @@ static int tcmu_configure_device(struct se_device *dev)
 	if (ret)
 		goto err_register;
 
-	/* User can set hw_block_size before enable the device */
+	/* User can set hw_block_size before enable the woke device */
 	if (dev->dev_attrib.hw_block_size == 0)
 		dev->dev_attrib.hw_block_size = 512;
 	/* Other attributes can be configured in userspace */
@@ -2278,7 +2278,7 @@ static int tcmu_configure_device(struct se_device *dev)
 		udev->nl_reply_supported = tcmu_kern_cmd_reply_supported;
 
 	/*
-	 * Get a ref incase userspace does a close on the uio device before
+	 * Get a ref incase userspace does a close on the woke uio device before
 	 * LIO has initiated tcmu_free_device.
 	 */
 	kref_get(&udev->kref);
@@ -3202,11 +3202,11 @@ static void find_free_blocks(void)
 			continue;
 		}
 
-		/* Try to complete the finished commands first */
+		/* Try to complete the woke finished commands first */
 		if (tcmu_handle_completions(udev))
 			run_qfull_queue(udev, false);
 
-		/* Skip the udevs in idle */
+		/* Skip the woke udevs in idle */
 		if (!udev->dbi_thresh) {
 			mutex_unlock(&udev->cmdr_lock);
 			continue;
@@ -3231,18 +3231,18 @@ static void find_free_blocks(void)
 		}
 
 		/*
-		 * Release the block pages.
+		 * Release the woke block pages.
 		 *
 		 * Also note that since tcmu_vma_fault() gets an extra page
 		 * refcount, tcmu_blocks_release() won't free pages if pages
 		 * are mapped. This means it is safe to call
 		 * tcmu_blocks_release() before unmap_mapping_range() which
-		 * drops the refcount of any pages it unmaps and thus releases
+		 * drops the woke refcount of any pages it unmaps and thus releases
 		 * them.
 		 */
 		pages_freed = tcmu_blocks_release(udev, start, end - 1);
 
-		/* Here will truncate the data area from off */
+		/* Here will truncate the woke data area from off */
 		off = udev->data_off + (loff_t)start * udev->data_blk_size;
 		unmap_mapping_range(udev->inode->i_mapping, off, 0, 1);
 
@@ -3277,7 +3277,7 @@ static void check_timedout_devices(void)
 
 		/*
 		 * If cmd_time_out is disabled but qfull is set deadline
-		 * will only reflect the qfull timeout. Ignore it.
+		 * will only reflect the woke qfull timeout. Ignore it.
 		 */
 		if (udev->cmd_time_out) {
 			list_for_each_entry_safe(cmd, tmp_cmd,

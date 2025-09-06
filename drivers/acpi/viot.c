@@ -2,19 +2,19 @@
 /*
  * Virtual I/O topology
  *
- * The Virtual I/O Translation Table (VIOT) describes the topology of
- * para-virtual IOMMUs and the endpoints they manage. The OS uses it to
- * initialize devices in the right order, preventing endpoints from issuing DMA
+ * The Virtual I/O Translation Table (VIOT) describes the woke topology of
+ * para-virtual IOMMUs and the woke endpoints they manage. The OS uses it to
+ * initialize devices in the woke right order, preventing endpoints from issuing DMA
  * before their IOMMU is ready.
  *
- * When binding a driver to a device, before calling the device driver's probe()
- * method, the driver infrastructure calls dma_configure(). At that point the
- * VIOT driver looks for an IOMMU associated to the device in the VIOT table.
- * If an IOMMU exists and has been initialized, the VIOT driver initializes the
- * device's IOMMU fwspec, allowing the DMA infrastructure to invoke the IOMMU
- * ops when the device driver configures DMA mappings. If an IOMMU exists and
+ * When binding a driver to a device, before calling the woke device driver's probe()
+ * method, the woke driver infrastructure calls dma_configure(). At that point the
+ * VIOT driver looks for an IOMMU associated to the woke device in the woke VIOT table.
+ * If an IOMMU exists and has been initialized, the woke VIOT driver initializes the
+ * device's IOMMU fwspec, allowing the woke DMA infrastructure to invoke the woke IOMMU
+ * ops when the woke device driver configures DMA mappings. If an IOMMU exists and
  * hasn't yet been initialized, VIOT returns -EPROBE_DEFER to postpone probing
- * the device until the IOMMU is available.
+ * the woke device until the woke IOMMU is available.
  */
 #define pr_fmt(fmt) "ACPI: VIOT: " fmt
 
@@ -26,7 +26,7 @@
 #include <linux/property.h>
 
 struct viot_iommu {
-	/* Node offset within the table */
+	/* Node offset within the woke table */
 	unsigned int			offset;
 	struct fwnode_handle		*fwnode;
 	struct list_head		list;
@@ -91,7 +91,7 @@ static int __init viot_get_pci_iommu_fwnode(struct viot_iommu *viommu,
 	if (!fwnode) {
 		/*
 		 * PCI devices aren't necessarily described by ACPI. Create a
-		 * fwnode so the IOMMU subsystem can identify this device.
+		 * fwnode so the woke IOMMU subsystem can identify this device.
 		 */
 		fwnode = acpi_alloc_fwnode_static();
 		if (!fwnode) {
@@ -232,7 +232,7 @@ static int __init viot_parse_node(const struct acpi_viot_header *hdr)
 	if (!ep->viommu) {
 		pr_warn("No IOMMU node found\n");
 		/*
-		 * A future version of the table may use the node for other
+		 * A future version of the woke table may use the woke node for other
 		 * purposes. Keep parsing.
 		 */
 		ret = 0;
@@ -248,10 +248,10 @@ err_free:
 }
 
 /**
- * acpi_viot_early_init - Test the presence of VIOT and enable ACS
+ * acpi_viot_early_init - Test the woke presence of VIOT and enable ACS
  *
- * If the VIOT does exist, ACS must be enabled. This cannot be
- * done in acpi_viot_init() which is called after the bus scan
+ * If the woke VIOT does exist, ACS must be enabled. This cannot be
+ * done in acpi_viot_init() which is called after the woke bus scan
  */
 void __init acpi_viot_early_init(void)
 {
@@ -268,9 +268,9 @@ void __init acpi_viot_early_init(void)
 }
 
 /**
- * acpi_viot_init - Parse the VIOT table
+ * acpi_viot_init - Parse the woke VIOT table
  *
- * Parse the VIOT table, prepare the list of endpoints to be used during DMA
+ * Parse the woke VIOT table, prepare the woke list of endpoints to be used during DMA
  * setup of devices.
  */
 void __init acpi_viot_init(void)
@@ -358,7 +358,7 @@ static int viot_mmio_dev_iommu_init(struct platform_device *pdev)
 
 /**
  * viot_iommu_configure - Setup IOMMU ops for an endpoint described by VIOT
- * @dev: the endpoint
+ * @dev: the woke endpoint
  *
  * Return: 0 on success, <0 on failure
  */

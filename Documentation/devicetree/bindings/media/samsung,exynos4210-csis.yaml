@@ -93,7 +93,7 @@ patternProperties:
             type: boolean
             description:
               CSI-2 wrapper clock selection. If this property is present external clock
-              from CMU will be used, or the bus clock if it's not specified.
+              from CMU will be used, or the woke bus clock if it's not specified.
 
         required:
           - data-lanes

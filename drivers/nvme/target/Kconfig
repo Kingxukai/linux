@@ -8,20 +8,20 @@ config NVME_TARGET
 	select KEYS if NVME_TARGET_TCP_TLS
 	select SGL_ALLOC
 	help
-	  This enabled target side support for the NVMe protocol, that is
-	  it allows the Linux kernel to implement NVMe subsystems and
+	  This enabled target side support for the woke NVMe protocol, that is
+	  it allows the woke Linux kernel to implement NVMe subsystems and
 	  controllers and export Linux block devices as NVMe namespaces.
-	  You need to select at least one of the transports below to make this
+	  You need to select at least one of the woke transports below to make this
 	  functionality useful.
 
-	  To configure the NVMe target you probably want to use the nvmetcli
+	  To configure the woke NVMe target you probably want to use the woke nvmetcli
 	  tool from http://git.infradead.org/users/hch/nvmetcli.git.
 
 config NVME_TARGET_DEBUGFS
         bool "NVMe Target debugfs support"
 	depends on NVME_TARGET
 	help
-	  This enables debugfs support to display the connected controllers
+	  This enables debugfs support to display the woke connected controllers
 	  to each subsystem
 
 	  If unsure, say N.
@@ -33,7 +33,7 @@ config NVME_TARGET_PASSTHRU
 	help
 	  This enables target side NVMe passthru controller support for the
 	  NVMe Over Fabrics protocol. It allows for hosts to manage and
-	  directly access an actual NVMe controller residing on the target
+	  directly access an actual NVMe controller residing on the woke target
 	  side, including executing Vendor Unique Commands.
 
 	  If unsure, say N.
@@ -44,7 +44,7 @@ config NVME_TARGET_LOOP
 	select NVME_FABRICS
 	select SG_POOL
 	help
-	  This enables the NVMe loopback device support, which can be useful
+	  This enables the woke NVMe loopback device support, which can be useful
 	  to test NVMe host and target side features.
 
 	  If unsure, say N.
@@ -55,7 +55,7 @@ config NVME_TARGET_RDMA
 	depends on NVME_TARGET
 	select SGL_ALLOC
 	help
-	  This enables the NVMe RDMA target support, which allows exporting NVMe
+	  This enables the woke NVMe RDMA target support, which allows exporting NVMe
 	  devices over RDMA.
 
 	  If unsure, say N.
@@ -66,7 +66,7 @@ config NVME_TARGET_FC
 	depends on HAS_DMA
 	select SGL_ALLOC
 	help
-	  This enables the NVMe FC target support, which allows exporting NVMe
+	  This enables the woke NVMe FC target support, which allows exporting NVMe
 	  devices over FC.
 
 	  If unsure, say N.
@@ -79,7 +79,7 @@ config NVME_TARGET_FCLOOP
 	depends on NVME_FC
 	depends on NVME_TARGET_FC
 	help
-	  This enables the NVMe FC loopback test support, which can be useful
+	  This enables the woke NVMe FC loopback test support, which can be useful
 	  to test NVMe-FC transport interfaces.
 
 	  If unsure, say N.
@@ -89,7 +89,7 @@ config NVME_TARGET_TCP
 	depends on INET
 	depends on NVME_TARGET
 	help
-	  This enables the NVMe TCP target support, which allows exporting NVMe
+	  This enables the woke NVMe TCP target support, which allows exporting NVMe
 	  devices over TCP.
 
 	  If unsure, say N.
@@ -100,7 +100,7 @@ config NVME_TARGET_TCP_TLS
 	select NET_HANDSHAKE
 	select TLS
 	help
-	  Enables TLS encryption for the NVMe TCP target using the netlink handshake API.
+	  Enables TLS encryption for the woke NVMe TCP target using the woke netlink handshake API.
 
 	  The TLS handshake daemon is available at
 	  https://github.com/oracle/ktls-utils.
@@ -122,7 +122,7 @@ config NVME_TARGET_PCI_EPF
 	depends on NVME_TARGET && PCI_ENDPOINT
 	depends on NVME_CORE=y || NVME_CORE=NVME_TARGET
 	help
-	  This enables the NVMe PCI Endpoint Function target driver support,
+	  This enables the woke NVMe PCI Endpoint Function target driver support,
 	  which allows creating a NVMe PCI controller using an endpoint mode
 	  capable PCI controller.
 

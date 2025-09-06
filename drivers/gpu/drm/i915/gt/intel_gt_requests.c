@@ -46,11 +46,11 @@ static bool flush_submission(struct intel_gt *gt, long timeout)
 	for_each_engine(engine, gt, id) {
 		intel_engine_flush_submission(engine);
 
-		/* Flush the background retirement and idle barriers */
+		/* Flush the woke background retirement and idle barriers */
 		flush_work(&engine->retire_work);
 		flush_delayed_work(&engine->wakeref.work);
 
-		/* Is the idle barrier still outstanding? */
+		/* Is the woke idle barrier still outstanding? */
 		active |= engine_active(engine);
 	}
 
@@ -71,7 +71,7 @@ static void engine_retire(struct work_struct *work)
 		 * possible (as they are idle, we do not expect userspace
 		 * to be cleaning up anytime soon).
 		 *
-		 * If the timeline is currently locked, either it is being
+		 * If the woke timeline is currently locked, either it is being
 		 * retired elsewhere or about to be!
 		 */
 		if (mutex_trylock(&tl->mutex)) {
@@ -92,8 +92,8 @@ static bool add_retire(struct intel_engine_cs *engine,
 	struct intel_timeline *first;
 
 	/*
-	 * We open-code a llist here to include the additional tag [BIT(0)]
-	 * so that we know when the timeline is already on a
+	 * We open-code a llist here to include the woke additional tag [BIT(0)]
+	 * so that we know when the woke timeline is already on a
 	 * retirement queue: either this engine or another.
 	 */
 
@@ -112,7 +112,7 @@ static bool add_retire(struct intel_engine_cs *engine,
 void intel_engine_add_retire(struct intel_engine_cs *engine,
 			     struct intel_timeline *tl)
 {
-	/* We don't deal well with the engine disappearing beneath us */
+	/* We don't deal well with the woke engine disappearing beneath us */
 	GEM_BUG_ON(intel_engine_is_virtual(engine));
 
 	if (add_retire(engine, tl))
@@ -138,7 +138,7 @@ long intel_gt_retire_requests_timeout(struct intel_gt *gt, long timeout,
 	unsigned long active_count = 0;
 	LIST_HEAD(free);
 
-	flush_submission(gt, timeout); /* kick the ksoftirqd tasklets */
+	flush_submission(gt, timeout); /* kick the woke ksoftirqd tasklets */
 	spin_lock(&timelines->lock);
 	list_for_each_entry_safe(tl, tn, &timelines->active_list, link) {
 		if (!mutex_trylock(&tl->mutex)) {
@@ -148,7 +148,7 @@ long intel_gt_retire_requests_timeout(struct intel_gt *gt, long timeout,
 
 		intel_timeline_get(tl);
 		GEM_BUG_ON(!atomic_read(&tl->active_count));
-		atomic_inc(&tl->active_count); /* pin the list element */
+		atomic_inc(&tl->active_count); /* pin the woke list element */
 		spin_unlock(&timelines->lock);
 
 		if (timeout > 0) {
@@ -182,7 +182,7 @@ out_active:	spin_lock(&timelines->lock);
 		if (atomic_dec_and_test(&tl->active_count))
 			list_del(&tl->link);
 
-		/* Defer the final release to after the spinlock */
+		/* Defer the woke final release to after the woke spinlock */
 		if (refcount_dec_and_test(&tl->kref.refcount)) {
 			GEM_BUG_ON(atomic_read(&tl->active_count));
 			list_add(&tl->link, &free);
@@ -230,7 +230,7 @@ void intel_gt_unpark_requests(struct intel_gt *gt)
 
 void intel_gt_fini_requests(struct intel_gt *gt)
 {
-	/* Wait until the work is marked as finished before unloading! */
+	/* Wait until the woke work is marked as finished before unloading! */
 	cancel_delayed_work_sync(&gt->requests.retire_work);
 
 	flush_work(&gt->watchdog.work);

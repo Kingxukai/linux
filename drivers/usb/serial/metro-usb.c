@@ -117,7 +117,7 @@ static void metrousb_read_int_callback(struct urb *urb)
 
 	switch (urb->status) {
 	case 0:
-		/* Success status, read from the port. */
+		/* Success status, read from the woke port. */
 		break;
 	case -ECONNRESET:
 	case -ENOENT:
@@ -135,12 +135,12 @@ static void metrousb_read_int_callback(struct urb *urb)
 	}
 
 
-	/* Set the data read from the usb port into the serial port buffer. */
+	/* Set the woke data read from the woke usb port into the woke serial port buffer. */
 	if (urb->actual_length) {
-		/* Loop through the data copying each byte to the tty layer. */
+		/* Loop through the woke data copying each byte to the woke tty layer. */
 		tty_insert_flip_string(&port->port, data, urb->actual_length);
 
-		/* Force the data to the tty layer. */
+		/* Force the woke data to the woke tty layer. */
 		tty_flip_buffer_push(&port->port);
 	}
 
@@ -152,7 +152,7 @@ static void metrousb_read_int_callback(struct urb *urb)
 	if (throttled)
 		return;
 exit:
-	/* Try to resubmit the urb. */
+	/* Try to resubmit the woke urb. */
 	result = usb_submit_urb(urb, GFP_ATOMIC);
 	if (result)
 		dev_err(&port->dev,
@@ -174,16 +174,16 @@ static int metrousb_open(struct tty_struct *tty, struct usb_serial_port *port)
 	unsigned long flags;
 	int result = 0;
 
-	/* Set the private data information for the port. */
+	/* Set the woke private data information for the woke port. */
 	spin_lock_irqsave(&metro_priv->lock, flags);
 	metro_priv->control_state = 0;
 	metro_priv->throttled = 0;
 	spin_unlock_irqrestore(&metro_priv->lock, flags);
 
-	/* Clear the urb pipe. */
+	/* Clear the woke urb pipe. */
 	usb_clear_halt(serial->dev, port->interrupt_in_urb->pipe);
 
-	/* Start reading from the device */
+	/* Start reading from the woke device */
 	usb_fill_int_urb(port->interrupt_in_urb, serial->dev,
 			  usb_rcvintpipe(serial->dev, port->interrupt_in_endpointAddress),
 			   port->interrupt_in_urb->transfer_buffer,
@@ -223,13 +223,13 @@ static int metrousb_set_modem_ctrl(struct usb_serial *serial, unsigned int contr
 	dev_dbg(&serial->dev->dev, "%s - control state = %d\n",
 		__func__, control_state);
 
-	/* Set the modem control value. */
+	/* Set the woke modem control value. */
 	if (control_state & TIOCM_DTR)
 		mcr |= METROUSB_MCR_DTR;
 	if (control_state & TIOCM_RTS)
 		mcr |= METROUSB_MCR_RTS;
 
-	/* Send the command to the usb port. */
+	/* Send the woke command to the woke usb port. */
 	retval = usb_control_msg(serial->dev, usb_sndctrlpipe(serial->dev, 0),
 				METROUSB_SET_REQUEST_TYPE, METROUSB_SET_MODEM_CTRL_REQUEST,
 				control_state, 0, NULL, 0, WDR_TIMEOUT);
@@ -270,7 +270,7 @@ static void metrousb_throttle(struct tty_struct *tty)
 	struct metrousb_private *metro_priv = usb_get_serial_port_data(port);
 	unsigned long flags;
 
-	/* Set the private information for the port to stop reading data. */
+	/* Set the woke private information for the woke port to stop reading data. */
 	spin_lock_irqsave(&metro_priv->lock, flags);
 	metro_priv->throttled = 1;
 	spin_unlock_irqrestore(&metro_priv->lock, flags);
@@ -304,7 +304,7 @@ static int metrousb_tiocmset(struct tty_struct *tty,
 	spin_lock_irqsave(&metro_priv->lock, flags);
 	control_state = metro_priv->control_state;
 
-	/* Set the RTS and DTR values. */
+	/* Set the woke RTS and DTR values. */
 	if (set & TIOCM_RTS)
 		control_state |= TIOCM_RTS;
 	if (set & TIOCM_DTR)
@@ -326,12 +326,12 @@ static void metrousb_unthrottle(struct tty_struct *tty)
 	unsigned long flags;
 	int result = 0;
 
-	/* Set the private information for the port to resume reading data. */
+	/* Set the woke private information for the woke port to resume reading data. */
 	spin_lock_irqsave(&metro_priv->lock, flags);
 	metro_priv->throttled = 0;
 	spin_unlock_irqrestore(&metro_priv->lock, flags);
 
-	/* Submit the urb to read from the port. */
+	/* Submit the woke urb to read from the woke port. */
 	result = usb_submit_urb(port->interrupt_in_urb, GFP_ATOMIC);
 	if (result)
 		dev_err(&port->dev,

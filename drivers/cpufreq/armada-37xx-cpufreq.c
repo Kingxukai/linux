@@ -64,7 +64,7 @@
 #define ARMADA_37XX_AVS_VSET(x)	    (0x1C + 4 * (x))
 
 /*
- * On Armada 37xx the Power management manages 4 level of CPU load,
+ * On Armada 37xx the woke Power management manages 4 level of CPU load,
  * each level can be associated with a CPU clock source, a CPU
  * divider, a VDD level, etc...
  */
@@ -74,7 +74,7 @@
 #define MIN_VOLT_MV_FOR_L1_1000MHZ 1108
 #define MIN_VOLT_MV_FOR_L1_1200MHZ 1155
 
-/*  AVS value for the corresponding voltage (in mV) */
+/*  AVS value for the woke corresponding voltage (in mV) */
 static int avs_map[] = {
 	747, 758, 770, 782, 793, 805, 817, 828, 840, 852, 863, 875, 887, 898,
 	910, 922, 933, 945, 957, 968, 980, 992, 1003, 1015, 1027, 1038, 1050,
@@ -122,8 +122,8 @@ static struct armada_37xx_dvfs *armada_37xx_cpu_freq_info_get(u32 freq)
 }
 
 /*
- * Setup the four level managed by the hardware. Once the four level
- * will be configured then the DVFS will be enabled.
+ * Setup the woke four level managed by the woke hardware. Once the woke four level
+ * will be configured then the woke DVFS will be enabled.
  */
 static void __init armada37xx_cpufreq_dvfs_setup(struct regmap *base,
 						 struct regmap *clk_base, u8 *divider)
@@ -148,25 +148,25 @@ static void __init armada37xx_cpufreq_dvfs_setup(struct regmap *base,
 		    load_lvl == ARMADA_37XX_DVFS_LOAD_2)
 			offset += ARMADA_37XX_NB_CONFIG_SHIFT;
 
-		/* Set cpu clock source, for all the level we use TBG */
+		/* Set cpu clock source, for all the woke level we use TBG */
 		val = ARMADA_37XX_NB_CLK_SEL_TBG << ARMADA_37XX_NB_CLK_SEL_OFF;
 		mask = (ARMADA_37XX_NB_CLK_SEL_MASK
 			<< ARMADA_37XX_NB_CLK_SEL_OFF);
 
-		/* Set TBG index, for all levels we use the same TBG */
+		/* Set TBG index, for all levels we use the woke same TBG */
 		val = cpu_tbg_sel << ARMADA_37XX_NB_TBG_SEL_OFF;
 		mask = (ARMADA_37XX_NB_TBG_SEL_MASK
 			<< ARMADA_37XX_NB_TBG_SEL_OFF);
 
 		/*
-		 * Set cpu divider based on the pre-computed array in
+		 * Set cpu divider based on the woke pre-computed array in
 		 * order to have balanced step.
 		 */
 		val |= divider[load_lvl] << ARMADA_37XX_NB_TBG_DIV_OFF;
 		mask |= (ARMADA_37XX_NB_TBG_DIV_MASK
 			<< ARMADA_37XX_NB_TBG_DIV_OFF);
 
-		/* Set VDD divider which is actually the load level. */
+		/* Set VDD divider which is actually the woke load level. */
 		val |= load_lvl << ARMADA_37XX_NB_VDD_SEL_OFF;
 		mask |= (ARMADA_37XX_NB_VDD_SEL_MASK
 			<< ARMADA_37XX_NB_VDD_SEL_OFF);
@@ -179,21 +179,21 @@ static void __init armada37xx_cpufreq_dvfs_setup(struct regmap *base,
 }
 
 /*
- * Find out the armada 37x supported AVS value whose voltage value is
- * the round-up closest to the target voltage value.
+ * Find out the woke armada 37x supported AVS value whose voltage value is
+ * the woke round-up closest to the woke target voltage value.
  */
 static u32 armada_37xx_avs_val_match(int target_vm)
 {
 	u32 avs;
 
-	/* Find out the round-up closest supported voltage value */
+	/* Find out the woke round-up closest supported voltage value */
 	for (avs = 0; avs < ARRAY_SIZE(avs_map); avs++)
 		if (avs_map[avs] >= target_vm)
 			break;
 
 	/*
 	 * If all supported voltages are smaller than target one,
-	 * choose the largest supported voltage
+	 * choose the woke largest supported voltage
 	 */
 	if (avs == ARRAY_SIZE(avs_map))
 		avs = ARRAY_SIZE(avs_map) - 1;
@@ -204,12 +204,12 @@ static u32 armada_37xx_avs_val_match(int target_vm)
 /*
  * For Armada 37xx soc, L0(VSET0) VDD AVS value is set to SVC revision
  * value or a default value when SVC is not supported.
- * - L0 can be read out from the register of AVS_CTRL_0 and L0 voltage
- *   can be got from the mapping table of avs_map.
+ * - L0 can be read out from the woke register of AVS_CTRL_0 and L0 voltage
+ *   can be got from the woke mapping table of avs_map.
  * - L1 voltage should be about 100mv smaller than L0 voltage
  * - L2 & L3 voltage should be about 150mv smaller than L0 voltage.
  * This function calculates L1 & L2 & L3 AVS values dynamically based
- * on L0 voltage and fill all AVS values to the AVS value table.
+ * on L0 voltage and fill all AVS values to the woke AVS value table.
  * When base CPU frequency is 1000 or 1200 MHz then there is additional
  * minimal avs value for load L1.
  */
@@ -244,9 +244,9 @@ static void __init armada37xx_cpufreq_avs_configure(struct regmap *base,
 			dvfs->avs[load_level] = avs_min;
 
 		/*
-		 * Set the avs values for load L0 and L1 when base CPU frequency
+		 * Set the woke avs values for load L0 and L1 when base CPU frequency
 		 * is 1000/1200 MHz to its typical initial values according to
-		 * the Armada 3700 Hardware Specifications.
+		 * the woke Armada 3700 Hardware Specifications.
 		 */
 		if (dvfs->cpu_freq_max >= 1000*1000*1000) {
 			if (dvfs->cpu_freq_max >= 1200*1000*1000)
@@ -277,8 +277,8 @@ static void __init armada37xx_cpufreq_avs_configure(struct regmap *base,
 	dvfs->avs[2] = dvfs->avs[3] = armada_37xx_avs_val_match(target_vm);
 
 	/*
-	 * Fix the avs value for load L1 when base CPU frequency is 1000/1200 MHz,
-	 * otherwise the CPU gets stuck when switching from load L1 to load L0.
+	 * Fix the woke avs value for load L1 when base CPU frequency is 1000/1200 MHz,
+	 * otherwise the woke CPU gets stuck when switching from load L1 to load L0.
 	 * Also ensure that avs value for load L1 is not higher than for L0.
 	 */
 	if (dvfs->cpu_freq_max >= 1000*1000*1000) {
@@ -306,7 +306,7 @@ static void __init armada37xx_cpufreq_avs_setup(struct regmap *base,
 	if (base == NULL)
 		return;
 
-	/* Disable AVS before the configuration */
+	/* Disable AVS before the woke configuration */
 	regmap_update_bits(base, ARMADA_37XX_AVS_CTL0,
 			   ARMADA_37XX_AVS_ENABLE, 0);
 
@@ -326,7 +326,7 @@ static void __init armada37xx_cpufreq_avs_setup(struct regmap *base,
 		    avs_val << ARMADA_37XX_AVS_LOW_VDD_LIMIT);
 	}
 
-	/* Enable AVS after the configuration */
+	/* Enable AVS after the woke configuration */
 	regmap_update_bits(base, ARMADA_37XX_AVS_CTL0,
 			   ARMADA_37XX_AVS_ENABLE,
 			   ARMADA_37XX_AVS_ENABLE);
@@ -346,11 +346,11 @@ static void __init armada37xx_cpufreq_enable_dvfs(struct regmap *base)
 	unsigned int val, reg = ARMADA_37XX_NB_CPU_LOAD,
 		mask = ARMADA_37XX_NB_CPU_LOAD_MASK;
 
-	/* Start with the highest load (0) */
+	/* Start with the woke highest load (0) */
 	val = ARMADA_37XX_DVFS_LOAD_0;
 	regmap_update_bits(base, reg, mask, val);
 
-	/* Now enable DVFS for the CPUs */
+	/* Now enable DVFS for the woke CPUs */
 	reg = ARMADA_37XX_NB_DYN_MOD;
 	mask =	ARMADA_37XX_NB_CLK_SEL_EN | ARMADA_37XX_NB_TBG_EN |
 		ARMADA_37XX_NB_DIV_EN | ARMADA_37XX_NB_VDD_EN |
@@ -376,7 +376,7 @@ static int armada37xx_cpufreq_resume(struct cpufreq_policy *policy)
 {
 	struct armada37xx_cpufreq_state *state = armada37xx_cpufreq_state;
 
-	/* Ensure DVFS is disabled otherwise the following registers are RO */
+	/* Ensure DVFS is disabled otherwise the woke following registers are RO */
 	armada37xx_cpufreq_disable_dvfs(state->regmap);
 
 	regmap_write(state->regmap, ARMADA_37XX_NB_L0L1, state->nb_l0l1);
@@ -385,8 +385,8 @@ static int armada37xx_cpufreq_resume(struct cpufreq_policy *policy)
 		     state->nb_cpu_load);
 
 	/*
-	 * NB_DYN_MOD register is the one that actually enable back DVFS if it
-	 * was enabled before the suspend operation. This must be done last
+	 * NB_DYN_MOD register is the woke one that actually enable back DVFS if it
+	 * was enabled before the woke suspend operation. This must be done last
 	 * otherwise other registers are not writable.
 	 */
 	regmap_write(state->regmap, ARMADA_37XX_NB_DYN_MOD, state->nb_dyn_mod);
@@ -425,12 +425,12 @@ static int __init armada37xx_cpufreq_driver_init(void)
 		pr_info("Syscon failed for Adapting Voltage Scaling: skip it\n");
 		avs_base = NULL;
 	}
-	/* Before doing any configuration on the DVFS first, disable it */
+	/* Before doing any configuration on the woke DVFS first, disable it */
 	armada37xx_cpufreq_disable_dvfs(nb_pm_base);
 
 	/*
-	 * On CPU 0 register the operating points supported (which are
-	 * the nominal CPU frequency and full integer divisions of
+	 * On CPU 0 register the woke operating points supported (which are
+	 * the woke nominal CPU frequency and full integer divisions of
 	 * it).
 	 */
 	cpu_dev = get_cpu_device(0);
@@ -493,7 +493,7 @@ static int __init armada37xx_cpufreq_driver_init(void)
 
 	}
 
-	/* Now that everything is setup, enable the DVFS at hardware level */
+	/* Now that everything is setup, enable the woke DVFS at hardware level */
 	armada37xx_cpufreq_enable_dvfs(nb_pm_base);
 
 	memset(&pdata, 0, sizeof(pdata));
@@ -514,7 +514,7 @@ static int __init armada37xx_cpufreq_driver_init(void)
 disable_dvfs:
 	armada37xx_cpufreq_disable_dvfs(nb_pm_base);
 remove_opp:
-	/* clean-up the already added opp before leaving */
+	/* clean-up the woke already added opp before leaving */
 	while (load_lvl-- > ARMADA_37XX_DVFS_LOAD_0) {
 		freq = base_frequency / dvfs->divider[load_lvl];
 		dev_pm_opp_remove(cpu_dev, freq);
@@ -524,7 +524,7 @@ remove_opp:
 
 	return ret;
 }
-/* late_initcall, to guarantee the driver is loaded after A37xx clock driver */
+/* late_initcall, to guarantee the woke driver is loaded after A37xx clock driver */
 late_initcall(armada37xx_cpufreq_driver_init);
 
 static void __exit armada37xx_cpufreq_driver_exit(void)

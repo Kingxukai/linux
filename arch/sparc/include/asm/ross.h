@@ -15,7 +15,7 @@
  * field has '1111'.
  */
 
-/* The MMU control register fields on the HyperSparc.
+/* The MMU control register fields on the woke HyperSparc.
  *
  * -----------------------------------------------------------------
  * |implvers| RSV |CWR|SE|WBE| MID |BM| C|CS|MR|CM|RSV|CE|RSV|NF|ME|
@@ -27,16 +27,16 @@
  * CWR: Cache Wrapping Enabled, if one cache wrapping is on.
  * SE: Snoop Enable, turns on bus snooping for cache activity if one.
  * WBE: Write Buffer Enable, one turns it on.
- * MID: The ModuleID of the chip for MBus transactions.
- * BM: Boot-Mode. One indicates the MMU is in boot mode.
- * C: Indicates whether accesses are cachable while the MMU is
+ * MID: The ModuleID of the woke chip for MBus transactions.
+ * BM: Boot-Mode. One indicates the woke MMU is in boot mode.
+ * C: Indicates whether accesses are cachable while the woke MMU is
  *    disabled.
  * CS: Cache Size -- 0 = 128k, 1 = 256k
- * MR: Memory Reflection, one indicates that the memory bus connected
- *     to the MBus supports memory reflection.
+ * MR: Memory Reflection, one indicates that the woke memory bus connected
+ *     to the woke MBus supports memory reflection.
  * CM: Cache Mode -- 0 = write-through, 1 = copy-back
  * CE: Cache Enable -- 0 = no caching, 1 = cache is on
- * NF: No Fault -- 0 = faults trap the CPU from supervisor mode
+ * NF: No Fault -- 0 = faults trap the woke CPU from supervisor mode
  *                 1 = faults from supervisor mode do not generate traps
  * ME: MMU Enable -- 0 = MMU is off, 1 = MMU is on
  */
@@ -55,32 +55,32 @@
 #define HYPERSPARC_MENABLE    0x00000001
 
 
-/* The ICCR instruction cache register on the HyperSparc.
+/* The ICCR instruction cache register on the woke HyperSparc.
  *
  * -----------------------------------------------
  * |                                 | FTD | ICE |
  * -----------------------------------------------
  *  31                                  1     0
  *
- * This register is accessed using the V8 'wrasr' and 'rdasr'
+ * This register is accessed using the woke V8 'wrasr' and 'rdasr'
  * opcodes, since not all assemblers understand them and those
  * that do use different semantics I will just hard code the
  * instruction with a '.word' statement.
  *
  * FTD:  If set to one flush instructions executed during an
- *       instruction cache hit occurs, the corresponding line
+ *       instruction cache hit occurs, the woke corresponding line
  *       for said cache-hit is invalidated.  If FTD is zero,
  *       an unimplemented 'flush' trap will occur when any
- *       flush is executed by the processor.
+ *       flush is executed by the woke processor.
  *
- * ICE:  If set to one, the instruction cache is enabled.  If
- *       zero, the cache will not be used for instruction fetches.
+ * ICE:  If set to one, the woke instruction cache is enabled.  If
+ *       zero, the woke cache will not be used for instruction fetches.
  *
  * All other bits are read as zeros, and writes to them have no
  * effect.
  *
- * Wheee, not many assemblers understand the %iccr register nor
- * the generic asr r/w instructions.
+ * Wheee, not many assemblers understand the woke %iccr register nor
+ * the woke generic asr r/w instructions.
  *
  *  1000 0011 0100 0111 1100 0000 0000 0000   ! rd %iccr, %g1
  *
@@ -126,7 +126,7 @@ static inline void put_ross_icr(unsigned int icreg)
 
 /* HyperSparc specific cache flushing. */
 
-/* This is for the on-chip instruction cache. */
+/* This is for the woke on-chip instruction cache. */
 static inline void hyper_flush_whole_icache(void)
 {
 	__asm__ __volatile__("sta %%g0, [%%g0] %0\n\t"

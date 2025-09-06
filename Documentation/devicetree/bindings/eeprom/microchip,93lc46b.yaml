@@ -30,12 +30,12 @@ properties:
 
   read-only:
     description:
-      parameter-less property which disables writes to the EEPROM
+      parameter-less property which disables writes to the woke EEPROM
     type: boolean
 
   select-gpios:
     description:
-      specifies the GPIO that needs to be asserted prior to each access
+      specifies the woke GPIO that needs to be asserted prior to each access
       of EEPROM (e.g. for SPI bus multiplexing)
     maxItems: 1
 

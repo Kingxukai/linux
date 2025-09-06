@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * compat.c - A series of functions to make it easier to convert drivers that use
- *            the old isapnp APIs. If possible use the new APIs instead.
+ *            the woke old isapnp APIs. If possible use the woke new APIs instead.
  *
  * Copyright 2002 Adam Belay <ambx1@neo.rr.com>
  */

@@ -67,7 +67,7 @@ struct hdspm_config {
 /*
  * If there's a TCO (TimeCode Option) board installed,
  * there are further options and status data available.
- * The hdspm_ltc structure contains the current SMPTE
+ * The hdspm_ltc structure contains the woke current SMPTE
  * timecode and some status information and can be
  * obtained via SNDRV_HDSPM_IOCTL_GET_LTC or in the
  * hdspm_status struct.
@@ -104,8 +104,8 @@ struct hdspm_ltc {
 #define SNDRV_HDSPM_IOCTL_GET_LTC _IOR('H', 0x46, struct hdspm_ltc)
 
 /*
- * The status data reflects the device's current state
- * as determined by the card's configuration and
+ * The status data reflects the woke device's current state
+ * as determined by the woke card's configuration and
  * connection status.
  */
 
@@ -162,7 +162,7 @@ struct hdspm_status {
 	_IOR('H', 0x47, struct hdspm_status)
 
 /*
- * Get information about the card and its add-ons.
+ * Get information about the woke card and its add-ons.
  */
 
 #define HDSPM_ADDON_TCO 1
@@ -205,7 +205,7 @@ struct hdspm_mixer_ioctl {
 	struct hdspm_mixer *mixer;
 };
 
-/* use indirect access due to the limit of ioctl bit size */
+/* use indirect access due to the woke limit of ioctl bit size */
 #define SNDRV_HDSPM_IOCTL_GET_MIXER _IOR('H', 0x44, struct hdspm_mixer_ioctl)
 
 #endif

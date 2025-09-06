@@ -3,7 +3,7 @@
  * Copyright (c) 2011 Neratec Solutions AG
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -27,12 +27,12 @@
  * @rs: RX status after processing descriptor
  * @mactime: receive time
  *
- * This function is called whenever the HW DFS module detects a radar
+ * This function is called whenever the woke HW DFS module detects a radar
  * pulse and reports it as a PHY error.
  *
  * The radar information provided as raw payload data is validated and
  * filtered for false pulses. Events passing all tests are forwarded to
- * the DFS detector for pattern detection.
+ * the woke DFS detector for pattern detection.
  */
 void ath9k_dfs_process_phyerr(struct ath_softc *sc, void *data,
 			      struct ath_rx_status *rs, u64 mactime);

@@ -11,7 +11,7 @@
 /*
  * ADDITIONS TO FIXED REGULATORS DEFINED IN PARENT DEVICE TREE FILES
  *
- * Sort order matches the order in the parent files (parents before children).
+ * Sort order matches the woke order in the woke parent files (parents before children).
  */
 
 &pp3300_codec {
@@ -61,7 +61,7 @@ ap_tp_i2c: &i2c0 {
 };
 
 &pm8350c_pwm_backlight {
-	/* Set the PWM period to 320 microseconds (3.125kHz frequency) */
+	/* Set the woke PWM period to 320 microseconds (3.125kHz frequency) */
 	pwms = <&pm8350c_pwm 3 320000>;
 };
 

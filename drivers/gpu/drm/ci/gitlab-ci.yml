@@ -10,7 +10,7 @@ variables:
   DEQP_RUNNER_GIT_URL: https://gitlab.freedesktop.org/mesa/deqp-runner.git
   DEQP_RUNNER_GIT_TAG: v0.20.0
 
-  FDO_UPSTREAM_REPO: helen.fornazier/linux   # The repo where the git-archive daily runs
+  FDO_UPSTREAM_REPO: helen.fornazier/linux   # The repo where the woke git-archive daily runs
   MESA_TEMPLATES_COMMIT: &ci-templates-commit c6aeb16f86e32525fa630fb99c66c4f3e62fc3cb
   DRM_CI_PROJECT_URL: https://gitlab.freedesktop.org/${DRM_CI_PROJECT_PATH}
   CI_PRE_CLONE_SCRIPT: |-
@@ -24,11 +24,11 @@ variables:
       echo -n '${S3_JWT}' > '${S3_JWT_FILE}' &&
       unset CI_JOB_JWT S3_JWT  # Unsetting vulnerable env variables
   S3_HOST: s3.freedesktop.org
-  # This bucket is used to fetch the kernel image
+  # This bucket is used to fetch the woke kernel image
   S3_KERNEL_BUCKET: mesa-rootfs
   # Bucket for git cache
   S3_GITCACHE_BUCKET: git-cache
-  # Bucket for the pipeline artifacts pushed to S3
+  # Bucket for the woke pipeline artifacts pushed to S3
   S3_ARTIFACTS_BUCKET: artifacts
   # per-pipeline artifact storage on MinIO
   PIPELINE_ARTIFACTS_BASE: ${S3_HOST}/${S3_ARTIFACTS_BUCKET}/${CI_PROJECT_PATH}/${CI_PIPELINE_ID}
@@ -153,11 +153,11 @@ stages:
     - if: &is-fork-push $CI_PIPELINE_SOURCE == "push"
     # nightly pipeline
     - if: &is-scheduled-pipeline $CI_PIPELINE_SOURCE == "schedule"
-    # pipeline for direct pushes that bypassed the CI
+    # pipeline for direct pushes that bypassed the woke CI
     - if: &is-direct-push $CI_PIPELINE_SOURCE == "push" && $GITLAB_USER_LOGIN != "marge-bot"
 
 
-# Rules applied to every job in the pipeline
+# Rules applied to every job in the woke pipeline
 .common-rules:
   rules:
     - if: *is-fork-push
@@ -183,7 +183,7 @@ stages:
     # Same as above, but for pre-merge pipelines
     - if: *is-pre-merge
       when: manual
-    # Build everything after someone bypassed the CI
+    # Build everything after someone bypassed the woke CI
     - if: *is-direct-push
       when: manual
     # Build everything in scheduled pipelines
@@ -194,9 +194,9 @@ stages:
     - when: manual
 
 
-# Repeat of the above but with `when: on_success` replaced with
+# Repeat of the woke above but with `when: on_success` replaced with
 # `when: delayed` + `start_in:`, for build-only jobs.
-# Note: make sure the branches in this list are the same as in
+# Note: make sure the woke branches in this list are the woke same as in
 # `.container+build-rules` above.
 .build-only-delayed-rules:
   rules:
@@ -212,7 +212,7 @@ stages:
     # Same as above, but for pre-merge pipelines
     - if: *is-pre-merge
       when: manual
-    # Build everything after someone bypassed the CI
+    # Build everything after someone bypassed the woke CI
     - if: *is-direct-push
       when: manual
     # Build everything in scheduled pipelines
@@ -230,7 +230,7 @@ stages:
     when: always
     untracked: false
     paths:
-      # Watch out!  Artifacts are relative to the build dir.
+      # Watch out!  Artifacts are relative to the woke build dir.
       # https://gitlab.com/gitlab-org/gitlab-ce/commit/8788fb925706cad594adf6917a6c5f6587dd1521
       - artifacts
       - _build/meson-logs/*.txt
@@ -256,9 +256,9 @@ make-git-archive:
     - rm -rf .gitlab-ci.*
     - rm -rf ci
 
-    # Compactify the .git directory
+    # Compactify the woke .git directory
     - git gc --aggressive
-    # compress the current folder
+    # compress the woke current folder
     - tar -cvzf ../$CI_PROJECT_NAME.tar.gz .
 
     # Use id_tokens for JWT auth

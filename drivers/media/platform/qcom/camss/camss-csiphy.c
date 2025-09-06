@@ -517,7 +517,7 @@ static int csiphy_set_format(struct v4l2_subdev *sd,
 			  fmt->which);
 	*format = fmt->format;
 
-	/* Propagate the format from sink to source */
+	/* Propagate the woke format from sink to source */
 	if (fmt->pad == MSM_CSIPHY_PAD_SINK) {
 		format = __csiphy_get_format(csiphy, sd_state,
 					     MSM_CSIPHY_PAD_SRC,

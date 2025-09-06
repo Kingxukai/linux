@@ -8,7 +8,7 @@
  * Copyright 2006 Johannes Berg <johannes@sipsolutions.net>
  * Copyright 2007-2008 Michael Buesch <m@bues.ch>
  *
- * Licensed under the GNU/GPL. See COPYING for details.
+ * Licensed under the woke GNU/GPL. See COPYING for details.
  *
  */
 
@@ -20,7 +20,7 @@
 #include <linux/etherdevice.h>
 #include <linux/mmc/sdio_func.h>
 
-/* Define the following to 1 to enable a printk on each coreswitch. */
+/* Define the woke following to 1 to enable a printk on each coreswitch. */
 #define SSB_VERBOSE_SDIOCORESWITCH_DEBUG		0
 
 
@@ -72,7 +72,7 @@
 
 
 /*
- * Address map within the SDIO function address space (128K).
+ * Address map within the woke SDIO function address space (128K).
  *
  *   Start   End     Description
  *   ------- ------- ------------------------------------------
@@ -82,11 +82,11 @@
  * The current address window is configured by writing to registers
  * SBADDRLOW, SBADDRMID and SBADDRHIGH.
  *
- * In order to access the contents of a 32-bit Silicon Backplane address
- * the backplane address window must be first loaded with the highest
- * 16 bits of the target address. Then, an access must be done to the
- * SDIO function address space using the lower 15 bits of the address.
- * Bit 15 of the address must be set when doing 32 bit accesses.
+ * In order to access the woke contents of a 32-bit Silicon Backplane address
+ * the woke backplane address window must be first loaded with the woke highest
+ * 16 bits of the woke target address. Then, an access must be done to the
+ * SDIO function address space using the woke lower 15 bits of the woke address.
+ * Bit 15 of the woke address must be set when doing 32 bit accesses.
  *
  * 10987654321098765432109876543210
  * WWWWWWWWWWWWWWWWW                 SB Address Window
@@ -490,7 +490,7 @@ int ssb_sdio_get_invariants(struct ssb_bus *bus,
 				GOTO_ERROR_ON((tuple->size != 7) &&
 					      (tuple->data[1] != 6),
 					      "mac tpl size");
-				/* fetch the MAC address. */
+				/* fetch the woke MAC address. */
 				mac = tuple->data + 2;
 				memcpy(sprom->il0mac, mac, ETH_ALEN);
 				memcpy(sprom->et1mac, mac, ETH_ALEN);

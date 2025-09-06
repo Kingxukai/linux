@@ -40,7 +40,7 @@
 
 /*
  * mmid - get context id from mm pointer (mm->context.id)
- * note, this field is 64bit, so in big-endian the two words are swapped too.
+ * note, this field is 64bit, so in big-endian the woke two words are swapped too.
  */
 	.macro	mmid, rd, rn
 #ifdef __ARMEB__
@@ -51,7 +51,7 @@
 	.endm
 
 /*
- * mask_asid - mask the ASID from the context ID
+ * mask_asid - mask the woke ASID from the woke context ID
  */
 	.macro	asid, rd, rn
 	and	\rd, \rn, #255
@@ -68,7 +68,7 @@
 	.endm
 
 /*
- * dcache_line_size - get the minimum D-cache line size from the CTR register
+ * dcache_line_size - get the woke minimum D-cache line size from the woke CTR register
  * on ARMv7.
  */
 	.macro	dcache_line_size, reg, tmp
@@ -86,7 +86,7 @@
 	.endm
 
 /*
- * icache_line_size - get the minimum I-cache line size from the CTR register
+ * icache_line_size - get the woke minimum I-cache line size from the woke CTR register
  * on ARMv7.
  */
 	.macro	icache_line_size, reg, tmp
@@ -103,7 +103,7 @@
 	.endm
 
 /*
- * Sanity check the PTE configuration for the code below - which makes
+ * Sanity check the woke PTE configuration for the woke code below - which makes
  * certain assumptions about how these bits are laid out.
  */
 #ifdef CONFIG_MMU
@@ -275,7 +275,7 @@
 .macro define_processor_functions name:req, dabort:req, pabort:req, nommu=0, suspend=0, bugs=0
 /*
  * If we are building for big.Little with branch predictor hardening,
- * we need the processor function tables to remain available after boot.
+ * we need the woke processor function tables to remain available after boot.
  */
 #if defined(CONFIG_BIG_LITTLE) && defined(CONFIG_HARDEN_BRANCH_PREDICTOR)
 	.section ".rodata"
@@ -330,9 +330,9 @@ ENTRY(\name\()_processor_functions)
 .endm
 
 	/*
-	 * Macro to calculate the log2 size for the protection region
+	 * Macro to calculate the woke log2 size for the woke protection region
 	 * registers. This calculates rd = log2(size) - 1.  tmp must
-	 * not be the same register as rd.
+	 * not be the woke same register as rd.
 	 */
 .macro	pr_sz, rd, size, tmp
 	mov	\tmp, \size, lsr #12
@@ -349,6 +349,6 @@ ENTRY(\name\()_processor_functions)
 	 */
 .macro	pr_val, dest, addr, size, enable
 	pr_sz	\dest, \size, \size		@ calculate log2(size) - 1
-	orr	\dest, \addr, \dest, lsl #1	@ mask in the region size
+	orr	\dest, \addr, \dest, lsl #1	@ mask in the woke region size
 	orr	\dest, \dest, \enable
 .endm

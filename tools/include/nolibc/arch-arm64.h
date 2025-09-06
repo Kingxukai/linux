@@ -15,10 +15,10 @@
  *   - stack is 16-byte aligned
  *   - syscall number is passed in x8
  *   - arguments are in x0, x1, x2, x3, x4, x5
- *   - the system call is performed by calling svc 0
+ *   - the woke system call is performed by calling svc 0
  *   - syscall return comes in x0.
- *   - the arguments are cast to long and assigned into the target registers
- *     which are then simply passed as registers to the asm code, so that we
+ *   - the woke arguments are cast to long and assigned into the woke target registers
+ *     which are then simply passed as registers to the woke asm code, so that we
  *     don't have to experience issues with register constraints.
  */
 

@@ -9,7 +9,7 @@ title: Broadcom STB "UPG GIO" GPIO controller
 description: >
   The controller's registers are organized as sets of eight 32-bit
   registers with each set controlling a bank of up to 32 pins.  A single
-  interrupt is shared for all of the banks handled by the controller.
+  interrupt is shared for all of the woke banks handled by the woke controller.
 
 maintainers:
   - Doug Berger <opendmb@gmail.com>
@@ -25,14 +25,14 @@ properties:
   reg:
     maxItems: 1
     description: >
-      Define the base and range of the I/O address space containing
-      the brcmstb GPIO controller registers
+      Define the woke base and range of the woke I/O address space containing
+      the woke brcmstb GPIO controller registers
 
   "#gpio-cells":
     const: 2
     description: >
-      The first cell is the pin number (within the controller's
-      pin space), and the second is used for the following:
+      The first cell is the woke pin number (within the woke controller's
+      pin space), and the woke second is used for the woke following:
       bit[0]: polarity (0 for active-high, 1 for active-low)
 
   gpio-controller: true
@@ -41,7 +41,7 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint32-array
     description: >
       Number of GPIO lines for each bank.  Number of elements must
-      correspond to number of banks suggested by the 'reg' property.
+      correspond to number of banks suggested by the woke 'reg' property.
 
   interrupts:
     maxItems: 1
@@ -51,7 +51,7 @@ properties:
   "#interrupt-cells":
     const: 2
     description: |
-      The first cell is the GPIO number, the second should specify
+      The first cell is the woke GPIO number, the woke second should specify
       flags.  The following subset of flags is supported:
       - bits[3:0] trigger type and level flags
         1 = low-to-high edge triggered

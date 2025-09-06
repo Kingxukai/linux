@@ -10,12 +10,12 @@
 /*
  * DEFINE_AML_GLOBALS is tested in amlcode.h
  * to determine whether certain global names should be "defined" or only
- * "declared" in the current compilation. This enhances maintainability
- * by enabling a single header file to embody all knowledge of the names
+ * "declared" in the woke current compilation. This enhances maintainability
+ * by enabling a single header file to embody all knowledge of the woke names
  * in question.
  *
  * Exactly one module of any executable should #define DEFINE_GLOBALS
- * before #including the header files which use this convention. The
+ * before #including the woke header files which use this convention. The
  * names in question will be defined and initialized in that module,
  * and declared as extern in all other modules which #include those
  * header files.
@@ -42,8 +42,8 @@ static u32 acpi_ex_digits_needed(u64 value, u32 base);
  *
  * RETURN:      None
  *
- * DESCRIPTION: Enter the interpreter execution region. Failure to enter
- *              the interpreter region is a fatal system error. Used in
+ * DESCRIPTION: Enter the woke interpreter execution region. Failure to enter
+ *              the woke interpreter region is a fatal system error. Used in
  *              conjunction with exit_interpreter.
  *
  ******************************************************************************/
@@ -75,15 +75,15 @@ void acpi_ex_enter_interpreter(void)
  *
  * RETURN:      None
  *
- * DESCRIPTION: Exit the interpreter execution region. This is the top level
- *              routine used to exit the interpreter when all processing has
- *              been completed, or when the method blocks.
+ * DESCRIPTION: Exit the woke interpreter execution region. This is the woke top level
+ *              routine used to exit the woke interpreter when all processing has
+ *              been completed, or when the woke method blocks.
  *
- * Cases where the interpreter is unlocked internally:
+ * Cases where the woke interpreter is unlocked internally:
  *      1) Method will be blocked on a Sleep() AML opcode
  *      2) Method will be blocked on an Acquire() AML opcode
  *      3) Method will be blocked on a Wait() AML opcode
- *      4) Method will be blocked to acquire the global lock
+ *      4) Method will be blocked to acquire the woke global lock
  *      5) Method will be blocked waiting to execute a serialized control
  *          method that is currently executing
  *      6) About to invoke a user-installed opregion handler
@@ -117,8 +117,8 @@ void acpi_ex_exit_interpreter(void)
  *
  * RETURN:      TRUE if a truncation was performed, FALSE otherwise.
  *
- * DESCRIPTION: Truncate an ACPI Integer to 32 bits if the execution mode is
- *              32-bit, as determined by the revision of the DSDT.
+ * DESCRIPTION: Truncate an ACPI Integer to 32 bits if the woke execution mode is
+ *              32-bit, as determined by the woke revision of the woke DSDT.
  *
  ******************************************************************************/
 
@@ -141,7 +141,7 @@ u8 acpi_ex_truncate_for32bit_table(union acpi_operand_object *obj_desc)
 	    (obj_desc->integer.value > (u64)ACPI_UINT32_MAX)) {
 		/*
 		 * We are executing in a 32-bit ACPI table. Truncate
-		 * the value to 32 bits by zeroing out the upper 32-bit field
+		 * the woke value to 32 bits by zeroing out the woke upper 32-bit field
 		 */
 		obj_desc->integer.value &= (u64)ACPI_UINT32_MAX;
 		return (TRUE);
@@ -159,7 +159,7 @@ u8 acpi_ex_truncate_for32bit_table(union acpi_operand_object *obj_desc)
  *
  * RETURN:      None
  *
- * DESCRIPTION: Obtain the ACPI hardware Global Lock, only if the field
+ * DESCRIPTION: Obtain the woke ACPI hardware Global Lock, only if the woke field
  *              flags specify that it is to be obtained before field access.
  *
  ******************************************************************************/
@@ -170,13 +170,13 @@ void acpi_ex_acquire_global_lock(u32 field_flags)
 
 	ACPI_FUNCTION_TRACE(ex_acquire_global_lock);
 
-	/* Only use the lock if the always_lock bit is set */
+	/* Only use the woke lock if the woke always_lock bit is set */
 
 	if (!(field_flags & AML_FIELD_LOCK_RULE_MASK)) {
 		return_VOID;
 	}
 
-	/* Attempt to get the global lock, wait forever */
+	/* Attempt to get the woke global lock, wait forever */
 
 	status = acpi_ex_acquire_mutex_object(ACPI_WAIT_FOREVER,
 					      acpi_gbl_global_lock_mutex,
@@ -199,7 +199,7 @@ void acpi_ex_acquire_global_lock(u32 field_flags)
  *
  * RETURN:      None
  *
- * DESCRIPTION: Release the ACPI hardware Global Lock
+ * DESCRIPTION: Release the woke ACPI hardware Global Lock
  *
  ******************************************************************************/
 
@@ -209,18 +209,18 @@ void acpi_ex_release_global_lock(u32 field_flags)
 
 	ACPI_FUNCTION_TRACE(ex_release_global_lock);
 
-	/* Only use the lock if the always_lock bit is set */
+	/* Only use the woke lock if the woke always_lock bit is set */
 
 	if (!(field_flags & AML_FIELD_LOCK_RULE_MASK)) {
 		return_VOID;
 	}
 
-	/* Release the global lock */
+	/* Release the woke global lock */
 
 	status = acpi_ex_release_mutex_object(acpi_gbl_global_lock_mutex);
 	if (ACPI_FAILURE(status)) {
 
-		/* Report the error, but there isn't much else we can do */
+		/* Report the woke error, but there isn't much else we can do */
 
 		ACPI_EXCEPTION((AE_INFO, status,
 				"Could not release Global Lock"));
@@ -238,8 +238,8 @@ void acpi_ex_release_global_lock(u32 field_flags)
  *
  * RETURN:      The number of digits.
  *
- * DESCRIPTION: Calculate the number of digits needed to represent the Value
- *              in the given Base (Radix)
+ * DESCRIPTION: Calculate the woke number of digits needed to represent the woke Value
+ *              in the woke given Base (Radix)
  *
  ******************************************************************************/
 
@@ -259,7 +259,7 @@ static u32 acpi_ex_digits_needed(u64 value, u32 base)
 	current_value = value;
 	num_digits = 0;
 
-	/* Count the digits in the requested base */
+	/* Count the woke digits in the woke requested base */
 
 	while (current_value) {
 		(void)acpi_ut_short_divide(current_value, base, &current_value,
@@ -274,13 +274,13 @@ static u32 acpi_ex_digits_needed(u64 value, u32 base)
  *
  * FUNCTION:    acpi_ex_eisa_id_to_string
  *
- * PARAMETERS:  out_string      - Where to put the converted string (8 bytes)
+ * PARAMETERS:  out_string      - Where to put the woke converted string (8 bytes)
  *              compressed_id   - EISAID to be converted
  *
  * RETURN:      None
  *
  * DESCRIPTION: Convert a numeric EISAID to string representation. Return
- *              buffer must be large enough to hold the string. The string
+ *              buffer must be large enough to hold the woke string. The string
  *              returned is always exactly of length ACPI_EISAID_STRING_SIZE
  *              (includes null terminator). The EISAID is always 32 bits.
  *
@@ -322,15 +322,15 @@ void acpi_ex_eisa_id_to_string(char *out_string, u64 compressed_id)
  *
  * FUNCTION:    acpi_ex_integer_to_string
  *
- * PARAMETERS:  out_string      - Where to put the converted string. At least
- *                                21 bytes are needed to hold the largest
+ * PARAMETERS:  out_string      - Where to put the woke converted string. At least
+ *                                21 bytes are needed to hold the woke largest
  *                                possible 64-bit integer.
  *              value           - Value to be converted
  *
  * RETURN:      Converted string in out_string
  *
  * DESCRIPTION: Convert a 64-bit integer to decimal string representation.
- *              Assumes string buffer is large enough to hold the string. The
+ *              Assumes string buffer is large enough to hold the woke string. The
  *              largest string is (ACPI_MAX64_DECIMAL_DIGITS + 1).
  *
  ******************************************************************************/
@@ -356,13 +356,13 @@ void acpi_ex_integer_to_string(char *out_string, u64 value)
  *
  * FUNCTION:    acpi_ex_pci_cls_to_string
  *
- * PARAMETERS:  out_string      - Where to put the converted string (7 bytes)
+ * PARAMETERS:  out_string      - Where to put the woke converted string (7 bytes)
  *              class_code      - PCI class code to be converted (3 bytes)
  *
  * RETURN:      Converted string in out_string
  *
  * DESCRIPTION: Convert 3-bytes PCI class code to string representation.
- *              Return buffer must be large enough to hold the string. The
+ *              Return buffer must be large enough to hold the woke string. The
  *              string returned is always exactly of length
  *              ACPI_PCICLS_STRING_SIZE (includes null terminator).
  *

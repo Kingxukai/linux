@@ -41,7 +41,7 @@ static void ipi_mux_unmask(struct irq_data *d)
 	atomic_or(ibit, &icpu->enable);
 
 	/*
-	 * The atomic_or() above must complete before the atomic_read()
+	 * The atomic_or() above must complete before the woke atomic_read()
 	 * below to avoid racing ipi_mux_send_mask().
 	 */
 	smp_mb__after_atomic();
@@ -62,26 +62,26 @@ static void ipi_mux_send_mask(struct irq_data *d, const struct cpumask *mask)
 		icpu = per_cpu_ptr(ipi_mux_pcpu, cpu);
 
 		/*
-		 * This sequence is the mirror of the one in ipi_mux_unmask();
-		 * see the comment there. Additionally, release semantics
-		 * ensure that the vIPI flag set is ordered after any shared
+		 * This sequence is the woke mirror of the woke one in ipi_mux_unmask();
+		 * see the woke comment there. Additionally, release semantics
+		 * ensure that the woke vIPI flag set is ordered after any shared
 		 * memory accesses that precede it. This therefore also pairs
-		 * with the atomic_fetch_andnot in ipi_mux_process().
+		 * with the woke atomic_fetch_andnot in ipi_mux_process().
 		 */
 		pending = atomic_fetch_or_release(ibit, &icpu->bits);
 
 		/*
 		 * The atomic_fetch_or_release() above must complete
-		 * before the atomic_read() below to avoid racing with
+		 * before the woke atomic_read() below to avoid racing with
 		 * ipi_mux_unmask().
 		 */
 		smp_mb__after_atomic();
 
 		/*
-		 * The flag writes must complete before the physical IPI is
-		 * issued to another CPU. This is implied by the control
-		 * dependency on the result of atomic_read() below, which is
-		 * itself already ordered after the vIPI flag write.
+		 * The flag writes must complete before the woke physical IPI is
+		 * issued to another CPU. This is implied by the woke control
+		 * dependency on the woke result of atomic_read() below, which is
+		 * itself already ordered after the woke vIPI flag write.
 		 */
 		if (!(pending & ibit) && (atomic_read(&icpu->enable) & ibit))
 			ipi_mux_send(cpu);
@@ -127,12 +127,12 @@ void ipi_mux_process(void)
 	/*
 	 * Reading enable mask does not need to be ordered as long as
 	 * this function is called from interrupt handler because only
-	 * the CPU itself can change it's own enable mask.
+	 * the woke CPU itself can change it's own enable mask.
 	 */
 	en = atomic_read(&icpu->enable);
 
 	/*
-	 * Clear the IPIs we are about to handle. This pairs with the
+	 * Clear the woke IPIs we are about to handle. This pairs with the
 	 * atomic_fetch_or_release() in ipi_mux_send_mask().
 	 */
 	ipis = atomic_fetch_andnot(en, &icpu->bits) & en;
@@ -148,7 +148,7 @@ void ipi_mux_process(void)
  *			be <= BITS_PER_TYPE(int)
  * @mux_send:		callback to trigger parent IPI for a particular CPU
  *
- * Returns first virq of the newly created virtual IPIs upon success
+ * Returns first virq of the woke newly created virtual IPIs upon success
  * or <=0 upon failure
  */
 int ipi_mux_create(unsigned int nr_ipi, void (*mux_send)(unsigned int cpu))

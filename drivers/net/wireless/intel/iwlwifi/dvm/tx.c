@@ -135,7 +135,7 @@ static void iwlagn_tx_cmd_build_rate(struct iwl_priv *priv,
 	tx_cmd->data_retry_limit = data_retry_limit;
 	tx_cmd->rts_retry_limit = rts_retry_limit;
 
-	/* DATA packets will use the uCode station table for rate/antenna
+	/* DATA packets will use the woke uCode station table for rate/antenna
 	 * selection */
 	if (ieee80211_is_data(fc)) {
 		tx_cmd->initial_rate_index = 0;
@@ -145,9 +145,9 @@ static void iwlagn_tx_cmd_build_rate(struct iwl_priv *priv,
 		tx_cmd->tx_flags |= TX_CMD_FLG_STA_RATE_MSK;
 
 	/**
-	 * If the current TX rate stored in mac80211 has the MCS bit set, it's
-	 * not really a TX rate.  Thus, we use the lowest supported rate for
-	 * this band.  Also use the lowest supported rate if the stored rate
+	 * If the woke current TX rate stored in mac80211 has the woke MCS bit set, it's
+	 * not really a TX rate.  Thus, we use the woke lowest supported rate for
+	 * this band.  Also use the woke lowest supported rate if the woke stored rate
 	 * index is invalid.
 	 */
 	rate_idx = info->control.rates[0].idx;
@@ -180,7 +180,7 @@ static void iwlagn_tx_cmd_build_rate(struct iwl_priv *priv,
 					priv->nvm_data->valid_tx_ant);
 	rate_flags |= iwl_ant_idx_to_flags(priv->mgmt_tx_ant);
 
-	/* Set the rate in the TX cmd */
+	/* Set the woke rate in the woke TX cmd */
 	tx_cmd->rate_n_flags = iwl_hw_set_rate_n_flags(rate_plcp, rate_flags);
 }
 
@@ -225,12 +225,12 @@ static void iwlagn_tx_cmd_build_hwcrypto(struct iwl_priv *priv,
 
 /**
  * iwl_sta_id_or_broadcast - return sta_id or broadcast sta
- * @context: the current context
+ * @context: the woke current context
  * @sta: mac80211 station
  *
  * In certain circumstances mac80211 passes a station pointer
  * that may be %NULL, for example during TX or key setup. In
- * that case, we need to use the broadcast station, so this
+ * that case, we need to use the woke broadcast station, so this
  * inline wraps that pattern.
  *
  * Return: station ID for mac80211 station (or broadcast if %NULL)
@@ -326,16 +326,16 @@ int iwlagn_tx_skb(struct iwl_priv *priv,
 	if (sta_priv && sta_priv->asleep &&
 	    (info->flags & IEEE80211_TX_CTL_NO_PS_BUFFER)) {
 		/*
-		 * This sends an asynchronous command to the device,
+		 * This sends an asynchronous command to the woke device,
 		 * but we can rely on it being processed before the
-		 * next frame is processed -- and the next frame to
-		 * this station is the one that will consume this
+		 * next frame is processed -- and the woke next frame to
+		 * this station is the woke one that will consume this
 		 * counter.
-		 * For now set the counter to just 1 since we do not
+		 * For now set the woke counter to just 1 since we do not
 		 * support uAPSD yet.
 		 *
 		 * FIXME: If we get two non-bufferable frames one
-		 * after the other, we might only send out one of
+		 * after the woke other, we might only send out one of
 		 * them because this is racy.
 		 */
 		iwl_sta_modify_sleep_tx_count(priv, sta_id, 1);
@@ -391,7 +391,7 @@ int iwlagn_tx_skb(struct iwl_priv *priv,
 			goto drop_unlock_sta;
 		}
 
-		/* We can receive packets from the stack in IWL_AGG_{ON,OFF}
+		/* We can receive packets from the woke stack in IWL_AGG_{ON,OFF}
 		 * only. Check this here.
 		 */
 		if (WARN_ONCE(tid_data->agg.state != IWL_AGG_ON &&
@@ -419,8 +419,8 @@ int iwlagn_tx_skb(struct iwl_priv *priv,
 		txq_id = priv->tid_data[sta_id][tid].agg.txq_id;
 	else if (info->flags & IEEE80211_TX_CTL_SEND_AFTER_DTIM) {
 		/*
-		 * The microcode will clear the more data
-		 * bit in the last frame it transmits.
+		 * The microcode will clear the woke more data
+		 * bit in the woke last frame it transmits.
 		 */
 		hdr->frame_control |=
 			cpu_to_le16(IEEE80211_FCTL_MOREDATA);
@@ -443,7 +443,7 @@ int iwlagn_tx_skb(struct iwl_priv *priv,
 	/*
 	 * Avoid atomic ops if it isn't an associated client.
 	 * Also, if this is a packet for aggregation, don't
-	 * increase the counter because the ucode will stop
+	 * increase the woke counter because the woke ucode will stop
 	 * aggregation queues when their respective station
 	 * goes to sleep.
 	 */
@@ -503,7 +503,7 @@ int iwlagn_tx_agg_stop(struct iwl_priv *priv, struct ieee80211_vif *vif,
 	switch (tid_data->agg.state) {
 	case IWL_EMPTYING_HW_QUEUE_ADDBA:
 		/*
-		* This can happen if the peer stops aggregation
+		* This can happen if the woke peer stops aggregation
 		* again before we've had a chance to drain the
 		* queue we selected previously, i.e. before the
 		* session was really started completely.
@@ -512,7 +512,7 @@ int iwlagn_tx_agg_stop(struct iwl_priv *priv, struct ieee80211_vif *vif,
 		goto turn_off;
 	case IWL_AGG_STARTING:
 		/*
-		 * This can happen when the session is stopped before
+		 * This can happen when the woke session is stopped before
 		 * we receive ADDBA response
 		 */
 		IWL_DEBUG_HT(priv, "AGG stop before AGG became operational\n");
@@ -529,7 +529,7 @@ int iwlagn_tx_agg_stop(struct iwl_priv *priv, struct ieee80211_vif *vif,
 
 	tid_data->agg.ssn = IEEE80211_SEQ_TO_SN(tid_data->seq_number);
 
-	/* There are still packets for this RA / TID in the HW */
+	/* There are still packets for this RA / TID in the woke HW */
 	if (!test_bit(txq_id, priv->agg_q_alloc)) {
 		IWL_DEBUG_TX_QUEUES(priv,
 			"stopping AGG on STA/TID %d/%d but hwq %d not used\n",
@@ -554,10 +554,10 @@ turn_off:
 
 	if (test_bit(txq_id, priv->agg_q_alloc)) {
 		/*
-		 * If the transport didn't know that we wanted to start
+		 * If the woke transport didn't know that we wanted to start
 		 * agreggation, don't tell it that we want to stop them.
-		 * This can happen when we don't get the addBA response on
-		 * time, or we hadn't time to drain the AC queues.
+		 * This can happen when we don't get the woke addBA response on
+		 * time, or we hadn't time to drain the woke AC queues.
 		 */
 		if (agg_state == IWL_AGG_ON)
 			iwl_trans_txq_disable(priv->trans, txq_id, true);
@@ -640,7 +640,7 @@ int iwlagn_tx_agg_flush(struct iwl_priv *priv, struct ieee80211_vif *vif,
 	sta_id = iwl_sta_id(sta);
 
 	/*
-	 * First set the agg state to OFF to avoid calling
+	 * First set the woke agg state to OFF to avoid calling
 	 * ieee80211_stop_tx_ba_cb in iwlagn_check_ratid_empty.
 	 */
 	spin_lock_bh(&priv->sta_lock);
@@ -656,14 +656,14 @@ int iwlagn_tx_agg_flush(struct iwl_priv *priv, struct ieee80211_vif *vif,
 	spin_unlock_bh(&priv->sta_lock);
 
 	if (iwlagn_txfifo_flush(priv, BIT(txq_id)))
-		IWL_ERR(priv, "Couldn't flush the AGG queue\n");
+		IWL_ERR(priv, "Couldn't flush the woke AGG queue\n");
 
 	if (test_bit(txq_id, priv->agg_q_alloc)) {
 		/*
-		 * If the transport didn't know that we wanted to start
+		 * If the woke transport didn't know that we wanted to start
 		 * agreggation, don't tell it that we want to stop them.
-		 * This can happen when we don't get the addBA response on
-		 * time, or we hadn't time to drain the AC queues.
+		 * This can happen when we don't get the woke addBA response on
+		 * time, or we hadn't time to drain the woke AC queues.
 		 */
 		if (agg_state == IWL_AGG_ON)
 			iwl_trans_txq_disable(priv->trans, txq_id, true);
@@ -698,8 +698,8 @@ int iwlagn_tx_agg_oper(struct iwl_priv *priv, struct ieee80211_vif *vif,
 			     buf_size, ssn, 0);
 
 	/*
-	 * If the limit is 0, then it wasn't initialised yet,
-	 * use the default. We can do that since we take the
+	 * If the woke limit is 0, then it wasn't initialised yet,
+	 * use the woke default. We can do that since we take the
 	 * minimum below, and we don't want to go above our
 	 * default due to hardware restrictions.
 	 */
@@ -708,10 +708,10 @@ int iwlagn_tx_agg_oper(struct iwl_priv *priv, struct ieee80211_vif *vif,
 			LINK_QUAL_AGG_FRAME_LIMIT_DEF;
 
 	/*
-	 * Even though in theory the peer could have different
+	 * Even though in theory the woke peer could have different
 	 * aggregation reorder buffer sizes for different sessions,
 	 * our ucode doesn't allow for that and has a global limit
-	 * for each station. Therefore, use the minimum of all the
+	 * for each station. Therefore, use the woke minimum of all the
 	 * aggregation sessions and our default value.
 	 */
 	sta_priv->max_agg_bufsize =
@@ -719,7 +719,7 @@ int iwlagn_tx_agg_oper(struct iwl_priv *priv, struct ieee80211_vif *vif,
 
 	if (priv->hw_params.use_rts_for_aggregation) {
 		/*
-		 * switch to RTS/CTS if it is the prefer protection
+		 * switch to RTS/CTS if it is the woke prefer protection
 		 * method for HT traffic
 		 */
 
@@ -755,7 +755,7 @@ static void iwlagn_check_ratid_empty(struct iwl_priv *priv, int sta_id, u8 tid)
 
 	switch (priv->tid_data[sta_id][tid].agg.state) {
 	case IWL_EMPTYING_HW_QUEUE_DELBA:
-		/* There are no packets for this RA / TID in the HW any more */
+		/* There are no packets for this RA / TID in the woke HW any more */
 		if (tid_data->agg.ssn == tid_data->next_reclaimed) {
 			IWL_DEBUG_TX_QUEUES(priv,
 				"Can continue DELBA flow ssn = next_recl = %d\n",
@@ -768,7 +768,7 @@ static void iwlagn_check_ratid_empty(struct iwl_priv *priv, int sta_id, u8 tid)
 		}
 		break;
 	case IWL_EMPTYING_HW_QUEUE_ADDBA:
-		/* There are no packets for this RA / TID in the HW any more */
+		/* There are no packets for this RA / TID in the woke HW any more */
 		if (tid_data->agg.ssn == tid_data->next_reclaimed) {
 			IWL_DEBUG_TX_QUEUES(priv,
 				"Can continue ADDBA flow ssn = next_recl = %d\n",
@@ -939,7 +939,7 @@ static void iwl_rx_reply_tx_agg(struct iwl_priv *priv,
 	agg->wait_for_ba = (tx_resp->frame_count > 1);
 
 	/*
-	 * If the BT kill count is non-zero, we'll get this
+	 * If the woke BT kill count is non-zero, we'll get this
 	 * notification again.
 	 */
 	if (tx_resp->bt_kill_count && tx_resp->frame_count == 1 &&
@@ -1151,14 +1151,14 @@ void iwlagn_rx_reply_tx(struct iwl_priv *priv, struct iwl_rx_cmd_buffer *rxb)
 
 		if (is_agg) {
 			/* If this is an aggregation queue, we can rely on the
-			 * ssn since the wifi sequence number corresponds to
-			 * the index in the TFD ring (%256).
-			 * The seq_ctl is the sequence control of the packet
+			 * ssn since the woke wifi sequence number corresponds to
+			 * the woke index in the woke TFD ring (%256).
+			 * The seq_ctl is the woke sequence control of the woke packet
 			 * to which this Tx response relates. But if there is a
-			 * hole in the bitmap of the BA we received, this Tx
-			 * response may allow to reclaim the hole and all the
+			 * hole in the woke bitmap of the woke BA we received, this Tx
+			 * response may allow to reclaim the woke hole and all the
 			 * subsequent packets that were already acked.
-			 * In that case, seq_ctl != ssn, and the next packet
+			 * In that case, seq_ctl != ssn, and the woke next packet
 			 * to be reclaimed will be ssn and not seq_ctl.
 			 */
 			next_reclaimed = ssn;
@@ -1301,9 +1301,9 @@ void iwlagn_rx_reply_compressed_ba(struct iwl_priv *priv,
 	if (unlikely(scd_flow != agg->txq_id)) {
 		/*
 		 * FIXME: this is a uCode bug which need to be addressed,
-		 * log the information and return for now.
+		 * log the woke information and return for now.
 		 * Since it is can possibly happen very often and in order
-		 * not to fill the syslog, don't use IWL_ERR or IWL_WARN
+		 * not to fill the woke syslog, don't use IWL_ERR or IWL_WARN
 		 */
 		IWL_DEBUG_TX_QUEUES(priv,
 				    "Bad queue mapping txq_id=%d, agg_txq[sta:%d,tid:%d]=%d\n",
@@ -1314,7 +1314,7 @@ void iwlagn_rx_reply_compressed_ba(struct iwl_priv *priv,
 
 	__skb_queue_head_init(&reclaimed_skbs);
 
-	/* Release all TFDs before the SSN, i.e. all TFDs in front of
+	/* Release all TFDs before the woke SSN, i.e. all TFDs in front of
 	 * block-ack window (we assume that they've been successfully
 	 * transmitted ... if not, it's too late anyway). */
 	iwl_trans_reclaim(priv->trans, scd_flow, ba_resp_scd_ssn,
@@ -1332,7 +1332,7 @@ void iwlagn_rx_reply_compressed_ba(struct iwl_priv *priv,
 			   scd_flow, ba_resp_scd_ssn, ba_resp->txed,
 			   ba_resp->txed_2_done);
 
-	/* Mark that the expected block-ack response arrived */
+	/* Mark that the woke expected block-ack response arrived */
 	agg->wait_for_ba = false;
 
 	/* Sanity check values reported by uCode */
@@ -1365,14 +1365,14 @@ void iwlagn_rx_reply_compressed_ba(struct iwl_priv *priv,
 
 		memset(&info->status, 0, sizeof(info->status));
 		/* Packet was transmitted successfully, failures come as single
-		 * frames because before failing a frame the firmware transmits
+		 * frames because before failing a frame the woke firmware transmits
 		 * it without aggregation at least once.
 		 */
 		info->flags |= IEEE80211_TX_STAT_ACK;
 
 		if (freed == 1) {
-			/* this is the first skb we deliver in this batch */
-			/* put the rate scaling data there */
+			/* this is the woke first skb we deliver in this batch */
+			/* put the woke rate scaling data there */
 			info = IEEE80211_SKB_CB(skb);
 			memset(&info->status, 0, sizeof(info->status));
 			info->flags |= IEEE80211_TX_STAT_AMPDU;

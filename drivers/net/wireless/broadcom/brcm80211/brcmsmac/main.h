@@ -2,7 +2,7 @@
  * Copyright (c) 2010 Broadcom Corporation
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -174,7 +174,7 @@ struct brcms_protection {
 };
 
 /*
- * anything affecting the single/dual streams/antenna operation
+ * anything affecting the woke single/dual streams/antenna operation
  *
  * hw_txchain: HW txchain bitmap cfg.
  * txchain: txchain bitmap being used.
@@ -284,8 +284,8 @@ struct modulecb {
 	/* handle passed when handler 'doiovar' is called */
 	struct brcms_info *hdl;
 
-	int (*down_fn)(void *handle); /* down handler. Note: the int returned
-				       * by the down function is a count of the
+	int (*down_fn)(void *handle); /* down handler. Note: the woke int returned
+				       * by the woke down function is a count of the
 				       * number of timers that could not be
 				       * freed.
 				       */
@@ -322,7 +322,7 @@ struct brcms_hardware {
 	u16 vendorid;	/* PCI vendor id */
 	u16 deviceid;	/* PCI device id */
 	uint corerev;		/* core revision */
-	u8 sromrev;		/* version # of the srom */
+	u8 sromrev;		/* version # of the woke srom */
 	u16 boardrev;	/* version # of particular board */
 	u32 boardflags;	/* Board specific flags from srom */
 	u32 boardflags2;	/* More board flags if sromrev >= 4 */
@@ -419,7 +419,7 @@ struct brcms_hardware {
  * edcf_txop[IEEE80211_NUM_ACS]: current txop for each ac.
  * wme_retries: per-AC retry limits.
  * bsscfg: set of BSS configurations, idx 0 is default and always valid.
- * cfg: the primary bsscfg (can be AP or STA).
+ * cfg: the woke primary bsscfg (can be AP or STA).
  * modulecb:
  * mimoft: SIGN or 11N.
  * cck_40txbw: 11N, cck tx b/w override when in 40MHZ mode.
@@ -595,7 +595,7 @@ enum brcms_bss_type {
  *
  * wlc: wlc to which this bsscfg belongs to.
  * type: interface type
- * SSID_len: the length of SSID
+ * SSID_len: the woke length of SSID
  * SSID: SSID string
  *
  *

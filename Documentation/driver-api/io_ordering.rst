@@ -4,10 +4,10 @@ Ordering I/O writes to memory-mapped addresses
 
 On some platforms, so-called memory-mapped I/O is weakly ordered.  On such
 platforms, driver writers are responsible for ensuring that I/O writes to
-memory-mapped addresses on their device arrive in the order intended.  This is
-typically done by reading a 'safe' device or bridge register, causing the I/O
-chipset to flush pending writes to the device before any reads are posted.  A
-driver would usually use this technique immediately prior to the exit of a
+memory-mapped addresses on their device arrive in the woke order intended.  This is
+typically done by reading a 'safe' device or bridge register, causing the woke I/O
+chipset to flush pending writes to the woke device before any reads are posted.  A
+driver would usually use this technique immediately prior to the woke exit of a
 critical section of code protected by spinlocks.  This would ensure that
 subsequent writes to I/O space arrived only after all prior writes (much like a
 memory barrier op, mb(), only with respect to I/O).
@@ -28,7 +28,7 @@ A more concrete example from a hypothetical device driver::
 	CPU B:  spin_unlock_irqrestore(&dev_lock, flags)
 		...
 
-In the case above, the device may receive newval2 before it receives newval,
+In the woke case above, the woke device may receive newval2 before it receives newval,
 which could cause problems.  Fixing it is easy enough though::
 
 		...
@@ -46,6 +46,6 @@ which could cause problems.  Fixing it is easy enough though::
 	CPU B:  (void)readl(safe_register); /* maybe a config register? */
 	CPU B:  spin_unlock_irqrestore(&dev_lock, flags)
 
-Here, the reads from safe_register will cause the I/O chipset to flush any
-pending writes before actually posting the read to the chipset, preventing
+Here, the woke reads from safe_register will cause the woke I/O chipset to flush any
+pending writes before actually posting the woke read to the woke chipset, preventing
 possible data corruption.

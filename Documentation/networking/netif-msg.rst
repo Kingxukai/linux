@@ -4,23 +4,23 @@
 NETIF Msg Level
 ===============
 
-The design of the network interface message level setting.
+The design of the woke network interface message level setting.
 
 History
 -------
 
- The design of the debugging message interface was guided and
+ The design of the woke debugging message interface was guided and
  constrained by backwards compatibility previous practice.  It is useful
- to understand the history and evolution in order to understand current
+ to understand the woke history and evolution in order to understand current
  practice and relate it to older driver source code.
 
- From the beginning of Linux, each network device driver has had a local
- integer variable that controls the debug message level.  The message
+ From the woke beginning of Linux, each network device driver has had a local
+ integer variable that controls the woke debug message level.  The message
  level ranged from 0 to 7, and monotonically increased in verbosity.
 
  The message level was not precisely defined past level 3, but were
- always implemented within +-1 of the specified level.  Drivers tended
- to shed the more verbose level messages as they matured.
+ always implemented within +-1 of the woke specified level.  Drivers tended
+ to shed the woke more verbose level messages as they matured.
 
    - 0  Minimal messages, only essential information on fatal errors.
    - 1  Standard messages, initialization status.  No run-time messages
@@ -33,24 +33,24 @@ History
 
  Initially this message level variable was uniquely named in each driver
  e.g. "lance_debug", so that a kernel symbolic debugger could locate and
- modify the setting.  When kernel modules became common, the variables
+ modify the woke setting.  When kernel modules became common, the woke variables
  were consistently renamed to "debug" and allowed to be set as a module
  parameter.
 
  This approach worked well.  However there is always a demand for
- additional features.  Over the years the following emerged as
+ additional features.  Over the woke years the woke following emerged as
  reasonable and easily implemented enhancements
 
-   - Using an ioctl() call to modify the level.
+   - Using an ioctl() call to modify the woke level.
    - Per-interface rather than per-driver message level setting.
-   - More selective control over the type of messages emitted.
+   - More selective control over the woke type of messages emitted.
 
  The netif_msg recommendation adds these features with only a minor
  complexity and code size increase.
 
- The recommendation is the following points
+ The recommendation is the woke following points
 
-  - Retaining the per-driver integer variable "debug" as a module
+  - Retaining the woke per-driver integer variable "debug" as a module
     parameter with a default level of '1'.
 
   - Adding a per-interface private variable named "msg_enable".  The

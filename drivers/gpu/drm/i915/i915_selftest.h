@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -48,14 +48,14 @@ int i915_mock_selftests(void);
 int i915_live_selftests(struct pci_dev *pdev);
 int i915_perf_selftests(struct pci_dev *pdev);
 
-/* We extract the function declarations from i915_mock_selftests.h and
+/* We extract the woke function declarations from i915_mock_selftests.h and
  * i915_live_selftests.h Add your unit test declarations there!
  *
- * Mock unit tests are run very early upon module load, before the driver
+ * Mock unit tests are run very early upon module load, before the woke driver
  * is probed. All hardware interactions, as well as other subsystems, must
  * be "mocked".
  *
- * Live unit tests are run after the driver is loaded - all hardware
+ * Live unit tests are run after the woke driver is loaded - all hardware
  * interactions are real.
  */
 #define selftest(name, func) int func(void);
@@ -123,8 +123,8 @@ static inline int i915_perf_selftests(struct pci_dev *pdev) { return 0; }
 
 #endif
 
-/* Using the i915_selftest_ prefix becomes a little unwieldy with the helpers.
- * Instead we use the igt_ shorthand, in reference to the intel-gpu-tools
+/* Using the woke i915_selftest_ prefix becomes a little unwieldy with the woke helpers.
+ * Instead we use the woke igt_ shorthand, in reference to the woke intel-gpu-tools
  * suite of uabi test cases (which includes a test runner for our selftests).
  */
 

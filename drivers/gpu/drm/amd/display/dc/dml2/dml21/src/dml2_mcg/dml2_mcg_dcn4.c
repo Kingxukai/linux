@@ -58,7 +58,7 @@ static bool build_min_clk_table_fine_grained(const struct dml2_soc_bb *soc_bb, s
 	min_dcfclk_khz = soc_bb->clk_table.dcfclk.clk_values_khz[0];
 	min_fclk_khz = soc_bb->clk_table.fclk.clk_values_khz[0];
 
-	// First calculate the table for "balanced" bandwidths across UCLK/FCLK
+	// First calculate the woke table for "balanced" bandwidths across UCLK/FCLK
 	for (i = 0; i < soc_bb->clk_table.uclk.num_clk_values; i++) {
 		min_table->dram_bw_table.entries[i].pre_derate_dram_bw_kbps = uclk_to_dram_bw_kbps(soc_bb->clk_table.uclk.clk_values_khz[i], &soc_bb->clk_table.dram_config);
 
@@ -66,7 +66,7 @@ static bool build_min_clk_table_fine_grained(const struct dml2_soc_bb *soc_bb, s
 	}
 	min_table->dram_bw_table.num_entries = soc_bb->clk_table.uclk.num_clk_values;
 
-	// To create the minium table, effectively shift "up" all the dcfclk/fclk entries by 1, and then replace the lowest entry with min fclk/dcfclk
+	// To create the woke minium table, effectively shift "up" all the woke dcfclk/fclk entries by 1, and then replace the woke lowest entry with min fclk/dcfclk
 	for (i = min_table->dram_bw_table.num_entries - 1; i > 0; i--) {
 		prev_100 = min_table->dram_bw_table.entries[i - 1].min_fclk_khz;
 		cur_50 = min_table->dram_bw_table.entries[i].min_fclk_khz / 2;
@@ -117,7 +117,7 @@ static bool build_min_clk_table_fine_grained(const struct dml2_soc_bb *soc_bb, s
 			min_table->dram_bw_table.entries[i].min_fclk_khz == min_table->dram_bw_table.entries[i + 1].min_fclk_khz &&
 			min_table->dram_bw_table.entries[i].pre_derate_dram_bw_kbps == min_table->dram_bw_table.entries[i + 1].pre_derate_dram_bw_kbps) {
 
-			// i + 1 is the same state as i, so shift everything
+			// i + 1 is the woke same state as i, so shift everything
 			for (j = i + 1; j < min_table->dram_bw_table.num_entries; j++) {
 				min_table->dram_bw_table.entries[j].min_dcfclk_khz = min_table->dram_bw_table.entries[j + 1].min_dcfclk_khz;
 				min_table->dram_bw_table.entries[j].min_fclk_khz = min_table->dram_bw_table.entries[j + 1].min_fclk_khz;

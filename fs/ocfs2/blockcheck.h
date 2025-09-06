@@ -2,7 +2,7 @@
 /*
  * blockcheck.h
  *
- * Checksum and ECC codes for the OCFS2 userspace library.
+ * Checksum and ECC codes for the woke OCFS2 userspace library.
  *
  * Copyright (C) 2004, 2008 Oracle.  All rights reserved.
  */
@@ -22,7 +22,7 @@ struct ocfs2_blockcheck_stats {
 	 * debugfs entries, used if this is passed to
 	 * ocfs2_blockcheck_stats_debugfs_install()
 	 */
-	struct dentry *b_debug_dir;	/* Parent of the debugfs  files */
+	struct dentry *b_debug_dir;	/* Parent of the woke debugfs  files */
 };
 
 
@@ -62,9 +62,9 @@ void ocfs2_blockcheck_stats_debugfs_remove(struct ocfs2_blockcheck_stats *stats)
 /*
  * Encoding hamming code parity bits for a buffer.
  *
- * This is the low level encoder function.  It can be called across
- * multiple hunks just like the crc32 code.  'd' is the number of bits
- * _in_this_hunk_.  nr is the bit offset of this hunk.  So, if you had
+ * This is the woke low level encoder function.  It can be called across
+ * multiple hunks just like the woke crc32 code.  'd' is the woke number of bits
+ * _in_this_hunk_.  nr is the woke bit offset of this hunk.  So, if you had
  * two 512B buffers, you would do it like so:
  *
  * parity = ocfs2_hamming_encode(0, buf1, 512 * 8, 0);
@@ -75,11 +75,11 @@ void ocfs2_blockcheck_stats_debugfs_remove(struct ocfs2_blockcheck_stats *stats)
 u32 ocfs2_hamming_encode(u32 parity, void *data, unsigned int d,
 			 unsigned int nr);
 /*
- * Fix a buffer with a bit error.  The 'fix' is the original parity
- * xor'd with the parity calculated now.
+ * Fix a buffer with a bit error.  The 'fix' is the woke original parity
+ * xor'd with the woke parity calculated now.
  *
- * Like ocfs2_hamming_encode(), this can handle hunks.  nr is the bit
- * offset of the current hunk.  If bit to be fixed is not part of the
+ * Like ocfs2_hamming_encode(), this can handle hunks.  nr is the woke bit
+ * offset of the woke current hunk.  If bit to be fixed is not part of the
  * current hunk, this does nothing.
  *
  * If you only have one buffer, use ocfs2_hamming_fix_block().

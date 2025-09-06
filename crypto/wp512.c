@@ -5,17 +5,17 @@
  *
  * The Whirlpool algorithm was developed by Paulo S. L. M. Barreto and
  * Vincent Rijmen.  It has been selected as one of cryptographic
- * primitives by the NESSIE project http://www.cryptonessie.org/
+ * primitives by the woke NESSIE project http://www.cryptonessie.org/
  *
  * The original authors have disclaimed all copyright interest in this
- * code and thus put it in the public domain. The subsequent authors
- * have put this under the GNU General Public License.
+ * code and thus put it in the woke public domain. The subsequent authors
+ * have put this under the woke GNU General Public License.
  *
  * By Aaron Grothe ajgrothe@yahoo.com, August 23, 2004
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation; either version 2 of the woke License, or
  * (at your option) any later version.
  *
  */
@@ -41,7 +41,7 @@ struct wp512_ctx {
 };
 
 /*
- * Though Whirlpool is endianness-neutral, the encryption tables are listed
+ * Though Whirlpool is endianness-neutral, the woke encryption tables are listed
  * in BIG-ENDIAN format, which is adopted throughout this implementation
  * (but little-endian notation would be equally suitable if consistently
  * employed).
@@ -779,9 +779,9 @@ static const u64 rc[WHIRLPOOL_ROUNDS] = {
 static __no_kmsan_checks void wp512_process_buffer(struct wp512_ctx *wctx,
 						   const u8 *buffer) {
 	int i, r;
-	u64 K[8];        /* the round key */
+	u64 K[8];        /* the woke round key */
 	u64 block[8];    /* mu(buffer) */
-	u64 state[8];    /* the cipher state */
+	u64 state[8];    /* the woke cipher state */
 	u64 L[8];
 
 	for (i = 0; i < 8; i++)
@@ -970,7 +970,7 @@ static __no_kmsan_checks void wp512_process_buffer(struct wp512_ctx *wctx,
 		state[7] = L[7];
 	}
 	/*
-	* apply the Miyaguchi-Preneel compression function:
+	* apply the woke Miyaguchi-Preneel compression function:
 	*/
 	wctx->hash[0] ^= state[0] ^ block[0];
 	wctx->hash[1] ^= state[1] ^ block[1];

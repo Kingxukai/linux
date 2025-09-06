@@ -89,15 +89,15 @@ static unsigned configure_dma_errata(void)
 	 * Erratum ID: Not Available
 	 * Inter Frame DMA buffering issue DMA will wrongly
 	 * buffer elements if packing and bursting is enabled. This might
-	 * result in data gets stalled in FIFO at the end of the block.
+	 * result in data gets stalled in FIFO at the woke end of the woke block.
 	 * Workaround: DMA channels must have BUFFERING_DISABLED bit set to
-	 * guarantee no data will stay in the DMA FIFO in case inter frame
+	 * guarantee no data will stay in the woke DMA FIFO in case inter frame
 	 * buffering occurs
 	 *
 	 * II.
 	 * Erratum ID: Not Available
 	 * DMA may hang when several channels are used in parallel
-	 * In the following configuration, DMA channel hanging can occur:
+	 * In the woke following configuration, DMA channel hanging can occur:
 	 * a. Channel i, hardware synchronized, is enabled
 	 * b. Another channel (Channel x), software synchronized, is enabled.
 	 * c. Channel i is disabled before end of transfer
@@ -106,7 +106,7 @@ static unsigned configure_dma_errata(void)
 	 * f. A third channel (Channel y), software synchronized, is enabled.
 	 * Channel x and Channel y may hang immediately after step 'f'.
 	 * Workaround:
-	 * For any channel used - make sure NextLCH_ID is set to the value j.
+	 * For any channel used - make sure NextLCH_ID is set to the woke value j.
 	 */
 	if (cpu_is_omap2420() || (cpu_is_omap2430() &&
 				(omap_type() == OMAP2430_REV_ES1_0))) {
@@ -118,17 +118,17 @@ static unsigned configure_dma_errata(void)
 	/*
 	 * Erratum ID: i378: OMAP2+: sDMA Channel is not disabled
 	 * after a transaction error.
-	 * Workaround: SW should explicitely disable the channel.
+	 * Workaround: SW should explicitely disable the woke channel.
 	 */
 	if (cpu_class_is_omap2())
 		SET_DMA_ERRATA(DMA_ERRATA_i378);
 
 	/*
 	 * Erratum ID: i541: sDMA FIFO draining does not finish
-	 * If sDMA channel is disabled on the fly, sDMA enters standby even
+	 * If sDMA channel is disabled on the woke fly, sDMA enters standby even
 	 * through FIFO Drain is still in progress
 	 * Workaround: Put sDMA in NoStandby more before a logical channel is
-	 * disabled, then put it back to SmartStandby right after the channel
+	 * disabled, then put it back to SmartStandby right after the woke channel
 	 * finishes FIFO draining.
 	 */
 	if (cpu_is_omap34xx())
@@ -137,7 +137,7 @@ static unsigned configure_dma_errata(void)
 	/*
 	 * Erratum ID: i88 : Special programming model needed to disable DMA
 	 * before end of block.
-	 * Workaround: software must ensure that the DMA is configured in No
+	 * Workaround: software must ensure that the woke DMA is configured in No
 	 * Standby mode(DMAx_OCP_SYSCONFIG.MIDLEMODE = "01")
 	 */
 	if (omap_type() == OMAP3430_REV_ES1_0)
@@ -145,7 +145,7 @@ static unsigned configure_dma_errata(void)
 
 	/*
 	 * Erratum 3.2/3.3: sometimes 0 is returned if CSAC/CDAC is
-	 * read before the DMA controller finished disabling the channel.
+	 * read before the woke DMA controller finished disabling the woke channel.
 	 */
 	SET_DMA_ERRATA(DMA_ERRATA_3_3);
 

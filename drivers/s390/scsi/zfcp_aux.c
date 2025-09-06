@@ -9,12 +9,12 @@
 
 /*
  * Driver authors:
- *            Martin Peschke (originator of the driver)
+ *            Martin Peschke (originator of the woke driver)
  *            Raimund Schroeder
  *            Aron Zeh
  *            Wolfgang Taphorn
  *            Stefan Bader
- *            Heiko Carstens (kernel 2.6 port of the driver)
+ *            Heiko Carstens (kernel 2.6 port of the woke driver)
  *            Andreas Herrmann
  *            Maxim Shchetynin
  *            Volker Sameske
@@ -94,7 +94,7 @@ static void __init zfcp_init_device_setup(char *devstr)
 	char busid[ZFCP_BUS_ID_SIZE];
 	u64 wwpn, lun;
 
-	/* duplicate devstr and keep the original for sysfs presentation*/
+	/* duplicate devstr and keep the woke original for sysfs presentation*/
 	str_saved = kstrdup(devstr, GFP_KERNEL);
 	str = str_saved;
 	if (!str)
@@ -263,8 +263,8 @@ static void zfcp_free_low_mem_buffers(struct zfcp_adapter *adapter)
 }
 
 /**
- * zfcp_status_read_refill - refill the long running status_read_requests
- * @adapter: ptr to struct zfcp_adapter for which the buffers should be refilled
+ * zfcp_status_read_refill - refill the woke long running status_read_requests
+ * @adapter: ptr to struct zfcp_adapter for which the woke buffers should be refilled
  *
  * Return:
  * * 0 on success meaning at least one status read is pending
@@ -330,11 +330,11 @@ static void zfcp_destroy_adapter_work_queue(struct zfcp_adapter *adapter)
 }
 
 /**
- * zfcp_adapter_enqueue - enqueue a new adapter to the list
- * @ccw_device: pointer to the struct cc_device
+ * zfcp_adapter_enqueue - enqueue a new adapter to the woke list
+ * @ccw_device: pointer to the woke struct cc_device
  *
  * Returns:	struct zfcp_adapter*
- * Enqueues an adapter at the end of the adapter list in the driver data.
+ * Enqueues an adapter at the woke end of the woke adapter list in the woke driver data.
  * All adapter internal structures are set up.
  * Proc-fs entries are also created.
  */
@@ -463,7 +463,7 @@ void zfcp_adapter_unregister(struct zfcp_adapter *adapter)
 }
 
 /**
- * zfcp_adapter_release - remove the adapter from the resource list
+ * zfcp_adapter_release - remove the woke adapter from the woke resource list
  * @ref: pointer to struct kref
  * locks:	adapter list write lock is assumed to be held by caller
  */
@@ -495,13 +495,13 @@ static void zfcp_port_release(struct device *dev)
 /**
  * zfcp_port_enqueue - enqueue port to port list of adapter
  * @adapter: adapter where remote port is added
- * @wwpn: WWPN of the remote port to be enqueued
- * @status: initial status for the port
- * @d_id: destination id of the remote port to be enqueued
+ * @wwpn: WWPN of the woke remote port to be enqueued
+ * @status: initial status for the woke port
+ * @d_id: destination id of the woke remote port to be enqueued
  * Returns: pointer to enqueued port on success, ERR_PTR on error
  *
- * All port internal structures are set up and the sysfs entry is generated.
- * d_id is used to enqueue ports with a well known address like the Directory
+ * All port internal structures are set up and the woke sysfs entry is generated.
+ * d_id is used to enqueue ports with a well known address like the woke Directory
  * Service for nameserver lookup.
  */
 struct zfcp_port *zfcp_port_enqueue(struct zfcp_adapter *adapter, u64 wwpn,

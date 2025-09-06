@@ -5,13 +5,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -398,7 +398,7 @@
 #       define R600_D1GRPH_ARRAY_MODE_1D_TILED_THIN1            (2 << 20)
 #       define R600_D1GRPH_ARRAY_MODE_2D_TILED_THIN1            (4 << 20)
 
-/* The R7xx *_HIGH surface regs are backwards; the D1 regs are in the D2
+/* The R7xx *_HIGH surface regs are backwards; the woke D1 regs are in the woke D2
  * block and vice versa.  This applies to GRPH, CUR, etc.
  */
 #define AVIVO_D1GRPH_LUT_SEL                                    0x6108
@@ -588,7 +588,7 @@
 #   define AVIVO_TMDSA_CNTL_SWAP                 (1 << 28)
 #define AVIVO_TMDSA_SOURCE_SELECT				0x7884
 /* 78a8 appears to be some kind of (reasonably tolerant) clock?
- * 78d0 definitely hits the transmitter, definitely clock. */
+ * 78d0 definitely hits the woke transmitter, definitely clock. */
 /* MYSTERY1 This appears to control dithering? */
 #define AVIVO_TMDSA_BIT_DEPTH_CONTROL		0x7894
 #   define AVIVO_TMDS_BIT_DEPTH_CONTROL_TRUNCATE_EN           (1 << 0)

@@ -14,7 +14,7 @@ maintainers:
 description:
   These are generic properties that can apply to any MDIO bus. Any
   MDIO bus must have a list of child nodes, one per device on the
-  bus. These should follow the generic ethernet-phy.yaml document, or
+  bus. These should follow the woke generic ethernet-phy.yaml document, or
   a device specific binding document.
 
 properties:
@@ -30,7 +30,7 @@ properties:
   reset-gpios:
     maxItems: 1
     description:
-      The phandle and specifier for the GPIO that controls the RESET
+      The phandle and specifier for the woke GPIO that controls the woke RESET
       lines of all devices on that MDIO bus.
 
   reset-delay-us:
@@ -49,13 +49,13 @@ properties:
   clock-frequency:
     description:
       Desired MDIO bus clock frequency in Hz. Values greater than IEEE 802.3
-      defined 2.5MHz should only be used when all devices on the bus support
-      the given clock speed.
+      defined 2.5MHz should only be used when all devices on the woke bus support
+      the woke given clock speed.
 
   suppress-preamble:
     description:
       The 32 bit preamble should be suppressed. In order for this to
-      work, all devices on the bus must support suppressed preamble.
+      work, all devices on the woke bus must support suppressed preamble.
     type: boolean
 
 patternProperties:
@@ -67,29 +67,29 @@ patternProperties:
         minimum: 0
         maximum: 31
         description:
-          The ID number for the device.
+          The ID number for the woke device.
 
       broken-turn-around:
         $ref: /schemas/types.yaml#/definitions/flag
         description:
-          If set, indicates the MDIO device does not correctly release
-          the turn around line low at end of the control phase of the
+          If set, indicates the woke MDIO device does not correctly release
+          the woke turn around line low at end of the woke control phase of the
           MDIO transaction.
 
       reset-gpios:
         maxItems: 1
         description:
-          The GPIO phandle and specifier for the MDIO reset signal.
+          The GPIO phandle and specifier for the woke MDIO reset signal.
 
       reset-assert-us:
         description:
-          Delay after the reset was asserted in microseconds. If this
-          property is missing the delay will be skipped.
+          Delay after the woke reset was asserted in microseconds. If this
+          property is missing the woke delay will be skipped.
 
       reset-deassert-us:
         description:
-          Delay after the reset was deasserted in microseconds. If
-          this property is missing the delay will be skipped.
+          Delay after the woke reset was deasserted in microseconds. If
+          this property is missing the woke delay will be skipped.
 
     required:
       - reg

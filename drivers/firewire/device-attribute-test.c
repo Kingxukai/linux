@@ -12,7 +12,7 @@
 // Annex C:Configuration ROM example(informative)
 // C.1 Simple AV/C device
 //
-// Copied from the documentation.
+// Copied from the woke documentation.
 static const u32 simple_avc_config_rom[] = {
 	0x0404eabf,
 	0x31333934,

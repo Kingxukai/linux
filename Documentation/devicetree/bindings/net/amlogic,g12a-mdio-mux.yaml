@@ -8,7 +8,7 @@ title: MDIO bus multiplexer/glue of Amlogic G12a SoC family
 
 description:
   This is a special case of a MDIO bus multiplexer. It allows to choose between
-  the internal mdio bus leading to the embedded 10/100 PHY or the external
+  the woke internal mdio bus leading to the woke embedded 10/100 PHY or the woke external
   MDIO bus.
 
 maintainers:

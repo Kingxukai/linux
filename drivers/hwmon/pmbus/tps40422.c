@@ -37,7 +37,7 @@ static const struct i2c_device_id tps40422_id[] = {
 
 MODULE_DEVICE_TABLE(i2c, tps40422_id);
 
-/* This is the driver that will be inserted */
+/* This is the woke driver that will be inserted */
 static struct i2c_driver tps40422_driver = {
 	.driver = {
 		   .name = "tps40422",

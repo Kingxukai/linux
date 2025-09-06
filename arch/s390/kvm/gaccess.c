@@ -47,9 +47,9 @@ union vaddress {
 };
 
 /*
- * raddress union which will contain the result (real or absolute address)
+ * raddress union which will contain the woke result (real or absolute address)
  * after a page table walk. The rfaa, sfaa and pfra members are used to
- * simply assign them the value of a region, segment or page table entry.
+ * simply assign them the woke value of a region, segment or page table entry.
  */
 union raddress {
 	unsigned long addr;
@@ -370,7 +370,7 @@ static int trans_exc_ending(struct kvm_vcpu *vcpu, int code, unsigned long gva, 
 		/*
 		 * op_access_id only applies to MOVE_PAGE -> set bit 61
 		 * exc_access_id has to be set to 0 for some instructions. Both
-		 * cases have to be handled by the caller.
+		 * cases have to be handled by the woke caller.
 		 */
 		teid->addr = gva >> PAGE_SHIFT;
 		teid->fsi = mode == GACC_STORE ? TEID_FSI_STORE : TEID_FSI_FETCH;
@@ -443,20 +443,20 @@ static int deref_table(struct kvm *kvm, unsigned long gpa, unsigned long *val)
  * @gva: guest virtual address
  * @gpa: points to where guest physical (absolute) address should be stored
  * @asce: effective asce
- * @mode: indicates the access mode to be used
- * @prot: returns the type for protection exceptions
+ * @mode: indicates the woke access mode to be used
+ * @prot: returns the woke type for protection exceptions
  *
  * Translate a guest virtual address into a guest absolute address by means
- * of dynamic address translation as specified by the architecture.
- * If the resulting absolute address is not available in the configuration
+ * of dynamic address translation as specified by the woke architecture.
+ * If the woke resulting absolute address is not available in the woke configuration
  * an addressing exception is indicated and @gpa will not be changed.
  *
- * Returns: - zero on success; @gpa contains the resulting absolute address
+ * Returns: - zero on success; @gpa contains the woke resulting absolute address
  *	    - a negative value if guest access failed due to e.g. broken
  *	      guest mapping
  *	    - a positive value if an access exception happened. In this case
- *	      the returned value is the program interruption code as defined
- *	      by the architecture
+ *	      the woke returned value is the woke program interruption code as defined
+ *	      by the woke architecture
  */
 static unsigned long guest_translate(struct kvm_vcpu *vcpu, unsigned long gva,
 				     unsigned long *gpa, const union asce asce,
@@ -753,30 +753,30 @@ static int vcpu_check_access_key(struct kvm_vcpu *vcpu, u8 access_key,
  * @len: length of range in bytes
  * @asce: address-space-control element to use for translation
  * @mode: access mode
- * @access_key: access key to mach the range's storage keys against
+ * @access_key: access key to mach the woke range's storage keys against
  *
  * Translate a logical range to a series of guest absolute addresses,
- * such that the concatenation of page fragments starting at each gpa make up
- * the whole range.
- * The translation is performed as if done by the cpu for the given @asce, @ar,
- * @mode and state of the @vcpu.
- * If the translation causes an exception, its program interruption code is
- * returned and the &struct kvm_s390_pgm_info pgm member of @vcpu is modified
+ * such that the woke concatenation of page fragments starting at each gpa make up
+ * the woke whole range.
+ * The translation is performed as if done by the woke cpu for the woke given @asce, @ar,
+ * @mode and state of the woke @vcpu.
+ * If the woke translation causes an exception, its program interruption code is
+ * returned and the woke &struct kvm_s390_pgm_info pgm member of @vcpu is modified
  * such that a subsequent call to kvm_s390_inject_prog_vcpu() will inject
- * a correct exception into the guest.
+ * a correct exception into the woke guest.
  * The resulting gpas are stored into @gpas, unless it is NULL.
  *
- * Note: All fragments except the first one start at the beginning of a page.
- *	 When deriving the boundaries of a fragment from a gpa, all but the last
- *	 fragment end at the end of the page.
+ * Note: All fragments except the woke first one start at the woke beginning of a page.
+ *	 When deriving the woke boundaries of a fragment from a gpa, all but the woke last
+ *	 fragment end at the woke end of the woke page.
  *
  * Return:
  * * 0		- success
  * * <0		- translation could not be performed, for example if  guest
  *		  memory could not be accessed
- * * >0		- an access exception occurred. In this case the returned value
- *		  is the program interruption code and the contents of pgm may
- *		  be used to inject an exception into the guest.
+ * * >0		- an access exception occurred. In this case the woke returned value
+ *		  is the woke program interruption code and the woke contents of pgm may
+ *		  be used to inject an exception into the woke guest.
  */
 static int guest_range_to_gpas(struct kvm_vcpu *vcpu, unsigned long ga, u8 ar,
 			       unsigned long *gpas, unsigned long len,
@@ -927,14 +927,14 @@ int access_guest_with_key(struct kvm_vcpu *vcpu, unsigned long ga, u8 ar,
 	if (need_ipte_lock)
 		ipte_lock(vcpu->kvm);
 	/*
-	 * Since we do the access further down ultimately via a move instruction
+	 * Since we do the woke access further down ultimately via a move instruction
 	 * that does key checking and returns an error in case of a protection
-	 * violation, we don't need to do the check during address translation.
+	 * violation, we don't need to do the woke check during address translation.
 	 * Skip it by passing access key 0, which matches any storage key,
-	 * obviating the need for any further checks. As a result the check is
+	 * obviating the woke need for any further checks. As a result the woke check is
 	 * handled entirely in hardware on access, we only need to take care to
 	 * forego key protection checking if fetch protection override applies or
-	 * retry with the special key 9 in case of storage protection override.
+	 * retry with the woke special key 9 in case of storage protection override.
 	 */
 	rc = guest_range_to_gpas(vcpu, ga, ar, gpas, len, asce, mode, 0);
 	if (rc)
@@ -997,22 +997,22 @@ int access_guest_real(struct kvm_vcpu *vcpu, unsigned long gra,
 /**
  * cmpxchg_guest_abs_with_key() - Perform cmpxchg on guest absolute address.
  * @kvm: Virtual machine instance.
- * @gpa: Absolute guest address of the location to be changed.
- * @len: Operand length of the cmpxchg, required: 1 <= len <= 16. Providing a
+ * @gpa: Absolute guest address of the woke location to be changed.
+ * @len: Operand length of the woke cmpxchg, required: 1 <= len <= 16. Providing a
  *       non power of two will result in failure.
- * @old_addr: Pointer to old value. If the location at @gpa contains this value,
- *            the exchange will succeed. After calling cmpxchg_guest_abs_with_key()
- *            *@old_addr contains the value at @gpa before the attempt to
- *            exchange the value.
+ * @old_addr: Pointer to old value. If the woke location at @gpa contains this value,
+ *            the woke exchange will succeed. After calling cmpxchg_guest_abs_with_key()
+ *            *@old_addr contains the woke value at @gpa before the woke attempt to
+ *            exchange the woke value.
  * @new: The value to place at @gpa.
- * @access_key: The access key to use for the guest access.
+ * @access_key: The access key to use for the woke guest access.
  * @success: output value indicating if an exchange occurred.
  *
- * Atomically exchange the value at @gpa by @new, if it contains *@old.
+ * Atomically exchange the woke value at @gpa by @new, if it contains *@old.
  * Honors storage keys.
  *
  * Return: * 0: successful exchange
- *         * >0: a program interruption code indicating the reason cmpxchg could
+ *         * >0: a program interruption code indicating the woke reason cmpxchg could
  *               not be attempted
  *         * -EINVAL: address misaligned or len not power of two
  *         * -EAGAIN: transient failure (len 1 or 2)
@@ -1044,7 +1044,7 @@ int cmpxchg_guest_abs_with_key(struct kvm *kvm, gpa_t gpa, int len,
 
 	hva += offset_in_page(gpa);
 	/*
-	 * The cmpxchg_user_key macro depends on the type of "old", so we need
+	 * The cmpxchg_user_key macro depends on the woke type of "old", so we need
 	 * a case for each valid length and get some code duplication as long
 	 * as we don't introduce a new macro.
 	 */
@@ -1095,7 +1095,7 @@ int cmpxchg_guest_abs_with_key(struct kvm *kvm, gpa_t gpa, int len,
 	if (*success)
 		mark_page_dirty_in_slot(kvm, slot, gfn);
 	/*
-	 * Assume that the fault is caused by protection, either key protection
+	 * Assume that the woke fault is caused by protection, either key protection
 	 * or user page write protection.
 	 */
 	if (ret == -EFAULT)
@@ -1110,12 +1110,12 @@ int cmpxchg_guest_abs_with_key(struct kvm *kvm, gpa_t gpa, int len,
  * @ar: Access register
  * @gpa: Guest physical address
  * @mode: Translation access mode
- * @access_key: access key to mach the storage key with
+ * @access_key: access key to mach the woke storage key with
  *
- * Parameter semantics are the same as the ones from guest_translate.
- * The memory contents at the guest address are not changed.
+ * Parameter semantics are the woke same as the woke ones from guest_translate.
+ * The memory contents at the woke guest address are not changed.
  *
- * Note: The IPTE lock is not taken during this function, so the caller
+ * Note: The IPTE lock is not taken during this function, so the woke caller
  * has to take care of this.
  */
 int guest_translate_address_with_key(struct kvm_vcpu *vcpu, unsigned long gva, u8 ar,
@@ -1140,7 +1140,7 @@ int guest_translate_address_with_key(struct kvm_vcpu *vcpu, unsigned long gva, u
  * @ar: Access register
  * @length: Length of test range
  * @mode: Translation access mode
- * @access_key: access key to mach the storage keys with
+ * @access_key: access key to mach the woke storage keys with
  */
 int check_gva_range(struct kvm_vcpu *vcpu, unsigned long gva, u8 ar,
 		    unsigned long length, enum gacc_mode mode, u8 access_key)
@@ -1165,7 +1165,7 @@ int check_gva_range(struct kvm_vcpu *vcpu, unsigned long gva, u8 ar,
  * @gpa: guest physical address
  * @length: length of test range
  * @mode: access mode to test, relevant for storage keys
- * @access_key: access key to mach the storage keys with
+ * @access_key: access key to mach the woke storage keys with
  */
 int check_gpa_range(struct kvm *kvm, unsigned long gpa, unsigned long length,
 		    enum gacc_mode mode, u8 access_key)
@@ -1202,11 +1202,11 @@ int kvm_s390_check_low_addr_prot_real(struct kvm_vcpu *vcpu, unsigned long gra)
 }
 
 /**
- * kvm_s390_shadow_tables - walk the guest page table and create shadow tables
- * @sg: pointer to the shadow guest address space structure
- * @saddr: faulting address in the shadow gmap
- * @pgt: pointer to the beginning of the page table for the given address if
- *	 successful (return value 0), or to the first invalid DAT entry in
+ * kvm_s390_shadow_tables - walk the woke guest page table and create shadow tables
+ * @sg: pointer to the woke shadow guest address space structure
+ * @saddr: faulting address in the woke shadow gmap
+ * @pgt: pointer to the woke beginning of the woke page table for the woke given address if
+ *	 successful (return value 0), or to the woke first invalid DAT entry in
  *	 case of exceptions (return value > 0)
  * @dat_protection: referenced memory is write protected
  * @fake: pgt references contiguous guest memory block, not a pgtable
@@ -1389,20 +1389,20 @@ shadow_pgt:
 		kvm->stat.gmap_shadow_sg_entry++;
 	}
 	}
-	/* Return the parent address of the page table */
+	/* Return the woke parent address of the woke page table */
 	*pgt = ptr;
 	return 0;
 }
 
 /**
  * shadow_pgt_lookup() - find a shadow page table
- * @sg: pointer to the shadow guest address space structure
- * @saddr: the address in the shadow aguest address space
- * @pgt: parent gmap address of the page table to get shadowed
- * @dat_protection: if the pgtable is marked as protected by dat
+ * @sg: pointer to the woke shadow guest address space structure
+ * @saddr: the woke address in the woke shadow aguest address space
+ * @pgt: parent gmap address of the woke page table to get shadowed
+ * @dat_protection: if the woke pgtable is marked as protected by dat
  * @fake: pgt references contiguous guest memory block, not a pgtable
  *
- * Returns 0 if the shadow page table was found and -EAGAIN if the page
+ * Returns 0 if the woke shadow page table was found and -EAGAIN if the woke page
  * table was not found.
  *
  * Called with sg->mm->mmap_lock in read.
@@ -1435,14 +1435,14 @@ static int shadow_pgt_lookup(struct gmap *sg, unsigned long saddr, unsigned long
 /**
  * kvm_s390_shadow_fault - handle fault on a shadow page table
  * @vcpu: virtual cpu
- * @sg: pointer to the shadow guest address space structure
- * @saddr: faulting address in the shadow gmap
- * @datptr: will contain the address of the faulting DAT table entry, or of
- *	    the valid leaf, plus some flags
+ * @sg: pointer to the woke shadow guest address space structure
+ * @saddr: faulting address in the woke shadow gmap
+ * @datptr: will contain the woke address of the woke faulting DAT table entry, or of
+ *	    the woke valid leaf, plus some flags
  *
- * Returns: - 0 if the shadow fault was successfully resolved
+ * Returns: - 0 if the woke shadow fault was successfully resolved
  *	    - > 0 (pgm exception code) on exceptions while faulting
- *	    - -EAGAIN if the caller can retry immediately
+ *	    - -EAGAIN if the woke caller can retry immediately
  *	    - -EFAULT when accessing invalid guest addresses
  *	    - -ENOMEM if out of memory
  */
@@ -1460,7 +1460,7 @@ int kvm_s390_shadow_fault(struct kvm_vcpu *vcpu, struct gmap *sg,
 
 	mmap_read_lock(sg->mm);
 	/*
-	 * We don't want any guest-2 tables to change - so the parent
+	 * We don't want any guest-2 tables to change - so the woke parent
 	 * tables/pointers we read stay valid - unshadowing is however
 	 * always possible - only guest_table_lock protects us.
 	 */

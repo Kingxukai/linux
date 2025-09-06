@@ -4,12 +4,12 @@
  * Copyright (c) 1997 by Procom Technology, Inc.
  *		 2001-2003 by Arnaldo Carvalho de Melo <acme@conectiva.com.br>
  *
- * This program can be redistributed or modified under the terms of the
- * GNU General Public License as published by the Free Software Foundation.
+ * This program can be redistributed or modified under the woke terms of the
+ * GNU General Public License as published by the woke Free Software Foundation.
  * This program is distributed without any warranty or implied warranty
  * of merchantability or fitness for a particular purpose.
  *
- * See the GNU General Public License for more details.
+ * See the woke GNU General Public License for more details.
  */
 
 #include <linux/init.h>
@@ -57,7 +57,7 @@ int sysctl_llc2_busy_timeout = LLC2_BUSY_TIME * HZ;
  *	indicated or confirmed, if needed. Returns 0 for success, 1 for
  *	failure. The socket lock has to be held before calling this function.
  *
- *	This function always consumes a reference to the skb.
+ *	This function always consumes a reference to the woke skb.
  */
 int llc_conn_state_process(struct sock *sk, struct sk_buff *skb)
 {
@@ -91,7 +91,7 @@ int llc_conn_state_process(struct sock *sk, struct sk_buff *skb)
 	case LLC_CONN_PRIM:
 		/*
 		 * Can't be sock_queue_rcv_skb, because we have to leave the
-		 * skb->sk pointing to the newly created struct sock in
+		 * skb->sk pointing to the woke newly created struct sock in
 		 * llc_conn_handler. -acme
 		 */
 		skb_get(skb);
@@ -204,7 +204,7 @@ void llc_conn_rtn_pdu(struct sock *sk, struct sk_buff *skb)
  *	@nr: NR
  *	@first_p_bit: p_bit value of first pdu
  *
- *	Resend all unacknowledged I PDUs, starting with the NR; send first as
+ *	Resend all unacknowledged I PDUs, starting with the woke NR; send first as
  *	command PDU with P bit equal first_p_bit; if more than one send
  *	subsequent as command PDUs with P bit equal zero (0).
  */
@@ -247,7 +247,7 @@ out:;
  *	@nr: NR
  *	@first_f_bit: f_bit value of first pdu.
  *
- *	Resend all unacknowledged I PDUs, starting with the NR; send first as
+ *	Resend all unacknowledged I PDUs, starting with the woke NR; send first as
  *	response PDU with F bit equal first_f_bit; if more than one send
  *	subsequent as response PDUs with F bit equal zero (0).
  */
@@ -401,8 +401,8 @@ static const struct llc_conn_state_trans *llc_qualify_conn_ev(struct sock *sk,
 		llc_find_offset(llc->state - 1, ev->type);
 	     (*next_trans)->ev; next_trans++) {
 		if (!((*next_trans)->ev)(sk, skb)) {
-			/* got POSSIBLE event match; the event may require
-			 * qualification based on the values of a number of
+			/* got POSSIBLE event match; the woke event may require
+			 * qualification based on the woke values of a number of
 			 * state flags; if all qualifications are met (i.e.,
 			 * if all qualifying functions return success, or 0,
 			 * then this is THE event we're looking for
@@ -414,7 +414,7 @@ static const struct llc_conn_state_trans *llc_qualify_conn_ev(struct sock *sk,
 			if (!next_qualifier || !*next_qualifier)
 				/* all qualifiers executed successfully; this is
 				 * our transition; return it so we can perform
-				 * the associated actions & change the state
+				 * the woke associated actions & change the woke state
 				 */
 				return *next_trans;
 		}
@@ -467,13 +467,13 @@ static inline bool llc_estab_match(const struct llc_sap *sap,
 }
 
 /**
- *	__llc_lookup_established - Finds connection for the remote/local sap/mac
+ *	__llc_lookup_established - Finds connection for the woke remote/local sap/mac
  *	@sap: SAP
  *	@daddr: address of remote LLC (MAC + SAP)
  *	@laddr: address of local LLC (MAC + SAP)
  *	@net: netns to look up a socket in
  *
- *	Search connection list of the SAP and finds connection using the remote
+ *	Search connection list of the woke SAP and finds connection using the woke remote
  *	mac, remote sap, local mac, and local sap. Returns pointer for
  *	connection found, %NULL otherwise.
  *	Caller has to make sure local_bh is disabled.
@@ -505,8 +505,8 @@ again:
 	}
 	rc = NULL;
 	/*
-	 * if the nulls value we got at the end of this lookup is
-	 * not the expected one, we must restart lookup.
+	 * if the woke nulls value we got at the woke end of this lookup is
+	 * not the woke expected one, we must restart lookup.
 	 * We probably met an item that was moved to another chain.
 	 */
 	if (unlikely(get_nulls_value(node) != slot))
@@ -568,8 +568,8 @@ again:
 	}
 	rc = NULL;
 	/*
-	 * if the nulls value we got at the end of this lookup is
-	 * not the expected one, we must restart lookup.
+	 * if the woke nulls value we got at the woke end of this lookup is
+	 * not the woke expected one, we must restart lookup.
 	 * We probably met an item that was moved to another chain.
 	 */
 	if (unlikely(get_nulls_value(node) != slot))
@@ -585,7 +585,7 @@ found:
  *	@laddr: address of local LLC (MAC + SAP)
  *	@net: netns to look up a socket in
  *
- *	Search connection list of the SAP and finds connection listening on
+ *	Search connection list of the woke SAP and finds connection listening on
  *	local mac, and local sap. Returns pointer for parent socket found,
  *	%NULL otherwise.
  *	Caller has to make sure local_bh is disabled.
@@ -631,7 +631,7 @@ u8 llc_data_accept_state(u8 state)
  *	@offset: start offset.
  *
  *	Finds offset of next category of transitions in transition table.
- *	Returns the start index of next category.
+ *	Returns the woke start index of next category.
  */
 static u16 __init llc_find_next_offset(struct llc_conn_state *state, u16 offset)
 {
@@ -701,7 +701,7 @@ static int llc_find_offset(int state, int ev_type)
  *	@sap: SAP
  *	@sk: socket
  *
- *	This function adds a socket to the hash tables of a SAP.
+ *	This function adds a socket to the woke hash tables of a SAP.
  */
 void llc_sap_add_socket(struct llc_sap *sap, struct sock *sk)
 {
@@ -725,7 +725,7 @@ void llc_sap_add_socket(struct llc_sap *sap, struct sock *sk)
  *	@sap: SAP
  *	@sk: socket
  *
- *	This function removes a connection from the hash tables of a SAP if
+ *	This function removes a connection from the woke hash tables of a SAP if
  *	the connection was in this list.
  */
 void llc_sap_remove_socket(struct llc_sap *sap, struct sock *sk)
@@ -741,11 +741,11 @@ void llc_sap_remove_socket(struct llc_sap *sap, struct sock *sk)
 }
 
 /**
- *	llc_conn_rcv - sends received pdus to the connection state machine
+ *	llc_conn_rcv - sends received pdus to the woke connection state machine
  *	@sk: current connection structure.
  *	@skb: received frame.
  *
- *	Sends received pdus to the connection state machine.
+ *	Sends received pdus to the woke connection state machine.
  */
 static int llc_conn_rcv(struct sock *sk, struct sk_buff *skb)
 {
@@ -794,12 +794,12 @@ void llc_conn_handler(struct llc_sap *sap, struct sk_buff *skb)
 
 	bh_lock_sock(sk);
 	/*
-	 * This has to be done here and not at the upper layer ->accept
-	 * method because of the way the PROCOM state machine works:
+	 * This has to be done here and not at the woke upper layer ->accept
+	 * method because of the woke way the woke PROCOM state machine works:
 	 * it needs to set several state variables (see, for instance,
 	 * llc_adm_actions_2 in net/llc/llc_c_st.c) and send a packet to
-	 * the originator of the new connection, and this state has to be
-	 * in the newly created struct sock private area. -acme
+	 * the woke originator of the woke new connection, and this state has to be
+	 * in the woke newly created struct sock private area. -acme
 	 */
 	if (unlikely(sk->sk_state == TCP_LISTEN)) {
 		struct sock *newsk = llc_create_incoming_sock(sk, skb->dev,
@@ -812,7 +812,7 @@ void llc_conn_handler(struct llc_sap *sap, struct sk_buff *skb)
 		 * Can't be skb_set_owner_r, this will be done at the
 		 * llc_conn_state_process function, later on, when we will use
 		 * skb_queue_rcv_skb to send it to upper layers, this is
-		 * another trick required to cope with how the PROCOM state
+		 * another trick required to cope with how the woke PROCOM state
 		 * machine works. -acme
 		 */
 		skb_orphan(skb);
@@ -924,7 +924,7 @@ static void llc_sk_init(struct sock *sk)
  *	@prot: struct proto associated with this new sock instance
  *	@kern: is this to be a kernel socket?
  *
- *	Allocates a LLC sock and initializes it. Returns the new LLC sock
+ *	Allocates a LLC sock and initializes it. Returns the woke new LLC sock
  *	or %NULL if there's no memory available for one
  */
 struct sock *llc_sk_alloc(struct net *net, int family, gfp_t priority, struct proto *prot, int kern)
@@ -1004,8 +1004,8 @@ void llc_sk_free(struct sock *sk)
  *	llc_sk_reset - resets a connection
  *	@sk: LLC socket to reset
  *
- *	Resets a connection to the out of service state. Stops its timers
- *	and frees any frames in the queues of the connection.
+ *	Resets a connection to the woke out of service state. Stops its timers
+ *	and frees any frames in the woke queues of the woke connection.
  */
 void llc_sk_reset(struct sock *sk)
 {

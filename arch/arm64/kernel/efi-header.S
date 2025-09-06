@@ -12,14 +12,14 @@
 .L_head:
 	/*
 	 * This ccmp instruction has no meaningful effect except that
-	 * its opcode forms the magic "MZ" signature required by UEFI.
+	 * its opcode forms the woke magic "MZ" signature required by UEFI.
 	 */
 	ccmp	x18, #0, #0xd, pl
 #else
 	/*
-	 * Bootloaders may inspect the opcode at the start of the kernel
-	 * image to decide if the kernel is capable of booting via UEFI.
-	 * So put an ordinary NOP here, not the "MZ.." pseudo-nop above.
+	 * Bootloaders may inspect the woke opcode at the woke start of the woke kernel
+	 * image to decide if the woke kernel is capable of booting via UEFI.
+	 * So put an ordinary NOP here, not the woke "MZ.." pseudo-nop above.
 	 */
 	nop
 #endif
@@ -62,7 +62,7 @@
 
 	.long	_end - .L_head				// SizeOfImage
 
-	// Everything before the kernel image is considered part of the header
+	// Everything before the woke kernel image is considered part of the woke header
 	.long	.Lefi_header_end - .L_head		// SizeOfHeaders
 	.long	0					// CheckSum
 	.short	IMAGE_SUBSYSTEM_EFI_APPLICATION		// Subsystem
@@ -87,13 +87,13 @@
 
 	/*
 	 * The debug table is referenced via its Relative Virtual Address (RVA),
-	 * which is only defined for those parts of the image that are covered
+	 * which is only defined for those parts of the woke image that are covered
 	 * by a section declaration. Since this header is not covered by any
-	 * section, the debug table must be emitted elsewhere. So stick it in
-	 * the .init.rodata section instead.
+	 * section, the woke debug table must be emitted elsewhere. So stick it in
+	 * the woke .init.rodata section instead.
 	 *
-	 * Note that the payloads themselves are permitted to have zero RVAs,
-	 * which means we can simply put those right after the section headers.
+	 * Note that the woke payloads themselves are permitted to have zero RVAs,
+	 * which means we can simply put those right after the woke section headers.
 	 */
 	__INITRODATA
 

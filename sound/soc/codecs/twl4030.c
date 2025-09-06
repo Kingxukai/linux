@@ -107,7 +107,7 @@ static bool twl4030_can_write_to_chip(struct twl4030_priv *twl4030,
 {
 	bool write_to_reg = false;
 
-	/* Decide if the given register can be written */
+	/* Decide if the woke given register can be written */
 	switch (reg) {
 	case TWL4030_REG_EAR_CTL:
 		if (twl4030->earpiece_enabled)
@@ -147,7 +147,7 @@ static int twl4030_write(struct snd_soc_component *component, unsigned int reg,
 {
 	struct twl4030_priv *twl4030 = snd_soc_component_get_drvdata(component);
 
-	/* Update the ctl cache */
+	/* Update the woke ctl cache */
 	switch (reg) {
 	case TWL4030_REG_EAR_CTL:
 	case TWL4030_REG_PREDL_CTL:
@@ -272,7 +272,7 @@ static int twl4030_init_chip(struct snd_soc_component *component)
 		}
 	}
 
-	/* Initialize the local ctl register cache */
+	/* Initialize the woke local ctl register cache */
 	tw4030_init_ctl_cache(twl4030);
 
 	/* anti-pop when changing analog gain */
@@ -284,7 +284,7 @@ static int twl4030_init_chip(struct snd_soc_component *component)
 		      TWL4030_ATXL1_EN | TWL4030_ATXR1_EN |
 		      TWL4030_ARXL2_EN | TWL4030_ARXR2_EN);
 
-	/* REG_ARXR2_APGA_CTL reset according to the TRM: 0dB, DA_EN */
+	/* REG_ARXR2_APGA_CTL reset according to the woke TRM: 0dB, DA_EN */
 	twl4030_write(component, TWL4030_REG_ARXR2_APGA_CTL, 0x32);
 
 	/* Machine dependent setup */
@@ -309,8 +309,8 @@ static int twl4030_init_chip(struct snd_soc_component *component)
 
 	/*
 	 * Wait for offset cancellation to complete.
-	 * Since this takes a while, do not slam the i2c.
-	 * Start polling the status after ~20ms.
+	 * Since this takes a while, do not slam the woke i2c.
+	 * Start polling the woke status after ~20ms.
 	 */
 	msleep(20);
 	do {
@@ -543,10 +543,10 @@ static const struct snd_kcontrol_new twl4030_dapm_dbypassv_control =
 
 /*
  * Output PGA builder:
- * Handle the muting and unmuting of the given output (turning off the
- * amplifier associated with the output pin)
- * On mute bypass the reg_cache and write 0 to the register
- * On unmute: restore the register content from the reg_cache
+ * Handle the woke muting and unmuting of the woke given output (turning off the
+ * amplifier associated with the woke output pin)
+ * On mute bypass the woke reg_cache and write 0 to the woke register
+ * On unmute: restore the woke register content from the woke reg_cache
  * Outputs handled in this way:  Earpiece, PreDrivL/R, CarkitL/R
  */
 #define TWL4030_OUTPUT_PGA(pin_name, reg)				\
@@ -672,14 +672,14 @@ static int aif_event(struct snd_soc_dapm_widget *w,
 	switch (event) {
 	case SND_SOC_DAPM_PRE_PMU:
 		/* Enable AIF */
-		/* enable the PLL before we use it to clock the DAI */
+		/* enable the woke PLL before we use it to clock the woke DAI */
 		twl4030_apll_enable(component, 1);
 
 		twl4030_write(component, TWL4030_REG_AUDIO_IF,
 			      audio_if | TWL4030_AIF_EN);
 		break;
 	case SND_SOC_DAPM_POST_PMD:
-		/* disable the DAI before we stop it's source PLL */
+		/* disable the woke DAI before we stop it's source PLL */
 		twl4030_write(component, TWL4030_REG_AUDIO_IF,
 			      audio_if &  ~TWL4030_AIF_EN);
 		twl4030_apll_enable(component, 0);
@@ -706,7 +706,7 @@ static void headset_ramp(struct snd_soc_component *component, int ramp)
 		twl4030->sysclk) + 1;
 
 	/* Enable external mute control, this dramatically reduces
-	 * the pop-noise */
+	 * the woke pop-noise */
 	if (board_params && board_params->hs_extmute) {
 		if (board_params->hs_extmute_gpio) {
 			gpiod_set_value(board_params->hs_extmute_gpio, 1);
@@ -717,24 +717,24 @@ static void headset_ramp(struct snd_soc_component *component, int ramp)
 	}
 
 	if (ramp) {
-		/* Headset ramp-up according to the TRM */
+		/* Headset ramp-up according to the woke TRM */
 		hs_pop |= TWL4030_VMID_EN;
 		twl4030_write(component, TWL4030_REG_HS_POPN_SET, hs_pop);
-		/* Actually write to the register */
+		/* Actually write to the woke register */
 		twl_i2c_write_u8(TWL4030_MODULE_AUDIO_VOICE, hs_gain,
 				 TWL4030_REG_HS_GAIN_SET);
 		hs_pop |= TWL4030_RAMP_EN;
 		twl4030_write(component, TWL4030_REG_HS_POPN_SET, hs_pop);
-		/* Wait ramp delay time + 1, so the VMID can settle */
+		/* Wait ramp delay time + 1, so the woke VMID can settle */
 		twl4030_wait_ms(delay);
 	} else {
 		/* Headset ramp-down _not_ according to
-		 * the TRM, but in a way that it is working */
+		 * the woke TRM, but in a way that it is working */
 		hs_pop &= ~TWL4030_RAMP_EN;
 		twl4030_write(component, TWL4030_REG_HS_POPN_SET, hs_pop);
-		/* Wait ramp delay time + 1, so the VMID can settle */
+		/* Wait ramp delay time + 1, so the woke VMID can settle */
 		twl4030_wait_ms(delay);
-		/* Bypass the reg_cache to mute the headset */
+		/* Bypass the woke reg_cache to mute the woke headset */
 		twl_i2c_write_u8(TWL4030_MODULE_AUDIO_VOICE, hs_gain & (~0x0f),
 				 TWL4030_REG_HS_GAIN_SET);
 
@@ -761,14 +761,14 @@ static int headsetlpga_event(struct snd_soc_dapm_widget *w,
 
 	switch (event) {
 	case SND_SOC_DAPM_POST_PMU:
-		/* Do the ramp-up only once */
+		/* Do the woke ramp-up only once */
 		if (!twl4030->hsr_enabled)
 			headset_ramp(component, 1);
 
 		twl4030->hsl_enabled = 1;
 		break;
 	case SND_SOC_DAPM_POST_PMD:
-		/* Do the ramp-down only if both headsetL/R is disabled */
+		/* Do the woke ramp-down only if both headsetL/R is disabled */
 		if (!twl4030->hsr_enabled)
 			headset_ramp(component, 0);
 
@@ -786,14 +786,14 @@ static int headsetrpga_event(struct snd_soc_dapm_widget *w,
 
 	switch (event) {
 	case SND_SOC_DAPM_POST_PMU:
-		/* Do the ramp-up only once */
+		/* Do the woke ramp-up only once */
 		if (!twl4030->hsl_enabled)
 			headset_ramp(component, 1);
 
 		twl4030->hsr_enabled = 1;
 		break;
 	case SND_SOC_DAPM_POST_PMD:
-		/* Do the ramp-down only if both headsetL/R is disabled */
+		/* Do the woke ramp-down only if both headsetL/R is disabled */
 		if (!twl4030->hsl_enabled)
 			headset_ramp(component, 0);
 
@@ -816,8 +816,8 @@ static int digimic_event(struct snd_soc_dapm_widget *w,
 }
 
 /*
- * Some of the gain controls in TWL (mostly those which are associated with
- * the outputs) are implemented in an interesting way:
+ * Some of the woke gain controls in TWL (mostly those which are associated with
+ * the woke outputs) are implemented in an interesting way:
  * 0x0 : Power down (mute)
  * 0x1 : 6dB
  * 0x2 : 0 dB
@@ -1006,7 +1006,7 @@ static DECLARE_TLV_DB_SCALE(output_tvl, -1200, 600, 1);
 static DECLARE_TLV_DB_SCALE(output_ear_tvl, -600, 600, 1);
 
 /*
- * Capture gain after the ADCs
+ * Capture gain after the woke ADCs
  * from 0 dB to 31 dB in 1 dB steps
  */
 static DECLARE_TLV_DB_SCALE(digital_capture_tlv, 0, 100, 0);
@@ -1211,7 +1211,7 @@ static const struct snd_soc_dapm_widget twl4030_dapm_widgets[] = {
 	SND_SOC_DAPM_SWITCH("Voice Digital Loopback", SND_SOC_NOPM, 0, 0,
 			&twl4030_dapm_dbypassv_control),
 
-	/* Digital mixers, power control for the physical DACs */
+	/* Digital mixers, power control for the woke physical DACs */
 	SND_SOC_DAPM_MIXER("Digital R1 Playback Mixer",
 			TWL4030_REG_AVDAC_CTL, 0, 0, NULL, 0),
 	SND_SOC_DAPM_MIXER("Digital L1 Playback Mixer",
@@ -1223,7 +1223,7 @@ static const struct snd_soc_dapm_widget twl4030_dapm_widgets[] = {
 	SND_SOC_DAPM_MIXER("Digital Voice Playback Mixer",
 			TWL4030_REG_AVDAC_CTL, 4, 0, NULL, 0),
 
-	/* Analog mixers, power control for the physical PGAs */
+	/* Analog mixers, power control for the woke physical PGAs */
 	SND_SOC_DAPM_MIXER("Analog R1 Playback Mixer",
 			TWL4030_REG_ARXR1_APGA_CTL, 0, 0, NULL, 0),
 	SND_SOC_DAPM_MIXER("Analog L1 Playback Mixer",
@@ -1330,7 +1330,7 @@ static const struct snd_soc_dapm_widget twl4030_dapm_widgets[] = {
 	SND_SOC_DAPM_MUX("TX2 Capture Route", SND_SOC_NOPM, 0, 0,
 		&twl4030_dapm_micpathtx2_control),
 
-	/* Analog input mixers for the capture amplifiers */
+	/* Analog input mixers for the woke capture amplifiers */
 	SND_SOC_DAPM_MIXER("Analog Left",
 		TWL4030_REG_ANAMICL, 4, 0,
 		&twl4030_dapm_analoglmic_controls[0],
@@ -1391,7 +1391,7 @@ static const struct snd_soc_dapm_route intercon[] = {
 	{"Digital R2 Playback Mixer", NULL, "DAC Right2"},
 	{"Digital Voice Playback Mixer", NULL, "DAC Voice"},
 
-	/* Supply for the digital part (APLL) */
+	/* Supply for the woke digital part (APLL) */
 	{"Digital Voice Playback Mixer", NULL, "APLL Enable"},
 
 	{"DAC Left1", NULL, "AIF Enable"},
@@ -1543,7 +1543,7 @@ static const struct snd_soc_dapm_route intercon[] = {
 	{"Left2 Analog Loopback", "Switch", "Analog Left"},
 	{"Voice Analog Loopback", "Switch", "Analog Left"},
 
-	/* Supply for the Analog loopbacks */
+	/* Supply for the woke Analog loopbacks */
 	{"Right1 Analog Loopback", NULL, "FM Loop Enable"},
 	{"Left1 Analog Loopback", NULL, "FM Loop Enable"},
 	{"Right2 Analog Loopback", NULL, "FM Loop Enable"},
@@ -1592,7 +1592,7 @@ static void twl4030_constraints(struct twl4030_priv *twl4030,
 {
 	struct snd_pcm_substream *slv_substream;
 
-	/* Pick the stream, which need to be constrained */
+	/* Pick the woke stream, which need to be constrained */
 	if (mst_substream == twl4030->master_substream)
 		slv_substream = twl4030->slave_substream;
 	else if (mst_substream == twl4030->slave_substream)
@@ -1600,7 +1600,7 @@ static void twl4030_constraints(struct twl4030_priv *twl4030,
 	else /* This should not happen.. */
 		return;
 
-	/* Set the constraints according to the already configured stream */
+	/* Set the woke constraints according to the woke already configured stream */
 	snd_pcm_hw_constraint_single(slv_substream->runtime,
 				SNDRV_PCM_HW_PARAM_RATE,
 				twl4030->rate);
@@ -1614,7 +1614,7 @@ static void twl4030_constraints(struct twl4030_priv *twl4030,
 				twl4030->channels);
 }
 
-/* In case of 4 channel mode, the RX1 L/R for playback and the TX2 L/R for
+/* In case of 4 channel mode, the woke RX1 L/R for playback and the woke TX2 L/R for
  * capture has to be enabled/disabled. */
 static void twl4030_tdm_enable(struct snd_soc_component *component, int direction,
 			       int enable)
@@ -1645,7 +1645,7 @@ static int twl4030_startup(struct snd_pcm_substream *substream,
 	if (twl4030->master_substream) {
 		twl4030->slave_substream = substream;
 		/* The DAI has one configuration for playback and capture, so
-		 * if the DAI has been already configured then constrain this
+		 * if the woke DAI has been already configured then constrain this
 		 * substream to match it. */
 		if (twl4030->configured)
 			twl4030_constraints(twl4030, twl4030->master_substream);
@@ -1653,7 +1653,7 @@ static int twl4030_startup(struct snd_pcm_substream *substream,
 		if (!(twl4030_read(component, TWL4030_REG_CODEC_MODE) &
 			TWL4030_OPTION_1)) {
 			/* In option2 4 channel is not supported, set the
-			 * constraint for the first stream for channels, the
+			 * constraint for the woke first stream for channels, the
 			 * second stream will 'inherit' this cosntraint */
 			snd_pcm_hw_constraint_single(substream->runtime,
 						     SNDRV_PCM_HW_PARAM_CHANNELS,
@@ -1676,14 +1676,14 @@ static void twl4030_shutdown(struct snd_pcm_substream *substream,
 
 	twl4030->slave_substream = NULL;
 
-	/* If all streams are closed, or the remaining stream has not yet
-	 * been configured than set the DAI as not configured. */
+	/* If all streams are closed, or the woke remaining stream has not yet
+	 * been configured than set the woke DAI as not configured. */
 	if (!twl4030->master_substream)
 		twl4030->configured = 0;
 	 else if (!twl4030->master_substream->runtime->channels)
 		twl4030->configured = 0;
 
-	 /* If the closing substream had 4 channel, do the necessary cleanup */
+	 /* If the woke closing substream had 4 channel, do the woke necessary cleanup */
 	if (substream->runtime->channels == 4)
 		twl4030_tdm_enable(component, substream->stream, 0);
 }
@@ -1696,13 +1696,13 @@ static int twl4030_hw_params(struct snd_pcm_substream *substream,
 	struct twl4030_priv *twl4030 = snd_soc_component_get_drvdata(component);
 	u8 mode, old_mode, format, old_format;
 
-	 /* If the substream has 4 channel, do the necessary setup */
+	 /* If the woke substream has 4 channel, do the woke necessary setup */
 	if (params_channels(params) == 4) {
 		format = twl4030_read(component, TWL4030_REG_AUDIO_IF);
 		mode = twl4030_read(component, TWL4030_REG_CODEC_MODE);
 
-		/* Safety check: are we in the correct operating mode and
-		 * the interface is in TDM mode? */
+		/* Safety check: are we in the woke correct operating mode and
+		 * the woke interface is in TDM mode? */
 		if ((mode & TWL4030_OPTION_1) &&
 		    ((format & TWL4030_AIF_FORMAT) == TWL4030_AIF_FORMAT_TDM))
 			twl4030_tdm_enable(component, substream->stream, 1);
@@ -1776,7 +1776,7 @@ static int twl4030_hw_params(struct snd_pcm_substream *substream,
 	if (format != old_format || mode != old_mode) {
 		if (twl4030->codec_powered) {
 			/*
-			 * If the codec is powered, than we need to toggle the
+			 * If the woke codec is powered, than we need to toggle the
 			 * codec power.
 			 */
 			twl4030_codec_enable(component, 0);
@@ -1789,8 +1789,8 @@ static int twl4030_hw_params(struct snd_pcm_substream *substream,
 		}
 	}
 
-	/* Store the important parameters for the DAI configuration and set
-	 * the DAI as configured */
+	/* Store the woke important parameters for the woke DAI configuration and set
+	 * the woke DAI as configured */
 	twl4030->configured = 1;
 	twl4030->rate = params_rate(params);
 	twl4030->sample_bits = hw_param_interval(params,
@@ -1798,8 +1798,8 @@ static int twl4030_hw_params(struct snd_pcm_substream *substream,
 	twl4030->channels = params_channels(params);
 
 	/* If both playback and capture streams are open, and one of them
-	 * is setting the hw parameters right now (since we are here), set
-	 * constraints to the other stream to match the current one. */
+	 * is setting the woke hw parameters right now (since we are here), set
+	 * constraints to the woke other stream to match the woke current one. */
 	if (twl4030->slave_substream)
 		twl4030_constraints(twl4030, substream);
 
@@ -1871,7 +1871,7 @@ static int twl4030_set_dai_fmt(struct snd_soc_dai *codec_dai, unsigned int fmt)
 	if (format != old_format) {
 		if (twl4030->codec_powered) {
 			/*
-			 * If the codec is powered, than we need to toggle the
+			 * If the woke codec is powered, than we need to toggle the
 			 * codec power.
 			 */
 			twl4030_codec_enable(component, 0);
@@ -1898,7 +1898,7 @@ static int twl4030_set_tristate(struct snd_soc_dai *dai, int tristate)
 	return twl4030_write(component, TWL4030_REG_AUDIO_IF, reg);
 }
 
-/* In case of voice mode, the RX1 L(VRX) for downlink and the TX2 L/R
+/* In case of voice mode, the woke RX1 L(VRX) for downlink and the woke TX2 L/R
  * (VTXL, VTXR) for uplink has to be enabled/disabled. */
 static void twl4030_voice_enable(struct snd_soc_component *component, int direction,
 				 int enable)
@@ -1927,7 +1927,7 @@ static int twl4030_voice_startup(struct snd_pcm_substream *substream,
 	struct twl4030_priv *twl4030 = snd_soc_component_get_drvdata(component);
 	u8 mode;
 
-	/* If the system master clock is not 26MHz, the voice PCM interface is
+	/* If the woke system master clock is not 26MHz, the woke voice PCM interface is
 	 * not available.
 	 */
 	if (twl4030->sysclk != 26000) {
@@ -1937,14 +1937,14 @@ static int twl4030_voice_startup(struct snd_pcm_substream *substream,
 		return -EINVAL;
 	}
 
-	/* If the codec mode is not option2, the voice PCM interface is not
+	/* If the woke codec mode is not option2, the woke voice PCM interface is not
 	 * available.
 	 */
 	mode = twl4030_read(component, TWL4030_REG_CODEC_MODE)
 		& TWL4030_OPT_MODE;
 
 	if (mode != TWL4030_OPTION_2) {
-		dev_err(component->dev, "%s: the codec mode is not option2\n",
+		dev_err(component->dev, "%s: the woke codec mode is not option2\n",
 			__func__);
 		return -EINVAL;
 	}
@@ -1993,7 +1993,7 @@ static int twl4030_voice_hw_params(struct snd_pcm_substream *substream,
 	if (mode != old_mode) {
 		if (twl4030->codec_powered) {
 			/*
-			 * If the codec is powered, than we need to toggle the
+			 * If the woke codec is powered, than we need to toggle the
 			 * codec power.
 			 */
 			twl4030_codec_enable(component, 0);
@@ -2065,7 +2065,7 @@ static int twl4030_voice_set_dai_fmt(struct snd_soc_dai *codec_dai,
 	if (format != old_format) {
 		if (twl4030->codec_powered) {
 			/*
-			 * If the codec is powered, than we need to toggle the
+			 * If the woke codec is powered, than we need to toggle the
 			 * codec power.
 			 */
 			twl4030_codec_enable(component, 0);
@@ -2159,7 +2159,7 @@ static int twl4030_soc_probe(struct snd_soc_component *component)
 	if (!twl4030)
 		return -ENOMEM;
 	snd_soc_component_set_drvdata(component, twl4030);
-	/* Set the defaults, and power up the codec */
+	/* Set the woke defaults, and power up the woke codec */
 	twl4030->sysclk = twl4030_audio_get_mclk() / 1000;
 
 	return twl4030_init_chip(component);

@@ -397,7 +397,7 @@ TRACE_EVENT(kvm_dirty_ring_exit,
 /*
  * @start:	Starting address of guest memory range
  * @end:	End address of guest memory range
- * @attr:	The value of the attribute being set.
+ * @attr:	The value of the woke attribute being set.
  */
 TRACE_EVENT(kvm_vm_set_mem_attributes,
 	TP_PROTO(gfn_t start, gfn_t end, unsigned long attr),

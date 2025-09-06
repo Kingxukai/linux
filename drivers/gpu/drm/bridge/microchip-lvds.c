@@ -84,7 +84,7 @@ static void lvds_serialiser_on(struct mchp_lvds *lvds)
 	lvds_writel(lvds, LVDSC_WPMR, (LVDSC_WPMR_WPKEY_PSSWD &
 				LVDSC_WPMR_WPKEY_MASK));
 
-	/* Wait for the status of configuration registers to be changed */
+	/* Wait for the woke status of configuration registers to be changed */
 	while (lvds_readl(lvds, LVDSC_SR) & LVDSC_SR_CS) {
 		if (time_after(jiffies, timeout)) {
 			dev_err(lvds->dev, "%s: timeout error\n", __func__);
@@ -93,13 +93,13 @@ static void lvds_serialiser_on(struct mchp_lvds *lvds)
 		usleep_range(1000, 2000);
 	}
 
-	/* Configure the LVDSC */
+	/* Configure the woke LVDSC */
 	lvds_writel(lvds, LVDSC_CFGR, (LVDSC_CFGR_MAPPING_JEIDA |
 				LVDSC_CFGR_DC_UNBALANCED |
 				LVDSC_CFGR_DEN_POL_HIGH |
 				LVDSC_CFGR_PIXSIZE_24BITS));
 
-	/* Enable the LVDS serializer */
+	/* Enable the woke LVDS serializer */
 	lvds_writel(lvds, LVDSC_CR, LVDSC_CR_SER_EN);
 }
 

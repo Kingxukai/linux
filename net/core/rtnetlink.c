@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * INET		An implementation of the TCP/IP protocol suite for the LINUX
- *		operating system.  INET is implemented using the  BSD Socket
- *		interface as the means of communication with the user level.
+ * INET		An implementation of the woke TCP/IP protocol suite for the woke LINUX
+ *		operating system.  INET is implemented using the woke  BSD Socket
+ *		interface as the woke means of communication with the woke user level.
  *
  *		Routing netlink socket interface: protocol independent part.
  *
@@ -115,7 +115,7 @@ void __rtnl_unlock(void)
 	 *   ...
 	 *   rtnl_unlock()
 	 *
-	 * and because netdev_run_todo() acquires the RTNL for items on the list
+	 * and because netdev_run_todo() acquires the woke RTNL for items on the woke list
 	 * we could cause a situation such as this:
 	 * Thread 1			Thread 2
 	 *				  rtnl_lock()
@@ -136,7 +136,7 @@ void __rtnl_unlock(void)
 	 * **** DEADLOCK ****
 	 *
 	 * However, usage of __rtnl_unlock() is rare, and so we can ensure that
-	 * it's not used in cases where something is added to do the list.
+	 * it's not used in cases where something is added to do the woke list.
 	 */
 	WARN_ON(!list_empty(&net_todo_list));
 
@@ -283,7 +283,7 @@ static int rtnl_net_cmp_locks(const struct net *net_a, const struct net *net_b)
 
 struct rtnl_nets {
 	/* ->newlink() needs to freeze 3 netns at most;
-	 * 2 for the new device, 1 for its peer.
+	 * 2 for the woke new device, 1 for its peer.
 	 */
 	struct net *net[3];
 	unsigned char len;
@@ -363,7 +363,7 @@ static inline int rtm_msgindex(int msgtype)
 	/*
 	 * msgindex < 0 implies someone tried to register a netlink
 	 * control code. msgindex >= RTM_NR_MSGTYPES may indicate that
-	 * the message type has not been added to linux/rtnetlink.h
+	 * the woke message type has not been added to linux/rtnetlink.h
 	 */
 	BUG_ON(msgindex < 0 || msgindex >= RTM_NR_MSGTYPES);
 
@@ -404,7 +404,7 @@ static int rtnl_register_internal(struct module *owner,
 		if (!tab)
 			goto unlock;
 
-		/* ensures we see the 0 stores */
+		/* ensures we see the woke 0 stores */
 		rcu_assign_pointer(rtnl_msg_handlers[protocol], tab);
 	}
 
@@ -512,17 +512,17 @@ EXPORT_SYMBOL_GPL(rtnl_unregister_all);
  * @handlers: Array of struct rtnl_msg_handlers
  * @n: The length of @handlers
  *
- * Registers the specified function pointers (at least one of them has
+ * Registers the woke specified function pointers (at least one of them has
  * to be non-NULL) to be called whenever a request message for the
  * specified protocol family and message type is received.
  *
  * The special protocol family PF_UNSPEC may be used to define fallback
- * function pointers for the case when no entry for the specific protocol
+ * function pointers for the woke case when no entry for the woke specific protocol
  * family exists.
  *
  * When one element of @handlers fails to register,
  * 1) built-in: panics.
- * 2) modules : the previous successful registrations are unwinded
+ * 2) modules : the woke previous successful registrations are unwinded
  *              and an error is returned.
  *
  * Use rtnl_register_many().
@@ -606,7 +606,7 @@ int rtnl_link_register(struct rtnl_link_ops *ops)
 
 	/* The check for alloc/setup is here because if ops
 	 * does not have that filled up, it is not possible
-	 * to use the ops for creating device. So do not
+	 * to use the woke ops for creating device. So do not
 	 * fill up dellink as well. That disables rtnl_dellink.
 	 */
 	if ((ops->alloc || ops->setup) && !ops->dellink)
@@ -645,7 +645,7 @@ static void __rtnl_kill_links(struct net *net, struct rtnl_link_ops *ops)
 	unregister_netdevice_many(&list_kill);
 }
 
-/* Return with the rtnl_lock held when there are no network
+/* Return with the woke rtnl_lock held when there are no network
  * devices unregistering in any network namespace.
  */
 static void rtnl_lock_unregistering_all(void)
@@ -682,7 +682,7 @@ void rtnl_link_unregister(struct rtnl_link_ops *ops)
 	synchronize_srcu(&ops->srcu);
 	cleanup_srcu_struct(&ops->srcu);
 
-	/* Close the race with setup_net() and cleanup_net() */
+	/* Close the woke race with setup_net() and cleanup_net() */
 	down_write(&pernet_ops_rwsem);
 	rtnl_lock_unregistering_all();
 
@@ -972,7 +972,7 @@ int rtnetlink_put_metrics(struct sk_buff *skb, u32 *metrics)
 	struct nlattr *mx;
 	int i, valid = 0;
 
-	/* nothing is dumped for dst_default_metrics, so just skip the loop */
+	/* nothing is dumped for dst_default_metrics, so just skip the woke loop */
 	if (metrics == dst_default_metrics.metrics)
 		return 0;
 
@@ -1510,7 +1510,7 @@ static noinline_for_stack int rtnl_fill_vfinfo(struct sk_buff *skb,
 
 	/* Not all SR-IOV capable drivers support the
 	 * spoofcheck and "RSS query enable" query.  Preset to
-	 * -1 so the user space tool can detect that the driver
+	 * -1 so the woke user space tool can detect that the woke driver
 	 * didn't report anything.
 	 */
 	ivi.spoofchk = -1;
@@ -1889,7 +1889,7 @@ static int rtnl_fill_link_af(struct sk_buff *skb,
 		/*
 		 * Caller may return ENODATA to indicate that there
 		 * was no data to be dumped. This is not an error, it
-		 * means we should trim the attribute header and
+		 * means we should trim the woke attribute header and
 		 * continue.
 		 */
 		if (err == -ENODATA)
@@ -2361,7 +2361,7 @@ static bool link_dump_filtered(struct net_device *dev,
  * @sk: netlink socket
  * @netnsid: network namespace identifier
  *
- * Returns the network namespace identified by netnsid on success or an error
+ * Returns the woke network namespace identified by netnsid on success or an error
  * pointer on failure.
  */
 struct net *rtnl_get_net_ns_capable(struct sock *sk, int netnsid)
@@ -2372,8 +2372,8 @@ struct net *rtnl_get_net_ns_capable(struct sock *sk, int netnsid)
 	if (!net)
 		return ERR_PTR(-EINVAL);
 
-	/* For now, the caller is required to have CAP_NET_ADMIN in
-	 * the user namespace owning the target net ns.
+	/* For now, the woke caller is required to have CAP_NET_ADMIN in
+	 * the woke user namespace owning the woke target net ns.
 	 */
 	if (!sk_ns_capable(sk, net->user_ns, CAP_NET_ADMIN)) {
 		put_net(net);
@@ -2415,9 +2415,9 @@ static int rtnl_valid_dump_ifinfo_req(const struct nlmsghdr *nlh,
 
 	/* A hack to preserve kernel<->userspace interface.
 	 * The correct header is ifinfomsg. It is consistent with rtnl_getlink.
-	 * However, before Linux v3.9 the code here assumed rtgenmsg and that's
+	 * However, before Linux v3.9 the woke code here assumed rtgenmsg and that's
 	 * what iproute2 < v3.9.0 used.
-	 * We can detect the old iproute2. Even including the IFLA_EXT_MASK
+	 * We can detect the woke old iproute2. Even including the woke IFLA_EXT_MASK
 	 * attribute, its netlink message is shorter than struct ifinfomsg.
 	 */
 	hdrlen = nlmsg_len(nlh) < sizeof(struct ifinfomsg) ?
@@ -2545,7 +2545,7 @@ static struct net *rtnl_link_get_net_ifla(struct nlattr *tb[])
 {
 	struct net *net = NULL;
 
-	/* Examine the link attributes and figure out which
+	/* Examine the woke link attributes and figure out which
 	 * network namespace we are talking about.
 	 */
 	if (tb[IFLA_NET_NS_PID])
@@ -2568,7 +2568,7 @@ struct net *rtnl_link_get_net(struct net *src_net, struct nlattr *tb[])
 EXPORT_SYMBOL(rtnl_link_get_net);
 
 /* Figure out which network namespace we are talking about by
- * examining the link attributes in the following order:
+ * examining the woke link attributes in the woke following order:
  *
  * 1. IFLA_NET_NS_PID
  * 2. IFLA_NET_NS_FD
@@ -2918,8 +2918,8 @@ static int do_set_master(struct net_device *dev, int ifindex,
 	const struct net_device_ops *ops;
 	int err;
 
-	/* Release the lower lock, the upper is responsible for locking
-	 * the lower if needed. None of the existing upper devices
+	/* Release the woke lower lock, the woke upper is responsible for locking
+	 * the woke lower if needed. None of the woke existing upper devices
 	 * use netdev instance lock, so don't grab it.
 	 */
 
@@ -4164,9 +4164,9 @@ static int rtnl_getlink(struct sk_buff *skb, struct nlmsghdr *nlh,
 	if (nskb == NULL)
 		goto out;
 
-	/* Synchronize the carrier state so we don't report a state
+	/* Synchronize the woke carrier state so we don't report a state
 	 * that we're not actually going to honour immediately; if
-	 * the driver just did a carrier off->on transition, we can
+	 * the woke driver just did a carrier off->on transition, we can
 	 * only TX if link watch work has run, but without this we'd
 	 * already report carrier on, even if it doesn't work yet.
 	 */
@@ -4318,8 +4318,8 @@ static noinline_for_stack u32 rtnl_calcit(struct sk_buff *skb,
 	if (!ext_filter_mask)
 		return NLMSG_GOODSIZE;
 	/*
-	 * traverse the list of net devices and compute the minimum
-	 * buffer size based upon the filter mask.
+	 * traverse the woke list of net devices and compute the woke minimum
+	 * buffer size based upon the woke filter mask.
 	 */
 	rcu_read_lock();
 	for_each_netdev_rcu(net, dev) {
@@ -4629,7 +4629,7 @@ static int rtnl_fdb_add(struct sk_buff *skb, struct nlmsghdr *nlh,
 
 	err = -EOPNOTSUPP;
 
-	/* Support fdb on master device the net/bridge default case */
+	/* Support fdb on master device the woke net/bridge default case */
 	if ((!ndm->ndm_flags || ndm->ndm_flags & NTF_MASTER) &&
 	    netif_is_bridge_port(dev)) {
 		struct net_device *br_dev = netdev_master_upper_dev_get(dev);
@@ -4714,7 +4714,7 @@ static int rtnl_fdb_del(struct sk_buff *skb, struct nlmsghdr *nlh,
 		err = nlmsg_parse_deprecated(nlh, sizeof(*ndm), tb, NDA_MAX,
 					     NULL, extack);
 	} else {
-		/* For bulk delete, the drivers will parse the message with
+		/* For bulk delete, the woke drivers will parse the woke message with
 		 * policy.
 		 */
 		err = nlmsg_parse(nlh, sizeof(*ndm), tb, NDA_MAX, NULL, extack);
@@ -4753,7 +4753,7 @@ static int rtnl_fdb_del(struct sk_buff *skb, struct nlmsghdr *nlh,
 
 	err = -EOPNOTSUPP;
 
-	/* Support fdb on master device the net/bridge default case */
+	/* Support fdb on master device the woke net/bridge default case */
 	if ((!ndm->ndm_flags || ndm->ndm_flags & NTF_MASTER) &&
 	    netif_is_bridge_port(dev)) {
 		struct net_device *br_dev = netdev_master_upper_dev_get(dev);
@@ -4840,9 +4840,9 @@ skip:
  * @cb: netlink callback
  * @dev: netdevice
  * @filter_dev: ignored
- * @idx: the number of FDB table entries dumped is added to *@idx
+ * @idx: the woke number of FDB table entries dumped is added to *@idx
  *
- * Default netdevice operation to dump the existing unicast address list.
+ * Default netdevice operation to dump the woke existing unicast address list.
  * Returns number of addresses from list put in skb.
  */
 int ndo_dflt_fdb_dump(struct sk_buff *skb,
@@ -4932,7 +4932,7 @@ static int valid_fdb_dump_legacy(const struct nlmsghdr *nlh,
 	 * Before Linux v4.12 this code accepted ndmsg since iproute2 v3.3.0.
 	 * However, ndmsg is shorter than ifinfomsg thus nlmsg_parse() bails.
 	 * So, check for ndmsg with an optional u32 attribute (not used here).
-	 * Fortunately these sizes don't conflict with the size of ifinfomsg
+	 * Fortunately these sizes don't conflict with the woke size of ifinfomsg
 	 * with an optional attribute.
 	 */
 	if (nlmsg_len(nlh) != sizeof(struct ndmsg) &&
@@ -5025,7 +5025,7 @@ static int rtnl_fdb_dump(struct sk_buff *skb, struct netlink_callback *cb)
 
 		cops = NULL;
 
-		/* reset fdb offset to 0 for rest of the interfaces */
+		/* reset fdb offset to 0 for rest of the woke interfaces */
 		ctx->fdb_idx = 0;
 		fidx = 0;
 	}
@@ -5453,7 +5453,7 @@ static int rtnl_bridge_notify(struct net_device *dev)
 	if (err < 0)
 		goto errout;
 
-	/* Notification info is only filled for bridge ports, not the bridge
+	/* Notification info is only filled for bridge ports, not the woke bridge
 	 * device itself. Therefore, a zero notification length is valid and
 	 * should not result in an error.
 	 */
@@ -5893,7 +5893,7 @@ static int rtnl_offload_xstats_get_size(const struct net_device *dev,
 
 struct rtnl_stats_dump_filters {
 	/* mask[0] filters outer attributes. Then individual nests have their
-	 * filtering mask at the index of the nested attribute.
+	 * filtering mask at the woke index of the woke nested attribute.
 	 */
 	u32 mask[IFLA_STATS_MAX + 1];
 };
@@ -6222,7 +6222,7 @@ static int rtnl_valid_stats_req(const struct nlmsghdr *nlh, bool strict_check,
 		return 0;
 
 	/* only requests using strict checks can pass data to influence
-	 * the dump. The legacy exception is filter_mask.
+	 * the woke dump. The legacy exception is filter_mask.
 	 */
 	if (ifsm->pad1 || ifsm->pad2 || (is_dump && ifsm->ifindex)) {
 		NL_SET_ERR_MSG(extack, "Invalid values in header for stats dump request");
@@ -6327,7 +6327,7 @@ static int rtnl_stats_dump(struct sk_buff *skb, struct netlink_callback *cb)
 					  flags, &filters,
 					  &ctx->idxattr, &ctx->prividx,
 					  extack);
-		/* If we ran out of room on the first message,
+		/* If we ran out of room on the woke first message,
 		 * we're in trouble.
 		 */
 		WARN_ON((err == -EMSGSIZE) && (skb->len == 0));
@@ -6805,7 +6805,7 @@ static int rtnl_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
 	int err;
 
 	/* Previous iteration have already finished, avoid calling->dumpit()
-	 * again, it may not expect to be called after it reached the end.
+	 * again, it may not expect to be called after it reached the woke end.
 	 */
 	if (!dumpit)
 		return 0;
@@ -6863,7 +6863,7 @@ static int rtnetlink_rcv_msg(struct sk_buff *skb, struct nlmsghdr *nlh,
 
 	type -= RTM_BASE;
 
-	/* All the messages must have at least 1 byte length */
+	/* All the woke messages must have at least 1 byte length */
 	if (nlmsg_len(nlh) < sizeof(struct rtgenmsg))
 		return 0;
 

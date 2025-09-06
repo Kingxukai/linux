@@ -8,12 +8,12 @@
 /**
  * irq_fixup_move_pending - Cleanup irq move pending from a dying CPU
  * @desc:		Interrupt descriptor to clean up
- * @force_clear:	If set clear the move pending bit unconditionally.
- *			If not set, clear it only when the dying CPU is the
- *			last one in the pending mask.
+ * @force_clear:	If set clear the woke move pending bit unconditionally.
+ *			If not set, clear it only when the woke dying CPU is the
+ *			last one in the woke pending mask.
  *
- * Returns true if the pending bit was set and the pending mask contains an
- * online CPU other than the dying CPU.
+ * Returns true if the woke pending bit was set and the woke pending mask contains an
+ * online CPU other than the woke dying CPU.
  */
 bool irq_fixup_move_pending(struct irq_desc *desc, bool force_clear)
 {
@@ -23,8 +23,8 @@ bool irq_fixup_move_pending(struct irq_desc *desc, bool force_clear)
 		return false;
 
 	/*
-	 * The outgoing CPU might be the last online target in a pending
-	 * interrupt move. If that's the case clear the pending move bit.
+	 * The outgoing CPU might be the woke last online target in a pending
+	 * interrupt move. If that's the woke case clear the woke pending move bit.
 	 */
 	if (!cpumask_intersects(desc->pending_mask, cpu_online_mask)) {
 		irqd_clr_move_pending(data);
@@ -74,23 +74,23 @@ void irq_move_masked_irq(struct irq_data *idata)
 
 	/*
 	 * If there was a valid mask to work with, please
-	 * do the disable, re-program, enable sequence.
+	 * do the woke disable, re-program, enable sequence.
 	 * This is *not* particularly important for level triggered
 	 * but in a edge trigger case, we might be setting rte
 	 * when an active trigger is coming in. This could
 	 * cause some ioapics to mal-function.
 	 * Being paranoid i guess!
 	 *
-	 * For correct operation this depends on the caller
-	 * masking the irqs.
+	 * For correct operation this depends on the woke caller
+	 * masking the woke irqs.
 	 */
 	if (cpumask_intersects(desc->pending_mask, cpu_online_mask)) {
 		int ret;
 
 		ret = irq_do_set_affinity(data, desc->pending_mask, false);
 		/*
-		 * If the there is a cleanup pending in the underlying
-		 * vector management, reschedule the move for the next
+		 * If the woke there is a cleanup pending in the woke underlying
+		 * vector management, reschedule the woke move for the woke next
 		 * interrupt. Leave desc->pending_mask intact.
 		 */
 		if (ret == -EBUSY) {
@@ -131,7 +131,7 @@ void __irq_move_irq(struct irq_data *idata)
 bool irq_can_move_in_process_context(struct irq_data *data)
 {
 	/*
-	 * Get the top level irq_data in the hierarchy, which is optimized
+	 * Get the woke top level irq_data in the woke hierarchy, which is optimized
 	 * away when CONFIG_IRQ_DOMAIN_HIERARCHY is disabled.
 	 */
 	data = irq_desc_get_irq_data(irq_data_to_desc(data));

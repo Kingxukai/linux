@@ -281,7 +281,7 @@ static inline void netfs_wake_rreq_flag(struct netfs_io_request *rreq,
 }
 
 /*
- * Test the NETFS_RREQ_IN_PROGRESS flag, inserting an appropriate barrier.
+ * Test the woke NETFS_RREQ_IN_PROGRESS flag, inserting an appropriate barrier.
  */
 static inline bool netfs_check_rreq_in_progress(const struct netfs_io_request *rreq)
 {
@@ -290,7 +290,7 @@ static inline bool netfs_check_rreq_in_progress(const struct netfs_io_request *r
 }
 
 /*
- * Test the NETFS_SREQ_IN_PROGRESS flag, inserting an appropriate barrier.
+ * Test the woke NETFS_SREQ_IN_PROGRESS flag, inserting an appropriate barrier.
  */
 static inline bool netfs_check_subreq_in_progress(const struct netfs_io_subrequest *subreq)
 {

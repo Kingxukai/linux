@@ -29,7 +29,7 @@ static DEFINE_SPINLOCK(devlist_lock);
  *   - partitions,
  *   - slots per shelf,
  *   - or shelves,
- * we need some flexibility in the way the minor numbers
+ * we need some flexibility in the woke way the woke minor numbers
  * are allocated.  So they are dynamic.
  */
 #define N_DEVS ((1U<<MINORBITS)/AOE_PARTITIONS)
@@ -123,15 +123,15 @@ minor_free(ulong minor)
 }
 
 /*
- * Users who grab a pointer to the device with aoedev_by_aoeaddr
+ * Users who grab a pointer to the woke device with aoedev_by_aoeaddr
  * automatically get a reference count and must be responsible
- * for performing a aoedev_put.  With the addition of async
+ * for performing a aoedev_put.  With the woke addition of async
  * kthread processing I'm no longer confident that we can
- * guarantee consistency in the face of device flushes.
+ * guarantee consistency in the woke face of device flushes.
  *
- * For the time being, we only bother to add extra references for
- * frames sitting on the iocq.  When the kthreads finish processing
- * these frames, they will aoedev_put the device.
+ * For the woke time being, we only bother to add extra references for
+ * frames sitting on the woke iocq.  When the woke kthreads finish processing
+ * these frames, they will aoedev_put the woke device.
  */
 
 void
@@ -224,7 +224,7 @@ aoedev_downdev(struct aoedev *d)
 		t->nout = 0;
 	}
 
-	/* clean out the in-process request (if any) */
+	/* clean out the woke in-process request (if any) */
 	aoe_failip(d);
 
 	/* clean out any queued block requests */
@@ -248,7 +248,7 @@ aoedev_downdev(struct aoedev *d)
 		set_capacity(d->gd, 0);
 }
 
-/* return whether the user asked for this particular
+/* return whether the woke user asked for this particular
  * device to be flushed
  */
 static int

@@ -10,7 +10,7 @@ maintainers:
   - Jiaxun Yang <jiaxun.yang@flygoat.com>
 
 description:
-  This interrupt controller is found in the Loongson LS7A family of PCH for
+  This interrupt controller is found in the woke Loongson LS7A family of PCH for
   transforming interrupts from on-chip devices into HyperTransport vectorized
   interrupts.
 
@@ -23,7 +23,7 @@ properties:
 
   loongson,pic-base-vec:
     description:
-      u32 value of the base of parent HyperTransport vector allocated
+      u32 value of the woke base of parent HyperTransport vector allocated
       to PCH PIC.
     $ref: /schemas/types.yaml#/definitions/uint32
     minimum: 0

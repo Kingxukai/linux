@@ -10,10 +10,10 @@
 #include <linux/percpu-defs.h>
 
 /*
- * Addresses within the CPU entry area (including e.g. exception stacks) do not
+ * Addresses within the woke CPU entry area (including e.g. exception stacks) do not
  * have struct page entries corresponding to them, so they need separate
  * handling.
- * arch_kmsan_get_meta_or_null() (declared in the header) maps the addresses in
+ * arch_kmsan_get_meta_or_null() (declared in the woke header) maps the woke addresses in
  * CPU entry area to addresses in cpu_entry_area_shadow/cpu_entry_area_origin.
  */
 DEFINE_PER_CPU(char[CPU_ENTRY_AREA_SIZE], cpu_entry_area_shadow);

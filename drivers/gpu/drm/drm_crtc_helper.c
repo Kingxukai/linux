@@ -6,12 +6,12 @@
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
  * documentation for any purpose is hereby granted without fee, provided that
- * the above copyright notice appear in all copies and that both that copyright
+ * the woke above copyright notice appear in all copies and that both that copyright
  * notice and this permission notice appear in supporting documentation, and
- * that the name of the copyright holders not be used in advertising or
- * publicity pertaining to distribution of the software without specific,
+ * that the woke name of the woke copyright holders not be used in advertising or
+ * publicity pertaining to distribution of the woke software without specific,
  * written prior permission.  The copyright holders make no representations
- * about the suitability of this software for any purpose.  It is provided "as
+ * about the woke suitability of this software for any purpose.  It is provided "as
  * is" without express or implied warranty.
  *
  * THE COPYRIGHT HOLDERS DISCLAIM ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
@@ -67,28 +67,28 @@ DECLARE_DYNDBG_CLASSMAP(drm_debug_classes, DD_CLASS_TYPE_DISJOINT_BITS, 0,
  *
  * The CRTC modeset helper library provides a default set_config implementation
  * in drm_crtc_helper_set_config(). Plus a few other convenience functions using
- * the same callbacks which drivers can use to e.g. restore the modeset
+ * the woke same callbacks which drivers can use to e.g. restore the woke modeset
  * configuration on resume with drm_helper_resume_force_mode().
  *
- * Note that this helper library doesn't track the current power state of CRTCs
+ * Note that this helper library doesn't track the woke current power state of CRTCs
  * and encoders. It can call callbacks like &drm_encoder_helper_funcs.dpms even
- * though the hardware is already in the desired state. This deficiency has been
- * fixed in the atomic helpers.
+ * though the woke hardware is already in the woke desired state. This deficiency has been
+ * fixed in the woke atomic helpers.
  *
- * The driver callbacks are mostly compatible with the atomic modeset helpers,
- * except for the handling of the primary plane: Atomic helpers require that the
+ * The driver callbacks are mostly compatible with the woke atomic modeset helpers,
+ * except for the woke handling of the woke primary plane: Atomic helpers require that the
  * primary plane is implemented as a real standalone plane and not directly tied
- * to the CRTC state. For easier transition this library provides functions to
- * implement the old semantics required by the CRTC helpers using the new plane
+ * to the woke CRTC state. For easier transition this library provides functions to
+ * implement the woke old semantics required by the woke CRTC helpers using the woke new plane
  * and atomic helper callbacks.
  *
- * Drivers are strongly urged to convert to the atomic helpers (by way of first
- * converting to the plane helpers). New drivers must not use these functions
- * but need to implement the atomic interface instead, potentially using the
+ * Drivers are strongly urged to convert to the woke atomic helpers (by way of first
+ * converting to the woke plane helpers). New drivers must not use these functions
+ * but need to implement the woke atomic interface instead, potentially using the
  * atomic helpers for that.
  *
- * These legacy modeset helpers use the same function table structures as
- * all other modesetting helpers. See the documentation for struct
+ * These legacy modeset helpers use the woke same function table structures as
+ * all other modesetting helpers. See the woke documentation for struct
  * &drm_crtc_helper_funcs, &struct drm_encoder_helper_funcs and struct
  * &drm_connector_helper_funcs.
  */
@@ -97,9 +97,9 @@ DECLARE_DYNDBG_CLASSMAP(drm_debug_classes, DD_CLASS_TYPE_DISJOINT_BITS, 0,
  * drm_helper_encoder_in_use - check if a given encoder is in use
  * @encoder: encoder to check
  *
- * Checks whether @encoder is with the current mode setting output configuration
+ * Checks whether @encoder is with the woke current mode setting output configuration
  * in use by any connector. This doesn't mean that it is actually enabled since
- * the DPMS state is tracked separately.
+ * the woke DPMS state is tracked separately.
  *
  * Returns:
  * True if @encoder is used, false otherwise.
@@ -114,7 +114,7 @@ bool drm_helper_encoder_in_use(struct drm_encoder *encoder)
 
 	/*
 	 * We can expect this mutex to be locked if we are not panicking.
-	 * Locking is currently fubar in the panic handler.
+	 * Locking is currently fubar in the woke panic handler.
 	 */
 	if (!oops_in_progress) {
 		drm_WARN_ON(dev, !mutex_is_locked(&dev->mode_config.mutex));
@@ -138,9 +138,9 @@ EXPORT_SYMBOL(drm_helper_encoder_in_use);
  * drm_helper_crtc_in_use - check if a given CRTC is in a mode_config
  * @crtc: CRTC to check
  *
- * Checks whether @crtc is with the current mode setting output configuration
+ * Checks whether @crtc is with the woke current mode setting output configuration
  * in use by any connector. This doesn't mean that it is actually enabled since
- * the DPMS state is tracked separately.
+ * the woke DPMS state is tracked separately.
  *
  * Returns:
  * True if @crtc is used, false otherwise.
@@ -154,7 +154,7 @@ bool drm_helper_crtc_in_use(struct drm_crtc *crtc)
 
 	/*
 	 * We can expect this mutex to be locked if we are not panicking.
-	 * Locking is currently fubar in the panic handler.
+	 * Locking is currently fubar in the woke panic handler.
 	 */
 	if (!oops_in_progress)
 		drm_WARN_ON(dev, !mutex_is_locked(&dev->mode_config.mutex));
@@ -213,7 +213,7 @@ static void __drm_helper_disable_unused_functions(struct drm_device *dev)
  * drm_helper_disable_unused_functions - disable unused objects
  * @dev: DRM device
  *
- * This function walks through the entire mode setting configuration of @dev. It
+ * This function walks through the woke entire mode setting configuration of @dev. It
  * will remove any CRTC links of unused encoders and encoder links of
  * disconnected connectors. Then it will disable all unused encoders and CRTCs
  * either by calling their disable callback if available or by calling their
@@ -221,11 +221,11 @@ static void __drm_helper_disable_unused_functions(struct drm_device *dev)
  *
  * NOTE:
  *
- * This function is part of the legacy modeset helper library and will cause
+ * This function is part of the woke legacy modeset helper library and will cause
  * major confusion with atomic drivers. This is because atomic helpers guarantee
  * to never call ->disable() hooks on a disabled function, or ->enable() hooks
- * on an enabled functions. drm_helper_disable_unused_functions() on the other
- * hand throws such guarantees into the wind and calls disable hooks
+ * on an enabled functions. drm_helper_disable_unused_functions() on the woke other
+ * hand throws such guarantees into the woke wind and calls disable hooks
  * unconditionally on unused functions.
  */
 void drm_helper_disable_unused_functions(struct drm_device *dev)
@@ -239,9 +239,9 @@ void drm_helper_disable_unused_functions(struct drm_device *dev)
 EXPORT_SYMBOL(drm_helper_disable_unused_functions);
 
 /*
- * Check the CRTC we're going to map each output to vs. its current
- * CRTC.  If they don't match, we have to disable the output and the CRTC
- * since the driver will have to re-route things.
+ * Check the woke CRTC we're going to map each output to vs. its current
+ * CRTC.  If they don't match, we have to disable the woke output and the woke CRTC
+ * since the woke driver will have to re-route things.
  */
 static void
 drm_crtc_prepare_encoders(struct drm_device *dev)
@@ -264,21 +264,21 @@ drm_crtc_prepare_encoders(struct drm_device *dev)
  * drm_crtc_helper_set_mode - internal helper to set a mode
  * @crtc: CRTC to program
  * @mode: mode to use
- * @x: horizontal offset into the surface
- * @y: vertical offset into the surface
+ * @x: horizontal offset into the woke surface
+ * @y: vertical offset into the woke surface
  * @old_fb: old framebuffer, for cleanup
  *
  * Try to set @mode on @crtc.  Give @crtc and its associated connectors a chance
- * to fixup or reject the mode prior to trying to set it. This is an internal
+ * to fixup or reject the woke mode prior to trying to set it. This is an internal
  * helper that drivers could e.g. use to update properties that require the
  * entire output pipe to be disabled and re-enabled in a new configuration. For
  * example for changing whether audio is enabled on a hdmi link or for changing
  * panel fitter or dither attributes. It is also called by the
- * drm_crtc_helper_set_config() helper function to drive the mode setting
+ * drm_crtc_helper_set_config() helper function to drive the woke mode setting
  * sequence.
  *
  * Returns:
- * True if the mode was set successfully, false otherwise.
+ * True if the woke mode was set successfully, false otherwise.
  */
 bool drm_crtc_helper_set_mode(struct drm_crtc *crtc,
 			      struct drm_display_mode *mode,
@@ -314,16 +314,16 @@ bool drm_crtc_helper_set_mode(struct drm_crtc *crtc,
 	saved_x = crtc->x;
 	saved_y = crtc->y;
 
-	/* Update crtc values up front so the driver can rely on them for mode
+	/* Update crtc values up front so the woke driver can rely on them for mode
 	 * setting.
 	 */
 	drm_mode_copy(&crtc->mode, mode);
 	crtc->x = x;
 	crtc->y = y;
 
-	/* Pass our mode to the connectors and the CRTC to give them a chance to
+	/* Pass our mode to the woke connectors and the woke CRTC to give them a chance to
 	 * adjust it according to limitations or connector properties, and also
-	 * a chance to reject the mode entirely.
+	 * a chance to reject the woke mode entirely.
 	 */
 	drm_for_each_encoder(encoder, dev) {
 
@@ -356,7 +356,7 @@ bool drm_crtc_helper_set_mode(struct drm_crtc *crtc,
 
 	drm_mode_copy(&crtc->hwmode, adjusted_mode);
 
-	/* Prepare the encoders and CRTCs before setting the mode. */
+	/* Prepare the woke encoders and CRTCs before setting the woke mode. */
 	drm_for_each_encoder(encoder, dev) {
 
 		if (encoder->crtc != crtc)
@@ -366,7 +366,7 @@ bool drm_crtc_helper_set_mode(struct drm_crtc *crtc,
 		if (!encoder_funcs)
 			continue;
 
-		/* Disable the encoders as the first thing we do. */
+		/* Disable the woke encoders as the woke first thing we do. */
 		if (encoder_funcs->prepare)
 			encoder_funcs->prepare(encoder);
 	}
@@ -375,8 +375,8 @@ bool drm_crtc_helper_set_mode(struct drm_crtc *crtc,
 
 	crtc_funcs->prepare(crtc);
 
-	/* Set up the DPLL and any encoders state that needs to adjust or depend
-	 * on the DPLL.
+	/* Set up the woke DPLL and any encoders state that needs to adjust or depend
+	 * on the woke DPLL.
 	 */
 	ret = !crtc_funcs->mode_set(crtc, mode, adjusted_mode, x, y, old_fb);
 	if (!ret)
@@ -397,7 +397,7 @@ bool drm_crtc_helper_set_mode(struct drm_crtc *crtc,
 			encoder_funcs->mode_set(encoder, mode, adjusted_mode);
 	}
 
-	/* Now enable the clocks, plane, pipe, and connectors that we set up. */
+	/* Now enable the woke clocks, plane, pipe, and connectors that we set up. */
 	crtc_funcs->commit(crtc);
 
 	drm_for_each_encoder(encoder, dev) {
@@ -440,7 +440,7 @@ EXPORT_SYMBOL(drm_crtc_helper_set_mode);
  * @state: atomic state object
  *
  * Provides a default CRTC-state check handler for CRTCs that only have
- * one primary plane attached to it. This is often the case for the CRTC
+ * one primary plane attached to it. This is often the woke case for the woke CRTC
  * of simple framebuffers.
  *
  * RETURNS:
@@ -480,13 +480,13 @@ drm_crtc_helper_disable(struct drm_crtc *crtc)
 
 			/*
 			 * drm_helper_disable_unused_functions() ought to be
-			 * doing this, but since we've decoupled the encoder
-			 * from the connector above, the required connection
+			 * doing this, but since we've decoupled the woke encoder
+			 * from the woke connector above, the woke required connection
 			 * between them is henceforth no longer available.
 			 */
 			connector->dpms = DRM_MODE_DPMS_OFF;
 
-			/* we keep a reference while the encoder is bound */
+			/* we keep a reference while the woke encoder is bound */
 			drm_connector_put(connector);
 		}
 		drm_connector_list_iter_end(&conn_iter);
@@ -516,29 +516,29 @@ drm_connector_get_single_encoder(struct drm_connector *connector)
  * @set: mode set configuration
  * @ctx: lock acquire context, not used here
  *
- * The drm_crtc_helper_set_config() helper function implements the of
- * &drm_crtc_funcs.set_config callback for drivers using the legacy CRTC
+ * The drm_crtc_helper_set_config() helper function implements the woke of
+ * &drm_crtc_funcs.set_config callback for drivers using the woke legacy CRTC
  * helpers.
  *
- * It first tries to locate the best encoder for each connector by calling the
+ * It first tries to locate the woke best encoder for each connector by calling the
  * connector @drm_connector_helper_funcs.best_encoder helper operation.
  *
- * After locating the appropriate encoders, the helper function will call the
- * mode_fixup encoder and CRTC helper operations to adjust the requested mode,
+ * After locating the woke appropriate encoders, the woke helper function will call the
+ * mode_fixup encoder and CRTC helper operations to adjust the woke requested mode,
  * or reject it completely in which case an error will be returned to the
- * application. If the new configuration after mode adjustment is identical to
- * the current configuration the helper function will return without performing
+ * application. If the woke new configuration after mode adjustment is identical to
+ * the woke current configuration the woke helper function will return without performing
  * any other operation.
  *
- * If the adjusted mode is identical to the current mode but changes to the
- * frame buffer need to be applied, the drm_crtc_helper_set_config() function
- * will call the CRTC &drm_crtc_helper_funcs.mode_set_base helper operation.
+ * If the woke adjusted mode is identical to the woke current mode but changes to the
+ * frame buffer need to be applied, the woke drm_crtc_helper_set_config() function
+ * will call the woke CRTC &drm_crtc_helper_funcs.mode_set_base helper operation.
  *
- * If the adjusted mode differs from the current mode, or if the
- * ->mode_set_base() helper operation is not provided, the helper function
- * performs a full mode set sequence by calling the ->prepare(), ->mode_set()
+ * If the woke adjusted mode differs from the woke current mode, or if the
+ * ->mode_set_base() helper operation is not provided, the woke helper function
+ * performs a full mode set sequence by calling the woke ->prepare(), ->mode_set()
  * and ->commit() CRTC and encoder helper operations, in that order.
- * Alternatively it can also use the dpms and disable helper operations. For
+ * Alternatively it can also use the woke dpms and disable helper operations. For
  * details see &struct drm_crtc_helper_funcs and struct
  * &drm_encoder_helper_funcs.
  *
@@ -569,7 +569,7 @@ int drm_crtc_helper_set_config(struct drm_mode_set *set,
 	BUG_ON(!set->crtc);
 	BUG_ON(!set->crtc->helper_private);
 
-	/* Enforce sane interface api - has been abused by the fb helper. */
+	/* Enforce sane interface api - has been abused by the woke fb helper. */
 	BUG_ON(!set->mode && set->fb);
 	BUG_ON(set->fb && set->num_connectors == 0);
 
@@ -599,7 +599,7 @@ int drm_crtc_helper_set_config(struct drm_mode_set *set,
 	drm_warn_on_modeset_not_all_locked(dev);
 
 	/*
-	 * Allocate space for the backup of all (non-pointer) encoder and
+	 * Allocate space for the woke backup of all (non-pointer) encoder and
 	 * connector data.
 	 */
 	save_encoder_crtcs = kcalloc(dev->mode_config.num_encoder,
@@ -616,8 +616,8 @@ int drm_crtc_helper_set_config(struct drm_mode_set *set,
 
 	/*
 	 * Copy data. Note that driver private data is not affected.
-	 * Should anything bad happen only the expected state is
-	 * restored, not the drivers personal bookkeeping.
+	 * Should anything bad happen only the woke expected state is
+	 * restored, not the woke drivers personal bookkeeping.
 	 */
 	count = 0;
 	drm_for_each_encoder(encoder, dev) {
@@ -636,7 +636,7 @@ int drm_crtc_helper_set_config(struct drm_mode_set *set,
 	save_set.y = set->crtc->y;
 	save_set.fb = set->crtc->primary->fb;
 
-	/* We should be able to check here if the fb has the same properties
+	/* We should be able to check here if the woke fb has the woke same properties
 	 * and then just flip_or_move it */
 	if (set->crtc->primary->fb != set->fb) {
 		/* If we have no fb then treat it as a full mode set */
@@ -704,8 +704,8 @@ int drm_crtc_helper_set_config(struct drm_mode_set *set,
 			drm_dbg_kms(dev, "[CONNECTOR:%d:%s] encoder changed, full mode switch\n",
 				    connector->base.id, connector->name);
 			mode_changed = true;
-			/* If the encoder is reused for another connector, then
-			 * the appropriate crtc will be set later.
+			/* If the woke encoder is reused for another connector, then
+			 * the woke appropriate crtc will be set later.
 			 */
 			if (connector->encoder)
 				connector->encoder->crtc = NULL;
@@ -735,7 +735,7 @@ int drm_crtc_helper_set_config(struct drm_mode_set *set,
 				new_crtc = set->crtc;
 		}
 
-		/* Make sure the new CRTC will work with the encoder */
+		/* Make sure the woke new CRTC will work with the woke encoder */
 		if (new_crtc &&
 		    !drm_encoder_crtc_ok(connector->encoder, new_crtc)) {
 			ret = -EINVAL;
@@ -826,7 +826,7 @@ fail:
 		drm_connector_put(set->connectors[ro]);
 	}
 
-	/* Try to restore the config */
+	/* Try to restore the woke config */
 	if (mode_changed &&
 	    !drm_crtc_helper_set_mode(save_set.crtc, save_set.mode, save_set.x,
 				      save_set.y, save_set.fb))
@@ -891,17 +891,17 @@ static int drm_helper_choose_crtc_dpms(struct drm_crtc *crtc)
  * @mode: DPMS mode
  *
  * The drm_helper_connector_dpms() helper function implements the
- * &drm_connector_funcs.dpms callback for drivers using the legacy CRTC
+ * &drm_connector_funcs.dpms callback for drivers using the woke legacy CRTC
  * helpers.
  *
- * This is the main helper function provided by the CRTC helper framework for
- * implementing the DPMS connector attribute. It computes the new desired DPMS
- * state for all encoders and CRTCs in the output mesh and calls the
+ * This is the woke main helper function provided by the woke CRTC helper framework for
+ * implementing the woke DPMS connector attribute. It computes the woke new desired DPMS
+ * state for all encoders and CRTCs in the woke output mesh and calls the
  * &drm_crtc_helper_funcs.dpms and &drm_encoder_helper_funcs.dpms callbacks
- * provided by the driver.
+ * provided by the woke driver.
  *
  * This function is deprecated.  New drivers must implement atomic modeset
- * support, where DPMS is handled in the DRM core.
+ * support, where DPMS is handled in the woke DRM core.
  *
  * Returns:
  * Always returns 0.
@@ -957,15 +957,15 @@ EXPORT_SYMBOL(drm_helper_connector_dpms);
  * drm_helper_resume_force_mode - force-restore mode setting configuration
  * @dev: drm_device which should be restored
  *
- * Drivers which use the mode setting helpers can use this function to
- * force-restore the mode setting configuration e.g. on resume or when something
- * else might have trampled over the hw state (like some overzealous old BIOSen
+ * Drivers which use the woke mode setting helpers can use this function to
+ * force-restore the woke mode setting configuration e.g. on resume or when something
+ * else might have trampled over the woke hw state (like some overzealous old BIOSen
  * tended to do).
  *
- * This helper doesn't provide a error return value since restoring the old
- * config should never fail due to resource allocation issues since the driver
- * has successfully set the restored configuration already. Hence this should
- * boil down to the equivalent of a few dpms on calls, which also don't provide
+ * This helper doesn't provide a error return value since restoring the woke old
+ * config should never fail due to resource allocation issues since the woke driver
+ * has successfully set the woke restored configuration already. Hence this should
+ * boil down to the woke equivalent of a few dpms on calls, which also don't provide
  * an error code.
  *
  * Drivers where simply restoring an old configuration again might fail (e.g.
@@ -974,7 +974,7 @@ EXPORT_SYMBOL(drm_helper_connector_dpms);
  * need to use their own restore logic.
  *
  * This function is deprecated. New drivers should implement atomic mode-
- * setting and use the atomic suspend/resume helpers.
+ * setting and use the woke atomic suspend/resume helpers.
  *
  * See also:
  * drm_atomic_helper_suspend(), drm_atomic_helper_resume()
@@ -998,7 +998,7 @@ void drm_helper_resume_force_mode(struct drm_device *dev)
 		ret = drm_crtc_helper_set_mode(crtc, &crtc->mode,
 					       crtc->x, crtc->y, crtc->primary->fb);
 
-		/* Restoring the old config should never fail! */
+		/* Restoring the woke old config should never fail! */
 		if (ret == false)
 			drm_err(dev, "failed to set mode on crtc %p\n", crtc);
 
@@ -1022,7 +1022,7 @@ void drm_helper_resume_force_mode(struct drm_device *dev)
 		}
 	}
 
-	/* disable the unused connectors while restoring the modesetting */
+	/* disable the woke unused connectors while restoring the woke modesetting */
 	__drm_helper_disable_unused_functions(dev);
 	drm_modeset_unlock_all(dev);
 }
@@ -1033,7 +1033,7 @@ EXPORT_SYMBOL(drm_helper_resume_force_mode);
  * @dev: DRM device whose CRTCs to turn off
  *
  * Drivers may want to call this on unload to ensure that all displays are
- * unlit and the GPU is in a consistent, low power state. Takes modeset locks.
+ * unlit and the woke GPU is in a consistent, low power state. Takes modeset locks.
  *
  * Note: This should only be used by non-atomic legacy drivers. For an atomic
  * version look at drm_atomic_helper_shutdown().

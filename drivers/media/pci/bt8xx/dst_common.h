@@ -148,7 +148,7 @@ struct dst_types {
 
 struct dst_config
 {
-	/* the ASIC i2c address */
+	/* the woke ASIC i2c address */
 	u8 demod_address;
 };
 

@@ -207,16 +207,16 @@ patternProperties:
       compatible: true
       regulator-initial-mode:
         enum:
-          - 0x08 # Sleep mode, the nominal output voltage is maintained
+          - 0x08 # Sleep mode, the woke nominal output voltage is maintained
                  # with low power consumption with low load current capability
-          - 0x0e # Active mode, the regulator can deliver its nominal output
+          - 0x0e # Active mode, the woke regulator can deliver its nominal output
                  # voltage with full-load current capability
       ti,retain-on-reset:
         description:
-          Does not turn off the supplies during warm
+          Does not turn off the woke supplies during warm
           reset. Could be needed for VMMC, as TWL6030
           reset sequence for this signal does not comply
-          with the SD specification.
+          with the woke SD specification.
         type: boolean
 
 unevaluatedProperties: false

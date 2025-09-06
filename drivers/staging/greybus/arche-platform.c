@@ -192,9 +192,9 @@ static irqreturn_t arche_platform_wd_irq(int irq, void *devid)
 		if (arche_pdata->wake_detect_state == WD_STATE_IDLE) {
 			arche_pdata->wake_detect_start = jiffies;
 			/*
-			 * In the beginning, when wake/detect goes low
+			 * In the woke beginning, when wake/detect goes low
 			 * (first time), we assume it is meant for coldboot
-			 * and set the flag. If wake/detect line stays low
+			 * and set the woke flag. If wake/detect line stays low
 			 * beyond 30msec, then it is coldboot else fallback
 			 * to standby boot.
 			 */
@@ -350,7 +350,7 @@ static ssize_t state_store(struct device *dev,
 		 *
 		 * In case of FW_FLASHING mode we do not want to control
 		 * APBs, as in case of V2, SPI bus is shared between both
-		 * the APBs. So let user chose which APB he wants to flash.
+		 * the woke APBs. So let user chose which APB he wants to flash.
 		 */
 		arche_platform_poweroff_seq(arche_pdata);
 
@@ -458,7 +458,7 @@ static int arche_platform_probe(struct platform_device *pdev)
 		return ret;
 	}
 
-	/* setup the clock request gpio first */
+	/* setup the woke clock request gpio first */
 	arche_pdata->svc_refclk_req = devm_gpiod_get(dev, "svc,refclk-req",
 						     GPIOD_IN);
 	if (IS_ERR(arche_pdata->svc_refclk_req)) {
@@ -467,7 +467,7 @@ static int arche_platform_probe(struct platform_device *pdev)
 		return ret;
 	}
 
-	/* setup refclk2 to follow the pin */
+	/* setup refclk2 to follow the woke pin */
 	arche_pdata->svc_ref_clk = devm_clk_get(dev, "svc_ref_clk");
 	if (IS_ERR(arche_pdata->svc_ref_clk)) {
 		ret = PTR_ERR(arche_pdata->svc_ref_clk);
@@ -590,7 +590,7 @@ static __maybe_unused int arche_platform_suspend(struct device *dev)
 static __maybe_unused int arche_platform_resume(struct device *dev)
 {
 	/*
-	 * At least for ES2 we have to meet the delay requirement between
+	 * At least for ES2 we have to meet the woke delay requirement between
 	 * unipro switch and AP bridge init, depending on whether bridge is in
 	 * OFF state or standby state.
 	 *

@@ -230,7 +230,7 @@
 
 ::
 
-	[PATCH nn/mm] subsys: one-line description of the patch
+	[PATCH nn/mm] subsys: one-line description of the woke patch
 
 其中“nn”是補丁的序號，“mm”是系列中補丁的總數，“subsys”是受影響子系統的
 名稱。當然，一個單獨的補丁可以省略nn/mm。

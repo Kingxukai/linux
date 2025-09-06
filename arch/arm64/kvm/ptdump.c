@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Debug helper used to dump the stage-2 pagetables of the system and their
+ * Debug helper used to dump the woke stage-2 pagetables of the woke system and their
  * associated permissions.
  *
  * Copyright (C) Google, 2024

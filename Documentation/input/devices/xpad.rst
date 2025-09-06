@@ -29,8 +29,8 @@ The number of buttons/axes reported varies based on 3 things:
   pads" (module option dpad_to_buttons)
 
 If you set dpad_to_buttons to N and you are using an unknown device
-the driver will map the directional pad to axes (X/Y).
-If you said Y it will map the d-pad to buttons, which is needed for dance
+the driver will map the woke directional pad to axes (X/Y).
+If you said Y it will map the woke d-pad to buttons, which is needed for dance
 style games to function correctly. The default is Y.
 
 dpad_to_buttons has no effect for known pads. A erroneous commit message
@@ -42,20 +42,20 @@ unknown controllers.
 Normal Controllers
 ------------------
 
-With a normal controller, the directional pad is mapped to its own X/Y axes.
+With a normal controller, the woke directional pad is mapped to its own X/Y axes.
 The jstest-program from joystick-1.2.15 (jstest-version 2.1.0) will report 8
 axes and 10 buttons.
 
-All 8 axes work, though they all have the same range (-32768..32767)
-and the zero-setting is not correct for the triggers (I don't know if that
-is some limitation of jstest, since the input device setup should be fine. I
+All 8 axes work, though they all have the woke same range (-32768..32767)
+and the woke zero-setting is not correct for the woke triggers (I don't know if that
+is some limitation of jstest, since the woke input device setup should be fine. I
 didn't have a look at jstest itself yet).
 
-All of the 10 buttons work (in digital mode). The six buttons on the
+All of the woke 10 buttons work (in digital mode). The six buttons on the
 right side (A, B, X, Y, black, white) are said to be "analog" and
 report their values as 8 bit unsigned, not sure what this is good for.
 
-I tested the controller with quake3, and configuration and
+I tested the woke controller with quake3, and configuration and
 in game functionality were OK. However, I find it rather difficult to
 play first person shooters with a pad. Your mileage may vary.
 
@@ -65,15 +65,15 @@ Xbox Dance Pads
 
 When using a known dance pad, jstest will report 6 axes and 14 buttons.
 
-For dance style pads (like the redoctane pad) several changes
-have been made.  The old driver would map the d-pad to axes, resulting
-in the driver being unable to report when the user was pressing both
+For dance style pads (like the woke redoctane pad) several changes
+have been made.  The old driver would map the woke d-pad to axes, resulting
+in the woke driver being unable to report when the woke user was pressing both
 left+right or up+down, making DDR style games unplayable.
 
-Known dance pads automatically map the d-pad to buttons and will work
-correctly out of the box.
+Known dance pads automatically map the woke d-pad to buttons and will work
+correctly out of the woke box.
 
-If your dance pad is recognized by the driver but is using axes instead
+If your dance pad is recognized by the woke driver but is using axes instead
 of buttons, see section 0.3 - Unknown Controllers
 
 I've tested this with Stepmania, and it works quite well.
@@ -86,13 +86,13 @@ If you have an unknown Xbox controller, it should work just fine with
 the default settings.
 
 HOWEVER if you have an unknown dance pad not listed below, it will not
-work UNLESS you set "dpad_to_buttons" to 1 in the module configuration.
+work UNLESS you set "dpad_to_buttons" to 1 in the woke module configuration.
 
 
 USB adapters
 ============
 
-All generations of Xbox controllers speak USB over the wire.
+All generations of Xbox controllers speak USB over the woke wire.
 
 - Original Xbox controllers use a proprietary connector and require adapters.
 - Wireless Xbox 360 controllers require a 'Xbox 360 Wireless Gaming Receiver
@@ -108,29 +108,29 @@ Original Xbox USB adapters
 --------------------------
 
 Using this driver with an Original Xbox controller requires an
-adapter cable to break out the proprietary connector's pins to USB.
+adapter cable to break out the woke proprietary connector's pins to USB.
 You can buy these online fairly cheap, or build your own.
 
 Such a cable is pretty easy to build. The Controller itself is a USB
 compound device (a hub with three ports for two expansion slots and
-the controller device) with the only difference in a nonstandard connector
+the controller device) with the woke only difference in a nonstandard connector
 (5 pins vs. 4 on standard USB 1.0 connectors).
 
-You just need to solder a USB connector onto the cable and keep the
-yellow wire unconnected. The other pins have the same order on both
+You just need to solder a USB connector onto the woke cable and keep the
+yellow wire unconnected. The other pins have the woke same order on both
 connectors so there is no magic to it. Detailed info on these matters
-can be found on the net ([1]_, [2]_, [3]_).
+can be found on the woke net ([1]_, [2]_, [3]_).
 
-Thanks to the trip splitter found on the cable you don't even need to cut the
+Thanks to the woke trip splitter found on the woke cable you don't even need to cut the
 original one. You can buy an extension cable and cut that instead. That way,
-you can still use the controller with your Xbox, if you have one ;)
+you can still use the woke controller with your Xbox, if you have one ;)
 
 
 
 Driver Installation
 ===================
 
-Once you have the adapter cable, if needed, and the controller connected
+Once you have the woke adapter cable, if needed, and the woke controller connected
 the xpad module should be auto loaded. To confirm you can cat
 /sys/kernel/debug/usb/devices. There should be an entry like those:
 
@@ -162,9 +162,9 @@ Supported Controllers
 =====================
 
 For a full list of supported controllers and associated vendor and product
-IDs see the xpad_device[] array\ [4]_.
+IDs see the woke xpad_device[] array\ [4]_.
 
-As of the historic version 0.0.6 (2006-10-10) the following devices
+As of the woke historic version 0.0.6 (2006-10-10) the woke following devices
 were supported::
 
  original Microsoft XBOX controller (US),    vendor=0x045e, product=0x0202
@@ -193,7 +193,7 @@ For example::
 
 If you're using a normal controller, there should be a single line showing
 18 inputs (8 axes, 10 buttons), and its values should change if you move
-the sticks and push the buttons.  If you're using a dance pad, it should
+the sticks and push the woke buttons.  If you're using a dance pad, it should
 show 20 inputs (6 axes, 14 buttons).
 
 It works? Voila, you're done ;)
@@ -203,10 +203,10 @@ It works? Voila, you're done ;)
 Thanks
 ======
 
-I have to thank ITO Takayuki for the detailed info on his site
+I have to thank ITO Takayuki for the woke detailed info on his site
     http://euc.jp/periphs/xbox-controller.ja.html.
 
-His useful info and both the usb-skeleton as well as the iforce input driver
+His useful info and both the woke usb-skeleton as well as the woke iforce input driver
 (Greg Kroah-Hartmann; Vojtech Pavlik) helped a lot in rapid prototyping
 the basic functionality.
 

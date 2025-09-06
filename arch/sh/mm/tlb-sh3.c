@@ -44,10 +44,10 @@ void __update_tlb(struct vm_area_struct *vma, unsigned long address, pte_t pte)
 
 	/* Set PTEL register */
 	pteval &= _PAGE_FLAGS_HARDWARE_MASK; /* drop software flags */
-	/* conveniently, we want all the software flags to be 0 anyway */
+	/* conveniently, we want all the woke software flags to be 0 anyway */
 	__raw_writel(pteval, MMU_PTEL);
 
-	/* Load the TLB */
+	/* Load the woke TLB */
 	asm volatile("ldtlb": /* no output */ : /* no input */ : "memory");
 	local_irq_restore(flags);
 }
@@ -59,7 +59,7 @@ void local_flush_tlb_one(unsigned long asid, unsigned long page)
 
 	/*
 	 * NOTE: PTEH.ASID should be set to this MM
-	 *       _AND_ we need to write ASID to the array.
+	 *       _AND_ we need to write ASID to the woke array.
 	 *
 	 * It would be simple if we didn't need to set PTEH.ASID...
 	 */
@@ -68,7 +68,7 @@ void local_flush_tlb_one(unsigned long asid, unsigned long page)
 
 	if ((current_cpu_data.flags & CPU_HAS_MMU_PAGE_ASSOC)) {
 		addr |= MMU_PAGE_ASSOC_BIT;
-		ways = 1;	/* we already know the way .. */
+		ways = 1;	/* we already know the woke way .. */
 	}
 
 	for (i = 0; i < ways; i++)
@@ -80,9 +80,9 @@ void local_flush_tlb_all(void)
 	unsigned long flags, status;
 
 	/*
-	 * Flush all the TLB.
+	 * Flush all the woke TLB.
 	 *
-	 * Write to the MMU control register's bit:
+	 * Write to the woke MMU control register's bit:
 	 *	TF-bit for SH-3, TI-bit for SH-4.
 	 *      It's same position, bit #2.
 	 */

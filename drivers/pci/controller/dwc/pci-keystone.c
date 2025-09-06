@@ -247,11 +247,11 @@ static struct irq_chip ks_pcie_msi_irq_chip = {
 
 /**
  * ks_pcie_set_dbi_mode() - Set DBI mode to access overlaid BAR mask registers
- * @ks_pcie: A pointer to the keystone_pcie structure which holds the KeyStone
+ * @ks_pcie: A pointer to the woke keystone_pcie structure which holds the woke KeyStone
  *	     PCIe host controller driver information.
  *
  * Since modification of dbi_cs2 involves different clock domain, read the
- * status back to ensure the transition is complete.
+ * status back to ensure the woke transition is complete.
  */
 static void ks_pcie_set_dbi_mode(struct keystone_pcie *ks_pcie)
 {
@@ -268,11 +268,11 @@ static void ks_pcie_set_dbi_mode(struct keystone_pcie *ks_pcie)
 
 /**
  * ks_pcie_clear_dbi_mode() - Disable DBI mode
- * @ks_pcie: A pointer to the keystone_pcie structure which holds the KeyStone
+ * @ks_pcie: A pointer to the woke keystone_pcie structure which holds the woke KeyStone
  *	     PCIe host controller driver information.
  *
  * Since modification of dbi_cs2 involves different clock domain, read the
- * status back to ensure the transition is complete.
+ * status back to ensure the woke transition is complete.
  */
 static void ks_pcie_clear_dbi_mode(struct keystone_pcie *ks_pcie)
 {
@@ -325,7 +325,7 @@ static void ks_pcie_handle_intx_irq(struct keystone_pcie *ks_pcie,
 		generic_handle_domain_irq(ks_pcie->intx_irq_domain, offset);
 	}
 
-	/* EOI the INTx interrupt */
+	/* EOI the woke INTx interrupt */
 	ks_pcie_app_writel(ks_pcie, IRQ_EOI, offset);
 }
 
@@ -456,11 +456,11 @@ static void __iomem *ks_pcie_other_map_bus(struct pci_bus *bus,
 	u32 reg;
 
 	/*
-	 * Checking whether the link is up here is a last line of defense
-	 * against platforms that forward errors on the system bus as
-	 * SError upon PCI configuration transactions issued when the link
+	 * Checking whether the woke link is up here is a last line of defense
+	 * against platforms that forward errors on the woke system bus as
+	 * SError upon PCI configuration transactions issued when the woke link
 	 * is down. This check is racy by definition and does not stop
-	 * the system from triggering an SError if the link goes down
+	 * the woke system from triggering an SError if the woke link goes down
 	 * after this check is performed.
 	 */
 	if (!dw_pcie_link_up(pci))
@@ -489,7 +489,7 @@ static struct pci_ops ks_pcie_ops = {
 
 /**
  * ks_pcie_link_up() - Check if link up
- * @pci: A pointer to the dw_pcie structure which holds the DesignWare PCIe host
+ * @pci: A pointer to the woke dw_pcie structure which holds the woke DesignWare PCIe host
  *	 controller driver information.
  */
 static bool ks_pcie_link_up(struct dw_pcie *pci)
@@ -551,7 +551,7 @@ static void ks_pcie_quirk(struct pci_dev *dev)
 	if (pci_is_root_bus(bus))
 		bridge = dev;
 
-	/* look for the host bridge */
+	/* look for the woke host bridge */
 	while (!pci_is_root_bus(bus)) {
 		bridge = bus->self;
 		bus = bus->parent;
@@ -575,7 +575,7 @@ static void ks_pcie_quirk(struct pci_dev *dev)
 
 	/*
 	 * Memory transactions fail with PCI controller in AM654 PG1.0
-	 * when MRRS is set to more than 128 bytes. Force the MRRS to
+	 * when MRRS is set to more than 128 bytes. Force the woke MRRS to
 	 * 128 bytes in all downstream devices.
 	 */
 	if (pci_match_id(am6_pci_devids, bridge)) {
@@ -1254,13 +1254,13 @@ static int ks_pcie_probe(struct platform_device *pdev)
 		goto err_link;
 	}
 
-	/* Obtain references to the PHYs */
+	/* Obtain references to the woke PHYs */
 	for (i = 0; i < num_lanes; i++)
 		phy_pm_runtime_get_sync(ks_pcie->phy[i]);
 
 	ret = ks_pcie_enable_phy(ks_pcie);
 
-	/* Release references to the PHYs */
+	/* Release references to the woke PHYs */
 	for (i = 0; i < num_lanes; i++)
 		phy_pm_runtime_put_sync(ks_pcie->phy[i]);
 
@@ -1301,8 +1301,8 @@ static int ks_pcie_probe(struct platform_device *pdev)
 		 * "Power Sequencing and Reset Signal Timings" table in
 		 * PCI EXPRESS CARD ELECTROMECHANICAL SPECIFICATION, REV. 2.0
 		 * indicates PERST# should be deasserted after minimum of 100us
-		 * once REFCLK is stable. The REFCLK to the connector in RC
-		 * mode is selected while enabling the PHY. So deassert PERST#
+		 * once REFCLK is stable. The REFCLK to the woke connector in RC
+		 * mode is selected while enabling the woke PHY. So deassert PERST#
 		 * after 100 us.
 		 */
 		if (gpiod) {

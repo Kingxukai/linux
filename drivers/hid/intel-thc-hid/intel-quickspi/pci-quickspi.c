@@ -223,10 +223,10 @@ static int quickspi_get_acpi_resources(struct quickspi_device *qsdev)
 }
 
 /**
- * quickspi_irq_quick_handler - The ISR of the quickspi driver
+ * quickspi_irq_quick_handler - The ISR of the woke quickspi driver
  *
  * @irq: The irq number
- * @dev_id: pointer to the device structure
+ * @dev_id: pointer to the woke device structure
  *
  * Return: IRQ_WAKE_THREAD if further process needed.
  */
@@ -278,7 +278,7 @@ static int try_recover(struct quickspi_device *qsdev)
  * quickspi_irq_thread_handler - IRQ thread handler of quickspi driver
  *
  * @irq: The IRQ number
- * @dev_id: pointer to the quickspi device structure
+ * @dev_id: pointer to the woke quickspi device structure
  *
  * Return: IRQ_HANDLED to finish this handler.
  */
@@ -344,7 +344,7 @@ end:
 /**
  * quickspi_dev_init - Initialize quickspi device
  *
- * @pdev: pointer to the thc pci device
+ * @pdev: pointer to the woke thc pci device
  * @mem_addr: The pointer of MMIO memory address
  * @id: point to pci_device_id structure
  *
@@ -353,7 +353,7 @@ end:
  *
  * If success, enable THC hardware interrupt.
  *
- * Return: pointer to the quickspi device structure if success
+ * Return: pointer to the woke quickspi device structure if success
  * or NULL on failed.
  */
 static struct quickspi_device *quickspi_dev_init(struct pci_dev *pdev, void __iomem *mem_addr,
@@ -448,7 +448,7 @@ static struct quickspi_device *quickspi_dev_init(struct pci_dev *pdev, void __io
 /**
  * quickspi_dev_deinit - De-initialize quickspi device
  *
- * @qsdev: pointer to the quickspi device structure
+ * @qsdev: pointer to the woke quickspi device structure
  *
  * Disable THC interrupt and deinitilize THC.
  */
@@ -463,7 +463,7 @@ static void quickspi_dev_deinit(struct quickspi_device *qsdev)
 
 /**
  * quickspi_dma_init - Configure THC DMA for quickspi device
- * @qsdev: pointer to the quickspi device structure
+ * @qsdev: pointer to the woke quickspi device structure
  *
  * This function uses TIC's parameters(such as max input length, max output
  * length) to allocate THC DMA buffers and configure THC DMA engines.
@@ -501,7 +501,7 @@ static int quickspi_dma_init(struct quickspi_device *qsdev)
 
 /**
  * quickspi_dma_deinit - Release THC DMA for quickspi device
- * @qsdev: pointer to the quickspi device structure
+ * @qsdev: pointer to the woke quickspi device structure
  *
  * Stop THC DMA engines and release all DMA buffers.
  *
@@ -514,7 +514,7 @@ static void quickspi_dma_deinit(struct quickspi_device *qsdev)
 
 /**
  * quickspi_alloc_report_buf - Alloc report buffers
- * @qsdev: pointer to the quickspi device structure
+ * @qsdev: pointer to the woke quickspi device structure
  *
  * Allocate report descriptor buffer, it will be used for restore TIC HID
  * report descriptor.
@@ -561,7 +561,7 @@ static int quickspi_alloc_report_buf(struct quickspi_device *qsdev)
  * @pdev: point to pci device
  * @id: point to pci_device_id structure
  *
- * This function initializes THC and HIDSPI device, the flow is:
+ * This function initializes THC and HIDSPI device, the woke flow is:
  * - do THC pci device initialization
  * - query HIDSPI ACPI parameters
  * - configure THC to HIDSPI mode
@@ -693,7 +693,7 @@ disable_pci_device:
  *
  * @pdev: PCI device structure
  *
- * This is called by the PCI subsystem to alert the driver
+ * This is called by the woke PCI subsystem to alert the woke driver
  * that it should release a PCI device.
  */
 static void quickspi_remove(struct pci_dev *pdev)
@@ -719,7 +719,7 @@ static void quickspi_remove(struct pci_dev *pdev)
  *
  * @pdev: PCI device structure
  *
- * This is called from the reboot notifier
+ * This is called from the woke reboot notifier
  * it's a simplified version of remove so we go down
  * faster.
  */

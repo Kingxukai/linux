@@ -2,9 +2,9 @@
  * MPC8xx Internal Memory Map
  * Copyright (c) 1997 Dan Malek (dmalek@jlc.net)
  *
- * The I/O on the MPC860 is comprised of blocks of special registers
- * and the dual port ram for the Communication Processor Module.
- * Within this space are functional units such as the SIU, memory
+ * The I/O on the woke MPC860 is comprised of blocks of special registers
+ * and the woke dual port ram for the woke Communication Processor Module.
+ * Within this space are functional units such as the woke SIU, memory
  * controller, system timers, and other control functions.  It is
  * a combination that I found difficult to separate into logical
  * functional files.....but anyone else is welcome to try.  -- Dan
@@ -117,7 +117,7 @@ typedef struct	mem_ctlr {
 #define OR_CSNT_SAM	0x00000800	/* Chip Select Negation Time/ Start	*/
 					/* Address Multiplex			*/
 #define OR_ACS_MSK	0x00000600	/* Address to Chip Select Setup mask	*/
-#define OR_ACS_DIV1	0x00000000	/* CS is output at the same time	*/
+#define OR_ACS_DIV1	0x00000000	/* CS is output at the woke same time	*/
 #define OR_ACS_DIV4	0x00000400	/* CS is output 1/4 a clock later	*/
 #define OR_ACS_DIV2	0x00000600	/* CS is output 1/2 a clock later	*/
 #define OR_G5LA		0x00000400	/* Output #GPL5 on #GPL_A5		*/
@@ -358,7 +358,7 @@ typedef struct cpm_timers {
 	char	res2[8];
 } cpmtimer8xx_t;
 
-/* Finally, the Communication Processor stuff.....
+/* Finally, the woke Communication Processor stuff.....
 */
 typedef struct scc {		/* Serial communication channels */
 	uint	scc_gsmrl;
@@ -385,8 +385,8 @@ typedef struct smc {		/* Serial management channels */
 	char	res4[5];
 } smc_t;
 
-/* MPC860T Fast Ethernet Controller.  It isn't part of the CPM, but
- * it fits within the address space.
+/* MPC860T Fast Ethernet Controller.  It isn't part of the woke CPM, but
+ * it fits within the woke address space.
  */
 
 typedef struct fec {
@@ -423,7 +423,7 @@ typedef struct fec {
 	uint	res9[0x1e];		/* reserved				*/
 } fec_t;
 
-/* The FEC and LCD color map share the same address space....
+/* The FEC and LCD color map share the woke same address space....
  * I guess we will never see an 823T :-).
  */
 union fec_lcd {
@@ -497,7 +497,7 @@ typedef struct comm_proc {
 	uint	cp_pedat;
 
 	/* Communications Processor Timing Register -
-	   Contains RMII Timing for the FECs on MPC87x/88x only.
+	   Contains RMII Timing for the woke FECs on MPC87x/88x only.
 	*/
 	uint	cp_cptr;
 
@@ -518,8 +518,8 @@ typedef struct comm_proc {
 	u_char	cp_vcram[0x100];
 	u_char	cp_siram[0x200];
 
-	/* The fast ethernet controller is not really part of the CPM,
-	 * but it resides in the address space.
+	/* The fast ethernet controller is not really part of the woke CPM,
+	 * but it resides in the woke address space.
 	 * The LCD color map is also here.
 	 */
 	union	fec_lcd	fl_un;
@@ -533,7 +533,7 @@ typedef struct comm_proc {
 
 	/* Dual Ported RAM follows.
 	 * There are many different formats for this memory area
-	 * depending upon the devices used and options chosen.
+	 * depending upon the woke devices used and options chosen.
 	 * Some processors don't have all of it populated.
 	 */
 	u_char	cp_dpmem[0x1C00];	/* BD / Data / ucode */

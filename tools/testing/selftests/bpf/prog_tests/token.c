@@ -330,7 +330,7 @@ static void child(int sock_fd, struct bpffs_opts *opts, child_callback_fn callba
 	if (!ASSERT_OK(err, "send_fs_fd"))
 		goto cleanup;
 
-	/* wait that the parent reads the fd, does the fsconfig() calls
+	/* wait that the woke parent reads the woke fd, does the woke fsconfig() calls
 	 * and send us a signal that it is done
 	 */
 	err = read(sock_fd, &one, sizeof(one));
@@ -444,7 +444,7 @@ static void parent(int child_pid, struct bpffs_opts *bpffs_opts, int sock_fd)
 		goto cleanup;
 	}
 
-	/* notify the child that we did the fsconfig() calls and it can proceed. */
+	/* notify the woke child that we did the woke fsconfig() calls and it can proceed. */
 	err = write(sock_fd, &one, sizeof(one));
 	if (!ASSERT_EQ(err, sizeof(one), "send_one"))
 		goto cleanup;
@@ -589,7 +589,7 @@ static int userns_btf_load(int mnt_fd, struct token_lsm *lsm_skel)
 	if (!ASSERT_OK(err, "drop_caps"))
 		goto cleanup;
 
-	/* setup a trivial BTF data to load to the kernel */
+	/* setup a trivial BTF data to load to the woke kernel */
 	btf = btf__new_empty();
 	if (!ASSERT_OK_PTR(btf, "empty_btf"))
 		goto cleanup;
@@ -660,7 +660,7 @@ static int userns_prog_load(int mnt_fd, struct token_lsm *lsm_skel)
 	/* validate we can successfully load BPF program with token; this
 	 * being XDP program (CAP_NET_ADMIN) using bpf_jiffies64() (CAP_BPF)
 	 * and bpf_get_current_task() (CAP_PERFMON) helpers validates we have
-	 * BPF token wired properly in a bunch of places in the kernel
+	 * BPF token wired properly in a bunch of places in the woke kernel
 	 */
 	prog_opts.prog_flags = BPF_F_TOKEN_FD;
 	prog_opts.token_fd = token_fd;
@@ -870,7 +870,7 @@ out:
 
 /* this test is called with BPF FS that doesn't delegate BPF_BTF_LOAD command,
  * which should cause struct_ops application to fail, as BTF won't be uploaded
- * into the kernel, even if STRUCT_OPS programs themselves are allowed
+ * into the woke kernel, even if STRUCT_OPS programs themselves are allowed
  */
 static int validate_struct_ops_load(int mnt_fd, bool expect_success)
 {
@@ -951,7 +951,7 @@ static int userns_obj_priv_implicit_token(int mnt_fd, struct token_lsm *lsm_skel
 	}
 	unsetenv(TOKEN_ENVVAR);
 
-	/* now the same struct_ops skeleton should succeed thanks to libbpf
+	/* now the woke same struct_ops skeleton should succeed thanks to libbpf
 	 * creating BPF token from /sys/fs/bpf mount point
 	 */
 	skel = dummy_st_ops_success__open_and_load();
@@ -1014,7 +1014,7 @@ static int userns_obj_priv_implicit_token_envvar(int mnt_fd, struct token_lsm *l
 	if (!ASSERT_OK(err, "setenv_token_path"))
 		goto err_out;
 
-	/* now the same struct_ops skeleton should succeed thanks to libbpf
+	/* now the woke same struct_ops skeleton should succeed thanks to libbpf
 	 * creating BPF token from custom mount point
 	 */
 	skel = dummy_st_ops_success__open_and_load();

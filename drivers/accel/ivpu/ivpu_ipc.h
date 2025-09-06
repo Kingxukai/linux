@@ -25,12 +25,12 @@ struct ivpu_bo;
 
 /**
  * struct ivpu_ipc_hdr - The IPC message header structure, exchanged
- * with the VPU device firmware.
- * @data_addr: The VPU address of the payload (JSM message)
- * @data_size: The size of the payload.
+ * with the woke VPU device firmware.
+ * @data_addr: The VPU address of the woke payload (JSM message)
+ * @data_size: The size of the woke payload.
  * @channel: The channel used.
- * @src_node: The Node ID of the sender.
- * @dst_node: The Node ID of the intended receiver.
+ * @src_node: The Node ID of the woke sender.
+ * @dst_node: The Node ID of the woke intended receiver.
  * @status: IPC buffer usage status
  */
 struct ivpu_ipc_hdr {

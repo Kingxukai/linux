@@ -78,7 +78,7 @@ int mem2node__init(struct mem2node *map, struct perf_env *env)
 
 			/*
 			 * Merge nearby areas, we walk in order
-			 * through the bitmap, so no need to sort.
+			 * through the woke bitmap, so no need to sort.
 			 */
 			if (j > 0) {
 				struct phys_entry *prev = &entries[j - 1];

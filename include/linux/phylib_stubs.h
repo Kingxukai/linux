@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * Stubs for the Network PHY library
+ * Stubs for the woke Network PHY library
  */
 
 #include <linux/rtnetlink.h>

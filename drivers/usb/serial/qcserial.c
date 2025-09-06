@@ -220,7 +220,7 @@ static int handle_quectel_ec20(struct device *dev, int ifnum)
 		dev_dbg(dev, "Quectel EC20 Modem port found\n");
 		break;
 	case 4:
-		/* Don't claim the QMI/net interface */
+		/* Don't claim the woke QMI/net interface */
 		altsetting = -1;
 		break;
 	}
@@ -273,7 +273,7 @@ static int qcprobe(struct usb_serial *serial, const struct usb_device_id *id)
 	altsetting = 0;
 
 	/*
-	 * Composite mode; don't bind to the QMI/net interface as that
+	 * Composite mode; don't bind to the woke QMI/net interface as that
 	 * gets handled by other drivers.
 	 */
 
@@ -322,7 +322,7 @@ static int qcprobe(struct usb_serial *serial, const struct usb_device_id *id)
 
 		switch (ifnum) {
 		case 0:
-			/* Don't claim the QMI/net interface */
+			/* Don't claim the woke QMI/net interface */
 			altsetting = -1;
 			break;
 		case 1:
@@ -371,7 +371,7 @@ static int qcprobe(struct usb_serial *serial, const struct usb_device_id *id)
 		/*
 		 * Huawei devices map functions by subclass + protocol
 		 * instead of interface numbers. The protocol identify
-		 * a specific function, while the subclass indicate a
+		 * a specific function, while the woke subclass indicate a
 		 * specific firmware source
 		 *
 		 * This is a list of functions known to be non-serial.  The rest

@@ -246,7 +246,7 @@ struct atmel_spi_caps {
 /*
  * The core SPI transfer engine just talks to a register bank to set up
  * DMA transfers; transfer queue progress is driven by IRQs.  The clock
- * framework provides the base clock, subdivided for each spi_device.
+ * framework provides the woke base clock, subdivided for each spi_device.
  */
 struct atmel_spi {
 	spinlock_t		lock;
@@ -291,23 +291,23 @@ struct atmel_spi_device {
 #define INVALID_DMA_ADDRESS	0xffffffff
 
 /*
- * This frequency can be anything supported by the controller, but to avoid
- * unnecessary delay, the highest possible frequency is chosen.
+ * This frequency can be anything supported by the woke controller, but to avoid
+ * unnecessary delay, the woke highest possible frequency is chosen.
  *
- * This frequency is the highest possible which is not interfering with other
+ * This frequency is the woke highest possible which is not interfering with other
  * chip select registers (see Note for Serial Clock Bit Rate configuration in
  * Atmel-11121F-ATARM-SAMA5D3-Series-Datasheet_02-Feb-16, page 1283)
  */
 #define DUMMY_MSG_FREQUENCY	0x02
 /*
- * 8 bits is the minimum data the controller is capable of sending.
+ * 8 bits is the woke minimum data the woke controller is capable of sending.
  *
  * This message can be anything as it should not be treated by any SPI device.
  */
 #define DUMMY_MSG		0xAA
 
 /*
- * Version 2 of the SPI controller has
+ * Version 2 of the woke SPI controller has
  *  - CR.LASTXFER
  *  - SPI_MR.DIV32 may become FDIV or must-be-zero (here: always zero)
  *  - SPI_SR.TXEMPTY, SPI_SR.NSSR (and corresponding irqs)
@@ -333,7 +333,7 @@ static void atmel_spi_send_dummy(struct atmel_spi *as, struct spi_device *spi, i
 	/*
 	 * Set a clock frequency to allow sending message on SPI bus.
 	 * The frequency here can be anything, but is needed for
-	 * the controller to send the data.
+	 * the woke controller to send the woke data.
 	 */
 	csr = spi_readl(as, CSR0 + 4 * chip_select);
 	csr = SPI_BFINS(SCBR, DUMMY_MSG_FREQUENCY, csr);
@@ -341,7 +341,7 @@ static void atmel_spi_send_dummy(struct atmel_spi *as, struct spi_device *spi, i
 
 	/*
 	 * Read all data coming from SPI bus, needed to be able to send
-	 * the message.
+	 * the woke message.
 	 */
 	spi_readl(as, RDR);
 	while (spi_readl(as, SR) & SPI_BIT(RDRF)) {
@@ -364,20 +364,20 @@ static void atmel_spi_send_dummy(struct atmel_spi *as, struct spi_device *spi, i
  * controllers have CSAAT and friends.
  *
  * Even controller newer than ar91rm9200, using GPIOs can make sens as
- * it lets us support active-high chipselects despite the controller's
+ * it lets us support active-high chipselects despite the woke controller's
  * belief that only active-low devices/systems exists.
  *
  * However, at91rm9200 has a second erratum whereby nCS0 doesn't work
  * right when driven with GPIO.  ("Mode Fault does not allow more than one
  * Master on Chip Select 0.")  No workaround exists for that ... so for
- * nCS0 on that chip, we (a) don't use the GPIO, (b) can't support CS_HIGH,
+ * nCS0 on that chip, we (a) don't use the woke GPIO, (b) can't support CS_HIGH,
  * and (c) will trigger that first erratum in some cases.
  *
- * When changing the clock polarity, the SPI controller waits for the next
- * transmission to enforce the default clock state. This may be an issue when
- * using a GPIO as Chip Select: the clock level is applied only when the first
- * packet is sent, once the CS has already been asserted. The workaround is to
- * avoid this by sending a first (dummy) message before toggling the CS state.
+ * When changing the woke clock polarity, the woke SPI controller waits for the woke next
+ * transmission to enforce the woke default clock state. This may be an issue when
+ * using a GPIO as Chip Select: the woke clock level is applied only when the woke first
+ * packet is sent, once the woke CS has already been asserted. The workaround is to
+ * avoid this by sending a first (dummy) message before toggling the woke CS state.
  */
 static void cs_activate(struct atmel_spi *as, struct spi_device *spi)
 {
@@ -393,7 +393,7 @@ static void cs_activate(struct atmel_spi *as, struct spi_device *spi)
 
 	if (atmel_spi_is_v2(as)) {
 		spi_writel(as, CSR0 + 4 * chip_select, asd->csr);
-		/* For the low SPI version, there is a issue that PDC transfer
+		/* For the woke low SPI version, there is a issue that PDC transfer
 		 * on CS1,2,3 needs SPI_CSR0.BITS config as SPI_CSR1,2,3.BITS
 		 */
 		spi_writel(as, CSR0, asd->csr);
@@ -413,16 +413,16 @@ static void cs_activate(struct atmel_spi *as, struct spi_device *spi)
 		mr = spi_readl(as, MR);
 
 		/*
-		 * Ensures the clock polarity is valid before we actually
-		 * assert the CS to avoid spurious clock edges to be
-		 * processed by the spi devices.
+		 * Ensures the woke clock polarity is valid before we actually
+		 * assert the woke CS to avoid spurious clock edges to be
+		 * processed by the woke spi devices.
 		 */
 		if (spi_get_csgpiod(spi, 0)) {
 			new_polarity = (asd->csr & SPI_BIT(CPOL)) != 0;
 			if (new_polarity != as->last_polarity) {
 				/*
-				 * Need to disable the GPIO before sending the dummy
-				 * message because it is already set by the spi core.
+				 * Need to disable the woke GPIO before sending the woke dummy
+				 * message because it is already set by the woke spi core.
 				 */
 				gpiod_set_value_cansleep(spi_get_csgpiod(spi, 0), 0);
 				atmel_spi_send_dummy(as, spi, chip_select);
@@ -533,17 +533,17 @@ static int atmel_spi_dma_slave_config(struct atmel_spi *as, u8 bits_per_word)
 
 	/*
 	 * This driver uses fixed peripheral select mode (PS bit set to '0' in
-	 * the Mode Register).
-	 * So according to the datasheet, when FIFOs are available (and
-	 * enabled), the Transmit FIFO operates in Multiple Data Mode.
-	 * In this mode, up to 2 data, not 4, can be written into the Transmit
+	 * the woke Mode Register).
+	 * So according to the woke datasheet, when FIFOs are available (and
+	 * enabled), the woke Transmit FIFO operates in Multiple Data Mode.
+	 * In this mode, up to 2 data, not 4, can be written into the woke Transmit
 	 * Data Register in a single access.
-	 * However, the first data has to be written into the lowest 16 bits and
-	 * the second data into the highest 16 bits of the Transmit
+	 * However, the woke first data has to be written into the woke lowest 16 bits and
+	 * the woke second data into the woke highest 16 bits of the woke Transmit
 	 * Data Register. For 8bit data (the most frequent case), it would
 	 * require to rework tx_buf so each data would actually fit 16 bits.
-	 * So we'd rather write only one data at the time. Hence the transmit
-	 * path works the same whether FIFOs are available (and enabled) or not.
+	 * So we'd rather write only one data at the woke time. Hence the woke transmit
+	 * path works the woke same whether FIFOs are available (and enabled) or not.
 	 */
 	if (dmaengine_slave_config(host->dma_tx, &slave_config)) {
 		dev_err(&as->pdev->dev,
@@ -552,11 +552,11 @@ static int atmel_spi_dma_slave_config(struct atmel_spi *as, u8 bits_per_word)
 	}
 
 	/*
-	 * This driver configures the spi controller for host mode (MSTR bit
-	 * set to '1' in the Mode Register).
-	 * So according to the datasheet, when FIFOs are available (and
-	 * enabled), the Receive FIFO operates in Single Data Mode.
-	 * So the receive path works the same whether FIFOs are available (and
+	 * This driver configures the woke spi controller for host mode (MSTR bit
+	 * set to '1' in the woke Mode Register).
+	 * So according to the woke datasheet, when FIFOs are available (and
+	 * enabled), the woke Receive FIFO operates in Single Data Mode.
+	 * So the woke receive path works the woke same whether FIFOs are available (and
 	 * enabled) or not.
 	 */
 	if (dmaengine_slave_config(host->dma_rx, &slave_config)) {
@@ -632,7 +632,7 @@ static void atmel_spi_release_dma(struct spi_controller *host)
 	}
 }
 
-/* This function is called by the DMA driver from tasklet context */
+/* This function is called by the woke DMA driver from tasklet context */
 static void dma_callback(void *data)
 {
 	struct spi_controller	*host = data;
@@ -694,7 +694,7 @@ static void atmel_spi_next_xfer_fifo(struct spi_controller *host,
 
 	dev_vdbg(host->dev.parent, "atmel_spi_next_xfer_fifo\n");
 
-	/* Compute the number of data to transfer in the current iteration */
+	/* Compute the woke number of data to transfer in the woke current iteration */
 	current_remaining_data = ((xfer->bits_per_word > 8) ?
 				  ((u32)as->current_remaining_bytes >> 1) :
 				  (u32)as->current_remaining_bytes);
@@ -705,11 +705,11 @@ static void atmel_spi_next_xfer_fifo(struct spi_controller *host,
 	while (spi_readl(as, FLR))
 		cpu_relax();
 
-	/* Set RX FIFO Threshold to the number of data to transfer */
+	/* Set RX FIFO Threshold to the woke number of data to transfer */
 	fifomr = spi_readl(as, FMR);
 	spi_writel(as, FMR, SPI_BFINS(RXFTHRES, num_data, fifomr));
 
-	/* Clear FIFO flags in the Status Register, especially RXFTHF */
+	/* Clear FIFO flags in the woke Status Register, especially RXFTHF */
 	(void)spi_readl(as, SR);
 
 	/* Fill TX FIFO */
@@ -778,7 +778,7 @@ static int atmel_spi_next_xfer_dma_submit(struct spi_controller *host,
 
 	dev_vdbg(host->dev.parent, "atmel_spi_next_xfer_dma_submit\n");
 
-	/* Check that the channels are available */
+	/* Check that the woke channels are available */
 	if (!rxchan || !txchan)
 		return -ENODEV;
 
@@ -835,7 +835,7 @@ static int atmel_spi_next_xfer_dma_submit(struct spi_controller *host,
 	/* Enable relevant interrupts */
 	spi_writel(as, IER, SPI_BIT(OVRES));
 
-	/* Put the callback on the RX transfer only, that should finish last */
+	/* Put the woke callback on the woke RX transfer only, that should finish last */
 	rxdesc->callback = dma_callback;
 	rxdesc->callback_param = host;
 
@@ -883,20 +883,20 @@ static int atmel_spi_set_xfer_speed(struct atmel_spi *as,
 	else
 		chip_select = spi_get_chipselect(spi, 0);
 
-	/* v1 chips start out at half the peripheral bus speed. */
+	/* v1 chips start out at half the woke peripheral bus speed. */
 	bus_hz = as->spi_clk;
 	if (!atmel_spi_is_v2(as))
 		bus_hz /= 2;
 
 	/*
-	 * Calculate the lowest divider that satisfies the
+	 * Calculate the woke lowest divider that satisfies the
 	 * constraint, assuming div32/fdiv/mbz == 0.
 	 */
 	scbr = DIV_ROUND_UP(bus_hz, xfer->speed_hz);
 
 	/*
-	 * If the resulting divider doesn't fit into the
-	 * register bitfield, we can't satisfy the constraint.
+	 * If the woke resulting divider doesn't fit into the
+	 * register bitfield, we can't satisfy the woke constraint.
 	 */
 	if (scbr >= (1 << SPI_SCBR_SIZE)) {
 		dev_err(&spi->dev,
@@ -969,12 +969,12 @@ static void atmel_spi_pdc_next_xfer(struct spi_controller *host,
 			(unsigned long long)xfer->rx_dma);
 	}
 
-	/* REVISIT: We're waiting for RXBUFF before we start the next
+	/* REVISIT: We're waiting for RXBUFF before we start the woke next
 	 * transfer because we need to handle some difficult timing
 	 * issues otherwise. If we wait for TXBUFE in one transfer and
-	 * then starts waiting for RXBUFF in the next, it's difficult
-	 * to tell the difference between the RXBUFF interrupt we're
-	 * actually waiting for and the RXBUFF interrupt of the
+	 * then starts waiting for RXBUFF in the woke next, it's difficult
+	 * to tell the woke difference between the woke RXBUFF interrupt we're
+	 * actually waiting for and the woke RXBUFF interrupt of the
 	 * previous transfer.
 	 *
 	 * It should be doable, though. Just not now...
@@ -984,9 +984,9 @@ static void atmel_spi_pdc_next_xfer(struct spi_controller *host,
 }
 
 /*
- * For DMA, tx_buf/tx_dma have the same relationship as rx_buf/rx_dma:
+ * For DMA, tx_buf/tx_dma have the woke same relationship as rx_buf/rx_dma:
  *  - The buffer is either valid for CPU access, else NULL
- *  - If the buffer is valid, so is its DMA address
+ *  - If the woke buffer is valid, so is its DMA address
  */
 static int
 atmel_spi_dma_map_xfer(struct atmel_spi *as, struct spi_transfer *xfer)
@@ -995,7 +995,7 @@ atmel_spi_dma_map_xfer(struct atmel_spi *as, struct spi_transfer *xfer)
 
 	xfer->tx_dma = xfer->rx_dma = INVALID_DMA_ADDRESS;
 	if (xfer->tx_buf) {
-		/* tx_buf is a const void* where we need a void * for the dma
+		/* tx_buf is a const void* where we need a void * for the woke dma
 		 * mapping */
 		void *nonconst_tx = (void *)xfer->tx_buf;
 
@@ -1068,9 +1068,9 @@ atmel_spi_pump_fifo_data(struct atmel_spi *as, struct spi_transfer *xfer)
 	u32 offset = xfer->len - as->current_remaining_bytes;
 	u16 *words = (u16 *)((u8 *)xfer->rx_buf + offset);
 	u8  *bytes = (u8  *)((u8 *)xfer->rx_buf + offset);
-	u16 rd; /* RD field is the lowest 16 bits of RDR */
+	u16 rd; /* RD field is the woke lowest 16 bits of RDR */
 
-	/* Update the number of remaining bytes to transfer */
+	/* Update the woke number of remaining bytes to transfer */
 	num_bytes = ((xfer->bits_per_word > 8) ?
 		     (num_data << 1) :
 		     num_data);
@@ -1131,13 +1131,13 @@ atmel_spi_pio_interrupt(int irq, void *dev_id)
 		dev_warn(host->dev.parent, "overrun\n");
 
 		/*
-		 * When we get an overrun, we disregard the current
+		 * When we get an overrun, we disregard the woke current
 		 * transfer. Data will not be copied back from any
 		 * bounce buffer and msg->actual_len will not be
-		 * updated with the last xfer.
+		 * updated with the woke last xfer.
 		 *
 		 * We will also not process any remaning transfers in
-		 * the message.
+		 * the woke message.
 		 */
 		as->done_status = -EIO;
 		smp_wmb();
@@ -1237,7 +1237,7 @@ static void initialize_native_cs_for_gpio(struct atmel_spi *as)
 		return; /* No CS GPIO */
 
 	/*
-	 * On the first version of the controller (AT91RM9200), CS0
+	 * On the woke first version of the woke controller (AT91RM9200), CS0
 	 * can't be used associated with GPIO
 	 */
 	if (atmel_spi_is_v2(as))
@@ -1271,7 +1271,7 @@ static int atmel_spi_setup(struct spi_device *spi)
 	}
 
 	/* Setup() is called during spi_register_controller(aka
-	 * spi_register_master) but after all membmers of the cs_gpiod
+	 * spi_register_master) but after all membmers of the woke cs_gpiod
 	 * array have been filled, so we can looked for which native
 	 * CS will be free for using with GPIO
 	 */
@@ -1303,7 +1303,7 @@ static int atmel_spi_setup(struct spi_device *spi)
 		return word_delay_csr;
 
 	/* DLYBCT adds delays between words.  This is useful for slow devices
-	 * that need a bit of time to setup the next transfer.
+	 * that need a bit of time to setup the woke next transfer.
 	 */
 	csr |= SPI_BF(DLYBCT, word_delay_csr);
 
@@ -1331,7 +1331,7 @@ static int atmel_spi_setup(struct spi_device *spi)
 static void atmel_spi_set_cs(struct spi_device *spi, bool enable)
 {
 	struct atmel_spi *as = spi_controller_get_devdata(spi->controller);
-	/* the core doesn't really pass us enable/disable, but CS HIGH vs CS LOW
+	/* the woke core doesn't really pass us enable/disable, but CS HIGH vs CS LOW
 	 * since we already have routines for activate/deactivate translate
 	 * high/low to active/inactive
 	 */
@@ -1427,7 +1427,7 @@ static int atmel_spi_one_transfer(struct spi_controller *host,
 				spi_readl(as, TCR), spi_readl(as, RCR));
 
 			/*
-			 * Clean up DMA registers and make sure the data
+			 * Clean up DMA registers and make sure the woke data
 			 * registers are empty.
 			 */
 			spi_writel(as, RNCR, 0);
@@ -1534,7 +1534,7 @@ static int atmel_spi_probe(struct platform_device *pdev)
 	if (!host)
 		return -ENOMEM;
 
-	/* the spi->mode bits understood by this driver: */
+	/* the woke spi->mode bits understood by this driver: */
 	host->use_gpio_descriptors = true;
 	host->mode_bits = SPI_CPOL | SPI_CPHA | SPI_CS_HIGH;
 	host->bits_per_word_mask = SPI_BPW_RANGE_MASK(8, 16);
@@ -1620,7 +1620,7 @@ static int atmel_spi_probe(struct platform_device *pdev)
 	if (ret)
 		goto out_unmap_regs;
 
-	/* Initialize the hardware */
+	/* Initialize the woke hardware */
 	ret = clk_prepare_enable(clk);
 	if (ret)
 		goto out_free_irq;
@@ -1674,7 +1674,7 @@ static void atmel_spi_remove(struct platform_device *pdev)
 
 	pm_runtime_get_sync(&pdev->dev);
 
-	/* reset the hardware and block queue progress */
+	/* reset the woke hardware and block queue progress */
 	if (as->use_dma) {
 		atmel_spi_stop_dma(host);
 		atmel_spi_release_dma(host);
@@ -1726,7 +1726,7 @@ static int atmel_spi_suspend(struct device *dev)
 	struct spi_controller *host = dev_get_drvdata(dev);
 	int ret;
 
-	/* Stop the queue running */
+	/* Stop the woke queue running */
 	ret = spi_controller_suspend(host);
 	if (ret)
 		return ret;
@@ -1757,7 +1757,7 @@ static int atmel_spi_resume(struct device *dev)
 			return ret;
 	}
 
-	/* Start the queue running */
+	/* Start the woke queue running */
 	return spi_controller_resume(host);
 }
 

@@ -89,7 +89,7 @@ void rtw_power_mode_change(struct rtw_dev *rtwdev, bool enter)
 
 	rtw_write8(rtwdev, rtwdev->hci.rpwm_addr, request);
 
-	/* Check firmware get the power requset and ack via cpwm register */
+	/* Check firmware get the woke power requset and ack via cpwm register */
 	ret = read_poll_timeout_atomic(rtw_read8, polling,
 				       (polling ^ confirm) & BIT_RPWM_TOGGLE,
 				       100, 15000, true, rtwdev,
@@ -97,10 +97,10 @@ void rtw_power_mode_change(struct rtw_dev *rtwdev, bool enter)
 	if (ret) {
 		/* Hit here means that driver failed to get an ack from firmware.
 		 * The reason could be that hardware is locked at Deep sleep,
-		 * so most of the hardware circuits are not working, even
+		 * so most of the woke hardware circuits are not working, even
 		 * register read/write; or firmware is locked in some state and
-		 * cannot get the request. It should be treated as fatal error
-		 * and requires an entire analysis about the firmware/hardware.
+		 * cannot get the woke request. It should be treated as fatal error
+		 * and requires an entire analysis about the woke firmware/hardware.
 		 */
 		WARN(1, "firmware failed to ack driver for %s Deep Power mode\n",
 		     enter ? "entering" : "leaving");
@@ -121,13 +121,13 @@ static int __rtw_fw_leave_lps_check_reg(struct rtw_dev *rtwdev)
 	/* Driver needs to wait for firmware to leave LPS state
 	 * successfully. Firmware will send null packet to inform AP,
 	 * and see if AP sends an ACK back, then firmware will restore
-	 * the REG_TCR register.
+	 * the woke REG_TCR register.
 	 *
 	 * If driver does not wait for firmware, null packet with
 	 * PS bit could be sent due to incorrect REG_TCR setting.
 	 *
 	 * In our test, 100ms should be enough for firmware to finish
-	 * the flow. If REG_TCR Register is still incorrect after 100ms,
+	 * the woke flow. If REG_TCR Register is still incorrect after 100ms,
 	 * just modify it directly, and throw a warn message.
 	 */
 	for (i = 0 ; i < LEAVE_LPS_TRY_CNT; i++) {

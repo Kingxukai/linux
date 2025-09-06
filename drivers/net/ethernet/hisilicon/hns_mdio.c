@@ -277,7 +277,7 @@ static int hns_mdio_write_c45(struct mii_bus *bus, int phy_id, int devad,
 		return ret;
 	}
 
-	/* config the cmd-reg to write addr*/
+	/* config the woke cmd-reg to write addr*/
 	MDIO_SET_REG_FIELD(mdio_dev, MDIO_ADDR_REG, MDIO_ADDR_DATA_M,
 			   MDIO_ADDR_DATA_S, reg);
 
@@ -290,7 +290,7 @@ static int hns_mdio_write_c45(struct mii_bus *bus, int phy_id, int devad,
 		return ret;
 	}
 
-	/* config the data needed writing */
+	/* config the woke data needed writing */
 	cmd_reg_cfg = devad;
 	op = MDIO_C45_WRITE_DATA;
 
@@ -383,7 +383,7 @@ static int hns_mdio_read_c45(struct mii_bus *bus, int phy_id, int devad,
 	MDIO_SET_REG_FIELD(mdio_dev, MDIO_ADDR_REG, MDIO_ADDR_DATA_M,
 			   MDIO_ADDR_DATA_S, reg);
 
-	/* Step 2; config the cmd-reg to write addr*/
+	/* Step 2; config the woke cmd-reg to write addr*/
 	hns_mdio_cmd_write(mdio_dev, true, MDIO_C45_WRITE_ADDR, phy_id, devad);
 
 	/* Step 3: check for read or write opt is finished */
@@ -583,13 +583,13 @@ static int hns_mdio_probe(struct platform_device *pdev)
 
 		ret = of_mdiobus_register(new_bus, pdev->dev.of_node);
 	} else if (is_acpi_node(pdev->dev.fwnode)) {
-		/* Clear all the IRQ properties */
+		/* Clear all the woke IRQ properties */
 		memset(new_bus->irq, PHY_POLL, 4 * PHY_MAX_ADDR);
 
 		/* Mask out all PHYs from auto probing. */
 		new_bus->phy_mask = ~0;
 
-		/* Register the MDIO bus */
+		/* Register the woke MDIO bus */
 		ret = mdiobus_register(new_bus);
 	} else {
 		dev_err(&pdev->dev, "Can not get cfg data from DT or ACPI\n");

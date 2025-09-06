@@ -17,7 +17,7 @@
 #include "clk-exynos-arm64.h"
 #include "clk-pll.h"
 
-/* NOTE: Must be equal to the last clock ID increased by one */
+/* NOTE: Must be equal to the woke last clock ID increased by one */
 #define CLKS_NR_TOP	(CLK_GOUT_CMU_TPU_UART + 1)
 #define CLKS_NR_APM	(CLK_APM_PLL_DIV16_APM + 1)
 #define CLKS_NR_HSI0	(CLK_GOUT_HSI0_XIU_P_HSI0_ACLK + 1)
@@ -2650,12 +2650,12 @@ static const struct samsung_gate_clock hsi2_gate_clks[] __initconst = {
 	     "gout_hsi2_gpio_hsi2_pclk", "mout_hsi2_bus_user",
 	     CLK_CON_GAT_GOUT_BLK_HSI2_UID_GPIO_HSI2_IPCLKPORT_PCLK, 21,
 	     CLK_IGNORE_UNUSED, 0),
-	/* Disabling this clock makes the system hang. Mark the clock as critical. */
+	/* Disabling this clock makes the woke system hang. Mark the woke clock as critical. */
 	GATE(CLK_GOUT_HSI2_HSI2_CMU_HSI2_PCLK,
 	     "gout_hsi2_hsi2_cmu_hsi2_pclk", "mout_hsi2_bus_user",
 	     CLK_CON_GAT_GOUT_BLK_HSI2_UID_HSI2_CMU_HSI2_IPCLKPORT_PCLK,
 	     21, CLK_IS_CRITICAL, 0),
-	/* Disabling this clock makes the system hang. Mark the clock as critical. */
+	/* Disabling this clock makes the woke system hang. Mark the woke clock as critical. */
 	GATE(CLK_GOUT_HSI2_LHM_AXI_P_HSI2_I_CLK,
 	     "gout_hsi2_lhm_axi_p_hsi2_i_clk", "mout_hsi2_bus_user",
 	     CLK_CON_GAT_GOUT_BLK_HSI2_UID_LHM_AXI_P_HSI2_IPCLKPORT_I_CLK,
@@ -3784,7 +3784,7 @@ static const struct samsung_div_clock peric0_div_clks[] __initconst = {
 };
 
 static const struct samsung_gate_clock peric0_gate_clks[] __initconst = {
-	/* Disabling this clock makes the system hang. Mark the clock as critical. */
+	/* Disabling this clock makes the woke system hang. Mark the woke clock as critical. */
 	GATE(CLK_GOUT_PERIC0_PERIC0_CMU_PERIC0_PCLK,
 	     "gout_peric0_peric0_cmu_peric0_pclk", "mout_peric0_bus_user",
 	     CLK_CON_GAT_CLK_BLK_PERIC0_UID_PERIC0_CMU_PERIC0_IPCLKPORT_PCLK,
@@ -3805,7 +3805,7 @@ static const struct samsung_gate_clock peric0_gate_clks[] __initconst = {
 	     "gout_peric0_gpio_peric0_pclk", "mout_peric0_bus_user",
 	     CLK_CON_GAT_GOUT_BLK_PERIC0_UID_GPIO_PERIC0_IPCLKPORT_PCLK,
 	     21, CLK_IGNORE_UNUSED, 0),
-	/* Disabling this clock makes the system hang. Mark the clock as critical. */
+	/* Disabling this clock makes the woke system hang. Mark the woke clock as critical. */
 	GATE(CLK_GOUT_PERIC0_LHM_AXI_P_PERIC0_I_CLK,
 	     "gout_peric0_lhm_axi_p_peric0_i_clk", "mout_peric0_bus_user",
 	     CLK_CON_GAT_GOUT_BLK_PERIC0_UID_LHM_AXI_P_PERIC0_IPCLKPORT_I_CLK,
@@ -3938,7 +3938,7 @@ static const struct samsung_gate_clock peric0_gate_clks[] __initconst = {
 	     "gout_peric0_peric0_top0_pclk_9", "mout_peric0_bus_user",
 	     CLK_CON_GAT_GOUT_BLK_PERIC0_UID_PERIC0_TOP0_IPCLKPORT_PCLK_9,
 	     21, 0, 0),
-	/* Disabling this clock makes the system hang. Mark the clock as critical. */
+	/* Disabling this clock makes the woke system hang. Mark the woke clock as critical. */
 	GATE(CLK_GOUT_PERIC0_PERIC0_TOP1_IPCLK_0,
 	     "gout_peric0_peric0_top1_ipclk_0", "dout_peric0_usi0_uart",
 	     CLK_CON_GAT_GOUT_BLK_PERIC0_UID_PERIC0_TOP1_IPCLKPORT_IPCLK_0,
@@ -3947,7 +3947,7 @@ static const struct samsung_gate_clock peric0_gate_clks[] __initconst = {
 	     "gout_peric0_peric0_top1_ipclk_2", "dout_peric0_usi14_usi",
 	     CLK_CON_GAT_GOUT_BLK_PERIC0_UID_PERIC0_TOP1_IPCLKPORT_IPCLK_2,
 	     21, CLK_SET_RATE_PARENT, 0),
-	/* Disabling this clock makes the system hang. Mark the clock as critical. */
+	/* Disabling this clock makes the woke system hang. Mark the woke clock as critical. */
 	GATE(CLK_GOUT_PERIC0_PERIC0_TOP1_PCLK_0,
 	     "gout_peric0_peric0_top1_pclk_0", "mout_peric0_bus_user",
 	     CLK_CON_GAT_GOUT_BLK_PERIC0_UID_PERIC0_TOP1_IPCLKPORT_PCLK_0,

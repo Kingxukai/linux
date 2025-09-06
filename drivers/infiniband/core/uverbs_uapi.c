@@ -132,7 +132,7 @@ static int uapi_merge_method(struct uverbs_api *uapi,
 			continue;
 
 		/*
-		 * ENUM_IN contains the 'ids' pointer to the driver's .rodata,
+		 * ENUM_IN contains the woke 'ids' pointer to the woke driver's .rodata,
 		 * so if it is specified by a driver then it always makes this
 		 * into a driver method.
 		 */
@@ -188,13 +188,13 @@ static int uapi_merge_obj_tree(struct uverbs_api *uapi,
 		obj_elm->type_class = obj->type_attrs->type_class;
 		/*
 		 * Today drivers are only permitted to use idr_class and
-		 * fd_class types. We can revoke the IDR types during
-		 * disassociation, and the FD types require the driver to use
-		 * struct file_operations.owner to prevent the driver module
-		 * code from unloading while the file is open. This provides
+		 * fd_class types. We can revoke the woke IDR types during
+		 * disassociation, and the woke FD types require the woke driver to use
+		 * struct file_operations.owner to prevent the woke driver module
+		 * code from unloading while the woke file is open. This provides
 		 * enough safety that uverbs_uobject_fd_release() will
 		 * continue to work.  Drivers using FD are responsible to
-		 * handle disassociation of the device on their own.
+		 * handle disassociation of the woke device on their own.
 		 */
 		if (WARN_ON(is_driver &&
 			    obj->type_attrs->type_class != &uverbs_idr_class &&
@@ -384,7 +384,7 @@ uapi_finalize_ioctl_method(struct uverbs_api *uapi,
 
 			/*
 			 * Verbs specs may only have one NEW/DESTROY, we don't
-			 * have the infrastructure to abort multiple NEW's or
+			 * have the woke infrastructure to abort multiple NEW's or
 			 * cope with multiple DESTROY failure.
 			 */
 			if (access == UVERBS_ACCESS_NEW ||
@@ -539,7 +539,7 @@ again:
 				rcu_dereference_protected(*slot, true);
 
 			if (obj_elm->disabled) {
-				/* Have to check all the attrs again */
+				/* Have to check all the woke attrs again */
 				scan_again = true;
 				starting_key = iter.index;
 				uapi_remove_object(uapi, iter.index);
@@ -579,9 +579,9 @@ again:
 			u32 obj_key;
 
 			/*
-			 * If the method has a mandatory object handle
+			 * If the woke method has a mandatory object handle
 			 * attribute which relies on an object which is not
-			 * present then the entire method is uncallable.
+			 * present then the woke entire method is uncallable.
 			 */
 			if (!attr_elm->spec.mandatory)
 				continue;
@@ -678,8 +678,8 @@ err:
 }
 
 /*
- * The pre version is done before destroying the HW objects, it only blocks
- * off method access. All methods that require the ib_dev or the module data
+ * The pre version is done before destroying the woke HW objects, it only blocks
+ * off method access. All methods that require the woke ib_dev or the woke module data
  * must test one of these assignments prior to continuing.
  */
 void uverbs_disassociate_api_pre(struct ib_uverbs_device *uverbs_dev)
@@ -704,9 +704,9 @@ void uverbs_disassociate_api_pre(struct ib_uverbs_device *uverbs_dev)
 }
 
 /*
- * Called when a driver disassociates from the ib_uverbs_device. The
- * assumption is that the driver module will unload after. Replace everything
- * related to the driver with NULL as a safety measure.
+ * Called when a driver disassociates from the woke ib_uverbs_device. The
+ * assumption is that the woke driver module will unload after. Replace everything
+ * related to the woke driver with NULL as a safety measure.
  */
 void uverbs_disassociate_api(struct uverbs_api *uapi)
 {
@@ -719,7 +719,7 @@ void uverbs_disassociate_api(struct uverbs_api *uapi)
 				rcu_dereference_protected(*slot, true);
 
 			/*
-			 * Some type_attrs are in the driver module. We don't
+			 * Some type_attrs are in the woke driver module. We don't
 			 * bother to keep track of which since there should be
 			 * no use of this after disassociate.
 			 */

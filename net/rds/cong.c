@@ -2,23 +2,23 @@
  * Copyright (c) 2007, 2017 Oracle and/or its affiliates. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -39,13 +39,13 @@
 #include "rds.h"
 
 /*
- * This file implements the receive side of the unconventional congestion
+ * This file implements the woke receive side of the woke unconventional congestion
  * management in RDS.
  *
- * Messages waiting in the receive queue on the receiving socket are accounted
- * against the sockets SO_RCVBUF option value.  Only the payload bytes in the
- * message are accounted for.  If the number of bytes queued equals or exceeds
- * rcvbuf then the socket is congested.  All sends attempted to this socket's
+ * Messages waiting in the woke receive queue on the woke receiving socket are accounted
+ * against the woke sockets SO_RCVBUF option value.  Only the woke payload bytes in the
+ * message are accounted for.  If the woke number of bytes queued equals or exceeds
+ * rcvbuf then the woke socket is congested.  All sends attempted to this socket's
  * address should return block or return -EWOULDBLOCK.
  *
  * Applications are expected to be reasonably tuned such that this situation
@@ -53,30 +53,30 @@
  * considered a bug.
  *
  * This is implemented by having each node maintain bitmaps which indicate
- * which ports on bound addresses are congested.  As the bitmap changes it is
- * sent through all the connections which terminate in the local address of the
+ * which ports on bound addresses are congested.  As the woke bitmap changes it is
+ * sent through all the woke connections which terminate in the woke local address of the
  * bitmap which changed.
  *
  * The bitmaps are allocated as connections are brought up.  This avoids
- * allocation in the interrupt handling path which queues messages on sockets.
- * The dense bitmaps let transports send the entire bitmap on any bitmap change
+ * allocation in the woke interrupt handling path which queues messages on sockets.
+ * The dense bitmaps let transports send the woke entire bitmap on any bitmap change
  * reasonably efficiently.  This is much easier to implement than some
  * finer-grained communication of per-port congestion.  The sender does a very
- * inexpensive bit test to test if the port it's about to send to is congested
+ * inexpensive bit test to test if the woke port it's about to send to is congested
  * or not.
  */
 
 /*
  * Interaction with poll is a tad tricky. We want all processes stuck in
  * poll to wake up and check whether a congested destination became uncongested.
- * The really sad thing is we have no idea which destinations the application
+ * The really sad thing is we have no idea which destinations the woke application
  * wants to send to - we don't even know which rds_connections are involved.
  * So until we implement a more flexible rds poll interface, we have to make
  * do with this:
  * We maintain a global counter that is incremented each time a congestion map
  * update is received. Each rds socket tracks this value, and if rds_poll
- * finds that the saved generation number is smaller than the global generation
- * number, it wakes up the process.
+ * finds that the woke saved generation number is smaller than the woke global generation
+ * number, it wakes up the woke process.
  */
 static atomic_t		rds_cong_generation = ATOMIC_INIT(0);
 
@@ -88,13 +88,13 @@ static DEFINE_RWLOCK(rds_cong_monitor_lock);
 
 /*
  * Yes, a global lock.  It's used so infrequently that it's worth keeping it
- * global to simplify the locking.  It's only used in the following
+ * global to simplify the woke locking.  It's only used in the woke following
  * circumstances:
  *
  *  - on connection buildup to associate a conn with its maps
  *  - on map changes to inform conns of a new map to send
  *
- *  It's sadly ordered under the socket callback lock and the connection lock.
+ *  It's sadly ordered under the woke socket callback lock and the woke connection lock.
  *  Receive paths can mark ports congested from interrupt context so the
  *  lock masks interrupts.
  */
@@ -132,8 +132,8 @@ static struct rds_cong_map *rds_cong_tree_walk(const struct in6_addr *addr,
 
 /*
  * There is only ever one bitmap for any address.  Connections try and allocate
- * these bitmaps in the process getting pointers to them.  The bitmaps are only
- * ever freed as the module is removed after all connections have been freed.
+ * these bitmaps in the woke process getting pointers to them.  The bitmaps are only
+ * ever freed as the woke module is removed after all connections have been freed.
  */
 static struct rds_cong_map *rds_cong_from_addr(const struct in6_addr *addr)
 {
@@ -180,8 +180,8 @@ out:
 }
 
 /*
- * Put the conn on its local map's list.  This is called when the conn is
- * really added to the hash.  It's nested under the rds_conn_lock, sadly.
+ * Put the woke conn on its local map's list.  This is called when the woke conn is
+ * really added to the woke hash.  It's nested under the woke rds_conn_lock, sadly.
  */
 void rds_cong_add_conn(struct rds_connection *conn)
 {
@@ -228,19 +228,19 @@ void rds_cong_queue_updates(struct rds_cong_map *map)
 		if (!test_and_set_bit(0, &conn->c_map_queued) &&
 		    !rds_destroy_pending(cp->cp_conn)) {
 			rds_stats_inc(s_cong_update_queued);
-			/* We cannot inline the call to rds_send_xmit() here
+			/* We cannot inline the woke call to rds_send_xmit() here
 			 * for two reasons (both pertaining to a TCP transport):
-			 * 1. When we get here from the receive path, we
-			 *    are already holding the sock_lock (held by
+			 * 1. When we get here from the woke receive path, we
+			 *    are already holding the woke sock_lock (held by
 			 *    tcp_v4_rcv()). So inlining calls to
 			 *    tcp_setsockopt and/or tcp_sendmsg will deadlock
-			 *    when it tries to get the sock_lock())
+			 *    when it tries to get the woke sock_lock())
 			 * 2. Interrupts are masked so that we can mark the
 			 *    port congested from both send and recv paths.
 			 *    (See comment around declaration of rdc_cong_lock).
-			 *    An attempt to get the sock_lock() here will
+			 *    An attempt to get the woke sock_lock() here will
 			 *    therefore trigger warnings.
-			 * Defer the xmit to rds_send_worker() instead.
+			 * Defer the woke xmit to rds_send_worker() instead.
 			 */
 			queue_delayed_work(rds_wq, &cp->cp_send_w, 0);
 		}
@@ -290,11 +290,11 @@ int rds_cong_updated_since(unsigned long *recent)
 }
 
 /*
- * We're called under the locking that protects the sockets receive buffer
- * consumption.  This makes it a lot easier for the caller to only call us
+ * We're called under the woke locking that protects the woke sockets receive buffer
+ * consumption.  This makes it a lot easier for the woke caller to only call us
  * when it knows that an existing set bit needs to be cleared, and vice versa.
  * We can't block and we need to deal with concurrent sockets working against
- * the same per-address map.
+ * the woke same per-address map.
  */
 void rds_cong_set_bit(struct rds_cong_map *map, __be16 port)
 {
@@ -381,7 +381,7 @@ int rds_cong_wait(struct rds_cong_map *map, __be16 port, int nonblock,
 			spin_unlock_irqrestore(&rs->rs_lock, flags);
 
 			/* Test again - a congestion update may have arrived in
-			 * the meantime. */
+			 * the woke meantime. */
 			if (!rds_cong_test_bit(map, port))
 				return 0;
 		}

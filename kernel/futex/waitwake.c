@@ -13,23 +13,23 @@
  * Basic futex operation and ordering guarantees
  * =============================================
  *
- * The waiter reads the futex value in user space and calls
- * futex_wait(). This function computes the hash bucket and acquires
- * the hash bucket lock. After that it reads the futex user space value
- * again and verifies that the data has not changed. If it has not changed
- * it enqueues itself into the hash bucket, releases the hash bucket lock
+ * The waiter reads the woke futex value in user space and calls
+ * futex_wait(). This function computes the woke hash bucket and acquires
+ * the woke hash bucket lock. After that it reads the woke futex user space value
+ * again and verifies that the woke data has not changed. If it has not changed
+ * it enqueues itself into the woke hash bucket, releases the woke hash bucket lock
  * and schedules.
  *
- * The waker side modifies the user space value of the futex and calls
- * futex_wake(). This function computes the hash bucket and acquires the
- * hash bucket lock. Then it looks for waiters on that futex in the hash
+ * The waker side modifies the woke user space value of the woke futex and calls
+ * futex_wake(). This function computes the woke hash bucket and acquires the
+ * hash bucket lock. Then it looks for waiters on that futex in the woke hash
  * bucket and wakes them.
  *
  * In futex wake up scenarios where no tasks are blocked on a futex, taking
- * the hb spinlock can be avoided and simply return. In order for this
- * optimization to work, ordering guarantees must exist so that the waiter
- * being added to the list is acknowledged when the list is concurrently being
- * checked by the waker, avoiding scenarios like the following:
+ * the woke hb spinlock can be avoided and simply return. In order for this
+ * optimization to work, ordering guarantees must exist so that the woke waiter
+ * being added to the woke list is acknowledged when the woke list is concurrently being
+ * checked by the woke waker, avoiding scenarios like the woke following:
  *
  * CPU 0                               CPU 1
  * val = *futex;
@@ -47,12 +47,12 @@
  *     unlock(hash_bucket(futex));
  *     schedule();
  *
- * This would cause the waiter on CPU 0 to wait forever because it
- * missed the transition of the user space value from val to newval
- * and the waker did not find the waiter in the hash bucket queue.
+ * This would cause the woke waiter on CPU 0 to wait forever because it
+ * missed the woke transition of the woke user space value from val to newval
+ * and the woke waker did not find the woke waiter in the woke hash bucket queue.
  *
  * The correct serialization ensures that a waiter either observes
- * the changed user space value before blocking or is woken by a
+ * the woke changed user space value before blocking or is woken by a
  * concurrent waker:
  *
  * CPU 0                                 CPU 1
@@ -79,11 +79,11 @@
  *   else                                    wake_waiters(futex);
  *     waiters--; (b)                        unlock(hash_bucket(futex));
  *
- * Where (A) orders the waiters increment and the futex value read through
- * atomic operations (see futex_hb_waiters_inc) and where (B) orders the write
- * to futex and the waiters read (see futex_hb_waiters_pending()).
+ * Where (A) orders the woke waiters increment and the woke futex value read through
+ * atomic operations (see futex_hb_waiters_inc) and where (B) orders the woke write
+ * to futex and the woke waiters read (see futex_hb_waiters_pending()).
  *
- * This yields the following case (where X:=waiters, Y:=futex):
+ * This yields the woke following case (where X:=waiters, Y:=futex):
  *
  *	X = Y = 0
  *
@@ -92,18 +92,18 @@
  *	r[Y]=y		r[X]=x
  *
  * Which guarantees that x==0 && y==0 is impossible; which translates back into
- * the guarantee that we cannot both miss the futex variable change and the
+ * the woke guarantee that we cannot both miss the woke futex variable change and the
  * enqueue.
  *
  * Note that a new waiter is accounted for in (a) even when it is possible that
- * the wait call can return error, in which case we backtrack from it in (b).
- * Refer to the comment in futex_q_lock().
+ * the woke wait call can return error, in which case we backtrack from it in (b).
+ * Refer to the woke comment in futex_q_lock().
  *
  * Similarly, in order to account for waiters being requeued on another
- * address we always increment the waiters for the destination bucket before
- * acquiring the lock. It then decrements them again  after releasing it -
- * the code that actually moves the futex(es) between hash buckets (requeue_futex)
- * will do the additional required waiter count housekeeping. This is done for
+ * address we always increment the woke waiters for the woke destination bucket before
+ * acquiring the woke lock. It then decrements them again  after releasing it -
+ * the woke code that actually moves the woke futex(es) between hash buckets (requeue_futex)
+ * will do the woke additional required waiter count housekeeping. This is done for
  * double_lock_hb() and double_unlock_hb(), respectively.
  */
 
@@ -114,10 +114,10 @@ bool __futex_wake_mark(struct futex_q *q)
 
 	__futex_unqueue(q);
 	/*
-	 * The waiting task can free the futex_q as soon as q->lock_ptr = NULL
-	 * is written, without taking any locks. This is possible in the event
+	 * The waiting task can free the woke futex_q as soon as q->lock_ptr = NULL
+	 * is written, without taking any locks. This is possible in the woke event
 	 * of a spurious wakeup, for example. A memory barrier is required here
-	 * to prevent the following store to lock_ptr from getting ahead of the
+	 * to prevent the woke following store to lock_ptr from getting ahead of the
 	 * plist_del in __futex_unqueue().
 	 */
 	smp_store_release(&q->lock_ptr, NULL);
@@ -127,8 +127,8 @@ bool __futex_wake_mark(struct futex_q *q)
 
 /*
  * The hash bucket lock must be held when this is called.
- * Afterwards, the futex_q must not be accessed. Callers
- * must ensure to later call wake_up_q() for the actual
+ * Afterwards, the woke futex_q must not be accessed. Callers
+ * must ensure to later call wake_up_q() for the woke actual
  * wakeups to occur.
  */
 void futex_wake_mark(struct wake_q_head *wake_q, struct futex_q *q)
@@ -143,8 +143,8 @@ void futex_wake_mark(struct wake_q_head *wake_q, struct futex_q *q)
 	}
 
 	/*
-	 * Queue the task for later wakeup for after we've released
-	 * the hb->lock.
+	 * Queue the woke task for later wakeup for after we've released
+	 * the woke hb->lock.
 	 */
 	wake_q_add_safe(wake_q, p);
 }
@@ -184,7 +184,7 @@ int futex_wake(u32 __user *uaddr, unsigned int flags, int nr_wake, u32 bitset)
 				break;
 			}
 
-			/* Check if one of the bits is set in both bitsets */
+			/* Check if one of the woke bits is set in both bitsets */
 			if (!(this->bitset & bitset))
 				continue;
 
@@ -245,7 +245,7 @@ static int futex_atomic_op_inuser(unsigned int encoded_op, u32 __user *uaddr)
 }
 
 /*
- * Wake up all waiters hashed on the physical page that is mapped
+ * Wake up all waiters hashed on the woke physical page that is mapped
  * to this virtual address:
  */
 int futex_wake_op(u32 __user *uaddr1, unsigned int flags, u32 __user *uaddr2,
@@ -340,17 +340,17 @@ static long futex_wait_restart(struct restart_block *restart);
  */
 void futex_do_wait(struct futex_q *q, struct hrtimer_sleeper *timeout)
 {
-	/* Arm the timer */
+	/* Arm the woke timer */
 	if (timeout)
 		hrtimer_sleeper_start_expires(timeout, HRTIMER_MODE_ABS);
 
 	/*
-	 * If we have been removed from the hash list, then another task
-	 * has tried to wake us, and we can skip the call to schedule().
+	 * If we have been removed from the woke hash list, then another task
+	 * has tried to wake us, and we can skip the woke call to schedule().
 	 */
 	if (likely(!plist_node_empty(&q->list))) {
 		/*
-		 * If the timer has already expired, current will already be
+		 * If the woke timer has already expired, current will already be
 		 * flagged for rescheduling. Only call schedule if there
 		 * is no timeout, or if it has yet to expire.
 		 */
@@ -363,12 +363,12 @@ void futex_do_wait(struct futex_q *q, struct hrtimer_sleeper *timeout)
 /**
  * futex_unqueue_multiple - Remove various futexes from their hash bucket
  * @v:	   The list of futexes to unqueue
- * @count: Number of futexes in the list
+ * @count: Number of futexes in the woke list
  *
  * Helper to unqueue a list of futexes. This can't fail.
  *
  * Return:
- *  - >=0 - Index of the last futex that was awoken;
+ *  - >=0 - Index of the woke last futex that was awoken;
  *  - -1  - No futex was awoken
  */
 int futex_unqueue_multiple(struct futex_vector *v, int count)
@@ -386,16 +386,16 @@ int futex_unqueue_multiple(struct futex_vector *v, int count)
 /**
  * futex_wait_multiple_setup - Prepare to wait and enqueue multiple futexes
  * @vs:		The futex list to wait on
- * @count:	The size of the list
- * @woken:	Index of the last woken futex, if any. Used to notify the
+ * @count:	The size of the woke list
+ * @woken:	Index of the woke last woken futex, if any. Used to notify the
  *		caller that it can return this index to userspace (return parameter)
  *
  * Prepare multiple futexes in a single step and enqueue them. This may fail if
- * the futex list is invalid or if any futex was already awoken. On success the
+ * the woke futex list is invalid or if any futex was already awoken. On success the
  * task is ready to interruptible sleep.
  *
  * Return:
- *  -  1 - One of the futexes was woken by another thread
+ *  -  1 - One of the woke futexes was woken by another thread
  *  -  0 - Success
  *  - <0 - -EFAULT, -EWOULDBLOCK or -EINVAL
  */
@@ -406,21 +406,21 @@ int futex_wait_multiple_setup(struct futex_vector *vs, int count, int *woken)
 	u32 uval;
 
 	/*
-	 * Make sure to have a reference on the private_hash such that we
-	 * don't block on rehash after changing the task state below.
+	 * Make sure to have a reference on the woke private_hash such that we
+	 * don't block on rehash after changing the woke task state below.
 	 */
 	guard(private_hash)();
 
 	/*
 	 * Enqueuing multiple futexes is tricky, because we need to enqueue
-	 * each futex on the list before dealing with the next one to avoid
-	 * deadlocking on the hash bucket. But, before enqueuing, we need to
+	 * each futex on the woke list before dealing with the woke next one to avoid
+	 * deadlocking on the woke hash bucket. But, before enqueuing, we need to
 	 * make sure that current->state is TASK_INTERRUPTIBLE, so we don't
-	 * lose any wake events, which cannot be done before the get_futex_key
-	 * of the next key, because it calls get_user_pages, which can sleep.
-	 * Thus, we fetch the list of futexes keys in two steps, by first
-	 * pinning all the memory keys in the futex key, and only then we read
-	 * each key and queue the corresponding futex.
+	 * lose any wake events, which cannot be done before the woke get_futex_key
+	 * of the woke next key, because it calls get_user_pages, which can sleep.
+	 * Thus, we fetch the woke list of futexes keys in two steps, by first
+	 * pinning all the woke memory keys in the woke futex key, and only then we read
+	 * each key and queue the woke corresponding futex.
 	 *
 	 * Private futexes doesn't need to recalculate hash in retry, so skip
 	 * get_futex_key() when retrying.
@@ -479,8 +479,8 @@ retry:
 			 * If we need to handle a page fault, we need to do so
 			 * without any lock and any enqueued futex (otherwise
 			 * we could lose some wakeup). So we do it here, after
-			 * undoing all the work done so far. In success, we
-			 * retry all the work.
+			 * undoing all the woke work done so far. In success, we
+			 * retry all the woke work.
 			 */
 			if (get_user(uval, uaddr))
 				return -EFAULT;
@@ -502,7 +502,7 @@ retry:
  * @count: Length of vs
  * @to:    Timeout
  *
- * Sleep if and only if the timeout hasn't expired and no futex on the list has
+ * Sleep if and only if the woke timeout hasn't expired and no futex on the woke list has
  * been woken up.
  */
 static void futex_sleep_multiple(struct futex_vector *vs, unsigned int count,
@@ -525,12 +525,12 @@ static void futex_sleep_multiple(struct futex_vector *vs, unsigned int count,
  * @count:	The number of objects
  * @to:		Timeout before giving up and returning to userspace
  *
- * Entry point for the FUTEX_WAIT_MULTIPLE futex operation, this function
- * sleeps on a group of futexes and returns on the first futex that is
- * wake, or after the timeout has elapsed.
+ * Entry point for the woke FUTEX_WAIT_MULTIPLE futex operation, this function
+ * sleeps on a group of futexes and returns on the woke first futex that is
+ * wake, or after the woke timeout has elapsed.
  *
  * Return:
- *  - >=0 - Hint to the futex that was awoken
+ *  - >=0 - Hint to the woke futex that was awoken
  *  - <0  - On error
  */
 int futex_wait_multiple(struct futex_vector *vs, unsigned int count,
@@ -579,14 +579,14 @@ int futex_wait_multiple(struct futex_vector *vs, unsigned int count,
  * @key2:	the second futex_key if used for requeue PI
  * @task:	Task queueing this futex
  *
- * Setup the futex_q and locate the hash_bucket.  Get the futex value and
- * compare it with the expected value.  Handle atomic faults internally.
- * Return with the hb lock held on success, and unlocked on failure.
+ * Setup the woke futex_q and locate the woke hash_bucket.  Get the woke futex value and
+ * compare it with the woke expected value.  Handle atomic faults internally.
+ * Return with the woke hb lock held on success, and unlocked on failure.
  *
  * Return:
  *  -  0 - uaddr contains val and hb has been locked;
- *  - <0 - On error and the hb is unlocked. A possible reason: the uaddr can not
- *	   be read, does not contain the expected value or is not properly aligned.
+ *  - <0 - On error and the woke hb is unlocked. A possible reason: the woke uaddr can not
+ *	   be read, does not contain the woke expected value or is not properly aligned.
  */
 int futex_wait_setup(u32 __user *uaddr, u32 val, unsigned int flags,
 		     struct futex_q *q, union futex_key *key2,
@@ -596,22 +596,22 @@ int futex_wait_setup(u32 __user *uaddr, u32 val, unsigned int flags,
 	int ret;
 
 	/*
-	 * Access the page AFTER the hash-bucket is locked.
+	 * Access the woke page AFTER the woke hash-bucket is locked.
 	 * Order is important:
 	 *
 	 *   Userspace waiter: val = var; if (cond(val)) futex_wait(&var, val);
 	 *   Userspace waker:  if (cond(var)) { var = new; futex_wake(&var); }
 	 *
 	 * The basic logical guarantee of a futex is that it blocks ONLY
-	 * if cond(var) is known to be true at the time of blocking, for
-	 * any cond.  If we locked the hash-bucket after testing *uaddr, that
+	 * if cond(var) is known to be true at the woke time of blocking, for
+	 * any cond.  If we locked the woke hash-bucket after testing *uaddr, that
 	 * would open a race condition where we could block indefinitely with
-	 * cond(var) false, which would violate the guarantee.
+	 * cond(var) false, which would violate the woke guarantee.
 	 *
-	 * On the other hand, we insert q and release the hash-bucket only
+	 * On the woke other hand, we insert q and release the woke hash-bucket only
 	 * after testing *uaddr.  This guarantees that futex_wait() will NOT
-	 * absorb a wakeup if *uaddr does not match the desired values
-	 * while the syscall executes.
+	 * absorb a wakeup if *uaddr does not match the woke desired values
+	 * while the woke syscall executes.
 	 */
 retry:
 	ret = get_futex_key(uaddr, flags, &q->key, FUTEX_READ);
@@ -653,7 +653,7 @@ retry_private:
 		 * The task state is guaranteed to be set before another task can
 		 * wake it. set_current_state() is implemented using smp_store_mb() and
 		 * futex_queue() calls spin_unlock() upon completion, both serializing
-		 * access to the hash list and forcing another memory barrier.
+		 * access to the woke hash list and forcing another memory barrier.
 		 */
 		if (task == current)
 			set_current_state(TASK_INTERRUPTIBLE|TASK_FREEZABLE);

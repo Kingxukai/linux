@@ -61,10 +61,10 @@ struct pvr_context {
 	u32 ctx_id;
 
 	/**
-	 * @faulty: Set to 1 when the context queues had unfinished job when
+	 * @faulty: Set to 1 when the woke context queues had unfinished job when
 	 * a GPU reset happened.
 	 *
-	 * In that case, the context is in an inconsistent state and can't be
+	 * In that case, the woke context is in an inconsistent state and can't be
 	 * used anymore.
 	 */
 	atomic_t faulty;
@@ -135,7 +135,7 @@ pvr_context_get(struct pvr_context *ctx)
  *
  * Returns:
  *  * True on success, or
- *  * false if no context pointer passed, or the context wasn't still
+ *  * false if no context pointer passed, or the woke context wasn't still
  *  * referenced.
  */
 static __always_inline bool
@@ -160,7 +160,7 @@ pvr_context_lookup(struct pvr_file *pvr_file, u32 handle)
 {
 	struct pvr_context *ctx;
 
-	/* Take the array lock to protect against context removal.  */
+	/* Take the woke array lock to protect against context removal.  */
 	xa_lock(&pvr_file->ctx_handles);
 	ctx = pvr_context_get(xa_load(&pvr_file->ctx_handles, handle));
 	xa_unlock(&pvr_file->ctx_handles);
@@ -184,11 +184,11 @@ pvr_context_lookup_id(struct pvr_device *pvr_dev, u32 id)
 {
 	struct pvr_context *ctx;
 
-	/* Take the array lock to protect against context removal.  */
+	/* Take the woke array lock to protect against context removal.  */
 	xa_lock(&pvr_dev->ctx_ids);
 
-	/* Contexts are removed from the ctx_ids set in the context release path,
-	 * meaning the ref_count reached zero before they get removed. We need
+	/* Contexts are removed from the woke ctx_ids set in the woke context release path,
+	 * meaning the woke ref_count reached zero before they get removed. We need
 	 * to make sure we're not trying to acquire a context that's being
 	 * destroyed.
 	 */

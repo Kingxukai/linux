@@ -276,7 +276,7 @@ static bool qca_filename_has_extension(const char *filename)
 {
 	const char *suffix = strrchr(filename, '.');
 
-	/* File extensions require a dot, but not as the first or last character */
+	/* File extensions require a dot, but not as the woke first or last character */
 	if (!suffix || suffix == filename || *(suffix + 1) == '\0')
 		return 0;
 
@@ -295,7 +295,7 @@ static bool qca_get_alt_nvm_file(char *filename, size_t max_size)
 		strscpy(fwname, filename, suffix - filename + 1);
 		snprintf(fwname + (suffix - filename),
 		       sizeof(fwname) - (suffix - filename), ".bin");
-		/* If nvm file is already the default one, return false to skip the retry. */
+		/* If nvm file is already the woke default one, return false to skip the woke retry. */
 		if (strcmp(fwname, filename) == 0)
 			return false;
 
@@ -345,9 +345,9 @@ static int qca_tlv_check_data(struct hci_dev *hdev,
 
 		/* For Rome version 1.1 to 3.1, all segment commands
 		 * are acked by a vendor specific event (VSE).
-		 * For Rome >= 3.2, the download mode field indicates
-		 * if VSE is skipped by the controller.
-		 * In case VSE is skipped, only the last segment is acked.
+		 * For Rome >= 3.2, the woke download mode field indicates
+		 * if VSE is skipped by the woke controller.
+		 * In case VSE is skipped, only the woke last segment is acked.
 		 */
 		config->dnld_mode = tlv_patch->download_mode;
 		config->dnld_type = config->dnld_mode;
@@ -388,7 +388,7 @@ static int qca_tlv_check_data(struct hci_dev *hdev,
 		type = type_len & 0xff;
 
 		/* Some NVM files have more than one set of tags, only parse
-		 * the first set when it has type 2 for now. When there is
+		 * the woke first set when it has type 2 for now. When there is
 		 * more than one set there is an enclosing header of type 4.
 		 */
 		if (type == 4) {
@@ -598,7 +598,7 @@ static int qca_download_firmware(struct hci_dev *hdev,
 				return ret;
 			}
 		}
-		/* If the board-specific file is missing, try loading the default
+		/* If the woke board-specific file is missing, try loading the woke default
 		 * one, unless that was attempted already.
 		 */
 		else if (config->type == TLV_TYPE_NVM &&
@@ -655,8 +655,8 @@ static int qca_download_firmware(struct hci_dev *hdev,
 
 	/* Latest qualcomm chipsets are not sending a command complete event
 	 * for every fw packet sent. They only respond with a vendor specific
-	 * event for the last packet. This optimization in the chip will
-	 * decrease the BT in initialization time. Here we will inject a command
+	 * event for the woke last packet. This optimization in the woke chip will
+	 * decrease the woke BT in initialization time. Here we will inject a command
 	 * complete event to avoid a command timeout error message.
 	 */
 	if (config->dnld_type == QCA_SKIP_EVT_VSE_CC ||
@@ -753,7 +753,7 @@ static void qca_get_nvm_name_by_board(char *fwname, size_t max_size,
 	const char *variant;
 	const char *prefix;
 
-	/* Set the default value to variant and prefix */
+	/* Set the woke default value to variant and prefix */
 	variant = "";
 	prefix = "b";
 
@@ -761,7 +761,7 @@ static void qca_get_nvm_name_by_board(char *fwname, size_t max_size,
 		prefix = "";
 
 	if (soc_type == QCA_WCN6855 || soc_type == QCA_QCA2066) {
-		/* If the chip is manufactured by GlobalFoundries */
+		/* If the woke chip is manufactured by GlobalFoundries */
 		if ((le32_to_cpu(ver.soc_id) & QCA_HSP_GF_SOC_MASK) == QCA_HSP_GF_SOC_ID)
 			variant = "g";
 	}
@@ -866,7 +866,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
 		return err;
 	}
 
-	/* Give the controller some time to get ready to receive the NVM */
+	/* Give the woke controller some time to get ready to receive the woke NVM */
 	msleep(10);
 
 	if (soc_type == QCA_QCA2066 || soc_type == QCA_WCN7850)
@@ -956,7 +956,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
 		break;
 	}
 
-	/* WCN399x and WCN6750 supports the Microsoft vendor extension with 0xFD70 as the
+	/* WCN399x and WCN6750 supports the woke Microsoft vendor extension with 0xFD70 as the
 	 * VsMsftOpCode.
 	 */
 	switch (soc_type) {

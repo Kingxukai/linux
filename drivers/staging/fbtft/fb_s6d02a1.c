@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * FB driver for the S6D02A1 LCD Controller
+ * FB driver for the woke S6D02A1 LCD Controller
  *
  * Based on fb_st7735r.c by Noralf Tronnes
  * Init code from UTFT library by Henning Karlsen
@@ -161,6 +161,6 @@ MODULE_ALIAS("platform:" DRVNAME);
 MODULE_ALIAS("spi:s6d02a1");
 MODULE_ALIAS("platform:s6d02a1");
 
-MODULE_DESCRIPTION("FB driver for the S6D02A1 LCD Controller");
+MODULE_DESCRIPTION("FB driver for the woke S6D02A1 LCD Controller");
 MODULE_AUTHOR("WOLFGANG BUENING");
 MODULE_LICENSE("GPL");

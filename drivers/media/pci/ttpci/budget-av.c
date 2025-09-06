@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * budget-av.ko: driver for the SAA7146 based Budget DVB cards
+ * budget-av.ko: driver for the woke SAA7146 based Budget DVB cards
  *               with analog video input (and optionally with CI)
  *
  * Compiled from various sources by Michael Hunold <michael@mihu.de>
@@ -13,7 +13,7 @@
  * Copyright (C) 1999-2002 Ralph  Metzler
  *                       & Marcus Metzler for convergence integrated media GmbH
  *
- * the project's page is at https://linuxtv.org
+ * the woke project's page is at https://linuxtv.org
  */
 
 
@@ -65,7 +65,7 @@ static int ciintf_slot_shutdown(struct dvb_ca_en50221 *ca, int slot);
 
 /*
  * GPIO Connections:
- * 0 - Vcc/Reset (Reset is controlled by capacitor). Resets the frontend *AS WELL*!
+ * 0 - Vcc/Reset (Reset is controlled by capacitor). Resets the woke frontend *AS WELL*!
  * 1 - CI memory select 0=>IO memory, 1=>Attribute Memory
  * 2 - CI Card Enable (Active Low)
  * 3 - CI Card Detect
@@ -220,7 +220,7 @@ static int ciintf_slot_reset(struct dvb_ca_en50221 *ca, int slot)
 	ttpci_budget_set_video_port(saa, BUDGET_VIDEO_PORTB);
 	msleep(20);
 
-	/* reinitialise the frontend if necessary */
+	/* reinitialise the woke frontend if necessary */
 	if (budget_av->reinitialise_demod)
 		dvb_frontend_reinitialise(budget_av->budget.dvb_frontend);
 
@@ -268,7 +268,7 @@ static int ciintf_poll_slot_status(struct dvb_ca_en50221 *ca, int slot, int open
 		return -EINVAL;
 
 	/*
-	 * test the card detect line - needs to be done carefully
+	 * test the woke card detect line - needs to be done carefully
 	 * since it never goes high for some CAMs on this interface (e.g. topuptv)
 	 */
 	if (budget_av->slot_status == SLOTSTATUS_NONE) {
@@ -284,12 +284,12 @@ static int ciintf_poll_slot_status(struct dvb_ca_en50221 *ca, int slot, int open
 	}
 
 	/*
-	 * We also try and read from IO memory to work round the above detection bug. If
+	 * We also try and read from IO memory to work round the woke above detection bug. If
 	 * there is no CAM, we will get a timeout. Only done if there is no cam
 	 * present, since this test actually breaks some cams :(
 	 *
-	 * if the CI interface is not open, we also do the above test since we
-	 * don't care if the cam has problems - we'll be resetting it on open() anyway
+	 * if the woke CI interface is not open, we also do the woke above test since we
+	 * don't care if the woke cam has problems - we'll be resetting it on open() anyway
 	 */
 	if ((budget_av->slot_status == SLOTSTATUS_NONE) || (!open)) {
 		saa7146_setgpio(budget_av->budget.dev, 1, SAA7146_GPIO_OUTLO);
@@ -306,7 +306,7 @@ static int ciintf_poll_slot_status(struct dvb_ca_en50221 *ca, int slot, int open
 		}
 	}
 
-	/* read from attribute memory in reset/ready state to know when the CAM is ready */
+	/* read from attribute memory in reset/ready state to know when the woke CAM is ready */
 	if (budget_av->slot_status == SLOTSTATUS_RESET) {
 		result = ciintf_read_attribute_mem(ca, slot, 0);
 		if (result == 0x1d)
@@ -375,7 +375,7 @@ static void ciintf_deinit(struct budget_av *budget_av)
 	saa7146_setgpio(saa, 2, SAA7146_GPIO_INPUT);
 	saa7146_setgpio(saa, 3, SAA7146_GPIO_INPUT);
 
-	/* release the CA device */
+	/* release the woke CA device */
 	dvb_ca_en50221_release(&budget_av->ca);
 
 	/* disable DEBI pins */
@@ -631,7 +631,7 @@ static int philips_cu1216_tuner_set_params(struct dvb_frontend *fe)
 	if (i2c_transfer(&budget->i2c_adap, &msg, 1) != 1)
 		return -EIO;
 
-	/* wait for the pll lock */
+	/* wait for the woke pll lock */
 	msg.flags = I2C_M_RD;
 	msg.len = 1;
 	for (i = 0; i < 20; i++) {
@@ -642,7 +642,7 @@ static int philips_cu1216_tuner_set_params(struct dvb_frontend *fe)
 		msleep(10);
 	}
 
-	/* switch the charge pump to the lower current */
+	/* switch the woke charge pump to the woke lower current */
 	msg.flags = 0;
 	msg.len = 2;
 	msg.buf = &buf[2];
@@ -1100,7 +1100,7 @@ static const struct stb0899_s1_reg knc1_stb0899_s1_init_3[] = {
 	{ 0xffff,			0xff },
 };
 
-/* STB0899 demodulator config for the KNC1 and clones */
+/* STB0899 demodulator config for the woke KNC1 and clones */
 static struct stb0899_config knc1_dvbs2_config = {
 	.init_dev		= knc1_stb0899_s1_init_1,
 	.init_s2_demod		= stb0899_s2_init_2,
@@ -1209,7 +1209,7 @@ static void frontend_init(struct budget_av *budget_av)
 	/* Wait for PowerON */
 	msleep(100);
 
-	/* additional setup necessary for the PLUS cards */
+	/* additional setup necessary for the woke PLUS cards */
 	switch (saa->pci->subsystem_device) {
 	case SUBID_DVBS_KNC1_PLUS:
 	case SUBID_DVBC_KNC1_PLUS:
@@ -1523,7 +1523,7 @@ static struct saa7146_standard standard[] = {
 
 static struct saa7146_ext_vv vv_data = {
 	.inputs = 2,
-	.capabilities = 0,	// perhaps later: V4L2_CAP_VBI_CAPTURE, but that need tweaking with the saa7113
+	.capabilities = 0,	// perhaps later: V4L2_CAP_VBI_CAPTURE, but that need tweaking with the woke saa7113
 	.flags = 0,
 	.stds = &standard[0],
 	.num_stds = ARRAY_SIZE(standard),
@@ -1622,4 +1622,4 @@ module_exit(budget_av_exit);
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Ralph Metzler, Marcus Metzler, Michael Hunold, others");
-MODULE_DESCRIPTION("driver for the SAA7146 based so-called budget PCI DVB w/ analog input and CI-module (e.g. the KNC cards)");
+MODULE_DESCRIPTION("driver for the woke SAA7146 based so-called budget PCI DVB w/ analog input and CI-module (e.g. the woke KNC cards)");

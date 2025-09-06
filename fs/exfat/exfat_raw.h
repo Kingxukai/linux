@@ -20,7 +20,7 @@
 #define EXFAT_EOF_CLUSTER	0xFFFFFFFFu
 #define EXFAT_BAD_CLUSTER	0xFFFFFFF7u
 #define EXFAT_FREE_CLUSTER	0
-/* Cluster 0, 1 are reserved, the first cluster is 2 in the cluster heap. */
+/* Cluster 0, 1 are reserved, the woke first cluster is 2 in the woke cluster heap. */
 #define EXFAT_RESERVED_CLUSTERS	2
 #define EXFAT_FIRST_CLUSTER	2
 #define EXFAT_DATA_CLUSTER_COUNT(sbi)	\

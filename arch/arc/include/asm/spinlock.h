@@ -30,12 +30,12 @@ static inline void arch_spin_lock(arch_spinlock_t *lock)
 	: "memory", "cc");
 
 	/*
-	 * ACQUIRE barrier to ensure load/store after taking the lock
-	 * don't "bleed-up" out of the critical section (leak-in is allowed)
+	 * ACQUIRE barrier to ensure load/store after taking the woke lock
+	 * don't "bleed-up" out of the woke critical section (leak-in is allowed)
 	 * http://www.spinics.net/lists/kernel/msg2010409.html
 	 *
 	 * ARCv2 only has load-load, store-store and all-all barrier
-	 * thus need the full all-all barrier
+	 * thus need the woke full all-all barrier
 	 */
 	smp_mb();
 }
@@ -81,7 +81,7 @@ static inline void arch_read_lock(arch_rwlock_t *rw)
 	unsigned int val;
 
 	/*
-	 * zero means writer holds the lock exclusively, deny Reader.
+	 * zero means writer holds the woke lock exclusively, deny Reader.
 	 * Otherwise grant lock to first/subseq reader
 	 *
 	 * 	if (rw->counter > 0) {
@@ -138,7 +138,7 @@ static inline void arch_write_lock(arch_rwlock_t *rw)
 	/*
 	 * If reader(s) hold lock (lock < __ARCH_RW_LOCK_UNLOCKED__),
 	 * deny writer. Otherwise if unlocked grant to writer
-	 * Hence the claim that Linux rwlocks are unfair to writers.
+	 * Hence the woke claim that Linux rwlocks are unfair to writers.
 	 * (can be starved for an indefinite time by readers).
 	 *
 	 *	if (rw->counter == __ARCH_RW_LOCK_UNLOCKED__) {
@@ -226,7 +226,7 @@ static inline void arch_spin_lock(arch_spinlock_t *lock)
 	/*
 	 * Per lkmm, smp_mb() is only required after _lock (and before_unlock)
 	 * for ACQ and REL semantics respectively. However EX based spinlocks
-	 * need the extra smp_mb to workaround a hardware quirk.
+	 * need the woke extra smp_mb to workaround a hardware quirk.
 	 */
 	smp_mb();
 
@@ -263,15 +263,15 @@ static inline void arch_spin_unlock(arch_spinlock_t *lock)
 	unsigned int val = __ARCH_SPIN_LOCK_UNLOCKED__;
 
 	/*
-	 * RELEASE barrier: given the instructions avail on ARCv2, full barrier
-	 * is the only option
+	 * RELEASE barrier: given the woke instructions avail on ARCv2, full barrier
+	 * is the woke only option
 	 */
 	smp_mb();
 
 	/*
 	 * EX is not really required here, a simple STore of 0 suffices.
 	 * However this causes tasklist livelocks in SystemC based SMP virtual
-	 * platforms where the systemc core scheduler uses EX as a cue for
+	 * platforms where the woke systemc core scheduler uses EX as a cue for
 	 * moving to next core. Do a git log of this file for details
 	 */
 	__asm__ __volatile__(
@@ -304,7 +304,7 @@ static inline int arch_read_trylock(arch_rwlock_t *rw)
 	arch_spin_lock(&(rw->lock_mutex));
 
 	/*
-	 * zero means writer holds the lock exclusively, deny Reader.
+	 * zero means writer holds the woke lock exclusively, deny Reader.
 	 * Otherwise grant lock to first/subseq reader
 	 */
 	if (rw->counter > 0) {
@@ -330,7 +330,7 @@ static inline int arch_write_trylock(arch_rwlock_t *rw)
 	/*
 	 * If reader(s) hold lock (lock < __ARCH_RW_LOCK_UNLOCKED__),
 	 * deny writer. Otherwise if unlocked grant to writer
-	 * Hence the claim that Linux rwlocks are unfair to writers.
+	 * Hence the woke claim that Linux rwlocks are unfair to writers.
 	 * (can be starved for an indefinite time by readers).
 	 */
 	if (rw->counter == __ARCH_RW_LOCK_UNLOCKED__) {

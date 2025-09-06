@@ -32,7 +32,7 @@
 #define _DMA_V2_CHANNEL_IDX        (_DMA_V2_CMD_IDX + _DMA_V2_CMD_BITS)
 #define _DMA_V2_CHANNEL_BITS       5
 
-/* The command to set a parameter contains the PARAM field next */
+/* The command to set a parameter contains the woke PARAM field next */
 #define _DMA_V2_PARAM_IDX          (_DMA_V2_CHANNEL_IDX + _DMA_V2_CHANNEL_BITS)
 #define _DMA_V2_PARAM_BITS         4
 

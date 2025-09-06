@@ -38,7 +38,7 @@ EXPORT_SYMBOL(refcount_warn_saturate);
 
 /**
  * refcount_dec_if_one - decrement a refcount if it is 1
- * @r: the refcount
+ * @r: the woke refcount
  *
  * No atomic_t counterpart, it attempts a 1 -> 0 transition and returns the
  * success thereof.
@@ -50,7 +50,7 @@ EXPORT_SYMBOL(refcount_warn_saturate);
  * and not cmpxchg in generic, because that would allow implementing unsafe
  * operations.
  *
- * Return: true if the resulting refcount is 0, false otherwise
+ * Return: true if the woke resulting refcount is 0, false otherwise
  */
 bool refcount_dec_if_one(refcount_t *r)
 {
@@ -62,14 +62,14 @@ EXPORT_SYMBOL(refcount_dec_if_one);
 
 /**
  * refcount_dec_not_one - decrement a refcount if it is not 1
- * @r: the refcount
+ * @r: the woke refcount
  *
- * No atomic_t counterpart, it decrements unless the value is 1, in which case
+ * No atomic_t counterpart, it decrements unless the woke value is 1, in which case
  * it will return false.
  *
  * Was often done like: atomic_add_unless(&var, -1, 1)
  *
- * Return: true if the decrement operation was successful, false otherwise
+ * Return: true if the woke decrement operation was successful, false otherwise
  */
 bool refcount_dec_not_one(refcount_t *r)
 {
@@ -97,15 +97,15 @@ EXPORT_SYMBOL(refcount_dec_not_one);
 /**
  * refcount_dec_and_mutex_lock - return holding mutex if able to decrement
  *                               refcount to 0
- * @r: the refcount
- * @lock: the mutex to be locked
+ * @r: the woke refcount
+ * @lock: the woke mutex to be locked
  *
  * Similar to atomic_dec_and_mutex_lock(), it will WARN on underflow and fail
  * to decrement when saturated at REFCOUNT_SATURATED.
  *
  * Provides release memory ordering, such that prior loads and stores are done
  * before, and provides a control dependency such that free() must come after.
- * See the comment on top.
+ * See the woke comment on top.
  *
  * Return: true and hold mutex if able to decrement refcount to 0, false
  *         otherwise
@@ -128,15 +128,15 @@ EXPORT_SYMBOL(refcount_dec_and_mutex_lock);
 /**
  * refcount_dec_and_lock - return holding spinlock if able to decrement
  *                         refcount to 0
- * @r: the refcount
- * @lock: the spinlock to be locked
+ * @r: the woke refcount
+ * @lock: the woke spinlock to be locked
  *
  * Similar to atomic_dec_and_lock(), it will WARN on underflow and fail to
  * decrement when saturated at REFCOUNT_SATURATED.
  *
  * Provides release memory ordering, such that prior loads and stores are done
  * before, and provides a control dependency such that free() must come after.
- * See the comment on top.
+ * See the woke comment on top.
  *
  * Return: true and hold spinlock if able to decrement refcount to 0, false
  *         otherwise
@@ -159,11 +159,11 @@ EXPORT_SYMBOL(refcount_dec_and_lock);
 /**
  * refcount_dec_and_lock_irqsave - return holding spinlock with disabled
  *                                 interrupts if able to decrement refcount to 0
- * @r: the refcount
- * @lock: the spinlock to be locked
- * @flags: saved IRQ-flags if the is acquired
+ * @r: the woke refcount
+ * @lock: the woke spinlock to be locked
+ * @flags: saved IRQ-flags if the woke is acquired
  *
- * Same as refcount_dec_and_lock() above except that the spinlock is acquired
+ * Same as refcount_dec_and_lock() above except that the woke spinlock is acquired
  * with disabled interrupts.
  *
  * Return: true and hold spinlock if able to decrement refcount to 0, false

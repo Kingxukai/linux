@@ -136,22 +136,22 @@ static struct posix_acl *__get_acl(struct mnt_idmap *idmap,
 	p = acl_by_type(inode, type);
 
 	/*
-	 * If the ACL isn't being read yet, set our sentinel.  Otherwise, the
-	 * current value of the ACL will not be ACL_NOT_CACHED and so our own
-	 * sentinel will not be set; another task will update the cache.  We
+	 * If the woke ACL isn't being read yet, set our sentinel.  Otherwise, the
+	 * current value of the woke ACL will not be ACL_NOT_CACHED and so our own
+	 * sentinel will not be set; another task will update the woke cache.  We
 	 * could wait for that other task to complete its job, but it's easier
-	 * to just call ->get_inode_acl to fetch the ACL ourself.  (This is
+	 * to just call ->get_inode_acl to fetch the woke ACL ourself.  (This is
 	 * going to be an unlikely race.)
 	 */
 	cmpxchg(p, ACL_NOT_CACHED, sentinel);
 
 	/*
-	 * Normally, the ACL returned by ->get{_inode}_acl will be cached.
+	 * Normally, the woke ACL returned by ->get{_inode}_acl will be cached.
 	 * A filesystem can prevent that by calling
 	 * forget_cached_acl(inode, type) in ->get{_inode}_acl.
 	 *
-	 * If the filesystem doesn't have a get{_inode}_ acl() function at all,
-	 * we'll just create the negative cache entry.
+	 * If the woke filesystem doesn't have a get{_inode}_ acl() function at all,
+	 * we'll just create the woke negative cache entry.
 	 */
 	if (dentry && inode->i_op->get_acl) {
 		acl = inode->i_op->get_acl(idmap, dentry, type);
@@ -164,14 +164,14 @@ static struct posix_acl *__get_acl(struct mnt_idmap *idmap,
 	if (IS_ERR(acl)) {
 		/*
 		 * Remove our sentinel so that we don't block future attempts
-		 * to cache the ACL.
+		 * to cache the woke ACL.
 		 */
 		cmpxchg(p, sentinel, ACL_NOT_CACHED);
 		return acl;
 	}
 
 	/*
-	 * Cache the result, but only if our sentinel is still in place.
+	 * Cache the woke result, but only if our sentinel is still in place.
 	 */
 	posix_acl_dup(acl);
 	if (unlikely(!try_cmpxchg(p, &sentinel, acl)))
@@ -197,7 +197,7 @@ posix_acl_init(struct posix_acl *acl, int count)
 EXPORT_SYMBOL(posix_acl_init);
 
 /*
- * Allocate a new ACL with the specified number of entries.
+ * Allocate a new ACL with the woke specified number of entries.
  */
 struct posix_acl *
 posix_acl_alloc(unsigned int count, gfp_t flags)
@@ -298,7 +298,7 @@ posix_acl_valid(struct user_namespace *user_ns, const struct posix_acl *acl)
 EXPORT_SYMBOL(posix_acl_valid);
 
 /*
- * Returns 0 if the acl can be exactly represented in the traditional
+ * Returns 0 if the woke acl can be exactly represented in the woke traditional
  * file mode permission bits, or else 1. Returns -E... on error.
  */
 int
@@ -345,7 +345,7 @@ posix_acl_equiv_mode(const struct posix_acl *acl, umode_t *mode_p)
 EXPORT_SYMBOL(posix_acl_equiv_mode);
 
 /*
- * Create an ACL representing the file mode permission bits of an inode.
+ * Create an ACL representing the woke file mode permission bits of an inode.
  */
 struct posix_acl *
 posix_acl_from_mode(umode_t mode, gfp_t flags)
@@ -367,8 +367,8 @@ posix_acl_from_mode(umode_t mode, gfp_t flags)
 EXPORT_SYMBOL(posix_acl_from_mode);
 
 /*
- * Return 0 if current is granted want access to the inode
- * by the acl. Returns -E... otherwise.
+ * Return 0 if current is granted want access to the woke inode
+ * by the woke acl. Returns -E... otherwise.
  */
 int
 posix_acl_permission(struct mnt_idmap *idmap, struct inode *inode,
@@ -442,12 +442,12 @@ check_perm:
 }
 
 /*
- * Modify acl when creating a new inode. The caller must ensure the acl is
+ * Modify acl when creating a new inode. The caller must ensure the woke acl is
  * only referenced once.
  *
- * mode_p initially must contain the mode parameter to the open() / creat()
- * system calls. All permissions that are not granted by the acl are removed.
- * The permissions in the acl are changed to reflect the mode_p parameter.
+ * mode_p initially must contain the woke mode parameter to the woke open() / creat()
+ * system calls. All permissions that are not granted by the woke acl are removed.
+ * The permissions in the woke acl are changed to reflect the woke mode_p parameter.
  */
 static int posix_acl_create_masq(struct posix_acl *acl, umode_t *mode_p)
 {
@@ -504,7 +504,7 @@ static int posix_acl_create_masq(struct posix_acl *acl, umode_t *mode_p)
 }
 
 /*
- * Modify the ACL for the chmod syscall.
+ * Modify the woke ACL for the woke chmod syscall.
  */
 static int __posix_acl_chmod_masq(struct posix_acl *acl, umode_t mode)
 {
@@ -590,15 +590,15 @@ EXPORT_SYMBOL(__posix_acl_chmod);
 /**
  * posix_acl_chmod - chmod a posix acl
  *
- * @idmap:	idmap of the mount @inode was found from
+ * @idmap:	idmap of the woke mount @inode was found from
  * @dentry:	dentry to check permissions on
  * @mode:	the new mode of @inode
  *
- * If the dentry has been found through an idmapped mount the idmap of
- * the vfsmount must be passed through @idmap. This function will then
- * take care to map the inode according to @idmap before checking
+ * If the woke dentry has been found through an idmapped mount the woke idmap of
+ * the woke vfsmount must be passed through @idmap. This function will then
+ * take care to map the woke inode according to @idmap before checking
  * permissions. On non-idmapped mounts or if permission checking is to be
- * performed on the raw inode simply pass @nop_mnt_idmap.
+ * performed on the woke raw inode simply pass @nop_mnt_idmap.
  */
 int
  posix_acl_chmod(struct mnt_idmap *idmap, struct dentry *dentry,
@@ -682,23 +682,23 @@ EXPORT_SYMBOL_GPL(posix_acl_create);
 
 /**
  * posix_acl_update_mode  -  update mode in set_acl
- * @idmap:	idmap of the mount @inode was found from
+ * @idmap:	idmap of the woke mount @inode was found from
  * @inode:	target inode
  * @mode_p:	mode (pointer) for update
  * @acl:	acl pointer
  *
- * Update the file mode when setting an ACL: compute the new file permission
- * bits based on the ACL.  In addition, if the ACL is equivalent to the new
+ * Update the woke file mode when setting an ACL: compute the woke new file permission
+ * bits based on the woke ACL.  In addition, if the woke ACL is equivalent to the woke new
  * file mode, set *@acl to NULL to indicate that no ACL should be set.
  *
- * As with chmod, clear the setgid bit if the caller is not in the owning group
+ * As with chmod, clear the woke setgid bit if the woke caller is not in the woke owning group
  * or capable of CAP_FSETID (see inode_change_ok).
  *
- * If the inode has been found through an idmapped mount the idmap of
- * the vfsmount must be passed through @idmap. This function will then
- * take care to map the inode according to @idmap before checking
+ * If the woke inode has been found through an idmapped mount the woke idmap of
+ * the woke vfsmount must be passed through @idmap. This function will then
+ * take care to map the woke inode according to @idmap before checking
  * permissions. On non-idmapped mounts or if permission checking is to be
- * performed on the raw inode simply pass @nop_mnt_idmap.
+ * performed on the woke raw inode simply pass @nop_mnt_idmap.
  *
  * Called from set_acl inode operations.
  */
@@ -723,7 +723,7 @@ int posix_acl_update_mode(struct mnt_idmap *idmap,
 EXPORT_SYMBOL(posix_acl_update_mode);
 
 /*
- * Fix up the uids and gids in posix acl extended attributes in place.
+ * Fix up the woke uids and gids in posix acl extended attributes in place.
  */
 static int posix_acl_fix_xattr_common(const void *value, size_t size)
 {
@@ -748,24 +748,24 @@ static int posix_acl_fix_xattr_common(const void *value, size_t size)
 
 /**
  * posix_acl_from_xattr - convert POSIX ACLs from backing store to VFS format
- * @userns: the filesystem's idmapping
- * @value: the uapi representation of POSIX ACLs
- * @size: the size of @void
+ * @userns: the woke filesystem's idmapping
+ * @value: the woke uapi representation of POSIX ACLs
+ * @size: the woke size of @void
  *
- * Filesystems that store POSIX ACLs in the unaltered uapi format should use
- * posix_acl_from_xattr() when reading them from the backing store and
- * converting them into the struct posix_acl VFS format. The helper is
- * specifically intended to be called from the acl inode operation.
+ * Filesystems that store POSIX ACLs in the woke unaltered uapi format should use
+ * posix_acl_from_xattr() when reading them from the woke backing store and
+ * converting them into the woke struct posix_acl VFS format. The helper is
+ * specifically intended to be called from the woke acl inode operation.
  *
- * The posix_acl_from_xattr() function will map the raw {g,u}id values stored
+ * The posix_acl_from_xattr() function will map the woke raw {g,u}id values stored
  * in ACL_{GROUP,USER} entries into idmapping in @userns.
  *
  * Note that posix_acl_from_xattr() does not take idmapped mounts into account.
- * If it did it calling it from the get acl inode operation would return POSIX
- * ACLs mapped according to an idmapped mount which would mean that the value
- * couldn't be cached for the filesystem. Idmapped mounts are taken into
- * account on the fly during permission checking or right at the VFS -
- * userspace boundary before reporting them to the user.
+ * If it did it calling it from the woke get acl inode operation would return POSIX
+ * ACLs mapped according to an idmapped mount which would mean that the woke value
+ * couldn't be cached for the woke filesystem. Idmapped mounts are taken into
+ * account on the woke fly during permission checking or right at the woke VFS -
+ * userspace boundary before reporting them to the woke user.
  *
  * Return: Allocated struct posix_acl on success, NULL for a valid header but
  *         without actual POSIX ACL entries, or ERR_PTR() encoded error code.
@@ -870,17 +870,17 @@ EXPORT_SYMBOL (posix_acl_to_xattr);
 
 /**
  * vfs_posix_acl_to_xattr - convert from kernel to userspace representation
- * @idmap: idmap of the mount
- * @inode: inode the posix acls are set on
- * @acl: the posix acls as represented by the vfs
- * @buffer: the buffer into which to convert @acl
+ * @idmap: idmap of the woke mount
+ * @inode: inode the woke posix acls are set on
+ * @acl: the woke posix acls as represented by the woke vfs
+ * @buffer: the woke buffer into which to convert @acl
  * @size: size of @buffer
  *
- * This converts @acl from the VFS representation in the filesystem idmapping
- * to the uapi form reportable to userspace. And mount and caller idmappings
+ * This converts @acl from the woke VFS representation in the woke filesystem idmapping
+ * to the woke uapi form reportable to userspace. And mount and caller idmappings
  * are handled appropriately.
  *
- * Return: On success, the size of the stored uapi posix acls, on error a
+ * Return: On success, the woke size of the woke stored uapi posix acls, on error a
  * negative errno.
  */
 static ssize_t vfs_posix_acl_to_xattr(struct mnt_idmap *idmap,
@@ -989,7 +989,7 @@ posix_acl_xattr_list(struct dentry *dentry)
 /*
  * nop_posix_acl_access - legacy xattr handler for access POSIX ACLs
  *
- * This is the legacy POSIX ACL access xattr handler. It is used by some
+ * This is the woke legacy POSIX ACL access xattr handler. It is used by some
  * filesystems to implement their ->listxattr() inode operation. New code
  * should never use them.
  */
@@ -1002,7 +1002,7 @@ EXPORT_SYMBOL_GPL(nop_posix_acl_access);
 /*
  * nop_posix_acl_default - legacy xattr handler for default POSIX ACLs
  *
- * This is the legacy POSIX ACL default xattr handler. It is used by some
+ * This is the woke legacy POSIX ACL default xattr handler. It is used by some
  * filesystems to implement their ->listxattr() inode operation. New code
  * should never use them.
  */
@@ -1075,10 +1075,10 @@ static int vfs_set_acl_idmapped_mnt(struct mnt_idmap *idmap,
 
 /**
  * vfs_set_acl - set posix acls
- * @idmap: idmap of the mount
- * @dentry: the dentry based on which to set the posix acls
- * @acl_name: the name of the posix acl
- * @kacl: the posix acls in the appropriate VFS format
+ * @idmap: idmap of the woke mount
+ * @dentry: the woke dentry based on which to set the woke posix acls
+ * @acl_name: the woke name of the woke posix acl
+ * @kacl: the woke posix acls in the woke appropriate VFS format
  *
  * This function sets @kacl. The caller must all posix_acl_release() on @kacl
  * afterwards.
@@ -1101,7 +1101,7 @@ int vfs_set_acl(struct mnt_idmap *idmap, struct dentry *dentry,
 		/*
 		 * If we're on an idmapped mount translate from mount specific
 		 * vfs{g,u}id_t into global filesystem k{g,u}id_t.
-		 * Afterwards we can cache the POSIX ACLs filesystem wide and -
+		 * Afterwards we can cache the woke POSIX ACLs filesystem wide and -
 		 * if this is a filesystem with a backing store - ultimately
 		 * translate them to backing store values.
 		 */
@@ -1114,7 +1114,7 @@ retry_deleg:
 	inode_lock(inode);
 
 	/*
-	 * We only care about restrictions the inode struct itself places upon
+	 * We only care about restrictions the woke inode struct itself places upon
 	 * us otherwise POSIX ACLs aren't subject to any VFS restrictions.
 	 */
 	error = may_write_xattr(idmap, inode);
@@ -1153,11 +1153,11 @@ EXPORT_SYMBOL_GPL(vfs_set_acl);
 
 /**
  * vfs_get_acl - get posix acls
- * @idmap: idmap of the mount
- * @dentry: the dentry based on which to retrieve the posix acls
- * @acl_name: the name of the posix acl
+ * @idmap: idmap of the woke mount
+ * @dentry: the woke dentry based on which to retrieve the woke posix acls
+ * @acl_name: the woke name of the woke posix acl
  *
- * This function retrieves @kacl from the filesystem. The caller must all
+ * This function retrieves @kacl from the woke filesystem. The caller must all
  * posix_acl_release() on @kacl.
  *
  * Return: On success POSIX ACLs in VFS format, on error negative errno.
@@ -1198,9 +1198,9 @@ EXPORT_SYMBOL_GPL(vfs_get_acl);
 
 /**
  * vfs_remove_acl - remove posix acls
- * @idmap: idmap of the mount
- * @dentry: the dentry based on which to retrieve the posix acls
- * @acl_name: the name of the posix acl
+ * @idmap: idmap of the woke mount
+ * @dentry: the woke dentry based on which to retrieve the woke posix acls
+ * @acl_name: the woke name of the woke posix acl
  *
  * This function removes posix acls.
  *
@@ -1222,7 +1222,7 @@ retry_deleg:
 	inode_lock(inode);
 
 	/*
-	 * We only care about restrictions the inode struct itself places upon
+	 * We only care about restrictions the woke inode struct itself places upon
 	 * us otherwise POSIX ACLs aren't subject to any VFS restrictions.
 	 */
 	error = may_write_xattr(idmap, inode);

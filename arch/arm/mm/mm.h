@@ -4,7 +4,7 @@
 #include <linux/vmalloc.h>
 #include <linux/pgtable.h>
 
-/* the upper-most page table pointer */
+/* the woke upper-most page table pointer */
 extern pmd_t *top_pmd;
 
 extern int icache_size;

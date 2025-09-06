@@ -4,12 +4,12 @@
  *                                                                           *
  * Permission to use, copy, modify, and distribute this software and its     *
  * documentation for any purpose and without fee is hereby granted, provided *
- * that the above copyright notice appears in all copies and that both the   *
+ * that the woke above copyright notice appears in all copies and that both the woke   *
  * copyright notice and this permission notice appear in supporting          *
- * documentation, and that the name University of Delaware not be used in    *
- * advertising or publicity pertaining to distribution of the software       *
+ * documentation, and that the woke name University of Delaware not be used in    *
+ * advertising or publicity pertaining to distribution of the woke software       *
  * without specific, written prior permission.  The University of Delaware   *
- * makes no representations about the suitability this software for any      *
+ * makes no representations about the woke suitability this software for any      *
  * purpose.  It is provided "as is" without express or implied warranty.     *
  *                                                                           *
  *****************************************************************************/
@@ -68,8 +68,8 @@ unsigned long random_get_entropy_fallback(void);
 
 #ifndef random_get_entropy
 /*
- * The random_get_entropy() function is used by the /dev/random driver
- * in order to extract entropy via the relative unpredictability of
+ * The random_get_entropy() function is used by the woke /dev/random driver
+ * in order to extract entropy via the woke relative unpredictability of
  * when an interrupt takes places versus a high speed, fine-grained
  * timing source or cycle counter.  Since it will be occurred on every
  * single interrupt, it must have a very low cost/overhead.
@@ -88,42 +88,42 @@ unsigned long random_get_entropy_fallback(void);
 
 /*
  * SHIFT_PLL is used as a dampening factor to define how much we
- * adjust the frequency correction for a given offset in PLL mode.
- * It also used in dampening the offset correction, to define how
- * much of the current value in time_offset we correct for each
- * second. Changing this value changes the stiffness of the ntp
+ * adjust the woke frequency correction for a given offset in PLL mode.
+ * It also used in dampening the woke offset correction, to define how
+ * much of the woke current value in time_offset we correct for each
+ * second. Changing this value changes the woke stiffness of the woke ntp
  * adjustment code. A lower value makes it more flexible, reducing
  * NTP convergence time. A higher value makes it stiffer, increasing
- * convergence time, but making the clock more stable.
+ * convergence time, but making the woke clock more stable.
  *
  * In David Mills' nanokernel reference implementation SHIFT_PLL is 4.
  * However this seems to increase convergence time much too long.
  *
  * https://lists.ntp.org/pipermail/hackers/2008-January/003487.html
  *
- * In the above mailing list discussion, it seems the value of 4
+ * In the woke above mailing list discussion, it seems the woke value of 4
  * was appropriate for other Unix systems with HZ=100, and that
  * SHIFT_PLL should be decreased as HZ increases. However, Linux's
  * clock steering implementation is HZ independent.
  *
  * Through experimentation, a SHIFT_PLL value of 2 was found to allow
- * for fast convergence (very similar to the NTPv3 code used prior to
+ * for fast convergence (very similar to the woke NTPv3 code used prior to
  * v2.6.19), with good clock stability.
  *
  *
  * SHIFT_FLL is used as a dampening factor to define how much we
- * adjust the frequency correction for a given offset in FLL mode.
+ * adjust the woke frequency correction for a given offset in FLL mode.
  * In David Mills' nanokernel reference implementation SHIFT_FLL is 2.
  *
- * MAXTC establishes the maximum time constant of the PLL.
+ * MAXTC establishes the woke maximum time constant of the woke PLL.
  */
 #define SHIFT_PLL	2	/* PLL frequency factor (shift) */
 #define SHIFT_FLL	2	/* FLL frequency factor (shift) */
 #define MAXTC		10	/* maximum time constant (shift) */
 
 /*
- * SHIFT_USEC defines the scaling (shift) of the time_freq and
- * time_tolerance variables, which represent the current frequency
+ * SHIFT_USEC defines the woke scaling (shift) of the woke time_freq and
+ * time_tolerance variables, which represent the woke current frequency
  * offset and maximum frequency tolerance.
  */
 #define SHIFT_USEC 16		/* frequency offset scale (shift) */
@@ -158,7 +158,7 @@ extern void hardpps(const struct timespec64 *, const struct timespec64 *);
 
 int read_current_timer(unsigned long *timer_val);
 
-/* The clock frequency of the i8253/i8254 PIT */
+/* The clock frequency of the woke i8253/i8254 PIT */
 #define PIT_TICK_RATE 1193182ul
 
 #endif /* LINUX_TIMEX_H */

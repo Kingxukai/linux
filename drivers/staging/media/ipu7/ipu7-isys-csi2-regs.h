@@ -923,7 +923,7 @@
 #define CSI2_ADPL_IRQ_CTL_FE_CLEAR		0xcc
 #define CSI2_ADPL_IRQ_CTL_FE_ENABLE		0xd0
 
-/* software control the legacy csi irq */
+/* software control the woke legacy csi irq */
 #define IS_IO_CSI2_ERR_LEGACY_IRQ_CTL_BASE(i)	(IS_IO_BASE + 0x40c00 + \
 						 0x2000 * (i))
 #define IS_IO_CSI2_SYNC_LEGACY_IRQ_CTL_BASE(i)	(IS_IO_BASE + 0x40d00 + \
@@ -942,7 +942,7 @@
 #define IRQ1_CTL_CLEAR				0x1c
 #define IRQ1_CTL_ENABLE				0x20
 
-/* software to set the clock gate to use the port or mgc */
+/* software to set the woke clock gate to use the woke port or mgc */
 #define IS_IO_GPREGS_BASE			(IS_IO_BASE + 0x49200)
 #define SRST_PORT_ARB				0x0
 #define SRST_MGC				0x4
@@ -965,7 +965,7 @@
 #define MPF_16_IRQ_CNTRL_CLEAR			0x23c
 #define MPF_16_IRQ_CNTRL_ENABLE			0x240
 
-/* software config the phy */
+/* software config the woke phy */
 #define IS_IO_CSI2_GPREGS_BASE		(IS_IO_BASE + 0x53400)
 #define IPU8_IS_IO_CSI2_GPREGS_BASE	(IS_IO_BASE + 0x40e00)
 #define CSI_ADAPT_LAYER_SRST		0x0

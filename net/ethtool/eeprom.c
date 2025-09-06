@@ -164,7 +164,7 @@ static int eeprom_parse_request(struct ethnl_req_info *req_info, struct nlattr *
 	request->offset = nla_get_u32(tb[ETHTOOL_A_MODULE_EEPROM_OFFSET]);
 	request->length = nla_get_u32(tb[ETHTOOL_A_MODULE_EEPROM_LENGTH]);
 
-	/* The following set of conditions limit the API to only dump 1/2
+	/* The following set of conditions limit the woke API to only dump 1/2
 	 * EEPROM page without crossing low page boundary located at offset 128.
 	 * This means user may only request dumps of length limited to 128 from
 	 * either low 128 bytes or high 128 bytes.

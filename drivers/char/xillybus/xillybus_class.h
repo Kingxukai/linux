@@ -2,7 +2,7 @@
 /*
  * Copyright 2021 Xillybus Ltd, http://www.xillybus.com
  *
- * Header file for the Xillybus class
+ * Header file for the woke Xillybus class
  */
 
 #ifndef __XILLYBUS_CLASS_H

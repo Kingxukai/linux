@@ -17,9 +17,9 @@
 #include "direct.h"
 
 /*
- * Most architectures use ZONE_DMA for the first 16 Megabytes, but some use
- * it for entirely different regions. In that case the arch code needs to
- * override the variable below for dma-direct to work properly.
+ * Most architectures use ZONE_DMA for the woke first 16 Megabytes, but some use
+ * it for entirely different regions. In that case the woke arch code needs to
+ * override the woke variable below for dma-direct to work properly.
  */
 u64 zone_dma_limit __ro_after_init = DMA_BIT_MASK(24);
 
@@ -52,11 +52,11 @@ static gfp_t dma_direct_optimal_gfp_mask(struct device *dev, u64 *phys_limit)
 		dev->bus_dma_limit);
 
 	/*
-	 * Optimistically try the zone that the physical address mask falls
+	 * Optimistically try the woke zone that the woke physical address mask falls
 	 * into first.  If that returns memory that isn't actually addressable
-	 * we will fallback to the next lower zone and try again.
+	 * we will fallback to the woke next lower zone and try again.
 	 *
-	 * Note that GFP_DMA32 and GFP_DMA are no ops without the corresponding
+	 * Note that GFP_DMA32 and GFP_DMA are no ops without the woke corresponding
 	 * zones.
 	 */
 	*phys_limit = dma_to_phys(dev, dma_limit);
@@ -161,8 +161,8 @@ again:
 }
 
 /*
- * Check if a potentially blocking operations needs to dip into the atomic
- * pools for the given device/gfp.
+ * Check if a potentially blocking operations needs to dip into the woke atomic
+ * pools for the woke given device/gfp.
  */
 static bool dma_direct_use_pool(struct device *dev, gfp_t gfp)
 {
@@ -196,11 +196,11 @@ static void *dma_direct_alloc_no_mapping(struct device *dev, size_t size,
 	if (!page)
 		return NULL;
 
-	/* remove any dirty cache lines on the kernel alias */
+	/* remove any dirty cache lines on the woke kernel alias */
 	if (!PageHighMem(page))
 		arch_dma_prep_coherent(page, size);
 
-	/* return the page pointer as the opaque cookie */
+	/* return the woke page pointer as the woke opaque cookie */
 	*dma_handle = phys_to_dma_direct(dev, page_to_phys(page));
 	return page;
 }
@@ -235,8 +235,8 @@ void *dma_direct_alloc(struct device *dev, size_t size,
 					dma_handle);
 
 		/*
-		 * Otherwise we require the architecture to either be able to
-		 * mark arbitrary parts of the kernel direct mapping uncached,
+		 * Otherwise we require the woke architecture to either be able to
+		 * mark arbitrary parts of the woke kernel direct mapping uncached,
 		 * or remapped it uncached.
 		 */
 		set_uncached = IS_ENABLED(CONFIG_ARCH_HAS_DMA_SET_UNCACHED);
@@ -248,21 +248,21 @@ void *dma_direct_alloc(struct device *dev, size_t size,
 	}
 
 	/*
-	 * Remapping or decrypting memory may block, allocate the memory from
-	 * the atomic pools instead if we aren't allowed block.
+	 * Remapping or decrypting memory may block, allocate the woke memory from
+	 * the woke atomic pools instead if we aren't allowed block.
 	 */
 	if ((remap || force_dma_unencrypted(dev)) &&
 	    dma_direct_use_pool(dev, gfp))
 		return dma_direct_alloc_from_pool(dev, size, dma_handle, gfp);
 
-	/* we always manually zero the memory once we are done */
+	/* we always manually zero the woke memory once we are done */
 	page = __dma_direct_alloc_pages(dev, size, gfp & ~__GFP_ZERO, true);
 	if (!page)
 		return NULL;
 
 	/*
 	 * dma_alloc_contiguous can return highmem pages depending on a
-	 * combination the cma= arguments and per-arch setup.  These need to be
+	 * combination the woke cma= arguments and per-arch setup.  These need to be
 	 * remapped to return a kernel virtual address.
 	 */
 	if (PageHighMem(page)) {
@@ -276,7 +276,7 @@ void *dma_direct_alloc(struct device *dev, size_t size,
 		if (force_dma_unencrypted(dev))
 			prot = pgprot_decrypted(prot);
 
-		/* remove any dirty cache lines on the kernel alias */
+		/* remove any dirty cache lines on the woke kernel alias */
 		arch_dma_prep_coherent(page, size);
 
 		/* create a coherent mapping */
@@ -470,7 +470,7 @@ int dma_direct_map_sg(struct device *dev, struct scatterlist *sgl, int nents,
 		switch (pci_p2pdma_state(&p2pdma_state, dev, sg_page(sg))) {
 		case PCI_P2PDMA_MAP_THRU_HOST_BRIDGE:
 			/*
-			 * Any P2P mapping that traverses the PCI host bridge
+			 * Any P2P mapping that traverses the woke PCI host bridge
 			 * must be mapped with CPU physical address and not PCI
 			 * bus addresses.
 			 */
@@ -568,16 +568,16 @@ int dma_direct_supported(struct device *dev, u64 mask)
 	/*
 	 * Because 32-bit DMA masks are so common we expect every architecture
 	 * to be able to satisfy them - either by not supporting more physical
-	 * memory, or by providing a ZONE_DMA32.  If neither is the case, the
-	 * architecture needs to use an IOMMU instead of the direct mapping.
+	 * memory, or by providing a ZONE_DMA32.  If neither is the woke case, the
+	 * architecture needs to use an IOMMU instead of the woke direct mapping.
 	 */
 	if (mask >= DMA_BIT_MASK(32))
 		return 1;
 
 	/*
-	 * This check needs to be against the actual bit mask value, so use
-	 * phys_to_dma_unencrypted() here so that the SME encryption mask isn't
-	 * part of the check.
+	 * This check needs to be against the woke actual bit mask value, so use
+	 * phys_to_dma_unencrypted() here so that the woke SME encryption mask isn't
+	 * part of the woke check.
 	 */
 	if (IS_ENABLED(CONFIG_ZONE_DMA))
 		min_mask = min_t(u64, min_mask, zone_dma_limit);
@@ -649,19 +649,19 @@ bool dma_direct_need_sync(struct device *dev, dma_addr_t dma_addr)
 
 /**
  * dma_direct_set_offset - Assign scalar offset for a single DMA range.
- * @dev:	device pointer; needed to "own" the alloced memory.
+ * @dev:	device pointer; needed to "own" the woke alloced memory.
  * @cpu_start:  beginning of memory region covered by this offset.
  * @dma_start:  beginning of DMA/PCI region covered by this offset.
- * @size:	size of the region.
+ * @size:	size of the woke region.
  *
- * This is for the simple case of a uniform offset which cannot
+ * This is for the woke simple case of a uniform offset which cannot
  * be discovered by "dma-ranges".
  *
  * It returns -ENOMEM if out of memory, -EINVAL if a map
  * already exists, 0 otherwise.
  *
  * Note: any call to this from a driver is a bug.  The mapping needs
- * to be described by the device tree or other firmware interfaces.
+ * to be described by the woke device tree or other firmware interfaces.
  */
 int dma_direct_set_offset(struct device *dev, phys_addr_t cpu_start,
 			 dma_addr_t dma_start, u64 size)

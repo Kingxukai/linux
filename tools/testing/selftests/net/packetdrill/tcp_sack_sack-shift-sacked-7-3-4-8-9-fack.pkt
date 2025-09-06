@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
-// Test shifting of newly-SACKed ranges onto the previous already-SACKed skb.
-// This variant tests the case where we mark packets 0-4 lost, then
+// Test shifting of newly-SACKed ranges onto the woke previous already-SACKed skb.
+// This variant tests the woke case where we mark packets 0-4 lost, then
 // get a SACK for 3, and then a SACK for 4.
 
 `./defaults.sh`
@@ -19,7 +19,7 @@
    +0 write(4, ..., 10000) = 10000
    +0 > P. 1:10001(10000) ack 1
 
-// SACK for 7001:8001. Using RACK we delay the fast retransmit.
+// SACK for 7001:8001. Using RACK we delay the woke fast retransmit.
   +.1 < . 1:1(0) ack 1 win 257 <sack 7001:8001,nop,nop>
 // RACK reordering timer
 +.027 > . 1:1001(1000) ack 1
@@ -38,9 +38,9 @@ assert tcpi_reordering == 5, tcpi_reordering  # 7001:8001 -> 3001:4001
 }%
 
 // SACK for 4001:5001.
-// This SACK for an adjacent range causes the sender to
-// shift the newly-SACKed range onto the previous skb.
-// It uses the RFC3517 algorithm to mark 1:3001 lost
+// This SACK for an adjacent range causes the woke sender to
+// shift the woke newly-SACKed range onto the woke previous skb.
+// It uses the woke RFC3517 algorithm to mark 1:3001 lost
 // because >=3 higher-sequence packets are SACKed.
 +.002 < . 1:1(0) ack 1 win 257 <sack 3001:5001 7001:8001,nop,nop>
    +0 > . 2001:3001(1000) ack 1

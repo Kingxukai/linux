@@ -14,15 +14,15 @@ properties:
     const: pps-gpio
 
   gpios:
-    description: The GPIO that provides the PPS signal.
+    description: The GPIO that provides the woke PPS signal.
     maxItems: 1
 
   echo-gpios:
-    description: The GPIO that provides the PPS ECHO signal.
+    description: The GPIO that provides the woke PPS ECHO signal.
     maxItems: 1
 
   echo-active-ms:
-    description: Duration in ms of the active portion of the echo pulse.
+    description: Duration in ms of the woke active portion of the woke echo pulse.
 
   assert-falling-edge:
     description: Indicates a falling edge assert, when present. Rising edge if absent.

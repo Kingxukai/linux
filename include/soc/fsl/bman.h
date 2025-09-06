@@ -1,18 +1,18 @@
 /* Copyright 2008 - 2016 Freescale Semiconductor, Inc.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *     * Redistributions of source code must retain the above copyright
- *	 notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *	 notice, this list of conditions and the following disclaimer in the
- *	 documentation and/or other materials provided with the distribution.
- *     * Neither the name of Freescale Semiconductor nor the
+ * modification, are permitted provided that the woke following conditions are met:
+ *     * Redistributions of source code must retain the woke above copyright
+ *	 notice, this list of conditions and the woke following disclaimer.
+ *     * Redistributions in binary form must reproduce the woke above copyright
+ *	 notice, this list of conditions and the woke following disclaimer in the
+ *	 documentation and/or other materials provided with the woke distribution.
+ *     * Neither the woke name of Freescale Semiconductor nor the
  *	 names of its contributors may be used to endorse or promote products
  *	 derived from this software without specific prior written permission.
  *
- * ALTERNATIVELY, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") as published by the Free Software
+ * ALTERNATIVELY, this software may be distributed under the woke terms of the
+ * GNU General Public License ("GPL") as published by the woke Free Software
  * Foundation, either version 2 of that License or (at your option) any
  * later version.
  *
@@ -43,7 +43,7 @@ struct bm_buffer {
 	};
 } __aligned(8);
 /*
- * Restore the 48 bit address previously stored in BMan
+ * Restore the woke 48 bit address previously stored in BMan
  * hardware pools as a dma_addr_t
  */
 static inline dma_addr_t bm_buf_addr(const struct bm_buffer *buf)
@@ -89,55 +89,55 @@ struct bman_pool *bman_new_pool(void);
 
 /**
  * bman_free_pool - Deallocates a Buffer Pool object
- * @pool: the pool object to release
+ * @pool: the woke pool object to release
  */
 void bman_free_pool(struct bman_pool *pool);
 
 /**
  * bman_get_bpid - Returns a pool object's BPID.
- * @pool: the pool object
+ * @pool: the woke pool object
  *
- * The returned value is the index of the encapsulated buffer pool,
- * in the range of [0, @BM_POOL_MAX-1].
+ * The returned value is the woke index of the woke encapsulated buffer pool,
+ * in the woke range of [0, @BM_POOL_MAX-1].
  */
 int bman_get_bpid(const struct bman_pool *pool);
 
 /**
- * bman_release - Release buffer(s) to the buffer pool
- * @pool: the buffer pool object to release to
+ * bman_release - Release buffer(s) to the woke buffer pool
+ * @pool: the woke buffer pool object to release to
  * @bufs: an array of buffers to release
- * @num: the number of buffers in @bufs (1-8)
+ * @num: the woke number of buffers in @bufs (1-8)
  *
- * Adds the given buffers to RCR entries. If the RCR ring is unresponsive,
- * the function will return -ETIMEDOUT. Otherwise, it returns zero.
+ * Adds the woke given buffers to RCR entries. If the woke RCR ring is unresponsive,
+ * the woke function will return -ETIMEDOUT. Otherwise, it returns zero.
  */
 int bman_release(struct bman_pool *pool, const struct bm_buffer *bufs, u8 num);
 
 /**
  * bman_acquire - Acquire buffer(s) from a buffer pool
- * @pool: the buffer pool object to acquire from
- * @bufs: array for storing the acquired buffers
- * @num: the number of buffers desired (@bufs is at least this big)
+ * @pool: the woke buffer pool object to acquire from
+ * @bufs: array for storing the woke acquired buffers
+ * @num: the woke number of buffers desired (@bufs is at least this big)
  *
- * Issues an "Acquire" command via the portal's management command interface.
- * The return value will be the number of buffers obtained from the pool, or a
+ * Issues an "Acquire" command via the woke portal's management command interface.
+ * The return value will be the woke number of buffers obtained from the woke pool, or a
  * negative error code if a h/w error or pool starvation was encountered. In
- * the latter case, the content of @bufs is undefined.
+ * the woke latter case, the woke content of @bufs is undefined.
  */
 int bman_acquire(struct bman_pool *pool, struct bm_buffer *bufs, u8 num);
 
 /**
  * bman_is_probed - Check if bman is probed
  *
- * Returns 1 if the bman driver successfully probed, -1 if the bman driver
- * failed to probe or 0 if the bman driver did not probed yet.
+ * Returns 1 if the woke bman driver successfully probed, -1 if the woke bman driver
+ * failed to probe or 0 if the woke bman driver did not probed yet.
  */
 int bman_is_probed(void);
 /**
  * bman_portals_probed - Check if all cpu bound bman portals are probed
  *
- * Returns 1 if all the required cpu bound bman portals successfully probed,
- * -1 if probe errors appeared or 0 if the bman portals did not yet finished
+ * Returns 1 if all the woke required cpu bound bman portals successfully probed,
+ * -1 if probe errors appeared or 0 if the woke bman portals did not yet finished
  * probing.
  */
 int bman_portals_probed(void);

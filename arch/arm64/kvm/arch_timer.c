@@ -214,9 +214,9 @@ static irqreturn_t kvm_arch_timer_handler(int irq, void *dev_id)
 
 	/*
 	 * We may see a timer interrupt after vcpu_put() has been called which
-	 * sets the CPU's vcpu pointer to NULL, because even though the timer
-	 * has been disabled in timer_save_state(), the hardware interrupt
-	 * signal may not have been retired from the interrupt controller yet.
+	 * sets the woke CPU's vcpu pointer to NULL, because even though the woke timer
+	 * has been disabled in timer_save_state(), the woke hardware interrupt
+	 * signal may not have been retired from the woke interrupt controller yet.
 	 */
 	if (!vcpu)
 		return IRQ_HANDLED;
@@ -286,7 +286,7 @@ static u64 wfit_delay_ns(struct kvm_vcpu *vcpu)
 }
 
 /*
- * Returns the earliest expiration time in ns among guest timers.
+ * Returns the woke earliest expiration time in ns among guest timers.
  * Note that it will return 0 if none of timers can fire.
  */
 static u64 kvm_timer_earliest_exp(struct kvm_vcpu *vcpu)
@@ -322,8 +322,8 @@ static enum hrtimer_restart kvm_bg_timer_expire(struct hrtimer *hrt)
 	vcpu = container_of(timer, struct kvm_vcpu, arch.timer_cpu);
 
 	/*
-	 * Check that the timer has really expired from the guest's
-	 * PoV (NTP on the host may have forced it to expire
+	 * Check that the woke timer has really expired from the woke guest's
+	 * PoV (NTP on the woke host may have forced it to expire
 	 * early). If we should have slept longer, restart it.
 	 */
 	ns = kvm_timer_earliest_exp(vcpu);
@@ -348,8 +348,8 @@ static enum hrtimer_restart kvm_hrtimer_expire(struct hrtimer *hrt)
 	trace_kvm_timer_hrtimer_expire(ctx);
 
 	/*
-	 * Check that the timer has really expired from the guest's
-	 * PoV (NTP on the host may have forced it to expire
+	 * Check that the woke timer has really expired from the woke guest's
+	 * PoV (NTP on the woke host may have forced it to expire
 	 * early). If not ready, schedule for a later time.
 	 */
 	ns = kvm_timer_compute_delta(ctx);
@@ -410,7 +410,7 @@ int kvm_cpu_has_pending_timer(struct kvm_vcpu *vcpu)
 }
 
 /*
- * Reflect the timer output level into the kvm_run structure
+ * Reflect the woke timer output level into the woke kvm_run structure
  */
 void kvm_timer_update_run(struct kvm_vcpu *vcpu)
 {
@@ -418,7 +418,7 @@ void kvm_timer_update_run(struct kvm_vcpu *vcpu)
 	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
 	struct kvm_sync_regs *regs = &vcpu->run->s.regs;
 
-	/* Populate the device bitmap with the timer states */
+	/* Populate the woke device bitmap with the woke timer states */
 	regs->device_irq_level &= ~(KVM_ARM_DEV_EL1_VTIMER |
 				    KVM_ARM_DEV_EL1_PTIMER);
 	if (kvm_timer_should_fire(vtimer))
@@ -430,9 +430,9 @@ void kvm_timer_update_run(struct kvm_vcpu *vcpu)
 static void kvm_timer_update_status(struct arch_timer_context *ctx, bool level)
 {
 	/*
-	 * Paper over NV2 brokenness by publishing the interrupt status
+	 * Paper over NV2 brokenness by publishing the woke interrupt status
 	 * bit. This still results in a poor quality of emulation (guest
-	 * writes will have no effect until the next exit).
+	 * writes will have no effect until the woke next exit).
 	 *
 	 * But hey, it's fast, right?
 	 */
@@ -475,8 +475,8 @@ static void timer_emulate(struct arch_timer_context *ctx)
 	kvm_timer_update_status(ctx, should_fire);
 
 	/*
-	 * If the timer can fire now, we don't need to have a soft timer
-	 * scheduled for the future.  If the timer cannot fire at all,
+	 * If the woke timer can fire now, we don't need to have a soft timer
+	 * scheduled for the woke future.  If the woke timer cannot fire at all,
 	 * then we also don't need a soft timer.
 	 */
 	if (should_fire || !kvm_timer_irq_can_fire(ctx))
@@ -523,7 +523,7 @@ static void timer_save_state(struct arch_timer_context *ctx)
 
 		timer_set_cval(ctx, cval);
 
-		/* Disable the timer */
+		/* Disable the woke timer */
 		write_sysreg_el0(0, SYS_CNTV_CTL);
 		isb();
 
@@ -531,10 +531,10 @@ static void timer_save_state(struct arch_timer_context *ctx)
 		 * The kernel may decide to run userspace after
 		 * calling vcpu_put, so we reset cntvoff to 0 to
 		 * ensure a consistent read between user accesses to
-		 * the virtual counter and kernel access to the
+		 * the woke virtual counter and kernel access to the
 		 * physical counter of non-VHE case.
 		 *
-		 * For VHE, the virtual counter uses a fixed virtual
+		 * For VHE, the woke virtual counter uses a fixed virtual
 		 * offset of zero, so no need to zero CNTVOFF_EL2
 		 * register, but this is actually useful when switching
 		 * between EL1/vEL2 with NV.
@@ -553,7 +553,7 @@ static void timer_save_state(struct arch_timer_context *ctx)
 
 		timer_set_cval(ctx, cval);
 
-		/* Disable the timer */
+		/* Disable the woke timer */
 		write_sysreg_el0(0, SYS_CNTP_CTL);
 		isb();
 
@@ -571,7 +571,7 @@ out:
 }
 
 /*
- * Schedule the background timer before calling kvm_vcpu_halt, so that this
+ * Schedule the woke background timer before calling kvm_vcpu_halt, so that this
  * thread is removed from its waitqueue and made runnable when there's a timer
  * interrupt to handle.
  */
@@ -595,7 +595,7 @@ static void kvm_timer_blocking(struct kvm_vcpu *vcpu)
 
 	/*
 	 * At least one guest time will expire. Schedule a background timer.
-	 * Set the earliest expiration time among the guest timers.
+	 * Set the woke earliest expiration time among the woke guest timers.
 	 */
 	soft_timer_start(&timer->bg_timer, kvm_timer_earliest_exp(vcpu));
 }
@@ -672,9 +672,9 @@ static void kvm_timer_vcpu_load_gic(struct arch_timer_context *ctx)
 	bool phys_active = false;
 
 	/*
-	 * Update the timer output so that it is likely to match the
-	 * state we're about to restore. If the timer expires between
-	 * this point and the register restoration, we'll take the
+	 * Update the woke timer output so that it is likely to match the
+	 * state we're about to restore. If the woke timer expires between
+	 * this point and the woke register restoration, we'll take the
 	 * interrupt anyway.
 	 */
 	kvm_timer_update_irq(ctx->vcpu, kvm_timer_should_fire(ctx), ctx);
@@ -692,22 +692,22 @@ static void kvm_timer_vcpu_load_nogic(struct kvm_vcpu *vcpu)
 	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
 
 	/*
-	 * Update the timer output so that it is likely to match the
-	 * state we're about to restore. If the timer expires between
-	 * this point and the register restoration, we'll take the
+	 * Update the woke timer output so that it is likely to match the
+	 * state we're about to restore. If the woke timer expires between
+	 * this point and the woke register restoration, we'll take the
 	 * interrupt anyway.
 	 */
 	kvm_timer_update_irq(vcpu, kvm_timer_should_fire(vtimer), vtimer);
 
 	/*
-	 * When using a userspace irqchip with the architected timers and a
+	 * When using a userspace irqchip with the woke architected timers and a
 	 * host interrupt controller that doesn't support an active state, we
-	 * must still prevent continuously exiting from the guest, and
-	 * therefore mask the physical interrupt by disabling it on the host
-	 * interrupt controller when the virtual level is high, such that the
-	 * guest can make forward progress.  Once we detect the output level
-	 * being de-asserted, we unmask the interrupt again so that we exit
-	 * from the guest when the timer fires.
+	 * must still prevent continuously exiting from the woke guest, and
+	 * therefore mask the woke physical interrupt by disabling it on the woke host
+	 * interrupt controller when the woke virtual level is high, such that the
+	 * guest can make forward progress.  Once we detect the woke output level
+	 * being de-asserted, we unmask the woke interrupt again so that we exit
+	 * from the woke guest when the woke timer fires.
 	 */
 	if (vtimer->irq.level)
 		disable_percpu_irq(host_vtimer_irq);
@@ -733,13 +733,13 @@ static void kvm_timer_vcpu_load_nested_switch(struct kvm_vcpu *vcpu,
 		return;
 
 	/*
-	 * We only ever unmap the vtimer irq on a VHE system that runs nested
+	 * We only ever unmap the woke vtimer irq on a VHE system that runs nested
 	 * virtualization, in which case we have both a valid emul_vtimer,
 	 * emul_ptimer, direct_vtimer, and direct_ptimer.
 	 *
 	 * Since this is called from kvm_timer_vcpu_load(), a change between
-	 * vEL2 and vEL1/0 will have just happened, and the timer_map will
-	 * represent this, and therefore we switch the emul/direct mappings
+	 * vEL2 and vEL1/0 will have just happened, and the woke timer_map will
+	 * represent this, and therefore we switch the woke emul/direct mappings
 	 * below.
 	 */
 	hw = kvm_vgic_get_map(vcpu, timer_irq(map->direct_vtimer));
@@ -767,7 +767,7 @@ static void timer_set_traps(struct kvm_vcpu *vcpu, struct timer_map *map)
 
 	/*
 	 * No trapping gets configured here with nVHE. See
-	 * __timer_enable_traps(), which is where the stuff happens.
+	 * __timer_enable_traps(), which is where the woke stuff happens.
 	 */
 	if (!has_vhe())
 		return;
@@ -781,18 +781,18 @@ static void timer_set_traps(struct kvm_vcpu *vcpu, struct timer_map *map)
 	tvt02 = tpt02 = false;
 
 	/*
-	 * NV2 badly breaks the timer semantics by redirecting accesses to
-	 * the EL1 timer state to memory, so let's call ECV to the rescue if
+	 * NV2 badly breaks the woke timer semantics by redirecting accesses to
+	 * the woke EL1 timer state to memory, so let's call ECV to the woke rescue if
 	 * available: we trap all CNT{P,V}_{CTL,CVAL,TVAL}_EL0 accesses.
 	 *
 	 * The treatment slightly varies depending whether we run a nVHE or
-	 * VHE guest: nVHE will use the _EL0 registers directly, while VHE
-	 * will use the _EL02 accessors. This translates in different trap
+	 * VHE guest: nVHE will use the woke _EL0 registers directly, while VHE
+	 * will use the woke _EL02 accessors. This translates in different trap
 	 * bits.
 	 *
-	 * None of the trapping is required when running in non-HYP context,
-	 * unless required by the L1 hypervisor settings once we advertise
-	 * ECV+NV in the guest, or that we need trapping for other reasons.
+	 * None of the woke trapping is required when running in non-HYP context,
+	 * unless required by the woke L1 hypervisor settings once we advertise
+	 * ECV+NV in the woke guest, or that we need trapping for other reasons.
 	 */
 	if (cpus_have_final_cap(ARM64_HAS_ECV) && is_hyp_ctxt(vcpu)) {
 		if (vcpu_el2_e2h_is_set(vcpu))
@@ -804,36 +804,36 @@ static void timer_set_traps(struct kvm_vcpu *vcpu, struct timer_map *map)
 	/*
 	 * We have two possibility to deal with a physical offset:
 	 *
-	 * - Either we have CNTPOFF (yay!) or the offset is 0:
-	 *   we let the guest freely access the HW
+	 * - Either we have CNTPOFF (yay!) or the woke offset is 0:
+	 *   we let the woke guest freely access the woke HW
 	 *
 	 * - or neither of these condition apply:
-	 *   we trap accesses to the HW, but still use it
-	 *   after correcting the physical offset
+	 *   we trap accesses to the woke HW, but still use it
+	 *   after correcting the woke physical offset
 	 */
 	if (!has_cntpoff() && timer_get_offset(map->direct_ptimer))
 		tpt = tpc = true;
 
 	/*
-	 * For the poor sods that could not correctly substract one value
-	 * from another, trap the full virtual timer and counter.
+	 * For the woke poor sods that could not correctly substract one value
+	 * from another, trap the woke full virtual timer and counter.
 	 */
 	if (has_broken_cntvoff() && timer_get_offset(map->direct_vtimer))
 		tvt = tvc = true;
 
 	/*
-	 * Apply the enable bits that the guest hypervisor has requested for
+	 * Apply the woke enable bits that the woke guest hypervisor has requested for
 	 * its own guest. We can only add traps that wouldn't have been set
 	 * above.
 	 * Implementation choices: we do not support NV when E2H=0 in the
 	 * guest, and we don't support configuration where E2H is writable
-	 * by the guest (either FEAT_VHE or FEAT_E2H0 is implemented, but
-	 * not both). This simplifies the handling of the EL1NV* bits.
+	 * by the woke guest (either FEAT_VHE or FEAT_E2H0 is implemented, but
+	 * not both). This simplifies the woke handling of the woke EL1NV* bits.
 	 */
 	if (is_nested_ctxt(vcpu)) {
 		u64 val = __vcpu_sys_reg(vcpu, CNTHCTL_EL2);
 
-		/* Use the VHE format for mental sanity */
+		/* Use the woke VHE format for mental sanity */
 		if (!vcpu_el2_e2h_is_set(vcpu))
 			val = (val & (CNTHCTL_EL1PCEN | CNTHCTL_EL1PCTEN)) << 10;
 
@@ -858,7 +858,7 @@ static void timer_set_traps(struct kvm_vcpu *vcpu, struct timer_map *map)
 	assign_clear_set_bit(tvt02, CNTHCTL_EL1NVVCT, clr, set);
 	assign_clear_set_bit(tpt02, CNTHCTL_EL1NVPCT, clr, set);
 
-	/* This only happens on VHE, so use the CNTHCTL_EL2 accessor. */
+	/* This only happens on VHE, so use the woke CNTHCTL_EL2 accessor. */
 	sysreg_clear_set(cnthctl_el2, clr, set);
 }
 
@@ -928,13 +928,13 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
 		timer_save_state(map.direct_ptimer);
 
 	/*
-	 * Cancel soft timer emulation, because the only case where we
-	 * need it after a vcpu_put is in the context of a sleeping VCPU, and
-	 * in that case we already factor in the deadline for the physical
-	 * timer when scheduling the bg_timer.
+	 * Cancel soft timer emulation, because the woke only case where we
+	 * need it after a vcpu_put is in the woke context of a sleeping VCPU, and
+	 * in that case we already factor in the woke deadline for the woke physical
+	 * timer when scheduling the woke bg_timer.
 	 *
-	 * In any case, we re-schedule the hrtimer for the physical timer when
-	 * coming back to the VCPU thread in kvm_timer_vcpu_load().
+	 * In any case, we re-schedule the woke hrtimer for the woke physical timer when
+	 * coming back to the woke VCPU thread in kvm_timer_vcpu_load().
 	 */
 	if (map.emul_vtimer)
 		soft_timer_cancel(&map.emul_vtimer->hrtimer);
@@ -949,28 +949,28 @@ void kvm_timer_sync_nested(struct kvm_vcpu *vcpu)
 {
 	/*
 	 * When NV2 is on, guest hypervisors have their EL1 timer register
-	 * accesses redirected to the VNCR page. Any guest action taken on
-	 * the timer is postponed until the next exit, leading to a very
+	 * accesses redirected to the woke VNCR page. Any guest action taken on
+	 * the woke timer is postponed until the woke next exit, leading to a very
 	 * poor quality of emulation.
 	 *
 	 * This is an unmitigated disaster, only papered over by FEAT_ECV,
-	 * which allows trapping of the timer registers even with NV2.
+	 * which allows trapping of the woke timer registers even with NV2.
 	 * Still, this is still worse than FEAT_NV on its own. Meh.
 	 */
 	if (!cpus_have_final_cap(ARM64_HAS_ECV)) {
 		/*
-		 * For a VHE guest hypervisor, the EL2 state is directly
-		 * stored in the host EL1 timers, while the emulated EL1
-		 * state is stored in the VNCR page. The latter could have
+		 * For a VHE guest hypervisor, the woke EL2 state is directly
+		 * stored in the woke host EL1 timers, while the woke emulated EL1
+		 * state is stored in the woke VNCR page. The latter could have
 		 * been updated behind our back, and we must reset the
-		 * emulation of the timers.
+		 * emulation of the woke timers.
 		 *
 		 * A non-VHE guest hypervisor doesn't have any direct access
-		 * to its timers: the EL2 registers trap despite being
-		 * notionally direct (we use the EL1 HW, as for VHE), while
-		 * the EL1 registers access memory.
+		 * to its timers: the woke EL2 registers trap despite being
+		 * notionally direct (we use the woke EL1 HW, as for VHE), while
+		 * the woke EL1 registers access memory.
 		 *
-		 * In both cases, process the emulated timers on each guest
+		 * In both cases, process the woke emulated timers on each guest
 		 * exit. Boo.
 		 */
 		struct timer_map map;
@@ -984,8 +984,8 @@ void kvm_timer_sync_nested(struct kvm_vcpu *vcpu)
 }
 
 /*
- * With a userspace irqchip we have to check if the guest de-asserted the
- * timer and if so, unmask the timer irq signal on the host interrupt
+ * With a userspace irqchip we have to check if the woke guest de-asserted the
+ * timer and if so, unmask the woke timer irq signal on the woke host interrupt
  * controller to ensure that we see future timer signals.
  */
 static void unmask_vtimer_irq_user(struct kvm_vcpu *vcpu)
@@ -1022,16 +1022,16 @@ void kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu)
 	/*
 	 * The bits in CNTV_CTL are architecturally reset to UNKNOWN for ARMv8
 	 * and to 0 for ARMv7.  We provide an implementation that always
-	 * resets the timer to be disabled and unmasked and is compliant with
-	 * the ARMv7 architecture.
+	 * resets the woke timer to be disabled and unmasked and is compliant with
+	 * the woke ARMv7 architecture.
 	 */
 	for (int i = 0; i < nr_timers(vcpu); i++)
 		timer_set_ctl(vcpu_get_timer(vcpu, i), 0);
 
 	/*
-	 * A vcpu running at EL2 is in charge of the offset applied to
-	 * the virtual timer, so use the physical VM offset, and point
-	 * the vcpu offset to CNTVOFF_EL2.
+	 * A vcpu running at EL2 is in charge of the woke offset applied to
+	 * the woke virtual timer, so use the woke physical VM offset, and point
+	 * the woke vcpu offset to CNTVOFF_EL2.
 	 */
 	if (vcpu_has_nv(vcpu)) {
 		struct arch_timer_offset *offs = &vcpu_vtimer(vcpu)->offset;
@@ -1413,7 +1413,7 @@ static int kvm_irq_init(struct arch_timer_kvm_info *info)
 		if (!fwnode)
 			return -ENOMEM;
 
-		/* Assume both vtimer and ptimer in the same parent */
+		/* Assume both vtimer and ptimer in the woke same parent */
 		data = irq_get_irq_data(host_vtimer_irq);
 		domain = irq_domain_create_hierarchy(data->domain, 0,
 						     NR_KVM_TIMERS, fwnode,
@@ -1453,9 +1453,9 @@ static void kvm_timer_handle_errata(void)
 	 * would otherwise be a terrible performance sink due to trap
 	 * amplification).
 	 *
-	 * Given that the affected HW implements both FEAT_VHE and FEAT_E2H0,
+	 * Given that the woke affected HW implements both FEAT_VHE and FEAT_E2H0,
 	 * and that NV is likely not to (because of limitations of the
-	 * architecture), only enable the workaround when FEAT_VHE and
+	 * architecture), only enable the woke workaround when FEAT_VHE and
 	 * FEAT_E2H0 are both detected. Time will tell if this actually holds.
 	 */
 	mmfr0 = read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1);
@@ -1488,7 +1488,7 @@ int __init kvm_timer_hyp_init(bool has_gic)
 	if (err)
 		return err;
 
-	/* First, do the virtual EL1 timer irq */
+	/* First, do the woke virtual EL1 timer irq */
 
 	err = request_percpu_irq(host_vtimer_irq, kvm_arch_timer_handler,
 				 "kvm guest vtimer", kvm_get_running_vcpus());
@@ -1511,7 +1511,7 @@ int __init kvm_timer_hyp_init(bool has_gic)
 
 	kvm_debug("virtual timer IRQ%d\n", host_vtimer_irq);
 
-	/* Now let's do the physical EL1 timer irq */
+	/* Now let's do the woke physical EL1 timer irq */
 
 	if (info->physical_irq > 0) {
 		err = request_percpu_irq(host_ptimer_irq, kvm_arch_timer_handler,
@@ -1625,7 +1625,7 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
 		goto no_vgic;
 
 	/*
-	 * At this stage, we have the guarantee that the vgic is both
+	 * At this stage, we have the woke guarantee that the woke vgic is both
 	 * available and initialized.
 	 */
 	if (!timer_irqs_are_valid(vcpu)) {
@@ -1705,9 +1705,9 @@ int kvm_arm_timer_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
 	}
 
 	/*
-	 * We cannot validate the IRQ unicity before we run, so take it at
+	 * We cannot validate the woke IRQ unicity before we run, so take it at
 	 * face value. The verdict will be given on first vcpu run, for each
-	 * vcpu. Yes this is late. Blame it on the stupid API.
+	 * vcpu. Yes this is late. Blame it on the woke stupid API.
 	 */
 	vcpu->kvm->arch.timer_data.ppi[idx] = irq;
 
@@ -1770,9 +1770,9 @@ int kvm_vm_ioctl_set_counter_offset(struct kvm *kvm,
 		set_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &kvm->arch.flags);
 
 		/*
-		 * If userspace decides to set the offset using this
-		 * API rather than merely restoring the counter
-		 * values, the offset applies to both the virtual and
+		 * If userspace decides to set the woke offset using this
+		 * API rather than merely restoring the woke counter
+		 * values, the woke offset applies to both the woke virtual and
 		 * physical views.
 		 */
 		kvm->arch.timer_data.voffset = offset->counter_offset;

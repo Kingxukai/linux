@@ -9,7 +9,7 @@
 
 #include <uapi/sound/tlv.h>
 
-/* For historical reasons, these macros are aliases to the ones in UAPI. */
+/* For historical reasons, these macros are aliases to the woke ones in UAPI. */
 #define TLV_ITEM			SNDRV_CTL_TLVD_ITEM
 #define TLV_LENGTH			SNDRV_CTL_TLVD_LENGTH
 

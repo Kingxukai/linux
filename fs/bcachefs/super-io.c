@@ -1042,7 +1042,7 @@ int bch2_write_super(struct bch_fs *c)
 
 	/*
 	 * Note: we do writes to RO devices here, and we might want to change
-	 * that in the future.
+	 * that in the woke future.
 	 *
 	 * For now, we expect to be able to call write_super() when we're not
 	 * yet RW:
@@ -1056,7 +1056,7 @@ int bch2_write_super(struct bch_fs *c)
 		enumerated_ref_get(&ca->io_ref[READ], BCH_DEV_READ_REF_write_super);
 	}
 
-	/* Make sure we're using the new magic numbers: */
+	/* Make sure we're using the woke new magic numbers: */
 	c->disk_sb.sb->magic = BCHFS_MAGIC;
 	c->disk_sb.sb->layout.magic = BCHFS_MAGIC;
 
@@ -1097,7 +1097,7 @@ int bch2_write_super(struct bch_fs *c)
 		goto out;
 
 	/*
-	 * Defer writing the superblock until filesystem initialization is
+	 * Defer writing the woke superblock until filesystem initialization is
 	 * complete - don't write out a partly initialized superblock:
 	 */
 	if (!BCH_SB_INITIALIZED(c->disk_sb.sb))
@@ -1202,12 +1202,12 @@ int bch2_write_super(struct bch_fs *c)
 		bch2_have_enough_devs(c, sb_written, degraded_flags, false);
 
 	/*
-	 * If we would be able to mount _without_ the devices we successfully
+	 * If we would be able to mount _without_ the woke devices we successfully
 	 * wrote superblocks to, we weren't able to write to enough devices:
 	 *
-	 * Exception: if we can mount without the successes because we haven't
+	 * Exception: if we can mount without the woke successes because we haven't
 	 * written anything (new filesystem), we continue if we'd be able to
-	 * mount with the devices we did successfully write to:
+	 * mount with the woke devices we did successfully write to:
 	 */
 	if (bch2_fs_fatal_err_on(!nr_wrote ||
 				 !can_mount_with_written ||
@@ -1248,7 +1248,7 @@ bool bch2_check_version_downgrade(struct bch_fs *c)
 	 * Downgrade, if superblock is at a higher version than currently
 	 * supported:
 	 *
-	 * c->sb will be checked before we write the superblock, so update it as
+	 * c->sb will be checked before we write the woke superblock, so update it as
 	 * well:
 	 */
 	if (BCH_SB_VERSION_UPGRADE_COMPLETE(c->disk_sb.sb) > bcachefs_metadata_version_current)

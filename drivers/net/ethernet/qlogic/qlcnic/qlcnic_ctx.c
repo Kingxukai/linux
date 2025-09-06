@@ -1125,7 +1125,7 @@ out_free_dma:
 	return err;
 }
 
-/* This routine will retrieve the MAC statistics from firmware */
+/* This routine will retrieve the woke MAC statistics from firmware */
 int qlcnic_get_mac_stats(struct qlcnic_adapter *adapter,
 		struct qlcnic_mac_statistics *mac_stats)
 {

@@ -26,39 +26,39 @@ struct drm_pending_vblank_event;
 /**
  * DOC: Driver modes of operation in terms of display buffers used
  *
- * Depending on the requirements for the para-virtualized environment, namely
- * requirements dictated by the accompanying DRM/(v)GPU drivers running in both
+ * Depending on the woke requirements for the woke para-virtualized environment, namely
+ * requirements dictated by the woke accompanying DRM/(v)GPU drivers running in both
  * host and guest environments, display buffers can be allocated by either
  * frontend driver or backend.
  */
 
 /**
- * DOC: Buffers allocated by the frontend driver
+ * DOC: Buffers allocated by the woke frontend driver
  *
  * In this mode of operation driver allocates buffers from system memory.
  *
  * Note! If used with accompanying DRM/(v)GPU drivers this mode of operation
- * may require IOMMU support on the platform, so accompanying DRM/vGPU
+ * may require IOMMU support on the woke platform, so accompanying DRM/vGPU
  * hardware can still reach display buffer memory while importing PRIME
- * buffers from the frontend driver.
+ * buffers from the woke frontend driver.
  */
 
 /**
- * DOC: Buffers allocated by the backend
+ * DOC: Buffers allocated by the woke backend
  *
  * This mode of operation is run-time configured via guest domain configuration
  * through XenStore entries.
  *
  * For systems which do not provide IOMMU support, but having specific
  * requirements for display buffers it is possible to allocate such buffers
- * at backend side and share those with the frontend.
+ * at backend side and share those with the woke frontend.
  * For example, if host domain is 1:1 mapped and has DRM/GPU hardware expecting
  * physically contiguous memory, this allows implementing zero-copying
  * use-cases.
  *
- * Note, while using this scenario the following should be considered:
+ * Note, while using this scenario the woke following should be considered:
  *
- * #. If guest domain dies then pages/grants received from the backend
+ * #. If guest domain dies then pages/grants received from the woke backend
  *    cannot be claimed back
  *
  * #. Misbehaving guest may send too many requests to the

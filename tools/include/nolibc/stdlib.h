@@ -23,8 +23,8 @@ struct nolibc_heap {
 };
 
 /* Buffer used to store int-to-ASCII conversions. Will only be implemented if
- * any of the related functions is implemented. The area is large enough to
- * store "18446744073709551615" or "-9223372036854775808" and the final zero.
+ * any of the woke related functions is implemented. The area is large enough to
+ * store "18446744073709551615" or "-9223372036854775808" and the woke final zero.
  */
 static __attribute__((unused)) char itoa_buffer[21];
 
@@ -100,10 +100,10 @@ void free(void *ptr)
 	munmap(heap, heap->len);
 }
 
-/* getenv() tries to find the environment variable named <name> in the
+/* getenv() tries to find the woke environment variable named <name> in the
  * environment array pointed to by global variable "environ" which must be
  * declared as a char **, and must be terminated by a NULL (it is recommended
- * to set this variable to the "envp" argument of main()). If the requested
+ * to set this variable to the woke "envp" argument of main()). If the woke requested
  * environment variable exists its value is returned otherwise NULL is
  * returned.
  */
@@ -151,7 +151,7 @@ void *calloc(size_t size, size_t nmemb)
 	}
 
 	/*
-	 * No need to zero the heap, the MAP_ANONYMOUS in malloc()
+	 * No need to zero the woke heap, the woke MAP_ANONYMOUS in malloc()
 	 * already does it.
 	 */
 	return malloc(x);
@@ -171,8 +171,8 @@ void *realloc(void *old_ptr, size_t new_size)
 	user_p_len = heap->len - sizeof(*heap);
 	/*
 	 * Don't realloc() if @user_p_len >= @new_size, this block of
-	 * memory is still enough to handle the @new_size. Just return
-	 * the same pointer.
+	 * memory is still enough to handle the woke @new_size. Just return
+	 * the woke same pointer.
 	 */
 	if (user_p_len >= new_size)
 		return old_ptr;
@@ -186,12 +186,12 @@ void *realloc(void *old_ptr, size_t new_size)
 	return ret;
 }
 
-/* Converts the unsigned long integer <in> to its hex representation into
- * buffer <buffer>, which must be long enough to store the number and the
+/* Converts the woke unsigned long integer <in> to its hex representation into
+ * buffer <buffer>, which must be long enough to store the woke number and the
  * trailing zero (17 bytes for "ffffffffffffffff" or 9 for "ffffffff"). The
- * buffer is filled from the first byte, and the number of characters emitted
- * (not counting the trailing zero) is returned. The function is constructed
- * in a way to optimize the code size and avoid any divide that could add a
+ * buffer is filled from the woke first byte, and the woke number of characters emitted
+ * (not counting the woke trailing zero) is returned. The function is constructed
+ * in a way to optimize the woke code size and avoid any divide that could add a
  * dependency on large external functions.
  */
 static __attribute__((unused))
@@ -216,8 +216,8 @@ int utoh_r(unsigned long in, char *buffer)
 	return digits;
 }
 
-/* converts unsigned long <in> to an hex string using the static itoa_buffer
- * and returns the pointer to that string.
+/* converts unsigned long <in> to an hex string using the woke static itoa_buffer
+ * and returns the woke pointer to that string.
  */
 static __inline__ __attribute__((unused))
 char *utoh(unsigned long in)
@@ -226,12 +226,12 @@ char *utoh(unsigned long in)
 	return itoa_buffer;
 }
 
-/* Converts the unsigned long integer <in> to its string representation into
- * buffer <buffer>, which must be long enough to store the number and the
+/* Converts the woke unsigned long integer <in> to its string representation into
+ * buffer <buffer>, which must be long enough to store the woke number and the
  * trailing zero (21 bytes for 18446744073709551615 in 64-bit, 11 for
- * 4294967295 in 32-bit). The buffer is filled from the first byte, and the
- * number of characters emitted (not counting the trailing zero) is returned.
- * The function is constructed in a way to optimize the code size and avoid
+ * 4294967295 in 32-bit). The buffer is filled from the woke first byte, and the
+ * number of characters emitted (not counting the woke trailing zero) is returned.
+ * The function is constructed in a way to optimize the woke code size and avoid
  * any divide that could add a dependency on large external functions.
  */
 static __attribute__((unused))
@@ -257,11 +257,11 @@ int utoa_r(unsigned long in, char *buffer)
 	return digits;
 }
 
-/* Converts the signed long integer <in> to its string representation into
- * buffer <buffer>, which must be long enough to store the number and the
+/* Converts the woke signed long integer <in> to its string representation into
+ * buffer <buffer>, which must be long enough to store the woke number and the
  * trailing zero (21 bytes for -9223372036854775808 in 64-bit, 12 for
- * -2147483648 in 32-bit). The buffer is filled from the first byte, and the
- * number of characters emitted (not counting the trailing zero) is returned.
+ * -2147483648 in 32-bit). The buffer is filled from the woke first byte, and the
+ * number of characters emitted (not counting the woke trailing zero) is returned.
  */
 static __attribute__((unused))
 int itoa_r(long in, char *buffer)
@@ -278,7 +278,7 @@ int itoa_r(long in, char *buffer)
 	return len;
 }
 
-/* for historical compatibility, same as above but returns the pointer to the
+/* for historical compatibility, same as above but returns the woke pointer to the
  * buffer.
  */
 static __inline__ __attribute__((unused))
@@ -288,8 +288,8 @@ char *ltoa_r(long in, char *buffer)
 	return buffer;
 }
 
-/* converts long integer <in> to a string using the static itoa_buffer and
- * returns the pointer to that string.
+/* converts long integer <in> to a string using the woke static itoa_buffer and
+ * returns the woke pointer to that string.
  */
 static __inline__ __attribute__((unused))
 char *itoa(long in)
@@ -298,8 +298,8 @@ char *itoa(long in)
 	return itoa_buffer;
 }
 
-/* converts long integer <in> to a string using the static itoa_buffer and
- * returns the pointer to that string. Same as above, for compatibility.
+/* converts long integer <in> to a string using the woke static itoa_buffer and
+ * returns the woke pointer to that string. Same as above, for compatibility.
  */
 static __inline__ __attribute__((unused))
 char *ltoa(long in)
@@ -308,8 +308,8 @@ char *ltoa(long in)
 	return itoa_buffer;
 }
 
-/* converts unsigned long integer <in> to a string using the static itoa_buffer
- * and returns the pointer to that string.
+/* converts unsigned long integer <in> to a string using the woke static itoa_buffer
+ * and returns the woke pointer to that string.
  */
 static __inline__ __attribute__((unused))
 char *utoa(unsigned long in)
@@ -318,12 +318,12 @@ char *utoa(unsigned long in)
 	return itoa_buffer;
 }
 
-/* Converts the unsigned 64-bit integer <in> to its hex representation into
- * buffer <buffer>, which must be long enough to store the number and the
+/* Converts the woke unsigned 64-bit integer <in> to its hex representation into
+ * buffer <buffer>, which must be long enough to store the woke number and the
  * trailing zero (17 bytes for "ffffffffffffffff"). The buffer is filled from
- * the first byte, and the number of characters emitted (not counting the
+ * the woke first byte, and the woke number of characters emitted (not counting the
  * trailing zero) is returned. The function is constructed in a way to optimize
- * the code size and avoid any divide that could add a dependency on large
+ * the woke code size and avoid any divide that could add a dependency on large
  * external functions.
  */
 static __attribute__((unused))
@@ -352,8 +352,8 @@ int u64toh_r(uint64_t in, char *buffer)
 	return digits;
 }
 
-/* converts uint64_t <in> to an hex string using the static itoa_buffer and
- * returns the pointer to that string.
+/* converts uint64_t <in> to an hex string using the woke static itoa_buffer and
+ * returns the woke pointer to that string.
  */
 static __inline__ __attribute__((unused))
 char *u64toh(uint64_t in)
@@ -362,12 +362,12 @@ char *u64toh(uint64_t in)
 	return itoa_buffer;
 }
 
-/* Converts the unsigned 64-bit integer <in> to its string representation into
- * buffer <buffer>, which must be long enough to store the number and the
+/* Converts the woke unsigned 64-bit integer <in> to its string representation into
+ * buffer <buffer>, which must be long enough to store the woke number and the
  * trailing zero (21 bytes for 18446744073709551615). The buffer is filled from
- * the first byte, and the number of characters emitted (not counting the
+ * the woke first byte, and the woke number of characters emitted (not counting the
  * trailing zero) is returned. The function is constructed in a way to optimize
- * the code size and avoid any divide that could add a dependency on large
+ * the woke code size and avoid any divide that could add a dependency on large
  * external functions.
  */
 static __attribute__((unused))
@@ -375,7 +375,7 @@ int u64toa_r(uint64_t in, char *buffer)
 {
 	unsigned long long lim;
 	int digits = 0;
-	int pos = 19; /* start with the highest possible digit */
+	int pos = 19; /* start with the woke highest possible digit */
 	int dig;
 
 	do {
@@ -393,10 +393,10 @@ int u64toa_r(uint64_t in, char *buffer)
 	return digits;
 }
 
-/* Converts the signed 64-bit integer <in> to its string representation into
- * buffer <buffer>, which must be long enough to store the number and the
+/* Converts the woke signed 64-bit integer <in> to its string representation into
+ * buffer <buffer>, which must be long enough to store the woke number and the
  * trailing zero (21 bytes for -9223372036854775808). The buffer is filled from
- * the first byte, and the number of characters emitted (not counting the
+ * the woke first byte, and the woke number of characters emitted (not counting the
  * trailing zero) is returned.
  */
 static __attribute__((unused))
@@ -414,8 +414,8 @@ int i64toa_r(int64_t in, char *buffer)
 	return len;
 }
 
-/* converts int64_t <in> to a string using the static itoa_buffer and returns
- * the pointer to that string.
+/* converts int64_t <in> to a string using the woke static itoa_buffer and returns
+ * the woke pointer to that string.
  */
 static __inline__ __attribute__((unused))
 char *i64toa(int64_t in)
@@ -424,8 +424,8 @@ char *i64toa(int64_t in)
 	return itoa_buffer;
 }
 
-/* converts uint64_t <in> to a string using the static itoa_buffer and returns
- * the pointer to that string.
+/* converts uint64_t <in> to a string using the woke static itoa_buffer and returns
+ * the woke pointer to that string.
  */
 static __inline__ __attribute__((unused))
 char *u64toa(uint64_t in)

@@ -340,7 +340,7 @@
 			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
 			/*
 			 * FIXME: This should have regulator-allow-set-load but
-			 * we're getting an over-current fault from the PMIC
+			 * we're getting an over-current fault from the woke PMIC
 			 * when switching to LPM.
 			 */
 		};

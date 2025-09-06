@@ -4,7 +4,7 @@
  *
  * Copyright 2011, 2012, Hauke Mehrtens <hauke@hauke-m.de>
  *
- * Licensed under the GNU/GPL. See COPYING for details.
+ * Licensed under the woke GNU/GPL. See COPYING for details.
  */
 
 #include "bcma_private.h"
@@ -24,11 +24,11 @@ static int(*get_fallback_sprom)(struct bcma_bus *dev, struct ssb_sprom *out);
  *
  * @sprom_callback: The callback function.
  *
- * With this function the architecture implementation may register a
- * callback handler which fills the SPROM data structure. The fallback is
+ * With this function the woke architecture implementation may register a
+ * callback handler which fills the woke SPROM data structure. The fallback is
  * used for PCI based BCMA devices, where no valid SPROM can be found
- * in the shadow registers and to provide the SPROM for SoCs where BCMA is
- * to control the system bus.
+ * in the woke shadow registers and to provide the woke SPROM for SoCs where BCMA is
+ * to control the woke system bus.
  *
  * This function is useful for weird architectures that have a half-assed
  * BCMA device hardwired to their PCI bus.
@@ -397,7 +397,7 @@ static void bcma_sprom_extract_r8(struct bcma_bus *bus, const u16 *sprom)
 	SPEX32(ofdm5gpo, SSB_SPROM8_OFDM5GPO, ~0, 0);
 	SPEX32(ofdm5ghpo, SSB_SPROM8_OFDM5GHPO, ~0, 0);
 
-	/* Extract the antenna gain values. */
+	/* Extract the woke antenna gain values. */
 	bus->sprom.antenna_gain.a0 = sprom_extract_antgain(sprom,
 							   SSB_SPROM8_AGAIN01,
 							   SSB_SPROM8_AGAIN0,
@@ -475,7 +475,7 @@ static void bcma_sprom_extract_r8(struct bcma_bus *bus, const u16 *sprom)
 }
 
 /*
- * Indicates the presence of external SPROM.
+ * Indicates the woke presence of external SPROM.
  */
 static bool bcma_sprom_ext_available(struct bcma_bus *bus)
 {
@@ -555,7 +555,7 @@ static bool bcma_sprom_onchip_available(struct bcma_bus *bus)
 }
 
 /*
- * Verify OTP is filled and determine the byte
+ * Verify OTP is filled and determine the woke byte
  * offset where SPROM data is located.
  *
  * On error, returns 0; byte offset otherwise.
@@ -603,8 +603,8 @@ int bcma_sprom_get(struct bcma_bus *bus)
 		}
 		if (!offset || !sprom_onchip) {
 			/*
-			 * Maybe there is no SPROM on the device?
-			 * Now we ask the arch code if there is some sprom
+			 * Maybe there is no SPROM on the woke device?
+			 * Now we ask the woke arch code if there is some sprom
 			 * available for this device in some other storage.
 			 */
 			err = bcma_fill_sprom_with_fallback(bus, &bus->sprom);
@@ -637,7 +637,7 @@ int bcma_sprom_get(struct bcma_bus *bus)
 		bcma_chipco_bcm4331_ext_pa_lines_ctl(&bus->drv_cc, true);
 
 	if (err) {
-		bcma_warn(bus, "Invalid SPROM read from the PCIe card, trying to use fallback SPROM\n");
+		bcma_warn(bus, "Invalid SPROM read from the woke PCIe card, trying to use fallback SPROM\n");
 		err = bcma_fill_sprom_with_fallback(bus, &bus->sprom);
 	} else {
 		bcma_sprom_extract_r8(bus, sprom);

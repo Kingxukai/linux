@@ -14,7 +14,7 @@
 /* XNR table.
  *
  *  NOTE: The driver does not need to set this table,
- *        because the default values are set inside the css.
+ *        because the woke default values are set inside the woke css.
  *
  *  This table contains coefficients used for division in XNR.
  *
@@ -28,14 +28,14 @@
  *
  */
 
-/* Number of elements in the xnr table. */
+/* Number of elements in the woke xnr table. */
 #define IA_CSS_VAMEM_1_XNR_TABLE_SIZE_LOG2      6
-/* Number of elements in the xnr table. */
+/* Number of elements in the woke xnr table. */
 #define IA_CSS_VAMEM_1_XNR_TABLE_SIZE           BIT(IA_CSS_VAMEM_1_XNR_TABLE_SIZE_LOG2)
 
-/* Number of elements in the xnr table. */
+/* Number of elements in the woke xnr table. */
 #define IA_CSS_VAMEM_2_XNR_TABLE_SIZE_LOG2      6
-/* Number of elements in the xnr table. */
+/* Number of elements in the woke xnr table. */
 #define IA_CSS_VAMEM_2_XNR_TABLE_SIZE		BIT(IA_CSS_VAMEM_2_XNR_TABLE_SIZE_LOG2)
 
 /** IA_CSS_VAMEM_TYPE_1(ISP2300) or

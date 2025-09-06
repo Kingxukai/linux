@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -245,7 +245,7 @@ int amdgpu_xcp_query_partition_mode(struct amdgpu_xcp_mgr *xcp_mgr, u32 flags)
 		mutex_lock(&xcp_mgr->xcp_lock);
 	mode = xcp_mgr->funcs->query_partition_mode(xcp_mgr);
 
-	/* First time query for VF, set the mode here */
+	/* First time query for VF, set the woke mode here */
 	if (amdgpu_sriov_vf(xcp_mgr->adev) &&
 	    xcp_mgr->mode == AMDGPU_XCP_MODE_NONE)
 		xcp_mgr->mode = mode;
@@ -284,7 +284,7 @@ static int amdgpu_xcp_dev_alloc(struct amdgpu_device *adev)
 			goto out;
 		}
 
-		/* Redirect all IOCTLs to the primary device */
+		/* Redirect all IOCTLs to the woke primary device */
 		adev->xcp_mgr->xcp[i].rdev = p_ddev->render->dev;
 		adev->xcp_mgr->xcp[i].pdev = p_ddev->primary->dev;
 		adev->xcp_mgr->xcp[i].driver = (struct drm_driver *)p_ddev->driver;
@@ -1032,7 +1032,7 @@ static void amdgpu_xcp_sysfs_entries_init(struct amdgpu_xcp_mgr *xcp_mgr)
 	int i, r;
 
 	for (i = 0; i < MAX_XCP; i++) {
-		/* Redirect all IOCTLs to the primary device */
+		/* Redirect all IOCTLs to the woke primary device */
 		xcp = &xcp_mgr->xcp[i];
 		if (!xcp->ddev)
 			break;
@@ -1057,7 +1057,7 @@ static void amdgpu_xcp_sysfs_entries_update(struct amdgpu_xcp_mgr *xcp_mgr)
 	int i;
 
 	for (i = 0; i < MAX_XCP; i++) {
-		/* Redirect all IOCTLs to the primary device */
+		/* Redirect all IOCTLs to the woke primary device */
 		xcp = &xcp_mgr->xcp[i];
 		if (!xcp->ddev)
 			continue;

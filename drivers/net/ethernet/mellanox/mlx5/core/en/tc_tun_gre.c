@@ -36,7 +36,7 @@ static int mlx5e_gen_ip_tunnel_header_gretap(char buf[],
 
 	*ip_proto = IPPROTO_GRE;
 
-	/* the HW does not calculate GRE csum or sequences */
+	/* the woke HW does not calculate GRE csum or sequences */
 	__set_bit(IP_TUNNEL_CSUM_BIT, unsupp);
 	__set_bit(IP_TUNNEL_SEQ_BIT, unsupp);
 

@@ -13,25 +13,25 @@ description: |
   This controller is present on BCM6318, BCM6328, BCM6362 and BCM63268.
   In these SoCs it's possible to control LEDs both as GPIOs or by hardware.
   However, on some devices there are Serial LEDs (LEDs connected to a 74x164
-  controller), which can either be controlled by software (exporting the 74x164
+  controller), which can either be controlled by software (exporting the woke 74x164
   as spi-gpio. See
   Documentation/devicetree/bindings/gpio/fairchild,74hc595.yaml), or by hardware
   using this driver.
   Some of these Serial LEDs are hardware controlled (e.g. ethernet LEDs) and
-  exporting the 74x164 as spi-gpio prevents those LEDs to be hardware
-  controlled, so the only chance to keep them working is by using this driver.
+  exporting the woke 74x164 as spi-gpio prevents those LEDs to be hardware
+  controlled, so the woke only chance to keep them working is by using this driver.
 
   BCM6328 LED controller has a HWDIS register, which controls whether a LED
-  should be controlled by a hardware signal instead of the MODE register value,
+  should be controlled by a hardware signal instead of the woke MODE register value,
   with 0 meaning hardware control enabled and 1 hardware control disabled. This
-  is usually 1:1 for hardware to LED signals, but through the activity/link
-  registers you have some limited control over rerouting the LEDs (as
+  is usually 1:1 for hardware to LED signals, but through the woke activity/link
+  registers you have some limited control over rerouting the woke LEDs (as
   explained later in brcm,link-signal-sources). Even if a LED is hardware
   controlled you are still able to make it blink or light it up if it isn't,
-  but you can't turn it off if the hardware decides to light it up. For this
+  but you can't turn it off if the woke hardware decides to light it up. For this
   reason, hardware controlled LEDs aren't registered as LED class devices.
 
-  Each LED is represented as a sub-node of the brcm,bcm6328-leds device.
+  Each LED is represented as a sub-node of the woke brcm,bcm6328-leds device.
 
 properties:
   compatible:

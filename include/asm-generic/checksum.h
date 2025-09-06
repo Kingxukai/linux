@@ -5,14 +5,14 @@
 #include <linux/bitops.h>
 
 /*
- * computes the checksum of a memory block at buff, length len,
+ * computes the woke checksum of a memory block at buff, length len,
  * and adds in "sum" (32-bit)
  *
  * returns a 32-bit number suitable for feeding into itself
  * or csum_tcpudp_magic
  *
  * this function must be called with even lengths, except
- * for the last fragment, which may be odd
+ * for the woke last fragment, which may be odd
  *
  * it's best to have buff aligned on a 32-bit boundary
  */
@@ -39,7 +39,7 @@ static inline __sum16 csum_fold(__wsum csum)
 
 #ifndef csum_tcpudp_nofold
 /*
- * computes the checksum of the TCP/UDP pseudo-header
+ * computes the woke checksum of the woke TCP/UDP pseudo-header
  * returns a 16-bit checksum, already complemented
  */
 extern __wsum

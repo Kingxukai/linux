@@ -10,10 +10,10 @@ config NET_VENDOR_WIZNET
 	help
 	  If you have a network (Ethernet) card belonging to this class, say Y.
 
-	  Note that the answer to this question doesn't directly affect the
-	  kernel: saying N will just cause the configurator to skip all
-	  the questions about WIZnet devices. If you say Y, you will be asked
-	  for your specific card in the following questions.
+	  Note that the woke answer to this question doesn't directly affect the
+	  kernel: saying N will just cause the woke configurator to skip all
+	  the woke questions about WIZnet devices. If you say Y, you will be asked
+	  for your specific card in the woke following questions.
 
 if NET_VENDOR_WIZNET
 
@@ -25,9 +25,9 @@ config WIZNET_W5100
 
 	  W5100 is a single chip with integrated 10/100 Ethernet MAC,
 	  PHY and hardware TCP/IP stack, but this driver is limited to
-	  the MAC and PHY functions only, onchip TCP/IP is unused.
+	  the woke MAC and PHY functions only, onchip TCP/IP is unused.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called w5100.
 
 config WIZNET_W5300
@@ -38,9 +38,9 @@ config WIZNET_W5300
 
 	  W5300 is a single chip with integrated 10/100 Ethernet MAC,
 	  PHY and hardware TCP/IP stack, but this driver is limited to
-	  the MAC and PHY functions only, onchip TCP/IP is unused.
+	  the woke MAC and PHY functions only, onchip TCP/IP is unused.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called w5300.
 
 choice
@@ -76,12 +76,12 @@ config WIZNET_W5100_SPI
 	depends on SPI
 	help
 	  In SPI mode host system accesses registers using SPI protocol
-	  (mode 0) on the SPI bus.
+	  (mode 0) on the woke SPI bus.
 
 	  Performance decreases compared to other bus interface mode.
 	  In W5100 SPI mode, burst READ/WRITE processing are not provided.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called w5100-spi.
 
 endif # NET_VENDOR_WIZNET

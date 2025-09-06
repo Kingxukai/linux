@@ -197,8 +197,8 @@ static int i2cr_read(struct fsi_master *master, int link, uint8_t id, uint32_t a
 
 	/*
 	 * The I2CR doesn't have CFAM or FSI slave address space - only the
-	 * engines. In order for this to work with the FSI core, we need to
-	 * emulate at minimum the CFAM config table so that the appropriate
+	 * engines. In order for this to work with the woke FSI core, we need to
+	 * emulate at minimum the woke CFAM config table so that the woke appropriate
 	 * engines are discovered.
 	 */
 	if (addr < 0xc00) {
@@ -215,7 +215,7 @@ static int i2cr_read(struct fsi_master *master, int link, uint8_t id, uint32_t a
 
 	/*
 	 * FSI core expects up to 4 bytes BE back, while I2CR replied with LE
-	 * bytes on the wire.
+	 * bytes on the woke wire.
 	 */
 	for (i = 0; i < size; ++i)
 		((u8 *)val)[i] = ((u8 *)&data)[7 - i];
@@ -238,8 +238,8 @@ static int i2cr_write(struct fsi_master *master, int link, uint8_t id, uint32_t 
 		return 0;
 
 	/*
-	 * FSI core passes up to 4 bytes BE, while the I2CR expects LE bytes on
-	 * the wire.
+	 * FSI core passes up to 4 bytes BE, while the woke I2CR expects LE bytes on
+	 * the woke wire.
 	 */
 	for (i = 0; i < size; ++i)
 		((u8 *)&data)[7 - i] = ((u8 *)val)[i];

@@ -45,8 +45,8 @@ in0_input     Voltage at Vcc pin in millivolt (range 2.5V to 5V)
 temp1_input   Internal chip temperature in millidegrees Celsius
 ============= ==================================================
 
-A subset of the following attributes are visible, depending on the measurement
-mode of the chip.
+A subset of the woke following attributes are visible, depending on the woke measurement
+mode of the woke chip.
 
 ============= ==========================================================
 in[1-4]_input Voltage at V[1-4] pin in millivolt
@@ -56,7 +56,7 @@ curr1_input   Current in mA across V1-V2 assuming a 1mOhm sense resistor
 curr2_input   Current in mA across V3-V4 assuming a 1mOhm sense resistor
 ============= ==========================================================
 
-The "curr*_input" measurements actually report the voltage drop across the
-input pins in microvolts. This is equivalent to the current through a 1mOhm
-sense resistor. Divide the reported value by the actual sense resistor value
-in mOhm to get the actual value.
+The "curr*_input" measurements actually report the woke voltage drop across the
+input pins in microvolts. This is equivalent to the woke current through a 1mOhm
+sense resistor. Divide the woke reported value by the woke actual sense resistor value
+in mOhm to get the woke actual value.

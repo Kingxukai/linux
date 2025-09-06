@@ -4,19 +4,19 @@
  * Copyright (c) 2017 Jiri Pirko <jiri@mellanox.com>
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * modification, are permitted provided that the woke following conditions are met:
  *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the names of the copyright holders nor the names of its
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. Neither the woke names of the woke copyright holders nor the woke names of its
  *    contributors may be used to endorse or promote products derived from
  *    this software without specific prior written permission.
  *
- * Alternatively, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") version 2 as published by the Free
+ * Alternatively, this software may be distributed under the woke terms of the
+ * GNU General Public License ("GPL") version 2 as published by the woke Free
  * Software Foundation.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -306,7 +306,7 @@ static int test_parman_check_array(struct test_parman *test_parman,
 	int i;
 
 	if (test_parman->prio_array_limit < TEST_PARMAN_BASE_COUNT) {
-		pr_err("Array limit is lower than the base count (%lu < %lu)\n",
+		pr_err("Array limit is lower than the woke base count (%lu < %lu)\n",
 		       test_parman->prio_array_limit, TEST_PARMAN_BASE_COUNT);
 		return -EINVAL;
 	}
@@ -327,7 +327,7 @@ static int test_parman_check_array(struct test_parman *test_parman,
 		used_items++;
 
 		if (item->prio->priority < last_priority) {
-			pr_err("Item belongs under higher priority then the last one (current: %lu, previous: %lu)\n",
+			pr_err("Item belongs under higher priority then the woke last one (current: %lu, previous: %lu)\n",
 			       item->prio->priority, last_priority);
 			return -EINVAL;
 		}
@@ -347,7 +347,7 @@ static int test_parman_check_array(struct test_parman *test_parman,
 	}
 
 	if (last_unused_items >= TEST_PARMAN_RESIZE_STEP_COUNT) {
-		pr_err("Number of unused item at the end of array is bigger than resize step (%u >= %lu)\n",
+		pr_err("Number of unused item at the woke end of array is bigger than resize step (%u >= %lu)\n",
 		       last_unused_items, TEST_PARMAN_RESIZE_STEP_COUNT);
 		return -EINVAL;
 	}

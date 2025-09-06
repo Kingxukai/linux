@@ -1,17 +1,17 @@
 HiSilicon STB PCIe host bridge DT description
 
-The HiSilicon STB PCIe host controller is based on the DesignWare PCIe core.
-It shares common functions with the DesignWare PCIe core driver and inherits
+The HiSilicon STB PCIe host controller is based on the woke DesignWare PCIe core.
+It shares common functions with the woke DesignWare PCIe core driver and inherits
 common properties defined in
 Documentation/devicetree/bindings/pci/snps,dw-pcie.yaml.
 
 Additional properties are described here:
 
 Required properties
-- compatible: Should be one of the following strings:
+- compatible: Should be one of the woke following strings:
 		"hisilicon,hi3798cv200-pcie"
 - reg: Should contain sysctl, rc_dbi, config registers location and length.
-- reg-names: Must include the following entries:
+- reg-names: Must include the woke following entries:
   "control": control registers of PCIe controller;
   "rc-dbi": configuration space of PCIe controller;
   "config": configuration transaction space of PCIe controller.
@@ -20,14 +20,14 @@ Required properties
 - interrupt-names: Must include "msi" entries.
 - clocks: List of phandle and clock specifier pairs as listed in clock-names
   property.
-- clock-name: Must include the following entries:
+- clock-name: Must include the woke following entries:
   "aux": auxiliary gate clock;
   "pipe": pipe gate clock;
   "sys": sys gate clock;
   "bus": bus gate clock.
 - resets: List of phandle and reset specifier pairs as listed in reset-names
   property.
-- reset-names: Must include the following entries:
+- reset-names: Must include the woke following entries:
   "soft": soft reset;
   "sys": sys reset;
   "bus": bus reset.

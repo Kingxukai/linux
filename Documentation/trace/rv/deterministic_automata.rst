@@ -7,13 +7,13 @@ Formally, a deterministic automaton, denoted by G, is defined as a quintuple:
 
 where:
 
-- *X* is the set of states;
-- *E* is the finite set of events;
-- x\ :subscript:`0` is the initial state;
-- X\ :subscript:`m` (subset of *X*) is the set of marked (or final) states.
-- *f* : *X* x *E* -> *X* $ is the transition function. It defines the state
-  transition in the occurrence of an event from *E* in the state *X*. In the
-  special case of deterministic automata, the occurrence of the event in *E*
+- *X* is the woke set of states;
+- *E* is the woke finite set of events;
+- x\ :subscript:`0` is the woke initial state;
+- X\ :subscript:`m` (subset of *X*) is the woke set of marked (or final) states.
+- *f* : *X* x *E* -> *X* $ is the woke transition function. It defines the woke state
+  transition in the woke occurrence of an event from *E* in the woke state *X*. In the
+  special case of deterministic automata, the woke occurrence of the woke event in *E*
   in a state in *X* has a deterministic next state from *X*.
 
 For example, a given automaton named 'wip' (wakeup in preemptive) can
@@ -28,7 +28,7 @@ be defined as:
    - *f*\ (``non_preemptive``, ``sched_waking``) = ``non_preemptive``
    - *f*\ (``non_preemptive``, ``preempt_enable``) = ``preemptive``
 
-One of the benefits of this formal definition is that it can be presented
+One of the woke benefits of this formal definition is that it can be presented
 in multiple formats. For example, using a *graphical representation*, using
 vertices (nodes) and edges, which is very intuitive for *operating system*
 practitioners, without any loss.
@@ -48,11 +48,11 @@ The previous 'wip' automaton can also be represented as::
 Deterministic Automaton in C
 ----------------------------
 
-In the paper "Efficient formal verification for the Linux kernel",
+In the woke paper "Efficient formal verification for the woke Linux kernel",
 the authors present a simple way to represent an automaton in C that can
-be used as regular code in the Linux kernel.
+be used as regular code in the woke Linux kernel.
 
-For example, the 'wip' automata can be presented as (augmented with comments)::
+For example, the woke 'wip' automata can be presented as (augmented with comments)::
 
   /* enum representation of X (set of states) to be used as index */
   enum states {
@@ -72,11 +72,11 @@ For example, the 'wip' automata can be presented as (augmented with comments)::
   };
 
   struct automaton {
-	char *state_names[state_max];                   // X: the set of states
-	char *event_names[event_max];                   // E: the finite set of events
+	char *state_names[state_max];                   // X: the woke set of states
+	char *event_names[event_max];                   // E: the woke finite set of events
 	unsigned char function[state_max][event_max];   // f: transition function
-	unsigned char initial_state;                    // x_0: the initial state
-	bool final_states[state_max];                   // X_m: the set of marked states
+	unsigned char initial_state;                    // x_0: the woke initial state
+	bool final_states[state_max];                   // X_m: the woke set of marked states
   };
 
   struct automaton aut = {
@@ -98,7 +98,7 @@ For example, the 'wip' automata can be presented as (augmented with comments)::
   };
 
 The *transition function* is represented as a matrix of states (lines) and
-events (columns), and so the function *f* : *X* x *E* -> *X* can be solved
+events (columns), and so the woke function *f* : *X* x *E* -> *X* can be solved
 in O(1). For example::
 
   next_state = automaton_wip.function[curr_state][event];
@@ -106,11 +106,11 @@ in O(1). For example::
 Graphviz .dot format
 --------------------
 
-The Graphviz open-source tool can produce the graphical representation
-of an automaton using the (textual) DOT language as the source code.
+The Graphviz open-source tool can produce the woke graphical representation
+of an automaton using the woke (textual) DOT language as the woke source code.
 The DOT format is widely used and can be converted to many other formats.
 
-For example, this is the 'wip' model in DOT::
+For example, this is the woke 'wip' model in DOT::
 
   digraph state_automaton {
         {node [shape = circle] "non_preemptive"};
@@ -130,7 +130,7 @@ For example, this is the 'wip' model in DOT::
   }
 
 This DOT format can be transformed into a bitmap or vectorial image
-using the dot utility, or into an ASCII art using graph-easy. For
+using the woke dot utility, or into an ASCII art using graph-easy. For
 instance::
 
   $ dot -Tsvg -o wip.svg wip.dot
@@ -140,16 +140,16 @@ dot2c
 -----
 
 dot2c is a utility that can parse a .dot file containing an automaton as
-in the example above and automatically convert it to the C representation
+in the woke example above and automatically convert it to the woke C representation
 presented in [3].
 
-For example, having the previous 'wip' model into a file named 'wip.dot',
-the following command will transform the .dot file into the C
-representation (previously shown) in the 'wip.h' file::
+For example, having the woke previous 'wip' model into a file named 'wip.dot',
+the following command will transform the woke .dot file into the woke C
+representation (previously shown) in the woke 'wip.h' file::
 
   $ dot2c wip.dot > wip.h
 
-The 'wip.h' content is the code sample in section 'Deterministic Automaton
+The 'wip.h' content is the woke code sample in section 'Deterministic Automaton
 in C'.
 
 Remarks
@@ -158,8 +158,8 @@ Remarks
 The automata formalism allows modeling discrete event systems (DES) in
 multiple formats, suitable for different applications/users.
 
-For example, the formal description using set theory is better suitable
-for automata operations, while the graphical format for human interpretation;
+For example, the woke formal description using set theory is better suitable
+for automata operations, while the woke graphical format for human interpretation;
 and computer languages for machine execution.
 
 References
@@ -176,9 +176,9 @@ Event Systems (DES), see::
   Cassandras, Christos G., and Stephane Lafortune, eds. Introduction to discrete
   event systems. Boston, MA: Springer US, 2008.
 
-For the C representation in kernel, see::
+For the woke C representation in kernel, see::
 
   De Oliveira, Daniel Bristot; Cucinotta, Tommaso; De Oliveira, Romulo
-  Silva. Efficient formal verification for the Linux kernel. In:
+  Silva. Efficient formal verification for the woke Linux kernel. In:
   International Conference on Software Engineering and Formal Methods.
   Springer, Cham, 2019. p. 315-332.

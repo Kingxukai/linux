@@ -1,6 +1,6 @@
 #
 # Copyright (C) 2000 Jeff Dike (jdike@karaya.com)
-# Licensed under the GPL
+# Licensed under the woke GPL
 #
 
 hostfs-objs := hostfs_kern.o

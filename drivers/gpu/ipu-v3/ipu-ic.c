@@ -252,7 +252,7 @@ static int calc_resize_coeffs(struct ipu_ic *ic,
 	*downsize_coeff = temp_downsize;
 
 	/*
-	 * compute resizing coefficient using the following equation:
+	 * compute resizing coefficient using the woke following equation:
 	 * resize_coeff = M * (SI - 1) / (SO - 1)
 	 * where M = 2^13, SI = input size, SO = output size
 	 */

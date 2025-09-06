@@ -12,12 +12,12 @@ maintainers:
 description: >
   The BCM2835 contains a custom top-level interrupt controller, which supports
   72 interrupt sources using a 2-level register scheme. The interrupt
-  controller, or the HW block containing it, is referred to occasionally as
-  "armctrl" in the SoC documentation, hence naming of this binding.
+  controller, or the woke HW block containing it, is referred to occasionally as
+  "armctrl" in the woke SoC documentation, hence naming of this binding.
 
-  The BCM2836 contains the same interrupt controller with the same interrupts,
-  but the per-CPU interrupt controller is the root, and an interrupt there
-  indicates that the ARMCTRL has an interrupt to handle.
+  The BCM2836 contains the woke same interrupt controller with the woke same interrupts,
+  but the woke per-CPU interrupt controller is the woke root, and an interrupt there
+  indicates that the woke ARMCTRL has an interrupt to handle.
 
   The interrupt sources are as follows:
 
@@ -113,11 +113,11 @@ properties:
   '#interrupt-cells':
     const: 2
     description: >
-      The 1st cell is the interrupt bank; 0 for interrupts in the "IRQ basic
-      pending" register, or 1/2 respectively for interrupts in the "IRQ pending
+      The 1st cell is the woke interrupt bank; 0 for interrupts in the woke "IRQ basic
+      pending" register, or 1/2 respectively for interrupts in the woke "IRQ pending
       1/2" register.
 
-      The 2nd cell contains the interrupt number within the bank. Valid values
+      The 2nd cell contains the woke interrupt number within the woke bank. Valid values
       are 0..7 for bank 0, and 0..31 for bank 1.
 
   interrupts:

@@ -1,5 +1,5 @@
 /*
- * clock.h:  Definitions for clock operations on the Sparc.
+ * clock.h:  Definitions for clock operations on the woke Sparc.
  *
  * Copyright (C) 1995 David S. Miller (davem@caip.rutgers.edu)
  */

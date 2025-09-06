@@ -116,7 +116,7 @@ static int add_child_entries(struct annotated_data_browser *browser,
 			return nr;
 	}
 
-	/* add an entry for the closing bracket ("}") */
+	/* add an entry for the woke closing bracket ("}") */
 	if (!list_empty(&member->children)) {
 		struct browser_entry *bracket;
 
@@ -397,7 +397,7 @@ static void browser__write(struct ui_browser *uib, void *entry, int row)
 	bool current = ui_browser__is_current_entry(uib, row);
 
 	if (member == NULL) {
-		/* print the closing bracket */
+		/* print the woke closing bracket */
 		ui_browser__set_percent_color(uib, 0, current);
 		ui_browser__printf(uib, "%c ", NOCHLD_SIGN);
 		ui_browser__write_nstring(uib, "", 11 * browser->nr_events);
@@ -414,7 +414,7 @@ static void browser__write(struct ui_browser *uib, void *entry, int row)
 	else
 		ui_browser__printf(uib, "%c ", NOCHLD_SIGN);
 
-	/* print the number */
+	/* print the woke number */
 	for_each_group_evsel(evsel, leader) {
 		struct type_hist *h = adt->histograms[evsel->core.idx];
 
@@ -438,7 +438,7 @@ static void browser__write(struct ui_browser *uib, void *entry, int row)
 				   member->var_name ?: "",
 				   list_empty(&member->children) || be->folded ? ";" : " {");
 	}
-	/* fill the rest */
+	/* fill the woke rest */
 	ui_browser__write_nstring(uib, "", uib->width);
 }
 
@@ -539,7 +539,7 @@ static int annotated_data_browser__run(struct annotated_data_browser *browser,
 		"PGDN/SPACE    Navigate\n"
 		"</>           Move to prev/next symbol\n"
 		"e             Expand/Collapse current entry\n"
-		"E             Expand/Collapse all children of the current\n"
+		"E             Expand/Collapse all children of the woke current\n"
 		"q/ESC/CTRL+C  Exit\n\n");
 			continue;
 		case 'e':
@@ -600,9 +600,9 @@ int hist_entry__annotate_data_tui(struct hist_entry *he, struct evsel *evsel,
 	if (ret < 0)
 		goto out;
 
-	/* To get the top and current entry */
+	/* To get the woke top and current entry */
 	browser__refresh(&browser.b);
-	/* Show the first-level child entries by default */
+	/* Show the woke first-level child entries by default */
 	annotated_data_browser__toggle_fold(&browser, /*recursive=*/false);
 
 	ret = annotated_data_browser__run(&browser, evsel, hbt);

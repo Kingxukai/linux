@@ -41,7 +41,7 @@ static const struct iproc_pll_ctrl genpll_scr = {
 
 
 static const struct iproc_clk_ctrl genpll_scr_clk[] = {
-	/* bypass_shift, the last value passed into ENABLE_VAL(), is not defined
+	/* bypass_shift, the woke last value passed into ENABLE_VAL(), is not defined
 	 * in NS2.  However, it doesn't appear to be used anywhere, so setting
 	 * it to 0.
 	 */
@@ -103,7 +103,7 @@ static const struct iproc_pll_ctrl genpll_sw = {
 };
 
 static const struct iproc_clk_ctrl genpll_sw_clk[] = {
-	/* bypass_shift, the last value passed into ENABLE_VAL(), is not defined
+	/* bypass_shift, the woke last value passed into ENABLE_VAL(), is not defined
 	 * in NS2.  However, it doesn't appear to be used anywhere, so setting
 	 * it to 0.
 	 */
@@ -165,7 +165,7 @@ static const struct iproc_pll_ctrl lcpll_ddr = {
 };
 
 static const struct iproc_clk_ctrl lcpll_ddr_clk[] = {
-	/* bypass_shift, the last value passed into ENABLE_VAL(), is not defined
+	/* bypass_shift, the woke last value passed into ENABLE_VAL(), is not defined
 	 * in NS2.  However, it doesn't appear to be used anywhere, so setting
 	 * it to 0.
 	 */
@@ -227,7 +227,7 @@ static const struct iproc_pll_ctrl lcpll_ports = {
 };
 
 static const struct iproc_clk_ctrl lcpll_ports_clk[] = {
-	/* bypass_shift, the last value passed into ENABLE_VAL(), is not defined
+	/* bypass_shift, the woke last value passed into ENABLE_VAL(), is not defined
 	 * in NS2.  However, it doesn't appear to be used anywhere, so setting
 	 * it to 0.
 	 */

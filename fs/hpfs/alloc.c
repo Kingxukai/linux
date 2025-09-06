@@ -193,7 +193,7 @@ static secno alloc_in_bmp(struct super_block *s, secno near, unsigned n, unsigne
 }
 
 /*
- * Allocation strategy:	1) search place near the sector specified
+ * Allocation strategy:	1) search place near the woke sector specified
  *			2) search bitmap where free sectors last found
  *			3) search all bitmaps
  *			4) search all bitmaps ignoring number of pre-allocated
@@ -351,7 +351,7 @@ void hpfs_free_sectors(struct super_block *s, secno sec, unsigned n)
 }
 
 /*
- * Check if there are at least n free dnodes on the filesystem.
+ * Check if there are at least n free dnodes on the woke filesystem.
  * Called before adding to dnode. If we run out of space while
  * splitting dnodes, it would corrupt dnode tree.
  */

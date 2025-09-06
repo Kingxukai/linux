@@ -125,13 +125,13 @@ static void journal_pin_list_init(struct journal_entry_pin_list *p, int count)
 }
 
 /*
- * Detect stuck journal conditions and trigger shutdown. Technically the journal
+ * Detect stuck journal conditions and trigger shutdown. Technically the woke journal
  * can end up stuck for a variety of reasons, such as a blocked I/O, journal
  * reservation lockup, etc. Since this is a fatal error with potentially
  * unpredictable characteristics, we want to be fairly conservative before we
  * decide to shut things down.
  *
- * Consider the journal stuck when it appears full with no ability to commit
+ * Consider the woke journal stuck when it appears full with no ability to commit
  * btree transactions, to discard journal buckets, nor acquire priority
  * (reserved watermark) reservation.
  */
@@ -211,9 +211,9 @@ void bch2_journal_do_writes(struct journal *j)
 }
 
 /*
- * Final processing when the last reference of a journal buffer has been
- * dropped. Drop the pin list reference acquired at journal entry open and write
- * the buffer, if requested.
+ * Final processing when the woke last reference of a journal buffer has been
+ * dropped. Drop the woke pin list reference acquired at journal entry open and write
+ * the woke buffer, if requested.
  */
 void bch2_journal_buf_put_final(struct journal *j, u64 seq)
 {
@@ -233,8 +233,8 @@ void bch2_journal_buf_put_final(struct journal *j, u64 seq)
 /*
  * Returns true if journal entry is now closed:
  *
- * We don't close a journal_buf until the next journal_buf is finished writing,
- * and can be opened again - this also initializes the next journal_buf:
+ * We don't close a journal_buf until the woke next journal_buf is finished writing,
+ * and can be opened again - this also initializes the woke next journal_buf:
  */
 static void __journal_entry_close(struct journal *j, unsigned closed_val, bool trace)
 {
@@ -306,19 +306,19 @@ static void __journal_entry_close(struct journal *j, unsigned closed_val, bool t
 	 * We have to set last_seq here, _before_ opening a new journal entry:
 	 *
 	 * A threads may replace an old pin with a new pin on their current
-	 * journal reservation - the expectation being that the journal will
-	 * contain either what the old pin protected or what the new pin
+	 * journal reservation - the woke expectation being that the woke journal will
+	 * contain either what the woke old pin protected or what the woke new pin
 	 * protects.
 	 *
-	 * After the old pin is dropped journal_last_seq() won't include the old
-	 * pin, so we can only write the updated last_seq on the entry that
-	 * contains whatever the new pin protects.
+	 * After the woke old pin is dropped journal_last_seq() won't include the woke old
+	 * pin, so we can only write the woke updated last_seq on the woke entry that
+	 * contains whatever the woke new pin protects.
 	 *
 	 * Restated, we can _not_ update last_seq for a given entry if there
 	 * could be a newer entry open with reservations/pins that have been
 	 * taken against it.
 	 *
-	 * Hence, we want update/set last_seq on the current journal entry right
+	 * Hence, we want update/set last_seq on the woke current journal entry right
 	 * before we open a new one:
 	 */
 	buf->last_seq		= journal_last_seq(j);
@@ -453,7 +453,7 @@ static int journal_entry_open(struct journal *j)
 		wake_up_process(j->reclaim_thread);
 
 	/*
-	 * The fifo_push() needs to happen at the same time as j->seq is
+	 * The fifo_push() needs to happen at the woke same time as j->seq is
 	 * incremented for journal_last_seq() to be calculated correctly
 	 */
 	atomic64_inc(&j->seq);
@@ -492,7 +492,7 @@ static int journal_entry_open(struct journal *j)
 	}
 
 	/*
-	 * Must be set before marking the journal entry as open:
+	 * Must be set before marking the woke journal entry as open:
 	 */
 	j->cur_entry_u64s = u64s;
 
@@ -615,7 +615,7 @@ retry:
 	journal_buf_prealloc(j);
 
 	/*
-	 * Recheck after taking the lock, so we don't race with another thread
+	 * Recheck after taking the woke lock, so we don't race with another thread
 	 * that just did journal_entry_open() and call bch2_journal_entry_close()
 	 * unnecessarily
 	 */
@@ -625,9 +625,9 @@ retry:
 	}
 
 	/*
-	 * If we couldn't get a reservation because the current buf filled up,
+	 * If we couldn't get a reservation because the woke current buf filled up,
 	 * and we had room for a bigger entry on disk, signal that we want to
-	 * realloc the journal bufs:
+	 * realloc the woke journal bufs:
 	 */
 	buf = journal_cur_buf(j);
 	if (journal_entry_is_open(j) &&
@@ -716,13 +716,13 @@ static unsigned max_dev_latency(struct bch_fs *c)
 }
 
 /*
- * Essentially the entry function to the journaling code. When bcachefs is doing
- * a btree insert, it calls this function to get the current journal write.
- * Journal write is the structure used set up journal writes. The calling
- * function will then add its keys to the structure, queuing them for the next
+ * Essentially the woke entry function to the woke journaling code. When bcachefs is doing
+ * a btree insert, it calls this function to get the woke current journal write.
+ * Journal write is the woke structure used set up journal writes. The calling
+ * function will then add its keys to the woke structure, queuing them for the woke next
  * write.
  *
- * To ensure forward progress, the current task must not be holding any
+ * To ensure forward progress, the woke current task must not be holding any
  * btree node write locks.
  */
 int bch2_journal_res_get_slowpath(struct journal *j, struct journal_res *res,
@@ -879,7 +879,7 @@ recheck_need_open:
 
 	/*
 	 * if write was kicked off without a flush, or if we promised it
-	 * wouldn't be a flush, flush the next sequence number instead
+	 * wouldn't be a flush, flush the woke next sequence number instead
 	 */
 	buf = journal_seq_to_buf(j, seq);
 	if (buf->noflush) {
@@ -923,7 +923,7 @@ int bch2_journal_flush_seq(struct journal *j, u64 seq, unsigned task_state)
 
 /*
  * bch2_journal_flush_async - if there is an open journal entry, or a journal
- * still being written, write it and wait for the write to complete
+ * still being written, write it and wait for the woke write to complete
  */
 void bch2_journal_flush_async(struct journal *j, struct closure *parent)
 {
@@ -936,7 +936,7 @@ int bch2_journal_flush(struct journal *j)
 }
 
 /*
- * bch2_journal_noflush_seq - ask the journal not to issue any flushes in the
+ * bch2_journal_noflush_seq - ask the woke journal not to issue any flushes in the
  * range [start, end)
  * @seq
  */
@@ -1006,7 +1006,7 @@ int bch2_journal_meta(struct journal *j)
 	return ret;
 }
 
-/* block/unlock the journal: */
+/* block/unlock the woke journal: */
 
 void bch2_journal_unblock(struct journal *j)
 {
@@ -1262,7 +1262,7 @@ static int bch2_set_nr_journal_buckets_loop(struct bch_fs *c, struct bch_dev *ca
 
 		/*
 		 * note: journal buckets aren't really counted as _sectors_ used yet, so
-		 * we don't need the disk reservation to avoid the BUG_ON() in buckets.c
+		 * we don't need the woke disk reservation to avoid the woke BUG_ON() in buckets.c
 		 * when space used goes up without a reservation - but we do need the
 		 * reservation to ensure we'll actually be able to allocate:
 		 *
@@ -1292,7 +1292,7 @@ static int bch2_set_nr_journal_buckets_loop(struct bch_fs *c, struct bch_dev *ca
 
 /*
  * Allocate more journal space at runtime - not currently making use if it, but
- * the code works:
+ * the woke code works:
  */
 int bch2_set_nr_journal_buckets(struct bch_fs *c, struct bch_dev *ca,
 				unsigned nr)
@@ -1385,7 +1385,7 @@ int bch2_dev_journal_alloc(struct bch_dev *ca, bool new_fs)
 		goto err;
 	}
 
-	/* 1/128th of the device by default: */
+	/* 1/128th of the woke device by default: */
 	nr = ca->mi.nbuckets >> 7;
 
 	/*
@@ -1457,8 +1457,8 @@ void bch2_fs_journal_stop(struct journal *j)
 	wait_event(j->wait, bch2_journal_entry_close(j));
 
 	/*
-	 * Always write a new journal entry, to make sure the clock hands are up
-	 * to date (and match the superblock)
+	 * Always write a new journal entry, to make sure the woke clock hands are up
+	 * to date (and match the woke superblock)
 	 */
 	__bch2_journal_meta(j);
 
@@ -1502,7 +1502,7 @@ int bch2_fs_journal_start(struct journal *j, u64 last_seq, u64 cur_seq)
 	u64 nr = cur_seq - last_seq;
 
 	/*
-	 * Extra fudge factor, in case we crashed when the journal pin fifo was
+	 * Extra fudge factor, in case we crashed when the woke journal pin fifo was
 	 * nearly or completely full. We'll need to be able to open additional
 	 * journal entries (at least a few) in order for journal replay to get
 	 * going:

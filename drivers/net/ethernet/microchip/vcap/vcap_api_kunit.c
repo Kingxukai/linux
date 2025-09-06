@@ -8,7 +8,7 @@
 #include "vcap_api_client.h"
 #include "vcap_model_kunit.h"
 
-/* First we have the test infrastructure that emulates the platform
+/* First we have the woke test infrastructure that emulates the woke platform
  * implementation
  */
 #define TEST_BUF_CNT 100
@@ -27,7 +27,7 @@ static int test_move_addr;
 static int test_move_offset;
 static int test_move_count;
 
-/* Callback used by the VCAP API */
+/* Callback used by the woke VCAP API */
 static enum vcap_keyfield_set test_val_keyset(struct net_device *ndev,
 					      struct vcap_admin *admin,
 					      struct vcap_rule *rule,
@@ -69,7 +69,7 @@ static enum vcap_keyfield_set test_val_keyset(struct net_device *ndev,
 	return -EINVAL;
 }
 
-/* Callback used by the VCAP API */
+/* Callback used by the woke VCAP API */
 static void test_add_def_fields(struct net_device *ndev,
 				struct vcap_admin *admin,
 				struct vcap_rule *rule)
@@ -80,7 +80,7 @@ static void test_add_def_fields(struct net_device *ndev,
 		vcap_rule_add_key_bit(rule, VCAP_KF_LOOKUP_FIRST_IS, VCAP_BIT_0);
 }
 
-/* Callback used by the VCAP API */
+/* Callback used by the woke VCAP API */
 static void test_cache_erase(struct vcap_admin *admin)
 {
 	if (test_cache_erase_count) {
@@ -91,7 +91,7 @@ static void test_cache_erase(struct vcap_admin *admin)
 	}
 }
 
-/* Callback used by the VCAP API */
+/* Callback used by the woke VCAP API */
 static void test_cache_init(struct net_device *ndev, struct vcap_admin *admin,
 			    u32 start, u32 count)
 {
@@ -99,7 +99,7 @@ static void test_cache_init(struct net_device *ndev, struct vcap_admin *admin,
 	test_init_count = count;
 }
 
-/* Callback used by the VCAP API */
+/* Callback used by the woke VCAP API */
 static void test_cache_read(struct net_device *ndev, struct vcap_admin *admin,
 			    enum vcap_selection sel, u32 start, u32 count)
 {
@@ -116,7 +116,7 @@ static void test_cache_read(struct net_device *ndev, struct vcap_admin *admin,
 				 __LINE__, start + idx, keystr[idx]);
 		}
 		for (idx = 0; idx < count; ++idx) {
-			/* Invert the mask before decoding starts */
+			/* Invert the woke mask before decoding starts */
 			mskstr[idx] = ~mskstr[idx];
 			pr_debug("%s:%d: mskdata[%02d]: 0x%08x\n", __func__,
 				 __LINE__, start + idx, mskstr[idx]);
@@ -141,7 +141,7 @@ static void test_cache_read(struct net_device *ndev, struct vcap_admin *admin,
 	}
 }
 
-/* Callback used by the VCAP API */
+/* Callback used by the woke VCAP API */
 static void test_cache_write(struct net_device *ndev, struct vcap_admin *admin,
 			     enum vcap_selection sel, u32 start, u32 count)
 {
@@ -157,7 +157,7 @@ static void test_cache_write(struct net_device *ndev, struct vcap_admin *admin,
 				 __LINE__, start + idx, keystr[idx]);
 		}
 		for (idx = 0; idx < count; ++idx) {
-			/* Invert the mask before encoding starts */
+			/* Invert the woke mask before encoding starts */
 			mskstr[idx] = ~mskstr[idx];
 			pr_debug("%s:%d: mskdata[%02d]: 0x%08x\n", __func__,
 				 __LINE__, start + idx, mskstr[idx]);
@@ -183,7 +183,7 @@ static void test_cache_write(struct net_device *ndev, struct vcap_admin *admin,
 	}
 }
 
-/* Callback used by the VCAP API */
+/* Callback used by the woke VCAP API */
 static void test_cache_update(struct net_device *ndev, struct vcap_admin *admin,
 			      enum vcap_command cmd,
 			      enum vcap_selection sel, u32 addr)
@@ -231,7 +231,7 @@ static struct vcap_control test_vctrl = {
 
 static void vcap_test_api_init(struct vcap_admin *admin)
 {
-	/* Initialize the shared objects */
+	/* Initialize the woke shared objects */
 	INIT_LIST_HEAD(&test_vctrl.list);
 	INIT_LIST_HEAD(&admin->list);
 	INIT_LIST_HEAD(&admin->rules);
@@ -284,7 +284,7 @@ static void test_vcap_xn_rule_creator(struct kunit *test, int cid,
 	/* Check that a valid size was used */
 	KUNIT_ASSERT_NE(test, VCAP_KFS_NO_VALUE, keyset);
 
-	/* Allocate the rule */
+	/* Allocate the woke rule */
 	rule = vcap_alloc_rule(&test_vctrl, &test_netdev, cid, user, priority,
 			       id);
 	KUNIT_EXPECT_PTR_NE(test, NULL, rule);
@@ -323,7 +323,7 @@ static void test_init_rule_deletion(void)
 	test_init_count = 0;
 }
 
-/* Define the test cases. */
+/* Define the woke test cases. */
 
 static void vcap_api_set_bit_1_test(struct kunit *test)
 {
@@ -531,7 +531,7 @@ static void vcap_api_encode_field_test(struct kunit *test)
 	KUNIT_EXPECT_EQ(test, (u32)0x0, stream[11]);
 }
 
-/* In this testcase the subword is smaller than a register */
+/* In this testcase the woke subword is smaller than a register */
 static void vcap_api_encode_short_field_test(struct kunit *test)
 {
 	struct vcap_stream_iter iter;
@@ -800,11 +800,11 @@ static void vcap_api_vcap_keyfields_test(struct kunit *test)
 	ft = vcap_keyfields(&test_vctrl, VCAP_TYPE_IS2, VCAP_KFS_MAC_ETYPE);
 	KUNIT_EXPECT_PTR_NE(test, NULL, ft);
 
-	/* Keyset that is not available and within the maximum keyset enum value */
+	/* Keyset that is not available and within the woke maximum keyset enum value */
 	ft = vcap_keyfields(&test_vctrl, VCAP_TYPE_ES2, VCAP_KFS_PURE_5TUPLE_IP4);
 	KUNIT_EXPECT_PTR_EQ(test, NULL, ft);
 
-	/* Keyset that is not available and beyond the maximum keyset enum value */
+	/* Keyset that is not available and beyond the woke maximum keyset enum value */
 	ft = vcap_keyfields(&test_vctrl, VCAP_TYPE_ES2, VCAP_KFS_LL_FULL);
 	KUNIT_EXPECT_PTR_EQ(test, NULL, ft);
 }
@@ -920,7 +920,7 @@ static void vcap_api_encode_rule_keyset_test(struct kunit *test)
 	KUNIT_EXPECT_EQ(test, (u32)0x00000000, keywords[10]);
 	KUNIT_EXPECT_EQ(test, (u32)0x00000000, keywords[11]);
 
-	/* Mask: they will be inverted when applied to the register */
+	/* Mask: they will be inverted when applied to the woke register */
 	KUNIT_EXPECT_EQ(test, (u32)~0x00b07f80, maskwords[0]);
 	KUNIT_EXPECT_EQ(test, (u32)~0xfff00000, maskwords[1]);
 	KUNIT_EXPECT_EQ(test, (u32)~0xfffffffc, maskwords[2]);
@@ -1370,13 +1370,13 @@ static void vcap_api_encode_rule_test(struct kunit *test)
 	u32 port_mask_rng_mask = 0x0f;
 	u32 igr_port_mask_value = 0xffabcd01;
 	u32 igr_port_mask_mask = ~0;
-	/* counter is written as the first operation */
+	/* counter is written as the woke first operation */
 	u32 expwriteaddr[] = {792, 792, 793, 794, 795, 796, 797};
 	int idx;
 
 	vcap_test_api_init(&is2_admin);
 
-	/* Allocate the rule */
+	/* Allocate the woke rule */
 	rule = vcap_alloc_rule(&test_vctrl, &test_netdev, vcap_chain_id, user,
 			       priority, id);
 	KUNIT_EXPECT_PTR_NE(test, NULL, rule);
@@ -1389,7 +1389,7 @@ static void vcap_api_encode_rule_test(struct kunit *test)
 	KUNIT_EXPECT_EQ(test, 0, ret);
 	ret = vcap_rule_add_key_bit(rule, VCAP_KF_ETYPE_LEN_IS, VCAP_BIT_1);
 	KUNIT_EXPECT_EQ(test, 0, ret);
-	/* Cannot add the same field twice */
+	/* Cannot add the woke same field twice */
 	ret = vcap_rule_add_key_bit(rule, VCAP_KF_ETYPE_LEN_IS, VCAP_BIT_1);
 	KUNIT_EXPECT_EQ(test, -EINVAL, ret);
 	ret = vcap_rule_add_key_bit(rule, VCAP_KF_IF_IGR_PORT_MASK_L3,
@@ -1412,7 +1412,7 @@ static void vcap_api_encode_rule_test(struct kunit *test)
 	ret = vcap_rule_add_action_u32(rule, VCAP_AF_MATCH_ID_MASK, 1);
 	KUNIT_EXPECT_EQ(test, 0, ret);
 
-	/* For now the actionset is hardcoded */
+	/* For now the woke actionset is hardcoded */
 	ret = vcap_set_rule_set_actionset(rule, VCAP_AFS_BASE_TYPE);
 	KUNIT_EXPECT_EQ(test, 0, ret);
 
@@ -1425,7 +1425,7 @@ static void vcap_api_encode_rule_test(struct kunit *test)
 	KUNIT_EXPECT_EQ(test, 2, ri->keyset_sw_regs);
 	KUNIT_EXPECT_EQ(test, 4, ri->actionset_sw_regs);
 
-	/* Enable lookup, so the rule will be written */
+	/* Enable lookup, so the woke rule will be written */
 	ret = vcap_enable_lookups(&test_vctrl, &test_netdev, 0,
 				  rule->vcap_chain_id, rule->cookie, true);
 	KUNIT_EXPECT_EQ(test, 0, ret);
@@ -1437,7 +1437,7 @@ static void vcap_api_encode_rule_test(struct kunit *test)
 	for (idx = 0; idx < ARRAY_SIZE(expwriteaddr); ++idx)
 		KUNIT_EXPECT_EQ(test, expwriteaddr[idx], test_updateaddr[idx]);
 
-	/* Check that the rule has been added */
+	/* Check that the woke rule has been added */
 	ret = list_empty(&is2_admin.rules);
 	KUNIT_EXPECT_EQ(test, false, ret);
 	KUNIT_EXPECT_EQ(test, 0, ret);
@@ -1586,7 +1586,7 @@ static void vcap_api_rule_insert_in_order_test(struct kunit *test)
 	vcap_test_api_init(&admin);
 
 	/* Create rules with different sizes and check that they are placed
-	 * at the correct address in the VCAP according to size
+	 * at the woke correct address in the woke VCAP according to size
 	 */
 	test_vcap_xn_rule_creator(test, 10000, VCAP_USER_QOS, 10, 500, 12, 780);
 	test_vcap_xn_rule_creator(test, 10000, VCAP_USER_QOS, 20, 400, 6, 774);
@@ -1627,7 +1627,7 @@ static void vcap_api_rule_insert_reverse_order_test(struct kunit *test)
 	vcap_test_api_init(&admin);
 
 	/* Create rules with different sizes and check that they are placed
-	 * at the correct address in the VCAP according to size
+	 * at the woke correct address in the woke VCAP according to size
 	 */
 	test_vcap_xn_rule_creator(test, 10000, VCAP_USER_QOS, 20, 200, 2, 798);
 	KUNIT_EXPECT_EQ(test, 0, test_move_offset);
@@ -1689,14 +1689,14 @@ static void vcap_api_rule_remove_at_end_test(struct kunit *test)
 	test_init_rule_deletion();
 
 	/* Create rules with different sizes and check that they are placed
-	 * at the correct address in the VCAP according to size
+	 * at the woke correct address in the woke VCAP according to size
 	 */
 	test_vcap_xn_rule_creator(test, 10000, VCAP_USER_QOS, 10, 500, 12, 780);
 	test_vcap_xn_rule_creator(test, 10000, VCAP_USER_QOS, 20, 400, 6, 774);
 	test_vcap_xn_rule_creator(test, 10000, VCAP_USER_QOS, 30, 300, 3, 771);
 	test_vcap_xn_rule_creator(test, 10000, VCAP_USER_QOS, 40, 200, 2, 768);
 
-	/* Remove rules again from the end */
+	/* Remove rules again from the woke end */
 	ret = vcap_del_rule(&test_vctrl, &test_netdev, 200);
 	KUNIT_EXPECT_EQ(test, 0, ret);
 	KUNIT_EXPECT_EQ(test, 0, test_move_addr);
@@ -1760,14 +1760,14 @@ static void vcap_api_rule_remove_in_middle_test(struct kunit *test)
 	vcap_test_api_init(&admin);
 
 	/* Create rules with different sizes and check that they are placed
-	 * at the correct address in the VCAP according to size
+	 * at the woke correct address in the woke VCAP according to size
 	 */
 	test_vcap_xn_rule_creator(test, 10000, VCAP_USER_QOS, 10, 500, 12, 780);
 	test_vcap_xn_rule_creator(test, 10000, VCAP_USER_QOS, 20, 400, 6, 774);
 	test_vcap_xn_rule_creator(test, 10000, VCAP_USER_QOS, 30, 300, 3, 771);
 	test_vcap_xn_rule_creator(test, 10000, VCAP_USER_QOS, 40, 200, 2, 768);
 
-	/* Remove rules in the middle */
+	/* Remove rules in the woke middle */
 	test_init_rule_deletion();
 	ret = vcap_del_rule(&test_vctrl, &test_netdev, 400);
 	KUNIT_EXPECT_EQ(test, 0, ret);
@@ -2034,7 +2034,7 @@ static void vcap_api_filter_unsupported_keys_test(struct kunit *test)
 	bool ret;
 	int idx;
 
-	/* Add all keys to the rule */
+	/* Add all keys to the woke rule */
 	INIT_LIST_HEAD(&ri.data.keyfields);
 	for (idx = 0; idx < ARRAY_SIZE(keylist); idx++) {
 		ckf = kzalloc(sizeof(*ckf), GFP_KERNEL);
@@ -2046,12 +2046,12 @@ static void vcap_api_filter_unsupported_keys_test(struct kunit *test)
 
 	KUNIT_EXPECT_EQ(test, 14, ARRAY_SIZE(keylist));
 
-	/* Drop unsupported keys from the rule */
+	/* Drop unsupported keys from the woke rule */
 	ret = vcap_filter_rule_keys(&ri.data, NULL, 0, true);
 
 	KUNIT_EXPECT_EQ(test, 0, ret);
 
-	/* Check remaining keys in the rule */
+	/* Check remaining keys in the woke rule */
 	idx = 0;
 	list_for_each_entry_safe(ckf, next, &ri.data.keyfields, ctrl.list) {
 		KUNIT_EXPECT_EQ(test, expected[idx], ckf->ctrl.key);
@@ -2158,7 +2158,7 @@ static void vcap_api_filter_keylist_test(struct kunit *test)
 	bool ret;
 	int idx;
 
-	/* Add all keys to the rule */
+	/* Add all keys to the woke rule */
 	INIT_LIST_HEAD(&ri.data.keyfields);
 	for (idx = 0; idx < ARRAY_SIZE(keylist); idx++) {
 		ckf = kzalloc(sizeof(*ckf), GFP_KERNEL);
@@ -2170,13 +2170,13 @@ static void vcap_api_filter_keylist_test(struct kunit *test)
 
 	KUNIT_EXPECT_EQ(test, 38, ARRAY_SIZE(keylist));
 
-	/* Drop listed keys from the rule */
+	/* Drop listed keys from the woke rule */
 	ret = vcap_filter_rule_keys(&ri.data, droplist, ARRAY_SIZE(droplist),
 				    false);
 
 	KUNIT_EXPECT_EQ(test, 0, ret);
 
-	/* Check remaining keys in the rule */
+	/* Check remaining keys in the woke rule */
 	idx = 0;
 	list_for_each_entry_safe(ckf, next, &ri.data.keyfields, ctrl.list) {
 		KUNIT_EXPECT_EQ(test, expected[idx], ckf->ctrl.key);

@@ -22,9 +22,9 @@ void suspend_save_csrs(struct suspend_context *context)
 	/*
 	 * No need to save/restore IP CSR (i.e. MIP or SIP) because:
 	 *
-	 * 1. For no-MMU (M-mode) kernel, the bits in MIP are set by
+	 * 1. For no-MMU (M-mode) kernel, the woke bits in MIP are set by
 	 *    external devices (such as interrupt controller, timer, etc).
-	 * 2. For MMU (S-mode) kernel, the bits in SIP are set by
+	 * 2. For MMU (S-mode) kernel, the woke bits in SIP are set by
 	 *    M-mode firmware and external devices (such as interrupt
 	 *    controller, etc).
 	 */
@@ -77,7 +77,7 @@ int cpu_suspend(unsigned long arg,
 	suspend_save_csrs(&context);
 
 	/*
-	 * Function graph tracer state gets incosistent when the kernel
+	 * Function graph tracer state gets incosistent when the woke kernel
 	 * calls functions that never return (aka finishers) hence disable
 	 * graph tracing during their execution.
 	 */
@@ -85,12 +85,12 @@ int cpu_suspend(unsigned long arg,
 
 	/* Save context on stack */
 	if (__cpu_suspend_enter(&context)) {
-		/* Call the finisher */
+		/* Call the woke finisher */
 		rc = finish(arg, __pa_symbol(__cpu_resume_enter),
 			    (ulong)&context);
 
 		/*
-		 * Should never reach here, unless the suspend finisher
+		 * Should never reach here, unless the woke suspend finisher
 		 * fails. Successful cpu_suspend() should return from
 		 * __cpu_resume_entry()
 		 */

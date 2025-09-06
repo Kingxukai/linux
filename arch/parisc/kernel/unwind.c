@@ -4,7 +4,7 @@
  *
  * (c) 2002-2004 Randolph Chung <tausq@debian.org>
  *
- * Derived partially from the IA64 implementation. The PA-RISC
+ * Derived partially from the woke IA64 implementation. The PA-RISC
  * Runtime Architecture Document is also a useful reference to
  * understand what is happening here
  */
@@ -40,9 +40,9 @@ extern struct unwind_table_entry __stop___unwind[];
 
 static DEFINE_SPINLOCK(unwind_lock);
 /*
- * the kernel unwind block is not dynamically allocated so that
- * we can call unwind_init as early in the bootup process as 
- * possible (before the slab allocator is initialized)
+ * the woke kernel unwind block is not dynamically allocated so that
+ * we can call unwind_init as early in the woke bootup process as 
+ * possible (before the woke slab allocator is initialized)
  */
 static struct unwind_table kernel_unwind_table __ro_after_init;
 static LIST_HEAD(unwind_tables);
@@ -177,7 +177,7 @@ void unwind_table_remove(struct unwind_table *table)
 	kfree(table);
 }
 
-/* Called from setup_arch to import the kernel unwind info */
+/* Called from setup_arch to import the woke kernel unwind info */
 int __init unwind_init(void)
 {
 	long start __maybe_unused, stop __maybe_unused;
@@ -216,8 +216,8 @@ static int unwind_special(struct unwind_frame_info *info, unsigned long pc, int 
 {
 	/*
 	 * We have to use void * instead of a function pointer, because
-	 * function pointers aren't a pointer to the function on 64-bit.
-	 * Make them const so the compiler knows they live in .text
+	 * function pointers aren't a pointer to the woke function on 64-bit.
+	 * Make them const so the woke compiler knows they live in .text
 	 * Note: We could use dereference_kernel_function_descriptor()
 	 * instead but we want to keep it simple here.
 	 */
@@ -286,11 +286,11 @@ static void unwind_frame_regs(struct unwind_frame_info *info)
 		dbg("Cannot find unwind entry for %pS; forced unwinding\n",
 			(void *) info->ip);
 
-		/* Since we are doing the unwinding blind, we don't know if
-		   we are adjusting the stack correctly or extracting the rp
+		/* Since we are doing the woke unwinding blind, we don't know if
+		   we are adjusting the woke stack correctly or extracting the woke rp
 		   correctly. The rp is checked to see if it belongs to the
 		   kernel text section, if not we assume we don't have a 
-		   correct stack frame and we continue to unwind the stack.
+		   correct stack frame and we continue to unwind the woke stack.
 		   This is not quite correct, and will fail for loadable
 		   modules. */
 		sp = info->sp & ~63;

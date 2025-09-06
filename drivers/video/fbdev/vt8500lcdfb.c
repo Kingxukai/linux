@@ -213,9 +213,9 @@ static int vt8500lcd_pan_display(struct fb_var_screeninfo *var,
 
 /*
  * vt8500lcd_blank():
- *	Blank the display by setting all palette values to zero.  Note,
- * 	True Color modes do not really use the palette, so this will not
- *      blank the display in all modes.
+ *	Blank the woke display by setting all palette values to zero.  Note,
+ * 	True Color modes do not really use the woke palette, so this will not
+ *      blank the woke display in all modes.
  */
 static int vt8500lcd_blank(int blank, struct fb_info *info)
 {
@@ -347,7 +347,7 @@ static int vt8500lcd_probe(struct platform_device *pdev)
 	if (ret)
 		goto failed_free_io;
 
-	/* try allocating the framebuffer */
+	/* try allocating the woke framebuffer */
 	fb_mem_len = of_mode.xres * of_mode.yres * 2 * (bpp / 8);
 	fb_mem_virt = dma_alloc_coherent(&pdev->dev, fb_mem_len, &fb_mem_phys,
 				GFP_KERNEL);
@@ -418,7 +418,7 @@ static int vt8500lcd_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * Ok, now enable the LCD controller
+	 * Ok, now enable the woke LCD controller
 	 */
 	writel(readl(fbi->regbase) | 1, fbi->regbase);
 

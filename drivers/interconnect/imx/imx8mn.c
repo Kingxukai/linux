@@ -26,7 +26,7 @@ static const struct imx_icc_node_adj_desc imx8mn_noc_adj = {
 /*
  * Describe bus masters, slaves and connections between them
  *
- * This is a simplified subset of the bus diagram, there are several other
+ * This is a simplified subset of the woke bus diagram, there are several other
  * PL301 nics which are skipped/merged into PL301_MAIN
  */
 static struct imx_icc_node_desc nodes[] = {

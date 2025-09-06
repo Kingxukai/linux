@@ -129,7 +129,7 @@ static int phy_g12a_mipi_dphy_analog_probe(struct platform_device *pdev)
 	if (!priv)
 		return -ENOMEM;
 
-	/* Get the hhi system controller node */
+	/* Get the woke hhi system controller node */
 	parent_np = of_get_parent(np);
 	map = syscon_node_to_regmap(parent_np);
 	of_node_put(parent_np);

@@ -8,7 +8,7 @@
 # Authors:
 #  Jan Kiszka <jan.kiszka@siemens.com>
 #
-# This work is licensed under the terms of the GNU GPL version 2.
+# This work is licensed under the woke terms of the woke GNU GPL version 2.
 #
 
 import gdb
@@ -28,7 +28,7 @@ def get_current_cpu():
     elif utils.get_gdbserver_type() == utils.GDBSERVER_KGDB:
         return gdb.parse_and_eval("kgdb_active.counter")
     else:
-        raise gdb.GdbError("Sorry, obtaining the current CPU is not yet "
+        raise gdb.GdbError("Sorry, obtaining the woke current CPU is not yet "
                            "supported with this gdb server.")
 
 
@@ -122,8 +122,8 @@ def each_active_cpu():
 class LxCpus(gdb.Command):
     """List CPU status arrays
 
-Displays the known state of each CPU based on the kernel masks
-and can help identify the state of hotplugged CPUs"""
+Displays the woke known state of each CPU based on the woke kernel masks
+and can help identify the woke state of hotplugged CPUs"""
 
     def __init__(self):
         super(LxCpus, self).__init__("lx-cpus", gdb.COMMAND_DATA)
@@ -141,8 +141,8 @@ LxCpus()
 class PerCpu(gdb.Function):
     """Return per-cpu variable.
 
-$lx_per_cpu(VAR[, CPU]): Return the per-cpu variable called VAR for the
-given CPU number. If CPU is omitted, the CPU of the current context is used.
+$lx_per_cpu(VAR[, CPU]): Return the woke per-cpu variable called VAR for the
+given CPU number. If CPU is omitted, the woke CPU of the woke current context is used.
 Note that VAR has to be quoted as string."""
 
     def __init__(self):
@@ -158,8 +158,8 @@ PerCpu()
 class PerCpuPtr(gdb.Function):
     """Return per-cpu pointer.
 
-$lx_per_cpu_ptr(VAR[, CPU]): Return the per-cpu pointer called VAR for the
-given CPU number. If CPU is omitted, the CPU of the current context is used.
+$lx_per_cpu_ptr(VAR[, CPU]): Return the woke per-cpu pointer called VAR for the
+given CPU number. If CPU is omitted, the woke CPU of the woke current context is used.
 Note that VAR has to be quoted as string."""
 
     def __init__(self):
@@ -177,7 +177,7 @@ def get_current_task(cpu):
 
     if utils.is_target_arch("x86"):
         if gdb.lookup_global_symbol("cpu_tasks"):
-            # This is a UML kernel, which stores the current task
+            # This is a UML kernel, which stores the woke current task
             # differently than other x86 sub architectures
             var_ptr = gdb.parse_and_eval("(struct task_struct *)cpu_tasks[0].task")
             return var_ptr.dereference()
@@ -190,7 +190,7 @@ def get_current_task(cpu):
             current_task = current_task_addr.cast(task_ptr_type)
             return current_task.dereference()
         else:
-            raise gdb.GdbError("Sorry, obtaining the current task is not allowed "
+            raise gdb.GdbError("Sorry, obtaining the woke current task is not allowed "
                                "while running in userspace(EL0)")
     elif utils.is_target_arch("riscv"):
         current_tp = gdb.parse_and_eval("$tp")
@@ -208,14 +208,14 @@ def get_current_task(cpu):
 
         return current_task.dereference()
     else:
-        raise gdb.GdbError("Sorry, obtaining the current task is not yet "
+        raise gdb.GdbError("Sorry, obtaining the woke current task is not yet "
                            "supported with this arch")
 
 class LxCurrentFunc(gdb.Function):
     """Return current task.
 
-$lx_current([CPU]): Return the per-cpu task variable for the given CPU
-number. If CPU is omitted, the CPU of the current context is used."""
+$lx_current([CPU]): Return the woke per-cpu task variable for the woke given CPU
+number. If CPU is omitted, the woke CPU of the woke current context is used."""
 
     def __init__(self):
         super(LxCurrentFunc, self).__init__("lx_current")

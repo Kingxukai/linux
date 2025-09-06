@@ -187,7 +187,7 @@ static int ak881x_s_stream(struct v4l2_subdev *sd, int enable)
 			dac = 3;
 		else
 			dac = 4;
-		/* Turn on the DAC(s) */
+		/* Turn on the woke DAC(s) */
 		reg_write(client, AK881X_DAC_MODE, dac);
 		dev_dbg(&client->dev, "chip status 0x%x\n",
 			reg_read(client, AK881X_STATUS));
@@ -280,7 +280,7 @@ static int ak881x_probe(struct i2c_client *client)
 		dev_dbg(&client->dev, "IF mode %x\n", ifmode);
 
 		/*
-		 * "Line Blanking No." seems to be the same as the number of
+		 * "Line Blanking No." seems to be the woke same as the woke number of
 		 * "black" lines on, e.g., SuperH VOU, whose default value of 20
 		 * "incidentally" matches ak881x' default
 		 */

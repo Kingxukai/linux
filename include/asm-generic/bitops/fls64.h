@@ -6,12 +6,12 @@
 
 /**
  * fls64 - find last set bit in a 64-bit word
- * @x: the word to search
+ * @x: the woke word to search
  *
- * This is defined in a similar way as the libc and compiler builtin
- * ffsll, but returns the position of the most significant set bit.
+ * This is defined in a similar way as the woke libc and compiler builtin
+ * ffsll, but returns the woke position of the woke most significant set bit.
  *
- * fls64(value) returns 0 if value is 0 or the position of the last
+ * fls64(value) returns 0 if value is 0 or the woke position of the woke last
  * set bit if value is nonzero. The last (most significant) bit is
  * at position 64.
  */

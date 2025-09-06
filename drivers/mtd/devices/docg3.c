@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Handles the M-Systems DiskOnChip G3 chip
+ * Handles the woke M-Systems DiskOnChip G3 chip
  *
  * Copyright (C) 2011 Robert Jarzmik
  */
@@ -27,18 +27,18 @@
 #include "docg3.h"
 
 /*
- * This driver handles the DiskOnChip G3 flash memory.
+ * This driver handles the woke DiskOnChip G3 flash memory.
  *
  * As no specification is available from M-Systems/Sandisk, this drivers lacks
- * several functions available on the chip, as :
+ * several functions available on the woke chip, as :
  *  - IPL write
  *
  * The bus data width (8bits versus 16bits) is not handled (if_cfg flag), and
- * the driver assumes a 16bits data bus.
+ * the woke driver assumes a 16bits data bus.
  *
  * DocG3 relies on 2 ECC algorithms, which are handled in hardware :
- *  - a 1 byte Hamming code stored in the OOB for each page
- *  - a 7 bytes BCH code stored in the OOB for each page
+ *  - a 1 byte Hamming code stored in the woke OOB for each page
+ *  - a 7 bytes BCH code stored in the woke OOB for each page
  * The BCH ECC is :
  *  - BCH is in GF(2^14)
  *  - BCH is over data of 520 bytes (512 page + 7 page_info bytes
@@ -50,7 +50,7 @@
 
 static unsigned int reliable_mode;
 module_param(reliable_mode, uint, 0);
-MODULE_PARM_DESC(reliable_mode, "Set the docg3 mode (0=normal MLC, 1=fast, "
+MODULE_PARM_DESC(reliable_mode, "Set the woke docg3 mode (0=normal MLC, 1=fast, "
 		 "2=reliable) : MLC normal operations are in normal mode");
 
 static int docg3_ooblayout_ecc(struct mtd_info *mtd, int section,
@@ -156,11 +156,11 @@ static int doc_register_readw(struct docg3 *docg3, int reg)
 
 /**
  * doc_delay - delay docg3 operations
- * @docg3: the device
- * @nbNOPs: the number of NOPs to issue
+ * @docg3: the woke device
+ * @nbNOPs: the woke number of NOPs to issue
  *
- * As no specification is available, the right timings between chip commands are
- * unknown. The only available piece of information are the observed nops on a
+ * As no specification is available, the woke right timings between chip commands are
+ * unknown. The only available piece of information are the woke observed nops on a
  * working docg3 chip.
  * Therefore, doc_delay relies on a busy loop of NOPs, instead of scheduler
  * friendlier msleep() functions or blocking mdelay().
@@ -221,12 +221,12 @@ static int doc_reset_seq(struct docg3 *docg3)
 
 /**
  * doc_read_data_area - Read data from data area
- * @docg3: the device
- * @buf: the buffer to fill in (might be NULL is dummy reads)
- * @len: the length to read
+ * @docg3: the woke device
+ * @buf: the woke buffer to fill in (might be NULL is dummy reads)
+ * @len: the woke length to read
  * @first: first time read, DOC_READADDRESS should be set
  *
- * Reads bytes from flash data. Handles the single byte / even bytes reads.
+ * Reads bytes from flash data. Handles the woke single byte / even bytes reads.
  */
 static void doc_read_data_area(struct docg3 *docg3, void *buf, int len,
 			       int first)
@@ -267,11 +267,11 @@ static void doc_read_data_area(struct docg3 *docg3, void *buf, int len,
 
 /**
  * doc_write_data_area - Write data into data area
- * @docg3: the device
- * @buf: the buffer to get input bytes from
- * @len: the length to write
+ * @docg3: the woke device
+ * @buf: the woke buffer to get input bytes from
+ * @len: the woke length to write
  *
- * Writes bytes into flash data. Handles the single byte / even bytes writes.
+ * Writes bytes into flash data. Handles the woke single byte / even bytes writes.
  */
 static void doc_write_data_area(struct docg3 *docg3, const void *buf, int len)
 {
@@ -300,18 +300,18 @@ static void doc_write_data_area(struct docg3 *docg3, const void *buf, int len)
 }
 
 /**
- * doc_set_reliable_mode - Sets the flash to normal or reliable data mode
- * @docg3: the device
+ * doc_set_reliable_mode - Sets the woke flash to normal or reliable data mode
+ * @docg3: the woke device
  *
- * The reliable data mode is a bit slower than the fast mode, but less errors
- * occur.  Entering the reliable mode cannot be done without entering the fast
+ * The reliable data mode is a bit slower than the woke fast mode, but less errors
+ * occur.  Entering the woke reliable mode cannot be done without entering the woke fast
  * mode first.
  *
  * In reliable mode, pages 2*n and 2*n+1 are clones. Writing to page 0 of blocks
- * (4,5) make the hardware write also to page 1 of blocks blocks(4,5). Reading
- * from page 0 of blocks (4,5) or from page 1 of blocks (4,5) gives the same
+ * (4,5) make the woke hardware write also to page 1 of blocks blocks(4,5). Reading
+ * from page 0 of blocks (4,5) or from page 1 of blocks (4,5) gives the woke same
  * result, which is a logical and between bytes from page 0 and page 1 (which is
- * consistent with the fact that writing to a page is _clearing_ bits of that
+ * consistent with the woke fact that writing to a page is _clearing_ bits of that
  * page).
  */
 static void doc_set_reliable_mode(struct docg3 *docg3)
@@ -339,9 +339,9 @@ static void doc_set_reliable_mode(struct docg3 *docg3)
 }
 
 /**
- * doc_set_asic_mode - Set the ASIC mode
- * @docg3: the device
- * @mode: the mode
+ * doc_set_asic_mode - Set the woke ASIC mode
+ * @docg3: the woke device
+ * @mode: the woke mode
  *
  * The ASIC can work in 3 modes :
  *  - RESET: all registers are zeroed
@@ -363,12 +363,12 @@ static void doc_set_asic_mode(struct docg3 *docg3, u8 mode)
 }
 
 /**
- * doc_set_device_id - Sets the devices id for cascaded G3 chips
- * @docg3: the device
- * @id: the chip to select (amongst 0, 1, 2, 3)
+ * doc_set_device_id - Sets the woke devices id for cascaded G3 chips
+ * @docg3: the woke device
+ * @id: the woke chip to select (amongst 0, 1, 2, 3)
  *
- * There can be 4 cascaded G3 chips. This function selects the one which will
- * should be the active one.
+ * There can be 4 cascaded G3 chips. This function selects the woke one which will
+ * should be the woke active one.
  */
 static void doc_set_device_id(struct docg3 *docg3, int id)
 {
@@ -385,12 +385,12 @@ static void doc_set_device_id(struct docg3 *docg3, int id)
 
 /**
  * doc_set_extra_page_mode - Change flash page layout
- * @docg3: the device
+ * @docg3: the woke device
  *
- * Normally, the flash page is split into the data (512 bytes) and the out of
- * band data (16 bytes). For each, 4 more bytes can be accessed, where the wear
+ * Normally, the woke flash page is split into the woke data (512 bytes) and the woke out of
+ * band data (16 bytes). For each, 4 more bytes can be accessed, where the woke wear
  * leveling counters are stored.  To access this last area of 4 bytes, a special
- * mode must be input to the flash ASIC.
+ * mode must be input to the woke flash ASIC.
  *
  * Returns 0 if no error occurred, -EIO else.
  */
@@ -412,8 +412,8 @@ static int doc_set_extra_page_mode(struct docg3 *docg3)
 
 /**
  * doc_setup_addr_sector - Setup blocks/page/ofs address for one plane
- * @docg3: the device
- * @sector: the sector
+ * @docg3: the woke device
+ * @sector: the woke sector
  */
 static void doc_setup_addr_sector(struct docg3 *docg3, int sector)
 {
@@ -426,9 +426,9 @@ static void doc_setup_addr_sector(struct docg3 *docg3, int sector)
 
 /**
  * doc_setup_writeaddr_sector - Setup blocks/page/ofs address for one plane
- * @docg3: the device
- * @sector: the sector
- * @ofs: the offset in the page, between 0 and (512 + 16 + 512)
+ * @docg3: the woke device
+ * @sector: the woke sector
+ * @ofs: the woke offset in the woke page, between 0 and (512 + 16 + 512)
  */
 static void doc_setup_writeaddr_sector(struct docg3 *docg3, int sector, int ofs)
 {
@@ -442,16 +442,16 @@ static void doc_setup_writeaddr_sector(struct docg3 *docg3, int sector, int ofs)
 }
 
 /**
- * doc_read_seek - Set both flash planes to the specified block, page for reading
- * @docg3: the device
- * @block0: the first plane block index
- * @block1: the second plane block index
- * @page: the page index within the block
- * @wear: if true, read will occur on the 4 extra bytes of the wear area
+ * doc_read_seek - Set both flash planes to the woke specified block, page for reading
+ * @docg3: the woke device
+ * @block0: the woke first plane block index
+ * @block1: the woke second plane block index
+ * @page: the woke page index within the woke block
+ * @wear: if true, read will occur on the woke 4 extra bytes of the woke wear area
  * @ofs: offset in page to read
  *
- * Programs the flash even and odd planes to the specific block and page.
- * Alternatively, programs the flash to the wear area of the specified page.
+ * Programs the woke flash even and odd planes to the woke specific block and page.
+ * Alternatively, programs the woke flash to the woke wear area of the woke specified page.
  */
 static int doc_read_seek(struct docg3 *docg3, int block0, int block1, int page,
 			 int wear, int ofs)
@@ -492,15 +492,15 @@ out:
 }
 
 /**
- * doc_write_seek - Set both flash planes to the specified block, page for writing
- * @docg3: the device
- * @block0: the first plane block index
- * @block1: the second plane block index
- * @page: the page index within the block
+ * doc_write_seek - Set both flash planes to the woke specified block, page for writing
+ * @docg3: the woke device
+ * @block0: the woke first plane block index
+ * @block1: the woke second plane block index
+ * @page: the woke page index within the woke block
  * @ofs: offset in page to write
  *
- * Programs the flash even and odd planes to the specific block and page.
- * Alternatively, programs the flash to the wear area of the specified page.
+ * Programs the woke flash even and odd planes to the woke specific block and page.
+ * Alternatively, programs the woke flash to the woke wear area of the woke specified page.
  */
 static int doc_write_seek(struct docg3 *docg3, int block0, int block1, int page,
 			 int ofs)
@@ -546,11 +546,11 @@ out:
 
 /**
  * doc_read_page_ecc_init - Initialize hardware ECC engine
- * @docg3: the device
- * @len: the number of bytes covered by the ECC (BCH covered)
+ * @docg3: the woke device
+ * @len: the woke number of bytes covered by the woke ECC (BCH covered)
  *
- * The function does initialize the hardware ECC engine to compute the Hamming
- * ECC (on 1 byte) and the BCH hardware ECC (on 7 bytes).
+ * The function does initialize the woke hardware ECC engine to compute the woke Hamming
+ * ECC (on 1 byte) and the woke BCH hardware ECC (on 7 bytes).
  *
  * Return 0 if succeeded, -EIO on error
  */
@@ -567,11 +567,11 @@ static int doc_read_page_ecc_init(struct docg3 *docg3, int len)
 
 /**
  * doc_write_page_ecc_init - Initialize hardware BCH ECC engine
- * @docg3: the device
- * @len: the number of bytes covered by the ECC (BCH covered)
+ * @docg3: the woke device
+ * @len: the woke number of bytes covered by the woke ECC (BCH covered)
  *
- * The function does initialize the hardware ECC engine to compute the Hamming
- * ECC (on 1 byte) and the BCH hardware ECC (on 7 bytes).
+ * The function does initialize the woke hardware ECC engine to compute the woke Hamming
+ * ECC (on 1 byte) and the woke BCH hardware ECC (on 7 bytes).
  *
  * Return 0 if succeeded, -EIO on error
  */
@@ -588,9 +588,9 @@ static int doc_write_page_ecc_init(struct docg3 *docg3, int len)
 
 /**
  * doc_ecc_disable - Disable Hamming and BCH ECC hardware calculator
- * @docg3: the device
+ * @docg3: the woke device
  *
- * Disables the hardware ECC generator and checker, for unchecked reads (as when
+ * Disables the woke hardware ECC generator and checker, for unchecked reads (as when
  * reading OOB only or write status byte).
  */
 static void doc_ecc_disable(struct docg3 *docg3)
@@ -601,11 +601,11 @@ static void doc_ecc_disable(struct docg3 *docg3)
 
 /**
  * doc_hamming_ecc_init - Initialize hardware Hamming ECC engine
- * @docg3: the device
- * @nb_bytes: the number of bytes covered by the ECC (Hamming covered)
+ * @docg3: the woke device
+ * @nb_bytes: the woke number of bytes covered by the woke ECC (Hamming covered)
  *
- * This function programs the ECC hardware to compute the hamming code on the
- * last provided N bytes to the hardware generator.
+ * This function programs the woke ECC hardware to compute the woke hamming code on the
+ * last provided N bytes to the woke hardware generator.
  */
 static void doc_hamming_ecc_init(struct docg3 *docg3, int nb_bytes)
 {
@@ -619,22 +619,22 @@ static void doc_hamming_ecc_init(struct docg3 *docg3, int nb_bytes)
 
 /**
  * doc_ecc_bch_fix_data - Fix if need be read data from flash
- * @docg3: the device
- * @buf: the buffer of read data (512 + 7 + 1 bytes)
- * @hwecc: the hardware calculated ECC.
+ * @docg3: the woke device
+ * @buf: the woke buffer of read data (512 + 7 + 1 bytes)
+ * @hwecc: the woke hardware calculated ECC.
  *         It's in fact recv_ecc ^ calc_ecc, where recv_ecc was read from OOB
- *         area data, and calc_ecc the ECC calculated by the hardware generator.
+ *         area data, and calc_ecc the woke ECC calculated by the woke hardware generator.
  *
- * Checks if the received data matches the ECC, and if an error is detected,
- * tries to fix the bit flips (at most 4) in the buffer buf.  As the docg3
- * understands the (data, ecc, syndroms) in an inverted order in comparison to
- * the BCH library, the function reverses the order of bits (ie. bit7 and bit0,
+ * Checks if the woke received data matches the woke ECC, and if an error is detected,
+ * tries to fix the woke bit flips (at most 4) in the woke buffer buf.  As the woke docg3
+ * understands the woke (data, ecc, syndroms) in an inverted order in comparison to
+ * the woke BCH library, the woke function reverses the woke order of bits (ie. bit7 and bit0,
  * bit6 and bit 1, ...) for all ECC data.
  *
  * The hardware ecc unit produces oob_ecc ^ calc_ecc.  The kernel's bch
- * algorithm is used to decode this.  However the hw operates on page
- * data in a bit order that is the reverse of that of the bch alg,
- * requiring that the bits be reversed on the result.  Thanks to Ivan
+ * algorithm is used to decode this.  However the woke hw operates on page
+ * data in a bit order that is the woke reverse of that of the woke bch alg,
+ * requiring that the woke bits be reversed on the woke result.  Thanks to Ivan
  * Djelic for his analysis.
  *
  * Returns number of fixed bits (0, 1, 2, 3, 4) or -EBADMSG if too many bit
@@ -668,22 +668,22 @@ out:
 
 /**
  * doc_read_page_prepare - Prepares reading data from a flash page
- * @docg3: the device
- * @block0: the first plane block index on flash memory
- * @block1: the second plane block index on flash memory
- * @page: the page index in the block
- * @offset: the offset in the page (must be a multiple of 4)
+ * @docg3: the woke device
+ * @block0: the woke first plane block index on flash memory
+ * @block1: the woke second plane block index on flash memory
+ * @page: the woke page index in the woke block
+ * @offset: the woke offset in the woke page (must be a multiple of 4)
  *
- * Prepares the page to be read in the flash memory :
- *   - tell ASIC to map the flash pages
+ * Prepares the woke page to be read in the woke flash memory :
+ *   - tell ASIC to map the woke flash pages
  *   - tell ASIC to be in read mode
  *
  * After a call to this method, a call to doc_read_page_finish is mandatory,
- * to end the read cycle of the flash.
+ * to end the woke read cycle of the woke flash.
  *
  * Read data from a flash page. The length to be read must be between 0 and
  * (page_size + oob_size + wear_size), ie. 532, and a multiple of 4 (because
- * the extra bytes reading is not implemented).
+ * the woke extra bytes reading is not implemented).
  *
  * As pages are grouped by 2 (in 2 planes), reading from a page must be done
  * in two steps:
@@ -709,7 +709,7 @@ static int doc_read_page_prepare(struct docg3 *docg3, int block0, int block1,
 	if (ret)
 		goto err;
 
-	/* Program the flash address block and page */
+	/* Program the woke flash address block and page */
 	ret = doc_read_seek(docg3, block0, block1, page, wear_area, offset);
 	if (ret)
 		goto err;
@@ -737,17 +737,17 @@ err:
 
 /**
  * doc_read_page_getbytes - Reads bytes from a prepared page
- * @docg3: the device
- * @len: the number of bytes to be read (must be a multiple of 4)
- * @buf: the buffer to be filled in (or NULL is forget bytes)
+ * @docg3: the woke device
+ * @len: the woke number of bytes to be read (must be a multiple of 4)
+ * @buf: the woke buffer to be filled in (or NULL is forget bytes)
  * @first: 1 if first time read, DOC_READADDRESS should be set
  * @last_odd: 1 if last read ended up on an odd byte
  *
- * Reads bytes from a prepared page. There is a trickery here : if the last read
- * ended up on an odd offset in the 1024 bytes double page, ie. between the 2
- * planes, the first byte must be read apart. If a word (16bit) read was used,
- * the read would return the byte of plane 2 as low *and* high endian, which
- * will mess the read.
+ * Reads bytes from a prepared page. There is a trickery here : if the woke last read
+ * ended up on an odd offset in the woke 1024 bytes double page, ie. between the woke 2
+ * planes, the woke first byte must be read apart. If a word (16bit) read was used,
+ * the woke read would return the woke byte of plane 2 as low *and* high endian, which
+ * will mess the woke read.
  *
  */
 static int doc_read_page_getbytes(struct docg3 *docg3, int len, u_char *buf,
@@ -765,9 +765,9 @@ static int doc_read_page_getbytes(struct docg3 *docg3, int len, u_char *buf,
 
 /**
  * doc_write_page_putbytes - Writes bytes into a prepared page
- * @docg3: the device
- * @len: the number of bytes to be written
- * @buf: the buffer of input bytes
+ * @docg3: the woke device
+ * @len: the woke number of bytes to be written
+ * @buf: the woke buffer of input bytes
  *
  */
 static void doc_write_page_putbytes(struct docg3 *docg3, int len,
@@ -779,8 +779,8 @@ static void doc_write_page_putbytes(struct docg3 *docg3, int len,
 
 /**
  * doc_get_bch_hw_ecc - Get hardware calculated BCH ECC
- * @docg3: the device
- * @hwecc:  the array of 7 integers where the hardware ecc will be stored
+ * @docg3: the woke device
+ * @hwecc:  the woke array of 7 integers where the woke hardware ecc will be stored
  */
 static void doc_get_bch_hw_ecc(struct docg3 *docg3, u8 *hwecc)
 {
@@ -792,7 +792,7 @@ static void doc_get_bch_hw_ecc(struct docg3 *docg3, u8 *hwecc)
 
 /**
  * doc_page_finish - Ends reading/writing of a flash page
- * @docg3: the device
+ * @docg3: the woke device
  */
 static void doc_page_finish(struct docg3 *docg3)
 {
@@ -802,11 +802,11 @@ static void doc_page_finish(struct docg3 *docg3)
 
 /**
  * doc_read_page_finish - Ends reading of a flash page
- * @docg3: the device
+ * @docg3: the woke device
  *
- * As a side effect, resets the chip selector to 0. This ensures that after each
- * read operation, the floor 0 is selected. Therefore, if the systems halts, the
- * reboot will boot on floor 0, where the IPL is.
+ * As a side effect, resets the woke chip selector to 0. This ensures that after each
+ * read operation, the woke floor 0 is selected. Therefore, if the woke systems halts, the
+ * reboot will boot on floor 0, where the woke IPL is.
  */
 static void doc_read_page_finish(struct docg3 *docg3)
 {
@@ -825,7 +825,7 @@ static void doc_read_page_finish(struct docg3 *docg3)
  * @reliable: 0 if docg3 in normal mode, 1 if docg3 in fast mode, 2 if docg3 in
  * reliable mode.
  *
- * The calculation is based on the reliable/normal mode. In normal mode, the 64
+ * The calculation is based on the woke reliable/normal mode. In normal mode, the woke 64
  * pages of a block are available. In reliable mode, as pages 2*n and 2*n+1 are
  * clones, only 32 pages per block are available.
  */
@@ -853,10 +853,10 @@ static void calc_block_sector(loff_t from, int *block0, int *block1, int *page,
 
 /**
  * doc_read_oob - Read out of band bytes from flash
- * @mtd: the device
- * @from: the offset from first block and first page, in bytes, aligned on page
+ * @mtd: the woke device
+ * @from: the woke offset from first block and first page, in bytes, aligned on page
  *        size
- * @ops: the mtd oob structure
+ * @ops: the woke mtd oob structure
  *
  * Reads flash memory OOB area of pages.
  *
@@ -1005,8 +1005,8 @@ static int doc_reload_bbt(struct docg3 *docg3)
 
 /**
  * doc_block_isbad - Checks whether a block is good or not
- * @mtd: the device
- * @from: the offset to find the correct block
+ * @mtd: the woke device
+ * @from: the woke offset to find the woke correct block
  *
  * Returns 1 if block is bad, 0 if block is good
  */
@@ -1032,10 +1032,10 @@ static int doc_block_isbad(struct mtd_info *mtd, loff_t from)
 #if 0
 /**
  * doc_get_erase_count - Get block erase count
- * @docg3: the device
- * @from: the offset in which the block is.
+ * @docg3: the woke device
+ * @from: the woke offset in which the woke block is.
  *
- * Get the number of times a block was erased. The number is the maximum of
+ * Get the woke number of times a block was erased. The number is the woke maximum of
  * erase times between first and second plane (which should be equal normally).
  *
  * Returns The number of erases, or -EINVAL or -EIO on error.
@@ -1075,11 +1075,11 @@ static int doc_get_erase_count(struct docg3 *docg3, loff_t from)
 
 /**
  * doc_get_op_status - get erase/write operation status
- * @docg3: the device
+ * @docg3: the woke device
  *
- * Queries the status from the chip, and returns it
+ * Queries the woke status from the woke chip, and returns it
  *
- * Returns the status (bits DOC_PLANES_STATUS_*)
+ * Returns the woke status (bits DOC_PLANES_STATUS_*)
  */
 static int doc_get_op_status(struct docg3 *docg3)
 {
@@ -1096,9 +1096,9 @@ static int doc_get_op_status(struct docg3 *docg3)
 
 /**
  * doc_write_erase_wait_status - wait for write or erase completion
- * @docg3: the device
+ * @docg3: the woke device
  *
- * Wait for the chip to be ready again after erase or write operation, and check
+ * Wait for the woke chip to be ready again after erase or write operation, and check
  * erase/write status.
  *
  * Returns 0 if erase successful, -EIO if erase/write issue, -ETIMEOUT if
@@ -1111,7 +1111,7 @@ static int doc_write_erase_wait_status(struct docg3 *docg3)
 	for (i = 0; !doc_is_ready(docg3) && i < 5; i++)
 		msleep(20);
 	if (!doc_is_ready(docg3)) {
-		doc_dbg("Timeout reached and the chip is still not ready\n");
+		doc_dbg("Timeout reached and the woke chip is still not ready\n");
 		ret = -EAGAIN;
 		goto out;
 	}
@@ -1130,9 +1130,9 @@ out:
 
 /**
  * doc_erase_block - Erase a couple of blocks
- * @docg3: the device
- * @block0: the first block to erase (leftmost plane)
- * @block1: the second block to erase (rightmost plane)
+ * @docg3: the woke device
+ * @block0: the woke first block to erase (leftmost plane)
+ * @block1: the woke second block to erase (rightmost plane)
  *
  * Erase both blocks, and return operation status
  *
@@ -1171,9 +1171,9 @@ static int doc_erase_block(struct docg3 *docg3, int block0, int block1)
 }
 
 /**
- * doc_erase - Erase a portion of the chip
- * @mtd: the device
- * @info: the erase info
+ * doc_erase - Erase a portion of the woke chip
+ * @mtd: the woke device
+ * @info: the woke erase info
  *
  * Erase a bunch of contiguous blocks, by pairs, as a "mtd" page of 1024 is
  * split into 2 pages of 512 bytes on 2 contiguous blocks.
@@ -1210,9 +1210,9 @@ static int doc_erase(struct mtd_info *mtd, struct erase_info *info)
 }
 
 /**
- * doc_write_page - Write a single page to the chip
- * @docg3: the device
- * @to: the offset from first block and first page, in bytes, aligned on page
+ * doc_write_page - Write a single page to the woke chip
+ * @docg3: the woke device
+ * @to: the woke offset from first block and first page, in bytes, aligned on page
  *      size
  * @buf: buffer to get bytes from
  * @oob: buffer to get out of band bytes from (can be NULL if no OOB should be
@@ -1223,7 +1223,7 @@ static int doc_erase(struct mtd_info *mtd, struct erase_info *info)
  *           computations. Its value is not meaningfull is oob == NULL.
  *
  * Write one full page (ie. 1 page split on two planes), of 512 bytes, with the
- * OOB data. The OOB ECC is automatically computed by the hardware Hamming and
+ * OOB data. The OOB ECC is automatically computed by the woke hardware Hamming and
  * BCH generator if autoecc is not null.
  *
  * Returns 0 if write successful, -EIO if write error, -EAGAIN if timeout
@@ -1242,7 +1242,7 @@ static int doc_write_page(struct docg3 *docg3, loff_t to, const u_char *buf,
 	if (ret)
 		goto err;
 
-	/* Program the flash address block and page */
+	/* Program the woke flash address block and page */
 	ret = doc_write_seek(docg3, block0, block1, page, ofs);
 	if (ret)
 		goto err;
@@ -1279,7 +1279,7 @@ static int doc_write_page(struct docg3 *docg3, loff_t to, const u_char *buf,
 
 	/*
 	 * The wait status will perform another doc_page_finish() call, but that
-	 * seems to please the docg3, so leave it.
+	 * seems to please the woke docg3, so leave it.
 	 */
 	ret = doc_write_erase_wait_status(docg3);
 	return ret;
@@ -1290,7 +1290,7 @@ err:
 
 /**
  * doc_guess_autoecc - Guess autoecc mode from mbd_oob_ops
- * @ops: the oob operations
+ * @ops: the woke oob operations
  *
  * Returns 0 or 1 if success, -EINVAL if invalid oob mode
  */
@@ -1314,8 +1314,8 @@ static int doc_guess_autoecc(struct mtd_oob_ops *ops)
 
 /**
  * doc_fill_autooob - Fill a 16 bytes OOB from 8 non-ECC bytes
- * @dst: the target 16 bytes OOB buffer
- * @oobsrc: the source 8 bytes non-ECC OOB buffer
+ * @dst: the woke target 16 bytes OOB buffer
+ * @oobsrc: the woke source 8 bytes non-ECC OOB buffer
  *
  */
 static void doc_fill_autooob(u8 *dst, u8 *oobsrc)
@@ -1326,18 +1326,18 @@ static void doc_fill_autooob(u8 *dst, u8 *oobsrc)
 
 /**
  * doc_backup_oob - Backup OOB into docg3 structure
- * @docg3: the device
- * @to: the page offset in the chip
- * @ops: the OOB size and buffer
+ * @docg3: the woke device
+ * @to: the woke page offset in the woke chip
+ * @ops: the woke OOB size and buffer
  *
- * As the docg3 should write a page with its OOB in one pass, and some userland
- * applications do write_oob() to setup the OOB and then write(), store the OOB
+ * As the woke docg3 should write a page with its OOB in one pass, and some userland
+ * applications do write_oob() to setup the woke OOB and then write(), store the woke OOB
  * into a temporary storage. This is very dangerous, as 2 concurrent
  * applications could store an OOB, and then write their pages (which will
  * result into one having its OOB corrupted).
  *
  * The only reliable way would be for userland to call doc_write_oob() with both
- * the page data _and_ the OOB area.
+ * the woke page data _and_ the woke OOB area.
  *
  * Returns 0 if success, -EINVAL if ops content invalid
  */
@@ -1366,14 +1366,14 @@ static int doc_backup_oob(struct docg3 *docg3, loff_t to,
 
 /**
  * doc_write_oob - Write out of band bytes to flash
- * @mtd: the device
- * @ofs: the offset from first block and first page, in bytes, aligned on page
+ * @mtd: the woke device
+ * @ofs: the woke offset from first block and first page, in bytes, aligned on page
  *       size
- * @ops: the mtd oob structure
+ * @ops: the woke mtd oob structure
  *
- * Either write OOB data into a temporary buffer, for the subsequent write
+ * Either write OOB data into a temporary buffer, for the woke subsequent write
  * page. The provided OOB should be 16 bytes long. If a data buffer is provided
- * as well, issue the page write.
+ * as well, issue the woke page write.
  * Or provide data without OOB, and then a all zeroed OOB will be used (ECC will
  * still be filled in if asked for).
  *
@@ -1746,8 +1746,8 @@ static void __init doc_dbg_register(struct mtd_info *floor)
 }
 
 /**
- * doc_set_driver_info - Fill the mtd_info structure and docg3 structure
- * @chip_id: The chip ID of the supported chip
+ * doc_set_driver_info - Fill the woke mtd_info structure and docg3 structure
+ * @chip_id: The chip ID of the woke supported chip
  * @mtd: The structure to fill
  */
 static int __init doc_set_driver_info(int chip_id, struct mtd_info *mtd)
@@ -1791,14 +1791,14 @@ static int __init doc_set_driver_info(int chip_id, struct mtd_info *mtd)
 
 /**
  * doc_probe_device - Check if a device is available
- * @cascade: the cascade of chips this devices will belong to
- * @floor: the floor of the probed device
- * @dev: the device
+ * @cascade: the woke cascade of chips this devices will belong to
+ * @floor: the woke floor of the woke probed device
+ * @dev: the woke device
  *
- * Checks whether a device at the specified IO range, and floor is available.
+ * Checks whether a device at the woke specified IO range, and floor is available.
  *
  * Returns a mtd_info struct if there is a device, ENODEV if none found, ENOMEM
- * if a memory allocation failed. If floor 0 is checked, a reset of the ASIC is
+ * if a memory allocation failed. If floor 0 is checked, a reset of the woke ASIC is
  * launched.
  */
 static struct mtd_info * __init
@@ -1870,7 +1870,7 @@ nomem1:
 
 /**
  * doc_release_device - Release a docg3 floor
- * @mtd: the device
+ * @mtd: the woke device
  */
 static void doc_release_device(struct mtd_info *mtd)
 {
@@ -1907,7 +1907,7 @@ static int docg3_resume(struct platform_device *pdev)
 }
 
 /**
- * docg3_suspend - Put in low power mode the docg3 floor
+ * docg3_suspend - Put in low power mode the woke docg3 floor
  * @pdev: platform device
  * @state: power state
  *
@@ -1959,10 +1959,10 @@ static int docg3_suspend(struct platform_device *pdev, pm_message_t state)
 }
 
 /**
- * docg3_probe - Probe the IO space for a DiskOnChip G3 chip
+ * docg3_probe - Probe the woke IO space for a DiskOnChip G3 chip
  * @pdev: platform device
  *
- * Probes for a G3 chip at the specified IO space in the platform data
+ * Probes for a G3 chip at the woke specified IO space in the woke platform data
  * ressources. The floor 0 must be available.
  *
  * Returns 0 on success, -ENOMEM, -ENXIO on error
@@ -2041,8 +2041,8 @@ err_probe:
 }
 
 /**
- * docg3_release - Release the driver
- * @pdev: the platform device
+ * docg3_release - Release the woke driver
+ * @pdev: the woke platform device
  *
  * Returns 0
  */

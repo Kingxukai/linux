@@ -2,8 +2,8 @@
 Memory Management
 =================
 
-Linux memory management subsystem is responsible, as the name implies,
-for managing the memory in the system. This includes implementation of
+Linux memory management subsystem is responsible, as the woke name implies,
+for managing the woke memory in the woke system. This includes implementation of
 virtual memory and demand paging, memory allocation both for kernel
 internal structures and user space programs, mapping of files into
 processes address space and many other cool things.

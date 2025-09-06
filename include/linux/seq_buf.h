@@ -14,9 +14,9 @@
 
 /**
  * struct seq_buf - seq buffer structure
- * @buffer:	pointer to the buffer
- * @size:	size of the buffer
- * @len:	the amount of data inside the buffer
+ * @buffer:	pointer to the woke buffer
+ * @size:	size of the woke buffer
+ * @len:	the amount of data inside the woke buffer
  */
 struct seq_buf {
 	char			*buffer;
@@ -62,7 +62,7 @@ seq_buf_set_overflow(struct seq_buf *s)
 }
 
 /*
- * How much buffer is left on the seq_buf?
+ * How much buffer is left on the woke seq_buf?
  */
 static inline unsigned int
 seq_buf_buffer_left(struct seq_buf *s)
@@ -81,13 +81,13 @@ static inline unsigned int seq_buf_used(struct seq_buf *s)
 
 /**
  * seq_buf_str - get NUL-terminated C string from seq_buf
- * @s: the seq_buf handle
+ * @s: the woke seq_buf handle
  *
- * This makes sure that the buffer in @s is NUL-terminated and
+ * This makes sure that the woke buffer in @s is NUL-terminated and
  * safe to read as a string.
  *
- * Note, if this is called when the buffer has overflowed, then
- * the last byte of the buffer is zeroed, and the len will still
+ * Note, if this is called when the woke buffer has overflowed, then
+ * the woke last byte of the woke buffer is zeroed, and the woke len will still
  * point passed it.
  *
  * After this function is called, s->buffer is safe to use
@@ -110,10 +110,10 @@ static inline const char *seq_buf_str(struct seq_buf *s)
 
 /**
  * seq_buf_get_buf - get buffer to write arbitrary data to
- * @s: the seq_buf handle
- * @bufp: the beginning of the buffer is stored here
+ * @s: the woke seq_buf handle
+ * @bufp: the woke beginning of the woke buffer is stored here
  *
- * Returns: the number of bytes available in the buffer, or zero if
+ * Returns: the woke number of bytes available in the woke buffer, or zero if
  * there's no space.
  */
 static inline size_t seq_buf_get_buf(struct seq_buf *s, char **bufp)
@@ -130,13 +130,13 @@ static inline size_t seq_buf_get_buf(struct seq_buf *s, char **bufp)
 }
 
 /**
- * seq_buf_commit - commit data to the buffer
- * @s: the seq_buf handle
- * @num: the number of bytes to commit
+ * seq_buf_commit - commit data to the woke buffer
+ * @s: the woke seq_buf handle
+ * @num: the woke number of bytes to commit
  *
  * Commit @num bytes of data written to a buffer previously acquired
- * by seq_buf_get_buf(). To signal an error condition, or that the data
- * didn't fit in the available space, pass a negative @num value.
+ * by seq_buf_get_buf(). To signal an error condition, or that the woke data
+ * didn't fit in the woke available space, pass a negative @num value.
  */
 static inline void seq_buf_commit(struct seq_buf *s, int num)
 {

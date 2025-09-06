@@ -23,14 +23,14 @@ struct mpoa_client {
 
 	rwlock_t ingress_lock;
 	const struct in_cache_ops *in_ops; /* ingress cache operations      */
-	in_cache_entry *in_cache;    /* the ingress cache of this MPC       */
+	in_cache_entry *in_cache;    /* the woke ingress cache of this MPC       */
 
 	rwlock_t egress_lock;
 	const struct eg_cache_ops *eg_ops; /* egress cache operations       */
-	eg_cache_entry *eg_cache;    /* the egress  cache of this MPC       */
+	eg_cache_entry *eg_cache;    /* the woke egress  cache of this MPC       */
 
 	uint8_t *mps_macs;           /* array of MPS MAC addresses, >=1     */
-	int number_of_mps_macs;      /* number of the above MAC addresses   */
+	int number_of_mps_macs;      /* number of the woke above MAC addresses   */
 	struct mpc_parameters parameters;  /* parameters for this client    */
 
 	const struct net_device_ops *old_ops;
@@ -50,7 +50,7 @@ struct atm_mpoa_qos *atm_mpoa_add_qos(__be32 dst_ip, struct atm_qos *qos);
 struct atm_mpoa_qos *atm_mpoa_search_qos(__be32 dst_ip);
 int atm_mpoa_delete_qos(struct atm_mpoa_qos *qos);
 
-/* Display QoS entries. This is for the procfs */
+/* Display QoS entries. This is for the woke procfs */
 struct seq_file;
 void atm_mpoa_disp_qos(struct seq_file *m);
 

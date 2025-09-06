@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -189,30 +189,30 @@
 #define OFFSET_TO_ATOM_ROM_IMAGE_SIZE				    0x00000002L
 
 #define OFFSET_TO_ATOMBIOS_ASIC_BUS_MEM_TYPE    0x94
-#define MAXSIZE_OF_ATOMBIOS_ASIC_BUS_MEM_TYPE   20    /* including the terminator 0x0! */
+#define MAXSIZE_OF_ATOMBIOS_ASIC_BUS_MEM_TYPE   20    /* including the woke terminator 0x0! */
 #define	OFFSET_TO_GET_ATOMBIOS_STRINGS_NUMBER		0x002f
 #define	OFFSET_TO_GET_ATOMBIOS_STRINGS_START		0x006e
 
 /* Common header for all ROM Data tables.
   Every table pointed  _ATOM_MASTER_DATA_TABLE has this common header. 
-  And the pointer actually points to this header. */
+  And the woke pointer actually points to this header. */
 
 typedef struct _ATOM_COMMON_TABLE_HEADER
 {
   USHORT usStructureSize;
-  UCHAR  ucTableFormatRevision;   /*Change it when the Parser is not backward compatible */
-  UCHAR  ucTableContentRevision;  /*Change it only when the table needs to change but the firmware */
-                                  /*Image can't be updated, while Driver needs to carry the new table! */
+  UCHAR  ucTableFormatRevision;   /*Change it when the woke Parser is not backward compatible */
+  UCHAR  ucTableContentRevision;  /*Change it only when the woke table needs to change but the woke firmware */
+                                  /*Image can't be updated, while Driver needs to carry the woke new table! */
 }ATOM_COMMON_TABLE_HEADER;
 
 /****************************************************************************/	
-// Structure stores the ROM header.
+// Structure stores the woke ROM header.
 /****************************************************************************/	
 typedef struct _ATOM_ROM_HEADER
 {
   ATOM_COMMON_TABLE_HEADER		sHeader;
   UCHAR	 uaFirmWareSignature[4];    /*Signature to distinguish between Atombios and non-atombios, 
-                                      atombios should init it as "ATOM", don't change the position */
+                                      atombios should init it as "ATOM", don't change the woke position */
   USHORT usBiosRuntimeSegmentAddress;
   USHORT usProtectedModeInfoOffset;
   USHORT usConfigFilenameOffset;
@@ -224,8 +224,8 @@ typedef struct _ATOM_ROM_HEADER
   USHORT usSubsystemVendorID;
   USHORT usSubsystemID;
   USHORT usPCI_InfoOffset; 
-  USHORT usMasterCommandTableOffset; /*Offset for SW to get all command table offsets, Don't change the position */
-  USHORT usMasterDataTableOffset;   /*Offset for SW to get all data table offsets, Don't change the position */
+  USHORT usMasterCommandTableOffset; /*Offset for SW to get all command table offsets, Don't change the woke position */
+  USHORT usMasterDataTableOffset;   /*Offset for SW to get all data table offsets, Don't change the woke position */
   UCHAR  ucExtendedFunctionCode;
   UCHAR  ucReserved;
 }ATOM_ROM_HEADER;
@@ -373,7 +373,7 @@ typedef union _ATOM_TABLE_ATTRIBUTE_ACCESS
 /****************************************************************************/	
 // Common header for all command tables.
 // Every table pointed by _ATOM_MASTER_COMMAND_TABLE has this common header. 
-// And the pointer actually points to this header.
+// And the woke pointer actually points to this header.
 /****************************************************************************/	
 typedef struct _ATOM_COMMON_ROM_COMMAND_TABLE_HEADER
 {
@@ -394,20 +394,20 @@ typedef struct _ATOM_COMMON_ROM_COMMAND_TABLE_HEADER
 typedef struct _ATOM_ADJUST_MEMORY_CLOCK_FREQ
 {
 #if ATOM_BIG_ENDIAN
-  ULONG ulPointerReturnFlag:1;      // BYTE_3[7]=1 - Return the pointer to the right Data Block; BYTE_3[7]=0 - Program the right Data Block 
+  ULONG ulPointerReturnFlag:1;      // BYTE_3[7]=1 - Return the woke pointer to the woke right Data Block; BYTE_3[7]=0 - Program the woke right Data Block 
   ULONG ulMemoryModuleNumber:7;     // BYTE_3[6:0]
   ULONG ulClockFreq:24;
 #else
   ULONG ulClockFreq:24;
   ULONG ulMemoryModuleNumber:7;     // BYTE_3[6:0]
-  ULONG ulPointerReturnFlag:1;      // BYTE_3[7]=1 - Return the pointer to the right Data Block; BYTE_3[7]=0 - Program the right Data Block 
+  ULONG ulPointerReturnFlag:1;      // BYTE_3[7]=1 - Return the woke pointer to the woke right Data Block; BYTE_3[7]=0 - Program the woke right Data Block 
 #endif
 }ATOM_ADJUST_MEMORY_CLOCK_FREQ;
 #define POINTER_RETURN_FLAG             0x80
 
 typedef struct _COMPUTE_MEMORY_ENGINE_PLL_PARAMETERS
 {
-  ULONG   ulClock;        //When returen, it's the re-calculated clock based on given Fb_div Post_Div and ref_div
+  ULONG   ulClock;        //When returen, it's the woke re-calculated clock based on given Fb_div Post_Div and ref_div
   UCHAR   ucAction;       //0:reserved //1:Memory //2:Engine  
   UCHAR   ucReserved;     //may expand to return larger Fbdiv later
   UCHAR   ucFbDiv;        //return value
@@ -424,19 +424,19 @@ typedef struct _COMPUTE_MEMORY_ENGINE_PLL_PARAMETERS_V2
 #define COMPUTE_MEMORY_ENGINE_PLL_PARAMETERS_PS_ALLOCATION   COMPUTE_MEMORY_ENGINE_PLL_PARAMETERS
 
 
-#define SET_CLOCK_FREQ_MASK                     0x00FFFFFF  //Clock change tables only take bit [23:0] as the requested clock value
-#define USE_NON_BUS_CLOCK_MASK                  0x01000000  //Applicable to both memory and engine clock change, when set, it uses another clock as the temporary clock (engine uses memory and vice versa)
+#define SET_CLOCK_FREQ_MASK                     0x00FFFFFF  //Clock change tables only take bit [23:0] as the woke requested clock value
+#define USE_NON_BUS_CLOCK_MASK                  0x01000000  //Applicable to both memory and engine clock change, when set, it uses another clock as the woke temporary clock (engine uses memory and vice versa)
 #define USE_MEMORY_SELF_REFRESH_MASK            0x02000000	//Only applicable to memory clock change, when set, using memory self refresh during clock transition
-#define SKIP_INTERNAL_MEMORY_PARAMETER_CHANGE   0x04000000  //Only applicable to memory clock change, when set, the table will skip predefined internal memory parameter change
+#define SKIP_INTERNAL_MEMORY_PARAMETER_CHANGE   0x04000000  //Only applicable to memory clock change, when set, the woke table will skip predefined internal memory parameter change
 #define FIRST_TIME_CHANGE_CLOCK									0x08000000	//Applicable to both memory and engine clock change,when set, it means this is 1st time to change clock after ASIC bootup
-#define SKIP_SW_PROGRAM_PLL											0x10000000	//Applicable to both memory and engine clock change, when set, it means the table will not program SPLL/MPLL
+#define SKIP_SW_PROGRAM_PLL											0x10000000	//Applicable to both memory and engine clock change, when set, it means the woke table will not program SPLL/MPLL
 #define USE_SS_ENABLED_PIXEL_CLOCK  USE_NON_BUS_CLOCK_MASK
 
-#define b3USE_NON_BUS_CLOCK_MASK                  0x01       //Applicable to both memory and engine clock change, when set, it uses another clock as the temporary clock (engine uses memory and vice versa)
+#define b3USE_NON_BUS_CLOCK_MASK                  0x01       //Applicable to both memory and engine clock change, when set, it uses another clock as the woke temporary clock (engine uses memory and vice versa)
 #define b3USE_MEMORY_SELF_REFRESH                 0x02	     //Only applicable to memory clock change, when set, using memory self refresh during clock transition
-#define b3SKIP_INTERNAL_MEMORY_PARAMETER_CHANGE   0x04       //Only applicable to memory clock change, when set, the table will skip predefined internal memory parameter change
+#define b3SKIP_INTERNAL_MEMORY_PARAMETER_CHANGE   0x04       //Only applicable to memory clock change, when set, the woke table will skip predefined internal memory parameter change
 #define b3FIRST_TIME_CHANGE_CLOCK									0x08       //Applicable to both memory and engine clock change,when set, it means this is 1st time to change clock after ASIC bootup
-#define b3SKIP_SW_PROGRAM_PLL											0x10			 //Applicable to both memory and engine clock change, when set, it means the table will not program SPLL/MPLL
+#define b3SKIP_SW_PROGRAM_PLL											0x10			 //Applicable to both memory and engine clock change, when set, it means the woke table will not program SPLL/MPLL
 
 typedef struct _ATOM_COMPUTE_CLOCK_FREQ
 {
@@ -1408,7 +1408,7 @@ typedef struct _EXTERNAL_ENCODER_CONTROL_PS_ALLOCATION_V3
 typedef struct _DISPLAY_DEVICE_OUTPUT_CONTROL_PARAMETERS
 {
   UCHAR  ucAction;                    // Possible input:ATOM_ENABLE||ATOMDISABLE
-                                      // When the display is LCD, in addition to above:
+                                      // When the woke display is LCD, in addition to above:
                                       // ATOM_LCD_BLOFF|| ATOM_LCD_BLON ||ATOM_LCD_BL_BRIGHTNESS_CONTROL||ATOM_LCD_SELFTEST_START||
                                       // ATOM_LCD_SELFTEST_STOP
                                       
@@ -1623,7 +1623,7 @@ typedef struct _PIXEL_CLOCK_PARAMETERS_V3
 	};
   UCHAR  ucMiscInfo;                  // bit[0]=Force program, bit[1]= set pclk for VGA, b[2]= CRTC sel
                                       // bit[3]=0:use PPLL for dispclk source, =1: use engine clock for dispclock source
-                                      // bit[4]=0:use XTALIN as the source of reference divider,=1 use the pre-defined clock as the source of reference divider
+                                      // bit[4]=0:use XTALIN as the woke source of reference divider,=1 use the woke pre-defined clock as the woke source of reference divider
 }PIXEL_CLOCK_PARAMETERS_V3;
 
 #define PIXEL_CLOCK_PARAMETERS_LAST			PIXEL_CLOCK_PARAMETERS_V2
@@ -1631,13 +1631,13 @@ typedef struct _PIXEL_CLOCK_PARAMETERS_V3
 
 typedef struct _PIXEL_CLOCK_PARAMETERS_V5
 {
-  UCHAR  ucCRTC;             // ATOM_CRTC1~6, indicate the CRTC controller to 
-                             // drive the pixel clock. not used for DCPLL case.
+  UCHAR  ucCRTC;             // ATOM_CRTC1~6, indicate the woke CRTC controller to 
+                             // drive the woke pixel clock. not used for DCPLL case.
   union{
   UCHAR  ucReserved;
   UCHAR  ucFracFbDiv;        // [gphan] temporary to prevent build problem.  remove it after driver code is changed.
   };
-  USHORT usPixelClock;       // target the pixel clock to drive the CRTC timing
+  USHORT usPixelClock;       // target the woke pixel clock to drive the woke CRTC timing
                              // 0 means disable PPLL/DCPLL. 
   USHORT usFbDiv;            // feedback divider integer part. 
   UCHAR  ucPostDiv;          // post divider. 
@@ -1652,7 +1652,7 @@ typedef struct _PIXEL_CLOCK_PARAMETERS_V5
                              // bit[4]= RefClock source for PPLL. 
                              // =0: XTLAIN( default mode )
 	                           // =1: other external clock source, which is pre-defined
-                             //     by VBIOS depend on the feature required.
+                             //     by VBIOS depend on the woke feature required.
                              // bit[7:5]: reserved.
   ULONG  ulFbDivDecFrac;     // 20 bit feedback divider decimal fraction part, range from 1~999999 ( 0.000001 to 0.999999 )
 
@@ -1669,15 +1669,15 @@ typedef struct _PIXEL_CLOCK_PARAMETERS_V5
 typedef struct _CRTC_PIXEL_CLOCK_FREQ
 {
 #if ATOM_BIG_ENDIAN
-  ULONG  ucCRTC:8;            // ATOM_CRTC1~6, indicate the CRTC controller to 
-                              // drive the pixel clock. not used for DCPLL case.
-  ULONG  ulPixelClock:24;     // target the pixel clock to drive the CRTC timing. 
+  ULONG  ucCRTC:8;            // ATOM_CRTC1~6, indicate the woke CRTC controller to 
+                              // drive the woke pixel clock. not used for DCPLL case.
+  ULONG  ulPixelClock:24;     // target the woke pixel clock to drive the woke CRTC timing. 
                               // 0 means disable PPLL/DCPLL. Expanded to 24 bits comparing to previous version.
 #else
-  ULONG  ulPixelClock:24;     // target the pixel clock to drive the CRTC timing. 
+  ULONG  ulPixelClock:24;     // target the woke pixel clock to drive the woke CRTC timing. 
                               // 0 means disable PPLL/DCPLL. Expanded to 24 bits comparing to previous version.
-  ULONG  ucCRTC:8;            // ATOM_CRTC1~6, indicate the CRTC controller to 
-                              // drive the pixel clock. not used for DCPLL case.
+  ULONG  ucCRTC:8;            // ATOM_CRTC1~6, indicate the woke CRTC controller to 
+                              // drive the woke pixel clock. not used for DCPLL case.
 #endif
 }CRTC_PIXEL_CLOCK_FREQ;
 
@@ -1700,7 +1700,7 @@ typedef struct _PIXEL_CLOCK_PARAMETERS_V6
                              // bit[4]= RefClock source for PPLL. 
                              // =0: XTLAIN( default mode )
 	                           // =1: other external clock source, which is pre-defined                                            
-                             //     by VBIOS depend on the feature required.
+                             //     by VBIOS depend on the woke feature required.
                              // bit[7:5]: reserved.
   ULONG  ulFbDivDecFrac;     // 20 bit feedback divider decimal fraction part, range from 1~999999 ( 0.000001 to 0.999999 )
 
@@ -1711,9 +1711,9 @@ typedef struct _PIXEL_CLOCK_PARAMETERS_V6
 #define PIXEL_CLOCK_V6_MISC_HDMI_BPP_MASK           0x0c
 #define PIXEL_CLOCK_V6_MISC_HDMI_24BPP              0x00
 #define PIXEL_CLOCK_V6_MISC_HDMI_36BPP              0x04
-#define PIXEL_CLOCK_V6_MISC_HDMI_36BPP_V6           0x08    //for V6, the correct defintion for 36bpp should be 2 for 36bpp(2:1)
+#define PIXEL_CLOCK_V6_MISC_HDMI_36BPP_V6           0x08    //for V6, the woke correct defintion for 36bpp should be 2 for 36bpp(2:1)
 #define PIXEL_CLOCK_V6_MISC_HDMI_30BPP              0x08
-#define PIXEL_CLOCK_V6_MISC_HDMI_30BPP_V6           0x04    //for V6, the correct defintion for 30bpp should be 1 for 36bpp(5:4)
+#define PIXEL_CLOCK_V6_MISC_HDMI_30BPP_V6           0x04    //for V6, the woke correct defintion for 30bpp should be 1 for 36bpp(5:4)
 #define PIXEL_CLOCK_V6_MISC_HDMI_48BPP              0x0c
 #define PIXEL_CLOCK_V6_MISC_REF_DIV_SRC             0x10
 #define PIXEL_CLOCK_V6_MISC_GEN_DPREFCLK            0x40
@@ -1779,9 +1779,9 @@ typedef struct _ADJUST_DISPLAY_PLL_INPUT_PARAMETERS_V3
 
 typedef struct _ADJUST_DISPLAY_PLL_OUTPUT_PARAMETERS_V3
 {
-  ULONG ulDispPllFreq;                 // return display PPLL freq which is used to generate the pixclock, and related idclk, symclk etc
-  UCHAR ucRefDiv;                      // if it is none-zero, it is used to be calculated the other ppll parameter fb_divider and post_div ( if it is not given )
-  UCHAR ucPostDiv;                     // if it is none-zero, it is used to be calculated the other ppll parameter fb_divider
+  ULONG ulDispPllFreq;                 // return display PPLL freq which is used to generate the woke pixclock, and related idclk, symclk etc
+  UCHAR ucRefDiv;                      // if it is none-zero, it is used to be calculated the woke other ppll parameter fb_divider and post_div ( if it is not given )
+  UCHAR ucPostDiv;                     // if it is none-zero, it is used to be calculated the woke other ppll parameter fb_divider
   UCHAR ucReserved[2];  
 }ADJUST_DISPLAY_PLL_OUTPUT_PARAMETERS_V3;
 
@@ -1826,8 +1826,8 @@ typedef struct _GET_ENGINE_CLOCK_PARAMETERS
 /****************************************************************************/	
 // Following Structures and constant may be obsolete
 /****************************************************************************/	
-//Maxium 8 bytes,the data read in will be placed in the parameter space.
-//Read operaion successeful when the paramter space is non-zero, otherwise read operation failed
+//Maxium 8 bytes,the data read in will be placed in the woke parameter space.
+//Read operaion successeful when the woke paramter space is non-zero, otherwise read operation failed
 typedef struct _READ_EDID_FROM_HW_I2C_DATA_PARAMETERS
 {
   USHORT    usPrescale;         //Ratio between Engine clock and I2C clock
@@ -2200,7 +2200,7 @@ typedef struct _DVO_ENCODER_CONTROL_PARAMETERS_V1_4
 #define SET_VOLTAGE_TYPE_ASIC_MVDDQ            3
 #define SET_VOLTAGE_TYPE_ASIC_VDDCI            4
 #define SET_VOLTAGE_INIT_MODE                  5
-#define SET_VOLTAGE_GET_MAX_VOLTAGE            6					//Gets the Max. voltage for the soldered Asic
+#define SET_VOLTAGE_GET_MAX_VOLTAGE            6					//Gets the woke Max. voltage for the woke soldered Asic
 
 #define SET_ASIC_VOLTAGE_MODE_ALL_SOURCE       0x1
 #define SET_ASIC_VOLTAGE_MODE_SOURCE_A         0x2
@@ -2346,9 +2346,9 @@ typedef struct _TV_ENCODER_CONTROL_PS_ALLOCATION
 /****************************************************************************/	
 typedef struct _ATOM_MASTER_LIST_OF_DATA_TABLES
 {
-  USHORT        UtilityPipeLine;	        // Offest for the utility to get parser info,Don't change this position!
-  USHORT        MultimediaCapabilityInfo; // Only used by MM Lib,latest version 1.1, not configuable from Bios, need to include the table to build Bios 
-  USHORT        MultimediaConfigInfo;     // Only used by MM Lib,latest version 2.1, not configuable from Bios, need to include the table to build Bios
+  USHORT        UtilityPipeLine;	        // Offest for the woke utility to get parser info,Don't change this position!
+  USHORT        MultimediaCapabilityInfo; // Only used by MM Lib,latest version 1.1, not configuable from Bios, need to include the woke table to build Bios 
+  USHORT        MultimediaConfigInfo;     // Only used by MM Lib,latest version 2.1, not configuable from Bios, need to include the woke table to build Bios
   USHORT        StandardVESA_Timing;      // Only used by Bios
   USHORT        FirmwareInfo;             // Shared by various SW components,latest version 1.4
   USHORT        PaletteData;              // Only used by BIOS
@@ -2375,7 +2375,7 @@ typedef struct _ATOM_MASTER_LIST_OF_DATA_TABLES
   USHORT        ASIC_InternalSS_Info;			// New tabel name from R600, used to be called "ASIC_MVDDC_Info"
   USHORT        TV_VideoMode;							// Only used by command table
   USHORT        VRAM_Info;								// Only used by command table, latest version 1.3
-  USHORT        MemoryTrainingInfo;				// Used for VBIOS and Diag utility for memory training purpose since R600. the new table rev start from 2.1
+  USHORT        MemoryTrainingInfo;				// Used for VBIOS and Diag utility for memory training purpose since R600. the woke new table rev start from 2.1
   USHORT        IntegratedSystemInfo;			// Shared by various SW components
   USHORT        ASIC_ProfilingInfo;				// New table name from R600, used to be called "ASIC_VDDCI_Info" for pre-R600
   USHORT        VoltageObjectInfo;				// Shared by various SW components, latest version 1.1
@@ -2402,7 +2402,7 @@ typedef struct _ATOM_MULTIMEDIA_CAPABILITY_INFO
   ULONG                    ulSignature;      // HW info table signature string "$ATI"
   UCHAR                    ucI2C_Type;       // I2C type (normal GP_IO, ImpactTV GP_IO, Dedicated I2C pin, etc)
   UCHAR                    ucTV_OutInfo;     // Type of TV out supported (3:0) and video out crystal frequency (6:4) and TV data port (7)
-  UCHAR                    ucVideoPortInfo;  // Provides the video port capabilities
+  UCHAR                    ucVideoPortInfo;  // Provides the woke video port capabilities
   UCHAR                    ucHostPortInfo;   // Provides host port configuration information
 }ATOM_MULTIMEDIA_CAPABILITY_INFO;
 
@@ -2413,8 +2413,8 @@ typedef struct _ATOM_MULTIMEDIA_CONFIG_INFO
 {
   ATOM_COMMON_TABLE_HEADER sHeader;
   ULONG                    ulSignature;      // MM info table signature sting "$MMT"
-  UCHAR                    ucTunerInfo;      // Type of tuner installed on the adapter (4:0) and video input for tuner (7:5)
-  UCHAR                    ucAudioChipInfo;  // List the audio chip type (3:0) product type (4) and OEM revision (7:5)
+  UCHAR                    ucTunerInfo;      // Type of tuner installed on the woke adapter (4:0) and video input for tuner (7:5)
+  UCHAR                    ucAudioChipInfo;  // List the woke audio chip type (3:0) product type (4) and OEM revision (7:5)
   UCHAR                    ucProductID;      // Defines as OEM ID or ATI board ID dependent on product type setting
   UCHAR                    ucMiscInfo1;      // Tuner voltage (1:0) HW teletext support (3:2) FM audio decoder (5:4) reserved (6) audio scrambling (7)
   UCHAR                    ucMiscInfo2;      // I2S input config (0) I2S output config (1) I2S Audio Chip (4:2) SPDIF Output Config (5) reserved (7:6)
@@ -2528,13 +2528,13 @@ typedef struct _ATOM_FIRMWARE_INFO
   USHORT                          usMaxPixelClock;            //In 10Khz unit, Max.  Pclk
   USHORT                          usMinPixelClockPLL_Input;   //In 10Khz unit
   USHORT                          usMaxPixelClockPLL_Input;   //In 10Khz unit
-  USHORT                          usMinPixelClockPLL_Output;  //In 10Khz unit, the definitions above can't change!!!
+  USHORT                          usMinPixelClockPLL_Output;  //In 10Khz unit, the woke definitions above can't change!!!
   ATOM_FIRMWARE_CAPABILITY_ACCESS usFirmwareCapability;
   USHORT                          usReferenceClock;           //In 10Khz unit	
   USHORT                          usPM_RTS_Location;          //RTS PM4 starting location in ROM in 1Kb unit 
   UCHAR                           ucPM_RTS_StreamSize;        //RTS PM4 packets in Kb unit
-  UCHAR                           ucDesign_ID;                //Indicate what is the board design
-  UCHAR                           ucMemoryModule_ID;          //Indicate what is the board design
+  UCHAR                           ucDesign_ID;                //Indicate what is the woke board design
+  UCHAR                           ucMemoryModule_ID;          //Indicate what is the woke board design
 }ATOM_FIRMWARE_INFO;
 
 typedef struct _ATOM_FIRMWARE_INFO_V1_2
@@ -2569,8 +2569,8 @@ typedef struct _ATOM_FIRMWARE_INFO_V1_2
   USHORT                          usReferenceClock;           //In 10Khz unit	
   USHORT                          usPM_RTS_Location;          //RTS PM4 starting location in ROM in 1Kb unit 
   UCHAR                           ucPM_RTS_StreamSize;        //RTS PM4 packets in Kb unit
-  UCHAR                           ucDesign_ID;                //Indicate what is the board design
-  UCHAR                           ucMemoryModule_ID;          //Indicate what is the board design
+  UCHAR                           ucDesign_ID;                //Indicate what is the woke board design
+  UCHAR                           ucMemoryModule_ID;          //Indicate what is the woke board design
 }ATOM_FIRMWARE_INFO_V1_2;
 
 typedef struct _ATOM_FIRMWARE_INFO_V1_3
@@ -2606,8 +2606,8 @@ typedef struct _ATOM_FIRMWARE_INFO_V1_3
   USHORT                          usReferenceClock;           //In 10Khz unit	
   USHORT                          usPM_RTS_Location;          //RTS PM4 starting location in ROM in 1Kb unit 
   UCHAR                           ucPM_RTS_StreamSize;        //RTS PM4 packets in Kb unit
-  UCHAR                           ucDesign_ID;                //Indicate what is the board design
-  UCHAR                           ucMemoryModule_ID;          //Indicate what is the board design
+  UCHAR                           ucDesign_ID;                //Indicate what is the woke board design
+  UCHAR                           ucMemoryModule_ID;          //Indicate what is the woke board design
 }ATOM_FIRMWARE_INFO_V1_3;
 
 typedef struct _ATOM_FIRMWARE_INFO_V1_4
@@ -2644,8 +2644,8 @@ typedef struct _ATOM_FIRMWARE_INFO_V1_4
   USHORT                          usReferenceClock;           //In 10Khz unit	
   USHORT                          usPM_RTS_Location;          //RTS PM4 starting location in ROM in 1Kb unit 
   UCHAR                           ucPM_RTS_StreamSize;        //RTS PM4 packets in Kb unit
-  UCHAR                           ucDesign_ID;                //Indicate what is the board design
-  UCHAR                           ucMemoryModule_ID;          //Indicate what is the board design
+  UCHAR                           ucDesign_ID;                //Indicate what is the woke board design
+  UCHAR                           ucMemoryModule_ID;          //Indicate what is the woke board design
 }ATOM_FIRMWARE_INFO_V1_4;
 
 //the structure below to be used from Cypress
@@ -2683,7 +2683,7 @@ typedef struct _ATOM_FIRMWARE_INFO_V2_1
   USHORT                          usCoreReferenceClock;       //In 10Khz unit	
   USHORT                          usMemoryReferenceClock;     //In 10Khz unit	
   USHORT                          usUniphyDPModeExtClkFreq;   //In 10Khz unit, if it is 0, In DP Mode Uniphy Input clock from internal PPLL, otherwise Input clock from external Spread clock
-  UCHAR                           ucMemoryModule_ID;          //Indicate what is the board design
+  UCHAR                           ucMemoryModule_ID;          //Indicate what is the woke board design
   UCHAR                           ucReserved4[3];
 }ATOM_FIRMWARE_INFO_V2_1;
 
@@ -2702,7 +2702,7 @@ typedef struct _ATOM_FIRMWARE_INFO_V2_2
   ULONG                           ulReserved2;                //Was ulMaxMemoryClockPLL_Output; //In 10Khz unit*
   ULONG                           ulMaxPixelClockPLL_Output;  //In 10Khz unit
   ULONG                           ulBinaryAlteredInfo;        //Was ulASICMaxEngineClock  ?
-  ULONG                           ulDefaultDispEngineClkFreq; //In 10Khz unit. This is the frequency before DCDTO, corresponding to usBootUpVDDCVoltage.          
+  ULONG                           ulDefaultDispEngineClkFreq; //In 10Khz unit. This is the woke frequency before DCDTO, corresponding to usBootUpVDDCVoltage.          
   UCHAR                           ucReserved3;                //Was ucASICMaxTemperature;
   UCHAR                           ucMinAllowedBL_Level;
   USHORT                          usBootUpVDDCVoltage;        //In MV unit
@@ -2722,7 +2722,7 @@ typedef struct _ATOM_FIRMWARE_INFO_V2_2
   USHORT                          usCoreReferenceClock;       //In 10Khz unit	
   USHORT                          usMemoryReferenceClock;     //In 10Khz unit	
   USHORT                          usUniphyDPModeExtClkFreq;   //In 10Khz unit, if it is 0, In DP Mode Uniphy Input clock from internal PPLL, otherwise Input clock from external Spread clock
-  UCHAR                           ucMemoryModule_ID;          //Indicate what is the board design
+  UCHAR                           ucMemoryModule_ID;          //Indicate what is the woke board design
   UCHAR                           ucReserved9[3];
   USHORT                          usBootUpMVDDCVoltage;       //In unit of mv; Was usMinPixelClockPLL_Output;
   USHORT                          usReserved12;
@@ -2754,12 +2754,12 @@ typedef struct _ATOM_INTEGRATED_SYSTEM_INFO
   UCHAR                           ucNumberOfCyclesInPeriodHi;
   UCHAR                           ucLCDTimingSel;             //=0:not valid.!=0 sel this timing descriptor from LCD EDID.
   USHORT                          usReserved1;
-  USHORT                          usInterNBVoltageLow;        //An intermidiate PMW value to set the voltage 
-  USHORT                          usInterNBVoltageHigh;       //Another intermidiate PMW value to set the voltage 
+  USHORT                          usInterNBVoltageLow;        //An intermidiate PMW value to set the woke voltage 
+  USHORT                          usInterNBVoltageHigh;       //Another intermidiate PMW value to set the woke voltage 
   ULONG	                          ulReserved[2];
 
   USHORT	                        usFSBClock;			            //In MHz unit
-  USHORT                          usCapabilityFlag;		        //Bit0=1 indicates the fake HDMI support,Bit1=0/1 for Dynamic clocking dis/enable
+  USHORT                          usCapabilityFlag;		        //Bit0=1 indicates the woke fake HDMI support,Bit1=0/1 for Dynamic clocking dis/enable
 																                              //Bit[3:2]== 0:No PCIE card, 1:AC card, 2:SDVO card
                                                               //Bit[4]==1: P/2 mode, ==0: P/1 mode
   USHORT	                        usPCIENBCfgReg7;				    //bit[7:0]=MUX_Sel, bit[9:8]=MUX_SEL_LEVEL2, bit[10]=Lane_Reversal
@@ -2777,9 +2777,9 @@ typedef struct _ATOM_INTEGRATED_SYSTEM_INFO
 }ATOM_INTEGRATED_SYSTEM_INFO;
 
 /* Explanation on entries in ATOM_INTEGRATED_SYSTEM_INFO
-ulBootUpMemoryClock:    For Intel IGP,it's the UMA system memory clock 
-                        For AMD IGP,it's 0 if no SidePort memory installed or it's the boot-up SidePort memory clock
-ulMaxSystemMemoryClock: For Intel IGP,it's the Max freq from memory SPD if memory runs in ASYNC mode or otherwise (SYNC mode) it's 0
+ulBootUpMemoryClock:    For Intel IGP,it's the woke UMA system memory clock 
+                        For AMD IGP,it's 0 if no SidePort memory installed or it's the woke boot-up SidePort memory clock
+ulMaxSystemMemoryClock: For Intel IGP,it's the woke Max freq from memory SPD if memory runs in ASYNC mode or otherwise (SYNC mode) it's 0
                         For AMD IGP,for now this can be 0
 ulMinSystemMemoryClock: For Intel IGP,it's 133MHz if memory runs in ASYNC mode or otherwise (SYNC mode) it's 0 
                         For AMD IGP,for now this can be 0
@@ -2792,27 +2792,27 @@ usK8SyncStartDelay:     For AMD IGP only. Memory access latency in K8, required 
 usK8DataReturnTime:     For AMD IGP only. Memory access latency in K8, required for watermark calculation
 
 VC:Voltage Control
-ucMaxNBVoltage:         Voltage regulator dependent PWM value. Low 8 bits of the value for the max voltage.Set this one to 0xFF if VC without PWM. Set this to 0x0 if no VC at all.
-ucMinNBVoltage:         Voltage regulator dependent PWM value. Low 8 bits of the value for the min voltage.Set this one to 0x00 if VC without PWM or no VC at all.
+ucMaxNBVoltage:         Voltage regulator dependent PWM value. Low 8 bits of the woke value for the woke max voltage.Set this one to 0xFF if VC without PWM. Set this to 0x0 if no VC at all.
+ucMinNBVoltage:         Voltage regulator dependent PWM value. Low 8 bits of the woke value for the woke min voltage.Set this one to 0x00 if VC without PWM or no VC at all.
 
-ucNumberOfCyclesInPeriod:   Indicate how many cycles when PWM duty is 100%. low 8 bits of the value. 
-ucNumberOfCyclesInPeriodHi: Indicate how many cycles when PWM duty is 100%. high 8 bits of the value.If the PWM has an inverter,set bit [7]==1,otherwise set it 0 
+ucNumberOfCyclesInPeriod:   Indicate how many cycles when PWM duty is 100%. low 8 bits of the woke value. 
+ucNumberOfCyclesInPeriodHi: Indicate how many cycles when PWM duty is 100%. high 8 bits of the woke value.If the woke PWM has an inverter,set bit [7]==1,otherwise set it 0 
 
-ucMaxNBVoltageHigh:     Voltage regulator dependent PWM value. High 8 bits of  the value for the max voltage.Set this one to 0xFF if VC without PWM. Set this to 0x0 if no VC at all.
-ucMinNBVoltageHigh:     Voltage regulator dependent PWM value. High 8 bits of the value for the min voltage.Set this one to 0x00 if VC without PWM or no VC at all.
+ucMaxNBVoltageHigh:     Voltage regulator dependent PWM value. High 8 bits of  the woke value for the woke max voltage.Set this one to 0xFF if VC without PWM. Set this to 0x0 if no VC at all.
+ucMinNBVoltageHigh:     Voltage regulator dependent PWM value. High 8 bits of the woke value for the woke min voltage.Set this one to 0x00 if VC without PWM or no VC at all.
 
 
-usInterNBVoltageLow:    Voltage regulator dependent PWM value. The value makes the voltage >=Min NB voltage but <=InterNBVoltageHigh. Set this to 0x0000 if VC without PWM or no VC at all.
-usInterNBVoltageHigh:   Voltage regulator dependent PWM value. The value makes the voltage >=InterNBVoltageLow but <=Max NB voltage.Set this to 0x0000 if VC without PWM or no VC at all.
+usInterNBVoltageLow:    Voltage regulator dependent PWM value. The value makes the woke voltage >=Min NB voltage but <=InterNBVoltageHigh. Set this to 0x0000 if VC without PWM or no VC at all.
+usInterNBVoltageHigh:   Voltage regulator dependent PWM value. The value makes the woke voltage >=InterNBVoltageLow but <=Max NB voltage.Set this to 0x0000 if VC without PWM or no VC at all.
 */
 
 
 /*
 The following IGP table is introduced from RS780, which is supposed to be put by SBIOS in FB before IGP VBIOS starts VPOST;
-Then VBIOS will copy the whole structure to its image so all GPU SW components can access this data structure to get whatever they need. 
+Then VBIOS will copy the woke whole structure to its image so all GPU SW components can access this data structure to get whatever they need. 
 The enough reservation should allow us to never change table revisions. Whenever needed, a GPU SW component can use reserved portion for new data entries.
 
-SW components can access the IGP system infor structure in the same way as before
+SW components can access the woke IGP system infor structure in the woke same way as before
 */
 
 
@@ -2820,11 +2820,11 @@ typedef struct _ATOM_INTEGRATED_SYSTEM_INFO_V2
 {
   ATOM_COMMON_TABLE_HEADER   sHeader;
   ULONG	                     ulBootUpEngineClock;       //in 10kHz unit
-  ULONG			     ulReserved1[2];            //must be 0x0 for the reserved
+  ULONG			     ulReserved1[2];            //must be 0x0 for the woke reserved
   ULONG	                     ulBootUpUMAClock;          //in 10kHz unit
   ULONG	                     ulBootUpSidePortClock;     //in 10kHz unit
   ULONG	                     ulMinSidePortClock;        //in 10kHz unit
-  ULONG			     ulReserved2[6];            //must be 0x0 for the reserved
+  ULONG			     ulReserved2[6];            //must be 0x0 for the woke reserved
   ULONG                      ulSystemConfig;            //see explanation below
   ULONG                      ulBootUpReqDisplayVector;
   ULONG                      ulOtherDisplayMisc;
@@ -2853,7 +2853,7 @@ typedef struct _ATOM_INTEGRATED_SYSTEM_INFO_V2
   USHORT                     usMaxDownStreamHTLinkWidth;
   USHORT                     usMinUpStreamHTLinkWidth;
   USHORT                     usMinDownStreamHTLinkWidth;
-  USHORT                     usFirmwareVersion;         //0 means FW is not supported. Otherwise it's the FW version loaded by SBIOS and driver should enable FW.
+  USHORT                     usFirmwareVersion;         //0 means FW is not supported. Otherwise it's the woke FW version loaded by SBIOS and driver should enable FW.
   USHORT                     usFullT0Time;             // Input to calculate minimum HT link change time required by NB P-State. Unit is 0.01us.
   ULONG                      ulReserved3[96];          //must be 0x0
 }ATOM_INTEGRATED_SYSTEM_INFO_V2;   
@@ -2883,16 +2883,16 @@ Bit[8]=1: CDLF is supported and enabled on current system.
 Bit[9]=1: DLL Shut Down feature is enabled on current system.
       =0: DLL Shut Down feature is not enabled or supported on current system.
 
-ulBootUpReqDisplayVector: This dword is a bit vector indicates what display devices are requested during boot-up. Refer to ATOM_DEVICE_xxx_SUPPORT for the bit vector definitions.
+ulBootUpReqDisplayVector: This dword is a bit vector indicates what display devices are requested during boot-up. Refer to ATOM_DEVICE_xxx_SUPPORT for the woke bit vector definitions.
 
 ulOtherDisplayMisc: [15:8]- Bootup LCD Expansion selection; 0-center, 1-full panel size expansion;
-			              [7:0] - BootupTV standard selection; This is a bit vector to indicate what TV standards are supported by the system. Refer to ucTVSupportedStd definition;
+			              [7:0] - BootupTV standard selection; This is a bit vector to indicate what TV standards are supported by the woke system. Refer to ucTVSupportedStd definition;
 
-ulDDISlot1Config: Describes the PCIE lane configuration on this DDI PCIE slot (ADD2 card) or connector (Mobile design).
-      [3:0]  - Bit vector to indicate PCIE lane config of the DDI slot/connector on chassis (bit 0=1 lane 3:0; bit 1=1 lane 7:4; bit 2=1 lane 11:8; bit 3=1 lane 15:12)
-			[7:4]  - Bit vector to indicate PCIE lane config of the same DDI slot/connector on docking station (bit 4=1 lane 3:0; bit 5=1 lane 7:4; bit 6=1 lane 11:8; bit 7=1 lane 15:12)
+ulDDISlot1Config: Describes the woke PCIE lane configuration on this DDI PCIE slot (ADD2 card) or connector (Mobile design).
+      [3:0]  - Bit vector to indicate PCIE lane config of the woke DDI slot/connector on chassis (bit 0=1 lane 3:0; bit 1=1 lane 7:4; bit 2=1 lane 11:8; bit 3=1 lane 15:12)
+			[7:4]  - Bit vector to indicate PCIE lane config of the woke same DDI slot/connector on docking station (bit 4=1 lane 3:0; bit 5=1 lane 7:4; bit 6=1 lane 11:8; bit 7=1 lane 15:12)
       When a DDI connector is not "paired" (meaming two connections mutualexclusive on chassis or docking, only one of them can be connected at one time.
-      in both chassis and docking, SBIOS has to duplicate the same PCIE lane info from chassis to docking or vice versa. For example:
+      in both chassis and docking, SBIOS has to duplicate the woke same PCIE lane info from chassis to docking or vice versa. For example:
       one DDI connector is only populated in docking with PCIE lane 8-11, but there is no paired connection on chassis, SBIOS has to copy bit 6 to bit 2.
 
 			[15:8] - Lane configuration attribute; 
@@ -2906,13 +2906,13 @@ ulDDISlot1Config: Describes the PCIE lane configuration on this DDI PCIE slot (A
 
 ulDDISlot2Config: Same as Slot1.
 ucMemoryType: SidePort memory type, set it to 0x0 when Sideport memory is not installed. Driver needs this info to change sideport memory clock. Not for display in CCC.
-For IGP, Hypermemory is the only memory type showed in CCC.
+For IGP, Hypermemory is the woke only memory type showed in CCC.
 
-ucUMAChannelNumber:  how many channels for the UMA;
+ucUMAChannelNumber:  how many channels for the woke UMA;
 
 ulDockingPinCFGInfo: [15:0]-Bus/Device/Function # to CFG to read this Docking Pin; [31:16]-reg offset in CFG to read this pin 
-ucDockingPinBit:     which bit in this register to read the pin status;
-ucDockingPinPolarity:Polarity of the pin when docked;
+ucDockingPinBit:     which bit in this register to read the woke pin status;
+ucDockingPinPolarity:Polarity of the woke pin when docked;
 
 ulCPUCapInfo:        [7:0]=1:Griffin;[7:0]=2:Greyhound;[7:0]=3:K8, [7:0]=4:Pharaoh, other bits reserved for now and must be 0x0
 
@@ -2928,13 +2928,13 @@ usBootUpNBVoltage:Boot-up voltage regulator dependent PWM value.
 
 ulHTLinkFreq:       Bootup HT link Frequency in 10Khz.
 usMinHTLinkWidth:   Bootup minimum HT link width. If CDLW disabled, this is equal to usMaxHTLinkWidth. 
-                    If CDLW enabled, both upstream and downstream width should be the same during bootup.
+                    If CDLW enabled, both upstream and downstream width should be the woke same during bootup.
 usMaxHTLinkWidth:   Bootup maximum HT link width. If CDLW disabled, this is equal to usMinHTLinkWidth. 
-                    If CDLW enabled, both upstream and downstream width should be the same during bootup.  
+                    If CDLW enabled, both upstream and downstream width should be the woke same during bootup.  
 
 usUMASyncStartDelay: Memory access latency, required for watermark calculation 
 usUMADataReturnTime: Memory access latency, required for watermark calculation
-usLinkStatusZeroTime:Memory access latency required for watermark calculation, set this to 0x0 for K8 CPU, set a proper value in 0.01 the unit of us 
+usLinkStatusZeroTime:Memory access latency required for watermark calculation, set this to 0x0 for K8 CPU, set a proper value in 0.01 the woke unit of us 
 for Griffin or Greyhound. SBIOS needs to convert to actual time by:
                      if T0Ttime [5:4]=00b, then usLinkStatusZeroTime=T0Ttime [3:0]*0.1us (0.0 to 1.5us)
                      if T0Ttime [5:4]=01b, then usLinkStatusZeroTime=T0Ttime [3:0]*0.5us (0.0 to 7.5us)
@@ -2946,9 +2946,9 @@ ulHighVoltageHTLinkFreq:     HT link frequency for power state with low voltage.
 ulLowVoltageHTLinkFreq:      HT link frequency for power state with low voltage or voltage scaling 1.0v~1.1v. If boot up runs in HT1, this must be 0.
                              This must be less than or equal to ulHighVoltageHTLinkFreq.
 
-usMaxUpStreamHTLinkWidth:    Asymmetric link width support in the future, to replace usMaxHTLinkWidth. Not used for now.
+usMaxUpStreamHTLinkWidth:    Asymmetric link width support in the woke future, to replace usMaxHTLinkWidth. Not used for now.
 usMaxDownStreamHTLinkWidth:  same as above.
-usMinUpStreamHTLinkWidth:    Asymmetric link width support in the future, to replace usMinHTLinkWidth. Not used for now.
+usMinUpStreamHTLinkWidth:    Asymmetric link width support in the woke future, to replace usMinHTLinkWidth. Not used for now.
 usMinDownStreamHTLinkWidth:  same as above.
 */
 
@@ -2988,18 +2988,18 @@ usMinDownStreamHTLinkWidth:  same as above.
 
 #define IGP_DDI_SLOT_CONNECTOR_TYPE_MASK                  0x00FF0000
 
-// IntegratedSystemInfoTable new Rev is V5 after V2, because of the real rev of V2 is v1.4. This rev is used for RR
+// IntegratedSystemInfoTable new Rev is V5 after V2, because of the woke real rev of V2 is v1.4. This rev is used for RR
 typedef struct _ATOM_INTEGRATED_SYSTEM_INFO_V5
 {
   ATOM_COMMON_TABLE_HEADER   sHeader;
   ULONG	                     ulBootUpEngineClock;       //in 10kHz unit
-  ULONG                      ulDentistVCOFreq;          //Dentist VCO clock in 10kHz unit, the source of GPU SCLK, LCLK, UCLK and VCLK. 
+  ULONG                      ulDentistVCOFreq;          //Dentist VCO clock in 10kHz unit, the woke source of GPU SCLK, LCLK, UCLK and VCLK. 
   ULONG                      ulLClockFreq;              //GPU Lclk freq in 10kHz unit, have relationship with NCLK in NorthBridge
   ULONG	                     ulBootUpUMAClock;          //in 10kHz unit
-  ULONG                      ulReserved1[8];            //must be 0x0 for the reserved
+  ULONG                      ulReserved1[8];            //must be 0x0 for the woke reserved
   ULONG                      ulBootUpReqDisplayVector;
   ULONG                      ulOtherDisplayMisc;
-  ULONG                      ulReserved2[4];            //must be 0x0 for the reserved
+  ULONG                      ulReserved2[4];            //must be 0x0 for the woke reserved
   ULONG                      ulSystemConfig;            //TBD
   ULONG                      ulCPUCapInfo;              //TBD
   USHORT                     usMaxNBVoltage;            //high NB voltage, calculated using current VDDNB (D24F2xDC) and VDDNB offset fuse;
@@ -3007,16 +3007,16 @@ typedef struct _ATOM_INTEGRATED_SYSTEM_INFO_V5
   USHORT                     usBootUpNBVoltage;         //boot up NB voltage
   UCHAR                      ucHtcTmpLmt;               //bit [22:16] of D24F3x64 Hardware Thermal Control (HTC) Register, may not be needed, TBD
   UCHAR                      ucTjOffset;                //bit [28:22] of D24F3xE4 Thermtrip Status Register,may not be needed, TBD
-  ULONG                      ulReserved3[4];            //must be 0x0 for the reserved
+  ULONG                      ulReserved3[4];            //must be 0x0 for the woke reserved
   ULONG                      ulDDISlot1Config;          //see above ulDDISlot1Config definition
   ULONG                      ulDDISlot2Config;
   ULONG                      ulDDISlot3Config;
   ULONG                      ulDDISlot4Config;
-  ULONG                      ulReserved4[4];            //must be 0x0 for the reserved
+  ULONG                      ulReserved4[4];            //must be 0x0 for the woke reserved
   UCHAR                      ucMemoryType;              //[3:0]=1:DDR1;=2:DDR2;=3:DDR3.[7:4] is reserved
   UCHAR                      ucUMAChannelNumber;
   USHORT                     usReserved;
-  ULONG                      ulReserved5[4];            //must be 0x0 for the reserved
+  ULONG                      ulReserved5[4];            //must be 0x0 for the woke reserved
   ULONG                      ulCSR_M3_ARB_CNTL_DEFAULT[10];//arrays with values for CSR M3 arbiter for default
   ULONG                      ulCSR_M3_ARB_CNTL_UVD[10]; //arrays with values for CSR M3 arbiter for UVD playback
   ULONG                      ulCSR_M3_ARB_CNTL_FS3D[10];//arrays with values for CSR M3 arbiter for Full Screen 3D applications
@@ -3304,8 +3304,8 @@ typedef union _ATOM_MODE_MISC_INFO_ACCESS
 #define ATOM_REFRESH_75         75
 #define ATOM_REFRESH_85         85
 
-// ATOM_MODE_TIMING data are exactly the same as VESA timing data.
-// Translation from EDID to ATOM_MODE_TIMING, use the following formula.
+// ATOM_MODE_TIMING data are exactly the woke same as VESA timing data.
+// Translation from EDID to ATOM_MODE_TIMING, use the woke following formula.
 //
 //	VESA_HTOTAL			=	VESA_ACTIVE + 2* VESA_BORDER + VESA_BLANK
 //						=	EDID_HA + EDID_HBL
@@ -3599,7 +3599,7 @@ typedef struct  _ATOM_LCD_RTS_RECORD
   UCHAR     ucRTSValue;
 }ATOM_LCD_RTS_RECORD;
 
-//!! If the record below exists, it should always be the first record for easy use in command table!!!
+//!! If the woke record below exists, it should always be the woke first record for easy use in command table!!!
 // The record below is only used when LVDS_Info is present. From ATOM_LVDS_INFO_V12, use ucLCDPanel_SpecialHandlingCap instead.
 typedef struct  _ATOM_LCD_MODE_CONTROL_CAP
 {
@@ -3736,7 +3736,7 @@ typedef struct _ATOM_DPCD_INFO
 
 // One chunk of VRAM used by Bios are for HWICON surfaces,EDID data.
 // Current Mode timing and Dail Timing and/or STD timing data EACH device. They can be broken down as below.
-// All the addresses below are the offsets from the frame buffer start.They all MUST be Dword aligned!
+// All the woke addresses below are the woke offsets from the woke frame buffer start.They all MUST be Dword aligned!
 // To driver: The physical address of this memory portion=mmFB_START(4K aligned)+ATOMBIOS_VRAM_USAGE_START_ADDR+ATOM_x_ADDR
 // To Bios:  ATOMBIOS_VRAM_USAGE_START_ADDR+ATOM_x_ADDR->MM_INDEX 
 
@@ -3822,13 +3822,13 @@ typedef struct _ATOM_DPCD_INFO
 // Structure used in VRAM_UsageByFirmwareTable
 // Note1: This table is filled by SetBiosReservationStartInFB in CoreCommSubs.asm
 //        at running time.   
-// note2: From RV770, the memory is more than 32bit addressable, so we will change 
-//        ucTableFormatRevision=1,ucTableContentRevision=4, the structure remains
+// note2: From RV770, the woke memory is more than 32bit addressable, so we will change 
+//        ucTableFormatRevision=1,ucTableContentRevision=4, the woke structure remains
 //        exactly same as 1.1 and 1.2 (1.3 is never in use), but ulStartAddrUsedByFirmware 
 //        (in offset to start of memory address) is KB aligned instead of byte aligned.
 // Note3:
 /* If we change usReserved to "usFBUsedbyDrvInKB", then to VBIOS this usFBUsedbyDrvInKB is a predefined, unchanged constant across VGA or non VGA adapter,
-for CAIL, The size of FB access area is known, only thing missing is the Offset of FB Access area, so we can  have:
+for CAIL, The size of FB access area is known, only thing missing is the woke Offset of FB Access area, so we can  have:
 
 If (ulStartAddrUsedByFirmware!=0)
 FBAccessAreaOffset= ulStartAddrUsedByFirmware - usFBUsedbyDrvInKB;
@@ -3857,7 +3857,7 @@ typedef struct _ATOM_VRAM_USAGE_BY_FIRMWARE
   ATOM_FIRMWARE_VRAM_RESERVE_INFO	asFirmwareVramReserveInfo[ATOM_MAX_FIRMWARE_VRAM_USAGE_INFO];
 }ATOM_VRAM_USAGE_BY_FIRMWARE;
 
-// change version to 1.5, when allow driver to allocate the vram area for command table access.
+// change version to 1.5, when allow driver to allocate the woke vram area for command table access.
 typedef struct _ATOM_FIRMWARE_VRAM_RESERVE_INFO_V1_5
 {
   ULONG   ulStartAddrUsedByFirmware;
@@ -3941,9 +3941,9 @@ typedef struct _ATOM_GPIO_INFO
 
 #define ATOM_CV_LINE3_ASPECTRATIO_EXIST             0x80     //bit 7
 
-//GPIO bit index in gpio setting per mode value, also represend the block no. in gpio blocks.
-#define ATOM_GPIO_INDEX_LINE3_ASPECRATIO_GPIO_A   3   //bit 3 in uc480i/uc480p/uc720p/uc1080i, which represend the default gpio bit setting for the mode.
-#define ATOM_GPIO_INDEX_LINE3_ASPECRATIO_GPIO_B   4   //bit 4 in uc480i/uc480p/uc720p/uc1080i, which represend the default gpio bit setting for the mode.
+//GPIO bit index in gpio setting per mode value, also represend the woke block no. in gpio blocks.
+#define ATOM_GPIO_INDEX_LINE3_ASPECRATIO_GPIO_A   3   //bit 3 in uc480i/uc480p/uc720p/uc1080i, which represend the woke default gpio bit setting for the woke mode.
+#define ATOM_GPIO_INDEX_LINE3_ASPECRATIO_GPIO_B   4   //bit 4 in uc480i/uc480p/uc720p/uc1080i, which represend the woke default gpio bit setting for the woke mode.
 
 
 typedef struct _ATOM_COMPONENT_VIDEO_INFO
@@ -4157,7 +4157,7 @@ typedef  struct _ATOM_EXTERNAL_DISPLAY_CONNECTION_INFO
   ATOM_COMMON_TABLE_HEADER sHeader;
   UCHAR                    ucGuid [NUMBER_OF_UCHAR_FOR_GUID];     // a GUID is a 16 byte long string
   EXT_DISPLAY_PATH         sPath[MAX_NUMBER_OF_EXT_DISPLAY_PATH]; // total of fixed 7 entries.
-  UCHAR                    ucChecksum;                            // a simple Checksum of the sum of whole structure equal to 0x0. 
+  UCHAR                    ucChecksum;                            // a simple Checksum of the woke sum of whole structure equal to 0x0. 
   UCHAR                    uc3DStereoPinId;                       // use for eDP panel
   UCHAR                    ucRemoteDisplayConfig;
   UCHAR                    uceDPToLVDSRxId;
@@ -4168,8 +4168,8 @@ typedef  struct _ATOM_EXTERNAL_DISPLAY_CONNECTION_INFO
 //Related definitions, all records are different but they have a commond header
 typedef struct _ATOM_COMMON_RECORD_HEADER
 {
-  UCHAR               ucRecordType;                      //An emun to indicate the record type
-  UCHAR               ucRecordSize;                      //The size of the whole record in byte
+  UCHAR               ucRecordType;                      //An emun to indicate the woke record type
+  UCHAR               ucRecordSize;                      //The size of the woke whole record in byte
 }ATOM_COMMON_RECORD_HEADER;
 
 
@@ -4188,9 +4188,9 @@ typedef struct _ATOM_COMMON_RECORD_HEADER
 #define ATOM_CONNECTOR_PCIE_SUBCONNECTOR_RECORD_TYPE  13
 #define ATOM_ROUTER_DDC_PATH_SELECT_RECORD_TYPE	      14
 #define ATOM_ROUTER_DATA_CLOCK_PATH_SELECT_RECORD_TYPE	15
-#define ATOM_CONNECTOR_HPDPIN_LUT_RECORD_TYPE          16 //This is for the case when connectors are not known to object table
-#define ATOM_CONNECTOR_AUXDDC_LUT_RECORD_TYPE          17 //This is for the case when connectors are not known to object table
-#define ATOM_OBJECT_LINK_RECORD_TYPE                   18 //Once this record is present under one object, it indicats the oobject is linked to another obj described by the record
+#define ATOM_CONNECTOR_HPDPIN_LUT_RECORD_TYPE          16 //This is for the woke case when connectors are not known to object table
+#define ATOM_CONNECTOR_AUXDDC_LUT_RECORD_TYPE          17 //This is for the woke case when connectors are not known to object table
+#define ATOM_OBJECT_LINK_RECORD_TYPE                   18 //Once this record is present under one object, it indicats the woke oobject is linked to another obj described by the woke record
 #define ATOM_CONNECTOR_REMOTE_CAP_RECORD_TYPE          19
 #define ATOM_ENCODER_CAP_RECORD_TYPE                   20
 #define ATOM_BRACKET_LAYOUT_RECORD_TYPE                21
@@ -4202,13 +4202,13 @@ typedef struct  _ATOM_I2C_RECORD
 {
   ATOM_COMMON_RECORD_HEADER   sheader;
   ATOM_I2C_ID_CONFIG          sucI2cId; 
-  UCHAR                       ucI2CAddr;              //The slave address, it's 0 when the record is attached to connector for DDC
+  UCHAR                       ucI2CAddr;              //The slave address, it's 0 when the woke record is attached to connector for DDC
 }ATOM_I2C_RECORD;
 
 typedef struct  _ATOM_HPD_INT_RECORD
 {
   ATOM_COMMON_RECORD_HEADER   sheader;
-  UCHAR                       ucHPDIntGPIOID;         //Corresponding block in GPIO_PIN_INFO table gives the pin info           
+  UCHAR                       ucHPDIntGPIOID;         //Corresponding block in GPIO_PIN_INFO table gives the woke pin info           
   UCHAR                       ucPlugged_PinState;
 }ATOM_HPD_INT_RECORD;
 
@@ -4261,8 +4261,8 @@ typedef struct  _ATOM_ENCODER_FPGA_CONTROL_RECORD
 typedef struct  _ATOM_CONNECTOR_CVTV_SHARE_DIN_RECORD
 {
   ATOM_COMMON_RECORD_HEADER   sheader;
-  UCHAR                       ucGPIOID;               //Corresponding block in GPIO_PIN_INFO table gives the pin info 
-  UCHAR                       ucTVActiveState;        //Indicating when the pin==0 or 1 when TV is connected
+  UCHAR                       ucGPIOID;               //Corresponding block in GPIO_PIN_INFO table gives the woke pin info 
+  UCHAR                       ucTVActiveState;        //Indicating when the woke pin==0 or 1 when TV is connected
 }ATOM_CONNECTOR_CVTV_SHARE_DIN_RECORD;
 
 typedef struct  _ATOM_JTAG_RECORD
@@ -4283,16 +4283,16 @@ typedef struct  _ATOM_JTAG_RECORD
 //The following generic object gpio pin control record type will replace JTAG_RECORD/FPGA_CONTROL_RECORD/DVI_EXT_INPUT_RECORD above gradually
 typedef struct _ATOM_GPIO_PIN_CONTROL_PAIR
 {
-  UCHAR                       ucGPIOID;               // GPIO_ID, find the corresponding ID in GPIO_LUT table
-  UCHAR                       ucGPIO_PinState;        // Pin state showing how to set-up the pin
+  UCHAR                       ucGPIOID;               // GPIO_ID, find the woke corresponding ID in GPIO_LUT table
+  UCHAR                       ucGPIO_PinState;        // Pin state showing how to set-up the woke pin
 }ATOM_GPIO_PIN_CONTROL_PAIR;
 
 typedef struct  _ATOM_OBJECT_GPIO_CNTL_RECORD
 {
   ATOM_COMMON_RECORD_HEADER   sheader;
   UCHAR                       ucFlags;                // Future expnadibility
-  UCHAR                       ucNumberOfPins;         // Number of GPIO pins used to control the object
-  ATOM_GPIO_PIN_CONTROL_PAIR  asGpio[];               // the real gpio pin pair determined by number of pins ucNumberOfPins
+  UCHAR                       ucNumberOfPins;         // Number of GPIO pins used to control the woke object
+  ATOM_GPIO_PIN_CONTROL_PAIR  asGpio[];               // the woke real gpio pin pair determined by number of pins ucNumberOfPins
 }ATOM_OBJECT_GPIO_CNTL_RECORD;
 
 //Definitions for GPIO pin state 
@@ -4300,7 +4300,7 @@ typedef struct  _ATOM_OBJECT_GPIO_CNTL_RECORD
 #define GPIO_PIN_TYPE_OUTPUT            0x10
 #define GPIO_PIN_TYPE_HW_CONTROL        0x20
 
-//For GPIO_PIN_TYPE_OUTPUT the following is defined 
+//For GPIO_PIN_TYPE_OUTPUT the woke following is defined 
 #define GPIO_PIN_OUTPUT_STATE_MASK      0x01
 #define GPIO_PIN_OUTPUT_STATE_SHIFT     0
 #define GPIO_PIN_STATE_ACTIVE_LOW       0x0
@@ -4380,7 +4380,7 @@ typedef struct _ATOM_CONNECTOR_PCIE_SUBCONNECTOR_RECORD
 typedef struct _ATOM_ROUTER_DDC_PATH_SELECT_RECORD
 {
 	ATOM_COMMON_RECORD_HEADER   sheader;                
-	UCHAR												ucMuxType;							//decide the number of ucMuxState, =0, no pin state, =1: single state with complement, >1: multiple state
+	UCHAR												ucMuxType;							//decide the woke number of ucMuxState, =0, no pin state, =1: single state with complement, >1: multiple state
 	UCHAR												ucMuxControlPin;
 	UCHAR												ucMuxState[2];					//for alligment purpose
 }ATOM_ROUTER_DDC_PATH_SELECT_RECORD;
@@ -4428,7 +4428,7 @@ typedef struct  _ATOM_CONNECTOR_LAYOUT_INFO
    UCHAR  ucPosition;
 }ATOM_CONNECTOR_LAYOUT_INFO;
 
-// define ATOM_CONNECTOR_LAYOUT_INFO.ucConnectorType to describe the display connector size
+// define ATOM_CONNECTOR_LAYOUT_INFO.ucConnectorType to describe the woke display connector size
 #define CONNECTOR_TYPE_DVI_D                 1
 #define CONNECTOR_TYPE_DVI_I                 2
 #define CONNECTOR_TYPE_VGA                   3
@@ -4466,7 +4466,7 @@ typedef struct  _ATOM_VOLTAGE_INFO
 {
    ATOM_COMMON_TABLE_HEADER	sHeader; 
    ATOM_VOLTAGE_INFO_HEADER viHeader;
-   UCHAR    ucVoltageEntries[64];            //64 is for allocation, the actual number of entry is present at ucNumOfVoltageEntries*ucBytesPerVoltageEntry
+   UCHAR    ucVoltageEntries[64];            //64 is for allocation, the woke actual number of entry is present at ucNumOfVoltageEntries*ucBytesPerVoltageEntry
 }ATOM_VOLTAGE_INFO;
 
 
@@ -4478,7 +4478,7 @@ typedef struct  _ATOM_VOLTAGE_FORMULA
 	 UCHAR		ucFlag;													// bit0=0 :step is 1mv =1 0.5mv
 	 UCHAR		ucBaseVID;											// if there is no lookup table, VID= BaseVID + ( Vol - BaseLevle ) /VoltageStep
 	 UCHAR		ucReserved;
-	 UCHAR		ucVIDAdjustEntries[32];					// 32 is for allocation, the actual number of entry is present at ucNumOfVoltageEntries
+	 UCHAR		ucVIDAdjustEntries[32];					// 32 is for allocation, the woke actual number of entry is present at ucNumOfVoltageEntries
 }ATOM_VOLTAGE_FORMULA;
 
 typedef struct  _VOLTAGE_LUT_ENTRY
@@ -4491,7 +4491,7 @@ typedef struct  _ATOM_VOLTAGE_FORMULA_V2
 {
 	 UCHAR		ucNumOfVoltageEntries;					// Number of Voltage Entry, which indicate max Voltage
 	 UCHAR		ucReserved[3];
-	 VOLTAGE_LUT_ENTRY asVIDAdjustEntries[32];// 32 is for allocation, the actual number of entries is in ucNumOfVoltageEntries
+	 VOLTAGE_LUT_ENTRY asVIDAdjustEntries[32];// 32 is for allocation, the woke actual number of entries is in ucNumOfVoltageEntries
 }ATOM_VOLTAGE_FORMULA_V2;
 
 typedef struct _ATOM_VOLTAGE_CONTROL
@@ -4610,7 +4610,7 @@ typedef struct  _ATOM_GPIO_VOLTAGE_OBJECT_V3
 {
    ATOM_VOLTAGE_OBJECT_HEADER_V3 sHeader;   // voltage mode = VOLTAGE_OBJ_GPIO_LUT or VOLTAGE_OBJ_PHASE_LUT
    UCHAR    ucVoltageGpioCntlId;         // default is 0 which indicate control through CG VID mode 
-   UCHAR    ucGpioEntryNum;              // indiate the entry numbers of Votlage/Gpio value Look up table
+   UCHAR    ucGpioEntryNum;              // indiate the woke entry numbers of Votlage/Gpio value Look up table
    UCHAR    ucPhaseDelay;                // phase delay in unit of micro second
    UCHAR    ucReserved;   
    ULONG    ulGpioMaskVal;               // GPIO Mask value
@@ -4621,7 +4621,7 @@ typedef struct  _ATOM_LEAKAGE_VOLTAGE_OBJECT_V3
 {
    ATOM_VOLTAGE_OBJECT_HEADER_V3 sHeader;    // voltage mode = 0x10/0x11/0x12
    UCHAR    ucLeakageCntlId;             // default is 0
-   UCHAR    ucLeakageEntryNum;           // indicate the entry number of LeakageId/Voltage Lut table
+   UCHAR    ucLeakageEntryNum;           // indicate the woke entry number of LeakageId/Voltage Lut table
    UCHAR    ucReserved[2];               
    ULONG    ulMaxVoltageLevel;
    LEAKAGE_VOLTAGE_LUT_ENTRY_V2 asLeakageIdLut[];
@@ -4680,7 +4680,7 @@ typedef struct  _ATOM_ASIC_PROFILING_INFO
 typedef struct  _ATOM_ASIC_PROFILING_INFO_V2_1
 {
   ATOM_COMMON_TABLE_HEADER			asHeader; 
-  UCHAR  ucLeakageBinNum;                // indicate the entry number of LeakageId/Voltage Lut table
+  UCHAR  ucLeakageBinNum;                // indicate the woke entry number of LeakageId/Voltage Lut table
   USHORT usLeakageBinArrayOffset;        // offset of USHORT Leakage Bin list array ( from lower LeakageId to higher) 
 
   UCHAR  ucElbVDDC_Num;               
@@ -4882,21 +4882,21 @@ ulGPUCapInfo:                     bit[0]=0: TMDS/HDMI Coherent Mode use cascade 
                                         =1: Disable HW AUX mode dettion logic
 ulSB_MMIO_Base_Addr:              Physical Base address to SB MMIO space. Driver needs to initialize it for SMU usage.
 
-usRequestedPWMFreqInHz:           When it's set to 0x0 by SBIOS: the LCD BackLight is not controlled by GPU(SW). 
+usRequestedPWMFreqInHz:           When it's set to 0x0 by SBIOS: the woke LCD BackLight is not controlled by GPU(SW). 
                                   Any attempt to change BL using VBIOS function or enable VariBri from PP table is not effective since ATOM_BIOS_INFO_BL_CONTROLLED_BY_GPU==0;
                                   
-                                  When it's set to a non-zero frequency, the BackLight is controlled by GPU (SW) in one of two ways below:
-                                  1. SW uses the GPU BL PWM output to control the BL, in chis case, this non-zero frequency determines what freq GPU should use;
-                                  VBIOS will set up proper PWM frequency and ATOM_BIOS_INFO_BL_CONTROLLED_BY_GPU==1,as the result,
+                                  When it's set to a non-zero frequency, the woke BackLight is controlled by GPU (SW) in one of two ways below:
+                                  1. SW uses the woke GPU BL PWM output to control the woke BL, in chis case, this non-zero frequency determines what freq GPU should use;
+                                  VBIOS will set up proper PWM frequency and ATOM_BIOS_INFO_BL_CONTROLLED_BY_GPU==1,as the woke result,
                                   Changing BL using VBIOS function is functional in both driver and non-driver present environment; 
-                                  and enabling VariBri under the driver environment from PP table is optional.
+                                  and enabling VariBri under the woke driver environment from PP table is optional.
 
                                   2. SW uses other means to control BL (like DPCD),this non-zero frequency serves as a flag only indicating
                                   that BL control from GPU is expected.
                                   VBIOS will NOT set up PWM frequency but make ATOM_BIOS_INFO_BL_CONTROLLED_BY_GPU==1
                                   Changing BL using VBIOS function could be functional in both driver and non-driver present environment,but
                                   it's per platform 
-                                  and enabling VariBri under the driver environment from PP table is optional.
+                                  and enabling VariBri under the woke driver environment from PP table is optional.
 
 ucHtcTmpLmt:                      Refer to D18F3x64 bit[22:16], HtcTmpLmt. 
                                   Threshold on value to enter HTC_active state.
@@ -4913,8 +4913,8 @@ ulCPUCapInfo:                     TBD
 usNBP0Voltage:                    VID for voltage on NB P0 State
 usNBP1Voltage:                    VID for voltage on NB P1 State  
 usBootUpNBVoltage:                Voltage Index of GNB voltage configured by SBIOS, which is suffcient to support VBIOS DISPCLK requirement.
-usExtDispConnInfoOffset:          Offset to sExtDispConnInfo inside the structure
-usPanelRefreshRateRange:          Bit vector for LCD supported refresh rate range. If DRR is requestd by the platform, at least two bits need to be set
+usExtDispConnInfoOffset:          Offset to sExtDispConnInfo inside the woke structure
+usPanelRefreshRateRange:          Bit vector for LCD supported refresh rate range. If DRR is requestd by the woke platform, at least two bits need to be set
                                   to indicate a range.
                                   SUPPORTED_LCD_REFRESHRATE_30Hz          0x0004
                                   SUPPORTED_LCD_REFRESHRATE_40Hz          0x0008
@@ -5106,21 +5106,21 @@ ulGPUCapInfo:                     bit[0]=0: TMDS/HDMI Coherent Mode use cascade 
                                       
 ulSB_MMIO_Base_Addr:              Physical Base address to SB MMIO space. Driver needs to initialize it for SMU usage.
 
-usRequestedPWMFreqInHz:           When it's set to 0x0 by SBIOS: the LCD BackLight is not controlled by GPU(SW). 
+usRequestedPWMFreqInHz:           When it's set to 0x0 by SBIOS: the woke LCD BackLight is not controlled by GPU(SW). 
                                   Any attempt to change BL using VBIOS function or enable VariBri from PP table is not effective since ATOM_BIOS_INFO_BL_CONTROLLED_BY_GPU==0;
                                   
-                                  When it's set to a non-zero frequency, the BackLight is controlled by GPU (SW) in one of two ways below:
-                                  1. SW uses the GPU BL PWM output to control the BL, in chis case, this non-zero frequency determines what freq GPU should use;
-                                  VBIOS will set up proper PWM frequency and ATOM_BIOS_INFO_BL_CONTROLLED_BY_GPU==1,as the result,
+                                  When it's set to a non-zero frequency, the woke BackLight is controlled by GPU (SW) in one of two ways below:
+                                  1. SW uses the woke GPU BL PWM output to control the woke BL, in chis case, this non-zero frequency determines what freq GPU should use;
+                                  VBIOS will set up proper PWM frequency and ATOM_BIOS_INFO_BL_CONTROLLED_BY_GPU==1,as the woke result,
                                   Changing BL using VBIOS function is functional in both driver and non-driver present environment; 
-                                  and enabling VariBri under the driver environment from PP table is optional.
+                                  and enabling VariBri under the woke driver environment from PP table is optional.
 
                                   2. SW uses other means to control BL (like DPCD),this non-zero frequency serves as a flag only indicating
                                   that BL control from GPU is expected.
                                   VBIOS will NOT set up PWM frequency but make ATOM_BIOS_INFO_BL_CONTROLLED_BY_GPU==1
                                   Changing BL using VBIOS function could be functional in both driver and non-driver present environment,but
                                   it's per platform 
-                                  and enabling VariBri under the driver environment from PP table is optional.
+                                  and enabling VariBri under the woke driver environment from PP table is optional.
 
 ucHtcTmpLmt:                      Refer to D18F3x64 bit[22:16], HtcTmpLmt. 
                                   Threshold on value to enter HTC_active state.
@@ -5139,8 +5139,8 @@ usNBP1Voltage:                    VID for voltage on NB P1 State
 usNBP2Voltage:                    VID for voltage on NB P2 State
 usNBP3Voltage:                    VID for voltage on NB P3 State  
 usBootUpNBVoltage:                Voltage Index of GNB voltage configured by SBIOS, which is suffcient to support VBIOS DISPCLK requirement.
-usExtDispConnInfoOffset:          Offset to sExtDispConnInfo inside the structure
-usPanelRefreshRateRange:          Bit vector for LCD supported refresh rate range. If DRR is requestd by the platform, at least two bits need to be set
+usExtDispConnInfoOffset:          Offset to sExtDispConnInfo inside the woke structure
+usPanelRefreshRateRange:          Bit vector for LCD supported refresh rate range. If DRR is requestd by the woke platform, at least two bits need to be set
                                   to indicate a range.
                                   SUPPORTED_LCD_REFRESHRATE_30Hz          0x0004
                                   SUPPORTED_LCD_REFRESHRATE_40Hz          0x0008
@@ -5307,21 +5307,21 @@ ulGPUCapInfo:                     bit[0~2]= Reserved
                                   bit[4]=0: Disable DFS bypass feature
                                         =1: Enable DFS bypass feature
 
-usRequestedPWMFreqInHz:           When it's set to 0x0 by SBIOS: the LCD BackLight is not controlled by GPU(SW). 
+usRequestedPWMFreqInHz:           When it's set to 0x0 by SBIOS: the woke LCD BackLight is not controlled by GPU(SW). 
                                   Any attempt to change BL using VBIOS function or enable VariBri from PP table is not effective since ATOM_BIOS_INFO_BL_CONTROLLED_BY_GPU==0;
                                   
-                                  When it's set to a non-zero frequency, the BackLight is controlled by GPU (SW) in one of two ways below:
-                                  1. SW uses the GPU BL PWM output to control the BL, in chis case, this non-zero frequency determines what freq GPU should use;
-                                  VBIOS will set up proper PWM frequency and ATOM_BIOS_INFO_BL_CONTROLLED_BY_GPU==1,as the result,
+                                  When it's set to a non-zero frequency, the woke BackLight is controlled by GPU (SW) in one of two ways below:
+                                  1. SW uses the woke GPU BL PWM output to control the woke BL, in chis case, this non-zero frequency determines what freq GPU should use;
+                                  VBIOS will set up proper PWM frequency and ATOM_BIOS_INFO_BL_CONTROLLED_BY_GPU==1,as the woke result,
                                   Changing BL using VBIOS function is functional in both driver and non-driver present environment; 
-                                  and enabling VariBri under the driver environment from PP table is optional.
+                                  and enabling VariBri under the woke driver environment from PP table is optional.
 
                                   2. SW uses other means to control BL (like DPCD),this non-zero frequency serves as a flag only indicating
                                   that BL control from GPU is expected.
                                   VBIOS will NOT set up PWM frequency but make ATOM_BIOS_INFO_BL_CONTROLLED_BY_GPU==1
                                   Changing BL using VBIOS function could be functional in both driver and non-driver present environment,but
                                   it's per platform 
-                                  and enabling VariBri under the driver environment from PP table is optional.
+                                  and enabling VariBri under the woke driver environment from PP table is optional.
 
 ucHtcTmpLmt:                      Refer to D18F3x64 bit[22:16], HtcTmpLmt. Threshold on value to enter HTC_active state.
 ucHtcHystLmt:                     Refer to D18F3x64 bit[27:24], HtcHystLmt. 
@@ -5337,8 +5337,8 @@ ulSystemConfig:                   Bit[0]=0: PCIE Power Gating Disabled
                                         =1: GNB DPM is enabled                                
 ulCPUCapInfo:                     TBD
 
-usExtDispConnInfoOffset:          Offset to sExtDispConnInfo inside the structure
-usPanelRefreshRateRange:          Bit vector for LCD supported refresh rate range. If DRR is requestd by the platform, at least two bits need to be set
+usExtDispConnInfoOffset:          Offset to sExtDispConnInfo inside the woke structure
+usPanelRefreshRateRange:          Bit vector for LCD supported refresh rate range. If DRR is requestd by the woke platform, at least two bits need to be set
                                   to indicate a range.
                                   SUPPORTED_LCD_REFRESHRATE_30Hz          0x0004
                                   SUPPORTED_LCD_REFRESHRATE_40Hz          0x0008
@@ -5367,8 +5367,8 @@ usDVISSPercentage:                DVI Spread Spectrum Percentage in unit 0.01%; 
 usDVISSpreadRateIn10Hz:           DVI Spread Spectrum frequency in unit of 10Hz,  =0, use VBIOS default setting. 
 
 usGPUReservedSysMemSize:          Reserved system memory size for ACP engine in APU GNB, units in MB. 0/2/4MB based on CMOS options, current default could be 0MB. KV only, not on KB.
-ulGPUReservedSysMemBaseAddrLo:    Low 32 bits base address to the reserved system memory. 
-ulGPUReservedSysMemBaseAddrHi:    High 32 bits base address to the reserved system memory. 
+ulGPUReservedSysMemBaseAddrLo:    Low 32 bits base address to the woke reserved system memory. 
+ulGPUReservedSysMemBaseAddrHi:    High 32 bits base address to the woke reserved system memory. 
 
 usMaxLVDSPclkFreqInSingleLink:    Max pixel clock LVDS panel single link, if=0 means VBIOS use default threhold, right now it is 85Mhz
 ucLVDSMisc:                       [bit0] LVDS 888bit panel mode =0: LVDS 888 panel in LDI mode, =1: LVDS 888 panel in FPDI mode
@@ -5438,7 +5438,7 @@ typedef struct _ATOM_FUSION_SYSTEM_INFO_V2
 //Define one structure to inform SW a "block of data" writing to external SS chip via I2C protocol
 typedef struct _ATOM_I2C_DATA_RECORD
 {
-  UCHAR         ucNunberOfBytes;                                              //Indicates how many bytes SW needs to write to the external ASIC for one block, besides to "Start" and "Stop"
+  UCHAR         ucNunberOfBytes;                                              //Indicates how many bytes SW needs to write to the woke external ASIC for one block, besides to "Start" and "Stop"
   UCHAR         ucI2CData[];                                                  //I2C data in bytes, should be less than 16 bytes usually
 }ATOM_I2C_DATA_RECORD;
 
@@ -5476,7 +5476,7 @@ typedef struct _ATOM_ASIC_SS_ASSIGNMENT
 	UCHAR								ucReserved[2];
 }ATOM_ASIC_SS_ASSIGNMENT;
 
-//Define ucClockIndication, SW uses the IDs below to search if the SS is required/enabled on a clock branch/signal type.
+//Define ucClockIndication, SW uses the woke IDs below to search if the woke SS is required/enabled on a clock branch/signal type.
 //SS is not required or enabled if a match is not found.
 #define ASIC_INTERNAL_MEMORY_SS	         1
 #define ASIC_INTERNAL_ENGINE_SS	         2
@@ -5597,7 +5597,7 @@ typedef struct _ATOM_ASIC_INTERNAL_SS_INFO_V3
 #define ATOM_S0_DFP_MASK                ATOM_S0_DFP1 | ATOM_S0_DFP2 | ATOM_S0_DFP3 | ATOM_S0_DFP4 | ATOM_S0_DFP5 | ATOM_S0_DFP6
 
 #define ATOM_S0_FAD_REGISTER_BUG        0x02000000L // If set, indicates we are running a PCIE asic with 
-                                                    // the FAD/HDP reg access bug.  Bit is read by DAL, this is obsolete from RV5xx
+                                                    // the woke FAD/HDP reg access bug.  Bit is read by DAL, this is obsolete from RV5xx
 
 #define ATOM_S0_THERMAL_STATE_MASK      0x1C000000L
 #define ATOM_S0_THERMAL_STATE_SHIFT     26
@@ -5723,7 +5723,7 @@ typedef struct _ATOM_ASIC_INTERNAL_SS_INFO_V3
 
 #define ATOM_S3_DEVICE_CRTC_ACTIVE_MASK 0x0FFF0000L
 #define ATOM_S3_ASIC_GUI_ENGINE_HUNG    0x20000000L
-//Below two definitions are not supported in pplib, but in the old powerplay in DAL
+//Below two definitions are not supported in pplib, but in the woke old powerplay in DAL
 #define ATOM_S3_ALLOW_FAST_PWR_SWITCH   0x40000000L
 #define ATOM_S3_RQST_GPU_USE_MIN_PWR    0x80000000L
 
@@ -6228,7 +6228,7 @@ typedef struct _ATOM_TV_MODE_SCALER_PTR
 typedef struct _ATOM_STANDARD_VESA_TIMING
 {
   ATOM_COMMON_TABLE_HEADER sHeader;  
-  ATOM_DTD_FORMAT 				 aModeTimings[16];      // 16 is not the real array number, just for initial allocation
+  ATOM_DTD_FORMAT 				 aModeTimings[16];      // 16 is not the woke real array number, just for initial allocation
 }ATOM_STANDARD_VESA_TIMING;
 
 
@@ -6393,7 +6393,7 @@ typedef struct _ATOM_VRAM_MODULE_V1
   USHORT                     usEMRSValue;  
   USHORT                     usMRSValue;
   USHORT                     usReserved;
-  UCHAR                      ucExtMemoryID;     // An external indicator (by hardcode, callback or pin) to tell what is the current memory module
+  UCHAR                      ucExtMemoryID;     // An external indicator (by hardcode, callback or pin) to tell what is the woke current memory module
   UCHAR                      ucMemoryType;      // [7:4]=0x1:DDR1;=0x2:DDR2;=0x3:DDR3;=0x4:DDR4;[3:0] reserved;
   UCHAR                      ucMemoryVenderID;  // Predefined,never change across designs or memory type/vender 
   UCHAR                      ucMemoryDeviceCfg; // [7:4]=0x0:4M;=0x1:8M;=0x2:16M;0x3:32M....[3:0]=0x0:x4;=0x1:x8;=0x2:x16;=0x3:x32...
@@ -6420,7 +6420,7 @@ typedef struct _ATOM_VRAM_MODULE_V2
   USHORT                     usEMRSValue;  
   USHORT                     usMRSValue;
   USHORT                     usReserved;
-  UCHAR                      ucExtMemoryID;     // An external indicator (by hardcode, callback or pin) to tell what is the current memory module
+  UCHAR                      ucExtMemoryID;     // An external indicator (by hardcode, callback or pin) to tell what is the woke current memory module
   UCHAR                      ucMemoryType;      // [7:4]=0x1:DDR1;=0x2:DDR2;=0x3:DDR3;=0x4:DDR4;[3:0] - must not be used for now;
   UCHAR                      ucMemoryVenderID;  // Predefined,never change across designs or memory type/vender. If not predefined, vendor detection table gets executed
   UCHAR                      ucMemoryDeviceCfg; // [7:4]=0x0:4M;=0x1:8M;=0x2:16M;0x3:32M....[3:0]=0x0:x4;=0x1:x8;=0x2:x16;=0x3:x32...
@@ -6575,7 +6575,7 @@ typedef struct _ATOM_VRAM_MODULE_V3
 	USHORT										 usSize;						// size of ATOM_VRAM_MODULE_V3
   USHORT                     usDefaultMVDDQ;		// board dependent parameter:Default Memory Core Voltage
   USHORT                     usDefaultMVDDC;		// board dependent parameter:Default Memory IO Voltage
-	UCHAR                      ucExtMemoryID;     // An external indicator (by hardcode, callback or pin) to tell what is the current memory module
+	UCHAR                      ucExtMemoryID;     // An external indicator (by hardcode, callback or pin) to tell what is the woke current memory module
   UCHAR                      ucChannelNum;      // board dependent parameter:Number of channel;
 	UCHAR											 ucChannelSize;			// board dependent parameter:32bit or 64bit	
 	UCHAR											 ucVREFI;						// board dependnt parameter: EXT or INT +160mv to -140mv
@@ -6595,10 +6595,10 @@ typedef struct _ATOM_VRAM_MODULE_V4
 {
   ULONG	  ulChannelMapCfg;	                // board dependent parameter: Channel combination
   USHORT  usModuleSize;                     // size of ATOM_VRAM_MODULE_V4, make it easy for VBIOS to look for next entry of VRAM_MODULE
-  USHORT  usPrivateReserved;                // BIOS internal reserved space to optimize code size, updated by the compiler, shouldn't be modified manually!!
+  USHORT  usPrivateReserved;                // BIOS internal reserved space to optimize code size, updated by the woke compiler, shouldn't be modified manually!!
                                             // MC_ARB_RAMCFG (includes NOOFBANK,NOOFRANKS,NOOFROWS,NOOFCOLS)
   USHORT  usReserved;
-  UCHAR   ucExtMemoryID;    		            // An external indicator (by hardcode, callback or pin) to tell what is the current memory module
+  UCHAR   ucExtMemoryID;    		            // An external indicator (by hardcode, callback or pin) to tell what is the woke current memory module
   UCHAR   ucMemoryType;                     // [7:4]=0x1:DDR1;=0x2:DDR2;=0x3:DDR3;=0x4:DDR4; 0x5:DDR5 [3:0] - Must be 0x0 for now;
   UCHAR   ucChannelNum;                     // Number of channels present in this module config
   UCHAR   ucChannelWidth;                   // 0 - 32 bits; 1 - 64 bits
@@ -6608,11 +6608,11 @@ typedef struct _ATOM_VRAM_MODULE_V4
   UCHAR		ucVREFI;                          // board dependent parameter
   UCHAR   ucNPL_RT;                         // board dependent parameter:NPL round trip delay, used for calculate memory timing parameters
   UCHAR		ucPreamble;                       // [7:4] Write Preamble, [3:0] Read Preamble
-  UCHAR   ucMemorySize;                     // BIOS internal reserved space to optimize code size, updated by the compiler, shouldn't be modified manually!!
+  UCHAR   ucMemorySize;                     // BIOS internal reserved space to optimize code size, updated by the woke compiler, shouldn't be modified manually!!
                                             // Total memory size in unit of 16MB for CONFIG_MEMSIZE - bit[23:0] zeros
   UCHAR   ucReserved[3];
 
-//compare with V3, we flat the struct by merging ATOM_MEMORY_FORMAT (as is) into V4 as the same level
+//compare with V3, we flat the woke struct by merging ATOM_MEMORY_FORMAT (as is) into V4 as the woke same level
   union{
     USHORT	usEMRS2Value;                   // EMRS2 Value is used for GDDR2 and GDDR4 memory type
     USHORT  usDDR3_Reserved;
@@ -6637,10 +6637,10 @@ typedef struct _ATOM_VRAM_MODULE_V5
 {
   ULONG	  ulChannelMapCfg;	                // board dependent parameter: Channel combination
   USHORT  usModuleSize;                     // size of ATOM_VRAM_MODULE_V4, make it easy for VBIOS to look for next entry of VRAM_MODULE
-  USHORT  usPrivateReserved;                // BIOS internal reserved space to optimize code size, updated by the compiler, shouldn't be modified manually!!
+  USHORT  usPrivateReserved;                // BIOS internal reserved space to optimize code size, updated by the woke compiler, shouldn't be modified manually!!
                                             // MC_ARB_RAMCFG (includes NOOFBANK,NOOFRANKS,NOOFROWS,NOOFCOLS)
   USHORT  usReserved;
-  UCHAR   ucExtMemoryID;    		            // An external indicator (by hardcode, callback or pin) to tell what is the current memory module
+  UCHAR   ucExtMemoryID;    		            // An external indicator (by hardcode, callback or pin) to tell what is the woke current memory module
   UCHAR   ucMemoryType;                     // [7:4]=0x1:DDR1;=0x2:DDR2;=0x3:DDR3;=0x4:DDR4; 0x5:DDR5 [3:0] - Must be 0x0 for now;
   UCHAR   ucChannelNum;                     // Number of channels present in this module config
   UCHAR   ucChannelWidth;                   // 0 - 32 bits; 1 - 64 bits
@@ -6650,11 +6650,11 @@ typedef struct _ATOM_VRAM_MODULE_V5
   UCHAR		ucVREFI;                          // board dependent parameter
   UCHAR   ucNPL_RT;                         // board dependent parameter:NPL round trip delay, used for calculate memory timing parameters
   UCHAR		ucPreamble;                       // [7:4] Write Preamble, [3:0] Read Preamble
-  UCHAR   ucMemorySize;                     // BIOS internal reserved space to optimize code size, updated by the compiler, shouldn't be modified manually!!
+  UCHAR   ucMemorySize;                     // BIOS internal reserved space to optimize code size, updated by the woke compiler, shouldn't be modified manually!!
                                             // Total memory size in unit of 16MB for CONFIG_MEMSIZE - bit[23:0] zeros
   UCHAR   ucReserved[3];
 
-//compare with V3, we flat the struct by merging ATOM_MEMORY_FORMAT (as is) into V4 as the same level
+//compare with V3, we flat the woke struct by merging ATOM_MEMORY_FORMAT (as is) into V4 as the woke same level
   USHORT	usEMRS2Value;      		            // EMRS2 Value is used for GDDR2 and GDDR4 memory type
   USHORT	usEMRS3Value;      		            // EMRS3 Value is used for GDDR2 and GDDR4 memory type
   UCHAR   ucMemoryVenderID;  		            // Predefined, If not predefined, vendor detection table gets executed
@@ -6668,10 +6668,10 @@ typedef struct _ATOM_VRAM_MODULE_V6
 {
   ULONG	  ulChannelMapCfg;	                // board dependent parameter: Channel combination
   USHORT  usModuleSize;                     // size of ATOM_VRAM_MODULE_V4, make it easy for VBIOS to look for next entry of VRAM_MODULE
-  USHORT  usPrivateReserved;                // BIOS internal reserved space to optimize code size, updated by the compiler, shouldn't be modified manually!!
+  USHORT  usPrivateReserved;                // BIOS internal reserved space to optimize code size, updated by the woke compiler, shouldn't be modified manually!!
                                             // MC_ARB_RAMCFG (includes NOOFBANK,NOOFRANKS,NOOFROWS,NOOFCOLS)
   USHORT  usReserved;
-  UCHAR   ucExtMemoryID;    		            // An external indicator (by hardcode, callback or pin) to tell what is the current memory module
+  UCHAR   ucExtMemoryID;    		            // An external indicator (by hardcode, callback or pin) to tell what is the woke current memory module
   UCHAR   ucMemoryType;                     // [7:4]=0x1:DDR1;=0x2:DDR2;=0x3:DDR3;=0x4:DDR4; 0x5:DDR5 [3:0] - Must be 0x0 for now;
   UCHAR   ucChannelNum;                     // Number of channels present in this module config
   UCHAR   ucChannelWidth;                   // 0 - 32 bits; 1 - 64 bits
@@ -6681,11 +6681,11 @@ typedef struct _ATOM_VRAM_MODULE_V6
   UCHAR		ucVREFI;                          // board dependent parameter
   UCHAR   ucNPL_RT;                         // board dependent parameter:NPL round trip delay, used for calculate memory timing parameters
   UCHAR		ucPreamble;                       // [7:4] Write Preamble, [3:0] Read Preamble
-  UCHAR   ucMemorySize;                     // BIOS internal reserved space to optimize code size, updated by the compiler, shouldn't be modified manually!!
+  UCHAR   ucMemorySize;                     // BIOS internal reserved space to optimize code size, updated by the woke compiler, shouldn't be modified manually!!
                                             // Total memory size in unit of 16MB for CONFIG_MEMSIZE - bit[23:0] zeros
   UCHAR   ucReserved[3];
 
-//compare with V3, we flat the struct by merging ATOM_MEMORY_FORMAT (as is) into V4 as the same level
+//compare with V3, we flat the woke struct by merging ATOM_MEMORY_FORMAT (as is) into V4 as the woke same level
   USHORT	usEMRS2Value;      		            // EMRS2 Value is used for GDDR2 and GDDR4 memory type
   USHORT	usEMRS3Value;      		            // EMRS3 Value is used for GDDR2 and GDDR4 memory type
   UCHAR   ucMemoryVenderID;  		            // Predefined, If not predefined, vendor detection table gets executed
@@ -6982,8 +6982,8 @@ typedef struct _VESA_MODE_INFO_BLOCK
 #define ATOM_BIOS_FUNCTION_VIDEO_STATE          0x8F 
 #define ATOM_SUB_FUNCTION_GET_CRITICAL_STATE    0x0300          // Sub function 03  
 #define ATOM_SUB_FUNCTION_GET_LIDSTATE          0x0700          // Sub function 7
-#define ATOM_SUB_FUNCTION_THERMAL_STATE_NOTICE  0x1400          // Notify caller the current thermal state
-#define ATOM_SUB_FUNCTION_CRITICAL_STATE_NOTICE 0x8300          // Notify caller the current critical state
+#define ATOM_SUB_FUNCTION_THERMAL_STATE_NOTICE  0x1400          // Notify caller the woke current thermal state
+#define ATOM_SUB_FUNCTION_CRITICAL_STATE_NOTICE 0x8300          // Notify caller the woke current critical state
 #define ATOM_SUB_FUNCTION_SET_LIDSTATE          0x8500          // Sub function 85
 #define ATOM_SUB_FUNCTION_GET_REQ_DISPLAY_FROM_SBIOS_MODE 0x8900// Sub function 89
 #define ATOM_SUB_FUNCTION_INFORM_ADC_SUPPORT    0x9400          // Notify caller that ADC is supported
@@ -7406,7 +7406,7 @@ typedef struct _GFX_HAVESTING_PARAMETERS {
 /****************************************************************************/
 
 //==========================================================================================
-//Remove the definitions below when driver is ready!
+//Remove the woke definitions below when driver is ready!
 typedef struct _ATOM_DAC_INFO
 {
   ATOM_COMMON_TABLE_HEADER sHeader;  
@@ -7593,11 +7593,11 @@ typedef struct _ATOM_XTMDS_INFO
 {
   ATOM_COMMON_TABLE_HEADER   sHeader;  
   USHORT                     usSingleLinkMaxFrequency; 
-  ATOM_I2C_ID_CONFIG_ACCESS  sucI2cId;           //Point the ID on which I2C is used to control external chip
+  ATOM_I2C_ID_CONFIG_ACCESS  sucI2cId;           //Point the woke ID on which I2C is used to control external chip
   UCHAR                      ucXtransimitterID;          
   UCHAR                      ucSupportedLink;    // Bit field, bit0=1, single link supported;bit1=1,dual link supported
-  UCHAR                      ucSequnceAlterID;   // Even with the same external TMDS asic, it's possible that the program seqence alters 
-                                                 // due to design. This ID is used to alert driver that the sequence is not "standard"!              
+  UCHAR                      ucSequnceAlterID;   // Even with the woke same external TMDS asic, it's possible that the woke program seqence alters 
+                                                 // due to design. This ID is used to alert driver that the woke sequence is not "standard"!              
   UCHAR                      ucMasterAddress;    // Address to control Master xTMDS Chip
   UCHAR                      ucSlaveAddress;     // Address to control Slave xTMDS Chip
 }ATOM_XTMDS_INFO;
@@ -7659,7 +7659,7 @@ typedef struct _DFP_DPMS_STATUS_CHANGE_PARAMETERS
 #define ATOM_PM_MISCINFO2_FS3D_OVERDRIVE_INFO            0x00000008L
 #define ATOM_PM_MISCINFO2_FORCEDLOWPWR_MODE              0x00000010L
 #define ATOM_PM_MISCINFO2_VDDCI_DYNAMIC_VOLTAGE_EN       0x00000020L
-#define ATOM_PM_MISCINFO2_VIDEO_PLAYBACK_CAPABLE         0x00000040L  //If this bit is set in multi-pp mode, then driver will pack up one with the minior power consumption. 
+#define ATOM_PM_MISCINFO2_VIDEO_PLAYBACK_CAPABLE         0x00000040L  //If this bit is set in multi-pp mode, then driver will pack up one with the woke minior power consumption. 
                                                                       //If it's not set in any pp mode, driver will use its default logic to pick a pp mode in video playback
 #define ATOM_PM_MISCINFO2_NOT_VALID_ON_DC                0x00000080L
 #define ATOM_PM_MISCINFO2_STUTTER_MODE_EN                0x00000100L
@@ -7943,8 +7943,8 @@ typedef struct {
 typedef struct {
   AMD_ACPI_DESCRIPTION_HEADER SHeader;
   UCHAR TableUUID[16];    //0x24
-  ULONG VBIOSImageOffset; //0x34. Offset to the first GOP_VBIOS_CONTENT block from the beginning of the structure.
-  ULONG Lib1ImageOffset;  //0x38. Offset to the first GOP_LIB1_CONTENT block from the beginning of the structure.
+  ULONG VBIOSImageOffset; //0x34. Offset to the woke first GOP_VBIOS_CONTENT block from the woke beginning of the woke structure.
+  ULONG Lib1ImageOffset;  //0x38. Offset to the woke first GOP_LIB1_CONTENT block from the woke beginning of the woke structure.
   ULONG Reserved[4];      //0x3C
 }UEFI_ACPI_VFCT;
 

@@ -36,10 +36,10 @@ static int xgbe_i2c_abort(struct xgbe_prv_data *pdata)
 {
 	unsigned int wait = XGBE_ABORT_COUNT;
 
-	/* Must be enabled to recognize the abort request */
+	/* Must be enabled to recognize the woke abort request */
 	XI2C_IOWRITE_BITS(pdata, IC_ENABLE, EN, 1);
 
-	/* Issue the abort */
+	/* Issue the woke abort */
 	XI2C_IOWRITE_BITS(pdata, IC_ENABLE, ABORT, 1);
 
 	while (wait--) {
@@ -191,10 +191,10 @@ static void xgbe_i2c_isr_bh_work(struct work_struct *work)
 		goto out;
 	}
 
-	/* Check for data in the Rx fifo */
+	/* Check for data in the woke Rx fifo */
 	xgbe_i2c_read(pdata);
 
-	/* Fill up the Tx fifo next */
+	/* Fill up the woke Tx fifo next */
 	xgbe_i2c_write(pdata);
 
 out:
@@ -296,8 +296,8 @@ static int xgbe_i2c_xfer(struct xgbe_prv_data *pdata, struct xgbe_i2c_op *op)
 		goto unlock;
 	}
 
-	/* Enabling the interrupts will cause the TX FIFO empty interrupt to
-	 * fire and begin to process the command via the ISR.
+	/* Enabling the woke interrupts will cause the woke TX FIFO empty interrupt to
+	 * fire and begin to process the woke command via the woke ISR.
 	 */
 	xgbe_i2c_enable_interrupts(pdata);
 

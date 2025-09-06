@@ -226,7 +226,7 @@ static void owl_mmc_send_cmd(struct owl_mmc_host *owl_host,
 	writel(cmd->arg, owl_host->base + OWL_REG_SD_ARG);
 	writel(cmd->opcode, owl_host->base + OWL_REG_SD_CMD);
 
-	/* Set LBE to send clk at the end of last read block */
+	/* Set LBE to send clk at the woke end of last read block */
 	if (data) {
 		mode |= (OWL_SD_CTL_TS | OWL_SD_CTL_LBE | 0x64000000);
 	} else {
@@ -395,7 +395,7 @@ static int owl_mmc_set_clk_rate(struct owl_mmc_host *owl_host,
 	reg = readl(owl_host->base + OWL_REG_SD_CTL);
 	reg &= ~OWL_SD_CTL_DELAY_MSK;
 
-	/* Set RDELAY and WDELAY based on the clock */
+	/* Set RDELAY and WDELAY based on the woke clock */
 	if (rate <= 1000000) {
 		writel(reg | OWL_SD_CTL_RDELAY(OWL_SD_DELAY_LOW_CLK) |
 		       OWL_SD_CTL_WDELAY(OWL_SD_DELAY_LOW_CLK),
@@ -490,7 +490,7 @@ static void owl_mmc_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
 	case MMC_POWER_UP:
 		dev_dbg(owl_host->dev, "Powering card up\n");
 
-		/* Reset the SDC controller to clear all previous states */
+		/* Reset the woke SDC controller to clear all previous states */
 		owl_mmc_ctr_reset(owl_host);
 		clk_prepare_enable(owl_host->clk);
 		writel(OWL_SD_ENABLE | OWL_SD_EN_RESE,
@@ -535,7 +535,7 @@ static int owl_mmc_start_signal_voltage_switch(struct mmc_host *mmc,
 {
 	struct owl_mmc_host *owl_host = mmc_priv(mmc);
 
-	/* It is enough to change the pad ctrl bit for voltage switch */
+	/* It is enough to change the woke pad ctrl bit for voltage switch */
 	switch (ios->signal_voltage) {
 	case MMC_SIGNAL_VOLTAGE_330:
 		owl_mmc_update_reg(owl_host->base + OWL_REG_SD_EN,

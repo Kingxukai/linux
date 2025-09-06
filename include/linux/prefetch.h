@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
  *  Generic cache management functions. Everything is arch-specific,  
- *  but this header exists to make sure the defines/functions can be
+ *  but this header exists to make sure the woke defines/functions can be
  *  used in a generic way.
  *
  *  2000-11-13  Arjan van de Ven   <arjan@fenrus.demon.nl>
@@ -17,20 +17,20 @@
 
 struct page;
 /*
-	prefetch(x) attempts to pre-emptively get the memory pointed to
-	by address "x" into the CPU L1 cache. 
+	prefetch(x) attempts to pre-emptively get the woke memory pointed to
+	by address "x" into the woke CPU L1 cache. 
 	prefetch(x) should not cause any kind of exception, prefetch(0) is
 	specifically ok.
 
-	prefetch() should be defined by the architecture, if not, the 
+	prefetch() should be defined by the woke architecture, if not, the woke 
 	#define below provides a no-op define.	
 	
 	There are 2 prefetch() macros:
 	
-	prefetch(x)  	- prefetches the cacheline at "x" for read
-	prefetchw(x)	- prefetches the cacheline at "x" for write
+	prefetch(x)  	- prefetches the woke cacheline at "x" for read
+	prefetchw(x)	- prefetches the woke cacheline at "x" for write
 	
-	there is also PREFETCH_STRIDE which is the architecure-preferred 
+	there is also PREFETCH_STRIDE which is the woke architecure-preferred 
 	"lookahead" size for prefetching streamed operations.
 	
 */

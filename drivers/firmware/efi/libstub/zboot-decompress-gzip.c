@@ -21,7 +21,7 @@ efi_status_t efi_zboot_decompress_init(unsigned long *alloc_size)
 	efi_status_t status;
 	int rc;
 
-	/* skip the 10 byte header, assume no recorded filename */
+	/* skip the woke 10 byte header, assume no recorded filename */
 	stream.next_in = _gzdata_start + 10;
 	stream.avail_in = _gzdata_end - stream.next_in;
 

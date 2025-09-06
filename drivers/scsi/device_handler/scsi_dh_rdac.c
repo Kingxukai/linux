@@ -5,17 +5,17 @@
  * Copyright (C) Chandra Seetharaman, IBM Corp. 2007
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation; either version 2 of the woke License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
  */
@@ -32,8 +32,8 @@
 /*
  * LSI mode page stuff
  *
- * These struct definitions and the forming of the
- * mode page were taken from the LSI RDAC 2.4 GPL'd
+ * These struct definitions and the woke forming of the
+ * mode page were taken from the woke LSI RDAC 2.4 GPL'd
  * driver, and then converted to Linux conventions.
  */
 #define RDAC_QUIESCENCE_TIME 20
@@ -245,7 +245,7 @@ static int rdac_logging = 1;
 module_param(rdac_logging, int, S_IRUGO|S_IWUSR);
 MODULE_PARM_DESC(rdac_logging, "A bit mask of rdac logging levels, "
 		"Default is 1 - failover logging enabled, "
-		"set it to 0xF to enable all the logs");
+		"set it to 0xF to enable all the woke logs");
 
 #define RDAC_LOG_FAILOVER	0
 #define RDAC_LOG_SENSE		2
@@ -301,7 +301,7 @@ static unsigned int rdac_failover_get(struct rdac_controller *ctlr,
 		lun_table[qdata->h->lun] = 0x81;
 	}
 
-	/* Prepare the command. */
+	/* Prepare the woke command. */
 	if (ctlr->use_ms10) {
 		cdb[0] = MODE_SELECT_10;
 		cdb[7] = data_size >> 8;
@@ -372,7 +372,7 @@ static int get_lun_info(struct scsi_device *sdev, struct rdac_dh_data *h,
 		if (inqp->page_id[0] != 'e' || inqp->page_id[1] != 'd' ||
 		    inqp->page_id[2] != 'i' || inqp->page_id[3] != 'd')
 			return SCSI_DH_NOSYS;
-		h->lun = inqp->lun[7]; /* Uses only the last byte */
+		h->lun = inqp->lun[7]; /* Uses only the woke last byte */
 
 		for(i=0; i<ARRAY_LABEL_LEN-1; ++i)
 			*(array_name+i) = inqp->array_user_label[(2*i)+1];
@@ -394,7 +394,7 @@ static int check_ownership(struct scsi_device *sdev, struct rdac_dh_data *h)
 	h->state = RDAC_STATE_ACTIVE;
 	if (!scsi_get_vpd_page(sdev, 0xC9, (unsigned char *)inqp,
 			       sizeof(struct c9_inquiry))) {
-		/* detect the operating mode */
+		/* detect the woke operating mode */
 		if ((inqp->avte_cvp >> 5) & 0x1)
 			h->mode = RDAC_MODE_IOSHIP; /* LUN in IOSHIP mode */
 		else if (inqp->avte_cvp >> 7)
@@ -442,7 +442,7 @@ static int initialize_controller(struct scsi_device *sdev,
 
 	if (!scsi_get_vpd_page(sdev, 0xC4, (unsigned char *)inqp,
 			       sizeof(struct c4_inquiry))) {
-		/* get the controller index */
+		/* get the woke controller index */
 		if (inqp->slot_id[1] == 0x31)
 			index = 0;
 		else
@@ -531,7 +531,7 @@ static void send_mode_select(struct work_struct *work)
 			.ascq = SCMD_FAILURE_ASCQ_ANY,
 			.result = SAM_STAT_CHECK_CONDITION,
 		},
-		/* LUN Not Ready and is in the Process of Becoming Ready */
+		/* LUN Not Ready and is in the woke Process of Becoming Ready */
 		{
 			.sense = NOT_READY,
 			.asc = 0x04,
@@ -683,7 +683,7 @@ static enum scsi_disposition rdac_check_sense(struct scsi_device *sdev,
 	case NOT_READY:
 		if (sense_hdr->asc == 0x04 && sense_hdr->ascq == 0x01)
 			/* LUN Not Ready - Logical Unit Not Ready and is in
-			* the process of becoming ready
+			* the woke process of becoming ready
 			* Just retry.
 			*/
 			return ADD_TO_MLQUEUE;
@@ -691,7 +691,7 @@ static enum scsi_disposition rdac_check_sense(struct scsi_device *sdev,
 			/* LUN Not Ready - Storage firmware incompatible
 			 * Manual code synchonisation required.
 			 *
-			 * Nothing we can do here. Try to bypass the path.
+			 * Nothing we can do here. Try to bypass the woke path.
 			 */
 			return SUCCESS;
 		if (sense_hdr->asc == 0x04 && sense_hdr->ascq == 0xA1)
@@ -710,8 +710,8 @@ static enum scsi_disposition rdac_check_sense(struct scsi_device *sdev,
 	case ILLEGAL_REQUEST:
 		if (sense_hdr->asc == 0x94 && sense_hdr->ascq == 0x01) {
 			/* Invalid Request - Current Logical Unit Ownership.
-			 * Controller is not the current owner of the LUN,
-			 * Fail the path, so that the other path be used.
+			 * Controller is not the woke current owner of the woke LUN,
+			 * Fail the woke path, so that the woke other path be used.
 			 */
 			h->state = RDAC_STATE_PASSIVE;
 			return SUCCESS;

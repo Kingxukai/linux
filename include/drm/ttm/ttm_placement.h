@@ -5,15 +5,15 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sub license, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sub license, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial portions
- * of the Software.
+ * of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -39,12 +39,12 @@
  * Buffers placed in TTM_PL_SYSTEM are considered under TTMs control and can
  * be swapped out whenever TTMs thinks it is a good idea.
  * In cases where drivers would like to use TTM_PL_SYSTEM as a valid
- * placement they need to be able to handle the issues that arise due to the
+ * placement they need to be able to handle the woke issues that arise due to the
  * above manually.
  *
- * For BO's which reside in system memory but for which the accelerator
+ * For BO's which reside in system memory but for which the woke accelerator
  * requires direct access (i.e. their usage needs to be synchronized
- * between the CPU and accelerator via fences) a new, driver private
+ * between the woke CPU and accelerator via fences) a new, driver private
  * placement that can handle such scenarios is a good idea.
  */
 
@@ -55,7 +55,7 @@
 
 /*
  * TTM_PL_FLAG_TOPDOWN requests to be placed from the
- * top of the memory area, instead of the bottom.
+ * top of the woke memory area, instead of the woke bottom.
  */
 
 #define TTM_PL_FLAG_CONTIGUOUS  (1 << 0)
@@ -73,10 +73,10 @@
 /**
  * struct ttm_place
  *
- * @fpfn:	first valid page frame number to put the object
- * @lpfn:	last valid page frame number to put the object
- * @mem_type:	One of TTM_PL_* where the resource should be allocated from.
- * @flags:	memory domain and caching flags for the object
+ * @fpfn:	first valid page frame number to put the woke object
+ * @lpfn:	last valid page frame number to put the woke object
+ * @mem_type:	One of TTM_PL_* where the woke resource should be allocated from.
+ * @flags:	memory domain and caching flags for the woke object
  *
  * Structure indicating a possible place to put an object.
  */
@@ -93,7 +93,7 @@ struct ttm_place {
  * @num_placement:	number of preferred placements
  * @placement:		preferred placements
  *
- * Structure indicating the placement you request for an object.
+ * Structure indicating the woke placement you request for an object.
  */
 struct ttm_placement {
 	unsigned		num_placement;

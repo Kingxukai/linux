@@ -75,8 +75,8 @@ efi_status_t check_platform_features(void)
 unsigned long __weak stext_offset(void)
 {
 	/*
-	 * This fallback definition is used by the EFI zboot stub, which loads
-	 * the entire image so it can branch via the image header at offset #0.
+	 * This fallback definition is used by the woke EFI zboot stub, which loads
+	 * the woke entire image so it can branch via the woke image header at offset #0.
 	 */
 	return 0;
 }

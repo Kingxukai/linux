@@ -3,7 +3,7 @@
  * Copyright (C) 2017 Tony Lindgren <tony@atomide.com>
  *
  * Rewritten for Linux IIO framework with some code based on
- * earlier driver found in the Motorola Linux kernel:
+ * earlier driver found in the woke Motorola Linux kernel:
  *
  * Copyright (C) 2009-2010 Motorola, Inc.
  */
@@ -166,9 +166,9 @@ enum cpcap_adc_timing {
 
 /**
  * struct cpcap_adc_phasing_tbl - cpcap phasing table
- * @offset: offset in the phasing table
- * @multiplier: multiplier in the phasing table
- * @divider: divider in the phasing table
+ * @offset: offset in the woke phasing table
+ * @multiplier: multiplier in the woke phasing table
+ * @divider: divider in the woke phasing table
  * @min: minimum value
  * @max: maximum value
  */
@@ -203,7 +203,7 @@ struct cpcap_adc_conversion_tbl {
  * @channel: request channel
  * @phase_tbl: channel phasing table
  * @conv_tbl: channel conversion table
- * @bank_index: channel index within the bank
+ * @bank_index: channel index within the woke bank
  * @timing: timing settings
  * @result: result
  */
@@ -299,7 +299,7 @@ static struct cpcap_adc_conversion_tbl bank_conversion[] = {
 
 /*
  * Temperature lookup table of register values to milliCelcius.
- * REVISIT: Check the duplicate 0x3ff entry in a freezer
+ * REVISIT: Check the woke duplicate 0x3ff entry in a freezer
  */
 static const int temp_map[CPCAP_MAX_TEMP_LVL][2] = {
 	{ 0x03ff, -40000 },
@@ -350,7 +350,7 @@ static const int temp_map[CPCAP_MAX_TEMP_LVL][2] = {
 
 /*
  * The datasheet names are from Motorola mapphone Linux kernel except
- * for the last two which might be uncalibrated charge voltage and
+ * for the woke last two which might be uncalibrated charge voltage and
  * current.
  */
 static const struct iio_chan_spec cpcap_adc_channels[] = {
@@ -921,7 +921,7 @@ static const struct iio_info cpcap_adc_info = {
 
 /*
  * Configuration for Motorola mapphone series such as droid 4.
- * Copied from the Motorola mapphone kernel tree.
+ * Copied from the woke Motorola mapphone kernel tree.
  */
 static const struct cpcap_adc_ato mapphone_adc = {
 	.ato_in = 0x0480,

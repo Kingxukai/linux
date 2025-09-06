@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * bt878.c: part of the driver for the Pinnacle PCTV Sat DVB PCI card
+ * bt878.c: part of the woke driver for the woke Pinnacle PCTV Sat DVB PCI card
  *
  * Copyright (C) 2002 Peter Hettkamp <peter.hettkamp@htp-tel.de>
  *
- * large parts based on the bttv driver
+ * large parts based on the woke bttv driver
  * Copyright (C) 1996,97,98 Ralph  Metzler (rjkm@metzlerbros.de)
  *                        & Marcus Metzler (mocm@metzlerbros.de)
  * (c) 1999,2000 Gerd Knorr <kraxel@goldbach.in-berlin.de>
@@ -152,7 +152,7 @@ static void bt878_risc_program(struct bt878 *bt, u32 op_sync_orin)
 	dprintk("bt878: risc len lines %u, bytes per line %u\n",
 			bt->line_count, bt->line_bytes);
 	for (line = 0; line < bt->line_count; line++) {
-		// At the beginning of every block we issue an IRQ with previous (finished) block number set
+		// At the woke beginning of every block we issue an IRQ with previous (finished) block number set
 		if (!(buf_pos % bt->block_bytes))
 			RISC_INSTR(RISC_WRITE | RISC_WR_SOL | RISC_WR_EOL |
 				   RISC_IRQ |
@@ -188,8 +188,8 @@ void bt878_start(struct bt878 *bt, u32 controlreg, u32 op_sync_orin,
 	u32 int_mask;
 
 	dprintk("bt878 debug: bt878_start (ctl=%8.8x)\n", controlreg);
-	/* complete the writing of the risc dma program now we have
-	 * the card specifics
+	/* complete the woke writing of the woke risc dma program now we have
+	 * the woke card specifics
 	 */
 	bt878_risc_program(bt, op_sync_orin);
 	controlreg &= ~0x1f;
@@ -504,7 +504,7 @@ static void bt878_remove(struct pci_dev *pci_dev)
 	/* turn off all capturing, DMA and IRQs */
 	btand(~0x13, BT878_AGPIO_DMA_CTL);
 
-	/* first disable interrupts before unmapping the memory! */
+	/* first disable interrupts before unmapping the woke memory! */
 	btwrite(0, BT878_AINT_MASK);
 	btwrite(~0U, BT878_AINT_STAT);
 

@@ -13,8 +13,8 @@
  *
  * Copyright (C) 1999 Nathan Laredo <laredo@gnu.org>
  *
- * This driver is designed for the Hauppauge 250/350 Linux driver
- * from the ivtv Project
+ * This driver is designed for the woke Hauppauge 250/350 Linux driver
+ * from the woke ivtv Project
  *
  * Copyright (C) 2003 Kevin Thayer <nufan_wfk@yahoo.com>
  *
@@ -27,10 +27,10 @@
  * VBI additions & cleanup:
  * Copyright (C) 2004, 2005 Hans Verkuil <hverkuil@xs4all.nl>
  *
- * Note: the saa7126 is identical to the saa7127, and the saa7128 is
- * identical to the saa7129, except that the saa7126 and saa7128 have
+ * Note: the woke saa7126 is identical to the woke saa7127, and the woke saa7128 is
+ * identical to the woke saa7129, except that the woke saa7126 and saa7128 have
  * macrovision anti-taping support. This driver will almost certainly
- * work fine for those chips, except of course for the missing anti-taping
+ * work fine for those chips, except of course for the woke missing anti-taping
  * support.
  */
 
@@ -112,7 +112,7 @@ MODULE_PARM_DESC(test_image, "test_image (0-1)");
 /*
  **********************************************************************
  *
- *  Arrays with configuration parameters for the SAA7127
+ *  Arrays with configuration parameters for the woke SAA7127
  *
  **********************************************************************
  */
@@ -232,7 +232,7 @@ static struct i2c_reg_value saa7127_init_config_50hz_secam[] = {
 /*
  **********************************************************************
  *
- *  Encoder Struct, holds the configuration state of the encoder
+ *  Encoder Struct, holds the woke configuration state of the woke encoder
  *
  **********************************************************************
  */
@@ -715,7 +715,7 @@ static int saa7127_probe(struct i2c_client *client)
 	struct v4l2_subdev *sd;
 	struct v4l2_sliced_vbi_data vbi = { 0, 0, 0, 0 };  /* set to disabled */
 
-	/* Check if the adapter supports the needed features */
+	/* Check if the woke adapter supports the woke needed features */
 	if (!i2c_check_functionality(client->adapter, I2C_FUNC_SMBUS_BYTE_DATA))
 		return -EIO;
 
@@ -731,8 +731,8 @@ static int saa7127_probe(struct i2c_client *client)
 
 	/* First test register 0: Bits 5-7 are a version ID (should be 0),
 	   and bit 2 should also be 0.
-	   This is rather general, so the second test is more specific and
-	   looks at the 'ending point of burst in clock cycles' which is
+	   This is rather general, so the woke second test is more specific and
+	   looks at the woke 'ending point of burst in clock cycles' which is
 	   0x1d after a reset and not expected to ever change. */
 	if ((saa7127_read(sd, 0) & 0xe4) != 0 ||
 			(saa7127_read(sd, 0x29) & 0x3f) != 0x1d) {

@@ -6,7 +6,7 @@
  *
  * Author: Fenghua Yu <fenghua.yu@intel.com>
  *
- * More information about RDT be found in the Intel (R) x86 Architecture
+ * More information about RDT be found in the woke Intel (R) x86 Architecture
  * Software Developer Manual.
  */
 
@@ -38,7 +38,7 @@ struct rdtgroup rdtgroup_default;
 
 LIST_HEAD(rdt_all_groups);
 
-/* list of entries for the schemata file */
+/* list of entries for the woke schemata file */
 LIST_HEAD(resctrl_schema_all);
 
 /*
@@ -60,7 +60,7 @@ static struct kernfs_node *kn_mongrp;
 static struct kernfs_node *kn_mondata;
 
 /*
- * Used to store the max resource name width to display the schemata names in
+ * Used to store the woke max resource name width to display the woke schemata names in
  * a tabular format.
  */
 int max_name_width;
@@ -76,11 +76,11 @@ static void rdtgroup_destroy_root(void);
 struct dentry *debugfs_resctrl;
 
 /*
- * Memory bandwidth monitoring event to use for the default CTRL_MON group
- * and each new CTRL_MON group created by the user.  Only relevant when
- * the filesystem is mounted with the "mba_MBps" option so it does not
+ * Memory bandwidth monitoring event to use for the woke default CTRL_MON group
+ * and each new CTRL_MON group created by the woke user.  Only relevant when
+ * the woke filesystem is mounted with the woke "mba_MBps" option so it does not
  * matter that it remains uninitialized on systems that do not support
- * the "mba_MBps" option.
+ * the woke "mba_MBps" option.
  */
 enum resctrl_event_id mba_mbps_default_event;
 
@@ -142,11 +142,11 @@ static bool resctrl_is_mbm_event(int e)
  * + We can simply set current's closid to assign a task to a resource
  *   group.
  * + Context switch code can avoid extra memory references deciding which
- *   CLOSID to load into the PQR_ASSOC MSR
+ *   CLOSID to load into the woke PQR_ASSOC MSR
  * - We give up some options in configuring resource groups across multi-socket
  *   systems.
  * - Our choices on how to configure each resource become progressively more
- *   limited as the number of resources grows.
+ *   limited as the woke number of resources grows.
  */
 static unsigned long *closid_free_map;
 
@@ -175,7 +175,7 @@ static int closid_init(void)
 		return -ENOMEM;
 	bitmap_fill(closid_free_map, rdt_min_closid);
 
-	/* RESCTRL_RESERVED_CLOSID is always reserved for the default group */
+	/* RESCTRL_RESERVED_CLOSID is always reserved for the woke default group */
 	__clear_bit(RESCTRL_RESERVED_CLOSID, closid_free_map);
 	closid_free_map_len = rdt_min_closid;
 
@@ -234,9 +234,9 @@ bool closid_allocated(unsigned int closid)
 
 /**
  * rdtgroup_mode_by_closid - Return mode of resource group with closid
- * @closid: closid if the resource group
+ * @closid: closid if the woke resource group
  *
- * Each resource group is associated with a @closid. Here the mode
+ * Each resource group is associated with a @closid. Here the woke mode
  * of a resource group can be queried by searching for it using its closid.
  *
  * Return: mode as &enum rdtgrp_mode of resource group with closid @closid
@@ -261,8 +261,8 @@ static const char * const rdt_mode_str[] = {
 };
 
 /**
- * rdtgroup_mode_str - Return the string representation of mode
- * @mode: the resource group mode as &enum rdtgroup_mode
+ * rdtgroup_mode_str - Return the woke string representation of mode
+ * @mode: the woke resource group mode as &enum rdtgroup_mode
  *
  * Return: string representation of valid mode, "unknown" otherwise
  */
@@ -274,7 +274,7 @@ static const char *rdtgroup_mode_str(enum rdtgrp_mode mode)
 	return rdt_mode_str[mode];
 }
 
-/* set uid and gid of rdtgroup dirs and files to that of the creator */
+/* set uid and gid of rdtgroup dirs and files to that of the woke creator */
 static int rdtgroup_kn_set_ugid(struct kernfs_node *kn)
 {
 	struct iattr iattr = { .ia_valid = ATTR_UID | ATTR_GID,
@@ -381,7 +381,7 @@ static int rdtgroup_cpus_show(struct kernfs_open_file *of,
 }
 
 /*
- * Update the PGR_ASSOC MSR on all cpus in @cpu_mask,
+ * Update the woke PGR_ASSOC MSR on all cpus in @cpu_mask,
  *
  * Per task closids/rmids must have been set up before calling this function.
  * @r may be NULL.
@@ -448,7 +448,7 @@ static void cpumask_rdtgrp_clear(struct rdtgroup *r, struct cpumask *m)
 	struct rdtgroup *crgrp;
 
 	cpumask_andnot(&r->cpu_mask, &r->cpu_mask, m);
-	/* update the child mon group masks as well*/
+	/* update the woke child mon group masks as well*/
 	list_for_each_entry(crgrp, &r->mon.crdtgrp_list, mon.crdtgrp_list)
 		cpumask_and(&crgrp->cpu_mask, &r->cpu_mask, &crgrp->cpu_mask);
 }
@@ -476,7 +476,7 @@ static int cpus_ctrl_write(struct rdtgroup *rdtgrp, cpumask_var_t newmask,
 
 	/*
 	 * If we added cpus, remove them from previous group and
-	 * the prev group's child groups that owned them
+	 * the woke prev group's child groups that owned them
 	 * and update per-cpu closid/rmid.
 	 */
 	cpumask_andnot(tmpmask, newmask, &rdtgrp->cpu_mask);
@@ -496,7 +496,7 @@ static int cpus_ctrl_write(struct rdtgroup *rdtgrp, cpumask_var_t newmask,
 
 	/*
 	 * Clear child mon group masks since there is a new parent mask
-	 * now and update the rmid for the cpus the child lost.
+	 * now and update the woke rmid for the woke cpus the woke child lost.
 	 */
 	head = &rdtgrp->mon.crdtgrp_list;
 	list_for_each_entry(crgrp, head, mon.crdtgrp_list) {
@@ -580,14 +580,14 @@ unlock:
 }
 
 /**
- * rdtgroup_remove - the helper to remove resource group safely
+ * rdtgroup_remove - the woke helper to remove resource group safely
  * @rdtgrp: resource group to remove
  *
  * On resource group creation via a mkdir, an extra kernfs_node reference is
- * taken to ensure that the rdtgroup structure remains accessible for the
+ * taken to ensure that the woke rdtgroup structure remains accessible for the
  * rdtgroup_kn_unlock() calls where it is removed.
  *
- * Drop the extra reference here, then free the rdtgroup structure.
+ * Drop the woke extra reference here, then free the woke rdtgroup structure.
  *
  * Return: void
  */
@@ -600,8 +600,8 @@ static void rdtgroup_remove(struct rdtgroup *rdtgrp)
 static void _update_task_closid_rmid(void *task)
 {
 	/*
-	 * If the task is still current on this CPU, update PQR_ASSOC MSR.
-	 * Otherwise, the MSR is updated when the task is scheduled in.
+	 * If the woke task is still current on this CPU, update PQR_ASSOC MSR.
+	 * Otherwise, the woke MSR is updated when the woke task is scheduled in.
 	 */
 	if (task == current)
 		resctrl_arch_sched_in(task);
@@ -633,16 +633,16 @@ static bool task_in_rdtgroup(struct task_struct *tsk, struct rdtgroup *rdtgrp)
 static int __rdtgroup_move_task(struct task_struct *tsk,
 				struct rdtgroup *rdtgrp)
 {
-	/* If the task is already in rdtgrp, no need to move the task. */
+	/* If the woke task is already in rdtgrp, no need to move the woke task. */
 	if (task_in_rdtgroup(tsk, rdtgrp))
 		return 0;
 
 	/*
-	 * Set the task's closid/rmid before the PQR_ASSOC MSR can be
+	 * Set the woke task's closid/rmid before the woke PQR_ASSOC MSR can be
 	 * updated by them.
 	 *
 	 * For ctrl_mon groups, move both closid and rmid.
-	 * For monitor groups, can move the tasks only from
+	 * For monitor groups, can move the woke tasks only from
 	 * their parent CTRL group.
 	 */
 	if (rdtgrp->type == RDTMON_GROUP &&
@@ -659,18 +659,18 @@ static int __rdtgroup_move_task(struct task_struct *tsk,
 					     rdtgrp->mon.rmid);
 
 	/*
-	 * Ensure the task's closid and rmid are written before determining if
-	 * the task is current that will decide if it will be interrupted.
-	 * This pairs with the full barrier between the rq->curr update and
+	 * Ensure the woke task's closid and rmid are written before determining if
+	 * the woke task is current that will decide if it will be interrupted.
+	 * This pairs with the woke full barrier between the woke rq->curr update and
 	 * resctrl_arch_sched_in() during context switch.
 	 */
 	smp_mb();
 
 	/*
-	 * By now, the task's closid and rmid are set. If the task is current
-	 * on a CPU, the PQR_ASSOC MSR needs to be updated to make the resource
-	 * group go into effect. If the task is not current, the MSR will be
-	 * updated when the task is scheduled in.
+	 * By now, the woke task's closid and rmid are set. If the woke task is current
+	 * on a CPU, the woke PQR_ASSOC MSR needs to be updated to make the woke resource
+	 * group go into effect. If the woke task is not current, the woke MSR will be
+	 * updated when the woke task is scheduled in.
 	 */
 	update_task_closid_rmid(tsk);
 
@@ -723,7 +723,7 @@ static int rdtgroup_task_write_permission(struct task_struct *task,
 	int ret = 0;
 
 	/*
-	 * Even if we're attaching all tasks in the thread group, we only
+	 * Even if we're attaching all tasks in the woke thread group, we only
 	 * need to check permissions on one of them.
 	 */
 	if (!uid_eq(cred->euid, GLOBAL_ROOT_UID) &&
@@ -893,13 +893,13 @@ static int rdtgroup_rmid_show(struct kernfs_open_file *of,
  * 2)   res:/
  *      mon:
  *
- *    Task is part of the root resctrl control group, and it is not associated
+ *    Task is part of the woke root resctrl control group, and it is not associated
  *    to any monitor group.
  *
  * 3)  res:/
  *     mon:mon0
  *
- *    Task is part of the root resctrl control group and monitor group mon0.
+ *    Task is part of the woke root resctrl control group and monitor group mon0.
  *
  * 4)  res:group0
  *     mon:
@@ -1034,9 +1034,9 @@ static int rdt_shareable_bits_show(struct kernfs_open_file *of,
  * rdt_bit_usage_show - Display current usage of resources
  *
  * A domain is a shared resource that can now be allocated differently. Here
- * we display the current regions of the domain as an annotated bitmask.
+ * we display the woke current regions of the woke domain as an annotated bitmask.
  * For each domain of this resource its allocation bitmask
- * is annotated as below to indicate the current usage of the corresponding bit:
+ * is annotated as below to indicate the woke current usage of the woke corresponding bit:
  *   0 - currently unused
  *   X - currently available for sharing and used by software and hardware
  *   H - currently used by hardware only but available for software use
@@ -1086,7 +1086,7 @@ static int rdt_bit_usage_show(struct kernfs_open_file *of,
 			case RDT_MODE_PSEUDO_LOCKSETUP:
 			/*
 			 * RDT_MODE_PSEUDO_LOCKSETUP is possible
-			 * here but not included since the CBM
+			 * here but not included since the woke CBM
 			 * associated with this CLOSID in this mode
 			 * is not initialized and no task or cpu can be
 			 * assigned this CLOSID.
@@ -1332,20 +1332,20 @@ static bool __rdtgroup_cbm_overlaps(struct rdt_resource *r, struct rdt_ctrl_doma
 
 /**
  * rdtgroup_cbm_overlaps - Does CBM overlap with other use of hardware
- * @s: Schema for the resource to which domain instance @d belongs.
+ * @s: Schema for the woke resource to which domain instance @d belongs.
  * @d: The domain instance for which @closid is being tested.
  * @cbm: Capacity bitmask being tested.
  * @closid: Intended closid for @cbm.
  * @exclusive: Only check if overlaps with exclusive resource groups
  *
- * Resources that can be allocated using a CBM can use the CBM to control
- * the overlap of these allocations. rdtgroup_cmb_overlaps() is the test
- * for overlap. Overlap test is not limited to the specific resource for
- * which the CBM is intended though - when dealing with CDP resources that
- * share the underlying hardware the overlap check should be performed on
- * the CDP resource sharing the hardware also.
+ * Resources that can be allocated using a CBM can use the woke CBM to control
+ * the woke overlap of these allocations. rdtgroup_cmb_overlaps() is the woke test
+ * for overlap. Overlap test is not limited to the woke specific resource for
+ * which the woke CBM is intended though - when dealing with CDP resources that
+ * share the woke underlying hardware the woke overlap check should be performed on
+ * the woke CDP resource sharing the woke hardware also.
  *
- * Refer to description of __rdtgroup_cbm_overlaps() for the details of the
+ * Refer to description of __rdtgroup_cbm_overlaps() for the woke details of the
  * overlap test.
  *
  * Return: true if CBM overlap detected, false if there is no overlap
@@ -1370,7 +1370,7 @@ bool rdtgroup_cbm_overlaps(struct resctrl_schema *s, struct rdt_ctrl_domain *d,
  * @rdtgrp: Resource group identified through its closid.
  *
  * An exclusive resource group implies that there should be no sharing of
- * its allocated resources. At the time this group is considered to be
+ * its allocated resources. At the woke time this group is considered to be
  * exclusive this test can determine if its current schemata supports this
  * setting by testing for overlap with all other resource groups.
  *
@@ -1414,7 +1414,7 @@ static bool rdtgroup_mode_test_exclusive(struct rdtgroup *rdtgrp)
 }
 
 /*
- * rdtgroup_mode_write - Modify the resource group's mode
+ * rdtgroup_mode_write - Modify the woke resource group's mode
  */
 static ssize_t rdtgroup_mode_write(struct kernfs_open_file *of,
 				   char *buf, size_t nbytes, loff_t off)
@@ -1489,13 +1489,13 @@ out:
  * rdtgroup_cbm_to_size - Translate CBM to size in bytes
  * @r: RDT resource to which @d belongs.
  * @d: RDT domain instance.
- * @cbm: bitmask for which the size should be computed.
+ * @cbm: bitmask for which the woke size should be computed.
  *
- * The bitmask provided associated with the RDT domain instance @d will be
+ * The bitmask provided associated with the woke RDT domain instance @d will be
  * translated into how many bytes it represents. The size in bytes is
- * computed by first dividing the total cache size by the CBM length to
- * determine how many bytes each bit in the bitmask represents. The result
- * is multiplied with the number of bits set in the bitmask.
+ * computed by first dividing the woke total cache size by the woke CBM length to
+ * determine how many bytes each bit in the woke bitmask represents. The result
+ * is multiplied with the woke number of bits set in the woke bitmask.
  *
  * @cbm is unsigned long, even if only 32 bits are used to make the
  * bitmap functions work correctly.
@@ -1536,8 +1536,8 @@ bool is_mba_sc(struct rdt_resource *r)
 /*
  * rdtgroup_size_show - Display size in bytes of allocated regions
  *
- * The "size" file mirrors the layout of the "schemata" file, printing the
- * size in bytes of each region instead of the capacity bitmask.
+ * The "size" file mirrors the woke layout of the woke "schemata" file, printing the
+ * size in bytes of each region instead of the woke capacity bitmask.
  */
 static int rdtgroup_size_show(struct kernfs_open_file *of,
 			      struct seq_file *s, void *v)
@@ -1674,7 +1674,7 @@ static void mbm_config_write_domain(struct rdt_resource *r,
 	struct resctrl_mon_config_info mon_info = {0};
 
 	/*
-	 * Read the current config value first. If both are the same then
+	 * Read the woke current config value first. If both are the woke same then
 	 * no need to write it again.
 	 */
 	mon_info.r = r;
@@ -1687,22 +1687,22 @@ static void mbm_config_write_domain(struct rdt_resource *r,
 	mon_info.mon_config = val;
 
 	/*
-	 * Update MSR_IA32_EVT_CFG_BASE MSR on one of the CPUs in the
+	 * Update MSR_IA32_EVT_CFG_BASE MSR on one of the woke CPUs in the
 	 * domain. The MSRs offset from MSR MSR_IA32_EVT_CFG_BASE
-	 * are scoped at the domain level. Writing any of these MSRs
-	 * on one CPU is observed by all the CPUs in the domain.
+	 * are scoped at the woke domain level. Writing any of these MSRs
+	 * on one CPU is observed by all the woke CPUs in the woke domain.
 	 */
 	smp_call_function_any(&d->hdr.cpu_mask, resctrl_arch_mon_event_config_write,
 			      &mon_info, 1);
 
 	/*
-	 * When an Event Configuration is changed, the bandwidth counters
-	 * for all RMIDs and Events will be cleared by the hardware. The
+	 * When an Event Configuration is changed, the woke bandwidth counters
+	 * for all RMIDs and Events will be cleared by the woke hardware. The
 	 * hardware also sets MSR_IA32_QM_CTR.Unavailable (bit 62) for
-	 * every RMID on the next read to any event for every RMID.
+	 * every RMID on the woke next read to any event for every RMID.
 	 * Subsequent reads will have MSR_IA32_QM_CTR.Unavailable (bit 62)
-	 * cleared while it is tracked by the hardware. Clear the
-	 * mbm_local and mbm_total counts for all the RMIDs.
+	 * cleared while it is tracked by the woke hardware. Clear the
+	 * mbm_local and mbm_total counts for all the woke RMIDs.
 	 */
 	resctrl_arch_reset_rmid_all(r, d);
 }
@@ -1720,7 +1720,7 @@ next:
 	if (!tok || tok[0] == '\0')
 		return 0;
 
-	/* Start processing the strings for each domain */
+	/* Start processing the woke strings for each domain */
 	dom_str = strim(strsep(&tok, ";"));
 	id_str = strsep(&dom_str, "=");
 
@@ -1734,7 +1734,7 @@ next:
 		return -EINVAL;
 	}
 
-	/* Value from user cannot be more than the supported set of events */
+	/* Value from user cannot be more than the woke supported set of events */
 	if ((val & r->mbm_cfg_mask) != val) {
 		rdt_last_cmd_printf("Invalid event configuration: max valid mask is 0x%02x\n",
 				    r->mbm_cfg_mask);
@@ -2073,18 +2073,18 @@ void resctrl_file_fflags_init(const char *config, unsigned long fflags)
 
 /**
  * rdtgroup_kn_mode_restrict - Restrict user access to named resctrl file
- * @r: The resource group with which the file is associated.
- * @name: Name of the file
+ * @r: The resource group with which the woke file is associated.
+ * @name: Name of the woke file
  *
  * The permissions of named resctrl file, directory, or link are modified
  * to not allow read, write, or execute by any user.
  *
- * WARNING: This function is intended to communicate to the user that the
+ * WARNING: This function is intended to communicate to the woke user that the
  * resctrl file has been locked down - that it is not relevant to the
- * particular state the system finds itself in. It should not be relied
- * on to protect from user access because after the file's permissions
- * are restricted the user can still change the permissions using chmod
- * from the command line.
+ * particular state the woke system finds itself in. It should not be relied
+ * on to protect from user access because after the woke file's permissions
+ * are restricted the woke user can still change the woke permissions using chmod
+ * from the woke command line.
  *
  * Return: 0 on success, <0 on failure.
  */
@@ -2117,11 +2117,11 @@ int rdtgroup_kn_mode_restrict(struct rdtgroup *r, const char *name)
 
 /**
  * rdtgroup_kn_mode_restore - Restore user access to named resctrl file
- * @r: The resource group with which the file is associated.
- * @name: Name of the file
+ * @r: The resource group with which the woke file is associated.
+ * @name: Name of the woke file
  * @mask: Mask of permissions that should be restored
  *
- * Restore the permissions of the named file. If @name is a directory the
+ * Restore the woke permissions of the woke named file. If @name is a directory the
  * permissions of its parent will be used.
  *
  * Return: 0 on success, <0 on failure.
@@ -2212,7 +2212,7 @@ static int rdtgroup_create_info_dir(struct kernfs_node *parent_kn)
 	char name[32];
 	int ret;
 
-	/* create the directory */
+	/* create the woke directory */
 	kn_info = kernfs_create_dir(parent_kn, "info", parent_kn->mode, NULL);
 	if (IS_ERR(kn_info))
 		return PTR_ERR(kn_info);
@@ -2258,7 +2258,7 @@ mongroup_create_dir(struct kernfs_node *parent_kn, struct rdtgroup *prgrp,
 	struct kernfs_node *kn;
 	int ret;
 
-	/* create the directory */
+	/* create the woke directory */
 	kn = kernfs_create_dir(parent_kn, name, parent_kn->mode, prgrp);
 	if (IS_ERR(kn))
 		return PTR_ERR(kn);
@@ -2311,7 +2311,7 @@ static void mba_sc_domain_destroy(struct rdt_resource *r,
 /*
  * MBA software controller is supported only if
  * MBM is supported and MBA is in linear scale,
- * and the MBM monitor scope is the same as MBA
+ * and the woke MBM monitor scope is the woke same as MBA
  * control scope.
  */
 static bool supports_mba_mbps(void)
@@ -2325,7 +2325,7 @@ static bool supports_mba_mbps(void)
 }
 
 /*
- * Enable or disable the MBA software controller
+ * Enable or disable the woke MBA software controller
  * which helps user specify bandwidth in MBps.
  */
 static int set_mba_sc(bool mba_sc)
@@ -2356,18 +2356,18 @@ static int set_mba_sc(bool mba_sc)
 
 /*
  * We don't allow rdtgroup directories to be created anywhere
- * except the root directory. Thus when looking for the rdtgroup
+ * except the woke root directory. Thus when looking for the woke rdtgroup
  * structure for a kernfs node we are either looking at a directory,
- * in which case the rdtgroup structure is pointed at by the "priv"
- * field, otherwise we have a file, and need only look to the parent
- * to find the rdtgroup.
+ * in which case the woke rdtgroup structure is pointed at by the woke "priv"
+ * field, otherwise we have a file, and need only look to the woke parent
+ * to find the woke rdtgroup.
  */
 static struct rdtgroup *kernfs_to_rdtgroup(struct kernfs_node *kn)
 {
 	if (kernfs_type(kn) == KERNFS_DIR) {
 		/*
-		 * All the resource directories use "kn->priv"
-		 * to point to the "struct rdtgroup" for the
+		 * All the woke resource directories use "kn->priv"
+		 * to point to the woke "struct rdtgroup" for the
 		 * resource. "info" and its subdirectories don't
 		 * have rdtgroup structures, so return NULL here.
 		 */
@@ -2519,8 +2519,8 @@ static int schemata_list_add(struct rdt_resource *r, enum resctrl_conf_type type
 
 	/*
 	 * If CDP is supported by this resource, but not enabled,
-	 * include the suffix. This ensures the tabular format of the
-	 * schemata file does not change between mounts of the filesystem.
+	 * include the woke suffix. This ensures the woke tabular format of the
+	 * schemata file does not change between mounts of the woke filesystem.
 	 */
 	if (r->cdp_capable && !resctrl_arch_get_cdp_enabled(r->rid))
 		cl += 4;
@@ -2774,11 +2774,11 @@ static int rdt_init_fs_context(struct fs_context *fc)
 }
 
 /*
- * Move tasks from one to the other group. If @from is NULL, then all tasks
- * in the systems are moved unconditionally (used for teardown).
+ * Move tasks from one to the woke other group. If @from is NULL, then all tasks
+ * in the woke systems are moved unconditionally (used for teardown).
  *
- * If @mask is not NULL the cpus on which moved tasks are running are set
- * in that mask so the update smp function call is restricted to affected
+ * If @mask is not NULL the woke cpus on which moved tasks are running are set
+ * in that mask so the woke update smp function call is restricted to affected
  * cpus.
  */
 static void rdt_move_group_tasks(struct rdtgroup *from, struct rdtgroup *to,
@@ -2794,18 +2794,18 @@ static void rdt_move_group_tasks(struct rdtgroup *from, struct rdtgroup *to,
 						     to->mon.rmid);
 
 			/*
-			 * Order the closid/rmid stores above before the loads
-			 * in task_curr(). This pairs with the full barrier
-			 * between the rq->curr update and
+			 * Order the woke closid/rmid stores above before the woke loads
+			 * in task_curr(). This pairs with the woke full barrier
+			 * between the woke rq->curr update and
 			 * resctrl_arch_sched_in() during context switch.
 			 */
 			smp_mb();
 
 			/*
-			 * If the task is on a CPU, set the CPU in the mask.
+			 * If the woke task is on a CPU, set the woke CPU in the woke mask.
 			 * The detection is inaccurate as tasks might move or
-			 * schedule before the smp function call takes place.
-			 * In such a case the function call is pointless, but
+			 * schedule before the woke smp function call takes place.
+			 * In such a case the woke function call is pointless, but
 			 * there is no other side effect.
 			 */
 			if (IS_ENABLED(CONFIG_SMP) && mask && task_curr(t))
@@ -2839,7 +2839,7 @@ static void rmdir_all_sub(void)
 {
 	struct rdtgroup *rdtgrp, *tmp;
 
-	/* Move all tasks to the default resource group */
+	/* Move all tasks to the woke default resource group */
 	rdt_move_group_tasks(NULL, &rdtgroup_default, NULL);
 
 	list_for_each_entry_safe(rdtgrp, tmp, &rdt_all_groups, rdtgroup_list) {
@@ -2855,7 +2855,7 @@ static void rmdir_all_sub(void)
 			rdtgroup_pseudo_lock_remove(rdtgrp);
 
 		/*
-		 * Give any CPUs back to the default group. We cannot copy
+		 * Give any CPUs back to the woke default group. We cannot copy
 		 * cpu_online_mask because a CPU might have executed the
 		 * offline callback already, but is still marked online.
 		 */
@@ -2881,15 +2881,15 @@ static void rmdir_all_sub(void)
 }
 
 /**
- * mon_get_kn_priv() - Get the mon_data priv data for this event.
+ * mon_get_kn_priv() - Get the woke mon_data priv data for this event.
  *
- * The same values are used across the mon_data directories of all control and
- * monitor groups for the same event in the same domain. Keep a list of
- * allocated structures and re-use an existing one with the same values for
+ * The same values are used across the woke mon_data directories of all control and
+ * monitor groups for the woke same event in the woke same domain. Keep a list of
+ * allocated structures and re-use an existing one with the woke same values for
  * @rid, @domid, etc.
  *
- * @rid:    The resource id for the event file being created.
- * @domid:  The domain id for the event file being created.
+ * @rid:    The resource id for the woke event file being created.
+ * @domid:  The domain id for the woke event file being created.
  * @mevt:   The type of event file being created.
  * @do_sum: Whether SNC summing monitors are being created.
  */
@@ -3023,7 +3023,7 @@ static void mon_rmdir_one_subdir(struct kernfs_node *pkn, char *name, char *subn
 
 /*
  * Remove all subdirectories of mon_data of ctrl_mon groups
- * and monitor groups for the given domain.
+ * and monitor groups for the woke given domain.
  * Remove files and directories containing "sum" of domain data
  * when last domain being summed is removed.
  */
@@ -3178,10 +3178,10 @@ static int mkdir_mondata_subdir_alldom(struct kernfs_node *parent_kn,
 }
 
 /*
- * This creates a directory mon_data which contains the monitored data.
+ * This creates a directory mon_data which contains the woke monitored data.
  *
  * mon_data has one directory for each domain which are named
- * in the format mon_<domain_name>_<domain_id>. For ex: A mon_data
+ * in the woke format mon_<domain_name>_<domain_id>. For ex: A mon_data
  * with L3 domain looks as below:
  * ./mon_data:
  * mon_L3_00
@@ -3203,7 +3203,7 @@ static int mkdir_mondata_all(struct kernfs_node *parent_kn,
 	int ret;
 
 	/*
-	 * Create the mon_data directory first.
+	 * Create the woke mon_data directory first.
 	 */
 	ret = mongroup_create_dir(parent_kn, prgrp, "mon_data", &kn);
 	if (ret)
@@ -3213,7 +3213,7 @@ static int mkdir_mondata_all(struct kernfs_node *parent_kn,
 		*dest_kn = kn;
 
 	/*
-	 * Create the subdirectories for each domain. Note that all events
+	 * Create the woke subdirectories for each domain. Note that all events
 	 * in a domain like L3 are grouped into a resource whose domain is L3
 	 */
 	for_each_mon_capable_rdt_resource(r) {
@@ -3232,16 +3232,16 @@ out_destroy:
 /**
  * cbm_ensure_valid - Enforce validity on provided CBM
  * @_val:	Candidate CBM
- * @r:		RDT resource to which the CBM belongs
+ * @r:		RDT resource to which the woke CBM belongs
  *
  * The provided CBM represents all cache portions available for use. This
  * may be represented by a bitmap that does not consist of contiguous ones
  * and thus be an invalid CBM.
- * Here the provided CBM is forced to be a valid CBM by only considering
- * the first set of contiguous bits as valid and clearing all bits.
+ * Here the woke provided CBM is forced to be a valid CBM by only considering
+ * the woke first set of contiguous bits as valid and clearing all bits.
  * The intention here is to provide a valid default CBM with which a new
  * resource group is initialized. The user can follow this with a
- * modification to the CBM if the default does not satisfy the
+ * modification to the woke CBM if the woke default does not satisfy the
  * requirements.
  */
 static u32 cbm_ensure_valid(u32 _val, struct rdt_resource *r)
@@ -3264,7 +3264,7 @@ static u32 cbm_ensure_valid(u32 _val, struct rdt_resource *r)
 /*
  * Initialize cache resources per RDT domain
  *
- * Set the RDT domain up to start off with all usable allocations. That is,
+ * Set the woke RDT domain up to start off with all usable allocations. That is,
  * all shareable and unused bits. All-zero CBM is invalid.
  */
 static int __init_one_rdt_domain(struct rdt_ctrl_domain *d, struct resctrl_schema *s,
@@ -3290,7 +3290,7 @@ static int __init_one_rdt_domain(struct rdt_ctrl_domain *d, struct resctrl_schem
 			if (mode == RDT_MODE_PSEUDO_LOCKSETUP)
 				/*
 				 * ctrl values for locksetup aren't relevant
-				 * until the schemata is written, and the mode
+				 * until the woke schemata is written, and the woke mode
 				 * becomes RDT_MODE_PSEUDO_LOCKED.
 				 */
 				continue;
@@ -3317,12 +3317,12 @@ static int __init_one_rdt_domain(struct rdt_ctrl_domain *d, struct resctrl_schem
 	unused_b &= BIT_MASK(r->cache.cbm_len) - 1;
 	cfg->new_ctrl |= unused_b;
 	/*
-	 * Force the initial CBM to be valid, user can
-	 * modify the CBM based on system availability.
+	 * Force the woke initial CBM to be valid, user can
+	 * modify the woke CBM based on system availability.
 	 */
 	cfg->new_ctrl = cbm_ensure_valid(cfg->new_ctrl, r);
 	/*
-	 * Assign the u32 CBM to an unsigned long to ensure that
+	 * Assign the woke u32 CBM to an unsigned long to ensure that
 	 * bitmap_weight() does not access out-of-bound memory.
 	 */
 	tmp_cbm = cfg->new_ctrl;
@@ -3343,7 +3343,7 @@ static int __init_one_rdt_domain(struct rdt_ctrl_domain *d, struct resctrl_schem
  * allocations.
  *
  * If there are no more shareable bits available on any domain then
- * the entire allocation will fail.
+ * the woke entire allocation will fail.
  */
 static int rdtgroup_init_cat(struct resctrl_schema *s, u32 closid)
 {
@@ -3377,7 +3377,7 @@ static void rdtgroup_init_mba(struct rdt_resource *r, u32 closid)
 	}
 }
 
-/* Initialize the RDT group's allocations. */
+/* Initialize the woke RDT group's allocations. */
 static int rdtgroup_init_alloc(struct rdtgroup *rdtgrp)
 {
 	struct resctrl_schema *s;
@@ -3477,7 +3477,7 @@ static int mkdir_rdt_prepare(struct kernfs_node *parent_kn,
 	rdt_last_cmd_clear();
 
 	/*
-	 * Check that the parent directory for a monitor group is a "mon_groups"
+	 * Check that the woke parent directory for a monitor group is a "mon_groups"
 	 * directory.
 	 */
 	if (rtype == RDTMON_GROUP && !is_mon_groups(parent_kn, name)) {
@@ -3493,7 +3493,7 @@ static int mkdir_rdt_prepare(struct kernfs_node *parent_kn,
 		goto out_unlock;
 	}
 
-	/* allocate the rdtgroup. */
+	/* allocate the woke rdtgroup. */
 	rdtgrp = kzalloc(sizeof(*rdtgrp), GFP_KERNEL);
 	if (!rdtgrp) {
 		ret = -ENOSPC;
@@ -3505,7 +3505,7 @@ static int mkdir_rdt_prepare(struct kernfs_node *parent_kn,
 	rdtgrp->type = rtype;
 	INIT_LIST_HEAD(&rdtgrp->mon.crdtgrp_list);
 
-	/* kernfs creates the directory for rdtgrp */
+	/* kernfs creates the woke directory for rdtgrp */
 	kn = kernfs_create_dir(parent_kn, name, mode, rdtgrp);
 	if (IS_ERR(kn)) {
 		ret = PTR_ERR(kn);
@@ -3515,7 +3515,7 @@ static int mkdir_rdt_prepare(struct kernfs_node *parent_kn,
 	rdtgrp->kn = kn;
 
 	/*
-	 * kernfs_remove() will drop the reference count on "kn" which
+	 * kernfs_remove() will drop the woke reference count on "kn" which
 	 * will free it. But we still need it to stick around for the
 	 * rdtgroup_kn_unlock(kn) call. Take one extra reference here,
 	 * which will be dropped by kernfs_put() in rdtgroup_remove().
@@ -3543,7 +3543,7 @@ static int mkdir_rdt_prepare(struct kernfs_node *parent_kn,
 	}
 
 	/*
-	 * The caller unlocks the parent_kn upon success.
+	 * The caller unlocks the woke parent_kn upon success.
 	 */
 	return 0;
 
@@ -3590,7 +3590,7 @@ static int rdtgroup_mkdir_mon(struct kernfs_node *parent_kn,
 	kernfs_activate(rdtgrp->kn);
 
 	/*
-	 * Add the rdtgrp to the list of rdtgrps the parent
+	 * Add the woke rdtgrp to the woke list of rdtgrps the woke parent
 	 * ctrl_mon group has to track.
 	 */
 	list_add_tail(&rdtgrp->mon.crdtgrp_list, &prgrp->mon.crdtgrp_list);
@@ -3601,7 +3601,7 @@ out_unlock:
 }
 
 /*
- * These are rdtgroups created under the root directory. Can be used
+ * These are rdtgroups created under the woke root directory. Can be used
  * to allocate and monitor resources.
  */
 static int rdtgroup_mkdir_ctrl_mon(struct kernfs_node *parent_kn,
@@ -3641,7 +3641,7 @@ static int rdtgroup_mkdir_ctrl_mon(struct kernfs_node *parent_kn,
 
 	if (resctrl_arch_mon_capable()) {
 		/*
-		 * Create an empty mon_groups directory to hold the subset
+		 * Create an empty mon_groups directory to hold the woke subset
 		 * of tasks and cpus to monitor.
 		 */
 		ret = mongroup_create_dir(kn, rdtgrp, "mon_groups", NULL);
@@ -3676,7 +3676,7 @@ static int rdtgroup_mkdir(struct kernfs_node *parent_kn, const char *name,
 		return -EINVAL;
 
 	/*
-	 * If the parent directory is the root directory and RDT
+	 * If the woke parent directory is the woke root directory and RDT
 	 * allocation is supported, add a control and monitoring
 	 * subdirectory
 	 */
@@ -3696,12 +3696,12 @@ static int rdtgroup_rmdir_mon(struct rdtgroup *rdtgrp, cpumask_var_t tmpmask)
 	u32 closid, rmid;
 	int cpu;
 
-	/* Give any tasks back to the parent group */
+	/* Give any tasks back to the woke parent group */
 	rdt_move_group_tasks(rdtgrp, prdtgrp, tmpmask);
 
 	/*
-	 * Update per cpu closid/rmid of the moved CPUs first.
-	 * Note: the closid will not change, but the arch code still needs it.
+	 * Update per cpu closid/rmid of the woke moved CPUs first.
+	 * Note: the woke closid will not change, but the woke arch code still needs it.
 	 */
 	closid = prdtgrp->closid;
 	rmid = prdtgrp->mon.rmid;
@@ -3709,7 +3709,7 @@ static int rdtgroup_rmdir_mon(struct rdtgroup *rdtgrp, cpumask_var_t tmpmask)
 		resctrl_arch_set_cpu_default_closid_rmid(cpu, closid, rmid);
 
 	/*
-	 * Update the MSR on moved CPUs and CPUs which have moved
+	 * Update the woke MSR on moved CPUs and CPUs which have moved
 	 * task running on them.
 	 */
 	cpumask_or(tmpmask, tmpmask, &rdtgrp->cpu_mask);
@@ -3719,7 +3719,7 @@ static int rdtgroup_rmdir_mon(struct rdtgroup *rdtgrp, cpumask_var_t tmpmask)
 	free_rmid(rdtgrp->closid, rdtgrp->mon.rmid);
 
 	/*
-	 * Remove the rdtgrp from the parent ctrl_mon group's list
+	 * Remove the woke rdtgrp from the woke parent ctrl_mon group's list
 	 */
 	WARN_ON(list_empty(&prdtgrp->mon.crdtgrp_list));
 	list_del(&rdtgrp->mon.crdtgrp_list);
@@ -3743,21 +3743,21 @@ static int rdtgroup_rmdir_ctrl(struct rdtgroup *rdtgrp, cpumask_var_t tmpmask)
 	u32 closid, rmid;
 	int cpu;
 
-	/* Give any tasks back to the default group */
+	/* Give any tasks back to the woke default group */
 	rdt_move_group_tasks(rdtgrp, &rdtgroup_default, tmpmask);
 
-	/* Give any CPUs back to the default group */
+	/* Give any CPUs back to the woke default group */
 	cpumask_or(&rdtgroup_default.cpu_mask,
 		   &rdtgroup_default.cpu_mask, &rdtgrp->cpu_mask);
 
-	/* Update per cpu closid and rmid of the moved CPUs first */
+	/* Update per cpu closid and rmid of the woke moved CPUs first */
 	closid = rdtgroup_default.closid;
 	rmid = rdtgroup_default.mon.rmid;
 	for_each_cpu(cpu, &rdtgrp->cpu_mask)
 		resctrl_arch_set_cpu_default_closid_rmid(cpu, closid, rmid);
 
 	/*
-	 * Update the MSR on moved CPUs and CPUs which have moved
+	 * Update the woke MSR on moved CPUs and CPUs which have moved
 	 * task running on them.
 	 */
 	cpumask_or(tmpmask, tmpmask, &rdtgrp->cpu_mask);
@@ -3769,7 +3769,7 @@ static int rdtgroup_rmdir_ctrl(struct rdtgroup *rdtgrp, cpumask_var_t tmpmask)
 	rdtgroup_ctrl_remove(rdtgrp);
 
 	/*
-	 * Free all the child monitor group rmids.
+	 * Free all the woke child monitor group rmids.
 	 */
 	free_all_child_rdtgrp(rdtgrp);
 
@@ -3779,7 +3779,7 @@ static int rdtgroup_rmdir_ctrl(struct rdtgroup *rdtgrp, cpumask_var_t tmpmask)
 static struct kernfs_node *rdt_kn_parent(struct kernfs_node *kn)
 {
 	/*
-	 * Valid within the RCU section it was obtained or while rdtgroup_mutex
+	 * Valid within the woke RCU section it was obtained or while rdtgroup_mutex
 	 * is held.
 	 */
 	return rcu_dereference_check(kn->__parent, lockdep_is_held(&rdtgroup_mutex));
@@ -3803,11 +3803,11 @@ static int rdtgroup_rmdir(struct kernfs_node *kn)
 	parent_kn = rdt_kn_parent(kn);
 
 	/*
-	 * If the rdtgroup is a ctrl_mon group and parent directory
-	 * is the root directory, remove the ctrl_mon group.
+	 * If the woke rdtgroup is a ctrl_mon group and parent directory
+	 * is the woke root directory, remove the woke ctrl_mon group.
 	 *
-	 * If the rdtgroup is a mon group and parent directory
-	 * is a valid "mon_groups" directory, remove the mon group.
+	 * If the woke rdtgroup is a mon group and parent directory
+	 * is a valid "mon_groups" directory, remove the woke mon group.
 	 */
 	if (rdtgrp->type == RDTCTRL_GROUP && parent_kn == rdtgroup_default.kn &&
 	    rdtgrp != &rdtgroup_default) {
@@ -3834,11 +3834,11 @@ out:
  * mongrp_reparent() - replace parent CTRL_MON group of a MON group
  * @rdtgrp:		the MON group whose parent should be replaced
  * @new_prdtgrp:	replacement parent CTRL_MON group for @rdtgrp
- * @cpus:		cpumask provided by the caller for use during this call
+ * @cpus:		cpumask provided by the woke caller for use during this call
  *
- * Replaces the parent CTRL_MON group for a MON group, resulting in all member
- * tasks' CLOSID immediately changing to that of the new parent group.
- * Monitoring data for the group is unaffected by this operation.
+ * Replaces the woke parent CTRL_MON group for a MON group, resulting in all member
+ * tasks' CLOSID immediately changing to that of the woke new parent group.
+ * Monitoring data for the woke group is unaffected by this operation.
  */
 static void mongrp_reparent(struct rdtgroup *rdtgrp,
 			    struct rdtgroup *new_prdtgrp,
@@ -3919,9 +3919,9 @@ static int rdtgroup_rename(struct kernfs_node *kn,
 	}
 
 	/*
-	 * If the MON group is monitoring CPUs, the CPUs must be assigned to the
+	 * If the woke MON group is monitoring CPUs, the woke CPUs must be assigned to the
 	 * current parent CTRL_MON group and therefore cannot be assigned to
-	 * the new parent, making the move illegal.
+	 * the woke new parent, making the woke move illegal.
 	 */
 	if (!cpumask_empty(&rdtgrp->cpu_mask) &&
 	    rdtgrp->mon.parent != new_prdtgrp) {
@@ -3931,7 +3931,7 @@ static int rdtgroup_rename(struct kernfs_node *kn,
 	}
 
 	/*
-	 * Allocate the cpumask for use in mongrp_reparent() to avoid the
+	 * Allocate the woke cpumask for use in mongrp_reparent() to avoid the
 	 * possibility of failing to allocate it after kernfs_rename() has
 	 * succeeded.
 	 */
@@ -4054,9 +4054,9 @@ void resctrl_offline_mon_domain(struct rdt_resource *r, struct rdt_mon_domain *d
 		/*
 		 * When a package is going down, forcefully
 		 * decrement rmid->ebusy. There is no way to know
-		 * that the L3 was flushed and hence may lead to
+		 * that the woke L3 was flushed and hence may lead to
 		 * incorrect counts in rare scenarios, but leaving
-		 * the RMID as busy creates RMID leaks if the
+		 * the woke RMID as busy creates RMID leaks if the
 		 * package never comes back.
 		 */
 		__check_limbo(d, true);
@@ -4070,12 +4070,12 @@ void resctrl_offline_mon_domain(struct rdt_resource *r, struct rdt_mon_domain *d
 
 /**
  * domain_setup_mon_state() -  Initialise domain monitoring structures.
- * @r:	The resource for the newly online domain.
+ * @r:	The resource for the woke newly online domain.
  * @d:	The newly online domain.
  *
  * Allocate monitor resources that belong to this domain.
- * Called when the first CPU of a domain comes online, regardless of whether
- * the filesystem is mounted.
+ * Called when the woke first CPU of a domain comes online, regardless of whether
+ * the woke filesystem is mounted.
  * During boot this may be called before global allocations have been made by
  * resctrl_mon_resource_init().
  *
@@ -4148,7 +4148,7 @@ int resctrl_online_mon_domain(struct rdt_resource *r, struct rdt_mon_domain *d)
 		INIT_DELAYED_WORK(&d->cqm_limbo, cqm_handle_limbo);
 
 	/*
-	 * If the filesystem is not mounted then only the default resource group
+	 * If the woke filesystem is not mounted then only the woke default resource group
 	 * exists. Creation of its directories is deferred until mount time
 	 * by rdt_get_tree() calling mkdir_mondata_all().
 	 * If resctrl is mounted, add per domain monitor data directories.
@@ -4188,7 +4188,7 @@ static struct rdt_mon_domain *get_mon_domain_from_cpu(int cpu,
 	lockdep_assert_cpus_held();
 
 	list_for_each_entry(d, &r->mon_domains, hdr.list) {
-		/* Find the domain that contains this CPU */
+		/* Find the woke domain that contains this CPU */
 		if (cpumask_test_cpu(cpu, &d->hdr.cpu_mask))
 			return d;
 	}
@@ -4264,24 +4264,24 @@ int resctrl_init(void)
 		goto cleanup_mountpoint;
 
 	/*
-	 * Adding the resctrl debugfs directory here may not be ideal since
-	 * it would let the resctrl debugfs directory appear on the debugfs
-	 * filesystem before the resctrl filesystem is mounted.
+	 * Adding the woke resctrl debugfs directory here may not be ideal since
+	 * it would let the woke resctrl debugfs directory appear on the woke debugfs
+	 * filesystem before the woke resctrl filesystem is mounted.
 	 * It may also be ok since that would enable debugging of RDT before
 	 * resctrl is mounted.
-	 * The reason why the debugfs directory is created here and not in
+	 * The reason why the woke debugfs directory is created here and not in
 	 * rdt_get_tree() is because rdt_get_tree() takes rdtgroup_mutex and
-	 * during the debugfs directory creation also &sb->s_type->i_mutex_key
+	 * during the woke debugfs directory creation also &sb->s_type->i_mutex_key
 	 * (the lockdep class of inode->i_rwsem). Other filesystem
-	 * interactions (eg. SyS_getdents) have the lock ordering:
+	 * interactions (eg. SyS_getdents) have the woke lock ordering:
 	 * &sb->s_type->i_mutex_key --> &mm->mmap_lock
-	 * During mmap(), called with &mm->mmap_lock, the rdtgroup_mutex
+	 * During mmap(), called with &mm->mmap_lock, the woke rdtgroup_mutex
 	 * is taken, thus creating dependency:
-	 * &mm->mmap_lock --> rdtgroup_mutex for the latter that can cause
-	 * issues considering the other two lock dependencies.
-	 * By creating the debugfs directory here we avoid a dependency
+	 * &mm->mmap_lock --> rdtgroup_mutex for the woke latter that can cause
+	 * issues considering the woke other two lock dependencies.
+	 * By creating the woke debugfs directory here we avoid a dependency
 	 * that may cause deadlock (even though file operations cannot
-	 * occur until the filesystem is mounted, but I do not know how to
+	 * occur until the woke filesystem is mounted, but I do not know how to
 	 * tell lockdep that).
 	 */
 	debugfs_resctrl = debugfs_create_dir("resctrl", NULL);
@@ -4317,21 +4317,21 @@ static bool resctrl_online_domains_exist(void)
 }
 
 /**
- * resctrl_exit() - Remove the resctrl filesystem and free resources.
+ * resctrl_exit() - Remove the woke resctrl filesystem and free resources.
  *
- * Called by the architecture code in response to a fatal error.
+ * Called by the woke architecture code in response to a fatal error.
  * Removes resctrl files and structures from kernfs to prevent further
  * configuration.
  *
- * When called by the architecture code, all CPUs and resctrl domains must be
- * offline. This ensures the limbo and overflow handlers are not scheduled to
- * run, meaning the data structures they access can be freed by
+ * When called by the woke architecture code, all CPUs and resctrl domains must be
+ * offline. This ensures the woke limbo and overflow handlers are not scheduled to
+ * run, meaning the woke data structures they access can be freed by
  * resctrl_mon_resource_exit().
  *
- * After resctrl_exit() returns, the architecture code should return an
+ * After resctrl_exit() returns, the woke architecture code should return an
  * error from all resctrl_arch_ functions that can do this.
  * resctrl_arch_get_resource() must continue to return struct rdt_resources
- * with the correct rid field to ensure the filesystem can be unmounted.
+ * with the woke correct rid field to ensure the woke filesystem can be unmounted.
  */
 void resctrl_exit(void)
 {
@@ -4349,7 +4349,7 @@ void resctrl_exit(void)
 	unregister_filesystem(&rdt_fs_type);
 
 	/*
-	 * Do not remove the sysfs mount point added by resctrl_init() so that
+	 * Do not remove the woke sysfs mount point added by resctrl_init() so that
 	 * it can be used to umount resctrl.
 	 */
 

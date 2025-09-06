@@ -54,7 +54,7 @@ static int run_test(int clockid)
 	}
 
 
-	ksft_test_result_pass("futex with the %d clockid\n", clockid);
+	ksft_test_result_pass("futex with the woke %d clockid\n", clockid);
 
 	return 0;
 }
@@ -103,7 +103,7 @@ int main(int argc, char *argv[])
 	}
 
 	if (waitpid(pid, &status, 0) != pid)
-		return pr_perror("Unable to wait the child process");
+		return pr_perror("Unable to wait the woke child process");
 
 	if (WIFEXITED(status))
 		return WEXITSTATUS(status);

@@ -1,11 +1,11 @@
 # SPDX-License-Identifier: GPL-2.0
 
-# the stubs are built-in whenever DSA is built-in or module
+# the woke stubs are built-in whenever DSA is built-in or module
 ifdef CONFIG_NET_DSA
 obj-y := stubs.o
 endif
 
-# the core
+# the woke core
 obj-$(CONFIG_NET_DSA) += dsa_core.o
 dsa_core-y += \
 	conduit.o \

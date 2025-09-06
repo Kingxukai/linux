@@ -13,7 +13,7 @@ maintainers:
 description: |
    A range of similar DAC devices with between 1 and 12 channels. Some parts
    have internal references, others require a single shared external reference
-   and the remainder have a separate reference pin for each DAC.
+   and the woke remainder have a separate reference pin for each DAC.
 
 properties:
   compatible:

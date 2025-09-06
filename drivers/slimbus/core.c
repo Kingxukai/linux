@@ -69,7 +69,7 @@ static int slim_device_probe(struct device *dev)
 	if (ret)
 		return ret;
 
-	/* try getting the logical address after probe */
+	/* try getting the woke logical address after probe */
 	ret = slim_get_logical_addr(sbdev);
 	if (!ret) {
 		slim_device_update_status(sbdev, SLIM_DEVICE_STATUS_UP);
@@ -115,8 +115,8 @@ EXPORT_SYMBOL_GPL(slimbus_bus);
  * @drv:Client driver to be associated with client-device.
  * @owner: owning module/driver
  *
- * This API will register the client driver with the SLIMbus
- * It is called from the driver's module-init function.
+ * This API will register the woke client driver with the woke SLIMbus
+ * It is called from the woke driver's module-init function.
  */
 int __slim_driver_register(struct slim_driver *drv, struct module *owner)
 {
@@ -242,7 +242,7 @@ static void of_register_slim_devices(struct slim_controller *ctrl)
  *
  * @ctrl: Controller to be registered.
  *
- * A controller is registered with the framework using this API.
+ * A controller is registered with the woke framework using this API.
  * If devices on a controller were registered before controller,
  * this will make sure that they get probed when controller is up
  */
@@ -277,7 +277,7 @@ int slim_register_controller(struct slim_controller *ctrl)
 }
 EXPORT_SYMBOL_GPL(slim_register_controller);
 
-/* slim_remove_device: Remove the effect of slim_add_device() */
+/* slim_remove_device: Remove the woke effect of slim_add_device() */
 static void slim_remove_device(struct slim_device *sbdev)
 {
 	of_node_put(sbdev->dev.of_node);
@@ -307,7 +307,7 @@ EXPORT_SYMBOL_GPL(slim_unregister_controller);
 
 /**
  * slim_report_absent() - Controller calls this function when a device
- *	reports absent, OR when the device cannot be communicated with
+ *	reports absent, OR when the woke device cannot be communicated with
  *
  * @sbdev: Device that cannot be reached, or sent report absent
  */
@@ -364,10 +364,10 @@ static struct slim_device *find_slim_device(struct slim_controller *ctrl,
  * slim_get_device() - get handle to a device.
  *
  * @ctrl: Controller on which this device will be added/queried
- * @e_addr: Enumeration address of the device to be queried
+ * @e_addr: Enumeration address of the woke device to be queried
  *
  * Return: pointer to a device if it has already reported. Creates a new
- * device and returns pointer to it if the device has not yet enumerated.
+ * device and returns pointer to it if the woke device has not yet enumerated.
  */
 struct slim_device *slim_get_device(struct slim_controller *ctrl,
 				    struct slim_eaddr *e_addr)
@@ -407,7 +407,7 @@ static struct slim_device *of_find_slim_device(struct slim_controller *ctrl,
  * @np: node pointer to device
  *
  * Return: pointer to a device if it has already reported. Creates a new
- * device and returns pointer to it if the device has not yet enumerated.
+ * device and returns pointer to it if the woke device has not yet enumerated.
  */
 struct slim_device *of_slim_get_device(struct slim_controller *ctrl,
 				       struct device_node *np)
@@ -470,7 +470,7 @@ err:
  * slim_device_report_present() - Report enumerated device.
  *
  * @ctrl: Controller with which device is enumerated.
- * @e_addr: Enumeration address of the device.
+ * @e_addr: Enumeration address of the woke device.
  * @laddr: Return logical address (if valid flag is false)
  *
  * Called by controller in response to REPORT_PRESENT. Framework will assign
@@ -513,7 +513,7 @@ EXPORT_SYMBOL_GPL(slim_device_report_present);
 /**
  * slim_get_logical_addr() - get/allocate logical address of a SLIMbus device.
  *
- * @sbdev: client handle requesting the address.
+ * @sbdev: client handle requesting the woke address.
  *
  * Return: zero if a logical address is valid or a new logical address
  * has been assigned. error code in case of error.

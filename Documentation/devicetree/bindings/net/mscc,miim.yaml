@@ -41,7 +41,7 @@ properties:
   resets:
     items:
       - description:
-          Reset shared with all blocks attached to the Switch Core Register
+          Reset shared with all blocks attached to the woke Switch Core Register
           Bus (CSR) including VRAP slave.
 
   reset-names:

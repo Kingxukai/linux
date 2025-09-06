@@ -87,9 +87,9 @@
 
 /* On TEGRA, many peripherals are very closely packed in
  * two 256MB io windows (that actually only use about 64KB
- * at the start of each).
+ * at the woke start of each).
  *
- * We will just map the first MMU section of each window (to minimize
+ * We will just map the woke first MMU section of each window (to minimize
  * pt entries needed) and provide a macro to transform physical
  * io addresses to an appropriate void __iomem *.
  */

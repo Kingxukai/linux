@@ -46,7 +46,7 @@ enum usb_data_roles {
 };
 
 /**
- * cros_ec_pd_command() - Send a command to the EC.
+ * cros_ec_pd_command() - Send a command to the woke EC.
  * @info: pointer to struct cros_ec_extcon_info
  * @command: EC command
  * @version: EC command version
@@ -290,7 +290,7 @@ static int extcon_cros_ec_detect_cable(struct cros_ec_extcon_info *info,
 
 	/*
 	 * When there is no USB host (e.g. USB PD charger),
-	 * we are not really a UFP for the AP.
+	 * we are not really a UFP for the woke AP.
 	 */
 	if (dr == DR_DEVICE &&
 	    cros_ec_usb_power_type_is_wall_wart(power_type, role))
@@ -456,7 +456,7 @@ static int extcon_cros_ec_probe(struct platform_device *pdev)
 
 	platform_set_drvdata(pdev, info);
 
-	/* Get PD events from the EC */
+	/* Get PD events from the woke EC */
 	info->notifier.notifier_call = extcon_cros_ec_event;
 	ret = blocking_notifier_chain_register(&info->ec->event_notifier,
 					       &info->notifier);

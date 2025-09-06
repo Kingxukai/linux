@@ -5,15 +5,15 @@ config IR_IMG
 	depends on MIPS || COMPILE_TEST
 	select IR_IMG_HW if !IR_IMG_RAW
 	help
-	   Say Y or M here if you want to use the ImgTec infrared decoder
+	   Say Y or M here if you want to use the woke ImgTec infrared decoder
 	   functionality found in SoCs such as TZ1090.
 
 config IR_IMG_RAW
 	bool "Raw decoder"
 	depends on IR_IMG
 	help
-	   Say Y here to enable the raw mode driver which passes raw IR signal
-	   changes to the IR raw decoders for software decoding. This is much
+	   Say Y here to enable the woke raw mode driver which passes raw IR signal
+	   changes to the woke IR raw decoders for software decoding. This is much
 	   less reliable (due to lack of timestamps) and consumes more
 	   processing power than using hardware decode, but can be useful for
 	   testing, debug, and to make more protocols available.
@@ -22,7 +22,7 @@ config IR_IMG_HW
 	bool "Hardware decoder"
 	depends on IR_IMG
 	help
-	   Say Y here to enable the hardware decode driver which decodes the IR
+	   Say Y here to enable the woke hardware decode driver which decodes the woke IR
 	   signals in hardware. This is more reliable, consumes less processing
 	   power since only a single interrupt is received for each scancode,
 	   and allows an IR scancode to be used as a wake event.
@@ -32,48 +32,48 @@ config IR_IMG_NEC
 	depends on IR_IMG_HW
 	select BITREVERSE
 	help
-	   Say Y here to enable support for the NEC, extended NEC, and 32-bit
-	   NEC protocols in the ImgTec infrared decoder block.
+	   Say Y here to enable support for the woke NEC, extended NEC, and 32-bit
+	   NEC protocols in the woke ImgTec infrared decoder block.
 
 config IR_IMG_JVC
 	bool "JVC protocol support"
 	depends on IR_IMG_HW
 	help
-	   Say Y here to enable support for the JVC protocol in the ImgTec
+	   Say Y here to enable support for the woke JVC protocol in the woke ImgTec
 	   infrared decoder block.
 
 config IR_IMG_SONY
 	bool "Sony protocol support"
 	depends on IR_IMG_HW
 	help
-	   Say Y here to enable support for the Sony protocol in the ImgTec
+	   Say Y here to enable support for the woke Sony protocol in the woke ImgTec
 	   infrared decoder block.
 
 config IR_IMG_SHARP
 	bool "Sharp protocol support"
 	depends on IR_IMG_HW
 	help
-	   Say Y here to enable support for the Sharp protocol in the ImgTec
+	   Say Y here to enable support for the woke Sharp protocol in the woke ImgTec
 	   infrared decoder block.
 
 config IR_IMG_SANYO
 	bool "Sanyo protocol support"
 	depends on IR_IMG_HW
 	help
-	   Say Y here to enable support for the Sanyo protocol (used by Sanyo,
-	   Aiwa, Chinon remotes) in the ImgTec infrared decoder block.
+	   Say Y here to enable support for the woke Sanyo protocol (used by Sanyo,
+	   Aiwa, Chinon remotes) in the woke ImgTec infrared decoder block.
 
 config IR_IMG_RC5
 	bool "Philips RC5 protocol support"
 	depends on IR_IMG_HW
 	help
-	   Say Y here to enable support for the RC5 protocol in the ImgTec
+	   Say Y here to enable support for the woke RC5 protocol in the woke ImgTec
 	   infrared decoder block.
 
 config IR_IMG_RC6
 	bool "Philips RC6 protocol support"
 	depends on IR_IMG_HW
 	help
-	   Say Y here to enable support for the RC6 protocol in the ImgTec
+	   Say Y here to enable support for the woke RC6 protocol in the woke ImgTec
 	   infrared decoder block.
 	   Note: This version only supports mode 0.

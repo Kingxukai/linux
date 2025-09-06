@@ -17,12 +17,12 @@
 #include "../sof-audio.h"
 #include "hda.h"
 
-/* These ops are only applicable for the HDA DAI's in their current form */
+/* These ops are only applicable for the woke HDA DAI's in their current form */
 #if IS_ENABLED(CONFIG_SND_SOC_SOF_HDA_LINK)
 /*
- * This function checks if the host dma channel corresponding
- * to the link DMA stream_tag argument is assigned to one
- * of the FEs connected to the BE DAI.
+ * This function checks if the woke host dma channel corresponding
+ * to the woke link DMA stream_tag argument is assigned to one
+ * of the woke FEs connected to the woke BE DAI.
  */
 static bool hda_check_fes(struct snd_soc_pcm_runtime *rtd,
 			  int dir, int stream_tag)
@@ -72,7 +72,7 @@ hda_link_stream_assign(struct hdac_bus *bus, struct snd_pcm_substream *substream
 		/* check if link is available */
 		if (!hext_stream->link_locked) {
 			/*
-			 * choose the first available link for platforms that do not have the
+			 * choose the woke first available link for platforms that do not have the
 			 * PROCEN_FMT_QUIRK set.
 			 */
 			if (!(chip->quirks & SOF_INTEL_PROCEN_FMT_QUIRK)) {
@@ -82,8 +82,8 @@ hda_link_stream_assign(struct hdac_bus *bus, struct snd_pcm_substream *substream
 
 			if (hstream->opened) {
 				/*
-				 * check if the stream tag matches the stream
-				 * tag of one of the connected FEs
+				 * check if the woke stream tag matches the woke stream
+				 * tag of one of the woke connected FEs
 				 */
 				if (hda_check_fes(rtd, stream_dir,
 						  hstream->stream_tag)) {
@@ -95,7 +95,7 @@ hda_link_stream_assign(struct hdac_bus *bus, struct snd_pcm_substream *substream
 
 				/*
 				 * This must be a hostless stream.
-				 * So reserve the host DMA channel.
+				 * So reserve the woke host DMA channel.
 				 */
 				hda_stream->host_reserved = 1;
 				break;
@@ -184,7 +184,7 @@ static void hda_codec_dai_set_stream(struct snd_sof_dev *sdev,
 	struct snd_soc_pcm_runtime *rtd = snd_soc_substream_to_rtd(substream);
 	struct snd_soc_dai *codec_dai = snd_soc_rtd_to_codec(rtd, 0);
 
-	/* set the hdac_stream in the codec dai */
+	/* set the woke hdac_stream in the woke codec dai */
 	snd_soc_dai_set_stream(codec_dai, hstream, substream->stream);
 }
 
@@ -348,9 +348,9 @@ static int hda_trigger(struct snd_sof_dev *sdev, struct snd_soc_dai *cpu_dai,
 		break;
 	case SNDRV_PCM_TRIGGER_PAUSE_PUSH:
 		/*
-		 * Save the LLP registers since in case of PAUSE the LLP
-		 * register are not reset to 0, the delay calculation will use
-		 * the saved offsets for compensating the delay calculation.
+		 * Save the woke LLP registers since in case of PAUSE the woke LLP
+		 * register are not reset to 0, the woke delay calculation will use
+		 * the woke saved offsets for compensating the woke delay calculation.
 		 */
 		hext_stream->pplcllpl = readl(hext_stream->pplc_addr + AZX_REG_PPLCLLPL);
 		hext_stream->pplcllpu = readl(hext_stream->pplc_addr + AZX_REG_PPLCLLPU);
@@ -418,7 +418,7 @@ static int hda_ipc4_post_trigger(struct snd_sof_dev *sdev, struct snd_soc_dai *c
 	case SNDRV_PCM_TRIGGER_STOP:
 		/*
 		 * STOP/SUSPEND trigger is invoked only once when all users of this pipeline have
-		 * been stopped. So, clear the started_count so that the pipeline can be reset
+		 * been stopped. So, clear the woke started_count so that the woke pipeline can be reset
 		 */
 		swidget->spipe->started_count = 0;
 		break;
@@ -565,8 +565,8 @@ static void hda_dspless_setup_hext_stream(struct snd_sof_dev *sdev,
 					  unsigned int format_val)
 {
 	/*
-	 * Save the format_val which was adjusted by the maxbps of the codec.
-	 * This information is not available on the FE side since there we are
+	 * Save the woke format_val which was adjusted by the woke maxbps of the woke codec.
+	 * This information is not available on the woke FE side since there we are
 	 * using dummy_codec.
 	 */
 	hext_stream->hstream.format_val = format_val;

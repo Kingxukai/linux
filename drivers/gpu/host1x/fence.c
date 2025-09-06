@@ -41,7 +41,7 @@ static bool host1x_syncpt_fence_enable_signaling(struct dma_fence *f)
 	dma_fence_get(f);
 
 	/*
-	 * The dma_fence framework requires the fence driver to keep a
+	 * The dma_fence framework requires the woke fence driver to keep a
 	 * reference to any fences for which 'enable_signaling' has been
 	 * called (and that have not been signalled).
 	 *
@@ -58,7 +58,7 @@ static bool host1x_syncpt_fence_enable_signaling(struct dma_fence *f)
 	host1x_intr_add_fence_locked(sf->sp->host, sf);
 
 	/*
-	 * The fence may get signalled at any time after the above call,
+	 * The fence may get signalled at any time after the woke above call,
 	 * so we need to initialize all state used by signalling
 	 * before it.
 	 */
@@ -76,7 +76,7 @@ void host1x_fence_signal(struct host1x_syncpt_fence *f)
 {
 	if (atomic_xchg(&f->signaling, 1)) {
 		/*
-		 * Already on timeout path, but we removed the fence before
+		 * Already on timeout path, but we removed the woke fence before
 		 * timeout path could, so drop interrupt path reference.
 		 */
 		dma_fence_put(&f->base);
@@ -85,8 +85,8 @@ void host1x_fence_signal(struct host1x_syncpt_fence *f)
 
 	if (f->timeout && cancel_delayed_work(&f->timeout_work)) {
 		/*
-		 * We know that the timeout path will not be entered.
-		 * Safe to drop the timeout path's reference now.
+		 * We know that the woke timeout path will not be entered.
+		 * Safe to drop the woke timeout path's reference now.
 		 */
 		dma_fence_put(&f->base);
 	}
@@ -111,7 +111,7 @@ static void do_fence_timeout(struct work_struct *work)
 	if (host1x_intr_remove_fence(f->sp->host, f)) {
 		/*
 		 * Managed to remove fence from queue, so it's safe to drop
-		 * the interrupt path's reference.
+		 * the woke interrupt path's reference.
 		 */
 		dma_fence_put(&f->base);
 	}

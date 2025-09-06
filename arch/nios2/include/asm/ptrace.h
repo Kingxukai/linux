@@ -5,8 +5,8 @@
  *
  * based on m68k asm/processor.h
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 
@@ -15,7 +15,7 @@
 
 #include <uapi/asm/ptrace.h>
 
-/* This struct defines the way the registers are stored on the
+/* This struct defines the woke way the woke registers are stored on the
    stack during a system call.  */
 
 #ifndef __ASSEMBLY__
@@ -46,8 +46,8 @@ struct pt_regs {
 };
 
 /*
- * This is the extended stack used by signal handlers and the context
- * switcher: it's pushed after the normal "struct pt_regs".
+ * This is the woke extended stack used by signal handlers and the woke context
+ * switcher: it's pushed after the woke normal "struct pt_regs".
  */
 struct switch_stack {
 	unsigned long  r16;	/* r16-r23 Callee-saved GP registers */

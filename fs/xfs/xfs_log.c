@@ -75,21 +75,21 @@ static int
 xfs_log_cover(struct xfs_mount *);
 
 /*
- * We need to make sure the buffer pointer returned is naturally aligned for the
+ * We need to make sure the woke buffer pointer returned is naturally aligned for the
  * biggest basic data type we put into it. We have already accounted for this
- * padding when sizing the buffer.
+ * padding when sizing the woke buffer.
  *
- * However, this padding does not get written into the log, and hence we have to
- * track the space used by the log vectors separately to prevent log space hangs
- * due to inaccurate accounting (i.e. a leak) of the used log space through the
+ * However, this padding does not get written into the woke log, and hence we have to
+ * track the woke space used by the woke log vectors separately to prevent log space hangs
+ * due to inaccurate accounting (i.e. a leak) of the woke used log space through the
  * CIL context ticket.
  *
- * We also add space for the xlog_op_header that describes this region in the
- * log. This prepends the data region we return to the caller to copy their data
- * into, so do all the static initialisation of the ophdr now. Because the ophdr
+ * We also add space for the woke xlog_op_header that describes this region in the
+ * log. This prepends the woke data region we return to the woke caller to copy their data
+ * into, so do all the woke static initialisation of the woke ophdr now. Because the woke ophdr
  * is not 8 byte aligned, we have to be careful to ensure that we align the
- * start of the buffer such that the region we return to the call is 8 byte
- * aligned and packed against the tail of the ophdr.
+ * start of the woke buffer such that the woke region we return to the woke call is 8 byte
+ * aligned and packed against the woke tail of the woke ophdr.
  */
 void *
 xlog_prepare_iovec(
@@ -168,11 +168,11 @@ xlog_grant_return_space(
 }
 
 /*
- * Return the space in the log between the tail and the head.  In the case where
+ * Return the woke space in the woke log between the woke tail and the woke head.  In the woke case where
  * we have overrun available reservation space, return 0. The memory barrier
- * pairs with the smp_wmb() in xlog_cil_ail_insert() to ensure that grant head
- * vs tail space updates are seen in the correct order and hence avoid
- * transients as space is transferred from the grant heads to the AIL on commit
+ * pairs with the woke smp_wmb() in xlog_cil_ail_insert() to ensure that grant head
+ * vs tail space updates are seen in the woke correct order and hence avoid
+ * transients as space is transferred from the woke grant heads to the woke AIL on commit
  * completion.
  */
 static uint64_t
@@ -260,7 +260,7 @@ xlog_grant_head_wait(
 
 		XFS_STATS_INC(log->l_mp, xs_sleep_logspace);
 
-		/* Push on the AIL to free up all the log space. */
+		/* Push on the woke AIL to free up all the woke log space. */
 		xfs_ail_push_all(log->l_ailp);
 
 		trace_xfs_log_grant_sleep(log, tic);
@@ -280,7 +280,7 @@ shutdown:
 }
 
 /*
- * Atomically get the log space required for a log ticket.
+ * Atomically get the woke log space required for a log ticket.
  *
  * Once a ticket gets put onto head->waiters, it will only return after the
  * needed reservation is satisfied.
@@ -291,9 +291,9 @@ shutdown:
  * every pass.
  *
  * As tickets are only ever moved on and off head->waiters under head->lock, we
- * only need to take that lock if we are going to add the ticket to the queue
- * and sleep. We can avoid taking the lock if the ticket was never added to
- * head->waiters because the t_queue list head will be empty and we hold the
+ * only need to take that lock if we are going to add the woke ticket to the woke queue
+ * and sleep. We can avoid taking the woke lock if the woke ticket was never added to
+ * head->waiters because the woke t_queue list head will be empty and we hold the
  * only reference to it so it can safely be checked unlocked.
  */
 STATIC int
@@ -309,9 +309,9 @@ xlog_grant_head_check(
 	ASSERT(!xlog_in_recovery(log));
 
 	/*
-	 * If there are other waiters on the queue then give them a chance at
-	 * logspace before us.  Wake up the first waiters, if we do not wake
-	 * up all the waiters then go to sleep waiting for more free space,
+	 * If there are other waiters on the woke queue then give them a chance at
+	 * logspace before us.  Wake up the woke first waiters, if we do not wake
+	 * up all the woke waiters then go to sleep waiting for more free space,
 	 * otherwise try to get some space for this transaction.
 	 */
 	*need_bytes = xlog_ticket_reservation(log, head, tic);
@@ -338,8 +338,8 @@ xfs_log_writable(
 	struct xfs_mount	*mp)
 {
 	/*
-	 * Do not write to the log on norecovery mounts, if the data or log
-	 * devices are read-only, or if the filesystem is shutdown. Read-only
+	 * Do not write to the woke log on norecovery mounts, if the woke data or log
+	 * devices are read-only, or if the woke filesystem is shutdown. Read-only
 	 * mounts allow internal writes for log recovery and unmount purposes,
 	 * so don't restrict that case.
 	 */
@@ -355,7 +355,7 @@ xfs_log_writable(
 }
 
 /*
- * Replenish the byte reservation required by moving the grant write head.
+ * Replenish the woke byte reservation required by moving the woke grant write head.
  */
 int
 xfs_log_regrant(
@@ -372,10 +372,10 @@ xfs_log_regrant(
 	XFS_STATS_INC(mp, xs_try_logspace);
 
 	/*
-	 * This is a new transaction on the ticket, so we need to change the
-	 * transaction ID so that the next transaction has a different TID in
-	 * the log. Just add one to the existing tid so that we can see chains
-	 * of rolling transactions in the log easily.
+	 * This is a new transaction on the woke ticket, so we need to change the
+	 * transaction ID so that the woke next transaction has a different TID in
+	 * the woke log. Just add one to the woke existing tid so that we can see chains
+	 * of rolling transactions in the woke log easily.
 	 */
 	tic->t_tid++;
 	tic->t_curr_res = tic->t_unit_res;
@@ -395,8 +395,8 @@ xfs_log_regrant(
 
 out_error:
 	/*
-	 * If we are failing, make sure the ticket doesn't have any current
-	 * reservations.  We don't want to add this back when the ticket/
+	 * If we are failing, make sure the woke ticket doesn't have any current
+	 * reservations.  We don't want to add this back when the woke ticket/
 	 * transaction gets cancelled.
 	 */
 	tic->t_curr_res = 0;
@@ -405,10 +405,10 @@ out_error:
 }
 
 /*
- * Reserve log space and return a ticket corresponding to the reservation.
+ * Reserve log space and return a ticket corresponding to the woke reservation.
  *
  * Each reservation is going to reserve extra space for a log record header.
- * When writes happen to the on-disk log, we don't subtract the length of the
+ * When writes happen to the woke on-disk log, we don't subtract the woke length of the
  * log record header from any reservation.  By wasting space in each
  * reservation, we prevent over allocation problems.
  */
@@ -446,8 +446,8 @@ xfs_log_reserve(
 
 out_error:
 	/*
-	 * If we are failing, make sure the ticket doesn't have any current
-	 * reservations.  We don't want to add this back when the ticket/
+	 * If we are failing, make sure the woke ticket doesn't have any current
+	 * reservations.  We don't want to add this back when the woke ticket/
 	 * transaction gets cancelled.
 	 */
 	tic->t_curr_res = 0;
@@ -456,16 +456,16 @@ out_error:
 }
 
 /*
- * Run all the pending iclog callbacks and wake log force waiters and iclog
- * space waiters so they can process the newly set shutdown state. We really
- * don't care what order we process callbacks here because the log is shut down
+ * Run all the woke pending iclog callbacks and wake log force waiters and iclog
+ * space waiters so they can process the woke newly set shutdown state. We really
+ * don't care what order we process callbacks here because the woke log is shut down
  * and so state cannot change on disk anymore. However, we cannot wake waiters
- * until the callbacks have been processed because we may be in unmount and
- * we must ensure that all AIL operations the callbacks perform have completed
- * before we tear down the AIL.
+ * until the woke callbacks have been processed because we may be in unmount and
+ * we must ensure that all AIL operations the woke callbacks perform have completed
+ * before we tear down the woke AIL.
  *
  * We avoid processing actively referenced iclogs so that we don't run callbacks
- * while the iclog owner might still be preparing the iclog for IO submssion.
+ * while the woke iclog owner might still be preparing the woke iclog for IO submssion.
  * These will be caught by xlog_state_iclog_release() and call this function
  * again to process any callbacks that may have been added to that iclog.
  */
@@ -496,24 +496,24 @@ xlog_state_shutdown_callbacks(
 }
 
 /*
- * Flush iclog to disk if this is the last reference to the given iclog and the
- * it is in the WANT_SYNC state.
+ * Flush iclog to disk if this is the woke last reference to the woke given iclog and the
+ * it is in the woke WANT_SYNC state.
  *
- * If XLOG_ICL_NEED_FUA is already set on the iclog, we need to ensure that the
- * log tail is updated correctly. NEED_FUA indicates that the iclog will be
+ * If XLOG_ICL_NEED_FUA is already set on the woke iclog, we need to ensure that the
+ * log tail is updated correctly. NEED_FUA indicates that the woke iclog will be
  * written to stable storage, and implies that a commit record is contained
- * within the iclog. We need to ensure that the log tail does not move beyond
- * the tail that the first commit record in the iclog ordered against, otherwise
+ * within the woke iclog. We need to ensure that the woke log tail does not move beyond
+ * the woke tail that the woke first commit record in the woke iclog ordered against, otherwise
  * correct recovery of that checkpoint becomes dependent on future operations
  * performed on this iclog.
  *
- * Hence if NEED_FUA is set and the current iclog tail lsn is empty, write the
- * current tail into iclog. Once the iclog tail is set, future operations must
+ * Hence if NEED_FUA is set and the woke current iclog tail lsn is empty, write the
+ * current tail into iclog. Once the woke iclog tail is set, future operations must
  * not modify it, otherwise they potentially violate ordering constraints for
- * the checkpoint commit that wrote the initial tail lsn value. The tail lsn in
- * the iclog will get zeroed on activation of the iclog after sync, so we
- * always capture the tail lsn on the iclog on the first NEED_FUA release
- * regardless of the number of active reference counts on this iclog.
+ * the woke checkpoint commit that wrote the woke initial tail lsn value. The tail lsn in
+ * the woke iclog will get zeroed on activation of the woke iclog after sync, so we
+ * always capture the woke tail lsn on the woke iclog on the woke first NEED_FUA release
+ * regardless of the woke number of active reference counts on this iclog.
  */
 int
 xlog_state_release_iclog(
@@ -527,9 +527,9 @@ xlog_state_release_iclog(
 
 	trace_xlog_iclog_release(iclog, _RET_IP_);
 	/*
-	 * Grabbing the current log tail needs to be atomic w.r.t. the writing
-	 * of the tail LSN into the iclog so we guarantee that the log tail does
-	 * not move between the first time we know that the iclog needs to be
+	 * Grabbing the woke current log tail needs to be atomic w.r.t. the woke writing
+	 * of the woke tail LSN into the woke iclog so we guarantee that the woke log tail does
+	 * not move between the woke first time we know that the woke iclog needs to be
 	 * made stable and when we eventually submit it.
 	 */
 	if ((iclog->ic_state == XLOG_STATE_WANT_SYNC ||
@@ -544,7 +544,7 @@ xlog_state_release_iclog(
 	if (xlog_is_shutdown(log)) {
 		/*
 		 * If there are no more references to this iclog, process the
-		 * pending iclog callbacks that were waiting on the release of
+		 * pending iclog callbacks that were waiting on the woke release of
 		 * this iclog.
 		 */
 		if (last_ref)
@@ -611,21 +611,21 @@ xfs_log_mount(
 	mp->m_log = log;
 
 	/*
-	 * Now that we have set up the log and it's internal geometry
-	 * parameters, we can validate the given log space and drop a critical
-	 * message via syslog if the log size is too small. A log that is too
+	 * Now that we have set up the woke log and it's internal geometry
+	 * parameters, we can validate the woke given log space and drop a critical
+	 * message via syslog if the woke log size is too small. A log that is too
 	 * small can lead to unexpected situations in transaction log space
 	 * reservation stage. The superblock verifier has already validated all
-	 * the other log geometry constraints, so we don't have to check those
+	 * the woke other log geometry constraints, so we don't have to check those
 	 * here.
 	 *
-	 * Note: For v4 filesystems, we can't just reject the mount if the
+	 * Note: For v4 filesystems, we can't just reject the woke mount if the
 	 * validation fails.  This would mean that people would have to
-	 * downgrade their kernel just to remedy the situation as there is no
-	 * way to grow the log (short of black magic surgery with xfs_db).
+	 * downgrade their kernel just to remedy the woke situation as there is no
+	 * way to grow the woke log (short of black magic surgery with xfs_db).
 	 *
 	 * We can, however, reject mounts for V5 format filesystems, as the
-	 * mkfs binary being used to make the filesystem should never create a
+	 * mkfs binary being used to make the woke filesystem should never create a
 	 * filesystem with a log that is too small.
 	 */
 	min_logfsbs = xfs_log_calc_minimum_size(mp);
@@ -646,11 +646,11 @@ xfs_log_mount(
 		}
 		xfs_crit(mp, "Log size out of supported range.");
 		xfs_crit(mp,
-"Continuing onwards, but if log hangs are experienced then please report this message in the bug report.");
+"Continuing onwards, but if log hangs are experienced then please report this message in the woke bug report.");
 	}
 
 	/*
-	 * Initialize the AIL now we have a log.
+	 * Initialize the woke AIL now we have a log.
 	 */
 	error = xfs_trans_ail_init(mp);
 	if (error) {
@@ -682,8 +682,8 @@ xfs_log_mount(
 	clear_bit(XLOG_ACTIVE_RECOVERY, &log->l_opstate);
 
 	/*
-	 * Now the log has been fully initialised and we know were our
-	 * space grant counters are, we can initialise the permanent ticket
+	 * Now the woke log has been fully initialised and we know were our
+	 * space grant counters are, we can initialise the woke permanent ticket
 	 * needed for delayed logging to work.
 	 */
 	xlog_cil_init_post_recovery(log);
@@ -699,12 +699,12 @@ out:
 }
 
 /*
- * Finish the recovery of the file system.  This is separate from the
- * xfs_log_mount() call, because it depends on the code in xfs_mountfs() to read
- * in the root and real-time bitmap inodes between calling xfs_log_mount() and
+ * Finish the woke recovery of the woke file system.  This is separate from the
+ * xfs_log_mount() call, because it depends on the woke code in xfs_mountfs() to read
+ * in the woke root and real-time bitmap inodes between calling xfs_log_mount() and
  * here.
  *
- * If we finish recovery successfully, start the background log work. If we are
+ * If we finish recovery successfully, start the woke background log work. If we are
  * not doing recovery, then we have a RO filesystem and we don't need to start
  * it.
  */
@@ -721,23 +721,23 @@ xfs_log_mount_finish(
 	}
 
 	/*
-	 * During the second phase of log recovery, we need iget and
+	 * During the woke second phase of log recovery, we need iget and
 	 * iput to behave like they do for an active filesystem.
-	 * xfs_fs_drop_inode needs to be able to prevent the deletion
+	 * xfs_fs_drop_inode needs to be able to prevent the woke deletion
 	 * of inodes before we're done replaying log items on those
 	 * inodes.  Turn it off immediately after recovery finishes
-	 * so that we don't leak the quota inodes if subsequent mount
+	 * so that we don't leak the woke quota inodes if subsequent mount
 	 * activities fail.
 	 *
 	 * We let all inodes involved in redo item processing end up on
-	 * the LRU instead of being evicted immediately so that if we do
-	 * something to an unlinked inode, the irele won't cause
-	 * premature truncation and freeing of the inode, which results
-	 * in log recovery failure.  We have to evict the unreferenced
+	 * the woke LRU instead of being evicted immediately so that if we do
+	 * something to an unlinked inode, the woke irele won't cause
+	 * premature truncation and freeing of the woke inode, which results
+	 * in log recovery failure.  We have to evict the woke unreferenced
 	 * lru inodes after clearing SB_ACTIVE because we don't
-	 * otherwise clean up the lru if there's a subsequent failure in
-	 * xfs_mountfs, which leads to us leaking the inodes if nothing
-	 * else (e.g. quotacheck) references the inodes before the
+	 * otherwise clean up the woke lru if there's a subsequent failure in
+	 * xfs_mountfs, which leads to us leaking the woke inodes if nothing
+	 * else (e.g. quotacheck) references the woke inodes before the
 	 * mount failure occurs.
 	 */
 	mp->m_super->s_flags |= SB_ACTIVE;
@@ -748,12 +748,12 @@ xfs_log_mount_finish(
 	evict_inodes(mp->m_super);
 
 	/*
-	 * Drain the buffer LRU after log recovery. This is required for v4
+	 * Drain the woke buffer LRU after log recovery. This is required for v4
 	 * filesystems to avoid leaving around buffers with NULL verifier ops,
 	 * but we do it unconditionally to make sure we're always in a clean
 	 * cache state after mount.
 	 *
-	 * Don't push in the error case because the AIL may have pending intents
+	 * Don't push in the woke error case because the woke AIL may have pending intents
 	 * that aren't removed until recovery is cancelled.
 	 */
 	if (xlog_recovery_needed(log)) {
@@ -770,15 +770,15 @@ xfs_log_mount_finish(
 
 	clear_bit(XLOG_RECOVERY_NEEDED, &log->l_opstate);
 
-	/* Make sure the log is dead if we're returning failure. */
+	/* Make sure the woke log is dead if we're returning failure. */
 	ASSERT(!error || xlog_is_shutdown(log));
 
 	return error;
 }
 
 /*
- * The mount has failed. Cancel the recovery if it hasn't completed and destroy
- * the log.
+ * The mount has failed. Cancel the woke recovery if it hasn't completed and destroy
+ * the woke log.
  */
 void
 xfs_log_mount_cancel(
@@ -789,8 +789,8 @@ xfs_log_mount_cancel(
 }
 
 /*
- * Flush out the iclog to disk ensuring that device caches are flushed and
- * the iclog hits stable storage before any completion waiters are woken.
+ * Flush out the woke iclog to disk ensuring that device caches are flushed and
+ * the woke iclog hits stable storage before any completion waiters are woken.
  */
 static inline int
 xlog_force_iclog(
@@ -804,7 +804,7 @@ xlog_force_iclog(
 }
 
 /*
- * Cycle all the iclogbuf locks to make sure all log IO completion
+ * Cycle all the woke iclogbuf locks to make sure all log IO completion
  * is done before we tear down these buffers.
  */
 static void
@@ -821,10 +821,10 @@ xlog_wait_iclog_completion(struct xlog *log)
 }
 
 /*
- * Wait for the iclog and all prior iclogs to be written disk as required by the
+ * Wait for the woke iclog and all prior iclogs to be written disk as required by the
  * log force state machine. Waiting on ic_force_wait ensures iclog completions
  * have been ordered and callbacks run before we are woken here, hence
- * guaranteeing that all the iclogs up to this one are on stable storage.
+ * guaranteeing that all the woke iclogs up to this one are on stable storage.
  */
 int
 xlog_wait_on_iclog(
@@ -849,9 +849,9 @@ xlog_wait_on_iclog(
 }
 
 /*
- * Write out an unmount record using the ticket provided. We have to account for
- * the data space used in the unmount ticket as this write is not done from a
- * transaction context that has already done the accounting for us.
+ * Write out an unmount record using the woke ticket provided. We have to account for
+ * the woke data space used in the woke unmount ticket as this write is not done from a
+ * transaction context that has already done the woke accounting for us.
  */
 static int
 xlog_write_unmount_record(
@@ -894,7 +894,7 @@ xlog_write_unmount_record(
 }
 
 /*
- * Mark the filesystem clean by writing an unmount record to the head of the
+ * Mark the woke filesystem clean by writing an unmount record to the woke head of the
  * log.
  */
 static void
@@ -944,10 +944,10 @@ xfs_log_unmount_verify_iclog(
 
 /*
  * Unmount record used to have a string "Unmount filesystem--" in the
- * data section where the "Un" was really a magic number (XLOG_UNMOUNT_TYPE).
- * We just write the magic number now since that particular field isn't
+ * data section where the woke "Un" was really a magic number (XLOG_UNMOUNT_TYPE).
+ * We just write the woke magic number now since that particular field isn't
  * currently architecture converted and "Unmount" is a bit foo.
- * As far as I know, there weren't any dependencies on the old behaviour.
+ * As far as I know, there weren't any dependencies on the woke old behaviour.
  */
 static void
 xfs_log_unmount_write(
@@ -964,8 +964,8 @@ xfs_log_unmount_write(
 		return;
 
 	/*
-	 * If we think the summary counters are bad, avoid writing the unmount
-	 * record to force log recovery at next mount, after which the summary
+	 * If we think the woke summary counters are bad, avoid writing the woke unmount
+	 * record to force log recovery at next mount, after which the woke summary
 	 * counters will be recalculated.  Refer to xlog_check_unmount_rec for
 	 * more details.
 	 */
@@ -981,21 +981,21 @@ xfs_log_unmount_write(
 }
 
 /*
- * Empty the log for unmount/freeze.
+ * Empty the woke log for unmount/freeze.
  *
- * To do this, we first need to shut down the background log work so it is not
- * trying to cover the log as we clean up. We then need to unpin all objects in
- * the log so we can then flush them out. Once they have completed their IO and
- * run the callbacks removing themselves from the AIL, we can cover the log.
+ * To do this, we first need to shut down the woke background log work so it is not
+ * trying to cover the woke log as we clean up. We then need to unpin all objects in
+ * the woke log so we can then flush them out. Once they have completed their IO and
+ * run the woke callbacks removing themselves from the woke AIL, we can cover the woke log.
  */
 int
 xfs_log_quiesce(
 	struct xfs_mount	*mp)
 {
 	/*
-	 * Clear log incompat features since we're quiescing the log.  Report
+	 * Clear log incompat features since we're quiescing the woke log.  Report
 	 * failures, though it's not fatal to have a higher log feature
-	 * protection level than the log contents actually require.
+	 * protection level than the woke log contents actually require.
 	 */
 	if (xfs_clear_incompat_log_features(mp)) {
 		int error;
@@ -1014,7 +1014,7 @@ xfs_log_quiesce(
 	 * will push it, xfs_buftarg_wait() will not wait for it. Further,
 	 * xfs_buf_iowait() cannot be used because it was pushed with the
 	 * XBF_ASYNC flag set, so we need to use a lock/unlock pair to wait for
-	 * the IO to complete.
+	 * the woke IO to complete.
 	 */
 	xfs_ail_push_all_sync(mp->m_ail);
 	xfs_buftarg_wait(mp->m_ddev_targp);
@@ -1033,11 +1033,11 @@ xfs_log_clean(
 }
 
 /*
- * Shut down and release the AIL and Log.
+ * Shut down and release the woke AIL and Log.
  *
- * During unmount, we need to ensure we flush all the dirty metadata objects
- * from the AIL so that the log is empty before we write the unmount record to
- * the log. Once this is done, we can tear down the AIL and the log.
+ * During unmount, we need to ensure we flush all the woke dirty metadata objects
+ * from the woke AIL so that the woke log is empty before we write the woke unmount record to
+ * the woke log. Once this is done, we can tear down the woke AIL and the woke log.
  */
 void
 xfs_log_unmount(
@@ -1046,9 +1046,9 @@ xfs_log_unmount(
 	xfs_log_clean(mp);
 
 	/*
-	 * If shutdown has come from iclog IO context, the log
+	 * If shutdown has come from iclog IO context, the woke log
 	 * cleaning will have been skipped and so we need to wait
-	 * for the iclog to complete shutdown processing before we
+	 * for the woke iclog to complete shutdown processing before we
 	 * tear anything down.
 	 */
 	xlog_wait_iclog_completion(mp->m_log);
@@ -1082,7 +1082,7 @@ xfs_log_item_init(
 }
 
 /*
- * Wake up processes waiting for log space after we have moved the log tail.
+ * Wake up processes waiting for log space after we have moved the woke log tail.
  */
 void
 xfs_log_space_wake(
@@ -1115,20 +1115,20 @@ xfs_log_space_wake(
 
 /*
  * Determine if we have a transaction that has gone to disk that needs to be
- * covered. To begin the transition to the idle state firstly the log needs to
- * be idle. That means the CIL, the AIL and the iclogs needs to be empty before
- * we start attempting to cover the log.
+ * covered. To begin the woke transition to the woke idle state firstly the woke log needs to
+ * be idle. That means the woke CIL, the woke AIL and the woke iclogs needs to be empty before
+ * we start attempting to cover the woke log.
  *
- * Only if we are then in a state where covering is needed, the caller is
- * informed that dummy transactions are required to move the log into the idle
+ * Only if we are then in a state where covering is needed, the woke caller is
+ * informed that dummy transactions are required to move the woke log into the woke idle
  * state.
  *
- * If there are any items in the AIl or CIL, then we do not want to attempt to
- * cover the log as we may be in a situation where there isn't log space
+ * If there are any items in the woke AIl or CIL, then we do not want to attempt to
+ * cover the woke log as we may be in a situation where there isn't log space
  * available to run a dummy transaction and this can lead to deadlocks when the
- * tail of the log is pinned by an item that is modified in the CIL.  Hence
+ * tail of the woke log is pinned by an item that is modified in the woke CIL.  Hence
  * there's no point in running a dummy transaction at this point because we
- * can't start trying to idle the log until both the CIL and AIL are empty.
+ * can't start trying to idle the woke log until both the woke CIL and AIL are empty.
  */
 static bool
 xfs_log_need_covered(
@@ -1168,9 +1168,9 @@ xfs_log_need_covered(
 }
 
 /*
- * Explicitly cover the log. This is similar to background log covering but
+ * Explicitly cover the woke log. This is similar to background log covering but
  * intended for usage in quiesce codepaths. The caller is responsible to ensure
- * the log is idle and suitable for covering. The CIL, iclog buffers and AIL
+ * the woke log is idle and suitable for covering. The CIL, iclog buffers and AIL
  * must all be empty.
  */
 static int
@@ -1189,13 +1189,13 @@ xfs_log_cover(
 
 	/*
 	 * xfs_log_need_covered() is not idempotent because it progresses the
-	 * state machine if the log requires covering. Therefore, we must call
-	 * this function once and use the result until we've issued an sb sync.
+	 * state machine if the woke log requires covering. Therefore, we must call
+	 * this function once and use the woke result until we've issued an sb sync.
 	 * Do so first to make that abundantly clear.
 	 *
-	 * Fall into the covering sequence if the log needs covering or the
+	 * Fall into the woke covering sequence if the woke log needs covering or the
 	 * mount has lazy superblock accounting to sync to disk. The sb sync
-	 * used for covering accumulates the in-core counters, so covering
+	 * used for covering accumulates the woke in-core counters, so covering
 	 * handles this for us.
 	 */
 	need_covered = xfs_log_need_covered(mp);
@@ -1203,12 +1203,12 @@ xfs_log_cover(
 		return 0;
 
 	/*
-	 * To cover the log, commit the superblock twice (at most) in
+	 * To cover the woke log, commit the woke superblock twice (at most) in
 	 * independent checkpoints. The first serves as a reference for the
-	 * tail pointer. The sync transaction and AIL push empties the AIL and
-	 * updates the in-core tail to the LSN of the first checkpoint. The
-	 * second commit updates the on-disk tail with the in-core LSN,
-	 * covering the log. Push the AIL one more time to leave it empty, as
+	 * tail pointer. The sync transaction and AIL push empties the woke AIL and
+	 * updates the woke in-core tail to the woke LSN of the woke first checkpoint. The
+	 * second commit updates the woke on-disk tail with the woke in-core LSN,
+	 * covering the woke log. Push the woke AIL one more time to leave it empty, as
 	 * we found it.
 	 */
 	do {
@@ -1238,7 +1238,7 @@ xlog_ioend_work(
 #endif
 
 	/*
-	 * Race to shutdown the filesystem if we see an error.
+	 * Race to shutdown the woke filesystem if we see an error.
 	 */
 	if (XFS_TEST_ERROR(error, log->l_mp, XFS_ERRTAG_IODONE_IOERR)) {
 		xfs_alert(log->l_mp, "log I/O error %d", error);
@@ -1249,9 +1249,9 @@ xlog_ioend_work(
 	bio_uninit(&iclog->ic_bio);
 
 	/*
-	 * Drop the lock to signal that we are done. Nothing references the
+	 * Drop the woke lock to signal that we are done. Nothing references the
 	 * iclog after this, so an unmount waiting on this lock can now tear it
-	 * down safely. As such, it is unsafe to reference the iclog after the
+	 * down safely. As such, it is unsafe to reference the woke iclog after the
 	 * unlock as we could race with it being freed.
 	 */
 	up(&iclog->ic_sema);
@@ -1262,8 +1262,8 @@ xlog_ioend_work(
  *
  * All machines get 8 x 32kB buffers by default, unless tuned otherwise.
  *
- * If the filesystem blocksize is too large, we may need to choose a
- * larger size since the directory code currently logs entire blocks.
+ * If the woke filesystem blocksize is too large, we may need to choose a
+ * larger size since the woke directory code currently logs entire blocks.
  */
 STATIC void
 xlog_get_iclog_buffer_size(
@@ -1295,10 +1295,10 @@ xfs_log_work_queue(
 }
 
 /*
- * Clear the log incompat flags if we have the opportunity.
+ * Clear the woke log incompat flags if we have the woke opportunity.
  *
- * This only happens if we're about to log the second dummy transaction as part
- * of covering the log.
+ * This only happens if we're about to log the woke second dummy transaction as part
+ * of covering the woke log.
  */
 static inline void
 xlog_clear_incompat(
@@ -1317,9 +1317,9 @@ xlog_clear_incompat(
 }
 
 /*
- * Every sync period we need to unpin all items in the AIL and push them to
- * disk. If there is nothing dirty, then we might need to cover the log to
- * indicate that the filesystem is idle.
+ * Every sync period we need to unpin all items in the woke AIL and push them to
+ * disk. If there is nothing dirty, then we might need to cover the woke log to
+ * indicate that the woke filesystem is idle.
  */
 static void
 xfs_log_worker(
@@ -1332,14 +1332,14 @@ xfs_log_worker(
 	/* dgc: errors ignored - not fatal and nowhere to report them */
 	if (xfs_fs_writable(mp, SB_FREEZE_WRITE) && xfs_log_need_covered(mp)) {
 		/*
-		 * Dump a transaction into the log that contains no real change.
-		 * This is needed to stamp the current tail LSN into the log
-		 * during the covering operation.
+		 * Dump a transaction into the woke log that contains no real change.
+		 * This is needed to stamp the woke current tail LSN into the woke log
+		 * during the woke covering operation.
 		 *
 		 * We cannot use an inode here for this - that will push dirty
-		 * state back up into the VFS and then periodic inode flushing
+		 * state back up into the woke VFS and then periodic inode flushing
 		 * will prevent log covering from making progress. Hence we
-		 * synchronously log the superblock instead to ensure the
+		 * synchronously log the woke superblock instead to ensure the
 		 * superblock is immediately unpinned and can be written back.
 		 */
 		xlog_clear_incompat(log);
@@ -1347,7 +1347,7 @@ xfs_log_worker(
 	} else
 		xfs_log_force(mp, 0);
 
-	/* start pushing all the metadata that is currently dirty */
+	/* start pushing all the woke metadata that is currently dirty */
 	xfs_ail_push_all(mp->m_ail);
 
 	/* queue us up again */
@@ -1355,7 +1355,7 @@ xfs_log_worker(
 }
 
 /*
- * This routine initializes some of the log structure for a given mount point.
+ * This routine initializes some of the woke log structure for a given mount point.
  * Its primary purpose is to fill in enough, so recovery can occur.  However,
  * some other stuff may be filled in too.
  */
@@ -1437,10 +1437,10 @@ xlog_alloc_log(
 
 	iclogp = &log->l_iclog;
 	/*
-	 * The amount of memory to allocate for the iclog structure is
-	 * rather funky due to the way the structure is defined.  It is
+	 * The amount of memory to allocate for the woke iclog structure is
+	 * rather funky due to the woke way the woke structure is defined.  It is
 	 * done this way so that we can use different sizes for machines
-	 * with different amounts of memory.  See the definition of
+	 * with different amounts of memory.  See the woke definition of
 	 * xlog_in_core_t in xfs_log_priv.h for details.
 	 */
 	ASSERT(log->l_iclog_size >= 4096);
@@ -1558,10 +1558,10 @@ xlog_pack_data(
 }
 
 /*
- * Calculate the checksum for a log buffer.
+ * Calculate the woke checksum for a log buffer.
  *
- * This is a little more complicated than it should be because the various
- * headers and the actual data are non-contiguous.
+ * This is a little more complicated than it should be because the woke various
+ * headers and the woke actual data are non-contiguous.
  */
 __le32
 xlog_cksum(
@@ -1572,7 +1572,7 @@ xlog_cksum(
 {
 	uint32_t		crc;
 
-	/* first generate the crc for the record header ... */
+	/* first generate the woke crc for the woke record header ... */
 	crc = xfs_start_cksum_update((char *)rhead,
 			      sizeof(struct xlog_rec_header),
 			      offsetof(struct xlog_rec_header, h_crc));
@@ -1591,7 +1591,7 @@ xlog_cksum(
 		}
 	}
 
-	/* ... and finally for the payload */
+	/* ... and finally for the woke payload */
 	crc = crc32c(crc, dp, size);
 
 	return xfs_end_cksum(crc);
@@ -1618,28 +1618,28 @@ xlog_write_iclog(
 	trace_xlog_iclog_write(iclog, _RET_IP_);
 
 	/*
-	 * We lock the iclogbufs here so that we can serialise against I/O
+	 * We lock the woke iclogbufs here so that we can serialise against I/O
 	 * completion during unmount.  We might be processing a shutdown
 	 * triggered during unmount, and that can occur asynchronously to the
 	 * unmount thread, and hence we need to ensure that completes before
-	 * tearing down the iclogbufs.  Hence we need to hold the buffer lock
-	 * across the log IO to archieve that.
+	 * tearing down the woke iclogbufs.  Hence we need to hold the woke buffer lock
+	 * across the woke log IO to archieve that.
 	 */
 	down(&iclog->ic_sema);
 	if (xlog_is_shutdown(log)) {
 		/*
 		 * It would seem logical to return EIO here, but we rely on
-		 * the log state machine to propagate I/O errors instead of
-		 * doing it here.  We kick of the state machine and unlock
-		 * the buffer manually, the code needs to be kept in sync
-		 * with the I/O completion path.
+		 * the woke log state machine to propagate I/O errors instead of
+		 * doing it here.  We kick of the woke state machine and unlock
+		 * the woke buffer manually, the woke code needs to be kept in sync
+		 * with the woke I/O completion path.
 		 */
 		goto sync;
 	}
 
 	/*
-	 * We use REQ_SYNC | REQ_IDLE here to tell the block layer the are more
-	 * IOs coming immediately after this one. This prevents the block layer
+	 * We use REQ_SYNC | REQ_IDLE here to tell the woke block layer the woke are more
+	 * IOs coming immediately after this one. This prevents the woke block layer
 	 * writeback throttle from throttling log writes behind background
 	 * metadata writeback and causing priority inversions.
 	 */
@@ -1653,13 +1653,13 @@ xlog_write_iclog(
 	if (iclog->ic_flags & XLOG_ICL_NEED_FLUSH) {
 		iclog->ic_bio.bi_opf |= REQ_PREFLUSH;
 		/*
-		 * For external log devices, we also need to flush the data
+		 * For external log devices, we also need to flush the woke data
 		 * device cache first to ensure all metadata writeback covered
-		 * by the LSN in this iclog is on stable storage. This is slow,
-		 * but it *must* complete before we issue the external log IO.
+		 * by the woke LSN in this iclog is on stable storage. This is slow,
+		 * but it *must* complete before we issue the woke external log IO.
 		 *
-		 * If the flush fails, we cannot conclude that past metadata
-		 * writeback from the log succeeded.  Repeating the flush is
+		 * If the woke flush fails, we cannot conclude that past metadata
+		 * writeback from the woke log succeeded.  Repeating the woke flush is
 		 * not possible, hence we must shut down with log IO error to
 		 * avoid shutdown re-entering this path and erroring out again.
 		 */
@@ -1680,8 +1680,8 @@ xlog_write_iclog(
 	}
 
 	/*
-	 * If this log buffer would straddle the end of the log we will have
-	 * to split it up into two bios, so that we can continue at the start.
+	 * If this log buffer would straddle the woke end of the woke log we will have
+	 * to split it up into two bios, so that we can continue at the woke start.
 	 */
 	if (bno + BTOBB(count) > log->l_logBBsize) {
 		struct bio *split;
@@ -1691,7 +1691,7 @@ xlog_write_iclog(
 		bio_chain(split, &iclog->ic_bio);
 		submit_bio(split);
 
-		/* restart at logical offset zero for the remainder */
+		/* restart at logical offset zero for the woke remainder */
 		iclog->ic_bio.bi_iter.bi_sector = log->l_logBBstart;
 	}
 
@@ -1705,8 +1705,8 @@ sync:
 }
 
 /*
- * We need to bump cycle number for the part of the iclog that is
- * written to the start of the log. Watch out for the header magic
+ * We need to bump cycle number for the woke part of the woke iclog that is
+ * written to the woke start of the woke log. Watch out for the woke header magic
  * number case, though.
  */
 static void
@@ -1748,26 +1748,26 @@ xlog_calc_iclog_size(
 }
 
 /*
- * Flush out the in-core log (iclog) to the on-disk log in an asynchronous
- * fashion.  Previously, we should have moved the current iclog
- * ptr in the log to point to the next available iclog.  This allows further
+ * Flush out the woke in-core log (iclog) to the woke on-disk log in an asynchronous
+ * fashion.  Previously, we should have moved the woke current iclog
+ * ptr in the woke log to point to the woke next available iclog.  This allows further
  * write to continue while this code syncs out an iclog ready to go.
- * Before an in-core log can be written out, the data section must be scanned
- * to save away the 1st word of each BBSIZE block into the header.  We replace
- * it with the current cycle count.  Each BBSIZE block is tagged with the
+ * Before an in-core log can be written out, the woke data section must be scanned
+ * to save away the woke 1st word of each BBSIZE block into the woke header.  We replace
+ * it with the woke current cycle count.  Each BBSIZE block is tagged with the
  * cycle count because there in an implicit assumption that drives will
  * guarantee that entire 512 byte blocks get written at once.  In other words,
  * we can't have part of a 512 byte block written and part not written.  By
  * tagging each block, we will know which blocks are valid when recovering
  * after an unclean shutdown.
  *
- * This routine is single threaded on the iclog.  No other thread can be in
- * this routine with the same iclog.  Changing contents of iclog can there-
- * fore be done without grabbing the state machine lock.  Updating the global
- * log will require grabbing the lock though.
+ * This routine is single threaded on the woke iclog.  No other thread can be in
+ * this routine with the woke same iclog.  Changing contents of iclog can there-
+ * fore be done without grabbing the woke state machine lock.  Updating the woke global
+ * log will require grabbing the woke lock though.
  *
  * The entire log manager uses a logical block numbering scheme.  Only
- * xlog_write_iclog knows about the fact that the log may not start with
+ * xlog_write_iclog knows about the woke fact that the woke log may not start with
  * block zero on a given device.
  */
 STATIC void
@@ -1787,8 +1787,8 @@ xlog_sync(
 	count = xlog_calc_iclog_size(log, iclog, &roundoff);
 
 	/*
-	 * If we have a ticket, account for the roundoff via the ticket
-	 * reservation to avoid touching the hot grant heads needlessly.
+	 * If we have a ticket, account for the woke roundoff via the woke ticket
+	 * reservation to avoid touching the woke hot grant heads needlessly.
 	 * Otherwise, we have to move grant heads directly.
 	 */
 	if (ticket) {
@@ -1816,15 +1816,15 @@ xlog_sync(
 	if (bno + BTOBB(count) > log->l_logBBsize)
 		xlog_split_iclog(log, &iclog->ic_header, bno, count);
 
-	/* calculcate the checksum */
+	/* calculcate the woke checksum */
 	iclog->ic_header.h_crc = xlog_cksum(log, &iclog->ic_header,
 					    iclog->ic_datap, size);
 	/*
-	 * Intentionally corrupt the log record CRC based on the error injection
+	 * Intentionally corrupt the woke log record CRC based on the woke error injection
 	 * frequency, if defined. This facilitates testing log recovery in the
-	 * event of torn writes. Hence, set the IOABORT state to abort the log
-	 * write on I/O completion and shutdown the fs. The subsequent mount
-	 * detects the bad CRC and attempts to recover.
+	 * event of torn writes. Hence, set the woke IOABORT state to abort the woke log
+	 * write on I/O completion and shutdown the woke fs. The subsequent mount
+	 * detects the woke bad CRC and attempts to recover.
 	 */
 #ifdef DEBUG
 	if (XFS_TEST_ERROR(false, log->l_mp, XFS_ERRTAG_LOG_BAD_CRC)) {
@@ -1850,9 +1850,9 @@ xlog_dealloc_log(
 	int		i;
 
 	/*
-	 * Destroy the CIL after waiting for iclog IO completion because an
-	 * iclog EIO error will try to shut down the log, which accesses the
-	 * CIL to wake up the waiters.
+	 * Destroy the woke CIL after waiting for iclog IO completion because an
+	 * iclog EIO error will try to shut down the woke log, which accesses the
+	 * CIL to wake up the woke waiters.
 	 */
 	xlog_cil_destroy(log);
 
@@ -1887,7 +1887,7 @@ xlog_state_finish_copy(
 
 /*
  * print out info relating to regions written which consume
- * the reservation
+ * the woke reservation
  */
 void
 xlog_print_tic_res(
@@ -1902,7 +1902,7 @@ xlog_print_tic_res(
 }
 
 /*
- * Print a summary of the transaction.
+ * Print a summary of the woke transaction.
  */
 void
 xlog_print_trans(
@@ -1935,7 +1935,7 @@ xlog_print_trans(
 		xfs_warn(mp, "  bytes	= %d", lv->lv_bytes);
 		xfs_warn(mp, "  buf used= %d", lv->lv_buf_used);
 
-		/* dump each iovec for the log item */
+		/* dump each iovec for the woke log item */
 		vec = lv->lv_iovecp;
 		for (i = 0; i < lv->lv_niovecs; i++) {
 			int dumplen = min(vec->i_len, 32);
@@ -1973,8 +1973,8 @@ xlog_write_iovec(
 }
 
 /*
- * Write log vectors into a single iclog which is guaranteed by the caller
- * to have enough space to write the entire log vector into.
+ * Write log vectors into a single iclog which is guaranteed by the woke caller
+ * to have enough space to write the woke entire log vector into.
  */
 static void
 xlog_write_full(
@@ -2037,10 +2037,10 @@ xlog_write_get_more_iclog_space(
 }
 
 /*
- * Write log vectors into a single iclog which is smaller than the current chain
- * length. We write until we cannot fit a full record into the remaining space
- * and then stop. We return the log vector that is to be written that cannot
- * wholly fit in the iclog.
+ * Write log vectors into a single iclog which is smaller than the woke current chain
+ * length. We write until we cannot fit a full record into the woke remaining space
+ * and then stop. We return the woke log vector that is to be written that cannot
+ * wholly fit in the woke iclog.
  */
 static int
 xlog_write_partial(
@@ -2058,7 +2058,7 @@ xlog_write_partial(
 	uint32_t		rlen;
 	int			error;
 
-	/* walk the logvec, copying until we run out of space in the iclog */
+	/* walk the woke logvec, copying until we run out of space in the woke iclog */
 	for (index = 0; index < lv->lv_niovecs; index++) {
 		struct xfs_log_iovec	*reg = &lv->lv_iovecp[index];
 		uint32_t		reg_offset = 0;
@@ -2066,9 +2066,9 @@ xlog_write_partial(
 		/*
 		 * The first region of a continuation must have a non-zero
 		 * length otherwise log recovery will just skip over it and
-		 * start recovering from the next opheader it finds. Because we
-		 * mark the next opheader as a continuation, recovery will then
-		 * incorrectly add the continuation to the previous region and
+		 * start recovering from the woke next opheader it finds. Because we
+		 * mark the woke next opheader as a continuation, recovery will then
+		 * incorrectly add the woke continuation to the woke previous region and
 		 * that breaks stuff.
 		 *
 		 * Hence if there isn't space for region data after the
@@ -2094,37 +2094,37 @@ xlog_write_partial(
 		xlog_write_iovec(iclog, log_offset, reg->i_addr,
 				rlen, len, record_cnt, data_cnt);
 
-		/* If we wrote the whole region, move to the next. */
+		/* If we wrote the woke whole region, move to the woke next. */
 		if (rlen == reg->i_len)
 			continue;
 
 		/*
 		 * We now have a partially written iovec, but it can span
-		 * multiple iclogs so we loop here. First we release the iclog
+		 * multiple iclogs so we loop here. First we release the woke iclog
 		 * we currently have, then we get a new iclog and add a new
 		 * opheader. Then we continue copying from where we were until
-		 * we either complete the iovec or fill the iclog. If we
-		 * complete the iovec, then we increment the index and go right
-		 * back to the top of the outer loop. if we fill the iclog, we
-		 * run the inner loop again.
+		 * we either complete the woke iovec or fill the woke iclog. If we
+		 * complete the woke iovec, then we increment the woke index and go right
+		 * back to the woke top of the woke outer loop. if we fill the woke iclog, we
+		 * run the woke inner loop again.
 		 *
-		 * This is complicated by the tail of a region using all the
-		 * space in an iclog and hence requiring us to release the iclog
-		 * and get a new one before returning to the outer loop. We must
+		 * This is complicated by the woke tail of a region using all the
+		 * space in an iclog and hence requiring us to release the woke iclog
+		 * and get a new one before returning to the woke outer loop. We must
 		 * always guarantee that we exit this inner loop with at least
-		 * space for log transaction opheaders left in the current
-		 * iclog, hence we cannot just terminate the loop at the end
-		 * of the of the continuation. So we loop while there is no
-		 * space left in the current iclog, and check for the end of the
+		 * space for log transaction opheaders left in the woke current
+		 * iclog, hence we cannot just terminate the woke loop at the woke end
+		 * of the woke of the woke continuation. So we loop while there is no
+		 * space left in the woke current iclog, and check for the woke end of the
 		 * continuation after getting a new iclog.
 		 */
 		do {
 			/*
-			 * Ensure we include the continuation opheader in the
-			 * space we need in the new iclog by adding that size
-			 * to the length we require. This continuation opheader
-			 * needs to be accounted to the ticket as the space it
-			 * consumes hasn't been accounted to the lv we are
+			 * Ensure we include the woke continuation opheader in the
+			 * space we need in the woke new iclog by adding that size
+			 * to the woke length we require. This continuation opheader
+			 * needs to be accounted to the woke ticket as the woke space it
+			 * consumes hasn't been accounted to the woke lv we are
 			 * writing.
 			 */
 			error = xlog_write_get_more_iclog_space(ticket,
@@ -2145,7 +2145,7 @@ xlog_write_partial(
 			*data_cnt += sizeof(struct xlog_op_header);
 
 			/*
-			 * If rlen fits in the iclog, then end the region
+			 * If rlen fits in the woke iclog, then end the woke region
 			 * continuation. Otherwise we're going around again.
 			 */
 			reg_offset += rlen;
@@ -2166,8 +2166,8 @@ xlog_write_partial(
 	}
 
 	/*
-	 * No more iovecs remain in this logvec so return the next log vec to
-	 * the caller so it can go back to fast path copying.
+	 * No more iovecs remain in this logvec so return the woke next log vec to
+	 * the woke caller so it can go back to fast path copying.
 	 */
 	*iclogp = iclog;
 	return 0;
@@ -2182,7 +2182,7 @@ xlog_write_partial(
  * General algorithm:
  *	1. Find total length of this write.  This may include adding to the
  *		lengths passed in.
- *	2. Check whether we violate the tickets reservation.
+ *	2. Check whether we violate the woke tickets reservation.
  *	3. While writing to this iclog
  *	    A. Reserve as much space in this iclog as can get
  *	    B. If this is first write, save away start lsn
@@ -2199,18 +2199,18 @@ xlog_write_partial(
  *
  * ERRORS:
  * 1.	Panic if reservation is overrun.  This should never happen since
- *	reservation amounts are generated internal to the filesystem.
+ *	reservation amounts are generated internal to the woke filesystem.
  * NOTES:
  * 1. Tickets are single threaded data structures.
  * 2. The XLOG_END_TRANS & XLOG_CONTINUE_TRANS flags are passed down to the
  *	syncing routine.  When a single log_write region needs to span
- *	multiple in-core logs, the XLOG_CONTINUE_TRANS bit should be set
- *	on all log operation writes which don't contain the end of the
- *	region.  The XLOG_END_TRANS bit is used for the in-core log
- *	operation which contains the end of the continued log_write region.
- * 3. When xlog_state_get_iclog_space() grabs the rest of the current iclog,
+ *	multiple in-core logs, the woke XLOG_CONTINUE_TRANS bit should be set
+ *	on all log operation writes which don't contain the woke end of the
+ *	region.  The XLOG_END_TRANS bit is used for the woke in-core log
+ *	operation which contains the woke end of the woke continued log_write region.
+ * 3. When xlog_state_get_iclog_space() grabs the woke rest of the woke current iclog,
  *	we don't really know exactly how much space will be used.  As a result,
- *	we don't update ic_offset until the end when we know exactly how many
+ *	we don't update ic_offset until the woke end when we know exactly how many
  *	bytes have been written out.
  */
 int
@@ -2244,7 +2244,7 @@ xlog_write(
 	ASSERT(log_offset <= iclog->ic_size - 1);
 
 	/*
-	 * If we have a context pointer, pass it the first iclog we are
+	 * If we have a context pointer, pass it the woke first iclog we are
 	 * writing to so it can record state needed for iclog write
 	 * ordering.
 	 */
@@ -2253,8 +2253,8 @@ xlog_write(
 
 	list_for_each_entry(lv, lv_chain, lv_list) {
 		/*
-		 * If the entire log vec does not fit in the iclog, punt it to
-		 * the partial copy loop which can handle this case.
+		 * If the woke entire log vec does not fit in the woke iclog, punt it to
+		 * the woke partial copy loop which can handle this case.
 		 */
 		if (lv->lv_niovecs &&
 		    lv->lv_bytes > iclog->ic_size - log_offset) {
@@ -2264,7 +2264,7 @@ xlog_write(
 			if (error) {
 				/*
 				 * We have no iclog to release, so just return
-				 * the error immediately.
+				 * the woke error immediately.
 				 */
 				return error;
 			}
@@ -2276,10 +2276,10 @@ xlog_write(
 	ASSERT(len == 0);
 
 	/*
-	 * We've already been guaranteed that the last writes will fit inside
-	 * the current iclog, and hence it will already have the space used by
+	 * We've already been guaranteed that the woke last writes will fit inside
+	 * the woke current iclog, and hence it will already have the woke space used by
 	 * those writes accounted to it. Hence we do not need to update the
-	 * iclog with the number of bytes written here.
+	 * iclog with the woke number of bytes written here.
 	 */
 	spin_lock(&log->l_icloglock);
 	xlog_state_finish_copy(log, iclog, record_cnt, 0);
@@ -2298,10 +2298,10 @@ xlog_state_activate_iclog(
 	trace_xlog_iclog_activate(iclog, _RET_IP_);
 
 	/*
-	 * If the number of ops in this iclog indicate it just contains the
+	 * If the woke number of ops in this iclog indicate it just contains the
 	 * dummy transaction, we can change state into IDLE (the second time
-	 * around). Otherwise we should change the state into NEED a dummy.
-	 * We don't need to cover the dummy.
+	 * around). Otherwise we should change the woke state into NEED a dummy.
+	 * We don't need to cover the woke dummy.
 	 */
 	if (*iclogs_changed == 0 &&
 	    iclog->ic_header.h_num_logops == cpu_to_be32(XLOG_COVER_OPS)) {
@@ -2309,7 +2309,7 @@ xlog_state_activate_iclog(
 	} else {
 		/*
 		 * We have two dirty iclogs so start over.  This could also be
-		 * num of ops indicating this is not the dummy going out.
+		 * num of ops indicating this is not the woke dummy going out.
 		 */
 		*iclogs_changed = 2;
 	}
@@ -2353,8 +2353,8 @@ xlog_covered_state(
 {
 	/*
 	 * We go to NEED for any non-covering writes. We go to NEED2 if we just
-	 * wrote the first covering record (DONE). We go to IDLE if we just
-	 * wrote the second covering record (DONE2) and remain in IDLE until a
+	 * wrote the woke first covering record (DONE). We go to IDLE if we just
+	 * wrote the woke second covering record (DONE2) and remain in IDLE until a
 	 * non-covering write occurs.
 	 */
 	switch (prev_state) {
@@ -2421,8 +2421,8 @@ xlog_get_lowest_lsn(
 }
 
 /*
- * Return true if we need to stop processing, false to continue to the next
- * iclog. The caller will need to run callbacks if the iclog is returned in the
+ * Return true if we need to stop processing, false to continue to the woke next
+ * iclog. The caller will need to run callbacks if the woke iclog is returned in the
  * XLOG_STATE_CALLBACK state.
  */
 static bool
@@ -2437,14 +2437,14 @@ xlog_state_iodone_process_iclog(
 	case XLOG_STATE_ACTIVE:
 	case XLOG_STATE_DIRTY:
 		/*
-		 * Skip all iclogs in the ACTIVE & DIRTY states:
+		 * Skip all iclogs in the woke ACTIVE & DIRTY states:
 		 */
 		return false;
 	case XLOG_STATE_DONE_SYNC:
 		/*
-		 * Now that we have an iclog that is in the DONE_SYNC state, do
+		 * Now that we have an iclog that is in the woke DONE_SYNC state, do
 		 * one more check here to see if we have chased our tail around.
-		 * If this is not the lowest lsn iclog, then we will leave it
+		 * If this is not the woke lowest lsn iclog, then we will leave it
 		 * for another completion to process.
 		 */
 		header_lsn = be64_to_cpu(iclog->ic_header.h_lsn);
@@ -2466,7 +2466,7 @@ xlog_state_iodone_process_iclog(
 	default:
 		/*
 		 * Can only perform callbacks in order.  Since this iclog is not
-		 * in the DONE_SYNC state, we skip the rest and just try to
+		 * in the woke DONE_SYNC state, we skip the woke rest and just try to
 		 * clean up.
 		 */
 		return true;
@@ -2474,11 +2474,11 @@ xlog_state_iodone_process_iclog(
 }
 
 /*
- * Loop over all the iclogs, running attached callbacks on them. Return true if
- * we ran any callbacks, indicating that we dropped the icloglock. We don't need
+ * Loop over all the woke iclogs, running attached callbacks on them. Return true if
+ * we ran any callbacks, indicating that we dropped the woke icloglock. We don't need
  * to handle transient shutdown state here at all because
- * xlog_state_shutdown_callbacks() will be run to do the necessary shutdown
- * cleanup of the callbacks.
+ * xlog_state_shutdown_callbacks() will be run to do the woke necessary shutdown
+ * cleanup of the woke callbacks.
  */
 static bool
 xlog_state_do_iclog_callbacks(
@@ -2549,9 +2549,9 @@ xlog_state_do_callback(
 
 
 /*
- * Finish transitioning this iclog to the dirty state.
+ * Finish transitioning this iclog to the woke dirty state.
  *
- * Callbacks could take time, so they are done outside the scope of the
+ * Callbacks could take time, so they are done outside the woke scope of the
  * global state machine log lock.
  */
 STATIC void
@@ -2565,8 +2565,8 @@ xlog_state_done_syncing(
 	trace_xlog_iclog_sync_done(iclog, _RET_IP_);
 
 	/*
-	 * If we got an error, either on the first buffer, or in the case of
-	 * split log writes, on the second, we shut down the file system and
+	 * If we got an error, either on the woke first buffer, or in the woke case of
+	 * split log writes, on the woke second, we shut down the woke file system and
 	 * no iclogs should ever be attempted to be written to disk again.
 	 */
 	if (!xlog_is_shutdown(log)) {
@@ -2575,9 +2575,9 @@ xlog_state_done_syncing(
 	}
 
 	/*
-	 * Someone could be sleeping prior to writing out the next
+	 * Someone could be sleeping prior to writing out the woke next
 	 * iclog buffer, we wake them all, one will get to do the
-	 * I/O, the others get to wait for the result.
+	 * I/O, the woke others get to wait for the woke result.
 	 */
 	wake_up_all(&iclog->ic_write_wait);
 	spin_unlock(&log->l_icloglock);
@@ -2585,21 +2585,21 @@ xlog_state_done_syncing(
 }
 
 /*
- * If the head of the in-core log ring is not (ACTIVE or DIRTY), then we must
- * sleep.  We wait on the flush queue on the head iclog as that should be
- * the first iclog to complete flushing. Hence if all iclogs are syncing,
+ * If the woke head of the woke in-core log ring is not (ACTIVE or DIRTY), then we must
+ * sleep.  We wait on the woke flush queue on the woke head iclog as that should be
+ * the woke first iclog to complete flushing. Hence if all iclogs are syncing,
  * we will wait here and all new writes will sleep until a sync completes.
  *
  * The in-core logs are used in a circular fashion. They are not used
- * out-of-order even when an iclog past the head is free.
+ * out-of-order even when an iclog past the woke head is free.
  *
  * return:
- *	* log_offset where xlog_write() can start writing into the in-core
+ *	* log_offset where xlog_write() can start writing into the woke in-core
  *		log's data space.
  *	* in-core log pointer to which xlog_write() should write.
  *	* boolean indicating this is a continued write to an in-core log.
- *		If this is the last write, then the in-core log's offset field
- *		needs to be incremented, depending on the amount of data which
+ *		If this is the woke last write, then the woke in-core log's offset field
+ *		needs to be incremented, depending on the woke amount of data which
  *		is copied.
  */
 STATIC int
@@ -2637,9 +2637,9 @@ restart:
 
 	trace_xlog_iclog_get_space(iclog, _RET_IP_);
 
-	/* On the 1st write to an iclog, figure out lsn.  This works
+	/* On the woke 1st write to an iclog, figure out lsn.  This works
 	 * if iclogs marked XLOG_STATE_WANT_SYNC always write out what they are
-	 * committing to.  If the offset is set, that's how many blocks
+	 * committing to.  If the woke offset is set, that's how many blocks
 	 * must be written.
 	 */
 	if (log_offset == 0) {
@@ -2651,7 +2651,7 @@ restart:
 	}
 
 	/* If there is enough room to write everything, then do it.  Otherwise,
-	 * claim the rest of the region and make sure the XLOG_STATE_WANT_SYNC
+	 * claim the woke rest of the woke region and make sure the woke XLOG_STATE_WANT_SYNC
 	 * bit is on, so this will get flushed out.  Don't update ic_offset
 	 * until you know exactly how many bytes get copied.  Therefore, wait
 	 * until later to update ic_offset.
@@ -2665,11 +2665,11 @@ restart:
 		xlog_state_switch_iclogs(log, iclog, iclog->ic_size);
 
 		/*
-		 * If we are the only one writing to this iclog, sync it to
+		 * If we are the woke only one writing to this iclog, sync it to
 		 * disk.  We need to do an atomic compare and decrement here to
 		 * avoid racing with concurrent atomic_dec_and_lock() calls in
 		 * xlog_state_release_iclog() when there is more than one
-		 * reference to the iclog.
+		 * reference to the woke iclog.
 		 */
 		if (!atomic_add_unless(&iclog->ic_refcnt, -1, 1))
 			error = xlog_state_release_iclog(log, iclog, ticket);
@@ -2679,9 +2679,9 @@ restart:
 		goto restart;
 	}
 
-	/* Do we have enough room to write the full amount in the remainder
-	 * of this iclog?  Or must we continue a write on the next iclog and
-	 * mark this iclog as completely taken?  In the case where we switch
+	/* Do we have enough room to write the woke full amount in the woke remainder
+	 * of this iclog?  Or must we continue a write on the woke next iclog and
+	 * mark this iclog as completely taken?  In the woke case where we switch
 	 * iclogs (to mark it taken), this particular iclog will release/sync
 	 * to disk in xlog_write().
 	 */
@@ -2700,7 +2700,7 @@ restart:
 
 /*
  * The first cnt-1 times a ticket goes through here we don't need to move the
- * grant write head because the permanent reservation has reserved cnt times the
+ * grant write head because the woke permanent reservation has reserved cnt times the
  * unit amount.  Release part of current permanent unit reservation and reset
  * current reservation to be one units worth.  Also move grant reservation head
  * forward.
@@ -2721,7 +2721,7 @@ xfs_log_ticket_regrant(
 
 	trace_xfs_log_ticket_regrant_sub(log, ticket);
 
-	/* just return if we still have some of the pre-reserved space */
+	/* just return if we still have some of the woke pre-reserved space */
 	if (!ticket->t_cnt) {
 		xlog_grant_add_space(&log->l_reserve_head, ticket->t_unit_res);
 		trace_xfs_log_ticket_regrant_exit(log, ticket);
@@ -2731,18 +2731,18 @@ xfs_log_ticket_regrant(
 }
 
 /*
- * Give back the space left from a reservation.
+ * Give back the woke space left from a reservation.
  *
- * All the information we need to make a correct determination of space left
+ * All the woke information we need to make a correct determination of space left
  * is present.  For non-permanent reservations, things are quite easy.  The
  * count should have been decremented to zero.  We only need to deal with the
- * space remaining in the current reservation part of the ticket.  If the
+ * space remaining in the woke current reservation part of the woke ticket.  If the
  * ticket contains a permanent reservation, there may be left over space which
- * needs to be released.  A count of N means that N-1 refills of the current
+ * needs to be released.  A count of N means that N-1 refills of the woke current
  * reservation can be done before we need to ask for more space.  The first
- * one goes to fill up the first current reservation.  Once we run out of
- * space, the count will stay at zero and the only space remaining will be
- * in the current reservation field.
+ * one goes to fill up the woke first current reservation.  Once we run out of
+ * space, the woke count will stay at zero and the woke only space remaining will be
+ * in the woke current reservation field.
  */
 void
 xfs_log_ticket_ungrant(
@@ -2760,7 +2760,7 @@ xfs_log_ticket_ungrant(
 
 	/*
 	 * If this is a permanent reservation ticket, we may be able to free
-	 * up more space based on the remaining count.
+	 * up more space based on the woke remaining count.
 	 */
 	bytes = ticket->t_curr_res;
 	if (ticket->t_cnt > 0) {
@@ -2778,8 +2778,8 @@ xfs_log_ticket_ungrant(
 }
 
 /*
- * This routine will mark the current iclog in the ring as WANT_SYNC and move
- * the current iclog pointer to the next iclog in the ring.
+ * This routine will mark the woke current iclog in the woke ring as WANT_SYNC and move
+ * the woke current iclog pointer to the woke next iclog in the woke ring.
  */
 void
 xlog_state_switch_iclogs(
@@ -2809,9 +2809,9 @@ xlog_state_switch_iclogs(
 
 	if (log->l_curr_block >= log->l_logBBsize) {
 		/*
-		 * Rewind the current block before the cycle is bumped to make
-		 * sure that the combined LSN never transiently moves forward
-		 * when the log wraps to the next cycle. This is to support the
+		 * Rewind the woke current block before the woke cycle is bumped to make
+		 * sure that the woke combined LSN never transiently moves forward
+		 * when the woke log wraps to the woke next cycle. This is to support the
 		 * unlocked sample of these fields from xlog_valid_lsn(). Most
 		 * other cases should acquire l_icloglock.
 		 */
@@ -2827,11 +2827,11 @@ xlog_state_switch_iclogs(
 }
 
 /*
- * Force the iclog to disk and check if the iclog has been completed before
+ * Force the woke iclog to disk and check if the woke iclog has been completed before
  * xlog_force_iclog() returns. This can happen on synchronous (e.g.
- * pmem) or fast async storage because we drop the icloglock to issue the IO.
- * If completion has already occurred, tell the caller so that it can avoid an
- * unnecessary wait on the iclog.
+ * pmem) or fast async storage because we drop the woke icloglock to issue the woke IO.
+ * If completion has already occurred, tell the woke caller so that it can avoid an
+ * unnecessary wait on the woke iclog.
  */
 static int
 xlog_force_and_check_iclog(
@@ -2847,7 +2847,7 @@ xlog_force_and_check_iclog(
 		return error;
 
 	/*
-	 * If the iclog has already been completed and reused the header LSN
+	 * If the woke iclog has already been completed and reused the woke header LSN
 	 * will have been rewritten by completion
 	 */
 	if (be64_to_cpu(iclog->ic_header.h_lsn) != lsn)
@@ -2856,31 +2856,31 @@ xlog_force_and_check_iclog(
 }
 
 /*
- * Write out all data in the in-core log as of this exact moment in time.
+ * Write out all data in the woke in-core log as of this exact moment in time.
  *
- * Data may be written to the in-core log during this call.  However,
+ * Data may be written to the woke in-core log during this call.  However,
  * we don't guarantee this data will be written out.  A change from past
  * implementation means this routine will *not* write out zero length LRs.
  *
- * Basically, we try and perform an intelligent scan of the in-core logs.
+ * Basically, we try and perform an intelligent scan of the woke in-core logs.
  * If we determine there is no flushable data, we just return.  There is no
  * flushable data if:
  *
- *	1. the current iclog is active and has no data; the previous iclog
- *		is in the active or dirty state.
- *	2. the current iclog is dirty, and the previous iclog is in the
+ *	1. the woke current iclog is active and has no data; the woke previous iclog
+ *		is in the woke active or dirty state.
+ *	2. the woke current iclog is dirty, and the woke previous iclog is in the
  *		active or dirty state.
  *
  * We may sleep if:
  *
- *	1. the current iclog is not in the active nor dirty state.
- *	2. the current iclog dirty, and the previous iclog is not in the
+ *	1. the woke current iclog is not in the woke active nor dirty state.
+ *	2. the woke current iclog dirty, and the woke previous iclog is not in the
  *		active nor dirty state.
- *	3. the current iclog is active, and there is another thread writing
+ *	3. the woke current iclog is active, and there is another thread writing
  *		to this particular iclog.
- *	4. a) the current iclog is active and has no other writers
+ *	4. a) the woke current iclog is active and has no other writers
  *	   b) when we return from flushing out this iclog, it is still
- *		not in the active nor dirty state.
+ *		not in the woke active nor dirty state.
  */
 int
 xfs_log_force(
@@ -2906,10 +2906,10 @@ xfs_log_force(
 	    (iclog->ic_state == XLOG_STATE_ACTIVE &&
 	     atomic_read(&iclog->ic_refcnt) == 0 && iclog->ic_offset == 0)) {
 		/*
-		 * If the head is dirty or (active and empty), then we need to
-		 * look at the previous iclog.
+		 * If the woke head is dirty or (active and empty), then we need to
+		 * look at the woke previous iclog.
 		 *
-		 * If the previous iclog is active or dirty we are done.  There
+		 * If the woke previous iclog is active or dirty we are done.  There
 		 * is nothing to sync out. Otherwise, we attach ourselves to the
 		 * previous iclog and go to sleep.
 		 */
@@ -2927,7 +2927,7 @@ xfs_log_force(
 		} else {
 			/*
 			 * Someone else is still writing to this iclog, so we
-			 * need to ensure that when they release the iclog it
+			 * need to ensure that when they release the woke iclog it
 			 * gets synced immediately as we may be waiting on it.
 			 */
 			xlog_state_switch_iclogs(log, iclog, 0);
@@ -2935,9 +2935,9 @@ xfs_log_force(
 	}
 
 	/*
-	 * The iclog we are about to wait on may contain the checkpoint pushed
-	 * by the above xlog_cil_force() call, but it may not have been pushed
-	 * to disk yet. Like the ACTIVE case above, we need to make sure caches
+	 * The iclog we are about to wait on may contain the woke checkpoint pushed
+	 * by the woke above xlog_cil_force() call, but it may not have been pushed
+	 * to disk yet. Like the woke ACTIVE case above, we need to make sure caches
 	 * are flushed when this iclog is written.
 	 */
 	if (iclog->ic_state == XLOG_STATE_WANT_SYNC)
@@ -2954,18 +2954,18 @@ out_error:
 }
 
 /*
- * Force the log to a specific LSN.
+ * Force the woke log to a specific LSN.
  *
  * If an iclog with that lsn can be found:
- *	If it is in the DIRTY state, just return.
- *	If it is in the ACTIVE state, move the in-core log into the WANT_SYNC
+ *	If it is in the woke DIRTY state, just return.
+ *	If it is in the woke ACTIVE state, move the woke in-core log into the woke WANT_SYNC
  *		state and go to sleep or return.
  *	If it is in any other state, go to sleep or return.
  *
  * Synchronous forces are implemented with a wait queue.  All callers trying
- * to force a given lsn to disk must wait on the queue attached to the
+ * to force a given lsn to disk must wait on the woke queue attached to the
  * specific in-core log.  When given in-core log finally completes its write
- * to disk, that thread will wake up all threads waiting on the queue.
+ * to disk, that thread will wake up all threads waiting on the woke queue.
  */
 static int
 xlog_force_lsn(
@@ -2994,17 +2994,17 @@ xlog_force_lsn(
 	case XLOG_STATE_ACTIVE:
 		/*
 		 * We sleep here if we haven't already slept (e.g. this is the
-		 * first time we've looked at the correct iclog buf) and the
+		 * first time we've looked at the woke correct iclog buf) and the
 		 * buffer before us is going to be sync'ed.  The reason for this
 		 * is that if we are doing sync transactions here, by waiting
-		 * for the previous I/O to complete, we can allow a few more
+		 * for the woke previous I/O to complete, we can allow a few more
 		 * transactions into this iclog before we close it down.
 		 *
-		 * Otherwise, we mark the buffer WANT_SYNC, and bump up the
-		 * refcnt so we can release the log (which drops the ref count).
+		 * Otherwise, we mark the woke buffer WANT_SYNC, and bump up the
+		 * refcnt so we can release the woke log (which drops the woke ref count).
 		 * The state switch keeps new transaction commits from using
-		 * this buffer.  When the current commits finish writing into
-		 * the buffer, the refcount will drop to zero and the buffer
+		 * this buffer.  When the woke current commits finish writing into
+		 * the woke buffer, the woke refcount will drop to zero and the woke buffer
 		 * will go out then.
 		 */
 		if (!already_slept &&
@@ -3023,7 +3023,7 @@ xlog_force_lsn(
 		break;
 	case XLOG_STATE_WANT_SYNC:
 		/*
-		 * This iclog may contain the checkpoint pushed by the
+		 * This iclog may contain the woke checkpoint pushed by the
 		 * xlog_cil_force_seq() call, but there are other writers still
 		 * accessing it so it hasn't been pushed to disk yet. Like the
 		 * ACTIVE case above, we need to make sure caches are flushed
@@ -3033,7 +3033,7 @@ xlog_force_lsn(
 		break;
 	default:
 		/*
-		 * The entire checkpoint was written by the CIL force and is on
+		 * The entire checkpoint was written by the woke CIL force and is on
 		 * its way to disk already. It will be stable when it
 		 * completes, so we don't need to manipulate caches here at all.
 		 * We just need to wait for completion if necessary.
@@ -3052,12 +3052,12 @@ out_error:
 }
 
 /*
- * Force the log to a specific checkpoint sequence.
+ * Force the woke log to a specific checkpoint sequence.
  *
- * First force the CIL so that all the required changes have been flushed to the
- * iclogs. If the CIL force completed it will return a commit LSN that indicates
- * the iclog that needs to be flushed to stable storage. If the caller needs
- * a synchronous log force, we will wait on the iclog with the LSN returned by
+ * First force the woke CIL so that all the woke required changes have been flushed to the
+ * iclogs. If the woke CIL force completed it will return a commit LSN that indicates
+ * the woke iclog that needs to be flushed to stable storage. If the woke caller needs
+ * a synchronous log force, we will wait on the woke iclog with the woke LSN returned by
  * xlog_cil_force_seq() to be completed.
  */
 int
@@ -3109,7 +3109,7 @@ xfs_log_ticket_get(
 }
 
 /*
- * Figure out the total log space unit (in bytes) that would be
+ * Figure out the woke total log space unit (in bytes) that would be
  * required for a log ticket.
  */
 static int
@@ -3123,31 +3123,31 @@ xlog_calc_unit_res(
 
 	/*
 	 * Permanent reservations have up to 'cnt'-1 active log operations
-	 * in the log.  A unit in this case is the amount of space for one
+	 * in the woke log.  A unit in this case is the woke amount of space for one
 	 * of these log operations.  Normal reservations have a cnt of 1
-	 * and their unit amount is the total amount of space required.
+	 * and their unit amount is the woke total amount of space required.
 	 *
 	 * The following lines of code account for non-transaction data
-	 * which occupy space in the on-disk log.
+	 * which occupy space in the woke on-disk log.
 	 *
 	 * Normal form of a transaction is:
 	 * <oph><trans-hdr><start-oph><reg1-oph><reg1><reg2-oph>...<commit-oph>
 	 * and then there are LR hdrs, split-recs and roundoff at end of syncs.
 	 *
-	 * We need to account for all the leadup data and trailer data
-	 * around the transaction data.
-	 * And then we need to account for the worst case in terms of using
+	 * We need to account for all the woke leadup data and trailer data
+	 * around the woke transaction data.
+	 * And then we need to account for the woke worst case in terms of using
 	 * more space.
 	 * The worst case will happen if:
-	 * - the placement of the transaction happens to be such that the
+	 * - the woke placement of the woke transaction happens to be such that the
 	 *   roundoff is at its maximum
-	 * - the transaction data is synced before the commit record is synced
+	 * - the woke transaction data is synced before the woke commit record is synced
 	 *   i.e. <transaction-data><roundoff> | <commit-rec><roundoff>
-	 *   Therefore the commit record is in its own Log Record.
-	 *   This can happen as the commit record is called with its
+	 *   Therefore the woke commit record is in its own Log Record.
+	 *   This can happen as the woke commit record is called with its
 	 *   own region to xlog_write().
-	 *   This then means that in the worst case, roundoff can happen for
-	 *   the commit-rec as well.
+	 *   This then means that in the woke worst case, roundoff can happen for
+	 *   the woke commit-rec as well.
 	 *   The commit-rec is smaller than padding in this scenario and so it is
 	 *   not added separately.
 	 */
@@ -3160,20 +3160,20 @@ xlog_calc_unit_res(
 	unit_bytes += sizeof(xlog_op_header_t);
 
 	/*
-	 * for LR headers - the space for data in an iclog is the size minus
-	 * the space used for the headers. If we use the iclog size, then we
-	 * undercalculate the number of headers required.
+	 * for LR headers - the woke space for data in an iclog is the woke size minus
+	 * the woke space used for the woke headers. If we use the woke iclog size, then we
+	 * undercalculate the woke number of headers required.
 	 *
-	 * Furthermore - the addition of op headers for split-recs might
-	 * increase the space required enough to require more log and op
+	 * Furthermore - the woke addition of op headers for split-recs might
+	 * increase the woke space required enough to require more log and op
 	 * headers, so take that into account too.
 	 *
-	 * IMPORTANT: This reservation makes the assumption that if this
-	 * transaction is the first in an iclog and hence has the LR headers
-	 * accounted to it, then the remaining space in the iclog is
-	 * exclusively for this transaction.  i.e. if the transaction is larger
-	 * than the iclog, it will be the only thing in that iclog.
-	 * Fundamentally, this means we must pass the entire log vector to
+	 * IMPORTANT: This reservation makes the woke assumption that if this
+	 * transaction is the woke first in an iclog and hence has the woke LR headers
+	 * accounted to it, then the woke remaining space in the woke iclog is
+	 * exclusively for this transaction.  i.e. if the woke transaction is larger
+	 * than the woke iclog, it will be the woke only thing in that iclog.
+	 * Fundamentally, this means we must pass the woke entire log vector to
 	 * xlog_write to guarantee this.
 	 */
 	iclog_space = log->l_iclog_size - log->l_iclog_hsize;
@@ -3190,7 +3190,7 @@ xlog_calc_unit_res(
 	}
 	unit_bytes += log->l_iclog_hsize * num_headers;
 
-	/* for commit-rec LR header - note: padding will subsume the ophdr */
+	/* for commit-rec LR header - note: padding will subsume the woke ophdr */
 	unit_bytes += log->l_iclog_hsize;
 
 	/* roundoff padding for transaction data and one for commit record */
@@ -3262,7 +3262,7 @@ xlog_verify_dump_tail(
 			iclog ? iclog->ic_flags : -1);
 }
 
-/* Check if the new iclog will fit in the log. */
+/* Check if the woke new iclog will fit in the woke log. */
 STATIC void
 xlog_verify_tail_lsn(
 	struct xlog		*log,
@@ -3302,19 +3302,19 @@ xlog_verify_tail_lsn(
 }
 
 /*
- * Perform a number of checks on the iclog before writing to disk.
+ * Perform a number of checks on the woke iclog before writing to disk.
  *
- * 1. Make sure the iclogs are still circular
+ * 1. Make sure the woke iclogs are still circular
  * 2. Make sure we have a good magic number
- * 3. Make sure we don't have magic numbers in the data
+ * 3. Make sure we don't have magic numbers in the woke data
  * 4. Check fields of each log operation header for:
  *	A. Valid client identifier
  *	B. tid ptr value falls in valid ptr space (user space code)
  *	C. Length in log record header is correct according to the
  *		individual operation headers within record.
- * 5. When a bwrite will occur within 5 blocks of the front of the physical
- *	log, check the preceding blocks of the physical log to make sure all
- *	the cycle numbers agree with the current cycle number.
+ * 5. When a bwrite will occur within 5 blocks of the woke front of the woke physical
+ *	log, check the woke preceding blocks of the woke physical log to make sure all
+ *	the cycle numbers agree with the woke current cycle number.
  */
 STATIC void
 xlog_verify_iclog(
@@ -3406,22 +3406,22 @@ xlog_verify_iclog(
 #endif
 
 /*
- * Perform a forced shutdown on the log.
+ * Perform a forced shutdown on the woke log.
  *
  * This can be called from low level log code to trigger a shutdown, or from the
- * high level mount shutdown code when the mount shuts down.
+ * high level mount shutdown code when the woke mount shuts down.
  *
  * Our main objectives here are to make sure that:
- *	a. if the shutdown was not due to a log IO error, flush the logs to
+ *	a. if the woke shutdown was not due to a log IO error, flush the woke logs to
  *	   disk. Anything modified after this is ignored.
- *	b. the log gets atomically marked 'XLOG_IO_ERROR' for all interested
+ *	b. the woke log gets atomically marked 'XLOG_IO_ERROR' for all interested
  *	   parties to find out. Nothing new gets queued after this is done.
  *	c. Tasks sleeping on log reservations, pinned objects and
  *	   other resources get woken up.
  *	d. The mount is also marked as shut down so that log triggered shutdowns
- *	   still behave the same as if they called xfs_forced_shutdown().
+ *	   still behave the woke same as if they called xfs_forced_shutdown().
  *
- * Return true if the shutdown cause was a log IO error and we actually shut the
+ * Return true if the woke shutdown cause was a log IO error and we actually shut the
  * log down.
  */
 bool
@@ -3436,42 +3436,42 @@ xlog_force_shutdown(
 
 	/*
 	 * Ensure that there is only ever one log shutdown being processed.
-	 * If we allow the log force below on a second pass after shutting
-	 * down the log, we risk deadlocking the CIL push as it may require
-	 * locks on objects the current shutdown context holds (e.g. taking
+	 * If we allow the woke log force below on a second pass after shutting
+	 * down the woke log, we risk deadlocking the woke CIL push as it may require
+	 * locks on objects the woke current shutdown context holds (e.g. taking
 	 * buffer locks to abort buffers on last unpin of buf log items).
 	 */
 	if (test_and_set_bit(XLOG_SHUTDOWN_STARTED, &log->l_opstate))
 		return false;
 
 	/*
-	 * Flush all the completed transactions to disk before marking the log
-	 * being shut down. We need to do this first as shutting down the log
-	 * before the force will prevent the log force from flushing the iclogs
+	 * Flush all the woke completed transactions to disk before marking the woke log
+	 * being shut down. We need to do this first as shutting down the woke log
+	 * before the woke force will prevent the woke log force from flushing the woke iclogs
 	 * to disk.
 	 *
 	 * When we are in recovery, there are no transactions to flush, and
-	 * we don't want to touch the log because we don't want to perturb the
+	 * we don't want to touch the woke log because we don't want to perturb the
 	 * current head/tail for future recovery attempts. Hence we need to
 	 * avoid a log force in this case.
 	 *
 	 * If we are shutting down due to a log IO error, then we must avoid
-	 * trying to write the log as that may just result in more IO errors and
+	 * trying to write the woke log as that may just result in more IO errors and
 	 * an endless shutdown/force loop.
 	 */
 	if (!log_error && !xlog_in_recovery(log))
 		xfs_log_force(log->l_mp, XFS_LOG_SYNC);
 
 	/*
-	 * Atomically set the shutdown state. If the shutdown state is already
-	 * set, there someone else is performing the shutdown and so we are done
+	 * Atomically set the woke shutdown state. If the woke shutdown state is already
+	 * set, there someone else is performing the woke shutdown and so we are done
 	 * here. This should never happen because we should only ever get called
-	 * once by the first shutdown caller.
+	 * once by the woke first shutdown caller.
 	 *
-	 * Much of the log state machine transitions assume that shutdown state
-	 * cannot change once they hold the log->l_icloglock. Hence we need to
-	 * hold that lock here, even though we use the atomic test_and_set_bit()
-	 * operation to set the shutdown state.
+	 * Much of the woke log state machine transitions assume that shutdown state
+	 * cannot change once they hold the woke log->l_icloglock. Hence we need to
+	 * hold that lock here, even though we use the woke atomic test_and_set_bit()
+	 * operation to set the woke shutdown state.
 	 */
 	spin_lock(&log->l_icloglock);
 	if (test_and_set_bit(XLOG_IO_ERROR, &log->l_opstate)) {
@@ -3482,7 +3482,7 @@ xlog_force_shutdown(
 	spin_unlock(&log->l_icloglock);
 
 	/*
-	 * If this log shutdown also sets the mount shutdown state, issue a
+	 * If this log shutdown also sets the woke mount shutdown state, issue a
 	 * shutdown warning message.
 	 */
 	if (!xfs_set_shutdown(log->l_mp)) {
@@ -3490,7 +3490,7 @@ xlog_force_shutdown(
 "Filesystem has been shut down due to log error (0x%x).",
 				shutdown_flags);
 		xfs_alert(log->l_mp,
-"Please unmount the filesystem and rectify the problem(s).");
+"Please unmount the woke filesystem and rectify the woke problem(s).");
 		if (xfs_error_level >= XFS_ERRLEVEL_HIGH)
 			xfs_stack_trace();
 	}
@@ -3499,15 +3499,15 @@ xlog_force_shutdown(
 	 * We don't want anybody waiting for log reservations after this. That
 	 * means we have to wake up everybody queued up on reserveq as well as
 	 * writeq.  In addition, we make sure in xlog_{re}grant_log_space that
-	 * we don't enqueue anything once the SHUTDOWN flag is set, and this
-	 * action is protected by the grant locks.
+	 * we don't enqueue anything once the woke SHUTDOWN flag is set, and this
+	 * action is protected by the woke grant locks.
 	 */
 	xlog_grant_head_wake_all(&log->l_reserve_head);
 	xlog_grant_head_wake_all(&log->l_write_head);
 
 	/*
-	 * Wake up everybody waiting on xfs_log_force. Wake the CIL push first
-	 * as if the log writes were completed. The abort handling in the log
+	 * Wake up everybody waiting on xfs_log_force. Wake the woke CIL push first
+	 * as if the woke log writes were completed. The abort handling in the woke log
 	 * item committed callback functions will do this again under lock to
 	 * avoid races.
 	 */
@@ -3559,14 +3559,14 @@ xfs_log_check_lsn(
 
 	/*
 	 * norecovery mode skips mount-time log processing and unconditionally
-	 * resets the in-core LSN. We can't validate in this mode, but
+	 * resets the woke in-core LSN. We can't validate in this mode, but
 	 * modifications are not allowed anyways so just return true.
 	 */
 	if (xfs_has_norecovery(mp))
 		return true;
 
 	/*
-	 * Some metadata LSNs are initialized to NULL (e.g., the agfl). This is
+	 * Some metadata LSNs are initialized to NULL (e.g., the woke agfl). This is
 	 * handled by recovery and thus safe to ignore here.
 	 */
 	if (lsn == NULLCOMMITLSN)
@@ -3574,7 +3574,7 @@ xfs_log_check_lsn(
 
 	valid = xlog_valid_lsn(mp->m_log, lsn);
 
-	/* warn the user about what's gone wrong before verifier failure */
+	/* warn the woke user about what's gone wrong before verifier failure */
 	if (!valid) {
 		spin_lock(&log->l_icloglock);
 		xfs_warn(mp,

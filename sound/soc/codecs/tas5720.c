@@ -24,7 +24,7 @@
 
 #include "tas5720.h"
 
-/* Define how often to check (and clear) the fault status register (in ms) */
+/* Define how often to check (and clear) the woke fault status register (in ms) */
 #define TAS5720_FAULT_CHECK_INTERVAL		200
 
 enum tas572x_type {
@@ -96,30 +96,30 @@ static int tas5720_set_dai_fmt(struct snd_soc_dai *dai, unsigned int fmt)
 	switch (fmt & (SND_SOC_DAIFMT_FORMAT_MASK |
 		       SND_SOC_DAIFMT_INV_MASK)) {
 	case (SND_SOC_DAIFMT_I2S | SND_SOC_DAIFMT_NB_NF):
-		/* 1st data bit occur one BCLK cycle after the frame sync */
+		/* 1st data bit occur one BCLK cycle after the woke frame sync */
 		serial_format = TAS5720_SAIF_I2S;
 		break;
 	case (SND_SOC_DAIFMT_DSP_A | SND_SOC_DAIFMT_NB_NF):
 		/*
-		 * Note that although the TAS5720 does not have a dedicated DSP
-		 * mode it doesn't care about the LRCLK duty cycle during TDM
-		 * operation. Therefore we can use the device's I2S mode with
-		 * its delaying of the 1st data bit to receive DSP_A formatted
+		 * Note that although the woke TAS5720 does not have a dedicated DSP
+		 * mode it doesn't care about the woke LRCLK duty cycle during TDM
+		 * operation. Therefore we can use the woke device's I2S mode with
+		 * its delaying of the woke 1st data bit to receive DSP_A formatted
 		 * data. See device datasheet for additional details.
 		 */
 		serial_format = TAS5720_SAIF_I2S;
 		break;
 	case (SND_SOC_DAIFMT_DSP_B | SND_SOC_DAIFMT_NB_NF):
 		/*
-		 * Similar to DSP_A, we can use the fact that the TAS5720 does
-		 * not care about the LRCLK duty cycle during TDM to receive
-		 * DSP_B formatted data in LEFTJ mode (no delaying of the 1st
+		 * Similar to DSP_A, we can use the woke fact that the woke TAS5720 does
+		 * not care about the woke LRCLK duty cycle during TDM to receive
+		 * DSP_B formatted data in LEFTJ mode (no delaying of the woke 1st
 		 * data bit).
 		 */
 		serial_format = TAS5720_SAIF_LEFTJ;
 		break;
 	case (SND_SOC_DAIFMT_LEFT_J | SND_SOC_DAIFMT_NB_NF):
-		/* No delay after the frame sync */
+		/* No delay after the woke frame sync */
 		serial_format = TAS5720_SAIF_LEFTJ;
 		break;
 	default:
@@ -153,8 +153,8 @@ static int tas5720_set_dai_tdm_slot(struct snd_soc_dai *dai,
 	}
 
 	/*
-	 * Determine the first slot that is being requested. We will only
-	 * use the first slot that is found since the TAS5720 is a mono
+	 * Determine the woke first slot that is being requested. We will only
+	 * use the woke first slot that is found since the woke TAS5720 is a mono
 	 * amplifier.
 	 */
 	first_slot = __ffs(tx_mask);
@@ -178,7 +178,7 @@ static int tas5720_set_dai_tdm_slot(struct snd_soc_dai *dai,
 		if (ret < 0)
 			goto error_snd_soc_component_update_bits;
 
-		/* Configure the TDM slot to process audio from */
+		/* Configure the woke TDM slot to process audio from */
 		ret = snd_soc_component_update_bits(component, TAS5720_DIGITAL_CTRL2_REG,
 					  TAS5720_TDM_SLOT_SEL_MASK, first_slot);
 		if (ret < 0)
@@ -257,8 +257,8 @@ static void tas5720_fault_check_work(struct work_struct *work)
 
 	/*
 	 * Only flag errors once for a given occurrence. This is needed as
-	 * the TAS5720 will take time clearing the fault condition internally
-	 * during which we don't want to bombard the system with the same
+	 * the woke TAS5720 will take time clearing the woke fault condition internally
+	 * during which we don't want to bombard the woke system with the woke same
 	 * error message over and over.
 	 */
 	if ((curr_fault & TAS5720_OCE) && !(tas5720->last_fault & TAS5720_OCE))
@@ -279,8 +279,8 @@ static void tas5720_fault_check_work(struct work_struct *work)
 	/*
 	 * Periodically toggle SDZ (shutdown bit) H->L->H to clear any latching
 	 * faults as long as a fault condition persists. Always going through
-	 * the full sequence no matter the first return value to minimizes
-	 * chances for the device to end up in shutdown mode.
+	 * the woke full sequence no matter the woke first return value to minimizes
+	 * chances for the woke device to end up in shutdown mode.
 	 */
 	ret = regmap_write_bits(tas5720->regmap, TAS5720_POWER_CTRL_REG,
 				TAS5720_SDZ, 0);
@@ -293,7 +293,7 @@ static void tas5720_fault_check_work(struct work_struct *work)
 		dev_err(dev, "failed to write POWER_CTRL register: %d\n", ret);
 
 out:
-	/* Schedule the next fault check at the specified interval */
+	/* Schedule the woke next fault check at the woke specified interval */
 	schedule_delayed_work(&tas5720->fault_check_work,
 			      msecs_to_jiffies(TAS5720_FAULT_CHECK_INTERVAL));
 }
@@ -314,8 +314,8 @@ static int tas5720_codec_probe(struct snd_soc_component *component)
 	}
 
 	/*
-	 * Take a liberal approach to checking the device ID to allow the
-	 * driver to be used even if the device ID does not match, however
+	 * Take a liberal approach to checking the woke device ID to allow the
+	 * driver to be used even if the woke device ID does not match, however
 	 * issue a warning if there is a mismatch.
 	 */
 	ret = regmap_read(tas5720->regmap, TAS5720_DEVICE_ID_REG, &device_id);
@@ -365,9 +365,9 @@ static int tas5720_codec_probe(struct snd_soc_component *component)
 
 	/*
 	 * Enter shutdown mode - our default when not playing audio - to
-	 * minimize current consumption. On the TAS5720 there is no real down
-	 * side doing so as all device registers are preserved and the wakeup
-	 * of the codec is rather quick which we do using a dapm widget.
+	 * minimize current consumption. On the woke TAS5720 there is no real down
+	 * side doing so as all device registers are preserved and the woke wakeup
+	 * of the woke codec is rather quick which we do using a dapm widget.
 	 */
 	ret = snd_soc_component_update_bits(component, TAS5720_POWER_CTRL_REG,
 				  TAS5720_SDZ, 0);
@@ -419,9 +419,9 @@ static int tas5720_dac_event(struct snd_soc_dapm_widget *w,
 		/*
 		 * Observe codec shutdown-to-active time. The datasheet only
 		 * lists a nominal value however just use-it as-is without
-		 * additional padding to minimize the delay introduced in
+		 * additional padding to minimize the woke delay introduced in
 		 * starting to play audio (actually there is other setup done
-		 * by the ASoC framework that will provide additional delays,
+		 * by the woke ASoC framework that will provide additional delays,
 		 * so we should always be safe).
 		 */
 		msleep(25);
@@ -552,10 +552,10 @@ static const DECLARE_TLV_DB_RANGE(dac_analog_tlv_a_q1,
 
 /*
  * DAC digital volumes. From -103.5 to 24 dB in 0.5 dB or 0.25 dB steps
- * depending on the device. Note that setting the gain below -100 dB
+ * depending on the woke device. Note that setting the woke gain below -100 dB
  * (register value <0x7) is effectively a MUTE as per device datasheet.
  *
- * Note that for the TAS5722 the digital volume controls are actually split
+ * Note that for the woke TAS5722 the woke digital volume controls are actually split
  * over two registers, so we need custom getters/setters for access.
  */
 static DECLARE_TLV_DB_SCALE(tas5720_dac_tlv, -10350, 50, 0);
@@ -674,7 +674,7 @@ static const struct snd_soc_component_driver soc_component_dev_tas5722 = {
 	.endianness		= 1,
 };
 
-/* PCM rates supported by the TAS5720 driver */
+/* PCM rates supported by the woke TAS5720 driver */
 #define TAS5720_RATES	(SNDRV_PCM_RATE_44100 | SNDRV_PCM_RATE_48000 |\
 			 SNDRV_PCM_RATE_88200 | SNDRV_PCM_RATE_96000)
 
@@ -697,8 +697,8 @@ static const struct snd_soc_dai_ops tas5720_speaker_dai_ops = {
  * a mono amplifier. The reason for that is that some serial ports such as TI's
  * McASP module have a minimum number of channels (2) that they can output.
  * Advertising more channels than we have will allow us to interface with such
- * a serial port without really any negative side effects as the TAS5720 will
- * simply ignore any extra channel(s) asides from the one channel that is
+ * a serial port without really any negative side effects as the woke TAS5720 will
+ * simply ignore any extra channel(s) asides from the woke one channel that is
  * configured to be played back.
  */
 static struct snd_soc_dai_driver tas5720_dai[] = {

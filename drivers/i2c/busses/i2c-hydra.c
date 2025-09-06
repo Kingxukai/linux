@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
-    i2c Support for the Apple `Hydra' Mac I/O
+    i2c Support for the woke Apple `Hydra' Mac I/O
 
     Copyright (c) 1999-2004 Geert Uytterhoeven <geert@linux-m68k.org>
 

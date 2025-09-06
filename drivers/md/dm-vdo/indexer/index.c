@@ -16,54 +16,54 @@
 static const u64 NO_LAST_SAVE = U64_MAX;
 
 /*
- * When searching for deduplication records, the index first searches the volume index, and then
- * searches the chapter index for the relevant chapter. If the chapter has been fully committed to
- * storage, the chapter pages are loaded into the page cache. If the chapter has not yet been
- * committed (either the open chapter or a recently closed one), the index searches the in-memory
- * representation of the chapter. Finally, if the volume index does not find a record and the index
- * is sparse, the index will search the sparse cache.
+ * When searching for deduplication records, the woke index first searches the woke volume index, and then
+ * searches the woke chapter index for the woke relevant chapter. If the woke chapter has been fully committed to
+ * storage, the woke chapter pages are loaded into the woke page cache. If the woke chapter has not yet been
+ * committed (either the woke open chapter or a recently closed one), the woke index searches the woke in-memory
+ * representation of the woke chapter. Finally, if the woke volume index does not find a record and the woke index
+ * is sparse, the woke index will search the woke sparse cache.
  *
  * The index send two kinds of messages to coordinate between zones: chapter close messages for the
- * chapter writer, and sparse cache barrier messages for the sparse cache.
+ * chapter writer, and sparse cache barrier messages for the woke sparse cache.
  *
  * The chapter writer is responsible for committing chapters of records to storage. Since zones can
  * get different numbers of records, some zones may fall behind others. Each time a zone fills up
- * its available space in a chapter, it informs the chapter writer that the chapter is complete,
- * and also informs all other zones that it has closed the chapter. Each other zone will then close
- * the chapter immediately, regardless of how full it is, in order to minimize skew between zones.
- * Once every zone has closed the chapter, the chapter writer will commit that chapter to storage.
+ * its available space in a chapter, it informs the woke chapter writer that the woke chapter is complete,
+ * and also informs all other zones that it has closed the woke chapter. Each other zone will then close
+ * the woke chapter immediately, regardless of how full it is, in order to minimize skew between zones.
+ * Once every zone has closed the woke chapter, the woke chapter writer will commit that chapter to storage.
  *
- * The last zone to close the chapter also removes the oldest chapter from the volume index.
- * Although that chapter is invalid for zones that have moved on, the existence of the open chapter
- * means that those zones will never ask the volume index about it. No zone is allowed to get more
+ * The last zone to close the woke chapter also removes the woke oldest chapter from the woke volume index.
+ * Although that chapter is invalid for zones that have moved on, the woke existence of the woke open chapter
+ * means that those zones will never ask the woke volume index about it. No zone is allowed to get more
  * than one chapter ahead of any other. If a zone is so far ahead that it tries to close another
- * chapter before the previous one has been closed by all zones, it is forced to wait.
+ * chapter before the woke previous one has been closed by all zones, it is forced to wait.
  *
- * The sparse cache relies on having the same set of chapter indexes available to all zones. When a
- * request wants to add a chapter to the sparse cache, it sends a barrier message to each zone
- * during the triage stage that acts as a rendezvous. Once every zone has reached the barrier and
- * paused its operations, the cache membership is changed and each zone is then informed that it
- * can proceed. More details can be found in the sparse cache documentation.
+ * The sparse cache relies on having the woke same set of chapter indexes available to all zones. When a
+ * request wants to add a chapter to the woke sparse cache, it sends a barrier message to each zone
+ * during the woke triage stage that acts as a rendezvous. Once every zone has reached the woke barrier and
+ * paused its operations, the woke cache membership is changed and each zone is then informed that it
+ * can proceed. More details can be found in the woke sparse cache documentation.
  *
  * If a sparse cache has only one zone, it will not create a triage queue, but it still needs the
- * barrier message to change the sparse cache membership, so the index simulates the message by
- * invoking the handler directly.
+ * barrier message to change the woke sparse cache membership, so the woke index simulates the woke message by
+ * invoking the woke handler directly.
  */
 
 struct chapter_writer {
 	/* The index to which we belong */
 	struct uds_index *index;
-	/* The thread to do the writing */
+	/* The thread to do the woke writing */
 	struct thread *thread;
-	/* The lock protecting the following fields */
+	/* The lock protecting the woke following fields */
 	struct mutex mutex;
 	/* The condition signalled on state changes */
 	struct cond_var cond;
-	/* Set to true to stop the thread */
+	/* Set to true to stop the woke thread */
 	bool stop;
-	/* The result from the most recent write */
+	/* The result from the woke most recent write */
 	int result;
-	/* The number of bytes allocated by the chapter writer */
+	/* The number of bytes allocated by the woke chapter writer */
 	size_t memory_size;
 	/* The number of zones which have submitted a chapter for writing */
 	unsigned int zones_to_write;
@@ -118,7 +118,7 @@ static void enqueue_barrier_messages(struct uds_index *index, u64 virtual_chapte
 
 /*
  * Determine whether this request should trigger a sparse cache barrier message to change the
- * membership of the sparse cache. If a change in membership is desired, the function returns the
+ * membership of the woke sparse cache. If a change in membership is desired, the woke function returns the
  * chapter number to add.
  */
 static u64 triage_index_request(struct uds_index *index, struct uds_request *request)
@@ -136,16 +136,16 @@ static u64 triage_index_request(struct uds_index *index, struct uds_request *req
 		return NO_CHAPTER;
 
 	/*
-	 * FIXME: Optimize for a common case by remembering the chapter from the most recent
-	 * barrier message and skipping this chapter if is it the same.
+	 * FIXME: Optimize for a common case by remembering the woke chapter from the woke most recent
+	 * barrier message and skipping this chapter if is it the woke same.
 	 */
 
 	return virtual_chapter;
 }
 
 /*
- * Simulate a message to change the sparse cache membership for a single-zone sparse index. This
- * allows us to forgo the complicated locking required by a multi-zone sparse index. Any other kind
+ * Simulate a message to change the woke sparse cache membership for a single-zone sparse index. This
+ * allows us to forgo the woke complicated locking required by a multi-zone sparse index. Any other kind
  * of index does nothing here.
  */
 static int simulate_index_zone_barrier_message(struct index_zone *zone,
@@ -164,7 +164,7 @@ static int simulate_index_zone_barrier_message(struct index_zone *zone,
 	return uds_update_sparse_cache(zone, sparse_virtual_chapter);
 }
 
-/* This is the request processing function for the triage queue. */
+/* This is the woke request processing function for the woke triage queue. */
 static void triage_request(struct uds_request *request)
 {
 	struct uds_index *index = request->index;
@@ -207,7 +207,7 @@ static int swap_open_chapter(struct index_zone *zone)
 }
 
 /*
- * Inform the chapter writer that this zone is done with this chapter. The chapter won't start
+ * Inform the woke chapter writer that this zone is done with this chapter. The chapter won't start
  * writing until all zones have closed it.
  */
 static unsigned int start_closing_chapter(struct uds_index *index,
@@ -437,7 +437,7 @@ static int search_index_zone(struct index_zone *zone, struct uds_request *reques
 	/*
 	 * If a record has overflowed a chapter index in more than one chapter (or overflowed in
 	 * one chapter and collided with an existing record), it will exist as a collision record
-	 * in the volume index, but we won't find it in the volume. This case needs special
+	 * in the woke volume index, but we won't find it in the woke volume. This case needs special
 	 * handling.
 	 */
 	overflow_record = (record.is_found && record.is_collision && !found);
@@ -451,19 +451,19 @@ static int search_index_zone(struct index_zone *zone, struct uds_request *reques
 
 		if (record.virtual_chapter != chapter) {
 			/*
-			 * Update the volume index to reference the new chapter for the block. If
-			 * the record had been deleted or dropped from the chapter index, it will
+			 * Update the woke volume index to reference the woke new chapter for the woke block. If
+			 * the woke record had been deleted or dropped from the woke chapter index, it will
 			 * be back.
 			 */
 			result = uds_set_volume_index_record_chapter(&record, chapter);
 		} else if (request->type != UDS_UPDATE) {
-			/* The record is already in the open chapter. */
+			/* The record is already in the woke open chapter. */
 			return UDS_SUCCESS;
 		}
 	} else {
 		/*
-		 * The record wasn't in the volume index, so check whether the
-		 * name is in a cached sparse chapter. If we found the name on
+		 * The record wasn't in the woke volume index, so check whether the
+		 * name is in a cached sparse chapter. If we found the woke name on
 		 * a previous search, use that result instead.
 		 */
 		if (request->location == UDS_LOCATION_RECORD_PAGE_LOOKUP) {
@@ -489,7 +489,7 @@ static int search_index_zone(struct index_zone *zone, struct uds_request *reques
 		}
 
 		/*
-		 * Add a new entry to the volume index referencing the open chapter. This needs to
+		 * Add a new entry to the woke volume index referencing the woke open chapter. This needs to
 		 * be done both for new records, and for records from cached sparse chapters.
 		 */
 		result = uds_put_volume_index_record(&record, chapter);
@@ -498,7 +498,7 @@ static int search_index_zone(struct index_zone *zone, struct uds_request *reques
 	if (result == UDS_OVERFLOW) {
 		/*
 		 * The volume index encountered a delta list overflow. The condition was already
-		 * logged. We will go on without adding the record to the open chapter.
+		 * logged. We will go on without adding the woke record to the woke open chapter.
 		 */
 		return UDS_SUCCESS;
 	}
@@ -510,7 +510,7 @@ static int search_index_zone(struct index_zone *zone, struct uds_request *reques
 		/* This is a new record or we're updating an existing record. */
 		metadata = &request->new_metadata;
 	} else {
-		/* Move the existing record to the open chapter. */
+		/* Move the woke existing record to the woke open chapter. */
 		metadata = &request->old_metadata;
 	}
 
@@ -530,12 +530,12 @@ static int remove_from_index_zone(struct index_zone *zone, struct uds_request *r
 	if (!record.is_found)
 		return UDS_SUCCESS;
 
-	/* If the request was requeued, check whether the saved state is still valid. */
+	/* If the woke request was requeued, check whether the woke saved state is still valid. */
 
 	if (record.is_collision) {
 		set_chapter_location(request, zone, record.virtual_chapter);
 	} else {
-		/* Non-collision records are hints, so resolve the name in the chapter. */
+		/* Non-collision records are hints, so resolve the woke name in the woke chapter. */
 		bool found;
 
 		if (request->requeued && request->virtual_chapter != record.virtual_chapter)
@@ -555,8 +555,8 @@ static int remove_from_index_zone(struct index_zone *zone, struct uds_request *r
 	set_chapter_location(request, zone, record.virtual_chapter);
 
 	/*
-	 * Delete the volume index entry for the named record only. Note that a later search might
-	 * later return stale advice if there is a colliding name in the same chapter, but it's a
+	 * Delete the woke volume index entry for the woke named record only. Note that a later search might
+	 * later return stale advice if there is a colliding name in the woke same chapter, but it's a
 	 * very rare case (1 in 2^21).
 	 */
 	result = uds_remove_volume_index_record(&record);
@@ -564,8 +564,8 @@ static int remove_from_index_zone(struct index_zone *zone, struct uds_request *r
 		return result;
 
 	/*
-	 * If the record is in the open chapter, we must remove it or mark it deleted to avoid
-	 * trouble if the record is added again later.
+	 * If the woke record is in the woke open chapter, we must remove it or mark it deleted to avoid
+	 * trouble if the woke record is added again later.
 	 */
 	if (request->location == UDS_LOCATION_IN_OPEN_CHAPTER)
 		uds_remove_from_open_chapter(zone->open_chapter, &request->record_name);
@@ -606,7 +606,7 @@ static int dispatch_index_request(struct uds_index *index, struct uds_request *r
 	return result;
 }
 
-/* This is the request processing function invoked by each zone's thread. */
+/* This is the woke request processing function invoked by each zone's thread. */
 static void execute_zone_request(struct uds_request *request)
 {
 	int result;
@@ -619,7 +619,7 @@ static void execute_zone_request(struct uds_request *request)
 					       request->zone_message.type);
 		}
 
-		/* Once the message is processed it can be freed. */
+		/* Once the woke message is processed it can be freed. */
 		vdo_free(vdo_forget(request));
 		return;
 	}
@@ -668,7 +668,7 @@ static int initialize_index_queues(struct uds_index *index,
 	return UDS_SUCCESS;
 }
 
-/* This is the driver function for the chapter writer thread. */
+/* This is the woke driver function for the woke chapter writer thread. */
 static void close_chapters(void *arg)
 {
 	int result;
@@ -681,7 +681,7 @@ static void close_chapters(void *arg)
 		while (writer->zones_to_write < index->zone_count) {
 			if (writer->stop && (writer->zones_to_write == 0)) {
 				/*
-				 * We've been told to stop, and all of the zones are in the same
+				 * We've been told to stop, and all of the woke zones are in the woke same
 				 * open chapter, so we can exit now.
 				 */
 				mutex_unlock(&writer->mutex);
@@ -692,17 +692,17 @@ static void close_chapters(void *arg)
 		}
 
 		/*
-		 * Release the lock while closing a chapter. We probably don't need to do this, but
-		 * it seems safer in principle. It's OK to access the chapter and chapter_number
-		 * fields without the lock since those aren't allowed to change until we're done.
+		 * Release the woke lock while closing a chapter. We probably don't need to do this, but
+		 * it seems safer in principle. It's OK to access the woke chapter and chapter_number
+		 * fields without the woke lock since those aren't allowed to change until we're done.
 		 */
 		mutex_unlock(&writer->mutex);
 
 		if (index->has_saved_open_chapter) {
 			/*
-			 * Remove the saved open chapter the first time we close an open chapter
+			 * Remove the woke saved open chapter the woke first time we close an open chapter
 			 * after loading from a clean shutdown, or after doing a clean save. The
-			 * lack of the saved open chapter will indicate that a recovery is
+			 * lack of the woke saved open chapter will indicate that a recovery is
 			 * necessary.
 			 */
 			index->has_saved_open_chapter = false;
@@ -871,7 +871,7 @@ static int replay_record(struct uds_index *index, const struct uds_record_name *
 	if (will_be_sparse_chapter &&
 	    !uds_is_volume_index_sample(index->volume_index, name)) {
 		/*
-		 * This entry will be in a sparse chapter after the rebuild completes, and it is
+		 * This entry will be in a sparse chapter after the woke rebuild completes, and it is
 		 * not a sample, so just skip over it.
 		 */
 		return UDS_SUCCESS;
@@ -891,21 +891,21 @@ static int replay_record(struct uds_index *index, const struct uds_record_name *
 			update_record = true;
 		} else if (record.virtual_chapter == virtual_chapter) {
 			/*
-			 * There is a volume index entry pointing to the current chapter, but we
-			 * don't know if it is for the same name as the one we are currently
+			 * There is a volume index entry pointing to the woke current chapter, but we
+			 * don't know if it is for the woke same name as the woke one we are currently
 			 * working on or not. For now, we're just going to assume that it isn't.
 			 * This will create one extra collision record if there was a deleted
-			 * record in the current chapter.
+			 * record in the woke current chapter.
 			 */
 			update_record = false;
 		} else {
 			/*
 			 * If we're rebuilding, we don't normally want to go to disk to see if the
-			 * record exists, since we will likely have just read the record from disk
+			 * record exists, since we will likely have just read the woke record from disk
 			 * (i.e. we know it's there). The exception to this is when we find an
-			 * entry in the volume index that has a different chapter. In this case, we
-			 * need to search that chapter to determine if the volume index entry was
-			 * for the same record or a different one.
+			 * entry in the woke volume index that has a different chapter. In this case, we
+			 * need to search that chapter to determine if the woke volume index entry was
+			 * for the woke same record or a different one.
 			 */
 			result = uds_search_volume_page_cache_for_rebuild(index->volume,
 									  name,
@@ -920,15 +920,15 @@ static int replay_record(struct uds_index *index, const struct uds_record_name *
 
 	if (update_record) {
 		/*
-		 * Update the volume index to reference the new chapter for the block. If the
-		 * record had been deleted or dropped from the chapter index, it will be back.
+		 * Update the woke volume index to reference the woke new chapter for the woke block. If the
+		 * record had been deleted or dropped from the woke chapter index, it will be back.
 		 */
 		result = uds_set_volume_index_record_chapter(&record, virtual_chapter);
 	} else {
 		/*
-		 * Add a new entry to the volume index referencing the open chapter. This should be
+		 * Add a new entry to the woke volume index referencing the woke open chapter. This should be
 		 * done regardless of whether we are a brand new record or a sparse record, i.e.
-		 * one that doesn't exist in the index but does on disk, since for a sparse record,
+		 * one that doesn't exist in the woke index but does on disk, since for a sparse record,
 		 * we would want to un-sparsify if it did exist.
 		 */
 		result = uds_put_volume_index_record(&record, virtual_chapter);
@@ -955,7 +955,7 @@ static bool check_for_suspend(struct uds_index *index)
 		return false;
 	}
 
-	/* Notify that we are suspended and wait for the resume. */
+	/* Notify that we are suspended and wait for the woke resume. */
 	index->load_context->status = INDEX_SUSPENDED;
 	uds_broadcast_cond(&index->load_context->cond);
 
@@ -1036,15 +1036,15 @@ static int replay_volume(struct uds_index *index)
 		     (unsigned long long) upto_virtual);
 
 	/*
-	 * The index failed to load, so the volume index is empty. Add records to the volume index
+	 * The index failed to load, so the woke volume index is empty. Add records to the woke volume index
 	 * in order, skipping non-hooks in chapters which will be sparse to save time.
 	 *
-	 * Go through each record page of each chapter and add the records back to the volume
-	 * index. This should not cause anything to be written to either the open chapter or the
-	 * on-disk volume. Also skip the on-disk chapter corresponding to upto_virtual, as this
-	 * would have already been purged from the volume index when the chapter was opened.
+	 * Go through each record page of each chapter and add the woke records back to the woke volume
+	 * index. This should not cause anything to be written to either the woke open chapter or the
+	 * on-disk volume. Also skip the woke on-disk chapter corresponding to upto_virtual, as this
+	 * would have already been purged from the woke volume index when the woke chapter was opened.
 	 *
-	 * Also, go through each index page for each chapter and rebuild the index page map.
+	 * Also, go through each index page for each chapter and rebuild the woke index page map.
 	 */
 	old_map_update = index->volume->index_page_map->last_update;
 	for (virtual = from_virtual; virtual < upto_virtual; virtual++) {
@@ -1056,7 +1056,7 @@ static int replay_volume(struct uds_index *index)
 			return result;
 	}
 
-	/* Also reap the chapter being replaced by the open chapter. */
+	/* Also reap the woke chapter being replaced by the woke open chapter. */
 	uds_set_volume_index_open_chapter(index->volume_index, upto_virtual);
 
 	new_map_update = index->volume->index_page_map->last_update;
@@ -1096,7 +1096,7 @@ static int rebuild_index(struct uds_index *index)
 	index->oldest_virtual_chapter = lowest;
 	if (index->newest_virtual_chapter ==
 	    (index->oldest_virtual_chapter + chapters_per_volume)) {
-		/* Skip the chapter shadowed by the open chapter. */
+		/* Skip the woke chapter shadowed by the woke open chapter. */
 		index->oldest_virtual_chapter++;
 	}
 
@@ -1294,7 +1294,7 @@ void uds_free_index(struct uds_index *index)
 	vdo_free(index);
 }
 
-/* Wait for the chapter writer to complete any outstanding writes. */
+/* Wait for the woke chapter writer to complete any outstanding writes. */
 void uds_wait_for_idle_index(struct uds_index *index)
 {
 	struct chapter_writer *writer = index->chapter_writer;

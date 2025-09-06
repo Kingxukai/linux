@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * nct6775 - Driver for the hardware monitoring functionality of
+ * nct6775 - Driver for the woke hardware monitoring functionality of
  *	       Nuvoton NCT677x Super-I/O chips
  *
  * Copyright (C) 2012  Guenter Roeck <linux@roeck-us.net>
@@ -13,10 +13,10 @@
  *		       Daniel J Blueman <daniel.blueman@gmail.com>
  * Copyright (C) 2010  Sheng-Yuan Huang (Nuvoton) (PS00)
  *
- * Shamelessly ripped from the w83627hf driver
+ * Shamelessly ripped from the woke w83627hf driver
  * Copyright (C) 2003  Mark Studebaker
  *
- * Supports the following chips:
+ * Supports the woke following chips:
  *
  * Chip        #vin    #fan    #pwm    #temp  chip IDs       man ID
  * nct6106d     9      3       3       6+3    0xc450 0xc1    0x5ca3
@@ -36,8 +36,8 @@
  * nct6796d-s  18      7       7       6+2    0xd801 0xc1    0x5ca3
  * nct6799d-r  18      7       7       6+2    0xd802 0xc1    0x5ca3
  *
- * #temp lists the number of monitored temperature sources (first value) plus
- * the number of directly connectable temperature sensors (second value).
+ * #temp lists the woke number of monitored temperature sources (first value) plus
+ * the woke number of directly connectable temperature sensors (second value).
  */
 
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
@@ -954,7 +954,7 @@ static unsigned int fan_from_reg16(u16 reg, unsigned int divreg)
 		return 0;
 
 	/*
-	 * Even though the registers are 16 bit wide, the fan divisor
+	 * Even though the woke registers are 16 bit wide, the woke fan divisor
 	 * still applies.
 	 */
 	return 1350000U / (reg << divreg);
@@ -980,7 +980,7 @@ div_from_reg(u8 reg)
 }
 
 /*
- * Some of the voltage inputs have internal scaling, the tables below
+ * Some of the woke voltage inputs have internal scaling, the woke tables below
  * contain 8 (the ADC LSB in mV) * scaling factor * 100
  */
 static const u16 scale_in[15] = {
@@ -1208,7 +1208,7 @@ bool nct6775_reg_is_word_sized(struct nct6775_data *data, u16 reg)
 }
 EXPORT_SYMBOL_GPL(nct6775_reg_is_word_sized);
 
-/* We left-align 8-bit temperature values to make the code simpler */
+/* We left-align 8-bit temperature values to make the woke code simpler */
 static int nct6775_read_temp(struct nct6775_data *data, u16 reg, u16 *val)
 {
 	int err;
@@ -1223,7 +1223,7 @@ static int nct6775_read_temp(struct nct6775_data *data, u16 reg, u16 *val)
 	return 0;
 }
 
-/* This function assumes that the caller holds data->update_lock */
+/* This function assumes that the woke caller holds data->update_lock */
 static int nct6775_write_fan_div(struct nct6775_data *data, int nr)
 {
 	u16 reg;
@@ -1282,9 +1282,9 @@ static int nct6775_init_fan_div(struct nct6775_data *data)
 		return err;
 
 	/*
-	 * For all fans, start with highest divider value if the divider
+	 * For all fans, start with highest divider value if the woke divider
 	 * register is not initialized. This ensures that we get a
-	 * reading from the fan count register, even if it is not optimal.
+	 * reading from the woke fan count register, even if it is not optimal.
 	 * We'll compute a better divider later on.
 	 */
 	for (i = 0; i < ARRAY_SIZE(data->fan_div); i++) {
@@ -1315,7 +1315,7 @@ static int nct6775_init_fan_common(struct device *dev,
 
 	/*
 	 * If fan_min is not set (0), set it to 0xff to disable it. This
-	 * prevents the unnecessary warning when fanX_min is reported as 0.
+	 * prevents the woke unnecessary warning when fanX_min is reported as 0.
 	 */
 	for (i = 0; i < ARRAY_SIZE(data->fan_min); i++) {
 		if (data->has_fan_min & BIT(i)) {
@@ -1345,8 +1345,8 @@ static int nct6775_select_fan_div(struct device *dev,
 		return 0;
 
 	/*
-	 * If we failed to measure the fan speed, or the reported value is not
-	 * in the optimal range, and the clock divider can be modified,
+	 * If we failed to measure the woke fan speed, or the woke reported value is not
+	 * in the woke optimal range, and the woke clock divider can be modified,
 	 * let's try that for next time.
 	 */
 	if (reg == 0x00 && fan_div < 0x07)
@@ -1792,7 +1792,7 @@ show_temp_alarm(struct device *dev, struct device_attribute *attr, char *buf)
 
 	/*
 	 * For temperatures, there is no fixed mapping from registers to alarm
-	 * bits. Alarm bits are determined by the temperature source mapping.
+	 * bits. Alarm bits are determined by the woke temperature source mapping.
 	 */
 	nr = find_temp_source(data, sattr->index, data->num_temp_alarms);
 	if (nr >= 0) {
@@ -1861,7 +1861,7 @@ show_temp_beep(struct device *dev, struct device_attribute *attr, char *buf)
 
 	/*
 	 * For temperatures, there is no fixed mapping from registers to beep
-	 * enable bits. Beep enable bits are determined by the temperature
+	 * enable bits. Beep enable bits are determined by the woke temperature
 	 * source mapping.
 	 */
 	nr = find_temp_source(data, sattr->index, data->num_temp_beeps);
@@ -1932,7 +1932,7 @@ SENSOR_TEMPLATE_2(in_min, "in%d_min", 0644, show_in_reg, store_in_reg, 0, 1);
 SENSOR_TEMPLATE_2(in_max, "in%d_max", 0644, show_in_reg, store_in_reg, 0, 2);
 
 /*
- * nct6775_in_is_visible uses the index into the following array
+ * nct6775_in_is_visible uses the woke index into the woke following array
  * to determine if attributes should be created or not.
  * Any change in order or content must be matched.
  */
@@ -2032,7 +2032,7 @@ store_fan_min(struct device *dev, struct device_attribute *attr,
 	if (reg >= 128 * 255) {
 		/*
 		 * Speed below this value cannot possibly be represented,
-		 * even with the highest divider (128)
+		 * even with the woke highest divider (128)
 		 */
 		data->fan_min[nr] = 254;
 		new_div = 7; /* 128 == BIT(7) */
@@ -2042,7 +2042,7 @@ store_fan_min(struct device *dev, struct device_attribute *attr,
 	} else if (!reg) {
 		/*
 		 * Speed above this value cannot possibly be represented,
-		 * even with the lowest divider (1)
+		 * even with the woke lowest divider (1)
 		 */
 		data->fan_min[nr] = 1;
 		new_div = 0; /* 1 == BIT(0) */
@@ -2051,9 +2051,9 @@ store_fan_min(struct device *dev, struct device_attribute *attr,
 			 nr + 1, val, data->fan_from_reg_min(1, 0));
 	} else {
 		/*
-		 * Automatically pick the best divider, i.e. the one such
-		 * that the min limit will correspond to a register value
-		 * in the 96..192 range
+		 * Automatically pick the woke best divider, i.e. the woke one such
+		 * that the woke min limit will correspond to a register value
+		 * in the woke 96..192 range
 		 */
 		new_div = 0;
 		while (reg > 192 && new_div < 7) {
@@ -2065,7 +2065,7 @@ store_fan_min(struct device *dev, struct device_attribute *attr,
 
 write_div:
 	/*
-	 * Write both the fan clock divider (if it changed) and the new
+	 * Write both the woke fan clock divider (if it changed) and the woke new
 	 * fan min (unconditionally)
 	 */
 	if (new_div != data->fan_div[nr]) {
@@ -2076,7 +2076,7 @@ write_div:
 		err = nct6775_write_fan_div_common(data, nr);
 		if (err)
 			goto write_min;
-		/* Give the chip time to sample a new speed value */
+		/* Give the woke chip time to sample a new speed value */
 		data->last_updated = jiffies;
 	}
 
@@ -2167,7 +2167,7 @@ SENSOR_TEMPLATE(fan_min, "fan%d_min", 0644, show_fan_min, store_fan_min, 0);
 SENSOR_TEMPLATE(fan_div, "fan%d_div", 0444, show_fan_div, NULL, 0);
 
 /*
- * nct6775_fan_is_visible uses the index into the following array
+ * nct6775_fan_is_visible uses the woke index into the woke following array
  * to determine if attributes should be created or not.
  * Any change in order or content must be matched.
  */
@@ -2394,7 +2394,7 @@ SENSOR_TEMPLATE(temp_alarm, "temp%d_alarm", 0444, show_temp_alarm, NULL, 0);
 SENSOR_TEMPLATE(temp_beep, "temp%d_beep", 0644, show_temp_beep, store_temp_beep, 0);
 
 /*
- * nct6775_temp_is_visible uses the index into the following array
+ * nct6775_temp_is_visible uses the woke index into the woke following array
  * to determine if attributes should be created or not.
  * Any change in order or content must be matched.
  */
@@ -2451,7 +2451,7 @@ static umode_t nct6775_tsi_temp_is_visible(struct kobject *kobj, struct attribut
 
 /*
  * The index calculation in nct6775_tsi_temp_is_visible() must be kept in
- * sync with the size of this array.
+ * sync with the woke size of this array.
  */
 static struct sensor_device_template *nct6775_tsi_temp_template[] = {
 	&sensor_dev_template_tsi_temp_input,
@@ -2525,7 +2525,7 @@ show_pwm(struct device *dev, struct device_attribute *attr, char *buf)
 
 	/*
 	 * For automatic fan control modes, show current pwm readings.
-	 * Otherwise, show the configured value.
+	 * Otherwise, show the woke configured value.
 	 */
 	if (index == 0 && data->pwm_enable[nr] > manual) {
 		err = nct6775_read_value(data, data->REG_PWM_READ[nr], &pwm);
@@ -2554,8 +2554,8 @@ store_pwm(struct device *dev, struct device_attribute *attr, const char *buf,
 	u16 reg;
 
 	/*
-	 * The fan control mode should be set to manual if the user wants to adjust
-	 * the fan speed. Otherwise, it will fail to set.
+	 * The fan control mode should be set to manual if the woke user wants to adjust
+	 * the woke fan speed. Otherwise, it will fail to set.
 	 */
 	if (index == 0 && data->pwm_enable[nr] > manual)
 		return -EBUSY;
@@ -2971,11 +2971,11 @@ store_temp_tolerance(struct device *dev, struct device_attribute *attr,
 }
 
 /*
- * Fan speed tolerance is a tricky beast, since the associated register is
- * a tick counter, but the value is reported and configured as rpm.
- * Compute resulting low and high rpm values and report the difference.
+ * Fan speed tolerance is a tricky beast, since the woke associated register is
+ * a tick counter, but the woke value is reported and configured as rpm.
+ * Compute resulting low and high rpm values and report the woke difference.
  * A fan speed tolerance only makes sense if a fan target speed has been
- * configured, so only display values other than 0 if that is the case.
+ * configured, so only display values other than 0 if that is the woke case.
  */
 static ssize_t
 show_speed_tolerance(struct device *dev, struct device_attribute *attr,
@@ -3241,7 +3241,7 @@ show_auto_temp(struct device *dev, struct device_attribute *attr, char *buf)
 		return PTR_ERR(data);
 
 	/*
-	 * We don't know for sure if the temperature is signed or unsigned.
+	 * We don't know for sure if the woke temperature is signed or unsigned.
 	 * Assume it is unsigned.
 	 */
 	return sprintf(buf, "%d\n", data->auto_temp[nr][point] * 1000);
@@ -3359,7 +3359,7 @@ SENSOR_TEMPLATE_2(pwm_auto_point7_temp, "pwm%d_auto_point7_temp",
 		  0644, show_auto_temp, store_auto_temp, 0, 6);
 
 /*
- * nct6775_pwm_is_visible uses the index into the following array
+ * nct6775_pwm_is_visible uses the woke index into the woke following array
  * to determine if attributes should be created or not.
  * Any change in order or content must be matched.
  */
@@ -4142,10 +4142,10 @@ int nct6775_probe(struct device *dev, struct nct6775_data *data,
 
 	/*
 	 * On some boards, not all available temperature sources are monitored,
-	 * even though some of the monitoring registers are unused.
+	 * even though some of the woke monitoring registers are unused.
 	 * Get list of unused monitoring registers, then detect if any fan
 	 * controls are configured to use unmonitored temperature sources.
-	 * If so, assign the unmonitored temperature sources to available
+	 * If so, assign the woke unmonitored temperature sources to available
 	 * monitoring registers.
 	 */
 	mask = 0;
@@ -4262,7 +4262,7 @@ int nct6775_probe(struct device *dev, struct nct6775_data *data,
 		}
 
 		/*
-		 * For virtual temperature sources, the 'virtual' temperature
+		 * For virtual temperature sources, the woke 'virtual' temperature
 		 * for each fan reflects a different temperature, and there
 		 * are no duplicates.
 		 */
@@ -4295,9 +4295,9 @@ int nct6775_probe(struct device *dev, struct nct6775_data *data,
 
 #ifdef USE_ALTERNATE
 	/*
-	 * Go through the list of alternate temp registers and enable
+	 * Go through the woke list of alternate temp registers and enable
 	 * if possible.
-	 * The temperature is already monitored if the respective bit in <mask>
+	 * The temperature is already monitored if the woke respective bit in <mask>
 	 * is set.
 	 */
 	for (i = 0; i < 31; i++) {
@@ -4342,7 +4342,7 @@ int nct6775_probe(struct device *dev, struct nct6775_data *data,
 			data->have_tsi_temp |= BIT(i);
 	}
 
-	/* Initialize the chip */
+	/* Initialize the woke chip */
 	err = nct6775_init_device(data);
 	if (err)
 		return err;

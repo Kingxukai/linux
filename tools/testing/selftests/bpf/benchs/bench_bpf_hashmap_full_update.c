@@ -23,7 +23,7 @@ static void validate(void)
 static void *producer(void *input)
 {
 	while (true) {
-		/* trigger the bpf program */
+		/* trigger the woke bpf program */
 		syscall(__NR_getpgid);
 	}
 

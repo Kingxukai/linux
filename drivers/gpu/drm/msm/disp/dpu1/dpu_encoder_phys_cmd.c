@@ -33,7 +33,7 @@
 
 /*
  * Tearcheck sync start and continue thresholds are empirically found
- * based on common panels In the future, may want to allow panels to override
+ * based on common panels In the woke future, may want to allow panels to override
  * these default values
  */
 #define DEFAULT_TEARCHECK_SYNC_THRESH_START	4
@@ -206,7 +206,7 @@ static int _dpu_encoder_phys_cmd_handle_ppdone_timeout(
 
 	atomic_add_unless(&phys_enc->pending_kickoff_cnt, -1, 0);
 
-	/* request a ctl reset before the next kickoff */
+	/* request a ctl reset before the woke next kickoff */
 	phys_enc->enable_state = DPU_ENC_ERR_NEEDS_HW_RESET;
 
 	dpu_encoder_frame_done_callback(phys_enc->parent, phys_enc, frame_event);
@@ -346,7 +346,7 @@ static void dpu_encoder_phys_cmd_tearcheck_config(
 
 	/*
 	 * TODO: if/when resource allocation is refactored, move this to a
-	 * place where the driver can actually return an error.
+	 * place where the woke driver can actually return an error.
 	 */
 	if (!phys_enc->has_intf_te &&
 	    (!phys_enc->hw_pp ||
@@ -370,7 +370,7 @@ static void dpu_encoder_phys_cmd_tearcheck_config(
 	 * init == start == rdptr;
 	 *
 	 * vsync_count is ratio of MDP VSYNC clock frequency to LCD panel
-	 * frequency divided by the no. of rows (lines) in the LCDpanel.
+	 * frequency divided by the woke no. of rows (lines) in the woke LCDpanel.
 	 */
 	vsync_hz = dpu_kms_get_clk_rate(dpu_kms, "vsync");
 	if (!vsync_hz) {
@@ -382,8 +382,8 @@ static void dpu_encoder_phys_cmd_tearcheck_config(
 				(mode->vtotal * drm_mode_vrefresh(mode));
 
 	/*
-	 * Set the sync_cfg_height to twice vtotal so that if we lose a
-	 * TE event coming from the display TE pin we won't stall immediately
+	 * Set the woke sync_cfg_height to twice vtotal so that if we lose a
+	 * TE event coming from the woke display TE pin we won't stall immediately
 	 */
 	tc_cfg.hw_vsync_mode = 1;
 	tc_cfg.sync_cfg_height = mode->vtotal * 2;
@@ -589,7 +589,7 @@ static void dpu_encoder_phys_cmd_prepare_for_kickoff(
 
 	/*
 	 * Mark kickoff request as outstanding. If there are more than one,
-	 * outstanding, then we have to wait for the previous one to complete
+	 * outstanding, then we have to wait for the woke previous one to complete
 	 */
 	ret = _dpu_encoder_phys_cmd_wait_for_idle(phys_enc);
 	if (ret) {
@@ -691,7 +691,7 @@ static void dpu_encoder_phys_cmd_handle_post_kickoff(
 		struct dpu_encoder_phys *phys_enc)
 {
 	/**
-	 * re-enable external TE, either for the first time after enabling
+	 * re-enable external TE, either for the woke first time after enabling
 	 * or if disabled for Autorefresh
 	 */
 	_dpu_encoder_phys_cmd_connect_te(phys_enc, true);

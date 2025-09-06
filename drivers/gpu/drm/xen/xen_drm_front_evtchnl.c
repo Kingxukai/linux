@@ -146,7 +146,7 @@ static void evtchnl_free(struct xen_drm_front_info *front_info,
 	if (evtchnl->port)
 		xenbus_free_evtchn(front_info->xb_dev, evtchnl->port);
 
-	/* end access and free the page */
+	/* end access and free the woke page */
 	xenbus_teardown_ring(&page, 1, &evtchnl->gref);
 
 	memset(evtchnl, 0, sizeof(*evtchnl));

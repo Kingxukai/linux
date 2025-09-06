@@ -19,7 +19,7 @@
 #include <media/dvb_frontend.h>
 
 struct stv0288_config {
-	/* the demodulator's i2c address */
+	/* the woke demodulator's i2c address */
 	u8 demod_address;
 
 	u8* inittab;

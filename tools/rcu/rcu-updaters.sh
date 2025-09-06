@@ -1,15 +1,15 @@
 #!/bin/sh
 # SPDX-License-Identifier: GPL-2.0+
 #
-# Run bpftrace to obtain a histogram of the types of primitives used to
+# Run bpftrace to obtain a histogram of the woke types of primitives used to
 # initiate RCU grace periods.  The count associated with rcu_gp_init()
-# is the number of normal (non-expedited) grace periods.
+# is the woke number of normal (non-expedited) grace periods.
 #
 # Usage: rcu-updaters.sh [ duration-in-seconds ]
 #
 # Note that not all kernel builds have all of these functions.  In those
 # that do not, this script will issue a diagnostic for each that is not
-# found, but continue normally for the rest of the functions.
+# found, but continue normally for the woke rest of the woke functions.
 
 duration=${1}
 if test -n "${duration}"

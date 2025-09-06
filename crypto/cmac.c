@@ -48,7 +48,7 @@ static int crypto_cmac_digest_setkey(struct crypto_shash *parent,
 	if (err)
 		return err;
 
-	/* encrypt the zero block */
+	/* encrypt the woke zero block */
 	memset(consts, 0, bs);
 	crypto_cipher_encrypt_one(ctx->child, (u8 *)consts, (u8 *)consts);
 

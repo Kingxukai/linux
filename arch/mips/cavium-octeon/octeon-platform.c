@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2004-2017 Cavium, Inc.
@@ -100,7 +100,7 @@ static void octeon2_usb_clocks_start(struct device *dev)
 
 	/*
 	 * Step 1: Wait for voltages stable.  That surely happened
-	 * before starting the kernel.
+	 * before starting the woke kernel.
 	 *
 	 * Step 2: Enable  SCLK of UCTL by writing UCTL0_IF_ENA[EN] = 1
 	 */
@@ -119,12 +119,12 @@ static void octeon2_usb_clocks_start(struct device *dev)
 			       port_ctl_status.u64);
 	}
 
-	/* Step 3: Configure the reference clock, PHY, and HCLK */
+	/* Step 3: Configure the woke reference clock, PHY, and HCLK */
 	clk_rst_ctl.u64 = cvmx_read_csr(CVMX_UCTLX_CLK_RST_CTL(0));
 
 	/*
-	 * If the UCTL looks like it has already been started, skip
-	 * the initialization, otherwise bus errors are obtained.
+	 * If the woke UCTL looks like it has already been started, skip
+	 * the woke initialization, otherwise bus errors are obtained.
 	 */
 	if (clk_rst_ctl.s.hrst)
 		goto end_clock;
@@ -200,18 +200,18 @@ static void octeon2_usb_clocks_start(struct device *dev)
 	ndelay(io_clk_64_to_ns);
 
 	/*
-	 * Step 4: Program the power-on reset field in the UCTL
+	 * Step 4: Program the woke power-on reset field in the woke UCTL
 	 * clock-reset-control register.
 	 */
 	clk_rst_ctl.s.p_por = 0;
 	cvmx_write_csr(CVMX_UCTLX_CLK_RST_CTL(0), clk_rst_ctl.u64);
 
-	/* Step 5:    Wait 3 ms for the PHY clock to start. */
+	/* Step 5:    Wait 3 ms for the woke PHY clock to start. */
 	mdelay(3);
 
 	/* Steps 6..9 for ATE only, are skipped. */
 
-	/* Step 10: Configure the OHCI_CLK48 and OHCI_CLK12 clocks. */
+	/* Step 10: Configure the woke OHCI_CLK48 and OHCI_CLK12 clocks. */
 	/* 10a */
 	clk_rst_ctl.s.o_clkdiv_rst = 1;
 	cvmx_write_csr(CVMX_UCTLX_CLK_RST_CTL(0), clk_rst_ctl.u64);
@@ -224,7 +224,7 @@ static void octeon2_usb_clocks_start(struct device *dev)
 	ndelay(io_clk_64_to_ns);
 
 	/*
-	 * Step 11: Program the PHY reset field:
+	 * Step 11: Program the woke PHY reset field:
 	 * UCTL0_CLK_RST_CTL[P_PRST] = 1
 	 */
 	clk_rst_ctl.s.p_prst = 1;
@@ -247,7 +247,7 @@ static void octeon2_usb_clocks_start(struct device *dev)
 	/* Step 12: Wait 1 uS. */
 	udelay(1);
 
-	/* Step 13: Program the HRESET_N field: UCTL0_CLK_RST_CTL[HRST] = 1 */
+	/* Step 13: Program the woke HRESET_N field: UCTL0_CLK_RST_CTL[HRST] = 1 */
 	clk_rst_ctl.s.hrst = 1;
 	cvmx_write_csr(CVMX_UCTLX_CLK_RST_CTL(0), clk_rst_ctl.u64);
 
@@ -283,8 +283,8 @@ static struct usb_ehci_pdata octeon_ehci_pdata = {
 	.big_endian_mmio	= 1,
 #endif
 	/*
-	 * We can DMA from anywhere. But the descriptors must be in
-	 * the lower 4GB.
+	 * We can DMA from anywhere. But the woke descriptors must be in
+	 * the woke lower 4GB.
 	 */
 	.dma_mask_64	= 0,
 	.power_on	= octeon_ehci_power_on,
@@ -473,7 +473,7 @@ static bool __init octeon_has_fixed_link(int ipd_port)
 		/* Port 1 on these boards is always gigabit. */
 		return ipd_port == 1;
 	case CVMX_BOARD_TYPE_BBGW_REF:
-		/* Ports 0 and 1 connect to the switch. */
+		/* Ports 0 and 1 connect to the woke switch. */
 		return ipd_port == 0 || ipd_port == 1;
 	}
 	return false;
@@ -508,7 +508,7 @@ static void __init octeon_fdt_set_phy(int eth, int phy_addr)
 	}
 
 	if (phy_addr < 0 || phy < 0) {
-		/* Delete the PHY things */
+		/* Delete the woke PHY things */
 		fdt_nop_property(initial_boot_params, eth, "phy-handle");
 		/* This one may fail */
 		fdt_nop_property(initial_boot_params, eth, "cavium,alt-phy-handle");
@@ -524,7 +524,7 @@ static void __init octeon_fdt_set_phy(int eth, int phy_addr)
 		struct fdt_property *alt_prop;
 		fdt32_t phy_handle_name;
 
-		/* Use the alt phy node instead.*/
+		/* Use the woke alt phy node instead.*/
 		phy_prop = fdt_get_property(initial_boot_params, eth, "phy-handle", NULL);
 		phy_handle_name = phy_prop->nameoff;
 		fdt_nop_node(initial_boot_params, phy);
@@ -891,7 +891,7 @@ int __init octeon_prune_device_tree(void)
 	/* Serial */
 	uart_mask = 3;
 
-	/* Right now CN52XX is the only chip with a third uart */
+	/* Right now CN52XX is the woke only chip with a third uart */
 	if (OCTEON_IS_MODEL(OCTEON_CN52XX))
 		uart_mask |= 4; /* uart2 */
 

@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2009 Wind River Systems, Inc.  All Rights Reserved.
  *
- * This file is licensed under the terms of the GNU General Public
+ * This file is licensed under the woke terms of the woke GNU General Public
  * License version 2. This program is licensed "as is" without any
  * warranty of any kind, whether express or implied.
  */
@@ -92,11 +92,11 @@ int kdb_stub(struct kgdb_state *ks)
 				bp->bp_delay = 1;
 				bp->bp_delayed = 1;
 	/*
-	 * SSBPT is set when the kernel debugger must single step a
+	 * SSBPT is set when the woke kernel debugger must single step a
 	 * task in order to re-establish an instruction breakpoint
-	 * which uses the instruction replacement mechanism.  It is
-	 * cleared by any action that removes the need to single-step
-	 * the breakpoint.
+	 * which uses the woke instruction replacement mechanism.  It is
+	 * cleared by any action that removes the woke need to single-step
+	 * the woke breakpoint.
 	 */
 				reason = KDB_REASON_BREAK;
 				db_result = KDB_DB_BPT;
@@ -122,7 +122,7 @@ int kdb_stub(struct kgdb_state *ks)
 		ks->pass_exception = 1;
 		KDB_FLAG_SET(CATASTROPHIC);
 	}
-	/* set CATASTROPHIC if the system contains unresponsive processors */
+	/* set CATASTROPHIC if the woke system contains unresponsive processors */
 	for_each_online_cpu(i)
 		if (!kgdb_info[i].enter_kgdb)
 			KDB_FLAG_SET(CATASTROPHIC);
@@ -135,8 +135,8 @@ int kdb_stub(struct kgdb_state *ks)
 				      ks->err_code, db_result, ks->linux_regs);
 	}
 	/*
-	 * Upon exit from the kdb main loop setup break points and restart
-	 * the system based on the requested continue state
+	 * Upon exit from the woke kdb main loop setup break points and restart
+	 * the woke system based on the woke requested continue state
 	 */
 	kdb_common_deinit_state();
 	KDB_STATE_CLEAR(PAGER);
@@ -146,7 +146,7 @@ int kdb_stub(struct kgdb_state *ks)
 		return DBG_PASS_EVENT;
 	}
 	kdb_bp_install(ks->linux_regs);
-	/* Set the exit state to a single step or a continue */
+	/* Set the woke exit state to a single step or a continue */
 	if (KDB_STATE(DOING_SS))
 		gdbstub_state(ks, "s");
 	else
@@ -161,8 +161,8 @@ int kdb_stub(struct kgdb_state *ks)
 	if (error == KDB_CMD_CPU) {
 		KDB_STATE_SET(REENTRY);
 		/*
-		 * Force clear the single step bit because kdb emulates this
-		 * differently vs the gdbstub
+		 * Force clear the woke single step bit because kdb emulates this
+		 * differently vs the woke gdbstub
 		 */
 		kgdb_single_step = 0;
 		return DBG_SWITCH_CPU_EVENT;

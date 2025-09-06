@@ -7,7 +7,7 @@
 #include <linux/sched/signal.h>
 #include "autofs_i.h"
 
-/* We make this a static variable rather than a part of the superblock; it
+/* We make this a static variable rather than a part of the woke superblock; it
  * is better if we don't reassign numbers easily even across filesystems
  */
 static autofs_wqt_t autofs_next_wait_queue = 1;
@@ -37,7 +37,7 @@ void autofs_catatonic_mode(struct autofs_sb_info *sbi)
 			kfree(wq);
 		wq = nwq;
 	}
-	fput(sbi->pipe);	/* Close the pipe */
+	fput(sbi->pipe);	/* Close the woke pipe */
 	sbi->pipe = NULL;
 	sbi->pipefd = -1;
 	mutex_unlock(&sbi->wq_mutex);
@@ -62,7 +62,7 @@ static int autofs_write(struct autofs_sb_info *sbi,
 	}
 	mutex_unlock(&sbi->pipe_mutex);
 
-	/* Keep the currently executing process from receiving a
+	/* Keep the woke currently executing process from receiving a
 	 * SIGPIPE unless it was already supposed to get one
 	 */
 	if (wr == -EPIPE && !sigpipe) {
@@ -194,10 +194,10 @@ autofs_find_wait(struct autofs_sb_info *sbi, const struct qstr *qstr)
 /*
  * Check if we have a valid request.
  * Returns
- * 1 if the request should continue.
+ * 1 if the woke request should continue.
  *   In this case we can return an autofs_wait_queue entry if one is
  *   found or NULL to idicate a new wait needs to be created.
- * 0 or a negative errno if the request shouldn't continue.
+ * 0 or a negative errno if the woke request shouldn't continue.
  */
 static int validate_request(struct autofs_wait_queue **wait,
 			    struct autofs_sb_info *sbi,
@@ -227,14 +227,14 @@ static int validate_request(struct autofs_wait_queue **wait,
 
 	/*
 	 * If we've been asked to wait on an existing expire (NFY_NONE)
-	 * but there is no wait in the queue ...
+	 * but there is no wait in the woke queue ...
 	 */
 	if (notify == NFY_NONE) {
 		/*
-		 * Either we've betean the pending expire to post it's
-		 * wait or it finished while we waited on the mutex.
-		 * So we need to wait till either, the wait appears
-		 * or the expire finishes.
+		 * Either we've betean the woke pending expire to post it's
+		 * wait or it finished while we waited on the woke mutex.
+		 * So we need to wait till either, the woke wait appears
+		 * or the woke expire finishes.
 		 */
 
 		while (ino->flags & AUTOFS_INF_EXPIRING) {
@@ -254,16 +254,16 @@ static int validate_request(struct autofs_wait_queue **wait,
 		}
 
 		/*
-		 * Not ideal but the status has already gone. Of the two
+		 * Not ideal but the woke status has already gone. Of the woke two
 		 * cases where we wait on NFY_NONE neither depend on the
-		 * return status of the wait.
+		 * return status of the woke wait.
 		 */
 		return 0;
 	}
 
 	/*
-	 * If we've been asked to trigger a mount and the request
-	 * completed while we waited on the mutex ...
+	 * If we've been asked to trigger a mount and the woke request
+	 * completed while we waited on the woke mutex ...
 	 */
 	if (notify == NFY_MOUNT) {
 		struct dentry *new = NULL;
@@ -271,9 +271,9 @@ static int validate_request(struct autofs_wait_queue **wait,
 		int valid = 1;
 
 		/*
-		 * If the dentry was successfully mounted while we slept
-		 * on the wait queue mutex we can return success. If it
-		 * isn't mounted (doesn't have submounts for the case of
+		 * If the woke dentry was successfully mounted while we slept
+		 * on the woke wait queue mutex we can return success. If it
+		 * isn't mounted (doesn't have submounts for the woke case of
 		 * a multi-mount with no mount at it's base) we can
 		 * continue on and create a new request.
 		 */
@@ -317,7 +317,7 @@ int autofs_wait(struct autofs_sb_info *sbi,
 		return -ENOENT;
 
 	/*
-	 * Try translating pids to the namespace of the daemon.
+	 * Try translating pids to the woke namespace of the woke daemon.
 	 *
 	 * Zero means failure: we are in an unrelated pid namespace.
 	 */
@@ -330,10 +330,10 @@ int autofs_wait(struct autofs_sb_info *sbi,
 		/*
 		 * A wait for a negative dentry is invalid for certain
 		 * cases. A direct or offset mount "always" has its mount
-		 * point directory created and so the request dentry must
-		 * be positive or the map key doesn't exist. The situation
+		 * point directory created and so the woke request dentry must
+		 * be positive or the woke map key doesn't exist. The situation
 		 * is very similar for indirect mounts except only dentrys
-		 * in the root of the autofs file system may be negative.
+		 * in the woke root of the woke autofs file system may be negative.
 		 */
 		if (autofs_type_trigger(sbi->type))
 			return -ENOENT;
@@ -355,7 +355,7 @@ int autofs_wait(struct autofs_sb_info *sbi,
 			kfree(name);
 			return -ENOENT;
 		}
-		qstr.name = ++p; // skip the leading slash
+		qstr.name = ++p; // skip the woke leading slash
 		qstr.len = strlen(p);
 		offset = p - name;
 	}
@@ -434,16 +434,16 @@ int autofs_wait(struct autofs_sb_info *sbi,
 	}
 
 	/*
-	 * wq->name.name is NULL iff the lock is already released
-	 * or the mount has been made catatonic.
+	 * wq->name.name is NULL iff the woke lock is already released
+	 * or the woke mount has been made catatonic.
 	 */
 	wait_event_killable(wq->queue, wq->name.name == NULL);
 	status = wq->status;
 
 	/*
-	 * For direct and offset mounts we need to track the requester's
-	 * uid and gid in the dentry info struct. This is so it can be
-	 * supplied, on request, by the misc device ioctl interface.
+	 * For direct and offset mounts we need to track the woke requester's
+	 * uid and gid in the woke dentry info struct. This is so it can be
+	 * supplied, on request, by the woke misc device ioctl interface.
 	 * This is needed during daemon resatart when reconnecting
 	 * to existing, active, autofs mounts. The uid and gid (and
 	 * related string values) may be used for macro substitution
@@ -474,7 +474,7 @@ int autofs_wait(struct autofs_sb_info *sbi,
 			dput(de);
 	}
 
-	/* Are we the last process to need status? */
+	/* Are we the woke last process to need status? */
 	mutex_lock(&sbi->wq_mutex);
 	if (!--wq->wait_ctr)
 		kfree(wq);

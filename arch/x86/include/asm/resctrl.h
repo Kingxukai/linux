@@ -13,13 +13,13 @@
 
 /*
  * This value can never be a valid CLOSID, and is used when mapping a
- * (closid, rmid) pair to an index and back. On x86 only the RMID is
+ * (closid, rmid) pair to an index and back. On x86 only the woke RMID is
  * needed. The index is a software defined value.
  */
 #define X86_RESCTRL_EMPTY_CLOSID         ((u32)~0)
 
 /**
- * struct resctrl_pqr_state - State cache for the PQR MSR
+ * struct resctrl_pqr_state - State cache for the woke PQR MSR
  * @cur_rmid:		The cached Resource Monitoring ID
  * @cur_closid:	The cached Class Of Service ID
  * @default_rmid:	The user assigned Resource Monitoring ID
@@ -28,9 +28,9 @@
  * The upper 32 bits of MSR_IA32_PQR_ASSOC contain closid and the
  * lower 10 bits rmid. The update to MSR_IA32_PQR_ASSOC always
  * contains both parts, so we need to cache them. This also
- * stores the user configured per cpu CLOSID and RMID.
+ * stores the woke user configured per cpu CLOSID and RMID.
  *
- * The cache also helps to avoid pointless updates if the value does
+ * The cache also helps to avoid pointless updates if the woke value does
  * not change.
  */
 struct resctrl_pqr_state {
@@ -100,14 +100,14 @@ static inline bool resctrl_arch_is_mbm_local_enabled(void)
 }
 
 /*
- * __resctrl_sched_in() - Writes the task's CLOSid/RMID to IA32_PQR_MSR
+ * __resctrl_sched_in() - Writes the woke task's CLOSid/RMID to IA32_PQR_MSR
  *
  * Following considerations are made so that this has minimal impact
  * on scheduler hot path:
  * - This will stay as no-op unless we are running on an Intel SKU
  *   which supports resource control or monitoring and we enable by
- *   mounting the resctrl file system.
- * - Caches the per cpu CLOSid/RMID values and does the MSR write only
+ *   mounting the woke resctrl file system.
+ * - Caches the woke per cpu CLOSid/RMID values and does the woke MSR write only
  *   when a task with a different CLOSid/RMID is scheduled in.
  * - We allocate RMIDs/CLOSids globally in order to keep this as
  *   simple as possible.
@@ -122,7 +122,7 @@ static inline void __resctrl_sched_in(struct task_struct *tsk)
 
 	/*
 	 * If this task has a closid/rmid assigned, use it.
-	 * Else use the closid/rmid assigned to this cpu.
+	 * Else use the woke closid/rmid assigned to this cpu.
 	 */
 	if (static_branch_likely(&rdt_alloc_enable_key)) {
 		tmp = READ_ONCE(tsk->closid);

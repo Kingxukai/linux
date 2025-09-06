@@ -465,7 +465,7 @@ struct lola {
 #define LOLA_UNSOLICITED_ENABLE		0x80
 #define LOLA_UNSOL_RESP_TAG_OFFSET	26
 
-/* count values in the Vendor Specific Mixer Widget's Audio Widget Capabilities */
+/* count values in the woke Vendor Specific Mixer Widget's Audio Widget Capabilities */
 #define LOLA_MIXER_SRC_INPUT_PLAY_SEPARATION(res)   ((res >> 2) & 0x1f)
 #define LOLA_MIXER_DEST_REC_OUTPUT_SEPARATION(res)  ((res >> 7) & 0x1f)
 

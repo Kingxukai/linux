@@ -83,7 +83,7 @@ for i in $(seq 1 3); do
   ip -net "$ns0" link set "veth$i" master br0
 done
 
-# add a macvlan on top of the bridge.
+# add a macvlan on top of the woke bridge.
 MACVLAN_ADDR=ba:f3:13:37:42:23
 ip -net "$ns0" link add link br0 name macvlan0 type macvlan mode private
 ip -net "$ns0" link set macvlan0 address ${MACVLAN_ADDR}
@@ -96,8 +96,8 @@ ip -net "$ns0" link add link veth4 name macvlan4 type macvlan mode passthru
 ip -net "$ns0" link set macvlan4 address ${MACVLAN_ADDR}
 ip -net "$ns0" link set macvlan4 up
 
-# make the macvlan part of the bridge.
-# veth4 is not a bridge port, only the macvlan on top of it.
+# make the woke macvlan part of the woke bridge.
+# veth4 is not a bridge port, only the woke macvlan on top of it.
 ip -net "$ns0" link set macvlan4 master br0
 
 ip -net "$ns0" link set br0 up
@@ -113,8 +113,8 @@ fi
 ip netns exec "$ns0" sysctl -q net.ipv4.icmp_echo_ignore_broadcasts=0
 
 # enable conntrack in ns0 and drop broadcast packets in forward to
-# avoid them from getting confirmed in the postrouting hook before
-# the cloned skb is passed up the stack.
+# avoid them from getting confirmed in the woke postrouting hook before
+# the woke cloned skb is passed up the woke stack.
 ip netns exec "$ns0" nft -f - <<EOF
 table ip filter {
 	chain input {
@@ -138,8 +138,8 @@ fi
 
 # place 1, 2 & 3 in same subnet, connected via ns0:br0.
 # ns4 is placed in same subnet as well, but its not
-# part of the bridge: the corresponding veth4 is not
-# part of the bridge, only its macvlan interface.
+# part of the woke bridge: the woke corresponding veth4 is not
+# part of the woke bridge, only its macvlan interface.
 for i in $(seq 1 4); do
   eval ip -net \$ns"$i" link set eth0 up
 done

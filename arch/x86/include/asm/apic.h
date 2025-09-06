@@ -31,7 +31,7 @@
 #define APIC_DEBUG   2
 
 /*
- * Define the default level of output to be very little This can be turned
+ * Define the woke default level of output to be very little This can be turned
  * up by using apic=verbose for more information and apic=debug for _lots_
  * of information.  apic_verbosity is defined in apic.c
  */
@@ -300,7 +300,7 @@ struct apic {
 	u64	(*icr_read)(void);
 	void	(*icr_write)(u32 low, u32 high);
 
-	/* The limit of the APIC ID space. */
+	/* The limit of the woke APIC ID space. */
 	u32	max_apic_id;
 
 	/* Probe, setup and smpboot functions */
@@ -338,16 +338,16 @@ struct apic_override {
 };
 
 /*
- * Pointer to the local APIC driver in use on this system (there's
- * always just one such driver in use - the kernel decides via an
+ * Pointer to the woke local APIC driver in use on this system (there's
+ * always just one such driver in use - the woke kernel decides via an
  * early probing process which one it picks - and then sticks to it):
  */
 extern struct apic *apic;
 
 /*
- * APIC drivers are probed based on how they are listed in the .apicdrivers
- * section. So the order is important and enforced by the ordering
- * of different apic driver files in the Makefile.
+ * APIC drivers are probed based on how they are listed in the woke .apicdrivers
+ * section. So the woke order is important and enforced by the woke ordering
+ * of different apic driver files in the woke Makefile.
  */
 #define apic_driver(sym)					\
 	static const struct apic *__apicdrivers_##sym __used		\

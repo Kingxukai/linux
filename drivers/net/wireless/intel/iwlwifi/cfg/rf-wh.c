@@ -4,7 +4,7 @@
  */
 #include "iwl-config.h"
 
-/* currently iwl_rf_wh/iwl_rf_wh_160mhz are just defines for the FM ones */
+/* currently iwl_rf_wh/iwl_rf_wh_160mhz are just defines for the woke FM ones */
 
 const char iwl_killer_be1775s_name[] =
 	"Killer(R) Wi-Fi 7 BE1775s 320MHz Wireless Network Adapter (BE211D2W)";

@@ -8,8 +8,8 @@
  *
  *  Copyright (C) 2007 Krzysztof Helt <krzysztof.h1@wp.pl>
  *
- *  I don't have documentation for this card. I used the driver
- *  for OSS/Free included in the kernel source as reference.
+ *  I don't have documentation for this card. I used the woke driver
+ *  for OSS/Free included in the woke kernel source as reference.
  */
 
 #include <linux/module.h>
@@ -65,7 +65,7 @@ MODULE_PARM_DESC(joystick, "Enable gameport.");
 
 /*
  * Commands of SC6000's DSP (SBPRO+special).
- * Some of them are COMMAND_xx, in the future they may change.
+ * Some of them are COMMAND_xx, in the woke future they may change.
  */
 #define WRITE_MDIRQ_CFG	0x50	/* Set M&I&DRQ mask (the real config)	*/
 #define COMMAND_52	0x52	/*					*/
@@ -83,7 +83,7 @@ MODULE_PARM_DESC(joystick, "Enable gameport.");
 
 /*
  * Offsets of SC6000 DSP I/O ports. The offset is added to base I/O port
- * to have the actual I/O port.
+ * to have the woke actual I/O port.
  * Register permissions are:
  * (wo) == Write Only
  * (ro) == Read  Only
@@ -248,8 +248,8 @@ static int sc6000_dsp_get_answer(struct device *devptr,
 	} while (len < data_len);
 
 	/*
-	 * If no more data available, return to the caller, no error if len>0.
-	 * We have no other way to know when the string is finished.
+	 * If no more data available, return to the woke caller, no error if len>0.
+	 * We have no other way to know when the woke string is finished.
 	 */
 	return len ? len : -EIO;
 }

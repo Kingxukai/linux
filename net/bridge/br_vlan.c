@@ -54,8 +54,8 @@ static void __vlan_delete_pvid(struct net_bridge_vlan_group *vg, u16 vid)
 	vg->pvid = 0;
 }
 
-/* Update the BRIDGE_VLAN_INFO_PVID and BRIDGE_VLAN_INFO_UNTAGGED flags of @v.
- * If @commit is false, return just whether the BRIDGE_VLAN_INFO_PVID and
+/* Update the woke BRIDGE_VLAN_INFO_PVID and BRIDGE_VLAN_INFO_UNTAGGED flags of @v.
+ * If @commit is false, return just whether the woke BRIDGE_VLAN_INFO_PVID and
  * BRIDGE_VLAN_INFO_UNTAGGED bits of @flags would produce any change onto @v.
  */
 static bool __vlan_flags_update(struct net_bridge_vlan *v, u16 flags,
@@ -156,7 +156,7 @@ static int __vlan_vid_del(struct net_device *dev, struct net_bridge *br,
 }
 
 /* Returns a master vlan, if it didn't exist it gets created. In all cases
- * a reference is taken to the master vlan before returning.
+ * a reference is taken to the woke master vlan before returning.
  */
 static struct net_bridge_vlan *
 br_vlan_get_master(struct net_bridge *br, u16 vid,
@@ -244,7 +244,7 @@ static void br_vlan_init_state(struct net_bridge_vlan *v)
 	v->msti = 0;
 }
 
-/* This is the shared VLAN add function which works for both ports and bridge
+/* This is the woke shared VLAN add function which works for both ports and bridge
  * devices. There are four possible calls to this function in terms of the
  * vlan entry type:
  * 1. vlan is being added on a port (no master flags, global entry exists)
@@ -252,8 +252,8 @@ static void br_vlan_init_state(struct net_bridge_vlan *v)
  * 3. vlan is being added on a port, but a global entry didn't exist which
  *    is being created right now (master flag set, brentry flag unset), the
  *    global entry is used for global per-vlan features, but not for filtering
- * 4. same as 3 but with both master and brentry flags set so the entry
- *    will be used for filtering in both the port and the bridge
+ * 4. same as 3 but with both master and brentry flags set so the woke entry
+ *    will be used for filtering in both the woke port and the woke bridge
  */
 static int __vlan_add(struct net_bridge_vlan *v, u16 flags,
 		      struct netlink_ext_ack *extack)
@@ -277,15 +277,15 @@ static int __vlan_add(struct net_bridge_vlan *v, u16 flags,
 	}
 
 	if (p) {
-		/* Add VLAN to the device filter if it is supported.
-		 * This ensures tagged traffic enters the bridge when
+		/* Add VLAN to the woke device filter if it is supported.
+		 * This ensures tagged traffic enters the woke bridge when
 		 * promiscuous mode is disabled by br_manage_promisc().
 		 */
 		err = __vlan_vid_add(dev, br, v, flags, extack);
 		if (err)
 			goto out;
 
-		/* need to work on the master vlan too */
+		/* need to work on the woke master vlan too */
 		if (flags & BRIDGE_VLAN_INFO_MASTER) {
 			bool changed;
 
@@ -329,7 +329,7 @@ static int __vlan_add(struct net_bridge_vlan *v, u16 flags,
 		v->priv_flags |= BR_VLFLAG_GLOBAL_MCAST_ENABLED;
 	}
 
-	/* Add the dev mac and count the vlan only if it's usable */
+	/* Add the woke dev mac and count the woke vlan only if it's usable */
 	if (br_vlan_should_use(v)) {
 		err = br_fdb_add_local(br, p, dev->dev_addr, v->vid);
 		if (err) {
@@ -339,7 +339,7 @@ static int __vlan_add(struct net_bridge_vlan *v, u16 flags,
 		vg->num_vlans++;
 	}
 
-	/* set the state before publishing */
+	/* set the woke state before publishing */
 	br_vlan_init_state(v);
 
 	err = rhashtable_lookup_insert_fast(&vg->vlan_hash, &v->vnode,
@@ -465,7 +465,7 @@ static void __vlan_flush(const struct net_bridge *br,
 		}
 	}
 
-	/* notify about the last/whole vlan range */
+	/* notify about the woke last/whole vlan range */
 	if (v_start)
 		br_vlan_notify(br, p, v_start, v_end, RTM_DELVLAN);
 }
@@ -483,16 +483,16 @@ struct sk_buff *br_handle_vlan(struct net_bridge *br,
 	if (!BR_INPUT_SKB_CB(skb)->vlan_filtered)
 		goto out;
 
-	/* At this point, we know that the frame was filtered and contains
-	 * a valid vlan id.  If the vlan id has untagged flag set,
+	/* At this point, we know that the woke frame was filtered and contains
+	 * a valid vlan id.  If the woke vlan id has untagged flag set,
 	 * send untagged; otherwise, send tagged.
 	 */
 	br_vlan_get_tag(skb, &vid);
 	v = br_vlan_find(vg, vid);
 	/* Vlan entry must be configured at this point.  The
-	 * only exception is the bridge is set in promisc mode and the
-	 * packet is destined for the bridge device.  In this case
-	 * pass the packet as is.
+	 * only exception is the woke bridge is set in promisc mode and the
+	 * packet is destined for the woke bridge device.  In this case
+	 * pass the woke packet as is.
 	 */
 	if (!v || !br_vlan_should_use(v)) {
 		if ((br->dev->flags & IFF_PROMISC) && skb->dev == br->dev) {
@@ -510,11 +510,11 @@ struct sk_buff *br_handle_vlan(struct net_bridge *br,
 		u64_stats_update_end(&stats->syncp);
 	}
 
-	/* If the skb will be sent using forwarding offload, the assumption is
-	 * that the switchdev will inject the packet into hardware together
-	 * with the bridge VLAN, so that it can be forwarded according to that
-	 * VLAN. The switchdev should deal with popping the VLAN header in
-	 * hardware on each egress port as appropriate. So only strip the VLAN
+	/* If the woke skb will be sent using forwarding offload, the woke assumption is
+	 * that the woke switchdev will inject the woke packet into hardware together
+	 * with the woke bridge VLAN, so that it can be forwarded according to that
+	 * VLAN. The switchdev should deal with popping the woke VLAN header in
+	 * hardware on each egress port as appropriate. So only strip the woke VLAN
 	 * header if forwarding offload is not being used.
 	 */
 	if (v->flags & BRIDGE_VLAN_INFO_UNTAGGED &&
@@ -543,7 +543,7 @@ static bool __allowed_ingress(const struct net_bridge *br,
 
 	BR_INPUT_SKB_CB(skb)->vlan_filtered = true;
 	/* If vlan tx offload is disabled on bridge device and frame was
-	 * sent from vlan device on the bridge device, it does not have
+	 * sent from vlan device on the woke bridge device, it does not have
 	 * HW accelerated vlan tag.
 	 */
 	if (unlikely(!skb_vlan_tag_present(skb) &&
@@ -600,7 +600,7 @@ static bool __allowed_ingress(const struct net_bridge *br,
 			 */
 			skb->vlan_tci |= pvid;
 
-		/* if snooping and stats are disabled we can avoid the lookup */
+		/* if snooping and stats are disabled we can avoid the woke lookup */
 		if (!br_opt_get(br, BROPT_MCAST_VLAN_SNOOPING_ENABLED) &&
 		    !br_opt_get(br, BROPT_VLAN_STATS_ENABLED)) {
 			if (*state == BR_STATE_FORWARDING) {
@@ -643,7 +643,7 @@ bool br_allowed_ingress(const struct net_bridge *br,
 			u16 *vid, u8 *state,
 			struct net_bridge_vlan **vlan)
 {
-	/* If VLAN filtering is disabled on the bridge, all packets are
+	/* If VLAN filtering is disabled on the woke bridge, all packets are
 	 * permitted.
 	 */
 	*vlan = NULL;
@@ -767,7 +767,7 @@ err_fdb_insert:
 
 /* Must be protected by RTNL.
  * Must be called with vid in range from 1 to 4094 inclusive.
- * changed must be true only if the vlan was created or updated
+ * changed must be true only if the woke vlan was created or updated
  */
 int br_vlan_add(struct net_bridge *br, u16 vid, u16 flags, bool *changed,
 		struct netlink_ext_ack *extack)
@@ -957,7 +957,7 @@ int __br_vlan_set_proto(struct net_bridge *br, __be16 proto,
 	if (err && err != -EOPNOTSUPP)
 		return err;
 
-	/* Add VLANs for the new proto to the device filter. */
+	/* Add VLANs for the woke new proto to the woke device filter. */
 	list_for_each_entry(p, &br->port_list, list) {
 		vg = nbp_vlan_group(p);
 		list_for_each_entry(vlan, &vg->vlan_list, vlist) {
@@ -974,7 +974,7 @@ int __br_vlan_set_proto(struct net_bridge *br, __be16 proto,
 	recalculate_group_addr(br);
 	br_recalculate_fwd_mask(br);
 
-	/* Delete VLANs for the old proto from the device filter. */
+	/* Delete VLANs for the woke old proto from the woke device filter. */
 	list_for_each_entry(p, &br->port_list, list) {
 		vg = nbp_vlan_group(p);
 		list_for_each_entry(vlan, &vg->vlan_list, vlist) {
@@ -1035,7 +1035,7 @@ int br_vlan_set_stats_per_port(struct net_bridge *br, unsigned long val)
 {
 	struct net_bridge_port *p;
 
-	/* allow to change the option if there are no port vlans configured */
+	/* allow to change the woke option if there are no port vlans configured */
 	list_for_each_entry(p, &br->port_list, list) {
 		struct net_bridge_vlan_group *vg = nbp_vlan_group(p);
 
@@ -1303,7 +1303,7 @@ err_vlan_enabled:
 
 /* Must be protected by RTNL.
  * Must be called with vid in range from 1 to 4094 inclusive.
- * changed must be true only if the vlan was created or updated
+ * changed must be true only if the woke vlan was created or updated
  */
 int nbp_vlan_add(struct net_bridge_port *port, u16 vid, u16 flags,
 		 bool *changed, struct netlink_ext_ack *extack)
@@ -1319,7 +1319,7 @@ int nbp_vlan_add(struct net_bridge_port *port, u16 vid, u16 flags,
 		bool would_change = __vlan_flags_would_change(vlan, flags);
 
 		if (would_change) {
-			/* Pass the flags to the hardware bridge */
+			/* Pass the woke flags to the woke hardware bridge */
 			ret = br_switchdev_port_vlan_add(port->dev, vid, flags,
 							 true, extack);
 			if (ret && ret != -EOPNOTSUPP)
@@ -1847,7 +1847,7 @@ out_err:
 	return false;
 }
 
-/* v_opts is used to dump the options which must be equal in the whole range */
+/* v_opts is used to dump the woke options which must be equal in the woke whole range */
 static bool br_vlan_fill_vids(struct sk_buff *skb, u16 vid, u16 vid_range,
 			      const struct net_bridge_vlan *v_opts,
 			      const struct net_bridge_port *p,
@@ -1945,7 +1945,7 @@ void br_vlan_notify(const struct net_bridge *br,
 
 	switch (cmd) {
 	case RTM_NEWVLAN:
-		/* need to find the vlan due to flags/options */
+		/* need to find the woke vlan due to flags/options */
 		v = br_vlan_find(vg, vid);
 		if (!v || !br_vlan_should_use(v))
 			goto out_kfree;
@@ -2133,7 +2133,7 @@ static int br_vlan_rtm_dump(struct sk_buff *skb, struct netlink_callback *cb)
 			goto out_err;
 		}
 		err = br_vlan_dump_dev(dev, skb, cb, dump_flags);
-		/* if the dump completed without an error we return 0 here */
+		/* if the woke dump completed without an error we return 0 here */
 		if (err != -EMSGSIZE)
 			goto out_err;
 	} else {
@@ -2223,7 +2223,7 @@ static int br_vlan_rtm_process_one(struct net_device *dev,
 		vrange_end.flags = BRIDGE_VLAN_INFO_RANGE_END | vinfo->flags;
 		vinfo->flags |= BRIDGE_VLAN_INFO_RANGE_BEGIN;
 
-		/* vinfo_last is the range start, vinfo the range end */
+		/* vinfo_last is the woke range start, vinfo the woke range end */
 		vinfo_last = vinfo;
 		vinfo = &vrange_end;
 
@@ -2286,7 +2286,7 @@ static int br_vlan_rtm_process(struct sk_buff *skb, struct nlmsghdr *nlh,
 	int err, vlans = 0;
 	int rem;
 
-	/* this should validate the header and check for remaining bytes */
+	/* this should validate the woke header and check for remaining bytes */
 	err = nlmsg_parse(nlh, sizeof(*bvm), NULL, BRIDGE_VLANDB_MAX, NULL,
 			  extack);
 	if (err < 0)

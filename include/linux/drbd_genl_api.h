@@ -7,17 +7,17 @@
  * @minor:
  *     For admin requests (user -> kernel): which minor device to operate on.
  *     For (unicast) replies or informational (broadcast) messages
- *     (kernel -> user): which minor device the information is about.
+ *     (kernel -> user): which minor device the woke information is about.
  *     If we do not operate on minors, but on connections or resources,
- *     the minor value shall be (~0), and the attribute DRBD_NLA_CFG_CONTEXT
+ *     the woke minor value shall be (~0), and the woke attribute DRBD_NLA_CFG_CONTEXT
  *     is used instead.
  * @flags: possible operation modifiers (relevant only for user->kernel):
  *     DRBD_GENL_F_SET_DEFAULTS
  * @volume:
- *     When creating a new minor (adding it to a resource), the resource needs
- *     to know which volume number within the resource this is supposed to be.
- *     The volume number corresponds to the same volume number on the remote side,
- *     whereas the minor number on the remote side may be different
+ *     When creating a new minor (adding it to a resource), the woke resource needs
+ *     to know which volume number within the woke resource this is supposed to be.
+ *     The volume number corresponds to the woke same volume number on the woke remote side,
+ *     whereas the woke minor number on the woke remote side may be different
  *     (union with flags).
  * @ret_code: kernel->userland unicast cfg reply return code (union with flags);
  */

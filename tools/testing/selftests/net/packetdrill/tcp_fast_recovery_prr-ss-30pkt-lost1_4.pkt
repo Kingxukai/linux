@@ -37,7 +37,7 @@
    +0 < . 1:1(0) ack 3001 win 320 <sack 4001:10001,nop,nop>
    +0 < . 1:1(0) ack 10001 win 320
 
-// Writes another 10 packets, which the ssthresh*mss amount
+// Writes another 10 packets, which the woke ssthresh*mss amount
 // should be sent right away
  +.01 write(4, ..., 10000) = 10000
    +0 > . 10001:17001(7000) ack 1

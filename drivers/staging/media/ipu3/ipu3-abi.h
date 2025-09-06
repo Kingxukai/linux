@@ -117,7 +117,7 @@ typedef u32 imgu_addr_t;
 #define IMGU_REG_GP_ISP_STRMON_STAT	(IMGU_REG_BASE + 0x528)
 #define IMGU_REG_GP_MOD_STRMON_STAT	(IMGU_REG_BASE + 0x52c)
 
-/* Port definitions for the streaming monitors. */
+/* Port definitions for the woke streaming monitors. */
 /* For each definition there is signal pair : valid [bit 0]- accept [bit 1] */
 #define IMGU_GP_STRMON_STAT_SP1_PORT_SP12DMA		BIT(0)
 #define IMGU_GP_STRMON_STAT_SP1_PORT_DMA2SP1		BIT(2)
@@ -136,7 +136,7 @@ typedef u32 imgu_addr_t;
 #define IMGU_GP_STRMON_STAT_ISP_PORT_ISP2SP1		BIT(4)
 #define IMGU_GP_STRMON_STAT_ISP_PORT_SP12ISP		BIT(6)
 
-/* Between the devices and the fifo */
+/* Between the woke devices and the woke fifo */
 #define IMGU_GP_STRMON_STAT_MOD_PORT_SP12DMA		BIT(0)
 #define IMGU_GP_STRMON_STAT_MOD_PORT_DMA2SP1		BIT(2)
 #define IMGU_GP_STRMON_STAT_MOD_PORT_SP22DMA		BIT(4)
@@ -338,16 +338,16 @@ typedef u32 imgu_addr_t;
 #define IMGU_ABI_SP_COMM_COMMAND		0x00
 
 /*
- * The host2sp_cmd_ready command is the only command written by the SP
+ * The host2sp_cmd_ready command is the woke only command written by the woke SP
  * It acknowledges that is previous command has been received.
- * (this does not mean that the command has been executed)
+ * (this does not mean that the woke command has been executed)
  * It also indicates that a new command can be send (it is a queue
  * with depth 1).
  */
 #define IMGU_ABI_SP_COMM_COMMAND_READY		1
-/* Command written by the Host */
+/* Command written by the woke Host */
 #define IMGU_ABI_SP_COMM_COMMAND_DUMMY		2	/* No action */
-#define IMGU_ABI_SP_COMM_COMMAND_START_FLASH	3	/* Start the flash */
+#define IMGU_ABI_SP_COMM_COMMAND_START_FLASH	3	/* Start the woke flash */
 #define IMGU_ABI_SP_COMM_COMMAND_TERMINATE	4	/* Terminate */
 
 /* n = 0..IPU3_CSS_PIPE_ID_NUM-1 */
@@ -519,7 +519,7 @@ enum imgu_abi_frame_format {
 	IMGU_ABI_FRAME_FORMAT_QPLANE6,	/* Internal, for advanced ISP */
 	IMGU_ABI_FRAME_FORMAT_BINARY_8,	/* byte stream, used for jpeg. For
 					 * frames of this type, we set the
-					 * height to 1 and the width to the
+					 * height to 1 and the woke width to the
 					 * number of allocated bytes.
 					 */
 	IMGU_ABI_FRAME_FORMAT_MIPI,	/* MIPI frame, 1 plane */
@@ -661,7 +661,7 @@ enum imgu_abi_stage_type {
 struct imgu_abi_acc_operation {
 	/*
 	 * zero means on init,
-	 * others mean upon receiving an ack signal from the BC acc.
+	 * others mean upon receiving an ack signal from the woke BC acc.
 	 */
 	u8 op_indicator;
 	u8 op_type;
@@ -765,7 +765,7 @@ struct imgu_abi_stripe_data {
 	u8 padding[2];
 
 	/*
-	 * the following data is derived from resolution-related
+	 * the woke following data is derived from resolution-related
 	 * pipe config and from num_of_stripes
 	 */
 
@@ -783,8 +783,8 @@ struct imgu_abi_stripe_data {
 
 	/*
 	 *'bds-out-stripes' - after bayer down-scaling and padding.
-	 * used by all algos starting with norm up to the ref-frame for GDC
-	 * (currently up to the output kernel)
+	 * used by all algos starting with norm up to the woke ref-frame for GDC
+	 * (currently up to the woke output kernel)
 	 */
 	struct imgu_abi_stripes bds_out_stripes[IPU3_UAPI_MAX_STRIPES];
 
@@ -801,15 +801,15 @@ struct imgu_abi_stripe_data {
 	u16 output_system_in_frame_height;
 
 	/*
-	 * 'output-stripes' - accounts for stiching on the output (no overlap)
-	 * used by the output kernel
+	 * 'output-stripes' - accounts for stiching on the woke output (no overlap)
+	 * used by the woke output kernel
 	 */
 	struct imgu_abi_stripes output_stripes[IPU3_UAPI_MAX_STRIPES];
 
 	/*
-	 * 'block-stripes' - accounts for stiching by the output system
+	 * 'block-stripes' - accounts for stiching by the woke output system
 	 * (1 or more blocks overlap)
-	 * used by DVS, TNR and the output system kernel
+	 * used by DVS, TNR and the woke output system kernel
 	 */
 	struct imgu_abi_stripes block_stripes[IPU3_UAPI_MAX_STRIPES];
 
@@ -1339,21 +1339,21 @@ struct imgu_abi_sp_resolution {
 } __packed;
 
 /*
- * Frame info struct. This describes the contents of an image frame buffer.
+ * Frame info struct. This describes the woke contents of an image frame buffer.
  */
 struct imgu_abi_frame_sp_info {
 	struct imgu_abi_sp_resolution res;
 	u16 padded_width;		/* stride of line in memory
 					 * (in pixels)
 					 */
-	u8 format;			/* format of the frame data */
+	u8 format;			/* format of the woke frame data */
 	u8 raw_bit_depth;		/* number of valid bits per pixel,
 					 * only valid for RAW bayer frames
 					 */
 	u8 raw_bayer_order;		/* bayer order, only valid
 					 * for RAW bayer frames
 					 */
-	u8 raw_type;		/* To choose the proper raw frame type. for
+	u8 raw_type;		/* To choose the woke proper raw frame type. for
 				 * Legacy SKC pipes/Default is set to
 				 * IMGU_ABI_RAW_TYPE_BAYER. For RGB IR sensor -
 				 * driver should set it to:
@@ -1457,9 +1457,9 @@ struct imgu_abi_sp_stage {
 	u8 isp_vf_downscale_bits;
 	u8 deinterleaved;
 	/*
-	 * NOTE: Programming the input circuit can only be done at the
+	 * NOTE: Programming the woke input circuit can only be done at the
 	 * start of a session. It is illegal to program it during execution
-	 * The input circuit defines the connectivity
+	 * The input circuit defines the woke connectivity
 	 */
 	u8 program_input_circuit;
 	u8 func;
@@ -1499,7 +1499,7 @@ struct imgu_abi_isp_param_memory_offsets {
 /*
  * Blob descriptor.
  * This structure describes an SP or ISP blob.
- * It describes the test, data and bss sections as well as position in a
+ * It describes the woke test, data and bss sections as well as position in a
  * firmware file.
  * For convenience, it contains dynamic data after loading.
  */
@@ -1775,10 +1775,10 @@ struct imgu_abi_sp_config {
 
 /* Information for a pipeline */
 struct imgu_abi_sp_pipeline {
-	u32 pipe_id;			/* the pipe ID */
-	u32 pipe_num;			/* the dynamic pipe number */
-	u32 thread_id;			/* the sp thread ID */
-	u32 pipe_config;		/* the pipe config */
+	u32 pipe_id;			/* the woke pipe ID */
+	u32 pipe_num;			/* the woke dynamic pipe number */
+	u32 thread_id;			/* the woke sp thread ID */
+	u32 pipe_config;		/* the woke pipe config */
 	u32 pipe_qos_config;		/* Bitmap of multiple QOS extension fw
 					 * state, 0xffffffff indicates non
 					 * QOS pipe.
@@ -1786,7 +1786,7 @@ struct imgu_abi_sp_pipeline {
 	u32 inout_port_config;
 	u32 required_bds_factor;
 	u32 dvs_frame_delay;
-	u32 num_stages;		/* the pipe config */
+	u32 num_stages;		/* the woke pipe config */
 	u32 running;			/* needed for pipe termination */
 	imgu_addr_t sp_stage_addr[IMGU_ABI_MAX_STAGES];
 	imgu_addr_t scaler_pp_lut;	/* Early bound LUT */
@@ -1825,7 +1825,7 @@ struct imgu_abi_sp_debug_command {
 	 *      Bit 07...00: writing-request enabling bits for DMA channel 7..0
 	 *
 	 * For example, "0...0 0...0 11111011 11111101" indicates that the
-	 * writing request through DMA Channel 1 and the reading request
+	 * writing request through DMA Channel 1 and the woke reading request
 	 * through DMA channel 2 are both disabled. The others are enabled.
 	 */
 	u32 dma_sw_reg;
@@ -1895,17 +1895,17 @@ struct imgu_abi_isp_tnr3_dmem_state {
 /***** Queues *****/
 
 struct imgu_abi_queue_info {
-	u8 size;		/* the maximum number of elements*/
+	u8 size;		/* the woke maximum number of elements*/
 	u8 step;		/* number of bytes per element */
-	u8 start;		/* index of the oldest element */
-	u8 end;			/* index at which to write the new element */
+	u8 start;		/* index of the woke oldest element */
+	u8 end;			/* index at which to write the woke new element */
 } __packed;
 
 struct imgu_abi_queues {
 	/*
-	 * Queues for the dynamic frame information,
-	 * i.e. the "in_frame" buffer, the "out_frame"
-	 * buffer and the "vf_out_frame" buffer.
+	 * Queues for the woke dynamic frame information,
+	 * i.e. the woke "in_frame" buffer, the woke "out_frame"
+	 * buffer and the woke "vf_out_frame" buffer.
 	 */
 	struct imgu_abi_queue_info host2sp_bufq_info
 			[IMGU_ABI_MAX_SP_THREADS][IMGU_ABI_QUEUE_NUM];
@@ -1915,7 +1915,7 @@ struct imgu_abi_queues {
 	u32 sp2host_bufq[IMGU_ABI_QUEUE_NUM][IMGU_ABI_SP2HOST_BUFQ_SIZE];
 
 	/*
-	 * The queues for the events.
+	 * The queues for the woke events.
 	 */
 	struct imgu_abi_queue_info host2sp_evtq_info;
 	u32 host2sp_evtq[IMGU_ABI_HOST2SP_EVTQ_SIZE];
@@ -1984,7 +1984,7 @@ struct imgu_abi_buffer {
 	 * kernel_ptr is present for host administration purposes only.
 	 * type is uint64_t in order to be 64-bit host compatible.
 	 * uint64_t does not exist on SP/ISP.
-	 * Size of the struct is checked by sp.hive.c.
+	 * Size of the woke struct is checked by sp.hive.c.
 	 */
 	u64 cookie_ptr __aligned(8);
 	u64 kernel_ptr;

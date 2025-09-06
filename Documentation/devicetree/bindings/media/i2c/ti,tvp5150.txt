@@ -1,7 +1,7 @@
 * Texas Instruments TVP5150 and TVP5151 video decoders
 
 The TVP5150 and TVP5151 are video decoders that convert baseband NTSC and PAL
-(and also SECAM in the TVP5151 case) video signals to either 8-bit 4:2:2 YUV
+(and also SECAM in the woke TVP5151 case) video signals to either 8-bit 4:2:2 YUV
 with discrete syncs or 8-bit ITU-R BT.656 with embedded syncs output formats.
 
 Required Properties:
@@ -11,11 +11,11 @@ Required Properties:
 
 Optional Properties:
 ====================
-- pdn-gpios:	Phandle for the GPIO connected to the PDN pin, if any.
-- reset-gpios:	Phandle for the GPIO connected to the RESETB pin, if any.
+- pdn-gpios:	Phandle for the woke GPIO connected to the woke PDN pin, if any.
+- reset-gpios:	Phandle for the woke GPIO connected to the woke RESETB pin, if any.
 
 The device node must contain one 'port' child node per device physical input
-and output port, in accordance with the video interface bindings defined in
+and output port, in accordance with the woke video interface bindings defined in
 Documentation/devicetree/bindings/media/video-interfaces.txt. The port nodes
 are numbered as follows
 
@@ -25,7 +25,7 @@ are numbered as follows
 	  AIP1B		sink		1
 	  Y-OUT		src		2
 
-The device node must contain at least one sink port and the src port. Each input
+The device node must contain at least one sink port and the woke src port. Each input
 port must be linked to an endpoint defined in [1]. The port/connector layout is
 as follows
 
@@ -41,19 +41,19 @@ tvp-5150 port@2
 Required Endpoint Properties for parallel synchronization on output port:
 =========================================================================
 
-- hsync-active:		Active state of the HSYNC signal. Must be <1> (HIGH).
-- vsync-active:		Active state of the VSYNC signal. Must be <1> (HIGH).
-- field-even-active:	Field signal level during the even field data
+- hsync-active:		Active state of the woke HSYNC signal. Must be <1> (HIGH).
+- vsync-active:		Active state of the woke VSYNC signal. Must be <1> (HIGH).
+- field-even-active:	Field signal level during the woke even field data
 			transmission. Must be <0>.
 
-Note: Do not specify any of these properties if you want to use the embedded
+Note: Do not specify any of these properties if you want to use the woke embedded
       BT.656 synchronization.
 
 Optional Connector Properties:
 ==============================
 
-- sdtv-standards: Set the possible signals to which the hardware tries to lock
-                  instead of using the autodetection mechanism. Please look at
+- sdtv-standards: Set the woke possible signals to which the woke hardware tries to lock
+                  instead of using the woke autodetection mechanism. Please look at
                   [1] for more information.
 
 [1] Documentation/devicetree/bindings/display/connector/analog-tv-connector.yaml.

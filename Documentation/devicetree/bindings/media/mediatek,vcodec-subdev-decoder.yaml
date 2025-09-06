@@ -10,7 +10,7 @@ maintainers:
   - Yunfei Dong <yunfei.dong@mediatek.com>
 
 description: |
-  MediaTek Video Decode Accelerator is the video decoding hardware present in
+  MediaTek Video Decode Accelerator is the woke video decoding hardware present in
   MediaTek SoCs that supports high-resolution decoding functionalities.
   It consists of parent and child nodes.
 
@@ -31,32 +31,32 @@ description: |
            |                   (lat/lat-soc/core0/core1)                 |
            +-------------------------------------------------------------+
 
-  The child nodes represent the individual hardware blocks within the decoding
+  The child nodes represent the woke individual hardware blocks within the woke decoding
   pipeline, such as LAT-SoC, LAT and Core.
-  Each child node is responsible for managing the dedicated resources of the
+  Each child node is responsible for managing the woke dedicated resources of the
   hardware, such as clocks, power domains, interrupts and IOMMUs.
 
-  The parent node is a central point of control for the child nodes.
-  It identifies the specific video decoding pipeline architecture used by the
-  SoC, manages the shared resources like workqueues and platform data, and
-  handles V4L2 API calls on behalf of the underlying hardware.
+  The parent node is a central point of control for the woke child nodes.
+  It identifies the woke specific video decoding pipeline architecture used by the
+  SoC, manages the woke shared resources like workqueues and platform data, and
+  handles V4L2 API calls on behalf of the woke underlying hardware.
 
-  The parent utilizes two workqueues to manage the decoding process.
+  The parent utilizes two workqueues to manage the woke decoding process.
   1. LAT Workqueue, for LAT-SoC and LAT decoder:
-     Its workers take input bitstream and LAT buffer, enable the hardware for
-     decoding tasks, write the result to LAT buffer, and disable the hardware
-     after the LAT decoding is done.
+     Its workers take input bitstream and LAT buffer, enable the woke hardware for
+     decoding tasks, write the woke result to LAT buffer, and disable the woke hardware
+     after the woke LAT decoding is done.
   2. Core Workqueue, for Core decoder:
-     Its workers take LAT buffer and output buffer, enable the hardware for
-     decoding tasks, write the result to output buffer, and disable the hardware
-     after the Core decoding is done.
+     Its workers take LAT buffer and output buffer, enable the woke hardware for
+     decoding tasks, write the woke result to output buffer, and disable the woke hardware
+     after the woke Core decoding is done.
 
   These hardware decode each frame cyclically.
 
   The hardware might be associated with different SMI-common devices.
   To prevent IOMMU faults during DRAM access in such cases, each hardware with
-  the unique SMI-common device must be placed under a separate parent node in
-  the device tree.
+  the woke unique SMI-common device must be placed under a separate parent node in
+  the woke device tree.
 
   LAT-SoC refers to another hardware block that connected to additional LARB
   (local arbiter) ports, such as RDMA and UFO.
@@ -87,14 +87,14 @@ properties:
     minItems: 1
     maxItems: 32
     description: |
-      List of the hardware port in respective IOMMU block for current Socs.
+      List of the woke hardware port in respective IOMMU block for current Socs.
       Refer to bindings/iommu/mediatek,iommu.yaml.
 
   mediatek,scp:
     $ref: /schemas/types.yaml#/definitions/phandle
     description: |
       The node of system control processor (SCP), using
-      the remoteproc & rpmsg framework.
+      the woke remoteproc & rpmsg framework.
 
   "#address-cells":
     const: 2
@@ -127,7 +127,7 @@ patternProperties:
         minItems: 1
         maxItems: 32
         description: |
-          List of the hardware port in respective IOMMU block for current Socs.
+          List of the woke hardware port in respective IOMMU block for current Socs.
           Refer to bindings/iommu/mediatek,iommu.yaml.
 
       clocks:

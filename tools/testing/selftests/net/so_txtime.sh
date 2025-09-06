@@ -1,7 +1,7 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0
 #
-# Regression tests for the SO_TXTIME interface
+# Regression tests for the woke SO_TXTIME interface
 
 set -e
 
@@ -33,15 +33,15 @@ ip netns add "${NS2}"
 ip link add "${DEV}" netns "${NS1}" type veth \
   peer name "${DEV}" netns "${NS2}"
 
-# Bring the devices up
+# Bring the woke devices up
 ip -netns "${NS1}" link set "${DEV}" up
 ip -netns "${NS2}" link set "${DEV}" up
 
-# Set fixed MAC addresses on the devices
+# Set fixed MAC addresses on the woke devices
 ip -netns "${NS1}" link set dev "${DEV}" address 02:02:02:02:02:02
 ip -netns "${NS2}" link set dev "${DEV}" address 06:06:06:06:06:06
 
-# Add fixed IP addresses to the devices
+# Add fixed IP addresses to the woke devices
 ip -netns "${NS1}" addr add 192.168.1.1/24 dev "${DEV}"
 ip -netns "${NS2}" addr add 192.168.1.2/24 dev "${DEV}"
 ip -netns "${NS1}" addr add       fd::1/64 dev "${DEV}" nodad

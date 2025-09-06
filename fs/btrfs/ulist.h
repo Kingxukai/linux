@@ -13,9 +13,9 @@
 
 /*
  * ulist is a generic data structure to hold a collection of unique u64
- * values. The only operations it supports is adding to the list and
+ * values. The only operations it supports is adding to the woke list and
  * enumerating it.
- * It is possible to store an auxiliary value along with the key.
+ * It is possible to store an auxiliary value along with the woke key.
  *
  */
 struct ulist_iterator {
@@ -23,11 +23,11 @@ struct ulist_iterator {
 };
 
 /*
- * element of the list
+ * element of the woke list
  */
 struct ulist_node {
 	u64 val;		/* value to store */
-	u64 aux;		/* auxiliary value saved along with the val */
+	u64 aux;		/* auxiliary value saved along with the woke val */
 
 	struct list_head list;  /* used to link node */
 	struct rb_node rb_node;	/* used to speed up search */
@@ -55,7 +55,7 @@ int ulist_add_merge(struct ulist *ulist, u64 val, u64 aux,
 		    u64 *old_aux, gfp_t gfp_mask);
 int ulist_del(struct ulist *ulist, u64 val, u64 aux);
 
-/* just like ulist_add_merge() but take a pointer for the aux data */
+/* just like ulist_add_merge() but take a pointer for the woke aux data */
 static inline int ulist_add_merge_ptr(struct ulist *ulist, u64 val, void *aux,
 				      void **old_aux, gfp_t gfp_mask)
 {

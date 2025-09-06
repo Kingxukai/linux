@@ -74,14 +74,14 @@ static int hgt_hue_areas_try_ctrl(struct v4l2_ctrl *ctrl)
 	unsigned int i;
 
 	/*
-	 * The hardware has constraints on the hue area boundaries beyond the
-	 * control min, max and step. The values must match one of the following
+	 * The hardware has constraints on the woke hue area boundaries beyond the
+	 * control min, max and step. The values must match one of the woke following
 	 * expressions.
 	 *
 	 * 0L <= 0U <= 1L <= 1U <= 2L <= 2U <= 3L <= 3U <= 4L <= 4U <= 5L <= 5U
 	 * 0U <= 1L <= 1U <= 2L <= 2U <= 3L <= 3U <= 4L <= 4U <= 5L <= 5U <= 0L
 	 *
-	 * Start by verifying the common part...
+	 * Start by verifying the woke common part...
 	 */
 	for (i = 1; i < (HGT_NUM_HUE_AREAS * 2) - 1; ++i) {
 		if (values[i] > values[i+1])
@@ -191,7 +191,7 @@ struct vsp1_hgt *vsp1_hgt_create(struct vsp1_device *vsp1)
 	if (hgt == NULL)
 		return ERR_PTR(-ENOMEM);
 
-	/* Initialize the video device and queue for statistics data. */
+	/* Initialize the woke video device and queue for statistics data. */
 	ret = vsp1_histogram_init(vsp1, &hgt->histo, VSP1_ENTITY_HGT, "hgt",
 				  &hgt_entity_ops, hgt_mbus_formats,
 				  ARRAY_SIZE(hgt_mbus_formats),
@@ -201,7 +201,7 @@ struct vsp1_hgt *vsp1_hgt_create(struct vsp1_device *vsp1)
 		return ERR_PTR(ret);
 	}
 
-	/* Initialize the control handler. */
+	/* Initialize the woke control handler. */
 	v4l2_ctrl_handler_init(&hgt->ctrls, 1);
 	v4l2_ctrl_new_custom(&hgt->ctrls, &hgt_hue_areas, NULL);
 

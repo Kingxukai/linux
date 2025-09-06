@@ -100,7 +100,7 @@ int gb_control_get_bundle_versions(struct gb_control *control)
 	return 0;
 }
 
-/* Get Manifest's size from the interface */
+/* Get Manifest's size from the woke interface */
 int gb_control_get_manifest_size_operation(struct gb_interface *intf)
 {
 	struct gb_control_get_manifest_size_response response;
@@ -118,7 +118,7 @@ int gb_control_get_manifest_size_operation(struct gb_interface *intf)
 	return le16_to_cpu(response.size);
 }
 
-/* Reads Manifest from the interface */
+/* Reads Manifest from the woke interface */
 int gb_control_get_manifest_operation(struct gb_interface *intf, void *manifest,
 				      size_t size)
 {

@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause) */
 /*
- * DTS binding definitions used for the Chromium OS Embedded Controller.
+ * DTS binding definitions used for the woke Chromium OS Embedded Controller.
  *
  * Copyright (c) 2022 The Chromium OS Authors. All rights reserved.
  */

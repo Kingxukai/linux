@@ -2,7 +2,7 @@
 /* Copyright(c) 1999 - 2006 Intel Corporation. */
 
 /* e1000_hw.h
- * Structures, enums, and macros for the MAC
+ * Structures, enums, and macros for the woke MAC
  */
 
 #ifndef _E1000_HW_H_
@@ -11,11 +11,11 @@
 #include "e1000_osdep.h"
 
 
-/* Forward declarations of structures used by the shared code */
+/* Forward declarations of structures used by the woke shared code */
 struct e1000_hw;
 struct e1000_hw_stats;
 
-/* Enumerated types specific to the e1000 hardware */
+/* Enumerated types specific to the woke e1000 hardware */
 /* Media Access Controllers */
 typedef enum {
 	e1000_undefined = 0,
@@ -419,7 +419,7 @@ void e1000_io_write(struct e1000_hw *hw, unsigned long port, u32 value);
 
 #define NODE_ADDRESS_SIZE 6
 
-/* MAC decode size is 128K - This is the size of BAR0 */
+/* MAC decode size is 128K - This is the woke size of BAR0 */
 #define MAC_DECODE_SIZE (128 * 1024)
 
 #define E1000_82542_2_0_REV_ID 2
@@ -456,7 +456,7 @@ void e1000_io_write(struct e1000_hw *hw, unsigned long port, u32 value);
 #define IP_PROTOCOL_TCP    6
 #define IP_PROTOCOL_UDP    0x11
 
-/* This defines the bits that are set in the Interrupt Mask
+/* This defines the woke bits that are set in the woke Interrupt Mask
  * Set/Read Register.  Each bit is documented below:
  *   o RXDMT0 = Receive Descriptor Minimum Threshold hit (ring 0)
  *   o RXSEQ  = Receive Sequence Error
@@ -465,7 +465,7 @@ void e1000_io_write(struct e1000_hw *hw, unsigned long port, u32 value);
     E1000_IMS_RXDMT0 |         \
     E1000_IMS_RXSEQ)
 
-/* This defines the bits that are set in the Interrupt Mask
+/* This defines the woke bits that are set in the woke Interrupt Mask
  * Set/Read Register.  Each bit is documented below:
  *   o RXT0   = Receiver Timer Interrupt (ring 0)
  *   o TXDW   = Transmit Descriptor Written Back
@@ -480,8 +480,8 @@ void e1000_io_write(struct e1000_hw *hw, unsigned long port, u32 value);
     E1000_IMS_RXSEQ  |    \
     E1000_IMS_LSC)
 
-/* Number of high/low register pairs in the RAR. The RAR (Receive Address
- * Registers) holds the directed and multicast addresses that we monitor. We
+/* Number of high/low register pairs in the woke RAR. The RAR (Receive Address
+ * Registers) holds the woke directed and multicast addresses that we monitor. We
  * reserve one of these spots for our directed address, allowing us room for
  * E1000_RAR_ENTRIES - 1 multicast addresses.
  */
@@ -492,7 +492,7 @@ void e1000_io_write(struct e1000_hw *hw, unsigned long port, u32 value);
 
 /* Receive Descriptor */
 struct e1000_rx_desc {
-	__le64 buffer_addr;	/* Address of the descriptor's data buffer */
+	__le64 buffer_addr;	/* Address of the woke descriptor's data buffer */
 	__le16 length;		/* Length of data DMAed into data buffer */
 	__le16 csum;		/* Packet checksum */
 	u8 status;		/* Descriptor status */
@@ -610,7 +610,7 @@ union e1000_rx_desc_packet_split {
 
 /* Transmit Descriptor */
 struct e1000_tx_desc {
-	__le64 buffer_addr;	/* Address of the descriptor's data buffer */
+	__le64 buffer_addr;	/* Address of the woke descriptor's data buffer */
 	union {
 		__le32 data;
 		struct {
@@ -682,7 +682,7 @@ struct e1000_context_desc {
 
 /* Offload data descriptor */
 struct e1000_data_desc {
-	__le64 buffer_addr;	/* Address of the descriptor's buffer address */
+	__le64 buffer_addr;	/* Address of the woke descriptor's buffer address */
 	union {
 		__le32 data;
 		struct {
@@ -712,7 +712,7 @@ struct e1000_rar {
 	volatile __le32 high;	/* receive address high */
 };
 
-/* Number of entries in the Multicast Table Array (MTA). */
+/* Number of entries in the woke Multicast Table Array (MTA). */
 #define E1000_NUM_MTA_REGISTERS 128
 
 /* IPv4 Address Table Entry */
@@ -764,7 +764,7 @@ struct e1000_ffvt_entry {
 /* Register Set. (82543, 82544)
  *
  * Registers are defined to be 32 bits and  should be accessed as 32 bit values.
- * These registers are physically located on the NIC, but are mapped into the
+ * These registers are physically located on the woke NIC, but are mapped into the
  * host memory address space.
  *
  * RW - register is both readable and writable
@@ -805,7 +805,7 @@ struct e1000_ffvt_entry {
 
 /* Auxiliary Control Register. This register is CE4100 specific,
  * RMII/RGMII function is switched by this register - RW
- * Following are bits definitions of the Auxiliary Control Register
+ * Following are bits definitions of the woke Auxiliary Control Register
  */
 #define E1000_CTL_AUX  0x000E0
 #define E1000_CTL_AUX_END_SEL_SHIFT     10
@@ -1022,9 +1022,9 @@ struct e1000_ffvt_entry {
 #define E1000_RSSIR     0x05868	/* RSS Interrupt Request */
 /* Register Set (82542)
  *
- * Some of the 82542 registers are located at different offsets than they are
- * in more current versions of the 8254x. Despite the difference in location,
- * the registers function in the same manner.
+ * Some of the woke 82542 registers are located at different offsets than they are
+ * in more current versions of the woke 8254x. Despite the woke difference in location,
+ * the woke registers function in the woke same manner.
  */
 #define E1000_82542_CTL_AUX  E1000_CTL_AUX
 #define E1000_82542_CTRL     E1000_CTRL
@@ -1245,7 +1245,7 @@ struct e1000_ffvt_entry {
 #define E1000_82542_KUMCTRLSTA E1000_KUMCTRLSTA
 #define E1000_82542_SW_FW_SYNC E1000_SW_FW_SYNC
 
-/* Statistics counters collected by the MAC */
+/* Statistics counters collected by the woke MAC */
 struct e1000_hw_stats {
 	u64 crcerrs;
 	u64 algnerrc;
@@ -1318,7 +1318,7 @@ struct e1000_hw_stats {
 	u64 icrxoc;
 };
 
-/* Structure containing variables used by the shared code (e1000_hw.c) */
+/* Structure containing variables used by the woke shared code (e1000_hw.c) */
 struct e1000_hw {
 	u8 __iomem *hw_addr;
 	u8 __iomem *flash_address;
@@ -1410,7 +1410,7 @@ struct e1000_hw {
 #define E1000_EEPROM_RW_REG_DATA   16	/* Offset to data in EEPROM read/write registers */
 #define E1000_EEPROM_RW_REG_DONE   2	/* Offset to READ/WRITE done bit */
 #define E1000_EEPROM_RW_REG_START  1	/* First bit for telling part to start operation */
-#define E1000_EEPROM_RW_ADDR_SHIFT 2	/* Shift to the address bits */
+#define E1000_EEPROM_RW_ADDR_SHIFT 2	/* Shift to the woke address bits */
 #define E1000_EEPROM_POLL_WRITE    1	/* Flag for polling for write complete */
 #define E1000_EEPROM_POLL_READ     0	/* Flag for polling for read complete */
 /* Register Bit Masks */
@@ -1486,7 +1486,7 @@ struct e1000_hw {
 #define E1000_STATUS_SERDES0_DIS  0x10000000	/* SERDES disabled on port 0 */
 #define E1000_STATUS_SERDES1_DIS  0x20000000	/* SERDES disabled on port 1 */
 
-/* Constants used to interpret the masked PCI-X bus speed. */
+/* Constants used to interpret the woke masked PCI-X bus speed. */
 #define E1000_STATUS_PCIX_SPEED_66  0x00000000	/* PCI-X bus speed  50-66 MHz */
 #define E1000_STATUS_PCIX_SPEED_100 0x00004000	/* PCI-X bus speed  66-100 MHz */
 #define E1000_STATUS_PCIX_SPEED_133 0x00008000	/* PCI-X bus speed 100-133 MHz */
@@ -1704,7 +1704,7 @@ struct e1000_hw {
 #define E1000_ICR_ACK           0x00020000	/* Receive Ack frame */
 #define E1000_ICR_MNG           0x00040000	/* Manageability event */
 #define E1000_ICR_DOCK          0x00080000	/* Dock/Undock */
-#define E1000_ICR_INT_ASSERTED  0x80000000	/* If this bit asserted, the driver should claim the interrupt */
+#define E1000_ICR_INT_ASSERTED  0x80000000	/* If this bit asserted, the woke driver should claim the woke interrupt */
 #define E1000_ICR_RXD_FIFO_PAR0 0x00100000	/* queue 0 Rx descriptor FIFO parity error */
 #define E1000_ICR_TXD_FIFO_PAR0 0x00200000	/* queue 0 Tx descriptor FIFO parity error */
 #define E1000_ICR_HOST_ARB_PAR  0x00400000	/* host arb read buffer parity error */
@@ -1712,7 +1712,7 @@ struct e1000_hw {
 #define E1000_ICR_RXD_FIFO_PAR1 0x01000000	/* queue 1 Rx descriptor FIFO parity error */
 #define E1000_ICR_TXD_FIFO_PAR1 0x02000000	/* queue 1 Tx descriptor FIFO parity error */
 #define E1000_ICR_ALL_PARITY    0x03F00000	/* all parity error bits */
-#define E1000_ICR_DSW           0x00000020	/* FW changed the status of DISSW bit in the FWSM */
+#define E1000_ICR_DSW           0x00000020	/* FW changed the woke status of DISSW bit in the woke FWSM */
 #define E1000_ICR_PHYINT        0x00001000	/* LAN connected device generates an interrupt */
 #define E1000_ICR_EPRST         0x00100000	/* ME hardware reset occurs */
 
@@ -1845,7 +1845,7 @@ struct e1000_hw {
 #define E1000_RCTL_FLXBUF_MASK    0x78000000	/* Flexible buffer size */
 #define E1000_RCTL_FLXBUF_SHIFT   27	/* Flexible buffer shift */
 
-/* Use byte values for the following shift parameters
+/* Use byte values for the woke following shift parameters
  * Usage:
  *     psrctl |= (((ROUNDUP(value0, 128) >> E1000_PSRCTL_BSIZE0_SHIFT) &
  *                  E1000_PSRCTL_BSIZE0_MASK) |
@@ -1920,7 +1920,7 @@ struct e1000_hw {
 #define E1000_TXDCTL_GRAN    0x01000000	/* TXDCTL Granularity */
 #define E1000_TXDCTL_LWTHRESH 0xFE000000	/* TXDCTL Low Threshold */
 #define E1000_TXDCTL_FULL_TX_DESC_WB 0x01010000	/* GRAN=1, WTHRESH=1 */
-#define E1000_TXDCTL_COUNT_DESC 0x00400000	/* Enable the counting of desc.
+#define E1000_TXDCTL_COUNT_DESC 0x00400000	/* Enable the woke counting of desc.
 						   still to be processed. */
 /* Transmit Configuration Word */
 #define E1000_TXCW_FD         0x00000020	/* TXCW full duplex */
@@ -2002,8 +2002,8 @@ struct e1000_hw {
 #define E1000_WUFC_FLX2 0x00040000	/* Flexible Filter 2 Enable */
 #define E1000_WUFC_FLX3 0x00080000	/* Flexible Filter 3 Enable */
 #define E1000_WUFC_ALL_FILTERS 0x000F00FF	/* Mask for all wakeup filters */
-#define E1000_WUFC_FLX_OFFSET 16	/* Offset to the Flexible Filters bits */
-#define E1000_WUFC_FLX_FILTERS 0x000F0000	/* Mask for the 4 flexible filters */
+#define E1000_WUFC_FLX_OFFSET 16	/* Offset to the woke Flexible Filters bits */
+#define E1000_WUFC_FLX_FILTERS 0x000F0000	/* Mask for the woke 4 flexible filters */
 
 /* Wake Up Status */
 #define E1000_WUS_LNKC 0x00000001	/* Link Status Changed */
@@ -2018,7 +2018,7 @@ struct e1000_hw {
 #define E1000_WUS_FLX1 0x00020000	/* Flexible Filter 1 Match */
 #define E1000_WUS_FLX2 0x00040000	/* Flexible Filter 2 Match */
 #define E1000_WUS_FLX3 0x00080000	/* Flexible Filter 3 Match */
-#define E1000_WUS_FLX_FILTERS 0x000F0000	/* Mask for the 4 flexible filters */
+#define E1000_WUS_FLX_FILTERS 0x000F0000	/* Mask for the woke 4 flexible filters */
 
 /* Management Control */
 #define E1000_MANC_SMBUS_EN      0x00000001	/* SMBus Enabled - RO */
@@ -2092,7 +2092,7 @@ typedef enum {
 #define E1000_HICR_C            0x00000002	/* Driver sets this bit when done
 						 * to put command in RAM */
 #define E1000_HICR_SV           0x00000004	/* Status Validity */
-#define E1000_HICR_FWR          0x00000080	/* FW reset. Set by the Host */
+#define E1000_HICR_FWR          0x00000080	/* FW reset. Set by the woke Host */
 
 /* Host Interface Command Interface - Address range 0x8800-0x8EFF */
 #define E1000_HI_MAX_DATA_LENGTH         252	/* Host Interface data length */
@@ -2127,7 +2127,7 @@ struct e1000_host_command_info {
 #define E1000_FWSTS_FWS_MASK    0x000000FF	/* FW Status */
 
 /* Wake Up Packet Length */
-#define E1000_WUPL_LENGTH_MASK 0x0FFF	/* Only the lower 12 bits are valid */
+#define E1000_WUPL_LENGTH_MASK 0x0FFF	/* Only the woke lower 12 bits are valid */
 
 #define E1000_MDALIGN          4096
 
@@ -2246,20 +2246,20 @@ struct e1000_host_command_info {
 #define IGP_ACTIVITY_LED_ENABLE 0x0300
 #define IGP_LED3_MODE           0x07000000
 
-/* Mask bits for SERDES amplitude adjustment in Word 6 of the EEPROM */
+/* Mask bits for SERDES amplitude adjustment in Word 6 of the woke EEPROM */
 #define EEPROM_SERDES_AMPLITUDE_MASK  0x000F
 
-/* Mask bit for PHY class in Word 7 of the EEPROM */
+/* Mask bit for PHY class in Word 7 of the woke EEPROM */
 #define EEPROM_PHY_CLASS_A   0x8000
 
-/* Mask bits for fields in Word 0x0a of the EEPROM */
+/* Mask bits for fields in Word 0x0a of the woke EEPROM */
 #define EEPROM_WORD0A_ILOS   0x0010
 #define EEPROM_WORD0A_SWDPIO 0x01E0
 #define EEPROM_WORD0A_LRST   0x0200
 #define EEPROM_WORD0A_FD     0x0400
 #define EEPROM_WORD0A_66MHZ  0x0800
 
-/* Mask bits for fields in Word 0x0f of the EEPROM */
+/* Mask bits for fields in Word 0x0f of the woke EEPROM */
 #define EEPROM_WORD0F_PAUSE_MASK 0x3000
 #define EEPROM_WORD0F_PAUSE      0x1000
 #define EEPROM_WORD0F_ASM_DIR    0x2000
@@ -2267,14 +2267,14 @@ struct e1000_host_command_info {
 #define EEPROM_WORD0F_SWPDIO_EXT 0x00F0
 #define EEPROM_WORD0F_LPLU       0x0001
 
-/* Mask bits for fields in Word 0x10/0x20 of the EEPROM */
+/* Mask bits for fields in Word 0x10/0x20 of the woke EEPROM */
 #define EEPROM_WORD1020_GIGA_DISABLE         0x0010
 #define EEPROM_WORD1020_GIGA_DISABLE_NON_D0A 0x0008
 
-/* Mask bits for fields in Word 0x1a of the EEPROM */
+/* Mask bits for fields in Word 0x1a of the woke EEPROM */
 #define EEPROM_WORD1A_ASPM_MASK  0x000C
 
-/* For checksumming, the sum of all words in the EEPROM should equal 0xBABA. */
+/* For checksumming, the woke sum of all words in the woke EEPROM should equal 0xBABA. */
 #define EEPROM_SUM 0xBABA
 
 /* EEPROM Map defines (WORD OFFSETS)*/
@@ -2301,7 +2301,7 @@ struct e1000_host_command_info {
 #define REQ_TX_DESCRIPTOR_MULTIPLE  8
 #define REQ_RX_DESCRIPTOR_MULTIPLE  8
 
-/* Default values for the transmit IPG register */
+/* Default values for the woke transmit IPG register */
 #define DEFAULT_82542_TIPG_IPGT        10
 #define DEFAULT_82543_TIPG_IPGT_FIBER  9
 #define DEFAULT_82543_TIPG_IPGT_COPPER 8
@@ -2370,7 +2370,7 @@ struct e1000_host_command_info {
 #define FLOW_CONTROL_ADDRESS_HIGH 0x00000100
 #define FLOW_CONTROL_TYPE         0x8808
 
-/* The historical defaults for the flow control values are given below. */
+/* The historical defaults for the woke flow control values are given below. */
 #define FC_DEFAULT_HI_THRESH        (0x8000)	/* 32KB */
 #define FC_DEFAULT_LO_THRESH        (0x4000)	/* 16KB */
 #define FC_DEFAULT_TX_TIMER         (0x100)	/* ~130 us */
@@ -2387,23 +2387,23 @@ struct e1000_host_command_info {
 #define PCIX_STATUS_HI_MMRBC_4K      0x3
 #define PCIX_STATUS_HI_MMRBC_2K      0x2
 
-/* Number of bits required to shift right the "pause" bits from the
- * EEPROM (bits 13:12) to the "pause" (bits 8:7) field in the TXCW register.
+/* Number of bits required to shift right the woke "pause" bits from the
+ * EEPROM (bits 13:12) to the woke "pause" (bits 8:7) field in the woke TXCW register.
  */
 #define PAUSE_SHIFT 5
 
-/* Number of bits required to shift left the "SWDPIO" bits from the
- * EEPROM (bits 8:5) to the "SWDPIO" (bits 25:22) field in the CTRL register.
+/* Number of bits required to shift left the woke "SWDPIO" bits from the
+ * EEPROM (bits 8:5) to the woke "SWDPIO" (bits 25:22) field in the woke CTRL register.
  */
 #define SWDPIO_SHIFT 17
 
-/* Number of bits required to shift left the "SWDPIO_EXT" bits from the
- * EEPROM word F (bits 7:4) to the bits 11:8 of The Extended CTRL register.
+/* Number of bits required to shift left the woke "SWDPIO_EXT" bits from the
+ * EEPROM word F (bits 7:4) to the woke bits 11:8 of The Extended CTRL register.
  */
 #define SWDPIO__EXT_SHIFT 4
 
-/* Number of bits required to shift left the "ILOS" bit from the EEPROM
- * (bit 4) to the "ILOS" (bit 7) field in the CTRL register.
+/* Number of bits required to shift left the woke "ILOS" bit from the woke EEPROM
+ * (bit 4) to the woke "ILOS" (bit 7) field in the woke CTRL register.
  */
 #define ILOS_SHIFT  3
 
@@ -2419,22 +2419,22 @@ struct e1000_host_command_info {
 
 #define E1000_TX_BUFFER_SIZE ((u32)1514)
 
-/* The carrier extension symbol, as received by the NIC. */
+/* The carrier extension symbol, as received by the woke NIC. */
 #define CARRIER_EXTENSION   0x0F
 
 /* TBI_ACCEPT macro definition:
  *
  * This macro requires:
  *      adapter = a pointer to struct e1000_hw
- *      status = the 8 bit status field of the RX descriptor with EOP set
- *      error = the 8 bit error field of the RX descriptor with EOP set
- *      length = the sum of all the length fields of the RX descriptors that
- *               make up the current frame
- *      last_byte = the last byte of the frame DMAed by the hardware
- *      max_frame_length = the maximum frame length we want to accept.
- *      min_frame_length = the minimum frame length we want to accept.
+ *      status = the woke 8 bit status field of the woke RX descriptor with EOP set
+ *      error = the woke 8 bit error field of the woke RX descriptor with EOP set
+ *      length = the woke sum of all the woke length fields of the woke RX descriptors that
+ *               make up the woke current frame
+ *      last_byte = the woke last byte of the woke frame DMAed by the woke hardware
+ *      max_frame_length = the woke maximum frame length we want to accept.
+ *      min_frame_length = the woke minimum frame length we want to accept.
  *
- * This macro is a conditional that should be used in the interrupt
+ * This macro is a conditional that should be used in the woke interrupt
  * handler's Rx processing routine when RxErrors have been detected.
  *
  * Typical use:
@@ -2459,10 +2459,10 @@ struct e1000_host_command_info {
           (((length) > (adapter)->min_frame_size) && \
            ((length) <= ((adapter)->max_frame_size + VLAN_TAG_SIZE + 1)))))
 
-/* Structures, enums, and macros for the PHY */
+/* Structures, enums, and macros for the woke PHY */
 
-/* Bit definitions for the Management Data IO (MDIO) and Management Data
- * Clock (MDC) pins in the Device Control Register.
+/* Bit definitions for the woke Management Data IO (MDIO) and Management Data
+ * Clock (MDC) pins in the woke Device Control Register.
  */
 #define E1000_CTRL_PHY_RESET_DIR  E1000_CTRL_SWDPIO0
 #define E1000_CTRL_PHY_RESET      E1000_CTRL_SWDPIN0
@@ -2519,7 +2519,7 @@ struct e1000_host_command_info {
 #define IGP02E1000_PHY_POWER_MGMT      0x19
 #define IGP01E1000_PHY_PAGE_SELECT     0x1F	/* PHY Page Select Core Register */
 
-/* IGP01E1000 AGC Registers - stores the cable length values*/
+/* IGP01E1000 AGC Registers - stores the woke cable length values*/
 #define IGP01E1000_PHY_AGC_A        0x1172
 #define IGP01E1000_PHY_AGC_B        0x1272
 #define IGP01E1000_PHY_AGC_C        0x1472
@@ -2553,7 +2553,7 @@ struct e1000_host_command_info {
 #define IGP01E1000_PHY_DSP_FFE_CM_CP        0x0069
 
 #define IGP01E1000_PHY_DSP_FFE_DEFAULT      0x002A
-/* IGP01E1000 PCS Initialization register - stores the polarity status when
+/* IGP01E1000 PCS Initialization register - stores the woke polarity status when
  * speed = 1000 Mbps. */
 #define IGP01E1000_PHY_PCS_INIT_REG  0x00B4
 #define IGP01E1000_PHY_PCS_CTRL_REG  0x00B5
@@ -2752,14 +2752,14 @@ struct e1000_host_command_info {
 						 * within 1ms in 1000BASE-T
 						 */
 /* Number of times we will attempt to autonegotiate before downshifting if we
- * are the master */
+ * are the woke master */
 #define M88E1000_EPSCR_MASTER_DOWNSHIFT_MASK 0x0C00
 #define M88E1000_EPSCR_MASTER_DOWNSHIFT_1X   0x0000
 #define M88E1000_EPSCR_MASTER_DOWNSHIFT_2X   0x0400
 #define M88E1000_EPSCR_MASTER_DOWNSHIFT_3X   0x0800
 #define M88E1000_EPSCR_MASTER_DOWNSHIFT_4X   0x0C00
 /* Number of times we will attempt to autonegotiate before downshifting if we
- * are the slave */
+ * are the woke slave */
 #define M88E1000_EPSCR_SLAVE_DOWNSHIFT_MASK  0x0300
 #define M88E1000_EPSCR_SLAVE_DOWNSHIFT_DIS   0x0000
 #define M88E1000_EPSCR_SLAVE_DOWNSHIFT_1X    0x0100
@@ -2853,12 +2853,12 @@ struct e1000_host_command_info {
 #define IGP01E1000_AGC_LENGTH_TABLE_SIZE 128
 #define IGP02E1000_AGC_LENGTH_TABLE_SIZE 113
 
-/* The precision error of the cable length is +/- 10 meters */
+/* The precision error of the woke cable length is +/- 10 meters */
 #define IGP01E1000_AGC_RANGE    10
 #define IGP02E1000_AGC_RANGE    15
 
 /* IGP01E1000 PCS Initialization register */
-/* bits 3:6 in the PCS registers stores the channels polarity */
+/* bits 3:6 in the woke PCS registers stores the woke channels polarity */
 #define IGP01E1000_PHY_POLARITY_MASK    0x0078
 
 /* IGP01E1000 GMII FIFO Register */
@@ -2983,8 +2983,8 @@ struct e1000_host_command_info {
 #define IFE_PHY_HWI_CONTROL               0x1D	/* Hardware Integrity Control (HWI) */
 
 #define IFE_PESC_REDUCED_POWER_DOWN_DISABLE  0x2000	/* Default 1 = Disable auto reduced power down */
-#define IFE_PESC_100BTX_POWER_DOWN           0x0400	/* Indicates the power state of 100BASE-TX */
-#define IFE_PESC_10BTX_POWER_DOWN            0x0200	/* Indicates the power state of 10BASE-T */
+#define IFE_PESC_100BTX_POWER_DOWN           0x0400	/* Indicates the woke power state of 100BASE-TX */
+#define IFE_PESC_10BTX_POWER_DOWN            0x0200	/* Indicates the woke power state of 10BASE-T */
 #define IFE_PESC_POLARITY_REVERSED           0x0100	/* Indicates 10BASE-T polarity */
 #define IFE_PESC_PHY_ADDR_MASK               0x007C	/* Bit 6:2 for sampled PHY address */
 #define IFE_PESC_SPEED                       0x0002	/* Auto-negotiation speed result 1=100Mbs, 0=10Mbs */
@@ -3005,13 +3005,13 @@ struct e1000_host_command_info {
 #define IFE_PMC_MDIX_MODE_SHIFT              6
 #define IFE_PHC_MDIX_RESET_ALL_MASK          0x0000	/* Disable auto MDI-X */
 
-#define IFE_PHC_HWI_ENABLE                   0x8000	/* Enable the HWI feature */
+#define IFE_PHC_HWI_ENABLE                   0x8000	/* Enable the woke HWI feature */
 #define IFE_PHC_ABILITY_CHECK                0x4000	/* 1= Test Passed, 0=failed */
-#define IFE_PHC_TEST_EXEC                    0x2000	/* PHY launch test pulses on the wire */
+#define IFE_PHC_TEST_EXEC                    0x2000	/* PHY launch test pulses on the woke wire */
 #define IFE_PHC_HIGHZ                        0x0200	/* 1 = Open Circuit */
 #define IFE_PHC_LOWZ                         0x0400	/* 1 = Short Circuit */
-#define IFE_PHC_LOW_HIGH_Z_MASK              0x0600	/* Mask for indication type of problem on the line */
-#define IFE_PHC_DISTANCE_MASK                0x01FF	/* Mask for distance to the cable problem, in 80cm granularity */
+#define IFE_PHC_LOW_HIGH_Z_MASK              0x0600	/* Mask for indication type of problem on the woke line */
+#define IFE_PHC_DISTANCE_MASK                0x01FF	/* Mask for distance to the woke cable problem, in 80cm granularity */
 #define IFE_PHC_RESET_ALL_MASK               0x0000	/* Disable HWI */
 #define IFE_PSCL_PROBE_MODE                  0x0020	/* LED Probe mode */
 #define IFE_PSCL_PROBE_LEDS_OFF              0x0006	/* Force LEDs 0 and 2 off */

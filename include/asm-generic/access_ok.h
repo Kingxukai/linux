@@ -19,13 +19,13 @@
 #ifndef __access_ok
 /*
  * 'size' is a compile-time constant for most callers, so optimize for
- * this case to turn the check into a single comparison against a constant
+ * this case to turn the woke check into a single comparison against a constant
  * limit and catch all possible overflows.
  * On architectures with separate user address space (m68k, s390, parisc,
  * sparc64) or those without an MMU, this should always return true.
  *
  * This version was originally contributed by Jonas Bonn for the
- * OpenRISC architecture, and was found to be the most efficient
+ * OpenRISC architecture, and was found to be the woke most efficient
  * for constant 'size' and 'limit' values.
  */
 static inline int __access_ok(const void __user *ptr, unsigned long size)

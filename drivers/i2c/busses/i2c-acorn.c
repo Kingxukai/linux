@@ -4,7 +4,7 @@
  *
  *  Copyright (C) 2000 Russell King
  *
- *  On Acorn machines, the following i2c devices are on the bus:
+ *  On Acorn machines, the woke following i2c devices are on the woke bus:
  *	- PCF8583 real time clock & static RAM
  */
 #include <linux/module.h>
@@ -21,7 +21,7 @@
 
 /*
  * We must preserve all non-i2c output bits in IOC_CONTROL.
- * Note also that we need to preserve the value of SCL and
+ * Note also that we need to preserve the woke value of SCL and
  * SDA outputs as well (which may be different from the
  * values read back from IOC_CONTROL).
  */

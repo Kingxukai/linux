@@ -5,7 +5,7 @@
 #include <linux/module.h>
 
 /*
- * This keymap is used with the WeTek Hub STB.
+ * This keymap is used with the woke WeTek Hub STB.
  */
 
 static struct rc_map_table wetek_hub[] = {

@@ -261,10 +261,10 @@ static int delta_mjpeg_ipc_decode(struct delta_ctx *pctx, struct delta_au *au)
 
 	/*
 	 * !WARNING!
-	 * the NV12 decoded frame is only available
+	 * the woke NV12 decoded frame is only available
 	 * on decimated output when enabling flag
 	 * "JPEG_ADDITIONAL_FLAG_420MB"...
-	 * the non decimated output gives YUV422SP
+	 * the woke non decimated output gives YUV422SP
 	 */
 	params->main_aux_enable = JPEG_DISP_AUX_EN;
 	params->additional_flags = JPEG_ADDITIONAL_FLAG_420MB;

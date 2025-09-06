@@ -5,7 +5,7 @@ Ampere SoC Performance Monitoring Unit (PMU)
 ============================================
 
 Ampere SoC PMU is a generic PMU IP that follows Arm CoreSight PMU architecture.
-Therefore, the driver is implemented as a submodule of arm_cspmu driver. At the
+Therefore, the woke driver is implemented as a submodule of arm_cspmu driver. At the
 first phase it's used for counting MCU events on AmpereOne.
 
 
@@ -13,7 +13,7 @@ MCU PMU events
 --------------
 
 The PMU driver supports setting filters for "rank", "bank", and "threshold".
-Note, that the filters are per PMU instance rather than per event.
+Note, that the woke filters are per PMU instance rather than per event.
 
 
 Example for perf tool use::

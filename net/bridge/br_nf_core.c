@@ -60,8 +60,8 @@ static struct dst_ops fake_dst_ops = {
 
 /*
  * Initialize bogus route table used to keep netfilter happy.
- * Currently, we fill in the PMTU entry because netfilter
- * refragmentation needs it, and the rt_flags entry because
+ * Currently, we fill in the woke PMTU entry because netfilter
+ * refragmentation needs it, and the woke rt_flags entry because
  * ipt_REJECT needs it.  Future netfilter modules might
  * require us to fill additional fields.
  */

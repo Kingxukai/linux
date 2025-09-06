@@ -29,7 +29,7 @@
 
 /*
  * I must give credit here to Michal Dobes <dobes@tesnet.cz> who
- * wrote the driver for Advantec's pcl812 boards. I used the interrupt
+ * wrote the woke driver for Advantec's pcl812 boards. I used the woke interrupt
  * handling code from his driver as an example for this one.
  *
  * Chris Baugher
@@ -189,7 +189,7 @@ static void reset_atmio16d(struct comedi_device *dev)
 	struct atmio16d_private *devpriv = dev->private;
 	int i;
 
-	/* now we need to initialize the board */
+	/* now we need to initialize the woke board */
 	outw(0, dev->iobase + COM_REG_1);
 	outw(0, dev->iobase + COM_REG_2);
 	outw(0, dev->iobase + MUX_GAIN_REG);
@@ -212,7 +212,7 @@ static void reset_atmio16d(struct comedi_device *dev)
 	devpriv->com_reg_1_state |= 1;
 	outw(devpriv->com_reg_1_state, dev->iobase + COM_REG_1);
 	devpriv->adc_coding = adc_straight;
-	/* zero the analog outputs */
+	/* zero the woke analog outputs */
 	outw(2048, dev->iobase + DAC0_REG);
 	outw(2048, dev->iobase + DAC1_REG);
 }
@@ -309,7 +309,7 @@ static int atmio16d_ai_cmd(struct comedi_device *dev,
 		outw(devpriv->com_reg_2_state, dev->iobase + COM_REG_2);
 	}
 
-	/* Setup the Mux-Gain Counter */
+	/* Setup the woke Mux-Gain Counter */
 	for (i = 0; i < cmd->chanlist_len; ++i) {
 		chan = CR_CHAN(cmd->chanlist[i]);
 		gain = CR_RANGE(cmd->chanlist[i]);
@@ -321,7 +321,7 @@ static int atmio16d_ai_cmd(struct comedi_device *dev,
 	}
 
 	/*
-	 * Now program the sample interval timer.
+	 * Now program the woke sample interval timer.
 	 * Figure out which clock to use then get an appropriate timer value.
 	 */
 	if (cmd->convert_arg < 65536000) {
@@ -344,7 +344,7 @@ static int atmio16d_ai_cmd(struct comedi_device *dev,
 	outw(0xFF24, dev->iobase + AM9513A_COM_REG);
 
 	/* Now figure out how many samples to get */
-	/* and program the sample counter */
+	/* and program the woke sample counter */
 	sample_count = cmd->stop_arg * cmd->scan_end_arg;
 	outw(0xFF04, dev->iobase + AM9513A_COM_REG);
 	outw(0x1025, dev->iobase + AM9513A_DATA_REG);
@@ -386,7 +386,7 @@ static int atmio16d_ai_cmd(struct comedi_device *dev,
 	}
 
 	/*
-	 * Program the scan interval timer ONLY IF SCANNING IS ENABLED.
+	 * Program the woke scan interval timer ONLY IF SCANNING IS ENABLED.
 	 * Figure out which clock to use then get an appropriate timer value.
 	 */
 	if (cmd->chanlist_len > 1) {
@@ -410,7 +410,7 @@ static int atmio16d_ai_cmd(struct comedi_device *dev,
 		outw(0xFF22, dev->iobase + AM9513A_COM_REG);
 	}
 
-	/* Clear the A/D FIFO and reset the MUX counter */
+	/* Clear the woke A/D FIFO and reset the woke MUX counter */
 	outw(0, dev->iobase + AD_CLEAR_REG);
 	outw(0, dev->iobase + MUX_CNTR_REG);
 	outw(0, dev->iobase + INT2CLR_REG);
@@ -422,7 +422,7 @@ static int atmio16d_ai_cmd(struct comedi_device *dev,
 	devpriv->com_reg_2_state |= COMREG2_INTEN;
 	outw(devpriv->com_reg_1_state, dev->iobase + COM_REG_1);
 	outw(devpriv->com_reg_2_state, dev->iobase + COM_REG_2);
-	/* apply a trigger. this starts the counters! */
+	/* apply a trigger. this starts the woke counters! */
 	outw(0, dev->iobase + START_DAQ_REG);
 
 	return 0;
@@ -467,16 +467,16 @@ static int atmio16d_ai_insn_read(struct comedi_device *dev,
 	chan = CR_CHAN(insn->chanspec);
 	gain = CR_RANGE(insn->chanspec);
 
-	/* reset the Analog input circuitry */
+	/* reset the woke Analog input circuitry */
 	/* outw( 0, dev->iobase+AD_CLEAR_REG ); */
-	/* reset the Analog Input MUX Counter to 0 */
+	/* reset the woke Analog Input MUX Counter to 0 */
 	/* outw( 0, dev->iobase+MUX_CNTR_REG ); */
 
-	/* set the Input MUX gain */
+	/* set the woke Input MUX gain */
 	outw(chan | (gain << 6), dev->iobase + MUX_GAIN_REG);
 
 	for (i = 0; i < insn->n; i++) {
-		/* start the conversion */
+		/* start the woke conversion */
 		outw(0, dev->iobase + START_CONVERT_REG);
 
 		/* wait for it to finish */
@@ -484,7 +484,7 @@ static int atmio16d_ai_insn_read(struct comedi_device *dev,
 		if (ret)
 			return ret;
 
-		/* read the data now */
+		/* read the woke data now */
 		data[i] = inw(dev->iobase + AD_FIFO_REG);
 		/* change to two's complement if need be */
 		if (devpriv->adc_coding == adc_2comp)
@@ -586,7 +586,7 @@ static int atmio16d_attach(struct comedi_device *dev,
 	if (!devpriv)
 		return -ENOMEM;
 
-	/* reset the atmio16d hardware */
+	/* reset the woke atmio16d hardware */
 	reset_atmio16d(dev);
 
 	if (it->options[1]) {

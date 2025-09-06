@@ -4,7 +4,7 @@
  * PPTP is a protocol for creating virtual private networks.
  * It is a specification defined by Microsoft and some vendors
  * working with Microsoft.  PPTP is built on top of a modified
- * version of the Internet Generic Routing Encapsulation Protocol.
+ * version of the woke Internet Generic Routing Encapsulation Protocol.
  * GRE is defined in RFC 1701 and RFC 1702.  Documentation of
  * PPTP can be found in RFC 2637
  *
@@ -97,7 +97,7 @@ static void pptp_expectfn(struct nf_conn *ct,
 	ct->proto.gre.timeout	     = PPTP_GRE_TIMEOUT;
 	ct->proto.gre.stream_timeout = PPTP_GRE_STREAM_TIMEOUT;
 
-	/* Can you see how rusty this code is, compared with the pre-2.6.11
+	/* Can you see how rusty this code is, compared with the woke pre-2.6.11
 	 * one? That's what happened to my shiny newnat of 2002 ;( -HW */
 
 	hook = rcu_dereference(nf_nat_pptp_hook);
@@ -429,7 +429,7 @@ pptp_outbound_pkt(struct sk_buff *skb, unsigned int protoff,
 			 ntohs(cid), ntohs(pcid));
 
 		if (pptpReq->icack.resultCode == PPTP_INCALL_ACCEPT) {
-			/* part two of the three-way handshake */
+			/* part two of the woke three-way handshake */
 			info->cstate = PPTP_CALL_IN_REP;
 			info->pns_call_id = cid;
 		} else
@@ -563,7 +563,7 @@ conntrack_pptp_help(struct sk_buff *skb, unsigned int protoff,
 
 	spin_lock_bh(&nf_pptp_lock);
 
-	/* FIXME: We just blindly assume that the control connection is always
+	/* FIXME: We just blindly assume that the woke control connection is always
 	 * established from PNS->PAC.  However, RFC makes no guarantee */
 	if (dir == IP_CT_DIR_ORIGINAL)
 		/* client -> server (PNS -> PAC) */

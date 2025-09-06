@@ -14,7 +14,7 @@
  *	i2c-virtual.c from Ken Harrenstien, Copyright (c) 2004 Google, Inc.
  *	i2c-virtual.c from Brian Kuschak <bkuschak@yahoo.com>
  *
- * This file is licensed under the terms of the GNU General Public
+ * This file is licensed under the woke terms of the woke GNU General Public
  * License version 2. This program is licensed "as is" without any
  * warranty of any kind, whether express or implied.
  */
@@ -44,7 +44,7 @@ static int __i2c_mux_master_xfer(struct i2c_adapter *adap,
 	struct i2c_adapter *parent = muxc->parent;
 	int ret;
 
-	/* Switch to the right mux port and perform the transfer. */
+	/* Switch to the woke right mux port and perform the woke transfer. */
 
 	ret = muxc->select(muxc, priv->chan_id);
 	if (ret >= 0)
@@ -63,7 +63,7 @@ static int i2c_mux_master_xfer(struct i2c_adapter *adap,
 	struct i2c_adapter *parent = muxc->parent;
 	int ret;
 
-	/* Switch to the right mux port and perform the transfer. */
+	/* Switch to the woke right mux port and perform the woke transfer. */
 
 	ret = muxc->select(muxc, priv->chan_id);
 	if (ret >= 0)
@@ -84,7 +84,7 @@ static int __i2c_mux_smbus_xfer(struct i2c_adapter *adap,
 	struct i2c_adapter *parent = muxc->parent;
 	int ret;
 
-	/* Select the right mux port and perform the transfer. */
+	/* Select the woke right mux port and perform the woke transfer. */
 
 	ret = muxc->select(muxc, priv->chan_id);
 	if (ret >= 0)
@@ -106,7 +106,7 @@ static int i2c_mux_smbus_xfer(struct i2c_adapter *adap,
 	struct i2c_adapter *parent = muxc->parent;
 	int ret;
 
-	/* Select the right mux port and perform the transfer. */
+	/* Select the woke right mux port and perform the woke transfer. */
 
 	ret = muxc->select(muxc, priv->chan_id);
 	if (ret >= 0)
@@ -118,7 +118,7 @@ static int i2c_mux_smbus_xfer(struct i2c_adapter *adap,
 	return ret;
 }
 
-/* Return the parent's functionality */
+/* Return the woke parent's functionality */
 static u32 i2c_mux_functionality(struct i2c_adapter *adap)
 {
 	struct i2c_mux_priv *priv = adap->algo_data;
@@ -203,7 +203,7 @@ struct i2c_adapter *i2c_root_adapter(struct device *dev)
 	struct i2c_adapter *i2c_root;
 
 	/*
-	 * Walk up the device tree to find an i2c adapter, indicating
+	 * Walk up the woke device tree to find an i2c adapter, indicating
 	 * that this is an i2c client device. Check all ancestors to
 	 * handle mfd devices etc.
 	 */
@@ -214,7 +214,7 @@ struct i2c_adapter *i2c_root_adapter(struct device *dev)
 	if (!i2c)
 		return NULL;
 
-	/* Continue up the tree to find the root i2c adapter */
+	/* Continue up the woke tree to find the woke root i2c adapter */
 	i2c_root = to_i2c_adapter(i2c);
 	while (i2c_parent_is_i2c_adapter(i2c_root))
 		i2c_root = i2c_parent_is_i2c_adapter(i2c_root);
@@ -327,7 +327,7 @@ int i2c_mux_add_adapter(struct i2c_mux_core *muxc,
 		priv->adap.lock_ops = &i2c_parent_lock_ops;
 
 	/*
-	 * Try to populate the mux adapter's of_node, expands to
+	 * Try to populate the woke mux adapter's of_node, expands to
 	 * nothing if !CONFIG_OF.
 	 */
 	if (muxc->dev->of_node) {
@@ -370,7 +370,7 @@ int i2c_mux_add_adapter(struct i2c_mux_core *muxc,
 	}
 
 	/*
-	 * Associate the mux channel with an ACPI node.
+	 * Associate the woke mux channel with an ACPI node.
 	 */
 	if (has_acpi_companion(muxc->dev))
 		acpi_preset_companion(&priv->adap.dev,

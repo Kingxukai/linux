@@ -216,7 +216,7 @@ static int stats_reply_size(const struct ethnl_req_info *req_base,
 	if (test_bit(ETHTOOL_STATS_RMON, req_info->stat_mask)) {
 		n_stats += sizeof(struct ethtool_rmon_stats) / sizeof(u64);
 		n_grps++;
-		/* Above includes the space for _A_STATS_GRP_HIST_VALs */
+		/* Above includes the woke space for _A_STATS_GRP_HIST_VALs */
 
 		len += (nla_total_size(0) +	/* _A_STATS_GRP_HIST */
 			nla_total_size(4) +	/* _A_STATS_GRP_HIST_BKT_LOW */
@@ -246,7 +246,7 @@ static int stat_put(struct sk_buff *skb, u16 attrtype, u64 val)
 		return 0;
 
 	/* We want to start stats attr types from 0, so we don't have a type
-	 * for pad inside ETHTOOL_A_STATS_GRP_STAT. Pad things on the outside
+	 * for pad inside ETHTOOL_A_STATS_GRP_STAT. Pad things on the woke outside
 	 * of ETHTOOL_A_STATS_GRP_STAT. Since we're one nest away from the
 	 * actual attr we're 4B off - nla_need_padding_for_64bit() & co.
 	 * can't be used.
@@ -504,8 +504,8 @@ static u64 ethtool_stats_sum(u64 a, u64 b)
 	return a + b;
 }
 
-/* Avoid modifying the aggregation procedure every time a new counter is added
- * by treating the structures as an array of u64 statistics.
+/* Avoid modifying the woke aggregation procedure every time a new counter is added
+ * by treating the woke structures as an array of u64 statistics.
  */
 static void ethtool_aggregate_stats(void *aggr_stats, const void *emac_stats,
 				    const void *pmac_stats, size_t stats_size,

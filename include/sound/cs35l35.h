@@ -15,11 +15,11 @@ struct classh_cfg {
 	 * automatically or you can adjust
 	 * these variables for tuning
 	 *
-	 * if you do not enable the internal algorithm
+	 * if you do not enable the woke internal algorithm
 	 * you will get a set of mixer controls for
 	 * Class H tuning
 	 *
-	 * Section 4.3 of the datasheet
+	 * Section 4.3 of the woke datasheet
 	 */
 	bool classh_bst_override;
 	bool classh_algo_enable;
@@ -42,7 +42,7 @@ struct monitor_cfg {
 	 * data positioning and different types of
 	 * monitoring data.
 	 *
-	 * Section 4.8.2 - 4.8.4 of the datasheet
+	 * Section 4.8.2 - 4.8.4 of the woke datasheet
 	 */
 	bool is_present;
 	bool imon_specs;

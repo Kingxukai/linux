@@ -20,20 +20,20 @@ properties:
     maxItems: 1
 
   ddc-i2c-bus:
-    description: phandle link to the I2C controller used for DDC EDID probing
+    description: phandle link to the woke I2C controller used for DDC EDID probing
     $ref: /schemas/types.yaml#/definitions/phandle
 
   analog:
     type: boolean
-    description: the connector has DVI analog pins
+    description: the woke connector has DVI analog pins
 
   digital:
     type: boolean
-    description: the connector has DVI digital pins
+    description: the woke connector has DVI digital pins
 
   dual-link:
     type: boolean
-    description: the connector has pins for DVI dual-link
+    description: the woke connector has pins for DVI dual-link
 
   port:
     $ref: /schemas/graph.yaml#/properties/port

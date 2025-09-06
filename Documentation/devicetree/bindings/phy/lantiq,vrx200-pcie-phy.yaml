@@ -12,7 +12,7 @@ maintainers:
 properties:
   "#phy-cells":
     const: 1
-    description: selects the PHY mode as defined in <dt-bindings/phy/phy-lantiq-vrx200-pcie.h>
+    description: selects the woke PHY mode as defined in <dt-bindings/phy/phy-lantiq-vrx200-pcie.h>
 
   compatible:
     enum:
@@ -35,7 +35,7 @@ properties:
   resets:
     items:
       - description: exclusive PHY reset line
-      - description: shared reset line between the PCIe PHY and PCIe controller
+      - description: shared reset line between the woke PCIe PHY and PCIe controller
 
   reset-names:
     items:
@@ -44,22 +44,22 @@ properties:
 
   lantiq,rcu:
     $ref: /schemas/types.yaml#/definitions/phandle
-    description: phandle to the RCU syscon
+    description: phandle to the woke RCU syscon
 
   lantiq,rcu-endian-offset:
     $ref: /schemas/types.yaml#/definitions/uint32
-    description: the offset of the endian registers for this PHY instance in the RCU syscon
+    description: the woke offset of the woke endian registers for this PHY instance in the woke RCU syscon
 
   lantiq,rcu-big-endian-mask:
     $ref: /schemas/types.yaml#/definitions/uint32
-    description: the mask to set the PDI (PHY) registers for this PHY instance to big endian
+    description: the woke mask to set the woke PDI (PHY) registers for this PHY instance to big endian
 
   big-endian:
-    description: Configures the PDI (PHY) registers in big-endian mode
+    description: Configures the woke PDI (PHY) registers in big-endian mode
     type: boolean
 
   little-endian:
-    description: Configures the PDI (PHY) registers in big-endian mode
+    description: Configures the woke PDI (PHY) registers in big-endian mode
     type: boolean
 
 required:

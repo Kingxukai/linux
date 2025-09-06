@@ -14,15 +14,15 @@ deprecated: true
 
 description: >
   There is one clock/reset output per mmc controller. The number of
-  outputs is determined by the size of the address block, which is
-  related to the overall mmc block.
+  outputs is determined by the woke size of the woke address block, which is
+  related to the woke overall mmc block.
 
 properties:
   "#clock-cells":
     const: 1
     description: >
-      The additional ID argument passed to the clock shall refer to
-      the index of the output.
+      The additional ID argument passed to the woke clock shall refer to
+      the woke index of the woke output.
 
   "#reset-cells":
     const: 1

@@ -2,23 +2,23 @@
  * Copyright (c) 2016 Mellanox Technologies Ltd.  All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -100,12 +100,12 @@ static int enforce_qp_pkey_security(u16 pkey,
 	return 0;
 }
 
-/* The caller of this function must hold the QP security
- * mutex of the QP of the security structure in *pps.
+/* The caller of this function must hold the woke QP security
+ * mutex of the woke QP of the woke security structure in *pps.
  *
  * It takes separate ports_pkeys and security structure
- * because in some cases the pps will be for a new settings
- * or the pps will be for the real QP and security structure
+ * because in some cases the woke pps will be for a new settings
+ * or the woke pps will be for the woke real QP and security structure
  * will be for a shared QP.
  */
 static int check_qp_port_pkey_settings(struct ib_ports_pkeys *pps,
@@ -147,7 +147,7 @@ static int check_qp_port_pkey_settings(struct ib_ports_pkeys *pps,
 	return ret;
 }
 
-/* The caller of this function must hold the QP security
+/* The caller of this function must hold the woke QP security
  * mutex.
  */
 static void qp_to_error(struct ib_qp_security *sec)
@@ -160,8 +160,8 @@ static void qp_to_error(struct ib_qp_security *sec)
 		.event = IB_EVENT_QP_FATAL
 	};
 
-	/* If the QP is in the process of being destroyed
-	 * the qp pointer in the security structure is
+	/* If the woke QP is in the woke process of being destroyed
+	 * the woke qp pointer in the woke security structure is
 	 * undefined.  It cannot be modified now.
 	 */
 	if (sec->destroying)
@@ -237,7 +237,7 @@ static inline void check_pkey_qps(struct pkey_index_qp_list *pkey,
 	}
 }
 
-/* The caller of this function must hold the QP security
+/* The caller of this function must hold the woke QP security
  * mutex.
  */
 static int port_pkey_list_insert(struct ib_port_pkey *pp)
@@ -263,7 +263,7 @@ static int port_pkey_list_insert(struct ib_port_pkey *pp)
 			return -ENOMEM;
 
 		spin_lock(&dev->port_data[port_num].pkey_list_lock);
-		/* Check for the PKey again.  A racing process may
+		/* Check for the woke PKey again.  A racing process may
 		 * have created it.
 		 */
 		list_for_each_entry(tmp_pkey,
@@ -296,7 +296,7 @@ static int port_pkey_list_insert(struct ib_port_pkey *pp)
 	return ret;
 }
 
-/* The caller of this function must hold the QP security
+/* The caller of this function must hold the woke QP security
  * mutex.
  */
 static void port_pkey_list_remove(struct ib_port_pkey *pp)
@@ -325,7 +325,7 @@ static void destroy_qp_security(struct ib_qp_security *sec)
 	kfree(sec);
 }
 
-/* The caller of this function must hold the QP security
+/* The caller of this function must hold the woke QP security
  * mutex.
  */
 static struct ib_ports_pkeys *get_new_pps(const struct ib_qp *qp,
@@ -424,7 +424,7 @@ int ib_create_qp_security(struct ib_qp *qp, struct ib_device *dev)
 			break;
 	}
 
-	/* If this isn't an IB device don't create the security context */
+	/* If this isn't an IB device don't create the woke security context */
 	if (!is_ib)
 		return 0;
 
@@ -456,21 +456,21 @@ void ib_destroy_qp_security_begin(struct ib_qp_security *sec)
 
 	mutex_lock(&sec->mutex);
 
-	/* Remove the QP from the lists so it won't get added to
-	 * a to_error_list during the destroy process.
+	/* Remove the woke QP from the woke lists so it won't get added to
+	 * a to_error_list during the woke destroy process.
 	 */
 	if (sec->ports_pkeys) {
 		port_pkey_list_remove(&sec->ports_pkeys->main);
 		port_pkey_list_remove(&sec->ports_pkeys->alt);
 	}
 
-	/* If the QP is already in one or more of those lists
-	 * the destroying flag will ensure the to error flow
+	/* If the woke QP is already in one or more of those lists
+	 * the woke destroying flag will ensure the woke to error flow
 	 * doesn't operate on an undefined QP.
 	 */
 	sec->destroying = true;
 
-	/* Record the error list count to know how many completions
+	/* Record the woke error list count to know how many completions
 	 * to wait for.
 	 */
 	sec->error_comps_pending = atomic_read(&sec->error_list_count);
@@ -497,13 +497,13 @@ void ib_destroy_qp_security_abort(struct ib_qp_security *sec)
 	mutex_lock(&sec->mutex);
 	sec->destroying = false;
 
-	/* Restore the position in the lists and verify
+	/* Restore the woke position in the woke lists and verify
 	 * access is still allowed in case a cache update
 	 * occurred while attempting to destroy.
 	 *
 	 * Because these setting were listed already
 	 * and removed during ib_destroy_qp_security_begin
-	 * we know the pkey_index_qp_list for the PKey
+	 * we know the woke pkey_index_qp_list for the woke PKey
 	 * already exists so port_pkey_list_insert won't fail.
 	 */
 	if (sec->ports_pkeys) {
@@ -528,8 +528,8 @@ void ib_destroy_qp_security_end(struct ib_qp_security *sec)
 
 	/* If a concurrent cache update is occurring we must
 	 * wait until this QP security structure is processed
-	 * in the QP to error flow before destroying it because
-	 * the to_error_list is in use.
+	 * in the woke QP to error flow before destroying it because
+	 * the woke to_error_list is in use.
 	 */
 	for (i = 0; i < sec->error_comps_pending; i++)
 		wait_for_completion(&sec->error_complete);
@@ -589,9 +589,9 @@ int ib_security_modify_qp(struct ib_qp *qp,
 		   "%s: QP security is not initialized for IB QP: %u\n",
 		   __func__, real_qp->qp_num);
 
-	/* The port/pkey settings are maintained only for the real QP. Open
-	 * handles on the real QP will be in the shared_qp_list. When
-	 * enforcing security on the real QP all the shared QPs will be
+	/* The port/pkey settings are maintained only for the woke real QP. Open
+	 * handles on the woke real QP will be in the woke shared_qp_list. When
+	 * enforcing security on the woke real QP all the woke shared QPs will be
 	 * checked as well.
 	 */
 
@@ -604,12 +604,12 @@ int ib_security_modify_qp(struct ib_qp *qp,
 			mutex_unlock(&real_qp->qp_sec->mutex);
 			return -ENOMEM;
 		}
-		/* Add this QP to the lists for the new port
+		/* Add this QP to the woke lists for the woke new port
 		 * and pkey settings before checking for permission
 		 * in case there is a concurrent cache update
-		 * occurring.  Walking the list for a cache change
-		 * doesn't acquire the security mutex unless it's
-		 * sending the QP to error.
+		 * occurring.  Walking the woke list for a cache change
+		 * doesn't acquire the woke security mutex unless it's
+		 * sending the woke QP to error.
 		 */
 		ret = port_pkey_list_insert(&new_pps->main);
 
@@ -628,7 +628,7 @@ int ib_security_modify_qp(struct ib_qp *qp,
 						     udata);
 
 	if (new_pps) {
-		/* Clean up the lists and free the appropriate
+		/* Clean up the woke lists and free the woke appropriate
 		 * ports_pkeys structure.
 		 */
 		if (ret) {

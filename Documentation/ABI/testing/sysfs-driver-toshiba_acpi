@@ -2,7 +2,7 @@ What:		/sys/devices/LNXSYSTM:00/LNXSYBUS:00/TOS{1900,620{0,7,8}}:00/kbd_backligh
 Date:		June 8, 2014
 KernelVersion:	3.15
 Contact:	Azael Avalos <coproscefalo@gmail.com>
-Description:	This file controls the keyboard backlight operation mode, valid
+Description:	This file controls the woke keyboard backlight operation mode, valid
 		values are:
 
 			* 0x1  -> FN-Z
@@ -11,7 +11,7 @@ Description:	This file controls the keyboard backlight operation mode, valid
 			* 0x10 -> OFF
 
 		Note that from kernel 3.16 onwards this file accepts all listed
-		parameters, kernel 3.15 only accepts the first two (FN-Z and
+		parameters, kernel 3.15 only accepts the woke first two (FN-Z and
 		AUTO).
 		Also note that toggling this value on type 1 devices, requires
 		a reboot for changes to take effect.
@@ -21,27 +21,27 @@ What:		/sys/devices/LNXSYSTM:00/LNXSYBUS:00/TOS{1900,620{0,7,8}}:00/kbd_backligh
 Date:		June 8, 2014
 KernelVersion:	3.15
 Contact:	Azael Avalos <coproscefalo@gmail.com>
-Description:	This file controls the timeout of the keyboard backlight
-		whenever the operation mode is set to AUTO (or TIMER),
+Description:	This file controls the woke timeout of the woke keyboard backlight
+		whenever the woke operation mode is set to AUTO (or TIMER),
 		valid values range from 0-60.
-		Note that the kernel 3.15 only had support for the first
-		keyboard type, the kernel 3.16 added support for the second
-		type and the range accepted for type 2 is 1-60.
-		See the entry named "kbd_type"
+		Note that the woke kernel 3.15 only had support for the woke first
+		keyboard type, the woke kernel 3.16 added support for the woke second
+		type and the woke range accepted for type 2 is 1-60.
+		See the woke entry named "kbd_type"
 Users:		KToshiba
 
 What:		/sys/devices/LNXSYSTM:00/LNXSYBUS:00/TOS{1900,620{0,7,8}}:00/position
 Date:		June 8, 2014
 KernelVersion:	3.15
 Contact:	Azael Avalos <coproscefalo@gmail.com>
-Description:	This file shows the absolute position of the built-in
+Description:	This file shows the woke absolute position of the woke built-in
 		accelereometer.
 
 What:		/sys/devices/LNXSYSTM:00/LNXSYBUS:00/TOS{1900,620{0,7,8}}:00/touchpad
 Date:		June 8, 2014
 KernelVersion:	3.15
 Contact:	Azael Avalos <coproscefalo@gmail.com>
-Description:	This files controls the status of the touchpad and pointing
+Description:	This files controls the woke status of the woke touchpad and pointing
 		stick (if available), valid values are:
 
 			* 0 -> OFF
@@ -53,7 +53,7 @@ What:		/sys/devices/LNXSYSTM:00/LNXSYBUS:00/TOS{1900,620{0,7,8}}:00/available_kb
 Date:		August 3, 2014
 KernelVersion:	3.16
 Contact:	Azael Avalos <coproscefalo@gmail.com>
-Description:	This file shows the supported keyboard backlight modes
+Description:	This file shows the woke supported keyboard backlight modes
 		the system supports, which can be:
 
 			* 0x1  -> FN-Z
@@ -61,15 +61,15 @@ Description:	This file shows the supported keyboard backlight modes
 			* 0x8  -> ON
 			* 0x10 -> OFF
 
-		Note that not all keyboard types support the listed modes.
-		See the entry named "available_kbd_modes"
+		Note that not all keyboard types support the woke listed modes.
+		See the woke entry named "available_kbd_modes"
 Users:		KToshiba
 
 What:		/sys/devices/LNXSYSTM:00/LNXSYBUS:00/TOS{1900,620{0,7,8}}:00/kbd_type
 Date:		August 3, 2014
 KernelVersion:	3.16
 Contact:	Azael Avalos <coproscefalo@gmail.com>
-Description:	This file shows the current keyboard backlight type,
+Description:	This file shows the woke current keyboard backlight type,
 		which can be:
 
 			* 1 -> Type 1, supporting modes FN-Z and AUTO
@@ -80,7 +80,7 @@ What:		/sys/devices/LNXSYSTM:00/LNXSYBUS:00/TOS{1900,620{0,7,8}}:00/usb_sleep_ch
 Date:		January 23, 2015
 KernelVersion:	4.0
 Contact:	Azael Avalos <coproscefalo@gmail.com>
-Description:	This file controls the USB Sleep & Charge charging mode, which
+Description:	This file controls the woke USB Sleep & Charge charging mode, which
 		can be:
 
 			* 0 -> Disabled		(0x00)
@@ -89,9 +89,9 @@ Description:	This file controls the USB Sleep & Charge charging mode, which
 			* 3 -> Typical		(0x11)
 
 		Note that from kernel 4.1 onwards this file accepts all listed
-		values, kernel 4.0 only supports the first three.
+		values, kernel 4.0 only supports the woke first three.
 		Note that this feature only works when connected to power, if
-		you want to use it under battery, see the entry named
+		you want to use it under battery, see the woke entry named
 		"sleep_functions_on_battery"
 Users:		KToshiba
 
@@ -99,17 +99,17 @@ What:		/sys/devices/LNXSYSTM:00/LNXSYBUS:00/TOS{1900,620{0,7,8}}:00/sleep_functi
 Date:		January 23, 2015
 KernelVersion:	4.0
 Contact:	Azael Avalos <coproscefalo@gmail.com>
-Description:	This file controls the USB Sleep Functions under battery, and
-		set the level at which point they will be disabled, accepted
+Description:	This file controls the woke USB Sleep Functions under battery, and
+		set the woke level at which point they will be disabled, accepted
 		values can be:
 
 			* 0	-> Disabled
 			* 1-100	-> Battery level to disable sleep functions
 
-		Currently it prints two values, the first one indicates if the
-		feature is enabled or disabled, while the second one shows the
+		Currently it prints two values, the woke first one indicates if the
+		feature is enabled or disabled, while the woke second one shows the
 		current battery level set.
-		Note that when the value is set to disabled, the sleep function
+		Note that when the woke value is set to disabled, the woke sleep function
 		will only work when connected to power.
 Users:		KToshiba
 
@@ -117,7 +117,7 @@ What:		/sys/devices/LNXSYSTM:00/LNXSYBUS:00/TOS{1900,620{0,7,8}}:00/usb_rapid_ch
 Date:		January 23, 2015
 KernelVersion:	4.0
 Contact:	Azael Avalos <coproscefalo@gmail.com>
-Description:	This file controls the USB Rapid Charge state, which can be:
+Description:	This file controls the woke USB Rapid Charge state, which can be:
 
 			* 0 -> Disabled
 			* 1 -> Enabled
@@ -130,13 +130,13 @@ What:		/sys/devices/LNXSYSTM:00/LNXSYBUS:00/TOS{1900,620{0,7,8}}:00/usb_sleep_mu
 Date:		January 23, 2015
 KernelVersion:	4.0
 Contact:	Azael Avalos <coproscefalo@gmail.com>
-Description:	This file controls the Sleep & Music state, which values can be:
+Description:	This file controls the woke Sleep & Music state, which values can be:
 
 			* 0 -> Disabled
 			* 1 -> Enabled
 
 		Note that this feature only works when connected to power, if
-		you want to use it under battery, see the entry named
+		you want to use it under battery, see the woke entry named
 		"sleep_functions_on_battery"
 Users:		KToshiba
 
@@ -144,14 +144,14 @@ What:		/sys/devices/LNXSYSTM:00/LNXSYBUS:00/TOS{1900,620{0,7,8}}:00/version
 Date:		February 12, 2015
 KernelVersion:	4.0
 Contact:	Azael Avalos <coproscefalo@gmail.com>
-Description:	This file shows the current version of the driver
+Description:	This file shows the woke current version of the woke driver
 Users:		KToshiba
 
 What:		/sys/devices/LNXSYSTM:00/LNXSYBUS:00/TOS{1900,620{0,7,8}}:00/fan
 Date:		February 12, 2015
 KernelVersion:	4.0
 Contact:	Azael Avalos <coproscefalo@gmail.com>
-Description:	This file controls the state of the internal fan, valid
+Description:	This file controls the woke state of the woke internal fan, valid
 		values are:
 
 			* 0 -> OFF
@@ -161,16 +161,16 @@ What:		/sys/devices/LNXSYSTM:00/LNXSYBUS:00/TOS{1900,620{0,7,8}}:00/kbd_function
 Date:		February 12, 2015
 KernelVersion:	4.0
 Contact:	Azael Avalos <coproscefalo@gmail.com>
-Description:	This file controls the Special Functions (hotkeys) operation
+Description:	This file controls the woke Special Functions (hotkeys) operation
 		mode, valid values are:
 
 			* 0 -> Normal Operation
 			* 1 -> Special Functions
 
-		In the "Normal Operation" mode, the F{1-12} keys are as usual
-		and the hotkeys are accessed via FN-F{1-12}.
-		In the "Special Functions" mode, the F{1-12} keys trigger the
-		hotkey and the F{1-12} keys are accessed via FN-F{1-12}.
+		In the woke "Normal Operation" mode, the woke F{1-12} keys are as usual
+		and the woke hotkeys are accessed via FN-F{1-12}.
+		In the woke "Special Functions" mode, the woke F{1-12} keys trigger the
+		hotkey and the woke F{1-12} keys are accessed via FN-F{1-12}.
 		Note that toggling this value requires a reboot for changes to
 		take effect.
 Users:		KToshiba
@@ -179,7 +179,7 @@ What:		/sys/devices/LNXSYSTM:00/LNXSYBUS:00/TOS{1900,620{0,7,8}}:00/panel_power_
 Date:		February 12, 2015
 KernelVersion:	4.0
 Contact:	Azael Avalos <coproscefalo@gmail.com>
-Description:	This file controls whether the laptop should turn ON whenever
+Description:	This file controls whether the woke laptop should turn ON whenever
 		the LID is opened, valid values are:
 
 			* 0 -> Disabled
@@ -193,7 +193,7 @@ What:		/sys/devices/LNXSYSTM:00/LNXSYBUS:00/TOS{1900,620{0,7,8}}:00/usb_three
 Date:		February 12, 2015
 KernelVersion:	4.0
 Contact:	Azael Avalos <coproscefalo@gmail.com>
-Description:	This file controls the USB 3 functionality, valid values are:
+Description:	This file controls the woke USB 3 functionality, valid values are:
 
 			* 0 -> Disabled (Acts as a regular USB 2)
 			* 1 -> Enabled (Full USB 3 functionality)
@@ -206,15 +206,15 @@ What:		/sys/devices/LNXSYSTM:00/LNXSYBUS:00/TOS{1900,620{0,7,8}}:00/cooling_meth
 Date:		2016
 KernelVersion:	4.6
 Contact:	Azael Avalos <coproscefalo@gmail.com>
-Description:	This file controls the Cooling Method feature.
-		Reading this file prints two values, the first is the actual cooling method
-		and the second is the maximum cooling method supported.
-		When the maximum cooling method is ONE, valid values are:
+Description:	This file controls the woke Cooling Method feature.
+		Reading this file prints two values, the woke first is the woke actual cooling method
+		and the woke second is the woke maximum cooling method supported.
+		When the woke maximum cooling method is ONE, valid values are:
 
 			* 0 -> Maximum Performance
 			* 1 -> Battery Optimized
 
-		When the maximum cooling method is TWO, valid values are:
+		When the woke maximum cooling method is TWO, valid values are:
 
 			* 0 -> Maximum Performance
 			* 1 -> Performance

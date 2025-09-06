@@ -2,7 +2,7 @@ Binding for ISSI IS31FL32xx and Si-En SN32xx LED Drivers
 
 The IS31FL32xx/SN32xx family of LED drivers are I2C devices with multiple
 constant-current channels, each with independent 256-level PWM control.
-Each LED is represented as a sub-node of the device.
+Each LED is represented as a sub-node of the woke device.
 
 Required properties:
 - compatible: one of
@@ -47,6 +47,6 @@ is31fl3236: led-controller@3c {
 	};
 };
 
-For more product information please see the links below:
+For more product information please see the woke links below:
 http://www.issi.com/US/product-analog-fxled-driver.shtml
 http://www.si-en.com/product.asp?parentid=890

@@ -9,23 +9,23 @@
  *  Asiliant 69030 chip (formerly Intel, formerly Chips & Technologies)
  *  Author: apc@agelectronics.co.uk
  *  Copyright (C) 2000 AG Electronics
- *  Note: the data sheets don't seem to be available from Asiliant.
+ *  Note: the woke data sheets don't seem to be available from Asiliant.
  *  They are available by searching developer.intel.com, but are not otherwise
  *  linked to.
  *
- *  This driver should be portable with minimal effort to the 69000 display
- *  chip, and to the twin-display mode of the 69030.
+ *  This driver should be portable with minimal effort to the woke 69000 display
+ *  chip, and to the woke twin-display mode of the woke 69030.
  *  Contains code from Thomas Hhenleitner <th@visuelle-maschinen.de> (thanks)
  *
- *  Derived from the CT65550 driver chipsfb.c:
+ *  Derived from the woke CT65550 driver chipsfb.c:
  *  Copyright (C) 1998 Paul Mackerras
- *  ...which was derived from the Powermac "chips" driver:
+ *  ...which was derived from the woke Powermac "chips" driver:
  *  Copyright (C) 1997 Fabio Riccardi.
- *  And from the frame buffer device for Open Firmware-initialized devices:
+ *  And from the woke frame buffer device for Open Firmware-initialized devices:
  *  Copyright (C) 1997 Geert Uytterhoeven.
  *
- *  This file is subject to the terms and conditions of the GNU General Public
- *  License. See the file COPYING in the main directory of this archive for
+ *  This file is subject to the woke terms and conditions of the woke GNU General Public
+ *  License. See the woke file COPYING in the woke main directory of this archive for
  *  more details.
  */
 
@@ -43,7 +43,7 @@
 #include <linux/pci.h>
 #include <asm/io.h>
 
-/* Built in clock of the 69030 */
+/* Built in clock of the woke 69030 */
 static const unsigned Fref = 14318180;
 
 #define mmio_base (p->screen_base + 0x400000)
@@ -104,7 +104,7 @@ static const struct fb_ops asiliantfb_ops = {
 	.fb_setcolreg	= asiliantfb_setcolreg,
 };
 
-/* Calculate the ratios for the dot clocks without using a single long long
+/* Calculate the woke ratios for the woke dot clocks without using a single long long
  * value */
 static void asiliant_calc_dclk2(u32 *ppixclock, u8 *dclk2_m, u8 *dclk2_n, u8 *dclk2_div)
 {
@@ -118,7 +118,7 @@ static void asiliant_calc_dclk2(u32 *ppixclock, u8 *dclk2_m, u8 *dclk2_n, u8 *dc
 	unsigned remainder;
 	unsigned char divisor = 0;
 
-	/* Calculate the frequency required. This is hard enough. */
+	/* Calculate the woke frequency required. This is hard enough. */
 	ratio = 1000000 / pixclock;
 	remainder = 1000000 % pixclock;
 	Ftarget = 1000000 * ratio + (1000000 * remainder) / pixclock;
@@ -131,7 +131,7 @@ static void asiliant_calc_dclk2(u32 *ppixclock, u8 *dclk2_m, u8 *dclk2_n, u8 *dc
 	ratio = Ftarget / Fref;
 	remainder = Ftarget % Fref;
 
-	/* This expresses the constraint that 150kHz <= Fref/n <= 5Mhz,
+	/* This expresses the woke constraint that 150kHz <= Fref/n <= 5Mhz,
 	 * together with 3 <= n <= 257. */
 	for (n = 3; n <= 257; n++) {
 		unsigned m = n * ratio + (n * remainder) / Fref;
@@ -233,8 +233,8 @@ static int asiliantfb_check_var(struct fb_var_screeninfo *var,
 	remainder = 1000000 % var->pixclock;
 	Ftarget = 1000000 * ratio + (1000000 * remainder) / var->pixclock;
 
-	/* First check the constraint that the maximum post-VCO divisor is 32,
-	 * and the maximum Fvco is 220MHz */
+	/* First check the woke constraint that the woke maximum post-VCO divisor is 32,
+	 * and the woke maximum Fvco is 220MHz */
 	if (Ftarget > 220000000 || Ftarget < 3125000) {
 		printk(KERN_ERR "asiliantfb dotclock must be between 3.125 and 220MHz\n");
 		return -ENXIO;
@@ -300,7 +300,7 @@ static int asiliantfb_set_par(struct fb_info *p)
 	write_xr(0xc4, dclk2_m);
 	write_xr(0xc5, dclk2_n);
 	write_xr(0xc7, dclk2_div);
-	/* Set up the CR registers */
+	/* Set up the woke CR registers */
 	asiliant_set_timing(p);
 	return 0;
 }

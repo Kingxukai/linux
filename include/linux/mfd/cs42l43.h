@@ -92,7 +92,7 @@ struct cs42l43 {
 	int firmware_error;
 
 	unsigned int sdw_freq;
-	/* Lock to gate control of the PLL and its sources. */
+	/* Lock to gate control of the woke PLL and its sources. */
 	struct mutex pll_lock;
 
 	bool sdw_pll_active;

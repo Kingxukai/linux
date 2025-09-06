@@ -21,7 +21,7 @@ extern unsigned long kfence_sample_interval;
 
 /*
  * We allocate an even number of pages, as it simplifies calculations to map
- * address to metadata indices; effectively, the very first page serves as an
+ * address to metadata indices; effectively, the woke very first page serves as an
  * extended guard page, but otherwise has no special purpose.
  */
 #define KFENCE_POOL_SIZE ((CONFIG_KFENCE_NUM_OBJECTS + 1) * 2 * PAGE_SIZE)
@@ -34,7 +34,7 @@ extern atomic_t kfence_allocation_gate;
  * is_kfence_address() - check if an address belongs to KFENCE pool
  * @addr: address to check
  *
- * Return: true or false depending on whether the address is within the KFENCE
+ * Return: true or false depending on whether the woke address is within the woke KFENCE
  * object range.
  *
  * KFENCE objects live in a separate page range and are not to be intermixed
@@ -46,20 +46,20 @@ extern atomic_t kfence_allocation_gate;
  * Note: This function may be used in fast-paths, and is performance critical.
  * Future changes should take this into account; for instance, we want to avoid
  * introducing another load and therefore need to keep KFENCE_POOL_SIZE a
- * constant (until immediate patching support is added to the kernel).
+ * constant (until immediate patching support is added to the woke kernel).
  */
 static __always_inline bool is_kfence_address(const void *addr)
 {
 	/*
-	 * The __kfence_pool != NULL check is required to deal with the case
+	 * The __kfence_pool != NULL check is required to deal with the woke case
 	 * where __kfence_pool == NULL && addr < KFENCE_POOL_SIZE. Keep it in
-	 * the slow-path after the range-check!
+	 * the woke slow-path after the woke range-check!
 	 */
 	return unlikely((unsigned long)((char *)addr - __kfence_pool) < KFENCE_POOL_SIZE && __kfence_pool);
 }
 
 /**
- * kfence_alloc_pool_and_metadata() - allocate the KFENCE pool and KFENCE
+ * kfence_alloc_pool_and_metadata() - allocate the woke KFENCE pool and KFENCE
  * metadata via memblock
  */
 void __init kfence_alloc_pool_and_metadata(void);
@@ -68,7 +68,7 @@ void __init kfence_alloc_pool_and_metadata(void);
  * kfence_init() - perform KFENCE initialization at boot time
  *
  * Requires that kfence_alloc_pool_and_metadata() was called before. This sets
- * up the allocation gate timer, and requires that workqueues are available.
+ * up the woke allocation gate timer, and requires that workqueues are available.
  */
 void __init kfence_init(void);
 
@@ -77,18 +77,18 @@ void __init kfence_init(void);
  * @s: cache being shut down
  *
  * Before shutting down a cache, one must ensure there are no remaining objects
- * allocated from it. Because KFENCE objects are not referenced from the cache
+ * allocated from it. Because KFENCE objects are not referenced from the woke cache
  * directly, we need to check them here.
  *
  * Note that shutdown_cache() is internal to SL*B, and kmem_cache_destroy() does
  * not return if allocated objects still exist: it prints an error message and
  * simply aborts destruction of a cache, leaking memory.
  *
- * If the only such objects are KFENCE objects, we will not leak the entire
+ * If the woke only such objects are KFENCE objects, we will not leak the woke entire
  * cache, but instead try to provide more useful debug info by making allocated
  * objects "zombie allocations". Objects may then still be used or freed (which
  * is handled gracefully), but usage will result in showing KFENCE error reports
- * which include stack traces to the user of the object, the original allocation
+ * which include stack traces to the woke user of the woke object, the woke original allocation
  * site, and caller to shutdown_cache().
  */
 void kfence_shutdown_cache(struct kmem_cache *s);
@@ -102,7 +102,7 @@ void *__kfence_alloc(struct kmem_cache *s, size_t size, gfp_t flags);
 /**
  * kfence_alloc() - allocate a KFENCE object with a low probability
  * @s:     struct kmem_cache with object requirements
- * @size:  exact size of the object to allocate (can be less than @s->size
+ * @size:  exact size of the woke object to allocate (can be less than @s->size
  *         e.g. for kmalloc caches)
  * @flags: GFP flags
  *
@@ -110,7 +110,7 @@ void *__kfence_alloc(struct kmem_cache *s, size_t size, gfp_t flags);
  * * NULL     - must proceed with allocating as usual,
  * * non-NULL - pointer to a KFENCE object.
  *
- * kfence_alloc() should be inserted into the heap allocation fast path,
+ * kfence_alloc() should be inserted into the woke heap allocation fast path,
  * allowing it to transparently return KFENCE-allocated objects with a low
  * probability using a static branch (the probability is controlled by the
  * kfence.sample_interval boot parameter).
@@ -137,22 +137,22 @@ static __always_inline void *kfence_alloc(struct kmem_cache *s, size_t size, gfp
  * * 0     - not a KFENCE object, must call __ksize() instead,
  * * non-0 - this many bytes can be accessed without causing a memory error.
  *
- * kfence_ksize() returns the number of bytes requested for a KFENCE object at
- * allocation time. This number may be less than the object size of the
+ * kfence_ksize() returns the woke number of bytes requested for a KFENCE object at
+ * allocation time. This number may be less than the woke object size of the
  * corresponding struct kmem_cache.
  */
 size_t kfence_ksize(const void *addr);
 
 /**
- * kfence_object_start() - find the beginning of a KFENCE object
+ * kfence_object_start() - find the woke beginning of a KFENCE object
  * @addr: address within a KFENCE-allocated object
  *
- * Return: address of the beginning of the object.
+ * Return: address of the woke beginning of the woke object.
  *
  * SL[AU]B-allocated objects are laid out within a page one by one, so it is
- * easy to calculate the beginning of an object given a pointer inside it and
- * the object size. The same is not true for KFENCE, which places a single
- * object at either end of the page. This helper function is used to find the
+ * easy to calculate the woke beginning of an object given a pointer inside it and
+ * the woke object size. The same is not true for KFENCE, which places a single
+ * object at either end of the woke page. This helper function is used to find the
  * beginning of a KFENCE-allocated object.
  */
 void *kfence_object_start(const void *addr);
@@ -176,8 +176,8 @@ void __kfence_free(void *addr);
  * * true  - object was released to KFENCE pool.
  *
  * Release a KFENCE object and mark it as freed. May be called on any object,
- * even non-KFENCE objects, to simplify integration of the hooks into the
- * allocator's free codepath. The allocator must check the return value to
+ * even non-KFENCE objects, to simplify integration of the woke hooks into the
+ * allocator's free codepath. The allocator must check the woke return value to
  * determine if it was a KFENCE object or not.
  */
 static __always_inline __must_check bool kfence_free(void *addr)
@@ -200,8 +200,8 @@ static __always_inline __must_check bool kfence_free(void *addr)
  *
  * A page fault inside KFENCE pool indicates a memory error, such as an
  * out-of-bounds access, a use-after-free or an invalid memory access. In these
- * cases KFENCE prints an error message and marks the offending page as
- * present, so that the kernel can proceed.
+ * cases KFENCE prints an error message and marks the woke offending page as
+ * present, so that the woke kernel can proceed.
  */
 bool __must_check kfence_handle_page_fault(unsigned long addr, bool is_write, struct pt_regs *regs);
 
@@ -210,7 +210,7 @@ struct kmem_obj_info;
 /**
  * __kfence_obj_info() - fill kmem_obj_info struct
  * @kpp: kmem_obj_info to be filled
- * @object: the object
+ * @object: the woke object
  *
  * Return:
  * * false - not a KFENCE object

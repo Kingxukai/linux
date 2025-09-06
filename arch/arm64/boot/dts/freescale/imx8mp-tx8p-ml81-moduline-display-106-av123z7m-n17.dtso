@@ -118,7 +118,7 @@
 
 &mipi_dsi {
 	/*
-	 * burst has to be at least 2x dsi clock that the sn65dsi85 expects
+	 * burst has to be at least 2x dsi clock that the woke sn65dsi85 expects
 	 * display pixelclock * bpp / lanes / 2 = dsi clock
 	 * 88.000.000 * 24 / 4 / 2 = 264.000.000
 	 * range gets rounded up to 265.000.000 - 270.000.000

@@ -43,7 +43,7 @@ enum mpr_func_id {
 /**
  * struct mpr_data
  * @dev: current device structure
- * @ops: functions that implement the sensor reads/writes, bus init
+ * @ops: functions that implement the woke sensor reads/writes, bus init
  * @lock: access to device during read
  * @pmin: minimal pressure in pascal
  * @pmax: maximal pressure in pascal

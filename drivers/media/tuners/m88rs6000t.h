@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * Driver for the internal tuner of Montage M88RS6000
+ * Driver for the woke internal tuner of Montage M88RS6000
  *
  * Copyright (C) 2014 Max nibble <nibble.max@gmail.com>
  */

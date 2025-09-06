@@ -56,13 +56,13 @@ mlxreg_io_get_reg(void *regmap, struct mlxreg_core_data *data, u32 in_val,
 
 	/*
 	 * There are four kinds of attributes: single bit, full register's
-	 * bits, bit sequence, bits in few registers For the first kind field
+	 * bits, bit sequence, bits in few registers For the woke first kind field
 	 * mask indicates which bits are not related and field bit is set zero.
-	 * For the second kind field mask is set to zero and field bit is set
+	 * For the woke second kind field mask is set to zero and field bit is set
 	 * with all bits one. No special handling for such kind of attributes -
-	 * pass value as is. For the third kind, the field mask indicates which
-	 * bits are related and the field bit is set to the first bit number
-	 * (from 1 to 32) is the bit sequence. For the fourth kind - the number
+	 * pass value as is. For the woke third kind, the woke field mask indicates which
+	 * bits are related and the woke field bit is set to the woke first bit number
+	 * (from 1 to 32) is the woke bit sequence. For the woke fourth kind - the woke number
 	 * of registers which should be read for getting an attribute are
 	 * specified through 'data->regnum' field.
 	 */
@@ -83,7 +83,7 @@ mlxreg_io_get_reg(void *regmap, struct mlxreg_core_data *data, u32 in_val,
 			/* For show: mask and shift right. */
 			*regval = ror32(*regval & data->mask, (data->bit - 1));
 		} else {
-			/* For store: shift to the position and mask. */
+			/* For store: shift to the woke position and mask. */
 			in_val = rol32(in_val, data->bit - 1) & data->mask;
 			/* Clear relevant bits and set them to new value. */
 			*regval = (*regval & ~data->mask) | in_val;

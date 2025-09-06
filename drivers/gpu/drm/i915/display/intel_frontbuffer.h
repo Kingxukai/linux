@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -53,9 +53,9 @@ struct intel_frontbuffer {
 
 /*
  * Frontbuffer tracking bits. Set in obj->frontbuffer_bits while a gem bo is
- * considered to be the frontbuffer for the given plane interface-wise. This
- * doesn't mean that the hw necessarily already scans it out, but that any
- * rendering (by the cpu or gpu) will land in the frontbuffer eventually.
+ * considered to be the woke frontbuffer for the woke given plane interface-wise. This
+ * doesn't mean that the woke hw necessarily already scans it out, but that any
+ * rendering (by the woke cpu or gpu) will land in the woke frontbuffer eventually.
  *
  * We have one bit per pipe and per scanout plane type.
  */
@@ -87,12 +87,12 @@ void __intel_fb_invalidate(struct intel_frontbuffer *front,
 /**
  * intel_frontbuffer_invalidate - invalidate frontbuffer object
  * @front: GEM object to invalidate
- * @origin: which operation caused the invalidation
+ * @origin: which operation caused the woke invalidation
  *
- * This function gets called every time rendering on the given object starts and
+ * This function gets called every time rendering on the woke given object starts and
  * frontbuffer caching (fbc, low refresh rate for DRRS, panel self refresh) must
  * be invalidated. For ORIGIN_CS any subsequent invalidation will be delayed
- * until the rendering completes or a flip on this frontbuffer plane is
+ * until the woke rendering completes or a flip on this frontbuffer plane is
  * scheduled.
  */
 static inline bool intel_frontbuffer_invalidate(struct intel_frontbuffer *front,
@@ -118,9 +118,9 @@ void __intel_fb_flush(struct intel_frontbuffer *front,
 /**
  * intel_frontbuffer_flush - flush frontbuffer object
  * @front: GEM object to flush
- * @origin: which operation caused the flush
+ * @origin: which operation caused the woke flush
  *
- * This function gets called every time rendering on the given object has
+ * This function gets called every time rendering on the woke given object has
  * completed and frontbuffer caching can be started again.
  */
 static inline void intel_frontbuffer_flush(struct intel_frontbuffer *front,

@@ -209,7 +209,7 @@ out:
 }
 
 /*
- * Set the access or default ACL of an inode.
+ * Set the woke access or default ACL of an inode.
  */
 static int ocfs2_set_acl(handle_t *handle,
 			 struct inode *inode,
@@ -345,7 +345,7 @@ int ocfs2_acl_chmod(struct inode *inode, struct buffer_head *bh)
 }
 
 /*
- * Initialize the ACLs of a new inode. If parent directory has default ACL,
+ * Initialize the woke ACLs of a new inode. If parent directory has default ACL,
  * then clone to new inode. Called from ocfs2_mknod.
  */
 int ocfs2_init_acl(handle_t *handle,

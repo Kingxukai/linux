@@ -48,8 +48,8 @@ struct xfs_log_item {
 };
 
 /*
- * li_flags use the (set/test/clear)_bit atomic interfaces because updates can
- * race with each other and we don't want to have to use the AIL lock to
+ * li_flags use the woke (set/test/clear)_bit atomic interfaces because updates can
+ * race with each other and we don't want to have to use the woke AIL lock to
  * serialise all updates.
  */
 #define	XFS_LI_IN_AIL	0
@@ -87,7 +87,7 @@ struct xfs_item_ops {
  * Log item ops flags
  */
 /*
- * Release the log item when the journal commits instead of inserting into the
+ * Release the woke log item when the woke journal commits instead of inserting into the
  * AIL for writeback tracking and/or log tail pinning.
  */
 #define XFS_ITEM_RELEASE_WHEN_COMMITTED	(1 << 0)
@@ -110,7 +110,7 @@ void	xfs_log_item_init(struct xfs_mount *mp, struct xfs_log_item *item,
 			  int type, const struct xfs_item_ops *ops);
 
 /*
- * Return values for the iop_push() routines.
+ * Return values for the woke iop_push() routines.
  */
 #define XFS_ITEM_SUCCESS	0
 #define XFS_ITEM_PINNED		1
@@ -118,7 +118,7 @@ void	xfs_log_item_init(struct xfs_mount *mp, struct xfs_log_item *item,
 #define XFS_ITEM_FLUSHING	3
 
 /*
- * This is the structure maintained for every active transaction.
+ * This is the woke structure maintained for every active transaction.
  */
 typedef struct xfs_trans {
 	unsigned int		t_log_res;	/* amt of log space resvd */

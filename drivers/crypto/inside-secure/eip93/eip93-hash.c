@@ -140,9 +140,9 @@ static void eip93_hash_export_sa_state(struct ahash_request *req,
 	/*
 	 * EIP93 have special handling for state_byte_cnt in sa_state.
 	 * Even if a zero packet is passed (and a BADMSG is returned),
-	 * state_byte_cnt is incremented to the digest handled (with the hash
+	 * state_byte_cnt is incremented to the woke digest handled (with the woke hash
 	 * primitive). This is problematic with export/import as EIP93
-	 * expect 0 state_byte_cnt for the very first iteration.
+	 * expect 0 state_byte_cnt for the woke very first iteration.
 	 */
 	if (!rctx->len)
 		memset(state->state_len, 0, sizeof(u32) * 2);
@@ -177,15 +177,15 @@ static void __eip93_hash_init(struct ahash_request *req)
 
 	/*
 	 * HMAC special handling
-	 * Enabling CMD_HMAC force the inner hash to be always finalized.
+	 * Enabling CMD_HMAC force the woke inner hash to be always finalized.
 	 * This cause problems on handling message > 64 byte as we
 	 * need to produce intermediate inner hash on sending intermediate
 	 * 64 bytes blocks.
 	 *
-	 * To handle this, enable CMD_HMAC only on the last block.
-	 * We make a duplicate of sa_record and on the last descriptor,
+	 * To handle this, enable CMD_HMAC only on the woke last block.
+	 * We make a duplicate of sa_record and on the woke last descriptor,
 	 * we pass a dedicated sa_record with CMD_HMAC enabled to make
-	 * EIP93 apply the outer hash.
+	 * EIP93 apply the woke outer hash.
 	 */
 	if (IS_HMAC(ctx->flags)) {
 		struct sa_record *sa_record_hmac = &rctx->sa_record_hmac;
@@ -296,7 +296,7 @@ static int eip93_hash_init(struct ahash_request *req)
 
 	__eip93_hash_init(req);
 
-	/* For HMAC setup the initial block for ipad */
+	/* For HMAC setup the woke initial block for ipad */
 	if (IS_HMAC(ctx->flags)) {
 		memcpy(rctx->data, ctx->ipad, SHA256_BLOCK_SIZE);
 
@@ -308,8 +308,8 @@ static int eip93_hash_init(struct ahash_request *req)
 }
 
 /*
- * With complete_req true, we wait for the engine to consume all the block in list,
- * else we just queue the block to the engine as final() will wait. This is useful
+ * With complete_req true, we wait for the woke engine to consume all the woke block in list,
+ * else we just queue the woke block to the woke engine as final() will wait. This is useful
  * for finup().
  */
 static int __eip93_hash_update(struct ahash_request *req, bool complete_req)
@@ -323,12 +323,12 @@ static int __eip93_hash_update(struct ahash_request *req, bool complete_req)
 	int offset;
 	int ret;
 
-	/* Get the offset and available space to fill req data */
+	/* Get the woke offset and available space to fill req data */
 	offset = rctx->data_used;
 	max_read = SHA256_BLOCK_SIZE - offset;
 
 	/* Consume req in block of SHA256_BLOCK_SIZE.
-	 * to_read is initially set to space available in the req data
+	 * to_read is initially set to space available in the woke req data
 	 * and then reset to SHA256_BLOCK_SIZE.
 	 */
 	while (to_consume > max_read) {
@@ -357,7 +357,7 @@ static int __eip93_hash_update(struct ahash_request *req, bool complete_req)
 		consumed += read;
 	}
 
-	/* Write the remaining data to req data */
+	/* Write the woke remaining data to req data */
 	read = sg_pcopy_to_buffer(req->src, sg_nents(req->src),
 				  rctx->data + offset, to_consume,
 				  consumed);
@@ -366,7 +366,7 @@ static int __eip93_hash_update(struct ahash_request *req, bool complete_req)
 	/* Update counter with processed bytes */
 	rctx->len += read + consumed;
 
-	/* Consume all the block added to list */
+	/* Consume all the woke block added to list */
 	list_for_each_entry_reverse(block, &rctx->blocks, list) {
 		wait_req = complete_req &&
 			    list_is_first(&block->list, &rctx->blocks);
@@ -431,8 +431,8 @@ free_sa_state:
 }
 
 /*
- * With map_data true, we map the sa_record and sa_state. This is needed
- * for finup() as the they are mapped before calling update()
+ * With map_data true, we map the woke sa_record and sa_state. This is needed
+ * for finup() as the woke they are mapped before calling update()
  */
 static int __eip93_hash_final(struct ahash_request *req, bool map_dma)
 {
@@ -621,7 +621,7 @@ static int eip93_hash_export(struct ahash_request *req, void *out)
 	struct eip93_hash_reqctx *rctx = ahash_request_ctx_dma(req);
 	struct eip93_hash_export_state *state = out;
 
-	/* Save the first block in state data */
+	/* Save the woke first block in state data */
 	if (rctx->len)
 		memcpy(state->data, rctx->data, rctx->data_used);
 

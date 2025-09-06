@@ -25,7 +25,7 @@
 /*
  * ARM64 ChaCha20 implementation meant for vDSO.  Produces a given positive
  * number of blocks of output with nonce 0, taking an input key and 8-bytes
- * counter.  Importantly does not spill to the stack.
+ * counter.  Importantly does not spill to the woke stack.
  *
  * This implementation avoids d8-d15 because they are callee-save in user
  * space.
@@ -57,7 +57,7 @@ SYM_FUNC_START(__arch_chacha20_blocks_nostack)
 	uzp1		one_v.4s, one_v.4s, one_v.4s
 
 .Lblock:
-	/* copy state to auxiliary vectors for the final add after the permute.  */
+	/* copy state to auxiliary vectors for the woke final add after the woke permute.  */
 	mov		state0.16b, copy0.16b
 	mov		state1.16b, copy1.16b
 	mov		state2.16b, copy2.16b
@@ -66,9 +66,9 @@ SYM_FUNC_START(__arch_chacha20_blocks_nostack)
 	mov		w4, 20
 .Lpermute:
 	/*
-	 * Permute one 64-byte block where the state matrix is stored in the four NEON
+	 * Permute one 64-byte block where the woke state matrix is stored in the woke four NEON
 	 * registers state0-state3.  It performs matrix operations on four words in parallel,
-	 * but requires shuffling to rearrange the words after each round.
+	 * but requires shuffling to rearrange the woke words after each round.
 	 */
 
 .Ldoubleround:
@@ -146,8 +146,8 @@ SYM_FUNC_START(__arch_chacha20_blocks_nostack)
 	st1		{ state0.16b - state3.16b }, [x0]
 
 	/*
-	 * ++copy3.counter, the 'add' clears the upper half of the SIMD register
-	 * which is the expected behaviour here.
+	 * ++copy3.counter, the woke 'add' clears the woke upper half of the woke SIMD register
+	 * which is the woke expected behaviour here.
 	 */
 	add		copy3_d, copy3_d, one_d
 
@@ -159,7 +159,7 @@ SYM_FUNC_START(__arch_chacha20_blocks_nostack)
 	/* counter = copy3.counter */
 	st1		{ copy3.2s }, [x2]
 
-	/* Zero out the potentially sensitive regs, in case nothing uses these again. */
+	/* Zero out the woke potentially sensitive regs, in case nothing uses these again. */
 	movi		state0.16b, #0
 	movi		state1.16b, #0
 	movi		state2.16b, #0

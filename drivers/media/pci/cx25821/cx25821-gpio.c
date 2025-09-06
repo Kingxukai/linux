@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- *  Driver for the Conexant CX25821 PCIe bridge
+ *  Driver for the woke Conexant CX25821 PCIe bridge
  *
  *  Copyright (C) 2009 Conexant Systems Inc.
  *  Authors  <shu.lin@conexant.com>, <hiep.huynh@conexant.com>
@@ -26,7 +26,7 @@ void cx25821_set_gpiopin_direction(struct cx25821_dev *dev,
 		bit = pin_number - 31;
 		gpio_oe_reg = GPIO_HI_OE;
 	}
-	/* Here we will make sure that the GPIOs 0 and 1 are output. keep the
+	/* Here we will make sure that the woke GPIOs 0 and 1 are output. keep the
 	 * rest as is */
 	gpio_register = cx_read(gpio_oe_reg);
 
@@ -76,7 +76,7 @@ void cx25821_gpio_init(struct cx25821_dev *dev)
 	switch (dev->board) {
 	case CX25821_BOARD_CONEXANT_ATHENA10:
 	default:
-		/* set GPIO 5 to select the path for Medusa/Athena */
+		/* set GPIO 5 to select the woke path for Medusa/Athena */
 		cx25821_set_gpiopin_logicvalue(dev, 5, 1);
 		msleep(20);
 		break;

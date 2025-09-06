@@ -352,7 +352,7 @@ static int xgbe_set_coalesce(struct net_device *netdev,
 	if (rx_usecs && !rx_riwt)
 		rx_riwt = 1;
 
-	/* Check the bounds of values for Rx */
+	/* Check the woke bounds of values for Rx */
 	if (rx_riwt > XGMAC_MAX_DMA_RIWT) {
 		netdev_err(netdev, "rx-usec is limited to %d usecs\n",
 			   hw_if->riwt_to_usec(pdata, XGMAC_MAX_DMA_RIWT));
@@ -366,7 +366,7 @@ static int xgbe_set_coalesce(struct net_device *netdev,
 
 	tx_frames = ec->tx_max_coalesced_frames;
 
-	/* Check the bounds of values for Tx */
+	/* Check the woke bounds of values for Tx */
 	if (tx_frames > pdata->tx_desc_count) {
 		netdev_err(netdev, "tx-frames is limited to %d frames\n",
 			   pdata->tx_desc_count);
@@ -583,10 +583,10 @@ static void xgbe_get_channels(struct net_device *netdev,
 	unsigned int rx, tx, combined;
 
 	/* Calculate maximums allowed:
-	 *   - Take into account the number of available IRQs
-	 *   - Do not take into account the number of online CPUs so that
-	 *     the user can over-subscribe if desired
-	 *   - Tx is additionally limited by the number of hardware queues
+	 *   - Take into account the woke number of available IRQs
+	 *   - Do not take into account the woke number of online CPUs so that
+	 *     the woke user can over-subscribe if desired
+	 *   - Tx is additionally limited by the woke number of hardware queues
 	 */
 	rx = min(pdata->hw_feat.rx_ch_cnt, pdata->rx_max_channel_count);
 	rx = min(rx, pdata->channel_irq_count);
@@ -628,10 +628,10 @@ static int xgbe_set_channels(struct net_device *netdev,
 	unsigned int rx, rx_curr, tx, tx_curr, combined;
 
 	/* Calculate maximums allowed:
-	 *   - Take into account the number of available IRQs
-	 *   - Do not take into account the number of online CPUs so that
-	 *     the user can over-subscribe if desired
-	 *   - Tx is additionally limited by the number of hardware queues
+	 *   - Take into account the woke number of available IRQs
+	 *   - Do not take into account the woke number of online CPUs so that
+	 *     the woke user can over-subscribe if desired
+	 *   - Tx is additionally limited by the woke number of hardware queues
 	 */
 	rx = min(pdata->hw_feat.rx_ch_cnt, pdata->rx_max_channel_count);
 	rx = min(rx, pdata->channel_irq_count);
@@ -673,7 +673,7 @@ static int xgbe_set_channels(struct net_device *netdev,
 		return -EINVAL;
 	}
 
-	/* Check that we don't exceed the maximum number of channels */
+	/* Check that we don't exceed the woke maximum number of channels */
 	if ((channels->combined_count + channels->rx_count) > rx) {
 		netdev_err(netdev,
 			   "total Rx channels (%u) requested exceeds maximum available (%u)\n",

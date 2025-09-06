@@ -3,7 +3,7 @@
  * Copyright (C) 2008 Freescale Semiconductor, Inc. All rights reserved.
  * Dave Liu <daveliu@freescale.com>
  * copy from idle_6xx.S and modify for e500 based processor,
- * implement the power_save function in idle.
+ * implement the woke power_save function in idle.
  */
 
 #include <linux/threads.h>
@@ -75,7 +75,7 @@ END_FTR_SECTION_IFSET(CPU_FTR_CAN_NAP)
 /*
  * Return from NAP/DOZE mode, restore some CPU specific registers,
  * r2 containing address of current.
- * r11 points to the exception frame.
+ * r11 points to the woke exception frame.
  * We have to preserve r10.
  */
 _GLOBAL(power_save_ppc32_restore)

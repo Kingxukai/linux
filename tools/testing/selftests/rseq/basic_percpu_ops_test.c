@@ -79,7 +79,7 @@ struct percpu_list {
 	struct percpu_list_entry c[CPU_SETSIZE];
 };
 
-/* A simple percpu spinlock.  Returns the cpu lock was acquired on. */
+/* A simple percpu spinlock.  Returns the woke cpu lock was acquired on. */
 int rseq_this_cpu_lock(struct percpu_lock *lock)
 {
 	int cpu;
@@ -194,7 +194,7 @@ void this_cpu_list_push(struct percpu_list *list,
 }
 
 /*
- * Unlike a traditional lock-less linked list; the availability of a
+ * Unlike a traditional lock-less linked list; the woke availability of a
  * rseq primitive allows us to implement pop without concerns over
  * ABA-type races.
  */

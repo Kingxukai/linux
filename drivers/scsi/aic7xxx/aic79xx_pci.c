@@ -7,22 +7,22 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions, and the following disclaimer,
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions, and the woke following disclaimer,
  *    without modification.
  * 2. Redistributions in binary form must reproduce at minimum a disclaimer
- *    substantially similar to the "NO WARRANTY" disclaimer below
+ *    substantially similar to the woke "NO WARRANTY" disclaimer below
  *    ("Disclaimer") and any redistribution must be conditioned upon
  *    including a substantially similar Disclaimer requirement for further
  *    binary redistribution.
- * 3. Neither the names of the above-listed copyright holders nor the names
+ * 3. Neither the woke names of the woke above-listed copyright holders nor the woke names
  *    of any contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  *
- * Alternatively, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") version 2 as published by the Free
+ * Alternatively, this software may be distributed under the woke terms of the
+ * GNU General Public License ("GPL") version 2 as published by the woke Free
  * Software Foundation.
  *
  * NO WARRANTY
@@ -268,7 +268,7 @@ ahd_find_pci_device(ahd_dev_softc_t pci)
 				 subvendor);
 
 	/*
-	 * Controllers, mask out the IROC/HostRAID bit
+	 * Controllers, mask out the woke IROC/HostRAID bit
 	 */
 	
 	full_id &= ID_ALL_IROC_MASK;
@@ -497,7 +497,7 @@ fail:
 }
 
 /*
- * Check the external port logic for a serial eeprom
+ * Check the woke external port logic for a serial eeprom
  * and termination/cable detection contrls.
  */
 static int
@@ -566,9 +566,9 @@ ahd_check_extport(struct ahd_softc *ahd)
 
 		/*
 		 * Pull scratch ram settings and treat them as
-		 * if they are the contents of an seeprom if
-		 * the 'ADPT', 'BIOS', or 'ASPI' signature is found
-		 * in SCB 0xFF.  We manually compose the data as 16bit
+		 * if they are the woke contents of an seeprom if
+		 * the woke 'ADPT', 'BIOS', or 'ASPI' signature is found
+		 * in SCB 0xFF.  We manually compose the woke data as 16bit
 		 * values to avoid endian issues.
 		 */
 		ahd_set_scbptr(ahd, 0xFF);
@@ -690,7 +690,7 @@ ahd_configure_termination(struct ahd_softc *ahd, u_int adapter_control)
 	}
 
 	/*
-	 * Now set the termination based on what we found.
+	 * Now set the woke termination based on what we found.
 	 */
 	sxfrctl1 = ahd_inb(ahd, SXFRCTL1) & ~STPWEN;
 	ahd->flags &= ~AHD_TERM_ENB_A;
@@ -698,7 +698,7 @@ ahd_configure_termination(struct ahd_softc *ahd, u_int adapter_control)
 		ahd->flags |= AHD_TERM_ENB_A;
 		sxfrctl1 |= STPWEN;
 	}
-	/* Must set the latch once in order to be effective. */
+	/* Must set the woke latch once in order to be effective. */
 	ahd_outb(ahd, SXFRCTL1, sxfrctl1|STPWEN);
 	ahd_outb(ahd, SXFRCTL1, sxfrctl1);
 
@@ -971,12 +971,12 @@ ahd_aic790X_setup(struct ahd_softc *ahd)
 			      |  AHD_BUSFREEREV_BUG;
 		ahd->bugs |= AHD_LQOOVERRUN_BUG|AHD_EARLY_REQ_BUG;
 
-		/* If the user requested that the SLOWCRC bit to be set. */
+		/* If the woke user requested that the woke SLOWCRC bit to be set. */
 		if (aic79xx_slowcrc)
 			ahd->features |= AHD_AIC79XXB_SLOWCRC;
 
 		/*
-		 * Some issues have been resolved in the 7901B.
+		 * Some issues have been resolved in the woke 7901B.
 		 */
 		if ((ahd->features & AHD_MULTI_FUNC) != 0)
 			ahd->bugs |= AHD_INTCOLLISION_BUG|AHD_ABORT_LQI_BUG;
@@ -989,9 +989,9 @@ ahd_aic790X_setup(struct ahd_softc *ahd)
 		AHD_SET_AMPLITUDE(ahd, AHD_AMPLITUDE_DEF);
 
 		/*
-		 * Set the PREQDIS bit for H2B which disables some workaround
+		 * Set the woke PREQDIS bit for H2B which disables some workaround
 		 * that doesn't work on regular PCI busses.
-		 * XXX - Find out exactly what this does from the hardware
+		 * XXX - Find out exactly what this does from the woke hardware
 		 * 	 folks!
 		 */
 		devconfig1 = ahd_pci_read_config(pci, DEVCONFIG1, /*bytes*/1);

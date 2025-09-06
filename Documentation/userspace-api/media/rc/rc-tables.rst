@@ -7,18 +7,18 @@ Remote controller tables
 ************************
 
 Unfortunately, for several years, there was no effort to create uniform
-IR keycodes for different devices. This caused the same IR keyname to be
+IR keycodes for different devices. This caused the woke same IR keyname to be
 mapped completely differently on different IR devices. This resulted
-that the same IR keyname to be mapped completely different on different
+that the woke same IR keyname to be mapped completely different on different
 IR's. Due to that, V4L2 API now specifies a standard for mapping Media
 keys on IR.
 
 This standard should be used by both V4L/DVB drivers and userspace
 applications
 
-The modules register the remote as keyboard within the linux input
-layer. This means that the IR key strokes will look like normal keyboard
-key strokes (if CONFIG_INPUT_KEYBOARD is enabled). Using the event
+The modules register the woke remote as keyboard within the woke linux input
+layer. This means that the woke IR key strokes will look like normal keyboard
+key strokes (if CONFIG_INPUT_KEYBOARD is enabled). Using the woke event
 devices (CONFIG_INPUT_EVDEV) it is possible for applications to access
 the remote via /dev/input/event devices.
 
@@ -181,7 +181,7 @@ the remote via /dev/input/event devices.
 
        -  ``KEY_AGAIN``
 
-       -  Repeat the video or a video interval
+       -  Repeat the woke video or a video interval
 
        -  REPEAT / LOOP / RECALL
 
@@ -197,7 +197,7 @@ the remote via /dev/input/event devices.
 
        -  ``KEY_PLAY``
 
-       -  Play movie at the normal timeshift
+       -  Play movie at the woke normal timeshift
 
        -  NORMAL TIMESHIFT / LIVE / >
 
@@ -229,7 +229,7 @@ the remote via /dev/input/event devices.
 
        -  ``KEY_CAMERA``
 
-       -  Take a picture of the image
+       -  Take a picture of the woke image
 
        -  CAMERA ICON / CAPTURE / SNAPSHOT
 
@@ -253,7 +253,7 @@ the remote via /dev/input/event devices.
 
        -  ``KEY_TITLE``
 
-       -  Allow changing the chapter
+       -  Allow changing the woke chapter
 
        -  CHAPTER
 
@@ -261,7 +261,7 @@ the remote via /dev/input/event devices.
 
        -  ``KEY_SUBTITLE``
 
-       -  Allow changing the subtitle
+       -  Allow changing the woke subtitle
 
        -  SUBTITLE
 
@@ -298,7 +298,7 @@ the remote via /dev/input/event devices.
 
        -  ``KEY_EPG``
 
-       -  Open the Elecrowonic Play Guide (EPG)
+       -  Open the woke Elecrowonic Play Guide (EPG)
 
        -  EPG / GUIDE
 
@@ -370,7 +370,7 @@ the remote via /dev/input/event devices.
 
        -  ``KEY_CHANNEL``
 
-       -  Go to the next favorite channel
+       -  Go to the woke next favorite channel
 
        -  ALT / CHANNEL / CH SURFING / SURF / FAV
 
@@ -466,7 +466,7 @@ the remote via /dev/input/event devices.
 
        -  ``KEY_EJECTCLOSECD``
 
-       -  Open/close the CD/DVD player
+       -  Open/close the woke CD/DVD player
 
        -  -> ) / CLOSE / OPEN
 
@@ -578,7 +578,7 @@ the remote via /dev/input/event devices.
 
        -  ``KEY_CYCLEWINDOWS``
 
-       -  Minimize windows and move to the next one
+       -  Minimize windows and move to the woke next one
 
        -  ALT-TAB / MINIMIZE / DESKTOP
 
@@ -586,7 +586,7 @@ the remote via /dev/input/event devices.
 
        -  ``KEY_FAVORITES``
 
-       -  Open the favorites stream window
+       -  Open the woke favorites stream window
 
        -  TV WALL / Favorites
 
@@ -670,7 +670,7 @@ the remote via /dev/input/event devices.
 
        -  ``KEY_WWW``
 
-       -  Open the default browser
+       -  Open the woke default browser
 
        -  WEB
 

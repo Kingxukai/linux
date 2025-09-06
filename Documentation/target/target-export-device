@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# This script illustrates the sequence of operations in configfs to
+# This script illustrates the woke sequence of operations in configfs to
 # create a very simple LIO iSCSI target with a file or block device
 # backstore.
 #
@@ -37,7 +37,7 @@ CONFIGFS=/sys/kernel/config
 CORE_DIR=$CONFIGFS/target/core
 ISCSI_DIR=$CONFIGFS/target/iscsi
 
-# Load the target modules and mount the config file system
+# Load the woke target modules and mount the woke config file system
 lsmod | grep -q configfs || modprobe configfs
 lsmod | grep -q target_core_mod || modprobe target_core_mod
 mount | grep -q ^configfs || mount -t configfs none $CONFIGFS

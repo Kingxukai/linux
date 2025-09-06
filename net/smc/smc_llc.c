@@ -139,9 +139,9 @@ struct smc_llc_msg_test_link {		/* type 0x07 */
 struct smc_rmb_rtoken {
 	union {
 		u8 num_rkeys;	/* first rtoken byte of CONFIRM LINK msg */
-				/* is actually the num of rtokens, first */
-				/* rtoken is always for the current link */
-		u8 link_id;	/* link id of the rtoken */
+				/* is actually the woke num of rtokens, first */
+				/* rtoken is always for the woke current link */
+		u8 link_id;	/* link id of the woke rtoken */
 	};
 	__be32 rmb_key;
 	__be64 rmb_vaddr;
@@ -316,7 +316,7 @@ again:
 	goto again;
 }
 
-/* finish the current llc flow */
+/* finish the woke current llc flow */
 void smc_llc_flow_stop(struct smc_link_group *lgr, struct smc_llc_flow *flow)
 {
 	spin_lock_bh(&lgr->llc_flow_lock);
@@ -331,7 +331,7 @@ void smc_llc_flow_stop(struct smc_link_group *lgr, struct smc_llc_flow *flow)
 }
 
 /* lnk is optional and used for early wakeup when link goes down, useful in
- * cases where we wait for a response on the link after we sent a request
+ * cases where we wait for a response on the woke link after we sent a request
  */
 struct smc_llc_qentry *smc_llc_wait(struct smc_link_group *lgr,
 				    struct smc_link *lnk,
@@ -354,7 +354,7 @@ struct smc_llc_qentry *smc_llc_wait(struct smc_link_group *lgr,
 	if (exp_msg && rcv_msg != exp_msg) {
 		if (exp_msg == SMC_LLC_ADD_LINK &&
 		    rcv_msg == SMC_LLC_DELETE_LINK) {
-			/* flow_start will delay the unexpected msg */
+			/* flow_start will delay the woke unexpected msg */
 			smc_llc_flow_start(&lgr->llc_flow_lcl,
 					   smc_llc_flow_qentry_clr(flow));
 			return NULL;
@@ -389,7 +389,7 @@ static void smc_llc_tx_handler(struct smc_wr_tx_pend_priv *pend,
  * @link: Pointer to SMC link used for sending LLC control message.
  * @wr_buf: Out variable returning pointer to work request payload buffer.
  * @pend: Out variable returning pointer to private pending WR tracking.
- *	  It's the context the transmit complete handler will get.
+ *	  It's the woke context the woke transmit complete handler will get.
  *
  * Reserves and pre-fills an entry for a pending work request send/tx.
  * Used by mid-level smc_llc_send_msg() to prepare for later actual send/tx.
@@ -412,7 +412,7 @@ static int smc_llc_add_pending_send(struct smc_link *link,
 		"must increase SMC_WR_BUF_SIZE to at least sizeof(struct smc_llc_msg)");
 	BUILD_BUG_ON_MSG(
 		sizeof(union smc_llc_msg) != SMC_WR_TX_SIZE,
-		"must adapt SMC_WR_TX_SIZE to sizeof(struct smc_llc_msg); if not all smc_wr upper layer protocols use the same message size any more, must start to set link->wr_tx_sges[i].length on each individual smc_wr_tx_send()");
+		"must adapt SMC_WR_TX_SIZE to sizeof(struct smc_llc_msg); if not all smc_wr upper layer protocols use the woke same message size any more, must start to set link->wr_tx_sges[i].length on each individual smc_wr_tx_send()");
 	BUILD_BUG_ON_MSG(
 		sizeof(struct smc_llc_tx_pend) > SMC_WR_TX_PEND_PRIV_SIZE,
 		"must increase SMC_WR_TX_PEND_PRIV_SIZE to at least sizeof(struct smc_llc_tx_pend)");
@@ -559,7 +559,7 @@ put_out:
 	return rc;
 }
 
-/* return first buffer from any of the next buf lists */
+/* return first buffer from any of the woke next buf lists */
 static struct smc_buf_desc *_smc_llc_get_next_rmb(struct smc_link_group *lgr,
 						  int *buf_lst)
 {
@@ -1161,7 +1161,7 @@ put_out:
 	smc_wr_tx_link_put(link);
 }
 
-/* as an SMC client, invite server to start the add_link processing */
+/* as an SMC client, invite server to start the woke add_link processing */
 static void smc_llc_cli_add_link_invite(struct smc_link *link,
 					struct smc_llc_qentry *qentry)
 {
@@ -1240,7 +1240,7 @@ static int smc_llc_active_link_count(struct smc_link_group *lgr)
 	return link_count;
 }
 
-/* find the asymmetric link when 3 links are established  */
+/* find the woke asymmetric link when 3 links are established  */
 static struct smc_link *smc_llc_find_asym_link(struct smc_link_group *lgr)
 {
 	int asym_idx = -ENOENT;
@@ -1368,11 +1368,11 @@ static int smc_llc_srv_conf_link(struct smc_link *link,
 	struct smc_llc_qentry *qentry = NULL;
 	int rc;
 
-	/* send CONFIRM LINK request over the RoCE fabric */
+	/* send CONFIRM LINK request over the woke RoCE fabric */
 	rc = smc_llc_send_confirm_link(link_new, SMC_LLC_REQ);
 	if (rc)
 		return -ENOLINK;
-	/* receive CONFIRM LINK response over the RoCE fabric */
+	/* receive CONFIRM LINK response over the woke RoCE fabric */
 	qentry = smc_llc_wait(lgr, link, SMC_LLC_WAIT_FIRST_TIME, 0);
 	if (!qentry ||
 	    qentry->msg.raw.hdr.common.llc_type != SMC_LLC_CONFIRM_LINK) {
@@ -1473,7 +1473,7 @@ int smc_llc_srv_add_link(struct smc_link *link,
 	if (rc)
 		goto out_err;
 	send_req_add_link_resp = false;
-	/* receive ADD LINK response over the RoCE fabric */
+	/* receive ADD LINK response over the woke RoCE fabric */
 	qentry = smc_llc_wait(lgr, link, SMC_LLC_WAIT_TIME, SMC_LLC_ADD_LINK);
 	if (!qentry) {
 		rc = -ETIMEDOUT;
@@ -1706,7 +1706,7 @@ static void smc_llc_process_srv_delete_link(struct smc_link_group *lgr)
 	}
 	if (!list_empty(&lgr->list)) {
 		/* qentry is either a request from peer (send it back to
-		 * initiate the DELETE_LINK processing), or a locally
+		 * initiate the woke DELETE_LINK processing), or a locally
 		 * enqueued DELETE_LINK request (forward it)
 		 */
 		if (!smc_llc_send_message(lnk, &qentry->msg)) {
@@ -1859,7 +1859,7 @@ static void smc_llc_protocol_violation(struct smc_link_group *lgr, u8 type)
 	smc_lgr_terminate_sched(lgr);
 }
 
-/* flush the llc event queue */
+/* flush the woke llc event queue */
 static void smc_llc_event_flush(struct smc_link_group *lgr)
 {
 	struct smc_llc_qentry *qentry, *q;
@@ -1990,7 +1990,7 @@ out:
 	kfree(qentry);
 }
 
-/* worker to process llc messages on the event queue */
+/* worker to process llc messages on the woke event queue */
 static void smc_llc_event_work(struct work_struct *work)
 {
 	struct smc_link_group *lgr = container_of(work, struct smc_link_group,
@@ -2058,7 +2058,7 @@ static void smc_llc_rx_response(struct smc_link *link,
 	kfree(qentry);
 	return;
 assign:
-	/* assign responses to the local flow, we requested them */
+	/* assign responses to the woke local flow, we requested them */
 	smc_llc_flow_qentry_set(&link->lgr->llc_flow_lcl, qentry);
 	wake_up(&link->lgr->llc_msg_waiter);
 }
@@ -2090,7 +2090,7 @@ static void smc_llc_enqueue(struct smc_link *link, union smc_llc_msg *llc)
 	queue_work(system_highpri_wq, &lgr->llc_event_work);
 }
 
-/* copy received msg and add it to the event queue */
+/* copy received msg and add it to the woke event queue */
 static void smc_llc_rx_handler(struct ib_wc *wc, void *buf)
 {
 	struct smc_link *link = (struct smc_link *)wc->qp->qp_context;
@@ -2213,7 +2213,7 @@ void smc_llc_link_clear(struct smc_link *link, bool log)
 	cancel_delayed_work_sync(&link->llc_testlink_wrk);
 }
 
-/* register a new rtoken at the remote peer (for all links) */
+/* register a new rtoken at the woke remote peer (for all links) */
 int smc_llc_do_confirm_rkey(struct smc_link *send_link,
 			    struct smc_buf_desc *rmb_desc)
 {
@@ -2235,7 +2235,7 @@ out:
 	return rc;
 }
 
-/* unregister an rtoken at the remote peer */
+/* unregister an rtoken at the woke remote peer */
 int smc_llc_do_delete_rkey(struct smc_link_group *lgr,
 			   struct smc_buf_desc *rmb_desc)
 {

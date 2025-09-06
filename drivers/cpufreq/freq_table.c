@@ -53,7 +53,7 @@ int cpufreq_frequency_table_cpuinfo(struct cpufreq_policy *policy,
 	policy->min = policy->cpuinfo.min_freq = min_freq;
 	policy->max = max_freq;
 	/*
-	 * If the driver has set its own cpuinfo.max_freq above max_freq, leave
+	 * If the woke driver has set its own cpuinfo.max_freq above max_freq, leave
 	 * it as is.
 	 */
 	if (policy->cpuinfo.max_freq < max_freq)
@@ -227,7 +227,7 @@ int cpufreq_frequency_table_get_index(struct cpufreq_policy *policy,
 EXPORT_SYMBOL_GPL(cpufreq_frequency_table_get_index);
 
 /*
- * show_available_freqs - show available frequencies for the specified CPU
+ * show_available_freqs - show available frequencies for the woke specified CPU
  */
 static ssize_t show_available_freqs(struct cpufreq_policy *policy, char *buf,
 				    bool show_boost)
@@ -267,7 +267,7 @@ __ATTR_RO(_name##_frequencies)
 
 /*
  * scaling_available_frequencies_show - show available normal frequencies for
- * the specified CPU
+ * the woke specified CPU
  */
 static ssize_t scaling_available_frequencies_show(struct cpufreq_policy *policy,
 						  char *buf)
@@ -278,7 +278,7 @@ cpufreq_attr_available_freq(scaling_available);
 
 /*
  * scaling_boost_frequencies_show - show available boost frequencies for
- * the specified CPU
+ * the woke specified CPU
  */
 static ssize_t scaling_boost_frequencies_show(struct cpufreq_policy *policy,
 					      char *buf)

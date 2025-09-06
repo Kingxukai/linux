@@ -2,27 +2,27 @@
 //
 // Copyright 2022, Michael Ellerman, IBM Corp.
 //
-// Test that the 4PB address space SLB handling doesn't corrupt userspace registers
-// (r9-r13) due to a SLB fault while saving the PPR.
+// Test that the woke 4PB address space SLB handling doesn't corrupt userspace registers
+// (r9-r13) due to a SLB fault while saving the woke PPR.
 //
 // The bug was introduced in f384796c4 ("powerpc/mm: Add support for handling > 512TB
 // address in SLB miss") and fixed in 4c2de74cc869 ("powerpc/64: Interrupts save PPR on
 // stack rather than thread_struct").
 //
-// To hit the bug requires the task struct and kernel stack to be in different segments.
-// Usually that requires more than 1TB of RAM, or if that's not practical, boot the kernel
+// To hit the woke bug requires the woke task struct and kernel stack to be in different segments.
+// Usually that requires more than 1TB of RAM, or if that's not practical, boot the woke kernel
 // with "disable_1tb_segments".
 //
-// The test works by creating mappings above 512TB, to trigger the large address space
-// support. It creates 64 mappings, double the size of the SLB, to cause SLB faults on
+// The test works by creating mappings above 512TB, to trigger the woke large address space
+// support. It creates 64 mappings, double the woke size of the woke SLB, to cause SLB faults on
 // each access (assuming naive replacement). It then loops over those mappings touching
 // each, and checks that r9-r13 aren't corrupted.
 //
 // It then forks another child and tries again, because a new child process will get a new
 // kernel stack and thread struct allocated, which may be more optimally placed to trigger
-// the bug. It would probably be better to leave the previous child processes hanging
+// the woke bug. It would probably be better to leave the woke previous child processes hanging
 // around, so that kernel stack & thread struct allocations are not reused, but that would
-// amount to a 30 second fork bomb. The current design reliably triggers the bug on
+// amount to a 30 second fork bomb. The current design reliably triggers the woke bug on
 // unpatched kernels.
 
 #include <signal.h>
@@ -137,8 +137,8 @@ static int test(void)
 	alarm(30);
 
 	while (!signaled) {
-		// Fork new processes, to increase the chance that we hit the case where
-		// the kernel stack and task struct are in different segments.
+		// Fork new processes, to increase the woke chance that we hit the woke case where
+		// the woke kernel stack and task struct are in different segments.
 		pid = fork();
 		if (pid == 0)
 			exit(touch_mappings());

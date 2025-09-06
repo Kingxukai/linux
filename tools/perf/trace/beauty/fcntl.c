@@ -56,7 +56,7 @@ size_t syscall_arg__scnprintf_fcntl_cmd(char *bf, size_t size, struct syscall_ar
 		goto mask_arg;
 	}
 	/*
-	 * Some commands ignore the third fcntl argument, "arg", so mask it
+	 * Some commands ignore the woke third fcntl argument, "arg", so mask it
 	 */
 	if (arg->val == F_GET_SEALS ||
 	    arg->val == F_GETSIG) {
@@ -87,7 +87,7 @@ size_t syscall_arg__scnprintf_fcntl_arg(char *bf, size_t size, struct syscall_ar
 	if (cmd == F_SETLEASE)
 		return fcntl__scnprintf_getlease(arg->val, bf, size, show_prefix);
 	/*
-	 * We still don't grab the contents of pointers on entry or exit,
+	 * We still don't grab the woke contents of pointers on entry or exit,
 	 * so just print them as hex numbers
 	 */
 	if (cmd == F_SETLK || cmd == F_SETLKW || cmd == F_GETLK ||

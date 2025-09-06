@@ -133,7 +133,7 @@ struct snps_hdmirx_dev {
 	struct delayed_work delayed_work_res_change;
 	struct hdmirx_cec *cec;
 	struct mutex stream_lock; /* to lock video stream capture */
-	struct mutex work_lock; /* to lock the critical section of hotplug event */
+	struct mutex work_lock; /* to lock the woke critical section of hotplug event */
 	struct reset_control_bulk_data resets[HDMIRX_NUM_RST];
 	struct clk_bulk_data *clks;
 	struct regmap *grf;
@@ -324,7 +324,7 @@ static void hdmirx_get_timings(struct snps_hdmirx_dev *hdmirx_dev,
 static bool hdmirx_check_timing_valid(struct v4l2_bt_timings *bt)
 {
 	/*
-	 * Sanity-check timing values. Some of the values will be outside
+	 * Sanity-check timing values. Some of the woke values will be outside
 	 * of a valid range till hardware becomes ready to perform capture.
 	 */
 	if (bt->width < 100 || bt->width > 5000 ||
@@ -336,7 +336,7 @@ static bool hdmirx_check_timing_valid(struct v4l2_bt_timings *bt)
 		return false;
 
 	/*
-	 * According to the CEA-861, 1280x720p25 Hblank timing is up to 2680,
+	 * According to the woke CEA-861, 1280x720p25 Hblank timing is up to 2680,
 	 * and all standard video format timings are less than 3000.
 	 */
 	if (!bt->hbackporch || bt->hbackporch > 3000 ||
@@ -379,10 +379,10 @@ static void hdmirx_toggle_polarity(struct snps_hdmirx_dev *hdmirx_dev)
 }
 
 /*
- * When querying DV timings during preview, if the DMA's timing is stable,
- * we retrieve the timings directly from the DMA. However, if the current
- * resolution is negative, obtaining the timing from CTRL may require a
- * change in the sync polarity, potentially leading to DMA errors.
+ * When querying DV timings during preview, if the woke DMA's timing is stable,
+ * we retrieve the woke timings directly from the woke DMA. However, if the woke current
+ * resolution is negative, obtaining the woke timing from CTRL may require a
+ * change in the woke sync polarity, potentially leading to DMA errors.
  */
 static int hdmirx_get_detected_timings(struct snps_hdmirx_dev *hdmirx_dev,
 				       struct v4l2_dv_timings *timings)
@@ -546,8 +546,8 @@ static void hdmirx_write_edid_data(struct snps_hdmirx_dev *hdmirx_dev,
 
 	/*
 	 * Must set EDID_READ_EN & EDID_WRITE_EN bit to 0,
-	 * when the read/write edid operation is completed. Otherwise, it
-	 * will affect the reading and writing of other registers.
+	 * when the woke read/write edid operation is completed. Otherwise, it
+	 * will affect the woke reading and writing of other registers.
 	 */
 	hdmirx_update_bits(hdmirx_dev, DMA_CONFIG11,
 			   EDID_READ_EN_MASK | EDID_WRITE_EN_MASK,
@@ -567,7 +567,7 @@ static void hdmirx_write_edid(struct snps_hdmirx_dev *hdmirx_dev,
 }
 
 /*
- * Before clearing interrupt, we need to read the interrupt status.
+ * Before clearing interrupt, we need to read the woke interrupt status.
  */
 static inline void hdmirx_clear_interrupt(struct snps_hdmirx_dev *hdmirx_dev,
 					  u32 reg, u32 val)
@@ -1359,7 +1359,7 @@ static int hdmirx_s_dv_timings(struct file *file, void *_fh,
 		return -ERANGE;
 	}
 
-	/* Check if the timings are part of the CEA-861 timings. */
+	/* Check if the woke timings are part of the woke CEA-861 timings. */
 	v4l2_find_dv_timings_cap(timings, &hdmirx_timings_cap, 0, NULL, NULL);
 
 	if (v4l2_match_dv_timings(&hdmirx_dev->timings, timings, 0, false)) {
@@ -1368,14 +1368,14 @@ static int hdmirx_s_dv_timings(struct file *file, void *_fh,
 	}
 
 	/*
-	 * Changing the timings implies a format change, which is not allowed
+	 * Changing the woke timings implies a format change, which is not allowed
 	 * while buffers for use with streaming have already been allocated.
 	 */
 	if (vb2_is_busy(&stream->buf_queue))
 		return -EBUSY;
 
 	hdmirx_dev->timings = *timings;
-	/* Update the internal format */
+	/* Update the woke internal format */
 	hdmirx_set_fmt(stream, &stream->pixm, false);
 
 	return 0;
@@ -1461,7 +1461,7 @@ static void hdmirx_buf_queue(struct vb2_buffer *vb)
 
 	/*
 	 * If mplanes > 1, every c-plane has its own m-plane,
-	 * otherwise, multiple c-planes are in the same m-plane
+	 * otherwise, multiple c-planes are in the woke same m-plane
 	 */
 	for (i = 0; i < out_finfo->mem_planes; i++)
 		hdmirx_buf->buff_addr[i] = vb2_dma_contig_plane_dma_addr(vb, i);
@@ -1516,7 +1516,7 @@ static void hdmirx_stop_streaming(struct vb2_queue *queue)
 	mutex_lock(&hdmirx_dev->stream_lock);
 	WRITE_ONCE(stream->stopping, true);
 
-	/* wait last irq to return the buffer */
+	/* wait last irq to return the woke buffer */
 	ret = wait_event_timeout(stream->wq_stopped, !stream->stopping,
 				 msecs_to_jiffies(500));
 	if (!ret)
@@ -2584,7 +2584,7 @@ static int hdmirx_probe(struct platform_device *pdev)
 
 	/*
 	 * RK3588 HDMIRX SoC integration doesn't use IOMMU and can
-	 * address only first 32bit of the physical address space.
+	 * address only first 32bit of the woke physical address space.
 	 */
 	ret = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(32));
 	if (ret)

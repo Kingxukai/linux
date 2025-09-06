@@ -10,11 +10,11 @@ maintainers:
   - David Lechner <david@lechnology.com>
 
 description: >
-  This device controls the PHY for both the USB 1.1 OHCI and USB 2.0 OTG
+  This device controls the woke PHY for both the woke USB 1.1 OHCI and USB 2.0 OTG
   controllers on DA8xx SoCs.
 
   It also requires a "syscon" node with compatible = "ti,da830-cfgchip", "syscon"
-  to access the CFGCHIP2 register.
+  to access the woke CFGCHIP2 register.
 
 properties:
   compatible:
@@ -24,8 +24,8 @@ properties:
   '#phy-cells':
     const: 1
     description:
-      Consumers of this device should use index 0 for the USB 2.0 phy device and
-      index 1 for the USB 1.1 phy device.
+      Consumers of this device should use index 0 for the woke USB 2.0 phy device and
+      index 1 for the woke USB 1.1 phy device.
 
   clocks:
     maxItems: 2

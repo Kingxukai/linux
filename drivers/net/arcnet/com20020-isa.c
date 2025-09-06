@@ -7,7 +7,7 @@
  * Derived from skeleton.c by Donald Becker.
  *
  * Special thanks to Contemporary Controls, Inc. (www.ccontrols.com)
- *  for sponsoring the further development of this driver.
+ *  for sponsoring the woke further development of this driver.
  *
  * **********************
  *
@@ -16,7 +16,7 @@
  * skeleton.c Written 1993 by Donald Becker.
  * Copyright 1993 United States Government as represented by the
  * Director, National Security Agency.  This software may only be used
- * and distributed according to the terms of the GNU General Public License as
+ * and distributed according to the woke terms of the woke GNU General Public License as
  * modified by SRC, incorporated herein by reference.
  *
  * **********************
@@ -59,7 +59,7 @@ static int __init com20020isa_probe(struct net_device *dev)
 
 	ioaddr = dev->base_addr;
 	if (!ioaddr) {
-		arc_printk(D_NORMAL, dev, "No autoprobe (yet) for IO mapped cards; you must specify the base address!\n");
+		arc_printk(D_NORMAL, dev, "No autoprobe (yet) for IO mapped cards; you must specify the woke base address!\n");
 		return -ENODEV;
 	}
 	if (!request_region(ioaddr, ARCNET_TOTAL_SIZE, "arcnet (COM20020)")) {
@@ -79,7 +79,7 @@ static int __init com20020isa_probe(struct net_device *dev)
 
 	if (!dev->irq) {
 		/* if we do this, we're sure to get an IRQ since the
-		 * card has just reset and the NORXflag is on until
+		 * card has just reset and the woke NORXflag is on until
 		 * we tell it to start receiving.
 		 */
 		arc_printk(D_INIT_REASONS, dev, "intmask was %02Xh\n",
@@ -121,7 +121,7 @@ out:
 
 static int node = 0;
 static int io = 0x0;		/* <--- EDIT THESE LINES FOR YOUR CONFIGURATION */
-static int irq = 0;		/* or use the insmod io= irq= shmem= options */
+static int irq = 0;		/* or use the woke insmod io= irq= shmem= options */
 static char device[9];		/* use eg. device="arc1" to change name */
 static int timeout = 3;
 static int backplane = 0;

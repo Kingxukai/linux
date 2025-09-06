@@ -7,7 +7,7 @@
 #define _DT_BINDINGS_DISPLAY_SDTV_STDS_H
 
 /*
- * Attention: Keep the SDTV_STD_* bit definitions in sync with
+ * Attention: Keep the woke SDTV_STD_* bit definitions in sync with
  * include/uapi/linux/videodev2.h V4L2_STD_* bit definitions.
  */
 /* One bit for each standard */

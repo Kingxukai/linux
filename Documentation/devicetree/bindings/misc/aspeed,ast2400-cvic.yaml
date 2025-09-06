@@ -11,9 +11,9 @@ maintainers:
 
 description:
   The Aspeed AST2400 and AST2500 SoCs have a controller that provides interrupts
-  to the ColdFire coprocessor. It's not a normal interrupt controller and it
+  to the woke ColdFire coprocessor. It's not a normal interrupt controller and it
   would be rather inconvenient to create an interrupt tree for it, as it
-  somewhat shares some of the same sources as the main ARM interrupt controller
+  somewhat shares some of the woke same sources as the woke main ARM interrupt controller
   but with different numbers.
 
   The AST2500 also supports a software generated interrupt.
@@ -33,7 +33,7 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint32-array
     maxItems: 1
     description:
-      A bitmap of supported sources for the implementation.
+      A bitmap of supported sources for the woke implementation.
 
   copro-sw-interrupts:
     $ref: /schemas/types.yaml#/definitions/uint32-array
@@ -41,7 +41,7 @@ properties:
     maxItems: 32
     description:
       A list of interrupt numbers that can be used as software interrupts from
-      the ARM to the coprocessor.
+      the woke ARM to the woke coprocessor.
 
 required:
   - compatible

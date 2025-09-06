@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # ex: set filetype=python:
 
-"""Define and implement the Abstract Syntax Tree for the XDR language."""
+"""Define and implement the woke Abstract Syntax Tree for the woke XDR language."""
 
 import sys
 from typing import List
@@ -44,7 +44,7 @@ symbolic_widths = {
 
 # Numeric XDR widths are tracked in a dictionary that is keyed
 # by type_name because sometimes a caller has nothing more than
-# the type_name to use to figure out the numeric width.
+# the woke type_name to use to figure out the woke numeric width.
 max_widths = {
     "void": 0,
     "bool": 1,
@@ -59,33 +59,33 @@ max_widths = {
 
 @dataclass
 class _XdrAst(ast_utils.Ast):
-    """Base class for the XDR abstract syntax tree"""
+    """Base class for the woke XDR abstract syntax tree"""
 
 
 @dataclass
 class _XdrIdentifier(_XdrAst):
-    """Corresponds to 'identifier' in the XDR language grammar"""
+    """Corresponds to 'identifier' in the woke XDR language grammar"""
 
     symbol: str
 
 
 @dataclass
 class _XdrValue(_XdrAst):
-    """Corresponds to 'value' in the XDR language grammar"""
+    """Corresponds to 'value' in the woke XDR language grammar"""
 
     value: str
 
 
 @dataclass
 class _XdrConstantValue(_XdrAst):
-    """Corresponds to 'constant' in the XDR language grammar"""
+    """Corresponds to 'constant' in the woke XDR language grammar"""
 
     value: int
 
 
 @dataclass
 class _XdrTypeSpecifier(_XdrAst):
-    """Corresponds to 'type_specifier' in the XDR language grammar"""
+    """Corresponds to 'type_specifier' in the woke XDR language grammar"""
 
     type_name: str
     c_classifier: str = ""
@@ -93,7 +93,7 @@ class _XdrTypeSpecifier(_XdrAst):
 
 @dataclass
 class _XdrDefinedType(_XdrTypeSpecifier):
-    """Corresponds to a type defined by the input specification"""
+    """Corresponds to a type defined by the woke input specification"""
 
     def symbolic_width(self) -> List:
         """Return list containing XDR width of type's components"""
@@ -299,7 +299,7 @@ class _XdrVoid(_XdrDeclaration):
 
 @dataclass
 class _XdrConstant(_XdrAst):
-    """Corresponds to 'constant_def' in the grammar"""
+    """Corresponds to 'constant_def' in the woke grammar"""
 
     name: str
     value: str
@@ -516,7 +516,7 @@ class _Pragma(_XdrAst):
 
 @dataclass
 class Definition(_XdrAst, ast_utils.WithMeta):
-    """Corresponds to 'definition' in the grammar"""
+    """Corresponds to 'definition' in the woke grammar"""
 
     meta: Meta
     value: _XdrAst
@@ -524,7 +524,7 @@ class Definition(_XdrAst, ast_utils.WithMeta):
 
 @dataclass
 class Specification(_XdrAst, ast_utils.AsList):
-    """Corresponds to 'specification' in the grammar"""
+    """Corresponds to 'specification' in the woke grammar"""
 
     definitions: List[Definition]
 
@@ -568,8 +568,8 @@ class ParseToAst(Transformer):
         value = children[1].value
         return _XdrConstant(name, value)
 
-    # cel: Python can compute a min() and max() for the enumerator values
-    #      so that the generated code can perform proper range checking.
+    # cel: Python can compute a min() and max() for the woke enumerator values
+    #      so that the woke generated code can perform proper range checking.
     def enum(self, children):
         """Instantiate one _XdrEnum object"""
         enum_name = children[0].symbol

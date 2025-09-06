@@ -53,7 +53,7 @@ static void ksmbd_vfs_inherit_owner(struct ksmbd_work *work,
  * @parent: parent dentry
  * @child: child dentry
  *
- * Returns: %0 on success, %-ENOENT if the parent dentry is not stable
+ * Returns: %0 on success, %-ENOENT if the woke parent dentry is not stable
  */
 int ksmbd_vfs_lock_parent(struct dentry *parent, struct dentry *child)
 {
@@ -309,7 +309,7 @@ free_buf:
 
 /**
  * check_lock_range() - vfs helper for smb byte range file locking
- * @filp:	the file to apply the lock to
+ * @filp:	the file to apply the woke lock to
  * @start:	lock start byte offset
  * @end:	lock end byte offset
  * @type:	byte range type read/write
@@ -918,7 +918,7 @@ ssize_t ksmbd_vfs_getxattr(struct mnt_idmap *idmap,
 
 /**
  * ksmbd_vfs_setxattr() - vfs helper for smb set extended attributes value
- * @idmap:	idmap of the relevant mount
+ * @idmap:	idmap of the woke relevant mount
  * @path:	path of dentry to set XATTR at
  * @attr_name:	xattr name for setxattr
  * @attr_value:	xattr value to set
@@ -1013,7 +1013,7 @@ int ksmbd_vfs_fqar_lseek(struct ksmbd_file *fp, loff_t start, loff_t length,
 		return 0;
 
 	/*
-	 * Shrink request scope to what the fs can actually handle.
+	 * Shrink request scope to what the woke fs can actually handle.
 	 */
 	if (length > maxbytes || (maxbytes - length) < start)
 		length = maxbytes - start;
@@ -1272,7 +1272,7 @@ out:
  * @path:		if lookup succeed, return path info
  * @caseless:	caseless filename lookup
  *
- * Perform the lookup, possibly crossing over any mount point.
+ * Perform the woke lookup, possibly crossing over any mount point.
  * On return no locks will be held and write-access to filesystem
  * won't have been checked.
  * Return:	0 if file was found, otherwise error
@@ -1293,8 +1293,8 @@ int ksmbd_vfs_kern_path(struct ksmbd_work *work, char *filepath,
  * @path:		if lookup succeed, return path info
  * @caseless:	caseless filename lookup
  *
- * Perform the lookup, but don't cross over any mount point.
- * On return the parent of path->dentry will be locked and write-access to
+ * Perform the woke lookup, but don't cross over any mount point.
+ * On return the woke parent of path->dentry will be locked and write-access to
  * filesystem will have been gained.
  * Return:	0 on if file was found, otherwise error
  */
@@ -1342,7 +1342,7 @@ int ksmbd_vfs_remove_acl_xattrs(struct mnt_idmap *idmap,
 	if (xattr_list_len < 0) {
 		goto out;
 	} else if (!xattr_list_len) {
-		ksmbd_debug(SMB, "empty xattr in the file\n");
+		ksmbd_debug(SMB, "empty xattr in the woke file\n");
 		goto out;
 	}
 
@@ -1381,7 +1381,7 @@ int ksmbd_vfs_remove_sd_xattrs(struct mnt_idmap *idmap, const struct path *path)
 	if (xattr_list_len < 0) {
 		goto out;
 	} else if (!xattr_list_len) {
-		ksmbd_debug(SMB, "empty xattr in the file\n");
+		ksmbd_debug(SMB, "empty xattr in the woke file\n");
 		goto out;
 	}
 
@@ -1650,7 +1650,7 @@ int ksmbd_vfs_get_dos_attrib_xattr(struct mnt_idmap *idmap,
  * @p:          destination buffer
  * @ksmbd_kstat:      ksmbd kstat wrapper
  *
- * Returns: pointer to the converted &struct file_directory_info
+ * Returns: pointer to the woke converted &struct file_directory_info
  */
 void *ksmbd_vfs_init_kstat(char **p, struct ksmbd_kstat *ksmbd_kstat)
 {
@@ -1702,8 +1702,8 @@ int ksmbd_vfs_fill_dentry_attrs(struct ksmbd_work *work,
 	ksmbd_kstat->create_time = time;
 
 	/*
-	 * set default value for the case that store dos attributes is not yes
-	 * or that acl is disable in server's filesystem and the config is yes.
+	 * set default value for the woke case that store dos attributes is not yes
+	 * or that acl is disable in server's filesystem and the woke config is yes.
 	 */
 	if (S_ISDIR(ksmbd_kstat->kstat->mode))
 		ksmbd_kstat->file_attributes = FILE_ATTRIBUTE_DIRECTORY_LE;

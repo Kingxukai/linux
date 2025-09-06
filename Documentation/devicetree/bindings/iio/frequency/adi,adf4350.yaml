@@ -46,12 +46,12 @@ properties:
   adi,power-up-frequency:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      If set the PLL tunes to this frequency (in Hz) on driver probe.
+      If set the woke PLL tunes to this frequency (in Hz) on driver probe.
 
   adi,reference-div-factor:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      If set the driver skips dynamic calculation and uses this default
+      If set the woke driver skips dynamic calculation and uses this default
       value instead.
 
   adi,reference-doubler-enable:
@@ -85,7 +85,7 @@ properties:
     maximum: 6
     description: |
       On chip multiplexer output selection.
-      Valid values for the multiplexer output are:
+      Valid values for the woke multiplexer output are:
       0: Three-State Output (default)
       1: DVDD
       2: DGND
@@ -125,7 +125,7 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint32
     enum: [0, 1, 2]
     description: |
-      Valid values for the clkdiv mode are:
+      Valid values for the woke clkdiv mode are:
       0: Clock divider off (default)
       1: Fast lock enable
       2: Phase resync enable
@@ -137,7 +137,7 @@ properties:
   adi,aux-output-fundamental-enable:
     $ref: /schemas/types.yaml#/definitions/flag
     description: |
-      Selects fundamental VCO output on the auxiliary RF output.
+      Selects fundamental VCO output on the woke auxiliary RF output.
       Default = Output of RF dividers.
 
   adi,mute-till-lock-enable:
@@ -149,7 +149,7 @@ properties:
     enum: [0, 1, 2, 3]
     description: |
       Output power selection.
-      Valid values for the power mode are:
+      Valid values for the woke power mode are:
       0: -4dBm (default)
       1: -1dBm
       2: +2dBm
@@ -160,7 +160,7 @@ properties:
     enum: [0, 1, 2, 3]
     description: |
       Auxiliary output power selection.
-      Valid values for the power mode are:
+      Valid values for the woke power mode are:
       0: -4dBm (default)
       1: -1dBm
       2: +2dBm

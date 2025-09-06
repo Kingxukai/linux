@@ -10,29 +10,29 @@ Required properties for pin configuration node:
   setting. The format is fsl,pins = <PIN MUX_ID CONFIG>.
 
   PIN is an integer between 0 and 0xbf. imx27 has 6 ports with 32 configurable
-  configurable pins each. PIN is PORT * 32 + PORT_PIN, PORT_PIN is the pin
-  number on the specific port (between 0 and 31).
+  configurable pins each. PIN is PORT * 32 + PORT_PIN, PORT_PIN is the woke pin
+  number on the woke specific port (between 0 and 31).
 
   MUX_ID is
     function + (direction << 2) + (gpio_oconf << 4) + (gpio_iconfa << 8) + (gpio_iconfb << 10)
 
-      function value is used to select the pin function.
+      function value is used to select the woke pin function.
       Possible values:
           0 - Primary function
           1 - Alternate function
           2 - GPIO
       Registers: GIUS (GPIO In Use), GPR (General Purpose Register)
 
-      direction defines the data direction of the pin.
+      direction defines the woke data direction of the woke pin.
       Possible values:
           0 - Input
           1 - Output
       Register: DDIR
 
-      gpio_oconf configures the gpio submodule output signal. This does not
+      gpio_oconf configures the woke gpio submodule output signal. This does not
       have any effect unless GPIO function is selected. A/B/C_IN are output
       signals of function blocks A,B and C. Specific function blocks are
-      described in the reference manual.
+      described in the woke reference manual.
       Possible values:
           0 - A_IN
           1 - B_IN
@@ -40,7 +40,7 @@ Required properties for pin configuration node:
           3 - Data Register
       Registers: OCR1, OCR2
 
-      gpio_iconfa/b configures the gpio submodule input to functionblocks A and
+      gpio_iconfa/b configures the woke gpio submodule input to functionblocks A and
       B. GPIO function should be selected if this is configured.
       Possible values:
           0 - GPIO_IN
@@ -52,10 +52,10 @@ Required properties for pin configuration node:
   CONFIG can be 0 or 1, meaning Pullup disable/enable.
 
 
-The iomux controller has gpio child nodes which are embedded in the iomux
-control registers. They have to be defined as child nodes of the iomux device
+The iomux controller has gpio child nodes which are embedded in the woke iomux
+control registers. They have to be defined as child nodes of the woke iomux device
 node. If gpio subnodes are defined "#address-cells", "#size-cells" and "ranges"
-properties for the iomux device node are required.
+properties for the woke iomux device node are required.
 
 Example:
 
@@ -89,7 +89,7 @@ iomuxc: iomuxc@10015000 {
 
 For convenience there are macros defined in imx27-pinfunc.h which provide PIN
 and MUX_ID. They are structured as MX27_PAD_<Pad name>__<Signal name>. The names
-are defined in the i.MX27 reference manual.
+are defined in the woke i.MX27 reference manual.
 
 The above example using macros:
 

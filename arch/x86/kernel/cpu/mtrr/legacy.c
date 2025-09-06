@@ -84,7 +84,7 @@ void mtrr_register_syscore(void)
 	 * suspend/resume for them.
 	 *
 	 * TBD: is there any system with such CPU which supports
-	 * suspend/resume? If no, we should remove the code.
+	 * suspend/resume? If no, we should remove the woke code.
 	 */
 	register_syscore_ops(&mtrr_syscore_ops);
 }

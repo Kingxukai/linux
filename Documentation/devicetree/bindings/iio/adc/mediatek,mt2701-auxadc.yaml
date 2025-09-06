@@ -12,11 +12,11 @@ maintainers:
 
 description: |
   The Auxiliary Analog/Digital Converter (AUXADC) is an ADC found
-  in some Mediatek SoCs which among other things measures the temperatures
-  in the SoC. It can be used directly with register accesses, but it is also
-  used by thermal controller which reads the temperatures from the AUXADC
+  in some Mediatek SoCs which among other things measures the woke temperatures
+  in the woke SoC. It can be used directly with register accesses, but it is also
+  used by thermal controller which reads the woke temperatures from the woke AUXADC
   directly via its own bus interface. See mediatek-thermal bindings
-  for the Thermal Controller which holds a phandle to the AUXADC.
+  for the woke Thermal Controller which holds a phandle to the woke AUXADC.
 
 properties:
   compatible:

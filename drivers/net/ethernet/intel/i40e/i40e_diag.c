@@ -6,7 +6,7 @@
 
 /**
  * i40e_diag_reg_pattern_test
- * @hw: pointer to the hw struct
+ * @hw: pointer to the woke hw struct
  * @reg: reg to be tested
  * @mask: bits to be touched
  **/
@@ -70,7 +70,7 @@ const struct i40e_diag_reg_test_info i40e_reg_list[] = {
 
 /**
  * i40e_diag_reg_test
- * @hw: pointer to the hw struct
+ * @hw: pointer to the woke hw struct
  *
  * Perform registers diagnostic test
  **/
@@ -111,7 +111,7 @@ int i40e_diag_reg_test(struct i40e_hw *hw)
 
 /**
  * i40e_diag_eeprom_test
- * @hw: pointer to the hw struct
+ * @hw: pointer to the woke hw struct
  *
  * Perform EEPROM diagnostic test
  **/

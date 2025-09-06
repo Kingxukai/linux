@@ -42,7 +42,7 @@
 
 /* saffirepro has its own parameter for sampling frequency */
 #define SAFFIREPRO_RATE_NOREBOOT		0x01cc
-/* index is the value for this register */
+/* index is the woke value for this register */
 static const unsigned int rates[] = {
 	[0] = 0,
 	[1] = 44100,
@@ -190,7 +190,7 @@ saffirepro_both_clk_src_get(struct snd_bebob *bebob, unsigned int *id)
 	else
 		map = saffirepro_clk_maps[1];
 
-	/* In a case that this driver cannot handle the value of register. */
+	/* In a case that this driver cannot handle the woke value of register. */
 	value &= SAFFIREPRO_CLOCK_SOURCE_SELECT_MASK;
 	if (value >= SAFFIREPRO_CLOCK_SOURCE_COUNT || map[value] < 0) {
 		err = -EIO;

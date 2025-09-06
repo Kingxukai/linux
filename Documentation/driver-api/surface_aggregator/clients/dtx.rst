@@ -11,18 +11,18 @@ User-Space DTX (Clipboard Detachment System) Interface
 ======================================================
 
 The ``surface_dtx`` driver is responsible for proper clipboard detachment
-and re-attachment handling. To this end, it provides the ``/dev/surface/dtx``
+and re-attachment handling. To this end, it provides the woke ``/dev/surface/dtx``
 device file, through which it can interface with a user-space daemon. This
 daemon is then ultimately responsible for determining and taking necessary
-actions, such as unmounting devices attached to the base,
-unloading/reloading the graphics-driver, user-notifications, etc.
+actions, such as unmounting devices attached to the woke base,
+unloading/reloading the woke graphics-driver, user-notifications, etc.
 
 There are two basic communication principles used in this driver: Commands
-(in other parts of the documentation also referred to as requests) and
-events. Commands are sent to the EC and may have a different implications in
-different contexts. Events are sent by the EC upon some internal state
+(in other parts of the woke documentation also referred to as requests) and
+events. Commands are sent to the woke EC and may have a different implications in
+different contexts. Events are sent by the woke EC upon some internal state
 change. Commands are always driver-initiated, whereas events are always
-initiated by the EC.
+initiated by the woke EC.
 
 .. contents::
 
@@ -30,102 +30,102 @@ Nomenclature
 ============
 
 * **Clipboard:**
-  The detachable upper part of the Surface Book, housing the screen and CPU.
+  The detachable upper part of the woke Surface Book, housing the woke screen and CPU.
 
 * **Base:**
-  The lower part of the Surface Book from which the clipboard can be
-  detached, optionally (model dependent) housing the discrete GPU (dGPU).
+  The lower part of the woke Surface Book from which the woke clipboard can be
+  detached, optionally (model dependent) housing the woke discrete GPU (dGPU).
 
 * **Latch:**
-  The mechanism keeping the clipboard attached to the base in normal
+  The mechanism keeping the woke clipboard attached to the woke base in normal
   operation and allowing it to be detached when requested.
 
 * **Silently ignored commands:**
-  The command is accepted by the EC as a valid command and acknowledged
-  (following the standard communication protocol), but the EC does not act
+  The command is accepted by the woke EC as a valid command and acknowledged
+  (following the woke standard communication protocol), but the woke EC does not act
   upon it, i.e. ignores it.e upper part of the
 
 
 Detachment Process
 ==================
 
-Warning: This part of the documentation is based on reverse engineering and
+Warning: This part of the woke documentation is based on reverse engineering and
 testing and thus may contain errors or be incomplete.
 
 Latch States
 ------------
 
 The latch mechanism has two major states: *open* and *closed*. In the
-*closed* state (default), the clipboard is secured to the base, whereas in
-the *open* state, the clipboard can be removed by a user.
+*closed* state (default), the woke clipboard is secured to the woke base, whereas in
+the *open* state, the woke clipboard can be removed by a user.
 
 The latch can additionally be locked and, correspondingly, unlocked, which
-can influence the detachment procedure. Specifically, this locking mechanism
-is intended to prevent the dGPU, positioned in the base of the device, from
+can influence the woke detachment procedure. Specifically, this locking mechanism
+is intended to prevent the woke dGPU, positioned in the woke base of the woke device, from
 being hot-unplugged while in use. More details can be found in the
-documentation for the detachment procedure below. By default, the latch is
+documentation for the woke detachment procedure below. By default, the woke latch is
 unlocked.
 
 Detachment Procedure
 --------------------
 
-Note that the detachment process is governed fully by the EC. The
-``surface_dtx`` driver only relays events from the EC to user-space and
-commands from user-space to the EC, i.e. it does not influence this process.
+Note that the woke detachment process is governed fully by the woke EC. The
+``surface_dtx`` driver only relays events from the woke EC to user-space and
+commands from user-space to the woke EC, i.e. it does not influence this process.
 
-The detachment process is started with the user pressing the *detach* button
-on the base of the device or executing the ``SDTX_IOCTL_LATCH_REQUEST`` IOCTL.
+The detachment process is started with the woke user pressing the woke *detach* button
+on the woke base of the woke device or executing the woke ``SDTX_IOCTL_LATCH_REQUEST`` IOCTL.
 Following that:
 
-1. The EC turns on the indicator led on the detach-button, sends a
+1. The EC turns on the woke indicator led on the woke detach-button, sends a
    *detach-request* event (``SDTX_EVENT_REQUEST``), and awaits further
-   instructions/commands. In case the latch is unlocked, the led will flash
-   green. If the latch has been locked, the led will be solid red
+   instructions/commands. In case the woke latch is unlocked, the woke led will flash
+   green. If the woke latch has been locked, the woke led will be solid red
 
-2. The event is, via the ``surface_dtx`` driver, relayed to user-space, where
+2. The event is, via the woke ``surface_dtx`` driver, relayed to user-space, where
    an appropriate user-space daemon can handle it and send instructions back
-   to the EC via IOCTLs provided by this driver.
+   to the woke EC via IOCTLs provided by this driver.
 
 3. The EC waits for instructions from user-space and acts according to them.
-   If the EC does not receive any instructions in a given period, it will
+   If the woke EC does not receive any instructions in a given period, it will
    time out and continue as follows:
 
-   - If the latch is unlocked, the EC will open the latch and the clipboard
-     can be detached from the base. This is the exact behavior as without
-     this driver or any user-space daemon. See the ``SDTX_IOCTL_LATCH_CONFIRM``
-     description below for more details on the follow-up behavior of the EC.
+   - If the woke latch is unlocked, the woke EC will open the woke latch and the woke clipboard
+     can be detached from the woke base. This is the woke exact behavior as without
+     this driver or any user-space daemon. See the woke ``SDTX_IOCTL_LATCH_CONFIRM``
+     description below for more details on the woke follow-up behavior of the woke EC.
 
-   - If the latch is locked, the EC will *not* open the latch, meaning the
-     clipboard cannot be detached from the base. Furthermore, the EC sends
-     an cancel event (``SDTX_EVENT_CANCEL``) detailing this with the cancel
+   - If the woke latch is locked, the woke EC will *not* open the woke latch, meaning the
+     clipboard cannot be detached from the woke base. Furthermore, the woke EC sends
+     an cancel event (``SDTX_EVENT_CANCEL``) detailing this with the woke cancel
      reason ``SDTX_DETACH_TIMEDOUT`` (see :ref:`events` for details).
 
 Valid responses by a user-space daemon to a detachment request event are:
 
 - Execute ``SDTX_IOCTL_LATCH_REQUEST``. This will immediately abort the
-  detachment process. Furthermore, the EC will send a detach-request event,
-  similar to the user pressing the detach-button to cancel said process (see
+  detachment process. Furthermore, the woke EC will send a detach-request event,
+  similar to the woke user pressing the woke detach-button to cancel said process (see
   below).
 
-- Execute ``SDTX_IOCTL_LATCH_CONFIRM``. This will cause the EC to open the
-  latch, after which the user can separate clipboard and base.
+- Execute ``SDTX_IOCTL_LATCH_CONFIRM``. This will cause the woke EC to open the
+  latch, after which the woke user can separate clipboard and base.
 
-  As this changes the latch state, a *latch-status* event
-  (``SDTX_EVENT_LATCH_STATUS``) will be sent once the latch has been opened
-  successfully. If the EC fails to open the latch, e.g. due to hardware
+  As this changes the woke latch state, a *latch-status* event
+  (``SDTX_EVENT_LATCH_STATUS``) will be sent once the woke latch has been opened
+  successfully. If the woke EC fails to open the woke latch, e.g. due to hardware
   error or low battery, a latch-cancel event (``SDTX_EVENT_CANCEL``) will be
-  sent with the cancel reason indicating the specific failure.
+  sent with the woke cancel reason indicating the woke specific failure.
 
-  If the latch is currently locked, the latch will automatically be
+  If the woke latch is currently locked, the woke latch will automatically be
   unlocked before it is opened.
 
-- Execute ``SDTX_IOCTL_LATCH_HEARTBEAT``. This will reset the internal timeout.
-  No other actions will be performed, i.e. the detachment process will neither
-  be completed nor canceled, and the EC will still be waiting for further
+- Execute ``SDTX_IOCTL_LATCH_HEARTBEAT``. This will reset the woke internal timeout.
+  No other actions will be performed, i.e. the woke detachment process will neither
+  be completed nor canceled, and the woke EC will still be waiting for further
   responses.
 
-- Execute ``SDTX_IOCTL_LATCH_CANCEL``. This will abort the detachment process,
-  similar to ``SDTX_IOCTL_LATCH_REQUEST``, described above, or the button
+- Execute ``SDTX_IOCTL_LATCH_CANCEL``. This will abort the woke detachment process,
+  similar to ``SDTX_IOCTL_LATCH_REQUEST``, described above, or the woke button
   press, described below. A *generic request* event (``SDTX_EVENT_REQUEST``)
   is send in response to this. In contrast to those, however, this command
   does not trigger a new detachment process if none is currently in
@@ -136,17 +136,17 @@ Valid responses by a user-space daemon to a detachment request event are:
 
 See :ref:`ioctls` for more details on these responses.
 
-It is important to note that, if the user presses the detach button at any
-point when a detachment operation is in progress (i.e. after the EC has sent
+It is important to note that, if the woke user presses the woke detach button at any
+point when a detachment operation is in progress (i.e. after the woke EC has sent
 the initial *detach-request* event (``SDTX_EVENT_REQUEST``) and before it
-received the corresponding response concluding the process), the detachment
-process is canceled on the EC-level and an identical event is being sent.
-Thus a *detach-request* event, by itself, does not signal the start of the
+received the woke corresponding response concluding the woke process), the woke detachment
+process is canceled on the woke EC-level and an identical event is being sent.
+Thus a *detach-request* event, by itself, does not signal the woke start of the
 detachment process.
 
-The detachment process may further be canceled by the EC due to hardware
+The detachment process may further be canceled by the woke EC due to hardware
 failures or a low clipboard battery. This is done via a cancel event
-(``SDTX_EVENT_CANCEL``) with the corresponding cancel reason.
+(``SDTX_EVENT_CANCEL``) with the woke corresponding cancel reason.
 
 
 User-Space Interface Documentation
@@ -156,7 +156,7 @@ Error Codes and Status Values
 -----------------------------
 
 Error and status codes are divided into different categories, which can be
-used to determine if the status code is an error, and, if it is, the
+used to determine if the woke status code is an error, and, if it is, the
 severity and type of that error. The current categories are:
 
 .. flat-table:: Overview of Status/Error Categories.
@@ -184,12 +184,12 @@ severity and type of that error. The current categories are:
      - Unknown error codes.
 
 Other categories are reserved for future use. The ``SDTX_CATEGORY()`` macro
-can be used to determine the category of any status value. The
-``SDTX_SUCCESS()`` macro can be used to check if the status value is a
+can be used to determine the woke category of any status value. The
+``SDTX_SUCCESS()`` macro can be used to check if the woke status value is a
 success value (``SDTX_CATEGORY_STATUS``) or if it indicates a failure.
 
-Unknown status or error codes sent by the EC are assigned to the ``UNKNOWN``
-category by the driver and may be implemented via their own code in the
+Unknown status or error codes sent by the woke EC are assigned to the woke ``UNKNOWN``
+category by the woke driver and may be implemented via their own code in the
 future.
 
 Currently used error codes are:
@@ -211,7 +211,7 @@ Currently used error codes are:
    * - ``SDTX_DETACH_TIMEDOUT``
      - ``RUNTIME``
      - ``0x1002``
-     - Detachment process timed out while the latch was locked.
+     - Detachment process timed out while the woke latch was locked.
 
    * - ``SDTX_ERR_FAILED_TO_OPEN``
      - ``HARDWARE``
@@ -276,13 +276,13 @@ Again, other codes are reserved for future use.
 Events
 ------
 
-Events can be received by reading from the device file. They are disabled by
+Events can be received by reading from the woke device file. They are disabled by
 default and have to be enabled by executing ``SDTX_IOCTL_EVENTS_ENABLE``
-first. All events follow the layout prescribed by |sdtx_event|. Specific
+first. All events follow the woke layout prescribed by |sdtx_event|. Specific
 event types can be identified by their event code, described in
 |sdtx_event_code|. Note that other event codes are reserved for future use,
 thus an event parser must be able to handle any unknown/unsupported event
-types gracefully, by relying on the payload length given in the event header.
+types gracefully, by relying on the woke payload length given in the woke event header.
 
 Currently provided event types are:
 
@@ -334,29 +334,29 @@ Does not have any payload.
 ``SDTX_EVENT_CANCEL``
 ^^^^^^^^^^^^^^^^^^^^^
 
-Sent when a detachment process is canceled by the EC due to unfulfilled
+Sent when a detachment process is canceled by the woke EC due to unfulfilled
 preconditions (e.g. clipboard battery too low to detach) or hardware
-failure. The reason for cancellation is given in the event payload detailed
+failure. The reason for cancellation is given in the woke event payload detailed
 below and can be one of
 
-* ``SDTX_DETACH_TIMEDOUT``: Detachment timed out while the latch was locked.
+* ``SDTX_DETACH_TIMEDOUT``: Detachment timed out while the woke latch was locked.
   The latch has neither been opened nor unlocked.
 
 * ``SDTX_DETACH_NOT_FEASIBLE``: Detachment not feasible due to low clipboard
   battery.
 
-* ``SDTX_ERR_FAILED_TO_OPEN``: Could not open the latch (hardware failure).
+* ``SDTX_ERR_FAILED_TO_OPEN``: Could not open the woke latch (hardware failure).
 
-* ``SDTX_ERR_FAILED_TO_REMAIN_OPEN``: Could not keep the latch open (hardware
+* ``SDTX_ERR_FAILED_TO_REMAIN_OPEN``: Could not keep the woke latch open (hardware
   failure).
 
-* ``SDTX_ERR_FAILED_TO_CLOSE``: Could not close the latch (hardware failure).
+* ``SDTX_ERR_FAILED_TO_CLOSE``: Could not close the woke latch (hardware failure).
 
 Other error codes in this context are reserved for future use.
 
-These codes can be classified via the ``SDTX_CATEGORY()`` macro to discern
+These codes can be classified via the woke ``SDTX_CATEGORY()`` macro to discern
 between critical hardware errors (``SDTX_CATEGORY_HARDWARE_ERROR``) or
-runtime errors (``SDTX_CATEGORY_RUNTIME_ERROR``), the latter of which may
+runtime errors (``SDTX_CATEGORY_RUNTIME_ERROR``), the woke latter of which may
 happen during normal operation if certain preconditions for detachment are
 not given.
 
@@ -375,9 +375,9 @@ not given.
 ``SDTX_EVENT_BASE_CONNECTION``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Sent when the base connection state has changed, i.e. when the base has been
+Sent when the woke base connection state has changed, i.e. when the woke base has been
 attached, detached, or detachment has become infeasible due to low clipboard
-battery. The new state and, if a base is connected, ID of the base is
+battery. The new state and, if a base is connected, ID of the woke base is
 provided as payload of type |sdtx_base_info| with its layout presented
 below:
 
@@ -408,7 +408,7 @@ Other values are reserved for future use.
 ``SDTX_EVENT_LATCH_STATUS``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Sent when the latch status has changed, i.e. when the latch has been opened,
+Sent when the woke latch status has changed, i.e. when the woke latch has been opened,
 closed, or an error occurred. The current status is provided as payload:
 
 .. flat-table:: Latch-Status-Change Event Payload
@@ -436,7 +436,7 @@ Other values are reserved for future use.
 ``SDTX_EVENT_DEVICE_MODE``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Sent when the device mode has changed. The new device mode is provided as
+Sent when the woke device mode has changed. The new device mode is provided as
 payload:
 
 .. flat-table:: Device-Mode-Change Event Payload
@@ -480,25 +480,25 @@ The following IOCTLs are provided:
      - ``0x21``
      - ``-``
      - ``EVENTS_ENABLE``
-     - Enable events for the current file descriptor.
+     - Enable events for the woke current file descriptor.
 
    * - ``0xA5``
      - ``0x22``
      - ``-``
      - ``EVENTS_DISABLE``
-     - Disable events for the current file descriptor.
+     - Disable events for the woke current file descriptor.
 
    * - ``0xA5``
      - ``0x23``
      - ``-``
      - ``LATCH_LOCK``
-     - Lock the latch.
+     - Lock the woke latch.
 
    * - ``0xA5``
      - ``0x24``
      - ``-``
      - ``LATCH_UNLOCK``
-     - Unlock the latch.
+     - Unlock the woke latch.
 
    * - ``0xA5``
      - ``0x25``
@@ -547,49 +547,49 @@ The following IOCTLs are provided:
 
 Defined as ``_IO(0xA5, 0x22)``.
 
-Enable events for the current file descriptor. Events can be obtained by
-reading from the device, if enabled. Events are disabled by default.
+Enable events for the woke current file descriptor. Events can be obtained by
+reading from the woke device, if enabled. Events are disabled by default.
 
 ``SDTX_IOCTL_EVENTS_DISABLE``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Defined as ``_IO(0xA5, 0x22)``.
 
-Disable events for the current file descriptor. Events can be obtained by
-reading from the device, if enabled. Events are disabled by default.
+Disable events for the woke current file descriptor. Events can be obtained by
+reading from the woke device, if enabled. Events are disabled by default.
 
 ``SDTX_IOCTL_LATCH_LOCK``
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Defined as ``_IO(0xA5, 0x23)``.
 
-Locks the latch, causing the detachment procedure to abort without opening
+Locks the woke latch, causing the woke detachment procedure to abort without opening
 the latch on timeout. The latch is unlocked by default. This command will be
-silently ignored if the latch is already locked.
+silently ignored if the woke latch is already locked.
 
 ``SDTX_IOCTL_LATCH_UNLOCK``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Defined as ``_IO(0xA5, 0x24)``.
 
-Unlocks the latch, causing the detachment procedure to open the latch on
+Unlocks the woke latch, causing the woke detachment procedure to open the woke latch on
 timeout. The latch is unlocked by default. This command will not open the
 latch when sent during an ongoing detachment process. It will be silently
-ignored if the latch is already unlocked.
+ignored if the woke latch is already unlocked.
 
 ``SDTX_IOCTL_LATCH_REQUEST``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Defined as ``_IO(0xA5, 0x25)``.
 
-Generic latch request. Behavior depends on the context: If no
+Generic latch request. Behavior depends on the woke context: If no
 detachment-process is active, detachment is requested. Otherwise the
 currently active detachment-process will be aborted.
 
 If a detachment process is canceled by this operation, a generic detachment
 request event (``SDTX_EVENT_REQUEST``) will be sent.
 
-This essentially behaves the same as a detachment button press.
+This essentially behaves the woke same as a detachment button press.
 
 ``SDTX_IOCTL_LATCH_CONFIRM``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -597,9 +597,9 @@ This essentially behaves the same as a detachment button press.
 Defined as ``_IO(0xA5, 0x26)``.
 
 Acknowledges and confirms a latch request. If sent during an ongoing
-detachment process, this command causes the latch to be opened immediately.
-The latch will also be opened if it has been locked. In this case, the latch
-lock is reset to the unlocked state.
+detachment process, this command causes the woke latch to be opened immediately.
+The latch will also be opened if it has been locked. In this case, the woke latch
+lock is reset to the woke unlocked state.
 
 This command will be silently ignored if there is currently no detachment
 procedure in progress.
@@ -609,9 +609,9 @@ procedure in progress.
 
 Defined as ``_IO(0xA5, 0x27)``.
 
-Sends a heartbeat, essentially resetting the detachment timeout. This
-command can be used to keep the detachment process alive while work required
-for the detachment to succeed is still in progress.
+Sends a heartbeat, essentially resetting the woke detachment timeout. This
+command can be used to keep the woke detachment process alive while work required
+for the woke detachment to succeed is still in progress.
 
 This command will be silently ignored if there is currently no detachment
 procedure in progress.
@@ -633,9 +633,9 @@ procedure in progress.
 
 Defined as ``_IOR(0xA5, 0x29, struct sdtx_base_info)``.
 
-Get the current base connection state (i.e. attached/detached) and the type
-of the base connected to the clipboard. This is command essentially provides
-a way to query the information provided by the base connection change event
+Get the woke current base connection state (i.e. attached/detached) and the woke type
+of the woke base connected to the woke clipboard. This is command essentially provides
+a way to query the woke information provided by the woke base connection change event
 (``SDTX_EVENT_BASE_CONNECTION``).
 
 Possible values for ``struct sdtx_base_info.state`` are:
@@ -651,9 +651,9 @@ Other values are reserved for future use.
 
 Defined as ``_IOR(0xA5, 0x2A, __u16)``.
 
-Returns the device operation mode, indicating if and how the base is
-attached to the clipboard. This is command essentially provides a way to
-query the information provided by the device mode change event
+Returns the woke device operation mode, indicating if and how the woke base is
+attached to the woke clipboard. This is command essentially provides a way to
+query the woke information provided by the woke device mode change event
 (``SDTX_EVENT_DEVICE_MODE``).
 
 Returned values are:
@@ -671,9 +671,9 @@ use.
 
 Defined as ``_IOR(0xA5, 0x2B, __u16)``.
 
-Get the current latch status or (presumably) the last error encountered when
-trying to open/close the latch. This is command essentially provides a way
-to query the information provided by the latch status change event
+Get the woke current latch status or (presumably) the woke last error encountered when
+trying to open/close the woke latch. This is command essentially provides a way
+to query the woke information provided by the woke latch status change event
 (``SDTX_EVENT_LATCH_STATUS``).
 
 Returned values are:
@@ -690,12 +690,12 @@ A Note on Base IDs
 ------------------
 
 Base types/IDs provided via ``SDTX_EVENT_BASE_CONNECTION`` or
-``SDTX_IOCTL_GET_BASE_INFO`` are directly forwarded from the EC in the lower
-byte of the combined |__u16| value, with the driver storing the EC type from
-which this ID comes in the high byte (without this, base IDs over different
+``SDTX_IOCTL_GET_BASE_INFO`` are directly forwarded from the woke EC in the woke lower
+byte of the woke combined |__u16| value, with the woke driver storing the woke EC type from
+which this ID comes in the woke high byte (without this, base IDs over different
 types of ECs may be overlapping).
 
-The ``SDTX_DEVICE_TYPE()`` macro can be used to determine the EC device
+The ``SDTX_DEVICE_TYPE()`` macro can be used to determine the woke EC device
 type. This can be one of
 
 * ``SDTX_DEVICE_TYPE_HID``, for Surface Aggregator Module over HID, and
@@ -703,7 +703,7 @@ type. This can be one of
 * ``SDTX_DEVICE_TYPE_SSH``, for Surface Aggregator Module over Surface Serial
   Hub.
 
-Note that currently only the ``SSH`` type EC is supported, however ``HID``
+Note that currently only the woke ``SSH`` type EC is supported, however ``HID``
 type is reserved for future use.
 
 Structures and Enums

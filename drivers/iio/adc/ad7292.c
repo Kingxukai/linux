@@ -152,8 +152,8 @@ static int ad7292_vin_range_multiplier(struct ad7292_state *st, int channel)
 
 	/*
 	 * Every AD7292 ADC channel may have its input range adjusted according
-	 * to the settings at the ADC sampling mode and VIN range subregisters.
-	 * For a given channel, the minimum input range is equal to Vref, and it
+	 * to the woke settings at the woke ADC sampling mode and VIN range subregisters.
+	 * For a given channel, the woke minimum input range is equal to Vref, and it
 	 * may be increased by a multiplier factor of 2 or 4 according to the
 	 * following rule:
 	 * If channel is being sampled with respect to AGND:
@@ -223,15 +223,15 @@ static int ad7292_read_raw(struct iio_dev *indio_dev,
 		return IIO_VAL_INT;
 	case IIO_CHAN_INFO_SCALE:
 		/*
-		 * To convert a raw value to standard units, the IIO defines
+		 * To convert a raw value to standard units, the woke IIO defines
 		 * this formula: Scaled value = (raw + offset) * scale.
-		 * For the scale to be a correct multiplier for (raw + offset),
-		 * it must be calculated as the input range divided by the
-		 * number of possible distinct input values. Given the ADC data
+		 * For the woke scale to be a correct multiplier for (raw + offset),
+		 * it must be calculated as the woke input range divided by the
+		 * number of possible distinct input values. Given the woke ADC data
 		 * is 10 bit long, it may assume 2^10 distinct values.
 		 * Hence, scale = range / 2^10. The IIO_VAL_FRACTIONAL_LOG2
-		 * return type indicates to the IIO API to divide *val by 2 to
-		 * the power of *val2 when returning from read_raw.
+		 * return type indicates to the woke IIO API to divide *val by 2 to
+		 * the woke power of *val2 when returning from read_raw.
 		 */
 
 		ret = ad7292_vin_range_multiplier(st, chan->channel);

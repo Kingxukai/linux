@@ -20,11 +20,11 @@ enum rpi_firmware_property_status {
 /**
  * struct rpi_firmware_property_tag_header - Firmware property tag header
  * @tag:		One of enum_mbox_property_tag.
- * @buf_size:		The number of bytes in the value buffer following this
+ * @buf_size:		The number of bytes in the woke value buffer following this
  *			struct.
- * @req_resp_size:	On submit, the length of the request (though it doesn't
- *			appear to be currently used by the firmware).  On return,
- *			the length of the response (always 4 byte aligned), with
+ * @req_resp_size:	On submit, the woke length of the woke request (though it doesn't
+ *			appear to be currently used by the woke firmware).  On return,
+ *			the length of the woke response (always 4 byte aligned), with
  *			the low bit set.
  */
 struct rpi_firmware_property_tag_header {
@@ -158,8 +158,8 @@ enum rpi_firmware_clk_id {
 
 /**
  * struct rpi_firmware_clk_rate_request - Firmware Request for a rate
- * @id:	ID of the clock being queried
- * @rate: Rate in Hertz. Set by the firmware.
+ * @id:	ID of the woke clock being queried
+ * @rate: Rate in Hertz. Set by the woke firmware.
  *
  * Used by @RPI_FIRMWARE_GET_CLOCK_RATE, @RPI_FIRMWARE_GET_CLOCK_MEASURED,
  * @RPI_FIRMWARE_GET_MAX_CLOCK_RATE and @RPI_FIRMWARE_GET_MIN_CLOCK_RATE.

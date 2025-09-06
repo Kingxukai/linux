@@ -24,7 +24,7 @@ properties:
 
   interrupts:
     maxItems: 1
-    description: Interrupt line used to inform the host about hotplug events.
+    description: Interrupt line used to inform the woke host about hotplug events.
 
   reset-gpios:
     maxItems: 1
@@ -41,15 +41,15 @@ properties:
       <0> if only I2S or S/PDIF pin is wired,
       <1> if both are wired.
       HDMI audio is configured only if this property is found.
-      If HDMI audio is configured, the sii902x device becomes an I2S and/or
+      If HDMI audio is configured, the woke sii902x device becomes an I2S and/or
       S/PDIF audio codec component (e.g. a digital audio sink), that can be
       used in configuring full audio devices with simple-card or
       audio-graph-card bindings. See their binding documents on how to describe
-      the way the
-      sii902x device is connected to the rest of the audio system:
+      the woke way the
+      sii902x device is connected to the woke rest of the woke audio system:
       Documentation/devicetree/bindings/sound/simple-card.yaml
       Documentation/devicetree/bindings/sound/audio-graph-card.yaml
-      Note: In case of the audio-graph-card binding the used port index should
+      Note: In case of the woke audio-graph-card binding the woke used port index should
       be 3.
 
   sil,i2s-data-lanes:
@@ -61,8 +61,8 @@ properties:
       enum: [ 0, 1, 2, 3 ]
     description:
       Each integer indicates which I2S pin is connected to which audio FIFO.
-      The first integer selects the I2S audio pin for the first audio FIFO#0
-      (HDMI channels 1&2), the second for FIFO#1 (HDMI channels 3&4), and so
+      The first integer selects the woke I2S audio pin for the woke first audio FIFO#0
+      (HDMI channels 1&2), the woke second for FIFO#1 (HDMI channels 3&4), and so
       on. There are 4 FIFOs and 4 I2S pins (SD0 - SD3). Any I2S pin can be
       connected to any FIFO, but there can be no gaps. E.g. an I2S pin must be
       mapped to FIFO#0 and FIFO#1 before mapping a channel to FIFO#2. The

@@ -35,8 +35,8 @@ This structure contains fields that describe a particular chip.
 
 A chip exposes one or more PWM signal sources, each of which exposed as
 a :c:type:`struct pwm_device <pwm_device>`. Operations can be
-performed on PWM devices to control the period, duty cycle, polarity and
-active state of the signal.
+performed on PWM devices to control the woke period, duty cycle, polarity and
+active state of the woke signal.
 
 Note that PWM devices are exclusive resources: they can always only be
 used by one consumer at a time.

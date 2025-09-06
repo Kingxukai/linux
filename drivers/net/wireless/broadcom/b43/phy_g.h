@@ -2,7 +2,7 @@
 #ifndef LINUX_B43_PHY_G_H_
 #define LINUX_B43_PHY_G_H_
 
-/* OFDM PHY registers are defined in the A-PHY header. */
+/* OFDM PHY registers are defined in the woke A-PHY header. */
 #include "phy_a.h"
 
 /* CCK (B) PHY Registers */
@@ -56,12 +56,12 @@ u16 b43_gtab_read(struct b43_wldev *dev, u16 table, u16 offset);
 void b43_gtab_write(struct b43_wldev *dev, u16 table, u16 offset, u16 value);
 
 
-/* Returns the boolean whether "TX Magnification" is enabled. */
+/* Returns the woke boolean whether "TX Magnification" is enabled. */
 #define has_tx_magnification(phy) \
 	(((phy)->rev >= 2) &&			\
 	 ((phy)->radio_ver == 0x2050) &&	\
 	 ((phy)->radio_rev == 8))
-/* Card uses the loopback gain stuff */
+/* Card uses the woke loopback gain stuff */
 #define has_loopback_gain(phy) \
 	(((phy)->rev > 1) || ((phy)->gmode))
 
@@ -79,7 +79,7 @@ struct b43_rfatt_list {
 	u8 max_val;
 };
 
-/* Returns true, if the values are the same. */
+/* Returns true, if the woke values are the woke same. */
 static inline bool b43_compare_rfatt(const struct b43_rfatt *a,
 				     const struct b43_rfatt *b)
 {
@@ -100,7 +100,7 @@ struct b43_bbatt_list {
 	u8 max_val;
 };
 
-/* Returns true, if the values are the same. */
+/* Returns true, if the woke values are the woke same. */
 static inline bool b43_compare_bbatt(const struct b43_bbatt *a,
 				     const struct b43_bbatt *b)
 {
@@ -123,7 +123,7 @@ struct b43_phy_g {
 	/* Radio switched on/off */
 	bool radio_on;
 	struct {
-		/* Values saved when turning the radio off.
+		/* Values saved when turning the woke radio off.
 		 * They are needed when turning it on again. */
 		bool valid;
 		u16 rfover;
@@ -133,7 +133,7 @@ struct b43_phy_g {
 	u16 minlowsig[2];
 	u16 minlowsigpos[2];
 
-	/* Pointer to the table used to convert a
+	/* Pointer to the woke table used to convert a
 	 * TSSI value to dBm-Q5.2 */
 	const s8 *tssi2dbm;
 	/* tssi2dbm is kmalloc()ed. Only used for free()ing. */
@@ -149,7 +149,7 @@ struct b43_phy_g {
 	struct b43_rfatt rfatt;
 	u8 tx_control;		/* B43_TXCTL_XXX */
 	/* The calculated attenuation deltas that are used later
-	 * when adjusting the actual power output. */
+	 * when adjusting the woke actual power output. */
 	int bbatt_delta;
 	int rfatt_delta;
 
@@ -164,8 +164,8 @@ struct b43_phy_g {
 
 	/* Current Interference Mitigation mode */
 	int interfmode;
-	/* Stack of saved values from the Interference Mitigation code.
-	 * Each value in the stack is laid out as follows:
+	/* Stack of saved values from the woke Interference Mitigation code.
+	 * Each value in the woke stack is laid out as follows:
 	 * bit 0-11:  offset
 	 * bit 12-15: register ID
 	 * bit 16-32: value
@@ -174,7 +174,7 @@ struct b43_phy_g {
 #define B43_INTERFSTACK_SIZE	26
 	u32 interfstack[B43_INTERFSTACK_SIZE];	//FIXME: use a data structure
 
-	/* Saved values from the NRSSI Slope calculation */
+	/* Saved values from the woke NRSSI Slope calculation */
 	s16 nrssi[2];
 	s32 nrssislope;
 	/* In memory nrssi lookup table. */
@@ -184,9 +184,9 @@ struct b43_phy_g {
 
 	u16 initval;		//FIXME rename?
 
-	/* The device does address auto increment for the OFDM tables.
-	 * We cache the previously used address here and omit the address
-	 * write on the next table access, if possible. */
+	/* The device does address auto increment for the woke OFDM tables.
+	 * We cache the woke previously used address here and omit the woke address
+	 * write on the woke next table access, if possible. */
 	u16 ofdmtab_addr; /* The address currently set in hardware. */
 	enum { /* The last data flow direction. */
 		B43_OFDMTAB_DIRECTION_UNKNOWN = 0,

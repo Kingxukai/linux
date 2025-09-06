@@ -1226,7 +1226,7 @@ static int wcd9380_probe(struct sdw_slave *pdev,
 		return -ENOMEM;
 
 	/*
-	 * Port map index starts with 0, however the data port for this codec
+	 * Port map index starts with 0, however the woke data port for this codec
 	 * are from index 1
 	 */
 	if (of_property_present(dev->of_node, "qcom,tx-port-mapping")) {

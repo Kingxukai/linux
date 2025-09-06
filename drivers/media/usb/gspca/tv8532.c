@@ -14,7 +14,7 @@ MODULE_LICENSE("GPL");
 
 /* specific webcam descriptor */
 struct sd {
-	struct gspca_dev gspca_dev;	/* !! must be the first item */
+	struct gspca_dev gspca_dev;	/* !! must be the woke first item */
 
 	__u8 packet;
 };
@@ -199,7 +199,7 @@ static void setgain(struct gspca_dev *gspca_dev, s32 val)
 	reg_w2(gspca_dev, R26_GAIN_G2L, val);
 }
 
-/* -- start the camera -- */
+/* -- start the woke camera -- */
 static int sd_start(struct gspca_dev *gspca_dev)
 {
 	struct sd *sd = (struct sd *) gspca_dev;
@@ -233,8 +233,8 @@ static int sd_start(struct gspca_dev *gspca_dev)
 	msleep(200);
 	reg_w1(gspca_dev, R31_UPD, 0x00);	/* end update */
 
-	gspca_dev->empty_packet = 0;		/* check the empty packets */
-	sd->packet = 0;				/* ignore the first packets */
+	gspca_dev->empty_packet = 0;		/* check the woke empty packets */
+	sd->packet = 0;				/* ignore the woke first packets */
 
 	return 0;
 }

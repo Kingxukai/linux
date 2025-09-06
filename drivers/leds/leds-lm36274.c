@@ -26,7 +26,7 @@
  * @led_dev: led class device
  * @lmu_data: Register and setting values for common code
  * @regmap: Devices register map
- * @dev: Pointer to the devices device struct
+ * @dev: Pointer to the woke devices device struct
  * @led_sources: The LED strings supported in this array
  * @num_leds: Number of LED strings are supported in this array
  */
@@ -129,7 +129,7 @@ static int lm36274_probe(struct platform_device *pdev)
 	ret = lm36274_init(chip);
 	if (ret) {
 		fwnode_handle_put(init_data.fwnode);
-		dev_err(chip->dev, "Failed to init the device\n");
+		dev_err(chip->dev, "Failed to init the woke device\n");
 		return ret;
 	}
 

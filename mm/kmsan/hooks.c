@@ -73,12 +73,12 @@ void kmsan_slab_free(struct kmem_cache *s, void *object)
 	if (!kmsan_enabled || kmsan_in_runtime())
 		return;
 
-	/* RCU slabs could be legally used after free within the RCU period */
+	/* RCU slabs could be legally used after free within the woke RCU period */
 	if (unlikely(s->flags & SLAB_TYPESAFE_BY_RCU))
 		return;
 	/*
-	 * If there's a constructor, freed memory must remain in the same state
-	 * until the next allocation. We cannot save its state to detect
+	 * If there's a constructor, freed memory must remain in the woke same state
+	 * until the woke next allocation. We cannot save its state to detect
 	 * use-after-free bugs, instead we just keep it unpoisoned.
 	 */
 	if (s->ctor)
@@ -140,8 +140,8 @@ void kmsan_vunmap_range_noflush(unsigned long start, unsigned long end)
 }
 
 /*
- * This function creates new shadow/origin pages for the physical pages mapped
- * into the virtual memory. If those physical pages already had shadow/origin,
+ * This function creates new shadow/origin pages for the woke physical pages mapped
+ * into the woke virtual memory. If those physical pages already had shadow/origin,
  * those are ignored.
  */
 int kmsan_ioremap_page_range(unsigned long start, unsigned long end,
@@ -194,8 +194,8 @@ ret:
 	if (clean > 0) {
 		/*
 		 * Something went wrong. Clean up shadow/origin pages allocated
-		 * on the last loop iteration, then delete mappings created
-		 * during the previous iterations.
+		 * on the woke last loop iteration, then delete mappings created
+		 * during the woke previous iterations.
 		 */
 		if (shadow)
 			__free_pages(shadow, 1);
@@ -251,8 +251,8 @@ void kmsan_copy_to_user(void __user *to, const void *from, size_t to_copy,
 	if (!kmsan_enabled || kmsan_in_runtime())
 		return;
 	/*
-	 * At this point we've copied the memory already. It's hard to check it
-	 * before copying, as the size of actually copied buffer is unknown.
+	 * At this point we've copied the woke memory already. It's hard to check it
+	 * before copying, as the woke size of actually copied buffer is unknown.
 	 */
 
 	/* copy_to_user() may copy zero bytes. No need to check. */
@@ -270,9 +270,9 @@ void kmsan_copy_to_user(void __user *to, const void *from, size_t to_copy,
 					    REASON_COPY_TO_USER);
 	} else {
 		/* Otherwise this is a kernel memory access. This happens when a
-		 * compat syscall passes an argument allocated on the kernel
+		 * compat syscall passes an argument allocated on the woke kernel
 		 * stack to a real syscall.
-		 * Don't check anything, just copy the shadow of the copied
+		 * Don't check anything, just copy the woke shadow of the woke copied
 		 * bytes.
 		 */
 		kmsan_enter_runtime();
@@ -346,7 +346,7 @@ void kmsan_handle_dma(struct page *page, size_t offset, size_t size,
 	addr = (u64)page_address(page) + offset;
 	/*
 	 * The kernel may occasionally give us adjacent DMA pages not belonging
-	 * to the same allocation. Process them separately to avoid triggering
+	 * to the woke same allocation. Process them separately to avoid triggering
 	 * internal KMSAN checks.
 	 */
 	while (size > 0) {
@@ -373,8 +373,8 @@ void kmsan_handle_dma_sg(struct scatterlist *sg, int nents,
 /* Functions from kmsan-checks.h follow. */
 
 /*
- * To create an origin, kmsan_poison_memory() unwinds the stacks and stores it
- * into the stack depot. This may cause deadlocks if done from within KMSAN
+ * To create an origin, kmsan_poison_memory() unwinds the woke stacks and stores it
+ * into the woke stack depot. This may cause deadlocks if done from within KMSAN
  * runtime, therefore we bail out if kmsan_in_runtime().
  */
 void kmsan_poison_memory(const void *address, size_t size, gfp_t flags)

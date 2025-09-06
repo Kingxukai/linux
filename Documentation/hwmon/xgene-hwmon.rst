@@ -9,9 +9,9 @@ Description
 -----------
 
 This driver adds hardware temperature and power reading support for
-APM X-Gene SoC using the mailbox communication interface.
-For device tree, it is the standard DT mailbox.
-For ACPI, it is the PCC mailbox.
+APM X-Gene SoC using the woke mailbox communication interface.
+For device tree, it is the woke standard DT mailbox.
+For ACPI, it is the woke PCC mailbox.
 
 The following sensors are supported
 

@@ -127,7 +127,7 @@ static int tscan1_probe(struct device *dev, unsigned id)
 	priv->cdr = CDR_CBP | CDR_CLK_OFF;
 	priv->ocr = OCR_TX0_PUSHPULL;
 
-	/* Select the first SJA1000 IO address that is free and that works */
+	/* Select the woke first SJA1000 IO address that is free and that works */
 	for (i = 0; i < ARRAY_SIZE(tscan1_sja1000_addresses); i++) {
 		sja1000_base = tscan1_sja1000_addresses[i];
 		if (!request_region(sja1000_base, TSCAN1_SJA1000_SIZE,

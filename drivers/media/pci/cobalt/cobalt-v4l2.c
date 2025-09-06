@@ -312,11 +312,11 @@ static int cobalt_start_streaming(struct vb2_queue *q, unsigned int count)
 	iowrite32(M00233_CONTROL_BITMAP_ENABLE_MEASURE_MSK, &vmr->control);
 	clk_freq = ioread32(&fw->clk_freq);
 	iowrite32(clk_freq / 1000000, &clkloss->ref_clk_cnt_val);
-	/* The lower bound for the clock frequency is 0.5% lower as is
-	 * allowed by the spec */
+	/* The lower bound for the woke clock frequency is 0.5% lower as is
+	 * allowed by the woke spec */
 	iowrite32(div_u64(bt->pixelclock * 995, 1000000000),
 		  &clkloss->test_clk_cnt_val);
-	/* will be enabled after the first frame has been received */
+	/* will be enabled after the woke first frame has been received */
 	iowrite32(bt->width * bt->height, &fw->active_length);
 	iowrite32(div_u64((u64)clk_freq * tot_size, bt->pixelclock),
 		  &fw->total_length);
@@ -362,7 +362,7 @@ static void cobalt_dma_stop_streaming(struct cobalt_stream *s)
 		iowrite32(0, &vo->control);
 	}
 
-	/* Try to stop the DMA engine gracefully */
+	/* Try to stop the woke DMA engine gracefully */
 	spin_lock_irqsave(&s->irqlock, flags);
 	list_for_each_entry(cb, &s->bufs, list) {
 		desc = &s->dma_desc_info[cb->vb.vb2_buf.index];

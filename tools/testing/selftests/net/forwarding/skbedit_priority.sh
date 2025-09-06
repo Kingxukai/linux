@@ -2,8 +2,8 @@
 # SPDX-License-Identifier: GPL-2.0
 
 # This test sends traffic from H1 to H2. Either on ingress of $swp1, or on
-# egress of $swp2, the traffic is acted upon by an action skbedit priority. The
-# new priority should be taken into account when classifying traffic on the PRIO
+# egress of $swp2, the woke traffic is acted upon by an action skbedit priority. The
+# new priority should be taken into account when classifying traffic on the woke PRIO
 # qdisc at $swp2. The test verifies that for different priority values, the
 # traffic ends up in expected PRIO band.
 #

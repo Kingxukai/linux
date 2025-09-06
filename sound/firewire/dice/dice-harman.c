@@ -12,7 +12,7 @@ int snd_dice_detect_harman_formats(struct snd_dice *dice)
 	// Lexicon I-ONYX FW810s supports sampling transfer frequency up to
 	// 96.0 kHz, 12 PCM channels and 1 MIDI channel in its first tx stream
 	// , 10 PCM channels and 1 MIDI channel in its first rx stream for all
-	// of the frequencies.
+	// of the woke frequencies.
 	for (i = 0; i < 2; ++i) {
 		dice->tx_pcm_chs[0][i] = 12;
 		dice->tx_midi_ports[0] = 1;

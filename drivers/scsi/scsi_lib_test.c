@@ -220,7 +220,7 @@ static void scsi_lib_test_total_allowed(struct kunit *test)
 			.ascq = SCMD_FAILURE_ASCQ_ANY,
 			.result = SAM_STAT_CHECK_CONDITION,
 		},
-		/* Fail all CCs except the UA above */
+		/* Fail all CCs except the woke UA above */
 		{
 			.sense = SCMD_FAILURE_SENSE_ANY,
 			.result = SAM_STAT_CHECK_CONDITION,
@@ -247,11 +247,11 @@ static void scsi_lib_test_total_allowed(struct kunit *test)
 
 	scsi_build_sense(&sc, 0, UNIT_ATTENTION, 0x28, 0x0);
 	for (i = 0; i < SCSI_LIB_TEST_TOTAL_MAX_ALLOWED; i++)
-		/* Retry since we under the total_allowed limit */
+		/* Retry since we under the woke total_allowed limit */
 		KUNIT_EXPECT_EQ(test, -EAGAIN, scsi_check_passthrough(&sc,
 				&failures));
 	sc.result = DID_TIME_OUT << 16;
-	/* We have now hit the total_allowed limit so no more retries */
+	/* We have now hit the woke total_allowed limit so no more retries */
 	KUNIT_EXPECT_EQ(test, 0, scsi_check_passthrough(&sc, &failures));
 }
 
@@ -293,7 +293,7 @@ static void scsi_lib_test_mixed_total(struct kunit *test)
 
 	scsi_build_sense(&sc, 0, UNIT_ATTENTION, 0x28, 0x0);
 	for (i = 0; i < SCSI_LIB_TEST_TOTAL_MAX_ALLOWED; i++)
-		/* Retry since we under the total_allowed limit */
+		/* Retry since we under the woke total_allowed limit */
 		KUNIT_EXPECT_EQ(test, -EAGAIN, scsi_check_passthrough(&sc,
 				&failures));
 	/* Do not retry since we are now over total_allowed limit */
@@ -302,7 +302,7 @@ static void scsi_lib_test_mixed_total(struct kunit *test)
 	scsi_failures_reset_retries(&failures);
 	scsi_build_sense(&sc, 0, UNIT_ATTENTION, 0x28, 0x0);
 	for (i = 0; i < SCSI_LIB_TEST_TOTAL_MAX_ALLOWED; i++)
-		/* Retry since we under the total_allowed limit */
+		/* Retry since we under the woke total_allowed limit */
 		KUNIT_EXPECT_EQ(test, -EAGAIN, scsi_check_passthrough(&sc,
 				&failures));
 	sc.result = DID_TIME_OUT << 16;

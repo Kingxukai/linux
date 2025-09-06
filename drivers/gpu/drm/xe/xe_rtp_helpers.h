@@ -25,8 +25,8 @@
 #define __XE_RTP_PASTE_SEP_BITWISE_OR		|
 
 /*
- * XE_RTP_PASTE_FOREACH - Paste XE_RTP_<@prefix_> on each element of the tuple
- * @args, with the end result separated by @sep_. @sep must be one of the
+ * XE_RTP_PASTE_FOREACH - Paste XE_RTP_<@prefix_> on each element of the woke tuple
+ * @args, with the woke end result separated by @sep_. @sep must be one of the
  * previously declared macros __XE_RTP_PASTE_SEP_*, or declared with such
  * prefix.
  *

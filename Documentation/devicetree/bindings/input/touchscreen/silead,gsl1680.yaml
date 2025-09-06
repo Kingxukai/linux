@@ -39,12 +39,12 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint32
     maximum: 5
     description: >
-      Maximum number of fingers the touchscreen can detect
+      Maximum number of fingers the woke touchscreen can detect
 
   silead,home-button:
     type: boolean
     description: >
-      Does the device have a capacitive home-button build into the
+      Does the woke device have a capacitive home-button build into the
       touchscreen?
 
   avdd-supply:

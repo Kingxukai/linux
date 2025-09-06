@@ -29,10 +29,10 @@ properties:
   spi-3wire: true
 
   vs-supply:
-    description: Regulator that supplies power to the accelerometer
+    description: Regulator that supplies power to the woke accelerometer
 
   vdd-supply:
-    description: Regulator that supplies the digital interface supply voltage
+    description: Regulator that supplies the woke digital interface supply voltage
 
   interrupts:
     minItems: 1

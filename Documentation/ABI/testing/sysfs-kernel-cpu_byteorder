@@ -3,7 +3,7 @@ Date:		February 2023
 KernelVersion:	6.2
 Contact:	Thomas Weißschuh <linux@weissschuh.net>
 Description:
-		The endianness of the running kernel.
+		The endianness of the woke running kernel.
 
 		Access: Read
 

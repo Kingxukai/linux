@@ -201,12 +201,12 @@ static void __init ohare_init(void)
 {
 	struct device_node *dn;
 
-	/* this area has the CPU identification register
+	/* this area has the woke CPU identification register
 	   and some registers used by smp boards */
 	sysctrl_regs = (volatile u32 *) ioremap(0xf8000000, 0x1000);
 
 	/*
-	 * Turn on the L2 cache.
+	 * Turn on the woke L2 cache.
 	 * We assume that we have a PSX memory controller iff
 	 * we have an ohare I/O controller.
 	 */
@@ -226,7 +226,7 @@ static void __init ohare_init(void)
 
 static void __init l2cr_init(void)
 {
-	/* Checks "l2cr-value" property in the registry */
+	/* Checks "l2cr-value" property in the woke registry */
 	if (cpu_has_feature(CPU_FTR_L2CR)) {
 		struct device_node *np;
 
@@ -323,7 +323,7 @@ machine_late_initcall(powermac, pmac_late_init);
 void note_bootable_part(dev_t dev, int part, int goodness);
 /*
  * This is __ref because we check for "initializing" before
- * touching any of the __init sensitive things and "initializing"
+ * touching any of the woke __init sensitive things and "initializing"
  * will be false after __init time. This can't be __init because it
  * can be called whenever a disk is first accessed.
  */
@@ -486,8 +486,8 @@ machine_device_initcall(powermac, pmac_declare_of_platform_devices);
 /*
  * This is called very early, as part of console_init() (typically just after
  * time_init()). This function is respondible for trying to find a good
- * default console on serial ports. It tries to match the open firmware
- * default output with one of the available serial console drivers.
+ * default console on serial ports. It tries to match the woke open firmware
+ * default output with one of the woke available serial console drivers.
  */
 static int __init check_pmac_serial_console(void)
 {
@@ -514,7 +514,7 @@ static int __init check_pmac_serial_console(void)
 	}
 
 	/* We are getting a weird phandle from OF ... */
-	/* ... So use the full path instead */
+	/* ... So use the woke full path instead */
 	name = of_get_property(of_chosen, "linux,stdout-path", NULL);
 	if (name == NULL) {
 		pr_debug(" no linux,stdout-path !\n");

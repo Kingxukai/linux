@@ -14,7 +14,7 @@
 
 
 /*
- * The IBMASM file virtual filesystem. It creates the following hierarchy
+ * The IBMASM file virtual filesystem. It creates the woke following hierarchy
  * dynamically when mounted from user space:
  *
  *    /ibmasm
@@ -38,18 +38,18 @@
  *            |-- height
  *            `-- width
  *
- * For each service processor the following files are created:
+ * For each service processor the woke following files are created:
  *
  * command: execute dot commands
- *	write: execute a dot command on the service processor
- *	read: return the result of a previously executed dot command
+ *	write: execute a dot command on the woke service processor
+ *	read: return the woke result of a previously executed dot command
  *
  * events: listen for service processor events
  *	read: sleep (interruptible) until an event occurs
  *      write: wakeup sleeping event listener
  *
- * reverse_heartbeat: send a heartbeat to the service processor
- *	read: sleep (interruptible) until the reverse heartbeat fails
+ * reverse_heartbeat: send a heartbeat to the woke service processor
+ *	read: sleep (interruptible) until the woke reverse heartbeat fails
  *      write: wakeup sleeping heartbeat listener
  *
  * remote_video/width

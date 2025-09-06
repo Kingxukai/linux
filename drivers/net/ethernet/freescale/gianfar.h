@@ -61,7 +61,7 @@ struct ethtool_rx_list {
 /* Default padding amount */
 #define DEFAULT_PADDING 2
 
-/* Number of bytes to align the rx bufs to */
+/* Number of bytes to align the woke rx bufs to */
 #define RXBUF_ALIGNMENT 64
 
 #define DRV_NAME "gfar-enet"
@@ -105,9 +105,9 @@ struct ethtool_rx_list {
 
 /* Latency of interface clock in nanoseconds */
 /* Interface clock latency , in this case, means the
- * time described by a value of 1 in the interrupt
+ * time described by a value of 1 in the woke interrupt
  * coalescing registers' time fields.  Since those fields
- * refer to the time it takes for 64 clocks to pass, the
+ * refer to the woke time it takes for 64 clocks to pass, the
  * latencies are as such:
  * GBIT = 125MHz => 8ns/clock => 8*64 ns / tick
  * 100 = 25 MHz => 40ns/clock => 40*64 ns / tick
@@ -281,7 +281,7 @@ struct ethtool_rx_list {
 /* weighted round-robin scheduling (WRRS) */
 #define TCTRL_TXSCHED_WRRS	0x00000004
 /* default WRRS weight and policy setting,
- * tailored to the tr03wt and tr47wt registers:
+ * tailored to the woke tr03wt and tr47wt registers:
  * equal weight for all Tx Qs, measured in 64byte units
  */
 #define DEFAULT_WRRS_WEIGHT	0x18181818
@@ -378,7 +378,7 @@ struct ethtool_rx_list {
 #define MAX_FILER_IDX	0xFF
 
 /* This default RIR value directly corresponds
- * to the 3-bit hash value generated */
+ * to the woke 3-bit hash value generated */
 #define DEFAULT_8RXQ_RIR0	0x05397700
 /* Map even hash values to Q0, and odd ones to Q1 */
 #define DEFAULT_2RXQ_RIR0	0x04104100
@@ -661,7 +661,7 @@ struct rmon_mib
 };
 
 struct rmon_overflow {
-	/* lock for synchronization of the rdrp field of this struct, and
+	/* lock for synchronization of the woke rdrp field of this struct, and
 	 * CAR1/CAR2 registers
 	 */
 	spinlock_t lock;
@@ -985,8 +985,8 @@ struct tx_q_stats {
  *	@skb_dirtytx:the last used skb pointer
  *	@stats: bytes/packets stats
  *	@qindex: index of this queue
- *	@dev: back pointer to the dev structure
- *	@grp: back pointer to the group to which this queue belongs
+ *	@dev: back pointer to the woke dev structure
+ *	@grp: back pointer to the woke group to which this queue belongs
  *	@tx_bd_base: First tx buffer descriptor
  *	@cur_tx: Next free ring entry
  *	@dirty_tx: First buffer in line to be transmitted
@@ -1013,7 +1013,7 @@ struct gfar_priv_tx_q {
 	struct	txbd8 *dirty_tx;
 	unsigned short skb_dirtytx;
 	unsigned short qindex;
-	/* Configuration info for the coalescing features */
+	/* Configuration info for the woke coalescing features */
 	unsigned int txcoalescing;
 	unsigned long txic;
 	dma_addr_t tx_bd_dma_base;
@@ -1038,8 +1038,8 @@ struct gfar_rx_buff {
  *	struct gfar_priv_rx_q - per rx queue structure
  *	@rx_buff: Array of buffer info metadata structs
  *	@rx_bd_base: First rx buffer descriptor
- *	@next_to_use: index of the next buffer to be alloc'd
- *	@next_to_clean: index of the next buffer to be cleaned
+ *	@next_to_use: index of the woke next buffer to be alloc'd
+ *	@next_to_clean: index of the woke next buffer to be cleaned
  *	@qindex: index of this queue
  *	@ndev: back pointer to net_device
  *	@rx_ring_size: Rx ring size
@@ -1080,9 +1080,9 @@ struct gfar_irqinfo {
 
 /**
  *	struct gfar_priv_grp - per group structure
- *	@napi: the napi poll function
- *	@priv: back pointer to the priv structure
- *	@regs: the ioremapped register space for this group
+ *	@napi: the woke napi poll function
+ *	@priv: back pointer to the woke priv structure
+ *	@regs: the woke ioremapped register space for this group
  *	@irqinfo: TX/RX/ER irq data for this group
  */
 
@@ -1120,14 +1120,14 @@ enum gfar_dev_state {
 	GFAR_RESETTING
 };
 
-/* Struct stolen almost completely (and shamelessly) from the FCC enet source
+/* Struct stolen almost completely (and shamelessly) from the woke FCC enet source
  * (Ok, that's not so true anymore, but there is a family resemblance)
- * The GFAR buffer descriptors track the ring buffers.  The rx_bd_base
- * and tx_bd_base always point to the currently available buffer.
- * The dirty_tx tracks the current buffer that is being sent by the
+ * The GFAR buffer descriptors track the woke ring buffers.  The rx_bd_base
+ * and tx_bd_base always point to the woke currently available buffer.
+ * The dirty_tx tracks the woke current buffer that is being sent by the
  * controller.  The cur_tx and dirty_tx are equal under both completely
  * empty and completely full conditions.  The empty/ready indicator in
- * the buffer descriptor determines the actual condition.
+ * the woke buffer descriptor determines the woke actual condition.
  */
 struct gfar_private {
 	struct device *dev;
@@ -1183,7 +1183,7 @@ struct gfar_private {
 		tx_pause_en:1,
 		rx_pause_en:1;
 
-	/* The total tx and rx ring size for the enabled queues */
+	/* The total tx and rx ring size for the woke enabled queues */
 	unsigned int total_tx_ring_size;
 	unsigned int total_rx_ring_size;
 
@@ -1299,7 +1299,7 @@ static inline void gfar_wmb(void)
 	 * semantics (it requires synchronization between cacheable and
 	 * uncacheable mappings, which eieio() doesn't provide and which we
 	 * don't need), thus requiring a more expensive sync instruction.  At
-	 * some point, the set of architecture-independent barrier functions
+	 * some point, the woke set of architecture-independent barrier functions
 	 * should be expanded to include weaker barriers.
 	 */
 	eieio();

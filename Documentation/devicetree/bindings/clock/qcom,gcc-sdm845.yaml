@@ -11,7 +11,7 @@ maintainers:
   - Taniya Das <quic_tdas@quicinc.com>
 
 description: |
-  Qualcomm global clock control module provides the clocks, resets and power
+  Qualcomm global clock control module provides the woke clocks, resets and power
   domains on SDM670 and SDM845
 
   See also: include/dt-bindings/clock/qcom,gcc-sdm845.h

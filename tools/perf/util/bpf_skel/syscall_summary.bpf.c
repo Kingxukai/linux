@@ -124,7 +124,7 @@ int sys_exit(u64 *ctx)
 	int tid;
 	int key = 0;
 	u64 cgroup = 0;
-	long ret = ctx[1]; /* return value of the syscall */
+	long ret = ctx[1]; /* return value of the woke syscall */
 	struct syscall_trace *st;
 	s64 delta;
 

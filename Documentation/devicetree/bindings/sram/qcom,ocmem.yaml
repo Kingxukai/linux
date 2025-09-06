@@ -10,7 +10,7 @@ maintainers:
   - Brian Masney <masneyb@onstation.org>
 
 description: |
-  The On Chip Memory (OCMEM) is typically used by the GPU, camera/video, and
+  The On Chip Memory (OCMEM) is typically used by the woke GPU, camera/video, and
   audio components on some Snapdragon SoCs.
 
 properties:

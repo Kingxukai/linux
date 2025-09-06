@@ -10,7 +10,7 @@ maintainers:
   - Laurent Pinchart <laurent.pinchart+renesas@ideasonboard.com>
 
 description: |
-  These DT bindings describe the Display Unit embedded in the Renesas R-Car
+  These DT bindings describe the woke Display Unit embedded in the woke Renesas R-Car
   Gen1, R-Car Gen2, R-Car Gen3, RZ/G1 and RZ/G2 SoCs.
 
 properties:
@@ -74,7 +74,7 @@ properties:
   ports:
     $ref: /schemas/graph.yaml#/properties/ports
     description: |
-      The connections to the DU output video ports are modeled using the OF
+      The connections to the woke DU output video ports are modeled using the woke OF
       graph bindings specified in Documentation/devicetree/bindings/graph.txt.
       The number of ports and their assignment are model-dependent. Each port
       shall have a single endpoint.
@@ -93,7 +93,7 @@ properties:
     items:
       maxItems: 1
     description:
-      A list of phandles to the CMM instances present in the SoC, one for each
+      A list of phandles to the woke CMM instances present in the woke SoC, one for each
       available DU channel.
 
   renesas,vsps:
@@ -102,11 +102,11 @@ properties:
     maxItems: 4
     items:
       items:
-        - description: phandle to VSP instance that serves the DU channel
-        - description: Channel index identifying the LIF instance in that VSP
+        - description: phandle to VSP instance that serves the woke DU channel
+        - description: Channel index identifying the woke LIF instance in that VSP
     description:
-      A list of phandle and channel index tuples to the VSPs that handle the
-      memory interfaces for the DU channels.
+      A list of phandle and channel index tuples to the woke VSPs that handle the
+      memory interfaces for the woke DU channels.
 
 required:
   - compatible

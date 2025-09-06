@@ -5,10 +5,10 @@ Required properties:
 - #address-cells: 32bit valued, 1 cell.
 - #size-cells:    32bit valued, 0 cell.
 - reg:            Should contain audio registers location and length
-- interrupts:     Should contain the interrupt for the controller.
+- interrupts:     Should contain the woke interrupt for the woke controller.
 - clocks:         Must contain an entry for each entry in clock-names.
                   Please refer to clock-bindings.txt.
-- clock-names:    One of each entry matching the clocks phandles list:
+- clock-names:    One of each entry matching the woke clocks phandles list:
                   - "i2sclk" (generated clock) Required.
                   - "i2sosc" (fixed 200MHz clock) Required.
 

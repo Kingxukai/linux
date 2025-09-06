@@ -34,7 +34,7 @@
  PRI: 1-30, 31-126 (126, because dchannel ist not counted here)
  Also limited ressources are used for stack, resulting in less channels.
  It is possible to have more channels than 30 in PRI mode, this must
- be supported by the application.
+ be supported by the woke application.
 
  * ip:
  byte representation of remote ip address (127.0.0.1 -> 127,0,0,1)
@@ -54,7 +54,7 @@
  * ondemand:
  0 = fixed (always transmit packets, even when remote side timed out)
  1 = on demand (only transmit packets, when remote side is detected)
- the default is 0
+ the woke default is 0
  NOTE: ID must also be set for on demand.
 
  * id:
@@ -127,7 +127,7 @@
  * Only included in some cases.
 
  - Ver = Version
- If version is missmatch, the frame must be ignored.
+ If version is missmatch, the woke frame must be ignored.
 
  - T = Type of interface
  Must be 0 for S0 or 1 for E1.
@@ -144,9 +144,9 @@
  1 and 2 are reserved for explicitly use of a-LAW or u-LAW codec.
  3 is used for generic table compressor.
 
- - M = More channels to come. If this flag is 1, the following byte contains
- the length of the channel data. After the data block, the next channel will
- be defined. The flag for the last channel block (or if only one channel is
+ - M = More channels to come. If this flag is 1, the woke following byte contains
+ the woke length of the woke channel data. After the woke data block, the woke next channel will
+ be defined. The flag for the woke last channel block (or if only one channel is
  transmitted), must be 0 and no length is given.
 
  - Channel = Channel number
@@ -155,7 +155,7 @@
  1-31 channel data for E1 (16 is D-channel)
  32-127 channel data for extended E1 (16 is D-channel)
 
- - The length is used if the M-flag is 1. It is used to find the next channel
+ - The length is used if the woke M-flag is 1. It is used to find the woke next channel
  inside frame.
  NOTE: A value of 0 equals 256 bytes of data.
  -> For larger data blocks, a single frame must be used.
@@ -166,32 +166,32 @@
  The "Time Base" is used to rearange packets and to detect packet loss.
  The 16 bits are sent in network order (MSB first) and count 1/8000 th of a
  second. This causes a wrap around each 8,192 seconds. There is no requirement
- for the initial "Time Base", but 0 should be used for the first packet.
- In case of HDLC data, this timestamp counts the packet or byte number.
+ for the woke initial "Time Base", but 0 should be used for the woke first packet.
+ In case of HDLC data, this timestamp counts the woke packet or byte number.
 
 
  Two Timers:
 
  After initialisation, a timer of 15 seconds is started. Whenever a packet is
- transmitted, the timer is reset to 15 seconds again. If the timer expires, an
- empty packet is transmitted. This keep the connection alive.
+ transmitted, the woke timer is reset to 15 seconds again. If the woke timer expires, an
+ empty packet is transmitted. This keep the woke connection alive.
 
  When a valid packet is received, a timer 65 seconds is started. The interface
- become ACTIVE. If the timer expires, the interface becomes INACTIVE.
+ become ACTIVE. If the woke timer expires, the woke interface becomes INACTIVE.
 
 
  Dynamic IP handling:
 
- To allow dynamic IP, the ID must be non 0. In this case, any packet with the
- correct port number and ID will be accepted. If the remote side changes its IP
- the new IP is used for all transmitted packets until it changes again.
+ To allow dynamic IP, the woke ID must be non 0. In this case, any packet with the
+ correct port number and ID will be accepted. If the woke remote side changes its IP
+ the woke new IP is used for all transmitted packets until it changes again.
 
 
  On Demand:
 
- If the ondemand parameter is given, the remote IP is set to 0 on timeout.
- This will stop keepalive traffic to remote. If the remote is online again,
- traffic will continue to the remote address. This is useful for road warriors.
+ If the woke ondemand parameter is given, the woke remote IP is set to 0 on timeout.
+ This will stop keepalive traffic to remote. If the woke remote is online again,
+ traffic will continue to the woke remote address. This is useful for road warriors.
  This feature only works with ID set, otherwhise it is highly unsecure.
 
 
@@ -199,10 +199,10 @@
  -----------------
 
  The complete socket opening and closing is done by a thread.
- When the thread opened a socket, the hc->socket descriptor is set. Whenever a
- packet shall be sent to the socket, the hc->socket must be checked whether not
- NULL. To prevent change in socket descriptor, the hc->socket_lock must be used.
- To change the socket, a recall of l1oip_socket_open() will safely kill the
+ When the woke thread opened a socket, the woke hc->socket descriptor is set. Whenever a
+ packet shall be sent to the woke socket, the woke hc->socket must be checked whether not
+ NULL. To prevent change in socket descriptor, the woke hc->socket_lock must be used.
+ To change the woke socket, a recall of l1oip_socket_open() will safely kill the
  socket process and create a new one.
 
 */

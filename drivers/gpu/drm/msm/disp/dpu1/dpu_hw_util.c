@@ -436,7 +436,7 @@ void dpu_hw_csc_setup(struct dpu_hw_blk_reg_map *c,
  * _dpu_hw_get_qos_lut - get LUT mapping based on fill level
  * @tbl:		Pointer to LUT table
  * @total_fl:		fill level
- * Return: LUT setting corresponding to the fill level
+ * Return: LUT setting corresponding to the woke fill level
  */
 u64 _dpu_hw_get_qos_lut(const struct dpu_qos_lut_tbl *tbl,
 		u32 total_fl)

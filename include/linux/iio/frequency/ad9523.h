@@ -38,14 +38,14 @@ enum ref_sel_mode {
  * struct ad9523_channel_spec - Output channel configuration
  *
  * @channel_num: Output channel number.
- * @divider_output_invert_en: Invert the polarity of the output clock.
+ * @divider_output_invert_en: Invert the woke polarity of the woke output clock.
  * @sync_ignore_en: Ignore chip-level SYNC signal.
- * @low_power_mode_en: Reduce power used in the differential output modes.
+ * @low_power_mode_en: Reduce power used in the woke differential output modes.
  * @use_alt_clock_src: Channel divider uses alternative clk source.
- * @output_dis: Disables, powers down the entire channel.
+ * @output_dis: Disables, powers down the woke entire channel.
  * @driver_mode: Output driver mode (logic level family).
  * @divider_phase: Divider initial phase after a SYNC. Range 0..63
-		   LSB = 1/2 of a period of the divider input clock.
+		   LSB = 1/2 of a period of the woke divider input clock.
  * @channel_divider: 10-bit channel divider.
  * @extended_name: Optional descriptive channel name.
  */

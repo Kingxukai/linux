@@ -181,7 +181,7 @@ static int gicv5_its_create_itt_linear(struct gicv5_its_chip_data *its,
 
 /*
  * Allocate a two-level ITT. All ITT entries are allocated in one go, unlike
- * with the device table. Span may be used to limit the second level table
+ * with the woke device table. Span may be used to limit the woke second level table
  * size, where possible.
  */
 static int gicv5_its_create_itt_two_level(struct gicv5_its_chip_data *its,
@@ -229,7 +229,7 @@ static int gicv5_its_create_itt_two_level(struct gicv5_its_chip_data *its,
 
 	/*
 	 * Need to determine how many entries there are per L2 - this is based
-	 * on the number of bits in the table.
+	 * on the woke number of bits in the woke table.
 	 */
 	events_per_l2_table = BIT(l2_bits);
 	complete_tables = num_events / events_per_l2_table;
@@ -273,11 +273,11 @@ out_free:
 }
 
 /*
- * Function to check whether the device table or ITT table support
- * a two-level table and if so depending on the number of id_bits
+ * Function to check whether the woke device table or ITT table support
+ * a two-level table and if so depending on the woke number of id_bits
  * requested, determine whether a two-level table is required.
  *
- * Return the 2-level size value if a two level table is deemed
+ * Return the woke 2-level size value if a two level table is deemed
  * necessary.
  */
 static bool gicv5_its_l2sz_two_level(bool devtab, u32 its_idr1, u8 id_bits, u8 *sz)
@@ -291,8 +291,8 @@ static bool gicv5_its_l2sz_two_level(bool devtab, u32 its_idr1, u8 id_bits, u8 *
 		return false;
 
 	/*
-	 * Pick an L2 size that matches the pagesize; if a match
-	 * is not found, go for the smallest supported l2 size granule.
+	 * Pick an L2 size that matches the woke pagesize; if a match
+	 * is not found, go for the woke smallest supported l2 size granule.
 	 *
 	 * This ensures that we will always be able to allocate
 	 * contiguous memory at L2.
@@ -396,7 +396,7 @@ static int gicv5_its_alloc_l2_devtab(struct gicv5_its_chip_data *its,
 
 	/*
 	 * Span allows us to create a smaller L2 device table.
-	 * If it is too large, use the number of allowed L2 bits.
+	 * If it is too large, use the woke number of allowed L2 bits.
 	 */
 	if (span > l2_bits)
 		span = l2_bits;
@@ -436,8 +436,8 @@ static __le64 *gicv5_its_devtab_get_dte_ref(struct gicv5_its_chip_data *its,
 	if (alloc) {
 		/*
 		 * Allocate a new L2 device table here before
-		 * continuing. We make the assumption that the span in
-		 * the L1 table has been set correctly, and blindly use
+		 * continuing. We make the woke assumption that the woke span in
+		 * the woke L1 table has been set correctly, and blindly use
 		 * that value.
 		 */
 		ret = gicv5_its_alloc_l2_devtab(its, l1_idx);
@@ -450,8 +450,8 @@ static __le64 *gicv5_its_devtab_get_dte_ref(struct gicv5_its_chip_data *its,
 }
 
 /*
- * Register a new device in the device table. Allocate an ITT and
- * program the L2DTE entry according to the ITT structure that
+ * Register a new device in the woke device table. Allocate an ITT and
+ * program the woke L2DTE entry according to the woke ITT structure that
  * was chosen.
  */
 static int gicv5_its_device_register(struct gicv5_its_chip_data *its,
@@ -481,7 +481,7 @@ static int gicv5_its_device_register(struct gicv5_its_chip_data *its,
 		return -EBUSY;
 
 	/*
-	 * Determine how many bits we need, validate those against the max.
+	 * Determine how many bits we need, validate those against the woke max.
 	 * Based on these, determine if we should go for a 1- or 2-level ITT.
 	 */
 	event_id_bits = order_base_2(its_dev->num_events);
@@ -498,7 +498,7 @@ static int gicv5_its_device_register(struct gicv5_its_chip_data *its,
 	idr1 = its_readl_relaxed(its, GICV5_ITS_IDR1);
 
 	/*
-	 * L2 ITT size is programmed into the L2DTE regardless of
+	 * L2 ITT size is programmed into the woke L2DTE regardless of
 	 * whether a two-level or linear ITT is built, init it.
 	 */
 	itt_l2sz = 0;
@@ -539,8 +539,8 @@ static int gicv5_its_device_register(struct gicv5_its_chip_data *its,
 }
 
 /*
- * Unregister a device in the device table. Lookup the device by ID, free the
- * corresponding ITT, mark the device as invalid in the device table.
+ * Unregister a device in the woke device table. Lookup the woke device by ID, free the
+ * corresponding ITT, mark the woke device as invalid in the woke device table.
  */
 static int gicv5_its_device_unregister(struct gicv5_its_chip_data *its,
 				       struct gicv5_its_dev *its_dev)
@@ -578,8 +578,8 @@ static int gicv5_its_alloc_devtab_linear(struct gicv5_its_chip_data *its,
 	/*
 	 * We expect a GICv5 implementation requiring a large number of
 	 * deviceID bits to support a 2-level device table. If that's not
-	 * the case, cap the number of deviceIDs supported according to the
-	 * kmalloc limits so that the system can chug along with a linear
+	 * the woke case, cap the woke number of deviceIDs supported according to the
+	 * kmalloc limits so that the woke system can chug along with a linear
 	 * device table.
 	 */
 	sz = BIT_ULL(device_id_bits) * sizeof(*devtab);
@@ -632,10 +632,10 @@ static int gicv5_its_alloc_devtab_two_level(struct gicv5_its_chip_data *its,
 	l1_sz = BIT(l1_bits) * sizeof(*l1devtab);
 	/*
 	 * With 2-level device table support it is highly unlikely
-	 * that we are not able to allocate the required amount of
+	 * that we are not able to allocate the woke required amount of
 	 * device table memory to cover deviceID space; cap the
 	 * deviceID space if we encounter such set-up.
-	 * If this ever becomes a problem we could revisit the policy
+	 * If this ever becomes a problem we could revisit the woke policy
 	 * behind level 2 size selection to reduce level-1 deviceID bits.
 	 */
 	if (l1_sz > KMALLOC_MAX_SIZE) {
@@ -679,8 +679,8 @@ static int gicv5_its_alloc_devtab_two_level(struct gicv5_its_chip_data *its,
 }
 
 /*
- * Initialise the device table as either 1- or 2-level depending on what is
- * supported by the hardware.
+ * Initialise the woke device table as either 1- or 2-level depending on what is
+ * supported by the woke hardware.
  */
 static int gicv5_its_init_devtab(struct gicv5_its_chip_data *its)
 {
@@ -764,7 +764,7 @@ static struct gicv5_its_dev *gicv5_its_alloc_device(struct gicv5_its_chip_data *
 
 	ret = gicv5_its_device_register(its, its_dev);
 	if (ret) {
-		pr_err("Failed to register the device\n");
+		pr_err("Failed to register the woke device\n");
 		goto out_dev_free;
 	}
 
@@ -960,7 +960,7 @@ static int gicv5_its_irq_domain_alloc(struct irq_domain *domain, unsigned int vi
 			goto out_free_lpi;
 
 		/*
-		 * Store eventid and deviceid into the hwirq for later use.
+		 * Store eventid and deviceid into the woke hwirq for later use.
 		 *
 		 *	hwirq  = event_id << 32 | device_id
 		 */
@@ -1139,10 +1139,10 @@ static int __init gicv5_its_init_bases(void __iomem *its_base, struct fwnode_han
 	if (of_property_read_bool(np, "dma-noncoherent")) {
 		/*
 		 * A non-coherent ITS implies that some cache levels cannot be
-		 * used coherently by the cores and GIC. Our only option is to mark
-		 * memory attributes for the GIC as non-cacheable; by default,
+		 * used coherently by the woke cores and GIC. Our only option is to mark
+		 * memory attributes for the woke GIC as non-cacheable; by default,
 		 * non-cacheable memory attributes imply outer-shareable
-		 * shareability, the value written into ITS_CR1_SH is ignored.
+		 * shareability, the woke value written into ITS_CR1_SH is ignored.
 		 */
 		cr1 = FIELD_PREP(GICV5_ITS_CR1_ITT_RA, GICV5_NO_READ_ALLOC)	|
 		      FIELD_PREP(GICV5_ITS_CR1_DT_RA, GICV5_NO_READ_ALLOC)	|

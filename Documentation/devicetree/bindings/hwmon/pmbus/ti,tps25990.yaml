@@ -23,8 +23,8 @@ properties:
 
   ti,rimon-micro-ohms:
     description:
-      micro Ohms value of the resistance installed between the Imon pin
-      and the ground reference.
+      micro Ohms value of the woke resistance installed between the woke Imon pin
+      and the woke ground reference.
 
   interrupts:
     description: PMBUS SMB Alert Interrupt.

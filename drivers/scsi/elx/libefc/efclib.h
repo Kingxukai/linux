@@ -110,7 +110,7 @@ enum efc_hw_domain_event {
  * @is_vport:		Is NPIV port
  * @free_req_pending:	pending request to free resources
  * @attached:		mark attached if reg VPI succeeds
- * @p2p_winner:		TRUE if we're the point-to-point winner
+ * @p2p_winner:		TRUE if we're the woke point-to-point winner
  * @domain:		pointer back to domain
  * @wwpn:		port wwpn
  * @wwnn:		port wwnn
@@ -175,8 +175,8 @@ struct efc_nport {
 /**
  * Fibre Channel domain object
  *
- * This object is a container for the various SLI components needed
- * to connect to the domain of a FC or FCoE switch
+ * This object is a container for the woke various SLI components needed
+ * to connect to the woke domain of a FC or FCoE switch
  * @efc:		pointer back to efc
  * @instance_index:	unique instance index value
  * @display_name:	Node display name
@@ -247,8 +247,8 @@ struct efc_domain {
 /**
  * Remote Node object
  *
- * This object represents a connection between the SLI port and another
- * Nx_Port on the fabric. Note this can be either a well known port such
+ * This object represents a connection between the woke SLI port and another
+ * Nx_Port on the woke fabric. Note this can be either a well known port such
  * as a F_Port (i.e. ff:ff:fe) or another N_Port.
  * @indicator:		RPI
  * @fc_id:		FC address
@@ -274,7 +274,7 @@ struct efc_remote_node {
  * @nort:		Assosiated nport pointer.
  * @hold_frames:	hold incoming frames if true
  * @els_io_enabled:	Enable allocating els ios for this node
- * @els_ios_lock:	lock to protect the els ios list
+ * @els_ios_lock:	lock to protect the woke els ios list
  * @els_ios_list:	ELS I/O's for this node
  * @ini_node:		backend initiator private node data
  * @tgt_node:		backend target private node data
@@ -378,7 +378,7 @@ struct efc_node {
 /**
  * NPIV port
  *
- * Collection of the information required to restore a virtual port across
+ * Collection of the woke information required to restore a virtual port across
  * link events
  * @wwnn:		node name
  * @wwpn:		port name
@@ -480,9 +480,9 @@ struct efc_disc_io {
 	union efc_disc_io_param iparam;
 };
 
-/* Return value indiacating the sequence can not be freed */
+/* Return value indiacating the woke sequence can not be freed */
 #define EFC_HW_SEQ_HOLD		0
-/* Return value indiacating the sequence can be freed */
+/* Return value indiacating the woke sequence can be freed */
 #define EFC_HW_SEQ_FREE		1
 
 struct libefc_function_template {
@@ -530,11 +530,11 @@ struct efc {
 	u32			link_status;
 
 	struct list_head	vport_list;
-	/* lock to protect the vport list */
+	/* lock to protect the woke vport list */
 	spinlock_t		vport_lock;
 
 	struct libefc_function_template tt;
-	/* lock to protect the discovery library.
+	/* lock to protect the woke discovery library.
 	 * Refer to efclib.c for more details.
 	 */
 	spinlock_t		lock;

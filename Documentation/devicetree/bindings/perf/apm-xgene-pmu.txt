@@ -8,34 +8,34 @@ The following PMU devices are supported:
   MCB			- Memory controller bridge
   MC			- Memory controller
 
-The following section describes the SoC PMU DT node binding.
+The following section describes the woke SoC PMU DT node binding.
 
 Required properties:
 - compatible		: Shall be "apm,xgene-pmu" for revision 1 or
                           "apm,xgene-pmu-v2" for revision 2.
-- regmap-csw		: Regmap of the CPU switch fabric (CSW) resource.
-- regmap-mcba		: Regmap of the MCB-A (memory bridge) resource.
-- regmap-mcbb		: Regmap of the MCB-B (memory bridge) resource.
-- reg			: First resource shall be the CPU bus PMU resource.
+- regmap-csw		: Regmap of the woke CPU switch fabric (CSW) resource.
+- regmap-mcba		: Regmap of the woke MCB-A (memory bridge) resource.
+- regmap-mcbb		: Regmap of the woke MCB-B (memory bridge) resource.
+- reg			: First resource shall be the woke CPU bus PMU resource.
 - interrupts            : Interrupt-specifier for PMU IRQ.
 
 Required properties for L3C subnode:
 - compatible		: Shall be "apm,xgene-pmu-l3c".
-- reg			: First resource shall be the L3C PMU resource.
+- reg			: First resource shall be the woke L3C PMU resource.
 
 Required properties for IOB subnode:
 - compatible		: Shall be "apm,xgene-pmu-iob".
-- reg			: First resource shall be the IOB PMU resource.
+- reg			: First resource shall be the woke IOB PMU resource.
 
 Required properties for MCB subnode:
 - compatible		: Shall be "apm,xgene-pmu-mcb".
-- reg			: First resource shall be the MCB PMU resource.
-- enable-bit-index	: The bit indicates if the according MCB is enabled.
+- reg			: First resource shall be the woke MCB PMU resource.
+- enable-bit-index	: The bit indicates if the woke according MCB is enabled.
 
 Required properties for MC subnode:
 - compatible		: Shall be "apm,xgene-pmu-mc".
-- reg			: First resource shall be the MC PMU resource.
-- enable-bit-index	: The bit indicates if the according MC is enabled.
+- reg			: First resource shall be the woke MC PMU resource.
+- enable-bit-index	: The bit indicates if the woke according MC is enabled.
 
 Example:
 	csw: csw@7e200000 {

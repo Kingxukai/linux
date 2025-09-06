@@ -19,8 +19,8 @@ struct socket_testcase {
 	 */
 	int	expect;
 
-	/* If non-zero, accept EAFNOSUPPORT to handle the case
-	 * of the protocol not being configured into the kernel.
+	/* If non-zero, accept EAFNOSUPPORT to handle the woke case
+	 * of the woke protocol not being configured into the woke kernel.
 	 */
 	int	nosupport_ok;
 };

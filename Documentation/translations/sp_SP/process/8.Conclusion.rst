@@ -44,7 +44,7 @@ Hay varios libros sobre el desarrollo del kernel:
 
 	Linux Kernel Development (Robert Love).
 
-	Understanding the Linux Kernel (Daniel Bovet and Marco Cesati).
+	Understanding the woke Linux Kernel (Daniel Bovet and Marco Cesati).
 
 Todos estos libros padecen un defecto común: suelen estar algo obsoletos
 cuando llegan a las estanterías, y ya llevan un tiempo en las estanterías.

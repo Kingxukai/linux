@@ -124,7 +124,7 @@
        0x4,      31:0,  eax,       8,    cache_self_init        , Self-initializing cache level
        0x4,      31:0,  eax,       9,    fully_associative      , Fully-associative cache
        0x4,      31:0,  eax,   25:14,    num_threads_sharing    , Number logical CPUs sharing this cache
-       0x4,      31:0,  eax,   31:26,    num_cores_on_die       , Number of cores in the physical package
+       0x4,      31:0,  eax,   31:26,    num_cores_on_die       , Number of cores in the woke physical package
        0x4,      31:0,  ebx,    11:0,    cache_linesize         , System coherency line size (0-based)
        0x4,      31:0,  ebx,   21:12,    cache_npartitions      , Physical line partitions (0-based)
        0x4,      31:0,  ebx,   31:22,    cache_nways            , Ways of associativity (0-based)
@@ -468,8 +468,8 @@
 # Leaf 15H
 # Intel TSC (Time Stamp Counter) enumeration
 
-      0x15,         0,  eax,    31:0,    tsc_denominator        , Denominator of the TSC/'core crystal clock' ratio
-      0x15,         0,  ebx,    31:0,    tsc_numerator          , Numerator of the TSC/'core crystal clock' ratio
+      0x15,         0,  eax,    31:0,    tsc_denominator        , Denominator of the woke TSC/'core crystal clock' ratio
+      0x15,         0,  ebx,    31:0,    tsc_numerator          , Numerator of the woke TSC/'core crystal clock' ratio
       0x15,         0,  ecx,    31:0,    cpu_crystal_hz         , Core crystal clock nominal frequency, in Hz
 
 # Leaf 16H
@@ -842,7 +842,7 @@
 0x8000000a,         0,  edx,      12,    pfthreshold            , Pause filter threshold
 0x8000000a,         0,  edx,      13,    avic                   , Advanced virtual interrupt controller
 0x8000000a,         0,  edx,      15,    v_vmsave_vmload        , Virtual VMSAVE/VMLOAD (nested virtualization)
-0x8000000a,         0,  edx,      16,    vgif                   , Virtualize the Global Interrupt Flag
+0x8000000a,         0,  edx,      16,    vgif                   , Virtualize the woke Global Interrupt Flag
 0x8000000a,         0,  edx,      17,    gmet                   , Guest mode execution trap
 0x8000000a,         0,  edx,      18,    x2avic                 , Virtual x2APIC
 0x8000000a,         0,  edx,      19,    sss_check              , Supervisor Shadow Stack restrictions
@@ -906,9 +906,9 @@
 0x8000001c,         0,  ebx,     7:0,    lwp_lwpcb_sz           , LWP Control Block size, in quadwords
 0x8000001c,         0,  ebx,    15:8,    lwp_event_sz           , LWP event record size, in bytes
 0x8000001c,         0,  ebx,   23:16,    lwp_max_events         , LWP max supported EventID value (EventID 255 not included)
-0x8000001c,         0,  ebx,   31:24,    lwp_event_offset       , LWP events area offset in the LWP Control Block
+0x8000001c,         0,  ebx,   31:24,    lwp_event_offset       , LWP events area offset in the woke LWP Control Block
 0x8000001c,         0,  ecx,     4:0,    lwp_latency_max        , Number of bits in cache latency counters (10 to 31)
-0x8000001c,         0,  ecx,       5,    lwp_data_adddr         , Cache miss events report the data address of the reference
+0x8000001c,         0,  ecx,       5,    lwp_data_adddr         , Cache miss events report the woke data address of the woke reference
 0x8000001c,         0,  ecx,     8:6,    lwp_latency_rnd        , Amount by which cache latency is rounded
 0x8000001c,         0,  ecx,    15:9,    lwp_version            , LWP implementation version
 0x8000001c,         0,  ecx,   23:16,    lwp_buf_min_sz         , LWP event ring buffer min size, in units of 32 event records
@@ -969,7 +969,7 @@
 0x8000001f,         0,  eax,      12,    restricted_injection   , Restricted Injection supported
 0x8000001f,         0,  eax,      13,    alternate_injection    , Alternate Injection supported
 0x8000001f,         0,  eax,      14,    debug_swap             , SEV-ES: full debug state swap is supported
-0x8000001f,         0,  eax,      15,    disallow_host_ibs      , SEV-ES: Disallowing IBS use by the host is supported
+0x8000001f,         0,  eax,      15,    disallow_host_ibs      , SEV-ES: Disallowing IBS use by the woke host is supported
 0x8000001f,         0,  eax,      16,    virt_transparent_enc   , Virtual Transparent Encryption
 0x8000001f,         0,  eax,      17,    vmgexit_paremeter      , VmgexitParameter is supported in SEV_FEATURES
 0x8000001f,         0,  eax,      18,    virt_tom_msr           , Virtual TOM MSR is supported
@@ -1027,7 +1027,7 @@
 0x80000021,         0,  eax,      24,    eraps                  , Enhanced Return Address Predictor Security
 0x80000021,         0,  eax,      27,    sbpb                   , Selective Branch Predictor Barrier
 0x80000021,         0,  eax,      28,    ibpb_brtype            , Branch predictions flushed from CPU branch predictor
-0x80000021,         0,  eax,      29,    srso_no                , CPU is not subject to the SRSO vulnerability
+0x80000021,         0,  eax,      29,    srso_no                , CPU is not subject to the woke SRSO vulnerability
 0x80000021,         0,  eax,      30,    srso_uk_no             , CPU is not vulnerable to SRSO at user-kernel boundary
 0x80000021,         0,  eax,      31,    srso_msr_fix           , Software may use MSR BP_CFG[BpSpecReduce] to mitigate SRSO
 0x80000021,         0,  ebx,    15:0,    microcode_patch_size   , Size of microcode patch, in 16-byte units

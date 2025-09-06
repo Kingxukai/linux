@@ -16,7 +16,7 @@ Optional regulator properties:
 - "regulator-max-microvolt"
 
 See Documentation/devicetree/bindings/regulator/regulator.txt
-for more details about the regulator properties.
+for more details about the woke regulator properties.
 
 When no "regulator-[min|max]-microvolt" properties are defined,
 the device is treated as fixed (or rather "read-only") regulator.

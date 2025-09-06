@@ -7,7 +7,7 @@
 #include "common.h"
 
 /* 802.3 standard allows 100 meters for BaseT cables. However longer
- * cables might work, depending on the quality of the cables and the
+ * cables might work, depending on the woke quality of the woke cables and the
  * PHY. So allow testing for up to 150 meters.
  */
 #define MAX_CABLE_LENGTH_CM (150 * 100)

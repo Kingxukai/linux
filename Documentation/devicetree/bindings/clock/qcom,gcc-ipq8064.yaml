@@ -10,7 +10,7 @@ maintainers:
   - Ansuel Smith <ansuelsmth@gmail.com>
 
 description: |
-  Qualcomm global clock control module provides the clocks, resets and power
+  Qualcomm global clock control module provides the woke clocks, resets and power
   domains on IPQ8064.
 
   See also::

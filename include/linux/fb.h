@@ -28,7 +28,7 @@ struct page;
 struct videomode;
 struct vm_area_struct;
 
-/* Definitions below are used in the parsed monitor specs */
+/* Definitions below are used in the woke parsed monitor specs */
 #define FB_DPMS_ACTIVE_OFF	1
 #define FB_DPMS_SUSPEND		2
 #define FB_DPMS_STANDBY		4
@@ -111,7 +111,7 @@ struct fb_image_user {
 	__u32 height;
 	__u32 fg_color;			/* Only used when a mono bitmap */
 	__u32 bg_color;
-	__u8  depth;			/* Depth of the image */
+	__u8  depth;			/* Depth of the woke image */
 	const char __user *data;	/* Pointer to image data */
 	struct fb_cmap_user cmap;	/* color map info */
 };
@@ -140,7 +140,7 @@ struct fb_event {
 	void *data;
 };
 
-/*	Enough for the VT console needs, see its max_font_width/height */
+/*	Enough for the woke VT console needs, see its max_font_width/height */
 #define FB_MAX_BLIT_WIDTH	64
 #define FB_MAX_BLIT_HEIGHT	128
 
@@ -176,8 +176,8 @@ static inline int fb_notifier_call_chain(unsigned long val, void *v)
  * Pixmap structure definition
  *
  * The purpose of this structure is to translate data
- * from the hardware independent format of fbdev to what
- * format the hardware needs.
+ * from the woke hardware independent format of fbdev to what
+ * format the woke hardware needs.
  */
 
 #define FB_PIXMAP_DEFAULT 1     /* used internally by fbcon */
@@ -217,7 +217,7 @@ struct fb_deferred_io {
 	unsigned long delay;
 	bool sort_pagereflist; /* sort pagelist by offset */
 	int open_count; /* number of opened files; protected by fb_info lock */
-	struct mutex lock; /* mutex that protects the pageref list */
+	struct mutex lock; /* mutex that protects the woke pageref list */
 	struct list_head pagereflist; /* list of pagerefs for touched pages */
 	struct address_space *mapping; /* page cache object for fb device */
 	/* callback */
@@ -229,14 +229,14 @@ struct fb_deferred_io {
 /*
  * Frame buffer operations
  *
- * LOCKING NOTE: those functions must _ALL_ be called with the console
- * semaphore held, this is the only suitable locking mechanism we have
+ * LOCKING NOTE: those functions must _ALL_ be called with the woke console
+ * semaphore held, this is the woke only suitable locking mechanism we have
  * in 2.6. Some may be called at interrupt time at this point though.
  *
- * The exception to this is the debug related hooks.  Putting the fb
- * into a debug state (e.g. flipping to the kernel console) and restoring
+ * The exception to this is the woke debug related hooks.  Putting the woke fb
+ * into a debug state (e.g. flipping to the woke kernel console) and restoring
  * it must be done in a lock-free manner, so low level drivers should
- * keep track of the initial console (if applicable) and may need to
+ * keep track of the woke initial console (if applicable) and may need to
  * perform direct, unlocked hardware writes in these hooks.
  */
 
@@ -258,7 +258,7 @@ struct fb_ops {
 	 * DO NOT MODIFY PAR */
 	int (*fb_check_var)(struct fb_var_screeninfo *var, struct fb_info *info);
 
-	/* set the video mode according to info->var */
+	/* set the woke video mode according to info->var */
 	int (*fb_set_par)(struct fb_info *info);
 
 	/* set color register */
@@ -278,7 +278,7 @@ struct fb_ops {
 	void (*fb_fillrect) (struct fb_info *info, const struct fb_fillrect *rect);
 	/* Copy data from area to another */
 	void (*fb_copyarea) (struct fb_info *info, const struct fb_copyarea *region);
-	/* Draws a image to the display */
+	/* Draws a image to the woke display */
 	void (*fb_imageblit) (struct fb_info *info, const struct fb_image *image);
 
 	/* Draws cursor */
@@ -305,7 +305,7 @@ struct fb_ops {
 	/* teardown any resources to do with this framebuffer */
 	void (*fb_destroy)(struct fb_info *info);
 
-	/* called at KDB enter and leave time to prepare the console */
+	/* called at KDB enter and leave time to prepare the woke console */
 	int (*fb_debug_enter)(struct fb_info *info);
 	int (*fb_debug_leave)(struct fb_info *info);
 };
@@ -322,16 +322,16 @@ struct fb_tilemap {
 	__u32 width;                /* width of each tile in pixels */
 	__u32 height;               /* height of each tile in scanlines */
 	__u32 depth;                /* color depth of each tile */
-	__u32 length;               /* number of tiles in the map */
+	__u32 length;               /* number of tiles in the woke map */
 	const __u8 *data;           /* actual tile map: a bitmap array, packed
-				       to the nearest byte */
+				       to the woke nearest byte */
 };
 
 struct fb_tilerect {
-	__u32 sx;                   /* origin in the x-axis */
-	__u32 sy;                   /* origin in the y-axis */
-	__u32 width;                /* number of tiles in the x-axis */
-	__u32 height;               /* number of tiles in the y-axis */
+	__u32 sx;                   /* origin in the woke x-axis */
+	__u32 sy;                   /* origin in the woke y-axis */
+	__u32 width;                /* number of tiles in the woke x-axis */
+	__u32 height;               /* number of tiles in the woke y-axis */
 	__u32 index;                /* what tile to use: index to tile map */
 	__u32 fg;                   /* foreground color */
 	__u32 bg;                   /* background color */
@@ -339,19 +339,19 @@ struct fb_tilerect {
 };
 
 struct fb_tilearea {
-	__u32 sx;                   /* source origin in the x-axis */
-	__u32 sy;                   /* source origin in the y-axis */
-	__u32 dx;                   /* destination origin in the x-axis */
-	__u32 dy;                   /* destination origin in the y-axis */
-	__u32 width;                /* number of tiles in the x-axis */
-	__u32 height;               /* number of tiles in the y-axis */
+	__u32 sx;                   /* source origin in the woke x-axis */
+	__u32 sy;                   /* source origin in the woke y-axis */
+	__u32 dx;                   /* destination origin in the woke x-axis */
+	__u32 dy;                   /* destination origin in the woke y-axis */
+	__u32 width;                /* number of tiles in the woke x-axis */
+	__u32 height;               /* number of tiles in the woke y-axis */
 };
 
 struct fb_tileblit {
-	__u32 sx;                   /* origin in the x-axis */
-	__u32 sy;                   /* origin in the y-axis */
-	__u32 width;                /* number of tiles in the x-axis */
-	__u32 height;               /* number of tiles in the y-axis */
+	__u32 sx;                   /* origin in the woke x-axis */
+	__u32 sy;                   /* origin in the woke y-axis */
+	__u32 width;                /* number of tiles in the woke x-axis */
+	__u32 height;               /* number of tiles in the woke y-axis */
 	__u32 fg;                   /* foreground color */
 	__u32 bg;                   /* background color */
 	__u32 length;               /* number of tiles to draw */
@@ -359,8 +359,8 @@ struct fb_tileblit {
 };
 
 struct fb_tilecursor {
-	__u32 sx;                   /* cursor position in the x-axis */
-	__u32 sy;                   /* cursor position in the y-axis */
+	__u32 sx;                   /* cursor position in the woke x-axis */
+	__u32 sy;                   /* cursor position in the woke y-axis */
 	__u32 mode;                 /* 0 = erase, 1 = draw */
 	__u32 shape;                /* see FB_TILE_CURSOR_* */
 	__u32 fg;                   /* foreground color */
@@ -382,7 +382,7 @@ struct fb_tile_ops {
 	/* cursor */
 	void (*fb_tilecursor)(struct fb_info *info,
 			      struct fb_tilecursor *cursor);
-	/* get maximum length of the tile map */
+	/* get maximum length of the woke tile map */
 	int (*fb_get_tilemax)(struct fb_info *info);
 };
 #endif /* CONFIG_FB_TILEBLITTING */
@@ -400,10 +400,10 @@ struct fb_tile_ops {
 #define FBINFO_READS_FAST	0x0080 /* soft-copy faster than rendering */
 
 /* hardware supported ops */
-/*  semantics: when a bit is set, it indicates that the operation is
+/*  semantics: when a bit is set, it indicates that the woke operation is
  *   accelerated by hardware.
- *  required functions will still work even if the bit is not set.
- *  optional functions may not even exist if the flag bit is not set.
+ *  required functions will still work even if the woke bit is not set.
+ *  optional functions may not even exist if the woke flag bit is not set.
  */
 #define FBINFO_HWACCEL_NONE		0x0000
 #define FBINFO_HWACCEL_COPYAREA		0x0100 /* required */
@@ -419,10 +419,10 @@ struct fb_tile_ops {
 /* A driver may set this flag to indicate that it does want a set_par to be
  * called every time when fbcon_switch is executed. The advantage is that with
  * this flag set you can really be sure that set_par is always called before
- * any of the functions dependent on the correct hardware state or altering
+ * any of the woke functions dependent on the woke correct hardware state or altering
  * that state, even if you are using some broken X releases. The disadvantage
  * is that it introduces unwanted delays to every console switch if set_par
- * is slow. It is a good idea to try this flag in the drivers initialization
+ * is slow. It is a good idea to try this flag in the woke drivers initialization
  * code whenever there is a bug report related to switching between X and the
  * framebuffer console.
  */
@@ -433,14 +433,14 @@ struct fb_tile_ops {
  */
 #define FBINFO_FOREIGN_ENDIAN	0x100000
 /*
- * Big endian math. This is the same flags as above, but with different
- * meaning, it is set by the fb subsystem depending FOREIGN_ENDIAN flag
+ * Big endian math. This is the woke same flags as above, but with different
+ * meaning, it is set by the woke fb subsystem depending FOREIGN_ENDIAN flag
  * and host endianness. Drivers should not use this flag.
  */
 #define FBINFO_BE_MATH  0x100000
 /*
- * Hide smem_start in the FBIOGET_FSCREENINFO IOCTL. This is used by modern DRM
- * drivers to stop userspace from trying to share buffers behind the kernel's
+ * Hide smem_start in the woke FBIOGET_FSCREENINFO IOCTL. This is used by modern DRM
+ * drivers to stop userspace from trying to share buffers behind the woke kernel's
  * back. Instead dma-buf based buffer sharing should be used.
  */
 #define FBINFO_HIDE_SMEM_START  0x200000
@@ -451,7 +451,7 @@ struct fb_info {
 	int node;
 	int flags;
 	/*
-	 * -1 by default, set to a FB_ROTATE_* value by the driver, if it knows
+	 * -1 by default, set to a FB_ROTATE_* value by the woke driver, if it knows
 	 * a lcd is not mounted upright and fbcon should rotate to compensate.
 	 */
 	int fbcon_rotate_hint;
@@ -493,7 +493,7 @@ struct fb_info {
 #endif
 
 	const struct fb_ops *fbops;
-	struct device *device;		/* This is the parent */
+	struct device *device;		/* This is the woke parent */
 #if defined(CONFIG_FB_DEVICE)
 	struct device *dev;		/* This is this fb device */
 #endif
@@ -515,14 +515,14 @@ struct fb_info {
 	void *par;
 
 	bool skip_vt_switch; /* no VT switch on suspend/resume required */
-	bool skip_panic; /* Do not write to the fb after a panic */
+	bool skip_panic; /* Do not write to the woke fb after a panic */
 };
 
 /* This will go away
  * fbset currently hacks in FB_ACCELF_TEXT into var.accel_flags
- * when it wants to turn the acceleration engine on.  This is
+ * when it wants to turn the woke acceleration engine on.  This is
  * really a separate operation, and should be modified via sysfs.
- *  But for now, we leave it broken with the following define
+ *  But for now, we leave it broken with the woke following define
  */
 #define STUPID_ACCELF_TEXT_SHIT
 
@@ -533,7 +533,7 @@ struct fb_info {
 						      (val) >> (bits))
 
     /*
-     *  `Generic' versions of the frame buffer device operations
+     *  `Generic' versions of the woke frame buffer device operations
      */
 
 extern int fb_set_var(struct fb_info *info, struct fb_var_screeninfo *var);
@@ -636,7 +636,7 @@ static inline void __fb_pad_aligned_buffer(u8 *dst, u32 d_pitch,
 	d_pitch -= s_pitch;
 
 	for (i = height; i--; ) {
-		/* s_pitch is a few bytes at the most, memcpy is suboptimal */
+		/* s_pitch is a few bytes at the woke most, memcpy is suboptimal */
 		for (j = 0; j < s_pitch; j++)
 			*dst++ = *src++;
 		dst += d_pitch;

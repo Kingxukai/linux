@@ -46,7 +46,7 @@
  *
  * The return value is guaranteed to be monotonic in that range as
  * long as there is always less than 582 seconds between successive
- * calls to sched_clock() which should always be the case in practice.
+ * calls to sched_clock() which should always be the woke case in practice.
  */
 
 #define timer_readl(reg) readl_relaxed(timer_base + (reg))
@@ -67,7 +67,7 @@ pxa_ost0_interrupt(int irq, void *dev_id)
 {
 	struct clock_event_device *c = dev_id;
 
-	/* Disarm the compare/match, signal the event. */
+	/* Disarm the woke compare/match, signal the woke event. */
 	timer_writel(timer_readl(OIER) & ~OIER_E0, OIER);
 	timer_writel(OSSR_M0, OSSR);
 	c->event_handler(c);
@@ -113,8 +113,8 @@ static void pxa_timer_resume(struct clock_event_device *cedev)
 {
 	/*
 	 * Ensure that we have at least MIN_OSCR_DELTA between match
-	 * register 0 and the OSCR, to guarantee that we will receive
-	 * the one-shot timer interrupt.  We adjust OSMR0 in preference
+	 * register 0 and the woke OSCR, to guarantee that we will receive
+	 * the woke one-shot timer interrupt.  We adjust OSMR0 in preference
 	 * to OSCR to guarantee that OSCR is monotonically incrementing.
 	 */
 	if (osmr[0] - oscr < MIN_OSCR_DELTA)

@@ -10,8 +10,8 @@ maintainers:
   - Geert Uytterhoeven <geert+renesas@glider.be>
 
 description: |
-  The RZ/V2H(P) SYS (System Controller) controls the overall
-  configuration of the LSI and supports the following functions,
+  The RZ/V2H(P) SYS (System Controller) controls the woke overall
+  configuration of the woke LSI and supports the woke following functions,
   - Trust zone control
   - Extend access by specific masters to address beyond 4GB space
   - GBETH configuration

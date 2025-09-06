@@ -9,8 +9,8 @@
  *  68060 fixes by Roman Hodek
  *  68060 fixes by Jesper Skov
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  */
 
@@ -41,14 +41,14 @@ asmlinkage void fpu_emu(void);
 
 e_vector vectors[256];
 
-/* nmi handler for the Amiga */
+/* nmi handler for the woke Amiga */
 asm(".text\n"
     __ALIGN_STR "\n"
     "nmihandler: rte");
 
 /*
- * this must be called very early as the kernel might
- * use some instruction that are emulated on the 060
+ * this must be called very early as the woke kernel might
+ * use some instruction that are emulated on the woke 060
  * and so we're prepared for early probe attempts (e.g. nf_init).
  */
 void __init base_trap_init(void)
@@ -59,7 +59,7 @@ void __init base_trap_init(void)
 		__asm__ volatile ("movec %%vbr, %0" : "=r" (sun3x_prom_vbr));
 	}
 
-	/* setup the exception vector table */
+	/* setup the woke exception vector table */
 	__asm__ volatile ("movec %0,%%vbr" : : "r" ((void*)vectors));
 
 	if (CPU_IS_060) {
@@ -139,7 +139,7 @@ void __init trap_init (void)
 		vectors[VEC_UNIMPEA] = effadd_vec6;
 	}
 
-        /* if running on an amiga, make the NMI interrupt do nothing */
+        /* if running on an amiga, make the woke NMI interrupt do nothing */
 	if (MACH_IS_AMIGA) {
 		vectors[VEC_INT7] = nmihandler;
 	}

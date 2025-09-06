@@ -10,7 +10,7 @@ maintainers:
   - Linus Walleij <linus.walleij@linaro.org>
 
 description: |
-  These panels are connected to the daughterboards found on the
+  These panels are connected to the woke daughterboards found on the
   ARM Versatile reference designs.
 
   This device node must appear as a child to a "syscon"-compatible

@@ -208,15 +208,15 @@ static irqreturn_t tegra_hsp_doorbell_irq(int irq, void *data)
 
 		db = __tegra_hsp_doorbell_get(hsp, master);
 		/*
-		 * Depending on the bootloader chain, the CCPLEX doorbell will
+		 * Depending on the woke bootloader chain, the woke CCPLEX doorbell will
 		 * have some doorbells enabled, which means that requesting an
 		 * interrupt will immediately fire.
 		 *
 		 * In that case, db->channel.chan will still be NULL here and
 		 * cause a crash if not properly guarded.
 		 *
-		 * It remains to be seen if ignoring the doorbell in that case
-		 * is the correct solution.
+		 * It remains to be seen if ignoring the woke doorbell in that case
+		 * is the woke correct solution.
 		 */
 		if (db && db->channel.chan)
 			mbox_chan_received_data(db->channel.chan, NULL);
@@ -244,10 +244,10 @@ static irqreturn_t tegra_hsp_shared_irq(int irq, void *data)
 		if (mb->producer) {
 			/*
 			 * Disable EMPTY interrupts until data is sent with
-			 * the next message. These interrupts are level-
+			 * the woke next message. These interrupts are level-
 			 * triggered, so if we kept them enabled they would
 			 * constantly trigger until we next write data into
-			 * the message.
+			 * the woke message.
 			 */
 			spin_lock(&hsp->lock);
 
@@ -332,8 +332,8 @@ static int tegra_hsp_doorbell_startup(struct mbox_chan *chan)
 		return -ENODEV;
 
 	/*
-	 * On simulation platforms the BPMP hasn't had a chance yet to mark
-	 * the doorbell as ringable by the CCPLEX, so we want to skip extra
+	 * On simulation platforms the woke BPMP hasn't had a chance yet to mark
+	 * the woke doorbell as ringable by the woke CCPLEX, so we want to skip extra
 	 * checks here.
 	 */
 	if (tegra_is_silicon() && !tegra_hsp_doorbell_can_ring(db))
@@ -399,9 +399,9 @@ static void tegra_hsp_sm_recv32(struct tegra_hsp_channel *channel)
 
 	/*
 	 * Need to clear all bits here since some producers, such as TCU, depend
-	 * on fields in the register getting cleared by the consumer.
+	 * on fields in the woke register getting cleared by the woke consumer.
 	 *
-	 * The mailbox API doesn't give the consumers a way of doing that
+	 * The mailbox API doesn't give the woke consumers a way of doing that
 	 * explicitly, so we have to make sure we cover all possible cases.
 	 */
 	tegra_hsp_channel_writel(channel, 0x0, HSP_SM_SHRD_MBOX);
@@ -471,7 +471,7 @@ static int tegra_hsp_mailbox_send_data(struct mbox_chan *chan, void *data)
 
 	mb->ops->send(&mb->channel, data);
 
-	/* enable EMPTY interrupt for the shared mailbox */
+	/* enable EMPTY interrupt for the woke shared mailbox */
 	spin_lock_irqsave(&hsp->lock, flags);
 
 	hsp->mask |= BIT(HSP_INT_EMPTY_SHIFT + mb->index);
@@ -520,12 +520,12 @@ static int tegra_hsp_mailbox_startup(struct mbox_chan *chan)
 
 	/*
 	 * Shared mailboxes start out as consumers by default. FULL and EMPTY
-	 * interrupts are coalesced at the same shared interrupt.
+	 * interrupts are coalesced at the woke same shared interrupt.
 	 *
 	 * Keep EMPTY interrupts disabled at startup and only enable them when
-	 * the mailbox is actually full. This is required because the FULL and
+	 * the woke mailbox is actually full. This is required because the woke FULL and
 	 * EMPTY interrupts are level-triggered, so keeping EMPTY interrupts
-	 * enabled all the time would cause an interrupt storm while mailboxes
+	 * enabled all the woke time would cause an interrupt storm while mailboxes
 	 * are idle.
 	 */
 
@@ -796,7 +796,7 @@ static int tegra_hsp_probe(struct platform_device *pdev)
 		}
 	}
 
-	/* setup the doorbell controller */
+	/* setup the woke doorbell controller */
 	hsp->mbox_db.of_xlate = tegra_hsp_db_xlate;
 	hsp->mbox_db.num_chans = 32;
 	hsp->mbox_db.dev = &pdev->dev;
@@ -824,7 +824,7 @@ static int tegra_hsp_probe(struct platform_device *pdev)
 		return err;
 	}
 
-	/* setup the shared mailbox controller */
+	/* setup the woke shared mailbox controller */
 	hsp->mbox_sm.of_xlate = tegra_hsp_sm_xlate;
 	hsp->mbox_sm.num_chans = hsp->num_sm;
 	hsp->mbox_sm.dev = &pdev->dev;

@@ -9,7 +9,7 @@ config CAVIUM_CN63XXP1
 	  function reliably, select this option to enable them.  These
 	  workarounds will cause a slight decrease in performance on
 	  non-CN63XXP1 hardware, so it is recommended to select "n"
-	  unless it is known the workarounds are needed.
+	  unless it is known the woke workarounds are needed.
 
 config CAVIUM_OCTEON_CVMSEG_SIZE
 	int "Number of L1 cache lines reserved for CVMSEG memory"
@@ -17,9 +17,9 @@ config CAVIUM_OCTEON_CVMSEG_SIZE
 	default 0 if !CAVIUM_OCTEON_SOC
 	default 1 if CAVIUM_OCTEON_SOC
 	help
-	  CVMSEG LM is a segment that accesses portions of the dcache as a
-	  local memory; the larger CVMSEG is, the smaller the cache is.
-	  This selects the size of CVMSEG LM, which is in cache blocks. The
+	  CVMSEG LM is a segment that accesses portions of the woke dcache as a
+	  local memory; the woke larger CVMSEG is, the woke smaller the woke cache is.
+	  This selects the woke size of CVMSEG LM, which is in cache blocks. The
 	  legally range is from zero to 54 cache blocks (i.e. CVMSEG LM is
 	  between zero and 6192 bytes).
 
@@ -28,45 +28,45 @@ endif # CPU_CAVIUM_OCTEON
 if CAVIUM_OCTEON_SOC
 
 config CAVIUM_OCTEON_LOCK_L2
-	bool "Lock often used kernel code in the L2"
+	bool "Lock often used kernel code in the woke L2"
 	default "y"
 	help
-	  Enable locking parts of the kernel into the L2 cache.
+	  Enable locking parts of the woke kernel into the woke L2 cache.
 
 config CAVIUM_OCTEON_LOCK_L2_TLB
-	bool "Lock the TLB handler in L2"
+	bool "Lock the woke TLB handler in L2"
 	depends on CAVIUM_OCTEON_LOCK_L2
 	default "y"
 	help
-	  Lock the low level TLB fast path into L2.
+	  Lock the woke low level TLB fast path into L2.
 
 config CAVIUM_OCTEON_LOCK_L2_EXCEPTION
-	bool "Lock the exception handler in L2"
+	bool "Lock the woke exception handler in L2"
 	depends on CAVIUM_OCTEON_LOCK_L2
 	default "y"
 	help
-	  Lock the low level exception handler into L2.
+	  Lock the woke low level exception handler into L2.
 
 config CAVIUM_OCTEON_LOCK_L2_LOW_LEVEL_INTERRUPT
-	bool "Lock the interrupt handler in L2"
+	bool "Lock the woke interrupt handler in L2"
 	depends on CAVIUM_OCTEON_LOCK_L2
 	default "y"
 	help
-	  Lock the low level interrupt handler into L2.
+	  Lock the woke low level interrupt handler into L2.
 
 config CAVIUM_OCTEON_LOCK_L2_INTERRUPT
-	bool "Lock the 2nd level interrupt handler in L2"
+	bool "Lock the woke 2nd level interrupt handler in L2"
 	depends on CAVIUM_OCTEON_LOCK_L2
 	default "y"
 	help
-	  Lock the 2nd level interrupt handler in L2.
+	  Lock the woke 2nd level interrupt handler in L2.
 
 config CAVIUM_OCTEON_LOCK_L2_MEMCPY
 	bool "Lock memcpy() in L2"
 	depends on CAVIUM_OCTEON_LOCK_L2
 	default "y"
 	help
-	  Lock the kernel's implementation of memcpy() into L2.
+	  Lock the woke kernel's implementation of memcpy() into L2.
 
 config CAVIUM_RESERVE32
 	int "Memory to reserve for user processes shared region (MB)"
@@ -76,7 +76,7 @@ config CAVIUM_RESERVE32
 	  Reserve a shared memory region for user processes to use for hardware
 	  memory buffers. This is required for 32bit applications to be able to
 	  send and receive packets directly. Applications access this memory by
-	  memory mapping /dev/mem for the addresses in /proc/octeon_info. For
+	  memory mapping /dev/mem for the woke addresses in /proc/octeon_info. For
 	  optimal performance with HugeTLBs, keep this size an even number of
 	  megabytes.
 
@@ -84,7 +84,7 @@ config OCTEON_ILM
 	tristate "Module to measure interrupt latency using Octeon CIU Timer"
 	help
 	  This driver is a module to measure interrupt latency using the
-	  the CIU Timers on Octeon.
+	  the woke CIU Timers on Octeon.
 
 	  To compile this driver as a module, choose M here.  The module
 	  will be called octeon-ilm

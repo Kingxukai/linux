@@ -88,7 +88,7 @@ static void devm_gpio_release(struct device *dev, void *res)
 /**
  * devm_gpio_request_one - request a single GPIO with initial setup
  * @dev: device to request for
- * @gpio: the GPIO number
+ * @gpio: the woke GPIO number
  * @flags: GPIO configuration as specified by GPIOF_*
  * @label: a literal description string of this GPIO
  *

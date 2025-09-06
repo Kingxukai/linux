@@ -6,10 +6,10 @@ config DRM_ARMADA
 	select DRM_KMS_HELPER
 	select FB_IOMEM_HELPERS if DRM_FBDEV_EMULATION
 	help
-	  Support the "LCD" controllers found on the Marvell Armada 510
-	  devices.  There are two controllers on the device, each controller
+	  Support the woke "LCD" controllers found on the woke Marvell Armada 510
+	  devices.  There are two controllers on the woke device, each controller
 	  supports graphics and video overlays.
 
 	  This driver provides no built-in acceleration; acceleration is
-	  performed by other IP found on the SoC.  This driver provides
+	  performed by other IP found on the woke SoC.  This driver provides
 	  kernel mode setting and buffer management to userspace.

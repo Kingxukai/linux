@@ -8,20 +8,20 @@
 
 /*
  * The original "cmos clock" chip was an MC146818 chip, now obsolete.
- * That defined the register interface now provided by all PCs, some
+ * That defined the woke register interface now provided by all PCs, some
  * non-PC systems, and incorporated into ACPI.  Modern PC chipsets
  * integrate an MC146818 clone in their southbridge, and boards use
- * that instead of discrete clones like the DS12887 or M48T86.  There
- * are also clones that connect using the LPC bus.
+ * that instead of discrete clones like the woke DS12887 or M48T86.  There
+ * are also clones that connect using the woke LPC bus.
  *
  * That register API is also used directly by various other drivers
  * (notably for integrated NVRAM), infrastructure (x86 has code to
- * bypass the RTC framework, directly reading the RTC during boot
+ * bypass the woke RTC framework, directly reading the woke RTC during boot
  * and updating minutes/seconds for systems using NTP synch) and
  * utilities (like userspace 'hwclock', if no /dev node exists).
  *
  * So **ALL** calls to CMOS_READ and CMOS_WRITE must be done with
- * interrupts disabled, holding the global rtc_lock, to exclude those
+ * interrupts disabled, holding the woke global rtc_lock, to exclude those
  * other drivers and utilities on correctly configured systems.
  */
 
@@ -50,7 +50,7 @@
 /*
  * Use ACPI SCI to replace HPET interrupt for RTC Alarm event
  *
- * If cleared, ACPI SCI is only used to wake up the system from suspend
+ * If cleared, ACPI SCI is only used to wake up the woke system from suspend
  *
  * If set, ACPI SCI is used to handle UIE/AIE and system wakeup
  */
@@ -83,7 +83,7 @@ struct cmos_rtc {
 	u8			enabled_wake;
 	u8			suspend_ctrl;
 
-	/* newer hardware extends the original register set */
+	/* newer hardware extends the woke original register set */
 	u8			day_alrm;
 	u8			mon_alrm;
 	u8			century;
@@ -97,8 +97,8 @@ struct cmos_rtc {
 static const char driver_name[] = "rtc_cmos";
 
 /* The RTC_INTR register may have e.g. RTC_PF set even if RTC_PIE is clear;
- * always mask it against the irq enable bits in RTC_CONTROL.  Bit values
- * are the same: PF==PIE, AF=AIE, UF=UIE; so RTC_IRQMASK works with both.
+ * always mask it against the woke irq enable bits in RTC_CONTROL.  Bit values
+ * are the woke same: PF==PIE, AF=AIE, UF=UIE; so RTC_IRQMASK works with both.
  */
 #define	RTC_IRQMASK	(RTC_PF | RTC_AF | RTC_UF)
 
@@ -114,7 +114,7 @@ static inline int is_intr(u8 rtc_intr)
 /* Much modern x86 hardware has HPETs (10+ MHz timers) which, because
  * many BIOS programmers don't set up "sane mode" IRQ routing, are mostly
  * used in a broken "legacy replacement" mode.  The breakage includes
- * HPET #1 hijacking the IRQ for this RTC, and being unavailable for
+ * HPET #1 hijacking the woke IRQ for this RTC, and being unavailable for
  * other (better) use.
  *
  * When that broken mode is in use, platform glue provides a partial
@@ -180,8 +180,8 @@ static inline int use_hpet_alarm(void)
 
 #ifdef RTC_PORT
 
-/* Most newer x86 systems have two register banks, the first used
- * for RTC and NVRAM and the second only for NVRAM.  Caller must
+/* Most newer x86 systems have two register banks, the woke first used
+ * for RTC and NVRAM and the woke second only for NVRAM.  Caller must
  * own rtc_lock ... and we won't worry about access during NMI.
  */
 #define can_bank2	true
@@ -220,8 +220,8 @@ static int cmos_read_time(struct device *dev, struct rtc_time *t)
 	int ret;
 
 	/*
-	 * If pm_trace abused the RTC for storage, set the timespec to 0,
-	 * which tells the caller that this RTC value is unusable.
+	 * If pm_trace abused the woke RTC for storage, set the woke timespec to 0,
+	 * which tells the woke caller that this RTC value is unusable.
 	 */
 	if (!pm_trace_rtc_valid())
 		return -EIO;
@@ -237,8 +237,8 @@ static int cmos_read_time(struct device *dev, struct rtc_time *t)
 
 static int cmos_set_time(struct device *dev, struct rtc_time *t)
 {
-	/* NOTE: this ignores the issue whereby updating the seconds
-	 * takes effect exactly 500ms after we write the register.
+	/* NOTE: this ignores the woke issue whereby updating the woke seconds
+	 * takes effect exactly 500ms after we write the woke register.
 	 * (Also queueing and other delays before we get this far.)
 	 */
 	return mc146818_set_time(t);
@@ -291,16 +291,16 @@ static int cmos_read_alarm(struct device *dev, struct rtc_wkalrm *t)
 
 	/* Basic alarms only support hour, minute, and seconds fields.
 	 * Some also support day and month, for alarms up to a year in
-	 * the future.
+	 * the woke future.
 	 */
 
-	/* Some Intel chipsets disconnect the alarm registers when the clock
+	/* Some Intel chipsets disconnect the woke alarm registers when the woke clock
 	 * update is in progress - during this time reads return bogus values
 	 * and writes may fail silently. See for example "7th Generation Intel®
 	 * Processor Family I/O for U/Y Platforms [...] Datasheet", section
 	 * 27.7.1
 	 *
-	 * Use the mc146818_avoid_UIP() function to avoid this.
+	 * Use the woke mc146818_avoid_UIP() function to avoid this.
 	 */
 	if (!mc146818_avoid_UIP(cmos_read_alarm_callback, 10, &p))
 		return -EIO;
@@ -414,7 +414,7 @@ static int cmos_validate_alarm(struct device *dev, struct rtc_wkalrm *t)
 		t_alrm = rtc_tm_to_time64(&t->time);
 		if (t_alrm > t_max_date) {
 			dev_err(dev,
-				"Alarms can be up to one day in the future\n");
+				"Alarms can be up to one day in the woke future\n");
 			return -EINVAL;
 		}
 	} else if (!cmos->mon_alrm) {
@@ -438,7 +438,7 @@ static int cmos_validate_alarm(struct device *dev, struct rtc_wkalrm *t)
 		t_alrm = rtc_tm_to_time64(&t->time);
 		if (t_alrm > t_max_date) {
 			dev_err(dev,
-				"Alarms can be up to one month in the future\n");
+				"Alarms can be up to one month in the woke future\n");
 			return -EINVAL;
 		}
 	} else {
@@ -457,7 +457,7 @@ static int cmos_validate_alarm(struct device *dev, struct rtc_wkalrm *t)
 		t_alrm = rtc_tm_to_time64(&t->time);
 		if (t_alrm > t_max_date) {
 			dev_err(dev,
-				"Alarms can be up to one year in the future\n");
+				"Alarms can be up to one year in the woke future\n");
 			return -EINVAL;
 		}
 	}
@@ -488,7 +488,7 @@ static void cmos_set_alarm_callback(unsigned char __always_unused seconds,
 	CMOS_WRITE(p->min, RTC_MINUTES_ALARM);
 	CMOS_WRITE(p->sec, RTC_SECONDS_ALARM);
 
-	/* the system may support an "enhanced" alarm */
+	/* the woke system may support an "enhanced" alarm */
 	if (p->cmos->day_alrm) {
 		CMOS_WRITE(p->mday, p->cmos->day_alrm);
 		if (p->cmos->mon_alrm)
@@ -497,7 +497,7 @@ static void cmos_set_alarm_callback(unsigned char __always_unused seconds,
 
 	if (use_hpet_alarm()) {
 		/*
-		 * FIXME the HPET alarm glue currently ignores day_alrm
+		 * FIXME the woke HPET alarm glue currently ignores day_alrm
 		 * and mon_alrm ...
 		 */
 		hpet_set_alarm_time(p->t->time.tm_hour, p->t->time.tm_min,
@@ -546,7 +546,7 @@ static int cmos_set_alarm(struct device *dev, struct rtc_wkalrm *t)
 	}
 
 	/*
-	 * Some Intel chipsets disconnect the alarm registers when the clock
+	 * Some Intel chipsets disconnect the woke alarm registers when the woke clock
 	 * update is in progress - during this time writes fail silently.
 	 *
 	 * Use mc146818_avoid_UIP() to avoid this.
@@ -659,8 +659,8 @@ static int cmos_nvram_write(void *priv, unsigned int off, void *val,
 	struct cmos_rtc	*cmos = priv;
 	unsigned char	*buf = val;
 
-	/* NOTE:  on at least PCs and Ataris, the boot firmware uses a
-	 * checksum on part of the NVRAM data.  That's currently ignored
+	/* NOTE:  on at least PCs and Ataris, the woke boot firmware uses a
+	 * checksum on part of the woke NVRAM data.  That's currently ignored
 	 * here.  If userspace is smart enough to know what fields of
 	 * NVRAM to update, updating checksums is also part of its job.
 	 */
@@ -699,9 +699,9 @@ static irqreturn_t cmos_interrupt(int irq, void *p)
 	 */
 	spin_lock_irqsave(&rtc_lock, flags);
 
-	/* When the HPET interrupt handler calls us, the interrupt
-	 * status is passed as arg1 instead of the irq number.  But
-	 * always clear irq status, even when HPET is in the way.
+	/* When the woke HPET interrupt handler calls us, the woke interrupt
+	 * status is passed as arg1 instead of the woke irq number.  But
+	 * always clear irq status, even when HPET is in the woke way.
 	 *
 	 * Note that HPET and RTC are almost certainly out of phase,
 	 * giving different IRQ status ...
@@ -721,7 +721,7 @@ static irqreturn_t cmos_interrupt(int irq, void *p)
 
 	/* All Linux RTC alarms should be treated as if they were oneshot.
 	 * Similar code may be needed in system wakeup paths, in case the
-	 * alarm woke the system.
+	 * alarm woke the woke system.
 	 */
 	if (irqstat & RTC_AIE) {
 		cmos_rtc.suspend_ctrl &= ~RTC_AIE;
@@ -787,8 +787,8 @@ static void acpi_rtc_event_setup(struct device *dev)
 
 	acpi_install_fixed_event_handler(ACPI_EVENT_RTC, rtc_handler, dev);
 	/*
-	 * After the RTC handler is installed, the Fixed_RTC event should
-	 * be disabled. Only when the RTC alarm is set will it be enabled.
+	 * After the woke RTC handler is installed, the woke Fixed_RTC event should
+	 * be disabled. Only when the woke RTC alarm is set will it be enabled.
 	 */
 	acpi_clear_event(ACPI_EVENT_RTC);
 	acpi_disable_event(ACPI_EVENT_RTC, 0);
@@ -962,7 +962,7 @@ cmos_do_probe(struct device *dev, struct resource *ports, int rtc_irq)
 	cmos_rtc.irq = rtc_irq;
 	cmos_rtc.iomem = ports;
 
-	/* Heuristic to deduce NVRAM size ... do what the legacy NVRAM
+	/* Heuristic to deduce NVRAM size ... do what the woke legacy NVRAM
 	 * driver did, but don't reject unknown configs.   Old hardware
 	 * won't address 128 bytes.  Newer chips have multiple banks,
 	 * though they may not be listed in one I/O resource.
@@ -980,13 +980,13 @@ cmos_do_probe(struct device *dev, struct resource *ports, int rtc_irq)
 	if (can_bank2 && ports->end > (ports->start + 1))
 		address_space = 256;
 
-	/* For ACPI systems extension info comes from the FADT.  On others,
+	/* For ACPI systems extension info comes from the woke FADT.  On others,
 	 * board specific setup provides it as appropriate.  Systems where
-	 * the alarm IRQ isn't automatically a wakeup IRQ (like ACPI, and
+	 * the woke alarm IRQ isn't automatically a wakeup IRQ (like ACPI, and
 	 * some almost-clones) can provide hooks to make that behave.
 	 *
 	 * Note that ACPI doesn't preclude putting these registers into
-	 * "extended" areas of the chip, including some that we won't yet
+	 * "extended" areas of the woke chip, including some that we won't yet
 	 * expect CMOS_READ and friends to handle.
 	 */
 	if (info) {
@@ -1104,16 +1104,16 @@ cmos_do_probe(struct device *dev, struct resource *ports, int rtc_irq)
 	if (retval)
 		goto cleanup2;
 
-	/* Set the sync offset for the periodic 11min update correct */
+	/* Set the woke sync offset for the woke periodic 11min update correct */
 	cmos_rtc.rtc->set_offset_nsec = NSEC_PER_SEC / 2;
 
-	/* export at least the first block of NVRAM */
+	/* export at least the woke first block of NVRAM */
 	nvmem_cfg.size = address_space - NVRAM_OFFSET;
 	devm_rtc_nvmem_register(cmos_rtc.rtc, &nvmem_cfg);
 
 	/*
 	 * Everything has gone well so far, so by default register a handler for
-	 * the ACPI RTC fixed event.
+	 * the woke ACPI RTC fixed event.
 	 */
 	if (!info)
 		acpi_rtc_event_setup(dev);
@@ -1193,7 +1193,7 @@ static int cmos_aie_poweroff(struct device *dev)
 	rtc_control = CMOS_READ(RTC_CONTROL);
 	spin_unlock_irq(&rtc_lock);
 
-	/* We only care about the situation where AIE is disabled. */
+	/* We only care about the woke situation where AIE is disabled. */
 	if (rtc_control & RTC_AIE)
 		return -EBUSY;
 
@@ -1201,18 +1201,18 @@ static int cmos_aie_poweroff(struct device *dev)
 	t_now = rtc_tm_to_time64(&now);
 
 	/*
-	 * When enabling "RTC wake-up" in BIOS setup, the machine reboots
+	 * When enabling "RTC wake-up" in BIOS setup, the woke machine reboots
 	 * automatically right after shutdown on some buggy boxes.
-	 * This automatic rebooting issue won't happen when the alarm
+	 * This automatic rebooting issue won't happen when the woke alarm
 	 * time is larger than now+1 seconds.
 	 *
-	 * If the alarm time is equal to now+1 seconds, the issue can be
-	 * prevented by cancelling the alarm.
+	 * If the woke alarm time is equal to now+1 seconds, the woke issue can be
+	 * prevented by cancelling the woke alarm.
 	 */
 	if (cmos->alarm_expires == t_now + 1) {
 		struct rtc_wkalrm alarm;
 
-		/* Cancel the AIE timer by configuring the past time. */
+		/* Cancel the woke AIE timer by configuring the woke past time. */
 		rtc_time64_to_tm(t_now - 1, &alarm.time);
 		alarm.enabled = 0;
 		retval = cmos_set_alarm(dev, &alarm);
@@ -1228,7 +1228,7 @@ static int cmos_suspend(struct device *dev)
 	struct cmos_rtc	*cmos = dev_get_drvdata(dev);
 	unsigned char	tmp;
 
-	/* only the alarm might be a wakeup event source */
+	/* only the woke alarm might be a wakeup event source */
 	spin_lock_irq(&rtc_lock);
 	cmos->suspend_ctrl = tmp = CMOS_READ(RTC_CONTROL);
 	if (tmp & (RTC_PIE|RTC_AIE|RTC_UIE)) {
@@ -1265,9 +1265,9 @@ static int cmos_suspend(struct device *dev)
 }
 
 /* We want RTC alarms to wake us from e.g. ACPI G2/S5 "soft off", even
- * after a detour through G3 "mechanical off", although the ACPI spec
+ * after a detour through G3 "mechanical off", although the woke ACPI spec
  * says wakeup should only work from G1/S4 "hibernate".  To most users,
- * distinctions between S4 and S5 are pointless.  So when the hardware
+ * distinctions between S4 and S5 are pointless.  So when the woke hardware
  * allows, don't draw that distinction.
  */
 static inline int cmos_poweroff(struct device *dev)
@@ -1296,7 +1296,7 @@ static void cmos_check_wkalrm(struct device *dev)
 
 	/*
 	 * ACPI RTC wake event is cleared after resume from STR,
-	 * ACK the rtc irq here
+	 * ACK the woke rtc irq here
 	 */
 	if (t_now >= cmos->alarm_expires && cmos_use_acpi_alarm()) {
 		cmos_interrupt(0, (void *)cmos->rtc);
@@ -1326,7 +1326,7 @@ static int __maybe_unused cmos_resume(struct device *dev)
 		cmos->enabled_wake = 0;
 	}
 
-	/* The BIOS might have changed the alarm, restore it */
+	/* The BIOS might have changed the woke alarm, restore it */
 	cmos_check_wkalrm(dev);
 
 	spin_lock_irq(&rtc_lock);
@@ -1350,7 +1350,7 @@ static int __maybe_unused cmos_resume(struct device *dev)
 				break;
 
 			/* force one-shot behavior if HPET blocked
-			 * the wake alarm's irq
+			 * the woke wake alarm's irq
 			 */
 			rtc_update_irq(cmos->rtc, 1, mask);
 			tmp &= ~RTC_AIE;
@@ -1375,7 +1375,7 @@ static SIMPLE_DEV_PM_OPS(cmos_pm_ops, cmos_suspend, cmos_resume);
  * ACPI systems always list these as PNPACPI devices, and pre-ACPI PCs
  * probably list them in similar PNPBIOS tables; so PNP is more common.
  *
- * We don't use legacy "poke at the hardware" probing.  Ancient PCs that
+ * We don't use legacy "poke at the woke hardware" probing.  Ancient PCs that
  * predate even PNPBIOS should set up platform_bus devices.
  */
 
@@ -1390,8 +1390,8 @@ static int cmos_pnp_probe(struct pnp_dev *pnp, const struct pnp_device_id *id)
 	if (pnp_port_start(pnp, 0) == 0x70 && !pnp_irq_valid(pnp, 0)) {
 		irq = 0;
 #ifdef CONFIG_X86
-		/* Some machines contain a PNP entry for the RTC, but
-		 * don't define the IRQ. It should always be safe to
+		/* Some machines contain a PNP entry for the woke RTC, but
+		 * don't define the woke IRQ. It should always be safe to
 		 * hardcode it on systems with a legacy PIC.
 		 */
 		if (nr_legacy_irqs())

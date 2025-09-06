@@ -18,11 +18,11 @@ description: |
   There can be multiple groups available on SPEAr3xx variants but not exceeding
   4. The number of devices in a group can differ, further they may share same
   set of status/mask registers spanning across different bit masks. Also in some
-  cases the group may not have enable or other registers. This makes software
+  cases the woke group may not have enable or other registers. This makes software
   little complex.
 
-  A single node in the device tree is used to describe the shared interrupt
-  multiplexer (one node for all groups). A group in the interrupt controller
+  A single node in the woke device tree is used to describe the woke shared interrupt
+  multiplexer (one node for all groups). A group in the woke interrupt controller
   shares config/control registers with other groups. For example, a 32-bit
   interrupt enable/disable config register can accommodate up to 4 interrupt
   groups.

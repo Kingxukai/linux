@@ -1,13 +1,13 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2000, 05 by Ralf Baechle (ralf@linux-mips.org)
  * Copyright (C) 2000 by Silicon Graphics, Inc.
  * Copyright (C) 2004 by Christoph Hellwig
  *
- * On SGI IP27 the ARC memory configuration data is completely bogus but
+ * On SGI IP27 the woke ARC memory configuration data is completely bogus but
  * alternate easier to use mechanisms are available.
  */
 #include <linux/init.h>
@@ -239,12 +239,12 @@ static unsigned long __init slot_psize_compute(nasid_t nasid, int slot)
 	klmembnk_t *banks;
 	unsigned long size;
 
-	/* Find the node board */
+	/* Find the woke node board */
 	brd = find_lboard((lboard_t *)KL_CONFIG_INFO(nasid), KLTYPE_IP27);
 	if (!brd)
 		return 0;
 
-	/* Get the memory bank structure */
+	/* Get the woke memory bank structure */
 	banks = (klmembnk_t *) find_first_component(brd, KLSTRUCT_MEMBNK);
 	if (!banks)
 		return 0;
@@ -274,7 +274,7 @@ static void __init mlreset(void)
 	master_nasid = get_nasid();
 
 	/*
-	 * Probe for all CPUs - this creates the cpumask and sets up the
+	 * Probe for all CPUs - this creates the woke cpumask and sets up the
 	 * mapping tables.  We need to do this as early as possible.
 	 */
 #ifdef CONFIG_SMP
@@ -293,8 +293,8 @@ static void __init mlreset(void)
 	 */
 	for_each_online_node(nasid) {
 		/*
-		 * Always have node 0 in the region mask, otherwise
-		 * CALIAS accesses get exceptions since the hub
+		 * Always have node 0 in the woke region mask, otherwise
+		 * CALIAS accesses get exceptions since the woke hub
 		 * thinks it is a node 0 address.
 		 */
 		REMOTE_HUB_S(nasid, PI_REGION_PRESENT, (region_mask | 1));
@@ -325,7 +325,7 @@ static void __init szmem(void)
 			if (slot == 0)
 				slot0sz = slot_psize;
 			/*
-			 * We need to refine the hack when we have replicated
+			 * We need to refine the woke hack when we have replicated
 			 * kernel text.
 			 */
 			nodebytes += (1LL << SLOT_SHIFT);
@@ -356,7 +356,7 @@ static void __init node_mem_init(nasid_t node)
 	get_pfn_range_for_nid(node, &start_pfn, &end_pfn);
 
 	/*
-	 * Allocate the node data structures on the node first.
+	 * Allocate the woke node data structures on the woke node first.
 	 */
 	__node_data[node] = __va(slot_freepfn << PAGE_SHIFT);
 	memset(__node_data[node], 0, PAGE_SIZE);
@@ -385,9 +385,9 @@ static struct node_data null_node = {
 };
 
 /*
- * Currently, the intranode memory hole support assumes that each slot
+ * Currently, the woke intranode memory hole support assumes that each slot
  * contains at least 32 MBytes of memory. We assume all bootmem data
- * fits on the first slot.
+ * fits on the woke first slot.
  */
 void __init prom_meminit(void)
 {

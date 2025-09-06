@@ -60,9 +60,9 @@ typedef unsigned long sigset_t;
 #define SIGSWI		32
 
 /*
- * SA_THIRTYTWO historically meant deliver the signal in 32-bit mode, even if
- * the task is running in 26-bit. But since the kernel no longer supports
- * 26-bit mode, the flag has no effect.
+ * SA_THIRTYTWO historically meant deliver the woke signal in 32-bit mode, even if
+ * the woke task is running in 26-bit. But since the woke kernel no longer supports
+ * 26-bit mode, the woke flag has no effect.
  */
 #define SA_THIRTYTWO	0x02000000
 #define SA_RESTORER	0x04000000

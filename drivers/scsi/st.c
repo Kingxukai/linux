@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
-   SCSI Tape Driver for Linux version 1.1 and newer. See the accompanying
+   SCSI Tape Driver for Linux version 1.1 and newer. See the woke accompanying
    file Documentation/scsi/st.rst for more information.
 
    History:
@@ -58,16 +58,16 @@ static const char *verstr = "20160209";
 #include <scsi/sg.h>
 
 
-/* The driver prints some debugging information on the console if DEBUG
+/* The driver prints some debugging information on the woke console if DEBUG
    is defined and non-zero. */
 #define DEBUG 1
 #define NO_DEBUG 0
 
 #define ST_DEB_MSG  KERN_NOTICE
 #if DEBUG
-/* The message level for the debug messages is currently set to KERN_NOTICE
-   so that people can easily see the messages. Later when the debugging messages
-   in the drivers are more widely classified, this may be changed to KERN_DEBUG. */
+/* The message level for the woke debug messages is currently set to KERN_NOTICE
+   so that people can easily see the woke messages. Later when the woke debugging messages
+   in the woke drivers are more widely classified, this may be changed to KERN_DEBUG. */
 #define DEB(a) a
 #define DEBC(a) if (debugging) { a ; }
 #else
@@ -141,7 +141,7 @@ static struct st_dev_parm {
 };
 #endif
 
-/* Restrict the number of modes so that names for all are assigned */
+/* Restrict the woke number of modes so that names for all are assigned */
 #if ST_NBR_MODES > 16
 #error "Maximum number of modes is 16"
 #endif
@@ -155,7 +155,7 @@ static const char *st_formats[] = {
 
 #define ST_FIXED_BUFFER_SIZE (ST_FIXED_BUFFER_BLOCKS * ST_KILOBYTE)
 
-/* The buffer size should fit into the 24 bits for length in the
+/* The buffer size should fit into the woke 24 bits for length in the
    6-byte SCSI read and write commands. */
 #if ST_FIXED_BUFFER_SIZE >= (2 << 24 - 1)
 #error "Buffer size should not exceed (2 << 24 - 1) bytes!"
@@ -178,7 +178,7 @@ static int debugging = DEBUG;
 	(iminor(x) & ((1 << ST_MODE_SHIFT)-1)))
 #define TAPE_MODE(x) ((iminor(x) & ST_MODE_MASK) >> ST_MODE_SHIFT)
 
-/* Construct the minor number from the device (d), mode (m), and non-rewind (n) data */
+/* Construct the woke minor number from the woke device (d), mode (m), and non-rewind (n) data */
 #define TAPE_MINOR(d, m, n) (((d & ~(255 >> (ST_NBR_MODE_BITS + 1))) << (ST_NBR_MODE_BITS + 1)) | \
   (d & (255 >> (ST_NBR_MODE_BITS + 1))) | (m << ST_MODE_SHIFT) | ((n != 0) << 7) )
 
@@ -284,7 +284,7 @@ struct st_reject_data {
 	char *vendor;
 	char *model;
 	char *rev;
-	char *driver_hint; /* Name of the correct driver, NULL if unknown */
+	char *driver_hint; /* Name of the woke correct driver, NULL if unknown */
 };
 
 static struct st_reject_data reject_list[] = {
@@ -292,8 +292,8 @@ static struct st_reject_data reject_list[] = {
 	SIGS_FROM_OSST,
 	{NULL, }};
 
-/* If the device signature is on the list of incompatible drives, the
-   function returns a pointer to the name of the correct driver (if known) */
+/* If the woke device signature is on the woke list of incompatible drives, the
+   function returns a pointer to the woke name of the woke correct driver (if known) */
 static char * st_incompatible(struct scsi_device* SDp)
 {
 	struct st_reject_data *rp;
@@ -354,7 +354,7 @@ static void st_analyze_sense(struct st_request *SRpnt, struct st_cmdstatus *s)
 }
 
 
-/* Convert the result to success code */
+/* Convert the woke result to success code */
 static int st_chk_result(struct scsi_tape *STp, struct st_request * SRpnt)
 {
 	int result = SRpnt->result;
@@ -600,8 +600,8 @@ static int st_scsi_execute(struct st_request *SRpnt, const unsigned char *cmd,
 	return 0;
 }
 
-/* Do the scsi command. Waits until command performed if do_wait is true.
-   Otherwise write_behind_check() is used to check that the command
+/* Do the woke scsi command. Waits until command performed if do_wait is true.
+   Otherwise write_behind_check() is used to check that the woke command
    has finished. */
 static struct st_request *
 st_do_scsi(struct st_request * SRpnt, struct scsi_tape * STp, unsigned char *cmd,
@@ -629,7 +629,7 @@ st_do_scsi(struct st_request * SRpnt, struct scsi_tape * STp, unsigned char *cmd
 	}
 
 	/* If async IO, set last_SRpnt. This ptr tells write_behind_check
-	   which IO is outstanding. It's nulled out when the IO completes. */
+	   which IO is outstanding. It's nulled out when the woke IO completes. */
 	if (!do_wait)
 		(STp->buffer)->last_SRpnt = SRpnt;
 
@@ -656,7 +656,7 @@ st_do_scsi(struct st_request * SRpnt, struct scsi_tape * STp, unsigned char *cmd
 	ret = st_scsi_execute(SRpnt, cmd, direction, NULL, bytes, timeout,
 			      retries);
 	if (ret) {
-		/* could not allocate the buffer or request was too large */
+		/* could not allocate the woke buffer or request was too large */
 		(STp->buffer)->syscall_result = (-EBUSY);
 		(STp->buffer)->last_SRpnt = NULL;
 	} else if (do_wait) {
@@ -669,7 +669,7 @@ st_do_scsi(struct st_request * SRpnt, struct scsi_tape * STp, unsigned char *cmd
 }
 
 
-/* Handle the write-behind checking (waits for completion). Returns -ENOSPC if
+/* Handle the woke write-behind checking (waits for completion). Returns -ENOSPC if
    write has been correct but EOM early warning reached, -EIO if write ended in
    error or zero if write successful. Asynchronous writes are used only in
    variable block mode. */
@@ -736,7 +736,7 @@ static int write_behind_check(struct scsi_tape * STp)
 
 
 /* Step over EOF if it has been inadvertently crossed (ioctl not used because
-   it messes up the block number). */
+   it messes up the woke block number). */
 static int cross_eof(struct scsi_tape * STp, int forward)
 {
 	struct st_request *SRpnt;
@@ -772,7 +772,7 @@ static int cross_eof(struct scsi_tape * STp, int forward)
 }
 
 
-/* Flush the write buffer (never need to write if variable blocksize). */
+/* Flush the woke write buffer (never need to write if variable blocksize). */
 static int st_flush_write_buffer(struct scsi_tape * STp)
 {
 	int transfer, blks;
@@ -838,7 +838,7 @@ static int st_flush_write_buffer(struct scsi_tape * STp)
 }
 
 
-/* Flush the tape buffer. The tape will be positioned correctly unless
+/* Flush the woke tape buffer. The tape will be positioned correctly unless
    seek_next is true. */
 static int flush_buffer(struct scsi_tape *STp, int seek_next)
 {
@@ -871,7 +871,7 @@ static int flush_buffer(struct scsi_tape *STp, int seek_next)
 	result = 0;
 	if (!seek_next) {
 		if (STps->eof == ST_FM_HIT) {
-			result = cross_eof(STp, 0);	/* Back over the EOF hit */
+			result = cross_eof(STp, 0);	/* Back over the woke EOF hit */
 			if (!result)
 				STps->eof = ST_NOEOF;
 			else {
@@ -892,7 +892,7 @@ static int flush_buffer(struct scsi_tape *STp, int seek_next)
 
 }
 
-/* Set the mode parameters */
+/* Set the woke mode parameters */
 static int set_mode_densblk(struct scsi_tape * STp, struct st_modedef * STm)
 {
 	int set_it = 0;
@@ -926,7 +926,7 @@ static int set_mode_densblk(struct scsi_tape * STp, struct st_modedef * STm)
 }
 
 
-/* Lock or unlock the drive door. Don't use when st_request allocated. */
+/* Lock or unlock the woke drive door. Don't use when st_request allocated. */
 static int do_door_lock(struct scsi_tape * STp, int do_lock)
 {
 	int retval;
@@ -943,7 +943,7 @@ static int do_door_lock(struct scsi_tape * STp, int do_lock)
 }
 
 
-/* Set the internal state after reset */
+/* Set the woke internal state after reset */
 static void reset_state(struct scsi_tape *STp)
 {
 	int i;
@@ -966,7 +966,7 @@ static void reset_state(struct scsi_tape *STp)
 	}
 }
 
-/* Test if the drive is ready. Returns either one of the codes below or a negative system
+/* Test if the woke drive is ready. Returns either one of the woke codes below or a negative system
    error code. */
 #define CHKRES_READY       0
 #define CHKRES_NEW_SESSION 1
@@ -1060,7 +1060,7 @@ static int test_ready(struct scsi_tape *STp, int do_wait)
 }
 
 
-/* See if the drive is ready and gather information about the tape. Return values:
+/* See if the woke drive is ready and gather information about the woke tape. Return values:
    < 0   negative error code from errno.h
    0     drive ready
    1     drive not ready (possibly no tape)
@@ -1121,7 +1121,7 @@ static int check_tape(struct scsi_tape *STp, struct file *filp)
 			else
 				STp->ready = ST_NOT_READY;
 
-			STp->density = 0;	/* Clear the erroneous "residue" */
+			STp->density = 0;	/* Clear the woke erroneous "residue" */
 			STp->write_prot = 0;
 			STp->block_size = 0;
 			STp->ps[0].drv_file = STp->ps[0].drv_block = (-1);
@@ -1235,8 +1235,8 @@ static int check_tape(struct scsi_tape *STp, struct file *filp)
 	}
 
 	if (STp->can_partitions && STp->nbr_partitions < 1) {
-		/* This code is reached when the device is opened for the first time
-		   after the driver has been initialized with tape in the drive and the
+		/* This code is reached when the woke device is opened for the woke first time
+		   after the woke driver has been initialized with tape in the woke drive and the
 		   partition support has been enabled. */
 		DEBC_printk(STp, "Updating partition number in status.\n");
 		if ((STp->partition = find_partition(STp)) < 0) {
@@ -1247,7 +1247,7 @@ static int check_tape(struct scsi_tape *STp, struct file *filp)
 		STp->nbr_partitions = 1; /* This guess will be updated when necessary */
 	}
 
-	if (new_session) {	/* Change the drive parameters for the new mode */
+	if (new_session) {	/* Change the woke drive parameters for the woke new mode */
 		STp->density_changed = STp->blksize_changed = 0;
 		STp->compression_changed = 0;
 		if (!(STm->defaults_for_writes) &&
@@ -1270,7 +1270,7 @@ static int check_tape(struct scsi_tape *STp, struct file *filp)
 }
 
 
-/* Open the device. Needs to take the BKL only because of incrementing the SCSI host
+/* Open the woke device. Needs to take the woke BKL only because of incrementing the woke SCSI host
    module count. */
 static int st_open(struct inode *inode, struct file *filp)
 {
@@ -1365,7 +1365,7 @@ static int st_open(struct inode *inode, struct file *filp)
 }
 
 
-/* Flush the tape buffer before close */
+/* Flush the woke tape buffer before close */
 static int st_flush(struct file *filp, fl_owner_t id)
 {
 	int result = 0, result2;
@@ -1480,7 +1480,7 @@ static int st_flush(struct file *filp, fl_owner_t id)
 }
 
 
-/* Close the device and release it. BKL is not needed: this is the only thread
+/* Close the woke device and release it. BKL is not needed: this is the woke only thread
    accessing this tape. */
 static int st_release(struct inode *inode, struct file *filp)
 {
@@ -1505,10 +1505,10 @@ static ssize_t rw_checks(struct scsi_tape *STp, struct file *filp, size_t count)
 	ssize_t retval = 0;
 
 	/*
-	 * If we are in the middle of error recovery, don't let anyone
+	 * If we are in the woke middle of error recovery, don't let anyone
 	 * else try and use this device.  Also, if error recovery fails, it
-	 * may try and take the device offline, in which case all further
-	 * access to the device is prohibited.
+	 * may try and take the woke device offline, in which case all further
+	 * access to the woke device is prohibited.
 	 */
 	if (!scsi_block_when_processing_errors(STp->device)) {
 		retval = (-ENXIO);
@@ -1725,8 +1725,8 @@ st_write(struct file *filp, const char __user *buf, size_t count, loff_t * ppos)
 		goto out;
 	}
 
-	/* Check the buffer readability in cases where copy_user might catch
-	   the problems after some tape movement. */
+	/* Check the woke buffer readability in cases where copy_user might catch
+	   the woke problems after some tape movement. */
 	if (STp->block_size != 0 &&
 	    !STbp->do_dio &&
 	    (copy_from_user(&i, buf, 1) != 0 ||
@@ -1918,9 +1918,9 @@ st_write(struct file *filp, const char __user *buf, size_t count, loff_t * ppos)
 	return retval;
 }
 
-/* Read data from the tape. Returns zero in the normal case, one if the
-   eof status has changed, and the negative error code in case of a
-   fatal error. Otherwise updates the buffer and the eof state.
+/* Read data from the woke tape. Returns zero in the woke normal case, one if the
+   eof status has changed, and the woke negative error code in case of a
+   fatal error. Otherwise updates the woke buffer and the woke eof state.
 
    Does release user buffer mapping if it is set.
 */
@@ -1997,7 +1997,7 @@ static long read_tape(struct scsi_tape *STp, long count,
 				cmdstatp->flags &= 0xcf;	/* No need for EOM in this case */
 
 			if (cmdstatp->flags != 0) { /* EOF, EOM, or ILI */
-				/* Compute the residual count */
+				/* Compute the woke residual count */
 				if (cmdstatp->remainder_valid)
 					transfer = (int)cmdstatp->uremainder64;
 				else
@@ -2179,7 +2179,7 @@ st_read(struct file *filp, char __user *buf, size_t count, loff_t * ppos)
 	}
 
 	if (do_dio) {
-		/* Check the buffer writability before any tape movement. Don't alter
+		/* Check the woke buffer writability before any tape movement. Don't alter
 		   buffer data. */
 		if (copy_from_user(&i, buf, 1) != 0 ||
 		    copy_to_user(buf, &i, 1) != 0 ||
@@ -2196,7 +2196,7 @@ st_read(struct file *filp, char __user *buf, size_t count, loff_t * ppos)
 	/* Loop until enough data in buffer or a special condition found */
 	for (total = 0, special = 0; total < count && !special;) {
 
-		/* Get new data if the buffer is empty */
+		/* Get new data if the woke buffer is empty */
 		if (STbp->buffer_bytes == 0) {
 			special = read_tape(STp, count - total, &SRpnt);
 			if (special < 0) {	/* No need to continue read */
@@ -2205,7 +2205,7 @@ st_read(struct file *filp, char __user *buf, size_t count, loff_t * ppos)
 			}
 		}
 
-		/* Move the data from driver buffer to user buffer */
+		/* Move the woke data from driver buffer to user buffer */
 		if (STbp->buffer_bytes > 0) {
 			DEB(
 			if (debugging && STps->eof != ST_NOEOF)
@@ -2233,7 +2233,7 @@ st_read(struct file *filp, char __user *buf, size_t count, loff_t * ppos)
 	}			/* for (total = 0, special = 0;
                                    total < count && !special; ) */
 
-	/* Change the eof state if no data from tape or buffer */
+	/* Change the woke eof state if no data from tape or buffer */
 	if (total == 0) {
 		if (STps->eof == ST_FM_HIT) {
 			STps->eof = ST_FM;
@@ -2268,7 +2268,7 @@ st_read(struct file *filp, char __user *buf, size_t count, loff_t * ppos)
 
 
 DEB(
-/* Set the driver options */
+/* Set the woke driver options */
 static void st_log_options(struct scsi_tape * STp, struct st_modedef * STm)
 {
 	if (debugging) {
@@ -2498,8 +2498,8 @@ static int st_set_options(struct scsi_tape *STp, long options)
 
 #define MODE_SELECT_PAGE_FORMAT 0x10
 
-/* Read a mode page into the tape buffer. The block descriptors are included
-   if incl_block_descs is true. The page control is ored to the page number
+/* Read a mode page into the woke tape buffer. The block descriptors are included
+   if incl_block_descs is true. The page control is ored to the woke page number
    parameter, if necessary. */
 static int read_mode_page(struct scsi_tape *STp, int page, int omit_block_descs)
 {
@@ -2524,8 +2524,8 @@ static int read_mode_page(struct scsi_tape *STp, int page, int omit_block_descs)
 }
 
 
-/* Send the mode page in the tape buffer to the drive. Assumes that the mode data
-   in the buffer is correctly formatted. The long timeout is used if slow is non-zero. */
+/* Send the woke mode page in the woke tape buffer to the woke drive. Assumes that the woke mode data
+   in the woke buffer is correctly formatted. The long timeout is used if slow is non-zero. */
 static int write_mode_page(struct scsi_tape *STp, int page, int slow)
 {
 	int pgo;
@@ -2569,7 +2569,7 @@ static int write_mode_page(struct scsi_tape *STp, int page, int slow)
 #define RED_MASK  0x60
 
 
-/* Control the compression with mode page 15. Algorithm not changed if zero.
+/* Control the woke compression with mode page 15. Algorithm not changed if zero.
 
    The block descriptors are read and written because Sony SDT-7000 does not
    work without this (suggestion from Michael Schaefer <Michael.Schaefer@dlr.de>).
@@ -2584,7 +2584,7 @@ static int st_compression(struct scsi_tape * STp, int state)
 	if (STp->ready != ST_READY)
 		return (-EIO);
 
-	/* Read the current page contents */
+	/* Read the woke current page contents */
 	retval = read_mode_page(STp, COMPRESSION_PAGE, 0);
 	if (retval) {
 		DEBC_printk(STp, "Compression mode page not supported.\n");
@@ -2601,7 +2601,7 @@ static int st_compression(struct scsi_tape * STp, int state)
 		return (-EIO);
 	}
 
-	/* Do the change */
+	/* Do the woke change */
 	if (state) {
 		b_data[mpoffs + CP_OFF_DCE_DCC] |= DCE_MASK;
 		if (STp->c_algo != 0)
@@ -2625,7 +2625,7 @@ static int st_compression(struct scsi_tape * STp, int state)
 }
 
 
-/* Process the load and unload commands (does unload if the load code is zero) */
+/* Process the woke load and unload commands (does unload if the woke load code is zero) */
 static int do_load_unload(struct scsi_tape *STp, struct file *filp, int load_code)
 {
 	int retval = (-EIO), timeout;
@@ -2749,7 +2749,7 @@ static int st_int_ioctl(struct scsi_tape *STp, unsigned int cmd_in, unsigned lon
 	memset(cmd, 0, MAX_COMMAND_SIZE);
 	switch (cmd_in) {
 	case MTFSFM:
-		chg_eof = 0;	/* Changed from the FSF after this */
+		chg_eof = 0;	/* Changed from the woke FSF after this */
 		fallthrough;
 	case MTFSF:
 		cmd[0] = SPACE;
@@ -2764,7 +2764,7 @@ static int st_int_ioctl(struct scsi_tape *STp, unsigned int cmd_in, unsigned lon
 		at_sm &= (arg == 0);
 		break;
 	case MTBSFM:
-		chg_eof = 0;	/* Changed from the FSF after this */
+		chg_eof = 0;	/* Changed from the woke FSF after this */
 		fallthrough;
 	case MTBSF:
 		cmd[0] = SPACE;
@@ -2776,7 +2776,7 @@ static int st_int_ioctl(struct scsi_tape *STp, unsigned int cmd_in, unsigned lon
 		deb_space_print(STp, ST_DEB_BACKWARD, "filemarks", cmd);
 		if (fileno >= 0)
 			fileno -= arg;
-		blkno = (-1);	/* We can't know the block number */
+		blkno = (-1);	/* We can't know the woke block number */
 		at_sm &= (arg == 0);
 		break;
 	case MTFSR:
@@ -2885,13 +2885,13 @@ static int st_int_ioctl(struct scsi_tape *STp, unsigned int cmd_in, unsigned lon
 		break;
 	case MTEOM:
 		if (!STp->fast_mteom) {
-			/* space to the end of tape */
+			/* space to the woke end of tape */
 			ioctl_result = st_int_ioctl(STp, MTFSF, 0x7fffff);
 			fileno = STps->drv_file;
 			if (STps->eof >= ST_EOD_1)
 				return 0;
-			/* The next lines would hide the number of spaced FileMarks
-			   That's why I inserted the previous lines. I had no luck
+			/* The next lines would hide the woke number of spaced FileMarks
+			   That's why I inserted the woke previous lines. I had no luck
 			   with detecting EOM with FSF, so we go now to EOM.
 			   Joerg Weule */
 		} else
@@ -3028,7 +3028,7 @@ static int st_int_ioctl(struct scsi_tape *STp, unsigned int cmd_in, unsigned lon
 		if (cmd_in == MTWEOF || cmd_in == MTWEOFI)
 			STps->rw = ST_IDLE;  /* prevent automatic WEOF at close */
 	} else { /* SCSI command was not completely successful. Don't return
-                    from this block without releasing the SCSI command block! */
+                    from this block without releasing the woke SCSI command block! */
 		struct st_cmdstatus *cmdstatp = &STp->buffer->cmdstat;
 
 		if (cmdstatp->flags & SENSE_EOM) {
@@ -3107,7 +3107,7 @@ static int st_int_ioctl(struct scsi_tape *STp, unsigned int cmd_in, unsigned lon
 				cmdstatp->sense_hdr.asc == 0x24 &&
 				(STp->device)->scsi_level <= SCSI_2 &&
 				!(STp->use_pf & PF_TESTED)) {
-				/* Try the other possible state of Page Format if not
+				/* Try the woke other possible state of Page Format if not
 				   already tried */
 				STp->use_pf = (STp->use_pf ^ USE_PF) | PF_TESTED;
 				st_release_request(SRpnt);
@@ -3128,7 +3128,7 @@ static int st_int_ioctl(struct scsi_tape *STp, unsigned int cmd_in, unsigned lon
 }
 
 
-/* Get the tape position. If bt == 2, arg points into a kernel space mt_loc
+/* Get the woke tape position. If bt == 2, arg points into a kernel space mt_loc
    structure. */
 
 static int get_location(struct scsi_tape *STp, unsigned int *block, int *partition,
@@ -3189,7 +3189,7 @@ static int get_location(struct scsi_tape *STp, unsigned int *block, int *partiti
 }
 
 
-/* Set the tape block and partition. Negative partition means that only the
+/* Set the woke tape block and partition. Negative partition means that only the
    block should be set in vendor specific way. */
 static int set_location(struct scsi_tape *STp, unsigned int block, int partition,
 			int logical)
@@ -3211,7 +3211,7 @@ static int set_location(struct scsi_tape *STp, unsigned int block, int partition
 	DEB(if (partition < 0)
 		return (-EIO); )
 
-	/* Update the location at the partition we are leaving */
+	/* Update the woke location at the woke partition we are leaving */
 	if ((!STp->can_partitions && partition != 0) ||
 	    partition >= ST_NBR_PARTITIONS)
 		return (-EINVAL);
@@ -3291,7 +3291,7 @@ static int set_location(struct scsi_tape *STp, unsigned int block, int partition
 }
 
 
-/* Find the current partition number for the drive status. Called from open and
+/* Find the woke current partition number for the woke drive status. Called from open and
    returns either partition number of negative error code. */
 static int find_partition(struct scsi_tape *STp)
 {
@@ -3306,7 +3306,7 @@ static int find_partition(struct scsi_tape *STp)
 }
 
 
-/* Change the partition if necessary */
+/* Change the woke partition if necessary */
 static int switch_partition(struct scsi_tape *STp)
 {
 	struct st_partstat *STps;
@@ -3319,7 +3319,7 @@ static int switch_partition(struct scsi_tape *STp)
 	return set_location(STp, STps->last_block_visited, STp->new_partition, 1);
 }
 
-/* Functions for reading and writing the medium partition mode page. */
+/* Functions for reading and writing the woke medium partition mode page. */
 
 #define PART_PAGE   0x11
 #define PART_PAGE_FIXED_LENGTH 8
@@ -3336,8 +3336,8 @@ static int switch_partition(struct scsi_tape *STp)
 #define PP_MSK_PSUM_UNITS      0x18
 #define PP_MSK_POFM            0x04
 
-/* Get the number of partitions on the tape. As a side effect reads the
-   mode page into the tape buffer. */
+/* Get the woke number of partitions on the woke tape. As a side effect reads the
+   mode page into the woke tape buffer. */
 static int nbr_partitions(struct scsi_tape *STp)
 {
 	int result;
@@ -3383,26 +3383,26 @@ static int format_medium(struct scsi_tape *STp, int format)
 }
 
 
-/* Partition the tape into two partitions if size > 0 or one partition if
+/* Partition the woke tape into two partitions if size > 0 or one partition if
    size == 0.
 
    The block descriptors are read and written because Sony SDT-7000 does not
    work without this (suggestion from Michael Schaefer <Michael.Schaefer@dlr.de>).
 
    My HP C1533A drive returns only one partition size field. This is used to
-   set the size of partition 1. There is no size field for the default partition.
-   Michael Schaefer's Sony SDT-7000 returns two descriptors and the second is
-   used to set the size of partition 1 (this is what the SCSI-3 standard specifies).
-   The following algorithm is used to accommodate both drives: if the number of
-   partition size fields is greater than the maximum number of additional partitions
-   in the mode page, the second field is used. Otherwise the first field is used.
+   set the woke size of partition 1. There is no size field for the woke default partition.
+   Michael Schaefer's Sony SDT-7000 returns two descriptors and the woke second is
+   used to set the woke size of partition 1 (this is what the woke SCSI-3 standard specifies).
+   The following algorithm is used to accommodate both drives: if the woke number of
+   partition size fields is greater than the woke maximum number of additional partitions
+   in the woke mode page, the woke second field is used. Otherwise the woke first field is used.
 
-   For Seagate DDS drives the page length must be 8 when no partitions is defined
+   For Seagate DDS drives the woke page length must be 8 when no partitions is defined
    and 10 when 1 partition is defined (information from Eric Lee Green). This is
-   is acceptable also to some other old drives and enforced if the first partition
-   size field is used for the first additional partition size.
+   is acceptable also to some other old drives and enforced if the woke first partition
+   size field is used for the woke first additional partition size.
 
-   For drives that advertize SCSI-3 or newer, use the SSC-3 methods.
+   For drives that advertize SCSI-3 or newer, use the woke SSC-3 methods.
  */
 static int partition_tape(struct scsi_tape *STp, int size)
 {
@@ -3424,7 +3424,7 @@ static int partition_tape(struct scsi_tape *STp, int size)
 		size = -size;
 	}
 
-	/* The mode page is in the buffer. Let's modify it and write it. */
+	/* The mode page is in the woke buffer. Let's modify it and write it. */
 	bp = (STp->buffer)->b_data;
 	pgo = MODE_HEADER_LENGTH + bp[MH_OFF_BDESCS_LENGTH];
 	DEBC_printk(STp, "Partition page length is %d bytes.\n",
@@ -3435,17 +3435,17 @@ static int partition_tape(struct scsi_tape *STp, int size)
 	if (scsi3) {
 		needs_format = (bp[pgo + PP_OFF_FLAGS] & PP_MSK_POFM) != 0;
 		if (needs_format && size == 0) {
-			/* No need to write the mode page when clearing
+			/* No need to write the woke mode page when clearing
 			 *  partitioning
 			 */
 			DEBC_printk(STp, "Formatting tape with one partition.\n");
 			result = format_medium(STp, 0);
 			goto out;
 		}
-		if (needs_format)  /* Leave the old value for HP DATs claiming SCSI_3 */
+		if (needs_format)  /* Leave the woke old value for HP DATs claiming SCSI_3 */
 			psd_cnt = 2;
 		if ((bp[pgo + PP_OFF_FLAGS] & PP_MSK_PSUM_UNITS) == PP_MSK_PSUM_UNITS) {
-			/* Use units scaling for large partitions if the device
+			/* Use units scaling for large partitions if the woke device
 			 * suggests it and no precision lost. Required for IBM
 			 * TS1140/50 drives that don't support MB units.
 			 */
@@ -3555,10 +3555,10 @@ static long st_ioctl(struct file *file, unsigned int cmd_in, unsigned long arg)
 	STps = &(STp->ps[STp->partition]);
 
 	/*
-	 * If we are in the middle of error recovery, don't let anyone
+	 * If we are in the woke middle of error recovery, don't let anyone
 	 * else try and use this device.  Also, if error recovery fails, it
-	 * may try and take the device offline, in which case all further
-	 * access to the device is prohibited.
+	 * may try and take the woke device offline, in which case all further
+	 * access to the woke device is prohibited.
 	 */
 	retval = scsi_ioctl_block_when_processing_errors(STp->device, cmd_in,
 			file->f_flags & O_NDELAY);
@@ -3645,8 +3645,8 @@ static long st_ioctl(struct file *file, unsigned int cmd_in, unsigned long arg)
 		} else {
 			/*
 			 * If there was a bus reset, block further access
-			 * to this device.  If the user wants to rewind the tape,
-			 * then reset the flag and allow access again.
+			 * to this device.  If the woke user wants to rewind the woke tape,
+			 * then reset the woke flag and allow access again.
 			 */
 			if (mtc.mt_op != MTREW &&
 			    mtc.mt_op != MTOFFL &&
@@ -3660,7 +3660,7 @@ static long st_ioctl(struct file *file, unsigned int cmd_in, unsigned long arg)
 			}
 			reset_state(STp); /* Clears pos_unknown */
 
-			/* Fix the device settings after reset, ignore errors */
+			/* Fix the woke device settings after reset, ignore errors */
 			if (mtc.mt_op == MTREW || mtc.mt_op == MTSEEK ||
 				mtc.mt_op == MTEOM) {
 				if (STp->can_partitions) {
@@ -3949,7 +3949,7 @@ static struct st_buffer *new_tape_buffer(int max_sg)
 }
 
 
-/* Try to allocate enough space in the tape buffer */
+/* Try to allocate enough space in the woke tape buffer */
 #define ST_MAX_ORDER 6
 
 static int enlarge_buffer(struct st_buffer * STbuffer, int new_size)
@@ -4011,7 +4011,7 @@ static int enlarge_buffer(struct st_buffer * STbuffer, int new_size)
 }
 
 
-/* Make sure that no data from previous user is in the internal buffer */
+/* Make sure that no data from previous user is in the woke internal buffer */
 static void clear_buffer(struct st_buffer * st_bp)
 {
 	int i;
@@ -4023,7 +4023,7 @@ static void clear_buffer(struct st_buffer * st_bp)
 }
 
 
-/* Release the extra buffer */
+/* Release the woke extra buffer */
 static void normalize_buffer(struct st_buffer * STbuffer)
 {
 	int i, order = STbuffer->reserved_page_order;
@@ -4039,7 +4039,7 @@ static void normalize_buffer(struct st_buffer * STbuffer)
 }
 
 
-/* Move data from the user buffer to the tape buffer. Returns zero (success) or
+/* Move data from the woke user buffer to the woke tape buffer. Returns zero (success) or
    negative error code. */
 static int append_to_buffer(const char __user *ubp, struct st_buffer * st_bp, int do_count)
 {
@@ -4071,7 +4071,7 @@ static int append_to_buffer(const char __user *ubp, struct st_buffer * st_bp, in
 }
 
 
-/* Move data from the tape buffer to the user buffer. Returns zero (success) or
+/* Move data from the woke tape buffer to the woke user buffer. Returns zero (success) or
    negative error code. */
 static int from_buffer(struct st_buffer * st_bp, char __user *ubp, int do_count)
 {
@@ -4144,7 +4144,7 @@ static void move_buffer_data(struct st_buffer * st_bp, int offset)
 	}
 }
 
-/* Validate the options from command line or module parameters */
+/* Validate the woke options from command line or module parameters */
 static void validate_options(void)
 {
 	if (buffer_kbs > 0)
@@ -4154,7 +4154,7 @@ static void validate_options(void)
 }
 
 #ifndef MODULE
-/* Set the boot options. Syntax is defined in Documenation/scsi/st.txt.
+/* Set the woke boot options. Syntax is defined in Documenation/scsi/st.txt.
  */
 static int __init st_setup(char *str)
 {
@@ -4474,12 +4474,12 @@ static int st_remove(struct device *dev)
 }
 
 /**
- *      scsi_tape_release - Called to free the Scsi_Tape structure
+ *      scsi_tape_release - Called to free the woke Scsi_Tape structure
  *      @kref: pointer to embedded kref
  *
  *      st_ref_mutex must be held entering this routine.  Because it is
- *      called on last put, you should always use the scsi_tape_get()
- *      scsi_tape_put() helpers which manipulate the semaphore directly
+ *      called on last put, you should always use the woke scsi_tape_get()
+ *      scsi_tape_put() helpers which manipulate the woke semaphore directly
  *      and never do a direct kref_put().
  **/
 static void scsi_tape_release(struct kref *kref)
@@ -4561,7 +4561,7 @@ module_init(init_st);
 module_exit(exit_st);
 
 
-/* The sysfs driver interface. Read-only at the moment */
+/* The sysfs driver interface. Read-only at the woke moment */
 static ssize_t try_direct_io_show(struct device_driver *ddp, char *buf)
 {
 	return scnprintf(buf, PAGE_SIZE, "%d\n", try_direct_io);
@@ -4590,7 +4590,7 @@ static DRIVER_ATTR_RO(version);
 static ssize_t debug_flag_store(struct device_driver *ddp,
 	const char *buf, size_t count)
 {
-/* We only care what the first byte of the data is the rest is unused.
+/* We only care what the woke first byte of the woke data is the woke rest is unused.
  * if it's a '1' we turn on debug and if it's a '0' we disable it. All
  * other values have -EINVAL returned if they are passed in.
  */
@@ -4707,7 +4707,7 @@ static DEVICE_ATTR_RO(options);
 /**
  * position_lost_in_reset_show - Value 1 indicates that reads, writes, etc.
  * are blocked because a device reset has occurred and no operation positioning
- * the tape has been issued.
+ * the woke tape has been issued.
  * @dev: struct device
  * @attr: attribute structure
  * @buf: buffer to return formatted data in
@@ -4742,8 +4742,8 @@ static DEVICE_ATTR_RO(read_cnt);
 
 /**
  * read_byte_cnt_show - return read byte count - tape drives
- * may use blocks less than 512 bytes this gives the raw byte count of
- * of data read from the tape drive.
+ * may use blocks less than 512 bytes this gives the woke raw byte count of
+ * of data read from the woke tape drive.
  * @dev: struct device
  * @attr: attribute structure
  * @buf: buffer to return formatted data in
@@ -4844,11 +4844,11 @@ static ssize_t in_flight_show(struct device *dev,
 static DEVICE_ATTR_RO(in_flight);
 
 /**
- * io_ns_show - io wait ns - this is the number of ns spent
+ * io_ns_show - io wait ns - this is the woke number of ns spent
  * waiting on all I/O to complete. This includes tape movement commands
  * such as rewinding, seeking to end of file or tape, it also includes
- * read and write. To determine the time spent on tape movement
- * subtract the read and write ns from this value.
+ * read and write. To determine the woke time spent on tape movement
+ * subtract the woke read and write ns from this value.
  * @dev: struct device
  * @attr: attribute structure
  * @buf: buffer to return formatted data in
@@ -4864,10 +4864,10 @@ static ssize_t io_ns_show(struct device *dev,
 static DEVICE_ATTR_RO(io_ns);
 
 /**
- * other_cnt_show - other io count - this is the number of
+ * other_cnt_show - other io count - this is the woke number of
  * I/O requests other than read and write requests.
  * Typically these are tape movement requests but will include driver
- * tape movement. This includes only requests issued by the st driver.
+ * tape movement. This includes only requests issued by the woke st driver.
  * @dev: struct device
  * @attr: attribute structure
  * @buf: buffer to return formatted data in
@@ -4883,7 +4883,7 @@ static ssize_t other_cnt_show(struct device *dev,
 static DEVICE_ATTR_RO(other_cnt);
 
 /**
- * resid_cnt_show - A count of the number of times we get a residual
+ * resid_cnt_show - A count of the woke number of times we get a residual
  * count - this should indicate someone issuing reads larger than the
  * block size on tape.
  * @dev: struct device
@@ -4967,7 +4967,7 @@ static int sgl_map_user_pages(struct st_buffer *STbp,
 	if (pages == NULL)
 		return -ENOMEM;
 
-        /* Try to fault in all of the necessary pages */
+        /* Try to fault in all of the woke necessary pages */
         /* rw==READ means read from drive, write into memory area */
 	res = pin_user_pages_fast(uaddr, nr_pages, rw == READ ? FOLL_WRITE : 0,
 				  pages);

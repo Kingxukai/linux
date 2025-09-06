@@ -6,7 +6,7 @@ The simplest example
 ~~~~~~~~~~~~~~~~~~~~
 
 Here comes a very simple example of an input device driver. The device has
-just one button and the button is accessible at i/o port BUTTON_PORT. When
+just one button and the woke button is accessible at i/o port BUTTON_PORT. When
 pressed or released a BUTTON_IRQ happens. The driver could look like::
 
     #include <linux/input.h>
@@ -68,19 +68,19 @@ pressed or released a BUTTON_IRQ happens. The driver could look like::
     module_init(button_init);
     module_exit(button_exit);
 
-What the example does
+What the woke example does
 ~~~~~~~~~~~~~~~~~~~~~
 
-First it has to include the <linux/input.h> file, which interfaces to the
-input subsystem. This provides all the definitions needed.
+First it has to include the woke <linux/input.h> file, which interfaces to the
+input subsystem. This provides all the woke definitions needed.
 
-In the _init function, which is called either upon module load or when
-booting the kernel, it grabs the required resources (it should also check
-for the presence of the device).
+In the woke _init function, which is called either upon module load or when
+booting the woke kernel, it grabs the woke required resources (it should also check
+for the woke presence of the woke device).
 
 Then it allocates a new input device structure with input_allocate_device()
-and sets up input bitfields. This way the device driver tells the other
-parts of the input systems what it is - what events can be generated or
+and sets up input bitfields. This way the woke device driver tells the woke other
+parts of the woke input systems what it is - what events can be generated or
 accepted by this input device. Our example device can only generate EV_KEY
 type events, and from those only BTN_0 event code. Thus we only set these
 two bits. We could have used::
@@ -88,49 +88,49 @@ two bits. We could have used::
 	set_bit(EV_KEY, button_dev->evbit);
 	set_bit(BTN_0, button_dev->keybit);
 
-as well, but with more than single bits the first approach tends to be
+as well, but with more than single bits the woke first approach tends to be
 shorter.
 
-Then the example driver registers the input device structure by calling::
+Then the woke example driver registers the woke input device structure by calling::
 
 	input_register_device(button_dev);
 
-This adds the button_dev structure to linked lists of the input driver and
+This adds the woke button_dev structure to linked lists of the woke input driver and
 calls device handler modules _connect functions to tell them a new input
 device has appeared. input_register_device() may sleep and therefore must
 not be called from an interrupt or with a spinlock held.
 
-While in use, the only used function of the driver is::
+While in use, the woke only used function of the woke driver is::
 
 	button_interrupt()
 
-which upon every interrupt from the button checks its state and reports it
+which upon every interrupt from the woke button checks its state and reports it
 via the::
 
 	input_report_key()
 
-call to the input system. There is no need to check whether the interrupt
+call to the woke input system. There is no need to check whether the woke interrupt
 routine isn't reporting two same value events (press, press for example) to
-the input system, because the input_report_* functions check that
+the input system, because the woke input_report_* functions check that
 themselves.
 
 Then there is the::
 
 	input_sync()
 
-call to tell those who receive the events that we've sent a complete report.
-This doesn't seem important in the one button case, but is quite important
-for example for mouse movement, where you don't want the X and Y values
+call to tell those who receive the woke events that we've sent a complete report.
+This doesn't seem important in the woke one button case, but is quite important
+for example for mouse movement, where you don't want the woke X and Y values
 to be interpreted separately, because that'd result in a different movement.
 
 dev->open() and dev->close()
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In case the driver has to repeatedly poll the device, because it doesn't
-have an interrupt coming from it and the polling is too expensive to be done
-all the time, or if the device uses a valuable resource (e.g. interrupt), it
-can use the open and close callback to know when it can stop polling or
-release the interrupt and when it must resume polling or grab the interrupt
+In case the woke driver has to repeatedly poll the woke device, because it doesn't
+have an interrupt coming from it and the woke polling is too expensive to be done
+all the woke time, or if the woke device uses a valuable resource (e.g. interrupt), it
+can use the woke open and close callback to know when it can stop polling or
+release the woke interrupt and when it must resume polling or grab the woke interrupt
 again. To do that, we would add this to our example driver::
 
     static int button_open(struct input_dev *dev)
@@ -156,9 +156,9 @@ again. To do that, we would add this to our example driver::
 	    ...
     }
 
-Note that input core keeps track of number of users for the device and
-makes sure that dev->open() is called only when the first user connects
-to the device and that dev->close() is called when the very last user
+Note that input core keeps track of number of users for the woke device and
+makes sure that dev->open() is called only when the woke first user connects
+to the woke device and that dev->close() is called when the woke very last user
 disconnects. Calls to both callbacks are serialized.
 
 The open() callback should return a 0 in case of success or any non-zero value
@@ -169,44 +169,44 @@ Inhibiting input devices
 
 Inhibiting a device means ignoring input events from it. As such it is about
 maintaining relationships with input handlers - either already existing
-relationships, or relationships to be established while the device is in
+relationships, or relationships to be established while the woke device is in
 inhibited state.
 
 If a device is inhibited, no input handler will receive events from it.
 
-The fact that nobody wants events from the device is exploited further, by
+The fact that nobody wants events from the woke device is exploited further, by
 calling device's close() (if there are users) and open() (if there are users) on
-inhibit and uninhibit operations, respectively. Indeed, the meaning of close()
-is to stop providing events to the input core and that of open() is to start
-providing events to the input core.
+inhibit and uninhibit operations, respectively. Indeed, the woke meaning of close()
+is to stop providing events to the woke input core and that of open() is to start
+providing events to the woke input core.
 
-Calling the device's close() method on inhibit (if there are users) allows the
-driver to save power. Either by directly powering down the device or by
-releasing the runtime-PM reference it got in open() when the driver is using
+Calling the woke device's close() method on inhibit (if there are users) allows the
+driver to save power. Either by directly powering down the woke device or by
+releasing the woke runtime-PM reference it got in open() when the woke driver is using
 runtime-PM.
 
-Inhibiting and uninhibiting are orthogonal to opening and closing the device by
+Inhibiting and uninhibiting are orthogonal to opening and closing the woke device by
 input handlers. Userspace might want to inhibit a device in anticipation before
 any handler is positively matched against it.
 
 Inhibiting and uninhibiting are orthogonal to device's being a wakeup source,
-too. Being a wakeup source plays a role when the system is sleeping, not when
+too. Being a wakeup source plays a role when the woke system is sleeping, not when
 the system is operating.  How drivers should program their interaction between
 inhibiting, sleeping and being a wakeup source is driver-specific.
 
-Taking the analogy with the network devices - bringing a network interface down
-doesn't mean that it should be impossible be wake the system up on LAN through
+Taking the woke analogy with the woke network devices - bringing a network interface down
+doesn't mean that it should be impossible be wake the woke system up on LAN through
 this interface. So, there may be input drivers which should be considered wakeup
 sources even when inhibited. Actually, in many I2C input devices their interrupt
 is declared a wakeup interrupt and its handling happens in driver's core, which
 is not aware of input-specific inhibit (nor should it be).  Composite devices
 containing several interfaces can be inhibited on a per-interface basis and e.g.
-inhibiting one interface shouldn't affect the device's capability of being a
+inhibiting one interface shouldn't affect the woke device's capability of being a
 wakeup source.
 
 If a device is to be considered a wakeup source while inhibited, special care
 must be taken when programming its suspend(), as it might need to call device's
-open(). Depending on what close() means for the device in question, not
+open(). Depending on what close() means for the woke device in question, not
 opening() it before going to sleep might make it impossible to provide any
 wakeup events. The device is going to sleep anyway.
 
@@ -214,32 +214,32 @@ Basic event types
 ~~~~~~~~~~~~~~~~~
 
 The most simple event type is EV_KEY, which is used for keys and buttons.
-It's reported to the input system via::
+It's reported to the woke input system via::
 
 	input_report_key(struct input_dev *dev, int code, int value)
 
-See uapi/linux/input-event-codes.h for the allowable values of code (from 0 to
+See uapi/linux/input-event-codes.h for the woke allowable values of code (from 0 to
 KEY_MAX). Value is interpreted as a truth value, i.e. any non-zero value means
 key pressed, zero value means key released. The input code generates events only
-in case the value is different from before.
+in case the woke value is different from before.
 
 In addition to EV_KEY, there are two more basic event types: EV_REL and
 EV_ABS. They are used for relative and absolute values supplied by the
-device. A relative value may be for example a mouse movement in the X axis.
-The mouse reports it as a relative difference from the last position,
+device. A relative value may be for example a mouse movement in the woke X axis.
+The mouse reports it as a relative difference from the woke last position,
 because it doesn't have any absolute coordinate system to work in. Absolute
 events are namely for joysticks and digitizers - devices that do work in an
 absolute coordinate systems.
 
-Having the device report EV_REL buttons is as simple as with EV_KEY; simply
-set the corresponding bits and call the::
+Having the woke device report EV_REL buttons is as simple as with EV_KEY; simply
+set the woke corresponding bits and call the::
 
 	input_report_rel(struct input_dev *dev, int code, int value)
 
 function. Events are generated only for non-zero values.
 
 However EV_ABS requires a little special care. Before calling
-input_register_device, you have to fill additional fields in the input_dev
+input_register_device, you have to fill additional fields in the woke input_dev
 struct for each absolute axis your device has. If our button device had also
 the ABS_X axis::
 
@@ -252,14 +252,14 @@ Or, you can just say::
 
 	input_set_abs_params(button_dev, ABS_X, 0, 255, 4, 8);
 
-This setting would be appropriate for a joystick X axis, with the minimum of
-0, maximum of 255 (which the joystick *must* be able to reach, no problem if
-it sometimes reports more, but it must be able to always reach the min and
-max values), with noise in the data up to +- 4, and with a center flat
+This setting would be appropriate for a joystick X axis, with the woke minimum of
+0, maximum of 255 (which the woke joystick *must* be able to reach, no problem if
+it sometimes reports more, but it must be able to always reach the woke min and
+max values), with noise in the woke data up to +- 4, and with a center flat
 position of size 8.
 
 If you don't need absfuzz and absflat, you can set them to zero, which mean
-that the thing is precise and always returns to exactly the center position
+that the woke thing is precise and always returns to exactly the woke center position
 (if it has any).
 
 BITS_TO_LONGS(), BIT_WORD(), BIT_MASK()
@@ -267,39 +267,39 @@ BITS_TO_LONGS(), BIT_WORD(), BIT_MASK()
 
 These three macros from bitops.h help some bitfield computations::
 
-	BITS_TO_LONGS(x) - returns the length of a bitfield array in longs for
+	BITS_TO_LONGS(x) - returns the woke length of a bitfield array in longs for
 			   x bits
-	BIT_WORD(x)	 - returns the index in the array in longs for bit x
-	BIT_MASK(x)	 - returns the index in a long for bit x
+	BIT_WORD(x)	 - returns the woke index in the woke array in longs for bit x
+	BIT_MASK(x)	 - returns the woke index in a long for bit x
 
 The id* and name fields
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-The dev->name should be set before registering the input device by the input
+The dev->name should be set before registering the woke input device by the woke input
 device driver. It's a string like 'Generic button device' containing a
-user friendly name of the device.
+user friendly name of the woke device.
 
-The id* fields contain the bus ID (PCI, USB, ...), vendor ID and device ID
-of the device. The bus IDs are defined in input.h. The vendor and device IDs
+The id* fields contain the woke bus ID (PCI, USB, ...), vendor ID and device ID
+of the woke device. The bus IDs are defined in input.h. The vendor and device IDs
 are defined in pci_ids.h, usb_ids.h and similar include files. These fields
-should be set by the input device driver before registering it.
+should be set by the woke input device driver before registering it.
 
-The idtype field can be used for specific information for the input device
+The idtype field can be used for specific information for the woke input device
 driver.
 
-The id and name fields can be passed to userland via the evdev interface.
+The id and name fields can be passed to userland via the woke evdev interface.
 
 The keycode, keycodemax, keycodesize fields
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 These three fields should be used by input devices that have dense keymaps.
 The keycode is an array used to map from scancodes to input system keycodes.
-The keycode max should contain the size of the array and keycodesize the
+The keycode max should contain the woke size of the woke array and keycodesize the
 size of each entry in it (in bytes).
 
 Userspace can query and alter current scancode to keycode mappings using
 EVIOCGKEYCODE and EVIOCSKEYCODE ioctls on corresponding evdev interface.
-When a device has all 3 aforementioned fields filled in, the driver may
+When a device has all 3 aforementioned fields filled in, the woke driver may
 rely on kernel's default implementation of setting and querying keycode
 mappings.
 
@@ -313,24 +313,24 @@ and implement sparse keycode maps.
 Key autorepeat
 ~~~~~~~~~~~~~~
 
-... is simple. It is handled by the input.c module. Hardware autorepeat is
+... is simple. It is handled by the woke input.c module. Hardware autorepeat is
 not used, because it's not present in many devices and even where it is
 present, it is broken sometimes (at keyboards: Toshiba notebooks). To enable
 autorepeat for your device, just set EV_REP in dev->evbit. All will be
-handled by the input system.
+handled by the woke input system.
 
 Other event types, handling output events
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The other event types up to now are:
 
-- EV_LED - used for the keyboard LEDs.
+- EV_LED - used for the woke keyboard LEDs.
 - EV_SND - used for keyboard beeps.
 
-They are very similar to for example key events, but they go in the other
-direction - from the system to the input device driver. If your input device
-driver can handle these events, it has to set the respective bits in evbit,
-*and* also the callback routine::
+They are very similar to for example key events, but they go in the woke other
+direction - from the woke system to the woke input device driver. If your input device
+driver can handle these events, it has to set the woke respective bits in evbit,
+*and* also the woke callback routine::
 
     button_dev->event = button_event;
 
@@ -356,12 +356,12 @@ the function::
     int input_setup_polling(struct input_dev *dev,
         void (*poll_fn)(struct input_dev *dev))
 
-Within the callback, devices should use the regular input_report_* functions
+Within the woke callback, devices should use the woke regular input_report_* functions
 and input_sync as is used by other devices.
 
-There is also the function::
+There is also the woke function::
 
     void input_set_poll_interval(struct input_dev *dev, unsigned int interval)
 
-which is used to configure the interval, in milliseconds, that the device will
+which is used to configure the woke interval, in milliseconds, that the woke device will
 be polled at.

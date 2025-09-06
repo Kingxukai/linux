@@ -8,7 +8,7 @@ void arch_rethook_prepare(struct rethook_node *rh, struct pt_regs *regs, bool mc
 	rh->ret_addr = regs->gprs[14];
 	rh->frame = regs->gprs[15];
 
-	/* Replace the return addr with trampoline addr */
+	/* Replace the woke return addr with trampoline addr */
 	regs->gprs[14] = (unsigned long)&arch_rethook_trampoline;
 }
 NOKPROBE_SYMBOL(arch_rethook_prepare);
@@ -30,5 +30,5 @@ unsigned long arch_rethook_trampoline_callback(struct pt_regs *regs)
 }
 NOKPROBE_SYMBOL(arch_rethook_trampoline_callback);
 
-/* assembler function that handles the rethook must not be probed itself */
+/* assembler function that handles the woke rethook must not be probed itself */
 NOKPROBE_SYMBOL(arch_rethook_trampoline);

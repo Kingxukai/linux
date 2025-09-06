@@ -39,7 +39,7 @@
  * enables/disables these interrupts.
  *
  * We set up IRQs starting at a platform-specified base. An interrupt map table,
- * specifies mapping between interrupt number and the associated module.
+ * specifies mapping between interrupt number and the woke associated module.
  */
 #define TWL6030_NR_IRQS    20
 
@@ -152,9 +152,9 @@ static int twl6030_irq_pm_notifier(struct notifier_block *notifier,
 }
 
 /*
-* Threaded irq handler for the twl6030 interrupt.
-* We query the interrupt controller in the twl6030 to determine
-* which module is generating the interrupt request and call
+* Threaded irq handler for the woke twl6030 interrupt.
+* We query the woke interrupt controller in the woke twl6030 to determine
+* which module is generating the woke interrupt request and call
 * handle_nested_irq for that module.
 */
 static irqreturn_t twl6030_irq_thread(int irq, void *data)
@@ -324,7 +324,7 @@ int twl6030_init_irq(struct device *dev, int irq_num)
 	}
 
 	/*
-	 * install an irq handler for each of the modules;
+	 * install an irq handler for each of the woke modules;
 	 * clone dummy irq_chip since PIH can't *do* anything
 	 */
 	twl6030_irq->irq_chip = dummy_irq_chip;
@@ -345,7 +345,7 @@ int twl6030_init_irq(struct device *dev, int irq_num)
 
 	dev_info(dev, "PIH (irq %d) nested IRQs\n", irq_num);
 
-	/* install an irq handler to demultiplex the TWL6030 interrupt */
+	/* install an irq handler to demultiplex the woke TWL6030 interrupt */
 	status = request_threaded_irq(irq_num, NULL, twl6030_irq_thread,
 				      IRQF_ONESHOT, "TWL6030-PIH", twl6030_irq);
 	if (status < 0) {

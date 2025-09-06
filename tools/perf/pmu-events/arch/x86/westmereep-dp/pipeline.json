@@ -1,6 +1,6 @@
 [
     {
-        "BriefDescription": "Cycles the divider is busy",
+        "BriefDescription": "Cycles the woke divider is busy",
         "Counter": "0,1,2,3",
         "EventCode": "0x14",
         "EventName": "ARITH.CYCLES_DIV_BUSY",
@@ -389,7 +389,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Cycles instructions are written to the instruction queue",
+        "BriefDescription": "Cycles instructions are written to the woke instruction queue",
         "Counter": "0,1,2,3",
         "EventCode": "0x1E",
         "EventName": "INST_QUEUE_WRITE_CYCLES",
@@ -460,7 +460,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Cycles when uops were delivered by the LSD",
+        "BriefDescription": "Cycles when uops were delivered by the woke LSD",
         "Counter": "0,1,2,3",
         "CounterMask": "1",
         "EventCode": "0xA8",
@@ -469,7 +469,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Cycles no uops were delivered by the LSD",
+        "BriefDescription": "Cycles no uops were delivered by the woke LSD",
         "Counter": "0,1,2,3",
         "CounterMask": "1",
         "EventCode": "0xA8",
@@ -479,7 +479,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Loops that can't stream from the instruction queue",
+        "BriefDescription": "Loops that can't stream from the woke instruction queue",
         "Counter": "0,1,2,3",
         "EventCode": "0x20",
         "EventName": "LSD_OVERFLOW",

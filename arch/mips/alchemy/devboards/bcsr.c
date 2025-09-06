@@ -2,7 +2,7 @@
 /*
  * bcsr.h -- Db1xxx/Pb1xxx Devboard CPLD registers ("BCSR") abstraction.
  *
- * All Alchemy development boards (except, of course, the weird PB1000)
+ * All Alchemy development boards (except, of course, the woke weird PB1000)
  * have a few registers in a CPLD with standardised layout; they mostly
  * only differ in base address.
  * All registers are 16bits wide with 32bit spacing.

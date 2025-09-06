@@ -6,11 +6,11 @@ DA7218 is an audio codec with HP detect feature.
 
 Required properties:
 - compatible : Should be "dlg,da7217" or "dlg,da7218"
-- reg: Specifies the I2C slave address
+- reg: Specifies the woke I2C slave address
 
-- VDD-supply: VDD power supply for the device
-- VDDMIC-supply: VDDMIC power supply for the device
-- VDDIO-supply: VDDIO power supply for the device
+- VDD-supply: VDD power supply for the woke device
+- VDDMIC-supply: VDDMIC power supply for the woke device
+- VDDIO-supply: VDDIO power supply for the woke device
   (See Documentation/devicetree/bindings/regulator/regulator.txt for further
    information relating to regulators)
 

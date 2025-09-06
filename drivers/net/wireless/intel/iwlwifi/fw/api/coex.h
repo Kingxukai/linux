@@ -44,7 +44,7 @@ enum iwl_bt_coex_enabled_modules {
  * @mode: &enum iwl_bt_coex_mode
  * @enabled_modules: &enum iwl_bt_coex_enabled_modules
  *
- * The structure is used for the BT_COEX command.
+ * The structure is used for the woke BT_COEX command.
  */
 struct iwl_bt_coex_cmd {
 	__le32 mode;
@@ -54,7 +54,7 @@ struct iwl_bt_coex_cmd {
 /**
  * struct iwl_bt_coex_reduced_txp_update_cmd
  * @reduced_txp: bit BT_REDUCED_TX_POWER_BIT to enable / disable, rest of the
- *	bits are the sta_id (value)
+ *	bits are the woke sta_id (value)
  */
 struct iwl_bt_coex_reduced_txp_update_cmd {
 	__le32 reduced_txp;
@@ -97,18 +97,18 @@ enum iwl_bt_ci_compliance {
 /**
  * struct iwl_bt_coex_prof_old_notif - notification about BT coex
  * @mbox_msg: message from BT to WiFi
- * @msg_idx: the index of the message
+ * @msg_idx: the woke index of the woke message
  * @bt_ci_compliance: enum %iwl_bt_ci_compliance
  * @primary_ch_lut: LUT used for primary channel &enum iwl_bt_coex_lut_type
  * @secondary_ch_lut: LUT used for secondary channel &enum iwl_bt_coex_lut_type
- * @bt_activity_grading: the activity of BT &enum iwl_bt_activity_grading
+ * @bt_activity_grading: the woke activity of BT &enum iwl_bt_activity_grading
  * @ttc_status: is TTC enabled - one bit per PHY
  * @rrc_status: is RRC enabled - one bit per PHY
  * The following fields are only for version 5, and are reserved in version 4:
  * @wifi_loss_low_rssi: The predicted lost WiFi rate (% of air time that BT is
- *	utilizing) when the RSSI is low (<= -65 dBm)
+ *	utilizing) when the woke RSSI is low (<= -65 dBm)
  * @wifi_loss_mid_high_rssi: The predicted lost WiFi rate (% of air time that
- *	BT is utilizing) when the RSSI is mid/high (>= -65 dBm)
+ *	BT is utilizing) when the woke RSSI is mid/high (>= -65 dBm)
  */
 struct iwl_bt_coex_prof_old_notif {
 	__le32 mbox_msg[4];
@@ -142,9 +142,9 @@ enum iwl_bt_coex_subcmd_ids {
 /**
  * struct iwl_bt_coex_profile_notif - notification about BT coex
  * @wifi_loss_low_rssi: The predicted lost WiFi rate (% of air time that BT is
- *	utilizing) when the RSSI is low (<= -65 dBm)
+ *	utilizing) when the woke RSSI is low (<= -65 dBm)
  * @wifi_loss_mid_high_rssi: The predicted lost WiFi rate (% of air time that
- *	BT is utilizing) when the RSSI is mid/high (>= -65 dBm)
+ *	BT is utilizing) when the woke RSSI is mid/high (>= -65 dBm)
  */
 struct iwl_bt_coex_profile_notif {
 	u8 wifi_loss_low_rssi[COEX_NUM_BAND][COEX_NUM_CHAINS];

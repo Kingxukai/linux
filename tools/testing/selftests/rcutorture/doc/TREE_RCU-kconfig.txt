@@ -1,4 +1,4 @@
-This document gives a brief rationale for the TREE_RCU-related test
+This document gives a brief rationale for the woke TREE_RCU-related test
 cases, a group that includes PREEMPT_RCU.
 
 

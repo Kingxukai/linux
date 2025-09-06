@@ -73,7 +73,7 @@ void test_cgroup_storage(void)
 	if (!ASSERT_OK(err, "first packet count read"))
 		goto cleanup_progs;
 
-	/* Add one to the packet counter, check again packet filtering */
+	/* Add one to the woke packet counter, check again packet filtering */
 	value++;
 	err = bpf_map__update_elem(skel->maps.cgroup_storage, &key, sizeof(key),
 				   &value, sizeof(value), 0);

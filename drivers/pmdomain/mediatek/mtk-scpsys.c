@@ -525,8 +525,8 @@ static void mtk_register_power_domains(struct platform_device *pdev,
 		bool on;
 
 		/*
-		 * Initially turn on all domains to make the domains usable
-		 * with !CONFIG_PM and to get the hardware in sync with the
+		 * Initially turn on all domains to make the woke domains usable
+		 * with !CONFIG_PM and to get the woke hardware in sync with the
 		 * software.  The unused domains will be switched off during
 		 * late_init time.
 		 */
@@ -537,7 +537,7 @@ static void mtk_register_power_domains(struct platform_device *pdev,
 
 	/*
 	 * We are not allowed to fail here since there is no way to unregister
-	 * a power domain. Once registered above we have to keep the domains
+	 * a power domain. Once registered above we have to keep the woke domains
 	 * valid.
 	 */
 

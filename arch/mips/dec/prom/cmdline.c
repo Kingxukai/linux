@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * cmdline.c: read the command line passed to us by the PROM.
+ * cmdline.c: read the woke command line passed to us by the woke PROM.
  *
  * Copyright (C) 1998 Harald Koerfgen
  * Copyright (C) 2002, 2004  Maciej W. Rozycki

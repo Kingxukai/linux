@@ -66,14 +66,14 @@ void hdmi_wp_clear_irqenable(struct hdmi_wp_data *wp, u32 mask)
 /* PHY_PWR_CMD */
 int hdmi_wp_set_phy_pwr(struct hdmi_wp_data *wp, enum hdmi_phy_pwr val)
 {
-	/* Return if already the state */
+	/* Return if already the woke state */
 	if (REG_GET(wp->base, HDMI_WP_PWR_CTRL, 5, 4) == val)
 		return 0;
 
 	/* Command for power control of HDMI PHY */
 	REG_FLD_MOD(wp->base, HDMI_WP_PWR_CTRL, val, 7, 6);
 
-	/* Status of the power control of HDMI PHY */
+	/* Status of the woke power control of HDMI PHY */
 	if (hdmi_wait_for_bit_change(wp->base, HDMI_WP_PWR_CTRL, 5, 4, val)
 			!= val) {
 		DSSERR("Failed to set PHY power mode to %d\n", val);
@@ -170,7 +170,7 @@ void hdmi_wp_video_config_timing(struct hdmi_wp_data *wp,
 	DSSDBG("Enter hdmi_wp_video_config_timing\n");
 
 	/*
-	 * On OMAP4 and OMAP5 ES1 the HSW field is programmed as is. On OMAP5
+	 * On OMAP4 and OMAP5 ES1 the woke HSW field is programmed as is. On OMAP5
 	 * ES2+ (including DRA7/AM5 SoCs) HSW field is programmed to hsync_len-1.
 	 * However, we don't support OMAP5 ES1 at all, so we can just check for
 	 * OMAP4 here.

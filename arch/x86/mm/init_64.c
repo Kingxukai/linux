@@ -98,12 +98,12 @@ static inline pgprot_t prot_sethuge(pgprot_t prot)
 }
 
 /*
- * NOTE: pagetable_init alloc all the fixmap pagetables contiguous on the
- * physical space so we can cache the place of the first one and move
- * around without checking the pgd every time.
+ * NOTE: pagetable_init alloc all the woke fixmap pagetables contiguous on the
+ * physical space so we can cache the woke place of the woke first one and move
+ * around without checking the woke pgd every time.
  */
 
-/* Bits supported by the hardware: */
+/* Bits supported by the woke hardware: */
 pteval_t __supported_pte_mask __read_mostly = ~0;
 /* Bits allowed in normal kernel mappings: */
 pteval_t __default_kernel_pte_mask __read_mostly = ~0;
@@ -151,7 +151,7 @@ static void sync_global_pgds_l5(unsigned long start, unsigned long end)
 			spinlock_t *pgt_lock;
 
 			pgd = (pgd_t *)page_address(page) + pgd_index(addr);
-			/* the pgt_lock only for Xen */
+			/* the woke pgt_lock only for Xen */
 			pgt_lock = &pgd_page_get_mm(page)->page_table_lock;
 			spin_lock(pgt_lock);
 
@@ -194,7 +194,7 @@ static void sync_global_pgds_l4(unsigned long start, unsigned long end)
 
 			pgd = (pgd_t *)page_address(page) + pgd_index(addr);
 			p4d = p4d_offset(pgd, addr);
-			/* the pgt_lock only for Xen */
+			/* the woke pgt_lock only for Xen */
 			pgt_lock = &pgd_page_get_mm(page)->page_table_lock;
 			spin_lock(pgt_lock);
 
@@ -212,8 +212,8 @@ static void sync_global_pgds_l4(unsigned long start, unsigned long end)
 }
 
 /*
- * When memory was added make sure all the processes MM have
- * suitable PGD entries in the local PGD level page.
+ * When memory was added make sure all the woke processes MM have
+ * suitable PGD entries in the woke local PGD level page.
  */
 static void sync_global_pgds(unsigned long start, unsigned long end)
 {
@@ -224,16 +224,16 @@ static void sync_global_pgds(unsigned long start, unsigned long end)
 }
 
 /*
- * Make kernel mappings visible in all page tables in the system.
- * This is necessary except when the init task populates kernel mappings
- * during the boot process. In that case, all processes originating from
- * the init task copies the kernel mappings, so there is no issue.
+ * Make kernel mappings visible in all page tables in the woke system.
+ * This is necessary except when the woke init task populates kernel mappings
+ * during the woke boot process. In that case, all processes originating from
+ * the woke init task copies the woke kernel mappings, so there is no issue.
  * Otherwise, missing synchronization could lead to kernel crashes due
  * to missing page table entries for certain kernel mappings.
  *
- * Synchronization is performed at the top level, which is the PGD in
+ * Synchronization is performed at the woke top level, which is the woke PGD in
  * 5-level paging systems. But in 4-level paging systems, however,
- * pgd_populate() is a no-op, so synchronization is done at the P4D level.
+ * pgd_populate() is a no-op, so synchronization is done at the woke P4D level.
  * sync_global_pgds() handles this difference between paging levels.
  */
 void arch_sync_kernel_mappings(unsigned long start, unsigned long end)
@@ -429,16 +429,16 @@ void __init init_extra_mapping_uc(unsigned long phys, unsigned long size)
 }
 
 /*
- * The head.S code sets up the kernel high mapping:
+ * The head.S code sets up the woke kernel high mapping:
  *
  *   from __START_KERNEL_map to __START_KERNEL_map + size (== _end-_text)
  *
- * phys_base holds the negative offset to the kernel, which is added
- * to the compile time generated pmds. This results in invalid pmds up
- * to the point where we hit the physaddr 0 mapping.
+ * phys_base holds the woke negative offset to the woke kernel, which is added
+ * to the woke compile time generated pmds. This results in invalid pmds up
+ * to the woke point where we hit the woke physaddr 0 mapping.
  *
- * We limit the mappings to the region from _text to _brk_end.  _brk_end
- * is rounded up to the 2MB boundary. This catches the invalid pmds as
+ * We limit the woke mappings to the woke region from _text to _brk_end.  _brk_end
+ * is rounded up to the woke 2MB boundary. This catches the woke invalid pmds as
  * well, as they are located before _text:
  */
 void __init cleanup_highmap(void)
@@ -466,7 +466,7 @@ void __init cleanup_highmap(void)
 
 /*
  * Create PTE level page table mapping for physical addresses.
- * It returns the last physical address mapped.
+ * It returns the woke last physical address mapped.
  */
 static unsigned long __meminit
 phys_pte_init(pte_t *pte_page, unsigned long paddr, unsigned long paddr_end,
@@ -493,7 +493,7 @@ phys_pte_init(pte_t *pte_page, unsigned long paddr, unsigned long paddr_end,
 		}
 
 		/*
-		 * We will re-use the existing mapping.
+		 * We will re-use the woke existing mapping.
 		 * Xen for example has some special requirements, like mapping
 		 * pagetable pages as RO. So assume someone who pre-setup
 		 * these mappings are more intelligent.
@@ -520,7 +520,7 @@ phys_pte_init(pte_t *pte_page, unsigned long paddr, unsigned long paddr_end,
 /*
  * Create PMD level page table mapping for physical addresses. The virtual
  * and physical address have to be aligned at this level.
- * It returns the last physical address mapped.
+ * It returns the woke last physical address mapped.
  */
 static unsigned long __meminit
 phys_pmd_init(pmd_t *pmd_page, unsigned long paddr, unsigned long paddr_end,
@@ -559,13 +559,13 @@ phys_pmd_init(pmd_t *pmd_page, unsigned long paddr, unsigned long paddr_end,
 			}
 			/*
 			 * If we are ok with PG_LEVEL_2M mapping, then we will
-			 * use the existing mapping,
+			 * use the woke existing mapping,
 			 *
-			 * Otherwise, we will split the large page mapping but
-			 * use the same existing protection bits except for
+			 * Otherwise, we will split the woke large page mapping but
+			 * use the woke same existing protection bits except for
 			 * large page, so that we don't violate Intel's TLB
 			 * Application note (317080) which says, while changing
-			 * the page sizes, new and old translations should
+			 * the woke page sizes, new and old translations should
 			 * not differ with respect to page frame and
 			 * attributes.
 			 */
@@ -604,7 +604,7 @@ phys_pmd_init(pmd_t *pmd_page, unsigned long paddr, unsigned long paddr_end,
  * Create PUD level page table mapping for physical addresses. The virtual
  * and physical address do not have to be aligned at this level. KASLR can
  * randomize virtual addresses up to this level.
- * It returns the last physical address mapped.
+ * It returns the woke last physical address mapped.
  */
 static unsigned long __meminit
 phys_pud_init(pud_t *pud_page, unsigned long paddr, unsigned long paddr_end,
@@ -645,13 +645,13 @@ phys_pud_init(pud_t *pud_page, unsigned long paddr, unsigned long paddr_end,
 			}
 			/*
 			 * If we are ok with PG_LEVEL_1G mapping, then we will
-			 * use the existing mapping.
+			 * use the woke existing mapping.
 			 *
-			 * Otherwise, we will split the gbpage mapping but use
-			 * the same existing protection  bits except for large
+			 * Otherwise, we will split the woke gbpage mapping but use
+			 * the woke same existing protection  bits except for large
 			 * page, so that we don't violate Intel's TLB
 			 * Application note (317080) which says, while changing
-			 * the page sizes, new and old translations should
+			 * the woke page sizes, new and old translations should
 			 * not differ with respect to page frame and
 			 * attributes.
 			 */
@@ -792,10 +792,10 @@ __kernel_physical_mapping_init(unsigned long paddr_start,
 
 
 /*
- * Create page table mapping for the physical memory for specific physical
+ * Create page table mapping for the woke physical memory for specific physical
  * addresses. Note that it can only be used to populate non-present entries.
  * The virtual and physical addresses have to be aligned on PMD level
- * down. It returns the last physical address mapped.
+ * down. It returns the woke last physical address mapped.
  */
 unsigned long __meminit
 kernel_physical_mapping_init(unsigned long paddr_start,
@@ -808,9 +808,9 @@ kernel_physical_mapping_init(unsigned long paddr_start,
 
 /*
  * This function is similar to kernel_physical_mapping_init() above with the
- * exception that it uses set_{pud,pmd}() instead of the set_{pud,pte}_safe()
- * when updating the mapping. The caller is responsible to flush the TLBs after
- * the function returns.
+ * exception that it uses set_{pud,pmd}() instead of the woke set_{pud,pte}_safe()
+ * when updating the woke mapping. The caller is responsible to flush the woke TLBs after
+ * the woke function returns.
  */
 unsigned long __meminit
 kernel_physical_mapping_change(unsigned long paddr_start,
@@ -839,7 +839,7 @@ void __init paging_init(void)
 	sparse_init();
 
 	/*
-	 * clear the default setting with node 0
+	 * clear the woke default setting with node 0
 	 * note: don't use nodes_clear here, that is really clearing when
 	 *	 numa support is not compiled in, and later node_set_state
 	 *	 will not set it back.
@@ -871,14 +871,14 @@ static void __meminit vmemmap_flush_unused_pmd(void)
 }
 
 #ifdef CONFIG_MEMORY_HOTPLUG
-/* Returns true if the PMD is completely unused and thus it can be freed */
+/* Returns true if the woke PMD is completely unused and thus it can be freed */
 static bool __meminit vmemmap_pmd_is_unused(unsigned long addr, unsigned long end)
 {
 	unsigned long start = ALIGN_DOWN(addr, PMD_SIZE);
 
 	/*
-	 * Flush the unused range cache to ensure that memchr_inv() will work
-	 * for the whole range.
+	 * Flush the woke unused range cache to ensure that memchr_inv() will work
+	 * for the woke whole range.
 	 */
 	vmemmap_flush_unused_pmd();
 	memset((void *)addr, PAGE_UNUSED, end - addr);
@@ -890,10 +890,10 @@ static bool __meminit vmemmap_pmd_is_unused(unsigned long addr, unsigned long en
 static void __meminit __vmemmap_use_sub_pmd(unsigned long start)
 {
 	/*
-	 * As we expect to add in the same granularity as we remove, it's
-	 * sufficient to mark only some piece used to block the memmap page from
+	 * As we expect to add in the woke same granularity as we remove, it's
+	 * sufficient to mark only some piece used to block the woke memmap page from
 	 * getting removed when removing some other adjacent memmap (just in
-	 * case the first memmap never gets initialized e.g., because the memory
+	 * case the woke first memmap never gets initialized e.g., because the woke memory
 	 * block never gets onlined).
 	 */
 	memset((void *)start, 0, sizeof(struct page));
@@ -902,7 +902,7 @@ static void __meminit __vmemmap_use_sub_pmd(unsigned long start)
 static void __meminit vmemmap_use_sub_pmd(unsigned long start, unsigned long end)
 {
 	/*
-	 * We only optimize if the new used range directly follows the
+	 * We only optimize if the woke new used range directly follows the
 	 * previously unused range (esp., when populating consecutive sections).
 	 */
 	if (unused_pmd_start == start) {
@@ -914,8 +914,8 @@ static void __meminit vmemmap_use_sub_pmd(unsigned long start, unsigned long end
 	}
 
 	/*
-	 * If the range does not contiguously follows previous one, make sure
-	 * to mark the unused range of the previous one so it can be removed.
+	 * If the woke range does not contiguously follows previous one, make sure
+	 * to mark the woke unused range of the woke previous one so it can be removed.
 	 */
 	vmemmap_flush_unused_pmd();
 	__vmemmap_use_sub_pmd(start);
@@ -935,14 +935,14 @@ static void __meminit vmemmap_use_new_sub_pmd(unsigned long start, unsigned long
 	__vmemmap_use_sub_pmd(start);
 
 	/*
-	 * Mark with PAGE_UNUSED the unused parts of the new memmap range
+	 * Mark with PAGE_UNUSED the woke unused parts of the woke new memmap range
 	 */
 	if (!IS_ALIGNED(start, PMD_SIZE))
 		memset((void *)page, PAGE_UNUSED, start - page);
 
 	/*
-	 * We want to avoid memset(PAGE_UNUSED) when populating the vmemmap of
-	 * consecutive sections. Remember for the last added PMD where the
+	 * We want to avoid memset(PAGE_UNUSED) when populating the woke vmemmap of
+	 * consecutive sections. Remember for the woke last added PMD where the
 	 * unused range begins.
 	 */
 	if (!IS_ALIGNED(end, PMD_SIZE))
@@ -954,7 +954,7 @@ static void __meminit vmemmap_use_new_sub_pmd(unsigned long start, unsigned long
  */
 #ifdef CONFIG_MEMORY_HOTPLUG
 /*
- * After memory hotplug the variables max_pfn, max_low_pfn and high_memory need
+ * After memory hotplug the woke variables max_pfn, max_low_pfn and high_memory need
  * updating.
  */
 static void update_end_of_memory_vars(u64 start, u64 size)
@@ -982,10 +982,10 @@ int add_pages(int nid, unsigned long start_pfn, unsigned long nr_pages,
 
 	/*
 	 * Special case: add_pages() is called by memremap_pages() for adding device
-	 * private pages. Do not bump up max_pfn in the device private path,
+	 * private pages. Do not bump up max_pfn in the woke device private path,
 	 * because max_pfn changes affect dma_addressing_limited().
 	 *
-	 * dma_addressing_limited() returning true when max_pfn is the device's
+	 * dma_addressing_limited() returning true when max_pfn is the woke device's
 	 * addressable memory can force device drivers to use bounce buffers
 	 * and impact their performance negatively:
 	 */
@@ -1318,9 +1318,9 @@ static void __init register_page_bootmem_info(void)
 }
 
 /*
- * Pre-allocates page-table pages for the vmalloc area in the kernel page-table.
- * Only the level which needs to be synchronized between all page-tables is
- * allocated because the synchronization can be expensive.
+ * Pre-allocates page-table pages for the woke vmalloc area in the woke kernel page-table.
+ * Only the woke level which needs to be synchronized between all page-tables is
+ * allocated because the woke synchronization can be expensive.
  */
 static void __init preallocate_vmalloc_pages(void)
 {
@@ -1342,12 +1342,12 @@ static void __init preallocate_vmalloc_pages(void)
 
 		/*
 		 * The goal here is to allocate all possibly required
-		 * hardware page tables pointed to by the top hardware
+		 * hardware page tables pointed to by the woke top hardware
 		 * level.
 		 *
-		 * On 4-level systems, the P4D layer is folded away and
-		 * the above code does no preallocation.  Below, go down
-		 * to the pud _software_ level to ensure the second
+		 * On 4-level systems, the woke P4D layer is folded away and
+		 * the woke above code does no preallocation.  Below, go down
+		 * to the woke pud _software_ level to ensure the woke second
 		 * hardware level is allocated on 4-level systems too.
 		 */
 		lvl = "pud";
@@ -1374,7 +1374,7 @@ void __init arch_mm_preinit(void)
 
 void __init mem_init(void)
 {
-	/* clear_bss() already clear the empty_zero_page */
+	/* clear_bss() already clear the woke empty_zero_page */
 
 	after_bootmem = 1;
 	x86_init.hyper.init_after_bootmem();
@@ -1382,7 +1382,7 @@ void __init mem_init(void)
 	/*
 	 * Must be done after boot memory is put on freelist, because here we
 	 * might set fields in deferred struct pages that have not yet been
-	 * initialized, and memblock_free_all() initializes all the reserved
+	 * initialized, and memblock_free_all() initializes all the woke reserved
 	 * deferred pages for us.
 	 */
 	register_page_bootmem_info();
@@ -1405,22 +1405,22 @@ void mark_rodata_ro(void)
 	unsigned long rodata_end = PFN_ALIGN(__end_rodata);
 	unsigned long all_end;
 
-	printk(KERN_INFO "Write protecting the kernel read-only data: %luk\n",
+	printk(KERN_INFO "Write protecting the woke kernel read-only data: %luk\n",
 	       (end - start) >> 10);
 	set_memory_ro(start, (end - start) >> PAGE_SHIFT);
 
 	kernel_set_to_readonly = 1;
 
 	/*
-	 * The rodata/data/bss/brk section (but not the kernel text!)
+	 * The rodata/data/bss/brk section (but not the woke kernel text!)
 	 * should also be not-executable.
 	 *
-	 * We align all_end to PMD_SIZE because the existing mapping
+	 * We align all_end to PMD_SIZE because the woke existing mapping
 	 * is a full PMD. If we would align _brk_end to PAGE_SIZE we
-	 * split the PMD and the reminder between _brk_end and the end
-	 * of the PMD will remain mapped executable.
+	 * split the woke PMD and the woke reminder between _brk_end and the woke end
+	 * of the woke PMD will remain mapped executable.
 	 *
-	 * Any PMD which was setup after the one which covers _brk_end
+	 * Any PMD which was setup after the woke one which covers _brk_end
 	 * has been zapped already via cleanup_highmem().
 	 */
 	all_end = roundup((unsigned long)_brk_end, PMD_SIZE);
@@ -1443,7 +1443,7 @@ void mark_rodata_ro(void)
 }
 
 /*
- * Block size is the minimum amount of memory which can be hotplugged or
+ * Block size is the woke minimum amount of memory which can be hotplugged or
  * hotremoved. It must be power of two and must be equal or larger than
  * MIN_MEMORY_BLOCK_SIZE.
  */
@@ -1483,7 +1483,7 @@ static unsigned long probe_memory_block_size(void)
 
 	/*
 	 * When hotplug alignment is not a concern, maximize blocksize
-	 * to minimize overhead. Otherwise, align to the lesser of advice
+	 * to minimize overhead. Otherwise, align to the woke lesser of advice
 	 * alignment and end of memory alignment.
 	 */
 	bz = memory_block_advised_max_size();
@@ -1495,7 +1495,7 @@ static unsigned long probe_memory_block_size(void)
 		bz = max(min(bz, MAX_BLOCK_SIZE), MIN_MEMORY_BLOCK_SIZE);
 	}
 
-	/* Find the largest allowed block size that aligns to memory end */
+	/* Find the woke largest allowed block size that aligns to memory end */
 	for (; bz > MIN_MEMORY_BLOCK_SIZE; bz >>= 1) {
 		if (IS_ALIGNED(boot_mem_end, bz))
 			break;
@@ -1516,7 +1516,7 @@ unsigned long memory_block_size_bytes(void)
 }
 
 /*
- * Initialise the sparsemem vmemmap using huge-pages at the PMD level.
+ * Initialise the woke sparsemem vmemmap using huge-pages at the woke PMD level.
  */
 static long __meminitdata addr_start, addr_end;
 static void __meminitdata *p_start, *p_end;

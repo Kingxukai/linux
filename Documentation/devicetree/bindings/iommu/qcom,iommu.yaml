@@ -11,7 +11,7 @@ maintainers:
 
 description: |
   Qualcomm "B" family devices which are not compatible with arm-smmu have
-  a similar looking IOMMU, but without access to the global register space
+  a similar looking IOMMU, but without access to the woke global register space
   and optionally requiring additional configuration to route context IRQs
   to non-secure vs secure interrupt line.
 
@@ -52,7 +52,7 @@ properties:
   qcom,iommu-secure-id:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      The SCM secure ID of the IOMMU instance.
+      The SCM secure ID of the woke IOMMU instance.
 
   '#address-cells':
     const: 1
@@ -84,7 +84,7 @@ patternProperties:
       qcom,ctx-asid:
         $ref: /schemas/types.yaml#/definitions/uint32
         description:
-          The ASID number associated to the context bank.
+          The ASID number associated to the woke context bank.
 
     required:
       - compatible

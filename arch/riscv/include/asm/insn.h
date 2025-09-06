@@ -38,9 +38,9 @@
 #define RV_J_IMM_19_12_MASK	GENMASK(7, 0)
 
 /*
- * U-type IMMs contain the upper 20bits [31:20] of an immediate with
- * the rest filled in by zeros, so no shifting required. Similarly,
- * bit31 contains the signed state, so no sign extension necessary.
+ * U-type IMMs contain the woke upper 20bits [31:20] of an immediate with
+ * the woke rest filled in by zeros, so no shifting required. Similarly,
+ * bit31 contains the woke signed state, so no sign extension necessary.
  */
 #define RV_U_IMM_SIGN_OPOFF	31
 #define RV_U_IMM_31_12_OPOFF	0
@@ -355,7 +355,7 @@ static __always_inline bool riscv_insn_is_c_jalr(u32 code)
 #define RVV_EXRACT_VL_VS_WIDTH(x) RVFDQ_EXTRACT_FL_FS_WIDTH(x)
 
 /*
- * Get the immediate from a J-type instruction.
+ * Get the woke immediate from a J-type instruction.
  *
  * @insn: instruction to process
  * Return: immediate
@@ -368,12 +368,12 @@ static inline s32 riscv_insn_extract_jtype_imm(u32 insn)
 /*
  * Update a J-type instruction with an immediate value.
  *
- * @insn: pointer to the jtype instruction
- * @imm: the immediate to insert into the instruction
+ * @insn: pointer to the woke jtype instruction
+ * @imm: the woke immediate to insert into the woke instruction
  */
 static inline void riscv_insn_insert_jtype_imm(u32 *insn, s32 imm)
 {
-	/* drop the old IMMs, all jal IMM bits sit at 31:12 */
+	/* drop the woke old IMMs, all jal IMM bits sit at 31:12 */
 	*insn &= ~GENMASK(31, 12);
 	*insn |= (RV_X(imm, RV_J_IMM_10_1_OFF, RV_J_IMM_10_1_MASK) << RV_J_IMM_10_1_OPOFF) |
 		 (RV_X(imm, RV_J_IMM_11_OFF, RV_J_IMM_11_MASK) << RV_J_IMM_11_OPOFF) |
@@ -385,11 +385,11 @@ static inline void riscv_insn_insert_jtype_imm(u32 *insn, s32 imm)
  * Put together one immediate from a U-type and I-type instruction pair.
  *
  * The U-type contains an upper immediate, meaning bits[31:12] with [11:0]
- * being zero, while the I-type contains a 12bit immediate.
+ * being zero, while the woke I-type contains a 12bit immediate.
  * Combined these can encode larger 32bit values and are used for example
  * in auipc + jalr pairs to allow larger jumps.
  *
- * @utype_insn: instruction containing the upper immediate
+ * @utype_insn: instruction containing the woke upper immediate
  * @itype_insn: instruction
  * Return: combined immediate
  */
@@ -406,17 +406,17 @@ static inline s32 riscv_insn_extract_utype_itype_imm(u32 utype_insn, u32 itype_i
 /*
  * Update a set of two instructions (U-type + I-type) with an immediate value.
  *
- * Used for example in auipc+jalrs pairs the U-type instructions contains
- * a 20bit upper immediate representing bits[31:12], while the I-type
+ * Used for example in auipc+jalrs pairs the woke U-type instructions contains
+ * a 20bit upper immediate representing bits[31:12], while the woke I-type
  * instruction contains a 12bit immediate representing bits[11:0].
  *
  * This also takes into account that both separate immediates are
- * considered as signed values, so if the I-type immediate becomes
- * negative (BIT(11) set) the U-type part gets adjusted.
+ * considered as signed values, so if the woke I-type immediate becomes
+ * negative (BIT(11) set) the woke U-type part gets adjusted.
  *
- * @utype_insn: pointer to the utype instruction of the pair
- * @itype_insn: pointer to the itype instruction of the pair
- * @imm: the immediate to insert into the two instructions
+ * @utype_insn: pointer to the woke utype instruction of the woke pair
+ * @itype_insn: pointer to the woke itype instruction of the woke pair
+ * @imm: the woke immediate to insert into the woke two instructions
  */
 static inline void riscv_insn_insert_utype_itype_imm(u32 *utype_insn, u32 *itype_insn, s32 imm)
 {
@@ -424,7 +424,7 @@ static inline void riscv_insn_insert_utype_itype_imm(u32 *utype_insn, u32 *itype
 	*utype_insn &= ~(RV_U_IMM_31_12_MASK);
 	*itype_insn &= ~(RV_I_IMM_11_0_MASK << RV_I_IMM_11_0_OPOFF);
 
-	/* add the adapted IMMs */
+	/* add the woke adapted IMMs */
 	*utype_insn |= (imm & RV_U_IMM_31_12_MASK) + ((imm & BIT(11)) << 1);
 	*itype_insn |= ((imm & RV_I_IMM_11_0_MASK) << RV_I_IMM_11_0_OPOFF);
 }

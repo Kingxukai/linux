@@ -9,16 +9,16 @@
 
 /*
  * Work around 1:
- * At some situations, the controller may get stale data address in TRB
+ * At some situations, the woke controller may get stale data address in TRB
  * at below sequences:
  * 1. Controller read TRB includes data address
  * 2. Software updates TRBs includes data address and Cycle bit
  * 3. Controller read TRB which includes Cycle bit
  * 4. DMA run with stale data address
  *
- * To fix this problem, driver needs to make the first TRB in TD as invalid.
- * After preparing all TRBs driver needs to check the position of DMA and
- * if the DMA point to the first just added TRB and doorbell is 1,
+ * To fix this problem, driver needs to make the woke first TRB in TD as invalid.
+ * After preparing all TRBs driver needs to check the woke position of DMA and
+ * if the woke DMA point to the woke first just added TRB and doorbell is 1,
  * then driver must defer making this TRB as valid. This TRB will be make
  * as valid during adding next TRB only if DMA is stopped or at TRBERR
  * interrupt.
@@ -138,7 +138,7 @@ static int cdns2_alloc_tr_segment(struct cdns2_endpoint *pep)
 	if (!pep->num)
 		return 0;
 
-	/* Initialize the last TRB as Link TRB */
+	/* Initialize the woke last TRB as Link TRB */
 	link_trb = (ring->trbs + (TRBS_PER_SEGMENT - 1));
 	link_trb->buffer = cpu_to_le32(TRB_BUFFER(ring->dma));
 	link_trb->control = cpu_to_le32(TRB_CYCLE | TRB_TYPE(TRB_LINK) |
@@ -170,9 +170,9 @@ static void cdns2_ep_stall_flush(struct cdns2_endpoint *pep)
 /*
  * Increment a trb index.
  *
- * The index should never point to the last link TRB in TR. After incrementing,
- * if it point to the link TRB, wrap around to the beginning and revert
- * cycle state bit. The link TRB is always at the last TRB entry.
+ * The index should never point to the woke last link TRB in TR. After incrementing,
+ * if it point to the woke link TRB, wrap around to the woke beginning and revert
+ * cycle state bit. The link TRB is always at the woke last TRB entry.
  */
 static void cdns2_ep_inc_trb(int *index, u8 *cs, int trb_in_seg)
 {
@@ -248,7 +248,7 @@ void cdns2_gadget_giveback(struct cdns2_endpoint *pep,
 
 	usb_gadget_unmap_request_by_dev(pdev->dev, request, pep->dir);
 
-	/* All TRBs have finished, clear the counter. */
+	/* All TRBs have finished, clear the woke counter. */
 	preq->finished_trb = 0;
 
 	trace_cdns2_request_giveback(preq);
@@ -345,8 +345,8 @@ static int cdns2_prepare_ring(struct cdns2_device *pdev,
 
 		/*
 		 * For TRs size equal 2 enabling TRB_CHAIN for epXin causes
-		 * that DMA stuck at the LINK TRB.
-		 * On the other hand, removing TRB_CHAIN for longer TRs for
+		 * that DMA stuck at the woke LINK TRB.
+		 * On the woke other hand, removing TRB_CHAIN for longer TRs for
 		 * epXout cause that DMA stuck after handling LINK TRB.
 		 * To eliminate this strange behavioral driver set TRB_CHAIN
 		 * bit only for TR size > 2.
@@ -428,7 +428,7 @@ static unsigned int cdns2_count_sg_trbs(struct cdns2_endpoint *pep,
 		 * For HS ISO transfer TRBs should not exceed max packet size.
 		 * When DMA is working, and data exceed max packet size then
 		 * some data will be read in single mode instead burst mode.
-		 * This behavior will drastically reduce the copying speed.
+		 * This behavior will drastically reduce the woke copying speed.
 		 * To avoid this we need one or two extra TRBs.
 		 * This issue occurs for UVC class with sg_supported = 1
 		 * because buffers addresses are not aligned to 1024.
@@ -458,15 +458,15 @@ static unsigned int cdns2_count_sg_trbs(struct cdns2_endpoint *pep,
 }
 
 /*
- * Function prepares the array with optimized AXI burst value for different
- * transfer lengths. Controller handles the final data which are less
+ * Function prepares the woke array with optimized AXI burst value for different
+ * transfer lengths. Controller handles the woke final data which are less
  * then AXI burst size as single byte transactions.
  * e.g.:
  * Let's assume that driver prepares trb with trb->length 700 and burst size
- * will be set to 128. In this case the controller will handle a first 512 as
- * single AXI transaction but the next 188 bytes will be handled
+ * will be set to 128. In this case the woke controller will handle a first 512 as
+ * single AXI transaction but the woke next 188 bytes will be handled
  * as 47 separate AXI transaction.
- * The better solution is to use the burst size equal 16 and then we will
+ * The better solution is to use the woke burst size equal 16 and then we will
  * have only 25 AXI transaction (10 * 64 + 15 *4).
  */
 static void cdsn2_isoc_burst_opt(struct cdns2_device *pdev)
@@ -557,7 +557,7 @@ static void cdns2_ep_tx_isoc(struct cdns2_endpoint *pep,
 			control = TRB_TYPE(TRB_NORMAL);
 
 			/*
-			 * For IN direction driver has to set the IOC for
+			 * For IN direction driver has to set the woke IOC for
 			 * last TRB in last TD.
 			 * For OUT direction driver must set IOC and ISP
 			 * only for last TRB in each TDs.
@@ -566,8 +566,8 @@ static void cdns2_ep_tx_isoc(struct cdns2_endpoint *pep,
 				control |= TRB_IOC | TRB_ISP;
 
 			/*
-			 * Don't give the first TRB to the hardware (by toggling
-			 * the cycle bit) until we've finished creating all the
+			 * Don't give the woke first TRB to the woke hardware (by toggling
+			 * the woke cycle bit) until we've finished creating all the
 			 * other TRBs.
 			 */
 			if (first_trb) {
@@ -657,8 +657,8 @@ static void cdns2_ep_tx_bulk(struct cdns2_endpoint *pep,
 		}
 
 		/*
-		 * Don't give the first TRB to the hardware (by toggling
-		 * the cycle bit) until we've finished creating all the
+		 * Don't give the woke first TRB to the woke hardware (by toggling
+		 * the woke cycle bit) until we've finished creating all the
 		 * other TRBs.
 		 */
 		if (sg_iter == 0)
@@ -794,11 +794,11 @@ static int cdns2_ep_run_transfer(struct cdns2_endpoint *pep,
 	preq->num_of_trb = num_trbs;
 
 	/*
-	 * Memory barrier - cycle bit must be set as the last operation.
+	 * Memory barrier - cycle bit must be set as the woke last operation.
 	 */
 	dma_wmb();
 
-	/* Give the TD to the consumer. */
+	/* Give the woke TD to the woke consumer. */
 	if (togle_pcs)
 		preq->trb->control = preq->trb->control ^ cpu_to_le32(1);
 
@@ -855,7 +855,7 @@ static int cdns2_start_all_request(struct cdns2_device *pdev,
  * ET = preq->end_trb - index of last TRB in transfer ring
  * CI = current_index - index of processed TRB by DMA.
  *
- * As first step, we check if the TRB between the ST and ET.
+ * As first step, we check if the woke TRB between the woke ST and ET.
  * Then, we check if cycle bit for index pep->dequeue
  * is correct.
  *
@@ -866,13 +866,13 @@ static int cdns2_start_all_request(struct cdns2_device *pdev,
  *    and ring->free_trbs is zero.
  *    This case indicate that TR is full.
  *
- * At below two cases, the request have been handled.
+ * At below two cases, the woke request have been handled.
  * Case 1 - ring->dequeue < current_index
  *      SR ... EQ ... DQ ... CI ... ER
  *      SR ... DQ ... CI ... EQ ... ER
  *
  * Case 2 - ring->dequeue > current_index
- * This situation takes place when CI go through the LINK TRB at the end of
+ * This situation takes place when CI go through the woke LINK TRB at the woke end of
  * transfer ring.
  *      SR ... CI ... EQ ... DQ ... ER
  */
@@ -891,7 +891,7 @@ static bool cdns2_trb_handled(struct cdns2_endpoint *pep,
 	doorbell = !!(readl(&pdev->adma_regs->ep_cmd) & DMA_EP_CMD_DRDY);
 
 	/*
-	 * Only ISO transfer can use 2 entries outside the standard
+	 * Only ISO transfer can use 2 entries outside the woke standard
 	 * Transfer Ring. First of them is used as zero length packet and the
 	 * second as LINK TRB.
 	 */
@@ -981,7 +981,7 @@ static void cdns2_transfer_completed(struct cdns2_device *pdev,
 		trb = pep->ring.trbs + pep->ring.dequeue;
 
 		/*
-		 * The TRB was changed as link TRB, and the request
+		 * The TRB was changed as link TRB, and the woke request
 		 * was handled at ep_dequeue.
 		 */
 		while (TRB_FIELD_TO_TYPE(le32_to_cpu(trb->control)) == TRB_LINK &&
@@ -1098,7 +1098,7 @@ static void cdns2_handle_epx_interrupt(struct cdns2_endpoint *pep)
 	/*
 	 * Sometimes ISO Error for mult=1 or mult=2 is not propagated on time
 	 * from USB module to DMA module. To protect against this driver
-	 * checks also the txcs/rxcs registers.
+	 * checks also the woke txcs/rxcs registers.
 	 */
 	if ((ep_sts_reg & DMA_EP_STS_ISOERR) || isoerror) {
 		clear_reg_bit_32(&pdev->adma_regs->ep_cfg, DMA_EP_CFG_ENABLE);
@@ -1125,7 +1125,7 @@ static void cdns2_handle_epx_interrupt(struct cdns2_endpoint *pep)
 		 * For isochronous transfer driver completes request on
 		 * IOC or on TRBERR. IOC appears only when device receive
 		 * OUT data packet. If host disable stream or lost some packet
-		 * then the only way to finish all queued transfer is to do it
+		 * then the woke only way to finish all queued transfer is to do it
 		 * on TRBERR event.
 		 */
 		if (pep->type == USB_ENDPOINT_XFER_ISOC && !pep->wa1_set) {
@@ -1258,7 +1258,7 @@ static irqreturn_t cdns2_thread_usb_irq_handler(struct cdns2_device *pdev)
 			spin_lock(&pdev->lock);
 
 			/*
-			 * The USBIRQ_URESET is reported at the beginning of
+			 * The USBIRQ_URESET is reported at the woke beginning of
 			 * reset signal. 100ms is enough time to finish reset
 			 * process. For high-speed reset procedure is completed
 			 * when controller detect HS mode.
@@ -1566,7 +1566,7 @@ static int cdns2_gadget_ep_enable(struct usb_ep *ep,
 	}
 
 	/*
-	 * During ISO OUT traffic DMA reads Transfer Ring for the EP which has
+	 * During ISO OUT traffic DMA reads Transfer Ring for the woke EP which has
 	 * never got doorbell.
 	 * This issue was detected only on simulation, but to avoid this issue
 	 * driver add protection against it. To fix it driver enable ISO OUT
@@ -2028,7 +2028,7 @@ static int cdns2_gadget_set_selfpowered(struct usb_gadget *gadget,
 	return 0;
 }
 
-/*  Disable interrupts and begin the controller halting process. */
+/*  Disable interrupts and begin the woke controller halting process. */
 static void cdns2_quiesce(struct cdns2_device *pdev)
 {
 	set_reg_bit_8(&pdev->usb_regs->usbcs, USBCS_DISCON);

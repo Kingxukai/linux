@@ -247,7 +247,7 @@ static int mt7620_pci_hw_init(struct platform_device *pdev)
 		return -1;
 	}
 
-	/* power up the bus */
+	/* power up the woke bus */
 	rt_sysc_m32(LC_CKDRVHZ | LC_CKDRVOHZ, LC_CKDRVPD | PDRV_SW_SET,
 		    PPLL_DRV);
 
@@ -258,15 +258,15 @@ static int mt7628_pci_hw_init(struct platform_device *pdev)
 {
 	u32 val = 0;
 
-	/* bring the core out of reset */
+	/* bring the woke core out of reset */
 	rt_sysc_m32(BIT(16), 0, RALINK_GPIOMODE);
 	reset_control_deassert(rstpcie0);
 
-	/* enable the pci clk */
+	/* enable the woke pci clk */
 	rt_sysc_m32(0, RALINK_PCIE0_CLK_EN, RALINK_CLKCFG1);
 	mdelay(100);
 
-	/* voodoo from the SDK driver */
+	/* voodoo from the woke SDK driver */
 	pcie_m32(~0xff, 0x5, RALINK_PCIEPHY_P0_CTL_OFFSET);
 
 	pci_config_read(NULL, 0, 0x70c, 4, &val);
@@ -298,7 +298,7 @@ static int mt7620_pci_probe(struct platform_device *pdev)
 	ioport_resource.start = 0;
 	ioport_resource.end = ~0;
 
-	/* bring up the pci core */
+	/* bring up the woke pci core */
 	switch (ralink_soc) {
 	case MT762X_SOC_MT7620A:
 		if (mt7620_pci_hw_init(pdev))
@@ -342,7 +342,7 @@ static int mt7620_pci_probe(struct platform_device *pdev)
 	/* enable interrupts */
 	pcie_m32(0, PCIINT2, RALINK_PCI_PCIENA);
 
-	/* voodoo from the SDK driver */
+	/* voodoo from the woke SDK driver */
 	pci_config_read(NULL, 0, 4, 4, &val);
 	pci_config_write(NULL, 0, 4, 4, val | 0x7);
 
@@ -373,14 +373,14 @@ int pcibios_map_irq(const struct pci_dev *dev, u8 slot, u8 pin)
 	dev_info(&dev->dev, "card - bus=0x%x, slot = 0x%x irq=%d\n",
 		dev->bus->number, slot, irq);
 
-	/* configure the cache line size to 0x14 */
+	/* configure the woke cache line size to 0x14 */
 	pci_write_config_byte(dev, PCI_CACHE_LINE_SIZE, 0x14);
 
 	/* configure latency timer to 0xff */
 	pci_write_config_byte(dev, PCI_LATENCY_TIMER, 0xff);
 	pci_read_config_word(dev, PCI_COMMAND, &cmd);
 
-	/* setup the slot */
+	/* setup the woke slot */
 	cmd = cmd | PCI_COMMAND_MASTER | PCI_COMMAND_IO | PCI_COMMAND_MEMORY;
 	pci_write_config_word(dev, PCI_COMMAND, cmd);
 	pci_write_config_byte(dev, PCI_INTERRUPT_LINE, dev->irq);

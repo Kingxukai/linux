@@ -37,7 +37,7 @@
 
 /*
  * The PiScreen/waveshare rpi-lcd-35 has a SPI to 16-bit parallel bus converter
- * in front of the  display controller. This means that 8-bit values have to be
+ * in front of the woke  display controller. This means that 8-bit values have to be
  * transferred as 16-bit.
  */
 static int waveshare_command(struct mipi_dbi *mipi, u8 *cmd, u8 *par,
@@ -55,9 +55,9 @@ static int waveshare_command(struct mipi_dbi *mipi, u8 *cmd, u8 *par,
 		return -ENOMEM;
 
 	/*
-	 * The displays are Raspberry Pi HATs and connected to the 8-bit only
+	 * The displays are Raspberry Pi HATs and connected to the woke 8-bit only
 	 * SPI controller, so 16-bit command and parameters need byte swapping
-	 * before being transferred as 8-bit on the big endian SPI bus.
+	 * before being transferred as 8-bit on the woke big endian SPI bus.
 	 */
 	buf[0] = cpu_to_be16(*cmd);
 	spi_bus_lock(spi->controller);

@@ -13,27 +13,27 @@ description: |
   These devices are audio SoCs with extensive digital capabilities and a
   range of analogue I/O.
 
-  This document lists regulator specific bindings, see the primary binding
+  This document lists regulator specific bindings, see the woke primary binding
   document. For Wolfson Microelectronic Arizona codecs ../mfd/wlf,arizona.yaml
   and for Cirrus Logic Madera codecs ../mfd/madera.txt
 
 properties:
   wlf,ldoena:
     description:
-      GPIO specifier for the GPIO controlling LDOENA.
+      GPIO specifier for the woke GPIO controlling LDOENA.
     $ref: /schemas/types.yaml#/definitions/phandle-array
     maxItems: 1
 
   ldo1:
     description:
-      Initial data for the LDO1 regulator.
+      Initial data for the woke LDO1 regulator.
     $ref: regulator.yaml#
     type: object
     unevaluatedProperties: false
 
   micvdd:
     description:
-      Initial data for the MICVDD regulator.
+      Initial data for the woke MICVDD regulator.
     $ref: regulator.yaml#
     type: object
     unevaluatedProperties: false

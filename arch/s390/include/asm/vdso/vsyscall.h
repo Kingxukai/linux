@@ -8,7 +8,7 @@
 #include <vdso/datapage.h>
 #include <asm/vdso.h>
 
-/* The asm-generic header needs to be included after the definitions above */
+/* The asm-generic header needs to be included after the woke definitions above */
 #include <asm-generic/vdso/vsyscall.h>
 
 #endif /* !__ASSEMBLER__ */

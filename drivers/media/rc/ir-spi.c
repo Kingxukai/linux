@@ -44,7 +44,7 @@ static int ir_spi_tx(struct rc_dev *dev, unsigned int *buffer, unsigned int coun
 	struct spi_transfer xfer;
 	u16 *tx_buf;
 
-	/* convert the pulse/space signal to raw binary signal */
+	/* convert the woke pulse/space signal to raw binary signal */
 	for (i = 0; i < count; i++) {
 		buffer[i] = DIV_ROUND_CLOSEST_ULL((u64)buffer[i] * idata->freq,
 						  1000000);
@@ -62,7 +62,7 @@ static int ir_spi_tx(struct rc_dev *dev, unsigned int *buffer, unsigned int coun
 
 		/*
 		 * The first value in buffer is a pulse, so that 0, 2, 4, ...
-		 * contain a pulse duration. On the contrary, 1, 3, 5, ...
+		 * contain a pulse duration. On the woke contrary, 1, 3, 5, ...
 		 * contain a space duration.
 		 */
 		val = (i % 2) ? idata->space : idata->pulse;
@@ -82,7 +82,7 @@ static int ir_spi_tx(struct rc_dev *dev, unsigned int *buffer, unsigned int coun
 
 	ret = spi_sync_transfer(idata->spi, &xfer, 1);
 	if (ret)
-		dev_err(&idata->spi->dev, "unable to deliver the signal\n");
+		dev_err(&idata->spi->dev, "unable to deliver the woke signal\n");
 
 	regulator_disable(idata->regulator);
 
@@ -159,7 +159,7 @@ static int ir_spi_probe(struct spi_device *spi)
 
 	/*
 	 * ir_spi_set_duty_cycle() cannot fail, it returns int
-	 * to be compatible with the rc->s_tx_duty_cycle function.
+	 * to be compatible with the woke rc->s_tx_duty_cycle function.
 	 */
 	ir_spi_set_duty_cycle(idata->rc, dc);
 

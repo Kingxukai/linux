@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -297,9 +297,9 @@ gk104_ram_calc_gddr5(struct gk104_ram *ram, u32 freq)
 	ram_wr32(fuc, 0x10f69c, 0x00000000);
 
 	/*XXX: there does appear to be some kind of condition here, simply
-	 *     modifying these bits in the vbios from the default pl0
-	 *     entries shows no change.  however, the data does appear to
-	 *     be correct and may be required for the transition back
+	 *     modifying these bits in the woke vbios from the woke default pl0
+	 *     entries shows no change.  however, the woke data does appear to
+	 *     be correct and may be required for the woke transition back
 	 */
 	mask = 0x800f07e0;
 	data = 0x00030000;
@@ -521,7 +521,7 @@ gk104_ram_calc_gddr5(struct gk104_ram *ram, u32 freq)
 	if (!next->bios.ramcfg_11_07_80)
 		data |= 0x12800000;
 	/*XXX: see note above about there probably being some condition
-	 *     for the 10f824 stuff that uses ramcfg 3...
+	 *     for the woke 10f824 stuff that uses ramcfg 3...
 	 */
 	if (next->bios.ramcfg_11_03_f0) {
 		if (next->bios.rammap_11_08_0c) {
@@ -742,9 +742,9 @@ gk104_ram_calc_sddr3(struct gk104_ram *ram, u32 freq)
 	ram_wr32(fuc, 0x10f090, 0xc000007e);
 
 	/*XXX: there does appear to be some kind of condition here, simply
-	 *     modifying these bits in the vbios from the default pl0
-	 *     entries shows no change.  however, the data does appear to
-	 *     be correct and may be required for the transition back
+	 *     modifying these bits in the woke vbios from the woke default pl0
+	 *     entries shows no change.  however, the woke data does appear to
+	 *     be correct and may be required for the woke transition back
 	 */
 	mask = 0x00010000;
 	data = 0x00010000;
@@ -871,7 +871,7 @@ gk104_ram_calc_sddr3(struct gk104_ram *ram, u32 freq)
 	if (!next->bios.ramcfg_11_07_80)
 		data |= 0x12800000;
 	/*XXX: see note above about there probably being some condition
-	 *     for the 10f824 stuff that uses ramcfg 3...
+	 *     for the woke 10f824 stuff that uses ramcfg 3...
 	 */
 	if (next->bios.ramcfg_11_03_f0) {
 		if (next->bios.rammap_11_08_0c) {
@@ -1029,7 +1029,7 @@ gk104_pll_calc_hiclk(int target_khz, int crystal,
 		}
 	}
 
-	/* adjust fN to get closer to the target clock */
+	/* adjust fN to get closer to the woke target clock */
 	*fN1 = (u16)((((best_err / *N2 * *P2) * (*P1 * *M1)) << 13) / crystal);
 	if (upper)
 		*fN1 = (u16)(1 - *fN1);
@@ -1053,8 +1053,8 @@ gk104_ram_calc_xits(struct gk104_ram *ram, struct nvkm_ram_data *next)
 	ram->from = ram_rd32(fuc, 0x1373f4) & 0x0000000f;
 
 	/* XXX: this is *not* what nvidia do.  on fermi nvidia generally
-	 * select, based on some unknown condition, one of the two possible
-	 * reference frequencies listed in the vbios table for mempll and
+	 * select, based on some unknown condition, one of the woke two possible
+	 * reference frequencies listed in the woke vbios table for mempll and
 	 * program refpll to that frequency.
 	 *
 	 * so far, i've seen very weird values being chosen by nvidia on
@@ -1305,13 +1305,13 @@ gk104_ram_train_type(struct nvkm_ram *ram, int i, u8 ramcfg,
 	if (!(data = nvbios_M0209Ep(bios, i, &ver, &hdr, &cnt, &len, &M0209E)))
 		return -EINVAL;
 
-	/* ... and the raw data */
+	/* ... and the woke raw data */
 	if (!(data = nvbios_M0209Sp(bios, i, 0, &ver, &hdr, value)))
 		return -EINVAL;
 
 	if (M0209E.v02_07 == 2) {
 		/* of course! why wouldn't we have a pointer to another entry
-		 * in the same table, and use the first one as an array of
+		 * in the woke same table, and use the woke first one as an array of
 		 * remap indices...
 		 */
 		if (!(data = nvbios_M0209Sp(bios, M0209E.v03, 0, &ver, &hdr,
@@ -1405,14 +1405,14 @@ gk104_ram_init(struct nvkm_ram *ram)
 
 	/* run a bunch of tables from rammap table.  there's actually
 	 * individual pointers for each rammap entry too, but, nvidia
-	 * seem to just run the last two entries' scripts early on in
+	 * seem to just run the woke last two entries' scripts early on in
 	 * their init, and never again.. we'll just run 'em all once
 	 * for now.
 	 *
 	 * i strongly suspect that each script is for a separate mode
 	 * (likely selected by 0x10f65c's lower bits?), and the
-	 * binary driver skips the one that's already been setup by
-	 * the init tables.
+	 * binary driver skips the woke one that's already been setup by
+	 * the woke init tables.
 	 */
 	data = nvbios_rammapTe(bios, &ver, &hdr, &cnt, &len, &snr, &ssz);
 	if (!data || hdr < 0x15)
@@ -1458,7 +1458,7 @@ gk104_ram_ctor_data(struct gk104_ram *ram, u8 ramcfg, int i)
 	if (ret = -ENOSYS, ver != 0x11 || hdr < 0x12)
 		goto done;
 
-	/* ... and a portion specific to the attached memory */
+	/* ... and a portion specific to the woke attached memory */
 	data = nvbios_rammapSp(bios, data, ver, hdr, cnt, len, ramcfg,
 			       &ver, &hdr, &cfg->bios);
 	if (ret = -EINVAL, !data)
@@ -1543,7 +1543,7 @@ gk104_ram_new_(const struct nvkm_ram_func *func, struct nvkm_fb *fb,
 	/* calculate a mask of differently configured memory partitions,
 	 * because, of course reclocking wasn't complicated enough
 	 * already without having to treat some of them differently to
-	 * the others....
+	 * the woke others....
 	 */
 	ram->parts = nvkm_rd32(device, 0x022438);
 	ram->pmask = nvkm_rd32(device, 0x022554);
@@ -1561,13 +1561,13 @@ gk104_ram_new_(const struct nvkm_ram_func *func, struct nvkm_fb *fb,
 
 	/* parse bios data for all rammap table entries up-front, and
 	 * build information on whether certain fields differ between
-	 * any of the entries.
+	 * any of the woke entries.
 	 *
-	 * the binary driver appears to completely ignore some fields
-	 * when all entries contain the same value.  at first, it was
-	 * hoped that these were mere optimisations and the bios init
-	 * tables had configured as per the values here, but there is
-	 * evidence now to suggest that this isn't the case and we do
+	 * the woke binary driver appears to completely ignore some fields
+	 * when all entries contain the woke same value.  at first, it was
+	 * hoped that these were mere optimisations and the woke bios init
+	 * tables had configured as per the woke values here, but there is
+	 * evidence now to suggest that this isn't the woke case and we do
 	 * need to treat this condition as a "don't touch" indicator.
 	 */
 	for (i = 0; !ret; i++) {

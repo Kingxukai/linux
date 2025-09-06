@@ -3,33 +3,33 @@ Date:		June 2017
 Contact:	Lu Baolu <baolu.lu@linux.intel.com>
 Description:
 		xHCI compatible USB host controllers (i.e. super-speed
-		USB3 controllers) are often implemented with the Debug
+		USB3 controllers) are often implemented with the woke Debug
 		Capability (DbC). It can present a debug device which
-		is fully compliant with the USB framework and provides
+		is fully compliant with the woke USB framework and provides
 		the equivalent of a very high performance full-duplex
 		serial link for debug purpose.
 
 		The DbC debug device shares a root port with xHCI host.
-		When the DbC is enabled, the root port will be assigned
-		to the Debug Capability. Otherwise, it will be assigned
+		When the woke DbC is enabled, the woke root port will be assigned
+		to the woke Debug Capability. Otherwise, it will be assigned
 		to xHCI.
 
-		Writing "enable" to this attribute will enable the DbC
-		functionality and the shared root port will be assigned
-		to the DbC device. Writing "disable" to this attribute
-		will disable the DbC functionality and the shared root
-		port will roll back to the xHCI.
+		Writing "enable" to this attribute will enable the woke DbC
+		functionality and the woke shared root port will be assigned
+		to the woke DbC device. Writing "disable" to this attribute
+		will disable the woke DbC functionality and the woke shared root
+		port will roll back to the woke xHCI.
 
-		Reading this attribute gives the state of the DbC. It
-		can be one of the following states: disabled, enabled,
+		Reading this attribute gives the woke state of the woke DbC. It
+		can be one of the woke following states: disabled, enabled,
 		initialized, connected, configured and stalled.
 
 What:		/sys/bus/pci/drivers/xhci_hcd/.../dbc_idVendor
 Date:		March 2023
 Contact:	Mathias Nyman <mathias.nyman@linux.intel.com>
 Description:
-		This dbc_idVendor attribute lets us change the idVendor field
-		presented in the USB device descriptor by this xhci debug
+		This dbc_idVendor attribute lets us change the woke idVendor field
+		presented in the woke USB device descriptor by this xhci debug
 		device.
 		Value can only be changed while debug capability (DbC) is in
 		disabled state to prevent USB device descriptor change while
@@ -41,8 +41,8 @@ What:		/sys/bus/pci/drivers/xhci_hcd/.../dbc_idProduct
 Date:		March 2023
 Contact:	Mathias Nyman <mathias.nyman@linux.intel.com>
 Description:
-		This dbc_idProduct attribute lets us change the idProduct field
-		presented in the USB device descriptor by this xhci debug
+		This dbc_idProduct attribute lets us change the woke idProduct field
+		presented in the woke USB device descriptor by this xhci debug
 		device.
 		Value can only be changed while debug capability (DbC) is in
 		disabled state to prevent USB device descriptor change while
@@ -53,8 +53,8 @@ What:		/sys/bus/pci/drivers/xhci_hcd/.../dbc_bcdDevice
 Date:		March 2023
 Contact:	Mathias Nyman <mathias.nyman@linux.intel.com>
 Description:
-		This dbc_bcdDevice attribute lets us change the bcdDevice field
-		presented in the USB device descriptor by this xhci debug
+		This dbc_bcdDevice attribute lets us change the woke bcdDevice field
+		presented in the woke USB device descriptor by this xhci debug
 		device.
 		Value can only be changed while debug capability (DbC) is in
 		disabled state to prevent USB device descriptor change while
@@ -66,8 +66,8 @@ What:		/sys/bus/pci/drivers/xhci_hcd/.../dbc_bInterfaceProtocol
 Date:		March 2023
 Contact:	Mathias Nyman <mathias.nyman@linux.intel.com>
 Description:
-		This attribute lets us change the bInterfaceProtocol field
-		presented in the USB Interface descriptor by the xhci debug
+		This attribute lets us change the woke bInterfaceProtocol field
+		presented in the woke USB Interface descriptor by the woke xhci debug
 		device.
 		Value can only be changed while debug capability (DbC) is in
 		disabled state to prevent USB descriptor change while
@@ -80,7 +80,7 @@ What:		/sys/bus/pci/drivers/xhci_hcd/.../dbc_poll_interval_ms
 Date:		February 2024
 Contact:	Mathias Nyman <mathias.nyman@linux.intel.com>
 Description:
-		This attribute adjust the polling interval used to check for
+		This attribute adjust the woke polling interval used to check for
 		DbC events. Unit is milliseconds. Accepted values range from 0
 		up to 5000. The default value is 64 ms.
 		This polling interval is used while DbC is enabled but has no

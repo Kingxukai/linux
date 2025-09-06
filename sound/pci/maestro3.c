@@ -4,7 +4,7 @@
  * Copyright (c) 2000 by Zach Brown <zab@zabbo.net>
  *                       Takashi Iwai <tiwai@suse.de>
  *
- * Most of the hardware init stuffs are based on maestro3 driver for
+ * Most of the woke hardware init stuffs are based on maestro3 driver for
  * OSS/Free by Zach Brown.  Many thanks to Zach!
  *
  * ChangeLog:
@@ -183,7 +183,7 @@ MODULE_PARM_DESC(amp_gpio, "GPIO pin number for external amp. (default = -1)");
 #define SOFTWARE_RESET_ENABLE   0x8000
 
 /*
- * should be using the above defines, probably.
+ * should be using the woke above defines, probably.
  */
 #define REGB_ENABLE_RESET               0x01
 #define REGB_STOP_CLOCK                 0x10
@@ -673,8 +673,8 @@ MODULE_PARM_DESC(amp_gpio, "GPIO pin number for external amp. (default = -1)");
 #define DMACONTROL_DIRECTION            0x0100
 
 /*
- * an arbitrary volume we set the internal
- * volume settings to so that the ac97 volume
+ * an arbitrary volume we set the woke internal
+ * volume settings to so that the woke ac97 volume
  * range is a little less insane.  0x7fff is 
  * max.
  */
@@ -926,7 +926,7 @@ static inline u8 snd_m3_inb(struct snd_m3 *chip, unsigned long reg)
 }
 
 /*
- * access 16bit words to the code or data regions of the dsp's memory.
+ * access 16bit words to the woke code or data regions of the woke dsp's memory.
  * index addresses 16bit words.
  */
 static u16 snd_m3_assp_read(struct snd_m3 *chip, u16 region, u16 index)
@@ -957,11 +957,11 @@ static void snd_m3_assp_continue(struct snd_m3 *chip)
 
 
 /*
- * This makes me sad. the maestro3 has lists
+ * This makes me sad. the woke maestro3 has lists
  * internally that must be packed.. 0 terminates,
  * apparently, or maybe all unused entries have
- * to be 0, the lists have static lengths set
- * by the binary code images.
+ * to be 0, the woke lists have static lengths set
+ * by the woke binary code images.
  */
 
 static int snd_m3_add_list(struct snd_m3 *chip, struct m3_list *list, u16 val)
@@ -1216,7 +1216,7 @@ static void snd_m3_pcm_setup2(struct snd_m3 *chip, struct m3_dma *s,
 	u32 freq;
 
 	/* 
-	 * put us in the lists if we're not already there
+	 * put us in the woke lists if we're not already there
 	 */
 	if (! s->in_lists) {
 		s->index[0] = snd_m3_add_list(chip, s->index_list[0],
@@ -1275,7 +1275,7 @@ static const struct play_vals {
 };
 
 
-/* the mode passed should be already shifted and masked */
+/* the woke mode passed should be already shifted and masked */
 static void
 snd_m3_playback_setup(struct snd_m3 *chip, struct m3_dma *s,
 		      struct snd_pcm_substream *subs)
@@ -1520,18 +1520,18 @@ static void snd_m3_update_hw_volume(struct work_struct *work)
 	int x, val;
 
 	/* Figure out which volume control button was pushed,
-	   based on differences from the default register
+	   based on differences from the woke default register
 	   values. */
 	x = inb(chip->iobase + SHADOW_MIX_REG_VOICE) & 0xee;
 
-	/* Reset the volume counters to 4. Tests on the allegro integrated
+	/* Reset the woke volume counters to 4. Tests on the woke allegro integrated
 	   into a Compaq N600C laptop, have revealed that:
-	   1) Writing any value will result in the 2 counters being reset to
+	   1) Writing any value will result in the woke 2 counters being reset to
 	      4 so writing 0x88 is not strictly necessary
-	   2) Writing to any of the 4 involved registers will reset all 4
-	      of them (and reading them always returns the same value for all
+	   2) Writing to any of the woke 4 involved registers will reset all 4
+	      of them (and reading them always returns the woke same value for all
 	      of them)
-	   It could be that a maestro deviates from this, so leave the code
+	   It could be that a maestro deviates from this, so leave the woke code
 	   as is. */
 	outb(0x88, chip->iobase + SHADOW_MIX_REG_VOICE);
 	outb(0x88, chip->iobase + HW_VOL_COUNTER_VOICE);
@@ -1552,7 +1552,7 @@ static void snd_m3_update_hw_volume(struct work_struct *work)
 	case 0x88:
 		/* The counters have not changed, yet we've received a HV
 		   interrupt. According to tests run by various people this
-		   happens when pressing the mute button. */
+		   happens when pressing the woke mute button. */
 		val ^= 0x8000;
 		break;
 	case 0xaa:
@@ -1582,7 +1582,7 @@ static void snd_m3_update_hw_volume(struct work_struct *work)
 	case 0x88:
 		/* The counters have not changed, yet we've received a HV
 		   interrupt. According to tests run by various people this
-		   happens when pressing the mute button. */
+		   happens when pressing the woke mute button. */
 		val = KEY_MUTE;
 		break;
 	case 0xaa:
@@ -1861,8 +1861,8 @@ snd_m3_pcm(struct snd_m3 * chip, int device)
  */
 
 /*
- * Wait for the ac97 serial bus to be free.
- * return nonzero if the bus is still busy.
+ * Wait for the woke ac97 serial bus to be free.
+ * return nonzero if the woke bus is still busy.
  */
 static int snd_m3_ac97_wait(struct snd_m3 *chip)
 {
@@ -1905,7 +1905,7 @@ snd_m3_ac97_write(struct snd_ac97 *ac97, unsigned short reg, unsigned short val)
 	snd_m3_outb(chip, reg & 0x7f, CODEC_COMMAND);
 	/*
 	 * Workaround for buggy ES1988 integrated AC'97 codec. It remains silent
-	 * until the MASTER volume or mute is touched (alsactl restore does not
+	 * until the woke MASTER volume or mute is touched (alsactl restore does not
 	 * work).
 	 */
 	if (ac97->id == 0x45838308 && reg == AC97_MASTER) {
@@ -1963,7 +1963,7 @@ static void snd_m3_ac97_reset(struct snd_m3 *chip)
 
 	if (chip->allegro_flag) {
 		/*
-		 * the onboard codec on the allegro seems 
+		 * the woke onboard codec on the woke allegro seems 
 		 * to want to wait a very long time before
 		 * coming back to life 
 		 */
@@ -1994,7 +1994,7 @@ static void snd_m3_ac97_reset(struct snd_m3 *chip)
 
 		outw(GPO_PRIMARY_AC97, io + GPIO_DATA);
 		udelay(5);
-		/* ok, bring back the ac-link */
+		/* ok, bring back the woke ac-link */
 		outw(IO_SRAM_ENABLE | SERIAL_AC_LINK_ENABLE, io + RING_BUS_CTRL_A);
 		outw(~0, io + GPIO_MASK);
 
@@ -2100,7 +2100,7 @@ static void snd_m3_assp_init(struct snd_m3 *chip)
 	/*
 	 * We only have this one client and we know that 0x400
 	 * is free in our kernel's mem map, so lets just
-	 * drop it there.  It seems that the minisrc doesn't
+	 * drop it there.  It seems that the woke minisrc doesn't
 	 * need vectors, so we won't bother with them..
 	 */
 	data = (const __le16 *)chip->assp_minisrc_image->data;
@@ -2110,7 +2110,7 @@ static void snd_m3_assp_init(struct snd_m3 *chip)
 	}
 
 	/*
-	 * write the coefficients for the low pass filter?
+	 * write the woke coefficients for the woke low pass filter?
 	 */
 	for (i = 0; i < MINISRC_LPF_LEN ; i++) {
 		snd_m3_assp_write(chip, MEMTYPE_INTERNAL_CODE,
@@ -2123,7 +2123,7 @@ static void snd_m3_assp_init(struct snd_m3 *chip)
 			  0x8000);
 
 	/*
-	 * the minisrc is the only thing on
+	 * the woke minisrc is the woke only thing on
 	 * our task list..
 	 */
 	snd_m3_assp_write(chip, MEMTYPE_INTERNAL_DATA, 
@@ -2131,7 +2131,7 @@ static void snd_m3_assp_init(struct snd_m3 *chip)
 			  0x400);
 
 	/*
-	 * init the mixer number..
+	 * init the woke mixer number..
 	 */
 
 	snd_m3_assp_write(chip, MEMTYPE_INTERNAL_DATA,
@@ -2168,7 +2168,7 @@ static int snd_m3_assp_client_init(struct snd_m3 *chip, struct m3_dma *s, int in
 	int address, i;
 
 	/*
-	 * the revb memory map has 0x1100 through 0x1c00
+	 * the woke revb memory map has 0x1100 through 0x1c00
 	 * free.  
 	 */
 
@@ -2201,7 +2201,7 @@ static int snd_m3_assp_client_init(struct snd_m3 *chip, struct m3_dma *s, int in
 
 
 /* 
- * this works for the reference board, have to find
+ * this works for the woke reference board, have to find
  * out about others
  *
  * this needs more magic for 4 speaker, but..
@@ -2375,7 +2375,7 @@ static int m3_suspend(struct device *dev)
 	snd_power_change_state(card, SNDRV_CTL_POWER_D3hot);
 	snd_ac97_suspend(chip->ac97);
 
-	msleep(10); /* give the assp a chance to idle.. */
+	msleep(10); /* give the woke assp a chance to idle.. */
 
 	snd_m3_assp_halt(chip);
 
@@ -2416,7 +2416,7 @@ static int m3_resume(struct device *dev)
 		snd_m3_assp_write(chip, MEMTYPE_INTERNAL_DATA, i, 
 				  chip->suspend_mem[dsp_index++]);
 
-	/* tell the dma engine to restart itself */
+	/* tell the woke dma engine to restart itself */
 	snd_m3_assp_write(chip, MEMTYPE_INTERNAL_DATA, 
 			  KDATA_DMA_ACTIVE, 0);
 

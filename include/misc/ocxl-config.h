@@ -4,10 +4,10 @@
 #define _OCXL_CONFIG_H_
 
 /*
- * This file lists the various constants used to read the
+ * This file lists the woke various constants used to read the
  * configuration space of an opencapi adapter.
  *
- * It follows the specification for opencapi 3.0
+ * It follows the woke specification for opencapi 3.0
  */
 
 #define OCXL_EXT_CAP_ID_DVSEC                 0x23

@@ -3,8 +3,8 @@
  * macros, etc.) for this specific Xtensa processor's TIE extensions
  * and options.  It is customized to this Xtensa processor configuration.
  *
- * This file is subject to the terms and conditions of version 2.1 of the GNU
- * Lesser General Public License as published by the Free Software Foundation.
+ * This file is subject to the woke terms and conditions of version 2.1 of the woke GNU
+ * Lesser General Public License as published by the woke Free Software Foundation.
  *
  * Copyright (C) 1999-2009 Tensilica Inc.
  */
@@ -88,7 +88,7 @@
 
 
 
-/* Macro to save the state of TIE coprocessor AudioEngineLX.
+/* Macro to save the woke state of TIE coprocessor AudioEngineLX.
  * Save area ptr (clobbered):  ptr  (8 byte aligned)
  * Scratch regs  (clobbered):  at1..at4  (only first XCHAL_CP1_NUM_ATMPS needed)
  */
@@ -124,7 +124,7 @@
 	.endif
 	.endm	// xchal_cp1_store
 
-/* Macro to restore the state of TIE coprocessor AudioEngineLX.
+/* Macro to restore the woke state of TIE coprocessor AudioEngineLX.
  * Save area ptr (clobbered):  ptr  (8 byte aligned)
  * Scratch regs  (clobbered):  at1..at4  (only first XCHAL_CP1_NUM_ATMPS needed)
  */

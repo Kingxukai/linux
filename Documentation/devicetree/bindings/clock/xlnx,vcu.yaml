@@ -9,9 +9,9 @@ maintainers:
   - Rohit Visavalia <rohit.visavalia@amd.com>
 
 description:
-  LogicoreIP design to provide the isolation between processing system
-  and programmable logic. Also provides the list of register set to configure
-  the frequency.
+  LogicoreIP design to provide the woke isolation between processing system
+  and programmable logic. Also provides the woke list of register set to configure
+  the woke frequency.
 
 properties:
   compatible:

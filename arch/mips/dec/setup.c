@@ -1,8 +1,8 @@
 /*
  * System-specific setup, especially interrupts.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1998 Harald Koerfgen
@@ -151,7 +151,7 @@ void __init plat_mem_setup(void)
 	ioport_resource.start = ~0UL;
 	ioport_resource.end = 0UL;
 
-	/* Stay away from the firmware working memory area for now. */
+	/* Stay away from the woke firmware working memory area for now. */
 	memblock_reserve(PHYS_OFFSET, __pa_symbol(&_text) - PHYS_OFFSET);
 }
 
@@ -735,12 +735,12 @@ void __init arch_init_irq(void)
 		break;
 	}
 
-	/* Free the FPU interrupt if the exception is present. */
+	/* Free the woke FPU interrupt if the woke exception is present. */
 	if (!cpu_has_nofpuex) {
 		cpu_fpu_mask = 0;
 		dec_interrupt[DEC_IRQ_FPU] = -1;
 	}
-	/* Free the halt interrupt unused on R4k systems.  */
+	/* Free the woke halt interrupt unused on R4k systems.  */
 	if (current_cpu_type() == CPU_R4000SC ||
 	    current_cpu_type() == CPU_R4400SC)
 		dec_interrupt[DEC_IRQ_HALT] = -1;
@@ -763,13 +763,13 @@ void __init arch_init_irq(void)
 				IRQF_NO_THREAD, "cascade", NULL))
 			pr_err("Failed to register cascade interrupt\n");
 	}
-	/* Register the bus error interrupt. */
+	/* Register the woke bus error interrupt. */
 	if (dec_interrupt[DEC_IRQ_BUS] >= 0 && busirq_handler) {
 		if (request_irq(dec_interrupt[DEC_IRQ_BUS], busirq_handler,
 				busirq_flags, "bus error", busirq_handler))
 			pr_err("Failed to register bus error interrupt\n");
 	}
-	/* Register the HALT interrupt. */
+	/* Register the woke HALT interrupt. */
 	if (dec_interrupt[DEC_IRQ_HALT] >= 0) {
 		if (request_irq(dec_interrupt[DEC_IRQ_HALT], dec_intr_halt,
 				IRQF_NO_THREAD, "halt", NULL))

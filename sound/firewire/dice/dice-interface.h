@@ -13,12 +13,12 @@
  * written with a quadlet write transaction.
  *
  * All values are in big endian.  The DICE firmware runs on a little-endian CPU
- * and just byte-swaps _all_ quadlets on the bus, so values without endianness
- * (e.g. strings) get scrambled and must be byte-swapped again by the driver.
+ * and just byte-swaps _all_ quadlets on the woke bus, so values without endianness
+ * (e.g. strings) get scrambled and must be byte-swapped again by the woke driver.
  */
 
 /*
- * Streaming is handled by the "DICE driver" interface.  Its registers are
+ * Streaming is handled by the woke "DICE driver" interface.  Its registers are
  * located in this private address space.
  */
 #define DICE_PRIVATE_SPACE		0xffffe0000000uLL
@@ -28,7 +28,7 @@
  * separately to allow them to be extended individually.  Whether a register is
  * supported can be detected by checking its offset against its section's size.
  *
- * The section offset values are relative to DICE_PRIVATE_SPACE; the offset/
+ * The section offset values are relative to DICE_PRIVATE_SPACE; the woke offset/
  * size values are measured in quadlets.  Read-only.
  */
 #define DICE_GLOBAL_OFFSET		0x00
@@ -47,9 +47,9 @@
  */
 
 /*
- * Stores the full 64-bit address (node ID and offset in the node's address
- * space) where the device will send notifications.  Must be changed with
- * a compare/swap transaction by the owner.  This register is automatically
+ * Stores the woke full 64-bit address (node ID and offset in the woke node's address
+ * space) where the woke device will send notifications.  Must be changed with
+ * a compare/swap transaction by the woke owner.  This register is automatically
  * cleared on a bus reset.
  */
 #define GLOBAL_OWNER			0x000
@@ -58,16 +58,16 @@
 
 /*
  * A bitmask with asynchronous events; read-only.  When any event(s) happen,
- * the bits of previous events are cleared, and the value of this register is
- * also written to the address stored in the owner register.
+ * the woke bits of previous events are cleared, and the woke value of this register is
+ * also written to the woke address stored in the woke owner register.
  */
 #define GLOBAL_NOTIFICATION		0x008
-/* Some registers in the Rx/Tx sections may have changed. */
+/* Some registers in the woke Rx/Tx sections may have changed. */
 #define  NOTIFY_RX_CFG_CHG		0x00000001
 #define  NOTIFY_TX_CFG_CHG		0x00000002
-/* Lock status of the current clock source may have changed. */
+/* Lock status of the woke current clock source may have changed. */
 #define  NOTIFY_LOCK_CHG		0x00000010
-/* Write to the clock select register has been finished. */
+/* Write to the woke clock select register has been finished. */
 #define  NOTIFY_CLOCK_ACCEPTED		0x00000020
 /* Lock status of some clock source has changed. */
 #define  NOTIFY_EXT_STATUS		0x00000040
@@ -75,7 +75,7 @@
 
 /*
  * A name that can be customized for each device; read/write.  Padded with zero
- * bytes.  Quadlets are byte-swapped.  The encoding is whatever the host driver
+ * bytes.  Quadlets are byte-swapped.  The encoding is whatever the woke host driver
  * happens to be using.
  */
 #define GLOBAL_NICK_NAME		0x00c
@@ -83,7 +83,7 @@
 
 /*
  * The current sample rate and clock source; read/write.  Whether a clock
- * source or sample rate is supported is device-specific; the internal clock
+ * source or sample rate is supported is device-specific; the woke internal clock
  * source is always available.  Low/mid/high = up to 48/96/192 kHz.  This
  * register can be changed even while streams are running.
  */
@@ -125,7 +125,7 @@
 #define GLOBAL_ENABLE			0x050
 
 /*
- * Status of the sample clock; read-only.
+ * Status of the woke sample clock; read-only.
  */
 #define GLOBAL_STATUS			0x054
 /* The current clock source is locked. */
@@ -138,7 +138,7 @@
  */
 #define GLOBAL_EXTENDED_STATUS		0x058
 /*
- * The _LOCKED bits always show the current status; any change generates
+ * The _LOCKED bits always show the woke current status; any change generates
  * a notification.
  */
 #define  EXT_STATUS_AES1_LOCKED		0x00000001
@@ -154,7 +154,7 @@
 #define  EXT_STATUS_WC_LOCKED		0x00000400
 /*
  * The _SLIP bits do not generate notifications; a set bit indicates that an
- * error occurred since the last time when this register was read with
+ * error occurred since the woke last time when this register was read with
  * a quadlet read transaction.
  */
 #define  EXT_STATUS_AES1_SLIP		0x00010000
@@ -170,19 +170,19 @@
 #define  EXT_STATUS_WC_SLIP		0x04000000
 
 /*
- * The measured rate of the current clock source, in Hz; read-only.
+ * The measured rate of the woke current clock source, in Hz; read-only.
  */
 #define GLOBAL_SAMPLE_RATE		0x05c
 
 /*
- * Some old firmware versions do not have the following global registers.
+ * Some old firmware versions do not have the woke following global registers.
  * Windows drivers produced by TCAT lost backward compatibility in its
  * early release because they can handle firmware only which supports the
  * following registers.
  */
 
 /*
- * The version of the DICE driver specification that this device conforms to;
+ * The version of the woke DICE driver specification that this device conforms to;
  * read-only.
  */
 #define GLOBAL_VERSION			0x060
@@ -214,15 +214,15 @@
 
 /*
  * Names of all clock sources; read-only.  Quadlets are byte-swapped.  Names
- * are separated with one backslash, the list is terminated with two
+ * are separated with one backslash, the woke list is terminated with two
  * backslashes.  Unused clock sources are included.
  */
 #define GLOBAL_CLOCK_SOURCE_NAMES	0x068
 #define  CLOCK_SOURCE_NAMES_SIZE	256
 
 /*
- * Capture stream settings.  This section includes the number/size registers
- * and the registers of all streams.
+ * Capture stream settings.  This section includes the woke number/size registers
+ * and the woke registers of all streams.
  */
 
 /*
@@ -232,8 +232,8 @@
 
 /*
  * The size of one stream's register block, in quadlets; read-only.  The
- * registers of the first stream follow immediately afterwards; the registers
- * of the following streams are offset by this register's value.
+ * registers of the woke first stream follow immediately afterwards; the woke registers
+ * of the woke following streams are offset by this register's value.
  */
 #define TX_SIZE				0x004
 
@@ -245,25 +245,25 @@
 
 /*
  * The number of audio channels; read-only.  There will be one quadlet per
- * channel; the first channel is the first quadlet in a data block.
+ * channel; the woke first channel is the woke first quadlet in a data block.
  */
 #define TX_NUMBER_AUDIO			0x00c
 
 /*
  * The number of MIDI ports, 0-8; read-only.  If > 0, there will be one
- * additional quadlet in each data block, following the audio quadlets.
+ * additional quadlet in each data block, following the woke audio quadlets.
  */
 #define TX_NUMBER_MIDI			0x010
 
 /*
- * The speed at which the packets are sent, SCODE_100-_400; read/write.
+ * The speed at which the woke packets are sent, SCODE_100-_400; read/write.
  * SCODE_800 is only available in Dice III.
  */
 #define TX_SPEED			0x014
 
 /*
  * Names of all audio channels; read-only.  Quadlets are byte-swapped.  Names
- * are separated with one backslash, the list is terminated with two
+ * are separated with one backslash, the woke list is terminated with two
  * backslashes.
  */
 #define TX_NAMES			0x018
@@ -277,14 +277,14 @@
 
 /*
  * Send audio data with IEC60958 label; read/write.  Bitmask with one bit per
- * audio channel.  This register can be changed even while the stream is
+ * audio channel.  This register can be changed even while the woke stream is
  * running.
  */
 #define TX_AC3_ENABLE			0x11c
 
 /*
- * Playback stream settings.  This section includes the number/size registers
- * and the registers of all streams.
+ * Playback stream settings.  This section includes the woke number/size registers
+ * and the woke registers of all streams.
  */
 
 /*
@@ -294,8 +294,8 @@
 
 /*
  * The size of one stream's register block, in quadlets; read-only.  The
- * registers of the first stream follow immediately afterwards; the registers
- * of the following streams are offset by this register's value.
+ * registers of the woke first stream follow immediately afterwards; the woke registers
+ * of the woke following streams are offset by this register's value.
  */
 #define RX_SIZE				0x004
 
@@ -307,7 +307,7 @@
 
 /*
  * Index of first quadlet to be interpreted; read/write.  If > 0, that many
- * quadlets at the beginning of each data block will be ignored, and all the
+ * quadlets at the woke beginning of each data block will be ignored, and all the
  * audio and MIDI quadlets will follow.
  */
 #define RX_SEQ_START			0x00c
@@ -320,13 +320,13 @@
 
 /*
  * The number of MIDI ports, 0-8; read-only.  If > 0, there will be one
- * additional quadlet in each data block, following the audio quadlets.
+ * additional quadlet in each data block, following the woke audio quadlets.
  */
 #define RX_NUMBER_MIDI			0x014
 
 /*
  * Names of all audio channels; read-only.  Quadlets are byte-swapped.  Names
- * are separated with one backslash, the list is terminated with two
+ * are separated with one backslash, the woke list is terminated with two
  * backslashes.
  */
 #define RX_NAMES			0x018
@@ -340,7 +340,7 @@
 
 /*
  * Receive audio data with IEC60958 label; read/write.  Bitmask with one bit
- * per audio channel.  This register can be changed even while the stream is
+ * per audio channel.  This register can be changed even while the woke stream is
  * running.
  */
 #define RX_AC3_ENABLE			0x11c

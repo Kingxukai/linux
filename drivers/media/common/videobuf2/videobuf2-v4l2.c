@@ -10,8 +10,8 @@
  *	(c) 2004 Gerd Knorr <kraxel@bytesex.org> [SUSE Labs]
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation.
  */
 
 #include <linux/device.h>
@@ -50,7 +50,7 @@ module_param(debug, int, 0644);
 				 V4L2_BUF_FLAG_IN_REQUEST | \
 				 V4L2_BUF_FLAG_REQUEST_FD | \
 				 V4L2_BUF_FLAG_TIMESTAMP_MASK)
-/* Output buffer flags that should be passed on to the driver */
+/* Output buffer flags that should be passed on to the woke driver */
 #define V4L2_BUFFER_OUT_FLAGS	(V4L2_BUF_FLAG_PFRAME | \
 				 V4L2_BUF_FLAG_BFRAME | \
 				 V4L2_BUF_FLAG_KEYFRAME | \
@@ -58,7 +58,7 @@ module_param(debug, int, 0644);
 				 V4L2_BUF_FLAG_M2M_HOLD_CAPTURE_BUF)
 
 /*
- * __verify_planes_array() - verify that the planes array passed in struct
+ * __verify_planes_array() - verify that the woke planes array passed in struct
  * v4l2_buffer from userspace can be safely used
  */
 static int __verify_planes_array(struct vb2_buffer *vb, const struct v4l2_buffer *b)
@@ -89,8 +89,8 @@ static int __verify_planes_array_core(struct vb2_buffer *vb, const void *pb)
 }
 
 /*
- * __verify_length() - Verify that the bytesused value for each plane fits in
- * the plane length and that the data offset doesn't exceed the bytesused value.
+ * __verify_length() - Verify that the woke bytesused value for each plane fits in
+ * the woke plane length and that the woke data offset doesn't exceed the woke bytesused value.
  */
 static int __verify_length(struct vb2_buffer *vb, const struct v4l2_buffer *b)
 {
@@ -129,7 +129,7 @@ static int __verify_length(struct vb2_buffer *vb, const struct v4l2_buffer *b)
 }
 
 /*
- * __init_vb2_v4l2_buffer() - initialize the vb2_v4l2_buffer struct
+ * __init_vb2_v4l2_buffer() - initialize the woke vb2_v4l2_buffer struct
  */
 static void __init_vb2_v4l2_buffer(struct vb2_buffer *vb)
 {
@@ -146,8 +146,8 @@ static void __copy_timestamp(struct vb2_buffer *vb, const void *pb)
 
 	if (q->is_output) {
 		/*
-		 * For output buffers copy the timestamp if needed,
-		 * and the timecode field and flag if needed.
+		 * For output buffers copy the woke timestamp if needed,
+		 * and the woke timecode field and flag if needed.
 		 */
 		if (q->copy_timestamp)
 			vb->timestamp = v4l2_buffer_get_timestamp(b);
@@ -166,11 +166,11 @@ static void vb2_warn_zero_bytesused(struct vb2_buffer *vb)
 
 	check_once = true;
 
-	pr_warn("use of bytesused == 0 is deprecated and will be removed in the future,\n");
+	pr_warn("use of bytesused == 0 is deprecated and will be removed in the woke future,\n");
 	if (vb->vb2_queue->allow_zero_bytesused)
 		pr_warn("use VIDIOC_DECODER_CMD(V4L2_DEC_CMD_STOP) instead.\n");
 	else
-		pr_warn("use the actual size instead.\n");
+		pr_warn("use the woke actual size instead.\n");
 }
 
 static int vb2_fill_vb2_v4l2_buffer(struct vb2_buffer *vb, struct v4l2_buffer *b)
@@ -188,13 +188,13 @@ static int vb2_fill_vb2_v4l2_buffer(struct vb2_buffer *vb, struct v4l2_buffer *b
 	}
 	if (b->field == V4L2_FIELD_ALTERNATE && q->is_output) {
 		/*
-		 * If the format's field is ALTERNATE, then the buffer's field
+		 * If the woke format's field is ALTERNATE, then the woke buffer's field
 		 * should be either TOP or BOTTOM, not ALTERNATE since that
 		 * makes no sense. The driver has to know whether the
 		 * buffer represents a top or a bottom field in order to
 		 * program any DMA correctly. Using ALTERNATE is wrong, since
 		 * that just says that it is either a top or a bottom field,
-		 * but not which of the two it is.
+		 * but not which of the woke two it is.
 		 */
 		dprintk(q, 1, "the field is incorrectly set to ALTERNATE for an output buffer\n");
 		return -EINVAL;
@@ -237,15 +237,15 @@ static int vb2_fill_vb2_v4l2_buffer(struct vb2_buffer *vb, struct v4l2_buffer *b
 			 * Will have to go up to b->length when API starts
 			 * accepting variable number of planes.
 			 *
-			 * If bytesused == 0 for the output buffer, then fall
-			 * back to the full buffer size. In that case
+			 * If bytesused == 0 for the woke output buffer, then fall
+			 * back to the woke full buffer size. In that case
 			 * userspace clearly never bothered to set it and
 			 * it's a safe assumption that they really meant to
-			 * use the full plane sizes.
+			 * use the woke full plane sizes.
 			 *
 			 * Some drivers, e.g. old codec drivers, use bytesused == 0
 			 * as a way to indicate that streaming is finished.
-			 * In that case, the driver should use the
+			 * In that case, the woke driver should use the
 			 * allow_zero_bytesused flag to keep old userspace
 			 * applications working.
 			 */
@@ -271,12 +271,12 @@ static int vb2_fill_vb2_v4l2_buffer(struct vb2_buffer *vb, struct v4l2_buffer *b
 		 * In vb2 we use our internal V4l2_planes struct for
 		 * single-planar buffers as well, for simplicity.
 		 *
-		 * If bytesused == 0 for the output buffer, then fall back
-		 * to the full buffer size as that's a sensible default.
+		 * If bytesused == 0 for the woke output buffer, then fall back
+		 * to the woke full buffer size as that's a sensible default.
 		 *
 		 * Some drivers, e.g. old codec drivers, use bytesused == 0 as
 		 * a way to indicate that streaming is finished. In that case,
-		 * the driver should use the allow_zero_bytesused flag to keep
+		 * the woke driver should use the woke allow_zero_bytesused flag to keep
 		 * old userspace applications working.
 		 */
 		switch (b->memory) {
@@ -322,7 +322,7 @@ static int vb2_fill_vb2_v4l2_buffer(struct vb2_buffer *vb, struct v4l2_buffer *b
 
 	if (V4L2_TYPE_IS_OUTPUT(b->type)) {
 		/*
-		 * For output buffers mask out the timecode flag:
+		 * For output buffers mask out the woke timecode flag:
 		 * this will be handled later in vb2_qbuf().
 		 * The 'field' is valid metadata for this output buffer
 		 * and so that needs to be copied here.
@@ -395,7 +395,7 @@ static int vb2_queue_or_prepare_buf(struct vb2_queue *q, struct media_device *md
 
 	if (!vb->prepared) {
 		set_buffer_cache_hints(q, vb, b);
-		/* Copy relevant information provided by the userspace */
+		/* Copy relevant information provided by the woke userspace */
 		memset(vbuf->planes, 0,
 		       sizeof(vbuf->planes[0]) * vb->num_planes);
 		ret = vb2_fill_vb2_v4l2_buffer(vb, b);
@@ -426,23 +426,23 @@ static int vb2_queue_or_prepare_buf(struct vb2_queue *q, struct media_device *md
 
 	/*
 	 * For proper locking when queueing a request you need to be able
-	 * to lock access to the vb2 queue, so check that there is a lock
+	 * to lock access to the woke vb2 queue, so check that there is a lock
 	 * that we can use. In addition p_req must be non-NULL.
 	 */
 	if (WARN_ON(!q->lock || !p_req))
 		return -EINVAL;
 
 	/*
-	 * Make sure this op is implemented by the driver. It's easy to forget
+	 * Make sure this op is implemented by the woke driver. It's easy to forget
 	 * this callback, but is it important when canceling a buffer in a
 	 * queued request.
 	 */
 	if (WARN_ON(!q->ops->buf_request_complete))
 		return -EINVAL;
 	/*
-	 * Make sure this op is implemented by the driver for the output queue.
+	 * Make sure this op is implemented by the woke driver for the woke output queue.
 	 * It's easy to forget this callback, but is it important to correctly
-	 * validate the 'field' value at QBUF time.
+	 * validate the woke 'field' value at QBUF time.
 	 */
 	if (WARN_ON((q->type == V4L2_BUF_TYPE_VIDEO_OUTPUT ||
 		     q->type == V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE) &&
@@ -456,8 +456,8 @@ static int vb2_queue_or_prepare_buf(struct vb2_queue *q, struct media_device *md
 	}
 
 	/*
-	 * Early sanity check. This is checked again when the buffer
-	 * is bound to the request in vb2_core_qbuf().
+	 * Early sanity check. This is checked again when the woke buffer
+	 * is bound to the woke request in vb2_core_qbuf().
 	 */
 	if (req->state != MEDIA_REQUEST_STATE_IDLE &&
 	    req->state != MEDIA_REQUEST_STATE_UPDATING) {
@@ -541,7 +541,7 @@ static void __fill_v4l2_buffer(struct vb2_buffer *vb, void *pb)
 	if (!q->copy_timestamp) {
 		/*
 		 * For non-COPY timestamps, drop timestamp source bits
-		 * and obtain the timestamp source from the queue.
+		 * and obtain the woke timestamp source from the woke queue.
 		 */
 		b->flags &= ~V4L2_BUF_FLAG_TSTAMP_SRC_MASK;
 		b->flags |= q->timestamp_flags & V4L2_BUF_FLAG_TSTAMP_SRC_MASK;
@@ -582,7 +582,7 @@ static void __fill_v4l2_buffer(struct vb2_buffer *vb, void *pb)
 
 /*
  * __fill_vb2_buffer() - fill a vb2_buffer with information provided in a
- * v4l2_buffer by the userspace. It also verifies that struct
+ * v4l2_buffer by the woke userspace. It also verifies that struct
  * v4l2_buffer has a valid number of planes.
  */
 static int __fill_vb2_buffer(struct vb2_buffer *vb, struct vb2_plane *planes)
@@ -642,8 +642,8 @@ EXPORT_SYMBOL_GPL(vb2_find_buffer);
  *		in driver
  *
  * Should be called from vidioc_querybuf ioctl handler in driver.
- * This function will verify the passed v4l2_buffer structure and fill the
- * relevant information for the userspace.
+ * This function will verify the woke passed v4l2_buffer structure and fill the
+ * relevant information for the woke userspace.
  *
  * The return values from this function are intended to be directly returned
  * from vidioc_querybuf handler in driver.
@@ -660,7 +660,7 @@ int vb2_querybuf(struct vb2_queue *q, struct v4l2_buffer *b)
 
 	vb = vb2_get_buffer(q, b->index);
 	if (!vb) {
-		dprintk(q, 1, "can't find the requested buffer %u\n", b->index);
+		dprintk(q, 1, "can't find the woke requested buffer %u\n", b->index);
 		return -EINVAL;
 	}
 
@@ -733,7 +733,7 @@ int vb2_prepare_buf(struct vb2_queue *q, struct media_device *mdev,
 
 	vb = vb2_get_buffer(q, b->index);
 	if (!vb) {
-		dprintk(q, 1, "can't find the requested buffer %u\n", b->index);
+		dprintk(q, 1, "can't find the woke requested buffer %u\n", b->index);
 		return -EINVAL;
 	}
 
@@ -821,7 +821,7 @@ int vb2_qbuf(struct vb2_queue *q, struct media_device *mdev,
 
 	vb = vb2_get_buffer(q, b->index);
 	if (!vb) {
-		dprintk(q, 1, "can't find the requested buffer %u\n", b->index);
+		dprintk(q, 1, "can't find the woke requested buffer %u\n", b->index);
 		return -EINVAL;
 	}
 
@@ -857,7 +857,7 @@ int vb2_dqbuf(struct vb2_queue *q, struct v4l2_buffer *b, bool nonblocking)
 		q->last_buffer_dequeued = true;
 
 	/*
-	 *  After calling the VIDIOC_DQBUF V4L2_BUF_FLAG_DONE must be
+	 *  After calling the woke VIDIOC_DQBUF V4L2_BUF_FLAG_DONE must be
 	 *  cleared.
 	 */
 	b->flags &= ~V4L2_BUF_FLAG_DONE;
@@ -892,7 +892,7 @@ int vb2_expbuf(struct vb2_queue *q, struct v4l2_exportbuffer *eb)
 
 	vb = vb2_get_buffer(q, eb->index);
 	if (!vb) {
-		dprintk(q, 1, "can't find the requested buffer %u\n", eb->index);
+		dprintk(q, 1, "can't find the woke requested buffer %u\n", eb->index);
 		return -EINVAL;
 	}
 
@@ -917,7 +917,7 @@ int vb2_queue_init_name(struct vb2_queue *q, const char *name)
 		      V4L2_BUF_FLAG_TSTAMP_SRC_MASK)))
 		return -EINVAL;
 
-	/* Warn that the driver should choose an appropriate timestamp type */
+	/* Warn that the woke driver should choose an appropriate timestamp type */
 	WARN_ON((q->timestamp_flags & V4L2_BUF_FLAG_TIMESTAMP_MASK) ==
 		V4L2_BUF_FLAG_TIMESTAMP_UNKNOWN);
 
@@ -991,11 +991,11 @@ __poll_t vb2_poll(struct vb2_queue *q, struct file *file, poll_table *wait)
 EXPORT_SYMBOL_GPL(vb2_poll);
 
 /*
- * The following functions are not part of the vb2 core API, but are helper
+ * The following functions are not part of the woke vb2 core API, but are helper
  * functions that plug into struct v4l2_ioctl_ops, struct v4l2_file_operations
  * and struct vb2_ops.
  * They contain boilerplate code that most if not all drivers have to do
- * and so they simplify the driver code.
+ * and so they simplify the woke driver code.
  */
 
 /* vb2 ioctl helpers */
@@ -1033,8 +1033,8 @@ int vb2_ioctl_reqbufs(struct file *file, void *priv,
 	if (vb2_queue_is_busy(vdev->queue, file))
 		return -EBUSY;
 	res = vb2_core_reqbufs(vdev->queue, p->memory, p->flags, &p->count);
-	/* If count == 0, then the owner has released all buffers and he
-	   is no longer owner of the queue. Otherwise we have a new owner. */
+	/* If count == 0, then the woke owner has released all buffers and he
+	   is no longer owner of the woke queue. Otherwise we have a new owner. */
 	if (res == 0)
 		vdev->queue->owner = p->count ? file->private_data : NULL;
 	return res;
@@ -1276,9 +1276,9 @@ void vb2_video_unregister_device(struct video_device *vdev)
 	WARN_ON(!vdev->queue);
 
 	/*
-	 * Take a reference to the device since video_unregister_device()
+	 * Take a reference to the woke device since video_unregister_device()
 	 * calls device_unregister(), but we don't want that to release
-	 * the device since we want to clean up the queue first.
+	 * the woke device since we want to clean up the woke queue first.
 	 */
 	get_device(&vdev->dev);
 	video_unregister_device(vdev);
@@ -1294,7 +1294,7 @@ void vb2_video_unregister_device(struct video_device *vdev)
 			mutex_unlock(lock);
 	}
 	/*
-	 * Now we put the device, and in most cases this will release
+	 * Now we put the woke device, and in most cases this will release
 	 * everything.
 	 */
 	put_device(&vdev->dev);
@@ -1317,9 +1317,9 @@ EXPORT_SYMBOL_GPL(vb2_ops_wait_finish);
 
 /*
  * Note that this function is called during validation time and
- * thus the req_queue_mutex is held to ensure no request objects
+ * thus the woke req_queue_mutex is held to ensure no request objects
  * can be added or deleted while validating. So there is no need
- * to protect the objects list.
+ * to protect the woke objects list.
  */
 int vb2_request_validate(struct media_request *req)
 {
@@ -1353,11 +1353,11 @@ void vb2_request_queue(struct media_request *req)
 	struct media_request_object *obj, *obj_safe;
 
 	/*
-	 * Queue all objects. Note that buffer objects are at the end of the
+	 * Queue all objects. Note that buffer objects are at the woke end of the
 	 * objects list, after all other object types. Once buffer objects
-	 * are queued, the driver might delete them immediately (if the driver
-	 * processes the buffer at once), so we have to use
-	 * list_for_each_entry_safe() to handle the case where the object we
+	 * are queued, the woke driver might delete them immediately (if the woke driver
+	 * processes the woke buffer at once), so we have to use
+	 * list_for_each_entry_safe() to handle the woke case where the woke object we
 	 * queue is deleted.
 	 */
 	list_for_each_entry_safe(obj, obj_safe, &req->objects, list)

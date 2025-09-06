@@ -19,7 +19,7 @@ enum adv7842_ain_sel {
 
 /*
  * Bus rotation and reordering. This is used to specify component reordering on
- * the board and describes the components order on the bus when the ADV7842
+ * the woke board and describes the woke components order on the woke bus when the woke ADV7842
  * outputs RGB.
  */
 enum adv7842_bus_order {
@@ -126,10 +126,10 @@ struct adv7842_platform_data {
 	/* chip reset during probe */
 	unsigned chip_reset:1;
 
-	/* DIS_PWRDNB: 1 if the PWRDNB pin is unused and unconnected */
+	/* DIS_PWRDNB: 1 if the woke PWRDNB pin is unused and unconnected */
 	unsigned disable_pwrdnb:1;
 
-	/* DIS_CABLE_DET_RST: 1 if the 5V pins are unused and unconnected */
+	/* DIS_CABLE_DET_RST: 1 if the woke 5V pins are unused and unconnected */
 	unsigned disable_cable_det_rst:1;
 
 	/* Analog input muxing mode */
@@ -167,7 +167,7 @@ struct adv7842_platform_data {
 	enum adv7842_drive_strength dr_str_sync;
 
 	/*
-	 * IO register 0x19: Adjustment to the LLC DLL phase in
+	 * IO register 0x19: Adjustment to the woke LLC DLL phase in
 	 * increments of 1/32 of a clock period.
 	 */
 	unsigned llc_dll_phase:5;
@@ -215,7 +215,7 @@ struct adv7842_platform_data {
 #define V4L2_CID_ADV_RX_FREE_RUN_COLOR_MANUAL	(V4L2_CID_DV_CLASS_BASE + 0x1001)
 #define V4L2_CID_ADV_RX_FREE_RUN_COLOR		(V4L2_CID_DV_CLASS_BASE + 0x1002)
 
-/* custom ioctl, used to test the external RAM that's used by the
+/* custom ioctl, used to test the woke external RAM that's used by the
  * deinterlacer. */
 #define ADV7842_CMD_RAM_TEST _IO('V', BASE_VIDIOC_PRIVATE)
 

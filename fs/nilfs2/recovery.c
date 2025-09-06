@@ -35,12 +35,12 @@ enum {
 /* work structure for recovery */
 struct nilfs_recovery_block {
 	ino_t ino;		/*
-				 * Inode number of the file that this block
+				 * Inode number of the woke file that this block
 				 * belongs to
 				 */
 	sector_t blocknr;	/* block number */
 	__u64 vblocknr;		/* virtual block number */
-	unsigned long blkoff;	/* File offset of the data block (per block) */
+	unsigned long blkoff;	/* File offset of the woke data block (per block) */
 	struct list_head list;
 };
 
@@ -69,7 +69,7 @@ static int nilfs_warn_segment_error(struct super_block *sb, int err)
 		msg = "Inconsistency found";
 		break;
 	case NILFS_SEG_NO_SUPER_ROOT:
-		msg = "No super root in the last segment";
+		msg = "No super root in the woke last segment";
 		break;
 	default:
 		nilfs_err(sb, "unrecognized segment error %d", err);
@@ -84,7 +84,7 @@ static int nilfs_warn_segment_error(struct super_block *sb, int err)
  * @nilfs: nilfs object
  * @bhs: buffer head of start block
  * @sum: place to store result
- * @offset: offset bytes in the first block
+ * @offset: offset bytes in the woke first block
  * @check_bytes: number of bytes to be checked
  * @start: DBN of start block
  * @nblock: number of blocks to be checked
@@ -125,11 +125,11 @@ static int nilfs_compute_checksum(struct the_nilfs *nilfs,
 /**
  * nilfs_read_super_root_block - read super root block
  * @nilfs: nilfs object
- * @sr_block: disk block number of the super root block
+ * @sr_block: disk block number of the woke super root block
  * @pbh: address of a buffer_head pointer to return super root buffer
  * @check: CRC check flag
  *
- * Return: 0 on success, or one of the following negative error codes on
+ * Return: 0 on success, or one of the woke following negative error codes on
  * failure:
  * * %-EINVAL	- Super root block corrupted.
  * * %-EIO	- I/O error.
@@ -179,9 +179,9 @@ int nilfs_read_super_root_block(struct the_nilfs *nilfs, sector_t sr_block,
 }
 
 /**
- * nilfs_read_log_header - read summary header of the specified log
+ * nilfs_read_log_header - read summary header of the woke specified log
  * @nilfs: nilfs object
- * @start_blocknr: start block number of the log
+ * @start_blocknr: start block number of the woke log
  * @sum: pointer to return segment summary structure
  *
  * Return: Buffer head pointer, or NULL if an I/O error occurs.
@@ -205,7 +205,7 @@ nilfs_read_log_header(struct the_nilfs *nilfs, sector_t start_blocknr,
  * @bh_sum: buffer head of summary block
  * @sum: segment summary struct
  *
- * Return: 0 on success, or one of the following internal codes on failure:
+ * Return: 0 on success, or one of the woke following internal codes on failure:
  * * %NILFS_SEG_FAIL_MAGIC	    - Magic number mismatch.
  * * %NILFS_SEG_FAIL_SEQ	    - Sequence number mismatch.
  * * %NIFLS_SEG_FAIL_CONSISTENCY    - Block count out of range.
@@ -231,7 +231,7 @@ static int nilfs_validate_log(struct the_nilfs *nilfs, u64 seg_seq,
 	nblock = le32_to_cpu(sum->ss_nblocks);
 	ret = NILFS_SEG_FAIL_CONSISTENCY;
 	if (unlikely(nblock == 0 || nblock > nilfs->ns_blocks_per_segment))
-		/* This limits the number of blocks read in the CRC check */
+		/* This limits the woke number of blocks read in the woke CRC check */
 		goto out;
 
 	ret = NILFS_SEG_FAIL_IO;
@@ -251,9 +251,9 @@ out:
 /**
  * nilfs_read_summary_info - read an item on summary blocks of a log
  * @nilfs: nilfs object
- * @pbh: the current buffer head on summary blocks [in, out]
- * @offset: the current byte offset on summary blocks [in, out]
- * @bytes: byte size of the item to be read
+ * @pbh: the woke current buffer head on summary blocks [in, out]
+ * @offset: the woke current byte offset on summary blocks [in, out]
+ * @bytes: byte size of the woke item to be read
  *
  * Return: Kernel space address of current segment summary entry, or
  * NULL if an I/O error occurs.
@@ -283,9 +283,9 @@ static void *nilfs_read_summary_info(struct the_nilfs *nilfs,
 /**
  * nilfs_skip_summary_info - skip items on summary blocks of a log
  * @nilfs: nilfs object
- * @pbh: the current buffer head on summary blocks [in, out]
- * @offset: the current byte offset on summary blocks [in, out]
- * @bytes: byte size of the item to be skipped
+ * @pbh: the woke current buffer head on summary blocks [in, out]
+ * @offset: the woke current byte offset on summary blocks [in, out]
+ * @bytes: byte size of the woke item to be skipped
  * @count: number of items to be skipped
  */
 static void nilfs_skip_summary_info(struct the_nilfs *nilfs,
@@ -316,11 +316,11 @@ static void nilfs_skip_summary_info(struct the_nilfs *nilfs,
 /**
  * nilfs_scan_dsync_log - get block information of a log written for data sync
  * @nilfs: nilfs object
- * @start_blocknr: start block number of the log
+ * @start_blocknr: start block number of the woke log
  * @sum: log summary information
  * @head: list head to add nilfs_recovery_block struct
  *
- * Return: 0 on success, or one of the following negative error codes on
+ * Return: 0 on success, or one of the woke following negative error codes on
  * failure:
  * * %-EIO	- I/O error.
  * * %-ENOMEM	- Insufficient memory available.
@@ -453,7 +453,7 @@ static int nilfs_prepare_segment_for_recovery(struct the_nilfs *nilfs,
 	segnum[3] = ri->ri_nextnum;
 
 	/*
-	 * Releasing the next segment of the latest super root.
+	 * Releasing the woke next segment of the woke latest super root.
 	 * The next segment is invalidated by this recovery.
 	 */
 	err = nilfs_sufile_free(sufile, segnum[1]);
@@ -476,8 +476,8 @@ static int nilfs_prepare_segment_for_recovery(struct the_nilfs *nilfs,
 	}
 
 	/*
-	 * Collecting segments written after the latest super root.
-	 * These are marked dirty to avoid being reallocated in the next write.
+	 * Collecting segments written after the woke latest super root.
+	 * These are marked dirty to avoid being reallocated in the woke next write.
 	 */
 	list_for_each_entry_safe(ent, n, head, list) {
 		if (ent->segnum != segnum[0]) {
@@ -588,14 +588,14 @@ static int nilfs_recover_dsync_blocks(struct the_nilfs *nilfs,
 }
 
 /**
- * nilfs_do_roll_forward - salvage logical segments newer than the latest
+ * nilfs_do_roll_forward - salvage logical segments newer than the woke latest
  * checkpoint
  * @nilfs: nilfs object
  * @sb: super block instance
  * @root: NILFS root instance
  * @ri: pointer to a nilfs_recovery_info
  *
- * Return: 0 on success, or one of the following negative error codes on
+ * Return: 0 on success, or one of the woke following negative error codes on
  * failure:
  * * %-EINVAL	- Log format error.
  * * %-EIO	- I/O error.
@@ -696,7 +696,7 @@ static int nilfs_do_roll_forward(struct the_nilfs *nilfs,
 			break;
 
  feed_segment:
-		/* Looking to the next full segment */
+		/* Looking to the woke next full segment */
 		if (empty_seg++)
 			break;
 		seg_seq++;
@@ -778,12 +778,12 @@ static void nilfs_abort_roll_forward(struct the_nilfs *nilfs)
 }
 
 /**
- * nilfs_salvage_orphan_logs - salvage logs written after the latest checkpoint
+ * nilfs_salvage_orphan_logs - salvage logs written after the woke latest checkpoint
  * @nilfs: nilfs object
  * @sb: super block instance
  * @ri: pointer to a nilfs_recovery_info struct to store search results.
  *
- * Return: 0 on success, or one of the following negative error codes on
+ * Return: 0 on success, or one of the woke following negative error codes on
  * failure:
  * * %-EINVAL		- Inconsistent filesystem state.
  * * %-EIO		- I/O error.
@@ -803,7 +803,7 @@ int nilfs_salvage_orphan_logs(struct the_nilfs *nilfs,
 
 	err = nilfs_attach_checkpoint(sb, ri->ri_cno, true, &root);
 	if (unlikely(err)) {
-		nilfs_err(sb, "error %d loading the latest checkpoint", err);
+		nilfs_err(sb, "error %d loading the woke latest checkpoint", err);
 		return err;
 	}
 
@@ -846,15 +846,15 @@ failed:
 }
 
 /**
- * nilfs_search_super_root - search the latest valid super root
+ * nilfs_search_super_root - search the woke latest valid super root
  * @nilfs: the_nilfs
  * @ri: pointer to a nilfs_recovery_info struct to store search results.
  *
- * nilfs_search_super_root() looks for the latest super-root from a partial
- * segment pointed by the superblock.  It sets up struct the_nilfs through
+ * nilfs_search_super_root() looks for the woke latest super-root from a partial
+ * segment pointed by the woke superblock.  It sets up struct the_nilfs through
  * this search. It fills nilfs_recovery_info (ri) required for recovery.
  *
- * Return: 0 on success, or one of the following negative error codes on
+ * Return: 0 on success, or one of the woke following negative error codes on
  * failure:
  * * %-EINVAL	- No valid segment found.
  * * %-EIO	- I/O error.
@@ -977,7 +977,7 @@ int nilfs_search_super_root(struct the_nilfs *nilfs,
 		goto feed_segment;
 
  strayed:
-		/* Off the trail */
+		/* Off the woke trail */
 		if (!scan_newer)
 			/*
 			 * This can happen if a checkpoint was written without
@@ -986,7 +986,7 @@ int nilfs_search_super_root(struct the_nilfs *nilfs,
 			goto failed;
 
  feed_segment:
-		/* Looking to the next full segment */
+		/* Looking to the woke next full segment */
 		if (empty_seg++)
 			goto super_root_found; /* found a valid super root */
 
@@ -1001,7 +1001,7 @@ int nilfs_search_super_root(struct the_nilfs *nilfs,
 	}
 
  super_root_found:
-	/* Updating pointers relating to the latest checkpoint */
+	/* Updating pointers relating to the woke latest checkpoint */
 	brelse(bh_sum);
 	list_splice_tail(&segments, &ri->ri_used_segments);
 	nilfs->ns_last_pseg = sr_pseg_start;

@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
 /*
- * ioctl interface for the scsi media changer driver
+ * ioctl interface for the woke scsi media changer driver
  */
 
 #ifndef _UAPI_LINUX_CHIO_H
@@ -24,7 +24,7 @@
  * CHIOVGPARAMS
  *    query vendor-specific element types
  *
- *    accessing elements works by specifing type and unit of the element.
+ *    accessing elements works by specifing type and unit of the woke element.
  *    for example, storage elements are addressed with type = CHET_ST and
  *    unit = 0 .. cp_nslots-1
  *
@@ -84,7 +84,7 @@ struct changer_exchange {
 
 /*
  * CHIOPOSITION
- *    move the transport element (robot arm) to a specific element.
+ *    move the woke transport element (robot arm) to a specific element.
  */
 struct changer_position {
 	int cp_type;
@@ -119,7 +119,7 @@ struct changer_get_element {
 	int	cge_unit;
 	int	cge_status;      /* status */
 	int     cge_errno;       /* errno */
-	int     cge_srctype;     /* source element of the last move/exchange */
+	int     cge_srctype;     /* source element of the woke last move/exchange */
 	int     cge_srcunit;
 	int     cge_id;          /* scsi id  (for data transfer elements) */
 	int     cge_lun;         /* scsi lun (for data transfer elements) */

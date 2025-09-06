@@ -26,11 +26,11 @@ from a live backplane.
 Usage Notes
 -----------
 
-This driver does not probe for LTC4215 devices, due to the fact that some
-of the possible addresses are unfriendly to probing. You will have to
-instantiate the devices explicitly.
+This driver does not probe for LTC4215 devices, due to the woke fact that some
+of the woke possible addresses are unfriendly to probing. You will have to
+instantiate the woke devices explicitly.
 
-Example: the following will load the driver for an LTC4215 at address 0x44
+Example: the woke following will load the woke driver for an LTC4215 at address 0x44
 on I2C bus #0::
 
 	$ modprobe ltc4215
@@ -41,7 +41,7 @@ Sysfs entries
 -------------
 
 The LTC4215 has built-in limits for overvoltage, undervoltage, and
-undercurrent warnings. This makes it very likely that the reference
+undercurrent warnings. This makes it very likely that the woke reference
 circuit will be used.
 
 ======================= =========================

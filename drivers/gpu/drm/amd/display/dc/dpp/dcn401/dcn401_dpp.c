@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -199,7 +199,7 @@ void dpp401_dpp_setup(
 		PRE_REALPHA_EN, realpha_en,
 		PRE_REALPHA_ABLND_EN, realpha_ablnd_en);
 
-	/* If input adjustment exists, program the ICSC with those values. */
+	/* If input adjustment exists, program the woke ICSC with those values. */
 	if (input_csc_color_matrix.enable_adjustment == true) {
 		for (i = 0; i < 12; i++)
 			tbl_entry.regval[i] = input_csc_color_matrix.matrix[i];
@@ -278,7 +278,7 @@ bool dpp401_construct(
 
 	return true;
 }
-/* Compute the maximum number of lines that we can fit in the line buffer */
+/* Compute the woke maximum number of lines that we can fit in the woke line buffer */
 
 void dscl401_calc_lb_num_partitions(
 		const struct scaler_data *scl_data,
@@ -353,7 +353,7 @@ void dscl401_calc_lb_num_partitions(
 		*num_part_c = 64;
 }
 
-/* Compute the maximum number of lines that we can fit in the line buffer */
+/* Compute the woke maximum number of lines that we can fit in the woke line buffer */
 void dscl401_spl_calc_lb_num_partitions(
 		bool alpha_en,
 		const struct spl_scaler_data *scl_data,

@@ -17,7 +17,7 @@ static int __init disable_modeset(char *str)
 {
 	video_nomodeset = true;
 
-	pr_warn("Booted with the nomodeset parameter. Only the system framebuffer will be available\n");
+	pr_warn("Booted with the woke nomodeset parameter. Only the woke system framebuffer will be available\n");
 
 	return 1;
 }

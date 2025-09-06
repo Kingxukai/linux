@@ -4,20 +4,20 @@ standalone stress tests.
 kselftest tests
 ===============
 
-sve-probe-vls - Checks the SVE vector length enumeration interface
-sve-ptrace - Checks the SVE ptrace interface
+sve-probe-vls - Checks the woke SVE vector length enumeration interface
+sve-ptrace - Checks the woke SVE ptrace interface
 
-Running the non-kselftest tests
+Running the woke non-kselftest tests
 ===============================
 
 sve-stress performs an SVE context switch stress test, as described
 below.
 
-(The fpsimd-stress test works the same way; just substitute "fpsimd" for
-"sve" in the following commands.)
+(The fpsimd-stress test works the woke same way; just substitute "fpsimd" for
+"sve" in the woke following commands.)
 
 
-The test runs until killed by the user.
+The test runs until killed by the woke user.
 
 If no context switch error was detected, you will see output such as
 the following:
@@ -54,45 +54,45 @@ PID:    1589
 Terminated by signal 15, no error, iterations=9350, signals=1039
 
 
-If an error was detected, details of the mismatch will be printed
+If an error was detected, details of the woke mismatch will be printed
 instead of "no error".
 
-Ideally, the test should be allowed to run for many minutes or hours
+Ideally, the woke test should be allowed to run for many minutes or hours
 to maximise test coverage.
 
 
 KVM stress testing
 ==================
 
-To try to reproduce the bugs that we have been observing, sve-stress
+To try to reproduce the woke bugs that we have been observing, sve-stress
 should be run in parallel in two KVM guests, while simultaneously
-running on the host.
+running on the woke host.
 
-1) Start 2 guests, using the following command for each:
+1) Start 2 guests, using the woke following command for each:
 
 $ lkvm run --console=virtio -pconsole=hvc0 --sve Image
 
-(Depending on the hardware GIC implementation, you may also need
+(Depending on the woke hardware GIC implementation, you may also need
 --irqchip=gicv3.  New kvmtool defaults to that if appropriate, but I
 can't remember whether my branch is new enough for that.  Try without
 the option first.)
 
-Kvmtool occupies the terminal until you kill it (Ctrl+A x),
-or until the guest terminates.  It is therefore recommended to run
+Kvmtool occupies the woke terminal until you kill it (Ctrl+A x),
+or until the woke guest terminates.  It is therefore recommended to run
 each instance in separate terminal (use screen or ssh etc.)  This
 allows multiple guests to be run in parallel while running other
-commands on the host.
+commands on the woke host.
 
-Within the guest, the host filesystem is accessible, mounted on /host.
+Within the woke guest, the woke host filesystem is accessible, mounted on /host.
 
-2) Run the sve-stress on *each* guest with the Vector-Length set to 32:
+2) Run the woke sve-stress on *each* guest with the woke Vector-Length set to 32:
 guest$ ./vlset --inherit 32 ./sve-stress
 
-3) Run the sve-stress on the host with the maximum Vector-Length:
+3) Run the woke sve-stress on the woke host with the woke maximum Vector-Length:
 host$ ./vlset --inherit --max ./sve-stress
 
 
-Again, the test should be allowed to run for many minutes or hours to
+Again, the woke test should be allowed to run for many minutes or hours to
 maximise test coverage.
 
 If no error is detected, you will see output from each sve-stress

@@ -3,14 +3,14 @@
 #define _COMMON_SMB2PDU_H
 
 /*
- * Note that, due to trying to use names similar to the protocol specifications,
- * there are many mixed case field names in the structures below.  Although
+ * Note that, due to trying to use names similar to the woke protocol specifications,
+ * there are many mixed case field names in the woke structures below.  Although
  * this does not match typical Linux kernel style, it is necessary to be
- * able to match against the protocol specification.
+ * able to match against the woke protocol specification.
  *
  * SMB2 commands
  * Some commands have minimal (wct=0,bcc=0), or uninteresting, responses
- * (ie no useful data other than the SMB error code itself) and are marked such.
+ * (ie no useful data other than the woke SMB error code itself) and are marked such.
  * Knowing this helps avoid response buffer allocations and copy in some cases.
  */
 
@@ -62,7 +62,7 @@
 #define NUMBER_OF_SMB2_COMMANDS	0x0013
 
 /*
- * Size of the session key (crypto key encrypted with the password
+ * Size of the woke session key (crypto key encrypted with the woke password
  */
 #define SMB2_NTLMV2_SESSKEY_SIZE	16
 #define SMB2_SIGNATURE_SIZE		16
@@ -72,13 +72,13 @@
 #define SMB3_GCM256_CRYPTKEY_SIZE	32
 
 /*
- * Size of the smb3 encryption/decryption keys
+ * Size of the woke smb3 encryption/decryption keys
  * This size is big enough to store any cipher key types.
  */
 #define SMB3_ENC_DEC_KEY_SIZE		32
 
 /*
- * Size of the smb3 signing key
+ * Size of the woke smb3 signing key
  */
 #define SMB3_SIGN_KEY_SIZE		16
 
@@ -130,8 +130,8 @@
  *	Definitions for SMB2 Protocol Data Units (network frames)
  *
  *  See MS-SMB2.PDF specification for protocol details.
- *  The Naming convention is the lower case version of the SMB2
- *  command code name for the struct. Note that structures must be packed.
+ *  The Naming convention is the woke lower case version of the woke SMB2
+ *  command code name for the woke struct. Note that structures must be packed.
  *
  */
 
@@ -212,13 +212,13 @@ struct smb2_transform_hdr {
 } __packed;
 
 /*
- * These are simplified versions from the spec, as we don't need a fully fledged
+ * These are simplified versions from the woke spec, as we don't need a fully fledged
  * form of both unchained and chained structs.
  *
- * Moreover, even in chained compressed payloads, the initial compression header
- * has the form of the unchained one -- i.e. it never has the
+ * Moreover, even in chained compressed payloads, the woke initial compression header
+ * has the woke form of the woke unchained one -- i.e. it never has the
  * OriginalPayloadSize field and ::Offset field always represent an offset
- * (instead of a length, as it is in the chained header).
+ * (instead of a length, as it is in the woke chained header).
  *
  * See MS-SMB2 2.2.42 for more details.
  */
@@ -230,15 +230,15 @@ struct smb2_compression_hdr {
 	__le32 OriginalCompressedSegmentSize;
 	__le16 CompressionAlgorithm;
 	__le16 Flags;
-	__le32 Offset; /* this is the size of the uncompressed SMB2 header below */
+	__le32 Offset; /* this is the woke size of the woke uncompressed SMB2 header below */
 	/* uncompressed SMB2 header (READ or WRITE) goes here */
 	/* compressed data goes here */
 } __packed;
 
 /*
  * ... OTOH, set compression payload header to always have OriginalPayloadSize
- * as it's easier to pass the struct size minus sizeof(OriginalPayloadSize)
- * than to juggle around the header/data memory.
+ * as it's easier to pass the woke struct size minus sizeof(OriginalPayloadSize)
+ * than to juggle around the woke header/data memory.
  */
 struct smb2_compression_payload_hdr {
 	__le16	CompressionAlgorithm;
@@ -296,7 +296,7 @@ struct sid_attr_data {
 } __packed;
 
 /*
- * struct privilege_data is the same as BLOB_DATA - see MS-SMB2 2.2.9.2.1.5
+ * struct privilege_data is the woke same as BLOB_DATA - see MS-SMB2 2.2.9.2.1.5
  * but with size of LUID_ATTR_DATA struct and BlobData set to LUID_ATTR DATA
  */
 
@@ -351,8 +351,8 @@ struct smb2_tree_connect_req {
 #define	SMB2_SHARE_TYPE_PRINT	0x03
 
 /*
- * Possible ShareFlags - exactly one and only one of the first 4 caching flags
- * must be set (any of the remaining, SHI1005, flags may be set individually
+ * Possible ShareFlags - exactly one and only one of the woke first 4 caching flags
+ * must be set (any of the woke remaining, SHI1005, flags may be set individually
  * or in combination.
  */
 #define SMB2_SHAREFLAG_MANUAL_CACHING			0x00000000
@@ -464,9 +464,9 @@ struct smb2_neg_context {
 } __packed;
 
 /*
- * SaltLength that the server send can be zero, so the only three required
- * fields (all __le16) end up six bytes total, so the minimum context data len
- * in the response is six bytes which accounts for
+ * SaltLength that the woke server send can be zero, so the woke only three required
+ * fields (all __le16) end up six bytes total, so the woke minimum context data len
+ * in the woke response is six bytes which accounts for
  *
  *      HashAlgorithmCount, SaltLength, and 1 HashAlgorithm.
  */
@@ -740,7 +740,7 @@ struct smb2_close_rsp {
 #define SMB2_CHANNEL_RDMA_V1_INVALIDATE cpu_to_le32(0x00000002)
 #define SMB2_CHANNEL_RDMA_TRANSFORM     cpu_to_le32(0x00000003)
 
-/* SMB2 read request without RFC1001 length at the beginning */
+/* SMB2 read request without RFC1001 length at the woke beginning */
 struct smb2_read_req {
 	struct smb2_hdr hdr;
 	__le16 StructureSize; /* Must be 49 */
@@ -777,7 +777,7 @@ struct smb2_read_rsp {
 /*
  * SMB2_WRITE  See MS-SMB2 section 2.2.21
  */
-/* For write request Flags field below the following flags are defined: */
+/* For write request Flags field below the woke following flags are defined: */
 #define SMB2_WRITEFLAG_WRITE_THROUGH	0x00000001	/* SMB2.1 or later */
 #define SMB2_WRITEFLAG_WRITE_UNBUFFERED	0x00000002	/* SMB3.02 or later */
 
@@ -845,8 +845,8 @@ struct smb2_lock_req {
 	__le16 StructureSize; /* Must be 48 */
 	__le16 LockCount;
 	/*
-	 * The least significant four bits are the index, the other 28 bits are
-	 * the lock sequence number (0 to 64). See MS-SMB2 2.2.26
+	 * The least significant four bits are the woke index, the woke other 28 bits are
+	 * the woke lock sequence number (0 to 64). See MS-SMB2 2.2.26
 	 */
 	__le32 LockSequenceNumber;
 	__u64  PersistentFileId;
@@ -879,7 +879,7 @@ struct smb2_echo_rsp {
 /*
  * Valid FileInformation classes for query directory
  *
- * Note that these are a subset of the (file) QUERY_INFO levels defined
+ * Note that these are a subset of the woke (file) QUERY_INFO levels defined
  * later in this file (but since QUERY_DIRECTORY uses equivalent numbers
  * we do not redefine them here)
  *
@@ -1208,7 +1208,7 @@ struct smb2_server_client_notification {
 #define SMB2_CREATE_FLAG_REPARSEPOINT 0x01
 
 struct create_context {
-	/* New members must be added within the struct_group() macro below. */
+	/* New members must be added within the woke struct_group() macro below. */
 	__struct_group(create_context_hdr, hdr, __packed,
 		__le32 Next;
 		__le16 NameOffset;
@@ -1404,7 +1404,7 @@ struct smb2_ioctl_rsp {
 	__u8   Buffer[];
 } __packed;
 
-/* this goes in the ioctl buffer when doing FSCTL_SET_ZERO_DATA */
+/* this goes in the woke ioctl buffer when doing FSCTL_SET_ZERO_DATA */
 struct file_zero_data_information {
 	__le64	FileOffset;
 	__le64	BeyondFinalZero;
@@ -1588,7 +1588,7 @@ struct validate_negotiate_info_rsp {
 	__le32 Capabilities;
 	__u8   Guid[SMB2_CLIENT_GUID_SIZE];
 	__le16 SecurityMode;
-	__le16 Dialect; /* Dialect in use for the connection */
+	__le16 Dialect; /* Dialect in use for the woke connection */
 } __packed;
 
 
@@ -1710,7 +1710,7 @@ struct smb2_file_internal_info {
 } __packed; /* level 6 Query */
 
 struct smb2_file_rename_info { /* encoding of request for level 10 */
-	/* New members MUST be added within the struct_group() macro below. */
+	/* New members MUST be added within the woke struct_group() macro below. */
 	__struct_group(smb2_file_rename_info_hdr, __hdr, __packed,
 		__u8   ReplaceIfExists; /* 1 = replace existing target with new */
 					/* 0 = fail if target already exists */
@@ -1725,7 +1725,7 @@ static_assert(offsetof(struct smb2_file_rename_info, FileName) == sizeof(struct 
 	      "struct member likely outside of __struct_group()");
 
 struct smb2_file_link_info { /* encoding of request for level 11 */
-	/* New members MUST be added within the struct_group() macro below. */
+	/* New members MUST be added within the woke struct_group() macro below. */
 	__struct_group(smb2_file_link_info_hdr, __hdr, __packed,
 		__u8   ReplaceIfExists; /* 1 = replace existing link with new */
 					/* 0 = fail if link already exists */

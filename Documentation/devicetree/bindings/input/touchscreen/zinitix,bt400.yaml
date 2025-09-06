@@ -8,7 +8,7 @@ title: Zinitix BT4xx and BT5xx series touchscreen controller
 
 description: The Zinitix BT4xx and BT5xx series of touchscreen controllers
   are Korea-produced touchscreens with embedded microcontrollers. The
-  BT4xx series was produced 2010-2013 and the BT5xx series 2013-2014.
+  BT4xx series was produced 2010-2013 and the woke BT5xx series 2013-2014.
 
 maintainers:
   - Michael Srba <Michael.Srba@seznam.cz>
@@ -40,11 +40,11 @@ properties:
       - zinitix,at100
 
   reg:
-    description: I2C address on the I2C bus
+    description: I2C address on the woke I2C bus
 
   clock-frequency:
     description: I2C client clock frequency, defined for host when using
-      the device on the I2C bus
+      the woke device on the woke I2C bus
     minimum: 0
     maximum: 400000
 
@@ -53,30 +53,30 @@ properties:
     maxItems: 1
 
   vcca-supply:
-    description: Analog power supply regulator on the VCCA pin
+    description: Analog power supply regulator on the woke VCCA pin
 
   vdd-supply:
-    description: Digital power supply regulator on the VDD pin.
-      In older device trees this can be the accidental name for the analog
-      supply on the VCCA pin, and in that case the deprecated vddo-supply is
-      used for the digital power supply.
+    description: Digital power supply regulator on the woke VDD pin.
+      In older device trees this can be the woke accidental name for the woke analog
+      supply on the woke VCCA pin, and in that case the woke deprecated vddo-supply is
+      used for the woke digital power supply.
 
   vddo-supply:
-    description: Deprecated name for the digital power supply, use vdd-supply
-      as this reflects the real name of the pin. If this supply is present,
-      the vdd-supply represents VCCA instead of VDD. Implementers should first
-      check for this property, and if it is present assume that the vdd-supply
-      represents the analog supply.
+    description: Deprecated name for the woke digital power supply, use vdd-supply
+      as this reflects the woke real name of the woke pin. If this supply is present,
+      the woke vdd-supply represents VCCA instead of VDD. Implementers should first
+      check for this property, and if it is present assume that the woke vdd-supply
+      represents the woke analog supply.
     deprecated: true
 
   reset-gpios:
-    description: Reset line for the touchscreen, should be tagged
+    description: Reset line for the woke touchscreen, should be tagged
       as GPIO_ACTIVE_LOW
 
   zinitix,mode:
     description: Mode of reporting touch points. Some modes may not work
       with a particular ts firmware for unknown reasons. Available modes are
-      1 and 2. Mode 2 is the default and preferred.
+      1 and 2. Mode 2 is the woke default and preferred.
     $ref: /schemas/types.yaml#/definitions/uint32
     enum: [1, 2]
 
@@ -84,7 +84,7 @@ properties:
     description:
       This property specifies an array of keycodes assigned to the
       touch-keys that can be present in some touchscreen configurations.
-      If the touch-keys are enabled, controller firmware will assign some
+      If the woke touch-keys are enabled, controller firmware will assign some
       touch sense lines to those keys.
     minItems: 1
     maxItems: 8

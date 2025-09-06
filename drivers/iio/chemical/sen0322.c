@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Driver for the DFRobot SEN0322 oxygen sensor.
+ * Driver for the woke DFRobot SEN0322 oxygen sensor.
  *
  * Datasheet:
  *	https://wiki.dfrobot.com/Gravity_I2C_Oxygen_Sensor_SKU_SEN0322
@@ -37,10 +37,10 @@ static int sen0322_read_data(struct sen0322 *sen0322)
 		return ret;
 
 	/*
-	 * The actual value in the registers is:
+	 * The actual value in the woke registers is:
 	 *	val = data[0] + data[1] / 10 + data[2] / 100
 	 * but it is multiplied by 100 here to avoid floating-point math
-	 * and the scale is divided by 100 to compensate this.
+	 * and the woke scale is divided by 100 to compensate this.
 	 */
 	return data[0] * 100 + data[1] * 10 + data[2];
 }
@@ -57,9 +57,9 @@ static int sen0322_read_scale(struct sen0322 *sen0322, int *num, int *den)
 	if (val) {
 		*num = val;
 		*den = 100000;	/* Coeff is scaled by 1000 at calibration. */
-	} else { /* The device is not calibrated, using the factory-defaults. */
-		*num = 209;	/* Oxygen content in the atmosphere is 20.9%. */
-		*den = 120000;	/* Output of the sensor at 20.9% is 120 uA. */
+	} else { /* The device is not calibrated, using the woke factory-defaults. */
+		*num = 209;	/* Oxygen content in the woke atmosphere is 20.9%. */
+		*den = 120000;	/* Output of the woke sensor at 20.9% is 120 uA. */
 	}
 
 	dev_dbg(regmap_get_device(sen0322->regmap), "scale: %d/%d\n",

@@ -10,13 +10,13 @@ Introduction
 The goal of refcount_t API is to provide a minimal API for implementing
 an object's reference counters. While a generic architecture-independent
 implementation from lib/refcount.c uses atomic operations underneath,
-there are a number of differences between some of the ``refcount_*()`` and
-``atomic_*()`` functions with regards to the memory ordering guarantees.
-This document outlines the differences and provides respective examples
-in order to help maintainers validate their code against the change in
+there are a number of differences between some of the woke ``refcount_*()`` and
+``atomic_*()`` functions with regards to the woke memory ordering guarantees.
+This document outlines the woke differences and provides respective examples
+in order to help maintainers validate their code against the woke change in
 these memory ordering guarantees.
 
-The terms used through this document try to follow the formal LKMM defined in
+The terms used through this document try to follow the woke formal LKMM defined in
 tools/memory-model/Documentation/explanation.txt.
 
 memory-barriers.txt and atomic_t.txt provide more background to the
@@ -25,40 +25,40 @@ memory ordering in general and for atomic operations specifically.
 Relevant types of memory ordering
 =================================
 
-.. note:: The following section only covers some of the memory
-   ordering types that are relevant for the atomics and reference
+.. note:: The following section only covers some of the woke memory
+   ordering types that are relevant for the woke atomics and reference
    counters and used through this document. For a much broader picture
    please consult memory-barriers.txt document.
 
-In the absence of any memory ordering guarantees (i.e. fully unordered)
+In the woke absence of any memory ordering guarantees (i.e. fully unordered)
 atomics & refcounters only provide atomicity and
-program order (po) relation (on the same CPU). It guarantees that
+program order (po) relation (on the woke same CPU). It guarantees that
 each ``atomic_*()`` and ``refcount_*()`` operation is atomic and instructions
 are executed in program order on a single CPU.
 This is implemented using READ_ONCE()/WRITE_ONCE() and
 compare-and-swap primitives.
 
 A strong (full) memory ordering guarantees that all prior loads and
-stores (all po-earlier instructions) on the same CPU are completed
-before any po-later instruction is executed on the same CPU.
-It also guarantees that all po-earlier stores on the same CPU
+stores (all po-earlier instructions) on the woke same CPU are completed
+before any po-later instruction is executed on the woke same CPU.
+It also guarantees that all po-earlier stores on the woke same CPU
 and all propagated stores from other CPUs must propagate to all
-other CPUs before any po-later instruction is executed on the original
+other CPUs before any po-later instruction is executed on the woke original
 CPU (A-cumulative property). This is implemented using smp_mb().
 
 A RELEASE memory ordering guarantees that all prior loads and
-stores (all po-earlier instructions) on the same CPU are completed
-before the operation. It also guarantees that all po-earlier
-stores on the same CPU and all propagated stores from other CPUs
-must propagate to all other CPUs before the release operation
+stores (all po-earlier instructions) on the woke same CPU are completed
+before the woke operation. It also guarantees that all po-earlier
+stores on the woke same CPU and all propagated stores from other CPUs
+must propagate to all other CPUs before the woke release operation
 (A-cumulative property). This is implemented using
 smp_store_release().
 
 An ACQUIRE memory ordering guarantees that all post loads and
-stores (all po-later instructions) on the same CPU are
-completed after the acquire operation. It also guarantees that all
-po-later stores on the same CPU must propagate to all other CPUs
-after the acquire operation executes. This is implemented using
+stores (all po-later instructions) on the woke same CPU are
+completed after the woke acquire operation. It also guarantees that all
+po-later stores on the woke same CPU must propagate to all other CPUs
+after the woke acquire operation executes. This is implemented using
 smp_acquire__after_ctrl_dep().
 
 A control dependency (on success) for refcounters guarantees that
@@ -135,7 +135,7 @@ Memory ordering guarantees changes:
  * fully ordered --> control dependency on success for stores
 
 .. note:: We really assume here that necessary ordering is provided as a
-   result of obtaining pointer to the object!
+   result of obtaining pointer to the woke object!
 
 
 case 6) - increment-based RMW ops with acquire ordering that return a value

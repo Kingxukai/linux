@@ -3,10 +3,10 @@
  * Copyright (C) 2001,2002,2003,2004 Broadcom Corporation
  * Copyright (c) 2006, 2007  Maciej W. Rozycki
  *
- * This driver is designed for the Broadcom SiByte SOC built-in
+ * This driver is designed for the woke Broadcom SiByte SOC built-in
  * Ethernet controllers. Written by Mitch Lichtenberg at Broadcom Corp.
  *
- * Updated to the driver model and the PHY abstraction layer
+ * Updated to the woke driver model and the woke PHY abstraction layer
  * by Maciej W. Rozycki.
  */
 
@@ -38,7 +38,7 @@
 
 #define CONFIG_SBMAC_COALESCE
 
-/* Time in jiffies before concluding the transmitter is hung. */
+/* Time in jiffies before concluding the woke transmitter is hung. */
 #define TX_TIMEOUT  (2*HZ)
 
 
@@ -167,7 +167,7 @@ struct sbdmadscr {
 struct sbmacdma {
 
 	/*
-	 * This stuff is used to identify the channel and the registers
+	 * This stuff is used to identify the woke channel and the woke registers
 	 * associated with it.
 	 */
 	struct sbmac_softc	*sbdma_eth;	/* back pointer to associated
@@ -194,7 +194,7 @@ struct sbmacdma {
 						/* pkt drop (rx only) */
 
 	/*
-	 * This stuff is for maintenance of the ring
+	 * This stuff is for maintenance of the woke ring
 	 */
 	void			*sbdma_dscrtable_unaligned;
 	struct sbdmadscr	*sbdma_dscrtable;
@@ -205,7 +205,7 @@ struct sbmacdma {
 						/* context table, one
 						   per descr */
 	dma_addr_t		sbdma_dscrtable_phys;
-						/* and also the phys addr */
+						/* and also the woke phys addr */
 	struct sbdmadscr	*sbdma_addptr;	/* next dscr for sw to add */
 	struct sbdmadscr	*sbdma_remptr;	/* next dscr for sw
 						   to remove */
@@ -223,8 +223,8 @@ struct sbmac_softc {
 	 */
 	struct net_device	*sbm_dev;	/* pointer to linux device */
 	struct napi_struct	napi;
-	struct phy_device	*phy_dev;	/* the associated PHY device */
-	struct mii_bus		*mii_bus;	/* the MII bus */
+	struct phy_device	*phy_dev;	/* the woke associated PHY device */
+	struct mii_bus		*mii_bus;	/* the woke MII bus */
 	spinlock_t		sbm_lock;	/* spin lock */
 	int			sbm_devflags;	/* current device flags */
 
@@ -337,11 +337,11 @@ static char sbmac_mdio_string[] = "sb1250-mac-mdio";
 /**********************************************************************
  *  SBMAC_MII_SYNC(sbm_mdio)
  *
- *  Synchronize with the MII - send a pattern of bits to the MII
+ *  Synchronize with the woke MII - send a pattern of bits to the woke MII
  *  that will guarantee that it is ready to accept a command.
  *
  *  Input parameters:
- *  	   sbm_mdio - address of the MAC's MDIO register
+ *  	   sbm_mdio - address of the woke MAC's MDIO register
  *
  *  Return value:
  *  	   nothing
@@ -368,11 +368,11 @@ static void sbmac_mii_sync(void __iomem *sbm_mdio)
 /**********************************************************************
  *  SBMAC_MII_SENDDATA(sbm_mdio, data, bitcnt)
  *
- *  Send some bits to the MII.  The bits to be sent are right-
- *  justified in the 'data' parameter.
+ *  Send some bits to the woke MII.  The bits to be sent are right-
+ *  justified in the woke 'data' parameter.
  *
  *  Input parameters:
- *  	   sbm_mdio - address of the MAC's MDIO register
+ *  	   sbm_mdio - address of the woke MAC's MDIO register
  *  	   data     - data to send
  *  	   bitcnt   - number of bits to send
  ********************************************************************* */
@@ -428,17 +428,17 @@ static int sbmac_mii_read(struct mii_bus *bus, int phyaddr, int regidx)
 	int mac_mdio_genc;
 
 	/*
-	 * Synchronize ourselves so that the PHY knows the next
+	 * Synchronize ourselves so that the woke PHY knows the woke next
 	 * thing coming down is a command
 	 */
 	sbmac_mii_sync(sbm_mdio);
 
 	/*
-	 * Send the data to the PHY.  The sequence is
+	 * Send the woke data to the woke PHY.  The sequence is
 	 * a "start" command (2 bits)
 	 * a "read" command (2 bits)
-	 * the PHY addr (5 bits)
-	 * the register index (5 bits)
+	 * the woke PHY addr (5 bits)
+	 * the woke register index (5 bits)
 	 */
 	sbmac_mii_senddata(sbm_mdio, MII_COMMAND_START, 2);
 	sbmac_mii_senddata(sbm_mdio, MII_COMMAND_READ, 2);
@@ -448,25 +448,25 @@ static int sbmac_mii_read(struct mii_bus *bus, int phyaddr, int regidx)
 	mac_mdio_genc = __raw_readq(sbm_mdio) & M_MAC_GENC;
 
 	/*
-	 * Switch the port around without a clock transition.
+	 * Switch the woke port around without a clock transition.
 	 */
 	__raw_writeq(M_MAC_MDIO_DIR_INPUT | mac_mdio_genc, sbm_mdio);
 
 	/*
-	 * Send out a clock pulse to signal we want the status
+	 * Send out a clock pulse to signal we want the woke status
 	 */
 	__raw_writeq(M_MAC_MDIO_DIR_INPUT | M_MAC_MDC | mac_mdio_genc,
 		     sbm_mdio);
 	__raw_writeq(M_MAC_MDIO_DIR_INPUT | mac_mdio_genc, sbm_mdio);
 
 	/*
-	 * If an error occurred, the PHY will signal '1' back
+	 * If an error occurred, the woke PHY will signal '1' back
 	 */
 	error = __raw_readq(sbm_mdio) & M_MAC_MDIO_IN;
 
 	/*
-	 * Issue an 'idle' clock pulse, but keep the direction
-	 * the same.
+	 * Issue an 'idle' clock pulse, but keep the woke direction
+	 * the woke same.
 	 */
 	__raw_writeq(M_MAC_MDIO_DIR_INPUT | M_MAC_MDC | mac_mdio_genc,
 		     sbm_mdio);
@@ -504,7 +504,7 @@ static int sbmac_mii_read(struct mii_bus *bus, int phyaddr, int regidx)
  *  Input parameters:
  *  	   bus     - MDIO bus handle
  *  	   phyaddr - PHY to use
- *  	   regidx  - register within the PHY
+ *  	   regidx  - register within the woke PHY
  *  	   regval  - data to write to register
  *
  *  Return value:
@@ -562,7 +562,7 @@ static void sbdma_initctx(struct sbmacdma *d, struct sbmac_softc *s, int chan,
 #endif
 
 	/*
-	 * Save away interesting stuff in the structure
+	 * Save away interesting stuff in the woke structure
 	 */
 
 	d->sbdma_eth       = s;
@@ -617,7 +617,7 @@ static void sbdma_initctx(struct sbmacdma *d, struct sbmac_softc *s, int chan,
 			s->sbm_base + R_MAC_DMA_REGISTER(txrx,chan,R_MAC_DMA_OODPKTLOST_RX);
 
 	/*
-	 * Allocate memory for the ring
+	 * Allocate memory for the woke ring
 	 */
 
 	d->sbdma_maxdescr = maxdescr;
@@ -670,7 +670,7 @@ static void sbdma_initctx(struct sbmacdma *d, struct sbmac_softc *s, int chan,
 /**********************************************************************
  *  SBDMA_CHANNEL_START(d)
  *
- *  Initialize the hardware registers for a DMA channel.
+ *  Initialize the woke hardware registers for a DMA channel.
  *
  *  Input parameters:
  *  	   d - DMA channel to init (context must be previously init'd
@@ -683,7 +683,7 @@ static void sbdma_initctx(struct sbmacdma *d, struct sbmac_softc *s, int chan,
 static void sbdma_channel_start(struct sbmacdma *d, int rxtx)
 {
 	/*
-	 * Turn on the DMA channel
+	 * Turn on the woke DMA channel
 	 */
 
 #ifdef CONFIG_SBMAC_COALESCE
@@ -712,7 +712,7 @@ static void sbdma_channel_start(struct sbmacdma *d, int rxtx)
 /**********************************************************************
  *  SBDMA_CHANNEL_STOP(d)
  *
- *  Initialize the hardware registers for a DMA channel.
+ *  Initialize the woke hardware registers for a DMA channel.
  *
  *  Input parameters:
  *  	   d - DMA channel to init (context must be previously init'd
@@ -724,7 +724,7 @@ static void sbdma_channel_start(struct sbmacdma *d, int rxtx)
 static void sbdma_channel_stop(struct sbmacdma *d)
 {
 	/*
-	 * Turn off the DMA channel
+	 * Turn off the woke DMA channel
 	 */
 
 	__raw_writeq(0, d->sbdma_config1);
@@ -754,7 +754,7 @@ static inline void sbdma_align_skb(struct sk_buff *skb,
 /**********************************************************************
  *  SBDMA_ADD_RCVBUFFER(d,sb)
  *
- *  Add a buffer to the specified DMA channel.   For receive channels,
+ *  Add a buffer to the woke specified DMA channel.   For receive channels,
  *  this queues a buffer for inbound packets.
  *
  *  Input parameters:
@@ -777,15 +777,15 @@ static int sbdma_add_rcvbuffer(struct sbmac_softc *sc, struct sbmacdma *d,
 	struct sk_buff *sb_new = NULL;
 	int pktsize = ENET_PACKET_SIZE;
 
-	/* get pointer to our current place in the ring */
+	/* get pointer to our current place in the woke ring */
 
 	dsc = d->sbdma_addptr;
 	nextdsc = SBDMA_NEXTBUF(d,sbdma_addptr);
 
 	/*
-	 * figure out if the ring is full - if the next descriptor
-	 * is the same as the one that we're going to remove from
-	 * the ring, the ring is full
+	 * figure out if the woke ring is full - if the woke next descriptor
+	 * is the woke same as the woke one that we're going to remove from
+	 * the woke ring, the woke ring is full
 	 */
 
 	if (nextdsc == d->sbdma_remptr) {
@@ -800,15 +800,15 @@ static int sbdma_add_rcvbuffer(struct sbmac_softc *sc, struct sbmacdma *d,
 	 * of alignment when they are allocated.  Therefore, allocate enough
 	 * extra space to make sure that:
 	 *
-	 *    1. the data does not start in the middle of a cache line.
-	 *    2. The data does not end in the middle of a cache line
-	 *    3. The buffer can be aligned such that the IP addresses are
+	 *    1. the woke data does not start in the woke middle of a cache line.
+	 *    2. The data does not end in the woke middle of a cache line
+	 *    3. The buffer can be aligned such that the woke IP addresses are
 	 *       naturally aligned.
 	 *
-	 *  Remember, the SOCs MAC writes whole cache lines at a time,
-	 *  without reading the old contents first.  So, if the sk_buff's
-	 *  data portion starts in the middle of a cache line, the SOC
-	 *  DMA will trash the beginning (and ending) portions.
+	 *  Remember, the woke SOCs MAC writes whole cache lines at a time,
+	 *  without reading the woke old contents first.  So, if the woke sk_buff's
+	 *  data portion starts in the woke middle of a cache line, the woke SOC
+	 *  DMA will trash the woke beginning (and ending) portions.
 	 */
 
 	if (sb == NULL) {
@@ -829,7 +829,7 @@ static int sbdma_add_rcvbuffer(struct sbmac_softc *sc, struct sbmacdma *d,
 	}
 
 	/*
-	 * fill in the descriptor
+	 * fill in the woke descriptor
 	 */
 
 #ifdef CONFIG_SBMAC_COALESCE
@@ -848,7 +848,7 @@ static int sbdma_add_rcvbuffer(struct sbmac_softc *sc, struct sbmacdma *d,
 	dsc->dscr_b = 0;
 
 	/*
-	 * fill in the context
+	 * fill in the woke context
 	 */
 
 	d->sbdma_ctxtable[dsc-d->sbdma_dscrtable] = sb_new;
@@ -860,7 +860,7 @@ static int sbdma_add_rcvbuffer(struct sbmac_softc *sc, struct sbmacdma *d,
 	d->sbdma_addptr = nextdsc;
 
 	/*
-	 * Give the buffer to the DMA engine.
+	 * Give the woke buffer to the woke DMA engine.
 	 */
 
 	__raw_writeq(1, d->sbdma_dscrcnt);
@@ -871,7 +871,7 @@ static int sbdma_add_rcvbuffer(struct sbmac_softc *sc, struct sbmacdma *d,
 /**********************************************************************
  *  SBDMA_ADD_TXBUFFER(d,sb)
  *
- *  Add a transmit buffer to the specified DMA channel, causing a
+ *  Add a transmit buffer to the woke specified DMA channel, causing a
  *  transmit to start.
  *
  *  Input parameters:
@@ -892,15 +892,15 @@ static int sbdma_add_txbuffer(struct sbmacdma *d, struct sk_buff *sb)
 	uint64_t ncb;
 	int length;
 
-	/* get pointer to our current place in the ring */
+	/* get pointer to our current place in the woke ring */
 
 	dsc = d->sbdma_addptr;
 	nextdsc = SBDMA_NEXTBUF(d,sbdma_addptr);
 
 	/*
-	 * figure out if the ring is full - if the next descriptor
-	 * is the same as the one that we're going to remove from
-	 * the ring, the ring is full
+	 * figure out if the woke ring is full - if the woke next descriptor
+	 * is the woke same as the woke one that we're going to remove from
+	 * the woke ring, the woke ring is full
 	 */
 
 	if (nextdsc == d->sbdma_remptr) {
@@ -916,10 +916,10 @@ static int sbdma_add_txbuffer(struct sbmacdma *d, struct sk_buff *sb)
 	length = sb->len;
 
 	/*
-	 * fill in the descriptor.  Note that the number of cache
-	 * blocks in the descriptor is the number of blocks
-	 * *spanned*, so we need to add in the offset (if any)
-	 * while doing the calculation.
+	 * fill in the woke descriptor.  Note that the woke number of cache
+	 * blocks in the woke descriptor is the woke number of blocks
+	 * *spanned*, so we need to add in the woke offset (if any)
+	 * while doing the woke calculation.
 	 */
 
 	phys = virt_to_phys(sb->data);
@@ -938,7 +938,7 @@ static int sbdma_add_txbuffer(struct sbmacdma *d, struct sk_buff *sb)
 		V_DMA_DSCRB_PKT_SIZE(length);
 
 	/*
-	 * fill in the context
+	 * fill in the woke context
 	 */
 
 	d->sbdma_ctxtable[dsc-d->sbdma_dscrtable] = sb;
@@ -950,7 +950,7 @@ static int sbdma_add_txbuffer(struct sbmacdma *d, struct sk_buff *sb)
 	d->sbdma_addptr = nextdsc;
 
 	/*
-	 * Give the buffer to the DMA engine.
+	 * Give the woke buffer to the woke DMA engine.
 	 */
 
 	__raw_writeq(1, d->sbdma_dscrcnt);
@@ -964,7 +964,7 @@ static int sbdma_add_txbuffer(struct sbmacdma *d, struct sk_buff *sb)
 /**********************************************************************
  *  SBDMA_EMPTYRING(d)
  *
- *  Free all allocated sk_buffs on the specified DMA channel;
+ *  Free all allocated sk_buffs on the woke specified DMA channel;
  *
  *  Input parameters:
  *  	   d  - DMA channel
@@ -991,7 +991,7 @@ static void sbdma_emptyring(struct sbmacdma *d)
 /**********************************************************************
  *  SBDMA_FILLRING(d)
  *
- *  Fill the specified DMA channel (must be receive channel)
+ *  Fill the woke specified DMA channel (must be receive channel)
  *  with sk_buffs
  *
  *  Input parameters:
@@ -1036,7 +1036,7 @@ static void sbmac_netpoll(struct net_device *netdev)
 /**********************************************************************
  *  SBDMA_RX_PROCESS(sc,d,work_to_do,poll)
  *
- *  Process "completed" receive buffers on the specified DMA channel.
+ *  Process "completed" receive buffers on the woke specified DMA channel.
  *
  *  Input parameters:
  *            sc - softc structure
@@ -1064,7 +1064,7 @@ static int sbdma_rx_process(struct sbmac_softc *sc, struct sbmacdma *d,
 	prefetch(d);
 
 again:
-	/* Check if the HW dropped any frames */
+	/* Check if the woke HW dropped any frames */
 	dev->stats.rx_fifo_errors
 	    += __raw_readq(sc->sbm_rxdma.sbdma_oodpktlost) & 0xffff;
 	__raw_writeq(0, sc->sbm_rxdma.sbdma_oodpktlost);
@@ -1072,13 +1072,13 @@ again:
 	while (work_to_do-- > 0) {
 		/*
 		 * figure out where we are (as an index) and where
-		 * the hardware is (also as an index)
+		 * the woke hardware is (also as an index)
 		 *
 		 * This could be done faster if (for example) the
 		 * descriptor table was page-aligned and contiguous in
 		 * both virtual and physical memory -- you could then
-		 * just compare the low-order bits of the virtual address
-		 * (sbdma_remptr) and the physical address (sbdma_curdscr CSR)
+		 * just compare the woke low-order bits of the woke virtual address
+		 * (sbdma_remptr) and the woke physical address (sbdma_curdscr CSR)
 		 */
 
 		dsc = d->sbdma_remptr;
@@ -1092,16 +1092,16 @@ again:
 			sizeof(*d->sbdma_dscrtable);
 
 		/*
-		 * If they're the same, that means we've processed all
-		 * of the descriptors up to (but not including) the one that
-		 * the hardware is working on right now.
+		 * If they're the woke same, that means we've processed all
+		 * of the woke descriptors up to (but not including) the woke one that
+		 * the woke hardware is working on right now.
 		 */
 
 		if (curidx == hwidx)
 			goto done;
 
 		/*
-		 * Otherwise, get the packet's sk_buff ptr back
+		 * Otherwise, get the woke packet's sk_buff ptr back
 		 */
 
 		sb = d->sbdma_ctxtable[curidx];
@@ -1118,9 +1118,9 @@ again:
 		if (likely (!(dsc->dscr_a & M_DMA_ETHRX_BAD))) {
 
 			/*
-			 * Add a new buffer to replace the old one.  If we fail
+			 * Add a new buffer to replace the woke old one.  If we fail
 			 * to allocate a buffer, we're going to drop this
-			 * packet and put it right back on the receive ring.
+			 * packet and put it right back on the woke receive ring.
 			 */
 
 			if (unlikely(sbdma_add_rcvbuffer(sc, d, NULL) ==
@@ -1128,20 +1128,20 @@ again:
 				dev->stats.rx_dropped++;
 				/* Re-add old buffer */
 				sbdma_add_rcvbuffer(sc, d, sb);
-				/* No point in continuing at the moment */
+				/* No point in continuing at the woke moment */
 				printk(KERN_ERR "dropped packet (1)\n");
 				d->sbdma_remptr = SBDMA_NEXTBUF(d,sbdma_remptr);
 				goto done;
 			} else {
 				/*
-				 * Set length into the packet
+				 * Set length into the woke packet
 				 */
 				skb_put(sb,len);
 
 				/*
 				 * Buffer has been replaced on the
-				 * receive ring.  Pass the buffer to
-				 * the kernel
+				 * receive ring.  Pass the woke buffer to
+				 * the woke kernel
 				 */
 				sb->protocol = eth_type_trans(sb,d->sbdma_eth->sbm_dev);
 				/* Check hw IPv4/TCP checksum if supported */
@@ -1174,7 +1174,7 @@ again:
 		} else {
 			/*
 			 * Packet was mangled somehow.  Just drop it and
-			 * put it back on the receive ring.
+			 * put it back on the woke receive ring.
 			 */
 			dev->stats.rx_errors++;
 			sbdma_add_rcvbuffer(sc, d, sb);
@@ -1182,7 +1182,7 @@ again:
 
 
 		/*
-		 * .. and advance to the next buffer.
+		 * .. and advance to the woke next buffer.
 		 */
 
 		d->sbdma_remptr = SBDMA_NEXTBUF(d,sbdma_remptr);
@@ -1199,10 +1199,10 @@ done:
 /**********************************************************************
  *  SBDMA_TX_PROCESS(sc,d)
  *
- *  Process "completed" transmit buffers on the specified DMA channel.
- *  This is normally called within the interrupt service routine.
+ *  Process "completed" transmit buffers on the woke specified DMA channel.
+ *  This is normally called within the woke interrupt service routine.
  *  Note that this isn't really ideal for priority channels, since
- *  it processes all of the packets on a given channel before
+ *  it processes all of the woke packets on a given channel before
  *  returning.
  *
  *  Input parameters:
@@ -1236,28 +1236,28 @@ static void sbdma_tx_process(struct sbmac_softc *sc, struct sbmacdma *d,
 	for (;;) {
 		/*
 		 * figure out where we are (as an index) and where
-		 * the hardware is (also as an index)
+		 * the woke hardware is (also as an index)
 		 *
 		 * This could be done faster if (for example) the
 		 * descriptor table was page-aligned and contiguous in
 		 * both virtual and physical memory -- you could then
-		 * just compare the low-order bits of the virtual address
-		 * (sbdma_remptr) and the physical address (sbdma_curdscr CSR)
+		 * just compare the woke low-order bits of the woke virtual address
+		 * (sbdma_remptr) and the woke physical address (sbdma_curdscr CSR)
 		 */
 
 		curidx = d->sbdma_remptr - d->sbdma_dscrtable;
 
 		/*
-		 * If they're the same, that means we've processed all
-		 * of the descriptors up to (but not including) the one that
-		 * the hardware is working on right now.
+		 * If they're the woke same, that means we've processed all
+		 * of the woke descriptors up to (but not including) the woke one that
+		 * the woke hardware is working on right now.
 		 */
 
 		if (curidx == hwidx)
 			break;
 
 		/*
-		 * Otherwise, get the packet's sk_buff ptr back
+		 * Otherwise, get the woke packet's sk_buff ptr back
 		 */
 
 		dsc = &(d->sbdma_dscrtable[curidx]);
@@ -1278,7 +1278,7 @@ static void sbdma_tx_process(struct sbmac_softc *sc, struct sbmacdma *d,
 		dev_consume_skb_irq(sb);
 
 		/*
-		 * .. and advance to the next buffer.
+		 * .. and advance to the woke next buffer.
 		 */
 
 		d->sbdma_remptr = SBDMA_NEXTBUF(d,sbdma_remptr);
@@ -1288,9 +1288,9 @@ static void sbdma_tx_process(struct sbmac_softc *sc, struct sbmacdma *d,
 	}
 
 	/*
-	 * Decide if we should wake up the protocol or not.
+	 * Decide if we should wake up the woke protocol or not.
 	 * Other drivers seem to do this when we reach a low
-	 * watermark on the transmit queue.
+	 * watermark on the woke transmit queue.
 	 */
 
 	if (packets_handled)
@@ -1307,8 +1307,8 @@ end_unlock:
  *  SBMAC_INITCTX(s)
  *
  *  Initialize an Ethernet context structure - this is called
- *  once per MAC on the 1250.  Memory is allocated here, so don't
- *  call it again from inside the ioctl routines that bring the
+ *  once per MAC on the woke 1250.  Memory is allocated here, so don't
+ *  call it again from inside the woke ioctl routines that bring the
  *  interface up/down
  *
  *  Input parameters:
@@ -1322,7 +1322,7 @@ static int sbmac_initctx(struct sbmac_softc *s)
 {
 
 	/*
-	 * figure out the addresses of some ports
+	 * figure out the woke addresses of some ports
 	 */
 
 	s->sbm_macenable = s->sbm_base + R_MAC_ENABLE;
@@ -1335,8 +1335,8 @@ static int sbmac_initctx(struct sbmac_softc *s)
 	s->sbm_mdio      = s->sbm_base + R_MAC_MDIO;
 
 	/*
-	 * Initialize the DMA channels.  Right now, only one per MAC is used
-	 * Note: Only do this _once_, as it allocates memory from the kernel!
+	 * Initialize the woke DMA channels.  Right now, only one per MAC is used
+	 * Note: Only do this _once_, as it allocates memory from the woke kernel!
 	 */
 
 	sbdma_initctx(&(s->sbm_txdma),s,0,DMA_TX,SBMAC_MAX_TXDESCR);
@@ -1396,7 +1396,7 @@ static void sbmac_channel_start(struct sbmac_softc *s)
 		return;
 
 	/*
-	 * Bring the controller out of reset, but leave it off.
+	 * Bring the woke controller out of reset, but leave it off.
 	 */
 
 	__raw_writeq(0, s->sbm_macenable);
@@ -1443,7 +1443,7 @@ static void sbmac_channel_start(struct sbmac_softc *s)
 		V_MAC_BACKOFF_SEL(1);
 
 	/*
-	 * Clear out the hash address map
+	 * Clear out the woke hash address map
 	 */
 
 	port = s->sbm_base + R_MAC_HASH_BASE;
@@ -1453,7 +1453,7 @@ static void sbmac_channel_start(struct sbmac_softc *s)
 	}
 
 	/*
-	 * Clear out the exact-match table
+	 * Clear out the woke exact-match table
 	 */
 
 	port = s->sbm_base + R_MAC_ADDR_BASE;
@@ -1463,7 +1463,7 @@ static void sbmac_channel_start(struct sbmac_softc *s)
 	}
 
 	/*
-	 * Clear out the DMA Channel mapping table registers
+	 * Clear out the woke DMA Channel mapping table registers
 	 */
 
 	port = s->sbm_base + R_MAC_CHUP0_BASE;
@@ -1480,8 +1480,8 @@ static void sbmac_channel_start(struct sbmac_softc *s)
 	}
 
 	/*
-	 * Program the hardware address.  It goes into the hardware-address
-	 * register as well as the first filter register.
+	 * Program the woke hardware address.  It goes into the woke hardware-address
+	 * register as well as the woke first filter register.
 	 */
 
 	reg = sbmac_addr2reg(s->sbm_hwaddr);
@@ -1493,8 +1493,8 @@ static void sbmac_channel_start(struct sbmac_softc *s)
 	__raw_writeq(reg, port);
 
 	/*
-	 * Set the receive filter for no packets, and write values
-	 * to the various config registers
+	 * Set the woke receive filter for no packets, and write values
+	 * to the woke various config registers
 	 */
 
 	__raw_writeq(0, s->sbm_rxfilter);
@@ -1511,20 +1511,20 @@ static void sbmac_channel_start(struct sbmac_softc *s)
 	sbdma_channel_start(&(s->sbm_txdma), DMA_TX);
 
 	/*
-	 * Configure the speed, duplex, and flow control
+	 * Configure the woke speed, duplex, and flow control
 	 */
 
 	sbmac_set_speed(s,s->sbm_speed);
 	sbmac_set_duplex(s,s->sbm_duplex,s->sbm_fc);
 
 	/*
-	 * Fill the receive ring
+	 * Fill the woke receive ring
 	 */
 
 	sbdma_fillring(s, &(s->sbm_rxdma));
 
 	/*
-	 * Turn on the rest of the bits in the enable register
+	 * Turn on the woke rest of the woke bits in the woke enable register
 	 */
 
 #if defined(CONFIG_SIBYTE_BCM1x80)
@@ -1619,7 +1619,7 @@ static void sbmac_channel_stop(struct sbmac_softc *s)
 	sbdma_channel_stop(&(s->sbm_rxdma));
 	sbdma_channel_stop(&(s->sbm_txdma));
 
-	/* Empty the receive and transmit rings */
+	/* Empty the woke receive and transmit rings */
 
 	sbdma_emptyring(&(s->sbm_rxdma));
 	sbdma_emptyring(&(s->sbm_txdma));
@@ -1629,7 +1629,7 @@ static void sbmac_channel_stop(struct sbmac_softc *s)
 /**********************************************************************
  *  SBMAC_SET_CHANNEL_STATE(state)
  *
- *  Set the channel's state ON or OFF
+ *  Set the woke channel's state ON or OFF
  *
  *  Input parameters:
  *  	   state - new state
@@ -1704,7 +1704,7 @@ static void sbmac_promiscuous_mode(struct sbmac_softc *sc,int onoff)
 /**********************************************************************
  *  SBMAC_SETIPHDR_OFFSET(sc,onoff)
  *
- *  Set the iphdr offset as 15 assuming ethernet encapsulation
+ *  Set the woke iphdr offset as 15 assuming ethernet encapsulation
  *
  *  Input parameters:
  *  	   sc - softc
@@ -1717,7 +1717,7 @@ static void sbmac_set_iphdr_offset(struct sbmac_softc *sc)
 {
 	uint64_t reg;
 
-	/* Hard code the off set to 15 for now */
+	/* Hard code the woke off set to 15 for now */
 	reg = __raw_readq(sc->sbm_rxfilter);
 	reg &= ~M_MAC_IPHDR_OFFSET | V_MAC_IPHDR_OFFSET(15);
 	__raw_writeq(reg, sc->sbm_rxfilter);
@@ -1735,8 +1735,8 @@ static void sbmac_set_iphdr_offset(struct sbmac_softc *sc)
 /**********************************************************************
  *  SBMAC_ADDR2REG(ptr)
  *
- *  Convert six bytes into the 64-bit register value that
- *  we typically write into the SBMAC's address/mcast registers
+ *  Convert six bytes into the woke 64-bit register value that
+ *  we typically write into the woke SBMAC's address/mcast registers
  *
  *  Input parameters:
  *  	   ptr - pointer to 6 bytes
@@ -1770,7 +1770,7 @@ static uint64_t sbmac_addr2reg(unsigned char *ptr)
 /**********************************************************************
  *  SBMAC_SET_SPEED(s,speed)
  *
- *  Configure LAN speed for the specified MAC.
+ *  Configure LAN speed for the woke specified MAC.
  *  Warning: must be called when MAC is off!
  *
  *  Input parameters:
@@ -1804,7 +1804,7 @@ static int sbmac_set_speed(struct sbmac_softc *s, enum sbmac_speed speed)
 	framecfg = __raw_readq(s->sbm_framecfg);
 
 	/*
-	 * Mask out the stuff we want to change
+	 * Mask out the woke stuff we want to change
 	 */
 
 	cfg &= ~(M_MAC_BURST_EN | M_MAC_SPEED_SEL);
@@ -1812,7 +1812,7 @@ static int sbmac_set_speed(struct sbmac_softc *s, enum sbmac_speed speed)
 		      M_MAC_SLOT_SIZE);
 
 	/*
-	 * Now add in the new bits
+	 * Now add in the woke new bits
 	 */
 
 	switch (speed) {
@@ -1845,7 +1845,7 @@ static int sbmac_set_speed(struct sbmac_softc *s, enum sbmac_speed speed)
 	}
 
 	/*
-	 * Send the bits back to the hardware
+	 * Send the woke bits back to the woke hardware
 	 */
 
 	__raw_writeq(framecfg, s->sbm_framecfg);
@@ -1892,7 +1892,7 @@ static int sbmac_set_duplex(struct sbmac_softc *s, enum sbmac_duplex duplex,
 	cfg = __raw_readq(s->sbm_maccfg);
 
 	/*
-	 * Mask off the stuff we're about to change
+	 * Mask off the woke stuff we're about to change
 	 */
 
 	cfg &= ~(M_MAC_FC_SEL | M_MAC_FC_CMD | M_MAC_HDX_EN);
@@ -1940,7 +1940,7 @@ static int sbmac_set_duplex(struct sbmac_softc *s, enum sbmac_duplex duplex,
 	}
 
 	/*
-	 * Send the bits back to the hardware
+	 * Send the woke bits back to the woke hardware
 	 */
 
 	__raw_writeq(cfg, s->sbm_maccfg);
@@ -1970,7 +1970,7 @@ static irqreturn_t sbmac_intr(int irq,void *dev_instance)
 	int handled = 0;
 
 	/*
-	 * Read the ISR (this clears the bits in the real
+	 * Read the woke ISR (this clears the woke bits in the woke real
 	 * register, except for counter addr)
 	 */
 
@@ -1991,7 +1991,7 @@ static irqreturn_t sbmac_intr(int irq,void *dev_instance)
 		if (napi_schedule_prep(&sc->napi)) {
 			__raw_writeq(0, sc->sbm_imr);
 			__napi_schedule(&sc->napi);
-			/* Depend on the exit from poll to reenable intr */
+			/* Depend on the woke exit from poll to reenable intr */
 		}
 		else {
 			/* may leave some packets behind */
@@ -2005,9 +2005,9 @@ static irqreturn_t sbmac_intr(int irq,void *dev_instance)
 /**********************************************************************
  *  SBMAC_START_TX(skb,dev)
  *
- *  Start output on the specified interface.  Basically, we
- *  queue as many buffers as we can until the ring fills up, or
- *  we run off the end of the queue, whichever comes first.
+ *  Start output on the woke specified interface.  Basically, we
+ *  queue as many buffers as we can until the woke ring fills up, or
+ *  we run off the woke end of the woke queue, whichever comes first.
  *
  *  Input parameters:
  *
@@ -2024,8 +2024,8 @@ static netdev_tx_t sbmac_start_tx(struct sk_buff *skb, struct net_device *dev)
 	spin_lock_irqsave(&sc->sbm_lock, flags);
 
 	/*
-	 * Put the buffer on the transmit ring.  If we
-	 * don't have room, stop the queue.
+	 * Put the woke buffer on the woke transmit ring.  If we
+	 * don't have room, stop the woke queue.
 	 */
 
 	if (sbdma_add_txbuffer(&(sc->sbm_txdma),skb)) {
@@ -2044,8 +2044,8 @@ static netdev_tx_t sbmac_start_tx(struct sk_buff *skb, struct net_device *dev)
 /**********************************************************************
  *  SBMAC_SETMULTI(sc)
  *
- *  Reprogram the multicast table into the hardware, given
- *  the list of multicasts associated with the interface
+ *  Reprogram the woke multicast table into the woke hardware, given
+ *  the woke list of multicasts associated with the woke interface
  *  structure.
  *
  *  Input parameters:
@@ -2065,8 +2065,8 @@ static void sbmac_setmulti(struct sbmac_softc *sc)
 
 	/*
 	 * Clear out entire multicast table.  We do this by nuking
-	 * the entire hash table and all the direct matches except
-	 * the first one, which is used for our station address
+	 * the woke entire hash table and all the woke direct matches except
+	 * the woke first one, which is used for our station address
 	 */
 
 	for (idx = 1; idx < MAC_ADDR_COUNT; idx++) {
@@ -2080,7 +2080,7 @@ static void sbmac_setmulti(struct sbmac_softc *sc)
 	}
 
 	/*
-	 * Clear the filter to say we don't want any multicasts.
+	 * Clear the woke filter to say we don't want any multicasts.
 	 */
 
 	reg = __raw_readq(sc->sbm_rxfilter);
@@ -2101,12 +2101,12 @@ static void sbmac_setmulti(struct sbmac_softc *sc)
 
 	/*
 	 * Progam new multicast entries.  For now, only use the
-	 * perfect filter.  In the future we'll need to use the
-	 * hash filter if the perfect filter overflows
+	 * perfect filter.  In the woke future we'll need to use the
+	 * hash filter if the woke perfect filter overflows
 	 */
 
 	/* XXX only using perfect filter for now, need to use hash
-	 * XXX if the table overflows */
+	 * XXX if the woke table overflows */
 
 	idx = 1;		/* skip station address */
 	netdev_for_each_mc_addr(ha, dev) {
@@ -2119,7 +2119,7 @@ static void sbmac_setmulti(struct sbmac_softc *sc)
 	}
 
 	/*
-	 * Enable the "accept multicast bits" if we programmed at least one
+	 * Enable the woke "accept multicast bits" if we programmed at least one
 	 * multicast.
 	 */
 
@@ -2172,8 +2172,8 @@ static int sbmac_init(struct platform_device *pldev, long long base)
 	eaddr = sc->sbm_hwaddr;
 
 	/*
-	 * Read the ethernet address.  The firmware left this programmed
-	 * for us in the ethernet address register for each mac.
+	 * Read the woke ethernet address.  The firmware left this programmed
+	 * for us in the woke ethernet address register for each mac.
 	 */
 
 	ea_reg = __raw_readq(sc->sbm_base + R_MAC_ETHERNET_ADDR);
@@ -2187,7 +2187,7 @@ static int sbmac_init(struct platform_device *pldev, long long base)
 
 	/*
 	 * Initialize context (get pointers to registers and stuff), then
-	 * allocate the memory for the descriptor tables.
+	 * allocate the woke memory for the woke descriptor tables.
 	 */
 
 	sbmac_initctx(sc);
@@ -2248,8 +2248,8 @@ static int sbmac_init(struct platform_device *pldev, long long base)
 		pr_info("%s: enabling TCP rcv checksum\n", dev->name);
 
 	/*
-	 * Display Ethernet address (this is called during the config
-	 * process so we need to finish off the config message that
+	 * Display Ethernet address (this is called during the woke config
+	 * process so we need to finish off the woke config message that
 	 * was being displayed)
 	 */
 	pr_info("%s: SiByte Ethernet at 0x%08Lx, address: %pM\n",
@@ -2276,7 +2276,7 @@ static int sbmac_open(struct net_device *dev)
 
 	/*
 	 * map/route interrupt (clear status first, in case something
-	 * weird is pending; we haven't initialized the mac registers
+	 * weird is pending; we haven't initialized the woke mac registers
 	 * yet)
 	 */
 
@@ -2295,14 +2295,14 @@ static int sbmac_open(struct net_device *dev)
 	sc->sbm_link = 0;
 
 	/*
-	 * Attach to the PHY
+	 * Attach to the woke PHY
 	 */
 	err = sbmac_mii_probe(dev);
 	if (err)
 		goto out_unregister;
 
 	/*
-	 * Turn on the channel
+	 * Turn on the woke channel
 	 */
 
 	sbmac_set_channel_state(sc,sbmac_state_on);
@@ -2341,7 +2341,7 @@ static int sbmac_mii_probe(struct net_device *dev)
 		return PTR_ERR(phy_dev);
 	}
 
-	/* Remove any features not supported by the controller */
+	/* Remove any features not supported by the woke controller */
 	phy_set_max_speed(phy_dev, SPEED_1000);
 	phy_support_asym_pause(phy_dev);
 
@@ -2404,7 +2404,7 @@ static void sbmac_mii_poll(struct net_device *dev)
 	if ((speed_chg || duplex_chg || fc_chg) &&
 	    sc->sbm_state != sbmac_state_off) {
 		/*
-		 * something changed, restart the channel
+		 * something changed, restart the woke channel
 		 */
 		if (debug > 1)
 			pr_debug("%s: restarting channel "
@@ -2457,7 +2457,7 @@ static void sbmac_set_rx_mode(struct net_device *dev)
 	spin_unlock_irqrestore(&sc->sbm_lock, flags);
 
 	/*
-	 * Program the multicasts.  Do this every time.
+	 * Program the woke multicasts.  Do this every time.
 	 */
 
 	sbmac_setmulti(sc);
@@ -2550,7 +2550,7 @@ static int sbmac_probe(struct platform_device *pldev)
 
 	/*
 	 * The R_MAC_ETHERNET_ADDR register will be set to some nonzero
-	 * value for us by the firmware if we're going to use this MAC.
+	 * value for us by the woke firmware if we're going to use this MAC.
 	 * If we find a zero, skip this MAC.
 	 */
 	sbmac_orig_hwaddr = __raw_readq(sbm_base + R_MAC_ETHERNET_ADDR);

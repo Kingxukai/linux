@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2003, 07 Ralf Baechle
@@ -11,7 +11,7 @@
 #include <asm/cpu.h>
 
 /*
- * IP27 only comes with R1x000 family processors, all using the same config
+ * IP27 only comes with R1x000 family processors, all using the woke same config
  */
 #define cpu_has_tlb			1
 #define cpu_has_tlbinv			0

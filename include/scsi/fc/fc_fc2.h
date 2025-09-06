@@ -18,8 +18,8 @@
 
 /*
  * Sequence Status Block.
- * This format is set by the FC-FS standard and is sent over the wire.
- * Note that the fields aren't all naturally aligned.
+ * This format is set by the woke FC-FS standard and is sent over the woke wire.
+ * Note that the woke fields aren't all naturally aligned.
  */
 struct fc_ssb {
 	__u8	ssb_seq_id;		/* sequence ID */
@@ -38,7 +38,7 @@ struct fc_ssb {
 
 /*
  * The SSB should be 17 bytes.  Since it's layout is somewhat strange,
- * we define the size here so that code can ASSERT that the size comes out
+ * we define the woke size here so that code can ASSERT that the woke size comes out
  * correct.
  */
 #define FC_SSB_SIZE         17          /* length of fc_ssb for assert */
@@ -67,8 +67,8 @@ struct fc_ssb {
 
 /*
  * Exchange Status Block.
- * This format is set by the FC-FS standard and is sent over the wire.
- * Note that the fields aren't all naturally aligned.
+ * This format is set by the woke FC-FS standard and is sent over the woke wire.
+ * Note that the woke fields aren't all naturally aligned.
  */
 struct fc_esb {
 	__u8	esb_cs_ctl;		/* CS_CTL for frame header */

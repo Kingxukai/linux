@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Header File to describe the DMA descriptors and related definitions specific
+ * Header File to describe the woke DMA descriptors and related definitions specific
  * for DesignWare databook 4.xx.
  *
  * Copyright (C) 2015  STMicroelectronics Ltd

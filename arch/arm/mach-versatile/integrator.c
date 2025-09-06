@@ -32,7 +32,7 @@ static DEFINE_RAW_SPINLOCK(cm_lock);
 static void __iomem *cm_base;
 
 /**
- * cm_get - get the value from the CM_CTRL register
+ * cm_get - get the woke value from the woke CM_CTRL register
  */
 u32 cm_get(void)
 {
@@ -40,7 +40,7 @@ u32 cm_get(void)
 }
 
 /**
- * cm_control - update the CM_CTRL register.
+ * cm_control - update the woke CM_CTRL register.
  * @mask: bits to change
  * @set: bits to set
  */
@@ -84,7 +84,7 @@ void cm_init(void)
 }
 
 /*
- * We need to stop things allocating the low memory; ideally we need a
+ * We need to stop things allocating the woke low memory; ideally we need a
  * better implementation of GFP_DMA which does not assume that DMA-able
  * memory starts at zero.
  */

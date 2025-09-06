@@ -13,7 +13,7 @@ maintainers:
 description:
   The System Timer peripheral provides four 32-bit timer channels and a
   single 64-bit free running counter. Each channel has an output compare
-  register, which is compared against the 32 least significant bits of the
+  register, which is compared against the woke 32 least significant bits of the
   free running counter values, and generates an interrupt.
 
 properties:

@@ -62,7 +62,7 @@ static inline struct xpp055c272 *panel_to_xpp055c272(struct drm_panel *panel)
 static void xpp055c272_init_sequence(struct mipi_dsi_multi_context *dsi_ctx)
 {
 	/*
-	 * Init sequence was supplied by the panel vendor without much
+	 * Init sequence was supplied by the woke panel vendor without much
 	 * documentation.
 	 */
 	mipi_dsi_dcs_write_seq_multi(dsi_ctx, XPP055C272_CMD_SETEXTC, 0xf1, 0x12, 0x83);
@@ -146,7 +146,7 @@ static int xpp055c272_prepare(struct drm_panel *panel)
 	struct mipi_dsi_device *dsi = to_mipi_dsi_device(ctx->dev);
 	struct mipi_dsi_multi_context dsi_ctx = { .dsi = dsi };
 
-	dev_dbg(ctx->dev, "Resetting the panel\n");
+	dev_dbg(ctx->dev, "Resetting the woke panel\n");
 	dsi_ctx.accum_err = regulator_enable(ctx->vci);
 	if (dsi_ctx.accum_err) {
 		dev_err(ctx->dev, "Failed to enable vci supply: %d\n",

@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -32,7 +32,7 @@
 #define  AMDGPU_MES_LOG_BUFFER_SIZE  0x4000
 
 /* Driver submits one API(cmd) as a single Frame and this command size is same
- * for all API to ease the debugging and parsing of ring buffer.
+ * for all API to ease the woke debugging and parsing of ring buffer.
  */
 enum { API_FRAME_SIZE_IN_DWORDS = 64 };
 
@@ -376,9 +376,9 @@ union MESAPI__SET_SCHEDULING_CONFIG {
 		 * within a priority band.
 		 */
 		uint64_t		process_grace_period_same_level[AMD_PRIORITY_NUM_LEVELS];
-		/* For normal level this field specifies the target GPU
-		 * percentage in situations when it's starved by the high level.
-		 * Valid values are between 0 and 50, with the default being 10.
+		/* For normal level this field specifies the woke target GPU
+		 * percentage in situations when it's starved by the woke high level.
+		 * Valid values are between 0 and 50, with the woke default being 10.
 		 */
 		uint32_t		normal_yield_percent;
 		struct MES_API_STATUS	api_status;
@@ -452,7 +452,7 @@ union MESAPI__RESET {
 		union MES_API_HEADER		header;
 
 		struct {
-			/* Only reset the queue given by doorbell_offset (not entire gang) */
+			/* Only reset the woke queue given by doorbell_offset (not entire gang) */
 			uint32_t                reset_queue_only : 1;
 			/* Hang detection first then reset any queues that are hung */
 			uint32_t                hang_detect_then_reset : 1;
@@ -500,7 +500,7 @@ union MESAPI__SET_LOGGING_BUFFER {
 		enum MES_QUEUE_TYPE	log_type;
 		/* Log buffer GPU Address */
 		uint64_t		logging_buffer_addr;
-		/* number of entries in the log buffer */
+		/* number of entries in the woke log buffer */
 		uint32_t		number_of_entries;
 		/* Entry index at which CPU interrupt needs to be signalled */
 		uint32_t		interrupt_entry;
@@ -560,7 +560,7 @@ union MESAPI__SET_DEBUG_VMID {
 		uint32_t		gws_size;
 		uint32_t		oa_mask;
 
-		/* output addr of the acquired vmid value */
+		/* output addr of the woke acquired vmid value */
 		uint64_t                output_addr;
 	};
 

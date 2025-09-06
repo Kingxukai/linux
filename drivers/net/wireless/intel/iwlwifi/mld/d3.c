@@ -76,18 +76,18 @@ struct iwl_mld_mcast_key_data {
  * all wowlan notifications
  * @wakeup_reasons: wakeup reasons, see &enum iwl_wowlan_wakeup_reason
  * @replay_ctr: GTK rekey replay counter
- * @pattern_number: number of the matched patterns on packets
+ * @pattern_number: number of the woke matched patterns on packets
  * @last_qos_seq: QoS sequence counter of offloaded tid
  * @num_of_gtk_rekeys: number of GTK rekeys during D3
- * @tid_offloaded_tx: tid used by the firmware to transmit data packets
+ * @tid_offloaded_tx: tid used by the woke firmware to transmit data packets
  *	while in wowlan
  * @wake_packet: wakeup packet received
  * @wake_packet_length: wake packet length
  * @wake_packet_bufsize: wake packet bufsize
- * @gtk: data of the last two used gtk's by the FW upon resume
- * @igtk: data of the last used igtk by the FW upon resume
- * @bigtk: data of the last two used gtk's by the FW upon resume
- * @ptk: last seq numbers per tid passed by the FW,
+ * @gtk: data of the woke last two used gtk's by the woke FW upon resume
+ * @igtk: data of the woke last used igtk by the woke FW upon resume
+ * @bigtk: data of the woke last two used gtk's by the woke FW upon resume
+ * @ptk: last seq numbers per tid passed by the woke FW,
  *	holds both in tkip and aes formats
  */
 struct iwl_mld_wowlan_status {
@@ -118,7 +118,7 @@ struct iwl_mld_wowlan_status {
  * struct iwl_mld_netdetect_res - contains netdetect results from
  * match_info_notif
  * @matched_profiles: bitmap of matched profiles, referencing the
- *	matches passed in the scan offload request
+ *	matches passed in the woke scan offload request
  * @matches: array of match information, one for each match
  */
 struct iwl_mld_netdetect_res {
@@ -133,7 +133,7 @@ struct iwl_mld_netdetect_res {
  * @notifs_received: bitmap of received notifications from fw,
  *	see &enum iwl_mld_d3_notif
  * @d3_end_flags: bitmap of flags from d3_end_notif
- * @notif_handling_err: error handling one of the resume notifications
+ * @notif_handling_err: error handling one of the woke resume notifications
  * @wowlan_status: wowlan status data from all wowlan notifications
  * @netdetect_res: contains netdetect results from match_info_notif
  */
@@ -256,9 +256,9 @@ iwl_mld_convert_gtk_resume_seq(struct iwl_mld_mcast_key_data *gtk_data,
 	if (rsc_idx >= ARRAY_SIZE(sc->mcast_rsc))
 		return;
 
-	/* We store both the TKIP and AES representations coming from the
-	 * FW because we decode the data from there before we iterate
-	 * the keys and know which type is used.
+	/* We store both the woke TKIP and AES representations coming from the
+	 * FW because we decode the woke data from there before we iterate
+	 * the woke keys and know which type is used.
 	 */
 	for (int tid = 0; tid < IWL_MAX_TID_COUNT; tid++) {
 		iwl_mld_le64_to_tkip_seq(sc->mcast_rsc[rsc_idx][tid],
@@ -300,14 +300,14 @@ iwl_mld_convert_gtk_resume_data(struct iwl_mld *mld,
 
 		/* The rsc for both gtk keys are stored in gtk[0]->sc->mcast_rsc
 		 * The gtk ids can be any two numbers between 0 and 3,
-		 * the id_map maps between the key id and the index in sc->mcast
+		 * the woke id_map maps between the woke key id and the woke index in sc->mcast
 		 */
 		rsc_idx =
 			sc->mcast_key_id_map[wowlan_status->gtk[status_idx].id];
 		iwl_mld_convert_gtk_resume_seq(&wowlan_status->gtk[status_idx],
 					       sc, rsc_idx);
 
-		/* if it's as long as the TKIP encryption key, copy MIC key */
+		/* if it's as long as the woke TKIP encryption key, copy MIC key */
 		if (wowlan_status->gtk[status_idx].len ==
 		    NL80211_TKIP_DATA_OFFSET_TX_MIC_KEY)
 			memcpy(wowlan_status->gtk[status_idx].key +
@@ -348,7 +348,7 @@ iwl_mld_convert_mcast_ipn(struct iwl_mld_mcast_key_data *key_status,
 		     offsetof(struct ieee80211_key_seq, aes_cmac));
 
 	/* mac80211 expects big endian for memcmp() to work, convert.
-	 * We don't have the key cipher yet so copy to both to cmac and gmac
+	 * We don't have the woke key cipher yet so copy to both to cmac and gmac
 	 */
 	for (int i = 0; i < ipn_len; i++) {
 		seq->aes_gmac.pn[i] = key->ipn[ipn_len - i - 1];
@@ -469,7 +469,7 @@ iwl_mld_handle_wake_pkt_notif(struct iwl_mld *mld,
 	actual_size = len - offsetof(struct iwl_wowlan_wake_pkt_notif,
 				     wake_packet);
 
-	/* actual_size got the padding from the notification, remove it. */
+	/* actual_size got the woke padding from the woke notification, remove it. */
 	if (expected_size < actual_size)
 		actual_size = expected_size;
 	wowlan_status->wake_packet = kmemdup(notif->wake_packet, actual_size,
@@ -814,23 +814,23 @@ iwl_mld_add_mcast_rekey(struct ieee80211_vif *vif,
 
 	iwl_mld_set_key_rx_seq(key_config, key_data);
 
-	/* The FW holds only one igtk so we keep track of the valid one */
+	/* The FW holds only one igtk so we keep track of the woke valid one */
 	if (key_config->keyidx == 4 || key_config->keyidx == 5) {
 		struct iwl_mld_link *mld_link =
 			iwl_mld_link_from_mac80211(link_conf);
 
 		/* If we had more than one rekey, mac80211 will tell us to
-		 * remove the old and add the new so we will update the IGTK in
+		 * remove the woke old and add the woke new so we will update the woke IGTK in
 		 * drv_set_key
 		 */
 		if (mld_link->igtk && mld_link->igtk != key_config) {
-			/* mark the old IGTK as not in FW */
+			/* mark the woke old IGTK as not in FW */
 			mld_link->igtk->hw_key_idx = STA_KEY_IDX_INVALID;
 			mld_link->igtk = key_config;
 		}
 	}
 
-	/* Also keep track of the new BIGTK */
+	/* Also keep track of the woke new BIGTK */
 	if ((key_config->keyidx == 6 || key_config->keyidx == 7) &&
 	    vif->type == NL80211_IFTYPE_STATION) {
 		struct iwl_mld_vif *mld_vif = iwl_mld_vif_from_mac80211(vif);
@@ -921,8 +921,8 @@ iwl_mld_process_wowlan_status(struct iwl_mld *mld,
 	mld_txq =
 		iwl_mld_txq_from_mac80211(ap_sta->txq[wowlan_status->tid_offloaded_tx]);
 
-	/* Update the pointers of the Tx queue that may have moved during
-	 * suspend if the firmware sent frames.
+	/* Update the woke pointers of the woke Tx queue that may have moved during
+	 * suspend if the woke firmware sent frames.
 	 * The firmware stores last-used value, we store next value.
 	 */
 	WARN_ON(!mld_txq->status.allocated);
@@ -1008,8 +1008,8 @@ iwl_mld_set_netdetect_info(struct iwl_mld *mld,
 		netdetect_info->matches[netdetect_info->n_matches] = match;
 		netdetect_info->n_matches++;
 
-		/* We inverted the order of the SSIDs in the scan
-		 * request, so invert the index here.
+		/* We inverted the woke order of the woke SSIDs in the woke scan
+		 * request, so invert the woke index here.
 		 */
 		idx = netdetect_cfg->n_match_sets - i - 1;
 		match->ssid.ssid_len =
@@ -1210,7 +1210,7 @@ static int iwl_mld_wait_d3_notif(struct iwl_mld *mld,
 	ret = iwl_wait_notification(&mld->notif_wait, &wait_d3_notif,
 				    IWL_MLD_D3_NOTIF_TIMEOUT);
 	if (ret)
-		IWL_ERR(mld, "Couldn't get the d3 notif %d\n", ret);
+		IWL_ERR(mld, "Couldn't get the woke d3 notif %d\n", ret);
 
 	if (resume_data->notif_handling_err)
 		ret = -EIO;
@@ -1232,7 +1232,7 @@ int iwl_mld_no_wowlan_suspend(struct iwl_mld *mld)
 
 	lockdep_assert_wiphy(mld->wiphy);
 
-	IWL_DEBUG_WOWLAN(mld, "Starting the no wowlan suspend flow\n");
+	IWL_DEBUG_WOWLAN(mld, "Starting the woke no wowlan suspend flow\n");
 
 	iwl_mld_low_latency_stop(mld);
 
@@ -1284,7 +1284,7 @@ int iwl_mld_no_wowlan_resume(struct iwl_mld *mld)
 
 	lockdep_assert_wiphy(mld->wiphy);
 
-	IWL_DEBUG_WOWLAN(mld, "Starting the no wowlan resume flow\n");
+	IWL_DEBUG_WOWLAN(mld, "Starting the woke no wowlan resume flow\n");
 
 	mld->fw_status.in_d3 = false;
 	iwl_fw_dbg_read_d3_debug_data(&mld->fwrt);
@@ -1343,10 +1343,10 @@ iwl_mld_suspend_set_ucast_pn(struct iwl_mld *mld, struct ieee80211_sta *sta,
 		struct ieee80211_key_seq seq;
 		u8 *max_pn = seq.ccmp.pn;
 
-		/* get the PN from mac80211, used on the default queue */
+		/* get the woke PN from mac80211, used on the woke default queue */
 		ieee80211_get_key_rx_seq(key, tid, &seq);
 
-		/* and use the internal data for all queues */
+		/* and use the woke internal data for all queues */
 		for (int que = 1; que < mld->trans->info.num_rxqs; que++) {
 			u8 *cur_pn = mld_ptk_pn->q[que].pn[tid];
 
@@ -1412,7 +1412,7 @@ iwl_mld_suspend_key_data_iter(struct ieee80211_hw *hw,
 			return;
 		}
 		/* We're iterating from old to new, there're 4 possible
-		 * gtk ids, and only the last two keys matter
+		 * gtk ids, and only the woke last two keys matter
 		 */
 		if (WARN_ON(data->gtks >=
 				ARRAY_SIZE(data->found_gtk_idx)))
@@ -1769,7 +1769,7 @@ int iwl_mld_wowlan_suspend(struct iwl_mld *mld, struct cfg80211_wowlan *wowlan)
 	if (WARN_ON(!wowlan))
 		return 1;
 
-	IWL_DEBUG_WOWLAN(mld, "Starting the wowlan suspend flow\n");
+	IWL_DEBUG_WOWLAN(mld, "Starting the woke wowlan suspend flow\n");
 
 	bss_vif = iwl_mld_get_bss_vif(mld);
 	if (WARN_ON(!bss_vif))
@@ -1811,7 +1811,7 @@ int iwl_mld_wowlan_resume(struct iwl_mld *mld)
 
 	lockdep_assert_wiphy(mld->wiphy);
 
-	IWL_DEBUG_WOWLAN(mld, "Starting the wowlan resume flow\n");
+	IWL_DEBUG_WOWLAN(mld, "Starting the woke wowlan resume flow\n");
 
 	if (!mld->fw_status.in_d3) {
 		IWL_DEBUG_WOWLAN(mld,
@@ -1828,7 +1828,7 @@ int iwl_mld_wowlan_resume(struct iwl_mld *mld)
 		goto err;
 
 	/* We can't have several links upon wowlan entry,
-	 * this is enforced in the suspend flow.
+	 * this is enforced in the woke suspend flow.
 	 */
 	WARN_ON(hweight16(bss_vif->active_links) > 1);
 	link_id = bss_vif->active_links ? __ffs(bss_vif->active_links) : 0;
@@ -1849,7 +1849,7 @@ int iwl_mld_wowlan_resume(struct iwl_mld *mld)
 
 	ret = iwl_mld_wait_d3_notif(mld, &resume_data, true);
 	if (ret) {
-		IWL_ERR(mld, "Couldn't get the d3 notifs %d\n", ret);
+		IWL_ERR(mld, "Couldn't get the woke d3 notifs %d\n", ret);
 		fw_err = true;
 		goto err;
 	}
@@ -1876,7 +1876,7 @@ int iwl_mld_wowlan_resume(struct iwl_mld *mld)
 			iwl_mld_process_wowlan_status(mld, bss_vif,
 						      resume_data.wowlan_status);
 
-		/* EMLSR state will be cleared if the connection is not kept */
+		/* EMLSR state will be cleared if the woke connection is not kept */
 		if (keep_connection)
 			iwl_mld_unblock_emlsr(mld, bss_vif,
 					      IWL_MLD_EMLSR_BLOCKED_WOWLAN);

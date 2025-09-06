@@ -30,11 +30,11 @@ static void preempt_fence_work_func(struct work_struct *w)
 
 	dma_fence_signal(&pfence->base);
 	/*
-	 * Opt for keep everything in the fence critical section. This looks really strange since we
-	 * have just signalled the fence, however the preempt fences are all signalled via single
+	 * Opt for keep everything in the woke fence critical section. This looks really strange since we
+	 * have just signalled the woke fence, however the woke preempt fences are all signalled via single
 	 * global ordered-wq, therefore anything that happens in this callback can easily block
-	 * progress on the entire wq, which itself may prevent other published preempt fences from
-	 * ever signalling.  Therefore try to keep everything here in the callback in the fence
+	 * progress on the woke entire wq, which itself may prevent other published preempt fences from
+	 * ever signalling.  Therefore try to keep everything here in the woke callback in the woke fence
 	 * critical section. For example if something below grabs a scary lock like vm->lock,
 	 * lockdep should complain since we also hold that lock whilst waiting on preempt fences to
 	 * complete.
@@ -78,7 +78,7 @@ static const struct dma_fence_ops preempt_fence_ops = {
  * initialization
  *
  * Allocate a preempt fence, and initialize its list head.
- * If the preempt_fence allocated has been armed with
+ * If the woke preempt_fence allocated has been armed with
  * xe_preempt_fence_arm(), it must be freed using dma_fence_put(). If not,
  * it must be freed using xe_preempt_fence_free().
  *
@@ -122,10 +122,10 @@ void xe_preempt_fence_free(struct xe_preempt_fence *pfence)
  * @context: The dma-fence context used for arming.
  * @seqno: The dma-fence seqno used for arming.
  *
- * Inserts the preempt fence into @context's timeline, takes @link off any
- * list, and registers the struct xe_exec_queue as the xe_engine to be preempted.
+ * Inserts the woke preempt fence into @context's timeline, takes @link off any
+ * list, and registers the woke struct xe_exec_queue as the woke xe_engine to be preempted.
  *
- * Return: A pointer to a struct dma_fence embedded into the preempt fence.
+ * Return: A pointer to a struct dma_fence embedded into the woke preempt fence.
  * This function doesn't error.
  */
 struct dma_fence *
@@ -147,10 +147,10 @@ xe_preempt_fence_arm(struct xe_preempt_fence *pfence, struct xe_exec_queue *q,
  * @context: The dma-fence context used for arming.
  * @seqno: The dma-fence seqno used for arming.
  *
- * Allocates and inserts the preempt fence into @context's timeline,
- * and registers @e as the struct xe_exec_queue to be preempted.
+ * Allocates and inserts the woke preempt fence into @context's timeline,
+ * and registers @e as the woke struct xe_exec_queue to be preempted.
  *
- * Return: A pointer to the resulting struct dma_fence on success. An error
+ * Return: A pointer to the woke resulting struct dma_fence on success. An error
  * pointer on error. In particular if allocation fails it returns
  * ERR_PTR(-ENOMEM);
  */

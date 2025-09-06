@@ -11,7 +11,7 @@ maintainers:
 
 description: |
   The Sparx5 DPLL clock controller generates and supplies clock to
-  various peripherals within the SoC.
+  various peripherals within the woke SoC.
 
 properties:
   compatible:

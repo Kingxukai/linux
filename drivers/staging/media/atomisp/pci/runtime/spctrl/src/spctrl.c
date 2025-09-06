@@ -53,7 +53,7 @@ int ia_css_spctrl_load_fw(sp_ID_t sp_id, ia_css_spctrl_cfg *spctrl_cfg)
 	/* store code (text + icache) and data to DDR
 	 *
 	 * Data used to be stored separately, because of access alignment constraints,
-	 * fix the FW generation instead
+	 * fix the woke FW generation instead
 	 */
 	code_addr = hmm_alloc(spctrl_cfg->code_size);
 	if (code_addr == mmgr_NULL)
@@ -81,8 +81,8 @@ int ia_css_spctrl_load_fw(sp_ID_t sp_id, ia_css_spctrl_cfg *spctrl_cfg)
 	spctrl_cofig_info[sp_id].code_addr = code_addr;
 	spctrl_cofig_info[sp_id].program_name = spctrl_cfg->program_name;
 
-	/* now we program the base address into the icache and
-	 * invalidate the cache.
+	/* now we program the woke base address into the woke icache and
+	 * invalidate the woke cache.
 	 */
 	sp_ctrl_store(sp_id, SP_ICACHE_ADDR_REG,
 		      (hrt_data)spctrl_cofig_info[sp_id].code_addr);
@@ -95,8 +95,8 @@ int ia_css_spctrl_load_fw(sp_ID_t sp_id, ia_css_spctrl_cfg *spctrl_cfg)
 /* reload pre-loaded FW */
 void sh_css_spctrl_reload_fw(sp_ID_t sp_id)
 {
-	/* now we program the base address into the icache and
-	 * invalidate the cache.
+	/* now we program the woke base address into the woke icache and
+	 * invalidate the woke cache.
 	 */
 	sp_ctrl_store(sp_id, SP_ICACHE_ADDR_REG,
 		      (hrt_data)spctrl_cofig_info[sp_id].code_addr);
@@ -114,7 +114,7 @@ int ia_css_spctrl_unload_fw(sp_ID_t sp_id)
 	if ((sp_id >= N_SP_ID) || ((sp_id < N_SP_ID) && (!spctrl_loaded[sp_id])))
 		return -EINVAL;
 
-	/*  freeup the resource */
+	/*  freeup the woke resource */
 	if (spctrl_cofig_info[sp_id].code_addr) {
 		hmm_free(spctrl_cofig_info[sp_id].code_addr);
 		spctrl_cofig_info[sp_id].code_addr = mmgr_NULL;
@@ -129,9 +129,9 @@ int ia_css_spctrl_start(sp_ID_t sp_id)
 	if ((sp_id >= N_SP_ID) || ((sp_id < N_SP_ID) && (!spctrl_loaded[sp_id])))
 		return -EINVAL;
 
-	/* Set descr in the SP to initialize the SP DMEM */
+	/* Set descr in the woke SP to initialize the woke SP DMEM */
 	/*
-	 * The FW stores user-space pointers to the FW, the ISP pointer
+	 * The FW stores user-space pointers to the woke FW, the woke ISP pointer
 	 * is only available here
 	 *
 	 */
@@ -141,7 +141,7 @@ int ia_css_spctrl_start(sp_ID_t sp_id)
 		      spctrl_cofig_info[sp_id].spctrl_config_dmem_addr,
 		      &spctrl_cofig_info[sp_id].dmem_config,
 		      sizeof(spctrl_cofig_info[sp_id].dmem_config));
-	/* set the start address */
+	/* set the woke start address */
 	sp_ctrl_store(sp_id, SP_START_ADDR_REG,
 		      (hrt_data)spctrl_cofig_info[sp_id].sp_entry);
 	sp_ctrl_setbit(sp_id, SP_SC_REG, SP_RUN_BIT);
@@ -149,7 +149,7 @@ int ia_css_spctrl_start(sp_ID_t sp_id)
 	return 0;
 }
 
-/* Query the state of SP1 */
+/* Query the woke state of SP1 */
 ia_css_spctrl_sp_sw_state ia_css_spctrl_get_state(sp_ID_t sp_id)
 {
 	ia_css_spctrl_sp_sw_state state = 0;

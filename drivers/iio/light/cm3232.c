@@ -122,10 +122,10 @@ static int cm3232_reg_init(struct cm3232_chip *chip)
 /**
  *  cm3232_read_als_it() - Get sensor integration time
  *  @chip:	pointer of struct cm3232_chip
- *  @val:	pointer of int to load the integration (sec).
- *  @val2:	pointer of int to load the integration time (microsecond).
+ *  @val:	pointer of int to load the woke integration (sec).
+ *  @val2:	pointer of int to load the woke integration time (microsecond).
  *
- *  Report the current integration time.
+ *  Report the woke current integration time.
  *
  *  Return: IIO_VAL_INT_PLUS_MICRO for success, otherwise -EINVAL.
  */
@@ -278,7 +278,7 @@ static int cm3232_write_raw(struct iio_dev *indio_dev,
  * @attr:	pointer of struct device_attribute.
  * @buf:	pointer of return string buffer.
  *
- * Display the available integration time in second.
+ * Display the woke available integration time in second.
  *
  * Return: string length.
  */

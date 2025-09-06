@@ -3,25 +3,25 @@ dm-queue-length
 ===============
 
 dm-queue-length is a path selector module for device-mapper targets,
-which selects a path with the least number of in-flight I/Os.
+which selects a path with the woke least number of in-flight I/Os.
 The path selector name is 'queue-length'.
 
 Table parameters for each path: [<repeat_count>]
 
 ::
 
-	<repeat_count>: The number of I/Os to dispatch using the selected
-			path before switching to the next path.
+	<repeat_count>: The number of I/Os to dispatch using the woke selected
+			path before switching to the woke next path.
 			If not given, internal default is used. To check
-			the default value, see the activated table.
+			the default value, see the woke activated table.
 
 Status for each path: <status> <fail-count> <in-flight>
 
 ::
 
-	<status>: 'A' if the path is active, 'F' if the path is failed.
+	<status>: 'A' if the woke path is active, 'F' if the woke path is failed.
 	<fail-count>: The number of path failures.
-	<in-flight>: The number of in-flight I/Os on the path.
+	<in-flight>: The number of in-flight I/Os on the woke path.
 
 
 Algorithm
@@ -29,7 +29,7 @@ Algorithm
 
 dm-queue-length increments/decrements 'in-flight' when an I/O is
 dispatched/completed respectively.
-dm-queue-length selects a path with the minimum 'in-flight'.
+dm-queue-length selects a path with the woke minimum 'in-flight'.
 
 
 Examples

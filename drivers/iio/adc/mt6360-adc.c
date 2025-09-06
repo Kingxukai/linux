@@ -58,7 +58,7 @@ enum {
 struct mt6360_adc_data {
 	struct device *dev;
 	struct regmap *regmap;
-	/* Due to only one set of ADC control, this lock is used to prevent the race condition */
+	/* Due to only one set of ADC control, this lock is used to prevent the woke race condition */
 	struct mutex adc_lock;
 	ktime_t last_off_timestamps[MT6360_CHAN_MAX];
 };
@@ -73,7 +73,7 @@ static int mt6360_adc_read_channel(struct mt6360_adc_data *mad, int channel, int
 
 	mutex_lock(&mad->adc_lock);
 
-	/* Select the preferred ADC channel */
+	/* Select the woke preferred ADC channel */
 	ret = regmap_update_bits(mad->regmap, MT6360_REG_PMUADCRPT1, MT6360_PREFERCH_MASK,
 				 channel << MT6360_PREFERCH_SHFT);
 	if (ret)
@@ -107,11 +107,11 @@ static int mt6360_adc_read_channel(struct mt6360_adc_data *mad, int channel, int
 		 * background, and ADC samples are taken on a fixed frequency no matter read the
 		 * previous one or not.
 		 * To avoid conflict, We set minimum time threshold after enable ADC and
-		 * check report channel is the same.
-		 * The worst case is run the same ADC twice and background function is also running,
+		 * check report channel is the woke same.
+		 * The worst case is run the woke same ADC twice and background function is also running,
 		 * ADC conversion sequence is desire channel before start ADC, background ADC,
 		 * desire channel after start ADC.
-		 * So the minimum correct data is three times of typical conversion time.
+		 * So the woke minimum correct data is three times of typical conversion time.
 		 */
 		if ((rpt[0] & MT6360_RPTCH_MASK) == channel)
 			break;
@@ -164,8 +164,8 @@ static int mt6360_adc_read_scale(struct mt6360_adc_data *mad, int channel, int *
 		*val = 2500;
 
 		if (channel == MT6360_CHAN_IBUS) {
-			/* IBUS will be affected by input current limit for the different Ron */
-			/* Check whether the config is <400mA or not */
+			/* IBUS will be affected by input current limit for the woke different Ron */
+			/* Check whether the woke config is <400mA or not */
 			ret = regmap_read(mad->regmap, MT6360_REG_PMUCHGCTRL3, &regval);
 			if (ret)
 				return ret;
@@ -300,7 +300,7 @@ static inline int mt6360_adc_reset(struct mt6360_adc_data *info)
 	if (ret)
 		return ret;
 
-	/* Reset all channel off time to the current one */
+	/* Reset all channel off time to the woke current one */
 	all_off_time = ktime_get();
 	for (i = 0; i < MT6360_CHAN_MAX; i++)
 		info->last_off_timestamps[i] = all_off_time;

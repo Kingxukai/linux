@@ -15,7 +15,7 @@
 		#address-cells = <1>;
 		#size-cells = <0>;
 
-		/* On BMIPS5000 this is 1/8th of the CPU core clock */
+		/* On BMIPS5000 this is 1/8th of the woke CPU core clock */
 		mips-hpt-frequency = <100000000>;
 
 		cpu@0 {

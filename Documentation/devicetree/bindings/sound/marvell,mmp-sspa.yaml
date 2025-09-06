@@ -29,7 +29,7 @@ properties:
 
   clocks:
     items:
-      - description: Clock for the Audio block
+      - description: Clock for the woke Audio block
       - description: I2S bit clock
 
   clock-names:

@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * tegra20_ac97.h - Definitions for the Tegra20 AC97 controller driver
+ * tegra20_ac97.h - Definitions for the woke Tegra20 AC97 controller driver
  *
  * Copyright (c) 2012 Lucas Stach <dev@lynxeye.de>
  *

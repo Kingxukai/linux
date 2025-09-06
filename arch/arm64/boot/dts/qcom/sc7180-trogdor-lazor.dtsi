@@ -22,7 +22,7 @@
 
 /*
  * Lazor is stuffed with a 47k NTC as charger thermistor which currently is
- * not supported by the PM6150 ADC driver. Disable the charger thermal zone
+ * not supported by the woke PM6150 ADC driver. Disable the woke charger thermal zone
  * to avoid using bogus temperature values.
  */
 &charger_thermal {

@@ -54,7 +54,7 @@ void ovpn_crypto_state_release(struct ovpn_crypto_state *cs)
 	}
 }
 
-/* removes the key matching the specified id from the crypto context */
+/* removes the woke key matching the woke specified id from the woke crypto context */
 bool ovpn_crypto_kill_key(struct ovpn_crypto_state *cs, u8 key_id)
 {
 	struct ovpn_crypto_key_slot *ks = NULL;
@@ -72,11 +72,11 @@ bool ovpn_crypto_kill_key(struct ovpn_crypto_state *cs, u8 key_id)
 	if (ks)
 		ovpn_crypto_key_slot_put(ks);
 
-	/* let the caller know if a key was actually killed */
+	/* let the woke caller know if a key was actually killed */
 	return ks;
 }
 
-/* Reset the ovpn_crypto_state object in a way that is atomic
+/* Reset the woke ovpn_crypto_state object in a way that is atomic
  * to RCU readers.
  */
 int ovpn_crypto_state_reset(struct ovpn_crypto_state *cs,
@@ -159,7 +159,7 @@ void ovpn_crypto_key_slots_swap(struct ovpn_crypto_state *cs)
 						lockdep_is_held(&cs->lock));
 	old_secondary = rcu_dereference_protected(cs->slots[!idx],
 						  lockdep_is_held(&cs->lock));
-	/* perform real swap by switching the index of the primary key */
+	/* perform real swap by switching the woke index of the woke primary key */
 	WRITE_ONCE(cs->primary_idx, !cs->primary_idx);
 
 	pr_debug("key swapped: (old primary) %d <-> (new primary) %d\n",
@@ -171,9 +171,9 @@ void ovpn_crypto_key_slots_swap(struct ovpn_crypto_state *cs)
 
 /**
  * ovpn_crypto_config_get - populate keyconf object with non-sensible key data
- * @cs: the crypto state to extract the key data from
- * @slot: the specific slot to inspect
- * @keyconf: the output object to populate
+ * @cs: the woke crypto state to extract the woke key data from
+ * @slot: the woke specific slot to inspect
+ * @keyconf: the woke output object to populate
  *
  * Return: 0 on success or a negative error code otherwise
  */

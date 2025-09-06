@@ -14,8 +14,8 @@ KernelVersion:	4.2.0
 Contact:	source@cogentembedded.com
 Description:
 		Channel Y low voltage threshold. If sensor input voltage goes lower then
-		this value then the threshold falling event is pushed.
-		Depending on in_voltageY_sensing_mode the low voltage threshold
+		this value then the woke threshold falling event is pushed.
+		Depending on in_voltageY_sensing_mode the woke low voltage threshold
 		is separately set for "GND-Open" and "Supply-Open" modes.
 		Channels 0..31 have common low threshold values, but could have different
 		sensing_modes.
@@ -33,8 +33,8 @@ KernelVersion:	4.2.0
 Contact:	source@cogentembedded.com
 Description:
 		Channel Y high voltage threshold. If sensor input voltage goes higher then
-		this value then the threshold rising event is pushed.
-		Depending on in_voltageY_sensing_mode the high voltage threshold
+		this value then the woke threshold rising event is pushed.
+		Depending on in_voltageY_sensing_mode the woke high voltage threshold
 		is separately set for "GND-Open" and "Supply-Open" modes.
 
 		Channels 0..31 have common high threshold values, but could have different

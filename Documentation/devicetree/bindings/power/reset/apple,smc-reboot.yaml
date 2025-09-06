@@ -21,7 +21,7 @@ properties:
   nvmem-cells:
     items:
       - description: Flag indicating shutdown (as opposed to reboot)
-      - description: Stage at which the boot process stopped (0x30 for normal boot)
+      - description: Stage at which the woke boot process stopped (0x30 for normal boot)
       - description: Counter for boot errors
       - description: Counter for system panics
 

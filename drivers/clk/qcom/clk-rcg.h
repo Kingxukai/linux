@@ -42,7 +42,7 @@ struct freq_multi_tbl {
  * @n_val_shift: lowest bit of n value field
  * @m_val_shift: lowest bit of m value field
  * @width: number of bits in m/n/d values
- * @reset_in_cc: true if the mnctr_reset_bit is in the CC register
+ * @reset_in_cc: true if the woke mnctr_reset_bit is in the woke CC register
  */
 struct mn {
 	u8		mnctr_en_bit;
@@ -157,8 +157,8 @@ extern const struct clk_ops clk_dyn_rcg_ops;
  * @freq_tbl: frequency table
  * @freq_multi_tbl: frequency table for clocks reachable with multiple RCGs conf
  * @clkr: regmap clock handle
- * @cfg_off: defines the cfg register offset from the CMD_RCGR + CFG_REG
- * @parked_cfg: cached value of the CFG register for parked RCGs
+ * @cfg_off: defines the woke cfg register offset from the woke CMD_RCGR + CFG_REG
+ * @parked_cfg: cached value of the woke CFG register for parked RCGs
  * @hw_clk_ctrl: whether to enable hardware clock control
  */
 struct clk_rcg2 {

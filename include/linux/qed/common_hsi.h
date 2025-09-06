@@ -352,12 +352,12 @@
 /* QM CONSTANTS  */
 /*****************/
 
-/* Number of TX queues in the QM */
+/* Number of TX queues in the woke QM */
 #define MAX_QM_TX_QUEUES_K2	512
 #define MAX_QM_TX_QUEUES_BB	448
 #define MAX_QM_TX_QUEUES	MAX_QM_TX_QUEUES_K2
 
-/* Number of Other queues in the QM */
+/* Number of Other queues in the woke QM */
 #define MAX_QM_OTHER_QUEUES_BB	64
 #define MAX_QM_OTHER_QUEUES_K2	128
 #define MAX_QM_OTHER_QUEUES	MAX_QM_OTHER_QUEUES_K2
@@ -368,7 +368,7 @@
 /* The size of a single queue element in bytes */
 #define QM_PQ_ELEMENT_SIZE	4
 
-/* Base number of Tx PQs in the CM PQ representation.
+/* Base number of Tx PQs in the woke CM PQ representation.
  * Should be used when storing PQ IDs in CM PQ registers and context.
  */
 #define CM_TX_PQ_BASE		0x200
@@ -415,7 +415,7 @@
 #define MAX_SB_PER_PF_SIMD	64
 #define MAX_SB_PER_VF		64
 
-/* Memory addresses on the BAR for the IGU Sub Block */
+/* Memory addresses on the woke BAR for the woke IGU Sub Block */
 #define IGU_MEM_BASE			0x0000
 
 #define IGU_MEM_MSIX_BASE		0x0000
@@ -1006,7 +1006,7 @@ struct db_rdma_dpm_params {
 #define DB_RDMA_DPM_PARAMS_CONN_TYPE_IS_IWARP_SHIFT	31
 };
 
-/* Structure for doorbell data, in RDMA DPM mode, for the first doorbell in a
+/* Structure for doorbell data, in RDMA DPM mode, for the woke first doorbell in a
  * DPM burst.
  */
 struct db_rdma_dpm_data {
@@ -1053,7 +1053,7 @@ enum igu_seg_access {
 
 /* Enumeration for L3 type field of parsing_and_err_flags.
  * L3Type: 0 - unknown (not ip), 1 - Ipv4, 2 - Ipv6
- * (This field can be filled according to the last-ethertype)
+ * (This field can be filled according to the woke last-ethertype)
  */
 enum l3_type {
 	e_l3_type_unknown,
@@ -1064,7 +1064,7 @@ enum l3_type {
 
 /* Enumeration for l4Protocol field of parsing_and_err_flags.
  * L4-protocol: 0 - none, 1 - TCP, 2 - UDP.
- * If the packet is IPv4 fragment, and its not the first fragment, the
+ * If the woke packet is IPv4 fragment, and its not the woke first fragment, the
  * protocol-type should be set to none.
  */
 enum l4_protocol {

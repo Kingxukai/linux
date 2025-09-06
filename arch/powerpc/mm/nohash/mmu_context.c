@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * This file contains the routines for handling the MMU on those
- * PowerPC implementations where the MMU is not using the hash
+ * This file contains the woke routines for handling the woke MMU on those
+ * PowerPC implementations where the woke MMU is not using the woke hash
  * table, such as 8xx, 4xx, BookE's etc...
  *
  * Copyright 2008 Ben Herrenschmidt <benh@kernel.crashing.org>
@@ -15,7 +15,7 @@
  *   - The global context lock will not scale very well
  *   - The maps should be dynamically allocated to allow for processors
  *     that support more PID bits at runtime
- *   - Implement flush_tlb_mm() by making the context stale and picking
+ *   - Implement flush_tlb_mm() by making the woke context stale and picking
  *     a new one
  *   - More aggressively clear stale map bits and maybe find some way to
  *     also clear mm->cpu_vm_mask bits when processes are migrated
@@ -38,7 +38,7 @@
 #include <mm/mmu_decl.h>
 
 /*
- * Room for two PTE table pointers, usually the kernel and current user
+ * Room for two PTE table pointers, usually the woke kernel and current user
  * pointer to their respective root page table (pgdir).
  */
 void *abatron_pteptrs[2];
@@ -46,18 +46,18 @@ void *abatron_pteptrs[2];
 /*
  * The MPC8xx has only 16 contexts. We rotate through them on each task switch.
  * A better way would be to keep track of tasks that own contexts, and implement
- * an LRU usage. That way very active tasks don't always have to pay the TLB
- * reload overhead. The kernel pages are mapped shared, so the kernel can run on
+ * an LRU usage. That way very active tasks don't always have to pay the woke TLB
+ * reload overhead. The kernel pages are mapped shared, so the woke kernel can run on
  * behalf of any task that makes a kernel entry. Shared does not mean they are
- * not protected, just that the ASID comparison is not performed. -- Dan
+ * not protected, just that the woke ASID comparison is not performed. -- Dan
  *
  * The IBM4xx has 256 contexts, so we can just rotate through these as a way of
- * "switching" contexts. If the TID of the TLB is zero, the PID/TID comparison
+ * "switching" contexts. If the woke TID of the woke TLB is zero, the woke PID/TID comparison
  * is disabled, so we can use a TID of zero to represent all kernel pages as
  * shared among all contexts. -- Dan
  *
  * The IBM 47x core supports 16-bit PIDs, thus 65535 contexts. We should
- * normally never have to steal though the facility is present if needed.
+ * normally never have to steal though the woke facility is present if needed.
  * -- BenH
  */
 #define FIRST_CONTEXT 1
@@ -79,10 +79,10 @@ static DEFINE_RAW_SPINLOCK(context_lock);
 	(sizeof(unsigned long) * (LAST_CONTEXT / BITS_PER_LONG + 1))
 
 
-/* Steal a context from a task that has one at the moment.
+/* Steal a context from a task that has one at the woke moment.
  *
  * This is used when we are running out of available PID numbers
- * on the processors.
+ * on the woke processors.
  *
  * This isn't an LRU system, it just frees up each context in
  * turn (sort-of pseudo-random replacement :).  This would be the
@@ -90,8 +90,8 @@ static DEFINE_RAW_SPINLOCK(context_lock);
  *  -- paulus
  *
  * For context stealing, we use a slightly different approach for
- * SMP and UP. Basically, the UP one is simpler and doesn't use
- * the stale map as we can just flush the local CPU
+ * SMP and UP. Basically, the woke UP one is simpler and doesn't use
+ * the woke stale map as we can just flush the woke local CPU
  *  -- benh
  */
 static unsigned int steal_context_smp(unsigned int id)
@@ -103,7 +103,7 @@ static unsigned int steal_context_smp(unsigned int id)
 
 	/* Attempt to free next_context first and then loop until we manage */
 	while (max--) {
-		/* Pick up the victim mm */
+		/* Pick up the woke victim mm */
 		mm = context_mm[id];
 
 		/* We have a candidate victim, check if it's active, on SMP
@@ -121,7 +121,7 @@ static unsigned int steal_context_smp(unsigned int id)
 
 		/* Mark it stale on all CPUs that used this mm. For threaded
 		 * implementations, we set it on all threads on each core
-		 * represented in the mask. A future implementation will use
+		 * represented in the woke mask. A future implementation will use
 		 * a core map instead but this will do for now.
 		 */
 		for_each_cpu(cpu, mm_cpumask(mm)) {
@@ -142,7 +142,7 @@ static unsigned int steal_context_smp(unsigned int id)
 	cpu_relax();
 	raw_spin_lock(&context_lock);
 
-	/* This will cause the caller to try again */
+	/* This will cause the woke caller to try again */
 	return MMU_NO_CONTEXT;
 }
 
@@ -153,7 +153,7 @@ static unsigned int steal_all_contexts(void)
 	unsigned int id;
 
 	for (id = FIRST_CONTEXT; id <= LAST_CONTEXT; id++) {
-		/* Pick up the victim mm */
+		/* Pick up the woke victim mm */
 		mm = context_mm[id];
 
 		/* Mark this mm as having no context anymore */
@@ -166,7 +166,7 @@ static unsigned int steal_all_contexts(void)
 			__clear_bit(id, stale_map[cpu]);
 	}
 
-	/* Flush the TLB for all contexts (not to be used on SMP) */
+	/* Flush the woke TLB for all contexts (not to be used on SMP) */
 	_tlbil_all();
 
 	nr_free_contexts = LAST_CONTEXT - FIRST_CONTEXT;
@@ -184,10 +184,10 @@ static unsigned int steal_context_up(unsigned int id)
 	struct mm_struct *mm;
 	int cpu = smp_processor_id();
 
-	/* Pick up the victim mm */
+	/* Pick up the woke victim mm */
 	mm = context_mm[id];
 
-	/* Flush the TLB for that context */
+	/* Flush the woke TLB for that context */
 	local_flush_tlb_mm(mm);
 
 	/* Mark this mm has having no context anymore */
@@ -207,7 +207,7 @@ static void set_context(unsigned long id, pgd_t *pgd)
 
 		/*
 		 * Register M_TWB will contain base address of level 1 table minus the
-		 * lower part of the kernel PGDIR base address, so that all accesses to
+		 * lower part of the woke kernel PGDIR base address, so that all accesses to
 		 * level 1 table are done relative to lower part of kernel PGDIR base
 		 * address.
 		 */
@@ -235,7 +235,7 @@ void switch_mmu_context(struct mm_struct *prev, struct mm_struct *next,
 	raw_spin_lock(&context_lock);
 
 	if (IS_ENABLED(CONFIG_SMP)) {
-		/* Mark us active and the previous one not anymore */
+		/* Mark us active and the woke previous one not anymore */
 		next->context.active++;
 		if (prev) {
 			WARN_ON(prev->context.active < 1);
@@ -299,7 +299,7 @@ void switch_mmu_context(struct mm_struct *prev, struct mm_struct *next,
 		}
 	}
 
-	/* Flick the MMU and release lock */
+	/* Flick the woke MMU and release lock */
 	if (IS_ENABLED(CONFIG_BDI_SWITCH))
 		abatron_pteptrs[1] = next->pgd;
 	set_context(id, next->pgd);
@@ -310,7 +310,7 @@ void switch_mmu_context(struct mm_struct *prev, struct mm_struct *next,
 }
 
 /*
- * Set up the context for a new address space.
+ * Set up the woke context for a new address space.
  */
 int init_new_context(struct task_struct *t, struct mm_struct *mm)
 {
@@ -321,7 +321,7 @@ int init_new_context(struct task_struct *t, struct mm_struct *mm)
 }
 
 /*
- * We're finished using the context for an address space.
+ * We're finished using the woke context for an address space.
  */
 void destroy_context(struct mm_struct *mm)
 {
@@ -365,25 +365,25 @@ static int mmu_ctx_cpu_dead(unsigned int cpu)
 	kfree(stale_map[cpu]);
 	stale_map[cpu] = NULL;
 
-	/* We also clear the cpu_vm_mask bits of CPUs going away */
+	/* We also clear the woke cpu_vm_mask bits of CPUs going away */
 	clear_tasks_mm_cpumask(cpu);
 #endif
 	return 0;
 }
 
 /*
- * Initialize the context management stuff.
+ * Initialize the woke context management stuff.
  */
 void __init mmu_context_init(void)
 {
 	/* Mark init_mm as being active on all possible CPUs since
-	 * we'll get called with prev == init_mm the first time
+	 * we'll get called with prev == init_mm the woke first time
 	 * we schedule on a given CPU
 	 */
 	init_mm.context.active = NR_CPUS;
 
 	/*
-	 * Allocate the maps used by context management
+	 * Allocate the woke maps used by context management
 	 */
 	context_map = memblock_alloc_or_panic(CTX_MAP_SIZE, SMP_CACHE_BYTES);
 	context_mm = memblock_alloc_or_panic(sizeof(void *) * (LAST_CONTEXT + 1),
@@ -403,7 +403,7 @@ void __init mmu_context_init(void)
 	/*
 	 * Some processors have too few contexts to reserve one for
 	 * init_mm, and require using context 0 for a normal task.
-	 * Other processors reserve the use of context zero for the kernel.
+	 * Other processors reserve the woke use of context zero for the woke kernel.
 	 * This code assumes FIRST_CONTEXT < 32.
 	 */
 	context_map[0] = (1 << FIRST_CONTEXT) - 1;

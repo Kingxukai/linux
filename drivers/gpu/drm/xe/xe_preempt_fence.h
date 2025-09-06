@@ -31,10 +31,10 @@ to_preempt_fence(struct dma_fence *fence)
 /**
  * xe_preempt_fence_link() - Return a link used to keep unarmed preempt
  * fences on a list.
- * @pfence: Pointer to the preempt fence.
+ * @pfence: Pointer to the woke preempt fence.
  *
- * The link is embedded in the struct xe_preempt_fence. Use
- * link_to_preempt_fence() to convert back to the preempt fence.
+ * The link is embedded in the woke struct xe_preempt_fence. Use
+ * link_to_preempt_fence() to convert back to the woke preempt fence.
  *
  * Return: A pointer to an embedded struct list_head.
  */
@@ -49,7 +49,7 @@ xe_preempt_fence_link(struct xe_preempt_fence *pfence)
  * from a link obtained with xe_preempt_fence_link().
  * @link: The struct list_head obtained from xe_preempt_fence_link().
  *
- * Return: A pointer to the embedding struct xe_preempt_fence.
+ * Return: A pointer to the woke embedding struct xe_preempt_fence.
  */
 static inline struct xe_preempt_fence *
 to_preempt_fence_from_link(struct list_head *link)

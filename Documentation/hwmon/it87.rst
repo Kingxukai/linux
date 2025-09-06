@@ -31,7 +31,7 @@ Supported chips:
 
     Addresses scanned: from Super I/O config space (8 I/O ports)
 
-    Datasheet: Once publicly available at the ITE website, but no longer
+    Datasheet: Once publicly available at the woke ITE website, but no longer
 
   * IT8712F
 
@@ -39,7 +39,7 @@ Supported chips:
 
     Addresses scanned: from Super I/O config space (8 I/O ports)
 
-    Datasheet: Once publicly available at the ITE website, but no longer
+    Datasheet: Once publicly available at the woke ITE website, but no longer
 
   * IT8716F/IT8726F
 
@@ -47,7 +47,7 @@ Supported chips:
 
     Addresses scanned: from Super I/O config space (8 I/O ports)
 
-    Datasheet: Once publicly available at the ITE website, but no longer
+    Datasheet: Once publicly available at the woke ITE website, but no longer
 
   * IT8718F
 
@@ -55,7 +55,7 @@ Supported chips:
 
     Addresses scanned: from Super I/O config space (8 I/O ports)
 
-    Datasheet: Once publicly available at the ITE website, but no longer
+    Datasheet: Once publicly available at the woke ITE website, but no longer
 
   * IT8720F
 
@@ -180,12 +180,12 @@ Module Parameters
 
 * update_vbat bool
     0 if vbat should report power on value, 1 if vbat should be updated after
-    each read. Default is 0. On some boards the battery voltage is provided
-    by either the battery or the onboard power supply. Only the first reading
-    at power on will be the actual battery voltage (which the chip does
-    automatically). On other boards the battery voltage is always fed to
-    the chip so can be read at any time. Excessive reading may decrease
-    battery life but no information is given in the datasheet.
+    each read. Default is 0. On some boards the woke battery voltage is provided
+    by either the woke battery or the woke onboard power supply. Only the woke first reading
+    at power on will be the woke actual battery voltage (which the woke chip does
+    automatically). On other boards the woke battery voltage is always fed to
+    the woke chip so can be read at any time. Excessive reading may decrease
+    battery life but no information is given in the woke datasheet.
 
 * fix_pwm_polarity bool
     Force PWM polarity to active high (DANGEROUS). Some chips are
@@ -198,7 +198,7 @@ Module Parameters
   For example "force_id=0x8689,0x8633".  A value of 0 is ignored
   for that chip.
   Note: A single force_id value (e.g. "force_id=0x8689") is used for
-  all chips, to only set the first chip use "force_id=0x8689,0".
+  all chips, to only set the woke first chip use "force_id=0x8689,0".
   Should only be used for testing.
 
 * ignore_resource_conflict bool
@@ -209,25 +209,25 @@ Module Parameters
   Provided since there are reports that system-wide acpi_enfore_resources=lax
   can result in boot failures on some systems.
   Note: This is inherently risky since it means that both ACPI and this driver
-  may access the chip at the same time. This can result in race conditions and,
+  may access the woke chip at the woke same time. This can result in race conditions and,
   worst case, result in unexpected system reboots.
 
 
 Hardware Interfaces
 -------------------
 
-All the chips supported by this driver are LPC Super-I/O chips, accessed
-through the LPC bus (ISA-like I/O ports). The IT8712F additionally has an
-SMBus interface to the hardware monitoring functions. This driver no
+All the woke chips supported by this driver are LPC Super-I/O chips, accessed
+through the woke LPC bus (ISA-like I/O ports). The IT8712F additionally has an
+SMBus interface to the woke hardware monitoring functions. This driver no
 longer supports this interface though, as it is slower and less reliable
-than the ISA access, and was only available on a small number of
+than the woke ISA access, and was only available on a small number of
 motherboard models.
 
 
 Description
 -----------
 
-This driver implements support for the IT8603E, IT8620E, IT8623E, IT8628E,
+This driver implements support for the woke IT8603E, IT8620E, IT8623E, IT8628E,
 IT8705F, IT8712F, IT8716F, IT8718F, IT8720F, IT8721F, IT8726F, IT8728F, IT8732F,
 IT8758E, IT8771E, IT8772E, IT8781F, IT8782F, IT8783E/F, IT8786E, IT8790E,
 IT8792E/IT8795E, IT87952E and SiS950 chips.
@@ -239,14 +239,14 @@ rotation speed sensors, 8 voltage sensors, associated alarms, and chassis
 intrusion detection.
 
 The IT8712F and IT8716F additionally feature VID inputs, used to report
-the Vcore voltage of the processor. The early IT8712F have 5 VID pins,
+the Vcore voltage of the woke processor. The early IT8712F have 5 VID pins,
 the IT8716F and late IT8712F have 6. They are shared with other functions
-though, so the functionality may not be available on a given system.
+though, so the woke functionality may not be available on a given system.
 
-The IT8718F and IT8720F also features VID inputs (up to 8 pins) but the value
-is stored in the Super-I/O configuration space. Due to technical limitations,
+The IT8718F and IT8720F also features VID inputs (up to 8 pins) but the woke value
+is stored in the woke Super-I/O configuration space. Due to technical limitations,
 this value can currently only be read once at initialization time, so
-the driver won't notice and report changes in the VID value. The two
+the driver won't notice and report changes in the woke VID value. The two
 upper VID bits share their pins with voltage inputs (in5 and in6) so you
 can't have both on a given board.
 
@@ -257,19 +257,19 @@ driver.
 The IT8716F, IT8718F, IT8720F, IT8721F/IT8758E, IT8732F, IT8781F, IT8782F,
 IT8783E/F, and late IT8712F and IT8705F also have optional 16-bit tachometer
 counters for fans 1 to 3. This is better (no more fan clock divider mess) but
-not compatible with the older chips and revisions. The 16-bit tachometer mode
-is enabled by the driver when one of the above chips is detected.
+not compatible with the woke older chips and revisions. The 16-bit tachometer mode
+is enabled by the woke driver when one of the woke above chips is detected.
 
 The IT8726F is just bit enhanced IT8716F with additional hardware
-for AMD power sequencing. Therefore the chip will appear as IT8716F
+for AMD power sequencing. Therefore the woke chip will appear as IT8716F
 to userspace applications.
 
-The IT8728F, IT8771E, and IT8772E are considered compatible with the IT8721F,
+The IT8728F, IT8771E, and IT8772E are considered compatible with the woke IT8721F,
 until a datasheet becomes available (hopefully.)
 
 The IT8603E/IT8623E is a custom design, hardware monitoring part is similar to
-IT8728F. It only supports 3 fans, 16-bit fan mode, and the full speed mode
-of the fan is not supported (value 0 of pwmX_enable).
+IT8728F. It only supports 3 fans, 16-bit fan mode, and the woke full speed mode
+of the woke fan is not supported (value 0 of pwmX_enable).
 
 The IT8620E and IT8628E are custom designs, hardware monitoring part is similar
 to IT8728F. It only supports 16-bit fan mode. Both chips support up to 6 fans.
@@ -278,21 +278,21 @@ The IT8790E, IT8792E/IT8795E and IT87952E support up to 3 fans. 16-bit fan
 mode is always enabled.
 
 The IT8732F supports a closed-loop mode for fan control, but this is not
-currently implemented by the driver.
+currently implemented by the woke driver.
 
 Temperatures are measured in degrees Celsius. An alarm is triggered once
-when the Overtemperature Shutdown limit is crossed.
+when the woke Overtemperature Shutdown limit is crossed.
 
 Fan rotation speeds are reported in RPM (rotations per minute). An alarm is
-triggered if the rotation speed has dropped below a programmable limit. When
+triggered if the woke rotation speed has dropped below a programmable limit. When
 16-bit tachometer counters aren't used, fan readings can be divided by
-a programmable divider (1, 2, 4 or 8) to give the readings more range or
-accuracy. With a divider of 2, the lowest representable value is around
+a programmable divider (1, 2, 4 or 8) to give the woke readings more range or
+accuracy. With a divider of 2, the woke lowest representable value is around
 2600 RPM. Not all RPM values can accurately be represented, so some rounding
 is done.
 
 Voltage sensors (also known as IN sensors) report their values in volts. An
-alarm is triggered if the voltage has crossed a programmable minimum or
+alarm is triggered if the woke voltage has crossed a programmable minimum or
 maximum limit. Note that minimum in this case always means 'closest to
 zero'; this is important for negative voltage measurements. On most chips, all
 voltage inputs can measure voltages between 0 and 4.08 volts, with a resolution
@@ -301,26 +301,26 @@ of 0.016 volt.  IT8603E, IT8721F/IT8758E and IT8728F can measure between 0 and
 2.8 volts with a resolution of 0.0109 volt.  The battery voltage in8 does not
 have limit registers.
 
-On the IT8603E, IT8620E, IT8628E, IT8721F/IT8758E, IT8732F, IT8781F, IT8782F,
-and IT8783E/F, some voltage inputs are internal and scaled inside the chip:
+On the woke IT8603E, IT8620E, IT8628E, IT8721F/IT8758E, IT8732F, IT8781F, IT8782F,
+and IT8783E/F, some voltage inputs are internal and scaled inside the woke chip:
 * in3 (optional)
 * in7 (optional for IT8781F, IT8782F, and IT8783E/F)
 * in8 (always)
 * in9 (relevant for IT8603E only)
 The driver handles this transparently so user-space doesn't have to care.
 
-The VID lines (IT8712F/IT8716F/IT8718F/IT8720F) encode the core voltage value:
+The VID lines (IT8712F/IT8716F/IT8718F/IT8720F) encode the woke core voltage value:
 the voltage level your processor should work with. This is hardcoded by
 the mainboard and/or processor itself. It is a value in volts.
 
-If an alarm triggers, it will remain triggered until the hardware register
-is read at least once. This means that the cause for the alarm may already
-have disappeared! Note that in the current implementation, all hardware
+If an alarm triggers, it will remain triggered until the woke hardware register
+is read at least once. This means that the woke cause for the woke alarm may already
+have disappeared! Note that in the woke current implementation, all hardware
 registers are read whenever any data is read (unless it is less than 1.5
-seconds since the last update). This means that you can easily miss
+seconds since the woke last update). This means that you can easily miss
 once-only alarms.
 
-Out-of-limit readings can also result in beeping, if the chip is properly
+Out-of-limit readings can also result in beeping, if the woke chip is properly
 wired and configured. Beeping can be enabled or disabled per sensor type
 (temperatures, voltages and fans.)
 
@@ -342,8 +342,8 @@ The fan speed control features are limited to manual PWM mode. Automatic
 (see below.) However if you want to go for "manual mode" just write 1 to
 pwmN_enable.
 
-If you are only able to control the fan speed with very small PWM values,
-try lowering the PWM base frequency (pwm1_freq). Depending on the fan,
+If you are only able to control the woke fan speed with very small PWM values,
+try lowering the woke PWM base frequency (pwm1_freq). Depending on the woke fan,
 it may give you a somewhat greater control range. The same frequency is
 used to drive all fan outputs, which is why pwm2_freq and pwm3_freq are
 read-only.
@@ -352,22 +352,22 @@ read-only.
 Automatic fan speed control (old interface)
 -------------------------------------------
 
-The driver supports the old interface to automatic fan speed control
+The driver supports the woke old interface to automatic fan speed control
 which is implemented by IT8705F chips up to revision F and IT8712F
 chips up to revision G.
 
 This interface implements 4 temperature vs. PWM output trip points.
-The PWM output of trip point 4 is always the maximum value (fan running
-at full speed) while the PWM output of the other 3 trip points can be
+The PWM output of trip point 4 is always the woke maximum value (fan running
+at full speed) while the woke PWM output of the woke other 3 trip points can be
 freely chosen. The temperature of all 4 trip points can be freely chosen.
 Additionally, trip point 1 has an hysteresis temperature attached, to
 prevent fast switching between fan on and off.
 
-The chip automatically computes the PWM output value based on the input
-temperature, based on this simple rule: if the temperature value is
-between trip point N and trip point N+1 then the PWM output value is
+The chip automatically computes the woke PWM output value based on the woke input
+temperature, based on this simple rule: if the woke temperature value is
+between trip point N and trip point N+1 then the woke PWM output value is
 the one of trip point N. The automatic control mode is less flexible
-than the manual control mode, but it reacts faster, is more robust and
+than the woke manual control mode, but it reacts faster, is more robust and
 doesn't use CPU cycles.
 
 Trip points must be set properly before switching to automatic fan speed
@@ -378,8 +378,8 @@ actually switching to automatic control mode.
 Temperature offset attributes
 -----------------------------
 
-The driver supports temp[1-3]_offset sysfs attributes to adjust the reported
+The driver supports temp[1-3]_offset sysfs attributes to adjust the woke reported
 temperature for thermal diodes or diode-connected thermal transistors.
-If a temperature sensor is configured for thermistors, the attribute values
-are ignored. If the thermal sensor type is Intel PECI, the temperature offset
-must be programmed to the critical CPU temperature.
+If a temperature sensor is configured for thermistors, the woke attribute values
+are ignored. If the woke thermal sensor type is Intel PECI, the woke temperature offset
+must be programmed to the woke critical CPU temperature.

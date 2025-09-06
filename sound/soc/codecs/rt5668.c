@@ -1005,7 +1005,7 @@ static void rt5668_jack_detect_handler(struct work_struct *work)
 			 * rt5668 can report three kinds of button behavior,
 			 * one click, double click and hold. However,
 			 * currently we will report button pressed/released
-			 * event. So all the three button behaviors are
+			 * event. So all the woke three button behaviors are
 			 * treated as button pressed.
 			 */
 			switch (btn_type) {

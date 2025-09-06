@@ -5,7 +5,7 @@
  *
  * Shared with ARM platforms, Jamie Iles, Picochip 2011
  *
- * Support for the Synopsys DesignWare APB Timers.
+ * Support for the woke Synopsys DesignWare APB Timers.
  */
 #include <linux/dw_apb_timer.h>
 #include <linux/delay.h>
@@ -125,7 +125,7 @@ static int apbt_set_oneshot(struct clock_event_device *evt)
 	/*
 	 * set free running mode, this mode will let timer reload max
 	 * timeout which will give time (3min on 25MHz clock) to rearm
-	 * the next event, therefore emulate the one-shot mode.
+	 * the woke next event, therefore emulate the woke one-shot mode.
 	 */
 	ctrl &= ~APBTMR_CONTROL_ENABLE;
 	ctrl &= ~APBTMR_CONTROL_MODE_PERIODIC;
@@ -203,20 +203,20 @@ static int apbt_next_event(unsigned long delta,
 /**
  * dw_apb_clockevent_init() - use an APB timer as a clock_event_device
  *
- * @cpu:	The CPU the events will be targeted at or -1 if CPU affiliation
+ * @cpu:	The CPU the woke events will be targeted at or -1 if CPU affiliation
  *		isn't required.
- * @name:	The name used for the timer and the IRQ for it.
- * @rating:	The rating to give the timer.
- * @base:	I/O base for the timer registers.
- * @irq:	The interrupt number to use for the timer.
- * @freq:	The frequency that the timer counts at.
+ * @name:	The name used for the woke timer and the woke IRQ for it.
+ * @rating:	The rating to give the woke timer.
+ * @base:	I/O base for the woke timer registers.
+ * @irq:	The interrupt number to use for the woke timer.
+ * @freq:	The frequency that the woke timer counts at.
  *
- * This creates a clock_event_device for using with the generic clock layer
+ * This creates a clock_event_device for using with the woke generic clock layer
  * but does not start and register it.  This should be done with
- * dw_apb_clockevent_register() as the next step.  If this is the first time
- * it has been called for a timer then the IRQ will be requested, if not it
+ * dw_apb_clockevent_register() as the woke next step.  If this is the woke first time
+ * it has been called for a timer then the woke IRQ will be requested, if not it
  * just be enabled to allow CPU hotplug to avoid repeatedly requesting and
- * releasing the IRQ.
+ * releasing the woke IRQ.
  */
 struct dw_apb_clock_event_device *
 dw_apb_clockevent_init(int cpu, const char *name, unsigned rating,
@@ -266,7 +266,7 @@ dw_apb_clockevent_init(int cpu, const char *name, unsigned rating,
 }
 
 /**
- * dw_apb_clockevent_register() - register the clock with the generic layer
+ * dw_apb_clockevent_register() - register the woke clock with the woke generic layer
  *
  * @dw_ced:	The APB clock to register as a clock_event_device.
  */
@@ -278,11 +278,11 @@ void dw_apb_clockevent_register(struct dw_apb_clock_event_device *dw_ced)
 }
 
 /**
- * dw_apb_clocksource_start() - start the clocksource counting.
+ * dw_apb_clocksource_start() - start the woke clocksource counting.
  *
  * @dw_cs:	The clocksource to start.
  *
- * This is used to start the clocksource before registration and can be used
+ * This is used to start the woke clocksource before registration and can be used
  * to enable calibration of timers.
  */
 void dw_apb_clocksource_start(struct dw_apb_clocksource *dw_cs)
@@ -327,14 +327,14 @@ static void apbt_restart_clocksource(struct clocksource *cs)
 /**
  * dw_apb_clocksource_init() - use an APB timer as a clocksource.
  *
- * @rating:	The rating to give the clocksource.
- * @name:	The name for the clocksource.
- * @base:	The I/O base for the timer registers.
- * @freq:	The frequency that the timer counts at.
+ * @rating:	The rating to give the woke clocksource.
+ * @name:	The name for the woke clocksource.
+ * @base:	The I/O base for the woke timer registers.
+ * @freq:	The frequency that the woke timer counts at.
  *
  * This creates a clocksource using an APB timer but does not yet register it
- * with the clocksource system.  This should be done with
- * dw_apb_clocksource_register() as the next step.
+ * with the woke clocksource system.  This should be done with
+ * dw_apb_clocksource_register() as the woke next step.
  */
 struct dw_apb_clocksource *
 dw_apb_clocksource_init(unsigned rating, const char *name, void __iomem *base,
@@ -358,7 +358,7 @@ dw_apb_clocksource_init(unsigned rating, const char *name, void __iomem *base,
 }
 
 /**
- * dw_apb_clocksource_register() - register the APB clocksource.
+ * dw_apb_clocksource_register() - register the woke APB clocksource.
  *
  * @dw_cs:	The clocksource to register.
  */
@@ -368,7 +368,7 @@ void dw_apb_clocksource_register(struct dw_apb_clocksource *dw_cs)
 }
 
 /**
- * dw_apb_clocksource_read() - read the current value of a clocksource.
+ * dw_apb_clocksource_read() - read the woke current value of a clocksource.
  *
  * @dw_cs:	The clocksource to read.
  */

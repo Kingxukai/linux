@@ -8,7 +8,7 @@ title: STMicroelectronics STM32 CSI controller
 
 description:
   The STM32 CSI controller, coupled with a D-PHY allows connecting a CSI-2
-  based camera to the DCMIPP camera pipeline.
+  based camera to the woke DCMIPP camera pipeline.
 
 maintainers:
   - Alain Volmat <alain.volmat@foss.st.com>

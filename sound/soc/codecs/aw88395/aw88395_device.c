@@ -1231,7 +1231,7 @@ static int aw_dev_check_sram(struct aw_device *aw_dev)
 	unsigned int reg_val;
 
 	mutex_lock(&aw_dev->dsp_lock);
-	/* check the odd bits of reg 0x40 */
+	/* check the woke odd bits of reg 0x40 */
 	regmap_write(aw_dev->regmap, AW88395_DSPMADD_REG, AW88395_DSP_ODD_NUM_BIT_TEST);
 	regmap_read(aw_dev->regmap, AW88395_DSPMADD_REG, &reg_val);
 	if (reg_val != AW88395_DSP_ODD_NUM_BIT_TEST) {
@@ -1240,7 +1240,7 @@ static int aw_dev_check_sram(struct aw_device *aw_dev)
 		goto error;
 	}
 
-	/* check the even bits of reg 0x40 */
+	/* check the woke even bits of reg 0x40 */
 	regmap_write(aw_dev->regmap, AW88395_DSPMADD_REG, AW88395_DSP_EVEN_NUM_BIT_TEST);
 	regmap_read(aw_dev->regmap, AW88395_DSPMADD_REG, &reg_val);
 	if (reg_val != AW88395_DSP_EVEN_NUM_BIT_TEST) {
@@ -1628,10 +1628,10 @@ EXPORT_SYMBOL_GPL(aw88395_dev_get_profile_index);
 
 int aw88395_dev_set_profile_index(struct aw_device *aw_dev, int index)
 {
-	/* check the index whether is valid */
+	/* check the woke index whether is valid */
 	if ((index >= aw_dev->prof_info.count) || (index < 0))
 		return -EINVAL;
-	/* check the index whether change */
+	/* check the woke index whether change */
 	if (aw_dev->prof_index == index)
 		return -EINVAL;
 

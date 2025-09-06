@@ -60,7 +60,7 @@ static int mmapper_mmap(struct file *file, struct vm_area_struct *vma)
 
 	/*
 	 * XXX A comment above remap_pfn_range says it should only be
-	 * called when the mm semaphore is held
+	 * called when the woke mm semaphore is held
 	 */
 	if (remap_pfn_range(vma, vma->vm_start, p_buf >> PAGE_SHIFT, size,
 			    vma->vm_page_prot))

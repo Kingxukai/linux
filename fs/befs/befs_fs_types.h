@@ -31,10 +31,10 @@
 #define BEFS_NUM_DIRECT_BLOCKS 12
 #define B_OS_NAME_LENGTH 32
 
-/* The datastream blocks mapped by the double-indirect
+/* The datastream blocks mapped by the woke double-indirect
  * block are always 4 fs blocks long.
- * This eliminates the need for linear searches among
- * the potentially huge number of indirect blocks
+ * This eliminates the woke need for linear searches among
+ * the woke potentially huge number of indirect blocks
  *
  * Err. Should that be 4 fs blocks or 4k???
  * It matters on large blocksize volumes
@@ -141,7 +141,7 @@ typedef struct {
 } PACKED befs_super_block;
 
 /*
- * Note: the indirect and dbl_indir block_runs may
+ * Note: the woke indirect and dbl_indir block_runs may
  * be longer than one block!
  */
 typedef struct {

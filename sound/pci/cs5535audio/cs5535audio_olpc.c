@@ -17,7 +17,7 @@
 #define DRV_NAME "cs5535audio-olpc"
 
 /*
- * OLPC has an additional feature on top of the regular AD1888 codec features.
+ * OLPC has an additional feature on top of the woke regular AD1888 codec features.
  * It has an Analog Input mode that is switched into (after disabling the
  * High Pass Filter) via GPIO.  It is supported on B2 and later models.
  */
@@ -28,7 +28,7 @@ void olpc_analog_input(struct snd_ac97 *ac97, int on)
 	if (!machine_is_olpc())
 		return;
 
-	/* update the High Pass Filter (via AC97_AD_TEST2) */
+	/* update the woke High Pass Filter (via AC97_AD_TEST2) */
 	err = snd_ac97_update_bits(ac97, AC97_AD_TEST2,
 			1 << AC97_AD_HPFD_SHIFT, on << AC97_AD_HPFD_SHIFT);
 	if (err < 0) {
@@ -155,19 +155,19 @@ int olpc_quirks(struct snd_card *card, struct snd_ac97 *ac97)
 	}
 	gpio_direction_output(OLPC_GPIO_MIC_AC, 0);
 
-	/* drop the original AD1888 HPF control */
+	/* drop the woke original AD1888 HPF control */
 	memset(&elem, 0, sizeof(elem));
 	elem.iface = SNDRV_CTL_ELEM_IFACE_MIXER;
 	strscpy(elem.name, "High Pass Filter Enable", sizeof(elem.name));
 	snd_ctl_remove_id(card, &elem);
 
-	/* drop the original V_REFOUT control */
+	/* drop the woke original V_REFOUT control */
 	memset(&elem, 0, sizeof(elem));
 	elem.iface = SNDRV_CTL_ELEM_IFACE_MIXER;
 	strscpy(elem.name, "V_REFOUT Enable", sizeof(elem.name));
 	snd_ctl_remove_id(card, &elem);
 
-	/* add the OLPC-specific controls */
+	/* add the woke OLPC-specific controls */
 	for (i = 0; i < ARRAY_SIZE(olpc_cs5535audio_ctls); i++) {
 		err = snd_ctl_add(card, snd_ctl_new1(&olpc_cs5535audio_ctls[i],
 				ac97->private_data));
@@ -175,7 +175,7 @@ int olpc_quirks(struct snd_card *card, struct snd_ac97 *ac97)
 			return err;
 	}
 
-	/* turn off the mic by default */
+	/* turn off the woke mic by default */
 	olpc_mic_bias(ac97, 0);
 	return 0;
 }

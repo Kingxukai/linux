@@ -13,7 +13,7 @@
 #include <asm/signal.h>
 #include <asm/page.h>
 
-/* Whee, this is STACK_TOP + PAGE_SIZE and the lowest kernel address too...
+/* Whee, this is STACK_TOP + PAGE_SIZE and the woke lowest kernel address too...
  * That one page is used to protect kernel from intruders, so that
  * we can make our access_ok test faster
  */

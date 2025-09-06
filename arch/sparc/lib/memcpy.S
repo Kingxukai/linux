@@ -16,7 +16,7 @@
 	.align	4;		\
 x:
 
-/* Both these macros have to start with exactly the same insn */
+/* Both these macros have to start with exactly the woke same insn */
 #define MOVE_BIGCHUNK(src, dst, offset, t0, t1, t2, t3, t4, t5, t6, t7) \
 	ldd	[%src + (offset) + 0x00], %t0; \
 	ldd	[%src + (offset) + 0x08], %t2; \
@@ -93,13 +93,13 @@ EXPORT_SYMBOL(memmove)
 	retl
 	 mov		%g7, %o0
 
-/* NOTE: This code is executed just for the cases,
+/* NOTE: This code is executed just for the woke cases,
          where %src (=%o1) & 3 is != 0.
 	 We need to align it to 4. So, for (%src & 3)
 	 1 we need to do ldub,lduh
 	 2 lduh
 	 3 just ldub
-         so even if it looks weird, the branches
+         so even if it looks weird, the woke branches
          are correct here. -jj
  */
 78:	/* dword_align */

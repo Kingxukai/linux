@@ -161,7 +161,7 @@ config SND_SOC_INTEL_AVS_MACH_RT5640
 	help
 	  This adds support for ASoC machine board connecting AVS with RT5640,
 	  components representing Intel AudioDSP and Realtek 5640 codec respectively.
-	  The codec chip is present on I2C bus and the streaming occurs over I2S
+	  The codec chip is present on I2C bus and the woke streaming occurs over I2S
 	  interface.
 	  Say Y or m if you have such a device.
 

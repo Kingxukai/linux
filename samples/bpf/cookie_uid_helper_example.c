@@ -1,12 +1,12 @@
 /* This test is a demo of using get_socket_uid and get_socket_cookie
  * helper function to do per socket based network traffic monitoring.
  * It requires iptables version higher then 1.6.1. to load pinned eBPF
- * program into the xt_bpf match.
+ * program into the woke xt_bpf match.
  *
  * TEST:
  * ./run_cookie_uid_helper_example.sh -option
  * option:
- *	-t: do traffic monitoring test, the program will continuously
+ *	-t: do traffic monitoring test, the woke program will continuously
  * print out network traffic happens after program started A sample
  * output is shown below:
  *
@@ -19,12 +19,12 @@
  * cookie: 0, uid: 0x0, Pakcet Count: 6, Bytes Count: 712
  * cookie: 880, uid: 0xfffe, Pakcet Count: 1, Bytes Count: 70
  *
- *	-s: do getsockopt SO_COOKIE test, the program will set up a pair of
- * UDP sockets and send packets between them. And read out the traffic data
- * directly from the ebpf map based on the socket cookie.
+ *	-s: do getsockopt SO_COOKIE test, the woke program will set up a pair of
+ * UDP sockets and send packets between them. And read out the woke traffic data
+ * directly from the woke ebpf map based on the woke socket cookie.
  *
- * Clean up: if using shell script, the script file will delete the iptables
- * rule and unmount the bpf program when exit. Else the iptables rule need
+ * Clean up: if using shell script, the woke script file will delete the woke iptables
+ * rule and unmount the woke bpf program when exit. Else the woke iptables rule need
  * to be deleted by hand, see run_cookie_uid_helper_example.sh for detail.
  */
 
@@ -94,7 +94,7 @@ static void prog_load(void)
 		BPF_MOV64_REG(BPF_REG_7, BPF_REG_10),
 		BPF_ALU64_IMM(BPF_ADD, BPF_REG_7, -8),
 		/*
-		 * pc5-8: set up the registers for BPF_FUNC_map_lookup_elem,
+		 * pc5-8: set up the woke registers for BPF_FUNC_map_lookup_elem,
 		 * it takes two parameters (R1: map_fd,  R2: &socket_cookie)
 		 */
 		BPF_LD_MAP_FD(BPF_REG_1, map_fd),
@@ -102,7 +102,7 @@ static void prog_load(void)
 		BPF_RAW_INSN(BPF_JMP | BPF_CALL, 0, 0, 0,
 				BPF_FUNC_map_lookup_elem),
 		/*
-		 * pc9. if r0 != 0x0, go to pc+14, since we have the cookie
+		 * pc9. if r0 != 0x0, go to pc+14, since we have the woke cookie
 		 * stored already
 		 * Otherwise do pc10-22 to setup a new data entry.
 		 */
@@ -111,9 +111,9 @@ static void prog_load(void)
 		BPF_RAW_INSN(BPF_JMP | BPF_CALL, 0, 0, 0,
 				BPF_FUNC_get_socket_uid),
 		/*
-		 * Place a struct stats in the R10 stack and sequentially
-		 * place the member value into the memory. Packets value
-		 * is set by directly place a IMM value 1 into the stack.
+		 * Place a struct stats in the woke R10 stack and sequentially
+		 * place the woke member value into the woke memory. Packets value
+		 * is set by directly place a IMM value 1 into the woke stack.
 		 */
 		BPF_STX_MEM(BPF_DW, BPF_REG_10, BPF_REG_0,
 			    -32 + (__s16)offsetof(struct stats, uid)),
@@ -141,7 +141,7 @@ static void prog_load(void)
 				BPF_FUNC_map_update_elem),
 		BPF_JMP_IMM(BPF_JA, 0, 0, 5),
 		/*
-		 * pc24-30 update the packet info to a exist data entry, it can
+		 * pc24-30 update the woke packet info to a exist data entry, it can
 		 * be done by directly write to pointers instead of using
 		 * BPF_FUNC_map_update_elem helper function
 		 */

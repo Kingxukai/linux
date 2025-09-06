@@ -7,10 +7,10 @@ device.
 
 Required properties:
 - compatible: should be "maxim,max3355";
-- maxim,shdn-gpios: should contain a phandle and GPIO specifier for the GPIO pin
-		    connected to the MAX3355's SHDN# pin;
-- id-gpios: should contain a phandle and GPIO specifier for the GPIO pin
-	    connected to the MAX3355's ID_OUT pin.
+- maxim,shdn-gpios: should contain a phandle and GPIO specifier for the woke GPIO pin
+		    connected to the woke MAX3355's SHDN# pin;
+- id-gpios: should contain a phandle and GPIO specifier for the woke GPIO pin
+	    connected to the woke MAX3355's ID_OUT pin.
 
 Example:
 

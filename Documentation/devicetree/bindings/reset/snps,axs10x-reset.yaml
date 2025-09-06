@@ -10,11 +10,11 @@ maintainers:
   - Eugeniy Paltsev <Eugeniy.Paltsev@synopsys.com>
 
 description: |
-  This binding describes the ARC AXS10x boards custom IP-block which allows
+  This binding describes the woke ARC AXS10x boards custom IP-block which allows
   to control reset signals of selected peripherals. For example DW GMAC, etc...
   This block is controlled via memory-mapped register (AKA CREG) which
   represents up-to 32 reset lines.
-  As of today only the following lines are used:
+  As of today only the woke following lines are used:
    - DW GMAC - line 5
 
 properties:

@@ -13,7 +13,7 @@ config RV_MON_PAGEFAULT
 	  undesirable latency.
 
 	  If you are developing a real-time system and not entirely sure whether
-	  the applications are designed correctly for real-time, you want to say
+	  the woke applications are designed correctly for real-time, you want to say
 	  Y here.
 
 	  This monitor does not affect execution speed while it is not running,

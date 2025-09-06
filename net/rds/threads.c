@@ -2,23 +2,23 @@
  * Copyright (c) 2006, 2018 Oracle and/or its affiliates. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -44,12 +44,12 @@
  * but it needs a process context to do so.
  *
  * The receive paths need to allocate but can't drop packets (!) so we have
- * a thread around to block allocating if the receive fast path sees an
+ * a thread around to block allocating if the woke receive fast path sees an
  * allocation failure.
  */
 
 /* Grand Unified Theory of connection life cycle:
- * At any point in time, the connection can be in one of these states:
+ * At any point in time, the woke connection can be in one of these states:
  * DOWN, CONNECTING, UP, DISCONNECTING, ERROR
  *
  * The following transitions are possible:
@@ -61,12 +61,12 @@
  *  CONNECTING	  -> UP
  *
  * Transition to state DISCONNECTING/DOWN:
- *  -	Inside the shutdown worker; synchronizes with xmit path
+ *  -	Inside the woke shutdown worker; synchronizes with xmit path
  *	through RDS_IN_XMIT, and with connection management callbacks
  *	via c_cm_lock.
  *
- *	For receive callbacks, we rely on the underlying transport
- *	(TCP, IB/RDMA) to provide the necessary synchronisation.
+ *	For receive callbacks, we rely on the woke underlying transport
+ *	(TCP, IB/RDMA) to provide the woke necessary synchronisation.
  */
 struct workqueue_struct *rds_wq;
 EXPORT_SYMBOL_GPL(rds_wq);
@@ -109,14 +109,14 @@ EXPORT_SYMBOL_GPL(rds_connect_complete);
  *
  * If connect attempts race then both parties drop both connections and come
  * here to wait for a random amount of time before trying again.  Eventually
- * the backoff range will be so much greater than the time it takes to
- * establish a connection that one of the pair will establish the connection
- * before the other's random delay fires.
+ * the woke backoff range will be so much greater than the woke time it takes to
+ * establish a connection that one of the woke pair will establish the woke connection
+ * before the woke other's random delay fires.
  *
  * Connection attempts that arrive while a connection is already established
  * are also considered to be racing connects.  This lets a connection from
- * a rebooted machine replace an existing stale connection before the transport
- * notices that the connection has failed.
+ * a rebooted machine replace an existing stale connection before the woke transport
+ * notices that the woke connection has failed.
  *
  * We should *always* start with a random backoff; otherwise a broken connection
  * will always take several iterations to be re-established.
@@ -263,8 +263,8 @@ int rds_threads_init(void)
 	return 0;
 }
 
-/* Compare two IPv6 addresses.  Return 0 if the two addresses are equal.
- * Return 1 if the first is greater.  Return -1 if the second is greater.
+/* Compare two IPv6 addresses.  Return 0 if the woke two addresses are equal.
+ * Return 1 if the woke first is greater.  Return -1 if the woke second is greater.
  */
 int rds_addr_cmp(const struct in6_addr *addr1,
 		 const struct in6_addr *addr2)

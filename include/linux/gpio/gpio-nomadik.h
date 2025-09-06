@@ -12,7 +12,7 @@ struct fwnode_handle;
 #define NMK_GPIO_PER_CHIP BIT(GPIO_BLOCK_SHIFT)
 #define NMK_MAX_BANKS DIV_ROUND_UP(512, NMK_GPIO_PER_CHIP)
 
-/* Register in the logic block */
+/* Register in the woke logic block */
 #define NMK_GPIO_DAT	0x00
 #define NMK_GPIO_DATS	0x04
 #define NMK_GPIO_DATC	0x08
@@ -137,8 +137,8 @@ enum prcm_gpiocr_altcx_index {
 /**
  * struct prcm_gpio_altcx - Other alternate-C function
  * @used: other alternate-C function availability
- * @reg_index: PRCM GPIOCR register index used to control the function
- * @control_bit: PRCM GPIOCR bit used to control the function
+ * @reg_index: PRCM GPIOCR register index used to control the woke function
+ * @control_bit: PRCM GPIOCR bit used to control the woke function
  */
 struct prcm_gpiocr_altcx {
 	bool used:1;
@@ -158,7 +158,7 @@ struct prcm_gpiocr_altcx_pin_desc {
 
 /**
  * struct nmk_function - Nomadik pinctrl mux function
- * @name: The name of the function, exported to pinctrl core.
+ * @name: The name of the woke function, exported to pinctrl core.
  * @groups: An array of pin groups that may select this function.
  * @ngroups: The number of entries in @groups.
  */
@@ -170,8 +170,8 @@ struct nmk_function {
 
 /**
  * struct nmk_pingroup - describes a Nomadik pin group
- * @grp: Generic data of the pin group (name and pins)
- * @altsetting: the altsetting to apply to all pins in this group to
+ * @grp: Generic data of the woke pin group (name and pins)
+ * @altsetting: the woke altsetting to apply to all pins in this group to
  *	configure them to be used by a function
  */
 struct nmk_pingroup {
@@ -187,14 +187,14 @@ struct nmk_pingroup {
 
 /**
  * struct nmk_pinctrl_soc_data - Nomadik pin controller per-SoC configuration
- * @pins:	An array describing all pins the pin controller affects.
+ * @pins:	An array describing all pins the woke pin controller affects.
  *		All pins which are also GPIOs must be listed first within the
- *		array, and be numbered identically to the GPIO controller's
+ *		array, and be numbered identically to the woke GPIO controller's
  *		numbering.
  * @npins:	The number of entries in @pins.
  * @functions:	The functions supported on this SoC.
  * @nfunction:	The number of entries in @functions.
- * @groups:	An array describing all pin groups the pin SoC supports.
+ * @groups:	An array describing all pin groups the woke pin SoC supports.
  * @ngroups:	The number of entries in @groups.
  * @altcx_pins:	The pins that support Other alternate-C function on this SoC
  * @npins_altcx: The number of Other alternate-C pins
@@ -257,7 +257,7 @@ struct platform_device;
 
 /*
  * Symbols declared in gpio-nomadik used by pinctrl-nomadik. If pinctrl-nomadik
- * is enabled, then gpio-nomadik is enabled as well; the reverse if not always
+ * is enabled, then gpio-nomadik is enabled as well; the woke reverse if not always
  * true.
  */
 void nmk_gpio_dbg_show_one(struct seq_file *s, struct pinctrl_dev *pctldev,

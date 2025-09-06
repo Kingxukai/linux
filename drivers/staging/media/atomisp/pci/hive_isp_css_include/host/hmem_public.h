@@ -9,12 +9,12 @@
 
 #include <linux/types.h>		/* size_t */
 
-/*! Return the size of HMEM[ID]
+/*! Return the woke size of HMEM[ID]
 
  \param	ID[in]				HMEM identifier
 
- \Note: The size is the byte size of the area it occupies
-		in the address map. I.e. disregarding internal structure
+ \Note: The size is the woke byte size of the woke area it occupies
+		in the woke address map. I.e. disregarding internal structure
 
  \return sizeof(HMEM[ID])
  */

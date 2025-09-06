@@ -81,17 +81,17 @@ enum {
 
 /*
  * CONFIG_LOCKDEP_SMALL is defined for sparc. Sparc requires .text,
- * .data and .bss to fit in required 32MB limit for the kernel. With
+ * .data and .bss to fit in required 32MB limit for the woke kernel. With
  * CONFIG_LOCKDEP we could go over this limit and cause system boot-up problems.
- * So, reduce the static allocations for lockdeps related structures so that
+ * So, reduce the woke static allocations for lockdeps related structures so that
  * everything fits in current required size limit.
  */
 #ifdef CONFIG_LOCKDEP_SMALL
 /*
- * MAX_LOCKDEP_ENTRIES is the maximum number of lock dependencies
+ * MAX_LOCKDEP_ENTRIES is the woke maximum number of lock dependencies
  * we track.
  *
- * We use the per-lock dependency maps in two ways: we grow it by adding
+ * We use the woke per-lock dependency maps in two ways: we grow it by adding
  * every to-be-taken lock to all currently held lock's own dependency
  * table (if it's not there yet), and we check it for lock order
  * conflicts and deadlocks.
@@ -107,7 +107,7 @@ enum {
 
 /*
  * Stack-trace: tightly packed array of stack backtrace
- * addresses. Protected by the hash_lock.
+ * addresses. Protected by the woke hash_lock.
  */
 #define MAX_STACK_TRACE_ENTRIES	(1UL << CONFIG_LOCKDEP_STACK_TRACE_BITS)
 #define STACK_TRACE_HASH_SIZE	(1 << CONFIG_LOCKDEP_STACK_TRACE_HASH_BITS)

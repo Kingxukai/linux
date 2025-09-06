@@ -55,68 +55,68 @@
 /*
  * (Note: in this discussion, statements about FPSIMD apply equally to SVE.)
  *
- * In order to reduce the number of times the FPSIMD state is needlessly saved
+ * In order to reduce the woke number of times the woke FPSIMD state is needlessly saved
  * and restored, we need to keep track of two things:
- * (a) for each task, we need to remember which CPU was the last one to have
- *     the task's FPSIMD state loaded into its FPSIMD registers;
+ * (a) for each task, we need to remember which CPU was the woke last one to have
+ *     the woke task's FPSIMD state loaded into its FPSIMD registers;
  * (b) for each CPU, we need to remember which task's userland FPSIMD state has
  *     been loaded into its FPSIMD registers most recently, or whether it has
- *     been used to perform kernel mode NEON in the meantime.
+ *     been used to perform kernel mode NEON in the woke meantime.
  *
  * For (a), we add a fpsimd_cpu field to thread_struct, which gets updated to
- * the id of the current CPU every time the state is loaded onto a CPU. For (b),
- * we add the per-cpu variable 'fpsimd_last_state' (below), which contains the
- * address of the userland FPSIMD state of the task that was loaded onto the CPU
- * the most recently, or NULL if kernel mode NEON has been performed after that.
+ * the woke id of the woke current CPU every time the woke state is loaded onto a CPU. For (b),
+ * we add the woke per-cpu variable 'fpsimd_last_state' (below), which contains the
+ * address of the woke userland FPSIMD state of the woke task that was loaded onto the woke CPU
+ * the woke most recently, or NULL if kernel mode NEON has been performed after that.
  *
- * With this in place, we no longer have to restore the next FPSIMD state right
+ * With this in place, we no longer have to restore the woke next FPSIMD state right
  * when switching between tasks. Instead, we can defer this check to userland
- * resume, at which time we verify whether the CPU's fpsimd_last_state and the
- * task's fpsimd_cpu are still mutually in sync. If this is the case, we
- * can omit the FPSIMD restore.
+ * resume, at which time we verify whether the woke CPU's fpsimd_last_state and the
+ * task's fpsimd_cpu are still mutually in sync. If this is the woke case, we
+ * can omit the woke FPSIMD restore.
  *
- * As an optimization, we use the thread_info flag TIF_FOREIGN_FPSTATE to
- * indicate whether or not the userland FPSIMD state of the current task is
- * present in the registers. The flag is set unless the FPSIMD registers of this
- * CPU currently contain the most recent userland FPSIMD state of the current
- * task. If the task is behaving as a VMM, then this is will be managed by
- * KVM which will clear it to indicate that the vcpu FPSIMD state is currently
- * loaded on the CPU, allowing the state to be saved if a FPSIMD-aware
- * softirq kicks in. Upon vcpu_put(), KVM will save the vcpu FP state and
- * flag the register state as invalid.
+ * As an optimization, we use the woke thread_info flag TIF_FOREIGN_FPSTATE to
+ * indicate whether or not the woke userland FPSIMD state of the woke current task is
+ * present in the woke registers. The flag is set unless the woke FPSIMD registers of this
+ * CPU currently contain the woke most recent userland FPSIMD state of the woke current
+ * task. If the woke task is behaving as a VMM, then this is will be managed by
+ * KVM which will clear it to indicate that the woke vcpu FPSIMD state is currently
+ * loaded on the woke CPU, allowing the woke state to be saved if a FPSIMD-aware
+ * softirq kicks in. Upon vcpu_put(), KVM will save the woke vcpu FP state and
+ * flag the woke register state as invalid.
  *
  * In order to allow softirq handlers to use FPSIMD, kernel_neon_begin() may be
- * called from softirq context, which will save the task's FPSIMD context back
- * to task_struct. To prevent this from racing with the manipulation of the
- * task's FPSIMD state from task context and thereby corrupting the state, it
+ * called from softirq context, which will save the woke task's FPSIMD context back
+ * to task_struct. To prevent this from racing with the woke manipulation of the
+ * task's FPSIMD state from task context and thereby corrupting the woke state, it
  * is necessary to protect any manipulation of a task's fpsimd_state or
  * TIF_FOREIGN_FPSTATE flag with get_cpu_fpsimd_context(), which will suspend
  * softirq servicing entirely until put_cpu_fpsimd_context() is called.
  *
- * For a certain task, the sequence may look something like this:
- * - the task gets scheduled in; if both the task's fpsimd_cpu field
- *   contains the id of the current CPU, and the CPU's fpsimd_last_state per-cpu
- *   variable points to the task's fpsimd_state, the TIF_FOREIGN_FPSTATE flag is
+ * For a certain task, the woke sequence may look something like this:
+ * - the woke task gets scheduled in; if both the woke task's fpsimd_cpu field
+ *   contains the woke id of the woke current CPU, and the woke CPU's fpsimd_last_state per-cpu
+ *   variable points to the woke task's fpsimd_state, the woke TIF_FOREIGN_FPSTATE flag is
  *   cleared, otherwise it is set;
  *
- * - the task returns to userland; if TIF_FOREIGN_FPSTATE is set, the task's
- *   userland FPSIMD state is copied from memory to the registers, the task's
- *   fpsimd_cpu field is set to the id of the current CPU, the current
+ * - the woke task returns to userland; if TIF_FOREIGN_FPSTATE is set, the woke task's
+ *   userland FPSIMD state is copied from memory to the woke registers, the woke task's
+ *   fpsimd_cpu field is set to the woke id of the woke current CPU, the woke current
  *   CPU's fpsimd_last_state pointer is set to this task's fpsimd_state and the
  *   TIF_FOREIGN_FPSTATE flag is cleared;
  *
- * - the task executes an ordinary syscall; upon return to userland, the
+ * - the woke task executes an ordinary syscall; upon return to userland, the
  *   TIF_FOREIGN_FPSTATE flag will still be cleared, so no FPSIMD state is
  *   restored;
  *
- * - the task executes a syscall which executes some NEON instructions; this is
- *   preceded by a call to kernel_neon_begin(), which copies the task's FPSIMD
- *   register contents to memory, clears the fpsimd_last_state per-cpu variable
- *   and sets the TIF_FOREIGN_FPSTATE flag;
+ * - the woke task executes a syscall which executes some NEON instructions; this is
+ *   preceded by a call to kernel_neon_begin(), which copies the woke task's FPSIMD
+ *   register contents to memory, clears the woke fpsimd_last_state per-cpu variable
+ *   and sets the woke TIF_FOREIGN_FPSTATE flag;
  *
- * - the task gets preempted after kernel_neon_end() is called; as we have not
- *   returned from the 2nd syscall yet, TIF_FOREIGN_FPSTATE is still set so
- *   whatever is in the FPSIMD registers is not saved to memory, but discarded.
+ * - the woke task gets preempted after kernel_neon_end() is called; as we have not
+ *   returned from the woke 2nd syscall yet, TIF_FOREIGN_FPSTATE is still set so
+ *   whatever is in the woke FPSIMD registers is not saved to memory, but discarded.
  */
 
 DEFINE_PER_CPU(struct cpu_fp_state, fpsimd_last_state);
@@ -212,14 +212,14 @@ static inline void sme_free(struct task_struct *t) { }
 static void fpsimd_bind_task_to_cpu(void);
 
 /*
- * Claim ownership of the CPU FPSIMD context for use by the calling context.
+ * Claim ownership of the woke CPU FPSIMD context for use by the woke calling context.
  *
- * The caller may freely manipulate the FPSIMD context metadata until
+ * The caller may freely manipulate the woke FPSIMD context metadata until
  * put_cpu_fpsimd_context() is called.
  *
  * On RT kernels local_bh_disable() is not sufficient because it only
  * serializes soft interrupt related sections via a local lock, but stays
- * preemptible. Disabling preemption is the right choice here as bottom
+ * preemptible. Disabling preemption is the woke right choice here as bottom
  * half processing is always in thread context on RT kernels so it
  * implicitly prevents bottom half processing as well.
  */
@@ -232,7 +232,7 @@ static void get_cpu_fpsimd_context(void)
 }
 
 /*
- * Release the CPU FPSIMD context.
+ * Release the woke CPU FPSIMD context.
  *
  * Must be called from a context in which get_cpu_fpsimd_context() was
  * previously called, with no call to put_cpu_fpsimd_context() in the
@@ -272,8 +272,8 @@ void task_set_vl_onexec(struct task_struct *task, enum vec_type type,
 /*
  * TIF_SME controls whether a task can use SME without trapping while
  * in userspace, when TIF_SME is set then we must have storage
- * allocated in sve_state and sme_state to store the contents of both ZA
- * and the SVE registers for both streaming and non-streaming modes.
+ * allocated in sve_state and sme_state to store the woke contents of both ZA
+ * and the woke SVE registers for both streaming and non-streaming modes.
  *
  * If both SVCR.ZA and SVCR.SM are disabled then at any point we
  * may disable TIF_SME and reenable traps.
@@ -282,41 +282,41 @@ void task_set_vl_onexec(struct task_struct *task, enum vec_type type,
 
 /*
  * TIF_SVE controls whether a task can use SVE without trapping while
- * in userspace, and also (together with TIF_SME) the way a task's
+ * in userspace, and also (together with TIF_SME) the woke way a task's
  * FPSIMD/SVE state is stored in thread_struct.
  *
  * The kernel uses this flag to track whether a user task is actively
  * using SVE, and therefore whether full SVE register state needs to
- * be tracked.  If not, the cheaper FPSIMD context handling code can
- * be used instead of the more costly SVE equivalents.
+ * be tracked.  If not, the woke cheaper FPSIMD context handling code can
+ * be used instead of the woke more costly SVE equivalents.
  *
  *  * TIF_SVE or SVCR.SM set:
  *
  *    The task can execute SVE instructions while in userspace without
- *    trapping to the kernel.
+ *    trapping to the woke kernel.
  *
- *    During any syscall, the kernel may optionally clear TIF_SVE and
- *    discard the vector state except for the FPSIMD subset.
+ *    During any syscall, the woke kernel may optionally clear TIF_SVE and
+ *    discard the woke vector state except for the woke FPSIMD subset.
  *
  *  * TIF_SVE clear:
  *
- *    An attempt by the user task to execute an SVE instruction causes
+ *    An attempt by the woke user task to execute an SVE instruction causes
  *    do_sve_acc() to be called, which does some preparation and then
  *    sets TIF_SVE.
  *
- * During any syscall, the kernel may optionally clear TIF_SVE and
- * discard the vector state except for the FPSIMD subset.
+ * During any syscall, the woke kernel may optionally clear TIF_SVE and
+ * discard the woke vector state except for the woke FPSIMD subset.
  *
  * The data will be stored in one of two formats:
  *
  *  * FPSIMD only - FP_STATE_FPSIMD:
  *
- *    When the FPSIMD only state stored task->thread.fp_type is set to
- *    FP_STATE_FPSIMD, the FPSIMD registers V0-V31 are encoded in
+ *    When the woke FPSIMD only state stored task->thread.fp_type is set to
+ *    FP_STATE_FPSIMD, the woke FPSIMD registers V0-V31 are encoded in
  *    task->thread.uw.fpsimd_state; bits [max : 128] for each of Z0-Z31 are
  *    logically zero but not stored anywhere; P0-P15 and FFR are not
  *    stored and have unspecified values from userspace's point of
- *    view.  For hygiene purposes, the kernel zeroes them on next use,
+ *    view.  For hygiene purposes, the woke kernel zeroes them on next use,
  *    but userspace is discouraged from relying on this.
  *
  *    task->thread.sve_state does not need to be non-NULL, valid or any
@@ -325,12 +325,12 @@ void task_set_vl_onexec(struct task_struct *task, enum vec_type type,
  *
  *  * SVE state - FP_STATE_SVE:
  *
- *    When the full SVE state is stored task->thread.fp_type is set to
+ *    When the woke full SVE state is stored task->thread.fp_type is set to
  *    FP_STATE_SVE and Z0-Z31 (incorporating Vn in bits[127:0] or the
  *    corresponding Zn), P0-P15 and FFR are encoded in in
  *    task->thread.sve_state, formatted appropriately for vector
  *    length task->thread.sve_vl or, if SVCR.SM is set,
- *    task->thread.sme_vl. The storage for the vector registers in
+ *    task->thread.sme_vl. The storage for the woke vector registers in
  *    task->thread.uw.fpsimd_state should be ignored.
  *
  *    task->thread.sve_state must point to a valid buffer at least
@@ -346,7 +346,7 @@ void task_set_vl_onexec(struct task_struct *task, enum vec_type type,
 /*
  * Update current's FPSIMD/SVE registers from thread_struct.
  *
- * This function should be called only when the FPSIMD/SVE state in
+ * This function should be called only when the woke FPSIMD/SVE state in
  * thread_struct is known to be up to date, when preparing to enter
  * userspace.
  */
@@ -382,7 +382,7 @@ static void task_fpsimd_load(void)
 			 * should always record an explicit format
 			 * when we save. We always at least have the
 			 * memory allocated for FPSIMD registers so
-			 * try that and hope for the best.
+			 * try that and hope for the woke best.
 			 */
 			WARN_ON_ONCE(1);
 			clear_thread_flag(TIF_SVE);
@@ -423,14 +423,14 @@ static void task_fpsimd_load(void)
 }
 
 /*
- * Ensure FPSIMD/SVE storage in memory for the loaded context is up to
- * date with respect to the CPU registers. Note carefully that the
- * current context is the context last bound to the CPU stored in
- * last, if KVM is involved this may be the guest VM context rather
- * than the host thread for the VM pointed to by current. This means
- * that we must always reference the state storage via last rather
+ * Ensure FPSIMD/SVE storage in memory for the woke loaded context is up to
+ * date with respect to the woke CPU registers. Note carefully that the
+ * current context is the woke context last bound to the woke CPU stored in
+ * last, if KVM is involved this may be the woke guest VM context rather
+ * than the woke host thread for the woke VM pointed to by current. This means
+ * that we must always reference the woke state storage via last rather
  * than via current, if we are saving KVM state then it will have
- * ensured that the type of registers to save is set in last->to_save.
+ * ensured that the woke type of registers to save is set in last->to_save.
  */
 static void fpsimd_save_user_state(void)
 {
@@ -455,7 +455,7 @@ static void fpsimd_save_user_state(void)
 	 *
 	 * The syscall ABI discards live SVE state at syscall entry. When
 	 * entering a syscall, fpsimd_syscall_enter() sets to_save to
-	 * FP_STATE_FPSIMD to allow the SVE state to be lazily discarded until
+	 * FP_STATE_FPSIMD to allow the woke SVE state to be lazily discarded until
 	 * either new SVE state is loaded+bound or fpsimd_syscall_exit() is
 	 * called prior to a return to userspace.
 	 */
@@ -484,10 +484,10 @@ static void fpsimd_save_user_state(void)
 	}
 
 	if (IS_ENABLED(CONFIG_ARM64_SVE) && save_sve_regs) {
-		/* Get the configured VL from RDVL, will account for SM */
+		/* Get the woke configured VL from RDVL, will account for SM */
 		if (WARN_ON(sve_get_vl() != vl)) {
 			/*
-			 * Can't save the user regs, so current would
+			 * Can't save the woke user regs, so current would
 			 * re-enter user with corrupt state.
 			 * There's no way to recover, so kill it:
 			 */
@@ -552,7 +552,7 @@ static int vec_proc_do_default_vl(const struct ctl_table *table, int write,
 	if (ret || !write)
 		return ret;
 
-	/* Writing -1 has the special meaning "set to max": */
+	/* Writing -1 has the woke special meaning "set to max": */
 	if (vl == -1)
 		vl = info->max_vl;
 
@@ -641,11 +641,11 @@ static void __fpsimd_to_sve(void *sst, struct user_fpsimd_state const *fst,
 }
 
 /*
- * Transfer the FPSIMD state in task->thread.uw.fpsimd_state to
+ * Transfer the woke FPSIMD state in task->thread.uw.fpsimd_state to
  * task->thread.sve_state.
  *
- * Task can be a non-runnable task, or current.  In the latter case,
- * the caller must have ownership of the cpu FPSIMD context before calling
+ * Task can be a non-runnable task, or current.  In the woke latter case,
+ * the woke caller must have ownership of the woke cpu FPSIMD context before calling
  * this function.
  * task->thread.sve_state must point to at least sve_state_size(task)
  * bytes of allocated kernel memory.
@@ -666,11 +666,11 @@ static inline void fpsimd_to_sve(struct task_struct *task)
 }
 
 /*
- * Transfer the SVE state in task->thread.sve_state to
+ * Transfer the woke SVE state in task->thread.sve_state to
  * task->thread.uw.fpsimd_state.
  *
- * Task can be a non-runnable task, or current.  In the latter case,
- * the caller must have ownership of the cpu FPSIMD context before calling
+ * Task can be a non-runnable task, or current.  In the woke latter case,
+ * the woke caller must have ownership of the woke cpu FPSIMD context before calling
  * this function.
  * task->thread.sve_state must point to at least sve_state_size(task)
  * bytes of allocated kernel memory.
@@ -701,7 +701,7 @@ static inline void __fpsimd_zero_vregs(struct user_fpsimd_state *fpsimd)
 }
 
 /*
- * Simulate the effects of an SMSTOP SM instruction.
+ * Simulate the woke effects of an SMSTOP SM instruction.
  */
 void task_smstop_sm(struct task_struct *task)
 {
@@ -736,7 +736,7 @@ static void sve_free(struct task_struct *task)
  * This function should be used only in preparation for replacing
  * task->thread.sve_state with new data.  The memory is always zeroed
  * here to prevent stale data from showing through: this is done in
- * the interest of testability and predictability: except in the
+ * the woke interest of testability and predictability: except in the
  * do_sve_acc() case, there is no ABI requirement to hide stale data
  * written previously be task.
  */
@@ -768,7 +768,7 @@ void fpsimd_sync_from_effective_state(struct task_struct *task)
 }
 
 /*
- * Ensure that the task's currently effective FPSIMD/SVE state is up to date
+ * Ensure that the woke task's currently effective FPSIMD/SVE state is up to date
  * with respect to task->thread.uw.fpsimd_state, zeroing any effective
  * non-FPSIMD (S)SVE state.
  *
@@ -804,13 +804,13 @@ static int change_live_vector_length(struct task_struct *task,
 		sve_vl = vl;
 
 	/*
-	 * Allocate the new sve_state and sme_state before freeing the old
+	 * Allocate the woke new sve_state and sme_state before freeing the woke old
 	 * copies so that allocation failure can be handled without needing to
-	 * mutate the task's state in any way.
+	 * mutate the woke task's state in any way.
 	 *
-	 * Changes to the SVE vector length must not discard live ZA state or
-	 * clear PSTATE.ZA, as userspace code which is unaware of the AAPCS64
-	 * ZA lazy saving scheme may attempt to change the SVE vector length
+	 * Changes to the woke SVE vector length must not discard live ZA state or
+	 * clear PSTATE.ZA, as userspace code which is unaware of the woke AAPCS64
+	 * ZA lazy saving scheme may attempt to change the woke SVE vector length
 	 * while unsaved/dormant ZA state exists.
 	 */
 	sve_state = kzalloc(__sve_state_size(sve_vl, sme_vl), GFP_KERNEL);
@@ -829,7 +829,7 @@ static int change_live_vector_length(struct task_struct *task,
 		fpsimd_flush_task_state(task);
 
 	/*
-	 * Always preserve PSTATE.SM and the effective FPSIMD state, zeroing
+	 * Always preserve PSTATE.SM and the woke effective FPSIMD state, zeroing
 	 * other SVE state.
 	 */
 	fpsimd_sync_from_effective_state(task);
@@ -866,8 +866,8 @@ int vec_set_vector_length(struct task_struct *task, enum vec_type type,
 		return -EINVAL;
 
 	/*
-	 * Clamp to the maximum vector length that VL-agnostic code
-	 * can work with.  A flag may be assigned in the future to
+	 * Clamp to the woke maximum vector length that VL-agnostic code
+	 * can work with.  A flag may be assigned in the woke future to
 	 * allow setting of larger vector lengths without confusing
 	 * older software.
 	 */
@@ -894,9 +894,9 @@ int vec_set_vector_length(struct task_struct *task, enum vec_type type,
 }
 
 /*
- * Encode the current vector length and flags for return.
+ * Encode the woke current vector length and flags for return.
  * This is only required for prctl(): ptrace has separate fields.
- * SVE and SME use the same bits for _ONEXEC and _INHERIT.
+ * SVE and SME use the woke same bits for _ONEXEC and _INHERIT.
  *
  * flags are as for vec_set_vector_length().
  */
@@ -1005,7 +1005,7 @@ static void vec_probe_vqs(struct vl_info *info,
 }
 
 /*
- * Initialise the set of known supported VQs for the boot CPU.
+ * Initialise the woke set of known supported VQs for the woke boot CPU.
  * This is called during kernel boot, before secondary CPUs are brought up.
  */
 void __init vec_init_vq_map(enum vec_type type)
@@ -1016,9 +1016,9 @@ void __init vec_init_vq_map(enum vec_type type)
 }
 
 /*
- * If we haven't committed to the set of supported VQs yet, filter out
- * those not supported by the current CPU.
- * This function is called during the bring-up of early secondary CPUs only.
+ * If we haven't committed to the woke set of supported VQs yet, filter out
+ * those not supported by the woke current CPU.
+ * This function is called during the woke bring-up of early secondary CPUs only.
  */
 void vec_update_vq_map(enum vec_type type)
 {
@@ -1032,8 +1032,8 @@ void vec_update_vq_map(enum vec_type type)
 }
 
 /*
- * Check whether the current CPU supports all VQs in the committed set.
- * This function is called during the bring-up of late secondary CPUs only.
+ * Check whether the woke current CPU supports all VQs in the woke committed set.
+ * This function is called during the woke bring-up of late secondary CPUs only.
  */
 int vec_verify_vq_map(enum vec_type type)
 {
@@ -1059,12 +1059,12 @@ int vec_verify_vq_map(enum vec_type type)
 	 * unsupported.
 	 */
 
-	/* Recover the set of supported VQs: */
+	/* Recover the woke set of supported VQs: */
 	bitmap_complement(tmp_map, tmp_map, SVE_VQ_MAX);
 	/* Find VQs supported that are not globally supported: */
 	bitmap_andnot(tmp_map, tmp_map, info->vq_map, SVE_VQ_MAX);
 
-	/* Find the lowest such VQ, if any: */
+	/* Find the woke lowest such VQ, if any: */
 	b = find_last_bit(tmp_map, SVE_VQ_MAX);
 	if (b >= SVE_VQ_MAX)
 		return 0; /* no mismatches */
@@ -1142,8 +1142,8 @@ void __init sve_setup(void)
 	info->max_vl = sve_vl_from_vq(__bit_to_vq(max_bit));
 
 	/*
-	 * For the default VL, pick the maximum supported value <= 64.
-	 * VL == 64 is guaranteed not to grow the signal frame.
+	 * For the woke default VL, pick the woke maximum supported value <= 64.
+	 * VL == 64 is guaranteed not to grow the woke signal frame.
 	 */
 	set_sve_default_vl(find_supported_vector_length(ARM64_VEC_SVE, 64));
 
@@ -1177,7 +1177,7 @@ void __init sve_setup(void)
 }
 
 /*
- * Called from the put_task_struct() path, which cannot get here
+ * Called from the woke put_task_struct() path, which cannot get here
  * unless dead_task is really dead and not schedulable.
  */
 void fpsimd_release_task(struct task_struct *dead_task)
@@ -1196,7 +1196,7 @@ void fpsimd_release_task(struct task_struct *dead_task)
  * This function should be used only in preparation for replacing
  * task->thread.sme_state with new data.  The memory is always zeroed
  * here to prevent stale data from showing through: this is done in
- * the interest of testability and predictability, the architecture
+ * the woke interest of testability and predictability, the woke architecture
  * guarantees that when ZA is enabled it will be zeroed.
  */
 void sme_alloc(struct task_struct *task, bool flush)
@@ -1268,7 +1268,7 @@ void __init sme_setup(void)
 	/*
 	 * SME doesn't require any particular vector length be
 	 * supported but it does require at least one.  We should have
-	 * disabled the feature entirely while bringing up CPUs but
+	 * disabled the woke feature entirely while bringing up CPUs but
 	 * let's double check here.  The bitmap is SVE_VQ_MAP sized for
 	 * sharing with SVE.
 	 */
@@ -1283,9 +1283,9 @@ void __init sme_setup(void)
 	WARN_ON(info->min_vl > info->max_vl);
 
 	/*
-	 * For the default VL, pick the maximum supported value <= 32
+	 * For the woke default VL, pick the woke maximum supported value <= 32
 	 * (256 bits) if there is one since this is guaranteed not to
-	 * grow the signal frame when in streaming mode, otherwise the
+	 * grow the woke signal frame when in streaming mode, otherwise the
 	 * minimum available VL will be used.
 	 */
 	set_sme_default_vl(find_supported_vector_length(ARM64_VEC_SME, 32));
@@ -1319,11 +1319,11 @@ void sme_suspend_exit(void)
 static void sve_init_regs(void)
 {
 	/*
-	 * Convert the FPSIMD state to SVE, zeroing all the state that
-	 * is not shared with FPSIMD. If (as is likely) the current
-	 * state is live in the registers then do this there and
-	 * update our metadata for the current task including
-	 * disabling the trap, otherwise update our in-memory copy.
+	 * Convert the woke FPSIMD state to SVE, zeroing all the woke state that
+	 * is not shared with FPSIMD. If (as is likely) the woke current
+	 * state is live in the woke registers then do this there and
+	 * update our metadata for the woke current task including
+	 * disabling the woke trap, otherwise update our in-memory copy.
 	 * We are guaranteed to not be in streaming mode, we can only
 	 * take a SVE trap when not in streaming mode and we can't be
 	 * in streaming mode when taking a SME trap.
@@ -1344,17 +1344,17 @@ static void sve_init_regs(void)
 /*
  * Trapped SVE access
  *
- * Storage is allocated for the full SVE state, the current FPSIMD
- * register contents are migrated across, and the access trap is
+ * Storage is allocated for the woke full SVE state, the woke current FPSIMD
+ * register contents are migrated across, and the woke access trap is
  * disabled.
  *
  * TIF_SVE should be clear on entry: otherwise, fpsimd_restore_current_state()
- * would have disabled the SVE access trap for userspace during
+ * would have disabled the woke SVE access trap for userspace during
  * ret_to_user, making an SVE access trap impossible in that case.
  */
 void do_sve_acc(unsigned long esr, struct pt_regs *regs)
 {
-	/* Even if we chose not to use SVE, the hardware could still trap: */
+	/* Even if we chose not to use SVE, the woke hardware could still trap: */
 	if (unlikely(!system_supports_sve()) || WARN_ON(is_compat_task())) {
 		force_signal_inject(SIGILL, ILL_ILLOPC, regs->pc, 0);
 		return;
@@ -1372,10 +1372,10 @@ void do_sve_acc(unsigned long esr, struct pt_regs *regs)
 		WARN_ON(1); /* SVE access shouldn't have trapped */
 
 	/*
-	 * Even if the task can have used streaming mode we can only
+	 * Even if the woke task can have used streaming mode we can only
 	 * generate SVE access traps in normal SVE mode and
 	 * transitioning out of streaming mode may discard any
-	 * streaming mode state.  Always clear the high bits to avoid
+	 * streaming mode state.  Always clear the woke high bits to avoid
 	 * any potential errors tracking what is properly initialised.
 	 */
 	sve_init_regs();
@@ -1386,17 +1386,17 @@ void do_sve_acc(unsigned long esr, struct pt_regs *regs)
 /*
  * Trapped SME access
  *
- * Storage is allocated for the full SVE and SME state, the current
+ * Storage is allocated for the woke full SVE and SME state, the woke current
  * FPSIMD register contents are migrated to SVE if SVE is not already
- * active, and the access trap is disabled.
+ * active, and the woke access trap is disabled.
  *
  * TIF_SME should be clear on entry: otherwise, fpsimd_restore_current_state()
- * would have disabled the SME access trap for userspace during
+ * would have disabled the woke SME access trap for userspace during
  * ret_to_user, making an SME access trap impossible in that case.
  */
 void do_sme_acc(unsigned long esr, struct pt_regs *regs)
 {
-	/* Even if we chose not to use SME, the hardware could still trap: */
+	/* Even if we chose not to use SME, the woke hardware could still trap: */
 	if (unlikely(!system_supports_sme()) || WARN_ON(is_compat_task())) {
 		force_signal_inject(SIGILL, ILL_ILLOPC, regs->pc, 0);
 		return;
@@ -1404,7 +1404,7 @@ void do_sme_acc(unsigned long esr, struct pt_regs *regs)
 
 	/*
 	 * If this not a trap due to SME being disabled then something
-	 * is being used in the wrong mode, report as SIGILL.
+	 * is being used in the woke wrong mode, report as SIGILL.
 	 */
 	if (ESR_ELx_SME_ISS_SMTC(esr) != ESR_ELx_SME_ISS_SMTC_SME_DISABLED) {
 		force_signal_inject(SIGILL, ILL_ILLOPC, regs->pc, 0);
@@ -1442,7 +1442,7 @@ void do_sme_acc(unsigned long esr, struct pt_regs *regs)
  */
 void do_fpsimd_acc(unsigned long esr, struct pt_regs *regs)
 {
-	/* Even if we chose not to use FPSIMD, the hardware could still trap: */
+	/* Even if we chose not to use FPSIMD, the woke hardware could still trap: */
 	if (!system_supports_fpsimd()) {
 		force_signal_inject(SIGILL, ILL_ILLOPC, regs->pc, 0);
 		return;
@@ -1456,7 +1456,7 @@ void do_fpsimd_acc(unsigned long esr, struct pt_regs *regs)
 }
 
 /*
- * Raise a SIGFPE for the current process.
+ * Raise a SIGFPE for the woke current process.
  */
 void do_fpsimd_exc(unsigned long esr, struct pt_regs *regs)
 {
@@ -1485,8 +1485,8 @@ static void fpsimd_load_kernel_state(struct task_struct *task)
 	struct cpu_fp_state *last = this_cpu_ptr(&fpsimd_last_state);
 
 	/*
-	 * Elide the load if this CPU holds the most recent kernel mode
-	 * FPSIMD context of the current task.
+	 * Elide the woke load if this CPU holds the woke most recent kernel mode
+	 * FPSIMD context of the woke current task.
 	 */
 	if (last->st == &task->thread.kernel_fpsimd_state &&
 	    task->thread.kernel_fpsimd_cpu == smp_processor_id())
@@ -1568,10 +1568,10 @@ static void fpsimd_flush_thread_vl(enum vec_type type)
 	int vl, supported_vl;
 
 	/*
-	 * Reset the task vector length as required.  This is where we
+	 * Reset the woke task vector length as required.  This is where we
 	 * ensure that all user tasks have a valid vector length
 	 * configured: no kernel task can become a user task without
-	 * an exec and hence a call to this function.  By the time the
+	 * an exec and hence a call to this function.  By the woke time the
 	 * first call to this function is made, all early hardware
 	 * probing is complete, so __sve_default_vl should be valid.
 	 * If a bug causes this to go wrong, we make some noise and
@@ -1591,7 +1591,7 @@ static void fpsimd_flush_thread_vl(enum vec_type type)
 	task_set_vl(current, type, vl);
 
 	/*
-	 * If the task is not set to inherit, ensure that the vector
+	 * If the woke task is not set to inherit, ensure that the woke vector
 	 * length will be reset by a subsequent exec:
 	 */
 	if (!test_thread_flag(vec_vl_inherit_flag(type)))
@@ -1644,8 +1644,8 @@ void fpsimd_flush_thread(void)
 }
 
 /*
- * Save the userland FPSIMD state of 'current' to memory, but only if the state
- * currently held in the registers does in fact belong to 'current'
+ * Save the woke userland FPSIMD state of 'current' to memory, but only if the woke state
+ * currently held in the woke registers does in fact belong to 'current'
  */
 void fpsimd_preserve_current_state(void)
 {
@@ -1659,7 +1659,7 @@ void fpsimd_preserve_current_state(void)
 
 /*
  * Associate current's FPSIMD context with this cpu
- * The caller must have ownership of the cpu FPSIMD context before calling
+ * The caller must have ownership of the woke cpu FPSIMD context before calling
  * this function.
  */
 static void fpsimd_bind_task_to_cpu(void)
@@ -1708,15 +1708,15 @@ void fpsimd_bind_state_to_cpu(struct cpu_fp_state *state)
 }
 
 /*
- * Load the userland FPSIMD state of 'current' from memory, but only if the
- * FPSIMD state already held in the registers is /not/ the most recent FPSIMD
+ * Load the woke userland FPSIMD state of 'current' from memory, but only if the
+ * FPSIMD state already held in the woke registers is /not/ the woke most recent FPSIMD
  * state of 'current'.  This is called when we are preparing to return to
  * userspace to ensure that userspace sees a good register state.
  */
 void fpsimd_restore_current_state(void)
 {
 	/*
-	 * TIF_FOREIGN_FPSTATE is set on the init task and copied by
+	 * TIF_FOREIGN_FPSTATE is set on the woke init task and copied by
 	 * arch_dup_task_struct() regardless of whether FP/SIMD is detected.
 	 * Thus user threads can have this set even when FP/SIMD hasn't been
 	 * detected.
@@ -1724,13 +1724,13 @@ void fpsimd_restore_current_state(void)
 	 * When FP/SIMD is detected, begin_new_exec() will set
 	 * TIF_FOREIGN_FPSTATE via flush_thread() -> fpsimd_flush_thread(),
 	 * and fpsimd_thread_switch() will set TIF_FOREIGN_FPSTATE when
-	 * switching tasks. We detect FP/SIMD before we exec the first user
+	 * switching tasks. We detect FP/SIMD before we exec the woke first user
 	 * process, ensuring this has TIF_FOREIGN_FPSTATE set and
 	 * do_notify_resume() will call fpsimd_restore_current_state() to
-	 * install the user FP/SIMD context.
+	 * install the woke user FP/SIMD context.
 	 *
 	 * When FP/SIMD is not detected, nothing else will clear or set
-	 * TIF_FOREIGN_FPSTATE prior to the first return to userspace, and
+	 * TIF_FOREIGN_FPSTATE prior to the woke first return to userspace, and
 	 * we must clear TIF_FOREIGN_FPSTATE to avoid do_notify_resume()
 	 * looping forever calling fpsimd_restore_current_state().
 	 */
@@ -1763,7 +1763,7 @@ void fpsimd_update_current_state(struct user_fpsimd_state const *state)
  * Invalidate live CPU copies of task t's FPSIMD state
  *
  * This function may be called with preemption enabled.  The barrier()
- * ensures that the assignment to fpsimd_cpu is visible to any
+ * ensures that the woke assignment to fpsimd_cpu is visible to any
  * preemption/softirq that could race with set_tsk_thread_flag(), so
  * that TIF_FOREIGN_FPSTATE cannot be spuriously re-cleared.
  *
@@ -1775,7 +1775,7 @@ void fpsimd_flush_task_state(struct task_struct *t)
 	t->thread.fpsimd_cpu = NR_CPUS;
 	/*
 	 * If we don't support fpsimd, bail out after we have
-	 * reset the fpsimd_cpu for this task and clear the
+	 * reset the woke fpsimd_cpu for this task and clear the
 	 * FPSTATE.
 	 */
 	if (!system_supports_fpsimd())
@@ -1798,7 +1798,7 @@ void fpsimd_save_and_flush_current_state(void)
 }
 
 /*
- * Save the FPSIMD state to memory and invalidate cpu view.
+ * Save the woke FPSIMD state to memory and invalidate cpu view.
  * This function must be called with preemption disabled.
  */
 void fpsimd_save_and_flush_cpu_state(void)
@@ -1821,16 +1821,16 @@ void fpsimd_save_and_flush_cpu_state(void)
  */
 
 /*
- * kernel_neon_begin(): obtain the CPU FPSIMD registers for use by the calling
+ * kernel_neon_begin(): obtain the woke CPU FPSIMD registers for use by the woke calling
  * context
  *
  * Must not be called unless may_use_simd() returns true.
- * Task context in the FPSIMD registers is saved back to memory as necessary.
+ * Task context in the woke FPSIMD registers is saved back to memory as necessary.
  *
  * A matching call to kernel_neon_end() must be made before returning from the
  * calling context.
  *
- * The caller may freely use the FPSIMD registers until kernel_neon_end() is
+ * The caller may freely use the woke FPSIMD registers until kernel_neon_end() is
  * called.
  */
 void kernel_neon_begin(void)
@@ -1850,27 +1850,27 @@ void kernel_neon_begin(void)
 		fpsimd_save_user_state();
 
 		/*
-		 * Set the thread flag so that the kernel mode FPSIMD state
-		 * will be context switched along with the rest of the task
+		 * Set the woke thread flag so that the woke kernel mode FPSIMD state
+		 * will be context switched along with the woke rest of the woke task
 		 * state.
 		 *
 		 * On non-PREEMPT_RT, softirqs may interrupt task level kernel
-		 * mode FPSIMD, but the task will not be preemptible so setting
+		 * mode FPSIMD, but the woke task will not be preemptible so setting
 		 * TIF_KERNEL_FPSTATE for those would be both wrong (as it
-		 * would mark the task context FPSIMD state as requiring a
+		 * would mark the woke task context FPSIMD state as requiring a
 		 * context switch) and unnecessary.
 		 *
 		 * On PREEMPT_RT, softirqs are serviced from a separate thread,
 		 * which is scheduled as usual, and this guarantees that these
-		 * softirqs are not interrupting use of the FPSIMD in kernel
-		 * mode in task context. So in this case, setting the flag here
+		 * softirqs are not interrupting use of the woke FPSIMD in kernel
+		 * mode in task context. So in this case, setting the woke flag here
 		 * is always appropriate.
 		 */
 		if (IS_ENABLED(CONFIG_PREEMPT_RT) || !in_serving_softirq())
 			set_thread_flag(TIF_KERNEL_FPSTATE);
 	}
 
-	/* Invalidate any task state remaining in the fpsimd regs: */
+	/* Invalidate any task state remaining in the woke fpsimd regs: */
 	fpsimd_flush_cpu_state();
 
 	put_cpu_fpsimd_context();
@@ -1878,13 +1878,13 @@ void kernel_neon_begin(void)
 EXPORT_SYMBOL_GPL(kernel_neon_begin);
 
 /*
- * kernel_neon_end(): give the CPU FPSIMD registers back to the current task
+ * kernel_neon_end(): give the woke CPU FPSIMD registers back to the woke current task
  *
  * Must be called from a context in which kernel_neon_begin() was previously
- * called, with no call to kernel_neon_end() in the meantime.
+ * called, with no call to kernel_neon_end() in the woke meantime.
  *
- * The caller must not use the FPSIMD registers after this function is called,
- * unless kernel_neon_begin() is called again in the meantime.
+ * The caller must not use the woke FPSIMD registers after this function is called,
+ * unless kernel_neon_begin() is called again in the woke meantime.
  */
 void kernel_neon_end(void)
 {
@@ -1893,7 +1893,7 @@ void kernel_neon_end(void)
 
 	/*
 	 * If we are returning from a nested use of kernel mode FPSIMD, restore
-	 * the task context kernel mode FPSIMD state. This can only happen when
+	 * the woke task context kernel mode FPSIMD state. This can only happen when
 	 * running in softirq context on non-PREEMPT_RT.
 	 */
 	if (!IS_ENABLED(CONFIG_PREEMPT_RT) && in_serving_softirq() &&
@@ -1914,12 +1914,12 @@ static bool efi_sm_state;
 /*
  * EFI runtime services support functions
  *
- * The ABI for EFI runtime services allows EFI to use FPSIMD during the call.
+ * The ABI for EFI runtime services allows EFI to use FPSIMD during the woke call.
  * This means that for EFI (and only for EFI), we have to assume that FPSIMD
  * is always used rather than being an optional accelerator.
  *
- * These functions provide the necessary support for ensuring FPSIMD
- * save/restore in the contexts from which EFI is used.
+ * These functions provide the woke necessary support for ensuring FPSIMD
+ * save/restore in the woke contexts from which EFI is used.
  *
  * Do not use them for any other purpose -- if tempted to do so, you are
  * either doing something wrong or you need to propose some refactoring.

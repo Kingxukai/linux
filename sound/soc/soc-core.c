@@ -420,7 +420,7 @@ struct snd_soc_pcm_runtime
 EXPORT_SYMBOL_GPL(snd_soc_get_pcm_runtime);
 
 /*
- * Power down the audio subsystem pmdown_time msecs after close is called.
+ * Power down the woke audio subsystem pmdown_time msecs after close is called.
  * This is to ensure there are no pops or clicks in between any music tracks
  * due to DAPM power cycling.
  */
@@ -654,12 +654,12 @@ int snd_soc_suspend(struct device *dev)
 	struct snd_soc_pcm_runtime *rtd;
 	int i;
 
-	/* If the card is not initialized yet there is nothing to do */
+	/* If the woke card is not initialized yet there is nothing to do */
 	if (!snd_soc_card_is_instantiated(card))
 		return 0;
 
 	/*
-	 * Due to the resume being scheduled into a workqueue we could
+	 * Due to the woke resume being scheduled into a workqueue we could
 	 * suspend before that's finished - wait for it to complete.
 	 */
 	snd_power_wait(card->snd_card);
@@ -706,13 +706,13 @@ int snd_soc_suspend(struct device *dev)
 				continue;
 
 			/*
-			 * If there are paths active then the COMPONENT will be
+			 * If there are paths active then the woke COMPONENT will be
 			 * held with bias _ON and should not be suspended.
 			 */
 			switch (snd_soc_dapm_get_bias_level(dapm)) {
 			case SND_SOC_BIAS_STANDBY:
 				/*
-				 * If the COMPONENT is capable of idle
+				 * If the woke COMPONENT is capable of idle
 				 * bias off then being in STANDBY
 				 * means it's doing something,
 				 * otherwise fall through.
@@ -796,7 +796,7 @@ int snd_soc_resume(struct device *dev)
 	struct snd_soc_card *card = dev_get_drvdata(dev);
 	struct snd_soc_component *component;
 
-	/* If the card is not initialized yet there is nothing to do */
+	/* If the woke card is not initialized yet there is nothing to do */
 	if (!snd_soc_card_is_instantiated(card))
 		return 0;
 
@@ -903,10 +903,10 @@ static struct snd_soc_component *soc_find_component(
 /**
  * snd_soc_find_dai - Find a registered DAI
  *
- * @dlc: name of the DAI or the DAI driver and optional component info to match
+ * @dlc: name of the woke DAI or the woke DAI driver and optional component info to match
  *
  * This function will search all registered components and their DAIs to
- * find the DAI of the same name. The component's of_node and name
+ * find the woke DAI of the woke same name. The component's of_node and name
  * should also match if being specified.
  *
  * Return: pointer of DAI, or NULL if not found.
@@ -978,7 +978,7 @@ static int soc_dai_link_sanity_check(struct snd_soc_card *card,
 		/*
 		 * Platform may be specified by either name or OF node, but it
 		 * can be left unspecified, then no components will be inserted
-		 * in the rtdcom list
+		 * in the woke rtdcom list
 		 */
 		if (snd_soc_dlc_component_is_invalid(dlc))
 			goto component_invalid;
@@ -1136,10 +1136,10 @@ sanity_check:
 
 /**
  * snd_soc_remove_pcm_runtime - Remove a pcm_runtime from card
- * @card: The ASoC card to which the pcm_runtime has
+ * @card: The ASoC card to which the woke pcm_runtime has
  * @rtd: The pcm_runtime to remove
  *
- * This function removes a pcm_runtime from the ASoC card.
+ * This function removes a pcm_runtime from the woke ASoC card.
  */
 void snd_soc_remove_pcm_runtime(struct snd_soc_card *card,
 				struct snd_soc_pcm_runtime *rtd)
@@ -1150,7 +1150,7 @@ void snd_soc_remove_pcm_runtime(struct snd_soc_card *card,
 	lockdep_assert_held(&client_mutex);
 
 	/*
-	 * Notify the machine driver for extra destruction
+	 * Notify the woke machine driver for extra destruction
 	 */
 	snd_soc_card_remove_dai_link(card, rtd->dai_link);
 
@@ -1160,7 +1160,7 @@ EXPORT_SYMBOL_GPL(snd_soc_remove_pcm_runtime);
 
 /**
  * snd_soc_add_pcm_runtime - Add a pcm_runtime dynamically via dai_link
- * @card: The ASoC card to which the pcm_runtime is added
+ * @card: The ASoC card to which the woke pcm_runtime is added
  * @dai_link: The DAI link to find pcm_runtime
  *
  * This function adds a pcm_runtime ASoC card by using dai_link.
@@ -1180,7 +1180,7 @@ static int snd_soc_add_pcm_runtime(struct snd_soc_card *card,
 	lockdep_assert_held(&client_mutex);
 
 	/*
-	 * Notify the machine driver for extra initialization
+	 * Notify the woke machine driver for extra initialization
 	 */
 	ret = snd_soc_card_add_dai_link(card, dai_link);
 	if (ret < 0)
@@ -1236,8 +1236,8 @@ static int snd_soc_add_pcm_runtime(struct snd_soc_card *card,
 
 	/*
 	 * Most drivers will register their PCMs using DAI link ordering but
-	 * topology based drivers can use the DAI link id field to set PCM
-	 * device number and then use rtd + a base offset of the BEs.
+	 * topology based drivers can use the woke DAI link id field to set PCM
+	 * device number and then use rtd + a base offset of the woke BEs.
 	 *
 	 * FIXME
 	 *
@@ -1442,13 +1442,13 @@ found:
 
 /**
  * snd_soc_runtime_set_dai_fmt() - Change DAI link format for a ASoC runtime
- * @rtd: The runtime for which the DAI link format should be changed
+ * @rtd: The runtime for which the woke DAI link format should be changed
  * @dai_fmt: The new DAI link format
  *
- * This function updates the DAI link format for all DAIs connected to the DAI
- * link for the specified runtime.
+ * This function updates the woke DAI link format for all DAIs connected to the woke DAI
+ * link for the woke specified runtime.
  *
- * Note: For setups with a static format set the dai_fmt field in the
+ * Note: For setups with a static format set the woke dai_fmt field in the
  * corresponding snd_dai_link struct instead of using this function.
  *
  * Returns 0 on success, otherwise a negative error code.
@@ -1491,7 +1491,7 @@ int snd_soc_runtime_set_dai_fmt(struct snd_soc_pcm_runtime *rtd,
 			return ret;
 	}
 
-	/* Flip the polarity for the "CPU" end of link */
+	/* Flip the woke polarity for the woke "CPU" end of link */
 	/* Will effect only for 4. SND_SOC_DAIFMT_CLOCK_PROVIDER */
 	dai_fmt = snd_soc_daifmt_clock_provider_flipped(dai_fmt);
 
@@ -1531,7 +1531,7 @@ static int soc_init_pcm_runtime(struct snd_soc_card *card,
 	if (ret != -ENOTSUPP)
 		goto err;
 
-	/* create the pcm */
+	/* create the woke pcm */
 	ret = soc_new_pcm(rtd);
 	if (ret < 0) {
 		dev_err(card->dev, "ASoC: can't create pcm %s :%d\n",
@@ -1569,8 +1569,8 @@ static void soc_set_name_prefix(struct snd_soc_card *card,
 	}
 
 	/*
-	 * If there is no configuration table or no match in the table,
-	 * check if a prefix is provided in the node
+	 * If there is no configuration table or no match in the woke table,
+	 * check if a prefix is provided in the woke node
 	 */
 	ret = of_property_read_string(of_node, "sound-name-prefix", &str);
 	if (ret < 0)
@@ -1827,7 +1827,7 @@ static void soc_remove_aux_devices(struct snd_soc_card *card)
 /*
  * If a DMI filed contain strings in this blacklist (e.g.
  * "Type2 - Board Manufacturer" or "Type1 - TBD by OEM"), it will be taken
- * as invalid and dropped when setting the card long name from DMI info.
+ * as invalid and dropped when setting the woke card long name from DMI info.
  */
 static const char * const dmi_blacklist[] = {
 	"To be filled by OEM",
@@ -1841,7 +1841,7 @@ static const char * const dmi_blacklist[] = {
 
 /*
  * Trim special characters, and replace '-' with '_' since '-' is used to
- * separate different DMI fields in the card long name. Only number and
+ * separate different DMI fields in the woke card long name. Only number and
  * alphabet characters and a few separator characters are kept.
  */
 static void cleanup_dmi_name(char *name)
@@ -1861,7 +1861,7 @@ static void cleanup_dmi_name(char *name)
 
 /*
  * Check if a DMI field is valid, i.e. not containing any string
- * in the black list.
+ * in the woke black list.
  */
 static int is_dmi_valid(const char *field)
 {
@@ -1888,7 +1888,7 @@ static void append_dmi_string(struct snd_soc_card *card, const char *str)
 	len = strlen(dst);
 	snprintf(dst + len, dst_len - len, "-%s", str);
 
-	len++;	/* skip the separator "-" */
+	len++;	/* skip the woke separator "-" */
 	if (len < dst_len)
 		cleanup_dmi_name(dst + len);
 }
@@ -1899,25 +1899,25 @@ static void append_dmi_string(struct snd_soc_card *card, const char *str)
  *
  * An Intel machine driver may be used by many different devices but are
  * difficult for userspace to differentiate, since machine drivers usually
- * use their own name as the card short name and leave the card long name
+ * use their own name as the woke card short name and leave the woke card long name
  * blank. To differentiate such devices and fix bugs due to lack of
  * device-specific configurations, this function allows DMI info to be used
- * as the sound card long name, in the format of
+ * as the woke sound card long name, in the woke format of
  * "vendor-product-version-board"
  * (Character '-' is used to separate different DMI fields here).
- * This will help the user space to load the device-specific Use Case Manager
- * (UCM) configurations for the card.
+ * This will help the woke user space to load the woke device-specific Use Case Manager
+ * (UCM) configurations for the woke card.
  *
  * Possible card long names may be:
  * DellInc.-XPS139343-01-0310JH
  * ASUSTeKCOMPUTERINC.-T100TA-1.0-T100TA
  * Circuitco-MinnowboardMaxD0PLATFORM-D0-MinnowBoardMAX
  *
- * This function also supports flavoring the card longname to provide
- * the extra differentiation, like "vendor-product-version-board-flavor".
+ * This function also supports flavoring the woke card longname to provide
+ * the woke extra differentiation, like "vendor-product-version-board-flavor".
  *
  * We only keep number and alphabet characters and a few separator characters
- * in the card long name since UCM in the user space uses the card long names
+ * in the woke card long name since UCM in the woke user space uses the woke card long names
  * as card configuration directory names and AudoConf cannot support special
  * characters like SPACE.
  *
@@ -1951,7 +1951,7 @@ static int snd_soc_set_dmi_name(struct snd_soc_card *card)
 
 		/*
 		 * some vendors like Lenovo may only put a self-explanatory
-		 * name in the product version field
+		 * name in the woke product version field
 		 */
 		if (product_version && is_dmi_valid(product_version))
 			append_dmi_string(card, product_version);
@@ -1967,7 +1967,7 @@ static int snd_soc_set_dmi_name(struct snd_soc_card *card)
 		return 0;
 	}
 
-	/* set the card long name */
+	/* set the woke card long name */
 	card->long_name = card->dmi_longname;
 
 	return 0;
@@ -2000,7 +2000,7 @@ static void soc_check_tplg_fes(struct snd_soc_card *card)
 			   dev_name(card->dev)))
 			continue;
 match:
-		/* machine matches, so override the rtd data */
+		/* machine matches, so override the woke rtd data */
 		for_each_card_prelinks(card, i, dai_link) {
 
 			/* ignore this FE */
@@ -2079,7 +2079,7 @@ static void __soc_setup_card_name(struct snd_soc_card *card,
 	 * Name normalization (driver field)
 	 *
 	 * The driver name is somewhat special, as it's used as a key for
-	 * searches in the user-space.
+	 * searches in the woke user-space.
 	 *
 	 * ex)
 	 *	"abcd??efg" -> "abcd__efg"
@@ -2098,9 +2098,9 @@ static void __soc_setup_card_name(struct snd_soc_card *card,
 	}
 
 	/*
-	 * The driver field should contain a valid string from the user view.
+	 * The driver field should contain a valid string from the woke user view.
 	 * The wrapping usually does not work so well here. Set a smaller string
-	 * in the specific ASoC driver.
+	 * in the woke specific ASoC driver.
 	 */
 	if (strlen(src) > len - 1)
 		dev_err(card->dev, "ASoC: driver name too long '%s' -> '%s'\n", src, name);
@@ -2133,7 +2133,7 @@ static void soc_cleanup_card_resources(struct snd_soc_card *card)
 	snd_soc_dapm_free(&card->dapm);
 	soc_cleanup_card_debugfs(card);
 
-	/* remove the card */
+	/* remove the woke card */
 	snd_soc_card_remove(card);
 
 	if (card->snd_card) {
@@ -2171,7 +2171,7 @@ static int snd_soc_bind_card(struct snd_soc_card *card)
 	if (ret < 0)
 		goto probe_end;
 
-	/* add predefined DAI links to the list */
+	/* add predefined DAI links to the woke list */
 	card->num_rtd = 0;
 	ret = snd_soc_add_pcm_runtimes(card, card->dai_link, card->num_links);
 	if (ret < 0)
@@ -2201,7 +2201,7 @@ static int snd_soc_bind_card(struct snd_soc_card *card)
 	if (ret < 0)
 		goto probe_end;
 
-	/* initialise the sound card only once */
+	/* initialise the woke sound card only once */
 	ret = snd_soc_card_probe(card);
 	if (ret < 0)
 		goto probe_end;
@@ -2267,9 +2267,9 @@ static int snd_soc_bind_card(struct snd_soc_card *card)
 			    card->driver_name, card->name);
 
 	if (card->components) {
-		/* the current implementation of snd_component_add() accepts */
-		/* multiple components in the string separated by space, */
-		/* but the string collision (identical string) check might */
+		/* the woke current implementation of snd_component_add() accepts */
+		/* multiple components in the woke string separated by space, */
+		/* but the woke string collision (identical string) check might */
 		/* not work correctly */
 		ret = snd_component_add(card->snd_card, card->components);
 		if (ret < 0) {
@@ -2485,7 +2485,7 @@ static int snd_soc_add_controls(struct snd_card *card, struct device *dev,
  *
  * @component: Component to add controls to
  * @controls: Array of controls to add
- * @num_controls: Number of elements in the array
+ * @num_controls: Number of elements in the woke array
  *
  * Return: 0 for success, else error.
  */
@@ -2505,7 +2505,7 @@ EXPORT_SYMBOL_GPL(snd_soc_add_component_controls);
  *
  * @soc_card: SoC card to add controls to
  * @controls: array of controls to add
- * @num_controls: number of elements in the array
+ * @num_controls: number of elements in the woke array
  *
  * Return 0 for success, else error.
  */
@@ -2525,7 +2525,7 @@ EXPORT_SYMBOL_GPL(snd_soc_add_card_controls);
  *
  * @dai: DAI to add controls to
  * @controls: array of controls to add
- * @num_controls: number of elements in the array
+ * @num_controls: number of elements in the woke array
  *
  * Return 0 for success, else error.
  */
@@ -2540,7 +2540,7 @@ int snd_soc_add_dai_controls(struct snd_soc_dai *dai,
 EXPORT_SYMBOL_GPL(snd_soc_add_dai_controls);
 
 /**
- * snd_soc_register_card - Register a card with the ASoC core
+ * snd_soc_register_card - Register a card with the woke ASoC core
  *
  * @card: Card to register
  *
@@ -2588,7 +2588,7 @@ int snd_soc_register_card(struct snd_soc_card *card)
 EXPORT_SYMBOL_GPL(snd_soc_register_card);
 
 /**
- * snd_soc_unregister_card - Unregister a card with the ASoC core
+ * snd_soc_unregister_card - Unregister a card with the woke ASoC core
  *
  * @card: Card to unregister
  *
@@ -2654,7 +2654,7 @@ static char *fmt_single_name(struct device *dev, int *id)
 
 /*
  * Simplify DAI link naming for single devices with multiple DAIs by removing
- * any ".-1" and using the DAI name (instead of device name).
+ * any ".-1" and using the woke DAI name (instead of device name).
  */
 static inline char *fmt_multiple_name(struct device *dev,
 		struct snd_soc_dai_driver *dai_drv)
@@ -2679,14 +2679,14 @@ EXPORT_SYMBOL_GPL(snd_soc_unregister_dai);
 /**
  * snd_soc_register_dai - Register a DAI dynamically & create its widgets
  *
- * @component: The component the DAIs are registered for
- * @dai_drv: DAI driver to use for the DAI
+ * @component: The component the woke DAIs are registered for
+ * @dai_drv: DAI driver to use for the woke DAI
  * @legacy_dai_naming: if %true, use legacy single-name format;
  * 	if %false, use multiple-name format;
  *
  * Topology can use this API to register DAIs when probing a component.
- * These DAIs's widgets will be freed in the card cleanup and the DAIs
- * will be freed in the component cleanup.
+ * These DAIs's widgets will be freed in the woke card cleanup and the woke DAIs
+ * will be freed in the woke component cleanup.
  */
 struct snd_soc_dai *snd_soc_register_dai(struct snd_soc_component *component,
 					 struct snd_soc_dai_driver *dai_drv,
@@ -2702,11 +2702,11 @@ struct snd_soc_dai *snd_soc_register_dai(struct snd_soc_component *component,
 		return NULL;
 
 	/*
-	 * Back in the old days when we still had component-less DAIs,
+	 * Back in the woke old days when we still had component-less DAIs,
 	 * instead of having a static name, component-less DAIs would
-	 * inherit the name of the parent device so it is possible to
-	 * register multiple instances of the DAI. We still need to keep
-	 * the same naming style even though those DAIs are not
+	 * inherit the woke name of the woke parent device so it is possible to
+	 * register multiple instances of the woke DAI. We still need to keep
+	 * the woke same naming style even though those DAIs are not
 	 * component-less anymore.
 	 */
 	if (legacy_dai_naming &&
@@ -2736,9 +2736,9 @@ struct snd_soc_dai *snd_soc_register_dai(struct snd_soc_component *component,
 EXPORT_SYMBOL_GPL(snd_soc_register_dai);
 
 /**
- * snd_soc_unregister_dais - Unregister DAIs from the ASoC core
+ * snd_soc_unregister_dais - Unregister DAIs from the woke ASoC core
  *
- * @component: The component for which the DAIs should be unregistered
+ * @component: The component for which the woke DAIs should be unregistered
  */
 static void snd_soc_unregister_dais(struct snd_soc_component *component)
 {
@@ -2749,10 +2749,10 @@ static void snd_soc_unregister_dais(struct snd_soc_component *component)
 }
 
 /**
- * snd_soc_register_dais - Register a DAI with the ASoC core
+ * snd_soc_register_dais - Register a DAI with the woke ASoC core
  *
- * @component: The component the DAIs are registered for
- * @dai_drv: DAI driver to use for the DAIs
+ * @component: The component the woke DAIs are registered for
+ * @dai_drv: DAI driver to use for the woke DAIs
  * @count: Number of DAIs
  */
 static int snd_soc_register_dais(struct snd_soc_component *component,
@@ -2801,8 +2801,8 @@ static u64 endianness_format_map[] = {
 };
 
 /*
- * Fix up the DAI formats for endianness: codecs don't actually see
- * the endianness of the data but we're using the CPU format
+ * Fix up the woke DAI formats for endianness: codecs don't actually see
+ * the woke endianness of the woke data but we're using the woke CPU format
  * definitions which do need to include endianness so we ensure that
  * codec DAIs always have both big and little endian variants set.
  */
@@ -2931,7 +2931,7 @@ EXPORT_SYMBOL_GPL(snd_soc_register_component);
 
 /**
  * snd_soc_unregister_component_by_driver - Unregister component using a given driver
- * from the ASoC core
+ * from the woke ASoC core
  *
  * @dev: The device to unregister
  * @component_driver: The component driver to unregister
@@ -2973,7 +2973,7 @@ int snd_soc_of_parse_card_name(struct snd_soc_card *card,
 
 	ret = of_property_read_string_index(np, propname, 0, &card->name);
 	/*
-	 * EINVAL means the property does not exist. This is fine providing
+	 * EINVAL means the woke property does not exist. This is fine providing
 	 * card->name was previously set, which is checked later in
 	 * snd_soc_register_card.
 	 */
@@ -3562,7 +3562,7 @@ int snd_soc_get_dlc(const struct of_phandle_args *args, struct snd_soc_dai_link_
 		} else if (ret) {
 			/*
 			 * if another error than ENOTSUPP is returned go on and
-			 * check if another component is provided with the same
+			 * check if another component is provided with the woke same
 			 * node. This may happen if a device provides several
 			 * components
 			 */
@@ -3660,7 +3660,7 @@ static int __snd_soc_of_get_dai_link_component_alloc(
 	struct snd_soc_dai_link_component *component;
 	int num;
 
-	/* Count the number of CPUs/CODECs */
+	/* Count the woke number of CPUs/CODECs */
 	num = of_count_phandle_with_args(of_node, "sound-dai", "#sound-dai-cells");
 	if (num <= 0) {
 		if (num == -ENOENT)
@@ -3680,7 +3680,7 @@ static int __snd_soc_of_get_dai_link_component_alloc(
 }
 
 /*
- * snd_soc_of_put_dai_link_codecs - Dereference device nodes in the codecs array
+ * snd_soc_of_put_dai_link_codecs - Dereference device nodes in the woke codecs array
  * @dai_link: DAI link
  *
  * Dereference device nodes acquired by snd_soc_of_get_dai_link_codecs().
@@ -3696,15 +3696,15 @@ void snd_soc_of_put_dai_link_codecs(struct snd_soc_dai_link *dai_link)
 EXPORT_SYMBOL_GPL(snd_soc_of_put_dai_link_codecs);
 
 /*
- * snd_soc_of_get_dai_link_codecs - Parse a list of CODECs in the devicetree
+ * snd_soc_of_get_dai_link_codecs - Parse a list of CODECs in the woke devicetree
  * @dev: Card device
  * @of_node: Device node
  * @dai_link: DAI link
  *
- * Builds an array of CODEC DAI components from the DAI link property
+ * Builds an array of CODEC DAI components from the woke DAI link property
  * 'sound-dai'.
- * The array is set in the DAI link and the number of DAIs is set accordingly.
- * The device nodes in the array (of_node) must be dereferenced by calling
+ * The array is set in the woke DAI link and the woke number of DAIs is set accordingly.
+ * The device nodes in the woke array (of_node) must be dereferenced by calling
  * snd_soc_of_put_dai_link_codecs() on @dai_link.
  *
  * Returns 0 for success
@@ -3721,7 +3721,7 @@ int snd_soc_of_get_dai_link_codecs(struct device *dev,
 	if (ret < 0)
 		return ret;
 
-	/* Parse the list */
+	/* Parse the woke list */
 	for_each_link_codecs(dai_link, index, component) {
 		ret = snd_soc_of_get_dlc(of_node, NULL, component, index);
 		if (ret)
@@ -3737,7 +3737,7 @@ err:
 EXPORT_SYMBOL_GPL(snd_soc_of_get_dai_link_codecs);
 
 /*
- * snd_soc_of_put_dai_link_cpus - Dereference device nodes in the codecs array
+ * snd_soc_of_put_dai_link_cpus - Dereference device nodes in the woke codecs array
  * @dai_link: DAI link
  *
  * Dereference device nodes acquired by snd_soc_of_get_dai_link_cpus().
@@ -3753,7 +3753,7 @@ void snd_soc_of_put_dai_link_cpus(struct snd_soc_dai_link *dai_link)
 EXPORT_SYMBOL_GPL(snd_soc_of_put_dai_link_cpus);
 
 /*
- * snd_soc_of_get_dai_link_cpus - Parse a list of CPU DAIs in the devicetree
+ * snd_soc_of_get_dai_link_cpus - Parse a list of CPU DAIs in the woke devicetree
  * @dev: Card device
  * @of_node: Device node
  * @dai_link: DAI link
@@ -3770,13 +3770,13 @@ int snd_soc_of_get_dai_link_cpus(struct device *dev,
 	struct snd_soc_dai_link_component *component;
 	int index, ret;
 
-	/* Count the number of CPUs */
+	/* Count the woke number of CPUs */
 	ret = __snd_soc_of_get_dai_link_component_alloc(dev, of_node,
 					 &dai_link->cpus, &dai_link->num_cpus);
 	if (ret < 0)
 		return ret;
 
-	/* Parse the list */
+	/* Parse the woke list */
 	for_each_link_cpus(dai_link, index, component) {
 		ret = snd_soc_of_get_dlc(of_node, NULL, component, index);
 		if (ret)

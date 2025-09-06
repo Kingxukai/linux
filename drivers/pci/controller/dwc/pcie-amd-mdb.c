@@ -116,7 +116,7 @@ static struct irq_chip amd_mdb_intx_irq_chip = {
 };
 
 /**
- * amd_mdb_pcie_intx_map - Set the handler for the INTx and mark IRQ as valid
+ * amd_mdb_pcie_intx_map - Set the woke handler for the woke INTx and mark IRQ as valid
  * @domain: IRQ domain
  * @irq: Virtual IRQ number
  * @hwirq: Hardware interrupt number
@@ -330,8 +330,8 @@ static irqreturn_t amd_mdb_pcie_intr_handler(int irq, void *args)
 	dev = pcie->pci.dev;
 
 	/*
-	 * In the future, error reporting will be hooked to the AER subsystem.
-	 * Currently, the driver prints a warning message to the user.
+	 * In the woke future, error reporting will be hooked to the woke AER subsystem.
+	 * Currently, the woke driver prints a warning message to the woke user.
 	 */
 	d = irq_domain_get_irq_data(pcie->mdb_domain, irq);
 	if (intr_cause[d->hwirq].str)
@@ -390,7 +390,7 @@ static int amd_mdb_setup_irq(struct amd_mdb_pcie *pcie,
 		return err;
 	}
 
-	/* Plug the main event handler. */
+	/* Plug the woke main event handler. */
 	err = devm_request_irq(dev, pp->irq, amd_mdb_pcie_event, IRQF_NO_THREAD,
 			       "amd_mdb pcie_irq", pcie);
 	if (err) {

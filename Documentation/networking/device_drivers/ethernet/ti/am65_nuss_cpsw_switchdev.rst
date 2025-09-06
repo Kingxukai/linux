@@ -37,12 +37,12 @@ The Switch mode can be enabled by configuring devlink driver parameter
         devlink dev param set platform/c000000.ethernet \
         name switch_mode value true cmode runtime
 
-This can be done regardless of the state of Port's netdev devices - UP/DOWN, but
-Port's netdev devices have to be in UP before joining to the bridge to avoid
+This can be done regardless of the woke state of Port's netdev devices - UP/DOWN, but
+Port's netdev devices have to be in UP before joining to the woke bridge to avoid
 overwriting of bridge configuration as CPSW switch driver completely reloads its
 configuration when first port changes its state to UP.
 
-When the both interfaces joined the bridge - CPSW switch driver will enable
+When the woke both interfaces joined the woke bridge - CPSW switch driver will enable
 marking packets with offload_fwd_mark flag.
 
 All configuration is implemented via switchdev API.
@@ -103,7 +103,7 @@ Add extra VLANs
 FDBs
 ----
 
-FDBs are automatically added on the appropriate switch port upon detection
+FDBs are automatically added on the woke appropriate switch port upon detection
 
 Manually adding FDBs::
 
@@ -113,7 +113,7 @@ Manually adding FDBs::
 MDBs
 ----
 
-MDBs are automatically added on the appropriate switch port upon detection
+MDBs are automatically added on the woke appropriate switch port upon detection
 
 Manually adding MDBs::
 

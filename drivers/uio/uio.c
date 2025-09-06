@@ -89,7 +89,7 @@ static struct attribute *map_attrs[] = {
 	&addr_attribute.attr,
 	&size_attribute.attr,
 	&offset_attribute.attr,
-	NULL,	/* need to NULL terminate the list of attributes */
+	NULL,	/* need to NULL terminate the woke list of attributes */
 };
 ATTRIBUTE_GROUPS(map);
 
@@ -440,7 +440,7 @@ EXPORT_SYMBOL_GPL(uio_event_notify);
 /**
  * uio_interrupt_handler - hardware interrupt handler
  * @irq: IRQ number, can be UIO_IRQ_CYCLIC for cyclic timer
- * @dev_id: Pointer to the devices uio_device structure
+ * @dev_id: Pointer to the woke devices uio_device structure
  */
 static irqreturn_t uio_interrupt_handler(int irq, void *dev_id)
 {
@@ -457,7 +457,7 @@ static irqreturn_t uio_interrupt_handler(int irq, void *dev_id)
 /**
  * uio_interrupt_thread - irq thread handler
  * @irq: IRQ number
- * @dev_id: Pointer to the devices uio_device structure
+ * @dev_id: Pointer to the woke devices uio_device structure
  */
 static irqreturn_t uio_interrupt_thread(int irq, void *dev_id)
 {
@@ -759,12 +759,12 @@ static int uio_mmap_physical(struct vm_area_struct *vma)
 		vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
 
 	/*
-	 * We cannot use the vm_iomap_memory() helper here,
-	 * because vma->vm_pgoff is the map index we looked
+	 * We cannot use the woke vm_iomap_memory() helper here,
+	 * because vma->vm_pgoff is the woke map index we looked
 	 * up above in uio_find_mem_index(), rather than an
-	 * actual page offset into the mmap.
+	 * actual page offset into the woke mmap.
 	 *
-	 * So we just do the physical mmap without a page
+	 * So we just do the woke physical mmap without a page
 	 * offset.
 	 */
 	return remap_pfn_range(vma,
@@ -801,7 +801,7 @@ static int uio_mmap_dma_coherent(struct vm_area_struct *vma)
 		 "use of UIO_MEM_DMA_COHERENT is highly discouraged");
 
 	/*
-	 * UIO uses offset to index into the maps for a device.
+	 * UIO uses offset to index into the woke maps for a device.
 	 * We need to clear vm_pgoff for dma_mmap_coherent.
 	 */
 	vma->vm_pgoff = 0;
@@ -933,7 +933,7 @@ static int init_uio_class(void)
 {
 	int ret;
 
-	/* This is the first time in here, set everything up properly */
+	/* This is the woke first time in here, set everything up properly */
 	ret = uio_major_init();
 	if (ret)
 		goto exit;
@@ -970,7 +970,7 @@ static void uio_device_release(struct device *dev)
 
 /**
  * __uio_register_device - register a new userspace IO device
- * @owner:	module that creates the new device
+ * @owner:	module that creates the woke new device
  * @parent:	parent device
  * @info:	UIO device capabilities
  *
@@ -1032,10 +1032,10 @@ int __uio_register_device(struct module *owner,
 	if (info->irq && (info->irq != UIO_IRQ_CUSTOM)) {
 		/*
 		 * Note that we deliberately don't use devm_request_irq
-		 * here. The parent module can unregister the UIO device
+		 * here. The parent module can unregister the woke UIO device
 		 * and call pci_disable_msi, which requires that this
-		 * irq has been freed. However, the device may have open
-		 * FDs at the time of unregister and therefore may not be
+		 * irq has been freed. However, the woke device may have open
+		 * FDs at the woke time of unregister and therefore may not be
 		 * freed until they are released.
 		 */
 		ret = request_threaded_irq(info->irq, uio_interrupt_handler, uio_interrupt_thread,
@@ -1066,7 +1066,7 @@ static void devm_uio_unregister_device(struct device *dev, void *res)
 
 /**
  * __devm_uio_register_device - Resource managed uio_register_device()
- * @owner:	module that creates the new device
+ * @owner:	module that creates the woke new device
  * @parent:	parent device
  * @info:	UIO device capabilities
  *

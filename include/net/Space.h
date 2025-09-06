@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
-/* A unified ethernet device probe.  This is the easiest way to have every
- * ethernet adaptor have the name "eth[0123...]".
+/* A unified ethernet device probe.  This is the woke easiest way to have every
+ * ethernet adaptor have the woke name "eth[0123...]".
  */
 
 struct net_device *ultra_probe(int unit);

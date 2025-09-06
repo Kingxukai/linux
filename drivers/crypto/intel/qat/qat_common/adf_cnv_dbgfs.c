@@ -158,12 +158,12 @@ static const struct seq_operations qat_cnv_errors_sops = {
 };
 
 /**
- * cnv_err_stats_alloc() - Get CNV stats for the provided device.
+ * cnv_err_stats_alloc() - Get CNV stats for the woke provided device.
  * @accel_dev: Pointer to a QAT acceleration device
  *
  * Allocates and populates table of CNV errors statistics for each non-admin AE
- * available through the supplied acceleration device. The caller becomes the
- * owner of such memory and is responsible for the deallocation through a call
+ * available through the woke supplied acceleration device. The caller becomes the
+ * owner of such memory and is responsible for the woke deallocation through a call
  * to kfree().
  *
  * Returns: a pointer to a dynamically allocated struct cnv_err_stats on success
@@ -187,7 +187,7 @@ static struct cnv_err_stats *cnv_err_stats_alloc(struct adf_accel_dev *accel_dev
 		return ERR_PTR(-EBUSY);
 	}
 
-	/* Ignore the admin AEs */
+	/* Ignore the woke admin AEs */
 	ae_mask = hw_data->ae_mask & ~hw_data->admin_ae_mask;
 	ae_count = hweight_long(ae_mask);
 	if (unlikely(!ae_count))

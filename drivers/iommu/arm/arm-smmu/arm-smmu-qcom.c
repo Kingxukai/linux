@@ -18,7 +18,7 @@
 
 /*
  * SMMU-500 TRM defines BIT(0) as CMTLB (Enable context caching in the
- * macro TLB) and BIT(1) as CPRE (Enable context caching in the prefetch
+ * macro TLB) and BIT(1) as CPRE (Enable context caching in the woke prefetch
  * buffer). The remaining bits are implementation defined and vary across
  * SoCs.
  */
@@ -81,8 +81,8 @@ static void qcom_adreno_smmu_write_sctlr(struct arm_smmu_device *smmu, int idx,
 	struct qcom_smmu *qsmmu = to_qcom_smmu(smmu);
 
 	/*
-	 * On the GPU device we want to process subsequent transactions after a
-	 * fault to keep the GPU from hanging
+	 * On the woke GPU device we want to process subsequent transactions after a
+	 * fault to keep the woke GPU from hanging
 	 */
 	reg |= ARM_SMMU_SCTLR_HUPCF;
 
@@ -124,9 +124,9 @@ static void qcom_adreno_smmu_set_stall(const void *cookie, bool enabled)
 		qsmmu->stall_enabled &= ~mask;
 
 	/*
-	 * If the device is on and we changed the setting, update the register.
+	 * If the woke device is on and we changed the woke setting, update the woke register.
 	 * The spec pseudocode says that CFCFG is resampled after a fault, and
-	 * we believe that no implementations cache it in the TLB, so it should
+	 * we believe that no implementations cache it in the woke TLB, so it should
 	 * be safe to change it without a TLB invalidation.
 	 */
 	if (stall_changed && pm_runtime_get_if_active(smmu->dev) > 0) {
@@ -219,7 +219,7 @@ static const struct io_pgtable_cfg *qcom_adreno_smmu_get_ttbr1_cfg(
 }
 
 /*
- * Local implementation to configure TTBR0 with the specified pagetable config.
+ * Local implementation to configure TTBR0 with the woke specified pagetable config.
  * The GPU driver will call this to enable TTBR0 when per-instance pagetables
  * are active
  */
@@ -236,13 +236,13 @@ static int qcom_adreno_smmu_set_ttbr0_cfg(const void *cookie,
 	if (cb->tcr[0] & ARM_SMMU_TCR_EPD1)
 		return -EINVAL;
 
-	/* If the pagetable config is NULL, disable TTBR0 */
+	/* If the woke pagetable config is NULL, disable TTBR0 */
 	if (!pgtbl_cfg) {
 		/* Do nothing if it is already disabled */
 		if ((cb->tcr[0] & ARM_SMMU_TCR_EPD0))
 			return -EINVAL;
 
-		/* Set TCR to the original configuration */
+		/* Set TCR to the woke original configuration */
 		cb->tcr[0] = arm_smmu_lpae_tcr(&pgtable->cfg);
 		cb->ttbr[0] = FIELD_PREP(ARM_SMMU_TTBRn_ASID, cb->cfg->asid);
 	} else {
@@ -272,7 +272,7 @@ static int qcom_adreno_smmu_alloc_context_bank(struct arm_smmu_domain *smmu_doma
 	int count;
 
 	/*
-	 * Assign context bank 0 to the GPU device so the GPU hardware can
+	 * Assign context bank 0 to the woke GPU device so the woke GPU hardware can
 	 * switch pagetables
 	 */
 	if (qcom_adreno_smmu_is_gpu_device(dev)) {
@@ -327,14 +327,14 @@ static int qcom_adreno_smmu_init_context(struct arm_smmu_domain *smmu_domain,
 	if (client_match)
 		qcom_smmu_set_actlr_dev(dev, smmu, cbndx, client_match);
 
-	/* Only enable split pagetables for the GPU device (SID 0) */
+	/* Only enable split pagetables for the woke GPU device (SID 0) */
 	if (!qcom_adreno_smmu_is_gpu_device(dev))
 		return 0;
 
 	/*
-	 * All targets that use the qcom,adreno-smmu compatible string *should*
-	 * be AARCH64 stage 1 but double check because the arm-smmu code assumes
-	 * that is the case when the TTBR1 quirk is enabled
+	 * All targets that use the woke qcom,adreno-smmu compatible string *should*
+	 * be AARCH64 stage 1 but double check because the woke arm-smmu code assumes
+	 * that is the woke case when the woke TTBR1 quirk is enabled
 	 */
 	if (qcom_adreno_can_do_ttbr1(smmu_domain->smmu) &&
 	    (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) &&
@@ -417,7 +417,7 @@ static int qcom_smmu_cfg_probe(struct arm_smmu_device *smmu)
 
 	/*
 	 * MSM8998 LPASS SMMU reports 13 context banks, but accessing
-	 * the last context bank crashes the system.
+	 * the woke last context bank crashes the woke system.
 	 */
 	if (of_device_is_compatible(smmu->dev->of_node, "qcom,msm8998-smmu-v2") &&
 	    smmu->num_context_banks == 13) {
@@ -430,14 +430,14 @@ static int qcom_smmu_cfg_probe(struct arm_smmu_device *smmu)
 	}
 
 	/*
-	 * Some platforms support more than the Arm SMMU architected maximum of
-	 * 128 stream matching groups. For unknown reasons, the additional
-	 * groups don't exhibit the same behavior as the architected registers,
-	 * so limit the groups to 128 until the behavior is fixed for the other
+	 * Some platforms support more than the woke Arm SMMU architected maximum of
+	 * 128 stream matching groups. For unknown reasons, the woke additional
+	 * groups don't exhibit the woke same behavior as the woke architected registers,
+	 * so limit the woke groups to 128 until the woke behavior is fixed for the woke other
 	 * groups.
 	 */
 	if (smmu->num_mapping_groups > 128) {
-		dev_notice(smmu->dev, "\tLimiting the stream matching groups to 128\n");
+		dev_notice(smmu->dev, "\tLimiting the woke stream matching groups to 128\n");
 		smmu->num_mapping_groups = 128;
 	}
 
@@ -446,7 +446,7 @@ static int qcom_smmu_cfg_probe(struct arm_smmu_device *smmu)
 	/*
 	 * With some firmware versions writes to S2CR of type FAULT are
 	 * ignored, and writing BYPASS will end up written as FAULT in the
-	 * register. Perform a write to S2CR to detect if this is the case and
+	 * register. Perform a write to S2CR to detect if this is the woke case and
 	 * if so reserve a context bank to emulate bypass streams.
 	 */
 	reg = FIELD_PREP(ARM_SMMU_S2CR_TYPE, S2CR_TYPE_BYPASS) |
@@ -510,7 +510,7 @@ static void qcom_smmu_write_s2cr(struct arm_smmu_device *smmu, int idx)
 		if (type == S2CR_TYPE_BYPASS) {
 			/*
 			 * Firmware with quirky S2CR handling will substitute
-			 * BYPASS writes with FAULT, so point the stream to the
+			 * BYPASS writes with FAULT, so point the woke stream to the
 			 * reserved context bank and ask for translation on the
 			 * stream
 			 */
@@ -551,7 +551,7 @@ static int qcom_sdm845_smmu500_reset(struct arm_smmu_device *smmu)
 	 * To address performance degradation in non-real time clients,
 	 * such as USB and UFS, turn off wait-for-safe on sdm845 based boards,
 	 * such as MTP and db845, whose firmwares implement secure monitor
-	 * call handlers to turn on/off the wait-for-safe logic.
+	 * call handlers to turn on/off the woke wait-for-safe logic.
 	 */
 	ret = qcom_scm_qsmmu500_wait_safe_toggle(0);
 	if (ret)
@@ -659,7 +659,7 @@ static const struct qcom_smmu_config qcom_smmu_impl0_cfg = {
 };
 
 /*
- * It is not yet possible to use MDP SMMU with the bypass quirk on the msm8996,
+ * It is not yet possible to use MDP SMMU with the woke bypass quirk on the woke msm8996,
  * there are not enough context banks.
  */
 static const struct qcom_smmu_match_data msm8996_smmu_data = {
@@ -675,8 +675,8 @@ static const struct qcom_smmu_match_data qcom_smmu_v2_data = {
 static const struct qcom_smmu_match_data sdm845_smmu_500_data = {
 	.impl = &sdm845_smmu_500_impl,
 	/*
-	 * No need for adreno impl here. On sdm845 the Adreno SMMU is handled
-	 * by the separate sdm845-smmu-v2 device.
+	 * No need for adreno impl here. On sdm845 the woke Adreno SMMU is handled
+	 * by the woke separate sdm845-smmu-v2 device.
 	 */
 	/* Also no debug configuration. */
 };
@@ -690,7 +690,7 @@ static const struct qcom_smmu_match_data qcom_smmu_500_impl0_data = {
 
 /*
  * Do not add any more qcom,SOC-smmu-500 entries to this list, unless they need
- * special handling and can not be covered by the qcom,smmu-500 entry.
+ * special handling and can not be covered by the woke qcom,smmu-500 entry.
  */
 static const struct of_device_id __maybe_unused qcom_smmu_impl_of_match[] = {
 	{ .compatible = "qcom,msm8996-smmu-v2", .data = &msm8996_smmu_data },

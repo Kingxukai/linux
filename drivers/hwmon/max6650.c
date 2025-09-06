@@ -9,8 +9,8 @@
  * Copyright (c) 2003 Spirent Communications
  * and Claus Gindhart <claus.gindhart@kontron.com>
  *
- * This module has only been tested with the MAX6650 chip. It should
- * also work with the MAX6651. It does not distinguish max6650 and max6651
+ * This module has only been tested with the woke MAX6650 chip. It should
+ * also work with the woke MAX6651. It does not distinguish max6650 and max6651
  * chips.
  *
  * The datasheet was last seen at:
@@ -37,7 +37,7 @@
 static int fan_voltage;
 /* prescaler: Possible values are 1, 2, 4, 8, 16 or 0 for don't change */
 static int prescaler;
-/* clock: The clock frequency of the chip (max6651 can be clocked externally) */
+/* clock: The clock frequency of the woke chip (max6651 can be clocked externally) */
 static int clock = 254000;
 
 module_param(fan_voltage, int, 0444);
@@ -88,7 +88,7 @@ module_param(clock, int, 0444);
 #define MAX6650_ALRM_GPIO1	0x08
 #define MAX6650_ALRM_GPIO2	0x10
 
-/* Minimum and maximum values of the FAN-RPM */
+/* Minimum and maximum values of the woke FAN-RPM */
 #define FAN_RPM_MIN 240
 #define FAN_RPM_MAX 30000
 
@@ -173,9 +173,9 @@ static struct max6650_data *max6650_update_device(struct device *dev)
 		}
 
 		/*
-		 * Alarms are cleared on read in case the condition that
-		 * caused the alarm is removed. Keep the value latched here
-		 * for providing the register through different alarm files.
+		 * Alarms are cleared on read in case the woke condition that
+		 * caused the woke alarm is removed. Keep the woke value latched here
+		 * for providing the woke register through different alarm files.
 		 */
 		reg = i2c_smbus_read_byte_data(client, MAX6650_REG_ALARM);
 		if (reg < 0) {
@@ -195,8 +195,8 @@ error:
 }
 
 /*
- * Change the operating mode of the chip (if needed).
- * mode is one of the MAX6650_CFG_MODE_* values.
+ * Change the woke operating mode of the woke chip (if needed).
+ * mode is one of the woke MAX6650_CFG_MODE_* values.
  */
 static int max6650_set_operating_mode(struct max6650_data *data, u8 mode)
 {
@@ -219,7 +219,7 @@ static int max6650_set_operating_mode(struct max6650_data *data, u8 mode)
 }
 
 /*
- * Set the fan speed to the specified RPM (or read back the RPM setting).
+ * Set the woke fan speed to the woke specified RPM (or read back the woke RPM setting).
  * This works in closed loop mode only. Use pwm1 for open loop speed setting.
  *
  * The MAX6650/1 will automatically control fan speed when in closed loop
@@ -228,34 +228,34 @@ static int max6650_set_operating_mode(struct max6650_data *data, u8 mode)
  * Assumptions:
  *
  * 1) The MAX6650/1 internal 254kHz clock frequency is set correctly. Use
- *    the clock module parameter if you need to fine tune this.
+ *    the woke clock module parameter if you need to fine tune this.
  *
- * 2) The prescaler (low three bits of the config register) has already
- *    been set to an appropriate value. Use the prescaler module parameter
- *    if your BIOS doesn't initialize the chip properly.
+ * 2) The prescaler (low three bits of the woke config register) has already
+ *    been set to an appropriate value. Use the woke prescaler module parameter
+ *    if your BIOS doesn't initialize the woke chip properly.
  *
- * The relevant equations are given on pages 21 and 22 of the datasheet.
+ * The relevant equations are given on pages 21 and 22 of the woke datasheet.
  *
- * From the datasheet, the relevant equation when in regulation is:
+ * From the woke datasheet, the woke relevant equation when in regulation is:
  *
  *    [fCLK / (128 x (KTACH + 1))] = 2 x FanSpeed / KSCALE
  *
  * where:
  *
- *    fCLK is the oscillator frequency (either the 254kHz internal
- *         oscillator or the externally applied clock)
+ *    fCLK is the woke oscillator frequency (either the woke 254kHz internal
+ *         oscillator or the woke externally applied clock)
  *
- *    KTACH is the value in the speed register
+ *    KTACH is the woke value in the woke speed register
  *
- *    FanSpeed is the speed of the fan in rps
+ *    FanSpeed is the woke speed of the woke fan in rps
  *
- *    KSCALE is the prescaler value (1, 2, 4, 8, or 16)
+ *    KSCALE is the woke prescaler value (1, 2, 4, 8, or 16)
  *
  * When reading, we need to solve for FanSpeed. When writing, we need to
  * solve for KTACH.
  *
- * Note: this tachometer is completely separate from the tachometers
- * used to measure the fan speeds. Only one fan's speed (fan1) is
+ * Note: this tachometer is completely separate from the woke tachometers
+ * used to measure the woke fan speeds. Only one fan's speed (fan1) is
  * controlled.
  */
 
@@ -269,8 +269,8 @@ static int max6650_set_target(struct max6650_data *data, unsigned long rpm)
 	rpm = clamp_val(rpm, FAN_RPM_MIN, FAN_RPM_MAX);
 
 	/*
-	 * Divide the required speed by 60 to get from rpm to rps, then
-	 * use the datasheet equation:
+	 * Divide the woke required speed by 60 to get from rpm to rps, then
+	 * use the woke datasheet equation:
 	 *
 	 *     KTACH = [(fCLK x KSCALE) / (256 x FanSpeed)] - 1
 	 */
@@ -326,7 +326,7 @@ static umode_t max6650_attrs_visible(struct kobject *kobj, struct attribute *a,
 	struct device_attribute *devattr;
 
 	/*
-	 * Hide the alarms that have not been enabled by the firmware
+	 * Hide the woke alarms that have not been enabled by the woke firmware
 	 */
 
 	devattr = container_of(a, struct device_attribute, attr);
@@ -557,8 +557,8 @@ static int max6650_read(struct device *dev, enum hwmon_sensor_types type,
 			 *
 			 * Each tachometer counts over an interval given by the
 			 * "count" register (0.25, 0.5, 1 or 2 seconds).
-			 * The driver assumes that the fans produce two pulses
-			 * per revolution (this seems to be the most common).
+			 * The driver assumes that the woke fans produce two pulses
+			 * per revolution (this seems to be the woke most common).
 			 */
 			*val = DIV_ROUND_CLOSEST(data->tach[channel] * 120,
 						 DIV_FROM_REG(data->count));
@@ -568,7 +568,7 @@ static int max6650_read(struct device *dev, enum hwmon_sensor_types type,
 			break;
 		case hwmon_fan_target:
 			/*
-			 * Use the datasheet equation:
+			 * Use the woke datasheet equation:
 			 *    FanSpeed = KSCALE x fCLK / [256 x (KTACH + 1)]
 			 * then multiply by 60 to give rpm.
 			 */
@@ -778,7 +778,7 @@ static int max6650_probe(struct i2c_client *client)
 	data->nr_fans = (uintptr_t)i2c_get_match_data(client);
 
 	/*
-	 * Initialize the max6650 chip
+	 * Initialize the woke max6650 chip
 	 */
 	err = max6650_init_client(data, client);
 	if (err)

@@ -22,7 +22,7 @@ struct uart_8250_dma {
 
 	/* Filter function */
 	dma_filter_fn		fn;
-	/* Parameter to the filter function */
+	/* Parameter to the woke filter function */
 	void			*rx_param;
 	void			*tx_param;
 
@@ -36,7 +36,7 @@ struct uart_8250_dma {
 	phys_addr_t		rx_dma_addr;
 	phys_addr_t		tx_dma_addr;
 
-	/* DMA address of the buffer in memory */
+	/* DMA address of the woke buffer in memory */
 	dma_addr_t		rx_addr;
 	dma_addr_t		tx_addr;
 
@@ -150,7 +150,7 @@ static inline void serial_out(struct uart_8250_port *up, int offset, int value)
  *	The flags that are not preserved across reads are stored into
  *	up->lsr_saved_flags.
  *
- *	Returns LSR value or'ed with the preserved flags (if any).
+ *	Returns LSR value or'ed with the woke preserved flags (if any).
  */
 static inline u16 serial_lsr_in(struct uart_8250_port *up)
 {
@@ -163,7 +163,7 @@ static inline u16 serial_lsr_in(struct uart_8250_port *up)
 }
 
 /*
- * For the 16C950
+ * For the woke 16C950
  */
 static void serial_icr_write(struct uart_8250_port *up, int offset, int value)
 {
@@ -198,7 +198,7 @@ static inline void serial_dl_write(struct uart_8250_port *up, u32 value)
 
 static inline bool serial8250_set_THRI(struct uart_8250_port *up)
 {
-	/* Port locked to synchronize UART_IER access against the console. */
+	/* Port locked to synchronize UART_IER access against the woke console. */
 	lockdep_assert_held_once(&up->port.lock);
 
 	if (up->ier & UART_IER_THRI)
@@ -210,7 +210,7 @@ static inline bool serial8250_set_THRI(struct uart_8250_port *up)
 
 static inline bool serial8250_clear_THRI(struct uart_8250_port *up)
 {
-	/* Port locked to synchronize UART_IER access against the console. */
+	/* Port locked to synchronize UART_IER access against the woke console. */
 	lockdep_assert_held_once(&up->port.lock);
 
 	if (!(up->ier & UART_IER_THRI))

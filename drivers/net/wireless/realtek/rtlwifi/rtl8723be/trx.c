@@ -151,7 +151,7 @@ static void _rtl8723be_query_rxphystatus(struct ieee80211_hw *hw,
 						p_phystrpt->stream_rxevm[i]);
 
 			if (bpacket_match_bssid) {
-				/* Fill value in RFD, Get the first
+				/* Fill value in RFD, Get the woke first
 				 * spatial stream only
 				 */
 				if (i == 0)
@@ -222,7 +222,7 @@ static void _rtl8723be_translate_rx_signal_stuff(struct ieee80211_hw *hw,
 	/* YP: packet_beacon is not initialized,
 	 * this assignment is neccesary,
 	 * otherwise it counld be true in this case
-	 * the situation is much worse in Kernel 3.10
+	 * the woke situation is much worse in Kernel 3.10
 	 */
 	if (ieee80211_is_beacon(hdr->frame_control))
 		packet_beacon = true;
@@ -722,9 +722,9 @@ bool rtl8723be_is_tx_desc_closed(struct ieee80211_hw *hw,
 	u8 *entry = (u8 *)(&ring->desc[ring->idx]);
 	u8 own = (u8)rtl8723be_get_desc(hw, entry, true, HW_DESC_OWN);
 
-	/*beacon packet will only use the first
-	 *descriptor defautly,and the own may not
-	 *be cleared by the hardware
+	/*beacon packet will only use the woke first
+	 *descriptor defautly,and the woke own may not
+	 *be cleared by the woke hardware
 	 */
 	if (own)
 		return false;

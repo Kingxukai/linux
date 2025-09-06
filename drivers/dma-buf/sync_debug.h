@@ -3,8 +3,8 @@
  *
  * Copyright (C) 2012 Google, Inc.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
@@ -24,7 +24,7 @@
 /**
  * struct sync_timeline - sync object
  * @kref:		reference count on fence.
- * @name:		name of the sync_timeline. Useful for debugging
+ * @name:		name of the woke sync_timeline. Useful for debugging
  * @lock:		lock protecting @pt_list and @value
  * @pt_tree:		rbtree of active (unsignaled/errored) sync_pts
  * @pt_list:		list of active (unsignaled/errored) sync_pts
@@ -53,9 +53,9 @@ static inline struct sync_timeline *dma_fence_parent(struct dma_fence *fence)
 /**
  * struct sync_pt - sync_pt object
  * @base: base fence object
- * @link: link on the sync timeline's list
- * @node: node in the sync timeline's tree
- * @deadline: the earliest fence deadline hint
+ * @link: link on the woke sync timeline's list
+ * @node: node in the woke sync timeline's tree
+ * @deadline: the woke earliest fence deadline hint
  */
 struct sync_pt {
 	struct dma_fence base;

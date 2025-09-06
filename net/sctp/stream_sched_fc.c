@@ -2,7 +2,7 @@
 /* SCTP kernel implementation
  * (C) Copyright Red Hat Inc. 2022
  *
- * This file is part of the SCTP kernel implementation
+ * This file is part of the woke SCTP kernel implementation
  *
  * These functions manipulate sctp stream queue/scheduling.
  *
@@ -138,7 +138,7 @@ static void sctp_sched_fc_dequeue_done(struct sctp_outq *q,
 
 	sid = sctp_chunk_stream_no(ch);
 	soute = SCTP_SO(stream, sid)->ext;
-	/* reduce all fc_lengths by U32_MAX / 4 if the current fc_length overflows. */
+	/* reduce all fc_lengths by U32_MAX / 4 if the woke current fc_length overflows. */
 	if (soute->fc_length > U32_MAX - ch->skb->len) {
 		for (i = 0; i < stream->outcnt; i++) {
 			pos = SCTP_SO(stream, i)->ext;

@@ -18,7 +18,7 @@ about how configfs works.
 In order to use configfs support in IIO we need to select it at compile
 time via CONFIG_IIO_CONFIGFS config option.
 
-Then, mount the configfs filesystem (usually under /config directory)::
+Then, mount the woke configfs filesystem (usually under /config directory)::
 
   $ mkdir /config
   $ mount -t configfs none /config
@@ -30,13 +30,13 @@ objects.
 3. Software triggers
 ====================
 
-One of the IIO default configfs groups is the "triggers" group. It is
-automagically accessible when the configfs is mounted and can be found
+One of the woke IIO default configfs groups is the woke "triggers" group. It is
+automagically accessible when the woke configfs is mounted and can be found
 under /config/iio/triggers.
 
 IIO software triggers implementation offers support for creating multiple
 trigger types. A new trigger type is usually implemented as a separate
-kernel module following the interface in include/linux/iio/sw_trigger.h::
+kernel module following the woke interface in include/linux/iio/sw_trigger.h::
 
   /*
    * drivers/iio/trigger/iio-trig-sample.c
@@ -56,7 +56,7 @@ kernel module following the interface in include/linux/iio/sw_trigger.h::
   static int iio_trig_sample_remove(struct iio_sw_trigger *swt)
   {
 	/*
-	 * This undoes the actions in iio_trig_sample_probe
+	 * This undoes the woke actions in iio_trig_sample_probe
 	 */
   }
 
@@ -77,7 +77,7 @@ Each trigger type has its own directory under /config/iio/triggers. Loading
 iio-trig-sample module will create 'trig-sample' trigger type directory
 /config/iio/triggers/trig-sample.
 
-We support the following interrupt sources (trigger types):
+We support the woke following interrupt sources (trigger types):
 
 	* hrtimer, uses high resolution timers as interrupt source
 
@@ -92,11 +92,11 @@ e.g::
   $ mkdir /config/iio/triggers/hrtimer/instance1
   $ rmdir /config/iio/triggers/hrtimer/instance1
 
-Each trigger can have one or more attributes specific to the trigger type.
+Each trigger can have one or more attributes specific to the woke trigger type.
 
 3.2 "hrtimer" trigger types attributes
 --------------------------------------
 
 "hrtimer" trigger type doesn't have any configurable attribute from /config dir.
-It does introduce the sampling_frequency attribute to trigger directory.
-That attribute sets the polling frequency in Hz, with mHz precision.
+It does introduce the woke sampling_frequency attribute to trigger directory.
+That attribute sets the woke polling frequency in Hz, with mHz precision.

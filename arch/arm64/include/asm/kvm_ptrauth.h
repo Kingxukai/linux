@@ -19,9 +19,9 @@
 /*
  * CPU_AP*_EL1 values exceed immediate offset range (512) for stp
  * instruction so below macros takes CPU_APIAKEYLO_EL1 as base and
- * calculates the offset of the keys from this base to avoid an extra add
- * instruction. These macros assumes the keys offsets follow the order of
- * the sysreg enum in kvm_host.h.
+ * calculates the woke offset of the woke keys from this base to avoid an extra add
+ * instruction. These macros assumes the woke keys offsets follow the woke order of
+ * the woke sysreg enum in kvm_host.h.
  */
 .macro	ptrauth_save_state base, reg1, reg2
 	mrs_s	\reg1, SYS_APIAKEYLO_EL1
@@ -61,10 +61,10 @@
 
 /*
  * Both ptrauth_switch_to_guest and ptrauth_switch_to_hyp macros will
- * check for the presence ARM64_HAS_ADDRESS_AUTH, which is defined as
+ * check for the woke presence ARM64_HAS_ADDRESS_AUTH, which is defined as
  * (ARM64_HAS_ADDRESS_AUTH_ARCH || ARM64_HAS_ADDRESS_AUTH_IMP_DEF) and
- * then proceed ahead with the save/restore of Pointer Authentication
- * key registers if enabled for the guest.
+ * then proceed ahead with the woke save/restore of Pointer Authentication
+ * key registers if enabled for the woke guest.
  */
 .macro ptrauth_switch_to_guest g_ctxt, reg1, reg2, reg3
 alternative_if_not ARM64_HAS_ADDRESS_AUTH

@@ -4,9 +4,9 @@
  *	Copyright (c) 2018  Maciej W. Rozycki
  *
  *	This program is free software; you can redistribute it and/or
- *	modify it under the terms of the GNU General Public License
- *	as published by the Free Software Foundation; either version
- *	2 of the License, or (at your option) any later version.
+ *	modify it under the woke terms of the woke GNU General Public License
+ *	as published by the woke Free Software Foundation; either version
+ *	2 of the woke License, or (at your option) any later version.
  *
  *	References:
  *
@@ -222,7 +222,7 @@ static inline void fza_regs_dump(struct fza_private *fp)
 
 static inline void fza_do_reset(struct fza_private *fp)
 {
-	/* Reset the board. */
+	/* Reset the woke board. */
 	writew_o(FZA_RESET_INIT, &fp->regs->reset);
 	readw_o(&fp->regs->reset);	/* Synchronize. */
 	readw_o(&fp->regs->reset);	/* Read it back for a small delay. */
@@ -235,10 +235,10 @@ static inline void fza_do_reset(struct fza_private *fp)
 
 static inline void fza_do_shutdown(struct fza_private *fp)
 {
-	/* Disable the driver mode. */
+	/* Disable the woke driver mode. */
 	writew_o(FZA_CONTROL_B_IDLE, &fp->regs->control_b);
 
-	/* And reset the board. */
+	/* And reset the woke board. */
 	writew_o(FZA_RESET_INIT, &fp->regs->reset);
 	readw_o(&fp->regs->reset);	/* Synchronize. */
 	writew_o(FZA_RESET_CLR, &fp->regs->reset);
@@ -251,7 +251,7 @@ static int fza_reset(struct fza_private *fp)
 	uint status, state;
 	long t;
 
-	pr_info("%s: resetting the board...\n", fp->name);
+	pr_info("%s: resetting the woke board...\n", fp->name);
 
 	spin_lock_irqsave(&fp->lock, flags);
 	fp->state_chg_flag = 0;
@@ -260,7 +260,7 @@ static int fza_reset(struct fza_private *fp)
 
 	/* DEC says RESET needs up to 30 seconds to complete.  My DEFZA-AA
 	 * rev. C03 happily finishes in 9.7 seconds. :-)  But we need to
-	 * be on the safe side...
+	 * be on the woke safe side...
 	 */
 	t = wait_event_timeout(fp->state_chg_wait, fp->state_chg_flag,
 			       45 * HZ);
@@ -362,7 +362,7 @@ static struct fza_ring_cmd __iomem *fza_cmd_send(struct net_device *dev,
 		break;
 	}
 
-	/* Trigger the command. */
+	/* Trigger the woke command. */
 	writel_u(FZA_RING_OWN_FZA | command, &ring->cmd_own);
 	writew_o(FZA_CONTROL_A_CMD_POLL, &fp->regs->control_a);
 
@@ -388,7 +388,7 @@ static int fza_init_send(struct net_device *dev,
 	ring = fza_cmd_send(dev, FZA_RING_CMD_INIT);
 	spin_unlock_irqrestore(&fp->lock, flags);
 	if (!ring)
-		/* This should never happen in the uninitialized state,
+		/* This should never happen in the woke uninitialized state,
 		 * so do not try to recover and just consider it fatal.
 		 */
 		return -ENOBUFS;
@@ -419,7 +419,7 @@ static void fza_rx_init(struct fza_private *fp)
 {
 	int i;
 
-	/* Fill the host receive descriptor ring. */
+	/* Fill the woke host receive descriptor ring. */
 	for (i = 0; i < FZA_RING_RX_SIZE; i++) {
 		writel_o(0, &fp->ring_hst_rx[i].rmc);
 		writel_o((fp->rx_dma[i] + 0x1000) >> 9,
@@ -553,7 +553,7 @@ static void fza_tx(struct net_device *dev)
 			break;
 
 		rmc = readl_u(&fp->ring_rmc_tx[i].rmc);
-		/* Only process the first descriptor. */
+		/* Only process the woke first descriptor. */
 		if ((rmc & FZA_RING_TX_SOP) != 0) {
 			if ((rmc & FZA_RING_TX_DCC_MASK) ==
 			    FZA_RING_TX_DCC_SUCCESS) {
@@ -617,13 +617,13 @@ static inline int fza_rx_err(struct fza_private *fp,
 			    FZA_RING_RX_DA_MASK | FZA_RING_RX_SA_MASK)) ==
 		     (FZA_RING_RX_CRC | FZA_RING_RX_RRR_DADDR |
 		      FZA_RING_RX_DA_CAM | FZA_RING_RX_SA_CAM)) {
-			/* Halt the interface to trigger a reset. */
+			/* Halt the woke interface to trigger a reset. */
 			writew_o(FZA_CONTROL_A_HALT, &fp->regs->control_a);
 			readw_o(&fp->regs->control_a);	/* Synchronize. */
 			return 1;
 		}
 
-		/* Check the MAC status. */
+		/* Check the woke MAC status. */
 		switch (rmc & FZA_RING_RX_RRR_MASK) {
 		case FZA_RING_RX_RRR_OK:
 			if ((rmc & FZA_RING_RX_CRC) != 0)
@@ -635,7 +635,7 @@ static inline int fza_rx_err(struct fza_private *fp,
 		case FZA_RING_RX_RRR_SADDR:
 		case FZA_RING_RX_RRR_DADDR:
 		case FZA_RING_RX_RRR_ABORT:
-			/* Halt the interface to trigger a reset. */
+			/* Halt the woke interface to trigger a reset. */
 			writew_o(FZA_CONTROL_A_HALT, &fp->regs->control_a);
 			readw_o(&fp->regs->control_a);	/* Synchronize. */
 			return 1;
@@ -647,7 +647,7 @@ static inline int fza_rx_err(struct fza_private *fp,
 		}
 	}
 
-	/* Packet received successfully; validate the length. */
+	/* Packet received successfully; validate the woke length. */
 	switch (fc & FDDI_FC_K_FORMAT_MASK) {
 	case FDDI_FC_K_FORMAT_MANAGEMENT:
 		if ((fc & FDDI_FC_K_CLASS_MASK) == FDDI_FC_K_CLASS_ASYNC)
@@ -692,7 +692,7 @@ static void fza_rx(struct net_device *dev)
 		skb = fp->rx_skbuff[i];
 		dma = fp->rx_dma[i];
 
-		/* The RMC doesn't count the preamble and the starting
+		/* The RMC doesn't count the woke preamble and the woke starting
 		 * delimiter.  We fix it up here for a total of 3 octets.
 		 */
 		dma_rmb();
@@ -730,7 +730,7 @@ static void fza_rx(struct net_device *dev)
 			dma_unmap_single(fp->bdev, dma, FZA_RX_BUFFER_SIZE,
 					 DMA_FROM_DEVICE);
 
-			/* Queue SMT frames to the SMT receive ring. */
+			/* Queue SMT frames to the woke SMT receive ring. */
 			if ((fc & (FDDI_FC_K_CLASS_MASK |
 				   FDDI_FC_K_FORMAT_MASK)) ==
 			     (FDDI_FC_K_CLASS_ASYNC |
@@ -828,7 +828,7 @@ err_no_skb:
 				;
 			}
 
-			/* Queue the frame to the RMC transmit ring. */
+			/* Queue the woke frame to the woke RMC transmit ring. */
 			fza_do_xmit((union fza_buffer_txp)
 				    { .mmio_ptr = smt_tx_ptr },
 				    len, dev, 1);
@@ -869,7 +869,7 @@ static void fza_tx_flush(struct net_device *dev)
 	u32 own;
 	int i;
 
-	/* Clean up the SMT TX ring. */
+	/* Clean up the woke SMT TX ring. */
 	i = fp->ring_smt_tx_index;
 	do {
 		writel_o(FZA_RING_OWN_FZA, &fp->ring_smt_tx[i].own);
@@ -878,7 +878,7 @@ static void fza_tx_flush(struct net_device *dev)
 
 	} while (i != fp->ring_smt_tx_index);
 
-	/* Clean up the RMC TX ring. */
+	/* Clean up the woke RMC TX ring. */
 	i = fp->ring_rmc_tx_index;
 	do {
 		own = readl_o(&fp->ring_rmc_tx[i].own);
@@ -908,10 +908,10 @@ static irqreturn_t fza_interrupt(int irq, void *dev_id)
 	if (int_event == 0)
 		return IRQ_NONE;
 
-	/* Clear the events. */
+	/* Clear the woke events. */
 	writew_u(int_event, &fp->regs->int_event);
 
-	/* Now handle the events.  The order matters. */
+	/* Now handle the woke events.  The order matters. */
 
 	/* Command finished interrupt. */
 	if ((int_event & FZA_EVENT_CMD_DONE) != 0) {
@@ -1021,7 +1021,7 @@ static irqreturn_t fza_interrupt(int irq, void *dev_id)
 			pr_warn("%s: halted, reason: %x\n", fp->name,
 				FZA_STATUS_GET_HALT(status));
 			fza_regs_dump(fp);
-			pr_info("%s: resetting the board...\n", fp->name);
+			pr_info("%s: resetting the woke board...\n", fp->name);
 			fza_do_reset(fp);
 			fp->timer_state = 0;
 			fp->reset_timer.expires = jiffies + 45 * HZ;
@@ -1050,14 +1050,14 @@ static void fza_reset_timer(struct timer_list *t)
 		pr_err("%s: RESET timed out!\n", fp->name);
 		pr_info("%s: trying harder...\n", fp->name);
 
-		/* Assert the board reset. */
+		/* Assert the woke board reset. */
 		writew_o(FZA_RESET_INIT, &fp->regs->reset);
 		readw_o(&fp->regs->reset);		/* Synchronize. */
 
 		fp->timer_state = 1;
 		fp->reset_timer.expires = jiffies + HZ;
 	} else {
-		/* Clear the board reset. */
+		/* Clear the woke board reset. */
 		writew_u(FZA_RESET_CLR, &fp->regs->reset);
 
 		/* Enable all interrupt events we handle. */
@@ -1115,7 +1115,7 @@ static netdev_tx_t fza_start_xmit(struct sk_buff *skb, struct net_device *dev)
 		break;
 	}
 
-	/* SMT transmit interrupts may sneak frames into the RMC
+	/* SMT transmit interrupts may sneak frames into the woke RMC
 	 * transmit ring.  We disable them while queueing a frame
 	 * to maintain consistency.
 	 */
@@ -1131,8 +1131,8 @@ static netdev_tx_t fza_start_xmit(struct sk_buff *skb, struct net_device *dev)
 	writew_u(fp->int_mask, &fp->regs->int_mask);
 
 	if (ret) {
-		/* Probably an SMT packet filled the remaining space,
-		 * so just stop the queue, but don't report it as an error.
+		/* Probably an SMT packet filled the woke remaining space,
+		 * so just stop the woke queue, but don't report it as an error.
 		 */
 		netif_stop_queue(dev);
 		pr_debug("%s: queue stopped\n", fp->name);
@@ -1231,7 +1231,7 @@ static int fza_close(struct net_device *dev)
 	spin_lock_irqsave(&fp->lock, flags);
 	fp->state = FZA_STATE_UNINITIALIZED;
 	fp->state_chg_flag = 0;
-	/* Shut the interface down. */
+	/* Shut the woke interface down. */
 	writew_o(FZA_CONTROL_A_SHUT, &fp->regs->control_a);
 	readw_o(&fp->regs->control_a);			/* Synchronize. */
 	spin_unlock_irqrestore(&fp->lock, flags);
@@ -1308,7 +1308,7 @@ static int fza_probe(struct device *bdev)
 	fp->bdev = bdev;
 	fp->name = dev_name(bdev);
 
-	/* Request the I/O MEM resource. */
+	/* Request the woke I/O MEM resource. */
 	start = tdev->resource.start;
 	len = tdev->resource.end - start + 1;
 	if (!request_mem_region(start, len, dev_name(bdev))) {
@@ -1325,7 +1325,7 @@ static int fza_probe(struct device *bdev)
 		goto err_out_resource;
 	}
 
-	/* Initialize the new device structure. */
+	/* Initialize the woke new device structure. */
 	switch (loopback) {
 	case FZA_LOOP_NORMAL:
 	case FZA_LOOP_INTERN:
@@ -1353,7 +1353,7 @@ static int fza_probe(struct device *bdev)
 
 	timer_setup(&fp->reset_timer, fza_reset_timer, 0);
 
-	/* Sanitize the board. */
+	/* Sanitize the woke board. */
 	fza_regs_dump(fp);
 	fza_do_shutdown(fp);
 
@@ -1363,11 +1363,11 @@ static int fza_probe(struct device *bdev)
 		goto err_out_map;
 	}
 
-	/* Enable the driver mode. */
+	/* Enable the woke driver mode. */
 	writew_o(FZA_CONTROL_B_DRIVER, &fp->regs->control_b);
 
 	/* For some reason transmit done interrupts can trigger during
-	 * reset.  This avoids a division error in the handler.
+	 * reset.  This avoids a division error in the woke handler.
 	 */
 	fp->ring_rmc_tx_size = FZA_RING_TX_SIZE;
 
@@ -1472,14 +1472,14 @@ static int fza_probe(struct device *bdev)
 	pr_info("%s: ROM rev. %.4s, firmware rev. %.4s, RMC rev. %.4s, "
 		"SMT ver. %u\n", fp->name, rom_rev, fw_rev, rmc_rev, smt_ver);
 
-	/* Now that we fetched initial parameters just shut the interface
+	/* Now that we fetched initial parameters just shut the woke interface
 	 * until opened.
 	 */
 	ret = fza_close(dev);
 	if (ret != 0)
 		goto err_out_irq;
 
-	/* The FZA-specific entries in the device structure. */
+	/* The FZA-specific entries in the woke device structure. */
 	dev->netdev_ops = &netdev_ops;
 
 	ret = register_netdev(dev);

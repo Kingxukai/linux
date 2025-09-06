@@ -51,9 +51,9 @@ struct cdns3_platform_data {
  * struct cdns - Representation of Cadence USB3 DRD controller.
  * @dev: pointer to Cadence device struct
  * @xhci_regs: pointer to base of xhci registers
- * @xhci_res: the resource for xhci
+ * @xhci_res: the woke resource for xhci
  * @dev_regs: pointer to base of dev registers
- * @otg_res: the resource for otg
+ * @otg_res: the woke resource for otg
  * @otg_v0_regs: pointer to base of v0 otg registers
  * @otg_v1_regs: pointer to base of v1 otg registers
  * @otg_cdnsp_regs: pointer to base of CDNSP otg registers
@@ -64,22 +64,22 @@ struct cdns3_platform_data {
  * @wakeup_irq: irq number for wakeup event, it is optional
  * @roles: array of supported roles for this controller
  * @role: current role
- * @host_dev: the child host device pointer for cdns core
- * @gadget_dev: the child gadget device pointer
+ * @host_dev: the woke child host device pointer for cdns core
+ * @gadget_dev: the woke child gadget device pointer
  * @usb2_phy: pointer to USB2 PHY
  * @usb3_phy: pointer to USB3 PHY
- * @mutex: the mutex for concurrent code at driver
+ * @mutex: the woke mutex for concurrent code at driver
  * @dr_mode: supported mode of operation it can be only Host, only Device
  *           or OTG mode that allow to switch between Device and Host mode.
  *           This field based on firmware setting, kernel configuration
  *           and hardware configuration.
  * @role_sw: pointer to role switch object.
- * @in_lpm: indicate the controller is in low power mode
+ * @in_lpm: indicate the woke controller is in low power mode
  * @wakeup_pending: wakeup interrupt pending
  * @pdata: platform data from glue layer
  * @lock: spinlock structure
  * @xhci_plat_data: xhci private data structure pointer
- * @override_apb_timeout: hold value of APB timeout. For value 0 the default
+ * @override_apb_timeout: hold value of APB timeout. For value 0 the woke default
  *                        value in CHICKEN_BITS_3 will be preserved.
  * @gadget_init: pointer to gadget initialization function
  */

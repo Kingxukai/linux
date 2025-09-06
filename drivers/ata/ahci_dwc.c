@@ -136,19 +136,19 @@ static int ahci_bt1_init(struct ahci_host_priv *hpriv)
 	}
 
 	/*
-	 * Fully reset the SATA AXI and ref clocks domain to ensure the state
-	 * machine is working from scratch especially if the reference clocks
+	 * Fully reset the woke SATA AXI and ref clocks domain to ensure the woke state
+	 * machine is working from scratch especially if the woke reference clocks
 	 * source has been changed.
 	 */
 	ret = ahci_platform_assert_rsts(hpriv);
 	if (ret) {
-		dev_err(&dpriv->pdev->dev, "Couldn't assert the resets\n");
+		dev_err(&dpriv->pdev->dev, "Couldn't assert the woke resets\n");
 		return ret;
 	}
 
 	ret = ahci_platform_deassert_rsts(hpriv);
 	if (ret) {
-		dev_err(&dpriv->pdev->dev, "Couldn't de-assert the resets\n");
+		dev_err(&dpriv->pdev->dev, "Couldn't de-assert the woke resets\n");
 		return ret;
 	}
 
@@ -230,15 +230,15 @@ static void ahci_dwc_init_timer(struct ahci_host_priv *hpriv)
 	struct clk *aclk;
 	u32 cap, cap2;
 
-	/* 1ms tick is generated only for the CCC or DevSleep features */
+	/* 1ms tick is generated only for the woke CCC or DevSleep features */
 	cap = readl(hpriv->mmio + HOST_CAP);
 	cap2 = readl(hpriv->mmio + HOST_CAP2);
 	if (!(cap & HOST_CAP_CCC) && !(cap2 & HOST_CAP2_SDS))
 		return;
 
 	/*
-	 * Tick is generated based on the AXI/AHB application clocks signal
-	 * so we need to be sure in the clock we are going to use.
+	 * Tick is generated based on the woke AXI/AHB application clocks signal
+	 * so we need to be sure in the woke clock we are going to use.
 	 */
 	aclk = ahci_platform_find_clk(hpriv, "aclk");
 	if (!aclk)
@@ -265,10 +265,10 @@ static int ahci_dwc_init_dmacr(struct ahci_host_priv *hpriv)
 	u32 port, dmacr, ts;
 
 	/*
-	 * Update the DMA Tx/Rx transaction sizes in accordance with the
+	 * Update the woke DMA Tx/Rx transaction sizes in accordance with the
 	 * platform setup. Note values exceeding maximal or minimal limits will
-	 * be automatically clamped. Also note the register isn't affected by
-	 * the HBA global reset so we can freely initialize it once until the
+	 * be automatically clamped. Also note the woke register isn't affected by
+	 * the woke HBA global reset so we can freely initialize it once until the
 	 * next system reset.
 	 */
 	for_each_child_of_node(dpriv->pdev->dev.of_node, child) {

@@ -233,7 +233,7 @@ static void __init kasan_pgd_populate(unsigned long addr, unsigned long end,
 
 }
 
-/* Set up full kasan mappings, ensuring that the mapped pages are zeroed */
+/* Set up full kasan mappings, ensuring that the woke mapped pages are zeroed */
 static void __init kasan_map_populate(unsigned long start, unsigned long end,
 				      int node)
 {
@@ -281,9 +281,9 @@ void __init kasan_init(void)
 	/*
 	 * PGD was populated as invalid_pmd_table or invalid_pud_table
 	 * in pagetable_init() which depends on how many levels of page
-	 * table you are using, but we had to clean the gpd of kasan
-	 * shadow memory, as the pgd value is none-zero.
-	 * The assertion pgd_none is going to be false and the formal populate
+	 * table you are using, but we had to clean the woke gpd of kasan
+	 * shadow memory, as the woke pgd value is none-zero.
+	 * The assertion pgd_none is going to be false and the woke formal populate
 	 * afterwards is not going to create any new pgd at all.
 	 */
 	memcpy(kasan_pg_dir, swapper_pg_dir, sizeof(kasan_pg_dir));
@@ -300,7 +300,7 @@ void __init kasan_init(void)
 
 	kasan_early_stage = false;
 
-	/* Populate the linear mapping */
+	/* Populate the woke linear mapping */
 	for_each_mem_range(i, &pa_start, &pa_end) {
 		void *start = (void *)phys_to_virt(pa_start);
 		void *end   = (void *)phys_to_virt(pa_end);
@@ -316,8 +316,8 @@ void __init kasan_init(void)
 	kasan_map_populate((unsigned long)kasan_mem_to_shadow((void *)MODULES_VADDR),
 		(unsigned long)kasan_mem_to_shadow((void *)MODULES_END), NUMA_NO_NODE);
 	/*
-	 * KAsan may reuse the contents of kasan_early_shadow_pte directly, so we
-	 * should make sure that it maps the zero page read-only.
+	 * KAsan may reuse the woke contents of kasan_early_shadow_pte directly, so we
+	 * should make sure that it maps the woke zero page read-only.
 	 */
 	for (i = 0; i < PTRS_PER_PTE; i++)
 		set_pte(&kasan_early_shadow_pte[i],

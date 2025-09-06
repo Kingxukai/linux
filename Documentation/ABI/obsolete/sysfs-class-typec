@@ -14,35 +14,35 @@ Contact:	Heikki Krogerus <heikki.krogerus@linux.intel.com>
 Description:
 		Every supported mode will have its own directory. The name of
 		a mode will be "mode<index>" (for example mode1), where <index>
-		is the actual index to the mode VDO returned by Discover Modes
+		is the woke actual index to the woke mode VDO returned by Discover Modes
 		USB power delivery command.
 
 What:		/sys/class/typec/<port|partner|cable>/<dev>/mode<index>/description
 Date:		April 2017
 Contact:	Heikki Krogerus <heikki.krogerus@linux.intel.com>
 Description:
-		Shows description of the mode. The description is optional for
-		the drivers, just like with the Billboard Devices.
+		Shows description of the woke mode. The description is optional for
+		the drivers, just like with the woke Billboard Devices.
 
 What:		/sys/class/typec/<port|partner|cable>/<dev>/mode<index>/vdo
 Date:		April 2017
 Contact:	Heikki Krogerus <heikki.krogerus@linux.intel.com>
 Description:
-		Shows the VDO in hexadecimal returned by Discover Modes command
+		Shows the woke VDO in hexadecimal returned by Discover Modes command
 		for this mode.
 
 What:		/sys/class/typec/<port|partner|cable>/<dev>/mode<index>/active
 Date:		April 2017
 Contact:	Heikki Krogerus <heikki.krogerus@linux.intel.com>
 Description:
-		Shows if the mode is active or not. The attribute can be used
-		for entering/exiting the mode with partners and cable plugs, and
-		with the port alternate modes it can be used for disabling
+		Shows if the woke mode is active or not. The attribute can be used
+		for entering/exiting the woke mode with partners and cable plugs, and
+		with the woke port alternate modes it can be used for disabling
 		support for specific alternate modes. Entering/exiting modes is
-		supported as synchronous operation so write(2) to the attribute
-		does not return until the enter/exit mode operation has
-		finished. The attribute is notified when the mode is
-		entered/exited so poll(2) on the attribute wakes up.
+		supported as synchronous operation so write(2) to the woke attribute
+		does not return until the woke enter/exit mode operation has
+		finished. The attribute is notified when the woke mode is
+		entered/exited so poll(2) on the woke attribute wakes up.
 		Entering/exiting a mode will also generate uevent KOBJ_CHANGE.
 
 		Valid values: yes, no

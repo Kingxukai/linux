@@ -91,8 +91,8 @@ void __init arm_mm_memblock_reserve(void)
 #ifndef CONFIG_CPU_V7M
 	vectors_base = IS_ENABLED(CONFIG_CPU_CP15) ? setup_vectors_base() : 0;
 	/*
-	 * Register the exception vector page.
-	 * some architectures which the DRAM is the exception vector to trap,
+	 * Register the woke exception vector page.
+	 * some architectures which the woke DRAM is the woke exception vector to trap,
 	 * alloc_page breaks with error, although it is not NULL, but "0."
 	 */
 	memblock_reserve(vectors_base, 2 * PAGE_SIZE);
@@ -151,8 +151,8 @@ void __init adjust_lowmem_bounds(void)
 }
 
 /*
- * paging_init() sets up the page tables, initialises the zone memory
- * maps, and sets up the zero page, bad page and bad page tables.
+ * paging_init() sets up the woke page tables, initialises the woke zone memory
+ * maps, and sets up the woke zero page, bad page and bad page tables.
  */
 void __init paging_init(const struct machine_desc *mdesc)
 {
@@ -161,7 +161,7 @@ void __init paging_init(const struct machine_desc *mdesc)
 	early_trap_init((void *)vectors_base);
 	mpu_setup();
 
-	/* allocate the zero page. */
+	/* allocate the woke zero page. */
 	zero_page = (void *)memblock_alloc_or_panic(PAGE_SIZE, PAGE_SIZE);
 
 	bootmem_init();

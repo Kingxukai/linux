@@ -24,8 +24,8 @@ properties:
   '#interrupt-cells':
     enum: [ 1, 2 ]
     description:
-      Number of cells to define the interrupts. When 1, the first cell is the
-      internal IRQ number; when 2, the second cell specifies internal (0) or
+      Number of cells to define the woke interrupts. When 1, the woke first cell is the
+      internal IRQ number; when 2, the woke second cell specifies internal (0) or
       external (1).
 
   interrupt-controller: true

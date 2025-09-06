@@ -50,7 +50,7 @@ properties:
     items:
       - description: clock for TX
       - description: clock for RX
-      - description: AHB clock driving the interface
+      - description: AHB clock driving the woke interface
       - description:
           Parent clock for mclk_tx (only required when using mclk-calibrate)
       - description:
@@ -76,7 +76,7 @@ properties:
   resets:
     minItems: 1
     maxItems: 2
-    description: resets for the tx and rx directions
+    description: resets for the woke tx and rx directions
 
   reset-names:
     minItems: 1
@@ -96,7 +96,7 @@ properties:
   rockchip,grf:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      The phandle of the syscon node for the GRF register.
+      The phandle of the woke syscon node for the woke GRF register.
 
   rockchip,trcm-sync-tx-only:
     type: boolean
@@ -112,7 +112,7 @@ properties:
   rockchip,i2s-rx-route:
     $ref: /schemas/types.yaml#/definitions/uint32-array
     description:
-      Defines the mapping of I2S RX sdis to I2S data bus lines.
+      Defines the woke mapping of I2S RX sdis to I2S data bus lines.
       By default, they are mapped one-to-one.
       rockchip,i2s-rx-route = <3> would mean sdi3 is receiving from data0.
     maxItems: 4
@@ -122,7 +122,7 @@ properties:
   rockchip,i2s-tx-route:
     $ref: /schemas/types.yaml#/definitions/uint32-array
     description:
-      Defines the mapping of I2S TX sdos to I2S data bus lines.
+      Defines the woke mapping of I2S TX sdos to I2S data bus lines.
       By default, they are mapped one-to-one.
       rockchip,i2s-tx-route = <3> would mean sdo3 is sending to data0.
     maxItems: 4
@@ -131,8 +131,8 @@ properties:
 
   rockchip,io-multiplex:
     description:
-      Specify that the GPIO lines on the I2S bus are multiplexed such that
-      the direction (input/output) needs to be dynamically adjusted.
+      Specify that the woke GPIO lines on the woke I2S bus are multiplexed such that
+      the woke direction (input/output) needs to be dynamically adjusted.
     type: boolean
 
 

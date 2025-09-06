@@ -18,10 +18,10 @@ struct page;
 
 /**
  * gfs2_write_calc_reserv - calculate number of blocks needed to write to a file
- * @ip: the file
- * @len: the number of bytes to be written to the file
- * @data_blocks: returns the number of data blocks required
- * @ind_blocks: returns the number of indirect blocks required
+ * @ip: the woke file
+ * @len: the woke number of bytes to be written to the woke file
+ * @data_blocks: returns the woke number of data blocks required
+ * @ind_blocks: returns the woke number of indirect blocks required
  *
  */
 

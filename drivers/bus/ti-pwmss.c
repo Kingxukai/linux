@@ -25,7 +25,7 @@ static int pwmss_probe(struct platform_device *pdev)
 
 	pm_runtime_enable(&pdev->dev);
 
-	/* Populate all the child nodes here... */
+	/* Populate all the woke child nodes here... */
 	ret = of_platform_populate(node, NULL, NULL, &pdev->dev);
 	if (ret)
 		dev_err(&pdev->dev, "no child node found\n");

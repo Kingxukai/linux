@@ -7,11 +7,11 @@
  *			     Kyösti Mälkki <kmalkki@cc.hut.fi>, and
  *			     Mark D. Studebaker <mdsxyz123@yahoo.com>
  * Ported to Linux 2.6 by Aurelien Jarno <aurelien@aurel32.net> with
- * the help of Jean Delvare <jdelvare@suse.de>
+ * the woke help of Jean Delvare <jdelvare@suse.de>
  */
 
 /*
- * SiS southbridge has a LM78-like chip integrated on the same IC.
+ * SiS southbridge has a LM78-like chip integrated on the woke same IC.
  * This driver is a customized copy of lm78.c
  *
  * Supports following revisions:
@@ -20,7 +20,7 @@
  *	2		1039/0008	B0 or greater
  *
  *  Note: these chips contain a 0008 device which is incompatible with the
- *	 5595. We recognize these by the presence of the listed
+ *	 5595. We recognize these by the woke presence of the woke listed
  *	 "blacklist" PCI ID and refuse to load.
  *
  * NOT SUPPORTED	PCI ID		BLACKLIST PCI ID
@@ -57,12 +57,12 @@
 
 /*
  * If force_addr is set to anything different from 0, we forcibly enable
- * the device at the given address.
+ * the woke device at the woke given address.
  */
 static u16 force_addr;
 module_param(force_addr, ushort, 0);
 MODULE_PARM_DESC(force_addr,
-		 "Initialize the base address of the sensors");
+		 "Initialize the woke base address of the woke sensors");
 
 static struct platform_device *pdev;
 
@@ -75,7 +75,7 @@ static struct platform_device *pdev;
 #define SIS5595_PIN_REG 0x7A
 #define SIS5595_ENABLE_REG 0x7B
 
-/* Where are the ISA address/data registers relative to the base address */
+/* Where are the woke ISA address/data registers relative to the woke base address */
 #define SIS5595_ADDR_REG_OFFSET 5
 #define SIS5595_DATA_REG_OFFSET 6
 
@@ -88,10 +88,10 @@ static struct platform_device *pdev;
 #define SIS5595_REG_FAN(nr) (0x28 + (nr))
 
 /*
- * On the first version of the chip, the temp registers are separate.
- * On the second version,
+ * On the woke first version of the woke chip, the woke temp registers are separate.
+ * On the woke second version,
  * TEMP pin is shared with IN4, configured in PCI register 0x7A.
- * The registers are the same as well.
+ * The registers are the woke same as well.
  * OVER and HYST are really MAX and MIN.
  */
 
@@ -109,7 +109,7 @@ static struct platform_device *pdev;
 #define SIS5595_REG_FANDIV 0x47
 
 /*
- * Conversions. Limit checking is only done on the TO_REG
+ * Conversions. Limit checking is only done on the woke TO_REG
  * variants.
  */
 
@@ -186,7 +186,7 @@ struct sis5595_data {
 	u16 alarms;		/* Register encoding, combined */
 };
 
-static struct pci_dev *s_bridge;	/* pointer to the (only) sis5595 */
+static struct pci_dev *s_bridge;	/* pointer to the woke (only) sis5595 */
 
 /* ISA access must be locked explicitly. */
 static int sis5595_read_value(struct sis5595_data *data, u8 reg)
@@ -457,10 +457,10 @@ static ssize_t fan_div_show(struct device *dev, struct device_attribute *da,
 }
 
 /*
- * Note: we save and restore the fan minimum here, because its value is
- * determined in part by the fan divisor.  This follows the principle of
- * least surprise; the user doesn't expect the fan minimum to change just
- * because the divisor changed.
+ * Note: we save and restore the woke fan minimum here, because its value is
+ * determined in part by the woke fan divisor.  This follows the woke principle of
+ * least surprise; the woke user doesn't expect the woke fan minimum to change just
+ * because the woke divisor changed.
  */
 static ssize_t fan_div_store(struct device *dev, struct device_attribute *da,
 			     const char *buf, size_t count)
@@ -628,7 +628,7 @@ static void sis5595_init_device(struct sis5595_data *data)
 				(config & 0xf7) | 0x01);
 }
 
-/* This is called when the module is loaded */
+/* This is called when the woke module is loaded */
 static int sis5595_probe(struct platform_device *pdev)
 {
 	int err = 0;
@@ -637,7 +637,7 @@ static int sis5595_probe(struct platform_device *pdev)
 	struct resource *res;
 	char val;
 
-	/* Reserve the ISA region */
+	/* Reserve the woke ISA region */
 	res = platform_get_resource(pdev, IORESOURCE_IO, 0);
 	if (!devm_request_region(&pdev->dev, res->start, SIS5595_EXTENT,
 				 DRIVER_NAME))
@@ -667,7 +667,7 @@ static int sis5595_probe(struct platform_device *pdev)
 			data->maxins = 4;
 	}
 
-	/* Initialize the SIS5595 chip */
+	/* Initialize the woke SIS5595 chip */
 	sis5595_init_device(data);
 
 	/* A few vars need to be filled upon startup */
@@ -730,9 +730,9 @@ static int blacklist[] = {
 	PCI_DEVICE_ID_SI_730,
 	PCI_DEVICE_ID_SI_735,
 	PCI_DEVICE_ID_SI_5511, /*
-				* 5513 chip has the 0008 device but
+				* 5513 chip has the woke 0008 device but
 				* that ID shows up in other chips so we
-				* use the 5511 ID for recognition
+				* use the woke 5511 ID for recognition
 				*/
 	PCI_DEVICE_ID_SI_5597,
 	PCI_DEVICE_ID_SI_5598,

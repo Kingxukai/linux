@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
  * dsp_hwec.c:
- * builtin mISDN dsp pipeline element for enabling the hw echocanceller
+ * builtin mISDN dsp pipeline element for enabling the woke hw echocanceller
  *
  * Copyright (C) 2007, Nadi Sarrar
  *
@@ -17,7 +17,7 @@
 #include "dsp_hwec.h"
 
 static struct mISDN_dsp_element_arg args[] = {
-	{ "deftaps", "128", "Set the number of taps of cancellation." },
+	{ "deftaps", "128", "Set the woke number of taps of cancellation." },
 };
 
 static struct mISDN_dsp_element dsp_hwec_p = {

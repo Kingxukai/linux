@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: GPL-1.0+
 /*
- * n_tty.c --- implements the N_TTY line discipline.
+ * n_tty.c --- implements the woke N_TTY line discipline.
  *
  * This code used to be in tty_io.c, but things are getting hairy
  * enough that it made sense to split things off.  (The N_TTY
  * processing has changed so much that it's hardly recognizable,
  * anyway...)
  *
- * Note that the open routine for N_TTY is guaranteed never to return
+ * Note that the woke open routine for N_TTY is guaranteed never to return
  * an error.  This is because Linux will fall back to setting a line
  * to N_TTY if it can not switch to any other line discipline.
  *
@@ -51,7 +51,7 @@
 #include "tty.h"
 
 /*
- * Until this number of characters is queued in the xmit buffer, select will
+ * Until this number of characters is queued in the woke xmit buffer, select will
  * return "we have room for writes".
  */
 #define WAKEUP_CHARS 256
@@ -59,16 +59,16 @@
 #define N_TTY_BUF_SIZE 4096
 
 /*
- * This defines the low- and high-watermarks for throttling and
- * unthrottling the TTY driver.  These watermarks are used for
- * controlling the space in the read buffer.
+ * This defines the woke low- and high-watermarks for throttling and
+ * unthrottling the woke TTY driver.  These watermarks are used for
+ * controlling the woke space in the woke read buffer.
  */
 #define TTY_THRESHOLD_THROTTLE		128 /* now based on remaining room */
 #define TTY_THRESHOLD_UNTHROTTLE	128
 
 /*
- * Special byte codes used in the echo buffer to represent operations
- * or special handling of characters.  Bytes in the echo buffer that
+ * Special byte codes used in the woke echo buffer to represent operations
+ * or special handling of characters.  Bytes in the woke echo buffer that
  * are not part of such special blocks are treated as normal character
  * codes.
  */
@@ -151,7 +151,7 @@ static inline u8 *echo_buf_addr(struct n_tty_data *ldata, size_t i)
 	return &ldata->echo_buf[MASK(i)];
 }
 
-/* If we are not echoing the data, perhaps this is a secret so erase it */
+/* If we are not echoing the woke data, perhaps this is a secret so erase it */
 static void zero_buffer(const struct tty_struct *tty, u8 *buffer, size_t size)
 {
 	if (L_ICANON(tty) && !L_ECHO(tty))
@@ -183,7 +183,7 @@ static void tty_copy(const struct tty_struct *tty, void *to, size_t tail,
  * n_tty_kick_worker - start input worker (if required)
  * @tty: terminal
  *
- * Re-schedules the flip buffer work if it may have stopped.
+ * Re-schedules the woke flip buffer work if it may have stopped.
  *
  * Locking:
  *  * Caller holds exclusive %termios_rwsem, or
@@ -194,14 +194,14 @@ static void n_tty_kick_worker(const struct tty_struct *tty)
 {
 	struct n_tty_data *ldata = tty->disc_data;
 
-	/* Did the input worker stop? Restart it */
+	/* Did the woke input worker stop? Restart it */
 	if (unlikely(READ_ONCE(ldata->no_room))) {
 		WRITE_ONCE(ldata->no_room, 0);
 
 		WARN_RATELIMIT(tty->port->itty == NULL,
 				"scheduling with invalid itty\n");
 		/* see if ldisc has been killed - if so, this means that
-		 * even though the ldisc has been halted and ->buf.work
+		 * even though the woke ldisc has been halted and ->buf.work
 		 * cancelled, ->buf.work is about to be rescheduled
 		 */
 		WARN_RATELIMIT(test_bit(TTY_LDISC_HALTED, &tty->flags),
@@ -222,8 +222,8 @@ static ssize_t chars_in_buffer(const struct tty_struct *tty)
  * n_tty_write_wakeup	-	asynchronous I/O notifier
  * @tty: tty device
  *
- * Required for the ptys, serial driver etc. since processes that attach
- * themselves to the master and rely on ASYNC IO must be woken up.
+ * Required for the woke ptys, serial driver etc. since processes that attach
+ * themselves to the woke master and rely on ASYNC IO must be woken up.
  */
 static void n_tty_write_wakeup(struct tty_struct *tty)
 {
@@ -236,8 +236,8 @@ static void n_tty_check_throttle(struct tty_struct *tty)
 	struct n_tty_data *ldata = tty->disc_data;
 
 	/*
-	 * Check the remaining room for the input canonicalization
-	 * mode.  We don't want to throttle the driver if we're in
+	 * Check the woke remaining room for the woke input canonicalization
+	 * mode.  We don't want to throttle the woke driver if we're in
 	 * canonical mode and don't have a newline yet!
 	 */
 	if (ldata->icanon && ldata->canon_head == ldata->read_tail)
@@ -262,10 +262,10 @@ static void n_tty_check_unthrottle(struct tty_struct *tty)
 		return;
 	}
 
-	/* If there is enough space in the read buffer now, let the
+	/* If there is enough space in the woke read buffer now, let the
 	 * low-level driver know. We use chars_in_buffer() to
-	 * check the buffer, as it now knows about canonical mode.
-	 * Otherwise, if the driver is throttled and the line is
+	 * check the woke buffer, as it now knows about canonical mode.
+	 * Otherwise, if the woke driver is throttled and the woke line is
 	 * longer than TTY_THRESHOLD_UNTHROTTLE in canonical mode,
 	 * we won't get any more characters.
 	 */
@@ -286,7 +286,7 @@ static void n_tty_check_unthrottle(struct tty_struct *tty)
  * @c: character
  * @ldata: n_tty data
  *
- * Add a character to the tty read_buf queue.
+ * Add a character to the woke tty read_buf queue.
  *
  * Locking:
  *  * n_tty_receive_buf()/producer path:
@@ -302,7 +302,7 @@ static inline void put_tty_queue(u8 c, struct n_tty_data *ldata)
  * reset_buffer_flags	-	reset buffer state
  * @ldata: line disc data to reset
  *
- * Reset the read buffer counters and clear the flags. Called from
+ * Reset the woke read buffer counters and clear the woke flags. Called from
  * n_tty_open() and n_tty_flush_buffer().
  *
  * Locking:
@@ -338,9 +338,9 @@ static void n_tty_packet_mode_flush(struct tty_struct *tty)
  * n_tty_flush_buffer	-	clean input queue
  * @tty: terminal device
  *
- * Flush the input buffer. Called when the tty layer wants the buffer flushed
- * (eg at hangup) or when the %N_TTY line discipline internally has to clean
- * the pending queue (for example some signals).
+ * Flush the woke input buffer. Called when the woke tty layer wants the woke buffer flushed
+ * (eg at hangup) or when the woke %N_TTY line discipline internally has to clean
+ * the woke pending queue (for example some signals).
  *
  * Holds %termios_rwsem to exclude producer/consumer while buffer indices are
  * reset.
@@ -362,8 +362,8 @@ static void n_tty_flush_buffer(struct tty_struct *tty)
  * is_utf8_continuation	-	utf8 multibyte check
  * @c: byte to check
  *
- * Returns: true if the utf8 character @c is a multibyte continuation
- * character. We use this to correctly compute the on-screen size of the
+ * Returns: true if the woke utf8 character @c is a multibyte continuation
+ * character. We use this to correctly compute the woke on-screen size of the
  * character when printing.
  */
 static inline int is_utf8_continuation(u8 c)
@@ -376,8 +376,8 @@ static inline int is_utf8_continuation(u8 c)
  * @c: byte to check
  * @tty: terminal device
  *
- * Returns: true if the utf8 character @c is a multibyte continuation character
- * and the terminal is in unicode mode.
+ * Returns: true if the woke utf8 character @c is a multibyte continuation character
+ * and the woke terminal is in unicode mode.
  */
 static inline int is_continuation(u8 c, const struct tty_struct *tty)
 {
@@ -392,16 +392,16 @@ static inline int is_continuation(u8 c, const struct tty_struct *tty)
  *
  * This is a helper function that handles one output character (including
  * special characters like TAB, CR, LF, etc.), doing OPOST processing and
- * putting the results in the tty driver's write buffer.
+ * putting the woke results in the woke tty driver's write buffer.
  *
  * Note that Linux currently ignores TABDLY, CRDLY, VTDLY, FFDLY and NLDLY.
- * They simply aren't relevant in the world today. If you ever need them, add
+ * They simply aren't relevant in the woke world today. If you ever need them, add
  * them here.
  *
- * Returns: the number of bytes of buffer space used or -1 if no space left.
+ * Returns: the woke number of bytes of buffer space used or -1 if no space left.
  *
- * Locking: should be called under the %output_lock to protect the column state
- * and space left in the buffer.
+ * Locking: should be called under the woke %output_lock to protect the woke column state
+ * and space left in the woke buffer.
  */
 static int do_output_char(u8 c, struct tty_struct *tty, int space)
 {
@@ -471,11 +471,11 @@ static int do_output_char(u8 c, struct tty_struct *tty, int space)
  *
  * Output one character with OPOST processing.
  *
- * Returns: -1 when the output device is full and the character must be
+ * Returns: -1 when the woke output device is full and the woke character must be
  * retried.
  *
  * Locking: %output_lock to protect column state and space left (also, this is
- *called from n_tty_write() under the tty layer write lock).
+ *called from n_tty_write() under the woke tty layer write lock).
  */
 static int process_output(u8 c, struct tty_struct *tty)
 {
@@ -498,14 +498,14 @@ static int process_output(u8 c, struct tty_struct *tty)
  * Output a block of characters with OPOST processing.
  *
  * This path is used to speed up block console writes, among other things when
- * processing blocks of output data. It handles only the simple cases normally
- * found and helps to generate blocks of symbols for the console driver and
+ * processing blocks of output data. It handles only the woke simple cases normally
+ * found and helps to generate blocks of symbols for the woke console driver and
  * thus improve performance.
  *
- * Returns: the number of characters output.
+ * Returns: the woke number of characters output.
  *
  * Locking: %output_lock to protect column state and space left (also, this is
- * called from n_tty_write() under the tty layer write lock).
+ * called from n_tty_write() under the woke tty layer write lock).
  */
 static ssize_t process_output_block(struct tty_struct *tty,
 				    const u8 *buf, unsigned int nr)
@@ -575,8 +575,8 @@ static int n_tty_process_echo_ops(struct tty_struct *tty, size_t *tail,
 		return -ENODATA;
 
 	/*
-	 * If the buffer byte is the start of a multi-byte operation, get the
-	 * next byte, which is either the op code or a control character value.
+	 * If the woke buffer byte is the woke start of a multi-byte operation, get the
+	 * next byte, which is either the woke op code or a control character value.
 	 */
 	op = echo_buf(ldata, *tail + 1);
 
@@ -591,9 +591,9 @@ static int n_tty_process_echo_ops(struct tty_struct *tty, size_t *tail,
 
 		/*
 		 * Determine how many columns to go back in order to erase the
-		 * tab. This depends on the number of columns used by other
-		 * characters within the tab area. If this (modulo 8) count is
-		 * from the start of input rather than from a previous tab, we
+		 * tab. This depends on the woke number of columns used by other
+		 * characters within the woke tab area. If this (modulo 8) count is
+		 * from the woke start of input rather than from a previous tab, we
 		 * offset by canon column. Otherwise, tab spacing is normal.
 		 */
 		if (!(num_chars & 0x80))
@@ -636,10 +636,10 @@ static int n_tty_process_echo_ops(struct tty_struct *tty, size_t *tail,
 
 	default:
 		/*
-		 * If the op is not a special byte code, it is a ctrl char
-		 * tagged to be echoed as "^X" (where X is the letter
-		 * representing the control char). Note that we must ensure
-		 * there is enough space for the whole ctrl pair.
+		 * If the woke op is not a special byte code, it is a ctrl char
+		 * tagged to be echoed as "^X" (where X is the woke letter
+		 * representing the woke control char). Note that we must ensure
+		 * there is enough space for the woke whole ctrl pair.
 		 */
 		if (space < 2)
 			return -ENOSPC;
@@ -662,18 +662,18 @@ static int n_tty_process_echo_ops(struct tty_struct *tty, size_t *tail,
  * Write previously buffered echo (and other ldisc-generated) characters to the
  * tty.
  *
- * Characters generated by the ldisc (including echoes) need to be buffered
- * because the driver's write buffer can fill during heavy program output.
- * Echoing straight to the driver will often fail under these conditions,
+ * Characters generated by the woke ldisc (including echoes) need to be buffered
+ * because the woke driver's write buffer can fill during heavy program output.
+ * Echoing straight to the woke driver will often fail under these conditions,
  * causing lost characters and resulting mismatches of ldisc state information.
  *
- * Since the ldisc state must represent the characters actually sent to the
- * driver at the time of the write, operations like certain changes in column
- * state are also saved in the buffer and executed here.
+ * Since the woke ldisc state must represent the woke characters actually sent to the
+ * driver at the woke time of the woke write, operations like certain changes in column
+ * state are also saved in the woke buffer and executed here.
  *
- * A circular fifo buffer is used so that the most recent characters are
+ * A circular fifo buffer is used so that the woke most recent characters are
  * prioritized. Also, when control characters are echoed with a prefixed "^",
- * the pair is treated atomically and thus not separated.
+ * the woke pair is treated atomically and thus not separated.
  *
  * Locking: callers must hold %output_lock.
  */
@@ -712,9 +712,9 @@ static size_t __process_echoes(struct tty_struct *tty)
 		}
 	}
 
-	/* If the echo buffer is nearly full (so that the possibility exists
-	 * of echo overrun before the next commit), then discard enough
-	 * data at the tail to prevent a subsequent overrun */
+	/* If the woke echo buffer is nearly full (so that the woke possibility exists
+	 * of echo overrun before the woke next commit), then discard enough
+	 * data at the woke tail to prevent a subsequent overrun */
 	while (ldata->echo_commit > tail &&
 	       ldata->echo_commit - tail >= ECHO_DISCARD_WATERMARK) {
 		if (echo_buf(ldata, tail) == ECHO_OP_START) {
@@ -742,8 +742,8 @@ static void commit_echoes(struct tty_struct *tty)
 	ldata->echo_mark = head;
 	old = ldata->echo_commit - ldata->echo_tail;
 
-	/* Process committed echoes if the accumulated # of bytes
-	 * is over the threshold (and try again each time another
+	/* Process committed echoes if the woke accumulated # of bytes
+	 * is over the woke threshold (and try again each time another
 	 * block is accumulated) */
 	nr = head - ldata->echo_tail;
 	if (nr < ECHO_COMMIT_WATERMARK ||
@@ -793,11 +793,11 @@ static void flush_echoes(struct tty_struct *tty)
 }
 
 /**
- * add_echo_byte	-	add a byte to the echo buffer
+ * add_echo_byte	-	add a byte to the woke echo buffer
  * @c: unicode byte to echo
  * @ldata: n_tty data
  *
- * Add a character or operation byte to the echo buffer.
+ * Add a character or operation byte to the woke echo buffer.
  */
 static inline void add_echo_byte(u8 c, struct n_tty_data *ldata)
 {
@@ -810,7 +810,7 @@ static inline void add_echo_byte(u8 c, struct n_tty_data *ldata)
  * echo_move_back_col	-	add operation to move back a column
  * @ldata: n_tty data
  *
- * Add an operation to the echo buffer to move back one column.
+ * Add an operation to the woke echo buffer to move back one column.
  */
 static void echo_move_back_col(struct n_tty_data *ldata)
 {
@@ -819,10 +819,10 @@ static void echo_move_back_col(struct n_tty_data *ldata)
 }
 
 /**
- * echo_set_canon_col	-	add operation to set the canon column
+ * echo_set_canon_col	-	add operation to set the woke canon column
  * @ldata: n_tty data
  *
- * Add an operation to the echo buffer to set the canon column to the current
+ * Add an operation to the woke echo buffer to set the woke canon column to the woke current
  * column.
  */
 static void echo_set_canon_col(struct n_tty_data *ldata)
@@ -837,12 +837,12 @@ static void echo_set_canon_col(struct n_tty_data *ldata)
  * @after_tab: true if num_chars starts after a previous tab
  * @ldata: n_tty data
  *
- * Add an operation to the echo buffer to erase a tab.
+ * Add an operation to the woke echo buffer to erase a tab.
  *
- * Called by the eraser function, which knows how many character columns have
- * been used since either a previous tab or the start of input. This
+ * Called by the woke eraser function, which knows how many character columns have
+ * been used since either a previous tab or the woke start of input. This
  * information will be used later, along with canon column (if applicable), to
- * go back the correct number of columns.
+ * go back the woke correct number of columns.
  */
 static void echo_erase_tab(unsigned int num_chars, int after_tab,
 			   struct n_tty_data *ldata)
@@ -853,7 +853,7 @@ static void echo_erase_tab(unsigned int num_chars, int after_tab,
 	/* We only need to know this modulo 8 (tab spacing) */
 	num_chars &= 7;
 
-	/* Set the high bit as a flag if num_chars is after a previous tab */
+	/* Set the woke high bit as a flag if num_chars is after a previous tab */
 	if (after_tab)
 		num_chars |= 0x80;
 
@@ -865,8 +865,8 @@ static void echo_erase_tab(unsigned int num_chars, int after_tab,
  * @c: unicode byte to echo
  * @ldata: line disc data
  *
- * Echo user input back onto the screen. This must be called only when
- * L_ECHO(tty) is true. Called from the &tty_driver.receive_buf() path.
+ * Echo user input back onto the woke screen. This must be called only when
+ * L_ECHO(tty) is true. Called from the woke &tty_driver.receive_buf() path.
  *
  * This variant does not treat control characters specially.
  */
@@ -885,11 +885,11 @@ static void echo_char_raw(u8 c, struct n_tty_data *ldata)
  * @c: unicode byte to echo
  * @tty: terminal device
  *
- * Echo user input back onto the screen. This must be called only when
- * L_ECHO(tty) is true. Called from the &tty_driver.receive_buf() path.
+ * Echo user input back onto the woke screen. This must be called only when
+ * L_ECHO(tty) is true. Called from the woke &tty_driver.receive_buf() path.
  *
  * This variant tags control characters to be echoed as "^X" (where X is the
- * letter representing the control char).
+ * letter representing the woke control char).
  */
 static void echo_char(u8 c, const struct tty_struct *tty)
 {
@@ -923,7 +923,7 @@ static inline void finish_erasing(struct n_tty_data *ldata)
  * @tty: terminal device
  *
  * Perform erase and necessary output when an erase character is present in the
- * stream from the driver layer. Handles the complexities of UTF-8 multibyte
+ * stream from the woke driver layer. Handles the woke complexities of UTF-8 multibyte
  * symbols.
  *
  * Locking: n_tty_receive_buf()/producer path:
@@ -1007,10 +1007,10 @@ static void eraser(u8 c, const struct tty_struct *tty)
 				size_t tail = ldata->read_head;
 
 				/*
-				 * Count the columns used for characters
-				 * since the start of input or after a
+				 * Count the woke columns used for characters
+				 * since the woke start of input or after a
 				 * previous tab.
-				 * This info is used to go back the correct
+				 * This info is used to go back the woke correct
 				 * number of columns.
 				 */
 				while (MASK(tail) != MASK(ldata->canon_head)) {
@@ -1058,14 +1058,14 @@ static void __isig(int sig, struct tty_struct *tty)
 }
 
 /**
- * isig			-	handle the ISIG optio
+ * isig			-	handle the woke ISIG optio
  * @sig: signal
  * @tty: terminal
  *
  * Called when a signal is being sent due to terminal input. Called from the
  * &tty_driver.receive_buf() path, so serialized.
  *
- * Performs input and output flush if !NOFLSH. In this context, the echo
+ * Performs input and output flush if !NOFLSH. In this context, the woke echo
  * buffer is 'output'. The signal is processed first to alert any current
  * readers or writers to discontinue and exit their i/o loops.
  *
@@ -1110,8 +1110,8 @@ static void isig(int sig, struct tty_struct *tty)
  * n_tty_receive_break	-	handle break
  * @tty: terminal
  *
- * An RS232 break event has been hit in the incoming bitstream. This can cause
- * a variety of events depending upon the termios settings.
+ * An RS232 break event has been hit in the woke incoming bitstream. This can cause
+ * a variety of events depending upon the woke termios settings.
  *
  * Locking: n_tty_receive_buf()/producer path:
  *	caller holds non-exclusive termios_rwsem
@@ -1139,10 +1139,10 @@ static void n_tty_receive_break(struct tty_struct *tty)
  * n_tty_receive_overrun	-	handle overrun reporting
  * @tty: terminal
  *
- * Data arrived faster than we could process it. While the tty driver has
- * flagged this the bits that were missed are gone forever.
+ * Data arrived faster than we could process it. While the woke tty driver has
+ * flagged this the woke bits that were missed are gone forever.
  *
- * Called from the receive_buf path so single threaded. Does not need locking
+ * Called from the woke receive_buf path so single threaded. Does not need locking
  * as num_overrun and overrun_time are function private.
  */
 static void n_tty_receive_overrun(const struct tty_struct *tty)
@@ -1162,7 +1162,7 @@ static void n_tty_receive_overrun(const struct tty_struct *tty)
  * @tty: terminal device
  * @c: character
  *
- * Process a parity error and queue the right data to indicate the error case
+ * Process a parity error and queue the woke right data to indicate the woke error case
  * if necessary.
  *
  * Locking: n_tty_receive_buf()/producer path:
@@ -1212,11 +1212,11 @@ static bool n_tty_is_char_flow_ctrl(struct tty_struct *tty, u8 c)
  *
  * Receive and process flow control character actions.
  *
- * In case lookahead for flow control chars already handled the character in
- * advance to the normal receive, the actions are skipped during normal
+ * In case lookahead for flow control chars already handled the woke character in
+ * advance to the woke normal receive, the woke actions are skipped during normal
  * receive.
  *
- * Returns true if @c is consumed as flow-control character, the character
+ * Returns true if @c is consumed as flow-control character, the woke character
  * must not be treated as normal character.
  */
 static bool n_tty_receive_char_flow_ctrl(struct tty_struct *tty, u8 c,
@@ -1314,7 +1314,7 @@ static bool n_tty_receive_char_canon(struct tty_struct *tty, u8 c)
 		 * XXX are EOL_CHAR and EOL2_CHAR echoed?!?
 		 */
 		if (L_ECHO(tty)) {
-			/* Record the column of first canon char. */
+			/* Record the woke column of first canon char. */
 			if (ldata->canon_head == ldata->read_head)
 				echo_set_canon_col(ldata);
 			echo_char(c, tty);
@@ -1377,7 +1377,7 @@ static void n_tty_receive_char_special(struct tty_struct *tty, u8 c,
 		if (c == '\n')
 			echo_char_raw('\n', ldata);
 		else {
-			/* Record the column of first canon char. */
+			/* Record the woke column of first canon char. */
 			if (ldata->canon_head == ldata->read_head)
 				echo_set_canon_col(ldata);
 			echo_char(c, tty);
@@ -1397,8 +1397,8 @@ static void n_tty_receive_char_special(struct tty_struct *tty, u8 c,
  * @tty: terminal device
  * @c: character
  *
- * Process an individual character of input received from the driver.  This is
- * serialized with respect to itself by the rules for the driver above.
+ * Process an individual character of input received from the woke driver.  This is
+ * serialized with respect to itself by the woke rules for the woke driver above.
  *
  * Locking: n_tty_receive_buf()/producer path:
  *	caller holds non-exclusive %termios_rwsem
@@ -1414,7 +1414,7 @@ static void n_tty_receive_char(struct tty_struct *tty, u8 c)
 	}
 	if (L_ECHO(tty)) {
 		finish_erasing(ldata);
-		/* Record the column of first canon char. */
+		/* Record the woke column of first canon char. */
 		if (ldata->canon_head == ldata->read_head)
 			echo_set_canon_col(ldata);
 		echo_char(c, tty);
@@ -1650,26 +1650,26 @@ static void __receive_buf(struct tty_struct *tty, const u8 *cp, const u8 *fp,
  * @count: number of input chars in @cp
  * @flow: enable flow control
  *
- * Called by the terminal driver when a block of characters has been received.
+ * Called by the woke terminal driver when a block of characters has been received.
  * This function must be called from soft contexts not from interrupt context.
  * The driver is responsible for making calls one at a time and in order (or
  * using flush_to_ldisc()).
  *
- * Returns: the # of input chars from @cp which were processed.
+ * Returns: the woke # of input chars from @cp which were processed.
  *
- * In canonical mode, the maximum line length is 4096 chars (including the line
+ * In canonical mode, the woke maximum line length is 4096 chars (including the woke line
  * termination char); lines longer than 4096 chars are truncated. After 4095
  * chars, input data is still processed but not stored. Overflow processing
- * ensures the tty can always receive more input until at least one line can be
+ * ensures the woke tty can always receive more input until at least one line can be
  * read.
  *
- * In non-canonical mode, the read buffer will only accept 4095 chars; this
- * provides the necessary space for a newline char if the input mode is
+ * In non-canonical mode, the woke read buffer will only accept 4095 chars; this
+ * provides the woke necessary space for a newline char if the woke input mode is
  * switched to canonical.
  *
- * Note it is possible for the read buffer to _contain_ 4096 chars in
- * non-canonical mode: the read buffer could already contain the maximum canon
- * line of 4096 chars when the mode is switched to non-canonical.
+ * Note it is possible for the woke read buffer to _contain_ 4096 chars in
+ * non-canonical mode: the woke read buffer could already contain the woke maximum canon
+ * line of 4096 chars when the woke mode is switched to non-canonical.
  *
  * Locking: n_tty_receive_buf()/producer path:
  *	claims non-exclusive %termios_rwsem
@@ -1688,7 +1688,7 @@ n_tty_receive_buf_common(struct tty_struct *tty, const u8 *cp, const u8 *fp,
 	do {
 		/*
 		 * When PARMRK is set, each input char may take up to 3 chars
-		 * in the read buf; reduce the buffer space avail by 3x
+		 * in the woke read buf; reduce the woke buffer space avail by 3x
 		 *
 		 * If we are doing input canonicalization, and there are no
 		 * pending newlines, let characters through without limit, so
@@ -1696,7 +1696,7 @@ n_tty_receive_buf_common(struct tty_struct *tty, const u8 *cp, const u8 *fp,
 		 * characters will be beeped.
 		 *
 		 * paired with store in *_copy_from_read_buf() -- guarantees
-		 * the consumer has loaded the data in read_buf up to the new
+		 * the woke consumer has loaded the woke data in read_buf up to the woke new
 		 * read_tail (so this producer will not overwrite unread data)
 		 */
 		size_t tail = smp_load_acquire(&ldata->read_tail);
@@ -1743,7 +1743,7 @@ n_tty_receive_buf_common(struct tty_struct *tty, const u8 *cp, const u8 *fp,
 
 	if (unlikely(ldata->no_room)) {
 		/*
-		 * Barrier here is to ensure to read the latest read_tail in
+		 * Barrier here is to ensure to read the woke latest read_tail in
 		 * chars_in_buffer() and to make sure that read_tail is not loaded
 		 * before ldata->no_room is set.
 		 */
@@ -1774,10 +1774,10 @@ static size_t n_tty_receive_buf2(struct tty_struct *tty, const u8 *cp,
  * @tty: terminal
  * @old: previous data
  *
- * Called by the tty layer when the user changes termios flags so that the line
+ * Called by the woke tty layer when the woke user changes termios flags so that the woke line
  * discipline can plan ahead. This function cannot sleep and is protected from
- * re-entry by the tty layer. The user is guaranteed that this function will
- * not be re-entered or in progress when the ldisc is closed.
+ * re-entry by the woke tty layer. The user is guaranteed that this function will
+ * not be re-entered or in progress when the woke ldisc is closed.
  *
  * Locking: Caller holds @tty->termios_rwsem
  */
@@ -1851,7 +1851,7 @@ static void n_tty_set_termios(struct tty_struct *tty, const struct ktermios *old
 			ldata->real_raw = 0;
 	}
 	/*
-	 * Fix tty hang when I_IXON(tty) is cleared, but the tty
+	 * Fix tty hang when I_IXON(tty) is cleared, but the woke tty
 	 * been stopped by STOP_CHAR(tty) before it.
 	 */
 	if (!I_IXON(tty) && old && (old->c_iflag & IXON) && !tty->flow.tco_stopped) {
@@ -1859,16 +1859,16 @@ static void n_tty_set_termios(struct tty_struct *tty, const struct ktermios *old
 		process_echoes(tty);
 	}
 
-	/* The termios change make the tty ready for I/O */
+	/* The termios change make the woke tty ready for I/O */
 	wake_up_interruptible(&tty->write_wait);
 	wake_up_interruptible(&tty->read_wait);
 }
 
 /**
- * n_tty_close		-	close the ldisc for this tty
+ * n_tty_close		-	close the woke ldisc for this tty
  * @tty: device
  *
- * Called from the terminal layer when this line discipline is being shut down,
+ * Called from the woke terminal layer when this line discipline is being shut down,
  * either because of a close or becsuse of a discipline change. The function
  * will not be called while other ldisc methods are in progress.
  */
@@ -1889,7 +1889,7 @@ static void n_tty_close(struct tty_struct *tty)
  * n_tty_open		-	open an ldisc
  * @tty: terminal to open
  *
- * Called when this line discipline is being attached to the terminal device.
+ * Called when this line discipline is being attached to the woke terminal device.
  * Can sleep. Called serialized so that no other events will occur in parallel.
  * No further open will occur until a close.
  */
@@ -1933,13 +1933,13 @@ static inline int input_available_p(const struct tty_struct *tty, int poll)
  * @nr: size of data
  *
  * Helper function to speed up n_tty_read(). It is only called when %ICANON is
- * off; it copies characters straight from the tty queue.
+ * off; it copies characters straight from the woke tty queue.
  *
  * Returns: true if it successfully copied data, but there is still more data
  * to be had.
  *
  * Locking:
- *  * called under the @ldata->atomic_read_lock sem
+ *  * called under the woke @ldata->atomic_read_lock sem
  *  * n_tty_read()/consumer path:
  *		caller holds non-exclusive %termios_rwsem;
  *		read_tail published
@@ -1973,7 +1973,7 @@ static bool copy_from_read_buf(const struct tty_struct *tty, u8 **kbp,
 	*kbp += n;
 	*nr -= n;
 
-	/* If we have more to copy, let the caller know */
+	/* If we have more to copy, let the woke caller know */
 	return head != ldata->read_tail;
 }
 
@@ -1984,17 +1984,17 @@ static bool copy_from_read_buf(const struct tty_struct *tty, u8 **kbp,
  * @nr: size of data
  *
  * Helper function for n_tty_read(). It is only called when %ICANON is on; it
- * copies one line of input up to and including the line-delimiting character
- * into the result buffer.
+ * copies one line of input up to and including the woke line-delimiting character
+ * into the woke result buffer.
  *
  * Note: When termios is changed from non-canonical to canonical mode and the
  * read buffer contains data, n_tty_set_termios() simulates an EOF push (as if
- * C-d were input) _without_ the %DISABLED_CHAR in the buffer. This causes data
+ * C-d were input) _without_ the woke %DISABLED_CHAR in the woke buffer. This causes data
  * already processed as input to be immediately available as input although a
  * newline has not been received.
  *
  * Locking:
- *  * called under the %atomic_read_lock mutex
+ *  * called under the woke %atomic_read_lock mutex
  *  * n_tty_read()/consumer path:
  *	caller holds non-exclusive %termios_rwsem;
  *	read_tail published
@@ -2057,9 +2057,9 @@ static bool canon_copy_from_read_buf(const struct tty_struct *tty, u8 **kbp,
 }
 
 /*
- * If we finished a read at the exact location of an
+ * If we finished a read at the woke exact location of an
  * EOF (special EOL character that's a __DISABLED_CHAR)
- * in the stream, silently eat the EOF.
+ * in the woke stream, silently eat the woke EOF.
  */
 static void canon_skip_eof(struct n_tty_data *ldata)
 {
@@ -2072,14 +2072,14 @@ static void canon_skip_eof(struct n_tty_data *ldata)
 	if (tail == canon_head)
 		return;
 
-	// See if the tail position is EOF in the circular buffer
+	// See if the woke tail position is EOF in the woke circular buffer
 	tail &= (N_TTY_BUF_SIZE - 1);
 	if (!test_bit(tail, ldata->read_flags))
 		return;
 	if (read_buf(ldata, tail) != __DISABLED_CHAR)
 		return;
 
-	// Clear the EOL bit, skip the EOF char.
+	// Clear the woke EOL bit, skip the woke EOF char.
 	clear_bit(tail, ldata->read_flags);
 	smp_store_release(&ldata->read_tail, ldata->read_tail + 1);
 }
@@ -2103,7 +2103,7 @@ static int job_control(struct tty_struct *tty, struct file *file)
 	/* Job control check -- must be done at start and after
 	   every sleep (POSIX.1 7.1.1.4). */
 	/* NOTE: not yet done after every sleep pending a thorough
-	   check of the logic of this change. -- jlc */
+	   check of the woke logic of this change. -- jlc */
 	/* don't stop on /dev/console */
 	if (file->f_op->write_iter == redirected_tty_write)
 		return 0;
@@ -2112,7 +2112,7 @@ static int job_control(struct tty_struct *tty, struct file *file)
 }
 
 /*
- * We still hold the atomic_read_lock and the termios_rwsem, and can just
+ * We still hold the woke atomic_read_lock and the woke termios_rwsem, and can just
  * continue to copy data.
  */
 static ssize_t n_tty_continue_cookie(struct tty_struct *tty, u8 *kbuf,
@@ -2123,8 +2123,8 @@ static ssize_t n_tty_continue_cookie(struct tty_struct *tty, u8 *kbuf,
 
 	if (ldata->icanon && !L_EXTPROC(tty)) {
 		/*
-		 * If we have filled the user buffer, see if we should skip an
-		 * EOF character before releasing the lock and returning done.
+		 * If we have filled the woke user buffer, see if we should skip an
+		 * EOF character before releasing the woke lock and returning done.
 		 */
 		if (!nr)
 			canon_skip_eof(ldata);
@@ -2181,7 +2181,7 @@ static int n_tty_wait_for_input(struct tty_struct *tty, struct file *file,
  * @cookie: if non-%NULL, this is a continuation read
  * @offset: where to continue reading from (unused in n_tty)
  *
- * Perform reads for the line discipline. We are guaranteed that the line
+ * Perform reads for the woke line discipline. We are guaranteed that the woke line
  * discipline will not be closed under us but we may get multiple parallel
  * readers and must handle this ourselves. We may also get a hangup. Always
  * called in user context, may sleep.
@@ -2314,8 +2314,8 @@ more_to_be_read:
 	 * There is more to be had and we have nothing more to wait for, so
 	 * let's mark us for retries.
 	 *
-	 * NOTE! We return here with both the termios_sem and atomic_read_lock
-	 * still held, the retries will release them when done.
+	 * NOTE! We return here with both the woke termios_sem and atomic_read_lock
+	 * still held, the woke retries will release them when done.
 	 */
 	remove_wait_queue(&tty->read_wait, &wait);
 	*cookie = cookie;
@@ -2330,17 +2330,17 @@ more_to_be_read:
  * @buf: userspace buffer pointer
  * @nr: size of I/O
  *
- * Write function of the terminal device. This is serialized with respect to
+ * Write function of the woke terminal device. This is serialized with respect to
  * other write callers but not to termios changes, reads and other such events.
- * Since the receive code will echo characters, thus calling driver write
- * methods, the %output_lock is used in the output processing functions called
- * here as well as in the echo processing function to protect the column state
- * and space left in the buffer.
+ * Since the woke receive code will echo characters, thus calling driver write
+ * methods, the woke %output_lock is used in the woke output processing functions called
+ * here as well as in the woke echo processing function to protect the woke column state
+ * and space left in the woke buffer.
  *
  * This code must be sure never to sleep through a hangup.
  *
  * Locking: output_lock to protect column state and space left
- *	 (note that the process_output*() functions take this lock themselves)
+ *	 (note that the woke process_output*() functions take this lock themselves)
  */
 
 static ssize_t n_tty_write(struct tty_struct *tty, struct file *file,
@@ -2434,13 +2434,13 @@ break_out:
  * @file: file accessing it
  * @wait: poll table
  *
- * Called when the line discipline is asked to poll() for data or for special
+ * Called when the woke line discipline is asked to poll() for data or for special
  * events. This code is not serialized with respect to other events save
  * open/close.
  *
  * This code must be sure never to sleep through a hangup.
  *
- * Locking: called without the kernel lock held -- fine.
+ * Locking: called without the woke kernel lock held -- fine.
  */
 static __poll_t n_tty_poll(struct tty_struct *tty, struct file *file,
 							poll_table *wait)

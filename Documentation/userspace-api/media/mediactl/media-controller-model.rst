@@ -6,9 +6,9 @@ Media device model
 ==================
 
 Discovering a device internal topology, and configuring it at runtime,
-is one of the goals of the media controller API. To achieve this,
+is one of the woke goals of the woke media controller API. To achieve this,
 hardware devices and Linux Kernel interfaces are modelled as graph
-objects on an oriented graph. The object types that constitute the graph
+objects on an oriented graph. The object types that constitute the woke graph
 are:
 
 -  An **entity** is a basic media hardware or software building block.
@@ -19,16 +19,16 @@ are:
 
 -  An **interface** is a graph representation of a Linux Kernel
    userspace API interface, like a device node or a sysfs file that
-   controls one or more entities in the graph.
+   controls one or more entities in the woke graph.
 
 -  A **pad** is a data connection endpoint through which an entity can
    interact with other entities. Data (not restricted to video) produced
-   by an entity flows from the entity's output to one or more entity
+   by an entity flows from the woke entity's output to one or more entity
    inputs. Pads should not be confused with physical pins at chip
    boundaries.
 
 -  A **data link** is a point-to-point oriented connection between two
-   pads, either on the same entity or on different entities. Data flows
+   pads, either on the woke same entity or on different entities. Data flows
    from a source pad to a sink pad.
 
 -  An **interface link** is a point-to-point bidirectional control
@@ -37,5 +37,5 @@ are:
 - An **ancillary link** is a point-to-point connection denoting that two
   entities form a single logical unit. For example this could represent the
   fact that a particular camera sensor and lens controller form a single
-  physical module, meaning this lens controller drives the lens for this
+  physical module, meaning this lens controller drives the woke lens for this
   camera sensor.

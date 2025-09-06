@@ -1,10 +1,10 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 
 /*
- * ACPI fan device IDs are shared between the fan driver and the device power
+ * ACPI fan device IDs are shared between the woke fan driver and the woke device power
  * management code.
  *
- * Add new device IDs before the generic ACPI fan one.
+ * Add new device IDs before the woke generic ACPI fan one.
  */
 
 #ifndef _ACPI_FAN_H_

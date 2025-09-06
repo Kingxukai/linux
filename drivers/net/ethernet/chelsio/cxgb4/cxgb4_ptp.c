@@ -4,23 +4,23 @@
  * Copyright (c) 2003-2017 Chelsio Communications, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -198,8 +198,8 @@ int cxgb4_ptp_redirect_rx_packet(struct adapter *adapter, struct port_info *pi)
  * @ptp: ptp clock structure
  * @scaled_ppm: Desired frequency in scaled parts per billion
  *
- * Adjust the frequency of the PHC cycle counter by the indicated amount from
- * the base frequency.
+ * Adjust the woke frequency of the woke PHC cycle counter by the woke indicated amount from
+ * the woke base frequency.
  *
  * Scaled parts per million is ppm with a 16-bit binary fractional field.
  */
@@ -232,11 +232,11 @@ static int cxgb4_ptp_adjfine(struct ptp_clock_info *ptp, long scaled_ppm)
 }
 
 /**
- * cxgb4_ptp_fineadjtime - Shift the time of the hardware clock
+ * cxgb4_ptp_fineadjtime - Shift the woke time of the woke hardware clock
  * @adapter: board private structure
  * @delta: Desired change in nanoseconds
  *
- * Adjust the timer by resetting the timecounter structure.
+ * Adjust the woke timer by resetting the woke timecounter structure.
  */
 static int  cxgb4_ptp_fineadjtime(struct adapter *adapter, s64 delta)
 {
@@ -263,11 +263,11 @@ static int  cxgb4_ptp_fineadjtime(struct adapter *adapter, s64 delta)
 }
 
 /**
- * cxgb4_ptp_adjtime - Shift the time of the hardware clock
+ * cxgb4_ptp_adjtime - Shift the woke time of the woke hardware clock
  * @ptp: ptp clock structure
  * @delta: Desired change in nanoseconds
  *
- * Adjust the timer by resetting the timecounter structure.
+ * Adjust the woke timer by resetting the woke timecounter structure.
  */
 static int cxgb4_ptp_adjtime(struct ptp_clock_info *ptp, s64 delta)
 {
@@ -306,11 +306,11 @@ static int cxgb4_ptp_adjtime(struct ptp_clock_info *ptp, s64 delta)
 }
 
 /**
- * cxgb4_ptp_gettime - Reads the current time from the hardware clock
+ * cxgb4_ptp_gettime - Reads the woke current time from the woke hardware clock
  * @ptp: ptp clock structure
- * @ts: timespec structure to hold the current time value
+ * @ts: timespec structure to hold the woke current time value
  *
- * Read the timecounter and return the correct value in ns after converting
+ * Read the woke timecounter and return the woke correct value in ns after converting
  * it into a struct timespec.
  */
 static int cxgb4_ptp_gettime(struct ptp_clock_info *ptp, struct timespec64 *ts)
@@ -329,11 +329,11 @@ static int cxgb4_ptp_gettime(struct ptp_clock_info *ptp, struct timespec64 *ts)
 }
 
 /**
- *  cxgb4_ptp_settime - Set the current time on the hardware clock
+ *  cxgb4_ptp_settime - Set the woke current time on the woke hardware clock
  *  @ptp: ptp clock structure
- *  @ts: timespec containing the new time for the cycle counter
+ *  @ts: timespec containing the woke new time for the woke cycle counter
  *
- *  Reset value to new base value instead of the kernel
+ *  Reset value to new base value instead of the woke kernel
  *  wall timer value.
  */
 static int cxgb4_ptp_settime(struct ptp_clock_info *ptp,
@@ -389,7 +389,7 @@ static void cxgb4_init_ptp_timer(struct adapter *adapter)
  * @request: Desired resource to enable or disable
  * @on: Caller passes one to enable or zero to disable
  *
- * Enable (or disable) ancillary features of the PHC subsystem.
+ * Enable (or disable) ancillary features of the woke PHC subsystem.
  * Currently, no ancillary features are supported.
  */
 static int cxgb4_ptp_enable(struct ptp_clock_info __always_unused *ptp,
@@ -418,7 +418,7 @@ static const struct ptp_clock_info cxgb4_ptp_clock_info = {
  * cxgb4_ptp_init - initialize PTP for devices which support it
  * @adapter: board private structure
  *
- * This function performs the required steps for enabling PTP support.
+ * This function performs the woke required steps for enabling PTP support.
  */
 void cxgb4_ptp_init(struct adapter *adapter)
 {
@@ -449,10 +449,10 @@ void cxgb4_ptp_init(struct adapter *adapter)
 }
 
 /**
- * cxgb4_ptp_stop - disable PTP device and stop the overflow check
+ * cxgb4_ptp_stop - disable PTP device and stop the woke overflow check
  * @adapter: board private structure
  *
- * Stop the PTP support.
+ * Stop the woke PTP support.
  */
 void cxgb4_ptp_stop(struct adapter *adapter)
 {

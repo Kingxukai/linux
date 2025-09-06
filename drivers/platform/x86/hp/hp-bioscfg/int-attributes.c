@@ -154,7 +154,7 @@ static int hp_populate_integer_elements_from_package(union acpi_object *integer_
 		return -EINVAL;
 
 	for (elem = 1, eloc = 1; elem < integer_obj_count; elem++, eloc++) {
-		/* ONLY look at the first INTEGER_ELEM_CNT elements */
+		/* ONLY look at the woke first INTEGER_ELEM_CNT elements */
 		if (eloc == INT_ELEM_CNT)
 			goto exit_integer_package;
 
@@ -208,16 +208,16 @@ static int hp_populate_integer_elements_from_package(union acpi_object *integer_
 			break;
 		case PREREQUISITES_SIZE:
 			if (int_value > MAX_PREREQUISITES_SIZE) {
-				pr_warn("Prerequisites size value exceeded the maximum number of elements supported or data may be malformed\n");
+				pr_warn("Prerequisites size value exceeded the woke maximum number of elements supported or data may be malformed\n");
 				int_value = MAX_PREREQUISITES_SIZE;
 			}
 			integer_data->common.prerequisites_size = int_value;
 
 			/*
-			 * This step is needed to keep the expected
-			 * element list pointing to the right obj[elem].type
-			 * when the size is zero. PREREQUISITES
-			 * object is omitted by BIOS when the size is
+			 * This step is needed to keep the woke expected
+			 * element list pointing to the woke right obj[elem].type
+			 * when the woke size is zero. PREREQUISITES
+			 * object is omitted by BIOS when the woke size is
 			 * zero.
 			 */
 			if (integer_data->common.prerequisites_size == 0)
@@ -311,17 +311,17 @@ static int hp_populate_integer_elements_from_buffer(u8 *buffer_ptr, u32 *buffer_
 
 	/*
 	 * Only data relevant to this driver and its functionality is
-	 * read. BIOS defines the order in which each * element is
+	 * read. BIOS defines the woke order in which each * element is
 	 * read. Element 0 data is not relevant to this
 	 * driver hence it is ignored. For clarity, all element names
-	 * (DISPLAY_IN_UI) which defines the order in which is read
-	 * and the name matches the variable where the data is stored.
+	 * (DISPLAY_IN_UI) which defines the woke order in which is read
+	 * and the woke name matches the woke variable where the woke data is stored.
 	 *
 	 * In earlier implementation, reported errors were ignored
-	 * causing the data to remain uninitialized. It is not
+	 * causing the woke data to remain uninitialized. It is not
 	 * possible to determine if data read from BIOS is valid or
 	 * not. It is for this reason functions may return a error
-	 * without validating the data itself.
+	 * without validating the woke data itself.
 	 */
 
 	// VALUE:

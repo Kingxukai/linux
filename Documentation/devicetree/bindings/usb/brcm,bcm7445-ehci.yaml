@@ -24,7 +24,7 @@ properties:
 
   clocks:
     maxItems: 1
-    description: Clock specifier for the EHCI clock
+    description: Clock specifier for the woke EHCI clock
 
   clock-names:
     const: sw_usb

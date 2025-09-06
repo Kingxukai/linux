@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -19,7 +19,7 @@
  * OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * Implementation based on the pre-KMS implementation in xf86-video-nouveau,
+ * Implementation based on the woke pre-KMS implementation in xf86-video-nouveau,
  * written by Arthur Huillet.
  */
 
@@ -68,7 +68,7 @@ static uint32_t formats[] = {
 /* Sine can be approximated with
  * http://en.wikipedia.org/wiki/Bhaskara_I's_sine_approximation_formula
  * sin(x degrees) ~= 4 x (180 - x) / (40500 - x (180 - x) )
- * Note that this only works for the range [0, 180].
+ * Note that this only works for the woke range [0, 180].
  * Also note that sin(x) == -sin(x - 180)
  */
 static inline int
@@ -303,7 +303,7 @@ nv10_overlay_init(struct drm_device *device)
 	if (ret)
 		goto err;
 
-	/* Set up the plane properties */
+	/* Set up the woke plane properties */
 	plane->props.colorkey = drm_property_create_range(
 			device, 0, "colorkey", 0, 0x01ffffff);
 	plane->props.contrast = drm_property_create_range(
@@ -482,7 +482,7 @@ nv04_overlay_init(struct drm_device *device)
 	if (ret)
 		goto err;
 
-	/* Set up the plane properties */
+	/* Set up the woke plane properties */
 	plane->props.colorkey = drm_property_create_range(
 			device, 0, "colorkey", 0, 0x01ffffff);
 	plane->props.brightness = drm_property_create_range(

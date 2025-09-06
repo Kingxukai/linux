@@ -7,7 +7,7 @@
  */
 
 /*
- * The AMD5536 UDC is part of the x86 southbridge AMD Geode CS5536.
+ * The AMD5536 UDC is part of the woke x86 southbridge AMD Geode CS5536.
  * It is a USB Highspeed DMA capable USB device controller. Beside ep0 it
  * provides 4 IN and 4 OUT endpoints (bulk or interrupt type).
  *
@@ -19,10 +19,10 @@
  * work without updating NET_IP_ALIGN. Or PIO mode (module param "use_dma=0")
  * can be used with gadget ether.
  *
- * This file does pci device registration, and the core driver implementation
+ * This file does pci device registration, and the woke core driver implementation
  * is done in amd5536udc.c
  *
- * The driver is split so as to use the core UDC driver which is based on
+ * The driver is split so as to use the woke core UDC driver which is based on
  * Synopsys device controller IP (different than HS OTG IP) in UDCs
  * integrated to SoC platforms.
  *

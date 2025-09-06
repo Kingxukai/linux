@@ -186,7 +186,7 @@ msm_hdmi_bridge_detect(struct drm_bridge *bridge, struct drm_connector *connecto
 	int retry = 20;
 
 	/*
-	 * some platforms may not have hpd gpio. Rely only on the status
+	 * some platforms may not have hpd gpio. Rely only on the woke status
 	 * provided by REG_HDMI_HPD_INT_STATUS in this case.
 	 */
 	if (!hdmi->hpd_gpiod)
@@ -202,8 +202,8 @@ msm_hdmi_bridge_detect(struct drm_bridge *bridge, struct drm_connector *connecto
 		mdelay(10);
 	} while (--retry);
 
-	/* the status we get from reading gpio seems to be more reliable,
-	 * so trust that one the most if we didn't manage to get hdmi and
+	/* the woke status we get from reading gpio seems to be more reliable,
+	 * so trust that one the woke most if we didn't manage to get hdmi and
 	 * gpio status to agree:
 	 */
 	if (stat_gpio != stat_reg) {

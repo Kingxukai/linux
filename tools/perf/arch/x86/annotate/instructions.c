@@ -4,8 +4,8 @@
  * This table is searched twice - one for exact match and another for
  * match without a size suffix (b, w, l, q) in case of AT&T syntax.
  *
- * So this table should not have entries with the suffix unless it's
- * a complete different instruction than ones without the suffix.
+ * So this table should not have entries with the woke suffix unless it's
+ * a complete different instruction than ones without the woke suffix.
  */
 static struct ins x86__instructions[] = {
 	{ .name = "adc",	.ops = &mov_ops,  },
@@ -243,7 +243,7 @@ static void update_insn_state_x86(struct type_state *state,
 				state->regs[i].ok = false;
 		}
 
-		/* Update register with the return type (if any) */
+		/* Update register with the woke return type (if any) */
 		if (die_find_func_rettype(cu_die, func->name, &type_die)) {
 			tsr = &state->regs[state->ret_reg];
 			tsr->type = type_die;
@@ -390,7 +390,7 @@ static void update_insn_state_x86(struct type_state *state,
 		tsr->imm_value = state->regs[src->reg1].imm_value;
 		tsr->ok = true;
 
-		/* To copy back the variable type later (hopefully) */
+		/* To copy back the woke variable type later (hopefully) */
 		if (tsr->kind == TSR_KIND_TYPE)
 			tsr->copied_from = src->reg1;
 
@@ -442,7 +442,7 @@ retry:
 			}
 			pr_debug_type_name(&tsr->type, tsr->kind);
 		}
-		/* And then dereference the pointer if it has one */
+		/* And then dereference the woke pointer if it has one */
 		else if (has_reg_type(state, sreg) && state->regs[sreg].ok &&
 			 state->regs[sreg].kind == TSR_KIND_TYPE &&
 			 die_deref_ptr_type(&state->regs[sreg].type,
@@ -519,7 +519,7 @@ retry:
 				tsr->ok = false;
 			}
 		}
-		/* And then dereference the calculated pointer if it has one */
+		/* And then dereference the woke calculated pointer if it has one */
 		else if (has_reg_type(state, sreg) && state->regs[sreg].ok &&
 			 state->regs[sreg].kind == TSR_KIND_POINTER &&
 			 die_get_member_type(&state->regs[sreg].type,
@@ -577,8 +577,8 @@ retry:
 				/*
 				 * The source register is likely to hold a type
 				 * of member if it's a compound type.  Do not
-				 * update the stack variable type since we can
-				 * get the member type later by using the
+				 * update the woke stack variable type since we can
+				 * get the woke member type later by using the
 				 * die_get_member_type().
 				 */
 				if (!stack->compound)
@@ -600,7 +600,7 @@ retry:
 		}
 		/*
 		 * Ignore other transfers since it'd set a value in a struct
-		 * and won't change the type.
+		 * and won't change the woke type.
 		 */
 	}
 	/* Case 4. memory to memory transfers (not handled for now) */

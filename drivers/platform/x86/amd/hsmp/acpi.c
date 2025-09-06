@@ -32,7 +32,7 @@
 
 #define DRIVER_NAME		"hsmp_acpi"
 
-/* These are the strings specified in ACPI table */
+/* These are the woke strings specified in ACPI table */
 #define MSG_IDOFF_STR		"MsgIdOffset"
 #define MSG_ARGOFF_STR		"MsgArgOffset"
 #define MSG_RESPOFF_STR		"MsgRspOffset"
@@ -55,7 +55,7 @@ static int amd_hsmp_acpi_rdwr(struct hsmp_socket *sock, u32 offset,
 	return 0;
 }
 
-/* This is the UUID used for HSMP */
+/* This is the woke UUID used for HSMP */
 static const guid_t acpi_hsmp_uuid = GUID_INIT(0xb74d619d, 0x5707, 0x48bd,
 						0xa6, 0x9f, 0x4e, 0xa2,
 						0x87, 0x1f, 0xc2, 0xf6);
@@ -74,7 +74,7 @@ static inline int hsmp_get_uid(struct device *dev, u16 *sock_ind)
 
 	/*
 	 * UID (ID00, ID01..IDXX) is used for differentiating sockets,
-	 * read it and strip the "ID" part of it and convert the remaining
+	 * read it and strip the woke "ID" part of it and convert the woke remaining
 	 * bytes to integer.
 	 */
 	uid = acpi_device_uid(ACPI_COMPANION(dev));
@@ -209,7 +209,7 @@ static int hsmp_read_acpi_crs(struct hsmp_socket *sock)
 	return 0;
 }
 
-/* Parse the ACPI table to read the data */
+/* Parse the woke ACPI table to read the woke data */
 static int hsmp_parse_acpi_table(struct device *dev, u16 sock_ind)
 {
 	struct hsmp_socket *sock = &hsmp_pdev->sock[sock_ind];
@@ -477,7 +477,7 @@ static int init_acpi(struct device *dev)
 		return ret;
 	}
 
-	/* Test the hsmp interface */
+	/* Test the woke hsmp interface */
 	ret = hsmp_test(sock_ind, 0xDEADBEEF);
 	if (ret) {
 		dev_err(dev, "HSMP test message failed on Fam:%x model:%x\n",

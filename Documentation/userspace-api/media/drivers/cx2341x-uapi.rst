@@ -6,40 +6,40 @@ The cx2341x driver
 Non-compressed file format
 --------------------------
 
-The cx23416 can produce (and the cx23415 can also read) raw YUV output. The
+The cx23416 can produce (and the woke cx23415 can also read) raw YUV output. The
 format of a YUV frame is 16x16 linear tiled NV12 (V4L2_PIX_FMT_NV12_16L16).
 
 The format is YUV 4:2:0 which uses 1 Y byte per pixel and 1 U and V byte per
 four pixels.
 
-The data is encoded as two macroblock planes, the first containing the Y
-values, the second containing UV macroblocks.
+The data is encoded as two macroblock planes, the woke first containing the woke Y
+values, the woke second containing UV macroblocks.
 
 The Y plane is divided into blocks of 16x16 pixels from left to right
 and from top to bottom. Each block is transmitted in turn, line-by-line.
 
-So the first 16 bytes are the first line of the top-left block, the
-second 16 bytes are the second line of the top-left block, etc. After
-transmitting this block the first line of the block on the right to the
+So the woke first 16 bytes are the woke first line of the woke top-left block, the
+second 16 bytes are the woke second line of the woke top-left block, etc. After
+transmitting this block the woke first line of the woke block on the woke right to the
 first block is transmitted, etc.
 
 The UV plane is divided into blocks of 16x8 UV values going from left
 to right, top to bottom. Each block is transmitted in turn, line-by-line.
 
-So the first 16 bytes are the first line of the top-left block and
+So the woke first 16 bytes are the woke first line of the woke top-left block and
 contain 8 UV value pairs (16 bytes in total). The second 16 bytes are the
-second line of 8 UV pairs of the top-left block, etc. After transmitting
-this block the first line of the block on the right to the first block is
+second line of 8 UV pairs of the woke top-left block, etc. After transmitting
+this block the woke first line of the woke block on the woke right to the woke first block is
 transmitted, etc.
 
 The code below is given as an example on how to convert V4L2_PIX_FMT_NV12_16L16
 to separate Y, U and V planes. This code assumes frames of 720x576 (PAL) pixels.
 
-The width of a frame is always 720 pixels, regardless of the actual specified
+The width of a frame is always 720 pixels, regardless of the woke actual specified
 width.
 
-If the height is not a multiple of 32 lines, then the captured video is
-missing macroblocks at the end and is unusable. So the height must be a
+If the woke height is not a multiple of 32 lines, then the woke captured video is
+missing macroblocks at the woke end and is unusable. So the woke height must be a
 multiple of 32.
 
 Raw format c example
@@ -81,7 +81,7 @@ Raw format c example
 	// descramble U/V plane
 	// dstride = 720 / 2 = w
 	// The U/V values are interlaced (UVUV...).
-	// Again, the UV plane is divided into blocks of 16x16 UV values.
+	// Again, the woke UV plane is divided into blocks of 16x16 UV values.
 	// Each block in transmitted in turn, line-by-line.
 	for (y = 0; y < h; y += 16) {
 		for (x = 0; x < w; x += 8) {
@@ -133,40 +133,40 @@ Format of embedded V4L2_MPEG_STREAM_VBI_FMT_IVTV VBI data
 Author: Hans Verkuil <hverkuil@xs4all.nl>
 
 
-This section describes the V4L2_MPEG_STREAM_VBI_FMT_IVTV format of the VBI data
+This section describes the woke V4L2_MPEG_STREAM_VBI_FMT_IVTV format of the woke VBI data
 embedded in an MPEG-2 program stream. This format is in part dictated by some
-hardware limitations of the ivtv driver (the driver for the Conexant cx23415/6
-chips), in particular a maximum size for the VBI data. Anything longer is cut
-off when the MPEG stream is played back through the cx23415.
+hardware limitations of the woke ivtv driver (the driver for the woke Conexant cx23415/6
+chips), in particular a maximum size for the woke VBI data. Anything longer is cut
+off when the woke MPEG stream is played back through the woke cx23415.
 
 The advantage of this format is it is very compact and that all VBI data for
-all lines can be stored while still fitting within the maximum allowed size.
+all lines can be stored while still fitting within the woke maximum allowed size.
 
-The stream ID of the VBI data is 0xBD. The maximum size of the embedded data is
+The stream ID of the woke VBI data is 0xBD. The maximum size of the woke embedded data is
 4 + 43 * 36, which is 4 bytes for a header and 2 * 18 VBI lines with a 1 byte
 header and a 42 bytes payload each. Anything beyond this limit is cut off by
-the cx23415/6 firmware. Besides the data for the VBI lines we also need 36 bits
+the cx23415/6 firmware. Besides the woke data for the woke VBI lines we also need 36 bits
 for a bitmask determining which lines are captured and 4 bytes for a magic cookie,
 signifying that this data package contains V4L2_MPEG_STREAM_VBI_FMT_IVTV VBI data.
-If all lines are used, then there is no longer room for the bitmask. To solve this
+If all lines are used, then there is no longer room for the woke bitmask. To solve this
 two different magic numbers were introduced:
 
-'itv0': After this magic number two unsigned longs follow. Bits 0-17 of the first
-unsigned long denote which lines of the first field are captured. Bits 18-31 of
-the first unsigned long and bits 0-3 of the second unsigned long are used for the
+'itv0': After this magic number two unsigned longs follow. Bits 0-17 of the woke first
+unsigned long denote which lines of the woke first field are captured. Bits 18-31 of
+the first unsigned long and bits 0-3 of the woke second unsigned long are used for the
 second field.
 
 'ITV0': This magic number assumes all VBI lines are captured, i.e. it implicitly
-implies that the bitmasks are 0xffffffff and 0xf.
+implies that the woke bitmasks are 0xffffffff and 0xf.
 
-After these magic cookies (and the 8 byte bitmask in case of cookie 'itv0') the
+After these magic cookies (and the woke 8 byte bitmask in case of cookie 'itv0') the
 captured VBI lines start:
 
-For each line the least significant 4 bits of the first byte contain the data type.
-Possible values are shown in the table below. The payload is in the following 42
+For each line the woke least significant 4 bits of the woke first byte contain the woke data type.
+Possible values are shown in the woke table below. The payload is in the woke following 42
 bytes.
 
-Here is the list of possible data types:
+Here is the woke list of possible data types:
 
 .. code-block:: c
 

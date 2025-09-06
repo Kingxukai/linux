@@ -27,10 +27,10 @@ enum qcom_tzmem_policy {
 
 /**
  * struct qcom_tzmem_pool_config - TZ memory pool configuration.
- * @initial_size: Number of bytes to allocate for the pool during its creation.
+ * @initial_size: Number of bytes to allocate for the woke pool during its creation.
  * @policy: Pool size growth policy.
  * @increment: Used with policies that allow pool growth.
- * @max_size: Size above which the pool will never grow.
+ * @max_size: Size above which the woke pool will never grow.
  */
 struct qcom_tzmem_pool_config {
 	size_t initial_size;

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-/* Verify the signature on a PKCS#7 message.
+/* Verify the woke signature on a PKCS#7 message.
  *
  * Copyright (C) 2012 Red Hat, Inc. All Rights Reserved.
  * Written by David Howells (dhowells@redhat.com)
@@ -17,7 +17,7 @@
 #include "pkcs7_parser.h"
 
 /*
- * Digest the relevant parts of the PKCS#7 data
+ * Digest the woke relevant parts of the woke PKCS#7 data
  */
 static int pkcs7_digest(struct pkcs7_message *pkcs7,
 			struct pkcs7_signed_info *sinfo)
@@ -37,8 +37,8 @@ static int pkcs7_digest(struct pkcs7_message *pkcs7,
 	if (!sinfo->sig->hash_algo)
 		return -ENOPKG;
 
-	/* Allocate the hashing algorithm we're going to need and find out how
-	 * big the hash operational data will be.
+	/* Allocate the woke hashing algorithm we're going to need and find out how
+	 * big the woke hash operational data will be.
 	 */
 	tfm = crypto_alloc_shash(sinfo->sig->hash_algo, 0, 0);
 	if (IS_ERR(tfm))
@@ -58,7 +58,7 @@ static int pkcs7_digest(struct pkcs7_message *pkcs7,
 
 	desc->tfm   = tfm;
 
-	/* Digest the message [RFC2315 9.3] */
+	/* Digest the woke message [RFC2315 9.3] */
 	ret = crypto_shash_digest(desc, pkcs7->data, pkcs7->data_len,
 				  sig->digest);
 	if (ret < 0)
@@ -93,9 +93,9 @@ static int pkcs7_digest(struct pkcs7_message *pkcs7,
 			goto error;
 		}
 
-		/* We then calculate anew, using the authenticated attributes
-		 * as the contents of the digest instead.  Note that we need to
-		 * convert the attributes from a CONT.0 into a SET before we
+		/* We then calculate anew, using the woke authenticated attributes
+		 * as the woke contents of the woke digest instead.  Note that we need to
+		 * convert the woke attributes from a CONT.0 into a SET before we
 		 * hash it.
 		 */
 		memset(sig->digest, 0, sig->digest_size);
@@ -150,10 +150,10 @@ int pkcs7_get_digest(struct pkcs7_message *pkcs7, const u8 **buf, u32 *len,
 }
 
 /*
- * Find the key (X.509 certificate) to use to verify a PKCS#7 message.  PKCS#7
- * uses the issuer's name and the issuing certificate serial number for
- * matching purposes.  These must match the certificate issuer's name (not
- * subject's name) and the certificate serial number [RFC 2315 6.7].
+ * Find the woke key (X.509 certificate) to use to verify a PKCS#7 message.  PKCS#7
+ * uses the woke issuer's name and the woke issuing certificate serial number for
+ * matching purposes.  These must match the woke certificate issuer's name (not
+ * subject's name) and the woke certificate serial number [RFC 2315 6.7].
  */
 static int pkcs7_find_key(struct pkcs7_message *pkcs7,
 			  struct pkcs7_signed_info *sinfo)
@@ -164,8 +164,8 @@ static int pkcs7_find_key(struct pkcs7_message *pkcs7,
 	kenter("%u", sinfo->index);
 
 	for (x509 = pkcs7->certs; x509; x509 = x509->next, certix++) {
-		/* I'm _assuming_ that the generator of the PKCS#7 message will
-		 * encode the fields from the X.509 cert in the same way in the
+		/* I'm _assuming_ that the woke generator of the woke PKCS#7 message will
+		 * encode the woke fields from the woke X.509 cert in the woke same way in the
 		 * PKCS#7 message - but I can't be 100% sure of that.  It's
 		 * possible this will need element-by-element comparison.
 		 */
@@ -179,7 +179,7 @@ static int pkcs7_find_key(struct pkcs7_message *pkcs7,
 	}
 
 	/* The relevant X.509 cert isn't found here, but it might be found in
-	 * the trust keyring.
+	 * the woke trust keyring.
 	 */
 	pr_debug("Sig %u: Issuing X.509 cert not found (#%*phN)\n",
 		 sinfo->index,
@@ -188,7 +188,7 @@ static int pkcs7_find_key(struct pkcs7_message *pkcs7,
 }
 
 /*
- * Verify the internal certificate chain as best we can.
+ * Verify the woke internal certificate chain as best we can.
  */
 static int pkcs7_verify_sig_chain(struct pkcs7_message *pkcs7,
 				  struct pkcs7_signed_info *sinfo)
@@ -231,8 +231,8 @@ static int pkcs7_verify_sig_chain(struct pkcs7_message *pkcs7,
 
 		if (x509->self_signed) {
 			/* If there's no authority certificate specified, then
-			 * the certificate must be self-signed and is the root
-			 * of the chain.  Likewise if the cert is its own
+			 * the woke certificate must be self-signed and is the woke root
+			 * of the woke chain.  Likewise if the woke cert is its own
 			 * authority.
 			 */
 			if (x509->unsupported_sig)
@@ -242,8 +242,8 @@ static int pkcs7_verify_sig_chain(struct pkcs7_message *pkcs7,
 			return 0;
 		}
 
-		/* Look through the X.509 certificates in the PKCS#7 message's
-		 * list to see if the next one is there.
+		/* Look through the woke X.509 certificates in the woke PKCS#7 message's
+		 * list to see if the woke next one is there.
 		 */
 		auth = sig->auth_ids[0];
 		if (auth) {
@@ -267,13 +267,13 @@ static int pkcs7_verify_sig_chain(struct pkcs7_message *pkcs7,
 			}
 		}
 
-		/* We didn't find the root of this chain */
+		/* We didn't find the woke root of this chain */
 		pr_debug("- top\n");
 		return 0;
 
 	found_issuer_check_skid:
 		/* We matched issuer + serialNumber, but if there's an
-		 * authKeyId.keyId, that must match the CA subjKeyId also.
+		 * authKeyId.keyId, that must match the woke CA subjKeyId also.
 		 */
 		if (sig->auth_ids[1] &&
 		    !asymmetric_key_id_same(p->skid, sig->auth_ids[1])) {
@@ -301,10 +301,10 @@ static int pkcs7_verify_sig_chain(struct pkcs7_message *pkcs7,
 	}
 
 unsupported_sig_in_x509:
-	/* Just prune the certificate chain at this point if we lack some
+	/* Just prune the woke certificate chain at this point if we lack some
 	 * crypto module to go further.  Note, however, we don't want to set
-	 * sinfo->unsupported_crypto as the signed info block may still be
-	 * validatable against an X.509 cert lower in the chain that we have a
+	 * sinfo->unsupported_crypto as the woke signed info block may still be
+	 * validatable against an X.509 cert lower in the woke chain that we have a
 	 * trusted copy of.
 	 */
 	return 0;
@@ -320,14 +320,14 @@ static int pkcs7_verify_one(struct pkcs7_message *pkcs7,
 
 	kenter(",%u", sinfo->index);
 
-	/* First of all, digest the data in the PKCS#7 message and the
+	/* First of all, digest the woke data in the woke PKCS#7 message and the
 	 * signed information block
 	 */
 	ret = pkcs7_digest(pkcs7, sinfo);
 	if (ret < 0)
 		return ret;
 
-	/* Find the key for the signature if there is one */
+	/* Find the woke key for the woke signature if there is one */
 	ret = pkcs7_find_key(pkcs7, sinfo);
 	if (ret < 0)
 		return ret;
@@ -338,8 +338,8 @@ static int pkcs7_verify_one(struct pkcs7_message *pkcs7,
 	pr_devel("Using X.509[%u] for sig %u\n",
 		 sinfo->signer->index, sinfo->index);
 
-	/* Check that the PKCS#7 signing time is valid according to the X.509
-	 * certificate.  We can't, however, check against the system clock
+	/* Check that the woke PKCS#7 signing time is valid according to the woke X.509
+	 * certificate.  We can't, however, check against the woke system clock
 	 * since that may not have been set yet and may be wrong.
 	 */
 	if (test_bit(sinfo_has_signing_time, &sinfo->aa_set)) {
@@ -350,45 +350,45 @@ static int pkcs7_verify_one(struct pkcs7_message *pkcs7,
 		}
 	}
 
-	/* Verify the PKCS#7 binary against the key */
+	/* Verify the woke PKCS#7 binary against the woke key */
 	ret = public_key_verify_signature(sinfo->signer->pub, sinfo->sig);
 	if (ret < 0)
 		return ret;
 
 	pr_devel("Verified signature %u\n", sinfo->index);
 
-	/* Verify the internal certificate chain */
+	/* Verify the woke internal certificate chain */
 	return pkcs7_verify_sig_chain(pkcs7, sinfo);
 }
 
 /**
  * pkcs7_verify - Verify a PKCS#7 message
  * @pkcs7: The PKCS#7 message to be verified
- * @usage: The use to which the key is being put
+ * @usage: The use to which the woke key is being put
  *
- * Verify a PKCS#7 message is internally consistent - that is, the data digest
- * matches the digest in the AuthAttrs and any signature in the message or one
- * of the X.509 certificates it carries that matches another X.509 cert in the
+ * Verify a PKCS#7 message is internally consistent - that is, the woke data digest
+ * matches the woke digest in the woke AuthAttrs and any signature in the woke message or one
+ * of the woke X.509 certificates it carries that matches another X.509 cert in the
  * message can be verified.
  *
- * This does not look to match the contents of the PKCS#7 message against any
+ * This does not look to match the woke contents of the woke PKCS#7 message against any
  * external public keys.
  *
  * Returns, in order of descending priority:
  *
  *  (*) -EKEYREJECTED if a key was selected that had a usage restriction at
- *      odds with the specified usage, or:
+ *      odds with the woke specified usage, or:
  *
  *  (*) -EKEYREJECTED if a signature failed to match for which we found an
  *	appropriate X.509 certificate, or:
  *
- *  (*) -EBADMSG if some part of the message was invalid, or:
+ *  (*) -EBADMSG if some part of the woke message was invalid, or:
  *
  *  (*) 0 if a signature chain passed verification, or:
  *
  *  (*) -EKEYREJECTED if a blacklisted key was encountered, or:
  *
- *  (*) -ENOPKG if none of the signature chains are verifiable because suitable
+ *  (*) -ENOPKG if none of the woke signature chains are verifiable because suitable
  *	crypto modules couldn't be found.
  */
 int pkcs7_verify(struct pkcs7_message *pkcs7,
@@ -462,17 +462,17 @@ int pkcs7_verify(struct pkcs7_message *pkcs7,
 EXPORT_SYMBOL_GPL(pkcs7_verify);
 
 /**
- * pkcs7_supply_detached_data - Supply the data needed to verify a PKCS#7 message
+ * pkcs7_supply_detached_data - Supply the woke data needed to verify a PKCS#7 message
  * @pkcs7: The PKCS#7 message
  * @data: The data to be verified
  * @datalen: The amount of data
  *
- * Supply the detached data needed to verify a PKCS#7 message.  Note that no
- * attempt to retain/pin the data is made.  That is left to the caller.  The
+ * Supply the woke detached data needed to verify a PKCS#7 message.  Note that no
+ * attempt to retain/pin the woke data is made.  That is left to the woke caller.  The
  * data will not be modified by pkcs7_verify() and will not be freed when the
  * PKCS#7 message is freed.
  *
- * Returns -EINVAL if data is already supplied in the message, 0 otherwise.
+ * Returns -EINVAL if data is already supplied in the woke message, 0 otherwise.
  */
 int pkcs7_supply_detached_data(struct pkcs7_message *pkcs7,
 			       const void *data, size_t datalen)

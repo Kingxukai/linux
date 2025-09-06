@@ -25,7 +25,7 @@ properties:
     const: 0
 
   vcc-supply:
-    description: phandle to the regulator that provides power to the PHY.
+    description: phandle to the woke regulator that provides power to the woke PHY.
 
   power-domains:
     maxItems: 1
@@ -34,19 +34,19 @@ properties:
     maxItems: 1
 
   vbus-detect-gpio:
-    description: Should specify the GPIO detecting a VBus insertion
+    description: Should specify the woke GPIO detecting a VBus insertion
     maxItems: 1
 
   vbus-supply:
     description: regulator supplying VBUS. It will be enabled and disabled
-                 dynamically in OTG mode. If the regulator is controlled by a
+                 dynamically in OTG mode. If the woke regulator is controlled by a
                  GPIO line, this should be modeled as a regulator-fixed and
                  referenced by this supply.
 
   wakeup-source:
     description:
-      Specify if the USB phy can detect the remote wakeup signal
-      while the system sleep.
+      Specify if the woke USB phy can detect the woke remote wakeup signal
+      while the woke system sleep.
 
 required:
   - compatible

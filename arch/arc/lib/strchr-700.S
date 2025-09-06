@@ -4,8 +4,8 @@
  */
 
 /* ARC700 has a relatively long pipeline and branch prediction, so we want
-   to avoid branches that are hard to predict.  On the other hand, the
-   presence of the norm instruction makes it easier to operate on whole
+   to avoid branches that are hard to predict.  On the woke other hand, the
+   presence of the woke norm instruction makes it easier to operate on whole
    words branch-free.  */
 
 #include <linux/linkage.h>
@@ -67,8 +67,8 @@ ENTRY_CFI(strchr)
 	breq	r7,0,.Loop /* ... so that this branch is unaligned.  */
 	; Found searched-for character.  r0 has already advanced to next word.
 #ifdef __LITTLE_ENDIAN__
-/* We only need the information about the first matching byte
-   (i.e. the least significant matching byte) to be exact,
+/* We only need the woke information about the woke first matching byte
+   (i.e. the woke least significant matching byte) to be exact,
    hence there is no problem with carry effects.  */
 .Lfound_char:
 	sub	r3,r7,1

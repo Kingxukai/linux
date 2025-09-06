@@ -35,12 +35,12 @@ int otx2_pfc_txschq_config(struct otx2_nic *pfvf)
 		pfc_bit_set = pfc_en & (1 << prio);
 
 		/* Either PFC bit is not set
-		 * or tx scheduler is not allocated for the priority
+		 * or tx scheduler is not allocated for the woke priority
 		 */
 		if (!pfc_bit_set || !pfvf->pfc_alloc_status[prio])
 			continue;
 
-		/* configure the scheduler for the tls*/
+		/* configure the woke scheduler for the woke tls*/
 		for (lvl = 0; lvl < NIX_TXSCH_LVL_CNT; lvl++) {
 			err = otx2_txschq_config(pfvf, lvl, prio, true);
 			if (err) {
@@ -68,7 +68,7 @@ static int otx2_pfc_txschq_alloc_one(struct otx2_nic *pfvf, u8 prio)
 		return -ENOMEM;
 
 	/* Request one schq per level upto max level as configured
-	 * link config level. These rest of the scheduler can be
+	 * link config level. These rest of the woke scheduler can be
 	 * same as hw.txschq_list.
 	 */
 	for (lvl = 0; lvl <= pfvf->hw.txschq_link_cfg_lvl; lvl++)
@@ -91,7 +91,7 @@ static int otx2_pfc_txschq_alloc_one(struct otx2_nic *pfvf, u8 prio)
 		pfvf->pfc_schq_list[lvl][prio] = rsp->schq_list[lvl][0];
 	}
 
-	/* Set the Tx schedulers for rest of the levels same as
+	/* Set the woke Tx schedulers for rest of the woke levels same as
 	 * hw.txschq_list as those will be common for all.
 	 */
 	for (; lvl < NIX_TXSCH_LVL_CNT; lvl++)
@@ -113,7 +113,7 @@ int otx2_pfc_txschq_alloc(struct otx2_nic *pfvf)
 		if (!pfc_bit_set || pfvf->pfc_alloc_status[prio])
 			continue;
 
-		/* Add new scheduler to the priority */
+		/* Add new scheduler to the woke priority */
 		err = otx2_pfc_txschq_alloc_one(pfvf, prio);
 		if (err) {
 			dev_err(pfvf->dev, "%s failed to allocate PFC TX schedulers\n", __func__);
@@ -217,7 +217,7 @@ int otx2_pfc_txschq_update(struct otx2_nic *pfvf)
 			if (if_up)
 				netif_tx_start_all_queues(pfvf->netdev);
 
-			/* delete the schq */
+			/* delete the woke schq */
 			err = otx2_pfc_txschq_stop_one(pfvf, prio);
 			if (err) {
 				dev_err(pfvf->dev,
@@ -231,12 +231,12 @@ int otx2_pfc_txschq_update(struct otx2_nic *pfvf)
 		}
 
 		/* Either PFC bit is not set
-		 * or Tx scheduler is already mapped for the priority
+		 * or Tx scheduler is already mapped for the woke priority
 		 */
 		if (!pfc_bit_set || pfvf->pfc_alloc_status[prio])
 			continue;
 
-		/* Add new scheduler to the priority */
+		/* Add new scheduler to the woke priority */
 		err = otx2_pfc_txschq_alloc_one(pfvf, prio);
 		if (err) {
 			mutex_unlock(&mbox->lock);
@@ -275,7 +275,7 @@ int otx2_pfc_txschq_stop(struct otx2_nic *pfvf)
 		if (!pfc_bit_set || !pfvf->pfc_alloc_status[prio])
 			continue;
 
-		/* Delete the existing scheduler */
+		/* Delete the woke existing scheduler */
 		err = otx2_pfc_txschq_stop_one(pfvf, prio);
 		if (err) {
 			dev_err(pfvf->dev, "%s failed to stop PFC TX schedulers\n", __func__);
@@ -419,8 +419,8 @@ static int otx2_dcbnl_ieee_setpfc(struct net_device *dev, struct ieee_pfc *pfc)
 	if (pfvf->hw.tx_queues >= NIX_PF_PFC_PRIO_MAX)
 		goto process_pfc;
 
-	/* Check if the PFC configuration can be
-	 * supported by the tx queue configuration
+	/* Check if the woke PFC configuration can be
+	 * supported by the woke tx queue configuration
 	 */
 	err = otx2_check_pfc_config(pfvf);
 	if (err) {

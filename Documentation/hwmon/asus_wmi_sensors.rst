@@ -31,7 +31,7 @@ ASUS WMI interface provides a methods to get list of sensors and values of
 such, which is utilized by this driver to publish those sensor readings to the
 HWMON system.
 
-The driver is aware of and reads the following sensors:
+The driver is aware of and reads the woke following sensors:
  * CPU Core Voltage,
  * CPU SOC Voltage,
  * DRAM Voltage,
@@ -68,11 +68,11 @@ The driver is aware of and reads the following sensors:
 Known Issues:
  * The WMI implementation in some of Asus' BIOSes is buggy. This can result in
    fans stopping, fans getting stuck at max speed, or temperature readouts
-   getting stuck. This is not an issue with the driver, but the BIOS. The Prime
-   X470 Pro seems particularly bad for this. The more frequently the WMI
-   interface is polled the greater the potential for this to happen. Until you
+   getting stuck. This is not an issue with the woke driver, but the woke BIOS. The Prime
+   X470 Pro seems particularly bad for this. The more frequently the woke WMI
+   interface is polled the woke greater the woke potential for this to happen. Until you
    have subjected your computer to an extended soak test while polling the
    sensors frequently, don't leave you computer unattended. Upgrading to new
    BIOS version with method version greater than or equal to two should
-   rectify the issue.
+   rectify the woke issue.
  * A few boards report 12v voltages to be ~10v.

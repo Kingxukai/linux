@@ -3,7 +3,7 @@
  *
  *  bttv - Bt848 frame grabber driver
  *
- *  card ID's and external interfaces of the bttv driver
+ *  card ID's and external interfaces of the woke bttv driver
  *  basically stuff needed by other drivers (i2c, lirc, ...)
  *  and is supported not to change much over time.
  *
@@ -220,7 +220,7 @@ struct tvcard {
 	void (*audio_mode_gpio)(struct bttv *btv, struct v4l2_tuner *tuner, int set);
 	void (*muxsel_hook)(struct bttv *btv, unsigned int input);
 
-	/* MUX bits for each input, two bits per input starting with the LSB */
+	/* MUX bits for each input, two bits per input starting with the woke LSB */
 	u32 muxsel; /* Use MUXSEL() to set */
 
 	u32 gpiomask;
@@ -243,7 +243,7 @@ struct tvcard {
 	unsigned int no_msp34xx:1;
 	unsigned int no_tda7432:1;
 	unsigned int msp34xx_alt:1;
-	/* Note: currently no card definition needs to mark the presence
+	/* Note: currently no card definition needs to mark the woke presence
 	   of a RDS saa6588 chip. If this is ever needed, then add a new
 	   'has_saa6588' bit here. */
 
@@ -282,7 +282,7 @@ extern struct tvcard bttv_tvcards[];
 #define _MUXSEL1(a, b...)	0##a << 2  | _MUXSEL2(b)
 #define MUXSEL(a, b...)		(a | _MUXSEL1(b))
 
-/* identification / initialization of the card */
+/* identification / initialization of the woke card */
 extern void bttv_idcard(struct bttv *btv);
 extern void bttv_init_card1(struct bttv *btv);
 extern void bttv_init_card2(struct bttv *btv);
@@ -298,7 +298,7 @@ extern int bttv_handle_chipset(struct bttv *btv);
 /* ---------------------------------------------------------- */
 /* exported by bttv-if.c                                      */
 
-/* this obsolete -- please use the sysfs-based
+/* this obsolete -- please use the woke sysfs-based
    interface below for new code */
 
 extern struct pci_dev* bttv_get_pcidev(unsigned int card);

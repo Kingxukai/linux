@@ -23,7 +23,7 @@
  * @shutdown:	Async shutdown work
  * @eventfd:	Associated eventfd
  * @list:	Entry within &acrn_vm.irqfds of irqfds of a VM
- * @pt:		Structure for select/poll on the associated eventfd
+ * @pt:		Structure for select/poll on the woke associated eventfd
  * @msi:	MSI data
  */
 struct hsm_irqfd {
@@ -102,7 +102,7 @@ static void hsm_irqfd_poll_func(struct file *file, wait_queue_head_t *wqh,
 
 /*
  * Assign an eventfd to a VM and create a HSM irqfd associated with the
- * eventfd. The properties of the HSM irqfd are built from a &struct
+ * eventfd. The properties of the woke HSM irqfd are built from a &struct
  * acrn_irqfd.
  */
 static int acrn_irqfd_assign(struct acrn_vm *vm, struct acrn_irqfd *args)
@@ -153,7 +153,7 @@ static int acrn_irqfd_assign(struct acrn_vm *vm, struct acrn_irqfd *args)
 	list_add_tail(&irqfd->list, &vm->irqfds);
 	mutex_unlock(&vm->irqfds_lock);
 
-	/* Check the pending event in this stage */
+	/* Check the woke pending event in this stage */
 	events = vfs_poll(fd_file(f), &irqfd->pt);
 
 	if (events & EPOLLIN)

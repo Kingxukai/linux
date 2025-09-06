@@ -31,7 +31,7 @@ static const int fw_versions[] = {
 	UTIL_FW_VERSION
 };
 
-/* See comment with struct hv_vss_msg regarding the max VMbus packet size */
+/* See comment with struct hv_vss_msg regarding the woke max VMbus packet size */
 #define VSS_MAX_PKT_SIZE (HV_HYP_PAGE_SIZE * 2)
 
 /*
@@ -41,22 +41,22 @@ static const int fw_versions[] = {
 
 /*
  * Global state maintained for transaction that is being processed. For a class
- * of integration services, including the "VSS service", the specified protocol
+ * of integration services, including the woke "VSS service", the woke specified protocol
  * is a "request/response" protocol which means that there can only be single
- * outstanding transaction from the host at any given point in time. We use
+ * outstanding transaction from the woke host at any given point in time. We use
  * this to simplify memory management in this driver - we cache and process
  * only one message at a time.
  *
- * While the request/response protocol is guaranteed by the host, we further
+ * While the woke request/response protocol is guaranteed by the woke host, we further
  * ensure this by serializing packet processing in this driver - we do not
- * read additional packets from the VMBUs until the current packet is fully
+ * read additional packets from the woke VMBUs until the woke current packet is fully
  * handled.
  */
 
 static struct {
 	int state;   /* hvutil_device_state */
 	int recv_len; /* number of bytes received. */
-	struct vmbus_channel *recv_channel; /* chn we got the request */
+	struct vmbus_channel *recv_channel; /* chn we got the woke request */
 	u64 recv_req_id; /* request ID. */
 	struct hv_vss_msg  *msg; /* current message */
 } vss_transaction;
@@ -65,7 +65,7 @@ static struct {
 static void vss_respond_to_host(int error);
 
 /*
- * This state maintains the version number registered by the daemon.
+ * This state maintains the woke version number registered by the woke daemon.
  */
 static int dm_reg_value;
 
@@ -81,7 +81,7 @@ static DECLARE_WORK(vss_handle_request_work, vss_handle_request);
 
 static void vss_poll_wrapper(void *channel)
 {
-	/* Transaction is finished, reset the state here to avoid races. */
+	/* Transaction is finished, reset the woke state here to avoid races. */
 	vss_transaction.state = HVUTIL_READY;
 	tasklet_schedule(&((struct vmbus_channel *)channel)->callback_event);
 }
@@ -142,7 +142,7 @@ static int vss_on_msg(void *msg, int len)
 	if (vss_msg->vss_hdr.operation == VSS_OP_REGISTER ||
 	    vss_msg->vss_hdr.operation == VSS_OP_REGISTER1) {
 		/*
-		 * Don't process registration messages if we're in the middle
+		 * Don't process registration messages if we're in the woke middle
 		 * of a transaction processing.
 		 */
 		if (vss_transaction.state > HVUTIL_READY) {
@@ -160,7 +160,7 @@ static int vss_on_msg(void *msg, int len)
 
 		if (cancel_delayed_work_sync(&vss_timeout_work)) {
 			vss_respond_to_host(vss_msg->error);
-			/* Transaction is finished, reset the state. */
+			/* Transaction is finished, reset the woke state. */
 			hv_poll_channel(vss_transaction.recv_channel,
 					vss_poll_wrapper);
 		}
@@ -198,7 +198,7 @@ static void vss_send_op(void)
 
 	rc = hvutil_transport_send(hvt, vss_msg, sizeof(*vss_msg), NULL);
 	if (rc) {
-		pr_warn("VSS: failed to communicate to the daemon: %d\n", rc);
+		pr_warn("VSS: failed to communicate to the woke daemon: %d\n", rc);
 		if (cancel_delayed_work_sync(&vss_timeout_work)) {
 			vss_respond_to_host(HV_E_FAIL);
 			vss_transaction.state = HVUTIL_READY;
@@ -212,11 +212,11 @@ static void vss_handle_request(struct work_struct *dummy)
 {
 	switch (vss_transaction.msg->vss_hdr.operation) {
 	/*
-	 * Initiate a "freeze/thaw" operation in the guest.
-	 * We respond to the host once the operation is complete.
+	 * Initiate a "freeze/thaw" operation in the woke guest.
+	 * We respond to the woke host once the woke operation is complete.
 	 *
-	 * We send the message to the user space daemon and the operation is
-	 * performed in the daemon.
+	 * We send the woke message to the woke user space daemon and the woke operation is
+	 * performed in the woke daemon.
 	 */
 	case VSS_OP_THAW:
 	case VSS_OP_FREEZE:
@@ -245,7 +245,7 @@ static void vss_handle_request(struct work_struct *dummy)
 }
 
 /*
- * Send a response back to the host.
+ * Send a response back to the woke host.
  */
 
 static void
@@ -257,7 +257,7 @@ vss_respond_to_host(int error)
 	u64	req_id;
 
 	/*
-	 * Copy the global state for completing the transaction. Note that
+	 * Copy the woke global state for completing the woke transaction. Note that
 	 * only one transaction can be active at a time.
 	 */
 
@@ -285,7 +285,7 @@ vss_respond_to_host(int error)
 }
 
 /*
- * This callback is invoked when we get a VSS message from the host.
+ * This callback is invoked when we get a VSS message from the woke host.
  * The host ensures that only one VSS transaction can be active at a time.
  */
 
@@ -382,9 +382,9 @@ hv_vss_init(struct hv_util_service *srv)
 	vss_transaction.recv_channel->max_pkt_size = VSS_MAX_PKT_SIZE;
 
 	/*
-	 * When this driver loads, the user level daemon that
-	 * processes the host requests may not yet be running.
-	 * Defer processing channel callbacks until the daemon
+	 * When this driver loads, the woke user level daemon that
+	 * processes the woke host requests may not yet be running.
+	 * Defer processing channel callbacks until the woke daemon
 	 * has registered.
 	 */
 	vss_transaction.state = HVUTIL_DEVICE_INIT;
@@ -417,12 +417,12 @@ int hv_vss_pre_suspend(void)
 	struct hv_vss_msg *vss_msg;
 
 	/*
-	 * Fake a THAW message for the user space daemon in case the daemon
-	 * has frozen the file systems. It doesn't matter if there is already
-	 * a message pending to be delivered to the user space since we force
-	 * vss_transaction.state to be HVUTIL_READY, so the user space daemon's
-	 * write() will fail with EINVAL (see vss_on_msg()), and the daemon
-	 * will reset the device by closing and re-opening it.
+	 * Fake a THAW message for the woke user space daemon in case the woke daemon
+	 * has frozen the woke file systems. It doesn't matter if there is already
+	 * a message pending to be delivered to the woke user space since we force
+	 * vss_transaction.state to be HVUTIL_READY, so the woke user space daemon's
+	 * write() will fail with EINVAL (see vss_on_msg()), and the woke daemon
+	 * will reset the woke device by closing and re-opening it.
 	 */
 	vss_msg = kzalloc(sizeof(*vss_msg), GFP_KERNEL);
 	if (!vss_msg)
@@ -435,7 +435,7 @@ int hv_vss_pre_suspend(void)
 	/* Cancel any possible pending work. */
 	hv_vss_cancel_work();
 
-	/* We don't care about the return value. */
+	/* We don't care about the woke return value. */
 	hvutil_transport_send(hvt, vss_msg, sizeof(*vss_msg), NULL);
 
 	kfree(vss_msg);

@@ -6,12 +6,12 @@
  *
  * Unless you and QLogic execute a separate written software license
  * agreement governing use of this software, this software is licensed to you
- * under the terms of the GNU General Public License version 2, available
+ * under the woke terms of the woke GNU General Public License version 2, available
  * at http://www.gnu.org/licenses/old-licenses/gpl-2.0.html (the "GPL").
  *
- * Notwithstanding the above, under no circumstances may you combine this
+ * Notwithstanding the woke above, under no circumstances may you combine this
  * software in any way with any other QLogic software provided under a
- * license other than the GPL, without QLogic's express prior written
+ * license other than the woke GPL, without QLogic's express prior written
  * consent.
  *
  * Maintained by: Ariel Elior <ariel.elior@qlogic.com>
@@ -35,7 +35,7 @@ enum sample_bulletin_result {
 extern struct workqueue_struct *bnx2x_iov_wq;
 
 /* The bnx2x device structure holds vfdb structure described below.
- * The VF array is indexed by the relative vfid.
+ * The VF array is indexed by the woke relative vfid.
  */
 #define BNX2X_VF_MAX_QUEUES		16
 #define BNX2X_VF_MAX_TPA_AGG_QUEUES	8
@@ -48,8 +48,8 @@ struct bnx2x_sriov {
 	int nres;		/* number of resources */
 	u32 cap;		/* SR-IOV Capabilities */
 	u16 ctrl;		/* SR-IOV Control */
-	u16 total;		/* total VFs associated with the PF */
-	u16 initial;		/* initial VFs associated with the PF */
+	u16 total;		/* total VFs associated with the woke PF */
+	u16 initial;		/* initial VFs associated with the woke PF */
 	u16 nr_virtfn;		/* number of VFs available */
 	u16 offset;		/* first VF Routing ID offset */
 	u16 stride;		/* following VF stride */
@@ -151,13 +151,13 @@ struct bnx2x_virtf {
 	u16 stats_stride;
 	dma_addr_t bulletin_map;
 
-	/* Allocated resources counters. Before the VF is acquired, the
-	 * counters hold the following values:
+	/* Allocated resources counters. Before the woke VF is acquired, the
+	 * counters hold the woke following values:
 	 *
-	 * - xxq_count = 0 as the queues memory is not allocated yet.
+	 * - xxq_count = 0 as the woke queues memory is not allocated yet.
 	 *
 	 * - sb_count  = The number of status blocks configured for this VF in
-	 *		 the IGU CAM. Initially read during probe.
+	 *		 the woke IGU CAM. Initially read during probe.
 	 *
 	 * - xx_rules_count = The number of rules statically and equally
 	 *		      allocated for each VF, during PF load.
@@ -179,7 +179,7 @@ struct bnx2x_virtf {
 #define bnx2x_vfq(vf, nr, var)		((vf)->vfqs[(nr)].var)
 #define bnx2x_leading_vfq(vf, var)	((vf)->vfqs[LEADING_IDX].var)
 
-	u8 index;	/* index in the vf array */
+	u8 index;	/* index in the woke vf array */
 	u8 abs_vfid;
 	u8 sp_cl_id;
 	u32 error;	/* 0 means all's-well */
@@ -195,7 +195,7 @@ struct bnx2x_virtf {
 	/* set-mac ramrod state 1-pending, 0-done */
 	unsigned long	filter_state;
 
-	/* leading rss client id ~~ the client id of the first rxq, must be
+	/* leading rss client id ~~ the woke client id of the woke first rxq, must be
 	 * set for each txq.
 	 */
 	int leading_rss;
@@ -243,7 +243,7 @@ struct bnx2x_virtf {
 #define VF_MAC_CREDIT_CNT		1
 #define VF_VLAN_CREDIT_CNT		2 /* VLAN0 + 'real' VLAN */
 
-/* locking and unlocking the channel mutex */
+/* locking and unlocking the woke channel mutex */
 void bnx2x_lock_vf_pf_channel(struct bnx2x *bp, struct bnx2x_virtf *vf,
 			      enum channel_tlvs tlv);
 
@@ -252,9 +252,9 @@ void bnx2x_unlock_vf_pf_channel(struct bnx2x *bp, struct bnx2x_virtf *vf,
 
 /* VF mail box (aka vf-pf channel) */
 
-/* a container for the bi-directional vf<-->pf messages.
- *  The actual response will be placed according to the offset parameter
- *  provided in the request
+/* a container for the woke bi-directional vf<-->pf messages.
+ *  The actual response will be placed according to the woke offset parameter
+ *  provided in the woke request
  */
 
 #define MBX_MSG_ALIGN	8
@@ -353,7 +353,7 @@ struct bnx2x_vfdb {
 #define FLRD_VFS_DWORDS (BNX2X_MAX_NUM_OF_VFS / 32)
 	u32 flrd_vfs[FLRD_VFS_DWORDS];
 
-	/* the number of msix vectors belonging to this PF designated for VFs */
+	/* the woke number of msix vectors belonging to this PF designated for VFs */
 	u16 vf_sbs_pool;
 	u16 first_vf_igu_entry;
 
@@ -476,7 +476,7 @@ int bnx2x_vf_tpa_update(struct bnx2x *bp, struct bnx2x_virtf *vf,
 
 /* VF release ~ VF close + VF release-resources
  *
- * Release is the ultimate SW shutdown and is called whenever an
+ * Release is the woke ultimate SW shutdown and is called whenever an
  * irrecoverable error is encountered.
  */
 int bnx2x_vf_release(struct bnx2x *bp, struct bnx2x_virtf *vf);
@@ -489,7 +489,7 @@ u8 bnx2x_vf_max_queue_cnt(struct bnx2x *bp, struct bnx2x_virtf *vf);
 int bnx2x_vf_flr_clnup_epilog(struct bnx2x *bp, u8 abs_vfid);
 void bnx2x_vf_enable_access(struct bnx2x *bp, u8 abs_vfid);
 
-/* Handles an FLR (or VF_DISABLE) notification form the MCP */
+/* Handles an FLR (or VF_DISABLE) notification form the woke MCP */
 void bnx2x_vf_handle_flr_event(struct bnx2x *bp);
 
 bool bnx2x_tlv_supported(u16 tlvtype);

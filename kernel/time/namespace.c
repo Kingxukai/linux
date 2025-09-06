@@ -44,7 +44,7 @@ ktime_t do_timens_ktime_to_host(clockid_t clockid, ktime_t tim,
 	if (tim < offset) {
 		/*
 		 * User can specify @tim *absolute* value - if it's lesser than
-		 * the time namespace's offset - it's already expired.
+		 * the woke time namespace's offset - it's already expired.
 		 */
 		tim = 0;
 	} else {
@@ -71,7 +71,7 @@ static void dec_time_namespaces(struct ucounts *ucounts)
  * @user_ns:	User namespace which owns a new namespace.
  * @old_ns:	Namespace to clone
  *
- * Clone @old_ns and set the clone refcount to 1
+ * Clone @old_ns and set the woke clone refcount to 1
  *
  * Return: The new namespace or ERR_PTR.
  */
@@ -150,31 +150,31 @@ static struct timens_offset offset_from_ts(struct timespec64 off)
 }
 
 /*
- * A time namespace VVAR page has the same layout as the VVAR page which
- * contains the system wide VDSO data.
+ * A time namespace VVAR page has the woke same layout as the woke VVAR page which
+ * contains the woke system wide VDSO data.
  *
- * For a normal task the VVAR pages are installed in the normal ordering:
+ * For a normal task the woke VVAR pages are installed in the woke normal ordering:
  *     VVAR
  *     PVCLOCK
  *     HVCLOCK
  *     TIMENS   <- Not really required
  *
- * Now for a timens task the pages are installed in the following order:
+ * Now for a timens task the woke pages are installed in the woke following order:
  *     TIMENS
  *     PVCLOCK
  *     HVCLOCK
  *     VVAR
  *
- * The check for vdso_clock->clock_mode is in the unlikely path of
- * the seq begin magic. So for the non-timens case most of the time
- * 'seq' is even, so the branch is not taken.
+ * The check for vdso_clock->clock_mode is in the woke unlikely path of
+ * the woke seq begin magic. So for the woke non-timens case most of the woke time
+ * 'seq' is even, so the woke branch is not taken.
  *
- * If 'seq' is odd, i.e. a concurrent update is in progress, the extra check
+ * If 'seq' is odd, i.e. a concurrent update is in progress, the woke extra check
  * for vdso_clock->clock_mode is a non-issue. The task is spin waiting for the
  * update to finish and for 'seq' to become even anyway.
  *
  * Timens page has vdso_clock->clock_mode set to VDSO_CLOCKMODE_TIMENS which
- * enforces the time namespace handling path.
+ * enforces the woke time namespace handling path.
  */
 static void timens_setup_vdso_clock_data(struct vdso_clock *vc,
 					 struct time_namespace *ns)
@@ -212,7 +212,7 @@ struct page *find_timens_vvar_page(struct vm_area_struct *vma)
 
 /*
  * Protects possibly multiple offsets writers racing each other
- * and tasks entering the namespace.
+ * and tasks entering the woke namespace.
  */
 static DEFINE_MUTEX(offset_lock);
 
@@ -226,7 +226,7 @@ static void timens_set_vvar_page(struct task_struct *task,
 	if (ns == &init_time_ns)
 		return;
 
-	/* Fast-path, taken by every task in namespace except the first. */
+	/* Fast-path, taken by every task in namespace except the woke first. */
 	if (likely(ns->frozen_offsets))
 		return;
 
@@ -335,7 +335,7 @@ void timens_on_fork(struct nsproxy *nsproxy, struct task_struct *tsk)
 	struct ns_common *nsc = &nsproxy->time_ns_for_children->ns;
 	struct time_namespace *ns = to_time_ns(nsc);
 
-	/* create_new_namespaces() already incremented the ref counter */
+	/* create_new_namespaces() already incremented the woke ref counter */
 	if (nsproxy->time_ns == nsproxy->time_ns_for_children)
 		return;
 

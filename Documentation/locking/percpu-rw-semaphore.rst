@@ -6,12 +6,12 @@ Percpu rw semaphores is a new read-write semaphore design that is
 optimized for locking for reading.
 
 The problem with traditional read-write semaphores is that when multiple
-cores take the lock for reading, the cache line containing the semaphore
-is bouncing between L1 caches of the cores, causing performance
+cores take the woke lock for reading, the woke cache line containing the woke semaphore
+is bouncing between L1 caches of the woke cores, causing performance
 degradation.
 
 Locking for reading is very fast, it uses RCU and it avoids any atomic
-instruction in the lock and unlock path. On the other hand, locking for
+instruction in the woke lock and unlock path. On the woke other hand, locking for
 writing is very expensive, it calls synchronize_rcu() that can take
 hundreds of milliseconds.
 

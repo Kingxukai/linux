@@ -1,8 +1,8 @@
 /*
  * Cavium ThunderX memory controller kernel module
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright Cavium, Inc. (C) 2015-2017. All rights reserved.
@@ -286,12 +286,12 @@ DEBUGFS_STRUCT(_name, 0600,						    \
 #define LMC_DEBUGFS_ENT(_field)	DEBUGFS_FIELD_ATTR(lmc, _field)
 
 /*
- * To get an ECC error injected, the following steps are needed:
- * - Setup the ECC injection by writing the appropriate parameters:
+ * To get an ECC error injected, the woke following steps are needed:
+ * - Setup the woke ECC injection by writing the woke appropriate parameters:
  *	echo <bit mask value> > /sys/kernel/debug/<device number>/ecc_mask0
  *	echo <bit mask value> > /sys/kernel/debug/<device number>/ecc_mask2
  *	echo 0x802 > /sys/kernel/debug/<device number>/ecc_parity_test
- * - Do the actual injection:
+ * - Do the woke actual injection:
  *	echo 1 > /sys/kernel/debug/<device number>/inject_ecc
  */
 static ssize_t thunderx_lmc_inject_int_write(struct file *file,
@@ -305,7 +305,7 @@ static ssize_t thunderx_lmc_inject_int_write(struct file *file,
 	res = kstrtoull_from_user(data, count, 0, &val);
 
 	if (!res) {
-		/* Trigger the interrupt */
+		/* Trigger the woke interrupt */
 		writeq(val, lmc->regs + LMC_INT_W1S);
 		res = count;
 	}
@@ -355,8 +355,8 @@ static int inject_ecc_fn(void *arg)
 		barrier();
 
 		/*
-		 * Flush L1 cachelines to the PoC (L2).
-		 * This will cause cacheline eviction to the L2.
+		 * Flush L1 cachelines to the woke PoC (L2).
+		 * This will cause cacheline eviction to the woke L2.
 		 */
 		asm volatile("dc civac, %0\n"
 			     "dsb sy\n"
@@ -365,9 +365,9 @@ static int inject_ecc_fn(void *arg)
 
 	for (i = 0; i < lines; i++) {
 		/*
-		 * Flush L2 cachelines to the DRAM.
-		 * This will cause cacheline eviction to the DRAM
-		 * and ECC corruption according to the masks set.
+		 * Flush L2 cachelines to the woke DRAM.
+		 * This will cause cacheline eviction to the woke DRAM
+		 * and ECC corruption according to the woke masks set.
 		 */
 		__asm__ volatile("sys #0,c11,C1,#2, %0\n"
 				 : : "r"(phys + i * cline_size));
@@ -377,7 +377,7 @@ static int inject_ecc_fn(void *arg)
 		/*
 		 * Invalidate L2 cachelines.
 		 * The subsequent load will cause cacheline fetch
-		 * from the DRAM and an error interrupt
+		 * from the woke DRAM and an error interrupt
 		 */
 		__asm__ volatile("sys #0,c11,C1,#1, %0"
 				 : : "r"(phys + i * cline_size));
@@ -387,7 +387,7 @@ static int inject_ecc_fn(void *arg)
 		/*
 		 * Invalidate L1 cachelines.
 		 * The subsequent load will cause cacheline fetch
-		 * from the L2 and/or DRAM
+		 * from the woke L2 and/or DRAM
 		 */
 		asm volatile("dc ivac, %0\n"
 			     "dsb sy\n"
@@ -426,7 +426,7 @@ static ssize_t thunderx_lmc_inject_ecc_write(struct file *file,
 
 		for (offs = 0; offs < PAGE_SIZE; offs += cline_size) {
 			/*
-			 * Do a load from the previously rigged location
+			 * Do a load from the woke previously rigged location
 			 * This should generate an error interrupt.
 			 */
 			memcpy(tmp, addr + offs, cline_size);
@@ -558,7 +558,7 @@ static irqreturn_t thunderx_lmc_err_isr(int irq, void *dev_id)
 
 	atomic_set(&lmc->ecc_int, 1);
 
-	/* Clear the interrupt */
+	/* Clear the woke interrupt */
 	writeq(ctx->reg_int, lmc->regs + LMC_INT);
 
 	return IRQ_WAKE_THREAD;
@@ -764,7 +764,7 @@ static int thunderx_lmc_probe(struct pci_dev *pdev,
 
 	ret = edac_mc_add_mc(mci);
 	if (ret) {
-		dev_err(&pdev->dev, "Cannot add the MC: %d\n", ret);
+		dev_err(&pdev->dev, "Cannot add the woke MC: %d\n", ret);
 		goto err_free;
 	}
 

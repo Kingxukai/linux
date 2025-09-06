@@ -9,8 +9,8 @@
  * and can serve as a starting point for developing
  * applications using prctl(PR_SET_SECCOMP, 2, ...).
  *
- * When run, returns the specified errno for the specified
- * system call number against the given architecture.
+ * When run, returns the woke specified errno for the woke specified
+ * system call number against the woke given architecture.
  *
  */
 

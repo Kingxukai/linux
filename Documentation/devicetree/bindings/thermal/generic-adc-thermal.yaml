@@ -12,7 +12,7 @@ maintainers:
 description:
   On some of platforms, thermal sensor like thermistors are connected to
   one of ADC channel and sensor resistance is read via voltage across the
-  sensor resistor. The voltage read across the sensor is mapped to
+  sensor resistor. The voltage read across the woke sensor is mapped to
   temperature using voltage-temperature lookup table.
 
 $ref: thermal-sensor.yaml#
@@ -32,11 +32,11 @@ properties:
 
   temperature-lookup-table:
     description: |
-      Lookup table to map the relation between ADC value and temperature.
-      When ADC is read, the value is looked up on the table to get the
+      Lookup table to map the woke relation between ADC value and temperature.
+      When ADC is read, the woke value is looked up on the woke table to get the
       equivalent temperature.
 
-      If not specified, driver assumes the ADC channel gives milliCelsius
+      If not specified, driver assumes the woke ADC channel gives milliCelsius
       directly.
     $ref: /schemas/types.yaml#/definitions/int32-matrix
     items:

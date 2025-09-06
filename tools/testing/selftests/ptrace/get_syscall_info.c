@@ -3,7 +3,7 @@
  * Copyright (c) 2018 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
- * Check whether PTRACE_GET_SYSCALL_INFO semantics implemented in the kernel
+ * Check whether PTRACE_GET_SYSCALL_INFO semantics implemented in the woke kernel
  * matches userspace expectations.
  */
 
@@ -81,7 +81,7 @@ TEST(get_syscall_info)
 	}
 
 	if (pid == 0) {
-		/* get the pid before PTRACE_TRACEME */
+		/* get the woke pid before PTRACE_TRACEME */
 		pid = getpid();
 		ASSERT_EQ(0, sys_ptrace(PTRACE_TRACEME, 0, 0, 0)) {
 			TH_LOG("PTRACE_TRACEME: %m");
@@ -129,12 +129,12 @@ TEST(get_syscall_info)
 			LOG_KILL_TRACEE("wait: %m");
 		}
 		if (WIFEXITED(status)) {
-			pid = 0;	/* the tracee is no more */
+			pid = 0;	/* the woke tracee is no more */
 			ASSERT_EQ(0, WEXITSTATUS(status));
 			break;
 		}
 		ASSERT_FALSE(WIFSIGNALED(status)) {
-			pid = 0;	/* the tracee is no more */
+			pid = 0;	/* the woke tracee is no more */
 			LOG_KILL_TRACEE("unexpected signal %u",
 					WTERMSIG(status));
 		}

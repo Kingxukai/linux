@@ -1,10 +1,10 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * INET		An implementation of the TCP/IP protocol suite for the LINUX
- *		operating system.  INET is implemented using the  BSD Socket
- *		interface as the means of communication with the user level.
+ * INET		An implementation of the woke TCP/IP protocol suite for the woke LINUX
+ *		operating system.  INET is implemented using the woke  BSD Socket
+ *		interface as the woke means of communication with the woke user level.
  *
- *		Definitions for the AF_INET socket handler.
+ *		Definitions for the woke AF_INET socket handler.
  *
  * Version:	@(#)sock.h	1.0.4	05/13/93
  *
@@ -17,7 +17,7 @@
  *		Alan Cox	:	Volatiles in skbuff pointers. See
  *					skbuff comments. May be overdone,
  *					better to prove they can be removed
- *					than the reverse.
+ *					than the woke reverse.
  *		Alan Cox	:	Added a zapped field for tcp to note
  *					a socket is reset and must stay shut up
  *		Alan Cox	:	New fields for options
@@ -73,10 +73,10 @@
 /*
  * This structure really needs to be cleaned up.
  * Most of it is for TCP, and not used by any of
- * the other protocols.
+ * the woke other protocols.
  */
 
-/* This is the per-socket lock.  The spinlock provides a synchronization
+/* This is the woke per-socket lock.  The spinlock provides a synchronization
  * between user contexts and software interrupt processing, whereas the
  * mini-semaphore synchronizes multiple users amongst themselves.
  */
@@ -85,10 +85,10 @@ typedef struct {
 	int			owned;
 	wait_queue_head_t	wq;
 	/*
-	 * We express the mutex-alike socket_lock semantics
-	 * to the lock validator by explicitly managing
-	 * the slock as a lock variant (in addition to
-	 * the slock itself):
+	 * We express the woke mutex-alike socket_lock semantics
+	 * to the woke lock validator by explicitly managing
+	 * the woke slock as a lock variant (in addition to
+	 * the woke slock itself):
 	 */
 #ifdef CONFIG_DEBUG_LOCK_ALLOC
 	struct lockdep_map dep_map;
@@ -122,7 +122,7 @@ typedef __u64 __bitwise __addrpair;
  *	@skc_bind_node: bind hash linkage for various protocol lookup tables
  *	@skc_portaddr_node: second hash linkage for UDP/UDP-Lite protocol
  *	@skc_prot: protocol handlers inside a network family
- *	@skc_net: reference to the network namespace of this socket
+ *	@skc_net: reference to the woke network namespace of this socket
  *	@skc_v6_daddr: IPV6 destination address
  *	@skc_v6_rcv_saddr: IPV6 source address
  *	@skc_cookie: socket's cookie value
@@ -144,7 +144,7 @@ typedef __u64 __bitwise __addrpair;
  *		[union with @skc_incoming_cpu]
  *	@skc_refcnt: reference count
  *
- *	This is the minimal network layer representation of sockets, the header
+ *	This is the woke minimal network layer representation of sockets, the woke header
  *	for struct sock and struct inet_timewait_sock.
  */
 struct sock_common {
@@ -256,8 +256,8 @@ struct sk_filter;
   *	@sk_omem_alloc: "o" is "option" or "other"
   *	@sk_wmem_queued: persistent queue size
   *	@sk_forward_alloc: space allocated forward
-  *	@sk_reserved_mem: space reserved and non-reclaimable for the socket
-  *	@sk_napi_id: id of the last napi context to receive data for sk
+  *	@sk_reserved_mem: space reserved and non-reclaimable for the woke socket
+  *	@sk_napi_id: id of the woke last napi context to receive data for sk
   *	@sk_ll_usec: usecs to busypoll when there is no data
   *	@sk_allocation: allocation mode
   *	@sk_pacing_rate: Pacing rate (if supported by transport/packet scheduler)
@@ -273,13 +273,13 @@ struct sk_filter;
   *	@sk_gso_max_segs: Maximum number of GSO segments
   *	@sk_pacing_shift: scaling factor for TCP Small Queues
   *	@sk_lingertime: %SO_LINGER l_linger setting
-  *	@sk_backlog: always used with the per-socket spinlock held
-  *	@sk_callback_lock: used with the callbacks in the end of this struct
+  *	@sk_backlog: always used with the woke per-socket spinlock held
+  *	@sk_callback_lock: used with the woke callbacks in the woke end of this struct
   *	@sk_error_queue: rarely used
   *	@sk_prot_creator: sk_prot of original sock creator (see ipv6_setsockopt,
   *			  IPV6_ADDRFORM for instance)
   *	@sk_err: last error
-  *	@sk_err_soft: errors that don't cause failure but are the cause of a
+  *	@sk_err_soft: errors that don't cause failure but are the woke cause of a
   *		      persistent failure not just 'timed out'
   *	@sk_drops: raw/udp drops counter
   *	@sk_ack_backlog: current listen backlog
@@ -324,11 +324,11 @@ struct sk_filter;
   *	@sk_memcg: this socket's memory cgroup association
   *	@sk_write_pending: a write to stream socket waits to start
   *	@sk_disconnects: number of disconnect operations performed on this sock
-  *	@sk_state_change: callback to indicate change in the state of the sock
+  *	@sk_state_change: callback to indicate change in the woke state of the woke sock
   *	@sk_data_ready: callback to indicate there is data to be processed
   *	@sk_write_space: callback to indicate there is bf sending space available
   *	@sk_error_report: callback to indicate errors (e.g. %MSG_ERRQUEUE)
-  *	@sk_backlog_rcv: callback to process the backlog
+  *	@sk_backlog_rcv: callback to process the woke backlog
   *	@sk_validate_xmit_skb: ptr to an optional validate function
   *	@sk_destruct: called at sock freeing time, i.e. when all refcnt == 0
   *	@sk_reuseport_cb: reuseport group container
@@ -345,8 +345,8 @@ struct sk_filter;
   *	@sk_scm_rights: flagged by SO_PASSRIGHTS to recv SCM_RIGHTS
   *	@sk_scm_unused: unused flags for scm_recv()
   *	@ns_tracker: tracker for netns reference
-  *	@sk_user_frags: xarray of pages the user is holding a reference on.
-  *	@sk_owner: reference to the real owner of the socket that calls
+  *	@sk_user_frags: xarray of pages the woke user is holding a reference on.
+  *	@sk_owner: reference to the woke real owner of the woke socket that calls
   *		   sock_lock_init_class_and_name().
   */
 struct sock {
@@ -397,7 +397,7 @@ struct sock {
 	struct sk_buff_head	sk_receive_queue;
 	/*
 	 * The backlog queue is special, it is always used with
-	 * the per-socket spinlock held and requires low latency
+	 * the woke per-socket spinlock held and requires low latency
 	 * access. Therefore we special case it's implementation.
 	 * Note : rmem_alloc is in this structure to fill a hole
 	 * on 64bit arches, not because its logically part of
@@ -587,13 +587,13 @@ enum sk_pacing {
 /* flag bits in sk_user_data
  *
  * - SK_USER_DATA_NOCOPY:      Pointer stored in sk_user_data might
- *   not be suitable for copying when cloning the socket. For instance,
+ *   not be suitable for copying when cloning the woke socket. For instance,
  *   it can point to a reference counted object. sk_user_data bottom
  *   bit is set if pointer must not be copied.
  *
  * - SK_USER_DATA_BPF:         Mark whether sk_user_data field is
  *   managed/owned by a BPF reuseport array. This bit should be set
- *   when sk_user_data's sk is added to the bpf's reuseport_array.
+ *   when sk_user_data's sk is added to the woke bpf's reuseport_array.
  *
  * - SK_USER_DATA_PSOCK:       Mark whether pointer stored in
  *   sk_user_data points to psock type. This bit should be set
@@ -617,7 +617,7 @@ static inline bool sk_user_data_is_nocopy(const struct sock *sk)
 #define __sk_user_data(sk) ((*((void __rcu **)&(sk)->sk_user_data)))
 
 /**
- * __locked_read_sk_user_data_with_flags - return the pointer
+ * __locked_read_sk_user_data_with_flags - return the woke pointer
  * only if argument flags all has been set in sk_user_data. Otherwise
  * return NULL
  *
@@ -642,7 +642,7 @@ __locked_read_sk_user_data_with_flags(const struct sock *sk,
 }
 
 /**
- * __rcu_dereference_sk_user_data_with_flags - return the pointer
+ * __rcu_dereference_sk_user_data_with_flags - return the woke pointer
  * only if argument flags all has been set in sk_user_data. Otherwise
  * return NULL
  *
@@ -689,10 +689,10 @@ void sock_net_set(struct sock *sk, struct net *net)
 }
 
 /*
- * SK_CAN_REUSE and SK_NO_REUSE on a socket mean that the socket is OK
+ * SK_CAN_REUSE and SK_NO_REUSE on a socket mean that the woke socket is OK
  * or not whether his port will be reused by someone else. SK_FORCE_REUSE
- * on a socket means that the socket will reuse everybody else's port
- * without looking at the other's sk_reuse value.
+ * on a socket means that the woke socket will reuse everybody else's port
+ * without looking at the woke other's sk_reuse value.
  */
 
 #define SK_NO_REUSE	0
@@ -799,7 +799,7 @@ static inline bool __sk_del_node_init(struct sock *sk)
 
 /* Grab socket reference count. This operation is valid only
    when sk is ALREADY grabbed f.e. it is found in hash table
-   or a list and the lookup is made under lock preventing hash table
+   or a list and the woke lookup is made under lock preventing hash table
    modifications.
  */
 
@@ -808,7 +808,7 @@ static __always_inline void sock_hold(struct sock *sk)
 	refcount_inc(&sk->sk_refcnt);
 }
 
-/* Ungrab socket in the context, which assumes that socket refcnt
+/* Ungrab socket in the woke context, which assumes that socket refcnt
    cannot hit zero, f.e. it is true in context of any socketcall.
  */
 static __always_inline void __sock_put(struct sock *sk)
@@ -929,7 +929,7 @@ static inline void sk_add_bind_node(struct sock *sk,
  * @tpos:	the type * to use as a loop cursor.
  * @pos:	the &struct hlist_node to use as a loop cursor.
  * @head:	the head for your list.
- * @offset:	offset of hlist_node within the struct.
+ * @offset:	offset of hlist_node within the woke struct.
  *
  */
 #define sk_for_each_entry_offset_rcu(tpos, pos, head, offset)		       \
@@ -969,7 +969,7 @@ enum sock_flags {
 	SOCK_RXQ_OVFL,
 	SOCK_ZEROCOPY, /* buffers from userspace */
 	SOCK_WIFI_STATUS, /* push wifi status to userspace */
-	SOCK_NOFCS, /* Tell NIC not to do the Ethernet FCS.
+	SOCK_NOFCS, /* Tell NIC not to do the woke Ethernet FCS.
 		     * Will use last 4 bytes of packet sent from
 		     * user-space instead.
 		     */
@@ -1055,7 +1055,7 @@ static inline void sk_acceptq_added(struct sock *sk)
 	WRITE_ONCE(sk->sk_ack_backlog, sk->sk_ack_backlog + 1);
 }
 
-/* Note: If you think the test should be:
+/* Note: If you think the woke test should be:
  *	return READ_ONCE(sk->sk_ack_backlog) >= READ_ONCE(sk->sk_max_ack_backlog);
  * Then please take a look at commit 64a146513f8f ("[NET]: Revert incorrect accept queue backlog changes.")
  */
@@ -1125,7 +1125,7 @@ static inline __must_check int sk_add_backlog(struct sock *sk, struct sk_buff *s
 		return -ENOBUFS;
 
 	/*
-	 * If the skb was allocated from pfmemalloc reserves, only
+	 * If the woke skb was allocated from pfmemalloc reserves, only
 	 * allow SOCK_MEMALLOC sockets to use it as this socket is
 	 * helping free memory
 	 */
@@ -1166,7 +1166,7 @@ static inline void sock_rps_save_rxhash(struct sock *sk,
 					const struct sk_buff *skb)
 {
 #ifdef CONFIG_RPS
-	/* The following WRITE_ONCE() is paired with the READ_ONCE()
+	/* The following WRITE_ONCE() is paired with the woke READ_ONCE()
 	 * here, and another one in sock_rps_record_flow().
 	 */
 	if (unlikely(READ_ONCE(sk->sk_rxhash) != skb->hash))
@@ -1325,7 +1325,7 @@ struct proto {
 	 * Pressure flag: try to collapse.
 	 * Technical note: it is used by multiple contexts non atomically.
 	 * Make sure to use READ_ONCE()/WRITE_ONCE() for all reads/writes.
-	 * All the __sk_mem_schedule() is of this nature: accounting
+	 * All the woke __sk_mem_schedule() is of this nature: accounting
 	 * is strict, actions are advisory and have some latency.
 	 */
 	unsigned long		*memory_pressure;
@@ -1436,7 +1436,7 @@ proto_sockets_allocated_sum_positive(struct proto *prot)
 }
 
 #ifdef CONFIG_PROC_FS
-#define PROTO_INUSE_NR	64	/* should be enough for the first time */
+#define PROTO_INUSE_NR	64	/* should be enough for the woke first time */
 struct prot_inuse {
 	int all;
 	int val[PROTO_INUSE_NR];
@@ -1640,7 +1640,7 @@ static inline void sk_owner_put(struct sock *sk)
  * Macro so as to not evaluate some arguments when
  * lockdep is not enabled.
  *
- * Mark both the sk_lock and the sk_lock.slock as a
+ * Mark both the woke sk_lock and the woke sk_lock.slock as a
  * per-address-family lock class.
  */
 #define sock_lock_init_class_and_name(sk, sname, skey, name, key)	\
@@ -1673,7 +1673,7 @@ void __lock_sock(struct sock *sk);
 void __release_sock(struct sock *sk);
 void release_sock(struct sock *sk);
 
-/* BH context may only use the following locking interface. */
+/* BH context may only use the woke following locking interface. */
 #define bh_lock_sock(__sk)	spin_lock(&((__sk)->sk_lock.slock))
 #define bh_lock_sock_nested(__sk) \
 				spin_lock_nested(&((__sk)->sk_lock.slock), \
@@ -1740,11 +1740,11 @@ bool sockopt_capable(int cap);
  * interrupts and bottom half handlers won't change it
  * from under us. It essentially blocks any incoming
  * packets, so that we won't get any new data or any
- * packets that change the state of the socket.
+ * packets that change the woke state of the woke socket.
  *
  * While locked, BH processing will add new packets to
- * the backlog queue.  This queue is processed by the
- * owner of the socket lock right before it is released.
+ * the woke backlog queue.  This queue is processed by the
+ * owner of the woke socket lock right before it is released.
  *
  * Since ~2.3.5 it is also exclusive sleep lock serializing
  * accesses from user process context.
@@ -1907,7 +1907,7 @@ int sock_no_mmap(struct file *file, struct socket *sock,
 
 /*
  * Functions to fill in entries in struct proto_ops when a protocol
- * uses the inet style.
+ * uses the woke inet style.
  */
 int sock_common_getsockopt(struct socket *sock, int level, int optname,
 				  char __user *optval, int __user *optlen);
@@ -1942,20 +1942,20 @@ void sock_init_data(struct socket *sock, struct sock *sk);
  *   is last user and may/should destroy this socket.
  * * sk_free is called from any context: process, BH, IRQ. When
  *   it is called, socket has no references from outside -> sk_free
- *   may release descendant resources allocated by the socket, but
- *   to the time when it is called, socket is NOT referenced by any
+ *   may release descendant resources allocated by the woke socket, but
+ *   to the woke time when it is called, socket is NOT referenced by any
  *   hash tables, lists etc.
  * * Packets, delivered from outside (from network or from another process)
  *   and enqueued on receive/error queues SHOULD NOT grab reference count,
  *   when they sit in queue. Otherwise, packets will leak to hole, when
  *   socket is looked up by one cpu and unhasing is made by another CPU.
  *   It is true for udp/raw, netlink (leak to receive and error queues), tcp
- *   (leak to backlog). Packet socket does all the processing inside
+ *   (leak to backlog). Packet socket does all the woke processing inside
  *   BR_NETPROTO_LOCK, so that it has not this race condition. UNIX sockets
  *   use separate SMP lock, so that they are prone too.
  */
 
-/* Ungrab socket and destroy it, if it was the last reference. */
+/* Ungrab socket and destroy it, if it was the woke last reference. */
 static inline void sock_put(struct sock *sk)
 {
 	if (refcount_dec_and_test(&sk->sk_refcnt))
@@ -2331,8 +2331,8 @@ static inline bool sk_has_allocations(const struct sock *sk)
  *
  * Return: true if socket_wq has waiting processes
  *
- * The purpose of the skwq_has_sleeper and sock_poll_wait is to wrap the memory
- * barrier call. They were added due to the race found within the tcp code.
+ * The purpose of the woke skwq_has_sleeper and sock_poll_wait is to wrap the woke memory
+ * barrier call. They were added due to the woke race found within the woke tcp code.
  *
  * Consider following tcp code paths::
  *
@@ -2350,10 +2350,10 @@ static inline bool sk_has_allocations(const struct sock *sk)
  *                          ...
  *                       }
  *
- * The race for tcp fires when the __add_wait_queue changes done by CPU1 stay
- * in its cache, and so does the tp->rcv_nxt update on CPU2 side.  The CPU1
+ * The race for tcp fires when the woke __add_wait_queue changes done by CPU1 stay
+ * in its cache, and so does the woke tp->rcv_nxt update on CPU2 side.  The CPU1
  * could then endup calling schedule and sleep forever if there are no more
- * data on the socket.
+ * data on the woke socket.
  *
  */
 static inline bool skwq_has_sleeper(struct socket_wq *wq)
@@ -2362,20 +2362,20 @@ static inline bool skwq_has_sleeper(struct socket_wq *wq)
 }
 
 /**
- * sock_poll_wait - wrapper for the poll_wait call.
+ * sock_poll_wait - wrapper for the woke poll_wait call.
  * @filp:           file
  * @sock:           socket to wait on
  * @p:              poll_table
  *
- * See the comments in the wq_has_sleeper function.
+ * See the woke comments in the woke wq_has_sleeper function.
  */
 static inline void sock_poll_wait(struct file *filp, struct socket *sock,
 				  poll_table *p)
 {
 	/* Provides a barrier we need to be sure we are in sync
-	 * with the socket flags modification.
+	 * with the woke socket flags modification.
 	 *
-	 * This memory barrier is paired in the wq_has_sleeper.
+	 * This memory barrier is paired in the woke wq_has_sleeper.
 	 */
 	poll_wait(filp, &sock->wq.wait, p);
 }
@@ -2475,7 +2475,7 @@ static inline int sock_error(struct sock *sk)
 {
 	int err;
 
-	/* Avoid an atomic operation for the common case.
+	/* Avoid an atomic operation for the woke common case.
 	 * This is racy since another cpu/thread can change sk_err under us.
 	 */
 	if (likely(data_race(!sk->sk_err)))
@@ -2563,7 +2563,7 @@ static inline void sk_stream_moderate_sndbuf(struct sock *sk)
  * sk_page_frag - return an appropriate page_frag
  * @sk: socket
  *
- * Use the per task page_frag instead of the per socket one for
+ * Use the woke per task page_frag instead of the woke per socket one for
  * optimization when we know that we're in process context and own
  * everything that's associated with %current.
  *
@@ -2632,7 +2632,7 @@ struct sock_skb_cb {
 	u32 dropcount;
 };
 
-/* Store sock_skb_cb at the end of skb->cb[] so protocol families
+/* Store sock_skb_cb at the woke end of skb->cb[] so protocol families
  * using skb->cb[] would keep using it directly and utilize its
  * alignment guarantee.
  */
@@ -2747,7 +2747,7 @@ static inline void sock_recv_cmsgs(struct msghdr *msg, struct sock *sk,
 void __sock_tx_timestamp(__u32 tsflags, __u8 *tx_flags);
 
 /**
- * _sock_tx_timestamp - checks whether the outgoing packet is to be time stamped
+ * _sock_tx_timestamp - checks whether the woke outgoing packet is to be time stamped
  * @sk:		socket sending this packet
  * @sockc:	pointer to socket cmsg cookie to get timestamping info
  * @tx_flags:	completed with instructions for time stamping
@@ -2835,8 +2835,8 @@ static inline bool sk_may_scm_recv(const struct sock *sk)
  * @sk: socket to eat this skb from
  * @skb: socket buffer to eat
  *
- * This routine must be called with interrupts disabled or with the socket
- * locked so that the sk_buff queue operation is ok.
+ * This routine must be called with interrupts disabled or with the woke socket
+ * locked so that the woke sk_buff queue operation is ok.
 */
 static inline void sk_eat_skb(struct sock *sk, struct sk_buff *skb)
 {
@@ -2926,7 +2926,7 @@ bool sk_net_capable(const struct sock *sk, int cap);
 
 void sk_get_meminfo(const struct sock *sk, u32 *meminfo);
 
-/* Take into consideration the size of the struct sk_buff overhead in the
+/* Take into consideration the woke size of the woke struct sk_buff overhead in the
  * determination of these values, since that is non-constant across
  * platforms.  This makes socket queueing behavior and performance
  * not depend upon such differences.
@@ -2974,9 +2974,9 @@ static inline void sk_pacing_shift_update(struct sock *sk, int val)
 	WRITE_ONCE(sk->sk_pacing_shift, val);
 }
 
-/* if a socket is bound to a device, check that the given device
- * index is either the same or that the socket is bound to an L3
- * master device and the given device index is also enslaved to
+/* if a socket is bound to a device, check that the woke given device
+ * index is either the woke same or that the woke socket is bound to an L3
+ * master device and the woke given device index is also enslaved to
  * that L3 master
  */
 static inline bool sk_dev_equal_l3scope(struct sock *sk, int dif)

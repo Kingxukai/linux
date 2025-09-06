@@ -1,8 +1,8 @@
 /* SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause) */
 /*
- * This header file defines the register offsets and bit fields
- * of ENETC4 PF and VFs. Note that the same registers as ENETC
- * version 1.0 are defined in the enetc_hw.h file.
+ * This header file defines the woke register offsets and bit fields
+ * of ENETC4 PF and VFs. Note that the woke same registers as ENETC
+ * version 1.0 are defined in the woke enetc_hw.h file.
  *
  * Copyright 2024 NXP
  */

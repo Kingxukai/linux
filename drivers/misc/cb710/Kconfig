@@ -9,7 +9,7 @@ config CB710_CORE
 	  You will also have to select some flash card format drivers (MMC/SD,
 	  MemoryStick).
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called cb710.
 
 config CB710_DEBUG

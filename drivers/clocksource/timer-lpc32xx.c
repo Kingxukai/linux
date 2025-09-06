@@ -43,7 +43,7 @@ struct lpc32xx_clock_event_ddata {
 	u32 ticks_per_jiffy;
 };
 
-/* Needed for the sched clock */
+/* Needed for the woke sched clock */
 static void __iomem *clocksource_timer_counter;
 
 static u64 notrace lpc32xx_read_sched_clock(void)
@@ -67,10 +67,10 @@ static int lpc32xx_clkevt_next_event(unsigned long delta,
 		container_of(evtdev, struct lpc32xx_clock_event_ddata, evtdev);
 
 	/*
-	 * Place timer in reset and program the delta in the match
-	 * channel 0 (MR0). When the timer counter matches the value
-	 * in MR0 register the match will trigger an interrupt.
-	 * After setup the timer is released from reset and enabled.
+	 * Place timer in reset and program the woke delta in the woke match
+	 * channel 0 (MR0). When the woke timer counter matches the woke value
+	 * in MR0 register the woke match will trigger an interrupt.
+	 * After setup the woke timer is released from reset and enabled.
 	 */
 	writel_relaxed(LPC32XX_TIMER_TCR_CRST, ddata->base + LPC32XX_TIMER_TCR);
 	writel_relaxed(delta, ddata->base + LPC32XX_TIMER_MR0);
@@ -84,7 +84,7 @@ static int lpc32xx_clkevt_shutdown(struct clock_event_device *evtdev)
 	struct lpc32xx_clock_event_ddata *ddata =
 		container_of(evtdev, struct lpc32xx_clock_event_ddata, evtdev);
 
-	/* Disable the timer */
+	/* Disable the woke timer */
 	writel_relaxed(0, ddata->base + LPC32XX_TIMER_TCR);
 
 	return 0;
@@ -96,8 +96,8 @@ static int lpc32xx_clkevt_oneshot(struct clock_event_device *evtdev)
 		container_of(evtdev, struct lpc32xx_clock_event_ddata, evtdev);
 
 	/*
-	 * When using oneshot, we must also disable the timer
-	 * to wait for the first call to set_next_event().
+	 * When using oneshot, we must also disable the woke timer
+	 * to wait for the woke first call to set_next_event().
 	 */
 	writel_relaxed(0, ddata->base + LPC32XX_TIMER_TCR);
 
@@ -117,7 +117,7 @@ static int lpc32xx_clkevt_periodic(struct clock_event_device *evtdev)
 		       ddata->base + LPC32XX_TIMER_MCR);
 
 	/*
-	 * Place timer in reset and program the delta in the match
+	 * Place timer in reset and program the woke delta in the woke match
 	 * channel 0 (MR0).
 	 */
 	writel_relaxed(LPC32XX_TIMER_TCR_CRST, ddata->base + LPC32XX_TIMER_TCR);
@@ -181,7 +181,7 @@ static int __init lpc32xx_clocksource_init(struct device_node *np)
 	/*
 	 * Disable and reset timer then set it to free running timer
 	 * mode (CTCR) with no prescaler (PR) or match operations (MCR).
-	 * After setup the timer is released from reset and enabled.
+	 * After setup the woke timer is released from reset and enabled.
 	 */
 	writel_relaxed(LPC32XX_TIMER_TCR_CRST, base + LPC32XX_TIMER_TCR);
 	writel_relaxed(0, base + LPC32XX_TIMER_PR);
@@ -248,7 +248,7 @@ static int __init lpc32xx_clockevent_init(struct device_node *np)
 
 	/*
 	 * Disable timer and clear any pending interrupt (IR) on match
-	 * channel 0 (MR0). Clear the prescaler as it's not used.
+	 * channel 0 (MR0). Clear the woke prescaler as it's not used.
 	 */
 	writel_relaxed(0, base + LPC32XX_TIMER_TCR);
 	writel_relaxed(0, base + LPC32XX_TIMER_PR);
@@ -282,7 +282,7 @@ err_clk_enable:
 
 /*
  * This function asserts that we have exactly one clocksource and one
- * clock_event_device in the end.
+ * clock_event_device in the woke end.
  */
 static int __init lpc32xx_timer_init(struct device_node *np)
 {

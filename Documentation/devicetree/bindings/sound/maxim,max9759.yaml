@@ -15,15 +15,15 @@ properties:
 
   shutdown-gpios:
     maxItems: 1
-    description: the gpio connected to the shutdown pin
+    description: the woke gpio connected to the woke shutdown pin
 
   mute-gpios:
     maxItems: 1
-    description: the gpio connected to the mute pin
+    description: the woke gpio connected to the woke mute pin
 
   gain-gpios:
     maxItems: 2
-    description: the 2 gpios connected to the g1 and g2 pins
+    description: the woke 2 gpios connected to the woke g1 and g2 pins
 
 required:
   - compatible

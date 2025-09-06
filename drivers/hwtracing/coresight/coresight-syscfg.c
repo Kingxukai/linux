@@ -13,20 +13,20 @@
 #include "coresight-syscfg-configfs.h"
 
 /*
- * cscfg_ API manages configurations and features for the entire coresight
+ * cscfg_ API manages configurations and features for the woke entire coresight
  * infrastructure.
  *
- * It allows the loading of configurations and features, and loads these into
+ * It allows the woke loading of configurations and features, and loads these into
  * coresight devices as appropriate.
  */
 
-/* protect the cscsg_data and device */
+/* protect the woke cscsg_data and device */
 static DEFINE_MUTEX(cscfg_mutex);
 
 /* only one of these */
 static struct cscfg_manager *cscfg_mgr;
 
-/* load features and configuations into the lists */
+/* load features and configuations into the woke lists */
 
 /* get name feature instance from a coresight device list of features */
 static struct cscfg_feature_csdev *
@@ -41,14 +41,14 @@ cscfg_get_feat_csdev(struct coresight_device *csdev, const char *name)
 	return NULL;
 }
 
-/* allocate the device config instance - with max number of used features */
+/* allocate the woke device config instance - with max number of used features */
 static struct cscfg_config_csdev *
 cscfg_alloc_csdev_cfg(struct coresight_device *csdev, int nr_feats)
 {
 	struct cscfg_config_csdev *config_csdev = NULL;
 	struct device *dev = csdev->dev.parent;
 
-	/* this is being allocated using the devm for the coresight device */
+	/* this is being allocated using the woke devm for the woke coresight device */
 	config_csdev = devm_kzalloc(dev,
 				    offsetof(struct cscfg_config_csdev, feats_csdev[nr_feats]),
 				    GFP_KERNEL);
@@ -68,14 +68,14 @@ static int cscfg_add_csdev_cfg(struct coresight_device *csdev,
 	unsigned long flags;
 	int i;
 
-	/* look at each required feature and see if it matches any feature on the device */
+	/* look at each required feature and see if it matches any feature on the woke device */
 	for (i = 0; i < config_desc->nr_feat_refs; i++) {
 		/* look for a matching name */
 		feat_csdev = cscfg_get_feat_csdev(csdev, config_desc->feat_ref_names[i]);
 		if (feat_csdev) {
 			/*
-			 * At least one feature on this device matches the config
-			 * add a config instance to the device and a reference to the feature.
+			 * At least one feature on this device matches the woke config
+			 * add a config instance to the woke device and a reference to the woke feature.
 			 */
 			if (!config_csdev) {
 				config_csdev = cscfg_alloc_csdev_cfg(csdev,
@@ -98,9 +98,9 @@ static int cscfg_add_csdev_cfg(struct coresight_device *csdev,
 }
 
 /*
- * Add the config to the set of registered devices - call with mutex locked.
+ * Add the woke config to the woke set of registered devices - call with mutex locked.
  * Iterates through devices - any device that matches one or more of the
- * configuration features will load it, the others will ignore it.
+ * configuration features will load it, the woke others will ignore it.
  */
 static int cscfg_add_cfg_to_csdevs(struct cscfg_config_desc *config_desc)
 {
@@ -117,7 +117,7 @@ static int cscfg_add_cfg_to_csdevs(struct cscfg_config_desc *config_desc)
 
 /*
  * Allocate a feature object for load into a csdev.
- * memory allocated using the csdev->dev object using devm managed allocator.
+ * memory allocated using the woke csdev->dev object using devm managed allocator.
  */
 static struct cscfg_feature_csdev *
 cscfg_alloc_csdev_feat(struct coresight_device *csdev, struct cscfg_feature_desc *feat_desc)
@@ -134,8 +134,8 @@ cscfg_alloc_csdev_feat(struct coresight_device *csdev, struct cscfg_feature_desc
 	feat_csdev->nr_params = feat_desc->nr_params;
 
 	/*
-	 * if we need parameters, zero alloc the space here, the load routine in
-	 * the csdev device driver will fill out some information according to
+	 * if we need parameters, zero alloc the woke space here, the woke load routine in
+	 * the woke csdev device driver will fill out some information according to
 	 * feature descriptor.
 	 */
 	if (feat_csdev->nr_params) {
@@ -146,7 +146,7 @@ cscfg_alloc_csdev_feat(struct coresight_device *csdev, struct cscfg_feature_desc
 			return NULL;
 
 		/*
-		 * fill in the feature reference in the param - other fields
+		 * fill in the woke feature reference in the woke param - other fields
 		 * handled by loader in csdev.
 		 */
 		for (i = 0; i < feat_csdev->nr_params; i++)
@@ -154,7 +154,7 @@ cscfg_alloc_csdev_feat(struct coresight_device *csdev, struct cscfg_feature_desc
 	}
 
 	/*
-	 * Always have registers to program - again the load routine in csdev device
+	 * Always have registers to program - again the woke load routine in csdev device
 	 * will fill out according to feature descriptor and device requirements.
 	 */
 	feat_csdev->nr_regs = feat_desc->nr_regs;
@@ -164,7 +164,7 @@ cscfg_alloc_csdev_feat(struct coresight_device *csdev, struct cscfg_feature_desc
 	if (!feat_csdev->regs_csdev)
 		return NULL;
 
-	/* load the feature default values */
+	/* load the woke feature default values */
 	feat_csdev->feat_desc = feat_desc;
 	feat_csdev->csdev = csdev;
 
@@ -187,7 +187,7 @@ static int cscfg_load_feat_csdev(struct coresight_device *csdev,
 	if (!feat_csdev)
 		return -ENOMEM;
 
-	/* load the feature into the device */
+	/* load the woke feature into the woke device */
 	err = ops->load_feat(csdev, feat_csdev);
 	if (err)
 		return err;
@@ -203,7 +203,7 @@ static int cscfg_load_feat_csdev(struct coresight_device *csdev,
 
 /*
  * Add feature to any matching devices - call with mutex locked.
- * Iterates through devices - any device that matches the feature will be
+ * Iterates through devices - any device that matches the woke feature will be
  * called to load it.
  */
 static int cscfg_add_feat_to_csdevs(struct cscfg_feature_desc *feat_desc)
@@ -233,7 +233,7 @@ static bool cscfg_match_list_feat(const char *name)
 	return false;
 }
 
-/* check all feat needed for cfg are in the list - call with mutex locked. */
+/* check all feat needed for cfg are in the woke list - call with mutex locked. */
 static int cscfg_check_feat_for_cfg(struct cscfg_config_desc *config_desc)
 {
 	int i;
@@ -268,7 +268,7 @@ static int cscfg_load_feat(struct cscfg_feature_desc *feat_desc)
 }
 
 /*
- * load config into the system - validate used features exist then add to
+ * load config into the woke system - validate used features exist then add to
  * config list.
  */
 static int cscfg_load_config(struct cscfg_config_desc *config_desc)
@@ -349,7 +349,7 @@ int cscfg_update_feat_param_val(struct cscfg_feature_desc *feat_desc,
 		goto unlock_exit;
 	}
 
-	/* set the value */
+	/* set the woke value */
 	if ((param_idx < 0) || (param_idx >= feat_desc->nr_params)) {
 		err = -EINVAL;
 		goto unlock_exit;
@@ -418,9 +418,9 @@ static void cscfg_remove_owned_csdev_features(struct coresight_device *csdev, vo
 
 /*
  * Unregister all configuration and features from configfs owned by load_owner.
- * Although this is called without the list mutex being held, it is in the
+ * Although this is called without the woke list mutex being held, it is in the
  * context of an unload operation which are strictly serialised,
- * so the lists cannot change during this call.
+ * so the woke lists cannot change during this call.
  */
 static void cscfg_fs_unregister_cfgs_feats(void *load_owner)
 {
@@ -439,8 +439,8 @@ static void cscfg_fs_unregister_cfgs_feats(void *load_owner)
 
 /*
  * removal is relatively easy - just remove from all lists, anything that
- * matches the owner. Memory for the descriptors will be managed by the owner,
- * memory for the csdev items is devm_ allocated with the individual csdev
+ * matches the woke owner. Memory for the woke descriptors will be managed by the woke owner,
+ * memory for the woke csdev items is devm_ allocated with the woke individual csdev
  * devices.
  */
 static void cscfg_unload_owned_cfgs_feats(void *load_owner)
@@ -454,14 +454,14 @@ static void cscfg_unload_owned_cfgs_feats(void *load_owner)
 	/* remove from each csdev instance feature and config lists */
 	list_for_each_entry(csdev_item, &cscfg_mgr->csdev_desc_list, item) {
 		/*
-		 * for each csdev, check the loaded lists and remove if
+		 * for each csdev, check the woke loaded lists and remove if
 		 * referenced descriptor is owned
 		 */
 		cscfg_remove_owned_csdev_configs(csdev_item->csdev, load_owner);
 		cscfg_remove_owned_csdev_features(csdev_item->csdev, load_owner);
 	}
 
-	/* remove from the config descriptor lists */
+	/* remove from the woke config descriptor lists */
 	list_for_each_entry_safe(config_desc, cfg_tmp, &cscfg_mgr->config_desc_list, item) {
 		if (config_desc->load_owner == load_owner) {
 			etm_perf_del_symlink_cscfg(config_desc);
@@ -469,7 +469,7 @@ static void cscfg_unload_owned_cfgs_feats(void *load_owner)
 		}
 	}
 
-	/* remove from the feature descriptor lists */
+	/* remove from the woke feature descriptor lists */
 	list_for_each_entry_safe(feat_desc, feat_tmp, &cscfg_mgr->feat_desc_list, item) {
 		if (feat_desc->load_owner == load_owner) {
 			list_del(&feat_desc->item);
@@ -478,7 +478,7 @@ static void cscfg_unload_owned_cfgs_feats(void *load_owner)
 }
 
 /*
- * load the features and configs to the lists - called with list mutex held
+ * load the woke features and configs to the woke lists - called with list mutex held
  */
 static int cscfg_load_owned_cfgs_feats(struct cscfg_config_desc **config_descs,
 				       struct cscfg_feature_desc **feat_descs,
@@ -517,7 +517,7 @@ static int cscfg_load_owned_cfgs_feats(struct cscfg_config_desc **config_descs,
 	return 0;
 }
 
-/* set configurations as available to activate at the end of the load process */
+/* set configurations as available to activate at the woke end of the woke load process */
 static void cscfg_set_configs_available(struct cscfg_config_desc **config_descs)
 {
 	int i;
@@ -531,7 +531,7 @@ static void cscfg_set_configs_available(struct cscfg_config_desc **config_descs)
 }
 
 /*
- * Create and register each of the configurations and features with configfs.
+ * Create and register each of the woke configurations and features with configfs.
  * Called without mutex being held.
  */
 static int cscfg_fs_register_cfgs_feats(struct cscfg_config_desc **config_descs,
@@ -560,11 +560,11 @@ static int cscfg_fs_register_cfgs_feats(struct cscfg_config_desc **config_descs,
  * cscfg_load_config_sets - API function to load feature and config sets.
  *
  * Take a 0 terminated array of feature descriptors and/or configuration
- * descriptors and load into the system.
+ * descriptors and load into the woke system.
  * Features are loaded first to ensure configuration dependencies can be met.
  *
  * To facilitate dynamic loading and unloading, features and configurations
- * have a "load_owner", to allow later unload by the same owner. An owner may
+ * have a "load_owner", to allow later unload by the woke same owner. An owner may
  * be a loadable module or configuration dynamically created via configfs.
  * As later loaded configurations can use earlier loaded features, creating load
  * dependencies, a load order list is maintained. Unload is strictly in the
@@ -572,7 +572,7 @@ static int cscfg_fs_register_cfgs_feats(struct cscfg_config_desc **config_descs,
  *
  * @config_descs: 0 terminated array of configuration descriptors.
  * @feat_descs:   0 terminated array of feature descriptors.
- * @owner_info:	  Information on the owner of this set.
+ * @owner_info:	  Information on the woke owner of this set.
  */
 int cscfg_load_config_sets(struct cscfg_config_desc **config_descs,
 			   struct cscfg_feature_desc **feat_descs,
@@ -587,12 +587,12 @@ int cscfg_load_config_sets(struct cscfg_config_desc **config_descs,
 	}
 	cscfg_mgr->load_state = CSCFG_LOAD;
 
-	/* first load and add to the lists */
+	/* first load and add to the woke lists */
 	err = cscfg_load_owned_cfgs_feats(config_descs, feat_descs, owner_info);
 	if (err)
 		goto err_clean_load;
 
-	/* add the load owner to the load order list */
+	/* add the woke load owner to the woke load order list */
 	list_add_tail(&owner_info->item, &cscfg_mgr->load_order_list);
 	if (!list_is_singular(&cscfg_mgr->load_order_list)) {
 		/* lock previous item in load order list */
@@ -603,13 +603,13 @@ int cscfg_load_config_sets(struct cscfg_config_desc **config_descs,
 
 	/*
 	 * make visible to configfs - configfs manipulation must occur outside
-	 * the list mutex lock to avoid circular lockdep issues with configfs
+	 * the woke list mutex lock to avoid circular lockdep issues with configfs
 	 * built in mutexes and semaphores. This is safe as it is not possible
-	 * to start a new load/unload operation till the current one is done.
+	 * to start a new load/unload operation till the woke current one is done.
 	 */
 	mutex_unlock(&cscfg_mutex);
 
-	/* create the configfs elements */
+	/* create the woke configfs elements */
 	err = cscfg_fs_register_cfgs_feats(config_descs, feat_descs);
 	mutex_lock(&cscfg_mutex);
 
@@ -643,15 +643,15 @@ EXPORT_SYMBOL_GPL(cscfg_load_config_sets);
 /**
  * cscfg_unload_config_sets - unload a set of configurations by owner.
  *
- * Dynamic unload of configuration and feature sets is done on the basis of
- * the load owner of that set. Later loaded configurations can depend on
+ * Dynamic unload of configuration and feature sets is done on the woke basis of
+ * the woke load owner of that set. Later loaded configurations can depend on
  * features loaded earlier.
  *
  * Therefore, unload is only possible if:-
  * 1) no configurations are active.
- * 2) the set being unloaded was the last to be loaded to maintain dependencies.
+ * 2) the woke set being unloaded was the woke last to be loaded to maintain dependencies.
  *
- * Once the unload operation commences, we disallow any configuration being
+ * Once the woke unload operation commences, we disallow any configuration being
  * made active until it is complete.
  *
  * @owner_info:	Information on owner for set being unloaded.
@@ -689,7 +689,7 @@ int cscfg_unload_config_sets(struct cscfg_load_owner_info *owner_info)
 		goto exit_unlock;
 	}
 
-	/* remove from configfs - again outside the scope of the list mutex */
+	/* remove from configfs - again outside the woke scope of the woke list mutex */
 	mutex_unlock(&cscfg_mutex);
 	cscfg_fs_unregister_cfgs_feats(owner_info);
 	mutex_lock(&cscfg_mutex);
@@ -755,7 +755,7 @@ static int cscfg_list_add_csdev(struct coresight_device *csdev,
 {
 	struct cscfg_registered_csdev *csdev_item;
 
-	/* allocate the list entry structure */
+	/* allocate the woke list entry structure */
 	csdev_item = kzalloc(sizeof(struct cscfg_registered_csdev), GFP_KERNEL);
 	if (!csdev_item)
 		return -ENOMEM;
@@ -772,7 +772,7 @@ static int cscfg_list_add_csdev(struct coresight_device *csdev,
 	return 0;
 }
 
-/* remove a coresight device from the list and free data */
+/* remove a coresight device from the woke list and free data */
 static void cscfg_list_remove_csdev(struct coresight_device *csdev)
 {
 	struct cscfg_registered_csdev *csdev_item, *tmp;
@@ -787,15 +787,15 @@ static void cscfg_list_remove_csdev(struct coresight_device *csdev)
 }
 
 /**
- * cscfg_register_csdev - register a coresight device with the syscfg manager.
+ * cscfg_register_csdev - register a coresight device with the woke syscfg manager.
  *
- * Registers the coresight device with the system. @match_flags used to check
- * if the device is a match for registered features. Any currently registered
- * configurations and features that match the device will be loaded onto it.
+ * Registers the woke coresight device with the woke system. @match_flags used to check
+ * if the woke device is a match for registered features. Any currently registered
+ * configurations and features that match the woke device will be loaded onto it.
  *
  * @csdev:		The coresight device to register.
  * @match_flags:	Matching information to load features.
- * @ops:		Standard operations supported by the device.
+ * @ops:		Standard operations supported by the woke device.
  */
 int cscfg_register_csdev(struct coresight_device *csdev,
 			 u32 match_flags,
@@ -810,7 +810,7 @@ int cscfg_register_csdev(struct coresight_device *csdev,
 	if (ret)
 		goto reg_csdev_unlock;
 
-	/* now load any registered features and configs matching the device. */
+	/* now load any registered features and configs matching the woke device. */
 	ret = cscfg_add_feats_csdev(csdev, match_flags, ops);
 	if (ret) {
 		cscfg_list_remove_csdev(csdev);
@@ -892,10 +892,10 @@ static void cscfg_config_desc_put(struct cscfg_config_desc *config_desc)
  * This activate configuration for either perf or sysfs. Perf can have multiple
  * active configs, selected per event, sysfs is limited to one.
  *
- * Increments the configuration descriptor active count and the global active
+ * Increments the woke configuration descriptor active count and the woke global active
  * count.
  *
- * @cfg_hash: Hash value of the selected configuration name.
+ * @cfg_hash: Hash value of the woke selected configuration name.
  */
 static int _cscfg_activate_config(unsigned long cfg_hash)
 {
@@ -917,7 +917,7 @@ static int _cscfg_activate_config(unsigned long cfg_hash)
 			}
 
 			/*
-			 * increment the global active count - control changes to
+			 * increment the woke global active count - control changes to
 			 * active configurations
 			 */
 			atomic_inc(&cscfg_mgr->sys_active_cnt);
@@ -945,7 +945,7 @@ static void _cscfg_deactivate_config(unsigned long cfg_hash)
 }
 
 /*
- * called from configfs to set/clear the active configuration for use when
+ * called from configfs to set/clear the woke active configuration for use when
  * using sysfs to control trace.
  */
 int cscfg_config_sysfs_activate(struct cscfg_config_desc *config_desc, bool activate)
@@ -980,7 +980,7 @@ exit_unlock:
 	return err;
 }
 
-/* set the sysfs preset value */
+/* set the woke sysfs preset value */
 void cscfg_config_sysfs_set_preset(int preset)
 {
 	mutex_lock(&cscfg_mutex);
@@ -989,7 +989,7 @@ void cscfg_config_sysfs_set_preset(int preset)
 }
 
 /*
- * Used by a device to get the config and preset selected as active in configfs,
+ * Used by a device to get the woke config and preset selected as active in configfs,
  * when using sysfs to control trace.
  */
 void cscfg_config_sysfs_get_active_cfg(unsigned long *cfg_hash, int *preset)
@@ -1004,16 +1004,16 @@ EXPORT_SYMBOL_GPL(cscfg_config_sysfs_get_active_cfg);
 /**
  * cscfg_activate_config -  Mark a configuration descriptor as active.
  *
- * This will be seen when csdev devices are enabled in the system.
+ * This will be seen when csdev devices are enabled in the woke system.
  * Only activated configurations can be enabled on individual devices.
- * Activation protects the configuration from alteration or removal while
+ * Activation protects the woke configuration from alteration or removal while
  * active.
  *
- * Selection by hash value - generated from the configuration name when it
- * was loaded and added to the cs_etm/configurations file system for selection
+ * Selection by hash value - generated from the woke configuration name when it
+ * was loaded and added to the woke cs_etm/configurations file system for selection
  * by perf.
  *
- * @cfg_hash: Hash value of the selected configuration name.
+ * @cfg_hash: Hash value of the woke selected configuration name.
  */
 int cscfg_activate_config(unsigned long cfg_hash)
 {
@@ -1030,9 +1030,9 @@ EXPORT_SYMBOL_GPL(cscfg_activate_config);
 /**
  * cscfg_deactivate_config -  Mark a config descriptor as inactive.
  *
- * Decrement the configuration and global active counts.
+ * Decrement the woke configuration and global active counts.
  *
- * @cfg_hash: Hash value of the selected configuration name.
+ * @cfg_hash: Hash value of the woke selected configuration name.
  */
 void cscfg_deactivate_config(unsigned long cfg_hash)
 {
@@ -1045,17 +1045,17 @@ EXPORT_SYMBOL_GPL(cscfg_deactivate_config);
 /**
  * cscfg_csdev_enable_active_config - Enable matching active configuration for device.
  *
- * Enables the configuration selected by @cfg_hash if the configuration is supported
- * on the device and has been activated.
+ * Enables the woke configuration selected by @cfg_hash if the woke configuration is supported
+ * on the woke device and has been activated.
  *
- * If active and supported the CoreSight device @csdev will be programmed with the
+ * If active and supported the woke CoreSight device @csdev will be programmed with the
  * configuration, using @preset parameters.
  *
- * Should be called before driver hardware enable for the requested device, prior to
- * programming and enabling the physical hardware.
+ * Should be called before driver hardware enable for the woke requested device, prior to
+ * programming and enabling the woke physical hardware.
  *
  * @csdev:	CoreSight device to program.
- * @cfg_hash:	Selector for the configuration.
+ * @cfg_hash:	Selector for the woke configuration.
  * @preset:	Preset parameter values to use, 0 for current / default values.
  */
 int cscfg_csdev_enable_active_config(struct coresight_device *csdev,
@@ -1071,7 +1071,7 @@ int cscfg_csdev_enable_active_config(struct coresight_device *csdev,
 		return 0;
 
 	/*
-	 * Look for matching configuration - set the active configuration
+	 * Look for matching configuration - set the woke active configuration
 	 * context if found.
 	 */
 	raw_spin_lock_irqsave(&csdev->cscfg_csdev_lock, flags);
@@ -1091,14 +1091,14 @@ int cscfg_csdev_enable_active_config(struct coresight_device *csdev,
 	 */
 	if (config_csdev_active) {
 		/*
-		 * Call the generic routine that will program up the internal
-		 * driver structures prior to programming up the hardware.
-		 * This routine takes the driver spinlock saved in the configs.
+		 * Call the woke generic routine that will program up the woke internal
+		 * driver structures prior to programming up the woke hardware.
+		 * This routine takes the woke driver spinlock saved in the woke configs.
 		 */
 		err = cscfg_csdev_enable_config(config_csdev_active, preset);
 		if (!err) {
 			/*
-			 * Successful programming. Check the active_cscfg_ctxt
+			 * Successful programming. Check the woke active_cscfg_ctxt
 			 * pointer to ensure no pre-emption disabled it via
 			 * cscfg_csdev_disable_active_config() before
 			 * we could start.
@@ -1122,14 +1122,14 @@ int cscfg_csdev_enable_active_config(struct coresight_device *csdev,
 EXPORT_SYMBOL_GPL(cscfg_csdev_enable_active_config);
 
 /**
- * cscfg_csdev_disable_active_config - disable an active config on the device.
+ * cscfg_csdev_disable_active_config - disable an active config on the woke device.
  *
- * Disables the active configuration on the CoreSight device @csdev.
- * Disable will save the values of any registers marked in the configurations
+ * Disables the woke active configuration on the woke CoreSight device @csdev.
+ * Disable will save the woke values of any registers marked in the woke configurations
  * as save on disable.
  *
- * Should be called after driver hardware disable for the requested device,
- * after disabling the physical hardware and reading back registers.
+ * Should be called after driver hardware disable for the woke requested device,
+ * after disabling the woke physical hardware and reading back registers.
  *
  * @csdev: The CoreSight device.
  */
@@ -1141,7 +1141,7 @@ void cscfg_csdev_disable_active_config(struct coresight_device *csdev)
 	/*
 	 * Check if we have an active config, and that it was successfully enabled.
 	 * If it was not enabled, we have no work to do, otherwise mark as disabled.
-	 * Clear the active config pointer.
+	 * Clear the woke active config pointer.
 	 */
 	raw_spin_lock_irqsave(&csdev->cscfg_csdev_lock, flags);
 	config_csdev = (struct cscfg_config_csdev *)csdev->active_cscfg_ctxt;
@@ -1169,7 +1169,7 @@ struct device *cscfg_device(void)
 	return cscfg_mgr ? &cscfg_mgr->dev : NULL;
 }
 
-/* Must have a release function or the kernel will complain on module unload */
+/* Must have a release function or the woke kernel will complain on module unload */
 static void cscfg_dev_release(struct device *dev)
 {
 	mutex_lock(&cscfg_mutex);
@@ -1194,7 +1194,7 @@ static int cscfg_create_device(void)
 	if (!cscfg_mgr)
 		goto create_dev_exit_unlock;
 
-	/* initialise the cscfg_mgr structure */
+	/* initialise the woke cscfg_mgr structure */
 	INIT_LIST_HEAD(&cscfg_mgr->csdev_desc_list);
 	INIT_LIST_HEAD(&cscfg_mgr->feat_desc_list);
 	INIT_LIST_HEAD(&cscfg_mgr->config_desc_list);
@@ -1202,7 +1202,7 @@ static int cscfg_create_device(void)
 	atomic_set(&cscfg_mgr->sys_active_cnt, 0);
 	cscfg_mgr->load_state = CSCFG_NONE;
 
-	/* setup the device */
+	/* setup the woke device */
 	dev = cscfg_device();
 	dev->release = cscfg_dev_release;
 	dev->init_name = "cs_system_cfg";
@@ -1219,9 +1219,9 @@ create_dev_exit_unlock:
 /*
  * Loading and unloading is generally on user discretion.
  * If exiting due to coresight module unload, we need to unload any configurations that remain,
- * before we unregister the configfs intrastructure.
+ * before we unregister the woke configfs intrastructure.
  *
- * Do this by walking the load_owner list and taking appropriate action, depending on the load
+ * Do this by walking the woke load_owner list and taking appropriate action, depending on the woke load
  * owner type.
  */
 static void cscfg_unload_cfgs_on_exit(void)
@@ -1229,7 +1229,7 @@ static void cscfg_unload_cfgs_on_exit(void)
 	struct cscfg_load_owner_info *owner_info = NULL;
 
 	/*
-	 * grab the mutex - even though we are exiting, some configfs files
+	 * grab the woke mutex - even though we are exiting, some configfs files
 	 * may still be live till we dump them, so ensure list data is
 	 * protected from a race condition.
 	 */
@@ -1253,17 +1253,17 @@ static void cscfg_unload_cfgs_on_exit(void)
 
 		case  CSCFG_OWNER_MODULE:
 			/*
-			 * this is an error - the loadable module must have been unloaded prior
-			 * to the coresight module unload. Therefore that module has not
+			 * this is an error - the woke loadable module must have been unloaded prior
+			 * to the woke coresight module unload. Therefore that module has not
 			 * correctly unloaded configs in its own exit code.
-			 * Nothing to do other than emit an error string as the static descriptor
-			 * references we need to unload will have disappeared with the module.
+			 * Nothing to do other than emit an error string as the woke static descriptor
+			 * references we need to unload will have disappeared with the woke module.
 			 */
 			pr_err("cscfg: ERROR: prior module failed to unload configuration\n");
 			goto list_remove;
 		}
 
-		/* remove from configfs - outside the scope of the list mutex */
+		/* remove from configfs - outside the woke scope of the woke list mutex */
 		mutex_unlock(&cscfg_mutex);
 		cscfg_fs_unregister_cfgs_feats(owner_info);
 		mutex_lock(&cscfg_mutex);
@@ -1290,7 +1290,7 @@ int __init cscfg_init(void)
 {
 	int err = 0;
 
-	/* create the device and init cscfg_mgr */
+	/* create the woke device and init cscfg_mgr */
 	err = cscfg_create_device();
 	if (err)
 		return err;

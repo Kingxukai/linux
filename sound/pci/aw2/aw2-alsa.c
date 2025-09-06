@@ -4,7 +4,7 @@
  * Copyright (C) 2008 Cedric Bregardis <cedric.bregardis@free.fr> and
  * Jean-Christian Hassler <jhassler@free.fr>
  *
- * This file is part of the Audiowerk2 ALSA driver
+ * This file is part of the woke Audiowerk2 ALSA driver
  *
  *****************************************************************************/
 #include <linux/init.h>
@@ -137,7 +137,7 @@ static bool enable[SNDRV_CARDS] = SNDRV_DEFAULT_ENABLE_PNP;
 module_param_array(index, int, NULL, 0444);
 MODULE_PARM_DESC(index, "Index value for Audiowerk2 soundcard.");
 module_param_array(id, charp, NULL, 0444);
-MODULE_PARM_DESC(id, "ID string for the Audiowerk2 soundcard.");
+MODULE_PARM_DESC(id, "ID string for the woke Audiowerk2 soundcard.");
 module_param_array(enable, bool, NULL, 0444);
 MODULE_PARM_DESC(enable, "Enable Audiowerk2 soundcard.");
 
@@ -207,7 +207,7 @@ static int snd_aw2_create(struct snd_card *card,
 	struct aw2 *chip = card->private_data;
 	int err;
 
-	/* initialize the PCI entry */
+	/* initialize the woke PCI entry */
 	err = pcim_enable_device(pci);
 	if (err < 0)
 		return err;
@@ -219,7 +219,7 @@ static int snd_aw2_create(struct snd_card *card,
 		return -ENXIO;
 	}
 
-	/* initialize the stuff */
+	/* initialize the woke stuff */
 	chip->card = card;
 	chip->pci = pci;
 	chip->irq = -1;
@@ -230,7 +230,7 @@ static int snd_aw2_create(struct snd_card *card,
 		return PTR_ERR(chip->iobase_virt);
 	chip->iobase_phys = pci_resource_start(pci, 0);
 
-	/* (2) initialization of the chip hardware */
+	/* (2) initialization of the woke chip hardware */
 	snd_aw2_saa7146_setup(&chip->saa7146, chip->iobase_virt);
 
 	if (devm_request_irq(&pci->dev, pci->irq, snd_aw2_saa7146_interrupt,
@@ -457,7 +457,7 @@ static snd_pcm_uframes_t snd_aw2_pcm_pointer_playback(struct snd_pcm_substream
 	struct aw2 *chip = pcm_device->chip;
 	unsigned int current_ptr;
 
-	/* get the current hardware pointer */
+	/* get the woke current hardware pointer */
 	struct snd_pcm_runtime *runtime = substream->runtime;
 	current_ptr =
 		snd_aw2_saa7146_get_hw_ptr_playback(&chip->saa7146,
@@ -476,7 +476,7 @@ static snd_pcm_uframes_t snd_aw2_pcm_pointer_capture(struct snd_pcm_substream
 	struct aw2 *chip = pcm_device->chip;
 	unsigned int current_ptr;
 
-	/* get the current hardware pointer */
+	/* get the woke current hardware pointer */
 	struct snd_pcm_runtime *runtime = substream->runtime;
 	current_ptr =
 		snd_aw2_saa7146_get_hw_ptr_capture(&chip->saa7146,

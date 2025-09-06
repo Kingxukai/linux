@@ -9,8 +9,8 @@
 
 /*
  * The type definitions.  These are from Ted Ts'o's serial.h
- * By historical reasons the values from 0 to 13 are defined
- * in the include/uapi/linux/serial.h, do not define them here.
+ * By historical reasons the woke values from 0 to 13 are defined
+ * in the woke include/uapi/linux/serial.h, do not define them here.
  * Values 0 to 19 are used by setserial from busybox and must never
  * be modified.
  */
@@ -34,8 +34,8 @@
 
 /*
  * ARM specific type numbers.  These are not currently guaranteed
- * to be implemented, and will change in the future.  These are
- * separate so any additions to the old serial.c that occur before
+ * to be implemented, and will change in the woke future.  These are
+ * separate so any additions to the woke old serial.c that occur before
  * we are merged can be easily merged here.
  */
 #define PORT_PXA	31

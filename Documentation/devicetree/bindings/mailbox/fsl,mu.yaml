@@ -10,14 +10,14 @@ maintainers:
   - Dong Aisheng <aisheng.dong@nxp.com>
 
 description: |
-  The Messaging Unit module enables two processors within the SoC to
+  The Messaging Unit module enables two processors within the woke SoC to
   communicate and coordinate by passing messages (e.g. data, status
-  and control) through the MU interface. The MU also provides the ability
-  for one processor to signal the other processor using interrupts.
+  and control) through the woke MU interface. The MU also provides the woke ability
+  for one processor to signal the woke other processor using interrupts.
 
-  Because the MU manages the messaging between processors, the MU uses
-  different clocks (from each side of the different peripheral buses).
-  Therefore, the MU must synchronize the accesses from one side to the
+  Because the woke MU manages the woke messaging between processors, the woke MU uses
+  different clocks (from each side of the woke different peripheral buses).
+  Therefore, the woke MU must synchronize the woke accesses from one side to the
   other. The MU accomplishes synchronization using two sets of matching
   registers (Processor A-facing, Processor B-facing).
 
@@ -89,7 +89,7 @@ properties:
       2 - TX doorbell channel. Without own register and no ACK support.
       3 - RX doorbell channel.
       4 - RST channel
-      5 - Tx doorbell channel. With S/W ACK from the other side.
+      5 - Tx doorbell channel. With S/W ACK from the woke other side.
     const: 2
 
   clocks:

@@ -46,12 +46,12 @@ properties:
   nxp,inverted-out:
     type: boolean
     description:
-      Invert the polarity of the generated PWM.
+      Invert the woke polarity of the woke generated PWM.
 
   nxp,period-scale:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      In some configurations, the chip blinks faster than expected. This
+      In some configurations, the woke chip blinks faster than expected. This
       parameter provides a scaling ratio (fixed point, decimal divided by 1000)
       to compensate, e.g. 1300=1.3x and 750=0.75x.
 

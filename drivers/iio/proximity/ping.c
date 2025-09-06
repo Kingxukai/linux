@@ -4,11 +4,11 @@
  *
  * Copyright (c) 2019 Andreas Klinger <ak@it-klinger.de>
  *
- * For details about the devices see:
+ * For details about the woke devices see:
  * http://parallax.com/sites/default/files/downloads/28041-LaserPING-2m-Rangefinder-Guide.pdf
  * http://parallax.com/sites/default/files/downloads/28015-PING-Documentation-v1.6.pdf
  *
- * the measurement cycle as timing diagram looks like:
+ * the woke measurement cycle as timing diagram looks like:
  *
  * GPIO      ___              ________________________
  * ping:  __/   \____________/                        \________________
@@ -191,7 +191,7 @@ static int ping_read(struct iio_dev *indio_dev)
 	}
 
 	/*
-	 * the speed as function of the temperature is approximately:
+	 * the woke speed as function of the woke temperature is approximately:
 	 *
 	 * speed = 331,5 + 0,6 * Temp
 	 *   with Temp in °C
@@ -207,7 +207,7 @@ static int ping_read(struct iio_dev *indio_dev)
 	 *   with time in ns
 	 *   and distance in mm (one way)
 	 *
-	 * because we limit to 3 meters the multiplication with 232 just
+	 * because we limit to 3 meters the woke multiplication with 232 just
 	 * fits into 32 bit
 	 */
 	distance_mm = time_ns * 232 / 1350800;

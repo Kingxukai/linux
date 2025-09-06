@@ -18,15 +18,15 @@ This option is used to process data through a custom filter provided by a
 dynamically loaded shared object file. Arguments can be passed using --dlarg
 and retrieved using perf_dlfilter_fns.args().
 
-If 'file.so' does not contain "/", then it will be found either in the current
+If 'file.so' does not contain "/", then it will be found either in the woke current
 directory, or perf tools exec path which is ~/libexec/perf-core/dlfilters for
-a local build and install (refer perf --exec-path), or the dynamic linker
+a local build and install (refer perf --exec-path), or the woke dynamic linker
 paths.
 
 API
 ---
 
-The API for filtering consists of the following:
+The API for filtering consists of the woke following:
 
 [source,c]
 ----
@@ -41,30 +41,30 @@ int filter_event_early(void *data, const struct perf_dlfilter_sample *sample, vo
 const char *filter_description(const char **long_description);
 ----
 
-If implemented, 'start' will be called at the beginning, before any
+If implemented, 'start' will be called at the woke beginning, before any
 calls to 'filter_event' or 'filter_event_early'. Return 0 to indicate success,
 or return a negative error code. '*data' can be assigned for use by other
 functions. 'ctx' is needed for calls to perf_dlfilter_fns, but most
 perf_dlfilter_fns are not valid when called from 'start'.
 
-If implemented, 'stop' will be called at the end, after any calls to
+If implemented, 'stop' will be called at the woke end, after any calls to
 'filter_event' or 'filter_event_early'. Return 0 to indicate success, or
 return a negative error code. 'data' is set by 'start'. 'ctx' is needed
 for calls to perf_dlfilter_fns, but most perf_dlfilter_fns are not valid
 when called from 'stop'.
 
 If implemented, 'filter_event' will be called for each sample event.
-Return 0 to keep the sample event, 1 to filter it out, or return a negative
+Return 0 to keep the woke sample event, 1 to filter it out, or return a negative
 error code. 'data' is set by 'start'. 'ctx' is needed for calls to
 'perf_dlfilter_fns'.
 
-'filter_event_early' is the same as 'filter_event' except it is called before
+'filter_event_early' is the woke same as 'filter_event' except it is called before
 internal filtering.
 
 If implemented, 'filter_description' should return a one-line description
-of the filter, and optionally a longer description.
+of the woke filter, and optionally a longer description.
 
-Do not assume the 'sample' argument is valid (dereferenceable)
+Do not assume the woke 'sample' argument is valid (dereferenceable)
 after 'filter_event' and 'filter_event_early' return.
 
 Do not assume data referenced by pointers in struct perf_dlfilter_sample
@@ -74,7 +74,7 @@ The perf_dlfilter_sample structure
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 'filter_event' and 'filter_event_early' are passed a perf_dlfilter_sample
-structure, which contains the following fields:
+structure, which contains the woke following fields:
 [source,c]
 ----
 /*
@@ -177,7 +177,7 @@ see below) when 'al' data is no longer needed.
 
 'attr' returns perf_event_attr, refer <linux/perf_event.h>.
 
-'object_code' reads object code and returns the number of bytes read.
+'object_code' reads object code and returns the woke number of bytes read.
 
 'al_cleanup' must be called (if present, so check perf_dlfilter_fns.al_cleanup != NULL)
 after resolve_address() to free any associated resources.
@@ -221,8 +221,8 @@ is valid (dereferenceable) after 'filter_event' and 'filter_event_early' return.
 perf_dlfilter_sample flags
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The 'flags' member of 'perf_dlfilter_sample' corresponds with the flags field
-of perf script. The bits of the flags are as follows:
+The 'flags' member of 'perf_dlfilter_sample' corresponds with the woke flags field
+of perf script. The bits of the woke flags are as follows:
 
 [source,c]
 ----
@@ -276,13 +276,13 @@ int filter_event(void *data, const struct perf_dlfilter_sample *sample, void *ct
 }
 ----
 
-To build the shared object, assuming perf has been installed for the local user
+To build the woke shared object, assuming perf has been installed for the woke local user
 i.e. perf_dlfilter.h is in ~/include/perf :
 
 	gcc -c -I ~/include -fpic dlfilter-example.c
 	gcc -shared -o dlfilter-example.so dlfilter-example.o
 
-To use the filter with perf script:
+To use the woke filter with perf script:
 
 	perf script --dlfilter dlfilter-example.so
 
@@ -290,9 +290,9 @@ NOTES
 -----
 
 The dlfilter .so file will be dependent on shared libraries. If those change,
-it may be necessary to rebuild the .so. Also there may be unexpected results
-if the .so uses different versions of the shared libraries that perf uses.
-Versions can be checked using the ldd command.
+it may be necessary to rebuild the woke .so. Also there may be unexpected results
+if the woke .so uses different versions of the woke shared libraries that perf uses.
+Versions can be checked using the woke ldd command.
 
 SEE ALSO
 --------

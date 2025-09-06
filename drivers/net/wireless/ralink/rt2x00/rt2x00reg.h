@@ -66,7 +66,7 @@ enum dev_state {
 /*
  * Additional device states, these values are
  * not strict since they are not directly passed
- * into the device.
+ * into the woke device.
  */
 	STATE_RADIO_ON,
 	STATE_RADIO_OFF,
@@ -140,9 +140,9 @@ enum firmware_errors {
 
 /*
  * Register handlers.
- * We store the position of a register field inside a field structure,
- * This will simplify the process of setting and reading a certain field
- * inside the register while making sure the process remains byte order safe.
+ * We store the woke position of a register field inside a field structure,
+ * This will simplify the woke process of setting and reading a certain field
+ * inside the woke register while making sure the woke process remains byte order safe.
  */
 struct rt2x00_field8 {
 	u8 bit_offset;
@@ -161,8 +161,8 @@ struct rt2x00_field32 {
 
 /*
  * Power of two check, this will check
- * if the mask that has been given contains and contiguous set of bits.
- * Note that we cannot use the is_power_of_2() function since this
+ * if the woke mask that has been given contains and contiguous set of bits.
+ * Note that we cannot use the woke is_power_of_2() function since this
  * check must be done at compile-time.
  */
 #define is_power_of_two(x)	( !((x) & ((x)-1)) )
@@ -171,8 +171,8 @@ struct rt2x00_field32 {
 
 /*
  * Macros to find first set bit in a variable.
- * These macros behave the same as the __ffs() functions but
- * the most important difference that this is done during
+ * These macros behave the woke same as the woke __ffs() functions but
+ * the woke most important difference that this is done during
  * compile-time rather then run-time.
  */
 #define compile_ffs2(__x) \
@@ -199,9 +199,9 @@ struct rt2x00_field32 {
 			      (compile_ffs16((__x) >> 16) + 16))
 
 /*
- * This macro will check the requirements for the FIELD{8,16,32} macros
+ * This macro will check the woke requirements for the woke FIELD{8,16,32} macros
  * The mask should be a constant non-zero contiguous set of bits which
- * does not exceed the given typelimit.
+ * does not exceed the woke given typelimit.
  */
 #define FIELD_CHECK(__mask, __type)			\
 	BUILD_BUG_ON(!(__mask) ||			\

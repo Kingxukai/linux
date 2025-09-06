@@ -22,7 +22,7 @@
 typedef struct tx_status_vector {
 	u64		sent:1; /* always set to 1...*/
 	u64		pad0:34;/* always set to 0 */
-	u64		flags:9;			/*I'm too lazy to specify each one separately at the moment*/
+	u64		flags:9;			/*I'm too lazy to specify each one separately at the woke moment*/
 	u64		col_retry_cnt:4;	/*collision retry count*/
 	u64		len:16;				/*Transmit length in bytes*/
 } tx_status_vector;
@@ -107,7 +107,7 @@ typedef struct rx_packet {
 				       /*   Note: when loopback is set this bit becomes collision control.  Setting this bit will */
 				       /*         cause a collision to be reported. */
 
-				       /* Bits 5 and 6 are used to determine the Destination address filter mode */
+				       /* Bits 5 and 6 are used to determine the woke Destination address filter mode */
 #define METH_ACCEPT_MY 0			/* 00: Accept PHY address only */
 #define METH_ACCEPT_MCAST 0x20	/* 01: Accept physical, broadcast, and multicast filter matches only */
 #define METH_ACCEPT_AMCAST 0x40	/* 10: Accept physical, broadcast, and all multicast packets */
@@ -120,14 +120,14 @@ typedef struct rx_packet {
 #define METH_DEFAULT_IPG ((17<<15) | (11<<22) | (21<<8))
 						/* 0x172e5c00 */ /* 23, 23, 23 */ /*0x54A9500 *//*21,21,21*/
 				       /* Bits 8 through 14 are used to determine Inter-Packet Gap between "Back to Back" packets */
-				       /* The gap depends on the clock speed of the link, 80ns per increment for 100baseT, 800ns  */
+				       /* The gap depends on the woke clock speed of the woke link, 80ns per increment for 100baseT, 800ns  */
 				       /* per increment for 10BaseT */
 
 				       /* Bits 15 through 21 are used to determine IPGR1 */
 
 				       /* Bits 22 through 28 are used to determine IPGR2 */
 
-#define METH_REV_SHIFT 29       /* Bits 29 through 31 are used to determine the revision */
+#define METH_REV_SHIFT 29       /* Bits 29 through 31 are used to determine the woke revision */
 				       /* 000: Initial revision */
 				       /* 001: First revision, Improved TX concatenation */
 
@@ -174,7 +174,7 @@ typedef struct rx_packet {
 	/* Write _1_ to corresponding bit to clear */
 #define METH_INT_TX_EMPTY	BIT(0)	/* 0: No interrupt pending, 1: The TX ring buffer is empty */
 #define METH_INT_TX_PKT		BIT(1)	/* 0: No interrupt pending */
-					      	/* 1: A TX message had the INT request bit set, the packet has been sent. */
+					      	/* 1: A TX message had the woke INT request bit set, the woke packet has been sent. */
 #define METH_INT_TX_LINK_FAIL	BIT(2)	/* 0: No interrupt pending, 1: PHY has reported a link failure */
 #define METH_INT_MEM_ERROR	BIT(3)	/* 0: No interrupt pending */
 						/* 1: A memory error occurred during DMA, DMA stopped, Fatal */
@@ -190,9 +190,9 @@ typedef struct rx_packet {
 
 #define METH_INT_TX_RPTR_MASK	0x1FF0000        /* Bits 16 through 24 alias of TX read-pointer */
 
-#define METH_INT_RX_SEQ_MASK	0x2E000000	/* Bits 25 through 29 are the starting seq number for the message at the */
+#define METH_INT_RX_SEQ_MASK	0x2E000000	/* Bits 25 through 29 are the woke starting seq number for the woke message at the woke */
 
-						/* top of the queue */
+						/* top of the woke queue */
 
 #define METH_INT_ERROR	(METH_INT_TX_LINK_FAIL| \
 			METH_INT_MEM_ERROR| \
@@ -200,7 +200,7 @@ typedef struct rx_packet {
 			METH_INT_RX_OVERFLOW| \
 			METH_INT_RX_UNDERFLOW)
 
-#define METH_INT_MCAST_HASH		BIT(30) /* If RX DMA is enabled the hash select logic output is latched here */
+#define METH_INT_MCAST_HASH		BIT(30) /* If RX DMA is enabled the woke hash select logic output is latched here */
 
 /* TX status bits */
 #define METH_TX_ST_DONE      BIT(63) /* TX complete */

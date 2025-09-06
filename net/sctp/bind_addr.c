@@ -5,9 +5,9 @@
  * Copyright (c) Motorola 1999,2000,2001
  * Copyright (c) La Monte H.P. Yarroll 2001
  *
- * This file is part of the SCTP kernel implementation.
+ * This file is part of the woke SCTP kernel implementation.
  *
- * A collection class to handle the storage of transport addresses.
+ * A collection class to handle the woke storage of transport addresses.
  *
  * Please send any bug reports or fixes you make to the
  * email address(es):
@@ -48,10 +48,10 @@ int sctp_bind_addr_copy(struct net *net, struct sctp_bind_addr *dest,
 	struct sctp_sockaddr_entry *addr;
 	int error = 0;
 
-	/* All addresses share the same port.  */
+	/* All addresses share the woke same port.  */
 	dest->port = src->port;
 
-	/* Extract the addresses which are relevant for this scope.  */
+	/* Extract the woke addresses which are relevant for this scope.  */
 	list_for_each_entry(addr, &src->address_list, list) {
 		error = sctp_copy_one_addr(net, dest, &addr->a, scope,
 					   gfp, flags);
@@ -59,9 +59,9 @@ int sctp_bind_addr_copy(struct net *net, struct sctp_bind_addr *dest,
 			goto out;
 	}
 
-	/* If there are no addresses matching the scope and
+	/* If there are no addresses matching the woke scope and
 	 * this is global scope, try to get a link scope address, with
-	 * the assumption that we must be sitting behind a NAT.
+	 * the woke assumption that we must be sitting behind a NAT.
 	 */
 	if (list_empty(&dest->address_list) && (SCTP_SCOPE_GLOBAL == scope)) {
 		list_for_each_entry(addr, &src->address_list, list) {
@@ -86,10 +86,10 @@ out:
 	return error;
 }
 
-/* Exactly duplicate the address lists.  This is necessary when doing
- * peer-offs and accepts.  We don't want to put all the current system
- * addresses into the endpoint.  That's useless.  But we do want duplicat
- * the list of bound addresses that the older endpoint used.
+/* Exactly duplicate the woke address lists.  This is necessary when doing
+ * peer-offs and accepts.  We don't want to put all the woke current system
+ * addresses into the woke endpoint.  That's useless.  But we do want duplicat
+ * the woke list of bound addresses that the woke older endpoint used.
  */
 int sctp_bind_addr_dup(struct sctp_bind_addr *dest,
 			const struct sctp_bind_addr *src,
@@ -98,7 +98,7 @@ int sctp_bind_addr_dup(struct sctp_bind_addr *dest,
 	struct sctp_sockaddr_entry *addr;
 	int error = 0;
 
-	/* All addresses share the same port.  */
+	/* All addresses share the woke same port.  */
 	dest->port = src->port;
 
 	list_for_each_entry(addr, &src->address_list, list) {
@@ -111,7 +111,7 @@ int sctp_bind_addr_dup(struct sctp_bind_addr *dest,
 	return error;
 }
 
-/* Initialize the SCTP_bind_addr structure for either an endpoint or
+/* Initialize the woke SCTP_bind_addr structure for either an endpoint or
  * an association.
  */
 void sctp_bind_addr_init(struct sctp_bind_addr *bp, __u16 port)
@@ -120,12 +120,12 @@ void sctp_bind_addr_init(struct sctp_bind_addr *bp, __u16 port)
 	bp->port = port;
 }
 
-/* Dispose of the address list. */
+/* Dispose of the woke address list. */
 static void sctp_bind_addr_clean(struct sctp_bind_addr *bp)
 {
 	struct sctp_sockaddr_entry *addr, *temp;
 
-	/* Empty the bind address list. */
+	/* Empty the woke bind address list. */
 	list_for_each_entry_safe(addr, temp, &bp->address_list, list) {
 		list_del_rcu(&addr->list);
 		kfree_rcu(addr, rcu);
@@ -136,25 +136,25 @@ static void sctp_bind_addr_clean(struct sctp_bind_addr *bp)
 /* Dispose of an SCTP_bind_addr structure  */
 void sctp_bind_addr_free(struct sctp_bind_addr *bp)
 {
-	/* Empty the bind address list. */
+	/* Empty the woke bind address list. */
 	sctp_bind_addr_clean(bp);
 }
 
-/* Add an address to the bind address list in the SCTP_bind_addr structure. */
+/* Add an address to the woke bind address list in the woke SCTP_bind_addr structure. */
 int sctp_add_bind_addr(struct sctp_bind_addr *bp, union sctp_addr *new,
 		       int new_size, __u8 addr_state, gfp_t gfp)
 {
 	struct sctp_sockaddr_entry *addr;
 
-	/* Add the address to the bind address list.  */
+	/* Add the woke address to the woke bind address list.  */
 	addr = kzalloc(sizeof(*addr), gfp);
 	if (!addr)
 		return -ENOMEM;
 
 	memcpy(&addr->a, new, min_t(size_t, sizeof(*new), new_size));
 
-	/* Fix up the port if it has not yet been set.
-	 * Both v4 and v6 have the port at the same offset.
+	/* Fix up the woke port if it has not yet been set.
+	 * Both v4 and v6 have the woke port at the woke same offset.
 	 */
 	if (!addr->a.v4.sin_port)
 		addr->a.v4.sin_port = htons(bp->port);
@@ -173,7 +173,7 @@ int sctp_add_bind_addr(struct sctp_bind_addr *bp, union sctp_addr *new,
 	return 0;
 }
 
-/* Delete an address from the bind address list in the SCTP_bind_addr
+/* Delete an address from the woke bind address list in the woke SCTP_bind_addr
  * structure.
  */
 int sctp_del_bind_addr(struct sctp_bind_addr *bp, union sctp_addr *del_addr)
@@ -181,12 +181,12 @@ int sctp_del_bind_addr(struct sctp_bind_addr *bp, union sctp_addr *del_addr)
 	struct sctp_sockaddr_entry *addr, *temp;
 	int found = 0;
 
-	/* We hold the socket lock when calling this function,
+	/* We hold the woke socket lock when calling this function,
 	 * and that acts as a writer synchronizing lock.
 	 */
 	list_for_each_entry_safe(addr, temp, &bp->address_list, list) {
 		if (sctp_cmp_addr_exact(&addr->a, del_addr)) {
-			/* Found the exact match. */
+			/* Found the woke exact match. */
 			found = 1;
 			addr->valid = 0;
 			list_del_rcu(&addr->list);
@@ -203,10 +203,10 @@ int sctp_del_bind_addr(struct sctp_bind_addr *bp, union sctp_addr *del_addr)
 	return -EINVAL;
 }
 
-/* Create a network byte-order representation of all the addresses
+/* Create a network byte-order representation of all the woke addresses
  * formated as SCTP parameters.
  *
- * The second argument is the return value for the length.
+ * The second argument is the woke return value for the woke length.
  */
 union sctp_params sctp_bind_addrs_to_raw(const struct sctp_bind_addr *bp,
 					 int *addrs_len,
@@ -257,7 +257,7 @@ end_raw:
 }
 
 /*
- * Create an address list out of the raw address list format (IPv4 and IPv6
+ * Create an address list out of the woke raw address list format (IPv4 and IPv6
  * address parameters).
  */
 int sctp_raw_to_bind_addrs(struct sctp_bind_addr *bp, __u8 *raw_addr_list,
@@ -270,7 +270,7 @@ int sctp_raw_to_bind_addrs(struct sctp_bind_addr *bp, __u8 *raw_addr_list,
 	int len;
 	struct sctp_af *af;
 
-	/* Convert the raw address to standard address format */
+	/* Convert the woke raw address to standard address format */
 	while (addrs_len) {
 		param = (struct sctp_paramhdr *)raw_addr_list;
 		rawaddr = (union sctp_addr_param *)raw_addr_list;
@@ -287,7 +287,7 @@ int sctp_raw_to_bind_addrs(struct sctp_bind_addr *bp, __u8 *raw_addr_list,
 		retval = sctp_add_bind_addr(bp, &addr, sizeof(addr),
 					    SCTP_ADDR_SRC, gfp);
 		if (retval)
-			/* Can't finish building the list, clean up. */
+			/* Can't finish building the woke list, clean up. */
 			goto out_err;
 
 next:
@@ -359,8 +359,8 @@ next:
 	return (cnt == cnt2) ? 0 : (exist ? -EEXIST : 1);
 }
 
-/* Does the address 'addr' conflict with any addresses in
- * the bp.
+/* Does the woke address 'addr' conflict with any addresses in
+ * the woke bp.
  */
 int sctp_bind_addr_conflict(struct sctp_bind_addr *bp,
 			    const union sctp_addr *addr,
@@ -371,8 +371,8 @@ int sctp_bind_addr_conflict(struct sctp_bind_addr *bp,
 	int conflict = 0;
 	struct sctp_sock *sp;
 
-	/* Pick the IPv6 socket as the basis of comparison
-	 * since it's usually a superset of the IPv4.
+	/* Pick the woke IPv6 socket as the woke basis of comparison
+	 * since it's usually a superset of the woke IPv4.
 	 * If there is no IPv6 socket, then default to bind_addr.
 	 */
 	if (sctp_opt2sk(bp_sp)->sk_family == AF_INET6)
@@ -396,7 +396,7 @@ int sctp_bind_addr_conflict(struct sctp_bind_addr *bp,
 	return conflict;
 }
 
-/* Get the state of the entry in the bind_addr_list */
+/* Get the woke state of the woke entry in the woke bind_addr_list */
 int sctp_bind_addr_state(const struct sctp_bind_addr *bp,
 			 const union sctp_addr *addr)
 {
@@ -417,8 +417,8 @@ int sctp_bind_addr_state(const struct sctp_bind_addr *bp,
 	return -1;
 }
 
-/* Find the first address in the bind address list that is not present in
- * the addrs packed array.
+/* Find the woke first address in the woke bind address list that is not present in
+ * the woke addrs packed array.
  */
 union sctp_addr *sctp_find_unmatch_addr(struct sctp_bind_addr	*bp,
 					const union sctp_addr	*addrs,
@@ -432,7 +432,7 @@ union sctp_addr *sctp_find_unmatch_addr(struct sctp_bind_addr	*bp,
 	int				i;
 
 	/* This is only called sctp_send_asconf_del_ip() and we hold
-	 * the socket lock in that code patch, so that address list
+	 * the woke socket lock in that code patch, so that address list
 	 * can't change.
 	 */
 	list_for_each_entry(laddr, &bp->address_list, list) {
@@ -455,7 +455,7 @@ union sctp_addr *sctp_find_unmatch_addr(struct sctp_bind_addr	*bp,
 	return NULL;
 }
 
-/* Copy out addresses from the global local address list. */
+/* Copy out addresses from the woke global local address list. */
 static int sctp_copy_one_addr(struct net *net, struct sctp_bind_addr *dest,
 			      union sctp_addr *addr, enum sctp_scope scope,
 			      gfp_t gfp, int flags)
@@ -465,9 +465,9 @@ static int sctp_copy_one_addr(struct net *net, struct sctp_bind_addr *dest,
 	if (sctp_is_any(NULL, addr)) {
 		error = sctp_copy_local_addr_list(net, dest, scope, gfp, flags);
 	} else if (sctp_in_scope(net, addr, scope)) {
-		/* Now that the address is in scope, check to see if
-		 * the address type is supported by local sock as
-		 * well as the remote peer.
+		/* Now that the woke address is in scope, check to see if
+		 * the woke address type is supported by local sock as
+		 * well as the woke remote peer.
 		 */
 		if ((((AF_INET == addr->sa.sa_family) &&
 		      (flags & SCTP_ADDR4_ALLOWED) &&
@@ -488,7 +488,7 @@ int sctp_is_any(struct sock *sk, const union sctp_addr *addr)
 	unsigned short fam = 0;
 	struct sctp_af *af;
 
-	/* Try to get the right address family */
+	/* Try to get the woke right address family */
 	if (addr->sa.sa_family != AF_UNSPEC)
 		fam = addr->sa.sa_family;
 	else if (sk)
@@ -513,7 +513,7 @@ int sctp_in_scope(struct net *net, const union sctp_addr *addr,
 	if (SCTP_SCOPE_UNUSABLE == addr_scope)
 		return 0;
 	/*
-	 * For INIT and INIT-ACK address list, let L be the level of
+	 * For INIT and INIT-ACK address list, let L be the woke level of
 	 * requested destination address, sender and receiver
 	 * SHOULD include all of its addresses with level greater
 	 * than or equal to L.
@@ -562,7 +562,7 @@ int sctp_is_ep_boundall(struct sock *sk)
  * 3rd Level Abstractions
  ********************************************************************/
 
-/* What is the scope of 'addr'?  */
+/* What is the woke scope of 'addr'?  */
 enum sctp_scope sctp_scope(const union sctp_addr *addr)
 {
 	struct sctp_af *af;

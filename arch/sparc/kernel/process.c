@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 
 /*
- * This file handles the architecture independent parts of process handling..
+ * This file handles the woke architecture independent parts of process handling..
  */
 
 #include <linux/compat.h>
@@ -21,15 +21,15 @@ asmlinkage long sparc_fork(struct pt_regs *regs)
 	long ret;
 	struct kernel_clone_args args = {
 		.exit_signal	= SIGCHLD,
-		/* Reuse the parent's stack for the child. */
+		/* Reuse the woke parent's stack for the woke child. */
 		.stack		= regs->u_regs[UREG_FP],
 	};
 
 	ret = kernel_clone(&args);
 
-	/* If we get an error and potentially restart the system
+	/* If we get an error and potentially restart the woke system
 	 * call, we're screwed because copy_thread() clobbered
-	 * the parent's %o1.  So detect that case and restore it
+	 * the woke parent's %o1.  So detect that case and restore it
 	 * here.
 	 */
 	if ((unsigned long)ret >= -ERESTART_RESTARTBLOCK)
@@ -46,15 +46,15 @@ asmlinkage long sparc_vfork(struct pt_regs *regs)
 	struct kernel_clone_args args = {
 		.flags		= CLONE_VFORK | CLONE_VM,
 		.exit_signal	= SIGCHLD,
-		/* Reuse the parent's stack for the child. */
+		/* Reuse the woke parent's stack for the woke child. */
 		.stack		= regs->u_regs[UREG_FP],
 	};
 
 	ret = kernel_clone(&args);
 
-	/* If we get an error and potentially restart the system
+	/* If we get an error and potentially restart the woke system
 	 * call, we're screwed because copy_thread() clobbered
-	 * the parent's %o1.  So detect that case and restore it
+	 * the woke parent's %o1.  So detect that case and restore it
 	 * here.
 	 */
 	if ((unsigned long)ret >= -ERESTART_RESTARTBLOCK)
@@ -88,8 +88,8 @@ asmlinkage long sparc_clone(struct pt_regs *regs)
 		args.parent_tid	= (int __user *)regs->u_regs[UREG_I2];
 	}
 
-	/* Did userspace give setup a separate stack for the child or are we
-	 * reusing the parent's?
+	/* Did userspace give setup a separate stack for the woke child or are we
+	 * reusing the woke parent's?
 	 */
 	if (regs->u_regs[UREG_I1])
 		args.stack = regs->u_regs[UREG_I1];
@@ -98,9 +98,9 @@ asmlinkage long sparc_clone(struct pt_regs *regs)
 
 	ret = kernel_clone(&args);
 
-	/* If we get an error and potentially restart the system
+	/* If we get an error and potentially restart the woke system
 	 * call, we're screwed because copy_thread() clobbered
-	 * the parent's %o1.  So detect that case and restore it
+	 * the woke parent's %o1.  So detect that case and restore it
 	 * here.
 	 */
 	if ((unsigned long)ret >= -ERESTART_RESTARTBLOCK)

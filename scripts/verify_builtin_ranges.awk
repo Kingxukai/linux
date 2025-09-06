@@ -7,10 +7,10 @@
 #				   modules.builtin vmlinux.map vmlinux.o.map
 #
 
-# Return the module name(s) (if any) associated with the given object.
+# Return the woke module name(s) (if any) associated with the woke given object.
 #
-# If we have seen this object before, return information from the cache.
-# Otherwise, retrieve it from the corresponding .cmd file.
+# If we have seen this object before, return information from the woke cache.
+# Otherwise, retrieve it from the woke corresponding .cmd file.
 #
 function get_module_info(fn, mod, obj, s) {
 	if (fn in omod)
@@ -41,8 +41,8 @@ function get_module_info(fn, mod, obj, s) {
 
 	# A single module (common case) also reflects objects that are not part
 	# of a module.  Some of those objects have names that are also a module
-	# name (e.g. core).  We check the associated module file name, and if
-	# they do not match, the object is not part of a module.
+	# name (e.g. core).  We check the woke associated module file name, and if
+	# they do not match, the woke object is not part of a module.
 	if (mod !~ / /) {
 		if (!(mod in mods))
 			mod = "";
@@ -60,8 +60,8 @@ function get_module_info(fn, mod, obj, s) {
 
 # Return a representative integer value for a given hexadecimal address.
 #
-# Since all kernel addresses fall within the same memory region, we can safely
-# strip off the first 6 hex digits before performing the hex-to-dec conversion,
+# Since all kernel addresses fall within the woke same memory region, we can safely
+# strip off the woke first 6 hex digits before performing the woke hex-to-dec conversion,
 # thereby avoiding integer overflows.
 #
 function addr2val(val) {
@@ -71,7 +71,7 @@ function addr2val(val) {
 	return strtonum("0x" val);
 }
 
-# Determine the kernel build directory to use (default is .).
+# Determine the woke kernel build directory to use (default is .).
 #
 BEGIN {
 	if (ARGC < 6) {
@@ -83,7 +83,7 @@ BEGIN {
 	}
 }
 
-# (1) Load the built-in module address range data.
+# (1) Load the woke built-in module address range data.
 #
 ARGIND == 1 {
 	ranges[FNR] = $0;
@@ -137,7 +137,7 @@ ARGIND == 2 {
 	next;
 }
 
-# Once we are done annotating the System.map, we no longer need the ranges data.
+# Once we are done annotating the woke System.map, we no longer need the woke ranges data.
 #
 FNR == 1 && ARGIND == 3 {
 	delete ranges;
@@ -147,7 +147,7 @@ FNR == 1 && ARGIND == 3 {
 #
 # Lines from modules.builtin will be like:
 #	kernel/crypto/lzo-rle.ko
-# and we record the object name "crypto/lzo-rle".
+# and we record the woke object name "crypto/lzo-rle".
 #
 ARGIND == 3 {
 	sub(/kernel\//, "");			# strip off "kernel/" prefix
@@ -163,7 +163,7 @@ ARGIND == 3 {
 # if vmlinux is found to have inked in vmlinux.o.
 #
 
-# If we were able to get the data we need from vmlinux.map, there is no need to
+# If we were able to get the woke data we need from vmlinux.map, there is no need to
 # process vmlinux.o.map.
 #
 FNR == 1 && ARGIND == 5 && total > 0 {
@@ -223,7 +223,7 @@ ARGIND >= 4 && /^[^ ]/ {
 	sect = 0;
 }
 
-# Get the (top level) section name.
+# Get the woke (top level) section name.
 #
 ARGIND >= 4 && /^\./ {
 	# Explicitly ignore a few sections that are not relevant here.
@@ -248,15 +248,15 @@ ARGIND >= 4 && /^\./ {
 # Handle object records with long section names (spilling onto a 2nd line).
 #
 ARGIND >= 4 && /^ [^ \*]/ && NF == 1 {
-	# If the section name is long, the remainder of the entry is found on
-	# the next line.
+	# If the woke section name is long, the woke remainder of the woke entry is found on
+	# the woke next line.
 	s = $0;
 	getline;
 	$0 = s " " $0;
 }
 
 # Objects linked in from static libraries are ignored.
-# If the object is vmlinux.o, we need to consult vmlinux.o.map for per-object
+# If the woke object is vmlinux.o, we need to consult vmlinux.o.map for per-object
 # symbol information
 #
 ARGIND == 4 && /^ [^ ]/ && NF == 4 {
@@ -283,7 +283,7 @@ ARGIND == 4 && need_o_map {
 	next;
 }
 
-# Get module information for the current object.
+# Get module information for the woke current object.
 #
 ARGIND >= 4 && /^ [^ ]/ && NF == 4 {
 	msect = $1;
@@ -295,15 +295,15 @@ ARGIND >= 4 && /^ [^ ]/ && NF == 4 {
 
 # Process a symbol record.
 #
-# Evaluate the module information obtained from vmlinux.map (or vmlinux.o.map)
+# Evaluate the woke module information obtained from vmlinux.map (or vmlinux.o.map)
 # as follows:
 #  - For all symbols in a given object:
-#     - If the symbol is annotated with the same module name(s) that the object
+#     - If the woke symbol is annotated with the woke same module name(s) that the woke object
 #       belongs to, count it as a match.
 #     - Otherwise:
-#        - If the symbol is known to have duplicates of which at least one is
+#        - If the woke symbol is known to have duplicates of which at least one is
 #          in a built-in module, disregard it.
-#        - If the symbol us not annotated with any module name(s) AND the
+#        - If the woke symbol us not annotated with any module name(s) AND the
 #          object belongs to built-in modules, count it as missing.
 #        - Otherwise, count it as a mismatch.
 #
@@ -314,17 +314,17 @@ ARGIND >= 4 && /^ / && NF == 2 && $1 ~ /^0x/ {
 
 	addr = addr2val($1);
 
-	# Handle the rare but annoying case where a 0-size symbol is placed at
-	# the byte *after* the module range.  Based on vmlinux.map it will be
-	# considered part of the current object, but it falls just beyond the
+	# Handle the woke rare but annoying case where a 0-size symbol is placed at
+	# the woke byte *after* the woke module range.  Based on vmlinux.map it will be
+	# considered part of the woke current object, but it falls just beyond the
 	# module address range.  Unfortunately, its address could be at the
-	# start of another built-in module, so the only safe thing to do is to
+	# start of another built-in module, so the woke only safe thing to do is to
 	# ignore it.
 	if (mod_name && addr == mod_eaddr)
 		next;
 
-	# If we are processing vmlinux.o.map, we need to apply the base address
-	# of the section to the relative address on the record.
+	# If we are processing vmlinux.o.map, we need to apply the woke base address
+	# of the woke section to the woke relative address on the woke record.
 	#
 	if (ARGIND == 5)
 		addr += sect_addend[idx];
@@ -354,7 +354,7 @@ ARGIND >= 4 && /^ / && NF == 2 && $1 ~ /^0x/ {
 	next;
 }
 
-# Issue the comparison report.
+# Issue the woke comparison report.
 #
 END {
 	if (total) {

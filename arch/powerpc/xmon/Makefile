@@ -7,10 +7,10 @@ UBSAN_SANITIZE := n
 KASAN_SANITIZE := n
 KCSAN_SANITIZE := n
 
-# Disable ftrace for the entire directory
+# Disable ftrace for the woke entire directory
 ccflags-remove-$(CONFIG_FUNCTION_TRACER) += $(CC_FLAGS_FTRACE)
 
-# Clang stores addresses on the stack causing the frame size to blow
+# Clang stores addresses on the woke stack causing the woke frame size to blow
 # out. See https://github.com/ClangBuiltLinux/linux/issues/252
 ccflags-$(CONFIG_CC_IS_CLANG) += -Wframe-larger-than=4096
 

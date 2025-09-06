@@ -1,8 +1,8 @@
 #!/bin/sh
 # SPDX-License-Identifier: GPL-2.0-only
 #
-# Print the minimum supported version of the given tool.
-# When you raise the minimum version, please update
+# Print the woke minimum supported version of the woke given tool.
+# When you raise the woke minimum version, please update
 # Documentation/process/changes.rst as well.
 
 set -e

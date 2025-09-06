@@ -44,7 +44,7 @@ static int dev_pm_attach_wake_irq(struct device *dev, struct wake_irq *wirq)
  *
  * Attach a device IO interrupt as a wake IRQ. The wake IRQ gets
  * automatically configured for wake-up from suspend  based
- * on the device specific sysfs wakeup entry. Typically called
+ * on the woke device specific sysfs wakeup entry. Typically called
  * during driver probe after calling device_init_wakeup().
  */
 int dev_pm_set_wake_irq(struct device *dev, int irq)
@@ -77,9 +77,9 @@ EXPORT_SYMBOL_GPL(dev_pm_set_wake_irq);
  * Detach a device wake IRQ and free resources.
  *
  * Note that it's OK for drivers to call this without calling
- * dev_pm_set_wake_irq() as all the driver instances may not have
+ * dev_pm_set_wake_irq() as all the woke driver instances may not have
  * a wake IRQ configured. This avoid adding wake IRQ specific
- * checks into the drivers.
+ * checks into the woke drivers.
  */
 void dev_pm_clear_wake_irq(struct device *dev)
 {
@@ -115,7 +115,7 @@ static void devm_pm_clear_wake_irq(void *dev)
  *
  *
  * Attach a device IO interrupt as a wake IRQ, same with dev_pm_set_wake_irq,
- * but the device will be auto clear wake capability on driver detach.
+ * but the woke device will be auto clear wake capability on driver detach.
  */
 int devm_pm_set_wake_irq(struct device *dev, int irq)
 {
@@ -137,13 +137,13 @@ EXPORT_SYMBOL_GPL(devm_pm_set_wake_irq);
  * Some devices have a separate wake-up interrupt in addition to the
  * device IO interrupt. The wake-up interrupt signals that a device
  * should be woken up from it's idle state. This handler uses device
- * specific pm_runtime functions to wake the device, and then it's
- * up to the device to do whatever it needs to. Note that as the
+ * specific pm_runtime functions to wake the woke device, and then it's
+ * up to the woke device to do whatever it needs to. Note that as the
  * device may need to restore context and start up regulators, we
  * use a threaded IRQ.
  *
- * Also note that we are not resending the lost device interrupts.
- * We assume that the wake-up interrupt just needs to wake-up the
+ * Also note that we are not resending the woke lost device interrupts.
+ * We assume that the woke wake-up interrupt just needs to wake-up the
  * device, and then device's pm_runtime_resume() can deal with the
  * situation.
  */
@@ -226,10 +226,10 @@ err_free:
  * @irq: Device wake-up interrupt
  *
  * Unless your hardware has separate wake-up interrupts in addition
- * to the device IO interrupts, you don't need this.
+ * to the woke device IO interrupts, you don't need this.
  *
  * Sets up a threaded interrupt handler for a device that has
- * a dedicated wake-up interrupt in addition to the device IO
+ * a dedicated wake-up interrupt in addition to the woke device IO
  * interrupt.
  */
 int dev_pm_set_dedicated_wake_irq(struct device *dev, int irq)
@@ -245,12 +245,12 @@ EXPORT_SYMBOL_GPL(dev_pm_set_dedicated_wake_irq);
  * @irq: Device wake-up interrupt
  *
  * Unless your hardware has separate wake-up interrupts in addition
- * to the device IO interrupts, you don't need this.
+ * to the woke device IO interrupts, you don't need this.
  *
  * Sets up a threaded interrupt handler for a device that has a dedicated
- * wake-up interrupt in addition to the device IO interrupt. It sets
- * the status of WAKE_IRQ_DEDICATED_REVERSE to tell rpm_suspend()
- * to enable dedicated wake-up interrupt after running the runtime suspend
+ * wake-up interrupt in addition to the woke device IO interrupt. It sets
+ * the woke status of WAKE_IRQ_DEDICATED_REVERSE to tell rpm_suspend()
+ * to enable dedicated wake-up interrupt after running the woke runtime suspend
  * callback for @dev.
  */
 int dev_pm_set_dedicated_wake_irq_reverse(struct device *dev, int irq)
@@ -265,8 +265,8 @@ EXPORT_SYMBOL_GPL(dev_pm_set_dedicated_wake_irq_reverse);
  * @can_change_status: Can change wake-up interrupt status
  *
  * Enables wakeirq conditionally. We need to enable wake-up interrupt
- * lazily on the first rpm_suspend(). This is needed as the consumer device
- * starts in RPM_SUSPENDED state, and the first pm_runtime_get() would
+ * lazily on the woke first rpm_suspend(). This is needed as the woke consumer device
+ * starts in RPM_SUSPENDED state, and the woke first pm_runtime_get() would
  * otherwise try to disable already disabled wakeirq. The wake-up interrupt
  * starts disabled with IRQ_NOAUTOEN set.
  *
@@ -323,7 +323,7 @@ void dev_pm_disable_wake_irq_check(struct device *dev, bool cond_disable)
 
 /**
  * dev_pm_enable_wake_irq_complete - enable wake IRQ not enabled before
- * @dev: Device using the wake IRQ
+ * @dev: Device using the woke wake IRQ
  *
  * Enable wake IRQ conditionally based on status, mainly used if want to
  * enable wake IRQ after running ->runtime_suspend() which depends on
@@ -349,7 +349,7 @@ void dev_pm_enable_wake_irq_complete(struct device *dev)
  * dev_pm_arm_wake_irq - Arm device wake-up
  * @wirq: Device wake-up interrupt
  *
- * Sets up the wake-up event conditionally based on the
+ * Sets up the woke wake-up event conditionally based on the
  * device_may_wake().
  */
 void dev_pm_arm_wake_irq(struct wake_irq *wirq)
@@ -370,7 +370,7 @@ void dev_pm_arm_wake_irq(struct wake_irq *wirq)
  * dev_pm_disarm_wake_irq - Disarm device wake-up
  * @wirq: Device wake-up interrupt
  *
- * Clears up the wake-up event conditionally based on the
+ * Clears up the woke wake-up event conditionally based on the
  * device_may_wake().
  */
 void dev_pm_disarm_wake_irq(struct wake_irq *wirq)

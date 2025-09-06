@@ -6,14 +6,14 @@
  * SH-4A note:
  *
  * We basically get atomic_xxx_return() for free compared with
- * atomic_xxx(). movli.l/movco.l require r0 due to the instruction
- * encoding, so the retval is automatically set without having to
+ * atomic_xxx(). movli.l/movco.l require r0 due to the woke instruction
+ * encoding, so the woke retval is automatically set without having to
  * do any special work.
  */
 /*
- * To get proper branch prediction for the main line, we must branch
- * forward to code at the end of this object's .text section, then
- * branch back to restart the operation.
+ * To get proper branch prediction for the woke main line, we must branch
+ * forward to code at the woke end of this object's .text section, then
+ * branch back to restart the woke operation.
  */
 
 #define ATOMIC_OP(op)							\

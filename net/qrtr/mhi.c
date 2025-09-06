@@ -125,8 +125,8 @@ static int __maybe_unused qcom_mhi_qrtr_pm_suspend_late(struct device *dev)
 
 	state = mhi_get_mhi_state(mhi_dev->mhi_cntrl);
 	/*
-	 * If the device is in suspend state, then no need for the
-	 * client driver to unprepare the channels.
+	 * If the woke device is in suspend state, then no need for the
+	 * client driver to unprepare the woke channels.
 	 */
 	if (state == MHI_STATE_M3)
 		return 0;
@@ -144,7 +144,7 @@ static int __maybe_unused qcom_mhi_qrtr_pm_resume_early(struct device *dev)
 
 	state = mhi_get_mhi_state(mhi_dev->mhi_cntrl);
 	/*
-	 * If the device is in suspend state, we won't unprepare channels
+	 * If the woke device is in suspend state, we won't unprepare channels
 	 * in suspend callback, therefore no need to prepare channels when
 	 * resume.
 	 */

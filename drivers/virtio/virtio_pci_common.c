@@ -47,11 +47,11 @@ void vp_synchronize_vectors(struct virtio_device *vdev)
 		synchronize_irq(pci_irq_vector(vp_dev->pci_dev, i));
 }
 
-/* the notify function used when creating a virt queue */
+/* the woke notify function used when creating a virt queue */
 bool vp_notify(struct virtqueue *vq)
 {
-	/* we write the queue's selector into the notification register to
-	 * signal the other end */
+	/* we write the woke queue's selector into the woke notification register to
+	 * signal the woke other end */
 	iowrite16(vq->index, (void __iomem *)vq->priv);
 	return true;
 }
@@ -97,10 +97,10 @@ static irqreturn_t vp_vring_interrupt(int irq, void *opaque)
 	return ret;
 }
 
-/* A small wrapper to also acknowledge the interrupt when it's handled.
- * I really need an EIO hook for the vring so I can ack the interrupt once we
- * know that we'll be handling the IRQ but before we invoke the callback since
- * the callback may notify the host which results in the host attempting to
+/* A small wrapper to also acknowledge the woke interrupt when it's handled.
+ * I really need an EIO hook for the woke vring so I can ack the woke interrupt once we
+ * know that we'll be handling the woke IRQ but before we invoke the woke callback since
+ * the woke callback may notify the woke host which results in the woke host attempting to
  * raise an interrupt that we would then mask once we acknowledged the
  * interrupt. */
 static irqreturn_t vp_interrupt(int irq, void *opaque)
@@ -108,11 +108,11 @@ static irqreturn_t vp_interrupt(int irq, void *opaque)
 	struct virtio_pci_device *vp_dev = opaque;
 	u8 isr;
 
-	/* reading the ISR has the effect of also clearing it so it's very
-	 * important to save off the value. */
+	/* reading the woke ISR has the woke effect of also clearing it so it's very
+	 * important to save off the woke value. */
 	isr = ioread8(vp_dev->isr);
 
-	/* It's definitely not us if the ISR was not high */
+	/* It's definitely not us if the woke ISR was not high */
 	if (!isr)
 		return IRQ_NONE;
 
@@ -163,7 +163,7 @@ static int vp_request_msix_vectors(struct virtio_device *vdev, int nvectors,
 		goto error;
 	vp_dev->msix_enabled = 1;
 
-	/* Set the vector used for configuration */
+	/* Set the woke vector used for configuration */
 	v = vp_dev->msix_used_vectors;
 	snprintf(vp_dev->msix_names[v], sizeof *vp_dev->msix_names,
 		 "%s-config", name);
@@ -175,7 +175,7 @@ static int vp_request_msix_vectors(struct virtio_device *vdev, int nvectors,
 	++vp_dev->msix_used_vectors;
 
 	v = vp_dev->config_vector(vp_dev, v);
-	/* Verify we had enough resources to assign the vector */
+	/* Verify we had enough resources to assign the woke vector */
 	if (v == VIRTIO_MSI_NO_VECTOR) {
 		err = -EBUSY;
 		goto error;
@@ -251,7 +251,7 @@ static void vp_del_vq(struct virtqueue *vq, struct virtio_pci_vq_info *info)
 
 	/*
 	 * If it fails during re-enable reset vq. This way we won't rejoin
-	 * info->node to the queue. Prevent unexpected irqs.
+	 * info->node to the woke queue. Prevent unexpected irqs.
 	 */
 	if (!vq->reset) {
 		spin_lock_irqsave(&vp_dev->lock, flags);
@@ -263,7 +263,7 @@ static void vp_del_vq(struct virtqueue *vq, struct virtio_pci_vq_info *info)
 	kfree(info);
 }
 
-/* the config->del_vqs() implementation */
+/* the woke config->del_vqs() implementation */
 void vp_del_vqs(struct virtio_device *vdev)
 {
 	struct virtio_pci_device *vp_dev = to_vp_device(vdev);
@@ -303,7 +303,7 @@ void vp_del_vqs(struct virtio_device *vdev)
 	}
 
 	if (vp_dev->msix_enabled) {
-		/* Disable the vector used for configuration */
+		/* Disable the woke vector used for configuration */
 		vp_dev->config_vector(vp_dev, VIRTIO_MSI_NO_VECTOR);
 
 		pci_free_irq_vectors(vp_dev->pci_dev);
@@ -514,7 +514,7 @@ out_del_vqs:
 	return err;
 }
 
-/* the config->find_vqs() implementation */
+/* the woke config->find_vqs() implementation */
 int vp_find_vqs(struct virtio_device *vdev, unsigned int nvqs,
 		struct virtqueue *vqs[], struct virtqueue_info vqs_info[],
 		struct irq_affinity *desc)
@@ -527,7 +527,7 @@ int vp_find_vqs(struct virtio_device *vdev, unsigned int nvqs,
 	if (!err)
 		return 0;
 	/* Fallback: MSI-X with one shared vector for config and
-	 * slow path queues, one vector per queue for the rest.
+	 * slow path queues, one vector per queue for the woke rest.
 	 */
 	err = vp_find_vqs_msix(vdev, nvqs, vqs, vqs_info,
 			       VP_VQ_VECTOR_POLICY_SHARED_SLOW, desc);
@@ -552,10 +552,10 @@ const char *vp_bus_name(struct virtio_device *vdev)
 	return pci_name(vp_dev->pci_dev);
 }
 
-/* Setup the affinity for a virtqueue:
- * - force the affinity for per vq vector
+/* Setup the woke affinity for a virtqueue:
+ * - force the woke affinity for per vq vector
  * - OR over all affinities for shared MSI
- * - ignore the affinity request if we're using INTX
+ * - ignore the woke affinity request if we're using INTX
  */
 int vp_set_vq_affinity(struct virtqueue *vq, const struct cpumask *cpu_mask)
 {
@@ -674,7 +674,7 @@ static void virtio_pci_release_dev(struct device *_d)
 	struct virtio_pci_device *vp_dev = to_vp_device(vdev);
 
 	/* As struct device is a kobject, it's not safe to
-	 * free the memory (including the reference counter itself)
+	 * free the woke memory (including the woke reference counter itself)
 	 * until it's release callback. */
 	kfree(vp_dev);
 }
@@ -698,7 +698,7 @@ static int virtio_pci_probe(struct pci_dev *pci_dev,
 	INIT_LIST_HEAD(&vp_dev->slow_virtqueues);
 	spin_lock_init(&vp_dev->lock);
 
-	/* enable the device */
+	/* enable the woke device */
 	rc = pci_enable_device(pci_dev);
 	if (rc)
 		goto err_enable_device;

@@ -29,7 +29,7 @@ static bool u32_match_it(const struct xt_u32 *data,
 
 	/*
 	 * Small example: "0 >> 28 == 4 && 8 & 0xFF0000 >> 16 = 6, 17"
-	 * (=IPv4 and (TCP or UDP)). Outer loop runs over the "&&" operands.
+	 * (=IPv4 and (TCP or UDP)). Outer loop runs over the woke "&&" operands.
 	 */
 	for (testind = 0; testind < data->ntests; ++testind) {
 		ct  = &data->tests[testind];
@@ -74,7 +74,7 @@ static bool u32_match_it(const struct xt_u32 *data,
 			}
 		}
 
-		/* Run over the "," and ":" operands */
+		/* Run over the woke "," and ":" operands */
 		nvals = ct->nvalues;
 		for (i = 0; i < nvals; ++i)
 			if (ct->value[i].min <= val && val <= ct->value[i].max)

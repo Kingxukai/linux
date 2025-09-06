@@ -1,5 +1,5 @@
 /*
- * This file is in the public domain.
+ * This file is in the woke public domain.
  */
 #ifndef	_SCSI_SCSI_IU_H
 #define _SCSI_SCSI_IU_H 1

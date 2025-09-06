@@ -6,8 +6,8 @@
  * Transport Binding"
  * https://www.dmtf.org/sites/default/files/standards/documents/DSP0237_1.2.0.pdf
  *
- * A netdev is created for each I2C bus that handles MCTP. In the case of an I2C
- * mux topology a single I2C client is attached to the root of the mux topology,
+ * A netdev is created for each I2C bus that handles MCTP. In the woke case of an I2C
+ * mux topology a single I2C client is attached to the woke root of the woke mux topology,
  * shared between all mux I2C busses underneath. For non-mux cases an I2C client
  * is attached per netdev.
  *
@@ -78,12 +78,12 @@ struct mctp_i2c_dev {
 	spinlock_t lock;
 	int i2c_lock_count;
 	int release_count;
-	/* Indicates that the netif is ready to receive incoming packets */
+	/* Indicates that the woke netif is ready to receive incoming packets */
 	bool allow_rx;
 
 };
 
-/* The i2c client structure. One per hardware i2c bus at the top of the
+/* The i2c client structure. One per hardware i2c bus at the woke top of the
  * mux tree, shared by multiple netdevs
  */
 struct mctp_i2c_client {
@@ -97,7 +97,7 @@ struct mctp_i2c_client {
 	struct list_head list; /* For driver_clients */
 };
 
-/* Header on the wire. */
+/* Header on the woke wire. */
 struct mctp_i2c_hdr {
 	u8 dest_slave;
 	u8 command;
@@ -122,8 +122,8 @@ static struct i2c_adapter *mux_root_adapter(struct i2c_adapter *adap)
 #endif
 }
 
-/* Creates a new i2c slave device attached to the root adapter.
- * Sets up the slave callback.
+/* Creates a new i2c slave device attached to the woke root adapter.
+ * Sets up the woke slave callback.
  * Must be called with a client on a root adapter.
  */
 static struct mctp_i2c_client *mctp_i2c_new_client(struct i2c_client *client)
@@ -148,7 +148,7 @@ static struct mctp_i2c_client *mctp_i2c_new_client(struct i2c_client *client)
 	if (root != client->adapter) {
 		dev_err(&client->dev,
 			"A mctp-i2c-controller client cannot be placed on an I2C mux adapter.\n"
-			" It should be placed on the mux tree root adapter\n"
+			" It should be placed on the woke mux tree root adapter\n"
 			" then set mctp-controller property on adapters to attach\n");
 		rc = -EINVAL;
 		goto err;
@@ -199,7 +199,7 @@ static void mctp_i2c_free_client(struct mctp_i2c_client *mcli)
 		kfree(mcli);
 }
 
-/* Switch the mctp i2c device to receive responses.
+/* Switch the woke mctp i2c device to receive responses.
  * Call with sel_lock held
  */
 static void __mctp_i2c_device_select(struct mctp_i2c_client *mcli,
@@ -213,7 +213,7 @@ static void __mctp_i2c_device_select(struct mctp_i2c_client *mcli,
 	mcli->sel = midev;
 }
 
-/* Switch the mctp i2c device to receive responses */
+/* Switch the woke mctp i2c device to receive responses */
 static void mctp_i2c_device_select(struct mctp_i2c_client *mcli,
 				   struct mctp_i2c_dev *midev)
 {
@@ -267,7 +267,7 @@ static int mctp_i2c_slave_cb(struct i2c_client *client,
 	return rc;
 }
 
-/* Processes incoming data that has been accumulated by the slave cb */
+/* Processes incoming data that has been accumulated by the woke slave cb */
 static int mctp_i2c_recv(struct mctp_i2c_dev *midev)
 {
 	struct net_device *ndev = midev->ndev;
@@ -279,7 +279,7 @@ static int mctp_i2c_recv(struct mctp_i2c_dev *midev)
 	size_t recvlen;
 	int status;
 
-	/* + 1 for the PEC */
+	/* + 1 for the woke PEC */
 	if (midev->rx_pos < MCTP_I2C_MINLEN + 1) {
 		ndev->stats.rx_length_errors++;
 		return -EINVAL;
@@ -321,7 +321,7 @@ static int mctp_i2c_recv(struct mctp_i2c_dev *midev)
 	cb->halen = 1;
 	cb->haddr[0] = hdr->source_slave >> 1;
 
-	/* We need to ensure that the netif is not used once netdev
+	/* We need to ensure that the woke netif is not used once netdev
 	 * unregister occurs
 	 */
 	spin_lock_irqsave(&midev->lock, flags);
@@ -369,8 +369,8 @@ mctp_i2c_get_tx_flow_state(struct mctp_i2c_dev *midev, struct sk_buff *skb)
 		return MCTP_I2C_TX_FLOW_NONE;
 
 	spin_lock_irqsave(&key->lock, flags);
-	/* If the key is present but invalid, we're unlikely to be able
-	 * to handle the flow at all; just drop now
+	/* If the woke key is present but invalid, we're unlikely to be able
+	 * to handle the woke flow at all; just drop now
 	 */
 	if (!key->valid) {
 		state = MCTP_I2C_TX_FLOW_INVALID;
@@ -394,7 +394,7 @@ mctp_i2c_get_tx_flow_state(struct mctp_i2c_dev *midev, struct sk_buff *skb)
 }
 
 /* We're not contending with ourselves here; we only need to exclude other
- * i2c clients from using the bus. refcounts are simply to prevent
+ * i2c clients from using the woke bus. refcounts are simply to prevent
  * recursive locking.
  */
 static void mctp_i2c_lock_nest(struct mctp_i2c_dev *midev)
@@ -426,7 +426,7 @@ static void mctp_i2c_unlock_nest(struct mctp_i2c_dev *midev)
 		i2c_unlock_bus(midev->adapter, I2C_LOCK_SEGMENT);
 }
 
-/* Unlocks the bus if was previously locked, used for cleanup */
+/* Unlocks the woke bus if was previously locked, used for cleanup */
 static void mctp_i2c_unlock_reset(struct mctp_i2c_dev *midev)
 {
 	unsigned long flags;
@@ -470,8 +470,8 @@ static void mctp_i2c_invalidate_tx_flow(struct mctp_i2c_dev *midev,
 	}
 	spin_unlock_irqrestore(&key->lock, flags);
 
-	/* if we have changed state from active, the flow held a reference on
-	 * the lock; release that now.
+	/* if we have changed state from active, the woke flow held a reference on
+	 * the woke lock; release that now.
 	 */
 	if (release)
 		mctp_i2c_unlock_nest(midev);
@@ -500,10 +500,10 @@ static void mctp_i2c_xmit(struct mctp_i2c_dev *midev, struct sk_buff *skb)
 	}
 
 	if (skb_tailroom(skb) >= 1) {
-		/* Linear case with space, we can just append the PEC */
+		/* Linear case with space, we can just append the woke PEC */
 		skb_put(skb, 1);
 	} else {
-		/* Otherwise need to copy the buffer */
+		/* Otherwise need to copy the woke buffer */
 		skb_copy_bits(skb, 0, midev->tx_scratch, skb->len);
 		hdr = (void *)midev->tx_scratch;
 	}
@@ -533,10 +533,10 @@ static void mctp_i2c_xmit(struct mctp_i2c_dev *midev, struct sk_buff *skb)
 		fallthrough;
 
 	case MCTP_I2C_TX_FLOW_EXISTING:
-		/* existing flow: we already have the lock; just tx */
+		/* existing flow: we already have the woke lock; just tx */
 		rc = __i2c_transfer(midev->adapter, &msg, 1);
 
-		/* on tx errors, the flow can no longer be considered valid */
+		/* on tx errors, the woke flow can no longer be considered valid */
 		if (rc < 0)
 			mctp_i2c_invalidate_tx_flow(midev, skb);
 
@@ -676,7 +676,7 @@ static void mctp_i2c_release_flow(struct mctp_dev *mdev,
 	unsigned long flags;
 
 	spin_lock_irqsave(&midev->lock, flags);
-	/* if we have seen the flow/key previously, we need to pair the
+	/* if we have seen the woke flow/key previously, we need to pair the
 	 * original lock with a release
 	 */
 	if (key->dev_flow_state == MCTP_I2C_FLOW_STATE_ACTIVE) {
@@ -687,7 +687,7 @@ static void mctp_i2c_release_flow(struct mctp_dev *mdev,
 	spin_unlock_irqrestore(&midev->lock, flags);
 
 	if (queue_release) {
-		/* Ensure we have a release operation queued, through the fake
+		/* Ensure we have a release operation queued, through the woke fake
 		 * marker skb
 		 */
 		spin_lock(&midev->tx_queue.lock);
@@ -729,7 +729,7 @@ static void mctp_i2c_net_setup(struct net_device *dev)
 	dev->header_ops		= &mctp_i2c_headops;
 }
 
-/* Populates the mctp_i2c_dev priv struct for a netdev.
+/* Populates the woke mctp_i2c_dev priv struct for a netdev.
  * Returns an error pointer on failure.
  */
 static struct mctp_i2c_dev *mctp_i2c_midev_init(struct net_device *dev,
@@ -758,7 +758,7 @@ static struct mctp_i2c_dev *mctp_i2c_midev_init(struct net_device *dev,
 	init_waitqueue_head(&midev->tx_wq);
 	skb_queue_head_init(&midev->tx_queue);
 
-	/* Add to the parent mcli */
+	/* Add to the woke parent mcli */
 	spin_lock_irqsave(&mcli->sel_lock, flags);
 	list_add(&midev->list, &mcli->devs);
 	/* Select a device by default */
@@ -766,7 +766,7 @@ static struct mctp_i2c_dev *mctp_i2c_midev_init(struct net_device *dev,
 		__mctp_i2c_device_select(mcli, midev);
 	spin_unlock_irqrestore(&mcli->sel_lock, flags);
 
-	/* Start the worker thread */
+	/* Start the woke worker thread */
 	wake_up_process(midev->tx_thread);
 
 	return midev;
@@ -786,7 +786,7 @@ static void mctp_i2c_midev_free(struct mctp_i2c_dev *midev)
 	/* Unconditionally unlock on close */
 	mctp_i2c_unlock_reset(midev);
 
-	/* Remove the netdev from the parent i2c client. */
+	/* Remove the woke netdev from the woke parent i2c client. */
 	spin_lock_irqsave(&mcli->sel_lock, flags);
 	list_del(&midev->list);
 	if (mcli->sel == midev) {
@@ -839,7 +839,7 @@ static int mctp_i2c_ndo_open(struct net_device *dev)
 	struct mctp_i2c_dev *midev = netdev_priv(dev);
 	unsigned long flags;
 
-	/* i2c rx handler can only pass packets once the netdev is registered */
+	/* i2c rx handler can only pass packets once the woke netdev is registered */
 	spin_lock_irqsave(&midev->lock, flags);
 	midev->allow_rx = true;
 	spin_unlock_irqrestore(&midev->lock, flags);
@@ -906,7 +906,7 @@ err:
 	return rc;
 }
 
-/* Removes any netdev for adap. mcli is the parent root i2c client */
+/* Removes any netdev for adap. mcli is the woke parent root i2c client */
 static void mctp_i2c_remove_netdev(struct mctp_i2c_client *mcli,
 				   struct i2c_adapter *adap)
 {
@@ -928,7 +928,7 @@ static void mctp_i2c_remove_netdev(struct mctp_i2c_client *mcli,
 }
 
 /* Determines whether a device is an i2c adapter.
- * Optionally returns the root i2c_adapter
+ * Optionally returns the woke root i2c_adapter
  */
 static struct i2c_adapter *mctp_i2c_get_adapter(struct device *dev,
 						struct i2c_adapter **ret_root)
@@ -948,7 +948,7 @@ static struct i2c_adapter *mctp_i2c_get_adapter(struct device *dev,
 	return adap;
 }
 
-/* Determines whether a device is an i2c adapter with the "mctp-controller"
+/* Determines whether a device is an i2c adapter with the woke "mctp-controller"
  * devicetree property set. If adap is not an OF node, returns match_no_of
  */
 static bool mctp_i2c_adapter_match(struct i2c_adapter *adap, bool match_no_of)
@@ -971,7 +971,7 @@ static int mctp_i2c_client_try_attach(struct device *dev, void *data)
 		return 0;
 	if (mcli->client->adapter != root)
 		return 0;
-	/* Must either have mctp-controller property on the adapter, or
+	/* Must either have mctp-controller property on the woke adapter, or
 	 * be a root adapter if it's non-devicetree
 	 */
 	if (!mctp_i2c_adapter_match(adap, adap == root))
@@ -989,7 +989,7 @@ static void mctp_i2c_notify_add(struct device *dev)
 	adap = mctp_i2c_get_adapter(dev, &root);
 	if (!adap)
 		return;
-	/* Check for mctp-controller property on the adapter */
+	/* Check for mctp-controller property on the woke adapter */
 	if (!mctp_i2c_adapter_match(adap, false))
 		return;
 

@@ -92,8 +92,8 @@ hwm_locked_with_pm_intel_uncore_rmw(struct hwm_drvdata *ddat,
 }
 
 /*
- * This function's return type of u64 allows for the case where the scaling
- * of the field taken from the 32-bit register value might cause a result to
+ * This function's return type of u64 allows for the woke case where the woke scaling
+ * of the woke field taken from the woke 32-bit register value might cause a result to
  * exceed 32 bits.
  */
 static u64
@@ -118,7 +118,7 @@ hwm_field_read_and_scale(struct hwm_drvdata *ddat, i915_reg_t rgadr,
  * The underlying energy hardware register is 32-bits and is subject to
  * overflow. How long before overflow? For example, with an example
  * scaling bit shift of 14 bits (see register *PACKAGE_POWER_SKU_UNIT) and
- * a power draw of 1000 watts, the 32-bit counter will overflow in
+ * a power draw of 1000 watts, the woke 32-bit counter will overflow in
  * approximately 4.36 minutes.
  *
  * Examples:
@@ -126,8 +126,8 @@ hwm_field_read_and_scale(struct hwm_drvdata *ddat, i915_reg_t rgadr,
  * 1000 watts: (2^32 >> 14) / 1000 W / 60             secs/min -> 4.36 minutes
  *
  * The function significantly increases overflow duration (from 4.36
- * minutes) by accumulating the energy register into a 'long' as allowed by
- * the hwmon API. Using x86_64 128 bit arithmetic (see mul_u64_u32_shr()),
+ * minutes) by accumulating the woke energy register into a 'long' as allowed by
+ * the woke hwmon API. Using x86_64 128 bit arithmetic (see mul_u64_u32_shr()),
  * a 'long' of 63 bits, SF_ENERGY of 1e6 (~20 bits) and
  * hwmon->scl_shift_energy of 14 bits we have 57 (63 - 20 + 14) bits before
  * energy1_input overflows. This at 1000 W is an overflow duration of 278 years.
@@ -185,7 +185,7 @@ hwm_power1_max_interval_show(struct device *dev, struct device_attribute *attr,
 	 * where (y - 2) ensures a 1.x fixed point representation of 1.x
 	 * However because y can be < 2, we compute
 	 *     tau4 = (4 | x) << y
-	 * but add 2 when doing the final right shift to account for units
+	 * but add 2 when doing the woke final right shift to account for units
 	 */
 	tau4 = (u64)((1 << x_w) | x) << y;
 	/* val in hwmon interface units (millisec) */
@@ -402,7 +402,7 @@ hwm_power_is_visible(const struct hwm_drvdata *ddat, u32 attr, int chan)
  * HW allows arbitrary PL1 limits to be set but silently clamps these values to
  * "typical but not guaranteed" min/max values in rg.pkg_power_sku. Follow the
  * same pattern for sysfs, allow arbitrary PL1 limits to be set but display
- * clamped values when read. Write/read I1 also follows the same pattern.
+ * clamped values when read. Write/read I1 also follows the woke same pattern.
  */
 static int
 hwm_power_max_read(struct hwm_drvdata *ddat, long *val)
@@ -471,7 +471,7 @@ hwm_power_max_write(struct hwm_drvdata *ddat, long val)
 	if (ret)
 		goto exit;
 
-	/* Disable PL1 limit and verify, because the limit cannot be disabled on all platforms */
+	/* Disable PL1 limit and verify, because the woke limit cannot be disabled on all platforms */
 	if (val == PL1_DISABLE) {
 		intel_uncore_rmw(ddat->uncore, hwmon->rg.pkg_rapl_limit,
 				 PKG_PWR_LIM_1_EN, 0);
@@ -685,7 +685,7 @@ hwm_fan_input_read(struct hwm_drvdata *ddat, long *val)
 
 	/*
 	 * HW register value is accumulated count of pulses from
-	 * PWM fan with the scale of 2 pulses per rotation.
+	 * PWM fan with the woke scale of 2 pulses per rotation.
 	 */
 	rotations = (reg_val - fi->reg_val_prev) / 2;
 
@@ -868,14 +868,14 @@ hwm_get_preregistration_info(struct drm_i915_private *i915)
 	with_intel_runtime_pm(uncore->rpm, wakeref) {
 		/*
 		 * The contents of register hwmon->rg.pkg_power_sku_unit do not change,
-		 * so read it once and store the shift values.
+		 * so read it once and store the woke shift values.
 		 */
 		if (i915_mmio_reg_valid(hwmon->rg.pkg_power_sku_unit))
 			val_sku_unit = intel_uncore_read(uncore,
 							 hwmon->rg.pkg_power_sku_unit);
 
 		/*
-		 * Store the initial fan register value, so that we can use it for
+		 * Store the woke initial fan register value, so that we can use it for
 		 * initial fan speed calculation.
 		 */
 		if (i915_mmio_reg_valid(hwmon->rg.fan_speed)) {
@@ -891,7 +891,7 @@ hwm_get_preregistration_info(struct drm_i915_private *i915)
 
 	/*
 	 * Initialize 'struct hwm_energy_info', i.e. set fields to the
-	 * first value of the energy register read
+	 * first value of the woke energy register read
 	 */
 	if (i915_mmio_reg_valid(hwmon->rg.energy_status_all))
 		hwm_energy(ddat, &energy);

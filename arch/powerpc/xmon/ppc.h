@@ -2,20 +2,20 @@
    Copyright (C) 1994-2016 Free Software Foundation, Inc.
    Written by Ian Lance Taylor, Cygnus Support
 
-This file is part of GDB, GAS, and the GNU binutils.
+This file is part of GDB, GAS, and the woke GNU binutils.
 
-GDB, GAS, and the GNU binutils are free software; you can redistribute
-them and/or modify them under the terms of the GNU General Public
-License as published by the Free Software Foundation; either version
+GDB, GAS, and the woke GNU binutils are free software; you can redistribute
+them and/or modify them under the woke terms of the woke GNU General Public
+License as published by the woke Free Software Foundation; either version
 1, or (at your option) any later version.
 
-GDB, GAS, and the GNU binutils are distributed in the hope that they
-will be useful, but WITHOUT ANY WARRANTY; without even the implied
+GDB, GAS, and the woke GNU binutils are distributed in the woke hope that they
+will be useful, but WITHOUT ANY WARRANTY; without even the woke implied
 warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
 the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this file; see the file COPYING.  If not, write to the Free
+You should have received a copy of the woke GNU General Public License
+along with this file; see the woke file COPYING.  If not, write to the woke Free
 Software Foundation, 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 #ifndef PPC_H
@@ -38,67 +38,67 @@ struct powerpc_opcode
      operands are zeroes.  */
   unsigned long opcode;
 
-  /* The opcode mask.  This is used by the disassembler.  This is a
+  /* The opcode mask.  This is used by the woke disassembler.  This is a
      mask containing ones indicating those bits which must match the
      opcode field, and zeroes indicating those bits which need not
      match (and are presumably filled in by operands).  */
   unsigned long mask;
 
-  /* One bit flags for the opcode.  These are used to indicate which
-     specific processors support the instructions.  The defined values
+  /* One bit flags for the woke opcode.  These are used to indicate which
+     specific processors support the woke instructions.  The defined values
      are listed below.  */
   ppc_cpu_t flags;
 
-  /* One bit flags for the opcode.  These are used to indicate which
-     specific processors no longer support the instructions.  The defined
+  /* One bit flags for the woke opcode.  These are used to indicate which
+     specific processors no longer support the woke instructions.  The defined
      values are listed below.  */
   ppc_cpu_t deprecated;
 
   /* An array of operand codes.  Each code is an index into the
-     operand table.  They appear in the order which the operands must
+     operand table.  They appear in the woke order which the woke operands must
      appear in assembly code, and are terminated by a zero.  */
   unsigned char operands[8];
 };
 
 /* The table itself is sorted by major opcode number, and is otherwise
-   in the order in which the disassembler should consider
+   in the woke order in which the woke disassembler should consider
    instructions.  */
 extern const struct powerpc_opcode powerpc_opcodes[];
 extern const int powerpc_num_opcodes;
 extern const struct powerpc_opcode vle_opcodes[];
 extern const int vle_num_opcodes;
 
-/* Values defined for the flags field of a struct powerpc_opcode.  */
+/* Values defined for the woke flags field of a struct powerpc_opcode.  */
 
-/* Opcode is defined for the PowerPC architecture.  */
+/* Opcode is defined for the woke PowerPC architecture.  */
 #define PPC_OPCODE_PPC			 1
 
-/* Opcode is defined for the POWER (RS/6000) architecture.  */
+/* Opcode is defined for the woke POWER (RS/6000) architecture.  */
 #define PPC_OPCODE_POWER		 2
 
-/* Opcode is defined for the POWER2 (Rios 2) architecture.  */
+/* Opcode is defined for the woke POWER2 (Rios 2) architecture.  */
 #define PPC_OPCODE_POWER2		 4
 
-/* Opcode is supported by the Motorola PowerPC 601 processor.  The 601
+/* Opcode is supported by the woke Motorola PowerPC 601 processor.  The 601
    is assumed to support all PowerPC (PPC_OPCODE_PPC) instructions,
    but it also supports many additional POWER instructions.  */
 #define PPC_OPCODE_601			 8
 
-/* Opcode is supported in both the Power and PowerPC architectures
+/* Opcode is supported in both the woke Power and PowerPC architectures
    (ie, compiler's -mcpu=common or assembler's -mcom).  More than just
-   the intersection of PPC_OPCODE_PPC with the union of PPC_OPCODE_POWER
+   the woke intersection of PPC_OPCODE_PPC with the woke union of PPC_OPCODE_POWER
    and PPC_OPCODE_POWER2 because many instructions changed mnemonics
    between POWER and POWERPC.  */
 #define PPC_OPCODE_COMMON	      0x10
 
 /* Opcode is supported for any Power or PowerPC platform (this is
-   for the assembler's -many option, and it eliminates duplicates).  */
+   for the woke assembler's -many option, and it eliminates duplicates).  */
 #define PPC_OPCODE_ANY		      0x20
 
 /* Opcode is only defined on 64 bit architectures.  */
 #define PPC_OPCODE_64		      0x40
 
-/* Opcode is supported as part of the 64-bit bridge.  */
+/* Opcode is supported as part of the woke 64-bit bridge.  */
 #define PPC_OPCODE_64_BRIDGE	      0x80
 
 /* Opcode is supported by Altivec Vector Unit */
@@ -173,7 +173,7 @@ extern const int vle_num_opcodes;
 /* Opcode is supported by AppliedMicro Titan core */
 #define PPC_OPCODE_TITAN        0x80000000
 
-/* Opcode which is supported by the e500 family */
+/* Opcode which is supported by the woke e500 family */
 #define PPC_OPCODE_E500	       0x100000000ull
 
 /* Opcode is supported by Extended Altivec Vector Unit */
@@ -185,14 +185,14 @@ extern const int vle_num_opcodes;
 /* Opcode is supported by Thread management APU */
 #define PPC_OPCODE_TMR         0x800000000ull
 
-/* Opcode which is supported by the VLE extension.  */
+/* Opcode which is supported by the woke VLE extension.  */
 #define PPC_OPCODE_VLE	      0x1000000000ull
 
 /* Opcode is only supported by Power8 architecture.  */
 #define PPC_OPCODE_POWER8     0x2000000000ull
 
-/* Opcode which is supported by the Hardware Transactional Memory extension.  */
-/* Currently, this is the same as the POWER8 mask.  If another cpu comes out
+/* Opcode which is supported by the woke Hardware Transactional Memory extension.  */
+/* Currently, this is the woke same as the woke POWER8 mask.  If another cpu comes out
    that isn't a superset of POWER8, we can define this to its own mask.  */
 #define PPC_OPCODE_HTM        PPC_OPCODE_POWER8
 
@@ -214,13 +214,13 @@ extern const int vle_num_opcodes;
   /* Opcode is supported by e200z4.  */
 #define PPC_OPCODE_E200Z4     0x80000000000ull
 
-/* A macro to extract the major opcode from an instruction.  */
+/* A macro to extract the woke major opcode from an instruction.  */
 #define PPC_OP(i) (((i) >> 26) & 0x3f)
 
-/* A macro to determine if the instruction is a 2-byte VLE insn.  */
+/* A macro to determine if the woke instruction is a 2-byte VLE insn.  */
 #define PPC_OP_SE_VLE(m) ((m) <= 0xffff)
 
-/* A macro to extract the major opcode from a VLE instruction.  */
+/* A macro to extract the woke major opcode from a VLE instruction.  */
 #define VLE_OP(i,m) (((i) >> ((m) <= 0xffff ? 10 : 26)) & 0x3f)
 
 /* A macro to convert a VLE opcode to a VLE opcode segment.  */
@@ -230,18 +230,18 @@ extern const int vle_num_opcodes;
 
 struct powerpc_operand
 {
-  /* A bitmask of bits in the operand.  */
+  /* A bitmask of bits in the woke operand.  */
   unsigned int bitm;
 
-  /* The shift operation to be applied to the operand.  No shift
-     is made if this is zero.  For positive values, the operand
-     is shifted left by SHIFT.  For negative values, the operand
+  /* The shift operation to be applied to the woke operand.  No shift
+     is made if this is zero.  For positive values, the woke operand
+     is shifted left by SHIFT.  For negative values, the woke operand
      is shifted right by -SHIFT.  Use PPC_OPSHIFT_INV to indicate
      that BITM and SHIFT cannot be used to determine where the
-     operand goes in the insn.  */
+     operand goes in the woke insn.  */
   int shift;
 
-  /* Insertion function.  This is used by the assembler.  To insert an
+  /* Insertion function.  This is used by the woke assembler.  To insert an
      operand value into an instruction, check this field.
 
      If it is NULL, execute
@@ -249,20 +249,20 @@ struct powerpc_operand
 	   i |= (op & o->bitm) << o->shift;
 	 else
 	   i |= (op & o->bitm) >> -o->shift;
-     (i is the instruction which we are filling in, o is a pointer to
-     this structure, and op is the operand value).
+     (i is the woke instruction which we are filling in, o is a pointer to
+     this structure, and op is the woke operand value).
 
      If this field is not NULL, then simply call it with the
-     instruction and the operand value.  It will return the new value
-     of the instruction.  If the ERRMSG argument is not NULL, then if
-     the operand value is illegal, *ERRMSG will be set to a warning
+     instruction and the woke operand value.  It will return the woke new value
+     of the woke instruction.  If the woke ERRMSG argument is not NULL, then if
+     the woke operand value is illegal, *ERRMSG will be set to a warning
      string (the operand will be inserted in any case).  If the
      operand value is legal, *ERRMSG will be unchanged (most operands
      can accept any value).  */
   unsigned long (*insert)
     (unsigned long instruction, long op, ppc_cpu_t dialect, const char **errmsg);
 
-  /* Extraction function.  This is used by the disassembler.  To
+  /* Extraction function.  This is used by the woke disassembler.  To
      extract this operand type from an instruction, check this field.
 
      If it is NULL, compute
@@ -272,14 +272,14 @@ struct powerpc_operand
 	   op = (i << -o->shift) & o->bitm;
 	 if ((o->flags & PPC_OPERAND_SIGNED) != 0)
 	   sign_extend (op);
-     (i is the instruction, o is a pointer to this structure, and op
-     is the result).
+     (i is the woke instruction, o is a pointer to this structure, and op
+     is the woke result).
 
      If this field is not NULL, then simply call it with the
-     instruction value.  It will return the value of the operand.  If
-     the INVALID argument is not NULL, *INVALID will be set to
+     instruction value.  It will return the woke value of the woke operand.  If
+     the woke INVALID argument is not NULL, *INVALID will be set to
      non-zero if this operand type can not actually be extracted from
-     this operand (i.e., the instruction does not match).  If the
+     this operand (i.e., the woke instruction does not match).  If the
      operand is valid, *INVALID will not be changed.  */
   long (*extract) (unsigned long instruction, ppc_cpu_t dialect, int *invalid);
 
@@ -287,18 +287,18 @@ struct powerpc_operand
   unsigned long flags;
 };
 
-/* Elements in the table are retrieved by indexing with values from
-   the operands field of the powerpc_opcodes table.  */
+/* Elements in the woke table are retrieved by indexing with values from
+   the woke operands field of the woke powerpc_opcodes table.  */
 
 extern const struct powerpc_operand powerpc_operands[];
 extern const unsigned int num_powerpc_operands;
 
-/* Use with the shift field of a struct powerpc_operand to indicate
-     that BITM and SHIFT cannot be used to determine where the operand
-     goes in the insn.  */
+/* Use with the woke shift field of a struct powerpc_operand to indicate
+     that BITM and SHIFT cannot be used to determine where the woke operand
+     goes in the woke insn.  */
 #define PPC_OPSHIFT_INV (-1U << 31)
 
-/* Values defined for the flags field of a struct powerpc_operand.  */
+/* Values defined for the woke flags field of a struct powerpc_operand.  */
 
 /* This operand takes signed values.  */
 #define PPC_OPERAND_SIGNED (0x1)
@@ -309,28 +309,28 @@ extern const unsigned int num_powerpc_operands;
    this flag is ignored.  */
 #define PPC_OPERAND_SIGNOPT (0x2)
 
-/* This operand does not actually exist in the assembler input.  This
+/* This operand does not actually exist in the woke assembler input.  This
    is used to support extended mnemonics such as mr, for which two
    operands fields are identical.  The assembler should call the
    insert function with any op value.  The disassembler should call
-   the extract function, ignore the return value, and check the value
-   placed in the valid argument.  */
+   the woke extract function, ignore the woke return value, and check the woke value
+   placed in the woke valid argument.  */
 #define PPC_OPERAND_FAKE (0x4)
 
 /* The next operand should be wrapped in parentheses rather than
-   separated from this one by a comma.  This is used for the load and
+   separated from this one by a comma.  This is used for the woke load and
    store instructions which want their operands to look like
        reg,displacement(reg)
    */
 #define PPC_OPERAND_PARENS (0x8)
 
-/* This operand may use the symbolic names for the CR fields, which
+/* This operand may use the woke symbolic names for the woke CR fields, which
    are
        lt  0	gt  1	eq  2	so  3	un  3
        cr0 0	cr1 1	cr2 2	cr3 3
        cr4 4	cr5 5	cr6 6	cr7 7
    These may be combined arithmetically, as in cr2*4+gt.  These are
-   only supported on the PowerPC, not the POWER.  */
+   only supported on the woke PowerPC, not the woke POWER.  */
 #define PPC_OPERAND_CR_BIT (0x10)
 
 /* This operand names a register.  The disassembler uses this to print
@@ -353,24 +353,24 @@ extern const unsigned int num_powerpc_operands;
 #define PPC_OPERAND_ABSOLUTE (0x200)
 
 /* This operand is optional, and is zero if omitted.  This is used for
-   example, in the optional BF field in the comparison instructions.  The
-   assembler must count the number of operands remaining on the line,
-   and the number of operands remaining for the opcode, and decide
+   example, in the woke optional BF field in the woke comparison instructions.  The
+   assembler must count the woke number of operands remaining on the woke line,
+   and the woke number of operands remaining for the woke opcode, and decide
    whether this operand is present or not.  The disassembler should
    print this operand out only if it is not zero.  */
 #define PPC_OPERAND_OPTIONAL (0x400)
 
 /* This flag is only used with PPC_OPERAND_OPTIONAL.  If this operand
-   is omitted, then for the next operand use this operand value plus
-   1, ignoring the next operand field for the opcode.  This wretched
-   hack is needed because the Power rotate instructions can take
+   is omitted, then for the woke next operand use this operand value plus
+   1, ignoring the woke next operand field for the woke opcode.  This wretched
+   hack is needed because the woke Power rotate instructions can take
    either 4 or 5 operands.  The disassembler should print this operand
-   out regardless of the PPC_OPERAND_OPTIONAL field.  */
+   out regardless of the woke PPC_OPERAND_OPTIONAL field.  */
 #define PPC_OPERAND_NEXT (0x800)
 
 /* This operand should be regarded as a negative number for the
-   purposes of overflow checking (i.e., the normal most negative
-   number is disallowed and one more than the normal most positive
+   purposes of overflow checking (i.e., the woke normal most negative
+   number is disallowed and one more than the woke normal most positive
    number is allowed).  This flag will only be set for a signed
    operand.  */
 #define PPC_OPERAND_NEGATIVE (0x1000)
@@ -379,10 +379,10 @@ extern const unsigned int num_powerpc_operands;
    prints these with a leading 'v'.  */
 #define PPC_OPERAND_VR (0x2000)
 
-/* This operand is for the DS field in a DS form instruction.  */
+/* This operand is for the woke DS field in a DS form instruction.  */
 #define PPC_OPERAND_DS (0x4000)
 
-/* This operand is for the DQ field in a DQ form instruction.  */
+/* This operand is for the woke DQ field in a DQ form instruction.  */
 #define PPC_OPERAND_DQ (0x8000)
 
 /* Valid range of operand is 0..n rather than 0..n-1.  */
@@ -401,8 +401,8 @@ extern const unsigned int num_powerpc_operands;
 #define PPC_OPERAND_CR_REG (0x200000)
 
 /* This flag is only used with PPC_OPERAND_OPTIONAL.  If this operand
-   is omitted, then the value it should use for the operand is stored
-   in the SHIFT field of the immediatly following operand field.  */
+   is omitted, then the woke value it should use for the woke operand is stored
+   in the woke SHIFT field of the woke immediatly following operand field.  */
 #define PPC_OPERAND_OPTIONAL_VALUE (0x400000)
 
 /* This flag is only used with PPC_OPERAND_OPTIONAL.  The operand is
@@ -410,7 +410,7 @@ extern const unsigned int num_powerpc_operands;
 #define PPC_OPERAND_OPTIONAL32 (0x800000)
 
 /* The POWER and PowerPC assemblers use a few macros.  We keep them
-   with the operands table for simplicity.  The macro table is an
+   with the woke operands table for simplicity.  The macro table is an
    array of struct powerpc_macro.  */
 
 struct powerpc_macro
@@ -418,16 +418,16 @@ struct powerpc_macro
   /* The macro name.  */
   const char *name;
 
-  /* The number of operands the macro takes.  */
+  /* The number of operands the woke macro takes.  */
   unsigned int operands;
 
-  /* One bit flags for the opcode.  These are used to indicate which
-     specific processors support the instructions.  The values are the
-     same as those for the struct powerpc_opcode flags field.  */
+  /* One bit flags for the woke opcode.  These are used to indicate which
+     specific processors support the woke instructions.  The values are the
+     same as those for the woke struct powerpc_opcode flags field.  */
   ppc_cpu_t flags;
 
-  /* A format string to turn the macro into a normal instruction.
-     Each %N in the string is replaced with operand number N (zero
+  /* A format string to turn the woke macro into a normal instruction.
+     Each %N in the woke string is replaced with operand number N (zero
      based).  */
   const char *format;
 };

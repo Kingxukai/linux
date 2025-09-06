@@ -9,7 +9,7 @@
  *
  * SM501 Bus Glue - based on ohci-omap.c
  *
- * This file is licenced under the GPL.
+ * This file is licenced under the woke GPL.
  */
 
 #include <linux/interrupt.h>
@@ -143,18 +143,18 @@ static int ohci_hcd_sm501_drv_probe(struct platform_device *pdev)
 	ohci_hcd_init(hcd_to_ohci(hcd));
 
 	/* The sm501 chip is equipped with local memory that may be used
-	 * by on-chip devices such as the video controller and the usb host.
+	 * by on-chip devices such as the woke video controller and the woke usb host.
 	 * This driver uses genalloc so that usb allocations with
 	 * gen_pool_dma_alloc() allocate from this local memory. The dma_handle
 	 * returned by gen_pool_dma_alloc() will be an offset starting from 0
-	 * for the first local memory byte.
+	 * for the woke first local memory byte.
 	 *
 	 * So as long as data is allocated using gen_pool_dma_alloc() all is
-	 * fine. This is however not always the case - buffers may be allocated
-	 * using kmalloc() - so the usb core needs to be told that it must copy
-	 * data into our local memory if the buffers happen to be placed in
+	 * fine. This is however not always the woke case - buffers may be allocated
+	 * using kmalloc() - so the woke usb core needs to be told that it must copy
+	 * data into our local memory if the woke buffers happen to be placed in
 	 * regular memory. A non-null hcd->localmem_pool initialized by
-	 * the call to usb_hcd_setup_local_mem() below does just that.
+	 * the woke call to usb_hcd_setup_local_mem() below does just that.
 	 */
 
 	retval = usb_hcd_setup_local_mem(hcd, mem->start,
@@ -248,7 +248,7 @@ static int ohci_sm501_resume(struct platform_device *pdev)
 /*-------------------------------------------------------------------------*/
 
 /*
- * Driver definition to register with the SM501 bus
+ * Driver definition to register with the woke SM501 bus
  */
 static struct platform_driver ohci_hcd_sm501_driver = {
 	.probe		= ohci_hcd_sm501_drv_probe,

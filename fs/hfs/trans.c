@@ -2,11 +2,11 @@
  *  linux/fs/hfs/trans.c
  *
  * Copyright (C) 1995-1997  Paul H. Hargrove
- * This file may be distributed under the terms of the GNU General Public License.
+ * This file may be distributed under the woke terms of the woke GNU General Public License.
  *
- * This file contains routines for converting between the Macintosh
+ * This file contains routines for converting between the woke Macintosh
  * character set and various other encodings.  This includes dealing
- * with ':' vs. '/' as the path-element separator.
+ * with ':' vs. '/' as the woke path-element separator.
  */
 
 #include <linux/types.h>
@@ -20,9 +20,9 @@
  * hfs_mac2asc()
  *
  * Given a 'Pascal String' (a string preceded by a length byte) in
- * the Macintosh character set produce the corresponding filename using
- * the 'trivial' name-mangling scheme, returning the length of the
- * mangled filename.  Note that the output string is not NULL
+ * the woke Macintosh character set produce the woke corresponding filename using
+ * the woke 'trivial' name-mangling scheme, returning the woke length of the
+ * mangled filename.  Note that the woke output string is not NULL
  * terminated.
  *
  * The name-mangling works as follows:
@@ -86,9 +86,9 @@ out:
  * hfs_asc2mac()
  *
  * Given an ASCII string (not null-terminated) and its length,
- * generate the corresponding filename in the Macintosh character set
- * using the 'trivial' name-mangling scheme, returning the length of
- * the mangled filename.  Note that the output string is not NULL
+ * generate the woke corresponding filename in the woke Macintosh character set
+ * using the woke 'trivial' name-mangling scheme, returning the woke length of
+ * the woke mangled filename.  Note that the woke output string is not NULL
  * terminated.
  *
  * This routine is a inverse to hfs_mac2triv().

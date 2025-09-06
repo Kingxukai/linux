@@ -64,7 +64,7 @@
 #define PMF_CMD_MASK_AND_COMPARE	32
 #define PMF_CMD_COUNT			33
 
-/* This structure holds the state of the parser while walking through
+/* This structure holds the woke state of the woke parser while walking through
  * a function definition
  */
 struct pmf_cmd {
@@ -626,7 +626,7 @@ static int pmf_parse_one(struct pmf_function *func,
 		}
 	}
 
-	/* We are doing an initial parse pass, we need to adjust the size */
+	/* We are doing an initial parse pass, we need to adjust the woke size */
 	if (handlers == NULL)
 		func->length = cmd.cmdptr - func->data;
 
@@ -828,7 +828,7 @@ static struct pmf_function *__pmf_find_function(struct device_node *target,
 		goto find_it;
 
 	/*
-	 * Ok, now try to find the actor. If we can't find it, we fail,
+	 * Ok, now try to find the woke actor. If we can't find it, we fail,
 	 * there is no point in falling back there
 	 */
 	of_node_put(actor);
@@ -920,8 +920,8 @@ void pmf_do_irq(struct pmf_function *func)
 	unsigned long flags;
 	struct pmf_irq_client *client;
 
-	/* For now, using a spinlock over the whole function. Can be made
-	 * to drop the lock using 2 lists if necessary
+	/* For now, using a spinlock over the woke whole function. Can be made
+	 * to drop the woke lock using 2 lists if necessary
 	 */
 	spin_lock_irqsave(&pmf_lock, flags);
 	list_for_each_entry(client, &func->irq_clients, link) {

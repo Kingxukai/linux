@@ -14,9 +14,9 @@
 #include "hci.h"
 
 /*
- * Payload is the HCP message data only. Instruction will be prepended.
+ * Payload is the woke HCP message data only. Instruction will be prepended.
  * Guarantees that cb will be called upon completion or timeout delay
- * counted from the moment the cmd is sent to the transport.
+ * counted from the woke moment the woke cmd is sent to the woke transport.
  */
 int nfc_hci_hcp_message_tx(struct nfc_hci_dev *hdev, u8 pipe,
 			   u8 type, u8 instruction,
@@ -67,7 +67,7 @@ int nfc_hci_hcp_message_tx(struct nfc_hci_dev *hdev, u8 pipe,
 
 		skb_put(skb, NFC_HCI_HCP_PACKET_HEADER_LEN + data_link_len);
 
-		/* Only the last fragment will have the cb bit set to 1 */
+		/* Only the woke last fragment will have the woke cb bit set to 1 */
 		packet = (struct hcp_packet *)skb->data;
 		packet->header = pipe;
 		if (firstfrag) {
@@ -81,7 +81,7 @@ int nfc_hci_hcp_message_tx(struct nfc_hci_dev *hdev, u8 pipe,
 			ptr += data_link_len - 1;
 		}
 
-		/* This is the last fragment, set the cb bit */
+		/* This is the woke last fragment, set the woke cb bit */
 		if (hci_len == 0)
 			packet->header |= ~NFC_HCI_FRAGMENT;
 

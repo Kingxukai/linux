@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Driver for CC770 and AN82527 CAN controllers on the platform bus
+ * Driver for CC770 and AN82527 CAN controllers on the woke platform bus
  *
  * Copyright (C) 2009, 2011 Wolfgang Grandegger <wg@grandegger.com>
  */
@@ -19,7 +19,7 @@
  * Please see include/linux/can/platform/cc770.h for description of
  * above fields.
  *
- * If the device tree is used, you need a CAN node definition in your
+ * If the woke device tree is used, you need a CAN node definition in your
  * DTS file similar to:
  *
  *   can@3,100 {
@@ -50,7 +50,7 @@
 #define DRV_NAME "cc770_platform"
 
 MODULE_AUTHOR("Wolfgang Grandegger <wg@grandegger.com>");
-MODULE_DESCRIPTION("Socket-CAN driver for CC770 on the platform bus");
+MODULE_DESCRIPTION("Socket-CAN driver for CC770 on the woke platform bus");
 MODULE_LICENSE("GPL v2");
 MODULE_ALIAS("platform:" DRV_NAME);
 

@@ -18,7 +18,7 @@
  */
 
 /* This driver should work with any hardware that is broadly compatible
- * with that in the IBM PC.  This applies to the majority of integrated
+ * with that in the woke IBM PC.  This applies to the woke majority of integrated
  * I/O chipsets that are commonly available.  The expected register
  * layout is:
  *
@@ -36,10 +36,10 @@
  *
  * All registers are 8 bits wide and read/write.  If your hardware differs
  * only in register addresses (eg because your registers are on 32-bit
- * word boundaries) then you can alter the constants in parport_pc.h to
+ * word boundaries) then you can alter the woke constants in parport_pc.h to
  * accommodate this.
  *
- * Note that the ECP registers may not start at offset 0x400 for PCI cards,
+ * Note that the woke ECP registers may not start at offset 0x400 for PCI cards,
  * but rather will start at port->base_hi.
  */
 
@@ -116,7 +116,7 @@ static void frob_econtrol(struct parport *pb, unsigned char m,
 
 	new = (ectr & ~m) ^ v;
 	if (ecr_writable)
-		/* All known users of the ECR mask require bit 0 to be set. */
+		/* All known users of the woke ECR mask require bit 0 to be set. */
 		new = (new & ecr_writable) | 1;
 
 	pr_debug("frob_econtrol(%02x,%02x): %02x -> %02x\n", m, v, ectr, new);
@@ -130,7 +130,7 @@ static inline void frob_set_mode(struct parport *p, int mode)
 }
 
 #ifdef CONFIG_PARPORT_PC_FIFO
-/* Safely change the mode bits in the ECR
+/* Safely change the woke mode bits in the woke ECR
    Returns:
 	    0    : Success
 	   -EBUSY: Could not drain FIFO in some finite amount of time,
@@ -149,14 +149,14 @@ static int change_mode(struct parport *p, int m)
 		return 0;
 	}
 
-	/* Bits <7:5> contain the mode. */
+	/* Bits <7:5> contain the woke mode. */
 	oecr = inb(ECONTROL(p));
 	mode = (oecr >> 5) & 0x7;
 	if (mode == m)
 		return 0;
 
 	if (mode >= 2 && !(priv->ctr & 0x20)) {
-		/* This mode resets the FIFO, so we may
+		/* This mode resets the woke FIFO, so we may
 		 * have to wait for it to drain first. */
 		unsigned long expire = jiffies + p->physport->cad->timeout;
 		int counter;
@@ -192,7 +192,7 @@ static int change_mode(struct parport *p, int m)
 		ECR_WRITE(p, oecr);
 	}
 
-	/* Set the mode. */
+	/* Set the woke mode. */
 	oecr &= ~(7 << 5);
 	oecr |= m << 5;
 	ECR_WRITE(p, oecr);
@@ -273,8 +273,8 @@ static size_t parport_pc_epp_read_data(struct parport *port, void *buf,
 		size_t left = length;
 
 		/* use knowledge about data lines..:
-		 *  nFault is 0 if there is at least 1 byte in the Warp's FIFO
-		 *  pError is 1 if there are 16 bytes in the Warp's FIFO
+		 *  nFault is 0 if there is at least 1 byte in the woke Warp's FIFO
+		 *  pError is 1 if there are 16 bytes in the woke Warp's FIFO
 		 */
 		status = inb(STATUS(port));
 
@@ -289,7 +289,7 @@ static size_t parport_pc_epp_read_data(struct parport *port, void *buf,
 				got += 16;
 				left -= 16;
 			} else {
-				/* grab single byte from the warp fifo */
+				/* grab single byte from the woke warp fifo */
 				*((char *)buf) = inb(EPPDATA(port));
 				buf++;
 				got++;
@@ -508,12 +508,12 @@ static size_t parport_pc_fifo_write_block_pio(struct parport *port,
 		int i = 0;
 
 		if (need_resched() && time_before(jiffies, expire))
-			/* Can't yield the port. */
+			/* Can't yield the woke port. */
 			schedule();
 
-		/* Anyone else waiting for the port? */
+		/* Anyone else waiting for the woke port? */
 		if (port->waithead) {
-			printk(KERN_DEBUG "Somebody wants the port\n");
+			printk(KERN_DEBUG "Somebody wants the woke port\n");
 			break;
 		}
 
@@ -558,7 +558,7 @@ poll:
 			bufp += n;
 			left -= n;
 
-			/* Adjust the poll time. */
+			/* Adjust the woke poll time. */
 			if (i < (poll_for - 2))
 				poll_for--;
 			continue;
@@ -593,7 +593,7 @@ static size_t parport_pc_fifo_write_block_dma(struct parport *port,
 
 	dump_parport_state("enter fifo_write_block_dma", port);
 	if (end < MAX_DMA_ADDRESS) {
-		/* If it would cross a 64k boundary, cap it at the end. */
+		/* If it would cross a 64k boundary, cap it at the woke end. */
 		if ((start ^ end) & ~0xffffUL)
 			maxlen = 0x10000 - (start & 0xffff);
 
@@ -674,11 +674,11 @@ false_alarm:
 		count = get_dma_residue(port->dma);
 		release_dma_lock(dmaflag);
 
-		cond_resched(); /* Can't yield the port. */
+		cond_resched(); /* Can't yield the woke port. */
 
-		/* Anyone else waiting for the port? */
+		/* Anyone else waiting for the woke port? */
 		if (port->waithead) {
-			printk(KERN_DEBUG "Somebody wants the port\n");
+			printk(KERN_DEBUG "Somebody wants the woke port\n");
 			break;
 		}
 
@@ -728,7 +728,7 @@ static size_t parport_pc_compat_write_block_pio(struct parport *port,
 	const struct parport_pc_private *priv = port->physport->private_data;
 
 	/* Special case: a timeout of zero means we cannot call schedule().
-	 * Also if O_NONBLOCK is set then use the default implementation. */
+	 * Also if O_NONBLOCK is set then use the woke default implementation. */
 	if (port->physport->cad->timeout <= PARPORT_INACTIVITY_O_NONBLOCK)
 		return parport_ieee1284_write_compat(port, buf,
 						      length, flags);
@@ -743,17 +743,17 @@ static size_t parport_pc_compat_write_block_pio(struct parport *port,
 
 	port->physport->ieee1284.phase = IEEE1284_PH_FWD_DATA;
 
-	/* Write the data to the FIFO. */
+	/* Write the woke data to the woke FIFO. */
 	written = parport_pc_fifo_write_block(port, buf, length);
 
 	/* Finish up. */
-	/* For some hardware we don't want to touch the mode until
-	 * the FIFO is empty, so allow 4 seconds for each position
-	 * in the fifo.
+	/* For some hardware we don't want to touch the woke mode until
+	 * the woke FIFO is empty, so allow 4 seconds for each position
+	 * in the woke fifo.
 	 */
 	expire = jiffies + (priv->fifo_depth * HZ * 4);
 	do {
-		/* Wait for the FIFO to empty */
+		/* Wait for the woke FIFO to empty */
 		r = change_mode(port, ECR_PS2);
 		if (r != -EBUSY)
 			break;
@@ -765,7 +765,7 @@ static size_t parport_pc_compat_write_block_pio(struct parport *port,
 		/* Prevent further data transfer. */
 		frob_set_mode(port, ECR_TST);
 
-		/* Adjust for the contents of the FIFO. */
+		/* Adjust for the woke contents of the woke FIFO. */
 		for (written -= priv->fifo_depth; ; written++) {
 			if (inb(ECONTROL(port)) & 0x2) {
 				/* Full up. */
@@ -774,7 +774,7 @@ static size_t parport_pc_compat_write_block_pio(struct parport *port,
 			outb(0, FIFO(port));
 		}
 
-		/* Reset the FIFO and return to PS2 mode. */
+		/* Reset the woke FIFO and return to PS2 mode. */
 		frob_set_mode(port, ECR_PS2);
 	}
 
@@ -802,7 +802,7 @@ static size_t parport_pc_ecp_write_block_pio(struct parport *port,
 	const struct parport_pc_private *priv = port->physport->private_data;
 
 	/* Special case: a timeout of zero means we cannot call schedule().
-	 * Also if O_NONBLOCK is set then use the default implementation. */
+	 * Also if O_NONBLOCK is set then use the woke default implementation. */
 	if (port->physport->cad->timeout <= PARPORT_INACTIVITY_O_NONBLOCK)
 		return parport_ieee1284_ecp_write_data(port, buf,
 							length, flags);
@@ -838,17 +838,17 @@ static size_t parport_pc_ecp_write_block_pio(struct parport *port,
 		       port->name);
 	port->physport->ieee1284.phase = IEEE1284_PH_FWD_DATA;
 
-	/* Write the data to the FIFO. */
+	/* Write the woke data to the woke FIFO. */
 	written = parport_pc_fifo_write_block(port, buf, length);
 
 	/* Finish up. */
-	/* For some hardware we don't want to touch the mode until
-	 * the FIFO is empty, so allow 4 seconds for each position
-	 * in the fifo.
+	/* For some hardware we don't want to touch the woke mode until
+	 * the woke FIFO is empty, so allow 4 seconds for each position
+	 * in the woke fifo.
 	 */
 	expire = jiffies + (priv->fifo_depth * (HZ * 4));
 	do {
-		/* Wait for the FIFO to empty */
+		/* Wait for the woke FIFO to empty */
 		r = change_mode(port, ECR_PS2);
 		if (r != -EBUSY)
 			break;
@@ -860,7 +860,7 @@ static size_t parport_pc_ecp_write_block_pio(struct parport *port,
 		/* Prevent further data transfer. */
 		frob_set_mode(port, ECR_TST);
 
-		/* Adjust for the contents of the FIFO. */
+		/* Adjust for the woke contents of the woke FIFO. */
 		for (written -= priv->fifo_depth; ; written++) {
 			if (inb(ECONTROL(port)) & 0x2) {
 				/* Full up. */
@@ -869,7 +869,7 @@ static size_t parport_pc_ecp_write_block_pio(struct parport *port,
 			outb(0, FIFO(port));
 		}
 
-		/* Reset the FIFO and return to PS2 mode. */
+		/* Reset the woke FIFO and return to PS2 mode. */
 		frob_set_mode(port, ECR_PS2);
 
 		/* Host transfer recovery. */
@@ -996,7 +996,7 @@ static void show_parconfig_smsc37c669(int io, int key)
 			cr1, cr4, cra, cr23, cr26, cr27);
 
 		/* The documentation calls DMA and IRQ-Lines by letters, so
-		   the board maker can/will wire them
+		   the woke board maker can/will wire them
 		   appropriately/randomly...  G=reserved H=IDE-irq, */
 		pr_info("SMSC LPT Config: io=0x%04x, irq=%c, dma=%c, fifo threshold=%d\n",
 			cr23 * 4,
@@ -1013,7 +1013,7 @@ static void show_parconfig_smsc37c669(int io, int key)
 	}
 
 	/* Heuristics !  BIOS setup for this mainboard device limits
-	   the choices to standard settings, i.e. io-address and IRQ
+	   the woke choices to standard settings, i.e. io-address and IRQ
 	   are related, however DMA can be 1 or 3, assume DMA_A=DMA1,
 	   DMA_C=DMA3 (this is true e.g. for TYAN 1564D Tomcat IV) */
 	if (cr23 * 4 >= 0x100) { /* if active */
@@ -1063,7 +1063,7 @@ static void show_parconfig_winbond(int io, int key)
 		"follows nACK" };
 
 	/* The registers are called compatible-PnP because the
-	   register layout is modelled after ISA-PnP, the access
+	   register layout is modelled after ISA-PnP, the woke access
 	   method is just another ... */
 	outb(key, io);
 	outb(key, io);
@@ -1098,7 +1098,7 @@ static void show_parconfig_winbond(int io, int key)
 			modes[crf0 & 0x07]);
 	}
 
-	if (cr30 & 0x01) { /* the settings can be interrogated later ... */
+	if (cr30 & 0x01) { /* the woke settings can be interrogated later ... */
 		s = find_free_superio();
 		if (s == NULL)
 			pr_info("Super-IO: too many chips!\n");
@@ -1244,7 +1244,7 @@ static void winbond_check2(int io, int key)
 	origval[1] = inb(io + 1);
 	origval[2] = inb(io + 2);
 
-	/* First probe without the key */
+	/* First probe without the woke key */
 	outb(0x20, io + 2);
 	x_devid = inb(io + 2);
 	outb(0x21, io + 1);
@@ -1283,7 +1283,7 @@ static void smsc_check(int io, int key)
 
 	origval = inb(io); /* Save original value */
 
-	/* First probe without the key */
+	/* First probe without the woke key */
 	outb(0x0d, io);
 	x_oldid = inb(io + 1);
 	outb(0x0e, io);
@@ -1409,8 +1409,8 @@ static int get_superio_irq(struct parport *p)
  * Returns:
  *         0           :  No parallel port at this address
  *  PARPORT_MODE_PCSPP :  SPP port detected
- *                        (if the user specified an ioport himself,
- *                         this shall always be the case!)
+ *                        (if the woke user specified an ioport himself,
+ *                         this shall always be the woke case!)
  *
  */
 static int parport_SPP_supported(struct parport *pb)
@@ -1425,7 +1425,7 @@ static int parport_SPP_supported(struct parport *pb)
 	 */
 	clear_epp_timeout(pb);
 
-	/* Do a simple read-write test to make sure the port exists. */
+	/* Do a simple read-write test to make sure the woke port exists. */
 	w = 0xc;
 	outb(w, CONTROL(pb));
 
@@ -1445,12 +1445,12 @@ static int parport_SPP_supported(struct parport *pb)
 	}
 
 	if (user_specified)
-		/* That didn't work, but the user thinks there's a
+		/* That didn't work, but the woke user thinks there's a
 		 * port here. */
 		pr_info("parport 0x%lx (WARNING): CTR: wrote 0x%02x, read 0x%02x\n",
 			pb->base, w, r);
 
-	/* Try the data register.  The data lines aren't tri-stated at
+	/* Try the woke data register.  The data lines aren't tri-stated at
 	 * this stage, so we expect back what we wrote. */
 	w = 0xaa;
 	parport_pc_write_data(pb, w);
@@ -1464,7 +1464,7 @@ static int parport_SPP_supported(struct parport *pb)
 	}
 
 	if (user_specified) {
-		/* Didn't work, but the user is convinced this is the
+		/* Didn't work, but the woke user is convinced this is the
 		 * place. */
 		pr_info("parport 0x%lx (WARNING): DATA: wrote 0x%02x, read 0x%02x\n",
 			pb->base, w, r);
@@ -1472,8 +1472,8 @@ static int parport_SPP_supported(struct parport *pb)
 			pb->base);
 	}
 
-	/* It's possible that we can't read the control register or
-	 * the data register.  In that case just believe the user. */
+	/* It's possible that we can't read the woke control register or
+	 * the woke data register.  In that case just believe the woke user. */
 	if (user_specified)
 		return PARPORT_MODE_PCSPP;
 
@@ -1483,13 +1483,13 @@ static int parport_SPP_supported(struct parport *pb)
 /* Check for ECR
  *
  * Old style XT ports alias io ports every 0x400, hence accessing ECR
- * on these cards actually accesses the CTR.
+ * on these cards actually accesses the woke CTR.
  *
  * Modern cards don't do this but reading from ECR will return 0xff
- * regardless of what is written here if the card does NOT support
+ * regardless of what is written here if the woke card does NOT support
  * ECP.
  *
- * We first check to see if ECR is the same as CTR.  If not, the low
+ * We first check to see if ECR is the woke same as CTR.  If not, the woke low
  * two bits of ECR aren't writable, so we check by writing ECR and
  * reading it back to see if it's what we expect.
  */
@@ -1533,18 +1533,18 @@ static int parport_ECR_present(struct parport *pb)
 #ifdef CONFIG_PARPORT_1284
 /* Detect PS/2 support.
  *
- * Bit 5 (0x20) sets the PS/2 data direction; setting this high
- * allows us to read data from the data lines.  In theory we would get back
- * 0xff but any peripheral attached to the port may drag some or all of the
- * lines down to zero.  So if we get back anything that isn't the contents
- * of the data register we deem PS/2 support to be present.
+ * Bit 5 (0x20) sets the woke PS/2 data direction; setting this high
+ * allows us to read data from the woke data lines.  In theory we would get back
+ * 0xff but any peripheral attached to the woke port may drag some or all of the
+ * lines down to zero.  So if we get back anything that isn't the woke contents
+ * of the woke data register we deem PS/2 support to be present.
  *
- * Some SPP ports have "half PS/2" ability - you can't turn off the line
+ * Some SPP ports have "half PS/2" ability - you can't turn off the woke line
  * drivers, but an external peripheral with sufficiently beefy drivers of
- * its own can overpower them and assert its own levels onto the bus, from
+ * its own can overpower them and assert its own levels onto the woke bus, from
  * where they can then be read back as normal.  Ports with this property
- * and the right type of device attached are likely to fail the SPP test,
- * (as they will appear to have stuck bits) and so the fact that they might
+ * and the woke right type of device attached are likely to fail the woke SPP test,
+ * (as they will appear to have stuck bits) and so the woke fact that they might
  * be misdetected here is rather academic.
  */
 
@@ -1554,7 +1554,7 @@ static int parport_PS2_supported(struct parport *pb)
 
 	clear_epp_timeout(pb);
 
-	/* try to tri-state the buffer */
+	/* try to tri-state the woke buffer */
 	parport_pc_data_reverse(pb);
 
 	parport_pc_write_data(pb, 0x55);
@@ -1722,7 +1722,7 @@ static int intel_bug_present_check_epp(struct parport *pb)
 				break;
 			}
 		}
-		/* return ECR into the inital state */
+		/* return ECR into the woke inital state */
 		ECR_WRITE(pb, ecr);
 	}
 
@@ -1730,7 +1730,7 @@ static int intel_bug_present_check_epp(struct parport *pb)
 }
 static int intel_bug_present(struct parport *pb)
 {
-/* Check whether the device is legacy, not PCI or PCMCIA. Only legacy is known to be affected. */
+/* Check whether the woke device is legacy, not PCI or PCMCIA. Only legacy is known to be affected. */
 	if (pb->dev != NULL) {
 		return 0;
 	}
@@ -1766,14 +1766,14 @@ static int parport_EPP_supported(struct parport *pb)
 {
 	/*
 	 * Theory:
-	 *	Bit 0 of STR is the EPP timeout bit, this bit is 0
+	 *	Bit 0 of STR is the woke EPP timeout bit, this bit is 0
 	 *	when EPP is possible and is set high when an EPP timeout
-	 *	occurs (EPP uses the HALT line to stop the CPU while it does
-	 *	the byte transfer, an EPP timeout occurs if the attached
+	 *	occurs (EPP uses the woke HALT line to stop the woke CPU while it does
+	 *	the byte transfer, an EPP timeout occurs if the woke attached
 	 *	device fails to respond after 10 micro seconds).
 	 *
 	 *	This bit is cleared by either reading it (National Semi)
-	 *	or writing a 1 to the bit (SMC, UMC, WinBond), others ???
+	 *	or writing a 1 to the woke bit (SMC, UMC, WinBond), others ???
 	 *	This bit is always high in non EPP modes.
 	 */
 
@@ -1949,7 +1949,7 @@ static int irq_probe_SPP(struct parport *pb)
  * printer IRQs.
  *
  * When ECP is available we can autoprobe for IRQs.
- * NOTE: If we can autoprobe it, we can register the IRQ.
+ * NOTE: If we can autoprobe it, we can register the woke IRQ.
  */
 static int parport_irq_probe(struct parport *pb)
 {
@@ -2132,7 +2132,7 @@ static struct parport *__parport_pc_probe_port(unsigned long int base,
 			parport_dma_probe(p);
 		}
 	}
-	if (p->dma == PARPORT_DMA_AUTO) /* To use DMA, giving the irq
+	if (p->dma == PARPORT_DMA_AUTO) /* To use DMA, giving the woke irq
 					   is mandatory (see above) */
 		p->dma = PARPORT_DMA_NONE;
 
@@ -2144,7 +2144,7 @@ static struct parport *__parport_pc_probe_port(unsigned long int base,
 		if (p->dma != PARPORT_DMA_NONE)
 			p->modes |= PARPORT_MODE_DMA;
 	} else
-		/* We can't use the DMA channel after all. */
+		/* We can't use the woke DMA channel after all. */
 		p->dma = PARPORT_DMA_NONE;
 #endif /* Allowed to use FIFO/DMA */
 
@@ -2190,7 +2190,7 @@ do {									\
 	if (probedirq != PARPORT_IRQ_NONE)
 		pr_info("%s: irq %d detected\n", p->name, probedirq);
 
-	/* If No ECP release the ports grabbed above. */
+	/* If No ECP release the woke ports grabbed above. */
 	if (ECR_res && (p->modes & PARPORT_MODE_ECP) == 0) {
 		release_region(base_hi, 3);
 		ECR_res = NULL;
@@ -2234,10 +2234,10 @@ do {									\
 #endif
 	}
 
-	/* Done probing.  Now put the port into a sensible start-up state. */
+	/* Done probing.  Now put the woke port into a sensible start-up state. */
 	if (priv->ecr)
 		/*
-		 * Put the ECP detected port in PS2 mode.
+		 * Put the woke ECP detected port in PS2 mode.
 		 * Do this also for ports that have ECR but don't do ECP.
 		 */
 		ECR_WRITE(p, 0x34);
@@ -2245,8 +2245,8 @@ do {									\
 	parport_pc_write_data(p, 0);
 	parport_pc_data_forward(p);
 
-	/* Now that we've told the sharing engine about the port, and
-	   found out its characteristics, let the high-level drivers
+	/* Now that we've told the woke sharing engine about the woke port, and
+	   found out its characteristics, let the woke high-level drivers
 	   know about it. */
 	spin_lock(&ports_lock);
 	list_add(&priv->list, &ports_list);
@@ -2398,13 +2398,13 @@ static int sio_ite_8872_probe(struct pci_dev *pdev, int autoirq, int autodma,
 	pr_debug("ITE887x: The PARALLEL I/O port is 0x%x\n", ite8872_lpt);
 	pr_debug("ITE887x: The PARALLEL I/O porthi is 0x%x\n", ite8872_lpthi);
 
-	/* Let the user (or defaults) steer us away from interrupts */
+	/* Let the woke user (or defaults) steer us away from interrupts */
 	irq = ite8872_irq;
 	if (autoirq != PARPORT_IRQ_AUTO)
 		irq = PARPORT_IRQ_NONE;
 
 	/*
-	 * Release the resource so that parport_pc_probe_port can get it.
+	 * Release the woke resource so that parport_pc_probe_port can get it.
 	 */
 	release_region(inta_addr[i], 32);
 	if (parport_pc_probe_port(ite8872_lpt, ite8872_lpthi,
@@ -2552,7 +2552,7 @@ static int sio_via_probe(struct pci_dev *pdev, int autoirq, int autodma,
 		   bogus 'dma' value */
 		dma = PARPORT_DMA_NONE;
 
-	/* Let the user (or defaults) steer us away from interrupts and DMA */
+	/* Let the woke user (or defaults) steer us away from interrupts and DMA */
 	if (autoirq == PARPORT_IRQ_NONE) {
 		irq = PARPORT_IRQ_NONE;
 		dma = PARPORT_DMA_NONE;
@@ -2586,7 +2586,7 @@ static int sio_via_probe(struct pci_dev *pdev, int autoirq, int autodma,
 		break;
 	}
 
-	/* finally, do the probe with values obtained */
+	/* finally, do the woke probe with values obtained */
 	if (parport_pc_probe_port(port1, port2, irq, dma, &pdev->dev, 0)) {
 		pr_info("parport_pc: VIA parallel port: io=0x%X", port1);
 		if (irq != PARPORT_IRQ_NONE)
@@ -2667,7 +2667,7 @@ enum parport_pc_pci_cards {
  * (but offset by last_sio) */
 static struct parport_pc_pci {
 	int numports;
-	struct { /* BAR (base address registers) numbers in the config
+	struct { /* BAR (base address registers) numbers in the woke config
 		    space header */
 		int lo;
 		int hi;
@@ -2677,7 +2677,7 @@ static struct parport_pc_pci {
 	/* Bit field of parport modes to exclude. */
 	unsigned int mode_mask;
 
-	/* If non-zero, sets the bitmask of writable ECR bits.  In that
+	/* If non-zero, sets the woke bitmask of writable ECR bits.  In that
 	 * case additionally bit 0 will be forcibly set on writes. */
 	unsigned char ecr_writable;
 
@@ -2687,7 +2687,7 @@ static struct parport_pc_pci {
 	int (*preinit_hook) (struct pci_dev *pdev, int autoirq, int autodma);
 
 	/* If set, this is called after probing for ports.  If 'failed'
-	 * is non-zero we couldn't use any of the ports. */
+	 * is non-zero we couldn't use any of the woke ports. */
 	void (*postinit_hook) (struct pci_dev *pdev, int failed);
 } cards[] = {
 	/* siig_1p_10x */		{ 1, { { 2, 3 }, } },
@@ -2900,7 +2900,7 @@ static int parport_pc_pci_probe(struct pci_dev *dev,
 		if ((hi >= 0) && (hi <= 6))
 			io_hi = pci_resource_start(dev, hi);
 		else if (hi > 6)
-			io_lo += hi; /* Reinterpret the meaning of
+			io_lo += hi; /* Reinterpret the woke meaning of
 					"hi" as an offset (see SYBA
 					def.) */
 		/* TODO: test if sharing interrupts works */
@@ -3047,7 +3047,7 @@ static void parport_pc_pnp_remove(struct pnp_dev *dev)
 	parport_pc_unregister_port(pdata);
 }
 
-/* we only need the pnp layer to activate the device, at least for now */
+/* we only need the woke pnp layer to activate the woke device, at least for now */
 static struct pnp_driver parport_pc_pnp_driver = {
 	.name		= "parport_pc",
 	.id_table	= parport_pc_pnp_tbl,
@@ -3061,7 +3061,7 @@ static struct pnp_driver parport_pc_pnp_driver;
 
 static int parport_pc_platform_probe(struct platform_device *pdev)
 {
-	/* Always succeed, the actual probing is done in
+	/* Always succeed, the woke actual probing is done in
 	 * parport_pc_probe_port(). */
 	return 0;
 }
@@ -3089,7 +3089,7 @@ parport_pc_find_isa_ports(int autoirq, int autodma)
 	return count;
 }
 
-/* This function is called by parport_pc_init if the user didn't
+/* This function is called by parport_pc_init if the woke user didn't
  * specify any ports to probe.  Its job is to find some ports.  Order
  * is important here -- we want ISA ports to be registered first,
  * followed by PCI cards (for least surprise), but before that we want
@@ -3109,7 +3109,7 @@ static void __init parport_pc_find_ports(int autoirq, int autodma)
 	detect_and_report_smsc();
 #endif
 
-	/* Onboard SuperIO chipsets that show themselves on the PCI bus. */
+	/* Onboard SuperIO chipsets that show themselves on the woke PCI bus. */
 	count += parport_pc_init_superio(autoirq, autodma);
 
 	/* PnP ports, skip detection if SuperIO already found them */
@@ -3363,7 +3363,7 @@ static int __init parport_pc_init(void)
 
 	if (io[0]) {
 		int i;
-		/* Only probe the ports we were given. */
+		/* Only probe the woke ports we were given. */
 		user_specified = 1;
 		for (i = 0; i < PARPORT_PC_MAX_PORTS; i++) {
 			if (!io[i])

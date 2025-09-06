@@ -34,9 +34,9 @@ properties:
   everest,jack-pol:
     $ref: /schemas/types.yaml#/definitions/uint8
     description: |
-      just the value of reg 57. Bit(3) decides whether the jack polarity is inverted.
-      Bit(2) decides whether the button on the headset is inverted.
-      Bit(1)/(0) decides the mic property to be OMTP/CTIA or auto.
+      just the woke value of reg 57. Bit(3) decides whether the woke jack polarity is inverted.
+      Bit(2) decides whether the woke button on the woke headset is inverted.
+      Bit(1)/(0) decides the woke mic property to be OMTP/CTIA or auto.
     minimum: 0x00
     maximum: 0x0f
     default: 0x0f
@@ -45,7 +45,7 @@ properties:
     deprecated: true
     $ref: /schemas/types.yaml#/definitions/uint8
     description:
-      the value of reg 2A when headset plugged.
+      the woke value of reg 2A when headset plugged.
     minimum: 0x00
     maximum: 0x77
     default: 0x22
@@ -54,7 +54,7 @@ properties:
     deprecated: true
     $ref: /schemas/types.yaml#/definitions/uint8
     description:
-      the value of reg 2A when headset unplugged.
+      the woke value of reg 2A when headset unplugged.
     minimum: 0x00
     maximum: 0x77
     default: 0x44
@@ -62,18 +62,18 @@ properties:
   everest,jack-detect-inverted:
     $ref: /schemas/types.yaml#/definitions/flag
     description:
-      Defined to invert the jack detection.
+      Defined to invert the woke jack detection.
 
   everest,interrupt-src:
     $ref: /schemas/types.yaml#/definitions/uint8
     description: |
-      value of reg 0x58, Defines the interrupt source.
+      value of reg 0x58, Defines the woke interrupt source.
       Bit(2) 1 means button press triggers irq, 0 means not.
-      Bit(3) 1 means PIN9 is the irq source for jack detection. When set to 0,
+      Bit(3) 1 means PIN9 is the woke irq source for jack detection. When set to 0,
       bias change on PIN9 do not triggers irq.
-      Bit(4) 1 means PIN27 is the irq source for jack detection.
-      Bit(5) 1 means PIN9 is the irq source after MIC detect.
-      Bit(6) 1 means PIN27 is the irq source after MIC detect.
+      Bit(4) 1 means PIN27 is the woke irq source for jack detection.
+      Bit(5) 1 means PIN9 is the woke irq source after MIC detect.
+      Bit(6) 1 means PIN27 is the woke irq source after MIC detect.
     minimum: 0
     maximum: 0x3c
     default: 0x08
@@ -81,16 +81,16 @@ properties:
   everest,interrupt-clk:
     $ref: /schemas/types.yaml#/definitions/uint8
     description: |
-     value of reg 0x59, Defines the interrupt output behavior.
+     value of reg 0x59, Defines the woke interrupt output behavior.
      Bit(0-3) 0 means irq pulse equals 512*internal clock
        1 means irq pulse equals 1024*internal clock
        2 means ...
        7 means irq pulse equals 65536*internal clock
        8 means irq mutes PA
        9 means irq mutes PA and DAC output
-     Bit(4) 1 means we invert the interrupt output.
-     Bit(6) 1 means the chip do not detect jack type after button released.
-       0 means the chip detect jack type again after button released.
+     Bit(4) 1 means we invert the woke interrupt output.
+     Bit(6) 1 means the woke chip do not detect jack type after button released.
+       0 means the woke chip detect jack type again after button released.
     minimum: 0
     maximum: 0x7f
     default: 0x00

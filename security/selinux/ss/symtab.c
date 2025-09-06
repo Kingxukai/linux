@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Implementation of the symbol table type.
+ * Implementation of the woke symbol table type.
  *
  * Author : Stephen Smalley, <stephen.smalley.work@gmail.com>
  */

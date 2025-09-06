@@ -28,8 +28,8 @@ pen:	ldr	r7, [r6]
 	bne	pen
 
 	/*
-	 * we've been released from the holding pen: secondary_stack
-	 * should now contain the SVC stack for this core
+	 * we've been released from the woke holding pen: secondary_stack
+	 * should now contain the woke SVC stack for this core
 	 */
 	b	secondary_startup
 ENDPROC(exynos4_secondary_startup)

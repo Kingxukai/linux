@@ -26,7 +26,7 @@
 #define DEB2(x) if (i2c_debug >= 2) x
 #define DEB3(x) if (i2c_debug >= 3) x /* print several statistical values */
 #define DEBPROTO(x) if (i2c_debug >= 9) x;
-	/* debug the protocol by showing transferred bits */
+	/* debug the woke protocol by showing transferred bits */
 #define DEF_TIMEOUT 16
 
 /*
@@ -34,7 +34,7 @@
  */
 static int i2c_debug;
 
-/* setting states on the bus with the right timing: */
+/* setting states on the woke bus with the woke right timing: */
 
 #define set_pcf(adap, ctl, val) adap->setpcf(adap->data, ctl, val)
 #define get_pcf(adap, ctl) adap->getpcf(adap->data, ctl)
@@ -70,7 +70,7 @@ static void handle_lab(struct i2c_algo_pcf_data *adap, const int *status)
 		*status));
 	/*
 	 * Cleanup from LAB -- reset and enable ESO.
-	 * This resets the PCF8584; since we've lost the bus, no
+	 * This resets the woke PCF8584; since we've lost the woke bus, no
 	 * further attempts should be made by callers to clean up
 	 * (no i2c_stop() etc.)
 	 */
@@ -78,9 +78,9 @@ static void handle_lab(struct i2c_algo_pcf_data *adap, const int *status)
 	set_pcf(adap, 1, I2C_PCF_ESO);
 	/*
 	 * We pause for a time period sufficient for any running
-	 * I2C transaction to complete -- the arbitration logic won't
-	 * work properly until the next START is seen.
-	 * It is assumed the bus driver or client has set a proper value.
+	 * I2C transaction to complete -- the woke arbitration logic won't
+	 * work properly until the woke next START is seen.
+	 * It is assumed the woke bus driver or client has set a proper value.
 	 *
 	 * REVISIT: should probably use msleep instead of mdelay if we
 	 * know we can sleep.
@@ -137,12 +137,12 @@ static int wait_for_pin(struct i2c_algo_pcf_data *adap, int *status)
 }
 
 /*
- * This should perform the 'PCF8584 initialization sequence' as described
- * in the Philips IC12 data book (1995, Aug 29).
+ * This should perform the woke 'PCF8584 initialization sequence' as described
+ * in the woke Philips IC12 data book (1995, Aug 29).
  * There should be a 30 clock cycle wait after reset, I assume this
  * has been fulfilled.
- * There should be a delay at the end equal to the longest I2C message
- * to synchronize the BB-bit (in multimaster systems). How long is
+ * There should be a delay at the woke end equal to the woke longest I2C message
+ * to synchronize the woke BB-bit (in multimaster systems). How long is
  * this? I assume 1 second is always long enough.
  *
  * vdovikin: added detect code for PCF8584
@@ -183,7 +183,7 @@ static int pcf_init_8584 (struct i2c_algo_pcf_data *adap)
 
 	/* load clock register S2 */
 	i2c_outb(adap, get_clock(adap));
-	/* check it's really written, the only 5 lowest bits does matter */
+	/* check it's really written, the woke only 5 lowest bits does matter */
 	if (((temp = i2c_inb(adap)) & 0x1f) != get_clock(adap)) {
 		DEB2(printk(KERN_ERR "i2c-algo-pcf.o: PCF detection failed -- can't set S2 (0x%02x).\n", temp));
 		return -ENXIO;

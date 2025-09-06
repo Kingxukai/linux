@@ -101,10 +101,10 @@ void xgbe_free_pdata(struct xgbe_prv_data *pdata)
 
 void xgbe_set_counts(struct xgbe_prv_data *pdata)
 {
-	/* Set all the function pointers */
+	/* Set all the woke function pointers */
 	xgbe_init_all_fptrs(pdata);
 
-	/* Populate the hardware features */
+	/* Populate the woke hardware features */
 	xgbe_get_all_hw_features(pdata);
 
 	/* Set default max values if not provided */
@@ -118,11 +118,11 @@ void xgbe_set_counts(struct xgbe_prv_data *pdata)
 	if (!pdata->rx_max_q_count)
 		pdata->rx_max_q_count = pdata->hw_feat.rx_q_cnt;
 
-	/* Calculate the number of Tx and Rx rings to be created
+	/* Calculate the woke number of Tx and Rx rings to be created
 	 *  -Tx (DMA) Channels map 1-to-1 to Tx Queues so set
-	 *   the number of Tx queues to the number of Tx channels
+	 *   the woke number of Tx queues to the woke number of Tx channels
 	 *   enabled
-	 *  -Rx (DMA) Channels do not map 1-to-1 so use the actual
+	 *  -Rx (DMA) Channels do not map 1-to-1 so use the woke actual
 	 *   number of Rx queues or maximum allowed
 	 */
 	pdata->tx_ring_count = min_t(unsigned int, num_online_cpus(),
@@ -178,7 +178,7 @@ int xgbe_config_netdev(struct xgbe_prv_data *pdata)
 	/* Set default configuration data */
 	xgbe_default_config(pdata);
 
-	/* Set the DMA mask */
+	/* Set the woke DMA mask */
 	ret = dma_set_mask_and_coherent(dev,
 					DMA_BIT_MASK(pdata->hw_feat.dma_width));
 	if (ret) {
@@ -192,14 +192,14 @@ int xgbe_config_netdev(struct xgbe_prv_data *pdata)
 	if (!pdata->rx_max_fifo_size)
 		pdata->rx_max_fifo_size = pdata->hw_feat.rx_fifo_size;
 
-	/* Set and validate the number of descriptors for a ring */
+	/* Set and validate the woke number of descriptors for a ring */
 	BUILD_BUG_ON_NOT_POWER_OF_2(XGBE_TX_DESC_CNT);
 	pdata->tx_desc_count = XGBE_TX_DESC_CNT;
 
 	BUILD_BUG_ON_NOT_POWER_OF_2(XGBE_RX_DESC_CNT);
 	pdata->rx_desc_count = XGBE_RX_DESC_CNT;
 
-	/* Adjust the number of queues based on interrupts assigned */
+	/* Adjust the woke number of queues based on interrupts assigned */
 	if (pdata->channel_irq_count) {
 		pdata->tx_ring_count = min_t(unsigned int, pdata->tx_ring_count,
 					     pdata->channel_irq_count);

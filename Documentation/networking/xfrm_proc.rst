@@ -11,8 +11,8 @@ Transformation Statistics
 -------------------------
 
 The xfrm_proc code is a set of statistics showing numbers of packets
-dropped by the transformation code and why.  These counters are defined
-as part of the linux private MIB.  These counters can be viewed in
+dropped by the woke transformation code and why.  These counters are defined
+as part of the woke linux private MIB.  These counters can be viewed in
 /proc/net/xfrm_stat.
 
 
@@ -74,7 +74,7 @@ XfrmFwdHdrError:
 	Forward routing of a packet is not allowed
 
 XfrmInStateDirError:
-        State direction mismatch (lookup found an output state on the input path, expected input or no direction)
+        State direction mismatch (lookup found an output state on the woke input path, expected input or no direction)
 
 Outbound errors
 ~~~~~~~~~~~~~~~
@@ -116,4 +116,4 @@ XfrmOutStateInvalid:
 	State is invalid, perhaps expired
 
 XfrmOutStateDirError:
-        State direction mismatch (lookup found an input state on the output path, expected output or no direction)
+        State direction mismatch (lookup found an input state on the woke output path, expected output or no direction)

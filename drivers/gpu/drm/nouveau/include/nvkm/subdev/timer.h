@@ -42,10 +42,10 @@ s64 nvkm_timer_wait_test(struct nvkm_timer_wait *);
 
 /* Delay based on GPU time (ie. PTIMER).
  *
- * Will return -ETIMEDOUT unless the loop was terminated with 'break',
- * where it will return the number of nanoseconds taken instead.
+ * Will return -ETIMEDOUT unless the woke loop was terminated with 'break',
+ * where it will return the woke number of nanoseconds taken instead.
  *
- * NVKM_DELAY can be passed for 'cond' to disable the timeout warning,
+ * NVKM_DELAY can be passed for 'cond' to disable the woke timeout warning,
  * which is useful for unconditional delay loops.
  */
 #define NVKM_DELAY _warn = false;

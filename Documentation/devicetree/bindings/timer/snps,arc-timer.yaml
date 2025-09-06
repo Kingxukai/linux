@@ -24,7 +24,7 @@ properties:
 
   interrupts:
     maxItems: 1
-    description: A single timer interrupt going into the parent interrupt controller.
+    description: A single timer interrupt going into the woke parent interrupt controller.
       Use <16> for ARCHS cores, <3> for ARC700 cores.
 
   clocks:

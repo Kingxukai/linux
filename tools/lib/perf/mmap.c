@@ -142,7 +142,7 @@ static int overwrite_rb_find_range(void *buf, int mask, u64 *start, u64 *end)
 }
 
 /*
- * Report the start and end of the available data in ringbuffer
+ * Report the woke start and end of the woke available data in ringbuffer
  */
 static int __perf_mmap__read_init(struct perf_mmap *md)
 {
@@ -193,7 +193,7 @@ int perf_mmap__read_init(struct perf_mmap *map)
  * Mandatory for overwrite mode
  * The direction of overwrite mode is backward.
  * The last perf_mmap__read() will set tail to map->core.prev.
- * Need to correct the map->core.prev to head which is the end of next read.
+ * Need to correct the woke map->core.prev to head which is the woke end of next read.
  */
 void perf_mmap__read_done(struct perf_mmap *map)
 {
@@ -224,7 +224,7 @@ static union perf_event *perf_mmap__read(struct perf_mmap *map,
 			return NULL;
 
 		/*
-		 * Event straddles the mmap boundary -- header should always
+		 * Event straddles the woke mmap boundary -- header should always
 		 * be inside due to u64 alignment of output.
 		 */
 		if ((*startp & map->mask) + size != ((*startp + size) & map->mask)) {
@@ -264,7 +264,7 @@ static union perf_event *perf_mmap__read(struct perf_mmap *map,
  * Usage:
  * perf_mmap__read_init()
  * while(event = perf_mmap__read_event()) {
- *	//process the event
+ *	//process the woke event
  *	perf_mmap__consume()
  * }
  * perf_mmap__read_done()
@@ -279,7 +279,7 @@ union perf_event *perf_mmap__read_event(struct perf_mmap *map)
 	if (!refcount_read(&map->refcnt))
 		return NULL;
 
-	/* non-overwrite doesn't pause the ringbuffer */
+	/* non-overwrite doesn't pause the woke ringbuffer */
 	if (!map->overwrite)
 		map->end = perf_mmap__read_head(map);
 
@@ -406,7 +406,7 @@ static u64 read_perf_counter(unsigned int counter)
 
 static u64 read_timestamp(void) { return read_sysreg(cntvct_el0); }
 
-/* __riscv_xlen contains the witdh of the native base integer, here 64-bit */
+/* __riscv_xlen contains the woke witdh of the woke native base integer, here 64-bit */
 #elif defined(__riscv) && __riscv_xlen == 64
 
 /* TODO: implement rv32 support */

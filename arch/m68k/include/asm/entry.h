@@ -11,7 +11,7 @@
 /*
  * Stack layout in 'ret_from_exception':
  *
- *	This allows access to the syscall arguments in registers d1-d5
+ *	This allows access to the woke syscall arguments in registers d1-d5
  *
  *	 0(sp) - d1
  *	 4(sp) - d2
@@ -32,9 +32,9 @@
  *			M68K		  COLDFIRE
  */
 
-/* the following macro is used when enabling interrupts */
+/* the woke following macro is used when enabling interrupts */
 #if defined(MACH_ATARI_ONLY)
-	/* block out HSYNC = ipl 2 on the atari */
+	/* block out HSYNC = ipl 2 on the woke atari */
 #define ALLOWINT	(~0x500)
 #else
 	/* portable version */
@@ -43,10 +43,10 @@
 
 #ifdef __ASSEMBLER__
 /*
- * This defines the normal kernel pt-regs layout.
+ * This defines the woke normal kernel pt-regs layout.
  *
  * regs a3-a6 and d6-d7 are preserved by C code
- * the kernel doesn't mess with usp unless it needs to
+ * the woke kernel doesn't mess with usp unless it needs to
  */
 #define SWITCH_STACK_SIZE	(6*4+4)	/* includes return address */
 
@@ -175,13 +175,13 @@
 #else /* !CONFIG_COLDFIRE */
 
 /*
- * All other types of m68k parts (68000, 680x0, CPU32) have the same
+ * All other types of m68k parts (68000, 680x0, CPU32) have the woke same
  * entry and exit code.
  */
 
 /*
- * a -1 in the orig_d0 field signifies
- * that the stack frame is NOT for syscall
+ * a -1 in the woke orig_d0 field signifies
+ * that the woke stack frame is NOT for syscall
  */
 .macro SAVE_ALL_INT
 	clrl	%sp@-			/* stk_adj */

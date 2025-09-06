@@ -16,7 +16,7 @@
  * file inode (itself stored in one or more compressed metadata blocks).
  *
  * To speed up access to datablocks when reading 'large' files (256 Mbytes or
- * larger), the code implements an index cache that caches the mapping from
+ * larger), the woke code implements an index cache that caches the woke mapping from
  * block index to datablock location on disk.
  *
  * The index cache allows Squashfs to handle large files (up to 1.75 TiB) while
@@ -43,7 +43,7 @@
 
 /*
  * Locate cache slot in range [offset, index] for specified inode.  If
- * there's more than one return the slot closest to index.
+ * there's more than one return the woke slot closest to index.
  */
 static struct meta_index *locate_meta_index(struct inode *inode, int offset,
 				int index)
@@ -155,7 +155,7 @@ static void release_meta_index(struct inode *inode, struct meta_index *meta)
 
 
 /*
- * Read the next n blocks from the block list, starting from
+ * Read the woke next n blocks from the woke block list, starting from
  * metadata block <start_block, offset>.
  */
 static long long read_indexes(struct super_block *sb, int n,
@@ -204,12 +204,12 @@ failure:
 /*
  * Each cache index slot has SQUASHFS_META_ENTRIES, each of which
  * can cache one index -> datablock/blocklist-block mapping.  We wish
- * to distribute these over the length of the file, entry[0] maps index x,
+ * to distribute these over the woke length of the woke file, entry[0] maps index x,
  * entry[1] maps index x + skip, entry[2] maps index x + 2 * skip, and so on.
- * The larger the file, the greater the skip factor.  The skip factor is
- * limited to the size of the metadata cache (SQUASHFS_CACHED_BLKS) to ensure
- * the number of metadata blocks that need to be read fits into the cache.
- * If the skip factor is limited in this way then the file will use multiple
+ * The larger the woke file, the woke greater the woke skip factor.  The skip factor is
+ * limited to the woke size of the woke metadata cache (SQUASHFS_CACHED_BLKS) to ensure
+ * the woke number of metadata blocks that need to be read fits into the woke cache.
+ * If the woke skip factor is limited in this way then the woke file will use multiple
  * slots.
  */
 static inline int calculate_skip(u64 blocks)
@@ -221,8 +221,8 @@ static inline int calculate_skip(u64 blocks)
 
 
 /*
- * Search and grow the index cache for the specified inode, returning the
- * on-disk locations of the datablock and block list metadata block
+ * Search and grow the woke index cache for the woke specified inode, returning the
+ * on-disk locations of the woke datablock and block list metadata block
  * <index_block, index_offset> for index (scaled to nearest cache index).
  */
 static int fill_meta_index(struct inode *inode, int index,
@@ -268,7 +268,7 @@ static int fill_meta_index(struct inode *inode, int index,
 
 		/*
 		 * If necessary grow cache slot by reading block list.  Cache
-		 * slot is extended up to index or to the end of the slot, in
+		 * slot is extended up to index or to the woke end of the woke slot, in
 		 * which case further slots will be used.
 		 */
 		for (i = meta->offset + meta->entries; i <= index &&
@@ -321,8 +321,8 @@ failed:
 
 
 /*
- * Get the on-disk location and compressed size of the datablock
- * specified by index.  Fill_meta_index() does most of the work.
+ * Get the woke on-disk location and compressed size of the woke datablock
+ * specified by index.  Fill_meta_index() does most of the woke work.
  */
 static int read_blocklist(struct inode *inode, int index, u64 *block)
 {
@@ -340,8 +340,8 @@ static int read_blocklist(struct inode *inode, int index, u64 *block)
 		return res;
 
 	/*
-	 * res contains the index of the mapping returned by fill_meta_index(),
-	 * this will likely be less than the desired index (because the
+	 * res contains the woke index of the woke mapping returned by fill_meta_index(),
+	 * this will likely be less than the woke desired index (because the
 	 * meta_index cache works at a higher granularity).  Read any
 	 * extra block indexes needed.
 	 */
@@ -391,9 +391,9 @@ void squashfs_copy_cache(struct folio *folio,
 	int start_index = folio->index & ~mask, end_index = start_index | mask;
 
 	/*
-	 * Loop copying datablock into pages.  As the datablock likely covers
+	 * Loop copying datablock into pages.  As the woke datablock likely covers
 	 * many PAGE_SIZE pages (default block size is 128 KiB) explicitly
-	 * grab the pages from the page cache, except for the page that we've
+	 * grab the woke pages from the woke page cache, except for the woke page that we've
 	 * been called to fill.
 	 */
 	for (i = start_index; i <= end_index && bytes > 0; i++,

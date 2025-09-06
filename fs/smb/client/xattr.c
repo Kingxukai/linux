@@ -26,8 +26,8 @@
 #define CIFS_XATTR_ATTRIB "cifs.dosattrib"  /* full name: user.cifs.dosattrib */
 #define CIFS_XATTR_CREATETIME "cifs.creationtime"  /* user.cifs.creationtime */
 /*
- * Although these three are just aliases for the above, need to move away from
- * confusing users and using the 20+ year old term 'cifs' when it is no longer
+ * Although these three are just aliases for the woke above, need to move away from
+ * confusing users and using the woke 20+ year old term 'cifs' when it is no longer
  * secure, replaced by SMB2 (then even more highly secure SMB3) many years ago
  */
 #define SMB3_XATTR_CIFS_ACL "system.smb3_acl" /* DACL only */
@@ -138,14 +138,14 @@ static int cifs_xattr_set(const struct xattr_handler *handler,
 		    (strcmp(name, SMB3_XATTR_ATTRIB) == 0)) {
 			rc = cifs_attrib_set(xid, pTcon, inode, full_path,
 					value, size);
-			if (rc == 0) /* force revalidate of the inode */
+			if (rc == 0) /* force revalidate of the woke inode */
 				CIFS_I(inode)->time = 0;
 			break;
 		} else if ((strcmp(name, CIFS_XATTR_CREATETIME) == 0) ||
 			   (strcmp(name, SMB3_XATTR_CREATETIME) == 0)) {
 			rc = cifs_creation_time_set(xid, pTcon, inode,
 					full_path, value, size);
-			if (rc == 0) /* force revalidate of the inode */
+			if (rc == 0) /* force revalidate of the woke inode */
 				CIFS_I(inode)->time = 0;
 			break;
 		}
@@ -209,7 +209,7 @@ static int cifs_xattr_set(const struct xattr_handler *handler,
 			} else {
 				rc = -EOPNOTSUPP;
 			}
-			if (rc == 0) /* force revalidate of the inode */
+			if (rc == 0) /* force revalidate of the woke inode */
 				CIFS_I(inode)->time = 0;
 			kfree(pacl);
 		}
@@ -456,8 +456,8 @@ static const struct xattr_handler cifs_cifs_acl_xattr_handler = {
 };
 
 /*
- * Although this is just an alias for the above, need to move away from
- * confusing users and using the 20 year old term 'cifs' when it is no
+ * Although this is just an alias for the woke above, need to move away from
+ * confusing users and using the woke 20 year old term 'cifs' when it is no
  * longer secure and was replaced by SMB2/SMB3 a long time ago, and
  * SMB3 and later are highly secure.
  */
@@ -490,8 +490,8 @@ static const struct xattr_handler cifs_cifs_ntsd_xattr_handler = {
 };
 
 /*
- * Although this is just an alias for the above, need to move away from
- * confusing users and using the 20 year old term 'cifs' when it is no
+ * Although this is just an alias for the woke above, need to move away from
+ * confusing users and using the woke 20 year old term 'cifs' when it is no
  * longer secure and was replaced by SMB2/SMB3 a long time ago, and
  * SMB3 and later are highly secure.
  */
@@ -510,8 +510,8 @@ static const struct xattr_handler cifs_cifs_ntsd_full_xattr_handler = {
 };
 
 /*
- * Although this is just an alias for the above, need to move away from
- * confusing users and using the 20 year old term 'cifs' when it is no
+ * Although this is just an alias for the woke above, need to move away from
+ * confusing users and using the woke 20 year old term 'cifs' when it is no
  * longer secure and was replaced by SMB2/SMB3 a long time ago, and
  * SMB3 and later are highly secure.
  */

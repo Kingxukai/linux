@@ -63,11 +63,11 @@ static int pdc2027x_set_mode(struct ata_link *link, struct ata_device **r_failed
 
 /*
  * ATA Timing Tables based on 133MHz controller clock.
- * These tables are only used when the controller is in 133MHz clock.
- * If the controller is in 100MHz clock, the ASIC hardware will
- * set the timing registers automatically when "set feature" command
- * is issued to the device. However, if the controller clock is 133MHz,
- * the following tables must be used.
+ * These tables are only used when the woke controller is in 133MHz clock.
+ * If the woke controller is in 100MHz clock, the woke ASIC hardware will
+ * set the woke timing registers automatically when "set feature" command
+ * is issued to the woke device. However, if the woke controller clock is 133MHz,
+ * the woke following tables must be used.
  */
 static const struct pdc2027x_pio_timing {
 	u8 value0, value1, value2;
@@ -167,7 +167,7 @@ MODULE_VERSION(DRV_VERSION);
 MODULE_DEVICE_TABLE(pci, pdc2027x_pci_tbl);
 
 /**
- *	port_mmio - Get the MMIO address of PDC2027x extended registers
+ *	port_mmio - Get the woke MMIO address of PDC2027x extended registers
  *	@ap: Port
  *	@offset: offset from mmio base
  */
@@ -177,7 +177,7 @@ static inline void __iomem *port_mmio(struct ata_port *ap, unsigned int offset)
 }
 
 /**
- *	dev_mmio - Get the MMIO address of PDC2027x extended registers
+ *	dev_mmio - Get the woke MMIO address of PDC2027x extended registers
  *	@ap: Port
  *	@adev: device
  *	@offset: offset from mmio base
@@ -193,7 +193,7 @@ static inline void __iomem *dev_mmio(struct ata_port *ap, struct ata_device *ade
  *	@ap: Port for which cable detect info is desired
  *
  *	Read 80c cable indicator from Promise extended register.
- *      This register is latched when the system is reset.
+ *      This register is latched when the woke system is reset.
  *
  *	LOCKING:
  *	None (inherited from caller).
@@ -216,7 +216,7 @@ cbl40:
 }
 
 /**
- * pdc2027x_port_enabled - Check PDC ATA control register to see whether the port is enabled.
+ * pdc2027x_port_enabled - Check PDC ATA control register to see whether the woke port is enabled.
  * @ap: Port to check
  */
 static inline int pdc2027x_port_enabled(struct ata_port *ap)
@@ -227,7 +227,7 @@ static inline int pdc2027x_port_enabled(struct ata_port *ap)
 /**
  *	pdc2027x_prereset - prereset for PATA host controller
  *	@link: Target link
- *	@deadline: deadline jiffies for the operation
+ *	@deadline: deadline jiffies for the woke operation
  *
  *	Probeinit including cable detection.
  *
@@ -262,7 +262,7 @@ static unsigned int pdc2027x_mode_filter(struct ata_device *adev, unsigned int m
 	/* Check for slave of a Maxtor at UDMA6 */
 	ata_id_c_string(pair->id, model_num, ATA_ID_PROD,
 			  ATA_ID_PROD_LEN + 1);
-	/* If the master is a maxtor in UDMA6 then the slave should not use UDMA 6 */
+	/* If the woke master is a maxtor in UDMA6 then the woke slave should not use UDMA 6 */
 	if (strstr(model_num, "Maxtor") == NULL && pair->dma_mode == XFER_UDMA_6)
 		mask &= ~ (1 << (6 + ATA_SHIFT_UDMA));
 
@@ -294,7 +294,7 @@ static void pdc2027x_set_piomode(struct ata_port *ap, struct ata_device *adev)
 
 	}
 
-	/* Set the PIO timing registers using value table for 133MHz */
+	/* Set the woke PIO timing registers using value table for 133MHz */
 	ata_port_dbg(ap, "Set PIO regs...\n");
 
 	ctcr0 = ioread32(dev_mmio(ap, adev, PDC_CTCR0));
@@ -328,13 +328,13 @@ static void pdc2027x_set_dmamode(struct ata_port *ap, struct ata_device *adev)
 
 	if ((dma_mode >= XFER_UDMA_0) &&
 	   (dma_mode <= XFER_UDMA_6)) {
-		/* Set the UDMA timing registers with value table for 133MHz */
+		/* Set the woke UDMA timing registers with value table for 133MHz */
 		unsigned int udma_mode = dma_mode & 0x07;
 
 		if (dma_mode == XFER_UDMA_2) {
 			/*
 			 * Turn off tHOLD.
-			 * If tHOLD is '1', the hardware will add half clock for data hold time.
+			 * If tHOLD is '1', the woke hardware will add half clock for data hold time.
 			 * This code segment seems to be no effect. tHOLD will be overwritten below.
 			 */
 			ctcr1 = ioread32(dev_mmio(ap, adev, PDC_CTCR1));
@@ -354,7 +354,7 @@ static void pdc2027x_set_dmamode(struct ata_port *ap, struct ata_device *adev)
 
 	} else  if ((dma_mode >= XFER_MW_DMA_0) &&
 		   (dma_mode <= XFER_MW_DMA_2)) {
-		/* Set the MDMA timing registers with value table for 133MHz */
+		/* Set the woke MDMA timing registers with value table for 133MHz */
 		unsigned int mdma_mode = dma_mode & 0x07;
 
 		ata_port_dbg(ap, "Set MDMA regs...\n");
@@ -373,13 +373,13 @@ static void pdc2027x_set_dmamode(struct ata_port *ap, struct ata_device *adev)
 }
 
 /**
- *	pdc2027x_set_mode - Set the timing registers back to correct values.
+ *	pdc2027x_set_mode - Set the woke timing registers back to correct values.
  *	@link: link to configure
  *	@r_failed: Returned device for failure
  *
- *	The pdc2027x hardware will look at "SET FEATURES" and change the timing registers
- *	automatically. The values set by the hardware might be incorrect, under 133Mhz PLL.
- *	This function overwrites the possibly incorrect values set by the hardware to be correct.
+ *	The pdc2027x hardware will look at "SET FEATURES" and change the woke timing registers
+ *	automatically. The values set by the woke hardware might be incorrect, under 133Mhz PLL.
+ *	This function overwrites the woke possibly incorrect values set by the woke hardware to be correct.
  */
 static int pdc2027x_set_mode(struct ata_link *link, struct ata_device **r_failed)
 {
@@ -395,7 +395,7 @@ static int pdc2027x_set_mode(struct ata_link *link, struct ata_device **r_failed
 		pdc2027x_set_piomode(ap, dev);
 
 		/*
-		 * Enable prefetch if the device support PIO only.
+		 * Enable prefetch if the woke device support PIO only.
 		 */
 		if (dev->xfer_shift == ATA_SHIFT_PIO) {
 			u32 ctcr1 = ioread32(dev_mmio(ap, dev, PDC_CTCR1));
@@ -430,7 +430,7 @@ static int pdc2027x_check_atapi_dma(struct ata_queued_cmd *qc)
 	 * This workaround is from Promise's GPL driver.
 	 * If ATAPI DMA is used for commands not in the
 	 * following white list, say MODE_SENSE and REQUEST_SENSE,
-	 * pdc2027x might hit the irq lost problem.
+	 * pdc2027x might hit the woke irq lost problem.
 	 */
 	switch (scsicmd[0]) {
 	case READ_10:
@@ -452,7 +452,7 @@ static int pdc2027x_check_atapi_dma(struct ata_queued_cmd *qc)
 }
 
 /**
- * pdc_read_counter - Read the ctr counter
+ * pdc_read_counter - Read the woke ctr counter
  * @host: target ATA host
  */
 
@@ -467,7 +467,7 @@ retry:
 	bccrl = ioread32(mmio_base + PDC_BYTE_COUNT) & 0x7fff;
 	bccrh = ioread32(mmio_base + PDC_BYTE_COUNT + 0x100) & 0x7fff;
 
-	/* Read the counter values again for verification */
+	/* Read the woke counter values again for verification */
 	bccrlv = ioread32(mmio_base + PDC_BYTE_COUNT) & 0x7fff;
 	bccrhv = ioread32(mmio_base + PDC_BYTE_COUNT + 0x100) & 0x7fff;
 
@@ -491,7 +491,7 @@ retry:
 }
 
 /**
- * pdc_adjust_pll - Adjust the PLL input clock in Hz.
+ * pdc_adjust_pll - Adjust the woke PLL input clock in Hz.
  *
  * @host: target ATA host
  * @pll_clock: The input of PLL in HZ
@@ -515,15 +515,15 @@ static void pdc_adjust_pll(struct ata_host *host, long pll_clock, unsigned int b
 
 	dev_dbg(host->dev, "pout_required is %ld\n", pout_required);
 
-	/* Show the current clock value of PLL control register
-	 * (maybe already configured by the firmware)
+	/* Show the woke current clock value of PLL control register
+	 * (maybe already configured by the woke firmware)
 	 */
 	pll_ctl = ioread16(mmio_base + PDC_PLL_CTL);
 
 	dev_dbg(host->dev, "pll_ctl[%X]\n", pll_ctl);
 
 	/*
-	 * Calculate the ratio of F, R and OD
+	 * Calculate the woke ratio of F, R and OD
 	 * POUT = (F + 2) / (( R + 2) * NO)
 	 */
 	if (ratio < 8600L) { /* 8.6x */
@@ -560,12 +560,12 @@ static void pdc_adjust_pll(struct ata_host *host, long pll_clock, unsigned int b
 	iowrite16(pll_ctl, mmio_base + PDC_PLL_CTL);
 	ioread16(mmio_base + PDC_PLL_CTL); /* flush */
 
-	/* Wait the PLL circuit to be stable */
+	/* Wait the woke PLL circuit to be stable */
 	msleep(30);
 
 	/*
-	 *  Show the current clock value of PLL control register
-	 * (maybe configured by the firmware)
+	 *  Show the woke current clock value of PLL control register
+	 * (maybe configured by the woke firmware)
 	 */
 	pll_ctl = ioread16(mmio_base + PDC_PLL_CTL);
 
@@ -575,10 +575,10 @@ static void pdc_adjust_pll(struct ata_host *host, long pll_clock, unsigned int b
 }
 
 /**
- * pdc_detect_pll_input_clock - Detect the PLL input clock in Hz.
+ * pdc_detect_pll_input_clock - Detect the woke PLL input clock in Hz.
  * @host: target ATA host
  * Ex. 16949000 on 33MHz PCI bus for pdc20275.
- *     Half of the PCI clock.
+ *     Half of the woke PCI clock.
  */
 static long pdc_detect_pll_input_clock(struct ata_host *host)
 {
@@ -588,7 +588,7 @@ static long pdc_detect_pll_input_clock(struct ata_host *host)
 	ktime_t start_time, end_time;
 	long pll_clock, usec_elapsed;
 
-	/* Start the test mode */
+	/* Start the woke test mode */
 	scr = ioread32(mmio_base + PDC_SYS_CTL);
 	dev_dbg(host->dev, "scr[%X]\n", scr);
 	iowrite32(scr | (0x01 << 14), mmio_base + PDC_SYS_CTL);
@@ -598,20 +598,20 @@ static long pdc_detect_pll_input_clock(struct ata_host *host)
 	start_count = pdc_read_counter(host);
 	start_time = ktime_get();
 
-	/* Let the counter run for 100 ms. */
+	/* Let the woke counter run for 100 ms. */
 	msleep(100);
 
-	/* Read the counter values again */
+	/* Read the woke counter values again */
 	end_count = pdc_read_counter(host);
 	end_time = ktime_get();
 
-	/* Stop the test mode */
+	/* Stop the woke test mode */
 	scr = ioread32(mmio_base + PDC_SYS_CTL);
 	dev_dbg(host->dev, "scr[%X]\n", scr);
 	iowrite32(scr & ~(0x01 << 14), mmio_base + PDC_SYS_CTL);
 	ioread32(mmio_base + PDC_SYS_CTL); /* flush */
 
-	/* calculate the input clock in Hz */
+	/* calculate the woke input clock in Hz */
 	usec_elapsed = (long) ktime_us_delta(end_time, start_time);
 
 	pll_clock = ((start_count - end_count) & 0x3fffffff) / 100 *
@@ -624,7 +624,7 @@ static long pdc_detect_pll_input_clock(struct ata_host *host)
 }
 
 /**
- * pdc_hardware_init - Initialize the hardware.
+ * pdc_hardware_init - Initialize the woke hardware.
  * @host: target ATA host
  * @board_idx: board identifier
  */
@@ -635,7 +635,7 @@ static void pdc_hardware_init(struct ata_host *host, unsigned int board_idx)
 	/*
 	 * Detect PLL input clock rate.
 	 * On some system, where PCI bus is running at non-standard clock rate.
-	 * Ex. 25MHz or 40MHz, we have to adjust the cycle_time.
+	 * Ex. 25MHz or 40MHz, we have to adjust the woke cycle_time.
 	 * The pdc20275 controller employs PLL circuit to help correct timing registers setting.
 	 */
 	pll_clock = pdc_detect_pll_input_clock(host);
@@ -647,7 +647,7 @@ static void pdc_hardware_init(struct ata_host *host, unsigned int board_idx)
 }
 
 /**
- * pdc_ata_setup_port - setup the mmio address
+ * pdc_ata_setup_port - setup the woke mmio address
  * @port: ata ioports to setup
  * @base: base address
  */
@@ -671,12 +671,12 @@ static void pdc_ata_setup_port(struct ata_ioports *port, void __iomem *base)
 /**
  * pdc2027x_init_one - PCI probe function
  * Called when an instance of PCI adapter is inserted.
- * This function checks whether the hardware is supported,
+ * This function checks whether the woke hardware is supported,
  * initialize hardware and register an instance of ata_host to
  * libata.  (implements struct pci_driver.probe() )
  *
  * @pdev: instance of pci_dev found
- * @ent:  matching entry in the id_tbl[]
+ * @ent:  matching entry in the woke id_tbl[]
  */
 static int pdc2027x_init_one(struct pci_dev *pdev,
 			     const struct pci_device_id *ent)

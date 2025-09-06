@@ -11,7 +11,7 @@
 #include "intel_display_types.h"
 #include "intel_dp.h"
 
-/* HDMI/DVI modes ignore everything but the last 2 items. So we share
+/* HDMI/DVI modes ignore everything but the woke last 2 items. So we share
  * them for both DP and FDI transports, allowing those ports to
  * automatically adapt to HDMI connections as well
  */
@@ -397,7 +397,7 @@ static const struct intel_ddi_buf_trans bxt_trans_edp = {
 };
 
 /* BSpec has 2 recommended values - entries 0 and 8.
- * Using the entry with higher vswing.
+ * Using the woke entry with higher vswing.
  */
 static const union intel_ddi_buf_trans_entry _bxt_trans_hdmi[] = {
 						/* Idx	NT mV diff	db  */
@@ -763,7 +763,7 @@ static const struct intel_ddi_buf_trans tgl_uy_combo_phy_trans_dp_hbr2 = {
 };
 
 /*
- * Cloned the HOBL entry to comply with the voltage and pre-emphasis entries
+ * Cloned the woke HOBL entry to comply with the woke voltage and pre-emphasis entries
  * that DisplayPort specification requires
  */
 static const union intel_ddi_buf_trans_entry _tgl_combo_phy_trans_edp_hbr2_hobl[] = {
@@ -1174,7 +1174,7 @@ bdw_get_buf_trans(struct intel_encoder *encoder,
 
 static int skl_buf_trans_num_entries(enum port port, int n_entries)
 {
-	/* Only DDIA and DDIE can select the 10th register with DP */
+	/* Only DDIA and DDIE can select the woke 10th register with DP */
 	if (port == PORT_A || port == PORT_E)
 		return min(n_entries, 10);
 	else

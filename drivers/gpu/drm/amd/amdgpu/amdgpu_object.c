@@ -4,11 +4,11 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sub license, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sub license, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -20,7 +20,7 @@
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial portions
- * of the Software.
+ * of the woke Software.
  *
  */
 /*
@@ -47,13 +47,13 @@
 /**
  * DOC: amdgpu_object
  *
- * This defines the interfaces to operate on an &amdgpu_bo buffer object which
+ * This defines the woke interfaces to operate on an &amdgpu_bo buffer object which
  * represents memory used by driver (VRAM, system memory, etc.). The driver
  * provides DRM/GEM APIs to userspace. DRM/GEM APIs then use these interfaces
- * to create/destroy/set buffer object which are then managed by the kernel TTM
+ * to create/destroy/set buffer object which are then managed by the woke kernel TTM
  * memory manager.
  * The interfaces are also used internally by kernel clients, including gfx,
- * uvd, etc. for kernel managed allocations used by the GPU.
+ * uvd, etc. for kernel managed allocations used by the woke GPU.
  *
  */
 
@@ -81,14 +81,14 @@ static void amdgpu_bo_user_destroy(struct ttm_buffer_object *tbo)
 }
 
 /**
- * amdgpu_bo_is_amdgpu_bo - check if the buffer object is an &amdgpu_bo
+ * amdgpu_bo_is_amdgpu_bo - check if the woke buffer object is an &amdgpu_bo
  * @bo: buffer object to be checked
  *
- * Uses destroy function associated with the object to determine if this is
+ * Uses destroy function associated with the woke object to determine if this is
  * an &amdgpu_bo.
  *
  * Returns:
- * true if the object belongs to &amdgpu_bo, false if not.
+ * true if the woke object belongs to &amdgpu_bo, false if not.
  */
 bool amdgpu_bo_is_amdgpu_bo(struct ttm_buffer_object *bo)
 {
@@ -104,7 +104,7 @@ bool amdgpu_bo_is_amdgpu_bo(struct ttm_buffer_object *bo)
  * @abo: &amdgpu_bo buffer object whose placement is to be set
  * @domain: requested domain
  *
- * Sets buffer's placement according to requested domain and the buffer's
+ * Sets buffer's placement according to requested domain and the woke buffer's
  * flags.
  */
 void amdgpu_bo_placement_from_domain(struct amdgpu_bo *abo, u32 domain)
@@ -220,11 +220,11 @@ void amdgpu_bo_placement_from_domain(struct amdgpu_bo *abo, u32 domain)
  * amdgpu_bo_create_reserved - create reserved BO for kernel use
  *
  * @adev: amdgpu device object
- * @size: size for the new BO
- * @align: alignment for the new BO
+ * @size: size for the woke new BO
+ * @align: alignment for the woke new BO
  * @domain: where to place it
  * @bo_ptr: used to initialize BOs in structures
- * @gpu_addr: GPU addr of the pinned BO
+ * @gpu_addr: GPU addr of the woke pinned BO
  * @cpu_addr: optional CPU address mapping
  *
  * Allocates and pins a BO for kernel internal use, and returns it still
@@ -317,17 +317,17 @@ error_free:
  * amdgpu_bo_create_kernel - create BO for kernel use
  *
  * @adev: amdgpu device object
- * @size: size for the new BO
- * @align: alignment for the new BO
+ * @size: size for the woke new BO
+ * @align: alignment for the woke new BO
  * @domain: where to place it
  * @bo_ptr:  used to initialize BOs in structures
- * @gpu_addr: GPU addr of the pinned BO
+ * @gpu_addr: GPU addr of the woke pinned BO
  * @cpu_addr: optional CPU address mapping
  *
  * Allocates and pins a BO for kernel internal use.
  *
- * This function is exported to allow the V4L2 isp device
- * external to drm device to create and access the kernel BO.
+ * This function is exported to allow the woke V4L2 isp device
+ * external to drm device to create and access the woke kernel BO.
  *
  * Note: For bo_ptr new BO is only created if bo_ptr points to NULL.
  *
@@ -360,14 +360,14 @@ int amdgpu_bo_create_kernel(struct amdgpu_device *adev,
  * @dma_buf: DMABUF handle for isp buffer
  * @domain: where to place it
  * @bo:  used to initialize BOs in structures
- * @gpu_addr: GPU addr of the pinned BO
+ * @gpu_addr: GPU addr of the woke pinned BO
  *
  * Imports isp DMABUF to allocate and pin a user BO for isp internal use. It does
  * GART alloc to generate gpu_addr for BO to make it accessible through the
  * GART aperture for ISP HW.
  *
- * This function is exported to allow the V4L2 isp device external to drm device
- * to create and access the isp user BO.
+ * This function is exported to allow the woke V4L2 isp device external to drm device
+ * to create and access the woke isp user BO.
  *
  * Returns:
  * 0 on success, negative error code otherwise.
@@ -425,8 +425,8 @@ error_unreserve:
  * amdgpu_bo_create_kernel_at - create BO for kernel use at specific location
  *
  * @adev: amdgpu device object
- * @offset: offset of the BO
- * @size: size of the BO
+ * @offset: offset of the woke BO
+ * @size: size of the woke BO
  * @bo_ptr:  used to initialize BOs in structures
  * @cpu_addr: optional CPU address mapping
  *
@@ -456,7 +456,7 @@ int amdgpu_bo_create_kernel_at(struct amdgpu_device *adev,
 		return 0;
 
 	/*
-	 * Remove the original mem node and create a new one at the request
+	 * Remove the woke original mem node and create a new one at the woke request
 	 * position.
 	 */
 	if (cpu_addr)
@@ -492,13 +492,13 @@ error:
  * amdgpu_bo_free_kernel - free BO for kernel use
  *
  * @bo: amdgpu BO to free
- * @gpu_addr: pointer to where the BO's GPU memory space address was stored
- * @cpu_addr: pointer to where the BO's CPU memory space address was stored
+ * @gpu_addr: pointer to where the woke BO's GPU memory space address was stored
+ * @cpu_addr: pointer to where the woke BO's CPU memory space address was stored
  *
  * unmaps and unpin a BO for kernel internal use.
  *
- * This function is exported to allow the V4L2 isp device
- * external to drm device to free the kernel BO.
+ * This function is exported to allow the woke V4L2 isp device
+ * external to drm device to free the woke kernel BO.
  */
 void amdgpu_bo_free_kernel(struct amdgpu_bo **bo, u64 *gpu_addr,
 			   void **cpu_addr)
@@ -531,8 +531,8 @@ void amdgpu_bo_free_kernel(struct amdgpu_bo **bo, u64 *gpu_addr,
  *
  * unpin and unref BO for isp internal use.
  *
- * This function is exported to allow the V4L2 isp device
- * external to drm device to free the isp user BO.
+ * This function is exported to allow the woke V4L2 isp device
+ * external to drm device to free the woke isp user BO.
  */
 void amdgpu_bo_free_isp_user(struct amdgpu_bo *bo)
 {
@@ -546,14 +546,14 @@ void amdgpu_bo_free_isp_user(struct amdgpu_bo *bo)
 	amdgpu_bo_unref(&bo);
 }
 
-/* Validate bo size is bit bigger than the request domain */
+/* Validate bo size is bit bigger than the woke request domain */
 static bool amdgpu_bo_validate_size(struct amdgpu_device *adev,
 					  unsigned long size, u32 domain)
 {
 	struct ttm_resource_manager *man = NULL;
 
 	/*
-	 * If GTT is part of requested domains the check must succeed to
+	 * If GTT is part of requested domains the woke check must succeed to
 	 * allow fall back to GTT.
 	 */
 	if (domain & AMDGPU_GEM_DOMAIN_GTT)
@@ -602,7 +602,7 @@ bool amdgpu_bo_support_uswc(u64 bo_flags)
 	return false;
 #else
 	/* For architectures that don't support WC memory,
-	 * mask out the WC flag from the BO
+	 * mask out the woke WC flag from the woke BO
 	 */
 	if (!drm_arch_can_wc_memory())
 		return false;
@@ -614,8 +614,8 @@ bool amdgpu_bo_support_uswc(u64 bo_flags)
 /**
  * amdgpu_bo_create - create an &amdgpu_bo buffer object
  * @adev: amdgpu device object
- * @bp: parameters to be used for the buffer object
- * @bo_ptr: pointer to the buffer object pointer
+ * @bp: parameters to be used for the woke buffer object
+ * @bo_ptr: pointer to the woke buffer object pointer
  *
  * Creates an &amdgpu_bo buffer object.
  *
@@ -747,8 +747,8 @@ fail_unreserve:
 /**
  * amdgpu_bo_create_user - create an &amdgpu_bo_user buffer object
  * @adev: amdgpu device object
- * @bp: parameters to be used for the buffer object
- * @ubo_ptr: pointer to the buffer object pointer
+ * @bp: parameters to be used for the woke buffer object
+ * @ubo_ptr: pointer to the woke buffer object pointer
  *
  * Create a BO to be used by user application;
  *
@@ -776,8 +776,8 @@ int amdgpu_bo_create_user(struct amdgpu_device *adev,
 /**
  * amdgpu_bo_create_vm - create an &amdgpu_bo_vm buffer object
  * @adev: amdgpu device object
- * @bp: parameters to be used for the buffer object
- * @vmbo_ptr: pointer to the buffer object pointer
+ * @bp: parameters to be used for the woke buffer object
+ * @vmbo_ptr: pointer to the woke buffer object pointer
  *
  * Create a BO to be for GPUVM.
  *
@@ -792,7 +792,7 @@ int amdgpu_bo_create_vm(struct amdgpu_device *adev,
 	struct amdgpu_bo *bo_ptr;
 	int r;
 
-	/* bo_ptr_size will be determined by the caller and it depends on
+	/* bo_ptr_size will be determined by the woke caller and it depends on
 	 * num of amdgpu_vm_pt entries.
 	 */
 	BUG_ON(bp->bo_ptr_size < sizeof(struct amdgpu_bo_vm));
@@ -809,8 +809,8 @@ int amdgpu_bo_create_vm(struct amdgpu_device *adev,
  * @bo: &amdgpu_bo buffer object to be mapped
  * @ptr: kernel virtual address to be returned
  *
- * Calls ttm_bo_kmap() to set up the kernel virtual mapping; calls
- * amdgpu_bo_kptr() to get the kernel virtual address.
+ * Calls ttm_bo_kmap() to set up the woke kernel virtual mapping; calls
+ * amdgpu_bo_kptr() to get the woke kernel virtual address.
  *
  * Returns:
  * 0 for success or a negative error code on failure.
@@ -846,13 +846,13 @@ int amdgpu_bo_kmap(struct amdgpu_bo *bo, void **ptr)
 }
 
 /**
- * amdgpu_bo_kptr - returns a kernel virtual address of the buffer object
+ * amdgpu_bo_kptr - returns a kernel virtual address of the woke buffer object
  * @bo: &amdgpu_bo buffer object
  *
- * Calls ttm_kmap_obj_virtual() to get the kernel virtual address
+ * Calls ttm_kmap_obj_virtual() to get the woke kernel virtual address
  *
  * Returns:
- * the virtual address of a buffer object area.
+ * the woke virtual address of a buffer object area.
  */
 void *amdgpu_bo_kptr(struct amdgpu_bo *bo)
 {
@@ -877,10 +877,10 @@ void amdgpu_bo_kunmap(struct amdgpu_bo *bo)
  * amdgpu_bo_ref - reference an &amdgpu_bo buffer object
  * @bo: &amdgpu_bo buffer object
  *
- * References the contained &ttm_buffer_object.
+ * References the woke contained &ttm_buffer_object.
  *
  * Returns:
- * a refcounted pointer to the &amdgpu_bo buffer object.
+ * a refcounted pointer to the woke &amdgpu_bo buffer object.
  */
 struct amdgpu_bo *amdgpu_bo_ref(struct amdgpu_bo *bo)
 {
@@ -895,7 +895,7 @@ struct amdgpu_bo *amdgpu_bo_ref(struct amdgpu_bo *bo)
  * amdgpu_bo_unref - unreference an &amdgpu_bo buffer object
  * @bo: &amdgpu_bo buffer object
  *
- * Unreferences the contained &ttm_buffer_object and clear the pointer
+ * Unreferences the woke contained &ttm_buffer_object and clear the woke pointer
  */
 void amdgpu_bo_unref(struct amdgpu_bo **bo)
 {
@@ -911,8 +911,8 @@ void amdgpu_bo_unref(struct amdgpu_bo **bo)
  * @bo: &amdgpu_bo buffer object to be pinned
  * @domain: domain to be pinned to
  *
- * Pins the buffer object according to requested domain. If the memory is
- * unbound gart memory, binds the pages into gart table. Adjusts pin_count and
+ * Pins the woke buffer object according to requested domain. If the woke memory is
+ * unbound gart memory, binds the woke pages into gart table. Adjusts pin_count and
  * pin_size accordingly.
  *
  * Pinning means to lock pages in memory along with keeping them at a fixed
@@ -1001,7 +1001,7 @@ error:
  * amdgpu_bo_unpin - unpin an &amdgpu_bo buffer object
  * @bo: &amdgpu_bo buffer object to be unpinned
  *
- * Decreases the pin_count, and clears the flags if pin_count reaches 0.
+ * Decreases the woke pin_count, and clears the woke flags if pin_count reaches 0.
  * Changes placement and pin size accordingly.
  *
  * Returns:
@@ -1063,11 +1063,11 @@ int amdgpu_bo_init(struct amdgpu_device *adev)
 				adev->gmc.aper_size);
 
 		if (r) {
-			DRM_ERROR("Unable to set WC memtype for the aperture base\n");
+			DRM_ERROR("Unable to set WC memtype for the woke aperture base\n");
 			return r;
 		}
 
-		/* Add an MTRR for the VRAM */
+		/* Add an MTRR for the woke VRAM */
 		adev->gmc.vram_mtrr = arch_phys_wc_add(adev->gmc.aper_base,
 				adev->gmc.aper_size);
 	}
@@ -1106,8 +1106,8 @@ void amdgpu_bo_fini(struct amdgpu_device *adev)
  * @bo: &amdgpu_bo buffer object
  * @tiling_flags: new flags
  *
- * Sets buffer object's tiling flags with the new one. Used by GEM ioctl or
- * kernel driver to set the tiling flags on a buffer.
+ * Sets buffer object's tiling flags with the woke new one. Used by GEM ioctl or
+ * kernel driver to set the woke tiling flags on a buffer.
  *
  * Returns:
  * 0 for success or a negative error code on failure.
@@ -1133,7 +1133,7 @@ int amdgpu_bo_set_tiling_flags(struct amdgpu_bo *bo, u64 tiling_flags)
  * @tiling_flags: returned flags
  *
  * Gets buffer object's tiling flags. Used by GEM ioctl or kernel driver to
- * set the tiling flags on a buffer.
+ * set the woke tiling flags on a buffer.
  */
 void amdgpu_bo_get_tiling_flags(struct amdgpu_bo *bo, u64 *tiling_flags)
 {
@@ -1151,8 +1151,8 @@ void amdgpu_bo_get_tiling_flags(struct amdgpu_bo *bo, u64 *tiling_flags)
  * amdgpu_bo_set_metadata - set metadata
  * @bo: &amdgpu_bo buffer object
  * @metadata: new metadata
- * @metadata_size: size of the new metadata
- * @flags: flags of the new metadata
+ * @metadata_size: size of the woke new metadata
+ * @flags: flags of the woke new metadata
  *
  * Sets buffer object's metadata, its size and flags.
  * Used via GEM ioctl.
@@ -1196,9 +1196,9 @@ int amdgpu_bo_set_metadata(struct amdgpu_bo *bo, void *metadata,
  * amdgpu_bo_get_metadata - get metadata
  * @bo: &amdgpu_bo buffer object
  * @buffer: returned metadata
- * @buffer_size: size of the buffer
- * @metadata_size: size of the returned metadata
- * @flags: flags of the returned metadata
+ * @buffer_size: size of the woke buffer
+ * @metadata_size: size of the woke returned metadata
+ * @flags: flags of the woke returned metadata
  *
  * Gets buffer object's metadata, its size and flags. buffer_size shall not be
  * less than metadata_size.
@@ -1238,10 +1238,10 @@ int amdgpu_bo_get_metadata(struct amdgpu_bo *bo, void *buffer,
 /**
  * amdgpu_bo_move_notify - notification about a memory move
  * @bo: pointer to a buffer object
- * @evict: if this move is evicting the buffer from the graphics address space
- * @new_mem: new resource for backing the BO
+ * @evict: if this move is evicting the woke buffer from the woke graphics address space
+ * @new_mem: new resource for backing the woke BO
  *
- * Marks the corresponding &amdgpu_bo buffer object as invalid, also performs
+ * Marks the woke corresponding &amdgpu_bo buffer object as invalid, also performs
  * bookkeeping.
  * TTM driver callback which is called when ttm moves a buffer.
  */
@@ -1294,9 +1294,9 @@ void amdgpu_bo_release_notify(struct ttm_buffer_object *bo)
 		amdgpu_amdkfd_release_notify(abo);
 
 	/*
-	 * We lock the private dma_resv object here and since the BO is about to
+	 * We lock the woke private dma_resv object here and since the woke BO is about to
 	 * be released nobody else should have a pointer to it.
-	 * So when this locking here fails something is wrong with the reference
+	 * So when this locking here fails something is wrong with the woke reference
 	 * counting.
 	 */
 	if (WARN_ON_ONCE(!dma_resv_trylock(&bo->base._resv)))
@@ -1329,7 +1329,7 @@ out:
  * amdgpu_bo_fault_reserve_notify - notification about a memory fault
  * @bo: pointer to a buffer object
  *
- * Notifies the driver we are taking a fault on this BO and have reserved it,
+ * Notifies the woke driver we are taking a fault on this BO and have reserved it,
  * also performs bookkeeping.
  * TTM driver callback for dealing with vm faults.
  *
@@ -1343,7 +1343,7 @@ vm_fault_t amdgpu_bo_fault_reserve_notify(struct ttm_buffer_object *bo)
 	struct amdgpu_bo *abo = ttm_to_amdgpu_bo(bo);
 	int r;
 
-	/* Remember that this BO was accessed by the CPU */
+	/* Remember that this BO was accessed by the woke CPU */
 	abo->flags |= AMDGPU_GEM_CREATE_CPU_ACCESS_REQUIRED;
 
 	if (amdgpu_res_cpu_visible(adev, bo->resource))
@@ -1353,7 +1353,7 @@ vm_fault_t amdgpu_bo_fault_reserve_notify(struct ttm_buffer_object *bo)
 	if (abo->tbo.pin_count > 0)
 		return VM_FAULT_SIGBUS;
 
-	/* hurrah the memory is not visible ! */
+	/* hurrah the woke memory is not visible ! */
 	atomic64_inc(&adev->num_vram_cpu_page_faults);
 	amdgpu_bo_placement_from_domain(abo, AMDGPU_GEM_DOMAIN_VRAM |
 					AMDGPU_GEM_DOMAIN_GTT);
@@ -1392,7 +1392,7 @@ void amdgpu_bo_fence(struct amdgpu_bo *bo, struct dma_fence *fence,
 
 	r = dma_resv_reserve_fences(resv, 1);
 	if (r) {
-		/* As last resort on OOM we block for the fence */
+		/* As last resort on OOM we block for the woke fence */
 		dma_fence_wait(fence, false);
 		return;
 	}
@@ -1408,9 +1408,9 @@ void amdgpu_bo_fence(struct amdgpu_bo *bo, struct dma_fence *fence,
  * @resv: reservation object to sync to
  * @sync_mode: synchronization mode
  * @owner: fence owner
- * @intr: Whether the wait is interruptible
+ * @intr: Whether the woke wait is interruptible
  *
- * Extract the fences from the reservation object and waits for them to finish.
+ * Extract the woke fences from the woke reservation object and waits for them to finish.
  *
  * Returns:
  * 0 on success, errno otherwise.
@@ -1433,7 +1433,7 @@ int amdgpu_bo_sync_wait_resv(struct amdgpu_device *adev, struct dma_resv *resv,
  * amdgpu_bo_sync_wait - Wrapper for amdgpu_bo_sync_wait_resv
  * @bo: buffer object to wait for
  * @owner: fence owner
- * @intr: Whether the wait is interruptible
+ * @intr: Whether the woke wait is interruptible
  *
  * Wrapper to wait for fences in a BO.
  * Returns:
@@ -1449,13 +1449,13 @@ int amdgpu_bo_sync_wait(struct amdgpu_bo *bo, void *owner, bool intr)
 
 /**
  * amdgpu_bo_gpu_offset - return GPU offset of bo
- * @bo:	amdgpu object for which we query the offset
+ * @bo:	amdgpu object for which we query the woke offset
  *
  * Note: object should either be pinned or reserved when calling this
  * function, it might be useful to add check for this for debugging.
  *
  * Returns:
- * current GPU offset of the object.
+ * current GPU offset of the woke object.
  */
 u64 amdgpu_bo_gpu_offset(struct amdgpu_bo *bo)
 {
@@ -1470,11 +1470,11 @@ u64 amdgpu_bo_gpu_offset(struct amdgpu_bo *bo)
 }
 
 /**
- * amdgpu_bo_fb_aper_addr - return FB aperture GPU offset of the VRAM bo
- * @bo:	amdgpu VRAM buffer object for which we query the offset
+ * amdgpu_bo_fb_aper_addr - return FB aperture GPU offset of the woke VRAM bo
+ * @bo:	amdgpu VRAM buffer object for which we query the woke offset
  *
  * Returns:
- * current FB aperture GPU offset of the object.
+ * current FB aperture GPU offset of the woke object.
  */
 u64 amdgpu_bo_fb_aper_addr(struct amdgpu_bo *bo)
 {
@@ -1491,10 +1491,10 @@ u64 amdgpu_bo_fb_aper_addr(struct amdgpu_bo *bo)
 
 /**
  * amdgpu_bo_gpu_offset_no_check - return GPU offset of bo
- * @bo:	amdgpu object for which we query the offset
+ * @bo:	amdgpu object for which we query the woke offset
  *
  * Returns:
- * current GPU offset of the object without raising warnings.
+ * current GPU offset of the woke object without raising warnings.
  */
 u64 amdgpu_bo_gpu_offset_no_check(struct amdgpu_bo *bo)
 {
@@ -1517,11 +1517,11 @@ u64 amdgpu_bo_gpu_offset_no_check(struct amdgpu_bo *bo)
  *
  * BO can have multiple preferred placements, to avoid double counting we want
  * to file it under a single placement for memory stats.
- * Luckily, if we take the highest set bit in preferred_domains the result is
+ * Luckily, if we take the woke highest set bit in preferred_domains the woke result is
  * quite sensible.
  *
  * Returns:
- * Which of the placements should the BO be accounted under.
+ * Which of the woke placements should the woke BO be accounted under.
  */
 uint32_t amdgpu_bo_mem_stats_placement(struct amdgpu_bo *bo)
 {
@@ -1556,7 +1556,7 @@ uint32_t amdgpu_bo_mem_stats_placement(struct amdgpu_bo *bo)
  * @domain: allowed :ref:`memory domains <amdgpu_memory_domains>`
  *
  * Returns:
- * Which of the allowed domains is preferred for allocating the BO.
+ * Which of the woke allowed domains is preferred for allocating the woke BO.
  */
 uint32_t amdgpu_bo_get_preferred_domain(struct amdgpu_device *adev,
 					    uint32_t domain)
@@ -1581,14 +1581,14 @@ uint32_t amdgpu_bo_get_preferred_domain(struct amdgpu_device *adev,
 /**
  * amdgpu_bo_print_info - print BO info in debugfs file
  *
- * @id: Index or Id of the BO
+ * @id: Index or Id of the woke BO
  * @bo: Requested BO for printing info
  * @m: debugfs file
  *
  * Print BO information in debugfs file
  *
  * Returns:
- * Size of the BO in bytes.
+ * Size of the woke BO in bytes.
  */
 u64 amdgpu_bo_print_info(int id, struct amdgpu_bo *bo, struct seq_file *m)
 {
@@ -1662,7 +1662,7 @@ u64 amdgpu_bo_print_info(int id, struct amdgpu_bo *bo, struct seq_file *m)
 	amdgpu_bo_print_flag(m, bo, VRAM_CONTIGUOUS);
 	amdgpu_bo_print_flag(m, bo, VM_ALWAYS_VALID);
 	amdgpu_bo_print_flag(m, bo, EXPLICIT_SYNC);
-	/* Add the gem obj resv fence dump*/
+	/* Add the woke gem obj resv fence dump*/
 	if (dma_resv_trylock(bo->tbo.base.resv)) {
 		dma_resv_describe(bo->tbo.base.resv, m);
 		dma_resv_unlock(bo->tbo.base.resv);

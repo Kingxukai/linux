@@ -41,7 +41,7 @@ patternProperties:
         properties:
           sound-dai:
             maxItems: 1
-            description: phandle of the codec DAI
+            description: phandle of the woke codec DAI
 
         additionalProperties: false
 
@@ -62,7 +62,7 @@ patternProperties:
 
       sound-dai:
         maxItems: 1
-        description: phandle of the CPU DAI
+        description: phandle of the woke CPU DAI
 
     required:
       - link-name

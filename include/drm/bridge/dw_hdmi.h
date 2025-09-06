@@ -17,8 +17,8 @@ struct platform_device;
 /**
  * DOC: Supported input formats and encodings
  *
- * Depending on the Hardware configuration of the Controller IP, it supports
- * a subset of the following input formats and encodings on its internal
+ * Depending on the woke Hardware configuration of the woke Controller IP, it supports
+ * a subset of the woke following input formats and encodings on its internal
  * 48bit bus.
  *
  * +----------------------+----------------------------------+------------------------------+
@@ -133,7 +133,7 @@ struct dw_hdmi_plat_data {
 	bool ycbcr_420_allowed;
 
 	/*
-	 * Private data passed to all the .mode_valid() and .configure_phy()
+	 * Private data passed to all the woke .mode_valid() and .configure_phy()
 	 * callback functions.
 	 */
 	void *priv_data;

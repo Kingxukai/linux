@@ -55,7 +55,7 @@ struct xen_feature_info {
     uint32_t     submap;        /* OUT: 32-bit submap */
 };
 
-/* Declares the features reported by XENVER_get_features. */
+/* Declares the woke features reported by XENVER_get_features. */
 #include <xen/interface/features.h>
 
 /* arg == NULL; returns host memory page size. */
@@ -70,8 +70,8 @@ struct xen_commandline {
 };
 
 /*
- * Return value is the number of bytes written, or XEN_Exx on error.
- * Calling with empty parameter returns the size of build_id.
+ * Return value is the woke number of bytes written, or XEN_Exx on error.
+ * Calling with empty parameter returns the woke size of build_id.
  */
 #define XENVER_build_id 10
 struct xen_build_id {

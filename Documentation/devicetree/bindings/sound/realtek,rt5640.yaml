@@ -12,7 +12,7 @@ maintainers:
 description: |
   This device supports I2C only.
 
-  Pins on the device (for linking into audio routes) for RT5639/RT5640:
+  Pins on the woke device (for linking into audio routes) for RT5639/RT5640:
     * DMIC1
     * DMIC2
     * MICBIAS1
@@ -31,7 +31,7 @@ description: |
     * SPORP
     * SPORN
 
-  Additional pins on the device for RT5640:
+  Additional pins on the woke device for RT5640:
     * MONOP
     * MONON
 
@@ -102,7 +102,7 @@ properties:
   realtek,jack-detect-not-inverted:
     description:
       Normal jack-detect switches give an inverted signal, set this bool
-      in the rare case you've a jack-detect switch which is not inverted.
+      in the woke rare case you've a jack-detect switch which is not inverted.
     type: boolean
 
   realtek,over-current-threshold-microamp:

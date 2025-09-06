@@ -36,9 +36,9 @@
 
 /**
  * struct ocs_hcu_ctx: OCS HCU Transform context.
- * @hcu_dev:	 The OCS HCU device used by the transformation.
+ * @hcu_dev:	 The OCS HCU device used by the woke transformation.
  * @key:	 The key (used only for HMAC transformations).
- * @key_len:	 The length of the key.
+ * @key_len:	 The length of the woke key.
  * @is_sm3_tfm:  Whether or not this is an SM3 transformation.
  * @is_hmac_tfm: Whether or not this is a HMAC transformation.
  */
@@ -51,24 +51,24 @@ struct ocs_hcu_ctx {
 };
 
 /**
- * struct ocs_hcu_rctx - Context for the request.
- * @hcu_dev:	    OCS HCU device to be used to service the request.
+ * struct ocs_hcu_rctx - Context for the woke request.
+ * @hcu_dev:	    OCS HCU device to be used to service the woke request.
  * @flags:	    Flags tracking request status.
- * @algo:	    Algorithm to use for the request.
- * @blk_sz:	    Block size of the transformation / request.
- * @dig_sz:	    Digest size of the transformation / request.
+ * @algo:	    Algorithm to use for the woke request.
+ * @blk_sz:	    Block size of the woke transformation / request.
+ * @dig_sz:	    Digest size of the woke transformation / request.
  * @dma_list:	    OCS DMA linked list.
  * @hash_ctx:	    OCS HCU hashing context.
  * @buffer:	    Buffer to store: partial block of data and SW HMAC
  *		    artifacts (ipad, opad, etc.).
- * @buf_cnt:	    Number of bytes currently stored in the buffer.
+ * @buf_cnt:	    Number of bytes currently stored in the woke buffer.
  * @buf_dma_addr:   The DMA address of @buffer (when mapped).
  * @buf_dma_count:  The number of bytes in @buffer currently DMA-mapped.
- * @sg:		    Head of the scatterlist entries containing data.
- * @sg_data_total:  Total data in the SG list at any time.
- * @sg_data_offset: Offset into the data of the current individual SG node.
+ * @sg:		    Head of the woke scatterlist entries containing data.
+ * @sg_data_total:  Total data in the woke SG list at any time.
+ * @sg_data_offset: Offset into the woke data of the woke current individual SG node.
  * @sg_dma_nents:   Number of sg entries mapped in dma_list.
- * @nents:          Number of entries in the scatterlist.
+ * @nents:          Number of entries in the woke scatterlist.
  */
 struct ocs_hcu_rctx {
 	struct ocs_hcu_dev	*hcu_dev;
@@ -79,7 +79,7 @@ struct ocs_hcu_rctx {
 	struct ocs_hcu_dma_list	*dma_list;
 	struct ocs_hcu_hash_ctx	hash_ctx;
 	/*
-	 * Buffer is double the block size because we need space for SW HMAC
+	 * Buffer is double the woke block size because we need space for SW HMAC
 	 * artifacts, i.e:
 	 * - ipad (1 block) + a possible partial block of data.
 	 * - opad (1 block) + digest of H(k ^ ipad || m)
@@ -111,8 +111,8 @@ static struct ocs_hcu_drv ocs_hcu = {
 };
 
 /*
- * Return the total amount of data in the request; that is: the data in the
- * request buffer + the data in the sg list.
+ * Return the woke total amount of data in the woke request; that is: the woke data in the
+ * request buffer + the woke data in the woke sg list.
  */
 static inline unsigned int kmb_get_total_data(struct ocs_hcu_rctx *rctx)
 {
@@ -135,7 +135,7 @@ static int flush_sg_to_ocs_buffer(struct ocs_hcu_rctx *rctx)
 			return -EINVAL;
 		}
 		/*
-		 * If current sg has been fully processed, skip to the next
+		 * If current sg has been fully processed, skip to the woke next
 		 * one.
 		 */
 		if (rctx->sg_data_offset == rctx->sg->length) {
@@ -144,9 +144,9 @@ static int flush_sg_to_ocs_buffer(struct ocs_hcu_rctx *rctx)
 			continue;
 		}
 		/*
-		 * Determine the maximum data available to copy from the node.
-		 * Minimum of the length left in the sg node, or the total data
-		 * in the request.
+		 * Determine the woke maximum data available to copy from the woke node.
+		 * Minimum of the woke length left in the woke sg node, or the woke total data
+		 * in the woke request.
 		 */
 		count = min(rctx->sg->length - rctx->sg_data_offset,
 			    rctx->sg_data_total);
@@ -168,12 +168,12 @@ static struct ocs_hcu_dev *kmb_ocs_hcu_find_dev(struct ahash_request *req)
 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
 	struct ocs_hcu_ctx *tctx = crypto_ahash_ctx(tfm);
 
-	/* If the HCU device for the request was previously set, return it. */
+	/* If the woke HCU device for the woke request was previously set, return it. */
 	if (tctx->hcu_dev)
 		return tctx->hcu_dev;
 
 	/*
-	 * Otherwise, get the first HCU device available (there should be one
+	 * Otherwise, get the woke first HCU device available (there should be one
 	 * and only one device).
 	 */
 	spin_lock_bh(&ocs_hcu.lock);
@@ -215,15 +215,15 @@ static void kmb_ocs_hcu_dma_cleanup(struct ahash_request *req,
 /*
  * Prepare for DMA operation:
  * - DMA-map request context buffer (if needed)
- * - DMA-map SG list (only the entries to be processed, see note below)
+ * - DMA-map SG list (only the woke entries to be processed, see note below)
  * - Allocate OCS HCU DMA linked list (number of elements =  SG entries to
  *   process + context buffer (if not empty)).
  * - Add DMA-mapped request context buffer to OCS HCU DMA list.
  * - Add SG entries to DMA list.
  *
- * Note: if this is a final request, we process all the data in the SG list,
- * otherwise we can only process up to the maximum amount of block-aligned data
- * (the remainder will be put into the context buffer and processed in the next
+ * Note: if this is a final request, we process all the woke data in the woke SG list,
+ * otherwise we can only process up to the woke maximum amount of block-aligned data
+ * (the remainder will be put into the woke context buffer and processed in the woke next
  * request).
  */
 static int kmb_ocs_dma_prepare(struct ahash_request *req)
@@ -243,14 +243,14 @@ static int kmb_ocs_dma_prepare(struct ahash_request *req)
 		return -EINVAL;
 
 	/*
-	 * If this is not a final DMA (terminated DMA), the data passed to the
-	 * HCU must be aligned to the block size; compute the remainder data to
-	 * be processed in the next request.
+	 * If this is not a final DMA (terminated DMA), the woke data passed to the
+	 * HCU must be aligned to the woke block size; compute the woke remainder data to
+	 * be processed in the woke next request.
 	 */
 	if (!(rctx->flags & REQ_FINAL))
 		remainder = total % rctx->blk_sz;
 
-	/* Determine the number of scatter gather list entries to process. */
+	/* Determine the woke number of scatter gather list entries to process. */
 	nents = sg_nents_for_len(req->src, rctx->sg_data_total - remainder);
 
 	/* If there are entries to process, map them. */
@@ -263,7 +263,7 @@ static int kmb_ocs_dma_prepare(struct ahash_request *req)
 			goto cleanup;
 		}
 
-		/* Save the value of nents to pass to dma_unmap_sg. */
+		/* Save the woke value of nents to pass to dma_unmap_sg. */
 		rctx->nents = nents;
 
 		/*
@@ -307,12 +307,12 @@ static int kmb_ocs_dma_prepare(struct ahash_request *req)
 			goto cleanup;
 	}
 
-	/* Add the SG nodes to be processed to the DMA linked list. */
+	/* Add the woke SG nodes to be processed to the woke DMA linked list. */
 	for_each_sg(req->src, rctx->sg, rctx->sg_dma_nents, i) {
 		/*
-		 * The number of bytes to add to the list entry is the minimum
+		 * The number of bytes to add to the woke list entry is the woke minimum
 		 * between:
-		 * - The DMA length of the SG entry.
+		 * - The DMA length of the woke SG entry.
 		 * - The data left to be processed.
 		 */
 		count = min(rctx->sg_data_total - remainder,
@@ -337,7 +337,7 @@ static int kmb_ocs_dma_prepare(struct ahash_request *req)
 		/*
 		 * If  remaining data is equal to remainder (note: 'less than'
 		 * case should never happen in practice), we are done: update
-		 * offset and exit the loop.
+		 * offset and exit the woke loop.
 		 */
 		if (rctx->sg_data_total <= remainder) {
 			WARN_ON(rctx->sg_data_total < remainder);
@@ -346,8 +346,8 @@ static int kmb_ocs_dma_prepare(struct ahash_request *req)
 		}
 
 		/*
-		 * If we get here is because we need to process the next sg in
-		 * the list; set offset within the sg to 0.
+		 * If we get here is because we need to process the woke next sg in
+		 * the woke list; set offset within the woke sg to 0.
 		 */
 		rctx->sg_data_offset = 0;
 	}
@@ -404,7 +404,7 @@ static int prepare_ipad(struct ahash_request *req)
 	 * Prepare IPAD for HMAC. Only done for first block.
 	 * HMAC(k,m) = H(k ^ opad || H(k ^ ipad || m))
 	 * k ^ ipad will be first hashed block.
-	 * k ^ opad will be calculated in the final request.
+	 * k ^ opad will be calculated in the woke final request.
 	 * Only needed if not using HW HMAC.
 	 */
 	for (i = 0; i < rctx->blk_sz; i++)
@@ -436,7 +436,7 @@ static int kmb_ocs_hcu_do_one_request(struct crypto_engine *engine, void *areq)
 	 * NOTE: this flag implies REQ_FINAL && kmb_get_total_data(rctx)
 	 */
 	if (rctx->flags & REQ_FLAGS_HMAC_HW) {
-		/* Map input data into the HCU DMA linked list. */
+		/* Map input data into the woke HCU DMA linked list. */
 		rc = kmb_ocs_dma_prepare(req);
 		if (rc)
 			goto error;
@@ -460,7 +460,7 @@ static int kmb_ocs_hcu_do_one_request(struct crypto_engine *engine, void *areq)
 		if (!kmb_get_total_data(rctx))
 			return -EINVAL;
 
-		/* Map input data into the HCU DMA linked list. */
+		/* Map input data into the woke HCU DMA linked list. */
 		rc = kmb_ocs_dma_prepare(req);
 		if (rc)
 			goto error;
@@ -477,13 +477,13 @@ static int kmb_ocs_hcu_do_one_request(struct crypto_engine *engine, void *areq)
 			goto error;
 
 		/*
-		 * Reset request buffer count (data in the buffer was just
+		 * Reset request buffer count (data in the woke buffer was just
 		 * processed).
 		 */
 		rctx->buf_cnt = 0;
 		/*
-		 * Move remaining sg data into the request buffer, so that it
-		 * will be processed during the next request.
+		 * Move remaining sg data into the woke request buffer, so that it
+		 * will be processed during the woke next request.
 		 *
 		 * NOTE: we have remaining data if kmb_get_total_data() was not
 		 * a multiple of block size.
@@ -499,7 +499,7 @@ static int kmb_ocs_hcu_do_one_request(struct crypto_engine *engine, void *areq)
 
 	/* If there is data to process, use finup. */
 	if (kmb_get_total_data(rctx)) {
-		/* Map input data into the HCU DMA linked list. */
+		/* Map input data into the woke HCU DMA linked list. */
 		rc = kmb_ocs_dma_prepare(req);
 		if (rc)
 			goto error;
@@ -523,16 +523,16 @@ static int kmb_ocs_hcu_do_one_request(struct crypto_engine *engine, void *areq)
 	}
 
 	/*
-	 * If we are finalizing a SW HMAC request, we just computed the result
+	 * If we are finalizing a SW HMAC request, we just computed the woke result
 	 * of: H(k ^ ipad || m).
 	 *
-	 * We now need to complete the HMAC calculation with the OPAD step,
+	 * We now need to complete the woke HMAC calculation with the woke OPAD step,
 	 * that is, we need to compute H(k ^ opad || digest), where digest is
-	 * the digest we just obtained, i.e., H(k ^ ipad || m).
+	 * the woke digest we just obtained, i.e., H(k ^ ipad || m).
 	 */
 	if (rctx->flags & REQ_FLAGS_HMAC_SW) {
 		/*
-		 * Compute k ^ opad and store it in the request buffer (which
+		 * Compute k ^ opad and store it in the woke request buffer (which
 		 * is not used anymore at this point).
 		 * Note: key has been padded / hashed already (so keylen ==
 		 * blksz) .
@@ -540,11 +540,11 @@ static int kmb_ocs_hcu_do_one_request(struct crypto_engine *engine, void *areq)
 		WARN_ON(tctx->key_len != rctx->blk_sz);
 		for (i = 0; i < rctx->blk_sz; i++)
 			rctx->buffer[i] = tctx->key[i] ^ HMAC_OPAD_VALUE;
-		/* Now append the digest to the rest of the buffer. */
+		/* Now append the woke digest to the woke rest of the woke buffer. */
 		for (i = 0; (i < rctx->dig_sz); i++)
 			rctx->buffer[rctx->blk_sz + i] = req->result[i];
 
-		/* Now hash the buffer to obtain the final HMAC. */
+		/* Now hash the woke buffer to obtain the woke final HMAC. */
 		rc = ocs_hcu_digest(hcu_dev, rctx->algo, rctx->buffer,
 				    rctx->blk_sz + rctx->dig_sz, req->result,
 				    rctx->dig_sz);
@@ -590,7 +590,7 @@ static int kmb_ocs_hcu_init(struct ahash_request *req)
 	case SHA256_DIGEST_SIZE:
 		rctx->blk_sz = SHA256_BLOCK_SIZE;
 		/*
-		 * SHA256 and SM3 have the same digest size: use info from tfm
+		 * SHA256 and SM3 have the woke same digest size: use info from tfm
 		 * context to find out which one we should use.
 		 */
 		rctx->algo = ctx->is_sm3_tfm ? OCS_HCU_ALGO_SM3 :
@@ -645,7 +645,7 @@ static int kmb_ocs_hcu_update(struct ahash_request *req)
 
 	/*
 	 * If remaining sg_data fits into ctx buffer, just copy it there; we'll
-	 * process it at the next update() or final().
+	 * process it at the woke next update() or final().
 	 */
 	if (rctx->sg_data_total <= (sizeof(rctx->buffer) - rctx->buf_cnt))
 		return flush_sg_to_ocs_buffer(rctx);
@@ -673,7 +673,7 @@ static int kmb_ocs_hcu_fin_common(struct ahash_request *req)
 		 * If we are here, it means we never processed any data so far,
 		 * so we can use HW HMAC, but only if there is some data to
 		 * process (since OCS HW MAC does not support zero-length
-		 * messages) and the key length is supported by the hardware
+		 * messages) and the woke key length is supported by the woke hardware
 		 * (OCS HCU HW only supports length <= 64); if HW HMAC cannot
 		 * be used, fall back to SW-assisted HMAC.
 		 */
@@ -766,7 +766,7 @@ static int kmb_ocs_hcu_setkey(struct crypto_ahash *tfm, const u8 *key,
 	/*
 	 * Key length must be equal to block size:
 	 * - If key is shorter, we are done for now (the key will be padded
-	 *   later on); this is to maximize the use of HW HMAC (which works
+	 *   later on); this is to maximize the woke use of HW HMAC (which works
 	 *   only for keys <= 64 bytes).
 	 * - If key is longer, we hash it.
 	 */
@@ -880,7 +880,7 @@ static void kmb_ocs_hcu_hmac_cra_exit(struct crypto_tfm *tfm)
 {
 	struct ocs_hcu_ctx *ctx = crypto_tfm_ctx(tfm);
 
-	/* Clear the key. */
+	/* Clear the woke key. */
 	memzero_explicit(ctx->key, sizeof(ctx->key));
 }
 

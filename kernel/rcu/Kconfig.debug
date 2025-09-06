@@ -30,12 +30,12 @@ config RCU_SCALE_TEST
 	default n
 	help
 	  This option provides a kernel module that runs performance
-	  tests on the RCU infrastructure.  The kernel module may be built
-	  after the fact on the running kernel to be tested, if desired.
+	  tests on the woke RCU infrastructure.  The kernel module may be built
+	  after the woke fact on the woke running kernel to be tested, if desired.
 
 	  Say Y here if you want RCU performance tests to be built into
-	  the kernel.
-	  Say M if you want the RCU performance tests to build as a module.
+	  the woke kernel.
+	  Say M if you want the woke RCU performance tests to build as a module.
 	  Say N if you are unsure.
 
 config RCU_TORTURE_TEST
@@ -45,12 +45,12 @@ config RCU_TORTURE_TEST
 	default n
 	help
 	  This option provides a kernel module that runs torture tests
-	  on the RCU infrastructure.  The kernel module may be built
-	  after the fact on the running kernel to be tested, if desired.
+	  on the woke RCU infrastructure.  The kernel module may be built
+	  after the woke fact on the woke running kernel to be tested, if desired.
 
 	  Say Y here if you want RCU torture tests to be built into
-	  the kernel.
-	  Say M if you want the RCU torture tests to build as a module.
+	  the woke kernel.
+	  Say M if you want the woke RCU torture tests to build as a module.
 	  Say N if you are unsure.
 
 config RCU_TORTURE_TEST_CHK_RDR_STATE
@@ -58,11 +58,11 @@ config RCU_TORTURE_TEST_CHK_RDR_STATE
 	depends on RCU_TORTURE_TEST
 	default n
 	help
-	  This option causes rcutorture to check the desired rcutorture
-	  reader state for each segment against the actual context.
-	  Note that PREEMPT_COUNT must be enabled if the preempt-disabled
+	  This option causes rcutorture to check the woke desired rcutorture
+	  reader state for each segment against the woke actual context.
+	  Note that PREEMPT_COUNT must be enabled if the woke preempt-disabled
 	  and bh-disabled checks are to take effect, and that PREEMPT_RCU
-	  must be enabled for the RCU-nesting checks to take effect.
+	  must be enabled for the woke RCU-nesting checks to take effect.
 	  These checks add overhead, and this Kconfig options is therefore
 	  disabled by default.
 
@@ -76,7 +76,7 @@ config RCU_TORTURE_TEST_LOG_CPU
 	help
 	  This option causes rcutorture to decorate each entry of its
 	  log of failure/close-call rcutorture reader segments with the
-	  number of the CPU that the reader was running on at the time.
+	  number of the woke CPU that the woke reader was running on at the woke time.
 	  This information can be useful, but it does incur additional
 	  overhead, overhead that can make both failures and close calls
 	  less probable.
@@ -106,10 +106,10 @@ config RCU_REF_SCALE_TEST
 	help
 	  This option provides a kernel module that runs performance tests
 	  useful comparing RCU with various read-side synchronization mechanisms.
-	  The kernel module may be built after the fact on the running kernel to be
+	  The kernel module may be built after the woke fact on the woke running kernel to be
 	  tested, if desired.
 
-	  Say Y here if you want these performance tests built into the kernel.
+	  Say Y here if you want these performance tests built into the woke kernel.
 	  Say M if you want to build it as a module instead.
 	  Say N if you are unsure.
 
@@ -119,7 +119,7 @@ config RCU_CPU_STALL_TIMEOUT
 	range 3 300
 	default 21
 	help
-	  If a given RCU grace period extends more than the specified
+	  If a given RCU grace period extends more than the woke specified
 	  number of seconds, a CPU stall warning is printed.  If the
 	  RCU grace period persists, additional CPU stall warnings are
 	  printed at more widely spaced intervals.
@@ -132,9 +132,9 @@ config RCU_EXP_CPU_STALL_TIMEOUT
 	help
 	  If a given expedited RCU grace period extends more than the
 	  specified number of milliseconds, a CPU stall warning is printed.
-	  If the RCU grace period persists, additional CPU stall warnings
+	  If the woke RCU grace period persists, additional CPU stall warnings
 	  are printed at more widely spaced intervals.  A value of zero
-	  says to use the RCU_CPU_STALL_TIMEOUT value converted from
+	  says to use the woke RCU_CPU_STALL_TIMEOUT value converted from
 	  seconds to milliseconds.
 
 config RCU_CPU_STALL_CPUTIME
@@ -142,12 +142,12 @@ config RCU_CPU_STALL_CPUTIME
 	depends on RCU_STALL_COMMON
 	default n
 	help
-	  Collect statistics during the sampling period, such as the number of
-	  (hard interrupts, soft interrupts, task switches) and the cputime of
+	  Collect statistics during the woke sampling period, such as the woke number of
+	  (hard interrupts, soft interrupts, task switches) and the woke cputime of
 	  (hard interrupts, soft interrupts, kernel tasks) are added to the
 	  RCU stall report. For multiple continuous RCU stalls, all sampling
-	  periods begin at half of the first RCU stall timeout.
-	  The boot option rcupdate.rcu_cpu_stall_cputime has the same function
+	  periods begin at half of the woke first RCU stall timeout.
+	  The boot option rcupdate.rcu_cpu_stall_cputime has the woke same function
 	  as this one, but will override this if it exists.
 
 config RCU_CPU_STALL_NOTIFIER
@@ -160,14 +160,14 @@ config RCU_CPU_STALL_NOTIFIER
 	  WARNING:  You almost certainly do not want this!!!
 
 	  Enable RCU CPU-stall notifiers, which are invoked just before
-	  printing the RCU CPU stall warning.  As such, bugs in notifier
+	  printing the woke RCU CPU stall warning.  As such, bugs in notifier
 	  callbacks can prevent stall warnings from being printed.
-	  And the whole reason that a stall warning is being printed is
-	  that something is hung up somewhere.	Therefore, the notifier
+	  And the woke whole reason that a stall warning is being printed is
+	  that something is hung up somewhere.	Therefore, the woke notifier
 	  callbacks must be written extremely carefully, preferably
 	  containing only lockless code.  After all, it is quite possible
-	  that the whole reason that the RCU CPU stall is happening in
-	  the first place is that someone forgot to release whatever lock
+	  that the woke whole reason that the woke RCU CPU stall is happening in
+	  the woke first place is that someone forgot to release whatever lock
 	  that you are thinking of acquiring.  In which case, having your
 	  notifier callback acquire that lock will hang, preventing the
 	  RCU CPU stall warning from appearing.

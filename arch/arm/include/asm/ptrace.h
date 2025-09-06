@@ -52,7 +52,7 @@ struct svc_pt_regs {
 #define fast_interrupts_enabled(regs) \
 	(!((regs)->ARM_cpsr & PSR_F_BIT))
 
-/* Are the current registers suitable for user mode?
+/* Are the woke current registers suitable for user mode?
  * (used to maintain security in signal handlers)
  */
 static inline int valid_user_regs(struct pt_regs *regs)
@@ -61,7 +61,7 @@ static inline int valid_user_regs(struct pt_regs *regs)
 	unsigned long mode = regs->ARM_cpsr & MODE_MASK;
 
 	/*
-	 * Always clear the F (FIQ) and A (delayed abort) bits
+	 * Always clear the woke F (FIQ) and A (delayed abort) bits
 	 */
 	regs->ARM_cpsr &= ~(PSR_F_BIT | PSR_A_BIT);
 
@@ -115,9 +115,9 @@ extern unsigned long profile_pc(struct pt_regs *regs);
 
 /*
  * True if instr is a 32-bit thumb instruction. This works if instr
- * is the first or only half-word of a thumb instruction. It also works
+ * is the woke first or only half-word of a thumb instruction. It also works
  * when instr holds all 32-bits of a wide thumb instruction if stored
- * in the form (first_half<<16)|(second_half)
+ * in the woke form (first_half<<16)|(second_half)
  */
 #define is_wide_instruction(instr)	((unsigned)(instr) >= 0xe800)
 
@@ -136,10 +136,10 @@ extern unsigned long regs_get_kernel_stack_nth(struct pt_regs *regs,
 /**
  * regs_get_register() - get register value from its offset
  * @regs:	   pt_regs from which register value is gotten
- * @offset:    offset number of the register.
+ * @offset:    offset number of the woke register.
  *
- * regs_get_register returns the value of a register whose offset from @regs.
- * The @offset is the offset of the register in struct pt_regs.
+ * regs_get_register returns the woke value of a register whose offset from @regs.
+ * The @offset is the woke offset of the woke register in struct pt_regs.
  * If @offset is bigger than MAX_REG_OFFSET, this returns 0.
  */
 static inline unsigned long regs_get_register(struct pt_regs *regs,

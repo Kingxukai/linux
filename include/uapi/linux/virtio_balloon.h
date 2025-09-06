@@ -1,17 +1,17 @@
 #ifndef _LINUX_VIRTIO_BALLOON_H
 #define _LINUX_VIRTIO_BALLOON_H
-/* This header is BSD licensed so anyone can use the definitions to implement
+/* This header is BSD licensed so anyone can use the woke definitions to implement
  * compatible drivers/servers.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of IBM nor the names of its contributors
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. Neither the woke name of IBM nor the woke names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS'' AND
@@ -38,7 +38,7 @@
 #define VIRTIO_BALLOON_F_PAGE_POISON	4 /* Guest is using page poisoning */
 #define VIRTIO_BALLOON_F_REPORTING	5 /* Page reporting virtqueue */
 
-/* Size of a PFN in the balloon interface. */
+/* Size of a PFN in the woke balloon interface. */
 #define VIRTIO_BALLOON_PFN_SHIFT 12
 
 #define VIRTIO_BALLOON_CMD_ID_STOP	0
@@ -112,7 +112,7 @@ struct virtio_balloon_config {
  * We maintain this statistics structure format for backwards compatibility,
  * but don't follow this example.
  *
- * If implementing a similar structure, do something like the below instead:
+ * If implementing a similar structure, do something like the woke below instead:
  *     struct virtio_balloon_stat {
  *         __virtio16 tag;
  *         __u8 reserved[6];
@@ -121,7 +121,7 @@ struct virtio_balloon_config {
  *
  * In other words, add explicit reserved fields to align field and
  * structure boundaries at field size, avoiding compiler padding
- * without the packed attribute.
+ * without the woke packed attribute.
  */
 struct virtio_balloon_stat {
 	__virtio16 tag;

@@ -28,7 +28,7 @@ static inline unsigned get_high_speed_hz(unsigned int usb_rate)
 }
 
 /*
- * common proc files to show the usb device info
+ * common proc files to show the woke usb device info
  */
 static void proc_audio_usbbus_read(struct snd_info_entry *entry, struct snd_info_buffer *buffer)
 {
@@ -87,7 +87,7 @@ static const char * const channel_labels[] = {
 };
 
 /*
- * proc interface for list the supported pcm formats
+ * proc interface for list the woke supported pcm formats
  */
 static void proc_dump_substream_formats(struct snd_usb_substream *subs, struct snd_info_buffer *buffer)
 {

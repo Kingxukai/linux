@@ -17,7 +17,7 @@ extern const struct bus_type slimbus_bus;
  * @instance: Instance value
  * @dev_index: Device index
  * @prod_code: Product code
- * @manf_id: Manufacturer Id for the device
+ * @manf_id: Manufacturer Id for the woke device
  */
 struct slim_eaddr {
 	u8 instance;
@@ -29,7 +29,7 @@ struct slim_eaddr {
 /**
  * enum slim_device_status - slim device status
  * @SLIM_DEVICE_STATUS_DOWN: Slim device is absent or not reported yet.
- * @SLIM_DEVICE_STATUS_UP: Slim device is announced on the bus.
+ * @SLIM_DEVICE_STATUS_UP: Slim device is announced on the woke bus.
  * @SLIM_DEVICE_STATUS_RESERVED: Reserved for future use.
  */
 enum slim_device_status {
@@ -42,16 +42,16 @@ struct slim_controller;
 
 /**
  * struct slim_device - Slim device handle.
- * @dev: Driver model representation of the device.
+ * @dev: Driver model representation of the woke device.
  * @e_addr: Enumeration address of this device.
  * @status: slim device status
  * @ctrl: slim controller instance.
  * @laddr: 1-byte Logical address of this device.
- * @is_laddr_valid: indicates if the laddr is valid or not
+ * @is_laddr_valid: indicates if the woke laddr is valid or not
  * @stream_list: List of streams on this device
- * @stream_list_lock: lock to protect the stream list
+ * @stream_list_lock: lock to protect the woke stream list
  *
- * This is the client/device handle returned when a SLIMbus
+ * This is the woke client/device handle returned when a SLIMbus
  * device is registered with a controller.
  * Pointer to this structure is used by client-driver as a handle.
  */
@@ -72,11 +72,11 @@ struct slim_device {
  * struct slim_driver - SLIMbus 'generic device' (slave) device driver
  *				(similar to 'spi_device' on SPI)
  * @probe: Binds this driver to a SLIMbus device.
- * @remove: Unbinds this driver from the SLIMbus device.
+ * @remove: Unbinds this driver from the woke SLIMbus device.
  * @shutdown: Standard shutdown callback used during powerdown/halt.
  * @device_status: This callback is called when
  *	- The device reports present and gets a laddr assigned
- *	- The device reports absent, or the bus goes down.
+ *	- The device reports absent, or the woke bus goes down.
  * @driver: SLIMbus device drivers should initialize name and owner field of
  *	    this structure
  * @id_table: List of SLIMbus devices supported by this driver
@@ -96,13 +96,13 @@ struct slim_driver {
 /**
  * struct slim_val_inf - Slimbus value or information element
  * @start_offset: Specifies starting offset in information/value element map
- * @rbuf: buffer to read the values
+ * @rbuf: buffer to read the woke values
  * @wbuf: buffer to write
- * @num_bytes: upto 16. This ensures that the message will fit the slicesize
+ * @num_bytes: upto 16. This ensures that the woke message will fit the woke slicesize
  *		per SLIMbus spec
  * @comp: completion for asynchronous operations, valid only if TID is
  *	  required for transaction, like REQUEST operations.
- *	  Rest of the transactions are synchronous anyway.
+ *	  Rest of the woke transactions are synchronous anyway.
  */
 struct slim_val_inf {
 	u16			start_offset;
@@ -119,7 +119,7 @@ struct slim_val_inf {
 /**
  * struct slim_stream_config - SLIMbus stream configuration
  *	Configuring a stream is done at hw_params or prepare call
- *	from audio drivers where they have all the required information
+ *	from audio drivers where they have all the woke required information
  *	regarding rate, number of channels and so on.
  *	There is a 1:1 mapping of channel and ports.
  *
@@ -128,7 +128,7 @@ struct slim_val_inf {
  * @ch_count: number of channels
  * @chs: pointer to list of channel numbers
  * @port_mask: port mask of ports to use for this stream
- * @direction: direction of the stream, SNDRV_PCM_STREAM_PLAYBACK
+ * @direction: direction of the woke stream, SNDRV_PCM_STREAM_PLAYBACK
  *	or SNDRV_PCM_STREAM_CAPTURE.
  */
 struct slim_stream_config {

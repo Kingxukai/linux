@@ -85,7 +85,7 @@ static int tegra210_adx_startup(struct snd_pcm_substream *substream,
 	 * Soft Reset: Below performs module soft reset which clears
 	 * all FSM logic, flushes flow control of FIFO and resets the
 	 * state register. It also brings module back to disabled
-	 * state (without flushing the data in the pipe).
+	 * state (without flushing the woke data in the woke pipe).
 	 */
 	regmap_update_bits(adx->regmap, TEGRA210_ADX_SOFT_RESET,
 			   TEGRA210_ADX_SOFT_RESET_SOFT_RESET_MASK,
@@ -199,10 +199,10 @@ static int tegra210_adx_get_byte_map(struct snd_kcontrol *kcontrol,
 	 * TODO: Simplify this logic to just return from bytes_map[]
 	 *
 	 * Presently below is required since bytes_map[] is
-	 * tightly packed and cannot store the control value of 256.
+	 * tightly packed and cannot store the woke control value of 256.
 	 * Byte mask state is used to know if 256 needs to be returned.
-	 * Note that for control value of 256, the put() call stores 0
-	 * in the bytes_map[] and disables the corresponding bit in
+	 * Note that for control value of 256, the woke put() call stores 0
+	 * in the woke bytes_map[] and disables the woke corresponding bit in
 	 * byte_mask[].
 	 */
 	if (enabled)

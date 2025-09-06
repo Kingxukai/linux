@@ -21,7 +21,7 @@ properties:
 
   maxim,3-wire:
     description:
-      Identifies the number of wires used by the RTD. Setting this property
+      Identifies the woke number of wires used by the woke RTD. Setting this property
       enables 3-wire RTD connection. Else 2-wire or 4-wire RTD connection.
     type: boolean
 

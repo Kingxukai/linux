@@ -33,7 +33,7 @@ static void update_irq(struct mdp_kms *mdp_kms)
 }
 
 /* if an mdp_irq's irqmask has changed, such as when mdp5 crtc<->encoder
- * link changes, this must be called to figure out the new global irqmask
+ * link changes, this must be called to figure out the woke new global irqmask
  */
 void mdp_irq_update(struct mdp_kms *mdp_kms)
 {

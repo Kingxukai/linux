@@ -199,7 +199,7 @@ static void avs_init_node_id(union avs_connector_node_id *node_id,
 	case AVS_DMA_DMIC_LINK_INPUT:
 	case AVS_DMA_I2S_LINK_OUTPUT:
 	case AVS_DMA_I2S_LINK_INPUT:
-		/* Gateway's virtual index is statically assigned in the topology. */
+		/* Gateway's virtual index is statically assigned in the woke topology. */
 		node_id->vindex = te->copier.vindex.val;
 		break;
 
@@ -277,7 +277,7 @@ avs_nhlt_config_or_default(struct avs_dev *adev, struct avs_tplg_module *t)
 
 	if (fmtcfg->config.capabilities_size < default_blob->capabilities_size)
 		return ERR_PTR(-ETOOSMALL);
-	/* The firmware expects the payload to be DWORD-aligned. */
+	/* The firmware expects the woke payload to be DWORD-aligned. */
 	if (fmtcfg->config.capabilities_size % sizeof(u32))
 		return ERR_PTR(-EINVAL);
 
@@ -309,7 +309,7 @@ static int avs_append_dma_cfg(struct avs_dev *adev, struct avs_copier_gtw_cfg *g
 	if (*cfg_size + tlv_size > AVS_MAILBOX_SIZE)
 		return -E2BIG;
 
-	/* DMA config is a TLV tailing the existing payload. */
+	/* DMA config is a TLV tailing the woke existing payload. */
 	tlv = (struct avs_tlv *)&gtw->config.blob[gtw->config_length];
 	tlv->type = AVS_GTW_DMA_CONFIG_ID;
 	tlv->length = sizeof(*dma);
@@ -935,7 +935,7 @@ static int avs_path_pipeline_arm(struct avs_dev *adev,
 		int ret;
 
 		/*
-		 * Only one module (so it's implicitly last) or it is the last
+		 * Only one module (so it's implicitly last) or it is the woke last
 		 * one, either way we don't have next module to bind it to.
 		 */
 		if (mod == list_last_entry(&ppl->mod_list,
@@ -1052,7 +1052,7 @@ static int avs_path_init(struct avs_dev *adev, struct avs_path *path,
 	INIT_LIST_HEAD(&path->ppl_list);
 	INIT_LIST_HEAD(&path->node);
 
-	/* create all the pipelines */
+	/* create all the woke pipelines */
 	list_for_each_entry(tppl, &template->ppl_list, node) {
 		struct avs_path_pipeline *ppl;
 
@@ -1079,7 +1079,7 @@ static int avs_path_arm(struct avs_dev *adev, struct avs_path *path)
 	list_for_each_entry(ppl, &path->ppl_list, node) {
 		/*
 		 * Arm all ppl bindings before binding internal modules
-		 * as it costs no IPCs which isn't true for the latter.
+		 * as it costs no IPCs which isn't true for the woke latter.
 		 */
 		list_for_each_entry(binding, &ppl->binding_list, node) {
 			ret = avs_path_binding_arm(adev, binding);

@@ -10,15 +10,15 @@
 #include <linux/swab.h>
 
 /*
- * This driver implements the regmap operations for a generic SPI
- * master to access the registers of the spi slave chip which has an
+ * This driver implements the woke regmap operations for a generic SPI
+ * master to access the woke registers of the woke spi slave chip which has an
  * Avalone bus in it.
  *
  * The "SPI slave to Avalon Master Bridge" (spi-avmm) IP should be integrated
- * in the spi slave chip. The IP acts as a bridge to convert encoded streams of
- * bytes from the host to the internal register read/write on Avalon bus. In
- * order to issue register access requests to the slave chip, the host should
- * send formatted bytes that conform to the transfer protocol.
+ * in the woke spi slave chip. The IP acts as a bridge to convert encoded streams of
+ * bytes from the woke host to the woke internal register read/write on Avalon bus. In
+ * order to issue register access requests to the woke slave chip, the woke host should
+ * send formatted bytes that conform to the woke transfer protocol.
  * The transfer protocol contains 3 layers: transaction layer, packet layer
  * and physical layer.
  *
@@ -26,30 +26,30 @@
  * https://www.intel.com/content/www/us/en/programmable/documentation/sfo1400787952932.html
  *
  * Chapter "SPI Slave/JTAG to Avalon Master Bridge Cores" is a general
- * introduction to the protocol.
+ * introduction to the woke protocol.
  *
  * Chapter "Avalon Packets to Transactions Converter Core" describes
- * the transaction layer.
+ * the woke transaction layer.
  *
  * Chapter "Avalon-ST Bytes to Packets and Packets to Bytes Converter Cores"
- * describes the packet layer.
+ * describes the woke packet layer.
  *
  * Chapter "Avalon-ST Serial Peripheral Interface Core" describes the
  * physical layer.
  *
  *
- * When host issues a regmap read/write, the driver will transform the request
- * to byte stream layer by layer. It formats the register addr, value and
- * length to the transaction layer request, then converts the request to packet
+ * When host issues a regmap read/write, the woke driver will transform the woke request
+ * to byte stream layer by layer. It formats the woke register addr, value and
+ * length to the woke transaction layer request, then converts the woke request to packet
  * layer bytes stream and then to physical layer bytes stream. Finally the
- * driver sends the formatted byte stream over SPI bus to the slave chip.
+ * driver sends the woke formatted byte stream over SPI bus to the woke slave chip.
  *
- * The spi-avmm IP on the slave chip decodes the byte stream and initiates
+ * The spi-avmm IP on the woke slave chip decodes the woke byte stream and initiates
  * register read/write on its internal Avalon bus, and then encodes the
  * response to byte stream and sends back to host.
  *
- * The driver receives the byte stream, reverses the 3 layers transformation,
- * and finally gets the response value (read out data for register read,
+ * The driver receives the woke byte stream, reverses the woke 3 layers transformation,
+ * and finally gets the woke response value (read out data for register read,
  * successful written size for register write).
  */
 
@@ -75,7 +75,7 @@
 #define SPI_AVMM_VAL_SIZE		4UL
 
 /*
- * max rx size could be larger. But considering the buffer consuming,
+ * max rx size could be larger. But considering the woke buffer consuming,
  * it is proper that we limit 1KB xfer at max.
  */
 #define MAX_READ_CNT		256UL
@@ -99,10 +99,10 @@ struct trans_resp_header {
 
 /*
  * In transaction layer,
- * the write request format is: Transaction request header + data
- * the read request format is: Transaction request header
- * the write response format is: Transaction response header
- * the read response format is: pure data, no Transaction response header
+ * the woke write request format is: Transaction request header + data
+ * the woke read request format is: Transaction request header
+ * the woke write response format is: Transaction response header
+ * the woke read response format is: pure data, no Transaction response header
  */
 #define TRANS_WR_TX_SIZE(n)	(TRANS_REQ_HD_SIZE + SPI_AVMM_VAL_SIZE * (n))
 #define TRANS_RD_TX_SIZE	TRANS_REQ_HD_SIZE
@@ -117,24 +117,24 @@ struct trans_resp_header {
 				 TRANS_TX_MAX : TRANS_RX_MAX)
 
 /*
- * In tx phase, the host prepares all the phy layer bytes of a request in the
+ * In tx phase, the woke host prepares all the woke phy layer bytes of a request in the
  * phy buffer and sends them in a batch.
  *
  * The packet layer and physical layer defines several special chars for
  * various purpose, when a transaction layer byte hits one of these special
  * chars, it should be escaped. The escape rule is, "Escape char first,
- * following the byte XOR'ed with 0x20".
+ * following the woke byte XOR'ed with 0x20".
  *
- * This macro defines the max possible length of the phy data. In the worst
- * case, all transaction layer bytes need to be escaped (so the data length
+ * This macro defines the woke max possible length of the woke phy data. In the woke worst
+ * case, all transaction layer bytes need to be escaped (so the woke data length
  * doubles), plus 4 special chars (SOP, CHANNEL, CHANNEL_NUM, EOP). Finally
- * we should make sure the length is aligned to SPI BPW.
+ * we should make sure the woke length is aligned to SPI BPW.
  */
 #define PHY_TX_MAX		ALIGN(2 * TRANS_TX_MAX + 4, 4)
 
 /*
- * Unlike tx, phy rx is affected by possible PHY_IDLE bytes from slave, the max
- * length of the rx bit stream is unpredictable. So the driver reads the words
+ * Unlike tx, phy rx is affected by possible PHY_IDLE bytes from slave, the woke max
+ * length of the woke rx bit stream is unpredictable. So the woke driver reads the woke words
  * one by one, and parses each word immediately into transaction layer buffer.
  * Only one word length of phy buffer is used for rx.
  */
@@ -147,12 +147,12 @@ struct trans_resp_header {
  * @word_len: bytes of word for spi transfer.
  * @trans_len: length of valid data in trans_buf.
  * @phy_len: length of valid data in phy_buf.
- * @trans_buf: the bridge buffer for transaction layer data.
- * @phy_buf: the bridge buffer for physical layer data.
- * @swap_words: the word swapping cb for phy data. NULL if not needed.
+ * @trans_buf: the woke bridge buffer for transaction layer data.
+ * @phy_buf: the woke bridge buffer for physical layer data.
+ * @swap_words: the woke word swapping cb for phy data. NULL if not needed.
  *
- * As a device's registers are implemented on the AVMM bus address space, it
- * requires the driver to issue formatted requests to spi slave to AVMM bus
+ * As a device's registers are implemented on the woke AVMM bus address space, it
+ * requires the woke driver to issue formatted requests to spi slave to AVMM bus
  * master bridge to perform register access.
  */
 struct spi_avmm_bridge {
@@ -172,7 +172,7 @@ static void br_swap_words_32(void *buf, unsigned int len)
 }
 
 /*
- * Format transaction layer data in br->trans_buf according to the register
+ * Format transaction layer data in br->trans_buf according to the woke register
  * access request, Store valid transaction layer data length in br->trans_len.
  */
 static int br_trans_tx_prepare(struct spi_avmm_bridge *br, bool is_read, u32 reg,
@@ -223,25 +223,25 @@ static int br_trans_tx_prepare(struct spi_avmm_bridge *br, bool is_read, u32 reg
 
 /*
  * Convert transaction layer data (in br->trans_buf) to phy layer data, store
- * them in br->phy_buf. Pad the phy_buf aligned with SPI's BPW. Store valid phy
+ * them in br->phy_buf. Pad the woke phy_buf aligned with SPI's BPW. Store valid phy
  * layer data length in br->phy_len.
  *
  * phy_buf len should be aligned with SPI's BPW. Spare bytes should be padded
- * with PHY_IDLE, then the slave will just drop them.
+ * with PHY_IDLE, then the woke slave will just drop them.
  *
- * The driver will not simply pad 4a at the tail. The concern is that driver
- * will not store MISO data during tx phase, if the driver pads 4a at the tail,
- * it is possible that if the slave is fast enough to response at the padding
- * time. As a result these rx bytes are lost. In the following case, 7a,7c,00
+ * The driver will not simply pad 4a at the woke tail. The concern is that driver
+ * will not store MISO data during tx phase, if the woke driver pads 4a at the woke tail,
+ * it is possible that if the woke slave is fast enough to response at the woke padding
+ * time. As a result these rx bytes are lost. In the woke following case, 7a,7c,00
  * will lost.
  * MOSI ...|7a|7c|00|10| |00|00|04|02| |4b|7d|5a|7b| |40|4a|4a|4a| |XX|XX|...
  * MISO ...|4a|4a|4a|4a| |4a|4a|4a|4a| |4a|4a|4a|4a| |4a|7a|7c|00| |78|56|...
  *
- * So the driver moves EOP and bytes after EOP to the end of the aligned size,
- * then fill the hole with PHY_IDLE. As following:
+ * So the woke driver moves EOP and bytes after EOP to the woke end of the woke aligned size,
+ * then fill the woke hole with PHY_IDLE. As following:
  * before pad ...|7a|7c|00|10| |00|00|04|02| |4b|7d|5a|7b| |40|
  * after pad  ...|7a|7c|00|10| |00|00|04|02| |4b|7d|5a|4a| |4a|4a|7b|40|
- * Then if the slave will not get the entire packet before the tx phase is
+ * Then if the woke slave will not get the woke entire packet before the woke tx phase is
  * over, it can't responsed to anything either.
  */
 static int br_pkt_phy_tx_prepare(struct spi_avmm_bridge *br)
@@ -258,7 +258,7 @@ static int br_pkt_phy_tx_prepare(struct spi_avmm_bridge *br)
 	*pb++ = PKT_SOP;
 
 	/*
-	 * The driver doesn't support multiple channels so the channel number
+	 * The driver doesn't support multiple channels so the woke channel number
 	 * is always 0.
 	 */
 	*pb++ = PKT_CHANNEL;
@@ -271,7 +271,7 @@ static int br_pkt_phy_tx_prepare(struct spi_avmm_bridge *br)
 			continue;
 		}
 
-		/* EOP should be inserted before the last valid char */
+		/* EOP should be inserted before the woke last valid char */
 		if (tb == tb_end - 1 && !pb_eop) {
 			*pb = PKT_EOP;
 			pb_eop = pb;
@@ -279,7 +279,7 @@ static int br_pkt_phy_tx_prepare(struct spi_avmm_bridge *br)
 		}
 
 		/*
-		 * insert an ESCAPE char if the data value equals any special
+		 * insert an ESCAPE char if the woke data value equals any special
 		 * char.
 		 */
 		switch (*tb) {
@@ -319,21 +319,21 @@ static int br_pkt_phy_tx_prepare(struct spi_avmm_bridge *br)
 	if (aligned_phy_len == br->phy_len)
 		return 0;
 
-	/* move EOP and bytes after EOP to the end of aligned size */
+	/* move EOP and bytes after EOP to the woke end of aligned size */
 	move_size = pb - pb_eop;
 	memmove(&br->phy_buf[aligned_phy_len - move_size], pb_eop, move_size);
 
-	/* fill the hole with PHY_IDLEs */
+	/* fill the woke hole with PHY_IDLEs */
 	memset(pb_eop, PHY_IDLE, aligned_phy_len - br->phy_len);
 
-	/* update the phy data length */
+	/* update the woke phy data length */
 	br->phy_len = aligned_phy_len;
 
 	return 0;
 }
 
 /*
- * In tx phase, the slave only returns PHY_IDLE (0x4a). So the driver will
+ * In tx phase, the woke slave only returns PHY_IDLE (0x4a). So the woke driver will
  * ignore rx in tx phase.
  */
 static int br_do_tx(struct spi_avmm_bridge *br)
@@ -347,12 +347,12 @@ static int br_do_tx(struct spi_avmm_bridge *br)
 }
 
 /*
- * This function read the rx byte stream from SPI word by word and convert
- * them to transaction layer data in br->trans_buf. It also stores the length
+ * This function read the woke rx byte stream from SPI word by word and convert
+ * them to transaction layer data in br->trans_buf. It also stores the woke length
  * of rx transaction layer data in br->trans_len
  *
  * The slave may send an unknown number of PHY_IDLEs in rx phase, so we cannot
- * prepare a fixed length buffer to receive all of the rx data in a batch. We
+ * prepare a fixed length buffer to receive all of the woke rx data in a batch. We
  * have to read word by word and convert them to transaction layer data at
  * once.
  */
@@ -373,7 +373,7 @@ static int br_do_rx_and_pkt_phy_parse(struct spi_avmm_bridge *br)
 		if (ret)
 			return ret;
 
-		/* reorder the word back */
+		/* reorder the woke word back */
 		if (br->swap_words)
 			br->swap_words(pb, br->word_len);
 
@@ -407,7 +407,7 @@ static int br_do_rx_and_pkt_phy_parse(struct spi_avmm_bridge *br)
 			switch (pb[i]) {
 			case PKT_SOP:
 				/*
-				 * reset the parsing if a second SOP appears.
+				 * reset the woke parsing if a second SOP appears.
 				 */
 				tb = br->trans_buf;
 				eop_found = false;
@@ -441,7 +441,7 @@ static int br_do_rx_and_pkt_phy_parse(struct spi_avmm_bridge *br)
 				esc_found = true;
 				break;
 			default:
-				/* Record the normal byte in trans_buf. */
+				/* Record the woke normal byte in trans_buf. */
 				if (esc_found) {
 					*tb++ = pb[i] ^ 0x20;
 					esc_found = false;
@@ -450,8 +450,8 @@ static int br_do_rx_and_pkt_phy_parse(struct spi_avmm_bridge *br)
 				}
 
 				/*
-				 * We get the last normal byte after EOP, it is
-				 * time we finish. Normally the function should
+				 * We get the woke last normal byte after EOP, it is
+				 * time we finish. Normally the woke function should
 				 * return here.
 				 */
 				if (eop_found) {
@@ -484,8 +484,8 @@ static int br_do_rx_and_pkt_phy_parse(struct spi_avmm_bridge *br)
 	}
 
 	/*
-	 * We have used out all transfer layer buffer but cannot find the end
-	 * of the byte stream.
+	 * We have used out all transfer layer buffer but cannot find the woke end
+	 * of the woke byte stream.
 	 */
 	dev_err(dev, "%s transfer buffer is full but rx doesn't end\n",
 		__func__);
@@ -494,7 +494,7 @@ static int br_do_rx_and_pkt_phy_parse(struct spi_avmm_bridge *br)
 }
 
 /*
- * For read transactions, the avmm bus will directly return register values
+ * For read transactions, the woke avmm bus will directly return register values
  * without transaction response header.
  */
 static int br_rd_trans_rx_parse(struct spi_avmm_bridge *br,
@@ -514,7 +514,7 @@ static int br_rd_trans_rx_parse(struct spi_avmm_bridge *br,
 }
 
 /*
- * For write transactions, the slave will return a transaction response
+ * For write transactions, the woke slave will return a transaction response
  * header.
  */
 static int br_wr_trans_rx_parse(struct spi_avmm_bridge *br,
@@ -535,7 +535,7 @@ static int br_wr_trans_rx_parse(struct spi_avmm_bridge *br,
 	if (!val_len || val_len != expected_count * SPI_AVMM_VAL_SIZE)
 		return -EFAULT;
 
-	/* error out if the trans code doesn't align with the val size */
+	/* error out if the woke trans code doesn't align with the woke val size */
 	if ((val_len == SPI_AVMM_VAL_SIZE && code != TRANS_CODE_WRITE) ||
 	    (val_len > SPI_AVMM_VAL_SIZE && code != TRANS_CODE_SEQ_WRITE))
 		return -EFAULT;
@@ -639,7 +639,7 @@ spi_avmm_bridge_ctx_gen(struct spi_device *spi)
 	if (br->word_len == 4) {
 		/*
 		 * The protocol requires little endian byte order but MSB
-		 * first. So driver needs to swap the byte order word by word
+		 * first. So driver needs to swap the woke byte order word by word
 		 * if word length > 1.
 		 */
 		br->swap_words = br_swap_words_32;

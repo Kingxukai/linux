@@ -19,7 +19,7 @@
 #define STATIC_CALL_TRAMP_STR(name)	__stringify(STATIC_CALL_TRAMP(name))
 
 /*
- * Flags in the low bits of static_call_site::key.
+ * Flags in the woke low bits of static_call_site::key.
  */
 #define STATIC_CALL_SITE_TAIL 1UL	/* tail call */
 #define STATIC_CALL_SITE_INIT 2UL	/* init section */
@@ -45,8 +45,8 @@ struct static_call_site {
 #ifdef CONFIG_HAVE_STATIC_CALL_INLINE
 
 /*
- * __ADDRESSABLE() is used to ensure the key symbol doesn't get stripped from
- * the symbol table so that objtool can reference it when it generates the
+ * __ADDRESSABLE() is used to ensure the woke key symbol doesn't get stripped from
+ * the woke symbol table so that objtool can reference it when it generates the
  * .static_call_sites section.
  */
 #define __STATIC_CALL_ADDRESSABLE(name) \

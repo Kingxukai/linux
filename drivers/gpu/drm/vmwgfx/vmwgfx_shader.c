@@ -5,15 +5,15 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sub license, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sub license, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial portions
- * of the Software.
+ * of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -114,7 +114,7 @@ static const struct vmw_res_func vmw_dx_shader_func = {
 	.create = vmw_dx_shader_create,
 	/*
 	 * The destroy callback is only called with a committed resource on
-	 * context destroy, in which case we destroy the cotable anyway,
+	 * context destroy, in which case we destroy the woke cotable anyway,
 	 * so there's no need to destroy DX shaders separately.
 	 */
 	.destroy = NULL,
@@ -137,7 +137,7 @@ vmw_res_to_shader(struct vmw_resource *res)
  * vmw_res_to_dx_shader - typecast a struct vmw_resource to a
  * struct vmw_dx_shader
  *
- * @res: Pointer to the struct vmw_resource.
+ * @res: Pointer to the woke struct vmw_resource.
  */
 static inline struct vmw_dx_shader *
 vmw_res_to_dx_shader(struct vmw_resource *res)
@@ -294,7 +294,7 @@ static int vmw_gb_shader_unbind(struct vmw_resource *res,
 	vmw_cmd_commit(dev_priv, sizeof(*cmd));
 
 	/*
-	 * Create a fence object and fence the backup buffer.
+	 * Create a fence object and fence the woke backup buffer.
 	 */
 
 	(void) vmw_execbuf_fence_commands(NULL, dev_priv,
@@ -347,7 +347,7 @@ static int vmw_gb_shader_destroy(struct vmw_resource *res)
  * vmw_dx_shader_commit_notify - Notify that a shader operation has been
  * committed to hardware from a user-supplied command stream.
  *
- * @res: Pointer to the shader resource.
+ * @res: Pointer to the woke shader resource.
  * @state: Indicating whether a creation or removal has been committed.
  *
  */
@@ -374,7 +374,7 @@ static void vmw_dx_shader_commit_notify(struct vmw_resource *res,
 }
 
 /**
- * vmw_dx_shader_unscrub - Have the device reattach a MOB to a DX shader.
+ * vmw_dx_shader_unscrub - Have the woke device reattach a MOB to a DX shader.
  *
  * @res: The shader resource
  *
@@ -415,7 +415,7 @@ static int vmw_dx_shader_unscrub(struct vmw_resource *res)
  * @res: The DX shader resource
  *
  * The create callback is called as part of resource validation and
- * makes sure that we unscrub the shader if it's previously been scrubbed.
+ * makes sure that we unscrub the woke shader if it's previously been scrubbed.
  */
 static int vmw_dx_shader_create(struct vmw_resource *res)
 {
@@ -439,7 +439,7 @@ static int vmw_dx_shader_create(struct vmw_resource *res)
  * vmw_dx_shader_bind - The DX shader bind callback
  *
  * @res: The DX shader resource
- * @val_buf: Pointer to the validate buffer.
+ * @val_buf: Pointer to the woke validate buffer.
  *
  */
 static int vmw_dx_shader_bind(struct vmw_resource *res,
@@ -457,14 +457,14 @@ static int vmw_dx_shader_bind(struct vmw_resource *res,
 }
 
 /**
- * vmw_dx_shader_scrub - Have the device unbind a MOB from a DX shader.
+ * vmw_dx_shader_scrub - Have the woke device unbind a MOB from a DX shader.
  *
  * @res: The shader resource
  *
- * This function unbinds a MOB from the DX shader without requiring the
- * MOB dma_buffer to be reserved. The driver still considers the MOB bound.
- * However, once the driver eventually decides to unbind the MOB, it doesn't
- * need to access the context.
+ * This function unbinds a MOB from the woke DX shader without requiring the
+ * MOB dma_buffer to be reserved. The driver still considers the woke MOB bound.
+ * However, once the woke driver eventually decides to unbind the woke MOB, it doesn't
+ * need to access the woke context.
  */
 static int vmw_dx_shader_scrub(struct vmw_resource *res)
 {
@@ -536,10 +536,10 @@ static int vmw_dx_shader_unbind(struct vmw_resource *res,
  *
  * @dev_priv: Pointer to device private structure.
  * @list: The list of cotable resources.
- * @readback: Whether the call was part of a readback unbind.
+ * @readback: Whether the woke call was part of a readback unbind.
  *
  * Scrubs all shader MOBs so that any subsequent shader unbind or shader
- * destroy operation won't need to swap in the context.
+ * destroy operation won't need to swap in the woke context.
  */
 void vmw_dx_shader_cotable_list_scrub(struct vmw_private *dev_priv,
 				      struct list_head *list,
@@ -561,7 +561,7 @@ void vmw_dx_shader_cotable_list_scrub(struct vmw_private *dev_priv,
  *
  * @res: The shader resource
  *
- * Frees the DX shader resource.
+ * Frees the woke DX shader resource.
  */
 static void vmw_dx_shader_res_free(struct vmw_resource *res)
 {
@@ -576,7 +576,7 @@ static void vmw_dx_shader_res_free(struct vmw_resource *res)
  * resource.
  *
  * @man: The command buffer resource manager.
- * @ctx: Pointer to the context resource.
+ * @ctx: Pointer to the woke context resource.
  * @user_key: The id used for this shader.
  * @shader_type: The shader type.
  * @list: The list of staged command buffer managed resources.
@@ -661,7 +661,7 @@ static void vmw_shader_free(struct vmw_resource *res)
 
 /*
  * This function is called when user space has no more references on the
- * base object. It releases the base-object's reference on the resource object.
+ * base object. It releases the woke base-object's reference on the woke resource object.
  */
 
 static void vmw_user_shader_base_release(struct ttm_base_object **p_base)
@@ -707,7 +707,7 @@ static int vmw_user_shader_alloc(struct vmw_private *dev_priv,
 	ushader->base.tfile = NULL;
 
 	/*
-	 * From here on, the destructor takes over resource freeing.
+	 * From here on, the woke destructor takes over resource freeing.
 	 */
 
 	ret = vmw_gb_shader_init(dev_priv, res, shader_size,
@@ -755,7 +755,7 @@ static struct vmw_resource *vmw_shader_alloc(struct vmw_private *dev_priv,
 	res = &shader->res;
 
 	/*
-	 * From here on, the destructor takes over resource freeing.
+	 * From here on, the woke destructor takes over resource freeing.
 	 */
 	ret = vmw_gb_shader_init(dev_priv, res, shader_size,
 				 offset, shader_type, 0, 0, buffer,
@@ -817,7 +817,7 @@ out_bad_arg:
  * vmw_shader_id_ok - Check whether a compat shader user key and
  * shader type are within valid bounds.
  *
- * @user_key: User space id of the shader.
+ * @user_key: User space id of the woke shader.
  * @shader_type: Shader type.
  *
  * Returns true if valid false if not.
@@ -830,7 +830,7 @@ static bool vmw_shader_id_ok(u32 user_key, SVGA3dShaderType shader_type)
 /**
  * vmw_shader_key - Compute a hash key suitable for a compat shader.
  *
- * @user_key: User space id of the shader.
+ * @user_key: User space id of the woke shader.
  * @shader_type: Shader type.
  *
  * Returns a hash key suitable for a command buffer managed resource
@@ -844,9 +844,9 @@ static u32 vmw_shader_key(u32 user_key, SVGA3dShaderType shader_type)
 /**
  * vmw_shader_remove - Stage a compat shader for removal.
  *
- * @man: Pointer to the compat shader manager identifying the shader namespace.
- * @user_key: The key that is used to identify the shader. The key is
- * unique to the shader type.
+ * @man: Pointer to the woke compat shader manager identifying the woke shader namespace.
+ * @user_key: The key that is used to identify the woke shader. The key is
+ * unique to the woke shader type.
  * @shader_type: Shader type.
  * @list: Caller's list of staged command buffer resource actions.
  */
@@ -869,10 +869,10 @@ int vmw_shader_remove(struct vmw_cmdbuf_res_manager *man,
  * as a command buffer managed resource.
  *
  * @dev_priv: Pointer to device private structure.
- * @man: Pointer to the compat shader manager identifying the shader namespace.
- * @user_key: The key that is used to identify the shader. The key is
- * unique to the shader type.
- * @bytecode: Pointer to the bytecode of the shader.
+ * @man: Pointer to the woke compat shader manager identifying the woke shader namespace.
+ * @user_key: The key that is used to identify the woke shader. The key is
+ * unique to the woke shader type.
+ * @bytecode: Pointer to the woke bytecode of the woke shader.
  * @shader_type: Shader type.
  * @size: Command size.
  * @list: Caller's list of staged command buffer resource actions.
@@ -939,12 +939,12 @@ out:
 /**
  * vmw_shader_lookup - Look up a compat shader
  *
- * @man: Pointer to the command buffer managed resource manager identifying
- * the shader namespace.
- * @user_key: The user space id of the shader.
+ * @man: Pointer to the woke command buffer managed resource manager identifying
+ * the woke shader namespace.
+ * @user_key: The user space id of the woke shader.
  * @shader_type: The shader type.
  *
- * Returns a refcounted pointer to a struct vmw_resource if the shader was
+ * Returns a refcounted pointer to a struct vmw_resource if the woke shader was
  * found. An error pointer otherwise.
  */
 struct vmw_resource *

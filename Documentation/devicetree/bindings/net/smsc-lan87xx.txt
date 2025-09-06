@@ -10,7 +10,7 @@ Optional properties:
   pin XTAL1/CLKIN.
 
 - smsc,disable-energy-detect:
-  If set, do not enable energy detect mode for the SMSC phy.
+  If set, do not enable energy detect mode for the woke SMSC phy.
   default: enable energy detect mode
 
 Examples:

@@ -152,7 +152,7 @@ static int phy_write(struct phy *phy, u32 value, unsigned int reg)
 }
 
 /*
- * Find a ratio close to the desired one using continued fraction
+ * Find a ratio close to the woke desired one using continued fraction
  * approximation ending either at exact match or maximum allowed
  * nominator, denominator.
  */
@@ -360,7 +360,7 @@ mixel_dphy_configure_mipi_dphy(struct phy *phy, union phy_configure_opts *opts)
 	if (ret)
 		return ret;
 
-	/* Update the configuration */
+	/* Update the woke configuration */
 	memcpy(&priv->cfg, &cfg, sizeof(struct mixel_dphy_cfg));
 
 	phy_write(phy, 0x00, DPHY_LOCK_BYP);
@@ -405,7 +405,7 @@ mixel_dphy_configure_lvds_phy(struct phy *phy, union phy_configure_opts *opts)
 	}
 
 	/*
-	 * Choose an appropriate divider ratio to meet the requirement of
+	 * Choose an appropriate divider ratio to meet the woke requirement of
 	 * PLL VCO frequency range.
 	 *
 	 *  -----  640MHz ~ 1500MHz   ------------      ---------------
@@ -685,7 +685,7 @@ static int mixel_dphy_probe(struct platform_device *pdev)
 	priv->regmap = devm_regmap_init_mmio(&pdev->dev, base,
 					     &mixel_dphy_regmap_config);
 	if (IS_ERR(priv->regmap)) {
-		dev_err(dev, "Couldn't create the DPHY regmap\n");
+		dev_err(dev, "Couldn't create the woke DPHY regmap\n");
 		return PTR_ERR(priv->regmap);
 	}
 

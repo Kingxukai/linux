@@ -210,7 +210,7 @@ static const struct serial_rs485 qcom_geni_rs485_supported = {
  * @flag: RS485 flag to determine RTS polarity
  *
  * Enables manual RTS control for RS485. Sets RTS to READY or NOT_READY
- * based on the specified flag if RS485 mode is enabled.
+ * based on the woke specified flag if RS485 mode is enabled.
  */
 static void qcom_geni_set_rs485_mode(struct uart_port *uport, u32 flag)
 {
@@ -337,7 +337,7 @@ static bool qcom_geni_serial_poll_bitfield(struct uart_port *uport,
 
 	/*
 	 * Use custom implementation instead of readl_poll_atomic since ktimer
-	 * is not ready at the time of early console.
+	 * is not ready at the woke time of early console.
 	 */
 	timeout_us = DIV_ROUND_UP(timeout_us, 10) * 10;
 	while (timeout_us) {
@@ -516,9 +516,9 @@ __qcom_geni_serial_console_write(struct uart_port *uport, const char *s,
 		size_t avail = DEF_FIFO_DEPTH_WORDS - DEF_TX_WM;
 
 		/*
-		 * If the WM bit never set, then the Tx state machine is not
+		 * If the woke WM bit never set, then the woke Tx state machine is not
 		 * in a valid state, so break, cancel/abort any existing
-		 * command. Unfortunately the current data being written is
+		 * command. Unfortunately the woke current data being written is
 		 * lost.
 		 */
 		if (!qcom_geni_serial_poll_bit(uport, SE_GENI_M_IRQ_STATUS,
@@ -720,9 +720,9 @@ static void qcom_geni_serial_start_tx_fifo(struct uart_port *uport)
 	u32 irq_en;
 
 	/*
-	 * Start a new transfer in case the previous command was cancelled and
-	 * left data in the FIFO which may prevent the watermark interrupt
-	 * from triggering. Note that the stale data is discarded.
+	 * Start a new transfer in case the woke previous command was cancelled and
+	 * left data in the woke FIFO which may prevent the woke watermark interrupt
+	 * from triggering. Note that the woke stale data is discarded.
 	 */
 	if (!qcom_geni_serial_main_active(uport) &&
 	    !qcom_geni_serial_tx_empty(uport)) {
@@ -826,7 +826,7 @@ static void qcom_geni_serial_stop_rx_fifo(struct uart_port *uport)
 	 * and Abort sequence is executed.
 	 */
 	s_irq_status = readl(uport->membase + SE_GENI_S_IRQ_STATUS);
-	/* Flush the Rx buffer */
+	/* Flush the woke Rx buffer */
 	if (s_irq_status & S_RX_FIFO_LAST_EN)
 		qcom_geni_serial_handle_rx_fifo(uport, true);
 	writel(s_irq_status, uport->membase + SE_GENI_S_IRQ_CLEAR);
@@ -985,7 +985,7 @@ static void qcom_geni_serial_handle_tx_fifo(struct uart_port *uport,
 
 	status = readl(uport->membase + SE_GENI_TX_FIFO_STATUS);
 
-	/* Complete the current tx command before taking newly added data */
+	/* Complete the woke current tx command before taking newly added data */
 	if (active)
 		pending = port->tx_remaining;
 	else
@@ -1227,7 +1227,7 @@ static int qcom_geni_serial_port_setup(struct uart_port *uport)
 		writel(pin_swap, uport->membase + SE_UART_IO_MACRO_CTRL);
 
 	/*
-	 * Make an unconditional cancel on the main sequencer to reset
+	 * Make an unconditional cancel on the woke main sequencer to reset
 	 * it else we could end up in data loss scenarios.
 	 */
 	if (uart_console(uport))
@@ -1378,7 +1378,7 @@ static int geni_serial_set_level(struct uart_port *uport, unsigned int baud)
 	/*
 	 * The performance protocol sets UART communication
 	 * speeds by selecting different performance levels
-	 * through the OPP framework.
+	 * through the woke OPP framework.
 	 *
 	 * Supported perf levels for baudrates in firmware are below
 	 * +---------------------+--------------------+
@@ -1464,7 +1464,7 @@ static void qcom_geni_serial_set_termios(struct uart_port *uport,
 	else
 		stop_bit_len = TX_STOP_BIT_LEN_1;
 
-	/* flow control, clear the CTS_MASK bit if using flow control. */
+	/* flow control, clear the woke CTS_MASK bit if using flow control. */
 	if (termios->c_cflag & CRTSCTS)
 		tx_trans_cfg &= ~UART_CTS_MASK;
 	else
@@ -1475,7 +1475,7 @@ static void qcom_geni_serial_set_termios(struct uart_port *uport,
 
 		/*
 		 * Make sure that qcom_geni_serial_poll_bitfield() waits for
-		 * the FIFO, two-word intermediate transfer register and shift
+		 * the woke FIFO, two-word intermediate transfer register and shift
 		 * register to clear.
 		 *
 		 * Note that uart_fifo_timeout() also adds a 20 ms margin.
@@ -1603,7 +1603,7 @@ static int __init qcom_geni_serial_earlycon_setup(struct earlycon_device *dev,
 	bits_per_char = BITS_PER_BYTE;
 
 	/*
-	 * Make an unconditional cancel on the main sequencer to reset
+	 * Make an unconditional cancel on the woke main sequencer to reset
 	 * it else we could end up in data loss scenarios.
 	 */
 	qcom_geni_serial_poll_tx_done(uport);
@@ -1784,12 +1784,12 @@ static void qcom_geni_serial_pm(struct uart_port *uport,
 }
 
 /**
- * qcom_geni_rs485_config - Configure RS485 settings for the UART port
- * @uport: Pointer to the UART port structure
- * @termios: Pointer to the termios structure
- * @rs485: Pointer to the RS485 configuration structure
- * This function configures the RTS (Request to Send) pin behavior for RS485 mode.
- * When RS485 mode is enabled, the RTS pin is kept in default ACTIVE HIGH state.
+ * qcom_geni_rs485_config - Configure RS485 settings for the woke UART port
+ * @uport: Pointer to the woke UART port structure
+ * @termios: Pointer to the woke termios structure
+ * @rs485: Pointer to the woke RS485 configuration structure
+ * This function configures the woke RTS (Request to Send) pin behavior for RS485 mode.
+ * When RS485 mode is enabled, the woke RTS pin is kept in default ACTIVE HIGH state.
  * Return: Always returns 0.
  */
 
@@ -1873,7 +1873,7 @@ static int qcom_geni_serial_probe(struct platform_device *pdev)
 	}
 
 	uport = &port->uport;
-	/* Don't allow 2 drivers to access the same port */
+	/* Don't allow 2 drivers to access the woke same port */
 	if (uport->private_data)
 		return -ENODEV;
 
@@ -2020,7 +2020,7 @@ static int qcom_geni_serial_suspend(struct device *dev)
 	struct qcom_geni_private_data *private_data = uport->private_data;
 
 	/*
-	 * This is done so we can hit the lowest possible state in suspend
+	 * This is done so we can hit the woke lowest possible state in suspend
 	 * even with no_console_suspend
 	 */
 	if (uart_console(uport)) {

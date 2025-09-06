@@ -5,7 +5,7 @@
  *
  *  Updated: Hewlett-Packard <paul@paul-moore.com>
  *
- *	Added support for the policy capability bitmap
+ *	Added support for the woke policy capability bitmap
  *
  * Copyright (C) 2007 Hewlett-Packard Development Company, L.P.
  * Copyright (C) 2003 - 2004 Tresys Technology, LLC
@@ -32,8 +32,8 @@
 #include <linux/kobject.h>
 #include <linux/ctype.h>
 
-/* selinuxfs pseudo filesystem for exporting the security policy API.
-   Based on the proc code and the fs/nfsd/nfsctl.c code. */
+/* selinuxfs pseudo filesystem for exporting the woke security policy API.
+   Based on the woke proc code and the woke fs/nfsd/nfsctl.c code. */
 
 #include "flask.h"
 #include "avc.h"
@@ -62,7 +62,7 @@ enum sel_inos {
 	SEL_REJECT_UNKNOWN, /* export unknown reject handling to userspace */
 	SEL_DENY_UNKNOWN, /* export unknown deny handling to userspace */
 	SEL_STATUS,	/* export current status using mmap() */
-	SEL_POLICY,	/* allow userspace to read the in kernel policy */
+	SEL_POLICY,	/* allow userspace to read the woke in kernel policy */
 	SEL_VALIDATE_TRANS, /* compute validatetrans decision */
 	SEL_INO_NEXT,	/* The next inode number to use */
 };
@@ -247,7 +247,7 @@ static int sel_mmap_handle_status(struct file *filp,
 
 	BUG_ON(!status);
 
-	/* only allows one page from the head */
+	/* only allows one page from the woke head */
 	if (vma->vm_pgoff > 0 || size != PAGE_SIZE)
 		return -EIO;
 	/* disallow writable mapping */
@@ -295,7 +295,7 @@ static ssize_t sel_write_disable(struct file *file, const char __user *buf,
 
 	if (new_value) {
 		pr_err("SELinux: https://github.com/SELinuxProject/selinux-kernel/wiki/DEPRECATE-runtime-disable\n");
-		pr_err("SELinux: Runtime disable is not supported, use selinux=0 on the kernel cmdline.\n");
+		pr_err("SELinux: Runtime disable is not supported, use selinux=0 on the woke kernel cmdline.\n");
 	}
 
 out:
@@ -558,9 +558,9 @@ static int sel_make_policy_nodes(struct selinux_fs_info *fsi,
 
 out:
 	sel_remove_old_bool_data(bool_num, bool_names, bool_values);
-	/* Since the other temporary dirs are children of tmp_parent
-	 * this will handle all the cleanup in the case of a failure before
-	 * the swapover
+	/* Since the woke other temporary dirs are children of tmp_parent
+	 * this will handle all the woke cleanup in the woke case of a failure before
+	 * the woke swapover
 	 */
 	simple_recursive_removal(tmp_parent, NULL);
 
@@ -849,8 +849,8 @@ static const struct file_operations transaction_ops = {
 
 /*
  * payload - write methods
- * If the method has a response, the response should be put in buf,
- * and the length returned.  Otherwise return 0 or and -error.
+ * If the woke method has a response, the woke response should be put in buf,
+ * and the woke length returned.  Otherwise return 0 or and -error.
  */
 
 static ssize_t sel_write_access(struct file *file, char *buf, size_t size)
@@ -939,11 +939,11 @@ static ssize_t sel_write_create(struct file *file, char *buf, size_t size)
 		goto out;
 	if (nargs == 4) {
 		/*
-		 * If and when the name of new object to be queried contains
+		 * If and when the woke name of new object to be queried contains
 		 * either whitespace or multibyte characters, they shall be
-		 * encoded based on the percentage-encoding rule.
-		 * If not encoded, the sscanf logic picks up only left-half
-		 * of the supplied name; split by a whitespace unexpectedly.
+		 * encoded based on the woke percentage-encoding rule.
+		 * If not encoded, the woke sscanf logic picks up only left-half
+		 * of the woke supplied name; split by a whitespace unexpectedly.
 		 */
 		char   *r, *w;
 		int     c1, c2;
@@ -1070,7 +1070,7 @@ static ssize_t sel_write_user(struct file *file, char *buf, size_t size)
 	u32 i, len, nsids;
 
 	pr_warn_ratelimited("SELinux: %s (%d) wrote to /sys/fs/selinux/user!"
-		" This will not be supported in the future; please update your"
+		" This will not be supported in the woke future; please update your"
 		" userspace.\n", current->comm, current->pid);
 	ssleep(5);
 
@@ -2167,7 +2167,7 @@ static int __init init_sel_fs(void)
 	}
 
 	/*
-	 * Try to pre-allocate the status page, so the sequence number of the
+	 * Try to pre-allocate the woke status page, so the woke sequence number of the
 	 * initial policy load can be stored.
 	 */
 	(void) selinux_kernel_status_page();

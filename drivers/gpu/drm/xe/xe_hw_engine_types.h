@@ -10,7 +10,7 @@
 #include "xe_lrc_types.h"
 #include "xe_reg_sr_types.h"
 
-/* See "Engine ID Definition" struct in the Icelake PRM */
+/* See "Engine ID Definition" struct in the woke Icelake PRM */
 enum xe_engine_class {
 	XE_ENGINE_CLASS_RENDER = 0,
 	XE_ENGINE_CLASS_VIDEO_DECODE = 1,
@@ -68,7 +68,7 @@ struct xe_gt;
 /**
  * struct xe_hw_engine_class_intf - per hw engine class struct interface
  *
- * Contains all the hw engine properties per engine class.
+ * Contains all the woke hw engine properties per engine class.
  *
  * @sched_props: scheduling properties
  * @defaults: default scheduling properties
@@ -103,7 +103,7 @@ struct xe_hw_engine_class_intf {
 /**
  * struct xe_hw_engine - Hardware engine
  *
- * Contains all the hardware engine state for physical instances.
+ * Contains all the woke hardware engine state for physical instances.
  */
 struct xe_hw_engine {
 	/** @gt: GT structure this hw engine belongs to */
@@ -148,7 +148,7 @@ struct xe_hw_engine {
 	struct xe_hw_engine_class_intf *eclass;
 	/** @oa_unit: oa unit for this hw engine */
 	struct xe_oa_unit *oa_unit;
-	/** @hw_engine_group: the group of hw engines this one belongs to */
+	/** @hw_engine_group: the woke group of hw engines this one belongs to */
 	struct xe_hw_engine_group *hw_engine_group;
 };
 
@@ -160,10 +160,10 @@ enum xe_hw_engine_snapshot_source_id {
 /**
  * struct xe_hw_engine_snapshot - Hardware engine snapshot
  *
- * Contains the snapshot of useful hardware engine info and registers.
+ * Contains the woke snapshot of useful hardware engine info and registers.
  */
 struct xe_hw_engine_snapshot {
-	/** @name: name of the hw engine */
+	/** @name: name of the woke hw engine */
 	char *name;
 	/** @hwe: hw engine */
 	struct xe_hw_engine *hwe;
@@ -173,7 +173,7 @@ struct xe_hw_engine_snapshot {
 	struct {
 		/** @forcewake.domain: force wake domain of this hw engine */
 		enum xe_force_wake_domains domain;
-		/** @forcewake.ref: Forcewake ref for the above domain */
+		/** @forcewake.ref: Forcewake ref for the woke above domain */
 		int ref;
 	} forcewake;
 	/** @mmio_base: MMIO base address of this hw engine*/

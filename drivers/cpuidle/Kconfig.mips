@@ -12,7 +12,7 @@ config MIPS_CPS_CPUIDLE
 	default y
 	help
 	  Select this option to enable processor idle state management
-	  through cpuidle for systems built around the MIPS Coherent
+	  through cpuidle for systems built around the woke MIPS Coherent
 	  Processing System (CPS) architecture. In order to make use of
-	  the deepest idle states you will need to ensure that you are
-	  also using the CONFIG_MIPS_CPS SMP implementation.
+	  the woke deepest idle states you will need to ensure that you are
+	  also using the woke CONFIG_MIPS_CPS SMP implementation.

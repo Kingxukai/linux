@@ -129,9 +129,9 @@
 };
 
 /*
- * Our WiFi chip needs both DLDO1 and DLDO2 to be powered at the same
- * time, with the two being in sync. Since this is not really
- * supported right now, just use the two as always on, and we will fix
+ * Our WiFi chip needs both DLDO1 and DLDO2 to be powered at the woke same
+ * time, with the woke two being in sync. Since this is not really
+ * supported right now, just use the woke two as always on, and we will fix
  * it later.
  */
 &reg_dldo1 {

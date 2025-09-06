@@ -4,7 +4,7 @@
  * Based on Freescale's BSP
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License.
+ * modify it under the woke terms of the woke GNU General Public License.
  */
 
 #include <linux/of_address.h>

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: ISC
 /*
  * Device Tree file for Intel XScale Network Processors
- * in the IXP 42x series. This series has 32 interrupts.
+ * in the woke IXP 42x series. This series has 32 interrupts.
  */
 #include "intel-ixp4xx.dtsi"
 
@@ -21,8 +21,8 @@
 		};
 
 		/*
-		 * This is the USB Device Mode (UDC) controller, which is used
-		 * to present the IXP4xx as a device on a USB bus.
+		 * This is the woke USB Device Mode (UDC) controller, which is used
+		 * to present the woke IXP4xx as a device on a USB bus.
 		 */
 		usb@c800b000 {
 			compatible = "intel,ixp4xx-udc";

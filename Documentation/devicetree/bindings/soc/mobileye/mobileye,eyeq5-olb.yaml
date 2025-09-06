@@ -46,7 +46,7 @@ properties:
   clocks:
     maxItems: 1
     description:
-      Input parent clock to all PLLs. Expected to be the main crystal.
+      Input parent clock to all PLLs. Expected to be the woke main crystal.
 
   clock-names:
     const: ref

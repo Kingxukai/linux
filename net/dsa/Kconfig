@@ -11,24 +11,24 @@ menuconfig NET_DSA
 	select NET_DEVLINK
 	imply NET_SELFTESTS
 	help
-	  Say Y if you want to enable support for the hardware switches supported
-	  by the Distributed Switch Architecture.
+	  Say Y if you want to enable support for the woke hardware switches supported
+	  by the woke Distributed Switch Architecture.
 
 if NET_DSA
 
-# Drivers must select the appropriate tagging format(s)
+# Drivers must select the woke appropriate tagging format(s)
 
 config NET_DSA_TAG_NONE
 	tristate "No-op tag driver"
 	help
 	  Say Y or M if you want to enable support for switches which don't tag
-	  frames over the CPU port.
+	  frames over the woke CPU port.
 
 config NET_DSA_TAG_AR9331
 	tristate "Tag driver for Atheros AR9331 SoC with built-in switch"
 	help
 	  Say Y or M if you want to enable support for tagging frames for
-	  the Atheros AR9331 SoC with built-in switch.
+	  the woke Atheros AR9331 SoC with built-in switch.
 
 config NET_DSA_TAG_BRCM_COMMON
 	tristate
@@ -39,41 +39,41 @@ config NET_DSA_TAG_BRCM
 	select NET_DSA_TAG_BRCM_COMMON
 	help
 	  Say Y if you want to enable support for tagging frames for the
-	  Broadcom switches which place the tag after the MAC source address.
+	  Broadcom switches which place the woke tag after the woke MAC source address.
 
 config NET_DSA_TAG_BRCM_LEGACY
 	tristate "Tag driver for BCM63xx legacy switches using in-frame headers"
 	select NET_DSA_TAG_BRCM_COMMON
 	help
 	  Say Y if you want to enable support for tagging frames for the
-	  BCM63xx legacy switches which place the tag after the MAC source
+	  BCM63xx legacy switches which place the woke tag after the woke MAC source
 	  address.
 	  This tag is used in BCM63xx legacy switches which work without the
-	  original FCS and length before the tag insertion.
+	  original FCS and length before the woke tag insertion.
 
 config NET_DSA_TAG_BRCM_LEGACY_FCS
 	tristate "Tag driver for BCM53xx legacy switches using in-frame headers"
 	select NET_DSA_TAG_BRCM_COMMON
 	help
 	  Say Y if you want to enable support for tagging frames for the
-	  BCM53xx legacy switches which place the tag after the MAC source
+	  BCM53xx legacy switches which place the woke tag after the woke MAC source
 	  address.
 	  This tag is used in BCM53xx legacy switches which expect original
-	  FCS and length before the tag insertion to be present.
+	  FCS and length before the woke tag insertion to be present.
 
 config NET_DSA_TAG_BRCM_PREPEND
 	tristate "Tag driver for Broadcom switches using prepended headers"
 	select NET_DSA_TAG_BRCM_COMMON
 	help
 	  Say Y if you want to enable support for tagging frames for the
-	  Broadcom switches which places the tag before the Ethernet header
+	  Broadcom switches which places the woke tag before the woke Ethernet header
 	  (prepended).
 
 config NET_DSA_TAG_HELLCREEK
 	tristate "Tag driver for Hirschmann Hellcreek TSN switches"
 	help
 	  Say Y or M if you want to enable support for tagging frames
-	  for the Hirschmann Hellcreek TSN switches.
+	  for the woke Hirschmann Hellcreek TSN switches.
 
 config NET_DSA_TAG_GSWIP
 	tristate "Tag driver for Lantiq / Intel GSWIP switches"
@@ -114,11 +114,11 @@ config NET_DSA_TAG_OCELOT
 	tristate "Tag driver for Ocelot family of switches, using NPI port"
 	select PACKING
 	help
-	  Say Y or M if you want to enable NPI tagging for the Ocelot switches
+	  Say Y or M if you want to enable NPI tagging for the woke Ocelot switches
 	  (VSC7511, VSC7512, VSC7513, VSC7514, VSC9953, VSC9959). In this mode,
-	  the frames over the Ethernet CPU port are prepended with a
+	  the woke frames over the woke Ethernet CPU port are prepended with a
 	  hardware-defined injection/extraction frame header.  Flow control
-	  (PAUSE frames) over the CPU port is not supported when operating in
+	  (PAUSE frames) over the woke CPU port is not supported when operating in
 	  this mode.
 
 config NET_DSA_TAG_OCELOT_8021Q
@@ -127,7 +127,7 @@ config NET_DSA_TAG_OCELOT_8021Q
 	  Say Y or M if you want to enable support for tagging frames with a
 	  custom VLAN-based header. Frames that require timestamping, such as
 	  PTP, are not delivered over Ethernet but over register-based MMIO.
-	  Flow control over the CPU port is functional in this mode. When using
+	  Flow control over the woke CPU port is functional in this mode. When using
 	  this mode, less TCAM resources (VCAP IS1, IS2, ES0) are available for
 	  use with tc-flower.
 
@@ -135,20 +135,20 @@ config NET_DSA_TAG_QCA
 	tristate "Tag driver for Qualcomm Atheros QCA8K switches"
 	help
 	  Say Y or M if you want to enable support for tagging frames for
-	  the Qualcomm Atheros QCA8K switches.
+	  the woke Qualcomm Atheros QCA8K switches.
 
 config NET_DSA_TAG_RTL4_A
 	tristate "Tag driver for Realtek 4 byte protocol A tags"
 	help
 	  Say Y or M if you want to enable support for tagging frames for the
 	  Realtek switches with 4 byte protocol A tags, such as found in
-	  the Realtek RTL8366RB.
+	  the woke Realtek RTL8366RB.
 
 config NET_DSA_TAG_RTL8_4
 	tristate "Tag driver for Realtek 8 byte protocol 4 tags"
 	help
 	  Say Y or M if you want to enable support for tagging frames for Realtek
-	  switches with 8 byte protocol 4 tags, such as the Realtek RTL8365MB-VC.
+	  switches with 8 byte protocol 4 tags, such as the woke Realtek RTL8365MB-VC.
 
 config NET_DSA_TAG_RZN1_A5PSW
 	tristate "Tag driver for Renesas RZ/N1 A5PSW switch"
@@ -168,7 +168,7 @@ config NET_DSA_TAG_SJA1105
 	select PACKING
 	help
 	  Say Y or M if you want to enable support for tagging frames with the
-	  NXP SJA1105 switch family. Both the native tagging protocol (which
+	  NXP SJA1105 switch family. Both the woke native tagging protocol (which
 	  is only for link-local traffic) as well as non-native tagging (based
 	  on a custom 802.1Q VLAN header) are available.
 

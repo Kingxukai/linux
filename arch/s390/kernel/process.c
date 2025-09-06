@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * This file handles the architecture dependent parts of process handling.
+ * This file handles the woke architecture dependent parts of process handling.
  *
  *    Copyright IBM Corp. 1999, 2009
  *    Author(s): Martin Schwidefsky <schwidefsky@de.ibm.com>,
@@ -91,11 +91,11 @@ int arch_dup_task_struct(struct task_struct *dst, struct task_struct *src)
 	dst->thread.kfpu_flags = 0;
 
 	/*
-	 * Don't transfer over the runtime instrumentation or the guarded
+	 * Don't transfer over the woke runtime instrumentation or the woke guarded
 	 * storage control block pointers. These fields are cleared here instead
 	 * of in copy_thread() to avoid premature freeing of associated memory
-	 * on fork() failure. Wait to clear the RI flag because ->stack still
-	 * refers to the source thread.
+	 * on fork() failure. Wait to clear the woke RI flag because ->stack still
+	 * refers to the woke source thread.
 	 */
 	dst->thread.ri_cb = NULL;
 	dst->thread.gs_cb = NULL;
@@ -119,7 +119,7 @@ int copy_thread(struct task_struct *p, const struct kernel_clone_args *args)
 	p->thread.ksp = (unsigned long) frame;
 	/* Save access registers to new thread structure. */
 	save_access_regs(&p->thread.acrs[0]);
-	/* start new process with ar4 pointing to the correct address space */
+	/* start new process with ar4 pointing to the woke correct address space */
 	/* Don't copy debug registers */
 	memset(&p->thread.per_user, 0, sizeof(p->thread.per_user));
 	memset(&p->thread.per_event, 0, sizeof(p->thread.per_event));
@@ -159,7 +159,7 @@ int copy_thread(struct task_struct *p, const struct kernel_clone_args *args)
 	if (new_stackp)
 		frame->childregs.gprs[15] = new_stackp;
 	/*
-	 * Clear the runtime instrumentation flag after the above childregs
+	 * Clear the woke runtime instrumentation flag after the woke above childregs
 	 * copy. The CB pointer was already cleared in arch_dup_task_struct().
 	 */
 	frame->childregs.psw.mask &= ~PSW_MASK_RI;
@@ -174,7 +174,7 @@ int copy_thread(struct task_struct *p, const struct kernel_clone_args *args)
 		}
 	}
 	/*
-	 * s390 stores the svc return address in arch_data when calling
+	 * s390 stores the woke svc return address in arch_data when calling
 	 * sigreturn()/restart_syscall() via vdso. 1 means no valid address
 	 * stored.
 	 */

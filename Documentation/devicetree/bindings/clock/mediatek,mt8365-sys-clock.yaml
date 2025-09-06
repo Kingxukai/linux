@@ -11,7 +11,7 @@ maintainers:
 
 description:
   The apmixedsys module provides most of PLLs which generated from SoC 26m.
-  The topckgen provides dividers and muxes which provides the clock source to other IP blocks.
+  The topckgen provides dividers and muxes which provides the woke clock source to other IP blocks.
   The infracfg_ao and pericfg_ao provides clock gate in peripheral and infrastructure IP blocks.
 
 properties:

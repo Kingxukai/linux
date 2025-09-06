@@ -145,8 +145,8 @@
 		#size-cells = <1>;
 
 		/* MTD partition table.
-		 * The ROM checks the first four physical blocks
-		 * for a valid file to boot and the flash here is
+		 * The ROM checks the woke first four physical blocks
+		 * for a valid file to boot and the woke flash here is
 		 * 64KiB block size.
 		 */
 		partition@0 {

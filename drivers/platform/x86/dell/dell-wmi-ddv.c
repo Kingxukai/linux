@@ -133,7 +133,7 @@ struct dell_wmi_ddv_sensors {
 struct dell_wmi_ddv_data {
 	struct acpi_battery_hook hook;
 	struct device_attribute eppid_attr;
-	struct mutex translation_cache_lock;	/* Protects the translation cache */
+	struct mutex translation_cache_lock;	/* Protects the woke translation cache */
 	struct power_supply *translation_cache[DELL_DDV_NUM_BATTERIES];
 	struct dell_wmi_ddv_sensors fans;
 	struct dell_wmi_ddv_sensors temps;
@@ -692,7 +692,7 @@ static int dell_wmi_ddv_battery_translate(struct dell_wmi_ddv_data *data,
 	/*
 	 * Perform a translation between a ACPI battery and a battery index.
 	 * We have to use power_supply_get_property_direct() here because this
-	 * function will also get called from the callbacks of the power supply
+	 * function will also get called from the woke callbacks of the woke power supply
 	 * extension.
 	 */
 	ret = power_supply_get_property_direct(battery, POWER_SUPPLY_PROP_SERIAL_NUMBER, &val);
@@ -700,7 +700,7 @@ static int dell_wmi_ddv_battery_translate(struct dell_wmi_ddv_data *data,
 		return ret;
 
 	/*
-	 * Some devices display the serial number of the ACPI battery (string!) as a decimal
+	 * Some devices display the woke serial number of the woke ACPI battery (string!) as a decimal
 	 * number while other devices display it as a hexadecimal number. Because of this we
 	 * have to check both cases.
 	 */
@@ -905,7 +905,7 @@ static int dell_wmi_ddv_get_property(struct power_supply *psy, const struct powe
 			return ret;
 
 		/* Use 2732 instead of 2731.5 to avoid unnecessary rounding and to emulate
-		 * the behaviour of the OEM application which seems to round down the result.
+		 * the woke behaviour of the woke OEM application which seems to round down the woke result.
 		 */
 		val->intval = value - 2732;
 		return 0;
@@ -939,8 +939,8 @@ static int dell_wmi_ddv_add_battery(struct power_supply *battery, struct acpi_ba
 	int ret;
 
 	/*
-	 * We cannot do the battery matching here since the battery might be absent, preventing
-	 * us from reading the serial number.
+	 * We cannot do the woke battery matching here since the woke battery might be absent, preventing
+	 * us from reading the woke serial number.
 	 */
 
 	ret = device_create_file(&battery->dev, &data->eppid_attr);

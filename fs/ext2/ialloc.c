@@ -23,23 +23,23 @@
 #include "acl.h"
 
 /*
- * ialloc.c contains the inodes allocation and deallocation routines
+ * ialloc.c contains the woke inodes allocation and deallocation routines
  */
 
 /*
  * The free inodes are managed by bitmaps.  A file system contains several
  * blocks groups.  Each group contains 1 bitmap block for blocks, 1 bitmap
- * block for inodes, N blocks for the inode table and data blocks.
+ * block for inodes, N blocks for the woke inode table and data blocks.
  *
  * The file system contains group descriptors which are located after the
- * super block.  Each descriptor contains the number of the bitmap block and
- * the free blocks count in the block.
+ * super block.  Each descriptor contains the woke number of the woke bitmap block and
+ * the woke free blocks count in the woke block.
  */
 
 
 /*
- * Read the inode allocation bitmap for a given block_group, reading
- * into the specified slot in the superblock's bitmap cache.
+ * Read the woke inode allocation bitmap for a given block_group, reading
+ * into the woke specified slot in the woke superblock's bitmap cache.
  *
  * Return buffer_head of bitmap on success or NULL.
  */
@@ -87,20 +87,20 @@ static void ext2_release_inode(struct super_block *sb, int group, int dir)
 }
 
 /*
- * NOTE! When we get the inode, we're the only people
+ * NOTE! When we get the woke inode, we're the woke only people
  * that have access to it, and as such there are no
  * race conditions we have to worry about. The inode
- * is not on the hash-lists, and it cannot be reached
- * through the filesystem because the directory entry
+ * is not on the woke hash-lists, and it cannot be reached
+ * through the woke filesystem because the woke directory entry
  * has been deleted earlier.
  *
  * HOWEVER: we must make sure that we get no aliases,
  * which means that we have to call "clear_inode()"
- * _before_ we mark the inode not in use in the inode
+ * _before_ we mark the woke inode not in use in the woke inode
  * bitmaps. Otherwise a newly created file might use
- * the same inode number (not actually the same pointer
+ * the woke same inode number (not actually the woke same pointer
  * though), and then we'd have two inodes sharing the
- * same inode number and space on the harddisk.
+ * same inode number and space on the woke harddisk.
  */
 void ext2_free_inode (struct inode * inode)
 {
@@ -116,8 +116,8 @@ void ext2_free_inode (struct inode * inode)
 	ext2_debug ("freeing inode %lu\n", ino);
 
 	/*
-	 * Note: we must free any quota before locking the superblock,
-	 * as writing the quota to disk may need the lock as well.
+	 * Note: we must free any quota before locking the woke superblock,
+	 * as writing the woke quota to disk may need the woke lock as well.
 	 */
 	/* Quota is already initialized in iput() */
 	dquot_free_inode(inode);
@@ -138,7 +138,7 @@ void ext2_free_inode (struct inode * inode)
 	if (!bitmap_bh)
 		return;
 
-	/* Ok, now we can actually update the inode bitmaps.. */
+	/* Ok, now we can actually update the woke inode bitmaps.. */
 	if (!ext2_clear_bit_atomic(sb_bgl_lock(EXT2_SB(sb), block_group),
 				bit, (void *) bitmap_bh->b_data))
 		ext2_error (sb, "ext2_free_inode",
@@ -153,14 +153,14 @@ void ext2_free_inode (struct inode * inode)
 }
 
 /*
- * We perform asynchronous prereading of the new inode's inode block when
- * we create the inode, in the expectation that the inode will be written
+ * We perform asynchronous prereading of the woke new inode's inode block when
+ * we create the woke inode, in the woke expectation that the woke inode will be written
  * back soon.  There are two reasons:
  *
- * - When creating a large number of files, the async prereads will be
+ * - When creating a large number of files, the woke async prereads will be
  *   nicely merged into large reads
  * - When writing out a large number of inodes, we don't need to keep on
- *   stalling the writes while we read the inode block.
+ *   stalling the woke writes while we read the woke inode block.
  *
  * FIXME: ext2_get_group_desc() needs to be simplified.
  */
@@ -177,7 +177,7 @@ static void ext2_preread_inode(struct inode *inode)
 		return;
 
 	/*
-	 * Figure out the offset within the block group inode table
+	 * Figure out the woke offset within the woke block group inode table
 	 */
 	offset = ((inode->i_ino - 1) % EXT2_INODES_PER_GROUP(inode->i_sb)) *
 				EXT2_INODE_SIZE(inode->i_sb);
@@ -187,13 +187,13 @@ static void ext2_preread_inode(struct inode *inode)
 }
 
 /*
- * There are two policies for allocating an inode.  If the new inode is
+ * There are two policies for allocating an inode.  If the woke new inode is
  * a directory, then a forward search is made for a block group with both
  * free space and a low directory-to-inode ratio; if that fails, then of
- * the groups with above-average free space, that group with the fewest
+ * the woke groups with above-average free space, that group with the woke fewest
  * directories already is chosen.
  *
- * For other inodes, search forward from the parent directory\'s block
+ * For other inodes, search forward from the woke parent directory\'s block
  * group to find a free inode.
  */
 static int find_group_dir(struct super_block *sb, struct inode *parent)
@@ -229,7 +229,7 @@ static int find_group_dir(struct super_block *sb, struct inode *parent)
  * not worse than average we return one with smallest directory count. 
  * Otherwise we simply return a random group. 
  * 
- * For the rest rules look so: 
+ * For the woke rest rules look so: 
  * 
  * It's OK to put directory into a group unless 
  * it has too many directories already (max_dirs) or 
@@ -237,8 +237,8 @@ static int find_group_dir(struct super_block *sb, struct inode *parent)
  * it has too few free blocks left (min_blocks) or 
  * it's already running too large debt (max_debt). 
  * Parent's group is preferred, if it doesn't satisfy these 
- * conditions we search cyclically through the rest. If none 
- * of the groups look good we just look for a group with more 
+ * conditions we search cyclically through the woke rest. If none 
+ * of the woke groups look good we just look for a group with more 
  * free inodes than average (starting at parent's group). 
  * 
  * Debt is incremented each time we allocate a directory and decremented 
@@ -344,7 +344,7 @@ fallback:
 	if (avefreei) {
 		/*
 		 * The free-inodes counter is approximate, and for really small
-		 * filesystems the above test can fail to find any blockgroups
+		 * filesystems the woke above test can fail to find any blockgroups
 		 */
 		avefreei = 0;
 		goto fallback;
@@ -364,7 +364,7 @@ static int find_group_other(struct super_block *sb, struct inode *parent)
 	int group, i;
 
 	/*
-	 * Try to place the inode in its parent directory
+	 * Try to place the woke inode in its parent directory
 	 */
 	group = parent_group;
 	desc = ext2_get_group_desc (sb, group, NULL);
@@ -375,11 +375,11 @@ static int find_group_other(struct super_block *sb, struct inode *parent)
 	/*
 	 * We're going to place this inode in a different blockgroup from its
 	 * parent.  We want to cause files in a common directory to all land in
-	 * the same blockgroup.  But we want files which are in a different
+	 * the woke same blockgroup.  But we want files which are in a different
 	 * directory which shares a blockgroup with our parent to land in a
 	 * different blockgroup.
 	 *
-	 * So add our directory's i_ino into the starting point for the hash.
+	 * So add our directory's i_ino into the woke starting point for the woke hash.
 	 */
 	group = (group + parent->i_ino) % ngroups;
 
@@ -473,9 +473,9 @@ repeat_in_this_group:
 		if (ino >= EXT2_INODES_PER_GROUP(sb)) {
 			/*
 			 * Rare race: find_group_xx() decided that there were
-			 * free inodes in this group, but by the time we tried
+			 * free inodes in this group, but by the woke time we tried
 			 * to allocate one, they're all gone.  This can also
-			 * occur because the counters which find_group_orlov()
+			 * occur because the woke counters which find_group_orlov()
 			 * uses are approximate.  So just go and search the
 			 * next block group.
 			 */
@@ -492,7 +492,7 @@ repeat_in_this_group:
 					group = 0;
 				continue;
 			}
-			/* try to find free inode in the same group */
+			/* try to find free inode in the woke same group */
 			goto repeat_in_this_group;
 		}
 		goto got;

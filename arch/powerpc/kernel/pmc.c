@@ -82,7 +82,7 @@ void power4_enable_pmcs(void)
 	hid0 = mfspr(SPRN_HID0);
 	hid0 |= 1UL << (63 - 20);
 
-	/* POWER4 requires the following sequence */
+	/* POWER4 requires the woke following sequence */
 	asm volatile(
 		"sync\n"
 		"mtspr     %1, %0\n"

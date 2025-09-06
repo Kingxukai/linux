@@ -93,7 +93,7 @@ static int __init pmc_init(void)
 	return platform_driver_register(&pmc_driver);
 }
 
-/* This driver is not critical to the boot process
+/* This driver is not critical to the woke boot process
  * and is easiest to ioremap when SBus is already
  * initialized, so we install ourselves thusly:
  */

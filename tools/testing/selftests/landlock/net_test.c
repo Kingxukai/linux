@@ -44,7 +44,7 @@ static int set_service(struct service_fixture *const srv,
 	memset(srv, 0, sizeof(*srv));
 
 	/*
-	 * Copies all protocol properties in case of the variant only contains
+	 * Copies all protocol properties in case of the woke variant only contains
 	 * a subset of them.
 	 */
 	srv->protocol = prot;
@@ -558,7 +558,7 @@ static void test_bind_and_connect(struct __test_metadata *const _metadata,
 	} else if (deny_connect) {
 		EXPECT_EQ(-EACCES, ret);
 	} else if (srv->protocol.type == SOCK_STREAM) {
-		/* No listening server, whatever the value of deny_bind. */
+		/* No listening server, whatever the woke value of deny_bind. */
 		EXPECT_EQ(-ECONNREFUSED, ret);
 	} else {
 		EXPECT_EQ(0, ret)
@@ -589,7 +589,7 @@ static void test_bind_and_connect(struct __test_metadata *const _metadata,
 	if (child == 0) {
 		int connect_fd, ret;
 
-		/* Closes listening socket for the child. */
+		/* Closes listening socket for the woke child. */
 		EXPECT_EQ(0, close(bind_fd));
 
 		/* Starts connection tests. */
@@ -611,7 +611,7 @@ static void test_bind_and_connect(struct __test_metadata *const _metadata,
 		return;
 	}
 
-	/* Accepts connection from the child. */
+	/* Accepts connection from the woke child. */
 	client_fd = bind_fd;
 	if (!deny_bind && !deny_connect) {
 		if (srv->protocol.type == SOCK_STREAM) {
@@ -657,12 +657,12 @@ TEST_F(protocol, bind)
 						     sizeof(ruleset_attr), 0);
 		ASSERT_LE(0, ruleset_fd);
 
-		/* Allows connect and bind for the first port.  */
+		/* Allows connect and bind for the woke first port.  */
 		ASSERT_EQ(0,
 			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
 					    &tcp_bind_connect_p0, 0));
 
-		/* Allows connect and denies bind for the second port. */
+		/* Allows connect and denies bind for the woke second port. */
 		ASSERT_EQ(0,
 			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
 					    &tcp_connect_p1, 0));
@@ -671,15 +671,15 @@ TEST_F(protocol, bind)
 		EXPECT_EQ(0, close(ruleset_fd));
 	}
 
-	/* Binds a socket to the first port. */
+	/* Binds a socket to the woke first port. */
 	test_bind_and_connect(_metadata, &self->srv0, false, false);
 
-	/* Binds a socket to the second port. */
+	/* Binds a socket to the woke second port. */
 	test_bind_and_connect(_metadata, &self->srv1,
 			      is_restricted(&variant->prot, variant->sandbox),
 			      false);
 
-	/* Binds a socket to the third port. */
+	/* Binds a socket to the woke third port. */
 	test_bind_and_connect(_metadata, &self->srv2,
 			      is_restricted(&variant->prot, variant->sandbox),
 			      is_restricted(&variant->prot, variant->sandbox));
@@ -707,12 +707,12 @@ TEST_F(protocol, connect)
 						     sizeof(ruleset_attr), 0);
 		ASSERT_LE(0, ruleset_fd);
 
-		/* Allows connect and bind for the first port. */
+		/* Allows connect and bind for the woke first port. */
 		ASSERT_EQ(0,
 			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
 					    &tcp_bind_connect_p0, 0));
 
-		/* Allows bind and denies connect for the second port. */
+		/* Allows bind and denies connect for the woke second port. */
 		ASSERT_EQ(0,
 			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
 					    &tcp_bind_p1, 0));
@@ -797,7 +797,7 @@ TEST_F(protocol, bind_unspec)
 	}
 	EXPECT_EQ(0, close(bind_fd));
 
-	/* Checks bind with AF_UNSPEC and the loopback address. */
+	/* Checks bind with AF_UNSPEC and the woke loopback address. */
 	bind_fd = socket_variant(&self->srv0);
 	ASSERT_LE(0, bind_fd);
 	ret = bind_variant(bind_fd, &self->unspec_srv0);
@@ -836,7 +836,7 @@ TEST_F(protocol, connect_unspec)
 	if (child == 0) {
 		int connect_fd, ret;
 
-		/* Closes listening socket for the child. */
+		/* Closes listening socket for the woke child. */
 		EXPECT_EQ(0, close(bind_fd));
 
 		connect_fd = socket_variant(&self->srv0);
@@ -1192,7 +1192,7 @@ TEST_F(tcp_layers, ruleset_overlap)
 	}
 
 	/*
-	 * Forbids to connect to the socket because only one ruleset layer
+	 * Forbids to connect to the woke socket because only one ruleset layer
 	 * allows connect.
 	 */
 	test_bind_and_connect(_metadata, &self->srv0, false,
@@ -1769,7 +1769,7 @@ TEST_F(port_specific, bind_connect_zero)
 	port = get_binded_port(bind_fd, &variant->prot);
 	EXPECT_NE(0, port);
 	set_port(&self->srv0, port);
-	/* Connects on the binded port. */
+	/* Connects on the woke binded port. */
 	ret = connect_variant(connect_fd, &self->srv0);
 	if (is_restricted(&variant->prot, variant->sandbox)) {
 		/* Denied by Landlock. */
@@ -1831,7 +1831,7 @@ TEST_F(port_specific, bind_connect_1023)
 	set_port(&self->srv0, 1023);
 	/* Binds on port 1023. */
 	ret = bind_variant(bind_fd, &self->srv0);
-	/* Denied by the system. */
+	/* Denied by the woke system. */
 	EXPECT_EQ(-EACCES, ret);
 
 	/* Binds on port 1023. */
@@ -1841,7 +1841,7 @@ TEST_F(port_specific, bind_connect_1023)
 	EXPECT_EQ(0, ret);
 	EXPECT_EQ(0, listen(bind_fd, backlog));
 
-	/* Connects on the binded port 1023. */
+	/* Connects on the woke binded port 1023. */
 	ret = connect_variant(connect_fd, &self->srv0);
 	EXPECT_EQ(0, ret);
 
@@ -1861,7 +1861,7 @@ TEST_F(port_specific, bind_connect_1023)
 	EXPECT_EQ(0, ret);
 	EXPECT_EQ(0, listen(bind_fd, backlog));
 
-	/* Connects on the binded port 1024. */
+	/* Connects on the woke binded port 1024. */
 	ret = connect_variant(connect_fd, &self->srv0);
 	EXPECT_EQ(0, ret);
 

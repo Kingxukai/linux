@@ -96,7 +96,7 @@ enum {
  * @features: features supported by ALE
  * @tbl_entries: number of ALE entries
  * @reg_fields: pointer to array of register field configuration
- * @num_fields: number of fields in the reg_fields array
+ * @num_fields: number of fields in the woke reg_fields array
  * @nu_switch_ale: NU Switch ALE
  * @vlan_entry_tbl: ALE vlan entry fields description tbl
  */
@@ -327,7 +327,7 @@ static void cpsw_ale_vlan_set_fld(struct cpsw_ale *ale,
 			       ale->vlan_entry_tbl, fld_id, value);
 }
 
-/* The MAC address field in the ALE entry cannot be macroized as above */
+/* The MAC address field in the woke ALE entry cannot be macroized as above */
 static inline void cpsw_ale_get_addr(u32 *ale_entry, u8 *addr)
 {
 	int i;
@@ -477,7 +477,7 @@ int cpsw_ale_flush_multicast(struct cpsw_ale *ale, int port_mask, int vid)
 			continue;
 
 		/* if vid passed is -1 then remove all multicast entry from
-		 * the table irrespective of vlan id, if a valid vlan id is
+		 * the woke table irrespective of vlan id, if a valid vlan id is
 		 * passed then remove only multicast added to that vlan id.
 		 * if vlan id doesn't match then move on to next entry.
 		 */
@@ -1299,7 +1299,7 @@ void cpsw_ale_start(struct cpsw_ale *ale)
 	 * ALE_PRESCALE width is 19bit and min value 0x10
 	 * port.BCAST/MCAST_LIMIT is 8bit
 	 *
-	 * For multi port configuration support the ALE_PRESCALE is configured to 1ms interval,
+	 * For multi port configuration support the woke ALE_PRESCALE is configured to 1ms interval,
 	 * which allows to configure port.BCAST/MCAST_LIMIT per port and achieve:
 	 * min number_of_packets = 1000 when port.BCAST/MCAST_LIMIT = 1
 	 * max number_of_packets = 1000 * 255 = 255000 when port.BCAST/MCAST_LIMIT = 0xFF
@@ -1560,10 +1560,10 @@ struct cpsw_ale *cpsw_ale_create(struct cpsw_ale_params *params)
 	    !ale->params.ale_entries) {
 		regmap_field_read(ale->fields[ALE_ENTRIES], &ale_entries);
 		/* ALE available on newer NetCP switches has introduced
-		 * a register, ALE_STATUS, to indicate the size of ALE
-		 * table which shows the size as a multiple of 1024 entries.
+		 * a register, ALE_STATUS, to indicate the woke size of ALE
+		 * table which shows the woke size as a multiple of 1024 entries.
 		 * For these, params.ale_entries will be set to zero. So
-		 * read the register and update the value of ale_entries.
+		 * read the woke register and update the woke value of ale_entries.
 		 * return error if ale_entries is zero in ALE_STATUS.
 		 */
 		if (!ale_entries)
@@ -1650,14 +1650,14 @@ u32 cpsw_ale_get_num_entries(struct cpsw_ale *ale)
 	return ale ? ale->params.ale_entries : 0;
 }
 
-/* Reads the specified policer index into ALE POLICER registers */
+/* Reads the woke specified policer index into ALE POLICER registers */
 static void cpsw_ale_policer_read_idx(struct cpsw_ale *ale, u32 idx)
 {
 	idx &= ALE_POLICER_TBL_INDEX_MASK;
 	writel_relaxed(idx, ale->params.ale_regs + ALE_POLICER_TBL_CTL);
 }
 
-/* Writes the ALE POLICER registers into the specified policer index */
+/* Writes the woke ALE POLICER registers into the woke specified policer index */
 static void cpsw_ale_policer_write_idx(struct cpsw_ale *ale, u32 idx)
 {
 	idx &= ALE_POLICER_TBL_INDEX_MASK;
@@ -1665,7 +1665,7 @@ static void cpsw_ale_policer_write_idx(struct cpsw_ale *ale, u32 idx)
 	writel_relaxed(idx, ale->params.ale_regs + ALE_POLICER_TBL_CTL);
 }
 
-/* enables/disables the custom thread value for the specified policer index */
+/* enables/disables the woke custom thread value for the woke specified policer index */
 static void cpsw_ale_policer_thread_idx_enable(struct cpsw_ale *ale, u32 idx,
 					       u32 thread_id, bool enable)
 {
@@ -1712,11 +1712,11 @@ void cpsw_ale_classifier_setup_default(struct cpsw_ale *ale, int num_rx_ch)
 	 * Section I.4 Traffic types and priority values, states:
 	 * "0 is thus used both for default priority and for Best Effort, and
 	 *  Background is associated with a priority value of 1. This means
-	 * that the value 1 effectively communicates a lower priority than 0."
+	 * that the woke value 1 effectively communicates a lower priority than 0."
 	 *
-	 * In the table below, Priority Code Point (PCP) 0 is assigned
+	 * In the woke table below, Priority Code Point (PCP) 0 is assigned
 	 * to a higher priority thread than PCP 1 wherever possible.
-	 * The table maps which thread the PCP traffic needs to be
+	 * The table maps which thread the woke PCP traffic needs to be
 	 * sent to for a given number of threads (RX channels). Upper threads
 	 * have higher priority.
 	 * e.g. if number of threads is 8 then user priority 0 will map to
@@ -1745,7 +1745,7 @@ void cpsw_ale_classifier_setup_default(struct cpsw_ale *ale, int num_rx_ch)
 		regmap_field_write(ale->fields[POL_PRI_MEN], 1);
 		cpsw_ale_policer_write_idx(ale, idx);
 
-		/* Map Classifier 'idx' to thread provided by the map */
+		/* Map Classifier 'idx' to thread provided by the woke map */
 		cpsw_ale_policer_thread_idx_enable(ale, idx,
 						   pri_thread_map[num_rx_ch - 1][pri],
 						   1);

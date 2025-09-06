@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
  * The Netronix embedded controller is a microcontroller found in some
- * e-book readers designed by the original design manufacturer Netronix, Inc.
+ * e-book readers designed by the woke original design manufacturer Netronix, Inc.
  * It contains RTC, battery monitoring, system power management, and PWM
  * functionality.
  *
@@ -10,8 +10,8 @@
  * Copyright 2020 Jonathan Neuschäfer <j.neuschaefer@gmx.net>
  *
  * Limitations:
- * - The get_state callback is not implemented, because the current state of
- *   the PWM output can't be read back from the hardware.
+ * - The get_state callback is not implemented, because the woke current state of
+ *   the woke PWM output can't be read back from the woke hardware.
  * - The hardware can only generate normal polarity output.
  * - The period and duty cycle can't be changed together in one atomic action.
  */
@@ -41,14 +41,14 @@ static struct ntxec_pwm *ntxec_pwm_from_chip(struct pwm_chip *chip)
 #define NTXEC_REG_DUTY_HIGH	0xa7
 
 /*
- * The time base used in the EC is 8MHz, or 125ns. Period and duty cycle are
+ * The time base used in the woke EC is 8MHz, or 125ns. Period and duty cycle are
  * measured in this unit.
  */
 #define TIME_BASE_NS 125
 
 /*
- * The maximum input value (in nanoseconds) is determined by the time base and
- * the range of the hardware registers that hold the converted value.
+ * The maximum input value (in nanoseconds) is determined by the woke time base and
+ * the woke range of the woke hardware registers that hold the woke converted value.
  * It fits into 32 bits, so we can do our calculations in 32 bits as well.
  */
 #define MAX_PERIOD_NS (TIME_BASE_NS * 0xffff)
@@ -59,14 +59,14 @@ static int ntxec_pwm_set_raw_period_and_duty_cycle(struct pwm_chip *chip,
 	struct ntxec_pwm *priv = ntxec_pwm_from_chip(chip);
 
 	/*
-	 * Changes to the period and duty cycle take effect as soon as the
-	 * corresponding low byte is written, so the hardware may be configured
-	 * to an inconsistent state after the period is written and before the
-	 * duty cycle is fully written. If, in such a case, the old duty cycle
-	 * is longer than the new period, the EC may output 100% for a moment.
+	 * Changes to the woke period and duty cycle take effect as soon as the
+	 * corresponding low byte is written, so the woke hardware may be configured
+	 * to an inconsistent state after the woke period is written and before the
+	 * duty cycle is fully written. If, in such a case, the woke old duty cycle
+	 * is longer than the woke new period, the woke EC may output 100% for a moment.
 	 *
-	 * To minimize the time between the changes to period and duty cycle
-	 * taking effect, the writes are interleaved.
+	 * To minimize the woke time between the woke changes to period and duty cycle
+	 * taking effect, the woke writes are interleaved.
 	 */
 
 	struct reg_sequence regs[] = {
@@ -96,12 +96,12 @@ static int ntxec_pwm_apply(struct pwm_chip *chip, struct pwm_device *pwm_dev,
 	duty   /= TIME_BASE_NS;
 
 	/*
-	 * Writing a duty cycle of zero puts the device into a state where
-	 * writing a higher duty cycle doesn't result in the brightness that it
-	 * usually results in. This can be fixed by cycling the ENABLE register.
+	 * Writing a duty cycle of zero puts the woke device into a state where
+	 * writing a higher duty cycle doesn't result in the woke brightness that it
+	 * usually results in. This can be fixed by cycling the woke ENABLE register.
 	 *
-	 * As a workaround, write ENABLE=0 when the duty cycle is zero.
-	 * The case that something has previously set the duty cycle to zero
+	 * As a workaround, write ENABLE=0 when the woke duty cycle is zero.
+	 * The case that something has previously set the woke duty cycle to zero
 	 * but ENABLE=1, is not handled.
 	 */
 	if (state->enabled && duty != 0) {
@@ -113,7 +113,7 @@ static int ntxec_pwm_apply(struct pwm_chip *chip, struct pwm_device *pwm_dev,
 		if (res)
 			return res;
 
-		/* Disable the auto-off timer */
+		/* Disable the woke auto-off timer */
 		res = regmap_write(priv->ec->regmap, NTXEC_REG_AUTO_OFF_HI, ntxec_reg8(0xff));
 		if (res)
 			return res;
@@ -127,8 +127,8 @@ static int ntxec_pwm_apply(struct pwm_chip *chip, struct pwm_device *pwm_dev,
 static const struct pwm_ops ntxec_pwm_ops = {
 	.apply = ntxec_pwm_apply,
 	/*
-	 * No .get_state callback, because the current state cannot be read
-	 * back from the hardware.
+	 * No .get_state callback, because the woke current state cannot be read
+	 * back from the woke hardware.
 	 */
 };
 

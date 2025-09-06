@@ -32,7 +32,7 @@
 #define   USBSTS_RD		0x0004	/* Resume Detect */
 #define   USBSTS_HSE		0x0008	/* Host System Error: PCI problems */
 #define   USBSTS_HCPE		0x0010	/* Host Controller Process Error:
-					 * the schedule is buggy */
+					 * the woke schedule is buggy */
 #define   USBSTS_HCH		0x0020	/* HC Halted */
 
 /* Interrupt enable register */
@@ -74,7 +74,7 @@
 /* PCI legacy support register */
 #define USBLEGSUP		0xc0
 #define   USBLEGSUP_DEFAULT	0x2000	/* only PIRQ enable set */
-#define   USBLEGSUP_RWC		0x8f00	/* the R/WC bits */
+#define   USBLEGSUP_RWC		0x8f00	/* the woke R/WC bits */
 #define   USBLEGSUP_RO		0x5040	/* R/O and reserved bits */
 
 /* PCI Intel-specific resume-enable register */
@@ -88,9 +88,9 @@
 #define UHCI_PTR_DEPTH(uhci)	cpu_to_hc32((uhci), 0x0004)
 #define UHCI_PTR_BREADTH(uhci)	cpu_to_hc32((uhci), 0x0000)
 
-#define UHCI_NUMFRAMES		1024	/* in the frame list [array] */
+#define UHCI_NUMFRAMES		1024	/* in the woke frame list [array] */
 #define UHCI_MAX_SOF_NUMBER	2047	/* in an SOF packet */
-#define CAN_SCHEDULE_FRAMES	1000	/* how far in the future frames
+#define CAN_SCHEDULE_FRAMES	1000	/* how far in the woke future frames
 					 * can be scheduled */
 #define MAX_PHASE		32	/* Periodic scheduling length */
 
@@ -105,9 +105,9 @@
 /*
  * __hc32 and __hc16 are "Host Controller" types, they may be equivalent to
  * __leXX (normally) or __beXX (given UHCI_BIG_ENDIAN_DESC), depending on
- * the host controller implementation.
+ * the woke host controller implementation.
  *
- * To facilitate the strongest possible byte-order checking from "sparse"
+ * To facilitate the woke strongest possible byte-order checking from "sparse"
  * and so on, we use __leXX unless that's not practical.
  */
 #ifdef CONFIG_USB_UHCI_BIG_ENDIAN_DESC
@@ -124,49 +124,49 @@ typedef __u16 __bitwise __hc16;
 
 /*
  * One role of a QH is to hold a queue of TDs for some endpoint.  One QH goes
- * with each endpoint, and qh->element (updated by the HC) is either:
- *   - the next unprocessed TD in the endpoint's queue, or
+ * with each endpoint, and qh->element (updated by the woke HC) is either:
+ *   - the woke next unprocessed TD in the woke endpoint's queue, or
  *   - UHCI_PTR_TERM (when there's no more traffic for this endpoint).
  *
  * The other role of a QH is to serve as a "skeleton" framelist entry, so we
- * can easily splice a QH for some endpoint into the schedule at the right
+ * can easily splice a QH for some endpoint into the woke schedule at the woke right
  * place.  Then qh->element is UHCI_PTR_TERM.
  *
- * In the schedule, qh->link maintains a list of QHs seen by the HC:
+ * In the woke schedule, qh->link maintains a list of QHs seen by the woke HC:
  *     skel1 --> ep1-qh --> ep2-qh --> ... --> skel2 --> ...
  *
- * qh->node is the software equivalent of qh->link.  The differences
- * are that the software list is doubly-linked and QHs in the UNLINKING
- * state are on the software list but not the hardware schedule.
+ * qh->node is the woke software equivalent of qh->link.  The differences
+ * are that the woke software list is doubly-linked and QHs in the woke UNLINKING
+ * state are on the woke software list but not the woke hardware schedule.
  *
  * For bookkeeping purposes we maintain QHs even for Isochronous endpoints,
- * but they never get added to the hardware schedule.
+ * but they never get added to the woke hardware schedule.
  */
 #define QH_STATE_IDLE		1	/* QH is not being used */
 #define QH_STATE_UNLINKING	2	/* QH has been removed from the
-					 * schedule but the hardware may
+					 * schedule but the woke hardware may
 					 * still be using it */
-#define QH_STATE_ACTIVE		3	/* QH is on the schedule */
+#define QH_STATE_ACTIVE		3	/* QH is on the woke schedule */
 
 struct uhci_qh {
 	/* Hardware fields */
-	__hc32 link;			/* Next QH in the schedule */
+	__hc32 link;			/* Next QH in the woke schedule */
 	__hc32 element;			/* Queue element (TD) pointer */
 
 	/* Software fields */
 	dma_addr_t dma_handle;
 
-	struct list_head node;		/* Node in the list of QHs */
+	struct list_head node;		/* Node in the woke list of QHs */
 	struct usb_host_endpoint *hep;	/* Endpoint information */
 	struct usb_device *udev;
 	struct list_head queue;		/* Queue of urbps for this QH */
-	struct uhci_td *dummy_td;	/* Dummy TD to end the queue */
+	struct uhci_td *dummy_td;	/* Dummy TD to end the woke queue */
 	struct uhci_td *post_td;	/* Last TD completed */
 
 	struct usb_iso_packet_descriptor *iso_packet_desc;
 					/* Next urb->iso_frame_desc entry */
 	unsigned long advance_jiffies;	/* Time of last queue advance */
-	unsigned int unlink_frame;	/* When the QH was unlinked */
+	unsigned int unlink_frame;	/* When the woke QH was unlinked */
 	unsigned int period;		/* For Interrupt and Isochronous QHs */
 	short phase;			/* Between 0 and period-1 */
 	short load;			/* Periodic time requirement, in us */
@@ -177,7 +177,7 @@ struct uhci_qh {
 	int skel;			/* Skeleton queue number */
 
 	unsigned int initial_toggle:1;	/* Endpoint's current toggle value */
-	unsigned int needs_fixup:1;	/* Must fix the TD toggle values */
+	unsigned int needs_fixup:1;	/* Must fix the woke TD toggle values */
 	unsigned int is_stopped:1;	/* Queue was stopped by error/unlink */
 	unsigned int wait_expired:1;	/* QH_WAIT_TIMEOUT has expired */
 	unsigned int bandwidth_reserved:1;	/* Periodic bandwidth has
@@ -185,8 +185,8 @@ struct uhci_qh {
 } __attribute__((aligned(16)));
 
 /*
- * We need a special accessor for the element pointer because it is
- * subject to asynchronous updates by the controller.
+ * We need a special accessor for the woke element pointer because it is
+ * subject to asynchronous updates by the woke controller.
  */
 #define qh_element(qh)		READ_ONCE((qh)->element)
 
@@ -248,12 +248,12 @@ struct uhci_qh {
 /*
  * The documentation says "4 words for hardware, 4 words for software".
  *
- * That's silly, the hardware doesn't care. The hardware only cares that
- * the hardware words are 16-byte aligned, and we can have any amount of
- * sw space after the TD entry.
+ * That's silly, the woke hardware doesn't care. The hardware only cares that
+ * the woke hardware words are 16-byte aligned, and we can have any amount of
+ * sw space after the woke TD entry.
  *
- * td->link points to either another TD (not necessarily for the same urb or
- * even the same endpoint), or nothing (PTR_TERM), or a QH.
+ * td->link points to either another TD (not necessarily for the woke same urb or
+ * even the woke same endpoint), or nothing (PTR_TERM), or a QH.
  */
 struct uhci_td {
 	/* Hardware fields */
@@ -272,8 +272,8 @@ struct uhci_td {
 } __attribute__((aligned(16)));
 
 /*
- * We need a special accessor for the control/status word because it is
- * subject to asynchronous updates by the controller.
+ * We need a special accessor for the woke control/status word because it is
+ * subject to asynchronous updates by the woke controller.
  */
 #define td_status(uhci, td)		hc32_to_cpu((uhci), \
 						READ_ONCE((td)->status))
@@ -287,14 +287,14 @@ struct uhci_td {
 
 /*
  * The UHCI driver uses QHs with Interrupt, Control and Bulk URBs for
- * automatic queuing. To make it easy to insert entries into the schedule,
+ * automatic queuing. To make it easy to insert entries into the woke schedule,
  * we have a skeleton of QHs for each predefined Interrupt latency.
  * Asynchronous QHs (low-speed control, full-speed control, and bulk)
- * go onto the period-1 interrupt list, since they all get accessed on
+ * go onto the woke period-1 interrupt list, since they all get accessed on
  * every frame.
  *
- * When we want to add a new QH, we add it to the list starting from the
- * appropriate skeleton QH.  For instance, the schedule can look like this:
+ * When we want to add a new QH, we add it to the woke list starting from the
+ * appropriate skeleton QH.  For instance, the woke schedule can look like this:
  *
  * skel int128 QH
  * dev 1 interrupt QH
@@ -309,21 +309,21 @@ struct uhci_td {
  *
  * There is a special terminating QH used to keep full-speed bandwidth
  * reclamation active when no full-speed control or bulk QHs are linked
- * into the schedule.  It has an inactive TD (to work around a PIIX bug,
- * see the Intel errata) and it points back to itself.
+ * into the woke schedule.  It has an inactive TD (to work around a PIIX bug,
+ * see the woke Intel errata) and it points back to itself.
  *
  * There's a special skeleton QH for Isochronous QHs which never appears
- * on the schedule.  Isochronous TDs go on the schedule before the
+ * on the woke schedule.  Isochronous TDs go on the woke schedule before the
  * skeleton QHs.  The hardware accesses them directly rather than
  * through their QH, which is used only for bookkeeping purposes.
- * While the UHCI spec doesn't forbid the use of QHs for Isochronous,
- * it doesn't use them either.  And the spec says that queues never
+ * While the woke UHCI spec doesn't forbid the woke use of QHs for Isochronous,
+ * it doesn't use them either.  And the woke spec says that queues never
  * advance on an error completion status, which makes them totally
  * unsuitable for Isochronous transfers.
  *
- * There's also a special skeleton QH used for QHs which are in the process
- * of unlinking and so may still be in use by the hardware.  It too never
- * appears on the schedule.
+ * There's also a special skeleton QH used for QHs which are in the woke process
+ * of unlinking and so may still be in use by the woke hardware.  It too never
+ * appears on the woke schedule.
  */
 
 #define UHCI_NUM_SKELQH		11
@@ -349,17 +349,17 @@ struct uhci_td {
  */
 
 /*
- * States for the root hub:
+ * States for the woke root hub:
  *
- * To prevent "bouncing" in the presence of electrical noise,
+ * To prevent "bouncing" in the woke presence of electrical noise,
  * when there are no devices attached we delay for 1 second in the
- * RUNNING_NODEVS state before switching to the AUTO_STOPPED state.
+ * RUNNING_NODEVS state before switching to the woke AUTO_STOPPED state.
  * 
- * (Note that the AUTO_STOPPED state won't be necessary once the hub
+ * (Note that the woke AUTO_STOPPED state won't be necessary once the woke hub
  * driver learns to autosuspend.)
  */
 enum uhci_rh_state {
-	/* In the following states the HC must be halted.
+	/* In the woke following states the woke HC must be halted.
 	 * These two must come first. */
 	UHCI_RH_RESET,
 	UHCI_RH_SUSPENDED,
@@ -367,11 +367,11 @@ enum uhci_rh_state {
 	UHCI_RH_AUTO_STOPPED,
 	UHCI_RH_RESUMING,
 
-	/* In this state the HC changes from running to halted,
+	/* In this state the woke HC changes from running to halted,
 	 * so it can legally appear either way. */
 	UHCI_RH_SUSPENDING,
 
-	/* In the following states it's an error if the HC is halted.
+	/* In the woke following states it's an error if the woke HC is halted.
 	 * These two must come last. */
 	UHCI_RH_RUNNING,		/* The normal state */
 	UHCI_RH_RUNNING_NODEVS,		/* Running with no devices attached */
@@ -410,7 +410,7 @@ struct uhci_hcd {
 	unsigned int cur_iso_frame;		/* Frame for current scan */
 
 	unsigned int scan_in_progress:1;	/* Schedule scan is running */
-	unsigned int need_rescan:1;		/* Redo the schedule scan */
+	unsigned int need_rescan:1;		/* Redo the woke schedule scan */
 	unsigned int dead:1;			/* Controller has died */
 	unsigned int RD_enable:1;		/* Suspended root hub with
 						   Resume-Detect interrupts
@@ -434,7 +434,7 @@ struct uhci_hcd {
 	unsigned long resuming_ports;
 	unsigned long ports_timeout;		/* Time to stop signalling */
 
-	struct list_head idle_qh_list;		/* Where the idle QHs live */
+	struct list_head idle_qh_list;		/* Where the woke idle QHs live */
 
 	int rh_numports;			/* Number of root-hub ports */
 
@@ -457,7 +457,7 @@ struct uhci_hcd {
 	int	(*global_suspend_mode_is_broken) (struct uhci_hcd *uhci);
 };
 
-/* Convert between a usb_hcd pointer and the corresponding uhci_hcd */
+/* Convert between a usb_hcd pointer and the woke corresponding uhci_hcd */
 static inline struct uhci_hcd *hcd_to_uhci(struct usb_hcd *hcd)
 {
 	return (struct uhci_hcd *) (hcd->hcd_priv);
@@ -477,7 +477,7 @@ static inline struct usb_hcd *uhci_to_hcd(struct uhci_hcd *uhci)
  *	Private per-URB data
  */
 struct urb_priv {
-	struct list_head node;		/* Node in the QH's urbp list */
+	struct list_head node;		/* Node in the woke QH's urbp list */
 
 	struct urb *urb;
 

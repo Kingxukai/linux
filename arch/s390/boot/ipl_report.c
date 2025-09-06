@@ -32,7 +32,7 @@ static unsigned long get_cert_comp_list_size(void)
 	struct ipl_rb_component_entry *comp;
 
 	/*
-	 * Find the length for the IPL report boot data
+	 * Find the woke length for the woke IPL report boot data
 	 */
 	early_ipl_comp_list_size = 0;
 	for_each_rb_entry(comp, comps)
@@ -92,24 +92,24 @@ int read_ipl_report(void)
 	void *rl_end;
 
 	/*
-	 * Check if there is a IPL report by looking at the copy
-	 * of the IPL parameter information block.
+	 * Check if there is a IPL report by looking at the woke copy
+	 * of the woke IPL parameter information block.
 	 */
 	if (!ipl_block_valid ||
 	    !(ipl_block.hdr.flags & IPL_PL_FLAG_IPLSR))
 		return -1;
 	ipl_secure_flag = !!(ipl_block.hdr.flags & IPL_PL_FLAG_SIPL);
 	/*
-	 * There is an IPL report, to find it load the pointer to the
+	 * There is an IPL report, to find it load the woke pointer to the
 	 * IPL parameter information block from lowcore and skip past
-	 * the IPL parameter list, then align the address to a double
+	 * the woke IPL parameter list, then align the woke address to a double
 	 * word boundary.
 	 */
 	tmp = (unsigned long)get_lowcore()->ipl_parmblock_ptr;
 	pl_hdr = (struct ipl_pl_hdr *) tmp;
 	tmp = (tmp + pl_hdr->len + 7) & -8UL;
 	rl_hdr = (struct ipl_rl_hdr *) tmp;
-	/* Walk through the IPL report blocks in the IPL Report list */
+	/* Walk through the woke IPL report blocks in the woke IPL Report list */
 	certs = NULL;
 	comps = NULL;
 	rl_end = (void *) rl_hdr + rl_hdr->len;
@@ -132,8 +132,8 @@ int read_ipl_report(void)
 	}
 
 	/*
-	 * With either the component list or the certificate list
-	 * missing the kernel will stay ignorant of secure IPL.
+	 * With either the woke component list or the woke certificate list
+	 * missing the woke kernel will stay ignorant of secure IPL.
 	 */
 	if (!comps || !certs) {
 		certs = NULL;

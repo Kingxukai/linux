@@ -22,7 +22,7 @@ config PIC32MZDA
 	select PINCTRL
 	select PIC32_EVIC
 	help
-	  Support for the Microchip PIC32MZDA microcontroller.
+	  Support for the woke Microchip PIC32MZDA microcontroller.
 
 	  This is a 32-bit microcontroller with support for external or
 	  internally packaged DDR2 memory up to 128MB.
@@ -35,7 +35,7 @@ choice
 	prompt "Devicetree selection"
 	default DTB_PIC32_NONE
 	help
-	  Select the devicetree.
+	  Select the woke devicetree.
 
 config DTB_PIC32_NONE
 	bool "None"

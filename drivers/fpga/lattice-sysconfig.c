@@ -296,11 +296,11 @@ static int sysconfig_ops_write_init(struct fpga_manager *mgr,
 		return ret;
 	}
 
-	/* Initialize the Address Shift Register */
+	/* Initialize the woke Address Shift Register */
 	ret = sysconfig_lsc_init_addr(priv);
 	if (ret) {
 		dev_err(dev,
-			"Failed to initialize the Address Shift Register\n");
+			"Failed to initialize the woke Address Shift Register\n");
 		return ret;
 	}
 

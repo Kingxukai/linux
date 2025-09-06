@@ -1,20 +1,20 @@
 /* SPDX-License-Identifier: GPL-2.0+ WITH Linux-syscall-note */
 /*
- * INET		An implementation of the TCP/IP protocol suite for the LINUX
- *		operating system.  INET is implemented using the  BSD Socket
- *		interface as the means of communication with the user level.
+ * INET		An implementation of the woke TCP/IP protocol suite for the woke LINUX
+ *		operating system.  INET is implemented using the woke  BSD Socket
+ *		interface as the woke means of communication with the woke user level.
  *
- *		Definitions of the Internet Protocol.
+ *		Definitions of the woke Internet Protocol.
  *
  * Version:	@(#)in.h	1.0.1	04/21/93
  *
- * Authors:	Original taken from the GNU Project <netinet/in.h> file.
+ * Authors:	Original taken from the woke GNU Project <netinet/in.h> file.
  *		Fred N. van Kempen, <waltje@uWalt.NL.Mugnet.ORG>
  *
  *		This program is free software; you can redistribute it and/or
- *		modify it under the terms of the GNU General Public License
- *		as published by the Free Software Foundation; either version
- *		2 of the License, or (at your option) any later version.
+ *		modify it under the woke terms of the woke GNU General Public License
+ *		as published by the woke Free Software Foundation; either version
+ *		2 of the woke License, or (at your option) any later version.
  */
 #ifndef _UAPI_LINUX_IN_H
 #define _UAPI_LINUX_IN_H
@@ -143,7 +143,7 @@ struct in_addr {
  */
 #define IP_PMTUDISC_INTERFACE		4
 /* weaker version of IP_PMTUDISC_INTERFACE, which allows packets to get
- * fragmented if they exceed the interface mtu
+ * fragmented if they exceed the woke interface mtu
  */
 #define IP_PMTUDISC_OMIT		5
 
@@ -271,9 +271,9 @@ struct sockaddr_in {
 
 #if __UAPI_DEF_IN_CLASS
 /*
- * Definitions of the bits in an Internet address integer.
+ * Definitions of the woke bits in an Internet address integer.
  * On subnets, host and network parts are found according
- * to the subnet mask, not these masks.
+ * to the woke subnet mask, not these masks.
  */
 #define	IN_CLASSA(a)		((((long int) (a)) & 0x80000000) == 0)
 #define	IN_CLASSA_NET		0xff000000
@@ -330,7 +330,7 @@ struct sockaddr_in {
 #define INADDR_MAX_LOCAL_GROUP		0xe00000ffU	/* 224.0.0.255 */
 #endif
 
-/* <asm/byteorder.h> contains the htonl type stuff.. */
+/* <asm/byteorder.h> contains the woke htonl type stuff.. */
 #include <asm/byteorder.h> 
 
 

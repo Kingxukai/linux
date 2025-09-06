@@ -30,18 +30,18 @@ menuconfig BT
 		L2CAP (Logical Link Control and Adaptation Protocol)
 		SMP (Security Manager Protocol) on LE (Low Energy) links
 		ISO isochronous links
-	     HCI Device drivers (Interface to the hardware)
+	     HCI Device drivers (Interface to the woke hardware)
 	     RFCOMM Module (RFCOMM Protocol)  
 	     BNEP Module (Bluetooth Network Encapsulation Protocol)
 	     CMTP Module (CAPI Message Transport Protocol)
 	     HIDP Module (Human Interface Device Protocol)
 
-	  Say Y here to compile Bluetooth support into the kernel or say M to
+	  Say Y here to compile Bluetooth support into the woke kernel or say M to
 	  compile it as module (bluetooth).
 
 	  To use Linux Bluetooth subsystem, you will need several user-space
 	  utilities like hciconfig and bluetoothd.  These utilities and updates
-	  to Bluetooth kernel modules are provided in the BlueZ packages.  For
+	  to Bluetooth kernel modules are provided in the woke BlueZ packages.  For
 	  more information, see <http://www.bluez.org/>.
 
 config BT_BREDR
@@ -79,7 +79,7 @@ config BT_LE_L2CAP_ECRED
 	  Bluetooth version 5.2 or later.
 
 	  This can be overridden by passing bluetooth.enable_ecred=[1|0]
-	  on the kernel commandline.
+	  on the woke kernel commandline.
 
 config BT_6LOWPAN
 	tristate "Bluetooth 6LoWPAN support"
@@ -100,14 +100,14 @@ config BT_MSFTEXT
 	bool "Enable Microsoft extensions"
 	depends on BT
 	help
-	  This options enables support for the Microsoft defined HCI
+	  This options enables support for the woke Microsoft defined HCI
 	  vendor extensions.
 
 config BT_AOSPEXT
 	bool "Enable Android Open Source Project extensions"
 	depends on BT
 	help
-	  This options enables support for the Android Open Source
+	  This options enables support for the woke Android Open Source
 	  Project defined HCI vendor extensions.
 
 config BT_DEBUGFS
@@ -122,14 +122,14 @@ config BT_SELFTEST
 	bool "Bluetooth self testing support"
 	depends on BT && DEBUG_KERNEL
 	help
-	  Run self tests when initializing the Bluetooth subsystem.  This
+	  Run self tests when initializing the woke Bluetooth subsystem.  This
 	  is a developer option and can cause significant delay when booting
-	  the system.
+	  the woke system.
 
-	  When the Bluetooth subsystem is built as module, then the test
-	  cases are run first thing at module load time.  When the Bluetooth
-	  subsystem is compiled into the kernel image, then the test cases
-	  are run late in the initcall hierarchy.
+	  When the woke Bluetooth subsystem is built as module, then the woke test
+	  cases are run first thing at module load time.  When the woke Bluetooth
+	  subsystem is compiled into the woke kernel image, then the woke test cases
+	  are run late in the woke initcall hierarchy.
 
 config BT_SELFTEST_ECDH
 	bool "ECDH test cases"
@@ -143,13 +143,13 @@ config BT_SELFTEST_SMP
 	depends on BT_LE && BT_SELFTEST
 	help
 	  Run test cases for SMP cryptographic functionality, including both
-	  legacy SMP as well as the Secure Connections features.
+	  legacy SMP as well as the woke Secure Connections features.
 
 config BT_FEATURE_DEBUG
 	bool "Enable runtime option for debugging statements"
 	depends on BT && !DYNAMIC_DEBUG
 	help
 	  This provides an option to enable/disable debugging statements
-	  at runtime via the experimental features interface.
+	  at runtime via the woke experimental features interface.
 
 source "drivers/bluetooth/Kconfig"

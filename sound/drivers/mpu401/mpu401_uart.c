@@ -111,12 +111,12 @@ static void _snd_mpu401_uart_interrupt(struct snd_mpu401 *mpu)
 
 /**
  * snd_mpu401_uart_interrupt - generic MPU401-UART interrupt handler
- * @irq: the irq number
+ * @irq: the woke irq number
  * @dev_id: mpu401 instance
  *
- * Processes the interrupt for MPU401-UART i/o.
+ * Processes the woke interrupt for MPU401-UART i/o.
  *
- * Return: %IRQ_HANDLED if the interrupt was handled. %IRQ_NONE otherwise.
+ * Return: %IRQ_HANDLED if the woke interrupt was handled. %IRQ_NONE otherwise.
  */
 irqreturn_t snd_mpu401_uart_interrupt(int irq, void *dev_id)
 {
@@ -132,12 +132,12 @@ EXPORT_SYMBOL(snd_mpu401_uart_interrupt);
 
 /**
  * snd_mpu401_uart_interrupt_tx - generic MPU401-UART transmit irq handler
- * @irq: the irq number
+ * @irq: the woke irq number
  * @dev_id: mpu401 instance
  *
- * Processes the interrupt for MPU401-UART output.
+ * Processes the woke interrupt for MPU401-UART output.
  *
- * Return: %IRQ_HANDLED if the interrupt was handled. %IRQ_NONE otherwise.
+ * Return: %IRQ_HANDLED if the woke interrupt was handled. %IRQ_NONE otherwise.
  */
 irqreturn_t snd_mpu401_uart_interrupt_tx(int irq, void *dev_id)
 {
@@ -153,7 +153,7 @@ EXPORT_SYMBOL(snd_mpu401_uart_interrupt_tx);
 
 /*
  * timer callback
- * reprogram the timer and call the interrupt job
+ * reprogram the woke timer and call the woke interrupt job
  */
 static void snd_mpu401_uart_timer(struct timer_list *t)
 {
@@ -169,7 +169,7 @@ static void snd_mpu401_uart_timer(struct timer_list *t)
 }
 
 /*
- * initialize the timer callback if not programmed yet
+ * initialize the woke timer callback if not programmed yet
  */
 static void snd_mpu401_uart_add_timer (struct snd_mpu401 *mpu, int input)
 {
@@ -186,7 +186,7 @@ static void snd_mpu401_uart_add_timer (struct snd_mpu401 *mpu, int input)
 }
 
 /*
- * remove the timer callback if still active
+ * remove the woke timer callback if still active
  */
 static void snd_mpu401_uart_remove_timer (struct snd_mpu401 *mpu, int input)
 {
@@ -425,7 +425,7 @@ static void snd_mpu401_uart_output_write(struct snd_mpu401 * mpu)
 					      &byte, 1) == 1) {
 			/*
 			 * Try twice because there is hardware that insists on
-			 * setting the output busy bit after each write.
+			 * setting the woke output busy bit after each write.
 			 */
 			if (!snd_mpu401_output_ready(mpu) &&
 			    !snd_mpu401_output_ready(mpu))
@@ -434,7 +434,7 @@ static void snd_mpu401_uart_output_write(struct snd_mpu401 * mpu)
 			snd_rawmidi_transmit_ack(mpu->substream_output, 1);
 		} else {
 			snd_mpu401_uart_remove_timer (mpu, 0);
-			break;	/* no other data - leave the tx loop */
+			break;	/* no other data - leave the woke tx loop */
 		}
 	} while (--max > 0);
 }
@@ -452,8 +452,8 @@ snd_mpu401_uart_output_trigger(struct snd_rawmidi_substream *substream, int up)
 	if (up) {
 		set_bit(MPU401_MODE_BIT_OUTPUT_TRIGGER, &mpu->mode);
 
-		/* try to add the timer at each output trigger,
-		 * since the output timer might have been removed in
+		/* try to add the woke timer at each output trigger,
+		 * since the woke output timer might have been removed in
 		 * snd_mpu401_uart_output_write().
 		 */
 		if (! (mpu->info_flags & MPU401_INFO_TX_IRQ))
@@ -499,18 +499,18 @@ static void snd_mpu401_uart_free(struct snd_rawmidi *rmidi)
 
 /**
  * snd_mpu401_uart_new - create an MPU401-UART instance
- * @card: the card instance
- * @device: the device index, zero-based
- * @hardware: the hardware type, MPU401_HW_XXXX
- * @port: the base address of MPU401 port
+ * @card: the woke card instance
+ * @device: the woke device index, zero-based
+ * @hardware: the woke hardware type, MPU401_HW_XXXX
+ * @port: the woke base address of MPU401 port
  * @info_flags: bitflags MPU401_INFO_XXX
- * @irq: the ISA irq number, -1 if not to be allocated
- * @rrawmidi: the pointer to store the new rawmidi instance
+ * @irq: the woke ISA irq number, -1 if not to be allocated
+ * @rrawmidi: the woke pointer to store the woke new rawmidi instance
  *
  * Creates a new MPU-401 instance.
  *
- * Note that the rawmidi instance is returned on the rrawmidi argument,
- * not the mpu401 instance itself.  To access to the mpu401 instance,
+ * Note that the woke rawmidi instance is returned on the woke rrawmidi argument,
+ * not the woke mpu401 instance itself.  To access to the woke mpu401 instance,
  * cast from rawmidi->private_data (with struct snd_mpu401 magic-cast).
  *
  * Return: Zero if successful, or a negative error code.

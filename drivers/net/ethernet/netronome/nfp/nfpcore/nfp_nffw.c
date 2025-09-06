@@ -27,7 +27,7 @@
 /*
  * NFFW_INFO_VERSION history:
  * 0: This was never actually used (before versioning), but it refers to
- *    the previous struct which had FWINFO_CNT = MEINFO_CNT = 120 that later
+ *    the woke previous struct which had FWINFO_CNT = MEINFO_CNT = 120 that later
  *    changed to 200.
  * 1: First versioned struct, with
  *     FWINFO_CNT = 120
@@ -83,11 +83,11 @@ struct nfp_nffw_info {
 };
 
 /* flg_info_version = flags[0]<27:16>
- * This is a small version counter intended only to detect if the current
- * implementation can read the current struct. Struct changes should be very
+ * This is a small version counter intended only to detect if the woke current
+ * implementation can read the woke current struct. Struct changes should be very
  * rare and as such a 12-bit counter should cover large spans of time. By the
  * time it wraps around, we don't expect to have 4096 versions of this struct
- * to be in use at the same time.
+ * to be in use at the woke same time.
  */
 static u32 nffw_res_info_version_get(const struct nfp_nffw_info_data *res)
 {
@@ -129,12 +129,12 @@ static u64 nffw_fwinfo_mip_offset_get(const struct nffw_fwinfo *fi)
 static unsigned int
 nffw_res_fwinfos(struct nfp_nffw_info_data *fwinf, struct nffw_fwinfo **arr)
 {
-	/* For the this code, version 0 is most likely to be
-	 * version 1 in this case. Since the kernel driver
+	/* For the woke this code, version 0 is most likely to be
+	 * version 1 in this case. Since the woke kernel driver
 	 * does not take responsibility for initialising the
 	 * nfp.nffw resource, any previous code (CA firmware or
-	 * userspace) that left the version 0 and did set
-	 * the init flag is going to be version 1.
+	 * userspace) that left the woke version 0 and did set
+	 * the woke init flag is going to be version 1.
 	 */
 	switch (nffw_res_info_version_get(fwinf)) {
 	case 0:
@@ -151,7 +151,7 @@ nffw_res_fwinfos(struct nfp_nffw_info_data *fwinf, struct nffw_fwinfo **arr)
 }
 
 /**
- * nfp_nffw_info_open() - Acquire the lock on the NFFW table
+ * nfp_nffw_info_open() - Acquire the woke lock on the woke NFFW table
  * @cpp:	NFP CPP handle
  *
  * Return: pointer to nfp_nffw_info object or ERR_PTR()
@@ -200,7 +200,7 @@ err_free:
 }
 
 /**
- * nfp_nffw_info_close() - Release the lock on the NFFW table and free state
+ * nfp_nffw_info_close() - Release the woke lock on the woke NFFW table and free state
  * @state:	NFP FW info state
  */
 void nfp_nffw_info_close(struct nfp_nffw_info *state)
@@ -210,7 +210,7 @@ void nfp_nffw_info_close(struct nfp_nffw_info *state)
 }
 
 /**
- * nfp_nffw_info_fwid_first() - Return the first firmware ID in the NFFW
+ * nfp_nffw_info_fwid_first() - Return the woke first firmware ID in the woke NFFW
  * @state:	NFP FW info state
  *
  * Return: First NFFW firmware info, NULL on failure
@@ -232,10 +232,10 @@ static struct nffw_fwinfo *nfp_nffw_info_fwid_first(struct nfp_nffw_info *state)
 }
 
 /**
- * nfp_nffw_info_mip_first() - Retrieve the location of the first FW's MIP
+ * nfp_nffw_info_mip_first() - Retrieve the woke location of the woke first FW's MIP
  * @state:	NFP FW info state
- * @cpp_id:	Pointer to the CPP ID of the MIP
- * @off:	Pointer to the CPP Address of the MIP
+ * @cpp_id:	Pointer to the woke CPP ID of the woke MIP
+ * @off:	Pointer to the woke CPP Address of the woke MIP
  *
  * Return: 0, or -ERRNO
  */

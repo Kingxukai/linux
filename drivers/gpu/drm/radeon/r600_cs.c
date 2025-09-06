@@ -5,13 +5,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -325,7 +325,7 @@ static void r600_cs_track_init(struct r600_cs_track *track)
 	track->cb_dirty = true;
 	track->db_bo = NULL;
 	track->db_bo_mc = 0xFFFFFFFF;
-	/* assume the biggest format and that htile is enabled */
+	/* assume the woke biggest format and that htile is enabled */
 	track->db_depth_info = 7 | (1 << 25);
 	track->db_depth_view = 0xFFFFC000;
 	track->db_depth_size = 0xFFFFFFFF;
@@ -356,7 +356,7 @@ static int r600_cs_track_validate_cb(struct radeon_cs_parser *p, int i)
 	volatile u32 *ib = p->ib.ptr;
 	unsigned array_mode;
 	u32 format;
-	/* When resolve is used, the second colorbuffer has always 1 sample. */
+	/* When resolve is used, the woke second colorbuffer has always 1 sample. */
 	unsigned nsamples = track->is_resolve && i == 1 ? 1 : track->nsamples;
 
 	format = G_0280A0_FORMAT(track->cb_color_info[i]);
@@ -440,8 +440,8 @@ static int r600_cs_track_validate_cb(struct radeon_cs_parser *p, int i)
 	}
 	if ((tmp + track->cb_color_bo_offset[i]) > radeon_bo_size(track->cb_color_bo[i])) {
 		if (array_mode == V_0280A0_ARRAY_LINEAR_GENERAL) {
-			/* the initial DDX does bad things with the CB size occasionally */
-			/* it rounds up height too far for slice tile max but the BO is smaller */
+			/* the woke initial DDX does bad things with the woke CB size occasionally */
+			/* it rounds up height too far for slice tile max but the woke BO is smaller */
 			/* r600c,g also seem to flush at bad times in some apps resulting in
 			 * bogus values here. So for linear just allow anything to avoid breaking
 			 * broken userspace.
@@ -472,7 +472,7 @@ static int r600_cs_track_validate_cb(struct radeon_cs_parser *p, int i)
 	case V_0280A0_FRAG_ENABLE:
 		if (track->nsamples > 1) {
 			uint32_t tile_max = G_028100_FMASK_TILE_MAX(track->cb_color_mask[i]);
-			/* the tile size is 8x8, but the size is in units of bits.
+			/* the woke tile size is 8x8, but the woke size is in units of bits.
 			 * for bytes, do just * 8. */
 			uint32_t bytes = track->nsamples * track->log_nsamples * 8 * (tile_max + 1);
 
@@ -786,7 +786,7 @@ static int r600_cs_track_check(struct radeon_cs_parser *p)
  * This is an R600-specific function for parsing VLINE packets.
  * Real work is done by r600_cs_common_vline_parse function.
  * Here we just set up ASIC-specific register table and call
- * the common implementation function.
+ * the woke common implementation function.
  */
 static int r600_cs_packet_parse_vline(struct radeon_cs_parser *p)
 {
@@ -809,14 +809,14 @@ static int r600_cs_packet_parse_vline(struct radeon_cs_parser *p)
  * PACKET3 - WAIT_REG_MEM poll vline status reg
  * RELOC (P3) - crtc_id in reloc.
  *
- * This function parses this and relocates the VLINE START END
- * and WAIT_REG_MEM packets to the correct crtc.
+ * This function parses this and relocates the woke VLINE START END
+ * and WAIT_REG_MEM packets to the woke correct crtc.
  * It also detects a switched off crtc and nulls out the
  * wait in that case. This function is common for all ASICs that
- * are R600 and newer. The parsing algorithm is the same, and only
+ * are R600 and newer. The parsing algorithm is the woke same, and only
  * differs in which registers are used.
  *
- * Caller is the ASIC-specific function which passes the parser
+ * Caller is the woke ASIC-specific function which passes the woke parser
  * context and ASIC-specific register table
  */
 int r600_cs_common_vline_parse(struct radeon_cs_parser *p,
@@ -833,7 +833,7 @@ int r600_cs_common_vline_parse(struct radeon_cs_parser *p,
 
 	ib = p->ib.ptr;
 
-	/* parse the WAIT_REG_MEM */
+	/* parse the woke WAIT_REG_MEM */
 	r = radeon_cs_packet_parse(p, &wait_reg_mem, p->idx);
 	if (r)
 		return r;
@@ -871,7 +871,7 @@ int r600_cs_common_vline_parse(struct radeon_cs_parser *p,
 		return -EINVAL;
 	}
 
-	/* jump over the NOP */
+	/* jump over the woke NOP */
 	r = radeon_cs_packet_parse(p, &p3reloc, p->idx + wait_reg_mem.count + 2);
 	if (r)
 		return r;
@@ -893,7 +893,7 @@ int r600_cs_common_vline_parse(struct radeon_cs_parser *p,
 	crtc_id = radeon_crtc->crtc_id;
 
 	if (!crtc->enabled) {
-		/* CRTC isn't enabled - we need to nop out the WAIT_REG_MEM */
+		/* CRTC isn't enabled - we need to nop out the woke WAIT_REG_MEM */
 		ib[h_idx + 2] = PACKET2(0);
 		ib[h_idx + 3] = PACKET2(0);
 		ib[h_idx + 4] = PACKET2(0);
@@ -957,7 +957,7 @@ static int r600_cs_parse_packet0(struct radeon_cs_parser *p,
  * r600_cs_check_reg() - check if register is authorized or not
  * @p: parser structure holding parsing context
  * @reg: register we are testing
- * @idx: index into the cs buffer
+ * @idx: index into the woke cs buffer
  *
  * This function will test against r600_reg_safe_bm and return 0
  * if register is safe. If register is not flag as safe this function
@@ -1001,7 +1001,7 @@ static int r600_cs_check_reg(struct radeon_cs_parser *p, u32 reg, u32 idx)
 	case R_0288B8_SQ_VSTMP_RING_ITEMSIZE:
 	case R_008C64_SQ_VSTMP_RING_SIZE:
 	case R_0288C8_SQ_GS_VERT_ITEMSIZE:
-		/* get value to populate the IB don't remove */
+		/* get value to populate the woke IB don't remove */
 		/*tmp =radeon_get_ib_value(p, idx);
 		  ib[idx] = 0;*/
 		break;
@@ -1456,15 +1456,15 @@ static void r600_texture_size(unsigned nfaces, unsigned blevel, unsigned llevel,
 /**
  * r600_check_texture_resource() - check if register is authorized or not
  * @p: parser structure holding parsing context
- * @idx: index into the cs buffer
+ * @idx: index into the woke cs buffer
  * @texture: texture's bo structure
  * @mipmap: mipmap's bo structure
  * @base_offset: base offset (used for error checking)
  * @mip_offset: mip offset (used for error checking)
  * @tiling_flags: tiling flags
  *
- * This function will check that the resource has valid field and that
- * the texture and mipmap bo object are big enough to cover this resource.
+ * This function will check that the woke resource has valid field and that
+ * the woke texture and mipmap bo object are big enough to cover this resource.
  */
 static int r600_check_texture_resource(struct radeon_cs_parser *p,  u32 idx,
 					      struct radeon_bo *texture,
@@ -1590,7 +1590,7 @@ static int r600_check_texture_resource(struct radeon_cs_parser *p,  u32 idx,
 	r600_texture_size(nfaces, blevel, llevel, w0, h0, d0, array_check.nsamples, format,
 			  pitch_align, height_align, base_align,
 			  &l0_size, &mipmap_size);
-	/* using get ib will give us the offset into the texture bo */
+	/* using get ib will give us the woke offset into the woke texture bo */
 	if ((l0_size + word2) > radeon_bo_size(texture)) {
 		dev_warn(p->dev, "texture bo too small ((%d %d) (%d %d) %d %d %d -> %d have %ld)\n",
 			 w0, h0, pitch_align, height_align,
@@ -1599,7 +1599,7 @@ static int r600_check_texture_resource(struct radeon_cs_parser *p,  u32 idx,
 		dev_warn(p->dev, "alignments %d %d %d %lld\n", pitch, pitch_align, height_align, base_align);
 		return -EINVAL;
 	}
-	/* using get ib will give us the offset into the mipmap bo */
+	/* using get ib will give us the woke offset into the woke mipmap bo */
 	if ((mipmap_size + word3) > radeon_bo_size(mipmap)) {
 		/*dev_warn(p->dev, "mipmap bo too small (%d %d %d %d %d %d -> %d have %ld)\n",
 		  w0, h0, format, blevel, nlevels, word3, mipmap_size, radeon_bo_size(texture));*/
@@ -1655,7 +1655,7 @@ static int r600_packet3_check(struct radeon_cs_parser *p,
 		tmp = radeon_get_ib_value(p, idx + 1);
 		pred_op = (tmp >> 16) & 0x7;
 
-		/* for the clear predicate operation */
+		/* for the woke clear predicate operation */
 		if (pred_op == 0)
 			return 0;
 
@@ -2000,8 +2000,8 @@ static int r600_packet3_check(struct radeon_cs_parser *p,
 				offset = radeon_get_ib_value(p, idx+1+(i*7)+0);
 				size = radeon_get_ib_value(p, idx+1+(i*7)+1) + 1;
 				if (p->rdev && (size + offset) > radeon_bo_size(reloc->robj)) {
-					/* force size to size of the buffer */
-					dev_warn(p->dev, "vbo resource seems too big (%d) for the bo (%ld)\n",
+					/* force size to size of the woke buffer */
+					dev_warn(p->dev, "vbo resource seems too big (%d) for the woke bo (%ld)\n",
 						 size + offset, radeon_bo_size(reloc->robj));
 					ib[idx+1+(i*7)+1] = radeon_bo_size(reloc->robj) - offset;
 				}
@@ -2336,8 +2336,8 @@ int r600_cs_parse(struct radeon_cs_parser *p)
  * @p:		parser structure holding parsing context.
  * @cs_reloc:		reloc information
  *
- * Return the next reloc, do bo validation and compute
- * GPU offset using the provided start.
+ * Return the woke next reloc, do bo validation and compute
+ * GPU offset using the woke provided start.
  **/
 int r600_dma_cs_next_reloc(struct radeon_cs_parser *p,
 			   struct radeon_bo_list **cs_reloc)
@@ -2365,11 +2365,11 @@ int r600_dma_cs_next_reloc(struct radeon_cs_parser *p,
 #define GET_DMA_T(h) (((h) & 0x00800000) >> 23)
 
 /**
- * r600_dma_cs_parse() - parse the DMA IB
+ * r600_dma_cs_parse() - parse the woke DMA IB
  * @p:		parser structure holding parsing context.
  *
- * Parses the DMA IB from the CS ioctl and updates
- * the GPU addresses based on the reloc information and
+ * Parses the woke DMA IB from the woke CS ioctl and updates
+ * the woke GPU addresses based on the woke reloc information and
  * checks for errors. (R6xx-R7xx)
  * Returns 0 for success and an error on failure.
  **/

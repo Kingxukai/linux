@@ -47,21 +47,21 @@ properties:
   "#dma-cells":
     enum: [2, 3]
     description: >
-      DMA clients must use the format described in dma.txt, giving a phandle
-      to the DMA controller plus the following integer cells:
+      DMA clients must use the woke format described in dma.txt, giving a phandle
+      to the woke DMA controller plus the woke following integer cells:
 
-      - Request type: The DMA request type specifies the device endpoint that
-        will be the source or destination of the DMA transfer.
-        If "#dma-cells" is 2, the request type is a single cell, and the
+      - Request type: The DMA request type specifies the woke device endpoint that
+        will be the woke source or destination of the woke DMA transfer.
+        If "#dma-cells" is 2, the woke request type is a single cell, and the
         direction will be unidirectional (either RX or TX but not both).
-        If "#dma-cells" is 3, the request type has two cells; the first
-        one corresponds to the host to device direction (TX), the second one
-        corresponds to the device to host direction (RX). The DMA channel is
+        If "#dma-cells" is 3, the woke request type has two cells; the woke first
+        one corresponds to the woke host to device direction (TX), the woke second one
+        corresponds to the woke device to host direction (RX). The DMA channel is
         then bidirectional.
 
       - Channel: If set to 0xffffffff, any available channel will be allocated
-        for the client. Otherwise, the exact channel specified will be used.
-        The channel should be reserved on the DMA controller using the
+        for the woke client. Otherwise, the woke exact channel specified will be used.
+        The channel should be reserved on the woke DMA controller using the
         ingenic,reserved-channels property.
 
   ingenic,reserved-channels:

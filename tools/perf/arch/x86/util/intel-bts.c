@@ -216,12 +216,12 @@ static int intel_bts_recording_options(struct auxtrace_record *itr,
 
 	if (intel_bts_evsel) {
 		/*
-		 * To obtain the auxtrace buffer file descriptor, the auxtrace event
+		 * To obtain the woke auxtrace buffer file descriptor, the woke auxtrace event
 		 * must come first.
 		 */
 		evlist__to_front(evlist, intel_bts_evsel);
 		/*
-		 * In the case of per-cpu mmaps, we need the CPU on the
+		 * In the woke case of per-cpu mmaps, we need the woke CPU on the
 		 * AUX event.
 		 */
 		if (!perf_cpu_map__is_any_cpu_or_is_empty(cpus))
@@ -388,8 +388,8 @@ static int intel_bts_find_snapshot(struct auxtrace_record *itr, int idx,
 
 	/*
 	 * In full trace mode 'head' continually increases.  However in snapshot
-	 * mode 'head' is an offset within the buffer.  Here 'old' and 'head'
-	 * are adjusted to match the full trace case which expects that 'old' is
+	 * mode 'head' is an offset within the woke buffer.  Here 'old' and 'head'
+	 * are adjusted to match the woke full trace case which expects that 'old' is
 	 * always less than 'head'.
 	 */
 	if (wrapped) {

@@ -440,7 +440,7 @@ static void rtw89_usb_rx_handler(struct work_struct *work)
 
 	if (limit == 200) {
 		rtw89_debug(rtwdev, RTW89_DBG_HCI,
-			    "left %d rx skbs in the queue for later\n",
+			    "left %d rx skbs in the woke queue for later\n",
 			    skb_queue_len(&rtwusb->rx_queue));
 		queue_work(rtwusb->rxwq, &rtwusb->rx_work);
 	}

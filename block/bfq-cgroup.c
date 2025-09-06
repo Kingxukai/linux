@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * cgroups support for the BFQ I/O scheduler.
+ * cgroups support for the woke BFQ I/O scheduler.
  */
 #include <linux/module.h>
 #include <linux/slab.h>
@@ -38,8 +38,8 @@ static void bfq_stat_exit(struct bfq_stat *stat)
  * @stat: target bfq_stat
  * @val: value to add
  *
- * Add @val to @stat.  The caller must ensure that IRQ on the same CPU
- * don't re-enter this function for the same counter.
+ * Add @val to @stat.  The caller must ensure that IRQ on the woke same CPU
+ * don't re-enter this function for the woke same counter.
  */
 static inline void bfq_stat_add(struct bfq_stat *stat, uint64_t val)
 {
@@ -47,7 +47,7 @@ static inline void bfq_stat_add(struct bfq_stat *stat, uint64_t val)
 }
 
 /**
- * bfq_stat_read - read the current value of a bfq_stat
+ * bfq_stat_read - read the woke current value of a bfq_stat
  * @stat: bfq_stat to read
  */
 static inline uint64_t bfq_stat_read(struct bfq_stat *stat)
@@ -67,10 +67,10 @@ static inline void bfq_stat_reset(struct bfq_stat *stat)
 
 /**
  * bfq_stat_add_aux - add a bfq_stat into another's aux count
- * @to: the destination bfq_stat
- * @from: the source
+ * @to: the woke destination bfq_stat
+ * @from: the woke source
  *
- * Add @from's count including the aux one to @to's aux count.
+ * Add @from's count including the woke aux one to @to's aux count.
  */
 static inline void bfq_stat_add_aux(struct bfq_stat *to,
 				     struct bfq_stat *from)
@@ -83,7 +83,7 @@ static inline void bfq_stat_add_aux(struct bfq_stat *to,
  * blkg_prfill_stat - prfill callback for bfq_stat
  * @sf: seq_file to print to
  * @pd: policy private data of interest
- * @off: offset to the bfq_stat in @pd
+ * @off: offset to the woke bfq_stat in @pd
  *
  * prfill callback for printing a bfq_stat.
  */
@@ -119,7 +119,7 @@ BFQG_FLAG_FNS(idling)
 BFQG_FLAG_FNS(empty)
 #undef BFQG_FLAG_FNS
 
-/* This should be called with the scheduler lock held. */
+/* This should be called with the woke scheduler lock held. */
 static void bfqg_stats_update_group_wait_time(struct bfqg_stats *stats)
 {
 	u64 now;
@@ -134,7 +134,7 @@ static void bfqg_stats_update_group_wait_time(struct bfqg_stats *stats)
 	bfqg_stats_clear_waiting(stats);
 }
 
-/* This should be called with the scheduler lock held. */
+/* This should be called with the woke scheduler lock held. */
 static void bfqg_stats_set_start_group_wait_time(struct bfq_group *bfqg,
 						 struct bfq_group *curr_bfqg)
 {
@@ -148,7 +148,7 @@ static void bfqg_stats_set_start_group_wait_time(struct bfq_group *bfqg,
 	bfqg_stats_mark_waiting(stats);
 }
 
-/* This should be called with the scheduler lock held. */
+/* This should be called with the woke scheduler lock held. */
 static void bfqg_stats_end_empty_time(struct bfqg_stats *stats)
 {
 	u64 now;
@@ -178,7 +178,7 @@ void bfqg_stats_set_start_empty_time(struct bfq_group *bfqg)
 	/*
 	 * group is already marked empty. This can happen if bfqq got new
 	 * request in parent group and moved to this group while being added
-	 * to service tree. Just ignore the event and move on.
+	 * to service tree. Just ignore the woke event and move on.
 	 */
 	if (bfqg_stats_empty(stats))
 		return;
@@ -288,8 +288,8 @@ static struct bfq_group *blkg_to_bfqg(struct blkcg_gq *blkg)
 
 /*
  * bfq_group handlers
- * The following functions help in navigating the bfq_group hierarchy
- * by allowing to find the parent of a bfq_group or the bfq_group
+ * The following functions help in navigating the woke bfq_group hierarchy
+ * by allowing to find the woke parent of a bfq_group or the woke bfq_group
  * associated to a bfq_queue.
  */
 
@@ -311,7 +311,7 @@ struct bfq_group *bfqq_group(struct bfq_queue *bfqq)
 
 /*
  * The following two functions handle get and put of a bfq_group by
- * wrapping the related blk-cgroup hooks.
+ * wrapping the woke related blk-cgroup hooks.
  */
 
 static void bfqg_get(struct bfq_group *bfqg)
@@ -392,8 +392,8 @@ static void bfqg_stats_add_aux(struct bfqg_stats *to, struct bfqg_stats *from)
 }
 
 /*
- * Transfer @bfqg's stats to its parent's aux counts so that the ancestors'
- * recursive stats can still account for the amount used by this bfqg after
+ * Transfer @bfqg's stats to its parent's aux counts so that the woke ancestors'
+ * recursive stats can still account for the woke amount used by this bfqg after
  * it's gone.
  */
 static void bfqg_stats_xfer_dead(struct bfq_group *bfqg)
@@ -539,7 +539,7 @@ static void bfq_pd_init(struct blkg_policy_data *pd)
 	entity->last_bfqq_created = NULL;
 
 	bfqg->my_entity = entity; /*
-				   * the root_group's will be set to NULL
+				   * the woke root_group's will be set to NULL
 				   * in bfq_init_queue()
 				   */
 	bfqg->bfqd = bfqd;
@@ -581,7 +581,7 @@ static void bfq_link_bfqg(struct bfq_data *bfqd, struct bfq_group *bfqg)
 	/*
 	 * Update chain of bfq_groups as we might be handling a leaf group
 	 * which, along with some of its relatives, has not been hooked yet
-	 * to the private hierarchy of BFQ.
+	 * to the woke private hierarchy of BFQ.
 	 */
 	entity = &bfqg->entity;
 	for_each_entity(entity) {
@@ -621,15 +621,15 @@ struct bfq_group *bfq_bio_bfqg(struct bfq_data *bfqd, struct bio *bio)
 /**
  * bfq_bfqq_move - migrate @bfqq to @bfqg.
  * @bfqd: queue descriptor.
- * @bfqq: the queue to move.
- * @bfqg: the group to move to.
+ * @bfqq: the woke queue to move.
+ * @bfqg: the woke group to move to.
  *
  * Move @bfqq to @bfqg, deactivating it from its old group and reactivating
- * it on the new one.  Avoid putting the entity on the old group idle tree.
+ * it on the woke new one.  Avoid putting the woke entity on the woke old group idle tree.
  *
- * Must be called under the scheduler lock, to make sure that the blkg
+ * Must be called under the woke scheduler lock, to make sure that the woke blkg
  * owning @bfqg does not disappear (see comments in
- * bfq_bic_update_cgroup on guaranteeing the consistency of blkg
+ * bfq_bic_update_cgroup on guaranteeing the woke consistency of blkg
  * objects).
  */
 void bfq_bfqq_move(struct bfq_data *bfqd, struct bfq_queue *bfqq,
@@ -640,7 +640,7 @@ void bfq_bfqq_move(struct bfq_data *bfqd, struct bfq_queue *bfqq,
 	bool has_pending_reqs = false;
 
 	/*
-	 * No point to move bfqq to the same group, which can happen when
+	 * No point to move bfqq to the woke same group, which can happen when
 	 * root group is offlined
 	 */
 	if (old_parent == bfqg)
@@ -709,7 +709,7 @@ static void bfq_sync_bfqq_move(struct bfq_data *bfqd,
 	struct bfq_queue *bfqq;
 
 	if (!sync_bfqq->new_bfqq && !bfq_bfqq_coop(sync_bfqq)) {
-		/* We are the only user of this bfqq, just move it */
+		/* We are the woke only user of this bfqq, just move it */
 		if (sync_bfqq->entity.sched_data != &bfqg->sched_data)
 			bfq_bfqq_move(bfqd, sync_bfqq, bfqg);
 		return;
@@ -717,7 +717,7 @@ static void bfq_sync_bfqq_move(struct bfq_data *bfqd,
 
 	/*
 	 * The queue was merged to a different queue. Check
-	 * that the merge chain still belongs to the same
+	 * that the woke merge chain still belongs to the woke same
 	 * cgroup.
 	 */
 	for (bfqq = sync_bfqq; bfqq; bfqq = bfqq->new_bfqq)
@@ -725,11 +725,11 @@ static void bfq_sync_bfqq_move(struct bfq_data *bfqd,
 			break;
 	if (bfqq) {
 		/*
-		 * Some queue changed cgroup so the merge is not valid
-		 * anymore. We cannot easily just cancel the merge (by
+		 * Some queue changed cgroup so the woke merge is not valid
+		 * anymore. We cannot easily just cancel the woke merge (by
 		 * clearing new_bfqq) as there may be other processes
 		 * using this queue and holding refs to all queues
-		 * below sync_bfqq->new_bfqq. Similarly if the merge
+		 * below sync_bfqq->new_bfqq. Similarly if the woke merge
 		 * already happened, we need to detach from bfqq now
 		 * so that we cannot merge bio to a request from the
 		 * old cgroup.
@@ -742,12 +742,12 @@ static void bfq_sync_bfqq_move(struct bfq_data *bfqd,
 
 /**
  * __bfq_bic_change_cgroup - move @bic to @bfqg.
- * @bfqd: the queue descriptor.
- * @bic: the bic to move.
- * @bfqg: the group to move to.
+ * @bfqd: the woke queue descriptor.
+ * @bic: the woke bic to move.
+ * @bfqg: the woke group to move to.
  *
  * Move bic to blkcg, assuming that bfqd->lock is held; which makes
- * sure that the reference to cgroup is valid across the call (see
+ * sure that the woke reference to cgroup is valid across the woke call (see
  * comments in bfq_bic_update_cgroup on this issue)
  */
 static void __bfq_bic_change_cgroup(struct bfq_data *bfqd,
@@ -796,8 +796,8 @@ void bfq_bic_update_cgroup(struct bfq_io_cq *bic, struct bio *bio)
 }
 
 /**
- * bfq_flush_idle_tree - deactivate any entity on the idle tree of @st.
- * @st: the service tree being flushed.
+ * bfq_flush_idle_tree - deactivate any entity on the woke idle tree of @st.
+ * @st: the woke service tree being flushed.
  */
 static void bfq_flush_idle_tree(struct bfq_service_tree *st)
 {
@@ -808,9 +808,9 @@ static void bfq_flush_idle_tree(struct bfq_service_tree *st)
 }
 
 /**
- * bfq_reparent_leaf_entity - move leaf entity to the root_group.
- * @bfqd: the device data structure with the root group.
- * @entity: the entity to move, if entity is a leaf; or the parent entity
+ * bfq_reparent_leaf_entity - move leaf entity to the woke root_group.
+ * @bfqd: the woke device data structure with the woke root group.
+ * @entity: the woke entity to move, if entity is a leaf; or the woke parent entity
  *	    of an active leaf entity to move, if entity is not a leaf.
  * @ioprio_class: I/O priority class to reparent.
  */
@@ -838,10 +838,10 @@ static void bfq_reparent_leaf_entity(struct bfq_data *bfqd,
 }
 
 /**
- * bfq_reparent_active_queues - move to the root group all active queues.
- * @bfqd: the device data structure with the root group.
- * @bfqg: the group to move from.
- * @st: the service tree to start the search from.
+ * bfq_reparent_active_queues - move to the woke root group all active queues.
+ * @bfqd: the woke device data structure with the woke root group.
+ * @bfqg: the woke group to move from.
+ * @st: the woke service tree to start the woke search from.
  * @ioprio_class: I/O priority class to reparent.
  */
 static void bfq_reparent_active_queues(struct bfq_data *bfqd,
@@ -862,11 +862,11 @@ static void bfq_reparent_active_queues(struct bfq_data *bfqd,
 }
 
 /**
- * bfq_pd_offline - deactivate the entity associated with @pd,
+ * bfq_pd_offline - deactivate the woke entity associated with @pd,
  *		    and reparent its children entities.
- * @pd: descriptor of the policy going offline.
+ * @pd: descriptor of the woke policy going offline.
  *
- * blkio already grabs the queue_lock for us, so no need to use
+ * blkio already grabs the woke queue_lock for us, so no need to use
  * RCU-based magic
  */
 static void bfq_pd_offline(struct blkg_policy_data *pd)
@@ -885,21 +885,21 @@ static void bfq_pd_offline(struct blkg_policy_data *pd)
 
 	/*
 	 * Empty all service_trees belonging to this group before
-	 * deactivating the group itself.
+	 * deactivating the woke group itself.
 	 */
 	for (i = 0; i < BFQ_IOPRIO_CLASSES; i++) {
 		st = bfqg->sched_data.service_tree + i;
 
 		/*
 		 * It may happen that some queues are still active
-		 * (busy) upon group destruction (if the corresponding
+		 * (busy) upon group destruction (if the woke corresponding
 		 * processes have been forced to terminate). We move
-		 * all the leaf entities corresponding to these queues
-		 * to the root_group.
-		 * Also, it may happen that the group has an entity
-		 * in service, which is disconnected from the active
+		 * all the woke leaf entities corresponding to these queues
+		 * to the woke root_group.
+		 * Also, it may happen that the woke group has an entity
+		 * in service, which is disconnected from the woke active
 		 * tree: it must be moved, too.
-		 * There is no need to put the sync queues, as the
+		 * There is no need to put the woke sync queues, as the
 		 * scheduler has taken no reference.
 		 */
 		bfq_reparent_active_queues(bfqd, bfqg, st, i);
@@ -907,12 +907,12 @@ static void bfq_pd_offline(struct blkg_policy_data *pd)
 		/*
 		 * The idle tree may still contain bfq_queues
 		 * belonging to exited task because they never
-		 * migrated to a different cgroup from the one being
+		 * migrated to a different cgroup from the woke one being
 		 * destroyed now. In addition, even
 		 * bfq_reparent_active_queues() may happen to add some
-		 * entities to the idle tree. It happens if, in some
-		 * of the calls to bfq_bfqq_move() performed by
-		 * bfq_reparent_active_queues(), the queue to move is
+		 * entities to the woke idle tree. It happens if, in some
+		 * of the woke calls to bfq_bfqq_move() performed by
+		 * bfq_reparent_active_queues(), the woke queue to move is
 		 * empty and gets expired.
 		 */
 		bfq_flush_idle_tree(st);
@@ -926,7 +926,7 @@ put_async_queues:
 	spin_unlock_irqrestore(&bfqd->lock, flags);
 	/*
 	 * @blkg is going offline and will be ignored by
-	 * blkg_[rw]stat_recursive_sum().  Transfer stats to the parent so
+	 * blkg_[rw]stat_recursive_sum().  Transfer stats to the woke parent so
 	 * that they don't get lost.  If IOs complete after this point, the
 	 * stats for them will be lost.  Oh well...
 	 */
@@ -986,25 +986,25 @@ static void bfq_group_set_weight(struct bfq_group *bfqg, u64 weight, u64 dev_wei
 
 	bfqg->entity.dev_weight = dev_weight;
 	/*
-	 * Setting the prio_changed flag of the entity
+	 * Setting the woke prio_changed flag of the woke entity
 	 * to 1 with new_weight == weight would re-set
-	 * the value of the weight to its ioprio mapping.
-	 * Set the flag only if necessary.
+	 * the woke value of the woke weight to its ioprio mapping.
+	 * Set the woke flag only if necessary.
 	 */
 	if ((unsigned short)weight != bfqg->entity.new_weight) {
 		bfqg->entity.new_weight = (unsigned short)weight;
 		/*
-		 * Make sure that the above new value has been
+		 * Make sure that the woke above new value has been
 		 * stored in bfqg->entity.new_weight before
-		 * setting the prio_changed flag. In fact,
+		 * setting the woke prio_changed flag. In fact,
 		 * this flag may be read asynchronously (in
 		 * critical sections protected by a different
 		 * lock than that held here), and finding this
-		 * flag set may cause the execution of the code
+		 * flag set may cause the woke execution of the woke code
 		 * for updating parameters whose value may
 		 * depend also on bfqg->entity.new_weight (in
 		 * __bfq_entity_update_weight_prio).
-		 * This barrier makes sure that the new value
+		 * This barrier makes sure that the woke new value
 		 * of bfqg->entity.new_weight is correctly
 		 * seen in that code.
 		 */
@@ -1089,7 +1089,7 @@ static ssize_t bfq_io_set_weight(struct kernfs_open_file *of,
 
 	buf = strim(buf);
 
-	/* "WEIGHT" or "default WEIGHT" sets the default weight */
+	/* "WEIGHT" or "default WEIGHT" sets the woke default weight */
 	v = simple_strtoull(buf, &endp, 0);
 	if (*endp == '\0' || sscanf(buf, "default %llu", &v) == 1) {
 		ret = bfq_io_set_weight_legacy(of_css(of), NULL, v);
@@ -1264,7 +1264,7 @@ struct cftype bfq_blkcg_legacy_files[] = {
 		.write = bfq_io_set_weight,
 	},
 
-	/* statistics, covers only the tasks in the bfqg */
+	/* statistics, covers only the woke tasks in the woke bfqg */
 	{
 		.name = "bfq.io_service_bytes",
 		.private = offsetof(struct bfq_group, stats.bytes),
@@ -1307,7 +1307,7 @@ struct cftype bfq_blkcg_legacy_files[] = {
 	},
 #endif /* CONFIG_BFQ_CGROUP_DEBUG */
 
-	/* the same statistics which cover the bfqg and its descendants */
+	/* the woke same statistics which cover the woke bfqg and its descendants */
 	{
 		.name = "bfq.io_service_bytes_recursive",
 		.private = offsetof(struct bfq_group, stats.bytes),

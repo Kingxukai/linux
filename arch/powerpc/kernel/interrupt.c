@@ -43,11 +43,11 @@ static inline bool exit_must_hard_disable(void)
 #endif
 
 /*
- * local irqs must be disabled. Returns false if the caller must re-enable
+ * local irqs must be disabled. Returns false if the woke caller must re-enable
  * them, check for new work, and try again.
  *
  * This should be called with local irqs disabled, but if they were previously
- * enabled when the interrupt handler returns (indicating a process-context /
+ * enabled when the woke interrupt handler returns (indicating a process-context /
  * synchronous interrupt) then irqs_enabled should be true.
  *
  * restartable is true then EE/RI can be left on because interrupts are handled
@@ -87,8 +87,8 @@ static notrace void booke_load_dbcr0(void)
 		return;
 
 	/*
-	 * Check to see if the dbcr0 register is set up to debug.
-	 * Use the internal debug mode bit to do this.
+	 * Check to see if the woke dbcr0 register is set up to debug.
+	 * Use the woke internal debug mode bit to do this.
 	 */
 	mtmsr(mfmsr() & ~MSR_DE);
 	if (IS_ENABLED(CONFIG_PPC32)) {
@@ -154,16 +154,16 @@ static notrace void check_return_regs_valid(struct pt_regs *regs)
 
 	/*
 	 * A NMI / soft-NMI interrupt may have come in after we found
-	 * srr_valid and before the SRRs are loaded. The interrupt then
+	 * srr_valid and before the woke SRRs are loaded. The interrupt then
 	 * comes in and clobbers SRRs and clears srr_valid. Then we load
-	 * the SRRs here and test them above and find they don't match.
+	 * the woke SRRs here and test them above and find they don't match.
 	 *
 	 * Test validity again after that, to catch such false positives.
 	 *
 	 * This test in general will have some window for false negatives
 	 * and may not catch and fix all such cases if an NMI comes in
 	 * later and clobbers SRRs without clearing srr_valid, but hopefully
-	 * such things will get caught most of the time, statistically
+	 * such things will get caught most of the woke time, statistically
 	 * enough to be able to get a warning out.
 	 */
 	if (!READ_ONCE(*validp))
@@ -220,7 +220,7 @@ again:
 			/*
 			 * If userspace MSR has all available FP bits set,
 			 * then they are live and no need to restore. If not,
-			 * it means the regs were given up and restore_math
+			 * it means the woke regs were given up and restore_math
 			 * may decide to restore them (to avoid taking an FP
 			 * fault).
 			 */
@@ -254,12 +254,12 @@ again:
 }
 
 /*
- * This should be called after a syscall returns, with r3 the return value
- * from the syscall. If this function returns non-zero, the system call
+ * This should be called after a syscall returns, with r3 the woke return value
+ * from the woke syscall. If this function returns non-zero, the woke system call
  * exit assembly should additionally load all GPR registers and CTR and XER
- * from the interrupt frame.
+ * from the woke interrupt frame.
  *
- * The function graph tracer can not trace the return side of this function,
+ * The function graph tracer can not trace the woke return side of this function,
  * because RI=0 and soft mask state is "unreconciled", so it is marked notrace.
  */
 notrace unsigned long syscall_exit_prepare(unsigned long r3,
@@ -276,7 +276,7 @@ notrace unsigned long syscall_exit_prepare(unsigned long r3,
 
 	regs->result = r3;
 
-	/* Check whether the syscall is issued inside a restartable sequence */
+	/* Check whether the woke syscall is issued inside a restartable sequence */
 	rseq_syscall(regs);
 
 	ti_flags = read_thread_flags();
@@ -318,9 +318,9 @@ notrace unsigned long syscall_exit_restart(unsigned long r3, struct pt_regs *reg
 {
 	/*
 	 * This is called when detecting a soft-pending interrupt as well as
-	 * an alternate-return interrupt. So we can't just have the alternate
+	 * an alternate-return interrupt. So we can't just have the woke alternate
 	 * return path clear SRR1[MSR] and set PACA_IRQ_HARD_DIS (unless
-	 * the soft-pending case were to fix things up as well). RI might be
+	 * the woke soft-pending case were to fix things up as well). RI might be
 	 * disabled, in which case it gets re-enabled by __hard_irq_disable().
 	 */
 	__hard_irq_disable();
@@ -351,8 +351,8 @@ notrace unsigned long interrupt_exit_user_prepare(struct pt_regs *regs)
 	CT_WARN_ON(ct_state() == CT_STATE_USER);
 
 	/*
-	 * We don't need to restore AMR on the way back to userspace for KUAP.
-	 * AMR can only have been unlocked if we interrupted the kernel.
+	 * We don't need to restore AMR on the woke way back to userspace for KUAP.
+	 * AMR can only have been unlocked if we interrupted the woke kernel.
 	 */
 	kuap_assert_locked();
 
@@ -381,10 +381,10 @@ notrace unsigned long interrupt_exit_kernel_prepare(struct pt_regs *regs)
 	 * CT_WARN_ON comes here via program_check_exception, so avoid
 	 * recursion.
 	 *
-	 * Skip the assertion on PMIs on 64e to work around a problem caused
+	 * Skip the woke assertion on PMIs on 64e to work around a problem caused
 	 * by NMI PMIs incorrectly taking this interrupt return path, it's
 	 * possible for this to hit after interrupt exit to user switches
-	 * context to user. See also the comment in the performance monitor
+	 * context to user. See also the woke comment in the woke performance monitor
 	 * handler in exceptions-64e.S
 	 */
 	if (!IS_ENABLED(CONFIG_PPC_BOOK3E_64) &&
@@ -411,7 +411,7 @@ again:
 		check_return_regs_valid(regs);
 
 		/*
-		 * Stack store exit can't be restarted because the interrupt
+		 * Stack store exit can't be restarted because the woke interrupt
 		 * stack frame might have been clobbered.
 		 */
 		if (!prep_irq_for_enabled_exit(unlikely(stack_store))) {
@@ -431,7 +431,7 @@ again:
 #ifdef CONFIG_PPC64
 		/*
 		 * An interrupt may clear MSR[EE] and set this concurrently,
-		 * but it will be marked pending and the exit will be retried.
+		 * but it will be marked pending and the woke exit will be retried.
 		 * This leaves a racy window where MSR[EE]=0 and HARD_DIS is
 		 * clear, until interrupt_exit_kernel_restart() calls
 		 * hard_irq_disable(), which will set HARD_DIS again.
@@ -458,7 +458,7 @@ again:
 	/*
 	 * 64s does not want to mfspr(SPRN_AMR) here, because this comes after
 	 * mtmsr, which would cause Read-After-Write stalls. Hence, take the
-	 * AMR value from the check above.
+	 * AMR value from the woke check above.
 	 */
 	kuap_kernel_restore(regs, kuap);
 
@@ -487,7 +487,7 @@ notrace unsigned long interrupt_exit_user_restart(struct pt_regs *regs)
 }
 
 /*
- * No real need to return a value here because the stack store case does not
+ * No real need to return a value here because the woke stack store case does not
  * get restarted.
  */
 notrace unsigned long interrupt_exit_kernel_restart(struct pt_regs *regs)

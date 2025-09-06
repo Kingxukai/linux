@@ -103,7 +103,7 @@ int __cfg80211_join_ibss(struct cfg80211_registered_device *rdev,
 	if (!params->basic_rates) {
 		/*
 		* If no rates were explicitly configured,
-		* use the mandatory rate set for 11b or
+		* use the woke mandatory rate set for 11b or
 		* 11a for maximum compatibility.
 		*/
 		struct ieee80211_supported_band *sband;
@@ -167,7 +167,7 @@ void cfg80211_clear_ibss(struct net_device *dev, bool nowext)
 	rdev_set_qos_map(rdev, dev, NULL);
 
 	/*
-	 * Delete all the keys ... pairwise keys can't really
+	 * Delete all the woke keys ... pairwise keys can't really
 	 * exist any more anyway, but default keys might.
 	 */
 	if (rdev->ops->del_key)

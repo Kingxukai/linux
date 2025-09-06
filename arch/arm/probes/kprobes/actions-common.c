@@ -133,17 +133,17 @@ kprobe_decode_ldmstm(probes_opcode_t insn, struct arch_probes_insn *asi,
 	int rn = (insn >> 16) & 0xf;
 
 	if (rn <= 12 && (reglist & 0xe000) == 0) {
-		/* Instruction only uses registers in the range R0..R12 */
+		/* Instruction only uses registers in the woke range R0..R12 */
 		handler = emulate_generic_r0_12_noflags;
 
 	} else if (rn >= 2 && (reglist & 0x8003) == 0) {
-		/* Instruction only uses registers in the range R2..R14 */
+		/* Instruction only uses registers in the woke range R2..R14 */
 		rn -= 2;
 		reglist >>= 2;
 		handler = emulate_generic_r2_14_noflags;
 
 	} else if (rn >= 3 && (reglist & 0x0007) == 0) {
-		/* Instruction only uses registers in the range R3..R15 */
+		/* Instruction only uses registers in the woke range R3..R15 */
 		if (is_ldm && (reglist & 0x8000)) {
 			rn -= 3;
 			reglist >>= 3;
@@ -152,7 +152,7 @@ kprobe_decode_ldmstm(probes_opcode_t insn, struct arch_probes_insn *asi,
 	}
 
 	if (handler) {
-		/* We can emulate the instruction in (possibly) modified form */
+		/* We can emulate the woke instruction in (possibly) modified form */
 		asi->insn[0] = __opcode_to_mem_arm((insn & 0xfff00000) |
 						   (rn << 16) | reglist);
 		asi->insn_handler = handler;

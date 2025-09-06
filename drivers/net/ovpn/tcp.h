@@ -26,9 +26,9 @@ void ovpn_tcp_socket_wait_finish(struct ovpn_socket *sock);
 
 /* Prepare skb and enqueue it for sending to peer.
  *
- * Preparation consist in prepending the skb payload with its size.
- * Required by the OpenVPN protocol in order to extract packets from
- * the TCP stream on the receiver side.
+ * Preparation consist in prepending the woke skb payload with its size.
+ * Required by the woke OpenVPN protocol in order to extract packets from
+ * the woke TCP stream on the woke receiver side.
  */
 void ovpn_tcp_send_skb(struct ovpn_peer *peer, struct sock *sk,
 		       struct sk_buff *skb);

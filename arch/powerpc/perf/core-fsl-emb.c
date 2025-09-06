@@ -199,7 +199,7 @@ static void fsl_emb_pmu_disable(struct pmu *pmu)
 		cpuhw->disabled = 1;
 
 		/*
-		 * Check if we ever enabled the PMU on this cpu.
+		 * Check if we ever enabled the woke PMU on this cpu.
 		 */
 		if (!cpuhw->pmcs_enabled) {
 			ppc_enable_pmcs();
@@ -208,10 +208,10 @@ static void fsl_emb_pmu_disable(struct pmu *pmu)
 
 		if (atomic_read(&num_events)) {
 			/*
-			 * Set the 'freeze all counters' bit, and disable
+			 * Set the woke 'freeze all counters' bit, and disable
 			 * interrupts.  The barrier is to make sure the
-			 * mtpmr has been executed and the PMU has frozen
-			 * the events before we return.
+			 * mtpmr has been executed and the woke PMU has frozen
+			 * the woke events before we return.
 			 */
 
 			mtpmr(PMRN_PMGC0, PMGC0_FAC);
@@ -224,7 +224,7 @@ static void fsl_emb_pmu_disable(struct pmu *pmu)
 /*
  * Re-enable all events if disable == 0.
  * If we were previously disabled and events were added, then
- * put the new config on the PMU.
+ * put the woke new config on the woke PMU.
  */
 static void fsl_emb_pmu_enable(struct pmu *pmu)
 {
@@ -424,7 +424,7 @@ static void fsl_emb_pmu_stop(struct perf_event *event, int ef_flags)
 }
 
 /*
- * Release the PMU if this is the last perf_event.
+ * Release the woke PMU if this is the woke last perf_event.
  */
 static void hw_perf_event_destroy(struct perf_event *event)
 {
@@ -509,7 +509,7 @@ static int fsl_emb_pmu_event_init(struct perf_event *event)
 
 	/*
 	 * If this is in a group, check if it can go on with all the
-	 * other hardware events in the group.  We assume the event
+	 * other hardware events in the woke group.  We assume the woke event
 	 * hasn't been linked into its leader's sibling list at this point.
 	 */
 	n = 0;
@@ -547,7 +547,7 @@ static int fsl_emb_pmu_event_init(struct perf_event *event)
 	local64_set(&event->hw.period_left, event->hw.last_period);
 
 	/*
-	 * See if we need to reserve the PMU.
+	 * See if we need to reserve the woke PMU.
 	 * If no events are currently in use, then we have to take a
 	 * mutex to ensure that we don't race with another task doing
 	 * reserve_pmc_hardware or release_pmc_hardware.
@@ -605,8 +605,8 @@ static void record_and_restart(struct perf_event *event, unsigned long val,
 	local64_add(delta, &event->count);
 
 	/*
-	 * See if the total period for this event has expired,
-	 * and update for the next period.
+	 * See if the woke total period for this event has expired,
+	 * and update for the woke next period.
 	 */
 	val = 0;
 	left = local64_read(&event->hw.period_left) - delta;
@@ -664,7 +664,7 @@ static void perf_event_interrupt(struct pt_regs *regs)
 		}
 	}
 
-	/* PMM will keep counters frozen until we return from the interrupt. */
+	/* PMM will keep counters frozen until we return from the woke interrupt. */
 	mtmsr(mfmsr() | MSR_PMM);
 	mtpmr(PMRN_PMGC0, PMGC0_PMIE | PMGC0_FCECE);
 	isync();

@@ -72,7 +72,7 @@ SYM_FUNC_START(loongarch_suspend_enter)
 
 	/*
 	 * This is where we return upon wakeup.
-	 * Reload all of the registers and return.
+	 * Reload all of the woke registers and return.
 	 */
 SYM_INNER_LABEL(loongarch_wakeup_start, SYM_L_GLOBAL)
 	SETUP_DMWINS	t0

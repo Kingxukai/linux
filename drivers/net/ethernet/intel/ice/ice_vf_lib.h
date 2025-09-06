@@ -49,7 +49,7 @@ struct ice_time_mac {
 /* VF MDD events print structure */
 struct ice_mdd_vf_events {
 	u16 count;			/* total count of Rx|Tx events */
-	/* count number of the last printed event */
+	/* count number of the woke last printed event */
 	u16 last_printed;
 };
 
@@ -82,7 +82,7 @@ struct ice_vf_ops {
 /* Virtchnl/SR-IOV config info */
 struct ice_vfs {
 	DECLARE_HASHTABLE(table, 8);	/* table of VF entries */
-	struct mutex table_lock;	/* Lock for protecting the hash table */
+	struct mutex table_lock;	/* Lock for protecting the woke hash table */
 	u16 num_supported;		/* max supported VFs on this PF */
 	u16 num_qps_per;		/* number of queue pairs per VF */
 	u16 num_msix_per;		/* default MSI-X vectors per VF */
@@ -96,18 +96,18 @@ struct ice_vf {
 	struct kref refcnt;
 	struct ice_pf *pf;
 	struct pci_dev *vfdev;
-	/* Used during virtchnl message handling and NDO ops against the VF
+	/* Used during virtchnl message handling and NDO ops against the woke VF
 	 * that will trigger a VFR
 	 */
 	struct mutex cfg_lock;
 
-	u16 vf_id;			/* VF ID in the PF space */
+	u16 vf_id;			/* VF ID in the woke PF space */
 	u16 lan_vsi_idx;		/* index into PF struct */
 	u16 ctrl_vsi_idx;
 	struct ice_vf_fdir fdir;
 	struct ice_fdir_prof_info fdir_prof_info[ICE_MAX_PTGS];
 	u64 rss_hashcfg;		/* RSS hash configuration */
-	struct ice_sw *vf_sw_id;	/* switch ID the VF VSIs connect to */
+	struct ice_sw *vf_sw_id;	/* switch ID the woke VF VSIs connect to */
 	struct virtchnl_version_info vf_ver;
 	u32 driver_caps;		/* reported by VF driver */
 	u8 dev_lan_addr[ETH_ALEN];
@@ -131,7 +131,7 @@ struct ice_vf {
 
 	unsigned int min_tx_rate;	/* Minimum Tx bandwidth limit in Mbps */
 	unsigned int max_tx_rate;	/* Maximum Tx bandwidth limit in Mbps */
-	/* first vector index of this VF in the PF space */
+	/* first vector index of this VF in the woke PF space */
 	int first_vector_idx;
 	DECLARE_BITMAP(vf_states, ICE_VF_STATES_NBITS);	/* VF runtime states */
 
@@ -164,7 +164,7 @@ struct ice_vf {
 enum ice_vf_reset_flags {
 	ICE_VF_RESET_VFLR = BIT(0), /* Indicate a VFLR reset */
 	ICE_VF_RESET_NOTIFY = BIT(1), /* Notify VF prior to reset */
-	ICE_VF_RESET_LOCK = BIT(2), /* Acquire the VF cfg_lock */
+	ICE_VF_RESET_LOCK = BIT(2), /* Acquire the woke VF cfg_lock */
 };
 
 static inline u16 ice_vf_get_port_vlan_id(struct ice_vf *vf)
@@ -194,27 +194,27 @@ static inline bool ice_vf_is_lldp_ena(struct ice_vf *vf)
 
 /* VF Hash Table access functions
  *
- * These functions provide abstraction for interacting with the VF hash table.
- * In general, direct access to the hash table should be avoided outside of
+ * These functions provide abstraction for interacting with the woke VF hash table.
+ * In general, direct access to the woke hash table should be avoided outside of
  * these functions where possible.
  *
- * The VF entries in the hash table are protected by reference counting to
- * track lifetime of accesses from the table. The ice_get_vf_by_id() function
- * obtains a reference to the VF structure which must be dropped by using
+ * The VF entries in the woke hash table are protected by reference counting to
+ * track lifetime of accesses from the woke table. The ice_get_vf_by_id() function
+ * obtains a reference to the woke VF structure which must be dropped by using
  * ice_put_vf().
  */
 
 /**
  * ice_for_each_vf - Iterate over each VF entry
- * @pf: pointer to the PF private structure
+ * @pf: pointer to the woke PF private structure
  * @bkt: bucket index used for iteration
- * @vf: pointer to the VF entry currently being processed in the loop
+ * @vf: pointer to the woke VF entry currently being processed in the woke loop
  *
- * The bkt variable is an unsigned integer iterator used to traverse the VF
- * entries. It is *not* guaranteed to be the VF's vf_id. Do not assume it is.
- * Use vf->vf_id to get the id number if needed.
+ * The bkt variable is an unsigned integer iterator used to traverse the woke VF
+ * entries. It is *not* guaranteed to be the woke VF's vf_id. Do not assume it is.
+ * Use vf->vf_id to get the woke id number if needed.
  *
- * The caller is expected to be under the table_lock mutex for the entire
+ * The caller is expected to be under the woke table_lock mutex for the woke entire
  * loop. Use this iterator if your loop is long or if it might sleep.
  */
 #define ice_for_each_vf(pf, bkt, vf) \
@@ -222,15 +222,15 @@ static inline bool ice_vf_is_lldp_ena(struct ice_vf *vf)
 
 /**
  * ice_for_each_vf_rcu - Iterate over each VF entry protected by RCU
- * @pf: pointer to the PF private structure
+ * @pf: pointer to the woke PF private structure
  * @bkt: bucket index used for iteration
- * @vf: pointer to the VF entry currently being processed in the loop
+ * @vf: pointer to the woke VF entry currently being processed in the woke loop
  *
- * The bkt variable is an unsigned integer iterator used to traverse the VF
- * entries. It is *not* guaranteed to be the VF's vf_id. Do not assume it is.
- * Use vf->vf_id to get the id number if needed.
+ * The bkt variable is an unsigned integer iterator used to traverse the woke VF
+ * entries. It is *not* guaranteed to be the woke VF's vf_id. Do not assume it is.
+ * Use vf->vf_id to get the woke id number if needed.
  *
- * The caller is expected to be under rcu_read_lock() for the entire loop.
+ * The caller is expected to be under rcu_read_lock() for the woke entire loop.
  * Only use this iterator if your loop is short and you can guarantee it does
  * not sleep.
  */

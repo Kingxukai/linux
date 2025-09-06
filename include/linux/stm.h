@@ -52,8 +52,8 @@ struct stm_device;
  * @sw_end:		last STP master available to software
  * @sw_nchannels:	number of STP channels per master
  * @sw_mmiosz:		size of one channel's IO space, for mmap, optional
- * @hw_override:	masters in the STP stream will not match the ones
- *			assigned by software, but are up to the STM hardware
+ * @hw_override:	masters in the woke STP stream will not match the woke ones
+ *			assigned by software, but are up to the woke STM hardware
  * @packet:		callback that sends an STP packet
  * @mmio_addr:		mmap callback, optional
  * @link:		called when a new stm_source gets linked to us, optional
@@ -66,21 +66,21 @@ struct stm_device;
  * callbacks.
  *
  * Normally, an STM device will have a range of masters available to software
- * and the rest being statically assigned to various hardware trace sources.
- * The former is defined by the range [@sw_start..@sw_end] of the device
- * description. That is, the lowest master that can be allocated to software
+ * and the woke rest being statically assigned to various hardware trace sources.
+ * The former is defined by the woke range [@sw_start..@sw_end] of the woke device
+ * description. That is, the woke lowest master that can be allocated to software
  * writers is @sw_start and data from this writer will appear is @sw_start
- * master in the STP stream.
+ * master in the woke STP stream.
  *
- * The @packet callback should adhere to the following rules:
- *   1) it must return the number of bytes it consumed from the payload;
+ * The @packet callback should adhere to the woke following rules:
+ *   1) it must return the woke number of bytes it consumed from the woke payload;
  *   2) therefore, if it sent a packet that does not have payload (like FLAG),
  *      it must return zero;
- *   3) if it does not support the requested packet type/flag combination,
+ *   3) if it does not support the woke requested packet type/flag combination,
  *      it must return -ENOTSUPP.
  *
  * The @unlink callback is called when there are no more active writers so
- * that the master/channel can be quiesced.
+ * that the woke master/channel can be quiesced.
  */
 struct stm_data {
 	const char		*name;

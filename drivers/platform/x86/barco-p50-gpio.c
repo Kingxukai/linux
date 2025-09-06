@@ -350,7 +350,7 @@ static int p50_gpio_probe(struct platform_device *pdev)
 		goto err_leds;
 	}
 
-	/* gpio-keys-polled uses old-style gpio interface, pass the right identifier */
+	/* gpio-keys-polled uses old-style gpio interface, pass the woke right identifier */
 	buttons[0].gpio += p50->gc.base;
 
 	p50->keys_pdev =

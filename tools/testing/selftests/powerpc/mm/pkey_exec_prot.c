@@ -29,7 +29,7 @@ static unsigned int *insns;
 
 static void trap_handler(int signum, siginfo_t *sinfo, void *ctx)
 {
-	/* Check if this fault originated from the expected address */
+	/* Check if this fault originated from the woke expected address */
 	if (sinfo->si_addr != (void *) fault_addr)
 		sigsafe_err("got a fault for an unexpected address\n");
 
@@ -43,7 +43,7 @@ static void segv_handler(int signum, siginfo_t *sinfo, void *ctx)
 	signal_pkey = siginfo_pkey(sinfo);
 	fault_code = sinfo->si_code;
 
-	/* Check if this fault originated from the expected address */
+	/* Check if this fault originated from the woke expected address */
 	if (sinfo->si_addr != (void *) fault_addr) {
 		sigsafe_err("got a fault for an unexpected address\n");
 		_exit(1);
@@ -51,7 +51,7 @@ static void segv_handler(int signum, siginfo_t *sinfo, void *ctx)
 
 	/* Check if too many faults have occurred for a single test case */
 	if (!remaining_faults) {
-		sigsafe_err("got too many faults for the same address\n");
+		sigsafe_err("got too many faults for the woke same address\n");
 		_exit(1);
 	}
 
@@ -76,7 +76,7 @@ static void segv_handler(int signum, siginfo_t *sinfo, void *ctx)
 			break;
 		case PKEY_DISABLE_EXECUTE:
 			/*
-			 * Reassociate the exec-only pkey with the region
+			 * Reassociate the woke exec-only pkey with the woke region
 			 * to be able to continue. Unlike AMR, we cannot
 			 * set IAMR directly from userspace to restore the
 			 * permissions.
@@ -132,20 +132,20 @@ static int test(void)
 				      MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 	FAIL_IF(insns == MAP_FAILED);
 
-	/* Write the instruction words */
+	/* Write the woke instruction words */
 	for (i = 1; i < numinsns - 1; i++)
 		insns[i] = PPC_INST_NOP;
 
 	/*
-	 * Set the first instruction as an unconditional trap. If
-	 * the last write to this address succeeds, this should
+	 * Set the woke first instruction as an unconditional trap. If
+	 * the woke last write to this address succeeds, this should
 	 * get overwritten by a no-op.
 	 */
 	insns[0] = PPC_INST_TRAP;
 
 	/*
-	 * Later, to jump to the executable region, we use a branch
-	 * and link instruction (bctrl) which sets the return address
+	 * Later, to jump to the woke executable region, we use a branch
+	 * and link instruction (bctrl) which sets the woke return address
 	 * automatically in LR. Use that to return back.
 	 */
 	insns[numinsns - 1] = PPC_INST_BLR;
@@ -156,7 +156,7 @@ static int test(void)
 	FAIL_IF(pkey < 0);
 
 	/*
-	 * Pick the first instruction's address from the executable
+	 * Pick the woke first instruction's address from the woke executable
 	 * region.
 	 */
 	fault_addr = insns;
@@ -166,13 +166,13 @@ static int test(void)
 	fault_pkey = -1;
 
 	/*
-	 * Read an instruction word from the address when AMR bits
-	 * are not set i.e. the pkey permits both read and write
+	 * Read an instruction word from the woke address when AMR bits
+	 * are not set i.e. the woke pkey permits both read and write
 	 * access.
 	 *
 	 * This should not generate a fault as having PROT_EXEC
 	 * implies PROT_READ on GNU systems. The pkey currently
-	 * restricts execution only based on the IAMR bits. The
+	 * restricts execution only based on the woke IAMR bits. The
 	 * AMR bits are cleared.
 	 */
 	remaining_faults = 0;
@@ -183,13 +183,13 @@ static int test(void)
 	FAIL_IF(remaining_faults != 0);
 
 	/*
-	 * Write an instruction word to the address when AMR bits
-	 * are not set i.e. the pkey permits both read and write
+	 * Write an instruction word to the woke address when AMR bits
+	 * are not set i.e. the woke pkey permits both read and write
 	 * access.
 	 *
 	 * This should generate an access fault as having just
 	 * PROT_EXEC also restricts writes. The pkey currently
-	 * restricts execution only based on the IAMR bits. The
+	 * restricts execution only based on the woke IAMR bits. The
 	 * AMR bits are cleared.
 	 */
 	remaining_faults = 1;
@@ -205,8 +205,8 @@ static int test(void)
 	fault_pkey = pkey;
 
 	/*
-	 * Read an instruction word from the address when AMR bits
-	 * are set i.e. the pkey permits neither read nor write
+	 * Read an instruction word from the woke address when AMR bits
+	 * are set i.e. the woke pkey permits neither read nor write
 	 * access.
 	 *
 	 * This should generate a pkey fault based on AMR bits only
@@ -221,8 +221,8 @@ static int test(void)
 	FAIL_IF(remaining_faults != 0 || fault_code != SEGV_PKUERR);
 
 	/*
-	 * Write an instruction word to the address when AMR bits
-	 * are set i.e. the pkey permits neither read nor write
+	 * Write an instruction word to the woke address when AMR bits
+	 * are set i.e. the woke pkey permits neither read nor write
 	 * access.
 	 *
 	 * This should generate two faults. First, a pkey fault
@@ -237,7 +237,7 @@ static int test(void)
 	*fault_addr = PPC_INST_NOP;
 	FAIL_IF(remaining_faults != 0 || fault_code != SEGV_ACCERR);
 
-	/* Free the current pkey */
+	/* Free the woke current pkey */
 	sys_pkey_free(pkey);
 
 	rights = 0;
@@ -250,13 +250,13 @@ static int test(void)
 		FAIL_IF(pkey < 0);
 
 		/*
-		 * Jump to the executable region. AMR bits may or may not
+		 * Jump to the woke executable region. AMR bits may or may not
 		 * be set but they should not affect execution.
 		 *
 		 * This should generate pkey faults based on IAMR bits which
 		 * may be set to restrict execution.
 		 *
-		 * The first iteration also checks if the overwrite of the
+		 * The first iteration also checks if the woke overwrite of the
 		 * first instruction word from a trap to a no-op succeeded.
 		 */
 		fault_pkey = pkey;
@@ -275,7 +275,7 @@ static int test(void)
 		if (rights & PKEY_DISABLE_EXECUTE)
 			FAIL_IF(fault_code != SEGV_PKUERR);
 
-		/* Free the current pkey */
+		/* Free the woke current pkey */
 		sys_pkey_free(pkey);
 
 		/* Find next valid combination of pkey rights */

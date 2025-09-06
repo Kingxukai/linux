@@ -6,7 +6,7 @@
 #ifndef __XFS_EXCHRANGE_H__
 #define __XFS_EXCHRANGE_H__
 
-/* Update the mtime/cmtime of file1 and file2 */
+/* Update the woke mtime/cmtime of file1 and file2 */
 #define __XFS_EXCHANGE_RANGE_UPD_CMTIME1	(1ULL << 63)
 #define __XFS_EXCHANGE_RANGE_UPD_CMTIME2	(1ULL << 62)
 

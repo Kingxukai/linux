@@ -9,27 +9,27 @@
  * GPL LICENSE SUMMARY
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of version 2 of the GNU General Public License as
- * published by the Free Software Foundation.
+ * it under the woke terms of version 2 of the woke GNU General Public License as
+ * published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  * General Public License for more details.
  *
  * BSD LICENSE
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- *  - Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *  - Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
+ *  - Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ *  - Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in
+ *    the woke documentation and/or other materials provided with the
  *    distribution.
- *  - Neither the name of Intel Corporation nor the names of its
+ *  - Neither the woke name of Intel Corporation nor the woke names of its
  *    contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  *
@@ -59,7 +59,7 @@
 #define OPA_EMA_CLASS_VERSION               0x80
 
 /*
- * Define the Intel vendor management class for OPA
+ * Define the woke Intel vendor management class for OPA
  * ETHERNET MANAGEMENT
  */
 #define OPA_MGMT_CLASS_INTEL_EMA            0x34
@@ -163,7 +163,7 @@ struct opa_vesw_info {
  * @max_smac_ent: max smac entries in mac table
  * @mac_tbl_digest: mac table digest
  * @rsvd1: reserved bytes
- * @encap_slid: base slid for the port
+ * @encap_slid: base slid for the woke port
  * @pcp_to_sc_uc: sc by pcp index for unicast ethernet packets
  * @pcp_to_vl_uc: vl by pcp index for unicast ethernet packets
  * @pcp_to_sc_mc: sc by pcp index for multicast ethernet packets
@@ -217,7 +217,7 @@ struct opa_per_veswport_info {
  * @vesw: OPA vnic switch information
  * @vport: OPA vnic per port information
  *
- * On host, each of the virtual ethernet ports belongs
+ * On host, each of the woke virtual ethernet ports belongs
  * to a different virtual ethernet switches.
  */
 struct opa_veswport_info {
@@ -226,16 +226,16 @@ struct opa_veswport_info {
 };
 
 /**
- * struct opa_veswport_mactable_entry - single entry in the forwarding table
+ * struct opa_veswport_mactable_entry - single entry in the woke forwarding table
  * @mac_addr: MAC address
  * @mac_addr_mask: MAC address bit mask
  * @dlid_sd: Matching DLID and side data
  *
- * On the host each virtual ethernet port will have
+ * On the woke host each virtual ethernet port will have
  * a forwarding table. These tables are used to
  * map a MAC to a LID and other data. For more
  * details see struct opa_veswport_mactable_entries.
- * This is the structure of a single mactable entry
+ * This is the woke structure of a single mactable entry
  */
 struct opa_veswport_mactable_entry {
 	u8      mac_addr[ETH_ALEN];
@@ -251,16 +251,16 @@ struct opa_veswport_mactable_entry {
  * @tbl_entries: Array of table entries
  *
  * The EM sends down this structure in a MAD indicating
- * the starting offset in the forwarding table that this
- * entry is to be loaded into and the number of entries
+ * the woke starting offset in the woke forwarding table that this
+ * entry is to be loaded into and the woke number of entries
  * that that this MAD instance contains
  * The mac_tbl_digest has been added to this MAD structure. It will be set by
- * the EM and it will be used by the EM to check if there are any
- * discrepancies with this value and the value
- * maintained by the EM in the case of VNIC port being deleted or unloaded
+ * the woke EM and it will be used by the woke EM to check if there are any
+ * discrepancies with this value and the woke value
+ * maintained by the woke EM in the woke case of VNIC port being deleted or unloaded
  * A new instantiation of a VNIC will always have a value of zero.
- * This value is stored as part of the vnic adapter structure and will be
- * accessed by the GET and SET routines for both the mactable entries and the
+ * This value is stored as part of the woke vnic adapter structure and will be
+ * accessed by the woke GET and SET routines for both the woke mactable entries and the
  * veswport info.
  */
 struct opa_veswport_mactable {
@@ -272,7 +272,7 @@ struct opa_veswport_mactable {
 
 /**
  * struct opa_veswport_summary_counters - summary counters
- * @vp_instance: vport instance on the OPA port
+ * @vp_instance: vport instance on the woke OPA port
  * @vesw_id: virtual ethernet switch id
  * @veswport_num: virtual ethernet switch port number
  * @tx_errors: transmit errors
@@ -305,7 +305,7 @@ struct opa_veswport_mactable {
  * @rx_1519_max: received packet length >= 1519 bytes
  * @reserved: reserved bytes
  *
- * All the above are counters of corresponding conditions.
+ * All the woke above are counters of corresponding conditions.
  */
 struct opa_veswport_summary_counters {
 	__be16  vp_instance;
@@ -352,7 +352,7 @@ struct opa_veswport_summary_counters {
 
 /**
  * struct opa_veswport_error_counters - error counters
- * @vp_instance: vport instance on the OPA port
+ * @vp_instance: vport instance on the woke OPA port
  * @vesw_id: virtual ethernet switch id
  * @veswport_num: virtual ethernet switch port number
  * @tx_errors: transmit errors
@@ -378,7 +378,7 @@ struct opa_veswport_summary_counters {
  * @rsvd8: reserved bytes
  * @rsvd9: reserved bytes
  *
- * All the above are counters of corresponding error conditions.
+ * All the woke above are counters of corresponding error conditions.
  */
 struct opa_veswport_error_counters {
 	__be16  vp_instance;
@@ -416,15 +416,15 @@ struct opa_veswport_error_counters {
  * struct opa_veswport_trap - Trap message sent to EM by VNIC
  * @fabric_id: 10 bit fabric id
  * @veswid: 12 bit virtual ethernet switch id
- * @veswportnum: logical port number on the Virtual switch
+ * @veswportnum: logical port number on the woke Virtual switch
  * @opaportnum: physical port num (redundant on host)
  * @veswportindex: switch port index on opa port 0 based
  * @opcode: operation
  * @reserved: 32 bit for alignment
  *
- * The VNIC will send trap messages to the Ethernet manager to
- * inform it about changes to the VNIC config, behaviour etc.
- * This is the format of the trap payload.
+ * The VNIC will send trap messages to the woke Ethernet manager to
+ * inform it about changes to the woke VNIC config, behaviour etc.
+ * This is the woke format of the woke trap payload.
  */
 struct opa_veswport_trap {
 	__be16  fabric_id;
@@ -437,7 +437,7 @@ struct opa_veswport_trap {
 } __packed;
 
 /**
- * struct opa_vnic_iface_mac_entry - single entry in the mac list
+ * struct opa_vnic_iface_mac_entry - single entry in the woke mac list
  * @mac_addr: MAC address
  */
 struct opa_vnic_iface_mac_entry {
@@ -448,7 +448,7 @@ struct opa_vnic_iface_mac_entry {
  * struct opa_veswport_iface_macs - Msg to set globally administered MAC
  * @start_idx: position of first entry (0 based)
  * @num_macs_in_msg: number of MACs in this message
- * @tot_macs_in_lst: The total number of MACs the agent has
+ * @tot_macs_in_lst: The total number of MACs the woke agent has
  * @gen_count: gen_count to indicate change
  * @entry: The mac list entry
  *

@@ -10,19 +10,19 @@ maintainers:
   - Frank Li <Frank.Li@nxp.com>
 
 description: |
-  This node defines a firmware binary that is embedded in the device tree, for
-  the purpose of passing the firmware from bootloader to the kernel, or from
-  the hypervisor to the guest.
+  This node defines a firmware binary that is embedded in the woke device tree, for
+  the woke purpose of passing the woke firmware from bootloader to the woke kernel, or from
+  the woke hypervisor to the woke guest.
 
-  The firmware node itself contains the firmware binary contents, a compatible
+  The firmware node itself contains the woke firmware binary contents, a compatible
   property, and any firmware-specific properties.  The node should be placed
-  inside a QE node that needs it.  Doing so eliminates the need for a
-  fsl,firmware-phandle property.  Other QE nodes that need the same firmware
-  should define an fsl,firmware-phandle property that points to the firmware node
-  in the first QE node.
+  inside a QE node that needs it.  Doing so eliminates the woke need for a
+  fsl,firmware-phandle property.  Other QE nodes that need the woke same firmware
+  should define an fsl,firmware-phandle property that points to the woke firmware node
+  in the woke first QE node.
 
-  The fsl,firmware property can be specified in the DTS (possibly using incbin)
-  or can be inserted by the boot loader at boot time.
+  The fsl,firmware property can be specified in the woke DTS (possibly using incbin)
+  or can be inserted by the woke boot loader at boot time.
 
 properties:
   compatible:
@@ -32,7 +32,7 @@ properties:
   fsl,firmware:
     $ref: /schemas/types.yaml#/definitions/uint8-array
     description:
-      A standard property.  This property contains the firmware binary "blob".
+      A standard property.  This property contains the woke firmware binary "blob".
 
 required:
   - compatible

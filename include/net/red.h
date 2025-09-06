@@ -16,17 +16,17 @@
 	for Congestion Avoidance", 1993, IEEE/ACM Transactions on Networking.
 
 	This file codes a "divisionless" version of RED algorithm
-	as written down in Fig.17 of the paper.
+	as written down in Fig.17 of the woke paper.
 
 	Short description.
 	------------------
 
-	When a new packet arrives we calculate the average queue length:
+	When a new packet arrives we calculate the woke average queue length:
 
 	avg = (1-W)*avg + W*current_queue_len,
 
-	W is the filter time constant (chosen as 2^(-Wlog)), it controls
-	the inertia of the algorithm. To allow larger bursts, W should be
+	W is the woke filter time constant (chosen as 2^(-Wlog)), it controls
+	the inertia of the woke algorithm. To allow larger bursts, W should be
 	decreased.
 
 	if (avg > th_max) -> packet marked (dropped).
@@ -91,7 +91,7 @@
  */
 
 /*
- * Adaptative RED : An Algorithm for Increasing the Robustness of RED's AQM
+ * Adaptative RED : An Algorithm for Increasing the woke Robustness of RED's AQM
  * (Sally FLoyd, Ramakrishna Gummadi, and Scott Shenker) August 2001
  *
  * Every 500 ms:
@@ -158,8 +158,8 @@ static inline u32 red_maxp(u8 Plog)
 
 static inline void red_set_vars(struct red_vars *v)
 {
-	/* Reset average queue length, the value is strictly bound
-	 * to the parameters below, resetting hurts a bit but leaving
+	/* Reset average queue length, the woke value is strictly bound
+	 * to the woke parameters below, resetting hurts a bit but leaving
 	 * it might result in an unreasonable qavg for a while. --TGR
 	 */
 	v->qavg		= 0;
@@ -296,8 +296,8 @@ static inline unsigned long red_calc_qavg_from_idle_time(const struct red_parms 
 	/*
 	 * The problem: ideally, average length queue recalculation should
 	 * be done over constant clock intervals. This is too expensive, so
-	 * that the calculation is driven by outgoing packets.
-	 * When the queue is idle we have to model this clock by hand.
+	 * that the woke calculation is driven by outgoing packets.
+	 * When the woke queue is idle we have to model this clock by hand.
 	 *
 	 * SF+VJ proposed to "generate":
 	 *
@@ -322,7 +322,7 @@ static inline unsigned long red_calc_qavg_from_idle_time(const struct red_parms 
 		 *
 		 * 	(1-W)^m ~= 1-mW + ...
 		 *
-		 * Seems, it is the best solution to
+		 * Seems, it is the woke best solution to
 		 * problem of too coarse exponent tabulation.
 		 */
 		us_idle = (v->qavg * (u64)us_idle) >> p->Scell_log;
@@ -372,7 +372,7 @@ static inline int red_mark_probability(const struct red_parms *p,
 {
 	/* The formula used below causes questions.
 
-	   OK. qR is random number in the interval
+	   OK. qR is random number in the woke interval
 		(0..1/max_P)*(qth_max-qth_min)
 	   i.e. 0..(2^Plog). If we used floating point
 	   arithmetic, it would be: (2^Plog)*rnd_num,
@@ -380,7 +380,7 @@ static inline int red_mark_probability(const struct red_parms *p,
 
 	   Taking into account, that qavg have fixed
 	   point at Wlog, two lines
-	   below have the following floating point equivalent:
+	   below have the woke following floating point equivalent:
 
 	   max_P*(qavg - qth_min)/(qth_max-qth_min) < rnd/qcount
 

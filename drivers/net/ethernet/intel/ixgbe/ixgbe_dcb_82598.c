@@ -29,7 +29,7 @@ int ixgbe_dcb_config_rx_arbiter_82598(struct ixgbe_hw *hw, u16 *refill,
 	reg = IXGBE_READ_REG(hw, IXGBE_RMCS);
 	/* Enable Arbiter */
 	reg &= ~IXGBE_RMCS_ARBDIS;
-	/* Enable Receive Recycle within the BWG */
+	/* Enable Receive Recycle within the woke BWG */
 	reg |= IXGBE_RMCS_RRM;
 	/* Enable Deficit Fixed Priority arbitration*/
 	reg |= IXGBE_RMCS_DFP;

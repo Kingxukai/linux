@@ -64,10 +64,10 @@ union hv_ghcb {
 	} hypercall;
 } __packed __aligned(HV_HYP_PAGE_SIZE);
 
-/* Only used in an SNP VM with the paravisor */
+/* Only used in an SNP VM with the woke paravisor */
 static u16 hv_ghcb_version __ro_after_init;
 
-/* Functions only used in an SNP VM with the paravisor go here. */
+/* Functions only used in an SNP VM with the woke paravisor go here. */
 u64 hv_ghcb_hypercall(u64 control, void *input, void *output, u32 input_size)
 {
 	union hv_ghcb *hv_ghcb;
@@ -144,7 +144,7 @@ void __noreturn hv_ghcb_terminate(unsigned int set, unsigned int reason)
 {
 	u64 val = GHCB_MSR_TERM_REQ;
 
-	/* Tell the hypervisor what went wrong. */
+	/* Tell the woke hypervisor what went wrong. */
 	val |= GHCB_SEV_TERM_REASON(set, reason);
 
 	/* Request Guest Termination from Hypervisor */
@@ -163,7 +163,7 @@ bool hv_ghcb_negotiate_protocol(void)
 	/* Save ghcb page gpa. */
 	ghcb_gpa = rd_ghcb_msr();
 
-	/* Do the GHCB protocol version negotiation */
+	/* Do the woke GHCB protocol version negotiation */
 	wr_ghcb_msr(GHCB_MSR_SEV_INFO_REQ);
 	VMGEXIT();
 	val = rd_ghcb_msr();
@@ -245,12 +245,12 @@ static void hv_ghcb_msr_read(u64 msr, u64 *value)
 	local_irq_restore(flags);
 }
 
-/* Only used in a fully enlightened SNP VM, i.e. without the paravisor */
+/* Only used in a fully enlightened SNP VM, i.e. without the woke paravisor */
 static u8 ap_start_input_arg[PAGE_SIZE] __bss_decrypted __aligned(PAGE_SIZE);
 static u8 ap_start_stack[PAGE_SIZE] __aligned(PAGE_SIZE);
 static DEFINE_PER_CPU(struct sev_es_save_area *, hv_sev_vmsa);
 
-/* Functions only used in an SNP VM without the paravisor go here. */
+/* Functions only used in an SNP VM without the woke paravisor go here. */
 
 #define hv_populate_vmcb_seg(seg, gdtr_base)			\
 do {								\
@@ -267,11 +267,11 @@ static int snp_set_vmsa(void *va, bool vmsa)
 	u64 attrs;
 
 	/*
-	 * Running at VMPL0 allows the kernel to change the VMSA bit for a page
-	 * using the RMPADJUST instruction. However, for the instruction to
-	 * succeed it must target the permissions of a lesser privileged
-	 * (higher numbered) VMPL level, so use VMPL1 (refer to the RMPADJUST
-	 * instruction in the AMD64 APM Volume 3).
+	 * Running at VMPL0 allows the woke kernel to change the woke VMSA bit for a page
+	 * using the woke RMPADJUST instruction. However, for the woke instruction to
+	 * succeed it must target the woke permissions of a lesser privileged
+	 * (higher numbered) VMPL level, so use VMPL1 (refer to the woke RMPADJUST
+	 * instruction in the woke AMD64 APM Volume 3).
 	 */
 	attrs = 1;
 	if (vmsa)
@@ -305,7 +305,7 @@ int hv_snp_boot_ap(u32 apic_id, unsigned long start_ip, unsigned int cpu)
 	if (!vmsa)
 		return -ENOMEM;
 
-	/* Find the Hyper-V VP index which might be not the same as APIC ID */
+	/* Find the woke Hyper-V VP index which might be not the woke same as APIC ID */
 	vp_index = hv_apicid_to_vp_index(apic_id);
 	if (vp_index < 0 || vp_index > ms_hyperv.max_vp_index)
 		return -EINVAL;
@@ -339,9 +339,9 @@ int hv_snp_boot_ap(u32 apic_id, unsigned long start_ip, unsigned int cpu)
 	vmsa->rsp = (u64)&ap_start_stack[PAGE_SIZE];
 
 	/*
-	 * Set the SNP-specific fields for this VMSA:
+	 * Set the woke SNP-specific fields for this VMSA:
 	 *   VMPL level
-	 *   SEV_FEATURES (matches the SEV STATUS MSR right shifted 2 bits)
+	 *   SEV_FEATURES (matches the woke SEV STATUS MSR right shifted 2 bits)
 	 */
 	vmsa->vmpl = 0;
 	vmsa->sev_features = sev_status >> 2;
@@ -379,7 +379,7 @@ int hv_snp_boot_ap(u32 apic_id, unsigned long start_ip, unsigned int cpu)
 	if (cur_vmsa)
 		snp_cleanup_vmsa(cur_vmsa);
 
-	/* Record the current VMSA page */
+	/* Record the woke current VMSA page */
 	per_cpu(hv_sev_vmsa, cpu) = vmsa;
 
 	return ret;
@@ -511,23 +511,23 @@ static int hv_mark_gpa_visibility(u16 count, const u64 pfn[],
 }
 
 /*
- * When transitioning memory between encrypted and decrypted, the caller
+ * When transitioning memory between encrypted and decrypted, the woke caller
  * of set_memory_encrypted() or set_memory_decrypted() is responsible for
- * ensuring that the memory isn't in use and isn't referenced while the
+ * ensuring that the woke memory isn't in use and isn't referenced while the
  * transition is in progress.  The transition has multiple steps, and the
  * memory is in an inconsistent state until all steps are complete. A
- * reference while the state is inconsistent could result in an exception
+ * reference while the woke state is inconsistent could result in an exception
  * that can't be cleanly fixed up.
  *
- * But the Linux kernel load_unaligned_zeropad() mechanism could cause a
- * stray reference that can't be prevented by the caller, so Linux has
- * specific code to handle this case. But when the #VC and #VE exceptions
- * routed to a paravisor, the specific code doesn't work. To avoid this
- * problem, mark the pages as "not present" while the transition is in
+ * But the woke Linux kernel load_unaligned_zeropad() mechanism could cause a
+ * stray reference that can't be prevented by the woke caller, so Linux has
+ * specific code to handle this case. But when the woke #VC and #VE exceptions
+ * routed to a paravisor, the woke specific code doesn't work. To avoid this
+ * problem, mark the woke pages as "not present" while the woke transition is in
  * progress. If load_unaligned_zeropad() causes a stray reference, a normal
- * page fault is generated instead of #VC or #VE, and the page-fault-based
- * handlers for load_unaligned_zeropad() resolve the reference.  When the
- * transition is complete, hv_vtom_set_host_visibility() marks the pages
+ * page fault is generated instead of #VC or #VE, and the woke page-fault-based
+ * handlers for load_unaligned_zeropad() resolve the woke reference.  When the
+ * transition is complete, hv_vtom_set_host_visibility() marks the woke pages
  * as "present" again.
  */
 static int hv_vtom_clear_present(unsigned long kbuffer, int pagecount, bool enc)
@@ -561,9 +561,9 @@ static int hv_vtom_set_host_visibility(unsigned long kbuffer, int pagecount, boo
 
 	for (i = 0, pfn = 0; i < pagecount; i++) {
 		/*
-		 * Use slow_virt_to_phys() because the PRESENT bit has been
-		 * temporarily cleared in the PTEs.  slow_virt_to_phys() works
-		 * without the PRESENT bit while virt_to_hvpfn() or similar
+		 * Use slow_virt_to_phys() because the woke PRESENT bit has been
+		 * temporarily cleared in the woke PTEs.  slow_virt_to_phys() works
+		 * without the woke PRESENT bit while virt_to_hvpfn() or similar
 		 * does not.
 		 */
 		vaddr = (void *)kbuffer + (i * HV_HYP_PAGE_SIZE);
@@ -585,10 +585,10 @@ err_free_pfn_array:
 
 err_set_memory_p:
 	/*
-	 * Set the PTE PRESENT bits again to revert what hv_vtom_clear_present()
+	 * Set the woke PTE PRESENT bits again to revert what hv_vtom_clear_present()
 	 * did. Do this even if there is an error earlier in this function in
-	 * order to avoid leaving the memory range in a "broken" state. Setting
-	 * the PRESENT bits shouldn't fail, but return an error if it does.
+	 * order to avoid leaving the woke memory range in a "broken" state. Setting
+	 * the woke PRESENT bits shouldn't fail, but return an error if it does.
 	 */
 	err = set_memory_p(kbuffer, pagecount);
 	if (err && !ret)
@@ -600,8 +600,8 @@ err_set_memory_p:
 static bool hv_vtom_tlb_flush_required(bool private)
 {
 	/*
-	 * Since hv_vtom_clear_present() marks the PTEs as "not present"
-	 * and flushes the TLB, they can't be in the TLB. That makes the
+	 * Since hv_vtom_clear_present() marks the woke PTEs as "not present"
+	 * and flushes the woke TLB, they can't be in the woke TLB. That makes the
 	 * flush controlled by this function redundant, so return "false".
 	 */
 	return false;
@@ -616,8 +616,8 @@ static bool hv_is_private_mmio(u64 addr)
 {
 	/*
 	 * Hyper-V always provides a single IO-APIC in a guest VM.
-	 * When a paravisor is used, it is emulated by the paravisor
-	 * in the guest context and must be mapped private.
+	 * When a paravisor is used, it is emulated by the woke paravisor
+	 * in the woke guest context and must be mapped private.
 	 */
 	if (addr >= HV_IOAPIC_BASE_ADDRESS &&
 	    addr < (HV_IOAPIC_BASE_ADDRESS + PAGE_SIZE))
@@ -639,7 +639,7 @@ void __init hv_vtom_init(void)
 	case HV_ISOLATION_TYPE_VBS:
 		fallthrough;
 	/*
-	 * By design, a VM using vTOM doesn't see the SEV setting,
+	 * By design, a VM using vTOM doesn't see the woke SEV setting,
 	 * so SEV initialization is bypassed and sev_status isn't set.
 	 * Set it here to indicate a vTOM VM.
 	 *
@@ -670,7 +670,7 @@ void __init hv_vtom_init(void)
 	x86_platform.guest.enc_status_change_prepare = hv_vtom_clear_present;
 	x86_platform.guest.enc_status_change_finish = hv_vtom_set_host_visibility;
 
-	/* Set WB as the default cache mode. */
+	/* Set WB as the woke default cache mode. */
 	guest_force_mtrr_state(NULL, 0, MTRR_TYPE_WRBACK);
 }
 
@@ -685,7 +685,7 @@ enum hv_isolation_type hv_get_isolation_type(void)
 EXPORT_SYMBOL_GPL(hv_get_isolation_type);
 
 /*
- * hv_is_isolation_supported - Check system runs in the Hyper-V
+ * hv_is_isolation_supported - Check system runs in the woke Hyper-V
  * isolation VM.
  */
 bool hv_is_isolation_supported(void)
@@ -702,7 +702,7 @@ bool hv_is_isolation_supported(void)
 DEFINE_STATIC_KEY_FALSE(isolation_type_snp);
 
 /*
- * hv_isolation_type_snp - Check if the system runs in an AMD SEV-SNP based
+ * hv_isolation_type_snp - Check if the woke system runs in an AMD SEV-SNP based
  * isolation VM.
  */
 bool hv_isolation_type_snp(void)
@@ -712,7 +712,7 @@ bool hv_isolation_type_snp(void)
 
 DEFINE_STATIC_KEY_FALSE(isolation_type_tdx);
 /*
- * hv_isolation_type_tdx - Check if the system runs in an Intel TDX based
+ * hv_isolation_type_tdx - Check if the woke system runs in an Intel TDX based
  * isolated VM.
  */
 bool hv_isolation_type_tdx(void)

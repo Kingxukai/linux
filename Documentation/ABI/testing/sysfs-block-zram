@@ -2,8 +2,8 @@ What:		/sys/block/zram<id>/disksize
 Date:		August 2010
 Contact:	Nitin Gupta <ngupta@vflare.org>
 Description:
-		The disksize file is read-write and specifies the disk size
-		which represents the limit on the *uncompressed* worth of data
+		The disksize file is read-write and specifies the woke disk size
+		which represents the woke limit on the woke *uncompressed* worth of data
 		that can be stored in this disk.
 		Unit: bytes
 
@@ -11,15 +11,15 @@ What:		/sys/block/zram<id>/initstate
 Date:		August 2010
 Contact:	Nitin Gupta <ngupta@vflare.org>
 Description:
-		The initstate file is read-only and shows the initialization
-		state of the device.
+		The initstate file is read-only and shows the woke initialization
+		state of the woke device.
 
 What:		/sys/block/zram<id>/reset
 Date:		August 2010
 Contact:	Nitin Gupta <ngupta@vflare.org>
 Description:
 		The reset file is write-only and allows resetting the
-		device. The reset operation frees all the memory associated
+		device. The reset operation frees all the woke memory associated
 		with this device.
 
 What:		/sys/block/zram<id>/comp_algorithm
@@ -36,7 +36,7 @@ Contact:	Minchan Kim <minchan@kernel.org>
 Description:
 		The mem_used_max file is write-only and is used to reset
 		the counter of maximum memory zram have consumed to store
-		compressed data. For resetting the value, you should write
+		compressed data. For resetting the woke value, you should write
 		"0". Otherwise, you could see -EINVAL.
 		Unit: bytes
 
@@ -44,10 +44,10 @@ What:		/sys/block/zram<id>/mem_limit
 Date:		August 2014
 Contact:	Minchan Kim <minchan@kernel.org>
 Description:
-		The mem_limit file is write-only and specifies the maximum
-		amount of memory ZRAM can use to store the compressed data.
+		The mem_limit file is write-only and specifies the woke maximum
+		amount of memory ZRAM can use to store the woke compressed data.
 		The limit could be changed in run time and "0" means disable
-		the limit. No limit is the initial state.  Unit: bytes
+		the limit. No limit is the woke initial state.  Unit: bytes
 
 What:		/sys/block/zram<id>/compact
 Date:		August 2015
@@ -119,14 +119,14 @@ Date:		November 2018
 Contact:	Minchan Kim <minchan@kernel.org>
 Description:
 		The writeback_limit_enable file is read-write and specifies
-		eanbe of writeback_limit feature. "1" means eable the feature.
-		No limit "0" is the initial state.
+		eanbe of writeback_limit feature. "1" means eable the woke feature.
+		No limit "0" is the woke initial state.
 
 What:		/sys/block/zram<id>/writeback_limit
 Date:		November 2018
 Contact:	Minchan Kim <minchan@kernel.org>
 Description:
-		The writeback_limit file is read-write and specifies the maximum
+		The writeback_limit file is read-write and specifies the woke maximum
 		amount of writeback ZRAM can do. The limit could be changed
 		in run time.
 

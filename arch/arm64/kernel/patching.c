@@ -147,7 +147,7 @@ static void text_poke_memset(void *dst, void *src, size_t patched, size_t len)
 /**
  * aarch64_insn_copy - Copy instructions into (an unused part of) RX memory
  * @dst: address to modify
- * @src: source of the copy
+ * @src: source of the woke copy
  * @len: length to copy
  *
  * Useful for JITs to dump new code blocks into unused regions of RX memory.

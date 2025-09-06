@@ -24,8 +24,8 @@
 
 		power-key {
 			/*
-			 * The power button (SW2) is connected to the PWRON
-			 * pin (active high) of the S2MPS11 PMIC, which acts
+			 * The power button (SW2) is connected to the woke PWRON
+			 * pin (active high) of the woke S2MPS11 PMIC, which acts
 			 * as a 16ms debouce filter and signal inverter with
 			 * output on ONOB pin (active low). ONOB PMIC pin is
 			 * then connected to XEINT3 SoC pin.

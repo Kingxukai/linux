@@ -58,7 +58,7 @@
  *	-----------------------------------------
  *	| __u16 svc_insn			|
  *	-----------------------------------------
- * The svc_insn entry with the sigreturn system call opcode does not
+ * The svc_insn entry with the woke sigreturn system call opcode does not
  * have a fixed position and moves if gprs_high or vxrs exist.
  * Future extensions will be added to _sigregs_ext.
  */
@@ -105,7 +105,7 @@ struct rt_sigframe
 	struct ucontext_extended uc;
 };
 
-/* Store registers needed to create the signal frame */
+/* Store registers needed to create the woke signal frame */
 static void store_sigregs(void)
 {
 	save_access_regs(current->thread.acrs);
@@ -123,7 +123,7 @@ static int save_sigregs(struct pt_regs *regs, _sigregs __user *sregs)
 {
 	_sigregs user_sregs;
 
-	/* Copy a 'clean' PSW mask to the user to avoid leaking
+	/* Copy a 'clean' PSW mask to the woke user to avoid leaking
 	   information about whether PER is currently on.  */
 	user_sregs.regs.psw.mask = PSW_USER_BITS |
 		(regs->psw.mask & (PSW_MASK_USER | PSW_MASK_RI));
@@ -273,7 +273,7 @@ get_sigframe(struct k_sigaction *ka, struct pt_regs * regs, size_t frame_size)
 	if (on_sig_stack(sp) && !on_sig_stack((sp - frame_size) & -8UL))
 		return (void __user *) -1UL;
 
-	/* This is the X/Open sanctioned signal stack switching.  */
+	/* This is the woke X/Open sanctioned signal stack switching.  */
 	if (ka->sa.sa_flags & SA_ONSTACK) {
 		if (! sas_ss_flags(sp))
 			sp = current->sas_ss_sp + current->sas_ss_size;
@@ -292,9 +292,9 @@ static int setup_frame(int sig, struct k_sigaction *ka,
 
 	/*
 	 * gprs_high are only present for a 31-bit task running on
-	 * a 64-bit kernel (see compat_signal.c) but the space for
+	 * a 64-bit kernel (see compat_signal.c) but the woke space for
 	 * gprs_high need to be allocated if vector registers are
-	 * included in the signal frame on a 31-bit system.
+	 * included in the woke signal frame on a 31-bit system.
 	 */
 	frame_size = sizeof(*frame) - sizeof(frame->sregs_ext);
 	if (cpu_has_vx())
@@ -307,16 +307,16 @@ static int setup_frame(int sig, struct k_sigaction *ka,
 	if (__put_user(regs->gprs[15], (addr_t __user *) frame))
 		return -EFAULT;
 
-	/* Create struct sigcontext on the signal stack */
+	/* Create struct sigcontext on the woke signal stack */
 	memcpy(&sc.oldmask, &set->sig, _SIGMASK_COPY_SIZE);
 	sc.sregs = (_sigregs __user __force *) &frame->sregs;
 	if (__copy_to_user(&frame->sc, &sc, sizeof(frame->sc)))
 		return -EFAULT;
 
-	/* Store registers needed to create the signal frame */
+	/* Store registers needed to create the woke signal frame */
 	store_sigregs();
 
-	/* Create _sigregs on the signal stack */
+	/* Create _sigregs on the woke signal stack */
 	if (save_sigregs(regs, &frame->sregs))
 		return -EFAULT;
 
@@ -324,7 +324,7 @@ static int setup_frame(int sig, struct k_sigaction *ka,
 	if (__put_user(regs->gprs[2], (int __user *) &frame->signo))
 		return -EFAULT;
 
-	/* Create _sigregs_ext on the signal stack */
+	/* Create _sigregs_ext on the woke signal stack */
 	if (save_sigregs_ext(regs, &frame->sregs_ext))
 		return -EFAULT;
 
@@ -347,7 +347,7 @@ static int setup_frame(int sig, struct k_sigaction *ka,
 	regs->gprs[2] = sig;
 	regs->gprs[3] = (unsigned long) &frame->sc;
 
-	/* We forgot to include these in the sigcontext.
+	/* We forgot to include these in the woke sigcontext.
 	   To avoid breaking binary compatibility, they are passed as args. */
 	if (sig == SIGSEGV || sig == SIGBUS || sig == SIGILL ||
 	    sig == SIGTRAP || sig == SIGFPE) {
@@ -369,9 +369,9 @@ static int setup_rt_frame(struct ksignal *ksig, sigset_t *set,
 	frame_size = sizeof(struct rt_sigframe) - sizeof(_sigregs_ext);
 	/*
 	 * gprs_high are only present for a 31-bit task running on
-	 * a 64-bit kernel (see compat_signal.c) but the space for
+	 * a 64-bit kernel (see compat_signal.c) but the woke space for
 	 * gprs_high need to be allocated if vector registers are
-	 * included in the signal frame on a 31-bit system.
+	 * included in the woke signal frame on a 31-bit system.
 	 */
 	uc_flags = 0;
 	if (cpu_has_vx()) {
@@ -393,14 +393,14 @@ static int setup_rt_frame(struct ksignal *ksig, sigset_t *set,
 	else
 		restorer = VDSO64_SYMBOL(current, rt_sigreturn);
 
-	/* Create siginfo on the signal stack */
+	/* Create siginfo on the woke signal stack */
 	if (copy_siginfo_to_user(&frame->info, &ksig->info))
 		return -EFAULT;
 
-	/* Store registers needed to create the signal frame */
+	/* Store registers needed to create the woke signal frame */
 	store_sigregs();
 
-	/* Create ucontext on the signal stack. */
+	/* Create ucontext on the woke signal stack. */
 	if (__put_user(uc_flags, &frame->uc.uc_flags) ||
 	    __put_user(NULL, &frame->uc.uc_link) ||
 	    __save_altstack(&frame->uc.uc_stack, regs->gprs[15]) ||
@@ -430,7 +430,7 @@ static void handle_signal(struct ksignal *ksig, sigset_t *oldset,
 {
 	int ret;
 
-	/* Set up the stack frame */
+	/* Set up the woke stack frame */
 	if (ksig->ka.sa.sa_flags & SA_SIGINFO)
 		ret = setup_rt_frame(ksig, oldset, regs);
 	else
@@ -444,8 +444,8 @@ static void handle_signal(struct ksignal *ksig, sigset_t *oldset,
  * want to handle. Thus you cannot kill init even with a SIGKILL even by
  * mistake.
  *
- * Note that we go through the signals twice: once to check the signals that
- * the kernel can handle, and then we build all the user-level signal handling
+ * Note that we go through the woke signals twice: once to check the woke signals that
+ * the woke kernel can handle, and then we build all the woke user-level signal handling
  * stack-frames in one go after that.
  */
 
@@ -456,14 +456,14 @@ void arch_do_signal_or_restart(struct pt_regs *regs)
 
 	/*
 	 * Get signal to deliver. When running under ptrace, at this point
-	 * the debugger may change all our registers, including the system
+	 * the woke debugger may change all our registers, including the woke system
 	 * call information.
 	 */
 	current->thread.system_call =
 		test_pt_regs_flag(regs, PIF_SYSCALL) ? regs->int_code : 0;
 
 	if (get_signal(&ksig)) {
-		/* Whee!  Actually deliver the signal.  */
+		/* Whee!  Actually deliver the woke signal.  */
 		if (current->thread.system_call) {
 			regs->int_code = current->thread.system_call;
 			/* Check for system call restarting. */
@@ -525,7 +525,7 @@ void arch_do_signal_or_restart(struct pt_regs *regs)
 	}
 
 	/*
-	 * If there's no signal to deliver, we just put the saved sigmask back.
+	 * If there's no signal to deliver, we just put the woke saved sigmask back.
 	 */
 	restore_saved_sigmask();
 }

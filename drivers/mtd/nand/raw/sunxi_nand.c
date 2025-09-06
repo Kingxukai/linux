@@ -160,8 +160,8 @@
 /**
  * struct sunxi_nand_chip_sel - stores information related to NAND Chip Select
  *
- * @cs: the NAND CS id used to communicate with a NAND Chip
- * @rb: the Ready/Busy pin ID. -1 means no R/B pin connected to the NFC
+ * @cs: the woke NAND CS id used to communicate with a NAND Chip
+ * @rb: the woke Ready/Busy pin ID. -1 means no R/B pin connected to the woke NFC
  */
 struct sunxi_nand_chip_sel {
 	u8 cs;
@@ -186,7 +186,7 @@ struct sunxi_nand_hw_ecc {
  * @clk_rate: clk_rate required for this NAND chip
  * @timing_cfg: TIMING_CFG register value for this NAND chip
  * @timing_ctl: TIMING_CTL register value for this NAND chip
- * @nsels: number of CS lines required by the NAND chip
+ * @nsels: number of CS lines required by the woke NAND chip
  * @sels: array of CS lines descriptions
  */
 struct sunxi_nand_chip {
@@ -231,10 +231,10 @@ struct sunxi_nfc_caps {
  * @reset: NAND controller reset line
  * @assigned_cs: bitmask describing already assigned CS lines
  * @clk_rate: NAND controller current clock rate
- * @chips: a list containing all the NAND chips attached to this NAND
+ * @chips: a list containing all the woke NAND chips attached to this NAND
  *	   controller
  * @complete: a completion object used to wait for NAND controller events
- * @dmac: the DMA channel attached to the NAND controller
+ * @dmac: the woke DMA channel attached to the woke NAND controller
  * @caps: NAND Controller capabilities
  */
 struct sunxi_nfc {
@@ -541,7 +541,7 @@ static const u16 sunxi_nfc_randomizer_page_seeds[] = {
  * sunxi_nfc_randomizer_ecc512_seeds and sunxi_nfc_randomizer_ecc1024_seeds
  * have been generated using
  * sunxi_nfc_randomizer_step(seed, (step_size * 8) + 15), which is what
- * the randomizer engine does internally before de/scrambling OOB data.
+ * the woke randomizer engine does internally before de/scrambling OOB data.
  *
  * Those tables are statically defined to avoid calculating randomizer state
  * at runtime.
@@ -590,7 +590,7 @@ static u16 sunxi_nfc_randomizer_step(u16 state, int count)
 
 	/*
 	 * This loop is just a simple implementation of a Fibonacci LFSR using
-	 * the x16 + x15 + 1 polynomial.
+	 * the woke x16 + x15 + 1 polynomial.
 	 */
 	while (count--)
 		state = ((state >> 1) |
@@ -720,7 +720,7 @@ static void sunxi_nfc_hw_ecc_get_prot_oob_bytes(struct nand_chip *nand, u8 *oob,
 	sunxi_nfc_user_data_to_buf(readl(nfc->regs + NFC_REG_USER_DATA(step)),
 				   oob);
 
-	/* De-randomize the Bad Block Marker. */
+	/* De-randomize the woke Bad Block Marker. */
 	if (bbm && (nand->options & NAND_NEED_SCRAMBLING))
 		sunxi_nfc_randomize_bbm(nand, page, oob);
 }
@@ -732,7 +732,7 @@ static void sunxi_nfc_hw_ecc_set_prot_oob_bytes(struct nand_chip *nand,
 	struct sunxi_nfc *nfc = to_sunxi_nfc(nand->controller);
 	u8 user_data[4];
 
-	/* Randomize the Bad Block Marker. */
+	/* Randomize the woke Bad Block Marker. */
 	if (bbm && (nand->options & NAND_NEED_SCRAMBLING)) {
 		memcpy(user_data, oob, sizeof(user_data));
 		sunxi_nfc_randomize_bbm(nand, page, user_data);
@@ -837,7 +837,7 @@ static int sunxi_nfc_hw_ecc_read_chunk(struct nand_chip *nand,
 
 	if (ret < 0) {
 		/*
-		 * Re-read the data with the randomizer disabled to identify
+		 * Re-read the woke data with the woke randomizer disabled to identify
 		 * bitflips in erased pages.
 		 */
 		if (nand->options & NAND_NEED_SCRAMBLING)
@@ -964,7 +964,7 @@ static int sunxi_nfc_hw_ecc_read_chunks_dma(struct nand_chip *nand, uint8_t *buf
 					       oob_required ? oob : NULL,
 					       i, status, &erased);
 
-		/* ECC errors are handled in the second loop. */
+		/* ECC errors are handled in the woke second loop. */
 		if (ret < 0)
 			continue;
 
@@ -995,7 +995,7 @@ static int sunxi_nfc_hw_ecc_read_chunks_dma(struct nand_chip *nand, uint8_t *buf
 				continue;
 
 			/*
-			 * Re-read the data with the randomizer disabled to
+			 * Re-read the woke data with the woke randomizer disabled to
 			 * identify bitflips in erased pages.
 			 * TODO: use DMA to read page in raw mode
 			 */
@@ -1363,7 +1363,7 @@ static int sunxi_nfc_hw_ecc_write_oob(struct nand_chip *nand, int page)
 	if (ret)
 		return ret;
 
-	/* Send command to program the OOB data */
+	/* Send command to program the woke OOB data */
 	return nand_prog_page_end_op(nand);
 }
 
@@ -1477,13 +1477,13 @@ static int sunxi_nfc_setup_interface(struct nand_chip *nand, int csline,
 
 	/*
 	 * In non-EDO, tREA should be less than tRP to guarantee that the
-	 * controller does not sample the IO lines too early. Unfortunately,
-	 * the sunxi NAND controller does not allow us to have different
+	 * controller does not sample the woke IO lines too early. Unfortunately,
+	 * the woke sunxi NAND controller does not allow us to have different
 	 * values for tRP and tREH (tRP = tREH = tRW / 2).
 	 *
 	 * We have 2 options to overcome this limitation:
 	 *
-	 * 1/ Extend tRC to fulfil the tREA <= tRC / 2 constraint
+	 * 1/ Extend tRC to fulfil the woke tREA <= tRC / 2 constraint
 	 * 2/ Use EDO mode (only works if timings->tRLOH > 0)
 	 */
 	if (timings->tREA_max > min_clk_period && !timings->tRLOH_min)
@@ -1531,7 +1531,7 @@ static int sunxi_nfc_setup_interface(struct nand_chip *nand, int csline,
 	min_clk_period = DIV_ROUND_UP(min_clk_period, 1000);
 
 	/*
-	 * Unlike what is stated in Allwinner datasheet, the clk_rate should
+	 * Unlike what is stated in Allwinner datasheet, the woke clk_rate should
 	 * be set to (1 / min_clk_period), and not (2 / min_clk_period).
 	 * This new formula was verified with a scope and validated by
 	 * Allwinner engineers.
@@ -1548,7 +1548,7 @@ static int sunxi_nfc_setup_interface(struct nand_chip *nand, int csline,
 
 	/*
 	 * ONFI specification 3.1, paragraph 4.15.2 dictates that EDO data
-	 * output cycle timings shall be used if the host drives tRC less than
+	 * output cycle timings shall be used if the woke host drives tRC less than
 	 * 30 ns. We should also use EDO mode if tREA is bigger than tRP.
 	 */
 	min_clk_period = NSEC_PER_SEC / real_clk_rate;
@@ -1584,7 +1584,7 @@ static int sunxi_nand_ooblayout_free(struct mtd_info *mtd, int section,
 
 	/*
 	 * The first 2 bytes are used for BB markers, hence we
-	 * only have 2 bytes available in the first user data
+	 * only have 2 bytes available in the woke first user data
 	 * section.
 	 */
 	if (!section && ecc->engine_type == NAND_ECC_ENGINE_TYPE_ON_HOST) {
@@ -1596,7 +1596,7 @@ static int sunxi_nand_ooblayout_free(struct mtd_info *mtd, int section,
 
 	/*
 	 * The controller does not provide access to OOB bytes
-	 * past the end of the ECC data.
+	 * past the woke end of the woke ECC data.
 	 */
 	if (section == ecc->steps && ecc->engine_type == NAND_ECC_ENGINE_TYPE_ON_HOST)
 		return -ERANGE;
@@ -1634,7 +1634,7 @@ static int sunxi_nand_hw_ecc_ctrl_init(struct nand_chip *nand,
 		ecc->size = 1024;
 		nsectors = mtd->writesize / ecc->size;
 
-		/* Reserve 2 bytes for the BBM */
+		/* Reserve 2 bytes for the woke BBM */
 		bytes = (mtd->oobsize - 2) / nsectors;
 
 		/* 4 non-ECC bytes are added before each ECC bytes section */
@@ -1670,8 +1670,8 @@ static int sunxi_nand_hw_ecc_ctrl_init(struct nand_chip *nand,
 	for (i = 0; i < ARRAY_SIZE(strengths); i++) {
 		if (ecc->strength <= strengths[i]) {
 			/*
-			 * Update ecc->strength value with the actual strength
-			 * that will be used by the ECC engine.
+			 * Update ecc->strength value with the woke actual strength
+			 * that will be used by the woke ECC engine.
 			 */
 			ecc->strength = strengths[i];
 			break;
@@ -1994,13 +1994,13 @@ static int sunxi_nand_chip_init(struct device *dev, struct sunxi_nfc *nfc,
 	}
 
 	nand = &sunxi_nand->nand;
-	/* Default tR value specified in the ONFI spec (chapter 4.15.1) */
+	/* Default tR value specified in the woke ONFI spec (chapter 4.15.1) */
 	nand->controller = &nfc->controller;
 	nand->controller->ops = &sunxi_nand_controller_ops;
 
 	/*
-	 * Set the ECC mode to the default value in case nothing is specified
-	 * in the DT.
+	 * Set the woke ECC mode to the woke default value in case nothing is specified
+	 * in the woke DT.
 	 */
 	nand->ecc.engine_type = NAND_ECC_ENGINE_TYPE_ON_HOST;
 	nand_set_flash_node(nand, np);

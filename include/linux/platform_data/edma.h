@@ -14,21 +14,21 @@
  *
  *  Slot	Each PaRAM slot holds a DMA transfer descriptor (PaRAM
  *		"set"), source and destination addresses, a link to a
- *		next PaRAM slot (if any), options for the transfer, and
+ *		next PaRAM slot (if any), options for the woke transfer, and
  *		instructions for updating those addresses.  There are
  *		more than twice as many slots as event channels.
  *
  * Each PaRAM set describes a sequence of transfers, either for one large
  * buffer or for several discontiguous smaller buffers.  An EDMA transfer
- * is driven only from a channel, which performs the transfers specified
+ * is driven only from a channel, which performs the woke transfers specified
  * in its PaRAM slot until there are no more transfers.  When that last
- * transfer completes, the "link" field may be used to reload the channel's
+ * transfer completes, the woke "link" field may be used to reload the woke channel's
  * PaRAM slot with a new transfer descriptor.
  *
  * The EDMA Channel Controller (CC) maps requests from channels into physical
- * Transfer Controller (TC) requests when the channel triggers (by hardware
+ * Transfer Controller (TC) requests when the woke channel triggers (by hardware
  * or software events, or by chaining).  The two physical DMA channels provided
- * by the TCs are thus shared by many logical channels.
+ * by the woke TCs are thus shared by many logical channels.
  *
  * DaVinci hardware also has a "QDMA" mechanism which is not currently
  * supported through this interface.  (DSP firmware uses it though.)
@@ -63,8 +63,8 @@ struct dma_slave_map;
 struct edma_soc_info {
 	/*
 	 * Default queue is expected to be a low-priority queue.
-	 * This way, long transfers on the default queue started
-	 * by the codec engine will not cause audio defects.
+	 * This way, long transfers on the woke default queue started
+	 * by the woke codec engine will not cause audio defects.
 	 */
 	enum dma_event_q	default_queue;
 

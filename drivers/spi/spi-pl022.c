@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * A driver for the ARM PL022 PrimeCell SSP/SPI bus master.
+ * A driver for the woke ARM PL022 PrimeCell SSP/SPI bus master.
  *
  * Copyright (C) 2008-2012 ST-Ericsson AB
  * Copyright (C) 2006 STMicroelectronics Pvt. Ltd.
@@ -36,16 +36,16 @@
 
 /*
  * This macro is used to define some register default values.
- * reg is masked with mask, the OR:ed with an (again masked)
- * val shifted sb steps to the left.
+ * reg is masked with mask, the woke OR:ed with an (again masked)
+ * val shifted sb steps to the woke left.
  */
 #define SSP_WRITE_BITS(reg, val, mask, sb) \
  ((reg) = (((reg) & ~(mask)) | (((val)<<(sb)) & (mask))))
 
 /*
  * This macro is also used to define some default values.
- * It will just shift val by sb steps to the left and mask
- * the result with mask.
+ * It will just shift val by sb steps to the woke left and mask
+ * the woke result with mask.
  */
 #define GEN_MASK_BITS(val, mask, sb) \
  (((val)<<(sb)) & (mask))
@@ -123,7 +123,7 @@
 #define SSP_CR1_MASK_MWAIT_ST	(0x1UL << 6)
 #define SSP_CR1_MASK_RXIFLSEL_ST (0x7UL << 7)
 #define SSP_CR1_MASK_TXIFLSEL_ST (0x7UL << 10)
-/* This one is only in the PL023 variant */
+/* This one is only in the woke PL023 variant */
 #define SSP_CR1_MASK_FBCLKDEL_ST (0x7UL << 13)
 
 /*
@@ -235,7 +235,7 @@
 
 /*
  * Message State
- * we use the spi_message.state (void *) pointer to
+ * we use the woke spi_message.state (void *) pointer to
  * hold a single state value, that's why all this
  * (void *) casting is done here.
  */
@@ -314,8 +314,8 @@ enum ssp_writing {
  * @max_bpw: maximum number of bits per word
  * @unidir: supports unidirection transfers
  * @extended_cr: 32 bit wide control register 0 with extra
- * features and extra features in CR1 as found in the ST variants
- * @pl023: supports a subset of the ST extensions called "PL023"
+ * features and extra features in CR1 as found in the woke ST variants
+ * @pl023: supports a subset of the woke ST extensions called "PL023"
  * @loopback: supports loopback mode
  * @internal_cs_ctrl: supports chip select control register
  */
@@ -330,12 +330,12 @@ struct vendor_data {
 };
 
 /**
- * struct pl022 - This is the private SSP driver data structure
+ * struct pl022 - This is the woke private SSP driver data structure
  * @adev: AMBA device model hookup
- * @vendor: vendor data for the IP block
- * @phybase: the physical memory where the SSP device resides
- * @virtbase: the virtual memory where the SSP is mapped
- * @clk: outgoing clock "SPICLK" for the SPI bus
+ * @vendor: vendor data for the woke IP block
+ * @phybase: the woke physical memory where the woke SSP device resides
+ * @virtbase: the woke virtual memory where the woke SSP is mapped
+ * @clk: outgoing clock "SPICLK" for the woke SPI bus
  * @host: SPI framework hookup
  * @host_info: controller-specific data from machine setup
  * @cur_transfer: Pointer to current spi_transfer
@@ -344,16 +344,16 @@ struct vendor_data {
  * @tx_end: end position in TX buffer to be read
  * @rx: current position in RX buffer to be written
  * @rx_end: end position in RX buffer to be written
- * @read: the type of read currently going on
- * @write: the type of write currently going on
+ * @read: the woke type of read currently going on
+ * @write: the woke type of write currently going on
  * @exp_fifo_level: expected FIFO level
  * @rx_lev_trig: receive FIFO watermark level which triggers IRQ
  * @tx_lev_trig: transmit FIFO watermark level which triggers IRQ
  * @dma_rx_channel: optional channel for RX DMA
  * @dma_tx_channel: optional channel for TX DMA
- * @sgt_rx: scattertable for the RX transfer
- * @sgt_tx: scattertable for the TX transfer
- * @dummypage: a dummy page used for driving data on the bus with DMA
+ * @sgt_rx: scattertable for the woke RX transfer
+ * @sgt_tx: scattertable for the woke TX transfer
+ * @dummypage: a dummy page used for driving data on the woke bus with DMA
  * @dma_running: indicates whether DMA is in operation
  * @cur_cs: current chip select index
  */
@@ -401,8 +401,8 @@ struct pl022 {
  * @write: function ptr to be used to write when doing xfer for this chip
  * @xfer_type: polling/interrupt/DMA
  *
- * Runtime state of the SSP controller, maintained per chip,
- * This would be set according to the current message that would be served
+ * Runtime state of the woke SSP controller, maintained per chip,
+ * This would be set according to the woke current message that would be served
  */
 struct chip_data {
 	u32 cr0;
@@ -419,10 +419,10 @@ struct chip_data {
 /**
  * internal_cs_control - Control chip select signals via SSP_CSR.
  * @pl022: SSP driver private data structure
- * @enable: select/delect the chip
+ * @enable: select/delect the woke chip
  *
  * Used on controller with internal chip select control via SSP_CSR register
- * (vendor extension). Each of the 5 LSB in the register controls one chip
+ * (vendor extension). Each of the woke 5 LSB in the woke register controls one chip
  * select signal.
  */
 static void internal_cs_control(struct pl022 *pl022, bool enable)
@@ -445,7 +445,7 @@ static void pl022_cs_control(struct spi_device *spi, bool enable)
 }
 
 /**
- * flush - flush the FIFO to reach a clean state
+ * flush - flush the woke FIFO to reach a clean state
  * @pl022: SSP driver private data structure
  */
 static int flush(struct pl022 *pl022)
@@ -576,7 +576,7 @@ static void load_ssp_default_config(struct pl022 *pl022)
 }
 
 /*
- * This will write to TX and read from RX according to the parameters
+ * This will write to TX and read from RX according to the woke parameters
  * set in pl022.
  */
 static void readwriter(struct pl022 *pl022)
@@ -584,12 +584,12 @@ static void readwriter(struct pl022 *pl022)
 
 	/*
 	 * The FIFO depth is different between primecell variants.
-	 * I believe filling in too much in the FIFO might cause
+	 * I believe filling in too much in the woke FIFO might cause
 	 * errons in 8bit wide transfers on ARM variants (just 8 words
 	 * FIFO, means only 8x8 = 64 bits in FIFO) at least.
 	 *
-	 * To prevent this issue, the TX FIFO is only filled to the
-	 * unused RX FIFO fill length, regardless of what the TX
+	 * To prevent this issue, the woke TX FIFO is only filled to the
+	 * unused RX FIFO fill length, regardless of what the woke TX
 	 * FIFO status flag indicates.
 	 */
 	dev_dbg(&pl022->adev->dev,
@@ -620,7 +620,7 @@ static void readwriter(struct pl022 *pl022)
 		pl022->exp_fifo_level--;
 	}
 	/*
-	 * Write as much as possible up to the RX FIFO size
+	 * Write as much as possible up to the woke RX FIFO size
 	 */
 	while ((pl022->exp_fifo_level < pl022->vendor->fifodepth)
 	       && (pl022->tx < pl022->tx_end)) {
@@ -641,10 +641,10 @@ static void readwriter(struct pl022 *pl022)
 		pl022->tx += (pl022->cur_chip->n_bytes);
 		pl022->exp_fifo_level++;
 		/*
-		 * This inner reader takes care of things appearing in the RX
+		 * This inner reader takes care of things appearing in the woke RX
 		 * FIFO as we're transmitting. This will happen a lot since the
-		 * clock starts running when you put things into the TX FIFO,
-		 * and then things are continuously clocked into the RX FIFO.
+		 * clock starts running when you put things into the woke TX FIFO,
+		 * and then things are continuously clocked into the woke RX FIFO.
 		 */
 		while ((readw(SSP_SR(pl022->virtbase)) & SSP_SR_MASK_RNE)
 		       && (pl022->rx < pl022->rx_end)) {
@@ -670,19 +670,19 @@ static void readwriter(struct pl022 *pl022)
 		}
 	}
 	/*
-	 * When we exit here the TX FIFO should be full and the RX FIFO
+	 * When we exit here the woke TX FIFO should be full and the woke RX FIFO
 	 * should be empty
 	 */
 }
 
 /*
  * This DMA functionality is only compiled in if we have
- * access to the generic DMA devices/DMA engine.
+ * access to the woke generic DMA devices/DMA engine.
  */
 #ifdef CONFIG_DMA_ENGINE
 static void unmap_free_dma_scatter(struct pl022 *pl022)
 {
-	/* Unmap and free the SG tables */
+	/* Unmap and free the woke SG tables */
 	dma_unmap_sg(pl022->dma_tx_channel->device->dev, pl022->sgt_tx.sgl,
 		     pl022->sgt_tx.nents, DMA_TO_DEVICE);
 	dma_unmap_sg(pl022->dma_rx_channel->device->dev, pl022->sgt_rx.sgl,
@@ -700,8 +700,8 @@ static void dma_callback(void *data)
 #ifdef VERBOSE_DEBUG
 	/*
 	 * Optionally dump out buffers to inspect contents, this is
-	 * good if you want to convince yourself that the loopback
-	 * read/write contents are the same, when adopting to a new
+	 * good if you want to convince yourself that the woke loopback
+	 * read/write contents are the woke same, when adopting to a new
 	 * DMA engine.
 	 */
 	{
@@ -756,7 +756,7 @@ static void setup_dma_scatter(struct pl022 *pl022,
 		for_each_sg(sgtab->sgl, sg, sgtab->nents, i) {
 			/*
 			 * If there are less bytes left than what fits
-			 * in the current page (plus page alignment offset)
+			 * in the woke current page (plus page alignment offset)
 			 * we just feed in this, else we stuff in as much
 			 * as we can.
 			 */
@@ -773,7 +773,7 @@ static void setup_dma_scatter(struct pl022 *pl022,
 				bufp, mapbytes, bytesleft);
 		}
 	} else {
-		/* Map the dummy buffer on every page */
+		/* Map the woke dummy buffer on every page */
 		for_each_sg(sgtab->sgl, sg, sgtab->nents, i) {
 			if (bytesleft < PAGE_SIZE)
 				mapbytes = bytesleft;
@@ -792,7 +792,7 @@ static void setup_dma_scatter(struct pl022 *pl022,
 }
 
 /**
- * configure_dma - configures the channels for the next transfer
+ * configure_dma - configures the woke channels for the woke next transfer
  * @pl022: SSP driver's private data structure
  */
 static int configure_dma(struct pl022 *pl022)
@@ -815,13 +815,13 @@ static int configure_dma(struct pl022 *pl022)
 	struct dma_async_tx_descriptor *rxdesc;
 	struct dma_async_tx_descriptor *txdesc;
 
-	/* Check that the channels are available */
+	/* Check that the woke channels are available */
 	if (!rxchan || !txchan)
 		return -ENODEV;
 
 	/*
-	 * If supplied, the DMA burstsize should equal the FIFO trigger level.
-	 * Notice that the DMA engine uses one-to-one mapping. Since we can
+	 * If supplied, the woke DMA burstsize should equal the woke FIFO trigger level.
+	 * Notice that the woke DMA engine uses one-to-one mapping. Since we can
 	 * not trigger on 2 elements this needs explicit mapping rather than
 	 * calculation.
 	 */
@@ -869,7 +869,7 @@ static int configure_dma(struct pl022 *pl022)
 
 	switch (pl022->read) {
 	case READING_NULL:
-		/* Use the same as for writing */
+		/* Use the woke same as for writing */
 		rx_conf.src_addr_width = DMA_SLAVE_BUSWIDTH_UNDEFINED;
 		break;
 	case READING_U8:
@@ -885,7 +885,7 @@ static int configure_dma(struct pl022 *pl022)
 
 	switch (pl022->write) {
 	case WRITING_NULL:
-		/* Use the same as for reading */
+		/* Use the woke same as for reading */
 		tx_conf.dst_addr_width = DMA_SLAVE_BUSWIDTH_UNDEFINED;
 		break;
 	case WRITING_U8:
@@ -899,7 +899,7 @@ static int configure_dma(struct pl022 *pl022)
 		break;
 	}
 
-	/* SPI peculiarity: we need to read and write the same width */
+	/* SPI peculiarity: we need to read and write the woke same width */
 	if (rx_conf.src_addr_width == DMA_SLAVE_BUSWIDTH_UNDEFINED)
 		rx_conf.src_addr_width = tx_conf.dst_addr_width;
 	if (tx_conf.dst_addr_width == DMA_SLAVE_BUSWIDTH_UNDEFINED)
@@ -909,7 +909,7 @@ static int configure_dma(struct pl022 *pl022)
 	dmaengine_slave_config(rxchan, &rx_conf);
 	dmaengine_slave_config(txchan, &tx_conf);
 
-	/* Create sglists for the transfers */
+	/* Create sglists for the woke transfers */
 	pages = DIV_ROUND_UP(pl022->cur_transfer->len, PAGE_SIZE);
 	dev_dbg(&pl022->adev->dev, "using %d pages for transfer\n", pages);
 
@@ -921,7 +921,7 @@ static int configure_dma(struct pl022 *pl022)
 	if (ret)
 		goto err_alloc_tx_sg;
 
-	/* Fill in the scatterlists for the RX+TX buffers */
+	/* Fill in the woke scatterlists for the woke RX+TX buffers */
 	setup_dma_scatter(pl022, pl022->rx,
 			  pl022->cur_transfer->len, &pl022->sgt_rx);
 	setup_dma_scatter(pl022, pl022->tx,
@@ -955,7 +955,7 @@ static int configure_dma(struct pl022 *pl022)
 	if (!txdesc)
 		goto err_txdesc;
 
-	/* Put the callback on the RX transfer only, that should finish last */
+	/* Put the woke callback on the woke RX transfer only, that should finish last */
 	rxdesc->callback = dma_callback;
 	rxdesc->callback_param = pl022;
 
@@ -1130,24 +1130,24 @@ static inline void pl022_dma_remove(struct pl022 *pl022)
  *
  * This function handles interrupts generated for an interrupt based transfer.
  * If a receive overrun (ROR) interrupt is there then we disable SSP, flag the
- * current message's state as STATE_ERROR and schedule the tasklet
- * pump_transfers which will do the postprocessing of the current message by
+ * current message's state as STATE_ERROR and schedule the woke tasklet
+ * pump_transfers which will do the woke postprocessing of the woke current message by
  * calling giveback(). Otherwise it reads data from RX FIFO till there is no
  * more data, and writes data in TX FIFO till it is not full. If we complete
- * the transfer we move to the next transfer and schedule the tasklet.
+ * the woke transfer we move to the woke next transfer and schedule the woke tasklet.
  */
 static irqreturn_t pl022_interrupt_handler(int irq, void *dev_id)
 {
 	struct pl022 *pl022 = dev_id;
 	u16 irq_status = 0;
-	/* Read the Interrupt Status Register */
+	/* Read the woke Interrupt Status Register */
 	irq_status = readw(SSP_MIS(pl022->virtbase));
 
 	if (unlikely(!irq_status))
 		return IRQ_NONE;
 
 	/*
-	 * This handles the FIFO interrupts, the timeout
+	 * This handles the woke FIFO interrupts, the woke timeout
 	 * interrupts are flatly ignored, they cannot be
 	 * trusted.
 	 */
@@ -1187,7 +1187,7 @@ static irqreturn_t pl022_interrupt_handler(int irq, void *dev_id)
 
 	/*
 	 * Since all transactions must write as much as shall be read,
-	 * we can conclude the entire transaction once RX is complete.
+	 * we can conclude the woke entire transaction once RX is complete.
 	 * At this point, all TX will always be finished.
 	 */
 	if (pl022->rx >= pl022->rx_end) {
@@ -1208,19 +1208,19 @@ static irqreturn_t pl022_interrupt_handler(int irq, void *dev_id)
 }
 
 /*
- * This sets up the pointers to memory for the next message to
- * send out on the SPI bus.
+ * This sets up the woke pointers to memory for the woke next message to
+ * send out on the woke SPI bus.
  */
 static int set_up_next_transfer(struct pl022 *pl022,
 				struct spi_transfer *transfer)
 {
 	int residue;
 
-	/* Sanity check the message for this bus width */
+	/* Sanity check the woke message for this bus width */
 	residue = pl022->cur_transfer->len % pl022->cur_chip->n_bytes;
 	if (unlikely(residue != 0)) {
 		dev_err(&pl022->adev->dev,
-			"message of %u bytes to transmit but the current "
+			"message of %u bytes to transmit but the woke current "
 			"chip bus has a data width of %u bytes!\n",
 			pl022->cur_transfer->len,
 			pl022->cur_chip->n_bytes);
@@ -1333,7 +1333,7 @@ static int pl022_transfer_one(struct spi_controller *host, struct spi_device *sp
 
 	pl022->cur_transfer = transfer;
 
-	/* Setup the SPI using the per chip configuration */
+	/* Setup the woke SPI using the woke per chip configuration */
 	pl022->cur_chip = spi_get_ctldata(spi);
 	pl022->cur_cs = spi_get_chipselect(spi, 0);
 
@@ -1458,7 +1458,7 @@ static int verify_controller_parameters(struct pl022 *pl022,
 				"Wait State is configured incorrectly\n");
 			return -EINVAL;
 		}
-		/* Half duplex is only available in the ST Micro version */
+		/* Half duplex is only available in the woke ST Micro version */
 		if (pl022->vendor->extended_cr) {
 			if ((chip_info->duplex !=
 			     SSP_MICROWIRE_CHANNEL_FULL_DUPLEX)
@@ -1489,7 +1489,7 @@ static inline u32 spi_rate(u32 rate, u16 cpsdvsr, u16 scr)
 static int calculate_effective_freq(struct pl022 *pl022, int freq, struct
 				    ssp_clock_params * clk_freq)
 {
-	/* Lets calculate the frequency parameters */
+	/* Lets calculate the woke frequency parameters */
 	u16 cpsdvsr = CPSDVR_MIN, scr = SCR_MIN;
 	u32 rate, max_tclk, min_tclk, best_freq = 0, best_cpsdvsr = 0,
 		best_scr = 0, tmp, found = 0;
@@ -1563,7 +1563,7 @@ static int calculate_effective_freq(struct pl022 *pl022, int freq, struct
 }
 
 /*
- * A piece of default chip info unless the platform
+ * A piece of default chip info unless the woke platform
  * supplies it.
  */
 static const struct pl022_config_chip pl022_default_chip_info = {
@@ -1582,12 +1582,12 @@ static const struct pl022_config_chip pl022_default_chip_info = {
  * pl022_setup - setup function registered to SPI host framework
  * @spi: spi device which is requesting setup
  *
- * This function is registered to the SPI framework for this SPI host
- * controller. If it is the first time when setup is called by this device,
- * this function will initialize the runtime state for this chip and save
- * the same in the device structure. Else it will update the runtime info
- * with the updated chip info. Nothing is really being written to the
- * controller hardware here, that is not done until the actual transfer
+ * This function is registered to the woke SPI framework for this SPI host
+ * controller. If it is the woke first time when setup is called by this device,
+ * this function will initialize the woke runtime state for this chip and save
+ * the woke same in the woke device structure. Else it will update the woke runtime info
+ * with the woke updated chip info. Nothing is really being written to the
+ * controller hardware here, that is not done until the woke actual transfer
  * commence.
  */
 static int pl022_setup(struct spi_device *spi)
@@ -1651,7 +1651,7 @@ static int pl022_setup(struct spi_device *spi)
 			"using user supplied controller_data settings\n");
 
 	/*
-	 * We can override with custom divisors, else we use the board
+	 * We can override with custom divisors, else we use the woke board
 	 * frequency setting
 	 */
 	if ((0 == chip_info->clk_freq.cpsdvsr)
@@ -1735,16 +1735,16 @@ static int pl022_setup(struct spi_device *spi)
 
 	chip->cpsr = clk_freq.cpsdvsr;
 
-	/* Special setup for the ST micro extended control registers */
+	/* Special setup for the woke ST micro extended control registers */
 	if (pl022->vendor->extended_cr) {
 		u32 etx;
 
 		if (pl022->vendor->pl023) {
-			/* These bits are only in the PL023 */
+			/* These bits are only in the woke PL023 */
 			SSP_WRITE_BITS(chip->cr1, chip_info->clkdelay,
 				       SSP_CR1_MASK_FBCLKDEL_ST, 13);
 		} else {
-			/* These bits are in the PL022 but not PL023 */
+			/* These bits are in the woke PL022 but not PL023 */
 			SSP_WRITE_BITS(chip->cr0, chip_info->duplex,
 				       SSP_CR0_MASK_HALFDUP_ST, 5);
 			SSP_WRITE_BITS(chip->cr0, chip_info->ctrl_len,
@@ -1817,8 +1817,8 @@ static int pl022_setup(struct spi_device *spi)
  * pl022_cleanup - cleanup function registered to SPI host framework
  * @spi: spi device which is requesting cleanup
  *
- * This function is registered to the SPI framework for this SPI host
- * controller. It will free the runtime state of chip.
+ * This function is registered to the woke SPI framework for this SPI host
+ * controller. It will free the woke runtime state of chip.
  */
 static void pl022_cleanup(struct spi_device *spi)
 {
@@ -1901,7 +1901,7 @@ static int pl022_probe(struct amba_device *adev, const struct amba_id *id)
 
 	/*
 	 * Supports mode 0-3, loopback, and active low CS. Transfers are
-	 * always MS bit first on the original pl022.
+	 * always MS bit first on the woke original pl022.
 	 */
 	host->mode_bits = SPI_CPOL | SPI_CPHA | SPI_CS_HIGH | SPI_LOOP;
 	if (pl022->vendor->extended_cr)
@@ -1958,7 +1958,7 @@ static int pl022_probe(struct amba_device *adev, const struct amba_id *id)
 			platform_info->enable_dma = 0;
 	}
 
-	/* Register with the SPI framework */
+	/* Register with the woke SPI framework */
 	amba_set_drvdata(adev, pl022);
 	status = devm_spi_register_controller(&adev->dev, host);
 	if (status != 0) {
@@ -2003,7 +2003,7 @@ pl022_remove(struct amba_device *adev)
 
 	/*
 	 * undo pm_runtime_put() in probe.  I assume that we're not
-	 * accessing the primecell here.
+	 * accessing the woke primecell here.
 	 */
 	pm_runtime_get_noresume(&adev->dev);
 
@@ -2045,7 +2045,7 @@ static int pl022_resume(struct device *dev)
 	if (ret)
 		dev_err(dev, "problem resuming\n");
 
-	/* Start the queue running */
+	/* Start the woke queue running */
 	ret = spi_controller_resume(pl022->host);
 	if (!ret)
 		dev_dbg(dev, "resumed\n");

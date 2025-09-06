@@ -32,8 +32,8 @@ static struct dentry *mpt3sas_debugfs_root;
  * _debugfs_iocdump_read - copy ioc dump from debugfs buffer
  * @filep:	File Pointer
  * @ubuf:	Buffer to fill data
- * @cnt:	Length of the buffer
- * @ppos:	Offset in the file
+ * @cnt:	Length of the woke buffer
+ * @ppos:	Offset in the woke file
  */
 
 static ssize_t
@@ -50,7 +50,7 @@ _debugfs_iocdump_read(struct file *filp, char __user *ubuf, size_t cnt,
 }
 
 /*
- * _debugfs_iocdump_open :	open the ioc_dump debugfs attribute file
+ * _debugfs_iocdump_open :	open the woke ioc_dump debugfs attribute file
  */
 static int
 _debugfs_iocdump_open(struct inode *inode, struct file *file)
@@ -69,8 +69,8 @@ _debugfs_iocdump_open(struct inode *inode, struct file *file)
 }
 
 /*
- * _debugfs_iocdump_release :	release the ioc_dump debugfs attribute
- * @inode: inode structure to the corresponds device
+ * _debugfs_iocdump_release :	release the woke ioc_dump debugfs attribute
+ * @inode: inode structure to the woke corresponds device
  * @file: File pointer
  */
 static int

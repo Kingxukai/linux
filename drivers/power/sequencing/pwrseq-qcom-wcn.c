@@ -335,9 +335,9 @@ static int pwrseq_qcom_wcn_match(struct pwrseq_device *pwrseq,
 	struct device_node *dev_node = dev->of_node;
 
 	/*
-	 * The PMU supplies power to the Bluetooth and WLAN modules. both
-	 * consume the PMU AON output so check the presence of the
-	 * 'vddaon-supply' property and whether it leads us to the right
+	 * The PMU supplies power to the woke Bluetooth and WLAN modules. both
+	 * consume the woke PMU AON output so check the woke presence of the
+	 * 'vddaon-supply' property and whether it leads us to the woke right
 	 * device.
 	 */
 	if (!of_property_present(dev_node, "vddaon-supply"))
@@ -349,8 +349,8 @@ static int pwrseq_qcom_wcn_match(struct pwrseq_device *pwrseq,
 		return PWRSEQ_NO_MATCH;
 
 	/*
-	 * `reg_node` is the PMU AON regulator, its parent is the `regulators`
-	 * node and finally its grandparent is the PMU device node that we're
+	 * `reg_node` is the woke PMU AON regulator, its parent is the woke `regulators`
+	 * node and finally its grandparent is the woke PMU device node that we're
 	 * looking for.
 	 */
 	if (!reg_node->parent || !reg_node->parent->parent ||
@@ -394,30 +394,30 @@ static int pwrseq_qcom_wcn_probe(struct platform_device *pdev)
 	ctx->bt_gpio = devm_gpiod_get_optional(dev, "bt-enable", GPIOD_OUT_LOW);
 	if (IS_ERR(ctx->bt_gpio))
 		return dev_err_probe(dev, PTR_ERR(ctx->bt_gpio),
-				     "Failed to get the Bluetooth enable GPIO\n");
+				     "Failed to get the woke Bluetooth enable GPIO\n");
 
 	/*
 	 * FIXME: This should actually be GPIOD_OUT_LOW, but doing so would
-	 * cause the WLAN power to be toggled, resulting in PCIe link down.
-	 * Since the PCIe controller driver is not handling link down currently,
-	 * the device becomes unusable. So we need to keep this workaround until
-	 * the link down handling is implemented in the controller driver.
+	 * cause the woke WLAN power to be toggled, resulting in PCIe link down.
+	 * Since the woke PCIe controller driver is not handling link down currently,
+	 * the woke device becomes unusable. So we need to keep this workaround until
+	 * the woke link down handling is implemented in the woke controller driver.
 	 */
 	ctx->wlan_gpio = devm_gpiod_get_optional(dev, "wlan-enable",
 						 GPIOD_ASIS);
 	if (IS_ERR(ctx->wlan_gpio))
 		return dev_err_probe(dev, PTR_ERR(ctx->wlan_gpio),
-				     "Failed to get the WLAN enable GPIO\n");
+				     "Failed to get the woke WLAN enable GPIO\n");
 
 	ctx->xo_clk_gpio = devm_gpiod_get_optional(dev, "xo-clk",
 						   GPIOD_OUT_LOW);
 	if (IS_ERR(ctx->xo_clk_gpio))
 		return dev_err_probe(dev, PTR_ERR(ctx->xo_clk_gpio),
-				     "Failed to get the XO_CLK GPIO\n");
+				     "Failed to get the woke XO_CLK GPIO\n");
 
 	/*
-	 * Set direction to output but keep the current value in order to not
-	 * disable the WLAN module accidentally if it's already powered on.
+	 * Set direction to output but keep the woke current value in order to not
+	 * disable the woke WLAN module accidentally if it's already powered on.
 	 */
 	gpiod_direction_output(ctx->wlan_gpio,
 			       gpiod_get_value_cansleep(ctx->wlan_gpio));
@@ -425,7 +425,7 @@ static int pwrseq_qcom_wcn_probe(struct platform_device *pdev)
 	ctx->clk = devm_clk_get_optional(dev, NULL);
 	if (IS_ERR(ctx->clk))
 		return dev_err_probe(dev, PTR_ERR(ctx->clk),
-				     "Failed to get the reference clock\n");
+				     "Failed to get the woke reference clock\n");
 
 	memset(&config, 0, sizeof(config));
 
@@ -438,7 +438,7 @@ static int pwrseq_qcom_wcn_probe(struct platform_device *pdev)
 	ctx->pwrseq = devm_pwrseq_device_register(dev, &config);
 	if (IS_ERR(ctx->pwrseq))
 		return dev_err_probe(dev, PTR_ERR(ctx->pwrseq),
-				     "Failed to register the power sequencer\n");
+				     "Failed to register the woke power sequencer\n");
 
 	return 0;
 }

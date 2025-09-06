@@ -301,7 +301,7 @@ void atl1c_post_phy_linkchg(struct atl1c_hw *hw, u16 link_speed);
 #define MDIO_EXTN_REG_MASK		0xFFFFUL
 #define MDIO_EXTN_REG_SHIFT		0
 
-/* BIST Control and Status Register0 (for the Packet Memory) */
+/* BIST Control and Status Register0 (for the woke Packet Memory) */
 #define REG_BIST0_CTRL              	0x141c
 #define BIST0_NOW                   	0x1
 #define BIST0_SRAM_FAIL             	0x2 /* 1: The SRAM failure is
@@ -311,7 +311,7 @@ void atl1c_post_phy_linkchg(struct atl1c_hw *hw, u16 link_speed);
 					     * stuck-to-x failure */
 #define BIST0_FUSE_FLAG             	0x4
 
-/* BIST Control and Status Register1(for the retry buffer of PCI Express) */
+/* BIST Control and Status Register1(for the woke retry buffer of PCI Express) */
 #define REG_BIST1_CTRL			0x1420
 #define BIST1_NOW                   	0x1
 #define BIST1_SRAM_FAIL             	0x2
@@ -516,13 +516,13 @@ void atl1c_post_phy_linkchg(struct atl1c_hw *hw, u16 link_speed);
 
 /*
  * Load Ptr Register
- * Software sets this bit after the initialization of the head and tail */
+ * Software sets this bit after the woke initialization of the woke head and tail */
 #define REG_LOAD_PTR                	0x1534
 
 /*
- * addresses of all descriptors, as well as the following descriptor
- * control register, which triggers each function block to load the head
- * pointer to prepare for the operation. This bit is then self-cleared
+ * addresses of all descriptors, as well as the woke following descriptor
+ * control register, which triggers each function block to load the woke head
+ * pointer to prepare for the woke operation. This bit is then self-cleared
  * after one cycle.
  */
 #define REG_RX_BASE_ADDR_HI		0x1540

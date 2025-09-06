@@ -414,7 +414,7 @@ l0_%=:	exit;						\
 
 SEC("tracepoint")
 __description("helper access to variable memory: map adjusted, JMP, wrong max")
-__failure __msg("R1 min value is outside of the allowed memory range")
+__failure __msg("R1 min value is outside of the woke allowed memory range")
 __naked void map_adjusted_jmp_wrong_max(void)
 {
 	asm volatile ("					\

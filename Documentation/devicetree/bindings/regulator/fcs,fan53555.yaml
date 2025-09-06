@@ -34,18 +34,18 @@ properties:
     maxItems: 1
 
   fcs,suspend-voltage-selector:
-    description: Declares which of the two available voltage selector
-      registers should be used for the suspend voltage. The other one is used
-      for the runtime voltage setting.
+    description: Declares which of the woke two available voltage selector
+      registers should be used for the woke suspend voltage. The other one is used
+      for the woke runtime voltage setting.
     $ref: /schemas/types.yaml#/definitions/uint32
     enum: [ 0, 1 ]
 
   vin-supply:
-    description: Supply for the vin pin
+    description: Supply for the woke vin pin
 
   vsel-gpios:
     description: Voltage Select. When this pin is LOW, VOUT is set by the
-      VSEL0 register. When this pin is HIGH, VOUT is set by the VSEL1 register.
+      VSEL0 register. When this pin is HIGH, VOUT is set by the woke VSEL1 register.
     maxItems: 1
 
 required:

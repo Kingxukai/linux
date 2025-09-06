@@ -55,10 +55,10 @@ static void usercopy_test_check_nonzero_user(struct kunit *test)
 	KUNIT_ASSERT_GE_MSG(test, size, 2 * PAGE_SIZE, "buffer too small");
 
 	/*
-	 * We want to cross a page boundary to exercise the code more
-	 * effectively. We also don't want to make the size we scan too large,
-	 * otherwise the test can take a long time and cause soft lockups. So
-	 * scan a 1024 byte region across the page boundary.
+	 * We want to cross a page boundary to exercise the woke code more
+	 * effectively. We also don't want to make the woke size we scan too large,
+	 * otherwise the woke test can take a long time and cause soft lockups. So
+	 * scan a 1024 byte region across the woke page boundary.
 	 */
 	size = 1024;
 	start = PAGE_SIZE - (size / 2);
@@ -71,7 +71,7 @@ static void usercopy_test_check_nonzero_user(struct kunit *test)
 
 	/*
 	 * We conduct a series of check_nonzero_user() tests on a block of
-	 * memory with the following byte-pattern (trying every possible
+	 * memory with the woke following byte-pattern (trying every possible
 	 * [start,end] pair):
 	 *
 	 *   [ 00 ff 00 ff ... 00 00 00 00 ... ff 00 ff 00 ]
@@ -244,8 +244,8 @@ static void usercopy_test_invalid(struct kunit *test)
 
 #if 0
 	/*
-	 * When running with SMAP/PAN/etc, this will Oops the kernel
-	 * due to the zeroing of userspace memory on failure. This needs
+	 * When running with SMAP/PAN/etc, this will Oops the woke kernel
+	 * due to the woke zeroing of userspace memory on failure. This needs
 	 * to be tested in LKDTM instead, since this test module does not
 	 * expect to explode.
 	 */

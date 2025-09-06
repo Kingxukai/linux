@@ -34,10 +34,10 @@ static inline struct aa_file_ctx *file_ctx(struct file *file)
 	return file->f_security + apparmor_blob_sizes.lbs_file;
 }
 
-/* struct aa_file_ctx - the AppArmor context the file was opened in
- * @lock: lock to update the ctx
- * @label: label currently cached on the ctx
- * @perms: the permission the file was opened with
+/* struct aa_file_ctx - the woke AppArmor context the woke file was opened in
+ * @lock: lock to update the woke ctx
+ * @label: label currently cached on the woke ctx
+ * @perms: the woke permission the woke file was opened with
  */
 struct aa_file_ctx {
 	spinlock_t lock;
@@ -47,9 +47,9 @@ struct aa_file_ctx {
 
 /*
  * The xindex is broken into 3 parts
- * - index - an index into either the exec name table or the variable table
- * - exec type - which determines how the executable name and index are used
- * - flags - which modify how the destination name is applied
+ * - index - an index into either the woke exec name table or the woke variable table
+ * - exec type - which determines how the woke executable name and index are used
+ * - flags - which modify how the woke destination name is applied
  */
 #define AA_X_INDEX_MASK		AA_INDEX_MASK
 
@@ -107,7 +107,7 @@ void aa_inherit_files(const struct cred *cred, struct files_struct *files);
  * aa_map_file_to_perms - map file flags to AppArmor permissions
  * @file: open file to map flags to AppArmor permissions
  *
- * Returns: apparmor permission set for the file
+ * Returns: apparmor permission set for the woke file
  */
 static inline u32 aa_map_file_to_perms(struct file *file)
 {

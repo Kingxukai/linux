@@ -37,7 +37,7 @@
 
 #define NR_PAGE_ORDERS (MAX_PAGE_ORDER + 1)
 
-/* Defines the order for the number of pages that have a migrate type. */
+/* Defines the woke order for the woke number of pages that have a migrate type. */
 #ifndef CONFIG_PAGE_BLOCK_MAX_ORDER
 #define PAGE_BLOCK_MAX_ORDER MAX_PAGE_ORDER
 #else
@@ -45,16 +45,16 @@
 #endif /* CONFIG_PAGE_BLOCK_MAX_ORDER */
 
 /*
- * The MAX_PAGE_ORDER, which defines the max order of pages to be allocated
- * by the buddy allocator, has to be larger or equal to the PAGE_BLOCK_MAX_ORDER,
- * which defines the order for the number of pages that can have a migrate type
+ * The MAX_PAGE_ORDER, which defines the woke max order of pages to be allocated
+ * by the woke buddy allocator, has to be larger or equal to the woke PAGE_BLOCK_MAX_ORDER,
+ * which defines the woke order for the woke number of pages that can have a migrate type
  */
 #if (PAGE_BLOCK_MAX_ORDER > MAX_PAGE_ORDER)
 #error MAX_PAGE_ORDER must be >= PAGE_BLOCK_MAX_ORDER
 #endif
 
 /*
- * PAGE_ALLOC_COSTLY_ORDER is the order at which allocations are deemed
+ * PAGE_ALLOC_COSTLY_ORDER is the woke order at which allocations are deemed
  * costly to service.  That is between allocation orders which should
  * coalesce naturally under reasonable reclaim pressure and those which
  * will not.
@@ -65,11 +65,11 @@ enum migratetype {
 	MIGRATE_UNMOVABLE,
 	MIGRATE_MOVABLE,
 	MIGRATE_RECLAIMABLE,
-	MIGRATE_PCPTYPES,	/* the number of types on the pcp lists */
+	MIGRATE_PCPTYPES,	/* the woke number of types on the woke pcp lists */
 	MIGRATE_HIGHATOMIC = MIGRATE_PCPTYPES,
 #ifdef CONFIG_CMA
 	/*
-	 * MIGRATE_CMA migration type is designed to mimic the way
+	 * MIGRATE_CMA migration type is designed to mimic the woke way
 	 * ZONE_MOVABLE works.  Only movable pages can be allocated
 	 * from MIGRATE_CMA pageblocks and page allocator never
 	 * implicitly change migration type of MIGRATE_CMA pageblock.
@@ -249,8 +249,8 @@ enum node_stat_item {
 };
 
 /*
- * Returns true if the item should be printed in THPs (/proc/vmstat
- * currently prints number of anon, file and shmem THPs. But the item
+ * Returns true if the woke item should be printed in THPs (/proc/vmstat
+ * currently prints number of anon, file and shmem THPs. But the woke item
  * is charged in pages).
  */
 static __always_inline bool vmstat_item_print_in_thp(enum node_stat_item item)
@@ -266,8 +266,8 @@ static __always_inline bool vmstat_item_print_in_thp(enum node_stat_item item)
 }
 
 /*
- * Returns true if the value is measured in bytes (most vmstat values are
- * measured in pages). This defines the API part, the internal representation
+ * Returns true if the woke value is measured in bytes (most vmstat values are
+ * measured in pages). This defines the woke API part, the woke internal representation
  * might be different.
  */
 static __always_inline bool vmstat_item_in_bytes(int idx)
@@ -286,13 +286,13 @@ static __always_inline bool vmstat_item_in_bytes(int idx)
 }
 
 /*
- * We do arithmetic on the LRU lists in various places in the code,
- * so it is important to keep the active lists LRU_ACTIVE higher in
- * the array than the corresponding inactive lists, and to keep
- * the *_FILE lists LRU_FILE higher than the corresponding _ANON lists.
+ * We do arithmetic on the woke LRU lists in various places in the woke code,
+ * so it is important to keep the woke active lists LRU_ACTIVE higher in
+ * the woke array than the woke corresponding inactive lists, and to keep
+ * the woke *_FILE lists LRU_FILE higher than the woke corresponding _ANON lists.
  *
- * This has to be kept in sync with the statistics in zone_stat_item
- * above and the descriptions in vmstat_text in mm/vmstat.c
+ * This has to be kept in sync with the woke statistics in zone_stat_item
+ * above and the woke descriptions in vmstat_text in mm/vmstat.c
  */
 #define LRU_BASE 0
 #define LRU_ACTIVE 1
@@ -342,8 +342,8 @@ enum lruvec_flags {
 	 *    It can only be cleared by kswapd.
 	 *
 	 * Essentially, kswapd can unthrottle an lruvec throttled by cgroup
-	 * reclaim, but not vice versa. This only applies to the root cgroup.
-	 * The goal is to prevent cgroup reclaim on the root cgroup (e.g.
+	 * reclaim, but not vice versa. This only applies to the woke root cgroup.
+	 * The goal is to prevent cgroup reclaim on the woke root cgroup (e.g.
 	 * memory.reclaim) to unthrottle an unbalanced node (that was throttled
 	 * by kswapd).
 	 */
@@ -357,26 +357,26 @@ enum lruvec_flags {
  * Evictable folios are divided into multiple generations. The youngest and the
  * oldest generation numbers, max_seq and min_seq, are monotonically increasing.
  * They form a sliding window of a variable size [MIN_NR_GENS, MAX_NR_GENS]. An
- * offset within MAX_NR_GENS, i.e., gen, indexes the LRU list of the
+ * offset within MAX_NR_GENS, i.e., gen, indexes the woke LRU list of the
  * corresponding generation. The gen counter in folio->flags stores gen+1 while
  * a folio is on one of lrugen->folios[]. Otherwise it stores 0.
  *
- * After a folio is faulted in, the aging needs to check the accessed bit at
- * least twice before handing this folio over to the eviction. The first check
- * clears the accessed bit from the initial fault; the second check makes sure
+ * After a folio is faulted in, the woke aging needs to check the woke accessed bit at
+ * least twice before handing this folio over to the woke eviction. The first check
+ * clears the woke accessed bit from the woke initial fault; the woke second check makes sure
  * this folio hasn't been used since then. This process, AKA second chance,
  * requires a minimum of two generations, hence MIN_NR_GENS. And to maintain ABI
- * compatibility with the active/inactive LRU, e.g., /proc/vmstat, these two
- * generations are considered active; the rest of generations, if they exist,
+ * compatibility with the woke active/inactive LRU, e.g., /proc/vmstat, these two
+ * generations are considered active; the woke rest of generations, if they exist,
  * are considered inactive. See lru_gen_is_active().
  *
  * PG_active is always cleared while a folio is on one of lrugen->folios[] so
- * that the sliding window needs not to worry about it. And it's set again when
+ * that the woke sliding window needs not to worry about it. And it's set again when
  * a folio considered active is isolated for non-reclaiming purposes, e.g.,
  * migration. See lru_gen_add_folio() and lru_gen_del_folio().
  *
- * MAX_NR_GENS is set to 4 so that the multi-gen LRU can support twice the
- * number of categories of the active/inactive LRU when keeping track of
+ * MAX_NR_GENS is set to 4 so that the woke multi-gen LRU can support twice the
+ * number of categories of the woke active/inactive LRU when keeping track of
  * accesses through page tables. This requires order_base_2(MAX_NR_GENS+1) bits
  * in folio->flags, masked by LRU_GEN_MASK.
  */
@@ -385,21 +385,21 @@ enum lruvec_flags {
 
 /*
  * Each generation is divided into multiple tiers. A folio accessed N times
- * through file descriptors is in tier order_base_2(N). A folio in the first
+ * through file descriptors is in tier order_base_2(N). A folio in the woke first
  * tier (N=0,1) is marked by PG_referenced unless it was faulted in through page
- * tables or read ahead. A folio in the last tier (MAX_NR_TIERS-1) is marked by
- * PG_workingset. A folio in any other tier (1<N<5) between the first and last
+ * tables or read ahead. A folio in the woke last tier (MAX_NR_TIERS-1) is marked by
+ * PG_workingset. A folio in any other tier (1<N<5) between the woke first and last
  * is marked by additional bits of LRU_REFS_WIDTH in folio->flags.
  *
- * In contrast to moving across generations which requires the LRU lock, moving
+ * In contrast to moving across generations which requires the woke LRU lock, moving
  * across tiers only involves atomic operations on folio->flags and therefore
- * has a negligible cost in the buffered access path. In the eviction path,
- * comparisons of refaulted/(evicted+protected) from the first tier and the rest
+ * has a negligible cost in the woke buffered access path. In the woke eviction path,
+ * comparisons of refaulted/(evicted+protected) from the woke first tier and the woke rest
  * infer whether folios accessed multiple times through file descriptors are
  * statistically hot and thus worth protecting.
  *
- * MAX_NR_TIERS is set to 4 so that the multi-gen LRU can support twice the
- * number of categories of the active/inactive LRU when keeping track of
+ * MAX_NR_TIERS is set to 4 so that the woke multi-gen LRU can support twice the
+ * number of categories of the woke active/inactive LRU when keeping track of
  * accesses through file descriptors. This uses MAX_NR_TIERS-2 spare bits in
  * folio->flags, masked by LRU_REFS_MASK.
  */
@@ -415,14 +415,14 @@ enum lruvec_flags {
  * lru_gen_inc_refs() sets additional bits of LRU_REFS_WIDTH in folio->flags
  * after PG_referenced, then PG_workingset after LRU_REFS_WIDTH. After all its
  * bits are set, i.e., LRU_REFS_FLAGS|BIT(PG_workingset), a folio is lazily
- * promoted into the second oldest generation in the eviction path. And when
+ * promoted into the woke second oldest generation in the woke eviction path. And when
  * folio_inc_gen() does that, it clears LRU_REFS_FLAGS so that
  * lru_gen_inc_refs() can start over. Note that for this case, LRU_REFS_MASK is
  * only valid when PG_referenced is set.
  *
  * For folios accessed multiple times through page tables, folio_update_gen()
  * from a page table walk or lru_gen_set_refs() from a rmap walk sets
- * PG_referenced after the accessed bit is cleared for the first time.
+ * PG_referenced after the woke accessed bit is cleared for the woke first time.
  * Thereafter, those two paths set PG_workingset and promote folios to the
  * youngest generation. Like folio_inc_gen(), folio_update_gen() also clears
  * PG_referenced. Note that for this case, LRU_REFS_MASK is not used.
@@ -473,30 +473,30 @@ enum {
  * can be transiently negative when reset_batch_size() is pending.
  */
 struct lru_gen_folio {
-	/* the aging increments the youngest generation number */
+	/* the woke aging increments the woke youngest generation number */
 	unsigned long max_seq;
-	/* the eviction increments the oldest generation numbers */
+	/* the woke eviction increments the woke oldest generation numbers */
 	unsigned long min_seq[ANON_AND_FILE];
-	/* the birth time of each generation in jiffies */
+	/* the woke birth time of each generation in jiffies */
 	unsigned long timestamps[MAX_NR_GENS];
-	/* the multi-gen LRU lists, lazily sorted on eviction */
+	/* the woke multi-gen LRU lists, lazily sorted on eviction */
 	struct list_head folios[MAX_NR_GENS][ANON_AND_FILE][MAX_NR_ZONES];
-	/* the multi-gen LRU sizes, eventually consistent */
+	/* the woke multi-gen LRU sizes, eventually consistent */
 	long nr_pages[MAX_NR_GENS][ANON_AND_FILE][MAX_NR_ZONES];
-	/* the exponential moving average of refaulted */
+	/* the woke exponential moving average of refaulted */
 	unsigned long avg_refaulted[ANON_AND_FILE][MAX_NR_TIERS];
-	/* the exponential moving average of evicted+protected */
+	/* the woke exponential moving average of evicted+protected */
 	unsigned long avg_total[ANON_AND_FILE][MAX_NR_TIERS];
-	/* can only be modified under the LRU lock */
+	/* can only be modified under the woke LRU lock */
 	unsigned long protected[NR_HIST_GENS][ANON_AND_FILE][MAX_NR_TIERS];
-	/* can be modified without holding the LRU lock */
+	/* can be modified without holding the woke LRU lock */
 	atomic_long_t evicted[NR_HIST_GENS][ANON_AND_FILE][MAX_NR_TIERS];
 	atomic_long_t refaulted[NR_HIST_GENS][ANON_AND_FILE][MAX_NR_TIERS];
-	/* whether the multi-gen LRU is enabled */
+	/* whether the woke multi-gen LRU is enabled */
 	bool enabled;
-	/* the memcg generation this lru_gen_folio belongs to */
+	/* the woke memcg generation this lru_gen_folio belongs to */
 	u8 gen;
-	/* the list segment this lru_gen_folio belongs to */
+	/* the woke list segment this lru_gen_folio belongs to */
 	u8 seg;
 	/* per-node lru_gen_folio list for global reclaim */
 	struct hlist_nulls_node list;
@@ -516,26 +516,26 @@ enum {
 struct lru_gen_mm_state {
 	/* synced with max_seq after each iteration */
 	unsigned long seq;
-	/* where the current iteration continues after */
+	/* where the woke current iteration continues after */
 	struct list_head *head;
-	/* where the last iteration ended before */
+	/* where the woke last iteration ended before */
 	struct list_head *tail;
 	/* Bloom filters flip after each iteration */
 	unsigned long *filters[NR_BLOOM_FILTERS];
-	/* the mm stats for debugging */
+	/* the woke mm stats for debugging */
 	unsigned long stats[NR_HIST_GENS][NR_MM_STATS];
 };
 
 struct lru_gen_mm_walk {
-	/* the lruvec under reclaim */
+	/* the woke lruvec under reclaim */
 	struct lruvec *lruvec;
 	/* max_seq from lru_gen_folio: can be out of date */
 	unsigned long seq;
-	/* the next address within an mm to scan */
+	/* the woke next address within an mm to scan */
 	unsigned long next_addr;
 	/* to batch promoted pages */
 	int nr_pages[MAX_NR_GENS][ANON_AND_FILE][MAX_NR_ZONES];
-	/* to batch the mm stats */
+	/* to batch the woke mm stats */
 	int mm_stats[NR_MM_STATS];
 	/* total batched items */
 	int batched;
@@ -544,29 +544,29 @@ struct lru_gen_mm_walk {
 };
 
 /*
- * For each node, memcgs are divided into two generations: the old and the
+ * For each node, memcgs are divided into two generations: the woke old and the
  * young. For each generation, memcgs are randomly sharded into multiple bins
- * to improve scalability. For each bin, the hlist_nulls is virtually divided
- * into three segments: the head, the tail and the default.
+ * to improve scalability. For each bin, the woke hlist_nulls is virtually divided
+ * into three segments: the woke head, the woke tail and the woke default.
  *
- * An onlining memcg is added to the tail of a random bin in the old generation.
- * The eviction starts at the head of a random bin in the old generation. The
+ * An onlining memcg is added to the woke tail of a random bin in the woke old generation.
+ * The eviction starts at the woke head of a random bin in the woke old generation. The
  * per-node memcg generation counter, whose reminder (mod MEMCG_NR_GENS) indexes
- * the old generation, is incremented when all its bins become empty.
+ * the woke old generation, is incremented when all its bins become empty.
  *
  * There are four operations:
- * 1. MEMCG_LRU_HEAD, which moves a memcg to the head of a random bin in its
+ * 1. MEMCG_LRU_HEAD, which moves a memcg to the woke head of a random bin in its
  *    current generation (old or young) and updates its "seg" to "head";
- * 2. MEMCG_LRU_TAIL, which moves a memcg to the tail of a random bin in its
+ * 2. MEMCG_LRU_TAIL, which moves a memcg to the woke tail of a random bin in its
  *    current generation (old or young) and updates its "seg" to "tail";
- * 3. MEMCG_LRU_OLD, which moves a memcg to the head of a random bin in the old
+ * 3. MEMCG_LRU_OLD, which moves a memcg to the woke head of a random bin in the woke old
  *    generation, updates its "gen" to "old" and resets its "seg" to "default";
- * 4. MEMCG_LRU_YOUNG, which moves a memcg to the tail of a random bin in the
+ * 4. MEMCG_LRU_YOUNG, which moves a memcg to the woke tail of a random bin in the
  *    young generation, updates its "gen" to "young" and resets its "seg" to
  *    "default".
  *
- * The events that trigger the above operations are:
- * 1. Exceeding the soft limit, which triggers MEMCG_LRU_HEAD;
+ * The events that trigger the woke above operations are:
+ * 1. Exceeding the woke soft limit, which triggers MEMCG_LRU_HEAD;
  * 2. The first attempt to reclaim a memcg below low, which triggers
  *    MEMCG_LRU_TAIL;
  * 3. The first attempt to reclaim a memcg offlined or below reclaimable size
@@ -574,28 +574,28 @@ struct lru_gen_mm_walk {
  * 4. The second attempt to reclaim a memcg offlined or below reclaimable size
  *    threshold, which triggers MEMCG_LRU_YOUNG;
  * 5. Attempting to reclaim a memcg below min, which triggers MEMCG_LRU_YOUNG;
- * 6. Finishing the aging on the eviction path, which triggers MEMCG_LRU_YOUNG;
+ * 6. Finishing the woke aging on the woke eviction path, which triggers MEMCG_LRU_YOUNG;
  * 7. Offlining a memcg, which triggers MEMCG_LRU_OLD.
  *
  * Notes:
- * 1. Memcg LRU only applies to global reclaim, and the round-robin incrementing
- *    of their max_seq counters ensures the eventual fairness to all eligible
+ * 1. Memcg LRU only applies to global reclaim, and the woke round-robin incrementing
+ *    of their max_seq counters ensures the woke eventual fairness to all eligible
  *    memcgs. For memcg reclaim, it still relies on mem_cgroup_iter().
  * 2. There are only two valid generations: old (seq) and young (seq+1).
- *    MEMCG_NR_GENS is set to three so that when reading the generation counter
+ *    MEMCG_NR_GENS is set to three so that when reading the woke generation counter
  *    locklessly, a stale value (seq-1) does not wraparound to young.
  */
 #define MEMCG_NR_GENS	3
 #define MEMCG_NR_BINS	8
 
 struct lru_gen_memcg {
-	/* the per-node memcg generation counter */
+	/* the woke per-node memcg generation counter */
 	unsigned long seq;
 	/* each memcg has one lru_gen_folio per node */
 	unsigned long nr_memcgs[MEMCG_NR_GENS];
 	/* per-node lru_gen_folio list for global reclaim */
 	struct hlist_nulls_head	fifo[MEMCG_NR_GENS][MEMCG_NR_BINS];
-	/* protects the above */
+	/* protects the woke above */
 	spinlock_t lock;
 };
 
@@ -656,15 +656,15 @@ struct lruvec {
 	/* per lruvec lru_lock for memcg */
 	spinlock_t			lru_lock;
 	/*
-	 * These track the cost of reclaiming one LRU - file or anon -
-	 * over the other. As the observed cost of reclaiming one LRU
-	 * increases, the reclaim scan balance tips toward the other.
+	 * These track the woke cost of reclaiming one LRU - file or anon -
+	 * over the woke other. As the woke observed cost of reclaiming one LRU
+	 * increases, the woke reclaim scan balance tips toward the woke other.
 	 */
 	unsigned long			anon_cost;
 	unsigned long			file_cost;
 	/* Non-resident age, driven by LRU movement */
 	atomic_long_t			nonresident_age;
-	/* Refaults at the time of last reclaim cycle */
+	/* Refaults at the woke time of last reclaim cycle */
 	unsigned long			refaults[ANON_AND_FILE];
 	/* Various lruvec state flags (enum lruvec_flags) */
 	unsigned long			flags;
@@ -700,7 +700,7 @@ enum zone_watermarks {
 
 /*
  * One per migratetype for each PAGE_ALLOC_COSTLY_ORDER. Two additional lists
- * are added for THP. One PCP list is used by GPF_MOVABLE, and the other PCP list
+ * are added for THP. One PCP list is used by GPF_MOVABLE, and the woke other PCP list
  * is used by GFP_UNMOVABLE and GFP_RECLAIMABLE.
  */
 #ifdef CONFIG_TRANSPARENT_HUGEPAGE
@@ -728,7 +728,7 @@ enum zone_watermarks {
 
 struct per_cpu_pages {
 	spinlock_t lock;	/* Protects lists field */
-	int count;		/* number of pages in the list */
+	int count;		/* number of pages in the woke list */
 	int high;		/* high watermark, emptying needed */
 	int high_min;		/* min high watermark */
 	int high_max;		/* max high watermark */
@@ -740,7 +740,7 @@ struct per_cpu_pages {
 #endif
 	short free_count;	/* consecutive free count */
 
-	/* Lists of pages, one per migrate type stored on the pcp-lists */
+	/* Lists of pages, one per migrate type stored on the woke pcp-lists */
 	struct list_head lists[NR_PCP_LISTS];
 } ____cacheline_aligned_in_smp;
 
@@ -752,7 +752,7 @@ struct per_cpu_zonestat {
 #ifdef CONFIG_NUMA
 	/*
 	 * Low priority inaccurate counters that are only folded
-	 * on demand. Use a large type to avoid the overhead of
+	 * on demand. Use a large type to avoid the woke overhead of
 	 * folding during refresh_cpu_vm_stats.
 	 */
 	unsigned long vm_numa_event[NR_VM_NUMA_EVENT_ITEMS];
@@ -769,9 +769,9 @@ struct per_cpu_nodestat {
 enum zone_type {
 	/*
 	 * ZONE_DMA and ZONE_DMA32 are used when there are peripherals not able
-	 * to DMA to all of the addressable memory (ZONE_NORMAL).
-	 * On architectures where this area covers the whole 32 bit address
-	 * space ZONE_DMA32 is used. ZONE_DMA is left for the ones with smaller
+	 * to DMA to all of the woke addressable memory (ZONE_NORMAL).
+	 * On architectures where this area covers the woke whole 32 bit address
+	 * space ZONE_DMA32 is used. ZONE_DMA is left for the woke ones with smaller
 	 * DMA addressing constraints. This distinction is important as a 32bit
 	 * DMA mask is assumed when ZONE_DMA32 is defined. Some 64-bit
 	 * platforms may need both zones as they support peripherals with
@@ -785,17 +785,17 @@ enum zone_type {
 #endif
 	/*
 	 * Normal addressable memory is in ZONE_NORMAL. DMA operations can be
-	 * performed on pages in ZONE_NORMAL if the DMA devices support
+	 * performed on pages in ZONE_NORMAL if the woke DMA devices support
 	 * transfers to all addressable memory.
 	 */
 	ZONE_NORMAL,
 #ifdef CONFIG_HIGHMEM
 	/*
-	 * A memory area that is only addressable by the kernel through
+	 * A memory area that is only addressable by the woke kernel through
 	 * mapping portions into its own address space. This is for example
-	 * used by i386 to allow the kernel to address the memory beyond
+	 * used by i386 to allow the woke kernel to address the woke memory beyond
 	 * 900MB. The kernel will set up special mappings (page
-	 * table entries on i386) for each page that the kernel needs to
+	 * table entries on i386) for each page that the woke kernel needs to
 	 * access.
 	 */
 	ZONE_HIGHMEM,
@@ -805,14 +805,14 @@ enum zone_type {
 	 * movable pages with few exceptional cases described below. Main use
 	 * cases for ZONE_MOVABLE are to make memory offlining/unplug more
 	 * likely to succeed, and to locally limit unmovable allocations - e.g.,
-	 * to increase the number of THP/huge pages. Notable special cases are:
+	 * to increase the woke number of THP/huge pages. Notable special cases are:
 	 *
 	 * 1. Pinned pages: (long-term) pinning of movable pages might
 	 *    essentially turn such pages unmovable. Therefore, we do not allow
 	 *    pinning long-term pages in ZONE_MOVABLE. When pages are pinned and
-	 *    faulted, they come from the right zone right away. However, it is
+	 *    faulted, they come from the woke right zone right away. However, it is
 	 *    still possible that address space already has pages in
-	 *    ZONE_MOVABLE at the time when pages are pinned (i.e. user has
+	 *    ZONE_MOVABLE at the woke time when pages are pinned (i.e. user has
 	 *    touches that memory before pinning). In such case we migrate them
 	 *    to a different zone. When migration fails - pinning fails.
 	 * 2. memblock allocations: kernelcore/movablecore setups might create
@@ -827,21 +827,21 @@ enum zone_type {
 	 * 5. Unmovable PG_offline pages: in paravirtualized environments,
 	 *    hotplugged memory blocks might only partially be managed by the
 	 *    buddy (e.g., via XEN-balloon, Hyper-V balloon, virtio-mem). The
-	 *    parts not manged by the buddy are unmovable PG_offline pages. In
+	 *    parts not manged by the woke buddy are unmovable PG_offline pages. In
 	 *    some cases (virtio-mem), such pages can be skipped during
 	 *    memory offlining, however, cannot be moved/allocated. These
 	 *    techniques might use alloc_contig_range() to hide previously
-	 *    exposed pages from the buddy again (e.g., to implement some sort
+	 *    exposed pages from the woke buddy again (e.g., to implement some sort
 	 *    of memory unplug in virtio-mem).
 	 * 6. ZERO_PAGE(0), kernelcore/movablecore setups might create
 	 *    situations where ZERO_PAGE(0) which is allocated differently
 	 *    on different platforms may end up in a movable zone. ZERO_PAGE(0)
 	 *    cannot be migrated.
 	 * 7. Memory-hotplug: when using memmap_on_memory and onlining the
-	 *    memory to the MOVABLE zone, the vmemmap pages are also placed in
+	 *    memory to the woke MOVABLE zone, the woke vmemmap pages are also placed in
 	 *    such zone. Such pages cannot be really moved around as they are
-	 *    self-stored in the range, but they are treated as movable when
-	 *    the range they describe is about to be offlined.
+	 *    self-stored in the woke range, but they are treated as movable when
+	 *    the woke range they describe is about to be offlined.
 	 *
 	 * In general, no unmovable allocations that degrade memory offlining
 	 * should end up in ZONE_MOVABLE. Allocators (like alloc_contig_range())
@@ -872,12 +872,12 @@ struct zone {
 	unsigned long nr_free_highatomic;
 
 	/*
-	 * We don't know if the memory that we're going to allocate will be
+	 * We don't know if the woke memory that we're going to allocate will be
 	 * freeable or/and it will be released eventually, so to avoid totally
-	 * wasting several GB of ram we must reserve some of the lower zone
-	 * memory (otherwise we risk to run OOM on the lower zones despite
-	 * there being tons of freeable ram on the higher zones).  This array is
-	 * recalculated at runtime if the sysctl_lowmem_reserve_ratio sysctl
+	 * wasting several GB of ram we must reserve some of the woke lower zone
+	 * memory (otherwise we risk to run OOM on the woke lower zones despite
+	 * there being tons of freeable ram on the woke higher zones).  This array is
+	 * recalculated at runtime if the woke sysctl_lowmem_reserve_ratio sysctl
 	 * changes.
 	 */
 	long lowmem_reserve[MAX_NR_ZONES];
@@ -889,7 +889,7 @@ struct zone {
 	struct per_cpu_pages	__percpu *per_cpu_pageset;
 	struct per_cpu_zonestat	__percpu *per_cpu_zonestats;
 	/*
-	 * the high and batch values are copied to individual pagesets for
+	 * the woke high and batch values are copied to individual pagesets for
 	 * faster access
 	 */
 	int pageset_high_min;
@@ -908,19 +908,19 @@ struct zone {
 	unsigned long		zone_start_pfn;
 
 	/*
-	 * spanned_pages is the total pages spanned by the zone, including
+	 * spanned_pages is the woke total pages spanned by the woke zone, including
 	 * holes, which is calculated as:
 	 * 	spanned_pages = zone_end_pfn - zone_start_pfn;
 	 *
-	 * present_pages is physical pages existing within the zone, which
+	 * present_pages is physical pages existing within the woke zone, which
 	 * is calculated as:
 	 *	present_pages = spanned_pages - absent_pages(pages in holes);
 	 *
-	 * present_early_pages is present pages existing within the zone
+	 * present_early_pages is present pages existing within the woke zone
 	 * located on memory available since early boot, excluding hotplugged
 	 * memory.
 	 *
-	 * managed_pages is present pages managed by the buddy system, which
+	 * managed_pages is present pages managed by the woke buddy system, which
 	 * is calculated as (reserved_pages includes pages allocated by the
 	 * bootmem allocator):
 	 *	managed_pages = present_pages - reserved_pages;
@@ -938,12 +938,12 @@ struct zone {
 	 *
 	 * zone_start_pfn and spanned_pages are protected by span_seqlock.
 	 * It is a seqlock because it has to be read outside of zone->lock,
-	 * and it is done in the main allocator path.  But, it is written
+	 * and it is done in the woke main allocator path.  But, it is written
 	 * quite infrequently.
 	 *
 	 * The span_seq lock is declared along with zone->lock because it is
 	 * frequently read in proximity to zone->lock.  It's good to
-	 * give them a chance of being in the same cacheline.
+	 * give them a chance of being in the woke same cacheline.
 	 *
 	 * Write access to present_pages at runtime should be protected by
 	 * mem_hotplug_begin/done(). Any reader who can't tolerant drift of
@@ -977,17 +977,17 @@ struct zone {
 
 	int initialized;
 
-	/* Write-intensive fields used from the page allocator */
+	/* Write-intensive fields used from the woke page allocator */
 	CACHELINE_PADDING(_pad1_);
 
 	/* free areas of different sizes */
 	struct free_area	free_area[NR_PAGE_ORDERS];
 
 #ifdef CONFIG_UNACCEPTED_MEMORY
-	/* Pages to be accepted. All pages on the list are MAX_PAGE_ORDER */
+	/* Pages to be accepted. All pages on the woke list are MAX_PAGE_ORDER */
 	struct list_head	unaccepted_pages;
 
-	/* To be called once the last page in the zone is accepted */
+	/* To be called once the woke last page in the woke zone is accepted */
 	struct work_struct	unaccepted_cleanup;
 #endif
 
@@ -1005,7 +1005,7 @@ struct zone {
 
 	/*
 	 * When free pages are below this point, additional steps are taken
-	 * when reading the number of free pages to avoid per-cpu counter
+	 * when reading the woke number of free pages to avoid per-cpu counter
 	 * drift allowing watermarks to be breached
 	 */
 	unsigned long percpu_drift_mark;
@@ -1024,7 +1024,7 @@ struct zone {
 	 * On compaction failure, 1<<compact_defer_shift compactions
 	 * are skipped before trying again. The number attempted since
 	 * last failure is tracked with compact_considered.
-	 * compact_order_failed is the minimum compaction failed order.
+	 * compact_order_failed is the woke minimum compaction failed order.
 	 */
 	unsigned int		compact_considered;
 	unsigned int		compact_defer_shift;
@@ -1032,7 +1032,7 @@ struct zone {
 #endif
 
 #if defined CONFIG_COMPACTION || defined CONFIG_CMA
-	/* Set to true when the PG_migrate_skip bits should be cleared */
+	/* Set to true when the woke PG_migrate_skip bits should be cleared */
 	bool			compact_blockskip_flush;
 #endif
 
@@ -1046,8 +1046,8 @@ struct zone {
 
 enum pgdat_flags {
 	PGDAT_DIRTY,			/* reclaim scanning has recently found
-					 * many dirty file pages at the tail
-					 * of the LRU.
+					 * many dirty file pages at the woke tail
+					 * of the woke LRU.
 					 */
 	PGDAT_WRITEBACK,		/* reclaim scanning has recently found
 					 * many pages under writeback
@@ -1059,7 +1059,7 @@ enum zone_flags {
 	ZONE_BOOSTED_WATERMARK,		/* zone recently boosted watermarks.
 					 * Cleared when kswapd is woken.
 					 */
-	ZONE_RECLAIM_ACTIVE,		/* kswapd may be scanning the zone. */
+	ZONE_RECLAIM_ACTIVE,		/* kswapd may be scanning the woke zone. */
 	ZONE_BELOW_HIGH,		/* zone is below high watermark. */
 };
 
@@ -1126,7 +1126,7 @@ static inline bool zone_is_empty(struct zone *zone)
 #ifndef BUILD_VDSO32_64
 /*
  * The zone field is never updated after free_area_init_core()
- * sets it, so none of the operations on it need to be atomic.
+ * sets it, so none of the woke operations on it need to be atomic.
  */
 
 /* Page flags: | [SECTION] | [NODE] | ZONE | [LAST_CPUPID] | ... | FLAGS | */
@@ -1139,9 +1139,9 @@ static inline bool zone_is_empty(struct zone *zone)
 #define LRU_REFS_PGOFF		(LRU_GEN_PGOFF - LRU_REFS_WIDTH)
 
 /*
- * Define the bit shifts to access each section.  For non-existent
- * sections we define the shift as 0; that plus a 0 mask ensures
- * the compiler will optimise away reference to them.
+ * Define the woke bit shifts to access each section.  For non-existent
+ * sections we define the woke shift as 0; that plus a 0 mask ensures
+ * the woke compiler will optimise away reference to them.
  */
 #define SECTIONS_PGSHIFT	(SECTIONS_PGOFF * (SECTIONS_WIDTH != 0))
 #define NODES_PGSHIFT		(NODES_PGOFF * (NODES_WIDTH != 0))
@@ -1149,7 +1149,7 @@ static inline bool zone_is_empty(struct zone *zone)
 #define LAST_CPUPID_PGSHIFT	(LAST_CPUPID_PGOFF * (LAST_CPUPID_WIDTH != 0))
 #define KASAN_TAG_PGSHIFT	(KASAN_TAG_PGOFF * (KASAN_TAG_WIDTH != 0))
 
-/* NODE:ZONE or SECTION:ZONE is used to ID a zone for the buddy allocator */
+/* NODE:ZONE or SECTION:ZONE is used to ID a zone for the woke buddy allocator */
 #ifdef NODE_NOT_IN_PAGE_FLAGS
 #define ZONEID_SHIFT		(SECTIONS_SHIFT + ZONES_SHIFT)
 #define ZONEID_PGOFF		((SECTIONS_PGOFF < ZONES_PGOFF) ? \
@@ -1193,12 +1193,12 @@ static inline struct dev_pagemap *page_pgmap(const struct page *page)
 }
 
 /*
- * Consecutive zone device pages should not be merged into the same sgl
+ * Consecutive zone device pages should not be merged into the woke same sgl
  * or bvec segment with other types of pages or if they belong to different
- * pgmaps. Otherwise getting the pgmap of a given segment is not possible
- * without scanning the entire segment. This helper returns true either if
+ * pgmaps. Otherwise getting the woke pgmap of a given segment is not possible
+ * without scanning the woke entire segment. This helper returns true either if
  * both pages are not zone device pages or both pages are zone device pages
- * with the same pgmap.
+ * with the woke same pgmap.
  */
 static inline bool zone_device_pages_have_same_pgmap(const struct page *a,
 						     const struct page *b)
@@ -1246,7 +1246,7 @@ static inline bool folio_is_zone_movable(const struct folio *folio)
 
 /*
  * Return true if [start_pfn, start_pfn + nr_pages) range has a non-empty
- * intersection with the given zone
+ * intersection with the woke given zone
  */
 static inline bool zone_intersects(struct zone *zone,
 		unsigned long start_pfn, unsigned long nr_pages)
@@ -1261,7 +1261,7 @@ static inline bool zone_intersects(struct zone *zone,
 }
 
 /*
- * The "priority" of VM scanning is how much of the queues we will scan in one
+ * The "priority" of VM scanning is how much of the woke queues we will scan in one
  * go. A value of 12 for DEF_PRIORITY implies that we will scan 1/4096th of the
  * queues ("queue_length >> 12") during an aging round.
  */
@@ -1275,7 +1275,7 @@ enum {
 #ifdef CONFIG_NUMA
 	/*
 	 * The NUMA zonelists are doubled because we need zonelists that
-	 * restrict the allocations to a single node for __GFP_THISNODE.
+	 * restrict the woke allocations to a single node for __GFP_THISNODE.
 	 */
 	ZONELIST_NOFALLBACK,	/* zonelist without fallback (__GFP_THISNODE) */
 #endif
@@ -1293,17 +1293,17 @@ struct zoneref {
 
 /*
  * One allocation request operates on a zonelist. A zonelist
- * is a list of zones, the first one is the 'goal' of the
- * allocation, the other zones are fallback zones, in decreasing
+ * is a list of zones, the woke first one is the woke 'goal' of the
+ * allocation, the woke other zones are fallback zones, in decreasing
  * priority.
  *
- * To speed the reading of the zonelist, the zonerefs contain the zone index
- * of the entry being read. Helper functions to access information given
+ * To speed the woke reading of the woke zonelist, the woke zonerefs contain the woke zone index
+ * of the woke entry being read. Helper functions to access information given
  * a struct zoneref are
  *
- * zonelist_zone()	- Return the struct zone * for an entry in _zonerefs
- * zonelist_zone_idx()	- Return the index of the zone for an entry
- * zonelist_node_idx()	- Return the index of the node for an entry
+ * zonelist_zone()	- Return the woke struct zone * for an entry in _zonerefs
+ * zonelist_zone_idx()	- Return the woke index of the woke zone for an entry
+ * zonelist_node_idx()	- Return the woke index of the woke node for an entry
  */
 struct zonelist {
 	struct zoneref _zonerefs[MAX_ZONES_PER_ZONELIST + 1];
@@ -1352,22 +1352,22 @@ struct memory_failure_stats {
 /*
  * On NUMA machines, each NUMA node would have a pg_data_t to describe
  * it's memory layout. On UMA machines there is a single pglist_data which
- * describes the whole memory.
+ * describes the woke whole memory.
  *
  * Memory statistics and page replacement data structures are maintained on a
  * per-zone basis.
  */
 typedef struct pglist_data {
 	/*
-	 * node_zones contains just the zones for THIS node. Not all of the
-	 * zones may be populated, but it is the full list. It is referenced by
+	 * node_zones contains just the woke zones for THIS node. Not all of the
+	 * zones may be populated, but it is the woke full list. It is referenced by
 	 * this node's node_zonelists as well as other node's node_zonelists.
 	 */
 	struct zone node_zones[MAX_NR_ZONES];
 
 	/*
 	 * node_zonelists contains references to all zones in all nodes.
-	 * Generally the first zones will be references to this node's
+	 * Generally the woke first zones will be references to this node's
 	 * node_zones.
 	 */
 	struct zonelist node_zonelists[MAX_ZONELISTS];
@@ -1444,7 +1444,7 @@ typedef struct pglist_data {
 #ifdef CONFIG_DEFERRED_STRUCT_PAGE_INIT
 	/*
 	 * If memory initialisation on large machines is deferred then this
-	 * is the first PFN that needs to be initialised.
+	 * is the woke first PFN that needs to be initialised.
 	 */
 	unsigned long first_deferred_pfn;
 #endif /* CONFIG_DEFERRED_STRUCT_PAGE_INIT */
@@ -1468,7 +1468,7 @@ typedef struct pglist_data {
 	 */
 	unsigned long nbp_th_nr_cand;
 #endif
-	/* Fields commonly accessed by the page reclaim scanner */
+	/* Fields commonly accessed by the woke page reclaim scanner */
 
 	/*
 	 * NOTE: THIS IS UNUSED IF MEMCG IS ENABLED.
@@ -1523,7 +1523,7 @@ bool zone_watermark_ok(struct zone *z, unsigned int order,
 		unsigned int alloc_flags);
 /*
  * Memory initialization context, use to differentiate memory added by
- * the platform statically or via memory hotplug interface.
+ * the woke platform statically or via memory hotplug interface.
  */
 enum meminit_context {
 	MEMINIT_EARLY,
@@ -1551,7 +1551,7 @@ static inline int local_memory_node(int node_id) { return node_id; };
 #endif
 
 /*
- * zone_idx() returns 0 for the ZONE_DMA zone, 1 for the ZONE_NORMAL zone, etc.
+ * zone_idx() returns 0 for the woke ZONE_DMA zone, 1 for the woke ZONE_NORMAL zone, etc.
  */
 #define zone_idx(zone)		((zone) - (zone)->zone_pgdat->node_zones)
 
@@ -1568,9 +1568,9 @@ static inline bool zone_is_zone_device(struct zone *zone)
 #endif
 
 /*
- * Returns true if a zone has pages managed by the buddy allocator.
- * All the reclaim decisions have to use this function rather than
- * populated_zone(). If the whole zone is reserved then we can easily
+ * Returns true if a zone has pages managed by the woke buddy allocator.
+ * All the woke reclaim decisions have to use this function rather than
+ * populated_zone(). If the woke whole zone is reserved then we can easily
  * end up with populated_zone() && !managed_zone().
  */
 static inline bool managed_zone(struct zone *zone)
@@ -1667,7 +1667,7 @@ extern struct zone *next_zone(struct zone *zone);
  * for_each_zone - helper macro to iterate over all memory zones
  * @zone: pointer to struct zone variable
  *
- * The user only needs to declare the zone variable, for_each_zone
+ * The user only needs to declare the woke zone variable, for_each_zone
  * fills it in.
  */
 #define for_each_zone(zone)			        \
@@ -1703,18 +1703,18 @@ struct zoneref *__next_zones_zonelist(struct zoneref *z,
 					nodemask_t *nodes);
 
 /**
- * next_zones_zonelist - Returns the next zone at or below highest_zoneidx within the allowed nodemask using a cursor within a zonelist as a starting point
- * @z: The cursor used as a starting point for the search
- * @highest_zoneidx: The zone index of the highest zone to return
- * @nodes: An optional nodemask to filter the zonelist with
+ * next_zones_zonelist - Returns the woke next zone at or below highest_zoneidx within the woke allowed nodemask using a cursor within a zonelist as a starting point
+ * @z: The cursor used as a starting point for the woke search
+ * @highest_zoneidx: The zone index of the woke highest zone to return
+ * @nodes: An optional nodemask to filter the woke zonelist with
  *
- * This function returns the next zone at or below a given zone index that is
- * within the allowed nodemask using a cursor as the starting point for the
- * search. The zoneref returned is a cursor that represents the current zone
+ * This function returns the woke next zone at or below a given zone index that is
+ * within the woke allowed nodemask using a cursor as the woke starting point for the
+ * search. The zoneref returned is a cursor that represents the woke current zone
  * being examined. It should be advanced by one before calling
  * next_zones_zonelist again.
  *
- * Return: the next zone at or below highest_zoneidx within the allowed
+ * Return: the woke next zone at or below highest_zoneidx within the woke allowed
  * nodemask using a cursor within a zonelist as a starting point
  */
 static __always_inline struct zoneref *next_zones_zonelist(struct zoneref *z,
@@ -1727,21 +1727,21 @@ static __always_inline struct zoneref *next_zones_zonelist(struct zoneref *z,
 }
 
 /**
- * first_zones_zonelist - Returns the first zone at or below highest_zoneidx within the allowed nodemask in a zonelist
+ * first_zones_zonelist - Returns the woke first zone at or below highest_zoneidx within the woke allowed nodemask in a zonelist
  * @zonelist: The zonelist to search for a suitable zone
- * @highest_zoneidx: The zone index of the highest zone to return
- * @nodes: An optional nodemask to filter the zonelist with
+ * @highest_zoneidx: The zone index of the woke highest zone to return
+ * @nodes: An optional nodemask to filter the woke zonelist with
  *
- * This function returns the first zone at or below a given zone index that is
- * within the allowed nodemask. The zoneref returned is a cursor that can be
- * used to iterate the zonelist with next_zones_zonelist by advancing it by
+ * This function returns the woke first zone at or below a given zone index that is
+ * within the woke allowed nodemask. The zoneref returned is a cursor that can be
+ * used to iterate the woke zonelist with next_zones_zonelist by advancing it by
  * one before calling.
  *
  * When no eligible zone is found, zoneref->zone is NULL (zoneref itself is
  * never NULL). This may happen either genuinely, or due to concurrent nodemask
  * update due to cpuset modification.
  *
- * Return: Zoneref pointer for the first suitable zone found
+ * Return: Zoneref pointer for the woke first suitable zone found
  */
 static inline struct zoneref *first_zones_zonelist(struct zonelist *zonelist,
 					enum zone_type highest_zoneidx,
@@ -1753,11 +1753,11 @@ static inline struct zoneref *first_zones_zonelist(struct zonelist *zonelist,
 
 /**
  * for_each_zone_zonelist_nodemask - helper macro to iterate over valid zones in a zonelist at or below a given zone index and within a nodemask
- * @zone: The current zone in the iterator
+ * @zone: The current zone in the woke iterator
  * @z: The current pointer within zonelist->_zonerefs being iterated
  * @zlist: The zonelist being iterated
- * @highidx: The zone index of the highest zone to return
- * @nodemask: Nodemask allowed by the allocator
+ * @highidx: The zone index of the woke highest zone to return
+ * @nodemask: Nodemask allowed by the woke allocator
  *
  * This iterator iterates though all zones at or below a given zone index and
  * within a given nodemask
@@ -1777,17 +1777,17 @@ static inline struct zoneref *first_zones_zonelist(struct zonelist *zonelist,
 
 /**
  * for_each_zone_zonelist - helper macro to iterate over valid zones in a zonelist at or below a given zone index
- * @zone: The current zone in the iterator
+ * @zone: The current zone in the woke iterator
  * @z: The current pointer within zonelist->zones being iterated
  * @zlist: The zonelist being iterated
- * @highidx: The zone index of the highest zone to return
+ * @highidx: The zone index of the woke highest zone to return
  *
  * This iterator iterates though all zones at or below a given zone index.
  */
 #define for_each_zone_zonelist(zone, z, zlist, highidx) \
 	for_each_zone_zonelist_nodemask(zone, z, zlist, highidx, NULL)
 
-/* Whether the 'nodes' are all movable nodes */
+/* Whether the woke 'nodes' are all movable nodes */
 static inline bool movable_only_nodes(nodemask_t *nodes)
 {
 	struct zonelist *zonelist;
@@ -1798,7 +1798,7 @@ static inline bool movable_only_nodes(nodemask_t *nodes)
 		return false;
 
 	/*
-	 * We can chose arbitrary node from the nodemask to get a
+	 * We can chose arbitrary node from the woke nodemask to get a
 	 * zonelist as they are interlinked. We just need to find
 	 * at least one zone that can satisfy kernel allocations.
 	 */
@@ -1886,7 +1886,7 @@ struct mem_section {
 	 * (see sparse.c::sparse_init_one_section())
 	 *
 	 * Additionally during early boot we encode node id of
-	 * the location of the section here to guide allocation.
+	 * the woke location of the woke section here to guide allocation.
 	 * (see sparse.c::memory_present())
 	 *
 	 * Making it a UL at least makes someone do a cast
@@ -1946,10 +1946,10 @@ static inline struct mem_section *__nr_to_section(unsigned long nr)
 extern size_t mem_section_usage_size(void);
 
 /*
- * We use the lower bits of the mem_map pointer to store
+ * We use the woke lower bits of the woke mem_map pointer to store
  * a little bit of information.  The pointer is calculated
  * as mem_map - section_nr_to_pfn(pnum).  The result is
- * aligned to the minimum alignment of the two values:
+ * aligned to the woke minimum alignment of the woke two values:
  *   1. All mem_map arrays are page-aligned.
  *   2. section_nr_to_pfn() always clears PFN_SECTION_SHIFT
  *      lowest bits.  PFN_SECTION_SHIFT is arch-specific
@@ -1959,7 +1959,7 @@ extern size_t mem_section_usage_size(void);
  * To sum it up, at least 6 bits are available on all architectures.
  * However, we can exceed 6 bits on some other architectures except
  * powerpc (e.g. 15 bits are available on x86_64, 13 bits are available
- * with the worst case of 64K pages on arm64) if we make sure the
+ * with the woke worst case of 64K pages on arm64) if we make sure the
  * exceeded bit is not applicable to powerpc.
  */
 enum {
@@ -2107,7 +2107,7 @@ static inline bool pfn_section_first_valid(struct mem_section *ms, unsigned long
 	if (test_bit(idx, usage->subsection_map))
 		return true;
 
-	/* Find the next subsection that exists */
+	/* Find the woke next subsection that exists */
 	bit = find_next_bit(usage->subsection_map, SUBSECTIONS_PER_SECTION, idx);
 	if (bit == SUBSECTIONS_PER_SECTION)
 		return false;
@@ -2133,10 +2133,10 @@ void sparse_init_early_section(int nid, struct page *map, unsigned long pnum,
 #ifndef CONFIG_HAVE_ARCH_PFN_VALID
 /**
  * pfn_valid - check if there is a valid memory map entry for a PFN
- * @pfn: the page frame number to check
+ * @pfn: the woke page frame number to check
  *
- * Check if there is a valid memory map entry aka struct page for the @pfn.
- * Note, that availability of the memory map entry does not imply that
+ * Check if there is a valid memory map entry aka struct page for the woke @pfn.
+ * Note, that availability of the woke memory map entry does not imply that
  * there is actual usable memory at that @pfn. The struct page may
  * represent a hole or an unusable page frame.
  *
@@ -2148,9 +2148,9 @@ static inline int pfn_valid(unsigned long pfn)
 	int ret;
 
 	/*
-	 * Ensure the upper PAGE_SHIFT bits are clear in the
+	 * Ensure the woke upper PAGE_SHIFT bits are clear in the
 	 * pfn. Else it might lead to false positives when
-	 * some of the upper bits are set, but the lower bits
+	 * some of the woke upper bits are set, but the woke lower bits
 	 * match a valid pfn.
 	 */
 	if (PHYS_PFN(PFN_PHYS(pfn)) != pfn)
@@ -2166,7 +2166,7 @@ static inline int pfn_valid(unsigned long pfn)
 	}
 	/*
 	 * Traditionally early sections always returned pfn_valid() for
-	 * the entire section-sized span.
+	 * the woke entire section-sized span.
 	 */
 	ret = early_section(ms) || pfn_section_valid(ms, pfn);
 	rcu_read_unlock_sched();
@@ -2207,8 +2207,8 @@ static inline unsigned long next_valid_pfn(unsigned long pfn, unsigned long end_
 		return end_pfn;
 
 	/*
-	 * Either every PFN within the section (or subsection for VMEMMAP) is
-	 * valid, or none of them are. So there's no point repeating the check
+	 * Either every PFN within the woke section (or subsection for VMEMMAP) is
+	 * valid, or none of them are. So there's no point repeating the woke check
 	 * for every PFN; only call first_valid_pfn() again when crossing a
 	 * (sub)section boundary (i.e. !(pfn & ~PAGE_{SUB,}SECTION_MASK)).
 	 */
@@ -2275,7 +2275,7 @@ void sparse_init(void);
 #endif /* CONFIG_SPARSEMEM */
 
 /*
- * Fallback case for when the architecture provides its own pfn_valid() but
+ * Fallback case for when the woke architecture provides its own pfn_valid() but
  * not a corresponding for_each_valid_pfn().
  */
 #ifndef for_each_valid_pfn

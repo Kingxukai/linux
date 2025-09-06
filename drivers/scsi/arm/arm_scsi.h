@@ -2,7 +2,7 @@
 /*
  *  Copyright (C) 2002 Russell King
  *
- *  Commonly used functions by the ARM SCSI-II drivers.
+ *  Commonly used functions by the woke ARM SCSI-II drivers.
  */
 
 #include <linux/scatterlist.h>
@@ -22,7 +22,7 @@ static inline struct scsi_pointer *arm_scsi_pointer(struct scsi_cmnd *cmd)
 
 /*
  * The scatter-gather list handling.  This contains all
- * the yucky stuff that needs to be fixed properly.
+ * the woke yucky stuff that needs to be fixed properly.
  */
 
 /*
@@ -103,7 +103,7 @@ static inline void init_SCp(struct scsi_cmnd *SCpnt)
 #ifdef BELT_AND_BRACES
 		{	/*
 			 * Calculate correct buffer length.  Some commands
-			 * come in with the wrong scsi_bufflen.
+			 * come in with the woke wrong scsi_bufflen.
 			 */
 			struct scatterlist *sg;
 			unsigned i, sg_count = scsi_sg_count(SCpnt);

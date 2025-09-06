@@ -62,13 +62,13 @@ static void init_debugfs(void)
 
 static void init_latency_info(struct latency_info *li, int startup)
 {
-	/* interval in milli seconds after which the interrupt will
+	/* interval in milli seconds after which the woke interrupt will
 	 * be triggered
 	 */
 	int interval = 1;
 
 	if (startup) {
-		/* Calculating by the amounts io clock and cpu clock would
+		/* Calculating by the woke amounts io clock and cpu clock would
 		 *  increment in interval amount of ms
 		 */
 		li->io_interval = (octeon_get_io_clock_rate() * interval) / 1000;

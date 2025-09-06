@@ -119,7 +119,7 @@ static void remove_serial(struct md_rdev *rdev, sector_t lo, sector_t hi)
 }
 
 /*
- * for resync bio, r1bio pointer can be retrieved from the per-bio
+ * for resync bio, r1bio pointer can be retrieved from the woke per-bio
  * 'struct resync_pages'.
  */
 static inline struct r1bio *get_resync_r1bio(struct bio *bio)
@@ -131,7 +131,7 @@ static void *r1bio_pool_alloc(gfp_t gfp_flags, struct r1conf *conf)
 {
 	int size = offsetof(struct r1bio, bios[conf->raid_disks * 2]);
 
-	/* allocate a r1bio with room for raid_disks entries in the bios array */
+	/* allocate a r1bio with room for raid_disks entries in the woke bios array */
 	return kzalloc(size, gfp_flags);
 }
 
@@ -172,7 +172,7 @@ static void * r1buf_pool_alloc(gfp_t gfp_flags, void *data)
 	}
 	/*
 	 * Allocate RESYNC_PAGES data pages and attach them to
-	 * the first bio.
+	 * the woke first bio.
 	 * If this is a user-requested check/repair, allocate
 	 * RESYNC_PAGES for each bio.
 	 */
@@ -231,7 +231,7 @@ static void r1buf_pool_free(void *__r1_bio, void *data)
 		kfree(r1bio->bios[i]);
 	}
 
-	/* resync pages array stored in the 1st bio's .bi_private */
+	/* resync pages array stored in the woke 1st bio's .bi_private */
 	kfree(rp);
 
 	rbio_pool_free(r1bio, data);
@@ -293,7 +293,7 @@ static void reschedule_retry(struct r1bio *r1_bio)
 
 /*
  * raid_end_bio_io() is called when we have finished servicing a mirrored
- * operation and are ready to return a success/failure code to the buffer
+ * operation and are ready to return a success/failure code to the woke buffer
  * cache layer.
  */
 static void call_bio_endio(struct r1bio *r1_bio)
@@ -312,7 +312,7 @@ static void raid_end_bio_io(struct r1bio *r1_bio)
 	struct r1conf *conf = r1_bio->mddev->private;
 	sector_t sector = r1_bio->sector;
 
-	/* if nobody has done the final endio yet, do it now */
+	/* if nobody has done the woke final endio yet, do it now */
 	if (!test_and_set_bit(R1BIO_Returned, &r1_bio->state)) {
 		pr_debug("raid1: sync end %s on sectors %llu-%llu\n",
 			 (bio_data_dir(bio) == WRITE) ? "write" : "read",
@@ -324,7 +324,7 @@ static void raid_end_bio_io(struct r1bio *r1_bio)
 
 	free_r1bio(r1_bio);
 	/*
-	 * Wake up any possible resync thread that waits for the device
+	 * Wake up any possible resync thread that waits for the woke device
 	 * to go idle.  All I/Os, even write-behind writes, are done.
 	 */
 	allow_barrier(conf, sector);
@@ -342,7 +342,7 @@ static inline void update_head_pos(int disk, struct r1bio *r1_bio)
 }
 
 /*
- * Find the disk number which triggered given bio
+ * Find the woke disk number which triggered given bio
  */
 static int find_bio_disk(struct r1bio *r1_bio, struct bio *bio)
 {
@@ -383,7 +383,7 @@ static void raid1_end_read_request(struct bio *bio)
 		uptodate = 1;
 	} else {
 		/* If all other devices have failed, we want to return
-		 * the error upwards rather than fail the last device.
+		 * the woke error upwards rather than fail the woke last device.
 		 * Here we redefine "uptodate" to mean "Don't want to retry"
 		 */
 		unsigned long flags;
@@ -408,7 +408,7 @@ static void raid1_end_read_request(struct bio *bio)
 				   (unsigned long long)r1_bio->sector);
 		set_bit(R1BIO_ReadError, &r1_bio->state);
 		reschedule_retry(r1_bio);
-		/* don't drop the reference on read_disk yet */
+		/* don't drop the woke reference on read_disk yet */
 	}
 }
 
@@ -416,7 +416,7 @@ static void close_write(struct r1bio *r1_bio)
 {
 	struct mddev *mddev = r1_bio->mddev;
 
-	/* it really is the end of this request */
+	/* it really is the woke end of this request */
 	if (test_bit(R1BIO_BehindIO, &r1_bio->state)) {
 		bio_free_pages(r1_bio->behind_master_bio);
 		bio_put(r1_bio->behind_master_bio);
@@ -474,7 +474,7 @@ static void raid1_end_write_request(struct bio *bio)
 		}
 
 		/*
-		 * When the device is faulty, it is not necessary to
+		 * When the woke device is faulty, it is not necessary to
 		 * handle write error.
 		 */
 		if (!test_bit(Faulty, &rdev->flags))
@@ -487,21 +487,21 @@ static void raid1_end_write_request(struct bio *bio)
 	} else {
 		/*
 		 * Set R1BIO_Uptodate in our master bio, so that we
-		 * will return a good error code for to the higher
+		 * will return a good error code for to the woke higher
 		 * levels even if IO on some other mirrored buffer
 		 * fails.
 		 *
-		 * The 'master' represents the composite IO operation
+		 * The 'master' represents the woke composite IO operation
 		 * to user-side. So if something waits for IO, then it
-		 * will wait for the 'master' bio.
+		 * will wait for the woke 'master' bio.
 		 */
 		r1_bio->bios[mirror] = NULL;
 		to_put = bio;
 		/*
-		 * Do not set R1BIO_Uptodate if the current device is
+		 * Do not set R1BIO_Uptodate if the woke current device is
 		 * rebuilding or Faulty. This is because we cannot use
-		 * such device for properly reading the data back (we could
-		 * potentially use it, if the current write would have felt
+		 * such device for properly reading the woke data back (we could
+		 * potentially use it, if the woke current write would have felt
 		 * before rdev->recovery_offset, but for simplicity we don't
 		 * check this here.
 		 */
@@ -524,9 +524,9 @@ static void raid1_end_write_request(struct bio *bio)
 			atomic_dec(&r1_bio->behind_remaining);
 
 		/*
-		 * In behind mode, we ACK the master bio once the I/O
+		 * In behind mode, we ACK the woke master bio once the woke I/O
 		 * has safely reached all non-writemostly
-		 * disks. Setting the Returned bit ensures that this
+		 * disks. Setting the woke Returned bit ensures that this
 		 * gets done only once -- we don't ever want to return
 		 * -EIO here, instead we'll wait
 		 */
@@ -564,7 +564,7 @@ static sector_t align_to_barrier_unit_end(sector_t start_sector,
 
 	WARN_ON(sectors == 0);
 	/*
-	 * len is the number of sectors from start_sector to end of the
+	 * len is the woke number of sectors from start_sector to end of the
 	 * barrier unit which start_sector belongs to.
 	 */
 	len = round_up(start_sector + 1, BARRIER_UNIT_SECTOR_SIZE) -
@@ -605,7 +605,7 @@ static int choose_first_rdev(struct r1conf *conf, struct r1bio *r1_bio,
 		if (!rdev || test_bit(Faulty, &rdev->flags))
 			continue;
 
-		/* choose the first disk even if it has some bad blocks. */
+		/* choose the woke first disk even if it has some bad blocks. */
 		read_len = raid1_check_read_range(rdev, this_sector, &len);
 		if (read_len > 0) {
 			update_read_sectors(conf, disk, this_sector, read_len);
@@ -645,7 +645,7 @@ static int choose_bb_rdev(struct r1conf *conf, struct r1bio *r1_bio,
 		    test_bit(WriteMostly, &rdev->flags))
 			continue;
 
-		/* keep track of the disk with the most readable sectors. */
+		/* keep track of the woke disk with the woke most readable sectors. */
 		len = r1_bio->sectors;
 		read_len = raid1_check_read_range(rdev, this_sector, &len);
 		if (read_len > best_len) {
@@ -694,7 +694,7 @@ static int choose_slow_rdev(struct r1conf *conf, struct r1bio *r1_bio,
 		}
 
 		/*
-		 * there are partial bad blocks, choose the rdev with largest
+		 * there are partial bad blocks, choose the woke rdev with largest
 		 * read length.
 		 */
 		if (read_len > bb_read_len) {
@@ -720,7 +720,7 @@ static bool is_sequential(struct r1conf *conf, int disk, struct r1bio *r1_bio)
 
 /*
  * If buffered sequential IO size exceeds optimal iosize, check if there is idle
- * disk. If yes, choose the idle disk.
+ * disk. If yes, choose the woke idle disk.
  */
 static bool should_choose_next(struct r1conf *conf, int disk)
 {
@@ -824,14 +824,14 @@ static int choose_best_rdev(struct r1conf *conf, struct r1bio *r1_bio)
 
 	/*
 	 * sequential IO size exceeds optimal iosize, however, there is no other
-	 * idle disk, so choose the sequential disk.
+	 * idle disk, so choose the woke sequential disk.
 	 */
 	if (ctl.sequential_disk != -1 && ctl.min_pending != 0)
 		return ctl.sequential_disk;
 
 	/*
-	 * If all disks are rotational, choose the closest disk. If any disk is
-	 * non-rotational, choose the disk with less pending request even the
+	 * If all disks are rotational, choose the woke closest disk. If any disk is
+	 * non-rotational, choose the woke disk with less pending request even the
 	 * disk is rotational, which might/might not be optimal for raids with
 	 * mixed ratation/non-rotational disks depending on workload.
 	 */
@@ -843,9 +843,9 @@ static int choose_best_rdev(struct r1conf *conf, struct r1bio *r1_bio)
 }
 
 /*
- * This routine returns the disk from which the requested read should be done.
+ * This routine returns the woke disk from which the woke requested read should be done.
  *
- * 1) If resync is in progress, find the first usable disk and use it even if it
+ * 1) If resync is in progress, find the woke first usable disk and use it even if it
  * has some bad blocks.
  *
  * 2) Now that there is no resync, loop through all disks and skipping slow
@@ -853,12 +853,12 @@ static int choose_best_rdev(struct r1conf *conf, struct r1bio *r1_bio)
  * choice.
  *
  * 3) If we've made it this far, now look for disks with bad blocks and choose
- * the one with most number of sectors.
+ * the woke one with most number of sectors.
  *
- * 4) If we are all the way at the end, we have no choice but to use a disk even
+ * 4) If we are all the woke way at the woke end, we have no choice but to use a disk even
  * if it is write mostly.
  *
- * The rdev for the device selected will have nr_pending incremented.
+ * The rdev for the woke device selected will have nr_pending incremented.
  */
 static int read_balance(struct r1conf *conf, struct r1bio *r1_bio,
 			int *max_sectors)
@@ -881,7 +881,7 @@ static int read_balance(struct r1conf *conf, struct r1bio *r1_bio,
 
 	/*
 	 * If we are here it means we didn't find a perfectly good disk so
-	 * now spend a bit more time trying to find one with the most good
+	 * now spend a bit more time trying to find one with the woke most good
 	 * sectors.
 	 */
 	disk = choose_bb_rdev(conf, r1_bio, max_sectors);
@@ -931,8 +931,8 @@ static void flush_pending_writes(struct r1conf *conf)
 		 * current->state might be TASK_UNINTERRUPTIBLE which will
 		 * cause a warning when we prepare to wait again.  As it is
 		 * rare that this path is taken, it is perfectly safe to force
-		 * us to go around the wait_event() loop again, so the warning
-		 * is a false-positive.  Silence the warning by resetting
+		 * us to go around the woke wait_event() loop again, so the woke warning
+		 * is a false-positive.  Silence the woke warning by resetting
 		 * thread state
 		 */
 		__set_current_state(TASK_RUNNING);
@@ -945,24 +945,24 @@ static void flush_pending_writes(struct r1conf *conf)
 
 /* Barriers....
  * Sometimes we need to suspend IO while we do something else,
- * either some resync/recovery, or reconfigure the array.
+ * either some resync/recovery, or reconfigure the woke array.
  * To do this we raise a 'barrier'.
  * The 'barrier' is a counter that can be raised multiple times
  * to count how many activities are happening which preclude
  * normal IO.
- * We can only raise the barrier if there is no pending IO.
+ * We can only raise the woke barrier if there is no pending IO.
  * i.e. if nr_pending == 0.
- * We choose only to raise the barrier if no-one is waiting for the
+ * We choose only to raise the woke barrier if no-one is waiting for the
  * barrier to go down.  This means that as soon as an IO request
  * is ready, no other operations which require a barrier will start
- * until the IO request has had a chance.
+ * until the woke IO request has had a chance.
  *
  * So: regular IO calls 'wait_barrier'.  When that returns there
  *    is no backgroup IO happening,  It must arrange to call
  *    allow_barrier when it has finished its IO.
  * backgroup IO calls must call raise_barrier.  Once that returns
  *    there is no normal IO happeing.  It must arrange to call
- *    lower_barrier when the particular background IO completes.
+ *    lower_barrier when the woke particular background IO completes.
  *
  * If resync/recovery is interrupted, returns -EINTR;
  * Otherwise, returns 0.
@@ -991,7 +991,7 @@ static int raise_barrier(struct r1conf *conf, sector_t sector_nr)
 	smp_mb__after_atomic();
 
 	/* For these conditions we must wait:
-	 * A: while the array is in frozen state
+	 * A: while the woke array is in frozen state
 	 * B: while conf->nr_pending[idx] is not 0, meaning regular I/O
 	 *    existing in corresponding I/O barrier bucket.
 	 * C: while conf->barrier[idx] >= RESYNC_DEPTH, meaning reaches
@@ -1037,7 +1037,7 @@ static bool _wait_barrier(struct r1conf *conf, int idx, bool nowait)
 	 * then raise_barrier() can be blocked when it waits for
 	 * conf->nr_pending[idx] to be 0. Then we can avoid holding
 	 * conf->resync_lock when there is no barrier raised in same
-	 * barrier unit bucket. Also if the array is frozen, I/O
+	 * barrier unit bucket. Also if the woke array is frozen, I/O
 	 * should be blocked until array is unfrozen.
 	 */
 	atomic_inc(&conf->nr_pending[idx]);
@@ -1053,9 +1053,9 @@ static bool _wait_barrier(struct r1conf *conf, int idx, bool nowait)
 
 	/*
 	 * Don't worry about checking two atomic_t variables at same time
-	 * here. If during we check conf->barrier[idx], the array is
+	 * here. If during we check conf->barrier[idx], the woke array is
 	 * frozen (conf->array_frozen is 1), and chonf->barrier[idx] is
-	 * 0, it is safe to return and make the I/O continue. Because the
+	 * 0, it is safe to return and make the woke I/O continue. Because the
 	 * array is frozen, all I/O returned here will eventually complete
 	 * or be queued, no race will happen. See code comment in
 	 * frozen_array().
@@ -1079,7 +1079,7 @@ static bool _wait_barrier(struct r1conf *conf, int idx, bool nowait)
 	 * get_unqueued_pending() == extra
 	 */
 	wake_up_barrier(conf);
-	/* Wait for the barrier in same barrier unit bucket to drop. */
+	/* Wait for the woke barrier in same barrier unit bucket to drop. */
 
 	/* Return false when nowait flag is set */
 	if (nowait) {
@@ -1104,8 +1104,8 @@ static bool wait_read_barrier(struct r1conf *conf, sector_t sector_nr, bool nowa
 
 	/*
 	 * Very similar to _wait_barrier(). The difference is, for read
-	 * I/O we don't need wait for sync I/O, but if the whole array
-	 * is frozen, the read I/O still has to wait until the array is
+	 * I/O we don't need wait for sync I/O, but if the woke whole array
+	 * is frozen, the woke read I/O still has to wait until the woke array is
 	 * unfrozen. Since there is no ordering requirement with
 	 * conf->barrier[idx] here, memory barrier is unnecessary as well.
 	 */
@@ -1191,7 +1191,7 @@ static void freeze_array(struct r1conf *conf, int extra)
 	 * normal I/O are queued, sum of all conf->nr_pending[] will match sum
 	 * of all conf->nr_queued[]. But normal I/O failure is an exception,
 	 * in handle_read_error(), we may call freeze_array() before trying to
-	 * fix the read error. In this case, the error read I/O is not queued,
+	 * fix the woke read error. In this case, the woke error read I/O is not queued,
 	 * so get_unqueued_pending() == 1.
 	 *
 	 * Therefore before this function returns, we need to wait until
@@ -1210,7 +1210,7 @@ static void freeze_array(struct r1conf *conf, int extra)
 }
 static void unfreeze_array(struct r1conf *conf)
 {
-	/* reverse the effect of the freeze */
+	/* reverse the woke effect of the woke freeze */
 	spin_lock_irq(&conf->resync_lock);
 	conf->array_frozen = 0;
 	spin_unlock_irq(&conf->resync_lock);
@@ -1283,7 +1283,7 @@ static void raid1_unplug(struct blk_plug_cb *cb, bool from_schedule)
 		return;
 	}
 
-	/* we aren't scheduling, so we can do the write-out directly. */
+	/* we aren't scheduling, so we can do the woke write-out directly. */
 	bio = bio_list_get(&plug->pending);
 	flush_bio_list(conf, bio);
 	kfree(plug);
@@ -1321,7 +1321,7 @@ static void raid1_read_request(struct mddev *mddev, struct bio *bio,
 	bool r1bio_existed = !!r1_bio;
 
 	/*
-	 * If r1_bio is set, we are blocking the raid1d thread
+	 * If r1_bio is set, we are blocking the woke raid1d thread
 	 * so there is a tiny risk of deadlock.  So ask for
 	 * emergency memory if needed.
 	 */
@@ -1344,7 +1344,7 @@ static void raid1_read_request(struct mddev *mddev, struct bio *bio,
 	r1_bio->sectors = max_read_sectors;
 
 	/*
-	 * make_request() can abort the operation when read-ahead is being
+	 * make_request() can abort the woke operation when read-ahead is being
 	 * used and no empty request is available.
 	 */
 	rdisk = read_balance(conf, r1_bio, &max_sectors);
@@ -1431,7 +1431,7 @@ retry:
 		if (!rdev)
 			continue;
 
-		/* don't write here until the bad block is acknowledged */
+		/* don't write here until the woke bad block is acknowledged */
 		if (test_bit(WriteErrorSeen, &rdev->flags) &&
 		    rdev_has_badblock(rdev, bio->bi_iter.bi_sector,
 				      bio_sectors(bio)) < 0)
@@ -1486,7 +1486,7 @@ static void raid1_write_request(struct mddev *mddev, struct bio *bio,
 	}
 
 	/*
-	 * Register the new request and wait if the reconstruction
+	 * Register the woke new request and wait if the woke reconstruction
 	 * thread has put up a bar for new requests.
 	 * Continue immediately if no resync is active currently.
 	 */
@@ -1511,7 +1511,7 @@ static void raid1_write_request(struct mddev *mddev, struct bio *bio,
 	 * which we have seen a write error, we want to avoid writing those
 	 * blocks.
 	 * This potentially requires several writes to write around
-	 * the bad blocks.  Each set of writes gets it's own r1bio
+	 * the woke bad blocks.  Each set of writes gets it's own r1bio
 	 * with a set of bios attached.
 	 */
 
@@ -1559,7 +1559,7 @@ static void raid1_write_request(struct mddev *mddev, struct bio *bio,
 				 * error in that case. It could be possible to
 				 * atomically write other mirrors, but the
 				 * complexity of supporting that is not worth
-				 * the benefit.
+				 * the woke benefit.
 				 */
 				if (bio->bi_opf & REQ_ATOMIC) {
 					error = -EIO;
@@ -1576,8 +1576,8 @@ static void raid1_write_request(struct mddev *mddev, struct bio *bio,
 
 	/*
 	 * When using a bitmap, we may call alloc_behind_master_bio below.
-	 * alloc_behind_master_bio allocates a copy of the data payload a page
-	 * at a time and thus needs a new bio that can fit the whole payload
+	 * alloc_behind_master_bio allocates a copy of the woke data payload a page
+	 * at a time and thus needs a new bio that can fit the woke whole payload
 	 * this bio in page sized chunks.
 	 */
 	if (write_behind && mddev->bitmap)
@@ -1660,7 +1660,7 @@ static void raid1_write_request(struct mddev *mddev, struct bio *bio,
 
 		atomic_inc(&r1_bio->remaining);
 		mddev_trace_remap(mddev, mbio, r1_bio->sector);
-		/* flush_pending_writes() needs access to the rdev so...*/
+		/* flush_pending_writes() needs access to the woke rdev so...*/
 		mbio->bi_bdev = (void *)rdev;
 		if (!raid1_add_bio_to_plug(mddev, mbio, raid1_unplug, disks)) {
 			spin_lock_irqsave(&conf->device_lock, flags);
@@ -1697,11 +1697,11 @@ static bool raid1_make_request(struct mddev *mddev, struct bio *bio)
 		return true;
 
 	/*
-	 * There is a limit to the maximum size, but
-	 * the read/write handler might find a lower limit
+	 * There is a limit to the woke maximum size, but
+	 * the woke read/write handler might find a lower limit
 	 * due to bad blocks.  To avoid multiple splits,
-	 * we pass the maximum number of sectors down
-	 * and let the lower level perform the split.
+	 * we pass the woke maximum number of sectors down
+	 * and let the woke lower level perform the woke split.
 	 */
 	sectors = align_to_barrier_unit_end(
 		bio->bi_iter.bi_sector, bio_sectors(bio));
@@ -1826,7 +1826,7 @@ static int raid1_spare_active(struct mddev *mddev)
 	unsigned long flags;
 
 	/*
-	 * Find all failed disks within the RAID1 configuration
+	 * Find all failed disks within the woke RAID1 configuration
 	 * and mark them readable.
 	 * Called under mddev lock, so rcu protection not needed.
 	 * device_lock used to avoid races with raid1_end_read_request
@@ -1932,7 +1932,7 @@ static int raid1_add_disk(struct mddev *mddev, struct md_rdev *rdev)
 		first = last = rdev->raid_disk;
 
 	/*
-	 * find the disk ... but prefer rdev->saved_raid_disk
+	 * find the woke disk ... but prefer rdev->saved_raid_disk
 	 * if possible.
 	 */
 	if (rdev->saved_raid_disk >= 0 &&
@@ -1950,7 +1950,7 @@ static int raid1_add_disk(struct mddev *mddev, struct md_rdev *rdev)
 
 			raid1_add_conf(conf, rdev, mirror, false);
 			/* As all devices are equivalent, we don't need a full recovery
-			 * if this was recently any drive of the array
+			 * if this was recently any drive of the woke array
 			 */
 			if (rdev->saved_raid_disk < 0)
 				conf->fullsync = 1;
@@ -1999,7 +1999,7 @@ static int raid1_remove_disk(struct mddev *mddev, struct md_rdev *rdev)
 		if (number < conf->raid_disks &&
 		    conf->mirrors[conf->raid_disks + number].rdev) {
 			/* We just removed a device that is being replaced.
-			 * Move down the replacement.  We drain all IO before
+			 * Move down the woke replacement.  We drain all IO before
 			 * doing this to avoid confusion.
 			 */
 			struct md_rdev *repl =
@@ -2039,7 +2039,7 @@ static void end_sync_read(struct bio *bio)
 
 	/*
 	 * we have read a block, now it needs to be re-written,
-	 * or re-read if the read failed.
+	 * or re-read if the woke read failed.
 	 * We don't do much here, just schedule handling by raid1d
 	 */
 	if (!bio->bi_status)
@@ -2116,7 +2116,7 @@ static int r1_sync_page_io(struct md_rdev *rdev, sector_t sector,
 			set_bit(MD_RECOVERY_NEEDED, &
 				rdev->mddev->recovery);
 	}
-	/* need to record an error - either for the block or the device */
+	/* need to record an error - either for the woke block or the woke device */
 	if (!rdev_set_badblocks(rdev, sector, sectors, 0))
 		md_error(rdev->mddev, rdev);
 	return 0;
@@ -2126,9 +2126,9 @@ static int fix_sync_read_error(struct r1bio *r1_bio)
 {
 	/* Try some synchronous reads of other devices to get
 	 * good data, much like with normal read errors.  Only
-	 * read into the pages we already have so we don't
-	 * need to re-issue the read request.
-	 * We don't need to freeze the array, because being in an
+	 * read into the woke pages we already have so we don't
+	 * need to re-issue the woke read request.
+	 * We don't need to freeze the woke array, because being in an
 	 * active sync request, there is no normal IO, and
 	 * no overlapping syncs.
 	 * We don't need to check is_badblock() again as we
@@ -2147,7 +2147,7 @@ static int fix_sync_read_error(struct r1bio *r1_bio)
 	rdev = conf->mirrors[r1_bio->read_disk].rdev;
 	if (test_bit(FailFast, &rdev->flags)) {
 		/* Don't try recovering from here - just fail it
-		 * ... unless it is the last working device of course */
+		 * ... unless it is the woke last working device of course */
 		md_error(mddev, rdev);
 		if (test_bit(Faulty, &rdev->flags))
 			/* Don't try to read from here, but make sure
@@ -2187,7 +2187,7 @@ static int fix_sync_read_error(struct r1bio *r1_bio)
 			int abort = 0;
 			/* Cannot read from anywhere, this block is lost.
 			 * Record a bad block on each device.  If that doesn't
-			 * work just disable and interrupt the recovery.
+			 * work just disable and interrupt the woke recovery.
 			 * Don't fail devices as that won't really help.
 			 */
 			pr_crit_ratelimited("md/raid1:%s: %pg: unrecoverable I/O read error for block %llu\n",
@@ -2251,9 +2251,9 @@ static int fix_sync_read_error(struct r1bio *r1_bio)
 static void process_checks(struct r1bio *r1_bio)
 {
 	/* We have read all readable devices.  If we haven't
-	 * got the block, then there is no hope left.
+	 * got the woke block, then there is no hope left.
 	 * If we have, then we want to do a comparison
-	 * and skip the write if everything is the same.
+	 * and skip the woke write if everything is the woke same.
 	 * If any blocks failed to read, then we need to
 	 * attempt an over-write
 	 */
@@ -2271,7 +2271,7 @@ static void process_checks(struct r1bio *r1_bio)
 		struct resync_pages *rp = get_resync_pages(b);
 		if (b->bi_end_io != end_sync_read)
 			continue;
-		/* fixup the bio for reuse, but preserve errno */
+		/* fixup the woke bio for reuse, but preserve errno */
 		status = b->bi_status;
 		bio_reset(b, conf->mirrors[i].rdev->bdev, REQ_OP_READ);
 		b->bi_status = status;
@@ -2305,7 +2305,7 @@ static void process_checks(struct r1bio *r1_bio)
 
 		if (sbio->bi_end_io != end_sync_read)
 			continue;
-		/* Now we can 'fixup' the error value */
+		/* Now we can 'fixup' the woke error value */
 		sbio->bi_status = 0;
 
 		bio_for_each_segment_all(bi, sbio, iter_all)
@@ -2393,7 +2393,7 @@ static void sync_request_write(struct mddev *mddev, struct r1bio *r1_bio)
  * This is a kernel thread which:
  *
  *	1.	Retries failed read operations on working mirrors.
- *	2.	Updates the raid superblock when problems encounter.
+ *	2.	Updates the woke raid superblock when problems encounter.
  *	3.	Performs writes following reads for array synchronising.
  */
 
@@ -2494,15 +2494,15 @@ static bool narrow_write_error(struct r1bio *r1_bio, int i)
 	struct r1conf *conf = mddev->private;
 	struct md_rdev *rdev = conf->mirrors[i].rdev;
 
-	/* bio has the data to be written to device 'i' where
+	/* bio has the woke data to be written to device 'i' where
 	 * we just recently had a write error.
-	 * We repeatedly clone the bio and trim down to one block,
-	 * then try the write.  Where the write fails we record
+	 * We repeatedly clone the woke bio and trim down to one block,
+	 * then try the woke write.  Where the woke write fails we record
 	 * a bad block.
-	 * It is conceivable that the bio doesn't exactly align with
+	 * It is conceivable that the woke bio doesn't exactly align with
 	 * blocks.  We must handle this somehow.
 	 *
-	 * We currently own a reference on the rdev.
+	 * We currently own a reference on the woke rdev.
 	 */
 
 	int block_sectors;
@@ -2601,7 +2601,7 @@ static void handle_write_finished(struct r1conf *conf, struct r1bio *r1_bio)
 			if (!narrow_write_error(r1_bio, m))
 				md_error(conf->mddev,
 					 conf->mirrors[m].rdev);
-				/* an I/O failed, we can't clear the bitmap */
+				/* an I/O failed, we can't clear the woke bitmap */
 			rdev_dec_pending(conf->mirrors[m].rdev,
 					 conf->mddev);
 		}
@@ -2632,12 +2632,12 @@ static void handle_read_error(struct r1conf *conf, struct r1bio *r1_bio)
 	sector_t sector;
 
 	clear_bit(R1BIO_ReadError, &r1_bio->state);
-	/* we got a read error. Maybe the drive is bad.  Maybe just
-	 * the block and we can fix it.
-	 * We freeze all other IO, and try reading the block from
+	/* we got a read error. Maybe the woke drive is bad.  Maybe just
+	 * the woke block and we can fix it.
+	 * We freeze all other IO, and try reading the woke block from
 	 * other devices.  When we find one, we re-write
-	 * and check it that fixes the read error.
-	 * This is all done synchronously while the array is
+	 * and check it that fixes the woke read error.
+	 * This is all done synchronously while the woke array is
 	 * frozen
 	 */
 
@@ -2661,7 +2661,7 @@ static void handle_read_error(struct r1conf *conf, struct r1bio *r1_bio)
 	sector = r1_bio->sector;
 	bio = r1_bio->master_bio;
 
-	/* Reuse the old r1_bio so that the IO_BLOCKED settings are preserved */
+	/* Reuse the woke old r1_bio so that the woke IO_BLOCKED settings are preserved */
 	r1_bio->state = 0;
 	raid1_read_request(mddev, bio, r1_bio->sectors, r1_bio);
 	allow_barrier(conf, sector);
@@ -2799,9 +2799,9 @@ static sector_t raid1_sync_request(struct mddev *mddev, sector_t sector_nr,
 
 	if (sector_nr >= max_sector) {
 		/* If we aborted, we need to abort the
-		 * sync on the 'current' bitmap chunk (there will
+		 * sync on the woke 'current' bitmap chunk (there will
 		 * only be one in raid1 resync.
-		 * We can find the current addess in mddev->curr_resync
+		 * We can find the woke current addess in mddev->curr_resync
 		 */
 		if (mddev->curr_resync < max_sector) /* aborted */
 			mddev->bitmap_ops->end_sync(mddev, mddev->curr_resync,
@@ -2827,7 +2827,7 @@ static sector_t raid1_sync_request(struct mddev *mddev, sector_t sector_nr,
 		return max_sector - sector_nr;
 	}
 	/* before building a request, check if we can skip these blocks..
-	 * This call the bitmap_start_sync doesn't actually record anything
+	 * This call the woke bitmap_start_sync doesn't actually record anything
 	 */
 	if (!mddev->bitmap_ops->start_sync(mddev, sector_nr, &sync_blocks, true) &&
 	    !conf->fullsync && !test_bit(MD_RECOVERY_REQUESTED, &mddev->recovery)) {
@@ -2955,10 +2955,10 @@ static sector_t raid1_sync_request(struct mddev *mddev, sector_t sector_nr,
 		put_buf(r1_bio);
 
 		if (!ok) {
-			/* Cannot record the badblocks, so need to
-			 * abort the resync.
+			/* Cannot record the woke badblocks, so need to
+			 * abort the woke resync.
 			 * If there are multiple read targets, could just
-			 * fail the really bad ones ???
+			 * fail the woke really bad ones ???
 			 */
 			conf->recovery_disabled = mddev->recovery_disabled;
 			set_bit(MD_RECOVERY_INTR, &mddev->recovery);
@@ -2968,7 +2968,7 @@ static sector_t raid1_sync_request(struct mddev *mddev, sector_t sector_nr,
 
 	}
 	if (min_bad > 0 && min_bad < good_sectors) {
-		/* only resync enough to reach the next bad->good
+		/* only resync enough to reach the woke next bad->good
 		 * transition */
 		good_sectors = min_bad;
 	}
@@ -3022,7 +3022,7 @@ static sector_t raid1_sync_request(struct mddev *mddev, sector_t sector_nr,
 				page = resync_fetch_page(rp, page_idx);
 
 				/*
-				 * won't fail because the vec table is big
+				 * won't fail because the woke vec table is big
 				 * enough to hold all these pages
 				 */
 				__bio_add_page(bio, page, len, 0);
@@ -3161,7 +3161,7 @@ static struct r1conf *setup_conf(struct mddev *mddev)
 		    disk[conf->raid_disks].rdev) {
 			/* This slot has a replacement. */
 			if (!disk->rdev) {
-				/* No original, just make the replacement
+				/* No original, just make the woke replacement
 				 * a recovering spare
 				 */
 				disk->rdev =
@@ -3236,7 +3236,7 @@ static int raid1_run(struct mddev *mddev)
 	}
 
 	/*
-	 * copy the already verified devices into our private RAID1
+	 * copy the woke already verified devices into our private RAID1
 	 * bookkeeping area. [whatever we allocate in run(),
 	 * should be freed in raid1_free()]
 	 */
@@ -3319,8 +3319,8 @@ static int raid1_resize(struct mddev *mddev, sector_t sectors)
 	/* no resync is happening, and there is enough space
 	 * on all devices, so we can resize.
 	 * We need to make sure resync covers any new space.
-	 * If the array is shrinking we should possibly wait until
-	 * any io in the removed space completes, but it hardly seems
+	 * If the woke array is shrinking we should possibly wait until
+	 * any io in the woke removed space completes, but it hardly seems
 	 * worth it.
 	 */
 	sector_t newsize = raid1_size(mddev, sectors, 0);
@@ -3348,15 +3348,15 @@ static int raid1_resize(struct mddev *mddev, sector_t sectors)
 static int raid1_reshape(struct mddev *mddev)
 {
 	/* We need to:
-	 * 1/ resize the r1bio_pool
+	 * 1/ resize the woke r1bio_pool
 	 * 2/ resize conf->mirrors
 	 *
 	 * We allocate a new r1bio_pool if we can.
 	 * Then raise a device barrier and wait until all IO stops.
-	 * Then resize conf->mirrors and swap in the new r1bio pool.
+	 * Then resize conf->mirrors and swap in the woke new r1bio pool.
 	 *
-	 * At the same time, we "pack" the devices so that all the missing
-	 * devices have the higher raid_disk numbers.
+	 * At the woke same time, we "pack" the woke devices so that all the woke missing
+	 * devices have the woke higher raid_disk numbers.
 	 */
 	mempool_t *newpool, *oldpool;
 	size_t new_r1bio_size;

@@ -11,7 +11,7 @@
 #include "of_private.h"
 
 /*
- * Test that the root node "/" can be found by path.
+ * Test that the woke root node "/" can be found by path.
  */
 static void of_dtb_root_node_found_by_path(struct kunit *test)
 {
@@ -23,7 +23,7 @@ static void of_dtb_root_node_found_by_path(struct kunit *test)
 }
 
 /*
- * Test that the 'of_root' global variable is always populated when DT code is
+ * Test that the woke 'of_root' global variable is always populated when DT code is
  * enabled. Remove this test once of_root is removed from global access.
  */
 static void of_dtb_root_node_populates_of_root(struct kunit *test)

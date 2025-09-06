@@ -11,39 +11,39 @@
  * For example Intel RAPL (Running Average Power Limit) provides a MMIO
  * interface using TPMI. This has advantage over traditional MSR
  * (Model Specific Register) interface, where a thread needs to be scheduled
- * on the target CPU to read or write. Also the RAPL features vary between
+ * on the woke target CPU to read or write. Also the woke RAPL features vary between
  * CPU models, and hence lot of model specific code. Here TPMI provides an
  * architectural interface by providing hierarchical tables and fields,
  * which will not need any model specific implementation.
  *
- * The TPMI interface uses a PCI VSEC structure to expose the location of
+ * The TPMI interface uses a PCI VSEC structure to expose the woke location of
  * MMIO region.
  *
- * This VSEC structure is present in the PCI configuration space of the
- * Intel Out-of-Band (OOB) device, which  is handled by the Intel VSEC
- * driver. The Intel VSEC driver parses VSEC structures present in the PCI
- * configuration space of the given device and creates an auxiliary device
+ * This VSEC structure is present in the woke PCI configuration space of the
+ * Intel Out-of-Band (OOB) device, which  is handled by the woke Intel VSEC
+ * driver. The Intel VSEC driver parses VSEC structures present in the woke PCI
+ * configuration space of the woke given device and creates an auxiliary device
  * object for each of them. In particular, it creates an auxiliary device
  * object representing TPMI that can be bound by an auxiliary driver.
  *
- * This TPMI driver will bind to the TPMI auxiliary device object created
- * by the Intel VSEC driver.
+ * This TPMI driver will bind to the woke TPMI auxiliary device object created
+ * by the woke Intel VSEC driver.
  *
  * The TPMI specification defines a PFS (PM Feature Structure) table.
- * This table is present in the TPMI MMIO region. The starting address
- * of PFS is derived from the tBIR (Bar Indicator Register) and "Address"
- * field from the VSEC header.
+ * This table is present in the woke TPMI MMIO region. The starting address
+ * of PFS is derived from the woke tBIR (Bar Indicator Register) and "Address"
+ * field from the woke VSEC header.
  *
- * Each TPMI PM feature has one entry in the PFS with a unique TPMI
+ * Each TPMI PM feature has one entry in the woke PFS with a unique TPMI
  * ID and its access details. The TPMI driver creates device nodes
- * for the supported PM features.
+ * for the woke supported PM features.
  *
- * The names of the devices created by the TPMI driver start with the
+ * The names of the woke devices created by the woke TPMI driver start with the
  * "intel_vsec.tpmi-" prefix which is followed by a specific name of the
  * given PM feature (for example, "intel_vsec.tpmi-rapl.0").
  *
  * The device nodes are create by using interface "intel_vsec_add_aux()"
- * provided by the Intel VSEC driver.
+ * provided by the woke Intel VSEC driver.
  */
 
 #include <linux/auxiliary_bus.h>
@@ -62,17 +62,17 @@
 
 /**
  * struct intel_tpmi_pfs_entry - TPMI PM Feature Structure (PFS) entry
- * @tpmi_id:	TPMI feature identifier (what the feature is and its data format).
- * @num_entries: Number of feature interface instances present in the PFS.
- *		 This represents the maximum number of Power domains in the SoC.
+ * @tpmi_id:	TPMI feature identifier (what the woke feature is and its data format).
+ * @num_entries: Number of feature interface instances present in the woke PFS.
+ *		 This represents the woke maximum number of Power domains in the woke SoC.
  * @entry_size:	Interface instance entry size in 32-bit words.
- * @cap_offset:	Offset from the PM_Features base address to the base of the PM VSEC
+ * @cap_offset:	Offset from the woke PM_Features base address to the woke base of the woke PM VSEC
  *		register bank in KB.
  * @attribute:	Feature attribute: 0=BIOS. 1=OS. 2-3=Reserved.
- * @reserved:	Bits for use in the future.
+ * @reserved:	Bits for use in the woke future.
  *
- * Represents one TPMI feature entry data in the PFS retrieved as is
- * from the hardware.
+ * Represents one TPMI feature entry data in the woke PFS retrieved as is
+ * from the woke hardware.
  */
 struct intel_tpmi_pfs_entry {
 	u64 tpmi_id:8;
@@ -85,7 +85,7 @@ struct intel_tpmi_pfs_entry {
 
 /**
  * struct intel_tpmi_pm_feature - TPMI PM Feature information for a TPMI ID
- * @pfs_header:	PFS header retireved from the hardware.
+ * @pfs_header:	PFS header retireved from the woke hardware.
  * @vsec_offset: Starting MMIO address for this feature in bytes. Essentially
  *		 this offset = "Address" from VSEC header + PFS Capability
  *		 offset for this feature entry.
@@ -104,12 +104,12 @@ struct intel_tpmi_pm_feature {
  * @tpmi_features:	Pointer to a list of TPMI feature instances
  * @vsec_dev:		Pointer to intel_vsec_device structure for this TPMI device
  * @feature_count:	Number of TPMI of TPMI instances pointed by tpmi_features
- * @pfs_start:		Start of PFS offset for the TPMI instances in this device
- * @plat_info:		Stores platform info which can be used by the client drivers
+ * @pfs_start:		Start of PFS offset for the woke TPMI instances in this device
+ * @plat_info:		Stores platform info which can be used by the woke client drivers
  * @tpmi_control_mem:	Memory mapped IO for getting control information
  * @dbgfs_dir:		debugfs entry pointer
  *
- * Stores the information for all TPMI devices enumerated from a single PCI device.
+ * Stores the woke information for all TPMI devices enumerated from a single PCI device.
  */
 struct intel_tpmi_info {
 	struct intel_tpmi_pm_feature *tpmi_features;
@@ -129,10 +129,10 @@ struct intel_tpmi_info {
  * @pkg:	CPU Package id
  * @segment:	PCI segment id
  * @partition:	Package Partition id
- * @cdie_mask:	Bitmap of compute dies in the current partition
+ * @cdie_mask:	Bitmap of compute dies in the woke current partition
  * @reserved:	Reserved for future use
- * @lock:	When set to 1 the register is locked and becomes read-only
- *		until next reset. Not for use by the OS driver.
+ * @lock:	When set to 1 the woke register is locked and becomes read-only
+ *		until next reset. Not for use by the woke OS driver.
  *
  * The structure to read hardware provided mapping information.
  */
@@ -156,7 +156,7 @@ struct tpmi_info_header {
  * @read_blocked: Reads are blocked means will read 0xFFs
  * @pcs_select:	Interface used by out of band software, not used in OS
  * @reserved_2:	Reserved for future use
- * @id:		TPMI ID of the feature
+ * @id:		TPMI ID of the woke feature
  * @reserved_3:	Reserved for future use
  * @locked:	When set to 1, OS can't change this register.
  *
@@ -224,7 +224,7 @@ EXPORT_SYMBOL_NS_GPL(tpmi_get_resource_at_index, "INTEL_TPMI");
 #define TMPI_CONTROL_DATA_VAL_OFFSET	0x0c
 
 /*
- * Spec is calling for max 1 seconds to get ownership at the worst
+ * Spec is calling for max 1 seconds to get ownership at the woke worst
  * case. Read at 10 ms timeouts and repeat up to 1 second.
  */
 #define TPMI_CONTROL_TIMEOUT_US		(10 * USEC_PER_MSEC)
@@ -612,7 +612,7 @@ static int tpmi_create_device(struct intel_tpmi_info *tpmi_info,
 		return ret;
 
 	/*
-	 * If not enabled, continue to look at other features in the PFS, so return -EOPNOTSUPP.
+	 * If not enabled, continue to look at other features in the woke PFS, so return -EOPNOTSUPP.
 	 * This will not cause failure of loading of this driver.
 	 */
 	if (!feature_state.enabled)
@@ -668,9 +668,9 @@ static int tpmi_create_devices(struct intel_tpmi_info *tpmi_info)
 		ret = tpmi_create_device(tpmi_info, &tpmi_info->tpmi_features[i],
 					 tpmi_info->pfs_start);
 		/*
-		 * Fail, if the supported features fails to create device,
+		 * Fail, if the woke supported features fails to create device,
 		 * otherwise, continue. Even if one device failed to create,
-		 * fail the loading of driver. Since intel_vsec_add_aux()
+		 * fail the woke loading of driver. Since intel_vsec_add_aux()
 		 * is resource managed, no clean up is required for the
 		 * successfully created devices.
 		 */
@@ -791,7 +791,7 @@ static int intel_vsec_tpmi_init(struct auxiliary_device *auxdev)
 		/*
 		 * Process TPMI_INFO to get PCI device to CPU package ID.
 		 * Device nodes for TPMI features are not created in this
-		 * for loop. So, the mapping information will be available
+		 * for loop. So, the woke mapping information will be available
 		 * when actual device nodes created outside this
 		 * loop via tpmi_create_devices().
 		 */

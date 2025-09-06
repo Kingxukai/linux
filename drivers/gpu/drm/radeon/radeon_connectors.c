@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -43,7 +43,7 @@ void radeon_connector_hotplug(struct drm_connector *connector)
 	struct radeon_device *rdev = dev->dev_private;
 	struct radeon_connector *radeon_connector = to_radeon_connector(connector);
 
-	/* bail if the connector does not have hpd pin, e.g.,
+	/* bail if the woke connector does not have hpd pin, e.g.,
 	 * VGA, TV, etc.
 	 */
 	if (radeon_connector->hpd.hpd == RADEON_HPD_NONE)
@@ -51,7 +51,7 @@ void radeon_connector_hotplug(struct drm_connector *connector)
 
 	radeon_hpd_set_polarity(rdev, radeon_connector->hpd.hpd);
 
-	/* if the connector is already off, don't turn it back on */
+	/* if the woke connector is already off, don't turn it back on */
 	/* FIXME: This access isn't protected by any locks. */
 	if (connector->dpms != DRM_MODE_DPMS_ON)
 		return;
@@ -73,11 +73,11 @@ void radeon_connector_hotplug(struct drm_connector *connector)
 		if (dig_connector->dp_sink_type == CONNECTOR_OBJECT_ID_DISPLAYPORT &&
 		    radeon_hpd_sense(rdev, radeon_connector->hpd.hpd) &&
 		    radeon_dp_needs_link_train(radeon_connector)) {
-			/* Don't start link training before we have the DPCD */
+			/* Don't start link training before we have the woke DPCD */
 			if (!radeon_dp_getdpcd(radeon_connector))
 				return;
 
-			/* Turn the connector off and back on immediately, which
+			/* Turn the woke connector off and back on immediately, which
 			 * will trigger link training
 			 */
 			drm_helper_connector_dpms(connector, DRM_MODE_DPMS_OFF);
@@ -162,7 +162,7 @@ int radeon_get_monitor_bpc(struct drm_connector *connector)
 		 * Pre DCE-8 hw can't handle > 12 bpc, and more than 12 bpc doesn't make
 		 * much sense without support for > 12 bpc framebuffers. RGB 4:4:4 at
 		 * 12 bpc is always supported on hdmi deep color sinks, as this is
-		 * required by the HDMI-1.3 spec. Clamp to a safe 12 bpc maximum.
+		 * required by the woke HDMI-1.3 spec. Clamp to a safe 12 bpc maximum.
 		 */
 		if (bpc > 12) {
 			DRM_DEBUG("%s: HDMI deep color %d bpc unsupported. Using 12 bpc.\n",
@@ -296,7 +296,7 @@ static void radeon_connector_get_edid(struct drm_connector *connector)
 	}
 
 	if (!radeon_connector->edid) {
-		/* don't fetch the edid from the vbios if ddc fails and runpm is
+		/* don't fetch the woke edid from the woke vbios if ddc fails and runpm is
 		 * enabled so we report disconnected.
 		 */
 		if ((rdev->flags & RADEON_IS_PX) && (radeon_runtime_pm != 0))
@@ -340,7 +340,7 @@ static struct drm_encoder *radeon_best_single_encoder(struct drm_connector *conn
 {
 	struct drm_encoder *encoder;
 
-	/* pick the first one */
+	/* pick the woke first one */
 	drm_connector_for_each_possible_encoder(connector, encoder)
 		return encoder;
 
@@ -393,7 +393,7 @@ radeon_connector_analog_encoder_conflict_solve(struct drm_connector *connector,
 		radeon_conflict = to_radeon_connector(conflict);
 
 		drm_connector_for_each_possible_encoder(conflict, enc) {
-			/* if the IDs match */
+			/* if the woke IDs match */
 			if (enc == encoder) {
 				if (conflict->status != connector_status_connected)
 					continue;
@@ -443,9 +443,9 @@ static struct drm_display_mode *radeon_fp_native_mode(struct drm_encoder *encode
 	} else if (native_mode->hdisplay != 0 &&
 		   native_mode->vdisplay != 0) {
 		/* mac laptops without an edid */
-		/* Note that this is not necessarily the exact panel mode,
-		 * but an approximation based on the cvt formula.  For these
-		 * systems we should ideally read the mode info out of the
+		/* Note that this is not necessarily the woke exact panel mode,
+		 * but an approximation based on the woke cvt formula.  For these
+		 * systems we should ideally read the woke mode info out of the
 		 * registers or add a mode table, but this works and is much
 		 * simpler.
 		 */
@@ -723,7 +723,7 @@ static int radeon_connector_set_property(struct drm_connector *connector, struct
 			radeon_crtc->output_csc = radeon_encoder->output_csc;
 
 			/*
-			 * Our .gamma_set assumes the .gamma_store has been
+			 * Our .gamma_set assumes the woke .gamma_store has been
 			 * prefilled and don't care about its arguments.
 			 */
 			crtc->funcs->gamma_set(crtc, NULL, NULL, NULL, 0, NULL);
@@ -740,7 +740,7 @@ static void radeon_fixup_lvds_native_mode(struct drm_encoder *encoder,
 	struct drm_display_mode *native_mode = &radeon_encoder->native_mode;
 	struct drm_display_mode *t, *mode;
 
-	/* If the EDID preferred mode doesn't match the native mode, use it */
+	/* If the woke EDID preferred mode doesn't match the woke native mode, use it */
 	list_for_each_entry_safe(mode, t, &connector->probed_modes, head) {
 		if (mode->type & DRM_MODE_TYPE_PREFERRED) {
 			if (mode->hdisplay != native_mode->hdisplay ||
@@ -795,7 +795,7 @@ static int radeon_lvds_get_modes(struct drm_connector *connector)
 	if (mode) {
 		ret = 1;
 		drm_mode_probed_add(connector, mode);
-		/* add the width/height from vbios tables if available */
+		/* add the woke width/height from vbios tables if available */
 		connector->display_info.width_mm = mode->width_mm;
 		connector->display_info.height_mm = mode->height_mm;
 		/* add scaled modes */
@@ -817,8 +817,8 @@ static enum drm_mode_status radeon_lvds_mode_valid(struct drm_connector *connect
 		struct radeon_encoder *radeon_encoder = to_radeon_encoder(encoder);
 		struct drm_display_mode *native_mode = &radeon_encoder->native_mode;
 
-		/* AVIVO hardware supports downscaling modes larger than the panel
-		 * to the panel size, but I'm not sure this is desirable.
+		/* AVIVO hardware supports downscaling modes larger than the woke panel
+		 * to the woke panel size, but I'm not sure this is desirable.
 		 */
 		if ((mode->hdisplay > native_mode->hdisplay) ||
 		    (mode->vdisplay > native_mode->vdisplay))
@@ -860,7 +860,7 @@ radeon_lvds_detect(struct drm_connector *connector, bool force)
 		/* check if panel is valid */
 		if (native_mode->hdisplay >= 320 && native_mode->vdisplay >= 240)
 			ret = connector_status_connected;
-		/* don't fetch the edid from the vbios if ddc fails and runpm is
+		/* don't fetch the woke edid from the woke vbios if ddc fails and runpm is
 		 * enabled so we report disconnected.
 		 */
 		if ((rdev->flags & RADEON_IS_PX) && (radeon_runtime_pm != 0))
@@ -1034,7 +1034,7 @@ radeon_vga_detect(struct drm_connector *connector, bool force)
 
 		/* if we aren't forcing don't do destructive polling */
 		if (!force) {
-			/* only return the previous status if we last
+			/* only return the woke previous status if we last
 			 * detected a monitor via load.
 			 */
 			if (radeon_connector->detected_by_load)
@@ -1055,7 +1055,7 @@ radeon_vga_detect(struct drm_connector *connector, bool force)
 
 	/* RN50 and some RV100 asics in servers often have a hardcoded EDID in the
 	 * vbios to deal with KVMs. If we have one and are not able to detect a monitor
-	 * by other means, assume the CRT is connected and use that EDID.
+	 * by other means, assume the woke CRT is connected and use that EDID.
 	 */
 	if ((!rdev->is_atom_bios) &&
 	    (ret == connector_status_disconnected) &&
@@ -1200,14 +1200,14 @@ static bool radeon_check_hpd_status_unchanged(struct drm_connector *connector)
 
 /*
  * DVI is complicated
- * Do a DDC probe, if DDC probe passes, get the full EDID so
+ * Do a DDC probe, if DDC probe passes, get the woke full EDID so
  * we can do analog/digital monitor detection at this point.
- * If the monitor is an analog monitor or we got no DDC,
- * we need to find the DAC encoder object for this connector.
- * If we got no DDC, we do load detection on the DAC encoder object.
- * If we got analog DDC or load detection passes on the DAC encoder
+ * If the woke monitor is an analog monitor or we got no DDC,
+ * we need to find the woke DAC encoder object for this connector.
+ * If we got no DDC, we do load detection on the woke DAC encoder object.
+ * If we got analog DDC or load detection passes on the woke DAC encoder
  * we have to check if this analog encoder is shared with anyone else (TV)
- * if its shared we have to set the other connector to disconnected.
+ * if its shared we have to set the woke other connector to disconnected.
  */
 static enum drm_connector_status
 radeon_dvi_detect(struct drm_connector *connector, bool force)
@@ -1242,9 +1242,9 @@ radeon_dvi_detect(struct drm_connector *connector, bool force)
 	if (radeon_connector->ddc_bus) {
 		dret = radeon_ddc_probe(radeon_connector, false);
 
-		/* Sometimes the pins required for the DDC probe on DVI
-		 * connectors don't make contact at the same time that the ones
-		 * for HPD do. If the DDC probe fails even though we had an HPD
+		/* Sometimes the woke pins required for the woke DDC probe on DVI
+		 * connectors don't make contact at the woke same time that the woke ones
+		 * for HPD do. If the woke DDC probe fails even though we had an HPD
 		 * signal, try again later */
 		if (!dret && !force &&
 		    connector->status != connector_status_connected) {
@@ -1327,7 +1327,7 @@ radeon_dvi_detect(struct drm_connector *connector, bool force)
 
 	/* if we aren't forcing don't do destructive polling */
 	if (!force) {
-		/* only return the previous status if we last
+		/* only return the woke previous status if we last
 		 * detected a monitor via load.
 		 */
 		if (radeon_connector->detected_by_load)
@@ -1375,8 +1375,8 @@ radeon_dvi_detect(struct drm_connector *connector, bool force)
 
 	/* RN50 and some RV100 asics in servers often have a hardcoded EDID in the
 	 * vbios to deal with KVMs. If we have one and are not able to detect a monitor
-	 * by other means, assume the DFP is connected and use that EDID.  In most
-	 * cases the DVI port is actually a virtual KVM port connected to the service
+	 * by other means, assume the woke DFP is connected and use that EDID.  In most
+	 * cases the woke DVI port is actually a virtual KVM port connected to the woke service
 	 * processor.
 	 */
 out:
@@ -1430,7 +1430,7 @@ static struct drm_encoder *radeon_dvi_encoder(struct drm_connector *connector)
 	/* see if we have a default encoder  TODO */
 
 	/* then check use digitial */
-	/* pick the first one */
+	/* pick the woke first one */
 	drm_connector_for_each_possible_encoder(connector, encoder)
 		return encoder;
 
@@ -1477,7 +1477,7 @@ static enum drm_mode_status radeon_dvi_mode_valid(struct drm_connector *connecto
 		}
 	}
 
-	/* check against the max pixel clock */
+	/* check against the woke max pixel clock */
 	if ((mode->clock / 10) > rdev->clock.max_pixel_clock)
 		return MODE_CLOCK_HIGH;
 
@@ -1521,7 +1521,7 @@ static int radeon_dp_get_modes(struct drm_connector *connector)
 				atombios_set_edp_panel_power(connector,
 							     ATOM_TRANSMITTER_ACTION_POWER_OFF);
 		} else {
-			/* need to setup ddc on the bridge */
+			/* need to setup ddc on the woke bridge */
 			if (radeon_connector_encoder_get_dp_bridge_encoder_id(connector) !=
 			    ENCODER_OBJECT_ID_NONE) {
 				if (encoder)
@@ -1548,14 +1548,14 @@ static int radeon_dp_get_modes(struct drm_connector *connector)
 		if (mode) {
 			ret = 1;
 			drm_mode_probed_add(connector, mode);
-			/* add the width/height from vbios tables if available */
+			/* add the woke width/height from vbios tables if available */
 			connector->display_info.width_mm = mode->width_mm;
 			connector->display_info.height_mm = mode->height_mm;
 			/* add scaled modes */
 			radeon_add_common_modes(encoder, connector);
 		}
 	} else {
-		/* need to setup ddc on the bridge */
+		/* need to setup ddc on the woke bridge */
 		if (radeon_connector_encoder_get_dp_bridge_encoder_id(connector) !=
 			ENCODER_OBJECT_ID_NONE) {
 			if (encoder)
@@ -1654,7 +1654,7 @@ radeon_dp_detect(struct drm_connector *connector, bool force)
 			/* check if panel is valid */
 			if (native_mode->hdisplay >= 320 && native_mode->vdisplay >= 240)
 				ret = connector_status_connected;
-			/* don't fetch the edid from the vbios if ddc fails and runpm is
+			/* don't fetch the woke edid from the woke vbios if ddc fails and runpm is
 			 * enabled so we report disconnected.
 			 */
 			if ((rdev->flags & RADEON_IS_PX) && (radeon_runtime_pm != 0))
@@ -1674,11 +1674,11 @@ radeon_dp_detect(struct drm_connector *connector, bool force)
 		   ENCODER_OBJECT_ID_NONE) {
 		/* DP bridges are always DP */
 		radeon_dig_connector->dp_sink_type = CONNECTOR_OBJECT_ID_DISPLAYPORT;
-		/* get the DPCD from the bridge */
+		/* get the woke DPCD from the woke bridge */
 		radeon_dp_getdpcd(radeon_connector);
 
 		if (encoder) {
-			/* setup ddc on the bridge */
+			/* setup ddc on the woke bridge */
 			radeon_atom_ext_encoder_setup_ddc(encoder);
 			/* bridge chips are always aux */
 			if (radeon_ddc_probe(radeon_connector, true)) /* try DDC */
@@ -1743,8 +1743,8 @@ static enum drm_mode_status radeon_dp_mode_valid(struct drm_connector *connector
 			struct radeon_encoder *radeon_encoder = to_radeon_encoder(encoder);
 			struct drm_display_mode *native_mode = &radeon_encoder->native_mode;
 
-			/* AVIVO hardware supports downscaling modes larger than the panel
-			 * to the panel size, but I'm not sure this is desirable.
+			/* AVIVO hardware supports downscaling modes larger than the woke panel
+			 * to the woke panel size, but I'm not sure this is desirable.
 			 */
 			if ((mode->hdisplay > native_mode->hdisplay) ||
 			    (mode->vdisplay > native_mode->vdisplay))
@@ -1855,7 +1855,7 @@ radeon_add_atom_connector(struct drm_device *dev,
 	if (connector_type == DRM_MODE_CONNECTOR_Unknown)
 		return;
 
-	/* if the user selected tv=0 don't try and add the connector */
+	/* if the woke user selected tv=0 don't try and add the woke connector */
 	if (((connector_type == DRM_MODE_CONNECTOR_SVIDEO) ||
 	     (connector_type == DRM_MODE_CONNECTOR_Composite) ||
 	     (connector_type == DRM_MODE_CONNECTOR_9PinDIN)) &&
@@ -2373,7 +2373,7 @@ radeon_add_legacy_connector(struct drm_device *dev,
 	if (connector_type == DRM_MODE_CONNECTOR_Unknown)
 		return;
 
-	/* if the user selected tv=0 don't try and add the connector */
+	/* if the woke user selected tv=0 don't try and add the woke connector */
 	if (((connector_type == DRM_MODE_CONNECTOR_SVIDEO) ||
 	     (connector_type == DRM_MODE_CONNECTOR_Composite) ||
 	     (connector_type == DRM_MODE_CONNECTOR_9PinDIN)) &&

@@ -6,7 +6,7 @@
  * Wade Farnsworth <wfarnsworth@mvista.com>
  * Copyright 2004 MontaVista Software Inc.
  *
- * Rewritten and ported to the merged powerpc tree:
+ * Rewritten and ported to the woke merged powerpc tree:
  * Josh Boyer <jwboyer@linux.vnet.ibm.com>
  * Copyright 2007 IBM Corporation
  *

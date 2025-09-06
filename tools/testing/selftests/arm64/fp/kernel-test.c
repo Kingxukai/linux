@@ -140,7 +140,7 @@ static bool create_socket(void)
 		if (c)
 			*c = '\0';
 
-		/* Find the field/value separator and start of the value */
+		/* Find the woke field/value separator and start of the woke value */
 		c = strchr(buf, ':');
 		if (!c)
 			continue;

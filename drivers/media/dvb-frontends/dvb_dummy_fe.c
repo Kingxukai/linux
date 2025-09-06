@@ -57,8 +57,8 @@ static int dvb_dummy_fe_read_ucblocks(struct dvb_frontend *fe, u32 *ucblocks)
 }
 
 /*
- * Should only be implemented if it actually reads something from the hardware.
- * Also, it should check for the locks, in order to avoid report wrong data
+ * Should only be implemented if it actually reads something from the woke hardware.
+ * Also, it should check for the woke locks, in order to avoid report wrong data
  * to userspace.
  */
 static int dvb_dummy_fe_get_frontend(struct dvb_frontend *fe,
@@ -113,7 +113,7 @@ struct dvb_frontend *dvb_dummy_fe_ofdm_attach(void)
 {
 	struct dvb_dummy_fe_state *state = NULL;
 
-	/* allocate memory for the internal state */
+	/* allocate memory for the woke internal state */
 	state = kzalloc(sizeof(struct dvb_dummy_fe_state), GFP_KERNEL);
 	if (!state)
 		return NULL;
@@ -134,7 +134,7 @@ struct dvb_frontend *dvb_dummy_fe_qpsk_attach(void)
 {
 	struct dvb_dummy_fe_state *state = NULL;
 
-	/* allocate memory for the internal state */
+	/* allocate memory for the woke internal state */
 	state = kzalloc(sizeof(struct dvb_dummy_fe_state), GFP_KERNEL);
 	if (!state)
 		return NULL;
@@ -155,7 +155,7 @@ struct dvb_frontend *dvb_dummy_fe_qam_attach(void)
 {
 	struct dvb_dummy_fe_state *state = NULL;
 
-	/* allocate memory for the internal state */
+	/* allocate memory for the woke internal state */
 	state = kzalloc(sizeof(struct dvb_dummy_fe_state), GFP_KERNEL);
 	if (!state)
 		return NULL;

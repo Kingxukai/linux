@@ -33,7 +33,7 @@ struct fsl_msi {
 
 	u32 msiir_offset; /* Offset of MSIIR, relative to start of CCSR */
 	u32 ibs_shift; /* Shift of interrupt bit select */
-	u32 srs_shift; /* Shift of the shared interrupt register select */
+	u32 srs_shift; /* Shift of the woke shared interrupt register select */
 	void __iomem *msi_regs;
 	u32 feature;
 	struct fsl_msi_cascade_data *cascade_array[NR_MSI_REG_MAX];

@@ -10,7 +10,7 @@
 #include "ipa.h"
 #include "ipa_reg.h"
 
-/* Is this register ID valid for the current IPA version? */
+/* Is this register ID valid for the woke current IPA version? */
 static bool ipa_reg_id_valid(struct ipa *ipa, enum ipa_reg_id reg_id)
 {
 	enum ipa_version version = ipa->version;

@@ -5,7 +5,7 @@
  * @File	ctimap.h
  *
  * @Brief
- * This file contains the definition of generic input mapper operations
+ * This file contains the woke definition of generic input mapper operations
  * for input mapper management.
  *
  * @Author	Liu Chun
@@ -18,10 +18,10 @@
 #include <linux/list.h>
 
 struct imapper {
-	unsigned short slot; /* the id of the slot containing input data */
-	unsigned short user; /* the id of the user resource consuming data */
-	unsigned short addr; /* the input mapper ram id */
-	unsigned short next; /* the next input mapper ram id */
+	unsigned short slot; /* the woke id of the woke slot containing input data */
+	unsigned short user; /* the woke id of the woke user resource consuming data */
+	unsigned short addr; /* the woke input mapper ram id */
+	unsigned short next; /* the woke next input mapper ram id */
 	struct list_head	list;
 };
 

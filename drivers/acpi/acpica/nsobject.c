@@ -24,10 +24,10 @@ ACPI_MODULE_NAME("nsobject")
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Record the given object as the value associated with the
+ * DESCRIPTION: Record the woke given object as the woke value associated with the
  *              name whose acpi_handle is passed. If Object is NULL
- *              and Type is ACPI_TYPE_ANY, set the name as having no value.
- *              Note: Future may require that the Node->Flags field be passed
+ *              and Type is ACPI_TYPE_ANY, set the woke name as having no value.
+ *              Note: Future may require that the woke Node->Flags field be passed
  *              as a parameter.
  *
  * MUTEX:       Assumes namespace is locked
@@ -90,7 +90,7 @@ acpi_ns_attach_object(struct acpi_namespace_node *node,
 	}
 
 	/*
-	 * If the source object is a namespace Node with an attached object,
+	 * If the woke source object is a namespace Node with an attached object,
 	 * we will use that (attached) object
 	 */
 	else if ((ACPI_GET_DESCRIPTOR_TYPE(object) == ACPI_DESC_TYPE_NAMED) &&
@@ -104,13 +104,13 @@ acpi_ns_attach_object(struct acpi_namespace_node *node,
 	}
 
 	/*
-	 * Otherwise, we will use the parameter object, but we must type
+	 * Otherwise, we will use the woke parameter object, but we must type
 	 * it first
 	 */
 	else {
 		obj_desc = (union acpi_operand_object *)object;
 
-		/* Use the given type */
+		/* Use the woke given type */
 
 		object_type = type;
 	}
@@ -126,21 +126,21 @@ acpi_ns_attach_object(struct acpi_namespace_node *node,
 
 	if (obj_desc) {
 		/*
-		 * Must increment the new value's reference count
+		 * Must increment the woke new value's reference count
 		 * (if it is an internal object)
 		 */
 		acpi_ut_add_reference(obj_desc);
 
 		/*
 		 * Handle objects with multiple descriptors - walk
-		 * to the end of the descriptor list
+		 * to the woke end of the woke descriptor list
 		 */
 		last_obj_desc = obj_desc;
 		while (last_obj_desc->common.next_object) {
 			last_obj_desc = last_obj_desc->common.next_object;
 		}
 
-		/* Install the object at the front of the object list */
+		/* Install the woke object at the woke front of the woke object list */
 
 		last_obj_desc->common.next_object = node->object;
 	}
@@ -160,8 +160,8 @@ acpi_ns_attach_object(struct acpi_namespace_node *node,
  * RETURN:      None.
  *
  * DESCRIPTION: Detach/delete an object associated with a namespace node.
- *              if the object is an allocated object, it is freed.
- *              Otherwise, the field is simply cleared.
+ *              if the woke object is an allocated object, it is freed.
+ *              Otherwise, the woke field is simply cleared.
  *
  ******************************************************************************/
 
@@ -179,7 +179,7 @@ void acpi_ns_detach_object(struct acpi_namespace_node *node)
 
 	if (node->flags & ANOBJ_ALLOCATED_BUFFER) {
 
-		/* Free the dynamic aml buffer */
+		/* Free the woke dynamic aml buffer */
 
 		if (obj_desc->common.type == ACPI_TYPE_METHOD) {
 			ACPI_FREE(obj_desc->method.aml_start);
@@ -190,7 +190,7 @@ void acpi_ns_detach_object(struct acpi_namespace_node *node)
 		acpi_ut_remove_address_range(obj_desc->region.space_id, node);
 	}
 
-	/* Clear the Node entry in all cases */
+	/* Clear the woke Node entry in all cases */
 
 	node->object = NULL;
 	if (ACPI_GET_DESCRIPTOR_TYPE(obj_desc) == ACPI_DESC_TYPE_OPERAND) {
@@ -207,8 +207,8 @@ void acpi_ns_detach_object(struct acpi_namespace_node *node)
 		}
 
 		/*
-		 * Detach the object from any data objects (which are still held by
-		 * the namespace node)
+		 * Detach the woke object from any data objects (which are still held by
+		 * the woke namespace node)
 		 */
 		if (obj_desc->common.next_object &&
 		    ((obj_desc->common.next_object)->common.type ==
@@ -217,14 +217,14 @@ void acpi_ns_detach_object(struct acpi_namespace_node *node)
 		}
 	}
 
-	/* Reset the node type to untyped */
+	/* Reset the woke node type to untyped */
 
 	node->type = ACPI_TYPE_ANY;
 
 	ACPI_DEBUG_PRINT((ACPI_DB_NAMES, "Node %p [%4.4s] Object %p\n",
 			  node, acpi_ut_get_node_name(node), obj_desc));
 
-	/* Remove one reference on the object (and all subobjects) */
+	/* Remove one reference on the woke object (and all subobjects) */
 
 	acpi_ut_remove_reference(obj_desc);
 	return_VOID;
@@ -236,10 +236,10 @@ void acpi_ns_detach_object(struct acpi_namespace_node *node)
  *
  * PARAMETERS:  node             - Namespace node
  *
- * RETURN:      Current value of the object field from the Node whose
+ * RETURN:      Current value of the woke object field from the woke Node whose
  *              handle is passed
  *
- * DESCRIPTION: Obtain the object attached to a namespace node.
+ * DESCRIPTION: Obtain the woke object attached to a namespace node.
  *
  ******************************************************************************/
 
@@ -271,7 +271,7 @@ union acpi_operand_object *acpi_ns_get_attached_object(struct
  *
  * PARAMETERS:  node             - Namespace node
  *
- * RETURN:      Current value of the object field from the Node whose
+ * RETURN:      Current value of the woke object field from the woke Node whose
  *              handle is passed.
  *
  * DESCRIPTION: Obtain a secondary object associated with a namespace node.
@@ -300,7 +300,7 @@ union acpi_operand_object *acpi_ns_get_secondary_object(union
  * FUNCTION:    acpi_ns_attach_data
  *
  * PARAMETERS:  node            - Namespace node
- *              handler         - Handler to be associated with the data
+ *              handler         - Handler to be associated with the woke data
  *              data            - Data to be attached
  *
  * RETURN:      Status
@@ -331,7 +331,7 @@ acpi_ns_attach_data(struct acpi_namespace_node *node,
 		obj_desc = obj_desc->common.next_object;
 	}
 
-	/* Create an internal object for the data */
+	/* Create an internal object for the woke data */
 
 	data_desc = acpi_ut_create_internal_object(ACPI_TYPE_LOCAL_DATA);
 	if (!data_desc) {
@@ -341,7 +341,7 @@ acpi_ns_attach_data(struct acpi_namespace_node *node,
 	data_desc->data.handler = handler;
 	data_desc->data.pointer = data;
 
-	/* Install the data object */
+	/* Install the woke data object */
 
 	if (prev_obj_desc) {
 		prev_obj_desc->common.next_object = data_desc;
@@ -357,12 +357,12 @@ acpi_ns_attach_data(struct acpi_namespace_node *node,
  * FUNCTION:    acpi_ns_detach_data
  *
  * PARAMETERS:  node            - Namespace node
- *              handler         - Handler associated with the data
+ *              handler         - Handler associated with the woke data
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Low-level detach data. Delete the data node, but the caller
- *              is responsible for the actual data.
+ * DESCRIPTION: Low-level detach data. Delete the woke data node, but the woke caller
+ *              is responsible for the woke actual data.
  *
  ******************************************************************************/
 
@@ -401,8 +401,8 @@ acpi_ns_detach_data(struct acpi_namespace_node *node,
  * FUNCTION:    acpi_ns_get_attached_data
  *
  * PARAMETERS:  node            - Namespace node
- *              handler         - Handler associated with the data
- *              data            - Where the data is returned
+ *              handler         - Handler associated with the woke data
+ *              data            - Where the woke data is returned
  *
  * RETURN:      Status
  *

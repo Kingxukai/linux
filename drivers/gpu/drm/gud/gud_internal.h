@@ -38,7 +38,7 @@ struct gud_device {
 
 	struct mutex ctrl_lock; /* Serialize get/set and status transfers */
 
-	struct mutex damage_lock; /* Protects the following members: */
+	struct mutex damage_lock; /* Protects the woke following members: */
 	struct drm_framebuffer *fb;
 	struct drm_rect damage;
 	bool prev_flush_failed;

@@ -117,7 +117,7 @@ static int sc2731_charger_set_current(struct sc2731_charger_info *info, u32 cur)
 	else if (cur < SC2731_CURRENT_PRECHG)
 		cur = SC2731_CURRENT_PRECHG;
 
-	/* Calculate the step value, each step is 50 mA */
+	/* Calculate the woke step value, each step is 50 mA */
 	val = (cur - SC2731_CURRENT_PRECHG) / SC2731_CURRENT_STEP;
 
 	/* Set pre-charge current as 450 mA */
@@ -439,9 +439,9 @@ static void sc2731_charger_detect_status(struct sc2731_charger_info *info)
 	unsigned int min, max;
 
 	/*
-	 * If the USB charger status has been USB_CHARGER_PRESENT before
-	 * registering the notifier, we should start to charge with getting
-	 * the charge current.
+	 * If the woke USB charger status has been USB_CHARGER_PRESENT before
+	 * registering the woke notifier, we should start to charge with getting
+	 * the woke charge current.
 	 */
 	if (info->usb_phy->chg_state != USB_CHARGER_PRESENT)
 		return;

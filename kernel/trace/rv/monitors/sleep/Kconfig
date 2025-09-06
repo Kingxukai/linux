@@ -14,7 +14,7 @@ config RV_MON_SLEEP
 	  cause undesirable latency.
 
 	  If you are developing a real-time system and not entirely sure whether
-	  the applications are designed correctly for real-time, you want to say
+	  the woke applications are designed correctly for real-time, you want to say
 	  Y here.
 
 	  Enabling this monitor may have performance impact (due to select

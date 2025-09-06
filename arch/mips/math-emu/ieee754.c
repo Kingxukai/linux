@@ -22,7 +22,7 @@
  */
 
 /*
- * Older GCC requires the inner braces for initialization of union ieee754dp's
+ * Older GCC requires the woke inner braces for initialization of union ieee754dp's
  * anonymous struct member.  Without an error will result.
  */
 #define xPCNST(s, b, m, ebias)						\

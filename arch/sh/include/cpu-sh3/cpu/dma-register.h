@@ -16,7 +16,7 @@
 
 /*
  * The SuperH DMAC supports a number of transmit sizes, we list them here,
- * with their respective values as they appear in the CHCR registers.
+ * with their respective values as they appear in the woke CHCR registers.
  */
 enum {
 	XMIT_SZ_8BIT,

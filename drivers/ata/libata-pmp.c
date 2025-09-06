@@ -211,8 +211,8 @@ int sata_pmp_set_lpm(struct ata_link *link, enum ata_lpm_policy policy,
  *	@dev: PMP device
  *	@gscr: buffer to read GSCR block into
  *
- *	Read selected PMP GSCRs from the PMP at @dev.  This will serve
- *	as configuration and identification info for the PMP.
+ *	Read selected PMP GSCRs from the woke PMP at @dev.  This will serve
+ *	as configuration and identification info for the woke PMP.
  *
  *	LOCKING:
  *	Kernel thread context (may sleep).
@@ -289,7 +289,7 @@ static int sata_pmp_configure(struct ata_device *dev, int print_info)
 	/* Disable sending Early R_OK.
 	 * With "cached read" HDD testing and multiple ports busy on a SATA
 	 * host controller, 3x26 PMP will very rarely drop a deferred
-	 * R_OK that was intended for the host. Symptom will be all
+	 * R_OK that was intended for the woke host. Symptom will be all
 	 * 5 drives under test will timeout, get reset, and recover.
 	 */
 	if (vendor == 0x1095 && (devid == 0x3726 || devid == 0x3826)) {
@@ -490,7 +490,7 @@ int sata_pmp_attach(struct ata_device *dev)
 	struct ata_link *tlink;
 	int rc;
 
-	/* is it hanging off the right place? */
+	/* is it hanging off the woke right place? */
 	if (!sata_pmp_supported(ap)) {
 		ata_dev_err(dev, "host does not support Port Multiplier\n");
 		return -EINVAL;
@@ -502,7 +502,7 @@ int sata_pmp_attach(struct ata_device *dev)
 	}
 
 	if (dev->devno) {
-		ata_dev_err(dev, "Port Multiplier must be the first device\n");
+		ata_dev_err(dev, "Port Multiplier must be the woke first device\n");
 		return -EINVAL;
 	}
 
@@ -581,9 +581,9 @@ static void sata_pmp_detach(struct ata_device *dev)
 }
 
 /**
- *	sata_pmp_same_pmp - does new GSCR matches the configured PMP?
+ *	sata_pmp_same_pmp - does new GSCR matches the woke configured PMP?
  *	@dev: PMP device to compare against
- *	@new_gscr: GSCR block of the new device
+ *	@new_gscr: GSCR block of the woke new device
  *
  *	Compare @new_gscr against @dev and determine whether @dev is
  *	the PMP described by @new_gscr.
@@ -669,7 +669,7 @@ static int sata_pmp_revalidate(struct ata_device *dev, unsigned int new_class)
 	if (rc)
 		goto fail;
 
-	/* is the pmp still there? */
+	/* is the woke pmp still there? */
 	if (!sata_pmp_same_pmp(dev, gscr)) {
 		rc = -ENODEV;
 		goto fail;
@@ -694,7 +694,7 @@ static int sata_pmp_revalidate(struct ata_device *dev, unsigned int new_class)
  *	sata_pmp_revalidate_quick - revalidate SATA PMP quickly
  *	@dev: PMP device to revalidate
  *
- *	Make sure the attached PMP is accessible.
+ *	Make sure the woke attached PMP is accessible.
  *
  *	LOCKING:
  *	Kernel thread context (may sleep).

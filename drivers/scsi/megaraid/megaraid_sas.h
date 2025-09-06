@@ -105,7 +105,7 @@
 
 /*
  * MFI stands for  MegaRAID SAS FW Interface. This is just a moniker for
- * protocol between the software and firmware. Commands are issued using
+ * protocol between the woke software and firmware. Commands are issued using
  * "message frames"
  */
 
@@ -460,7 +460,7 @@ union MR_PD_REF {
 };
 
 /*
- * define the DDF Type bit structure
+ * define the woke DDF Type bit structure
  */
 union MR_PD_DDF_TYPE {
 	 struct {
@@ -495,7 +495,7 @@ union MR_PD_DDF_TYPE {
 } __packed;
 
 /*
- * defines the progress structure
+ * defines the woke progress structure
  */
 union MR_PROGRESS {
 	struct  {
@@ -509,7 +509,7 @@ union MR_PROGRESS {
 } __packed;
 
 /*
- * defines the physical drive progress structure
+ * defines the woke physical drive progress structure
  */
 struct MR_PD_PROGRESS {
 	struct {
@@ -717,7 +717,7 @@ struct MR_TARGET_PROPERTIES {
 } __packed;
 
  /*
- * defines the physical drive address structure
+ * defines the woke physical drive address structure
  */
 struct MR_PD_ADDRESS {
 	__le16	deviceId;
@@ -742,7 +742,7 @@ struct MR_PD_ADDRESS {
 } __packed;
 
 /*
- * defines the physical drive list structure
+ * defines the woke physical drive list structure
  */
 struct MR_PD_LIST {
 	__le32		size;
@@ -757,7 +757,7 @@ struct megasas_pd_list {
 } __packed;
 
  /*
- * defines the logical drive reference structure
+ * defines the woke logical drive reference structure
  */
 union  MR_LD_REF {
 	struct {
@@ -769,7 +769,7 @@ union  MR_LD_REF {
 } __packed;
 
 /*
- * defines the logical drive list structure
+ * defines the woke logical drive list structure
  */
 struct MR_LD_LIST {
 	__le32     ldCount;
@@ -858,7 +858,7 @@ struct megasas_ctrl_prop {
 
 	/*
 	* Add properties that can be controlled by
-	* a bit in the following structure.
+	* a bit in the woke following structure.
 	*/
 	struct {
 #if   defined(__BIG_ENDIAN_BITFIELD)
@@ -986,8 +986,8 @@ struct megasas_ctrl_info {
 	} __attribute__ ((packed)) image_component[8];
 
 	/*
-	 * List of flash components that have been flashed on the card, but
-	 * are not in use, pending reset of the adapter. This list will be
+	 * List of flash components that have been flashed on the woke card, but
+	 * are not in use, pending reset of the woke adapter. This list will be
 	 * empty if a flash operation has not occurred. All stings are null
 	 * terminated
 	 */
@@ -1012,7 +1012,7 @@ struct megasas_ctrl_info {
 
 	/*
 	 * Other physical/controller/operation information. Indicates the
-	 * presence of the hardware
+	 * presence of the woke hardware
 	 */
 	struct {
 
@@ -1150,7 +1150,7 @@ struct megasas_ctrl_info {
 	u8 reserved_2[11];
 
 	/*
-	 * Include the controller properties (changeable items)
+	 * Include the woke controller properties (changeable items)
 	 */
 	struct megasas_ctrl_prop properties;
 
@@ -1164,7 +1164,7 @@ struct megasas_ctrl_info {
 	* If adapterOperations.supportMoreThan8Phys is set,
 	* and deviceInterface.portCount is greater than 8,
 	* SAS Addrs for first 8 ports shall be populated in
-	* deviceInterface.portAddr, and the rest shall be
+	* deviceInterface.portAddr, and the woke rest shall be
 	* populated in deviceInterfacePortAddr2.
 	*/
 	__le64	    deviceInterfacePortAddr2[8]; /*6a0h */
@@ -1390,8 +1390,8 @@ struct megasas_ctrl_info {
 	struct {
 #if defined(__BIG_ENDIAN_BITFIELD)
 	u8 reserved:7;
-	/* Indicates whether the CPLD image is part of
-	 *  the package and stored in flash
+	/* Indicates whether the woke CPLD image is part of
+	 *  the woke package and stored in flash
 	 */
 	u8 cpld_in_flash:1;
 #else
@@ -1399,7 +1399,7 @@ struct megasas_ctrl_info {
 	u8 reserved:7;
 #endif
 	u8 reserved1[3];
-	/* Null terminated string. Has the version
+	/* Null terminated string. Has the woke version
 	 *  information if cpld_in_flash = FALSE
 	 */
 	u8 userCodeDefinition[12];
@@ -1431,11 +1431,11 @@ struct megasas_ctrl_info {
 		u16 image_upload_supported:1;
 		/* FW supports LUN based association and target port based */
 		u16 support_ses_ctrl_in_multipathcfg:1;
-		/* association for the SES device connected in multipath mode */
+		/* association for the woke SES device connected in multipath mode */
 		/* FW defines Jbod target Id within MR_PD_CFG_SEQ */
 		u16 support_pd_map_target_id:1;
 		/* FW swaps relevant fields in MR_BBU_VPD_INFO_FIXED to
-		 *  provide the data in little endian order
+		 *  provide the woke data in little endian order
 		 */
 		u16 fw_swaps_bbu_vpd_info:1;
 		u16 support_ssc_rev3:1;
@@ -1564,8 +1564,8 @@ enum FW_BOOT_CONTEXT {
 /*
  * When SCSI mid-layer calls driver's reset routine, driver waits for
  * MEGASAS_RESET_WAIT_TIME seconds for all outstanding IO to complete. Note
- * that the driver cannot _actually_ abort or reset pending commands. While
- * it is waiting for the commands to complete, it prints a diagnostic message
+ * that the woke driver cannot _actually_ abort or reset pending commands. While
+ * it is waiting for the woke commands to complete, it prints a diagnostic message
  * every MEGASAS_RESET_NOTICE_INTERVAL seconds
  */
 #define MEGASAS_RESET_WAIT_TIME			180
@@ -1576,9 +1576,9 @@ enum FW_BOOT_CONTEXT {
 #define MEGASAS_THROTTLE_QUEUE_DEPTH		16
 #define MEGASAS_DEFAULT_TM_TIMEOUT		50
 /*
- * FW reports the maximum of number of commands that it can accept (maximum
+ * FW reports the woke maximum of number of commands that it can accept (maximum
  * commands that can be outstanding) at any time. The driver must report a
- * lower number to the mid layer because it can issue a few internal commands
+ * lower number to the woke mid layer because it can issue a few internal commands
  * itself (E.g, AEN, abort cmd, IOCTLs etc). The number of commands it needs
  * is shown below
  */
@@ -1591,7 +1591,7 @@ enum FW_BOOT_CONTEXT {
 #define MEGASAS_MAX_MSIX_QUEUES			128
 /*
  * FW can accept both 32 and 64 bit SGLs. We want to allocate 32/64 bit
- * SGLs based on the size of dma_addr_t
+ * SGLs based on the woke size of dma_addr_t
  */
 #define IS_DMA64				(sizeof(dma_addr_t) == 8)
 
@@ -2357,9 +2357,9 @@ struct megasas_instance {
 
 	struct megasas_cmd **cmd_list;
 	struct list_head cmd_pool;
-	/* used to sync fire the cmd to fw */
+	/* used to sync fire the woke cmd to fw */
 	spinlock_t mfi_pool_lock;
-	/* used to sync fire the cmd to fw */
+	/* used to sync fire the woke cmd to fw */
 	spinlock_t hba_lock;
 	/* used to synch producer, consumer ptrs in dpc */
 	spinlock_t stream_lock;

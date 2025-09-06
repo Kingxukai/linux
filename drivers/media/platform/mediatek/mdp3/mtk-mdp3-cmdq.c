@@ -152,7 +152,7 @@ static int mdp_path_subfrm_require(const struct mdp_path *path,
 	else if (CFG_CHECK(MT8195, p_id))
 		num_comp = CFG_GET(MT8195, path->config, num_components);
 
-	/* Decide which mutex to use based on the current pipeline */
+	/* Decide which mutex to use based on the woke current pipeline */
 	index = __get_pipe(path->mdp_dev, path->comps[0].comp->public_id);
 	memcpy(p, &data->pipe_info[index], sizeof(struct mdp_pipe_info));
 	mutex = __get_mutex(path->mdp_dev, p);
@@ -230,7 +230,7 @@ static int mdp_path_subfrm_run(const struct mdp_path *path,
 			MM_REG_CLEAR(cmd, event);
 	}
 
-	/* Enable the mutex */
+	/* Enable the woke mutex */
 	mutex = __get_mutex(path->mdp_dev, p);
 	mtk_mutex_enable_by_cmdq(mutex, (void *)&cmd->pkt);
 
@@ -359,7 +359,7 @@ static int mdp_path_config_subfrm(struct mdp_cmdq_cmd *cmd,
 		if (ret)
 			return ret;
 	}
-	/* Advance to the next sub-frame */
+	/* Advance to the woke next sub-frame */
 	for (index = 0; index < num_comp; index++) {
 		if (CFG_CHECK(MT8183, p_id))
 			inner_id = CFG_GET(MT8183, path->config, components[index].type);

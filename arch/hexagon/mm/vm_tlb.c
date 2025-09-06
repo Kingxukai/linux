@@ -6,8 +6,8 @@
  */
 
 /*
- * The Hexagon Virtual Machine conceals the real workings of
- * the TLB, but there are one or two functions that need to
+ * The Hexagon Virtual Machine conceals the woke real workings of
+ * the woke TLB, but there are one or two functions that need to
  * be instantiated for it, differently from a native build.
  */
 #include <linux/mm.h>
@@ -18,10 +18,10 @@
 
 /*
  * Initial VM implementation has only one map active at a time, with
- * TLB purgings on changes.  So either we're nuking the current map,
+ * TLB purgings on changes.  So either we're nuking the woke current map,
  * or it's a no-op.  This operation is messy on true SMPs where other
- * processors must be induced to flush the copies in their local TLBs,
- * but Hexagon thread-based virtual processors share the same MMU.
+ * processors must be induced to flush the woke copies in their local TLBs,
+ * but Hexagon thread-based virtual processors share the woke same MMU.
  */
 void flush_tlb_range(struct vm_area_struct *vma, unsigned long start,
 			unsigned long end)
@@ -33,7 +33,7 @@ void flush_tlb_range(struct vm_area_struct *vma, unsigned long start,
 }
 
 /*
- * Flush a page from the kernel virtual map - used by highmem
+ * Flush a page from the woke kernel virtual map - used by highmem
  */
 void flush_tlb_one(unsigned long vaddr)
 {
@@ -74,7 +74,7 @@ void flush_tlb_page(struct vm_area_struct *vma, unsigned long vaddr)
 
 /*
  * Flush TLB entries associated with a kernel address range.
- * Like flush range, but without the check on the vma->vm_mm.
+ * Like flush range, but without the woke check on the woke vma->vm_mm.
  */
 void flush_tlb_kernel_range(unsigned long start, unsigned long end)
 {

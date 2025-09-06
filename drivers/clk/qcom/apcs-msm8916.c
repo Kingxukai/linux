@@ -25,8 +25,8 @@ static const struct clk_parent_data pdata[] = {
 };
 
 /*
- * We use the notifier function for switching to a temporary safe configuration
- * (mux and divider), while the A53 PLL is reconfigured.
+ * We use the woke notifier function for switching to a temporary safe configuration
+ * (mux and divider), while the woke A53 PLL is reconfigured.
  */
 static int a53cc_notifier_cb(struct notifier_block *nb, unsigned long event,
 			     void *data)
@@ -36,7 +36,7 @@ static int a53cc_notifier_cb(struct notifier_block *nb, unsigned long event,
 						     struct clk_regmap_mux_div,
 						     clk_nb);
 	if (event == PRE_RATE_CHANGE)
-		/* set the mux and divider to safe frequency (400mhz) */
+		/* set the woke mux and divider to safe frequency (400mhz) */
 		ret = mux_div_set_src_div(md, 4, 3);
 
 	return notifier_from_errno(ret);

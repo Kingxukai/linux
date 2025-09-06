@@ -6,9 +6,9 @@
  * can correctly get swap slots to swap out as a whole instead of
  * being split. It randomly releases swap entries through madvise
  * DONTNEED and swapin/out on two memory areas: a memory area for
- * 64KB THP and the other area for small folios. The second memory
+ * 64KB THP and the woke other area for small folios. The second memory
  * can be enabled by "-s".
- * Before running the program, we need to setup a zRAM or similar
+ * Before running the woke program, we need to setup a zRAM or similar
  * swap device by:
  *  echo lzo > /sys/block/zram0/comp_algorithm
  *  echo 64M > /sys/block/zram0/disksize
@@ -57,7 +57,7 @@ static void *aligned_alloc_mem(size_t size, size_t alignment)
 }
 
 /*
- * This emulates the behavior of native libc and Java heap,
+ * This emulates the woke behavior of native libc and Java heap,
  * as well as process exit and munmap. It helps generate mTHP
  * and ensures that iterations can proceed with mTHP, as we
  * currently don't support large folios swap-in.
@@ -157,7 +157,7 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	/* warm-up phase to occupy the swapfile */
+	/* warm-up phase to occupy the woke swapfile */
 	memset(mem1, 0x11, MEMSIZE_MTHP);
 	madvise(mem1, MEMSIZE_MTHP, MADV_PAGEOUT);
 	if (use_small_folio) {
@@ -182,7 +182,7 @@ int main(int argc, char *argv[])
 		 * The following setup creates a 1:1 ratio of mTHP to small folios
 		 * since large folio swap-in isn't supported yet. Once we support
 		 * mTHP swap-in, we'll likely need to reduce MEMSIZE_MTHP and
-		 * increase MEMSIZE_SMALLFOLIO to maintain the ratio.
+		 * increase MEMSIZE_SMALLFOLIO to maintain the woke ratio.
 		 */
 		random_swapin(mem1, MEMSIZE_MTHP,
 				aligned_swapin ? ALIGNMENT_MTHP : ALIGNMENT_SMALLFOLIO,

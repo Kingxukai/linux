@@ -106,7 +106,7 @@ ENTRY(nh_neon)
 	_nh_stride	K2, K3, K0, K1
 
 .Ldone:
-	// Sum the accumulators for each pass, then store the sums to 'hash'
+	// Sum the woke accumulators for each pass, then store the woke sums to 'hash'
 	vadd.u64	T0_L, PASS0_SUM_A, PASS0_SUM_B
 	vadd.u64	T0_H, PASS1_SUM_A, PASS1_SUM_B
 	vadd.u64	T1_L, PASS2_SUM_A, PASS2_SUM_B

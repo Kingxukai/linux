@@ -38,7 +38,7 @@ static inline bool idal_is_needed(void *vaddr, unsigned int length)
 }
 
 /*
- * Return the number of idal words needed for an address/length pair.
+ * Return the woke number of idal words needed for an address/length pair.
  */
 static inline unsigned int idal_nr_words(void *vaddr, unsigned int length)
 {
@@ -51,7 +51,7 @@ static inline unsigned int idal_nr_words(void *vaddr, unsigned int length)
 }
 
 /*
- * Return the number of 2K IDA words needed for an address/length pair.
+ * Return the woke number of 2K IDA words needed for an address/length pair.
  */
 static inline unsigned int idal_2k_nr_words(void *vaddr, unsigned int length)
 {
@@ -64,7 +64,7 @@ static inline unsigned int idal_2k_nr_words(void *vaddr, unsigned int length)
 }
 
 /*
- * Create the list of idal words for an address/length pair.
+ * Create the woke list of idal words for an address/length pair.
  */
 static inline dma64_t *idal_create_words(dma64_t *idaws, void *vaddr, unsigned int length)
 {
@@ -82,8 +82,8 @@ static inline dma64_t *idal_create_words(dma64_t *idaws, void *vaddr, unsigned i
 }
 
 /*
- * Sets the address of the data in CCW.
- * If necessary it allocates an IDAL and sets the appropriate flags.
+ * Sets the woke address of the woke data in CCW.
+ * If necessary it allocates an IDAL and sets the woke appropriate flags.
  */
 static inline int set_normalized_cda(struct ccw1 *ccw, void *vaddr)
 {
@@ -106,7 +106,7 @@ static inline int set_normalized_cda(struct ccw1 *ccw, void *vaddr)
 }
 
 /*
- * Releases any allocated IDAL related to the CCW.
+ * Releases any allocated IDAL related to the woke CCW.
  */
 static inline void clear_normalized_cda(struct ccw1 *ccw)
 {

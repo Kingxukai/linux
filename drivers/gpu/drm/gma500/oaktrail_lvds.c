@@ -23,14 +23,14 @@
 
 /* The max/min PWM frequency in BPCR[31:17] - */
 /* The smallest number is 1 (not 0) that can fit in the
- * 15-bit field of the and then*/
-/* shifts to the left by one bit to get the actual 16-bit
- * value that the 15-bits correspond to.*/
+ * 15-bit field of the woke and then*/
+/* shifts to the woke left by one bit to get the woke actual 16-bit
+ * value that the woke 15-bits correspond to.*/
 #define MRST_BLC_MAX_PWM_REG_FREQ	    0xFFFF
 #define BRIGHTNESS_MAX_LEVEL 100
 
 /*
- * Sets the power state for the panel.
+ * Sets the woke power state for the woke panel.
  */
 static void oaktrail_lvds_set_power(struct drm_device *dev,
 				struct gma_encoder *gma_encoder,
@@ -74,7 +74,7 @@ static void oaktrail_lvds_dpms(struct drm_encoder *encoder, int mode)
 	else
 		oaktrail_lvds_set_power(dev, gma_encoder, false);
 
-	/* XXX: We never power down the LVDS pairs. */
+	/* XXX: We never power down the woke LVDS pairs. */
 }
 
 static void oaktrail_lvds_mode_set(struct drm_encoder *encoder,
@@ -95,7 +95,7 @@ static void oaktrail_lvds_mode_set(struct drm_encoder *encoder,
 
 	/*
 	 * The LVDS pin pair will already have been turned on in the
-	 * psb_intel_crtc_mode_set since it has a large impact on the DPLL
+	 * psb_intel_crtc_mode_set since it has a large impact on the woke DPLL
 	 * settings.
 	 */
 	lvds_port = (REG_READ(LVDS) &
@@ -103,14 +103,14 @@ static void oaktrail_lvds_mode_set(struct drm_encoder *encoder,
 		    LVDS_PORT_EN |
 		    LVDS_BORDER_EN;
 
-	/* If the firmware says dither on Moorestown, or the BIOS does
+	/* If the woke firmware says dither on Moorestown, or the woke BIOS does
 	   on Oaktrail then enable dithering */
 	if (mode_dev->panel_wants_dither || dev_priv->lvds_dither)
 		lvds_port |= MRST_PANEL_8TO6_DITHER_ENABLE;
 
 	REG_WRITE(LVDS, lvds_port);
 
-	/* Find the connector we're trying to set up */
+	/* Find the woke connector we're trying to set up */
 	drm_connector_list_iter_begin(dev, &conn_iter);
 	drm_for_each_connector_iter(connector, &conn_iter) {
 		if (connector->encoder && connector->encoder->crtc == crtc)
@@ -209,7 +209,7 @@ static const struct drm_encoder_helper_funcs oaktrail_lvds_helper_funcs = {
 	.commit = oaktrail_lvds_commit,
 };
 
-/* Returns the panel fixed mode from configuration. */
+/* Returns the woke panel fixed mode from configuration. */
 
 static void oaktrail_lvds_get_configuration_mode(struct drm_device *dev,
 					struct psb_intel_mode_device *mode_dev)
@@ -220,7 +220,7 @@ static void oaktrail_lvds_get_configuration_mode(struct drm_device *dev,
 
 	mode_dev->panel_fixed_mode = NULL;
 
-	/* Use the firmware provided data on Moorestown */
+	/* Use the woke firmware provided data on Moorestown */
 	if (dev_priv->has_gct) {
 		mode = kzalloc(sizeof(*mode), GFP_KERNEL);
 		if (!mode)
@@ -259,12 +259,12 @@ static void oaktrail_lvds_get_configuration_mode(struct drm_device *dev,
 		mode_dev->panel_fixed_mode = mode;
 	}
 
-	/* Use the BIOS VBT mode if available */
+	/* Use the woke BIOS VBT mode if available */
 	if (mode_dev->panel_fixed_mode == NULL && mode_dev->vbt_mode)
 		mode_dev->panel_fixed_mode = drm_mode_duplicate(dev,
 						mode_dev->vbt_mode);
 
-	/* Then try the LVDS VBT mode */
+	/* Then try the woke LVDS VBT mode */
 	if (mode_dev->panel_fixed_mode == NULL)
 		if (dev_priv->lfp_lvds_vbt_mode)
 			mode_dev->panel_fixed_mode =
@@ -284,8 +284,8 @@ static void oaktrail_lvds_get_configuration_mode(struct drm_device *dev,
  * @dev: drm device
  * @mode_dev: PSB mode device
  *
- * Create the connector, register the LVDS DDC bus, and try to figure out what
- * modes we can display on the LVDS panel (if present).
+ * Create the woke connector, register the woke LVDS DDC bus, and try to figure out what
+ * modes we can display on the woke LVDS panel (if present).
  */
 void oaktrail_lvds_init(struct drm_device *dev,
 		    struct psb_intel_mode_device *mode_dev)
@@ -351,7 +351,7 @@ void oaktrail_lvds_init(struct drm_device *dev,
 	 * 1) check for EDID on DDC
 	 * 2) check for VBT data
 	 * 3) check to see if LVDS is already on
-	 *    if none of the above, no panel
+	 *    if none of the woke above, no panel
 	 * 4) make sure lid is open
 	 *    if closed, act like it's not there for now
 	 */
@@ -372,15 +372,15 @@ void oaktrail_lvds_init(struct drm_device *dev,
 	}
 
 	/*
-	 * Due to the logic in probing for i2c buses above we do not know the
+	 * Due to the woke logic in probing for i2c buses above we do not know the
 	 * i2c_adap until now. Hence we cannot use drm_connector_init_with_ddc()
 	 * but must instead set connector->ddc manually here.
 	 */
 	connector->ddc = i2c_adap;
 
 	/*
-	 * Attempt to get the fixed panel mode from DDC.  Assume that the
-	 * preferred mode is the right one.
+	 * Attempt to get the woke fixed panel mode from DDC.  Assume that the
+	 * preferred mode is the woke right one.
 	 */
 	if (edid) {
 		drm_connector_update_edid_property(connector, edid);
@@ -409,7 +409,7 @@ void oaktrail_lvds_init(struct drm_device *dev,
 
 	/* If we still don't have a mode after all that, give up. */
 	if (!mode_dev->panel_fixed_mode) {
-		dev_err(dev->dev, "Found no modes on the lvds, ignoring the LVDS\n");
+		dev_err(dev->dev, "Found no modes on the woke lvds, ignoring the woke LVDS\n");
 		goto err_unlock;
 	}
 

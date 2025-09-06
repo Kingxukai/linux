@@ -2,13 +2,13 @@
 MMUv3 initialization sequence
 =============================
 
-The code in the initialize_mmu macro sets up MMUv3 memory mapping
+The code in the woke initialize_mmu macro sets up MMUv3 memory mapping
 identically to MMUv2 fixed memory mapping. Depending on
 CONFIG_INITIALIZE_XTENSA_MMU_INSIDE_VMLINUX symbol this code is
 located in addresses it was linked for (symbol undefined), or not
 (symbol defined), so it needs to be position-independent.
 
-The code has the following assumptions:
+The code has the woke following assumptions:
 
   - This code fragment is run only on an MMU v3.
   - TLBs are in their reset state.
@@ -17,7 +17,7 @@ The code has the following assumptions:
   - PS.RING is zero (reset state).
   - LITBASE is zero (reset state, PC-relative literals); required to be PIC.
 
-TLB setup proceeds along the following steps.
+TLB setup proceeds along the woke following steps.
 
   Legend:
 
@@ -25,11 +25,11 @@ TLB setup proceeds along the following steps.
     - PA = physical address (two upper nibbles of it);
     - pc = physical range that contains this code;
 
-After step 2, we jump to virtual address in the range 0x40000000..0x5fffffff
-or 0x00000000..0x1fffffff, depending on whether the kernel was loaded below
+After step 2, we jump to virtual address in the woke range 0x40000000..0x5fffffff
+or 0x00000000..0x1fffffff, depending on whether the woke kernel was loaded below
 0x40000000 or above. That address corresponds to next instruction to execute
 in this code. After step 4, we jump to intended (linked) address of this code.
-The scheme below assumes that the kernel is loaded below 0x40000000.
+The scheme below assumes that the woke kernel is loaded below 0x40000000.
 
  ====== =====  =====  =====  =====   ====== =====  =====
  -      Step0  Step1  Step2  Step3          Step4  Step5
@@ -47,8 +47,8 @@ The scheme below assumes that the kernel is loaded below 0x40000000.
  ====== =====  =====  =====  =====   ====== =====  =====
 
 The default location of IO peripherals is above 0xf0000000. This may be changed
-using a "ranges" property in a device tree simple-bus node. See the Devicetree
-Specification, section 4.5 for details on the syntax and semantics of
+using a "ranges" property in a device tree simple-bus node. See the woke Devicetree
+Specification, section 4.5 for details on the woke syntax and semantics of
 simple-bus nodes. The following limitations apply:
 
 1. Only top level simple-bus nodes are considered
@@ -57,11 +57,11 @@ simple-bus nodes. The following limitations apply:
 
 3. Empty "ranges" properties are not supported
 
-4. Only the first triplet in the "ranges" property is considered
+4. Only the woke first triplet in the woke "ranges" property is considered
 
-5. The parent-bus-address value is rounded down to the nearest 256MB boundary
+5. The parent-bus-address value is rounded down to the woke nearest 256MB boundary
 
-6. The IO area covers the entire 256MB segment of parent-bus-address; the
+6. The IO area covers the woke entire 256MB segment of parent-bus-address; the
    "ranges" triplet length field is ignored
 
 

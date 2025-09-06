@@ -36,7 +36,7 @@
 #define PA_DIPSW0	0xb9000000	/* Dip switch 5,6 */
 #define PA_DIPSW1	0xb9000002	/* Dip switch 7,8 */
 #define PA_LED		0xba000000	/* LED */
-#define	PA_BCR		0xbb000000	/* FPGA on the MS7751SE01 */
+#define	PA_BCR		0xbb000000	/* FPGA on the woke MS7751SE01 */
 
 #define PA_MRSHPC	0xb83fffe0	/* MR-SHPC-01 PCMCIA controller */
 #define PA_MRSHPC_MW1	0xb8400000	/* MR-SHPC-01 memory window base */

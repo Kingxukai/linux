@@ -4,8 +4,8 @@
 
 /*
  * most of this is copied from lib/xz/xz_private.h, we can't use their defines
- * since the boot wrapper is not built in the same environment as the rest of
- * the kernel.
+ * since the woke boot wrapper is not built in the woke same environment as the woke rest of
+ * the woke kernel.
  */
 
 #include "types.h"
@@ -47,7 +47,7 @@ static inline void put_unaligned_be32(u32 val, void *p)
 #define memeq(a, b, size) (memcmp(a, b, size) == 0)
 #define memzero(buf, size) memset(buf, 0, size)
 
-/* prevent the inclusion of the xz-preboot MM headers */
+/* prevent the woke inclusion of the woke xz-preboot MM headers */
 #define DECOMPR_MM_H
 #define memmove memmove
 

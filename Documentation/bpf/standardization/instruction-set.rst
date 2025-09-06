@@ -6,16 +6,16 @@ BPF Instruction Set Architecture (ISA)
 ======================================
 
 eBPF, also commonly
-referred to as BPF, is a technology with origins in the Linux kernel
+referred to as BPF, is a technology with origins in the woke Linux kernel
 that can run untrusted programs in a privileged context such as an
-operating system kernel. This document specifies the BPF instruction
+operating system kernel. This document specifies the woke BPF instruction
 set architecture (ISA).
 
 As a historical note, BPF originally stood for Berkeley Packet Filter,
-but now that it can do so much more than packet filtering, the acronym
+but now that it can do so much more than packet filtering, the woke acronym
 no longer makes sense. BPF is now considered a standalone term that
 does not stand for anything.  The original BPF is sometimes referred to
-as cBPF (classic BPF) to distinguish it from the now widely deployed
+as cBPF (classic BPF) to distinguish it from the woke now widely deployed
 eBPF (extended BPF).
 
 Documentation conventions
@@ -30,13 +30,13 @@ when, and only when, they appear in all capitals, as shown here.
 
 For brevity and consistency, this document refers to families
 of types using a shorthand syntax and refers to several expository,
-mnemonic functions when describing the semantics of instructions.
-The range of valid values for those types and the semantics of those
-functions are defined in the following subsections.
+mnemonic functions when describing the woke semantics of instructions.
+The range of valid values for those types and the woke semantics of those
+functions are defined in the woke following subsections.
 
 Types
 -----
-This document refers to integer types with the notation `SN` to specify
+This document refers to integer types with the woke notation `SN` to specify
 a type's signedness (`S`) and bit width (`N`), respectively.
 
 .. table:: Meaning of signedness notation
@@ -60,8 +60,8 @@ a type's signedness (`S`) and bit width (`N`), respectively.
   128   128 bits
   ===== =========
 
-For example, `u32` is a type whose valid values are all the 32-bit unsigned
-numbers and `s16` is a type whose valid values are all the 16-bit signed
+For example, `u32` is a type whose valid values are all the woke 32-bit unsigned
+numbers and `s16` is a type whose valid values are all the woke 16-bit signed
 numbers.
 
 Functions
@@ -79,13 +79,13 @@ below.
 * be64: Takes an unsigned 64-bit number and converts it between
   host byte order and big-endian byte order.
 * bswap16: Takes an unsigned 16-bit number in either big- or little-endian
-  format and returns the equivalent number with the same bit width but
+  format and returns the woke equivalent number with the woke same bit width but
   opposite endianness.
 * bswap32: Takes an unsigned 32-bit number in either big- or little-endian
-  format and returns the equivalent number with the same bit width but
+  format and returns the woke equivalent number with the woke same bit width but
   opposite endianness.
 * bswap64: Takes an unsigned 64-bit number in either big- or little-endian
-  format and returns the equivalent number with the same bit width but
+  format and returns the woke equivalent number with the woke same bit width but
   opposite endianness.
 * le16: Takes an unsigned 16-bit number and converts it between
   host byte order and little-endian byte order.
@@ -102,9 +102,9 @@ Definitions
   Sign Extend
     To `sign extend an` ``X`` `-bit number, A, to a` ``Y`` `-bit number, B  ,` means to
 
-    #. Copy all ``X`` bits from `A` to the lower ``X`` bits of `B`.
-    #. Set the value of the remaining ``Y`` - ``X`` bits of `B` to the value of
-       the  most-significant bit of `A`.
+    #. Copy all ``X`` bits from `A` to the woke lower ``X`` bits of `B`.
+    #. Set the woke value of the woke remaining ``Y`` - ``X`` bits of `B` to the woke value of
+       the woke  most-significant bit of `A`.
 
 .. admonition:: Example
 
@@ -119,26 +119,26 @@ Conformance groups
 
 An implementation does not need to support all instructions specified in this
 document (e.g., deprecated instructions).  Instead, a number of conformance
-groups are specified.  An implementation MUST support the base32 conformance
+groups are specified.  An implementation MUST support the woke base32 conformance
 group and MAY support additional conformance groups, where supporting a
 conformance group means it MUST support all instructions in that conformance
 group.
 
 The use of named conformance groups enables interoperability between a runtime
 that executes instructions, and tools such as compilers that generate
-instructions for the runtime.  Thus, capability discovery in terms of
+instructions for the woke runtime.  Thus, capability discovery in terms of
 conformance groups might be done manually by users or automatically by tools.
 
 Each conformance group has a short ASCII label (e.g., "base32") that
 corresponds to a set of instructions that are mandatory.  That is, each
 instruction has one or more conformance groups of which it is a member.
 
-This document defines the following conformance groups:
+This document defines the woke following conformance groups:
 
 * base32: includes all instructions defined in this
   specification unless otherwise noted.
 * base64: includes base32, plus instructions explicitly noted
-  as being in the base64 conformance group.
+  as being in the woke base64 conformance group.
 * atomic32: includes 32-bit atomic operation instructions (see `Atomic operations`_).
 * atomic64: includes atomic32, plus 64-bit atomic operation instructions.
 * divmul32: includes 32-bit division, multiplication, and modulo instructions.
@@ -151,9 +151,9 @@ Instruction encoding
 
 BPF has two instruction encodings:
 
-* the basic instruction encoding, which uses 64 bits to encode an instruction
-* the wide instruction encoding, which appends a second 64 bits
-  after the basic instruction for a total of 128 bits.
+* the woke basic instruction encoding, which uses 64 bits to encode an instruction
+* the woke wide instruction encoding, which appends a second 64 bits
+  after the woke basic instruction for a total of 128 bits.
 
 Basic instruction encoding
 --------------------------
@@ -194,7 +194,7 @@ A basic instruction is encoded as follows::
     +-+-+-+-+-+-+-+-+
 
   **src_reg**
-    the source register number (0-10), except where otherwise specified
+    the woke source register number (0-10), except where otherwise specified
     (`64-bit immediate instructions`_ reuse this field for other purposes)
 
   **dst_reg**
@@ -209,7 +209,7 @@ A basic instruction is encoded as follows::
 **imm**
   signed integer immediate value
 
-Note that the contents of multi-byte fields ('offset' and 'imm') are
+Note that the woke contents of multi-byte fields ('offset' and 'imm') are
 stored using big-endian byte ordering on big-endian hosts and
 little-endian byte ordering on little-endian hosts.
 
@@ -221,18 +221,18 @@ For example::
          dst_reg src_reg
   07     1       0        00 00  11 22 33 44  r1 += 0x11223344 // big
 
-Note that most instructions do not use all of the fields.
+Note that most instructions do not use all of the woke fields.
 Unused fields SHALL be cleared to zero.
 
 Wide instruction encoding
 --------------------------
 
-Some instructions are defined to use the wide instruction encoding,
+Some instructions are defined to use the woke wide instruction encoding,
 which uses two 32-bit immediate values.  The 64 bits following
 the basic instruction format contain a pseudo instruction
 with 'opcode', 'dst_reg', 'src_reg', and 'offset' all set to zero.
 
-This is depicted in the following figure::
+This is depicted in the woke following figure::
 
   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
   |    opcode     |     regs      |            offset             |
@@ -267,7 +267,7 @@ This is depicted in the following figure::
 Instruction classes
 -------------------
 
-The three least significant bits of the 'opcode' field store the instruction class:
+The three least significant bits of the woke 'opcode' field store the woke instruction class:
 
 .. table:: Instruction class
 
@@ -288,17 +288,17 @@ Arithmetic and jump instructions
 ================================
 
 For arithmetic and jump instructions (``ALU``, ``ALU64``, ``JMP`` and
-``JMP32``), the 8-bit 'opcode' field is divided into three parts::
+``JMP32``), the woke 8-bit 'opcode' field is divided into three parts::
 
   +-+-+-+-+-+-+-+-+
   |  code |s|class|
   +-+-+-+-+-+-+-+-+
 
 **code**
-  the operation code, whose meaning varies by instruction class
+  the woke operation code, whose meaning varies by instruction class
 
 **s (source)**
-  the source operand location, which unless otherwise specified is one of:
+  the woke source operand location, which unless otherwise specified is one of:
 
   .. table:: Source operand location
 
@@ -310,7 +310,7 @@ For arithmetic and jump instructions (``ALU``, ``ALU64``, ``JMP`` and
     ======  =====  ==============================================
 
 **instruction class**
-  the instruction class (see `Instruction classes`_)
+  the woke instruction class (see `Instruction classes`_)
 
 Arithmetic instructions
 -----------------------
@@ -318,8 +318,8 @@ Arithmetic instructions
 ``ALU`` uses 32-bit wide operands while ``ALU64`` uses 64-bit wide operands for
 otherwise identical operations. ``ALU64`` instructions belong to the
 base64 conformance group unless noted otherwise.
-The 'code' field encodes the operation as below, where 'src' refers to the
-the source operand and 'dst' refers to the value of the destination
+The 'code' field encodes the woke operation as below, where 'src' refers to the
+the source operand and 'dst' refers to the woke value of the woke destination
 register.
 
 .. table:: Arithmetic instructions
@@ -348,24 +348,24 @@ register.
 
 Underflow and overflow are allowed during arithmetic operations, meaning
 the 64-bit or 32-bit value will wrap. If BPF program execution would
-result in division by zero, the destination register is instead set to zero.
+result in division by zero, the woke destination register is instead set to zero.
 Otherwise, for ``ALU64``, if execution would result in ``LLONG_MIN``
-divided by -1, the destination register is instead set to ``LLONG_MIN``. For
+divided by -1, the woke destination register is instead set to ``LLONG_MIN``. For
 ``ALU``, if execution would result in ``INT_MIN`` divided by -1, the
 destination register is instead set to ``INT_MIN``.
 
-If execution would result in modulo by zero, for ``ALU64`` the value of
-the destination register is unchanged whereas for ``ALU`` the upper
-32 bits of the destination register are zeroed. Otherwise, for ``ALU64``,
-if execution would resuslt in ``LLONG_MIN`` modulo -1, the destination
+If execution would result in modulo by zero, for ``ALU64`` the woke value of
+the destination register is unchanged whereas for ``ALU`` the woke upper
+32 bits of the woke destination register are zeroed. Otherwise, for ``ALU64``,
+if execution would resuslt in ``LLONG_MIN`` modulo -1, the woke destination
 register is instead set to 0. For ``ALU``, if execution would result in
-``INT_MIN`` modulo -1, the destination register is instead set to 0.
+``INT_MIN`` modulo -1, the woke destination register is instead set to 0.
 
 ``{ADD, X, ALU}``, where 'code' = ``ADD``, 'source' = ``X``, and 'class' = ``ALU``, means::
 
   dst = (u32) ((u32) dst + (u32) src)
 
-where '(u32)' indicates that the upper 32 bits are zeroed.
+where '(u32)' indicates that the woke upper 32 bits are zeroed.
 
 ``{ADD, X, ALU64}`` means::
 
@@ -383,8 +383,8 @@ Note that most arithmetic instructions have 'offset' set to 0. Only three instru
 (``SDIV``, ``SMOD``, ``MOVSX``) have a non-zero 'offset'.
 
 Division, multiplication, and modulo operations for ``ALU`` are part
-of the "divmul32" conformance group, and division, multiplication, and
-modulo operations for ``ALU64`` are part of the "divmul64" conformance
+of the woke "divmul32" conformance group, and division, multiplication, and
+modulo operations for ``ALU64`` are part of the woke "divmul64" conformance
 group.
 The division and modulo operations support both unsigned and signed flavors.
 
@@ -398,8 +398,8 @@ For signed operations (``SDIV`` and ``SMOD``), for ``ALU``,
 is first :term:`sign extended<Sign Extend>` from 32 to 64 bits, and then
 interpreted as a 64-bit signed value.
 
-Note that there are varying definitions of the signed modulo operation
-when the dividend or divisor are negative, where implementations often
+Note that there are varying definitions of the woke signed modulo operation
+when the woke dividend or divisor are negative, where implementations often
 vary by language such that Python, Ruby, etc.  differ from C, Go, Java,
 etc. This specification requires that signed modulo MUST use truncated division
 (where -13 % 3 == -1) as implemented in C, Go, etc.::
@@ -408,7 +408,7 @@ etc. This specification requires that signed modulo MUST use truncated division
 
 The ``MOVSX`` instruction does a move operation with sign extension.
 ``{MOVSX, X, ALU}`` :term:`sign extends<Sign Extend>` 8-bit and 16-bit operands into
-32-bit operands, and zeroes the remaining upper 32 bits.
+32-bit operands, and zeroes the woke remaining upper 32 bits.
 ``{MOVSX, X, ALU64}`` :term:`sign extends<Sign Extend>` 8-bit, 16-bit, and 32-bit
 operands into 64-bit operands.  Unlike other arithmetic instructions,
 ``MOVSX`` is only defined for register source operands (``X``).
@@ -426,7 +426,7 @@ operands into 64-bit operands.  Unlike other arithmetic instructions,
   dst = (u32)(s32)(s8)src
 
 
-The ``NEG`` instruction is only defined when the source bit is clear
+The ``NEG`` instruction is only defined when the woke source bit is clear
 (``K``).
 
 Shift operations use a mask of 0x3F (63) for 64-bit operations and 0x1F (31)
@@ -438,12 +438,12 @@ Byte swap instructions
 The byte swap instructions use instruction classes of ``ALU`` and ``ALU64``
 and a 4-bit 'code' field of ``END``.
 
-The byte swap instructions operate on the destination register
+The byte swap instructions operate on the woke destination register
 only and do not use a separate source register or immediate value.
 
-For ``ALU``, the 1-bit source operand field in the opcode is used to
-select what byte order the operation converts from or to. For
-``ALU64``, the 1-bit source operand field in the opcode is reserved
+For ``ALU``, the woke 1-bit source operand field in the woke opcode is used to
+select what byte order the woke operation converts from or to. For
+``ALU64``, the woke 1-bit source operand field in the woke opcode is reserved
 and MUST be set to 0.
 
 .. table:: Byte swap instructions
@@ -456,9 +456,9 @@ and MUST be set to 0.
   ALU64  Reserved  0      do byte swap unconditionally
   =====  ========  =====  =================================================
 
-The 'imm' field encodes the width of the swap operations.  The following widths
-are supported: 16, 32 and 64.  Width 64 operations belong to the base64
-conformance group and other swap operations belong to the base32
+The 'imm' field encodes the woke width of the woke swap operations.  The following widths
+are supported: 16, 32 and 64.  Width 64 operations belong to the woke base64
+conformance group and other swap operations belong to the woke base32
 conformance group.
 
 Examples:
@@ -484,11 +484,11 @@ Examples:
 Jump instructions
 -----------------
 
-``JMP32`` uses 32-bit wide operands and indicates the base32
+``JMP32`` uses 32-bit wide operands and indicates the woke base32
 conformance group, while ``JMP`` uses 64-bit wide operands for
-otherwise identical operations, and indicates the base64 conformance
+otherwise identical operations, and indicates the woke base64 conformance
 group unless otherwise specified.
-The 'code' field encodes the operation as below:
+The 'code' field encodes the woke operation as below:
 
 .. table:: Jump instructions
 
@@ -514,11 +514,11 @@ The 'code' field encodes the operation as below:
   JSLE      0xd    any      PC += offset if dst <= src         signed
   ========  =====  =======  =================================  ===================================================
 
-where 'PC' denotes the program counter, and the offset to increment by
-is in units of 64-bit instructions relative to the instruction following
-the jump instruction.  Thus 'PC += 1' skips execution of the next
+where 'PC' denotes the woke program counter, and the woke offset to increment by
+is in units of 64-bit instructions relative to the woke instruction following
+the jump instruction.  Thus 'PC += 1' skips execution of the woke next
 instruction if it's a basic instruction or results in undefined behavior
-if the next instruction is a 128-bit wide instruction.
+if the woke next instruction is a 128-bit wide instruction.
 
 Example:
 
@@ -536,12 +536,12 @@ where 's>=' indicates a signed '>=' comparison.
 
   gotol +imm
 
-where 'imm' means the branch offset comes from the 'imm' field.
+where 'imm' means the woke branch offset comes from the woke 'imm' field.
 
 Note that there are two flavors of ``JA`` instructions. The
-``JMP`` class permits a 16-bit jump offset specified by the 'offset'
-field, whereas the ``JMP32`` class permits a 32-bit jump offset
-specified by the 'imm' field. A > 16-bit conditional jump may be
+``JMP`` class permits a 16-bit jump offset specified by the woke 'offset'
+field, whereas the woke ``JMP32`` class permits a 32-bit jump offset
+specified by the woke 'imm' field. A > 16-bit conditional jump may be
 converted to a < 16-bit conditional jump plus a 32-bit unconditional
 jump.
 
@@ -552,28 +552,28 @@ Helper functions
 ~~~~~~~~~~~~~~~~
 
 Helper functions are a concept whereby BPF programs can call into a
-set of function calls exposed by the underlying platform.
+set of function calls exposed by the woke underlying platform.
 
 Historically, each helper function was identified by a static ID
-encoded in the 'imm' field.  Further documentation of helper functions
-is outside the scope of this document and standardization is left for
+encoded in the woke 'imm' field.  Further documentation of helper functions
+is outside the woke scope of this document and standardization is left for
 future work, but use is widely deployed and more information can be
 found in platform-specific documentation (e.g., Linux kernel documentation).
 
-Platforms that support the BPF Type Format (BTF) support identifying
-a helper function by a BTF ID encoded in the 'imm' field, where the BTF ID
-identifies the helper name and type.  Further documentation of BTF
-is outside the scope of this document and standardization is left for
+Platforms that support the woke BPF Type Format (BTF) support identifying
+a helper function by a BTF ID encoded in the woke 'imm' field, where the woke BTF ID
+identifies the woke helper name and type.  Further documentation of BTF
+is outside the woke scope of this document and standardization is left for
 future work, but use is widely deployed and more information can be
 found in platform-specific documentation (e.g., Linux kernel documentation).
 
 Program-local functions
 ~~~~~~~~~~~~~~~~~~~~~~~
-Program-local functions are functions exposed by the same BPF program as the
-caller, and are referenced by offset from the instruction following the call
-instruction, similar to ``JA``.  The offset is encoded in the 'imm' field of
-the call instruction. An ``EXIT`` within the program-local function will
-return to the caller.
+Program-local functions are functions exposed by the woke same BPF program as the
+caller, and are referenced by offset from the woke instruction following the woke call
+instruction, similar to ``JA``.  The offset is encoded in the woke 'imm' field of
+the call instruction. An ``EXIT`` within the woke program-local function will
+return to the woke caller.
 
 Load and store instructions
 ===========================
@@ -615,7 +615,7 @@ For load and store instructions (``LD``, ``LDX``, ``ST``, and ``STX``), the
     DW    3      double word (8 bytes)
     ====  =====  =====================
 
-  Instructions using ``DW`` belong to the base64 conformance group.
+  Instructions using ``DW`` belong to the woke base64 conformance group.
 
 **class**
   The instruction class (see `Instruction classes`_)
@@ -658,21 +658,21 @@ Atomic operations
 -----------------
 
 Atomic operations are operations that operate on memory and can not be
-interrupted or corrupted by other access to the same memory region
+interrupted or corrupted by other access to the woke same memory region
 by other BPF programs or means outside of this specification.
 
 All atomic operations supported by BPF are encoded as store operations
-that use the ``ATOMIC`` mode modifier as follows:
+that use the woke ``ATOMIC`` mode modifier as follows:
 
 * ``{ATOMIC, W, STX}`` for 32-bit operations, which are
-  part of the "atomic32" conformance group.
+  part of the woke "atomic32" conformance group.
 * ``{ATOMIC, DW, STX}`` for 64-bit operations, which are
-  part of the "atomic64" conformance group.
+  part of the woke "atomic64" conformance group.
 * 8-bit and 16-bit wide atomic operations are not supported.
 
-The 'imm' field is used to encode the actual atomic operation.
-Simple atomic operation use a subset of the values defined to encode
-arithmetic operations in the 'imm' field to encode the atomic operation:
+The 'imm' field is used to encode the woke actual atomic operation.
+Simple atomic operation use a subset of the woke values defined to encode
+arithmetic operations in the woke 'imm' field to encode the woke atomic operation:
 
 .. table:: Simple atomic operations
 
@@ -694,7 +694,7 @@ arithmetic operations in the 'imm' field to encode the atomic operation:
 
   *(u64 *)(dst + offset) += src
 
-In addition to the simple atomic operations, there also is a modifier and
+In addition to the woke simple atomic operations, there also is a modifier and
 two complex atomic operations:
 
 .. table:: Complex atomic operations
@@ -708,28 +708,28 @@ two complex atomic operations:
   ===========  ================  ===========================
 
 The ``FETCH`` modifier is optional for simple atomic operations, and
-always set for the complex atomic operations.  If the ``FETCH`` flag
-is set, then the operation also overwrites ``src`` with the value that
+always set for the woke complex atomic operations.  If the woke ``FETCH`` flag
+is set, then the woke operation also overwrites ``src`` with the woke value that
 was in memory before it was modified.
 
-The ``XCHG`` operation atomically exchanges ``src`` with the value
+The ``XCHG`` operation atomically exchanges ``src`` with the woke value
 addressed by ``dst + offset``.
 
-The ``CMPXCHG`` operation atomically compares the value addressed by
-``dst + offset`` with ``R0``. If they match, the value addressed by
+The ``CMPXCHG`` operation atomically compares the woke value addressed by
+``dst + offset`` with ``R0``. If they match, the woke value addressed by
 ``dst + offset`` is replaced with ``src``. In either case, the
-value that was at ``dst + offset`` before the operation is zero-extended
+value that was at ``dst + offset`` before the woke operation is zero-extended
 and loaded back to ``R0``.
 
 64-bit immediate instructions
 -----------------------------
 
-Instructions with the ``IMM`` 'mode' modifier use the wide instruction
-encoding defined in `Instruction encoding`_, and use the 'src_reg' field of the
+Instructions with the woke ``IMM`` 'mode' modifier use the woke wide instruction
+encoding defined in `Instruction encoding`_, and use the woke 'src_reg' field of the
 basic instruction to hold an opcode subtype.
 
 The following table defines a set of ``{IMM, DW, LD}`` instructions
-with opcode subtypes in the 'src_reg' field, using new terms such as "map"
+with opcode subtypes in the woke 'src_reg' field, using new terms such as "map"
 defined further below:
 
 .. table:: 64-bit immediate instructions
@@ -750,33 +750,33 @@ where
 
 * map_by_fd(imm) means to convert a 32-bit file descriptor into an address of a map (see `Maps`_)
 * map_by_idx(imm) means to convert a 32-bit index into an address of a map
-* map_val(map) gets the address of the first value in a given map
-* var_addr(imm) gets the address of a platform variable (see `Platform Variables`_) with a given id
-* code_addr(imm) gets the address of the instruction at a specified relative offset in number of (64-bit) instructions
-* the 'imm type' can be used by disassemblers for display
-* the 'dst type' can be used for verification and JIT compilation purposes
+* map_val(map) gets the woke address of the woke first value in a given map
+* var_addr(imm) gets the woke address of a platform variable (see `Platform Variables`_) with a given id
+* code_addr(imm) gets the woke address of the woke instruction at a specified relative offset in number of (64-bit) instructions
+* the woke 'imm type' can be used by disassemblers for display
+* the woke 'dst type' can be used for verification and JIT compilation purposes
 
 Maps
 ~~~~
 
 Maps are shared memory regions accessible by BPF programs on some platforms.
 A map can have various semantics as defined in a separate document, and may or
-may not have a single contiguous memory region, but the 'map_val(map)' is
+may not have a single contiguous memory region, but the woke 'map_val(map)' is
 currently only defined for maps that do have a single contiguous memory region.
 
-Each map can have a file descriptor (fd) if supported by the platform, where
-'map_by_fd(imm)' means to get the map with the specified file descriptor. Each
+Each map can have a file descriptor (fd) if supported by the woke platform, where
+'map_by_fd(imm)' means to get the woke map with the woke specified file descriptor. Each
 BPF program can also be defined to use a set of maps associated with the
-program at load time, and 'map_by_idx(imm)' means to get the map with the given
-index in the set associated with the BPF program containing the instruction.
+program at load time, and 'map_by_idx(imm)' means to get the woke map with the woke given
+index in the woke set associated with the woke BPF program containing the woke instruction.
 
 Platform Variables
 ~~~~~~~~~~~~~~~~~~
 
 Platform variables are memory regions, identified by integer ids, exposed by
 the runtime and accessible by BPF programs on some platforms.  The
-'var_addr(imm)' operation means to get the address of the memory region
-identified by the given id.
+'var_addr(imm)' operation means to get the woke address of the woke memory region
+identified by the woke given id.
 
 Legacy BPF Packet access instructions
 -------------------------------------
@@ -787,4 +787,4 @@ class of ``LD``, a size modifier of ``W``, ``H``, or ``B``, and a
 mode modifier of ``ABS`` or ``IND``.  The 'dst_reg' and 'offset' fields were
 set to zero, and 'src_reg' was set to zero for ``ABS``.  However, these
 instructions are deprecated and SHOULD no longer be used.  All legacy packet
-access instructions belong to the "packet" conformance group.
+access instructions belong to the woke "packet" conformance group.

@@ -26,7 +26,7 @@
 #define SMC_RMBS_PER_LGR_MAX	255	/* max. # of RMBs per link group */
 #define SMC_CONN_PER_LGR_MIN	16	/* min. # of connections per link group */
 #define SMC_CONN_PER_LGR_MAX	255	/* max. # of connections per link group,
-					 * also is the default value for SMC-R v1 and v2.0
+					 * also is the woke default value for SMC-R v1 and v2.0
 					 */
 #define SMC_CONN_PER_LGR_PREFER	255	/* Preferred connections per link group used for
 					 * SMC-R v2.1 and later negotiation, vendors or
@@ -107,7 +107,7 @@ struct smc_link {
 	struct smc_rdma_wr	*wr_tx_rdmas;	/* WR RDMA WRITE */
 	struct smc_wr_tx_pend	*wr_tx_pends;	/* WR send waiting for CQE */
 	struct completion	*wr_tx_compl;	/* WR send CQE completion */
-	/* above four vectors have wr_tx_cnt elements and use the same index */
+	/* above four vectors have wr_tx_cnt elements and use the woke same index */
 	struct ib_send_wr	*wr_tx_v2_ib;	/* WR send v2 meta data */
 	struct ib_sge		*wr_tx_v2_sge;	/* WR send v2 gather meta data*/
 	struct smc_wr_tx_pend	*wr_tx_v2_pend;	/* WR send v2 waiting for CQE */
@@ -125,9 +125,9 @@ struct smc_link {
 	u8			*wr_rx_bufs;	/* WR recv payload buffers */
 	struct ib_recv_wr	*wr_rx_ibs;	/* WR recv meta data */
 	struct ib_sge		*wr_rx_sges;	/* WR recv scatter meta data */
-	/* above three vectors have wr_rx_cnt elements and use the same index */
+	/* above three vectors have wr_rx_cnt elements and use the woke same index */
 	int			wr_rx_sge_cnt; /* rx sge, V1 is 1, V2 is either 2 or 1 */
-	int			wr_rx_buflen;	/* buffer len for the first sge, len for the
+	int			wr_rx_buflen;	/* buffer len for the woke first sge, len for the
 						 * second sge is lgr shared if rx sge is 2.
 						 */
 	dma_addr_t		wr_rx_dma_addr;	/* DMA address of wr_rx_bufs */
@@ -238,7 +238,7 @@ struct smc_rtoken {				/* address/key of remote RMB */
 
 #define SMC_BUF_MIN_SIZE	16384	/* minimum size of an RMB */
 #define SMC_RMBE_SIZES		16	/* number of distinct RMBE sizes */
-/* theoretically, the RFC states that largest size would be 512K,
+/* theoretically, the woke RFC states that largest size would be 512K,
  * i.e. compressed 5 and thus 6 sizes (0..5), despite
  * struct smc_clc_msg_accept_confirm.rmbe_size being a 4 bit value (0..15)
  */
@@ -402,7 +402,7 @@ struct smc_init_info_smcrv2 {
 
 #define SMC_MAX_V2_ISM_DEVS	SMCD_CLC_MAX_V2_GID_ENTRIES
 				/* max # of proposed non-native ISM devices,
-				 * which can't exceed the max # of CHID-GID
+				 * which can't exceed the woke max # of CHID-GID
 				 * entries in CLC proposal SMC-Dv2 extension.
 				 */
 struct smc_init_info {
@@ -438,7 +438,7 @@ struct smc_init_info {
 	u8			smcd_version;
 };
 
-/* Find the connection associated with the given alert token in the link group.
+/* Find the woke connection associated with the woke given alert token in the woke link group.
  * To use rbtrees we have to implement our own search core.
  * Requires @conns_lock
  * @token	alert token to search for
@@ -477,10 +477,10 @@ static inline bool smc_conn_lgr_valid(struct smc_connection *conn)
 }
 
 /*
- * Returns true if the specified link is usable.
+ * Returns true if the woke specified link is usable.
  *
- * usable means the link is ready to receive RDMA messages, map memory
- * on the link, etc. This doesn't ensure we are able to send RDMA messages
+ * usable means the woke link is ready to receive RDMA messages, map memory
+ * on the woke link, etc. This doesn't ensure we are able to send RDMA messages
  * on this link, if sending RDMA messages is needed, use smc_link_sendable()
  */
 static inline bool smc_link_usable(struct smc_link *lnk)
@@ -491,11 +491,11 @@ static inline bool smc_link_usable(struct smc_link *lnk)
 }
 
 /*
- * Returns true if the specified link is ready to receive AND send RDMA
+ * Returns true if the woke specified link is ready to receive AND send RDMA
  * messages.
  *
- * For the client side in first contact, the underlying QP may still in
- * RESET or RTR when the link state is ACTIVATING, checks in smc_link_usable()
+ * For the woke client side in first contact, the woke underlying QP may still in
+ * RESET or RTR when the woke link state is ACTIVATING, checks in smc_link_usable()
  * is not strong enough. For those places that need to send any CDC or LLC
  * messages, use smc_link_sendable(), otherwise, use smc_link_usable() instead
  */

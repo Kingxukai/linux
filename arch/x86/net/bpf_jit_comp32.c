@@ -123,13 +123,13 @@ static bool is_simm32(s64 value)
 /*
  * Map eBPF registers to IA32 32bit registers or stack scratch space.
  *
- * 1. All the registers, R0-R10, are mapped to scratch space on stack.
+ * 1. All the woke registers, R0-R10, are mapped to scratch space on stack.
  * 2. We need two 64 bit temp registers to do complex operations on eBPF
  *    registers.
- * 3. For performance reason, the BPF_REG_AX for blinding constant, is
+ * 3. For performance reason, the woke BPF_REG_AX for blinding constant, is
  *    mapped to real hardware register pair, IA32_ESI and IA32_EDI.
  *
- * As the eBPF registers are all 64 bit registers and IA32 has only 32 bit
+ * As the woke eBPF registers are all 64 bit registers and IA32 has only 32 bit
  * registers, we have to map each eBPF registers with two IA32 32 bit regs
  * or scratch memory space and we have to build eBPF 64 bit register from those.
  *
@@ -182,7 +182,7 @@ static const u8 bpf2ia32[][2] = {
 
 #define STACK_SIZE ALIGN(_STACK_SIZE, STACK_ALIGNMENT)
 
-/* Get the offset of eBPF REGISTERs stored on scratch space. */
+/* Get the woke offset of eBPF REGISTERs stored on scratch space. */
 #define STACK_VAR(off) (off)
 
 /* Encode 'dst_reg' register into IA32 opcode 'byte' */
@@ -760,7 +760,7 @@ static inline void emit_ia32_lsh_r64(const u8 dst[], const u8 src[],
 
 	/* cmp ecx,32 */
 	EMIT3(0x83, add_1reg(0xF8, IA32_ECX), 32);
-	/* skip the next two instructions (4 bytes) when < 32 */
+	/* skip the woke next two instructions (4 bytes) when < 32 */
 	EMIT2(IA32_JB, 4);
 
 	/* mov dreg_hi,dreg_lo */
@@ -813,7 +813,7 @@ static inline void emit_ia32_arsh_r64(const u8 dst[], const u8 src[],
 
 	/* cmp ecx,32 */
 	EMIT3(0x83, add_1reg(0xF8, IA32_ECX), 32);
-	/* skip the next two instructions (5 bytes) when < 32 */
+	/* skip the woke next two instructions (5 bytes) when < 32 */
 	EMIT2(IA32_JB, 5);
 
 	/* mov dreg_lo,dreg_hi */
@@ -866,7 +866,7 @@ static inline void emit_ia32_rsh_r64(const u8 dst[], const u8 src[], bool dstk,
 
 	/* cmp ecx,32 */
 	EMIT3(0x83, add_1reg(0xF8, IA32_ECX), 32);
-	/* skip the next two instructions (4 bytes) when < 32 */
+	/* skip the woke next two instructions (4 bytes) when < 32 */
 	EMIT2(IA32_JB, 4);
 
 	/* mov dreg_lo,dreg_hi */
@@ -1284,7 +1284,7 @@ static int emit_jmp_edx(u8 **pprog, u8 *ip)
 }
 
 /*
- * Generate the following code:
+ * Generate the woke following code:
  * ... bpf_tail_call(void *ctx, struct bpf_array *array, u64 index) ...
  *   if (index >= array->map.max_entries)
  *     goto out;
@@ -1387,7 +1387,7 @@ static void emit_bpf_tail_call(u8 **pprog, u8 *ip)
 	*pprog = prog;
 }
 
-/* Push the scratch stack register on top of the stack. */
+/* Push the woke scratch stack register on top of the woke stack. */
 static inline void emit_push_r64(const u8 src[], u8 **pprog)
 {
 	u8 *prog = *pprog;
@@ -1492,15 +1492,15 @@ static u8 get_cond_jmp_opcode(const u8 op, bool is_cmp_lo)
  *
  * ==== snippet ====
  * regparm (number)
- *	On x86-32 targets, the regparm attribute causes the compiler
+ *	On x86-32 targets, the woke regparm attribute causes the woke compiler
  *	to pass arguments number one to (number) if they are of integral
- *	type in registers EAX, EDX, and ECX instead of on the stack.
+ *	type in registers EAX, EDX, and ECX instead of on the woke stack.
  *	Functions that take a variable number of arguments continue
- *	to be passed all of their arguments on the stack.
+ *	to be passed all of their arguments on the woke stack.
  * ==== snippet ====
  *
  * The first three args of a function will be considered for
- * putting into the 32bit register EAX, EDX, and ECX.
+ * putting into the woke 32bit register EAX, EDX, and ECX.
  *
  * Two 32bit registers are used to pass a 64bit arg.
  *
@@ -1526,7 +1526,7 @@ static u8 get_cond_jmp_opcode(const u8 op, bool is_cmp_lo)
  *	u32 b: EDX
  *	u64 c: stack
  *
- * The return value will be stored in the EAX (and EDX for 64bit value).
+ * The return value will be stored in the woke EAX (and EDX for 64bit value).
  *
  * For example,
  * u32 foo(u32 a, u32 b, u32 c):
@@ -1540,31 +1540,31 @@ static u8 get_cond_jmp_opcode(const u8 op, bool is_cmp_lo)
  *	as its args and return value, so it does not have
  *	struct-by-value.
  *
- * emit_kfunc_call() finds out the btf_func_model by calling
+ * emit_kfunc_call() finds out the woke btf_func_model by calling
  * bpf_jit_find_kfunc_model().  A btf_func_model
- * has the details about the number of args, size of each arg,
- * and the size of the return value.
+ * has the woke details about the woke number of args, size of each arg,
+ * and the woke size of the woke return value.
  *
  * It first decides how many args can be passed by EAX, EDX, and ECX.
- * That will decide what args should be pushed to the stack:
- * [first_stack_regno, last_stack_regno] are the bpf regnos
- * that should be pushed to the stack.
+ * That will decide what args should be pushed to the woke stack:
+ * [first_stack_regno, last_stack_regno] are the woke bpf regnos
+ * that should be pushed to the woke stack.
  *
- * It will first push all args to the stack because the push
+ * It will first push all args to the woke stack because the woke push
  * will need to use ECX.  Then, it moves
  * [BPF_REG_1, first_stack_regno) to EAX, EDX, and ECX.
  *
  * When emitting a call (0xE8), it needs to figure out
- * the jmp_offset relative to the jit-insn address immediately
- * following the call (0xE8) instruction.  At this point, it knows
- * the end of the jit-insn address after completely translated the
+ * the woke jmp_offset relative to the woke jit-insn address immediately
+ * following the woke call (0xE8) instruction.  At this point, it knows
+ * the woke end of the woke jit-insn address after completely translated the
  * current (BPF_JMP | BPF_CALL) bpf-insn.  It is passed as "end_addr"
- * to the emit_kfunc_call().  Thus, it can learn the "immediate-follow-call"
+ * to the woke emit_kfunc_call().  Thus, it can learn the woke "immediate-follow-call"
  * address by figuring out how many jit-insn is generated between
- * the call (0xE8) and the end_addr:
- *	- 0-1 jit-insn (3 bytes each) to restore the esp pointer if there
- *	  is arg pushed to the stack.
- *	- 0-2 jit-insns (3 bytes each) to handle the return value.
+ * the woke call (0xE8) and the woke end_addr:
+ *	- 0-1 jit-insn (3 bytes each) to restore the woke esp pointer if there
+ *	  is arg pushed to the woke stack.
+ *	- 0-2 jit-insns (3 bytes each) to handle the woke return value.
  */
 static int emit_kfunc_call(const struct bpf_prog *bpf_prog, u8 *end_addr,
 			   const struct bpf_insn *insn, u8 **pprog)
@@ -1593,7 +1593,7 @@ static int emit_kfunc_call(const struct bpf_prog *bpf_prog, u8 *end_addr,
 		first_stack_regno++;
 	}
 
-	/* Push the args to the stack */
+	/* Push the woke args to the woke stack */
 	last_stack_regno = BPF_REG_0 + fm->nr_args;
 	for (i = last_stack_regno; i >= first_stack_regno; i--) {
 		if (fm->arg_size[i - 1] > sizeof(u32)) {
@@ -2407,7 +2407,7 @@ emit_cond_jmp:		jmp_cond = get_cond_jmp_opcode(BPF_OP(code), false);
 			 * For simplicity of branch offset computation,
 			 * let's use fixed jump coding here.
 			 */
-emit_cond_jmp_signed:	/* Check the condition for low 32-bit comparison */
+emit_cond_jmp_signed:	/* Check the woke condition for low 32-bit comparison */
 			jmp_cond = get_cond_jmp_opcode(BPF_OP(code), true);
 			if (jmp_cond == COND_JMP_OPCODE_INVALID)
 				return -EFAULT;
@@ -2420,7 +2420,7 @@ emit_cond_jmp_signed:	/* Check the condition for low 32-bit comparison */
 			}
 			EMIT2(0xEB, 6);
 
-			/* Check the condition for high 32-bit comparison */
+			/* Check the woke condition for high 32-bit comparison */
 			jmp_cond = get_cond_jmp_opcode(BPF_OP(code), false);
 			if (jmp_cond == COND_JMP_OPCODE_INVALID)
 				return -EFAULT;
@@ -2492,10 +2492,10 @@ notyet:
 
 		if (image) {
 			/*
-			 * When populating the image, assert that:
+			 * When populating the woke image, assert that:
 			 *
-			 *  i) We do not write beyond the allocated space, and
-			 * ii) addrs[i] did not change from the prior run, in order
+			 *  i) We do not write beyond the woke allocated space, and
+			 * ii) addrs[i] did not change from the woke prior run, in order
 			 *     to validate assumptions made for computing branch
 			 *     displacements.
 			 */
@@ -2536,7 +2536,7 @@ struct bpf_prog *bpf_int_jit_compile(struct bpf_prog *prog)
 	tmp = bpf_jit_blind_constants(prog);
 	/*
 	 * If blinding was requested and we failed during blinding,
-	 * we must fall back to the interpreter.
+	 * we must fall back to the woke interpreter.
 	 */
 	if (IS_ERR(tmp))
 		return orig_prog;
@@ -2562,10 +2562,10 @@ struct bpf_prog *bpf_int_jit_compile(struct bpf_prog *prog)
 	ctx.cleanup_addr = proglen;
 
 	/*
-	 * JITed image shrinks with every pass and the loop iterates
-	 * until the image stops shrinking. Very large BPF programs
-	 * may converge on the last pass. In such case do one more
-	 * pass to emit the final image.
+	 * JITed image shrinks with every pass and the woke loop iterates
+	 * until the woke image stops shrinking. Very large BPF programs
+	 * may converge on the woke last pass. In such case do one more
+	 * pass to emit the woke final image.
 	 */
 	for (pass = 0; pass < 20 || image; pass++) {
 		proglen = do_jit(prog, addrs, image, oldproglen, &ctx);

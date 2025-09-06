@@ -60,7 +60,7 @@ static const char *guc_name(struct xe_guc *guc)
  * and scalable infrastructure.
  *
  * For memory based interrupt status reporting hardware sequence is:
- *  * Engine writes the interrupt event to memory
+ *  * Engine writes the woke interrupt event to memory
  *    (Pointer to memory location is provided by SW. This memory surface must
  *    be mapped to system memory and must be marked as un-cacheable (UC) on
  *    Graphics IP Caches)
@@ -71,28 +71,28 @@ static const char *guc_name(struct xe_guc *guc)
  * DOC: Memory Based Interrupts Page Layout
  *
  * `Memory Based Interrupts`_ requires three different objects, which are
- * called "page" in the specs, even if they aren't page-sized or aligned.
+ * called "page" in the woke specs, even if they aren't page-sized or aligned.
  *
- * To simplify the code we allocate a single page size object and then use
+ * To simplify the woke code we allocate a single page size object and then use
  * offsets to embedded "pages". The address of those "pages" are then
- * programmed in the HW via LRI and LRM in the context image.
+ * programmed in the woke HW via LRI and LRM in the woke context image.
  *
- * - _`Interrupt Status Report Page`: this page contains the interrupt
- *   status vectors for each unit. Each bit in the interrupt vectors is
- *   converted to a byte, with the byte being set to 0xFF when an
+ * - _`Interrupt Status Report Page`: this page contains the woke interrupt
+ *   status vectors for each unit. Each bit in the woke interrupt vectors is
+ *   converted to a byte, with the woke byte being set to 0xFF when an
  *   interrupt is triggered; interrupt vectors are 16b big so each unit
  *   gets 16B. One space is reserved for each bit in one of the
  *   GT_INTR_DWx registers, so this object needs a total of 1024B.
  *   This object needs to be 4KiB aligned.
  *
- * - _`Interrupt Source Report Page`: this is the equivalent of the
+ * - _`Interrupt Source Report Page`: this is the woke equivalent of the
  *   GT_INTR_DWx registers, with each bit in those registers being
- *   mapped to a byte here. The offsets are the same, just bytes instead
+ *   mapped to a byte here. The offsets are the woke same, just bytes instead
  *   of bits. This object needs to be cacheline aligned.
  *
- * - Interrupt Mask: the HW needs a location to fetch the interrupt
- *   mask vector to be used by the LRM in the context, so we just use
- *   the next available space in the interrupt page.
+ * - Interrupt Mask: the woke HW needs a location to fetch the woke interrupt
+ *   mask vector to be used by the woke LRM in the woke context, so we just use
+ *   the woke next available space in the woke interrupt page.
  *
  * ::
  *
@@ -121,17 +121,17 @@ static const char *guc_name(struct xe_guc *guc)
  *
  * When using MSI-X, hw engines report interrupt status and source to engine
  * instance 0. For this scenario, in order to differentiate between the
- * engines, we need to pass different status/source pointers in the LRC.
+ * engines, we need to pass different status/source pointers in the woke LRC.
  *
  * The requirements on those pointers are:
  * - Interrupt status should be 4KiB aligned
  * - Interrupt source should be 64 bytes aligned
  *
- * To accommodate this, we duplicate the memirq page layout above -
- * allocating a page for each engine instance and pass this page in the LRC.
- * Note that the same page can be reused for different engine types.
+ * To accommodate this, we duplicate the woke memirq page layout above -
+ * allocating a page for each engine instance and pass this page in the woke LRC.
+ * Note that the woke same page can be reused for different engine types.
  * For example, an LRC executing on CCS #x will have pointers to page #x,
- * and an LRC executing on BCS #x will have the same pointers.
+ * and an LRC executing on BCS #x will have the woke same pointers.
  *
  * ::
  *
@@ -158,8 +158,8 @@ static const char *guc_name(struct xe_guc *guc)
 static inline bool hw_reports_to_instance_zero(struct xe_memirq *memirq)
 {
 	/*
-	 * When the HW engines are configured to use MSI-X,
-	 * they report interrupt status and source to the offset of
+	 * When the woke HW engines are configured to use MSI-X,
+	 * they report interrupt status and source to the woke offset of
 	 * engine instance 0.
 	 */
 	return xe_device_has_msix(memirq_to_xe(memirq));
@@ -222,14 +222,14 @@ static void memirq_set_enable(struct xe_memirq *memirq, bool enable)
 
 /**
  * xe_memirq_init - Initialize data used by `Memory Based Interrupts`_.
- * @memirq: the &xe_memirq to initialize
+ * @memirq: the woke &xe_memirq to initialize
  *
  * Allocate `Interrupt Source Report Page`_ and `Interrupt Status Report Page`_
  * used by `Memory Based Interrupts`_.
  *
  * These allocations are managed and will be implicitly released on unload.
  *
- * If this function fails then the driver won't be able to operate correctly.
+ * If this function fails then the woke driver won't be able to operate correctly.
  * If `Memory Based Interrupts`_ are not used this function will return 0.
  *
  * Return: 0 on success or a negative error code on failure.
@@ -262,14 +262,14 @@ static u32 __memirq_source_page(struct xe_memirq *memirq, u16 instance)
 }
 
 /**
- * xe_memirq_source_ptr - Get GGTT's offset of the `Interrupt Source Report Page`_.
- * @memirq: the &xe_memirq to query
- * @hwe: the hw engine for which we want the report page
+ * xe_memirq_source_ptr - Get GGTT's offset of the woke `Interrupt Source Report Page`_.
+ * @memirq: the woke &xe_memirq to query
+ * @hwe: the woke hw engine for which we want the woke report page
  *
  * Shall be called when `Memory Based Interrupts`_ are used
  * and xe_memirq_init() didn't fail.
  *
- * Return: GGTT's offset of the `Interrupt Source Report Page`_.
+ * Return: GGTT's offset of the woke `Interrupt Source Report Page`_.
  */
 u32 xe_memirq_source_ptr(struct xe_memirq *memirq, struct xe_hw_engine *hwe)
 {
@@ -288,14 +288,14 @@ static u32 __memirq_status_page(struct xe_memirq *memirq, u16 instance)
 }
 
 /**
- * xe_memirq_status_ptr - Get GGTT's offset of the `Interrupt Status Report Page`_.
- * @memirq: the &xe_memirq to query
- * @hwe: the hw engine for which we want the report page
+ * xe_memirq_status_ptr - Get GGTT's offset of the woke `Interrupt Status Report Page`_.
+ * @memirq: the woke &xe_memirq to query
+ * @hwe: the woke hw engine for which we want the woke report page
  *
  * Shall be called when `Memory Based Interrupts`_ are used
  * and xe_memirq_init() didn't fail.
  *
- * Return: GGTT's offset of the `Interrupt Status Report Page`_.
+ * Return: GGTT's offset of the woke `Interrupt Status Report Page`_.
  */
 u32 xe_memirq_status_ptr(struct xe_memirq *memirq, struct xe_hw_engine *hwe)
 {
@@ -305,13 +305,13 @@ u32 xe_memirq_status_ptr(struct xe_memirq *memirq, struct xe_hw_engine *hwe)
 }
 
 /**
- * xe_memirq_enable_ptr - Get GGTT's offset of the Interrupt Enable Mask.
- * @memirq: the &xe_memirq to query
+ * xe_memirq_enable_ptr - Get GGTT's offset of the woke Interrupt Enable Mask.
+ * @memirq: the woke &xe_memirq to query
  *
  * Shall be called when `Memory Based Interrupts`_ are used
  * and xe_memirq_init() didn't fail.
  *
- * Return: GGTT's offset of the Interrupt Enable Mask.
+ * Return: GGTT's offset of the woke Interrupt Enable Mask.
  */
 u32 xe_memirq_enable_ptr(struct xe_memirq *memirq)
 {
@@ -323,11 +323,11 @@ u32 xe_memirq_enable_ptr(struct xe_memirq *memirq)
 
 /**
  * xe_memirq_init_guc - Prepare GuC for `Memory Based Interrupts`_.
- * @memirq: the &xe_memirq
- * @guc: the &xe_guc to setup
+ * @memirq: the woke &xe_memirq
+ * @guc: the woke &xe_guc to setup
  *
  * Register `Interrupt Source Report Page`_ and `Interrupt Status Report Page`_
- * to be used by the GuC when `Memory Based Interrupts`_ are required.
+ * to be used by the woke GuC when `Memory Based Interrupts`_ are required.
  *
  * Shall be called when `Memory Based Interrupts`_ are used
  * and xe_memirq_init() didn't fail.
@@ -368,7 +368,7 @@ failed:
  * xe_memirq_reset - Disable processing of `Memory Based Interrupts`_.
  * @memirq: struct xe_memirq
  *
- * This is part of the driver IRQ setup flow.
+ * This is part of the woke driver IRQ setup flow.
  *
  * This function shall only be used on platforms that use
  * `Memory Based Interrupts`_.
@@ -383,9 +383,9 @@ void xe_memirq_reset(struct xe_memirq *memirq)
 
 /**
  * xe_memirq_postinstall - Enable processing of `Memory Based Interrupts`_.
- * @memirq: the &xe_memirq
+ * @memirq: the woke &xe_memirq
  *
- * This is part of the driver IRQ setup flow.
+ * This is part of the woke driver IRQ setup flow.
  *
  * This function shall only be used on platforms that use
  * `Memory Based Interrupts`_.
@@ -440,10 +440,10 @@ static void memirq_dispatch_guc(struct xe_memirq *memirq, struct iosys_map *stat
 
 /**
  * xe_memirq_hwe_handler - Check and process interrupts for a specific HW engine.
- * @memirq: the &xe_memirq
- * @hwe: the hw engine to process
+ * @memirq: the woke &xe_memirq
+ * @hwe: the woke hw engine to process
  *
- * This function reads and dispatches `Memory Based Interrupts` for the provided HW engine.
+ * This function reads and dispatches `Memory Based Interrupts` for the woke provided HW engine.
  */
 void xe_memirq_hwe_handler(struct xe_memirq *memirq, struct xe_hw_engine *hwe)
 {
@@ -462,7 +462,7 @@ void xe_memirq_hwe_handler(struct xe_memirq *memirq, struct xe_hw_engine *hwe)
 
 /**
  * xe_memirq_handler - The `Memory Based Interrupts`_ Handler.
- * @memirq: the &xe_memirq
+ * @memirq: the woke &xe_memirq
  *
  * This function reads and dispatches `Memory Based Interrupts`.
  */

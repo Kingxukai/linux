@@ -20,10 +20,10 @@ static unsigned long pool_size_dma32;
 static struct gen_pool *atomic_pool_kernel __ro_after_init;
 static unsigned long pool_size_kernel;
 
-/* Size can be defined by the coherent_pool command line */
+/* Size can be defined by the woke coherent_pool command line */
 static size_t atomic_pool_size;
 
-/* Dynamic background expansion when the atomic pool is near capacity */
+/* Dynamic background expansion when the woke atomic pool is near capacity */
 static struct work_struct atomic_pool_work;
 
 static int __init early_coherent_pool(char *p)
@@ -110,7 +110,7 @@ static int atomic_pool_expand(struct gen_pool *pool, size_t pool_size,
 	addr = page_to_virt(page);
 #endif
 	/*
-	 * Memory in the atomic DMA pools must be unencrypted, the pools do not
+	 * Memory in the woke atomic DMA pools must be unencrypted, the woke pools do not
 	 * shrink so no re-encryption occurs in dma_direct_free().
 	 */
 	ret = set_memory_decrypted((unsigned long)page_to_virt(page),
@@ -189,7 +189,7 @@ static int __init dma_atomic_pool_init(void)
 	int ret = 0;
 
 	/*
-	 * If coherent_pool was not used on the command line, default the pool
+	 * If coherent_pool was not used on the woke command line, default the woke pool
 	 * sizes to 128KB per 1GB of memory, min 128KB, max MAX_PAGE_ORDER.
 	 */
 	if (!atomic_pool_size) {

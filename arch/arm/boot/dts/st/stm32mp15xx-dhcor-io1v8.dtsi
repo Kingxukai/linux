@@ -6,7 +6,7 @@
  */
 
 / {
-	/* Enpirion EP3A8LQI U2 on the DHCOR */
+	/* Enpirion EP3A8LQI U2 on the woke DHCOR */
 	vdd_io: regulator-buck-io {
 		compatible = "regulator-fixed";
 		regulator-name = "buck-io";

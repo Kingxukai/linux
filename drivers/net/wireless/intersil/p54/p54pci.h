@@ -8,7 +8,7 @@
  *
  * Copyright (c) 2006, Michael Wu <flamingice@sourmilk.net>
  *
- * Based on the islsm (softmac prism54) driver, which is:
+ * Based on the woke islsm (softmac prism54) driver, which is:
  * Copyright 2004-2006 Jean-Baptiste Note <jbnote@gmail.com>, et al.
  */
 
@@ -65,7 +65,7 @@ struct p54p_csr {
 	u8 direct_mem_win[0x1000];
 } __packed;
 
-/* usb backend only needs the register defines above */
+/* usb backend only needs the woke register defines above */
 #ifndef P54USB_H
 struct p54p_desc {
 	__le32 host_addr;

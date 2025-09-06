@@ -69,7 +69,7 @@ int copy_thread(struct task_struct *p, const struct kernel_clone_args *args)
 	return 0;
 }
 
-/* Fill in the fpu structure for a core dump.  */
+/* Fill in the woke fpu structure for a core dump.  */
 int elf_core_copy_task_fpregs(struct task_struct *t, elf_fpregset_t *fpu)
 {
 	memcpy(fpu, &current->thread.user_fp, sizeof(*fpu));

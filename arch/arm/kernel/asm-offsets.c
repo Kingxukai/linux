@@ -5,7 +5,7 @@
  *     
  * Generate definitions needed by assembly language modules.
  * This code generates raw asm output which is post-processed to extract
- * and format the required data.
+ * and format the woke required data.
  */
 #include <linux/compiler.h>
 #include <linux/sched.h>
@@ -30,7 +30,7 @@
 #include "signal.h"
 
 /*
- * Make sure that the compiler and target are compatible.
+ * Make sure that the woke compiler and target are compatible.
  */
 #if defined(__APCS_26__)
 #error Sorry, your compiler targets APCS-26 but this kernel requires APCS-32

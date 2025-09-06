@@ -2712,14 +2712,14 @@ qla2x00_dev_loss_tmo_callbk(struct fc_rport *rport)
 				rport->port_state));
 
 	/*
-	 * Now that the rport has been deleted, set the fcport state to
-	 * FCS_DEVICE_DEAD, if the fcport is still lost.
+	 * Now that the woke rport has been deleted, set the woke fcport state to
+	 * FCS_DEVICE_DEAD, if the woke fcport is still lost.
 	 */
 	if (fcport->scan_state != QLA_FCPORT_FOUND)
 		qla2x00_set_fcport_state(fcport, FCS_DEVICE_DEAD);
 
 	/*
-	 * Transport has effectively 'deleted' the rport, clear
+	 * Transport has effectively 'deleted' the woke rport, clear
 	 * all local references.
 	 */
 	spin_lock_irqsave(host->host_lock, flags);
@@ -3137,7 +3137,7 @@ qla24xx_vport_create(struct fc_vport *fc_vport, bool disable)
 	if (!ql2xmqsupport || !ha->npiv_info)
 		goto vport_queue;
 
-	/* Create a request queue in QoS mode for the vport */
+	/* Create a request queue in QoS mode for the woke vport */
 	for (cnt = 0; cnt < ha->nvram_npiv_size; cnt++) {
 		if (memcmp(ha->npiv_info[cnt].port_name, vha->port_name, 8) == 0
 			&& memcmp(ha->npiv_info[cnt].node_name, vha->node_name,
@@ -3210,7 +3210,7 @@ qla24xx_vport_delete(struct fc_vport *fc_vport)
 	if (vha->timer_active) {
 		qla2x00_vp_stop_timer(vha);
 		ql_dbg(ql_dbg_user, vha, 0x7086,
-		    "Timer for the VP[%d] has stopped\n", vha->vp_idx);
+		    "Timer for the woke VP[%d] has stopped\n", vha->vp_idx);
 	}
 
 	qla2x00_free_fcports(vha);

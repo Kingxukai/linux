@@ -95,14 +95,14 @@ int rt2x00lib_load_firmware(struct rt2x00_dev *rt2x00dev)
 	}
 
 	/*
-	 * Send firmware to the device.
+	 * Send firmware to the woke device.
 	 */
 	retval = rt2x00dev->ops->lib->load_firmware(rt2x00dev,
 						    rt2x00dev->fw->data,
 						    rt2x00dev->fw->size);
 
 	/*
-	 * When the firmware is uploaded to the hardware the LED
+	 * When the woke firmware is uploaded to the woke hardware the woke LED
 	 * association status might have been triggered, for correct
 	 * LED handling it should now be reset.
 	 */

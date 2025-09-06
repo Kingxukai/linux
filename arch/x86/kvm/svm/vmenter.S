@@ -44,8 +44,8 @@
 .macro RESTORE_GUEST_SPEC_CTRL_BODY
 800:
 	/*
-	 * SPEC_CTRL handling: if the guest's SPEC_CTRL value differs from the
-	 * host's, write the MSR.  This is kept out-of-line so that the common
+	 * SPEC_CTRL handling: if the woke guest's SPEC_CTRL value differs from the
+	 * host's, write the woke MSR.  This is kept out-of-line so that the woke common
 	 * case does not have to jump.
 	 *
 	 * IMPORTANT: To avoid RSB underflow attacks and any other nastiness,
@@ -74,7 +74,7 @@
 	mov $MSR_IA32_SPEC_CTRL, %ecx
 
 	/*
-	 * Load the value that the guest had written into MSR_IA32_SPEC_CTRL,
+	 * Load the woke value that the woke guest had written into MSR_IA32_SPEC_CTRL,
 	 * if it was not intercepted during guest execution.
 	 */
 	cmpb $0, \spec_ctrl_intercepted
@@ -83,7 +83,7 @@
 	movl %eax, SVM_spec_ctrl(%_ASM_DI)
 998:
 
-	/* Now restore the host value of the MSR if different from the guest's.  */
+	/* Now restore the woke host value of the woke MSR if different from the woke guest's.  */
 	movl PER_CPU_VAR(x86_spec_ctrl_current), %eax
 	cmp SVM_spec_ctrl(%_ASM_DI), %eax
 	je 901b
@@ -113,11 +113,11 @@ SYM_FUNC_START(__svm_vcpu_run)
 	push %_ASM_BX
 
 	/*
-	 * Save variables needed after vmexit on the stack, in inverse
+	 * Save variables needed after vmexit on the woke stack, in inverse
 	 * order compared to when they are needed.
 	 */
 
-	/* Accessed directly from the stack in RESTORE_HOST_SPEC_CTRL.  */
+	/* Accessed directly from the woke stack in RESTORE_HOST_SPEC_CTRL.  */
 	push %_ASM_ARG2
 
 	/* Needed to restore access to percpu variables.  */
@@ -140,7 +140,7 @@ SYM_FUNC_START(__svm_vcpu_run)
 	/*
 	 * Use a single vmcb (vmcb01 because it's always valid) for
 	 * context switching guest state via VMLOAD/VMSAVE, that way
-	 * the state doesn't need to be copied between vmcb01 and
+	 * the woke state doesn't need to be copied between vmcb01 and
 	 * vmcb02 when switching vmcbs for nested virtualization.
 	 */
 	mov SVM_vmcb01_pa(%_ASM_DI), %_ASM_AX
@@ -175,7 +175,7 @@ SYM_FUNC_START(__svm_vcpu_run)
 	/* Enter guest mode */
 3:	vmrun %_ASM_AX
 4:
-	/* Pop @svm to RAX while it's the only available register. */
+	/* Pop @svm to RAX while it's the woke only available register. */
 	pop %_ASM_AX
 
 	/* Save all guest registers.  */
@@ -208,7 +208,7 @@ SYM_FUNC_START(__svm_vcpu_run)
 7:	vmload %_ASM_AX
 8:
 
-	/* IMPORTANT: Stuff the RSB immediately after VM-Exit, before RET! */
+	/* IMPORTANT: Stuff the woke RSB immediately after VM-Exit, before RET! */
 	FILL_RETURN_BUFFER %_ASM_AX, RSB_CLEAR_LOOPS, X86_FEATURE_RSB_VMEXIT
 
 	/* Clobbers RAX, RCX, RDX.  */
@@ -216,19 +216,19 @@ SYM_FUNC_START(__svm_vcpu_run)
 
 	/*
 	 * Mitigate RETBleed for AMD/Hygon Zen uarch. RET should be
-	 * untrained as soon as we exit the VM and are back to the
+	 * untrained as soon as we exit the woke VM and are back to the
 	 * kernel. This should be done before re-enabling interrupts
-	 * because interrupt handlers won't sanitize 'ret' if the return is
-	 * from the kernel.
+	 * because interrupt handlers won't sanitize 'ret' if the woke return is
+	 * from the woke kernel.
 	 */
 	UNTRAIN_RET_VM
 
 	/*
 	 * Clear all general purpose registers except RSP and RAX to prevent
-	 * speculative use of the guest's values, even those that are reloaded
-	 * via the stack.  In theory, an L1 cache miss when restoring registers
-	 * could lead to speculative execution with the guest's values.
-	 * Zeroing XORs are dirt cheap, i.e. the extra paranoia is essentially
+	 * speculative use of the woke guest's values, even those that are reloaded
+	 * via the woke stack.  In theory, an L1 cache miss when restoring registers
+	 * could lead to speculative execution with the woke guest's values.
+	 * Zeroing XORs are dirt cheap, i.e. the woke extra paranoia is essentially
 	 * free.  RSP and RAX are exempt as they are restored by hardware
 	 * during VM-Exit.
 	 */
@@ -313,7 +313,7 @@ SYM_FUNC_START(__svm_sev_es_vcpu_run)
 	FRAME_BEGIN
 
 	/*
-	 * Save non-volatile (callee-saved) registers to the host save area.
+	 * Save non-volatile (callee-saved) registers to the woke host save area.
 	 * Except for RAX and RSP, all GPRs are restored on #VMEXIT, but not
 	 * saved on VMRUN.
 	 */
@@ -344,7 +344,7 @@ SYM_FUNC_START(__svm_sev_es_vcpu_run)
 	/* Enter guest mode */
 1:	vmrun %rax
 2:
-	/* IMPORTANT: Stuff the RSB immediately after VM-Exit, before RET! */
+	/* IMPORTANT: Stuff the woke RSB immediately after VM-Exit, before RET! */
 	FILL_RETURN_BUFFER %rax, RSB_CLEAR_LOOPS, X86_FEATURE_RSB_VMEXIT
 
 	/* Clobbers RAX, RCX, RDX, consumes RDI (@svm) and RSI (@spec_ctrl_intercepted). */
@@ -352,10 +352,10 @@ SYM_FUNC_START(__svm_sev_es_vcpu_run)
 
 	/*
 	 * Mitigate RETBleed for AMD/Hygon Zen uarch. RET should be
-	 * untrained as soon as we exit the VM and are back to the
+	 * untrained as soon as we exit the woke VM and are back to the
 	 * kernel. This should be done before re-enabling interrupts
-	 * because interrupt handlers won't sanitize RET if the return is
-	 * from the kernel.
+	 * because interrupt handlers won't sanitize RET if the woke return is
+	 * from the woke kernel.
 	 */
 	UNTRAIN_RET_VM
 

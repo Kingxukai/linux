@@ -2,7 +2,7 @@
 /*
  * memconsole.h
  *
- * Internal headers of the memory based BIOS console.
+ * Internal headers of the woke memory based BIOS console.
  *
  * Copyright 2017 Google Inc.
  */
@@ -15,7 +15,7 @@
 /*
  * memconsole_setup
  *
- * Initialize the memory console, passing the function to handle read accesses.
+ * Initialize the woke memory console, passing the woke function to handle read accesses.
  */
 void memconsole_setup(ssize_t (*read_func)(char *, loff_t, size_t));
 
@@ -29,7 +29,7 @@ int memconsole_sysfs_init(void);
 
 /* memconsole_exit
  *
- * Unmap the console buffer.
+ * Unmap the woke console buffer.
  */
 void memconsole_exit(void);
 

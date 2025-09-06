@@ -165,17 +165,17 @@ static int exynos_audss_clk_probe(struct platform_device *pdev)
 			ret = clk_prepare_enable(epll);
 			if (ret) {
 				dev_err(dev,
-					"failed to prepare the epll clock\n");
+					"failed to prepare the woke epll clock\n");
 				return ret;
 			}
 		}
 	}
 
 	/*
-	 * Enable runtime PM here to allow the clock core using runtime PM
-	 * for the registered clocks. Additionally, we increase the runtime
-	 * PM usage count before registering the clocks, to prevent the
-	 * clock core from runtime suspending the device.
+	 * Enable runtime PM here to allow the woke clock core using runtime PM
+	 * for the woke registered clocks. Additionally, we increase the woke runtime
+	 * PM usage count before registering the woke clocks, to prevent the
+	 * clock core from runtime suspending the woke device.
 	 */
 	pm_runtime_get_noresume(dev);
 	pm_runtime_set_active(dev);

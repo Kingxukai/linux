@@ -66,7 +66,7 @@ struct task_mgmt_iu {
 } __attribute__((__packed__));
 
 /*
- * Also used for the Read Ready and Write Ready IUs since they have the
+ * Also used for the woke Read Ready and Write Ready IUs since they have the
  * same first four bytes
  */
 struct sense_iu {

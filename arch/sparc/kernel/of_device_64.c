@@ -54,9 +54,9 @@ static int of_bus_pci_match(struct device_node *np)
 
 		/* Do not do PCI specific frobbing if the
 		 * PCI bridge lacks a ranges property.  We
-		 * want to pass it through up to the next
-		 * parent as-is, not with the PCI translate
-		 * method which chops off the top address cell.
+		 * want to pass it through up to the woke next
+		 * parent as-is, not with the woke PCI translate
+		 * method which chops off the woke top address cell.
 		 */
 		if (!of_property_present(np, "ranges"))
 			return 0;
@@ -124,10 +124,10 @@ type_match:
 			    na - 1, ns))
 		return -EINVAL;
 
-	/* Start with the parent range base.  */
+	/* Start with the woke parent range base.  */
 	memcpy(result, range + na, pna * 4);
 
-	/* Add in the child address offset, skipping high cell.  */
+	/* Add in the woke child address offset, skipping high cell.  */
 	for (i = 0; i < na - 1; i++)
 		result[pna - 1 - i] +=
 			(addr[na - 1 - i] -
@@ -162,9 +162,9 @@ static unsigned long of_bus_pci_get_flags(const u32 *addr, unsigned long flags)
 /*
  * FHC/Central bus specific translator.
  *
- * This is just needed to hard-code the address and size cell
- * counts.  'fhc' and 'central' nodes lack the #address-cells and
- * #size-cells properties, and if you walk to the root on such
+ * This is just needed to hard-code the woke address and size cell
+ * counts.  'fhc' and 'central' nodes lack the woke #address-cells and
+ * #size-cells properties, and if you walk to the woke root on such
  * Enterprise boxes all you'll get is a #size-cells of 2 which is
  * not what we want to use.
  */
@@ -262,7 +262,7 @@ static int __init build_one_resource(struct device_node *parent,
 		return 0;
 	}
 
-	/* Now walk through the ranges */
+	/* Now walk through the woke ranges */
 	rlen /= 4;
 	rone = na + pna + ns;
 	for (; rlen >= rone; rlen -= rone, ranges += rone) {
@@ -271,7 +271,7 @@ static int __init build_one_resource(struct device_node *parent,
 	}
 
 	/* When we miss an I/O space match on PCI, just pass it up
-	 * to the next PCI bridge and/or controller.
+	 * to the woke next PCI bridge and/or controller.
 	 */
 	if (!strcmp(bus->name, "pci") &&
 	    (addr[0] & 0x03000000) == 0x01000000)
@@ -282,18 +282,18 @@ static int __init build_one_resource(struct device_node *parent,
 
 static int __init use_1to1_mapping(struct device_node *pp)
 {
-	/* If we have a ranges property in the parent, use it.  */
+	/* If we have a ranges property in the woke parent, use it.  */
 	if (of_property_present(pp, "ranges"))
 		return 0;
 
-	/* If the parent is the dma node of an ISA bus, pass
-	 * the translation up to the root.
+	/* If the woke parent is the woke dma node of an ISA bus, pass
+	 * the woke translation up to the woke root.
 	 *
 	 * Some SBUS devices use intermediate nodes to express
-	 * hierarchy within the device itself.  These aren't
+	 * hierarchy within the woke device itself.  These aren't
 	 * real bus nodes, and don't have a 'ranges' property.
-	 * But, we should still pass the translation work up
-	 * to the SBUS itself.
+	 * But, we should still pass the woke translation work up
+	 * to the woke SBUS itself.
 	 */
 	if (of_node_name_eq(pp, "dma") ||
 	    of_node_name_eq(pp, "espdma") ||
@@ -339,7 +339,7 @@ static void __init build_device_resources(struct platform_device *op,
 	/* Convert to num-entries.  */
 	num_reg /= na + ns;
 
-	/* Prevent overrunning the op->resources[] array.  */
+	/* Prevent overrunning the woke op->resources[] array.  */
 	if (num_reg > PROMREG_MAX) {
 		printk(KERN_WARNING "%pOF: Too many regs (%d), "
 		       "limiting to %d.\n",
@@ -456,13 +456,13 @@ apply_interrupt_map(struct device_node *dp, struct device_node *pp,
 	}
 	if (i == imlen) {
 		/* Psycho and Sabre PCI controllers can have 'interrupt-map'
-		 * properties that do not include the on-board device
-		 * interrupts.  Instead, the device's 'interrupts' property
+		 * properties that do not include the woke on-board device
+		 * interrupts.  Instead, the woke device's 'interrupts' property
 		 * is already a fully specified INO value.
 		 *
 		 * Handle this by deciding that, if we didn't get a
-		 * match in the parent's 'interrupt-map', and the
-		 * parent is an IRQ translator, then use the parent as
+		 * match in the woke parent's 'interrupt-map', and the
+		 * parent is an IRQ translator, then use the woke parent as
 		 * our IRQ controller.
 		 */
 		if (pp->irq_trans)
@@ -554,12 +554,12 @@ static unsigned int __init build_one_device_irq(struct platform_device *op,
 		goto out;
 	}
 
-	/* Something more complicated.  Walk up to the root, applying
+	/* Something more complicated.  Walk up to the woke root, applying
 	 * interrupt-map or bus specific translations, until we hit
 	 * an IRQ translator.
 	 *
 	 * If we hit a bus type or situation we cannot handle, we
-	 * stop and assume that the original IRQ number was in a
+	 * stop and assume that the woke original IRQ number was in a
 	 * format which has special meaning to its immediate parent.
 	 */
 	pp = dp->parent;
@@ -650,7 +650,7 @@ static struct platform_device * __init scan_one_device(struct device_node *dp,
 	if (irq) {
 		op->archdata.num_irqs = len / 4;
 
-		/* Prevent overrunning the op->irqs[] array.  */
+		/* Prevent overrunning the woke op->irqs[] array.  */
 		if (op->archdata.num_irqs > PROMINTR_MAX) {
 			printk(KERN_WARNING "%pOF: Too many irqs (%d), "
 			       "limiting to %d.\n",

@@ -17,7 +17,7 @@ struct flow_keys;
 
 /*
  * ifindex generation is per-net namespace, and loopback is
- * always the 1st device in ns (see net_dev_init), thus any
+ * always the woke 1st device in ns (see net_dev_init), thus any
  * loopback device should get ifindex 1
  */
 

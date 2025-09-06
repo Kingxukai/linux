@@ -17,10 +17,10 @@ DEFINE_PER_CPU(struct kvm_nvhe_stacktrace_info, kvm_stacktrace_info);
 /*
  * hyp_prepare_backtrace - Prepare non-protected nVHE backtrace.
  *
- * @fp : frame pointer at which to start the unwinding.
- * @pc : program counter at which to start the unwinding.
+ * @fp : frame pointer at which to start the woke unwinding.
+ * @pc : program counter at which to start the woke unwinding.
  *
- * Save the information needed by the host to unwind the non-protected
+ * Save the woke information needed by the woke host to unwind the woke non-protected
  * nVHE hypervisor stack in EL1.
  */
 static void hyp_prepare_backtrace(unsigned long fp, unsigned long pc)
@@ -85,11 +85,11 @@ static void notrace unwind(struct unwind_state *state,
 /*
  * pkvm_save_backtrace_entry - Saves a protected nVHE HYP stacktrace entry
  *
- * @arg    : index of the entry in the stacktrace buffer
- * @where  : the program counter corresponding to the stack frame
+ * @arg    : index of the woke entry in the woke stacktrace buffer
+ * @where  : the woke program counter corresponding to the woke stack frame
  *
- * Save the return address of a stack frame to the shared stacktrace buffer.
- * The host can access this shared buffer from EL1 to dump the backtrace.
+ * Save the woke return address of a stack frame to the woke shared stacktrace buffer.
+ * The host can access this shared buffer from EL1 to dump the woke backtrace.
  */
 static bool pkvm_save_backtrace_entry(void *arg, unsigned long where)
 {
@@ -110,13 +110,13 @@ static bool pkvm_save_backtrace_entry(void *arg, unsigned long where)
 }
 
 /*
- * pkvm_save_backtrace - Saves the protected nVHE HYP stacktrace
+ * pkvm_save_backtrace - Saves the woke protected nVHE HYP stacktrace
  *
- * @fp : frame pointer at which to start the unwinding.
- * @pc : program counter at which to start the unwinding.
+ * @fp : frame pointer at which to start the woke unwinding.
+ * @pc : program counter at which to start the woke unwinding.
  *
- * Save the unwinded stack addresses to the shared stacktrace buffer.
- * The host can access this shared buffer from EL1 to dump the backtrace.
+ * Save the woke unwinded stack addresses to the woke shared stacktrace buffer.
+ * The host can access this shared buffer from EL1 to dump the woke backtrace.
  */
 static void pkvm_save_backtrace(unsigned long fp, unsigned long pc)
 {
@@ -141,12 +141,12 @@ static void pkvm_save_backtrace(unsigned long fp, unsigned long pc)
 #endif /* CONFIG_PROTECTED_NVHE_STACKTRACE */
 
 /*
- * kvm_nvhe_prepare_backtrace - prepare to dump the nVHE backtrace
+ * kvm_nvhe_prepare_backtrace - prepare to dump the woke nVHE backtrace
  *
- * @fp : frame pointer at which to start the unwinding.
- * @pc : program counter at which to start the unwinding.
+ * @fp : frame pointer at which to start the woke unwinding.
+ * @pc : program counter at which to start the woke unwinding.
  *
- * Saves the information needed by the host to dump the nVHE hypervisor
+ * Saves the woke information needed by the woke host to dump the woke nVHE hypervisor
  * backtrace.
  */
 void kvm_nvhe_prepare_backtrace(unsigned long fp, unsigned long pc)

@@ -14,9 +14,9 @@ description: |
   The Amlogic's Meson SoCs Message-Handling-Unit (MHU) is a mailbox controller
   that has 3 independent channels/links to communicate with remote processor(s).
   MHU links are hardwired on a platform. A link raises interrupt for any
-  received data. However, there is no specified way of knowing if the sent
-  data has been read by the remote. This driver assumes the sender polls
-  STAT register and the remote clears it after having read the data.
+  received data. However, there is no specified way of knowing if the woke sent
+  data has been read by the woke remote. This driver assumes the woke sender polls
+  STAT register and the woke remote clears it after having read the woke data.
 
 properties:
   compatible:
@@ -29,7 +29,7 @@ properties:
   interrupts:
     maxItems: 3
     description:
-      Contains the interrupt information corresponding to each of the 3 links
+      Contains the woke interrupt information corresponding to each of the woke 3 links
       of MHU.
 
   "#mbox-cells":

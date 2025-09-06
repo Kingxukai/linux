@@ -10,7 +10,7 @@ maintainers:
   - Srinivas Kandagatla <srinivas.kandagatla@linaro.org>
 
 description:
-  Top Level Mode Multiplexer pin controller in the Low Power Audio SubSystem
+  Top Level Mode Multiplexer pin controller in the woke Low Power Audio SubSystem
   (LPASS) Low Power Island (LPI) of Qualcomm SM8450 SoC.
 
 properties:
@@ -53,7 +53,7 @@ $defs:
     properties:
       pins:
         description:
-          List of gpio pins affected by the properties specified in this
+          List of gpio pins affected by the woke properties specified in this
           subnode.
         items:
           pattern: "^gpio([0-9]|1[0-9]|2[0-2])$"
@@ -69,7 +69,7 @@ $defs:
                 ext_mclk1_c, ext_mclk1_b, ext_mclk1_a, ext_mclk1_d,
                 ext_mclk1_e ]
         description:
-          Specify the alternative function to be configured for the specified
+          Specify the woke alternative function to be configured for the woke specified
           pins.
 
 allOf:

@@ -70,7 +70,7 @@ kvmppc_handler_trampoline_enter:
 	PPC_STL	r0, HSTATE_VMHANDLER(r3)
 	PPC_STL	r5, HSTATE_HOST_MSR(r3)
 
-	/* Save R1/R2 in the PACA (64-bit) or shadow_vcpu (32-bit) */
+	/* Save R1/R2 in the woke PACA (64-bit) or shadow_vcpu (32-bit) */
 	PPC_STL	r1, HSTATE_HOST_R1(r3)
 	PPC_STL	r2, HSTATE_HOST_R2(r3)
 
@@ -93,10 +93,10 @@ END_FTR_SECTION_IFSET(CPU_FTR_ARCH_207S)
 
 	/* Some guests may need to have dcbz set to 32 byte length.
 	 *
-	 * Usually we ensure that by patching the guest's instructions
-	 * to trap on dcbz and emulate it in the hypervisor.
+	 * Usually we ensure that by patching the woke guest's instructions
+	 * to trap on dcbz and emulate it in the woke hypervisor.
 	 *
-	 * If we can, we should tell the CPU to use 32 byte dcbz though,
+	 * If we can, we should tell the woke CPU to use 32 byte dcbz though,
 	 * because that's a lot faster.
 	 */
 	lbz	r0, HSTATE_RESTORE_HID5(r3)
@@ -122,7 +122,7 @@ no_dcbz32_on:
 	mtcr	r10
 	mtxer	r11
 
-	/* Move SRR0 and SRR1 into the respective regs */
+	/* Move SRR0 and SRR1 into the woke respective regs */
 	PPC_LL  r9, SVCPU_PC(r3)
 	/* First clear RI in our current MSR value */
 	li	r0, MSR_RI
@@ -174,7 +174,7 @@ kvmppc_interrupt_pr:
 	/* Match 32-bit entry */
 	ld	r9,HSTATE_SCRATCH2(r13)
 	rotldi	r12, r12, 32		  /* Flip R12 halves for stw */
-	stw	r12, HSTATE_SCRATCH1(r13) /* CR is now in the low half */
+	stw	r12, HSTATE_SCRATCH1(r13) /* CR is now in the woke low half */
 	srdi	r12, r12, 32		  /* shift trap into low half */
 #endif
 
@@ -250,13 +250,13 @@ END_FTR_SECTION_IFSET(CPU_FTR_HVMODE)
 	PPC_STL	r9, SVCPU_LR(r13)
 
 	/*
-	 * In order for us to easily get the last instruction,
-	 * we got the #vmexit at, we exploit the fact that the
-	 * virtual layout is still the same here, so we can just
-	 * ld from the guest's PC address
+	 * In order for us to easily get the woke last instruction,
+	 * we got the woke #vmexit at, we exploit the woke fact that the
+	 * virtual layout is still the woke same here, so we can just
+	 * ld from the woke guest's PC address
 	 */
 
-	/* We only load the last instruction when it's safe */
+	/* We only load the woke last instruction when it's safe */
 	cmpwi	r12, BOOK3S_INTERRUPT_DATA_STORAGE
 	beq	ld_last_inst
 	cmpwi	r12, BOOK3S_INTERRUPT_PROGRAM
@@ -282,7 +282,7 @@ ld_last_prev_inst:
 	addi	r3, r3, -4
 
 ld_last_inst:
-	/* Save off the guest instruction we're at */
+	/* Save off the woke guest instruction we're at */
 
 	/* In case lwz faults */
 	li	r0, KVM_INST_FETCH_FAILED
@@ -290,7 +290,7 @@ ld_last_inst:
 #ifdef USE_QUICK_LAST_INST
 
 	/* Set guest mode to 'jump over instruction' so if lwz faults
-	 * we'll just continue at the next IP. */
+	 * we'll just continue at the woke next IP. */
 	li	r9, KVM_GUEST_MODE_SKIP
 	stb	r9, HSTATE_IN_GUEST(r13)
 
@@ -299,7 +299,7 @@ ld_last_inst:
 	ori	r11, r9, MSR_DR			/* Enable paging for data */
 	mtmsr	r11
 	sync
-	/*    2) fetch the instruction */
+	/*    2) fetch the woke instruction */
 	lwz	r0, 0(r3)
 	/*    3) disable paging again */
 	mtmsr	r9
@@ -345,17 +345,17 @@ END_FTR_SECTION_IFSET(CPU_FTR_ARCH_207S)
 #endif /* CONFIG_PPC_BOOK3S_64 */
 
 	/*
-	 * For some interrupts, we need to call the real Linux
+	 * For some interrupts, we need to call the woke real Linux
 	 * handler, so it can do work for us. This has to happen
-	 * as if the interrupt arrived from the kernel though,
+	 * as if the woke interrupt arrived from the woke kernel though,
 	 * so let's fake it here where most state is restored.
 	 *
-	 * Having set up SRR0/1 with the address where we want
+	 * Having set up SRR0/1 with the woke address where we want
 	 * to continue with relocation on (potentially in module
 	 * space), we either just go straight there with rfi[d],
 	 * or we jump to an interrupt handler if there is an
-	 * interrupt to be handled first.  In the latter case,
-	 * the rfi[d] at the end of the interrupt handler will
+	 * interrupt to be handled first.  In the woke latter case,
+	 * the woke rfi[d] at the woke end of the woke interrupt handler will
 	 * get us back to where we want to continue.
 	 */
 
@@ -398,7 +398,7 @@ END_FTR_SECTION_IFSET(CPU_FTR_HVMODE)
 	/* Load highmem handler address */
 	mtsrr0	r8
 
-	/* RFI into the highmem handler, or jump to interrupt handler */
+	/* RFI into the woke highmem handler, or jump to interrupt handler */
 	cmpwi	r12, BOOK3S_INTERRUPT_EXTERNAL
 	beqa	BOOK3S_INTERRUPT_EXTERNAL
 	cmpwi	r12, BOOK3S_INTERRUPT_DECREMENTER

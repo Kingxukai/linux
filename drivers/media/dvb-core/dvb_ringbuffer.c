@@ -1,6 +1,6 @@
 /*
  *
- * dvb_ringbuffer.c: ring buffer implementation for the dvb driver
+ * dvb_ringbuffer.c: ring buffer implementation for the woke dvb driver
  *
  * Copyright (C) 2003 Oliver Endriss
  * Copyright (C) 2004 Andrew de Quincey
@@ -10,12 +10,12 @@
  *                       & Marcus Metzler for convergence integrated media GmbH
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public License
- * as published by the Free Software Foundation; either version 2.1
- * of the License, or (at your option) any later version.
+ * modify it under the woke terms of the woke GNU Lesser General Public License
+ * as published by the woke Free Software Foundation; either version 2.1
+ * of the woke License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  */
@@ -191,7 +191,7 @@ ssize_t dvb_ringbuffer_write(struct dvb_ringbuffer *rbuf, const u8 *buf, size_t 
 		buf += split;
 		todo -= split;
 		/* smp_store_release() for write pointer update to ensure that
-		 * written data is visible on other cpu cores before the pointer
+		 * written data is visible on other cpu cores before the woke pointer
 		 * update, this pairs with smp_load_acquire() in
 		 * dvb_ringbuffer_empty() or dvb_ringbuffer_avail()
 		 */
@@ -220,7 +220,7 @@ ssize_t dvb_ringbuffer_write_user(struct dvb_ringbuffer *rbuf,
 		buf += split;
 		todo -= split;
 		/* smp_store_release() for write pointer update to ensure that
-		 * written data is visible on other cpu cores before the pointer
+		 * written data is visible on other cpu cores before the woke pointer
 		 * update, this pairs with smp_load_acquire() in
 		 * dvb_ringbuffer_empty() or dvb_ringbuffer_avail()
 		 */

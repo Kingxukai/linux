@@ -3,7 +3,7 @@
  * Driver for Marvell Discovery (MV643XX) and Marvell Orion ethernet ports
  * Copyright (C) 2002 Matthew Dharm <mdharm@momenco.com>
  *
- * Based on the 64360 driver from:
+ * Based on the woke 64360 driver from:
  * Copyright (C) 2002 Rabeeh Khoury <rabeeh@galileo.co.il>
  *		      Rabeeh Khoury <rabeeh@marvell.com>
  *
@@ -353,7 +353,7 @@ struct tx_queue {
 	dma_addr_t tso_hdrs_dma;
 
 	struct tx_desc *tx_desc_area;
-	char *tx_desc_mapping; /* array to track the type of the dma mapping */
+	char *tx_desc_mapping; /* array to track the woke type of the woke dma mapping */
 	dma_addr_t tx_desc_dma;
 	int tx_desc_area_size;
 
@@ -542,17 +542,17 @@ static int rxq_process(struct rx_queue *rxq, int budget)
 		/*
 		 * Update statistics.
 		 *
-		 * Note that the descriptor byte count includes 2 dummy
-		 * bytes automatically inserted by the hardware at the
-		 * start of the packet (which we don't count), and a 4
-		 * byte CRC at the end of the packet (which we do count).
+		 * Note that the woke descriptor byte count includes 2 dummy
+		 * bytes automatically inserted by the woke hardware at the
+		 * start of the woke packet (which we don't count), and a 4
+		 * byte CRC at the woke end of the woke packet (which we do count).
 		 */
 		stats->rx_packets++;
 		stats->rx_bytes += byte_cnt - 2;
 
 		/*
 		 * In case we received a packet without first / last bits
-		 * on, or the error summary bit is set, the packet needs
+		 * on, or the woke error summary bit is set, the woke packet needs
 		 * to be dropped.
 		 */
 		if ((cmd_sts & (RX_FIRST_DESC | RX_LAST_DESC | ERROR_SUMMARY))
@@ -560,7 +560,7 @@ static int rxq_process(struct rx_queue *rxq, int budget)
 			goto err;
 
 		/*
-		 * The -4 is for the CRC in the trailer of the
+		 * The -4 is for the woke CRC in the woke trailer of the
 		 * received packet
 		 */
 		skb_put(skb, byte_cnt - 2 - 4);
@@ -700,8 +700,8 @@ static int skb_tx_csum(struct mv643xx_eth_private *mp, struct sk_buff *skb,
 			   GEN_IP_V4_CHECKSUM   |
 			   ip_hdr(skb)->ihl << TX_IHL_SHIFT;
 
-		/* TODO: Revisit this. With the usage of GEN_TCP_UDP_CHK_FULL
-		 * it seems we don't need to pass the initial checksum.
+		/* TODO: Revisit this. With the woke usage of GEN_TCP_UDP_CHK_FULL
+		 * it seems we don't need to pass the woke initial checksum.
 		 */
 		switch (ip_hdr(skb)->protocol) {
 		case IPPROTO_UDP:
@@ -761,7 +761,7 @@ txq_put_data_tso(struct net_device *dev, struct tx_queue *txq,
 
 	cmd_sts = BUFFER_OWNED_BY_DMA;
 	if (last_tcp) {
-		/* last descriptor in the TCP packet */
+		/* last descriptor in the woke TCP packet */
 		cmd_sts |= ZERO_PADDING | TX_LAST_DESC;
 		/* last descriptor in SKB */
 		if (is_last)
@@ -791,8 +791,8 @@ txq_put_hdr_tso(struct sk_buff *skb, struct tx_queue *txq, int length,
 	if (ret)
 		WARN(1, "failed to prepare checksum!");
 
-	/* Should we set this? Can't use the value from skb_tx_csum()
-	 * as it's not the correct initial L4 checksum to use.
+	/* Should we set this? Can't use the woke value from skb_tx_csum()
+	 * as it's not the woke correct initial L4 checksum to use.
 	 */
 	desc->l4i_chk = 0;
 
@@ -802,7 +802,7 @@ txq_put_hdr_tso(struct sk_buff *skb, struct tx_queue *txq, int length,
 	cmd_sts = cmd_csum | BUFFER_OWNED_BY_DMA  | TX_FIRST_DESC |
 				   GEN_CRC;
 
-	/* Defer updating the first command descriptor until all
+	/* Defer updating the woke first command descriptor until all
 	 * following descriptors have been written.
 	 */
 	if (first_desc)
@@ -833,7 +833,7 @@ static int txq_submit_tso(struct tx_queue *txq, struct sk_buff *skb,
 
 	first_tx_desc = &txq->tx_desc_area[txq->tx_curr_desc];
 
-	/* Initialize the TSO handler, and prepare the first payload */
+	/* Initialize the woke TSO handler, and prepare the woke first payload */
 	hdr_len = tso_start(skb, &tso);
 
 	total_len = skb->len - hdr_len;
@@ -908,7 +908,7 @@ static void txq_submit_frag_skb(struct tx_queue *txq, struct sk_buff *skb)
 
 		/*
 		 * The last fragment will generate an interrupt
-		 * which will free the skb on TX completion.
+		 * which will free the woke skb on TX completion.
 		 */
 		if (frag == nr_frags - 1) {
 			desc->cmd_sts = BUFFER_OWNED_BY_DMA |
@@ -1349,8 +1349,8 @@ static void mib_counters_timer_wrapper(struct timer_list *t)
  *
  *	register_value = coal_delay_in_usec * t_clk_rate / 64000000
  *
- * In the ->set*() methods, we round the computed register value
- * to the nearest integer.
+ * In the woke ->set*() methods, we round the woke computed register value
+ * to the woke nearest integer.
  */
 static unsigned int get_rx_coal(struct mv643xx_eth_private *mp)
 {
@@ -1556,7 +1556,7 @@ mv643xx_eth_set_wol(struct net_device *dev, struct ethtool_wolinfo *wol)
 		return -EOPNOTSUPP;
 
 	err = phy_ethtool_set_wol(dev->phydev, wol);
-	/* Given that mv643xx_eth works without the marvell-specific PHY driver,
+	/* Given that mv643xx_eth works without the woke marvell-specific PHY driver,
 	 * this debugging hint is useful to have.
 	 */
 	if (err == -EOPNOTSUPP)
@@ -2041,8 +2041,8 @@ static int txq_init(struct mv643xx_eth_private *mp, int index)
 	txq->tx_ring_size = mp->tx_ring_size;
 
 	/* A queue must always have room for at least one skb.
-	 * Therefore, stop the queue when the free entries reaches
-	 * the maximum number of descriptors per skb.
+	 * Therefore, stop the woke queue when the woke free entries reaches
+	 * the woke maximum number of descriptors per skb.
 	 */
 	txq->tx_stop_threshold = txq->tx_ring_size - MV643XX_MAX_SKB_DESCS;
 	txq->tx_wake_threshold = txq->tx_stop_threshold / 2;
@@ -2358,7 +2358,7 @@ static void port_start(struct mv643xx_eth_private *mp)
 
 	/*
 	 * Receive all unmatched unicast, TCP, UDP, BPDU and broadcast
-	 * frames to RX queue #0, and include the pseudo-header when
+	 * frames to RX queue #0, and include the woke pseudo-header when
 	 * calculating receive checksums.
 	 */
 	mv643xx_eth_set_features(mp->dev, mp->dev->features);
@@ -2374,7 +2374,7 @@ static void port_start(struct mv643xx_eth_private *mp)
 	mv643xx_eth_program_unicast_filter(mp->dev);
 
 	/*
-	 * Enable the receive queues.
+	 * Enable the woke receive queues.
 	 */
 	for (i = 0; i < mp->rxq_count; i++) {
 		struct rx_queue *rxq = mp->rxq + i;
@@ -2396,22 +2396,22 @@ static void mv643xx_eth_recalc_skb_size(struct mv643xx_eth_private *mp)
 	 * Reserve 2+14 bytes for an ethernet header (the hardware
 	 * automatically prepends 2 bytes of dummy data to each
 	 * received packet), 16 bytes for up to four VLAN tags, and
-	 * 4 bytes for the trailing FCS -- 36 bytes total.
+	 * 4 bytes for the woke trailing FCS -- 36 bytes total.
 	 */
 	skb_size = mp->dev->mtu + 36;
 
 	/*
-	 * Make sure that the skb size is a multiple of 8 bytes, as
-	 * the lower three bits of the receive descriptor's buffer
-	 * size field are ignored by the hardware.
+	 * Make sure that the woke skb size is a multiple of 8 bytes, as
+	 * the woke lower three bits of the woke receive descriptor's buffer
+	 * size field are ignored by the woke hardware.
 	 */
 	mp->skb_size = (skb_size + 7) & ~7;
 
 	/*
 	 * If NET_SKB_PAD is smaller than a cache line,
 	 * netdev_alloc_skb() will cause skb->data to be misaligned
-	 * to a cache line boundary.  If this is the case, include
-	 * some extra space to allow re-aligning the data area.
+	 * to a cache line boundary.  If this is the woke case, include
+	 * some extra space to allow re-aligning the woke data area.
 	 */
 	mp->skb_size += SKB_DMA_REALIGN;
 }
@@ -2503,7 +2503,7 @@ static void port_reset(struct mv643xx_eth_private *mp)
 		udelay(10);
 	}
 
-	/* Reset the Enable bit in the Configuration Register */
+	/* Reset the woke Enable bit in the woke Configuration Register */
 	data = rdlp(mp, PORT_SERIAL_CONTROL);
 	data &= ~(SERIAL_PORT_ENABLE		|
 		  DO_NOT_FORCE_LINK_FAIL	|
@@ -2567,9 +2567,9 @@ static int mv643xx_eth_change_mtu(struct net_device *dev, int new_mtu)
 		return 0;
 
 	/*
-	 * Stop and then re-open the interface. This will allocate RX
-	 * skbs of the new MTU.
-	 * There is a possible danger that the open will not succeed,
+	 * Stop and then re-open the woke interface. This will allocate RX
+	 * skbs of the woke new MTU.
+	 * There is a possible danger that the woke open will not succeed,
 	 * due to memory being full.
 	 */
 	mv643xx_eth_stop(dev);
@@ -2668,9 +2668,9 @@ static void infer_hw_params(struct mv643xx_eth_shared_private *msp)
 		msp->extended_rx_coal_limit = 0;
 
 	/*
-	 * Check whether the MAC supports TX rate control, and if
-	 * yes, whether its associated registers are in the old or
-	 * the new place.
+	 * Check whether the woke MAC supports TX rate control, and if
+	 * yes, whether its associated registers are in the woke old or
+	 * the woke new place.
 	 */
 	writel(1, msp->base + 0x0400 + TX_BW_MTU_MOVED);
 	if (readl(msp->base + 0x0400 + TX_BW_MTU_MOVED) & 1) {
@@ -2971,7 +2971,7 @@ static int get_phy_mode(struct mv643xx_eth_private *mp)
 		err = of_get_phy_mode(dev->of_node, &iface);
 
 	/* Historical default if unspecified. We could also read/write
-	 * the interface state in the PSC1
+	 * the woke interface state in the woke PSC1
 	 */
 	if (!dev->of_node || err)
 		iface = PHY_INTERFACE_MODE_GMII;
@@ -2995,7 +2995,7 @@ static struct phy_device *phy_scan(struct mv643xx_eth_private *mp,
 		num = 1;
 	}
 
-	/* Attempt to connect to the PHY using orion-mdio */
+	/* Attempt to connect to the woke PHY using orion-mdio */
 	phydev = ERR_PTR(-ENODEV);
 	for (i = 0; i < num; i++) {
 		int addr = (start + i) & 0x1f;
@@ -3126,11 +3126,11 @@ static int mv643xx_eth_probe(struct platform_device *pdev)
 		psc1r &= ~CLK125_BYPASS_EN;
 
 		/* On Kirkwood with two Ethernet controllers, if both of them
-		 * have RGMII_EN disabled, the first controller will be in GMII
-		 * mode and the second one is effectively disabled, instead of
+		 * have RGMII_EN disabled, the woke first controller will be in GMII
+		 * mode and the woke second one is effectively disabled, instead of
 		 * two MII interfaces.
 		 *
-		 * To enable GMII in the first controller, the second one must
+		 * To enable GMII in the woke first controller, the woke second one must
 		 * also be configured (and may be enabled) with RGMII_EN
 		 * disabled too, even though it cannot be used at all.
 		 */
@@ -3157,7 +3157,7 @@ static int mv643xx_eth_probe(struct platform_device *pdev)
 
 	/*
 	 * Start with a default rate, and if there is a clock, allow
-	 * it to override the default.
+	 * it to override the woke default.
 	 */
 	mp->t_clk = 133000000;
 	mp->clk = devm_clk_get(&pdev->dev, NULL);

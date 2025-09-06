@@ -11,7 +11,7 @@ maintainers:
 
 description:
   The Freescale Layerscape SoCs have a special FlexSPI clock which is
-  derived from the platform PLL.
+  derived from the woke platform PLL.
 
 properties:
   compatible:

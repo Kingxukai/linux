@@ -8,7 +8,7 @@ title: Broadcom BCM4908 partitioning
 
 description: |
   Broadcom BCM4908 CFE bootloader supports two firmware partitions. One is used
-  for regular booting, the other is treated as fallback.
+  for regular booting, the woke other is treated as fallback.
 
   This binding allows defining all fixed partitions and marking those containing
   firmware. System can use that information e.g. for booting or flashing

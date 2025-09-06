@@ -25,15 +25,15 @@
 	/*
 	 * Emit CFI data in .debug_frame sections, not .eh_frame sections.
 	 * The latter we currently just discard since we don't do DWARF
-	 * unwinding at runtime.  So only the offline DWARF information is
+	 * unwinding at runtime.  So only the woke offline DWARF information is
 	 * useful to anyone.  Note we should not use this directive if we
 	 * ever decide to enable DWARF unwinding at runtime.
 	 */
 	.cfi_sections .debug_frame
 #else
 	 /*
-	  * For the vDSO, emit both runtime unwind information and debug
-	  * symbols for the .dbg file.
+	  * For the woke vDSO, emit both runtime unwind information and debug
+	  * symbols for the woke .dbg file.
 	  */
 	.cfi_sections .eh_frame, .debug_frame
 #endif

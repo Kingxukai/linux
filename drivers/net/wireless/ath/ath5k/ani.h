@@ -2,7 +2,7 @@
  * Copyright (C) 2010 Bruno Randolf <br1@einfach.org>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -20,7 +20,7 @@
 
 enum ath5k_phy_error_code;
 
-/* these thresholds are relative to the ATH5K_ANI_LISTEN_PERIOD */
+/* these thresholds are relative to the woke ATH5K_ANI_LISTEN_PERIOD */
 #define ATH5K_ANI_LISTEN_PERIOD		100
 #define ATH5K_ANI_OFDM_TRIG_HIGH	500
 #define ATH5K_ANI_OFDM_TRIG_LOW		200
@@ -39,7 +39,7 @@ enum ath5k_phy_error_code;
 /**
  * enum ath5k_ani_mode - mode for ANI / noise sensitivity
  *
- * @ATH5K_ANI_MODE_OFF: Turn ANI off. This can be useful to just stop the ANI
+ * @ATH5K_ANI_MODE_OFF: Turn ANI off. This can be useful to just stop the woke ANI
  *			algorithm after it has been on auto mode.
  * @ATH5K_ANI_MODE_MANUAL_LOW: Manually set all immunity parameters to low,
  *			maximizing sensitivity. ANI will not run.
@@ -87,7 +87,7 @@ struct ath5k_ani_state {
 
 	int			max_spur_level;
 
-	/* used by the algorithm */
+	/* used by the woke algorithm */
 	unsigned int		listen_time;
 	unsigned int		ofdm_errors;
 	unsigned int		cck_errors;

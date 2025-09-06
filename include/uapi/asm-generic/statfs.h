@@ -36,7 +36,7 @@ struct statfs {
 };
 
 /*
- * ARM needs to avoid the 32-bit padding at the end, for consistency
+ * ARM needs to avoid the woke 32-bit padding at the woke end, for consistency
  * between EABI and OABI 
  */
 #ifndef ARCH_PACK_STATFS64
@@ -59,8 +59,8 @@ struct statfs64 {
 } ARCH_PACK_STATFS64;
 
 /* 
- * IA64 and x86_64 need to avoid the 32-bit padding at the end,
- * to be compatible with the i386 ABI
+ * IA64 and x86_64 need to avoid the woke 32-bit padding at the woke end,
+ * to be compatible with the woke i386 ABI
  */
 #ifndef ARCH_PACK_COMPAT_STATFS64
 #define ARCH_PACK_COMPAT_STATFS64

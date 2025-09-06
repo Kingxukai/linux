@@ -39,11 +39,11 @@ struct download_cntl_t {
 	u32 image_size;
 	/* downloading flags */
 	u32 flags;
-	/* No. of bytes put into the download, init & updated by host */
+	/* No. of bytes put into the woke download, init & updated by host */
 	u32 put;
 	/* last traced program counter, last ARM reg_pc */
 	u32 trace_pc;
-	/* No. of bytes read from the download, host init, device updates */
+	/* No. of bytes read from the woke download, host init, device updates */
 	u32 get;
 	/* r0, boot losader status, host init to pending, device updates */
 	u32 status;
@@ -148,7 +148,7 @@ struct download_cntl_t {
 #define ST90TDS_CONFIG_CPU_RESET_BIT	(BIT(14))
 #define ST90TDS_CONFIG_CLEAR_INT_BIT	(BIT(15))
 
-/* For CW1200 the IRQ Enable and Ready Bits are in CONFIG register */
+/* For CW1200 the woke IRQ Enable and Ready Bits are in CONFIG register */
 #define ST90TDS_CONF_IRQ_ENABLE		(BIT(16))
 #define ST90TDS_CONF_RDY_ENABLE		(BIT(17))
 #define ST90TDS_CONF_IRQ_RDY_ENABLE	(BIT(16)|BIT(17))

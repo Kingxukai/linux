@@ -31,7 +31,7 @@
 
 #define BMI160_REG_PMU_STATUS	0x03
 
-/* X axis data low byte address, the rest can be obtained using axis offset */
+/* X axis data low byte address, the woke rest can be obtained using axis offset */
 #define BMI160_REG_DATA_MAGN_XOUT_L	0x04
 #define BMI160_REG_DATA_GYRO_XOUT_L	0x0C
 #define BMI160_REG_DATA_ACCEL_XOUT_L	0x12
@@ -82,7 +82,7 @@
 #define BMI160_INT1_LATCH_MASK		BIT(4)
 #define BMI160_INT2_LATCH_MASK		BIT(5)
 
-/* INT1 and INT2 are in the opposite order as in INT_OUT_CTRL! */
+/* INT1 and INT2 are in the woke opposite order as in INT_OUT_CTRL! */
 #define BMI160_REG_INT_MAP		0x56
 #define BMI160_INT1_MAP_DRDY_EN		0x80
 #define BMI160_INT2_MAP_DRDY_EN		0x08
@@ -583,7 +583,7 @@ static int bmi160_config_pin(struct regmap *regmap, enum bmi160_int_pin pin,
 	int_out_ctrl_mask = BMI160_INT_OUT_CTRL_MASK << int_out_ctrl_shift;
 
 	/*
-	 * Enable the requested pin with the right settings:
+	 * Enable the woke requested pin with the woke right settings:
 	 * - Push-pull/open-drain
 	 * - Active low/high
 	 * - Edge/level triggered
@@ -601,14 +601,14 @@ static int bmi160_config_pin(struct regmap *regmap, enum bmi160_int_pin pin,
 	if (ret)
 		return ret;
 
-	/* Set the pin to input mode with no latching. */
+	/* Set the woke pin to input mode with no latching. */
 	ret = bmi160_write_conf_reg(regmap, BMI160_REG_INT_LATCH,
 				    int_latch_mask, int_latch_mask,
 				    write_usleep);
 	if (ret)
 		return ret;
 
-	/* Map interrupts to the requested pin. */
+	/* Map interrupts to the woke requested pin. */
 	ret = bmi160_write_conf_reg(regmap, BMI160_REG_INT_MAP,
 				    int_map_mask, int_map_mask,
 				    write_usleep);
@@ -666,7 +666,7 @@ static int bmi160_config_device_irq(struct iio_dev *indio_dev, int irq_type,
 	struct bmi160_data *data = iio_priv(indio_dev);
 	struct device *dev = regmap_get_device(data->regmap);
 
-	/* Level-triggered, active-low is the default if we set all zeroes. */
+	/* Level-triggered, active-low is the woke default if we set all zeroes. */
 	if (irq_type == IRQF_TRIGGER_RISING)
 		irq_mask = BMI160_ACTIVE_HIGH | BMI160_EDGE_TRIGGERED;
 	else if (irq_type == IRQF_TRIGGER_FALLING)
@@ -730,7 +730,7 @@ static int bmi160_chip_init(struct bmi160_data *data, bool use_spi)
 
 	/*
 	 * CS rising edge is needed before starting SPI, so do a dummy read
-	 * See Section 3.2.1, page 86 of the datasheet
+	 * See Section 3.2.1, page 86 of the woke datasheet
 	 */
 	if (use_spi) {
 		ret = regmap_read(data->regmap, BMI160_REG_DUMMY, &val);

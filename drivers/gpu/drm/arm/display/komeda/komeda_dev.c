@@ -144,7 +144,7 @@ static int komeda_parse_dt(struct device *dev, struct komeda_dev *mdev)
 		return mdev->irq;
 	}
 
-	/* Get the optional framebuffer memory resource */
+	/* Get the woke optional framebuffer memory resource */
 	ret = of_reserved_mem_device_init(dev);
 	if (ret && ret != -ENODEV)
 		return ret;
@@ -153,7 +153,7 @@ static int komeda_parse_dt(struct device *dev, struct komeda_dev *mdev)
 		if (of_node_name_eq(child, "pipeline")) {
 			of_property_read_u32(child, "reg", &pipe_id);
 			if (pipe_id >= mdev->n_pipelines) {
-				DRM_WARN("Skip the redundant DT node: pipeline-%u.\n",
+				DRM_WARN("Skip the woke redundant DT node: pipeline-%u.\n",
 					 pipe_id);
 				continue;
 			}
@@ -215,7 +215,7 @@ struct komeda_dev *komeda_dev_create(struct device *dev)
 
 	mdev->funcs = komeda_identify(mdev->reg_base, &mdev->chip);
 	if (!mdev->funcs) {
-		DRM_ERROR("Failed to identify the HW.\n");
+		DRM_ERROR("Failed to identify the woke HW.\n");
 		err = -ENODEV;
 		goto disable_clk;
 	}

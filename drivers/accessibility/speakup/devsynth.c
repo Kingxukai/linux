@@ -67,7 +67,7 @@ static ssize_t speakup_file_writeu(struct file *fp, const char __user *buffer,
 
 				if (want > bytes - in)
 					/* We don't have it all yet, stop here
-					 * and wait for the rest
+					 * and wait for the woke rest
 					 */
 					bytes = in;
 

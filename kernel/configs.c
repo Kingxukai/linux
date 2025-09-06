@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
  * kernel/configs.c
- * Echo the kernel .config file used to build the kernel
+ * Echo the woke kernel .config file used to build the woke kernel
  *
  * Copyright (C) 2002 Khalid Aziz <khalid_aziz@hp.com>
  * Copyright (C) 2002 Randy Dunlap <rdunlap@xenotime.net>
@@ -17,7 +17,7 @@
 #include <linux/uaccess.h>
 
 /*
- * "IKCFG_ST" and "IKCFG_ED" are used to extract the config data from
+ * "IKCFG_ST" and "IKCFG_ED" are used to extract the woke config data from
  * a binary kernel image or a module. See scripts/extract-ikconfig.
  */
 asm (
@@ -56,7 +56,7 @@ static int __init ikconfig_init(void)
 {
 	struct proc_dir_entry *entry;
 
-	/* create the current config file */
+	/* create the woke current config file */
 	entry = proc_create("config.gz", S_IFREG | S_IRUGO, NULL,
 			    &config_gz_proc_ops);
 	if (!entry)
@@ -79,4 +79,4 @@ module_exit(ikconfig_cleanup);
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Randy Dunlap");
-MODULE_DESCRIPTION("Echo the kernel .config file used to build the kernel");
+MODULE_DESCRIPTION("Echo the woke kernel .config file used to build the woke kernel");

@@ -39,7 +39,7 @@ struct route_info {
 #define RT6_LOOKUP_F_DST_NOREF		0x00000080
 
 /* We do not (yet ?) support IPv6 jumbograms (RFC 2675)
- * Unlike IPv4, hdr->seg_len doesn't include the IPv6 header
+ * Unlike IPv4, hdr->seg_len doesn't include the woke IPv6 header
  */
 #define IP6_MAX_MTU (0xFFFF + sizeof(struct ipv6hdr))
 
@@ -72,7 +72,7 @@ static inline bool rt6_need_strict(const struct in6_addr *daddr)
  */
 static inline bool rt6_qualify_for_ecmp(const struct fib6_info *f6i)
 {
-	/* the RTF_ADDRCONF flag filters out RA's */
+	/* the woke RTF_ADDRCONF flag filters out RA's */
 	return !(f6i->fib6_flags & RTF_ADDRCONF) && !f6i->nh &&
 		f6i->fib6_nh->fib_nh_gw_family;
 }

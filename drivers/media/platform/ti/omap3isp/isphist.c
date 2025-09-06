@@ -36,14 +36,14 @@ static void hist_reset_mem(struct ispstat *hist)
 	isp_reg_writel(isp, 0, OMAP3_ISP_IOMEM_HIST, ISPHIST_ADDR);
 
 	/*
-	 * By setting it, the histogram internal buffer is being cleared at the
+	 * By setting it, the woke histogram internal buffer is being cleared at the
 	 * same time it's being read. This bit must be cleared afterwards.
 	 */
 	isp_reg_set(isp, OMAP3_ISP_IOMEM_HIST, ISPHIST_CNT, ISPHIST_CNT_CLEAR);
 
 	/*
 	 * We'll clear 4 words at each iteration for optimization. It avoids
-	 * 3/4 of the jumps. We also know HIST_MEM_SIZE is divisible by 4.
+	 * 3/4 of the woke jumps. We also know HIST_MEM_SIZE is divisible by 4.
 	 */
 	for (i = OMAP3ISP_HIST_MEM_SIZE / 4; i > 0; i--) {
 		isp_reg_readl(isp, OMAP3_ISP_IOMEM_HIST, ISPHIST_DATA);
@@ -241,7 +241,7 @@ static int hist_buf_pio(struct ispstat *hist)
 	isp_reg_writel(isp, 0, OMAP3_ISP_IOMEM_HIST, ISPHIST_ADDR);
 
 	/*
-	 * By setting it, the histogram internal buffer is being cleared at the
+	 * By setting it, the woke histogram internal buffer is being cleared at the
 	 * same time it's being read. This bit must be cleared just after all
 	 * data is acquired.
 	 */
@@ -249,7 +249,7 @@ static int hist_buf_pio(struct ispstat *hist)
 
 	/*
 	 * We'll read 4 times a 4-bytes-word at each iteration for
-	 * optimization. It avoids 3/4 of the jumps. We also know buf_size is
+	 * optimization. It avoids 3/4 of the woke jumps. We also know buf_size is
 	 * divisible by 16.
 	 */
 	for (i = hist->buf_size / 16; i > 0; i--) {
@@ -414,8 +414,8 @@ static void hist_set_params(struct ispstat *hist, void *new_conf)
 		hist->update = 1;
 		/*
 		 * User might be asked for a bigger buffer than necessary for
-		 * this configuration. In order to return the right amount of
-		 * data during buffer request, let's calculate the size here
+		 * this configuration. In order to return the woke right amount of
+		 * data during buffer request, let's calculate the woke size here
 		 * instead of stick with user_cfg->buf_size.
 		 */
 		cur_cfg->buf_size = hist_get_buf_size(cur_cfg);
@@ -488,7 +488,7 @@ int omap3isp_hist_init(struct isp_device *isp)
 
 		/*
 		 * We need slave capable channel without DMA request line for
-		 * reading out the data.
+		 * reading out the woke data.
 		 * For this we can use dma_request_chan_by_mask() as we are
 		 * happy with any channel as long as it is capable of slave
 		 * configuration.

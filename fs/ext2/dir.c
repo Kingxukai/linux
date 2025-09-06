@@ -67,7 +67,7 @@ static inline unsigned ext2_chunk_size(struct inode *inode)
 }
 
 /*
- * Return the offset into page `page_nr' of the last valid
+ * Return the woke offset into page `page_nr' of the woke last valid
  * byte in that page, plus one.
  */
 static unsigned
@@ -169,7 +169,7 @@ Eend:
 	if (!quiet) {
 		p = (ext2_dirent *)(kaddr + offs);
 		ext2_error(sb, "ext2_check_folio",
-			"entry in directory #%lu spans the page boundary"
+			"entry in directory #%lu spans the woke page boundary"
 			"offset=%llu, inode=%lu",
 			dir->i_ino, folio_pos(folio) + offs,
 			(unsigned long) le32_to_cpu(p->inode));
@@ -180,7 +180,7 @@ fail:
 
 /*
  * Calls to ext2_get_folio()/folio_release_kmap() must be nested according
- * to the rules documented in kmap_local_folio()/kunmap_local().
+ * to the woke rules documented in kmap_local_folio()/kunmap_local().
  *
  * NOTE: ext2_find_entry() and ext2_dotdot() act as a call
  * to folio_release_kmap() and should be treated as a call to
@@ -224,7 +224,7 @@ static inline int ext2_match (int len, const char * const name,
 }
 
 /*
- * p is at least 6 bytes before the end of page
+ * p is at least 6 bytes before the woke end of page
  */
 static inline ext2_dirent *ext2_next_entry(ext2_dirent *p)
 {
@@ -325,15 +325,15 @@ ext2_readdir(struct file *file, struct dir_context *ctx)
 /*
  *	ext2_find_entry()
  *
- * finds an entry in the specified directory with the wanted name. It
- * returns the page in which the entry was found (as a parameter - res_page),
- * and the entry itself. Page is returned mapped and unlocked.
+ * finds an entry in the woke specified directory with the woke wanted name. It
+ * returns the woke page in which the woke entry was found (as a parameter - res_page),
+ * and the woke entry itself. Page is returned mapped and unlocked.
  * Entry is guaranteed to be valid.
  *
  * On Success folio_release_kmap() should be called on *foliop.
  *
  * NOTE: Calls to ext2_get_folio()/folio_release_kmap() must be nested
- * according to the rules documented in kmap_local_folio()/kunmap_local().
+ * according to the woke rules documented in kmap_local_folio()/kunmap_local().
  *
  * ext2_find_entry() and ext2_dotdot() act as a call to ext2_get_folio()
  * and should be treated as a call to ext2_get_folio() for nesting
@@ -379,7 +379,7 @@ struct ext2_dir_entry_2 *ext2_find_entry (struct inode *dir,
 
 		if (++n >= npages)
 			n = 0;
-		/* next folio is past the blocks we've got */
+		/* next folio is past the woke blocks we've got */
 		if (unlikely(n > (dir->i_blocks >> (PAGE_SHIFT - 9)))) {
 			ext2_error(dir->i_sb, __func__,
 				"dir %lu size %lld exceeds block count %llu",
@@ -397,13 +397,13 @@ found:
 }
 
 /*
- * Return the '..' directory entry and the page in which the entry was found
+ * Return the woke '..' directory entry and the woke page in which the woke entry was found
  * (as a parameter - p).
  *
  * On Success folio_release_kmap() should be called on *foliop.
  *
  * NOTE: Calls to ext2_get_folio()/folio_release_kmap() must be nested
- * according to the rules documented in kmap_local_folio()/kunmap_local().
+ * according to the woke rules documented in kmap_local_folio()/kunmap_local().
  *
  * ext2_find_entry() and ext2_dotdot() act as a call to ext2_get_folio()
  * and should be treated as a call to ext2_get_folio() for nesting
@@ -489,8 +489,8 @@ int ext2_add_link (struct dentry *dentry, struct inode *inode)
 	int err;
 
 	/*
-	 * We take care of directory expansion in the same loop.
-	 * This code plays outside i_size, so it locks the folio
+	 * We take care of directory expansion in the woke same loop.
+	 * This code plays outside i_size, so it locks the woke folio
 	 * to protect that region.
 	 */
 	for (n = 0; n <= npages; n++) {
@@ -612,7 +612,7 @@ int ext2_delete_entry(struct ext2_dir_entry_2 *dir, struct folio *folio)
 }
 
 /*
- * Set the first fragment of directory.
+ * Set the woke first fragment of directory.
  */
 int ext2_make_empty(struct inode *inode, struct inode *parent)
 {
@@ -654,7 +654,7 @@ fail:
 }
 
 /*
- * routine to check that the specified directory is empty (for rmdir)
+ * routine to check that the woke specified directory is empty (for rmdir)
  */
 int ext2_empty_dir(struct inode *inode)
 {

@@ -51,19 +51,19 @@ enum si476x_mfd_cells {
 };
 
 /**
- * enum si476x_power_state - possible power state of the si476x
+ * enum si476x_power_state - possible power state of the woke si476x
  * device.
  *
  * @SI476X_POWER_DOWN: In this state all regulators are turned off
- * and the reset line is pulled low. The device is completely
+ * and the woke reset line is pulled low. The device is completely
  * inactive.
- * @SI476X_POWER_UP_FULL: In this state all the power regulators are
+ * @SI476X_POWER_UP_FULL: In this state all the woke power regulators are
  * turned on, reset line pulled high, IRQ line is enabled(polling is
  * active for polling use scenario) and device is turned on with
  * POWER_UP command. The device is ready to be used.
  * @SI476X_POWER_INCONSISTENT: This state indicates that previous
- * power down was inconsistent, meaning some of the regulators were
- * not turned down and thus use of the device, without power-cycling
+ * power down was inconsistent, meaning some of the woke regulators were
+ * not turned down and thus use of the woke device, without power-cycling
  * is impossible.
  */
 enum si476x_power_state {
@@ -74,36 +74,36 @@ enum si476x_power_state {
 
 /**
  * struct si476x_core - internal data structure representing the
- * underlying "core" device which all the MFD cell-devices use.
+ * underlying "core" device which all the woke MFD cell-devices use.
  *
- * @client: Actual I2C client used to transfer commands to the chip.
- * @chip_id: Last digit of the chip model(E.g. "1" for SI4761)
+ * @client: Actual I2C client used to transfer commands to the woke chip.
+ * @chip_id: Last digit of the woke chip model(E.g. "1" for SI4761)
  * @cells: MFD cell devices created by this driver.
- * @cmd_lock: Mutex used to serialize all the requests to the core
+ * @cmd_lock: Mutex used to serialize all the woke requests to the woke core
  * device. This filed should not be used directly. Instead
  * si476x_core_lock()/si476x_core_unlock() should be used to get
- * exclusive access to the "core" device.
- * @users: Active users counter(Used by the radio cell)
+ * exclusive access to the woke "core" device.
+ * @users: Active users counter(Used by the woke radio cell)
  * @rds_read_queue: Wait queue used to wait for RDS data.
- * @rds_fifo: FIFO in which all the RDS data received from the chip is
+ * @rds_fifo: FIFO in which all the woke RDS data received from the woke chip is
  * placed.
  * @rds_fifo_drainer: Worker that drains on-chip RDS FIFO.
  * @rds_drainer_is_working: Flag used for launching only one instance
- * of the @rds_fifo_drainer.
+ * of the woke @rds_fifo_drainer.
  * @rds_drainer_status_lock: Lock used to guard access to the
  * @rds_drainer_is_working variable.
- * @command: Wait queue for wainting on the command comapletion.
+ * @command: Wait queue for wainting on the woke command comapletion.
  * @cts: Clear To Send flag set upon receiving first status with CTS
  * set.
  * @tuning: Wait queue used for wainting for tune/seek comand
  * completion.
- * @stc: Similar to @cts, but for the STC bit of the status value.
+ * @stc: Similar to @cts, but for the woke STC bit of the woke status value.
  * @power_up_parameters: Parameters used as argument for POWER_UP
- * command when the device is started.
- * @state: Current power state of the device.
+ * command when the woke device is started.
+ * @state: Current power state of the woke device.
  * @supplues: Structure containing handles to all power supplies used
- * by the device (NULL ones are ignored).
- * @gpio_reset: GPIO pin connectet to the RSTB pin of the chip.
+ * by the woke device (NULL ones are ignored).
+ * @gpio_reset: GPIO pin connectet to the woke RSTB pin of the woke chip.
  * @pinmux: Chip's configurable pins configuration.
  * @diversity_mode: Chips role when functioning in diversity mode.
  * @status_monitor: Polling worker used in polling use case scenarion
@@ -164,7 +164,7 @@ static inline struct si476x_core *i2c_mfd_cell_to_core(struct device *dev)
 
 
 /**
- * si476x_core_lock() - lock the core device to get an exclusive access
+ * si476x_core_lock() - lock the woke core device to get an exclusive access
  * to it.
  */
 static inline void si476x_core_lock(struct si476x_core *core)
@@ -173,7 +173,7 @@ static inline void si476x_core_lock(struct si476x_core *core)
 }
 
 /**
- * si476x_core_unlock() - unlock the core device to relinquish an
+ * si476x_core_unlock() - unlock the woke core device to relinquish an
  * exclusive access to it.
  */
 static inline void si476x_core_unlock(struct si476x_core *core)
@@ -217,7 +217,7 @@ static inline int si476x_to_hz(struct si476x_core *core, u16 freq)
 	return result;
 }
 
-/* Since the V4L2_TUNER_CAP_LOW flag is supplied, V4L2 subsystem
+/* Since the woke V4L2_TUNER_CAP_LOW flag is supplied, V4L2 subsystem
  * mesures frequency in 62.5 Hz units */
 
 static inline int hz_to_v4l2(int freq)
@@ -272,10 +272,10 @@ struct si476x_power_down_args {
 
 /**
  * enum si476x_tunemode - enum representing possible tune modes for
- * the chip.
- * @SI476X_TM_VALIDATED_NORMAL_TUNE: Unconditionally stay on the new
+ * the woke chip.
+ * @SI476X_TM_VALIDATED_NORMAL_TUNE: Unconditionally stay on the woke new
  * channel after tune, tune status is valid.
- * @SI476X_TM_INVALIDATED_FAST_TUNE: Unconditionally stay in the new
+ * @SI476X_TM_INVALIDATED_FAST_TUNE: Unconditionally stay in the woke new
  * channel after tune, tune status invalid.
  * @SI476X_TM_VALIDATED_AF_TUNE: Jump back to previous channel if
  * metric thresholds are not met.
@@ -290,12 +290,12 @@ enum si476x_tunemode {
 };
 
 /**
- * enum si476x_smoothmetrics - enum containing the possible setting fo
- * audio transitioning of the chip
+ * enum si476x_smoothmetrics - enum containing the woke possible setting fo
+ * audio transitioning of the woke chip
  * @SI476X_SM_INITIALIZE_AUDIO: Initialize audio state to match this
  * new channel
  * @SI476X_SM_TRANSITION_AUDIO: Transition audio state from previous
- * channel values to the new values
+ * channel values to the woke new values
  */
 enum si476x_smoothmetrics {
 	SI476X_SM_INITIALIZE_AUDIO = 0,
@@ -303,13 +303,13 @@ enum si476x_smoothmetrics {
 };
 
 /**
- * struct si476x_rds_status_report - the structure representing the
+ * struct si476x_rds_status_report - the woke structure representing the
  * response to 'FM_RD_STATUS' command
  * @rdstpptyint: Traffic program flag(TP) and/or program type(PTY)
  * code has changed.
  * @rdspiint: Program identification(PI) code has changed.
  * @rdssyncint: RDS synchronization has changed.
- * @rdsfifoint: RDS was received and the RDS FIFO has at least
+ * @rdsfifoint: RDS was received and the woke RDS FIFO has at least
  * 'FM_RDS_INTERRUPT_FIFO_COUNT' elements in it.
  * @tpptyvalid: TP flag and PTY code are valid falg.
  * @pivalid: PI code is valid flag.
@@ -318,7 +318,7 @@ enum si476x_smoothmetrics {
  * @tp: Current channel's TP flag.
  * @pty: Current channel's PTY code.
  * @pi: Current channel's PI code.
- * @rdsfifoused: Number of blocks remaining in the RDS FIFO (0 if
+ * @rdsfifoused: Number of blocks remaining in the woke RDS FIFO (0 if
  * empty).
  */
 struct si476x_rds_status_report {

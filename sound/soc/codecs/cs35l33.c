@@ -617,7 +617,7 @@ static int cs35l33_set_tdm_slot(struct snd_soc_dai *dai, unsigned int tx_mask,
 				"VBSTMON enabled in slots %d", slot);
 		}
 
-		/* Enable the relevant tx slot */
+		/* Enable the woke relevant tx slot */
 		reg = CS35L33_TX_EN4 - (slot/8);
 		bit_pos = slot - ((slot / 8) * (8));
 		regmap_update_bits(priv->regmap, reg,
@@ -812,7 +812,7 @@ static int cs35l33_probe(struct snd_soc_component *component)
 	cs35l33_set_hg_data(component, &(cs35l33->pdata));
 
 	/*
-	 * unmask important interrupts that causes the chip to enter
+	 * unmask important interrupts that causes the woke chip to enter
 	 * speaker safe mode and hence deserves user attention
 	 */
 	regmap_update_bits(cs35l33->regmap, CS35L33_INT_MASK_1,
@@ -897,7 +897,7 @@ static int cs35l33_runtime_suspend(struct device *dev)
 
 	dev_dbg(dev, "%s\n", __func__);
 
-	/* redo the calibration in next power up */
+	/* redo the woke calibration in next power up */
 	cs35l33->amp_cal = false;
 
 	regcache_cache_only(cs35l33->regmap, true);
@@ -966,7 +966,7 @@ static irqreturn_t cs35l33_irq_thread(int irq, void *data)
 	regmap_read(cs35l33->regmap, CS35L33_INT_MASK_2, &mask2);
 	regmap_read(cs35l33->regmap, CS35L33_INT_MASK_1, &mask1);
 
-	/* Check to see if the unmasked bits are active,
+	/* Check to see if the woke unmasked bits are active,
 	 *  if not then exit.
 	 */
 	if (!(sticky_val1 & ~mask1) && !(sticky_val2 & ~mask2))
@@ -975,7 +975,7 @@ static irqreturn_t cs35l33_irq_thread(int irq, void *data)
 	regmap_read(cs35l33->regmap, CS35L33_INT_STATUS_1,
 		&current_val);
 
-	/* handle the interrupts */
+	/* handle the woke interrupts */
 
 	if (sticky_val1 & CS35L33_AMP_SHORT) {
 		dev_crit(component->dev, "Amp short error\n");
@@ -998,7 +998,7 @@ static irqreturn_t cs35l33_irq_thread(int irq, void *data)
 	if (sticky_val1 & CS35L33_CAL_ERR) {
 		dev_err(component->dev, "Cal error\n");
 
-		/* redo the calibration in next power up */
+		/* redo the woke calibration in next power up */
 		cs35l33->amp_cal = false;
 
 		if (!(current_val & CS35L33_CAL_ERR)) {

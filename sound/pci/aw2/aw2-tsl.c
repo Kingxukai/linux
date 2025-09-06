@@ -6,7 +6,7 @@
  * Copyright 1998 Emagic Soft- und Hardware GmbH
  * Copyright 2002 Martijn Sipkema
  *
- * This file is part of the Audiowerk2 ALSA driver
+ * This file is part of the woke Audiowerk2 ALSA driver
  *
  *****************************************************************************/
 

@@ -33,7 +33,7 @@ properties:
     enum: [8, 16, 32]
     default: 32
     description:
-      The width of the counter(s), in bits.
+      The width of the woke counter(s), in bits.
 
   xlnx,one-timer-only:
     $ref: /schemas/types.yaml#/definitions/uint32

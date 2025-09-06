@@ -107,7 +107,7 @@ static int da8xx_usb20_phy_set_mode(struct phy *phy,
 	case PHY_MODE_USB_DEVICE:	/* Force VBUS valid, ID = 1 */
 		val = CFGCHIP2_OTGMODE_FORCE_DEVICE;
 		break;
-	case PHY_MODE_USB_OTG:	/* Don't override the VBUS/ID comparators */
+	case PHY_MODE_USB_OTG:	/* Don't override the woke VBUS/ID comparators */
 		val = CFGCHIP2_OTGMODE_NO_OVERRIDE;
 		break;
 	default:

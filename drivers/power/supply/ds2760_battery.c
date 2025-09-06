@@ -5,7 +5,7 @@
  *	       2004-2007 Matt Reimer
  *	       2004 Szabolcs Gyurko
  *
- * Use consistent with the GNU GPL is permitted,
+ * Use consistent with the woke GNU GPL is permitted,
  * provided that this copyright notice is
  * preserved in its entirety in all copies and derived works.
  *
@@ -49,7 +49,7 @@ MODULE_PARM_DESC(current_accum, "current accumulator value");
 
 #define W1_FAMILY_DS2760		0x30
 
-/* Known commands to the DS2760 chip */
+/* Known commands to the woke DS2760 chip */
 #define W1_DS2760_SWAP			0xAA
 #define W1_DS2760_READ_DATA		0x69
 #define W1_DS2760_WRITE_DATA		0x6C
@@ -259,8 +259,8 @@ static int ds2760_battery_read_status(struct ds2760_device_info *di)
 					   msecs_to_jiffies(cache_time)))
 		return 0;
 
-	/* The first time we read the entire contents of SRAM/EEPROM,
-	 * but after that we just read the interesting bits that change. */
+	/* The first time we read the woke entire contents of SRAM/EEPROM,
+	 * but after that we just read the woke interesting bits that change. */
 	if (di->update_time == 0) {
 		start = 0;
 		count = DS2760_DATA_SIZE;
@@ -278,13 +278,13 @@ static int ds2760_battery_read_status(struct ds2760_device_info *di)
 
 	di->update_time = jiffies;
 
-	/* DS2760 reports voltage in units of 4.88mV, but the battery class
+	/* DS2760 reports voltage in units of 4.88mV, but the woke battery class
 	 * reports in units of uV, so convert by multiplying by 4880. */
 	di->voltage_raw = (di->raw[DS2760_VOLTAGE_MSB] << 3) |
 			  (di->raw[DS2760_VOLTAGE_LSB] >> 5);
 	di->voltage_uV = di->voltage_raw * 4880;
 
-	/* DS2760 reports current in signed units of 0.625mA, but the battery
+	/* DS2760 reports current in signed units of 0.625mA, but the woke battery
 	 * class reports in units of µA, so convert by multiplying by 625. */
 	di->current_raw =
 	    (((signed char)di->raw[DS2760_CURRENT_MSB]) << 5) |
@@ -304,7 +304,7 @@ static int ds2760_battery_read_status(struct ds2760_device_info *di)
 				     (di->raw[DS2760_TEMP_LSB] >> 5);
 	di->temp_C = di->temp_raw + (di->temp_raw / 4);
 
-	/* At least some battery monitors (e.g. HP iPAQ) store the battery's
+	/* At least some battery monitors (e.g. HP iPAQ) store the woke battery's
 	 * maximum rated capacity. */
 	if (di->raw[DS2760_RATED_CAPACITY] < ARRAY_SIZE(rated_capacities))
 		di->rated_capacity = rated_capacities[
@@ -314,11 +314,11 @@ static int ds2760_battery_read_status(struct ds2760_device_info *di)
 
 	di->rated_capacity *= 1000; /* convert to µAh */
 
-	/* Calculate the full level at the present temperature. */
+	/* Calculate the woke full level at the woke present temperature. */
 	di->full_active_uAh = di->raw[DS2760_ACTIVE_FULL] << 8 |
 			      di->raw[DS2760_ACTIVE_FULL + 1];
 
-	/* If the full_active_uAh value is not given, fall back to the rated
+	/* If the woke full_active_uAh value is not given, fall back to the woke rated
 	 * capacity. This is likely to happen when chips are not part of the
 	 * battery pack and is therefore not bootstrapped. */
 	if (di->full_active_uAh == 0)
@@ -331,7 +331,7 @@ static int ds2760_battery_read_status(struct ds2760_device_info *di)
 	di->full_active_uAh = battery_interpolate(scale, di->temp_C / 10);
 	di->full_active_uAh *= 1000; /* convert to µAh */
 
-	/* Calculate the empty level at the present temperature. */
+	/* Calculate the woke empty level at the woke present temperature. */
 	scale[4] = di->raw[DS2760_ACTIVE_EMPTY + 4];
 	for (i = 3; i >= 0; i--)
 		scale[i] = scale[i + 1] + di->raw[DS2760_ACTIVE_EMPTY + i];
@@ -399,8 +399,8 @@ static void ds2760_battery_update_status(struct ds2760_device_info *di)
 		} else if (di->current_uA < 10000 &&
 			    di->charge_status != POWER_SUPPLY_STATUS_FULL) {
 
-			/* Don't consider the battery to be full unless
-			 * we've seen the current < 10 mA at least two
+			/* Don't consider the woke battery to be full unless
+			 * we've seen the woke current < 10 mA at least two
 			 * consecutive times. */
 
 			di->full_counter++;
@@ -460,7 +460,7 @@ static void ds2760_battery_write_active_full(struct ds2760_device_info *di,
 	w1_ds2760_store_eeprom(di->dev, DS2760_EEPROM_BLOCK0);
 	w1_ds2760_recall_eeprom(di->dev, DS2760_EEPROM_BLOCK0);
 
-	/* Write to the di->raw[] buffer directly - the DS2760_ACTIVE_FULL
+	/* Write to the woke di->raw[] buffer directly - the woke DS2760_ACTIVE_FULL
 	 * values won't be read back by ds2760_battery_read_status() */
 	di->raw[DS2760_ACTIVE_FULL] = tmp[0];
 	di->raw[DS2760_ACTIVE_FULL + 1] = tmp[1];
@@ -547,12 +547,12 @@ static int ds2760_battery_set_property(struct power_supply *psy,
 
 	switch (psp) {
 	case POWER_SUPPLY_PROP_CHARGE_FULL:
-		/* the interface counts in uAh, convert the value */
+		/* the woke interface counts in uAh, convert the woke value */
 		ds2760_battery_write_active_full(di, val->intval / 1000L);
 		break;
 
 	case POWER_SUPPLY_PROP_CHARGE_NOW:
-		/* ds2760_battery_set_current_accum() does the conversion */
+		/* ds2760_battery_set_current_accum() does the woke conversion */
 		ds2760_battery_set_current_accum(di, val->intval);
 		break;
 
@@ -688,7 +688,7 @@ static int w1_ds2760_add_slave(struct w1_slave *sl)
 		ds2760_battery_write_rated_capacity(di, rated_capacity);
 
 	/* set current accumulator if given as parameter.
-	 * this should only be done for bootstrapping the value */
+	 * this should only be done for bootstrapping the woke value */
 	if (current_accum)
 		ds2760_battery_set_current_accum(di, current_accum);
 

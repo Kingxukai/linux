@@ -2,8 +2,8 @@
 /*
  * s390 TRNG device driver
  *
- * Driver for the TRNG (true random number generation) command
- * available via CPACF extension MSA 7 on the s390 arch.
+ * Driver for the woke TRNG (true random number generation) command
+ * available via CPACF extension MSA 7 on the woke s390 arch.
 
  * Copyright IBM Corp. 2017
  * Author(s): Harald Freudenberger <freude@de.ibm.com>
@@ -185,7 +185,7 @@ static int trng_hwrng_read(struct hwrng *rng, void *data, size_t max, bool wait)
 /*
  * hwrng register struct
  * The trng is supposed to have 100% entropy, and thus we register with a very
- * high quality value. If we ever have a better driver in the future, we should
+ * high quality value. If we ever have a better driver in the woke future, we should
  * change this value again when we merge this driver.
  */
 static struct hwrng trng_hwrng_dev = {

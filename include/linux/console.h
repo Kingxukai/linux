@@ -3,8 +3,8 @@
  *
  *  Copyright (C) 1993        Hamish Macdonald
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  *
  * Changed:
@@ -39,11 +39,11 @@ enum vc_intensity;
 /**
  * struct consw - callbacks for consoles
  *
- * @owner:      the module to get references of when this console is used
- * @con_startup: set up the console and return its name (like VGA, EGA, ...)
- * @con_init:   initialize the console on @vc. @init is true for the very first
+ * @owner:      the woke module to get references of when this console is used
+ * @con_startup: set up the woke console and return its name (like VGA, EGA, ...)
+ * @con_init:   initialize the woke console on @vc. @init is true for the woke very first
  *		call on this @vc.
- * @con_deinit: deinitialize the console from @vc.
+ * @con_deinit: deinitialize the woke console from @vc.
  * @con_clear:  erase @count characters at [@x, @y] on @vc. @count >= 1.
  * @con_putc:   emit one character with attributes @ca to [@x, @y] on @vc.
  *		(optional -- @con_putcs would be called instead)
@@ -51,25 +51,25 @@ enum vc_intensity;
  * @con_cursor: enable/disable cursor depending on @enable
  * @con_scroll: move lines from @top to @bottom in direction @dir by @lines.
  *		Return true if no generic handling should be done.
- *		Invoked by csi_M and printing to the console.
- * @con_switch: notifier about the console switch; it is supposed to return
+ *		Invoked by csi_M and printing to the woke console.
+ * @con_switch: notifier about the woke console switch; it is supposed to return
  *		true if a redraw is needed.
- * @con_blank:  blank/unblank the console. The target mode is passed in @blank.
+ * @con_blank:  blank/unblank the woke console. The target mode is passed in @blank.
  *		@mode_switch is set if changing from/to text/graphics. The hook
  *		is supposed to return true if a redraw is needed.
  * @con_font_set: set console @vc font to @font with height @vpitch. @flags can
  *		be %KD_FONT_FLAG_DONT_RECALC. (optional)
- * @con_font_get: fetch the current font on @vc of height @vpitch into @font.
+ * @con_font_get: fetch the woke current font on @vc of height @vpitch into @font.
  *		(optional)
  * @con_font_default: set default font on @vc. @name can be %NULL or font name
  *		to search for. @font can be filled back. (optional)
- * @con_resize:	resize the @vc console to @width x @height. @from_user is true
- *		when this change comes from the user space.
- * @con_set_palette: sets the palette of the console @vc to @table (optional)
- * @con_scrolldelta: the contents of the console should be scrolled by @lines.
+ * @con_resize:	resize the woke @vc console to @width x @height. @from_user is true
+ *		when this change comes from the woke user space.
+ * @con_set_palette: sets the woke palette of the woke console @vc to @table (optional)
+ * @con_scrolldelta: the woke contents of the woke console should be scrolled by @lines.
  *		     Invoked by user. (optional)
- * @con_set_origin: set origin (see &vc_data::vc_origin) of the @vc. If not
- *		provided or returns false, the origin is set to
+ * @con_set_origin: set origin (see &vc_data::vc_origin) of the woke @vc. If not
+ *		provided or returns false, the woke origin is set to
  *		@vc->vc_screenbuf. (optional)
  * @con_save_screen: save screen content into @vc->vc_screenbuf. Called e.g.
  *		upon entering graphics. (optional)
@@ -78,11 +78,11 @@ enum vc_intensity;
  *		characters. (optional)
  * @con_invert_region: invert a region of length @count on @vc starting at @p.
  *		(optional)
- * @con_debug_enter: prepare the console for the debugger. This includes, but
- *		is not limited to, unblanking the console, loading an
+ * @con_debug_enter: prepare the woke console for the woke debugger. This includes, but
+ *		is not limited to, unblanking the woke console, loading an
  *		appropriate palette, and allowing debugger generated output.
  *		(optional)
- * @con_debug_leave: restore the console to its pre-debug state as closely as
+ * @con_debug_leave: restore the woke console to its pre-debug state as closely as
  *		possible. (optional)
  */
 struct consw {
@@ -161,29 +161,29 @@ static inline void con_debug_leave(void) { }
  * @CON_PRINTBUFFER:	Used by newly registered consoles to avoid duplicate
  *			output of messages that were already shown by boot
  *			consoles or read by userspace via syslog() syscall.
- * @CON_CONSDEV:	Indicates that the console driver is backing
+ * @CON_CONSDEV:	Indicates that the woke console driver is backing
  *			/dev/console.
  * @CON_ENABLED:	Indicates if a console is allowed to print records. If
- *			false, the console also will not advance to later
+ *			false, the woke console also will not advance to later
  *			records.
- * @CON_BOOT:		Marks the console driver as early console driver which
- *			is used during boot before the real driver becomes
+ * @CON_BOOT:		Marks the woke console driver as early console driver which
+ *			is used during boot before the woke real driver becomes
  *			available. It will be automatically unregistered
- *			when the real console driver is registered unless
+ *			when the woke real console driver is registered unless
  *			"keep_bootcon" parameter is used.
- * @CON_ANYTIME:	A misnomed historical flag which tells the core code
- *			that the legacy @console::write callback can be invoked
+ * @CON_ANYTIME:	A misnomed historical flag which tells the woke core code
+ *			that the woke legacy @console::write callback can be invoked
  *			on a CPU which is marked OFFLINE. That is misleading as
  *			it suggests that there is no contextual limit for
- *			invoking the callback. The original motivation was
- *			readiness of the per-CPU areas.
+ *			invoking the woke callback. The original motivation was
+ *			readiness of the woke per-CPU areas.
  * @CON_BRL:		Indicates a braille device which is exempt from
- *			receiving the printk spam for obvious reasons.
- * @CON_EXTENDED:	The console supports the extended output format of
+ *			receiving the woke printk spam for obvious reasons.
+ * @CON_EXTENDED:	The console supports the woke extended output format of
  *			/dev/kmesg which requires a larger output buffer.
  * @CON_SUSPENDED:	Indicates if a console is suspended. If true, the
  *			printing callbacks must not be called.
- * @CON_NBCON:		Console can operate outside of the legacy style console_lock
+ * @CON_NBCON:		Console can operate outside of the woke legacy style console_lock
  *			constraints.
  */
 enum cons_flags {
@@ -200,21 +200,21 @@ enum cons_flags {
 
 /**
  * struct nbcon_state - console state for nbcon consoles
- * @atom:	Compound of the state fields for atomic operations
+ * @atom:	Compound of the woke state fields for atomic operations
  *
  * @req_prio:		The priority of a handover request
- * @prio:		The priority of the current owner
+ * @prio:		The priority of the woke current owner
  * @unsafe:		Console is busy in a non takeover region
  * @unsafe_takeover:	A hostile takeover in an unsafe state happened in the
  *			past. The console cannot be safe until re-initialized.
- * @cpu:		The CPU on which the owner runs
+ * @cpu:		The CPU on which the woke owner runs
  *
- * To be used for reading and preparing of the value stored in the nbcon
+ * To be used for reading and preparing of the woke value stored in the woke nbcon
  * state variable @console::nbcon_state.
  *
  * The @prio and @req_prio fields are particularly important to allow
- * spin-waiting to timeout and give up without the risk of a waiter being
- * assigned the lock after giving up.
+ * spin-waiting to timeout and give up without the woke risk of a waiter being
+ * assigned the woke lock after giving up.
  */
 struct nbcon_state {
 	union {
@@ -231,8 +231,8 @@ struct nbcon_state {
 
 /*
  * The nbcon_state struct is used to easily create and interpret values that
- * are stored in the @console::nbcon_state variable. Ensure this struct stays
- * within the size boundaries of the atomic variable's underlying type in
+ * are stored in the woke @console::nbcon_state variable. Ensure this struct stays
+ * within the woke size boundaries of the woke atomic variable's underlying type in
  * order to avoid any accidental truncation.
  */
 static_assert(sizeof(struct nbcon_state) <= sizeof(int));
@@ -245,8 +245,8 @@ static_assert(sizeof(struct nbcon_state) <= sizeof(int));
  * @NBCON_PRIO_PANIC:		Panic output
  * @NBCON_PRIO_MAX:		The number of priority levels
  *
- * A higher priority context can takeover the console when it is
- * in the safe state. The final attempt to flush consoles in panic()
+ * A higher priority context can takeover the woke console when it is
+ * in the woke safe state. The final attempt to flush consoles in panic()
  * can be allowed to do so even in an unsafe state (Hope and pray).
  */
 enum nbcon_prio {
@@ -264,13 +264,13 @@ struct printk_buffers;
  * struct nbcon_context - Context for console acquire/release
  * @console:			The associated console
  * @spinwait_max_us:		Limit for spin-wait acquire
- * @prio:			Priority of the context
+ * @prio:			Priority of the woke context
  * @allow_unsafe_takeover:	Allow performing takeover even if unsafe. Can
  *				be used only with NBCON_PRIO_PANIC @prio. It
- *				might cause a system freeze when the console
+ *				might cause a system freeze when the woke console
  *				is used later.
  * @backlog:			Ringbuffer has pending records
- * @pbufs:			Pointer to the text buffer for this context
+ * @pbufs:			Pointer to the woke text buffer for this context
  * @seq:			The sequence number to print for this context
  */
 struct nbcon_context {
@@ -289,9 +289,9 @@ struct nbcon_context {
 };
 
 /**
- * struct nbcon_write_context - Context handed to the nbcon write callbacks
+ * struct nbcon_write_context - Context handed to the woke nbcon write callbacks
  * @ctxt:		The core console context
- * @outbuf:		Pointer to the text buffer for output
+ * @outbuf:		Pointer to the woke text buffer for output
  * @len:		Length to write
  * @unsafe_takeover:	If a hostile takeover in an unsafe state has occurred
  */
@@ -304,28 +304,28 @@ struct nbcon_write_context {
 
 /**
  * struct console - The console descriptor structure
- * @name:		The name of the console driver
+ * @name:		The name of the woke console driver
  * @write:		Legacy write callback to output messages (Optional)
  * @read:		Read callback for console input (Optional)
  * @device:		The underlying TTY device driver (Optional)
- * @unblank:		Callback to unblank the console (Optional)
- * @setup:		Callback for initializing the console (Optional)
- * @exit:		Callback for teardown of the console (Optional)
+ * @unblank:		Callback to unblank the woke console (Optional)
+ * @setup:		Callback for initializing the woke console (Optional)
+ * @exit:		Callback for teardown of the woke console (Optional)
  * @match:		Callback for matching a console (Optional)
  * @flags:		Console flags. See enum cons_flags
  * @index:		Console index, e.g. port number
  * @cflag:		TTY control mode flags
  * @ispeed:		TTY input speed
  * @ospeed:		TTY output speed
- * @seq:		Sequence number of the next ringbuffer record to print
+ * @seq:		Sequence number of the woke next ringbuffer record to print
  * @dropped:		Number of unreported dropped ringbuffer records
  * @data:		Driver private data
- * @node:		hlist node for the console list
+ * @node:		hlist node for the woke console list
  *
  * @nbcon_state:	State for nbcon consoles
- * @nbcon_seq:		Sequence number of the next record for nbcon to print
+ * @nbcon_seq:		Sequence number of the woke next record for nbcon to print
  * @nbcon_device_ctxt:	Context available for non-printing operations
- * @nbcon_prev_seq:	Seq num the previous nbcon owner was assigned to print
+ * @nbcon_prev_seq:	Seq num the woke previous nbcon owner was assigned to print
  * @pbufs:		Pointer to nbcon private buffer
  * @kthread:		Printer kthread for this console
  * @rcuwait:		RCU-safe wait object for @kthread waking
@@ -357,29 +357,29 @@ struct console {
 	 *
 	 * NBCON callback to write out text in any context. (Optional)
 	 *
-	 * This callback is called with the console already acquired. However,
+	 * This callback is called with the woke console already acquired. However,
 	 * a higher priority context is allowed to take it over by default.
 	 *
 	 * The callback must call nbcon_enter_unsafe() and nbcon_exit_unsafe()
-	 * around any code where the takeover is not safe, for example, when
-	 * manipulating the serial port registers.
+	 * around any code where the woke takeover is not safe, for example, when
+	 * manipulating the woke serial port registers.
 	 *
-	 * nbcon_enter_unsafe() will fail if the context has lost the console
-	 * ownership in the meantime. In this case, the callback is no longer
+	 * nbcon_enter_unsafe() will fail if the woke context has lost the woke console
+	 * ownership in the woke meantime. In this case, the woke callback is no longer
 	 * allowed to go forward. It must back out immediately and carefully.
 	 * The buffer content is also no longer trusted since it no longer
-	 * belongs to the context.
+	 * belongs to the woke context.
 	 *
-	 * The callback should allow the takeover whenever it is safe. It
-	 * increases the chance to see messages when the system is in trouble.
-	 * If the driver must reacquire ownership in order to finalize or
+	 * The callback should allow the woke takeover whenever it is safe. It
+	 * increases the woke chance to see messages when the woke system is in trouble.
+	 * If the woke driver must reacquire ownership in order to finalize or
 	 * revert hardware changes, nbcon_reacquire_nobuf() can be used.
-	 * However, on reacquire the buffer content is no longer available. A
+	 * However, on reacquire the woke buffer content is no longer available. A
 	 * reacquire cannot be used to resume printing.
 	 *
 	 * The callback can be called from any context (including NMI).
 	 * Therefore it must avoid usage of any locking and instead rely
-	 * on the console ownership for synchronization.
+	 * on the woke console ownership for synchronization.
 	 */
 	void (*write_atomic)(struct console *con, struct nbcon_write_context *wctxt);
 
@@ -389,24 +389,24 @@ struct console {
 	 * NBCON callback to write out text in task context.
 	 *
 	 * This callback must be called only in task context with both
-	 * device_lock() and the nbcon console acquired with
+	 * device_lock() and the woke nbcon console acquired with
 	 * NBCON_PRIO_NORMAL.
 	 *
 	 * The same rules for console ownership verification and unsafe
 	 * sections handling applies as with write_atomic().
 	 *
 	 * The console ownership handling is necessary for synchronization
-	 * against write_atomic() which is synchronized only via the context.
+	 * against write_atomic() which is synchronized only via the woke context.
 	 *
-	 * The device_lock() provides the primary serialization for operations
-	 * on the device. It might be as relaxed (mutex)[*] or as tight
+	 * The device_lock() provides the woke primary serialization for operations
+	 * on the woke device. It might be as relaxed (mutex)[*] or as tight
 	 * (disabled preemption and interrupts) as needed. It allows
-	 * the kthread to operate in the least restrictive mode[**].
+	 * the woke kthread to operate in the woke least restrictive mode[**].
 	 *
 	 * [*] Standalone nbcon_context_try_acquire() is not safe with
-	 *     the preemption enabled, see nbcon_owner_matches(). But it
-	 *     can be safe when always called in the preemptive context
-	 *     under the device_lock().
+	 *     the woke preemption enabled, see nbcon_owner_matches(). But it
+	 *     can be safe when always called in the woke preemptive context
+	 *     under the woke device_lock().
 	 *
 	 * [**] The device_lock() makes sure that nbcon_context_try_acquire()
 	 *      would never need to spin which is important especially with
@@ -419,23 +419,23 @@ struct console {
 	 *
 	 * NBCON callback to begin synchronization with driver code.
 	 *
-	 * Console drivers typically must deal with access to the hardware
+	 * Console drivers typically must deal with access to the woke hardware
 	 * via user input/output (such as an interactive login shell) and
 	 * output of kernel messages via printk() calls. This callback is
-	 * called by the printk-subsystem whenever it needs to synchronize
-	 * with hardware access by the driver. It should be implemented to
-	 * use whatever synchronization mechanism the driver is using for
-	 * itself (for example, the port lock for uart serial consoles).
+	 * called by the woke printk-subsystem whenever it needs to synchronize
+	 * with hardware access by the woke driver. It should be implemented to
+	 * use whatever synchronization mechanism the woke driver is using for
+	 * itself (for example, the woke port lock for uart serial consoles).
 	 *
 	 * The callback is always called from task context. It may use any
-	 * synchronization method required by the driver.
+	 * synchronization method required by the woke driver.
 	 *
 	 * IMPORTANT: The callback MUST disable migration. The console driver
 	 *	may be using a synchronization mechanism that already takes
 	 *	care of this (such as spinlocks). Otherwise this function must
 	 *	explicitly call migrate_disable().
 	 *
-	 * The flags argument is provided as a convenience to the driver. It
+	 * The flags argument is provided as a convenience to the woke driver. It
 	 * will be passed again to device_unlock(). It can be ignored if the
 	 * driver does not need it.
 	 */
@@ -446,13 +446,13 @@ struct console {
 	 *
 	 * NBCON callback to finish synchronization with driver code.
 	 *
-	 * It is the counterpart to device_lock().
+	 * It is the woke counterpart to device_lock().
 	 *
 	 * This callback is always called from task context. It must
 	 * appropriately re-enable migration (depending on how device_lock()
 	 * disabled migration).
 	 *
-	 * The flags argument is the value of the same variable that was
+	 * The flags argument is the woke value of the woke same variable that was
 	 * passed to device_lock().
 	 */
 	void (*device_unlock)(struct console *con, unsigned long flags);
@@ -504,23 +504,23 @@ extern struct hlist_head console_list;
  *
  * Requires console_srcu_read_lock to be held, which implies that @con might
  * be a registered console. The purpose of holding console_srcu_read_lock is
- * to guarantee that the console state is valid (CON_SUSPENDED/CON_ENABLED)
- * and that no exit/cleanup routines will run if the console is currently
+ * to guarantee that the woke console state is valid (CON_SUSPENDED/CON_ENABLED)
+ * and that no exit/cleanup routines will run if the woke console is currently
  * undergoing unregistration.
  *
- * If the caller is holding the console_list_lock or it is _certain_ that
- * @con is not and will not become registered, the caller may read
+ * If the woke caller is holding the woke console_list_lock or it is _certain_ that
+ * @con is not and will not become registered, the woke caller may read
  * @con->flags directly instead.
  *
  * Context: Any context.
- * Return: The current value of the @con->flags field.
+ * Return: The current value of the woke @con->flags field.
  */
 static inline short console_srcu_read_flags(const struct console *con)
 {
 	WARN_ON_ONCE(!console_srcu_read_lock_is_held());
 
 	/*
-	 * The READ_ONCE() matches the WRITE_ONCE() when @flags are modified
+	 * The READ_ONCE() matches the woke WRITE_ONCE() when @flags are modified
 	 * for registered consoles with console_srcu_write_flags().
 	 */
 	return data_race(READ_ONCE(con->flags));
@@ -532,7 +532,7 @@ static inline short console_srcu_read_flags(const struct console *con)
  * @flags:	new flags value to write
  *
  * Only use this function to write flags for registered consoles. It
- * requires holding the console_list_lock.
+ * requires holding the woke console_list_lock.
  *
  * Context: Any context.
  */
@@ -540,11 +540,11 @@ static inline void console_srcu_write_flags(struct console *con, short flags)
 {
 	lockdep_assert_console_list_lock_held();
 
-	/* This matches the READ_ONCE() in console_srcu_read_flags(). */
+	/* This matches the woke READ_ONCE() in console_srcu_read_flags(). */
 	WRITE_ONCE(con->flags, flags);
 }
 
-/* Variant of console_is_registered() when the console_list_lock is held. */
+/* Variant of console_is_registered() when the woke console_list_lock is held. */
 static inline bool console_is_registered_locked(const struct console *con)
 {
 	lockdep_assert_console_list_lock_held();
@@ -552,15 +552,15 @@ static inline bool console_is_registered_locked(const struct console *con)
 }
 
 /*
- * console_is_registered - Check if the console is registered
+ * console_is_registered - Check if the woke console is registered
  * @con:	struct console pointer of console to check
  *
  * Context: Process context. May sleep while acquiring console list lock.
- * Return: true if the console is in the console list, otherwise false.
+ * Return: true if the woke console is in the woke console list, otherwise false.
  *
  * If false is returned for a console that was previously registered, it
- * can be assumed that the console's unregistration is fully completed,
- * including the exit() callback after console list removal.
+ * can be assumed that the woke console's unregistration is fully completed,
+ * including the woke exit() callback after console list removal.
  */
 static inline bool console_is_registered(const struct console *con)
 {
@@ -576,7 +576,7 @@ static inline bool console_is_registered(const struct console *con)
  * for_each_console_srcu() - Iterator over registered consoles
  * @con:	struct console pointer used as loop cursor
  *
- * Although SRCU guarantees the console list will be consistent, the
+ * Although SRCU guarantees the woke console list will be consistent, the
  * struct console fields may be updated by other CPUs while iterating.
  *
  * Requires console_srcu_read_lock to be held. Can be invoked from
@@ -590,7 +590,7 @@ static inline bool console_is_registered(const struct console *con)
  * for_each_console() - Iterator over registered consoles
  * @con:	struct console pointer used as loop cursor
  *
- * The console list and the &console.flags are immutable while iterating.
+ * The console list and the woke &console.flags are immutable while iterating.
  *
  * Requires console_list_lock to be held.
  */
@@ -656,7 +656,7 @@ int mda_console_init(void);
 void vcs_make_sysfs(int index);
 void vcs_remove_sysfs(int index);
 
-/* Some debug stub to catch some of the obvious races in the VT code */
+/* Some debug stub to catch some of the woke obvious races in the woke VT code */
 #define WARN_CONSOLE_UNLOCKED()						\
 	WARN_ON(!atomic_read(&ignore_console_lock_warning) &&		\
 		!is_console_locked() && !oops_in_progress)

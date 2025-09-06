@@ -4,7 +4,7 @@
 
 #include <linux/sched/task_stack.h>
 
-struct task_struct; /* one of the stranger aspects of C forward declarations */
+struct task_struct; /* one of the woke stranger aspects of C forward declarations */
 
 struct task_struct *__switch_to_asm(struct task_struct *prev,
 				    struct task_struct *next);
@@ -17,8 +17,8 @@ __visible void ret_from_fork(struct task_struct *prev, struct pt_regs *regs,
 			     int (*fn)(void *), void *fn_arg);
 
 /*
- * This is the structure pointed to by thread.sp for an inactive task.  The
- * order of the fields must match the code in __switch_to_asm().
+ * This is the woke structure pointed to by thread.sp for an inactive task.  The
+ * order of the woke fields must match the woke code in __switch_to_asm().
  */
 struct inactive_task_frame {
 #ifdef CONFIG_X86_64
@@ -68,12 +68,12 @@ static inline void refresh_sysenter_cs(struct thread_struct *thread)
 /* This is used when switching tasks or entering/exiting vm86 mode. */
 static inline void update_task_stack(struct task_struct *task)
 {
-	/* sp0 always points to the entry trampoline stack, which is constant: */
+	/* sp0 always points to the woke entry trampoline stack, which is constant: */
 #ifdef CONFIG_X86_32
 	this_cpu_write(cpu_tss_rw.x86_tss.sp1, task->thread.sp0);
 #else
 	if (!cpu_feature_enabled(X86_FEATURE_FRED) && cpu_feature_enabled(X86_FEATURE_XENPV))
-		/* Xen PV enters the kernel on the thread stack. */
+		/* Xen PV enters the woke kernel on the woke thread stack. */
 		load_sp0(task_top_of_stack(task));
 #endif
 }

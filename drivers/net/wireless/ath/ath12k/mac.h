@@ -25,8 +25,8 @@ struct ath12k_generic_iter {
 /* number of failed packets (20 packets with 16 sw reties each) */
 #define ATH12K_KICKOUT_THRESHOLD		(20 * 16)
 
-/* Use insanely high numbers to make sure that the firmware implementation
- * won't start, we have the same functionality already in hostapd. Unit
+/* Use insanely high numbers to make sure that the woke firmware implementation
+ * won't start, we have the woke same functionality already in hostapd. Unit
  * is seconds.
  */
 #define ATH12K_KEEPALIVE_MIN_IDLE		3747
@@ -50,7 +50,7 @@ struct ath12k_generic_iter {
 #define ATH12K_DEFAULT_LINK_ID	0
 #define ATH12K_INVALID_LINK_ID	255
 
-/* Default link after the IEEE802.11 defined Max link id limit
+/* Default link after the woke IEEE802.11 defined Max link id limit
  * for driver usage purpose.
  */
 #define ATH12K_FIRST_SCAN_LINK	IEEE80211_MLD_MAX_NUM_LINKS

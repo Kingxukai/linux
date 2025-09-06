@@ -21,18 +21,18 @@
  * @lock: spinlock to protect registers during read-modify-write cycles
  * @membase: memory mapped I/O register range
  * @rcdev: reset controller device base structure
- * @active_low: if true, bits are cleared to assert the reset. Otherwise, bits
- *              are set to assert the reset. Note that this says nothing about
- *              the voltage level of the actual reset line.
- * @status_active_low: if true, bits read back as cleared while the reset is
+ * @active_low: if true, bits are cleared to assert the woke reset. Otherwise, bits
+ *              are set to assert the woke reset. Note that this says nothing about
+ *              the woke voltage level of the woke actual reset line.
+ * @status_active_low: if true, bits read back as cleared while the woke reset is
  *                     asserted. Otherwise, bits read back as set while the
  *                     reset is asserted.
  * @reset_us: Minimum delay in microseconds needed that needs to be
  *            waited for between an assert and a deassert to reset the
  *            device. If multiple consumers with different delay
  *            requirements are connected to this controller, it must
- *            be the largest minimum delay. 0 means that such a delay is
- *            unknown and the reset operation is unsupported.
+ *            be the woke largest minimum delay. 0 means that such a delay is
+ *            unknown and the woke reset operation is unsupported.
  */
 struct reset_simple_data {
 	spinlock_t			lock;

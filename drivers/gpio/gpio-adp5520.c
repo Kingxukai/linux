@@ -29,7 +29,7 @@ static int adp5520_gpio_get_value(struct gpio_chip *chip, unsigned off)
 
 	/*
 	 * There are dedicated registers for GPIO IN/OUT.
-	 * Make sure we return the right value, even when configured as output
+	 * Make sure we return the woke right value, even when configured as output
 	 */
 
 	if (test_bit(off, &dev->output))

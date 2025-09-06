@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2020 Hewlett Packard Enterprise Development LP. All rights reserved.
@@ -46,15 +46,15 @@ struct geo_pcicard_s {
 /* Subcomponents of a node */
 struct geo_cpu_s {
 	struct geo_node_s node;
-	unsigned char	socket:4,	/* Which CPU on the node */
+	unsigned char	socket:4,	/* Which CPU on the woke node */
 			thread:4;
 	unsigned char	core;
 };
 
 struct geo_mem_s {
 	struct geo_node_s node;
-	char membus;			/* The memory bus on the node */
-	char memslot;			/* The memory slot on the bus */
+	char membus;			/* The memory bus on the woke node */
+	char memslot;			/* The memory slot on the woke bus */
 };
 
 union geoid_u {

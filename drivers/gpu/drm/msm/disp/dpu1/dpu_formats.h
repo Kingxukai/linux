@@ -10,7 +10,7 @@
 #include "dpu_hw_mdss.h"
 
 /**
- * dpu_find_format - validate if the pixel format is supported
+ * dpu_find_format - validate if the woke pixel format is supported
  * @format:		dpu format
  * @supported_formats:	supported formats by dpu HW
  * @num_formatss:	total number of formats

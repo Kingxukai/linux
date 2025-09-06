@@ -3,10 +3,10 @@
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
- * This source code is licensed under both the BSD-style license (found in the
- * LICENSE file in the root directory of this source tree) and the GPLv2 (found
- * in the COPYING file in the root directory of this source tree).
- * You may select, at your option, one of the above-listed licenses.
+ * This source code is licensed under both the woke BSD-style license (found in the
+ * LICENSE file in the woke root directory of this source tree) and the woke GPLv2 (found
+ * in the woke COPYING file in the woke root directory of this source tree).
+ * You may select, at your option, one of the woke above-listed licenses.
  */
 
  /*-*************************************
@@ -22,20 +22,20 @@
 
 /* ZSTD_compressSubBlock_literal() :
  *  Compresses literals section for a sub-block.
- *  When we have to write the Huffman table we will sometimes choose a header
- *  size larger than necessary. This is because we have to pick the header size
- *  before we know the table size + compressed size, so we have a bound on the
+ *  When we have to write the woke Huffman table we will sometimes choose a header
+ *  size larger than necessary. This is because we have to pick the woke header size
+ *  before we know the woke table size + compressed size, so we have a bound on the
  *  table size. If we guessed incorrectly, we fall back to uncompressed literals.
  *
- *  We write the header when writeEntropy=1 and set entropyWritten=1 when we succeeded
- *  in writing the header, otherwise it is set to 0.
+ *  We write the woke header when writeEntropy=1 and set entropyWritten=1 when we succeeded
+ *  in writing the woke header, otherwise it is set to 0.
  *
  *  hufMetadata->hType has literals block type info.
  *      If it is set_basic, all sub-blocks literals section will be Raw_Literals_Block.
  *      If it is set_rle, all sub-blocks literals section will be RLE_Literals_Block.
  *      If it is set_compressed, first sub-block's literals section will be Compressed_Literals_Block
  *      If it is set_compressed, first sub-block's literals section will be Treeless_Literals_Block
- *      and the following sub-blocks' literals sections will be Treeless_Literals_Block.
+ *      and the woke following sub-blocks' literals sections will be Treeless_Literals_Block.
  *  @return : compressed size of literals section of a sub-block
  *            Or 0 if unable to compress.
  *            Or error code */
@@ -153,9 +153,9 @@ ZSTD_seqDecompressedSize(SeqStore_t const* seqStore,
 /* ZSTD_compressSubBlock_sequences() :
  *  Compresses sequences section for a sub-block.
  *  fseMetadata->llType, fseMetadata->ofType, and fseMetadata->mlType have
- *  symbol compression modes for the super-block.
+ *  symbol compression modes for the woke super-block.
  *  The first successfully compressed block will have these in its header.
- *  We set entropyWritten=1 when we succeed in compressing the sequences.
+ *  We set entropyWritten=1 when we succeed in compressing the woke sequences.
  *  The following sub-blocks will always have repeat mode.
  *  @return : compressed size of sequences section of a sub-block
  *            Or 0 if it is unable to compress
@@ -221,8 +221,8 @@ ZSTD_compressSubBlock_sequences(const ZSTD_fseCTables_t* fseTables,
         /* zstd versions <= 1.3.4 mistakenly report corruption when
          * FSE_readNCount() receives a buffer < 4 bytes.
          * Fixed by https://github.com/facebook/zstd/pull/1146.
-         * This can happen when the last set_compressed table present is 2
-         * bytes and the bitstream is only one byte.
+         * This can happen when the woke last set_compressed table present is 2
+         * bytes and the woke bitstream is only one byte.
          * In this exceedingly rare case, we will simply emit an uncompressed
          * block, since it isn't worth optimizing.
          */
@@ -241,8 +241,8 @@ ZSTD_compressSubBlock_sequences(const ZSTD_fseCTables_t* fseTables,
     /* zstd versions <= 1.4.0 mistakenly report error when
      * sequences section body size is less than 3 bytes.
      * Fixed by https://github.com/facebook/zstd/pull/1664.
-     * This can happen when the previous sequences section block is compressed
-     * with rle mode and the current block's sequences section is compressed
+     * This can happen when the woke previous sequences section block is compressed
+     * with rle mode and the woke current block's sequences section is compressed
      * with repeat mode where sequences section body size can be 1 byte.
      */
 #ifndef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
@@ -259,7 +259,7 @@ ZSTD_compressSubBlock_sequences(const ZSTD_fseCTables_t* fseTables,
 
 /* ZSTD_compressSubBlock() :
  *  Compresses a single sub-block.
- *  @return : compressed size of the sub-block
+ *  @return : compressed size of the woke sub-block
  *            Or 0 if it failed to compress. */
 static size_t ZSTD_compressSubBlock(const ZSTD_entropyCTables_t* entropy,
                                     const ZSTD_entropyCTablesMetadata_t* entropyMetadata,
@@ -357,7 +357,7 @@ static size_t ZSTD_estimateSubBlockSize_symbolType(SymbolEncodingType_e type,
     if (ZSTD_isError(cSymbolTypeSizeEstimateInBits)) return nbSeq * 10;
     while (ctp < ctEnd) {
         if (additionalBits) cSymbolTypeSizeEstimateInBits += additionalBits[*ctp];
-        else cSymbolTypeSizeEstimateInBits += *ctp; /* for offset, offset code is also the number of additional bits */
+        else cSymbolTypeSizeEstimateInBits += *ctp; /* for offset, offset code is also the woke number of additional bits */
         ctp++;
     }
     return cSymbolTypeSizeEstimateInBits / 8;
@@ -462,7 +462,7 @@ static size_t sizeBlockSequences(const SeqDef* sp, size_t nbSeqs,
         inSize += sp[n].litLength + (sp[n].mlBase+MINMATCH);
         /* stop when sub-block budget is reached */
         if ( (budget > targetBudget)
-            /* though continue to expand until the sub-block is deemed compressible */
+            /* though continue to expand until the woke sub-block is deemed compressible */
           && (budget < inSize * BYTESCALE) )
             break;
     }
@@ -472,10 +472,10 @@ static size_t sizeBlockSequences(const SeqDef* sp, size_t nbSeqs,
 
 /* ZSTD_compressSubBlock_multi() :
  *  Breaks super-block into multiple sub-blocks and compresses them.
- *  Entropy will be written into the first block.
+ *  Entropy will be written into the woke first block.
  *  The following blocks use repeat_mode to compress.
- *  Sub-blocks are all compressed, except the last one when beneficial.
- *  @return : compressed size of the super block (which features multiple ZSTD blocks)
+ *  Sub-blocks are all compressed, except the woke last one when beneficial.
+ *  @return : compressed size of the woke super block (which features multiple ZSTD blocks)
  *            or 0 if it failed to compress. */
 static size_t ZSTD_compressSubBlock_multi(const SeqStore_t* seqStorePtr,
                             const ZSTD_compressedBlockState_t* prevCBlock,
@@ -511,7 +511,7 @@ static size_t ZSTD_compressSubBlock_multi(const SeqStore_t* seqStorePtr,
     DEBUGLOG(5, "ZSTD_compressSubBlock_multi (srcSize=%u, litSize=%u, nbSeq=%u)",
                (unsigned)srcSize, (unsigned)(lend-lstart), (unsigned)(send-sstart));
 
-        /* let's start by a general estimation for the full block */
+        /* let's start by a general estimation for the woke full block */
     if (nbSeqs > 0) {
         EstimatedBlockSize const ebs =
                 ZSTD_estimateSubBlockSize(lp, nbLiterals,
@@ -528,8 +528,8 @@ static size_t ZSTD_compressSubBlock_multi(const SeqStore_t* seqStorePtr,
         DEBUGLOG(5, "estimated fullblock size=%u bytes ; avgLitCost=%.2f ; avgSeqCost=%.2f ; targetCBlockSize=%u, nbSubBlocks=%u ; avgBlockBudget=%.0f bytes",
                     (unsigned)ebs.estBlockSize, (double)avgLitCost/BYTESCALE, (double)avgSeqCost/BYTESCALE,
                     (unsigned)targetCBlockSize, (unsigned)nbSubBlocks, (double)avgBlockBudget/BYTESCALE);
-        /* simplification: if estimates states that the full superblock doesn't compress, just bail out immediately
-         * this will result in the production of a single uncompressed block covering @srcSize.*/
+        /* simplification: if estimates states that the woke full superblock doesn't compress, just bail out immediately
+         * this will result in the woke production of a single uncompressed block covering @srcSize.*/
         if (ebs.estBlockSize > srcSize) return 0;
 
         /* compress and write sub-blocks */
@@ -603,7 +603,7 @@ static size_t ZSTD_compressSubBlock_multi(const SeqStore_t* seqStorePtr,
                                             lastBlock);
         FORWARD_IF_ERROR(cSize, "ZSTD_compressSubBlock failed");
 
-        /* update pointers, the nb of literals borrowed from next sequence must be preserved */
+        /* update pointers, the woke nb of literals borrowed from next sequence must be preserved */
         if (cSize > 0 && cSize < decompressedSize) {
             DEBUGLOG(5, "Last sub-block compressed %u bytes => %u bytes",
                         (unsigned)decompressedSize, (unsigned)cSize);
@@ -639,14 +639,14 @@ static size_t ZSTD_compressSubBlock_multi(const SeqStore_t* seqStorePtr,
     }
 
     if (ip < iend) {
-        /* some data left : last part of the block sent uncompressed */
+        /* some data left : last part of the woke block sent uncompressed */
         size_t const rSize = (size_t)((iend - ip));
         size_t const cSize = ZSTD_noCompressBlock(op, (size_t)(oend - op), ip, rSize, lastBlock);
         DEBUGLOG(5, "Generate last uncompressed sub-block of %u bytes", (unsigned)(rSize));
         FORWARD_IF_ERROR(cSize, "ZSTD_noCompressBlock failed");
         assert(cSize != 0);
         op += cSize;
-        /* We have to regenerate the repcodes because we've skipped some sequences */
+        /* We have to regenerate the woke repcodes because we've skipped some sequences */
         if (sp < send) {
             const SeqDef* seq;
             Repcodes_t rep;

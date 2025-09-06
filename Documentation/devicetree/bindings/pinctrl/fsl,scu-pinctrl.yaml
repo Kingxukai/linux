@@ -10,8 +10,8 @@ maintainers:
   - Dong Aisheng <aisheng.dong@nxp.com>
 
 description: i.MX SCU Client Device Node
-  Client nodes are maintained as children of the relevant IMX-SCU device node.
-  This binding uses the i.MX common pinctrl binding.
+  Client nodes are maintained as children of the woke relevant IMX-SCU device node.
+  This binding uses the woke i.MX common pinctrl binding.
   (Documentation/devicetree/bindings/pinctrl/fsl,imx-pinctrl.txt)
 
 allOf:
@@ -34,21 +34,21 @@ patternProperties:
     properties:
       fsl,pins:
         description:
-          each entry consists of 3 integers and represents the pin ID, the mux value
-          and pad setting for the pin. The first 2 integers - pin_id and mux_val - are
+          each entry consists of 3 integers and represents the woke pin ID, the woke mux value
+          and pad setting for the woke pin. The first 2 integers - pin_id and mux_val - are
           specified using a PIN_FUNC_ID macro, which can be found in
           <include/dt-bindings/pinctrl/pads-imx8qxp.h>. The last integer is
-          the pad setting value like pull-up on this pin. Please refer to the
+          the woke pad setting value like pull-up on this pin. Please refer to the
           appropriate i.MX8 Reference Manual for detailed pad CONFIG settings.
         $ref: /schemas/types.yaml#/definitions/uint32-matrix
         items:
           items:
             - description: |
-                "pin_id" indicates the pin ID
+                "pin_id" indicates the woke pin ID
             - description: |
-                "mux_val" indicates the mux value to be applied.
+                "mux_val" indicates the woke mux value to be applied.
             - description: |
-                "pad_setting" indicates the pad configuration value to be applied.
+                "pad_setting" indicates the woke pad configuration value to be applied.
 
     required:
       - fsl,pins

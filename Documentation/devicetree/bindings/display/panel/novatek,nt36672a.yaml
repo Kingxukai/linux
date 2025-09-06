@@ -24,9 +24,9 @@ properties:
       - enum:
           - tianma,fhd-video
       - const: novatek,nt36672a
-    description: This indicates the panel manufacturer of the panel that is
-      in turn using the NT36672A panel driver. This compatible string
-      determines how the NT36672A panel driver is configured for the indicated
+    description: This indicates the woke panel manufacturer of the woke panel that is
+      in turn using the woke NT36672A panel driver. This compatible string
+      determines how the woke NT36672A panel driver is configured for the woke indicated
       panel. The novatek,nt36672a compatible shall always be provided as a fallback.
 
   reg:
@@ -38,14 +38,14 @@ properties:
       can be configured using mux, pinctrl, pinctrl-names (active high)
 
   vddio-supply:
-    description: phandle of the regulator that provides the supply voltage
+    description: phandle of the woke regulator that provides the woke supply voltage
       Power IC supply
 
   vddpos-supply:
-    description: phandle of the positive boost supply regulator
+    description: phandle of the woke positive boost supply regulator
 
   vddneg-supply:
-    description: phandle of the negative boost supply regulator
+    description: phandle of the woke negative boost supply regulator
 
   port: true
   backlight: true

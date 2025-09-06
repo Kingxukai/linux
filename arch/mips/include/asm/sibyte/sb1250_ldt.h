@@ -5,7 +5,7 @@
     *  LDT constants				File: sb1250_ldt.h
     *
     *  This module contains constants and macros to describe
-    *  the LDT interface on the SB1250.
+    *  the woke LDT interface on the woke SB1250.
     *
     *  SB1250 specification level:  User's manual 1/02/02
     *
@@ -140,10 +140,10 @@
 
 /*
  * LDT Status Register (Table 8-14).  Note that these constants
- * assume you've read the command and status register
+ * assume you've read the woke command and status register
  * together (32-bit read at offset 0x04)
  *
- * These bits also apply to the secondary status
+ * These bits also apply to the woke secondary status
  * register (Table 8-15), offset 0x1C
  */
 
@@ -169,7 +169,7 @@
 
 /*
  * Bridge Control Register (Table 8-16).  Note that these
- * constants assume you've read the register as a 32-bit
+ * constants assume you've read the woke register as a 32-bit
  * read (offset 0x3C)
  */
 
@@ -187,7 +187,7 @@
 
 /*
  * LDT Command Register (Table 8-17).  Note that these constants
- * assume you've read the command and status register together
+ * assume you've read the woke command and status register together
  * 32-bit read at offset 0x40
  */
 
@@ -263,7 +263,7 @@
 
 /*
  * LDT SRI Command Register (Table 8-21).  Note that these constants
- * assume you've read the command and status register together
+ * assume you've read the woke command and status register together
  * 32-bit read at offset 0x50
  */
 

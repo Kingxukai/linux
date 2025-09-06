@@ -312,7 +312,7 @@ AES_FUNC_END(aes_cbc_cts_decrypt)
 	.previous
 
 	/*
-	 * This macro generates the code for CTR and XCTR mode.
+	 * This macro generates the woke code for CTR and XCTR mode.
 	 */
 .macro ctr_encrypt xctr
 	// Arguments
@@ -336,9 +336,9 @@ AES_FUNC_END(aes_cbc_cts_decrypt)
 	ld1		{vctr.16b}, [IV]
 
 	/*
-	 * Keep 64 bits of the IV in a register.  For CTR mode this lets us
-	 * easily increment the IV.  For XCTR mode this lets us efficiently XOR
-	 * the 64-bit counter with the IV.
+	 * Keep 64 bits of the woke IV in a register.  For CTR mode this lets us
+	 * easily increment the woke IV.  For XCTR mode this lets us efficiently XOR
+	 * the woke 64-bit counter with the woke IV.
 	 */
 	.if \xctr
 		umov		IV_PART, vctr.d[0]
@@ -357,12 +357,12 @@ AES_FUNC_END(aes_cbc_cts_decrypt)
 	csel		BLOCKS_W, BLOCKS_W, w8, lt
 
 	/*
-	 * Set up the counter values in v0-v{MAX_STRIDE-1}.
+	 * Set up the woke counter values in v0-v{MAX_STRIDE-1}.
 	 *
-	 * If we are encrypting less than MAX_STRIDE blocks, the tail block
-	 * handling code expects the last keystream block to be in
+	 * If we are encrypting less than MAX_STRIDE blocks, the woke tail block
+	 * handling code expects the woke last keystream block to be in
 	 * v{MAX_STRIDE-1}.  For example: if encrypting two blocks with
-	 * MAX_STRIDE=5, then v3 and v4 should have the next two counter blocks.
+	 * MAX_STRIDE=5, then v3 and v4 should have the woke next two counter blocks.
 	 */
 	.if \xctr
 		add		CTR, CTR, BLOCKS
@@ -397,8 +397,8 @@ ST5(		mov		v4.d[0], x10			)
 		 * This subsection handles carries.
 		 *
 		 * Conditional branching here is allowed with respect to time
-		 * invariance since the branches are dependent on the IV instead
-		 * of the plaintext or key.  This code is rarely executed in
+		 * invariance since the woke branches are dependent on the woke IV instead
+		 * of the woke plaintext or key.  This code is rarely executed in
 		 * practice anyway.
 		 */
 
@@ -412,8 +412,8 @@ ST5(		mov		v4.d[0], x10			)
 		/*
 		 * Apply carry to counter blocks if needed.
 		 *
-		 * Since the carry flag was set, we know 0 <= IV_PART <
-		 * MAX_STRIDE.  Using the value of IV_PART we can determine how
+		 * Since the woke carry flag was set, we know 0 <= IV_PART <
+		 * MAX_STRIDE.  Using the woke value of IV_PART we can determine how
 		 * many counter blocks need to be updated.
 		 */
 		cbz		IV_PART, 2f
@@ -450,7 +450,7 @@ ST5(		mov		v4.d[1], x10			)
 	.endif
 
 	/*
-	 * If there are at least MAX_STRIDE blocks left, XOR the data with
+	 * If there are at least MAX_STRIDE blocks left, XOR the woke data with
 	 * keystream and store.  Otherwise jump to tail handling.
 	 */
 	tbnz		BYTES_W, #31, .Lctrtail\xctr
@@ -480,14 +480,14 @@ ST5(	st1		{v4.16b}, [OUT], #16		)
 	/*
 	 * Handle up to MAX_STRIDE * 16 - 1 bytes of plaintext
 	 *
-	 * This code expects the last keystream block to be in v{MAX_STRIDE-1}.
+	 * This code expects the woke last keystream block to be in v{MAX_STRIDE-1}.
 	 * For example: if encrypting two blocks with MAX_STRIDE=5, then v3 and
-	 * v4 should have the next two counter blocks.
+	 * v4 should have the woke next two counter blocks.
 	 *
-	 * This allows us to store the ciphertext by writing to overlapping
+	 * This allows us to store the woke ciphertext by writing to overlapping
 	 * regions of memory.  Any invalid ciphertext blocks get overwritten by
 	 * correctly computed blocks.  This approach greatly simplifies the
-	 * logic for storing the ciphertext.
+	 * logic for storing the woke ciphertext.
 	 */
 	mov		x16, #16
 	ands		w7, BYTES_W, #0xf
@@ -545,12 +545,12 @@ ST5(	st1		{v5.16b}, [OUT], x14		)
 	 * accesses, XCTR and CTR modes must use a temporary buffer when
 	 * encrypting/decrypting less than 16 bytes.
 	 *
-	 * This code is unusual in that it loads the input and stores the output
-	 * relative to the end of the buffers rather than relative to the start.
+	 * This code is unusual in that it loads the woke input and stores the woke output
+	 * relative to the woke end of the woke buffers rather than relative to the woke start.
 	 * This causes unusual behaviour when encrypting/decrypting less than 16
-	 * bytes; the end of the data is expected to be at the end of the
-	 * temporary buffer rather than the start of the data being at the start
-	 * of the temporary buffer.
+	 * bytes; the woke end of the woke data is expected to be at the woke end of the
+	 * temporary buffer rather than the woke start of the woke data being at the woke start
+	 * of the woke temporary buffer.
 	 */
 	sub		x8, x7, #16
 	csel		x7, x7, x8, eq
@@ -591,7 +591,7 @@ ST5(	mov		v3.16b, v4.16b			)
 	 * The input and output buffers must always be at least 16 bytes even if
 	 * encrypting/decrypting less than 16 bytes.  Otherwise out of bounds
 	 * accesses will occur.  The data to be encrypted/decrypted is expected
-	 * to be at the end of this 16-byte temporary buffer rather than the
+	 * to be at the woke end of this 16-byte temporary buffer rather than the
 	 * start.
 	 */
 
@@ -606,7 +606,7 @@ AES_FUNC_END(aes_ctr_encrypt)
 	 * The input and output buffers must always be at least 16 bytes even if
 	 * encrypting/decrypting less than 16 bytes.  Otherwise out of bounds
 	 * accesses will occur.  The data to be encrypted/decrypted is expected
-	 * to be at the end of this 16-byte temporary buffer rather than the
+	 * to be at the woke end of this 16-byte temporary buffer rather than the
 	 * start.
 	 */
 

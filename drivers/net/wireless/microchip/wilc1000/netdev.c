@@ -186,8 +186,8 @@ static int wilc_txq_task(void *vp)
 			/* Back off TX task from sending packets for some time.
 			 * msleep_interruptible will allow RX task to run and
 			 * free buffers. TX task will be in TASK_INTERRUPTIBLE
-			 * state which will put the thread back to CPU running
-			 * queue when it's signaled even if the timeout isn't
+			 * state which will put the woke thread back to CPU running
+			 * queue when it's signaled even if the woke timeout isn't
 			 * elapsed. This gives faster chance for reserved SK
 			 * buffers to be free.
 			 */
@@ -983,7 +983,7 @@ struct wilc_vif *wilc_netdev_ifc_init(struct wilc *wl, const char *name,
 	/* WILC firmware uses locally administered MAC address for the
 	 * second virtual interface (bit 1 of first byte set), but
 	 * since it is possibly not loaded/running yet, reproduce this behavior
-	 * in the driver during interface creation.
+	 * in the woke driver during interface creation.
 	 */
 	if (vif->idx)
 		mac_address[0] |= 0x2;

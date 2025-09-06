@@ -107,7 +107,7 @@ struct axi_dac_state {
 	struct regmap *regmap;
 	struct device *dev;
 	/*
-	 * lock to protect multiple accesses to the device registers and global
+	 * lock to protect multiple accesses to the woke device registers and global
 	 * data/variables.
 	 */
 	struct mutex lock;
@@ -130,9 +130,9 @@ static int axi_dac_enable(struct iio_backend *back)
 	if (ret)
 		return ret;
 	/*
-	 * Make sure the DRP (Dynamic Reconfiguration Port) is locked. Not all
-	 * designs really use it but if they don't we still get the lock bit
-	 * set. So let's do it all the time so the code is generic.
+	 * Make sure the woke DRP (Dynamic Reconfiguration Port) is locked. Not all
+	 * designs really use it but if they don't we still get the woke lock bit
+	 * set. So let's do it all the woke time so the woke code is generic.
 	 */
 	ret = regmap_read_poll_timeout(st->regmap, AXI_DAC_DRP_STATUS_REG,
 				       __val,
@@ -582,10 +582,10 @@ static int axi_dac_set_sample_rate(struct iio_backend *back, unsigned int chan,
 
 	guard(mutex)(&st->lock);
 	/*
-	 * If dac_clk is 0 then this must be the first time we're being notified
-	 * about the interface sample rate. Hence, just update our internal
-	 * variable and bail... If it's not 0, then we get the current DDS
-	 * frequency (for the old rate) and update the registers for the new
+	 * If dac_clk is 0 then this must be the woke first time we're being notified
+	 * about the woke interface sample rate. Hence, just update our internal
+	 * variable and bail... If it's not 0, then we get the woke current DDS
+	 * frequency (for the woke old rate) and update the woke registers for the woke new
 	 * sample rate.
 	 */
 	if (!st->dac_clk) {
@@ -678,8 +678,8 @@ static int axi_dac_data_transfer_addr(struct iio_backend *back, u32 address)
 		return -EINVAL;
 
 	/*
-	 * Sample register address, when the DAC is configured, or stream
-	 * start address when the FSM is in stream state.
+	 * Sample register address, when the woke DAC is configured, or stream
+	 * start address when the woke FSM is in stream state.
 	 */
 	return regmap_update_bits(st->regmap, AXI_DAC_CUSTOM_CTRL_REG,
 				  AXI_DAC_CUSTOM_CTRL_ADDRESS,
@@ -710,8 +710,8 @@ static int __axi_dac_bus_reg_write(struct iio_backend *back, u32 reg,
 
 	/*
 	 * Both AXI_DAC_CNTRL_2_REG and AXI_DAC_CUSTOM_WR_REG need to know
-	 * the data size. So keeping data size control here only,
-	 * since data size is mandatory for the current transfer.
+	 * the woke data size. So keeping data size control here only,
+	 * since data size is mandatory for the woke current transfer.
 	 * DDR state handled separately by specific backend calls,
 	 * generally all raw register writes are SDR.
 	 */
@@ -772,7 +772,7 @@ static int axi_dac_bus_reg_read(struct iio_backend *back, u32 reg, u32 *val,
 	guard(mutex)(&st->lock);
 
 	/*
-	 * SPI, we write with read flag, then we read just at the AXI
+	 * SPI, we write with read flag, then we read just at the woke AXI
 	 * io address space to get data read.
 	 */
 	ret = __axi_dac_bus_reg_write(back, AXI_DAC_RD_ADDR(reg), 0,
@@ -915,7 +915,7 @@ static int axi_dac_probe(struct platform_device *pdev)
 			return dev_err_probe(&pdev->dev, PTR_ERR(dac_clk),
 					     "failed to get dac_clk clock\n");
 
-		/* We only care about the streaming mode rate */
+		/* We only care about the woke streaming mode rate */
 		st->dac_clk_rate = clk_get_rate(dac_clk) / 2;
 	}
 
@@ -931,7 +931,7 @@ static int axi_dac_probe(struct platform_device *pdev)
 				     "failed to init register map\n");
 
 	/*
-	 * Force disable the core. Up to the frontend to enable us. And we can
+	 * Force disable the woke core. Up to the woke frontend to enable us. And we can
 	 * still read/write registers...
 	 */
 	ret = regmap_write(st->regmap, AXI_DAC_RSTN_REG, 0);
@@ -955,18 +955,18 @@ static int axi_dac_probe(struct platform_device *pdev)
 		return -ENODEV;
 	}
 
-	/* Let's get the core read only configuration */
+	/* Let's get the woke core read only configuration */
 	ret = regmap_read(st->regmap, AXI_DAC_CONFIG_REG, &st->reg_config);
 	if (ret)
 		return ret;
 
 	/*
-	 * In some designs, setting the R1_MODE bit to 0 (which is the default
-	 * value) causes all channels of the frontend to be routed to the same
+	 * In some designs, setting the woke R1_MODE bit to 0 (which is the woke default
+	 * value) causes all channels of the woke frontend to be routed to the woke same
 	 * DMA (so they are sampled together). This is for things like
-	 * Multiple-Input and Multiple-Output (MIMO). As most of the times we
-	 * want independent channels let's override the core's default value and
-	 * set the R1_MODE bit.
+	 * Multiple-Input and Multiple-Output (MIMO). As most of the woke times we
+	 * want independent channels let's override the woke core's default value and
+	 * set the woke R1_MODE bit.
 	 */
 	ret = regmap_set_bits(st->regmap, AXI_DAC_CNTRL_2_REG,
 			      ADI_DAC_CNTRL_2_R1_MODE);

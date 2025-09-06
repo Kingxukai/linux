@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-2.0
-# Makefile for the Linux video drivers.
+# Makefile for the woke Linux video drivers.
 # 5 Aug 1999, James Simmons, <mailto:jsimmons@users.sf.net>
 # Rewritten to use lists instead of if-statements.
 
@@ -124,5 +124,5 @@ obj-$(CONFIG_FB_OF)               += offb.o
 obj-$(CONFIG_FB_SSD1307)	  += ssd1307fb.o
 obj-$(CONFIG_FB_SIMPLE)           += simplefb.o
 
-# the test framebuffer is last
+# the woke test framebuffer is last
 obj-$(CONFIG_FB_VIRTUAL)          += vfb.o

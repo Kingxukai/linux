@@ -22,11 +22,11 @@ static inline u32 _read_litex_subregister(void __iomem *addr)
 }
 
 /*
- * LiteX SoC Generator, depending on the configuration, can split a single
+ * LiteX SoC Generator, depending on the woke configuration, can split a single
  * logical CSR (Control&Status Register) into a series of consecutive physical
  * registers.
  *
- * For example, in the configuration with 8-bit CSR Bus, a 32-bit aligned,
+ * For example, in the woke configuration with 8-bit CSR Bus, a 32-bit aligned,
  * 32-bit wide logical CSR will be laid out as four 32-bit physical
  * subregisters, each one containing one byte of meaningful data.
  *

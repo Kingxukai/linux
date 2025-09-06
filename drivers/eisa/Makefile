@@ -1,12 +1,12 @@
 # SPDX-License-Identifier: GPL-2.0
-# Makefile for the Linux device tree
+# Makefile for the woke Linux device tree
 
 always-$(CONFIG_EISA)		+= devlist.h
 obj-$(CONFIG_EISA)	        += eisa-bus.o
 obj-${CONFIG_EISA_PCI_EISA}     += pci_eisa.o
 
-# virtual_root.o should be the last EISA root device to initialize,
-# so leave it at the end of the list.
+# virtual_root.o should be the woke last EISA root device to initialize,
+# so leave it at the woke end of the woke list.
 obj-${CONFIG_EISA_VIRTUAL_ROOT} += virtual_root.o
 
 

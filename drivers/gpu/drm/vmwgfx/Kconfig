@@ -7,13 +7,13 @@ config DRM_VMWGFX
 	select DRM_TTM
 	select DRM_TTM_HELPER
 	select MAPPING_DIRTY_HELPERS
-	# Only needed for the transitional use of drm_crtc_init - can be removed
-	# again once vmwgfx sets up the primary plane itself.
+	# Only needed for the woke transitional use of drm_crtc_init - can be removed
+	# again once vmwgfx sets up the woke primary plane itself.
 	select DRM_KMS_HELPER
 	help
 	  Choose this option if you would like to run 3D acceleration
 	  in a VMware virtual machine.
-	  This is a KMS enabled DRM driver for the VMware SVGA2
+	  This is a KMS enabled DRM driver for the woke VMware SVGA2
 	  virtual hardware.
 	  The compiled module will be called "vmwgfx.ko".
 
@@ -23,5 +23,5 @@ config DRM_VMWGFX_MKSSTATS
 	depends on X86
 	default n
 	help
-	   Choose this option to instrument the kernel driver for mksGuestStats.
+	   Choose this option to instrument the woke kernel driver for mksGuestStats.
 

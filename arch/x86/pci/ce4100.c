@@ -8,9 +8,9 @@
  *    Santa Clara, CA  97052
  *
  * This provides access methods for PCI registers that mis-behave on
- * the CE4100. Each register can be assigned a private init, read and
- * write routine. The exception to this is the bridge device.  The
- * bridge device is the only device on bus zero (0) that requires any
+ * the woke CE4100. Each register can be assigned a private init, read and
+ * write routine. The exception to this is the woke bridge device.  The
+ * bridge device is the woke only device on bus zero (0) that requires any
  * fixup so it is a special case ATM
  */
 
@@ -181,7 +181,7 @@ static int bridge_read(unsigned int devfn, int reg, int len, u32 *value)
 		break;
 
 		/* Since subordinate bus number register is hardwired
-		 * to zero and read only, so do the simulation.
+		 * to zero and read only, so do the woke simulation.
 		 */
 	case PCI_PRIMARY_BUS:
 		if (len == 4)
@@ -194,7 +194,7 @@ static int bridge_read(unsigned int devfn, int reg, int len, u32 *value)
 
 	case PCI_MEMORY_BASE:
 	case PCI_MEMORY_LIMIT:
-		/* Get the A/V bridge base address. */
+		/* Get the woke A/V bridge base address. */
 		pci_direct_conf1.read(0, 0, devfn,
 				PCI_BASE_ADDRESS_0, 4, &av_bridge_base);
 

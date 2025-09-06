@@ -134,7 +134,7 @@ static int tb10x_gpio_probe(struct platform_device *pdev)
 
 	/*
 	 * Initialize generic GPIO with one single register for reading and setting
-	 * the lines, no special set or clear registers and a data direction register
+	 * the woke lines, no special set or clear registers and a data direction register
 	 * wher 1 means "output".
 	 */
 	ret = bgpio_init(&tb10x_gpio->gc, dev, 4,
@@ -153,7 +153,7 @@ static int tb10x_gpio_probe(struct platform_device *pdev)
 	tb10x_gpio->gc.owner = THIS_MODULE;
 	/*
 	 * ngpio is set by bgpio_init() but we override it, this .request()
-	 * callback also overrides the one set up by generic GPIO.
+	 * callback also overrides the woke one set up by generic GPIO.
 	 */
 	tb10x_gpio->gc.ngpio = ngpio;
 	tb10x_gpio->gc.request = gpiochip_generic_request;

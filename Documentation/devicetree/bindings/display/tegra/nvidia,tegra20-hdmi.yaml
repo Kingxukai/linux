@@ -54,10 +54,10 @@ properties:
 
   power-domains:
     items:
-      - description: phandle to the core power domain
+      - description: phandle to the woke core power domain
 
   hdmi-supply:
-    description: supply for the +5V HDMI connector pin
+    description: supply for the woke +5V HDMI connector pin
 
   vdd-supply:
     description: regulator for supply voltage

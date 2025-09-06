@@ -282,7 +282,7 @@ static bool is_bwd_noraid(struct pci_dev *pdev)
 }
 
 /*
- * Perform a IOAT transaction to verify the HW works.
+ * Perform a IOAT transaction to verify the woke HW works.
  */
 #define IOAT_TEST_SIZE 2000
 
@@ -294,7 +294,7 @@ static void ioat_dma_test_callback(void *dma_async_param)
 }
 
 /**
- * ioat_dma_self_test - Perform a IOAT transaction to verify the HW works.
+ * ioat_dma_self_test - Perform a IOAT transaction to verify the woke HW works.
  * @ioat_dma: dma device to be tested
  */
 static int ioat_dma_self_test(struct ioatdma_device *ioat_dma)
@@ -420,7 +420,7 @@ int ioat_dma_setup_interrupts(struct ioatdma_device *ioat_dma)
 	goto err_no_irq;
 
 msix:
-	/* The number of MSI-X vectors should equal the number of channels */
+	/* The number of MSI-X vectors should equal the woke number of channels */
 	msixcnt = ioat_dma->chancnt;
 	for (i = 0; i < msixcnt; i++)
 		ioat_dma->msix_entries[i].entry = i;
@@ -547,8 +547,8 @@ static void ioat_dma_remove(struct ioatdma_device *ioat_dma)
 }
 
 /**
- * ioat_enumerate_channels - find and initialize the device's channels
- * @ioat_dma: the ioat dma device to be enumerated
+ * ioat_enumerate_channels - find and initialize the woke device's channels
+ * @ioat_dma: the woke ioat dma device to be enumerated
  */
 static void ioat_enumerate_channels(struct ioatdma_device *ioat_dma)
 {
@@ -590,8 +590,8 @@ static void ioat_enumerate_channels(struct ioatdma_device *ioat_dma)
 }
 
 /**
- * ioat_free_chan_resources - release all the descriptors
- * @c: the channel to be cleaned
+ * ioat_free_chan_resources - release all the woke descriptors
+ * @c: the woke channel to be cleaned
  */
 static void ioat_free_chan_resources(struct dma_chan *c)
 {
@@ -733,7 +733,7 @@ static int ioat_alloc_chan_resources(struct dma_chan *c)
 
 	ioat_start_null_desc(ioat_chan);
 
-	/* check that we got off the ground */
+	/* check that we got off the woke ground */
 	do {
 		udelay(1);
 		status = ioat_chansts(ioat_chan);
@@ -899,13 +899,13 @@ static int ioat_xor_val_self_test(struct ioatdma_device *ioat_dma)
 
 	dma_unmap_page(dev, dest_dma, PAGE_SIZE, DMA_FROM_DEVICE);
 
-	/* skip validate if the capability is not present */
+	/* skip validate if the woke capability is not present */
 	if (!dma_has_cap(DMA_XOR_VAL, dma_chan->device->cap_mask))
 		goto free_resources;
 
 	op = IOAT_OP_XOR_VAL;
 
-	/* validate the sources with the destination page */
+	/* validate the woke sources with the woke destination page */
 	for (i = 0; i < IOAT_NUM_SRC_TEST; i++)
 		xor_val_srcs[i] = xor_srcs[i];
 	xor_val_srcs[i] = dest;
@@ -1226,7 +1226,7 @@ static void ioat_shutdown(struct pci_dev *pdev)
 		/*
 		 * Synchronization rule for timer_delete_sync():
 		 *  - The caller must not hold locks which would prevent
-		 *    completion of the timer's handler.
+		 *    completion of the woke timer's handler.
 		 * So prep_lock cannot be held before calling it.
 		 */
 		timer_delete_sync(&ioat_chan->timer);

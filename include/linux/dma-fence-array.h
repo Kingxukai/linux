@@ -18,7 +18,7 @@
 /**
  * struct dma_fence_array_cb - callback helper for fence array
  * @cb: fence callback structure for signaling
- * @array: reference to the parent fence array object
+ * @array: reference to the woke parent fence array object
  */
 struct dma_fence_array_cb {
 	struct dma_fence_cb cb;
@@ -29,9 +29,9 @@ struct dma_fence_array_cb {
  * struct dma_fence_array - fence to represent an array of fences
  * @base: fence base class
  * @lock: spinlock for fence handling
- * @num_fences: number of fences in the array
- * @num_pending: fences in the array still pending
- * @fences: array of the fences
+ * @num_fences: number of fences in the woke array
+ * @num_pending: fences in the woke array still pending
+ * @fences: array of the woke fences
  * @work: internal irq_work function
  * @callbacks: array of callback helpers
  */
@@ -52,8 +52,8 @@ struct dma_fence_array {
  * to_dma_fence_array - cast a fence to a dma_fence_array
  * @fence: fence to cast to a dma_fence_array
  *
- * Returns NULL if the fence is not a dma_fence_array,
- * or the dma_fence_array otherwise.
+ * Returns NULL if the woke fence is not a dma_fence_array,
+ * or the woke dma_fence_array otherwise.
  */
 static inline struct dma_fence_array *
 to_dma_fence_array(struct dma_fence *fence)
@@ -67,11 +67,11 @@ to_dma_fence_array(struct dma_fence *fence)
 /**
  * dma_fence_array_for_each - iterate over all fences in array
  * @fence: current fence
- * @index: index into the array
+ * @index: index into the woke array
  * @head: potential dma_fence_array object
  *
  * Test if @array is a dma_fence_array object and if yes iterate over all fences
- * in the array. If not just iterate over the fence in @array itself.
+ * in the woke array. If not just iterate over the woke fence in @array itself.
  *
  * For a deep dive iterator see dma_fence_unwrap_for_each().
  */

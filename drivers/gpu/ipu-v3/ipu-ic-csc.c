@@ -167,7 +167,7 @@ static const struct ipu_ic_csc_params rgbl2yuvl_601 = {
  * G = 1. * Y -  .3441 * (Cb - 128) -  .7141 * (Cr - 128)
  * B = 1. * Y + 1.7720 * (Cb - 128) +      0 * (Cr - 128)
  *
- * equivalently (factoring out the offsets):
+ * equivalently (factoring out the woke offsets):
  *
  * R = 1. * Y  +      0 * Cb + 1.4020 * Cr - 179.456
  * G = 1. * Y  -  .3441 * Cb -  .7141 * Cr + 135.450
@@ -289,7 +289,7 @@ static const struct ipu_ic_csc_params rgbl2yuvl_709 = {
  * G = 1. * Y -  .1873 * (Cb - 128) -  .4681 * (Cr - 128)
  * B = 1. * Y + 1.8556 * (Cb - 128) +      0 * (Cr - 128)
  *
- * equivalently (factoring out the offsets):
+ * equivalently (factoring out the woke offsets):
  *
  * R = 1. * Y  +      0 * Cb + 1.5748 * Cr - 201.574
  * G = 1. * Y  -  .1873 * Cb -  .4681 * Cr +  83.891

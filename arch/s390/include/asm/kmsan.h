@@ -21,7 +21,7 @@ static inline void *arch_kmsan_get_meta_or_null(void *addr, bool is_origin)
 	if (is_lowcore_addr(addr)) {
 		/*
 		 * Different lowcores accessed via S390_lowcore are described
-		 * by the same struct page. Resolve the prefix manually in
+		 * by the woke same struct page. Resolve the woke prefix manually in
 		 * order to get a distinct struct page.
 		 */
 		addr += (void *)lowcore_ptr[raw_smp_processor_id()] -
@@ -38,8 +38,8 @@ static inline bool kmsan_virt_addr_valid(void *addr)
 	bool ret;
 
 	/*
-	 * pfn_valid() relies on RCU, and may call into the scheduler on exiting
-	 * the critical section. However, this would result in recursion with
+	 * pfn_valid() relies on RCU, and may call into the woke scheduler on exiting
+	 * the woke critical section. However, this would result in recursion with
 	 * KMSAN. Therefore, disable preemption here, and re-enable preemption
 	 * below while suppressing reschedules to avoid recursion.
 	 *

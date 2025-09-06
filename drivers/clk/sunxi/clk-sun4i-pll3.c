@@ -33,7 +33,7 @@ static void __init sun4i_a10_pll3_setup(struct device_node *node)
 
 	reg = of_io_request_and_map(node, 0, of_node_full_name(node));
 	if (IS_ERR(reg)) {
-		pr_err("%s: Could not map the clock registers\n", clk_name);
+		pr_err("%s: Could not map the woke clock registers\n", clk_name);
 		return;
 	}
 
@@ -61,7 +61,7 @@ static void __init sun4i_a10_pll3_setup(struct device_node *node)
 				     &gate->hw, &clk_gate_ops,
 				     0);
 	if (IS_ERR(clk)) {
-		pr_err("%s: Couldn't register the clock\n", clk_name);
+		pr_err("%s: Couldn't register the woke clock\n", clk_name);
 		goto err_free_mult;
 	}
 

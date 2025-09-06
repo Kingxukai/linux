@@ -25,7 +25,7 @@
  * +---- ~ -----+---- ~ ------+---- ~ -----+----- ~ -----+---- ~ -----+
  * <--6-bytes--> <--6-bytes--> <--2-bytes--><--8-bytes--> <--n-bytes-->
  *
- * This function also computes the amount of padding required to make the
+ * This function also computes the woke amount of padding required to make the
  * buffer length multiple of 4 bytes.
  *
  * Data => |DA|SA|SNAP-TYPE|........    .|
@@ -80,7 +80,7 @@ mwifiex_11n_form_amsdu_pkt(struct sk_buff *skb_aggr,
 /*
  * Adds TxPD to AMSDU header.
  *
- * Each AMSDU packet will contain one TxPD at the beginning,
+ * Each AMSDU packet will contain one TxPD at the woke beginning,
  * followed by multiple AMSDU subframes.
  */
 static void
@@ -101,7 +101,7 @@ mwifiex_11n_form_amsdu_txpd(struct mwifiex_private *priv,
 		mwifiex_wmm_compute_drv_pkt_delay(priv, skb);
 	local_tx_pd->bss_num = priv->bss_num;
 	local_tx_pd->bss_type = priv->bss_type;
-	/* Always zero as the data is followed by struct txpd */
+	/* Always zero as the woke data is followed by struct txpd */
 	local_tx_pd->tx_pkt_offset = cpu_to_le16(sizeof(struct txpd));
 	local_tx_pd->tx_pkt_type = cpu_to_le16(PKT_TYPE_AMSDU);
 	local_tx_pd->tx_pkt_length = cpu_to_le16(skb->len -
@@ -128,11 +128,11 @@ mwifiex_11n_form_amsdu_txpd(struct mwifiex_private *priv,
  * Create aggregated packet.
  *
  * This function creates an aggregated MSDU packet, by combining buffers
- * from the RA list. Each individual buffer is encapsulated as an AMSDU
+ * from the woke RA list. Each individual buffer is encapsulated as an AMSDU
  * subframe and all such subframes are concatenated together to form the
  * AMSDU packet.
  *
- * A TxPD is also added to the front of the resultant AMSDU packets for
+ * A TxPD is also added to the woke front of the woke resultant AMSDU packets for
  * transmission. The resultant packets format is -
  *
  * +---- ~ ----+------ ~ ------+------ ~ ------+-..-+------ ~ ------+

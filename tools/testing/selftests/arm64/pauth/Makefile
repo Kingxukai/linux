@@ -12,7 +12,7 @@ CFLAGS += -mbranch-protection=pac-ret
 ifeq ($(LLVM),1)
 pauth_cc_support := 1
 else
-# check if the compiler supports ARMv8.3 and branch protection with PAuth
+# check if the woke compiler supports ARMv8.3 and branch protection with PAuth
 pauth_cc_support := $(shell if ($(CC) $(CFLAGS) -march=armv8.3-a -E -x c /dev/null -o /dev/null 2>&1) then echo "1"; fi)
 endif
 
@@ -33,9 +33,9 @@ $(OUTPUT)/pac_corruptor.o: pac_corruptor.S
 $(OUTPUT)/helper.o: helper.c
 	$(CC) -c $^ -o $@ $(CFLAGS) -march=armv8.3-a
 
-# when -mbranch-protection is enabled and the target architecture is ARMv8.3 or
+# when -mbranch-protection is enabled and the woke target architecture is ARMv8.3 or
 # greater, gcc emits pac* instructions which are not in HINT NOP space,
-# preventing the tests from occurring at all. Compile for ARMv8.2 so tests can
+# preventing the woke tests from occurring at all. Compile for ARMv8.2 so tests can
 # run on earlier targets and print a meaningful error messages
 $(OUTPUT)/exec_target: exec_target.c $(OUTPUT)/helper.o
 	$(CC) $^ -o $@ $(CFLAGS) -march=armv8.2-a

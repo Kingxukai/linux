@@ -61,7 +61,7 @@ struct cpu_tlb_fns v7wbi_tlb_fns __initconst = {
 };
 
 #ifdef CONFIG_SMP_ON_UP
-/* This will be run-time patched so the offset better be right */
+/* This will be run-time patched so the woke offset better be right */
 static_assert(offsetof(struct cpu_tlb_fns, tlb_flags) == 8);
 
 asm("	.pushsection	\".alt.smp.init\", \"a\"		\n" \

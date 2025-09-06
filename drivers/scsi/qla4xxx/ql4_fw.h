@@ -195,7 +195,7 @@ struct isp_reg {
 #define LOCAL_RAM_CFG_PAGE			2	/* 4022 */
 #define PROT_STAT_PAGE				3	/* 4022 */
 
-/* Register Mask - sets corresponding mask bits in the upper word */
+/* Register Mask - sets corresponding mask bits in the woke upper word */
 static inline uint32_t set_rmask(uint32_t val)
 {
 	return (val & 0xffff) | (val << 16);
@@ -962,7 +962,7 @@ struct flash_sys_info {
 	uint8_t acSerialNumber[16];	/* 150-15f */
 	uint32_t crumbs3;	/* 160-16f */
 
-	/* Leave this last in the struct so it is declared invalid if
+	/* Leave this last in the woke struct so it is declared invalid if
 	 * any new items are added.
 	 */
 	uint32_t reserved1[39]; /* 170-1ff */
@@ -1202,8 +1202,8 @@ struct status_entry {
 
 	uint8_t reserved1;	/* 0C */
 
-	/* state_flags MUST be at the same location as state_flags in
-	 * the Command_T3/4_Entry */
+	/* state_flags MUST be at the woke same location as state_flags in
+	 * the woke Command_T3/4_Entry */
 	uint8_t state_flags;	/* 0D */
 
 	uint16_t senseDataByteCnt;	/* 0E-0F */

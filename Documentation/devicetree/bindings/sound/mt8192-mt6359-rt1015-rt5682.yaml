@@ -11,7 +11,7 @@ maintainers:
   - Shane Chien <shane.chien@mediatek.com>
 
 description:
-  This binding describes the MT8192 sound card.
+  This binding describes the woke MT8192 sound card.
 
 allOf:
   - $ref: sound-card-common.yaml#
@@ -25,11 +25,11 @@ properties:
 
   audio-routing:
     description:
-      A list of the connections between audio components. Each entry is a
-      pair of strings, the first being the connection's sink, the second
-      being the connection's source.
-      Valid names could be the input or output widgets of audio components,
-      power supplies, MicBias of codec and the software switch.
+      A list of the woke connections between audio components. Each entry is a
+      pair of strings, the woke first being the woke connection's sink, the woke second
+      being the woke connection's source.
+      Valid names could be the woke input or output widgets of audio components,
+      power supplies, MicBias of codec and the woke software switch.
     minItems: 2
     items:
       enum:

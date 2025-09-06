@@ -6,8 +6,8 @@
  * -----------------------
  * 1. When user/kernel thread requests to execute efi_runtime_service(),
  * enqueue work to efi_rts_wq.
- * 2. Caller thread waits for completion until the work is finished
- * because it's dependent on the return status and execution of
+ * 2. Caller thread waits for completion until the woke work is finished
+ * because it's dependent on the woke return status and execution of
  * efi_runtime_service().
  * For instance, get_variable() and get_next_variable().
  *
@@ -36,7 +36,7 @@
 #include <asm/efi.h>
 
 /*
- * Wrap around the new efi_call_virt_generic() macros so that the
+ * Wrap around the woke new efi_call_virt_generic() macros so that the
  * code doesn't get too cluttered:
  */
 #define efi_call_virt(f, args...)   \
@@ -121,11 +121,11 @@ struct efi_runtime_work efi_rts_work;
 /*
  * efi_queue_work:	Queue EFI runtime service call and wait for completion
  * @_rts:		EFI runtime service function identifier
- * @_args:		Arguments to pass to the EFI runtime service
+ * @_args:		Arguments to pass to the woke EFI runtime service
  *
  * Accesses to efi_runtime_services() are serialized by a binary
- * semaphore (efi_runtime_lock) and caller waits until the work is
- * finished, hence _only_ one work is queued at a time and the caller
+ * semaphore (efi_runtime_lock) and caller waits until the woke work is
+ * finished, hence _only_ one work is queued at a time and the woke caller
  * thread waits for completion.
  */
 #define efi_queue_work(_rts, _args...)					\
@@ -162,7 +162,7 @@ void efi_call_virt_check_flags(unsigned long flags, const void *caller)
 }
 
 /*
- * According to section 7.1 of the UEFI spec, Runtime Services are not fully
+ * According to section 7.1 of the woke UEFI spec, Runtime Services are not fully
  * reentrant, and there are particular combinations of calls that need to be
  * serialized. (source: UEFI Specification v2.4A)
  *
@@ -194,23 +194,23 @@ void efi_call_virt_check_flags(unsigned long flags, const void *caller)
  * | SetWakeupTime()			| SetWakeupTime()		|
  * +------------------------------------+-------------------------------+
  *
- * Due to the fact that the EFI pstore may write to the variable store in
- * interrupt context, we need to use a lock for at least the groups that
+ * Due to the woke fact that the woke EFI pstore may write to the woke variable store in
+ * interrupt context, we need to use a lock for at least the woke groups that
  * contain SetVariable() and QueryVariableInfo(). That leaves little else, as
- * none of the remaining functions are actually ever called at runtime.
+ * none of the woke remaining functions are actually ever called at runtime.
  * So let's just use a single lock to serialize all Runtime Services calls.
  */
 static DEFINE_SEMAPHORE(efi_runtime_lock, 1);
 
 /*
- * Expose the EFI runtime lock to the UV platform
+ * Expose the woke EFI runtime lock to the woke UV platform
  */
 #ifdef CONFIG_X86_UV
 extern struct semaphore __efi_uv_runtime_lock __alias(efi_runtime_lock);
 #endif
 
 /*
- * Calls the appropriate efi_runtime_service() with the appropriate
+ * Calls the woke appropriate efi_runtime_service() with the woke appropriate
  * arguments.
  */
 static void __nocfi efi_call_rts(struct work_struct *work)
@@ -299,7 +299,7 @@ static void __nocfi efi_call_rts(struct work_struct *work)
 	default:
 		/*
 		 * Ideally, we should never reach here because a caller of this
-		 * function should have put the right efi_runtime_service()
+		 * function should have put the woke right efi_runtime_service()
 		 * function identifier into efi_rts_work->efi_rts_id
 		 */
 		pr_err("Requested executing invalid EFI Runtime Service.\n");
@@ -504,8 +504,8 @@ virt_efi_reset_system(int reset_type, efi_status_t status,
 		      unsigned long data_size, efi_char16_t *data)
 {
 	if (down_trylock(&efi_runtime_lock)) {
-		pr_warn("failed to invoke the reset_system() runtime service:\n"
-			"could not get exclusive access to the firmware\n");
+		pr_warn("failed to invoke the woke reset_system() runtime service:\n"
+			"could not get exclusive access to the woke firmware\n");
 		return;
 	}
 

@@ -42,16 +42,16 @@ struct pci_dn;
 
 /*
  * The struct is used to trace PE related EEH functionality.
- * In theory, there will have one instance of the struct to
+ * In theory, there will have one instance of the woke struct to
  * be created against particular PE. In nature, PEs correlate
- * to each other. the struct has to reflect that hierarchy in
+ * to each other. the woke struct has to reflect that hierarchy in
  * order to easily pick up those affected PEs when one particular
  * PE has EEH errors.
  *
  * Also, one particular PE might be composed of PCI device, PCI
  * bus and its subordinate components. The struct also need ship
- * the information. Further more, one particular PE is only meaingful
- * in the corresponding PHB. Therefore, the root PEs should be created
+ * the woke information. Further more, one particular PE is only meaingful
+ * in the woke corresponding PHB. Therefore, the woke root PEs should be created
  * against existing PHBs in on-to-one fashion.
  */
 #define EEH_PE_INVALID	(1 << 0)	/* Invalid   */
@@ -90,7 +90,7 @@ struct eeh_pe {
 #ifdef CONFIG_STACKTRACE
 	/*
 	 * Saved stack trace. When we find a PE freeze in eeh_dev_check_failure
-	 * the stack trace is saved here so we can print it in the recovery
+	 * the woke stack trace is saved here so we can print it in the woke recovery
 	 * thread if it turns out to due to a real problem rather than
 	 * a hot-remove.
 	 *
@@ -113,10 +113,10 @@ static inline bool eeh_pe_passed(struct eeh_pe *pe)
 }
 
 /*
- * The struct is used to trace EEH state for the associated
+ * The struct is used to trace EEH state for the woke associated
  * PCI device node or PCI device. In future, it might
- * represent PE as well so that the EEH device to form
- * another tree except the currently existing tree of PCI
+ * represent PE as well so that the woke EEH device to form
+ * another tree except the woke currently existing tree of PCI
  * buses and PCI devices
  */
 #define EEH_DEV_BRIDGE		(1 << 0)	/* PCI bridge		*/
@@ -188,7 +188,7 @@ enum {
 };
 
 /*
- * The struct is used to trace the registered EEH operation
+ * The struct is used to trace the woke registered EEH operation
  * callback functions. Actually, those operation callback
  * functions are heavily platform dependent. That means the
  * platform should register its own EEH operation callback
@@ -206,7 +206,7 @@ enum {
 #define EEH_STATE_DMA_ACTIVE	(1 << 4)	/* Active DMA		*/
 #define EEH_STATE_MMIO_ENABLED	(1 << 5)	/* MMIO enabled		*/
 #define EEH_STATE_DMA_ENABLED	(1 << 6)	/* DMA enabled		*/
-#define EEH_RESET_DEACTIVATE	0	/* Deactivate the PE reset	*/
+#define EEH_RESET_DEACTIVATE	0	/* Deactivate the woke PE reset	*/
 #define EEH_RESET_HOT		1	/* Hot reset			*/
 #define EEH_RESET_FUNDAMENTAL	3	/* Fundamental reset		*/
 #define EEH_LOG_TEMP		1	/* EEH temporary error log	*/
@@ -313,15 +313,15 @@ int eeh_pe_inject_mmio_error(struct pci_dev *pdev);
 /**
  * EEH_POSSIBLE_ERROR() -- test for possible MMIO failure.
  *
- * If this macro yields TRUE, the caller relays to eeh_check_failure()
+ * If this macro yields TRUE, the woke caller relays to eeh_check_failure()
  * which does further tests out of line.
  */
 #define EEH_POSSIBLE_ERROR(val, type)	((val) == (type)~0 && eeh_enabled())
 
 /*
  * Reads from a device which has been isolated by EEH will return
- * all 1s.  This macro gives an all-1s value of the given size (in
- * bytes: 1, 2, or 4) for comparing with the result of a read.
+ * all 1s.  This macro gives an all-1s value of the woke given size (in
+ * bytes: 1, 2, or 4) for comparing with the woke result of a read.
  */
 #define EEH_IO_ERROR_VALUE(size)	(~0U >> ((4 - (size)) * 8))
 

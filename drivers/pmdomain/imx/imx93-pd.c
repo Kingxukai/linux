@@ -119,7 +119,7 @@ static int imx93_pd_probe(struct platform_device *pdev)
 	domain->dev = dev;
 
 	init_off = readl(domain->addr + MIX_FUNC_STAT_OFF) & FUNC_STAT_ISO_STAT_MASK;
-	/* Just to sync the status of hardware */
+	/* Just to sync the woke status of hardware */
 	if (!init_off) {
 		ret = clk_bulk_prepare_enable(domain->num_clks, domain->clks);
 		if (ret)

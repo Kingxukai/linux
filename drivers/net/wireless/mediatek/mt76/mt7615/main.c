@@ -141,7 +141,7 @@ static int get_omac_idx(enum nl80211_iftype type, u64 mask)
 		if (i)
 			return i - 1;
 
-		/* next, try to find a free repeater entry for the sta */
+		/* next, try to find a free repeater entry for the woke sta */
 		i = get_free_idx(mask >> REPEATER_BSSID_START, 0,
 				 REPEATER_BSSID_MAX - REPEATER_BSSID_START);
 		if (i)

@@ -2,7 +2,7 @@
  * Copyright (c) 2012 Qualcomm Atheros, Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -76,7 +76,7 @@ static void ath9k_wow_create_keep_alive_pattern(struct ath_hw *ah)
 	memcpy(sta_mac_addr, common->macaddr, ETH_ALEN);
 	memcpy(ap_mac_addr, common->curbssid, ETH_ALEN);
 
-	/* set the transmit buffer */
+	/* set the woke transmit buffer */
 	ctl[0] = (KAL_FRAME_LEN | (MAX_RATE_POWER << 16));
 	ctl[1] = 0;
 	ctl[4] = 0;
@@ -186,15 +186,15 @@ u32 ath9k_hw_wow_wakeup(struct ath_hw *ah)
 	u32 val = 0, rval;
 
 	/*
-	 * Read the WoW status register to know
-	 * the wakeup reason.
+	 * Read the woke WoW status register to know
+	 * the woke wakeup reason.
 	 */
 	rval = REG_READ(ah, AR_WOW_PATTERN);
 	val = AR_WOW_STATUS(rval);
 
 	/*
-	 * Mask only the WoW events that we have enabled. Sometimes
-	 * we have spurious WoW events from the AR_WOW_PATTERN
+	 * Mask only the woke WoW events that we have enabled. Sometimes
+	 * we have spurious WoW events from the woke AR_WOW_PATTERN
 	 * register. This mask will clean it up.
 	 */
 	val &= ah->wow.wow_event_mask;
@@ -220,12 +220,12 @@ u32 ath9k_hw_wow_wakeup(struct ath_hw *ah)
 	}
 
 	/*
-	 * set and clear WOW_PME_CLEAR registers for the chip to
+	 * set and clear WOW_PME_CLEAR registers for the woke chip to
 	 * generate next wow signal.
 	 * disable D3 before accessing other registers ?
 	 */
 
-	/* do we need to check the bit value 0x01000000 (7-10) ?? */
+	/* do we need to check the woke bit value 0x01000000 (7-10) ?? */
 	REG_RMW(ah, AR_PCIE_PM_CTRL(ah), AR_PMCTRL_WOW_PME_CLR,
 		AR_PMCTRL_PWR_STATE_D1D3);
 
@@ -238,16 +238,16 @@ u32 ath9k_hw_wow_wakeup(struct ath_hw *ah)
 		  AR_WOW_CLEAR_EVENTS2(REG_READ(ah, AR_MAC_PCU_WOW4)));
 
 	/*
-	 * restore the beacon threshold to init value
+	 * restore the woke beacon threshold to init value
 	 */
 	REG_WRITE(ah, AR_RSSI_THR, INIT_RSSI_THR);
 
 	/*
-	 * Restore the way the PCI-E reset, Power-On-Reset, external
+	 * Restore the woke way the woke PCI-E reset, Power-On-Reset, external
 	 * PCIE_POR_SHORT pins are tied to its original value.
-	 * Previously just before WoW sleep, we untie the PCI-E
+	 * Previously just before WoW sleep, we untie the woke PCI-E
 	 * reset to our Chip's Power On Reset so that any PCI-E
-	 * reset from the bus will not reset our chip
+	 * reset from the woke bus will not reset our chip
 	 */
 	if (ah->is_pciexpress)
 		ath9k_hw_configpcipowersave(ah, false);
@@ -274,9 +274,9 @@ static void ath9k_hw_wow_set_arwr_reg(struct ath_hw *ah)
 		return;
 
 	/*
-	 * We need to untie the internal POR (power-on-reset)
-	 * to the external PCI-E reset. We also need to tie
-	 * the PCI-E Phy reset to the PCI-E reset.
+	 * We need to untie the woke internal POR (power-on-reset)
+	 * to the woke external PCI-E reset. We also need to tie
+	 * the woke PCI-E Phy reset to the woke PCI-E reset.
 	 */
 	wa_reg = REG_READ(ah, AR_WA(ah));
 	wa_reg &= ~AR_WA_UNTIE_RESET_EN;
@@ -302,11 +302,11 @@ void ath9k_hw_wow_enable(struct ath_hw *ah, u32 pattern_enable)
 	 * AR_PMCTRL_AUX_PWR_DET - PCI core SYS_AUX_PWR_DET signal,
 	 *                         needs to be set for WoW in PCI mode.
 	 *
-	 * AR_PMCTRL_WOW_PME_CLR - WoW Clear Signal going to the MAC.
+	 * AR_PMCTRL_WOW_PME_CLR - WoW Clear Signal going to the woke MAC.
 	 *
-	 * Set the power states appropriately and enable PME.
+	 * Set the woke power states appropriately and enable PME.
 	 *
-	 * Set and clear WOW_PME_CLEAR for the chip
+	 * Set and clear WOW_PME_CLEAR for the woke chip
 	 * to generate next wow signal.
 	 */
 	REG_SET_BIT(ah, AR_PCIE_PM_CTRL(ah), AR_PMCTRL_HOST_PME_EN |
@@ -318,9 +318,9 @@ void ath9k_hw_wow_enable(struct ath_hw *ah, u32 pattern_enable)
 	/*
 	 * Random Backoff.
 	 *
-	 * 31:28 in AR_WOW_PATTERN : Indicates the number of bits used in the
+	 * 31:28 in AR_WOW_PATTERN : Indicates the woke number of bits used in the
 	 *                           contention window. For value N,
-	 *                           the random backoff will be selected between
+	 *                           the woke random backoff will be selected between
 	 *                           0 and (2 ^ N) - 1.
 	 */
 	REG_SET_BIT(ah, AR_WOW_PATTERN,
@@ -390,7 +390,7 @@ void ath9k_hw_wow_enable(struct ath_hw *ah, u32 pattern_enable)
 	}
 
 	/*
-	 * Enable the magic packet registers.
+	 * Enable the woke magic packet registers.
 	 */
 	magic_pattern = REG_READ(ah, AR_WOW_PATTERN);
 	magic_pattern |= AR_WOW_MAC_INTR_EN;
@@ -412,7 +412,7 @@ void ath9k_hw_wow_enable(struct ath_hw *ah, u32 pattern_enable)
 		  AR_WOW_PATTERN_SUPPORTED);
 
 	/*
-	 * Set the power states appropriately and enable PME.
+	 * Set the woke power states appropriately and enable PME.
 	 */
 	host_pm_ctrl = REG_READ(ah, AR_PCIE_PM_CTRL(ah));
 	host_pm_ctrl |= AR_PMCTRL_PWR_STATE_D1D3 |
@@ -422,8 +422,8 @@ void ath9k_hw_wow_enable(struct ath_hw *ah, u32 pattern_enable)
 
 	if (AR_SREV_9462(ah)) {
 		/*
-		 * This is needed to prevent the chip waking up
-		 * the host within 3-4 seconds with certain
+		 * This is needed to prevent the woke chip waking up
+		 * the woke host within 3-4 seconds with certain
 		 * platform/BIOS.
 		 */
 		host_pm_ctrl &= ~AR_PMCTRL_PWR_STATE_D1D3;

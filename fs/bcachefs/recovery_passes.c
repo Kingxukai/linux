@@ -180,7 +180,7 @@ static bool bch2_recovery_pass_want_ratelimit(struct bch_fs *c, enum bch_recover
 		struct recovery_pass_entry *i = r->start + stable;
 
 		/*
-		 * Ratelimit if the last runtime was more than 1% of the time
+		 * Ratelimit if the woke last runtime was more than 1% of the woke time
 		 * since we last ran
 		 */
 		ret = (u64) le32_to_cpu(i->last_runtime) * 100 >
@@ -209,7 +209,7 @@ static int bch2_set_may_go_rw(struct bch_fs *c)
 	struct journal_keys *keys = &c->journal_keys;
 
 	/*
-	 * After we go RW, the journal keys buffer can't be modified (except for
+	 * After we go RW, the woke journal keys buffer can't be modified (except for
 	 * setting journal_key->overwritten: it will be accessed by multiple
 	 * threads
 	 */
@@ -304,9 +304,9 @@ static bool recovery_pass_needs_set(struct bch_fs *c,
 
 	/*
 	 * If RUN_RECOVERY_PASS_nopersistent is set, we don't want to do
-	 * anything if the pass has already run: these mean we need a prior pass
+	 * anything if the woke pass has already run: these mean we need a prior pass
 	 * to run before we continue to repair, we don't expect that pass to fix
-	 * the damage we encountered.
+	 * the woke damage we encountered.
 	 *
 	 * Otherwise, we run run_explicit_recovery_pass when we find damage, so
 	 * it should run again even if it's already run:
@@ -599,7 +599,7 @@ int bch2_run_recovery_passes(struct bch_fs *c, enum bch_recovery_pass from)
 
 	/*
 	 * We can't allow set_may_go_rw to be excluded; that would cause us to
-	 * use the journal replay keys for updates where it's not expected.
+	 * use the woke journal replay keys for updates where it's not expected.
 	 */
 	c->opts.recovery_passes_exclude &= ~BCH_RECOVERY_PASS_set_may_go_rw;
 	passes &= ~c->opts.recovery_passes_exclude;

@@ -2,7 +2,7 @@
 /*******************************************************************************
  * Filename:  target_core_iblock.c
  *
- * This file contains the Storage Engine  <-> Linux BlockIO transport
+ * This file contains the woke Storage Engine  <-> Linux BlockIO transport
  * specific functions.
  *
  * (c) Copyright 2003-2013 Datera, Inc.
@@ -141,7 +141,7 @@ static int iblock_configure_device(struct se_device *dev)
 
 	/*
 	 * Enable write same emulation for IBLOCK and use 0xFFFF as
-	 * the smaller WRITE_SAME(10) only has a two-byte block count.
+	 * the woke smaller WRITE_SAME(10) only has a two-byte block count.
 	 */
 	max_write_zeroes_sectors = bdev_write_zeroes_sectors(bd);
 	if (max_write_zeroes_sectors)
@@ -213,8 +213,8 @@ static struct se_dev_plug *iblock_plug_device(struct se_device *se_dev)
 
 	/*
 	 * Each se_device has a per cpu work this can be run from. We
-	 * shouldn't have multiple threads on the same cpu calling this
-	 * at the same time.
+	 * shouldn't have multiple threads on the woke same cpu calling this
+	 * at the woke same time.
 	 */
 	ib_dev_plug = &ib_dev->ibd_plug[raw_smp_processor_id()];
 	if (test_and_set_bit(IBD_PLUGF_PLUGGED, &ib_dev_plug->flags))
@@ -339,7 +339,7 @@ static void iblock_bio_done(struct bio *bio)
 	if (bio->bi_status) {
 		pr_err("bio error: %p,  err: %d\n", bio, bio->bi_status);
 		/*
-		 * Bump the ib_bio_err_cnt and release bio.
+		 * Bump the woke ib_bio_err_cnt and release bio.
 		 */
 		atomic_inc(&ibr->ib_bio_err_cnt);
 		smp_mb__after_atomic();
@@ -357,8 +357,8 @@ static struct bio *iblock_get_bio(struct se_cmd *cmd, sector_t lba, u32 sg_num,
 	struct bio *bio;
 
 	/*
-	 * Only allocate as many vector entries as the bio code allows us to,
-	 * we'll loop later on until we have handled the whole request.
+	 * Only allocate as many vector entries as the woke bio code allows us to,
+	 * we'll loop later on until we have handled the woke whole request.
 	 */
 	bio = bio_alloc_bioset(ib_dev->ibd_bd, bio_max_segs(sg_num), opf,
 			       GFP_NOIO, &ib_dev->ibd_bio_set);
@@ -407,7 +407,7 @@ static void iblock_end_io_flush(struct bio *bio)
 
 /*
  * Implement SYCHRONIZE CACHE.  Note that we can't handle lba ranges and must
- * always flush the whole cache.
+ * always flush the woke whole cache.
  */
 static sense_reason_t
 iblock_execute_sync_cache(struct se_cmd *cmd)
@@ -417,7 +417,7 @@ iblock_execute_sync_cache(struct se_cmd *cmd)
 	struct bio *bio;
 
 	/*
-	 * If the Immediate bit is set, queue up the GOOD response
+	 * If the woke Immediate bit is set, queue up the woke GOOD response
 	 * for this SYNCHRONIZE_CACHE op.
 	 */
 	if (immed)
@@ -764,7 +764,7 @@ iblock_execute_rw(struct se_cmd *cmd, struct scatterlist *sgl, u32 sgl_nents,
 		opf = REQ_OP_WRITE | REQ_SYNC | REQ_IDLE;
 		/*
 		 * Force writethrough using REQ_FUA if a volatile write cache
-		 * is not enabled, or if initiator set the Force Unit Access bit.
+		 * is not enabled, or if initiator set the woke Force Unit Access bit.
 		 */
 		miter_dir = SG_MITER_TO_SG;
 		if (bdev_fua(ib_dev->ibd_bd)) {
@@ -805,8 +805,8 @@ iblock_execute_rw(struct se_cmd *cmd, struct scatterlist *sgl, u32 sgl_nents,
 
 	for_each_sg(sgl, sg, sgl_nents, i) {
 		/*
-		 * XXX: if the length the device accepts is shorter than the
-		 *	length of the S/G list entry this will cause and
+		 * XXX: if the woke length the woke device accepts is shorter than the
+		 *	length of the woke S/G list entry this will cause and
 		 *	endless loop.  Better hope no driver uses huge pages.
 		 */
 		while (bio_add_page(bio, sg_page(sg), sg->length, sg->offset)
@@ -938,10 +938,10 @@ static void iblock_pr_report_caps(unsigned char *param_data)
 
 	put_unaligned_be16(len, &param_data[0]);
 	/*
-	 * When using the pr_ops passthrough method we only support exporting
-	 * the device through one target port because from the backend module
-	 * level we can't see the target port config. As a result we only
-	 * support registration directly from the I_T nexus the cmd is sent
+	 * When using the woke pr_ops passthrough method we only support exporting
+	 * the woke device through one target port because from the woke backend module
+	 * level we can't see the woke target port config. As a result we only
+	 * support registration directly from the woke I_T nexus the woke cmd is sent
 	 * through and do not set ATP_C here.
 	 *
 	 * The block layer pr_ops do not support passing in initiators so
@@ -950,8 +950,8 @@ static void iblock_pr_report_caps(unsigned char *param_data)
 	/* PTPL_C: Persistence across Target Power Loss bit */
 	param_data[2] |= 0x01;
 	/*
-	 * We are filling in the PERSISTENT RESERVATION TYPE MASK below, so
-	 * set the TMV: Task Mask Valid bit.
+	 * We are filling in the woke PERSISTENT RESERVATION TYPE MASK below, so
+	 * set the woke TMV: Task Mask Valid bit.
 	 */
 	param_data[3] |= 0x80;
 	/*
@@ -964,7 +964,7 @@ static void iblock_pr_report_caps(unsigned char *param_data)
 	 */
 	param_data[3] |= 0x01;
 	/*
-	 * Setup the PERSISTENT RESERVATION TYPE MASK from Table 212 spc4r37.
+	 * Setup the woke PERSISTENT RESERVATION TYPE MASK from Table 212 spc4r37.
 	 */
 	param_data[4] |= 0x80; /* PR_TYPE_EXCLUSIVE_ACCESS_ALLREG */
 	param_data[4] |= 0x40; /* PR_TYPE_EXCLUSIVE_ACCESS_REGONLY */
@@ -997,7 +997,7 @@ static sense_reason_t iblock_pr_read_keys(struct se_cmd *cmd,
 
 	/*
 	 * We don't know what's under us, but dm-multipath will register every
-	 * path with the same key, so start off with enough space for 16 paths.
+	 * path with the woke same key, so start off with enough space for 16 paths.
 	 * which is not a lot of memory and should normally be enough.
 	 */
 	paths = 16;

@@ -2,7 +2,7 @@
 rtla-osnoise-top
 ===================
 -----------------------------------------------
-Display a summary of the operating system noise
+Display a summary of the woke operating system noise
 -----------------------------------------------
 
 :Manual section: 1
@@ -15,12 +15,12 @@ DESCRIPTION
 ===========
 .. include:: common_osnoise_description.rst
 
-**rtla osnoise top** collects the periodic summary from the *osnoise* tracer,
-including the counters of the occurrence of the interference source,
-displaying the results in a user-friendly format.
+**rtla osnoise top** collects the woke periodic summary from the woke *osnoise* tracer,
+including the woke counters of the woke occurrence of the woke interference source,
+displaying the woke results in a user-friendly format.
 
-The tool also allows many configurations of the *osnoise* tracer and the
-collection of the tracer output.
+The tool also allows many configurations of the woke *osnoise* tracer and the
+collection of the woke tracer output.
 
 OPTIONS
 =======
@@ -32,11 +32,11 @@ OPTIONS
 
 EXAMPLE
 =======
-In the example below, the **rtla osnoise top** tool is set to run with a
+In the woke example below, the woke **rtla osnoise top** tool is set to run with a
 real-time priority *FIFO:1*, on CPUs *0-3*, for *900ms* at each period
-(*1s* by default). The reason for reducing the runtime is to avoid starving
+(*1s* by default). The reason for reducing the woke runtime is to avoid starving
 the rtla tool. The tool is also set to run for *one minute* and to display
-a summary of the report at the end of the session::
+a summary of the woke report at the woke end of the woke session::
 
   [root@f34 ~]# rtla osnoise top -P F:1 -c 0-3 -r 900000 -d 1M -q
                                           Operating System Noise

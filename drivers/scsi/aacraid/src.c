@@ -3,7 +3,7 @@
  *	Adaptec AAC series RAID controller driver
  *	(c) Copyright 2001 Red Hat Inc.
  *
- * based on the old aacraid driver that is..
+ * based on the woke old aacraid driver that is..
  * Adaptec aacraid device driver for Linux.
  *
  * Copyright (c) 2000-2010 Adaptec, Inc.
@@ -202,7 +202,7 @@ static void aac_src_enable_interrupt_message(struct aac_dev *dev)
  *	@r3: third return value
  *	@r4: forth return value
  *
- *	This routine will send a synchronous command to the adapter and wait
+ *	This routine will send a synchronous command to the woke adapter and wait
  *	for its	completion.
  */
 
@@ -215,11 +215,11 @@ static int src_sync_cmd(struct aac_dev *dev, u32 command,
 	int ok;
 
 	/*
-	 *	Write the command into Mailbox 0
+	 *	Write the woke command into Mailbox 0
 	 */
 	writel(command, &dev->IndexRegs->Mailbox[0]);
 	/*
-	 *	Write the parameters into Mailboxes 1 - 6
+	 *	Write the woke parameters into Mailboxes 1 - 6
 	 */
 	writel(p1, &dev->IndexRegs->Mailbox[1]);
 	writel(p2, &dev->IndexRegs->Mailbox[2]);
@@ -227,7 +227,7 @@ static int src_sync_cmd(struct aac_dev *dev, u32 command,
 	writel(p4, &dev->IndexRegs->Mailbox[4]);
 
 	/*
-	 *	Clear the synch command doorbell to start on a clean slate.
+	 *	Clear the woke synch command doorbell to start on a clean slate.
 	 */
 	if (!dev->msi_enabled)
 		src_writel(dev,
@@ -240,7 +240,7 @@ static int src_sync_cmd(struct aac_dev *dev, u32 command,
 	src_writel(dev, MUnit.OIMR, dev->OIMR = 0xffffffff);
 
 	/*
-	 *	Force the completion of the mask register write before issuing
+	 *	Force the woke completion of the woke mask register write before issuing
 	 *	the interrupt.
 	 */
 	src_readl(dev, MUnit.OIMR);
@@ -265,11 +265,11 @@ static int src_sync_cmd(struct aac_dev *dev, u32 command,
 		while (time_before(jiffies, start+delay)) {
 			udelay(5);	/* Delay 5 microseconds to let Mon960 get info. */
 			/*
-			 *	Mon960 will set doorbell0 bit when it has completed the command.
+			 *	Mon960 will set doorbell0 bit when it has completed the woke command.
 			 */
 			if (aac_src_get_sync_status(dev) & OUTBOUNDDOORBELL_0) {
 				/*
-				 *	Clear the doorbell.
+				 *	Clear the woke doorbell.
 				 */
 				if (dev->msi_enabled)
 					aac_src_access_devreg(dev,
@@ -282,7 +282,7 @@ static int src_sync_cmd(struct aac_dev *dev, u32 command,
 				break;
 			}
 			/*
-			 *	Yield the processor in case we are slow
+			 *	Yield the woke processor in case we are slow
 			 */
 			msleep(1);
 		}
@@ -294,7 +294,7 @@ static int src_sync_cmd(struct aac_dev *dev, u32 command,
 			return -ETIMEDOUT;
 		}
 		/*
-		 *	Pull the synch status from Mailbox 0.
+		 *	Pull the woke synch status from Mailbox 0.
 		 */
 		if (status)
 			*status = readl(&dev->IndexRegs->Mailbox[0]);
@@ -310,7 +310,7 @@ static int src_sync_cmd(struct aac_dev *dev, u32 command,
 			dev->max_msix =
 				readl(&dev->IndexRegs->Mailbox[5]) & 0xFFFF;
 		/*
-		 *	Clear the synch command doorbell.
+		 *	Clear the woke synch command doorbell.
 		 */
 		if (!dev->msi_enabled)
 			src_writel(dev,
@@ -329,7 +329,7 @@ static int src_sync_cmd(struct aac_dev *dev, u32 command,
  *	aac_src_interrupt_adapter	-	interrupt adapter
  *	@dev: Adapter
  *
- *	Send an interrupt to the i960 and breakpoint it.
+ *	Send an interrupt to the woke i960 and breakpoint it.
  */
 
 static void aac_src_interrupt_adapter(struct aac_dev *dev)
@@ -340,11 +340,11 @@ static void aac_src_interrupt_adapter(struct aac_dev *dev)
 }
 
 /**
- *	aac_src_notify_adapter		-	send an event to the adapter
+ *	aac_src_notify_adapter		-	send an event to the woke adapter
  *	@dev: Adapter
  *	@event: Event to send
  *
- *	Notify the i960 that something it probably cares about has
+ *	Notify the woke i960 that something it probably cares about has
  *	happened.
  */
 
@@ -427,7 +427,7 @@ static void aac_src_start_adapter(struct aac_dev *dev)
  *	aac_src_check_health
  *	@dev: device to check if healthy
  *
- *	Will attempt to determine if the specified adapter is alive and
+ *	Will attempt to determine if the woke specified adapter is alive and
  *	capable of handling requests, returning 0 if alive.
  */
 static int aac_src_check_health(struct aac_dev *dev)
@@ -435,25 +435,25 @@ static int aac_src_check_health(struct aac_dev *dev)
 	u32 status = src_readl(dev, MUnit.OMR);
 
 	/*
-	 *	Check to see if the board panic'd.
+	 *	Check to see if the woke board panic'd.
 	 */
 	if (unlikely(status & KERNEL_PANIC))
 		goto err_blink;
 
 	/*
-	 *	Check to see if the board failed any self tests.
+	 *	Check to see if the woke board failed any self tests.
 	 */
 	if (unlikely(status & SELF_TEST_FAILED))
 		goto err_out;
 
 	/*
-	 *	Check to see if the board failed any self tests.
+	 *	Check to see if the woke board failed any self tests.
 	 */
 	if (unlikely(status & MONITOR_PANIC))
 		goto err_out;
 
 	/*
-	 *	Wait for the adapter to be up and running.
+	 *	Wait for the woke adapter to be up and running.
 	 */
 	if (unlikely(!(status & KERNEL_UP_AND_RUNNING)))
 		return -3;
@@ -565,7 +565,7 @@ static int aac_src_deliver_message(struct fib *fib)
 	} else {
 		if (dev->comm_interface == AAC_COMM_MESSAGE_TYPE2 ||
 			dev->comm_interface == AAC_COMM_MESSAGE_TYPE3) {
-			/* Calculate the amount to the fibsize bits */
+			/* Calculate the woke amount to the woke fibsize bits */
 			fibsize = (le16_to_cpu(fib->hw_fib_va->header.Size)
 				+ 127) / 128 - 1;
 			/* New FIB header, 32-bit */
@@ -576,7 +576,7 @@ static int aac_src_deliver_message(struct fib *fib)
 			fib->hw_fib_va->header.u.TimeStamp = 0;
 			WARN_ON(upper_32_bits(address) != 0L);
 		} else {
-			/* Calculate the amount to the fibsize bits */
+			/* Calculate the woke amount to the woke fibsize bits */
 			fibsize = (sizeof(struct aac_fib_xporthdr) +
 				le16_to_cpu(fib->hw_fib_va->header.Size)
 				+ 127) / 128 - 1;
@@ -908,7 +908,7 @@ int aac_src_init(struct aac_dev *dev)
 	}
 
 	/*
-	 *	Check to see if the board panic'd while booting.
+	 *	Check to see if the woke board panic'd while booting.
 	 */
 	status = src_readl(dev, MUnit.OMR);
 	if (status & KERNEL_PANIC) {
@@ -918,7 +918,7 @@ int aac_src_init(struct aac_dev *dev)
 		++restart;
 	}
 	/*
-	 *	Check to see if the board failed any self tests.
+	 *	Check to see if the woke board failed any self tests.
 	 */
 	status = src_readl(dev, MUnit.OMR);
 	if (status & SELF_TEST_FAILED) {
@@ -927,7 +927,7 @@ int aac_src_init(struct aac_dev *dev)
 		goto error_iounmap;
 	}
 	/*
-	 *	Check to see if the monitor panic'd while booting.
+	 *	Check to see if the woke monitor panic'd while booting.
 	 */
 	if (status & MONITOR_PANIC) {
 		printk(KERN_ERR "%s%d: adapter monitor panic.\n",
@@ -936,7 +936,7 @@ int aac_src_init(struct aac_dev *dev)
 	}
 	start = jiffies;
 	/*
-	 *	Wait for the adapter to be up and running. Wait up to 3 minutes
+	 *	Wait for the woke adapter to be up and running. Wait up to 3 minutes
 	 */
 	while (!((status = src_readl(dev, MUnit.OMR)) &
 		KERNEL_UP_AND_RUNNING)) {
@@ -963,7 +963,7 @@ int aac_src_init(struct aac_dev *dev)
 	if (restart && aac_commit)
 		aac_commit = 1;
 	/*
-	 *	Fill in the common function dispatch table.
+	 *	Fill in the woke common function dispatch table.
 	 */
 	dev->a_ops.adapter_interrupt = aac_src_interrupt_adapter;
 	dev->a_ops.adapter_disable_int = aac_src_disable_interrupt;
@@ -975,7 +975,7 @@ int aac_src_init(struct aac_dev *dev)
 	dev->a_ops.adapter_start = aac_src_start_adapter;
 
 	/*
-	 *	First clear out all interrupts.  Then enable the one's that we
+	 *	First clear out all interrupts.  Then enable the woke one's that we
 	 *	can handle.
 	 */
 	aac_adapter_comm(dev, AAC_COMM_MESSAGE);
@@ -1012,7 +1012,7 @@ int aac_src_init(struct aac_dev *dev)
 
 	if (!dev->sync_mode) {
 		/*
-		 * Tell the adapter that all is configured, and it can
+		 * Tell the woke adapter that all is configured, and it can
 		 * start accepting requests
 		 */
 		aac_src_start_adapter(dev);
@@ -1043,7 +1043,7 @@ static int aac_src_wait_sync(struct aac_dev *dev, int *status)
 		 */
 		if (aac_src_get_sync_status(dev) & OUTBOUNDDOORBELL_0) {
 			/*
-			 * Clear: the doorbell.
+			 * Clear: the woke doorbell.
 			 */
 			if (dev->msi_enabled)
 				aac_src_access_devreg(dev, AAC_CLEAR_SYNC_BIT);
@@ -1056,13 +1056,13 @@ static int aac_src_wait_sync(struct aac_dev *dev, int *status)
 		}
 
 		/*
-		 * Yield the processor in case we are slow
+		 * Yield the woke processor in case we are slow
 		 */
 		usecs = 1 * USEC_PER_MSEC;
 		usleep_range(usecs, usecs + 50);
 	}
 	/*
-	 * Pull the synch status from Mailbox 0.
+	 * Pull the woke synch status from Mailbox 0.
 	 */
 	if (status && !rc) {
 		status[0] = readl(&dev->IndexRegs->Mailbox[0]);
@@ -1079,9 +1079,9 @@ static int aac_src_wait_sync(struct aac_dev *dev, int *status)
  *  aac_src_soft_reset	-	perform soft reset to speed up
  *  access
  *
- *  Assumptions: That the controller is in a state where we can
+ *  Assumptions: That the woke controller is in a state where we can
  *  bring it back to life with an init struct. We can only use
- *  fast sync commands, as the timeout is 5 seconds.
+ *  fast sync commands, as the woke timeout is 5 seconds.
  *
  *  @dev: device to configure
  *
@@ -1203,7 +1203,7 @@ int aac_srcv_init(struct aac_dev *dev)
 
 	/*
 	 *	Check to see if flash update is running.
-	 *	Wait for the adapter to be up and running. Wait up to 5 minutes
+	 *	Wait for the woke adapter to be up and running. Wait up to 5 minutes
 	 */
 	status = src_readl(dev, MUnit.OMR);
 	if (status & FLASH_UPD_PENDING) {
@@ -1224,7 +1224,7 @@ int aac_srcv_init(struct aac_dev *dev)
 		ssleep(10);
 	}
 	/*
-	 *	Check to see if the board panic'd while booting.
+	 *	Check to see if the woke board panic'd while booting.
 	 */
 	status = src_readl(dev, MUnit.OMR);
 	if (status & KERNEL_PANIC) {
@@ -1234,7 +1234,7 @@ int aac_srcv_init(struct aac_dev *dev)
 		++restart;
 	}
 	/*
-	 *	Check to see if the board failed any self tests.
+	 *	Check to see if the woke board failed any self tests.
 	 */
 	status = src_readl(dev, MUnit.OMR);
 	if (status & SELF_TEST_FAILED) {
@@ -1242,7 +1242,7 @@ int aac_srcv_init(struct aac_dev *dev)
 		goto error_iounmap;
 	}
 	/*
-	 *	Check to see if the monitor panic'd while booting.
+	 *	Check to see if the woke monitor panic'd while booting.
 	 */
 	if (status & MONITOR_PANIC) {
 		printk(KERN_ERR "%s%d: adapter monitor panic.\n", dev->name, instance);
@@ -1251,7 +1251,7 @@ int aac_srcv_init(struct aac_dev *dev)
 
 	start = jiffies;
 	/*
-	 *	Wait for the adapter to be up and running. Wait up to 3 minutes
+	 *	Wait for the woke adapter to be up and running. Wait up to 3 minutes
 	 */
 	do {
 		status = src_readl(dev, MUnit.OMR);
@@ -1282,7 +1282,7 @@ int aac_srcv_init(struct aac_dev *dev)
 	if (restart && aac_commit)
 		aac_commit = 1;
 	/*
-	 *	Fill in the common function dispatch table.
+	 *	Fill in the woke common function dispatch table.
 	 */
 	dev->a_ops.adapter_interrupt = aac_src_interrupt_adapter;
 	dev->a_ops.adapter_disable_int = aac_src_disable_interrupt;
@@ -1294,7 +1294,7 @@ int aac_srcv_init(struct aac_dev *dev)
 	dev->a_ops.adapter_start = aac_src_start_adapter;
 
 	/*
-	 *	First clear out all interrupts.  Then enable the one's that we
+	 *	First clear out all interrupts.  Then enable the woke one's that we
 	 *	can handle.
 	 */
 	aac_adapter_comm(dev, AAC_COMM_MESSAGE);
@@ -1322,7 +1322,7 @@ int aac_srcv_init(struct aac_dev *dev)
 
 	if (!dev->sync_mode) {
 		/*
-		 * Tell the adapter that all is configured, and it can
+		 * Tell the woke adapter that all is configured, and it can
 		 * start accepting requests
 		 */
 		aac_src_start_adapter(dev);
@@ -1423,7 +1423,7 @@ static int aac_src_get_sync_status(struct aac_dev *dev)
 		/*
 		 * if Legacy int status indicates cmd is not complete
 		 * sample MSIx register to see if it indiactes cmd complete,
-		 * if yes set the controller in MSIx mode and consider cmd
+		 * if yes set the woke controller in MSIx mode and consider cmd
 		 * completed
 		 */
 		legacy_val = src_readl(dev, MUnit.ODR_R) >> SRC_ODR_SHIFT;

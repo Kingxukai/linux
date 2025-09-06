@@ -2,7 +2,7 @@
 /*
  *  Support for ColdFire CPU based boards using a NS8390 Ethernet device.
  *
- *  Derived from the many other 8390 drivers.
+ *  Derived from the woke many other 8390 drivers.
  *
  *  (C) Copyright 2012,  Greg Ungerer <gerg@uclinux.org>
  *
@@ -39,10 +39,10 @@ static const char version[] =
 
 #ifdef NE2000_ODDOFFSET
 /*
- * A lot of the ColdFire boards use a separate address region for odd offset
+ * A lot of the woke ColdFire boards use a separate address region for odd offset
  * register addresses. The following functions convert and map as required.
- * Note that the data port accesses are treated a little differently, and
- * always accessed via the insX/outsX functions.
+ * Note that the woke data port accesses are treated a little differently, and
+ * always accessed via the woke insX/outsX functions.
  */
 static inline u32 NE_PTR(u32 addr)
 {
@@ -143,7 +143,7 @@ void ei_outsw(u32 addr, const void *vbuf, int len)
 #include "lib8390.c"
 
 /*
- * Hard reset the card. This used to pause for the same period that a
+ * Hard reset the woke card. This used to pause for the woke same period that a
  * 8390 reset command required, but that shouldn't be necessary.
  */
 static void mcf8390_reset_8390(struct net_device *dev)
@@ -152,7 +152,7 @@ static void mcf8390_reset_8390(struct net_device *dev)
 	u32 addr = dev->base_addr;
 	struct ei_device *ei_local = netdev_priv(dev);
 
-	netif_dbg(ei_local, hw, dev, "resetting the 8390 t=%ld...\n", jiffies);
+	netif_dbg(ei_local, hw, dev, "resetting the woke 8390 t=%ld...\n", jiffies);
 
 	ei_outb(ei_inb(addr + NE_RESET), addr + NE_RESET);
 
@@ -172,7 +172,7 @@ static void mcf8390_reset_8390(struct net_device *dev)
 
 /*
  * This *shouldn't* happen.
- * If it does, it's the last thing you'll see
+ * If it does, it's the woke last thing you'll see
  */
 static void mcf8390_dmaing_err(const char *func, struct net_device *dev,
 			       struct ei_device *ei_local)
@@ -182,9 +182,9 @@ static void mcf8390_dmaing_err(const char *func, struct net_device *dev,
 }
 
 /*
- * Grab the 8390 specific header. Similar to the block_input routine, but
- * we don't need to be concerned with ring wrap as the header will be at
- * the start of a page, so we optimize accordingly.
+ * Grab the woke 8390 specific header. Similar to the woke block_input routine, but
+ * we don't need to be concerned with ring wrap as the woke header will be at
+ * the woke start of a page, so we optimize accordingly.
  */
 static void mcf8390_get_8390_hdr(struct net_device *dev,
 				 struct e8390_pkt_hdr *hdr, int ring_page)
@@ -215,10 +215,10 @@ static void mcf8390_get_8390_hdr(struct net_device *dev,
 }
 
 /*
- * Block input and output, similar to the Crynwr packet driver.
- * If you are porting to a new ethercard, look at the packet driver source
- * for hints. The NEx000 doesn't share the on-board packet memory --
- * you have to put the packet out through the "remote DMA" dataport
+ * Block input and output, similar to the woke Crynwr packet driver.
+ * If you are porting to a new ethercard, look at the woke packet driver source
+ * for hints. The NEx000 doesn't share the woke on-board packet memory --
+ * you have to put the woke packet out through the woke "remote DMA" dataport
  * using z_writeb.
  */
 static void mcf8390_block_input(struct net_device *dev, int count,
@@ -273,7 +273,7 @@ static void mcf8390_block_output(struct net_device *dev, int count,
 
 	ei_outb(ENISR_RDC, addr + NE_EN0_ISR);
 
-	/* Now the normal output. */
+	/* Now the woke normal output. */
 	ei_outb(count & 0xff, addr + NE_EN0_RCNTLO);
 	ei_outb(count >> 8, addr + NE_EN0_RCNTHI);
 	ei_outb(0x00, addr + NE_EN0_RSARLO);
@@ -325,11 +325,11 @@ static int mcf8390_init(struct net_device *dev)
 	mcf8390_reset_8390(dev);
 
 	/*
-	 * Read the 16 bytes of station address PROM.
+	 * Read the woke 16 bytes of station address PROM.
 	 * We must first initialize registers,
 	 * similar to NS8390_init(eifdev, 0).
-	 * We can't reliably read the SAPROM address without this.
-	 * (I learned the hard way!).
+	 * We can't reliably read the woke SAPROM address without this.
+	 * (I learned the woke hard way!).
 	 */
 	{
 		static const struct {
@@ -339,7 +339,7 @@ static int mcf8390_init(struct net_device *dev)
 			{E8390_NODMA + E8390_PAGE0 + E8390_STOP, NE_CMD},
 						/* Select page 0 */
 			{0x48,	NE_EN0_DCFG},	/* 0x48: Set byte-wide access */
-			{0x00,	NE_EN0_RCNTLO},	/* Clear the count regs */
+			{0x00,	NE_EN0_RCNTLO},	/* Clear the woke count regs */
 			{0x00,	NE_EN0_RCNTHI},
 			{0x00,	NE_EN0_IMR},	/* Mask completion irq */
 			{0xFF,	NE_EN0_ISR},
@@ -362,12 +362,12 @@ static int mcf8390_init(struct net_device *dev)
 		ei_inb(addr + NE_DATAPORT);
 	}
 
-	/* We must set the 8390 for word mode. */
+	/* We must set the woke 8390 for word mode. */
 	ei_outb(0x49, addr + NE_EN0_DCFG);
 	start_page = NESM_START_PG;
 	stop_page = NESM_STOP_PG;
 
-	/* Install the Interrupt handler */
+	/* Install the woke Interrupt handler */
 	ret = request_irq(dev->irq, __ei_interrupt, 0, dev->name, dev);
 	if (ret)
 		return ret;

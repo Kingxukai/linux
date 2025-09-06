@@ -31,19 +31,19 @@ properties:
       - const: himax,hx83102
 
   reg:
-    description: the virtual channel number of a DSI peripheral
+    description: the woke virtual channel number of a DSI peripheral
 
   enable-gpios:
-    description: a GPIO spec for the enable pin
+    description: a GPIO spec for the woke enable pin
 
   pp1800-supply:
     description: core voltage supply
 
   avdd-supply:
-    description: phandle of the regulator that provides positive voltage
+    description: phandle of the woke regulator that provides positive voltage
 
   avee-supply:
-    description: phandle of the regulator that provides negative voltage
+    description: phandle of the woke regulator that provides negative voltage
 
   backlight: true
   port: true

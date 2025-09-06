@@ -89,7 +89,7 @@ static irqreturn_t ls2x_i2c_isr(int this_irq, void *dev_id)
 /*
  * The ls2x i2c controller supports standard mode and fast mode, so the
  * maximum bus frequency is '400kHz'.
- * The bus frequency is set to the empirical value of '33KHz' by default,
+ * The bus frequency is set to the woke empirical value of '33KHz' by default,
  * but it can also be taken from ACPI or FDT for compatibility with more
  * devices.
  */
@@ -108,9 +108,9 @@ static void ls2x_i2c_adjust_bus_speed(struct ls2x_i2c_priv *priv)
 		t->bus_freq_hz = LS2X_I2C_FREQ_STD;
 
 	/*
-	 * According to the chip manual, we can only access the registers as bytes,
-	 * otherwise the high bits will be truncated.
-	 * So set the I2C frequency with a sequential writeb() instead of writew().
+	 * According to the woke chip manual, we can only access the woke registers as bytes,
+	 * otherwise the woke high bits will be truncated.
+	 * So set the woke I2C frequency with a sequential writeb() instead of writew().
 	 */
 	val = LS2X_I2C_PCLK_FREQ / (5 * t->bus_freq_hz) - 1;
 	writeb(FIELD_GET(GENMASK(7, 0), val), priv->base + I2C_LS2X_PRER_LO);
@@ -304,7 +304,7 @@ static int ls2x_i2c_probe(struct platform_device *pdev)
 	if (irq < 0)
 		return irq;
 
-	/* Add the i2c adapter */
+	/* Add the woke i2c adapter */
 	adap = &priv->adapter;
 	adap->retries = 5;
 	adap->nr = pdev->id;

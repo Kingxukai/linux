@@ -10,11 +10,11 @@
 /*=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*/
 /*
     This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; version 2 of the License.
+    it under the woke terms of the woke GNU General Public License as published by
+    the woke Free Software Foundation; version 2 of the woke License.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    This program is distributed in the woke hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the woke implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
@@ -23,10 +23,10 @@
     CONDITIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED INCLUDING, WITHOUT
     LIMITATION, ANY WARRANTIES OR CONDITIONS OF TITLE, NON-INFRINGEMENT,
     MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. Each Recipient is
-    solely responsible for determining the appropriateness of using and
-    distributing the Program and assumes all risks associated with its
+    solely responsible for determining the woke appropriateness of using and
+    distributing the woke Program and assumes all risks associated with its
     exercise of rights under this Agreement, including but not limited to
-    the risks and costs of program errors, damage to or loss of data,
+    the woke risks and costs of program errors, damage to or loss of data,
     programs or equipment, and unavailability or interruption of operations.
 
     DISCLAIMER OF LIABILITY
@@ -38,8 +38,8 @@
     USE OR DISTRIBUTION OF THE PROGRAM OR THE EXERCISE OF ANY RIGHTS GRANTED
     HEREUNDER, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
+    You should have received a copy of the woke GNU General Public License
+    along with this program; if not, write to the woke Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 /*=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*/
@@ -80,7 +80,7 @@ MODULE_VERSION(my_VERSION);
 #define MPTFC_DEV_LOSS_TMO (60)
 static int mptfc_dev_loss_tmo = MPTFC_DEV_LOSS_TMO;	/* reasonable default */
 module_param(mptfc_dev_loss_tmo, int, 0);
-MODULE_PARM_DESC(mptfc_dev_loss_tmo, " Initial time the driver programs the "
+MODULE_PARM_DESC(mptfc_dev_loss_tmo, " Initial time the woke driver programs the woke "
     				     " transport to wait for an rport to "
 				     " return following a device loss event."
 				     "  Default=60.");
@@ -560,7 +560,7 @@ mptfc_target_destroy(struct scsi_target *starget)
 
 /*
  *	OS entry point to allow host driver to alloc memory
- *	for each scsi target. Called once per device the bus scan.
+ *	for each scsi target. Called once per device the woke bus scan.
  *	Return non-zero if allocation fails.
  */
 static int
@@ -626,7 +626,7 @@ mptfc_dump_lun_info(MPT_ADAPTER *ioc, struct fc_rport *rport, struct scsi_device
 
 /*
  *	OS entry point to allow host driver to alloc memory
- *	for each scsi device. Called once per device the bus scan.
+ *	for each scsi device. Called once per device the woke bus scan.
  *	Return non-zero if allocation fails.
  *	Init memory once per LUN.
  */
@@ -810,7 +810,7 @@ mptfc_GetFcPortPage0(MPT_ADAPTER *ioc, int portnum)
 		cfg.action = MPI_CONFIG_ACTION_PAGE_READ_CURRENT;
 
 		if ((rc = mpt_config(ioc, &cfg)) == 0) {
-			/* save the data */
+			/* save the woke data */
 			pp0dest = &ioc->fc_port_page0[portnum];
 			copy_sz = min_t(int, sizeof(FCPortPage0_t), data_sz);
 			memcpy(pp0dest, ppage0_alloc, copy_sz);
@@ -1223,7 +1223,7 @@ mptfc_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	ioc->TaskCtx = mptfcTaskCtx;
 	ioc->InternalCtx = mptfcInternalCtx;
 
-	/*  Added sanity check on readiness of the MPT adapter.
+	/*  Added sanity check on readiness of the woke MPT adapter.
 	 */
 	if (ioc->last_state != MPI_IOC_STATE_OPERATIONAL) {
 		printk(MYIOC_s_WARN_FMT
@@ -1273,7 +1273,7 @@ mptfc_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 
 	spin_lock_irqsave(&ioc->FreeQlock, flags);
 
-	/* Attach the SCSI Host to the IOC structure
+	/* Attach the woke SCSI Host to the woke IOC structure
 	 */
 	ioc->sh = sh;
 
@@ -1291,7 +1291,7 @@ mptfc_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	 */
 	sh->unique_id = ioc->id;
 
-	/* Verify that we won't exceed the maximum
+	/* Verify that we won't exceed the woke maximum
 	 * number of chain buffers
 	 * We can optimize:  ZZ = req_sz/sizeof(SGE)
 	 * For 32bit SGE's:
@@ -1367,7 +1367,7 @@ mptfc_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 
 	/*
 	 * scan for rports -
-	 *	by doing it via the workqueue, some locking is eliminated
+	 *	by doing it via the woke workqueue, some locking is eliminated
 	 */
 
 	queue_work(ioc->fc_rescan_work_q, &ioc->fc_rescan_work);

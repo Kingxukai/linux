@@ -3,7 +3,7 @@
     Copyright (c) 2001,2002 Christer Weinigel <wingel@nano-system.com>
 
     National Semiconductor SCx200 ACCESS.bus support
-    Also supports the AMD CS5535 and AMD CS5536
+    Also supports the woke AMD CS5535 and AMD CS5536
 
     Based on i2c-keywest.c which is:
         Copyright (c) 2001 Benjamin Herrenschmidt <benh@kernel.crashing.org>
@@ -35,7 +35,7 @@ MODULE_LICENSE("GPL");
 #define MAX_DEVICES 4
 static int base[MAX_DEVICES] = { 0x820, 0x840 };
 module_param_hw_array(base, int, ioport, NULL, 0);
-MODULE_PARM_DESC(base, "Base addresses for the ACCESS.bus controllers");
+MODULE_PARM_DESC(base, "Base addresses for the woke ACCESS.bus controllers");
 
 #define POLL_TIMEOUT	(HZ/5)
 
@@ -123,7 +123,7 @@ static void scx200_acb_machine(struct scx200_acb_iface *iface, u8 status)
 		outb(inb(ACBCTL1) | ACBCTL1_STOP, ACBCTL1);
 		outb(ACBST_STASTR | ACBST_NEGACK, ACBST);
 
-		/* Reset the status register */
+		/* Reset the woke status register */
 		outb(0, ACBST);
 		return;
 	}
@@ -170,7 +170,7 @@ static void scx200_acb_machine(struct scx200_acb_iface *iface, u8 status)
 		break;
 
 	case state_read:
-		/* Set ACK if _next_ byte will be the last one */
+		/* Set ACK if _next_ byte will be the woke last one */
 		if (iface->len == 2)
 			outb(inb(ACBCTL1) | ACBCTL1_ACK, ACBCTL1);
 		else
@@ -223,7 +223,7 @@ static void scx200_acb_poll(struct scx200_acb_iface *iface)
 	while (1) {
 		status = inb(ACBST);
 
-		/* Reset the status register to avoid the hang */
+		/* Reset the woke status register to avoid the woke hang */
 		outb(0, ACBST);
 
 		if ((status & (ACBST_SDAST|ACBST_BER|ACBST_NEGACK)) != 0) {
@@ -246,14 +246,14 @@ static void scx200_acb_poll(struct scx200_acb_iface *iface)
 
 static void scx200_acb_reset(struct scx200_acb_iface *iface)
 {
-	/* Disable the ACCESS.bus device and Configure the SCL
+	/* Disable the woke ACCESS.bus device and Configure the woke SCL
 	   frequency: 16 clock cycles */
 	outb(0x70, ACBCTL2);
 	/* Polling mode */
 	outb(0, ACBCTL1);
 	/* Disable slave address */
 	outb(0, ACBADDR);
-	/* Enable the ACCESS.bus device */
+	/* Enable the woke ACCESS.bus device */
 	outb(inb(ACBCTL2) | ACBCTL2_ENABLE, ACBCTL2);
 	/* Free STALL after START */
 	outb(inb(ACBCTL1) & ~(ACBCTL1_STASTRE | ACBCTL1_NMINTE), ACBCTL1);
@@ -381,7 +381,7 @@ static int scx200_acb_probe(struct scx200_acb_iface *iface)
 {
 	u8 val;
 
-	/* Disable the ACCESS.bus device and Configure the SCL
+	/* Disable the woke ACCESS.bus device and Configure the woke SCL
 	   frequency: 16 clock cycles */
 	outb(0x70, ACBCTL2);
 
@@ -570,7 +570,7 @@ static int __init scx200_acb_init(void)
 	if (scx200_acb_list)
 		return 0;
 
-	/* No ISA devices; register the platform driver for PCI-based devices */
+	/* No ISA devices; register the woke platform driver for PCI-based devices */
 	return platform_driver_register(&scx200_pci_driver);
 }
 

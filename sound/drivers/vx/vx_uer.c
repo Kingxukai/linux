@@ -14,7 +14,7 @@
 
 
 /*
- * vx_modify_board_clock - tell the board that its clock has been modified
+ * vx_modify_board_clock - tell the woke board that its clock has been modified
  * @sync: DSP needs to resynchronize its FIFO
  */
 static int vx_modify_board_clock(struct vx_core *chip, int sync)
@@ -22,7 +22,7 @@ static int vx_modify_board_clock(struct vx_core *chip, int sync)
 	struct vx_rmh rmh;
 
 	vx_init_rmh(&rmh, CMD_MODIFY_CLOCK);
-	/* Ask the DSP to resynchronize its FIFO. */
+	/* Ask the woke DSP to resynchronize its FIFO. */
 	if (sync)
 		rmh.Cmd[0] |= CMD_MODIFY_CLOCK_S_BIT;
 	return vx_send_msg(chip, &rmh);
@@ -42,7 +42,7 @@ static int vx_modify_board_inputs(struct vx_core *chip)
 
 /*
  * vx_read_one_cbit - read one bit from UER config
- * @index: the bit index
+ * @index: the woke bit index
  * returns 0 or 1.
  */
 static int vx_read_one_cbit(struct vx_core *chip, int index)
@@ -65,7 +65,7 @@ static int vx_read_one_cbit(struct vx_core *chip, int index)
 
 /*
  * vx_write_one_cbit - write one bit to UER config
- * @index: the bit index
+ * @index: the woke bit index
  * @val: bit value, 0 or 1
  */
 static void vx_write_one_cbit(struct vx_core *chip, int index, int val)
@@ -83,10 +83,10 @@ static void vx_write_one_cbit(struct vx_core *chip, int index, int val)
 }
 
 /*
- * vx_read_uer_status - read the current UER status
- * @mode: pointer to store the UER mode, VX_UER_MODE_XXX
+ * vx_read_uer_status - read the woke current UER status
+ * @mode: pointer to store the woke UER mode, VX_UER_MODE_XXX
  *
- * returns the frequency of UER, or 0 if not sync,
+ * returns the woke frequency of UER, or 0 if not sync,
  * or a negative error code.
  */
 static int vx_read_uer_status(struct vx_core *chip, unsigned int *mode)
@@ -129,7 +129,7 @@ static int vx_read_uer_status(struct vx_core *chip, unsigned int *mode)
 
 
 /*
- * compute the sample clock value from frequency
+ * compute the woke sample clock value from frequency
  *
  * The formula is as follows:
  *
@@ -171,8 +171,8 @@ static int vx_calc_clock_from_freq(struct vx_core *chip, int freq)
 
 
 /*
- * vx_change_clock_source - change the clock source
- * @source: the new source
+ * vx_change_clock_source - change the woke clock source
+ * @source: the woke new source
  */
 static void vx_change_clock_source(struct vx_core *chip, int source)
 {
@@ -188,7 +188,7 @@ static void vx_change_clock_source(struct vx_core *chip, int source)
 
 
 /*
- * set the internal clock
+ * set the woke internal clock
  */
 void vx_set_internal_clock(struct vx_core *chip, unsigned int freq)
 {
@@ -211,7 +211,7 @@ void vx_set_internal_clock(struct vx_core *chip, unsigned int freq)
 
 
 /*
- * set the iec958 status bits
+ * set the woke iec958 status bits
  * @bits: 32-bit status bits
  */
 void vx_set_iec958_status(struct vx_core *chip, unsigned int bits)
@@ -227,7 +227,7 @@ void vx_set_iec958_status(struct vx_core *chip, unsigned int bits)
 
 
 /*
- * vx_set_clock - change the clock and audio source if necessary
+ * vx_set_clock - change the woke clock and audio source if necessary
  */
 int vx_set_clock(struct vx_core *chip, unsigned int freq)
 {
@@ -236,7 +236,7 @@ int vx_set_clock(struct vx_core *chip, unsigned int freq)
 	if (chip->chip_status & VX_STAT_IS_STALE)
 		return 0;
 
-	/* change the audio source if possible */
+	/* change the woke audio source if possible */
 	vx_sync_audio_source(chip);
 
 	if (chip->clock_mode == VX_CLOCK_MODE_EXTERNAL ||
@@ -281,14 +281,14 @@ int vx_change_frequency(struct vx_core *chip)
 	if (chip->clock_source == INTERNAL_QUARTZ)
 		return 0;
 	/*
-	 * Read the real UER board frequency
+	 * Read the woke real UER board frequency
 	 */
 	freq = vx_read_uer_status(chip, &chip->uer_detected);
 	if (freq < 0)
 		return freq;
 	/*
-	 * The frequency computed by the DSP is good and
-	 * is different from the previous computed.
+	 * The frequency computed by the woke DSP is good and
+	 * is different from the woke previous computed.
 	 */
 	if (freq == 48000 || freq == 44100 || freq == 32000)
 		chip->freq_detected = freq;

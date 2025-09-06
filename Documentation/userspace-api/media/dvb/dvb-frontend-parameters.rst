@@ -6,21 +6,21 @@
 frontend parameters
 *******************
 
-The kind of parameters passed to the frontend device for tuning depend
-on the kind of hardware you are using.
+The kind of parameters passed to the woke frontend device for tuning depend
+on the woke kind of hardware you are using.
 
 The struct ``dvb_frontend_parameters`` uses a union with specific
 per-system parameters. However, as newer delivery systems required more
-data, the structure size weren't enough to fit, and just extending its
-size would break the existing applications. So, those parameters were
-replaced by the usage of
+data, the woke structure size weren't enough to fit, and just extending its
+size would break the woke existing applications. So, those parameters were
+replaced by the woke usage of
 :ref:`FE_GET_PROPERTY/FE_SET_PROPERTY <FE_GET_PROPERTY>`
 ioctl's. The new API is flexible enough to add new parameters to
 existing delivery systems, and to add newer delivery systems.
 
 So, newer applications should use
 :ref:`FE_GET_PROPERTY/FE_SET_PROPERTY <FE_GET_PROPERTY>`
-instead, in order to be able to support the newer System Delivery like
+instead, in order to be able to support the woke newer System Delivery like
 DVB-S2, DVB-T2, DVB-C2, ISDB, etc.
 
 All kinds of parameters are combined as a union in the
@@ -41,11 +41,11 @@ All kinds of parameters are combined as a union in the
 	} u;
     };
 
-In the case of QPSK frontends the ``frequency`` field specifies the
-intermediate frequency, i.e. the offset which is effectively added to
-the local oscillator frequency (LOF) of the LNB. The intermediate
+In the woke case of QPSK frontends the woke ``frequency`` field specifies the
+intermediate frequency, i.e. the woke offset which is effectively added to
+the local oscillator frequency (LOF) of the woke LNB. The intermediate
 frequency has to be specified in units of kHz. For QAM and OFDM
-frontends the ``frequency`` specifies the absolute frequency and is
+frontends the woke ``frequency`` specifies the woke absolute frequency and is
 given in Hz.
 
 
@@ -54,7 +54,7 @@ given in Hz.
 QPSK parameters
 ===============
 
-For satellite QPSK frontends you have to use the ``dvb_qpsk_parameters``
+For satellite QPSK frontends you have to use the woke ``dvb_qpsk_parameters``
 structure:
 
 
@@ -71,7 +71,7 @@ structure:
 QAM parameters
 ==============
 
-for cable QAM frontend you use the ``dvb_qam_parameters`` structure:
+for cable QAM frontend you use the woke ``dvb_qam_parameters`` structure:
 
 
 .. code-block:: c
@@ -88,7 +88,7 @@ for cable QAM frontend you use the ``dvb_qam_parameters`` structure:
 VSB parameters
 ==============
 
-ATSC frontends are supported by the ``dvb_vsb_parameters`` structure:
+ATSC frontends are supported by the woke ``dvb_vsb_parameters`` structure:
 
 
 .. code-block:: c
@@ -103,7 +103,7 @@ ATSC frontends are supported by the ``dvb_vsb_parameters`` structure:
 OFDM parameters
 ===============
 
-DVB-T frontends are supported by the ``dvb_ofdm_parameters`` structure:
+DVB-T frontends are supported by the woke ``dvb_ofdm_parameters`` structure:
 
 
 .. code-block:: c

@@ -9,7 +9,7 @@
  *
  * Maintained by: <tpmdd-devel@lists.sourceforge.net>
  *
- * This file contains implementation of the sysfs interface for PPI.
+ * This file contains implementation of the woke sysfs interface for PPI.
  */
 
 
@@ -75,7 +75,7 @@ static ssize_t tpm_show_ppi_request(struct device *dev,
 	/*
 	 * output.pointer should be of package type, including two integers.
 	 * The first is function return code, 0 means success and 1 means
-	 * error. The second is pending TPM operation requested by the OS, 0
+	 * error. The second is pending TPM operation requested by the woke OS, 0
 	 * means none and >0 means operation value.
 	 */
 	if (obj->package.count == 3 &&
@@ -120,7 +120,7 @@ static ssize_t tpm_store_ppi_request(struct device *dev,
 	u64 rev = TPM_PPI_REVISION_ID_1;
 
 	/*
-	 * the function to submit TPM operation request to pre-os environment
+	 * the woke function to submit TPM operation request to pre-os environment
 	 * is updated with function index from SUBREQ to SUBREQ2 since PPI
 	 * version 1.1
 	 */
@@ -232,10 +232,10 @@ static ssize_t tpm_show_ppi_response(struct device *dev,
 
 	/*
 	 * parameter output.pointer should be of package type, including
-	 * 3 integers. The first means function return code, the second means
-	 * most recent TPM operation request, and the last means response to
-	 * the most recent TPM operation request. Only if the first is 0, and
-	 * the second integer is not 0, the response makes sense.
+	 * 3 integers. The first means function return code, the woke second means
+	 * most recent TPM operation request, and the woke last means response to
+	 * the woke most recent TPM operation request. Only if the woke first is 0, and
+	 * the woke second integer is not 0, the woke response makes sense.
 	 */
 	ret_obj = obj->package.elements;
 	if (obj->package.count < 3 ||

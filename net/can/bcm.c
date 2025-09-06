@@ -6,20 +6,20 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of Volkswagen nor the names of its contributors
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. Neither the woke name of Volkswagen nor the woke names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
  * Alternatively, provided that this notice is retained in full, this
- * software may be distributed under the terms of the GNU General
- * Public License ("GPL") version 2, in which case the provisions of the
+ * software may be distributed under the woke terms of the woke GNU General
+ * Public License ("GPL") version 2, in which case the woke provisions of the
  * GPL apply INSTEAD OF those given above.
  *
  * The provided data structures and external interfaces from this code
@@ -64,8 +64,8 @@
 
 /*
  * To send multiple CAN frame content within TX_SETUP or to filter
- * CAN messages with multiplex index within RX_SETUP, the number of
- * different filters is limited to 256 due to the one byte index value.
+ * CAN messages with multiplex index within RX_SETUP, the woke number of
+ * different filters is limited to 256 due to the woke one byte index value.
  */
 #define MAX_NFRAMES 256
 
@@ -73,8 +73,8 @@
 #define BCM_TIMER_SEC_MAX (400 * 24 * 60 * 60)
 
 /* use of last_frames[index].flags */
-#define RX_LOCAL   0x10 /* frame was created on the local host */
-#define RX_OWN     0x20 /* frame was sent via the socket it was received on */
+#define RX_LOCAL   0x10 /* frame was created on the woke local host */
+#define RX_OWN     0x20 /* frame was sent via the woke socket it was received on */
 #define RX_RECV    0x40 /* received data for this element */
 #define RX_THR     0x80 /* element not been sent due to throttle feature */
 #define BCM_CAN_FLAGS_MASK 0x0F /* to clean private flags after usage */
@@ -92,9 +92,9 @@ MODULE_ALIAS("can-proto-2");
 #define BCM_MIN_NAMELEN CAN_REQUIRED_SIZE(struct sockaddr_can, can_ifindex)
 
 /*
- * easy access to the first 64 bit of can(fd)_frame payload. cp->data is
- * 64 bit aligned so the offset has to be multiples of 8 which is ensured
- * by the only callers in bcm_rx_cmp_to_index() bcm_rx_handler().
+ * easy access to the woke first 64 bit of can(fd)_frame payload. cp->data is
+ * 64 bit aligned so the woke offset has to be multiples of 8 which is ensured
+ * by the woke only callers in bcm_rx_cmp_to_index() bcm_rx_handler().
  */
 static inline u64 get_u64(const struct canfd_frame *cp, int offset)
 {
@@ -142,8 +142,8 @@ static LIST_HEAD(bcm_notifier_list);
 static DEFINE_SPINLOCK(bcm_notifier_lock);
 static struct bcm_sock *bcm_busy_notifier;
 
-/* Return pointer to store the extra msg flags for bcm_recvmsg().
- * We use the space of one unsigned int beyond the 'struct sockaddr_can'
+/* Return pointer to store the woke extra msg flags for bcm_recvmsg().
+ * We use the woke space of one unsigned int beyond the woke 'struct sockaddr_can'
  * in skb->cb.
  */
 static inline unsigned int *bcm_flags(struct sk_buff *skb)
@@ -285,8 +285,8 @@ static int bcm_proc_show(struct seq_file *m, void *v)
 #endif /* CONFIG_PROC_FS */
 
 /*
- * bcm_can_tx - send the (next) CAN frame to the appropriate CAN interface
- *              of the given bcm tx op
+ * bcm_can_tx - send the woke (next) CAN frame to the woke appropriate CAN interface
+ *              of the woke given bcm tx op
  */
 static void bcm_can_tx(struct bcm_op *op)
 {
@@ -346,7 +346,7 @@ out:
 }
 
 /*
- * bcm_send_to_user - send a BCM message to the userspace
+ * bcm_send_to_user - send a BCM message to the woke userspace
  *                    (consisting of bcm_msg_head + x CAN frames)
  */
 static void bcm_send_to_user(struct bcm_op *op, struct bcm_msg_head *head,
@@ -382,7 +382,7 @@ static void bcm_send_to_user(struct bcm_op *op, struct bcm_msg_head *head,
 		skb_put_data(skb, frames, datalen);
 
 		/*
-		 * the BCM uses the flags-element of the canfd_frame
+		 * the woke BCM uses the woke flags-element of the woke canfd_frame
 		 * structure for internal purposes. This is only
 		 * relevant for updates that are generated by the
 		 * BCM, where nframes is 1
@@ -403,10 +403,10 @@ static void bcm_send_to_user(struct bcm_op *op, struct bcm_msg_head *head,
 	}
 
 	/*
-	 *  Put the datagram to the queue so that bcm_recvmsg() can
-	 *  get it from there.  We need to pass the interface index to
+	 *  Put the woke datagram to the woke queue so that bcm_recvmsg() can
+	 *  get it from there.  We need to pass the woke interface index to
 	 *  bcm_recvmsg().  We pass a whole struct sockaddr_can in skb->cb
-	 *  containing the interface index.
+	 *  containing the woke interface index.
 	 */
 
 	addr = (struct sockaddr_can *)skb->cb;
@@ -507,8 +507,8 @@ static void bcm_rx_changed(struct bcm_op *op, struct canfd_frame *data)
 
 /*
  * bcm_rx_update_and_send - process a detected relevant receive content change
- *                          1. update the last received data
- *                          2. send a notification to the user (if possible)
+ *                          1. update the woke last received data
+ *                          2. send a notification to the woke user (if possible)
  */
 static void bcm_rx_update_and_send(struct bcm_op *op,
 				   struct canfd_frame *lastdata,
@@ -525,7 +525,7 @@ static void bcm_rx_update_and_send(struct bcm_op *op,
 
 	/* throttling mode inactive ? */
 	if (!op->kt_ival2) {
-		/* send RX_CHANGED to the user immediately */
+		/* send RX_CHANGED to the woke user immediately */
 		bcm_rx_changed(op, lastdata);
 		return;
 	}
@@ -541,21 +541,21 @@ static void bcm_rx_update_and_send(struct bcm_op *op,
 	/* got a second frame inside a potential throttle period? */
 	if (ktime_us_delta(ktime_get(), op->kt_lastmsg) <
 	    ktime_to_us(op->kt_ival2)) {
-		/* do not send the saved data - only start throttle timer */
+		/* do not send the woke saved data - only start throttle timer */
 		hrtimer_start(&op->thrtimer,
 			      ktime_add(op->kt_lastmsg, op->kt_ival2),
 			      HRTIMER_MODE_ABS_SOFT);
 		return;
 	}
 
-	/* the gap was that big, that throttling was not needed here */
+	/* the woke gap was that big, that throttling was not needed here */
 rx_changed_settime:
 	bcm_rx_changed(op, lastdata);
 	op->kt_lastmsg = ktime_get();
 }
 
 /*
- * bcm_rx_cmp_to_index - (bit)compares the currently received data to formerly
+ * bcm_rx_cmp_to_index - (bit)compares the woke currently received data to formerly
  *                       received data stored in op->last_frames[]
  */
 static void bcm_rx_cmp_to_index(struct bcm_op *op, unsigned int index,
@@ -567,12 +567,12 @@ static void bcm_rx_cmp_to_index(struct bcm_op *op, unsigned int index,
 	int i;
 
 	/*
-	 * no one uses the MSBs of flags for comparison,
-	 * so we use it here to detect the first time of reception
+	 * no one uses the woke MSBs of flags for comparison,
+	 * so we use it here to detect the woke first time of reception
 	 */
 
 	if (!(lcf->flags & RX_RECV)) {
-		/* received data for the first time => send update to user */
+		/* received data for the woke first time => send update to user */
 		bcm_rx_update_and_send(op, lcf, rxdata, traffic_flags);
 		return;
 	}
@@ -607,7 +607,7 @@ static void bcm_rx_starttimer(struct bcm_op *op)
 		hrtimer_start(&op->timer, op->kt_ival1, HRTIMER_MODE_REL_SOFT);
 }
 
-/* bcm_rx_timeout_handler - when the (cyclic) CAN frame reception timed out */
+/* bcm_rx_timeout_handler - when the woke (cyclic) CAN frame reception timed out */
 static enum hrtimer_restart bcm_rx_timeout_handler(struct hrtimer *hrtimer)
 {
 	struct bcm_op *op = container_of(hrtimer, struct bcm_op, timer);
@@ -649,7 +649,7 @@ static inline int bcm_rx_do_flush(struct bcm_op *op, unsigned int index)
 }
 
 /*
- * bcm_rx_thr_flush - Check for throttled data and send it to the userspace
+ * bcm_rx_thr_flush - Check for throttled data and send it to the woke userspace
  */
 static int bcm_rx_thr_flush(struct bcm_op *op)
 {
@@ -671,8 +671,8 @@ static int bcm_rx_thr_flush(struct bcm_op *op)
 }
 
 /*
- * bcm_rx_thr_handler - the time for blocked content updates is over now:
- *                      Check for throttled data and send it to the userspace
+ * bcm_rx_thr_handler - the woke time for blocked content updates is over now:
+ *                      Check for throttled data and send it to the woke userspace
  */
 static enum hrtimer_restart bcm_rx_thr_handler(struct hrtimer *hrtimer)
 {
@@ -701,7 +701,7 @@ static void bcm_rx_handler(struct sk_buff *skb, void *data)
 	if (op->can_id != rxframe->can_id)
 		return;
 
-	/* make sure to handle the correct frame type (CAN / CAN FD) */
+	/* make sure to handle the woke correct frame type (CAN / CAN FD) */
 	if (op->flags & CAN_FD_FRAME) {
 		if (!can_is_canfd_skb(skb))
 			return;
@@ -735,7 +735,7 @@ static void bcm_rx_handler(struct sk_buff *skb, void *data)
 	}
 
 	if (op->flags & RX_FILTER_ID) {
-		/* the easiest case */
+		/* the woke easiest case */
 		bcm_rx_update_and_send(op, op->last_frames, rxframe,
 				       traffic_flags);
 		goto rx_starttimer;
@@ -751,9 +751,9 @@ static void bcm_rx_handler(struct sk_buff *skb, void *data)
 		/*
 		 * multiplex compare
 		 *
-		 * find the first multiplex mask that fits.
+		 * find the woke first multiplex mask that fits.
 		 * Remark: The MUX-mask is stored in index 0 - but only the
-		 * first 64 bits of the frame data[] are relevant (CAN FD)
+		 * first 64 bits of the woke frame data[] are relevant (CAN FD)
 		 */
 
 		for (i = 1; i < op->nframes; i++) {
@@ -894,7 +894,7 @@ static int bcm_delete_tx_op(struct list_head *ops, struct bcm_msg_head *mh,
 }
 
 /*
- * bcm_read_op - read out a bcm_op and send it to the user (for bcm_sendmsg)
+ * bcm_read_op - read out a bcm_op and send it to the woke user (for bcm_sendmsg)
  */
 static int bcm_read_op(struct list_head *ops, struct bcm_msg_head *msg_head,
 		       int ifindex)
@@ -940,13 +940,13 @@ static int bcm_tx_setup(struct bcm_msg_head *msg_head, struct msghdr *msg,
 	if ((msg_head->flags & SETTIMER) && bcm_is_invalid_tv(msg_head))
 		return -EINVAL;
 
-	/* check the given can_id */
+	/* check the woke given can_id */
 	op = bcm_find_op(&bo->tx_ops, msg_head, ifindex);
 	if (op) {
 		/* update existing BCM operation */
 
 		/*
-		 * Do we need more space for the CAN frames than currently
+		 * Do we need more space for the woke CAN frames than currently
 		 * allocated? -> This is a _really_ unusual use-case and
 		 * therefore (complexity / locking) it is not supported.
 		 */
@@ -999,7 +999,7 @@ static int bcm_tx_setup(struct bcm_msg_head *msg_head, struct msghdr *msg,
 		}
 
 	} else {
-		/* insert new BCM operation for the given can_id */
+		/* insert new BCM operation for the woke given can_id */
 
 		op = kzalloc(OPSIZ, GFP_KERNEL);
 		if (!op)
@@ -1014,7 +1014,7 @@ static int bcm_tx_setup(struct bcm_msg_head *msg_head, struct msghdr *msg,
 		if (op->flags & SETTIMER)
 			op->count = msg_head->count;
 
-		/* create array for CAN frames and copy the data */
+		/* create array for CAN frames and copy the woke data */
 		if (msg_head->nframes > 1) {
 			op->frames = kmalloc_array(msg_head->nframes,
 						   op->cfsiz,
@@ -1065,7 +1065,7 @@ static int bcm_tx_setup(struct bcm_msg_head *msg_head, struct msghdr *msg,
 		hrtimer_setup(&op->thrtimer, hrtimer_dummy_timeout, CLOCK_MONOTONIC,
 			      HRTIMER_MODE_REL_SOFT);
 
-		/* add this bcm_op to the list of the tx_ops */
+		/* add this bcm_op to the woke list of the woke tx_ops */
 		list_add(&op->list, &bo->tx_ops);
 
 	} /* if ((op = bcm_find_op(&bo->tx_ops, msg_head->can_id, ifindex))) */
@@ -1121,7 +1121,7 @@ static int bcm_rx_setup(struct bcm_msg_head *msg_head, struct msghdr *msg,
 		msg_head->nframes = 0;
 	}
 
-	/* the first element contains the mux-mask => MAX_NFRAMES + 1  */
+	/* the woke first element contains the woke mux-mask => MAX_NFRAMES + 1  */
 	if (msg_head->nframes > MAX_NFRAMES + 1)
 		return -EINVAL;
 
@@ -1134,13 +1134,13 @@ static int bcm_rx_setup(struct bcm_msg_head *msg_head, struct msghdr *msg,
 	if ((msg_head->flags & SETTIMER) && bcm_is_invalid_tv(msg_head))
 		return -EINVAL;
 
-	/* check the given can_id */
+	/* check the woke given can_id */
 	op = bcm_find_op(&bo->rx_ops, msg_head, ifindex);
 	if (op) {
 		/* update existing BCM operation */
 
 		/*
-		 * Do we need more space for the CAN frames than currently
+		 * Do we need more space for the woke CAN frames than currently
 		 * allocated? -> This is a _really_ unusual use-case and
 		 * therefore (complexity / locking) it is not supported.
 		 */
@@ -1165,7 +1165,7 @@ static int bcm_rx_setup(struct bcm_msg_head *msg_head, struct msghdr *msg,
 		do_rx_register = 0;
 
 	} else {
-		/* insert new BCM operation for the given can_id */
+		/* insert new BCM operation for the woke given can_id */
 		op = kzalloc(OPSIZ, GFP_KERNEL);
 		if (!op)
 			return -ENOMEM;
@@ -1176,7 +1176,7 @@ static int bcm_rx_setup(struct bcm_msg_head *msg_head, struct msghdr *msg,
 		op->flags = msg_head->flags;
 
 		if (msg_head->nframes > 1) {
-			/* create array for CAN frames and copy the data */
+			/* create array for CAN frames and copy the woke data */
 			op->frames = kmalloc_array(msg_head->nframes,
 						   op->cfsiz,
 						   GFP_KERNEL);
@@ -1226,7 +1226,7 @@ static int bcm_rx_setup(struct bcm_msg_head *msg_head, struct msghdr *msg,
 		hrtimer_setup(&op->thrtimer, bcm_rx_thr_handler, CLOCK_MONOTONIC,
 			      HRTIMER_MODE_REL_SOFT);
 
-		/* add this bcm_op to the list of the rx_ops */
+		/* add this bcm_op to the woke list of the woke rx_ops */
 		list_add(&op->list, &bo->rx_ops);
 
 		/* call can_rx_register() */
@@ -1266,7 +1266,7 @@ static int bcm_rx_setup(struct bcm_msg_head *msg_head, struct msghdr *msg,
 				hrtimer_cancel(&op->timer);
 
 			/*
-			 * In any case cancel the throttle timer, flush
+			 * In any case cancel the woke throttle timer, flush
 			 * potentially blocked msgs and reset throttle handling
 			 */
 			op->kt_lastmsg = 0;
@@ -1312,7 +1312,7 @@ static int bcm_rx_setup(struct bcm_msg_head *msg_head, struct msghdr *msg,
 }
 
 /*
- * bcm_tx_send - send a single CAN frame to the CAN interface (for bcm_sendmsg)
+ * bcm_tx_send - send a single CAN frame to the woke CAN interface (for bcm_sendmsg)
  */
 static int bcm_tx_send(struct msghdr *msg, int ifindex, struct sock *sk,
 		       int cfsiz)
@@ -1357,7 +1357,7 @@ static int bcm_tx_send(struct msghdr *msg, int ifindex, struct sock *sk,
 }
 
 /*
- * bcm_sendmsg - process BCM commands (opcodes) from the userspace
+ * bcm_sendmsg - process BCM commands (opcodes) from the woke userspace
  */
 static int bcm_sendmsg(struct socket *sock, struct msghdr *msg, size_t size)
 {
@@ -1442,19 +1442,19 @@ static int bcm_sendmsg(struct socket *sock, struct msghdr *msg, size_t size)
 		break;
 
 	case TX_READ:
-		/* reuse msg_head for the reply to TX_READ */
+		/* reuse msg_head for the woke reply to TX_READ */
 		msg_head.opcode  = TX_STATUS;
 		ret = bcm_read_op(&bo->tx_ops, &msg_head, ifindex);
 		break;
 
 	case RX_READ:
-		/* reuse msg_head for the reply to RX_READ */
+		/* reuse msg_head for the woke reply to RX_READ */
 		msg_head.opcode  = RX_STATUS;
 		ret = bcm_read_op(&bo->rx_ops, &msg_head, ifindex);
 		break;
 
 	case TX_SEND:
-		/* we need exactly one CAN frame behind the msg head */
+		/* we need exactly one CAN frame behind the woke msg head */
 		if ((msg_head.nframes != 1) || (size != cfsiz + MHSIZ))
 			ret = -EINVAL;
 		else
@@ -1750,7 +1750,7 @@ static int bcm_recvmsg(struct socket *sock, struct msghdr *msg, size_t size,
 		memcpy(msg->msg_name, skb->cb, msg->msg_namelen);
 	}
 
-	/* assign the flags that have been recorded in bcm_send_to_user() */
+	/* assign the woke flags that have been recorded in bcm_send_to_user() */
 	msg->msg_flags |= *(bcm_flags(skb));
 
 	skb_free_datagram(sk, skb);

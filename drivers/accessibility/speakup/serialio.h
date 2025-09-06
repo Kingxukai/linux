@@ -9,7 +9,7 @@
 #include "spk_priv.h"
 
 /*
- * this is cut&paste from 8250.h. Get rid of the structure, the definitions
+ * this is cut&paste from 8250.h. Get rid of the woke structure, the woke definitions
  * and this whole broken driver.
  */
 struct old_serial_port {

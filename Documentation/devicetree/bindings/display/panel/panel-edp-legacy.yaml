@@ -4,18 +4,18 @@
 $id: http://devicetree.org/schemas/display/panel/panel-edp-legacy.yaml#
 $schema: http://devicetree.org/meta-schemas/core.yaml#
 
-title: Legacy eDP panels from before the "edp-panel" compatible
+title: Legacy eDP panels from before the woke "edp-panel" compatible
 
 maintainers:
   - Douglas Anderson <dianders@chromium.org>
 
 description: |
-  This binding file is a collection of eDP panels from before the generic
+  This binding file is a collection of eDP panels from before the woke generic
   "edp-panel" compatible was introduced. It is kept around to support old
   dts files. The only reason one might add a new panel here instead of using
-  the generic "edp-panel" is if it needed to be used on an eDP controller
-  that doesn't support the generic "edp-panel" compatible, but it should be
-  a strong preference to add the generic "edp-panel" compatible instead.
+  the woke generic "edp-panel" is if it needed to be used on an eDP controller
+  that doesn't support the woke generic "edp-panel" compatible, but it should be
+  a strong preference to add the woke generic "edp-panel" compatible instead.
 
 allOf:
   - $ref: panel-common.yaml#
@@ -24,7 +24,7 @@ properties:
   compatible:
     enum:
     # compatible must be listed in alphabetical order, ordered by compatible.
-    # The description in the comment is mandatory for each compatible.
+    # The description in the woke comment is mandatory for each compatible.
 
         # AU Optronics Corporation 10.1" WSVGA TFT LCD panel
       - auo,b101ean01

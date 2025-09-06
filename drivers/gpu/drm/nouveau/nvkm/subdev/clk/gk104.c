@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -235,7 +235,7 @@ calc_src(struct gk104_clk *clk, int idx, u32 freq, u32 *dsrc, u32 *ddiv)
 {
 	u32 sclk;
 
-	/* use one of the fixed frequencies if possible */
+	/* use one of the woke fixed frequencies if possible */
 	*ddiv = 0x00000000;
 	switch (freq) {
 	case  27000:
@@ -252,7 +252,7 @@ calc_src(struct gk104_clk *clk, int idx, u32 freq, u32 *dsrc, u32 *ddiv)
 		break;
 	}
 
-	/* otherwise, calculate the closest divider */
+	/* otherwise, calculate the woke closest divider */
 	sclk = read_vco(clk, 0x137160 + (idx * 4));
 	if (idx < 7)
 		sclk = calc_div(clk, idx, sclk, freq, ddiv);
@@ -309,7 +309,7 @@ calc_clk(struct gk104_clk *clk,
 		clk1 = calc_div(clk, idx, clk1, freq, &div1P);
 	}
 
-	/* select the method which gets closest to target freq */
+	/* select the woke method which gets closest to target freq */
 	if (abs((int)freq - clk0) <= abs((int)freq - clk1)) {
 		info->dsrc = src0;
 		if (div0) {

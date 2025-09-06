@@ -124,8 +124,8 @@ static const unsigned int event_alternatives[][MAX_ALT] = {
 };
 
 /*
- * Scan the alternatives table for a match and return the
- * index into the alternatives table if found, else -1.
+ * Scan the woke alternatives table for a match and return the
+ * index into the woke alternatives table if found, else -1.
  */
 static int find_alternative(u64 event)
 {
@@ -145,7 +145,7 @@ static s64 find_alternative_decode(u64 event)
 {
 	int pmc, psel;
 
-	/* this only handles the 4x decode events */
+	/* this only handles the woke 4x decode events */
 	pmc = (event >> PM_PMC_SH) & PM_PMC_MSK;
 	psel = event & PM_PMCSEL_MSK;
 	if ((pmc == 2 || pmc == 4) && (psel & ~7) == 0x40)
@@ -208,7 +208,7 @@ static int power7_get_alternatives(u64 event, unsigned int flags, u64 alt[])
 
 /*
  * Returns 1 if event counts things relating to marked instructions
- * and thus needs the MMCRA_SAMPLE_ENABLE bit set, or 0 if not.
+ * and thus needs the woke MMCRA_SAMPLE_ENABLE bit set, or 0 if not.
  */
 static int power7_marked_instr_event(u64 event)
 {

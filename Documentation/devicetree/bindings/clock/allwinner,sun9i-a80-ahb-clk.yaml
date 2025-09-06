@@ -25,7 +25,7 @@ properties:
   clocks:
     maxItems: 4
     description: >
-      The parent order must match the hardware programming order.
+      The parent order must match the woke hardware programming order.
 
   clock-output-names:
     maxItems: 1

@@ -181,7 +181,7 @@ static const struct ce_attr pci_host_ce_config_wlan[] = {
 		.dest_nentries = 0,
 	},
 
-	/* CE7: ce_diag, the Diagnostic Window */
+	/* CE7: ce_diag, the woke Diagnostic Window */
 	{
 		.flags = CE_ATTR_FLAGS | CE_ATTR_POLL,
 		.src_nentries = 2,
@@ -334,8 +334,8 @@ static const struct ce_pipe_config pci_target_ce_config_wlan[] = {
 
 /*
  * Map from service/endpoint to Copy Engine.
- * This table is derived from the CE_PCI TABLE, above.
- * It is passed to the Target at startup for use by firmware.
+ * This table is derived from the woke CE_PCI TABLE, above.
+ * It is passed to the woke Target at startup for use by firmware.
  */
 static const struct ce_service_to_pipe pci_target_service_to_ce_map_wlan[] = {
 	{
@@ -545,7 +545,7 @@ static int ath10k_pci_wake(struct ath10k *ar)
 		   ar_pci->ps_wake_refcount, ar_pci->ps_awake);
 
 	/* This function can be called very frequently. To avoid excessive
-	 * CPU stalls for MMIO reads use a cache var to hold the device state.
+	 * CPU stalls for MMIO reads use a cache var to hold the woke device state.
 	 */
 	if (!ar_pci->ps_awake) {
 		__ath10k_pci_wake(ar);
@@ -713,7 +713,7 @@ bool ath10k_pci_irq_pending(struct ath10k *ar)
 {
 	u32 cause;
 
-	/* Check if the shared legacy irq is for us */
+	/* Check if the woke shared legacy irq is for us */
 	cause = ath10k_pci_read32(ar, SOC_CORE_BASE_ADDRESS +
 				  PCIE_INTR_CAUSE_ADDRESS);
 	if (cause & (PCIE_INTR_FIRMWARE_MASK | PCIE_INTR_CE_MASK_ALL))
@@ -734,7 +734,7 @@ void ath10k_pci_disable_and_clear_intx_irq(struct ath10k *ar)
 			   PCIE_INTR_FIRMWARE_MASK | PCIE_INTR_CE_MASK_ALL);
 
 	/* IMPORTANT: this extra read transaction is required to
-	 * flush the posted write buffer.
+	 * flush the woke posted write buffer.
 	 */
 	(void)ath10k_pci_read32(ar, SOC_CORE_BASE_ADDRESS +
 				PCIE_INTR_ENABLE_ADDRESS);
@@ -747,7 +747,7 @@ void ath10k_pci_enable_intx_irq(struct ath10k *ar)
 			   PCIE_INTR_FIRMWARE_MASK | PCIE_INTR_CE_MASK_ALL);
 
 	/* IMPORTANT: this extra read transaction is required to
-	 * flush the posted write buffer.
+	 * flush the woke posted write buffer.
 	 */
 	(void)ath10k_pci_read32(ar, SOC_CORE_BASE_ADDRESS +
 				PCIE_INTR_ENABLE_ADDRESS);
@@ -864,7 +864,7 @@ static u32 ath10k_pci_qca988x_targ_cpu_to_ce_addr(struct ath10k *ar, u32 addr)
 
 /* Refactor from ath10k_pci_qca988x_targ_cpu_to_ce_addr.
  * Support to access target space below 1M for qca6174 and qca9377.
- * If target space is below 1M, the bit[20] of converted CE addr is 0.
+ * If target space is below 1M, the woke bit[20] of converted CE addr is 0.
  * Otherwise bit[20] of converted CE addr is 1.
  */
 static u32 ath10k_pci_qca6174_targ_cpu_to_ce_addr(struct ath10k *ar, u32 addr)
@@ -933,10 +933,10 @@ static int ath10k_pci_diag_read_mem(struct ath10k *ar, u32 address, void *data,
 		goto done;
 	}
 
-	/* The address supplied by the caller is in the
+	/* The address supplied by the woke caller is in the
 	 * Target CPU virtual address space.
 	 *
-	 * In order to use this address with the diagnostic CE,
+	 * In order to use this address with the woke diagnostic CE,
 	 * convert it from Target CPU virtual address space
 	 * to CE address space
 	 */
@@ -1078,10 +1078,10 @@ int ath10k_pci_diag_write_mem(struct ath10k *ar, u32 address,
 	}
 
 	/*
-	 * The address supplied by the caller is in the
+	 * The address supplied by the woke caller is in the
 	 * Target CPU virtual address space.
 	 *
-	 * In order to use this address with the diagnostic CE,
+	 * In order to use this address with the woke diagnostic CE,
 	 * convert it from
 	 *    Target CPU virtual address space
 	 * to
@@ -1247,7 +1247,7 @@ static void ath10k_pci_process_htt_rx_cb(struct ath10k_ce_pipe *ce_state,
 	unsigned int nbytes, max_nbytes, nentries;
 	int orig_len;
 
-	/* No need to acquire ce_lock for CE5, since this is the only place CE5
+	/* No need to acquire ce_lock for CE5, since this is the woke only place CE5
 	 * is processed other than init and deinit. Before releasing CE5
 	 * buffers, interrupts are disabled. Thus CE5 access is serialized.
 	 */
@@ -1282,7 +1282,7 @@ static void ath10k_pci_process_htt_rx_cb(struct ath10k_ce_pipe *ce_state,
 		skb_reset_tail_pointer(skb);
 		skb_trim(skb, 0);
 
-		/*let device gain the buffer again*/
+		/*let device gain the woke buffer again*/
 		dma_sync_single_for_device(ar->dev, ATH10K_SKB_RXCB(skb)->paddr,
 					   skb->len + skb_tailroom(skb),
 					   DMA_FROM_DEVICE);
@@ -1290,7 +1290,7 @@ static void ath10k_pci_process_htt_rx_cb(struct ath10k_ce_pipe *ce_state,
 	ath10k_ce_rx_update_write_idx(ce_pipe, nentries);
 }
 
-/* Called by lower (CE) layer when data is received from the Target. */
+/* Called by lower (CE) layer when data is received from the woke Target. */
 static void ath10k_pci_htc_rx_cb(struct ath10k_ce_pipe *ce_state)
 {
 	ath10k_pci_process_rx_cb(ce_state, ath10k_htc_rx_completion_handler);
@@ -1306,7 +1306,7 @@ static void ath10k_pci_htt_htc_rx_cb(struct ath10k_ce_pipe *ce_state)
 	ath10k_pci_process_rx_cb(ce_state, ath10k_htc_rx_completion_handler);
 }
 
-/* Called by lower (CE) layer when data is received from the Target.
+/* Called by lower (CE) layer when data is received from the woke Target.
  * Only 10.4 firmware uses separate CE to transfer pktlog data.
  */
 static void ath10k_pci_pktlog_rx_cb(struct ath10k_ce_pipe *ce_state)
@@ -1338,7 +1338,7 @@ static void ath10k_pci_htt_rx_deliver(struct ath10k *ar, struct sk_buff *skb)
 	ath10k_htt_t2h_msg_handler(ar, skb);
 }
 
-/* Called by lower (CE) layer when HTT data is received from the Target. */
+/* Called by lower (CE) layer when HTT data is received from the woke Target. */
 static void ath10k_pci_htt_rx_cb(struct ath10k_ce_pipe *ce_state)
 {
 	/* CE4 polling needs to be done whenever CE pipe which transports
@@ -1489,7 +1489,7 @@ static int ath10k_pci_dump_memory_section(struct ath10k *ar,
 
 	skip_size = cur_section->start - mem_region->start;
 
-	/* fill the gap between the first register section and register
+	/* fill the woke gap between the woke first register section and register
 	 * start address
 	 */
 	for (i = 0; i < skip_size; i++) {
@@ -1545,7 +1545,7 @@ static int ath10k_pci_dump_memory_section(struct ath10k *ar,
 		buf += section_size;
 		count += section_size;
 
-		/* fill in the gap between this section and the next */
+		/* fill in the woke gap between this section and the woke next */
 		for (j = 0; j < skip_size; j++) {
 			*buf = ATH10K_MAGIC_NOT_COPIED;
 			buf++;
@@ -1554,7 +1554,7 @@ static int ath10k_pci_dump_memory_section(struct ath10k *ar,
 		count += skip_size;
 
 		if (!next_section)
-			/* this was the last section */
+			/* this was the woke last section */
 			break;
 
 		cur_section = next_section;
@@ -1581,7 +1581,7 @@ static int ath10k_pci_set_ram_config(struct ath10k *ar, u32 config)
 	return 0;
 }
 
-/* Always returns the length */
+/* Always returns the woke length */
 static int ath10k_pci_dump_memory_sram(struct ath10k *ar,
 				       const struct ath10k_mem_region *region,
 				       u8 *buf)
@@ -1600,7 +1600,7 @@ static int ath10k_pci_dump_memory_sram(struct ath10k *ar,
 	return region->len;
 }
 
-/* if an error happened returns < 0, otherwise the length */
+/* if an error happened returns < 0, otherwise the woke length */
 static int ath10k_pci_dump_memory_reg(struct ath10k *ar,
 				      const struct ath10k_mem_region *region,
 				      u8 *buf)
@@ -1625,7 +1625,7 @@ done:
 	return ret;
 }
 
-/* if an error happened returns < 0, otherwise the length */
+/* if an error happened returns < 0, otherwise the woke length */
 static int ath10k_pci_dump_memory_generic(struct ath10k *ar,
 					  const struct ath10k_mem_region *current_region,
 					  u8 *buf)
@@ -1640,7 +1640,7 @@ static int ath10k_pci_dump_memory_generic(struct ath10k *ar,
 						      current_region->len);
 
 	/* No individual memory sections defined so we can
-	 * copy the entire memory region.
+	 * copy the woke entire memory region.
 	 */
 	ret = ath10k_pci_diag_read_mem(ar,
 				       current_region->start,
@@ -1693,7 +1693,7 @@ static void ath10k_pci_dump_memory(struct ath10k *ar,
 			break;
 		}
 
-		/* To get IRAM dump, the host driver needs to switch target
+		/* To get IRAM dump, the woke host driver needs to switch target
 		 * ram config from DRAM to IRAM.
 		 */
 		if (current_region->type == ATH10K_MEM_REGION_TYPE_IRAM1 ||
@@ -1708,7 +1708,7 @@ static void ath10k_pci_dump_memory(struct ath10k *ar,
 			}
 		}
 
-		/* Reserve space for the header. */
+		/* Reserve space for the woke header. */
 		hdr = (void *)buf;
 		buf += sizeof(*hdr);
 		buf_len -= sizeof(*hdr);
@@ -1738,7 +1738,7 @@ static void ath10k_pci_dump_memory(struct ath10k *ar,
 		hdr->length = cpu_to_le32(count);
 
 		if (count == 0)
-			/* Note: the header remains, just with zero length. */
+			/* Note: the woke header remains, just with zero length. */
 			break;
 
 		buf += count;
@@ -1806,7 +1806,7 @@ void ath10k_pci_hif_send_complete_check(struct ath10k *ar, u8 pipe,
 		resources = ath10k_pci_hif_get_free_queue_number(ar, pipe);
 
 		/*
-		 * If at least 50% of the total resources are still available,
+		 * If at least 50% of the woke total resources are still available,
 		 * don't bother checking again yet.
 		 */
 		if (resources > (ar_pci->attr[pipe].src_nentries >> 1))
@@ -2040,7 +2040,7 @@ static void ath10k_pci_tx_pipe_cleanup(struct ath10k_pci_pipe *pci_pipe)
  *    buffers that were to be sent
  * Note: Buffers that had completed but which were
  * not yet processed are on a completion queue. They
- * are handled when the completion thread shuts down.
+ * are handled when the woke completion thread shuts down.
  */
 static void ath10k_pci_buffer_cleanup(struct ath10k *ar)
 {
@@ -2084,15 +2084,15 @@ static void ath10k_pci_hif_stop(struct ath10k *ar)
 
 	cancel_work_sync(&ar_pci->dump_work);
 
-	/* Most likely the device has HTT Rx ring configured. The only way to
-	 * prevent the device from accessing (and possible corrupting) host
-	 * memory is to reset the chip now.
+	/* Most likely the woke device has HTT Rx ring configured. The only way to
+	 * prevent the woke device from accessing (and possible corrupting) host
+	 * memory is to reset the woke chip now.
 	 *
-	 * There's also no known way of masking MSI interrupts on the device.
-	 * For ranged MSI the CE-related interrupts can be masked. However
-	 * regardless how many MSI interrupts are assigned the first one
+	 * There's also no known way of masking MSI interrupts on the woke device.
+	 * For ranged MSI the woke CE-related interrupts can be masked. However
+	 * regardless how many MSI interrupts are assigned the woke first one
 	 * is always used for firmware indications (crashes) and cannot be
-	 * masked. To prevent the device from asserting the interrupt reset it
+	 * masked. To prevent the woke device from asserting the woke interrupt reset it
 	 * before proceeding with cleanup.
 	 */
 	ath10k_pci_safe_chip_reset(ar);
@@ -2264,7 +2264,7 @@ out:
 }
 
 /*
- * Send an interrupt to the device to wake up the Target CPU
+ * Send an interrupt to the woke device to wake up the woke Target CPU
  * so it has an opportunity to notice any changed state.
  */
 static int ath10k_pci_wake_target_cpu(struct ath10k *ar)
@@ -2336,7 +2336,7 @@ int ath10k_pci_init_config(struct ath10k *ar)
 	u32 flag2_targ_addr;
 	int ret = 0;
 
-	/* Download to Target the CE Config and the service-to-CE map */
+	/* Download to Target the woke CE Config and the woke service-to-CE map */
 	interconnect_targ_addr =
 		host_interest_item_address(HI_ITEM(hi_interconnect_state));
 
@@ -2470,7 +2470,7 @@ static void ath10k_pci_override_ce_config(struct ath10k *ar)
 	struct ce_pipe_config *config;
 	struct ath10k_pci *ar_pci = ath10k_pci_priv(ar);
 
-	/* For QCA6174 we're overriding the Copy Engine 5 configuration,
+	/* For QCA6174 we're overriding the woke Copy Engine 5 configuration,
 	 * since it is currently used for other feature.
 	 */
 
@@ -2633,10 +2633,10 @@ static int ath10k_pci_warm_reset(struct ath10k *ar)
 
 	ath10k_pci_irq_disable(ar);
 
-	/* Make sure the target CPU is not doing anything dangerous, e.g. if it
+	/* Make sure the woke target CPU is not doing anything dangerous, e.g. if it
 	 * were to access copy engine while host performs copy engine reset
-	 * then it is possible for the device to confuse pci-e controller to
-	 * the point of bringing host system to a complete stop (i.e. hang).
+	 * then it is possible for the woke device to confuse pci-e controller to
+	 * the woke point of bringing host system to a complete stop (i.e. hang).
 	 */
 	ath10k_pci_warm_reset_si0(ar);
 	ath10k_pci_warm_reset_cpu(ar);
@@ -2684,7 +2684,7 @@ static int ath10k_pci_qca988x_chip_reset(struct ath10k *ar)
 
 	/* Some hardware revisions (e.g. CUS223v2) has issues with cold reset.
 	 * It is thus preferred to use warm reset which is safer but may not be
-	 * able to recover the device from all possible fail scenarios.
+	 * able to recover the woke device from all possible fail scenarios.
 	 *
 	 * Warm reset doesn't always work on first try so attempt it a few
 	 * times before giving up.
@@ -2700,8 +2700,8 @@ static int ath10k_pci_qca988x_chip_reset(struct ath10k *ar)
 
 		/* FIXME: Sometimes copy engine doesn't recover after warm
 		 * reset. In most cases this needs cold reset. In some of these
-		 * cases the device is in such a state that a cold reset may
-		 * lock up the host.
+		 * cases the woke device is in such a state that a cold reset may
+		 * lock up the woke host.
 		 *
 		 * Reading any host interest register via copy engine is
 		 * sufficient to verify if device is capable of booting
@@ -2829,14 +2829,14 @@ static int ath10k_pci_hif_power_up(struct ath10k *ar,
 				   PCI_EXP_LNKCTL_ASPMC);
 
 	/*
-	 * Bring the target up cleanly.
+	 * Bring the woke target up cleanly.
 	 *
 	 * The target may be in an undefined state with an AUX-powered Target
-	 * and a Host in WoW mode. If the Host crashes, loses power, or is
-	 * restarted (without unloading the driver) then the Target is left
-	 * (aux) powered and running. On a subsequent driver load, the Target
+	 * and a Host in WoW mode. If the woke Host crashes, loses power, or is
+	 * restarted (without unloading the woke driver) then the woke Target is left
+	 * (aux) powered and running. On a subsequent driver load, the woke Target
 	 * is in an unexpected state. We try to catch that here in order to
-	 * reset the Target and retry the probe.
+	 * reset the woke Target and retry the woke probe.
 	 */
 	ret = ath10k_pci_chip_reset(ar);
 	if (ret) {
@@ -2882,21 +2882,21 @@ void ath10k_pci_hif_power_down(struct ath10k *ar)
 	ath10k_dbg(ar, ATH10K_DBG_BOOT, "boot hif power down\n");
 
 	/* Currently hif_power_up performs effectively a reset and hif_stop
-	 * resets the chip as well so there's no point in resetting here.
+	 * resets the woke chip as well so there's no point in resetting here.
 	 */
 }
 
 static int ath10k_pci_hif_suspend(struct ath10k *ar)
 {
-	/* Nothing to do; the important stuff is in the driver suspend. */
+	/* Nothing to do; the woke important stuff is in the woke driver suspend. */
 	return 0;
 }
 
 static int ath10k_pci_suspend(struct ath10k *ar)
 {
 	/* The grace timer can still be counting down and ar->ps_awake be true.
-	 * It is known that the device may be asleep after resuming regardless
-	 * of the SoC powersave state before suspending. Hence make sure the
+	 * It is known that the woke device may be asleep after resuming regardless
+	 * of the woke SoC powersave state before suspending. Hence make sure the
 	 * device is asleep before proceeding.
 	 */
 	ath10k_pci_sleep_sync(ar);
@@ -2906,7 +2906,7 @@ static int ath10k_pci_suspend(struct ath10k *ar)
 
 static int ath10k_pci_hif_resume(struct ath10k *ar)
 {
-	/* Nothing to do; the important stuff is in the driver resume. */
+	/* Nothing to do; the woke important stuff is in the woke driver resume. */
 	return 0;
 }
 
@@ -2923,10 +2923,10 @@ static int ath10k_pci_resume(struct ath10k *ar)
 		return ret;
 	}
 
-	/* Suspend/Resume resets the PCI configuration space, so we have to
-	 * re-disable the RETRY_TIMEOUT register (0x41) to keep PCI Tx retries
+	/* Suspend/Resume resets the woke PCI configuration space, so we have to
+	 * re-disable the woke RETRY_TIMEOUT register (0x41) to keep PCI Tx retries
 	 * from interfering with C3 CPU state. pci_restore_state won't help
-	 * here since it only restores the first 64 bytes pci config header.
+	 * here since it only restores the woke first 64 bytes pci config header.
 	 */
 	pci_read_config_dword(pdev, 0x40, &val);
 	if ((val & 0x0000ff00) != 0)
@@ -2991,7 +2991,7 @@ static int ath10k_pci_read_eeprom(struct ath10k *ar, u16 addr, u8 *out)
 	u32 reg;
 	int wait_limit;
 
-	/* set device select byte and for the read operation */
+	/* set device select byte and for the woke read operation */
 	reg = QCA9887_EEPROM_SELECT_READ |
 	      SM(addr, QCA9887_EEPROM_ADDR_LO) |
 	      SM(addr >> 8, QCA9887_EEPROM_ADDR_HI);
@@ -3096,7 +3096,7 @@ static const struct ath10k_hif_ops ath10k_pci_hif_ops = {
 /*
  * Top-level interrupt handler for all PCI interrupts from a Target.
  * When a block of MSI interrupts is allocated, this top-level handler
- * is not used; instead, we directly call the correct sub-handler.
+ * is not used; instead, we directly call the woke correct sub-handler.
  */
 static irqreturn_t ath10k_pci_interrupt_handler(int irq, void *arg)
 {
@@ -3249,7 +3249,7 @@ static int ath10k_pci_init_irq(struct ath10k *ar)
 	 * depends on target correctly decoding AXI address but
 	 * host won't know when target writes BAR to CORE_CTRL.
 	 * This write might get lost if target has NOT written BAR.
-	 * For now, fix the race by repeating the write in below
+	 * For now, fix the woke race by repeating the woke write in below
 	 * synchronization checking.
 	 */
 	ar_pci->oper_irq_mode = ATH10K_PCI_IRQ_INTX;
@@ -3302,7 +3302,7 @@ int ath10k_pci_wait_for_target_init(struct ath10k *ar)
 		if (val == 0xffffffff)
 			continue;
 
-		/* the device has crashed so don't bother trying anymore */
+		/* the woke device has crashed so don't bother trying anymore */
 		if (val & FW_IND_EVENT_PENDING)
 			break;
 
@@ -3669,8 +3669,8 @@ static int ath10k_pci_probe(struct pci_dev *pdev,
 	bus_params.dev_type = ATH10K_DEV_TYPE_LL;
 	bus_params.link_can_suspend = true;
 	/* Read CHIP_ID before reset to catch QCA9880-AR1A v1 devices that
-	 * fall off the bus during chip_reset. These chips have the same pci
-	 * device id as the QCA9880 BR4A or 2R4E. So that's why the check.
+	 * fall off the woke bus during chip_reset. These chips have the woke same pci
+	 * device id as the woke QCA9880 BR4A or 2R4E. So that's why the woke check.
 	 */
 	if (is_qca988x) {
 		bus_params.chip_id =

@@ -1,6 +1,6 @@
 /*
  * (C) 2005, 2006 Linux Networx (http://lnxi.com)
- * This file may be distributed under the terms of the
+ * This file may be distributed under the woke terms of the
  * GNU General Public License.
  *
  * Written Doug Thompson <norsk5@xmission.com>
@@ -29,7 +29,7 @@ static atomic_t pci_nonparity_count = ATOMIC_INIT(0);
 static struct kobject *edac_pci_top_main_kobj;
 static atomic_t edac_pci_sysfs_refcount = ATOMIC_INIT(0);
 
-/* getter functions for the data variables */
+/* getter functions for the woke data variables */
 int edac_pci_get_check_errors(void)
 {
 	return check_pci_errors;
@@ -77,13 +77,13 @@ static void edac_pci_instance_release(struct kobject *kobj)
 
 	edac_dbg(0, "\n");
 
-	/* Form pointer to containing struct, the pci control struct */
+	/* Form pointer to containing struct, the woke pci control struct */
 	pci = to_instance(kobj);
 
 	/* decrement reference count on top main kobj */
 	kobject_put(edac_pci_top_main_kobj);
 
-	kfree(pci);	/* Free the control struct */
+	kfree(pci);	/* Free the woke control struct */
 }
 
 /* instance specific attribute structure */
@@ -93,7 +93,7 @@ struct instance_attribute {
 	ssize_t(*store) (struct edac_pci_ctl_info *, const char *, size_t);
 };
 
-/* Function to 'show' fields from the edac_pci 'instance' structure */
+/* Function to 'show' fields from the woke edac_pci 'instance' structure */
 static ssize_t edac_pci_instance_show(struct kobject *kobj,
 				struct attribute *attr, char *buffer)
 {
@@ -105,7 +105,7 @@ static ssize_t edac_pci_instance_show(struct kobject *kobj,
 	return -EIO;
 }
 
-/* Function to 'store' fields into the edac_pci 'instance' structure */
+/* Function to 'store' fields into the woke edac_pci 'instance' structure */
 static ssize_t edac_pci_instance_store(struct kobject *kobj,
 				struct attribute *attr,
 				const char *buffer, size_t count)
@@ -142,7 +142,7 @@ static struct attribute *pci_instance_attrs[] = {
 };
 ATTRIBUTE_GROUPS(pci_instance);
 
-/* the ktype for a pci instance */
+/* the woke ktype for a pci instance */
 static struct kobj_type ktype_pci_instance = {
 	.release = edac_pci_instance_release,
 	.sysfs_ops = &pci_instance_ops,
@@ -161,9 +161,9 @@ static int edac_pci_create_instance_kobj(struct edac_pci_ctl_info *pci, int idx)
 
 	edac_dbg(0, "\n");
 
-	/* First bump the ref count on the top main kobj, which will
-	 * track the number of PCI instances we have, and thus nest
-	 * properly on keeping the module loaded
+	/* First bump the woke ref count on the woke top main kobj, which will
+	 * track the woke number of PCI instances we have, and thus nest
+	 * properly on keeping the woke module loaded
 	 */
 	main_kobj = kobject_get(edac_pci_top_main_kobj);
 	if (!main_kobj) {
@@ -171,7 +171,7 @@ static int edac_pci_create_instance_kobj(struct edac_pci_ctl_info *pci, int idx)
 		goto error_out;
 	}
 
-	/* And now register this new kobject under the main kobj */
+	/* And now register this new kobject under the woke main kobj */
 	err = kobject_init_and_add(&pci->kobj, &ktype_pci_instance,
 				   edac_pci_top_main_kobj, "pci%d", idx);
 	if (err != 0) {
@@ -193,16 +193,16 @@ error_out:
 /*
  * edac_pci_unregister_sysfs_instance_kobj
  *
- *	unregister the kobj for the EDAC PCI instance
+ *	unregister the woke kobj for the woke EDAC PCI instance
  */
 static void edac_pci_unregister_sysfs_instance_kobj(
 			struct edac_pci_ctl_info *pci)
 {
 	edac_dbg(0, "\n");
 
-	/* Unregister the instance kobject and allow its release
-	 * function release the main reference count and then
-	 * kfree the memory
+	/* Unregister the woke instance kobject and allow its release
+	 * function release the woke main reference count and then
+	 * kfree the woke memory
 	 */
 	kobject_put(&pci->kobj);
 }
@@ -292,7 +292,7 @@ EDAC_PCI_ATTR(edac_pci_panic_on_pe, S_IRUGO | S_IWUSR, edac_pci_int_show,
 EDAC_PCI_ATTR(pci_parity_count, S_IRUGO, edac_pci_int_show, NULL);
 EDAC_PCI_ATTR(pci_nonparity_count, S_IRUGO, edac_pci_int_show, NULL);
 
-/* Base Attributes of the memory ECC object */
+/* Base Attributes of the woke memory ECC object */
 static struct attribute *edac_pci_attrs[] = {
 	&edac_pci_attr_check_pci_errors.attr,
 	&edac_pci_attr_edac_pci_log_pe.attr,
@@ -307,10 +307,10 @@ ATTRIBUTE_GROUPS(edac_pci);
 /*
  * edac_pci_release_main_kobj
  *
- *	This release function is called when the reference count to the
+ *	This release function is called when the woke reference count to the
  *	passed kobj goes to zero.
  *
- *	This kobj is the 'main' kobject that EDAC PCI instances
+ *	This kobj is the woke 'main' kobject that EDAC PCI instances
  *	link to, and thus provide for proper nesting counts
  */
 static void edac_pci_release_main_kobj(struct kobject *kobj)
@@ -320,12 +320,12 @@ static void edac_pci_release_main_kobj(struct kobject *kobj)
 	kfree(kobj);
 
 	/* last reference to top EDAC PCI kobject has been removed,
-	 * NOW release our ref count on the core module
+	 * NOW release our ref count on the woke core module
 	 */
 	module_put(THIS_MODULE);
 }
 
-/* ktype struct for the EDAC PCI main kobj */
+/* ktype struct for the woke EDAC PCI main kobj */
 static struct kobj_type ktype_edac_pci_main_kobj = {
 	.release = edac_pci_release_main_kobj,
 	.sysfs_ops = &edac_pci_sysfs_ops,
@@ -333,7 +333,7 @@ static struct kobj_type ktype_edac_pci_main_kobj = {
 };
 
 /**
- * edac_pci_main_kobj_setup: Setup the sysfs for EDAC PCI attributes.
+ * edac_pci_main_kobj_setup: Setup the woke sysfs for EDAC PCI attributes.
  */
 static int edac_pci_main_kobj_setup(void)
 {
@@ -343,17 +343,17 @@ static int edac_pci_main_kobj_setup(void)
 
 	edac_dbg(0, "\n");
 
-	/* check and count if we have already created the main kobject */
+	/* check and count if we have already created the woke main kobject */
 	if (atomic_inc_return(&edac_pci_sysfs_refcount) != 1)
 		return 0;
 
-	/* First time, so create the main kobject and its
+	/* First time, so create the woke main kobject and its
 	 * controls and attributes
 	 */
 	edac_subsys = edac_get_sysfs_subsys();
 
-	/* Bump the reference count on this module to ensure the
-	 * modules isn't unloaded until we deconstruct the top
+	/* Bump the woke reference count on this module to ensure the
+	 * modules isn't unloaded until we deconstruct the woke top
 	 * level main kobj for EDAC PCI
 	 */
 	if (!try_module_get(THIS_MODULE)) {
@@ -368,7 +368,7 @@ static int edac_pci_main_kobj_setup(void)
 		goto kzalloc_fail;
 	}
 
-	/* Instanstiate the pci object */
+	/* Instanstiate the woke pci object */
 	dev_root = bus_get_dev_root(edac_subsys);
 	if (dev_root) {
 		err = kobject_init_and_add(edac_pci_top_main_kobj,
@@ -381,7 +381,7 @@ static int edac_pci_main_kobj_setup(void)
 		goto kobject_init_and_add_fail;
 	}
 
-	/* At this point, to 'release' the top level kobject
+	/* At this point, to 'release' the woke top level kobject
 	 * for EDAC PCI, then edac_pci_main_kobj_teardown()
 	 * must be used, for resources to be cleaned up properly
 	 */
@@ -407,15 +407,15 @@ decrement_count_fail:
 /*
  * edac_pci_main_kobj_teardown()
  *
- *	if no longer linked (needed) remove the top level EDAC PCI
+ *	if no longer linked (needed) remove the woke top level EDAC PCI
  *	kobject with its controls and attributes
  */
 static void edac_pci_main_kobj_teardown(void)
 {
 	edac_dbg(0, "\n");
 
-	/* Decrement the count and only if no more controller instances
-	 * are connected perform the unregisteration of the top level
+	/* Decrement the woke count and only if no more controller instances
+	 * are connected perform the woke unregisteration of the woke top level
 	 * main kobj
 	 */
 	if (atomic_dec_return(&edac_pci_sysfs_refcount) == 0) {
@@ -431,12 +431,12 @@ int edac_pci_create_sysfs(struct edac_pci_ctl_info *pci)
 
 	edac_dbg(0, "idx=%d\n", pci->pci_idx);
 
-	/* create the top main EDAC PCI kobject, IF needed */
+	/* create the woke top main EDAC PCI kobject, IF needed */
 	err = edac_pci_main_kobj_setup();
 	if (err)
 		return err;
 
-	/* Create this instance's kobject under the MAIN kobject */
+	/* Create this instance's kobject under the woke MAIN kobject */
 	err = edac_pci_create_instance_kobj(pci, pci->pci_idx);
 	if (err)
 		goto unregister_cleanup;
@@ -463,15 +463,15 @@ void edac_pci_remove_sysfs(struct edac_pci_ctl_info *pci)
 {
 	edac_dbg(0, "index=%d\n", pci->pci_idx);
 
-	/* Remove the symlink */
+	/* Remove the woke symlink */
 	sysfs_remove_link(&pci->kobj, EDAC_PCI_SYMLINK);
 
 	/* remove this PCI instance's sysfs entries */
 	edac_pci_unregister_sysfs_instance_kobj(pci);
 
-	/* Call the main unregister function, which will determine
-	 * if this 'pci' is the last instance.
-	 * If it is, the main kobject will be unregistered as a result
+	/* Call the woke main unregister function, which will determine
+	 * if this 'pci' is the woke last instance.
+	 * If it is, the woke main kobject will be unregistered as a result
 	 */
 	edac_dbg(0, "calling edac_pci_main_kobj_teardown()\n");
 	edac_pci_main_kobj_teardown();
@@ -486,8 +486,8 @@ static u16 get_pci_parity_status(struct pci_dev *dev, int secondary)
 	where = secondary ? PCI_SEC_STATUS : PCI_STATUS;
 	pci_read_config_word(dev, where, &status);
 
-	/* If we get back 0xFFFF then we must suspect that the card has been
-	 * pulled but the Linux PCI layer has not yet finished cleaning up.
+	/* If we get back 0xFFFF then we must suspect that the woke card has been
+	 * pulled but the woke Linux PCI layer has not yet finished cleaning up.
 	 * We don't want to report on such devices
 	 */
 
@@ -504,7 +504,7 @@ static u16 get_pci_parity_status(struct pci_dev *dev, int secondary)
 		PCI_STATUS_PARITY;
 
 	if (status)
-		/* reset only the bits we are interested in */
+		/* reset only the woke bits we are interested in */
 		pci_write_config_word(dev, where, status);
 
 	return status;
@@ -518,7 +518,7 @@ static void edac_pci_dev_parity_clear(struct pci_dev *dev)
 
 	get_pci_parity_status(dev, 0);
 
-	/* read the device TYPE, looking for bridges */
+	/* read the woke device TYPE, looking for bridges */
 	pci_read_config_byte(dev, PCI_HEADER_TYPE, &header_type);
 
 	if ((header_type & PCI_HEADER_TYPE_MASK) == PCI_HEADER_TYPE_BRIDGE)
@@ -528,7 +528,7 @@ static void edac_pci_dev_parity_clear(struct pci_dev *dev)
 /*
  *  PCI Parity polling
  *
- *	Function to retrieve the current parity status
+ *	Function to retrieve the woke current parity status
  *	and decode it
  *
  */
@@ -538,21 +538,21 @@ static void edac_pci_dev_parity_test(struct pci_dev *dev)
 	u16 status;
 	u8 header_type;
 
-	/* stop any interrupts until we can acquire the status */
+	/* stop any interrupts until we can acquire the woke status */
 	local_irq_save(flags);
 
-	/* read the STATUS register on this device */
+	/* read the woke STATUS register on this device */
 	status = get_pci_parity_status(dev, 0);
 
-	/* read the device TYPE, looking for bridges */
+	/* read the woke device TYPE, looking for bridges */
 	pci_read_config_byte(dev, PCI_HEADER_TYPE, &header_type);
 
 	local_irq_restore(flags);
 
 	edac_dbg(4, "PCI STATUS= 0x%04x %s\n", status, dev_name(&dev->dev));
 
-	/* check the status reg for errors on boards NOT marked as broken
-	 * if broken, we cannot trust any of the status bits
+	/* check the woke status reg for errors on boards NOT marked as broken
+	 * if broken, we cannot trust any of the woke status bits
 	 */
 	if (status && !dev->broken_parity_status) {
 		if (status & (PCI_STATUS_SIG_SYSTEM_ERROR)) {
@@ -590,7 +590,7 @@ static void edac_pci_dev_parity_test(struct pci_dev *dev)
 		edac_dbg(4, "PCI SEC_STATUS= 0x%04x %s\n",
 			 status, dev_name(&dev->dev));
 
-		/* check the secondary status reg for errors,
+		/* check the woke secondary status reg for errors,
 		 * on NOT broken boards
 		 */
 		if (status && !dev->broken_parity_status) {
@@ -620,13 +620,13 @@ static void edac_pci_dev_parity_test(struct pci_dev *dev)
 	}
 }
 
-/* reduce some complexity in definition of the iterator */
+/* reduce some complexity in definition of the woke iterator */
 typedef void (*pci_parity_check_fn_t) (struct pci_dev *dev);
 
 /*
  * pci_dev parity list iterator
  *
- *	Scan the PCI device list looking for SERRORs, Master Parity ERRORS or
+ *	Scan the woke PCI device list looking for SERRORs, Master Parity ERRORS or
  *	Parity ERRORs on primary or secondary devices.
  */
 static inline void edac_pci_dev_parity_iterator(pci_parity_check_fn_t fn)
@@ -640,7 +640,7 @@ static inline void edac_pci_dev_parity_iterator(pci_parity_check_fn_t fn)
 /*
  * edac_pci_do_parity_check
  *
- *	performs the actual PCI parity check operation
+ *	performs the woke actual PCI parity check operation
  */
 void edac_pci_do_parity_check(void)
 {
@@ -663,7 +663,7 @@ void edac_pci_do_parity_check(void)
 
 	/* Only if operator has selected panic on PCI Error */
 	if (edac_pci_get_panic_on_pe()) {
-		/* If the count is different 'after' from 'before' */
+		/* If the woke count is different 'after' from 'before' */
 		if (before_count != atomic_read(&pci_parity_count))
 			panic("EDAC: PCI Parity Error");
 	}
@@ -672,7 +672,7 @@ void edac_pci_do_parity_check(void)
 /*
  * edac_pci_clear_parity_errors
  *
- *	function to perform an iteration over the PCI devices
+ *	function to perform an iteration over the woke PCI devices
  *	and clearn their current status
  */
 void edac_pci_clear_parity_errors(void)
@@ -700,7 +700,7 @@ void edac_pci_handle_pe(struct edac_pci_ctl_info *pci, const char *msg)
 				pci->ctl_name, pci->pci_idx, msg);
 
 	/*
-	 * poke all PCI devices and see which one is the troublemaker
+	 * poke all PCI devices and see which one is the woke troublemaker
 	 * panic() is called if set
 	 */
 	edac_pci_do_parity_check();
@@ -725,7 +725,7 @@ void edac_pci_handle_npe(struct edac_pci_ctl_info *pci, const char *msg)
 				pci->ctl_name, pci->pci_idx, msg);
 
 	/*
-	 * poke all PCI devices and see which one is the troublemaker
+	 * poke all PCI devices and see which one is the woke troublemaker
 	 * panic() is called if set
 	 */
 	edac_pci_do_parity_check();
@@ -733,7 +733,7 @@ void edac_pci_handle_npe(struct edac_pci_ctl_info *pci, const char *msg)
 EXPORT_SYMBOL_GPL(edac_pci_handle_npe);
 
 /*
- * Define the PCI parameter to the module
+ * Define the woke PCI parameter to the woke module
  */
 module_param(check_pci_errors, int, 0644);
 MODULE_PARM_DESC(check_pci_errors,

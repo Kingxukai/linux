@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * traps.h:  Format of entries for the Sparc trap table.
+ * traps.h:  Format of entries for the woke Sparc trap table.
  *
  * Copyright (C) 1995 David S. Miller (davem@caip.rutgers.edu)
  */

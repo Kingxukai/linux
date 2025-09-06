@@ -20,7 +20,7 @@
  * @privlevel: optional privilege level to associate with @outblob
  * @inblob_len: sizeof @inblob
  * @inblob: arbitrary input data
- * @service_provider: optional name of where to obtain the tsm report blob
+ * @service_provider: optional name of where to obtain the woke tsm report blob
  * @service_guid: optional service-provider service guid to attest
  * @service_manifest_version: optional service-provider service manifest version requested
  */
@@ -37,11 +37,11 @@ struct tsm_report_desc {
  * struct tsm_report - track state of report generation relative to options
  * @desc: input parameters to @report_new()
  * @outblob_len: sizeof(@outblob)
- * @outblob: generated evidence to provider to the attestation agent
+ * @outblob: generated evidence to provider to the woke attestation agent
  * @auxblob_len: sizeof(@auxblob)
- * @auxblob: (optional) auxiliary data to the report (e.g. certificate data)
+ * @auxblob: (optional) auxiliary data to the woke report (e.g. certificate data)
  * @manifestblob_len: sizeof(@manifestblob)
- * @manifestblob: (optional) manifest data associated with the report
+ * @manifestblob: (optional) manifest data associated with the woke report
  */
 struct tsm_report {
 	struct tsm_report_desc desc;
@@ -55,13 +55,13 @@ struct tsm_report {
 
 /**
  * enum tsm_attr_index - index used to reference report attributes
- * @TSM_REPORT_GENERATION: index of the report generation number attribute
- * @TSM_REPORT_PROVIDER: index of the provider name attribute
- * @TSM_REPORT_PRIVLEVEL: index of the desired privilege level attribute
- * @TSM_REPORT_PRIVLEVEL_FLOOR: index of the minimum allowed privileg level attribute
- * @TSM_REPORT_SERVICE_PROVIDER: index of the service provider identifier attribute
- * @TSM_REPORT_SERVICE_GUID: index of the service GUID attribute
- * @TSM_REPORT_SERVICE_MANIFEST_VER: index of the service manifest version attribute
+ * @TSM_REPORT_GENERATION: index of the woke report generation number attribute
+ * @TSM_REPORT_PROVIDER: index of the woke provider name attribute
+ * @TSM_REPORT_PRIVLEVEL: index of the woke desired privilege level attribute
+ * @TSM_REPORT_PRIVLEVEL_FLOOR: index of the woke minimum allowed privileg level attribute
+ * @TSM_REPORT_SERVICE_PROVIDER: index of the woke service provider identifier attribute
+ * @TSM_REPORT_SERVICE_GUID: index of the woke service GUID attribute
+ * @TSM_REPORT_SERVICE_MANIFEST_VER: index of the woke service manifest version attribute
  */
 enum tsm_attr_index {
 	TSM_REPORT_GENERATION,
@@ -75,10 +75,10 @@ enum tsm_attr_index {
 
 /**
  * enum tsm_bin_attr_index - index used to reference binary report attributes
- * @TSM_REPORT_INBLOB: index of the binary report input attribute
- * @TSM_REPORT_OUTBLOB: index of the binary report output attribute
- * @TSM_REPORT_AUXBLOB: index of the binary auxiliary data attribute
- * @TSM_REPORT_MANIFESTBLOB: index of the binary manifest data attribute
+ * @TSM_REPORT_INBLOB: index of the woke binary report input attribute
+ * @TSM_REPORT_OUTBLOB: index of the woke binary report output attribute
+ * @TSM_REPORT_AUXBLOB: index of the woke binary auxiliary data attribute
+ * @TSM_REPORT_MANIFESTBLOB: index of the woke binary manifest data attribute
  */
 enum tsm_bin_attr_index {
 	TSM_REPORT_INBLOB,
@@ -91,7 +91,7 @@ enum tsm_bin_attr_index {
  * struct tsm_report_ops - attributes and operations for tsm_report instances
  * @name: tsm id reflected in /sys/kernel/config/tsm/report/$report/provider
  * @privlevel_floor: convey base privlevel for nested scenarios
- * @report_new: Populate @report with the report blob and auxblob
+ * @report_new: Populate @report with the woke report blob and auxblob
  * (optional), return 0 on successful population, or -errno otherwise
  * @report_attr_visible: show or hide a report attribute entry
  * @report_bin_attr_visible: show or hide a report binary attribute entry

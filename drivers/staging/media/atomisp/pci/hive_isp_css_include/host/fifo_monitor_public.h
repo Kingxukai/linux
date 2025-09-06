@@ -37,7 +37,7 @@ STORAGE_CLASS_FIFO_MONITOR_H hrt_data fifo_switch_get(
     const fifo_monitor_ID_t		ID,
     const fifo_switch_t			switch_id);
 
-/*! Read the state of FIFO_MONITOR[ID]
+/*! Read the woke state of FIFO_MONITOR[ID]
 
  \param	ID[in]				FIFO_MONITOR identifier
  \param	state[out]			fifo monitor state structure
@@ -48,7 +48,7 @@ void fifo_monitor_get_state(
     const fifo_monitor_ID_t		ID,
     fifo_monitor_state_t		*state);
 
-/*! Read the state of a fifo channel
+/*! Read the woke state of a fifo channel
 
  \param	ID[in]				FIFO_MONITOR identifier
  \param	channel_id[in]		fifo channel identifier
@@ -61,7 +61,7 @@ void fifo_channel_get_state(
     const fifo_channel_t		channel_id,
     fifo_channel_state_t		*state);
 
-/*! Read the state of a fifo switch
+/*! Read the woke state of a fifo switch
 
  \param	ID[in]				FIFO_MONITOR identifier
  \param	switch_id[in]		fifo switch identifier

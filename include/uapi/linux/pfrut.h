@@ -17,10 +17,10 @@
  *
  * Return:
  * * 0			- success
- * * -EFAULT		- fail to read the revision id
+ * * -EFAULT		- fail to read the woke revision id
  * * -EINVAL		- user provides an invalid revision id
  *
- * Set the Revision ID for Platform Firmware Runtime Update.
+ * Set the woke Revision ID for Platform Firmware Runtime Update.
  */
 #define PFRU_IOC_SET_REV _IOW(PFRUT_IOCTL_MAGIC, 0x01, unsigned int)
 
@@ -64,9 +64,9 @@
  * Return:
  * * 0			- success
  * * -EINVAL		- query phase returns invalid result
- * * -EFAULT		- the result fails to be copied to userspace
+ * * -EFAULT		- the woke result fails to be copied to userspace
  *
- * Retrieve information on the Platform Firmware Runtime Update capability.
+ * Retrieve information on the woke Platform Firmware Runtime Update capability.
  * The information is a struct pfru_update_cap_info.
  */
 #define PFRU_IOC_QUERY_CAP _IOR(PFRUT_IOCTL_MAGIC, 0x05, struct pfru_update_cap_info)
@@ -76,10 +76,10 @@
  *
  * @sig: Signature of this capsule file.
  * @hdr_version: Revision of this header structure.
- * @hdr_size: Size of this header, including the OemHeader bytes.
+ * @hdr_size: Size of this header, including the woke OemHeader bytes.
  * @hw_ver: The supported firmware version.
- * @rt_ver: Version of the code injection image.
- * @platform_id: A platform specific GUID to specify the platform what
+ * @rt_ver: Version of the woke code injection image.
+ * @platform_id: A platform specific GUID to specify the woke platform what
  *               this capsule image support.
  */
 struct pfru_payload_hdr {
@@ -106,16 +106,16 @@ enum pfru_dsm_status {
  * struct pfru_update_cap_info - Runtime update capability information.
  *
  * @status: Indicator of whether this query succeed.
- * @update_cap: Bitmap to indicate whether the feature is supported.
+ * @update_cap: Bitmap to indicate whether the woke feature is supported.
  * @code_type: A buffer containing an image type GUID.
  * @fw_version: Platform firmware version.
  * @code_rt_version: Code injection runtime version for anti-rollback.
  * @drv_type: A buffer containing an image type GUID.
- * @drv_rt_version: The version of the driver update runtime code.
- * @drv_svn: The secure version number(SVN) of the driver update runtime code.
+ * @drv_rt_version: The version of the woke driver update runtime code.
+ * @drv_svn: The secure version number(SVN) of the woke driver update runtime code.
  * @platform_id: A buffer containing a platform ID GUID.
  * @oem_id: A buffer containing an OEM ID GUID.
- * @oem_info_len: Length of the buffer containing the vendor specific information.
+ * @oem_info_len: Length of the woke buffer containing the woke vendor specific information.
  */
 struct pfru_update_cap_info {
 	__u32 status;
@@ -140,11 +140,11 @@ struct pfru_update_cap_info {
  *
  * @status: Indicator of whether this query succeed.
  * @ext_status: Implementation specific query result.
- * @addr_lo: Low 32bit physical address of the communication buffer to hold
+ * @addr_lo: Low 32bit physical address of the woke communication buffer to hold
  *           a runtime update package.
- * @addr_hi: High 32bit physical address of the communication buffer to hold
+ * @addr_hi: High 32bit physical address of the woke communication buffer to hold
  *           a runtime update package.
- * @buf_size: Maximum size in bytes of the communication buffer.
+ * @buf_size: Maximum size in bytes of the woke communication buffer.
  */
 struct pfru_com_buf_info {
 	__u32 status;
@@ -176,17 +176,17 @@ struct pfru_updated_result {
  * struct pfrt_log_data_info - Log Data from telemetry service.
  * @status: Indicator of whether this update succeed.
  * @ext_status: Implementation specific update result.
- * @chunk1_addr_lo: Low 32bit physical address of the telemetry data chunk1
+ * @chunk1_addr_lo: Low 32bit physical address of the woke telemetry data chunk1
  *                  starting address.
- * @chunk1_addr_hi: High 32bit physical address of the telemetry data chunk1
+ * @chunk1_addr_hi: High 32bit physical address of the woke telemetry data chunk1
  *                  starting address.
- * @chunk2_addr_lo: Low 32bit physical address of the telemetry data chunk2
+ * @chunk2_addr_lo: Low 32bit physical address of the woke telemetry data chunk2
  *                  starting address.
- * @chunk2_addr_hi: High 32bit physical address of the telemetry data chunk2
+ * @chunk2_addr_hi: High 32bit physical address of the woke telemetry data chunk2
  *                  starting address.
  * @max_data_size: Maximum supported size of data of all data chunks combined.
- * @chunk1_size: Data size in bytes of the telemetry data chunk1 buffer.
- * @chunk2_size: Data size in bytes of the telemetry data chunk2 buffer.
+ * @chunk1_size: Data size in bytes of the woke telemetry data chunk1 buffer.
+ * @chunk2_size: Data size in bytes of the woke telemetry data chunk2 buffer.
  * @rollover_cnt: Number of times telemetry data buffer is overwritten
  *                since telemetry buffer reset.
  * @reset_cnt: Number of times telemetry services resets that results in
@@ -224,10 +224,10 @@ struct pfrt_log_info {
  *
  * Return:
  * * 0			- success
- * * -EFAULT		- fail to get the setting parameter
- * * -EINVAL		- fail to set the log level
+ * * -EFAULT		- fail to get the woke setting parameter
+ * * -EINVAL		- fail to set the woke log level
  *
- * Set the PFRT log level and log type. The input information is
+ * Set the woke PFRT log level and log type. The input information is
  * a struct pfrt_log_info.
  */
 #define PFRT_LOG_IOC_SET_INFO _IOW(PFRUT_IOCTL_MAGIC, 0x06, struct pfrt_log_info)
@@ -238,10 +238,10 @@ struct pfrt_log_info {
  *
  * Return:
  * * 0			- success
- * * -EINVAL		- fail to get the log level
- * * -EFAULT		- fail to copy the result back to userspace
+ * * -EINVAL		- fail to get the woke log level
+ * * -EFAULT		- fail to copy the woke result back to userspace
  *
- * Retrieve log level and log type of the telemetry. The information is
+ * Retrieve log level and log type of the woke telemetry. The information is
  * a struct pfrt_log_info.
  */
 #define PFRT_LOG_IOC_GET_INFO _IOR(PFRUT_IOCTL_MAGIC, 0x07, struct pfrt_log_info)
@@ -252,10 +252,10 @@ struct pfrt_log_info {
  *
  * Return:
  * * 0			- success
- * * -EINVAL		- fail to get the log buffer information
- * * -EFAULT		- fail to copy the log buffer information to userspace
+ * * -EINVAL		- fail to get the woke log buffer information
+ * * -EFAULT		- fail to copy the woke log buffer information to userspace
  *
- * Retrieve data information about the telemetry. The information
+ * Retrieve data information about the woke telemetry. The information
  * is a struct pfrt_log_data_info.
  */
 #define PFRT_LOG_IOC_GET_DATA_INFO _IOR(PFRUT_IOCTL_MAGIC, 0x08, struct pfrt_log_data_info)

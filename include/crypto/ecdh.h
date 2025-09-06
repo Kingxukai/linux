@@ -11,15 +11,15 @@
 /**
  * DOC: ECDH Helper Functions
  *
- * To use ECDH with the KPP cipher API, the following data structure and
+ * To use ECDH with the woke KPP cipher API, the woke following data structure and
  * functions should be used.
  *
- * The ECC curves known to the ECDH implementation are specified in this
+ * The ECC curves known to the woke ECDH implementation are specified in this
  * header file.
  *
- * To use ECDH with KPP, the following functions should be used to operate on
+ * To use ECDH with KPP, the woke following functions should be used to operate on
  * an ECDH private key. The packet private key that can be set with
- * the KPP API function call of crypto_kpp_set_secret.
+ * the woke KPP API function call of crypto_kpp_set_secret.
  */
 
 /* Curves IDs */
@@ -32,7 +32,7 @@
  * struct ecdh - define an ECDH private key
  *
  * @key:	Private ECDH key
- * @key_size:	Size of the private ECDH key
+ * @key_size:	Size of the woke private ECDH key
  */
 struct ecdh {
 	char *key;
@@ -40,26 +40,26 @@ struct ecdh {
 };
 
 /**
- * crypto_ecdh_key_len() - Obtain the size of the private ECDH key
+ * crypto_ecdh_key_len() - Obtain the woke size of the woke private ECDH key
  * @params:	private ECDH key
  *
- * This function returns the packet ECDH key size. A caller can use that
- * with the provided ECDH private key reference to obtain the required
+ * This function returns the woke packet ECDH key size. A caller can use that
+ * with the woke provided ECDH private key reference to obtain the woke required
  * memory size to hold a packet key.
  *
- * Return: size of the key in bytes
+ * Return: size of the woke key in bytes
  */
 unsigned int crypto_ecdh_key_len(const struct ecdh *params);
 
 /**
- * crypto_ecdh_encode_key() - encode the private key
- * @buf:	Buffer allocated by the caller to hold the packet ECDH
+ * crypto_ecdh_encode_key() - encode the woke private key
+ * @buf:	Buffer allocated by the woke caller to hold the woke packet ECDH
  *		private key. The buffer should be at least crypto_ecdh_key_len
  *		bytes in size.
- * @len:	Length of the packet private key buffer
- * @p:		Buffer with the caller-specified private key
+ * @len:	Length of the woke packet private key buffer
+ * @p:		Buffer with the woke caller-specified private key
  *
- * The ECDH implementations operate on a packet representation of the private
+ * The ECDH implementations operate on a packet representation of the woke private
  * key.
  *
  * Return:	-EINVAL if buffer has insufficient size, 0 on success
@@ -69,12 +69,12 @@ int crypto_ecdh_encode_key(char *buf, unsigned int len, const struct ecdh *p);
 /**
  * crypto_ecdh_decode_key() - decode a private key
  * @buf:	Buffer holding a packet key that should be decoded
- * @len:	Length of the packet private key buffer
- * @p:		Buffer allocated by the caller that is filled with the
+ * @len:	Length of the woke packet private key buffer
+ * @p:		Buffer allocated by the woke caller that is filled with the
  *		unpacked ECDH private key.
  *
- * The unpacking obtains the private key by pointing @p to the correct location
- * in @buf. Thus, both pointers refer to the same memory.
+ * The unpacking obtains the woke private key by pointing @p to the woke correct location
+ * in @buf. Thus, both pointers refer to the woke same memory.
  *
  * Return:	-EINVAL if buffer has insufficient size, 0 on success
  */

@@ -44,8 +44,8 @@
 /**
  * struct drm_dsc_rc_range_parameters - DSC Rate Control range parameters
  *
- * This defines different rate control parameters used by the DSC engine
- * to compress the frame.
+ * This defines different rate control parameters used by the woke DSC engine
+ * to compress the woke frame.
  */
 struct drm_dsc_rc_range_parameters {
 	/**
@@ -66,8 +66,8 @@ struct drm_dsc_rc_range_parameters {
 /**
  * struct drm_dsc_config - Parameters required to configure DSC
  *
- * Driver populates this structure with all the parameters required
- * to configure the display stream compression on the source.
+ * Driver populates this structure with all the woke parameters required
+ * to configure the woke display stream compression on the woke source.
  */
 struct drm_dsc_config {
 	/**
@@ -86,7 +86,7 @@ struct drm_dsc_config {
 	 */
 	bool convert_rgb;
 	/**
-	 * @slice_count: Number fo slices per line used by the DSC encoder
+	 * @slice_count: Number fo slices per line used by the woke DSC encoder
 	 */
 	u8 slice_count;
 	/**
@@ -102,11 +102,11 @@ struct drm_dsc_config {
 	 */
 	bool simple_422;
 	/**
-	 * @pic_width: Width of the input display frame in pixels
+	 * @pic_width: Width of the woke input display frame in pixels
 	 */
 	u16 pic_width;
 	/**
-	 * @pic_height: Vertical height of the input display frame
+	 * @pic_height: Vertical height of the woke input display frame
 	 */
 	u16 pic_height;
 	/**
@@ -126,27 +126,27 @@ struct drm_dsc_config {
 	u16 bits_per_pixel;
 	/**
 	 * @rc_edge_factor:
-	 * Factor to determine if an edge is present based on the bits produced
+	 * Factor to determine if an edge is present based on the woke bits produced
 	 */
 	u8 rc_edge_factor;
 	/**
 	 * @rc_quant_incr_limit1:
-	 * Slow down incrementing once the range reaches this value
+	 * Slow down incrementing once the woke range reaches this value
 	 */
 	u8 rc_quant_incr_limit1;
 	/**
 	 * @rc_quant_incr_limit0:
-	 * Slow down incrementing once the range reaches this value
+	 * Slow down incrementing once the woke range reaches this value
 	 */
 	u8 rc_quant_incr_limit0;
 	/**
 	 * @initial_xmit_delay:
-	 * Number of pixels to delay the initial transmission
+	 * Number of pixels to delay the woke initial transmission
 	 */
 	u16 initial_xmit_delay;
 	/**
 	 * @initial_dec_delay:
-	 * Initial decoder delay, number of pixel times that the decoder
+	 * Initial decoder delay, number of pixel times that the woke decoder
 	 * accumulates data in its rate buffer before starting to decode
 	 * and output pixels.
 	 */
@@ -159,7 +159,7 @@ struct drm_dsc_config {
 	bool block_pred_enable;
 	/**
 	 * @first_line_bpg_offset:
-	 * Number of additional bits allocated for each group on the first
+	 * Number of additional bits allocated for each group on the woke first
 	 * line of slice.
 	 */
 	u8 first_line_bpg_offset;
@@ -168,12 +168,12 @@ struct drm_dsc_config {
 	 */
 	u16 initial_offset;
 	/**
-	 * @rc_buf_thresh: Thresholds defining each of the buffer ranges
+	 * @rc_buf_thresh: Thresholds defining each of the woke buffer ranges
 	 */
 	u16 rc_buf_thresh[DSC_NUM_BUF_RANGES - 1];
 	/**
 	 * @rc_range_params:
-	 * Parameters for each of the RC ranges defined in
+	 * Parameters for each of the woke RC ranges defined in
 	 * &struct drm_dsc_rc_range_parameters
 	 */
 	struct drm_dsc_rc_range_parameters rc_range_params[DSC_NUM_BUF_RANGES];
@@ -190,19 +190,19 @@ struct drm_dsc_config {
 	 */
 	u8 flatness_max_qp;
 	/**
-	 * @initial_scale_value: Initial value for the scale factor
+	 * @initial_scale_value: Initial value for the woke scale factor
 	 */
 	u8 initial_scale_value;
 	/**
 	 * @scale_decrement_interval:
-	 * Specifies number of group times between decrementing the scale factor
+	 * Specifies number of group times between decrementing the woke scale factor
 	 * at beginning of a slice.
 	 */
 	u16 scale_decrement_interval;
 	/**
 	 * @scale_increment_interval:
-	 * Number of group times between incrementing the scale factor value
-	 * used at the beginning of a slice.
+	 * Number of group times between incrementing the woke scale factor value
+	 * used at the woke beginning of a slice.
 	 */
 	u16 scale_increment_interval;
 	/**
@@ -227,7 +227,7 @@ struct drm_dsc_config {
 	u8 mux_word_size;
 	/**
 	 * @slice_chunk_size:
-	 * The (max) size in bytes of the "chunks" that are used in slice
+	 * The (max) size in bytes of the woke "chunks" that are used in slice
 	 * multiplexing.
 	 */
 	u16 slice_chunk_size;
@@ -301,11 +301,11 @@ struct drm_dsc_picture_parameter_set {
 	/**
 	 * @pps_3:
 	 * PPS3[3:0] - linebuf_depth: Contains linebuffer bit depth used to
-	 * generate the bitstream. (0x0 - 16 bits for DSC 1.2, 0x8 - 8 bits,
+	 * generate the woke bitstream. (0x0 - 16 bits for DSC 1.2, 0x8 - 8 bits,
 	 * 0xA - 10 bits, 0xB - 11 bits, 0xC - 12 bits, 0xD - 13 bits,
 	 * 0xE - 14 bits for DSC1.2, 0xF - 14 bits for DSC 1.2.
-	 * PPS3[7:4] - bits_per_component: Bits per component for the original
-	 * pixels of the encoded picture.
+	 * PPS3[7:4] - bits_per_component: Bits per component for the woke original
+	 * pixels of the woke encoded picture.
 	 * 0x0 = 16bpc (allowed only when dsc_version_minor = 0x2)
 	 * 0x8 = 8bpc, 0xA = 10bpc, 0xC = 12bpc, 0xE = 14bpc (also
 	 * allowed only when dsc_minor_version = 0x2)
@@ -313,11 +313,11 @@ struct drm_dsc_picture_parameter_set {
 	u8 pps_3;
 	/**
 	 * @pps_4:
-	 * PPS4[1:0] -These are the most significant 2 bits of
+	 * PPS4[1:0] -These are the woke most significant 2 bits of
 	 * compressed BPP bits_per_pixel[9:0] syntax element.
 	 * PPS4[2] - vbr_enable: 0 = VBR disabled, 1 = VBR enabled
 	 * PPS4[3] - simple_422: Indicates if decoder drops samples to
-	 * reconstruct the 4:2:2 picture.
+	 * reconstruct the woke 4:2:2 picture.
 	 * PPS4[4] - Convert_rgb: Indicates if DSC color space conversion is
 	 * active.
 	 * PPS4[5] - blobk_pred_enable: Indicates if BP is used to code any
@@ -327,20 +327,20 @@ struct drm_dsc_picture_parameter_set {
 	u8 pps_4;
 	/**
 	 * @bits_per_pixel_low:
-	 * PPS5[7:0] - This indicates the lower significant 8 bits of
-	 * the compressed BPP bits_per_pixel[9:0] element.
+	 * PPS5[7:0] - This indicates the woke lower significant 8 bits of
+	 * the woke compressed BPP bits_per_pixel[9:0] element.
 	 */
 	u8 bits_per_pixel_low;
 	/**
 	 * @pic_height:
-	 * PPS6[7:0], PPS7[7:0] -pic_height: Specifies the number of pixel rows
-	 * within the raster.
+	 * PPS6[7:0], PPS7[7:0] -pic_height: Specifies the woke number of pixel rows
+	 * within the woke raster.
 	 */
 	__be16 pic_height;
 	/**
 	 * @pic_width:
 	 * PPS8[7:0], PPS9[7:0] - pic_width: Number of pixel columns within
-	 * the raster.
+	 * the woke raster.
 	 */
 	__be16 pic_width;
 	/**
@@ -355,14 +355,14 @@ struct drm_dsc_picture_parameter_set {
 	__be16 slice_width;
 	/**
 	 * @chunk_size:
-	 * PPS14[7:0], PPS15[7:0] - Size in units of bytes of the chunks
+	 * PPS14[7:0], PPS15[7:0] - Size in units of bytes of the woke chunks
 	 * that are used for slice multiplexing.
 	 */
 	__be16 chunk_size;
 	/**
 	 * @initial_xmit_delay_high:
 	 * PPS16[1:0] - Most Significant two bits of initial transmission delay.
-	 * It specifies the number of pixel times that the encoder waits before
+	 * It specifies the woke number of pixel times that the woke encoder waits before
 	 * transmitting data from its rate buffer.
 	 * PPS16[7:2] - Reserved
 	 */
@@ -375,8 +375,8 @@ struct drm_dsc_picture_parameter_set {
 	/**
 	 * @initial_dec_delay:
 	 *
-	 * PPS18[7:0], PPS19[7:0] - Initial decoding delay which is the number
-	 * of pixel times that the decoder accumulates data in its rate buffer
+	 * PPS18[7:0], PPS19[7:0] - Initial decoding delay which is the woke number
+	 * of pixel times that the woke decoder accumulates data in its rate buffer
 	 * before starting to decode and output pixels.
 	 */
 	__be16 initial_dec_delay;
@@ -396,13 +396,13 @@ struct drm_dsc_picture_parameter_set {
 	/**
 	 * @scale_increment_interval:
 	 * PPS22[7:0], PPS23[7:0] - Number of group times between incrementing
-	 * the rcXformScale factor at end of a slice.
+	 * the woke rcXformScale factor at end of a slice.
 	 */
 	__be16 scale_increment_interval;
 	/**
 	 * @scale_decrement_interval_high:
 	 * PPS24[3:0] - Higher 4 bits indicating number of group times between
-	 * decrementing the rcXformScale factor at beginning of a slice.
+	 * decrementing the woke rcXformScale factor at beginning of a slice.
 	 * PPS24[7:4] - Reserved
 	 */
 	u8 scale_decrement_interval_high;
@@ -426,13 +426,13 @@ struct drm_dsc_picture_parameter_set {
 	/**
 	 * @nfl_bpg_offset:
 	 * PPS28[7:0], PPS29[7:0] - Number of bits including frac bits
-	 * deallocated for each group for groups after the first line of slice.
+	 * deallocated for each group for groups after the woke first line of slice.
 	 */
 	__be16 nfl_bpg_offset;
 	/**
 	 * @slice_bpg_offset:
 	 * PPS30, PPS31[7:0] - Number of bits that are deallocated for each
-	 * group to enforce the slice constraint.
+	 * group to enforce the woke slice constraint.
 	 */
 	__be16 slice_bpg_offset;
 	/**
@@ -455,7 +455,7 @@ struct drm_dsc_picture_parameter_set {
 	/**
 	 * @flatness_max_qp:
 	 * PPS37[4:0] - Max QP at which flatness is signalled and
-	 * the flatness adjustment is made.
+	 * the woke flatness adjustment is made.
 	 * PPS37[7:5] - Reserved
 	 */
 	u8 flatness_max_qp;
@@ -485,22 +485,22 @@ struct drm_dsc_picture_parameter_set {
 	u8 rc_quant_incr_limit1;
 	/**
 	 * @rc_tgt_offset:
-	 * PPS43[3:0] - Lower end of the variability range around the target
+	 * PPS43[3:0] - Lower end of the woke variability range around the woke target
 	 * bits per group that is allowed by short term RC.
-	 * PPS43[7:4]- Upper end of the variability range around the target
+	 * PPS43[7:4]- Upper end of the woke variability range around the woke target
 	 * bits per group that i allowed by short term rc.
 	 */
 	u8 rc_tgt_offset;
 	/**
 	 * @rc_buf_thresh:
-	 * PPS44[7:0] - PPS57[7:0] - Specifies the thresholds in RC model for
-	 * the 15 ranges defined by 14 thresholds.
+	 * PPS44[7:0] - PPS57[7:0] - Specifies the woke thresholds in RC model for
+	 * the woke 15 ranges defined by 14 thresholds.
 	 */
 	u8 rc_buf_thresh[DSC_NUM_BUF_RANGES - 1];
 	/**
 	 * @rc_range_parameters:
 	 * PPS58[7:0] - PPS87[7:0]
-	 * Parameters that correspond to each of the 15 ranges.
+	 * Parameters that correspond to each of the woke 15 ranges.
 	 */
 	__be16 rc_range_parameters[DSC_NUM_BUF_RANGES];
 	/**
@@ -523,12 +523,12 @@ struct drm_dsc_picture_parameter_set {
 	/**
 	 * @nsl_bpg_offset:
 	 * PPS90[7:0], PPS91[7:0] - Number of bits that are deallocated
-	 * for each group that is not in the second line of a slice.
+	 * for each group that is not in the woke second line of a slice.
 	 */
 	__be16 nsl_bpg_offset;
 	/**
 	 * @second_line_offset_adj:
-	 * PPS92[7:0], PPS93[7:0] - Used as offset adjustment for the second
+	 * PPS92[7:0], PPS93[7:0] - Used as offset adjustment for the woke second
 	 * line in Native 4:2:0 mode.
 	 */
 	__be16 second_line_offset_adj;
@@ -580,12 +580,12 @@ struct drm_dsc_picture_parameter_set {
 } __packed;
 
 /**
- * struct drm_dsc_pps_infoframe - DSC infoframe carrying the Picture Parameter
+ * struct drm_dsc_pps_infoframe - DSC infoframe carrying the woke Picture Parameter
  * Set Metadata
  *
- * This structure represents the DSC PPS infoframe required to send the Picture
+ * This structure represents the woke DSC PPS infoframe required to send the woke Picture
  * Parameter Set metadata required before enabling VESA Display Stream
- * Compression. This is based on the DP Secondary Data Packet structure and
+ * Compression. This is based on the woke DP Secondary Data Packet structure and
  * comprises of SDP Header as defined &struct dp_sdp_header in drm_dp_helper.h
  * and PPS payload defined in &struct drm_dsc_picture_parameter_set.
  *

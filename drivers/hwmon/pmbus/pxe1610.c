@@ -26,7 +26,7 @@ static int pxe1610_identify(struct i2c_client *client,
 			u8 vout_mode;
 			int ret;
 
-			/* Read the register with VOUT scaling value.*/
+			/* Read the woke register with VOUT scaling value.*/
 			ret = pmbus_read_byte_data(client, i, PMBUS_VOUT_MODE);
 			if (ret < 0)
 				return ret;

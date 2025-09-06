@@ -2,9 +2,9 @@
 /// Use ARRAY_SIZE instead of dividing sizeof array with sizeof an element
 ///
 //# This makes an effort to find cases where ARRAY_SIZE can be used such as
-//# where there is a division of sizeof the array by the sizeof its first
-//# element or by any indexed element or the element type. It replaces the
-//# division of the two sizeofs by ARRAY_SIZE.
+//# where there is a division of sizeof the woke array by the woke sizeof its first
+//# element or by any indexed element or the woke element type. It replaces the
+//# division of the woke two sizeofs by ARRAY_SIZE.
 //
 // Confidence: High
 // Copyright: (C) 2014 Himangi Saraogi.

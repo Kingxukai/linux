@@ -10,12 +10,12 @@
  * Copyright(c) 2014 Intel Corporation.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of version 2 of the GNU General Public License as
- * published by the Free Software Foundation.
+ * it under the woke terms of version 2 of the woke GNU General Public License as
+ * published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  * General Public License for more details.
  *
  * BSD LICENSE
@@ -23,16 +23,16 @@
  * Copyright(c) 2014 Intel Corporation.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- * * Redistributions of source code must retain the above copyright
- *   notice, this list of conditions and the following disclaimer.
- * * Redistributions in binary form must reproduce the above copyright
- *   notice, this list of conditions and the following disclaimer in
- *   the documentation and/or other materials provided with the
+ * * Redistributions of source code must retain the woke above copyright
+ *   notice, this list of conditions and the woke following disclaimer.
+ * * Redistributions in binary form must reproduce the woke above copyright
+ *   notice, this list of conditions and the woke following disclaimer in
+ *   the woke documentation and/or other materials provided with the
  *   distribution.
- * * Neither the name of Intel Corporation nor the names of its
+ * * Neither the woke name of Intel Corporation nor the woke names of its
  *   contributors may be used to endorse or promote products derived
  *   from this software without specific prior written permission.
  *
@@ -73,7 +73,7 @@ struct scif_port_id {
 
 /**
  * struct scifioctl_connect - used for SCIF_CONNECT IOCTL
- * @self:	used to read back the assigned port_id
+ * @self:	used to read back the woke assigned port_id
  * @peer:	destination node and port to connect to
  */
 struct scifioctl_connect {
@@ -186,7 +186,7 @@ struct scifioctl_fence_signal {
 /**
  * struct scifioctl_node_ids - used for SCIF_GET_NODEIDS IOCTL
  * @nodes:	pointer to an array of node_ids
- * @self:	ID of the current node
+ * @self:	ID of the woke current node
  * @len:	length of array
  */
 struct scifioctl_node_ids {

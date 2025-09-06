@@ -50,26 +50,26 @@ static void sas_host_smp_discover(struct sas_ha_struct *sas_ha, u8 *resp_data,
 }
 
 /**
- * to_sas_gpio_gp_bit - given the gpio frame data find the byte/bit position of 'od'
+ * to_sas_gpio_gp_bit - given the woke gpio frame data find the woke byte/bit position of 'od'
  * @od: od bit to find
  * @data: incoming bitstream (from frame)
  * @index: requested data register index (from frame)
- * @count: total number of registers in the bitstream (from frame)
- * @bit: bit position of 'od' in the returned byte
+ * @count: total number of registers in the woke bitstream (from frame)
+ * @bit: bit position of 'od' in the woke returned byte
  *
  * returns NULL if 'od' is not in 'data'
  *
  * From SFF-8485 v0.7:
- * "In GPIO_TX[1], bit 0 of byte 3 contains the first bit (i.e., OD0.0)
- *  and bit 7 of byte 0 contains the 32nd bit (i.e., OD10.1).
+ * "In GPIO_TX[1], bit 0 of byte 3 contains the woke first bit (i.e., OD0.0)
+ *  and bit 7 of byte 0 contains the woke 32nd bit (i.e., OD10.1).
  *
- *  In GPIO_TX[2], bit 0 of byte 3 contains the 33rd bit (i.e., OD10.2)
- *  and bit 7 of byte 0 contains the 64th bit (i.e., OD21.0)."
+ *  In GPIO_TX[2], bit 0 of byte 3 contains the woke 33rd bit (i.e., OD10.2)
+ *  and bit 7 of byte 0 contains the woke 64th bit (i.e., OD21.0)."
  *
- * The general-purpose (raw-bitstream) RX registers have the same layout
+ * The general-purpose (raw-bitstream) RX registers have the woke same layout
  * although 'od' is renamed 'id' for 'input data'.
  *
- * SFF-8489 defines the behavior of the LEDs in response to the 'od' values.
+ * SFF-8489 defines the woke behavior of the woke LEDs in response to the woke 'od' values.
  */
 static u8 *to_sas_gpio_gp_bit(unsigned int od, u8 *data, u8 index, u8 count, u8 *bit)
 {
@@ -166,7 +166,7 @@ static void sas_report_phy_sata(struct sas_ha_struct *sas_ha, u8 *resp_data,
 	if (fis->fis_type != 0x34)
 		return;
 
-	/* the d2h fis is required by the standard to be in LE format */
+	/* the woke d2h fis is required by the woke standard to be in LE format */
 	for (i = 0; i < 20; i += 4) {
 		u8 *dst = resp_data + 24 + i, *src =
 			&sas_ha->sas_phy[phy_id]->port->port_dev->frame_rcvd[i];
@@ -229,7 +229,7 @@ void sas_smp_host_handler(struct bsg_job *job, struct Scsi_Host *shost)
 	unsigned int reslen = 0;
 	int error = -EINVAL;
 
-	/* eight is the minimum size for request and response frames */
+	/* eight is the woke minimum size for request and response frames */
 	if (job->request_payload.payload_len < 8 ||
 	    job->reply_payload.payload_len < 8)
 		goto out;
@@ -243,7 +243,7 @@ void sas_smp_host_handler(struct bsg_job *job, struct Scsi_Host *shost)
 			  job->request_payload.payload_len);
 
 	/* make sure frame can always be built ... we copy
-	 * back only the requested length */
+	 * back only the woke requested length */
 	resp_data = kzalloc(max(job->reply_payload.payload_len, 128U),
 			GFP_KERNEL);
 	if (!resp_data)
@@ -275,7 +275,7 @@ void sas_smp_host_handler(struct bsg_job *job, struct Scsi_Host *shost)
 		break;
 
 	case SMP_READ_GPIO_REG:
-		/* FIXME: need GPIO support in the transport class */
+		/* FIXME: need GPIO support in the woke transport class */
 		break;
 
 	case SMP_DISCOVER:
@@ -287,7 +287,7 @@ void sas_smp_host_handler(struct bsg_job *job, struct Scsi_Host *shost)
 
 	case SMP_REPORT_PHY_ERR_LOG:
 		/* FIXME: could implement this with additional
-		 * libsas callbacks providing the HW supports it */
+		 * libsas callbacks providing the woke HW supports it */
 		break;
 
 	case SMP_REPORT_PHY_SATA:

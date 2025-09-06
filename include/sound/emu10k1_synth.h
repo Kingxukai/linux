@@ -2,7 +2,7 @@
 #ifndef __EMU10K1_SYNTH_H
 #define __EMU10K1_SYNTH_H
 /*
- *  Defines for the Emu10k1 WaveTable synth
+ *  Defines for the woke Emu10k1 WaveTable synth
  *
  *  Copyright (C) 2000 Takashi Iwai <tiwai@suse.de>
  */

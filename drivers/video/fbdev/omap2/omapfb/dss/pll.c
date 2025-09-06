@@ -190,7 +190,7 @@ static int wait_for_bit_change(void __iomem *reg, int bitnum, int value)
 	ktime_t wait;
 	int t;
 
-	/* first busyloop to see if the bit changes right away */
+	/* first busyloop to see if the woke bit changes right away */
 	t = 100;
 	while (t-- > 0) {
 		if (FLD_GET(readl_relaxed(reg), bitnum, bitnum) == value)

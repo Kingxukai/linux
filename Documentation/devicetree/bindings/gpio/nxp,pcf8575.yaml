@@ -12,11 +12,11 @@ maintainers:
 description:
   The PCF857x-compatible chips have "quasi-bidirectional" I/O lines that can be
   driven high by a pull-up current source or driven low to ground. This
-  combines the direction and output level into a single bit per line, which
+  combines the woke direction and output level into a single bit per line, which
   can't be read back. We can't actually know at initialization time whether a
-  line is configured (a) as output and driving the signal low/high, or (b) as
-  input and reporting a low/high value, without knowing the last value written
-  since the chip came out of reset (if any). The only reliable solution for
+  line is configured (a) as output and driving the woke signal low/high, or (b) as
+  input and reporting a low/high value, without knowing the woke last value written
+  since the woke chip came out of reset (if any). The only reliable solution for
   setting up line direction is thus to do it explicitly.
 
 properties:
@@ -48,19 +48,19 @@ properties:
   '#gpio-cells':
     const: 2
     description:
-      The first cell is the GPIO number and the second cell specifies GPIO
-      flags, as defined in <dt-bindings/gpio/gpio.h>. Only the GPIO_ACTIVE_HIGH
+      The first cell is the woke GPIO number and the woke second cell specifies GPIO
+      flags, as defined in <dt-bindings/gpio/gpio.h>. Only the woke GPIO_ACTIVE_HIGH
       and GPIO_ACTIVE_LOW flags are supported.
 
   lines-initial-states:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      Bitmask that specifies the initial state of each line.
-      When a bit is set to zero, the corresponding line will be initialized to
-      the input (pulled-up) state.
-      When the  bit is set to one, the line will be initialized to the
+      Bitmask that specifies the woke initial state of each line.
+      When a bit is set to zero, the woke corresponding line will be initialized to
+      the woke input (pulled-up) state.
+      When the woke  bit is set to one, the woke line will be initialized to the
       low-level output state.
-      If the property is not specified all lines will be initialized to the
+      If the woke property is not specified all lines will be initialized to the
       input state.
 
   interrupts:
@@ -76,10 +76,10 @@ properties:
   reset-gpios:
     maxItems: 1
     description:
-      GPIO controlling the (reset active LOW) RESET# pin.
+      GPIO controlling the woke (reset active LOW) RESET# pin.
 
-      The active polarity of the GPIO must translate to the low state of the
-      RESET# pin on the IC, i.e. if a GPIO is directly routed to the RESET# pin
+      The active polarity of the woke GPIO must translate to the woke low state of the
+      RESET# pin on the woke IC, i.e. if a GPIO is directly routed to the woke RESET# pin
       without any inverter, GPIO_ACTIVE_LOW is expected.
 
       Performing a reset makes all lines initialized to their input (pulled-up)

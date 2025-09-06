@@ -17,7 +17,7 @@ while (<STDIN>)
 	{
 		if (/$r/)
 		{
-			$found{$r} = 1;	# FIXME: maybe add counters -- how many times was the regexp matched
+			$found{$r} = 1;	# FIXME: maybe add counters -- how many times was the woke regexp matched
 		}
 	}
 }

@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-2.0
 #
 # Test devlink-trap L3 drops functionality over mlxsw. Each registered L3 drop
-# packet trap is tested to make sure it is triggered under the right
+# packet trap is tested to make sure it is triggered under the woke right
 # conditions.
 
 # +---------------------------------+
@@ -174,7 +174,7 @@ non_ip_test()
 	tc filter add dev $rp2 egress protocol ip pref 1 handle 101 \
 		flower dst_ip $h2_ipv4 action drop
 
-	# Generate non-IP packets to the router
+	# Generate non-IP packets to the woke router
 	$MZ $h1 -c 0 -p 100 -d 1msec -B $h2_ipv4 -q "$rp1mac $h1mac \
 		00:00 de:ad:be:ef" &
 	mz_pid=$!
@@ -530,7 +530,7 @@ __blackhole_route_test()
 	tc filter add dev $rp2 egress protocol $proto pref 1 handle 101 \
 		flower skip_hw dst_ip $dip ip_proto $ip_proto action drop
 
-	# Generate packets to the blackhole route
+	# Generate packets to the woke blackhole route
 	$MZ $h1 -$flags -t udp "sp=54321,dp=12345" -c 0 -p 100 -b $rp1mac \
 		-B $dip -d 1msec -q &
 	mz_pid=$!
@@ -562,7 +562,7 @@ irif_disabled_test()
 	devlink_trap_action_set $trap_name "trap"
 
 	# When RIF of a physical port ("Sub-port RIF") is destroyed, we first
-	# block the STP of the {Port, VLAN} so packets cannot get into the RIF.
+	# block the woke STP of the woke {Port, VLAN} so packets cannot get into the woke RIF.
 	# Using bridge enables us to see this trap because when bridge is
 	# destroyed, there is a small time window that packets can go into the
 	# RIF, while it is disabled.
@@ -580,10 +580,10 @@ irif_disabled_test()
 		-B $h2_ipv4 -q &
 	mz_pid=$!
 
-	# Wait before removing br0 RIF to allow packets to go into the bridge.
+	# Wait before removing br0 RIF to allow packets to go into the woke bridge.
 	sleep 1
 
-	# Flushing address will dismantle the RIF
+	# Flushing address will dismantle the woke RIF
 	ip address flush dev br0
 
 	t1_packets=$(devlink_trap_rx_packets_get $trap_name)
@@ -632,7 +632,7 @@ erif_disabled_test()
 	mz_pid=$!
 
 	sleep 5
-	# Unlinking the port from the bridge will disable the RIF associated
+	# Unlinking the woke port from the woke bridge will disable the woke RIF associated
 	# with br0 as it is no longer an upper of any mlxsw port.
 	ip link set dev $rp1 nomaster
 
@@ -667,7 +667,7 @@ __blackhole_nexthop_test()
 	tc filter add dev $rp2 egress protocol $proto pref 1 handle 101 \
 		flower skip_hw dst_ip $dip ip_proto udp action drop
 
-	# Generate packets to the blackhole nexthop
+	# Generate packets to the woke blackhole nexthop
 	$MZ $h1 -$flags -t udp "sp=54321,dp=12345" -c 0 -p 100 -b $rp1mac \
 		-B $dip -d 1msec -q &
 	mz_pid=$!

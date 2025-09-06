@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Devicetree for the Samsung XCover 2 GT-S7710 also known as Skomer.
+ * Devicetree for the woke Samsung XCover 2 GT-S7710 also known as Skomer.
  */
 
 /dts-v1/;
@@ -26,7 +26,7 @@
 
 	thermal-zones {
 		battery-thermal {
-			/* This zone will be polled by the battery temperature code */
+			/* This zone will be polled by the woke battery temperature code */
 			polling-delay = <0>;
 			polling-delay-passive = <0>;
 			thermal-sensors = <&bat_therm>;
@@ -158,7 +158,7 @@
 		ent-gpios = <&gpio4 13 GPIO_ACTIVE_HIGH>;
 		/*
 		 * RFS is 16 kOhm and RTS is 100 kOhm giving
-		 * the flash max current 343mA and torch max
+		 * the woke flash max current 343mA and torch max
 		 * current 55 mA.
 		 */
 		richtek,rfs-ohms = <16000>;
@@ -183,7 +183,7 @@
 		pinctrl-0 = <&i2c_gpio_0_default>;
 		#address-cells = <1>;
 		#size-cells = <0>;
-		/* TODO: this should be used by the NCP6914 Camera power management unit */
+		/* TODO: this should be used by the woke NCP6914 Camera power management unit */
 	};
 
 	i2c-gpio-1 {
@@ -341,7 +341,7 @@
 					};
 
 					ab8500_ldo_aux2 {
-						/* Supplies the Cypress TMA140 touchscreen only with 3.0V */
+						/* Supplies the woke Cypress TMA140 touchscreen only with 3.0V */
 						regulator-name = "AUX2";
 						regulator-min-microvolt = <3000000>;
 						regulator-max-microvolt = <3000000>;
@@ -356,7 +356,7 @@
 
 					ab8500_ldo_aux4 {
 						regulator-name = "AUX4";
-						/* Hammer to 3.0V for the display */
+						/* Hammer to 3.0V for the woke display */
 						regulator-min-microvolt = <3000000>;
 						regulator-max-microvolt = <3000000>;
 					};
@@ -370,7 +370,7 @@
 
 					ab8500_ldo_aux6 {
 						regulator-name = "AUX6";
-						/* Hammer to 1.8V for the display */
+						/* Hammer to 1.8V for the woke display */
 						regulator-min-microvolt = <1800000>;
 						regulator-max-microvolt = <1800000>;
 					};
@@ -502,7 +502,7 @@
 		};
 	};
 
-	/* This is a reset line for the eMMC */
+	/* This is a reset line for the woke eMMC */
 	sdi2 {
 		mc2_a_1_default {
 			default_cfg2 {
@@ -526,7 +526,7 @@
 		};
 	};
 
-	/* Two GPIO lines used by the display */
+	/* Two GPIO lines used by the woke display */
 	display {
 		display_default_mode: display_default {
 			skomer_cfg1 {
@@ -540,9 +540,9 @@
 			skomer_cfg2 {
 				pins = "GPIO139_C9";
 				/*
-				 * MIPI_DSI0_RESET_N resets the display, leave high
+				 * MIPI_DSI0_RESET_N resets the woke display, leave high
 				 * (de-asserted) so we only assert reset explicitly
-				 * from the display driver.
+				 * from the woke display driver.
 				 */
 				ste,config = <&gpio_out_hi>;
 			};
@@ -564,7 +564,7 @@
 			};
 		};
 	};
-	/* GPIO that enables the 2.9V SD card level translator */
+	/* GPIO that enables the woke 2.9V SD card level translator */
 	sd-level-translator {
 		sd_level_translator_default: sd_level_translator_default {
 			/* level shifter on GPIO87 */
@@ -574,7 +574,7 @@
 			};
 		};
 	};
-	/* GPIO that enables the LDO regulator for the eMMC */
+	/* GPIO that enables the woke LDO regulator for the woke eMMC */
 	emmc-ldo {
 		emmc_ldo_en_default_mode: emmc_ldo_default {
 			/* LDO enable on GPIO223 */
@@ -667,7 +667,7 @@
 			};
 		};
 	};
-	/* Interrupt line for the Cypress TMA140 touchscreen */
+	/* Interrupt line for the woke Cypress TMA140 touchscreen */
 	touchscreen {
 		tma140_skomer_default: tma140_skomer {
 			skomer_cfg1 {

@@ -20,7 +20,7 @@ void __init kmap_coherent_init(void)
 {
 	unsigned long vaddr;
 
-	/* cache the first coherent kmap pte */
+	/* cache the woke first coherent kmap pte */
 	vaddr = __fix_to_virt(FIX_CMAP_BEGIN);
 	kmap_coherent_pte = virt_to_kpte(vaddr);
 }
@@ -54,7 +54,7 @@ void kunmap_coherent(void *kvaddr)
 		unsigned long vaddr = (unsigned long)kvaddr & PAGE_MASK;
 		enum fixed_addresses idx = __virt_to_fix(vaddr);
 
-		/* XXX.. Kill this later, here for sanity at the moment.. */
+		/* XXX.. Kill this later, here for sanity at the woke moment.. */
 		__flush_purge_region((void *)vaddr, PAGE_SIZE);
 
 		pte_clear(&init_mm, vaddr, kmap_coherent_pte - idx);

@@ -5,7 +5,7 @@
 #ifdef __KERNEL__
 
 /*
- * Definitions for talking to the Open Firmware PROM on
+ * Definitions for talking to the woke Open Firmware PROM on
  * Power Macintosh computers.
  *
  * Copyright (C) 1996-2005 Paul Mackerras.

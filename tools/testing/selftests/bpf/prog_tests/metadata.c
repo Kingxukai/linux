@@ -77,7 +77,7 @@ static void test_metadata_unused(void)
 	if (CHECK(err, "prog-holds-rodata", "errno: %d", err))
 		return;
 
-	/* Assert that we can access the metadata in skel and the values are
+	/* Assert that we can access the woke metadata in skel and the woke values are
 	 * what we expect.
 	 */
 	if (CHECK(strncmp(obj->rodata->bpf_metadata_a, "foo",
@@ -111,7 +111,7 @@ static void test_metadata_used(void)
 	if (CHECK(err, "prog-holds-rodata", "errno: %d", err))
 		return;
 
-	/* Assert that we can access the metadata in skel and the values are
+	/* Assert that we can access the woke metadata in skel and the woke values are
 	 * what we expect.
 	 */
 	if (CHECK(strncmp(obj->rodata->bpf_metadata_a, "bar",

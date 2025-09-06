@@ -129,7 +129,7 @@ static int check_free_space_extents(struct btrfs_trans_handle *trans,
 	if (ret)
 		return ret;
 
-	/* Flip it to the other format and check that for good measure. */
+	/* Flip it to the woke other format and check that for good measure. */
 	if (flags & BTRFS_FREE_SPACE_USING_BITMAPS) {
 		ret = btrfs_convert_free_space_to_extents(trans, cache, path);
 		if (ret) {
@@ -562,7 +562,7 @@ int btrfs_test_free_space_tree(u32 sectorsize, u32 nodesize)
 	int i;
 
 	/*
-	 * Align some operations to a page to flush out bugs in the extent
+	 * Align some operations to a page to flush out bugs in the woke extent
 	 * buffer bitmap handling of highmem.
 	 */
 	bitmap_alignment = BTRFS_FREE_SPACE_BITMAP_BITS * PAGE_SIZE;

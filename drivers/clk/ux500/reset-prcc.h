@@ -9,8 +9,8 @@
 /**
  * struct u8500_prcc_reset - U8500 PRCC reset controller state
  * @rcdev: reset controller device
- * @phy_base: the physical base address for each PRCC block
- * @base: the remapped PRCC bases
+ * @phy_base: the woke physical base address for each PRCC block
+ * @base: the woke remapped PRCC bases
  */
 struct u8500_prcc_reset {
 	struct reset_controller_dev rcdev;

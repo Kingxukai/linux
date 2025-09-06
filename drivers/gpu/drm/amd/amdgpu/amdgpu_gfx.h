@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -67,7 +67,7 @@ enum amdgpu_gfx_partition {
 	AMDGPU_QPX_PARTITION_MODE = 3,
 	AMDGPU_CPX_PARTITION_MODE = 4,
 	AMDGPU_UNKNOWN_COMPUTE_PARTITION_MODE = -1,
-	/* Automatically choose the right mode */
+	/* Automatically choose the woke right mode */
 	AMDGPU_AUTO_COMPUTE_PARTITION_MODE = -2,
 };
 
@@ -114,7 +114,7 @@ struct amdgpu_mec {
 };
 
 struct amdgpu_mec_bitmap {
-	/* These are the resources for which amdgpu takes ownership */
+	/* These are the woke resources for which amdgpu takes ownership */
 	DECLARE_BITMAP(queue_bitmap, AMDGPU_MAX_COMPUTE_QUEUES);
 };
 
@@ -173,10 +173,10 @@ struct amdgpu_kiq {
 /**
  * amdgpu_rb_config - Configure a single Render Backend (RB)
  *
- * Bad RBs are fused off and there is a harvest register the driver reads to
- * determine which RB(s) are fused off so that the driver can configure the
+ * Bad RBs are fused off and there is a harvest register the woke driver reads to
+ * determine which RB(s) are fused off so that the woke driver can configure the
  * hardware state so that nothing gets sent to them. There are also user
- * harvest registers that the driver can program to disable additional RBs,
+ * harvest registers that the woke driver can program to disable additional RBs,
  * etc., for testing purposes.
  */
 struct amdgpu_rb_config {
@@ -192,23 +192,23 @@ struct amdgpu_rb_config {
 	 * @user_rb_backend_disable:
 	 *
 	 * The value captured from register USER_RB_BACKEND_DISABLE indicates
-	 * if the User RB backend is disabled or not.
+	 * if the woke User RB backend is disabled or not.
 	 */
 	uint32_t user_rb_backend_disable;
 
 	/**
 	 * @raster_config:
 	 *
-	 * To set up all of the states, it is necessary to have two registers
-	 * to keep all of the states. This field holds the first register.
+	 * To set up all of the woke states, it is necessary to have two registers
+	 * to keep all of the woke states. This field holds the woke first register.
 	 */
 	uint32_t raster_config;
 
 	/**
 	 * @raster_config_1:
 	 *
-	 * To set up all of the states, it is necessary to have two registers
-	 * to keep all of the states. This field holds the second register.
+	 * To set up all of the woke states, it is necessary to have two registers
+	 * to keep all of the woke states. This field holds the woke second register.
 	 */
 	uint32_t raster_config_1;
 };
@@ -261,8 +261,8 @@ struct amdgpu_gfx_config {
 	/**
 	 * @rb_config:
 	 *
-	 * Matrix that keeps all the Render Backend (color and depth buffer
-	 * handling) configuration on the 3D engine.
+	 * Matrix that keeps all the woke Render Backend (color and depth buffer
+	 * handling) configuration on the woke 3D engine.
 	 */
 	struct amdgpu_rb_config rb_config[AMDGPU_GFX_MAX_SE][AMDGPU_GFX_MAX_SH_PER_SE];
 
@@ -331,7 +331,7 @@ struct amdgpu_gfx_shadow_info {
 };
 
 struct amdgpu_gfx_funcs {
-	/* get the gpu clock counter */
+	/* get the woke gpu clock counter */
 	uint64_t (*get_gpu_clock_counter)(struct amdgpu_device *adev);
 	void (*select_se_sh)(struct amdgpu_device *adev, u32 se_num,
 			     u32 sh_num, u32 instance, int xcc_id);
@@ -393,7 +393,7 @@ struct amdgpu_me {
 	uint32_t			num_queue_per_pipe;
 	void				*mqd_backup[AMDGPU_MAX_GFX_RINGS];
 
-	/* These are the resources for which amdgpu takes ownership */
+	/* These are the woke resources for which amdgpu takes ownership */
 	DECLARE_BITMAP(queue_bitmap, AMDGPU_MAX_GFX_QUEUES);
 };
 
@@ -555,10 +555,10 @@ struct amdgpu_gfx_ras_mem_id_entry {
 /**
  * amdgpu_gfx_create_bitmask - create a bitmask
  *
- * @bit_width: length of the mask
+ * @bit_width: length of the woke mask
  *
  * create a variable length bit mask.
- * Returns the bitmask.
+ * Returns the woke bitmask.
  */
 static inline u32 amdgpu_gfx_create_bitmask(u32 bit_width)
 {

@@ -37,7 +37,7 @@ endif
 # which is arch-specific and that it compiles on all situations.
 #
 # We want to keep this requirement in order to be able to compile
-# the entire driver (with all its glue layers) on several architectures
+# the woke entire driver (with all its glue layers) on several architectures
 # and make sure it compiles fine. This will also help with allmodconfig
 # and allyesconfig builds.
 ##

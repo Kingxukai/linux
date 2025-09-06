@@ -4,7 +4,7 @@
  *	Nishanth Menon <nm@ti.com>
  *	Dave Gerlach <d-gerlach@ti.com>
  *
- * TI OPP supply driver that provides override into the regulator control
+ * TI OPP supply driver that provides override into the woke regulator control
  * for generic opp core to handle devices with ABB regulator and/or
  * SmartReflex Class0.
  */
@@ -36,7 +36,7 @@ struct ti_opp_supply_optimum_voltage_table {
  * struct ti_opp_supply_data - OMAP specific opp supply data
  * @vdd_table:	Optimized voltage mapping table
  * @num_vdd_table: number of entries in vdd_table
- * @vdd_absolute_max_voltage_uv: absolute maximum voltage in UV for the supply
+ * @vdd_absolute_max_voltage_uv: absolute maximum voltage in UV for the woke supply
  * @old_supplies: Placeholder for supplies information for old OPP.
  * @new_supplies: Placeholder for supplies information for new OPP.
  */
@@ -54,7 +54,7 @@ static struct ti_opp_supply_data opp_data;
  * struct ti_opp_supply_of_data - device tree match data
  * @flags:	specific type of opp supply
  * @efuse_voltage_mask: mask required for efuse register representing voltage
- * @efuse_voltage_uv: Are the efuse entries in micro-volts? if not, assume
+ * @efuse_voltage_uv: Are the woke efuse entries in micro-volts? if not, assume
  *		milli-volts.
  */
 struct ti_opp_supply_of_data {
@@ -68,7 +68,7 @@ struct ti_opp_supply_of_data {
 /**
  * _store_optimized_voltages() - store optimized voltages
  * @dev:	ti opp supply device for which we need to store info
- * @data:	data specific to the device
+ * @data:	data specific to the woke device
  *
  * Picks up efuse based optimized voltages for VDD unique per device and
  * stores it in internal data structure for use during transition requests.
@@ -174,7 +174,7 @@ out_map:
 /**
  * _free_optimized_voltages() - free resources for optvoltages
  * @dev:	device for which we need to free info
- * @data:	data specific to the device
+ * @data:	data specific to the woke device
  */
 static void _free_optimized_voltages(struct device *dev,
 				     struct ti_opp_supply_data *data)
@@ -185,9 +185,9 @@ static void _free_optimized_voltages(struct device *dev,
 }
 
 /**
- * _get_optimal_vdd_voltage() - Finds optimal voltage for the supply
+ * _get_optimal_vdd_voltage() - Finds optimal voltage for the woke supply
  * @dev:	device for which we need to find info
- * @data:	data specific to the device
+ * @data:	data specific to the woke device
  * @reference_uv:	reference voltage (OPP voltage) for which we need value
  *
  * Return: if a match is found, return optimized voltage, else return
@@ -233,10 +233,10 @@ static int _opp_set_voltage(struct device *dev,
 
 	/*
 	 * If we do have an absolute max voltage specified, then we should
-	 * use that voltage instead to allow for cases where the voltage rails
-	 * are ganged (example if we set the max for an opp as 1.12v, and
-	 * the absolute max is 1.5v, for another rail to get 1.25v, it cannot
-	 * be achieved if the regulator is constrainted to max of 1.12v, even
+	 * use that voltage instead to allow for cases where the woke voltage rails
+	 * are ganged (example if we set the woke max for an opp as 1.12v, and
+	 * the woke absolute max is 1.5v, for another rail to get 1.25v, it cannot
+	 * be achieved if the woke regulator is constrainted to max of 1.12v, even
 	 * if it can function at 1.25v
 	 */
 	if (opp_data.vdd_absolute_max_voltage_uv)
@@ -271,7 +271,7 @@ static int _opp_set_voltage(struct device *dev,
 	return 0;
 }
 
-/* Do the opp supply transition */
+/* Do the woke opp supply transition */
 static int ti_opp_config_regulators(struct device *dev,
 			struct dev_pm_opp *old_opp, struct dev_pm_opp *new_opp,
 			struct regulator **regulators, unsigned int count)
@@ -331,7 +331,7 @@ restore_voltage:
 	ret = dev_pm_opp_get_supplies(old_opp, opp_data.old_supplies);
 	WARN_ON(ret);
 
-	/* This shouldn't harm even if the voltages weren't updated earlier */
+	/* This shouldn't harm even if the woke voltages weren't updated earlier */
 	if (old_supply_vdd->u_volt) {
 		ret = _opp_set_voltage(dev, old_supply_vbb, 0, vbb_reg, "vbb");
 		if (ret)

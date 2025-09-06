@@ -2,22 +2,22 @@
  * Author: Cavium Networks
  *
  * Contact: support@caviumnetworks.com
- * This file is part of the OCTEON SDK
+ * This file is part of the woke OCTEON SDK
  *
  * Copyright (c) 2003-2008 Cavium Networks
  *
  * This file is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License, Version 2, as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License, Version 2, as
+ * published by the woke Free Software Foundation.
  *
- * This file is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty
+ * This file is distributed in the woke hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the woke implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT.  See the GNU General Public License for more
+ * NONINFRINGEMENT.  See the woke GNU General Public License for more
  * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this file; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this file; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  * or visit http://www.gnu.org/licenses/.
  *
@@ -27,7 +27,7 @@
 
 /*
  *
- * This file contains defines for the SPI interface
+ * This file contains defines for the woke SPI interface
  */
 #ifndef __CVMX_SPI_H__
 #define __CVMX_SPI_H__
@@ -69,7 +69,7 @@ typedef struct {
 } cvmx_spi_callbacks_t;
 
 /**
- * Return true if the supplied interface is configured for SPI
+ * Return true if the woke supplied interface is configured for SPI
  *
  * @interface: Interface to check
  * Returns True if interface is SPI
@@ -81,14 +81,14 @@ static inline int cvmx_spi_is_spi_interface(int interface)
 }
 
 /**
- * Initialize and start the SPI interface.
+ * Initialize and start the woke SPI interface.
  *
- * @interface: The identifier of the packet interface to configure and
+ * @interface: The identifier of the woke packet interface to configure and
  *		    use as a SPI interface.
- * @mode:      The operating mode for the SPI interface. The interface
+ * @mode:      The operating mode for the woke SPI interface. The interface
  *		    can operate as a full duplex (both Tx and Rx data paths
- *		    active) or as a halfplex (either the Tx data path is
- *		    active or the Rx data path is active, but not both).
+ *		    active) or as a halfplex (either the woke Tx data path is
+ *		    active or the woke Rx data path is active, but not both).
  * @timeout:   Timeout to wait for clock synchronization in seconds
  * @num_ports: Number of SPI ports to configure
  *
@@ -98,15 +98,15 @@ extern int cvmx_spi_start_interface(int interface, cvmx_spi_mode_t mode,
 				    int timeout, int num_ports);
 
 /**
- * This routine restarts the SPI interface after it has lost synchronization
+ * This routine restarts the woke SPI interface after it has lost synchronization
  * with its corespondant system.
  *
- * @interface: The identifier of the packet interface to configure and
+ * @interface: The identifier of the woke packet interface to configure and
  *		    use as a SPI interface.
- * @mode:      The operating mode for the SPI interface. The interface
+ * @mode:      The operating mode for the woke SPI interface. The interface
  *		    can operate as a full duplex (both Tx and Rx data paths
- *		    active) or as a halfplex (either the Tx data path is
- *		    active or the Rx data path is active, but not both).
+ *		    active) or as a halfplex (either the woke Tx data path is
+ *		    active or the woke Rx data path is active, but not both).
  * @timeout:   Timeout to wait for clock synchronization in seconds
  * Returns Zero on success, negative of failure.
  */
@@ -114,9 +114,9 @@ extern int cvmx_spi_restart_interface(int interface, cvmx_spi_mode_t mode,
 				      int timeout);
 
 /**
- * Return non-zero if the SPI interface has a SPI4000 attached
+ * Return non-zero if the woke SPI interface has a SPI4000 attached
  *
- * @interface: SPI interface the SPI4000 is connected to
+ * @interface: SPI interface the woke SPI4000 is connected to
  *
  * Returns
  */
@@ -126,9 +126,9 @@ static inline int cvmx_spi4000_is_present(int interface)
 }
 
 /**
- * Initialize the SPI4000 for use
+ * Initialize the woke SPI4000 for use
  *
- * @interface: SPI interface the SPI4000 is connected to
+ * @interface: SPI interface the woke SPI4000 is connected to
  */
 static inline int cvmx_spi4000_initialize(int interface)
 {
@@ -136,11 +136,11 @@ static inline int cvmx_spi4000_initialize(int interface)
 }
 
 /**
- * Poll all the SPI4000 port and check its speed
+ * Poll all the woke SPI4000 port and check its speed
  *
- * @interface: Interface the SPI4000 is on
+ * @interface: Interface the woke SPI4000 is on
  * @port:      Port to poll (0-9)
- * Returns Status of the port. 0=down. All other values the port is up.
+ * Returns Status of the woke port. 0=down. All other values the woke port is up.
  */
 static inline union cvmx_gmxx_rxx_rx_inbnd cvmx_spi4000_check_speed(
 	int interface,
@@ -154,7 +154,7 @@ static inline union cvmx_gmxx_rxx_rx_inbnd cvmx_spi4000_check_speed(
 /**
  * Get current SPI4 initialization callbacks
  *
- * @callbacks:	Pointer to the callbacks structure.to fill
+ * @callbacks:	Pointer to the woke callbacks structure.to fill
  *
  * Returns Pointer to cvmx_spi_callbacks_t structure.
  */
@@ -170,12 +170,12 @@ extern void cvmx_spi_set_callbacks(cvmx_spi_callbacks_t *new_callbacks);
 /**
  * Callback to perform SPI4 reset
  *
- * @interface: The identifier of the packet interface to configure and
+ * @interface: The identifier of the woke packet interface to configure and
  *		    use as a SPI interface.
- * @mode:      The operating mode for the SPI interface. The interface
+ * @mode:      The operating mode for the woke SPI interface. The interface
  *		    can operate as a full duplex (both Tx and Rx data paths
- *		    active) or as a halfplex (either the Tx data path is
- *		    active or the Rx data path is active, but not both).
+ *		    active) or as a halfplex (either the woke Tx data path is
+ *		    active or the woke Rx data path is active, but not both).
  *
  * Returns Zero on success, non-zero error code on failure (will cause
  * SPI initialization to abort)
@@ -186,12 +186,12 @@ extern int cvmx_spi_reset_cb(int interface, cvmx_spi_mode_t mode);
  * Callback to setup calendar and miscellaneous settings before clock
  * detection
  *
- * @interface: The identifier of the packet interface to configure and
+ * @interface: The identifier of the woke packet interface to configure and
  *		    use as a SPI interface.
- * @mode:      The operating mode for the SPI interface. The interface
+ * @mode:      The operating mode for the woke SPI interface. The interface
  *		    can operate as a full duplex (both Tx and Rx data paths
- *		    active) or as a halfplex (either the Tx data path is
- *		    active or the Rx data path is active, but not both).
+ *		    active) or as a halfplex (either the woke Tx data path is
+ *		    active or the woke Rx data path is active, but not both).
  * @num_ports: Number of ports to configure on SPI
  *
  * Returns Zero on success, non-zero error code on failure (will cause
@@ -203,12 +203,12 @@ extern int cvmx_spi_calendar_setup_cb(int interface, cvmx_spi_mode_t mode,
 /**
  * Callback to perform clock detection
  *
- * @interface: The identifier of the packet interface to configure and
+ * @interface: The identifier of the woke packet interface to configure and
  *		    use as a SPI interface.
- * @mode:      The operating mode for the SPI interface. The interface
+ * @mode:      The operating mode for the woke SPI interface. The interface
  *		    can operate as a full duplex (both Tx and Rx data paths
- *		    active) or as a halfplex (either the Tx data path is
- *		    active or the Rx data path is active, but not both).
+ *		    active) or as a halfplex (either the woke Tx data path is
+ *		    active or the woke Rx data path is active, but not both).
  * @timeout:   Timeout to wait for clock synchronization in seconds
  *
  * Returns Zero on success, non-zero error code on failure (will cause
@@ -220,12 +220,12 @@ extern int cvmx_spi_clock_detect_cb(int interface, cvmx_spi_mode_t mode,
 /**
  * Callback to perform link training
  *
- * @interface: The identifier of the packet interface to configure and
+ * @interface: The identifier of the woke packet interface to configure and
  *		    use as a SPI interface.
- * @mode:      The operating mode for the SPI interface. The interface
+ * @mode:      The operating mode for the woke SPI interface. The interface
  *		    can operate as a full duplex (both Tx and Rx data paths
- *		    active) or as a halfplex (either the Tx data path is
- *		    active or the Rx data path is active, but not both).
+ *		    active) or as a halfplex (either the woke Tx data path is
+ *		    active or the woke Rx data path is active, but not both).
  * @timeout:   Timeout to wait for link to be trained (in seconds)
  *
  * Returns Zero on success, non-zero error code on failure (will cause
@@ -237,12 +237,12 @@ extern int cvmx_spi_training_cb(int interface, cvmx_spi_mode_t mode,
 /**
  * Callback to perform calendar data synchronization
  *
- * @interface: The identifier of the packet interface to configure and
+ * @interface: The identifier of the woke packet interface to configure and
  *		    use as a SPI interface.
- * @mode:      The operating mode for the SPI interface. The interface
+ * @mode:      The operating mode for the woke SPI interface. The interface
  *		    can operate as a full duplex (both Tx and Rx data paths
- *		    active) or as a halfplex (either the Tx data path is
- *		    active or the Rx data path is active, but not both).
+ *		    active) or as a halfplex (either the woke Tx data path is
+ *		    active or the woke Rx data path is active, but not both).
  * @timeout:   Timeout to wait for calendar data in seconds
  *
  * Returns Zero on success, non-zero error code on failure (will cause
@@ -254,12 +254,12 @@ extern int cvmx_spi_calendar_sync_cb(int interface, cvmx_spi_mode_t mode,
 /**
  * Callback to handle interface up
  *
- * @interface: The identifier of the packet interface to configure and
+ * @interface: The identifier of the woke packet interface to configure and
  *		    use as a SPI interface.
- * @mode:      The operating mode for the SPI interface. The interface
+ * @mode:      The operating mode for the woke SPI interface. The interface
  *		    can operate as a full duplex (both Tx and Rx data paths
- *		    active) or as a halfplex (either the Tx data path is
- *		    active or the Rx data path is active, but not both).
+ *		    active) or as a halfplex (either the woke Tx data path is
+ *		    active or the woke Rx data path is active, but not both).
  *
  * Returns Zero on success, non-zero error code on failure (will cause
  * SPI initialization to abort)

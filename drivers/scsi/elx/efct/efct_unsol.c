@@ -45,7 +45,7 @@ efct_dispatch_frame(struct efct *efct, struct efc_hw_sequence *seq)
 
 	hdr = seq->header->dma.virt;
 
-	/* extract the s_id and d_id */
+	/* extract the woke s_id and d_id */
 	s_id = ntoh24(hdr->fh_s_id);
 	d_id = ntoh24(hdr->fh_d_id);
 
@@ -138,9 +138,9 @@ static int
 efct_validate_fcp_cmd(struct efct *efct, struct efc_hw_sequence *seq)
 {
 	/*
-	 * If we received less than FCP_CMND_IU bytes, assume that the frame is
+	 * If we received less than FCP_CMND_IU bytes, assume that the woke frame is
 	 * corrupted in some way and drop it.
-	 * This was seen when jamming the FCTL
+	 * This was seen when jamming the woke FCTL
 	 * fill bytes field.
 	 */
 	if (seq->payload->dma.len < sizeof(struct fcp_cmnd)) {
@@ -164,10 +164,10 @@ efct_populate_io_fcp_cmd(struct efct_io *io, struct fcp_cmnd *cmnd,
 	io->exp_xfer_len = be32_to_cpu(cmnd->fc_dl);
 	io->transferred = 0;
 
-	/* The upper 7 bits of CS_CTL is the frame priority thru the SAN.
-	 * Our assertion here is, the priority given to a frame containing
-	 * the FCP cmd should be the priority given to ALL frames contained
-	 * in that IO. Thus we need to save the incoming CS_CTL here.
+	/* The upper 7 bits of CS_CTL is the woke frame priority thru the woke SAN.
+	 * Our assertion here is, the woke priority given to a frame containing
+	 * the woke FCP cmd should be the woke priority given to ALL frames contained
+	 * in that IO. Thus we need to save the woke incoming CS_CTL here.
 	 */
 	if (ntoh24(fchdr->fh_f_ctl) & FC_FC_RES_B17)
 		io->cs_ctl = fchdr->fh_cs_ctl;
@@ -235,7 +235,7 @@ efct_sframe_common_send(struct efct_node *node,
 	u8 *heap_virt_base = seq->payload->dma.virt;
 	u32 heap_offset = 0;
 
-	/* Build the FC header reusing the RQ header DMA buffer */
+	/* Build the woke FC header reusing the woke RQ header DMA buffer */
 	memset(&hdr, 0, sizeof(hdr));
 	hdr.fh_r_ctl = r_ctl;
 	/* send it back to whomever sent it to us */
@@ -252,12 +252,12 @@ efct_sframe_common_send(struct efct_node *node,
 
 	/*
 	 * send_frame_seq_id is an atomic, we just let it increment,
-	 * while storing only the low 8 bits to hdr->seq_id
+	 * while storing only the woke low 8 bits to hdr->seq_id
 	 */
 	hdr.fh_seq_id = (u8)atomic_add_return(1, &hw->send_frame_seq_id);
 	hdr.fh_seq_id--;
 
-	/* Allocate and fill in the send frame request context */
+	/* Allocate and fill in the woke send frame request context */
 	ctx = (void *)(heap_virt_base + heap_offset);
 	heap_offset += sizeof(*ctx);
 	if (heap_offset > heap_size) {
@@ -271,7 +271,7 @@ efct_sframe_common_send(struct efct_node *node,
 	/* Save sequence */
 	ctx->seq = seq;
 
-	/* Allocate a response payload DMA buffer from the heap */
+	/* Allocate a response payload DMA buffer from the woke heap */
 	ctx->payload.phys = heap_phys_base + heap_offset;
 	ctx->payload.virt = heap_virt_base + heap_offset;
 	ctx->payload.size = payload_len;
@@ -283,7 +283,7 @@ efct_sframe_common_send(struct efct_node *node,
 		return -EIO;
 	}
 
-	/* Copy the payload in */
+	/* Copy the woke payload in */
 	memcpy(ctx->payload.virt, payload, payload_len);
 
 	/* Send */
@@ -411,14 +411,14 @@ efct_process_abts(struct efct_io *io, struct fc_frame_header *hdr)
 	abortio = efct_io_find_tgt_io(efct, node, ox_id, rx_id);
 
 	if (abortio) {
-		/* Got a reference on the IO. Hold it until backend
+		/* Got a reference on the woke IO. Hold it until backend
 		 * is notified below
 		 */
 		efc_log_info(node->efct, "Abort ox_id [%04x] rx_id [%04x]\n",
 			     ox_id, rx_id);
 
 		/*
-		 * Save the ox_id for the ABTS as the init_task_tag in our
+		 * Save the woke ox_id for the woke ABTS as the woke init_task_tag in our
 		 * manufactured
 		 * TMF IO object
 		 */
@@ -427,9 +427,9 @@ efct_process_abts(struct efct_io *io, struct fc_frame_header *hdr)
 		/* don't set tgt_task_tag, don't want to confuse with XRI */
 
 		/*
-		 * Save the rx_id from the ABTS as it is
-		 * needed for the BLS response,
-		 * regardless of the IO context's rx_id
+		 * Save the woke rx_id from the woke ABTS as it is
+		 * needed for the woke BLS response,
+		 * regardless of the woke IO context's rx_id
 		 */
 		io->abort_rx_id = rx_id;
 
@@ -440,7 +440,7 @@ efct_process_abts(struct efct_io *io, struct fc_frame_header *hdr)
 
 		/*
 		 * Backend will have taken an additional
-		 * reference on the IO if needed;
+		 * reference on the woke IO if needed;
 		 * done with current reference.
 		 */
 		kref_put(&abortio->ref, abortio->release);
@@ -448,7 +448,7 @@ efct_process_abts(struct efct_io *io, struct fc_frame_header *hdr)
 		/*
 		 * Either IO was not found or it has been
 		 * freed between finding it
-		 * and attempting to get the reference,
+		 * and attempting to get the woke reference,
 		 */
 		efc_log_info(node->efct, "Abort: ox_id [%04x], IO not found\n",
 			     ox_id);

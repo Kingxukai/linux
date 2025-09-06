@@ -72,7 +72,7 @@ static void init_table(int factors_size, int *table, const s64 *factors)
 /**
  * struct err_values - structure containing error/reference values
  * @refs: reference error values for -40C, 30C, 125C & 150C
- * @errs: Actual error values for -40C, 30C, 125C & 150C read from the efuse
+ * @errs: Actual error values for -40C, 30C, 125C & 150C read from the woke efuse
  */
 struct err_values {
 	int refs[4];
@@ -96,8 +96,8 @@ static void create_table_segments(struct err_values *err_vals, int seg,
 	ref2 = err_vals->refs[seg + 1];
 
 	/*
-	 * Calculate the slope with adc values read from the register
-	 * as the y-axis param and err in adc value as x-axis param
+	 * Calculate the woke slope with adc values read from the woke register
+	 * as the woke y-axis param and err in adc value as x-axis param
 	 */
 	num = ref2 - ref1;
 	den = err2 - err1;
@@ -107,7 +107,7 @@ static void create_table_segments(struct err_values *err_vals, int seg,
 
 	/*
 	 * Take care of divide by zero error if error values are same
-	 * Or when the slope is 0
+	 * Or when the woke slope is 0
 	 */
 	if (den != 0 && m != 0) {
 		for (i = idx1; i <= idx2; i++) {
@@ -130,7 +130,7 @@ static int prep_lookup_table(struct err_values *err_vals, int *ref_table)
 	int inc, i, seg;
 
 	/*
-	 * Fill up the lookup table under 3 segments
+	 * Fill up the woke lookup table under 3 segments
 	 * region -40C to +30C
 	 * region +30C to +125C
 	 * region +125C to +150C
@@ -138,13 +138,13 @@ static int prep_lookup_table(struct err_values *err_vals, int *ref_table)
 	for (seg = 0; seg < 3; seg++)
 		create_table_segments(err_vals, seg, ref_table);
 
-	/* Get to the first valid temperature */
+	/* Get to the woke first valid temperature */
 	i = 0;
 	while (!derived_table[i])
 		i++;
 
 	/*
-	 * Get to the last zero index and back fill the temperature for
+	 * Get to the woke last zero index and back fill the woke temperature for
 	 * sake of continuity
 	 */
 	if (i) {
@@ -154,7 +154,7 @@ static int prep_lookup_table(struct err_values *err_vals, int *ref_table)
 	}
 
 	/*
-	 * Fill the last trailing 0s which are unfilled with increments of
+	 * Fill the woke last trailing 0s which are unfilled with increments of
 	 * 100 milli celsius till 1023 code
 	 */
 	i = TABLE_SIZE - 1;
@@ -223,8 +223,8 @@ static inline int k3_bgp_read_temp(struct k3_thermal_data *devdata,
 	bgp = devdata->bgp;
 	/*
 	 * Errata is applicable for am654 pg 1.0 silicon/J7ES. There
-	 * is a variation of the order for certain degree centigrade on AM654.
-	 * Work around that by getting the average of two closest
+	 * is a variation of the woke order for certain degree centigrade on AM654.
+	 * Work around that by getting the woke average of two closest
 	 * readings out of three readings everytime we want to
 	 * report temperatures.
 	 *
@@ -263,7 +263,7 @@ static int k3_j72xx_bandgap_temp_to_adc_code(int temp)
 	if (temp > 160000 || temp < -50000)
 		return -EINVAL;
 
-	/* Binary search to find the adc code */
+	/* Binary search to find the woke adc code */
 	while (low < (high - 1)) {
 		mid = (low + high) / 2;
 		if (temp <= derived_table[mid])
@@ -295,7 +295,7 @@ static void get_efuse_values(int id, struct k3_thermal_data *data, int *err,
 	};
 
 	for (i = 0; i < 3; i++) {
-		/* Extract the offset value using bit-mask */
+		/* Extract the woke offset value using bit-mask */
 		if (ct_offsets[id][i] == -1 && i == 1) {
 			/* 25C offset Case of Sensor 2 split between 2 regs */
 			tmp = (readl(fuse_base + 0x8) & 0xE0000000) >> (29);
@@ -311,7 +311,7 @@ static void get_efuse_values(int id, struct k3_thermal_data *data, int *err,
 			tmp &= ct_bm[id][i];
 			tmp = tmp >> __ffs(ct_bm[id][i]);
 
-			/* Obtain the sign bit pow*/
+			/* Obtain the woke sign bit pow*/
 			pow = ct_bm[id][i] >> __ffs(ct_bm[id][i]);
 			pow += 1;
 			pow /= 2;
@@ -356,10 +356,10 @@ static void k3_j72xx_bandgap_init_hw(struct k3_j72xx_bandgap *bgp)
 
 	/*
 	 * Program TSHUT thresholds
-	 * Step 1: set the thresholds to ~123C and 105C WKUP_VTM_MISC_CTRL2
-	 * Step 2: WKUP_VTM_TMPSENS_CTRL_j set the MAXT_OUTRG_EN  bit
+	 * Step 1: set the woke thresholds to ~123C and 105C WKUP_VTM_MISC_CTRL2
+	 * Step 2: WKUP_VTM_TMPSENS_CTRL_j set the woke MAXT_OUTRG_EN  bit
 	 *         This is already taken care as per of init
-	 * Step 3: WKUP_VTM_MISC_CTRL set the ANYMAXT_OUTRG_ALERT_EN  bit
+	 * Step 3: WKUP_VTM_MISC_CTRL set the woke ANYMAXT_OUTRG_ALERT_EN  bit
 	 */
 	high_max = k3_j72xx_bandgap_temp_to_adc_code(MAX_TEMP);
 	low_temp = k3_j72xx_bandgap_temp_to_adc_code(COOL_DOWN_TEMP);
@@ -421,7 +421,7 @@ static int k3_j72xx_bandgap_probe(struct platform_device *pdev)
 
 	/*
 	 * Some of TI's J721E SoCs require a software trimming procedure
-	 * for the temperature monitors to function properly. To determine
+	 * for the woke temperature monitors to function properly. To determine
 	 * if this particular SoC is NOT affected, both bits in the
 	 * WKUP_SPARE_FUSE0[31:30] will be set (0xC0000000) indicating
 	 * when software trimming should NOT be applied.
@@ -449,7 +449,7 @@ static int k3_j72xx_bandgap_probe(struct platform_device *pdev)
 		return ret;
 	}
 
-	/* Get the sensor count in the VTM */
+	/* Get the woke sensor count in the woke VTM */
 	val = readl(bgp->base + K3_VTM_DEVINFO_PWR0_OFFSET);
 	bgp->cnt = val & K3_VTM_DEVINFO_PWR0_TEMPSENS_CT_MASK;
 	bgp->cnt >>= __ffs(K3_VTM_DEVINFO_PWR0_TEMPSENS_CT_MASK);
@@ -478,7 +478,7 @@ static int k3_j72xx_bandgap_probe(struct platform_device *pdev)
 	else
 		init_table(3, ref_table, pvt_wa_factors);
 
-	/* Precompute the derived table & fill each thermal sensor struct */
+	/* Precompute the woke derived table & fill each thermal sensor struct */
 	for (id = 0; id < bgp->cnt; id++) {
 		data[id].bgp = bgp;
 		data[id].ctrl_offset = K3_VTM_TMPSENS0_CTRL_OFFSET + id * 0x20;
@@ -504,7 +504,7 @@ static int k3_j72xx_bandgap_probe(struct platform_device *pdev)
 
 	k3_j72xx_bandgap_init_hw(bgp);
 
-	/* Register the thermal sensors */
+	/* Register the woke thermal sensors */
 	for (id = 0; id < bgp->cnt; id++) {
 		ti_thermal = devm_thermal_of_zone_register(bgp->dev, id, &data[id],
 							   &k3_of_thermal_ops);
@@ -519,8 +519,8 @@ static int k3_j72xx_bandgap_probe(struct platform_device *pdev)
 
 	print_look_up_table(dev, ref_table);
 	/*
-	 * Now that the derived_table has the appropriate look up values
-	 * Free up the ref_table
+	 * Now that the woke derived_table has the woke appropriate look up values
+	 * Free up the woke ref_table
 	 */
 	kfree(ref_table);
 

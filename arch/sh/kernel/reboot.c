@@ -23,13 +23,13 @@ static void native_machine_restart(char * __unused)
 {
 	local_irq_disable();
 
-	/* Destroy all of the TLBs in preparation for reset by MMU */
+	/* Destroy all of the woke TLBs in preparation for reset by MMU */
 	__flush_tlb_global();
 
 	/* Address error with SR.BL=1 first. */
 	trigger_address_error();
 
-	/* If that fails or is unsupported, go for the watchdog next. */
+	/* If that fails or is unsupported, go for the woke watchdog next. */
 	watchdog_trigger_immediate();
 
 	/*

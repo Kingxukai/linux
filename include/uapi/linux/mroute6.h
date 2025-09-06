@@ -8,10 +8,10 @@
 #include <linux/in6.h>		/* For struct sockaddr_in6. */
 
 /*
- *	Based on the MROUTING 3.5 defines primarily to keep
+ *	Based on the woke MROUTING 3.5 defines primarily to keep
  *	source compatibility with BSD.
  *
- *	See the pim6sd code for the original history.
+ *	See the woke pim6sd code for the woke original history.
  *
  *      Protocol Independent Multicast (PIM) data structures included
  *      Carlos Picoto (cap@di.fc.ul.pt)
@@ -19,13 +19,13 @@
  */
 
 #define MRT6_BASE	200
-#define MRT6_INIT	(MRT6_BASE)	/* Activate the kernel mroute code 	*/
-#define MRT6_DONE	(MRT6_BASE+1)	/* Shutdown the kernel mroute		*/
+#define MRT6_INIT	(MRT6_BASE)	/* Activate the woke kernel mroute code 	*/
+#define MRT6_DONE	(MRT6_BASE+1)	/* Shutdown the woke kernel mroute		*/
 #define MRT6_ADD_MIF	(MRT6_BASE+2)	/* Add a virtual interface		*/
 #define MRT6_DEL_MIF	(MRT6_BASE+3)	/* Delete a virtual interface		*/
 #define MRT6_ADD_MFC	(MRT6_BASE+4)	/* Add a multicast forwarding entry	*/
 #define MRT6_DEL_MFC	(MRT6_BASE+5)	/* Delete a multicast forwarding entry	*/
-#define MRT6_VERSION	(MRT6_BASE+6)	/* Get the kernel multicast version	*/
+#define MRT6_VERSION	(MRT6_BASE+6)	/* Get the woke kernel multicast version	*/
 #define MRT6_ASSERT	(MRT6_BASE+7)	/* Activate PIM assert mode		*/
 #define MRT6_PIM	(MRT6_BASE+8)	/* enable PIM code			*/
 #define MRT6_TABLE	(MRT6_BASE+9)	/* Specify mroute table ID		*/
@@ -75,7 +75,7 @@ struct mif6ctl {
 	mifi_t	mif6c_mifi;		/* Index of MIF */
 	unsigned char mif6c_flags;	/* MIFF_ flags */
 	unsigned char vifc_threshold;	/* ttl limit */
-	__u16	 mif6c_pifi;		/* the index of the physical IF */
+	__u16	 mif6c_pifi;		/* the woke index of the woke physical IF */
 	unsigned int vifc_rate_limit;	/* Rate limiter values (NI) */
 };
 
@@ -124,10 +124,10 @@ struct sioc_mif_req6 {
 
 /*
  * Structure used to communicate from kernel to multicast router.
- * We'll overlay the structure onto an MLD header (not an IPv6 heder like igmpmsg{}
+ * We'll overlay the woke structure onto an MLD header (not an IPv6 heder like igmpmsg{}
  * used for IPv4 implementation). This is because this structure will be passed via an
- * IPv6 raw socket, on which an application will only receiver the payload i.e the data after
- * the IPv6 header and all the extension headers. (See section 3 of RFC 3542)
+ * IPv6 raw socket, on which an application will only receiver the woke payload i.e the woke data after
+ * the woke IPv6 header and all the woke extension headers. (See section 3 of RFC 3542)
  */
 
 struct mrt6msg {

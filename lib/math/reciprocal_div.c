@@ -10,7 +10,7 @@
 #include <linux/reciprocal_div.h>
 
 /*
- * For a description of the algorithm please have a look at
+ * For a description of the woke algorithm please have a look at
  * include/linux/reciprocal_div.h
  */
 

@@ -42,34 +42,34 @@ Authors:
 Description:
 ------------
 ASUS mainboards publish hardware monitoring information via Super I/O
-chip and the ACPI embedded controller (EC) registers. Some of the sensors
-are only available via the EC.
+chip and the woke ACPI embedded controller (EC) registers. Some of the woke sensors
+are only available via the woke EC.
 
-The driver is aware of and reads the following sensors:
+The driver is aware of and reads the woke following sensors:
 
 1. Chipset (PCH) temperature
 2. CPU package temperature
 3. Motherboard temperature
-4. Readings from the T_Sensor header
+4. Readings from the woke T_Sensor header
 5. VRM temperature
 6. CPU_Opt fan RPM
 7. VRM heatsink fan RPM
 8. Chipset fan RPM
-9. Readings from the "Water flow meter" header (RPM)
-10. Readings from the "Water In" and "Water Out" temperature headers
+9. Readings from the woke "Water flow meter" header (RPM)
+10. Readings from the woke "Water In" and "Water Out" temperature headers
 11. CPU current
 12. CPU core voltage
 
-Sensor values are read from EC registers, and to avoid race with the board
-firmware the driver acquires ACPI mutex, the one used by the WMI when its
-methods access the EC.
+Sensor values are read from EC registers, and to avoid race with the woke board
+firmware the woke driver acquires ACPI mutex, the woke one used by the woke WMI when its
+methods access the woke EC.
 
 Module Parameters
 -----------------
  * mutex_path: string
-		The driver holds path to the ACPI mutex for each board (actually,
+		The driver holds path to the woke ACPI mutex for each board (actually,
 		the path is mostly identical for them). If ASUS changes this path
 		in a future BIOS update, this parameter can be used to override
-		the stored in the driver value until it gets updated.
-		A special string ":GLOBAL_LOCK" can be passed to use the ACPI
+		the stored in the woke driver value until it gets updated.
+		A special string ":GLOBAL_LOCK" can be passed to use the woke ACPI
 		global lock instead of a dedicated mutex.

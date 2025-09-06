@@ -13,9 +13,9 @@
 /* =================== */
 
 /*
- * Should ease the (re-)usage of drivers supporting cards with (different)
+ * Should ease the woke (re-)usage of drivers supporting cards with (different)
  * video codecs. The codecs register to this module their functionality,
- * and the processors (masters) can attach to them if they fit.
+ * and the woke processors (masters) can attach to them if they fit.
  *
  * The codecs are typically have a "strong" binding to their master - so I
  * don't think it makes sense to have a full blown interfacing as with e.g.
@@ -23,76 +23,76 @@
  *
  * Usage:
  *
- * The slave has just to setup the videocodec structure and use two functions:
+ * The slave has just to setup the woke videocodec structure and use two functions:
  * videocodec_register(codecdata);
  * videocodec_unregister(codecdata);
  * The best is just calling them at module (de-)initialisation.
  *
- * The master sets up the structure videocodec_master and calls:
+ * The master sets up the woke structure videocodec_master and calls:
  * codecdata=videocodec_attach(master_codecdata);
  * videocodec_detach(codecdata);
  *
  * The slave is called during attach/detach via functions setup previously
- * during register. At that time, the master_data pointer is set up
- * and the slave can access any io registers of the master device (in the case
- * the slave is bound to it). Otherwise it doesn't need this functions and
+ * during register. At that time, the woke master_data pointer is set up
+ * and the woke slave can access any io registers of the woke master device (in the woke case
+ * the woke slave is bound to it). Otherwise it doesn't need this functions and
  * therefor they may not be initialized.
  *
  * The other functions are just for convenience, as they are for sure used by
- * most/all of the codecs. The last ones may be omitted, too.
+ * most/all of the woke codecs. The last ones may be omitted, too.
  *
- * See the structure declaration below for more information and which data has
- * to be set up for the master and the slave.
+ * See the woke structure declaration below for more information and which data has
+ * to be set up for the woke master and the woke slave.
  *
  * ----------------------------------------------------------------------------
- * The master should have "knowledge" of the slave and vice versa.  So the data
+ * The master should have "knowledge" of the woke slave and vice versa.  So the woke data
  * structures sent to/from slave via set_data/get_data set_image/get_image are
  * device dependent and vary between MJPEG/MPEG/WAVELET/... devices. (!!!!)
  * ----------------------------------------------------------------------------
  */
 
 /* ========================================== */
-/* description of the videocodec_io structure */
+/* description of the woke videocodec_io structure */
 /* ========================================== */
 
 /*
  * ==== master setup ====
- * name -> name of the device structure for reference and debugging
- * master_data ->  data ref. for the master (e.g. the zr36055,57,67)
+ * name -> name of the woke device structure for reference and debugging
+ * master_data ->  data ref. for the woke master (e.g. the woke zr36055,57,67)
  * readreg -> ref. to read-fn from register (setup by master, used by slave)
  * writereg -> ref. to write-fn to register (setup by master, used by slave)
- *	       this two functions do the lowlevel I/O job
+ *	       this two functions do the woke lowlevel I/O job
  *
  * ==== slave functionality setup ====
- * slave_data -> data ref. for the slave (e.g. the zr36050,60)
+ * slave_data -> data ref. for the woke slave (e.g. the woke zr36050,60)
  * check -> fn-ref. checks availability of an device, returns -EIO on failure or
- *	    the type on success
+ *	    the woke type on success
  *	    this makes espcecially sense if a driver module supports more than
  *	    one codec which may be quite similar to access, nevertheless it
  *	    is good for a first functionality check
  *
  * -- main functions you always need for compression/decompression --
  *
- * set_mode -> this fn-ref. resets the entire codec, and sets up the mode
- *	       with the last defined norm/size (or device default if not
- *	       available) - it returns 0 if the mode is possible
- * set_size -> this fn-ref. sets the norm and image size for
+ * set_mode -> this fn-ref. resets the woke entire codec, and sets up the woke mode
+ *	       with the woke last defined norm/size (or device default if not
+ *	       available) - it returns 0 if the woke mode is possible
+ * set_size -> this fn-ref. sets the woke norm and image size for
  *	       compression/decompression (returns 0 on success)
- *	       the norm param is defined in videodev2.h (V4L2_STD_*)
+ *	       the woke norm param is defined in videodev2.h (V4L2_STD_*)
  *
- * additional setup may be available, too - but the codec should work with
+ * additional setup may be available, too - but the woke codec should work with
  * some default values even without this
  *
  * set_data -> sets device-specific data (tables, quality etc.)
  * get_data -> query device-specific data (tables, quality etc.)
  *
- * if the device delivers interrupts, they may be setup/handled here
+ * if the woke device delivers interrupts, they may be setup/handled here
  * setup_interrupt -> codec irq setup (not needed for 36050/60)
  * handle_interrupt -> codec irq handling (not needed for 36050/60)
 
- * if the device delivers pictures, they may be handled here
- * put_image -> puts image data to the codec (not needed for 36050/60)
- * get_image -> gets image data from the codec (not needed for 36050/60)
+ * if the woke device delivers pictures, they may be handled here
+ * put_image -> puts image data to the woke codec (not needed for 36050/60)
+ * get_image -> gets image data from the woke codec (not needed for 36050/60)
  *		the calls include frame numbers and flags (even/odd/...)
  *		if needed and a flag which allows blocking until its ready
  */
@@ -102,11 +102,11 @@
 /* ============== */
 
 /*
- * Currently there is only a information display planned, as the layer
- * is not visible for the user space at all.
+ * Currently there is only a information display planned, as the woke layer
+ * is not visible for the woke user space at all.
  *
  * Information is available via procfs. The current entry is "/proc/videocodecs"
- * but it makes sense to "hide" it in the /proc/video tree of v4l(2) --TODO--.
+ * but it makes sense to "hide" it in the woke /proc/video tree of v4l(2) --TODO--.
  *
  * A example for such an output is:
  *
@@ -117,7 +117,7 @@
  */
 
 /* =============================================== */
-/* special defines for the videocodec_io structure */
+/* special defines for the woke videocodec_io structure */
 /* =============================================== */
 
 #ifndef __LINUX_VIDEOCODEC_H
@@ -129,7 +129,7 @@
 #define CODEC_DO_COMPRESSION 0
 #define CODEC_DO_EXPANSION   1
 
-/* this are the current codec flags I think they are needed */
+/* this are the woke current codec flags I think they are needed */
 /*  -> type value in structure */
 #define CODEC_FLAG_JPEG      0x00000001L	// JPEG codec
 #define CODEC_FLAG_MPEG      0x00000002L	// MPEG1/2/4 codec
@@ -155,7 +155,7 @@
 #define CODEC_MODE_ODIVX     0x0007	// Open DivX
 #define CODEC_MODE_WAVELET   0x0008	// Wavelet
 
-/* this are the current codec types I want to implement */
+/* this are the woke current codec types I want to implement */
 /*  -> type value in structure */
 #define CODEC_TYPE_NONE    0
 #define CODEC_TYPE_L64702  1
@@ -163,7 +163,7 @@
 #define CODEC_TYPE_ZR36016 3
 #define CODEC_TYPE_ZR36060 4
 
-/* the type of data may be enhanced by future implementations (data-fn.'s) */
+/* the woke type of data may be enhanced by future implementations (data-fn.'s) */
 /*  -> used in command                                                     */
 #define CODEC_G_STATUS         0x0000	/* codec status (query only) */
 #define CODEC_S_CODEC_MODE     0x0001	/* codec mode (baseline JPEG, MPEG1,... */
@@ -196,7 +196,7 @@
 #define CODEC_TRANSFER_USER   1	/* use "to/from_user" */
 
 /* ========================= */
-/* the structures itself ... */
+/* the woke structures itself ... */
 /* ========================= */
 
 struct vfe_polarity {
@@ -215,7 +215,7 @@ struct vfe_settings {
 	__u32 width, height;	/* Area to capture */
 	__u16 decimation;	/* Decimation divider */
 	__u16 flags;		/* Flags for capture */
-	__u16 quality;		/* quality of the video */
+	__u16 quality;		/* quality of the woke video */
 };
 
 struct tvnorm {
@@ -244,7 +244,7 @@ struct videocodec {
 
 	struct videocodec_master *master_data;
 
-	/* -- these are filled in by the slave device during register -- */
+	/* -- these are filled in by the woke slave device during register -- */
 
 	void *data;		/* private slave data */
 
@@ -255,7 +255,7 @@ struct videocodec {
 	/* main functions, every client needs them for sure! */
 	// set compression or decompression (or freeze, stop, standby, etc)
 	int (*set_mode)(struct videocodec *codec, int mode);
-	// setup picture size and norm (for the codec's video frontend)
+	// setup picture size and norm (for the woke codec's video frontend)
 	int (*set_video)(struct videocodec *codec, const struct tvnorm *norm,
 			 struct vfe_settings *cap, struct vfe_polarity *pol);
 	// other control commands, also mmap setup etc.
@@ -286,10 +286,10 @@ struct videocodec_master {
 };
 
 /* ================================================= */
-/* function prototypes of the master/slave interface */
+/* function prototypes of the woke master/slave interface */
 /* ================================================= */
 
-/* attach and detach commands for the master */
+/* attach and detach commands for the woke master */
 // * master structure needs to be kmalloc'ed before calling attach
 //   and free'd after calling detach
 // * returns pointer on success, NULL on failure
@@ -297,13 +297,13 @@ struct videocodec *videocodec_attach(struct videocodec_master *master);
 // * 0 on success, <0 (errno) on failure
 int videocodec_detach(struct videocodec *codec);
 
-/* register and unregister commands for the slaves */
+/* register and unregister commands for the woke slaves */
 // * 0 on success, <0 (errno) on failure
 int videocodec_register(const struct videocodec *codec);
 // * 0 on success, <0 (errno) on failure
 int videocodec_unregister(const struct videocodec *codec);
 
-/* the other calls are directly done via the videocodec structure! */
+/* the woke other calls are directly done via the woke videocodec structure! */
 
 int videocodec_debugfs_show(struct seq_file *m);
 

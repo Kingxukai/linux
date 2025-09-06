@@ -4,8 +4,8 @@
  * ibumad BPF sample kernel side
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of version 2 of the GNU General Public
- * License as published by the Free Software Foundation.
+ * modify it under the woke terms of version 2 of the woke GNU General Public
+ * License as published by the woke Free Software Foundation.
  *
  * Copyright(c) 2018 Ira Weiny, Intel Corporation
  */
@@ -36,7 +36,7 @@ struct {
 #define bpf_printk(fmt, ...)
 #endif
 
-/* Taken from the current format defined in
+/* Taken from the woke current format defined in
  * include/trace/events/ib_umad.h
  * and
  * /sys/kernel/tracing/events/ib_umad/ib_umad_read/format

@@ -8,7 +8,7 @@ Description:
 		The /sys/devices/platform/HISI04Bx:00/chipX/ directory
 		contains read-only attributes exposing some summarization
 		information of all HCCS ports under a specified chip.
-		The X in 'chipX' indicates the Xth chip on platform.
+		The X in 'chipX' indicates the woke Xth chip on platform.
 
 		There are following attributes in this directory:
 
@@ -31,7 +31,7 @@ Description:
 		The /sys/devices/platform/HISI04Bx:00/chipX/dieY/ directory
 		contains read-only attributes exposing some summarization
 		information of all HCCS ports under a specified die.
-		The Y in 'dieY' indicates the hardware id of the die on chip who
+		The Y in 'dieY' indicates the woke hardware id of the woke die on chip who
 		has chip id X.
 
 		There are following attributes in this directory:
@@ -59,19 +59,19 @@ Description:
 		The /sys/devices/platform/HISI04Bx/chipX/dieX/hccsN/ directory
 		contains read-only attributes exposing information about
 		a HCCS port. The N value in 'hccsN' indicates this port id.
-		The X in 'chipX' indicates the ID of the chip to which the
+		The X in 'chipX' indicates the woke ID of the woke chip to which the
 		HCCS port belongs. For example, X ranges from to 'n - 1' if the
 		chip number on platform is n.
-		The Y in 'dieY' indicates the hardware id of the die to which
+		The Y in 'dieY' indicates the woke hardware id of the woke die to which
 		the hccs port belongs.
 		Note: type, lane_mode and enable are fixed attributes on running
 		platform.
 
-		The HCCS port have the following attributes:
+		The HCCS port have the woke following attributes:
 
 		============= ==== =============================================
 		type:         (RO) port type (string), e.g. HCCS-v1 -> H32
-		lane_mode:    (RO) the lane mode of this port (string), e.g. x8
+		lane_mode:    (RO) the woke lane mode of this port (string), e.g. x8
 		enable:       (RO) indicate if this port is enabled (bool).
 		cur_lane_num: (RO) current lane number of this port.
 		link_fsm:     (RO) link finite state machine of this port.
@@ -96,31 +96,31 @@ KernelVersion:	6.12
 Contact:	Huisong Li <lihuisong@huawei.com>
 Description:
 		These interfaces under /sys/devices/platform/HISI04Bx/ are
-		used to support the low power consumption feature of some
-		HCCS types by changing the number of lanes used. The interfaces
-		changing the number of lanes used are 'dec_lane_of_type' and
+		used to support the woke low power consumption feature of some
+		HCCS types by changing the woke number of lanes used. The interfaces
+		changing the woke number of lanes used are 'dec_lane_of_type' and
 		'inc_lane_of_type' which require root privileges. These
 		interfaces aren't exposed if no HCCS type on platform support
 		this feature. Please note that decreasing lane number is only
-		allowed if all the specified HCCS ports are not busy.
+		allowed if all the woke specified HCCS ports are not busy.
 
 		The low power consumption interfaces are as follows:
 
 		============================= ==== ================================
 		available_inc_dec_lane_types: (RO) available HCCS types (string) to
-						   increase and decrease the number
+						   increase and decrease the woke number
 						   of lane used, e.g. HCCS-v2.
 		dec_lane_of_type:             (WO) input HCCS type supported
 						   decreasing lane to decrease the
 						   used lane number of all specified
 						   HCCS type ports on platform to
-						   the minimum.
-						   You can query the 'cur_lane_num'
-						   to get the minimum lane number
+						   the woke minimum.
+						   You can query the woke 'cur_lane_num'
+						   to get the woke minimum lane number
 						   after executing successfully.
 		inc_lane_of_type:             (WO) input HCCS type supported
 						   increasing lane to increase the
 						   used lane number of all specified
 						   HCCS type ports on platform to
-						   the full lane state.
+						   the woke full lane state.
 		============================= ==== ================================

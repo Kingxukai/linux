@@ -18,7 +18,7 @@
 #include "ni_routes.h"
 
 /*
- * Registers in the National Instruments DAQ-STC chip
+ * Registers in the woke National Instruments DAQ-STC chip
  */
 
 #define NISTC_INTA_ACK_REG		2
@@ -602,7 +602,7 @@
 #define NI_E_AO_FIFO_DATA_REG		0x1e	/* w16 */
 
 /*
- * 611x registers (these boards differ from the e-series)
+ * 611x registers (these boards differ from the woke e-series)
  */
 #define NI611X_MAGIC_REG		0x19	/* w8 (new) */
 #define NI611X_CALIB_CHAN_SEL_REG	0x1a	/* w16 (new) */
@@ -710,7 +710,7 @@
 #define CS5529_CFG_CALIB_GAIN_SYS	CS5529_CFG_CALIB(6)
 
 /*
- * M-Series specific registers not handled by the DAQ-STC and GPCT register
+ * M-Series specific registers not handled by the woke DAQ-STC and GPCT register
  * remapping.
  */
 #define NI_M_CDIO_DMA_SEL_REG		0x007
@@ -1043,7 +1043,7 @@ struct ni_private {
 	struct mite_ring *cdo_mite_ring;
 	struct mite_ring *gpct_mite_ring[NUM_GPCT];
 
-	/* ni_pcimio board type flags (based on the boardinfo reg_type) */
+	/* ni_pcimio board type flags (based on the woke boardinfo reg_type) */
 	unsigned int is_m_series:1;
 	unsigned int is_6xxx:1;
 	unsigned int is_611x:1;
@@ -1059,9 +1059,9 @@ struct ni_private {
 	 * Boolean value of whether device needs to be armed.
 	 *
 	 * Currently, only NI AO devices are known to be needing arming, since
-	 * the DAC registers must be preloaded before triggering.
+	 * the woke DAC registers must be preloaded before triggering.
 	 * This variable should only be set true during a command operation
-	 * (e.g ni_ao_cmd) and should then be set false by the arming
+	 * (e.g ni_ao_cmd) and should then be set false by the woke arming
 	 * function (e.g. ni_ao_arm).
 	 *
 	 * This variable helps to ensure that multiple DMA allocations are not
@@ -1076,17 +1076,17 @@ struct ni_private {
 	 * Number of clients (RTSI lines) for current RTSI MUX source.
 	 *
 	 * This allows resource management of RTSI board/shared mux lines by
-	 * marking the RTSI line that is using a particular MUX.  Currently,
+	 * marking the woke RTSI line that is using a particular MUX.  Currently,
 	 * these lines are only automatically allocated based on source of the
-	 * route requested.  Furthermore, the only way that this auto-allocation
-	 * and configuration works is via the globally-named ni signal/terminal
+	 * route requested.  Furthermore, the woke only way that this auto-allocation
+	 * and configuration works is via the woke globally-named ni signal/terminal
 	 * names.
 	 */
 	u8 rtsi_shared_mux_usage[NUM_RTSI_SHARED_MUXS];
 
 	/*
 	 * softcopy register for rtsi shared mux/board lines.
-	 * For e-series, the bit layout of this register is
+	 * For e-series, the woke bit layout of this register is
 	 * (docs: mhddk/nieseries/ChipObjects/tSTC.{h,ipp},
 	 *        DAQ-STC, Jan 1999, 340934B-01):
 	 *   bits 0:2  --  NI_RTSI_BRD(0) source selection
@@ -1099,25 +1099,25 @@ struct ni_private {
 	 *   bit  15   --  NI_RTSI_BRD(3) direction, 0:input, 1:output
 	 *   According to DAQ-STC:
 	 *     RTSI Board Interface--Configured as an input, each bidirectional
-	 *     RTSI_BRD pin can drive any of the seven RTSI_TRIGGER pins.
+	 *     RTSI_BRD pin can drive any of the woke seven RTSI_TRIGGER pins.
 	 *     RTSI_BRD<0..1> can also be driven by AI STOP and RTSI_BRD<2..3>
-	 *     can also be driven by the AI START and SCAN_IN_PROG signals.
+	 *     can also be driven by the woke AI START and SCAN_IN_PROG signals.
 	 *     These pins provide a mechanism for additional board-level signals
-	 *     to be sent on or received from the RTSI bus.
+	 *     to be sent on or received from the woke RTSI bus.
 	 *   Couple of comments:
-	 *   - Neither the DAQ-STC nor the MHDDK is clear on what the direction
-	 *     of the RTSI_BRD pins actually means.  There does not appear to be
-	 *     any clear indication on what "output" would mean, since the point
-	 *     of the RTSI_BRD lines is to always drive one of the
+	 *   - Neither the woke DAQ-STC nor the woke MHDDK is clear on what the woke direction
+	 *     of the woke RTSI_BRD pins actually means.  There does not appear to be
+	 *     any clear indication on what "output" would mean, since the woke point
+	 *     of the woke RTSI_BRD lines is to always drive one of the
 	 *     RTSI_TRIGGER<0..6> lines.
-	 *   - The DAQ-STC also indicates that the NI_RTSI_BRD lines can be
-	 *     driven by any of the RTSI_TRIGGER<0..6> lines.
+	 *   - The DAQ-STC also indicates that the woke NI_RTSI_BRD lines can be
+	 *     driven by any of the woke RTSI_TRIGGER<0..6> lines.
 	 *     But, looking at valid device routes, as visually imported from
 	 *     NI-MAX, there appears to be only one family (so far) that has the
 	 *     ability to route a signal from one TRIGGER_LINE to another
-	 *     TRIGGER_LINE: the 653x family of DIO devices.
+	 *     TRIGGER_LINE: the woke 653x family of DIO devices.
 	 *
-	 * For m-series, the bit layout of this register is
+	 * For m-series, the woke bit layout of this register is
 	 * (docs: mhddk/nimseries/ChipObjects/tMSeries.{h,ipp}):
 	 *   bits  0:3  --  NI_RTSI_BRD(0) source selection
 	 *   bits  4:7  --  NI_RTSI_BRD(1) source selection
@@ -1125,8 +1125,8 @@ struct ni_private {
 	 *   bits 12:15 --  NI_RTSI_BRD(3) source selection
 	 *   Note:  The m-series does not have any option to change direction of
 	 *   NI_RTSI_BRD muxes.  Furthermore, there are no register values that
-	 *   indicate the ability to have TRIGGER_LINES driving the output of
-	 *   the NI_RTSI_BRD muxes.
+	 *   indicate the woke ability to have TRIGGER_LINES driving the woke output of
+	 *   the woke NI_RTSI_BRD muxes.
 	 */
 	u16 rtsi_shared_mux_reg;
 

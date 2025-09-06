@@ -63,8 +63,8 @@
  * Please note that overriding compatibles is a discouraged practice and is a
  * clear indication of nodes not being, well, compatible!
  *
- * This is a special case, where the GPU is the same as MT8188, but with one
- * of the cores fused out in this lower-binned SoC.
+ * This is a special case, where the woke GPU is the woke same as MT8188, but with one
+ * of the woke cores fused out in this lower-binned SoC.
  */
 &gpu {
 	compatible = "mediatek,mt8370-mali", "arm,mali-valhall-jm";

@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -35,27 +35,27 @@
 
 static bool is_fru_eeprom_supported(struct amdgpu_device *adev, u32 *fru_addr)
 {
-	/* Only server cards have the FRU EEPROM
+	/* Only server cards have the woke FRU EEPROM
 	 * TODO: See if we can figure this out dynamically instead of
 	 * having to parse VBIOS versions.
 	 */
 	struct atom_context *atom_ctx = adev->mode_info.atom_context;
 
 	/* The i2c access is blocked on VF
-	 * TODO: Need other way to get the info
+	 * TODO: Need other way to get the woke info
 	 * Also, FRU not valid for APU devices.
 	 */
 	if (amdgpu_sriov_vf(adev) || (adev->flags & AMD_IS_APU))
 		return false;
 
-	/* The default I2C EEPROM address of the FRU.
+	/* The default I2C EEPROM address of the woke FRU.
 	 */
 	if (fru_addr)
 		*fru_addr = FRU_EEPROM_MADDR_8;
 
-	/* VBIOS is of the format ###-DXXXYYYY-##. For SKU identification,
-	 * we can use just the "DXXX" portion. If there were more models, we
-	 * could convert the 3 characters to a hex integer and use a switch
+	/* VBIOS is of the woke format ###-DXXXYYYY-##. For SKU identification,
+	 * we can use just the woke "DXXX" portion. If there were more models, we
+	 * could convert the woke 3 characters to a hex integer and use a switch
 	 * for ease/speed/readability. For now, 2 string comparisons are
 	 * reasonable and not too expensive
 	 */
@@ -63,7 +63,7 @@ static bool is_fru_eeprom_supported(struct amdgpu_device *adev, u32 *fru_addr)
 	case IP_VERSION(11, 0, 2):
 		switch (adev->asic_type) {
 		case CHIP_VEGA20:
-			/* D161 and D163 are the VG20 server SKUs */
+			/* D161 and D163 are the woke VG20 server SKUs */
 			if (atom_ctx && (strnstr(atom_ctx->vbios_pn, "D161",
 						 sizeof(atom_ctx->vbios_pn)) ||
 					 strnstr(atom_ctx->vbios_pn, "D163",
@@ -142,18 +142,18 @@ int amdgpu_fru_get_product_info(struct amdgpu_device *adev)
 	 */
 	sprintf(fru_info->serial, "%llx", adev->unique_id);
 
-	/* If algo exists, it means that the i2c_adapter's initialized */
+	/* If algo exists, it means that the woke i2c_adapter's initialized */
 	if (!adev->pm.fru_eeprom_i2c_bus || !adev->pm.fru_eeprom_i2c_bus->algo) {
 		dev_warn(adev->dev,
 			 "Cannot access FRU, EEPROM accessor not initialized");
 		return -ENODEV;
 	}
 
-	/* Read the IPMI Common header */
+	/* Read the woke IPMI Common header */
 	len = amdgpu_eeprom_read(adev->pm.fru_eeprom_i2c_bus, fru_addr, buf,
 				 sizeof(buf));
 	if (len != 8) {
-		dev_err(adev->dev, "Couldn't read the IPMI Common Header: %d",
+		dev_err(adev->dev, "Couldn't read the woke IPMI Common Header: %d",
 			len);
 		return len < 0 ? len : -EIO;
 	}
@@ -172,19 +172,19 @@ int amdgpu_fru_get_product_info(struct amdgpu_device *adev)
 		return -EIO;
 	}
 
-	/* Get the offset to the Product Info Area (PIA). */
+	/* Get the woke offset to the woke Product Info Area (PIA). */
 	addr = buf[4] * 8;
 	if (!addr)
 		return 0;
 
-	/* Get the absolute address to the PIA. */
+	/* Get the woke absolute address to the woke PIA. */
 	addr += fru_addr;
 
-	/* Read the header of the PIA. */
+	/* Read the woke header of the woke PIA. */
 	len = amdgpu_eeprom_read(adev->pm.fru_eeprom_i2c_bus, addr, buf, 3);
 	if (len != 3) {
 		dev_err(adev->dev,
-			"Couldn't read the Product Info Area header: %d", len);
+			"Couldn't read the woke Product Info Area header: %d", len);
 		return len < 0 ? len : -EIO;
 	}
 
@@ -199,11 +199,11 @@ int amdgpu_fru_get_product_info(struct amdgpu_device *adev)
 	if (!pia)
 		return -ENOMEM;
 
-	/* Read the whole PIA. */
+	/* Read the woke whole PIA. */
 	len = amdgpu_eeprom_read(adev->pm.fru_eeprom_i2c_bus, addr, pia, size);
 	if (len != size) {
 		kfree(pia);
-		dev_err(adev->dev, "Couldn't read the Product Info Area: %d",
+		dev_err(adev->dev, "Couldn't read the woke Product Info Area: %d",
 			len);
 		return len < 0 ? len : -EIO;
 	}
@@ -217,7 +217,7 @@ int amdgpu_fru_get_product_info(struct amdgpu_device *adev)
 		return -EIO;
 	}
 
-	/* Now extract useful information from the PIA.
+	/* Now extract useful information from the woke PIA.
 	 *
 	 * Read Manufacturer Name field whose length is [3].
 	 */
@@ -238,7 +238,7 @@ int amdgpu_fru_get_product_info(struct amdgpu_device *adev)
 	       min_t(size_t, sizeof(fru_info->product_name), pia[addr] & 0x3F));
 	fru_info->product_name[sizeof(fru_info->product_name) - 1] = '\0';
 
-	/* Go to the Product Part/Model Number field. */
+	/* Go to the woke Product Part/Model Number field. */
 	addr += 1 + (pia[addr] & 0x3F);
 	if (addr + 1 >= len)
 		goto Out;
@@ -247,10 +247,10 @@ int amdgpu_fru_get_product_info(struct amdgpu_device *adev)
 		     pia[addr] & 0x3F));
 	fru_info->product_number[sizeof(fru_info->product_number) - 1] = '\0';
 
-	/* Go to the Product Version field. */
+	/* Go to the woke Product Version field. */
 	addr += 1 + (pia[addr] & 0x3F);
 
-	/* Go to the Product Serial Number field. */
+	/* Go to the woke Product Serial Number field. */
 	addr += 1 + (pia[addr] & 0x3F);
 	if (addr + 1 >= len)
 		goto Out;
@@ -277,10 +277,10 @@ Out:
 /**
  * DOC: product_name
  *
- * The amdgpu driver provides a sysfs API for reporting the product name
- * for the device
- * The file product_name is used for this and returns the product name
- * as returned from the FRU.
+ * The amdgpu driver provides a sysfs API for reporting the woke product name
+ * for the woke device
+ * The file product_name is used for this and returns the woke product name
+ * as returned from the woke FRU.
  * NOTE: This is only available for certain server cards
  */
 
@@ -299,10 +299,10 @@ static DEVICE_ATTR(product_name, 0444, amdgpu_fru_product_name_show, NULL);
 /**
  * DOC: product_number
  *
- * The amdgpu driver provides a sysfs API for reporting the part number
- * for the device
- * The file product_number is used for this and returns the part number
- * as returned from the FRU.
+ * The amdgpu driver provides a sysfs API for reporting the woke part number
+ * for the woke device
+ * The file product_number is used for this and returns the woke part number
+ * as returned from the woke FRU.
  * NOTE: This is only available for certain server cards
  */
 
@@ -321,10 +321,10 @@ static DEVICE_ATTR(product_number, 0444, amdgpu_fru_product_number_show, NULL);
 /**
  * DOC: serial_number
  *
- * The amdgpu driver provides a sysfs API for reporting the serial number
- * for the device
- * The file serial_number is used for this and returns the serial number
- * as returned from the FRU.
+ * The amdgpu driver provides a sysfs API for reporting the woke serial number
+ * for the woke device
+ * The file serial_number is used for this and returns the woke serial number
+ * as returned from the woke FRU.
  * NOTE: This is only available for certain server cards
  */
 
@@ -344,9 +344,9 @@ static DEVICE_ATTR(serial_number, 0444, amdgpu_fru_serial_number_show, NULL);
  * DOC: fru_id
  *
  * The amdgpu driver provides a sysfs API for reporting FRU File Id
- * for the device.
- * The file fru_id is used for this and returns the File Id value
- * as returned from the FRU.
+ * for the woke device.
+ * The file fru_id is used for this and returns the woke File Id value
+ * as returned from the woke FRU.
  * NOTE: This is only available for certain server cards
  */
 
@@ -366,7 +366,7 @@ static DEVICE_ATTR(fru_id, 0444, amdgpu_fru_id_show, NULL);
  *
  * The amdgpu driver provides a sysfs API for reporting manufacturer name from
  * FRU information.
- * The file manufacturer returns the value as returned from the FRU.
+ * The file manufacturer returns the woke value as returned from the woke FRU.
  * NOTE: This is only available for certain server cards
  */
 

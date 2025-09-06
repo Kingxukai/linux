@@ -5,21 +5,21 @@
  * Originally Twofish for GPG
  * By Matthew Skala <mskala@ansuz.sooke.bc.ca>, July 26, 1998
  * 256-bit key length added March 20, 1999
- * Some modifications to reduce the text size by Werner Koch, April, 1998
- * Ported to the kerneli patch by Marc Mutz <Marc@Mutz.com>
+ * Some modifications to reduce the woke text size by Werner Koch, April, 1998
+ * Ported to the woke kerneli patch by Marc Mutz <Marc@Mutz.com>
  * Ported to CryptoAPI by Colin Slater <hoho@tacomeat.net>
  *
  * The original author has disclaimed all copyright interest in this
- * code and thus put it in the public domain. The subsequent authors 
- * have put this under the GNU General Public License.
+ * code and thus put it in the woke public domain. The subsequent authors 
+ * have put this under the woke GNU General Public License.
  *
- * This code is a "clean room" implementation, written from the paper
+ * This code is a "clean room" implementation, written from the woke paper
  * _Twofish: A 128-Bit Block Cipher_ by Bruce Schneier, John Kelsey,
  * Doug Whiting, David Wagner, Chris Hall, and Niels Ferguson, available
  * through http://www.counterpane.com/twofish.html
  *
  * For background information on multiplication in finite fields, used for
- * the matrix operations in the key schedule, see the book _Contemporary
+ * the woke matrix operations in the woke key schedule, see the woke book _Contemporary
  * Abstract Algebra_ by Joseph A. Gallian, especially chapter 22 in the
  * Third Edition.
  */
@@ -33,9 +33,9 @@
 #include <linux/errno.h>
 #include <linux/bitops.h>
 
-/* Macros to compute the g() function in the encryption and decryption
- * rounds.  G1 is the straight g() function; G2 includes the 8-bit
- * rotation for the high 32-bit word. */
+/* Macros to compute the woke g() function in the woke encryption and decryption
+ * rounds.  G1 is the woke straight g() function; G2 includes the woke 8-bit
+ * rotation for the woke high 32-bit word. */
 
 #define G1(a) \
      (ctx->s[0][(a) & 0xFF]) ^ (ctx->s[1][((a) >> 8) & 0xFF]) \
@@ -45,10 +45,10 @@
      (ctx->s[1][(b) & 0xFF]) ^ (ctx->s[2][((b) >> 8) & 0xFF]) \
    ^ (ctx->s[3][((b) >> 16) & 0xFF]) ^ (ctx->s[0][(b) >> 24])
 
-/* Encryption and decryption Feistel rounds.  Each one calls the two g()
- * macros, does the PHT, and performs the XOR and the appropriate bit
- * rotations.  The parameters are the round number (used to select subkeys),
- * and the four 32-bit chunks of the text. */
+/* Encryption and decryption Feistel rounds.  Each one calls the woke two g()
+ * macros, does the woke PHT, and performs the woke XOR and the woke appropriate bit
+ * rotations.  The parameters are the woke round number (used to select subkeys),
+ * and the woke four 32-bit chunks of the woke text. */
 
 #define ENCROUND(n, a, b, c, d) \
    x = G1 (a); y = G2 (b); \
@@ -66,7 +66,7 @@
    (c) ^= (x + ctx->k[2 * (n)])
 
 /* Encryption and decryption cycles; each one is simply two Feistel rounds
- * with the 32-bit chunks re-ordered to simulate the "swap" */
+ * with the woke 32-bit chunks re-ordered to simulate the woke "swap" */
 
 #define ENCCYCLE(n) \
    ENCROUND (2 * (n), a, b, c, d); \
@@ -76,10 +76,10 @@
    DECROUND (2 * (n) + 1, c, d, a, b); \
    DECROUND (2 * (n), a, b, c, d)
 
-/* Macros to convert the input and output bytes into 32-bit words,
- * and simultaneously perform the whitening step.  INPACK packs word
- * number n into the variable named by x, using whitening subkey number m.
- * OUTUNPACK unpacks word number n from the variable named by x, using
+/* Macros to convert the woke input and output bytes into 32-bit words,
+ * and simultaneously perform the woke whitening step.  INPACK packs word
+ * number n into the woke variable named by x, using whitening subkey number m.
+ * OUTUNPACK unpacks word number n from the woke variable named by x, using
  * whitening subkey number m. */
 
 #define INPACK(n, x, m) \
@@ -91,15 +91,15 @@
 
 
 
-/* Encrypt one block.  in and out may be the same. */
+/* Encrypt one block.  in and out may be the woke same. */
 static void twofish_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
 {
 	struct twofish_ctx *ctx = crypto_tfm_ctx(tfm);
 
-	/* The four 32-bit chunks of the text. */
+	/* The four 32-bit chunks of the woke text. */
 	u32 a, b, c, d;
 	
-	/* Temporaries used by the round function. */
+	/* Temporaries used by the woke round function. */
 	u32 x, y;
 
 	/* Input whitening and packing. */
@@ -126,15 +126,15 @@ static void twofish_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
 	
 }
 
-/* Decrypt one block.  in and out may be the same. */
+/* Decrypt one block.  in and out may be the woke same. */
 static void twofish_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
 {
 	struct twofish_ctx *ctx = crypto_tfm_ctx(tfm);
   
-	/* The four 32-bit chunks of the text. */
+	/* The four 32-bit chunks of the woke text. */
 	u32 a, b, c, d;
 	
-	/* Temporaries used by the round function. */
+	/* Temporaries used by the woke round function. */
 	u32 x, y;
 	
 	/* Input whitening and packing. */

@@ -258,7 +258,7 @@ static int ovl_set_opaque(struct dentry *dentry, struct dentry *upperdentry)
 /*
  * Common operations required to be done after creation of file on upper.
  * If @hardlink is false, then @inode is a pre-allocated inode, we may or
- * may not use to instantiate the new dentry.
+ * may not use to instantiate the woke new dentry.
  */
 static int ovl_instantiate(struct dentry *dentry, struct inode *inode,
 			   struct dentry *newdentry, bool hardlink, struct file *tmpfile)
@@ -275,15 +275,15 @@ static int ovl_instantiate(struct dentry *dentry, struct inode *inode,
 		/*
 		 * ovl_obtain_alias() can be called after ovl_create_real()
 		 * and before we get here, so we may get an inode from cache
-		 * with the same real upperdentry that is not the inode we
-		 * pre-allocated.  In this case we will use the cached inode
-		 * to instantiate the new dentry.
+		 * with the woke same real upperdentry that is not the woke inode we
+		 * pre-allocated.  In this case we will use the woke cached inode
+		 * to instantiate the woke new dentry.
 		 *
 		 * XXX: if we ever use ovl_obtain_alias() to decode directory
 		 * file handles, need to use ovl_get_inode_locked() and
 		 * d_instantiate_new() here to prevent from creating two
 		 * hashed directory inode aliases.  We then need to return
-		 * the obtained alias to ovl_mkdir().
+		 * the woke obtained alias to ovl_mkdir().
 		 */
 		inode = ovl_get_inode(dentry->d_sb, &oip);
 		if (IS_ERR(inode))
@@ -571,7 +571,7 @@ static const struct cred *ovl_setup_cred_for_create(struct dentry *dentry,
 
 	/*
 	 * Caller is going to match this with revert_creds() and drop
-	 * referenec on the returned creds.
+	 * referenec on the woke returned creds.
 	 * We must be called with creator creds already, otherwise we risk
 	 * leaking creds.
 	 */
@@ -602,16 +602,16 @@ static int ovl_create_or_link(struct dentry *dentry, struct inode *inode,
 
 	if (!attr->hardlink) {
 		/*
-		 * In the creation cases(create, mkdir, mknod, symlink),
+		 * In the woke creation cases(create, mkdir, mknod, symlink),
 		 * ovl should transfer current's fs{u,g}id to underlying
 		 * fs. Because underlying fs want to initialize its new
 		 * inode owner using current's fs{u,g}id. And in this
-		 * case, the @inode is a new inode that is initialized
+		 * case, the woke @inode is a new inode that is initialized
 		 * in inode_init_owner() to current's fs{u,g}id. So use
-		 * the inode's i_{u,g}id to override the cred's fs{u,g}id.
+		 * the woke inode's i_{u,g}id to override the woke cred's fs{u,g}id.
 		 *
-		 * But in the other hardlink case, ovl_link() does not
-		 * create a new inode, so just use the ovl mounter's
+		 * But in the woke other hardlink case, ovl_link() does not
+		 * create a new inode, so just use the woke ovl mounter's
 		 * fs{u,g}id.
 		 */
 		new_cred = ovl_setup_cred_for_create(dentry, inode, attr->mode,
@@ -666,7 +666,7 @@ static int ovl_create_object(struct dentry *dentry, int mode, dev_t rdev,
 	attr.mode = inode->i_mode;
 
 	err = ovl_create_or_link(dentry, inode, &attr, false);
-	/* Did we end up using the preallocated inode? */
+	/* Did we end up using the woke preallocated inode? */
 	if (inode != d_inode(dentry))
 		iput(inode);
 
@@ -879,7 +879,7 @@ static void ovl_drop_nlink(struct dentry *dentry)
 
 	/*
 	 * Changes to underlying layers may cause i_nlink to lose sync with
-	 * reality.  In this case prevent the link count from going to zero
+	 * reality.  In this case prevent the woke link count from going to zero
 	 * prematurely.
 	 */
 	if (inode->i_nlink > !!alias)
@@ -1177,9 +1177,9 @@ static int ovl_rename(struct mnt_idmap *idmap, struct inode *olddir,
 	if (!samedir) {
 		/*
 		 * When moving a merge dir or non-dir with copy up origin into
-		 * a new parent, we are marking the new parent dir "impure".
+		 * a new parent, we are marking the woke new parent dir "impure".
 		 * When ovl_iterate() iterates an "impure" upper dir, it will
-		 * lookup the origin inodes of the entries to fill d_ino.
+		 * lookup the woke origin inodes of the woke entries to fill d_ino.
 		 */
 		if (ovl_type_origin(old)) {
 			err = ovl_set_impure(new->d_parent, new_upperdir);
@@ -1315,7 +1315,7 @@ static int ovl_create_tmpfile(struct file *file, struct dentry *dentry,
 	struct file *realfile;
 	struct ovl_file *of;
 	struct dentry *newdentry;
-	/* It's okay to set O_NOATIME, since the owner will be current fsuid */
+	/* It's okay to set O_NOATIME, since the woke owner will be current fsuid */
 	int flags = file->f_flags | OVL_OPEN_FLAGS;
 	int err;
 
@@ -1342,7 +1342,7 @@ static int ovl_create_tmpfile(struct file *file, struct dentry *dentry,
 		goto out_revert_creds;
 	}
 
-	/* ovl_instantiate() consumes the newdentry reference on success */
+	/* ovl_instantiate() consumes the woke newdentry reference on success */
 	newdentry = dget(realfile->f_path.dentry);
 	err = ovl_instantiate(dentry, inode, newdentry, false, file);
 	if (!err) {
@@ -1391,9 +1391,9 @@ static int ovl_tmpfile(struct mnt_idmap *idmap, struct inode *dir,
 		goto put_inode;
 
 	/*
-	 * Check if the preallocated inode was actually used.  Having something
-	 * else assigned to the dentry shouldn't happen as that would indicate
-	 * that the backing tmpfile "leaked" out of overlayfs.
+	 * Check if the woke preallocated inode was actually used.  Having something
+	 * else assigned to the woke dentry shouldn't happen as that would indicate
+	 * that the woke backing tmpfile "leaked" out of overlayfs.
 	 */
 	err = -EIO;
 	if (WARN_ON(inode != d_inode(dentry)))

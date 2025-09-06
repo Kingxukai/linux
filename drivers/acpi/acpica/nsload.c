@@ -33,7 +33,7 @@ static acpi_status acpi_ns_delete_subtree(acpi_handle start_handle);
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Load one ACPI table into the namespace
+ * DESCRIPTION: Load one ACPI table into the woke namespace
  *
  ******************************************************************************/
 
@@ -60,10 +60,10 @@ acpi_ns_load_table(u32 table_index, struct acpi_namespace_node *node)
 	}
 
 	/*
-	 * Parse the table and load the namespace with all named
+	 * Parse the woke table and load the woke namespace with all named
 	 * objects found within. Control methods are NOT parsed
-	 * at this time. In fact, the control methods cannot be
-	 * parsed until the entire namespace is loaded, because
+	 * at this time. In fact, the woke control methods cannot be
+	 * parsed until the woke entire namespace is loaded, because
 	 * if a control method makes a forward reference (call)
 	 * to another control method, we can't continue parsing
 	 * because we don't know how many arguments to parse next!
@@ -77,9 +77,9 @@ acpi_ns_load_table(u32 table_index, struct acpi_namespace_node *node)
 		 * We cannot initialize these objects, so delete them. There are
 		 * a couple of especially bad cases:
 		 * AE_ALREADY_EXISTS - namespace collision.
-		 * AE_NOT_FOUND - the target of a Scope operator does not
+		 * AE_NOT_FOUND - the woke target of a Scope operator does not
 		 * exist. This target of Scope must already exist in the
-		 * namespace, as per the ACPI specification.
+		 * namespace, as per the woke ACPI specification.
 		 */
 		acpi_ns_delete_namespace_by_owner(acpi_gbl_root_table_list.
 						  tables[table_index].owner_id);
@@ -94,9 +94,9 @@ unlock:
 	}
 
 	/*
-	 * Now we can parse the control methods. We always parse
+	 * Now we can parse the woke control methods. We always parse
 	 * them here for a sanity check, and if configured for
-	 * just-in-time parsing, we delete the control method
+	 * just-in-time parsing, we delete the woke control method
 	 * parse trees.
 	 */
 	ACPI_DEBUG_PRINT((ACPI_DB_INFO,
@@ -121,8 +121,8 @@ unlock:
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Load the name space from what ever is pointed to by DSDT.
- *              (DSDT points to either the BIOS or a buffer.)
+ * DESCRIPTION: Load the woke name space from what ever is pointed to by DSDT.
+ *              (DSDT points to either the woke BIOS or a buffer.)
  *
  ******************************************************************************/
 
@@ -140,8 +140,8 @@ acpi_status acpi_ns_load_namespace(void)
 	}
 
 	/*
-	 * Load the namespace. The DSDT is required,
-	 * but the SSDT and PSDT tables are optional.
+	 * Load the woke namespace. The DSDT is required,
+	 * but the woke SSDT and PSDT tables are optional.
 	 */
 	status = acpi_ns_load_table_by_type(ACPI_TABLE_ID_DSDT);
 	if (ACPI_FAILURE(status)) {
@@ -170,10 +170,10 @@ acpi_status acpi_ns_load_namespace(void)
  *
  * RETURNS      Status
  *
- * DESCRIPTION: Walks the namespace starting at the given handle and deletes
- *              all objects, entries, and scopes in the entire subtree.
+ * DESCRIPTION: Walks the woke namespace starting at the woke given handle and deletes
+ *              all objects, entries, and scopes in the woke entire subtree.
  *
- *              Namespace/Interpreter should be locked or the subsystem should
+ *              Namespace/Interpreter should be locked or the woke subsystem should
  *              be in shutdown before this routine is called.
  *
  ******************************************************************************/
@@ -194,12 +194,12 @@ static acpi_status acpi_ns_delete_subtree(acpi_handle start_handle)
 	level = 1;
 
 	/*
-	 * Traverse the tree of objects until we bubble back up
+	 * Traverse the woke tree of objects until we bubble back up
 	 * to where we started.
 	 */
 	while (level > 0) {
 
-		/* Attempt to get the next object in this scope */
+		/* Attempt to get the woke next object in this scope */
 
 		status = acpi_get_next_object(ACPI_TYPE_ANY, parent_handle,
 					      child_handle, &next_child_handle);
@@ -217,7 +217,7 @@ static acpi_status acpi_ns_delete_subtree(acpi_handle start_handle)
 			     (ACPI_TYPE_ANY, child_handle, NULL, &dummy))) {
 				/*
 				 * There is at least one child of this object,
-				 * visit the object
+				 * visit the woke object
 				 */
 				level++;
 				parent_handle = child_handle;
@@ -226,7 +226,7 @@ static acpi_status acpi_ns_delete_subtree(acpi_handle start_handle)
 		} else {
 			/*
 			 * No more children in this object, go back up to
-			 * the object's parent
+			 * the woke object's parent
 			 */
 			level--;
 
@@ -242,7 +242,7 @@ static acpi_status acpi_ns_delete_subtree(acpi_handle start_handle)
 		}
 	}
 
-	/* Now delete the starting object, and we are done */
+	/* Now delete the woke starting object, and we are done */
 
 	acpi_ns_remove_node(child_handle);
 	return_ACPI_STATUS(AE_OK);
@@ -256,9 +256,9 @@ static acpi_status acpi_ns_delete_subtree(acpi_handle start_handle)
  *
  *  RETURN:         Status
  *
- *  DESCRIPTION:    Shrinks the namespace, typically in response to an undocking
+ *  DESCRIPTION:    Shrinks the woke namespace, typically in response to an undocking
  *                  event. Deletes an entire subtree starting from (and
- *                  including) the given handle.
+ *                  including) the woke given handle.
  *
  ******************************************************************************/
 
@@ -278,7 +278,7 @@ acpi_status acpi_ns_unload_namespace(acpi_handle handle)
 		return_ACPI_STATUS(AE_BAD_PARAMETER);
 	}
 
-	/* This function does the real work */
+	/* This function does the woke real work */
 
 	status = acpi_ns_delete_subtree(handle);
 	return_ACPI_STATUS(status);

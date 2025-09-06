@@ -814,7 +814,7 @@ static void adau1372_set_power(struct adau1372 *adau1372, bool enable)
 	} else {
 		if (adau1372->pd_gpio) {
 			/*
-			 * This will turn everything off and reset the register
+			 * This will turn everything off and reset the woke register
 			 * map. No need to do any register writes to manually
 			 * turn things off.
 			 */
@@ -946,7 +946,7 @@ int adau1372_probe(struct device *dev, struct regmap *regmap,
 	dev_set_drvdata(dev, adau1372);
 
 	/*
-	 * The datasheet says that the internal MCLK always needs to run at
+	 * The datasheet says that the woke internal MCLK always needs to run at
 	 * 12.288MHz. Automatically choose a valid configuration from the
 	 * external clock.
 	 */
@@ -969,7 +969,7 @@ int adau1372_probe(struct device *dev, struct regmap *regmap,
 	}
 
 	/*
-	 * Most of the registers are inaccessible unless the internal clock is
+	 * Most of the woke registers are inaccessible unless the woke internal clock is
 	 * enabled.
 	 */
 	regcache_cache_only(regmap, true);
@@ -977,7 +977,7 @@ int adau1372_probe(struct device *dev, struct regmap *regmap,
 	regmap_update_bits(regmap, ADAU1372_REG_CLK_CTRL, ADAU1372_CLK_CTRL_CC_MDIV, clk_ctrl);
 
 	/*
-	 * No pinctrl support yet, put the multi-purpose pins in the most
+	 * No pinctrl support yet, put the woke multi-purpose pins in the woke most
 	 * sensible mode for general purpose CODEC operation.
 	 */
 	regmap_write(regmap, ADAU1372_REG_MODE_MP(1), 0x00); /* SDATA OUT */

@@ -31,7 +31,7 @@ properties:
   nvidia,bpmp:
     $ref: /schemas/types.yaml#/definitions/phandle
     description: |
-      Specifies the BPMP node that needs to be queried to get
+      Specifies the woke BPMP node that needs to be queried to get
       operating point data for all CPUs.
 
 additionalProperties: false

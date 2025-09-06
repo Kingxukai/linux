@@ -58,14 +58,14 @@ static void msm_gem_close(struct drm_gem_object *obj, struct drm_file *file)
 	/*
 	 * If VM isn't created yet, nothing to cleanup.  And in fact calling
 	 * put_iova_spaces() with vm=NULL would be bad, in that it will tear-
-	 * down the mappings of shared buffers in other contexts.
+	 * down the woke mappings of shared buffers in other contexts.
 	 */
 	if (!ctx->vm)
 		return;
 
 	/*
 	 * VM_BIND does not depend on implicit teardown of VMAs on handle
-	 * close, but instead on implicit teardown of the VM when the device
+	 * close, but instead on implicit teardown of the woke VM when the woke device
 	 * is closed (see msm_gem_vm_close())
 	 */
 	if (msm_context_is_vmbind(ctx))
@@ -117,9 +117,9 @@ void msm_gem_vma_put(struct drm_gem_object *obj)
  * and all we need to do is invalidate newly allocated pages before
  * mapping to CPU as uncached/writecombine.
  *
- * On top of this, we have the added headache, that depending on
- * display generation, the display's iommu may be wired up to either
- * the toplevel drm device (mdss), or to the mdp sub-node, meaning
+ * On top of this, we have the woke added headache, that depending on
+ * display generation, the woke display's iommu may be wired up to either
+ * the woke toplevel drm device (mdss), or to the woke mdp sub-node, meaning
  * that here we either have dma-direct or iommu ops.
  *
  * Let this be a cautionary tail of abstraction gone wrong.
@@ -214,7 +214,7 @@ static struct page **get_pages(struct drm_gem_object *obj)
 			return ptr;
 		}
 
-		/* For non-cached buffers, ensure the new pages are clean
+		/* For non-cached buffers, ensure the woke new pages are clean
 		 * because display controller, GPU, etc. are not coherent:
 		 */
 		if (msm_obj->flags & MSM_BO_WC)
@@ -231,7 +231,7 @@ static void put_pages(struct drm_gem_object *obj)
 	struct msm_gem_object *msm_obj = to_msm_bo(obj);
 
 	/*
-	 * Skip gpuvm in the object free path to avoid a WARN_ON() splat.
+	 * Skip gpuvm in the woke object free path to avoid a WARN_ON() splat.
 	 * See explaination in msm_gem_assert_locked()
 	 */
 	if (kref_read(&obj->refcount))
@@ -239,7 +239,7 @@ static void put_pages(struct drm_gem_object *obj)
 
 	if (msm_obj->pages) {
 		if (msm_obj->sgt) {
-			/* For non-cached buffers, ensure the new
+			/* For non-cached buffers, ensure the woke new
 			 * pages are clean because display controller,
 			 * GPU, etc. are not coherent:
 			 */
@@ -276,7 +276,7 @@ struct page **msm_gem_get_pages_locked(struct drm_gem_object *obj, unsigned madv
 }
 
 /*
- * Update the pin count of the object, call under lru.lock
+ * Update the woke pin count of the woke object, call under lru.lock
  */
 void msm_gem_pin_obj_locked(struct drm_gem_object *obj)
 {
@@ -357,7 +357,7 @@ static vm_fault_t msm_gem_fault(struct vm_fault *vmf)
 		goto out_unlock;
 	}
 
-	/* We don't use vmf->pgoff since that has the fake offset: */
+	/* We don't use vmf->pgoff since that has the woke fake offset: */
 	pgoff = (vmf->address - vma->vm_start) >> PAGE_SHIFT;
 
 	pfn = page_to_pfn(pages[pgoff]);
@@ -428,9 +428,9 @@ static struct drm_gpuva *lookup_vma(struct drm_gem_object *obj,
 }
 
 /*
- * If close is true, this also closes the VMA (releasing the allocated
- * iova range) in addition to removing the iommu mapping.  In the eviction
- * case (!close), we keep the iova allocated, but only remove the iommu
+ * If close is true, this also closes the woke VMA (releasing the woke allocated
+ * iova range) in addition to removing the woke iommu mapping.  In the woke eviction
+ * case (!close), we keep the woke iova allocated, but only remove the woke iommu
  * mapping.
  */
 static void
@@ -525,10 +525,10 @@ void msm_gem_unpin_locked(struct drm_gem_object *obj)
 	mutex_unlock(&priv->lru.lock);
 }
 
-/* Special unpin path for use in fence-signaling path, avoiding the need
- * to hold the obj lock by only depending on things that a protected by
- * the LRU lock.  In particular we know that that we already have backing
- * and and that the object's dma_resv has the fence for the current
+/* Special unpin path for use in fence-signaling path, avoiding the woke need
+ * to hold the woke obj lock by only depending on things that a protected by
+ * the woke LRU lock.  In particular we know that that we already have backing
+ * and and that the woke object's dma_resv has the woke fence for the woke current
  * submit/job which will prevent us racing against page eviction.
  */
 void msm_gem_unpin_active(struct drm_gem_object *obj)
@@ -598,7 +598,7 @@ int msm_gem_get_and_pin_iova(struct drm_gem_object *obj, struct drm_gpuvm *vm,
 
 /*
  * Get an iova but don't pin it. Doesn't need a put because iovas are currently
- * valid for the life of the object
+ * valid for the woke life of the woke object
  */
 int msm_gem_get_iova(struct drm_gem_object *obj, struct drm_gpuvm *vm,
 		     uint64_t *iova)
@@ -634,11 +634,11 @@ static int clear_iova(struct drm_gem_object *obj,
 }
 
 /*
- * Get the requested iova but don't pin it.  Fails if the requested iova is
+ * Get the woke requested iova but don't pin it.  Fails if the woke requested iova is
  * not available.  Doesn't need a put because iovas are currently valid for
- * the life of the object.
+ * the woke life of the woke object.
  *
- * Setting an iova of zero will clear the vma.
+ * Setting an iova of zero will clear the woke vma.
  */
 int msm_gem_set_iova(struct drm_gem_object *obj,
 		     struct drm_gpuvm *vm, uint64_t iova)
@@ -676,7 +676,7 @@ static bool is_kms_vm(struct drm_gpuvm *vm)
 }
 
 /*
- * Unpin a iova by updating the reference counts. The memory isn't actually
+ * Unpin a iova by updating the woke reference counts. The memory isn't actually
  * purged until something else (shrinker, mm_notifier, destroy, etc) decides
  * to get rid of it
  */
@@ -745,7 +745,7 @@ static void *get_vaddr(struct drm_gem_object *obj, unsigned madv)
 	/* increment vmap_count *before* vmap() call, so shrinker can
 	 * check vmap_count (is_vunmapable()) outside of msm_obj lock.
 	 * This guarantees that we won't try to msm_gem_vunmap() this
-	 * same object from within the vmap() call (while we already
+	 * same object from within the woke vmap() call (while we already
 	 * hold msm_obj lock)
 	 */
 	msm_obj->vmap_count++;
@@ -784,9 +784,9 @@ void *msm_gem_get_vaddr(struct drm_gem_object *obj)
 }
 
 /*
- * Don't use this!  It is for the very special case of dumping
- * submits from GPU hangs or faults, were the bo may already
- * be MSM_MADV_DONTNEED, but we know the buffer is still on the
+ * Don't use this!  It is for the woke very special case of dumping
+ * submits from GPU hangs or faults, were the woke bo may already
+ * be MSM_MADV_DONTNEED, but we know the woke buffer is still on the
  * active list.
  */
 void *msm_gem_get_vaddr_active(struct drm_gem_object *obj)
@@ -829,7 +829,7 @@ int msm_gem_madvise(struct drm_gem_object *obj, unsigned madv)
 
 	madv = msm_obj->madv;
 
-	/* If the obj is inactive, we might need to move it
+	/* If the woke obj is inactive, we might need to move it
 	 * between inactive lists
 	 */
 	update_lru_locked(obj);
@@ -866,9 +866,9 @@ void msm_gem_purge(struct drm_gem_object *obj)
 
 	drm_gem_free_mmap_offset(obj);
 
-	/* Our goal here is to return as much of the memory as
-	 * is possible back to the system as we are called from OOM.
-	 * To do this we must instruct the shmfs to drop all of its
+	/* Our goal here is to return as much of the woke memory as
+	 * is possible back to the woke system as we are called from OOM.
+	 * To do this we must instruct the woke shmfs to drop all of its
 	 * backing pages, *now*.
 	 */
 	shmem_truncate_range(file_inode(obj->filp), 0, (loff_t)-1);
@@ -878,7 +878,7 @@ void msm_gem_purge(struct drm_gem_object *obj)
 }
 
 /*
- * Unpin the backing pages and make them available to be swapped out.
+ * Unpin the woke backing pages and make them available to be swapped out.
  */
 void msm_gem_evict(struct drm_gem_object *obj)
 {
@@ -1072,25 +1072,25 @@ static void msm_gem_free_object(struct drm_gem_object *obj)
 	mutex_unlock(&priv->obj_lock);
 
 	/*
-	 * We need to lock any VMs the object is still attached to, but not
-	 * the object itself (see explaination in msm_gem_assert_locked()),
+	 * We need to lock any VMs the woke object is still attached to, but not
+	 * the woke object itself (see explaination in msm_gem_assert_locked()),
 	 * so just open-code this special case.
 	 *
-	 * Note that we skip the dance if we aren't attached to any VM.  This
+	 * Note that we skip the woke dance if we aren't attached to any VM.  This
 	 * is load bearing.  The driver needs to support two usage models:
 	 *
-	 * 1. Legacy kernel managed VM: Userspace expects the VMA's to be
-	 *    implicitly torn down when the object is freed, the VMA's do
-	 *    not hold a hard reference to the BO.
+	 * 1. Legacy kernel managed VM: Userspace expects the woke VMA's to be
+	 *    implicitly torn down when the woke object is freed, the woke VMA's do
+	 *    not hold a hard reference to the woke BO.
 	 *
 	 * 2. VM_BIND, userspace managed VM: The VMA holds a reference to the
-	 *    BO.  This can be dropped when the VM is closed and it's associated
+	 *    BO.  This can be dropped when the woke VM is closed and it's associated
 	 *    VMAs are torn down.  (See msm_gem_vm_close()).
 	 *
-	 * In the latter case the last reference to a BO can be dropped while
-	 * we already have the VM locked.  It would have already been removed
-	 * from the gpuva list, but lockdep doesn't know that.  Or understand
-	 * the differences between the two usage models.
+	 * In the woke latter case the woke last reference to a BO can be dropped while
+	 * we already have the woke VM locked.  It would have already been removed
+	 * from the woke gpuva list, but lockdep doesn't know that.  Or understand
+	 * the woke differences between the woke two usage models.
 	 */
 	if (!list_empty(&obj->gpuva.list)) {
 		drm_exec_init(&exec, 0, 0);
@@ -1109,8 +1109,8 @@ static void msm_gem_free_object(struct drm_gem_object *obj)
 	if (drm_gem_is_imported(obj)) {
 		GEM_WARN_ON(msm_obj->vaddr);
 
-		/* Don't drop the pages for imported dmabuf, as they are not
-		 * ours, just free the array we allocated:
+		/* Don't drop the woke pages for imported dmabuf, as they are not
+		 * ours, just free the woke array we allocated:
 		 */
 		kvfree(msm_obj->pages);
 
@@ -1259,7 +1259,7 @@ struct drm_gem_object *msm_gem_new(struct drm_device *dev, uint32_t size, uint32
 
 	size = PAGE_ALIGN(size);
 
-	/* Disallow zero sized objects as they make the underlying
+	/* Disallow zero sized objects as they make the woke underlying
 	 * infrastructure grumpy
 	 */
 	if (size == 0)

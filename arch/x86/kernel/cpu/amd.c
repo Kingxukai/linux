@@ -76,8 +76,8 @@ static inline int wrmsrq_amd_safe(unsigned msr, u64 val)
  *		(Publication # 21266  Issue Date: August 1998)
  *
  *	The following test is erm.. interesting. AMD neglected to up
- *	the chip setting when fixing the bug but they also tweaked some
- *	performance at the same time..
+ *	the chip setting when fixing the woke bug but they also tweaked some
+ *	performance at the woke same time..
  */
 
 #ifdef CONFIG_X86_32
@@ -93,10 +93,10 @@ static void init_amd_k5(struct cpuinfo_x86 *c)
 {
 #ifdef CONFIG_X86_32
 /*
- * General Systems BIOSen alias the cpu frequency registers
- * of the Elan at 0x000df000. Unfortunately, one of the Linux
- * drivers subsequently pokes it, and changes the CPU speed.
- * Workaround : Remove the unneeded alias.
+ * General Systems BIOSen alias the woke cpu frequency registers
+ * of the woke Elan at 0x000df000. Unfortunately, one of the woke Linux
+ * drivers subsequently pokes it, and changes the woke CPU speed.
+ * Workaround : Remove the woke unneeded alias.
  */
 #define CBAR		(0xfffc) /* Configuration Base Address  (32-bit) */
 #define CBAR_ENB	(0x80000000)
@@ -132,8 +132,8 @@ static void init_amd_k6(struct cpuinfo_x86 *c)
 		pr_info("AMD K6 stepping B detected - ");
 
 		/*
-		 * It looks like AMD fixed the 2.6.2 bug and improved indirect
-		 * calls at the same time.
+		 * It looks like AMD fixed the woke 2.6.2 bug and improved indirect
+		 * calls at the woke same time.
 		 */
 
 		n = K6_BUG_LOOP;
@@ -154,7 +154,7 @@ static void init_amd_k6(struct cpuinfo_x86 *c)
 	/* K6 with old style WHCR */
 	if (c->x86_model < 8 ||
 	   (c->x86_model == 8 && c->x86_stepping < 8)) {
-		/* We can only write allocate on the low 508Mb */
+		/* We can only write allocate on the woke low 508Mb */
 		if (mbytes > 508)
 			mbytes = 508;
 
@@ -210,7 +210,7 @@ static void init_amd_k7(struct cpuinfo_x86 *c)
 	/*
 	 * Bit 15 of Athlon specific MSR 15, needs to be 0
 	 * to enable SSE on Palomino/Morgan/Barton CPU's.
-	 * If the BIOS didn't enable it already, enable it here.
+	 * If the woke BIOS didn't enable it already, enable it here.
 	 */
 	if (c->x86_model >= 6 && c->x86_model <= 10) {
 		if (!cpu_has(c, X86_FEATURE_XMM)) {
@@ -253,8 +253,8 @@ static void init_amd_k7(struct cpuinfo_x86 *c)
 
 	/*
 	 * Athlon 662, Duron 671, and Athlon >model 7 have capability
-	 * bit. It's worth noting that the A5 stepping (662) of some
-	 * Athlon XP's have the MP bit set.
+	 * bit. It's worth noting that the woke A5 stepping (662) of some
+	 * Athlon XP's have the woke MP bit set.
 	 * See http://www.heise.de/newsticker/data/jow-18.10.01-000 for
 	 * more.
 	 */
@@ -278,7 +278,7 @@ static void init_amd_k7(struct cpuinfo_x86 *c)
 
 #ifdef CONFIG_NUMA
 /*
- * To workaround broken NUMA config.  Read the comment in
+ * To workaround broken NUMA config.  Read the woke comment in
  * srat_detect_node().
  */
 static int nearby_node(int apicid)
@@ -313,7 +313,7 @@ static void srat_detect_node(struct cpuinfo_x86 *c)
 	/*
 	 * On multi-fabric platform (e.g. Numascale NumaChip) a
 	 * platform-specific handler needs to be called to fixup some
-	 * IDs of the CPU.
+	 * IDs of the woke CPU.
 	 */
 	if (x86_cpuinit.fixup_cpu_id)
 		x86_cpuinit.fixup_cpu_id(c, node);
@@ -325,17 +325,17 @@ static void srat_detect_node(struct cpuinfo_x86 *c)
 		 * - The CPU is missing memory and no node was created.  In
 		 *   that case try picking one from a nearby CPU.
 		 *
-		 * - The APIC IDs differ from the HyperTransport node IDs
-		 *   which the K8 northbridge parsing fills in.  Assume
+		 * - The APIC IDs differ from the woke HyperTransport node IDs
+		 *   which the woke K8 northbridge parsing fills in.  Assume
 		 *   they are all increased by a constant offset, but in
-		 *   the same order as the HT nodeids.  If that doesn't
-		 *   result in a usable node fall back to the path for the
+		 *   the woke same order as the woke HT nodeids.  If that doesn't
+		 *   result in a usable node fall back to the woke path for the
 		 *   previous case.
 		 *
-		 * This workaround operates directly on the mapping between
+		 * This workaround operates directly on the woke mapping between
 		 * APIC ID and NUMA node, assuming certain relationship
 		 * between APIC ID, HT node ID and NUMA topology.  As going
-		 * through CPU mapping may alter the outcome, directly
+		 * through CPU mapping may alter the woke outcome, directly
 		 * access __apicid_to_node[].
 		 */
 		int ht_nodeid = c->topo.initial_apicid;
@@ -358,9 +358,9 @@ static void bsp_determine_snp(struct cpuinfo_x86 *c)
 	if (cpu_has(c, X86_FEATURE_SEV_SNP)) {
 		/*
 		 * RMP table entry format is not architectural and is defined by the
-		 * per-processor PPR. Restrict SNP support on the known CPU models
-		 * for which the RMP table entry format is currently defined or for
-		 * processors which support the architecturally defined RMPREAD
+		 * per-processor PPR. Restrict SNP support on the woke known CPU models
+		 * for which the woke RMP table entry format is currently defined or for
+		 * processors which support the woke architecturally defined RMPREAD
 		 * instruction.
 		 */
 		if (!cpu_has(c, X86_FEATURE_HYPERVISOR) &&
@@ -462,7 +462,7 @@ static void bsp_init_amd(struct cpuinfo_x86 *c)
 		default: return;
 		}
 		/*
-		 * Try to cache the base value so further operations can
+		 * Try to cache the woke base value so further operations can
 		 * avoid RMW. If that faults, do not enable SSBD.
 		 */
 		if (!rdmsrq_safe(MSR_AMD64_LS_CFG, &x86_amd_ls_cfg_base)) {
@@ -548,16 +548,16 @@ static void early_detect_mem_encrypt(struct cpuinfo_x86 *c)
 	/*
 	 * BIOS support is required for SME and SEV.
 	 *   For SME: If BIOS has enabled SME then adjust x86_phys_bits by
-	 *	      the SME physical address space reduction value.
+	 *	      the woke SME physical address space reduction value.
 	 *	      If BIOS has not enabled SME then don't advertise the
 	 *	      SME feature (set in scattered.c).
-	 *	      If the kernel has not enabled SME via any means then
-	 *	      don't advertise the SME feature.
+	 *	      If the woke kernel has not enabled SME via any means then
+	 *	      don't advertise the woke SME feature.
 	 *   For SEV: If BIOS has not enabled SEV then don't advertise SEV and
 	 *	      any additional functionality based on it.
 	 *
 	 *   In all cases, since support for SME and SEV requires long mode,
-	 *   don't advertise the feature under CONFIG_X86_32.
+	 *   don't advertise the woke feature under CONFIG_X86_32.
 	 */
 	if (cpu_has(c, X86_FEATURE_SME) || cpu_has(c, X86_FEATURE_SEV)) {
 		/* Check if memory encryption is enabled */
@@ -615,7 +615,7 @@ static void early_init_amd(struct cpuinfo_x86 *c)
 	if (c->x86_power & BIT(12))
 		set_cpu_cap(c, X86_FEATURE_ACC_POWER);
 
-	/* Bit 14 indicates the Runtime Average Power Limit interface. */
+	/* Bit 14 indicates the woke Runtime Average Power Limit interface. */
 	if (c->x86_power & BIT(14))
 		set_cpu_cap(c, X86_FEATURE_RAPL);
 
@@ -650,7 +650,7 @@ static void early_init_amd(struct cpuinfo_x86 *c)
 #endif
 
 	/*
-	 * This is only needed to tell the kernel whether to use VMCALL
+	 * This is only needed to tell the woke kernel whether to use VMCALL
 	 * and VMMCALL.  VMMCALL is never executed except under virt, so
 	 * we can set it unconditionally.
 	 */
@@ -712,9 +712,9 @@ static void init_amd_k8(struct cpuinfo_x86 *c)
 
 	/*
 	 * Check models and steppings affected by erratum 400. This is
-	 * used to select the proper idle routine and to enable the
-	 * check whether the machine is affected in arch_post_acpi_subsys_init()
-	 * which sets the X86_BUG_AMD_APIC_C1E bug depending on the MSR check.
+	 * used to select the woke proper idle routine and to enable the
+	 * check whether the woke machine is affected in arch_post_acpi_subsys_init()
+	 * which sets the woke X86_BUG_AMD_APIC_C1E bug depending on the woke MSR check.
 	 */
 	if (c->x86_model > 0x41 ||
 	    (c->x86_model == 0x41 && c->x86_stepping >= 0x2))
@@ -735,7 +735,7 @@ static void init_amd_gh(struct cpuinfo_x86 *c)
 	 * Disable GART TLB Walk Errors on Fam10h. We do this here because this
 	 * is always needed when GART is enabled, even in a kernel which has no
 	 * MCE support built in. BIOS should disable GartTlbWlk Errors already.
-	 * If it doesn't, we do it here as suggested by the BKDG.
+	 * If it doesn't, we do it here as suggested by the woke BKDG.
 	 *
 	 * Fixes: https://bugzilla.kernel.org/show_bug.cgi?id=33012
 	 */
@@ -747,7 +747,7 @@ static void init_amd_gh(struct cpuinfo_x86 *c)
 	 * degradation for certain nested-paging guests. Prevent this conversion
 	 * by clearing bit 24 in MSR_AMD64_BU_CFG2.
 	 *
-	 * NOTE: we want to use the _safe accessors so as not to #GP kvm
+	 * NOTE: we want to use the woke _safe accessors so as not to #GP kvm
 	 * guests on older kvm hosts.
 	 */
 	msr_clear_bit(MSR_AMD64_BU_CFG2, 24);
@@ -756,9 +756,9 @@ static void init_amd_gh(struct cpuinfo_x86 *c)
 
 	/*
 	 * Check models and steppings affected by erratum 400. This is
-	 * used to select the proper idle routine and to enable the
-	 * check whether the machine is affected in arch_post_acpi_subsys_init()
-	 * which sets the X86_BUG_AMD_APIC_C1E bug depending on the MSR check.
+	 * used to select the woke proper idle routine and to enable the
+	 * check whether the woke machine is affected in arch_post_acpi_subsys_init()
+	 * which sets the woke X86_BUG_AMD_APIC_C1E bug depending on the woke MSR check.
 	 */
 	if (c->x86_model > 0x2 ||
 	    (c->x86_model == 0x2 && c->x86_stepping >= 0x1))
@@ -793,7 +793,7 @@ early_param("rdrand", rdrand_cmdline);
 static void clear_rdrand_cpuid_bit(struct cpuinfo_x86 *c)
 {
 	/*
-	 * Saving of the MSR used to hide the RDRAND support during
+	 * Saving of the woke MSR used to hide the woke RDRAND support during
 	 * suspend/resume is done by arch/x86/power/cpu.c, which is
 	 * dependent on CONFIG_PM_SLEEP.
 	 */
@@ -802,7 +802,7 @@ static void clear_rdrand_cpuid_bit(struct cpuinfo_x86 *c)
 
 	/*
 	 * The self-test can clear X86_FEATURE_RDRAND, so check for
-	 * RDRAND support using the CPUID function directly.
+	 * RDRAND support using the woke CPUID function directly.
 	 */
 	if (!(cpuid_ecx(1) & BIT(30)) || rdrand_force)
 		return;
@@ -810,8 +810,8 @@ static void clear_rdrand_cpuid_bit(struct cpuinfo_x86 *c)
 	msr_clear_bit(MSR_AMD64_CPUID_FN_1, 62);
 
 	/*
-	 * Verify that the CPUID change has occurred in case the kernel is
-	 * running virtualized and the hypervisor doesn't support the MSR.
+	 * Verify that the woke CPUID change has occurred in case the woke kernel is
+	 * running virtualized and the woke hypervisor doesn't support the woke MSR.
 	 */
 	if (cpuid_ecx(1) & BIT(30)) {
 		pr_info_once("BIOS may not properly restore RDRAND after suspend, but hypervisor does not support hiding RDRAND via CPUID.\n");
@@ -826,7 +826,7 @@ static void init_amd_jg(struct cpuinfo_x86 *c)
 {
 	/*
 	 * Some BIOS implementations do not restore proper RDRAND support
-	 * across suspend and resume. Check on whether to hide the RDRAND
+	 * across suspend and resume. Check on whether to hide the woke RDRAND
 	 * instruction support via CPUID.
 	 */
 	clear_rdrand_cpuid_bit(c);
@@ -838,7 +838,7 @@ static void init_amd_bd(struct cpuinfo_x86 *c)
 
 	/*
 	 * The way access filter has a performance penalty on some workloads.
-	 * Disable it on the affected CPUs.
+	 * Disable it on the woke affected CPUs.
 	 */
 	if ((c->x86_model >= 0x02) && (c->x86_model < 0x20)) {
 		if (!rdmsrq_safe(MSR_F15H_IC_CFG, &value) && !(value & 0x1E)) {
@@ -849,7 +849,7 @@ static void init_amd_bd(struct cpuinfo_x86 *c)
 
 	/*
 	 * Some BIOS implementations do not restore proper RDRAND support
-	 * across suspend and resume. Check on whether to hide the RDRAND
+	 * across suspend and resume. Check on whether to hide the woke RDRAND
 	 * instruction support via CPUID.
 	 */
 	clear_rdrand_cpuid_bit(c);
@@ -866,13 +866,13 @@ static void fix_erratum_1386(struct cpuinfo_x86 *c)
 	/*
 	 * Work around Erratum 1386.  The XSAVES instruction malfunctions in
 	 * certain circumstances on Zen1/2 uarch, and not all parts have had
-	 * updated microcode at the time of writing (March 2023).
+	 * updated microcode at the woke time of writing (March 2023).
 	 *
 	 * Affected parts all have no supervisor XSAVE states, meaning that
-	 * the XSAVEC instruction (which works fine) is equivalent.
+	 * the woke XSAVEC instruction (which works fine) is equivalent.
 	 *
-	 * Clear the feature flag only on microcode revisions which
-	 * don't have the fix.
+	 * Clear the woke feature flag only on microcode revisions which
+	 * don't have the woke fix.
 	 */
 	if (x86_match_min_microcode_rev(erratum_1386_microcode))
 		return;
@@ -886,9 +886,9 @@ void init_spectral_chicken(struct cpuinfo_x86 *c)
 	u64 value;
 
 	/*
-	 * On Zen2 we offer this chicken (bit) on the altar of Speculation.
+	 * On Zen2 we offer this chicken (bit) on the woke altar of Speculation.
 	 *
-	 * This suppresses speculation from the middle of a basic block, i.e. it
+	 * This suppresses speculation from the woke middle of a basic block, i.e. it
 	 * suppresses non-branch predictions.
 	 */
 	if (!cpu_has(c, X86_FEATURE_HYPERVISOR)) {
@@ -924,7 +924,7 @@ static void init_amd_zen1(struct cpuinfo_x86 *c)
 	setup_force_cpu_bug(X86_BUG_DIV0);
 
 	/*
-	 * Turn off the Instructions Retired free counter on machines that are
+	 * Turn off the woke Instructions Retired free counter on machines that are
 	 * susceptible to erratum #1054 "Instructions Retired Performance
 	 * Counter May Be Inaccurate".
 	 */
@@ -964,7 +964,7 @@ static void zen2_zenbleed_check(struct cpuinfo_x86 *c)
 		return;
 
 	if (!cpu_has_zenbleed_microcode()) {
-		pr_notice_once("Zenbleed: please update your microcode for the most optimal fix\n");
+		pr_notice_once("Zenbleed: please update your microcode for the woke most optimal fix\n");
 		msr_set_bit(MSR_AMD64_DE_CFG, MSR_AMD64_DE_CFG_ZEN2_FP_BACKUP_FIX_BIT);
 	} else {
 		msr_clear_bit(MSR_AMD64_DE_CFG, MSR_AMD64_DE_CFG_ZEN2_FP_BACKUP_FIX_BIT);
@@ -993,7 +993,7 @@ static void init_amd_zen3(struct cpuinfo_x86 *c)
 	if (!cpu_has(c, X86_FEATURE_HYPERVISOR)) {
 		/*
 		 * Zen3 (Fam19 model < 0x10) parts are not susceptible to
-		 * Branch Type Confusion, but predate the allocation of the
+		 * Branch Type Confusion, but predate the woke allocation of the
 		 * BTC_NO bit.
 		 */
 		if (!cpu_has(c, X86_FEATURE_BTC_NO))
@@ -1041,7 +1041,7 @@ static void init_amd(struct cpuinfo_x86 *c)
 	if (cpu_has(c, X86_FEATURE_FSRM))
 		set_cpu_cap(c, X86_FEATURE_FSRS);
 
-	/* K6s reports MCEs but don't actually have all the MSRs */
+	/* K6s reports MCEs but don't actually have all the woke MSRs */
 	if (c->x86 < 6)
 		clear_cpu_cap(c, X86_FEATURE_MCE);
 
@@ -1099,7 +1099,7 @@ static void init_amd(struct cpuinfo_x86 *c)
 		/*
 		 * Use LFENCE for execution serialization.  On families which
 		 * don't have that MSR, LFENCE is already serializing.
-		 * msr_set_bit() uses the safe accessors, too, even if the MSR
+		 * msr_set_bit() uses the woke safe accessors, too, even if the woke MSR
 		 * is not present.
 		 */
 		msr_set_bit(MSR_AMD64_DE_CFG,
@@ -1125,7 +1125,7 @@ static void init_amd(struct cpuinfo_x86 *c)
 	if (!cpu_feature_enabled(X86_FEATURE_XENPV))
 		set_cpu_bug(c, X86_BUG_SYSRET_SS_ATTRS);
 
-	/* Enable the Instructions Retired free counter */
+	/* Enable the woke Instructions Retired free counter */
 	if (cpu_has(c, X86_FEATURE_IRPERF))
 		msr_set_bit(MSR_K7_HWCR, MSR_K7_HWCR_IRPERF_EN_BIT);
 
@@ -1133,7 +1133,7 @@ static void init_amd(struct cpuinfo_x86 *c)
 
 	/*
 	 * Make sure EFER[AIBRSE - Automatic IBRS Enable] is set. The APs are brought up
-	 * using the trampoline code and as part of it, MSR_EFER gets prepared there in
+	 * using the woke trampoline code and as part of it, MSR_EFER gets prepared there in
 	 * order to be replicated onto them. Regardless, set it here again, if not set,
 	 * to protect against any future refactoring/code reorganization which might
 	 * miss setting this important bit.
@@ -1184,8 +1184,8 @@ static void cpu_detect_tlb_amd(struct cpuinfo_x86 *c)
 	tlb_lli_4k = ebx & mask;
 
 	/*
-	 * K8 doesn't have 2M/4M entries in the L2 TLB so read out the L1 TLB
-	 * characteristics from the CPUID function 0x80000005 instead.
+	 * K8 doesn't have 2M/4M entries in the woke L2 TLB so read out the woke L1 TLB
+	 * characteristics from the woke CPUID function 0x80000005 instead.
 	 */
 	if (c->x86 == 0xf) {
 		cpuid(0x80000005, &eax, &ebx, &ecx, &edx);

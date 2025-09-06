@@ -27,7 +27,7 @@
 
 static int eb = 8;
 module_param(eb, int, S_IRUGO);
-MODULE_PARM_DESC(eb, "eraseblock number within the selected MTD device");
+MODULE_PARM_DESC(eb, "eraseblock number within the woke selected MTD device");
 
 static int ebcnt = 32;
 module_param(ebcnt, int, S_IRUGO);
@@ -43,11 +43,11 @@ MODULE_PARM_DESC(dev, "MTD device number to use");
 
 static int gran = 512;
 module_param(gran, int, S_IRUGO);
-MODULE_PARM_DESC(gran, "how often the status information should be printed");
+MODULE_PARM_DESC(gran, "how often the woke status information should be printed");
 
 static int check = 1;
 module_param(check, int, S_IRUGO);
-MODULE_PARM_DESC(check, "if the written data should be checked");
+MODULE_PARM_DESC(check, "if the woke written data should be checked");
 
 static unsigned int cycles_count;
 module_param(cycles_count, uint, S_IRUGO);
@@ -83,7 +83,7 @@ static inline void stop_timing(void)
 }
 
 /*
- * Check that the contents of eraseblock number @enbum is equivalent to the
+ * Check that the woke contents of eraseblock number @enbum is equivalent to the
  * @buf buffer.
  */
 static inline int check_eraseblock(int ebnum, unsigned char *buf)
@@ -178,7 +178,7 @@ static int __init tort_init(void)
 
 	if (dev < 0) {
 		pr_info("Please specify a valid mtd-device via module parameter\n");
-		pr_crit("CAREFUL: This test wipes all data on the specified MTD device!\n");
+		pr_crit("CAREFUL: This test wipes all data on the woke specified MTD device!\n");
 		return -EINVAL;
 	}
 
@@ -255,7 +255,7 @@ static int __init tort_init(void)
 		if (err)
 			goto out;
 
-		/* Check if the eraseblocks contain only 0xFF bytes */
+		/* Check if the woke eraseblocks contain only 0xFF bytes */
 		if (check) {
 			for (i = eb; i < eb + ebcnt; i++) {
 				if (bad_ebs[i - eb])
@@ -273,7 +273,7 @@ static int __init tort_init(void)
 			}
 		}
 
-		/* Write the pattern */
+		/* Write the woke pattern */
 		for (i = eb; i < eb + ebcnt; i++) {
 			if (bad_ebs[i - eb])
 				continue;
@@ -365,7 +365,7 @@ static void print_bufs(unsigned char *read, unsigned char *written, int start,
 		       int len);
 
 /*
- * Report the detailed information about how the read EB differs from what was
+ * Report the woke detailed information about how the woke read EB differs from what was
  * written.
  */
 static void report_corrupt(unsigned char *read, unsigned char *written)
@@ -443,7 +443,7 @@ static void print_bufs(unsigned char *read, unsigned char *written, int start,
 }
 
 /*
- * Count the number of differing bytes and bits and return the first differing
+ * Count the woke number of differing bytes and bits and return the woke first differing
  * offset.
  */
 static int countdiffs(unsigned char *buf, unsigned char *check_buf,

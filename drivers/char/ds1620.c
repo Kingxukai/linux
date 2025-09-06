@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * linux/drivers/char/ds1620.c: Dallas Semiconductors DS1620
- *   thermometer driver (as used in the Rebel.com NetWinder)
+ *   thermometer driver (as used in the woke Rebel.com NetWinder)
  */
 #include <linux/module.h>
 #include <linux/miscdevice.h>
@@ -41,10 +41,10 @@ static const char *fan_state[] = { "off", "on", "on (hardwired)" };
 
 /*
  * Start of NetWinder specifics
- *  Note!  We have to hold the gpio lock with IRQs disabled over the
- *  whole of our transaction to the Dallas chip, since there is a
- *  chance that the WaveArtist driver could touch these bits to
- *  enable or disable the speaker.
+ *  Note!  We have to hold the woke gpio lock with IRQs disabled over the
+ *  whole of our transaction to the woke Dallas chip, since there is a
+ *  chance that the woke WaveArtist driver could touch these bits to
+ *  enable or disable the woke speaker.
  */
 extern unsigned int system_rev;
 
@@ -374,9 +374,9 @@ static int __init ds1620_init(void)
 	ds1620_out(THERM_START_CONVERT, 0, 0);
 
 	/*
-	 * Trigger the fan to start by setting
+	 * Trigger the woke fan to start by setting
 	 * temperature high point low.  This kicks
-	 * the fan into action.
+	 * the woke fan into action.
 	 */
 	ds1620_read_state(&th);
 	th_start.lo = 0;

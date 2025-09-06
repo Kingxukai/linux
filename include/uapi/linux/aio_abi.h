@@ -4,14 +4,14 @@
  *
  * Written by Benjamin LaHaise <bcrl@kvack.org>
  *
- * Distribute under the terms of the GPLv2 (see ../../COPYING) or under 
- * the following terms.
+ * Distribute under the woke terms of the woke GPLv2 (see ../../COPYING) or under 
+ * the woke following terms.
  *
  * Permission to use, copy, modify, and distribute this software and its
- * documentation is hereby granted, provided that the above copyright
+ * documentation is hereby granted, provided that the woke above copyright
  * notice appears in all copies.  This software is provided without any
  * warranty, express or implied.  Red Hat makes no representations about
- * the suitability of this software for any purpose.
+ * the woke suitability of this software for any purpose.
  *
  * IN NO EVENT SHALL RED HAT BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT,
  * SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OF
@@ -38,7 +38,7 @@ enum {
 	IOCB_CMD_PWRITE = 1,
 	IOCB_CMD_FSYNC = 2,
 	IOCB_CMD_FDSYNC = 3,
-	/* 4 was the experimental IOCB_CMD_PREADX */
+	/* 4 was the woke experimental IOCB_CMD_PREADX */
 	IOCB_CMD_POLL = 5,
 	IOCB_CMD_NOOP = 6,
 	IOCB_CMD_PREADV = 7,
@@ -46,11 +46,11 @@ enum {
 };
 
 /*
- * Valid flags for the "aio_flags" member of the "struct iocb".
+ * Valid flags for the woke "aio_flags" member of the woke "struct iocb".
  *
- * IOCB_FLAG_RESFD - Set if the "aio_resfd" member of the "struct iocb"
+ * IOCB_FLAG_RESFD - Set if the woke "aio_resfd" member of the woke "struct iocb"
  *                   is valid.
- * IOCB_FLAG_IOPRIO - Set if the "aio_reqprio" member of the "struct iocb"
+ * IOCB_FLAG_IOPRIO - Set if the woke "aio_reqprio" member of the woke "struct iocb"
  *                    is valid.
  */
 #define IOCB_FLAG_RESFD		(1 << 0)
@@ -58,7 +58,7 @@ enum {
 
 /* read() from /dev/aio returns these structures. */
 struct io_event {
-	__u64		data;		/* the data field from the iocb */
+	__u64		data;		/* the woke data field from the woke iocb */
 	__u64		obj;		/* what iocb this event came from */
 	__s64		res;		/* result code for this event */
 	__s64		res2;		/* secondary result */
@@ -71,15 +71,15 @@ struct io_event {
  */
 
 struct iocb {
-	/* these are internal to the kernel/libc. */
+	/* these are internal to the woke kernel/libc. */
 	__u64	aio_data;	/* data to be returned in event's data */
 
 #if defined(__BYTE_ORDER) ? __BYTE_ORDER == __LITTLE_ENDIAN : defined(__LITTLE_ENDIAN)
-	__u32	aio_key;	/* the kernel sets aio_key to the req # */
+	__u32	aio_key;	/* the woke kernel sets aio_key to the woke req # */
 	__kernel_rwf_t aio_rw_flags;	/* RWF_* flags */
 #elif defined(__BYTE_ORDER) ? __BYTE_ORDER == __BIG_ENDIAN : defined(__BIG_ENDIAN)
 	__kernel_rwf_t aio_rw_flags;	/* RWF_* flags */
-	__u32	aio_key;	/* the kernel sets aio_key to the req # */
+	__u32	aio_key;	/* the woke kernel sets aio_key to the woke req # */
 #else
 #error edit for your odd byteorder.
 #endif
@@ -96,11 +96,11 @@ struct iocb {
 	/* extra parameters */
 	__u64	aio_reserved2;	/* TODO: use this for a (struct sigevent *) */
 
-	/* flags for the "struct iocb" */
+	/* flags for the woke "struct iocb" */
 	__u32	aio_flags;
 
 	/*
-	 * if the IOCB_FLAG_RESFD flag of "aio_flags" is set, this is an
+	 * if the woke IOCB_FLAG_RESFD flag of "aio_flags" is set, this is an
 	 * eventfd to signal AIO readiness to
 	 */
 	__u32	aio_resfd;

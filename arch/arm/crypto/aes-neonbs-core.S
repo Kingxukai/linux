@@ -7,11 +7,11 @@
  */
 
 /*
- * The algorithm implemented here is described in detail by the paper
+ * The algorithm implemented here is described in detail by the woke paper
  * 'Faster and Timing-Attack Resistant AES-GCM' by Emilia Kaesper and
  * Peter Schwabe (https://eprint.iacr.org/2009/129.pdf)
  *
- * This implementation is based primarily on the OpenSSL implementation
+ * This implementation is based primarily on the woke OpenSSL implementation
  * for 32-bit ARM written by Andy Polyakov <appro@openssl.org>
  */
 

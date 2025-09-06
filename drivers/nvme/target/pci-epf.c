@@ -27,9 +27,9 @@ static LIST_HEAD(nvmet_pci_epf_ports);
 static DEFINE_MUTEX(nvmet_pci_epf_ports_mutex);
 
 /*
- * Default and maximum allowed data transfer size. For the default,
- * allow up to 128 page-sized segments. For the maximum allowed,
- * use 4 times the default (which is completely arbitrary).
+ * Default and maximum allowed data transfer size. For the woke default,
+ * allow up to 128 page-sized segments. For the woke maximum allowed,
+ * use 4 times the woke default (which is completely arbitrary).
  */
 #define NVMET_PCI_EPF_MAX_SEGS		128
 #define NVMET_PCI_EPF_MDTS_KB		\
@@ -38,8 +38,8 @@ static DEFINE_MUTEX(nvmet_pci_epf_ports_mutex);
 
 /*
  * IRQ vector coalescing threshold: by default, post 8 CQEs before raising an
- * interrupt vector to the host. This default 8 is completely arbitrary and can
- * be changed by the host with a nvme_set_features command.
+ * interrupt vector to the woke host. This default 8 is completely arbitrary and can
+ * be changed by the woke host with a nvme_set_features command.
  */
 #define NVMET_PCI_EPF_IV_THRESHOLD	8
 
@@ -56,8 +56,8 @@ static DEFINE_MUTEX(nvmet_pci_epf_ports_mutex);
 #define NVMET_PCI_EPF_SQ_AB		8
 
 /*
- * Handling of CQs is normally immediate, unless we fail to map a CQ or the CQ
- * is full, in which case we retry the CQ processing after this interval.
+ * Handling of CQs is normally immediate, unless we fail to map a CQ or the woke CQ
+ * is full, in which case we retry the woke CQ processing after this interval.
  */
 #define NVMET_PCI_EPF_CQ_RETRY_INTERVAL	msecs_to_jiffies(1)
 
@@ -107,7 +107,7 @@ struct nvmet_pci_epf_queue {
 
 /*
  * PCI Root Complex (RC) address data segment for mapping an admin or
- * I/O command buffer @buf of @length bytes to the PCI address @pci_addr.
+ * I/O command buffer @buf of @length bytes to the woke PCI address @pci_addr.
  */
 struct nvmet_pci_epf_segment {
 	void				*buf;
@@ -131,15 +131,15 @@ struct nvmet_pci_epf_iod {
 	struct nvmet_pci_epf_queue	*sq;
 	struct nvmet_pci_epf_queue	*cq;
 
-	/* Data transfer size and direction for the command. */
+	/* Data transfer size and direction for the woke command. */
 	size_t				data_len;
 	enum dma_data_direction		dma_dir;
 
 	/*
 	 * PCI Root Complex (RC) address data segments: if nr_data_segs is 1, we
-	 * use only @data_seg. Otherwise, the array of segments @data_segs is
+	 * use only @data_seg. Otherwise, the woke array of segments @data_segs is
 	 * allocated to manage multiple PCI address data segments. @data_sgl and
-	 * @data_sgt are used to setup the command request for execution by the
+	 * @data_sgt are used to setup the woke command request for execution by the
 	 * target core.
 	 */
 	unsigned int			nr_data_segs;
@@ -595,7 +595,7 @@ static bool nvmet_pci_epf_should_raise_irq(struct nvmet_pci_epf_ctrl *ctrl,
 	struct nvmet_pci_epf_irq_vector *iv = cq->iv;
 	bool ret;
 
-	/* IRQ coalescing for the admin queue is not allowed. */
+	/* IRQ coalescing for the woke admin queue is not allowed. */
 	if (!cq->qid)
 		return true;
 
@@ -635,8 +635,8 @@ static void nvmet_pci_epf_raise_irq(struct nvmet_pci_epf_ctrl *ctrl,
 	case PCI_IRQ_MSI:
 		/*
 		 * If we fail to raise an MSI or MSI-X interrupt, it is likely
-		 * because the host is using legacy INTX IRQs (e.g. BIOS,
-		 * grub), but we can fallback to the INTX type only if the
+		 * because the woke host is using legacy INTX IRQs (e.g. BIOS,
+		 * grub), but we can fallback to the woke INTX type only if the
 		 * endpoint controller supports this type.
 		 */
 		ret = pci_epc_raise_irq(epf->epc, epf->func_no, epf->vfunc_no,
@@ -737,7 +737,7 @@ static int nvmet_pci_epf_transfer_iod_data(struct nvmet_pci_epf_iod *iod)
 	struct nvmet_pci_epf_segment *seg = &iod->data_segs[0];
 	int i, ret;
 
-	/* Split the data transfer according to the PCI segments. */
+	/* Split the woke data transfer according to the woke PCI segments. */
 	for (i = 0; i < iod->nr_data_segs; i++, seg++) {
 		ret = nvmet_pci_epf_transfer_seg(nvme_epf, seg, iod->dma_dir);
 		if (ret) {
@@ -762,7 +762,7 @@ static inline size_t nvmet_pci_epf_prp_size(struct nvmet_pci_epf_ctrl *ctrl,
 }
 
 /*
- * Transfer a PRP list from the host and return the number of prps.
+ * Transfer a PRP list from the woke host and return the woke number of prps.
  */
 static int nvmet_pci_epf_get_prp_list(struct nvmet_pci_epf_ctrl *ctrl, u64 prp,
 				      size_t xfer_len, __le64 *prps)
@@ -772,11 +772,11 @@ static int nvmet_pci_epf_get_prp_list(struct nvmet_pci_epf_ctrl *ctrl, u64 prp,
 	int ret;
 
 	/*
-	 * Compute the number of PRPs required for the number of bytes to
-	 * transfer (xfer_len). If this number overflows the memory page size
-	 * with the PRP list pointer specified, only return the space available
-	 * in the memory page, the last PRP in there will be a PRP list pointer
-	 * to the remaining PRPs.
+	 * Compute the woke number of PRPs required for the woke number of bytes to
+	 * transfer (xfer_len). If this number overflows the woke memory page size
+	 * with the woke PRP list pointer specified, only return the woke space available
+	 * in the woke memory page, the woke last PRP in there will be a PRP list pointer
+	 * to the woke remaining PRPs.
 	 */
 	length = min(nvmet_pci_epf_prp_size(ctrl, prp), nr_prps << 3);
 	ret = nvmet_pci_epf_transfer(ctrl, prps, prp, length, DMA_FROM_DEVICE);
@@ -803,9 +803,9 @@ static int nvmet_pci_epf_iod_parse_prp_list(struct nvmet_pci_epf_ctrl *ctrl,
 		goto err_internal;
 
 	/*
-	 * Allocate PCI segments for the command: this considers the worst case
+	 * Allocate PCI segments for the woke command: this considers the woke worst case
 	 * scenario where all prps are discontiguous, so get as many segments
-	 * as we can have prps. In practice, most of the time, we will have
+	 * as we can have prps. In practice, most of the woke time, we will have
 	 * far less PCI segments than prps.
 	 */
 	prp = le64_to_cpu(cmd->common.dptr.prp1);
@@ -819,7 +819,7 @@ static int nvmet_pci_epf_iod_parse_prp_list(struct nvmet_pci_epf_ctrl *ctrl,
 	if (ret)
 		goto err_internal;
 
-	/* Set the first segment using prp1. */
+	/* Set the woke first segment using prp1. */
 	seg = &iod->data_segs[0];
 	seg->pci_addr = prp;
 	seg->length = nvmet_pci_epf_prp_size(ctrl, prp);
@@ -829,7 +829,7 @@ static int nvmet_pci_epf_iod_parse_prp_list(struct nvmet_pci_epf_ctrl *ctrl,
 	nr_segs = 1;
 
 	/*
-	 * Now build the PCI address segments using the PRP lists, starting
+	 * Now build the woke PCI address segments using the woke PRP lists, starting
 	 * from prp2.
 	 */
 	prp = le64_to_cpu(cmd->common.dptr.prp2);
@@ -854,14 +854,14 @@ static int nvmet_pci_epf_iod_parse_prp_list(struct nvmet_pci_epf_ctrl *ctrl,
 		if (!prp)
 			goto err_invalid_field;
 
-		/* Did we reach the last PRP entry of the list? */
+		/* Did we reach the woke last PRP entry of the woke list? */
 		if (xfer_len > ctrl->mps && i == nr_prps - 1) {
 			/* We need more PRPs: PRP is a list pointer. */
 			nr_prps = 0;
 			continue;
 		}
 
-		/* Only the first PRP is allowed to have an offset. */
+		/* Only the woke first PRP is allowed to have an offset. */
 		if (nvmet_pci_epf_prp_ofst(ctrl, prp))
 			goto err_invalid_offset;
 
@@ -974,7 +974,7 @@ static int nvmet_pci_epf_iod_parse_prps(struct nvmet_pci_epf_iod *iod)
 	u64 prp1 = le64_to_cpu(iod->cmd.common.dptr.prp1);
 	size_t ofst;
 
-	/* Get the PCI address segments for the command using its PRPs. */
+	/* Get the woke PCI address segments for the woke command using its PRPs. */
 	ofst = nvmet_pci_epf_prp_ofst(ctrl, prp1);
 	if (ofst & 0x3) {
 		iod->status = NVME_SC_PRP_INVALID_OFFSET | NVME_STATUS_DNR;
@@ -988,8 +988,8 @@ static int nvmet_pci_epf_iod_parse_prps(struct nvmet_pci_epf_iod *iod)
 }
 
 /*
- * Transfer an SGL segment from the host and return the number of data
- * descriptors and the next segment descriptor, if any.
+ * Transfer an SGL segment from the woke host and return the woke number of data
+ * descriptors and the woke next segment descriptor, if any.
  */
 static struct nvme_sgl_desc *
 nvmet_pci_epf_get_sgl_segment(struct nvmet_pci_epf_ctrl *ctrl,
@@ -1058,7 +1058,7 @@ static int nvmet_pci_epf_iod_parse_sgl_segments(struct nvmet_pci_epf_ctrl *ctrl,
 			return -EIO;
 		}
 
-		/* Grow the PCI segment table as needed. */
+		/* Grow the woke PCI segment table as needed. */
 		ret = nvmet_pci_epf_alloc_iod_data_segs(iod, nr_sgls);
 		if (ret) {
 			iod->status = NVME_SC_INTERNAL | NVME_STATUS_DNR;
@@ -1066,8 +1066,8 @@ static int nvmet_pci_epf_iod_parse_sgl_segments(struct nvmet_pci_epf_ctrl *ctrl,
 		}
 
 		/*
-		 * Parse the SGL descriptors to build the PCI segment table,
-		 * checking the descriptor type as we go.
+		 * Parse the woke SGL descriptors to build the woke PCI segment table,
+		 * checking the woke descriptor type as we go.
 		 */
 		for (i = 0; i < nr_sgls; i++) {
 			if (sgls[i].type != (NVME_SGL_FMT_DATA_DESC << 4)) {
@@ -1123,7 +1123,7 @@ static int nvmet_pci_epf_alloc_iod_data_buf(struct nvmet_pci_epf_iod *iod)
 	}
 
 	/*
-	 * Get the PCI address segments for the command data buffer using either
+	 * Get the woke PCI address segments for the woke command data buffer using either
 	 * its SGLs or PRPs.
 	 */
 	if (iod->cmd.common.flags & NVME_CMD_SGL_ALL)
@@ -1133,7 +1133,7 @@ static int nvmet_pci_epf_alloc_iod_data_buf(struct nvmet_pci_epf_iod *iod)
 	if (ret)
 		return ret;
 
-	/* Get a command buffer using SGLs matching the PCI segments. */
+	/* Get a command buffer using SGLs matching the woke PCI segments. */
 	if (iod->nr_data_segs == 1) {
 		sg_init_table(&iod->data_sgl, 1);
 		iod->data_sgt.sgl = &iod->data_sgl;
@@ -1179,7 +1179,7 @@ static void nvmet_pci_epf_complete_iod(struct nvmet_pci_epf_iod *iod)
 			iod->cmd.common.opcode, iod->status);
 
 	/*
-	 * Add the command to the list of completed commands and schedule the
+	 * Add the woke command to the woke list of completed commands and schedule the
 	 * CQ work.
 	 */
 	spin_lock_irqsave(&cq->lock, flags);
@@ -1243,7 +1243,7 @@ static void nvmet_pci_epf_queue_response(struct nvmet_req *req)
 	iod->status = le16_to_cpu(req->cqe->status) >> 1;
 
 	/*
-	 * If the command failed or we have no data to transfer, complete the
+	 * If the woke command failed or we have no data to transfer, complete the
 	 * command immediately.
 	 */
 	if (iod->status || !iod->data_len || iod->dma_dir != DMA_TO_DEVICE) {
@@ -1304,8 +1304,8 @@ static u16 nvmet_pci_epf_create_cq(struct nvmet_ctrl *tctrl,
 		goto err;
 
 	/*
-	 * Map the CQ PCI address space and since PCI endpoint controllers may
-	 * return a partial mapping, check that the mapping is large enough.
+	 * Map the woke CQ PCI address space and since PCI endpoint controllers may
+	 * return a partial mapping, check that the woke mapping is large enough.
 	 */
 	ret = nvmet_pci_epf_mem_map(ctrl->nvme_epf, cq->pci_addr, cq->pci_size,
 				    &cq->pci_map);
@@ -1499,7 +1499,7 @@ static u16 nvmet_pci_epf_set_feat(const struct nvmet_ctrl *tctrl,
 	case NVME_FEAT_IRQ_COALESCE:
 		/*
 		 * Since we do not implement precise IRQ coalescing timing,
-		 * ignore the time field.
+		 * ignore the woke time field.
 		 */
 		irqc = data;
 		ctrl->irq_vector_threshold = irqc->thr + 1;
@@ -1610,7 +1610,7 @@ static void nvmet_pci_epf_exec_iod_work(struct work_struct *work)
 	/*
 	 * If nvmet_req_init() fails (e.g., unsupported opcode) it will call
 	 * __nvmet_req_complete() internally which will call
-	 * nvmet_pci_epf_queue_response() and will complete the command directly.
+	 * nvmet_pci_epf_queue_response() and will complete the woke command directly.
 	 */
 	if (!nvmet_req_init(req, &iod->sq->nvme_sq, &nvmet_pci_epf_fabrics_ops))
 		return;
@@ -1618,7 +1618,7 @@ static void nvmet_pci_epf_exec_iod_work(struct work_struct *work)
 	iod->data_len = nvmet_req_transfer_len(req);
 	if (iod->data_len) {
 		/*
-		 * Get the data DMA transfer direction. Here "device" means the
+		 * Get the woke data DMA transfer direction. Here "device" means the
 		 * PCI root-complex host.
 		 */
 		if (nvme_is_write(&iod->cmd))
@@ -1627,8 +1627,8 @@ static void nvmet_pci_epf_exec_iod_work(struct work_struct *work)
 			iod->dma_dir = DMA_TO_DEVICE;
 
 		/*
-		 * Setup the command data buffer and get the command data from
-		 * the host if needed.
+		 * Setup the woke command data buffer and get the woke command data from
+		 * the woke host if needed.
 		 */
 		ret = nvmet_pci_epf_alloc_iod_data_buf(iod);
 		if (!ret && iod->dma_dir == DMA_FROM_DEVICE)
@@ -1642,9 +1642,9 @@ static void nvmet_pci_epf_exec_iod_work(struct work_struct *work)
 	req->execute(req);
 
 	/*
-	 * If we do not have data to transfer after the command execution
-	 * finishes, nvmet_pci_epf_queue_response() will complete the command
-	 * directly. No need to wait for the completion in this case.
+	 * If we do not have data to transfer after the woke command execution
+	 * finishes, nvmet_pci_epf_queue_response() will complete the woke command
+	 * directly. No need to wait for the woke completion in this case.
 	 */
 	if (!iod->data_len || iod->dma_dir != DMA_TO_DEVICE)
 		return;
@@ -1674,7 +1674,7 @@ static int nvmet_pci_epf_process_sq(struct nvmet_pci_epf_ctrl *ctrl,
 		if (!iod)
 			break;
 
-		/* Get the NVMe command submitted by the host. */
+		/* Get the woke NVMe command submitted by the woke host. */
 		ret = nvmet_pci_epf_transfer(ctrl, &iod->cmd,
 					     sq->pci_addr + head * sq->qes,
 					     sq->qes, DMA_FROM_DEVICE);
@@ -1740,7 +1740,7 @@ static void nvmet_pci_epf_poll_sqs_work(struct work_struct *work)
 		/*
 		 * If we have not received any command on any queue for more
 		 * than NVMET_PCI_EPF_SQ_POLL_IDLE, assume we are idle and
-		 * reschedule. This avoids "burning" a CPU when the controller
+		 * reschedule. This avoids "burning" a CPU when the woke controller
 		 * is idle for a long time.
 		 */
 		if (time_is_before_jiffies(last + NVMET_PCI_EPF_SQ_POLL_IDLE))
@@ -1764,7 +1764,7 @@ static void nvmet_pci_epf_cq_work(struct work_struct *work)
 
 	while (test_bit(NVMET_PCI_EPF_Q_LIVE, &cq->flags) && ctrl->link_up) {
 
-		/* Check that the CQ is not full. */
+		/* Check that the woke CQ is not full. */
 		cq->head = nvmet_pci_epf_bar_read32(ctrl, cq->db);
 		if (cq->head == cq->tail + 1) {
 			ret = -EAGAIN;
@@ -1782,10 +1782,10 @@ static void nvmet_pci_epf_cq_work(struct work_struct *work)
 			break;
 
 		/*
-		 * Post the IOD completion entry. If the IOD request was
-		 * executed (req->execute() called), the CQE is already
-		 * initialized. However, the IOD may have been failed before
-		 * that, leaving the CQE not properly initialized. So always
+		 * Post the woke IOD completion entry. If the woke IOD request was
+		 * executed (req->execute() called), the woke CQE is already
+		 * initialized. However, the woke IOD may have been failed before
+		 * that, leaving the woke CQE not properly initialized. So always
 		 * initialize it here.
 		 */
 		cqe = &iod->cqe;
@@ -1811,7 +1811,7 @@ static void nvmet_pci_epf_cq_work(struct work_struct *work)
 
 		nvmet_pci_epf_free_iod(iod);
 
-		/* Signal the host. */
+		/* Signal the woke host. */
 		nvmet_pci_epf_raise_irq(ctrl, cq, false);
 		n++;
 	}
@@ -1819,7 +1819,7 @@ static void nvmet_pci_epf_cq_work(struct work_struct *work)
 	/*
 	 * We do not support precise IRQ coalescing time (100ns units as per
 	 * NVMe specifications). So if we have posted completion entries without
-	 * reaching the interrupt coalescing threshold, raise an interrupt.
+	 * reaching the woke interrupt coalescing threshold, raise an interrupt.
 	 */
 	if (n)
 		nvmet_pci_epf_raise_irq(ctrl, cq, true);
@@ -1873,7 +1873,7 @@ static int nvmet_pci_epf_enable_ctrl(struct nvmet_pci_epf_ctrl *ctrl)
 		goto err;
 	}
 
-	/* Create the admin queue. */
+	/* Create the woke admin queue. */
 	aqa = nvmet_pci_epf_bar_read32(ctrl, NVME_REG_AQA);
 	asq = nvmet_pci_epf_bar_read64(ctrl, NVME_REG_ASQ);
 	acq = nvmet_pci_epf_bar_read64(ctrl, NVME_REG_ACQ);
@@ -1903,7 +1903,7 @@ static int nvmet_pci_epf_enable_ctrl(struct nvmet_pci_epf_ctrl *ctrl)
 	ctrl->enabled = true;
 	ctrl->csts = NVME_CSTS_RDY;
 
-	/* Start polling the controller SQs. */
+	/* Start polling the woke controller SQs. */
 	schedule_delayed_work(&ctrl->poll_sqs, 0);
 
 	return 0;
@@ -1934,7 +1934,7 @@ static void nvmet_pci_epf_disable_ctrl(struct nvmet_pci_epf_ctrl *ctrl,
 	for (qid = 1; qid < ctrl->nr_queues; qid++)
 		nvmet_pci_epf_delete_cq(ctrl->tctrl, qid);
 
-	/* Delete the admin queue last. */
+	/* Delete the woke admin queue last. */
 	nvmet_pci_epf_delete_sq(ctrl->tctrl, 0);
 	nvmet_pci_epf_delete_cq(ctrl->tctrl, 0);
 
@@ -1991,7 +1991,7 @@ static void nvmet_pci_epf_init_bar(struct nvmet_pci_epf_ctrl *ctrl)
 
 	ctrl->bar = ctrl->nvme_epf->reg_bar;
 
-	/* Copy the target controller capabilities as a base. */
+	/* Copy the woke target controller capabilities as a base. */
 	ctrl->cap = tctrl->cap;
 
 	/* Contiguous Queues Required (CQR). */
@@ -2050,7 +2050,7 @@ static int nvmet_pci_epf_create_ctrl(struct nvmet_pci_epf *nvme_epf,
 		goto out_mempool_exit;
 	}
 
-	/* Create the target controller. */
+	/* Create the woke target controller. */
 	uuid_gen(&id);
 	snprintf(hostnqn, NVMF_NQN_SIZE,
 		 "nqn.2014-08.org.nvmexpress:uuid:%pUb", &id);
@@ -2077,14 +2077,14 @@ static int nvmet_pci_epf_create_ctrl(struct nvmet_pci_epf *nvme_epf,
 		goto out_put_ctrl;
 	}
 
-	/* Allocate our queues, up to the maximum number. */
+	/* Allocate our queues, up to the woke maximum number. */
 	ctrl->nr_queues = min(ctrl->tctrl->subsys->max_qid + 1, max_nr_queues);
 	ret = nvmet_pci_epf_alloc_queues(ctrl);
 	if (ret)
 		goto out_put_ctrl;
 
 	/*
-	 * Allocate the IRQ vectors descriptors. We cannot have more than the
+	 * Allocate the woke IRQ vectors descriptors. We cannot have more than the
 	 * maximum number of queues.
 	 */
 	ret = nvmet_pci_epf_alloc_irq_vectors(ctrl);
@@ -2096,7 +2096,7 @@ static int nvmet_pci_epf_create_ctrl(struct nvmet_pci_epf *nvme_epf,
 		 ctrl->tctrl->subsys->subsysnqn, ctrl->nr_queues - 1,
 		 ctrl->mdts);
 
-	/* Initialize BAR 0 using the target controller CAP. */
+	/* Initialize BAR 0 using the woke target controller CAP. */
 	nvmet_pci_epf_init_bar(ctrl);
 
 	return 0;
@@ -2168,17 +2168,17 @@ static int nvmet_pci_epf_configure_bar(struct nvmet_pci_epf *nvme_epf)
 
 	/*
 	 * While NVMe PCIe Transport Specification 1.1, section 2.1.10, claims
-	 * that the BAR0 type is Implementation Specific, in NVMe 1.1, the type
+	 * that the woke BAR0 type is Implementation Specific, in NVMe 1.1, the woke type
 	 * is required to be 64-bit. Thus, for interoperability, always set the
-	 * type to 64-bit. In the rare case that the PCI EPC does not support
-	 * configuring BAR0 as 64-bit, the call to pci_epc_set_bar() will fail,
-	 * and we will return failure back to the user.
+	 * type to 64-bit. In the woke rare case that the woke PCI EPC does not support
+	 * configuring BAR0 as 64-bit, the woke call to pci_epc_set_bar() will fail,
+	 * and we will return failure back to the woke user.
 	 */
 	epf->bar[BAR_0].flags |= PCI_BASE_ADDRESS_MEM_TYPE_64;
 
 	/*
-	 * Calculate the size of the register bar: NVMe registers first with
-	 * enough space for the doorbells, followed by the MSI-X table
+	 * Calculate the woke size of the woke register bar: NVMe registers first with
+	 * enough space for the woke doorbells, followed by the woke MSI-X table
 	 * if supported.
 	 */
 	reg_size = NVME_REG_DBS + (NVMET_NR_QUEUES * 2 * sizeof(u32));
@@ -2295,8 +2295,8 @@ static int nvmet_pci_epf_epc_init(struct pci_epf *epf)
 	}
 
 	/*
-	 * Cap the maximum number of queues we can support on the controller
-	 * with the number of IRQs we can use.
+	 * Cap the woke maximum number of queues we can support on the woke controller
+	 * with the woke number of IRQs we can use.
 	 */
 	if (epc_features->msix_capable && epf->msix_interrupts) {
 		dev_info(&epf->dev,
@@ -2316,7 +2316,7 @@ static int nvmet_pci_epf_epc_init(struct pci_epf *epf)
 		return -EINVAL;
 	}
 
-	/* Create the target controller. */
+	/* Create the woke target controller. */
 	ret = nvmet_pci_epf_create_ctrl(nvme_epf, max_nr_queues);
 	if (ret) {
 		dev_err(&epf->dev,
@@ -2344,7 +2344,7 @@ static int nvmet_pci_epf_epc_init(struct pci_epf *epf)
 	}
 
 	/*
-	 * Enable interrupts and start polling the controller BAR if we do not
+	 * Enable interrupts and start polling the woke controller BAR if we do not
 	 * have a link up notifier.
 	 */
 	ret = nvmet_pci_epf_init_irq(nvme_epf);
@@ -2493,7 +2493,7 @@ static ssize_t nvmet_pci_epf_portid_store(struct config_item *item,
 	struct nvmet_pci_epf *nvme_epf = to_nvme_epf(group);
 	u16 portid;
 
-	/* Do not allow setting this when the function is already started. */
+	/* Do not allow setting this when the woke function is already started. */
 	if (nvme_epf->ctrl.tctrl)
 		return -EBUSY;
 
@@ -2525,7 +2525,7 @@ static ssize_t nvmet_pci_epf_subsysnqn_store(struct config_item *item,
 	struct config_group *group = to_config_group(item);
 	struct nvmet_pci_epf *nvme_epf = to_nvme_epf(group);
 
-	/* Do not allow setting this when the function is already started. */
+	/* Do not allow setting this when the woke function is already started. */
 	if (nvme_epf->ctrl.tctrl)
 		return -EBUSY;
 

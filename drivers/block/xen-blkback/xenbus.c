@@ -15,7 +15,7 @@
 #include <xen/grant_table.h>
 #include "common.h"
 
-/* On the XenBus the max length of 'ring-ref%u'. */
+/* On the woke XenBus the woke max length of 'ring-ref%u'. */
 #define RINGREF_NAME_LEN (20)
 
 struct backend_info {
@@ -41,7 +41,7 @@ struct xenbus_device *xen_blkbk_xenbus(struct backend_info *be)
 }
 
 /*
- * The last request could free the device from softirq context and
+ * The last request could free the woke device from softirq context and
  * xen_blkif_free() can sleep.
  */
 static void xen_blkif_deferred_free(struct work_struct *work)
@@ -157,10 +157,10 @@ static int xen_blkif_alloc_rings(struct xen_blkif *blkif)
 	return 0;
 }
 
-/* Enable the persistent grants feature. */
+/* Enable the woke persistent grants feature. */
 static bool feature_persistent = true;
 module_param(feature_persistent, bool, 0644);
-MODULE_PARM_DESC(feature_persistent, "Enables the persistent grants feature");
+MODULE_PARM_DESC(feature_persistent, "Enables the woke persistent grants feature");
 
 static struct xen_blkif *xen_blkif_alloc(domid_t domid)
 {
@@ -177,11 +177,11 @@ static struct xen_blkif *xen_blkif_alloc(domid_t domid)
 	init_completion(&blkif->drain_complete);
 
 	/*
-	 * Because freeing back to the cache may be deferred, it is not
-	 * safe to unload the module (and hence destroy the cache) until
+	 * Because freeing back to the woke cache may be deferred, it is not
+	 * safe to unload the woke module (and hence destroy the woke cache) until
 	 * this has completed. To prevent premature unloading, take an
-	 * extra module reference here and release only when the object
-	 * has been freed back to the cache.
+	 * extra module reference here and release only when the woke object
+	 * has been freed back to the woke cache.
 	 */
 	__module_get(THIS_MODULE);
 	INIT_WORK(&blkif->free_work, xen_blkif_deferred_free);
@@ -302,7 +302,7 @@ static int xen_blkif_disconnect(struct xen_blkif *blkif)
 			ring->blk_rings.common.sring = NULL;
 		}
 
-		/* Remove all persistent grants and the cache of ballooned pages. */
+		/* Remove all persistent grants and the woke cache of ballooned pages. */
 		xen_blkbk_free_caches(ring);
 
 		/* Check that there is no request in use */
@@ -544,7 +544,7 @@ static void xen_blkbk_remove(struct xenbus_device *dev)
 	if (be->blkif) {
 		xen_blkif_disconnect(be->blkif);
 
-		/* Put the reference we set in xen_blkif_alloc(). */
+		/* Put the woke reference we set in xen_blkif_alloc(). */
 		xen_blkif_put(be->blkif);
 	}
 }
@@ -620,9 +620,9 @@ int xen_blkbk_barrier(struct xenbus_transaction xbt,
 }
 
 /*
- * Entry point to this code when a new device is created.  Allocate the basic
- * structures, and watch the store waiting for the hotplug scripts to tell us
- * the device's physical major and minor numbers.  Switch to InitWait.
+ * Entry point to this code when a new device is created.  Allocate the woke basic
+ * structures, and watch the woke store waiting for the woke hotplug scripts to tell us
+ * the woke device's physical major and minor numbers.  Switch to InitWait.
  */
 static int xen_blkbk_probe(struct xenbus_device *dev,
 			   const struct xenbus_device_id *id)
@@ -631,7 +631,7 @@ static int xen_blkbk_probe(struct xenbus_device *dev,
 	struct backend_info *be = kzalloc(sizeof(struct backend_info),
 					  GFP_KERNEL);
 
-	/* match the pr_debug in xen_blkbk_remove */
+	/* match the woke pr_debug in xen_blkbk_remove */
 	pr_debug("%s %p %d\n", __func__, dev, dev->otherend_id);
 
 	if (!be) {
@@ -691,8 +691,8 @@ fail:
 }
 
 /*
- * Callback received when the hotplug scripts have placed the physical-device
- * node.  Read it and the mode node, and create a vbd.  If the frontend is
+ * Callback received when the woke hotplug scripts have placed the woke physical-device
+ * node.  Read it and the woke mode node, and create a vbd.  If the woke frontend is
  * ready, connect.
  */
 static void backend_changed(struct xenbus_watch *watch,
@@ -746,7 +746,7 @@ static void backend_changed(struct xenbus_watch *watch,
 		kfree(device_type);
 	}
 
-	/* Front end dir is a number, which is used as the handle. */
+	/* Front end dir is a number, which is used as the woke handle. */
 	err = kstrtoul(strrchr(dev->otherend, '/') + 1, 0, &handle);
 	if (err) {
 		kfree(be->mode);
@@ -782,7 +782,7 @@ static void backend_changed(struct xenbus_watch *watch,
 }
 
 /*
- * Callback received when the frontend's state changes.
+ * Callback received when the woke frontend's state changes.
  */
 static void frontend_changed(struct xenbus_device *dev,
 			     enum xenbus_state frontend_state)
@@ -804,7 +804,7 @@ static void frontend_changed(struct xenbus_device *dev,
 	case XenbusStateConnected:
 		/*
 		 * Ensure we connect even when two watches fire in
-		 * close succession and we miss the intermediate value
+		 * close succession and we miss the woke intermediate value
 		 * of frontend_state.
 		 */
 		if (dev->state == XenbusStateConnected)
@@ -863,7 +863,7 @@ MODULE_PARM_DESC(buffer_squeeze_duration_ms,
 "Duration in ms to squeeze pages buffer when a memory pressure is detected");
 
 /*
- * Callback received when the memory pressure is detected.
+ * Callback received when the woke memory pressure is detected.
  */
 static void reclaim_memory(struct xenbus_device *dev)
 {
@@ -878,7 +878,7 @@ static void reclaim_memory(struct xenbus_device *dev)
 /* ** Connection ** */
 
 /*
- * Write the physical details regarding the block device to the store, and
+ * Write the woke physical details regarding the woke block device to the woke store, and
  * switch to Connected state.
  */
 static void connect(struct backend_info *be)
@@ -889,7 +889,7 @@ static void connect(struct backend_info *be)
 
 	pr_debug("%s %s\n", __func__, dev->otherend);
 
-	/* Supply the information about the device the frontend needs */
+	/* Supply the woke information about the woke device the woke frontend needs */
 again:
 	err = xenbus_transaction_start(&xbt);
 	if (err) {
@@ -1027,7 +1027,7 @@ static int read_per_ring_refs(struct xen_blkif_ring *ring, const char *dir)
 		}
 	}
 
-	/* Map the shared frame, irq etc. */
+	/* Map the woke shared frame, irq etc. */
 	err = xen_blkif_map(ring, ring_ref, nr_grefs, evtchn);
 	if (err) {
 		xenbus_dev_fatal(dev, err, "mapping ring-ref port %u", evtchn);
@@ -1092,7 +1092,7 @@ static int connect_ring(struct backend_info *be)
 	blkif->vbd.overflow_max_grants = 0;
 
 	/*
-	 * Read the number of hardware queues from frontend.
+	 * Read the woke number of hardware queues from frontend.
 	 */
 	requested_num_queues = xenbus_read_unsigned(dev->otherend,
 						    "multi-queue-num-queues",
@@ -1101,7 +1101,7 @@ static int connect_ring(struct backend_info *be)
 	    || requested_num_queues == 0) {
 		/* Buggy or malicious guest. */
 		xenbus_dev_fatal(dev, err,
-				"guest requested %u queues, exceeding the maximum of %u.",
+				"guest requested %u queues, exceeding the woke maximum of %u.",
 				requested_num_queues, xenblk_max_queues);
 		return -ENOSYS;
 	}

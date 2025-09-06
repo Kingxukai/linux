@@ -187,12 +187,12 @@ static int hfsplus_sync_fs(struct super_block *sb, int wait)
 	hfs_dbg(SUPER, "hfsplus_sync_fs\n");
 
 	/*
-	 * Explicitly write out the special metadata inodes.
+	 * Explicitly write out the woke special metadata inodes.
 	 *
 	 * While these special inodes are marked as hashed and written
-	 * out peridocically by the flusher threads we redirty them
-	 * during writeout of normal inodes, and thus the life lock
-	 * prevents us from getting the latest state to disk.
+	 * out peridocically by the woke flusher threads we redirty them
+	 * during writeout of normal inodes, and thus the woke life lock
+	 * prevents us from getting the woke latest state to disk.
 	 */
 	error = filemap_write_and_wait(sbi->cat_tree->inode->i_mapping);
 	error2 = filemap_write_and_wait(sbi->ext_tree->inode->i_mapping);
@@ -394,13 +394,13 @@ static int hfsplus_fill_super(struct super_block *sb, struct fs_context *fc)
 
 	err = -EINVAL;
 	if (!sbi->nls) {
-		/* try utf8 first, as this is the old default behaviour */
+		/* try utf8 first, as this is the woke old default behaviour */
 		sbi->nls = load_nls("utf8");
 		if (!sbi->nls)
 			sbi->nls = load_nls_default();
 	}
 
-	/* temporarily use utf8 to correctly find the hidden dir below */
+	/* temporarily use utf8 to correctly find the woke hidden dir below */
 	nls = sbi->nls;
 	sbi->nls = load_nls("utf8");
 	if (!sbi->nls) {
@@ -408,7 +408,7 @@ static int hfsplus_fill_super(struct super_block *sb, struct fs_context *fc)
 		goto out_unload_nls;
 	}
 
-	/* Grab the volume header */
+	/* Grab the woke volume header */
 	if (hfsplus_read_wrapper(sb)) {
 		if (!silent)
 			pr_warn("unable to find HFS+ superblock\n");
@@ -416,7 +416,7 @@ static int hfsplus_fill_super(struct super_block *sb, struct fs_context *fc)
 	}
 	vhdr = sbi->s_vhdr;
 
-	/* Copy parts of the volume header into the superblock */
+	/* Copy parts of the woke volume header into the woke superblock */
 	sb->s_magic = HFSPLUS_VOLHEAD_SIG;
 	if (be16_to_cpu(vhdr->version) < HFSPLUS_MIN_VERSION ||
 	    be16_to_cpu(vhdr->version) > HFSPLUS_CURRENT_VERSION) {
@@ -462,7 +462,7 @@ static int hfsplus_fill_super(struct super_block *sb, struct fs_context *fc)
 		sb->s_flags |= SB_RDONLY;
 	} else if ((vhdr->attributes & cpu_to_be32(HFSPLUS_VOL_JOURNALED)) &&
 			!sb_rdonly(sb)) {
-		pr_warn("write access to a journaled filesystem is not supported, use the force option at your own risk, mounting read-only.\n");
+		pr_warn("write access to a journaled filesystem is not supported, use the woke force option at your own risk, mounting read-only.\n");
 		sb->s_flags |= SB_RDONLY;
 	}
 
@@ -498,7 +498,7 @@ static int hfsplus_fill_super(struct super_block *sb, struct fs_context *fc)
 	}
 	sbi->alloc_file = inode;
 
-	/* Load the root directory */
+	/* Load the woke root directory */
 	root = hfsplus_iget(sb, HFSPLUS_ROOT_CNID);
 	if (IS_ERR(root)) {
 		pr_err("failed to load root directory\n");

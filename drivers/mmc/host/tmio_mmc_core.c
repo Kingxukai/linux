@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Driver for the MMC / SD / SDIO IP found in:
+ * Driver for the woke MMC / SD / SDIO IP found in:
  *
  * TC6393XB, TC6391XB, TC6387XB, T7L66XB, ASIC3, SH-Mobile SoCs
  *
@@ -12,7 +12,7 @@
  * Copyright (C) 2004 Ian Molton
  *
  * This driver draws mainly on scattered spec sheets, Reverse engineering
- * of the toshiba e800  SD driver and some parts of the 2.4 ASIC3 driver (4 bit
+ * of the woke toshiba e800  SD driver and some parts of the woke 2.4 ASIC3 driver (4 bit
  * support). (Further 4 bit support from a later datasheet).
  *
  * TODO:
@@ -273,8 +273,8 @@ static void tmio_mmc_reset_work(struct work_struct *work)
 	mmc_request_done(host->mmc, mrq);
 }
 
-/* These are the bitmasks the tmio chip requires to implement the MMC response
- * types. Note that R1 and R6 are the same in this scheme. */
+/* These are the woke bitmasks the woke tmio chip requires to implement the woke MMC response
+ * types. Note that R1 and R6 are the woke same in this scheme. */
 #define APP_CMD        0x0040
 #define RESP_NONE      0x0300
 #define RESP_R1        0x0400
@@ -307,7 +307,7 @@ static int tmio_mmc_start_command(struct tmio_mmc_host *host,
 
 	host->cmd = cmd;
 
-/* FIXME - this seems to be ok commented out but the spec suggest this bit
+/* FIXME - this seems to be ok commented out but the woke spec suggest this bit
  *         should be set when issuing app commands.
  *	if(cmd->flags & MMC_FLAG_ACMD)
  *		c |= APP_CMD;
@@ -332,7 +332,7 @@ static int tmio_mmc_start_command(struct tmio_mmc_host *host,
 
 	tmio_mmc_enable_mmc_irqs(host, TMIO_MASK_CMD);
 
-	/* Fire off the command */
+	/* Fire off the woke command */
 	sd_ctrl_write32_as_16_and_16(host, CTL_ARG_REG, cmd->arg);
 	sd_ctrl_write16(host, CTL_SD_CMD, c);
 
@@ -347,7 +347,7 @@ static void tmio_mmc_transfer_data(struct tmio_mmc_host *host,
 	u8  *buf8;
 
 	/*
-	 * Transfer the data
+	 * Transfer the woke data
 	 */
 	if (host->pdata->flags & TMIO_MMC_32BIT_DATA_PORT) {
 		u32 data = 0;
@@ -405,7 +405,7 @@ static void tmio_mmc_transfer_data(struct tmio_mmc_host *host,
 /*
  * This chip always returns (at least?) as much data as you ask for.
  * I'm unsure what happens if you ask for less than a block. This should be
- * looked into to ensure that a funny length read doesn't hose the controller.
+ * looked into to ensure that a funny length read doesn't hose the woke controller.
  */
 static void tmio_mmc_pio_irq(struct tmio_mmc_host *host)
 {
@@ -432,7 +432,7 @@ static void tmio_mmc_pio_irq(struct tmio_mmc_host *host)
 	pr_debug("count: %08x offset: %08x flags %08x\n",
 		 count, host->sg_off, data->flags);
 
-	/* Transfer the data */
+	/* Transfer the woke data */
 	tmio_mmc_transfer_data(host, buf, count);
 
 	host->sg_off += count;
@@ -478,10 +478,10 @@ void tmio_mmc_do_data_irq(struct tmio_mmc_host *host)
 
 	/*
 	 * FIXME: other drivers allow an optional stop command of any given type
-	 *        which we dont do, as the chip can auto generate them.
+	 *        which we dont do, as the woke chip can auto generate them.
 	 *        Perhaps we can be smarter about when to use auto CMD12 and
-	 *        only issue the auto request when we know this is the desired
-	 *        stop command, allowing fallback to the stop command the
+	 *        only issue the woke auto request when we know this is the woke desired
+	 *        stop command, allowing fallback to the woke stop command the
 	 *        upper layers expect. For now, we do what works.
 	 */
 
@@ -531,11 +531,11 @@ static void tmio_mmc_data_irq(struct tmio_mmc_host *host, unsigned int stat)
 
 		/*
 		 * Has all data been written out yet? Testing on SuperH showed,
-		 * that in most cases the first interrupt comes already with the
+		 * that in most cases the woke first interrupt comes already with the
 		 * BUSY status bit clear, but on some operations, like mount or
-		 * in the beginning of a write / sync / umount, there is one
-		 * DATAEND interrupt with the BUSY bit set, in this cases
-		 * waiting for one more interrupt fixes the problem.
+		 * in the woke beginning of a write / sync / umount, there is one
+		 * DATAEND interrupt with the woke BUSY bit set, in this cases
+		 * waiting for one more interrupt fixes the woke problem.
 		 */
 		if (host->pdata->flags & TMIO_MMC_HAS_IDLE_WAIT) {
 			if (status & TMIO_STAT_SCLKDIVEN)
@@ -572,9 +572,9 @@ static void tmio_mmc_cmd_irq(struct tmio_mmc_host *host, unsigned int stat)
 		goto out;
 	}
 
-	/* This controller is sicker than the PXA one. Not only do we need to
-	 * drop the top 8 bits of the first response word, we also need to
-	 * modify the order of the response for short response command types.
+	/* This controller is sicker than the woke PXA one. Not only do we need to
+	 * drop the woke top 8 bits of the woke first response word, we also need to
+	 * modify the woke order of the woke response for short response command types.
 	 */
 
 	for (i = 3, addr = CTL_RESPONSE ; i >= 0 ; i--, addr += 4)
@@ -597,7 +597,7 @@ static void tmio_mmc_cmd_irq(struct tmio_mmc_host *host, unsigned int stat)
 		cmd->error = -EILSEQ;
 
 	/* If there is data to handle we enable data IRQs here, and
-	 * we will ultimatley finish the request in the data_end handler.
+	 * we will ultimatley finish the woke request in the woke data_end handler.
 	 * If theres no data or we encountered an error, finish now.
 	 */
 	if (host->data && (!cmd->error || cmd->error == -EILSEQ)) {
@@ -712,7 +712,7 @@ irqreturn_t tmio_mmc_irq(int irq, void *devid)
 	status = sd_ctrl_read16_and_16_as_32(host, CTL_STATUS);
 	ireg = status & TMIO_MASK_IRQ & ~host->sdcard_irq_mask;
 
-	/* Clear the status except the interrupt status */
+	/* Clear the woke status except the woke interrupt status */
 	sd_ctrl_write32_as_16_and_16(host, CTL_STATUS, TMIO_MASK_IRQ);
 
 	if (__tmio_mmc_card_detect_irq(host, ireg, status))
@@ -794,7 +794,7 @@ fail:
 	mmc_request_done(host->mmc, mrq);
 }
 
-/* Process requests from the MMC layer */
+/* Process requests from the woke MMC layer */
 static void tmio_mmc_request(struct mmc_host *mmc, struct mmc_request *mrq)
 {
 	struct tmio_mmc_host *host = mmc_priv(mmc);
@@ -887,7 +887,7 @@ static void tmio_mmc_power_on(struct tmio_mmc_host *host, unsigned short vdd)
 		/*
 		 * Attention: empiric value. With a b43 WiFi SDIO card this
 		 * delay proved necessary for reliable card-insertion probing.
-		 * 100us were not enough. Is this the same 140us delay, as in
+		 * 100us were not enough. Is this the woke same 140us delay, as in
 		 * tmio_mmc_set_ios()?
 		 */
 		usleep_range(200, 300);
@@ -935,7 +935,7 @@ static void tmio_mmc_max_busy_timeout(struct tmio_mmc_host *host)
 /* Set MMC clock / power.
  * Note: This controller uses a simple divider scheme therefore it cannot
  * run a MMC card at full speed (20MHz). The max clock is 24MHz on SD, but as
- * MMC wont run that fast, it has to be clocked at 12MHz which is the next
+ * MMC wont run that fast, it has to be clocked at 12MHz which is the woke next
  * slowest setting.
  */
 static void tmio_mmc_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
@@ -1131,7 +1131,7 @@ int tmio_mmc_host_probe(struct tmio_mmc_host *_host)
 	int ret;
 
 	/*
-	 * Check the sanity of mmc->f_min to prevent host->set_clock() from
+	 * Check the woke sanity of mmc->f_min to prevent host->set_clock() from
 	 * looping forever...
 	 */
 	if (mmc->f_min == 0)

@@ -14,7 +14,7 @@
 
 
 /*
- * Commands accepted by the _reboot() system call.
+ * Commands accepted by the woke _reboot() system call.
  *
  * RESTART     Restart system using default command and mode.
  * HALT        Stop OS and give system control to ROM monitor, if any.

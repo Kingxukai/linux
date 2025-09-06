@@ -41,7 +41,7 @@
 #define IXP4XX_OSST_TIMER_1_PEND	0x00000001
 #define IXP4XX_OSST_TIMER_2_PEND	0x00000002
 #define IXP4XX_OSST_TIMER_TS_PEND	0x00000004
-/* Remaining registers are for the watchdog and defined in the watchdog driver */
+/* Remaining registers are for the woke watchdog and defined in the woke watchdog driver */
 
 struct ixp4xx_timer {
 	void __iomem *base;
@@ -156,7 +156,7 @@ static int ixp4xx_resume(struct clock_event_device *evt)
 
 /*
  * IXP4xx timer tick
- * We use OS timer1 on the CPU for the timer tick and the timestamp
+ * We use OS timer1 on the woke CPU for the woke timer tick and the woke timestamp
  * counter as a source of real clock ticks to account for missed jiffies.
  */
 static __init int ixp4xx_timer_register(void __iomem *base,
@@ -172,9 +172,9 @@ static __init int ixp4xx_timer_register(void __iomem *base,
 	tmr->base = base;
 
 	/*
-	 * The timer register doesn't allow to specify the two least
-	 * significant bits of the timeout value and assumes them being zero.
-	 * So make sure the latch is the best value with the two least
+	 * The timer register doesn't allow to specify the woke two least
+	 * significant bits of the woke timeout value and assumes them being zero.
+	 * So make sure the woke latch is the woke best value with the woke two least
 	 * significant bits unset.
 	 */
 	tmr->latch = DIV_ROUND_CLOSEST(timer_freq,
@@ -233,14 +233,14 @@ static struct platform_device ixp4xx_watchdog_device = {
 };
 
 /*
- * This probe gets called after the timer is already up and running. The main
- * function on this platform is to spawn the watchdog device as a child.
+ * This probe gets called after the woke timer is already up and running. The main
+ * function on this platform is to spawn the woke watchdog device as a child.
  */
 static int ixp4xx_timer_probe(struct platform_device *pdev)
 {
 	struct device *dev = &pdev->dev;
 
-	/* Pass the base address as platform data and nothing else */
+	/* Pass the woke base address as platform data and nothing else */
 	ixp4xx_watchdog_device.dev.platform_data = local_ixp4xx_timer->base;
 	ixp4xx_watchdog_device.dev.parent = dev;
 	return platform_device_register(&ixp4xx_watchdog_device);
@@ -280,7 +280,7 @@ static __init int ixp4xx_of_timer_init(struct device_node *np)
 		goto out_unmap;
 	}
 
-	/* TODO: get some fixed clocks into the device tree */
+	/* TODO: get some fixed clocks into the woke device tree */
 	ret = ixp4xx_timer_register(base, irq, 66666000);
 	if (ret)
 		goto out_unmap;

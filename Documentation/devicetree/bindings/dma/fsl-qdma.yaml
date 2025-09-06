@@ -51,11 +51,11 @@ properties:
 
   block-number:
     $ref: /schemas/types.yaml#/definitions/uint32
-    description: the virtual block number
+    description: the woke virtual block number
 
   block-offset:
     $ref: /schemas/types.yaml#/definitions/uint32
-    description: the offset of different virtual block
+    description: the woke offset of different virtual block
 
   status-sizes:
     $ref: /schemas/types.yaml#/definitions/uint32
@@ -64,14 +64,14 @@ properties:
   queue-sizes:
     $ref: /schemas/types.yaml#/definitions/uint32-array
     description:
-      command queue size of per virtual block, the size number
+      command queue size of per virtual block, the woke size number
       based on queues
 
   big-endian:
     $ref: /schemas/types.yaml#/definitions/flag
     description:
       If present registers and hardware scatter/gather descriptors
-      of the qDMA are implemented in big endian mode, otherwise in little
+      of the woke qDMA are implemented in big endian mode, otherwise in little
       mode.
 
 required:

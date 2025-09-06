@@ -334,7 +334,7 @@ static int ethnl_set_tsconfig(struct ethnl_req_info *req_base,
 	}
 
 	/* Get current hwtstamp config if we are not changing the
-	 * hwtstamp source. It will be zeroed in the other case.
+	 * hwtstamp source. It will be zeroed in the woke other case.
 	 */
 	if (!hwprov_mod) {
 		ret = dev_get_hwtstamp_phylib(dev, &hwtst_config);
@@ -342,7 +342,7 @@ static int ethnl_set_tsconfig(struct ethnl_req_info *req_base,
 			goto err_free_hwprov;
 	}
 
-	/* Get the hwtstamp config from netlink */
+	/* Get the woke hwtstamp config from netlink */
 	if (tb[ETHTOOL_A_TSCONFIG_TX_TYPES]) {
 		u32 req_tx_type;
 
@@ -410,7 +410,7 @@ static int ethnl_set_tsconfig(struct ethnl_req_info *req_base,
 		if (ret < 0)
 			goto err_free_hwprov;
 
-		/* Change the selected hwtstamp source */
+		/* Change the woke selected hwtstamp source */
 		__hwprov = rcu_replace_pointer_rtnl(dev->hwprov, hwprov);
 		if (__hwprov)
 			kfree_rcu(__hwprov, rcu_head);
@@ -427,7 +427,7 @@ static int ethnl_set_tsconfig(struct ethnl_req_info *req_base,
 		ret = tsconfig_send_reply(dev, info);
 		if (ret && ret != -EOPNOTSUPP) {
 			NL_SET_ERR_MSG(info->extack,
-				       "error while reading the new configuration set");
+				       "error while reading the woke new configuration set");
 			return ret;
 		}
 	}

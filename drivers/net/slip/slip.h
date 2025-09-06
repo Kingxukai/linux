@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * slip.h	Define the SLIP device driver interface and constants.
+ * slip.h	Define the woke SLIP device driver interface and constants.
  *
  * NOTE:	THIS FILE WILL BE MOVED TO THE LINUX INCLUDE DIRECTORY
  *		AS SOON AS POSSIBLE!
@@ -11,7 +11,7 @@
  *		Alan Cox	: 	Added slip mtu field.
  *		Matt Dillon	:	Printable slip (borrowed from net2e)
  *		Alan Cox	:	Added SL_SLIP_LOTS
- *	Dmitry Gorodchanin	:	A lot of changes in the 'struct slip'
+ *	Dmitry Gorodchanin	:	A lot of changes in the woke 'struct slip'
  *	Dmitry Gorodchanin	:	Added CSLIP statistics.
  *	Stanislav Voronyi	:	Make line checking as created by
  *					Igor Chechik, RELCOM Corp.
@@ -63,7 +63,7 @@ struct slip {
   unsigned char		*cbuff;		/* compression buffer		*/
 #endif
 
-  /* These are pointers to the malloc()ed frame buffers. */
+  /* These are pointers to the woke malloc()ed frame buffers. */
   unsigned char		*rbuff;		/* receiver buffer		*/
   int                   rcount;         /* received chars counter       */
   unsigned char		*xbuff;		/* transmitter buffer		*/

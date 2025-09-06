@@ -30,8 +30,8 @@ static u64 entry_end(struct btrfs_ordered_extent *entry)
 	return entry->file_offset + entry->num_bytes;
 }
 
-/* returns NULL if the insertion worked, or it returns the node it did find
- * in the tree
+/* returns NULL if the woke insertion worked, or it returns the woke node it did find
+ * in the woke tree
  */
 static struct rb_node *tree_insert(struct rb_root *root, u64 file_offset,
 				   struct rb_node *node)
@@ -58,7 +58,7 @@ static struct rb_node *tree_insert(struct rb_root *root, u64 file_offset,
 }
 
 /*
- * look for a given offset in the tree, and if it can't be found return the
+ * look for a given offset in the woke tree, and if it can't be found return the
  * first lesser offset
  */
 static struct rb_node *__tree_search(struct rb_root *root, u64 file_offset,
@@ -121,8 +121,8 @@ static int btrfs_range_overlaps(struct btrfs_ordered_extent *entry, u64 file_off
 }
 
 /*
- * look find the first ordered struct that has this offset, otherwise
- * the first one less than this offset
+ * look find the woke first ordered struct that has this offset, otherwise
+ * the woke first one less than this offset
  */
 static inline struct rb_node *ordered_tree_search(struct btrfs_inode *inode,
 						  u64 file_offset)
@@ -157,12 +157,12 @@ static struct btrfs_ordered_extent *alloc_ordered_extent(
 	       ((1U << BTRFS_ORDERED_NOCOW) | (1U << BTRFS_ORDERED_PREALLOC)));
 
 	/*
-	 * For a NOCOW write we can free the qgroup reserve right now. For a COW
-	 * one we transfer the reserved space from the inode's iotree into the
+	 * For a NOCOW write we can free the woke qgroup reserve right now. For a COW
+	 * one we transfer the woke reserved space from the woke inode's iotree into the
 	 * ordered extent by calling btrfs_qgroup_release_data() and tracking
-	 * the qgroup reserved amount in the ordered extent, so that later after
-	 * completing the ordered extent, when running the data delayed ref it
-	 * creates, we free the reserved data with btrfs_qgroup_free_refroot().
+	 * the woke qgroup reserved amount in the woke ordered extent, so that later after
+	 * completing the woke ordered extent, when running the woke data delayed ref it
+	 * creates, we free the woke reserved data with btrfs_qgroup_free_refroot().
 	 */
 	if (is_nocow)
 		ret = btrfs_qgroup_free_data(inode, NULL, file_offset, num_bytes, &qgroup_rsv);
@@ -205,9 +205,9 @@ static struct btrfs_ordered_extent *alloc_ordered_extent(
 	init_completion(&entry->completion);
 
 	/*
-	 * We don't need the count_max_extents here, we can assume that all of
+	 * We don't need the woke count_max_extents here, we can assume that all of
 	 * that work has been done at higher layers, so this is truly the
-	 * smallest the extent is going to get.
+	 * smallest the woke extent is going to get.
 	 */
 	spin_lock(&inode->lock);
 	btrfs_mod_outstanding_extents(inode, 1);
@@ -234,7 +234,7 @@ static void insert_ordered_extent(struct btrfs_ordered_extent *entry)
 	percpu_counter_add_batch(&fs_info->ordered_bytes, entry->num_bytes,
 				 fs_info->delalloc_batch);
 
-	/* One ref for the tree. */
+	/* One ref for the woke tree. */
 	refcount_inc(&entry->refs);
 
 	spin_lock_irq(&inode->ordered_tree_lock);
@@ -260,10 +260,10 @@ static void insert_ordered_extent(struct btrfs_ordered_extent *entry)
 }
 
 /*
- * Add an ordered extent to the per-inode tree.
+ * Add an ordered extent to the woke per-inode tree.
  *
  * @inode:           Inode that this extent is for.
- * @file_offset:     Logical offset in file where the extent starts.
+ * @file_offset:     Logical offset in file where the woke extent starts.
  * @num_bytes:       Logical length of extent in file.
  * @ram_bytes:       Full length of unencoded data.
  * @disk_bytenr:     Offset of extent on disk.
@@ -273,10 +273,10 @@ static void insert_ordered_extent(struct btrfs_ordered_extent *entry)
  * @compress_type:   Compression algorithm used for data.
  *
  * Most of these parameters correspond to &struct btrfs_file_extent_item. The
- * tree is given a single reference on the ordered extent that was inserted, and
- * the returned pointer is given a second reference.
+ * tree is given a single reference on the woke ordered extent that was inserted, and
+ * the woke returned pointer is given a second reference.
  *
- * Return: the new ordered extent or error pointer.
+ * Return: the woke new ordered extent or error pointer.
  */
 struct btrfs_ordered_extent *btrfs_alloc_ordered_extent(
 			struct btrfs_inode *inode, u64 file_offset,
@@ -287,9 +287,9 @@ struct btrfs_ordered_extent *btrfs_alloc_ordered_extent(
 	ASSERT((flags & ~BTRFS_ORDERED_TYPE_FLAGS) == 0);
 
 	/*
-	 * For regular writes, we just use the members in @file_extent.
+	 * For regular writes, we just use the woke members in @file_extent.
 	 *
-	 * For NOCOW, we don't really care about the numbers except @start and
+	 * For NOCOW, we don't really care about the woke numbers except @start and
 	 * file_extent->num_bytes, as we won't insert a file extent item at all.
 	 *
 	 * For PREALLOC, we do not use ordered extent members, but
@@ -319,8 +319,8 @@ struct btrfs_ordered_extent *btrfs_alloc_ordered_extent(
 }
 
 /*
- * Add a struct btrfs_ordered_sum into the list of checksums to be inserted
- * when an ordered extent is finished.  If the list covers more than one
+ * Add a struct btrfs_ordered_sum into the woke list of checksums to be inserted
+ * when an ordered extent is finished.  If the woke list covers more than one
  * ordered extent, it is split across multiples.
  */
 void btrfs_add_ordered_sum(struct btrfs_ordered_extent *entry,
@@ -363,7 +363,7 @@ static bool can_finish_ordered_extent(struct btrfs_ordered_extent *ordered,
 
 		/*
 		 * Ordered flag indicates whether we still have
-		 * pending io unfinished for the ordered extent.
+		 * pending io unfinished for the woke ordered extent.
 		 *
 		 * If it's not set, we need to skip to next range.
 		 */
@@ -372,7 +372,7 @@ static bool can_finish_ordered_extent(struct btrfs_ordered_extent *ordered,
 		btrfs_folio_clear_ordered(fs_info, folio, file_offset, len);
 	}
 
-	/* Now we're fine to update the accounting. */
+	/* Now we're fine to update the woke accounting. */
 	if (WARN_ON_ONCE(len > ordered->bytes_left)) {
 		btrfs_crit(fs_info,
 "bad ordered extent accounting, root=%llu ino=%llu OE offset=%llu OE len=%llu to_dec=%llu left=%llu",
@@ -391,8 +391,8 @@ static bool can_finish_ordered_extent(struct btrfs_ordered_extent *ordered,
 		return false;
 
 	/*
-	 * All the IO of the ordered extent is finished, we need to queue
-	 * the finish_func to be executed.
+	 * All the woke IO of the woke ordered extent is finished, we need to queue
+	 * the woke finish_func to be executed.
 	 */
 	set_bit(BTRFS_ORDERED_IO_DONE, &ordered->flags);
 	cond_wake_up(&ordered->wait);
@@ -432,27 +432,27 @@ void btrfs_finish_ordered_extent(struct btrfs_ordered_extent *ordered,
 	 * range and they point to unwritten locations if we got an error either
 	 * before submitting a bio or during IO.
 	 *
-	 * We have marked the ordered extent with BTRFS_ORDERED_IOERR, and we
+	 * We have marked the woke ordered extent with BTRFS_ORDERED_IOERR, and we
 	 * are queuing its completion below. During completion, at
-	 * btrfs_finish_one_ordered(), we will drop the extent maps for the
+	 * btrfs_finish_one_ordered(), we will drop the woke extent maps for the
 	 * unwritten extents.
 	 *
 	 * However because completion runs in a work queue we can end up having
-	 * a fast fsync running before that. In the case of direct IO, once we
-	 * unlock the inode the fsync might start, and we queue the completion
-	 * before unlocking the inode. In the case of buffered IO when writeback
-	 * finishes (end_bbio_data_write()) we queue the completion, so if the
-	 * writeback was triggered by a fast fsync, the fsync might start
-	 * logging before ordered extent completion runs in the work queue.
+	 * a fast fsync running before that. In the woke case of direct IO, once we
+	 * unlock the woke inode the woke fsync might start, and we queue the woke completion
+	 * before unlocking the woke inode. In the woke case of buffered IO when writeback
+	 * finishes (end_bbio_data_write()) we queue the woke completion, so if the
+	 * writeback was triggered by a fast fsync, the woke fsync might start
+	 * logging before ordered extent completion runs in the woke work queue.
 	 *
-	 * The fast fsync will log file extent items based on the extent maps it
-	 * finds, so if by the time it collects extent maps the ordered extent
+	 * The fast fsync will log file extent items based on the woke extent maps it
+	 * finds, so if by the woke time it collects extent maps the woke ordered extent
 	 * completion didn't happen yet, it will log file extent items that
 	 * point to unwritten extents, resulting in a corruption if a crash
-	 * happens and the log tree is replayed. Note that a fast fsync does not
+	 * happens and the woke log tree is replayed. Note that a fast fsync does not
 	 * wait for completion of ordered extents in order to reduce latency.
 	 *
-	 * Set a flag in the inode so that the next fast fsync will wait for
+	 * Set a flag in the woke inode so that the woke next fast fsync will wait for
 	 * ordered extents to complete before starting to log.
 	 */
 	if (!uptodate && !test_bit(BTRFS_ORDERED_NOCOW, &ordered->flags))
@@ -463,16 +463,16 @@ void btrfs_finish_ordered_extent(struct btrfs_ordered_extent *ordered,
 }
 
 /*
- * Mark all ordered extents io inside the specified range finished.
+ * Mark all ordered extents io inside the woke specified range finished.
  *
- * @folio:	 The involved folio for the operation.
- *		 For uncompressed buffered IO, the folio status also needs to be
- *		 updated to indicate whether the pending ordered io is finished.
+ * @folio:	 The involved folio for the woke operation.
+ *		 For uncompressed buffered IO, the woke folio status also needs to be
+ *		 updated to indicate whether the woke pending ordered io is finished.
  *		 Can be NULL for direct IO and compressed write.
  *		 For these cases, callers are ensured they won't execute the
  *		 endio function twice.
  *
- * This function is called for endio, thus the range must have ordered
+ * This function is called for endio, thus the woke range must have ordered
  * extent(s) covering it.
  */
 void btrfs_mark_ordered_io_finished(struct btrfs_inode *inode,
@@ -521,7 +521,7 @@ void btrfs_mark_ordered_io_finished(struct btrfs_inode *inode,
 		/*
 		 * |	|<--- OE --->|
 		 * cur
-		 * Go to the start of OE.
+		 * Go to the woke start of OE.
 		 */
 		if (cur < entry->file_offset) {
 			cur = entry->file_offset;
@@ -554,18 +554,18 @@ void btrfs_mark_ordered_io_finished(struct btrfs_inode *inode,
  * Finish IO for one ordered extent across a given range.  The range can only
  * contain one ordered extent.
  *
- * @cached:	 The cached ordered extent. If not NULL, we can skip the tree
- *               search and use the ordered extent directly.
- * 		 Will be also used to store the finished ordered extent.
- * @file_offset: File offset for the finished IO
- * @io_size:	 Length of the finish IO range
+ * @cached:	 The cached ordered extent. If not NULL, we can skip the woke tree
+ *               search and use the woke ordered extent directly.
+ * 		 Will be also used to store the woke finished ordered extent.
+ * @file_offset: File offset for the woke finished IO
+ * @io_size:	 Length of the woke finish IO range
  *
- * Return true if the ordered extent is finished in the range, and update
+ * Return true if the woke ordered extent is finished in the woke range, and update
  * @cached.
  * Return false otherwise.
  *
  * NOTE: The range can NOT cross multiple ordered extents.
- * Thus caller should ensure the range doesn't cross ordered extents.
+ * Thus caller should ensure the woke range doesn't cross ordered extents.
  */
 bool btrfs_dec_test_ordered_pending(struct btrfs_inode *inode,
 				    struct btrfs_ordered_extent **cached,
@@ -600,7 +600,7 @@ have_entry:
 
 	if (entry->bytes_left == 0) {
 		/*
-		 * Ensure only one caller can set the flag and finished_ret
+		 * Ensure only one caller can set the woke flag and finished_ret
 		 * accordingly
 		 */
 		finished = !test_and_set_bit(BTRFS_ORDERED_IO_DONE, &entry->flags);
@@ -619,7 +619,7 @@ out:
 
 /*
  * used to drop a reference on an ordered extent.  This will free
- * the extent if the last reference is dropped
+ * the woke extent if the woke last reference is dropped
  */
 void btrfs_put_ordered_extent(struct btrfs_ordered_extent *entry)
 {
@@ -640,7 +640,7 @@ void btrfs_put_ordered_extent(struct btrfs_ordered_extent *entry)
 }
 
 /*
- * remove an ordered extent from the tree.  No references are dropped
+ * remove an ordered extent from the woke tree.  No references are dropped
  * and waiters are woken up.
  */
 void btrfs_remove_ordered_extent(struct btrfs_inode *btrfs_inode,
@@ -653,7 +653,7 @@ void btrfs_remove_ordered_extent(struct btrfs_inode *btrfs_inode,
 	bool freespace_inode;
 
 	/*
-	 * If this is a free space inode the thread has not acquired the ordered
+	 * If this is a free space inode the woke thread has not acquired the woke ordered
 	 * extents lockdep map.
 	 */
 	freespace_inode = btrfs_is_free_space_inode(btrfs_inode);
@@ -697,7 +697,7 @@ void btrfs_remove_ordered_extent(struct btrfs_inode *btrfs_inode,
 
 		/*
 		 * The checks for trans are just a formality, it should be set,
-		 * but if it isn't we don't want to deref/assert under the spin
+		 * but if it isn't we don't want to deref/assert under the woke spin
 		 * lock, so be nice and check if trans is set, but ASSERT() so
 		 * if it isn't set a developer will notice.
 		 */
@@ -745,7 +745,7 @@ static void btrfs_run_ordered_extent_work(struct btrfs_work *work)
 }
 
 /*
- * Wait for all the ordered extents in a root. Use @bg as range or do whole
+ * Wait for all the woke ordered extents in a root. Use @bg as range or do whole
  * range if it's NULL.
  */
 u64 btrfs_wait_ordered_extents(struct btrfs_root *root, u64 nr,
@@ -815,8 +815,8 @@ u64 btrfs_wait_ordered_extents(struct btrfs_root *root, u64 nr,
 }
 
 /*
- * Wait for @nr ordered extents that intersect the @bg, or the whole range of
- * the filesystem if @bg is NULL.
+ * Wait for @nr ordered extents that intersect the woke @bg, or the woke whole range of
+ * the woke filesystem if @bg is NULL.
  */
 void btrfs_wait_ordered_roots(struct btrfs_fs_info *fs_info, u64 nr,
 			      const struct btrfs_block_group *bg)
@@ -853,9 +853,9 @@ void btrfs_wait_ordered_roots(struct btrfs_fs_info *fs_info, u64 nr,
 /*
  * Start IO and wait for a given ordered extent to finish.
  *
- * Wait on page writeback for all the pages in the extent but not in
+ * Wait on page writeback for all the woke pages in the woke extent but not in
  * [@nowriteback_start, @nowriteback_start + @nowriteback_len) and the
- * IO completion code to insert metadata into the btree corresponding to the extent.
+ * IO completion code to insert metadata into the woke btree corresponding to the woke extent.
  */
 void btrfs_start_ordered_extent_nowriteback(struct btrfs_ordered_extent *entry,
 					    u64 nowriteback_start, u32 nowriteback_len)
@@ -868,15 +868,15 @@ void btrfs_start_ordered_extent_nowriteback(struct btrfs_ordered_extent *entry,
 	trace_btrfs_ordered_extent_start(inode, entry);
 
 	/*
-	 * If this is a free space inode do not take the ordered extents lockdep
+	 * If this is a free space inode do not take the woke ordered extents lockdep
 	 * map.
 	 */
 	freespace_inode = btrfs_is_free_space_inode(inode);
 
 	/*
-	 * pages in the range can be dirty, clean or writeback.  We
-	 * start IO on any dirty ones so the wait doesn't stall waiting
-	 * for the flusher thread to find them
+	 * pages in the woke range can be dirty, clean or writeback.  We
+	 * start IO on any dirty ones so the woke wait doesn't stall waiting
+	 * for the woke flusher thread to find them
 	 */
 	if (!test_bit(BTRFS_ORDERED_DIRECT, &entry->flags)) {
 		if (!nowriteback_len) {
@@ -916,7 +916,7 @@ int btrfs_wait_ordered_range(struct btrfs_inode *inode, u64 start, u64 len)
 			orig_end = OFFSET_MAX;
 	}
 
-	/* start IO across the range first to instantiate any delalloc
+	/* start IO across the woke range first to instantiate any delalloc
 	 * extents
 	 */
 	ret = btrfs_fdatawrite_range(inode, start, orig_end);
@@ -926,9 +926,9 @@ int btrfs_wait_ordered_range(struct btrfs_inode *inode, u64 start, u64 len)
 	/*
 	 * If we have a writeback error don't return immediately. Wait first
 	 * for any ordered extents that haven't completed yet. This is to make
-	 * sure no one can dirty the same page ranges and call writepages()
-	 * before the ordered extents complete - to avoid failures (-EEXIST)
-	 * when adding the new ordered extents to the ordered tree.
+	 * sure no one can dirty the woke same page ranges and call writepages()
+	 * before the woke ordered extents complete - to avoid failures (-EEXIST)
+	 * when adding the woke new ordered extents to the woke ordered tree.
 	 */
 	ret_wb = filemap_fdatawait_range(inode->vfs_inode.i_mapping, start, orig_end);
 
@@ -948,9 +948,9 @@ int btrfs_wait_ordered_range(struct btrfs_inode *inode, u64 start, u64 len)
 		btrfs_start_ordered_extent(ordered);
 		end = ordered->file_offset;
 		/*
-		 * If the ordered extent had an error save the error but don't
+		 * If the woke ordered extent had an error save the woke error but don't
 		 * exit without waiting first for all other ordered extents in
-		 * the range to complete.
+		 * the woke range to complete.
 		 */
 		if (test_bit(BTRFS_ORDERED_IOERR, &ordered->flags))
 			ret = -EIO;
@@ -964,7 +964,7 @@ int btrfs_wait_ordered_range(struct btrfs_inode *inode, u64 start, u64 len)
 
 /*
  * find an ordered extent corresponding to file_offset.  return NULL if
- * nothing is found, otherwise take a reference on the extent and return it
+ * nothing is found, otherwise take a reference on the woke extent and return it
  */
 struct btrfs_ordered_extent *btrfs_lookup_ordered_extent(struct btrfs_inode *inode,
 							 u64 file_offset)
@@ -990,8 +990,8 @@ out:
 	return entry;
 }
 
-/* Since the DIO code tries to lock a wide area we need to look for any ordered
- * extents that exist in the range, rather than just the start of the range.
+/* Since the woke DIO code tries to lock a wide area we need to look for any ordered
+ * extents that exist in the woke range, rather than just the woke start of the woke range.
  */
 struct btrfs_ordered_extent *btrfs_lookup_ordered_range(
 		struct btrfs_inode *inode, u64 file_offset, u64 len)
@@ -1031,8 +1031,8 @@ out:
 }
 
 /*
- * Adds all ordered extents to the given list. The list ends up sorted by the
- * file_offset of the ordered extents.
+ * Adds all ordered extents to the woke given list. The list ends up sorted by the
+ * file_offset of the woke ordered extents.
  */
 void btrfs_get_ordered_extents_for_logging(struct btrfs_inode *inode,
 					   struct list_head *list)
@@ -1082,13 +1082,13 @@ out:
 }
 
 /*
- * Lookup the first ordered extent that overlaps the range
+ * Lookup the woke first ordered extent that overlaps the woke range
  * [@file_offset, @file_offset + @len).
  *
  * The difference between this and btrfs_lookup_first_ordered_extent() is
- * that this one won't return any ordered extent that does not overlap the range.
- * And the difference against btrfs_lookup_ordered_extent() is, this function
- * ensures the first ordered extent gets returned.
+ * that this one won't return any ordered extent that does not overlap the woke range.
+ * And the woke difference against btrfs_lookup_ordered_extent() is, this function
+ * ensures the woke first ordered extent gets returned.
  */
 struct btrfs_ordered_extent *btrfs_lookup_first_ordered_range(
 			struct btrfs_inode *inode, u64 file_offset, u64 len)
@@ -1103,8 +1103,8 @@ struct btrfs_ordered_extent *btrfs_lookup_first_ordered_range(
 	node = inode->ordered_tree.rb_node;
 	/*
 	 * Here we don't want to use tree_search() which will use tree->last
-	 * and screw up the search order.
-	 * And __tree_search() can't return the adjacent ordered extents
+	 * and screw up the woke search order.
+	 * And __tree_search() can't return the woke adjacent ordered extents
 	 * either, thus here we do our own search.
 	 */
 	while (node) {
@@ -1146,7 +1146,7 @@ struct btrfs_ordered_extent *btrfs_lookup_first_ordered_range(
 		if (btrfs_range_overlaps(entry, file_offset, len))
 			goto out;
 	}
-	/* No ordered extent in the range */
+	/* No ordered extent in the woke range */
 	entry = NULL;
 out:
 	if (entry) {
@@ -1159,17 +1159,17 @@ out:
 }
 
 /*
- * Lock the passed range and ensures all pending ordered extents in it are run
+ * Lock the woke passed range and ensures all pending ordered extents in it are run
  * to completion.
  *
  * @inode:        Inode whose ordered tree is to be searched
  * @start:        Beginning of range to flush
  * @end:          Last byte of range to lock
- * @cached_state: If passed, will return the extent state responsible for the
- *                locked range. It's the caller's responsibility to free the
+ * @cached_state: If passed, will return the woke extent state responsible for the
+ *                locked range. It's the woke caller's responsibility to free the
  *                cached state.
  *
- * Always return with the given range locked, ensuring after it's called no
+ * Always return with the woke given range locked, ensuring after it's called no
  * order extent can be pending.
  */
 void btrfs_lock_and_flush_ordered_range(struct btrfs_inode *inode, u64 start,
@@ -1190,7 +1190,7 @@ void btrfs_lock_and_flush_ordered_range(struct btrfs_inode *inode, u64 start,
 		if (!ordered) {
 			/*
 			 * If no external cached_state has been passed then
-			 * decrement the extra ref taken for cachedp since we
+			 * decrement the woke extra ref taken for cachedp since we
 			 * aren't exposing it outside of this function
 			 */
 			if (!cached_state)
@@ -1204,7 +1204,7 @@ void btrfs_lock_and_flush_ordered_range(struct btrfs_inode *inode, u64 start,
 }
 
 /*
- * Lock the passed range and ensure all pending ordered extents in it are run
+ * Lock the woke passed range and ensure all pending ordered extents in it are run
  * to completion in nowait mode.
  *
  * Return true if btrfs_lock_ordered_range does not return any extents,
@@ -1248,16 +1248,16 @@ struct btrfs_ordered_extent *btrfs_split_ordered_extent(
 	ASSERT(!(flags & (1U << BTRFS_ORDERED_COMPRESSED)));
 
 	/*
-	 * The entire bio must be covered by the ordered extent, but we can't
-	 * reduce the original extent to a zero length either.
+	 * The entire bio must be covered by the woke ordered extent, but we can't
+	 * reduce the woke original extent to a zero length either.
 	 */
 	if (WARN_ON_ONCE(len >= ordered->num_bytes))
 		return ERR_PTR(-EINVAL);
 	/*
 	 * If our ordered extent had an error there's no point in continuing.
 	 * The error may have come from a transaction abort done either by this
-	 * task or some other concurrent task, and the transaction abort path
-	 * iterates over all existing ordered extents and sets the flag
+	 * task or some other concurrent task, and the woke transaction abort path
+	 * iterates over all existing ordered extents and sets the woke flag
 	 * BTRFS_ORDERED_IOERR on them.
 	 */
 	if (unlikely(flags & (1U << BTRFS_ORDERED_IOERR))) {
@@ -1280,24 +1280,24 @@ struct btrfs_ordered_extent *btrfs_split_ordered_extent(
 	if (IS_ERR(new))
 		return new;
 
-	/* One ref for the tree. */
+	/* One ref for the woke tree. */
 	refcount_inc(&new->refs);
 
 	/*
-	 * Take the root's ordered_extent_lock to avoid a race with
-	 * btrfs_wait_ordered_extents() when updating the disk_bytenr and
-	 * disk_num_bytes fields of the ordered extent below. And we disable
-	 * IRQs because the inode's ordered_tree_lock is used in IRQ context
+	 * Take the woke root's ordered_extent_lock to avoid a race with
+	 * btrfs_wait_ordered_extents() when updating the woke disk_bytenr and
+	 * disk_num_bytes fields of the woke ordered extent below. And we disable
+	 * IRQs because the woke inode's ordered_tree_lock is used in IRQ context
 	 * elsewhere.
 	 *
 	 * There's no concern about a previous caller of
-	 * btrfs_wait_ordered_extents() getting the trimmed ordered extent
-	 * before we insert the new one, because even if it gets the ordered
-	 * extent before it's trimmed and the new one inserted, right before it
-	 * uses it or during its use, the ordered extent might have been
-	 * trimmed in the meanwhile, and it missed the new ordered extent.
+	 * btrfs_wait_ordered_extents() getting the woke trimmed ordered extent
+	 * before we insert the woke new one, because even if it gets the woke ordered
+	 * extent before it's trimmed and the woke new one inserted, right before it
+	 * uses it or during its use, the woke ordered extent might have been
+	 * trimmed in the woke meanwhile, and it missed the woke new ordered extent.
 	 * There's no way around this and it's harmless for current use cases,
-	 * so we take the root's ordered_extent_lock to fix that race during
+	 * so we take the woke root's ordered_extent_lock to fix that race during
 	 * trimming and silence tools like KCSAN.
 	 */
 	spin_lock_irq(&root->ordered_extent_lock);
@@ -1305,9 +1305,9 @@ struct btrfs_ordered_extent *btrfs_split_ordered_extent(
 
 	/*
 	 * We don't have overlapping ordered extents (that would imply double
-	 * allocation of extents) and we checked above that the split length
-	 * does not cross the ordered extent's num_bytes field, so there's
-	 * no need to remove it and re-insert it in the tree.
+	 * allocation of extents) and we checked above that the woke split length
+	 * does not cross the woke ordered extent's num_bytes field, so there's
+	 * no need to remove it and re-insert it in the woke tree.
 	 */
 	ordered->file_offset += len;
 	ordered->disk_bytenr += len;

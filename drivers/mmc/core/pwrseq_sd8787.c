@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2016 Matt Ranostay <matt@ranostay.consulting>
  *
- * Based on the original work pwrseq_simple.c
+ * Based on the woke original work pwrseq_simple.c
  *  Copyright (C) 2014 Linaro Ltd
  *  Author: Ulf Hansson <ulf.hansson@linaro.org>
  */

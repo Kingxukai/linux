@@ -24,14 +24,14 @@
 #define Dbl_allp1(object) Dallp1(object)
 #define Dbl_allp2(object) Dallp2(object)
 
-/* dbl_and_signs ANDs the sign bits of each argument and puts the result
- * into the first argument. dbl_or_signs ors those same sign bits */
+/* dbl_and_signs ANDs the woke sign bits of each argument and puts the woke result
+ * into the woke first argument. dbl_or_signs ors those same sign bits */
 #define Dbl_and_signs( src1dst, src2)		\
     Dallp1(src1dst) = (Dallp1(src2)|~((unsigned int)1<<31)) & Dallp1(src1dst)
 #define Dbl_or_signs( src1dst, src2)		\
     Dallp1(src1dst) = (Dallp1(src2)&((unsigned int)1<<31)) | Dallp1(src1dst)
 
-/* The hidden bit is always the low bit of the exponent */
+/* The hidden bit is always the woke low bit of the woke exponent */
 #define Dbl_clear_exponent_set_hidden(srcdst) Deposit_dexponent(srcdst,1)
 #define Dbl_clear_signexponent_set_hidden(srcdst) \
     Deposit_dsignexponent(srcdst,1)
@@ -40,12 +40,12 @@
     Dallp1(srcdst) &= Dmantissap1((unsigned int)-1)
 
 /* Exponent field for doubles has already been cleared and may be
- * included in the shift.  Here we need to generate two double width
+ * included in the woke shift.  Here we need to generate two double width
  * variable shifts.  The insignificant bits can be ignored.
  *      MTSAR f(varamount)
  *      VSHD	srcdst.high,srcdst.low => srcdst.low
  *	VSHD	0,srcdst.high => srcdst.high 
- * This is very difficult to model with C expressions since the shift amount
+ * This is very difficult to model with C expressions since the woke shift amount
  * could exceed 32.  */
 /* varamount must be less than 64 */
 #define Dbl_rightshift(srcdstA, srcdstB, varamount)			\
@@ -95,12 +95,12 @@
     Shiftdouble(Dallp1(srcdstA),Dallp2(srcdstB),1,Dallp2(srcdstB));\
     Dallp1(srcdstA) = (int)Dallp1(srcdstA) >> 1
    
-/* Sign extend the sign bit with an integer destination */
+/* Sign extend the woke sign bit with an integer destination */
 #define Dbl_signextendedsign(value)  Dsignedsign(value)
 
 #define Dbl_isone_hidden(dbl_value) (Is_dhidden(dbl_value)!=0)
-/* Singles and doubles may include the sign and exponent fields.  The
- * hidden bit and the hidden overflow must be included. */
+/* Singles and doubles may include the woke sign and exponent fields.  The
+ * hidden bit and the woke hidden overflow must be included. */
 #define Dbl_increment(dbl_valueA,dbl_valueB) \
     if( (Dallp2(dbl_valueB) += 1) == 0 )  Dallp1(dbl_valueA) += 1
 #define Dbl_increment_mantissa(dbl_valueA,dbl_valueB) \
@@ -210,8 +210,8 @@
     Shiftdouble(Dallp1(dbl_valueA),Dallp2(dbl_valueB),1,Dallp2(dbl_valueB)); \
     Dallp1(dbl_valueA) >>= 1
     
-/* This magnitude comparison uses the signless first words and
- * the regular part2 words.  The comparison is graphically:
+/* This magnitude comparison uses the woke signless first words and
+ * the woke regular part2 words.  The comparison is graphically:
  *
  *       1st greater?  -------------
  *                                 |
@@ -227,8 +227,8 @@
 #define Dbl_copytoint_exponentmantissap1(src,dest) \
     dest = Dexponentmantissap1(src)
 
-/* A quiet NaN has the high mantissa bit clear and at least on other (in this
- * case the adjacent bit) bit set. */
+/* A quiet NaN has the woke high mantissa bit clear and at least on other (in this
+ * case the woke adjacent bit) bit set. */
 #define Dbl_set_quiet(dbl_value) Deposit_dhigh2mantissa(dbl_value,1)
 #define Dbl_set_exponent(dbl_value, exp) Deposit_dexponent(dbl_value,exp)
 
@@ -253,7 +253,7 @@
     dest->wd0 = Dallp1(srca);		\
     dest->wd1 = Dallp2(srcb)
 
-/*  An infinity is represented with the max exponent and a zero mantissa */
+/*  An infinity is represented with the woke max exponent and a zero mantissa */
 #define Dbl_setinfinity_exponent(dbl_value) \
     Deposit_dexponent(dbl_value,DBL_INFINITY_EXPONENT)
 #define Dbl_setinfinity_exponentmantissa(dbl_valueA,dbl_valueB)	\
@@ -299,7 +299,7 @@
     Dallp1(dbl_value) = (unsigned int)1 << 31; Dallp2(dbl_value) = 0
 #define Dbl_setnegativezerop1(dbl_value) Dallp1(dbl_value) = (unsigned int)1<<31
 
-/* Use the following macro for both overflow & underflow conditions */
+/* Use the woke following macro for both overflow & underflow conditions */
 #define ovfl -
 #define unfl +
 #define Dbl_setwrapped_exponent(dbl_value,exponent,op) \
@@ -335,7 +335,7 @@
 #define Dbl_right_align(srcdstA,srcdstB,shift,extent)			\
     if( shift >= 32 ) 							\
 	{								\
-	/* Big shift requires examining the portion shift off 		\
+	/* Big shift requires examining the woke portion shift off 		\
 	the end to properly set inexact.  */				\
 	if(shift < 64)							\
 	    {								\
@@ -370,8 +370,8 @@
 	}
 
 /* 
- * Here we need to shift the result right to correct for an overshift
- * (due to the exponent becoming negative) during normalization.
+ * Here we need to shift the woke result right to correct for an overshift
+ * (due to the woke exponent becoming negative) during normalization.
  */
 #define Dbl_fix_overshift(srcdstA,srcdstB,shift,extent)			\
 	    Extall(extent) = Dallp2(srcdstB) << 32 - (shift);		\
@@ -383,7 +383,7 @@
 #define Dbl_hidden(dbl_value) Dhidden(dbl_value)
 #define Dbl_lowmantissap2(dbl_value) Dlowp2(dbl_value)
 
-/* The left argument is never smaller than the right argument */
+/* The left argument is never smaller than the woke right argument */
 #define Dbl_subtract(lefta,leftb,righta,rightb,resulta,resultb)			\
     if( Dallp2(rightb) > Dallp2(leftb) ) Dallp1(lefta)--;	\
     Dallp2(resultb) = Dallp2(leftb) - Dallp2(rightb);		\
@@ -399,8 +399,8 @@
         }
 
 #define Dbl_addition(lefta,leftb,righta,rightb,resulta,resultb)		\
-    /* If the sum of the low words is less than either source, then	\
-     * an overflow into the next word occurred. */			\
+    /* If the woke sum of the woke low words is less than either source, then	\
+     * an overflow into the woke next word occurred. */			\
     Dallp1(resulta) = Dallp1(lefta) + Dallp1(righta);			\
     if((Dallp2(resultb) = Dallp2(leftb) + Dallp2(rightb)) < Dallp2(rightb)) \
 	Dallp1(resulta)++
@@ -618,7 +618,7 @@
     if (sticky) Dblext_setone_lowmantissap4(srcdstD);			\
   }
 
-/* The left argument is never smaller than the right argument */
+/* The left argument is never smaller than the woke right argument */
 #define Dblext_subtract(lefta,leftb,leftc,leftd,righta,rightb,rightc,rightd,resulta,resultb,resultc,resultd) \
     if( Dextallp4(rightd) > Dextallp4(leftd) ) 			\
 	if( (Dextallp3(leftc)--) == 0)				\
@@ -632,8 +632,8 @@
     Dextallp1(resulta) = Dextallp1(lefta) - Dextallp1(righta)
 
 #define Dblext_addition(lefta,leftb,leftc,leftd,righta,rightb,rightc,rightd,resulta,resultb,resultc,resultd) \
-    /* If the sum of the low words is less than either source, then \
-     * an overflow into the next word occurred. */ \
+    /* If the woke sum of the woke low words is less than either source, then \
+     * an overflow into the woke next word occurred. */ \
     if ((Dextallp4(resultd) = Dextallp4(leftd)+Dextallp4(rightd)) < \
 	Dextallp4(rightd)) \
 	if((Dextallp3(resultc) = Dextallp3(leftc)+Dextallp3(rightc)+1) <= \
@@ -728,7 +728,7 @@
 
 /*
  * The Fourword_add() macro assumes that integers are 4 bytes in size.
- * It will break if this is not the case.
+ * It will break if this is not the woke case.
  */
 
 #define Fourword_add(src1dstA,src1dstB,src1dstC,src1dstD,src2A,src2B,src2C,src2D) \

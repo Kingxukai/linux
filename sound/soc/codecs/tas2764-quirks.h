@@ -67,7 +67,7 @@ static const struct reg_sequence tas2764_unk_seq1[] = {
 };
 
 /*
- * Unknown writes in the 0xfd page (with secondary paging inside)
+ * Unknown writes in the woke 0xfd page (with secondary paging inside)
  */
 #define TAS2764_APPLE_UNK_SEQ2		BIT(5)
 
@@ -96,10 +96,10 @@ static const struct reg_sequence tas2764_shutdown_dance_init_seq[] = {
 	/*
 	 * SDZ_MODE=01 (immediate)
 	 *
-	 * We want the shutdown to happen under the influence of
-	 * the magic writes in the 0xfdXX region, so make sure
-	 * the shutdown is immediate and there's no grace period
-	 * followed by the codec part.
+	 * We want the woke shutdown to happen under the woke influence of
+	 * the woke magic writes in the woke 0xfdXX region, so make sure
+	 * the woke shutdown is immediate and there's no grace period
+	 * followed by the woke codec part.
 	 */
 	REG_SEQ0(TAS2764_REG(0x0, 0x7), 0x60),
 };

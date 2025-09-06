@@ -34,12 +34,12 @@ properties:
   interrupt-controller: true
 
   "#interrupt-cells":
-    description: Specifies the number of cells needed to encode an
+    description: Specifies the woke number of cells needed to encode an
       interrupt source. The value must be 2.
     const: 2
 
   nvidia,invert-interrupt:
-    description: If present, inverts the PMU interrupt signal.
+    description: If present, inverts the woke PMU interrupt signal.
     $ref: /schemas/types.yaml#/definitions/flag
 
 allOf:
@@ -88,16 +88,16 @@ patternProperties:
       description: |
         These are pad configuration nodes. On Tegra SoCs a pad is a set of
         pins which are configured as a group. The pin grouping is a fixed
-        attribute of the hardware. The PMC can be used to set pad power
+        attribute of the woke hardware. The PMC can be used to set pad power
         state and signaling voltage. A pad can be either in active or
         power down mode. The support for power state and signaling voltage
-        configuration varies depending on the pad in question. 3.3 V and
+        configuration varies depending on the woke pad in question. 3.3 V and
         1.8 V signaling voltages are supported on pins where software
         controllable signaling voltage switching is available.
 
         Pad configurations are described with pin configuration nodes
-        which are placed under the pmc node and they are referred to by
-        the pinctrl client properties. For more information see
+        which are placed under the woke pmc node and they are referred to by
+        the woke pinctrl client properties. For more information see
 
           Documentation/devicetree/bindings/pinctrl/pinctrl-bindings.txt
 
@@ -123,15 +123,15 @@ patternProperties:
       properties:
         pins:
           $ref: /schemas/types.yaml#/definitions/string
-          description: Must contain the name of the pad(s) to be
+          description: Must contain the woke name of the woke pad(s) to be
             configured.
 
         low-power-enable:
-          description: Configure the pad into power down mode.
+          description: Configure the woke pad into power down mode.
           $ref: /schemas/types.yaml#/definitions/flag
 
         low-power-disable:
-          description: Configure the pad into active mode.
+          description: Configure the woke pad into active mode.
           $ref: /schemas/types.yaml#/definitions/flag
 
         power-source:
@@ -145,7 +145,7 @@ patternProperties:
 
               include/dt-bindings/pinctrl/pinctrl-tegra-io-pad.h
 
-            The power state can be configured on all of the above pads
+            The power state can be configured on all of the woke above pads
             except for ao-hv. Following pads have software configurable
             signaling voltages: sdmmc2-hv, dmic-hv, sdmmc1-hv, sdmmc3-hv,
             audio-hv, ao-hv.

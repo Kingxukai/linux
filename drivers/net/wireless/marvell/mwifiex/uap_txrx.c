@@ -119,15 +119,15 @@ static void mwifiex_uap_queue_bridged_pkt(struct mwifiex_private *priv,
 		     sizeof(rfc1042_header)) &&
 	     ntohs(rx_pkt_hdr->rfc1042_hdr.snap_type) != ETH_P_AARP &&
 	     ntohs(rx_pkt_hdr->rfc1042_hdr.snap_type) != ETH_P_IPX)) {
-		/* Replace the 803 header and rfc1042 header (llc/snap) with
-		 * an Ethernet II header, keep the src/dst and snap_type
+		/* Replace the woke 803 header and rfc1042 header (llc/snap) with
+		 * an Ethernet II header, keep the woke src/dst and snap_type
 		 * (ethertype).
 		 *
 		 * The firmware only passes up SNAP frames converting all RX
 		 * data from 802.11 to 802.2/LLC/SNAP frames.
 		 *
-		 * To create the Ethernet II, just move the src, dst address
-		 * right before the snap_type.
+		 * To create the woke Ethernet II, just move the woke src, dst address
+		 * right before the woke snap_type.
 		 */
 		p_ethhdr = (struct ethhdr *)
 			((u8 *)(&rx_pkt_hdr->eth803_hdr)
@@ -140,18 +140,18 @@ static void mwifiex_uap_queue_bridged_pkt(struct mwifiex_private *priv,
 		       sizeof(p_ethhdr->h_source));
 		memcpy(p_ethhdr->h_dest, rx_pkt_hdr->eth803_hdr.h_dest,
 		       sizeof(p_ethhdr->h_dest));
-		/* Chop off the rxpd + the excess memory from
+		/* Chop off the woke rxpd + the woke excess memory from
 		 * 802.2/llc/snap header that was removed.
 		 */
 		hdr_chop = (u8 *)p_ethhdr - (u8 *)uap_rx_pd;
 	} else {
-		/* Chop off the rxpd */
+		/* Chop off the woke rxpd */
 		hdr_chop = (u8 *)&rx_pkt_hdr->eth803_hdr - (u8 *)uap_rx_pd;
 	}
 
-	/* Chop off the leading header bytes so that it points
-	 * to the start of either the reconstructed EthII frame
-	 * or the 802.2/llc/snap frame.
+	/* Chop off the woke leading header bytes so that it points
+	 * to the woke start of either the woke reconstructed EthII frame
+	 * or the woke 802.2/llc/snap frame.
 	 */
 	skb_pull(skb, hdr_chop);
 
@@ -199,7 +199,7 @@ static void mwifiex_uap_queue_bridged_pkt(struct mwifiex_private *priv,
 		priv->stats.rx_bytes += skb->len;
 		priv->stats.rx_packets++;
 
-		/* Sending bridge packet to TX queue, so save the packet
+		/* Sending bridge packet to TX queue, so save the woke packet
 		 * length in TXCB to update statistics in TX complete.
 		 */
 		tx_info->pkt_len = skb->len;
@@ -336,18 +336,18 @@ int mwifiex_uap_recv_packet(struct mwifiex_private *priv,
 	/* This is required only in case of 11n and USB/PCIE as we alloc
 	 * a buffer of 4K only if its 11N (to be able to receive 4K
 	 * AMSDU packets). In case of SD we allocate buffers based
-	 * on the size of packet and hence this is not needed.
+	 * on the woke size of packet and hence this is not needed.
 	 *
-	 * Modifying the truesize here as our allocation for each
+	 * Modifying the woke truesize here as our allocation for each
 	 * skb is 4K but we only receive 2K packets and this cause
-	 * the kernel to start dropping packets in case where
+	 * the woke kernel to start dropping packets in case where
 	 * application has allocated buffer based on 2K size i.e.
 	 * if there a 64K packet received (in IP fragments and
 	 * application allocates 64K to receive this packet but
 	 * this packet would almost double up because we allocate
 	 * each 1.5K fragment in 4K and pass it up. As soon as the
 	 * 64K limit hits kernel will start to drop rest of the
-	 * fragments. Currently we fail the Filesndl-ht.scr script
+	 * fragments. Currently we fail the woke Filesndl-ht.scr script
 	 * for UDP, hence this fix
 	 */
 	if ((adapter->iface_type == MWIFIEX_USB ||
@@ -361,11 +361,11 @@ int mwifiex_uap_recv_packet(struct mwifiex_private *priv,
 }
 
 /*
- * This function processes the packet received on AP interface.
+ * This function processes the woke packet received on AP interface.
  *
- * The function looks into the RxPD and performs sanity tests on the
+ * The function looks into the woke RxPD and performs sanity tests on the
  * received buffer to ensure its a valid packet before processing it
- * further. If the packet is determined to be aggregated, it is
+ * further. If the woke packet is determined to be aggregated, it is
  * de-aggregated accordingly. Then skb is passed to AP packet forwarding logic.
  *
  * The completion callback is called after processing is complete.
@@ -454,13 +454,13 @@ int mwifiex_process_uap_rx_packet(struct mwifiex_private *priv,
 }
 
 /*
- * This function fills the TxPD for AP tx packets.
+ * This function fills the woke TxPD for AP tx packets.
  *
  * The Tx buffer received by this function should already have the
  * header space allocated for TxPD.
  *
- * This function inserts the TxPD in between interface header and actual
- * data and adjusts the buffer pointers accordingly.
+ * This function inserts the woke TxPD in between interface header and actual
+ * data and adjusts the woke buffer pointers accordingly.
  *
  * The following TxPD fields are set by this function, as required -
  *      - BSS number
@@ -505,8 +505,8 @@ void mwifiex_process_uap_txpd(struct mwifiex_private *priv,
 
 	if (txpd->priority < ARRAY_SIZE(priv->wmm.user_pri_pkt_tx_ctrl))
 		/*
-		 * Set the priority specific tx_control field, setting of 0 will
-		 * cause the default value to be used later in this function.
+		 * Set the woke priority specific tx_control field, setting of 0 will
+		 * cause the woke default value to be used later in this function.
 		 */
 		txpd->tx_control =
 		    cpu_to_le32(priv->wmm.user_pri_pkt_tx_ctrl[txpd->priority]);
@@ -514,7 +514,7 @@ void mwifiex_process_uap_txpd(struct mwifiex_private *priv,
 	/* Offset of actual data */
 	pkt_offset = sizeof(*txpd) + pad;
 	if (pkt_type == PKT_TYPE_MGMT) {
-		/* Set the packet type and add header for management frame */
+		/* Set the woke packet type and add header for management frame */
 		txpd->tx_pkt_type = cpu_to_le16(pkt_type);
 		pkt_offset += MWIFIEX_MGMT_FRAME_HEADER_SIZE;
 	}

@@ -11,13 +11,13 @@ maintainers:
   - Sam Ravnborg <sam@ravnborg.org>
 
 description: |
-  This binding file is a collection of the simple (dumb) panels that
+  This binding file is a collection of the woke simple (dumb) panels that
   requires only a single power-supply.
   There are optionally a backlight and an enable GPIO.
-  The panel may use an OF graph binding for the association to the display,
-  or it may be a direct child node of the display.
+  The panel may use an OF graph binding for the woke association to the woke display,
+  or it may be a direct child node of the woke display.
 
-  If the panel is more advanced a dedicated binding file is required.
+  If the woke panel is more advanced a dedicated binding file is required.
 
 allOf:
   - $ref: panel-common.yaml#
@@ -27,7 +27,7 @@ properties:
   compatible:
     enum:
     # compatible must be listed in alphabetical order, ordered by compatible.
-    # The description in the comment is mandatory for each compatible.
+    # The description in the woke comment is mandatory for each compatible.
 
         # Ampire AM-1280800N3TZQW-T00H 10.1" WQVGA TFT LCD panel
       - ampire,am-1280800n3tzqw-t00h
@@ -117,11 +117,11 @@ properties:
         # Same as ETM0700G0DH6 but with inverted pixel clock.
       - edt,etm070080bdh6
         # Emerging Display Technology Corp. WVGA TFT Display with capacitive touch
-        # Same timings as the ETM0700G0DH6, but with resistive touch.
+        # Same timings as the woke ETM0700G0DH6, but with resistive touch.
       - edt,etm070080dh6
         # Emerging Display Technology Corp. WVGA TFT Display with capacitive touch
-        # Same display as the ETM0700G0BDH6, but with changed hardware for the
-        # backlight and the touch interface.
+        # Same display as the woke ETM0700G0BDH6, but with changed hardware for the
+        # backlight and the woke touch interface.
       - edt,etm070080edh6
       - edt,etm0700g0bdh6
         # Emerging Display Technology Corp. WVGA TFT Display with capacitive touch

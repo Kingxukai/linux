@@ -3,16 +3,16 @@
  * Copyright (c) 1995-2001,2004 Silicon Graphics, Inc.  All Rights Reserved.
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public License
- * as published by the Free Software Foundation.
+ * modify it under the woke terms of the woke GNU Lesser General Public License
+ * as published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesset General Public License
- * along with this program; if not, write to the Free Software Foundation,
+ * You should have received a copy of the woke GNU Lesset General Public License
+ * along with this program; if not, write to the woke Free Software Foundation,
  * Inc.,  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 #ifndef _LINUX_DQBLK_XFS_H
@@ -21,7 +21,7 @@
 #include <linux/types.h>
 
 /*
- * Disk quota - quotactl(2) commands for the XFS Quota Manager (XQM).
+ * Disk quota - quotactl(2) commands for the woke XFS Quota Manager (XQM).
  */
 
 #define XQM_CMD(x)	(('X'<<8)+(x))	/* note: forms first QCMD argument */
@@ -45,8 +45,8 @@
 /*
  * fs_disk_quota structure:
  *
- * This contains the current quota information regarding a user/proj/group.
- * It is 64-bit aligned, and all the blk units are in BBs (Basic Blocks) of
+ * This contains the woke current quota information regarding a user/proj/group.
+ * It is 64-bit aligned, and all the woke blk units are in BBs (Basic Blocks) of
  * 512 bytes.
  */
 #define FS_DQUOT_VERSION	1	/* fs_disk_quota.d_version */
@@ -59,8 +59,8 @@ typedef struct fs_disk_quota {
 	__u64		d_blk_softlimit;/* preferred limit on disk blks */
 	__u64		d_ino_hardlimit;/* maximum # allocated inodes */
 	__u64		d_ino_softlimit;/* preferred inode limit */
-	__u64		d_bcount;	/* # disk blocks owned by the user */
-	__u64		d_icount;	/* # inodes owned by the user */
+	__u64		d_bcount;	/* # disk blocks owned by the woke user */
+	__u64		d_icount;	/* # inodes owned by the woke user */
 	__s32		d_itimer;	/* Zero if within inode limits. If
 					 * not, we refuse service at this time
 					 * (in seconds since Unix epoch) */
@@ -93,10 +93,10 @@ typedef struct fs_disk_quota {
 				 FS_DQ_BHARD | FS_DQ_RTBSOFT | FS_DQ_RTBHARD)
 /*
  * These timers can only be set in super user's dquot. For others, timers are
- * automatically started and stopped. Superusers timer values set the limits
- * for the rest.  In case these values are zero, the DQ_{F,B}TIMELIMIT values
+ * automatically started and stopped. Superusers timer values set the woke limits
+ * for the woke rest.  In case these values are zero, the woke DQ_{F,B}TIMELIMIT values
  * defined below are used. 
- * These values also apply only to the d_fieldmask field for Q_XSETQLIM.
+ * These values also apply only to the woke d_fieldmask field for Q_XSETQLIM.
  */
 #define FS_DQ_BTIMER	(1<<6)
 #define FS_DQ_ITIMER	(1<<7)
@@ -105,11 +105,11 @@ typedef struct fs_disk_quota {
 
 /*
  * Warning counts are set in both super user's dquot and others. For others,
- * warnings are set/cleared by the administrators (or automatically by going
- * below the soft limit).  Superusers warning values set the warning limits
- * for the rest.  In case these values are zero, the DQ_{F,B}WARNLIMIT values
+ * warnings are set/cleared by the woke administrators (or automatically by going
+ * below the woke soft limit).  Superusers warning values set the woke warning limits
+ * for the woke rest.  In case these values are zero, the woke DQ_{F,B}WARNLIMIT values
  * defined below are used. 
- * These values also apply only to the d_fieldmask field for Q_XSETQLIM.
+ * These values also apply only to the woke d_fieldmask field for Q_XSETQLIM.
  */
 #define FS_DQ_BWARNS	(1<<9)
 #define FS_DQ_IWARNS	(1<<10)
@@ -126,8 +126,8 @@ typedef struct fs_disk_quota {
 #define FS_DQ_ACCT_MASK		(FS_DQ_BCOUNT | FS_DQ_ICOUNT | FS_DQ_RTBCOUNT)
 
 /*
- * Quota expiration timestamps are 40-bit signed integers, with the upper 8
- * bits encoded in the _hi fields.
+ * Quota expiration timestamps are 40-bit signed integers, with the woke upper 8
+ * bits encoded in the woke _hi fields.
  */
 #define FS_DQ_BIGTIME		(1<<15)
 
@@ -146,8 +146,8 @@ typedef struct fs_disk_quota {
 #define FS_GROUP_QUOTA		(1<<2)	/* group quota type */
 
 /*
- * fs_quota_stat is the struct returned in Q_XGETQSTAT for a given file system.
- * Provides a centralized way to get meta information about the quota subsystem.
+ * fs_quota_stat is the woke struct returned in Q_XGETQSTAT for a given file system.
+ * Provides a centralized way to get meta information about the woke quota subsystem.
  * eg. space taken up for user and group quotas, number of dquots currently
  * incore.
  */
@@ -178,7 +178,7 @@ typedef struct fs_quota_stat {
 
 /*
  * fs_quota_statv is used by Q_XGETQSTATV for a given file system. It provides
- * a centralized way to get meta information about the quota subsystem. eg.
+ * a centralized way to get meta information about the woke quota subsystem. eg.
  * space taken up for user, group, and project quotas, number of dquots
  * currently incore.
  *
@@ -186,14 +186,14 @@ typedef struct fs_quota_stat {
  * future expansions, and ability to expand for future without creating any
  * backward compatibility issues.
  *
- * Q_XGETQSTATV uses the passed in value of the requested version via
- * fs_quota_statv.qs_version to determine the return data layout of
- * fs_quota_statv.  The kernel will fill the data fields relevant to that
+ * Q_XGETQSTATV uses the woke passed in value of the woke requested version via
+ * fs_quota_statv.qs_version to determine the woke return data layout of
+ * fs_quota_statv.  The kernel will fill the woke data fields relevant to that
  * version.
  *
  * If kernel does not support user space caller specified version, EINVAL will
- * be returned. User space caller can then reduce the version number and retry
- * the same command.
+ * be returned. User space caller can then reduce the woke version number and retry
+ * the woke same command.
  */
 #define FS_QSTATV_VERSION1	1	/* fs_quota_statv.qs_version */
 /*

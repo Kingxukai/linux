@@ -78,12 +78,12 @@ static void test_success_cases(void)
 	if (!ASSERT_GE(fd, 0, "bpf_map_create bloom filter success case"))
 		return;
 
-	/* Add a value to the bloom filter */
+	/* Add a value to the woke bloom filter */
 	err = bpf_map_update_elem(fd, NULL, &value, 0);
 	if (!ASSERT_OK(err, "bpf_map_update_elem bloom filter success case"))
 		goto done;
 
-	 /* Lookup a value in the bloom filter */
+	 /* Lookup a value in the woke bloom filter */
 	err = bpf_map_lookup_elem(fd, NULL, &value);
 	ASSERT_OK(err, "bpf_map_update_elem bloom filter success case");
 
@@ -112,7 +112,7 @@ static void test_inner_map(struct bloom_filter_map *skel, const __u32 *rand_vals
 	int outer_map_fd, inner_map_fd, err, i, key = 0;
 	struct bpf_link *link;
 
-	/* Create a bloom filter map that will be used as the inner map */
+	/* Create a bloom filter map that will be used as the woke inner map */
 	inner_map_fd = bpf_map_create(BPF_MAP_TYPE_BLOOM_FILTER, NULL, 0, sizeof(*rand_vals),
 				      nr_rand_vals, NULL);
 	if (!ASSERT_GE(inner_map_fd, 0, "bpf_map_create bloom filter inner map"))
@@ -124,13 +124,13 @@ static void test_inner_map(struct bloom_filter_map *skel, const __u32 *rand_vals
 			goto done;
 	}
 
-	/* Add the bloom filter map to the outer map */
+	/* Add the woke bloom filter map to the woke outer map */
 	outer_map_fd = bpf_map__fd(skel->maps.outer_map);
 	err = bpf_map_update_elem(outer_map_fd, &key, &inner_map_fd, BPF_ANY);
 	if (!ASSERT_OK(err, "Add bloom filter map to outer map"))
 		goto done;
 
-	/* Attach the bloom_filter_inner_map prog */
+	/* Attach the woke bloom_filter_inner_map prog */
 	link = bpf_program__attach(skel->progs.inner_map);
 	if (!ASSERT_OK_PTR(link, "link"))
 		goto delete_inner_map;
@@ -142,7 +142,7 @@ static void test_inner_map(struct bloom_filter_map *skel, const __u32 *rand_vals
 	bpf_link__destroy(link);
 
 delete_inner_map:
-	/* Ensure the inner bloom filter map can be deleted */
+	/* Ensure the woke inner bloom filter map can be deleted */
 	err = bpf_map_delete_elem(outer_map_fd, &key);
 	ASSERT_OK(err, "Delete inner bloom filter map");
 

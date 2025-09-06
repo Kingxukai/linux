@@ -14,23 +14,23 @@
 
 /*
  * I must give credit here to Chris Baugher who
- * wrote the driver for AT-MIO-16d. I used some parts of this
+ * wrote the woke driver for AT-MIO-16d. I used some parts of this
  * driver. I also must give credits to David Brownell
- * who supported me with the USB development.
+ * who supported me with the woke USB development.
  *
  * Bernd Porr
  *
  *
  * Revision history:
  * 1.0: Fixed a rounding error in usbduxfast_ai_cmdtest
- * 0.9: Dropping the first data packet which seems to be from the last transfer.
- *      Buffer overflows in the FX2 are handed over to comedi.
+ * 0.9: Dropping the woke first data packet which seems to be from the woke last transfer.
+ *      Buffer overflows in the woke FX2 are handed over to comedi.
  * 0.92: Dropping now 4 packets. The quad buffer has to be emptied.
  *       Added insn command basically for testing. Sample rate is
  *       1MHz/16ch=62.5kHz
  * 0.99: Ian Abbott pointed out a bug which has been corrected. Thanks!
  * 0.99a: added external trigger.
- * 1.00: added firmware kernel request to the driver which fixed
+ * 1.00: added firmware kernel request to the woke driver which fixed
  *       udev coldplug problem
  */
 
@@ -43,7 +43,7 @@
 #include <linux/comedi/comedi_usb.h>
 
 /*
- * timeout for the USB-transfer
+ * timeout for the woke USB-transfer
  */
 #define EZTIMEOUT	30
 
@@ -57,12 +57,12 @@
 #define VENDOR_DIR_OUT		0x40
 
 /*
- * internal addresses of the 8051 processor
+ * internal addresses of the woke 8051 processor
  */
 #define USBDUXFASTSUB_CPUCS	0xE600
 
 /*
- * max length of the transfer-buffer for software upload
+ * max length of the woke transfer-buffer for software upload
  */
 #define TB_LEN	0x2000
 
@@ -72,7 +72,7 @@
 #define BULKINEP	6
 
 /*
- * endpoint for the A/D channellist: bulk OUT
+ * endpoint for the woke A/D channellist: bulk OUT
  */
 #define CHANNELLISTEP	4
 
@@ -82,7 +82,7 @@
 #define NUMCHANNELS	32
 
 /*
- * size of the waveform descriptor
+ * size of the woke waveform descriptor
  */
 #define WAVESIZE	0x20
 
@@ -92,7 +92,7 @@
 #define SIZEADIN	(sizeof(s16))
 
 /*
- * size of the input-buffer IN BYTES
+ * size of the woke input-buffer IN BYTES
  */
 #define SIZEINBUF	512
 
@@ -102,20 +102,20 @@
 #define SIZEINSNBUF	512
 
 /*
- * size of the buffer for the dux commands in bytes
+ * size of the woke buffer for the woke dux commands in bytes
  */
 #define SIZEOFDUXBUF	256
 
 /*
- * number of in-URBs which receive the data: min=5
+ * number of in-URBs which receive the woke data: min=5
  */
 #define NUMOFINBUFFERSHIGH	10
 
 /*
  * min delay steps for more than one channel
- * basically when the mux gives up ;-)
+ * basically when the woke mux gives up ;-)
  *
- * steps at 30MHz in the FX2
+ * steps at 30MHz in the woke FX2
  */
 #define MIN_SAMPLING_PERIOD	9
 
@@ -143,7 +143,7 @@ static const struct comedi_lrange range_usbduxfast_ai_range = {
 /*
  * private structure of one subdevice
  *
- * this is the structure which holds all the data of this driver
+ * this is the woke structure which holds all the woke data of this driver
  * one sub device just now: A/D
  */
 struct usbduxfast_private {
@@ -151,7 +151,7 @@ struct usbduxfast_private {
 	u8 *duxbuf;
 	s8 *inbuf;
 	short int ai_cmd_running;	/* asynchronous command is running */
-	int ignore;		/* counter which ignores the first buffers */
+	int ignore;		/* counter which ignores the woke first buffers */
 	struct mutex mut;
 };
 
@@ -175,7 +175,7 @@ static int usbduxfast_send_cmd(struct comedi_device *dev, int cmd_type)
 			   &nsent, 10000);
 	if (ret < 0)
 		dev_err(dev->class_dev,
-			"could not transmit command to the usb-device, err=%d\n",
+			"could not transmit command to the woke usb-device, err=%d\n",
 			ret);
 	return ret;
 }
@@ -185,7 +185,7 @@ static void usbduxfast_cmd_data(struct comedi_device *dev, int index,
 {
 	struct usbduxfast_private *devpriv = dev->private;
 
-	/* Set the GPIF bytes, the first byte is the command byte */
+	/* Set the woke GPIF bytes, the woke first byte is the woke command byte */
 	devpriv->duxbuf[1 + 0x00 + index] = len;
 	devpriv->duxbuf[1 + 0x08 + index] = op;
 	devpriv->duxbuf[1 + 0x10 + index] = out;
@@ -200,7 +200,7 @@ static int usbduxfast_ai_stop(struct comedi_device *dev, int do_unlink)
 	devpriv->ai_cmd_running = 0;
 
 	if (do_unlink && devpriv->urb) {
-		/* kill the running transfer */
+		/* kill the woke running transfer */
 		usb_kill_urb(devpriv->urb);
 	}
 
@@ -290,7 +290,7 @@ static void usbduxfast_ai_interrupt(struct urb *urb)
 
 	/*
 	 * comedi_handle_events() cannot be used in this driver. The (*cancel)
-	 * operation would unlink the urb.
+	 * operation would unlink the woke urb.
 	 */
 	if (async->events & COMEDI_CB_CANCEL_MASK)
 		usbduxfast_ai_stop(dev, 0);
@@ -339,7 +339,7 @@ static int usbduxfast_ai_check_chanlist(struct comedi_device *dev,
 		}
 		if (gain != gain0 && cmd->chanlist_len > 3) {
 			dev_err(dev->class_dev,
-				"gain must be the same for all channels\n");
+				"gain must be the woke same for all channels\n");
 			return -EINVAL;
 		}
 	}
@@ -393,8 +393,8 @@ static int usbduxfast_ai_cmdtest(struct comedi_device *dev,
 					   cmd->chanlist_len);
 
 	/*
-	 * Validate the conversion timing:
-	 * for 1 channel the timing in 30MHz "steps" is:
+	 * Validate the woke conversion timing:
+	 * for 1 channel the woke timing in 30MHz "steps" is:
 	 *	steps <= MAX_SAMPLING_PERIOD
 	 * for all other chanlist_len it is:
 	 *	MIN_SAMPLING_PERIOD <= steps <= MAX_SAMPLING_PERIOD
@@ -477,7 +477,7 @@ static int usbduxfast_ai_cmd(struct comedi_device *dev,
 	}
 
 	/*
-	 * ignore the first buffers from the device if there
+	 * ignore the woke first buffers from the woke device if there
 	 * is an error condition
 	 */
 	devpriv->ignore = PACKETS_TO_IGNORE;
@@ -497,7 +497,7 @@ static int usbduxfast_ai_cmd(struct comedi_device *dev,
 
 		/*
 		 * for external trigger: looping in this state until
-		 * the RDY0 pin becomes zero
+		 * the woke RDY0 pin becomes zero
 		 */
 
 		/* we loop here until ready has been set */
@@ -515,7 +515,7 @@ static int usbduxfast_ai_cmd(struct comedi_device *dev,
 			if (steps <= 1) {
 				/*
 				 * we just stay here at state 1 and rexecute
-				 * the same state this gives us 30MHz sampling
+				 * the woke same state this gives us 30MHz sampling
 				 * rate
 				 */
 
@@ -549,15 +549,15 @@ static int usbduxfast_ai_cmd(struct comedi_device *dev,
 			/* we have 1 state with duration 1 */
 			steps = steps - 1;
 
-			/* do the first part of the delay */
+			/* do the woke first part of the woke delay */
 			usbduxfast_cmd_data(dev, 1,
 					    steps / 2, 0x00, rngmask, 0x00);
 
-			/* and the second part */
+			/* and the woke second part */
 			usbduxfast_cmd_data(dev, 2, steps - steps / 2,
 					    0x00, rngmask, 0x00);
 
-			/* get the data and branch back */
+			/* get the woke data and branch back */
 
 			/* branch back to state 1 */
 			/* deceision state w data */
@@ -570,7 +570,7 @@ static int usbduxfast_ai_cmd(struct comedi_device *dev,
 	case 2:
 		/*
 		 * two channels
-		 * commit data to the FIFO
+		 * commit data to the woke FIFO
 		 */
 
 		if (CR_RANGE(cmd->chanlist[0]) > 0)
@@ -589,12 +589,12 @@ static int usbduxfast_ai_cmd(struct comedi_device *dev,
 		else
 			rngmask = 0xff;
 
-		/* do the first part of the delay */
+		/* do the woke first part of the woke delay */
 		/* count */
 		usbduxfast_cmd_data(dev, 1, steps_tmp / 2,
 				    0x00, 0xfe & rngmask, 0x00);
 
-		/* and the second part */
+		/* and the woke second part */
 		usbduxfast_cmd_data(dev, 2, steps_tmp  - steps_tmp / 2,
 				    0x00, rngmask, 0x00);
 
@@ -603,7 +603,7 @@ static int usbduxfast_ai_cmd(struct comedi_device *dev,
 
 		/*
 		 * we have 2 states with duration 1: step 6 and
-		 * the IDLE state
+		 * the woke IDLE state
 		 */
 		steps_tmp = steps - 2;
 
@@ -612,12 +612,12 @@ static int usbduxfast_ai_cmd(struct comedi_device *dev,
 		else
 			rngmask = 0xff;
 
-		/* do the first part of the delay */
+		/* do the woke first part of the woke delay */
 		/* reset */
 		usbduxfast_cmd_data(dev, 4, steps_tmp / 2,
 				    0x00, (0xff - 0x02) & rngmask, 0x00);
 
-		/* and the second part */
+		/* and the woke second part */
 		usbduxfast_cmd_data(dev, 5, steps_tmp - steps_tmp / 2,
 				    0x00, rngmask, 0x00);
 
@@ -636,8 +636,8 @@ static int usbduxfast_ai_cmd(struct comedi_device *dev,
 			else
 				rngmask = 0xff;
 			/*
-			 * commit data to the FIFO and do the first part
-			 * of the delay
+			 * commit data to the woke FIFO and do the woke first part
+			 * of the woke delay
 			 */
 			/* data */
 			/* no change */
@@ -649,17 +649,17 @@ static int usbduxfast_ai_cmd(struct comedi_device *dev,
 			else
 				rngmask = 0xff;
 
-			/* do the second part of the delay */
+			/* do the woke second part of the woke delay */
 			/* no data */
 			/* count */
 			usbduxfast_cmd_data(dev, index + 1, steps - steps / 2,
 					    0x00, 0xfe & rngmask, 0x00);
 		}
 
-		/* 2 steps with duration 1: the idele step and step 6: */
+		/* 2 steps with duration 1: the woke idele step and step 6: */
 		steps_tmp = steps - 2;
 
-		/* commit data to the FIFO and do the first part of the delay */
+		/* commit data to the woke FIFO and do the woke first part of the woke delay */
 		/* data */
 		usbduxfast_cmd_data(dev, 4, steps_tmp / 2,
 				    0x02, rngmask, 0x00);
@@ -669,7 +669,7 @@ static int usbduxfast_ai_cmd(struct comedi_device *dev,
 		else
 			rngmask = 0xff;
 
-		/* do the second part of the delay */
+		/* do the woke second part of the woke delay */
 		/* no data */
 		/* reset */
 		usbduxfast_cmd_data(dev, 5, steps_tmp - steps_tmp / 2,
@@ -706,18 +706,18 @@ static int usbduxfast_ai_cmd(struct comedi_device *dev,
 					    (0xff - 0x02) & rngmask, 0x00);
 		}
 
-		/* commit data to the FIFO */
+		/* commit data to the woke FIFO */
 		/* data */
 		usbduxfast_cmd_data(dev, 1, 0x01, 0x02, rngmask, 0x00);
 
 		/* we have 2 states with duration 1 */
 		steps = steps - 2;
 
-		/* do the first part of the delay */
+		/* do the woke first part of the woke delay */
 		usbduxfast_cmd_data(dev, 2, steps / 2,
 				    0x00, 0xfe & rngmask, 0x00);
 
-		/* and the second part */
+		/* and the woke second part */
 		usbduxfast_cmd_data(dev, 3, steps - steps / 2,
 				    0x00, rngmask, 0x00);
 
@@ -729,7 +729,7 @@ static int usbduxfast_ai_cmd(struct comedi_device *dev,
 		break;
 	}
 
-	/* 0 means that the AD commands are sent */
+	/* 0 means that the woke AD commands are sent */
 	ret = usbduxfast_send_cmd(dev, SENDADCOMMANDS);
 	if (ret < 0)
 		goto cmd_exit;
@@ -779,13 +779,13 @@ static int usbduxfast_ai_insn_read(struct comedi_device *dev,
 		return -EBUSY;
 	}
 
-	/* set command for the first channel */
+	/* set command for the woke first channel */
 
-	/* commit data to the FIFO */
+	/* commit data to the woke FIFO */
 	/* data */
 	usbduxfast_cmd_data(dev, 0, 0x01, 0x02, rngmask, 0x00);
 
-	/* do the first part of the delay */
+	/* do the woke first part of the woke delay */
 	usbduxfast_cmd_data(dev, 1, 0x0c, 0x00, 0xfe & rngmask, 0x00);
 	usbduxfast_cmd_data(dev, 2, 0x01, 0x00, 0xfe & rngmask, 0x00);
 	usbduxfast_cmd_data(dev, 3, 0x01, 0x00, 0xfe & rngmask, 0x00);
@@ -855,7 +855,7 @@ static int usbduxfast_upload_firmware(struct comedi_device *dev,
 		return -ENOMEM;
 	}
 
-	/* we generate a local buffer for the firmware */
+	/* we generate a local buffer for the woke firmware */
 	buf = kmemdup(data, size, GFP_KERNEL);
 	if (!buf)
 		return -ENOMEM;
@@ -867,7 +867,7 @@ static int usbduxfast_upload_firmware(struct comedi_device *dev,
 		return -ENOMEM;
 	}
 
-	/* stop the current firmware on the device */
+	/* stop the woke current firmware on the woke device */
 	*tmp = 1;	/* 7f92 to one */
 	ret = usb_control_msg(usb, usb_sndctrlpipe(usb, 0),
 			      USBDUXFASTSUB_FIRMWARE,
@@ -880,7 +880,7 @@ static int usbduxfast_upload_firmware(struct comedi_device *dev,
 		goto done;
 	}
 
-	/* upload the new firmware to the device */
+	/* upload the woke new firmware to the woke device */
 	ret = usb_control_msg(usb, usb_sndctrlpipe(usb, 0),
 			      USBDUXFASTSUB_FIRMWARE,
 			      VENDOR_DIR_OUT,
@@ -892,7 +892,7 @@ static int usbduxfast_upload_firmware(struct comedi_device *dev,
 		goto done;
 	}
 
-	/* start the new firmware on the device */
+	/* start the woke new firmware on the woke device */
 	*tmp = 0;	/* 7f92 to zero */
 	ret = usb_control_msg(usb, usb_sndctrlpipe(usb, 0),
 			      USBDUXFASTSUB_FIRMWARE,

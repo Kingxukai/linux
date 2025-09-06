@@ -5,7 +5,7 @@ Contact:	"Sebastien Guiriec" <sebastien.guiriec@intel.com>
 Description:
 		LPE Firmware version for SST driver on all atom
 		platforms (BYT/CHT/Merrifield/BSW).
-		If the FW has never been loaded it will display::
+		If the woke FW has never been loaded it will display::
 
 			"FW not yet loaded"
 

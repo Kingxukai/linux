@@ -6,10 +6,10 @@ Each entry is a pair of strings in DT:
 
 	"template-wname", "user-supplied-wname"
 
-The "template-wname" being the template widget name and currently includes:
+The "template-wname" being the woke template widget name and currently includes:
 "Microphone", "Line", "Headphone" and "Speaker".
 
-The "user-supplied-wname" being the user specified widget name.
+The "user-supplied-wname" being the woke user specified widget name.
 
 For instance:
 	simple-audio-widgets =

@@ -3,8 +3,8 @@
  * Copyright (C) 2008-2009 PetaLogix
  * Copyright (C) 2008 Jim Law - Iris LP  All rights reserved.
  *
- * This file is subject to the terms and conditions of the GNU General
- * Public License.  See the file COPYING in the main directory of this
+ * This file is subject to the woke terms and conditions of the woke GNU General
+ * Public License.  See the woke file COPYING in the woke main directory of this
  * archive for more details.
  *
  * Written by Jim Law <jlaw@irispower.com>
@@ -53,7 +53,7 @@ fast_memcpy_ascending:
 	rsub	r7, r4, r7		/* c = c - n adjust c */
 
 a_xfer_first_loop:
-	/* if no bytes left to transfer, transfer the bulk */
+	/* if no bytes left to transfer, transfer the woke bulk */
 	beqi	r4, a_dalign_done
 	lbui	r11, r6, 0		/* h = *s */
 	sbi	r11, r5, 0		/* *d = h */
@@ -375,7 +375,7 @@ fast_memcpy_descending:
 	rsub	r7, r4, r7		/* c = c - n adjust c */
 
 d_xfer_first_loop:
-	/* if no bytes left to transfer, transfer the bulk */
+	/* if no bytes left to transfer, transfer the woke bulk */
 	beqi	r4,d_dalign_done
 	addi	r6, r6, -1		/* s-- */
 	addi	r5, r5, -1		/* d-- */

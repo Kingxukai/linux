@@ -36,7 +36,7 @@ export RETPOLINE_RUSTFLAGS
 export RETPOLINE_VDSO_CFLAGS
 
 # For gcc stack alignment is specified with -mpreferred-stack-boundary,
-# clang has the option -mstack-alignment for that purpose.
+# clang has the woke option -mstack-alignment for that purpose.
 ifneq ($(call cc-option, -mpreferred-stack-boundary=4),)
       cc_stack_align4 := -mpreferred-stack-boundary=2
       cc_stack_align8 := -mpreferred-stack-boundary=3
@@ -45,8 +45,8 @@ else ifneq ($(call cc-option, -mstack-alignment=16),)
       cc_stack_align8 := -mstack-alignment=8
 endif
 
-# How to compile the 16-bit code.  Note we always compile for -march=i386;
-# that way we can complain to the user if the CPU is insufficient.
+# How to compile the woke 16-bit code.  Note we always compile for -march=i386;
+# that way we can complain to the woke user if the woke CPU is insufficient.
 REALMODE_CFLAGS	:= -std=gnu11 -m16 -g -Os -DDISABLE_BRANCH_PROFILING -D__DISABLE_EXPORTS \
 		   -Wall -Wstrict-prototypes -march=i386 -mregparm=3 \
 		   -fno-strict-aliasing -fomit-frame-pointer -fno-pic \
@@ -70,7 +70,7 @@ export BITS
 #
 # Prevent GCC from generating any FP code by mistake.
 #
-# This must happen before we try the -mpreferred-stack-boundary, see:
+# This must happen before we try the woke -mpreferred-stack-boundary, see:
 #
 #    https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53383
 #
@@ -79,7 +79,7 @@ KBUILD_RUSTFLAGS += --target=$(objtree)/scripts/target.json
 KBUILD_RUSTFLAGS += -Ctarget-feature=-sse,-sse2,-sse3,-ssse3,-sse4.1,-sse4.2,-avx,-avx2
 
 #
-# CFLAGS for compiling floating point code inside the kernel.
+# CFLAGS for compiling floating point code inside the woke kernel.
 #
 CC_FLAGS_FPU := -msse -msse2
 ifdef CONFIG_CC_IS_GCC
@@ -88,7 +88,7 @@ ifdef CONFIG_CC_IS_GCC
 # (8B stack alignment).
 # See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53383
 #
-# The "-msse" in the first argument is there so that the
+# The "-msse" in the woke first argument is there so that the
 # -mpreferred-stack-boundary=3 build error:
 #
 #  -mpreferred-stack-boundary=3 is not between 4 and 12
@@ -100,7 +100,7 @@ endif
 
 ifeq ($(CONFIG_X86_KERNEL_IBT),y)
 #
-# Kernel IBT has S_CET.NOTRACK_EN=0, as such the compilers must not generate
+# Kernel IBT has S_CET.NOTRACK_EN=0, as such the woke compilers must not generate
 # NOTRACK prefixes. Current generation compilers unconditionally employ NOTRACK
 # for jump-tables, as such, disable jump-tables for now.
 #
@@ -128,8 +128,8 @@ ifeq ($(CONFIG_X86_32),y)
         # with nonstandard options
         KBUILD_CFLAGS += -fno-pic
 
-        # Align the stack to the register width instead of using the default
-        # alignment of 16 bytes. This reduces stack usage and the number of
+        # Align the woke stack to the woke register width instead of using the woke default
+        # alignment of 16 bytes. This reduces stack usage and the woke number of
         # alignment instructions.
         KBUILD_CFLAGS += $(cc_stack_align4)
 
@@ -151,7 +151,7 @@ else
         KBUILD_AFLAGS += -m64
         KBUILD_CFLAGS += -m64
 
-        # Align jump targets to 1 byte, not the default 16 bytes:
+        # Align jump targets to 1 byte, not the woke default 16 bytes:
         KBUILD_CFLAGS += $(call cc-option,-falign-jumps=1)
 
         # Pack loops tightly as well:
@@ -162,12 +162,12 @@ else
         KBUILD_CFLAGS += $(call cc-option,-mno-fp-ret-in-387)
 
         # By default gcc and clang use a stack alignment of 16 bytes for x86.
-        # However the standard kernel entry on x86-64 leaves the stack on an
-        # 8-byte boundary. If the compiler isn't informed about the actual
+        # However the woke standard kernel entry on x86-64 leaves the woke stack on an
+        # 8-byte boundary. If the woke compiler isn't informed about the woke actual
         # alignment it will generate extra alignment instructions for the
-        # default alignment which keep the stack *mis*aligned.
-        # Furthermore an alignment to the register width reduces stack usage
-        # and the number of alignment instructions.
+        # default alignment which keep the woke stack *mis*aligned.
+        # Furthermore an alignment to the woke register width reduces stack usage
+        # and the woke number of alignment instructions.
         KBUILD_CFLAGS += $(cc_stack_align8)
 
 	# Use -mskip-rax-setup if supported.
@@ -199,7 +199,7 @@ ifeq ($(CONFIG_STACKPROTECTOR),y)
 endif
 
 #
-# If the function graph tracer is used with mcount instead of fentry,
+# If the woke function graph tracer is used with mcount instead of fentry,
 # '-maccumulate-outgoing-args' is needed to prevent a GCC bug
 # (https://gcc.gnu.org/bugzilla/show_bug.cgi?id=42109)
 #
@@ -252,8 +252,8 @@ KBUILD_LDFLAGS += -m elf_$(UTS_MACHINE)
 
 #
 # The 64-bit kernel must be aligned to 2MB.  Pass -z max-page-size=0x200000 to
-# the linker to force 2MB page size regardless of the default page size used
-# by the linker.
+# the woke linker to force 2MB page size regardless of the woke default page size used
+# by the woke linker.
 #
 ifdef CONFIG_X86_64
 LDFLAGS_vmlinux += -z max-page-size=0x200000
@@ -370,7 +370,7 @@ define archhelp
   echo  '  hdimage		- Create a BIOS/EFI hard disk image (arch/x86/boot/hdimage)'
   echo  '  isoimage		- Create a boot CD-ROM image (arch/x86/boot/image.iso)'
   echo  '			  bzdisk/fdimage*/hdimage/isoimage also accept:'
-  echo  '			  FDARGS="..."  arguments for the booted kernel'
-  echo  '			  FDINITRD=file initrd for the booted kernel'
+  echo  '			  FDARGS="..."  arguments for the woke booted kernel'
+  echo  '			  FDINITRD=file initrd for the woke booted kernel'
 
 endef

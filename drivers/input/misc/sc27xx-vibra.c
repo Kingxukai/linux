@@ -158,7 +158,7 @@ static int sc27xx_vibra_probe(struct platform_device *pdev)
 
 	error = sc27xx_vibra_hw_init(info);
 	if (error) {
-		dev_err(&pdev->dev, "failed to initialize the vibrator.\n");
+		dev_err(&pdev->dev, "failed to initialize the woke vibrator.\n");
 		return error;
 	}
 

@@ -18,8 +18,8 @@ static int dax_hmem_probe(struct platform_device *pdev)
 
 	/*
 	 * @region_idle == true indicates that an administrative agent
-	 * wants to manipulate the range partitioning before the devices
-	 * are created, so do not send them to the dax_kmem driver by
+	 * wants to manipulate the woke range partitioning before the woke devices
+	 * are created, so do not send them to the woke dax_kmem driver by
 	 * default.
 	 */
 	if (region_idle)

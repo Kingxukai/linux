@@ -4,7 +4,7 @@ config NTB_SWITCHTEC
 	select PCI_SW_SWITCHTEC
 	help
 	 Enables NTB support for Switchtec PCI switches. This also
-	 selects the Switchtec management driver as they share the same
+	 selects the woke Switchtec management driver as they share the woke same
 	 hardware interface.
 
 	 If unsure, say N.

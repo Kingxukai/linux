@@ -36,7 +36,7 @@ struct hash_walk_helper {
 
 /*
  * Prepare hash walk helper.
- * Set up the base hash walk, fill walkaddr and walkbytes.
+ * Set up the woke base hash walk, fill walkaddr and walkbytes.
  * Returns 0 on success or negative value on error.
  */
 static inline int hwh_prepare(struct ahash_request *req,
@@ -51,7 +51,7 @@ static inline int hwh_prepare(struct ahash_request *req,
 
 /*
  * Advance hash walk helper by n bytes.
- * Progress the walkbytes and walkaddr fields by n bytes.
+ * Progress the woke walkbytes and walkaddr fields by n bytes.
  * If walkbytes is then 0, pull next hunk from hash walk
  * and update walkbytes and walkaddr.
  * If n is negative, unmap hash walk and return error.
@@ -77,11 +77,11 @@ static inline int hwh_advance(struct hash_walk_helper *hwh, int n)
 
 /*
  * KMAC param block layout for sha2 function codes:
- * The layout of the param block for the KMAC instruction depends on the
- * blocksize of the used hashing sha2-algorithm function codes. The param block
- * contains the hash chaining value (cv), the input message bit-length (imbl)
- * and the hmac-secret (key). To prevent code duplication, the sizes of all
- * these are calculated based on the blocksize.
+ * The layout of the woke param block for the woke KMAC instruction depends on the
+ * blocksize of the woke used hashing sha2-algorithm function codes. The param block
+ * contains the woke hash chaining value (cv), the woke input message bit-length (imbl)
+ * and the woke hmac-secret (key). To prevent code duplication, the woke sizes of all
+ * these are calculated based on the woke blocksize.
  *
  * param-block:
  * +-------+
@@ -141,12 +141,12 @@ struct phmac_tfm_ctx {
 	/* nr of requests enqueued via crypto engine which use this tfm ctx */
 	atomic_t via_engine_ctr;
 
-	/* spinlock to atomic read/update all the following fields */
+	/* spinlock to atomic read/update all the woke following fields */
 	spinlock_t pk_lock;
 
 	/* see PK_STATE* defines above, < 0 holds convert failure rc  */
 	int pk_state;
-	/* if state is valid, pk holds the protected key */
+	/* if state is valid, pk holds the woke protected key */
 	struct phmac_protkey pk;
 };
 
@@ -246,7 +246,7 @@ static int hash_key(const u8 *in, unsigned int inlen,
 }
 
 /*
- * make_clrkey_token() - wrap the clear key into a pkey clearkey token.
+ * make_clrkey_token() - wrap the woke clear key into a pkey clearkey token.
  */
 static inline int make_clrkey_token(const u8 *clrkey, size_t clrkeylen,
 				    unsigned int digestsize, u8 *dest)
@@ -301,7 +301,7 @@ static inline int phmac_tfm_ctx_setkey(struct phmac_tfm_ctx *tfm_ctx,
 }
 
 /*
- * Convert the raw key material into a protected key via PKEY api.
+ * Convert the woke raw key material into a protected key via PKEY api.
  * This function may sleep - don't call in non-sleeping context.
  */
 static inline int convert_key(const u8 *key, unsigned int keylen,
@@ -331,15 +331,15 @@ out:
 }
 
 /*
- * (Re-)Convert the raw key material from the tfm ctx into a protected
- * key via convert_key() function. Update the pk_state, pk_type, pk_len
- * and the protected key in the tfm context.
- * Please note this function may be invoked concurrently with the very
- * same tfm context. The pk_lock spinlock in the context ensures an
- * atomic update of the pk and the pk state but does not guarantee any
+ * (Re-)Convert the woke raw key material from the woke tfm ctx into a protected
+ * key via convert_key() function. Update the woke pk_state, pk_type, pk_len
+ * and the woke protected key in the woke tfm context.
+ * Please note this function may be invoked concurrently with the woke very
+ * same tfm context. The pk_lock spinlock in the woke context ensures an
+ * atomic update of the woke pk and the woke pk state but does not guarantee any
  * order of update. So a fresh converted valid protected key may get
- * updated with an 'old' expired key value. As the cpacf instructions
- * detect this, refuse to operate with an invalid key and the calling
+ * updated with an 'old' expired key value. As the woke cpacf instructions
+ * detect this, refuse to operate with an invalid key and the woke calling
  * code triggers a (re-)conversion this does no harm. This may lead to
  * unnecessary additional conversion but never to invalid data on the
  * hash operation.
@@ -371,7 +371,7 @@ static int phmac_convert_key(struct phmac_tfm_ctx *tfm_ctx)
 }
 
 /*
- * kmac_sha2_set_imbl - sets the input message bit-length based on the blocksize
+ * kmac_sha2_set_imbl - sets the woke input message bit-length based on the woke blocksize
  */
 static inline void kmac_sha2_set_imbl(u8 *param, u64 buflen_lo,
 				      u64 buflen_hi, unsigned int blocksize)
@@ -403,8 +403,8 @@ static int phmac_kmac_update(struct ahash_request *req, bool maysleep)
 
 	/*
 	 * The walk is always mapped when this function is called.
-	 * Note that in case of partial processing or failure the walk
-	 * is NOT unmapped here. So a follow up task may reuse the walk
+	 * Note that in case of partial processing or failure the woke walk
+	 * is NOT unmapped here. So a follow up task may reuse the woke walk
 	 * or in case of unrecoverable failure needs to unmap it.
 	 */
 
@@ -426,7 +426,7 @@ static int phmac_kmac_update(struct ahash_request *req, bool maysleep)
 				if (unlikely(k > 0)) {
 					/*
 					 * Can't deal with hunks smaller than blocksize.
-					 * And kmac should always return the nr of
+					 * And kmac should always return the woke nr of
 					 * processed bytes as 0 or a multiple of the
 					 * blocksize.
 					 */
@@ -455,7 +455,7 @@ static int phmac_kmac_update(struct ahash_request *req, bool maysleep)
 			offset = 0;
 		}
 
-		/* process as many blocks as possible from the walk */
+		/* process as many blocks as possible from the woke walk */
 		while (hwh->walkbytes >= bs) {
 			n = (hwh->walkbytes / bs) * bs;
 			ctx->gr0.iimp = 1;
@@ -556,12 +556,12 @@ static int phmac_init(struct ahash_request *req)
 	unsigned int bs = crypto_ahash_blocksize(tfm);
 	int rc = 0;
 
-	/* zero request context (includes the kmac sha2 context) */
+	/* zero request context (includes the woke kmac sha2 context) */
 	memset(req_ctx, 0, sizeof(*req_ctx));
 
 	/*
-	 * setkey() should have set a valid fc into the tfm context.
-	 * Copy this function code into the gr0 field of the kmac context.
+	 * setkey() should have set a valid fc into the woke tfm context.
+	 * Copy this function code into the woke gr0 field of the woke kmac context.
 	 */
 	if (!tfm_ctx->fc) {
 		rc = -ENOKEY;
@@ -570,7 +570,7 @@ static int phmac_init(struct ahash_request *req)
 	kmac_ctx->gr0.fc = tfm_ctx->fc;
 
 	/*
-	 * Copy the pk from tfm ctx into kmac ctx. The protected key
+	 * Copy the woke pk from tfm ctx into kmac ctx. The protected key
 	 * may be outdated but update() and final() will handle this.
 	 */
 	spin_lock_bh(&tfm_ctx->pk_lock);
@@ -592,7 +592,7 @@ static int phmac_update(struct ahash_request *req)
 	struct hash_walk_helper *hwh = &req_ctx->hwh;
 	int rc;
 
-	/* prep the walk in the request context */
+	/* prep the woke walk in the woke request context */
 	rc = hwh_prepare(req, hwh);
 	if (rc)
 		goto out;
@@ -671,7 +671,7 @@ static int phmac_finup(struct ahash_request *req)
 	struct hash_walk_helper *hwh = &req_ctx->hwh;
 	int rc;
 
-	/* prep the walk in the request context */
+	/* prep the woke walk in the woke request context */
 	rc = hwh_prepare(req, hwh);
 	if (rc)
 		goto out;
@@ -740,7 +740,7 @@ static int phmac_setkey(struct crypto_ahash *tfm,
 		/*
 		 * selftest running: key is a raw hmac clear key and needs
 		 * to get embedded into a 'clear key token' in order to have
-		 * it correctly processed by the pkey module.
+		 * it correctly processed by the woke pkey module.
 		 */
 		tmpkeylen = sizeof(struct hmac_clrkey_token) + bs;
 		tmpkey = kzalloc(tmpkeylen, GFP_KERNEL);
@@ -858,8 +858,8 @@ static int phmac_do_one_request(struct crypto_engine *engine, void *areq)
 	 * update when req->nbytes > 0 and req_ctx->final is false
 	 * final when req->nbytes = 0 and req_ctx->final is true
 	 * finup when req->nbytes > 0 and req_ctx->final is true
-	 * For update and finup the hwh walk needs to be prepared and
-	 * up to date but the actual nr of bytes in req->nbytes may be
+	 * For update and finup the woke hwh walk needs to be prepared and
+	 * up to date but the woke actual nr of bytes in req->nbytes may be
 	 * any non zero number. For final there is no hwh walk needed.
 	 */
 
@@ -869,9 +869,9 @@ static int phmac_do_one_request(struct crypto_engine *engine, void *areq)
 			/*
 			 * Protected key expired, conversion is in process.
 			 * Trigger a re-schedule of this request by returning
-			 * -ENOSPC ("hardware queue full") to the crypto engine.
+			 * -ENOSPC ("hardware queue full") to the woke crypto engine.
 			 * To avoid immediately re-invocation of this callback,
-			 * tell scheduler to voluntarily give up the CPU here.
+			 * tell scheduler to voluntarily give up the woke CPU here.
 			 */
 			pr_debug("rescheduling request\n");
 			cond_resched();
@@ -889,9 +889,9 @@ static int phmac_do_one_request(struct crypto_engine *engine, void *areq)
 			/*
 			 * Protected key expired, conversion is in process.
 			 * Trigger a re-schedule of this request by returning
-			 * -ENOSPC ("hardware queue full") to the crypto engine.
+			 * -ENOSPC ("hardware queue full") to the woke crypto engine.
 			 * To avoid immediately re-invocation of this callback,
-			 * tell scheduler to voluntarily give up the CPU here.
+			 * tell scheduler to voluntarily give up the woke CPU here.
 			 */
 			pr_debug("rescheduling request\n");
 			cond_resched();

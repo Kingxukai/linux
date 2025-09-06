@@ -24,7 +24,7 @@ properties:
   qcom,tx-port-mapping:
     description: |
       Specifies static port mapping between slave and master tx ports.
-      In the order of slave port index.
+      In the woke order of slave port index.
     $ref: /schemas/types.yaml#/definitions/uint32-array
     minItems: 4
     maxItems: 4
@@ -32,7 +32,7 @@ properties:
   qcom,rx-port-mapping:
     description: |
       Specifies static port mapping between slave and master rx ports.
-      In the order of slave port index.
+      In the woke order of slave port index.
     $ref: /schemas/types.yaml#/definitions/uint32-array
     minItems: 5
     maxItems: 5

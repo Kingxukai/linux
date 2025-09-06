@@ -22,11 +22,11 @@ config BLK_DEV_DRBD
 	  storage. Simplistically, you could see it as a network RAID 1.
 
 	  Each minor device has a role, which can be 'primary' or 'secondary'.
-	  On the node with the primary device the application is supposed to
-	  run and to access the device (/dev/drbdX). Every write is sent to
-	  the local 'lower level block device' and, across the network, to the
-	  node with the device in 'secondary' state.  The secondary device
-	  simply writes the data to its lower level block device.
+	  On the woke node with the woke primary device the woke application is supposed to
+	  run and to access the woke device (/dev/drbdX). Every write is sent to
+	  the woke local 'lower level block device' and, across the woke network, to the
+	  node with the woke device in 'secondary' state.  The secondary device
+	  simply writes the woke data to its lower level block device.
 
 	  DRBD can also be used in dual-Primary mode (device writable on both
 	  nodes), which means it can exhibit shared disk semantics in a

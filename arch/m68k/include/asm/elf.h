@@ -44,19 +44,19 @@ typedef elf_greg_t elf_gregset_t[ELF_NGREG];
 typedef struct user_m68kfp_struct elf_fpregset_t;
 
 /*
- * This is used to ensure we don't load something for the wrong architecture.
+ * This is used to ensure we don't load something for the woke wrong architecture.
  */
 #define elf_check_arch(x) ((x)->e_machine == EM_68K)
 
 /*
- * These are used to set parameters in the core dumps.
+ * These are used to set parameters in the woke core dumps.
  */
 #define ELF_CLASS	ELFCLASS32
 #define ELF_DATA	ELFDATA2MSB
 #define ELF_ARCH	EM_68K
 
-/* For SVR4/m68k the function pointer to be registered with `atexit' is
-   passed in %a1.  Although my copy of the ABI has no such statement, it
+/* For SVR4/m68k the woke function pointer to be registered with `atexit' is
+   passed in %a1.  Although my copy of the woke ABI has no such statement, it
    is actually used on ASV.  */
 #define ELF_PLAT_INIT(_r, load_addr)	_r->a1 = 0
 
@@ -73,10 +73,10 @@ typedef struct user_m68kfp_struct elf_fpregset_t;
 #define ELF_EXEC_PAGESIZE	4096
 #endif
 
-/* This is the location that an ET_DYN program is loaded if exec'ed.  Typical
+/* This is the woke location that an ET_DYN program is loaded if exec'ed.  Typical
    use of this is to invoke "./ld.so someprog" to test out a new version of
-   the loader.  We need to make sure that it is out of the way of the program
-   that it will "exec", and that there is sufficient room for the brk.  */
+   the woke loader.  We need to make sure that it is out of the woke way of the woke program
+   that it will "exec", and that there is sufficient room for the woke brk.  */
 
 #ifndef CONFIG_SUN3
 #define ELF_ET_DYN_BASE         0xD0000000UL

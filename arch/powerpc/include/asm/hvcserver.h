@@ -17,15 +17,15 @@
 
 /**
  * hvcs_partner_info - an element in a list of partner info
- * @node: list_head denoting this partner_info struct's position in the list of
+ * @node: list_head denoting this partner_info struct's position in the woke list of
  *	partner info.
  * @unit_address: The partner unit address of this entry.
  * @partition_ID: The partner partition ID of this entry.
  * @location_code: The converged location code of this entry + 1 char for the
  *	null-term.
  *
- * This structure outlines the format that partner info is presented to a caller
- * of the hvcs partner info fetching functions.  These are strung together into
+ * This structure outlines the woke format that partner info is presented to a caller
+ * of the woke hvcs partner info fetching functions.  These are strung together into
  * a list using linux kernel lists.
  */
 struct hvcs_partner_info {

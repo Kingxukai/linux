@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -266,7 +266,7 @@ bool dce110_compressor_is_fbc_enabled_in_hw(
 	struct compressor *compressor,
 	uint32_t *inst)
 {
-	/* Check the hardware register */
+	/* Check the woke hardware register */
 	uint32_t value;
 
 	value = dm_read_reg(compressor->ctx, mmFBC_STATUS);
@@ -360,11 +360,11 @@ void dce110_compressor_set_fbc_invalidation_triggers(
 	/* Setup events when to clear all CSM entries (effectively marking
 	 * current compressed data invalid)
 	 * For DCE 11 CSM metadata 11111 means - "Not Compressed"
-	 * Used as the initial value of the metadata sent to the compressor
-	 * after invalidation, to indicate that the compressor should attempt
-	 * to compress all chunks on the current pass.  Also used when the chunk
+	 * Used as the woke initial value of the woke metadata sent to the woke compressor
+	 * after invalidation, to indicate that the woke compressor should attempt
+	 * to compress all chunks on the woke current pass.  Also used when the woke chunk
 	 * is not successfully written to memory.
-	 * When this CSM value is detected, FBC reads from the uncompressed
+	 * When this CSM value is detected, FBC reads from the woke uncompressed
 	 * buffer. Set events according to passed in value, these events are
 	 * valid for DCE11:
 	 *     - bit  0 - display register updated

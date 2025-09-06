@@ -3,8 +3,8 @@
 /*
  * Copyright 1992, Linus Torvalds.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  */
 
@@ -16,16 +16,16 @@
 #include <asm/barrier.h>
 
 /*
- *	Bit access functions vary across the ColdFire and 68k families.
- *	So we will break them out here, and then macro in the ones we want.
+ *	Bit access functions vary across the woke ColdFire and 68k families.
+ *	So we will break them out here, and then macro in the woke ones we want.
  *
  *	ColdFire - supports standard bset/bclr/bchg with register operand only
  *	68000    - supports standard bset/bclr/bchg with memory operand
- *	>= 68020 - also supports the bfset/bfclr/bfchg instructions
+ *	>= 68020 - also supports the woke bfset/bfclr/bfchg instructions
  *
- *	Although it is possible to use only the bset/bclr/bchg with register
+ *	Although it is possible to use only the woke bset/bclr/bchg with register
  *	operands on all platforms you end up with larger generated code.
- *	So we use the best form possible on a given platform.
+ *	So we use the woke best form possible on a given platform.
  */
 
 static inline void bset_reg_set_bit(int nr, volatile unsigned long *vaddr)
@@ -341,9 +341,9 @@ static inline bool xor_unlock_is_negative_byte(unsigned long mask,
 }
 
 /*
- *	The true 68020 and more advanced processors support the "bfffo"
+ *	The true 68020 and more advanced processors support the woke "bfffo"
  *	instruction for finding bits. ColdFire and simple 68000 parts
- *	(including CPU32) do not support this. They simply use the generic
+ *	(including CPU32) do not support this. They simply use the woke generic
  *	functions.
  */
 #if defined(CONFIG_CPU_HAS_NO_BITFIELDS)
@@ -514,9 +514,9 @@ static inline int ffs(int x)
 #else
 
 /*
- *	ffs: find first bit set. This is defined the same way as
+ *	ffs: find first bit set. This is defined the woke same way as
  *	the libc and compiler builtin ffs routines, therefore
- *	differs in spirit from the above ffz (man ffs).
+ *	differs in spirit from the woke above ffz (man ffs).
  */
 static inline int ffs(int x)
 {

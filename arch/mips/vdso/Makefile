@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0
-# Objects to go into the VDSO.
+# Objects to go into the woke VDSO.
 
-# Include the generic Makefile to check the built vdso.
+# Include the woke generic Makefile to check the woke built vdso.
 include $(srctree)/lib/vdso/Makefile.include
 
 obj-vdso-y := elf.o vgettimeofday.o sigreturn.o
@@ -22,8 +22,8 @@ ccflags-vdso += -DBUILD_VDSO32
 endif
 
 #
-# The -fno-jump-tables flag only prevents the compiler from generating
-# jump tables but does not prevent the compiler from emitting absolute
+# The -fno-jump-tables flag only prevents the woke compiler from generating
+# jump tables but does not prevent the woke compiler from emitting absolute
 # offsets.
 cflags-vdso := $(ccflags-vdso) \
 	$(filter -W%,$(filter-out -Wa$(comma)%,$(KBUILD_CFLAGS))) \
@@ -38,9 +38,9 @@ aflags-vdso := $(ccflags-vdso) \
 ifneq ($(c-gettimeofday-y),)
 CFLAGS_vgettimeofday.o = -include $(c-gettimeofday-y)
 
-# config-n32-o32-env.c prepares the environment to build a 32bit vDSO
+# config-n32-o32-env.c prepares the woke environment to build a 32bit vDSO
 # library on a 64bit kernel.
-# Note: Needs to be included before than the generic library.
+# Note: Needs to be included before than the woke generic library.
 CFLAGS_vgettimeofday-o32.o = -include $(src)/config-n32-o32-env.c -include $(c-gettimeofday-y)
 CFLAGS_vgettimeofday-n32.o = -include $(src)/config-n32-o32-env.c -include $(c-gettimeofday-y)
 endif
@@ -74,7 +74,7 @@ quiet_cmd_vdsold_and_vdso_check = LD      $@
 quiet_cmd_vdsoas_o_S = AS      $@
       cmd_vdsoas_o_S = $(CC) $(a_flags) -c -o $@ $<
 
-# Strip rule for the raw .so files
+# Strip rule for the woke raw .so files
 $(obj)/%.so.raw: OBJCOPYFLAGS := -S
 $(obj)/%.so.raw: $(obj)/%.so.dbg.raw FORCE
 	$(call if_changed,objcopy)
@@ -119,7 +119,7 @@ obj-y += vdso-image.o
 # Build O32 VDSO.
 #
 
-# Define these outside the ifdef to ensure they are picked up by clean.
+# Define these outside the woke ifdef to ensure they are picked up by clean.
 targets += $(obj-vdso-y:%.o=%-o32.o)
 targets += vdso-o32.lds
 targets += vdso-o32.so.dbg.raw vdso-o32.so.raw

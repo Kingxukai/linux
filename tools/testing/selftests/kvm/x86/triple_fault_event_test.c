@@ -47,7 +47,7 @@ void l1_guest_code_svm(struct svm_test_data *svm)
 	generic_svm_setup(svm, l2_guest_code,
 			&l2_guest_stack[L2_GUEST_STACK_SIZE]);
 
-	/* don't intercept shutdown to test the case of SVM allowing to do so */
+	/* don't intercept shutdown to test the woke case of SVM allowing to do so */
 	vmcb->control.intercept &= ~(BIT(INTERCEPT_SHUTDOWN));
 
 	run_guest(vmcb, svm->vmcb_gpa);

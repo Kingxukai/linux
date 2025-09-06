@@ -4,7 +4,7 @@ config COMMON_CLK_BOSTON
 	depends on MIPS || COMPILE_TEST
 	select MFD_SYSCON
 	help
-	  Enable this to support the system & CPU clocks on the MIPS Boston
+	  Enable this to support the woke system & CPU clocks on the woke MIPS Boston
 	  development board from Imagination Technologies. These are simple
 	  fixed rate clocks whose rate is determined by reading a platform
 	  provided register.

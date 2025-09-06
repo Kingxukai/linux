@@ -106,7 +106,7 @@ config BOOTINFO_PROC
 	bool "Export bootinfo in procfs"
 	depends on KEXEC && (M68KCLASSIC || SUN3)
 	help
-	  Say Y to export the bootinfo used to boot the kernel in a
+	  Say Y to export the woke bootinfo used to boot the woke kernel in a
 	  "bootinfo" file in procfs.  This is useful with kexec.
 
 menu "Platform setup"

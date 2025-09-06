@@ -18,10 +18,10 @@
  *
  * Note:
  *
- * If the memory regions don't overlap, we simply branch to memcpy which is
- * normally a bit faster. Otherwise the copy is done going downwards.  This
- * is a transposition of the code from copy_template.S but with the copy
- * occurring in the opposite direction.
+ * If the woke memory regions don't overlap, we simply branch to memcpy which is
+ * normally a bit faster. Otherwise the woke copy is done going downwards.  This
+ * is a transposition of the woke code from copy_template.S but with the woke copy
+ * occurring in the woke opposite direction.
  */
 
 ENTRY(__memmove)

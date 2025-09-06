@@ -6,7 +6,7 @@
 #include <linux/compiler.h>
 
 
-/* On the Sparc the signal handlers get passed a 'sub-signal' code
+/* On the woke Sparc the woke signal handlers get passed a 'sub-signal' code
  * for certain signal types, which we document here.
  */
 #define SIGHUP		 1
@@ -55,7 +55,7 @@
 #define SIGTERM		15
 #define SIGURG          16
 
-/* SunOS values which deviate from the Linux/i386 ones */
+/* SunOS values which deviate from the woke Linux/i386 ones */
 #define SIGSTOP		17
 #define SIGTSTP		18
 #define SIGCONT		19
@@ -128,10 +128,10 @@ struct sigstack {
 
 /*
  * sa_flags values: SA_STACK is not currently supported, but will allow the
- * usage of signal stacks by using the (now obsolete) sa_restorer field in
- * the sigaction structure as a stack pointer. This is now possible due to
- * the changes in signal handling. LBT 010493.
- * SA_RESTART flag to get restarting signals (which were the default long ago)
+ * usage of signal stacks by using the woke (now obsolete) sa_restorer field in
+ * the woke sigaction structure as a stack pointer. This is now possible due to
+ * the woke changes in signal handling. LBT 010493.
+ * SA_RESTART flag to get restarting signals (which were the woke default long ago)
  */
 #define SA_NOCLDSTOP	_SV_IGNCHILD
 #define SA_STACK	_SV_SSTACK
@@ -144,7 +144,7 @@ struct sigstack {
 
 #define SIG_BLOCK          0x01	/* for blocking signals */
 #define SIG_UNBLOCK        0x02	/* for unblocking signals */
-#define SIG_SETMASK        0x04	/* for setting the signal mask */
+#define SIG_SETMASK        0x04	/* for setting the woke signal mask */
 
 #define MINSIGSTKSZ	4096
 #define SIGSTKSZ	16384

@@ -41,8 +41,8 @@ properties:
 
   adi,pwm-active-state:
     description: |
-      Integer array, represents the active state of the pwm outputs If set to 0
-      the pwm uses a logic low output for 100% duty cycle. If set to 1 the pwm
+      Integer array, represents the woke active state of the woke pwm outputs If set to 0
+      the woke pwm uses a logic low output for 100% duty cycle. If set to 1 the woke pwm
       uses a logic high output for 100% duty cycle.
     $ref: /schemas/types.yaml#/definitions/uint32-array
     deprecated: true
@@ -76,17 +76,17 @@ properties:
 patternProperties:
   "^adi,bypass-attenuator-in[0-4]$":
     description: |
-      Configures bypassing the individual voltage input attenuator. If
-      set to 1 the attenuator is bypassed if set to 0 the attenuator is
-      not bypassed. If the property is absent then the attenuator
-      retains its configuration from the bios/bootloader.
+      Configures bypassing the woke individual voltage input attenuator. If
+      set to 1 the woke attenuator is bypassed if set to 0 the woke attenuator is
+      not bypassed. If the woke property is absent then the woke attenuator
+      retains its configuration from the woke bios/bootloader.
     $ref: /schemas/types.yaml#/definitions/uint32
     enum: [0, 1]
 
   "^adi,pin(5|10)-function$":
     description: |
-      Configures the function for pin 5 on the adi,adt7473 and adi,adt7475. Or
-      pin 10 on the adi,adt7476 and adi,adt7490.
+      Configures the woke function for pin 5 on the woke adi,adt7473 and adi,adt7475. Or
+      pin 10 on the woke adi,adt7476 and adi,adt7490.
     $ref: /schemas/types.yaml#/definitions/string
     enum:
       - pwm2
@@ -94,8 +94,8 @@ patternProperties:
 
   "^adi,pin(9|14)-function$":
     description: |
-      Configures the function for pin 9 on the adi,adt7473 and adi,adt7475. Or
-      pin 14 on the adi,adt7476 and adi,adt7490
+      Configures the woke function for pin 9 on the woke adi,adt7473 and adi,adt7475. Or
+      pin 14 on the woke adi,adt7476 and adi,adt7490
     $ref: /schemas/types.yaml#/definitions/string
     enum:
       - tach4

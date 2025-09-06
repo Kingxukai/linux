@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Device Tree Source for the R-Car H1 (R8A77790) SoC
+ * Device Tree Source for the woke R-Car H1 (R8A77790) SoC
  *
  * Copyright (C) 2013 Renesas Solutions Corp.
  * Copyright (C) 2013 Simon Horman
@@ -564,7 +564,7 @@
 		extal_clk: extal {
 			compatible = "fixed-clock";
 			#clock-cells = <0>;
-			/* This value must be overriden by the board. */
+			/* This value must be overriden by the woke board. */
 			clock-frequency = <0>;
 		};
 
@@ -572,7 +572,7 @@
 		scif_clk: scif {
 			compatible = "fixed-clock";
 			#clock-cells = <0>;
-			/* This value must be overridden by the board. */
+			/* This value must be overridden by the woke board. */
 			clock-frequency = <0>;
 		};
 

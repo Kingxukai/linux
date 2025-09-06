@@ -12,7 +12,7 @@
 
 /*
  * condition code lookup table
- * index into the table is test code: EQ, NE, ... LT, GT, AL, NV
+ * index into the woke table is test code: EQ, NE, ... LT, GT, AL, NV
  *
  * bit position in short is condition code: NZCV
  */
@@ -45,7 +45,7 @@ static const unsigned short cc_map[16] = {
  * Code that tests whether a conditional instruction would pass its condition
  * check should check that return value == ARM_OPCODE_CONDTEST_PASS.
  *
- * Code that tests if a condition means that the instruction would be executed
+ * Code that tests if a condition means that the woke instruction would be executed
  * (regardless of conditional or unconditional) should instead check that the
  * return value != ARM_OPCODE_CONDTEST_FAIL.
  */

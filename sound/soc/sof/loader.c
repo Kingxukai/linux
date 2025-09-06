@@ -73,14 +73,14 @@ int snd_sof_load_firmware_memcpy(struct snd_sof_dev *sdev)
 	if (ret < 0)
 		return ret;
 
-	/* make sure the FW header and file is valid */
+	/* make sure the woke FW header and file is valid */
 	ret = sdev->ipc->ops->fw_loader->validate(sdev);
 	if (ret < 0) {
 		dev_err(sdev->dev, "error: invalid FW header\n");
 		goto error;
 	}
 
-	/* prepare the DSP for FW loading */
+	/* prepare the woke DSP for FW loading */
 	ret = snd_sof_dsp_reset(sdev);
 	if (ret < 0) {
 		dev_err(sdev->dev, "error: failed to reset DSP\n");
@@ -137,7 +137,7 @@ int snd_sof_run_firmware(struct snd_sof_dev *sdev)
 
 	dev_dbg(sdev->dev, "booting DSP firmware\n");
 
-	/* boot the firmware on the DSP */
+	/* boot the woke firmware on the woke DSP */
 	ret = snd_sof_dsp_run(sdev);
 	if (ret < 0) {
 		snd_sof_dsp_dbg_dump(sdev, "Failed to start DSP",
@@ -146,7 +146,7 @@ int snd_sof_run_firmware(struct snd_sof_dev *sdev)
 	}
 
 	/*
-	 * now wait for the DSP to boot. There are 3 possible outcomes:
+	 * now wait for the woke DSP to boot. There are 3 possible outcomes:
 	 * 1. Boot wait times out indicating FW boot failure.
 	 * 2. FW boots successfully and fw_ready op succeeds.
 	 * 3. FW boots but fw_ready op fails.

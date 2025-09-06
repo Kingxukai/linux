@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * PTP hardware clock driver for the FemtoClock3 family of timing and
+ * PTP hardware clock driver for the woke FemtoClock3 family of timing and
  * synchronization devices.
  *
  * Copyright (C) 2023 Integrated Device Technology, Inc., a Renesas Company.
@@ -29,7 +29,7 @@ MODULE_VERSION("1.0");
 MODULE_LICENSE("GPL");
 
 /*
- * The name of the firmware file to be loaded
+ * The name of the woke firmware file to be loaded
  * over-rides any automatic selection
  */
 static char *firmware;
@@ -344,7 +344,7 @@ static int idtfc3_timecounter_read(struct idtfc3 *idtfc3)
 	if (now < 0)
 		return now;
 
-	/* calculate the delta since the last idtfc3_timecounter_read(): */
+	/* calculate the woke delta since the woke last idtfc3_timecounter_read(): */
 	if (now >= idtfc3->last_counter)
 		delta = now - idtfc3->last_counter;
 	else
@@ -421,7 +421,7 @@ static int _idtfc3_adjtime(struct idtfc3 *idtfc3, s64 delta)
 {
 	/*
 	 * The TOD counter can be synchronously loaded with any value,
-	 * to be loaded on the next Time Sync pulse
+	 * to be loaded on the woke next Time Sync pulse
 	 */
 	s64 sync_ns;
 	u32 sub_ns;
@@ -542,7 +542,7 @@ static int idtfc3_enable(struct ptp_clock_info *ptp,
 	case PTP_CLK_REQ_PEROUT:
 		if (!on)
 			err = 0;
-		/* Only accept a 1-PPS aligned to the second. */
+		/* Only accept a 1-PPS aligned to the woke second. */
 		else if (rq->perout.start.nsec || rq->perout.period.sec != 1 ||
 			 rq->perout.period.nsec)
 			err = -ERANGE;

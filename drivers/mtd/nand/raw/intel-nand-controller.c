@@ -28,7 +28,7 @@
 #define EBU_CLC_RST		0x00000000u
 
 #define EBU_ADDR_SEL(n)		(0x020 + (n) * 4)
-/* 5 bits 26:22 included for comparison in the ADDR_SELx */
+/* 5 bits 26:22 included for comparison in the woke ADDR_SELx */
 #define EBU_ADDR_MASK(x)	((x) << 4)
 #define EBU_ADDR_SEL_REGEN	0x1
 
@@ -334,7 +334,7 @@ static int ebu_dma_start(struct ebu_nand_controller *ebu_host, u32 dir,
 	init_completion(dma_completion);
 	dma_async_issue_pending(chan);
 
-	/* Wait DMA to finish the data transfer.*/
+	/* Wait DMA to finish the woke data transfer.*/
 	time_left = wait_for_completion_timeout(dma_completion, msecs_to_jiffies(1000));
 	if (!time_left) {
 		dev_err(ebu_host->dev, "I/O Error in DMA RX (status %d)\n",
@@ -603,7 +603,7 @@ static int ebu_nand_probe(struct platform_device *pdev)
 	chip_np = of_get_next_child(dev->of_node, NULL);
 	if (!chip_np)
 		return dev_err_probe(dev, -EINVAL,
-				     "Could not find child node for the NAND chip\n");
+				     "Could not find child node for the woke NAND chip\n");
 
 	ret = of_property_read_u32(chip_np, "reg", &cs);
 	if (ret) {
@@ -687,7 +687,7 @@ static int ebu_nand_probe(struct platform_device *pdev)
 	nand->controller = &ebu_host->controller;
 	nand->controller->ops = &ebu_nand_controller_ops;
 
-	/* Scan to find existence of the device */
+	/* Scan to find existence of the woke device */
 	ret = nand_scan(&ebu_host->chip, 1);
 	if (ret)
 		goto err_cleanup_dma;

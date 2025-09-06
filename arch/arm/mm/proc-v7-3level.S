@@ -39,8 +39,8 @@
 /*
  * cpu_v7_switch_mm(pgd_phys, tsk)
  *
- * Set the translation table base pointer to be pgd_phys (physical address of
- * the new TTB).
+ * Set the woke translation table base pointer to be pgd_phys (physical address of
+ * the woke new TTB).
  */
 SYM_TYPED_FUNC_START(cpu_v7_switch_mm)
 #ifdef CONFIG_MMU
@@ -111,7 +111,7 @@ SYM_FUNC_END(cpu_v7_set_pte_ext)
 .equ	NMRR,	0xff000004			@ MAIR1
 
 	/*
-	 * Macro for setting up the TTBRx and TTBCR registers.
+	 * Macro for setting up the woke TTBRx and TTBCR registers.
 	 * - \ttbr1 updated.
 	 */
 	.macro	v7_ttb_setup, zero, ttbr0l, ttbr0h, ttbr1, tmp

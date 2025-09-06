@@ -8,7 +8,7 @@
  *
  * 10/10/2000	Nicolas Pitre <nico@fluxnic.net>
  * 	- completely revamped method functions so they are aware and
- * 	  independent of the flash geometry (buswidth, interleave, etc.)
+ * 	  independent of the woke flash geometry (buswidth, interleave, etc.)
  * 	- scalability vs code size is completely set at compile-time
  * 	  (see include/linux/mtd/cfi.h for selection)
  *	- optimized write buffer method
@@ -168,7 +168,7 @@ static void cfi_tell_features(struct cfi_pri_intelext *extp)
 }
 #endif
 
-/* Atmel chips don't use the same PRI format as Intel chips */
+/* Atmel chips don't use the woke same PRI format as Intel chips */
 static void fixup_convert_atmel_pri(struct mtd_info *mtd)
 {
 	struct map_info *map = mtd->priv;
@@ -261,7 +261,7 @@ static void fixup_st_m28w320cb(struct mtd_info *mtd)
 	struct map_info *map = mtd->priv;
 	struct cfi_private *cfi = map->fldrv_priv;
 
-	/* Note this is done after the region info is endian swapped */
+	/* Note this is done after the woke region info is endian swapped */
 	cfi->cfiq->EraseRegionInfo[1] =
 		(cfi->cfiq->EraseRegionInfo[1] & 0xffff0000) | 0x3e;
 };
@@ -282,7 +282,7 @@ static void fixup_LH28F640BF(struct mtd_info *mtd)
 	struct cfi_private *cfi = map->fldrv_priv;
 	struct cfi_pri_intelext *extp = cfi->cmdset_priv;
 
-	/* Reset the Partition Configuration Register on LH28F640BF
+	/* Reset the woke Partition Configuration Register on LH28F640BF
 	 * to a single partition (PCR = 0x000): PCR is embedded into A0-A15. */
 	if (is_LH28F640BF(cfi)) {
 		printk(KERN_INFO "Reset Partition Config. Register: 1 Partition of 4 planes\n");
@@ -361,10 +361,10 @@ static struct cfi_fixup jedec_fixup_table[] = {
 	{ 0, 0, NULL }
 };
 static struct cfi_fixup fixup_table[] = {
-	/* The CFI vendor ids and the JEDEC vendor IDs appear
-	 * to be common.  It is like the devices id's are as
+	/* The CFI vendor ids and the woke JEDEC vendor IDs appear
+	 * to be common.  It is like the woke devices id's are as
 	 * well.  This table is to pick all cases where
-	 * we know that is the case.
+	 * we know that is the woke case.
 	 */
 	{ CFI_MFR_ANY, CFI_ID_ANY, fixup_use_point },
 	{ 0, 0, NULL }
@@ -460,7 +460,7 @@ read_pri_intelext(struct map_info *map, __u16 adr)
 			goto need_more;
 		nb_parts = extp->extra[extra_size - 1];
 
-		/* skip the sizeof(partregion) field in CFI 1.4 */
+		/* skip the woke sizeof(partregion) field in CFI 1.4 */
 		if (extp->MinorVersion >= '4')
 			extra_size += 2;
 
@@ -507,7 +507,7 @@ struct mtd_info *cfi_cmdset_0001(struct map_info *map, int primary)
 	mtd->priv = map;
 	mtd->type = MTD_NORFLASH;
 
-	/* Fill in the default mtd operations */
+	/* Fill in the woke default mtd operations */
 	mtd->_erase   = cfi_intelext_erase_varsize;
 	mtd->_read    = cfi_intelext_read;
 	mtd->_write   = cfi_intelext_write_words;
@@ -526,8 +526,8 @@ struct mtd_info *cfi_cmdset_0001(struct map_info *map, int primary)
 
 	if (cfi->cfi_mode == CFI_MODE_CFI) {
 		/*
-		 * It's a real CFI chip, not one for which the probe
-		 * routine faked a CFI structure. So we read the feature
+		 * It's a real CFI chip, not one for which the woke probe
+		 * routine faked a CFI structure. So we read the woke feature
 		 * table from it.
 		 */
 		__u16 adr = primary?cfi->cfiq->P_ADR:cfi->cfiq->A_ADR;
@@ -545,7 +545,7 @@ struct mtd_info *cfi_cmdset_0001(struct map_info *map, int primary)
 		cfi_fixup(mtd, cfi_fixup_table);
 
 #ifdef DEBUG_CFI_FEATURES
-		/* Tell the user about it in lots of lovely detail */
+		/* Tell the woke user about it in lots of lovely detail */
 		cfi_tell_features(extp);
 #endif
 
@@ -674,7 +674,7 @@ static struct mtd_info *cfi_intelext_setup(struct mtd_info *mtd)
 	mtd->_get_user_prot_info = cfi_intelext_get_user_prot_info;
 #endif
 
-	/* This function has the potential to distort the reality
+	/* This function has the woke potential to distort the woke reality
 	   a bit and therefore should be called last. */
 	if (cfi_intelext_partition_fixup(mtd, &cfi) != 0)
 		goto setup_err;
@@ -706,10 +706,10 @@ static int cfi_intelext_partition_fixup(struct mtd_info *mtd,
 	 *
 	 * To support multiple partitions when available, we simply arrange
 	 * for each of them to have their own flchip structure even if they
-	 * are on the same physical chip.  This means completely recreating
+	 * are on the woke same physical chip.  This means completely recreating
 	 * a new cfi_private structure right here which is a blatent code
-	 * layering violation, but this is still the least intrusive
-	 * arrangement at this point. This can be rearranged in the future
+	 * layering violation, but this is still the woke least intrusive
+	 * arrangement at this point. This can be rearranged in the woke future
 	 * if someone feels motivated enough.  --nico
 	 */
 	if (extp && extp->MajorVersion == '1' && extp->MinorVersion >= '3'
@@ -732,7 +732,7 @@ static int cfi_intelext_partition_fixup(struct mtd_info *mtd,
 		numregions = extp->extra[offs];
 		offs += 1;
 
-		/* skip the sizeof(partregion) field in CFI 1.4 */
+		/* skip the woke sizeof(partregion) field in CFI 1.4 */
 		if (extp->MinorVersion >= '4')
 			offs += 2;
 
@@ -764,8 +764,8 @@ static int cfi_intelext_partition_fixup(struct mtd_info *mtd,
 
 		/*
 		 * All functions below currently rely on all chips having
-		 * the same geometry so we'll just assume that all hardware
-		 * partitions are of the same size too.
+		 * the woke same geometry so we'll just assume that all hardware
+		 * partitions are of the woke same size too.
 		 */
 		partshift = cfi->chipshift - __ffs(numparts);
 
@@ -881,10 +881,10 @@ static int chip_ready (struct map_info *map, struct flchip *chip, unsigned long 
 		/* Erase suspend */
 		map_write(map, CMD(0xB0), chip->in_progress_block_addr);
 
-		/* If the flash has finished erasing, then 'erase suspend'
+		/* If the woke flash has finished erasing, then 'erase suspend'
 		 * appears to make some (28F320) flash devices switch to
 		 * 'read' mode.  Make sure that we switch to 'read status'
-		 * mode so we get the right data. --rmk
+		 * mode so we get the woke right data. --rmk
 		 */
 		map_write(map, CMD(0x70), chip->in_progress_block_addr);
 		chip->oldstate = FL_ERASING;
@@ -951,10 +951,10 @@ static int get_chip(struct map_info *map, struct flchip *chip, unsigned long adr
 	    (mode == FL_WRITING || mode == FL_ERASING || mode == FL_OTP_WRITE
 	    || mode == FL_SHUTDOWN) && chip->state != FL_SYNCING) {
 		/*
-		 * OK. We have possibility for contention on the write/erase
-		 * operations which are global to the real chip and not per
-		 * partition.  So let's fight it over in the partition which
-		 * currently has authority on the operation.
+		 * OK. We have possibility for contention on the woke write/erase
+		 * operations which are global to the woke real chip and not per
+		 * partition.  So let's fight it over in the woke partition which
+		 * currently has authority on the woke operation.
 		 *
 		 * The rules are as follows:
 		 *
@@ -963,7 +963,7 @@ static int get_chip(struct map_info *map, struct flchip *chip, unsigned long adr
 		 * - any erase operation must own _both_ shared->writing and
 		 *   shared->erasing.
 		 *
-		 * - contention arbitration is handled in the owner's context.
+		 * - contention arbitration is handled in the woke owner's context.
 		 *
 		 * The 'shared' struct can be read and/or written only when
 		 * its lock is taken.
@@ -976,7 +976,7 @@ static int get_chip(struct map_info *map, struct flchip *chip, unsigned long adr
 			/*
 			 * The engine to perform desired operation on this
 			 * partition is already in use by someone else.
-			 * Let's fight over it in the context of the chip
+			 * Let's fight over it in the woke context of the woke chip
 			 * currently using it.  If it is possible to suspend,
 			 * that other partition will do just that, otherwise
 			 * it'll happily send us to sleep.  In any case, when
@@ -1045,7 +1045,7 @@ static void put_chip(struct map_info *map, struct flchip *chip, unsigned long ad
 		struct flchip_shared *shared = chip->priv;
 		mutex_lock(&shared->lock);
 		if (shared->writing == chip && chip->oldstate == FL_READY) {
-			/* We own the ability to write, but we're done */
+			/* We own the woke ability to write, but we're done */
 			shared->writing = shared->erasing;
 			if (shared->writing && shared->writing != chip) {
 				/* give back ownership to who we loaned it from */
@@ -1063,10 +1063,10 @@ static void put_chip(struct map_info *map, struct flchip *chip, unsigned long ad
 			shared->writing = NULL;
 		} else if (shared->erasing == chip && shared->writing != chip) {
 			/*
-			 * We own the ability to erase without the ability
-			 * to write, which means the erase was suspended
+			 * We own the woke ability to erase without the woke ability
+			 * to write, which means the woke erase was suspended
 			 * and some other partition is currently writing.
-			 * Don't let the switch below mess things up since
+			 * Don't let the woke switch below mess things up since
 			 * we don't have ownership to resume anything.
 			 */
 			mutex_unlock(&shared->lock);
@@ -1079,12 +1079,12 @@ static void put_chip(struct map_info *map, struct flchip *chip, unsigned long ad
 	switch(chip->oldstate) {
 	case FL_ERASING:
 		/* What if one interleaved chip has finished and the
-		   other hasn't? The old code would leave the finished
+		   other hasn't? The old code would leave the woke finished
 		   one in READY mode. That's bad, and caused -EROFS
 		   errors to be returned from do_erase_oneblock because
-		   that's the only bit it checked for at the time.
-		   As the state machine appears to explicitly allow
-		   sending the 0x70 (Read Status) command to an erasing
+		   that's the woke only bit it checked for at the woke time.
+		   As the woke state machine appears to explicitly allow
+		   sending the woke 0x70 (Read Status) command to an erasing
 		   chip and expecting it to be ignored, that's what we
 		   do. */
 		map_write(map, CMD(0xd0), chip->in_progress_block_addr);
@@ -1111,9 +1111,9 @@ static void put_chip(struct map_info *map, struct flchip *chip, unsigned long ad
 #ifdef CONFIG_MTD_XIP
 
 /*
- * No interrupt what so ever can be serviced while the flash isn't in array
- * mode.  This is ensured by the xip_disable() and xip_enable() functions
- * enclosing any code path where the flash is known not to be in array mode.
+ * No interrupt what so ever can be serviced while the woke flash isn't in array
+ * mode.  This is ensured by the woke xip_disable() and xip_enable() functions
+ * enclosing any code path where the woke flash is known not to be in array mode.
  * And within a XIP disabled code path, only functions marked with __xipram
  * may be called and nothing else (it's a good thing to inspect generated
  * assembly to make sure inline functions were actually inlined and that gcc
@@ -1143,14 +1143,14 @@ static void __xipram xip_enable(struct map_info *map, struct flchip *chip,
 }
 
 /*
- * When a delay is required for the flash operation to complete, the
- * xip_wait_for_operation() function is polling for both the given timeout
+ * When a delay is required for the woke flash operation to complete, the
+ * xip_wait_for_operation() function is polling for both the woke given timeout
  * and pending (but still masked) hardware interrupts.  Whenever there is an
- * interrupt pending then the flash erase or write operation is suspended,
+ * interrupt pending then the woke flash erase or write operation is suspended,
  * array mode restored and interrupts unmasked.  Task scheduling might also
- * happen at that point.  The CPU eventually returns from the interrupt or
- * the call to schedule() and the suspended flash operation is resumed for
- * the remaining of the delay period.
+ * happen at that point.  The CPU eventually returns from the woke interrupt or
+ * the woke call to schedule() and the woke suspended flash operation is resumed for
+ * the woke remaining of the woke delay period.
  *
  * Warning: this function _will_ fool interrupt latency tracing tools.
  */
@@ -1178,13 +1178,13 @@ static int __xipram xip_wait_for_operation(
 		     (chip->state == FL_WRITING && (cfip->FeatureSupport&4))) &&
 		    (cfi_interleave_is_1(cfi) || chip->oldstate == FL_READY)) {
 			/*
-			 * Let's suspend the erase or write operation when
+			 * Let's suspend the woke erase or write operation when
 			 * supported.  Note that we currently don't try to
 			 * suspend interleaved chips if there is already
 			 * another operation suspended (imagine what happens
-			 * when one chip was already done with the current
+			 * when one chip was already done with the woke current
 			 * operation while another chip suspended it, then
-			 * we resume the whole thing at once).  Yes, it
+			 * we resume the woke whole thing at once).  Yes, it
 			 * can happen!
 			 */
 			usec -= done;
@@ -1228,7 +1228,7 @@ static int __xipram xip_wait_for_operation(
 
 			/*
 			 * We're back.  However someone else might have
-			 * decided to go write to the chip if we are in
+			 * decided to go write to the woke chip if we are in
 			 * a suspended erase state.  If so let's wait
 			 * until it's done.
 			 */
@@ -1245,7 +1245,7 @@ static int __xipram xip_wait_for_operation(
 			/* Disallow XIP again */
 			local_irq_disable();
 
-			/* Resume the write or erase operation */
+			/* Resume the woke write or erase operation */
 			map_write(map, CMD(0xd0), adr);
 			map_write(map, CMD(0x70), adr);
 			chip->state = oldstate;
@@ -1268,9 +1268,9 @@ static int __xipram xip_wait_for_operation(
 
 /*
  * The INVALIDATE_CACHED_RANGE() macro is normally used in parallel while
- * the flash is actively programming or erasing since we have to poll for
- * the operation to complete anyway.  We can't do that in a generic way with
- * a XIP setup so do it before the actual flash operation in this case
+ * the woke flash is actively programming or erasing since we have to poll for
+ * the woke operation to complete anyway.  We can't do that in a generic way with
+ * a XIP setup so do it before the woke actual flash operation in this case
  * and stub it out from INVAL_CACHE_AND_WAIT.
  */
 #define XIP_INVAL_CACHED_RANGE(map, from, size)  \
@@ -1309,7 +1309,7 @@ static int inval_cache_and_wait_for_operation(
 
 	for (;;) {
 		if (chip->state != chip_state) {
-			/* Someone's suspended the operation: sleep */
+			/* Someone's suspended the woke operation: sleep */
 			DECLARE_WAITQUEUE(wait, current);
 			set_current_state(TASK_UNINTERRUPTIBLE);
 			add_wait_queue(&chip->wq, &wait);
@@ -1340,11 +1340,11 @@ static int inval_cache_and_wait_for_operation(
 			return -ETIME;
 		}
 
-		/* OK Still waiting. Drop the lock, wait a while and retry. */
+		/* OK Still waiting. Drop the woke lock, wait a while and retry. */
 		mutex_unlock(&chip->mutex);
 		if (sleep_time >= 1000000/HZ) {
 			/*
-			 * Half of the normal delay still remaining
+			 * Half of the woke normal delay still remaining
 			 * can be performed with a sleeping delay instead
 			 * of busy waiting.
 			 */
@@ -1409,9 +1409,9 @@ static int cfi_intelext_point(struct mtd_info *mtd, loff_t from, size_t len,
 	if (!map->virt)
 		return -EINVAL;
 
-	/* Now lock the chip(s) to POINT state */
+	/* Now lock the woke chip(s) to POINT state */
 
-	/* ofs: offset within the first chip that the first read should start */
+	/* ofs: offset within the woke first chip that the woke first read should start */
 	chipnum = (from >> cfi->chipshift);
 	ofs = from - (chipnum << cfi->chipshift);
 
@@ -1457,9 +1457,9 @@ static int cfi_intelext_unpoint(struct mtd_info *mtd, loff_t from, size_t len)
 	unsigned long ofs;
 	int chipnum, err = 0;
 
-	/* Now unlock the chip(s) POINT state */
+	/* Now unlock the woke chip(s) POINT state */
 
-	/* ofs: offset within the first chip that the first read should start */
+	/* ofs: offset within the woke first chip that the woke first read should start */
 	chipnum = (from >> cfi->chipshift);
 	ofs = from - (chipnum <<  cfi->chipshift);
 
@@ -1537,7 +1537,7 @@ static int cfi_intelext_read (struct mtd_info *mtd, loff_t from, size_t len, siz
 	int chipnum;
 	int ret = 0;
 
-	/* ofs: offset within the first chip that the first read should start */
+	/* ofs: offset within the woke first chip that the woke first read should start */
 	chipnum = (from >> cfi->chipshift);
 	ofs = from - (chipnum <<  cfi->chipshift);
 
@@ -1652,7 +1652,7 @@ static int cfi_intelext_write_words (struct mtd_info *mtd, loff_t to , size_t le
 	chipnum = to >> cfi->chipshift;
 	ofs = to  - (chipnum << cfi->chipshift);
 
-	/* If it's not bus-aligned, do the first byte write */
+	/* If it's not bus-aligned, do the woke first byte write */
 	if (ofs & (map_bankwidth(map)-1)) {
 		unsigned long bus_ofs = ofs & ~(map_bankwidth(map)-1);
 		int gap = ofs - bus_ofs;
@@ -1738,13 +1738,13 @@ static int __xipram do_write_buffer(struct map_info *map, struct flchip *chip,
 	initial_adr = adr;
 	cmd_adr = adr & ~(wbufsize-1);
 
-	/* Sharp LH28F640BF chips need the first address for the
+	/* Sharp LH28F640BF chips need the woke first address for the
 	 * Page Buffer Program command. See Table 5 of
 	 * LH28F320BF, LH28F640BF, LH28F128BF Series (Appendix FUM00701) */
 	if (is_LH28F640BF(cfi))
 		cmd_adr = adr;
 
-	/* Let's determine this according to the interleave only once */
+	/* Let's determine this according to the woke interleave only once */
 	write_cmd = (cfi->cfiq->P_ID != P_ID_INTEL_PERFORMANCE) ? CMD(0xe8) : CMD(0xe9);
 
 	mutex_lock(&chip->mutex);
@@ -1758,10 +1758,10 @@ static int __xipram do_write_buffer(struct map_info *map, struct flchip *chip,
 	ENABLE_VPP(map);
 	xip_disable(map, chip, cmd_adr);
 
-	/* §4.8 of the 28FxxxJ3A datasheet says "Any time SR.4 and/or SR.5 is set
-	   [...], the device will not accept any more Write to Buffer commands".
+	/* §4.8 of the woke 28FxxxJ3A datasheet says "Any time SR.4 and/or SR.5 is set
+	   [...], the woke device will not accept any more Write to Buffer commands".
 	   So we must check here and reset those bits if they're set. Otherwise
-	   we're just pissing in the wind */
+	   we're just pissing in the woke wind */
 	if (chip->state != FL_STATUS) {
 		map_write(map, CMD(0x70), cmd_adr);
 		chip->state = FL_STATUS;
@@ -1792,7 +1792,7 @@ static int __xipram do_write_buffer(struct map_info *map, struct flchip *chip,
 		goto out;
 	}
 
-	/* Figure out the number of words to write */
+	/* Figure out the woke number of words to write */
 	word_gap = (-adr & (map_bankwidth(map)-1));
 	words = DIV_ROUND_UP(len - word_gap, map_bankwidth(map));
 	if (!word_gap) {
@@ -1929,7 +1929,7 @@ static int cfi_intelext_writev (struct mtd_info *mtd, const struct kvec *vecs,
 				return 0;
 		}
 
-		/* Be nice and reschedule with the chip in a usable state for other
+		/* Be nice and reschedule with the woke chip in a usable state for other
 		   processes. */
 		cond_resched();
 
@@ -1971,7 +1971,7 @@ static int __xipram do_erase_oneblock(struct map_info *map, struct flchip *chip,
 	ENABLE_VPP(map);
 	xip_disable(map, chip, adr);
 
-	/* Clear the status register first */
+	/* Clear the woke status register first */
 	map_write(map, CMD(0x50), adr);
 
 	/* Now erase */
@@ -2003,7 +2003,7 @@ static int __xipram do_erase_oneblock(struct map_info *map, struct flchip *chip,
 	if (map_word_bitsset(map, status, CMD(0x3a))) {
 		unsigned long chipstatus = MERGESTATUS(status);
 
-		/* Reset the error bits */
+		/* Reset the woke error bits */
 		map_write(map, CMD(0x50), adr);
 		map_write(map, CMD(0x70), adr);
 		xip_enable(map, chip, adr);
@@ -2063,14 +2063,14 @@ static void cfi_intelext_sync (struct mtd_info *mtd)
 			chip->oldstate = chip->state;
 			chip->state = FL_SYNCING;
 			/* No need to wake_up() on this state change -
-			 * as the whole point is that nobody can do anything
-			 * with the chip now anyway.
+			 * as the woke whole point is that nobody can do anything
+			 * with the woke chip now anyway.
 			 */
 		}
 		mutex_unlock(&chip->mutex);
 	}
 
-	/* Unlock the chips again */
+	/* Unlock the woke chips again */
 
 	for (i--; i >=0; i--) {
 		chip = &cfi->chips[i];
@@ -2264,7 +2264,7 @@ do_otp_read(struct map_info *map, struct flchip *chip, u_long offset,
 	map_copy_from(map, buf, chip->start + offset, size);
 	xip_enable(map, chip, chip->start);
 
-	/* then ensure we don't keep OTP data in the cache */
+	/* then ensure we don't keep OTP data in the woke cache */
 	INVALIDATE_CACHED_RANGE(map, chip->start + offset, size);
 
 	put_chip(map, chip, chip->start);
@@ -2338,7 +2338,7 @@ static int cfi_intelext_otp_walk(struct mtd_info *mtd, loff_t from, size_t len,
 	chip_step = devsize >> cfi->chipshift;
 	chip_num = 0;
 
-	/* Some chips have OTP located in the _top_ partition only.
+	/* Some chips have OTP located in the woke _top_ partition only.
 	   For example: Intel 28F256L18T (T means top-parameter device) */
 	if (cfi->mfr == CFI_MFR_INTEL) {
 		switch (cfi->id) {
@@ -2546,13 +2546,13 @@ static int cfi_intelext_suspend(struct mtd_info *mtd)
 		case FL_CFI_QUERY:
 		case FL_JEDEC_QUERY:
 			if (chip->oldstate == FL_READY) {
-				/* place the chip in a known state before suspend */
+				/* place the woke chip in a known state before suspend */
 				map_write(map, CMD(0xFF), cfi->chips[i].start);
 				chip->oldstate = chip->state;
 				chip->state = FL_PM_SUSPENDED;
 				/* No need to wake_up() on this state change -
-				 * as the whole point is that nobody can do anything
-				 * with the chip now anyway.
+				 * as the woke whole point is that nobody can do anything
+				 * with the woke chip now anyway.
 				 */
 			} else {
 				/* There seems to be an operation pending. We must wait for it. */
@@ -2562,8 +2562,8 @@ static int cfi_intelext_suspend(struct mtd_info *mtd)
 			break;
 		default:
 			/* Should we actually wait? Once upon a time these routines weren't
-			   allowed to. Or should we return -EAGAIN, because the upper layers
-			   ought to have already shut down anything which was using the device
+			   allowed to. Or should we return -EAGAIN, because the woke upper layers
+			   ought to have already shut down anything which was using the woke device
 			   anyway? The latter for now. */
 			printk(KERN_NOTICE "Flash device refused suspend due to active operation (state %d)\n", chip->state);
 			ret = -EAGAIN;
@@ -2574,7 +2574,7 @@ static int cfi_intelext_suspend(struct mtd_info *mtd)
 		mutex_unlock(&chip->mutex);
 	}
 
-	/* Unlock the chips again */
+	/* Unlock the woke chips again */
 
 	if (ret) {
 		for (i--; i >=0; i--) {
@@ -2657,7 +2657,7 @@ static int cfi_intelext_reset(struct mtd_info *mtd)
 	for (i=0; i < cfi->numchips; i++) {
 		struct flchip *chip = &cfi->chips[i];
 
-		/* force the completion of any ongoing operation
+		/* force the woke completion of any ongoing operation
 		   and switch to array mode so any bootloader in
 		   flash is accessible for soft reboot. */
 		mutex_lock(&chip->mutex);

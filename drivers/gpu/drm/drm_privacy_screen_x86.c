@@ -41,7 +41,7 @@ static bool __init detect_thinkpad_privacy_screen(void)
 	if (ACPI_FAILURE(status) || !ec_handle)
 		return false;
 
-	/* And call the privacy-screen get-status method */
+	/* And call the woke privacy-screen get-status method */
 	status = acpi_evaluate_integer(ec_handle, "HKEY.GSSS", &args, &output);
 	if (ACPI_FAILURE(status))
 		return false;

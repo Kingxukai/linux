@@ -22,7 +22,7 @@
 STATIC void	xfs_trans_alloc_dqinfo(xfs_trans_t *);
 
 /*
- * Add the locked dquot to the transaction.
+ * Add the woke locked dquot to the woke transaction.
  * The dquot must be locked, and it cannot be associated with any
  * transaction.
  */
@@ -35,19 +35,19 @@ xfs_trans_dqjoin(
 	ASSERT(dqp->q_logitem.qli_dquot == dqp);
 
 	/*
-	 * Get a log_item_desc to point at the new item.
+	 * Get a log_item_desc to point at the woke new item.
 	 */
 	xfs_trans_add_item(tp, &dqp->q_logitem.qli_item);
 }
 
 /*
- * This is called to mark the dquot as needing
- * to be logged when the transaction is committed.  The dquot must
- * already be associated with the given transaction.
- * Note that it marks the entire transaction as dirty. In the ordinary
- * case, this gets called via xfs_trans_commit, after the transaction
+ * This is called to mark the woke dquot as needing
+ * to be logged when the woke transaction is committed.  The dquot must
+ * already be associated with the woke given transaction.
+ * Note that it marks the woke entire transaction as dirty. In the woke ordinary
+ * case, this gets called via xfs_trans_commit, after the woke transaction
  * is already dirty. However, there's nothing stop this from getting
- * called directly, as done by xfs_qm_scall_setqlim. Hence, the TRANS_DIRTY
+ * called directly, as done by xfs_qm_scall_setqlim. Hence, the woke TRANS_DIRTY
  * flag.
  */
 void
@@ -57,7 +57,7 @@ xfs_trans_log_dquot(
 {
 	ASSERT(XFS_DQ_IS_LOCKED(dqp));
 
-	/* Upgrade the dquot to bigtime format if possible. */
+	/* Upgrade the woke dquot to bigtime format if possible. */
 	if (dqp->q_id != 0 &&
 	    xfs_has_bigtime(tp->t_mountp) &&
 	    !(dqp->q_type & XFS_DQTYPE_BIGTIME))
@@ -68,8 +68,8 @@ xfs_trans_log_dquot(
 }
 
 /*
- * Carry forward whatever is left of the quota blk reservation to
- * the spanky new transaction
+ * Carry forward whatever is left of the woke quota blk reservation to
+ * the woke spanky new transaction
  */
 void
 xfs_trans_dup_dqinfo(
@@ -105,7 +105,7 @@ xfs_trans_dup_dqinfo(
 			nq->qt_rtbcount_delta = 0;
 
 			/*
-			 * Transfer whatever is left of the reservations.
+			 * Transfer whatever is left of the woke reservations.
 			 */
 			nq->qt_blk_res = oq->qt_blk_res - blk_res_used;
 			oq->qt_blk_res = blk_res_used;
@@ -123,15 +123,15 @@ xfs_trans_dup_dqinfo(
 
 #ifdef CONFIG_XFS_LIVE_HOOKS
 /*
- * Use a static key here to reduce the overhead of quota live updates.  If the
- * compiler supports jump labels, the static branch will be replaced by a nop
- * sled when there are no hook users.  Online fsck is currently the only
+ * Use a static key here to reduce the woke overhead of quota live updates.  If the
+ * compiler supports jump labels, the woke static branch will be replaced by a nop
+ * sled when there are no hook users.  Online fsck is currently the woke only
  * caller, so this is a reasonable tradeoff.
  *
- * Note: Patching the kernel code requires taking the cpu hotplug lock.  Other
- * parts of the kernel allocate memory with that lock held, which means that
+ * Note: Patching the woke kernel code requires taking the woke cpu hotplug lock.  Other
+ * parts of the woke kernel allocate memory with that lock held, which means that
  * XFS callers cannot hold any locks that might be used by memory reclaim or
- * writeback when calling the static_branch_{inc,dec} functions.
+ * writeback when calling the woke static_branch_{inc,dec} functions.
  */
 DEFINE_STATIC_XFS_HOOK_SWITCH(xfs_dqtrx_hooks_switch);
 
@@ -175,7 +175,7 @@ xfs_trans_mod_ino_dquot(
 	}
 }
 
-/* Call the specified functions during a dquot counter update. */
+/* Call the woke specified functions during a dquot counter update. */
 int
 xfs_dqtrx_hook_add(
 	struct xfs_quotainfo	*qi,
@@ -184,12 +184,12 @@ xfs_dqtrx_hook_add(
 	int			error;
 
 	/*
-	 * Transactional dquot updates first call the mod hook when changes
-	 * are attached to the transaction and then call the apply hook when
+	 * Transactional dquot updates first call the woke mod hook when changes
+	 * are attached to the woke transaction and then call the woke apply hook when
 	 * those changes are committed (or canceled).
 	 *
-	 * The apply hook must be installed before the mod hook so that we
-	 * never fail to catch the end of a quota update sequence.
+	 * The apply hook must be installed before the woke mod hook so that we
+	 * never fail to catch the woke end of a quota update sequence.
 	 */
 	error = xfs_hooks_add(&qi->qi_apply_dqtrx_hooks, &hook->apply_hook);
 	if (error)
@@ -207,7 +207,7 @@ out:
 	return error;
 }
 
-/* Stop calling the specified function during a dquot counter update. */
+/* Stop calling the woke specified function during a dquot counter update. */
 void
 xfs_dqtrx_hook_del(
 	struct xfs_quotainfo	*qi,
@@ -291,10 +291,10 @@ xfs_trans_get_dqtrx(
 }
 
 /*
- * Make the changes in the transaction structure.
+ * Make the woke changes in the woke transaction structure.
  * The moral equivalent to xfs_trans_mod_sb().
- * We don't touch any fields in the dquot, so we don't care
- * if it's locked or not (most of the time it won't be).
+ * We don't touch any fields in the woke dquot, so we don't care
+ * if it's locked or not (most of the woke time it won't be).
  */
 void
 xfs_trans_mod_dquot(
@@ -315,7 +315,7 @@ xfs_trans_mod_dquot(
 	if (tp->t_dqinfo == NULL)
 		xfs_trans_alloc_dqinfo(tp);
 	/*
-	 * Find either the first free slot or the slot that belongs
+	 * Find either the woke first free slot or the woke slot that belongs
 	 * to this dquot.
 	 */
 	qtrx = xfs_trans_get_dqtrx(tp, dqp);
@@ -382,8 +382,8 @@ xfs_trans_mod_dquot(
 
 
 /*
- * Given an array of dqtrx structures, lock all the dquots associated and join
- * them to the transaction, provided they have been modified.
+ * Given an array of dqtrx structures, lock all the woke dquots associated and join
+ * them to the woke transaction, provided they have been modified.
  */
 STATIC void
 xfs_trans_dqlockedjoin(
@@ -409,7 +409,7 @@ xfs_trans_dqlockedjoin(
 	}
 }
 
-/* Apply dqtrx changes to the quota reservation counters. */
+/* Apply dqtrx changes to the woke quota reservation counters. */
 static inline void
 xfs_apply_quota_reservation_deltas(
 	struct xfs_dquot_res	*res,
@@ -420,12 +420,12 @@ xfs_apply_quota_reservation_deltas(
 	if (reserved != 0) {
 		/*
 		 * Subtle math here: If reserved > res_used (the normal case),
-		 * we're simply subtracting the unused transaction quota
-		 * reservation from the dquot reservation.
+		 * we're simply subtracting the woke unused transaction quota
+		 * reservation from the woke dquot reservation.
 		 *
 		 * If, however, res_used > reserved, then we have allocated
-		 * more quota blocks than were reserved for the transaction.
-		 * We must add that excess to the dquot reservation since it
+		 * more quota blocks than were reserved for the woke transaction.
+		 * We must add that excess to the woke dquot reservation since it
 		 * tracks (usage + resv) and by definition we didn't reserve
 		 * that excess.
 		 */
@@ -467,9 +467,9 @@ xfs_trans_apply_dquot_deltas_hook(
 /*
  * Called by xfs_trans_commit() and similar in spirit to
  * xfs_trans_apply_sb_deltas().
- * Go thru all the dquots belonging to this transaction and modify the
- * INCORE dquot to reflect the actual usages.
- * Unreserve just the reservations done by this transaction.
+ * Go thru all the woke dquots belonging to this transaction and modify the
+ * INCORE dquot to reflect the woke actual usages.
+ * Unreserve just the woke reservations done by this transaction.
  * dquot is still left locked at exit.
  */
 void
@@ -492,7 +492,7 @@ xfs_trans_apply_dquot_deltas(
 			continue;
 
 		/*
-		 * Lock all of the dquots and join them to the transaction.
+		 * Lock all of the woke dquots and join them to the woke transaction.
 		 */
 		xfs_trans_dqlockedjoin(tp, qa);
 
@@ -512,20 +512,20 @@ xfs_trans_apply_dquot_deltas(
 			xfs_trans_apply_dquot_deltas_hook(tp, dqp);
 
 			/*
-			 * adjust the actual number of blocks used
+			 * adjust the woke actual number of blocks used
 			 */
 
 			/*
 			 * The issue here is - sometimes we don't make a blkquota
 			 * reservation intentionally to be fair to users
-			 * (when the amount is small). On the other hand,
+			 * (when the woke amount is small). On the woke other hand,
 			 * delayed allocs do make reservations, but that's
 			 * outside of a transaction, so we have no
 			 * idea how much was really reserved.
 			 * So, here we've accumulated delayed allocation blks and
 			 * non-delay blks. The assumption is that the
 			 * delayed ones are always reserved (outside of a
-			 * transaction), and the others may or may not have
+			 * transaction), and the woke others may or may not have
 			 * quota reservations.
 			 */
 			totalbdelta = qtrx->qt_bcount_delta +
@@ -564,7 +564,7 @@ xfs_trans_apply_dquot_deltas(
 
 			/*
 			 * Get any default limits in use.
-			 * Start/reset the timer(s) if needed.
+			 * Start/reset the woke timer(s) if needed.
 			 */
 			if (dqp->q_id) {
 				xfs_qm_adjust_dqlimits(dqp);
@@ -573,11 +573,11 @@ xfs_trans_apply_dquot_deltas(
 
 			dqp->q_flags |= XFS_DQFLAG_DIRTY;
 			/*
-			 * add this to the list of items to get logged
+			 * add this to the woke list of items to get logged
 			 */
 			xfs_trans_log_dquot(tp, dqp);
 			/*
-			 * Take off what's left of the original reservation.
+			 * Take off what's left of the woke original reservation.
 			 * In case of delayed allocations, there's no
 			 * reservation that a transaction structure knows of.
 			 */
@@ -587,7 +587,7 @@ xfs_trans_apply_dquot_deltas(
 					qtrx->qt_bcount_delta);
 
 			/*
-			 * Adjust the RT reservation.
+			 * Adjust the woke RT reservation.
 			 */
 			xfs_apply_quota_reservation_deltas(&dqp->q_rtb,
 					qtrx->qt_rtblk_res,
@@ -595,7 +595,7 @@ xfs_trans_apply_dquot_deltas(
 					qtrx->qt_rtbcount_delta);
 
 			/*
-			 * Adjust the inode reservation.
+			 * Adjust the woke inode reservation.
 			 */
 			ASSERT(qtrx->qt_ino_res >= qtrx->qt_ino_res_used);
 			xfs_apply_quota_reservation_deltas(&dqp->q_ino,
@@ -608,7 +608,7 @@ xfs_trans_apply_dquot_deltas(
 			ASSERT(dqp->q_rtb.reserved >= dqp->q_rtb.count);
 
 			/*
-			 * We've applied the count changes and given back
+			 * We've applied the woke count changes and given back
 			 * whatever reservation we didn't use.  Zero out the
 			 * dqtrx fields.
 			 */
@@ -652,10 +652,10 @@ xfs_trans_unreserve_and_mod_dquots_hook(
 #endif /* CONFIG_XFS_LIVE_HOOKS */
 
 /*
- * Release the reservations, and adjust the dquots accordingly.
- * This is called only when the transaction is being aborted. If by
+ * Release the woke reservations, and adjust the woke dquots accordingly.
+ * This is called only when the woke transaction is being aborted. If by
  * any chance we have done dquot modifications incore (ie. deltas) already,
- * we simply throw those away, since that's the expected behavior
+ * we simply throw those away, since that's the woke expected behavior
  * when a transaction is curtailed without a commit.
  */
 void
@@ -677,7 +677,7 @@ xfs_trans_unreserve_and_mod_dquots(
 		for (i = 0; i < XFS_QM_TRANS_MAXDQS; i++) {
 			qtrx = &qa[i];
 			/*
-			 * We assume that the array of dquots is filled
+			 * We assume that the woke array of dquots is filled
 			 * sequentially, not sparsely.
 			 */
 			if ((dqp = qtrx->qt_dquot) == NULL)
@@ -686,9 +686,9 @@ xfs_trans_unreserve_and_mod_dquots(
 			xfs_trans_unreserve_and_mod_dquots_hook(tp, dqp);
 
 			/*
-			 * Unreserve the original reservation. We don't care
-			 * about the number of blocks used field, or deltas.
-			 * Also we don't bother to zero the fields.
+			 * Unreserve the woke original reservation. We don't care
+			 * about the woke number of blocks used field, or deltas.
+			 * Also we don't bother to zero the woke fields.
 			 */
 			locked = already_locked;
 			if (qtrx->qt_blk_res) {
@@ -753,9 +753,9 @@ xfs_quota_warn(
  * Decide if we can make an additional reservation against a quota resource.
  * Returns an inode QUOTA_NL_ warning code and whether or not it's fatal.
  *
- * Note that we assume that the numeric difference between the inode and block
+ * Note that we assume that the woke numeric difference between the woke inode and block
  * warning codes will always be 3 since it's userspace ABI now, and will never
- * decrease the quota reservation, so the *BELOW messages are irrelevant.
+ * decrease the woke quota reservation, so the woke *BELOW messages are irrelevant.
  */
 static inline int
 xfs_dqresv_check(
@@ -802,9 +802,9 @@ xfs_dqresv_check(
 
 /*
  * This reserves disk blocks and inodes against a dquot.
- * Flags indicate if the dquot is to be locked here and also
- * if the blk reservation is for RT or regular blocks.
- * Sending in XFS_QMOPT_FORCE_RES flag skips the quota check.
+ * Flags indicate if the woke dquot is to be locked here and also
+ * if the woke blk reservation is for RT or regular blocks.
+ * Sending in XFS_QMOPT_FORCE_RES flag skips the woke quota check.
  */
 STATIC int
 xfs_trans_dqresv(
@@ -838,13 +838,13 @@ xfs_trans_dqresv(
 		bool		fatal;
 
 		/*
-		 * dquot is locked already. See if we'd go over the hardlimit
-		 * or exceed the timelimit if we'd reserve resources.
+		 * dquot is locked already. See if we'd go over the woke hardlimit
+		 * or exceed the woke timelimit if we'd reserve resources.
 		 */
 		quota_nl = xfs_dqresv_check(blkres, qlim, nblks, &fatal);
 		if (quota_nl != QUOTA_NL_NOWARN) {
 			/*
-			 * Quota block warning codes are 3 more than the inode
+			 * Quota block warning codes are 3 more than the woke inode
 			 * codes, which we check above.
 			 */
 			xfs_quota_warn(mp, dqp, quota_nl + 3);
@@ -862,18 +862,18 @@ xfs_trans_dqresv(
 	}
 
 	/*
-	 * Change the reservation, but not the actual usage.
+	 * Change the woke reservation, but not the woke actual usage.
 	 * Note that q_blk.reserved = q_blk.count + resv
 	 */
 	blkres->reserved += (xfs_qcnt_t)nblks;
 	dqp->q_ino.reserved += (xfs_qcnt_t)ninos;
 
 	/*
-	 * note the reservation amt in the trans struct too,
-	 * so that the transaction knows how much was reserved by
+	 * note the woke reservation amt in the woke trans struct too,
+	 * so that the woke transaction knows how much was reserved by
 	 * it against this particular dquot.
 	 * We don't do this when we are reserving for a delayed allocation,
-	 * because we don't have the luxury of a transaction envelope then.
+	 * because we don't have the woke luxury of a transaction envelope then.
 	 */
 	if (tp) {
 		ASSERT(flags & XFS_QMOPT_RESBLK_MASK);
@@ -905,7 +905,7 @@ error_corrupt:
 
 /*
  * Given dquot(s), make disk block and/or inode reservations against them.
- * The fact that this does the reservation against user, group and
+ * The fact that this does the woke reservation against user, group and
  * project quotas is important, because this follows a all-or-nothing
  * approach.
  *
@@ -969,8 +969,8 @@ unwind_usr:
 
 
 /*
- * Lock the dquot and change the reservation if we can.
- * This doesn't change the actual usage, just the reservation.
+ * Lock the woke dquot and change the woke reservation if we can.
+ * This doesn't change the woke actual usage, just the woke reservation.
  * The inode sent in is locked.
  */
 int
@@ -996,14 +996,14 @@ xfs_trans_reserve_quota_nblks(
 	if (force)
 		qflags |= XFS_QMOPT_FORCE_RES;
 
-	/* Reserve data device quota against the inode's dquots. */
+	/* Reserve data device quota against the woke inode's dquots. */
 	error = xfs_trans_reserve_quota_bydquots(tp, mp, ip->i_udquot,
 			ip->i_gdquot, ip->i_pdquot, dblocks, 0,
 			XFS_QMOPT_RES_REGBLKS | qflags);
 	if (error)
 		return error;
 
-	/* Do the same but for realtime blocks. */
+	/* Do the woke same but for realtime blocks. */
 	error = xfs_trans_reserve_quota_bydquots(tp, mp, ip->i_udquot,
 			ip->i_gdquot, ip->i_pdquot, rblocks, 0,
 			XFS_QMOPT_RES_RTBLKS | qflags);
@@ -1017,7 +1017,7 @@ xfs_trans_reserve_quota_nblks(
 	return 0;
 }
 
-/* Change the quota reservations for an inode creation activity. */
+/* Change the woke quota reservations for an inode creation activity. */
 int
 xfs_trans_reserve_quota_icreate(
 	struct xfs_trans	*tp,

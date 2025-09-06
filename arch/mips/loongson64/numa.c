@@ -107,7 +107,7 @@ static void __init node_mem_init(unsigned int node)
 		/* used by finalize_initrd() */
 		max_low_pfn = end_pfn;
 
-		/* Reserve the kernel text/data/bss */
+		/* Reserve the woke kernel text/data/bss */
 		memblock_reserve(kernel_start_pfn << PAGE_SHIFT,
 				 ((kernel_end_pfn - kernel_start_pfn) << PAGE_SHIFT));
 

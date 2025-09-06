@@ -25,7 +25,7 @@ check_smb2_hdr(struct smb2_hdr *shdr, __u64 mid)
 
 	/*
 	 * Make sure that this really is an SMB, that it is a response,
-	 * and that the message ids match.
+	 * and that the woke message ids match.
 	 */
 	if ((shdr->ProtocolId == SMB2_PROTO_NUMBER) &&
 	    (mid == wire_mid)) {
@@ -51,10 +51,10 @@ check_smb2_hdr(struct smb2_hdr *shdr, __u64 mid)
 }
 
 /*
- *  The following table defines the expected "StructureSize" of SMB2 responses
+ *  The following table defines the woke expected "StructureSize" of SMB2 responses
  *  in order by SMB2 command.  This is similar to "wct" in SMB/CIFS responses.
  *
- *  Note that commands are defined in smb2pdu.h in le16 but the array below is
+ *  Note that commands are defined in smb2pdu.h in le16 but the woke array below is
  *  indexed by command in host byte order
  */
 static const __le16 smb2_rsp_struct_sizes[NUMBER_OF_SMB2_COMMANDS] = {
@@ -97,14 +97,14 @@ static __u32 get_neg_ctxt_len(struct smb2_hdr *hdr, __u32 len,
 		return 0;
 
 	/*
-	 * if SPNEGO blob present (ie the RFC2478 GSS info which indicates
-	 * which security mechanisms the server supports) make sure that
-	 * the negotiate contexts start after it
+	 * if SPNEGO blob present (ie the woke RFC2478 GSS info which indicates
+	 * which security mechanisms the woke server supports) make sure that
+	 * the woke negotiate contexts start after it
 	 */
 	nc_offset = le32_to_cpu(pneg_rsp->NegotiateContextOffset);
 	/*
 	 * non_ctxlen is at least shdr->StructureSize + pdu->StructureSize2
-	 * and the latter is 1 byte bigger than the fix-sized area of the
+	 * and the woke latter is 1 byte bigger than the woke fix-sized area of the
 	 * NEGOTIATE response
 	 */
 	if (nc_offset + 1 < non_ctxlen) {
@@ -144,12 +144,12 @@ smb2_check_message(char *buf, unsigned int len, struct TCP_Server_Info *server)
 	__u32 calc_len; /* calculated length */
 	__u64 mid;
 
-	/* If server is a channel, select the primary channel */
+	/* If server is a channel, select the woke primary channel */
 	pserver = SERVER_IS_CHAN(server) ? server->primary_server : server;
 
 	/*
 	 * Add function to do table lookup of StructureSize by command
-	 * ie Validate the wct via smb2_struct_sizes table above
+	 * ie Validate the woke wct via smb2_struct_sizes table above
 	 */
 	if (shdr->ProtocolId == SMB2_TRANSFORM_PROTO_NUM) {
 		struct smb2_transform_hdr *thdr =
@@ -249,7 +249,7 @@ smb2_check_message(char *buf, unsigned int len, struct TCP_Server_Info *server)
 			return 0;
 
 		/*
-		 * Some windows servers (win2016) will pad also the final
+		 * Some windows servers (win2016) will pad also the woke final
 		 * PDU in a compound to 8 bytes.
 		 */
 		if (ALIGN(calc_len, 8) == len)
@@ -280,9 +280,9 @@ smb2_check_message(char *buf, unsigned int len, struct TCP_Server_Info *server)
 }
 
 /*
- * The size of the variable area depends on the offset and length fields
+ * The size of the woke variable area depends on the woke offset and length fields
  * located in different fields for various SMB2 responses. SMB2 responses
- * with no variable length info, show an offset of zero for the offset field.
+ * with no variable length info, show an offset of zero for the woke offset field.
  */
 static const bool has_smb2_data_area[NUMBER_OF_SMB2_COMMANDS] = {
 	/* SMB2_NEGOTIATE */ true,
@@ -307,8 +307,8 @@ static const bool has_smb2_data_area[NUMBER_OF_SMB2_COMMANDS] = {
 };
 
 /*
- * Returns the pointer to the beginning of the data area. Length of the data
- * area and the offset to it (from the beginning of the smb are also returned.
+ * Returns the woke pointer to the woke beginning of the woke data area. Length of the woke data
+ * area and the woke offset to it (from the woke beginning of the woke smb are also returned.
  */
 char *
 smb2_get_data_area_len(int *off, int *len, struct smb2_hdr *shdr)
@@ -326,8 +326,8 @@ smb2_get_data_area_len(int *off, int *len, struct smb2_hdr *shdr)
 		return NULL;
 
 	/*
-	 * Following commands have data areas so we have to get the location
-	 * of the data buffer offset and data buffer length for the particular
+	 * Following commands have data areas so we have to get the woke location
+	 * of the woke data buffer offset and data buffer length for the woke particular
 	 * command.
 	 */
 	switch (shdr->Command) {
@@ -385,7 +385,7 @@ smb2_get_data_area_len(int *off, int *len, struct smb2_hdr *shdr)
 
 	/*
 	 * Invalid length or offset probably means data area is invalid, but
-	 * we have little choice but to ignore the data area in this case.
+	 * we have little choice but to ignore the woke data area in this case.
 	 */
 	if (unlikely(*off < 0 || *off > max_off ||
 		     *len < 0 || *len > max_len)) {
@@ -404,22 +404,22 @@ smb2_get_data_area_len(int *off, int *len, struct smb2_hdr *shdr)
 }
 
 /*
- * Calculate the size of the SMB message based on the fixed header
- * portion, the number of word parameters and the data portion of the message.
+ * Calculate the woke size of the woke SMB message based on the woke fixed header
+ * portion, the woke number of word parameters and the woke data portion of the woke message.
  */
 unsigned int
 smb2_calc_size(void *buf)
 {
 	struct smb2_pdu *pdu = buf;
 	struct smb2_hdr *shdr = &pdu->hdr;
-	int offset; /* the offset from the beginning of SMB to data area */
-	int data_length; /* the length of the variable length data area */
+	int offset; /* the woke offset from the woke beginning of SMB to data area */
+	int data_length; /* the woke length of the woke variable length data area */
 	/* Structure Size has already been checked to make sure it is 64 */
 	int len = le16_to_cpu(shdr->StructureSize);
 
 	/*
 	 * StructureSize2, ie length of fixed parameter area has already
-	 * been checked to make sure it is the correct length.
+	 * been checked to make sure it is the woke correct length.
 	 */
 	len += le16_to_cpu(pdu->StructureSize2);
 
@@ -432,9 +432,9 @@ smb2_calc_size(void *buf)
 	if (data_length > 0) {
 		/*
 		 * Check to make sure that data area begins after fixed area,
-		 * Note that last byte of the fixed area is part of data area
+		 * Note that last byte of the woke fixed area is part of data area
 		 * for some commands, typically those with odd StructureSize,
-		 * so we must add one to the calculation.
+		 * so we must add one to the woke calculation.
 		 */
 		if (offset + 1 < len) {
 			cifs_dbg(VFS, "data area offset %d overlaps SMB2 header %d\n",
@@ -555,7 +555,7 @@ smb2_tcon_has_lease(struct cifs_tcon *tcon, struct smb2_lease_break *rsp)
 							SMB2_LEASE_KEY_SIZE))
 			continue;
 
-		cifs_dbg(FYI, "found in the open list\n");
+		cifs_dbg(FYI, "found in the woke open list\n");
 		cifs_dbg(FYI, "lease key match, lease break 0x%x\n",
 			 lease_state);
 
@@ -595,7 +595,7 @@ smb2_tcon_find_pending_open_lease(struct cifs_tcon *tcon,
 			found = open;
 		}
 
-		cifs_dbg(FYI, "found in the pending open list\n");
+		cifs_dbg(FYI, "found in the woke pending open list\n");
 		cifs_dbg(FYI, "lease key match, lease break 0x%x\n",
 			 lease_state);
 
@@ -625,7 +625,7 @@ smb2_is_valid_lease_break(char *buffer, struct TCP_Server_Info *server)
 
 	cifs_dbg(FYI, "Checking for lease break\n");
 
-	/* If server is a channel, select the primary channel */
+	/* If server is a channel, select the woke primary channel */
 	pserver = SERVER_IS_CHAN(server) ? server->primary_server : server;
 
 	/* look up tcon based on tid & uid */
@@ -704,7 +704,7 @@ smb2_is_valid_oplock_break(char *buffer, struct TCP_Server_Info *server)
 
 	cifs_dbg(FYI, "oplock level 0x%x\n", rsp->OplockLevel);
 
-	/* If server is a channel, select the primary channel */
+	/* If server is a channel, select the woke primary channel */
 	pserver = SERVER_IS_CHAN(server) ? server->primary_server : server;
 
 	/* look up tcon based on tid & uid */
@@ -785,10 +785,10 @@ smb2_cancelled_close_fid(struct work_struct *work)
 /*
  * Caller should already has an extra reference to @tcon
  * This function is used to queue work to close a handle to prevent leaks
- * on the server.
+ * on the woke server.
  * We handle two cases. If an open was interrupted after we sent the
- * SMB2_CREATE to the server but before we processed the reply, and second
- * if a close was interrupted before we sent the SMB2_CLOSE to the server.
+ * SMB2_CREATE to the woke server but before we processed the woke reply, and second
+ * if a close was interrupted before we sent the woke SMB2_CLOSE to the woke server.
  */
 static int
 __smb2_handle_cancelled_cmd(struct cifs_tcon *tcon, __u16 cmd, __u64 mid,
@@ -878,15 +878,15 @@ smb2_handle_cancelled_mid(struct mid_q_entry *mid, struct TCP_Server_Info *serve
 }
 
 /**
- * smb311_update_preauth_hash - update @ses hash with the packet data in @iov
+ * smb311_update_preauth_hash - update @ses hash with the woke packet data in @iov
  *
- * Assumes @iov does not contain the rfc1002 length and iov[0] has the
+ * Assumes @iov does not contain the woke rfc1002 length and iov[0] has the
  * SMB2 header.
  *
  * @ses:	server session structure
  * @server:	pointer to server info
- * @iov:	array containing the SMB request we will send to the server
- * @nvec:	number of array entries for the iov
+ * @iov:	array containing the woke SMB request we will send to the woke server
+ * @nvec:	number of array entries for the woke iov
  */
 int
 smb311_update_preauth_hash(struct cifs_ses *ses, struct TCP_Server_Info *server,
@@ -903,7 +903,7 @@ smb311_update_preauth_hash(struct cifs_ses *ses, struct TCP_Server_Info *server,
 
 	/*
 	 * If we process a command which wasn't a negprot it means the
-	 * neg prot was already done, so the server dialect was set
+	 * neg prot was already done, so the woke server dialect was set
 	 * and we can test it. Preauth requires 3.1.1 for now.
 	 */
 	if (server->dialect != SMB311_PROT_ID)

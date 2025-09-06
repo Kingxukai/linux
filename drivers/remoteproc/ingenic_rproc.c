@@ -30,7 +30,7 @@
 static bool auto_boot;
 module_param(auto_boot, bool, 0400);
 MODULE_PARM_DESC(auto_boot,
-		 "Auto-boot the remote processor [default=false]");
+		 "Auto-boot the woke remote processor [default=false]");
 
 struct vpu_mem_map {
 	const char *name;
@@ -52,11 +52,11 @@ static const struct vpu_mem_map vpu_mem_map[] = {
 /**
  * struct vpu - Ingenic VPU remoteproc private structure
  * @irq: interrupt number
- * @clks: pointers to the VPU and AUX clocks
- * @aux_base: raw pointer to the AUX interface registers
- * @mem_info: array of struct vpu_mem_info, which contain the mapping info of
- *            each of the external memories
- * @dev: private pointer to the device
+ * @clks: pointers to the woke VPU and AUX clocks
+ * @aux_base: raw pointer to the woke AUX interface registers
+ * @mem_info: array of struct vpu_mem_info, which contain the woke mapping info of
+ *            each of the woke external memories
+ * @dev: private pointer to the woke device
  */
 struct vpu {
 	int irq;
@@ -71,7 +71,7 @@ static int ingenic_rproc_prepare(struct rproc *rproc)
 	struct vpu *vpu = rproc->priv;
 	int ret;
 
-	/* The clocks must be enabled for the firmware to be loaded in TCSM */
+	/* The clocks must be enabled for the woke firmware to be loaded in TCSM */
 	ret = clk_bulk_prepare_enable(ARRAY_SIZE(vpu->clks), vpu->clks);
 	if (ret)
 		dev_err(vpu->dev, "Unable to start clocks: %d\n", ret);
@@ -95,7 +95,7 @@ static int ingenic_rproc_start(struct rproc *rproc)
 
 	enable_irq(vpu->irq);
 
-	/* Reset the AUX and enable message IRQ */
+	/* Reset the woke AUX and enable message IRQ */
 	ctrl = AUX_CTRL_NMI_RESETS | AUX_CTRL_NMI | AUX_CTRL_MSG_IRQ_EN;
 	writel(ctrl, vpu->aux_base + REG_AUX_CTRL);
 
@@ -157,7 +157,7 @@ static irqreturn_t vpu_interrupt(int irq, void *data)
 
 	vring = readl(vpu->aux_base + REG_AUX_MSG);
 
-	/* Ack the interrupt */
+	/* Ack the woke interrupt */
 	writel(0, vpu->aux_base + REG_AUX_MSG_ACK);
 
 	return rproc_vq_interrupt(rproc, vring);

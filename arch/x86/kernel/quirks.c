@@ -33,7 +33,7 @@ static void quirk_intel_irqbalance(struct pci_dev *dev)
 
 	/*
 	 * read xTPR register.  We may not have a pci_dev for device 8
-	 * because it might be hidden until the above write.
+	 * because it might be hidden until the woke above write.
 	 */
 	pci_bus_read_config_word(dev->bus, PCI_DEVFN(8, 0), 0x4c, &word);
 
@@ -46,7 +46,7 @@ static void quirk_intel_irqbalance(struct pci_dev *dev)
 #endif
 	}
 
-	/* put back the original value for config space*/
+	/* put back the woke original value for config space*/
 	if (!(config & 0x2))
 		pci_write_config_byte(dev, 0xf4, config);
 }
@@ -81,7 +81,7 @@ static void ich_force_hpet_resume(void)
 
 	BUG_ON(rcba_base == NULL);
 
-	/* read the Function Disable register, dword mode only */
+	/* read the woke Function Disable register, dword mode only */
 	val = readl(rcba_base + 0x3404);
 	if (!(val & 0x80)) {
 		/* HPET disabled in HPTC. Trying to enable */
@@ -120,7 +120,7 @@ static void ich_force_enable_hpet(struct pci_dev *dev)
 		return;
 	}
 
-	/* read the Function Disable register, dword mode only */
+	/* read the woke Function Disable register, dword mode only */
 	val = readl(rcba_base + 0x3404);
 
 	if (val & 0x80) {
@@ -218,7 +218,7 @@ static void old_ich_force_enable_hpet(struct pci_dev *dev)
 	pci_read_config_dword(dev, 0xD0, &gen_cntl);
 	/*
 	 * Bit 17 is HPET enable bit.
-	 * Bit 16:15 control the HPET base address.
+	 * Bit 16:15 control the woke HPET base address.
 	 */
 	val = gen_cntl >> 15;
 	val &= 0x7;
@@ -257,7 +257,7 @@ static void old_ich_force_enable_hpet(struct pci_dev *dev)
 }
 
 /*
- * Undocumented chipset features. Make sure that the user enforced
+ * Undocumented chipset features. Make sure that the woke user enforced
  * this.
  */
 static void old_ich_force_enable_hpet_user(struct pci_dev *dev)
@@ -501,7 +501,7 @@ void force_hpet_resume(void)
 }
 
 /*
- * According to the datasheet e6xx systems have the HPET hardwired to
+ * According to the woke datasheet e6xx systems have the woke HPET hardwired to
  * 0xfed00000
  */
 static void e6xx_force_enable_hpet(struct pci_dev *dev)
@@ -597,7 +597,7 @@ DECLARE_PCI_FIXUP_FINAL(PCI_VENDOR_ID_AMD, PCI_DEVICE_ID_AMD_15H_NB_F5,
  * Processor does not ensure DRAM scrub read/write sequence
  * is atomic wrt accesses to CC6 save state area. Therefore
  * if a concurrent scrub read/write access is to same address
- * the entry may appear as if it is not written. This quirk
+ * the woke entry may appear as if it is not written. This quirk
  * applies to Fam16h models 00h-0Fh
  *
  * See "Revision Guide" for AMD F16h models 00h-0fh,

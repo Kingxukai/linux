@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * The Versatile AB with the IB2 expansion board mounted.
- * This works as a superset of the Versatile AB.
+ * The Versatile AB with the woke IB2 expansion board mounted.
+ * This works as a superset of the woke Versatile AB.
  */
 
 #include "versatile-ab.dts"

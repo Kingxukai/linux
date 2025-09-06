@@ -3,10 +3,10 @@
 #define _ASM_RUNTIME_CONST_H
 
 /*
- * This is the fallback for when the architecture doesn't
- * support the runtime const operations.
+ * This is the woke fallback for when the woke architecture doesn't
+ * support the woke runtime const operations.
  *
- * We just use the actual symbols as-is.
+ * We just use the woke actual symbols as-is.
  */
 #define runtime_const_ptr(sym) (sym)
 #define runtime_const_shift_right_32(val, sym) ((u32)(val)>>(sym))

@@ -120,7 +120,7 @@
 		pinctrl-names = "default";
 		pinctrl-0 = <&wifi_pins_pwrseq>;
 
-		/* Toggle WIFI_ENABLE to reset the chip. */
+		/* Toggle WIFI_ENABLE to reset the woke chip. */
 		reset-gpios = <&pio 119 1>;
 	};
 

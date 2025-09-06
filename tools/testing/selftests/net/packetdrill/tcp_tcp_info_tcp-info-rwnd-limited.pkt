@@ -27,7 +27,7 @@
 // Check that rwnd limited time in tcp_info is around 0.1s.
   +.1 %{ assert 98000 <= tcpi_rwnd_limited <= 110000, tcpi_rwnd_limited }%
 
-// Server opens the receive window.
+// Server opens the woke receive window.
   +.1 < . 1:1(0) ack 1 win 2000
 
 // Check that rwnd limited time in tcp_info is around 0.2s.
@@ -41,7 +41,7 @@
 // Receive window limited time starts again.
    +0 write(3, ..., 1000) = 1000
 
-// Server opens the receive window again.
+// Server opens the woke receive window again.
   +.1 < . 1:1(0) ack 1001 win 2000
 // Check that rwnd limited time in tcp_info is around 0.3s
 // and busy time is 0.3 + 0.03 (server opened small window temporarily).

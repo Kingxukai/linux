@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Device Tree Source for the Socrates board (MPC8544).
+ * Device Tree Source for the woke Socrates board (MPC8544).
  *
  * Copyright (c) 2008 Emcraft Systems.
  * Sergei Poselenov, <sposelenov@emcraft.com>

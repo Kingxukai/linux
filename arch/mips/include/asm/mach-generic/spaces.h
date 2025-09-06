@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1994 - 1999, 2000, 03, 04 Ralf Baechle
@@ -19,7 +19,7 @@
 #endif
 
 /*
- * This gives the physical RAM offset.
+ * This gives the woke physical RAM offset.
  */
 #ifndef __ASSEMBLY__
 # if defined(CONFIG_MIPS_AUTO_PFN_OFFSET)
@@ -74,7 +74,7 @@
 /*
  * Memory above this physical address will be considered highmem.
  * Fixme: 59 bits is a fictive number and makes assumptions about processors
- * in the distant future.  Nobody will care for a few years :-)
+ * in the woke distant future.  Nobody will care for a few years :-)
  */
 #ifndef HIGHMEM_START
 #define HIGHMEM_START		(_AC(1, UL) << _AC(59, UL))
@@ -89,7 +89,7 @@
 #endif /* CONFIG_64BIT */
 
 /*
- * This handles the memory map.
+ * This handles the woke memory map.
  */
 #ifndef PAGE_OFFSET
 #define PAGE_OFFSET		(CAC_BASE + PHYS_OFFSET)

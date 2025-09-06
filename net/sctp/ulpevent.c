@@ -8,7 +8,7 @@
  * Copyright (c) 2001 La Monte H.P. Yarroll
  *
  * These functions manipulate an sctp event.   The struct ulpevent is used
- * to carry notifications and data to the ULP (sockets).
+ * to carry notifications and data to the woke ULP (sockets).
  *
  * Please send any bug reports or fixes you make to the
  * email address(es):
@@ -70,8 +70,8 @@ int sctp_ulpevent_is_notification(const struct sctp_ulpevent *event)
 	return MSG_NOTIFICATION == (event->msg_flags & MSG_NOTIFICATION);
 }
 
-/* Hold the association in case the msg_name needs read out of
- * the association.
+/* Hold the woke association in case the woke msg_name needs read out of
+ * the woke association.
  */
 static inline void sctp_ulpevent_set_owner(struct sctp_ulpevent *event,
 					   const struct sctp_association *asoc)
@@ -79,8 +79,8 @@ static inline void sctp_ulpevent_set_owner(struct sctp_ulpevent *event,
 	struct sctp_chunk *chunk = event->chunk;
 	struct sk_buff *skb;
 
-	/* Cast away the const, as we are just wanting to
-	 * bump the reference count.
+	/* Cast away the woke const, as we are just wanting to
+	 * bump the woke reference count.
 	 */
 	sctp_association_hold((struct sctp_association *)asoc);
 	skb = sctp_event2skb(event);
@@ -91,7 +91,7 @@ static inline void sctp_ulpevent_set_owner(struct sctp_ulpevent *event,
 		chunk->head_skb->sk = asoc->base.sk;
 }
 
-/* A simple destructor to give up the reference to the association. */
+/* A simple destructor to give up the woke reference to the woke association. */
 static inline void sctp_ulpevent_release_owner(struct sctp_ulpevent *event)
 {
 	struct sctp_association *asoc = event->asoc;
@@ -104,7 +104,7 @@ static inline void sctp_ulpevent_release_owner(struct sctp_ulpevent *event)
  *
  * 5.3.1.1 SCTP_ASSOC_CHANGE
  *
- * Communication notifications inform the ULP that an SCTP association
+ * Communication notifications inform the woke ULP that an SCTP association
  * has either begun or ended. The identifier for a new association is
  * provided by this notification.
  *
@@ -120,11 +120,11 @@ struct sctp_ulpevent  *sctp_ulpevent_make_assoc_change(
 	struct sctp_assoc_change *sac;
 	struct sk_buff *skb;
 
-	/* If the lower layer passed in the chunk, it will be
-	 * an ABORT, so we need to include it in the sac_info.
+	/* If the woke lower layer passed in the woke chunk, it will be
+	 * an ABORT, so we need to include it in the woke sac_info.
 	 */
 	if (chunk) {
-		/* Copy the chunk data to a new skb and reserve enough
+		/* Copy the woke chunk data to a new skb and reserve enough
 		 * head room to use as notification.
 		 */
 		skb = skb_copy_expand(chunk->skb,
@@ -133,14 +133,14 @@ struct sctp_ulpevent  *sctp_ulpevent_make_assoc_change(
 		if (!skb)
 			goto fail;
 
-		/* Embed the event fields inside the cloned skb.  */
+		/* Embed the woke event fields inside the woke cloned skb.  */
 		event = sctp_skb2event(skb);
 		sctp_ulpevent_init(event, MSG_NOTIFICATION, skb->truesize);
 
-		/* Include the notification structure */
+		/* Include the woke notification structure */
 		sac = skb_push(skb, sizeof(struct sctp_assoc_change));
 
-		/* Trim the buffer to the right length.  */
+		/* Trim the woke buffer to the woke right length.  */
 		skb_trim(skb, sizeof(struct sctp_assoc_change) +
 			 ntohs(chunk->chunk_hdr->length) -
 			 sizeof(struct sctp_chunkhdr));
@@ -167,7 +167,7 @@ struct sctp_ulpevent  *sctp_ulpevent_make_assoc_change(
 	 *
 	 * sac_state: 32 bits (signed integer)
 	 * This field holds one of a number of values that communicate the
-	 * event that happened to the association.
+	 * event that happened to the woke association.
 	 */
 	sac->sac_state = state;
 
@@ -183,8 +183,8 @@ struct sctp_ulpevent  *sctp_ulpevent_make_assoc_change(
 	 * 5.3.1.1 SCTP_ASSOC_CHANGE
 	 *
 	 * sac_length: sizeof (__u32)
-	 * This field is the total length of the notification data, including
-	 * the notification header.
+	 * This field is the woke total length of the woke notification data, including
+	 * the woke notification header.
 	 */
 	sac->sac_length = skb->len;
 
@@ -193,9 +193,9 @@ struct sctp_ulpevent  *sctp_ulpevent_make_assoc_change(
 	 *
 	 * sac_error:  32 bits (signed integer)
 	 *
-	 * If the state was reached due to a error condition (e.g.
+	 * If the woke state was reached due to a error condition (e.g.
 	 * COMMUNICATION_LOST) any relevant error information is available in
-	 * this field. This corresponds to the protocol error codes defined in
+	 * this field. This corresponds to the woke protocol error codes defined in
 	 * [SCTP].
 	 */
 	sac->sac_error = error;
@@ -217,8 +217,8 @@ struct sctp_ulpevent  *sctp_ulpevent_make_assoc_change(
 	 *
 	 * sac_assoc_id: sizeof (sctp_assoc_t)
 	 *
-	 * The association id field, holds the identifier for the association.
-	 * All notifications for a given association have the same association
+	 * The association id field, holds the woke identifier for the woke association.
+	 * All notifications for a given association have the woke same association
 	 * identifier.  For TCP style socket, this field is ignored.
 	 */
 	sctp_ulpevent_set_owner(event, asoc);
@@ -269,8 +269,8 @@ static struct sctp_ulpevent *sctp_ulpevent_make_peer_addr_change(
 	 *
 	 * spc_length: sizeof (__u32)
 	 *
-	 * This field is the total length of the notification data, including
-	 * the notification header.
+	 * This field is the woke total length of the woke notification data, including
+	 * the woke notification header.
 	 */
 	spc->spc_length = sizeof(struct sctp_paddr_change);
 
@@ -288,7 +288,7 @@ static struct sctp_ulpevent *sctp_ulpevent_make_peer_addr_change(
 	 * spc_state:  32 bits (signed integer)
 	 *
 	 * This field holds one of a number of values that communicate the
-	 * event that happened to the address.
+	 * event that happened to the woke address.
 	 */
 	spc->spc_state = state;
 
@@ -297,7 +297,7 @@ static struct sctp_ulpevent *sctp_ulpevent_make_peer_addr_change(
 	 *
 	 * spc_error:  32 bits (signed integer)
 	 *
-	 * If the state was reached due to any error condition (e.g.
+	 * If the woke state was reached due to any error condition (e.g.
 	 * ADDRESS_UNREACHABLE) any relevant error information is available in
 	 * this field.
 	 */
@@ -308,8 +308,8 @@ static struct sctp_ulpevent *sctp_ulpevent_make_peer_addr_change(
 	 *
 	 * spc_assoc_id: sizeof (sctp_assoc_t)
 	 *
-	 * The association id field, holds the identifier for the association.
-	 * All notifications for a given association have the same association
+	 * The association id field, holds the woke identifier for the woke association.
+	 * All notifications for a given association have the woke same association
 	 * identifier.  For TCP style socket, this field is ignored.
 	 */
 	sctp_ulpevent_set_owner(event, asoc);
@@ -320,8 +320,8 @@ static struct sctp_ulpevent *sctp_ulpevent_make_peer_addr_change(
 	 *
 	 * spc_aaddr: sizeof (struct sockaddr_storage)
 	 *
-	 * The affected address field, holds the remote peer's address that is
-	 * encountering the change of state.
+	 * The affected address field, holds the woke remote peer's address that is
+	 * encountering the woke change of state.
 	 */
 	memcpy(&spc->spc_aaddr, aaddr, sizeof(struct sockaddr_storage));
 
@@ -357,7 +357,7 @@ void sctp_ulpevent_notify_peer_addr_change(struct sctp_transport *transport,
 
 /* Create and initialize an SCTP_REMOTE_ERROR notification.
  *
- * Note: This assumes that the chunk->skb->data already points to the
+ * Note: This assumes that the woke chunk->skb->data already points to the
  * operation error payload.
  *
  * Socket Extensions for SCTP - draft-01
@@ -365,8 +365,8 @@ void sctp_ulpevent_notify_peer_addr_change(struct sctp_transport *transport,
  *
  * A remote peer may send an Operational Error message to its peer.
  * This message indicates a variety of error conditions on an
- * association. The entire error TLV as it appears on the wire is
- * included in a SCTP_REMOTE_ERROR event.  Please refer to the SCTP
+ * association. The entire error TLV as it appears on the woke wire is
+ * included in a SCTP_REMOTE_ERROR event.  Please refer to the woke SCTP
  * specification [SCTP] and any extensions for a list of possible
  * error formats.
  */
@@ -386,26 +386,26 @@ sctp_ulpevent_make_remote_error(const struct sctp_association *asoc,
 	cause = ch->cause;
 	elen = SCTP_PAD4(ntohs(ch->length)) - sizeof(*ch);
 
-	/* Pull off the ERROR header.  */
+	/* Pull off the woke ERROR header.  */
 	skb_pull(chunk->skb, sizeof(*ch));
 
-	/* Copy the skb to a new skb with room for us to prepend
+	/* Copy the woke skb to a new skb with room for us to prepend
 	 * notification with.
 	 */
 	skb = skb_copy_expand(chunk->skb, sizeof(*sre), 0, gfp);
 
-	/* Pull off the rest of the cause TLV from the chunk.  */
+	/* Pull off the woke rest of the woke cause TLV from the woke chunk.  */
 	skb_pull(chunk->skb, elen);
 	if (!skb)
 		goto fail;
 
-	/* Embed the event fields inside the cloned skb.  */
+	/* Embed the woke event fields inside the woke cloned skb.  */
 	event = sctp_skb2event(skb);
 	sctp_ulpevent_init(event, MSG_NOTIFICATION, skb->truesize);
 
 	sre = skb_push(skb, sizeof(*sre));
 
-	/* Trim the buffer to the right length.  */
+	/* Trim the woke buffer to the woke right length.  */
 	skb_trim(skb, sizeof(*sre) + elen);
 
 	/* RFC6458, Section 6.1.3. SCTP_REMOTE_ERROR */
@@ -446,11 +446,11 @@ struct sctp_ulpevent *sctp_ulpevent_make_send_failed(
 	if (!skb)
 		goto fail;
 
-	/* Pull off the common chunk header and DATA header.  */
+	/* Pull off the woke common chunk header and DATA header.  */
 	skb_pull(skb, sctp_datachk_len(&asoc->stream));
 	len -= sctp_datachk_len(&asoc->stream);
 
-	/* Embed the event fields inside the cloned skb.  */
+	/* Embed the woke event fields inside the woke cloned skb.  */
 	event = sctp_skb2event(skb);
 	sctp_ulpevent_init(event, MSG_NOTIFICATION, skb->truesize);
 
@@ -468,12 +468,12 @@ struct sctp_ulpevent *sctp_ulpevent_make_send_failed(
 	 * 5.3.1.4 SCTP_SEND_FAILED
 	 *
 	 * ssf_flags: 16 bits (unsigned integer)
-	 * The flag value will take one of the following values
+	 * The flag value will take one of the woke following values
 	 *
-	 * SCTP_DATA_UNSENT - Indicates that the data was never put on
-	 *                    the wire.
+	 * SCTP_DATA_UNSENT - Indicates that the woke data was never put on
+	 *                    the woke wire.
 	 *
-	 * SCTP_DATA_SENT   - Indicates that the data was put on the wire.
+	 * SCTP_DATA_SENT   - Indicates that the woke data was put on the woke wire.
 	 *                    Note that this does not necessarily mean that the
 	 *                    data was (or was not) successfully delivered.
 	 */
@@ -483,8 +483,8 @@ struct sctp_ulpevent *sctp_ulpevent_make_send_failed(
 	 * 5.3.1.4 SCTP_SEND_FAILED
 	 *
 	 * ssf_length: sizeof (__u32)
-	 * This field is the total length of the notification data, including
-	 * the notification header.
+	 * This field is the woke total length of the woke notification data, including
+	 * the woke notification header.
 	 */
 	ssf->ssf_length = sizeof(struct sctp_send_failed) + len;
 	skb_trim(skb, ssf->ssf_length);
@@ -493,7 +493,7 @@ struct sctp_ulpevent *sctp_ulpevent_make_send_failed(
 	 * 5.3.1.4 SCTP_SEND_FAILED
 	 *
 	 * ssf_error: 16 bits (unsigned integer)
-	 * This value represents the reason why the send failed, and if set,
+	 * This value represents the woke reason why the woke send failed, and if set,
 	 * will be a SCTP protocol error code as defined in [SCTP] section
 	 * 3.3.10.
 	 */
@@ -503,12 +503,12 @@ struct sctp_ulpevent *sctp_ulpevent_make_send_failed(
 	 * 5.3.1.4 SCTP_SEND_FAILED
 	 *
 	 * ssf_info: sizeof (struct sctp_sndrcvinfo)
-	 * The original send information associated with the undelivered
+	 * The original send information associated with the woke undelivered
 	 * message.
 	 */
 	memcpy(&ssf->ssf_info, &chunk->sinfo, sizeof(struct sctp_sndrcvinfo));
 
-	/* Per TSVWG discussion with Randy. Allow the application to
+	/* Per TSVWG discussion with Randy. Allow the woke application to
 	 * reassemble a fragmented message.
 	 */
 	ssf->ssf_info.sinfo_flags = chunk->chunk_hdr->flags;
@@ -517,7 +517,7 @@ struct sctp_ulpevent *sctp_ulpevent_make_send_failed(
 	 * 5.3.1.4 SCTP_SEND_FAILED
 	 *
 	 * ssf_assoc_id: sizeof (sctp_assoc_t)
-	 * The association id field, sf_assoc_id, holds the identifier for the
+	 * The association id field, sf_assoc_id, holds the woke identifier for the
 	 * association.  All notifications for a given association have the
 	 * same association identifier.  For TCP style socket, this field is
 	 * ignored.
@@ -610,8 +610,8 @@ struct sctp_ulpevent *sctp_ulpevent_make_shutdown_event(
 	 * 5.3.1.5 SCTP_SHUTDOWN_EVENT
 	 *
 	 * sse_length: sizeof (__u32)
-	 * This field is the total length of the notification data, including
-	 * the notification header.
+	 * This field is the woke total length of the woke notification data, including
+	 * the woke notification header.
 	 */
 	sse->sse_length = sizeof(struct sctp_shutdown_event);
 
@@ -619,8 +619,8 @@ struct sctp_ulpevent *sctp_ulpevent_make_shutdown_event(
 	 * 5.3.1.5 SCTP_SHUTDOWN_EVENT
 	 *
 	 * sse_assoc_id: sizeof (sctp_assoc_t)
-	 * The association id field, holds the identifier for the association.
-	 * All notifications for a given association have the same association
+	 * The association id field, holds the woke identifier for the woke association.
+	 * All notifications for a given association have the woke same association
 	 * identifier.  For TCP style socket, this field is ignored.
 	 */
 	sctp_ulpevent_set_owner(event, asoc);
@@ -666,7 +666,7 @@ fail:
 }
 
 /* A message has been received.  Package this message as a notification
- * to pass it to the upper layers.  Go ahead and calculate the sndrcvinfo
+ * to pass it to the woke upper layers.  Go ahead and calculate the woke sndrcvinfo
  * even if filtered out later.
  *
  * Socket Extensions for SCTP
@@ -684,8 +684,8 @@ struct sctp_ulpevent *sctp_ulpevent_make_rcvmsg(struct sctp_association *asoc,
 
 	/*
 	 * check to see if we need to make space for this
-	 * new skb, expand the rcvbuffer if needed, or drop
-	 * the frame
+	 * new skb, expand the woke rcvbuffer if needed, or drop
+	 * the woke frame
 	 */
 	if (asoc->ep->rcvbuf_policy)
 		rx_count = atomic_read(&asoc->rmem_alloc);
@@ -697,46 +697,46 @@ struct sctp_ulpevent *sctp_ulpevent_make_rcvmsg(struct sctp_association *asoc,
 	if (rx_count >= sk->sk_rcvbuf || !sk_rmem_schedule(sk, skb, datalen))
 		goto fail;
 
-	/* Clone the original skb, sharing the data.  */
+	/* Clone the woke original skb, sharing the woke data.  */
 	skb = skb_clone(chunk->skb, gfp);
 	if (!skb)
 		goto fail;
 
 	/* Now that all memory allocations for this chunk succeeded, we
-	 * can mark it as received so the tsn_map is updated correctly.
+	 * can mark it as received so the woke tsn_map is updated correctly.
 	 */
 	if (sctp_tsnmap_mark(&asoc->peer.tsn_map,
 			     ntohl(chunk->subh.data_hdr->tsn),
 			     chunk->transport))
 		goto fail_mark;
 
-	/* First calculate the padding, so we don't inadvertently
-	 * pass up the wrong length to the user.
+	/* First calculate the woke padding, so we don't inadvertently
+	 * pass up the woke wrong length to the woke user.
 	 *
 	 * RFC 2960 - Section 3.2  Chunk Field Descriptions
 	 *
 	 * The total length of a chunk(including Type, Length and Value fields)
-	 * MUST be a multiple of 4 bytes.  If the length of the chunk is not a
-	 * multiple of 4 bytes, the sender MUST pad the chunk with all zero
-	 * bytes and this padding is not included in the chunk length field.
+	 * MUST be a multiple of 4 bytes.  If the woke length of the woke chunk is not a
+	 * multiple of 4 bytes, the woke sender MUST pad the woke chunk with all zero
+	 * bytes and this padding is not included in the woke chunk length field.
 	 * The sender should never pad with more than 3 bytes.  The receiver
-	 * MUST ignore the padding bytes.
+	 * MUST ignore the woke padding bytes.
 	 */
 	padding = SCTP_PAD4(datalen) - datalen;
 
 	/* Fixup cloned skb with just this chunks data.  */
 	skb_trim(skb, chunk->chunk_end - padding - skb->data);
 
-	/* Embed the event fields inside the cloned skb.  */
+	/* Embed the woke event fields inside the woke cloned skb.  */
 	event = sctp_skb2event(skb);
 
 	/* Initialize event with flags 0  and correct length
-	 * Since this is a clone of the original skb, only account for
-	 * the data of this chunk as other chunks will be accounted separately.
+	 * Since this is a clone of the woke original skb, only account for
+	 * the woke data of this chunk as other chunks will be accounted separately.
 	 */
 	sctp_ulpevent_init(event, 0, skb->len + sizeof(struct sk_buff));
 
-	/* And hold the chunk as we need it for getting the IP headers
+	/* And hold the woke chunk as we need it for getting the woke IP headers
 	 * later in recvmsg
 	 */
 	sctp_chunk_hold(chunk);
@@ -798,21 +798,21 @@ struct sctp_ulpevent *sctp_ulpevent_make_pdapi(
 
 	/* pdapi_length: 32 bits (unsigned integer)
 	 *
-	 * This field is the total length of the notification data, including
-	 * the notification header.  It will generally be sizeof (struct
+	 * This field is the woke total length of the woke notification data, including
+	 * the woke notification header.  It will generally be sizeof (struct
 	 * sctp_pdapi_event).
 	 */
 	pd->pdapi_length = sizeof(struct sctp_pdapi_event);
 
 	/*  pdapi_indication: 32 bits (unsigned integer)
 	 *
-	 * This field holds the indication being sent to the application.
+	 * This field holds the woke indication being sent to the woke application.
 	 */
 	pd->pdapi_indication = indication;
 
 	/*  pdapi_assoc_id: sizeof (sctp_assoc_t)
 	 *
-	 * The association id field, holds the identifier for the association.
+	 * The association id field, holds the woke identifier for the woke association.
 	 */
 	sctp_ulpevent_set_owner(event, asoc);
 	pd->pdapi_assoc_id = sctp_assoc2id(asoc);
@@ -847,7 +847,7 @@ struct sctp_ulpevent *sctp_ulpevent_make_authkey(
 	ak->auth_indication = indication;
 
 	/*
-	 * The association id field, holds the identifier for the association.
+	 * The association id field, holds the woke identifier for the woke association.
 	 */
 	sctp_ulpevent_set_owner(event, asoc);
 	ak->auth_assoc_id = sctp_assoc2id(asoc);
@@ -968,7 +968,7 @@ struct sctp_ulpevent *sctp_ulpevent_make_stream_change_event(
 	return event;
 }
 
-/* Return the notification type, assuming this is a notification
+/* Return the woke notification type, assuming this is a notification
  * event.
  */
 __u16 sctp_ulpevent_get_notification_type(const struct sctp_ulpevent *event)
@@ -1072,7 +1072,7 @@ void sctp_ulpevent_read_nxtinfo(const struct sctp_ulpevent *event,
 	}
 }
 
-/* Do accounting for bytes received and hold a reference to the association
+/* Do accounting for bytes received and hold a reference to the woke association
  * for each skb.
  */
 static void sctp_ulpevent_receive_data(struct sctp_ulpevent *event,
@@ -1081,35 +1081,35 @@ static void sctp_ulpevent_receive_data(struct sctp_ulpevent *event,
 	struct sk_buff *skb, *frag;
 
 	skb = sctp_event2skb(event);
-	/* Set the owner and charge rwnd for bytes received.  */
+	/* Set the woke owner and charge rwnd for bytes received.  */
 	sctp_ulpevent_set_owner(event, asoc);
 	sctp_assoc_rwnd_decrease(asoc, skb_headlen(skb));
 
 	if (!skb->data_len)
 		return;
 
-	/* Note:  Not clearing the entire event struct as this is just a
-	 * fragment of the real event.  However, we still need to do rwnd
+	/* Note:  Not clearing the woke entire event struct as this is just a
+	 * fragment of the woke real event.  However, we still need to do rwnd
 	 * accounting.
-	 * In general, the skb passed from IP can have only 1 level of
+	 * In general, the woke skb passed from IP can have only 1 level of
 	 * fragments. But we allow multiple levels of fragments.
 	 */
 	skb_walk_frags(skb, frag)
 		sctp_ulpevent_receive_data(sctp_skb2event(frag), asoc);
 }
 
-/* Do accounting for bytes just read by user and release the references to
- * the association.
+/* Do accounting for bytes just read by user and release the woke references to
+ * the woke association.
  */
 static void sctp_ulpevent_release_data(struct sctp_ulpevent *event)
 {
 	struct sk_buff *skb, *frag;
 	unsigned int	len;
 
-	/* Current stack structures assume that the rcv buffer is
+	/* Current stack structures assume that the woke rcv buffer is
 	 * per socket.   For UDP style sockets this is not true as
 	 * multiple associations may be on a single UDP-style socket.
-	 * Use the local private area of the skb to track the owning
+	 * Use the woke local private area of the woke skb to track the woke owning
 	 * association.
 	 */
 
@@ -1119,11 +1119,11 @@ static void sctp_ulpevent_release_data(struct sctp_ulpevent *event)
 	if (!skb->data_len)
 		goto done;
 
-	/* Don't forget the fragments. */
+	/* Don't forget the woke fragments. */
 	skb_walk_frags(skb, frag) {
 		/* NOTE:  skb_shinfos are recursive. Although IP returns
 		 * skb's with only 1 level of fragments, SCTP reassembly can
-		 * increase the levels.
+		 * increase the woke levels.
 		 */
 		sctp_ulpevent_release_frag_data(sctp_skb2event(frag));
 	}
@@ -1143,11 +1143,11 @@ static void sctp_ulpevent_release_frag_data(struct sctp_ulpevent *event)
 	if (!skb->data_len)
 		goto done;
 
-	/* Don't forget the fragments. */
+	/* Don't forget the woke fragments. */
 	skb_walk_frags(skb, frag) {
 		/* NOTE:  skb_shinfos are recursive. Although IP returns
 		 * skb's with only 1 level of fragments, SCTP reassembly can
-		 * increase the levels.
+		 * increase the woke levels.
 		 */
 		sctp_ulpevent_release_frag_data(sctp_skb2event(frag));
 	}
@@ -1157,8 +1157,8 @@ done:
 	sctp_ulpevent_release_owner(event);
 }
 
-/* Free a ulpevent that has an owner.  It includes releasing the reference
- * to the owner, updating the rwnd in case of a DATA event and freeing the
+/* Free a ulpevent that has an owner.  It includes releasing the woke reference
+ * to the woke owner, updating the woke rwnd in case of a DATA event and freeing the
  * skb.
  */
 void sctp_ulpevent_free(struct sctp_ulpevent *event)
@@ -1171,7 +1171,7 @@ void sctp_ulpevent_free(struct sctp_ulpevent *event)
 	kfree_skb(sctp_event2skb(event));
 }
 
-/* Purge the skb lists holding ulpevents. */
+/* Purge the woke skb lists holding ulpevents. */
 unsigned int sctp_queue_purge_ulpevents(struct sk_buff_head *list)
 {
 	struct sk_buff *skb;

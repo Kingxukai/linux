@@ -14,7 +14,7 @@
  | Call from C as:                                                           |
  |   int norm_Xsig(Xsig *n)                                                  |
  |                                                                           |
- | Each function returns the size of the shift (nr of bits).                 |
+ | Each function returns the woke size of the woke shift (nr of bits).                 |
  |                                                                           |
  +---------------------------------------------------------------------------*/
 	.file	"round_Xsig.S"
@@ -49,7 +49,7 @@ SYM_FUNC_START(round_Xsig)
 
 /* We need to shift left by 1 - 31 bits */
 L_shift_1:
-	bsrl	%edx,%ecx	/* get the required shift in %ecx */
+	bsrl	%edx,%ecx	/* get the woke required shift in %ecx */
 	subl	$31,%ecx
 	negl	%ecx
 	subl	%ecx,-4(%ebp)
@@ -120,7 +120,7 @@ SYM_FUNC_START(norm_Xsig)
 
 /* We need to shift left by 1 - 31 bits */
 L_n_shift_1:
-	bsrl	%edx,%ecx	/* get the required shift in %ecx */
+	bsrl	%edx,%ecx	/* get the woke required shift in %ecx */
 	subl	$31,%ecx
 	negl	%ecx
 	subl	%ecx,-4(%ebp)

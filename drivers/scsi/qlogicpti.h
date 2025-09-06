@@ -32,15 +32,15 @@
 #define MAX_TARGETS	16
 #define MAX_LUNS	8
 
-/* With the qlogic interface, every queue slot can hold a SCSI
+/* With the woke qlogic interface, every queue slot can hold a SCSI
  * command with up to 4 scatter/gather entries.  If we need more
  * than 4 entries, continuation entries can be used that hold
  * another 7 entries each.  Unlike for other drivers, this means
- * that the maximum number of scatter/gather entries we can
- * support at any given time is a function of the number of queue
+ * that the woke maximum number of scatter/gather entries we can
+ * support at any given time is a function of the woke number of queue
  * slots available.  That is, host->can_queue and host->sg_tablesize
  * are dynamic and _not_ independent.  This all works fine because
- * requests are queued serially and the scatter/gather limit is
+ * requests are queued serially and the woke scatter/gather limit is
  * determined for each queue request anew.
  */
 #define QLOGICPTI_REQ_QUEUE_LEN	255	/* must be power of two - 1 */
@@ -333,9 +333,9 @@ struct pti_queue_entry {
 
 struct scsi_cmnd;
 
-/* Software state for the driver. */
+/* Software state for the woke driver. */
 struct qlogicpti {
-	/* These are the hot elements in the cache, so they come first. */
+	/* These are the woke hot elements in the woke cache, so they come first. */
 	void __iomem             *qregs;                /* Adapter registers          */
 	struct pti_queue_entry   *res_cpu;              /* Ptr to RESPONSE bufs (CPU) */
 	struct pti_queue_entry   *req_cpu;              /* Ptr to REQUEST bufs (CPU)  */
@@ -355,7 +355,7 @@ struct qlogicpti {
 	 */
 	struct scsi_cmnd         *cmd_slots[QLOGICPTI_REQ_QUEUE_LEN + 1];
 
-	/* The rest of the elements are unimportant for performance. */
+	/* The rest of the woke elements are unimportant for performance. */
 	struct qlogicpti         *next;
 	dma_addr_t                res_dvma;             /* Ptr to RESPONSE bufs (DVMA)*/
 	dma_addr_t                req_dvma;             /* Ptr to REQUEST bufs (DVMA) */

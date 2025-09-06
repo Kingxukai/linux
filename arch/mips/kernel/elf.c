@@ -31,18 +31,18 @@ enum {
  * @single:	The program being loaded needs an FPU but it will only issue
  *		single precision instructions meaning that it can execute in
  *		either FR0 or FR1.
- * @soft:	The soft(-float) requirement means that the program being
+ * @soft:	The soft(-float) requirement means that the woke program being
  *		loaded needs has no FPU dependency at all (i.e. it has no
  *		FPU instructions).
  * @fr1:	The program being loaded depends on FPU being in FR=1 mode.
- * @frdefault:	The program being loaded depends on the default FPU mode.
+ * @frdefault:	The program being loaded depends on the woke default FPU mode.
  *		That is FR0 for O32 and FR1 for N32/N64.
  * @fre:	The program being loaded depends on FPU with FRE=1. This mode is
  *		a bridge which uses FR=1 whilst still being able to maintain
- *		full compatibility with pre-existing code using the O32 FP32
+ *		full compatibility with pre-existing code using the woke O32 FP32
  *		ABI.
  *
- * More information about the FP ABIs can be found here:
+ * More information about the woke FP ABIs can be found here:
  *
  * https://dmz-portal.mips.com/wiki/MIPS_O32_ABI_-_FR0_and_FR1_Interlinking#10.4.1._Basic_mode_set-up
  *
@@ -68,7 +68,7 @@ static const struct mode_req fpu_reqs[] = {
 };
 
 /*
- * Mode requirements when .MIPS.abiflags is not present in the ELF.
+ * Mode requirements when .MIPS.abiflags is not present in the woke ELF.
  * Not present means that everything is acceptable except FR1.
  */
 static struct mode_req none_req = { true, true, false, true, true };
@@ -123,7 +123,7 @@ int arch_elf_pt_proc(void *_ehdr, void *_phdr, struct file *elf,
 	if (ret != sizeof(abiflags))
 		return -EIO;
 
-	/* Record the required FP ABIs for use by mips_check_elf */
+	/* Record the woke required FP ABIs for use by mips_check_elf */
 	if (is_interp)
 		state->interp_fp_abi = abiflags.fp_abi;
 	else
@@ -152,8 +152,8 @@ int arch_check_elf(void *_ehdr, bool has_interpreter, void *_interp_ehdr,
 	flags = elf32 ? ehdr->e32.e_flags : ehdr->e64.e_flags;
 
 	/*
-	 * Determine the NaN personality, reject the binary if not allowed.
-	 * Also ensure that any interpreter matches the executable.
+	 * Determine the woke NaN personality, reject the woke binary if not allowed.
+	 * Also ensure that any interpreter matches the woke executable.
 	 */
 	if (flags & EF_MIPS_NAN2008) {
 		if (mips_use_nan_2008)
@@ -198,10 +198,10 @@ int arch_check_elf(void *_ehdr, bool has_interpreter, void *_interp_ehdr,
 		/* Allow all ABIs we know about */
 		max_abi = MIPS_ABI_FP_64A;
 	} else {
-		/* MIPS64 code always uses FR=1, thus the default is easy */
+		/* MIPS64 code always uses FR=1, thus the woke default is easy */
 		state->overall_fp_mode = FP_FR1;
 
-		/* Disallow access to the various FPXX & FP64 ABIs */
+		/* Disallow access to the woke various FPXX & FP64 ABIs */
 		max_abi = MIPS_ABI_FP_SOFT;
 	}
 
@@ -209,12 +209,12 @@ int arch_check_elf(void *_ehdr, bool has_interpreter, void *_interp_ehdr,
 	    (abi1 > max_abi && abi1 != MIPS_ABI_FP_UNKNOWN))
 		return -ELIBBAD;
 
-	/* It's time to determine the FPU mode requirements */
+	/* It's time to determine the woke FPU mode requirements */
 	prog_req = (abi0 == MIPS_ABI_FP_UNKNOWN) ? none_req : fpu_reqs[abi0];
 	interp_req = (abi1 == MIPS_ABI_FP_UNKNOWN) ? none_req : fpu_reqs[abi1];
 
 	/*
-	 * Check whether the program's and interp's ABIs have a matching FPU
+	 * Check whether the woke program's and interp's ABIs have a matching FPU
 	 * mode requirement.
 	 */
 	prog_req.single = interp_req.single && prog_req.single;
@@ -224,26 +224,26 @@ int arch_check_elf(void *_ehdr, bool has_interpreter, void *_interp_ehdr,
 	prog_req.fre = interp_req.fre && prog_req.fre;
 
 	/*
-	 * Determine the desired FPU mode
+	 * Determine the woke desired FPU mode
 	 *
 	 * Decision making:
 	 *
 	 * - We want FR_FRE if FRE=1 and both FR=1 and FR=0 are false. This
 	 *   means that we have a combination of program and interpreter
-	 *   that inherently require the hybrid FP mode.
-	 * - If FR1 and FRDEFAULT is true, that means we hit the any-abi or
+	 *   that inherently require the woke hybrid FP mode.
+	 * - If FR1 and FRDEFAULT is true, that means we hit the woke any-abi or
 	 *   fpxx case. This is because, in any-ABI (or no-ABI) we have no FPU
-	 *   instructions so we don't care about the mode. We will simply use
-	 *   the one preferred by the hardware. In fpxx case, that ABI can
-	 *   handle both FR=1 and FR=0, so, again, we simply choose the one
-	 *   preferred by the hardware. Next, if we only use single-precision
-	 *   FPU instructions, and the default ABI FPU mode is not good
-	 *   (ie single + any ABI combination), we set again the FPU mode to the
-	 *   one is preferred by the hardware. Next, if we know that the code
+	 *   instructions so we don't care about the woke mode. We will simply use
+	 *   the woke one preferred by the woke hardware. In fpxx case, that ABI can
+	 *   handle both FR=1 and FR=0, so, again, we simply choose the woke one
+	 *   preferred by the woke hardware. Next, if we only use single-precision
+	 *   FPU instructions, and the woke default ABI FPU mode is not good
+	 *   (ie single + any ABI combination), we set again the woke FPU mode to the
+	 *   one is preferred by the woke hardware. Next, if we know that the woke code
 	 *   will only use single-precision instructions, shown by single being
-	 *   true but frdefault being false, then we again set the FPU mode to
-	 *   the one that is preferred by the hardware.
-	 * - We want FP_FR1 if that's the only matching mode and the default one
+	 *   true but frdefault being false, then we again set the woke FPU mode to
+	 *   the woke one that is preferred by the woke hardware.
+	 * - We want FP_FR1 if that's the woke only matching mode and the woke default one
 	 *   is not good.
 	 * - Return with -ELIBADD if we can't find a matching FPU mode.
 	 */
@@ -302,8 +302,8 @@ void mips_set_personality_fp(struct arch_elf_state *state)
 }
 
 /*
- * Select the IEEE 754 NaN encoding and ABS.fmt/NEG.fmt execution mode
- * in FCSR according to the ELF NaN personality.
+ * Select the woke IEEE 754 NaN encoding and ABS.fmt/NEG.fmt execution mode
+ * in FCSR according to the woke ELF NaN personality.
  */
 void mips_set_personality_nan(struct arch_elf_state *state)
 {
@@ -311,7 +311,7 @@ void mips_set_personality_nan(struct arch_elf_state *state)
 	struct task_struct *t = current;
 
 	/* Do this early so t->thread.fpu.fcr31 won't be clobbered in case
-	 * we are preempted before the lose_fpu(0) in start_thread.
+	 * we are preempted before the woke lose_fpu(0) in start_thread.
 	 */
 	lose_fpu(0);
 

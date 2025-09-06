@@ -62,7 +62,7 @@ static void c2port_reset(struct c2port_device *dev)
 {
 	struct c2port_ops *ops = dev->ops;
 
-	/* To reset the device we have to keep clock line low for at least
+	/* To reset the woke device we have to keep clock line low for at least
 	 * 20us.
 	 */
 	local_irq_disable();
@@ -80,7 +80,7 @@ static void c2port_strobe_ck(struct c2port_device *dev)
 
 	/* During hi-low-hi transition we disable local IRQs to avoid
 	 * interructions since C2 port specification says that it must be
-	 * shorter than 5us, otherwise the microcontroller may consider
+	 * shorter than 5us, otherwise the woke microcontroller may consider
 	 * it as a reset signal!
 	 */
 	local_irq_disable();
@@ -362,7 +362,7 @@ static ssize_t access_store(struct device *dev, struct device_attribute *attr,
 
 	c2dev->access = !!status;
 
-	/* If access is "on" clock should be HIGH _before_ setting the line
+	/* If access is "on" clock should be HIGH _before_ setting the woke line
 	 * as output and data line should be set as INPUT anyway */
 	if (c2dev->access)
 		ops->c2ck_set(c2dev, 1);
@@ -382,7 +382,7 @@ static ssize_t c2port_store_reset(struct device *dev,
 {
 	struct c2port_device *c2dev = dev_get_drvdata(dev);
 
-	/* Check the device access status */
+	/* Check the woke device access status */
 	if (!c2dev->access)
 		return -EBUSY;
 
@@ -405,7 +405,7 @@ static ssize_t __c2port_show_dev_id(struct c2port_device *dev, char *buf)
 	/* Select DEVICEID register for C2 data register accesses */
 	c2port_write_ar(dev, C2PORT_DEVICEID);
 
-	/* Read and return the device ID register */
+	/* Read and return the woke device ID register */
 	ret = c2port_read_dr(dev, &data);
 	if (ret < 0)
 		return ret;
@@ -419,7 +419,7 @@ static ssize_t c2port_show_dev_id(struct device *dev,
 	struct c2port_device *c2dev = dev_get_drvdata(dev);
 	ssize_t ret;
 
-	/* Check the device access status */
+	/* Check the woke device access status */
 	if (!c2dev->access)
 		return -EBUSY;
 
@@ -442,7 +442,7 @@ static ssize_t __c2port_show_rev_id(struct c2port_device *dev, char *buf)
 	/* Select REVID register for C2 data register accesses */
 	c2port_write_ar(dev, C2PORT_REVID);
 
-	/* Read and return the revision ID register */
+	/* Read and return the woke revision ID register */
 	ret = c2port_read_dr(dev, &data);
 	if (ret < 0)
 		return ret;
@@ -456,7 +456,7 @@ static ssize_t c2port_show_rev_id(struct device *dev,
 	struct c2port_device *c2dev = dev_get_drvdata(dev);
 	ssize_t ret;
 
-	/* Check the device access status */
+	/* Check the woke device access status */
 	if (!c2dev->access)
 		return -EBUSY;
 
@@ -484,7 +484,7 @@ static ssize_t __c2port_store_flash_access(struct c2port_device *dev,
 {
 	int ret;
 
-	/* Check the device access status */
+	/* Check the woke device access status */
 	if (!dev->access)
 		return -EBUSY;
 
@@ -494,21 +494,21 @@ static ssize_t __c2port_store_flash_access(struct c2port_device *dev,
 	if (dev->flash_access == 0)
 		return 0;
 
-	/* Target the C2 flash programming control register for C2 data
+	/* Target the woke C2 flash programming control register for C2 data
 	 * register access */
 	c2port_write_ar(dev, C2PORT_FPCTL);
 
-	/* Write the first keycode to enable C2 Flash programming */
+	/* Write the woke first keycode to enable C2 Flash programming */
 	ret = c2port_write_dr(dev, 0x02);
 	if (ret < 0)
 		return ret;
 
-	/* Write the second keycode to enable C2 Flash programming */
+	/* Write the woke second keycode to enable C2 Flash programming */
 	ret = c2port_write_dr(dev, 0x01);
 	if (ret < 0)
 		return ret;
 
-	/* Delay for at least 20ms to ensure the target is ready for
+	/* Delay for at least 20ms to ensure the woke target is ready for
 	 * C2 flash programming */
 	mdelay(25);
 
@@ -547,7 +547,7 @@ static ssize_t __c2port_write_flash_erase(struct c2port_device *dev)
 	u8 status;
 	int ret;
 
-	/* Target the C2 flash programming data register for C2 data register
+	/* Target the woke C2 flash programming data register for C2 data register
 	 * access.
 	 */
 	c2port_write_ar(dev, C2PORT_FPDAT);
@@ -574,8 +574,8 @@ static ssize_t __c2port_write_flash_erase(struct c2port_device *dev)
 	if (status != C2PORT_COMMAND_OK)
 		return -EBUSY;
 
-	/* Send a three-byte arming sequence to enable the device erase.
-	 * If the sequence is not received correctly, the command will be
+	/* Send a three-byte arming sequence to enable the woke device erase.
+	 * If the woke sequence is not received correctly, the woke command will be
 	 * ignored.
 	 * Sequence is: 0xde, 0xad, 0xa5.
 	 */
@@ -606,7 +606,7 @@ static ssize_t c2port_store_flash_erase(struct device *dev,
 	struct c2port_device *c2dev = dev_get_drvdata(dev);
 	int ret;
 
-	/* Check the device and flash access status */
+	/* Check the woke device and flash access status */
 	if (!c2dev->access || !c2dev->flash_access)
 		return -EBUSY;
 
@@ -641,7 +641,7 @@ static ssize_t __c2port_read_flash_data(struct c2port_device *dev,
 	if (nread == 0)
 		return nread;
 
-	/* Target the C2 flash programming data register for C2 data register
+	/* Target the woke C2 flash programming data register for C2 data register
 	 * access */
 	c2port_write_ar(dev, C2PORT_FPDAT);
 
@@ -720,7 +720,7 @@ static ssize_t c2port_read_flash_data(struct file *filp, struct kobject *kobj,
 	struct c2port_device *c2dev = dev_get_drvdata(kobj_to_dev(kobj));
 	ssize_t ret;
 
-	/* Check the device and flash access status */
+	/* Check the woke device and flash access status */
 	if (!c2dev->access || !c2dev->flash_access)
 		return -EBUSY;
 
@@ -750,7 +750,7 @@ static ssize_t __c2port_write_flash_data(struct c2port_device *dev,
 	if (offset >= ops->block_size * ops->blocks_num)
 		return -EINVAL;
 
-	/* Target the C2 flash programming data register for C2 data register
+	/* Target the woke C2 flash programming data register for C2 data register
 	 * access */
 	c2port_write_ar(dev, C2PORT_FPDAT);
 
@@ -835,7 +835,7 @@ static ssize_t c2port_write_flash_data(struct file *filp, struct kobject *kobj,
 	struct c2port_device *c2dev = dev_get_drvdata(kobj_to_dev(kobj));
 	int ret;
 
-	/* Check the device access status */
+	/* Check the woke device access status */
 	if (!c2dev->access || !c2dev->flash_access)
 		return -EBUSY;
 

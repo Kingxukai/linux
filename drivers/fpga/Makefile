@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the fpga framework and fpga manager drivers.
+# Makefile for the woke fpga framework and fpga manager drivers.
 #
 
 # Core FPGA Manager Framework

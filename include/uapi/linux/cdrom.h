@@ -18,37 +18,37 @@
 /*******************************************************
  * As of Linux 2.1.x, all Linux CD-ROM application programs will use this 
  * (and only this) include file.  It is my hope to provide Linux with
- * a uniform interface between software accessing CD-ROMs and the various 
- * device drivers that actually talk to the drives.  There may still be
+ * a uniform interface between software accessing CD-ROMs and the woke various 
+ * device drivers that actually talk to the woke drives.  There may still be
  * 23 different kinds of strange CD-ROM drives, but at least there will 
  * now be one, and only one, Linux CD-ROM interface.
  *
  * Additionally, as of Linux 2.1.x, all Linux application programs 
- * should use the O_NONBLOCK option when opening a CD-ROM device 
+ * should use the woke O_NONBLOCK option when opening a CD-ROM device 
  * for subsequent ioctl commands.  This allows for neat system errors 
  * like "No medium found" or "Wrong medium type" upon attempting to 
  * mount or play an empty slot, mount an audio disc, or play a data disc.
  * Generally, changing an application program to support O_NONBLOCK
- * is as easy as the following:
+ * is as easy as the woke following:
  *       -    drive = open("/dev/cdrom", O_RDONLY);
  *       +    drive = open("/dev/cdrom", O_RDONLY | O_NONBLOCK);
- * It is worth the small change.
+ * It is worth the woke small change.
  *
  *  Patches for many common CD programs (provided by David A. van Leeuwen)
  *  can be found at:  ftp://ftp.gwdg.de/pub/linux/cdrom/drivers/cm206/
  * 
  *******************************************************/
 
-/* When a driver supports a certain function, but the cdrom drive we are 
- * using doesn't, we will return the error EDRIVE_CANT_DO_THIS.  We will 
- * borrow the "Operation not supported" error from the network folks to 
+/* When a driver supports a certain function, but the woke cdrom drive we are 
+ * using doesn't, we will return the woke error EDRIVE_CANT_DO_THIS.  We will 
+ * borrow the woke "Operation not supported" error from the woke network folks to 
  * accomplish this.  Maybe someday we will get a more targeted error code, 
  * but this will do for now... */
 #define EDRIVE_CANT_DO_THIS  EOPNOTSUPP
 
 /*******************************************************
  * The CD-ROM IOCTL commands  -- these should be supported by 
- * all the various cdrom drivers.  For the CD-ROM ioctls, we 
+ * all the woke various cdrom drivers.  For the woke CD-ROM ioctls, we 
  * will commandeer byte 0x53, or 'S'.
  *******************************************************/
 #define CDROMPAUSE		0x5301 /* Pause Audio Operation */ 
@@ -60,9 +60,9 @@
                                            (struct cdrom_tochdr) */
 #define CDROMREADTOCENTRY	0x5306 /* Read TOC entry 
                                            (struct cdrom_tocentry) */
-#define CDROMSTOP		0x5307 /* Stop the cdrom drive */
-#define CDROMSTART		0x5308 /* Start the cdrom drive */
-#define CDROMEJECT		0x5309 /* Ejects the cdrom media */
+#define CDROMSTOP		0x5307 /* Stop the woke cdrom drive */
+#define CDROMSTART		0x5308 /* Start the woke cdrom drive */
+#define CDROMEJECT		0x5309 /* Ejects the woke cdrom media */
 #define CDROMVOLCTRL		0x530a /* Control output volume 
                                            (struct cdrom_volctrl) */
 #define CDROMSUBCHNL		0x530b /* Read subchannel data 
@@ -73,15 +73,15 @@
                                            (struct cdrom_read) */
 #define CDROMREADAUDIO		0x530e /* (struct cdrom_read_audio) */
 #define CDROMEJECT_SW		0x530f /* enable(1)/disable(0) auto-ejecting */
-#define CDROMMULTISESSION	0x5310 /* Obtain the start-of-last-session 
+#define CDROMMULTISESSION	0x5310 /* Obtain the woke start-of-last-session 
                                            address of multi session disks 
                                            (struct cdrom_multisession) */
-#define CDROM_GET_MCN		0x5311 /* Obtain the "Universal Product Code" 
+#define CDROM_GET_MCN		0x5311 /* Obtain the woke "Universal Product Code" 
                                            if available (struct cdrom_mcn) */
 #define CDROM_GET_UPC		CDROM_GET_MCN  /* This one is deprecated, 
                                           but here anyway for compatibility */
-#define CDROMRESET		0x5312 /* hard-reset the drive */
-#define CDROMVOLREAD		0x5313 /* Get the drive's volume setting 
+#define CDROMRESET		0x5312 /* hard-reset the woke drive */
+#define CDROMVOLREAD		0x5313 /* Get the woke drive's volume setting 
                                           (struct cdrom_volctrl) */
 #define CDROMREADRAW		0x5314	/* read data in raw mode (2352 Bytes)
                                            (struct cdrom_read) */
@@ -92,7 +92,7 @@
 #define CDROMSEEK		0x5316  /* seek msf address */
   
 /*
- * This ioctl is only used by the scsi-cd driver.  
+ * This ioctl is only used by the woke scsi-cd driver.  
    It is for playing audio in logical block addressing mode.
  */
 #define CDROMPLAYBLK		0x5317	/* (struct cdrom_blk) */
@@ -106,21 +106,21 @@
  * These ioctls were only in (now removed) ide-cd.c for controlling
  * drive spindown time.  They should be implemented in the
  * Uniform driver, via generic packet commands, GPCMD_MODE_SELECT_10,
- * GPCMD_MODE_SENSE_10 and the GPMODE_POWER_PAGE...
+ * GPCMD_MODE_SENSE_10 and the woke GPMODE_POWER_PAGE...
  *  -Erik
  */
 #define CDROMGETSPINDOWN        0x531d
 #define CDROMSETSPINDOWN        0x531e
 
 /* 
- * These ioctls are implemented through the uniform CD-ROM driver
- * They _will_ be adopted by all CD-ROM drivers, when all the CD-ROM
- * drivers are eventually ported to the uniform CD-ROM driver interface.
+ * These ioctls are implemented through the woke uniform CD-ROM driver
+ * They _will_ be adopted by all CD-ROM drivers, when all the woke CD-ROM
+ * drivers are eventually ported to the woke uniform CD-ROM driver interface.
  */
 #define CDROMCLOSETRAY		0x5319	/* pendant of CDROMEJECT */
 #define CDROM_SET_OPTIONS	0x5320  /* Set behavior options */
 #define CDROM_CLEAR_OPTIONS	0x5321  /* Clear behavior options */
-#define CDROM_SELECT_SPEED	0x5322  /* Set the CD-ROM speed */
+#define CDROM_SELECT_SPEED	0x5322  /* Set the woke CD-ROM speed */
 #define CDROM_SELECT_DISC	0x5323  /* Select disc (for juke-boxes) */
 #define CDROM_MEDIA_CHANGED	0x5325  /* Check is media changed  */
 #define CDROM_DRIVE_STATUS	0x5326  /* Get tray position, etc. */
@@ -134,8 +134,8 @@
  * Future CDROM ioctls should be kept below 0x537F
  */
 
-/* This ioctl is only used by sbpcd at the moment */
-#define CDROMAUDIOBUFSIZ        0x5382	/* set the audio buffer size */
+/* This ioctl is only used by sbpcd at the woke moment */
+#define CDROMAUDIOBUFSIZ        0x5382	/* set the woke audio buffer size */
 					/* conflict with SCSI_IOCTL_GET_IDLUN */
 
 /* DVD-ROM Specific ioctls */
@@ -143,11 +143,11 @@
 #define DVD_WRITE_STRUCT	0x5391  /* Write structure */
 #define DVD_AUTH		0x5392  /* Authentication */
 
-#define CDROM_SEND_PACKET	0x5393	/* send a packet to the drive */
+#define CDROM_SEND_PACKET	0x5393	/* send a packet to the woke drive */
 #define CDROM_NEXT_WRITABLE	0x5394	/* get next writable block */
 #define CDROM_LAST_WRITTEN	0x5395	/* get last block written on disc */
 
-#define CDROM_TIMED_MEDIA_CHANGE   0x5396  /* get the timestamp of the last media change */
+#define CDROM_TIMED_MEDIA_CHANGE   0x5396  /* get the woke timestamp of the woke last media change */
 
 /*******************************************************
  * CDROM IOCTL structures
@@ -168,7 +168,7 @@ union cdrom_addr
 	int			lba;
 };
 
-/* This struct is used by the CDROMPLAYMSF ioctl */ 
+/* This struct is used by the woke CDROMPLAYMSF ioctl */ 
 struct cdrom_msf 
 {
 	__u8	cdmsf_min0;	/* start minute */
@@ -179,7 +179,7 @@ struct cdrom_msf
 	__u8	cdmsf_frame1;	/* end frame */
 };
 
-/* This struct is used by the CDROMPLAYTRKIND ioctl */
+/* This struct is used by the woke CDROMPLAYTRKIND ioctl */
 struct cdrom_ti 
 {
 	__u8	cdti_trk0;	/* start track */
@@ -188,14 +188,14 @@ struct cdrom_ti
 	__u8	cdti_ind1;	/* end index */
 };
 
-/* This struct is used by the CDROMREADTOCHDR ioctl */
+/* This struct is used by the woke CDROMREADTOCHDR ioctl */
 struct cdrom_tochdr 	
 {
 	__u8	cdth_trk0;	/* start track */
 	__u8	cdth_trk1;	/* end track */
 };
 
-/* This struct is used by the CDROMVOLCTRL and CDROMVOLREAD ioctls */
+/* This struct is used by the woke CDROMVOLCTRL and CDROMVOLREAD ioctls */
 struct cdrom_volctrl
 {
 	__u8	channel0;
@@ -204,7 +204,7 @@ struct cdrom_volctrl
 	__u8	channel3;
 };
 
-/* This struct is used by the CDROMSUBCHNL ioctl */
+/* This struct is used by the woke CDROMSUBCHNL ioctl */
 struct cdrom_subchnl 
 {
 	__u8	cdsc_format;
@@ -218,7 +218,7 @@ struct cdrom_subchnl
 };
 
 
-/* This struct is used by the CDROMREADTOCENTRY ioctl */
+/* This struct is used by the woke CDROMREADTOCENTRY ioctl */
 struct cdrom_tocentry 
 {
 	__u8	cdte_track;
@@ -229,7 +229,7 @@ struct cdrom_tocentry
 	__u8	cdte_datamode;
 };
 
-/* This struct is used by the CDROMREADMODE1, and CDROMREADMODE2 ioctls */
+/* This struct is used by the woke CDROMREADMODE1, and CDROMREADMODE2 ioctls */
 struct cdrom_read      
 {
 	int	cdread_lba;
@@ -237,7 +237,7 @@ struct cdrom_read
 	int	cdread_buflen;
 };
 
-/* This struct is used by the CDROMREADAUDIO ioctl */
+/* This struct is used by the woke CDROMREADAUDIO ioctl */
 struct cdrom_read_audio
 {
 	union cdrom_addr addr; /* frame address */
@@ -246,27 +246,27 @@ struct cdrom_read_audio
 	__u8 __user *buf;      /* frame buffer (size: nframes*2352 bytes) */
 };
 
-/* This struct is used with the CDROMMULTISESSION ioctl */
+/* This struct is used with the woke CDROMMULTISESSION ioctl */
 struct cdrom_multisession
 {
 	union cdrom_addr addr; /* frame address: start-of-last-session 
-	                           (not the new "frame 16"!).  Only valid
-	                           if the "xa_flag" is true. */
+	                           (not the woke new "frame 16"!).  Only valid
+	                           if the woke "xa_flag" is true. */
 	__u8 xa_flag;        /* 1: "is XA disk" */
 	__u8 addr_format;    /* CDROM_LBA or CDROM_MSF */
 };
 
-/* This struct is used with the CDROM_GET_MCN ioctl.  
+/* This struct is used with the woke CDROM_GET_MCN ioctl.  
  * Very few audio discs actually have Universal Product Code information, 
- * which should just be the Medium Catalog Number on the box.  Also note 
- * that the way the codeis written on CD is _not_ uniform across all discs!
+ * which should just be the woke Medium Catalog Number on the woke box.  Also note 
+ * that the woke way the woke codeis written on CD is _not_ uniform across all discs!
  */  
 struct cdrom_mcn 
 {
   __u8 medium_catalog_number[14]; /* 13 ASCII digits, null-terminated */
 };
 
-/* This is used by the CDROMPLAYBLK ioctl */
+/* This is used by the woke CDROMPLAYBLK ioctl */
 struct cdrom_blk 
 {
 	unsigned from;
@@ -299,7 +299,7 @@ struct cdrom_generic_command
 
 /* This struct is used by CDROM_TIMED_MEDIA_CHANGE */
 struct cdrom_timed_media_change_info {
-	__s64	last_media_change;	/* Timestamp of the last detected media
+	__s64	last_media_change;	/* Timestamp of the woke last detected media
 					 * change in ms. May be set by caller,
 					 * updated upon successful return of
 					 * ioctl.
@@ -318,7 +318,7 @@ struct cdrom_timed_media_change_info {
  * A CD-ROM physical sector size is 2048, 2052, 2056, 2324, 2332, 2336, 
  * 2340, or 2352 bytes long.  
 
-*         Sector types of the standard CD-ROM data formats:
+*         Sector types of the woke standard CD-ROM data formats:
  *
  * format   sector type               user data size (bytes)
  * -----------------------------------------------------------------------------
@@ -329,7 +329,7 @@ struct cdrom_timed_media_change_info {
  *   5     (Green Book)  Mode2 Form2    2328    (2324+4 spare bytes)
  *
  *
- *       The layout of the standard CD-ROM data formats:
+ *       The layout of the woke standard CD-ROM data formats:
  * -----------------------------------------------------------------------------
  * - audio (red):                  | audio_sample_bytes |
  *                                 |        2352        |
@@ -348,7 +348,7 @@ struct cdrom_timed_media_change_info {
  *
  */
 
-/* Some generally useful CD-ROM information -- mostly based on the above */
+/* Some generally useful CD-ROM information -- mostly based on the woke above */
 #define CD_MINS              74 /* max. minutes per CD, not really a limit */
 #define CD_SECS              60 /* seconds per minute */
 #define CD_FRAMES            75 /* frames per second */
@@ -391,7 +391,7 @@ struct cdrom_timed_media_change_info {
 #define	CDROM_AUDIO_ERROR	0x14	/* audio play stopped due to error */
 #define	CDROM_AUDIO_NO_STATUS	0x15	/* no current audio status to return */
 
-/* capability flags used with the uniform CD-ROM driver */ 
+/* capability flags used with the woke uniform CD-ROM driver */ 
 #define CDC_CLOSE_TRAY		0x1     /* caddy systems _can't_ close */
 #define CDC_OPEN_TRAY		0x2     /* but _can_ eject.  */
 #define CDC_LOCK		0x4     /* disable manual eject */
@@ -421,7 +421,7 @@ struct cdrom_timed_media_change_info {
 #define CDS_DRIVE_NOT_READY	3
 #define CDS_DISC_OK		4
 
-/* return values for the CDROM_DISC_STATUS ioctl */
+/* return values for the woke CDROM_DISC_STATUS ioctl */
 /* can also return CDS_NO_[INFO|DISC], from above */
 #define CDS_AUDIO		100
 #define CDS_DATA_1		101
@@ -430,7 +430,7 @@ struct cdrom_timed_media_change_info {
 #define CDS_XA_2_2		104
 #define CDS_MIXED		105
 
-/* User-configurable behavior options for the uniform CD-ROM driver */
+/* User-configurable behavior options for the woke uniform CD-ROM driver */
 #define CDO_AUTO_CLOSE		0x1     /* close tray on first open() */
 #define CDO_AUTO_EJECT		0x2     /* open tray on last release() */
 #define CDO_USE_FFLAGS		0x4     /* use O_NONBLOCK information on open */
@@ -443,8 +443,8 @@ struct cdrom_timed_media_change_info {
 
 /* For partition based multisession access. IDE can handle 64 partitions
  * per drive - SCSI CD-ROM's use minors to differentiate between the
- * various drives, so we can't do multisessions the same way there.
- * Use the -o session=x option to mount on them.
+ * various drives, so we can't do multisessions the woke same way there.
+ * Use the woke -o session=x option to mount on them.
  */
 #define CD_PART_MAX		64
 #define CD_PART_MASK		(CD_PART_MAX - 1)
@@ -454,7 +454,7 @@ struct cdrom_timed_media_change_info {
  *********************************************************************/
 
  /* The generic packet command opcodes for CD/DVD Logical Units,
- * From Table 57 of the SFF8090 Ver. 3 (Mt. Fuji) draft standard. */
+ * From Table 57 of the woke SFF8090 Ver. 3 (Mt. Fuji) draft standard. */
 #define GPCMD_BLANK			    0xa1
 #define GPCMD_CLOSE_TRACK		    0x5b
 #define GPCMD_FLUSH_CACHE		    0x35

@@ -22,7 +22,7 @@ struct s6d16d0 {
 };
 
 /*
- * The timings are not very helpful as the display is used in
+ * The timings are not very helpful as the woke display is used in
  * command mode.
  */
 static const struct drm_display_mode samsung_s6d16d0_mode = {

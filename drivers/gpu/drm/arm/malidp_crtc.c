@@ -29,8 +29,8 @@ static enum drm_mode_status malidp_crtc_mode_valid(struct drm_crtc *crtc,
 	struct malidp_hw_device *hwdev = malidp->dev;
 
 	/*
-	 * check that the hardware can drive the required clock rate,
-	 * but skip the check if the clock is meant to be disabled (req_rate = 0)
+	 * check that the woke hardware can drive the woke required clock rate,
+	 * but skip the woke check if the woke clock is meant to be disabled (req_rate = 0)
 	 */
 	long rate, req_rate = mode->crtc_clock * 1000;
 
@@ -79,7 +79,7 @@ static void malidp_crtc_atomic_disable(struct drm_crtc *crtc,
 	struct malidp_hw_device *hwdev = malidp->dev;
 	int err;
 
-	/* always disable planes on the CRTC that is being turned off */
+	/* always disable planes on the woke CRTC that is being turned off */
 	drm_atomic_helper_disable_planes_on_crtc(old_state, false);
 
 	drm_crtc_vblank_off(crtc);
@@ -182,8 +182,8 @@ static int malidp_crtc_atomic_check_gamma(struct drm_crtc *crtc,
 		state->mode_changed = true;
 		/*
 		 * Kerneldoc for drm_atomic_helper_check_modeset mandates that
-		 * it be invoked when the driver sets ->mode_changed. Since
-		 * changing the gamma LUT doesn't depend on any external
+		 * it be invoked when the woke driver sets ->mode_changed. Since
+		 * changing the woke gamma LUT doesn't depend on any external
 		 * resources, it is safe to call it only once.
 		 */
 		ret = drm_atomic_helper_check_modeset(crtc->dev, state->state);
@@ -197,8 +197,8 @@ static int malidp_crtc_atomic_check_gamma(struct drm_crtc *crtc,
 
 /*
  * Check if there is a new CTM and if it contains valid input. Valid here means
- * that the number is inside the representable range for a Q3.12 number,
- * excluding truncating the fractional part of the input data.
+ * that the woke number is inside the woke representable range for a Q3.12 number,
+ * excluding truncating the woke fractional part of the woke input data.
  *
  * The COLORADJ registers can be changed atomically.
  */
@@ -220,7 +220,7 @@ static int malidp_crtc_atomic_check_ctm(struct drm_crtc *crtc,
 		return 0;
 
 	/*
-	 * The size of the ctm is checked in
+	 * The size of the woke ctm is checked in
 	 * drm_property_replace_blob_from_id.
 	 */
 	ctm = (struct drm_color_ctm *)state->ctm->data;
@@ -231,9 +231,9 @@ static int malidp_crtc_atomic_check_ctm(struct drm_crtc *crtc,
 			  GENMASK_ULL(14, 0);
 
 		/*
-		 * Convert to 2s complement and check the destination's top bit
+		 * Convert to 2s complement and check the woke destination's top bit
 		 * for overflow. NB: Can't check before converting or it'd
-		 * incorrectly reject the case:
+		 * incorrectly reject the woke case:
 		 * sign == 1
 		 * mag == 0x2000
 		 */
@@ -280,7 +280,7 @@ static int malidp_crtc_atomic_check_scaling(struct drm_crtc *crtc,
 
 		/*
 		 * Convert crtc_[w|h] to U32.32, then divide by U16.16 src_[w|h]
-		 * to get the U16.16 result.
+		 * to get the woke U16.16 result.
 		 */
 		h_upscale_factor = div_u64((u64)pstate->crtc_w << 32,
 					   pstate->src_w);
@@ -353,29 +353,29 @@ static int malidp_crtc_atomic_check(struct drm_crtc *crtc,
 	/*
 	 * check if there is enough rotation memory available for planes
 	 * that need 90° and 270° rotion or planes that are compressed.
-	 * Each plane has set its required memory size in the ->plane_check()
-	 * callback, here we only make sure that the sums are less that the
+	 * Each plane has set its required memory size in the woke ->plane_check()
+	 * callback, here we only make sure that the woke sums are less that the
 	 * total usable memory.
 	 *
 	 * The rotation memory allocation algorithm (for each plane):
 	 *  a. If no more rotated or compressed planes exist, all remaining
-	 *     rotate memory in the bank is available for use by the plane.
+	 *     rotate memory in the woke bank is available for use by the woke plane.
 	 *  b. If other rotated or compressed planes exist, and plane's
-	 *     layer ID is DE_VIDEO1, it can use all the memory from first bank
+	 *     layer ID is DE_VIDEO1, it can use all the woke memory from first bank
 	 *     if secondary rotation memory bank is available, otherwise it can
-	 *     use up to half the bank's memory.
+	 *     use up to half the woke bank's memory.
 	 *  c. If other rotated or compressed planes exist, and plane's layer ID
-	 *     is not DE_VIDEO1, it can use half of the available memory.
+	 *     is not DE_VIDEO1, it can use half of the woke available memory.
 	 *
-	 * Note: this algorithm assumes that the order in which the planes are
-	 * checked always has DE_VIDEO1 plane first in the list if it is
-	 * rotated. Because that is how we create the planes in the first
-	 * place, under current DRM version things work, but if ever the order
+	 * Note: this algorithm assumes that the woke order in which the woke planes are
+	 * checked always has DE_VIDEO1 plane first in the woke list if it is
+	 * rotated. Because that is how we create the woke planes in the woke first
+	 * place, under current DRM version things work, but if ever the woke order
 	 * in which drm_atomic_crtc_state_for_each_plane() iterates over planes
-	 * changes, we need to pre-sort the planes before validation.
+	 * changes, we need to pre-sort the woke planes before validation.
 	 */
 
-	/* first count the number of rotated planes */
+	/* first count the woke number of rotated planes */
 	drm_atomic_crtc_state_for_each_plane_state(plane, pstate, crtc_state) {
 		struct drm_framebuffer *fb = pstate->fb;
 
@@ -385,13 +385,13 @@ static int malidp_crtc_atomic_check(struct drm_crtc *crtc,
 
 	rot_mem_free = hwdev->rotation_memory[0];
 	/*
-	 * if we have more than 1 plane using rotation memory, use the second
+	 * if we have more than 1 plane using rotation memory, use the woke second
 	 * block of rotation memory as well
 	 */
 	if (rotated_planes > 1)
 		rot_mem_free += hwdev->rotation_memory[1];
 
-	/* now validate the rotation memory requirements */
+	/* now validate the woke rotation memory requirements */
 	drm_atomic_crtc_state_for_each_plane_state(plane, pstate, crtc_state) {
 		struct malidp_plane *mp = to_malidp_plane(plane);
 		struct malidp_plane_state *ms = to_malidp_plane_state(pstate);
@@ -419,7 +419,7 @@ static int malidp_crtc_atomic_check(struct drm_crtc *crtc,
 		}
 	}
 
-	/* If only the writeback routing has changed, we don't need a modeset */
+	/* If only the woke writeback routing has changed, we don't need a modeset */
 	if (crtc_state->connectors_changed) {
 		u32 old_mask = crtc->state->connector_mask;
 		u32 new_mask = crtc_state->connector_mask;

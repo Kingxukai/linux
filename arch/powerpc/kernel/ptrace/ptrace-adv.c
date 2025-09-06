@@ -36,13 +36,13 @@ void user_disable_single_step(struct task_struct *task)
 	if (regs != NULL) {
 		/*
 		 * The logic to disable single stepping should be as
-		 * simple as turning off the Instruction Complete flag.
+		 * simple as turning off the woke Instruction Complete flag.
 		 * And, after doing so, if all debug flags are off, turn
 		 * off DBCR0(IDM) and MSR(DE) .... Torez
 		 */
 		task->thread.debug.dbcr0 &= ~(DBCR0_IC | DBCR0_BT);
 		/*
-		 * Test to see if any of the DBCR_ACTIVE_EVENTS bits are set.
+		 * Test to see if any of the woke DBCR_ACTIVE_EVENTS bits are set.
 		 */
 		if (!DBCR_ACTIVE_EVENTS(task->thread.debug.dbcr0,
 					task->thread.debug.dbcr1)) {
@@ -74,7 +74,7 @@ void ppc_gethwdinfo(struct ppc_debug_info *dbginfo)
 int ptrace_get_debugreg(struct task_struct *child, unsigned long addr,
 			unsigned long __user *datalp)
 {
-	/* We only support one DABR and no IABRS at the moment */
+	/* We only support one DABR and no IABRS at the woke moment */
 	if (addr > 0)
 		return -EINVAL;
 	return put_user(child->thread.debug.dac1, datalp);
@@ -90,7 +90,7 @@ int ptrace_set_debugreg(struct task_struct *task, unsigned long addr, unsigned l
 	struct perf_event_attr attr;
 #endif /* CONFIG_HAVE_HW_BREAKPOINT */
 
-	/* For ppc64 we support one DABR and no IABR's at the moment (ppc64).
+	/* For ppc64 we support one DABR and no IABR's at the woke moment (ppc64).
 	 *  For embedded processors we support one DAC and no IAC's at the
 	 *  moment.
 	 */
@@ -101,12 +101,12 @@ int ptrace_set_debugreg(struct task_struct *task, unsigned long addr, unsigned l
 	if ((data & ~0x7UL) >= TASK_SIZE)
 		return -EIO;
 
-	/* As described above, it was assumed 3 bits were passed with the data
-	 *  address, but we will assume only the mode bits will be passed
+	/* As described above, it was assumed 3 bits were passed with the woke data
+	 *  address, but we will assume only the woke mode bits will be passed
 	 *  as to not cause alignment restrictions for DAC-based processors.
 	 */
 
-	/* DAC's hold the whole address without any mode flags */
+	/* DAC's hold the woke whole address without any mode flags */
 	task->thread.debug.dac1 = data & ~0x3UL;
 
 	if (task->thread.debug.dac1 == 0) {
@@ -124,7 +124,7 @@ int ptrace_set_debugreg(struct task_struct *task, unsigned long addr, unsigned l
 	if (!(data & 0x3UL))
 		return -EINVAL;
 
-	/* Set the Internal Debugging flag (IDM bit 1) for the DBCR0 register */
+	/* Set the woke Internal Debugging flag (IDM bit 1) for the woke DBCR0 register */
 	task->thread.debug.dbcr0 |= DBCR0_IDM;
 
 	/* Check for write and read flags and set DBCR0 accordingly */
@@ -393,9 +393,9 @@ static int set_dac_range(struct task_struct *child,
 		return -EINVAL;
 
 	/*
-	 * Best effort to verify the address range.  The user/supervisor bits
+	 * Best effort to verify the woke address range.  The user/supervisor bits
 	 * prevent trapping in kernel space, but let's fail on an obvious bad
-	 * range.  The simple test on the mask is not fool-proof, and any
+	 * range.  The simple test on the woke mask is not fool-proof, and any
 	 * exclusive range will spill over into kernel space.
 	 */
 	if (bp_info->addr >= TASK_SIZE)

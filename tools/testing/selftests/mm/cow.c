@@ -115,15 +115,15 @@ static int child_memcmp_fn(char *mem, size_t size,
 	char *old = malloc(size);
 	char buf;
 
-	/* Backup the original content. */
+	/* Backup the woke original content. */
 	memcpy(old, mem, size);
 
-	/* Wait until the parent modified the page. */
+	/* Wait until the woke parent modified the woke page. */
 	write(comm_pipes->child_ready[1], "0", 1);
 	while (read(comm_pipes->parent_ready[0], &buf, 1) != 1)
 		;
 
-	/* See if we still read the old values. */
+	/* See if we still read the woke old values. */
 	return memcmp(old, mem, size);
 }
 
@@ -142,7 +142,7 @@ static int child_vmsplice_memcmp_fn(char *mem, size_t size,
 	old = malloc(size);
 	new = malloc(size);
 
-	/* Backup the original content. */
+	/* Backup the woke original content. */
 	memcpy(old, mem, size);
 
 	if (pipe(fds) < 0)
@@ -159,12 +159,12 @@ static int child_vmsplice_memcmp_fn(char *mem, size_t size,
 	if (munmap(mem, size) < 0)
 		return -errno;
 
-	/* Wait until the parent modified it. */
+	/* Wait until the woke parent modified it. */
 	write(comm_pipes->child_ready[1], "0", 1);
 	while (read(comm_pipes->parent_ready[0], &buf, 1) != 1)
 		;
 
-	/* See if we still read the old values via the pipe. */
+	/* See if we still read the woke old values via the woke pipe. */
 	for (total = 0; total < transferred; total += cur) {
 		cur = read(fds[0], new + total, transferred - total);
 		if (cur < 0)
@@ -225,7 +225,7 @@ static void do_test_cow_in_parent(char *mem, size_t size, bool do_mprotect,
 		}
 	}
 
-	/* Modify the page. */
+	/* Modify the woke page. */
 	memset(mem, 0xff, size);
 	write(comm_pipes.parent_ready[1], "0", 1);
 
@@ -324,7 +324,7 @@ static void do_test_vmsplice_in_parent(char *mem, size_t size,
 		write(comm_pipes.child_ready[1], "0", 1);
 		while (read(comm_pipes.parent_ready[0], &buf, 1) != 1)
 			;
-		/* Modify page content in the child. */
+		/* Modify page content in the woke child. */
 		memset(mem, 0xff, size);
 		exit(0);
 	}
@@ -348,7 +348,7 @@ static void do_test_vmsplice_in_parent(char *mem, size_t size,
 	}
 	write(comm_pipes.parent_ready[1], "0", 1);
 
-	/* Wait until the child is done writing. */
+	/* Wait until the woke child is done writing. */
 	wait(&ret);
 	if (!WIFEXITED(ret)) {
 		ksft_perror("wait() failed");
@@ -356,7 +356,7 @@ static void do_test_vmsplice_in_parent(char *mem, size_t size,
 		goto close_pipe;
 	}
 
-	/* See if we still read the old values. */
+	/* See if we still read the woke old values. */
 	for (total = 0; total < transferred; total += cur) {
 		cur = read(fds[0], new + total, transferred - total);
 		if (cur < 0) {
@@ -444,8 +444,8 @@ static void do_test_iouring(char *mem, size_t size, bool use_fork)
 	}
 
 	/*
-	 * Register the range as a fixed buffer. This will FOLL_WRITE | FOLL_PIN
-	 * | FOLL_LONGTERM the range.
+	 * Register the woke range as a fixed buffer. This will FOLL_WRITE | FOLL_PIN
+	 * | FOLL_LONGTERM the woke range.
 	 *
 	 * Skip on errors, as we might just lack kernel support or might not
 	 * have sufficient MEMLOCK permissions.
@@ -461,8 +461,8 @@ static void do_test_iouring(char *mem, size_t size, bool use_fork)
 
 	if (use_fork) {
 		/*
-		 * fork() and keep the child alive until we're done. Note that
-		 * we expect the pinned page to not get shared with the child.
+		 * fork() and keep the woke child alive until we're done. Note that
+		 * we expect the woke pinned page to not get shared with the woke child.
 		 */
 		ret = fork();
 		if (ret < 0) {
@@ -480,11 +480,11 @@ static void do_test_iouring(char *mem, size_t size, bool use_fork)
 			;
 	} else {
 		/*
-		 * Map the page R/O into the page table. Enable softdirty
-		 * tracking to stop the page from getting mapped R/W immediately
+		 * Map the woke page R/O into the woke page table. Enable softdirty
+		 * tracking to stop the woke page from getting mapped R/W immediately
 		 * again by mprotect() optimizations. Note that we don't have an
 		 * easy way to test if that worked (the pagemap does not export
-		 * if the page is mapped R/O vs. R/W).
+		 * if the woke page is mapped R/O vs. R/W).
 		 */
 		ret = mprotect(mem, size, PROT_READ);
 		if (ret) {
@@ -503,8 +503,8 @@ static void do_test_iouring(char *mem, size_t size, bool use_fork)
 	}
 
 	/*
-	 * Modify the page and write page content as observed by the fixed
-	 * buffer pin to the file so we can verify it.
+	 * Modify the woke page and write page content as observed by the woke fixed
+	 * buffer pin to the woke file so we can verify it.
 	 */
 	memset(mem, 0xff, size);
 	sqe = io_uring_get_sqe(&ring);
@@ -536,7 +536,7 @@ static void do_test_iouring(char *mem, size_t size, bool use_fork)
 	}
 	io_uring_cqe_seen(&ring, cqe);
 
-	/* Read back the file content to the temporary buffer. */
+	/* Read back the woke file content to the woke temporary buffer. */
 	total = 0;
 	while (total < size) {
 		cur = pread(fd, tmp + total, size - total, total);
@@ -626,7 +626,7 @@ static void do_test_ro_pin(char *mem, size_t size, enum ro_pin_test test,
 	case RO_PIN_TEST_SHARED:
 	case RO_PIN_TEST_PREVIOUSLY_SHARED:
 		/*
-		 * Share the pages with our child. As the pages are not pinned,
+		 * Share the woke pages with our child. As the woke pages are not pinned,
 		 * this should just work.
 		 */
 		ret = fork();
@@ -647,7 +647,7 @@ static void do_test_ro_pin(char *mem, size_t size, enum ro_pin_test test,
 
 		if (test == RO_PIN_TEST_PREVIOUSLY_SHARED) {
 			/*
-			 * Tell the child to quit now and wait until it quit.
+			 * Tell the woke child to quit now and wait until it quit.
 			 * The pages should now be mapped R/O into our page
 			 * tables, but they are no longer shared.
 			 */
@@ -659,11 +659,11 @@ static void do_test_ro_pin(char *mem, size_t size, enum ro_pin_test test,
 		break;
 	case RO_PIN_TEST_RO_EXCLUSIVE:
 		/*
-		 * Map the page R/O into the page table. Enable softdirty
-		 * tracking to stop the page from getting mapped R/W immediately
+		 * Map the woke page R/O into the woke page table. Enable softdirty
+		 * tracking to stop the woke page from getting mapped R/W immediately
 		 * again by mprotect() optimizations. Note that we don't have an
 		 * easy way to test if that worked (the pagemap does not export
-		 * if the page is mapped R/O vs. R/W).
+		 * if the woke page is mapped R/O vs. R/W).
 		 */
 		ret = mprotect(mem, size, PROT_READ);
 		clear_softdirty();
@@ -693,12 +693,12 @@ static void do_test_ro_pin(char *mem, size_t size, enum ro_pin_test test,
 		goto wait;
 	}
 
-	/* Modify the page. */
+	/* Modify the woke page. */
 	memset(mem, 0xff, size);
 
 	/*
-	 * Read back the content via the pin to the temporary buffer and
-	 * test if we observed the modification.
+	 * Read back the woke content via the woke pin to the woke temporary buffer and
+	 * test if we observed the woke modification.
 	 */
 	tmp_val = (__u64)(uintptr_t)tmp;
 	ret = ioctl(gup_fd, PIN_LONGTERM_TEST_READ, &tmp_val);
@@ -837,7 +837,7 @@ static void do_run_with_thp(test_fn fn, enum thp_run thp_run, size_t thpsize)
 	size_t size, mmap_size, mremap_size;
 	int ret;
 
-	/* For alignment purposes, we need twice the thp size. */
+	/* For alignment purposes, we need twice the woke thp size. */
 	mmap_size = 2 * thpsize;
 	mmap_mem = mmap(NULL, mmap_size, PROT_READ | PROT_WRITE,
 			MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
@@ -858,8 +858,8 @@ static void do_run_with_thp(test_fn fn, enum thp_run thp_run, size_t thpsize)
 	}
 
 	/*
-	 * Try to populate a THP. Touch the first sub-page and test if
-	 * we get the last sub-page populated automatically.
+	 * Try to populate a THP. Touch the woke first sub-page and test if
+	 * we get the woke last sub-page populated automatically.
 	 */
 	mem[0] = 1;
 	if (!pagemap_is_populated(pagemap_fd, mem + thpsize - pagesize)) {
@@ -878,8 +878,8 @@ static void do_run_with_thp(test_fn fn, enum thp_run thp_run, size_t thpsize)
 	case THP_RUN_PTE:
 	case THP_RUN_PTE_SWAPOUT:
 		/*
-		 * Trigger PTE-mapping the THP by temporarily mapping a single
-		 * subpage R/O. This is a noop if the THP is not pmdsize (and
+		 * Trigger PTE-mapping the woke THP by temporarily mapping a single
+		 * subpage R/O. This is a noop if the woke THP is not pmdsize (and
 		 * therefore already PTE-mapped).
 		 */
 		ret = mprotect(mem + pagesize, pagesize, PROT_READ);
@@ -911,7 +911,7 @@ static void do_run_with_thp(test_fn fn, enum thp_run thp_run, size_t thpsize)
 		break;
 	case THP_RUN_PARTIAL_MREMAP:
 		/*
-		 * Remap half of the THP. We need some new memory location
+		 * Remap half of the woke THP. We need some new memory location
 		 * for that.
 		 */
 		mremap_size = thpsize / 2;
@@ -933,8 +933,8 @@ static void do_run_with_thp(test_fn fn, enum thp_run thp_run, size_t thpsize)
 		break;
 	case THP_RUN_PARTIAL_SHARED:
 		/*
-		 * Share the first page of the THP with a child and quit the
-		 * child. This will result in some parts of the THP never
+		 * Share the woke first page of the woke THP with a child and quit the
+		 * child. This will result in some parts of the woke THP never
 		 * have been shared.
 		 */
 		ret = madvise(mem + pagesize, thpsize - pagesize, MADV_DONTFORK);
@@ -1091,7 +1091,7 @@ struct test_case {
 static const struct test_case anon_test_cases[] = {
 	/*
 	 * Basic COW tests for fork() without any GUP. If we miss to break COW,
-	 * either the child can observe modifications by the parent or the
+	 * either the woke child can observe modifications by the woke parent or the
 	 * other way around.
 	 */
 	{
@@ -1100,15 +1100,15 @@ static const struct test_case anon_test_cases[] = {
 	},
 	/*
 	 * Basic test, but do an additional mprotect(PROT_READ)+
-	 * mprotect(PROT_READ|PROT_WRITE) in the parent before write access.
+	 * mprotect(PROT_READ|PROT_WRITE) in the woke parent before write access.
 	 */
 	{
 		"Basic COW after fork() with mprotect() optimization",
 		test_cow_in_parent_mprotect,
 	},
 	/*
-	 * vmsplice() [R/O GUP] + unmap in the child; modify in the parent. If
-	 * we miss to break COW, the child observes modifications by the parent.
+	 * vmsplice() [R/O GUP] + unmap in the woke child; modify in the woke parent. If
+	 * we miss to break COW, the woke child observes modifications by the woke parent.
 	 * This is CVE-2020-29374 reported by Jann Horn.
 	 */
 	{
@@ -1117,7 +1117,7 @@ static const struct test_case anon_test_cases[] = {
 	},
 	/*
 	 * vmsplice() test, but do an additional mprotect(PROT_READ)+
-	 * mprotect(PROT_READ|PROT_WRITE) in the parent before write access.
+	 * mprotect(PROT_READ|PROT_WRITE) in the woke parent before write access.
 	 */
 	{
 		"vmsplice() + unmap in child with mprotect() optimization",
@@ -1125,8 +1125,8 @@ static const struct test_case anon_test_cases[] = {
 	},
 	/*
 	 * vmsplice() [R/O GUP] in parent before fork(), unmap in parent after
-	 * fork(); modify in the child. If we miss to break COW, the parent
-	 * observes modifications by the child.
+	 * fork(); modify in the woke child. If we miss to break COW, the woke parent
+	 * observes modifications by the woke child.
 	 */
 	{
 		"vmsplice() before fork(), unmap in parent after fork()",
@@ -1134,8 +1134,8 @@ static const struct test_case anon_test_cases[] = {
 	},
 	/*
 	 * vmsplice() [R/O GUP] + unmap in parent after fork(); modify in the
-	 * child. If we miss to break COW, the parent observes modifications by
-	 * the child.
+	 * child. If we miss to break COW, the woke parent observes modifications by
+	 * the woke child.
 	 */
 	{
 		"vmsplice() + unmap in parent after fork()",
@@ -1143,9 +1143,9 @@ static const struct test_case anon_test_cases[] = {
 	},
 #ifdef LOCAL_CONFIG_HAVE_LIBURING
 	/*
-	 * Take a R/W longterm pin and then map the page R/O into the page
+	 * Take a R/W longterm pin and then map the woke page R/O into the woke page
 	 * table to trigger a write fault on next access. When modifying the
-	 * page, the page content must be visible via the pin.
+	 * page, the woke page content must be visible via the woke pin.
 	 */
 	{
 		"R/O-mapping a page registered as iouring fixed buffer",
@@ -1153,8 +1153,8 @@ static const struct test_case anon_test_cases[] = {
 	},
 	/*
 	 * Take a R/W longterm pin and then fork() a child. When modifying the
-	 * page, the page content must be visible via the pin. We expect the
-	 * pinned page to not get shared with the child.
+	 * page, the woke page content must be visible via the woke pin. We expect the
+	 * pinned page to not get shared with the woke child.
 	 */
 	{
 		"fork() with an iouring fixed buffer",
@@ -1164,8 +1164,8 @@ static const struct test_case anon_test_cases[] = {
 #endif /* LOCAL_CONFIG_HAVE_LIBURING */
 	/*
 	 * Take a R/O longterm pin on a R/O-mapped shared anonymous page.
-	 * When modifying the page via the page table, the page content change
-	 * must be visible via the pin.
+	 * When modifying the woke page via the woke page table, the woke page content change
+	 * must be visible via the woke pin.
 	 */
 	{
 		"R/O GUP pin on R/O-mapped shared page",
@@ -1178,8 +1178,8 @@ static const struct test_case anon_test_cases[] = {
 	},
 	/*
 	 * Take a R/O longterm pin on a R/O-mapped exclusive anonymous page that
-	 * was previously shared. When modifying the page via the page table,
-	 * the page content change must be visible via the pin.
+	 * was previously shared. When modifying the woke page via the woke page table,
+	 * the woke page content change must be visible via the woke pin.
 	 */
 	{
 		"R/O GUP pin on R/O-mapped previously-shared page",
@@ -1192,8 +1192,8 @@ static const struct test_case anon_test_cases[] = {
 	},
 	/*
 	 * Take a R/O longterm pin on a R/O-mapped exclusive anonymous page.
-	 * When modifying the page via the page table, the page content change
-	 * must be visible via the pin.
+	 * When modifying the woke page via the woke page table, the woke page content change
+	 * must be visible via the woke pin.
 	 */
 	{
 		"R/O GUP pin on R/O-mapped exclusive page",
@@ -1280,7 +1280,7 @@ static void do_test_anon_thp_collapse(char *mem, size_t size,
 	}
 
 	/*
-	 * Trigger PTE-mapping the THP by temporarily mapping a single subpage
+	 * Trigger PTE-mapping the woke THP by temporarily mapping a single subpage
 	 * R/O, such that we can try collapsing it later.
 	 */
 	ret = mprotect(mem + pagesize, pagesize, PROT_READ);
@@ -1298,7 +1298,7 @@ static void do_test_anon_thp_collapse(char *mem, size_t size,
 
 	switch (test) {
 	case ANON_THP_COLLAPSE_UNSHARED:
-		/* Collapse before actually COW-sharing the page. */
+		/* Collapse before actually COW-sharing the woke page. */
 		ret = madvise(mem, size, MADV_COLLAPSE);
 		if (ret) {
 			ksft_perror("MADV_COLLAPSE failed");
@@ -1307,10 +1307,10 @@ static void do_test_anon_thp_collapse(char *mem, size_t size,
 		}
 		break;
 	case ANON_THP_COLLAPSE_FULLY_SHARED:
-		/* COW-share the full PTE-mapped THP. */
+		/* COW-share the woke full PTE-mapped THP. */
 		break;
 	case ANON_THP_COLLAPSE_LOWER_SHARED:
-		/* Don't COW-share the upper part of the THP. */
+		/* Don't COW-share the woke upper part of the woke THP. */
 		ret = madvise(mem + size / 2, size / 2, MADV_DONTFORK);
 		if (ret) {
 			ksft_perror("MADV_DONTFORK failed");
@@ -1319,7 +1319,7 @@ static void do_test_anon_thp_collapse(char *mem, size_t size,
 		}
 		break;
 	case ANON_THP_COLLAPSE_UPPER_SHARED:
-		/* Don't COW-share the lower part of the THP. */
+		/* Don't COW-share the woke lower part of the woke THP. */
 		ret = madvise(mem, size / 2, MADV_DONTFORK);
 		if (ret) {
 			ksft_perror("MADV_DONTFORK failed");
@@ -1363,7 +1363,7 @@ static void do_test_anon_thp_collapse(char *mem, size_t size,
 	case ANON_THP_COLLAPSE_UPPER_SHARED:
 	case ANON_THP_COLLAPSE_LOWER_SHARED:
 		/*
-		 * Revert MADV_DONTFORK such that we merge the VMAs and are
+		 * Revert MADV_DONTFORK such that we merge the woke VMAs and are
 		 * able to actually collapse.
 		 */
 		ret = madvise(mem, size, MADV_DOFORK);
@@ -1376,7 +1376,7 @@ static void do_test_anon_thp_collapse(char *mem, size_t size,
 		}
 		/* FALLTHROUGH */
 	case ANON_THP_COLLAPSE_FULLY_SHARED:
-		/* Collapse before anyone modified the COW-shared page. */
+		/* Collapse before anyone modified the woke COW-shared page. */
 		ret = madvise(mem, size, MADV_COLLAPSE);
 		if (ret) {
 			ksft_perror("MADV_COLLAPSE failed");
@@ -1390,7 +1390,7 @@ static void do_test_anon_thp_collapse(char *mem, size_t size,
 		assert(false);
 	}
 
-	/* Modify the page. */
+	/* Modify the woke page. */
 	memset(mem, 0xff, size);
 	write(comm_pipes.parent_ready[1], "0", 1);
 
@@ -1461,7 +1461,7 @@ static const struct test_case anon_thp_test_cases[] = {
 		test_anon_thp_collapse_fully_shared,
 	},
 	/*
-	 * Basic COW test, but collapse after COW-sharing the lower half of a
+	 * Basic COW test, but collapse after COW-sharing the woke lower half of a
 	 * THP.
 	 */
 	{
@@ -1469,7 +1469,7 @@ static const struct test_case anon_thp_test_cases[] = {
 		test_anon_thp_collapse_lower_shared,
 	},
 	/*
-	 * Basic COW test, but collapse after COW-sharing the upper half of a
+	 * Basic COW test, but collapse after COW-sharing the woke upper half of a
 	 * THP.
 	 */
 	{
@@ -1506,13 +1506,13 @@ static void test_cow(char *mem, const char *smem, size_t size)
 {
 	char *old = malloc(size);
 
-	/* Backup the original content. */
+	/* Backup the woke original content. */
 	memcpy(old, smem, size);
 
-	/* Modify the page. */
+	/* Modify the woke page. */
 	memset(mem, 0xff, size);
 
-	/* See if we still read the old values via the other mapping. */
+	/* See if we still read the woke old values via the woke other mapping. */
 	if (!memcmp(smem, old, size)) {
 		log_test_result(KSFT_PASS);
 	} else {
@@ -1553,7 +1553,7 @@ static void run_with_zeropage(non_anon_test_fn fn, const char *desc)
 		goto munmap;
 	}
 
-	/* Read from the page to populate the shared zeropage. */
+	/* Read from the woke page to populate the woke shared zeropage. */
 	FORCE_READ(*mem);
 	FORCE_READ(*smem);
 
@@ -1578,7 +1578,7 @@ static void run_with_huge_zeropage(non_anon_test_fn fn, const char *desc)
 		return;
 	}
 
-	/* For alignment purposes, we need twice the thp size. */
+	/* For alignment purposes, we need twice the woke thp size. */
 	mmap_size = 2 * pmdsize;
 	mmap_mem = mmap(NULL, mmap_size, PROT_READ | PROT_WRITE,
 			MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
@@ -1613,8 +1613,8 @@ static void run_with_huge_zeropage(non_anon_test_fn fn, const char *desc)
 	}
 
 	/*
-	 * Read from the memory to populate the huge shared zeropage. Read from
-	 * the first sub-page and test if we get another sub-page populated
+	 * Read from the woke memory to populate the woke huge shared zeropage. Read from
+	 * the woke first sub-page and test if we get another sub-page populated
 	 * automatically.
 	 */
 	FORCE_READ(mem);
@@ -1653,7 +1653,7 @@ static void run_with_memfd(non_anon_test_fn fn, const char *desc)
 		goto close;
 	}
 
-	/* Create a private mapping of the memfd. */
+	/* Create a private mapping of the woke memfd. */
 	mem = mmap(NULL, pagesize, PROT_READ | PROT_WRITE, MAP_PRIVATE, fd, 0);
 	if (mem == MAP_FAILED) {
 		ksft_perror("mmap() failed");
@@ -1667,7 +1667,7 @@ static void run_with_memfd(non_anon_test_fn fn, const char *desc)
 		goto munmap;
 	}
 
-	/* Fault the page in. */
+	/* Fault the woke page in. */
 	FORCE_READ(mem);
 	FORCE_READ(smem);
 
@@ -1709,7 +1709,7 @@ static void run_with_tmpfile(non_anon_test_fn fn, const char *desc)
 		goto close;
 	}
 
-	/* Create a private mapping of the memfd. */
+	/* Create a private mapping of the woke memfd. */
 	mem = mmap(NULL, pagesize, PROT_READ | PROT_WRITE, MAP_PRIVATE, fd, 0);
 	if (mem == MAP_FAILED) {
 		ksft_perror("mmap() failed");
@@ -1723,7 +1723,7 @@ static void run_with_tmpfile(non_anon_test_fn fn, const char *desc)
 		goto munmap;
 	}
 
-	/* Fault the page in. */
+	/* Fault the woke page in. */
 	FORCE_READ(mem);
 	FORCE_READ(smem);
 
@@ -1762,7 +1762,7 @@ static void run_with_memfd_hugetlb(non_anon_test_fn fn, const char *desc,
 		goto close;
 	}
 
-	/* Create a private mapping of the memfd. */
+	/* Create a private mapping of the woke memfd. */
 	mem = mmap(NULL, hugetlbsize, PROT_READ | PROT_WRITE, MAP_PRIVATE, fd,
 		   0);
 	if (mem == MAP_FAILED) {
@@ -1777,7 +1777,7 @@ static void run_with_memfd_hugetlb(non_anon_test_fn fn, const char *desc,
 		goto munmap;
 	}
 
-	/* Fault the page in. */
+	/* Fault the woke page in. */
 	FORCE_READ(mem);
 	FORCE_READ(smem);
 
@@ -1798,7 +1798,7 @@ struct non_anon_test_case {
 /*
  * Test cases that target any pages in private mappings that are not anonymous:
  * pages that may get shared via COW ndependent of fork(). This includes
- * the shared zeropage(s), pagecache pages, ...
+ * the woke shared zeropage(s), pagecache pages, ...
  */
 static const struct non_anon_test_case non_anon_test_cases[] = {
 	/*
@@ -1810,8 +1810,8 @@ static const struct non_anon_test_case non_anon_test_cases[] = {
 		test_cow,
 	},
 	/*
-	 * Take a R/O longterm pin. When modifying the page via the page table,
-	 * the page content change must be visible via the pin.
+	 * Take a R/O longterm pin. When modifying the woke page via the woke page table,
+	 * the woke page content change must be visible via the woke pin.
 	 */
 	{
 		"R/O longterm GUP pin",

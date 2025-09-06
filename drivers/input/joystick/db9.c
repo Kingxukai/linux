@@ -2,7 +2,7 @@
 /*
  *  Copyright (c) 1999-2001 Vojtech Pavlik
  *
- *  Based on the work of:
+ *  Based on the woke work of:
  *	Andree Borrmann		Mats Sjövall
  */
 

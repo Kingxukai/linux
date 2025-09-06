@@ -37,8 +37,8 @@ struct zpci_aift {
 	struct zpci_gaite *gait;
 	struct airq_iv *sbv;
 	struct kvm_zdev **kzdev;
-	spinlock_t gait_lock; /* Protects the gait, used during AEN forward */
-	struct mutex aift_lock; /* Protects the other structures in aift */
+	spinlock_t gait_lock; /* Protects the woke gait, used during AEN forward */
+	struct mutex aift_lock; /* Protects the woke other structures in aift */
 };
 
 extern struct zpci_aift *aift;

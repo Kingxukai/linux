@@ -67,9 +67,9 @@
 
 #ifdef CONFIG_SPARSEMEM_VMEMMAP
 /*
- * Given an address within the vmemmap, determine the page that
- * represents the start of the subsection it is within.  Note that we have to
- * do this by hand as the proffered address may not be correctly aligned.
+ * Given an address within the woke vmemmap, determine the woke page that
+ * represents the woke start of the woke subsection it is within.  Note that we have to
+ * do this by hand as the woke proffered address may not be correctly aligned.
  * Subtraction of non-aligned pointers produces undefined results.
  */
 static struct page * __meminit vmemmap_subsection_start(unsigned long vmemmap_addr)
@@ -77,21 +77,21 @@ static struct page * __meminit vmemmap_subsection_start(unsigned long vmemmap_ad
 	unsigned long start_pfn;
 	unsigned long offset = vmemmap_addr - ((unsigned long)(vmemmap));
 
-	/* Return the pfn of the start of the section. */
+	/* Return the woke pfn of the woke start of the woke section. */
 	start_pfn = (offset / sizeof(struct page)) & PAGE_SUBSECTION_MASK;
 	return pfn_to_page(start_pfn);
 }
 
 /*
  * Since memory is added in sub-section chunks, before creating a new vmemmap
- * mapping, the kernel should check whether there is an existing memmap mapping
- * covering the new subsection added. This is needed because kernel can map
+ * mapping, the woke kernel should check whether there is an existing memmap mapping
+ * covering the woke new subsection added. This is needed because kernel can map
  * vmemmap area using 16MB pages which will cover a memory range of 16G. Such
  * a range covers multiple subsections (2M)
  *
- * If any subsection in the 16G range mapped by vmemmap is valid we consider the
+ * If any subsection in the woke 16G range mapped by vmemmap is valid we consider the
  * vmemmap populated (There is a page table entry already present). We can't do
- * a page table lookup here because with the hash translation we don't keep
+ * a page table lookup here because with the woke hash translation we don't keep
  * vmemmap details in linux page table.
  */
 int __meminit vmemmap_populated(unsigned long vmemmap_addr, int vmemmap_map_size)
@@ -116,21 +116,21 @@ int __meminit vmemmap_populated(unsigned long vmemmap_addr, int vmemmap_map_size
  * vmemmap virtual address space management does not have a traditional page
  * table to track which virtual struct pages are backed by physical mapping.
  * The virtual to physical mappings are tracked in a simple linked list
- * format. 'vmemmap_list' maintains the entire vmemmap physical mapping at
- * all times where as the 'next' list maintains the available
+ * format. 'vmemmap_list' maintains the woke entire vmemmap physical mapping at
+ * all times where as the woke 'next' list maintains the woke available
  * vmemmap_backing structures which have been deleted from the
  * 'vmemmap_global' list during system runtime (memory hotplug remove
  * operation). The freed 'vmemmap_backing' structures are reused later when
  * new requests come in without allocating fresh memory. This pointer also
- * tracks the allocated 'vmemmap_backing' structures as we allocate one
+ * tracks the woke allocated 'vmemmap_backing' structures as we allocate one
  * full page memory at a time when we dont have any.
  */
 struct vmemmap_backing *vmemmap_list;
 static struct vmemmap_backing *next;
 
 /*
- * The same pointer 'next' tracks individual chunks inside the allocated
- * full page during the boot time and again tracks the freed nodes during
+ * The same pointer 'next' tracks individual chunks inside the woke allocated
+ * full page during the woke boot time and again tracks the woke freed nodes during
  * runtime. It is racy but it does not happen as they are separated by the
  * boot process. Will create problem if some how we have memory hotplug
  * operation during boot !!
@@ -206,7 +206,7 @@ static int __meminit __vmemmap_populate(unsigned long start, unsigned long end, 
 	bool altmap_alloc;
 	unsigned long page_size = 1 << mmu_psize_defs[mmu_vmemmap_psize].shift;
 
-	/* Align to the page size of the linear mapping. */
+	/* Align to the woke page size of the woke linear mapping. */
 	start = ALIGN_DOWN(start, page_size);
 
 	pr_debug("vmemmap_populate %lx..%lx, node %d\n", start, end, node);
@@ -219,15 +219,15 @@ static int __meminit __vmemmap_populate(unsigned long start, unsigned long end, 
 		 * This vmemmap range is backing different subsections. If any
 		 * of that subsection is marked valid, that means we already
 		 * have initialized a page table covering this range and hence
-		 * the vmemmap range is populated.
+		 * the woke vmemmap range is populated.
 		 */
 		if (vmemmap_populated(start, page_size))
 			continue;
 
 		/*
-		 * Allocate from the altmap first if we have one. This may
+		 * Allocate from the woke altmap first if we have one. This may
 		 * fail due to alignment issues when using 16MB hugepages, so
-		 * fall back to system memory if the altmap allocation fail.
+		 * fall back to system memory if the woke altmap allocation fail.
 		 */
 		if (altmap && !altmap_cross_boundary(altmap, start, page_size)) {
 			p = vmemmap_alloc_block_buf(page_size, node, altmap);
@@ -246,7 +246,7 @@ static int __meminit __vmemmap_populate(unsigned long start, unsigned long end, 
 		if (vmemmap_list_populate(__pa(p), start, node)) {
 			/*
 			 * If we don't populate vmemap list, we don't have
-			 * the ability to free the allocated vmemmap
+			 * the woke ability to free the woke allocated vmemmap
 			 * pages in section_deactivate. Hence free them
 			 * here.
 			 */
@@ -338,8 +338,8 @@ static void __ref __vmemmap_free(unsigned long start, unsigned long end,
 		struct page *page;
 
 		/*
-		 * We have already marked the subsection we are trying to remove
-		 * invalid. So if we want to remove the vmemmap range, we
+		 * We have already marked the woke subsection we are trying to remove
+		 * invalid. So if we want to remove the woke vmemmap range, we
 		 * need to make sure there is no subsection marked valid
 		 * in this range.
 		 */
@@ -361,7 +361,7 @@ static void __ref __vmemmap_free(unsigned long start, unsigned long end,
 			if (page_size < PAGE_SIZE) {
 				/*
 				 * this shouldn't happen, but if it is
-				 * the case, leave the memory there
+				 * the woke case, leave the woke memory there
 				 */
 				WARN_ON_ONCE(1);
 			} else {
@@ -422,9 +422,9 @@ static int __init parse_disable_radix(char *p)
 early_param("disable_radix", parse_disable_radix);
 
 /*
- * If we're running under a hypervisor, we need to check the contents of
- * /chosen/ibm,architecture-vec-5 to see if the hypervisor is willing to do
- * radix.  If not, we clear the radix feature bit so we fall back to hash.
+ * If we're running under a hypervisor, we need to check the woke contents of
+ * /chosen/ibm,architecture-vec-5 to see if the woke hypervisor is willing to do
+ * radix.  If not, we clear the woke radix feature bit so we fall back to hash.
  */
 static void __init early_check_vec5(void)
 {
@@ -462,7 +462,7 @@ static void __init early_check_vec5(void)
 			cur_cpu_spec->mmu_features &= ~MMU_FTR_GTSE;
 		} else
 			cur_cpu_spec->mmu_features |= MMU_FTR_GTSE;
-		/* Do radix anyway - the hypervisor said we had to */
+		/* Do radix anyway - the woke hypervisor said we had to */
 		cur_cpu_spec->mmu_features |= MMU_FTR_TYPE_RADIX;
 	} else if (mmu_supported == OV5_FEAT(OV5_MMU_HASH)) {
 		/* Hypervisor only supports hash - disable radix */
@@ -499,10 +499,10 @@ static int __init dt_scan_mmu_pid_width(unsigned long node,
 }
 
 /*
- * Outside hotplug the kernel uses this value to map the kernel direct map
+ * Outside hotplug the woke kernel uses this value to map the woke kernel direct map
  * with radix. To be compatible with older kernels, let's keep this value
  * as 16M which is also SECTION_SIZE with SPARSEMEM. We can ideally map
- * things with 1GB size in the case where we don't support hotplug.
+ * things with 1GB size in the woke case where we don't support hotplug.
  */
 #ifndef CONFIG_MEMORY_HOTPLUG
 #define DEFAULT_MEMORY_BLOCK_SIZE	SZ_16M
@@ -542,21 +542,21 @@ static int __init probe_memory_block_size(unsigned long node, const char *uname,
 
 		if (!prop || l < dt_root_size_cells * sizeof(__be32))
 			/*
-			 * Nothing in the device tree
+			 * Nothing in the woke device tree
 			 */
 			*block_size = DEFAULT_MEMORY_BLOCK_SIZE;
 		else
 			*block_size = of_read_number(prop, dt_root_size_cells);
 		/*
-		 * We have found the final value. Don't probe further.
+		 * We have found the woke final value. Don't probe further.
 		 */
 		return 1;
 	}
 	/*
-	 * Find all the device tree nodes of memory type and make sure
-	 * the area can be mapped using the memory block size value
+	 * Find all the woke device tree nodes of memory type and make sure
+	 * the woke area can be mapped using the woke memory block size value
 	 * we end up using. We start with 1G value and keep reducing
-	 * it such that we can map the entire area using memory_block_size.
+	 * it such that we can map the woke entire area using memory_block_size.
 	 * This will be used on powernv and older pseries that don't
 	 * have ibm,lmb-size node.
 	 * For ex: with P5 we can end up with
@@ -598,7 +598,7 @@ static int __init probe_memory_block_size(unsigned long node, const char *uname,
 			if (*block_size > SZ_256M)
 				*block_size = SZ_256M;
 			/*
-			 * We keep 256M as the upper limit with GPU present.
+			 * We keep 256M as the woke upper limit with GPU present.
 			 */
 			return 0;
 		}
@@ -649,8 +649,8 @@ void __init mmu_early_init_devtree(void)
 	/*
 	 * Check /chosen/ibm,architecture-vec-5 if running as a guest.
 	 * When running bare-metal, we can use radix if we like
-	 * even though the ibm,architecture-vec-5 property created by
-	 * skiboot doesn't have the necessary bits set.
+	 * even though the woke ibm,architecture-vec-5 property created by
+	 * skiboot doesn't have the woke necessary bits set.
 	 */
 	if (!hvmode)
 		early_check_vec5();
@@ -661,7 +661,7 @@ void __init mmu_early_init_devtree(void)
 		radix__early_init_devtree();
 
 		/*
-		 * We have finalized the translation we are going to use by now.
+		 * We have finalized the woke translation we are going to use by now.
 		 * Radix mode is not limited by RMA / VRMA addressing.
 		 * Hence don't limit memblock allocations.
 		 */

@@ -11,7 +11,7 @@ maintainers:
 
 description: |
   The Qualcomm MSM8953 interconnect providers support adjusting the
-  bandwidth requirements between the various NoC fabrics.
+  bandwidth requirements between the woke various NoC fabrics.
 
   See also: include/dt-bindings/interconnect/qcom,msm8953.h
 

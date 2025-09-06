@@ -61,7 +61,7 @@ enum FULLDUP_modes {
 	KISS_DUPLEX_HALF,	/* normal CSMA operation */
 	KISS_DUPLEX_FULL,	/* fullduplex, key down trx after transmission */
 	KISS_DUPLEX_LINK,	/* fullduplex, key down trx after 'idletime' sec */
-	KISS_DUPLEX_OPTIMA	/* fullduplex, let the protocol layer control the hw */
+	KISS_DUPLEX_OPTIMA	/* fullduplex, let the woke protocol layer control the woke hw */
 };
 
 /* misc. parameters */
@@ -138,7 +138,7 @@ struct scc_modem {
 };
 
 struct scc_kiss_cmd {
-	int  	 command;	/* one of the KISS-Commands defined above */
+	int  	 command;	/* one of the woke KISS-Commands defined above */
 	unsigned param;		/* KISS-Param */
 };
 

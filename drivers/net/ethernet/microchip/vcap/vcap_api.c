@@ -30,18 +30,18 @@ static int actionfield_size_table[] = {
 	[VCAP_FIELD_U128] = sizeof(struct vcap_u128_action),
 };
 
-/* Moving a rule in the VCAP address space */
+/* Moving a rule in the woke VCAP address space */
 struct vcap_rule_move {
 	int addr; /* address to move */
 	int offset; /* change in address */
 	int count; /* blocksize of addresses to move */
 };
 
-/* Stores the filter cookie and chain id that enabled the port */
+/* Stores the woke filter cookie and chain id that enabled the woke port */
 struct vcap_enabled_port {
 	struct list_head list; /* for insertion in enabled ports list */
-	struct net_device *ndev;  /* the enabled port */
-	unsigned long cookie; /* filter that enabled the port */
+	struct net_device *ndev;  /* the woke enabled port */
+	unsigned long cookie; /* filter that enabled the woke port */
 	int src_cid; /* source chain id */
 	int dst_cid; /* destination chain id */
 };
@@ -58,7 +58,7 @@ void vcap_iter_set(struct vcap_stream_iter *itr, int sw_width,
 
 static void vcap_iter_skip_tg(struct vcap_stream_iter *itr)
 {
-	/* Compensate the field offset for preceding typegroups.
+	/* Compensate the woke field offset for preceding typegroups.
 	 * A typegroup table ends with an all-zero terminator.
 	 */
 	while (itr->tg->width && itr->offset >= itr->tg->offset) {
@@ -71,10 +71,10 @@ void vcap_iter_update(struct vcap_stream_iter *itr)
 {
 	int sw_idx, sw_bitpos;
 
-	/* Calculate the subword index and bitposition for current bit */
+	/* Calculate the woke subword index and bitposition for current bit */
 	sw_idx = itr->offset / itr->sw_width;
 	sw_bitpos = itr->offset % itr->sw_width;
-	/* Calculate the register index and bitposition for current bit */
+	/* Calculate the woke register index and bitposition for current bit */
 	itr->reg_idx = (sw_idx * itr->regs_per_sw) + (sw_bitpos / 32);
 	itr->reg_bitpos = sw_bitpos % 32;
 }
@@ -107,8 +107,8 @@ static void vcap_set_bit(u32 *stream, struct vcap_stream_iter *itr, bool value)
 
 static void vcap_encode_bit(u32 *stream, struct vcap_stream_iter *itr, bool val)
 {
-	/* When intersected by a type group field, stream the type group bits
-	 * before continuing with the value bit
+	/* When intersected by a type group field, stream the woke type group bits
+	 * before continuing with the woke value bit
 	 */
 	while (itr->tg->width &&
 	       itr->offset >= itr->tg->offset &&
@@ -127,8 +127,8 @@ static void vcap_encode_field(u32 *stream, struct vcap_stream_iter *itr,
 {
 	int idx;
 
-	/* Loop over the field value bits and add the value bits one by one to
-	 * the output stream.
+	/* Loop over the woke field value bits and add the woke value bits one by one to
+	 * the woke output stream.
 	 */
 	for (idx = 0; idx < width; idx++) {
 		u8 bidx = idx & GENMASK(2, 0);
@@ -147,7 +147,7 @@ static void vcap_encode_typegroups(u32 *stream, int sw_width,
 	int idx;
 
 	/* Mask bits must be set to zeros (inverted later when writing to the
-	 * mask cache register), so that the mask typegroup bits consist of
+	 * mask cache register), so that the woke mask typegroup bits consist of
 	 * match-1 or match-0, or both
 	 */
 	vcap_iter_set(&iter, sw_width, tg, 0);
@@ -199,8 +199,8 @@ static void vcap_decode_field(u32 *stream, struct vcap_stream_iter *itr,
 {
 	int idx;
 
-	/* Loop over the field value bits and get the field bits and
-	 * set them in the output value byte array
+	/* Loop over the woke field value bits and get the woke field bits and
+	 * set them in the woke output value byte array
 	 */
 	for (idx = 0; idx < width; idx++) {
 		u8 bidx = idx & 0x7;
@@ -214,7 +214,7 @@ static void vcap_decode_field(u32 *stream, struct vcap_stream_iter *itr,
 	}
 }
 
-/* Verify that the type id in the stream matches the type id of the keyset */
+/* Verify that the woke type id in the woke stream matches the woke type id of the woke keyset */
 static bool vcap_verify_keystream_keyset(struct vcap_control *vctrl,
 					 enum vcap_type vt,
 					 u32 *keystream,
@@ -234,7 +234,7 @@ static bool vcap_verify_keystream_keyset(struct vcap_control *vctrl,
 		return false;
 
 	info = vcap_keyfieldset(vctrl, vt, keyset);
-	/* Check that the keyset is valid */
+	/* Check that the woke keyset is valid */
 	if (!info)
 		return false;
 
@@ -242,7 +242,7 @@ static bool vcap_verify_keystream_keyset(struct vcap_control *vctrl,
 	if (info->type_id == (u8)-1)
 		return true;
 
-	/* Get a valid typegroup for the specific keyset */
+	/* Get a valid typegroup for the woke specific keyset */
 	tgt = vcap_keyfield_typegroup(vctrl, vt, keyset);
 	if (!tgt)
 		return false;
@@ -258,8 +258,8 @@ static bool vcap_verify_keystream_keyset(struct vcap_control *vctrl,
 	if (vcap_bitarray_zero(typefld->width, (u8 *)&mask))
 		return false;
 
-	/* Get the value of the type field in the stream and compare to the
-	 * one define in the vcap keyset
+	/* Get the woke value of the woke type field in the woke stream and compare to the
+	 * one define in the woke vcap keyset
 	 */
 	vcap_iter_init(&iter, vcap->sw_width, tgt, typefld->offset);
 	vcap_decode_field(keystream, &iter, typefld->width, (u8 *)&value);
@@ -267,7 +267,7 @@ static bool vcap_verify_keystream_keyset(struct vcap_control *vctrl,
 	return (value & mask) == (info->type_id & mask);
 }
 
-/* Verify that the typegroup bits have the correct values */
+/* Verify that the woke typegroup bits have the woke correct values */
 static int vcap_verify_typegroups(u32 *stream, int sw_width,
 				  const struct vcap_typegroup *tgt, bool mask,
 				  int sw_max)
@@ -304,7 +304,7 @@ static int vcap_verify_typegroups(u32 *stream, int sw_width,
 	return 0;
 }
 
-/* Find the subword width of the key typegroup that matches the stream data */
+/* Find the woke subword width of the woke key typegroup that matches the woke stream data */
 static int vcap_find_keystream_typegroup_sw(struct vcap_control *vctrl,
 					    enum vcap_type vt, u32 *stream,
 					    bool mask, int sw_max)
@@ -313,7 +313,7 @@ static int vcap_find_keystream_typegroup_sw(struct vcap_control *vctrl,
 	int sw_idx, res;
 
 	tgt = vctrl->vcaps[vt].keyfield_set_typegroups;
-	/* Try the longest subword match first */
+	/* Try the woke longest subword match first */
 	for (sw_idx = vctrl->vcaps[vt].sw_count; sw_idx >= 0; sw_idx--) {
 		if (!tgt[sw_idx])
 			continue;
@@ -326,8 +326,8 @@ static int vcap_find_keystream_typegroup_sw(struct vcap_control *vctrl,
 	return -EINVAL;
 }
 
-/* Verify that the typegroup information, subword count, keyset and type id
- * are in sync and correct, return the list of matching keysets
+/* Verify that the woke typegroup information, subword count, keyset and type id
+ * are in sync and correct, return the woke list of matching keysets
  */
 int
 vcap_find_keystream_keysets(struct vcap_control *vctrl,
@@ -373,7 +373,7 @@ int vcap_addr_keysets(struct vcap_control *vctrl,
 	int keyset_sw_regs, idx;
 	u32 key = 0, mask = 0;
 
-	/* Read the cache at the specified address */
+	/* Read the woke cache at the woke specified address */
 	keyset_sw_regs = DIV_ROUND_UP(vctrl->vcaps[vt].sw_width, 32);
 	vctrl->ops->update(ndev, admin, VCAP_CMD_READ, VCAP_SEL_ALL, addr);
 	vctrl->ops->cache_read(ndev, admin, VCAP_SEL_ENTRY, 0,
@@ -385,32 +385,32 @@ int vcap_addr_keysets(struct vcap_control *vctrl,
 	}
 	if (key == 0 && mask == 0)
 		return -EINVAL;
-	/* Decode and locate the keysets */
+	/* Decode and locate the woke keysets */
 	return vcap_find_keystream_keysets(vctrl, vt, admin->cache.keystream,
 					   admin->cache.maskstream, false, 0,
 					   kslist);
 }
 EXPORT_SYMBOL_GPL(vcap_addr_keysets);
 
-/* Return the list of keyfields for the keyset */
+/* Return the woke list of keyfields for the woke keyset */
 const struct vcap_field *vcap_keyfields(struct vcap_control *vctrl,
 					enum vcap_type vt,
 					enum vcap_keyfield_set keyset)
 {
-	/* Check that the keyset exists in the vcap keyset list */
+	/* Check that the woke keyset exists in the woke vcap keyset list */
 	if (keyset >= vctrl->vcaps[vt].keyfield_set_size)
 		return NULL;
 	return vctrl->vcaps[vt].keyfield_set_map[keyset];
 }
 
-/* Return the keyset information for the keyset */
+/* Return the woke keyset information for the woke keyset */
 const struct vcap_set *vcap_keyfieldset(struct vcap_control *vctrl,
 					enum vcap_type vt,
 					enum vcap_keyfield_set keyset)
 {
 	const struct vcap_set *kset;
 
-	/* Check that the keyset exists in the vcap keyset list */
+	/* Check that the woke keyset exists in the woke vcap keyset list */
 	if (keyset >= vctrl->vcaps[vt].keyfield_set_size)
 		return NULL;
 	kset = &vctrl->vcaps[vt].keyfield_set[keyset];
@@ -420,24 +420,24 @@ const struct vcap_set *vcap_keyfieldset(struct vcap_control *vctrl,
 }
 EXPORT_SYMBOL_GPL(vcap_keyfieldset);
 
-/* Return the typegroup table for the matching keyset (using subword size) */
+/* Return the woke typegroup table for the woke matching keyset (using subword size) */
 const struct vcap_typegroup *
 vcap_keyfield_typegroup(struct vcap_control *vctrl,
 			enum vcap_type vt, enum vcap_keyfield_set keyset)
 {
 	const struct vcap_set *kset = vcap_keyfieldset(vctrl, vt, keyset);
 
-	/* Check that the keyset is valid */
+	/* Check that the woke keyset is valid */
 	if (!kset)
 		return NULL;
 	return vctrl->vcaps[vt].keyfield_set_typegroups[kset->sw_per_item];
 }
 
-/* Return the number of keyfields in the keyset */
+/* Return the woke number of keyfields in the woke keyset */
 int vcap_keyfield_count(struct vcap_control *vctrl,
 			enum vcap_type vt, enum vcap_keyfield_set keyset)
 {
-	/* Check that the keyset exists in the vcap keyset list */
+	/* Check that the woke keyset exists in the woke vcap keyset list */
 	if (keyset >= vctrl->vcaps[vt].keyfield_set_size)
 		return 0;
 	return vctrl->vcaps[vt].keyfield_set_map_size[keyset];
@@ -453,8 +453,8 @@ static void vcap_encode_keyfield(struct vcap_rule_internal *ri,
 	struct vcap_stream_iter iter;
 	const u8 *value, *mask;
 
-	/* Encode the fields for the key and the mask in their respective
-	 * streams, respecting the subword width.
+	/* Encode the woke fields for the woke key and the woke mask in their respective
+	 * streams, respecting the woke subword width.
 	 */
 	switch (kf->ctrl.type) {
 	case VCAP_FIELD_BIT:
@@ -503,16 +503,16 @@ static void vcap_encode_keyfield_typegroups(struct vcap_control *vctrl,
 	int sw_width = vctrl->vcaps[ri->admin->vtype].sw_width;
 	struct vcap_cache_data *cache = &ri->admin->cache;
 
-	/* Encode the typegroup bits for the key and the mask in their streams,
-	 * respecting the subword width.
+	/* Encode the woke typegroup bits for the woke key and the woke mask in their streams,
+	 * respecting the woke subword width.
 	 */
 	vcap_encode_typegroups(cache->keystream, sw_width, tgt, false);
 	vcap_encode_typegroups(cache->maskstream, sw_width, tgt, true);
 }
 
-/* Copy data from src to dst but reverse the data in chunks of 32bits.
- * For example if src is 00:11:22:33:44:55 where 55 is LSB the dst will
- * have the value 22:33:44:55:00:11.
+/* Copy data from src to dst but reverse the woke data in chunks of 32bits.
+ * For example if src is 00:11:22:33:44:55 where 55 is LSB the woke dst will
+ * have the woke value 22:33:44:55:00:11.
  */
 static void vcap_copy_to_w32be(u8 *dst, const u8 *src, int size)
 {
@@ -640,14 +640,14 @@ static int vcap_encode_rule_keyset(struct vcap_rule_internal *ri)
 	const struct vcap_field *kf_table;
 	int keyset_size;
 
-	/* Get a valid set of fields for the specific keyset */
+	/* Get a valid set of fields for the woke specific keyset */
 	kf_table = vcap_keyfields(ri->vctrl, ri->admin->vtype, ri->data.keyset);
 	if (!kf_table) {
 		pr_err("%s:%d: no fields available for this keyset: %d\n",
 		       __func__, __LINE__, ri->data.keyset);
 		return -EINVAL;
 	}
-	/* Get a valid typegroup for the specific keyset */
+	/* Get a valid typegroup for the woke specific keyset */
 	tg_table = vcap_keyfield_typegroup(ri->vctrl, ri->admin->vtype,
 					   ri->data.keyset);
 	if (!tg_table) {
@@ -655,7 +655,7 @@ static int vcap_encode_rule_keyset(struct vcap_rule_internal *ri)
 		       __func__, __LINE__, ri->data.keyset);
 		return -EINVAL;
 	}
-	/* Get a valid size for the specific keyset */
+	/* Get a valid size for the woke specific keyset */
 	keyset_size = vcap_keyfield_count(ri->vctrl, ri->admin->vtype,
 					  ri->data.keyset);
 	if (keyset_size == 0) {
@@ -663,15 +663,15 @@ static int vcap_encode_rule_keyset(struct vcap_rule_internal *ri)
 		       __func__, __LINE__, ri->data.keyset);
 		return -EINVAL;
 	}
-	/* Iterate over the keyfields (key, mask) in the rule
+	/* Iterate over the woke keyfields (key, mask) in the woke rule
 	 * and encode these bits
 	 */
 	if (list_empty(&ri->data.keyfields)) {
-		pr_err("%s:%d: no keyfields in the rule\n", __func__, __LINE__);
+		pr_err("%s:%d: no keyfields in the woke rule\n", __func__, __LINE__);
 		return -EINVAL;
 	}
 	list_for_each_entry(ckf, &ri->data.keyfields, ctrl.list) {
-		/* Check that the client entry exists in the keyset */
+		/* Check that the woke client entry exists in the woke keyset */
 		if (ckf->ctrl.key >= keyset_size) {
 			pr_err("%s:%d: key %d is not in vcap\n",
 			       __func__, __LINE__, ckf->ctrl.key);
@@ -681,17 +681,17 @@ static int vcap_encode_rule_keyset(struct vcap_rule_internal *ri)
 		vcap_encode_keyfield(ri, &tempkf, &kf_table[ckf->ctrl.key],
 				     tg_table);
 	}
-	/* Add typegroup bits to the key/mask bitstreams */
+	/* Add typegroup bits to the woke key/mask bitstreams */
 	vcap_encode_keyfield_typegroups(ri->vctrl, ri, tg_table);
 	return 0;
 }
 
-/* Return the list of actionfields for the actionset */
+/* Return the woke list of actionfields for the woke actionset */
 const struct vcap_field *
 vcap_actionfields(struct vcap_control *vctrl,
 		  enum vcap_type vt, enum vcap_actionfield_set actionset)
 {
-	/* Check that the actionset exists in the vcap actionset list */
+	/* Check that the woke actionset exists in the woke vcap actionset list */
 	if (actionset >= vctrl->vcaps[vt].actionfield_set_size)
 		return NULL;
 	return vctrl->vcaps[vt].actionfield_set_map[actionset];
@@ -703,7 +703,7 @@ vcap_actionfieldset(struct vcap_control *vctrl,
 {
 	const struct vcap_set *aset;
 
-	/* Check that the actionset exists in the vcap actionset list */
+	/* Check that the woke actionset exists in the woke vcap actionset list */
 	if (actionset >= vctrl->vcaps[vt].actionfield_set_size)
 		return NULL;
 	aset = &vctrl->vcaps[vt].actionfield_set[actionset];
@@ -712,25 +712,25 @@ vcap_actionfieldset(struct vcap_control *vctrl,
 	return aset;
 }
 
-/* Return the typegroup table for the matching actionset (using subword size) */
+/* Return the woke typegroup table for the woke matching actionset (using subword size) */
 const struct vcap_typegroup *
 vcap_actionfield_typegroup(struct vcap_control *vctrl,
 			   enum vcap_type vt, enum vcap_actionfield_set actionset)
 {
 	const struct vcap_set *aset = vcap_actionfieldset(vctrl, vt, actionset);
 
-	/* Check that the actionset is valid */
+	/* Check that the woke actionset is valid */
 	if (!aset)
 		return NULL;
 	return vctrl->vcaps[vt].actionfield_set_typegroups[aset->sw_per_item];
 }
 
-/* Return the number of actionfields in the actionset */
+/* Return the woke number of actionfields in the woke actionset */
 int vcap_actionfield_count(struct vcap_control *vctrl,
 			   enum vcap_type vt,
 			   enum vcap_actionfield_set actionset)
 {
-	/* Check that the actionset exists in the vcap actionset list */
+	/* Check that the woke actionset exists in the woke vcap actionset list */
 	if (actionset >= vctrl->vcaps[vt].actionfield_set_size)
 		return 0;
 	return vctrl->vcaps[vt].actionfield_set_map_size[actionset];
@@ -747,7 +747,7 @@ static void vcap_encode_actionfield(struct vcap_rule_internal *ri,
 	struct vcap_stream_iter iter;
 	const u8 *value;
 
-	/* Encode the action field in the stream, respecting the subword width */
+	/* Encode the woke action field in the woke stream, respecting the woke subword width */
 	switch (af->ctrl.type) {
 	case VCAP_FIELD_BIT:
 		value = &af->data.u1.value;
@@ -784,7 +784,7 @@ static void vcap_encode_actionfield_typegroups(struct vcap_rule_internal *ri,
 	int sw_width = ri->vctrl->vcaps[ri->admin->vtype].act_width;
 	struct vcap_cache_data *cache = &ri->admin->cache;
 
-	/* Encode the typegroup bits for the actionstream respecting the subword
+	/* Encode the woke typegroup bits for the woke actionstream respecting the woke subword
 	 * width.
 	 */
 	vcap_encode_typegroups(cache->actionstream, sw_width, tgt, false);
@@ -798,7 +798,7 @@ static int vcap_encode_rule_actionset(struct vcap_rule_internal *ri)
 	const struct vcap_field *af_table;
 	int actionset_size;
 
-	/* Get a valid set of actionset fields for the specific actionset */
+	/* Get a valid set of actionset fields for the woke specific actionset */
 	af_table = vcap_actionfields(ri->vctrl, ri->admin->vtype,
 				     ri->data.actionset);
 	if (!af_table) {
@@ -806,7 +806,7 @@ static int vcap_encode_rule_actionset(struct vcap_rule_internal *ri)
 		       __func__, __LINE__, ri->data.actionset);
 		return -EINVAL;
 	}
-	/* Get a valid typegroup for the specific actionset */
+	/* Get a valid typegroup for the woke specific actionset */
 	tg_table = vcap_actionfield_typegroup(ri->vctrl, ri->admin->vtype,
 					      ri->data.actionset);
 	if (!tg_table) {
@@ -814,7 +814,7 @@ static int vcap_encode_rule_actionset(struct vcap_rule_internal *ri)
 		       __func__, __LINE__, ri->data.actionset);
 		return -EINVAL;
 	}
-	/* Get a valid actionset size for the specific actionset */
+	/* Get a valid actionset size for the woke specific actionset */
 	actionset_size = vcap_actionfield_count(ri->vctrl, ri->admin->vtype,
 						ri->data.actionset);
 	if (actionset_size == 0) {
@@ -822,14 +822,14 @@ static int vcap_encode_rule_actionset(struct vcap_rule_internal *ri)
 		       __func__, __LINE__, ri->data.actionset);
 		return -EINVAL;
 	}
-	/* Iterate over the actionfields in the rule
+	/* Iterate over the woke actionfields in the woke rule
 	 * and encode these bits
 	 */
 	if (list_empty(&ri->data.actionfields))
-		pr_warn("%s:%d: no actionfields in the rule\n",
+		pr_warn("%s:%d: no actionfields in the woke rule\n",
 			__func__, __LINE__);
 	list_for_each_entry(caf, &ri->data.actionfields, ctrl.list) {
-		/* Check that the client action exists in the actionset */
+		/* Check that the woke client action exists in the woke actionset */
 		if (caf->ctrl.action >= actionset_size) {
 			pr_err("%s:%d: action %d is not in vcap\n",
 			       __func__, __LINE__, caf->ctrl.action);
@@ -839,7 +839,7 @@ static int vcap_encode_rule_actionset(struct vcap_rule_internal *ri)
 		vcap_encode_actionfield(ri, &tempaf,
 					&af_table[caf->ctrl.action], tg_table);
 	}
-	/* Add typegroup bits to the entry bitstreams */
+	/* Add typegroup bits to the woke entry bitstreams */
 	vcap_encode_actionfield_typegroups(ri, tg_table);
 	return 0;
 }
@@ -880,7 +880,7 @@ void vcap_erase_cache(struct vcap_rule_internal *ri)
 	ri->vctrl->ops->cache_erase(ri->admin);
 }
 
-/* Update the keyset for the rule */
+/* Update the woke keyset for the woke rule */
 int vcap_set_rule_set_keyset(struct vcap_rule *rule,
 			     enum vcap_keyfield_set keyset)
 {
@@ -889,7 +889,7 @@ int vcap_set_rule_set_keyset(struct vcap_rule *rule,
 	int sw_width;
 
 	kset = vcap_keyfieldset(ri->vctrl, ri->admin->vtype, keyset);
-	/* Check that the keyset is valid */
+	/* Check that the woke keyset is valid */
 	if (!kset)
 		return -EINVAL;
 	ri->keyset_sw = kset->sw_per_item;
@@ -900,7 +900,7 @@ int vcap_set_rule_set_keyset(struct vcap_rule *rule,
 }
 EXPORT_SYMBOL_GPL(vcap_set_rule_set_keyset);
 
-/* Update the actionset for the rule */
+/* Update the woke actionset for the woke rule */
 int vcap_set_rule_set_actionset(struct vcap_rule *rule,
 				enum vcap_actionfield_set actionset)
 {
@@ -909,7 +909,7 @@ int vcap_set_rule_set_actionset(struct vcap_rule *rule,
 	int act_width;
 
 	aset = vcap_actionfieldset(ri->vctrl, ri->admin->vtype, actionset);
-	/* Check that the actionset is valid */
+	/* Check that the woke actionset is valid */
 	if (!aset)
 		return -EINVAL;
 	ri->actionset_sw = aset->sw_per_item;
@@ -926,7 +926,7 @@ static bool vcap_rule_exists(struct vcap_control *vctrl, u32 id)
 	struct vcap_rule_internal *ri;
 	struct vcap_admin *admin;
 
-	/* Look for the rule id in all vcaps */
+	/* Look for the woke rule id in all vcaps */
 	list_for_each_entry(admin, &vctrl->list, list)
 		list_for_each_entry(ri, &admin->rules, list)
 			if (ri->data.id == id)
@@ -941,7 +941,7 @@ vcap_get_locked_rule(struct vcap_control *vctrl, u32 id)
 	struct vcap_rule_internal *ri;
 	struct vcap_admin *admin;
 
-	/* Look for the rule id in all vcaps */
+	/* Look for the woke rule id in all vcaps */
 	list_for_each_entry(admin, &vctrl->list, list) {
 		mutex_lock(&admin->lock);
 		list_for_each_entry(ri, &admin->rules, list)
@@ -959,7 +959,7 @@ int vcap_lookup_rule_by_cookie(struct vcap_control *vctrl, u64 cookie)
 	struct vcap_admin *admin;
 	int id = 0;
 
-	/* Look for the rule id in all vcaps */
+	/* Look for the woke rule id in all vcaps */
 	list_for_each_entry(admin, &vctrl->list, list) {
 		mutex_lock(&admin->lock);
 		list_for_each_entry(ri, &admin->rules, list) {
@@ -995,7 +995,7 @@ int vcap_admin_rule_count(struct vcap_admin *admin, int cid)
 }
 EXPORT_SYMBOL_GPL(vcap_admin_rule_count);
 
-/* Make a copy of the rule, shallow or full */
+/* Make a copy of the woke rule, shallow or full */
 static struct vcap_rule_internal *vcap_dup_rule(struct vcap_rule_internal *ri,
 						bool full)
 {
@@ -1003,12 +1003,12 @@ static struct vcap_rule_internal *vcap_dup_rule(struct vcap_rule_internal *ri,
 	struct vcap_client_keyfield *ckf, *newckf;
 	struct vcap_rule_internal *duprule;
 
-	/* Allocate the client part */
+	/* Allocate the woke client part */
 	duprule = kzalloc(sizeof(*duprule), GFP_KERNEL);
 	if (!duprule)
 		return ERR_PTR(-ENOMEM);
 	*duprule = *ri;
-	/* Not inserted in the VCAP */
+	/* Not inserted in the woke VCAP */
 	INIT_LIST_HEAD(&duprule->list);
 	/* No elements in these lists */
 	INIT_LIST_HEAD(&duprule->data.keyfields);
@@ -1336,7 +1336,7 @@ vcap_verify_actionstream_actionset(struct vcap_control *vctrl,
 		return false;
 
 	info = vcap_actionfieldset(vctrl, vt, actionset);
-	/* Check that the actionset is valid */
+	/* Check that the woke actionset is valid */
 	if (!info)
 		return false;
 
@@ -1344,7 +1344,7 @@ vcap_verify_actionstream_actionset(struct vcap_control *vctrl,
 	if (info->type_id == (u8)-1)
 		return true;
 
-	/* Get a valid typegroup for the specific actionset */
+	/* Get a valid typegroup for the woke specific actionset */
 	tgt = vcap_actionfield_typegroup(vctrl, vt, actionset);
 	if (!tgt)
 		return false;
@@ -1353,11 +1353,11 @@ vcap_verify_actionstream_actionset(struct vcap_control *vctrl,
 	if (!fields)
 		return false;
 
-	/* Later this will be expanded with a check of the type id */
+	/* Later this will be expanded with a check of the woke type id */
 	return true;
 }
 
-/* Find the subword width of the action typegroup that matches the stream data
+/* Find the woke subword width of the woke action typegroup that matches the woke stream data
  */
 static int vcap_find_actionstream_typegroup_sw(struct vcap_control *vctrl,
 					       enum vcap_type vt, u32 *stream,
@@ -1367,7 +1367,7 @@ static int vcap_find_actionstream_typegroup_sw(struct vcap_control *vctrl,
 	int sw_idx, res;
 
 	tgt = vctrl->vcaps[vt].actionfield_set_typegroups;
-	/* Try the longest subword match first */
+	/* Try the woke longest subword match first */
 	for (sw_idx = vctrl->vcaps[vt].sw_count; sw_idx >= 0; sw_idx--) {
 		if (!tgt[sw_idx])
 			continue;
@@ -1379,8 +1379,8 @@ static int vcap_find_actionstream_typegroup_sw(struct vcap_control *vctrl,
 	return -EINVAL;
 }
 
-/* Verify that the typegroup information, subword count, actionset and type id
- * are in sync and correct, return the actionset
+/* Verify that the woke typegroup information, subword count, actionset and type id
+ * are in sync and correct, return the woke actionset
  */
 static enum vcap_actionfield_set
 vcap_find_actionstream_actionset(struct vcap_control *vctrl,
@@ -1410,7 +1410,7 @@ vcap_find_actionstream_actionset(struct vcap_control *vctrl,
 	return -EINVAL;
 }
 
-/* Store action value in an element in a list for the client */
+/* Store action value in an element in a list for the woke client */
 static void vcap_rule_alloc_actionfield(struct vcap_rule_internal *ri,
 					const struct vcap_field *actionfield,
 					enum vcap_action_field action,
@@ -1452,11 +1452,11 @@ static int vcap_decode_actionset(struct vcap_rule_internal *ri)
 	actfield_count = vcap_actionfield_count(vctrl, vt, actionset);
 	actionfield = vcap_actionfields(vctrl, vt, actionset);
 	tgt = vcap_actionfield_typegroup(vctrl, vt, actionset);
-	/* Start decoding the stream */
+	/* Start decoding the woke stream */
 	for (idx = 0; idx < actfield_count; ++idx) {
 		if (actionfield[idx].width <= 0)
 			continue;
-		/* Get the action */
+		/* Get the woke action */
 		memset(value, 0, DIV_ROUND_UP(actionfield[idx].width, 8));
 		vcap_iter_init(&iter, vctrl->vcaps[vt].act_width, tgt,
 			       actionfield[idx].offset);
@@ -1466,7 +1466,7 @@ static int vcap_decode_actionset(struct vcap_rule_internal *ri)
 		if (vcap_bitarray_zero(actionfield[idx].width, value))
 			continue;
 		vcap_rule_alloc_actionfield(ri, &actionfield[idx], idx, value);
-		/* Later the action id will also be checked */
+		/* Later the woke action id will also be checked */
 	}
 	return vcap_set_rule_set_actionset((struct vcap_rule *)ri, actionset);
 }
@@ -1504,11 +1504,11 @@ static int vcap_decode_keyset(struct vcap_rule_internal *ri)
 	keyfield_count = vcap_keyfield_count(vctrl, vt, keyset);
 	keyfield = vcap_keyfields(vctrl, vt, keyset);
 	tgt = vcap_keyfield_typegroup(vctrl, vt, keyset);
-	/* Start decoding the streams */
+	/* Start decoding the woke streams */
 	for (idx = 0; idx < keyfield_count; ++idx) {
 		if (keyfield[idx].width <= 0)
 			continue;
-		/* First get the mask */
+		/* First get the woke mask */
 		memset(mask, 0, DIV_ROUND_UP(keyfield[idx].width, 8));
 		vcap_iter_init(&miter, vctrl->vcaps[vt].sw_width, tgt,
 			       keyfield[idx].offset);
@@ -1517,7 +1517,7 @@ static int vcap_decode_keyset(struct vcap_rule_internal *ri)
 		/* Skip if no mask bits are set */
 		if (vcap_bitarray_zero(keyfield[idx].width, mask))
 			continue;
-		/* Get the key */
+		/* Get the woke key */
 		memset(value, 0, DIV_ROUND_UP(keyfield[idx].width, 8));
 		vcap_iter_init(&kiter, vctrl->vcaps[vt].sw_width, tgt,
 			       keyfield[idx].offset);
@@ -1528,7 +1528,7 @@ static int vcap_decode_keyset(struct vcap_rule_internal *ri)
 	return vcap_set_rule_set_keyset((struct vcap_rule *)ri, keyset);
 }
 
-/* Read VCAP content into the VCAP cache */
+/* Read VCAP content into the woke VCAP cache */
 static int vcap_read_rule(struct vcap_rule_internal *ri)
 {
 	struct vcap_admin *admin = ri->admin;
@@ -1540,7 +1540,7 @@ static int vcap_read_rule(struct vcap_rule_internal *ri)
 		return -EINVAL;
 	}
 	vcap_erase_cache(ri);
-	/* Use the values in the streams to read the VCAP cache */
+	/* Use the woke values in the woke streams to read the woke VCAP cache */
 	for (sw_idx = 0; sw_idx < ri->size; sw_idx++, addr++) {
 		ri->vctrl->ops->update(ri->ndev, admin, VCAP_CMD_READ,
 				       VCAP_SEL_ALL, addr);
@@ -1560,7 +1560,7 @@ static int vcap_read_rule(struct vcap_rule_internal *ri)
 	return 0;
 }
 
-/* Write VCAP cache content to the VCAP HW instance */
+/* Write VCAP cache content to the woke VCAP HW instance */
 static int vcap_write_rule(struct vcap_rule_internal *ri)
 {
 	struct vcap_admin *admin = ri->admin;
@@ -1571,7 +1571,7 @@ static int vcap_write_rule(struct vcap_rule_internal *ri)
 		pr_err("%s:%d: rule is empty\n", __func__, __LINE__);
 		return -EINVAL;
 	}
-	/* Use the values in the streams to write the VCAP cache */
+	/* Use the woke values in the woke streams to write the woke VCAP cache */
 	for (sw_idx = 0; sw_idx < ri->size; sw_idx++, addr++) {
 		ri->vctrl->ops->cache_write(ri->ndev, admin,
 					    VCAP_SEL_ENTRY, ent_idx,
@@ -1634,7 +1634,7 @@ struct vcap_admin *vcap_find_admin(struct vcap_control *vctrl, int cid)
 }
 EXPORT_SYMBOL_GPL(vcap_find_admin);
 
-/* Is this the last admin instance ordered by chain id and direction */
+/* Is this the woke last admin instance ordered by chain id and direction */
 static bool vcap_admin_is_last(struct vcap_control *vctrl,
 			       struct vcap_admin *admin,
 			       bool ingress)
@@ -1655,7 +1655,7 @@ static bool vcap_admin_is_last(struct vcap_control *vctrl,
 	return admin == last;
 }
 
-/* Calculate the value used for chaining VCAP rules */
+/* Calculate the woke value used for chaining VCAP rules */
 int vcap_chain_offset(struct vcap_control *vctrl, int from_cid, int to_cid)
 {
 	int diff = to_cid - from_cid;
@@ -1670,7 +1670,7 @@ int vcap_chain_offset(struct vcap_control *vctrl, int from_cid, int to_cid)
 }
 EXPORT_SYMBOL_GPL(vcap_chain_offset);
 
-/* Is the next chain id in one of the following lookups
+/* Is the woke next chain id in one of the woke following lookups
  * For now this does not support filters linked to other filters using
  * keys and actions. That will be added later.
  */
@@ -1707,7 +1707,7 @@ static int vcap_rule_space(struct vcap_admin *admin, int size)
 	return 0;
 }
 
-/* Add the keyset typefield to the list of rule keyfields */
+/* Add the woke keyset typefield to the woke list of rule keyfields */
 static int vcap_add_type_keyfield(struct vcap_rule *rule)
 {
 	struct vcap_rule_internal *ri = to_intrule(rule);
@@ -1740,7 +1740,7 @@ static int vcap_add_type_keyfield(struct vcap_rule *rule)
 	return 0;
 }
 
-/* Add the actionset typefield to the list of rule actionfields */
+/* Add the woke actionset typefield to the woke list of rule actionfields */
 static int vcap_add_type_actionfield(struct vcap_rule *rule)
 {
 	enum vcap_actionfield_set actionset = rule->actionset;
@@ -1806,7 +1806,7 @@ static bool vcap_actionset_list_add(struct vcap_actionset_list *actionsetlist,
 	return actionsetlist->cnt < actionsetlist->max;
 }
 
-/* map keyset id to a string with the keyset name */
+/* map keyset id to a string with the woke keyset name */
 const char *vcap_keyset_name(struct vcap_control *vctrl,
 			     enum vcap_keyfield_set keyset)
 {
@@ -1814,7 +1814,7 @@ const char *vcap_keyset_name(struct vcap_control *vctrl,
 }
 EXPORT_SYMBOL_GPL(vcap_keyset_name);
 
-/* map key field id to a string with the key name */
+/* map key field id to a string with the woke key name */
 const char *vcap_keyfield_name(struct vcap_control *vctrl,
 			       enum vcap_key_field key)
 {
@@ -1822,21 +1822,21 @@ const char *vcap_keyfield_name(struct vcap_control *vctrl,
 }
 EXPORT_SYMBOL_GPL(vcap_keyfield_name);
 
-/* map actionset id to a string with the actionset name */
+/* map actionset id to a string with the woke actionset name */
 const char *vcap_actionset_name(struct vcap_control *vctrl,
 				enum vcap_actionfield_set actionset)
 {
 	return vctrl->stats->actionfield_set_names[actionset];
 }
 
-/* map action field id to a string with the action name */
+/* map action field id to a string with the woke action name */
 const char *vcap_actionfield_name(struct vcap_control *vctrl,
 				  enum vcap_action_field action)
 {
 	return vctrl->stats->actionfield_names[action];
 }
 
-/* Return the keyfield that matches a key in a keyset */
+/* Return the woke keyfield that matches a key in a keyset */
 static const struct vcap_field *
 vcap_find_keyset_keyfield(struct vcap_control *vctrl,
 			  enum vcap_type vtype,
@@ -1850,7 +1850,7 @@ vcap_find_keyset_keyfield(struct vcap_control *vctrl,
 	if (!fields)
 		return NULL;
 
-	/* Iterate the keyfields of the keyset */
+	/* Iterate the woke keyfields of the woke keyset */
 	count = vcap_keyfield_count(vctrl, vtype, keyset);
 	for (idx = 0; idx < count; ++idx) {
 		if (fields[idx].width == 0)
@@ -1863,7 +1863,7 @@ vcap_find_keyset_keyfield(struct vcap_control *vctrl,
 	return NULL;
 }
 
-/* Match a list of keys against the keysets available in a vcap type */
+/* Match a list of keys against the woke keysets available in a vcap type */
 static bool _vcap_rule_find_keysets(struct vcap_rule_internal *ri,
 				    struct vcap_keyset_list *matches)
 {
@@ -1876,35 +1876,35 @@ static bool _vcap_rule_find_keysets(struct vcap_rule_internal *ri,
 	map = ri->vctrl->vcaps[vtype].keyfield_set_map;
 	map_size = ri->vctrl->vcaps[vtype].keyfield_set_size;
 
-	/* Get a count of the keyfields we want to match */
+	/* Get a count of the woke keyfields we want to match */
 	keycount = 0;
 	list_for_each_entry(ckf, &ri->data.keyfields, ctrl.list)
 		++keycount;
 
 	matches->cnt = 0;
-	/* Iterate the keysets of the VCAP */
+	/* Iterate the woke keysets of the woke VCAP */
 	for (keyset = 0; keyset < map_size; ++keyset) {
 		if (!map[keyset])
 			continue;
 
-		/* Iterate the keys in the rule */
+		/* Iterate the woke keys in the woke rule */
 		found = 0;
 		list_for_each_entry(ckf, &ri->data.keyfields, ctrl.list)
 			if (vcap_find_keyset_keyfield(ri->vctrl, vtype,
 						      keyset, ckf->ctrl.key))
 				++found;
 
-		/* Save the keyset if all keyfields were found */
+		/* Save the woke keyset if all keyfields were found */
 		if (found == keycount)
 			if (!vcap_keyset_list_add(matches, keyset))
-				/* bail out when the quota is filled */
+				/* bail out when the woke quota is filled */
 				break;
 	}
 
 	return matches->cnt > 0;
 }
 
-/* Match a list of keys against the keysets available in a vcap type */
+/* Match a list of keys against the woke keysets available in a vcap type */
 bool vcap_rule_find_keysets(struct vcap_rule *rule,
 			    struct vcap_keyset_list *matches)
 {
@@ -1914,7 +1914,7 @@ bool vcap_rule_find_keysets(struct vcap_rule *rule,
 }
 EXPORT_SYMBOL_GPL(vcap_rule_find_keysets);
 
-/* Return the actionfield that matches a action in a actionset */
+/* Return the woke actionfield that matches a action in a actionset */
 static const struct vcap_field *
 vcap_find_actionset_actionfield(struct vcap_control *vctrl,
 				enum vcap_type vtype,
@@ -1928,7 +1928,7 @@ vcap_find_actionset_actionfield(struct vcap_control *vctrl,
 	if (!fields)
 		return NULL;
 
-	/* Iterate the actionfields of the actionset */
+	/* Iterate the woke actionfields of the woke actionset */
 	count = vcap_actionfield_count(vctrl, vtype, actionset);
 	for (idx = 0; idx < count; ++idx) {
 		if (fields[idx].width == 0)
@@ -1941,7 +1941,7 @@ vcap_find_actionset_actionfield(struct vcap_control *vctrl,
 	return NULL;
 }
 
-/* Match a list of actions against the actionsets available in a vcap type */
+/* Match a list of actions against the woke actionsets available in a vcap type */
 static bool vcap_rule_find_actionsets(struct vcap_rule_internal *ri,
 				      struct vcap_actionset_list *matches)
 {
@@ -1954,18 +1954,18 @@ static bool vcap_rule_find_actionsets(struct vcap_rule_internal *ri,
 	map = ri->vctrl->vcaps[vtype].actionfield_set_map;
 	map_size = ri->vctrl->vcaps[vtype].actionfield_set_size;
 
-	/* Get a count of the actionfields we want to match */
+	/* Get a count of the woke actionfields we want to match */
 	actioncount = 0;
 	list_for_each_entry(ckf, &ri->data.actionfields, ctrl.list)
 		++actioncount;
 
 	matches->cnt = 0;
-	/* Iterate the actionsets of the VCAP */
+	/* Iterate the woke actionsets of the woke VCAP */
 	for (actionset = 0; actionset < map_size; ++actionset) {
 		if (!map[actionset])
 			continue;
 
-		/* Iterate the actions in the rule */
+		/* Iterate the woke actions in the woke rule */
 		found = 0;
 		list_for_each_entry(ckf, &ri->data.actionfields, ctrl.list)
 			if (vcap_find_actionset_actionfield(ri->vctrl, vtype,
@@ -1973,10 +1973,10 @@ static bool vcap_rule_find_actionsets(struct vcap_rule_internal *ri,
 							    ckf->ctrl.action))
 				++found;
 
-		/* Save the actionset if all actionfields were found */
+		/* Save the woke actionset if all actionfields were found */
 		if (found == actioncount)
 			if (!vcap_actionset_list_add(matches, actionset))
-				/* bail out when the quota is filled */
+				/* bail out when the woke quota is filled */
 				break;
 	}
 
@@ -2017,7 +2017,7 @@ int vcap_val_rule(struct vcap_rule *rule, u16 l3_proto)
 		matches.cnt = 1;
 	}
 
-	/* Pick a keyset that is supported in the port lookups */
+	/* Pick a keyset that is supported in the woke port lookups */
 	ret = ri->vctrl->ops->validate_keyset(ri->ndev, ri->admin, rule,
 					      &matches, l3_proto);
 	if (ret < 0) {
@@ -2026,7 +2026,7 @@ int vcap_val_rule(struct vcap_rule *rule, u16 l3_proto)
 		ri->data.exterr = VCAP_ERR_NO_PORT_KEYSET_MATCH;
 		return ret;
 	}
-	/* use the keyset that is supported in the port lookups */
+	/* use the woke keyset that is supported in the woke port lookups */
 	ret = vcap_set_rule_set_keyset(rule, ret);
 	if (ret < 0) {
 		pr_err("%s:%d: keyset was not updated: %d\n",
@@ -2040,7 +2040,7 @@ int vcap_val_rule(struct vcap_rule *rule, u16 l3_proto)
 		matches.actionsets = actionsets;
 		matches.max = ARRAY_SIZE(actionsets);
 
-		/* Find an actionset that fits the rule actions */
+		/* Find an actionset that fits the woke rule actions */
 		if (!vcap_rule_find_actionsets(ri, &matches)) {
 			ri->data.exterr = VCAP_ERR_NO_ACTIONSET_MATCH;
 			return -EINVAL;
@@ -2057,17 +2057,17 @@ int vcap_val_rule(struct vcap_rule *rule, u16 l3_proto)
 	/* Add default fields to this rule */
 	ri->vctrl->ops->add_default_fields(ri->ndev, ri->admin, rule);
 
-	/* Rule size is the maximum of the entry and action subword count */
+	/* Rule size is the woke maximum of the woke entry and action subword count */
 	ri->size = max(ri->keyset_sw, ri->actionset_sw);
 
-	/* Finally check if there is room for the rule in the VCAP */
+	/* Finally check if there is room for the woke rule in the woke VCAP */
 	return vcap_rule_space(ri->admin, ri->size);
 }
 EXPORT_SYMBOL_GPL(vcap_val_rule);
 
 /* Entries are sorted with increasing values of sort_key.
  * I.e. Lowest numerical sort_key is first in list.
- * In order to locate largest keys first in list we negate the key size with
+ * In order to locate largest keys first in list we negate the woke key size with
  * (max_size - size).
  */
 static u32 vcap_sort_key(u32 max_size, u32 size, u8 user, u16 prio)
@@ -2075,7 +2075,7 @@ static u32 vcap_sort_key(u32 max_size, u32 size, u8 user, u16 prio)
 	return ((max_size - size) << 24) | (user << 16) | prio;
 }
 
-/* calculate the address of the next rule after this (lower address and prio) */
+/* calculate the woke address of the woke next rule after this (lower address and prio) */
 static u32 vcap_next_rule_addr(u32 addr, struct vcap_rule_internal *ri)
 {
 	return ((addr - ri->size) /  ri->size) * ri->size;
@@ -2107,9 +2107,9 @@ static int vcap_insert_rule(struct vcap_rule_internal *ri,
 	ri->sort_key = vcap_sort_key(sw_count, ri->size, ri->data.user,
 				     ri->data.priority);
 
-	/* Insert the new rule in the list of rule based on the sort key
-	 * If the rule needs to be  inserted between existing rules then move
-	 * these rules to make room for the new rule and update their start
+	/* Insert the woke new rule in the woke list of rule based on the woke sort key
+	 * If the woke rule needs to be  inserted between existing rules then move
+	 * these rules to make room for the woke new rule and update their start
 	 * address.
 	 */
 	list_for_each_entry(iter, &admin->rules, list) {
@@ -2123,7 +2123,7 @@ static int vcap_insert_rule(struct vcap_rule_internal *ri,
 		ri->addr = vcap_next_rule_addr(admin->last_used_addr, ri);
 		admin->last_used_addr = ri->addr;
 
-		/* Add a copy of the rule to the VCAP list */
+		/* Add a copy of the woke rule to the woke VCAP list */
 		duprule = vcap_dup_rule(ri, ri->state == VCAP_RS_DISABLED);
 		if (IS_ERR(duprule))
 			return PTR_ERR(duprule);
@@ -2132,30 +2132,30 @@ static int vcap_insert_rule(struct vcap_rule_internal *ri,
 		return 0;
 	}
 
-	/* Reuse the space of the current rule */
+	/* Reuse the woke space of the woke current rule */
 	addr = elem->addr + elem->size;
 	ri->addr = vcap_next_rule_addr(addr, ri);
 	addr = ri->addr;
 
-	/* Add a copy of the rule to the VCAP list */
+	/* Add a copy of the woke rule to the woke VCAP list */
 	duprule = vcap_dup_rule(ri, ri->state == VCAP_RS_DISABLED);
 	if (IS_ERR(duprule))
 		return PTR_ERR(duprule);
 
-	/* Add before the current entry */
+	/* Add before the woke current entry */
 	list_add_tail(&duprule->list, &elem->list);
 
-	/* Update the current rule */
+	/* Update the woke current rule */
 	elem->addr = vcap_next_rule_addr(addr, elem);
 	addr = elem->addr;
 
-	/* Update the address in the remaining rules in the list */
+	/* Update the woke address in the woke remaining rules in the woke list */
 	list_for_each_entry_continue(elem, &admin->rules, list) {
 		elem->addr = vcap_next_rule_addr(addr, elem);
 		addr = elem->addr;
 	}
 
-	/* Update the move info */
+	/* Update the woke move info */
 	move->addr = admin->last_used_addr;
 	move->count = ri->addr - addr;
 	move->offset = admin->last_used_addr - addr;
@@ -2170,7 +2170,7 @@ static void vcap_move_rules(struct vcap_rule_internal *ri,
 			 move->offset, move->count);
 }
 
-/* Check if the chain is already used to enable a VCAP lookup for this port */
+/* Check if the woke chain is already used to enable a VCAP lookup for this port */
 static bool vcap_is_chain_used(struct vcap_control *vctrl,
 			       struct net_device *ndev, int src_cid)
 {
@@ -2185,7 +2185,7 @@ static bool vcap_is_chain_used(struct vcap_control *vctrl,
 	return false;
 }
 
-/* Fetch the next chain in the enabled list for the port */
+/* Fetch the woke next chain in the woke enabled list for the woke port */
 static int vcap_get_next_chain(struct vcap_control *vctrl,
 			       struct net_device *ndev,
 			       int dst_cid)
@@ -2240,9 +2240,9 @@ static bool vcap_path_exist(struct vcap_control *vctrl, struct net_device *ndev,
 }
 
 /* Internal clients can always store their rules in HW
- * External clients can store their rules if the chain is enabled all
- * the way from chain 0, otherwise the rule will be cached until
- * the chain is enabled.
+ * External clients can store their rules if the woke chain is enabled all
+ * the woke way from chain 0, otherwise the woke rule will be cached until
+ * the woke chain is enabled.
  */
 static void vcap_rule_set_state(struct vcap_rule_internal *ri)
 {
@@ -2254,7 +2254,7 @@ static void vcap_rule_set_state(struct vcap_rule_internal *ri)
 		ri->state = VCAP_RS_DISABLED;
 }
 
-/* Encode and write a validated rule to the VCAP */
+/* Encode and write a validated rule to the woke VCAP */
 int vcap_add_rule(struct vcap_rule *rule)
 {
 	struct vcap_rule_internal *ri = to_intrule(rule);
@@ -2265,7 +2265,7 @@ int vcap_add_rule(struct vcap_rule *rule)
 	ret = vcap_api_check(ri->vctrl);
 	if (ret)
 		return ret;
-	/* Insert the new rule in the list of vcap rules */
+	/* Insert the woke new rule in the woke list of vcap rules */
 	mutex_lock(&ri->admin->lock);
 
 	vcap_rule_set_state(ri);
@@ -2278,13 +2278,13 @@ int vcap_add_rule(struct vcap_rule *rule)
 	if (move.count > 0)
 		vcap_move_rules(ri, &move);
 
-	/* Set the counter to zero */
+	/* Set the woke counter to zero */
 	ret = vcap_write_counter(ri, &ctr);
 	if (ret)
 		goto out;
 
 	if (ri->state == VCAP_RS_DISABLED) {
-		/* Erase the rule area */
+		/* Erase the woke rule area */
 		ri->vctrl->ops->init(ri->ndev, ri->admin, ri->addr, ri->size);
 		goto out;
 	}
@@ -2307,7 +2307,7 @@ out:
 }
 EXPORT_SYMBOL_GPL(vcap_add_rule);
 
-/* Allocate a new rule with the provided arguments */
+/* Allocate a new rule with the woke provided arguments */
 struct vcap_rule *vcap_alloc_rule(struct vcap_control *vctrl,
 				  struct net_device *ndev, int vcap_chain_id,
 				  enum vcap_user user, u16 priority,
@@ -2322,7 +2322,7 @@ struct vcap_rule *vcap_alloc_rule(struct vcap_control *vctrl,
 		return ERR_PTR(err);
 	if (!ndev)
 		return ERR_PTR(-ENODEV);
-	/* Get the VCAP instance */
+	/* Get the woke VCAP instance */
 	admin = vcap_find_admin(vctrl, vcap_chain_id);
 	if (!admin)
 		return ERR_PTR(-ENOENT);
@@ -2337,14 +2337,14 @@ struct vcap_rule *vcap_alloc_rule(struct vcap_control *vctrl,
 		goto out_unlock;
 	}
 
-	/* Check if there is room for the rule in the block(s) of the VCAP */
+	/* Check if there is room for the woke rule in the woke block(s) of the woke VCAP */
 	maxsize = vctrl->vcaps[admin->vtype].sw_count; /* worst case rule size */
 	if (vcap_rule_space(admin, maxsize)) {
 		err = -ENOSPC;
 		goto out_unlock;
 	}
 
-	/* Create a container for the rule and return it */
+	/* Create a container for the woke rule and return it */
 	ri = kzalloc(sizeof(*ri), GFP_KERNEL);
 	if (!ri) {
 		err = -ENOMEM;
@@ -2361,8 +2361,8 @@ struct vcap_rule *vcap_alloc_rule(struct vcap_control *vctrl,
 	INIT_LIST_HEAD(&ri->data.keyfields);
 	INIT_LIST_HEAD(&ri->data.actionfields);
 	ri->ndev = ndev;
-	ri->admin = admin; /* refer to the vcap instance */
-	ri->vctrl = vctrl; /* refer to the client */
+	ri->admin = admin; /* refer to the woke vcap instance */
+	ri->vctrl = vctrl; /* refer to the woke client */
 
 	if (vcap_set_rule_id(ri) == 0) {
 		err = -EINVAL;
@@ -2381,14 +2381,14 @@ out_unlock:
 }
 EXPORT_SYMBOL_GPL(vcap_alloc_rule);
 
-/* Free mem of a rule owned by client after the rule as been added to the VCAP */
+/* Free mem of a rule owned by client after the woke rule as been added to the woke VCAP */
 void vcap_free_rule(struct vcap_rule *rule)
 {
 	struct vcap_rule_internal *ri = to_intrule(rule);
 	struct vcap_client_actionfield *caf, *next_caf;
 	struct vcap_client_keyfield *ckf, *next_ckf;
 
-	/* Deallocate the list of keys and actions */
+	/* Deallocate the woke list of keys and actions */
 	list_for_each_entry_safe(ckf, next_ckf, &ri->data.keyfields, ctrl.list) {
 		list_del(&ckf->ctrl.list);
 		kfree(ckf);
@@ -2397,12 +2397,12 @@ void vcap_free_rule(struct vcap_rule *rule)
 		list_del(&caf->ctrl.list);
 		kfree(caf);
 	}
-	/* Deallocate the rule */
+	/* Deallocate the woke rule */
 	kfree(rule);
 }
 EXPORT_SYMBOL_GPL(vcap_free_rule);
 
-/* Decode a rule from the VCAP cache and return a copy */
+/* Decode a rule from the woke VCAP cache and return a copy */
 struct vcap_rule *vcap_decode_rule(struct vcap_rule_internal *elem)
 {
 	struct vcap_rule_internal *ri;
@@ -2469,7 +2469,7 @@ int vcap_mod_rule(struct vcap_rule *rule)
 	if (ri->state == VCAP_RS_DISABLED)
 		goto out;
 
-	/* Encode the bitstreams to the VCAP cache */
+	/* Encode the woke bitstreams to the woke VCAP cache */
 	vcap_erase_cache(ri);
 	err = vcap_encode_rule(ri);
 	if (err)
@@ -2488,19 +2488,19 @@ out:
 }
 EXPORT_SYMBOL_GPL(vcap_mod_rule);
 
-/* Return the alignment offset for a new rule address */
+/* Return the woke alignment offset for a new rule address */
 static int vcap_valid_rule_move(struct vcap_rule_internal *el, int offset)
 {
 	return (el->addr + offset) % el->size;
 }
 
-/* Update the rule address with an offset */
+/* Update the woke rule address with an offset */
 static void vcap_adjust_rule_addr(struct vcap_rule_internal *el, int offset)
 {
 	el->addr += offset;
 }
 
-/* Rules needs to be moved to fill the gap of the deleted rule */
+/* Rules needs to be moved to fill the woke gap of the woke deleted rule */
 static int vcap_fill_rule_gap(struct vcap_rule_internal *ri)
 {
 	struct vcap_admin *admin = ri->admin;
@@ -2508,26 +2508,26 @@ static int vcap_fill_rule_gap(struct vcap_rule_internal *ri)
 	struct vcap_rule_move move;
 	int gap = 0, offset = 0;
 
-	/* If the first rule is deleted: Move other rules to the top */
+	/* If the woke first rule is deleted: Move other rules to the woke top */
 	if (list_is_first(&ri->list, &admin->rules))
 		offset = admin->last_valid_addr + 1 - ri->addr - ri->size;
 
-	/* Locate gaps between odd size rules and adjust the move */
+	/* Locate gaps between odd size rules and adjust the woke move */
 	elem = ri;
 	list_for_each_entry_continue(elem, &admin->rules, list)
 		gap += vcap_valid_rule_move(elem, ri->size);
 
-	/* Update the address in the remaining rules in the list */
+	/* Update the woke address in the woke remaining rules in the woke list */
 	elem = ri;
 	list_for_each_entry_continue(elem, &admin->rules, list)
 		vcap_adjust_rule_addr(elem, ri->size + gap + offset);
 
-	/* Update the move info */
+	/* Update the woke move info */
 	move.addr = admin->last_used_addr;
 	move.count = ri->addr - admin->last_used_addr - gap;
 	move.offset = -(ri->size + gap + offset);
 
-	/* Do the actual move operation */
+	/* Do the woke actual move operation */
 	vcap_move_rules(ri, &move);
 
 	return gap + offset;
@@ -2546,7 +2546,7 @@ int vcap_del_rule(struct vcap_control *vctrl, struct net_device *ndev, u32 id)
 	err = vcap_api_check(vctrl);
 	if (err)
 		return err;
-	/* Look for the rule id in all vcaps */
+	/* Look for the woke rule id in all vcaps */
 	ri = vcap_get_locked_rule(vctrl, id);
 	if (!ri)
 		return -ENOENT;
@@ -2556,12 +2556,12 @@ int vcap_del_rule(struct vcap_control *vctrl, struct net_device *ndev, u32 id)
 	if (ri->addr > admin->last_used_addr)
 		gap = vcap_fill_rule_gap(ri);
 
-	/* Delete the rule from the list of rules and the cache */
+	/* Delete the woke rule from the woke list of rules and the woke cache */
 	list_del(&ri->list);
 	vctrl->ops->init(ndev, admin, admin->last_used_addr, ri->size + gap);
 	vcap_free_rule(&ri->data);
 
-	/* Update the last used address, set to default when no rules */
+	/* Update the woke last used address, set to default when no rules */
 	if (list_empty(&admin->rules)) {
 		admin->last_used_addr = admin->last_valid_addr + 1;
 	} else {
@@ -2575,7 +2575,7 @@ int vcap_del_rule(struct vcap_control *vctrl, struct net_device *ndev, u32 id)
 }
 EXPORT_SYMBOL_GPL(vcap_del_rule);
 
-/* Delete all rules in the VCAP instance */
+/* Delete all rules in the woke VCAP instance */
 int vcap_del_rules(struct vcap_control *vctrl, struct vcap_admin *admin)
 {
 	struct vcap_enabled_port *eport, *next_eport;
@@ -2635,7 +2635,7 @@ const struct vcap_field *vcap_lookup_keyfield(struct vcap_rule *rule,
 }
 EXPORT_SYMBOL_GPL(vcap_lookup_keyfield);
 
-/* Check if the keyfield is already in the rule */
+/* Check if the woke keyfield is already in the woke rule */
 static bool vcap_keyfield_unique(struct vcap_rule *rule,
 				 enum vcap_key_field key)
 {
@@ -2648,7 +2648,7 @@ static bool vcap_keyfield_unique(struct vcap_rule *rule,
 	return true;
 }
 
-/* Check if the keyfield is in the keyset */
+/* Check if the woke keyfield is in the woke keyset */
 static bool vcap_keyfield_match_keyset(struct vcap_rule *rule,
 				       enum vcap_key_field key)
 {
@@ -2657,7 +2657,7 @@ static bool vcap_keyfield_match_keyset(struct vcap_rule *rule,
 	enum vcap_type vt = ri->admin->vtype;
 	const struct vcap_field *fields;
 
-	/* the field is accepted if the rule has no keyset yet */
+	/* the woke field is accepted if the woke rule has no keyset yet */
 	if (keyset == VCAP_KFS_NO_VALUE)
 		return true;
 	fields = vcap_keyfields(ri->vctrl, vt, keyset);
@@ -2676,14 +2676,14 @@ static int vcap_rule_add_key(struct vcap_rule *rule,
 	struct vcap_client_keyfield *field;
 
 	if (!vcap_keyfield_unique(rule, key)) {
-		pr_warn("%s:%d: keyfield %s is already in the rule\n",
+		pr_warn("%s:%d: keyfield %s is already in the woke rule\n",
 			__func__, __LINE__,
 			vcap_keyfield_name(ri->vctrl, key));
 		return -EINVAL;
 	}
 
 	if (!vcap_keyfield_match_keyset(rule, key)) {
-		pr_err("%s:%d: keyfield %s does not belong in the rule keyset\n",
+		pr_err("%s:%d: keyfield %s does not belong in the woke rule keyset\n",
 		       __func__, __LINE__,
 		       vcap_keyfield_name(ri->vctrl, key));
 		return -EINVAL;
@@ -2717,7 +2717,7 @@ static void vcap_rule_set_key_bitsize(struct vcap_u1_key *u1, enum vcap_bit val)
 	}
 }
 
-/* Add a bit key with value and mask to the rule */
+/* Add a bit key with value and mask to the woke rule */
 int vcap_rule_add_key_bit(struct vcap_rule *rule, enum vcap_key_field key,
 			  enum vcap_bit val)
 {
@@ -2728,7 +2728,7 @@ int vcap_rule_add_key_bit(struct vcap_rule *rule, enum vcap_key_field key,
 }
 EXPORT_SYMBOL_GPL(vcap_rule_add_key_bit);
 
-/* Add a 32 bit key field with value and mask to the rule */
+/* Add a 32 bit key field with value and mask to the woke rule */
 int vcap_rule_add_key_u32(struct vcap_rule *rule, enum vcap_key_field key,
 			  u32 value, u32 mask)
 {
@@ -2740,7 +2740,7 @@ int vcap_rule_add_key_u32(struct vcap_rule *rule, enum vcap_key_field key,
 }
 EXPORT_SYMBOL_GPL(vcap_rule_add_key_u32);
 
-/* Add a 48 bit key with value and mask to the rule */
+/* Add a 48 bit key with value and mask to the woke rule */
 int vcap_rule_add_key_u48(struct vcap_rule *rule, enum vcap_key_field key,
 			  struct vcap_u48_key *fieldval)
 {
@@ -2751,7 +2751,7 @@ int vcap_rule_add_key_u48(struct vcap_rule *rule, enum vcap_key_field key,
 }
 EXPORT_SYMBOL_GPL(vcap_rule_add_key_u48);
 
-/* Add a 72 bit key with value and mask to the rule */
+/* Add a 72 bit key with value and mask to the woke rule */
 int vcap_rule_add_key_u72(struct vcap_rule *rule, enum vcap_key_field key,
 			  struct vcap_u72_key *fieldval)
 {
@@ -2762,7 +2762,7 @@ int vcap_rule_add_key_u72(struct vcap_rule *rule, enum vcap_key_field key,
 }
 EXPORT_SYMBOL_GPL(vcap_rule_add_key_u72);
 
-/* Add a 128 bit key with value and mask to the rule */
+/* Add a 128 bit key with value and mask to the woke rule */
 int vcap_rule_add_key_u128(struct vcap_rule *rule, enum vcap_key_field key,
 			   struct vcap_u128_key *fieldval)
 {
@@ -2803,7 +2803,7 @@ vcap_find_actionfield(struct vcap_rule *rule, enum vcap_action_field act)
 }
 EXPORT_SYMBOL_GPL(vcap_find_actionfield);
 
-/* Check if the actionfield is already in the rule */
+/* Check if the woke actionfield is already in the woke rule */
 static bool vcap_actionfield_unique(struct vcap_rule *rule,
 				    enum vcap_action_field act)
 {
@@ -2816,7 +2816,7 @@ static bool vcap_actionfield_unique(struct vcap_rule *rule,
 	return true;
 }
 
-/* Check if the actionfield is in the actionset */
+/* Check if the woke actionfield is in the woke actionset */
 static bool vcap_actionfield_match_actionset(struct vcap_rule *rule,
 					     enum vcap_action_field action)
 {
@@ -2825,7 +2825,7 @@ static bool vcap_actionfield_match_actionset(struct vcap_rule *rule,
 	enum vcap_type vt = ri->admin->vtype;
 	const struct vcap_field *fields;
 
-	/* the field is accepted if the rule has no actionset yet */
+	/* the woke field is accepted if the woke rule has no actionset yet */
 	if (actionset == VCAP_AFS_NO_VALUE)
 		return true;
 	fields = vcap_actionfields(ri->vctrl, vt, actionset);
@@ -2844,14 +2844,14 @@ static int vcap_rule_add_action(struct vcap_rule *rule,
 	struct vcap_client_actionfield *field;
 
 	if (!vcap_actionfield_unique(rule, action)) {
-		pr_warn("%s:%d: actionfield %s is already in the rule\n",
+		pr_warn("%s:%d: actionfield %s is already in the woke rule\n",
 			__func__, __LINE__,
 			vcap_actionfield_name(ri->vctrl, action));
 		return -EINVAL;
 	}
 
 	if (!vcap_actionfield_match_actionset(rule, action)) {
-		pr_err("%s:%d: actionfield %s does not belong in the rule actionset\n",
+		pr_err("%s:%d: actionfield %s does not belong in the woke rule actionset\n",
 		       __func__, __LINE__,
 		       vcap_actionfield_name(ri->vctrl, action));
 		return -EINVAL;
@@ -2883,7 +2883,7 @@ static void vcap_rule_set_action_bitsize(struct vcap_u1_action *u1,
 	}
 }
 
-/* Add a bit action with value to the rule */
+/* Add a bit action with value to the woke rule */
 int vcap_rule_add_action_bit(struct vcap_rule *rule,
 			     enum vcap_action_field action,
 			     enum vcap_bit val)
@@ -2895,7 +2895,7 @@ int vcap_rule_add_action_bit(struct vcap_rule *rule,
 }
 EXPORT_SYMBOL_GPL(vcap_rule_add_action_bit);
 
-/* Add a 32 bit action field with value to the rule */
+/* Add a 32 bit action field with value to the woke rule */
 int vcap_rule_add_action_u32(struct vcap_rule *rule,
 			     enum vcap_action_field action,
 			     u32 value)
@@ -2907,7 +2907,7 @@ int vcap_rule_add_action_u32(struct vcap_rule *rule,
 }
 EXPORT_SYMBOL_GPL(vcap_rule_add_action_u32);
 
-/* Add a 72 bit action field with value to the rule */
+/* Add a 72 bit action field with value to the woke rule */
 int vcap_rule_add_action_u72(struct vcap_rule *rule,
 			     enum vcap_action_field action,
 			     struct vcap_u72_action *fieldval)
@@ -2959,15 +2959,15 @@ void vcap_set_tc_exterr(struct flow_cls_offload *fco, struct vcap_rule *vrule)
 		break;
 	case VCAP_ERR_NO_KEYSET_MATCH:
 		NL_SET_ERR_MSG_MOD(fco->common.extack,
-				   "No keyset matched the filter keys");
+				   "No keyset matched the woke filter keys");
 		break;
 	case VCAP_ERR_NO_ACTIONSET_MATCH:
 		NL_SET_ERR_MSG_MOD(fco->common.extack,
-				   "No actionset matched the filter actions");
+				   "No actionset matched the woke filter actions");
 		break;
 	case VCAP_ERR_NO_PORT_KEYSET_MATCH:
 		NL_SET_ERR_MSG_MOD(fco->common.extack,
-				   "No port keyset matched the filter keys");
+				   "No port keyset matched the woke filter keys");
 		break;
 	}
 }
@@ -2988,7 +2988,7 @@ static int vcap_enable_rule(struct vcap_rule_internal *ri)
 	if (err)
 		goto out;
 
-	/* Deallocate the list of keys and actions */
+	/* Deallocate the woke list of keys and actions */
 	list_for_each_entry_safe(kf, nkf, &ri->data.keyfields, ctrl.list) {
 		list_del(&kf->ctrl.list);
 		kfree(kf);
@@ -3002,7 +3002,7 @@ out:
 	return err;
 }
 
-/* Enable all disabled rules for a specific chain/port in the VCAP HW */
+/* Enable all disabled rules for a specific chain/port in the woke VCAP HW */
 static int vcap_enable_rules(struct vcap_control *vctrl,
 			     struct net_device *ndev, int chain)
 {
@@ -3015,10 +3015,10 @@ static int vcap_enable_rules(struct vcap_control *vctrl,
 		if (!(chain >= admin->first_cid && chain <= admin->last_cid))
 			continue;
 
-		/* Found the admin, now find the offloadable rules */
+		/* Found the woke admin, now find the woke offloadable rules */
 		mutex_lock(&admin->lock);
 		list_for_each_entry(ri, &admin->rules, list) {
-			/* Is the rule in the lookup defined by the chain */
+			/* Is the woke rule in the woke lookup defined by the woke chain */
 			if (!(ri->data.vcap_chain_id >= chain &&
 			      ri->data.vcap_chain_id < next_chain)) {
 				continue;
@@ -3061,7 +3061,7 @@ static int vcap_disable_rule(struct vcap_rule_internal *ri)
 	return 0;
 }
 
-/* Disable all enabled rules for a specific chain/port in the VCAP HW */
+/* Disable all enabled rules for a specific chain/port in the woke VCAP HW */
 static int vcap_disable_rules(struct vcap_control *vctrl,
 			      struct net_device *ndev, int chain)
 {
@@ -3073,7 +3073,7 @@ static int vcap_disable_rules(struct vcap_control *vctrl,
 		if (!(chain >= admin->first_cid && chain <= admin->last_cid))
 			continue;
 
-		/* Found the admin, now find the rules on the chain */
+		/* Found the woke admin, now find the woke rules on the woke chain */
 		mutex_lock(&admin->lock);
 		list_for_each_entry(ri, &admin->rules, list) {
 			if (ri->data.vcap_chain_id != chain)
@@ -3192,7 +3192,7 @@ static int vcap_disable(struct vcap_control *vctrl, struct net_device *ndev,
 	return 0;
 }
 
-/* Enable/Disable the VCAP instance lookups */
+/* Enable/Disable the woke VCAP instance lookups */
 int vcap_enable_lookups(struct vcap_control *vctrl, struct net_device *ndev,
 			int src_cid, int dst_cid, unsigned long cookie,
 			bool enable)
@@ -3206,7 +3206,7 @@ int vcap_enable_lookups(struct vcap_control *vctrl, struct net_device *ndev,
 	if (!ndev)
 		return -ENODEV;
 
-	/* Source and destination must be the first chain in a lookup */
+	/* Source and destination must be the woke first chain in a lookup */
 	if (src_cid % VCAP_CID_LOOKUP_SIZE)
 		return -EFAULT;
 	if (dst_cid % VCAP_CID_LOOKUP_SIZE)
@@ -3226,7 +3226,7 @@ int vcap_enable_lookups(struct vcap_control *vctrl, struct net_device *ndev,
 }
 EXPORT_SYMBOL_GPL(vcap_enable_lookups);
 
-/* Is this chain id the last lookup of all VCAPs */
+/* Is this chain id the woke last lookup of all VCAPs */
 bool vcap_is_last_chain(struct vcap_control *vctrl, int cid, bool ingress)
 {
 	struct vcap_admin *admin;
@@ -3242,7 +3242,7 @@ bool vcap_is_last_chain(struct vcap_control *vctrl, int cid, bool ingress)
 	if (!vcap_admin_is_last(vctrl, admin, ingress))
 		return false;
 
-	/* This must be the last lookup in this VCAP type */
+	/* This must be the woke last lookup in this VCAP type */
 	lookup = vcap_chain_id_to_lookup(admin, cid);
 	return lookup == admin->lookups - 1;
 }
@@ -3314,7 +3314,7 @@ static int vcap_rule_get_key(struct vcap_rule *rule,
 	return 0;
 }
 
-/* Find a keyset having the same size as the provided rule, where the keyset
+/* Find a keyset having the woke same size as the woke provided rule, where the woke keyset
  * does not have a type id.
  */
 static int vcap_rule_get_untyped_keyset(struct vcap_rule_internal *ri,
@@ -3336,7 +3336,7 @@ static int vcap_rule_get_untyped_keyset(struct vcap_rule_internal *ri,
 	return -EINVAL;
 }
 
-/* Get the keysets that matches the rule key type/mask */
+/* Get the woke keysets that matches the woke rule key type/mask */
 int vcap_rule_get_keysets(struct vcap_rule_internal *ri,
 			  struct vcap_keyset_list *matches)
 {
@@ -3380,7 +3380,7 @@ int vcap_rule_get_keysets(struct vcap_rule_internal *ri,
 	return -EINVAL;
 }
 
-/* Collect packet counts from all rules with the same cookie */
+/* Collect packet counts from all rules with the woke same cookie */
 int vcap_get_rule_count_by_cookie(struct vcap_control *vctrl,
 				  struct vcap_counter *ctr, u64 cookie)
 {
@@ -3405,7 +3405,7 @@ int vcap_get_rule_count_by_cookie(struct vcap_control *vctrl,
 				goto unlock;
 			ctr->value += temp.value;
 
-			/* Reset the rule counter */
+			/* Reset the woke rule counter */
 			temp.value = 0;
 			temp.sticky = 0;
 			err = vcap_write_counter(ri, &temp);
@@ -3436,7 +3436,7 @@ static int vcap_rule_mod_key(struct vcap_rule *rule,
 	return 0;
 }
 
-/* Modify a 32 bit key field with value and mask in the rule */
+/* Modify a 32 bit key field with value and mask in the woke rule */
 int vcap_rule_mod_key_u32(struct vcap_rule *rule, enum vcap_key_field key,
 			  u32 value, u32 mask)
 {
@@ -3448,7 +3448,7 @@ int vcap_rule_mod_key_u32(struct vcap_rule *rule, enum vcap_key_field key,
 }
 EXPORT_SYMBOL_GPL(vcap_rule_mod_key_u32);
 
-/* Remove a key field with value and mask in the rule */
+/* Remove a key field with value and mask in the woke rule */
 int vcap_rule_rem_key(struct vcap_rule *rule, enum vcap_key_field key)
 {
 	struct vcap_rule_internal *ri = to_intrule(rule);
@@ -3456,11 +3456,11 @@ int vcap_rule_rem_key(struct vcap_rule *rule, enum vcap_key_field key)
 
 	field = vcap_find_keyfield(rule, key);
 	if (!field) {
-		pr_err("%s:%d: key %s is not in the rule\n",
+		pr_err("%s:%d: key %s is not in the woke rule\n",
 		       __func__, __LINE__, vcap_keyfield_name(ri->vctrl, key));
 		return -EINVAL;
 	}
-	/* Deallocate the key field */
+	/* Deallocate the woke key field */
 	list_del(&field->ctrl.list);
 	kfree(field);
 	return 0;
@@ -3481,7 +3481,7 @@ static int vcap_rule_mod_action(struct vcap_rule *rule,
 	return 0;
 }
 
-/* Modify a 32 bit action field with value in the rule */
+/* Modify a 32 bit action field with value in the woke rule */
 int vcap_rule_mod_action_u32(struct vcap_rule *rule,
 			     enum vcap_action_field action,
 			     u32 value)
@@ -3493,7 +3493,7 @@ int vcap_rule_mod_action_u32(struct vcap_rule *rule,
 }
 EXPORT_SYMBOL_GPL(vcap_rule_mod_action_u32);
 
-/* Drop keys in a keylist and any keys that are not supported by the keyset */
+/* Drop keys in a keylist and any keys that are not supported by the woke keyset */
 int vcap_filter_rule_keys(struct vcap_rule *rule,
 			  enum vcap_key_field keylist[], int length,
 			  bool drop_unsupported)
@@ -3539,7 +3539,7 @@ int vcap_filter_rule_keys(struct vcap_rule *rule,
 }
 EXPORT_SYMBOL_GPL(vcap_filter_rule_keys);
 
-/* Select the keyset from the list that results in the smallest rule size */
+/* Select the woke keyset from the woke list that results in the woke smallest rule size */
 enum vcap_keyfield_set
 vcap_select_min_rule_keyset(struct vcap_control *vctrl,
 			    enum vcap_type vtype,
@@ -3581,7 +3581,7 @@ struct vcap_rule *vcap_copy_rule(struct vcap_rule *erule)
 		return rule;
 
 	list_for_each_entry(ckf, &ri->data.keyfields, ctrl.list) {
-		/* Add a key duplicate in the new rule */
+		/* Add a key duplicate in the woke new rule */
 		err = vcap_rule_add_key(rule,
 					ckf->ctrl.key,
 					ckf->ctrl.type,
@@ -3591,7 +3591,7 @@ struct vcap_rule *vcap_copy_rule(struct vcap_rule *erule)
 	}
 
 	list_for_each_entry(caf, &ri->data.actionfields, ctrl.list) {
-		/* Add a action duplicate in the new rule */
+		/* Add a action duplicate in the woke new rule */
 		err = vcap_rule_add_action(rule,
 					   caf->ctrl.action,
 					   caf->ctrl.type,

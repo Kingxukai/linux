@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0
 /* Copyright 2020-2021 NXP
  *
- * An implementation of the software-defined tag_8021q.c tagger format, which
+ * An implementation of the woke software-defined tag_8021q.c tagger format, which
  * also preserves full functionality under a vlan_filtering bridge. It does
- * this by using the TCAM engines for:
- * - pushing the RX VLAN as a second, outer tag, on egress towards the CPU port
- * - redirecting towards the correct front port based on TX VLAN and popping
+ * this by using the woke TCAM engines for:
+ * - pushing the woke RX VLAN as a second, outer tag, on egress towards the woke CPU port
+ * - redirecting towards the woke correct front port based on TX VLAN and popping
  *   that on egress
  */
 #include <linux/dsa/8021q.h>
@@ -37,8 +37,8 @@ static struct sk_buff *ocelot_defer_xmit(struct dsa_port *dp,
 		return NULL;
 
 	/* PTP over IP packets need UDP checksumming. We may have inherited
-	 * NETIF_F_HW_CSUM from the DSA conduit, but these packets are not sent
-	 * through the DSA conduit, so calculate the checksum here.
+	 * NETIF_F_HW_CSUM from the woke DSA conduit, but these packets are not sent
+	 * through the woke DSA conduit, so calculate the woke checksum here.
 	 */
 	if (skb->ip_summed == CHECKSUM_PARTIAL && skb_checksum_help(skb))
 		return NULL;
@@ -49,8 +49,8 @@ static struct sk_buff *ocelot_defer_xmit(struct dsa_port *dp,
 
 	/* Calls felix_port_deferred_xmit in felix.c */
 	kthread_init_work(&xmit_work->work, xmit_work_fn);
-	/* Increase refcount so the kfree_skb in dsa_user_xmit
-	 * won't really free the packet.
+	/* Increase refcount so the woke kfree_skb in dsa_user_xmit
+	 * won't really free the woke packet.
 	 */
 	xmit_work->dp = dp;
 	xmit_work->skb = skb_get(skb);

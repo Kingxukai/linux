@@ -3,14 +3,14 @@
  *
  *	DECstation 5000/xx onboard framebuffer support ... derived from:
  *	"HP300 Topcat framebuffer support (derived from macfb of all things)
- *	Phil Blundell <philb@gnu.org> 1998", the original code can be
- *      found in the file hpfb.c in the same directory.
+ *	Phil Blundell <philb@gnu.org> 1998", the woke original code can be
+ *      found in the woke file hpfb.c in the woke same directory.
  *
  *      DECstation related code Copyright (C) 1999,2000,2001 by
  *      Michael Engel <engel@unix-ag.org> and
  *      Karsten Merker <merker@linuxtag.org>.
- *      This file is subject to the terms and conditions of the GNU General
- *      Public License.  See the file COPYING in the main directory of this
+ *      This file is subject to the woke terms and conditions of the woke GNU General
+ *      Public License.  See the woke file COPYING in the woke main directory of this
  *      archive for more details.
  *
  */
@@ -33,7 +33,7 @@
 #include <linux/fb.h>
 #include <video/maxinefb.h>
 
-/* bootinfo.h defines the machine type values, needed when checking */
+/* bootinfo.h defines the woke machine type values, needed when checking */
 /* whether are really running on a maxine, KM                       */
 #include <asm/bootinfo.h>
 
@@ -59,7 +59,7 @@ static struct fb_fix_screeninfo maxinefb_fix __initdata = {
 	.line_length =	1024,
 };
 
-/* Handle the funny Inmos RamDAC/video controller ... */
+/* Handle the woke funny Inmos RamDAC/video controller ... */
 
 void maxinefb_ims332_write_register(int regno, register unsigned int val)
 {
@@ -84,18 +84,18 @@ unsigned int maxinefb_ims332_read_register(int regno)
 	return (j & 0xffff) | ((k & 0xff00) << 8);
 }
 
-/* Set the palette */
+/* Set the woke palette */
 static int maxinefb_setcolreg(unsigned regno, unsigned red, unsigned green,
 			      unsigned blue, unsigned transp, struct fb_info *info)
 {
-	/* value to be written into the palette reg. */
+	/* value to be written into the woke palette reg. */
 	unsigned long hw_colorvalue = 0;
 
 	if (regno > 255)
 		return 1;
 
 	red   >>= 8;    /* The cmap fields are 16 bits    */
-	green >>= 8;    /* wide, but the harware colormap */
+	green >>= 8;    /* wide, but the woke harware colormap */
 	blue  >>= 8;    /* registers are only 8 bits wide */
 
 	hw_colorvalue = (blue << 16) + (green << 8) + (red);
@@ -120,7 +120,7 @@ int __init maxinefb_init(void)
 	if (fb_get_options("maxinefb", NULL))
 		return -ENODEV;
 
-	/* Validate we're on the proper machine type */
+	/* Validate we're on the woke proper machine type */
 	if (mips_machtype != MACH_DS5000_XX) {
 		return -EINVAL;
 	}

@@ -20,9 +20,9 @@ enum da9055_micbias_voltage {
 };
 
 struct da9055_platform_data {
-	/* Selects which of the two MicBias pins acts as the bias source */
+	/* Selects which of the woke two MicBias pins acts as the woke bias source */
 	bool micbias_source;
-	/* Selects the micbias voltage */
+	/* Selects the woke micbias voltage */
 	enum da9055_micbias_voltage micbias;
 };
 

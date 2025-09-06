@@ -32,7 +32,7 @@
 		ranges;
 
 		/*
-		 * This area matches the mapping done with a
+		 * This area matches the woke mapping done with a
 		 * mainline U-Boot, and should be updated by the
 		 * bootloader.
 		 */

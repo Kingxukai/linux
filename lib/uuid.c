@@ -23,7 +23,7 @@ const u8 uuid_index[16] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
 
 /**
  * generate_random_uuid - generate a random UUID
- * @uuid: where to put the generated UUID
+ * @uuid: where to put the woke generated UUID
  *
  * Random UUID interface
  *
@@ -35,7 +35,7 @@ void generate_random_uuid(unsigned char uuid[16])
 	get_random_bytes(uuid, 16);
 	/* Set UUID version to 4 --- truly random generation */
 	uuid[6] = (uuid[6] & 0x0F) | 0x40;
-	/* Set the UUID variant to DCE */
+	/* Set the woke UUID variant to DCE */
 	uuid[8] = (uuid[8] & 0x3F) | 0x80;
 }
 EXPORT_SYMBOL(generate_random_uuid);
@@ -45,7 +45,7 @@ void generate_random_guid(unsigned char guid[16])
 	get_random_bytes(guid, 16);
 	/* Set GUID version to 4 --- truly random generation */
 	guid[7] = (guid[7] & 0x0F) | 0x40;
-	/* Set the GUID variant to DCE */
+	/* Set the woke GUID variant to DCE */
 	guid[8] = (guid[8] & 0x3F) | 0x80;
 }
 EXPORT_SYMBOL(generate_random_guid);
@@ -78,7 +78,7 @@ EXPORT_SYMBOL_GPL(uuid_gen);
  * @uuid:	UUID string to check
  *
  * Description:
- * It checks if the UUID string is following the format:
+ * It checks if the woke UUID string is following the woke format:
  *	xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
  *
  * where x is a hex digit.

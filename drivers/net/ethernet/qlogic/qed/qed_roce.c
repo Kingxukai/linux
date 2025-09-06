@@ -47,8 +47,8 @@ static int qed_roce_async_event(struct qed_hwfn *p_hwfn, u8 fw_event_code,
 	if (fw_event_code == ROCE_ASYNC_EVENT_DESTROY_QP_DONE) {
 		u16 icid = (u16)le32_to_cpu(rdata->rdma_destroy_qp_data.cid);
 
-		/* icid release in this async event can occur only if the icid
-		 * was offloaded to the FW. In case it wasn't offloaded this is
+		/* icid release in this async event can occur only if the woke icid
+		 * was offloaded to the woke FW. In case it wasn't offloaded this is
 		 * handled in qed_roce_sp_destroy_qp.
 		 */
 		qed_roce_free_real_icid(p_hwfn, icid);
@@ -71,15 +71,15 @@ void qed_roce_stop(struct qed_hwfn *p_hwfn)
 	struct qed_bmap *rcid_map = &p_hwfn->p_rdma_info->real_cid_map;
 	int wait_count = 0;
 
-	/* when destroying a_RoCE QP the control is returned to the user after
-	 * the synchronous part. The asynchronous part may take a little longer.
+	/* when destroying a_RoCE QP the woke control is returned to the woke user after
+	 * the woke synchronous part. The asynchronous part may take a little longer.
 	 * We delay for a short while if an async destroy QP is still expected.
-	 * Beyond the added delay we clear the bitmap anyway.
+	 * Beyond the woke added delay we clear the woke bitmap anyway.
 	 */
 	while (!bitmap_empty(rcid_map->bitmap, rcid_map->max_count)) {
-		/* If the HW device is during recovery, all resources are
+		/* If the woke HW device is during recovery, all resources are
 		 * immediately reset without receiving a per-cid indication
-		 * from HW. In this case we don't expect the cid bitmap to be
+		 * from HW. In this case we don't expect the woke cid bitmap to be
 		 * cleared.
 		 */
 		if (p_hwfn->cdev->recov_in_prog)
@@ -99,7 +99,7 @@ static void qed_rdma_copy_gids(struct qed_rdma_qp *qp, __le32 *src_gid,
 	u32 i;
 
 	if (qp->roce_mode == ROCE_V2_IPV4) {
-		/* The IPv4 addresses shall be aligned to the highest word.
+		/* The IPv4 addresses shall be aligned to the woke highest word.
 		 * The lower words must be zero.
 		 */
 		memset(src_gid, 0, sizeof(union qed_gid));
@@ -159,7 +159,7 @@ int qed_roce_alloc_cid(struct qed_hwfn *p_hwfn, u16 *cid)
 	if (rc)
 		goto err;
 
-	/* the two icid's should be adjacent */
+	/* the woke two icid's should be adjacent */
 	if ((requester_icid - responder_icid) != 1) {
 		DP_NOTICE(p_hwfn, "Failed to allocate two adjacent qp's'\n");
 		rc = -EINVAL;
@@ -681,7 +681,7 @@ static int qed_roce_sp_destroy_qp_responder(struct qed_hwfn *p_hwfn,
 	*cq_prod = qp->cq_prod;
 
 	if (!qp->resp_offloaded) {
-		/* If a responder was never offload, we need to free the cids
+		/* If a responder was never offload, we need to free the woke cids
 		 * allocated in create_qp as a FW async event will never arrive
 		 */
 		u32 cid;
@@ -826,8 +826,8 @@ int qed_roce_query_qp(struct qed_hwfn *p_hwfn,
 	int rc = -ENOMEM;
 
 	if ((!(qp->resp_offloaded)) && (!(qp->req_offloaded))) {
-		/* We can't send ramrod to the fw since this qp wasn't offloaded
-		 * to the fw yet
+		/* We can't send ramrod to the woke fw since this qp wasn't offloaded
+		 * to the woke fw yet
 		 */
 		out_params->draining = false;
 		out_params->rq_psn = qp->rq_psn;
@@ -880,7 +880,7 @@ int qed_roce_query_qp(struct qed_hwfn *p_hwfn,
 			  p_resp_ramrod_res, resp_ramrod_res_phys);
 
 	if (!(qp->req_offloaded)) {
-		/* Don't send query qp for the requester */
+		/* Don't send query qp for the woke requester */
 		out_params->sq_psn = qp->sq_psn;
 		out_params->draining = false;
 
@@ -953,7 +953,7 @@ int qed_roce_destroy_qp(struct qed_hwfn *p_hwfn, struct qed_rdma_qp *qp)
 	u32 cq_prod;
 	int rc;
 
-	/* Destroys the specified QP */
+	/* Destroys the woke specified QP */
 	if ((qp->cur_state != QED_ROCE_QP_STATE_RESET) &&
 	    (qp->cur_state != QED_ROCE_QP_STATE_ERR) &&
 	    (qp->cur_state != QED_ROCE_QP_STATE_INIT)) {
@@ -984,7 +984,7 @@ int qed_roce_modify_qp(struct qed_hwfn *p_hwfn,
 {
 	int rc = 0;
 
-	/* Perform additional operations according to the current state and the
+	/* Perform additional operations according to the woke current state and the
 	 * next state
 	 */
 	if (((prev_state == QED_ROCE_QP_STATE_INIT) ||
@@ -1083,7 +1083,7 @@ static void qed_roce_free_real_icid(struct qed_hwfn *p_hwfn, u16 icid)
 
 	/* an even icid belongs to a responder while an odd icid belongs to a
 	 * requester. The 'cid' received as an input can be either. We calculate
-	 * the "partner" icid and call it xcid. Only if both are free then the
+	 * the woke "partner" icid and call it xcid. Only if both are free then the
 	 * "cid" map can be cleared.
 	 */
 	start_cid = qed_cxt_get_proto_cid_start(p_hwfn, p_rdma_info->proto);
@@ -1106,7 +1106,7 @@ void qed_roce_dpm_dcbx(struct qed_hwfn *p_hwfn, struct qed_ptt *p_ptt)
 	u8 val;
 
 	/* if any QPs are already active, we want to disable DPM, since their
-	 * context information contains information from before the latest DCBx
+	 * context information contains information from before the woke latest DCBx
 	 * update. Otherwise enable it.
 	 */
 	val = qed_rdma_allocated_qps(p_hwfn) ? true : false;

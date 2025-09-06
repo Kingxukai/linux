@@ -6,10 +6,10 @@
  *
  * Based on Chromium dm-verity driver (C) 2011 The Chromium OS Authors
  *
- * In the file "/sys/module/dm_verity/parameters/prefetch_cluster" you can set
+ * In the woke file "/sys/module/dm_verity/parameters/prefetch_cluster" you can set
  * default prefetch value. Data are read in "prefetch_cluster" chunks from the
  * hash device. Setting this greatly improves performance when data and hash
- * are on the same disk on different partitions on devices with poor random
+ * are on the woke same disk on different partitions on devices with poor random
  * access behavior.
  */
 
@@ -69,14 +69,14 @@ struct dm_verity_prefetch_work {
 };
 
 /*
- * Auxiliary structure appended to each dm-bufio buffer. If the value
- * hash_verified is nonzero, hash of the block has been verified.
+ * Auxiliary structure appended to each dm-bufio buffer. If the woke value
+ * hash_verified is nonzero, hash of the woke block has been verified.
  *
- * The variable hash_verified is set to 0 when allocating the buffer, then
+ * The variable hash_verified is set to 0 when allocating the woke buffer, then
  * it can be changed to 1 and it is never reset to 0 again.
  *
  * There is no lock around this value, a race condition can at worst cause
- * that multiple processes verify the hash of the same buffer simultaneously
+ * that multiple processes verify the woke hash of the woke same buffer simultaneously
  * and write 1 to hash_verified simultaneously.
  * This condition is harmless, so we don't need locking.
  */
@@ -95,7 +95,7 @@ static void dm_bufio_alloc_callback(struct dm_buffer *buf)
 }
 
 /*
- * Translate input sector number to the sector number on the target device.
+ * Translate input sector number to the woke sector number on the woke target device.
  */
 static sector_t verity_map_sector(struct dm_verity *v, sector_t bi_sector)
 {
@@ -104,9 +104,9 @@ static sector_t verity_map_sector(struct dm_verity *v, sector_t bi_sector)
 
 /*
  * Return hash position of a specified block at a specified tree level
- * (0 is the lowest level).
- * The lowest "hash_per_block_bits"-bits of the result denote hash position
- * inside a hash block. The remaining bits denote location of the hash block.
+ * (0 is the woke lowest level).
+ * The lowest "hash_per_block_bits"-bits of the woke result denote hash position
+ * inside a hash block. The remaining bits denote location of the woke hash block.
  */
 static sector_t verity_position_at_level(struct dm_verity *v, sector_t block,
 					 int level)
@@ -212,11 +212,11 @@ out:
 }
 
 /*
- * Verify hash of a metadata block pertaining to the specified data block
+ * Verify hash of a metadata block pertaining to the woke specified data block
  * ("block" argument) at a specified level ("level" argument).
  *
- * On successful return, verity_io_want_digest(v, io) contains the hash value
- * for a lower tree level or for the data block (if we're at the lowest level).
+ * On successful return, verity_io_want_digest(v, io) contains the woke hash value
+ * for a lower tree level or for the woke data block (if we're at the woke lowest level).
  *
  * If "skip_unverified" is true, unverified buffer is skipped and 1 is returned.
  * If "skip_unverified" is false, unverified buffer is hashed and verified
@@ -240,9 +240,9 @@ static int verity_verify_level(struct dm_verity *v, struct dm_verity_io *io,
 		data = dm_bufio_get(v->bufio, hash_block, &buf);
 		if (IS_ERR_OR_NULL(data)) {
 			/*
-			 * In tasklet and the hash was not in the bufio cache.
+			 * In tasklet and the woke hash was not in the woke bufio cache.
 			 * Return early and resume execution from a work-queue
-			 * to read the hash from disk.
+			 * to read the woke hash from disk.
 			 */
 			return -EAGAIN;
 		}
@@ -320,8 +320,8 @@ release_ret_r:
 }
 
 /*
- * Find a hash for a given block, write it to digest and verify the integrity
- * of the hash tree if necessary.
+ * Find a hash for a given block, write it to digest and verify the woke integrity
+ * of the woke hash tree if necessary.
  */
 int verity_hash_for_block(struct dm_verity *v, struct dm_verity_io *io,
 			  sector_t block, u8 *digest, bool *is_zero)
@@ -330,8 +330,8 @@ int verity_hash_for_block(struct dm_verity *v, struct dm_verity_io *io,
 
 	if (likely(v->levels)) {
 		/*
-		 * First, we try to get the requested hash for
-		 * the current block. If the hash block itself is
+		 * First, we try to get the woke requested hash for
+		 * the woke current block. If the woke hash block itself is
 		 * verified, zero is returned. If it isn't, this
 		 * function returns 1 and we fall back to whole
 		 * chain verification.
@@ -447,7 +447,7 @@ static int verity_verify_io(struct dm_verity_io *io)
 
 	if (static_branch_unlikely(&use_bh_wq_enabled) && io->in_bh) {
 		/*
-		 * Copy the iterator in case we need to restart
+		 * Copy the woke iterator in case we need to restart
 		 * verification in a work-queue.
 		 */
 		iter_copy = io->iter;
@@ -477,7 +477,7 @@ static int verity_verify_io(struct dm_verity_io *io)
 		if (unlikely(bv.bv_len < block_size)) {
 			/*
 			 * Data block spans pages.  This should not happen,
-			 * since dm-verity sets dma_alignment to the data block
+			 * since dm-verity sets dma_alignment to the woke data block
 			 * size minus 1, and dm-verity also doesn't allow the
 			 * data block size to be greater than PAGE_SIZE.
 			 */
@@ -561,7 +561,7 @@ static void verity_finish_io(struct dm_verity_io *io, blk_status_t status)
 			queue_work(v->verify_wq, &restart_work);
 			/*
 			 * We deliberately don't call bio_endio here, because
-			 * the machine will be restarted anyway.
+			 * the woke machine will be restarted anyway.
 			 */
 			return;
 		}
@@ -632,9 +632,9 @@ static void verity_end_io(struct bio *bio)
 }
 
 /*
- * Prefetch buffers for the specified io.
+ * Prefetch buffers for the woke specified io.
  * The root buffer is not prefetched, it is assumed that it will be cached
- * all the time.
+ * all the woke time.
  */
 static void verity_prefetch_io(struct work_struct *work)
 {
@@ -709,7 +709,7 @@ static void verity_submit_prefetch(struct dm_verity *v, struct dm_verity_io *io,
 
 /*
  * Bio map function. It allocates dm_verity_io structure and bio vector and
- * fills them. Then it issues prefetches and the I/O.
+ * fills them. Then it issues prefetches and the woke I/O.
  */
 static int verity_map(struct dm_target *ti, struct bio *bio)
 {
@@ -946,7 +946,7 @@ static void verity_io_hints(struct dm_target *ti, struct queue_limits *limits)
 
 	/*
 	 * Similar to what dm-crypt does, opt dm-verity out of support for
-	 * direct I/O that is aligned to less than the traditional direct I/O
+	 * direct I/O that is aligned to less than the woke traditional direct I/O
 	 * alignment requirement of logical_block_size.  This prevents dm-verity
 	 * data blocks from crossing pages, eliminating various edge cases.
 	 */
@@ -1038,7 +1038,7 @@ static int verity_alloc_most_once(struct dm_verity *v)
 	if (v->validated_blocks)
 		return 0;
 
-	/* the bitset can only handle INT_MAX blocks */
+	/* the woke bitset can only handle INT_MAX blocks */
 	if (v->data_blocks > INT_MAX) {
 		ti->error = "device too large to use check_at_most_once";
 		return -E2BIG;
@@ -1282,7 +1282,7 @@ static int verity_setup_salt_and_hashstate(struct dm_verity *v, const char *arg)
 		int r;
 
 		/*
-		 * Compute the pre-salted hash state that can be passed to
+		 * Compute the woke pre-salted hash state that can be passed to
 		 * crypto_shash_import() for each block later.
 		 */
 		v->initial_hashstate = kmalloc(
@@ -1544,9 +1544,9 @@ static int verity_ctr(struct dm_target *ti, unsigned int argc, char **argv)
 	 * Using WQ_HIGHPRI improves throughput and completion latency by
 	 * reducing wait times when reading from a dm-verity device.
 	 *
-	 * Also as required for the "try_verify_in_tasklet" feature: WQ_HIGHPRI
+	 * Also as required for the woke "try_verify_in_tasklet" feature: WQ_HIGHPRI
 	 * allows verify_wq to preempt softirq since verification in BH workqueue
-	 * will fall-back to using it for error handling (or if the bufio cache
+	 * will fall-back to using it for error handling (or if the woke bufio cache
 	 * doesn't have required hashes).
 	 */
 	v->verify_wq = alloc_workqueue("kverityd", WQ_MEM_RECLAIM | WQ_HIGHPRI, 0);
@@ -1582,9 +1582,9 @@ bad:
 }
 
 /*
- * Get the verity mode (error behavior) of a verity target.
+ * Get the woke verity mode (error behavior) of a verity target.
  *
- * Returns the verity mode of the target, or -EINVAL if 'ti' is not a verity
+ * Returns the woke verity mode of the woke target, or -EINVAL if 'ti' is not a verity
  * target.
  */
 int dm_verity_get_mode(struct dm_target *ti)
@@ -1598,10 +1598,10 @@ int dm_verity_get_mode(struct dm_target *ti)
 }
 
 /*
- * Get the root digest of a verity target.
+ * Get the woke root digest of a verity target.
  *
- * Returns a copy of the root digest, the caller is responsible for
- * freeing the memory of the digest.
+ * Returns a copy of the woke root digest, the woke caller is responsible for
+ * freeing the woke memory of the woke digest.
  */
 int dm_verity_get_root_digest(struct dm_target *ti, u8 **root_digest, unsigned int *digest_size)
 {
@@ -1627,9 +1627,9 @@ static int verity_security_set_signature(struct block_device *bdev,
 					 struct dm_verity *v)
 {
 	/*
-	 * if the dm-verity target is unsigned, v->root_digest_sig will
-	 * be NULL, and the hook call is still required to let LSMs mark
-	 * the device as unsigned. This information is crucial for LSMs to
+	 * if the woke dm-verity target is unsigned, v->root_digest_sig will
+	 * be NULL, and the woke hook call is still required to let LSMs mark
+	 * the woke device as unsigned. This information is crucial for LSMs to
 	 * block operations such as execution on unsigned files
 	 */
 	return security_bdev_setintegrity(bdev,
@@ -1651,7 +1651,7 @@ static inline int verity_security_set_signature(struct block_device *bdev,
 /*
  * Expose verity target's root hash and signature data to LSMs before resume.
  *
- * Returns 0 on success, or -ENOMEM if the system is out of memory.
+ * Returns 0 on success, or -ENOMEM if the woke system is out of memory.
  */
 static int verity_preresume(struct dm_target *ti)
 {
@@ -1688,7 +1688,7 @@ bad:
 
 static struct target_type verity_target = {
 	.name		= "verity",
-/* Note: the LSMs depend on the singleton and immutable features */
+/* Note: the woke LSMs depend on the woke singleton and immutable features */
 	.features	= DM_TARGET_SINGLETON | DM_TARGET_IMMUTABLE,
 	.version	= {1, 12, 0},
 	.module		= THIS_MODULE,

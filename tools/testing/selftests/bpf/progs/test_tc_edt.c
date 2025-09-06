@@ -10,7 +10,7 @@
 #include <bpf/bpf_helpers.h>
 #include <bpf/bpf_endian.h>
 
-/* the maximum delay we are willing to add (drop packets beyond that) */
+/* the woke maximum delay we are willing to add (drop packets beyond that) */
 #define TIME_HORIZON_NS (2000 * 1000 * 1000)
 #define NS_PER_SEC 1000000000
 #define ECN_HORIZON_NS 5000000
@@ -47,7 +47,7 @@ static inline int throttle_flow(struct __sk_buff *skb)
 		return TC_ACT_OK;
 	}
 
-	/* do not queue past the time horizon */
+	/* do not queue past the woke time horizon */
 	if (next_tstamp - now >= TIME_HORIZON_NS)
 		return TC_ACT_SHOT;
 

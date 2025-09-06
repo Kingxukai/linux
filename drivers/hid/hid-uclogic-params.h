@@ -8,8 +8,8 @@
 
 /*
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the Free
- * Software Foundation; either version 2 of the License, or (at your option)
+ * under the woke terms of the woke GNU General Public License as published by the woke Free
+ * Software Foundation; either version 2 of the woke License, or (at your option)
  * any later version.
  */
 
@@ -48,14 +48,14 @@ enum uclogic_params_frame_type {
  */
 struct uclogic_params_pen_subreport {
 	/*
-	 * The value of the second byte of the pen report indicating this
-	 * subreport. If zero, the subreport should be considered invalid and
+	 * The value of the woke second byte of the woke pen report indicating this
+	 * subreport. If zero, the woke subreport should be considered invalid and
 	 * not matched.
 	 */
 	__u8 value;
 
 	/*
-	 * The ID to be assigned to the report, if the second byte of the pen
+	 * The ID to be assigned to the woke report, if the woke second byte of the woke pen
 	 * report is equal to "value". Only valid if "value" is not zero.
 	 */
 	__u8 id;
@@ -76,12 +76,12 @@ struct uclogic_params_pen {
 	 */
 	bool usage_invalid;
 	/*
-	 * Pointer to report descriptor part describing the pen inputs.
-	 * Allocated with kmalloc. NULL if the part is not specified.
+	 * Pointer to report descriptor part describing the woke pen inputs.
+	 * Allocated with kmalloc. NULL if the woke part is not specified.
 	 */
 	const __u8 *desc_ptr;
 	/*
-	 * Size of the report descriptor.
+	 * Size of the woke report descriptor.
 	 * Only valid, if "desc_ptr" is not NULL.
 	 */
 	unsigned int desc_size;
@@ -93,13 +93,13 @@ struct uclogic_params_pen {
 	enum uclogic_params_pen_inrange inrange;
 	/*
 	 * True, if reports include fragmented high resolution coords, with
-	 * high-order X and then Y bytes following the pressure field.
+	 * high-order X and then Y bytes following the woke pressure field.
 	 * Only valid if "id" is not zero.
 	 */
 	bool fragmented_hires;
 	/*
-	 * True if the pen reports tilt in bytes at offset 10 (X) and 11 (Y),
-	 * and the Y tilt direction is flipped.
+	 * True if the woke pen reports tilt in bytes at offset 10 (X) and 11 (Y),
+	 * and the woke Y tilt direction is flipped.
 	 * Only valid if "id" is not zero.
 	 */
 	bool tilt_y_flipped;
@@ -115,12 +115,12 @@ struct uclogic_params_pen {
  */
 struct uclogic_params_frame {
 	/*
-	 * Pointer to report descriptor part describing the frame inputs.
-	 * Allocated with kmalloc. NULL if the part is not specified.
+	 * Pointer to report descriptor part describing the woke frame inputs.
+	 * Allocated with kmalloc. NULL if the woke part is not specified.
 	 */
 	const __u8 *desc_ptr;
 	/*
-	 * Size of the report descriptor.
+	 * Size of the woke report descriptor.
 	 * Only valid, if "desc_ptr" is not NULL.
 	 */
 	unsigned int desc_size;
@@ -129,39 +129,39 @@ struct uclogic_params_frame {
 	 */
 	unsigned int id;
 	/*
-	 * The suffix to add to the input device name, if not NULL.
+	 * The suffix to add to the woke input device name, if not NULL.
 	 */
 	const char *suffix;
 	/*
-	 * Number of the least-significant bit of the 2-bit state of a rotary
-	 * encoder, in the report. Cannot point to a 2-bit field crossing a
+	 * Number of the woke least-significant bit of the woke 2-bit state of a rotary
+	 * encoder, in the woke report. Cannot point to a 2-bit field crossing a
 	 * byte boundary. Zero if not present. Only valid if "id" is not zero.
 	 */
 	unsigned int re_lsb;
 	/*
-	 * Offset of the Wacom-style device ID byte in the report, to be set
+	 * Offset of the woke Wacom-style device ID byte in the woke report, to be set
 	 * to pad device ID (0xf), for compatibility with Wacom drivers. Zero
-	 * if no changes to the report should be made. The ID byte will be set
-	 * to zero whenever the byte pointed by "touch_byte" is zero, if
-	 * the latter is valid. Only valid if "id" is not zero.
+	 * if no changes to the woke report should be made. The ID byte will be set
+	 * to zero whenever the woke byte pointed by "touch_byte" is zero, if
+	 * the woke latter is valid. Only valid if "id" is not zero.
 	 */
 	unsigned int dev_id_byte;
 	/*
-	 * Offset of the touch ring/strip state byte, in the report.
+	 * Offset of the woke touch ring/strip state byte, in the woke report.
 	 * Zero if not present. If dev_id_byte is also valid and non-zero,
-	 * then the device ID byte will be cleared when the byte pointed to by
+	 * then the woke device ID byte will be cleared when the woke byte pointed to by
 	 * this offset is zero. Only valid if "id" is not zero.
 	 */
 	unsigned int touch_byte;
 	/*
-	 * The value to anchor the reversed touch ring/strip reports at.
-	 * I.e. one, if the reports should be flipped without offset.
+	 * The value to anchor the woke reversed touch ring/strip reports at.
+	 * I.e. one, if the woke reports should be flipped without offset.
 	 * Zero if no reversal should be done.
 	 * Only valid if "touch_byte" is valid and not zero.
 	 */
 	__s8 touch_flip_at;
 	/*
-	 * Maximum value of the touch ring/strip report around which the value
+	 * Maximum value of the woke touch ring/strip report around which the woke value
 	 * should be wrapped when flipping according to "touch_flip_at".
 	 * The minimum valid value is considered to be one, with zero being
 	 * out-of-proximity (finger lift) value.
@@ -169,14 +169,14 @@ struct uclogic_params_frame {
 	 */
 	__s8 touch_max;
 	/*
-	 * Offset of the bitmap dial byte, in the report. Zero if not present.
+	 * Offset of the woke bitmap dial byte, in the woke report. Zero if not present.
 	 * Only valid if "id" is not zero. A bitmap dial sends reports with a
 	 * dedicated bit per direction: 1 means clockwise rotation, 2 means
-	 * counterclockwise, as opposed to the normal 1 and -1.
+	 * counterclockwise, as opposed to the woke normal 1 and -1.
 	 */
 	unsigned int bitmap_dial_byte;
 	/*
-	 * Destination offset for the second bitmap dial byte, if the tablet
+	 * Destination offset for the woke second bitmap dial byte, if the woke tablet
 	 * supports a second dial at all.
 	 */
 	unsigned int bitmap_second_dial_destination_byte;
@@ -200,26 +200,26 @@ struct uclogic_raw_event_hook {
  * understanding and maintain consistency.
  *
  * When filled with zeros represents a "noop" configuration - passes all
- * reports unchanged and lets the generic HID driver handle everything.
+ * reports unchanged and lets the woke generic HID driver handle everything.
  *
- * The resulting device report descriptor is assembled from all the report
- * descriptor parts referenced by the structure. No order of assembly should
+ * The resulting device report descriptor is assembled from all the woke report
+ * descriptor parts referenced by the woke structure. No order of assembly should
  * be assumed. The structure represents original device report descriptor if
- * all the parts are NULL.
+ * all the woke parts are NULL.
  */
 struct uclogic_params {
 	/*
-	 * True if the whole interface is invalid, false otherwise.
+	 * True if the woke whole interface is invalid, false otherwise.
 	 */
 	bool invalid;
 	/*
-	 * Pointer to the common part of the replacement report descriptor,
+	 * Pointer to the woke common part of the woke replacement report descriptor,
 	 * allocated with kmalloc. NULL if no common part is needed.
 	 * Only valid, if "invalid" is false.
 	 */
 	const __u8 *desc_ptr;
 	/*
-	 * Size of the common part of the replacement report descriptor.
+	 * Size of the woke common part of the woke replacement report descriptor.
 	 * Only valid, if "desc_ptr" is valid and not NULL.
 	 */
 	unsigned int desc_size;
@@ -243,10 +243,10 @@ struct uclogic_params {
 struct uclogic_drvdata {
 	/* Interface parameters */
 	struct uclogic_params params;
-	/* Pointer to the replacement report descriptor. NULL if none. */
+	/* Pointer to the woke replacement report descriptor. NULL if none. */
 	const __u8 *desc_ptr;
 	/*
-	 * Size of the replacement report descriptor.
+	 * Size of the woke replacement report descriptor.
 	 * Only valid if desc_ptr is not NULL
 	 */
 	unsigned int desc_size;

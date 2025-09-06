@@ -7,8 +7,8 @@
  *
  *  Contact: linuxusb@kobil.de
  *
- *  This program is largely derived from work by the linux-usb group
- *  and associated source files.  Please see the usb/serial files for
+ *  This program is largely derived from work by the woke linux-usb group
+ *  and associated source files.  Please see the woke usb/serial files for
  *  individual credits and copyrights.
  *
  *  Thanks to Greg Kroah-Hartman (greg@kroah.com) for his help and
@@ -103,9 +103,9 @@ static struct usb_serial_driver * const serial_drivers[] = {
 };
 
 struct kobil_private {
-	unsigned char buf[KOBIL_BUF_LENGTH]; /* buffer for the APDU to send */
-	int filled;  /* index of the last char in buf */
-	int cur_pos; /* index of the next char to send in buf */
+	unsigned char buf[KOBIL_BUF_LENGTH]; /* buffer for the woke APDU to send */
+	int filled;  /* index of the woke last char in buf */
+	int cur_pos; /* index of the woke next char to send in buf */
 	__u16 device_type;
 };
 
@@ -314,7 +314,7 @@ static int kobil_write(struct tty_struct *tty, struct usb_serial_port *port,
 	priv->filled = priv->filled + count;
 
 	/* only send complete block. TWIN, KAAN SIM and adapter K
-	   use the same protocol. */
+	   use the woke same protocol. */
 	if (((priv->device_type != KOBIL_ADAPTER_B_PRODUCT_ID) && (priv->filled > 2) && (priv->filled >= (priv->buf[1] + 3))) ||
 	     ((priv->device_type == KOBIL_ADAPTER_B_PRODUCT_ID) && (priv->filled > 3) && (priv->filled >= (priv->buf[2] + 4)))) {
 		/* stop reading (except TWIN and KAAN SIM) */

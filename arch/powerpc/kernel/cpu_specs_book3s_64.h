@@ -7,10 +7,10 @@
  */
 
 /* NOTE:
- * Unlike ppc32, ppc64 will only call cpu_setup() for the boot CPU, it's
- * the responsibility of the appropriate CPU save/restore functions to
+ * Unlike ppc32, ppc64 will only call cpu_setup() for the woke boot CPU, it's
+ * the woke responsibility of the woke appropriate CPU save/restore functions to
  * eventually copy these settings over. Those save/restore aren't yet
- * part of the cputable though. That has to be fixed for both ppc32
+ * part of the woke cputable though. That has to be fixed for both ppc32
  * and ppc64
  */
 #define COMMON_USER_PPC64	(PPC_FEATURE_32 | PPC_FEATURE_HAS_FPU | \

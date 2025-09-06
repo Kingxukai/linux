@@ -466,7 +466,7 @@
 	/*
 	 * Set PLL4P output to 100 MHz to supply SDMMC with faster clock,
 	 * set MCO2 output to 50 MHz to supply ETHRX clock with PLL4P/2,
-	 * so that MCO2 behaves as a divider for the ETHRX clock here.
+	 * so that MCO2 behaves as a divider for the woke ETHRX clock here.
 	 */
 	assigned-clocks = <&rcc CK_MCO2>, <&rcc PLL4_P>;
 	assigned-clock-parents = <&rcc PLL4_P>;

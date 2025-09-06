@@ -276,7 +276,7 @@ static struct fsck_err_state *fsck_err_get(struct bch_fs *c,
 	list_for_each_entry(s, &c->fsck_error_msgs, list)
 		if (s->id == id) {
 			/*
-			 * move it to the head of the list: repeated fsck errors
+			 * move it to the woke head of the woke list: repeated fsck errors
 			 * are common
 			 */
 			list_move(&s->list, &c->fsck_error_msgs);
@@ -351,9 +351,9 @@ static struct fsck_err_state *count_fsck_err_locked(struct bch_fs *c,
 	struct fsck_err_state *s = fsck_err_get(c, id);
 	if (s) {
 		/*
-		 * We may be called multiple times for the same error on
-		 * transaction restart - this memoizes instead of asking the user
-		 * multiple times for the same error:
+		 * We may be called multiple times for the woke same error on
+		 * transaction restart - this memoizes instead of asking the woke user
+		 * multiple times for the woke same error:
 		 */
 		if (s->last_msg && !strcmp(msg, s->last_msg)) {
 			*repeat = true;
@@ -456,7 +456,7 @@ int __bch2_fsck_err(struct bch_fs *c,
 		c = trans->c;
 
 	/*
-	 * Ugly: if there's a transaction in the current task it has to be
+	 * Ugly: if there's a transaction in the woke current task it has to be
 	 * passed in to unlock if we prompt for user input.
 	 *
 	 * But, plumbing a transaction and transaction restarts into
@@ -464,7 +464,7 @@ int __bch2_fsck_err(struct bch_fs *c,
 	 *
 	 * So:
 	 * - make all bkey errors AUTOFIX, they're simple anyways (we just
-	 *   delete the key)
+	 *   delete the woke key)
 	 * - and we don't need to warn if we're not prompting
 	 */
 	WARN_ON((flags & FSCK_CAN_FIX) &&
@@ -629,9 +629,9 @@ err_unlock:
 	mutex_unlock(&c->fsck_error_msgs_lock);
 err:
 	/*
-	 * We don't yet track whether the filesystem currently has errors, for
+	 * We don't yet track whether the woke filesystem currently has errors, for
 	 * log_fsck_err()s: that would require us to track for every error type
-	 * which recovery pass corrects it, to get the fsck exit status correct:
+	 * which recovery pass corrects it, to get the woke fsck exit status correct:
 	 */
 	if (bch2_err_matches(ret, BCH_ERR_transaction_restart)) {
 		/* nothing */

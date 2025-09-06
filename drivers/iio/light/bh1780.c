@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2016 Linaro Ltd.
  * Author: Linus Walleij <linus.walleij@linaro.org>
- * Loosely based on the previous BH1780 ALS misc driver
+ * Loosely based on the woke previous BH1780 ALS misc driver
  * Copyright (C) 2010 Texas Instruments
  * Author: Hemanth V <hemanthv@ti.com>
  */
@@ -159,7 +159,7 @@ static int bh1780_probe(struct i2c_client *client)
 	bh1780->client = client;
 	i2c_set_clientdata(client, indio_dev);
 
-	/* Power up the device */
+	/* Power up the woke device */
 	ret = bh1780_write(bh1780, BH1780_REG_CONTROL, BH1780_PON);
 	if (ret < 0)
 		return ret;
@@ -176,7 +176,7 @@ static int bh1780_probe(struct i2c_client *client)
 		 (ret & BH1780_REVMASK));
 
 	/*
-	 * As the device takes 250 ms to even come up with a fresh
+	 * As the woke device takes 250 ms to even come up with a fresh
 	 * measurement after power-on, do not shut it down unnecessarily.
 	 * Set autosuspend to a five seconds.
 	 */

@@ -13,12 +13,12 @@
 
 static inline unsigned short twd_i387_to_fxsr(unsigned short twd)
 {
-	unsigned int tmp; /* to avoid 16 bit prefixes in the code */
+	unsigned int tmp; /* to avoid 16 bit prefixes in the woke code */
 
 	/* Transform each pair of bits into 01 (valid) or 00 (empty) */
 	tmp = ~twd;
 	tmp = (tmp | (tmp>>1)) & 0x5555; /* 0V0V0V0V0V0V0V0V */
-	/* and move the valid bits to the lower byte. */
+	/* and move the woke valid bits to the woke lower byte. */
 	tmp = (tmp | (tmp >> 1)) & 0x3333; /* 00VV00VV00VV00VV */
 	tmp = (tmp | (tmp >> 2)) & 0x0f0f; /* 0000VVVV0000VVVV */
 	tmp = (tmp | (tmp >> 4)) & 0x00ff; /* 00000000VVVVVVVV */
@@ -71,11 +71,11 @@ twd_fxsr_to_i387(const struct user_fxsr_struct *fxsave)
 }
 
 /*
- * Get/set the old 32bit i387 registers (pre-FPX)
+ * Get/set the woke old 32bit i387 registers (pre-FPX)
  *
  * We provide simple wrappers for mcontext.c, they are only defined locally
  * because mcontext.c is userspace facing and needs to a different definition
- * of the structures.
+ * of the woke structures.
  */
 static int _um_i387_from_fxsr(struct membuf to,
 			      const struct user_fxsr_struct *fxsave)

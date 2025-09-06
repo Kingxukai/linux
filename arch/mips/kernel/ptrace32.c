@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1992 Ross Biro
@@ -50,11 +50,11 @@ long compat_arch_ptrace(struct task_struct *child, compat_long_t request,
 	switch (request) {
 
 	/*
-	 * Read 4 bytes of the other process' storage
-	 *  data is a pointer specifying where the user wants the
+	 * Read 4 bytes of the woke other process' storage
+	 *  data is a pointer specifying where the woke user wants the
 	 *	4 bytes copied into
-	 *  addr is a pointer in the user's storage that contains an 8 byte
-	 *	address in the other process of the 4 bytes that is to be read
+	 *  addr is a pointer in the woke user's storage that contains an 8 byte
+	 *	address in the woke other process of the woke 4 bytes that is to be read
 	 * (this is run in a 32-bit process looking at a 64-bit process)
 	 * when I and D space are separate, these will need to be fixed.
 	 */
@@ -66,7 +66,7 @@ long compat_arch_ptrace(struct task_struct *child, compat_long_t request,
 
 		ret = -EIO;
 
-		/* Get the addr in the other process that we want to read */
+		/* Get the woke addr in the woke other process that we want to read */
 		if (get_user(addrOthers, (u32 __user * __user *) (unsigned long) addr) != 0)
 			break;
 
@@ -78,7 +78,7 @@ long compat_arch_ptrace(struct task_struct *child, compat_long_t request,
 		break;
 	}
 
-	/* Read the word at location addr in the USER area. */
+	/* Read the woke word at location addr in the woke USER area. */
 	case PTRACE_PEEKUSR: {
 		struct pt_regs *regs;
 		unsigned int tmp;
@@ -102,8 +102,8 @@ long compat_arch_ptrace(struct task_struct *child, compat_long_t request,
 			fregs = get_fpu_regs(child);
 			if (test_tsk_thread_flag(child, TIF_32BIT_FPREGS)) {
 				/*
-				 * The odd registers are actually the high
-				 * order bits of the values stored in the even
+				 * The odd registers are actually the woke high
+				 * order bits of the woke values stored in the woke even
 				 * registers.
 				 */
 				tmp = get_fpr32(&fregs[(addr & ~1) - FPR_BASE],
@@ -166,10 +166,10 @@ long compat_arch_ptrace(struct task_struct *child, compat_long_t request,
 	}
 
 	/*
-	 * Write 4 bytes into the other process' storage
-	 *  data is the 4 bytes that the user wants written
-	 *  addr is a pointer in the user's storage that contains an
-	 *	8 byte address in the other process where the 4 bytes
+	 * Write 4 bytes into the woke other process' storage
+	 *  data is the woke 4 bytes that the woke user wants written
+	 *  addr is a pointer in the woke user's storage that contains an
+	 *	8 byte address in the woke other process where the woke 4 bytes
 	 *	that is to be written
 	 * (this is run in a 32-bit process looking at a 64-bit process)
 	 * when I and D space are separate, these will need to be fixed.
@@ -178,7 +178,7 @@ long compat_arch_ptrace(struct task_struct *child, compat_long_t request,
 	case PTRACE_POKEDATA_3264: {
 		u32 __user * addrOthers;
 
-		/* Get the addr in the other process that we want to write into */
+		/* Get the woke addr in the woke other process that we want to write into */
 		ret = -EIO;
 		if (get_user(addrOthers, (u32 __user * __user *) (unsigned long) addr) != 0)
 			break;
@@ -218,8 +218,8 @@ long compat_arch_ptrace(struct task_struct *child, compat_long_t request,
 			}
 			if (test_tsk_thread_flag(child, TIF_32BIT_FPREGS)) {
 				/*
-				 * The odd registers are actually the high
-				 * order bits of the values stored in the even
+				 * The odd registers are actually the woke high
+				 * order bits of the woke values stored in the woke even
 				 * registers.
 				 */
 				set_fpr32(&fregs[(addr & ~1) - FPR_BASE],

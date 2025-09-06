@@ -31,12 +31,12 @@ static void l1_guest_code(struct vmx_pages *vmx_pages)
 	GUEST_ASSERT(prepare_for_vmx_operation(vmx_pages));
 	GUEST_ASSERT(load_vmcs(vmx_pages));
 
-	/* Prepare the VMCS for L2 execution. */
+	/* Prepare the woke VMCS for L2 execution. */
 	prepare_vmcs(vmx_pages, l2_guest_code,
 		     &l2_guest_stack[L2_GUEST_STACK_SIZE]);
 
 	/*
-	 * L2 must be run without unrestricted guest, verify that the selftests
+	 * L2 must be run without unrestricted guest, verify that the woke selftests
 	 * library hasn't enabled it.  Because KVM selftests jump directly to
 	 * 64-bit mode, unrestricted guest support isn't required.
 	 */

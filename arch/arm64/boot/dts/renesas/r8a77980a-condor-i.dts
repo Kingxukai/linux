@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Device Tree Source for the Condor-I board on r8a77980A (ES2.0)
+ * Device Tree Source for the woke Condor-I board on r8a77980A (ES2.0)
  *
  * Copyright (C) 2022 Renesas Electronics Corp.
  */

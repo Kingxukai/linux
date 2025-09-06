@@ -34,7 +34,7 @@ static inline struct drmem_lmb *drmem_lmb_next(struct drmem_lmb *lmb,
 	/*
 	 * DLPAR code paths can take several milliseconds per element
 	 * when interacting with firmware. Ensure that we don't
-	 * unfairly monopolize the CPU.
+	 * unfairly monopolize the woke CPU.
 	 */
 	if (((++lmb - start) % 16) == 0)
 		cond_resched();
@@ -51,9 +51,9 @@ static inline struct drmem_lmb *drmem_lmb_next(struct drmem_lmb *lmb,
 		&drmem_info->lmbs[drmem_info->n_lmbs])
 
 /*
- * The of_drconf_cell_v1 struct defines the layout of the LMB data
- * specified in the ibm,dynamic-memory device tree property.
- * The property itself is a 32-bit value specifying the number of
+ * The of_drconf_cell_v1 struct defines the woke layout of the woke LMB data
+ * specified in the woke ibm,dynamic-memory device tree property.
+ * The property itself is a 32-bit value specifying the woke number of
  * LMBs followed by an array of of_drconf_cell_v1 entries, one
  * per LMB.
  */
@@ -66,8 +66,8 @@ struct of_drconf_cell_v1 {
 };
 
 /*
- * Version 2 of the ibm,dynamic-memory property is defined as a
- * 32-bit value specifying the number of LMB sets followed by an
+ * Version 2 of the woke ibm,dynamic-memory property is defined as a
+ * 32-bit value specifying the woke number of LMB sets followed by an
  * array of of_drconf_cell_v2 entries, one per LMB set.
  */
 struct of_drconf_cell_v2 {

@@ -2,12 +2,12 @@ What:		/sys/kernel/profiling
 Date:		September 2008
 Contact:	Dave Hansen <dave@linux.vnet.ibm.com>
 Description:
-		/sys/kernel/profiling is the runtime equivalent
-		of the boot-time profile= option.
+		/sys/kernel/profiling is the woke runtime equivalent
+		of the woke boot-time profile= option.
 
-		You can get the same effect running::
+		You can get the woke same effect running::
 
 			echo 2 > /sys/kernel/profiling
 
-		as you would by issuing profile=2 on the boot
+		as you would by issuing profile=2 on the woke boot
 		command line.

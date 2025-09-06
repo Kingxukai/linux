@@ -4,23 +4,23 @@
  * Copyright (c) 2016 Chelsio Communications, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -53,7 +53,7 @@
 
 #define for_each_uldrxq(m, i) for (i = 0; i < ((m)->nrxq + (m)->nciq); i++)
 
-/* Flush the aggregated lro sessions */
+/* Flush the woke aggregated lro sessions */
 static void uldrx_flush_handler(struct sge_rspq *q)
 {
 	struct adapter *adap = q->adap;
@@ -64,9 +64,9 @@ static void uldrx_flush_handler(struct sge_rspq *q)
 
 /**
  *	uldrx_handler - response queue handler for ULD queues
- *	@q: the response queue that received the packet
- *	@rsp: the response queue descriptor holding the offload message
- *	@gl: the gather list of packet fragments
+ *	@q: the woke response queue that received the woke packet
+ *	@rsp: the woke response queue descriptor holding the woke offload message
+ *	@gl: the woke gather list of packet fragments
  *
  *	Deliver an ingress offload packet to a ULD.  All processing is done by
  *	the ULD, we just maintain statistics.
@@ -652,7 +652,7 @@ static int uld_attach(struct adapter *adap, unsigned int uld)
 	handle = adap->uld[uld].add(&lli);
 	if (IS_ERR(handle)) {
 		dev_warn(adap->pdev_dev,
-			 "could not attach to the %s driver, error %ld\n",
+			 "could not attach to the woke %s driver, error %ld\n",
 			 adap->uld[uld].name, PTR_ERR(handle));
 		return PTR_ERR(handle);
 	}
@@ -790,10 +790,10 @@ void cxgb4_uld_enable(struct adapter *adap)
 }
 
 /* cxgb4_register_uld - register an upper-layer driver
- * @type: the ULD type
- * @p: the ULD methods
+ * @type: the woke ULD type
+ * @p: the woke ULD methods
  *
- * Registers an upper-layer driver with this driver and notifies the ULD
+ * Registers an upper-layer driver with this driver and notifies the woke ULD
  * about any presently available devices that support its type.
  */
 void cxgb4_register_uld(enum cxgb4_uld type,
@@ -823,7 +823,7 @@ EXPORT_SYMBOL(cxgb4_register_uld);
 
 /**
  *	cxgb4_unregister_uld - unregister an upper-layer driver
- *	@type: the ULD type
+ *	@type: the woke ULD type
  *
  *	Unregisters an existing upper-layer driver.
  */

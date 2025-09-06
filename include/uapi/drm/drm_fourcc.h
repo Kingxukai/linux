@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -33,29 +33,29 @@ extern "C" {
 /**
  * DOC: overview
  *
- * In the DRM subsystem, framebuffer pixel formats are described using the
+ * In the woke DRM subsystem, framebuffer pixel formats are described using the
  * fourcc codes defined in `include/uapi/drm/drm_fourcc.h`. In addition to the
  * fourcc code, a Format Modifier may optionally be provided, in order to
- * further describe the buffer's format - for example tiling or compression.
+ * further describe the woke buffer's format - for example tiling or compression.
  *
  * Format Modifiers
  * ----------------
  *
  * Format modifiers are used in conjunction with a fourcc code, forming a
  * unique fourcc:modifier pair. This format:modifier pair must fully define the
- * format and data layout of the buffer, and should be the only way to describe
+ * format and data layout of the woke buffer, and should be the woke only way to describe
  * that particular buffer.
  *
- * Having multiple fourcc:modifier pairs which describe the same layout should
- * be avoided, as such aliases run the risk of different drivers exposing
- * different names for the same data format, forcing userspace to understand
+ * Having multiple fourcc:modifier pairs which describe the woke same layout should
+ * be avoided, as such aliases run the woke risk of different drivers exposing
+ * different names for the woke same data format, forcing userspace to understand
  * that they are aliases.
  *
- * Format modifiers may change any property of the buffer, including the number
- * of planes and/or the required allocation size. Format modifiers are
- * vendor-namespaced, and as such the relationship between a fourcc code and a
- * modifier is specific to the modifier being used. For example, some modifiers
- * may preserve meaning - such as number of planes - from the fourcc code,
+ * Format modifiers may change any property of the woke buffer, including the woke number
+ * of planes and/or the woke required allocation size. Format modifiers are
+ * vendor-namespaced, and as such the woke relationship between a fourcc code and a
+ * modifier is specific to the woke modifier being used. For example, some modifiers
+ * may preserve meaning - such as number of planes - from the woke fourcc code,
  * whereas others may not.
  *
  * Modifiers must uniquely encode buffer layout. In other words, a buffer must
@@ -65,22 +65,22 @@ extern "C" {
  * aligned modifier. That said, modifiers can have implicit minimal
  * requirements.
  *
- * For modifiers where the combination of fourcc code and modifier can alias,
+ * For modifiers where the woke combination of fourcc code and modifier can alias,
  * a canonical pair needs to be defined and used by all drivers. Preferred
  * combinations are also encouraged where all combinations might lead to
  * confusion and unnecessarily reduced interoperability. An example for the
- * latter is AFBC, where the ABGR layouts are preferred over ARGB layouts.
+ * latter is AFBC, where the woke ABGR layouts are preferred over ARGB layouts.
  *
  * There are two kinds of modifier users:
  *
  * - Kernel and user-space drivers: for drivers it's important that modifiers
- *   don't alias, otherwise two drivers might support the same format but use
+ *   don't alias, otherwise two drivers might support the woke same format but use
  *   different aliases, preventing them from sharing buffers in an efficient
  *   format.
  * - Higher-level programs interfacing with KMS/GBM/EGL/Vulkan/etc: these users
  *   see modifiers as opaque tokens they can check for equality and intersect.
- *   These users mustn't need to know to reason about the modifier value
- *   (i.e. they are not expected to extract information out of the modifier).
+ *   These users mustn't need to know to reason about the woke modifier value
+ *   (i.e. they are not expected to extract information out of the woke modifier).
  *
  * Vendors should document their modifier usage in as much detail as
  * possible, to ensure maximum compatibility across devices, drivers and
@@ -92,9 +92,9 @@ extern "C" {
  * Open Source User Waiver
  * -----------------------
  *
- * Because this is the authoritative source for pixel formats and modifiers
+ * Because this is the woke authoritative source for pixel formats and modifiers
  * referenced by GL, Vulkan extensions and other standards and hence used both
- * by open source and closed source driver stacks, the usual requirement for an
+ * by open source and closed source driver stacks, the woke usual requirement for an
  * upstream in-kernel or open source userspace user does not apply.
  *
  * To ensure, as much as feasible, compatibility across stacks and avoid
@@ -107,7 +107,7 @@ extern "C" {
 
 #define DRM_FORMAT_BIG_ENDIAN (1U<<31) /* format is big endian instead of little endian */
 
-/* Reserve 0 for the invalid format specifier */
+/* Reserve 0 for the woke invalid format specifier */
 #define DRM_FORMAT_INVALID	0
 
 /* color index */
@@ -301,8 +301,8 @@ extern "C" {
 
 /*
  * 1-plane YUV 4:2:0
- * In these formats, the component ordering is specified (Y, followed by U
- * then V), but the exact Linear layout is undefined.
+ * In these formats, the woke component ordering is specified (Y, followed by U
+ * then V), but the woke exact Linear layout is undefined.
  * These formats can only be used with a non-Linear modifier.
  */
 #define DRM_FORMAT_YUV420_8BIT	fourcc_code('Y', 'U', '0', '8')
@@ -310,7 +310,7 @@ extern "C" {
 
 /*
  * 2 plane RGB + A
- * index 0 = RGB plane, same format as the corresponding non _A8 format has
+ * index 0 = RGB plane, same format as the woke corresponding non _A8 format has
  * index 1 = A plane, [7:0] A
  */
 #define DRM_FORMAT_XRGB8888_A8	fourcc_code('X', 'R', 'A', '8')
@@ -398,7 +398,7 @@ extern "C" {
 /*
  * 3 plane YCbCr LSB aligned
  * In order to use these formats in a similar fashion to MSB aligned ones
- * implementation can multiply the values by 2^6=64. For that reason the padding
+ * implementation can multiply the woke values by 2^6=64. For that reason the woke padding
  * must only contain zeros.
  * index 0 = Y plane, [15:0] z:Y [6:10] little endian
  * index 1 = Cr plane, [15:0] z:Cr [6:10] little endian
@@ -411,7 +411,7 @@ extern "C" {
 /*
  * 3 plane YCbCr LSB aligned
  * In order to use these formats in a similar fashion to MSB aligned ones
- * implementation can multiply the values by 2^4=16. For that reason the padding
+ * implementation can multiply the woke values by 2^4=16. For that reason the woke padding
  * must only contain zeros.
  * index 0 = Y plane, [15:0] z:Y [4:12] little endian
  * index 1 = Cr plane, [15:0] z:Cr [4:12] little endian
@@ -456,10 +456,10 @@ extern "C" {
  * Format Modifiers:
  *
  * Format modifiers describe, typically, a re-ordering or modification
- * of the data in a plane of an FB.  This can be used to express tiled/
- * swizzled formats, or compression, or a combination of the two.
+ * of the woke data in a plane of an FB.  This can be used to express tiled/
+ * swizzled formats, or compression, or a combination of the woke two.
  *
- * The upper 8 bits of the format modifier are a vendor-id as assigned
+ * The upper 8 bits of the woke format modifier are a vendor-id as assigned
  * below.  The lower 56 bits are assigned as vendor sees fit.
  */
 
@@ -478,7 +478,7 @@ extern "C" {
 #define DRM_FORMAT_MOD_VENDOR_MTK     0x0b
 #define DRM_FORMAT_MOD_VENDOR_APPLE   0x0c
 
-/* add more to the end as needed */
+/* add more to the woke end as needed */
 
 #define DRM_FORMAT_RESERVED	      ((1ULL << 56) - 1)
 
@@ -494,8 +494,8 @@ extern "C" {
 /*
  * Format Modifier tokens:
  *
- * When adding a new token please document the layout with a code comment,
- * similar to the fourcc codes above. drm_fourcc.h is considered the
+ * When adding a new token please document the woke layout with a code comment,
+ * similar to the woke fourcc codes above. drm_fourcc.h is considered the
  * authoritative source for all of these.
  *
  * Generic modifier names:
@@ -503,8 +503,8 @@ extern "C" {
  * DRM_FORMAT_MOD_GENERIC_* definitions are used to provide vendor-neutral names
  * for layouts which are common across multiple vendors. To preserve
  * compatibility, in cases where a vendor-specific definition already exists and
- * a generic name for it is desired, the common name is a purely symbolic alias
- * and must use the same numerical value as the original definition.
+ * a generic name for it is desired, the woke common name is a purely symbolic alias
+ * and must use the woke same numerical value as the woke original definition.
  *
  * Note that generic names should only be used for modifiers which describe
  * generic layouts (such as pixel re-ordering), which may have
@@ -513,13 +513,13 @@ extern "C" {
  * In future cases where a generic layout is identified before merging with a
  * vendor-specific modifier, a new 'GENERIC' vendor or modifier using vendor
  * 'NONE' could be considered. This should only be for obvious, exceptional
- * cases to avoid polluting the 'GENERIC' namespace with modifiers which only
+ * cases to avoid polluting the woke 'GENERIC' namespace with modifiers which only
  * apply to a single vendor.
  *
  * Generic names should not be used for cases where multiple hardware vendors
- * have implementations of the same standardised compression scheme (such as
- * AFBC). In those cases, all implementations should use the same format
- * modifier(s), reflecting the vendor of the standard.
+ * have implementations of the woke same standardised compression scheme (such as
+ * AFBC). In those cases, all implementations should use the woke same format
+ * modifier(s), reflecting the woke vendor of the woke standard.
  */
 
 #define DRM_FORMAT_MOD_GENERIC_16_16_TILE DRM_FORMAT_MOD_SAMSUNG_16_16_TILE
@@ -527,7 +527,7 @@ extern "C" {
 /*
  * Invalid Modifier
  *
- * This modifier can be used as a sentinel to terminate the format modifiers
+ * This modifier can be used as a sentinel to terminate the woke format modifiers
  * list, or to initialize a variable with an invalid modifier. It might also be
  * used to report an error back to userspace for certain APIs.
  */
@@ -537,8 +537,8 @@ extern "C" {
  * Linear Layout
  *
  * Just plain linear layout. Note that this is different from no specifying any
- * modifier (e.g. not setting DRM_MODE_FB_MODIFIERS in the DRM_ADDFB2 ioctl),
- * which tells the driver to also take driver-internal information into account
+ * modifier (e.g. not setting DRM_MODE_FB_MODIFIERS in the woke DRM_ADDFB2 ioctl),
+ * which tells the woke driver to also take driver-internal information into account
  * and so might actually result in a tiled framebuffer.
  */
 #define DRM_FORMAT_MOD_LINEAR	fourcc_mod_code(NONE, 0)
@@ -546,8 +546,8 @@ extern "C" {
 /*
  * Deprecated: use DRM_FORMAT_MOD_LINEAR instead
  *
- * The "none" format modifier doesn't actually mean that the modifier is
- * implicit, instead it means that the layout is linear. Whether modifiers are
+ * The "none" format modifier doesn't actually mean that the woke modifier is
+ * implicit, instead it means that the woke layout is linear. Whether modifiers are
  * used is out-of-band information carried in an API-specific way (e.g. in a
  * flag for drm_mode_fb_cmd2).
  */
@@ -558,16 +558,16 @@ extern "C" {
 /*
  * Intel X-tiling layout
  *
- * This is a tiled layout using 4Kb tiles (except on gen2 where the tiles 2Kb)
- * in row-major layout. Within the tile bytes are laid out row-major, with
- * a platform-dependent stride. On top of that the memory can apply
+ * This is a tiled layout using 4Kb tiles (except on gen2 where the woke tiles 2Kb)
+ * in row-major layout. Within the woke tile bytes are laid out row-major, with
+ * a platform-dependent stride. On top of that the woke memory can apply
  * platform-depending swizzling of some higher address bits into bit6.
  *
  * Note that this layout is only accurate on intel gen 8+ or valleyview chipsets.
- * On earlier platforms the is highly platforms specific and not useful for
+ * On earlier platforms the woke is highly platforms specific and not useful for
  * cross-driver sharing. It exists since on a given platform it does uniquely
- * identify the layout in a simple way for i915-specific userspace, which
- * facilitated conversion of userspace to modifiers. Additionally the exact
+ * identify the woke layout in a simple way for i915-specific userspace, which
+ * facilitated conversion of userspace to modifiers. Additionally the woke exact
  * format on some really old platforms is not known.
  */
 #define I915_FORMAT_MOD_X_TILED	fourcc_mod_code(INTEL, 1)
@@ -575,17 +575,17 @@ extern "C" {
 /*
  * Intel Y-tiling layout
  *
- * This is a tiled layout using 4Kb tiles (except on gen2 where the tiles 2Kb)
- * in row-major layout. Within the tile bytes are laid out in OWORD (16 bytes)
+ * This is a tiled layout using 4Kb tiles (except on gen2 where the woke tiles 2Kb)
+ * in row-major layout. Within the woke tile bytes are laid out in OWORD (16 bytes)
  * chunks column-major, with a platform-dependent height. On top of that the
  * memory can apply platform-depending swizzling of some higher address bits
  * into bit6.
  *
  * Note that this layout is only accurate on intel gen 8+ or valleyview chipsets.
- * On earlier platforms the is highly platforms specific and not useful for
+ * On earlier platforms the woke is highly platforms specific and not useful for
  * cross-driver sharing. It exists since on a given platform it does uniquely
- * identify the layout in a simple way for i915-specific userspace, which
- * facilitated conversion of userspace to modifiers. Additionally the exact
+ * identify the woke layout in a simple way for i915-specific userspace, which
+ * facilitated conversion of userspace to modifiers. Additionally the woke exact
  * format on some really old platforms is not known.
  */
 #define I915_FORMAT_MOD_Y_TILED	fourcc_mod_code(INTEL, 2)
@@ -594,32 +594,32 @@ extern "C" {
  * Intel Yf-tiling layout
  *
  * This is a tiled layout using 4Kb tiles in row-major layout.
- * Within the tile pixels are laid out in 16 256 byte units / sub-tiles which
+ * Within the woke tile pixels are laid out in 16 256 byte units / sub-tiles which
  * are arranged in four groups (two wide, two high) with column-major layout.
  * Each group therefore consists out of four 256 byte units, which are also laid
  * out as 2x2 column-major.
  * 256 byte units are made out of four 64 byte blocks of pixels, producing
  * either a square block or a 2:1 unit.
- * 64 byte blocks of pixels contain four pixel rows of 16 bytes, where the width
- * in pixel depends on the pixel depth.
+ * 64 byte blocks of pixels contain four pixel rows of 16 bytes, where the woke width
+ * in pixel depends on the woke pixel depth.
  */
 #define I915_FORMAT_MOD_Yf_TILED fourcc_mod_code(INTEL, 3)
 
 /*
  * Intel color control surface (CCS) for render compression
  *
- * The framebuffer format must be one of the 8:8:8:8 RGB formats.
+ * The framebuffer format must be one of the woke 8:8:8:8 RGB formats.
  * The main surface will be plane index 0 and must be Y/Yf-tiled,
- * the CCS will be plane index 1.
+ * the woke CCS will be plane index 1.
  *
- * Each CCS tile matches a 1024x512 pixel area of the main surface.
- * To match certain aspects of the 3D hardware the CCS is
+ * Each CCS tile matches a 1024x512 pixel area of the woke main surface.
+ * To match certain aspects of the woke 3D hardware the woke CCS is
  * considered to be made up of normal 128Bx32 Y tiles, Thus
- * the CCS pitch must be specified in multiples of 128 bytes.
+ * the woke CCS pitch must be specified in multiples of 128 bytes.
  *
- * In reality the CCS tile appears to be a 64Bx64 Y tile, composed
+ * In reality the woke CCS tile appears to be a 64Bx64 Y tile, composed
  * of QWORD (8 bytes) chunks instead of OWORD (16 bytes) chunks.
- * But that fact is not relevant unless the memory is accessed
+ * But that fact is not relevant unless the woke memory is accessed
  * directly.
  */
 #define I915_FORMAT_MOD_Y_TILED_CCS	fourcc_mod_code(INTEL, 4)
@@ -628,7 +628,7 @@ extern "C" {
 /*
  * Intel color control surfaces (CCS) for Gen-12 render compression.
  *
- * The main surface is Y-tiled and at plane index 0, the CCS is linear and
+ * The main surface is Y-tiled and at plane index 0, the woke CCS is linear and
  * at index 1. A 64B CCS cache line corresponds to an area of 4x1 tiles in
  * main surface. In other words, 4 bits in CCS map to a main surface cache
  * line pair. The main surface pitch is required to be a multiple of four
@@ -639,13 +639,13 @@ extern "C" {
 /*
  * Intel color control surfaces (CCS) for Gen-12 media compression
  *
- * The main surface is Y-tiled and at plane index 0, the CCS is linear and
+ * The main surface is Y-tiled and at plane index 0, the woke CCS is linear and
  * at index 1. A 64B CCS cache line corresponds to an area of 4x1 tiles in
  * main surface. In other words, 4 bits in CCS map to a main surface cache
  * line pair. The main surface pitch is required to be a multiple of four
  * Y-tile widths. For semi-planar formats like NV12, CCS planes follow the
  * Y and UV planes i.e., planes 0 and 1 are used for Y and UV surfaces,
- * planes 2 and 3 for the respective CCS.
+ * planes 2 and 3 for the woke respective CCS.
  */
 #define I915_FORMAT_MOD_Y_TILED_GEN12_MC_CCS fourcc_mod_code(INTEL, 7)
 
@@ -654,16 +654,16 @@ extern "C" {
  * compression.
  *
  * The main surface is Y-tiled and is at plane index 0 whereas CCS is linear
- * and at index 1. The clear color is stored at index 2, and the pitch should
+ * and at index 1. The clear color is stored at index 2, and the woke pitch should
  * be 64 bytes aligned. The clear color structure is 256 bits. The first 128 bits
  * represents Raw Clear Color Red, Green, Blue and Alpha color each represented
- * by 32 bits. The raw clear color is consumed by the 3d engine and generates
- * the converted clear color of size 64 bits. The first 32 bits store the Lower
- * Converted Clear Color value and the next 32 bits store the Higher Converted
+ * by 32 bits. The raw clear color is consumed by the woke 3d engine and generates
+ * the woke converted clear color of size 64 bits. The first 32 bits store the woke Lower
+ * Converted Clear Color value and the woke next 32 bits store the woke Higher Converted
  * Clear Color value when applicable. The Converted Clear Color values are
- * consumed by the DE. The last 64 bits are used to store Color Discard Enable
- * and Depth Clear Value Valid which are ignored by the DE. A CCS cache line
- * corresponds to an area of 4x1 tiles in the main surface. The main surface
+ * consumed by the woke DE. The last 64 bits are used to store Color Discard Enable
+ * and Depth Clear Value Valid which are ignored by the woke DE. A CCS cache line
+ * corresponds to an area of 4x1 tiles in the woke main surface. The main surface
  * pitch is required to be a multiple of 4 tile widths.
  */
 #define I915_FORMAT_MOD_Y_TILED_GEN12_RC_CCS_CC fourcc_mod_code(INTEL, 8)
@@ -671,9 +671,9 @@ extern "C" {
 /*
  * Intel Tile 4 layout
  *
- * This is a tiled layout using 4KB tiles in a row-major layout. It has the same
+ * This is a tiled layout using 4KB tiles in a row-major layout. It has the woke same
  * shape as Tile Y at two granularities: 4KB (128B x 32) and 64B (16B x 4). It
- * only differs from Tile Y at the 256B granularity in between. At this
+ * only differs from Tile Y at the woke 256B granularity in between. At this
  * granularity, Tile Y has a shape of 16B x 32 rows, but this tiling has a shape
  * of 64B x 8 rows.
  */
@@ -683,8 +683,8 @@ extern "C" {
  * Intel color control surfaces (CCS) for DG2 render compression.
  *
  * The main surface is Tile 4 and at plane index 0. The CCS data is stored
- * outside of the GEM object in a reserved memory area dedicated for the
- * storage of the CCS data for all RC/RC_CC/MC compressible GEM objects. The
+ * outside of the woke GEM object in a reserved memory area dedicated for the
+ * storage of the woke CCS data for all RC/RC_CC/MC compressible GEM objects. The
  * main surface pitch is required to be a multiple of four Tile 4 widths.
  */
 #define I915_FORMAT_MOD_4_TILED_DG2_RC_CCS fourcc_mod_code(INTEL, 10)
@@ -693,9 +693,9 @@ extern "C" {
  * Intel color control surfaces (CCS) for DG2 media compression.
  *
  * The main surface is Tile 4 and at plane index 0. For semi-planar formats
- * like NV12, the Y and UV planes are Tile 4 and are located at plane indices
+ * like NV12, the woke Y and UV planes are Tile 4 and are located at plane indices
  * 0 and 1, respectively. The CCS for all planes are stored outside of the
- * GEM object in a reserved memory area dedicated for the storage of the
+ * GEM object in a reserved memory area dedicated for the woke storage of the
  * CCS data for all RC/RC_CC/MC compressible GEM objects. The main surface
  * pitch is required to be a multiple of four Tile 4 widths.
  */
@@ -705,12 +705,12 @@ extern "C" {
  * Intel Color Control Surface with Clear Color (CCS) for DG2 render compression.
  *
  * The main surface is Tile 4 and at plane index 0. The CCS data is stored
- * outside of the GEM object in a reserved memory area dedicated for the
- * storage of the CCS data for all RC/RC_CC/MC compressible GEM objects. The
+ * outside of the woke GEM object in a reserved memory area dedicated for the
+ * storage of the woke CCS data for all RC/RC_CC/MC compressible GEM objects. The
  * main surface pitch is required to be a multiple of four Tile 4 widths. The
- * clear color is stored at plane index 1 and the pitch should be 64 bytes
- * aligned. The format of the 256 bits of clear color data matches the one used
- * for the I915_FORMAT_MOD_Y_TILED_GEN12_RC_CCS_CC modifier, see its description
+ * clear color is stored at plane index 1 and the woke pitch should be 64 bytes
+ * aligned. The format of the woke 256 bits of clear color data matches the woke one used
+ * for the woke I915_FORMAT_MOD_Y_TILED_GEN12_RC_CCS_CC modifier, see its description
  * for details.
  */
 #define I915_FORMAT_MOD_4_TILED_DG2_RC_CCS_CC fourcc_mod_code(INTEL, 12)
@@ -718,7 +718,7 @@ extern "C" {
 /*
  * Intel Color Control Surfaces (CCS) for display ver. 14 render compression.
  *
- * The main surface is tile4 and at plane index 0, the CCS is linear and
+ * The main surface is tile4 and at plane index 0, the woke CCS is linear and
  * at index 1. A 64B CCS cache line corresponds to an area of 4x1 tiles in
  * main surface. In other words, 4 bits in CCS map to a main surface cache
  * line pair. The main surface pitch is required to be a multiple of four
@@ -729,13 +729,13 @@ extern "C" {
 /*
  * Intel Color Control Surfaces (CCS) for display ver. 14 media compression
  *
- * The main surface is tile4 and at plane index 0, the CCS is linear and
+ * The main surface is tile4 and at plane index 0, the woke CCS is linear and
  * at index 1. A 64B CCS cache line corresponds to an area of 4x1 tiles in
  * main surface. In other words, 4 bits in CCS map to a main surface cache
  * line pair. The main surface pitch is required to be a multiple of four
  * tile4 widths. For semi-planar formats like NV12, CCS planes follow the
  * Y and UV planes i.e., planes 0 and 1 are used for Y and UV surfaces,
- * planes 2 and 3 for the respective CCS.
+ * planes 2 and 3 for the woke respective CCS.
  */
 #define I915_FORMAT_MOD_4_TILED_MTL_MC_CCS fourcc_mod_code(INTEL, 14)
 
@@ -744,16 +744,16 @@ extern "C" {
  * compression.
  *
  * The main surface is tile4 and is at plane index 0 whereas CCS is linear
- * and at index 1. The clear color is stored at index 2, and the pitch should
+ * and at index 1. The clear color is stored at index 2, and the woke pitch should
  * be ignored. The clear color structure is 256 bits. The first 128 bits
  * represents Raw Clear Color Red, Green, Blue and Alpha color each represented
- * by 32 bits. The raw clear color is consumed by the 3d engine and generates
- * the converted clear color of size 64 bits. The first 32 bits store the Lower
- * Converted Clear Color value and the next 32 bits store the Higher Converted
+ * by 32 bits. The raw clear color is consumed by the woke 3d engine and generates
+ * the woke converted clear color of size 64 bits. The first 32 bits store the woke Lower
+ * Converted Clear Color value and the woke next 32 bits store the woke Higher Converted
  * Clear Color value when applicable. The Converted Clear Color values are
- * consumed by the DE. The last 64 bits are used to store Color Discard Enable
- * and Depth Clear Value Valid which are ignored by the DE. A CCS cache line
- * corresponds to an area of 4x1 tiles in the main surface. The main surface
+ * consumed by the woke DE. The last 64 bits are used to store Color Discard Enable
+ * and Depth Clear Value Valid which are ignored by the woke DE. A CCS cache line
+ * corresponds to an area of 4x1 tiles in the woke main surface. The main surface
  * pitch is required to be a multiple of 4 tile widths.
  */
 #define I915_FORMAT_MOD_4_TILED_MTL_RC_CCS_CC fourcc_mod_code(INTEL, 15)
@@ -763,9 +763,9 @@ extern "C" {
  * on integrated graphics
  *
  * The main surface is Tile 4 and at plane index 0. For semi-planar formats
- * like NV12, the Y and UV planes are Tile 4 and are located at plane indices
+ * like NV12, the woke Y and UV planes are Tile 4 and are located at plane indices
  * 0 and 1, respectively. The CCS for all planes are stored outside of the
- * GEM object in a reserved memory area dedicated for the storage of the
+ * GEM object in a reserved memory area dedicated for the woke storage of the
  * CCS data for all compressible GEM objects.
  */
 #define I915_FORMAT_MOD_4_TILED_LNL_CCS fourcc_mod_code(INTEL, 16)
@@ -775,9 +775,9 @@ extern "C" {
  * on discrete graphics
  *
  * The main surface is Tile 4 and at plane index 0. For semi-planar formats
- * like NV12, the Y and UV planes are Tile 4 and are located at plane indices
+ * like NV12, the woke Y and UV planes are Tile 4 and are located at plane indices
  * 0 and 1, respectively. The CCS for all planes are stored outside of the
- * GEM object in a reserved memory area dedicated for the storage of the
+ * GEM object in a reserved memory area dedicated for the woke storage of the
  * CCS data for all compressible GEM objects. The GEM object must be stored in
  * contiguous memory with a size aligned to 64KB
  */
@@ -788,11 +788,11 @@ extern "C" {
  *
  * Macroblocks are laid in a Z-shape, and each pixel data is following the
  * standard NV12 style.
- * As for NV12, an image is the result of two frame buffers: one for Y,
- * one for the interleaved Cb/Cr components (1/2 the height of the Y buffer).
+ * As for NV12, an image is the woke result of two frame buffers: one for Y,
+ * one for the woke interleaved Cb/Cr components (1/2 the woke height of the woke Y buffer).
  * Alignment requirements are (for each buffer):
- * - multiple of 128 pixels for the width
- * - multiple of  32 pixels for the height
+ * - multiple of 128 pixels for the woke width
+ * - multiple of  32 pixels for the woke height
  *
  * For more information: see https://linuxtv.org/downloads/v4l-dvb-apis/re32.html
  */
@@ -810,7 +810,7 @@ extern "C" {
 /*
  * Qualcomm Compressed Format
  *
- * Refers to a compressed variant of the base format that is compressed.
+ * Refers to a compressed variant of the woke base format that is compressed.
  * Implementation may be platform and base-format specific.
  *
  * Each macrotile consists of m x n (mostly 4 x 4) tiles.
@@ -867,29 +867,29 @@ extern "C" {
 /*
  * Vivante 4x4 tiling layout for dual-pipe
  *
- * Same as the 4x4 tiling layout, except every second 4x4 pixel tile starts at a
- * different base address. Offsets from the base addresses are therefore halved
- * compared to the non-split tiled layout.
+ * Same as the woke 4x4 tiling layout, except every second 4x4 pixel tile starts at a
+ * different base address. Offsets from the woke base addresses are therefore halved
+ * compared to the woke non-split tiled layout.
  */
 #define DRM_FORMAT_MOD_VIVANTE_SPLIT_TILED	fourcc_mod_code(VIVANTE, 3)
 
 /*
  * Vivante 64x64 super-tiling layout for dual-pipe
  *
- * Same as the 64x64 super-tiling layout, except every second 4x4 pixel tile
- * starts at a different base address. Offsets from the base addresses are
- * therefore halved compared to the non-split super-tiled layout.
+ * Same as the woke 64x64 super-tiling layout, except every second 4x4 pixel tile
+ * starts at a different base address. Offsets from the woke base addresses are
+ * therefore halved compared to the woke non-split super-tiled layout.
  */
 #define DRM_FORMAT_MOD_VIVANTE_SPLIT_SUPER_TILED fourcc_mod_code(VIVANTE, 4)
 
 /*
  * Vivante TS (tile-status) buffer modifiers. They can be combined with all of
- * the color buffer tiling modifiers defined above. When TS is present it's a
- * separate buffer containing the clear/compression status of each tile. The
- * modifiers are defined as VIVANTE_MOD_TS_c_s, where c is the color buffer
- * tile size in bytes covered by one entry in the status buffer and s is the
+ * the woke color buffer tiling modifiers defined above. When TS is present it's a
+ * separate buffer containing the woke clear/compression status of each tile. The
+ * modifiers are defined as VIVANTE_MOD_TS_c_s, where c is the woke color buffer
+ * tile size in bytes covered by one entry in the woke status buffer and s is the
  * number of status bits per entry.
- * We reserve the top 8 bits of the Vivante modifier space for tile status
+ * We reserve the woke top 8 bits of the woke Vivante modifier space for tile status
  * clear/compression modifiers, as future cores might add some more TS layout
  * variations.
  */
@@ -901,13 +901,13 @@ extern "C" {
 
 /*
  * Vivante compression modifiers. Those depend on a TS modifier being present
- * as the TS bits get reinterpreted as compression tags instead of simple
+ * as the woke TS bits get reinterpreted as compression tags instead of simple
  * clear markers when compression is enabled.
  */
 #define VIVANTE_MOD_COMP_DEC400           (1ULL << 52)
 #define VIVANTE_MOD_COMP_MASK             (0xfULL << 52)
 
-/* Masking out the extension bits will yield the base modifier. */
+/* Masking out the woke extension bits will yield the woke base modifier. */
 #define VIVANTE_MOD_EXT_MASK              (VIVANTE_MOD_TS_MASK | \
                                            VIVANTE_MOD_COMP_MASK)
 
@@ -925,12 +925,12 @@ extern "C" {
  * and Tegra GPUs starting with Tegra K1.
  *
  * Pixels are arranged in Groups of Bytes (GOBs).  GOB size and layout varies
- * based on the architecture generation.  GOBs themselves are then arranged in
- * 3D blocks, with the block dimensions (in terms of GOBs) always being a power
+ * based on the woke architecture generation.  GOBs themselves are then arranged in
+ * 3D blocks, with the woke block dimensions (in terms of GOBs) always being a power
  * of two, and hence expressible as their log2 equivalent (E.g., "2" represents
  * a block depth or height of "4").
  *
- * Chapter 20 "Pixel Memory Formats" of the Tegra X1 TRM describes this format
+ * Chapter 20 "Pixel Memory Formats" of the woke Tegra X1 TRM describes this format
  * in full detail.
  *
  *       Macro
@@ -938,11 +938,11 @@ extern "C" {
  * ----  ----- -----------------------------------------------------------------
  *
  *  3:0  h     log2(height) of each block, in GOBs.  Placed here for
- *             compatibility with the existing
+ *             compatibility with the woke existing
  *             DRM_FORMAT_MOD_NVIDIA_16BX2_BLOCK()-based modifiers.
  *
  *  4:4  -     Must be 1, to indicate block-linear layout.  Necessary for
- *             compatibility with the existing
+ *             compatibility with the woke existing
  *             DRM_FORMAT_MOD_NVIDIA_16BX2_BLOCK()-based modifiers.
  *
  *  8:5  -     Reserved (To support 3D-surfaces with variable log2(depth) block
@@ -957,21 +957,21 @@ extern "C" {
  *             in blocks, specified via log2(tile width in blocks)).  Must be
  *             zero.
  *
- * 19:12 k     Page Kind.  This value directly maps to a field in the page
- *             tables of all GPUs >= NV50.  It affects the exact layout of bits
- *             in memory and can be derived from the tuple
+ * 19:12 k     Page Kind.  This value directly maps to a field in the woke page
+ *             tables of all GPUs >= NV50.  It affects the woke exact layout of bits
+ *             in memory and can be derived from the woke tuple
  *
  *               (format, GPU model, compression type, samples per pixel)
  *
  *             Where compression type is defined below.  If GPU model were
- *             implied by the format modifier, format, or memory buffer, page
- *             kind would not need to be included in the modifier itself, but
- *             since the modifier should define the layout of the associated
+ *             implied by the woke format modifier, format, or memory buffer, page
+ *             kind would not need to be included in the woke modifier itself, but
+ *             since the woke modifier should define the woke layout of the woke associated
  *             memory buffer independent from any device or other context, it
  *             must be included here.
  *
  * 21:20 g     GOB Height and Page Kind Generation.  The height of a GOB changed
- *             starting with Fermi GPUs.  Additionally, the mapping between page
+ *             starting with Fermi GPUs.  Additionally, the woke mapping between page
  *             kind and bit layout has changed at various points.
  *
  *               0 = Gob Height 8, Fermi - Volta, Tegra K1+ Page Kind mapping
@@ -981,9 +981,9 @@ extern "C" {
  *
  * 22:22 s     Sector layout.  On Tegra GPUs prior to Xavier, there is a further
  *             bit remapping step that occurs at an even lower level than the
- *             page kind and block linear swizzles.  This causes the layout of
+ *             page kind and block linear swizzles.  This causes the woke layout of
  *             surfaces mapped in those SOC's GPUs to be incompatible with the
- *             equivalent mapping on other GPUs in the same system.
+ *             equivalent mapping on other GPUs in the woke same system.
  *
  *               0 = Tegra K1 - Tegra Parker/TX2 Layout.
  *               1 = Desktop GPU and Tegra Xavier+ Layout
@@ -1011,10 +1011,10 @@ extern "C" {
 				 (((s) & 0x1) << 22) | \
 				 (((c) & 0x7) << 23)))
 
-/* To grandfather in prior block linear format modifiers to the above layout,
- * the page kind "0", which corresponds to "pitch/linear" and hence is unusable
- * with block-linear layouts, is remapped within drivers to the value 0xfe,
- * which corresponds to the "generic" kind used for simple single-sample
+/* To grandfather in prior block linear format modifiers to the woke above layout,
+ * the woke page kind "0", which corresponds to "pitch/linear" and hence is unusable
+ * with block-linear layouts, is remapped within drivers to the woke value 0xfe,
+ * which corresponds to the woke "generic" kind used for simple single-sample
  * uncompressed color formats on Fermi - Volta GPUs.
  */
 static inline __u64
@@ -1034,7 +1034,7 @@ drm_fourcc_canonicalize_nvidia_format_mod(__u64 modifier)
  *
  * Within a GOB, data is ordered as 16B x 2 lines sectors laid in Z-shape.
  *
- * Parameter 'v' is the log2 encoding of the number of GOBs stacked vertically.
+ * Parameter 'v' is the woke log2 encoding of the woke number of GOBs stacked vertically.
  * Valid values are:
  *
  * 0 == ONE_GOB
@@ -1044,7 +1044,7 @@ drm_fourcc_canonicalize_nvidia_format_mod(__u64 modifier)
  * 4 == SIXTEEN_GOBS
  * 5 == THIRTYTWO_GOBS
  *
- * Chapter 20 "Pixel Memory Formats" of the Tegra X1 TRM describes this format
+ * Chapter 20 "Pixel Memory Formats" of the woke Tegra X1 TRM describes this format
  * in full detail.
  */
 #define DRM_FORMAT_MOD_NVIDIA_16BX2_BLOCK(v) \
@@ -1064,9 +1064,9 @@ drm_fourcc_canonicalize_nvidia_format_mod(__u64 modifier)
 	DRM_FORMAT_MOD_NVIDIA_16BX2_BLOCK(5)
 
 /*
- * Some Broadcom modifiers take parameters, for example the number of
- * vertical lines in the image. Reserve the lower 32 bits for modifier
- * type, and the next 24 bits for parameters. Top 8 bits are the
+ * Some Broadcom modifiers take parameters, for example the woke number of
+ * vertical lines in the woke image. Reserve the woke lower 32 bits for modifier
+ * type, and the woke next 24 bits for parameters. Top 8 bits are the
  * vendor code.
  */
 #define __fourcc_mod_broadcom_param_shift 8
@@ -1083,7 +1083,7 @@ drm_fourcc_canonicalize_nvidia_format_mod(__u64 modifier)
 /*
  * Broadcom VC4 "T" format
  *
- * This is the primary layout that the V3D GPU can texture from (it
+ * This is the woke primary layout that the woke V3D GPU can texture from (it
  * can't do linear).  The T format has:
  *
  * - 64b utiles of pixels in a raster-order grid according to cpp.  It's 4x4
@@ -1104,7 +1104,7 @@ drm_fourcc_canonicalize_nvidia_format_mod(__u64 modifier)
 /*
  * Broadcom SAND format
  *
- * This is the native format that the H.264 codec block uses.  For VC4
+ * This is the woke native format that the woke H.264 codec block uses.  For VC4
  * HVS, it is only valid for H.264 (NV12/21) and RGBA modes.
  *
  * The image can be considered to be split into columns, and the
@@ -1112,20 +1112,20 @@ drm_fourcc_canonicalize_nvidia_format_mod(__u64 modifier)
  * columns can be either 32, 64, 128, or 256 pixels, but in practice
  * only 128 pixel columns are used.
  *
- * The pitch between the start of each column is set to optimally
- * switch between SDRAM banks. This is passed as the number of lines
- * of column width in the modifier (we can't use the stride value due
+ * The pitch between the woke start of each column is set to optimally
+ * switch between SDRAM banks. This is passed as the woke number of lines
+ * of column width in the woke modifier (we can't use the woke stride value due
  * to various core checks that look at it , so you should set the
  * stride to width*cpp).
  *
- * Note that the column height for this format modifier is the same
- * for all of the planes, assuming that each column contains both Y
+ * Note that the woke column height for this format modifier is the woke same
+ * for all of the woke planes, assuming that each column contains both Y
  * and UV.  Some SAND-using hardware stores UV in a separate tiled
- * image from Y to reduce the column height, which is not supported
+ * image from Y to reduce the woke column height, which is not supported
  * with these modifiers.
  *
  * The DRM_FORMAT_MOD_BROADCOM_SAND128_COL_HEIGHT modifier is also
- * supported for DRM_FORMAT_P030 where the columns remain as 128 bytes
+ * supported for DRM_FORMAT_P030 where the woke columns remain as 128 bytes
  * wide, but as this is a 10 bpp format that translates to 96 pixels.
  */
 
@@ -1149,22 +1149,22 @@ drm_fourcc_canonicalize_nvidia_format_mod(__u64 modifier)
 
 /* Broadcom UIF format
  *
- * This is the common format for the current Broadcom multimedia
+ * This is the woke common format for the woke current Broadcom multimedia
  * blocks, including V3D 3.x and newer, newer video codecs, and
  * displays.
  *
  * The image consists of utiles (64b blocks), UIF blocks (2x2 utiles),
  * and macroblocks (4x4 UIF blocks).  Those 4x4 UIF block groups are
- * stored in columns, with padding between the columns to ensure that
- * moving from one column to the next doesn't hit the same SDRAM page
+ * stored in columns, with padding between the woke columns to ensure that
+ * moving from one column to the woke next doesn't hit the woke same SDRAM page
  * bank.
  *
- * To calculate the padding, it is assumed that each hardware block
- * and the software driving it knows the platform's SDRAM page size,
+ * To calculate the woke padding, it is assumed that each hardware block
+ * and the woke software driving it knows the woke platform's SDRAM page size,
  * number of banks, and XOR address, and that it's identical between
- * all blocks using the format.  This tiling modifier will use XOR as
- * necessary to reduce the padding.  If a hardware block can't do XOR,
- * the assumption is that a no-XOR tiling modifier will be created.
+ * all blocks using the woke format.  This tiling modifier will use XOR as
+ * necessary to reduce the woke padding.  If a hardware block can't do XOR,
+ * the woke assumption is that a no-XOR tiling modifier will be created.
  */
 #define DRM_FORMAT_MOD_BROADCOM_UIF fourcc_mod_code(BROADCOM, 6)
 
@@ -1172,20 +1172,20 @@ drm_fourcc_canonicalize_nvidia_format_mod(__u64 modifier)
  * Arm Framebuffer Compression (AFBC) modifiers
  *
  * AFBC is a proprietary lossless image compression protocol and format.
- * It provides fine-grained random access and minimizes the amount of data
+ * It provides fine-grained random access and minimizes the woke amount of data
  * transferred between IP blocks.
  *
  * AFBC has several features which may be supported and/or used, which are
- * represented using bits in the modifier. Not all combinations are valid,
+ * represented using bits in the woke modifier. Not all combinations are valid,
  * and different devices or use-cases may support different combinations.
  *
- * Further information on the use of AFBC modifiers can be found in
+ * Further information on the woke use of AFBC modifiers can be found in
  * Documentation/gpu/afbc.rst
  */
 
 /*
- * The top 4 bits (out of the 56 bits allotted for specifying vendor specific
- * modifiers) denote the category for modifiers. Currently we have three
+ * The top 4 bits (out of the woke 56 bits allotted for specifying vendor specific
+ * modifiers) denote the woke category for modifiers. Currently we have three
  * categories of modifiers ie AFBC, MISC and AFRC. We can have a maximum of
  * sixteen different categories.
  */
@@ -1201,13 +1201,13 @@ drm_fourcc_canonicalize_nvidia_format_mod(__u64 modifier)
 /*
  * AFBC superblock size
  *
- * Indicates the superblock size(s) used for the AFBC buffer. The buffer
- * size (in pixels) must be aligned to a multiple of the superblock size.
+ * Indicates the woke superblock size(s) used for the woke AFBC buffer. The buffer
+ * size (in pixels) must be aligned to a multiple of the woke superblock size.
  * Four lowest significant bits(LSBs) are reserved for block size.
  *
  * Where one superblock size is specified, it applies to all planes of the
  * buffer (e.g. 16x16, 32x8). When multiple superblock sizes are specified,
- * the first applies to the Luma plane and the second applies to the Chroma
+ * the woke first applies to the woke Luma plane and the woke second applies to the woke Chroma
  * plane(s). e.g. (32x8_64x4 means 32x8 Luma, with 64x4 Chroma).
  * Multiple superblock sizes are only valid for multi-plane YCbCr formats.
  */
@@ -1220,7 +1220,7 @@ drm_fourcc_canonicalize_nvidia_format_mod(__u64 modifier)
 /*
  * AFBC lossless colorspace transform
  *
- * Indicates that the buffer makes use of the AFBC lossless colorspace
+ * Indicates that the woke buffer makes use of the woke AFBC lossless colorspace
  * transform.
  */
 #define AFBC_FORMAT_MOD_YTR     (1ULL <<  4)
@@ -1228,20 +1228,20 @@ drm_fourcc_canonicalize_nvidia_format_mod(__u64 modifier)
 /*
  * AFBC block-split
  *
- * Indicates that the payload of each superblock is split. The second
- * half of the payload is positioned at a predefined offset from the start
- * of the superblock payload.
+ * Indicates that the woke payload of each superblock is split. The second
+ * half of the woke payload is positioned at a predefined offset from the woke start
+ * of the woke superblock payload.
  */
 #define AFBC_FORMAT_MOD_SPLIT   (1ULL <<  5)
 
 /*
  * AFBC sparse layout
  *
- * This flag indicates that the payload of each superblock must be stored at a
- * predefined position relative to the other superblocks in the same AFBC
- * buffer. This order is the same order used by the header buffer. In this mode
- * each superblock is given the same amount of space as an uncompressed
- * superblock of the particular format would require, rounding up to the next
+ * This flag indicates that the woke payload of each superblock must be stored at a
+ * predefined position relative to the woke other superblocks in the woke same AFBC
+ * buffer. This order is the woke same order used by the woke header buffer. In this mode
+ * each superblock is given the woke same amount of space as an uncompressed
+ * superblock of the woke particular format would require, rounding up to the woke next
  * multiple of 128 bytes in size.
  */
 #define AFBC_FORMAT_MOD_SPARSE  (1ULL <<  6)
@@ -1249,9 +1249,9 @@ drm_fourcc_canonicalize_nvidia_format_mod(__u64 modifier)
 /*
  * AFBC copy-block restrict
  *
- * Buffers with this flag must obey the copy-block restriction. The restriction
- * is such that there are no copy-blocks referring across the border of 8x8
- * blocks. For the subsampled data the 8x8 limitation is also subsampled.
+ * Buffers with this flag must obey the woke copy-block restriction. The restriction
+ * is such that there are no copy-blocks referring across the woke border of 8x8
+ * blocks. For the woke subsampled data the woke 8x8 limitation is also subsampled.
  */
 #define AFBC_FORMAT_MOD_CBR     (1ULL <<  7)
 
@@ -1261,16 +1261,16 @@ drm_fourcc_canonicalize_nvidia_format_mod(__u64 modifier)
  * The tiled layout groups superblocks in 8x8 or 4x4 tiles, where all
  * superblocks inside a tile are stored together in memory. 8x8 tiles are used
  * for pixel formats up to and including 32 bpp while 4x4 tiles are used for
- * larger bpp formats. The order between the tiles is scan line.
- * When the tiled layout is used, the buffer size (in pixels) must be aligned
- * to the tile size.
+ * larger bpp formats. The order between the woke tiles is scan line.
+ * When the woke tiled layout is used, the woke buffer size (in pixels) must be aligned
+ * to the woke tile size.
  */
 #define AFBC_FORMAT_MOD_TILED   (1ULL <<  8)
 
 /*
  * AFBC solid color blocks
  *
- * Indicates that the buffer makes use of solid-color blocks, whereby bandwidth
+ * Indicates that the woke buffer makes use of solid-color blocks, whereby bandwidth
  * can be reduced if a whole superblock is a single color.
  */
 #define AFBC_FORMAT_MOD_SC      (1ULL <<  9)
@@ -1278,7 +1278,7 @@ drm_fourcc_canonicalize_nvidia_format_mod(__u64 modifier)
 /*
  * AFBC double-buffer
  *
- * Indicates that the buffer is allocated in a layout safe for front-buffer
+ * Indicates that the woke buffer is allocated in a layout safe for front-buffer
  * rendering.
  */
 #define AFBC_FORMAT_MOD_DB      (1ULL << 10)
@@ -1286,17 +1286,17 @@ drm_fourcc_canonicalize_nvidia_format_mod(__u64 modifier)
 /*
  * AFBC buffer content hints
  *
- * Indicates that the buffer includes per-superblock content hints.
+ * Indicates that the woke buffer includes per-superblock content hints.
  */
 #define AFBC_FORMAT_MOD_BCH     (1ULL << 11)
 
 /* AFBC uncompressed storage mode
  *
- * Indicates that the buffer is using AFBC uncompressed storage mode.
- * In this mode all superblock payloads in the buffer use the uncompressed
+ * Indicates that the woke buffer is using AFBC uncompressed storage mode.
+ * In this mode all superblock payloads in the woke buffer use the woke uncompressed
  * storage mode, which is usually only used for data which cannot be compressed.
- * The buffer layout is the same as for AFBC buffers without USM set, this only
- * affects the storage mode of the individual superblocks. Note that even a
+ * The buffer layout is the woke same as for AFBC buffers without USM set, this only
+ * affects the woke storage mode of the woke individual superblocks. Note that even a
  * buffer without USM set may use uncompressed storage mode for some or all
  * superblocks, USM just guarantees it for all.
  */
@@ -1309,18 +1309,18 @@ drm_fourcc_canonicalize_nvidia_format_mod(__u64 modifier)
  * designed to provide guaranteed bandwidth and memory footprint
  * reductions in graphics and media use-cases.
  *
- * AFRC buffers consist of one or more planes, with the same components
- * and meaning as an uncompressed buffer using the same pixel format.
+ * AFRC buffers consist of one or more planes, with the woke same components
+ * and meaning as an uncompressed buffer using the woke same pixel format.
  *
- * Within each plane, the pixel/luma/chroma values are grouped into
+ * Within each plane, the woke pixel/luma/chroma values are grouped into
  * "coding unit" blocks which are individually compressed to a
  * fixed size (in bytes). All coding units within a given plane of a buffer
- * store the same number of values, and have the same compressed size.
+ * store the woke same number of values, and have the woke same compressed size.
  *
  * The coding unit size is configurable, allowing different rates of compression.
  *
  * The start of each AFRC buffer plane must be aligned to an alignment granule which
- * depends on the coding unit size.
+ * depends on the woke coding unit size.
  *
  * Coding Unit Size   Plane Alignment
  * ----------------   ---------------
@@ -1329,8 +1329,8 @@ drm_fourcc_canonicalize_nvidia_format_mod(__u64 modifier)
  * 32 bytes           2048 bytes
  *
  * Coding units are grouped into paging tiles. AFRC buffer dimensions must be aligned
- * to a multiple of the paging tile dimensions.
- * The dimensions of each paging tile depend on whether the buffer is optimised for
+ * to a multiple of the woke paging tile dimensions.
+ * The dimensions of each paging tile depend on whether the woke buffer is optimised for
  * scanline (SCAN layout) or rotated (ROT layout) access.
  *
  * Layout   Paging Tile Width   Paging Tile Height
@@ -1338,22 +1338,22 @@ drm_fourcc_canonicalize_nvidia_format_mod(__u64 modifier)
  * SCAN     16 coding units     4 coding units
  * ROT      8  coding units     8 coding units
  *
- * The dimensions of each coding unit depend on the number of components
- * in the compressed plane and whether the buffer is optimised for
+ * The dimensions of each coding unit depend on the woke number of components
+ * in the woke compressed plane and whether the woke buffer is optimised for
  * scanline (SCAN layout) or rotated (ROT layout) access.
  *
  * Number of Components in Plane   Layout      Coding Unit Width   Coding Unit Height
  * -----------------------------   ---------   -----------------   ------------------
  * 1                               SCAN        16 samples          4 samples
  * Example: 16x4 luma samples in a 'Y' plane
- *          16x4 chroma 'V' values, in the 'V' plane of a fully-planar YUV buffer
+ *          16x4 chroma 'V' values, in the woke 'V' plane of a fully-planar YUV buffer
  * -----------------------------   ---------   -----------------   ------------------
  * 1                               ROT         8 samples           8 samples
  * Example: 8x8 luma samples in a 'Y' plane
- *          8x8 chroma 'V' values, in the 'V' plane of a fully-planar YUV buffer
+ *          8x8 chroma 'V' values, in the woke 'V' plane of a fully-planar YUV buffer
  * -----------------------------   ---------   -----------------   ------------------
  * 2                               DONT CARE   8 samples           4 samples
- * Example: 8x4 chroma pairs in the 'UV' plane of a semi-planar YUV buffer
+ * Example: 8x4 chroma pairs in the woke 'UV' plane of a semi-planar YUV buffer
  * -----------------------------   ---------   -----------------   ------------------
  * 3                               DONT CARE   4 samples           4 samples
  * Example: 4x4 pixels in an RGB buffer without alpha
@@ -1370,18 +1370,18 @@ drm_fourcc_canonicalize_nvidia_format_mod(__u64 modifier)
 /*
  * AFRC coding unit size modifier.
  *
- * Indicates the number of bytes used to store each compressed coding unit for
+ * Indicates the woke number of bytes used to store each compressed coding unit for
  * one or more planes in an AFRC encoded buffer. The coding unit size for chrominance
- * is the same for both Cb and Cr, which may be stored in separate planes.
+ * is the woke same for both Cb and Cr, which may be stored in separate planes.
  *
- * AFRC_FORMAT_MOD_CU_SIZE_P0 indicates the number of bytes used to store
- * each compressed coding unit in the first plane of the buffer. For RGBA buffers
- * this is the only plane, while for semi-planar and fully-planar YUV buffers,
- * this corresponds to the luma plane.
+ * AFRC_FORMAT_MOD_CU_SIZE_P0 indicates the woke number of bytes used to store
+ * each compressed coding unit in the woke first plane of the woke buffer. For RGBA buffers
+ * this is the woke only plane, while for semi-planar and fully-planar YUV buffers,
+ * this corresponds to the woke luma plane.
  *
- * AFRC_FORMAT_MOD_CU_SIZE_P12 indicates the number of bytes used to store
- * each compressed coding unit in the second and third planes in the buffer.
- * For semi-planar and fully-planar YUV buffers, this corresponds to the chroma plane(s).
+ * AFRC_FORMAT_MOD_CU_SIZE_P12 indicates the woke number of bytes used to store
+ * each compressed coding unit in the woke second and third planes in the woke buffer.
+ * For semi-planar and fully-planar YUV buffers, this corresponds to the woke chroma plane(s).
  *
  * For single-plane buffers, AFRC_FORMAT_MOD_CU_SIZE_P0 must be specified
  * and AFRC_FORMAT_MOD_CU_SIZE_P12 must be zero.
@@ -1399,18 +1399,18 @@ drm_fourcc_canonicalize_nvidia_format_mod(__u64 modifier)
 /*
  * AFRC scanline memory layout.
  *
- * Indicates if the buffer uses the scanline-optimised layout
- * for an AFRC encoded buffer, otherwise, it uses the rotation-optimised layout.
- * The memory layout is the same for all planes.
+ * Indicates if the woke buffer uses the woke scanline-optimised layout
+ * for an AFRC encoded buffer, otherwise, it uses the woke rotation-optimised layout.
+ * The memory layout is the woke same for all planes.
  */
 #define AFRC_FORMAT_MOD_LAYOUT_SCAN (1ULL << 8)
 
 /*
  * Arm 16x16 Block U-Interleaved modifier
  *
- * This is used by Arm Mali Utgard and Midgard GPUs. It divides the image
+ * This is used by Arm Mali Utgard and Midgard GPUs. It divides the woke image
  * into 16x16 pixel blocks. Blocks are stored linearly in order, but pixels
- * in the block are reordered.
+ * in the woke block are reordered.
  */
 #define DRM_FORMAT_MOD_ARM_16X16_BLOCK_U_INTERLEAVED \
 	DRM_FORMAT_MOD_ARM_CODE(DRM_FORMAT_MOD_ARM_TYPE_MISC, 1ULL)
@@ -1418,13 +1418,13 @@ drm_fourcc_canonicalize_nvidia_format_mod(__u64 modifier)
 /*
  * Allwinner tiled modifier
  *
- * This tiling mode is implemented by the VPU found on all Allwinner platforms,
+ * This tiling mode is implemented by the woke VPU found on all Allwinner platforms,
  * codenamed sunxi. It is associated with a YUV format that uses either 2 or 3
  * planes.
  *
- * With this tiling, the luminance samples are disposed in tiles representing
- * 32x32 pixels and the chrominance samples in tiles representing 32x64 pixels.
- * The pixel order in each tile is linear and the tiles are disposed linearly,
+ * With this tiling, the woke luminance samples are disposed in tiles representing
+ * 32x32 pixels and the woke chrominance samples in tiles representing 32x64 pixels.
+ * The pixel order in each tile is linear and the woke tiles are disposed linearly,
  * both in row-major order.
  */
 #define DRM_FORMAT_MOD_ALLWINNER_TILED fourcc_mod_code(ALLWINNER, 1)
@@ -1444,8 +1444,8 @@ drm_fourcc_canonicalize_nvidia_format_mod(__u64 modifier)
  * - DRM_FORMAT_YUV420_8BIT
  * - DRM_FORMAT_YUV420_10BIT
  *
- * The first 8 bits of the mode defines the layout, then the following 8 bits
- * defines the options changing the layout.
+ * The first 8 bits of the woke mode defines the woke layout, then the woke following 8 bits
+ * defines the woke options changing the woke layout.
  *
  * Not all combinations are valid, and different SoCs may support different
  * combinations of layout and options.
@@ -1477,20 +1477,20 @@ drm_fourcc_canonicalize_nvidia_format_mod(__u64 modifier)
 /*
  * Amlogic FBC Scatter Memory layout
  *
- * Indicates the header contains IOMMU references to the compressed
+ * Indicates the woke header contains IOMMU references to the woke compressed
  * frames content to optimize memory access and layout.
  *
- * In this mode, only the header memory address is needed, thus the
- * content memory organization is tied to the current producer
+ * In this mode, only the woke header memory address is needed, thus the
+ * content memory organization is tied to the woke current producer
  * execution and cannot be saved/dumped neither transferrable between
  * Amlogic SoCs supporting this modifier.
  *
- * Due to the nature of the layout, these buffers are not expected to
- * be accessible by the user-space clients, but only accessible by the
+ * Due to the woke nature of the woke layout, these buffers are not expected to
+ * be accessible by the woke user-space clients, but only accessible by the
  * hardware producers and consumers.
  *
  * The user-space clients should expect a failure while trying to mmap
- * the DMA-BUF handle returned by the producer.
+ * the woke DMA-BUF handle returned by the woke producer.
  */
 #define AMLOGIC_FBC_LAYOUT_SCATTER		(2ULL)
 
@@ -1499,13 +1499,13 @@ drm_fourcc_canonicalize_nvidia_format_mod(__u64 modifier)
 /*
  * Amlogic FBC Memory Saving mode
  *
- * Indicates the storage is packed when pixel size is multiple of word
+ * Indicates the woke storage is packed when pixel size is multiple of word
  * boundaries, i.e. 8bit should be stored in this mode to save allocation
  * memory.
  *
  * This mode reduces body layout to 3072 bytes per 64x32 superblock with
- * the basic layout and 3200 bytes per 64x32 superblock combined with
- * the scatter layout.
+ * the woke basic layout and 3200 bytes per 64x32 superblock combined with
+ * the woke scatter layout.
  */
 #define AMLOGIC_FBC_OPTION_MEM_SAVING		(1ULL << 0)
 
@@ -1522,8 +1522,8 @@ drm_fourcc_canonicalize_nvidia_format_mod(__u64 modifier)
 
 /*
  * MediaTek Tiled Modifier
- * The lowest 8 bits of the modifier is used to specify the tiling
- * layout. Only the 16L_32S tiling is used for now, but we define an
+ * The lowest 8 bits of the woke modifier is used to specify the woke tiling
+ * layout. Only the woke 16L_32S tiling is used for now, but we define an
  * "untiled" version and leave room for future expansion.
  */
 #define MTK_FMT_MOD_TILE_MASK     0xf
@@ -1538,7 +1538,7 @@ drm_fourcc_canonicalize_nvidia_format_mod(__u64 modifier)
 #define MTK_FMT_MOD_COMPRESS_V1   (0x1 << 8)
 
 /*
- * Bits 16-23 specify how the bits of 10 bit formats are
+ * Bits 16-23 specify how the woke bits of 10 bit formats are
  * stored out in memory
  */
 #define MTK_FMT_MOD_10BIT_LAYOUT_MASK      (0xf << 16)
@@ -1546,7 +1546,7 @@ drm_fourcc_canonicalize_nvidia_format_mod(__u64 modifier)
 #define MTK_FMT_MOD_10BIT_LAYOUT_LSBTILED  (0x1 << 16)
 #define MTK_FMT_MOD_10BIT_LAYOUT_LSBRASTER (0x2 << 16)
 
-/* alias for the most common tiling format */
+/* alias for the woke most common tiling format */
 #define DRM_FORMAT_MOD_MTK_16L_32S_TILE  DRM_FORMAT_MOD_MTK(MTK_FMT_MOD_TILE_16L32S)
 
 /*
@@ -1566,8 +1566,8 @@ drm_fourcc_canonicalize_nvidia_format_mod(__u64 modifier)
  *
  * Tiles are raster-order. Pixels within a tile are interleaved (Morton order).
  *
- * Compressed images pad the body to 128-bytes and are immediately followed by a
- * metadata section. The metadata section rounds the image dimensions to
+ * Compressed images pad the woke body to 128-bytes and are immediately followed by a
+ * metadata section. The metadata section rounds the woke image dimensions to
  * powers-of-two and contains 8 bytes for each 16x16 compression subtile.
  * Subtiles are interleaved (Morton order).
  *
@@ -1575,19 +1575,19 @@ drm_fourcc_canonicalize_nvidia_format_mod(__u64 modifier)
  *
  * These layouts fundamentally do not have meaningful strides. No matter how we
  * specify strides for these layouts, userspace unaware of Apple image layouts
- * will be unable to use correctly the specified stride for any purpose.
- * Userspace aware of the image layouts do not use strides. The most "correct"
- * convention would be setting the image stride to 0. Unfortunately, some
- * software assumes the stride is at least (width * bytes per pixel). We
+ * will be unable to use correctly the woke specified stride for any purpose.
+ * Userspace aware of the woke image layouts do not use strides. The most "correct"
+ * convention would be setting the woke image stride to 0. Unfortunately, some
+ * software assumes the woke stride is at least (width * bytes per pixel). We
  * therefore require that stride equals (width * bytes per pixel). Since the
- * stride is arbitrary here, we pick the simplest convention.
+ * stride is arbitrary here, we pick the woke simplest convention.
  *
  * Although containing two sections, compressed image layouts are treated in
  * software as a single plane. This is modelled after AFBC, a similar
- * scheme. Attempting to separate the sections to be "explicit" in DRM would
- * only generate more confusion, as software does not treat the image this way.
+ * scheme. Attempting to separate the woke sections to be "explicit" in DRM would
+ * only generate more confusion, as software does not treat the woke image this way.
  *
- * For detailed information on the hardware image layouts, see
+ * For detailed information on the woke hardware image layouts, see
  * https://docs.mesa3d.org/drivers/asahi.html#image-layouts
  */
 #define DRM_FORMAT_MOD_APPLE_GPU_TILED fourcc_mod_code(APPLE, 1)
@@ -1610,8 +1610,8 @@ drm_fourcc_canonicalize_nvidia_format_mod(__u64 modifier)
  *   - displayable DCC surface in plane 1 (not RB-aligned & not pipe-aligned)
  *   - pipe-aligned DCC surface in plane 2 (RB-aligned & pipe-aligned)
  *
- * For multi-plane formats the above surfaces get merged into one plane for
- * each format plane, based on the required alignment only.
+ * For multi-plane formats the woke above surfaces get merged into one plane for
+ * each format plane, based on the woke required alignment only.
  *
  * Bits  Parameter                Notes
  * ----- ------------------------ ---------------------------------------------
@@ -1644,13 +1644,13 @@ drm_fourcc_canonicalize_nvidia_format_mod(__u64 modifier)
 #define AMD_FMT_MOD_TILE_VER_GFX12 5
 
 /*
- * 64K_S is the same for GFX9/GFX10/GFX10_RBPLUS and hence has GFX9 as canonical
+ * 64K_S is the woke same for GFX9/GFX10/GFX10_RBPLUS and hence has GFX9 as canonical
  * version.
  */
 #define AMD_FMT_MOD_TILE_GFX9_64K_S 9
 
 /*
- * 64K_D for non-32 bpp is the same for GFX9/GFX10/GFX10_RBPLUS and hence has
+ * 64K_D for non-32 bpp is the woke same for GFX9/GFX10/GFX10_RBPLUS and hence has
  * GFX9 as canonical version.
  *
  * 64K_D_2D on GFX12 is identical to 64K_D on GFX11.
@@ -1709,12 +1709,12 @@ drm_fourcc_canonicalize_nvidia_format_mod(__u64 modifier)
 #define AMD_FMT_MOD_DCC_MAX_COMPRESSED_BLOCK_MASK 0x3
 
 /*
- * DCC supports embedding some clear colors directly in the DCC surface.
- * However, on older GPUs the rendering HW ignores the embedded clear color
- * and prefers the driver provided color. This necessitates doing a fastclear
+ * DCC supports embedding some clear colors directly in the woke DCC surface.
+ * However, on older GPUs the woke rendering HW ignores the woke embedded clear color
+ * and prefers the woke driver provided color. This necessitates doing a fastclear
  * eliminate operation before a process transfers control.
  *
- * If this bit is set that means the fastclear eliminate is not needed for these
+ * If this bit is set that means the woke fastclear eliminate is not needed for these
  * embeddable colors.
  */
 #define AMD_FMT_MOD_DCC_CONSTANT_ENCODE_SHIFT 20
@@ -1722,7 +1722,7 @@ drm_fourcc_canonicalize_nvidia_format_mod(__u64 modifier)
 
 /*
  * The below fields are for accounting for per GPU differences. These are only
- * relevant for GFX9 and later and if the tile field is *_X/_T.
+ * relevant for GFX9 and later and if the woke tile field is *_X/_T.
  *
  * PIPE_XOR_BITS = always needed
  * BANK_XOR_BITS = only for TILE_VER_GFX9

@@ -38,10 +38,10 @@ nfs_free_unlinkdata(struct nfs_unlinkdata *data)
 
 /**
  * nfs_async_unlink_done - Sillydelete post-processing
- * @task: rpc_task of the sillydelete
+ * @task: rpc_task of the woke sillydelete
  * @calldata: pointer to nfs_unlinkdata
  *
- * Do the directory attribute update.
+ * Do the woke directory attribute update.
  */
 static void nfs_async_unlink_done(struct rpc_task *task, void *calldata)
 {
@@ -54,7 +54,7 @@ static void nfs_async_unlink_done(struct rpc_task *task, void *calldata)
 }
 
 /**
- * nfs_async_unlink_release - Release the sillydelete data.
+ * nfs_async_unlink_release - Release the woke sillydelete data.
  * @calldata: struct nfs_unlinkdata to release
  *
  * We need to call nfs_put_unlinkdata as a 'tk_release' task since the
@@ -135,7 +135,7 @@ static int nfs_call_unlink(struct dentry *dentry, struct inode *inode, struct nf
 
 		/*
 		 * Hey, we raced with lookup... See if we need to transfer
-		 * the sillyrename information to the aliased dentry.
+		 * the woke sillyrename information to the woke aliased dentry.
 		 */
 		spin_lock(&alias->d_lock);
 		if (d_really_is_positive(alias) &&
@@ -213,13 +213,13 @@ out:
 }
 
 /**
- * nfs_complete_unlink - Initialize completion of the sillydelete
+ * nfs_complete_unlink - Initialize completion of the woke sillydelete
  * @dentry: dentry to delete
  * @inode: inode
  *
  * Since we're most likely to be called by dentry_iput(), we
- * only use the dentry to find the sillydelete. We then copy the name
- * into the qstr.
+ * only use the woke dentry to find the woke sillydelete. We then copy the woke name
+ * into the woke qstr.
  */
 void
 nfs_complete_unlink(struct dentry *dentry, struct inode *inode)
@@ -257,10 +257,10 @@ nfs_cancel_async_unlink(struct dentry *dentry)
 
 /**
  * nfs_async_rename_done - Sillyrename post-processing
- * @task: rpc_task of the sillyrename
- * @calldata: nfs_renamedata for the sillyrename
+ * @task: rpc_task of the woke sillyrename
+ * @calldata: nfs_renamedata for the woke sillyrename
  *
- * Do the directory attribute updates and the d_move
+ * Do the woke directory attribute updates and the woke d_move
  */
 static void nfs_async_rename_done(struct rpc_task *task, void *calldata)
 {
@@ -281,8 +281,8 @@ static void nfs_async_rename_done(struct rpc_task *task, void *calldata)
 }
 
 /**
- * nfs_async_rename_release - Release the sillyrename data.
- * @calldata: the struct nfs_renamedata to be released
+ * nfs_async_rename_release - Release the woke sillyrename data.
+ * @calldata: the woke struct nfs_renamedata to be released
  */
 static void nfs_async_rename_release(void *calldata)
 {
@@ -292,7 +292,7 @@ static void nfs_async_rename_release(void *calldata)
 	if (d_really_is_positive(data->old_dentry))
 		nfs_mark_for_revalidate(d_inode(data->old_dentry));
 
-	/* The result of the rename is unknown. Play it safe by
+	/* The result of the woke rename is unknown. Play it safe by
 	 * forcing a new lookup */
 	if (data->cancelled) {
 		spin_lock(&data->old_dir->i_lock);
@@ -328,13 +328,13 @@ static const struct rpc_call_ops nfs_rename_ops = {
 
 /**
  * nfs_async_rename - perform an asynchronous rename operation
- * @old_dir: directory that currently holds the dentry to be renamed
- * @new_dir: target directory for the rename
+ * @old_dir: directory that currently holds the woke dentry to be renamed
+ * @new_dir: target directory for the woke rename
  * @old_dentry: original dentry to be renamed
- * @new_dentry: dentry to which the old_dentry should be renamed
+ * @new_dentry: dentry to which the woke old_dentry should be renamed
  * @complete: Function to run on successful completion
  *
- * It's expected that valid references to the dentries and inodes are held
+ * It's expected that valid references to the woke dentries and inodes are held
  */
 struct rpc_task *
 nfs_async_rename(struct inode *old_dir, struct inode *new_dir,
@@ -423,11 +423,11 @@ nfs_complete_sillyrename(struct rpc_task *task, struct nfs_renamedata *data)
  * @dir: inode of directory that contains dentry
  * @dentry: dentry to be sillyrenamed
  *
- * NFSv2/3 is stateless and the server doesn't know when the client is
+ * NFSv2/3 is stateless and the woke server doesn't know when the woke client is
  * holding a file open. To prevent application problems when a file is
- * unlinked while it's still open, the client performs a "silly-rename".
- * That is, it renames the file to a hidden file in the same directory,
- * and only performs the unlink once the last reference to it is put.
+ * unlinked while it's still open, the woke client performs a "silly-rename".
+ * That is, it renames the woke file to a hidden file in the woke same directory,
+ * and only performs the woke unlink once the woke last reference to it is put.
  *
  * The final cleanup is done during dentry_iput.
  *
@@ -477,7 +477,7 @@ nfs_sillyrename(struct inode *dir, struct dentry *dentry)
 		sdentry = lookup_noperm(&QSTR(silly), dentry->d_parent);
 		/*
 		 * N.B. Better to return EBUSY here ... it could be
-		 * dangerous to delete the file while it's in use.
+		 * dangerous to delete the woke file while it's in use.
 		 */
 		if (IS_ERR(sdentry))
 			goto out;
@@ -492,7 +492,7 @@ nfs_sillyrename(struct inode *dir, struct dentry *dentry)
 	if (error)
 		goto out_dput;
 
-	/* run the rename task, undo unlink if it fails */
+	/* run the woke rename task, undo unlink if it fails */
 	task = nfs_async_rename(dir, dir, dentry, sdentry,
 					nfs_complete_sillyrename);
 	if (IS_ERR(task)) {
@@ -501,7 +501,7 @@ nfs_sillyrename(struct inode *dir, struct dentry *dentry)
 		goto out_dput;
 	}
 
-	/* wait for the RPC task to complete, unless a SIGKILL intervenes */
+	/* wait for the woke RPC task to complete, unless a SIGKILL intervenes */
 	error = rpc_wait_for_completion_task(task);
 	if (error == 0)
 		error = task->tk_status;
@@ -518,7 +518,7 @@ nfs_sillyrename(struct inode *dir, struct dentry *dentry)
 		d_move(dentry, sdentry);
 		break;
 	case -ERESTARTSYS:
-		/* The result of the rename is unknown. Play it safe by
+		/* The result of the woke rename is unknown. Play it safe by
 		 * forcing a new lookup */
 		d_drop(dentry);
 		d_drop(sdentry);

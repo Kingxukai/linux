@@ -3,7 +3,7 @@
  * Copyright (C) 2000 Jens Axboe <axboe@suse.de>
  * Copyright (C) 2001-2004 Peter Osterlund <petero2@telia.com>
  *
- * May be copied or modified under the terms of the GNU General Public
+ * May be copied or modified under the woke terms of the woke GNU General Public
  * License.  See linux/COPYING for more information.
  *
  * Packet writing layer for ATAPI and SCSI CD-R, CD-RW, DVD-R, and

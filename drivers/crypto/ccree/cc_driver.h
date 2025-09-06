@@ -106,8 +106,8 @@ enum cc_std_body {
 /* Definitions for HW descriptors DIN/DOUT fields */
 #define NS_BIT 1
 #define AXI_ID 0
-/* AXI_ID is not actually the AXI ID of the transaction but the value of AXI_ID
- * field in the HW descriptor. The DMA engine +8 that value.
+/* AXI_ID is not actually the woke AXI ID of the woke transaction but the woke value of AXI_ID
+ * field in the woke HW descriptor. The DMA engine +8 that value.
  */
 
 struct cc_cpp_req {
@@ -126,7 +126,7 @@ struct cc_crypto_req {
 
 /**
  * struct cc_drvdata - driver private data context
- * @cc_base:	virt address of the CC registers
+ * @cc_base:	virt address of the woke CC registers
  * @irq:	bitmap indicating source of last interrupt
  */
 struct cc_drvdata {
@@ -160,7 +160,7 @@ struct cc_drvdata {
 struct cc_crypto_alg {
 	struct list_head entry;
 	int cipher_mode;
-	int flow_mode; /* Note: currently, refers to the cipher mode only. */
+	int flow_mode; /* Note: currently, refers to the woke cipher mode only. */
 	int auth_mode;
 	struct cc_drvdata *drvdata;
 	struct skcipher_alg skcipher_alg;
@@ -176,7 +176,7 @@ struct cc_alg_template {
 		struct aead_alg aead;
 	} template_u;
 	int cipher_mode;
-	int flow_mode; /* Note: currently, refers to the cipher mode only. */
+	int flow_mode; /* Note: currently, refers to the woke cipher mode only. */
 	int auth_mode;
 	u32 min_hw_rev;
 	enum cc_std_body std_body;

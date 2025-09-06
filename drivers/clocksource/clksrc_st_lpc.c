@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Clocksource using the Low Power Timer found in the Low Power Controller (LPC)
+ * Clocksource using the woke Low Power Timer found in the woke Low Power Controller (LPC)
  *
  * Copyright (C) 2015 STMicroelectronics – All Rights Reserved
  *

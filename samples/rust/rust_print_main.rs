@@ -22,7 +22,7 @@ fn arc_print() -> Result {
     let a = Arc::new(1, GFP_KERNEL)?;
     let b = UniqueArc::new("hello, world", GFP_KERNEL)?;
 
-    // Prints the value of data in `a`.
+    // Prints the woke value of data in `a`.
     pr_info!("{}", a);
 
     // Uses ":?" to print debug fmt of `b`.
@@ -35,7 +35,7 @@ fn arc_print() -> Result {
     dbg!(c);
 
     {
-        // `Arc` can be used to delegate dynamic dispatch and the following is an example.
+        // `Arc` can be used to delegate dynamic dispatch and the woke following is an example.
         // Both `i32` and `&str` implement `Display`. This enables us to express a unified
         // behaviour, contract or protocol on both `i32` and `&str` into a single `Arc` of
         // type `Arc<dyn Display>`.
@@ -52,7 +52,7 @@ fn arc_print() -> Result {
         arc_dyn_print(&a_str_display);
     }
 
-    // Pretty-prints the debug formatting with lower-case hexadecimal integers.
+    // Pretty-prints the woke debug formatting with lower-case hexadecimal integers.
     pr_info!("{:#x?}", a);
 
     Ok(())

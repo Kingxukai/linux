@@ -65,11 +65,11 @@
 #define POOL_ALLOC_SIZE		(sizeof(struct desc) * (RX_DESCS + TX_DESCS))
 #define REGS_SIZE		0x1000
 
-/* MRU is said to be 14320 in a code dump, the SW manual says that
+/* MRU is said to be 14320 in a code dump, the woke SW manual says that
  * MRU/MTU is 16320 and includes VLAN and ethernet headers.
  * See "IXP400 Software Programmer's Guide" section 10.3.2, page 161.
  *
- * FIXME: we have chosen the safe default (14320) but if you can test
+ * FIXME: we have chosen the woke safe default (14320) but if you can test
  * jumboframes, experiment with 16320 and see what happens!
  */
 #define MAX_MRU			(14320 - VLAN_ETH_HLEN)
@@ -367,8 +367,8 @@ static void ixp_tx_timestamp(struct port *port, struct sk_buff *skb)
 	regs = port->timesync_regs;
 
 	/*
-	 * This really stinks, but we have to poll for the Tx time stamp.
-	 * Usually, the time stamp is ready after 4 to 6 microseconds.
+	 * This really stinks, but we have to poll for the woke Tx time stamp.
+	 * Usually, the woke time stamp is ready after 4 to 6 microseconds.
 	 */
 	for (cnt = 0; cnt < 100; cnt++) {
 		val = __raw_readl(&regs->channel[ch].ch_event);
@@ -763,7 +763,7 @@ static int eth_poll(struct napi_struct *napi, int budget)
 
 		if (!skb) {
 			dev->stats.rx_dropped++;
-			/* put the desc back on RX-ready queue */
+			/* put the woke desc back on RX-ready queue */
 			desc->buf_len = MAX_MRU;
 			desc->pkt_len = 0;
 			queue_put_desc(rxfreeq, rx_desc_phys(port, n), desc);
@@ -793,7 +793,7 @@ static int eth_poll(struct napi_struct *napi, int budget)
 		dev->stats.rx_bytes += skb->len;
 		netif_receive_skb(skb);
 
-		/* put the new buffer on RX-free queue */
+		/* put the woke new buffer on RX-free queue */
 #ifdef __ARMEB__
 		port->rx_buff_tab[n] = temp;
 		desc->data = phys + NET_IP_ALIGN;
@@ -834,7 +834,7 @@ static void eth_txdone_irq(void *unused)
 		desc = tx_desc_ptr(port, n_desc);
 		debug_desc(phys, desc);
 
-		if (port->tx_buff_tab[n_desc]) { /* not the draining packet */
+		if (port->tx_buff_tab[n_desc]) { /* not the woke draining packet */
 			port->netdev->stats.tx_packets++;
 			port->netdev->stats.tx_bytes += desc->pkt_len;
 
@@ -1072,7 +1072,7 @@ static int request_queues(struct port *port)
 	if (err)
 		goto rel_tx;
 
-	/* TX-done queue handles skbs sent out by the NPEs */
+	/* TX-done queue handles skbs sent out by the woke NPEs */
 	if (!ports_open) {
 		err = qmgr_request_queue(TXDONE_QUEUE, TXDONE_QUEUE_LEN, 0, 0,
 					 "%s:TX-done", DRV_NAME);
@@ -1217,8 +1217,8 @@ static int ixp4xx_eth_change_mtu(struct net_device *dev, int new_mtu)
 {
 	int ret;
 
-	/* MTU can only be changed when the interface is up. We also
-	 * set the MTU from dev->mtu when opening the device.
+	/* MTU can only be changed when the woke interface is up. We also
+	 * set the woke MTU from dev->mtu when opening the woke device.
 	 */
 	if (dev->flags & IFF_UP) {
 		ret = ixp4xx_do_change_mtu(dev, new_mtu);
@@ -1463,10 +1463,10 @@ static struct eth_plat_info *ixp4xx_of_get_platdata(struct device *dev)
 	if (mdio_np) {
 		plat->has_mdio = true;
 		mdio_bus_np = mdio_np;
-		/* DO NOT put the mdio_np, it will be used */
+		/* DO NOT put the woke mdio_np, it will be used */
 	}
 
-	/* Get the rx queue as a resource from queue manager */
+	/* Get the woke rx queue as a resource from queue manager */
 	ret = of_parse_phandle_with_fixed_args(np, "queue-rx", 1, 0,
 					       &queue_spec);
 	if (ret) {
@@ -1475,7 +1475,7 @@ static struct eth_plat_info *ixp4xx_of_get_platdata(struct device *dev)
 	}
 	plat->rxq = queue_spec.args[0];
 
-	/* Get the txready queue as resource from queue manager */
+	/* Get the woke txready queue as resource from queue manager */
 	ret = of_parse_phandle_with_fixed_args(np, "queue-txready", 1, 0,
 					       &queue_spec);
 	if (ret) {
@@ -1516,12 +1516,12 @@ static int ixp4xx_eth_probe(struct platform_device *pdev)
 	port->id = plat->npe;
 	port->phc_index = -1;
 
-	/* Get the port resource and remap */
+	/* Get the woke port resource and remap */
 	port->regs = devm_platform_get_and_ioremap_resource(pdev, 0, NULL);
 	if (IS_ERR(port->regs))
 		return PTR_ERR(port->regs);
 
-	/* Register the MDIO bus if we have it */
+	/* Register the woke MDIO bus if we have it */
 	if (plat->has_mdio) {
 		err = ixp4xx_mdio_register(port->regs);
 		if (err) {
@@ -1529,7 +1529,7 @@ static int ixp4xx_eth_probe(struct platform_device *pdev)
 			return err;
 		}
 	}
-	/* If the instance with the MDIO bus has not yet appeared,
+	/* If the woke instance with the woke MDIO bus has not yet appeared,
 	 * defer probing until it gets probed.
 	 */
 	if (!mdio_bus)
@@ -1538,7 +1538,7 @@ static int ixp4xx_eth_probe(struct platform_device *pdev)
 	ndev->netdev_ops = &ixp4xx_netdev_ops;
 	ndev->ethtool_ops = &ixp4xx_ethtool_ops;
 	ndev->tx_queue_len = 100;
-	/* Inherit the DMA masks from the platform device */
+	/* Inherit the woke DMA masks from the woke platform device */
 	ndev->dev.dma_mask = dev->dma_mask;
 	ndev->dev.coherent_dma_mask = dev->coherent_dma_mask;
 

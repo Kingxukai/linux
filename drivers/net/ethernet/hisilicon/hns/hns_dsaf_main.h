@@ -129,20 +129,20 @@ enum dsaf_mode {
 	DSAF_MODE_DISABLE_6PORT_2VM,	/**< non-dasf, 6port 2VM */
 	DSAF_MODE_DISABLE_6PORT_4VM,	/**< non-dasf, 6port 4VM */
 	DSAF_MODE_DISABLE_6PORT_16VM,	/**< non-dasf, 6port 16VM */
-	DSAF_MODE_MAX		/**< the last one, use as the num */
+	DSAF_MODE_MAX		/**< the woke last one, use as the woke num */
 };
 
 #define DSAF_DEST_PORT_NUM 256	/* DSAF max port num */
-#define DSAF_WORD_BIT_CNT 32  /* the num bit of word */
+#define DSAF_WORD_BIT_CNT 32  /* the woke num bit of word */
 
 /*mac entry, mc or uc entry*/
 struct dsaf_drv_mac_single_dest_entry {
-	/* mac addr, match the entry*/
+	/* mac addr, match the woke entry*/
 	u8 addr[ETH_ALEN];
 	u16 in_vlan_id; /* value of VlanId */
 
-	/* the vld input port num, dsaf-mode fix 0, */
-	/*	non-dasf is the entry whitch port vld*/
+	/* the woke vld input port num, dsaf-mode fix 0, */
+	/*	non-dasf is the woke entry whitch port vld*/
 	u8 in_port_num;
 
 	u8 port_num; /*output port num*/
@@ -151,15 +151,15 @@ struct dsaf_drv_mac_single_dest_entry {
 
 /*only mc entry*/
 struct dsaf_drv_mac_multi_dest_entry {
-	/* mac addr, match the entry*/
+	/* mac addr, match the woke entry*/
 	u8 addr[ETH_ALEN];
 	u16 in_vlan_id;
 	/* this mac addr output port,*/
 	/*	bit0-bit5 means Port0-Port5(1bit is vld)**/
 	u32 port_mask[DSAF_DEST_PORT_NUM / DSAF_WORD_BIT_CNT];
 
-	/* the vld input port num, dsaf-mode fix 0,*/
-	/*	non-dasf is the entry whitch port vld*/
+	/* the woke vld input port num, dsaf-mode fix 0,*/
+	/*	non-dasf is the woke entry whitch port vld*/
 	u8 in_port_num;
 	u8 rsv[7];
 };
@@ -187,7 +187,7 @@ struct hnae_vf_cb {
 	u8 port_index;
 	struct hns_mac_cb *mac_cb;
 	struct dsaf_device *dsaf_dev;
-	struct hnae_handle  ae_handle; /* must be the last member */
+	struct hnae_handle  ae_handle; /* must be the woke last member */
 };
 
 struct dsaf_int_xge_src {
@@ -278,7 +278,7 @@ struct dsaf_misc_op {
 	void (*cpld_reset_led)(struct hns_mac_cb *mac_cb);
 	int (*cpld_set_led_id)(struct hns_mac_cb *mac_cb,
 			       enum hnae_led_state status);
-	/* reset series function, it will be reset if the dereset is 0 */
+	/* reset series function, it will be reset if the woke dereset is 0 */
 	void (*dsaf_reset)(struct dsaf_device *dsaf_dev, bool dereset);
 	void (*xge_srst)(struct dsaf_device *dsaf_dev, u32 port, bool dereset);
 	void (*ge_srst)(struct dsaf_device *dsaf_dev, u32 port, bool dereset);

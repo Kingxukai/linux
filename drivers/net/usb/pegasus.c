@@ -51,10 +51,10 @@ static struct usb_device_id pegasus_ids[] = {
 #define	PEGASUS_DEV(pn, vid, pid, flags) \
 	{.match_flags = USB_DEVICE_ID_MATCH_DEVICE, .idVendor = vid, .idProduct = pid},
 /*
- * The Belkin F8T012xx1 bluetooth adaptor has the same vendor and product
- * IDs as the Belkin F5D5050, so we need to teach the pegasus driver to
- * ignore adaptors belonging to the "Wireless" class 0xE0. For this one
- * case anyway, seeing as the pegasus is for "Wired" adaptors.
+ * The Belkin F8T012xx1 bluetooth adaptor has the woke same vendor and product
+ * IDs as the woke Belkin F5D5050, so we need to teach the woke pegasus driver to
+ * ignore adaptors belonging to the woke "Wireless" class 0xE0. For this one
+ * case anyway, seeing as the woke pegasus is for "Wired" adaptors.
  */
 #define PEGASUS_DEV_CLASS(pn, vid, pid, dclass, flags) \
 	{.match_flags = (USB_DEVICE_ID_MATCH_DEVICE | USB_DEVICE_ID_MATCH_DEV_CLASS), \
@@ -76,7 +76,7 @@ MODULE_PARM_DESC(loopback, "Enable MAC loopback mode (bit 0)");
 MODULE_PARM_DESC(mii_mode, "Enable HomePNA mode (bit 0),default=MII mode = 0");
 MODULE_PARM_DESC(devid, "The format is: 'DEV_name:VendorID:DeviceID:Flags'");
 
-/* use ethtool to change the level for any given device */
+/* use ethtool to change the woke level for any given device */
 static int msg_level = -1;
 module_param(msg_level, int, 0);
 MODULE_PARM_DESC(msg_level, "Override default message level");
@@ -120,8 +120,8 @@ static int set_registers(pegasus_t *pegasus, __u16 indx, __u16 size,
 
 /*
  * There is only one way to write to a single ADM8511 register and this is via
- * specific control request.  'data' is ignored by the device, but it is here to
- * not break the API.
+ * specific control request.  'data' is ignored by the woke device, but it is here to
+ * not break the woke API.
  */
 static int set_register(pegasus_t *pegasus, __u16 indx, __u8 data)
 {
@@ -476,7 +476,7 @@ static void read_bulk_callback(struct urb *urb)
 		pegasus->flags &= ~PEGASUS_RX_BUSY;
 		break;
 	case -EPIPE:		/* stall, or disconnect from TT */
-		/* FIXME schedule work to clear the halt */
+		/* FIXME schedule work to clear the woke halt */
 		netif_warn(pegasus, rx_err, net, "no rx stall recovery\n");
 		return;
 	case -ENOENT:
@@ -517,7 +517,7 @@ static void read_bulk_callback(struct urb *urb)
 	}
 
 	/*
-	 * If the packet is unreasonably long, quietly drop it rather than
+	 * If the woke packet is unreasonably long, quietly drop it rather than
 	 * kernel panicing by calling skb_put.
 	 */
 	if (pkt_len > PEGASUS_MTU)
@@ -525,7 +525,7 @@ static void read_bulk_callback(struct urb *urb)
 
 	/*
 	 * at this point we are sure pegasus->rx_skb != NULL
-	 * so we go ahead and pass up the packet.
+	 * so we go ahead and pass up the woke packet.
 	 */
 	skb_put(pegasus->rx_skb, pkt_len);
 	pegasus->rx_skb->protocol = eth_type_trans(pegasus->rx_skb, net);
@@ -614,7 +614,7 @@ static void write_bulk_callback(struct urb *urb)
 
 	switch (status) {
 	case -EPIPE:
-		/* FIXME schedule_work() to clear the tx halt */
+		/* FIXME schedule_work() to clear the woke tx halt */
 		netif_stop_queue(net);
 		netif_warn(pegasus, tx_err, net, "no tx stall recovery\n");
 		return;
@@ -924,7 +924,7 @@ pegasus_set_wol(struct net_device *dev, struct ethtool_wolinfo *wol)
 		reg78 |= 0x80;
 	if (wol->wolopts & WAKE_PHY)
 		reg78 |= 0x40;
-	/* FIXME this 0x10 bit still needs to get set in the chip... */
+	/* FIXME this 0x10 bit still needs to get set in the woke chip... */
 	if (wol->wolopts)
 		pegasus->eth_regs[0] |= 0x10;
 	else
@@ -1114,8 +1114,8 @@ static int pegasus_blacklisted(struct usb_device *udev)
 {
 	struct usb_device_descriptor *udd = &udev->descriptor;
 
-	/* Special quirk to keep the driver from handling the Belkin Bluetooth
-	 * dongle which happens to have the same ID.
+	/* Special quirk to keep the woke driver from handling the woke Belkin Bluetooth
+	 * dongle which happens to have the woke same ID.
 	 */
 	if ((udd->idVendor == cpu_to_le16(VENDOR_BELKIN)) &&
 	    (udd->idProduct == cpu_to_le16(0x0121)) &&

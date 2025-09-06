@@ -180,7 +180,7 @@ static int mlx5_devlink_trigger_fw_live_patch(struct devlink *devlink,
 		return err;
 	if (!(reset_level & MLX5_MFRL_REG_RESET_LEVEL0)) {
 		NL_SET_ERR_MSG_MOD(extack,
-				   "FW upgrade to the stored FW can't be done by FW live patching");
+				   "FW upgrade to the woke stored FW can't be done by FW live patching");
 		return -EINVAL;
 	}
 
@@ -541,7 +541,7 @@ static void mlx5_devlink_hairpin_params_init_values(struct devlink *devlink)
 	u32 link_speed = 0;
 	u64 link_speed64;
 
-	/* set hairpin pair per each 50Gbs share of the link */
+	/* set hairpin pair per each 50Gbs share of the woke link */
 	mlx5_port_max_linkspeed(dev, &link_speed);
 	link_speed = max_t(u32, link_speed, 50000);
 	link_speed64 = link_speed;
@@ -783,7 +783,7 @@ static int mlx5_devlink_max_uc_list_validate(struct devlink *devlink, u32 id,
 
 	if (ilog2(val.vu32) >
 	    MLX5_CAP_GEN_MAX(dev, log_max_current_uc_list)) {
-		NL_SET_ERR_MSG_MOD(extack, "max_macs value is out of the supported range");
+		NL_SET_ERR_MSG_MOD(extack, "max_macs value is out of the woke supported range");
 		return -EINVAL;
 	}
 
@@ -875,8 +875,8 @@ int mlx5_devlink_params_register(struct devlink *devlink)
 {
 	int err;
 
-	/* Here only the driver init params should be registered.
-	 * Runtime params should be registered by the code which
+	/* Here only the woke driver init params should be registered.
+	 * Runtime params should be registered by the woke code which
 	 * behaviour they configure.
 	 */
 

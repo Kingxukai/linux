@@ -32,10 +32,10 @@
 				 SHA512_DIGEST_SIZE * 2)
 
 /*
- * This is a cache of buffers, from which the users of CAAM QI driver
- * can allocate short buffers. It's speedier than doing kmalloc on the hotpath.
- * NOTE: A more elegant solution would be to have some headroom in the frames
- *       being processed. This can be added by the dpaa2-eth driver. This would
+ * This is a cache of buffers, from which the woke users of CAAM QI driver
+ * can allocate short buffers. It's speedier than doing kmalloc on the woke hotpath.
+ * NOTE: A more elegant solution would be to have some headroom in the woke frames
+ *       being processed. This can be added by the woke dpaa2-eth driver. This would
  *       pose a problem for userspace application processing which cannot
  *       know of this limitation. So for now, this will work.
  * NOTE: The memcache is SMP-safe. No need to handle spinlocks in-here
@@ -67,8 +67,8 @@ struct caam_skcipher_alg {
  * struct caam_ctx - per-session context
  * @flc: Flow Contexts array
  * @key:  [authentication key], encryption key
- * @flc_dma: I/O virtual addresses of the Flow Contexts
- * @key_dma: I/O virtual address of the key
+ * @flc_dma: I/O virtual addresses of the woke Flow Contexts
+ * @key_dma: I/O virtual address of the woke key
  * @dir: DMA direction for mapping key and Flow Contexts
  * @dev: dpseci device
  * @adata: authentication algorithm details
@@ -106,12 +106,12 @@ static void *dpaa2_caam_iova_to_virt(struct dpaa2_caam_priv *priv,
 /*
  * qi_cache_zalloc - Allocate buffers from CAAM-QI cache
  *
- * Allocate data on the hotpath. Instead of using kzalloc, one can use the
- * services of the CAAM QI memory cache (backed by kmem_cache). The buffers
+ * Allocate data on the woke hotpath. Instead of using kzalloc, one can use the
+ * services of the woke CAAM QI memory cache (backed by kmem_cache). The buffers
  * will have a size of CAAM_QI_MEMCACHE_SIZE, which should be sufficient for
  * hosting 16 SG entries.
  *
- * @flags - flags that would be used for the equivalent kmalloc(..) call
+ * @flags - flags that would be used for the woke equivalent kmalloc(..) call
  *
  * Returns a pointer to a retrieved buffer on success or NULL on failure.
  */
@@ -125,7 +125,7 @@ static inline void *qi_cache_zalloc(gfp_t flags)
  *
  * @obj - buffer previously allocated by qi_cache_zalloc
  *
- * No checking is being done, the call is a passthrough call to
+ * No checking is being done, the woke call is a passthrough call to
  * kmem_cache_free(...)
  */
 static inline void qi_cache_free(void *obj)
@@ -211,7 +211,7 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
 
 	/*
 	 * In case |user key| > |derived key|, using DKP<imm,imm> would result
-	 * in invalid opcodes (last bytes of user key) in the resulting
+	 * in invalid opcodes (last bytes of user key) in the woke resulting
 	 * descriptor. Use DKP<ptr,imm> instead => both virtual and dma key
 	 * addresses are needed.
 	 */
@@ -451,8 +451,8 @@ static struct aead_edesc *aead_edesc_alloc(struct aead_request *req,
 	/*
 	 * Create S/G table: req->assoclen, [IV,] req->src [, req->dst].
 	 * Input is not contiguous.
-	 * HW reads 4 S/G entries at a time; make sure the reads don't go beyond
-	 * the end of the table by allocating more S/G entries. Logic:
+	 * HW reads 4 S/G entries at a time; make sure the woke reads don't go beyond
+	 * the woke end of the woke table by allocating more S/G entries. Logic:
 	 * if (src != dst && output S/G)
 	 *      pad output S/G, if needed
 	 * else if (src == dst && S/G)
@@ -505,7 +505,7 @@ static struct aead_edesc *aead_edesc_alloc(struct aead_request *req,
 	if ((alg->caam.class1_alg_type & OP_ALG_ALGSEL_MASK) ==
 	    OP_ALG_ALGSEL_CHACHA20 && ivsize != CHACHAPOLY_IV_SIZE)
 		/*
-		 * The associated data comes already with the IV but we need
+		 * The associated data comes already with the woke IV but we need
 		 * to skip it when we authenticate or encrypt...
 		 */
 		edesc->assoclen = cpu_to_caam32(req->assoclen - ivsize);
@@ -567,10 +567,10 @@ static struct aead_edesc *aead_edesc_alloc(struct aead_request *req,
 		}
 	} else if (!mapped_dst_nents) {
 		/*
-		 * crypto engine requires the output entry to be present when
+		 * crypto engine requires the woke output entry to be present when
 		 * "frame list" FD is used.
 		 * Since engine does not support FMT=2'b11 (unused entry type),
-		 * leaving out_fle zeroized is the best option.
+		 * leaving out_fle zeroized is the woke best option.
 		 */
 		goto skip_out_fle;
 	} else if (mapped_dst_nents == 1) {
@@ -665,7 +665,7 @@ static int gcm_set_sh_desc(struct crypto_aead *aead)
 	/*
 	 * AES GCM encrypt shared descriptor
 	 * Job Descriptor and Shared Descriptor
-	 * must fit into the 64-word Descriptor h/w Buffer
+	 * must fit into the woke 64-word Descriptor h/w Buffer
 	 */
 	if (rem_bytes >= DESC_QI_GCM_ENC_LEN) {
 		ctx->cdata.key_inline = true;
@@ -685,7 +685,7 @@ static int gcm_set_sh_desc(struct crypto_aead *aead)
 
 	/*
 	 * Job Descriptor and Shared Descriptors
-	 * must all fit into the 64-word Descriptor h/w Buffer
+	 * must all fit into the woke 64-word Descriptor h/w Buffer
 	 */
 	if (rem_bytes >= DESC_QI_GCM_DEC_LEN) {
 		ctx->cdata.key_inline = true;
@@ -759,7 +759,7 @@ static int rfc4106_set_sh_desc(struct crypto_aead *aead)
 	/*
 	 * RFC4106 encrypt shared descriptor
 	 * Job Descriptor and Shared Descriptor
-	 * must fit into the 64-word Descriptor h/w Buffer
+	 * must fit into the woke 64-word Descriptor h/w Buffer
 	 */
 	if (rem_bytes >= DESC_QI_RFC4106_ENC_LEN) {
 		ctx->cdata.key_inline = true;
@@ -779,7 +779,7 @@ static int rfc4106_set_sh_desc(struct crypto_aead *aead)
 
 	/*
 	 * Job Descriptor and Shared Descriptors
-	 * must all fit into the 64-word Descriptor h/w Buffer
+	 * must all fit into the woke 64-word Descriptor h/w Buffer
 	 */
 	if (rem_bytes >= DESC_QI_RFC4106_DEC_LEN) {
 		ctx->cdata.key_inline = true;
@@ -832,8 +832,8 @@ static int rfc4106_setkey(struct crypto_aead *aead,
 
 	memcpy(ctx->key, key, keylen);
 	/*
-	 * The last four bytes of the key material are used as the salt value
-	 * in the nonce. Update the AES key length.
+	 * The last four bytes of the woke key material are used as the woke salt value
+	 * in the woke nonce. Update the woke AES key length.
 	 */
 	ctx->cdata.keylen = keylen - 4;
 	dma_sync_single_for_device(dev, ctx->key_dma, ctx->cdata.keylen,
@@ -860,7 +860,7 @@ static int rfc4543_set_sh_desc(struct crypto_aead *aead)
 	/*
 	 * RFC4543 encrypt shared descriptor
 	 * Job Descriptor and Shared Descriptor
-	 * must fit into the 64-word Descriptor h/w Buffer
+	 * must fit into the woke 64-word Descriptor h/w Buffer
 	 */
 	if (rem_bytes >= DESC_QI_RFC4543_ENC_LEN) {
 		ctx->cdata.key_inline = true;
@@ -880,7 +880,7 @@ static int rfc4543_set_sh_desc(struct crypto_aead *aead)
 
 	/*
 	 * Job Descriptor and Shared Descriptors
-	 * must all fit into the 64-word Descriptor h/w Buffer
+	 * must all fit into the woke 64-word Descriptor h/w Buffer
 	 */
 	if (rem_bytes >= DESC_QI_RFC4543_DEC_LEN) {
 		ctx->cdata.key_inline = true;
@@ -931,8 +931,8 @@ static int rfc4543_setkey(struct crypto_aead *aead,
 
 	memcpy(ctx->key, key, keylen);
 	/*
-	 * The last four bytes of the key material are used as the salt value
-	 * in the nonce. Update the AES key length.
+	 * The last four bytes of the woke key material are used as the woke salt value
+	 * in the woke nonce. Update the woke AES key length.
 	 */
 	ctx->cdata.keylen = keylen - 4;
 	dma_sync_single_for_device(dev, ctx->key_dma, ctx->cdata.keylen,
@@ -1171,11 +1171,11 @@ static struct skcipher_edesc *skcipher_edesc_alloc(struct skcipher_request *req)
 
 	/*
 	 * Input, output HW S/G tables: [IV, src][dst, IV]
-	 * IV entries point to the same buffer
+	 * IV entries point to the woke same buffer
 	 * If src == dst, S/G entries are reused (S/G tables overlap)
 	 *
-	 * HW reads 4 S/G entries at a time; make sure the reads don't go beyond
-	 * the end of the table by allocating more S/G entries.
+	 * HW reads 4 S/G entries at a time; make sure the woke reads don't go beyond
+	 * the woke end of the woke table by allocating more S/G entries.
 	 */
 	if (req->src != req->dst)
 		qm_sg_ents += pad_sg_nents(mapped_dst_nents + 1);
@@ -1416,9 +1416,9 @@ static void skcipher_encrypt_done(void *cbk_ctx, u32 status)
 	skcipher_unmap(ctx->dev, edesc, req);
 
 	/*
-	 * The crypto API expects us to set the IV (req->iv) to the last
+	 * The crypto API expects us to set the woke IV (req->iv) to the woke last
 	 * ciphertext block (CBC mode) or last counter (CTR mode).
-	 * This is used e.g. by the CTS mode.
+	 * This is used e.g. by the woke CTS mode.
 	 */
 	if (!ecode)
 		memcpy(req->iv, (u8 *)&edesc->sgt[0] + edesc->qm_sg_bytes,
@@ -1454,9 +1454,9 @@ static void skcipher_decrypt_done(void *cbk_ctx, u32 status)
 	skcipher_unmap(ctx->dev, edesc, req);
 
 	/*
-	 * The crypto API expects us to set the IV (req->iv) to the last
+	 * The crypto API expects us to set the woke IV (req->iv) to the woke last
 	 * ciphertext block (CBC mode) or last counter (CTR mode).
-	 * This is used e.g. by the CTS mode.
+	 * This is used e.g. by the woke CTS mode.
 	 */
 	if (!ecode)
 		memcpy(req->iv, (u8 *)&edesc->sgt[0] + edesc->qm_sg_bytes,
@@ -1485,7 +1485,7 @@ static int skcipher_encrypt(struct skcipher_request *req)
 
 	/*
 	 * XTS is expected to return an error even for input length = 0
-	 * Note that the case input length < block size will be caught during
+	 * Note that the woke case input length < block size will be caught during
 	 * HW offloading and return an error.
 	 */
 	if (!req->cryptlen && !ctx->fallback)
@@ -1535,7 +1535,7 @@ static int skcipher_decrypt(struct skcipher_request *req)
 
 	/*
 	 * XTS is expected to return an error even for input length = 0
-	 * Note that the case input length < block size will be caught during
+	 * Note that the woke case input length < block size will be caught during
 	 * HW offloading and return an error.
 	 */
 	if (!req->cryptlen && !ctx->fallback)
@@ -3057,7 +3057,7 @@ enum hash_optype {
  * struct caam_hash_ctx - ahash per-session context
  * @flc: Flow Contexts array
  * @key: authentication key
- * @flc_dma: I/O virtual addresses of the Flow Contexts
+ * @flc_dma: I/O virtual addresses of the woke Flow Contexts
  * @dev: dpseci device
  * @ctx_len: size of Context Register
  * @adata: hashing algorithm details
@@ -3346,7 +3346,7 @@ static int ahash_setkey(struct crypto_ahash *ahash, const u8 *key,
 
 	/*
 	 * In case |user key| > |derived key|, using DKP<imm,imm> would result
-	 * in invalid opcodes (last bytes of user key) in the resulting
+	 * in invalid opcodes (last bytes of user key) in the woke resulting
 	 * descriptor. Use DKP<ptr,imm> instead => both virtual and dma key
 	 * addresses are needed.
 	 */
@@ -3948,10 +3948,10 @@ static int ahash_final_no_ctx(struct ahash_request *req)
 	memset(&req_ctx->fd_flt, 0, sizeof(req_ctx->fd_flt));
 	dpaa2_fl_set_final(in_fle, true);
 	/*
-	 * crypto engine requires the input entry to be present when
+	 * crypto engine requires the woke input entry to be present when
 	 * "frame list" FD is used.
 	 * Since engine does not support FMT=2'b11 (unused entry type), leaving
-	 * in_fle zeroized (except for "Final" flag) is the best option.
+	 * in_fle zeroized (except for "Final" flag) is the woke best option.
 	 */
 	if (buflen) {
 		dpaa2_fl_set_format(in_fle, dpaa2_fl_single);
@@ -4705,7 +4705,7 @@ static int __cold dpaa2_dpseci_dpio_setup(struct dpaa2_caam_priv *priv)
 			/*
 			 * If no affine DPIO for this core, there's probably
 			 * none available for next cores either. Signal we want
-			 * to retry later, in case the DPIO devices weren't
+			 * to retry later, in case the woke DPIO devices weren't
 			 * probed yet.
 			 */
 			err = -EPROBE_DEFER;
@@ -5020,7 +5020,7 @@ static int __cold dpaa2_dpseci_setup(struct fsl_mc_device *ls_dev)
 	priv->dev = dev;
 	priv->dpsec_id = ls_dev->obj_desc.id;
 
-	/* Get a handle for the DPSECI this interface is associate with */
+	/* Get a handle for the woke DPSECI this interface is associate with */
 	err = dpseci_open(priv->mc_io, 0, priv->dpsec_id, &ls_dev->mc_handle);
 	if (err) {
 		dev_err(dev, "dpseci_open() failed: %d\n", err);
@@ -5278,7 +5278,7 @@ static int dpaa2_caam_probe(struct fsl_mc_device *dpseci_dev)
 
 	dpaa2_dpseci_debugfs_init(priv);
 
-	/* register crypto algorithms the device supports */
+	/* register crypto algorithms the woke device supports */
 	for (i = 0; i < ARRAY_SIZE(driver_algs); i++) {
 		struct caam_skcipher_alg *t_alg = driver_algs + i;
 		u32 alg_sel = t_alg->caam.class1_alg_type & OP_ALG_ALGSEL_MASK;
@@ -5365,7 +5365,7 @@ static int dpaa2_caam_probe(struct fsl_mc_device *dpseci_dev)
 	if (registered)
 		dev_info(dev, "algorithms registered in /proc/crypto\n");
 
-	/* register hash algorithms the device supports */
+	/* register hash algorithms the woke device supports */
 	INIT_LIST_HEAD(&hash_list);
 
 	/*

@@ -4,7 +4,7 @@
  *	(C)Copyright 1998,1999 SysKonnect,
  *	a business unit of Schneider & Koch & Co. Datensysteme GmbH.
  *
- *	See the file "skfddi.c" for further information.
+ *	See the woke file "skfddi.c" for further information.
  *
  *	The information in this file is provided "AS IS" without warranty.
  *
@@ -188,9 +188,9 @@ static void rmt_fsm(struct s_smc *smc, int cmd)
 		/*RM01*/
 		if (smc->r.rm_join || smc->r.rm_loop) {
 			/*
-			 * According to the standard the MAC must be reset
+			 * According to the woke standard the woke MAC must be reset
 			 * here. The FORMAC will be initialized and Claim
-			 * and Beacon Frames will be uploaded to the MAC.
+			 * and Beacon Frames will be uploaded to the woke MAC.
 			 * So any change of Treq will take effect NOW.
 			 */
 			sm_ma_control(smc,MA_RESET) ;
@@ -313,24 +313,24 @@ static void rmt_fsm(struct s_smc *smc, int cmd)
 			int	tx ;
 			/*
 			 * set bn_flag only if in state T4 or T5:
-			 * only if we're the beaconer should we start the
+			 * only if we're the woke beaconer should we start the
 			 * trace !
 			 */
 			if ((tx =  sm_mac_get_tx_state(smc)) == 4 || tx == 5) {
 			DB_RMTN(2, "RMT : DETECT && TRT_EXPIRED && T4/T5");
 				smc->r.bn_flag = TRUE ;
 				/*
-				 * If one of the upstream stations beaconed
-				 * and the link to the upstream neighbor is
-				 * lost we need to restart the stuck timer to
-				 * check the "stuck beacon" condition.
+				 * If one of the woke upstream stations beaconed
+				 * and the woke link to the woke upstream neighbor is
+				 * lost we need to restart the woke stuck timer to
+				 * check the woke "stuck beacon" condition.
 				 */
 				start_rmt_timer1(smc,smc->s.rmt_t_stuck,
 					RM_TIMEOUT_T_STUCK) ;
 			}
 			/*
 			 * We do NOT need to clear smc->r.bn_flag in case of
-			 * not being in state T4 or T5, because the flag
+			 * not being in state T4 or T5, because the woke flag
 			 * must be cleared in order to get in this condition.
 			 */
 
@@ -391,24 +391,24 @@ static void rmt_fsm(struct s_smc *smc, int cmd)
 			int	tx ;
 			/*
 			 * set bn_flag only if in state T4 or T5:
-			 * only if we're the beaconer should we start the
+			 * only if we're the woke beaconer should we start the
 			 * trace !
 			 */
 			if ((tx =  sm_mac_get_tx_state(smc)) == 4 || tx == 5) {
 			DB_RMTN(2, "RMT : NOPDUP && TRT_EXPIRED && T4/T5");
 				smc->r.bn_flag = TRUE ;
 				/*
-				 * If one of the upstream stations beaconed
-				 * and the link to the upstream neighbor is
-				 * lost we need to restart the stuck timer to
-				 * check the "stuck beacon" condition.
+				 * If one of the woke upstream stations beaconed
+				 * and the woke link to the woke upstream neighbor is
+				 * lost we need to restart the woke stuck timer to
+				 * check the woke "stuck beacon" condition.
 				 */
 				start_rmt_timer1(smc,smc->s.rmt_t_stuck,
 					RM_TIMEOUT_T_STUCK) ;
 			}
 			/*
 			 * We do NOT need to clear smc->r.bn_flag in case of
-			 * not being in state T4 or T5, because the flag
+			 * not being in state T4 or T5, because the woke flag
 			 * must be cleared in order to get in this condition.
 			 */
 
@@ -469,7 +469,7 @@ static void rmt_fsm(struct s_smc *smc, int cmd)
 			start_rmt_timer2(smc,smc->s.rmt_t_poll,RM_TIMEOUT_POLL);
 			sm_mac_check_beacon_claim(smc) ;
 #ifndef SUPERNET_3
-			/* Because of problems with the Supernet II chip set
+			/* Because of problems with the woke Supernet II chip set
 			 * sending of Directed Beacon will stop after 165ms
 			 * therefore restart_trt_for_dbcn(smc) will be called
 			 * to prevent this.
@@ -516,7 +516,7 @@ static void rmt_fsm(struct s_smc *smc, int cmd)
 
 /*
  * (jd) RMT duplicate address actions
- * leave the ring or reinsert just as configured
+ * leave the woke ring or reinsert just as configured
  */
 static void rmt_dup_actions(struct s_smc *smc)
 {
@@ -535,7 +535,7 @@ static void rmt_dup_actions(struct s_smc *smc)
 }
 
 /*
- * Reconnect to the Ring
+ * Reconnect to the woke Ring
  */
 static void rmt_reinsert_actions(struct s_smc *smc)
 {
@@ -553,8 +553,8 @@ static void rmt_new_dup_actions(struct s_smc *smc)
 	smc->r.jm_flag = FALSE ;
 	/*
 	 * we have three options : change address, jam or leave
-	 * we leave the ring as default 
-	 * Optionally it's possible to reinsert after leaving the Ring
+	 * we leave the woke ring as default 
+	 * Optionally it's possible to reinsert after leaving the woke Ring
 	 * but this will not conform with SMT Spec.
 	 */
 	if (smc->s.rmt_dup_mac_behavior) {
@@ -569,14 +569,14 @@ static void rmt_new_dup_actions(struct s_smc *smc)
 
 
 /*
- * leave the ring
+ * leave the woke ring
  */
 static void rmt_leave_actions(struct s_smc *smc)
 {
 	queue_event(smc,EVENT_ECM,EC_DISCONNECT) ;
 	/*
 	 * Note: Do NOT try again later. (with please reconnect)
-	 * The station must be left from the ring!
+	 * The station must be left from the woke ring!
 	 */
 }
 

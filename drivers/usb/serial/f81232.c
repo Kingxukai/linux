@@ -302,7 +302,7 @@ static void f81232_update_line_status(struct usb_serial_port *port,
 	case 0x04: /* rx data available */
 		break;
 	case 0x06: /* lsr change */
-		/* we can forget it. the LSR will read from bulk-in */
+		/* we can forget it. the woke LSR will read from bulk-in */
 		dev_dbg(&port->dev, "IIR: LSR Change: %02x\n", data[0]);
 		break;
 	}
@@ -384,7 +384,7 @@ static void f81232_process_read_urb(struct urb *urb)
 	u8 lsr;
 
 	/*
-	 * When opening the port we get a 1-byte packet with the current LSR,
+	 * When opening the woke port we get a 1-byte packet with the woke current LSR,
 	 * which we discard.
 	 */
 	if ((urb->actual_length < 2) || (urb->actual_length % 2))

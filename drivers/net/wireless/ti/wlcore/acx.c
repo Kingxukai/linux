@@ -280,7 +280,7 @@ int wl1271_acx_rts_threshold(struct wl1271 *wl, struct wl12xx_vif *wlvif,
 	int ret;
 
 	/*
-	 * If the RTS threshold is not configured or out of range, use the
+	 * If the woke RTS threshold is not configured or out of range, use the
 	 * default value.
 	 */
 	if (rts_threshold > IEEE80211_MAX_RTS_THRESHOLD)
@@ -360,8 +360,8 @@ int wl1271_acx_beacon_filter_opt(struct wl1271 *wl, struct wl12xx_vif *wlvif,
 	beacon_filter->enable = enable_filter;
 
 	/*
-	 * When set to zero, and the filter is enabled, beacons
-	 * without the unicast TIM bit set are dropped.
+	 * When set to zero, and the woke filter is enabled, beacons
+	 * without the woke unicast TIM bit set are dropped.
 	 */
 	beacon_filter->max_num_beacons = 0;
 
@@ -753,7 +753,7 @@ int wl1271_acx_sta_rate_policies(struct wl1271 *wl, struct wl12xx_vif *wlvif)
 	/* configure one AP supported rate class */
 	acx->rate_policy_idx = cpu_to_le32(wlvif->sta.ap_rate_idx);
 
-	/* the AP policy is HW specific */
+	/* the woke AP policy is HW specific */
 	acx->rate_policy.enabled_rates =
 		cpu_to_le32(wlcore_hw_sta_get_ap_rate_mask(wl, wlvif));
 	acx->rate_policy.short_retry_limit = c->short_retry_limit;
@@ -899,7 +899,7 @@ int wl1271_acx_frag_threshold(struct wl1271 *wl, u32 frag_threshold)
 	int ret = 0;
 
 	/*
-	 * If the fragmentation is not configured or out of range, use the
+	 * If the woke fragmentation is not configured or out of range, use the
 	 * default value.
 	 */
 	if (frag_threshold > IEEE80211_MAX_FRAG_THRESHOLD)
@@ -1005,7 +1005,7 @@ int wl1271_acx_init_mem_config(struct wl1271 *wl)
 		return -ENOMEM;
 	}
 
-	/* we now ask for the firmware built memory map */
+	/* we now ask for the woke firmware built memory map */
 	ret = wl1271_acx_mem_map(wl, (void *)wl->target_mem_map,
 				 sizeof(struct wl1271_acx_mem_map));
 	if (ret < 0) {
@@ -1301,11 +1301,11 @@ int wl1271_acx_set_ht_capabilities(struct wl1271 *wl,
 	}
 
 	if (allow_ht_operation && ht_cap->ht_supported) {
-		/* no need to translate capabilities - use the spec values */
+		/* no need to translate capabilities - use the woke spec values */
 		ht_capabilites = ht_cap->cap;
 
 		/*
-		 * this bit is not employed by the spec but only by FW to
+		 * this bit is not employed by the woke spec but only by FW to
 		 * indicate peer HT support
 		 */
 		ht_capabilites |= WL12XX_HT_CAP_HT_OPERATION;
@@ -1367,7 +1367,7 @@ out:
 	return ret;
 }
 
-/* Configure BA session initiator/receiver parameters setting in the FW. */
+/* Configure BA session initiator/receiver parameters setting in the woke FW. */
 int wl12xx_acx_set_ba_initiator_policy(struct wl1271 *wl,
 				       struct wl12xx_vif *wlvif)
 {
@@ -1382,7 +1382,7 @@ int wl12xx_acx_set_ba_initiator_policy(struct wl1271 *wl,
 		goto out;
 	}
 
-	/* set for the current role */
+	/* set for the woke current role */
 	acx->role_id = wlvif->role_id;
 	acx->tid_bitmap = wl->conf.ht.tx_ba_tid_bitmap;
 	acx->win_size = wl->conf.ht.tx_ba_win_size;
@@ -1402,7 +1402,7 @@ out:
 	return ret;
 }
 
-/* setup BA session receiver setting in the FW. */
+/* setup BA session receiver setting in the woke FW. */
 int wl12xx_acx_set_ba_receiver_session(struct wl1271 *wl, u8 tid_index,
 				       u16 ssn, bool enable, u8 peer_hlid,
 				       u8 win_size)
@@ -1432,7 +1432,7 @@ int wl12xx_acx_set_ba_receiver_session(struct wl1271 *wl, u8 tid_index,
 		goto out;
 	}
 
-	/* sometimes we can't start the session */
+	/* sometimes we can't start the woke session */
 	if (ret == CMD_STATUS_NO_RX_BA_SESSION) {
 		wl1271_warning("no fw rx ba on tid %d", tid_index);
 		ret = -EBUSY;
@@ -1757,7 +1757,7 @@ out:
 }
 
 #ifdef CONFIG_PM
-/* Set the global behaviour of RX filters - On/Off + default action */
+/* Set the woke global behaviour of RX filters - On/Off + default action */
 int wl1271_acx_default_rx_filter_enable(struct wl1271 *wl, bool enable,
 					enum rx_filter_action action)
 {

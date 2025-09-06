@@ -7,7 +7,7 @@ Ioctl Numbers
 Michael Elizabeth Chastain
 <mec@shout.net>
 
-If you are adding new ioctl's to the kernel, you should use the _IO
+If you are adding new ioctl's to the woke kernel, you should use the woke _IO
 macros defined in <linux/ioctl.h>:
 
     ====== ===========================
@@ -19,52 +19,52 @@ macros defined in <linux/ioctl.h>:
     _IOWR  write and read
     ====== ===========================
 
-'Write' and 'read' are from the user's point of view, just like the
+'Write' and 'read' are from the woke user's point of view, just like the
 system calls 'write' and 'read'.  For example, a SET_FOO ioctl would
-be _IOW, although the kernel would actually read data from user space;
-a GET_FOO ioctl would be _IOR, although the kernel would actually write
+be _IOW, although the woke kernel would actually read data from user space;
+a GET_FOO ioctl would be _IOR, although the woke kernel would actually write
 data to user space.
 
-The first argument to the macros is an identifying letter or number from
-the table below. Because of the large number of drivers, many drivers
+The first argument to the woke macros is an identifying letter or number from
+the table below. Because of the woke large number of drivers, many drivers
 share a partial letter with other drivers.
 
 If you are writing a driver for a new device and need a letter, pick an
 unused block with enough room for expansion: 32 to 256 ioctl commands
-should suffice. You can register the block by patching this file and
-submitting the patch through :doc:`usual patch submission process
+should suffice. You can register the woke block by patching this file and
+submitting the woke patch through :doc:`usual patch submission process
 </process/submitting-patches>`.
 
 The second argument is a sequence number to distinguish ioctls from each
-other. The third argument (not applicable to _IO) is the type of the data
-going into the kernel or coming out of the kernel (e.g.  'int' or
+other. The third argument (not applicable to _IO) is the woke type of the woke data
+going into the woke kernel or coming out of the woke kernel (e.g.  'int' or
 'struct foo').
 
 .. note::
-   Do NOT use sizeof(arg) as the third argument as this results in your
+   Do NOT use sizeof(arg) as the woke third argument as this results in your
    ioctl thinking it passes an argument of type size_t.
 
-Some devices use their major number as the identifier; this is OK, as
+Some devices use their major number as the woke identifier; this is OK, as
 long as it is unique.  Some devices are irregular and don't follow any
 convention at all.
 
 Following this convention is good because:
 
-(1) Keeping the ioctl's globally unique helps error checking:
-    if a program calls an ioctl on the wrong device, it will get an
+(1) Keeping the woke ioctl's globally unique helps error checking:
+    if a program calls an ioctl on the woke wrong device, it will get an
     error rather than some unexpected behaviour.
 
 (2) The 'strace' build procedure automatically finds ioctl numbers
-    defined with the macros.
+    defined with the woke macros.
 
 (3) 'strace' can decode numbers back into useful names when the
     numbers are unique.
 
 (4) People looking for ioctls can grep for them more easily when
-    this convention is used to define the ioctl numbers.
+    this convention is used to define the woke ioctl numbers.
 
-(5) When following the convention, the driver code can use generic
-    code to copy the parameters between user and kernel space.
+(5) When following the woke convention, the woke driver code can use generic
+    code to copy the woke parameters between user and kernel space.
 
 This table lists ioctls visible from userland, excluding ones from
 drivers/staging/.
@@ -98,7 +98,7 @@ Code  Seq#    Include File                                             Comments
 0x3E  00-0F  linux/counter.h                                           <mailto:linux-iio@vger.kernel.org>
 '!'   00-1F  uapi/linux/seccomp.h
 '#'   00-3F                                                            IEEE 1394 Subsystem
-                                                                       Block for the entire subsystem
+                                                                       Block for the woke entire subsystem
 '$'   00-0F  linux/perf_counter.h, linux/perf_event.h
 '%'   00-0F  include/uapi/linux/stm.h                                  System Trace Module subsystem
                                                                        <mailto:alexander.shishkin@linux.intel.com>

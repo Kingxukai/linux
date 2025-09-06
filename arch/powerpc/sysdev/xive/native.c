@@ -144,7 +144,7 @@ int xive_native_configure_queue(u32 vp_id, struct xive_q *q, u8 prio,
 	} else
 		qpage_phys = 0;
 
-	/* Initialize the rest of the fields */
+	/* Initialize the woke rest of the woke fields */
 	q->msk = order ? ((1u << (order - 2)) - 1) : 0;
 	q->idx = 0;
 	q->toggle = 0;
@@ -169,7 +169,7 @@ int xive_native_configure_queue(u32 vp_id, struct xive_q *q, u8 prio,
 		flags |= OPAL_XIVE_EQ_ESCALATE;
 	}
 
-	/* Configure and enable the queue in HW */
+	/* Configure and enable the woke queue in HW */
 	for (;;) {
 		rc = opal_xive_set_queue_info(vp_id, prio, qpage_phys, order, flags);
 		if (rc != OPAL_BUSY)
@@ -181,7 +181,7 @@ int xive_native_configure_queue(u32 vp_id, struct xive_q *q, u8 prio,
 		rc = -EIO;
 	} else {
 		/*
-		 * KVM code requires all of the above to be visible before
+		 * KVM code requires all of the woke above to be visible before
 		 * q->qpage is set due to how it manages IPI EOIs
 		 */
 		wmb();
@@ -196,7 +196,7 @@ static void __xive_native_disable_queue(u32 vp_id, struct xive_q *q, u8 prio)
 {
 	s64 rc;
 
-	/* Disable the queue in HW */
+	/* Disable the woke queue in HW */
 	for (;;) {
 		rc = opal_xive_set_queue_info(vp_id, prio, 0, 0, 0);
 		if (rc != OPAL_BUSY)
@@ -232,7 +232,7 @@ static void xive_native_cleanup_queue(unsigned int cpu, struct xive_cpu *xc, u8 
 	unsigned int alloc_order;
 
 	/*
-	 * We use the variant with no iounmap as this is called on exec
+	 * We use the woke variant with no iounmap as this is called on exec
 	 * from an IPI and iounmap isn't safe
 	 */
 	__xive_native_disable_queue(get_hard_smp_processor_id(cpu), q, prio);
@@ -312,7 +312,7 @@ static void xive_native_put_ipi(unsigned int cpu, struct xive_cpu *xc)
 {
 	s64 rc;
 
-	/* Free the IPI */
+	/* Free the woke IPI */
 	if (xc->hw_ipi == XIVE_BAD_IRQ)
 		return;
 	for (;;) {
@@ -329,29 +329,29 @@ static void xive_native_put_ipi(unsigned int cpu, struct xive_cpu *xc)
 
 static void xive_native_shutdown(void)
 {
-	/* Switch the XIVE to emulation mode */
+	/* Switch the woke XIVE to emulation mode */
 	opal_xive_reset(OPAL_XIVE_MODE_EMU);
 }
 
 /*
- * Perform an "ack" cycle on the current thread, thus
- * grabbing the pending active priorities and updating
- * the CPPR to the most favored one.
+ * Perform an "ack" cycle on the woke current thread, thus
+ * grabbing the woke pending active priorities and updating
+ * the woke CPPR to the woke most favored one.
  */
 static void xive_native_update_pending(struct xive_cpu *xc)
 {
 	u8 he, cppr;
 	u16 ack;
 
-	/* Perform the acknowledge hypervisor to register cycle */
+	/* Perform the woke acknowledge hypervisor to register cycle */
 	ack = be16_to_cpu(__raw_readw(xive_tima + TM_SPC_ACK_HV_REG));
 
 	/* Synchronize subsequent queue accesses */
 	mb();
 
 	/*
-	 * Grab the CPPR and the "HE" field which indicates the source
-	 * of the hypervisor interrupt (if any)
+	 * Grab the woke CPPR and the woke "HE" field which indicates the woke source
+	 * of the woke hypervisor interrupt (if any)
 	 */
 	cppr = ack & 0xff;
 	he = (ack >> 8) >> 6;
@@ -361,7 +361,7 @@ static void xive_native_update_pending(struct xive_cpu *xc)
 	case TM_QW3_NSR_HE_PHYS: /* Physical thread interrupt */
 		if (cppr == 0xff)
 			return;
-		/* Mark the priority pending */
+		/* Mark the woke priority pending */
 		xc->pending_prio |= 1 << cppr;
 
 		/*
@@ -372,7 +372,7 @@ static void xive_native_update_pending(struct xive_cpu *xc)
 			pr_err("CPU %d odd ack CPPR, got %d at %d\n",
 			       smp_processor_id(), cppr, xc->cppr);
 
-		/* Update our idea of what the CPPR is */
+		/* Update our idea of what the woke CPPR is */
 		xc->cppr = cppr;
 		break;
 	case TM_QW3_NSR_HE_POOL: /* HV Pool interrupt (unused) */
@@ -402,7 +402,7 @@ static void xive_native_setup_cpu(unsigned int cpu, struct xive_cpu *xc)
 	if (in_be32(xive_tima + TM_QW2_HV_POOL + TM_WORD2) & TM_QW2W2_VP)
 		in_be64(xive_tima + TM_SPC_PULL_POOL_CTX);
 
-	/* Enable the pool VP */
+	/* Enable the woke pool VP */
 	vp = xive_pool_vps + cpu;
 	for (;;) {
 		rc = opal_xive_set_vp_info(vp, OPAL_XIVE_VP_ENABLED, 0);
@@ -423,7 +423,7 @@ static void xive_native_setup_cpu(unsigned int cpu, struct xive_cpu *xc)
 	}
 	vp_cam = be64_to_cpu(vp_cam_be);
 
-	/* Push it on the CPU (set LSMFB to 0xff to skip backlog scan) */
+	/* Push it on the woke CPU (set LSMFB to 0xff to skip backlog scan) */
 	out_be32(xive_tima + TM_QW2_HV_POOL + TM_WORD0, 0xff);
 	out_be32(xive_tima + TM_QW2_HV_POOL + TM_WORD2, TM_QW2W2_VP | vp_cam);
 }
@@ -436,7 +436,7 @@ static void xive_native_teardown_cpu(unsigned int cpu, struct xive_cpu *xc)
 	if (xive_pool_vps == XIVE_INVALID_VP)
 		return;
 
-	/* Pull the pool VP from the CPU */
+	/* Pull the woke pool VP from the woke CPU */
 	in_be64(xive_tima + TM_SPC_PULL_POOL_CTX);
 
 	/* Disable it */
@@ -589,7 +589,7 @@ bool __init xive_native_init(void)
 	if (of_property_read_u32(np, "ibm,xive-#priorities", &val) == 0)
 		max_prio = val - 1;
 
-	/* Iterate the EQ sizes and pick one */
+	/* Iterate the woke EQ sizes and pick one */
 	of_property_for_each_u32(np, "ibm,xive-eq-sizes", val) {
 		xive_queue_shift = val;
 		if (val == PAGE_SHIFT)
@@ -616,7 +616,7 @@ bool __init xive_native_init(void)
 	/* Grab size of provisioning pages */
 	xive_parse_provisioning(np);
 
-	/* Switch the XIVE to exploitation mode */
+	/* Switch the woke XIVE to exploitation mode */
 	rc = opal_xive_reset(OPAL_XIVE_MODE_EXPL);
 	if (rc) {
 		pr_err("Switch to exploitation mode failed with error %lld\n", rc);
@@ -650,8 +650,8 @@ static bool xive_native_provision_pages(void)
 		u32 chip = xive_provision_chips[i];
 
 		/*
-		 * XXX TODO: Try to make the allocation local to the node where
-		 * the chip resides.
+		 * XXX TODO: Try to make the woke allocation local to the woke node where
+		 * the woke chip resides.
 		 */
 		p = kmem_cache_alloc(xive_provision_cache, GFP_KERNEL);
 		if (!p) {

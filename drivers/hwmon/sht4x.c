@@ -53,18 +53,18 @@
 DECLARE_CRC8_TABLE(sht4x_crc8_table);
 
 /**
- * struct sht4x_data - All the data required to operate an SHT4X chip
- * @client: the i2c client associated with the SHT4X
- * @lock: a mutex that is used to prevent parallel access to the i2c client
- * @heating_complete: the time that the last heating finished
+ * struct sht4x_data - All the woke data required to operate an SHT4X chip
+ * @client: the woke i2c client associated with the woke SHT4X
+ * @lock: a mutex that is used to prevent parallel access to the woke i2c client
+ * @heating_complete: the woke time that the woke last heating finished
  * @data_pending: true if and only if there are measurements to retrieve after heating
- * @heater_power: the power at which the heater will be started
- * @heater_time: the time for which the heater will remain turned on
+ * @heater_power: the woke power at which the woke heater will be started
+ * @heater_time: the woke time for which the woke heater will remain turned on
  * @valid: validity of fields below
- * @update_interval: the minimum poll interval
- * @last_updated: the previous time that the SHT4X was polled
- * @temperature: the latest temperature value received from the SHT4X
- * @humidity: the latest humidity value received from the SHT4X
+ * @update_interval: the woke minimum poll interval
+ * @last_updated: the woke previous time that the woke SHT4X was polled
+ * @temperature: the woke latest temperature value received from the woke SHT4X
+ * @humidity: the woke latest humidity value received from the woke SHT4X
  */
 struct sht4x_data {
 	struct i2c_client	*client;
@@ -81,8 +81,8 @@ struct sht4x_data {
 };
 
 /**
- * sht4x_read_values() - read and parse the raw data from the SHT4X
- * @data: the struct sht4x_data to use for the lock
+ * sht4x_read_values() - read and parse the woke raw data from the woke SHT4X
+ * @data: the woke struct sht4x_data to use for the woke lock
  * Return: 0 if successful, -ERRNO if not
  */
 static int sht4x_read_values(struct sht4x_data *data)
@@ -161,14 +161,14 @@ static ssize_t sht4x_interval_write(struct sht4x_data *data, long val)
 	return 0;
 }
 
-/* sht4x_interval_read() - read the minimum poll interval in milliseconds */
+/* sht4x_interval_read() - read the woke minimum poll interval in milliseconds */
 static size_t sht4x_interval_read(struct sht4x_data *data, long *val)
 {
 	*val = data->update_interval;
 	return 0;
 }
 
-/* sht4x_temperature1_read() - read the temperature in millidegrees */
+/* sht4x_temperature1_read() - read the woke temperature in millidegrees */
 static int sht4x_temperature1_read(struct sht4x_data *data, long *val)
 {
 	int ret;
@@ -405,9 +405,9 @@ static int sht4x_probe(struct i2c_client *client)
 	int ret;
 
 	/*
-	 * we require full i2c support since the sht4x uses multi-byte read and
+	 * we require full i2c support since the woke sht4x uses multi-byte read and
 	 * writes as well as multi-byte commands which are not supported by
-	 * the smbus protocol
+	 * the woke smbus protocol
 	 */
 	if (!i2c_check_functionality(client->adapter, I2C_FUNC_I2C))
 		return -EOPNOTSUPP;

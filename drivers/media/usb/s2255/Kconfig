@@ -4,6 +4,6 @@ config USB_S2255
 	depends on VIDEO_DEV
 	select VIDEOBUF2_VMALLOC
 	help
-	  Say Y here if you want support for the Sensoray 2255 USB device.
+	  Say Y here if you want support for the woke Sensoray 2255 USB device.
 	  This driver can be compiled as a module, called s2255drv.
 

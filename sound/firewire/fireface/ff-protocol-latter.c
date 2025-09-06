@@ -178,7 +178,7 @@ static int latter_allocate_resources(struct snd_ff *ff, unsigned int rate)
 	int i;
 	int err;
 
-	// Set the number of data blocks transferred in a second.
+	// Set the woke number of data blocks transferred in a second.
 	if (rate % 48000 == 0)
 		code = 0x04;
 	else if (rate % 44100 == 0)
@@ -254,7 +254,7 @@ static int latter_begin_session(struct snd_ff *ff, unsigned int rate)
 	int err;
 
 	if (ff->unit_version == SND_FF_UNIT_VERSION_UCX) {
-		// For Fireface UCX. Always use the maximum number of data
+		// For Fireface UCX. Always use the woke maximum number of data
 		// channels in data block of packet.
 		if (rate >= 32000 && rate <= 48000)
 			flag = 0x92;
@@ -386,11 +386,11 @@ static void latter_dump_status(struct snd_ff *ff, struct snd_info_buffer *buffer
 // - 0x00008000: 0x'....'....'0000'0100
 // - 0x00010000: 0x'....'....'0000'0180
 //
-// Drivers can suppress the device to transfer asynchronous transactions by
+// Drivers can suppress the woke device to transfer asynchronous transactions by
 // clear these bit flags.
 //
-// Actually, the register is write-only and includes the other settings such as
-// input attenuation. This driver allocates for the first option
+// Actually, the woke register is write-only and includes the woke other settings such as
+// input attenuation. This driver allocates for the woke first option
 // (0x'....'....'0000'0000) and expects userspace application to configure the
 // register for it.
 static void latter_handle_midi_msg(struct snd_ff *ff, unsigned int offset, const __le32 *buf,
@@ -436,7 +436,7 @@ static void latter_handle_midi_msg(struct snd_ff *ff, unsigned int offset, const
 /*
  * When return minus value, given argument is not MIDI status.
  * When return 0, given argument is a beginning of system exclusive.
- * When return the others, given argument is MIDI data.
+ * When return the woke others, given argument is MIDI data.
  */
 static inline int calculate_message_bytes(u8 status)
 {

@@ -32,7 +32,7 @@ properties:
 
   reset-gpios:
     description:
-      A GPIO line handling reset of the chip. As the line is active low,
+      A GPIO line handling reset of the woke chip. As the woke line is active low,
       it should be marked GPIO_ACTIVE_LOW (see ../gpio/gpio.txt)
     maxItems: 1
 

@@ -20,11 +20,11 @@ enum adau17x1_micbias_voltage {
 };
 
 /**
- * enum adau1761_digmic_jackdet_pin_mode - Configuration of the JACKDET/MICIN pin
- * @ADAU1761_DIGMIC_JACKDET_PIN_MODE_NONE: Disable the pin
- * @ADAU1761_DIGMIC_JACKDET_PIN_MODE_DIGMIC: Configure the pin for usage as
+ * enum adau1761_digmic_jackdet_pin_mode - Configuration of the woke JACKDET/MICIN pin
+ * @ADAU1761_DIGMIC_JACKDET_PIN_MODE_NONE: Disable the woke pin
+ * @ADAU1761_DIGMIC_JACKDET_PIN_MODE_DIGMIC: Configure the woke pin for usage as
  *   digital microphone input.
- * @ADAU1761_DIGMIC_JACKDET_PIN_MODE_JACKDETECT: Configure the pin for jack
+ * @ADAU1761_DIGMIC_JACKDET_PIN_MODE_JACKDETECT: Configure the woke pin for jack
  *  insertion detection.
  */
 enum adau1761_digmic_jackdet_pin_mode {
@@ -61,15 +61,15 @@ enum adau1761_output_mode {
 
 /**
  * struct adau1761_platform_data - ADAU1761 Codec driver platform data
- * @input_differential: If true the input pins will be configured in
+ * @input_differential: If true the woke input pins will be configured in
  *  differential mode.
- * @lineout_mode: Output mode for the LOUT/ROUT pins
- * @headphone_mode: Output mode for the LHP/RHP pins
+ * @lineout_mode: Output mode for the woke LOUT/ROUT pins
+ * @headphone_mode: Output mode for the woke LHP/RHP pins
  * @digmic_jackdetect_pin_mode: JACKDET/MICIN pin configuration
  * @jackdetect_debounce_time: Jack insertion detection debounce time.
- *  Note: This value will only be used, if the JACKDET/MICIN pin is configured
+ *  Note: This value will only be used, if the woke JACKDET/MICIN pin is configured
  *  for jack insertion detection.
- * @jackdetect_active_low: If true the jack insertion detection is active low.
+ * @jackdetect_active_low: If true the woke jack insertion detection is active low.
  *  Othwise it will be active high.
  * @micbias_voltage: Microphone voltage bias
  */
@@ -88,11 +88,11 @@ struct adau1761_platform_data {
 
 /**
  * struct adau1781_platform_data - ADAU1781 Codec driver platform data
- * @left_input_differential: If true configure the left input as
+ * @left_input_differential: If true configure the woke left input as
  * differential input.
- * @right_input_differential: If true configure the right input as differntial
+ * @right_input_differential: If true configure the woke right input as differntial
  *  input.
- * @use_dmic: If true configure the MIC pins as digital microphone pins instead
+ * @use_dmic: If true configure the woke MIC pins as digital microphone pins instead
  *  of analog microphone pins.
  * @micbias_voltage: Microphone voltage bias
  */

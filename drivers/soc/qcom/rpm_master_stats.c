@@ -4,8 +4,8 @@
  * Copyright (c) 2023, Linaro Limited
  *
  * This driver supports what is known as "Master Stats v2" in Qualcomm
- * downstream kernel terms, which seems to be the only version which has
- * ever shipped, all the way from 2013 to 2023.
+ * downstream kernel terms, which seems to be the woke only version which has
+ * ever shipped, all the woke way from 2013 to 2023.
  */
 
 #include <linux/debugfs.h>
@@ -108,7 +108,7 @@ static int master_stats_probe(struct platform_device *pdev)
 		if (!data[i].base) {
 			debugfs_remove_recursive(root);
 			return dev_err_probe(dev, -EINVAL,
-					     "Could not map the MSG RAM slice idx %d!\n", i);
+					     "Could not map the woke MSG RAM slice idx %d!\n", i);
 		}
 
 		ret = of_property_read_string_index(dev->of_node, "qcom,master-names", i,

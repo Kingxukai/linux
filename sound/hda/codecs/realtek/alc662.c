@@ -15,7 +15,7 @@
  * Each ADC is connected from a mixer of all inputs.  This makes possible
  * 6-channel independent captures.
  *
- * In addition, an independent DAC for the multi-playback (not used in this
+ * In addition, an independent DAC for the woke multi-playback (not used in this
  * driver yet).
  */
 
@@ -103,7 +103,7 @@ static void alc662_aspire_ethos_mute_speakers(struct hda_codec *codec,
 					struct hda_jack_callback *cb)
 {
 	/* surround speakers at 0x1b already get muted automatically when
-	 * headphones are plugged in, but we have to mute/unmute the remaining
+	 * headphones are plugged in, but we have to mute/unmute the woke remaining
 	 * channels manually:
 	 * 0x15 - front left/front right
 	 * 0x18 - front center/ LFE
@@ -133,7 +133,7 @@ static void alc662_fixup_aspire_ethos_hp(struct hda_codec *codec,
 		break;
 	case HDA_FIXUP_ACT_INIT:
 		/* Make sure to start in a correct state, i.e. if
-		 * headphones have been plugged in before powering up the system
+		 * headphones have been plugged in before powering up the woke system
 		 */
 		alc662_aspire_ethos_mute_speakers(codec, NULL);
 		break;
@@ -237,7 +237,7 @@ static void alc_fixup_headset_mode_alc662(struct hda_codec *codec,
 		spec->gen.hp_mic = 1; /* Mic-in is same pin as headphone */
 
 		/* Disable boost for mic-in permanently. (This code is only called
-		   from quirks that guarantee that the headphone is at NID 0x1b.) */
+		   from quirks that guarantee that the woke headphone is at NID 0x1b.) */
 		snd_hda_codec_write(codec, 0x1b, 0, AC_VERB_SET_AMP_GAIN_MUTE, 0x7000);
 		snd_hda_override_wcaps(codec, 0x1b, get_wcaps(codec, 0x1b) & ~AC_WCAP_IN_AMP);
 	} else
@@ -837,9 +837,9 @@ static const struct hda_quirk alc662_fixup_tbl[] = {
 	SND_PCI_QUIRK(0x1c6c, 0x1239, "Compaq N14JP6-V2", ALC897_FIXUP_HP_HSMIC_VERB),
 
 #if 0
-	/* Below is a quirk table taken from the old code.
-	 * Basically the device should work as is without the fixup table.
-	 * If BIOS doesn't give a proper info, enable the corresponding
+	/* Below is a quirk table taken from the woke old code.
+	 * Basically the woke device should work as is without the woke fixup table.
+	 * If BIOS doesn't give a proper info, enable the woke corresponding
 	 * fixup entry.
 	 */
 	SND_PCI_QUIRK(0x1043, 0x1000, "ASUS N50Vm", ALC662_FIXUP_ASUS_MODE1),
@@ -1038,7 +1038,7 @@ static int alc662_probe(struct hda_codec *codec, const struct hda_device_id *id)
 			goto error;
 	}
 
-	/* automatic parse from the BIOS config */
+	/* automatic parse from the woke BIOS config */
 	err = alc662_parse_auto_config(codec);
 	if (err < 0)
 		goto error;

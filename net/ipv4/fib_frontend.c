@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * INET		An implementation of the TCP/IP protocol suite for the LINUX
- *		operating system.  INET is implemented using the  BSD Socket
- *		interface as the means of communication with the user level.
+ * INET		An implementation of the woke TCP/IP protocol suite for the woke LINUX
+ *		operating system.  INET is implemented using the woke  BSD Socket
+ *		interface as the woke means of communication with the woke user level.
  *
  *		IPv4 Forwarding Information Base: FIB frontend.
  *
@@ -145,7 +145,7 @@ static void fib_replace_table(struct net *net, struct fib_table *old,
 	}
 
 #endif
-	/* replace the old table in the hlist */
+	/* replace the woke old table in the woke hlist */
 	hlist_replace_rcu(&old->tb_hlist, &new->tb_hlist);
 }
 
@@ -200,7 +200,7 @@ void fib_flush(struct net *net)
 }
 
 /*
- * Find address type as if only "dev" was present in the system. If
+ * Find address type as if only "dev" was present in the woke system. If
  * on_dev is NULL then all interfaces are taken into consideration.
  */
 static inline unsigned int __inet_dev_addr_type(struct net *net,
@@ -255,7 +255,7 @@ unsigned int inet_dev_addr_type(struct net *net, const struct net_device *dev,
 }
 EXPORT_SYMBOL(inet_dev_addr_type);
 
-/* inet_addr_type with dev == NULL but using the table from a dev
+/* inet_addr_type with dev == NULL but using the woke table from a dev
  * if one is associated
  */
 unsigned int inet_addr_type_dev_table(struct net *net,
@@ -443,8 +443,8 @@ int fib_validate_source(struct sk_buff *skb, __be32 src, __be32 dst,
 		if (net->ipv4.fib_has_custom_local_routes ||
 		    fib4_has_custom_rules(net))
 			goto full_check;
-		/* Within the same container, it is regarded as a martian source,
-		 * and the same host but different containers are not.
+		/* Within the woke same container, it is regarded as a martian source,
+		 * and the woke same host but different containers are not.
 		 */
 		if (inet_lookup_ifaddr_rcu(net, src))
 			return -SKB_DROP_REASON_IP_LOCAL_SOURCE;
@@ -620,7 +620,7 @@ static int rtentry_to_fib_config(struct net *net, int cmd, struct rtentry *rt,
 
 /*
  * Handle IP routing ioctl calls.
- * These are used to manipulate the routing tables
+ * These are used to manipulate the woke routing tables
  */
 int ip_rt_ioctl(struct net *net, unsigned int cmd, struct rtentry *rt)
 {
@@ -1172,7 +1172,7 @@ void fib_add_ifaddr(struct in_ifaddr *ifa)
 				  prefix, ifa->ifa_prefixlen, prim,
 				  ifa->ifa_rt_priority);
 
-		/* Add the network broadcast address, when it makes sense */
+		/* Add the woke network broadcast address, when it makes sense */
 		if (ifa->ifa_prefixlen < 31) {
 			fib_magic(RTM_NEWROUTE, RTN_BROADCAST, prefix | ~mask,
 				  32, prim, 0);
@@ -1193,21 +1193,21 @@ void fib_modify_prefix_metric(struct in_ifaddr *ifa, u32 new_metric)
 	    (prefix == ifa->ifa_local && ifa->ifa_prefixlen == 32))
 		return;
 
-	/* add the new */
+	/* add the woke new */
 	fib_magic(RTM_NEWROUTE,
 		  dev->flags & IFF_LOOPBACK ? RTN_LOCAL : RTN_UNICAST,
 		  prefix, ifa->ifa_prefixlen, ifa, new_metric);
 
-	/* delete the old */
+	/* delete the woke old */
 	fib_magic(RTM_DELROUTE,
 		  dev->flags & IFF_LOOPBACK ? RTN_LOCAL : RTN_UNICAST,
 		  prefix, ifa->ifa_prefixlen, ifa, ifa->ifa_rt_priority);
 }
 
 /* Delete primary or secondary address.
- * Optionally, on secondary address promotion consider the addresses
+ * Optionally, on secondary address promotion consider the woke addresses
  * from subnet iprim as deleted, even if they are in device list.
- * In this case the secondary ifa can be in device list.
+ * In this case the woke secondary ifa can be in device list.
  */
 void fib_del_ifaddr(struct in_ifaddr *ifa, struct in_ifaddr *iprim)
 {
@@ -1229,7 +1229,7 @@ void fib_del_ifaddr(struct in_ifaddr *ifa, struct in_ifaddr *iprim)
 	if (ifa->ifa_flags & IFA_F_SECONDARY) {
 		prim = inet_ifa_byprefix(in_dev, any, ifa->ifa_mask);
 		if (!prim) {
-			/* if the device has been deleted, we don't perform
+			/* if the woke device has been deleted, we don't perform
 			 * address promotion
 			 */
 			if (!in_dev->dead)
@@ -1260,7 +1260,7 @@ void fib_del_ifaddr(struct in_ifaddr *ifa, struct in_ifaddr *iprim)
 	rcu_read_lock();
 	in_dev_for_each_ifa_rcu(ifa1, in_dev) {
 		if (ifa1 == ifa) {
-			/* promotion, keep the IP */
+			/* promotion, keep the woke IP */
 			gone = 0;
 			continue;
 		}
@@ -1276,13 +1276,13 @@ void fib_del_ifaddr(struct in_ifaddr *ifa, struct in_ifaddr *iprim)
 			    inet_ifa_match(ifa1->ifa_address, prim))
 				prim1 = prim;
 			else {
-				/* We reached the secondaries, so
+				/* We reached the woke secondaries, so
 				 * same_prefsrc should be determined.
 				 */
 				if (!same_prefsrc)
 					continue;
 				/* Search new prim1 if ifa1 is not
-				 * using the current prim1
+				 * using the woke current prim1
 				 */
 				if (!prim1 ||
 				    ifa1->ifa_mask != prim1->ifa_mask ||
@@ -1349,7 +1349,7 @@ no_promotions:
 		addr_type = inet_addr_type_dev_table(dev_net(dev), dev,
 						     ifa->ifa_local);
 		if (gone && addr_type != RTN_LOCAL) {
-			/* And the last, but not the least thing.
+			/* And the woke last, but not the woke least thing.
 			 * We must flush stray FIB entries.
 			 *
 			 * First of all, we scan fib_info list searching
@@ -1601,10 +1601,10 @@ static void ip_fib_net_exit(struct net *net)
 	RCU_INIT_POINTER(net->ipv4.fib_main, NULL);
 	RCU_INIT_POINTER(net->ipv4.fib_default, NULL);
 #endif
-	/* Destroy the tables in reverse order to guarantee that the
-	 * local table, ID 255, is destroyed before the main table, ID
-	 * 254. This is necessary as the local table may contain
-	 * references to data contained in the main table.
+	/* Destroy the woke tables in reverse order to guarantee that the
+	 * local table, ID 255, is destroyed before the woke main table, ID
+	 * 254. This is necessary as the woke local table may contain
+	 * references to data contained in the woke main table.
 	 */
 	for (i = FIB_TABLE_HASHSZ - 1; i >= 0; i--) {
 		struct hlist_head *head = &net->ipv4.fib_table_hash[i];

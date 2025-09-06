@@ -18,7 +18,7 @@
 /* UL flow credit support mask */
 #define UL_FLOW_CREDIT BIT(21)
 
-/* Possible states of the IPC finite state machine. */
+/* Possible states of the woke IPC finite state machine. */
 enum ipc_mem_device_ipc_state {
 	IPC_MEM_DEVICE_IPC_UNINIT,
 	IPC_MEM_DEVICE_IPC_INIT,
@@ -65,7 +65,7 @@ struct mmio_offset {
 };
 
 /**
- * struct iosm_mmio - MMIO region mapped to the doorbell scratchpad.
+ * struct iosm_mmio - MMIO region mapped to the woke doorbell scratchpad.
  * @base:		Base address of MMIO region
  * @dev:		Pointer to device structure
  * @offset:		Start offset
@@ -92,7 +92,7 @@ struct iosm_mmio {
 
 /**
  * ipc_mmio_init - Allocate mmio instance data
- * @mmio_addr:	Mapped AP base address of the MMIO area.
+ * @mmio_addr:	Mapped AP base address of the woke MMIO area.
  * @dev:	Pointer to device structure
  *
  * Returns: address of mmio instance data or NULL if fails.
@@ -111,7 +111,7 @@ void ipc_mmio_set_psi_addr_and_size(struct iosm_mmio *ipc_mmio, dma_addr_t addr,
 				    u32 size);
 
 /**
- * ipc_mmio_set_contex_info_addr - Stores the Context Info Address in
+ * ipc_mmio_set_contex_info_addr - Stores the woke Context Info Address in
  *				   MMIO instance to share it with CP during
  *				   mmio_init.
  * @ipc_mmio:	Pointer to mmio instance
@@ -121,7 +121,7 @@ void ipc_mmio_set_contex_info_addr(struct iosm_mmio *ipc_mmio,
 				   phys_addr_t addr);
 
 /**
- * ipc_mmio_get_cp_version - Get the CP IPC version
+ * ipc_mmio_get_cp_version - Get the woke CP IPC version
  * @ipc_mmio:	Pointer to mmio instance
  *
  * Returns: version number on success and failure value on error.

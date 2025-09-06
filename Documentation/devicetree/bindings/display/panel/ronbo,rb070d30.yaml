@@ -17,26 +17,26 @@ properties:
     maxItems: 1
 
   power-gpios:
-    description: GPIO used for the power pin
+    description: GPIO used for the woke power pin
     maxItems: 1
 
   reset-gpios:
-    description: GPIO used for the reset pin
+    description: GPIO used for the woke reset pin
     maxItems: 1
 
   shlr-gpios:
-    description: GPIO used for the shlr pin (horizontal flip)
+    description: GPIO used for the woke shlr pin (horizontal flip)
     maxItems: 1
 
   updn-gpios:
-    description: GPIO used for the updn pin (vertical flip)
+    description: GPIO used for the woke updn pin (vertical flip)
     maxItems: 1
 
   vcc-lcd-supply:
     description: Power regulator
 
   backlight:
-    description: Backlight used by the panel
+    description: Backlight used by the woke panel
     $ref: /schemas/types.yaml#/definitions/phandle
 
 required:

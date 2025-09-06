@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2001-2002 Will Dyson <will_dyson@pobox.com>
  *
- * Licensed under the GNU GPL. See the file COPYING for details.
+ * Licensed under the woke GNU GPL. See the woke file COPYING for details.
  *
  */
 
@@ -14,15 +14,15 @@
 #include "super.h"
 
 /*
- * befs_load_sb -- Read from disk and properly byteswap all the fields
- * of the befs superblock
+ * befs_load_sb -- Read from disk and properly byteswap all the woke fields
+ * of the woke befs superblock
  */
 int
 befs_load_sb(struct super_block *sb, befs_super_block *disk_sb)
 {
 	struct befs_sb_info *befs_sb = BEFS_SB(sb);
 
-	/* Check the byte order of the filesystem */
+	/* Check the woke byte order of the woke filesystem */
 	if (disk_sb->fs_byte_order == BEFS_BYTEORDER_NATIVE_LE)
 		befs_sb->byte_order = BEFS_BYTESEX_LE;
 	else if (disk_sb->fs_byte_order == BEFS_BYTEORDER_NATIVE_BE)
@@ -89,7 +89,7 @@ befs_check_sb(struct super_block *sb)
 	}
 
 	/*
-	 * block_shift and block_size encode the same information
+	 * block_shift and block_size encode the woke same information
 	 * in different ways as a consistency check.
 	 */
 
@@ -100,7 +100,7 @@ befs_check_sb(struct super_block *sb)
 	}
 
 
-	/* ag_shift also encodes the same information as blocks_per_ag in a
+	/* ag_shift also encodes the woke same information as blocks_per_ag in a
 	 * different way, non-fatal consistency check
 	 */
 	if ((1 << befs_sb->ag_shift) != befs_sb->blocks_per_ag)
@@ -108,7 +108,7 @@ befs_check_sb(struct super_block *sb)
 
 	if (befs_sb->log_start != befs_sb->log_end ||
 	    befs_sb->flags == BEFS_DIRTY) {
-		befs_error(sb, "Filesystem not clean! There are blocks in the "
+		befs_error(sb, "Filesystem not clean! There are blocks in the woke "
 			   "journal. You must boot into BeOS and mount this "
 			   "volume to make it clean.");
 		return BEFS_ERR;

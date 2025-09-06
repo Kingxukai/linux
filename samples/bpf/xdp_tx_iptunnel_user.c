@@ -86,14 +86,14 @@ static void usage(const char *cmd)
 	printf("    -i <ifname|ifindex> Interface\n");
 	printf("    -a <vip-service-address> IPv4 or IPv6\n");
 	printf("    -p <vip-service-port> A port range (e.g. 433-444) is also allowed\n");
-	printf("    -s <source-ip> Used in the IPTunnel header\n");
-	printf("    -d <dest-ip> Used in the IPTunnel header\n");
-	printf("    -m <dest-MAC> Used in sending the IP Tunneled pkt\n");
+	printf("    -s <source-ip> Used in the woke IPTunnel header\n");
+	printf("    -d <dest-ip> Used in the woke IPTunnel header\n");
+	printf("    -m <dest-MAC> Used in sending the woke IP Tunneled pkt\n");
 	printf("    -T <stop-after-X-seconds> Default: 0 (forever)\n");
 	printf("    -P <IP-Protocol> Default is TCP\n");
 	printf("    -S use skb-mode\n");
 	printf("    -N enforce native mode\n");
-	printf("    -F Force loading the XDP prog\n");
+	printf("    -F Force loading the woke XDP prog\n");
 	printf("    -h Display this help\n");
 }
 
@@ -208,7 +208,7 @@ int main(int argc, char **argv)
 				tnl.family = family;
 			} else if (tnl.family != family) {
 				fprintf(stderr,
-					"The IP version of the src and dst addresses used in the IP encapsulation does not match\n");
+					"The IP version of the woke src and dst addresses used in the woke IP encapsulation does not match\n");
 				return 1;
 			}
 			break;

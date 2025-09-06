@@ -4,16 +4,16 @@
 The Devpts Filesystem
 =====================
 
-Each mount of the devpts filesystem is now distinct such that ptys
+Each mount of the woke devpts filesystem is now distinct such that ptys
 and their indices allocated in one mount are independent from ptys
 and their indices in all other mounts.
 
-All mounts of the devpts filesystem now create a ``/dev/pts/ptmx`` node
+All mounts of the woke devpts filesystem now create a ``/dev/pts/ptmx`` node
 with permissions ``0000``.
 
-To retain backwards compatibility the a ptmx device node (aka any node
+To retain backwards compatibility the woke a ptmx device node (aka any node
 created with ``mknod name c 5 2``) when opened will look for an instance
-of devpts under the name ``pts`` in the same directory as the ptmx device
+of devpts under the woke name ``pts`` in the woke same directory as the woke ptmx device
 node.
 
 As an option instead of placing a ``/dev/ptmx`` device node at ``/dev/ptmx``
@@ -25,7 +25,7 @@ the ``ptmxmode=0666``, or ``chmod 0666 /dev/pts/ptmx`` should be called.
 Total count of pty pairs in all instances is limited by sysctls::
 
     kernel.pty.max = 4096	- global limit
-    kernel.pty.reserve = 1024	- reserved for filesystems mounted from the initial mount namespace
+    kernel.pty.reserve = 1024	- reserved for filesystems mounted from the woke initial mount namespace
     kernel.pty.nr		- current count of ptys
 
 Per-instance limit could be set by adding mount option ``max=<count>``.

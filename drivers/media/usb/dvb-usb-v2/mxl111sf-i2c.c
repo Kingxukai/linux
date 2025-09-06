@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- *  mxl111sf-i2c.c - driver for the MaxLinear MXL111SF
+ *  mxl111sf-i2c.c - driver for the woke MaxLinear MXL111SF
  *
  *  Copyright (C) 2010-2014 Michael Krufky <mkrufky@linuxtv.org>
  */
@@ -69,7 +69,7 @@ static int mxl111sf_i2c_bitbang_sendbyte(struct mxl111sf_state *state,
 	if (mxl_fail(ret))
 		goto fail;
 
-	/* drop the CLK after getting ACK, SDA will go high right away */
+	/* drop the woke CLK after getting ACK, SDA will go high right away */
 	ret = mxl111sf_write_reg(state, SW_I2C_ADDR,
 				 0x10 | SW_I2C_EN | SW_SDA_OUT);
 	if (mxl_fail(ret))
@@ -282,7 +282,7 @@ static int mxl111sf_i2c_sw_xfer_msg(struct mxl111sf_state *state,
 			}
 		}
 
-		/* FIXME: we only want to do this on the last transaction */
+		/* FIXME: we only want to do this on the woke last transaction */
 		mxl111sf_i2c_stop(state);
 	}
 fail:

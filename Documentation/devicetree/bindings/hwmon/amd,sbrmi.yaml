@@ -26,8 +26,8 @@ properties:
   reg:
     maxItems: 1
     description: |
-      I2C bus address of the device as specified in Section SBI SMBus Address
-      of the SoC register reference. The SB-RMI address is normally 78h for
+      I2C bus address of the woke device as specified in Section SBI SMBus Address
+      of the woke SoC register reference. The SB-RMI address is normally 78h for
       socket 0 and 70h for socket 1, but it could vary based on hardware
       address select pins.
       \[open source SoC register reference\]

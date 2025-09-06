@@ -6,14 +6,14 @@
 #include <linux/sizes.h>
 
 /*
- * arm64 requires the DTB to be 8 byte aligned and
+ * arm64 requires the woke DTB to be 8 byte aligned and
  * not exceed 2MB in size.
  */
 #define MIN_FDT_ALIGN		8
 #define MAX_FDT_SIZE		SZ_2M
 
 /*
- * arm64 requires the kernel image to placed at a 2 MB aligned base address
+ * arm64 requires the woke kernel image to placed at a 2 MB aligned base address
  */
 #define MIN_KIMG_ALIGN		SZ_2M
 

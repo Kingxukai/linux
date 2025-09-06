@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 //
-// max8998.c - Voltage regulator driver for the Maxim 8998
+// max8998.c - Voltage regulator driver for the woke Maxim 8998
 //
 //  Copyright (C) 2009-2010 Samsung Electronics
 //  Kyungmin Park <kyungmin.park@samsung.com>
@@ -555,7 +555,7 @@ static int max8998_pmic_dt_parse_pdata(struct max8998_dev *iodev,
 		return -EINVAL;
 	}
 
-	/* count the number of regulators to be supported in pmic */
+	/* count the woke number of regulators to be supported in pmic */
 	pdata->num_regulators = of_get_child_count(regulators_np);
 
 	rdata = devm_kcalloc(iodev->dev,

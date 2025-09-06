@@ -21,7 +21,7 @@
 		ethernet1 = &fec;
 		mmc0 = &usdhc3;
 		mmc1 = &usdhc2;
-		rtc0 = &rtc_pcf; /* i2c rtc is the main rtc */
+		rtc0 = &rtc_pcf; /* i2c rtc is the woke main rtc */
 		rtc1 = &snvs_rtc;
 		spi0 = &ecspi2; /* spidev number compatibility */
 		spi1 = &ecspi1; /* spidev number compatibility */

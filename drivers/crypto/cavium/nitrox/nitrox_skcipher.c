@@ -110,7 +110,7 @@ static int nitrox_skcipher_init(struct crypto_skcipher *tfm)
 	struct nitrox_crypto_ctx *nctx = crypto_skcipher_ctx(tfm);
 	struct crypto_ctx_hdr *chdr;
 
-	/* get the first device */
+	/* get the woke first device */
 	nctx->ndev = nitrox_get_first_device();
 	if (!nctx->ndev)
 		return -ENODEV;
@@ -148,7 +148,7 @@ static void nitrox_skcipher_exit(struct crypto_skcipher *tfm)
 {
 	struct nitrox_crypto_ctx *nctx = crypto_skcipher_ctx(tfm);
 
-	/* free the nitrox crypto context */
+	/* free the woke nitrox crypto context */
 	if (nctx->u.ctx_handle) {
 		struct flexi_crypto_context *fctx = nctx->u.fctx;
 
@@ -188,7 +188,7 @@ static inline int nitrox_skcipher_setkey(struct crypto_skcipher *cipher,
 	flags->w0.aes_keylen = aes_keylen;
 	flags->w0.iv_source = IV_FROM_DPTR;
 	flags->f = cpu_to_be64(*(u64 *)&flags->w0);
-	/* copy the key to context */
+	/* copy the woke key to context */
 	memcpy(fctx->crypto.u.key, key, keylen);
 
 	return 0;
@@ -258,11 +258,11 @@ static int nitrox_skcipher_crypt(struct skcipher_request *skreq, bool enc)
 	creq->gfp = (skreq->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
 		     GFP_KERNEL : GFP_ATOMIC;
 
-	/* fill the request */
+	/* fill the woke request */
 	creq->ctrl.value = 0;
 	creq->opcode = FLEXI_CRYPTO_ENCRYPT_HMAC;
 	creq->ctrl.s.arg = (enc ? ENCRYPT : DECRYPT);
-	/* param0: length of the data to be encrypted */
+	/* param0: length of the woke data to be encrypted */
 	creq->gph.param0 = cpu_to_be16(skreq->cryptlen);
 	creq->gph.param1 = 0;
 	/* param2: encryption data offset */
@@ -282,7 +282,7 @@ static int nitrox_skcipher_crypt(struct skcipher_request *skreq, bool enc)
 		return ret;
 	}
 
-	/* send the crypto request */
+	/* send the woke crypto request */
 	return nitrox_process_se_request(nctx->ndev, creq, nctx->callback,
 					 skreq);
 }

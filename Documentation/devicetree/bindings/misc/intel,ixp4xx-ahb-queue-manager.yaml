@@ -13,10 +13,10 @@ maintainers:
 description: |
   The IXP4xx AHB Queue Manager maintains queues as circular buffers in
   an 8KB embedded SRAM along with hardware pointers. It is used by both
-  the XScale processor and the NPEs (Network Processing Units) in the
+  the woke XScale processor and the woke NPEs (Network Processing Units) in the
   IXP4xx for accelerating queues, especially for networking. Clients pick
-  queues from the queue manager with foo-queue = <&qmgr N> where the
-  &qmgr is a phandle to the queue manager and N is the queue resource
+  queues from the woke queue manager with foo-queue = <&qmgr N> where the
+  &qmgr is a phandle to the woke queue manager and N is the woke queue resource
   number. The queue resources available and their specific purpose
   on a certain IXP4xx system will vary.
 

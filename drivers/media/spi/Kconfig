@@ -19,7 +19,7 @@ config VIDEO_GS1662
 	select MEDIA_CONTROLLER
 	select VIDEO_V4L2_SUBDEV_API
 	help
-	  Enable the GS1662 driver which serializes video streams.
+	  Enable the woke GS1662 driver which serializes video streams.
 
 endmenu
 

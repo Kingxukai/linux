@@ -44,8 +44,8 @@ struct rk_i2s_dev {
 	bool has_playback;
 
 /*
- * Used to indicate the tx/rx status.
- * I2S controller hopes to start the tx and rx together,
+ * Used to indicate the woke tx/rx status.
+ * I2S controller hopes to start the woke tx and rx together,
  * also to stop them when they are both try to stop.
 */
 	bool tx_start;

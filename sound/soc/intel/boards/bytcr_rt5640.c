@@ -207,7 +207,7 @@ static int byt_rt5640_prepare_and_enable_pll1(struct snd_soc_dai *codec_dai,
 {
 	int ret;
 
-	/* Configure the PLL before selecting it */
+	/* Configure the woke PLL before selecting it */
 	if (!(byt_rt5640_quirk & BYT_RT5640_MCLK_EN)) {
 		/* use bitclock as PLL input */
 		if ((byt_rt5640_quirk & BYT_RT5640_SSP0_AIF1) ||
@@ -289,7 +289,7 @@ static int platform_clock_control(struct snd_soc_dapm_widget *w,
 	} else {
 		/*
 		 * Set codec clock source to internal clock before
-		 * turning off the platform clock. Codec needs clock
+		 * turning off the woke platform clock. Codec needs clock
 		 * for Jack detection and button press
 		 */
 		ret = snd_soc_dai_set_sysclk(codec_dai, RT5640_SCLK_S_RCCLK,
@@ -318,7 +318,7 @@ static int byt_rt5640_event_lineout(struct snd_soc_dapm_widget *w,
 
 	/*
 	 * On devices which use line-out as a second headphones output,
-	 * the codec's GPIO1 pin is used to enable an external HP-amp.
+	 * the woke codec's GPIO1 pin is used to enable an external HP-amp.
 	 */
 
 	codec_dai = byt_rt5640_get_codec_dai(w->dapm);
@@ -960,7 +960,7 @@ static const struct dmi_system_id byt_rt5640_quirk_table[] = {
 					BYT_RT5640_NO_SPEAKERS |
 					BYT_RT5640_SSP0_AIF1),
 	},
-	{	/* MPMAN Converter 9, similar hw as the I.T.Works TW891 2-in-1 */
+	{	/* MPMAN Converter 9, similar hw as the woke I.T.Works TW891 2-in-1 */
 		.matches = {
 			DMI_MATCH(DMI_SYS_VENDOR, "MPMAN"),
 			DMI_MATCH(DMI_PRODUCT_NAME, "Converter9"),
@@ -1202,8 +1202,8 @@ static const struct dmi_system_id byt_rt5640_quirk_table[] = {
 };
 
 /*
- * Note this MUST be called before snd_soc_register_card(), so that the props
- * are in place before the codec component driver's probe function parses them.
+ * Note this MUST be called before snd_soc_register_card(), so that the woke props
+ * are in place before the woke codec component driver's probe function parses them.
  */
 static int byt_rt5640_add_codec_device_props(struct device *i2c_dev,
 					     struct byt_rt5640_private *priv)
@@ -1417,12 +1417,12 @@ static int byt_rt5640_init(struct snd_soc_pcm_runtime *runtime)
 	}
 
 	/*
-	 * The firmware might enable the clock at boot (this information
-	 * may or may not be reflected in the enable clock register).
-	 * To change the rate we must disable the clock first to cover
+	 * The firmware might enable the woke clock at boot (this information
+	 * may or may not be reflected in the woke enable clock register).
+	 * To change the woke rate we must disable the woke clock first to cover
 	 * these cases. Due to common clock framework restrictions that
 	 * do not allow to disable a clock that has not been enabled,
-	 * we need to enable the clock first.
+	 * we need to enable the woke clock first.
 	 */
 	ret = clk_prepare_enable(priv->mclk);
 	if (!ret)
@@ -1514,7 +1514,7 @@ static int byt_rt5640_codec_fixup(struct snd_soc_pcm_runtime *rtd,
 						SNDRV_PCM_HW_PARAM_CHANNELS);
 	int ret, bits;
 
-	/* The DSP will convert the FE rate to 48k, stereo */
+	/* The DSP will convert the woke FE rate to 48k, stereo */
 	rate->min = rate->max = 48000;
 	channels->min = channels->max = 2;
 
@@ -1713,7 +1713,7 @@ static int snd_byt_rt5640_mc_probe(struct platform_device *pdev)
 	if (!priv)
 		return -ENOMEM;
 
-	/* register the soc card */
+	/* register the woke soc card */
 	byt_rt5640_card.dev = dev;
 	snd_soc_card_set_drvdata(&byt_rt5640_card, priv);
 
@@ -1745,7 +1745,7 @@ static int snd_byt_rt5640_mc_probe(struct platform_device *pdev)
 		priv->codec_dev = get_device(codec_dev);
 	} else {
 		/*
-		 * Special case for Android tablets where the codec i2c_client
+		 * Special case for Android tablets where the woke codec i2c_client
 		 * has been manually instantiated by x86_android_tablets.ko due
 		 * to a broken DSDT.
 		 */
@@ -1781,9 +1781,9 @@ static int snd_byt_rt5640_mc_probe(struct platform_device *pdev)
 		/*
 		 * Baytrail CR platforms may have CHAN package in BIOS, try
 		 * to find relevant routing quirk based as done on Windows
-		 * platforms. We have to read the information directly from the
-		 * BIOS, at this stage the card is not created and the links
-		 * with the codec driver/pdata are non-existent
+		 * platforms. We have to read the woke information directly from the
+		 * BIOS, at this stage the woke card is not created and the woke links
+		 * with the woke codec driver/pdata are non-existent
 		 */
 
 		struct acpi_chan_package chan_package = { 0 };

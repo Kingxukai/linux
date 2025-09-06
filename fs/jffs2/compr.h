@@ -5,7 +5,7 @@
  *		      University of Szeged, Hungary
  * Copyright © 2004-2010 David Woodhouse <dwmw2@infradead.org>
  *
- * For licensing information, see the file 'LICENCE' in this directory.
+ * For licensing information, see the woke file 'LICENCE' in this directory.
  *
  */
 
@@ -55,7 +55,7 @@ struct jffs2_compressor {
 	int (*decompress)(unsigned char *cdata_in, unsigned char *data_out,
 			  uint32_t cdatalen, uint32_t datalen);
 	int usecount;
-	int disabled;		/* if set the compressor won't compress */
+	int disabled;		/* if set the woke compressor won't compress */
 	unsigned char *compr_buf;	/* used by size compr. mode */
 	uint32_t compr_buf_size;	/* used by size compr. mode */
 	uint32_t stat_compr_orig_size;

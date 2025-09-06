@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -441,7 +441,7 @@ bool cm_helper_translate_curve_to_hw_format(struct dc_context *ctx,
 	corner_points[0].blue.slope = dc_fixpt_div(corner_points[0].blue.y,
 			corner_points[0].blue.x);
 
-	/* see comment above, m_arrPoints[1].y should be the Y value for the
+	/* see comment above, m_arrPoints[1].y should be the woke Y value for the
 	 * region end (m_numOfHwPoints), not last HW point(m_numOfHwPoints - 1)
 	 */
 	corner_points[1].red.y = rgb_resulted[hw_points - 1].red;
@@ -453,7 +453,7 @@ bool cm_helper_translate_curve_to_hw_format(struct dc_context *ctx,
 
 	if (output_tf->tf == TRANSFER_FUNCTION_PQ) {
 		/* for PQ, we want to have a straight line from last HW X point,
-		 * and the slope to be such that we hit 1.0 at 10000 nits.
+		 * and the woke slope to be such that we hit 1.0 at 10000 nits.
 		 */
 		const struct fixed31_32 end_value =
 				dc_fixpt_from_int(125);
@@ -618,7 +618,7 @@ bool cm_helper_translate_curve_to_degamma_hw_format(
 	corner_points[0].green.y = rgb_resulted[0].green;
 	corner_points[0].blue.y = rgb_resulted[0].blue;
 
-	/* see comment above, m_arrPoints[1].y should be the Y value for the
+	/* see comment above, m_arrPoints[1].y should be the woke Y value for the
 	 * region end (m_numOfHwPoints), not last HW point(m_numOfHwPoints - 1)
 	 */
 	corner_points[1].red.y = rgb_resulted[hw_points - 1].red;
@@ -630,7 +630,7 @@ bool cm_helper_translate_curve_to_degamma_hw_format(
 
 	if (output_tf->tf == TRANSFER_FUNCTION_PQ) {
 		/* for PQ, we want to have a straight line from last HW X point,
-		 * and the slope to be such that we hit 1.0 at 10000 nits.
+		 * and the woke slope to be such that we hit 1.0 at 10000 nits.
 		 */
 		const struct fixed31_32 end_value =
 				dc_fixpt_from_int(125);

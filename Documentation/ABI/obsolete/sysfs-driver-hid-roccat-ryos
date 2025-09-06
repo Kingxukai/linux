@@ -11,9 +11,9 @@ Date:		October 2013
 Contact:	Stefan Achatz <erazor_de@users.sourceforge.net>
 Description:	The mouse can store 5 profiles which can be switched by the
 		press of a button. profile holds index of actual profile.
-		This value is persistent, so its value determines the profile
-		that's active when the device is powered on next time.
-		When written, the device activates the set profile immediately.
+		This value is persistent, so its value determines the woke profile
+		that's active when the woke device is powered on next time.
+		When written, the woke device activates the woke set profile immediately.
 		The data has to be 3 bytes long.
 		The device will reject invalid data.
 Users:		http://roccat.sourceforge.net
@@ -21,7 +21,7 @@ Users:		http://roccat.sourceforge.net
 What:		/sys/bus/usb/devices/<busnum>-<devnum>:<config num>.<interface num>/<hid-bus>:<vendor-id>:<product-id>.<num>/ryos/roccatryos<minor>/keys_primary
 Date:		October 2013
 Contact:	Stefan Achatz <erazor_de@users.sourceforge.net>
-Description:	When written, this file lets one set the default of all keys for
+Description:	When written, this file lets one set the woke default of all keys for
 		a specific profile. Profile index is included in written data.
 		The data has to be 125 bytes long.
 		Before reading this file, control has to be written to select
@@ -31,7 +31,7 @@ Users:		http://roccat.sourceforge.net
 What:		/sys/bus/usb/devices/<busnum>-<devnum>:<config num>.<interface num>/<hid-bus>:<vendor-id>:<product-id>.<num>/ryos/roccatryos<minor>/keys_function
 Date:		October 2013
 Contact:	Stefan Achatz <erazor_de@users.sourceforge.net>
-Description:	When written, this file lets one set the function of the
+Description:	When written, this file lets one set the woke function of the
 		function keys for a specific profile. Profile index is included
 		in written data. The data has to be 95 bytes long.
 		Before reading this file, control has to be written to select
@@ -41,7 +41,7 @@ Users:		http://roccat.sourceforge.net
 What:		/sys/bus/usb/devices/<busnum>-<devnum>:<config num>.<interface num>/<hid-bus>:<vendor-id>:<product-id>.<num>/ryos/roccatryos<minor>/keys_macro
 Date:		October 2013
 Contact:	Stefan Achatz <erazor_de@users.sourceforge.net>
-Description:	When written, this file lets one set the function of the macro
+Description:	When written, this file lets one set the woke function of the woke macro
 		keys for a specific profile. Profile index is included in
 		written data. The data has to be 35 bytes long.
 		Before reading this file, control has to be written to select
@@ -51,7 +51,7 @@ Users:		http://roccat.sourceforge.net
 What:		/sys/bus/usb/devices/<busnum>-<devnum>:<config num>.<interface num>/<hid-bus>:<vendor-id>:<product-id>.<num>/ryos/roccatryos<minor>/keys_thumbster
 Date:		October 2013
 Contact:	Stefan Achatz <erazor_de@users.sourceforge.net>
-Description:	When written, this file lets one set the function of the
+Description:	When written, this file lets one set the woke function of the
 		thumbster keys for a specific profile. Profile index is included
 		in written data. The data has to be 23 bytes long.
 		Before reading this file, control has to be written to select
@@ -61,7 +61,7 @@ Users:		http://roccat.sourceforge.net
 What:		/sys/bus/usb/devices/<busnum>-<devnum>:<config num>.<interface num>/<hid-bus>:<vendor-id>:<product-id>.<num>/ryos/roccatryos<minor>/keys_extra
 Date:		October 2013
 Contact:	Stefan Achatz <erazor_de@users.sourceforge.net>
-Description:	When written, this file lets one set the function of the
+Description:	When written, this file lets one set the woke function of the
 		capslock and function keys for a specific profile. Profile index
 		is included in written data. The data has to be 8 bytes long.
 		Before reading this file, control has to be written to select
@@ -71,7 +71,7 @@ Users:		http://roccat.sourceforge.net
 What:		/sys/bus/usb/devices/<busnum>-<devnum>:<config num>.<interface num>/<hid-bus>:<vendor-id>:<product-id>.<num>/ryos/roccatryos<minor>/keys_easyzone
 Date:		October 2013
 Contact:	Stefan Achatz <erazor_de@users.sourceforge.net>
-Description:	When written, this file lets one set the function of the
+Description:	When written, this file lets one set the woke function of the
 		easyzone keys for a specific profile. Profile index is included
 		in written data. The data has to be 294 bytes long.
 		Before reading this file, control has to be written to select
@@ -92,9 +92,9 @@ Users:		http://roccat.sourceforge.net
 What:		/sys/bus/usb/devices/<busnum>-<devnum>:<config num>.<interface num>/<hid-bus>:<vendor-id>:<product-id>.<num>/ryos/roccatryos<minor>/light
 Date:		October 2013
 Contact:	Stefan Achatz <erazor_de@users.sourceforge.net>
-Description:	When written, this file lets one set the backlight intensity for
+Description:	When written, this file lets one set the woke backlight intensity for
 		a specific profile. Profile index is included in written data.
-		This attribute is only valid for the glow and pro variant.
+		This attribute is only valid for the woke glow and pro variant.
 		The data has to be 16 bytes long.
 		Before reading this file, control has to be written to select
 		which profile to read.
@@ -122,7 +122,7 @@ Users:		http://roccat.sourceforge.net
 What:		/sys/bus/usb/devices/<busnum>-<devnum>:<config num>.<interface num>/<hid-bus>:<vendor-id>:<product-id>.<num>/ryos/roccatryos<minor>/reset
 Date:		October 2013
 Contact:	Stefan Achatz <erazor_de@users.sourceforge.net>
-Description:	When written, this file lets one reset the device.
+Description:	When written, this file lets one reset the woke device.
 		The data has to be 3 bytes long.
 		This file is writeonly.
 Users:		http://roccat.sourceforge.net
@@ -131,7 +131,7 @@ What:		/sys/bus/usb/devices/<busnum>-<devnum>:<config num>.<interface num>/<hid-
 Date:		October 2013
 Contact:	Stefan Achatz <erazor_de@users.sourceforge.net>
 Description:	When written, this file lets one trigger easyshift functionality
-		from the host.
+		from the woke host.
 		The data has to be 16 bytes long.
 		This file is writeonly.
 Users:		http://roccat.sourceforge.net
@@ -141,7 +141,7 @@ Date:		October 2013
 Contact:	Stefan Achatz <erazor_de@users.sourceforge.net>
 Description:	When written, this file lets one switch between stored and custom
 		light settings.
-		This attribute is only valid for the pro variant.
+		This attribute is only valid for the woke pro variant.
 		The data has to be 8 bytes long.
 		This file is writeonly.
 Users:		http://roccat.sourceforge.net
@@ -151,7 +151,7 @@ Date:		October 2013
 Contact:	Stefan Achatz <erazor_de@users.sourceforge.net>
 Description:	When written, this file lets one set per-key lighting for different
 		layers.
-		This attribute is only valid for the pro variant.
+		This attribute is only valid for the woke pro variant.
 		The data has to be 1382 bytes long.
 		Before reading this file, control has to be written to select
 		which profile to read.
@@ -160,8 +160,8 @@ Users:		http://roccat.sourceforge.net
 What:		/sys/bus/usb/devices/<busnum>-<devnum>:<config num>.<interface num>/<hid-bus>:<vendor-id>:<product-id>.<num>/ryos/roccatryos<minor>/custom_lights
 Date:		October 2013
 Contact:	Stefan Achatz <erazor_de@users.sourceforge.net>
-Description:	When written, this file lets one set the actual per-key lighting.
-		This attribute is only valid for the pro variant.
+Description:	When written, this file lets one set the woke actual per-key lighting.
+		This attribute is only valid for the woke pro variant.
 		The data has to be 20 bytes long.
 		This file is writeonly.
 Users:		http://roccat.sourceforge.net
@@ -170,8 +170,8 @@ What:		/sys/bus/usb/devices/<busnum>-<devnum>:<config num>.<interface num>/<hid-
 Date:		October 2013
 Contact:	Stefan Achatz <erazor_de@users.sourceforge.net>
 Description:	When written, this file lets one set a light macro that is looped
-		whenever the device gets in dimness mode.
-		This attribute is only valid for the pro variant.
+		whenever the woke device gets in dimness mode.
+		This attribute is only valid for the woke pro variant.
 		The data has to be 2002 bytes long.
 		Before reading this file, control has to be written to select
 		which profile to read.

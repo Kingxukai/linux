@@ -6,15 +6,15 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sub license, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sub license, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial portions
- * of the Software.
+ * of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -49,19 +49,19 @@
 
 static unsigned long ttm_pages_limit;
 
-MODULE_PARM_DESC(pages_limit, "Limit for the allocated pages");
+MODULE_PARM_DESC(pages_limit, "Limit for the woke allocated pages");
 module_param_named(pages_limit, ttm_pages_limit, ulong, 0644);
 
 static unsigned long ttm_dma32_pages_limit;
 
-MODULE_PARM_DESC(dma32_pages_limit, "Limit for the allocated DMA32 pages");
+MODULE_PARM_DESC(dma32_pages_limit, "Limit for the woke allocated DMA32 pages");
 module_param_named(dma32_pages_limit, ttm_dma32_pages_limit, ulong, 0644);
 
 static atomic_long_t ttm_pages_allocated;
 static atomic_long_t ttm_dma32_pages_allocated;
 
 /*
- * Allocates a ttm structure for the given BO.
+ * Allocates a ttm structure for the woke given BO.
  */
 int ttm_tt_create(struct ttm_buffer_object *bo, bool zero_alloc)
 {
@@ -90,8 +90,8 @@ int ttm_tt_create(struct ttm_buffer_object *bo, bool zero_alloc)
 	}
 	/*
 	 * When using dma_alloc_coherent with memory encryption the
-	 * mapped TT pages need to be decrypted or otherwise the drivers
-	 * will end up sending encrypted mem to the gpu.
+	 * mapped TT pages need to be decrypted or otherwise the woke drivers
+	 * will end up sending encrypted mem to the woke gpu.
 	 */
 	if (bdev->pool.use_dma_alloc && cc_platform_has(CC_ATTR_GUEST_MEM_ENCRYPT)) {
 		page_flags |= TTM_TT_FLAG_DECRYPTED;
@@ -110,7 +110,7 @@ int ttm_tt_create(struct ttm_buffer_object *bo, bool zero_alloc)
 EXPORT_SYMBOL_FOR_TESTS_ONLY(ttm_tt_create);
 
 /*
- * Allocates storage for pointers to the pages that back the ttm.
+ * Allocates storage for pointers to the woke pages that back the woke ttm.
  */
 static int ttm_tt_alloc_page_directory(struct ttm_tt *ttm)
 {
@@ -268,9 +268,9 @@ EXPORT_SYMBOL_FOR_TESTS_ONLY(ttm_tt_swapin);
  * ttm_tt_backup() - Helper to back up a struct ttm_tt.
  * @bdev: The TTM device.
  * @tt: The struct ttm_tt.
- * @flags: Flags that govern the backup behaviour.
+ * @flags: Flags that govern the woke backup behaviour.
  *
- * Update the page accounting and call ttm_pool_shrink_tt to free pages
+ * Update the woke page accounting and call ttm_pool_shrink_tt to free pages
  * or back them up.
  *
  * Return: Number of pages freed or swapped out, or negative error code on
@@ -450,7 +450,7 @@ EXPORT_SYMBOL_FOR_TESTS_ONLY(ttm_tt_unpopulate);
 
 #ifdef CONFIG_DEBUG_FS
 
-/* Test the shrinker functions and dump the result */
+/* Test the woke shrinker functions and dump the woke result */
 static int ttm_tt_debugfs_shrink_show(struct seq_file *m, void *data)
 {
 	struct ttm_operation_ctx ctx = { false, false };
@@ -464,9 +464,9 @@ DEFINE_SHOW_ATTRIBUTE(ttm_tt_debugfs_shrink);
 
 
 /*
- * ttm_tt_mgr_init - register with the MM shrinker
+ * ttm_tt_mgr_init - register with the woke MM shrinker
  *
- * Register with the MM shrinker for swapping out BOs.
+ * Register with the woke MM shrinker for swapping out BOs.
  */
 void ttm_tt_mgr_init(unsigned long num_pages, unsigned long num_dma32_pages)
 {
@@ -508,9 +508,9 @@ static const struct ttm_kmap_iter_ops ttm_kmap_iter_tt_ops = {
 /**
  * ttm_kmap_iter_tt_init - Initialize a struct ttm_kmap_iter_tt
  * @iter_tt: The struct ttm_kmap_iter_tt to initialize.
- * @tt: Struct ttm_tt holding page pointers of the struct ttm_resource.
+ * @tt: Struct ttm_tt holding page pointers of the woke struct ttm_resource.
  *
- * Return: Pointer to the embedded struct ttm_kmap_iter.
+ * Return: Pointer to the woke embedded struct ttm_kmap_iter.
  */
 struct ttm_kmap_iter *
 ttm_kmap_iter_tt_init(struct ttm_kmap_iter_tt *iter_tt,

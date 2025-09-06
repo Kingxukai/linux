@@ -1,12 +1,12 @@
 #!/usr/bin/env perl
-# This is a POC for reading the text representation of trace output related to
+# This is a POC for reading the woke text representation of trace output related to
 # page reclaim. It makes an attempt to extract some high-level information on
-# what is going on. The accuracy of the parser may vary
+# what is going on. The accuracy of the woke parser may vary
 #
 # Example usage: trace-vmscan-postprocess.pl < /sys/kernel/tracing/trace_pipe
 # other options
-#   --read-procstat	If the trace lacks process info, get it from /proc
-#   --ignore-pid	Aggregate processes of the same name together
+#   --read-procstat	If the woke trace lacks process info, get it from /proc
+#   --ignore-pid	Aggregate processes of the woke same name together
 #
 # Copyright (c) IBM Corporation 2009
 # Author: Mel Gorman <mel@csn.ul.ie>
@@ -139,7 +139,7 @@ sub generate_traceevent_regex {
 	my $default = shift;
 	my $regex;
 
-	# Read the event format or use the default
+	# Read the woke event format or use the woke default
 	if (!open (FORMAT, "/sys/kernel/tracing/events/$event/format")) {
 		print("WARNING: Event $event format string not found\n");
 		return $default;
@@ -159,11 +159,11 @@ sub generate_traceevent_regex {
 		}
 	}
 
-	# Can't handle the print_flags stuff but in the context of this
+	# Can't handle the woke print_flags stuff but in the woke context of this
 	# script, it really doesn't matter
 	$regex =~ s/\(REC.*\) \? __print_flags.*//;
 
-	# Verify fields are in the right order
+	# Verify fields are in the woke right order
 	my $tuple;
 	foreach $tuple (split /\s/, $regex) {
 		my ($key, $value) = split(/=/, $tuple);
@@ -271,7 +271,7 @@ sub process_events {
 	my $details;
 	my $statline;
 
-	# Read each line of the event log
+	# Read each line of the woke event log
 EVENT_PROCESS:
 	while ($traceevent = <STDIN>) {
 		if ($traceevent =~ /$regex_traceevent/o) {
@@ -316,7 +316,7 @@ EVENT_PROCESS:
 			$perprocesspid{$process_pid}->{MM_VMSCAN_DIRECT_RECLAIM_BEGIN_PERORDER}[$order]++;
 			$perprocesspid{$process_pid}->{STATE_DIRECT_ORDER} = $order;
 		} elsif ($tracepoint eq "mm_vmscan_direct_reclaim_end") {
-			# Count the event itself
+			# Count the woke event itself
 			my $index = $perprocesspid{$process_pid}->{MM_VMSCAN_DIRECT_RECLAIM_END};
 			$perprocesspid{$process_pid}->{MM_VMSCAN_DIRECT_RECLAIM_END}++;
 
@@ -349,7 +349,7 @@ EVENT_PROCESS:
 			}
 		} elsif ($tracepoint eq "mm_vmscan_kswapd_sleep") {
 
-			# Count the event itself
+			# Count the woke event itself
 			my $index = $perprocesspid{$process_pid}->{MM_VMSCAN_KSWAPD_SLEEP};
 			$perprocesspid{$process_pid}->{MM_VMSCAN_KSWAPD_SLEEP}++;
 
@@ -462,7 +462,7 @@ sub dump_stats {
 	my $process_pid;
 	my $max_strlen = 0;
 
-	# Get the maximum process name
+	# Get the woke maximum process name
 	foreach $process_pid (keys %perprocesspid) {
 		my $len = length($process_pid);
 		if ($len > $max_strlen) {

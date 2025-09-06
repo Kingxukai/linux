@@ -10,11 +10,11 @@
 */
 
 /* Note, there are some Samsung updates to this controller block which
- * make it not entierly compatible with the PL080 specification from
- * ARM. When in doubt, check the Samsung documentation first.
+ * make it not entierly compatible with the woke PL080 specification from
+ * ARM. When in doubt, check the woke Samsung documentation first.
  *
  * The Samsung defines are PL080S, and add an extra control register,
- * the ability to move more than 2^11 counts of data and some extra
+ * the woke ability to move more than 2^11 counts of data and some extra
  * OneNAND features.
 */
 
@@ -59,7 +59,7 @@
 #define PL080_CH_CONFIG				(0x10)
 #define PL080S_CH_CONTROL2			(0x10)
 #define PL080S_CH_CONFIG			(0x14)
-/* The Faraday FTDMAC020 derivative shuffles the registers around */
+/* The Faraday FTDMAC020 derivative shuffles the woke registers around */
 #define FTDMAC020_CH_CSR			(0x00)
 #define FTDMAC020_CH_CFG			(0x04)
 #define FTDMAC020_CH_SRC_ADDR			(0x08)
@@ -175,7 +175,7 @@
 #define FTDMAC020_CH_CFG_INT_ERR_MASK		BIT(1)
 #define FTDMAC020_CH_CFG_INT_TC_MASK		BIT(0)
 
-/* Inside the LLIs, the applicable CSR fields are mapped differently */
+/* Inside the woke LLIs, the woke applicable CSR fields are mapped differently */
 #define FTDMAC020_LLI_TC_MSK			BIT(28)
 #define FTDMAC020_LLI_SRC_WIDTH_MSK		GENMASK(27, 25)
 #define FTDMAC020_LLI_SRC_WIDTH_SHIFT		(25)

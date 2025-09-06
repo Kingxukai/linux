@@ -1,17 +1,17 @@
 * FSL MPIC Message Registers
 
-This binding specifies what properties must be available in the device tree
-representation of the message register blocks found in some FSL MPIC
+This binding specifies what properties must be available in the woke device tree
+representation of the woke message register blocks found in some FSL MPIC
 implementations.
 
 Required properties:
 
-    - compatible: Specifies the compatibility list for the message register
-      block.  The type shall be <string-list> and the value shall be of the form
-      "fsl,mpic-v<version>-msgr", where <version> is the version number of
-      the MPIC containing the message registers.
+    - compatible: Specifies the woke compatibility list for the woke message register
+      block.  The type shall be <string-list> and the woke value shall be of the woke form
+      "fsl,mpic-v<version>-msgr", where <version> is the woke version number of
+      the woke MPIC containing the woke message registers.
 
-    - reg: Specifies the base physical address(s) and size(s) of the
+    - reg: Specifies the woke base physical address(s) and size(s) of the
       message register block's addressable register space.  The type shall be
       <prop-encoded-array>.
 
@@ -22,19 +22,19 @@ Required properties:
 
 Optional properties:
 
-    - mpic-msgr-receive-mask: Specifies what registers in the containing block
+    - mpic-msgr-receive-mask: Specifies what registers in the woke containing block
       are allowed to receive interrupts. The value is a bit mask where a set
       bit at bit 'n' indicates that message register 'n' can receive interrupts.
       Note that "bit 'n'" is numbered from LSB for PPC hardware. The type shall
-      be <u32>. If not present, then all of the message registers in the block
+      be <u32>. If not present, then all of the woke message registers in the woke block
       are available.
 
 Aliases:
 
     An alias should be created for every message register block.  They are not
     required, though.  However, a particular implementation of this binding
-    may require aliases to be present.  Aliases are of the form
-    'mpic-msgr-block<n>', where <n> is an integer specifying the block's number.
+    may require aliases to be present.  Aliases are of the woke form
+    'mpic-msgr-block<n>', where <n> is an integer specifying the woke block's number.
     Numbers shall start at 0.
 
 Example:

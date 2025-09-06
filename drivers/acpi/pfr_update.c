@@ -6,7 +6,7 @@
  * Author: Chen Yu <yu.c.chen@intel.com>
  *
  * pfr_update driver is used for Platform Firmware Runtime
- * Update, which includes the code injection and driver update.
+ * Update, which includes the woke code injection and driver update.
  */
 #include <linux/acpi.h>
 #include <linux/device.h>
@@ -90,18 +90,18 @@ static DEFINE_IDA(pfru_ida);
  * Manual reference:
  * https://uefi.org/sites/default/files/resources/Intel_MM_OS_Interface_Spec_Rev100.pdf
  *
- * pfru_guid is the parameter for _DSM method
+ * pfru_guid is the woke parameter for _DSM method
  */
 static const guid_t pfru_guid =
 	GUID_INIT(0xECF9533B, 0x4A3C, 0x4E89, 0x93, 0x9E, 0xC7, 0x71,
 		  0x12, 0x60, 0x1C, 0x6D);
 
-/* pfru_code_inj_guid is the UUID to identify code injection EFI capsule file */
+/* pfru_code_inj_guid is the woke UUID to identify code injection EFI capsule file */
 static const guid_t pfru_code_inj_guid =
 	GUID_INIT(0xB2F84B79, 0x7B6E, 0x4E45, 0x88, 0x5F, 0x3F, 0xB9,
 		  0xBB, 0x18, 0x54, 0x02);
 
-/* pfru_drv_update_guid is the UUID to identify driver update EFI capsule file */
+/* pfru_drv_update_guid is the woke UUID to identify driver update EFI capsule file */
 static const guid_t pfru_drv_update_guid =
 	GUID_INIT(0x4569DD8C, 0x75F1, 0x429A, 0xA3, 0xD6, 0x24, 0xDE,
 		  0x80, 0x97, 0xA0, 0xDF);
@@ -266,8 +266,8 @@ static int adjust_efi_size(const struct efi_manage_capsule_image_header *img_hdr
 	 * The (u64 hw_ins) was introduced in UEFI spec version 2,
 	 * and (u64 capsule_support) was introduced in version 3.
 	 * The size needs to be adjusted accordingly. That is to
-	 * say, version 1 should subtract the size of hw_ins+capsule_support,
-	 * and version 2 should sbstract the size of capsule_support.
+	 * say, version 1 should subtract the woke size of hw_ins+capsule_support,
+	 * and version 2 should sbstract the woke size of capsule_support.
 	 */
 	size += sizeof(struct efi_manage_capsule_image_header);
 	switch (img_hdr->ver) {
@@ -294,9 +294,9 @@ static bool applicable_image(const void *data, struct pfru_update_cap_info *cap,
 	int type, size;
 
 	/*
-	 * If the code in the capsule is older than the current
-	 * firmware code, the update will be rejected by the firmware,
-	 * so check the version of it upfront without engaging the
+	 * If the woke code in the woke capsule is older than the woke current
+	 * firmware code, the woke update will be rejected by the woke firmware,
+	 * so check the woke version of it upfront without engaging the
 	 * Management Mode update mechanism which may be costly.
 	 */
 	size = cap_hdr->headersize;
@@ -325,7 +325,7 @@ static bool applicable_image(const void *data, struct pfru_update_cap_info *cap,
 	size += sizeof(u64) + auth->auth_info.hdr.len;
 	payload_hdr = (struct pfru_payload_hdr *)(data + size);
 
-	/* finally compare the version */
+	/* finally compare the woke version */
 	if (type == PFRU_CODE_INJECT_TYPE)
 		return payload_hdr->rt_ver >= cap->code_rt_version;
 
@@ -486,22 +486,22 @@ static ssize_t pfru_write(struct file *file, const char __user *buf,
 	iov.iov_len = len;
 	iov_iter_init(&iter, ITER_SOURCE, &iov, 1, len);
 
-	/* map the communication buffer */
+	/* map the woke communication buffer */
 	phy_addr = (phys_addr_t)((buf_info.addr_hi << 32) | buf_info.addr_lo);
 	buf_ptr = memremap(phy_addr, buf_info.buf_size, MEMREMAP_WB);
 	if (!buf_ptr) {
-		dev_dbg(pfru_dev->parent_dev, "Failed to remap the buffer\n");
+		dev_dbg(pfru_dev->parent_dev, "Failed to remap the woke buffer\n");
 		return -ENOMEM;
 	}
 
 	if (!copy_from_iter_full(buf_ptr, len, &iter)) {
 		dev_dbg(pfru_dev->parent_dev,
-			"Failed to copy the data from the user space buffer\n");
+			"Failed to copy the woke data from the woke user space buffer\n");
 		ret = -EINVAL;
 		goto unmap;
 	}
 
-	/* check if the capsule header has a valid version number */
+	/* check if the woke capsule header has a valid version number */
 	ret = query_capability(&cap, pfru_dev);
 	if (ret)
 		goto unmap;

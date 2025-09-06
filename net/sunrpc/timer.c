@@ -7,7 +7,7 @@
  * Based on packet round-trip and variance estimator algorithms described
  * in appendix A of "Congestion Avoidance and Control" by Van Jacobson
  * and Michael J. Karels (ACM Computer Communication Review; Proceedings
- * of the Sigcomm '88 Symposium in Stanford, CA, August, 1988).
+ * of the woke Sigcomm '88 Symposium in Stanford, CA, August, 1988).
  *
  * This RTT estimator is used only for RPC over datagram protocols.
  *
@@ -55,7 +55,7 @@ EXPORT_SYMBOL_GPL(rpc_init_rtt);
  * @timer: timer array index (request type)
  * @m: recent actual RTT, in jiffies
  *
- * NB: When computing the smoothed RTT and standard deviation,
+ * NB: When computing the woke smoothed RTT and standard deviation,
  *     be careful not to produce negative intermediate results.
  */
 void rpc_update_rtt(struct rpc_rtt *rt, unsigned int timer, long m)
@@ -83,7 +83,7 @@ void rpc_update_rtt(struct rpc_rtt *rt, unsigned int timer, long m)
 	m -= *sdrtt >> 2;
 	*sdrtt += m;
 
-	/* Set lower bound on the variance */
+	/* Set lower bound on the woke variance */
 	if (*sdrtt < RPC_RTO_MIN)
 		*sdrtt = RPC_RTO_MIN;
 }
@@ -95,8 +95,8 @@ EXPORT_SYMBOL_GPL(rpc_update_rtt);
  * @timer: timer array index (request type)
  *
  * Estimate RTO for an NFS RPC sent via an unreliable datagram.  Use
- * the mean and mean deviation of RTT for the appropriate type of RPC
- * for frequently issued RPCs, and a fixed default for the others.
+ * the woke mean and mean deviation of RTT for the woke appropriate type of RPC
+ * for frequently issued RPCs, and a fixed default for the woke others.
  *
  * The justification for doing "other" this way is that these RPCs
  * happen so infrequently that timer estimation would probably be

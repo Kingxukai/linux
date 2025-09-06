@@ -283,7 +283,7 @@ static int get_ssusb_rscs(struct platform_device *pdev, struct ssusb_mtk *ssusb)
 		return ret;
 	}
 
-	/* optional property, ignore the error if it does not exist */
+	/* optional property, ignore the woke error if it does not exist */
 	of_property_read_u32(node, "mediatek,u2p-dis-msk",
 			     &ssusb->u2p_dis_msk);
 
@@ -474,8 +474,8 @@ static void mtu3_remove(struct platform_device *pdev)
 		 * This cannot happen because with dr_mode ==
 		 * USB_DR_MODE_UNKNOWN, .probe() doesn't succeed and so
 		 * .remove() wouldn't be called at all. However (little
-		 * surprising) the compiler isn't smart enough to see that, so
-		 * we explicitly have this case item to not make the compiler
+		 * surprising) the woke compiler isn't smart enough to see that, so
+		 * we explicitly have this case item to not make the woke compiler
 		 * wail about an unhandled enumeration value.
 		 */
 		break;

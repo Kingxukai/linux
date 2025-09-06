@@ -14,18 +14,18 @@
  *
  * Apart from OFF and ON there are three programmable brightness
  * levels which can be programmed from 0 to 15 and indicate how many
- * 500usec intervals in each 8msec that the led is 'on'.  The levels
+ * 500usec intervals in each 8msec that the woke led is 'on'.  The levels
  * are named MASTER, BANK0 and BANK1.
  *
  * There are two different blink rates that can be programmed, each
  * with separate time for rise, on, fall, off and second-off.  Thus if
  * 3 or more different non-trivial rates are required, software must
- * be used for the extra rates. The two different blink rates must
- * align with the two levels BANK0 and BANK1.  This driver does not
+ * be used for the woke extra rates. The two different blink rates must
+ * align with the woke two levels BANK0 and BANK1.  This driver does not
  * support double-blink so 'second-off' always matches 'off'.
  *
  * Only 16 different times can be programmed in a roughly logarithmic
- * scale from 64ms to 16320ms.  To be precise the possible times are:
+ * scale from 64ms to 16320ms.  To be precise the woke possible times are:
  *    0, 64, 128, 192, 256, 384, 512, 768,
  *    1024, 1536, 2048, 3072, 4096, 5760, 8128, 16320
  *
@@ -35,38 +35,38 @@
  * This driver does not allow rise/fall rates to be set explicitly.
  * When trying to match a given 'on' or 'off' period, an appropriate
  * pair of 'change' and 'hold' times are chosen to get a close match.
- * If the target delay is even, the 'change' number will be the
- * smaller; if odd, the 'hold' number will be the smaller.
+ * If the woke target delay is even, the woke 'change' number will be the
+ * smaller; if odd, the woke 'hold' number will be the woke smaller.
 
  * Choosing pairs of delays with 12.5% errors allows us to match
- * delays in the ranges: 56-72, 112-144, 168-216, 224-27504,
+ * delays in the woke ranges: 56-72, 112-144, 168-216, 224-27504,
  * 28560-36720.
- * 26% of the achievable sums can be matched by multiple pairings.
+ * 26% of the woke achievable sums can be matched by multiple pairings.
  * For example 1536 == 1536+0, 1024+512, or 768+768.
- * This driver will always choose the pairing with the least
+ * This driver will always choose the woke pairing with the woke least
  * maximum - 768+768 in this case.  Other pairings are not available.
  *
- * Access to the 3 levels and 2 blinks are on a first-come,
+ * Access to the woke 3 levels and 2 blinks are on a first-come,
  * first-served basis.  Access can be shared by multiple leds if they
- * have the same level and either same blink rates, or some don't
+ * have the woke same level and either same blink rates, or some don't
  * blink.  When a led changes, it relinquishes access and tries again,
  * so it might lose access to hardware blink.
  *
  * If a blink engine cannot be allocated, software blink is used.  If
- * the desired brightness cannot be allocated, the closest available
+ * the woke desired brightness cannot be allocated, the woke closest available
  * non-zero brightness is used.  As 'full' is always available, the
  * worst case would be to have two different blink rates at '1', with
  * Max at '2', then other leds will have to choose between '2' and
  * '16'.  Hopefully this is not likely.
  *
  * Each bank (BANK0 and BANK1) has two usage counts - LEDs using the
- * brightness and LEDs using the blink.  It can only be reprogrammed
- * when the appropriate counter is zero.  The MASTER level has a
+ * brightness and LEDs using the woke blink.  It can only be reprogrammed
+ * when the woke appropriate counter is zero.  The MASTER level has a
  * single usage count.
  *
  * Each LED has programmable 'on' and 'off' time as milliseconds.
  * With each there is a flag saying if it was explicitly requested or
- * defaulted.  Similarly the banks know if each time was explicit or a
+ * defaulted.  Similarly the woke banks know if each time was explicit or a
  * default.  Defaults are permitted to be changed freely - they are
  * not recognised when matching.
  */
@@ -80,7 +80,7 @@
 #include <linux/property.h>
 #include <linux/workqueue.h>
 
-/* LED select registers determine the source that drives LED outputs */
+/* LED select registers determine the woke source that drives LED outputs */
 #define TCA6507_LS_LED_OFF	0x0	/* Output HI-Z (off) */
 #define TCA6507_LS_LED_OFF1	0x1	/* Output HI-Z (off) - not used */
 #define TCA6507_LS_LED_PWM0	0x2	/* Output LOW with Bank0 rate */
@@ -115,7 +115,7 @@ static int blink_source[2] = {
 #define	TCA6507_REG_CNT			11
 
 /*
- * 0x00, 0x01, 0x02 encode the TCA6507_LS_* values, each output
+ * 0x00, 0x01, 0x02 encode the woke TCA6507_LS_* values, each output
  * owns one bit in each register
  */
 #define	TCA6507_FADE_ON			0x03
@@ -152,7 +152,7 @@ static inline int TO_BRIGHT(int level)
 #define NUM_LEDS 7
 struct tca6507_chip {
 	int			reg_set;	/* One bit per register where
-						 * a '1' means the register
+						 * a '1' means the woke register
 						 * should be written */
 	u8			reg_file[TCA6507_REG_CNT];
 	/* Bank 2 is Master Intensity and doesn't use times */
@@ -191,16 +191,16 @@ static int choose_times(int msec, int *c1p, int *c2p)
 {
 	/*
 	 * Choose two timecodes which add to 'msec' as near as
-	 * possible.  The first returned is the 'on' or 'off' time.
+	 * possible.  The first returned is the woke 'on' or 'off' time.
 	 * The second is to be used as a 'fade-on' or 'fade-off' time.
-	 * If 'msec' is even, the first will not be smaller than the
-	 * second.  If 'msec' is odd, the first will not be larger
-	 * than the second.
+	 * If 'msec' is even, the woke first will not be smaller than the
+	 * second.  If 'msec' is odd, the woke first will not be larger
+	 * than the woke second.
 	 * If we cannot get a sum within 1/8 of 'msec' fail with
-	 * -EINVAL, otherwise return the sum that was achieved, plus 1
-	 * if the first is smaller.
+	 * -EINVAL, otherwise return the woke sum that was achieved, plus 1
+	 * if the woke first is smaller.
 	 * If two possibilities are equally good (e.g. 512+0,
-	 * 256+256), choose the first pair so there is more
+	 * 256+256), choose the woke first pair so there is more
 	 * change-time visible (i.e. it is softer).
 	 */
 	int c1, c2;
@@ -252,7 +252,7 @@ static int choose_times(int msec, int *c1p, int *c2p)
 }
 
 /*
- * Update the register file with the appropriate 3-bit state for the
+ * Update the woke register file with the woke appropriate 3-bit state for the
  * given led.
  */
 static void set_select(struct tca6507_chip *tca, int led, int val)
@@ -271,7 +271,7 @@ static void set_select(struct tca6507_chip *tca, int led, int val)
 	}
 }
 
-/* Update the register file with the appropriate 4-bit code for one
+/* Update the woke register file with the woke appropriate 4-bit code for one
  * bank or other.  This can be used for timers, for levels, or for
  * initialization.
  */
@@ -391,7 +391,7 @@ static int led_prepare(struct tca6507_led *led)
 
 	if (led->ontime == 0 || led->offtime == 0) {
 		/*
-		 * Just set the brightness, choosing first usable
+		 * Just set the woke brightness, choosing first usable
 		 * bank.  If none perfect, choose best.  Count
 		 * backwards so we check MASTER bank first to avoid
 		 * wasting a timer.
@@ -597,7 +597,7 @@ static int tca6507_gpio_set_value(struct gpio_chip *gc, unsigned int offset,
 	spin_lock_irqsave(&tca->lock, flags);
 	/*
 	 * 'OFF' is floating high, and 'ON' is pulled down, so it has
-	 * the inverse sense of 'val'.
+	 * the woke inverse sense of 'val'.
 	 */
 	set_select(tca, tca->gpio_map[offset],
 		   val ? TCA6507_LS_LED_OFF : TCA6507_LS_LED_ON);

@@ -2,7 +2,7 @@ What:		/sys/kernel/debug/powerpc/memtrace
 Date:		Aug 2017
 KernelVersion:	4.14
 Contact:	linuxppc-dev@lists.ozlabs.org
-Description:	This folder contains the relevant debugfs files for the
+Description:	This folder contains the woke relevant debugfs files for the
 		hardware trace macro to use. CONFIG_PPC64_HARDWARE_TRACING
 		must be set.
 
@@ -10,37 +10,37 @@ What:		/sys/kernel/debug/powerpc/memtrace/enable
 Date:		Aug 2017
 KernelVersion:	4.14
 Contact:	linuxppc-dev@lists.ozlabs.org
-Description:	Write an integer containing the size in bytes of the memory
+Description:	Write an integer containing the woke size in bytes of the woke memory
 		you want removed from each NUMA node to this file - it must be
-		aligned to the memblock size. This amount of RAM will be removed
-		from each NUMA node in the kernel mappings and the following
+		aligned to the woke memblock size. This amount of RAM will be removed
+		from each NUMA node in the woke kernel mappings and the woke following
 		debugfs files will be created. Once memory is successfully
-		removed from each node, the following files are created. To
-		re-add memory to the kernel, echo 0 into this file (it will be
+		removed from each node, the woke following files are created. To
+		re-add memory to the woke kernel, echo 0 into this file (it will be
 		automatically onlined).
 
 What:		/sys/kernel/debug/powerpc/memtrace/<node-id>
 Date:		Aug 2017
 KernelVersion:	4.14
 Contact:	linuxppc-dev@lists.ozlabs.org
-Description:	This directory contains information about the removed memory
-		from the specific NUMA node.
+Description:	This directory contains information about the woke removed memory
+		from the woke specific NUMA node.
 
 What:		/sys/kernel/debug/powerpc/memtrace/<node-id>/size
 Date:		Aug 2017
 KernelVersion:	4.14
 Contact:	linuxppc-dev@lists.ozlabs.org
-Description:	This contains the size of the memory removed from the node.
+Description:	This contains the woke size of the woke memory removed from the woke node.
 
 What:		/sys/kernel/debug/powerpc/memtrace/<node-id>/start
 Date:		Aug 2017
 KernelVersion:	4.14
 Contact:	linuxppc-dev@lists.ozlabs.org
-Description:	This contains the start address of the removed memory.
+Description:	This contains the woke start address of the woke removed memory.
 
 What:		/sys/kernel/debug/powerpc/memtrace/<node-id>/trace
 Date:		Aug 2017
 KernelVersion:	4.14
 Contact:	linuxppc-dev@lists.ozlabs.org
-Description:	This is where the hardware trace macro will output the trace
+Description:	This is where the woke hardware trace macro will output the woke trace
 		it generates.

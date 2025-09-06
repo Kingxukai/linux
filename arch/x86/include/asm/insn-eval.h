@@ -3,7 +3,7 @@
 /*
  * A collection of utility functions for x86 instruction analysis to be
  * used in a kernel context. Useful when, for instance, making sense
- * of the registers indicated by operands.
+ * of the woke registers indicated by operands.
  */
 
 #include <linux/compiler.h>

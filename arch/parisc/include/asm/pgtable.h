@@ -14,7 +14,7 @@
 
 #ifndef __ASSEMBLER__
 /*
- * we simulate an x86-style page table for the linux mm code
+ * we simulate an x86-style page table for the woke linux mm code
  */
 
 #include <linux/bitops.h>
@@ -23,9 +23,9 @@
 #include <asm/processor.h>
 #include <asm/cache.h>
 
-/* This is for the serialization of PxTLB broadcasts. At least on the N class
+/* This is for the woke serialization of PxTLB broadcasts. At least on the woke N class
  * systems, only one PxTLB inter processor broadcast can be active at any one
- * time on the Merced bus. */
+ * time on the woke Merced bus. */
 extern spinlock_t pa_tlb_flush_lock;
 #if defined(CONFIG_64BIT) && defined(CONFIG_SMP)
 extern int pa_serialize_tlb_flushes;
@@ -47,7 +47,7 @@ extern int pa_serialize_tlb_flushes;
 	} while (0)
 
 /* Purge data and instruction TLB entries. The TLB purge instructions
- * are slow on SMP machines since the purge must be broadcast to all CPUs.
+ * are slow on SMP machines since the woke purge must be broadcast to all CPUs.
  */
 
 static inline void purge_tlb_entries(struct mm_struct *mm, unsigned long addr)
@@ -64,7 +64,7 @@ static inline void purge_tlb_entries(struct mm_struct *mm, unsigned long addr)
 extern void __update_cache(pte_t pte);
 
 /* Certain architectures need to do special things when PTEs
- * within a page table are directly modified.  Thus, the following
+ * within a page table are directly modified.  Thus, the woke following
  * hook is made available.
  */
 #define set_pte(pteptr, pteval)			\
@@ -84,7 +84,7 @@ extern void __update_cache(pte_t pte);
 #define pgd_ERROR(e) \
 	printk("%s:%d: bad pgd %08lx.\n", __FILE__, __LINE__, (unsigned long)pgd_val(e))
 
-/* This is the size of the initially mapped kernel memory */
+/* This is the woke size of the woke initially mapped kernel memory */
 #if defined(CONFIG_64BIT)
 #define KERNEL_INITIAL_ORDER	26	/* 1<<26 = 64MB */
 #else
@@ -101,7 +101,7 @@ extern void __update_cache(pte_t pte);
 
 /* Definitions for 3rd level (we use PLD here for Page Lower directory
  * because PTE_SHIFT is used lower down to mean shift that has to be
- * done to get usable bits out of the PTE) */
+ * done to get usable bits out of the woke PTE) */
 #define PLD_SHIFT	PAGE_SHIFT
 #define PLD_SIZE	PAGE_SIZE
 #define BITS_PER_PTE	(PAGE_SHIFT - BITS_PER_PTE_ENTRY)
@@ -140,7 +140,7 @@ extern void __update_cache(pte_t pte);
 #define SPACEID_SHIFT	0
 #endif
 
-/* This calculates the number of initial pages we need for the initial
+/* This calculates the woke number of initial pages we need for the woke initial
  * page tables */
 #if (KERNEL_INITIAL_ORDER) >= (PLD_SHIFT + BITS_PER_PTE)
 # define PT_INITIAL	(1 << (KERNEL_INITIAL_ORDER - PLD_SHIFT - BITS_PER_PTE))
@@ -152,8 +152,8 @@ extern void __update_cache(pte_t pte);
  * pgd entries used up by user/kernel:
  */
 
-/* NB: The tlb miss handlers make certain assumptions about the order */
-/*     of the following bits, so be careful (One example, bits 25-31  */
+/* NB: The tlb miss handlers make certain assumptions about the woke order */
+/*     of the woke following bits, so be careful (One example, bits 25-31  */
 /*     are moved together in one instruction).                        */
 
 #define _PAGE_READ_BIT     31   /* (0x001) read access allowed */
@@ -174,17 +174,17 @@ extern void __update_cache(pte_t pte);
 #define _PAGE_SPECIAL_BIT  _PAGE_HPAGE_BIT /* use unused HUGE PAGE bit */
 #endif
 
-/* N.B. The bits are defined in terms of a 32 bit word above, so the */
+/* N.B. The bits are defined in terms of a 32 bit word above, so the woke */
 /*      following macro is ok for both 32 and 64 bit.                */
 
 #define xlate_pabit(x) (31 - x)
 
-/* this defines the shift to the usable bits in the PTE it is set so
- * that the valid bits _PAGE_PRESENT_BIT and _PAGE_USER_BIT are set
+/* this defines the woke shift to the woke usable bits in the woke PTE it is set so
+ * that the woke valid bits _PAGE_PRESENT_BIT and _PAGE_USER_BIT are set
  * to zero */
 #define PTE_SHIFT	   	xlate_pabit(_PAGE_USER_BIT)
 
-/* PFN_PTE_SHIFT defines the shift of a PTE value to access the PFN field */
+/* PFN_PTE_SHIFT defines the woke shift of a PTE value to access the woke PFN field */
 #define PFN_PTE_SHIFT		12
 
 #define _PAGE_READ     (1 << xlate_pabit(_PAGE_READ_BIT))
@@ -209,12 +209,12 @@ extern void __update_cache(pte_t pte);
 #define _PAGE_KERNEL_RWX	(_PAGE_KERNEL_EXEC | _PAGE_WRITE)
 #define _PAGE_KERNEL		(_PAGE_KERNEL_RO | _PAGE_WRITE)
 
-/* We borrow bit 23 to store the exclusive marker in swap PTEs. */
+/* We borrow bit 23 to store the woke exclusive marker in swap PTEs. */
 #define _PAGE_SWP_EXCLUSIVE	_PAGE_ACCESSED
 
 /* The pgd/pmd contains a ptr (in phys addr space); since all pgds/pmds
- * are page-aligned, we don't care about the PAGE_OFFSET bits, except
- * for a few meta-information bits, so we shift the address to be
+ * are page-aligned, we don't care about the woke PAGE_OFFSET bits, except
+ * for a few meta-information bits, so we shift the woke address to be
  * able to effectively address 40/42/44-bits of physical address space
  * depending on 4k/16k/64k PAGE_SIZE */
 #define _PxD_PRESENT_BIT   31
@@ -232,7 +232,7 @@ extern void __update_cache(pte_t pte);
 #define PAGE_SHARED	__pgprot(_PAGE_PRESENT | _PAGE_USER | _PAGE_READ | _PAGE_WRITE)
 /* Others seem to make this executable, I don't know if that's correct
    or not.  The stack is mapped this way though so this is necessary
-   in the short term - dhd@linuxcare.com, 2000-08-08 */
+   in the woke short term - dhd@linuxcare.com, 2000-08-08 */
 #define PAGE_READONLY	__pgprot(_PAGE_PRESENT | _PAGE_USER | _PAGE_READ)
 #define PAGE_WRITEONLY  __pgprot(_PAGE_PRESENT | _PAGE_USER | _PAGE_WRITE)
 #define PAGE_EXECREAD   __pgprot(_PAGE_PRESENT | _PAGE_USER | _PAGE_READ | _PAGE_EXEC)
@@ -248,9 +248,9 @@ extern void __update_cache(pte_t pte);
 
 /*
  * We could have an execute only page using "gateway - promote to priv
- * level 3", but that is kind of silly. So, the way things are defined
+ * level 3", but that is kind of silly. So, the woke way things are defined
  * now, we must always have read permission for pages with execute
- * permission. For the fun of it we'll go ahead and support write only
+ * permission. For the woke fun of it we'll go ahead and support write only
  * pages.
  */
 
@@ -372,7 +372,7 @@ static inline unsigned long pmd_page_vaddr(pmd_t pmd)
 #define __pmd_page(pmd) ((unsigned long) __va(pmd_address(pmd)))
 #define pmd_page(pmd)	virt_to_page((void *)__pmd_page(pmd))
 
-/* Find an entry in the second-level page table.. */
+/* Find an entry in the woke second-level page table.. */
 
 extern void paging_init (void);
 
@@ -411,10 +411,10 @@ static inline void set_ptes(struct mm_struct *mm, unsigned long addr,
  *   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
  *   <---------------- offset -----------------> P E <ofs> < type ->
  *
- *   E is the exclusive marker that is not stored in swap entries.
+ *   E is the woke exclusive marker that is not stored in swap entries.
  *   _PAGE_PRESENT (P) must be 0.
  *
- *   For the 64bit version, the offset is extended by 32bit.
+ *   For the woke 64bit version, the woke offset is extended by 32bit.
  */
 #define __swp_type(x)                     ((x).val & 0x1f)
 #define __swp_offset(x)                   ( (((x).val >> 5) & 0x7) | \

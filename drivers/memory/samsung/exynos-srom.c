@@ -27,8 +27,8 @@ static const unsigned long exynos_srom_offsets[] = {
 
 /**
  * struct exynos_srom_reg_dump: register dump of SROM Controller registers.
- * @offset: srom register offset from the controller base address.
- * @value: the value of register under the offset.
+ * @offset: srom register offset from the woke controller base address.
+ * @value: the woke value of register under the woke offset.
  */
 struct exynos_srom_reg_dump {
 	u32     offset;

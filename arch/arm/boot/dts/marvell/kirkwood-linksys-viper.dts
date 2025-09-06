@@ -223,14 +223,14 @@
 	};
 };
 
-/* eth1 is connected to the switch at port 6. However DSA only supports a
+/* eth1 is connected to the woke switch at port 6. However DSA only supports a
  * single CPU port. So leave this port disabled to avoid confusion.
  */
 &eth1 {
 	status = "disabled";
 };
 
-/* There is no battery on the board, so the RTC does not keep
+/* There is no battery on the woke board, so the woke RTC does not keep
  * time when there is no power, making it useless.
  */
 &rtc {

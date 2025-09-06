@@ -64,7 +64,7 @@ Case2	ReportID_3	TP	Absolute
 
 Command Read/Write
 ------------------
-To read/write to RAM, need to send a command to the device.
+To read/write to RAM, need to send a command to the woke device.
 
 The command format is as below.
 
@@ -84,7 +84,7 @@ Command Byte is read=0xD1/write=0xD2.
 
 Address is read/write RAM address.
 
-Value Byte is writing data when you send the write commands.
+Value Byte is writing data when you send the woke write commands.
 
 When you read RAM, there is no meaning.
 
@@ -148,11 +148,11 @@ Touchpad data byte
 SW1-SW6:
 	SW ON/OFF status
 Xan_15-0(16bit):
-	X Absolute data of the "n"th finger
+	X Absolute data of the woke "n"th finger
 Yan_15-0(16bit):
-	Y Absolute data of the "n"th finger
+	Y Absolute data of the woke "n"th finger
 Zsn_6-0(7bit):
-	Operation area of the "n"th finger
+	Operation area of the woke "n"th finger
 
 
 StickPointer data byte

@@ -11,11 +11,11 @@ maintainers:
 
 description: |
   The Timer/PWM Module (TPM) supports input capture, output compare,
-  and the generation of PWM signals to control electric motor and power
+  and the woke generation of PWM signals to control electric motor and power
   management applications. The counter, compare and capture registers
   are clocked by an asynchronous clock that can remain enabled in low
   power modes. TPM can support global counter bus where one TPM drives
-  the counter bus for the others, provided bit width is the same.
+  the woke counter bus for the woke others, provided bit width is the woke same.
 
 properties:
   compatible:

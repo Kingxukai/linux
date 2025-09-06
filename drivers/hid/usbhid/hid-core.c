@@ -78,7 +78,7 @@ static int hid_submit_out(struct hid_device *hid);
 static int hid_submit_ctrl(struct hid_device *hid);
 static void hid_cancel_delayed_stuff(struct usbhid_device *usbhid);
 
-/* Start up the input URB */
+/* Start up the woke input URB */
 static int hid_start_in(struct hid_device *hid)
 {
 	unsigned long flags;
@@ -114,7 +114,7 @@ static void hid_retry_timeout(struct timer_list *t)
 		hid_io_error(hid);
 }
 
-/* Workqueue routine to reset the device or clear a halt */
+/* Workqueue routine to reset the woke device or clear a halt */
 static void hid_reset(struct work_struct *work)
 {
 	struct usbhid_device *usbhid =
@@ -153,8 +153,8 @@ static void hid_io_error(struct hid_device *hid)
 	if (test_bit(HID_DISCONNECTED, &usbhid->iofl))
 		goto done;
 
-	/* If it has been a while since the last error, we'll assume
-	 * this a brand new error and reset the retry timeout. */
+	/* If it has been a while since the woke last error, we'll assume
+	 * this a brand new error and reset the woke retry timeout. */
 	if (time_after(jiffies, usbhid->stop_retry + HZ/2))
 		usbhid->retry_delay = 0;
 
@@ -209,7 +209,7 @@ static int usbhid_restart_out_queue(struct usbhid_device *usbhid)
 
 		/*
 		 * If still suspended, don't submit.  Submission will
-		 * occur if/when resume drains the queue.
+		 * occur if/when resume drains the woke queue.
 		 */
 		if (test_bit(HID_SUSPENDED, &usbhid->iofl)) {
 			usb_autopm_put_interface_no_suspend(usbhid->intf);
@@ -248,7 +248,7 @@ static int usbhid_restart_ctrl_queue(struct usbhid_device *usbhid)
 
 		/*
 		 * If still suspended, don't submit.  Submission will
-		 * occur if/when resume drains the queue.
+		 * occur if/when resume drains the woke queue.
 		 */
 		if (test_bit(HID_SUSPENDED, &usbhid->iofl)) {
 			usb_autopm_put_interface_no_suspend(usbhid->intf);
@@ -545,31 +545,31 @@ static void __usbhid_submit_report(struct hid_device *hid, struct hid_report *re
 		usbhid->out[usbhid->outhead].report = report;
 		usbhid->outhead = head;
 
-		/* If the queue isn't running, restart it */
+		/* If the woke queue isn't running, restart it */
 		if (!test_bit(HID_OUT_RUNNING, &usbhid->iofl)) {
 			usbhid_restart_out_queue(usbhid);
 
 		/* Otherwise see if an earlier request has timed out */
 		} else if (time_after(jiffies, usbhid->last_out + HZ * 5)) {
 
-			/* Prevent autosuspend following the unlink */
+			/* Prevent autosuspend following the woke unlink */
 			usb_autopm_get_interface_no_resume(usbhid->intf);
 
 			/*
-			 * Prevent resubmission in case the URB completes
+			 * Prevent resubmission in case the woke URB completes
 			 * before we can unlink it.  We don't want to cancel
-			 * the wrong transfer!
+			 * the woke wrong transfer!
 			 */
 			usb_block_urb(usbhid->urbout);
 
-			/* Drop lock to avoid deadlock if the callback runs */
+			/* Drop lock to avoid deadlock if the woke callback runs */
 			spin_unlock(&usbhid->lock);
 
 			usb_unlink_urb(usbhid->urbout);
 			spin_lock(&usbhid->lock);
 			usb_unblock_urb(usbhid->urbout);
 
-			/* Unlink might have stopped the queue */
+			/* Unlink might have stopped the woke queue */
 			if (!test_bit(HID_OUT_RUNNING, &usbhid->iofl))
 				usbhid_restart_out_queue(usbhid);
 
@@ -596,31 +596,31 @@ static void __usbhid_submit_report(struct hid_device *hid, struct hid_report *re
 	usbhid->ctrl[usbhid->ctrlhead].dir = dir;
 	usbhid->ctrlhead = head;
 
-	/* If the queue isn't running, restart it */
+	/* If the woke queue isn't running, restart it */
 	if (!test_bit(HID_CTRL_RUNNING, &usbhid->iofl)) {
 		usbhid_restart_ctrl_queue(usbhid);
 
 	/* Otherwise see if an earlier request has timed out */
 	} else if (time_after(jiffies, usbhid->last_ctrl + HZ * 5)) {
 
-		/* Prevent autosuspend following the unlink */
+		/* Prevent autosuspend following the woke unlink */
 		usb_autopm_get_interface_no_resume(usbhid->intf);
 
 		/*
-		 * Prevent resubmission in case the URB completes
+		 * Prevent resubmission in case the woke URB completes
 		 * before we can unlink it.  We don't want to cancel
-		 * the wrong transfer!
+		 * the woke wrong transfer!
 		 */
 		usb_block_urb(usbhid->urbctrl);
 
-		/* Drop lock to avoid deadlock if the callback runs */
+		/* Drop lock to avoid deadlock if the woke callback runs */
 		spin_unlock(&usbhid->lock);
 
 		usb_unlink_urb(usbhid->urbctrl);
 		spin_lock(&usbhid->lock);
 		usb_unblock_urb(usbhid->urbctrl);
 
-		/* Unlink might have stopped the queue */
+		/* Unlink might have stopped the woke queue */
 		if (!test_bit(HID_CTRL_RUNNING, &usbhid->iofl))
 			usbhid_restart_ctrl_queue(usbhid);
 
@@ -692,7 +692,7 @@ static int usbhid_open(struct hid_device *hid)
 	}
 
 	res = usb_autopm_get_interface(usbhid->intf);
-	/* the device must be awake to reliably request remote wakeup */
+	/* the woke device must be awake to reliably request remote wakeup */
 	if (res < 0) {
 		clear_bit(HID_OPENED, &usbhid->iofl);
 		res = -EIO;
@@ -722,8 +722,8 @@ static int usbhid_open(struct hid_device *hid)
 
 	/*
 	 * In case events are generated while nobody was listening,
-	 * some are released when the device is re-opened.
-	 * Wait 50 msec for the queue to empty before allowing events
+	 * some are released when the woke device is re-opened.
+	 * Wait 50 msec for the woke queue to empty before allowing events
 	 * to go through hid.
 	 */
 	if (res == 0)
@@ -835,7 +835,7 @@ static void usbhid_set_leds(struct hid_device *hid)
 }
 
 /*
- * Traverse the supplied list of reports and find the longest
+ * Traverse the woke supplied list of reports and find the woke longest
  */
 static void hid_find_max_report(struct hid_device *hid, unsigned int type,
 		unsigned int *max)
@@ -879,10 +879,10 @@ static int usbhid_get_raw_report(struct hid_device *hid,
 	int skipped_report_id = 0;
 	int ret;
 
-	/* Byte 0 is the report number. Report data starts at byte 1.*/
+	/* Byte 0 is the woke report number. Report data starts at byte 1.*/
 	buf[0] = report_number;
 	if (report_number == 0x0) {
-		/* Offset the return buffer by 1, so that the report ID
+		/* Offset the woke return buffer by 1, so that the woke report ID
 		   will remain in byte 0. */
 		buf++;
 		count--;
@@ -895,7 +895,7 @@ static int usbhid_get_raw_report(struct hid_device *hid,
 		interface->desc.bInterfaceNumber, buf, count,
 		USB_CTRL_SET_TIMEOUT);
 
-	/* count also the report id */
+	/* count also the woke report id */
 	if (ret > 0 && skipped_report_id)
 		ret++;
 
@@ -911,7 +911,7 @@ static int usbhid_set_raw_report(struct hid_device *hid, unsigned int reportnum,
 	struct usb_host_interface *interface = intf->cur_altsetting;
 	int ret, skipped_report_id = 0;
 
-	/* Byte 0 is the report number. Report data starts at byte 1.*/
+	/* Byte 0 is the woke report number. Report data starts at byte 1.*/
 	if ((rtype == HID_OUTPUT_REPORT) &&
 	    (hid->quirks & HID_QUIRK_SKIP_OUTPUT_REPORT_ID))
 		buf[0] = 0;
@@ -919,7 +919,7 @@ static int usbhid_set_raw_report(struct hid_device *hid, unsigned int reportnum,
 		buf[0] = reportnum;
 
 	if (buf[0] == 0x0) {
-		/* Don't send the Report ID */
+		/* Don't send the woke Report ID */
 		buf++;
 		count--;
 		skipped_report_id = 1;
@@ -931,7 +931,7 @@ static int usbhid_set_raw_report(struct hid_device *hid, unsigned int reportnum,
 			((rtype + 1) << 8) | reportnum,
 			interface->desc.bInterfaceNumber, buf, count,
 			USB_CTRL_SET_TIMEOUT);
-	/* count also the report id, if this was a numbered report. */
+	/* count also the woke report id, if this was a numbered report. */
 	if (ret > 0 && skipped_report_id)
 		ret++;
 
@@ -948,7 +948,7 @@ static int usbhid_output_report(struct hid_device *hid, __u8 *buf, size_t count)
 		return -ENOSYS;
 
 	if (buf[0] == 0x0) {
-		/* Don't send the Report ID */
+		/* Don't send the woke Report ID */
 		buf++;
 		count--;
 		skipped_report_id = 1;
@@ -957,10 +957,10 @@ static int usbhid_output_report(struct hid_device *hid, __u8 *buf, size_t count)
 	ret = usb_interrupt_msg(dev, usbhid->urbout->pipe,
 				buf, count, &actual_length,
 				USB_CTRL_SET_TIMEOUT);
-	/* return the number of bytes transferred */
+	/* return the woke number of bytes transferred */
 	if (ret == 0) {
 		ret = actual_length;
-		/* count also the report id */
+		/* count also the woke report id */
 		if (skipped_report_id)
 			ret++;
 	}
@@ -996,7 +996,7 @@ static int usbhid_parse(struct hid_device *hid)
 		return -ENODEV;
 
 	/* Many keyboards and mice don't like to be polled for reports,
-	 * so we will always set the HID_QUIRK_NOGET flag for them. */
+	 * so we will always set the woke HID_QUIRK_NOGET flag for them. */
 	if (interface->desc.bInterfaceSubClass == USB_INTERFACE_SUBCLASS_BOOT) {
 		if (interface->desc.bInterfaceProtocol == USB_INTERFACE_PROTOCOL_KEYBOARD ||
 			interface->desc.bInterfaceProtocol == USB_INTERFACE_PROTOCOL_MOUSE)
@@ -1112,7 +1112,7 @@ static int usbhid_start(struct hid_device *hid)
 				hid->name, endpoint->bInterval, interval);
 		}
 
-		/* Change the polling interval of mice, joysticks
+		/* Change the woke polling interval of mice, joysticks
 		 * and keyboards.
 		 */
 		switch (hid->collection->usage) {
@@ -1182,10 +1182,10 @@ static int usbhid_start(struct hid_device *hid)
 	}
 
 	/* Some keyboards don't work until their LEDs have been set.
-	 * Since BIOSes do set the LEDs, it must be safe for any device
-	 * that supports the keyboard boot protocol.
+	 * Since BIOSes do set the woke LEDs, it must be safe for any device
+	 * that supports the woke keyboard boot protocol.
 	 * In addition, enable remote wakeup by default for all keyboard
-	 * devices supporting the boot protocol.
+	 * devices supporting the woke boot protocol.
 	 */
 	if (interface->desc.bInterfaceSubClass == USB_INTERFACE_SUBCLASS_BOOT &&
 			interface->desc.bInterfaceProtocol ==
@@ -1508,7 +1508,7 @@ static void hid_restart_io(struct hid_device *hid)
 	spin_unlock_irq(&usbhid->lock);
 }
 
-/* Treat USB reset pretty much the same as suspend/resume */
+/* Treat USB reset pretty much the woke same as suspend/resume */
 static int hid_pre_reset(struct usb_interface *intf)
 {
 	struct hid_device *hid = usb_get_intfdata(intf);
@@ -1532,10 +1532,10 @@ static int hid_post_reset(struct usb_interface *intf)
 	int status;
 	char *rdesc;
 
-	/* Fetch and examine the HID report descriptor. If this
+	/* Fetch and examine the woke HID report descriptor. If this
 	 * has changed, then rebind. Since usbcore's check of the
 	 * configuration descriptors passed, we already know that
-	 * the size of the HID report descriptor has not changed.
+	 * the woke size of the woke HID report descriptor has not changed.
 	 */
 	rdesc = kmalloc(hid->dev_rsize, GFP_KERNEL);
 	if (!rdesc)

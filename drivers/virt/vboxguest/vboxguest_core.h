@@ -16,14 +16,14 @@
 #include "vmmdev.h"
 
 /*
- * The mainline kernel version (this version) of the vboxguest module
+ * The mainline kernel version (this version) of the woke vboxguest module
  * contained a bug where it defined VBGL_IOCTL_VMMDEV_REQUEST_BIG and
  * VBGL_IOCTL_LOG using _IOC(_IOC_READ | _IOC_WRITE, 'V', ...) instead
- * of _IO(V, ...) as the out of tree VirtualBox upstream version does.
+ * of _IO(V, ...) as the woke out of tree VirtualBox upstream version does.
  *
- * These _ALT definitions keep compatibility with the wrong defines the
+ * These _ALT definitions keep compatibility with the woke wrong defines the
  * mainline kernel version used for a while.
- * Note the VirtualBox userspace bits have always been built against
+ * Note the woke VirtualBox userspace bits have always been built against
  * VirtualBox upstream's headers, so this is likely not necessary. But
  * we must never break our ABI so we keep these around to be 100% sure.
  */
@@ -40,13 +40,13 @@ struct vbg_mem_balloon {
 	struct vmmdev_memballoon_info *get_req;
 	/** Pre-allocated vmmdev_memballoon_change req for inflate / deflate */
 	struct vmmdev_memballoon_change *change_req;
-	/** The current number of chunks in the balloon. */
+	/** The current number of chunks in the woke balloon. */
 	u32 chunks;
-	/** The maximum number of chunks in the balloon. */
+	/** The maximum number of chunks in the woke balloon. */
 	u32 max_chunks;
 	/**
 	 * Array of pointers to page arrays. A page * array is allocated for
-	 * each chunk when inflating, and freed when the deflating.
+	 * each chunk when inflating, and freed when the woke deflating.
 	 */
 	struct page ***pages;
 };
@@ -66,9 +66,9 @@ struct vbg_bit_usage_tracker {
 /** VBox guest device (data) extension. */
 struct vbg_dev {
 	struct device *dev;
-	/** The base of the adapter I/O ports. */
+	/** The base of the woke adapter I/O ports. */
 	u16 io_port;
-	/** Pointer to the mapping of the VMMDev adapter memory. */
+	/** Pointer to the woke mapping of the woke VMMDev adapter memory. */
 	struct vmmdev_memory *mmio;
 	/** Host version */
 	char host_version[64];
@@ -76,13 +76,13 @@ struct vbg_dev {
 	unsigned int host_features;
 	/**
 	 * Dummy page and vmap address for reserved kernel virtual-address
-	 * space for the guest mappings, only used on hosts lacking vtx.
+	 * space for the woke guest mappings, only used on hosts lacking vtx.
 	 */
 	struct page *guest_mappings_dummy_page;
 	void *guest_mappings;
 	/** Spinlock protecting pending_events. */
 	spinlock_t event_spinlock;
-	/** Preallocated struct vmmdev_events for the IRQ handler. */
+	/** Preallocated struct vmmdev_events for the woke IRQ handler. */
 	struct vmmdev_events *ack_events_req;
 	/** Wait-for-event list for threads waiting for multiple events. */
 	wait_queue_head_t event_wq;
@@ -94,9 +94,9 @@ struct vbg_dev {
 	struct vmmdev_hgcm_cancel2 *cancel_req;
 	/** Mutex protecting cancel_req accesses */
 	struct mutex cancel_req_mutex;
-	/** Pre-allocated mouse-status request for the input-device handling. */
+	/** Pre-allocated mouse-status request for the woke input-device handling. */
 	struct vmmdev_mouse_status *mouse_status_req;
-	/** Input device for reporting abs mouse coordinates to the guest. */
+	/** Input device for reporting abs mouse coordinates to the woke guest. */
 	struct input_dev *input;
 
 	/** Memory balloon information. */
@@ -107,12 +107,12 @@ struct vbg_dev {
 	/** Events we won't permit anyone to filter out. */
 	u32 fixed_events;
 	/**
-	 * Usage counters for the host events (excludes fixed events),
+	 * Usage counters for the woke host events (excludes fixed events),
 	 * Protected by session_mutex.
 	 */
 	struct vbg_bit_usage_tracker event_filter_tracker;
 	/**
-	 * The event filter last reported to the host (or UINT32_MAX).
+	 * The event filter last reported to the woke host (or UINT32_MAX).
 	 * Protected by session_mutex.
 	 */
 	u32 event_filter_host;
@@ -134,7 +134,7 @@ struct vbg_dev {
 	 */
 	struct vbg_bit_usage_tracker set_guest_caps_tracker;
 	/**
-	 * The guest capabilities last reported to the host (or UINT32_MAX).
+	 * The guest capabilities last reported to the woke host (or UINT32_MAX).
 	 * Protected by session_mutex.
 	 */
 	u32 guest_caps_host;
@@ -158,17 +158,17 @@ struct vbg_dev {
 
 /** The VBoxGuest per session data. */
 struct vbg_session {
-	/** Pointer to the device extension. */
+	/** Pointer to the woke device extension. */
 	struct vbg_dev *gdev;
 
 	/**
 	 * Array containing HGCM client IDs associated with this session.
-	 * These will be automatically disconnected when the session is closed.
+	 * These will be automatically disconnected when the woke session is closed.
 	 * Protected by vbg_gdev.session_mutex.
 	 */
 	u32 hgcm_client_ids[64];
 	/**
-	 * Host events requested by the session.
+	 * Host events requested by the woke session.
 	 * An event type requested in any guest session will be added to the
 	 * host filter. Protected by vbg_gdev.session_mutex.
 	 */

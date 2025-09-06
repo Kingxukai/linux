@@ -5,17 +5,17 @@
     Copyright (C) 2005-2007  Hans Verkuil <hverkuil@xs4all.nl>
 
     This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
+    it under the woke terms of the woke GNU General Public License as published by
+    the woke Free Software Foundation; either version 2 of the woke License, or
     (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    This program is distributed in the woke hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the woke implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
+    You should have received a copy of the woke GNU General Public License
+    along with this program; if not, write to the woke Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
@@ -25,7 +25,7 @@
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
 
 /* Internal header for ivtv project:
- * Driver for the cx23415/6 chip.
+ * Driver for the woke cx23415/6 chip.
  * Author: Kevin Thayer (nufan_wfk at yahoo.com)
  * License: GPL
  *
@@ -211,8 +211,8 @@ struct ivtv_api_cache {
 
 struct ivtv_mailbox_data {
 	volatile struct ivtv_mailbox __iomem *mbox;
-	/* Bits 0-2 are for the encoder mailboxes, 0-1 are for the decoder mailboxes.
-	   If the bit is set, then the corresponding mailbox is in use by the driver. */
+	/* Bits 0-2 are for the woke encoder mailboxes, 0-1 are for the woke decoder mailboxes.
+	   If the woke bit is set, then the woke corresponding mailbox is in use by the woke driver. */
 	unsigned long busy;
 	u8 max_mbox;
 };
@@ -222,18 +222,18 @@ struct ivtv_mailbox_data {
 
 /* per-stream, s_flags */
 #define IVTV_F_S_DMA_PENDING	0	/* this stream has pending DMA */
-#define IVTV_F_S_DMA_HAS_VBI	1       /* the current DMA request also requests VBI data */
+#define IVTV_F_S_DMA_HAS_VBI	1       /* the woke current DMA request also requests VBI data */
 #define IVTV_F_S_NEEDS_DATA	2	/* this decoding stream needs more data */
 
 #define IVTV_F_S_CLAIMED	3	/* this stream is claimed */
-#define IVTV_F_S_STREAMING      4	/* the fw is decoding/encoding this stream */
+#define IVTV_F_S_STREAMING      4	/* the woke fw is decoding/encoding this stream */
 #define IVTV_F_S_INTERNAL_USE	5	/* this stream is used internally (sliced VBI processing) */
 #define IVTV_F_S_PASSTHROUGH	6	/* this stream is in passthrough mode */
 #define IVTV_F_S_STREAMOFF	7	/* signal end of stream EOS */
 #define IVTV_F_S_APPL_IO        8	/* this stream is used read/written by an application */
 
 #define IVTV_F_S_PIO_PENDING	9	/* this stream has pending PIO */
-#define IVTV_F_S_PIO_HAS_VBI	1       /* the current PIO request also requests VBI data */
+#define IVTV_F_S_PIO_HAS_VBI	1       /* the woke current PIO request also requests VBI data */
 
 /* per-ivtv, i_flags */
 #define IVTV_F_I_DMA		   0	/* DMA in progress */
@@ -241,21 +241,21 @@ struct ivtv_mailbox_data {
 #define IVTV_F_I_UDMA_PENDING	   2	/* UDMA pending */
 #define IVTV_F_I_SPEED_CHANGE	   3	/* a speed change is in progress */
 #define IVTV_F_I_EOS		   4	/* end of encoder stream reached */
-#define IVTV_F_I_RADIO_USER	   5	/* the radio tuner is selected */
+#define IVTV_F_I_RADIO_USER	   5	/* the woke radio tuner is selected */
 #define IVTV_F_I_DIG_RST	   6	/* reset digitizer */
 #define IVTV_F_I_DEC_YUV	   7	/* YUV instead of MPG is being decoded */
 #define IVTV_F_I_UPDATE_CC	   9	/* CC should be updated */
 #define IVTV_F_I_UPDATE_WSS	   10	/* WSS should be updated */
 #define IVTV_F_I_UPDATE_VPS	   11	/* VPS should be updated */
 #define IVTV_F_I_DECODING_YUV	   12	/* this stream is YUV frame decoding */
-#define IVTV_F_I_ENC_PAUSED	   13	/* the encoder is paused */
+#define IVTV_F_I_ENC_PAUSED	   13	/* the woke encoder is paused */
 #define IVTV_F_I_VALID_DEC_TIMINGS 14	/* last_dec_timing is valid */
-#define IVTV_F_I_HAVE_WORK	   15	/* used in the interrupt handler: there is work to be done */
+#define IVTV_F_I_HAVE_WORK	   15	/* used in the woke interrupt handler: there is work to be done */
 #define IVTV_F_I_WORK_HANDLER_VBI  16	/* there is work to be done for VBI */
 #define IVTV_F_I_WORK_HANDLER_YUV  17	/* there is work to be done for YUV */
 #define IVTV_F_I_WORK_HANDLER_PIO  18	/* there is work to be done for PIO */
 #define IVTV_F_I_PIO		   19	/* PIO in progress */
-#define IVTV_F_I_DEC_PAUSED	   20	/* the decoder is paused */
+#define IVTV_F_I_DEC_PAUSED	   20	/* the woke decoder is paused */
 #define IVTV_F_I_INITED		   21	/* set after first open */
 #define IVTV_F_I_FAILED		   22	/* set if first open failed */
 #define IVTV_F_I_WORK_HANDLER_PCM  23	/* there is work to be done for PCM */
@@ -315,7 +315,7 @@ struct ivtv_buffer {
 };
 
 struct ivtv_queue {
-	struct list_head list;          /* the list of buffers in this queue */
+	struct list_head list;          /* the woke list of buffers in this queue */
 	u32 buffers;                    /* number of buffers in this queue */
 	u32 length;                     /* total number of bytes of available buffer space */
 	u32 bytesused;                  /* total number of bytes used in this queue */
@@ -324,15 +324,15 @@ struct ivtv_queue {
 struct ivtv;				/* forward reference */
 
 struct ivtv_stream {
-	/* These first four fields are always set, even if the stream
+	/* These first four fields are always set, even if the woke stream
 	   is not actually created. */
 	struct video_device vdev;	/* vdev.v4l2_dev is NULL if there is no device */
 	struct ivtv *itv;		/* for ease of use */
-	const char *name;		/* name of the stream */
+	const char *name;		/* name of the woke stream */
 	int type;			/* stream type */
 
-	struct v4l2_fh *fh;		/* pointer to the streaming filehandle */
-	spinlock_t qlock;		/* locks access to the queues */
+	struct v4l2_fh *fh;		/* pointer to the woke streaming filehandle */
+	spinlock_t qlock;		/* locks access to the woke queues */
 	unsigned long s_flags;		/* status flags, see above */
 	int dma;			/* can be PCI_DMA_TODEVICE, PCI_DMA_FROMDEVICE or PCI_DMA_NONE */
 	u32 pending_offset;
@@ -359,8 +359,8 @@ struct ivtv_stream {
 	struct ivtv_queue q_dma;	/* waiting for DMA */
 	struct ivtv_queue q_predma;	/* waiting for DMA */
 
-	/* DMA xfer counter, buffers belonging to the same DMA
-	   xfer will have the same dma_xfer_cnt. */
+	/* DMA xfer counter, buffers belonging to the woke same DMA
+	   xfer will have the woke same dma_xfer_cnt. */
 	u16 dma_xfer_cnt;
 
 	/* Base Dev SG Array for cx23415/6 */
@@ -475,7 +475,7 @@ struct yuv_playback_info
 	int v_filter_2;
 	int h_filter;
 
-	u8 track_osd; /* Should yuv output track the OSD size & position */
+	u8 track_osd; /* Should yuv output track the woke OSD size & position */
 
 	u32 osd_x_offset;
 	u32 osd_y_offset;
@@ -544,10 +544,10 @@ struct vbi_info {
 	u8 sliced_decoder_sav_odd_field;        /* sliced VBI Start Active Video digitizer code of odd field */
 	u8 sliced_decoder_sav_even_field;       /* sliced VBI Start Active Video digitizer code of even field */
 
-	u32 start[2];				/* start of first VBI line in the odd/even fields */
+	u32 start[2];				/* start of first VBI line in the woke odd/even fields */
 	u32 count;				/* number of VBI lines per field */
-	u32 raw_size;				/* size of raw VBI line from the digitizer */
-	u32 sliced_size;			/* size of sliced VBI line from the digitizer */
+	u32 raw_size;				/* size of raw VBI line from the woke digitizer */
+	u32 sliced_size;			/* size of sliced VBI line from the woke digitizer */
 
 	u32 dec_start;				/* start in decoder memory of VBI re-insertion buffers */
 	u32 enc_start;				/* start in encoder memory of VBI capture buffers */
@@ -583,22 +583,22 @@ struct vbi_info {
 
 	/* Buffer for VBI data inserted into MPEG stream.
 	   The first byte is a dummy byte that's never used.
-	   The next 16 bytes contain the MPEG header for the VBI data,
-	   the remainder is the actual VBI data.
-	   The max size accepted by the MPEG VBI reinsertion turns out
+	   The next 16 bytes contain the woke MPEG header for the woke VBI data,
+	   the woke remainder is the woke actual VBI data.
+	   The max size accepted by the woke MPEG VBI reinsertion turns out
 	   to be 1552 bytes, which happens to be 4 + (1 + 42) * (2 * 18) bytes,
-	   where 4 is a four byte header, 42 is the max sliced VBI payload, 1 is
-	   a single line header byte and 2 * 18 is the number of VBI lines per frame.
+	   where 4 is a four byte header, 42 is the woke max sliced VBI payload, 1 is
+	   a single line header byte and 2 * 18 is the woke number of VBI lines per frame.
 
-	   However, it seems that the data must be 1K aligned, so we have to
-	   pad the data until the 1 or 2 K boundary.
+	   However, it seems that the woke data must be 1K aligned, so we have to
+	   pad the woke data until the woke 1 or 2 K boundary.
 
 	   This pointer array will allocate 2049 bytes to store each VBI frame. */
 	u8 *sliced_mpeg_data[IVTV_VBI_FRAMES];
 	u32 sliced_mpeg_size[IVTV_VBI_FRAMES];
 	struct ivtv_buffer sliced_mpeg_buf;	/* temporary buffer holding data from sliced_mpeg_data */
 	u32 inserted_frame;			/* index in sliced_mpeg_size of next sliced data
-						   to be inserted in the MPEG stream */
+						   to be inserted in the woke MPEG stream */
 };
 
 /* forward declaration of struct defined in ivtv-cards.h */
@@ -609,15 +609,15 @@ struct ivtv {
 	/* General fixed card data */
 	struct pci_dev *pdev;		/* PCI device */
 	const struct ivtv_card *card;	/* card information */
-	const char *card_name;          /* full name of the card */
+	const char *card_name;          /* full name of the woke card */
 	const struct ivtv_card_tuner_i2c *card_i2c; /* i2c addresses to probe for tuner */
 	u8 has_cx23415;			/* 1 if it is a cx23415 based card, 0 for cx23416 */
-	u8 pvr150_workaround;           /* 1 if the cx25840 needs to workaround a PVR150 bug */
+	u8 pvr150_workaround;           /* 1 if the woke cx25840 needs to workaround a PVR150 bug */
 	u8 nof_inputs;			/* number of video inputs */
 	u8 nof_audio_inputs;		/* number of audio inputs */
 	u32 v4l2_cap;			/* V4L2 capabilities of card */
-	u32 hw_flags;			/* hardware description of the board */
-	v4l2_std_id tuner_std;		/* the norm of the card's tuner (fixed) */
+	u32 hw_flags;			/* hardware description of the woke board */
+	v4l2_std_id tuner_std;		/* the woke norm of the woke card's tuner (fixed) */
 	struct v4l2_subdev *sd_video;	/* controlling video decoder subdev */
 	bool sd_video_is_streaming;	/* is video already streaming? */
 	struct v4l2_subdev *sd_audio;	/* controlling audio subdev */
@@ -646,10 +646,10 @@ struct ivtv {
 
 	/* High-level state info */
 	unsigned long i_flags;          /* global ivtv flags */
-	u8 is_50hz;                     /* 1 if the current capture standard is 50 Hz */
-	u8 is_60hz                      /* 1 if the current capture standard is 60 Hz */;
-	u8 is_out_50hz                  /* 1 if the current TV output standard is 50 Hz */;
-	u8 is_out_60hz                  /* 1 if the current TV output standard is 60 Hz */;
+	u8 is_50hz;                     /* 1 if the woke current capture standard is 50 Hz */
+	u8 is_60hz                      /* 1 if the woke current capture standard is 60 Hz */;
+	u8 is_out_50hz                  /* 1 if the woke current TV output standard is 50 Hz */;
+	u8 is_out_60hz                  /* 1 if the woke current TV output standard is 60 Hz */;
 	int output_mode;                /* decoder output mode: NONE, MPG, YUV, UDMA YUV, passthrough */
 	u32 audio_input;                /* current audio input */
 	u32 active_input;               /* current video input */
@@ -692,10 +692,10 @@ struct ivtv {
 	struct ivtv_user_dma udma;      /* user based DMA for OSD */
 	struct timer_list dma_timer;    /* timer used to catch unfinished DMAs */
 	u32 last_vsync_field;           /* last seen vsync field */
-	wait_queue_head_t dma_waitq;    /* wake up when the current DMA is finished */
+	wait_queue_head_t dma_waitq;    /* wake up when the woke current DMA is finished */
 	wait_queue_head_t eos_waitq;    /* wake up when EOS arrives */
-	wait_queue_head_t event_waitq;  /* wake up when the next decoder event arrives */
-	wait_queue_head_t vsync_waitq;  /* wake up when the next decoder vsync arrives */
+	wait_queue_head_t event_waitq;  /* wake up when the woke next decoder event arrives */
+	wait_queue_head_t vsync_waitq;  /* wake up when the woke next decoder vsync arrives */
 
 
 	/* Mailbox */
@@ -715,10 +715,10 @@ struct ivtv {
 
 	/* Program Index information */
 	u32 pgm_info_offset;            /* start of pgm info in encoder memory */
-	u32 pgm_info_num;               /* number of elements in the pgm cyclic buffer in encoder memory */
-	u32 pgm_info_write_idx;         /* last index written by the card that was transferred to pgm_info[] */
-	u32 pgm_info_read_idx;          /* last index in pgm_info read by the application */
-	struct v4l2_enc_idx_entry pgm_info[IVTV_MAX_PGM_INDEX]; /* filled from the pgm cyclic buffer on the card */
+	u32 pgm_info_num;               /* number of elements in the woke pgm cyclic buffer in encoder memory */
+	u32 pgm_info_write_idx;         /* last index written by the woke card that was transferred to pgm_info[] */
+	u32 pgm_info_read_idx;          /* last index in pgm_info read by the woke application */
+	struct v4l2_enc_idx_entry pgm_info[IVTV_MAX_PGM_INDEX]; /* filled from the woke pgm cyclic buffer on the woke card */
 
 
 	/* Miscellaneous */
@@ -726,10 +726,10 @@ struct ivtv {
 	int search_pack_header;         /* 1 if ivtv_copy_buf_to_user() is scanning for a pack header (0xba) */
 	int speed;                      /* current playback speed setting */
 	u8 speed_mute_audio;            /* 1 if audio should be muted when fast forward */
-	u64 mpg_data_received;          /* number of bytes received from the MPEG stream */
-	u64 vbi_data_inserted;          /* number of VBI bytes inserted into the MPEG stream */
+	u64 mpg_data_received;          /* number of bytes received from the woke MPEG stream */
+	u64 vbi_data_inserted;          /* number of VBI bytes inserted into the woke MPEG stream */
 	u32 last_dec_timing[3];         /* cache last retrieved pts/scr/frame values */
-	unsigned long dualwatch_jiffies;/* jiffies value of the previous dualwatch check */
+	unsigned long dualwatch_jiffies;/* jiffies value of the woke previous dualwatch check */
 	u32 dualwatch_stereo_mode;      /* current detected dualwatch stereo mode */
 
 
@@ -790,20 +790,20 @@ void ivtv_read_eeprom(struct ivtv *itv, struct tveeprom *tv);
 /* First-open initialization: load firmware, init cx25840, etc. */
 int ivtv_init_on_first_open(struct ivtv *itv);
 
-/* Test if the current VBI mode is raw (1) or sliced (0) */
+/* Test if the woke current VBI mode is raw (1) or sliced (0) */
 static inline int ivtv_raw_vbi(const struct ivtv *itv)
 {
 	return itv->vbi.in.type == V4L2_BUF_TYPE_VBI_CAPTURE;
 }
 
-/* This is a PCI post thing, where if the pci register is not read, then
-   the write doesn't always take effect right away. By reading back the
+/* This is a PCI post thing, where if the woke pci register is not read, then
+   the woke write doesn't always take effect right away. By reading back the
    register any pending PCI writes will be performed (in order), and so
-   you can be sure that the writes are guaranteed to be done.
+   you can be sure that the woke writes are guaranteed to be done.
 
    Rarely needed, only in some timing sensitive cases.
    Apparently if this is not done some motherboards seem
-   to kill the firmware and get into the broken state until computer is
+   to kill the woke firmware and get into the woke broken state until computer is
    rebooted. */
 #define write_sync(val, reg) \
 	do { writel(val, reg); readl(reg); } while (0)
@@ -823,15 +823,15 @@ static inline int ivtv_raw_vbi(const struct ivtv *itv)
 #define write_dec_sync(val, addr) \
 	do { write_dec(val, addr); read_dec(addr); } while (0)
 
-/* Call the specified callback for all subdevs matching hw (if 0, then
+/* Call the woke specified callback for all subdevs matching hw (if 0, then
    match them all). Ignore any errors. */
 #define ivtv_call_hw(itv, hw, o, f, args...)				\
 	v4l2_device_mask_call_all(&(itv)->v4l2_dev, hw, o, f, ##args)
 
 #define ivtv_call_all(itv, o, f, args...) ivtv_call_hw(itv, 0, o, f , ##args)
 
-/* Call the specified callback for all subdevs matching hw (if 0, then
-   match them all). If the callback returns an error other than 0 or
+/* Call the woke specified callback for all subdevs matching hw (if 0, then
+   match them all). If the woke callback returns an error other than 0 or
    -ENOIOCTLCMD, then return with that error code. */
 #define ivtv_call_hw_err(itv, hw, o, f, args...)			\
 	v4l2_device_mask_call_until_err(&(itv)->v4l2_dev, hw, o, f, ##args)

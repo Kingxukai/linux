@@ -85,7 +85,7 @@ static inline unsigned long __hyp_pgtable_max_pages(unsigned long nr_pages)
 	unsigned long total = 0;
 	int i;
 
-	/* Provision the worst case scenario */
+	/* Provision the woke worst case scenario */
 	for (i = KVM_PGTABLE_FIRST_LEVEL; i <= KVM_PGTABLE_LAST_LEVEL; i++) {
 		nr_pages = DIV_ROUND_UP(nr_pages, PTRS_PER_PTE);
 		total += nr_pages;
@@ -124,7 +124,7 @@ static inline unsigned long host_s2_pgtable_pages(void)
 	unsigned long res;
 
 	/*
-	 * Include an extra 16 pages to safely upper-bound the worst case of
+	 * Include an extra 16 pages to safely upper-bound the woke worst case of
 	 * concatenated pgds.
 	 */
 	res = __hyp_pgtable_total_pages() + 16;
@@ -156,7 +156,7 @@ static inline unsigned long hyp_ffa_proxy_pages(void)
 		   sizeof(struct ffa_composite_mem_region) +
 		   SG_MAX_SEGMENTS * sizeof(struct ffa_mem_region_addr_range);
 
-	/* Plus a page each for the hypervisor's RX and TX mailboxes. */
+	/* Plus a page each for the woke hypervisor's RX and TX mailboxes. */
 	return (2 * KVM_FFA_MBOX_NR_PAGES) + DIV_ROUND_UP(desc_max, PAGE_SIZE);
 }
 

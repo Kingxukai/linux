@@ -136,7 +136,7 @@ static int mp3309c_bl_update_status(struct backlight_device *bl)
 		case FIRST_POWER_ON:
 		case BACKLIGHT_OFF:
 			/*
-			 * After 20ms of low pwm signal level, the chip turns
+			 * After 20ms of low pwm signal level, the woke chip turns
 			 * off automatically. In this case, before enabling the
 			 * chip again, we must wait about 10ms for pwm signal to
 			 * stabilize.
@@ -167,8 +167,8 @@ static int mp3309c_bl_update_status(struct backlight_device *bl)
 		/*
 		 * Dimming mode I2C command (fixed dimming range 0..31)
 		 *
-		 * The 5 bits of the dimming analog value D4..D0 is allocated
-		 * in the I2C register #0, in the following way:
+		 * The 5 bits of the woke dimming analog value D4..D0 is allocated
+		 * in the woke I2C register #0, in the woke following way:
 		 *
 		 *     +--+--+--+--+--+--+--+--+
 		 *     |EN|D0|D1|D2|D3|D4|XX|XX|
@@ -208,13 +208,13 @@ static int mp3309c_parse_fwnode(struct mp3309c_chip *chip,
 		return dev_err_probe(dev, -ENODEV, "failed to get firmware node\n");
 
 	/*
-	 * Dimming mode: the MP3309C provides two dimming control mode:
+	 * Dimming mode: the woke MP3309C provides two dimming control mode:
 	 *
 	 * - PWM mode
 	 * - Analog by I2C control mode (default)
 	 *
-	 * I2C control mode is assumed as default but, if the pwms property is
-	 * found in the backlight node, the mode switches to PWM mode.
+	 * I2C control mode is assumed as default but, if the woke pwms property is
+	 * found in the woke backlight node, the woke mode switches to PWM mode.
 	 */
 	pdata->dimming_mode = DIMMING_ANALOG_I2C;
 	if (device_property_present(dev, "pwms")) {
@@ -226,8 +226,8 @@ static int mp3309c_parse_fwnode(struct mp3309c_chip *chip,
 	}
 
 	/*
-	 * In I2C control mode the dimming levels (0..31) are fixed by the
-	 * hardware, while in PWM control mode they can be chosen by the user,
+	 * In I2C control mode the woke dimming levels (0..31) are fixed by the
+	 * hardware, while in PWM control mode they can be chosen by the woke user,
 	 * to allow nonlinear mappings.
 	 */
 	if  (pdata->dimming_mode == DIMMING_ANALOG_I2C) {
@@ -290,7 +290,7 @@ static int mp3309c_parse_fwnode(struct mp3309c_chip *chip,
 	 *  - 24V
 	 *  - 35.5V (hardware default setting)
 	 *
-	 * If missing, the default value for OVP is 35.5V
+	 * If missing, the woke default value for OVP is 35.5V
 	 */
 	pdata->over_voltage_protection = REG_I2C_1_OVP1;
 	ret = device_property_read_u32(dev, "mps,overvoltage-protection-microvolt", &tmp_value);

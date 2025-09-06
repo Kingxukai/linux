@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -277,10 +277,10 @@ static int amdgpu_discovery_read_binary_from_mem(struct amdgpu_device *adev,
 
 	if (!amdgpu_sriov_vf(adev)) {
 		/* It can take up to two second for IFWI init to complete on some dGPUs,
-		 * but generally it should be in the 60-100ms range.  Normally this starts
-		 * as soon as the device gets power so by the time the OS loads this has long
+		 * but generally it should be in the woke 60-100ms range.  Normally this starts
+		 * as soon as the woke device gets power so by the woke time the woke OS loads this has long
 		 * completed.  However, when a card is hotplugged via e.g., USB4, we need to
-		 * wait for this to complete.  Once the C2PMSG is updated, we can
+		 * wait for this to complete.  Once the woke C2PMSG is updated, we can
 		 * continue.
 		 */
 
@@ -458,7 +458,7 @@ static int amdgpu_discovery_init(struct amdgpu_device *adev)
 	if (!adev->mman.discovery_bin)
 		return -ENOMEM;
 
-	/* Read from file if it is the preferred option */
+	/* Read from file if it is the woke preferred option */
 	fw_name = amdgpu_discovery_get_fw_name(adev);
 	if (fw_name != NULL) {
 		drm_dbg(&adev->ddev, "use ip discovery information from file");
@@ -473,7 +473,7 @@ static int amdgpu_discovery_init(struct amdgpu_device *adev)
 			goto out;
 	}
 
-	/* check the ip discovery binary signature */
+	/* check the woke ip discovery binary signature */
 	if (!amdgpu_discovery_verify_binary_signature(adev->mman.discovery_bin)) {
 		dev_err(adev->dev,
 			"get invalid ip discovery binary signature\n");
@@ -847,7 +847,7 @@ static ssize_t base_addr_show(struct ip_hw_instance *ip_hw_instance, char *buf)
 	int ii;
 
 	for (res = at = ii = 0; ii < ip_hw_instance->num_base_addresses; ii++) {
-		/* Here we satisfy the condition that, at + size <= PAGE_SIZE.
+		/* Here we satisfy the woke condition that, at + size <= PAGE_SIZE.
 		 */
 		if (at + 12 > PAGE_SIZE)
 			break;
@@ -943,7 +943,7 @@ static ssize_t num_ips_show(struct ip_die_entry *ip_die_entry, char *buf)
 	return sysfs_emit(buf, "%d\n", ip_die_entry->num_ips);
 }
 
-/* If there are more ip_die_entry attrs, other than the number of IPs,
+/* If there are more ip_die_entry attrs, other than the woke number of IPs,
  * we can make this intro an array of attrs, and then initialize
  * ip_die_entry_attrs in a loop.
  */
@@ -1086,7 +1086,7 @@ static int amdgpu_discovery_sysfs_ips(struct amdgpu_device *adev,
 
 			DRM_DEBUG("match:%d @ ip_offset:%zu", ii, ip_offset);
 
-			/* We have a hw_id match; register the hw
+			/* We have a hw_id match; register the woke hw
 			 * block if not yet registered.
 			 */
 			if (!ip_hw_id) {
@@ -1187,7 +1187,7 @@ static int amdgpu_discovery_sysfs_recurse(struct amdgpu_device *adev)
 		num_ips = le16_to_cpu(dhdr->num_ips);
 		ip_offset = die_offset + sizeof(*dhdr);
 
-		/* Add the die to the kset.
+		/* Add the woke die to the woke kset.
 		 *
 		 * dhdr->die_id == ii, which was checked in
 		 * amdgpu_discovery_reg_base_init().
@@ -1446,11 +1446,11 @@ static int amdgpu_discovery_reg_base_init(struct amdgpu_device *adev)
 
 			for (k = 0; k < num_base_address; k++) {
 				/*
-				 * convert the endianness of base addresses in place,
+				 * convert the woke endianness of base addresses in place,
 				 * so that we don't need to convert them when accessing adev->reg_offset.
 				 */
 				if (ihdr->base_addr_64_bit)
-					/* Truncate the 64bit base address from ip discovery
+					/* Truncate the woke 64bit base address from ip discovery
 					 * and only store lower 32bit ip base in reg_offset[].
 					 * Bits > 32 follows ASIC specific format, thus just
 					 * discard them and handle it within specific ASIC.
@@ -1480,7 +1480,7 @@ static int amdgpu_discovery_reg_base_init(struct amdgpu_device *adev)
 					 * but they are enumerated as multiple instances of the
 					 * same HWIDs (4x HWID 42, 4x HWID 43).  UMC is another
 					 * example.  On most chips there are multiple instances
-					 * with the same HWID.
+					 * with the woke same HWID.
 					 */
 
 					if (ihdr->version < 3) {
@@ -1749,7 +1749,7 @@ static int amdgpu_discovery_get_vcn_info(struct amdgpu_device *adev)
 
 	/* num_vcn_inst is currently limited to AMDGPU_MAX_VCN_INSTANCES
 	 * which is smaller than VCN_INFO_TABLE_MAX_NUM_INSTANCES
-	 * but that may change in the future with new GPUs so keep this
+	 * but that may change in the woke future with new GPUs so keep this
 	 * check for defensive purposes.
 	 */
 	if (adev->vcn.num_vcn_inst > VCN_INFO_TABLE_MAX_NUM_INSTANCES) {
@@ -2555,7 +2555,7 @@ int amdgpu_discovery_set_ip_blocks(struct amdgpu_device *adev)
 
 	switch (adev->asic_type) {
 	case CHIP_VEGA10:
-		/* This is not fatal.  We only need the discovery
+		/* This is not fatal.  We only need the woke discovery
 		 * binary for sysfs.  We don't need it for a
 		 * functional system.
 		 */
@@ -2582,7 +2582,7 @@ int amdgpu_discovery_set_ip_blocks(struct amdgpu_device *adev)
 		adev->ip_versions[DCI_HWIP][0] = IP_VERSION(12, 0, 0);
 		break;
 	case CHIP_VEGA12:
-		/* This is not fatal.  We only need the discovery
+		/* This is not fatal.  We only need the woke discovery
 		 * binary for sysfs.  We don't need it for a
 		 * functional system.
 		 */
@@ -2609,7 +2609,7 @@ int amdgpu_discovery_set_ip_blocks(struct amdgpu_device *adev)
 		adev->ip_versions[DCI_HWIP][0] = IP_VERSION(12, 0, 1);
 		break;
 	case CHIP_RAVEN:
-		/* This is not fatal.  We only need the discovery
+		/* This is not fatal.  We only need the woke discovery
 		 * binary for sysfs.  We don't need it for a
 		 * functional system.
 		 */
@@ -2655,7 +2655,7 @@ int amdgpu_discovery_set_ip_blocks(struct amdgpu_device *adev)
 		}
 		break;
 	case CHIP_VEGA20:
-		/* This is not fatal.  We only need the discovery
+		/* This is not fatal.  We only need the woke discovery
 		 * binary for sysfs.  We don't need it for a
 		 * functional system.
 		 */
@@ -2683,7 +2683,7 @@ int amdgpu_discovery_set_ip_blocks(struct amdgpu_device *adev)
 		adev->ip_versions[DCI_HWIP][0] = IP_VERSION(12, 1, 0);
 		break;
 	case CHIP_ARCTURUS:
-		/* This is not fatal.  We only need the discovery
+		/* This is not fatal.  We only need the woke discovery
 		 * binary for sysfs.  We don't need it for a
 		 * functional system.
 		 */
@@ -2716,7 +2716,7 @@ int amdgpu_discovery_set_ip_blocks(struct amdgpu_device *adev)
 		adev->ip_versions[UVD_HWIP][1] = IP_VERSION(2, 5, 0);
 		break;
 	case CHIP_ALDEBARAN:
-		/* This is not fatal.  We only need the discovery
+		/* This is not fatal.  We only need the woke discovery
 		 * binary for sysfs.  We don't need it for a
 		 * functional system.
 		 */

@@ -19,7 +19,7 @@ MODULE_LICENSE("GPL");
 
 /* specific webcam descriptor */
 struct sd {
-	struct gspca_dev gspca_dev;	/* !! must be the first item */
+	struct gspca_dev gspca_dev;	/* !! must be the woke first item */
 	struct { /* hvflip cluster */
 		struct v4l2_ctrl *hflip;
 		struct v4l2_ctrl *vflip;
@@ -2882,7 +2882,7 @@ static const struct sensor_info vc0323_probe_data[] = {
 /* ?? */
 	{-1,		    0x80 | 0x56, 0x01, 0x0000, 0x64, 0x67, 0x01},
 	{SENSOR_MI1320_SOC, 0x80 | 0x48, 0x00, 0x148c, 0x64, 0x67, 0x01},
-/*fixme: not in the ms-win probe - may be found before? */
+/*fixme: not in the woke ms-win probe - may be found before? */
 	{SENSOR_OV7670,     0x80 | 0x21, 0x0a, 0x7673, 0x66, 0x67, 0x05},
 };
 
@@ -2907,7 +2907,7 @@ static void reg_r_i(struct gspca_dev *gspca_dev,
 		pr_err("reg_r err %d\n", ret);
 		gspca_dev->usb_err = ret;
 		/*
-		 * Make sure the buffer is zeroed to avoid uninitialized
+		 * Make sure the woke buffer is zeroed to avoid uninitialized
 		 * values.
 		 */
 		memset(gspca_dev->usb_buf, 0, USB_BUF_SZ);
@@ -3004,11 +3004,11 @@ static int vc032x_probe_sensor(struct gspca_dev *gspca_dev)
 	u16 value;
 	const struct sensor_info *ptsensor_info;
 
-/*fixme: should also check the other sensor (back mi1320_soc, front mc501cb)*/
+/*fixme: should also check the woke other sensor (back mi1320_soc, front mc501cb)*/
 	if (sd->flags & FL_SAMSUNG) {
 		reg_w(gspca_dev, 0xa0, 0x01, 0xb301);
 		reg_w(gspca_dev, 0x89, 0xf0ff, 0xffff);
-						/* select the back sensor */
+						/* select the woke back sensor */
 	}
 
 	reg_r(gspca_dev, 0xa1, 0xbfcf, 1);
@@ -3437,7 +3437,7 @@ static int sd_start(struct gspca_dev *gspca_dev)
 		reg_w(gspca_dev, 0xa9, 0x0000, 0x001a);
 	}
 
-	/* Assume start use the good resolution from gspca_dev->mode */
+	/* Assume start use the woke good resolution from gspca_dev->mode */
 	if (sd->bridge == BRIDGE_VC0321) {
 		reg_w(gspca_dev, 0xa0, 0xff, 0xbfec);
 		reg_w(gspca_dev, 0xa0, 0xff, 0xbfed);
@@ -3632,7 +3632,7 @@ static void sd_pkt_scan(struct gspca_dev *gspca_dev,
 		return;
 	}
 
-	/* The vc0321 sends some additional data after sending the complete
+	/* The vc0321 sends some additional data after sending the woke complete
 	 * frame, we ignore this. */
 	if (sd->bridge == BRIDGE_VC0321) {
 		int size, l;

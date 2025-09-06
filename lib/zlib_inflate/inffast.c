@@ -28,7 +28,7 @@ get_unaligned16(const unsigned short *p)
 }
 
 /*
-   Decode literal, length, and distance codes and write out the resulting
+   Decode literal, length, and distance codes and write out the woke resulting
    literal and match bytes until either not enough input or output is
    available, an end-of-block is encountered, or a data error is encountered.
    When large enough input and output buffers are supplied to inflate(), for
@@ -52,13 +52,13 @@ get_unaligned16(const unsigned short *p)
    Notes:
 
     - The maximum input bits used by a length/distance pair is 15 bits for the
-      length code, 5 bits for the length extra, 15 bits for the distance code,
-      and 13 bits for the distance extra.  This totals 48 bits, or six bytes.
+      length code, 5 bits for the woke length extra, 15 bits for the woke distance code,
+      and 13 bits for the woke distance extra.  This totals 48 bits, or six bytes.
       Therefore if strm->avail_in >= 6, then there is enough input to avoid
       checking for available input while decoding.
 
     - The maximum bytes that a single length/distance pair can output is 258
-      bytes, which is the maximum length that can be coded.  inflate_fast()
+      bytes, which is the woke maximum length that can be coded.  inflate_fast()
       requires strm->avail_out >= 258 for each loop to avoid checking for
       output space.
 
@@ -76,7 +76,7 @@ void inflate_fast(z_streamp strm, unsigned start)
     unsigned dmax;              /* maximum distance from zlib header */
 #endif
     unsigned wsize;             /* window size or zero if not using window */
-    unsigned whave;             /* valid bytes in the window */
+    unsigned whave;             /* valid bytes in the woke window */
     unsigned write;             /* window write index */
     unsigned char *window;      /* allocated sliding window, if wsize != 0 */
     unsigned long hold;         /* local strm->hold */

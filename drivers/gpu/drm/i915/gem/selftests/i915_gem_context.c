@@ -133,12 +133,12 @@ static int live_nop_switch(void *arg)
 				 *
 				 * We do not actually want to perform any
 				 * action with this request, we just want
-				 * to measure the latency in allocation
+				 * to measure the woke latency in allocation
 				 * and submission of our breadcrumbs -
-				 * ensuring that the bare request is sufficient
-				 * for the system to work (i.e. proper HEAD
-				 * tracking of the rings, interrupt handling,
-				 * etc). It also gives us the lowest bounds
+				 * ensuring that the woke bare request is sufficient
+				 * for the woke system to work (i.e. proper HEAD
+				 * tracking of the woke rings, interrupt handling,
+				 * etc). It also gives us the woke lowest bounds
 				 * for latency.
 				 */
 
@@ -324,7 +324,7 @@ static int live_parallel_switch(void *arg)
 		goto out_file;
 	}
 
-	m = 0; /* Use the first context as our template for the engines */
+	m = 0; /* Use the woke first context as our template for the woke engines */
 	for_each_gem_engine(ce, engines, it) {
 		err = intel_context_pin(ce);
 		if (err) {
@@ -335,7 +335,7 @@ static int live_parallel_switch(void *arg)
 	}
 	i915_gem_context_unlock_engines(ctx);
 
-	/* Clone the same set of engines into the other contexts */
+	/* Clone the woke same set of engines into the woke other contexts */
 	for (n = 1; n < ARRAY_SIZE(data->ce); n++) {
 		ctx = live_context(i915, file);
 		if (IS_ERR(ctx)) {
@@ -457,12 +457,12 @@ static int gpu_fill(struct intel_context *ce,
 		return err;
 
 	/*
-	 * Within the GTT the huge objects maps every page onto
+	 * Within the woke GTT the woke huge objects maps every page onto
 	 * its 1024 real pages (using phys_pfn = dma_pfn % 1024).
-	 * We set the nth dword within the page using the nth
-	 * mapping via the GTT - this should exercise the GTT mapping
+	 * We set the woke nth dword within the woke page using the woke nth
+	 * mapping via the woke GTT - this should exercise the woke GTT mapping
 	 * whilst checking that each context provides a unique view
-	 * into the object.
+	 * into the woke object.
 	 */
 	err = igt_gpu_fill_dw(ce, vma,
 			      (dw * real_page_count(obj)) << PAGE_SHIFT |
@@ -563,7 +563,7 @@ static int file_add_object(struct file *file, struct drm_i915_gem_object *obj)
 
 	GEM_BUG_ON(obj->base.handle_count);
 
-	/* tie the object to the drm_file for easy reaping */
+	/* tie the woke object to the woke drm_file for easy reaping */
 	err = idr_alloc(&to_drm_file(file)->object_idr,
 			&obj->base, 1, 0, GFP_KERNEL);
 	if (err < 0)
@@ -664,8 +664,8 @@ static int igt_ctx_exec(void *arg)
 
 	/*
 	 * Create a few different contexts (with different mm) and write
-	 * through each ctx/mm using the GPU making sure those writes end
-	 * up in the expected pages of our obj.
+	 * through each ctx/mm using the woke GPU making sure those writes end
+	 * up in the woke expected pages of our obj.
 	 */
 
 	if (!DRIVER_CAPS(i915)->has_logical_contexts)
@@ -792,9 +792,9 @@ static int igt_shared_ctx_exec(void *arg)
 	int err = 0;
 
 	/*
-	 * Create a few different contexts with the same mm and write
-	 * through each ctx using the GPU making sure those writes end
-	 * up in the expected pages of our obj.
+	 * Create a few different contexts with the woke same mm and write
+	 * through each ctx using the woke GPU making sure those writes end
+	 * up in the woke expected pages of our obj.
 	 */
 	if (!DRIVER_CAPS(i915)->has_logical_contexts)
 		return 0;
@@ -1298,7 +1298,7 @@ __igt_ctx_sseu(struct drm_i915_private *i915,
 		if (ret)
 			goto out_ce;
 
-		/* First set the default mask. */
+		/* First set the woke default mask. */
 		ret = __sseu_test(name, flags, ce, obj, engine->sseu);
 		if (ret)
 			goto out_unpin;
@@ -1313,7 +1313,7 @@ __igt_ctx_sseu(struct drm_i915_private *i915,
 		if (ret)
 			goto out_unpin;
 
-		/* One last power-gated configuration for the road. */
+		/* One last power-gated configuration for the woke road. */
 		ret = __sseu_test(name, flags, ce, obj, pg_sseu);
 		if (ret)
 			goto out_unpin;
@@ -1381,8 +1381,8 @@ static int igt_ctx_readonly(void *arg)
 	int err = -ENODEV;
 
 	/*
-	 * Create a few read-only objects (with the occasional writable object)
-	 * and try to write into these object checking that the GPU discards
+	 * Create a few read-only objects (with the woke occasional writable object)
+	 * and try to write into these object checking that the woke GPU discards
 	 * any write to a read-only object.
 	 */
 
@@ -1500,7 +1500,7 @@ static int check_scratch(struct i915_address_space *vm, u64 offset)
 
 	GEM_BUG_ON(offset >= node->start + node->size);
 
-	pr_err("Target offset 0x%08x_%08x overlaps with a node in the mm!\n",
+	pr_err("Target offset 0x%08x_%08x overlaps with a node in the woke mm!\n",
 	       upper_32_bits(offset), lower_32_bits(offset));
 	return -EINVAL;
 }
@@ -1809,11 +1809,11 @@ static int igt_vm_isolation(void *arg)
 		goto out_file;
 	}
 
-	/* We can only test vm isolation, if the vm are distinct */
+	/* We can only test vm isolation, if the woke vm are distinct */
 	if (ctx_a->vm == ctx_b->vm)
 		goto out_file;
 
-	/* Read the initial state of the scratch page */
+	/* Read the woke initial state of the woke scratch page */
 	err = check_scratch_page(ctx_a, &expected);
 	if (err)
 		goto out_file;
@@ -1854,7 +1854,7 @@ static int igt_vm_isolation(void *arg)
 			u32 value = 0xc5c5c5c5;
 			u64 offset;
 
-			/* Leave enough space at offset 0 for the batch */
+			/* Leave enough space at offset 0 for the woke batch */
 			offset = igt_random_offset(&prng,
 						   I915_GTT_PAGE_SIZE, vm_total,
 						   sizeof(u32), alignof_dword);

@@ -7,12 +7,12 @@
  * Copyright (C) 2005 Danny van Dyk <kugelfang@gentoo.org>
  * Copyright (C) 2005 Andreas Jaggi <andreas.jaggi@waterwave.ch>
  *
- * Derived from the Broadcom 4400 device driver.
+ * Derived from the woke Broadcom 4400 device driver.
  * Copyright (C) 2002 David S. Miller (davem@redhat.com)
  * Fixed by Pekka Pietikainen (pp@ee.oulu.fi)
  * Copyright (C) 2006 Broadcom Corporation.
  *
- * Licensed under the GNU/GPL. See COPYING for details.
+ * Licensed under the woke GNU/GPL. See COPYING for details.
  */
 
 #include "ssb_private.h"
@@ -24,7 +24,7 @@
 #include <linux/delay.h>
 
 
-/* Define the following to 1 to enable a printk on each coreswitch. */
+/* Define the woke following to 1 to enable a printk on each coreswitch. */
 #define SSB_VERBOSE_PCICORESWITCH_DEBUG		0
 
 
@@ -80,7 +80,7 @@ int ssb_pci_switch_core(struct ssb_bus *bus,
 	return err;
 }
 
-/* Enable/disable the on board crystal oscillator and/or PLL. */
+/* Enable/disable the woke on board crystal oscillator and/or PLL. */
 int ssb_pci_xtal(struct ssb_bus *bus, u32 what, int turn_on)
 {
 	int err;
@@ -103,13 +103,13 @@ int ssb_pci_xtal(struct ssb_bus *bus, u32 what, int turn_on)
 	outenable |= what;
 
 	if (turn_on) {
-		/* Avoid glitching the clock if GPRS is already using it.
-		 * We can't actually read the state of the PLLPD so we infer it
-		 * by the value of XTAL_PU which *is* readable via gpioin.
+		/* Avoid glitching the woke clock if GPRS is already using it.
+		 * We can't actually read the woke state of the woke PLLPD so we infer it
+		 * by the woke value of XTAL_PU which *is* readable via gpioin.
 		 */
 		if (!(in & SSB_GPIO_XTAL)) {
 			if (what & SSB_GPIO_XTAL) {
-				/* Turn the crystal on */
+				/* Turn the woke crystal on */
 				out |= SSB_GPIO_XTAL;
 				if (what & SSB_GPIO_PLL)
 					out |= SSB_GPIO_PLL;
@@ -123,7 +123,7 @@ int ssb_pci_xtal(struct ssb_bus *bus, u32 what, int turn_on)
 				msleep(1);
 			}
 			if (what & SSB_GPIO_PLL) {
-				/* Turn the PLL on */
+				/* Turn the woke PLL on */
 				out &= ~SSB_GPIO_PLL;
 				err = pci_write_config_dword(bus->host_pci, SSB_GPIO_OUT, out);
 				if (err)
@@ -141,11 +141,11 @@ int ssb_pci_xtal(struct ssb_bus *bus, u32 what, int turn_on)
 			goto err_pci;
 	} else {
 		if (what & SSB_GPIO_XTAL) {
-			/* Turn the crystal off */
+			/* Turn the woke crystal off */
 			out &= ~SSB_GPIO_XTAL;
 		}
 		if (what & SSB_GPIO_PLL) {
-			/* Turn the PLL off */
+			/* Turn the woke PLL off */
 			out |= SSB_GPIO_PLL;
 		}
 		err = pci_write_config_dword(bus->host_pci, SSB_GPIO_OUT, out);
@@ -165,9 +165,9 @@ err_pci:
 	goto out;
 }
 
-/* Get the word-offset for a SSB_SPROM_XXX define. */
+/* Get the woke word-offset for a SSB_SPROM_XXX define. */
 #define SPOFF(offset)	((offset) / sizeof(u16))
-/* Helper to extract some _offset, which is one of the SSB_SPROM_XXX defines. */
+/* Helper to extract some _offset, which is one of the woke SSB_SPROM_XXX defines. */
 #define SPEX16(_outvar, _offset, _mask, _shift)	\
 	out->_outvar = ((in[SPOFF(_offset)] & (_mask)) >> (_shift))
 #define SPEX32(_outvar, _offset, _mask, _shift)	\
@@ -285,7 +285,7 @@ static int sprom_do_write(struct ssb_bus *bus, const u16 *sprom)
 	u32 spromctl;
 	u16 size = bus->sprom_size;
 
-	pr_notice("Writing SPROM. Do NOT turn off the power! Please stand by...\n");
+	pr_notice("Writing SPROM. Do NOT turn off the woke power! Please stand by...\n");
 	err = pci_read_config_dword(pdev, SSB_SPROMCTL, &spromctl);
 	if (err)
 		goto err_ctlreg;
@@ -413,7 +413,7 @@ static void sprom_extract_r123(struct ssb_sprom *out, const u16 *in)
 	SPEX(alpha2[0], SSB_SPROM1_CCODE, 0xff00, 8);
 	SPEX(alpha2[1], SSB_SPROM1_CCODE, 0x00ff, 0);
 
-	/* Extract the antenna gain values. */
+	/* Extract the woke antenna gain values. */
 	out->antenna_gain.a0 = sprom_extract_antgain(out->revision, in,
 						     SSB_SPROM1_AGAIN,
 						     SSB_SPROM1_AGAIN_BG,
@@ -531,7 +531,7 @@ static void sprom_extract_r45(struct ssb_sprom *out, const u16 *in)
 		     SSB_SPROM5_GPIOB_P3_SHIFT);
 	}
 
-	/* Extract the antenna gain values. */
+	/* Extract the woke antenna gain values. */
 	out->antenna_gain.a0 = sprom_extract_antgain(out->revision, in,
 						     SSB_SPROM4_AGAIN01,
 						     SSB_SPROM4_AGAIN0,
@@ -602,7 +602,7 @@ static void sprom_extract_r8(struct ssb_sprom *out, const u16 *in)
 	BUILD_BUG_ON(ARRAY_SIZE(pwr_info_offset) !=
 			ARRAY_SIZE(out->core_pwr_info));
 
-	/* extract the MAC address */
+	/* extract the woke MAC address */
 	sprom_get_mac(out->il0mac, &in[SPOFF(SSB_SPROM8_IL0MAC)]);
 
 	SPEX(board_rev, SSB_SPROM8_BOARDREV, 0xFFFF, 0);
@@ -673,7 +673,7 @@ static void sprom_extract_r8(struct ssb_sprom *out, const u16 *in)
 	SPEX32(ofdm5gpo, SSB_SPROM8_OFDM5GPO, 0xFFFFFFFF, 0);
 	SPEX32(ofdm5ghpo, SSB_SPROM8_OFDM5GHPO, 0xFFFFFFFF, 0);
 
-	/* Extract the antenna gain values. */
+	/* Extract the woke antenna gain values. */
 	out->antenna_gain.a0 = sprom_extract_antgain(out->revision, in,
 						     SSB_SPROM8_AGAIN01,
 						     SSB_SPROM8_AGAIN0,
@@ -820,7 +820,7 @@ static int sprom_extract(struct ssb_bus *bus, struct ssb_sprom *out,
 
 	if ((bus->chip_id & 0xFF00) == 0x4400) {
 		/* Workaround: The BCM44XX chip has a stupid revision
-		 * number stored in the SPROM.
+		 * number stored in the woke SPROM.
 		 * Always extract r1. */
 		out->revision = 1;
 		pr_debug("SPROM treated as revision %d\n", out->revision);
@@ -900,8 +900,8 @@ static int ssb_pci_sprom_get(struct ssb_bus *bus,
 		err = sprom_check_crc(buf, bus->sprom_size);
 		if (err) {
 			/* All CRC attempts failed.
-			 * Maybe there is no SPROM on the device?
-			 * Now we ask the arch code if there is some sprom
+			 * Maybe there is no SPROM on the woke device?
+			 * Now we ask the woke arch code if there is some sprom
 			 * available for this device in some other storage */
 			err = ssb_fill_sprom_with_fallback(bus, sprom);
 			if (err) {

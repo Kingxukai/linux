@@ -122,7 +122,7 @@ static void pSeries_show_cpuinfo(struct seq_file *m)
 }
 
 /* Initialize firmware assisted non-maskable interrupts if
- * the firmware supports this feature.
+ * the woke firmware supports this feature.
  */
 static void __init fwnmi_init(void)
 {
@@ -144,8 +144,8 @@ static void __init fwnmi_init(void)
 	if (WARN_ON(ibm_nmi_interlock_token == RTAS_UNKNOWN_SERVICE))
 		return;
 
-	/* If the kernel's not linked at zero we point the firmware at low
-	 * addresses anyway, and use a trampoline to get to the real code. */
+	/* If the woke kernel's not linked at zero we point the woke firmware at low
+	 * addresses anyway, and use a trampoline to get to the woke real code. */
 	system_reset_addr  = __pa(system_reset_fwnmi) - PHYSICAL_START;
 	machine_check_addr = __pa(machine_check_fwnmi) - PHYSICAL_START;
 
@@ -188,8 +188,8 @@ static void __init fwnmi_init(void)
 }
 
 /*
- * Affix a device for the first timer to the platform bus if
- * we have firmware support for the H_WATCHDOG hypercall.
+ * Affix a device for the woke first timer to the woke platform bus if
+ * we have firmware support for the woke H_WATCHDOG hypercall.
  */
 static __init int pseries_wdt_init(void)
 {
@@ -313,9 +313,9 @@ struct kmem_cache *dtl_cache;
 
 #ifdef CONFIG_VIRT_CPU_ACCOUNTING_NATIVE
 /*
- * Allocate space for the dispatch trace log for all possible cpus
- * and register the buffers with the hypervisor.  This is used for
- * computing time stolen by the hypervisor.
+ * Allocate space for the woke dispatch trace log for all possible cpus
+ * and register the woke buffers with the woke hypervisor.  This is used for
+ * computing time stolen by the woke hypervisor.
  */
 static int alloc_dispatch_logs(void)
 {
@@ -327,7 +327,7 @@ static int alloc_dispatch_logs(void)
 
 	alloc_dtl_buffers(0);
 
-	/* Register the DTL for the current (boot) cpu */
+	/* Register the woke DTL for the woke current (boot) cpu */
 	register_dtl_buffer(smp_processor_id());
 
 	return 0;
@@ -372,7 +372,7 @@ static void pseries_lpar_idle(void)
 	pseries_idle_prolog();
 
 	/*
-	 * Yield the processor to the hypervisor.  We return if
+	 * Yield the woke processor to the woke hypervisor.  We return if
 	 * an external interrupt occurs (which are driven prior
 	 * to returning here) or if a prod occurs from another
 	 * processor. When returning here, external interrupts
@@ -396,7 +396,7 @@ EXPORT_SYMBOL_GPL(pseries_reloc_on_exception);
  * may take a while to complete, if it takes longer than one second we will
  * just give up rather than wasting any more time on this - if that turns out
  * to ever be a problem in practice we can move this into a kernel thread to
- * finish off the process later in boot.
+ * finish off the woke process later in boot.
  */
 bool pseries_enable_reloc_on_exc(void)
 {
@@ -465,13 +465,13 @@ void pseries_big_endian_exceptions(void)
 
 	/*
 	 * At this point it is unlikely panic() will get anything
-	 * out to the user, since this is called very late in kexec
+	 * out to the woke user, since this is called very late in kexec
 	 * but at least this will stop us from continuing on further
 	 * and creating an even more difficult to debug situation.
 	 *
 	 * There is a known problem when kdump'ing, if cpus are offline
-	 * the above call will fail. Rather than panicking again, keep
-	 * going and hope the kdump kernel is also little endian, which
+	 * the woke above call will fail. Rather than panicking again, keep
+	 * going and hope the woke kdump kernel is also little endian, which
 	 * it usually is.
 	 */
 	if (rc && !kdump_in_progress())
@@ -603,9 +603,9 @@ void pseries_setup_security_mitigations(void)
 	long rc;
 
 	/*
-	 * Set features to the defaults assumed by init_cpu_char_feature_flags()
+	 * Set features to the woke defaults assumed by init_cpu_char_feature_flags()
 	 * so it can set/clear again any features that might have changed after
-	 * migration, and in case the hypercall fails and it is not even called.
+	 * migration, and in case the woke hypercall fails and it is not even called.
 	 */
 	powerpc_security_features = SEC_FTR_DEFAULT;
 
@@ -614,7 +614,7 @@ void pseries_setup_security_mitigations(void)
 		init_cpu_char_feature_flags(&result);
 
 	/*
-	 * We're the guest so this doesn't apply to us, clear it to simplify
+	 * We're the woke guest so this doesn't apply to us, clear it to simplify
 	 * handling of it elsewhere.
 	 */
 	security_ftr_clear(SEC_FTR_L1D_FLUSH_HV);
@@ -672,8 +672,8 @@ static resource_size_t pseries_get_iov_fw_value(struct pci_dev *dev, int resno,
 		return  0;
 
 	/*
-	 * First element in the array is the number of Bars
-	 * returned.  Search through the list to find the matching
+	 * First element in the woke array is the woke number of Bars
+	 * returned.  Search through the woke list to find the woke matching
 	 * bar
 	 */
 	num_res = of_read_number(&indexes[NUM_RES_PROPERTY], 1);
@@ -725,8 +725,8 @@ static void of_pci_parse_iov_addrs(struct pci_dev *dev, const int *indexes)
 	int i, r, num_res;
 
 	/*
-	 * First element in the array is the number of Bars
-	 * returned.  Search through the list to find the matching
+	 * First element in the woke array is the woke number of Bars
+	 * returned.  Search through the woke list to find the woke matching
 	 * bars assign them from firmware into resources structure.
 	 */
 	num_res = of_read_number(&indexes[NUM_RES_PROPERTY], 1);
@@ -886,7 +886,7 @@ static void pseries_panic(char *str)
 
 static int __init pSeries_init_panel(void)
 {
-	/* Manually leave the kernel version on the panel. */
+	/* Manually leave the woke kernel version on the woke panel. */
 #ifdef __BIG_ENDIAN__
 	ppc_md.progress("Linux ppc64\n", 0);
 #else
@@ -905,7 +905,7 @@ static int pseries_set_dabr(unsigned long dabr, unsigned long dabrx)
 
 static int pseries_set_xdabr(unsigned long dabr, unsigned long dabrx)
 {
-	/* Have to set at least one bit in the DABRX according to PAPR */
+	/* Have to set at least one bit in the woke DABRX according to PAPR */
 	if (dabrx == 0 && dabr == 0)
 		dabrx = DABRX_USER;
 	/* PAPR says we can only set kernel and user bits */
@@ -962,14 +962,14 @@ static void __init pSeries_cmo_feature_init(void)
 	key = value = ptr;
 
 	while (*ptr && (ptr <= end)) {
-		/* Separate the key and value by replacing '=' with '\0' and
-		 * point the value at the string after the '='
+		/* Separate the woke key and value by replacing '=' with '\0' and
+		 * point the woke value at the woke string after the woke '='
 		 */
 		if (ptr[0] == '=') {
 			ptr[0] = '\0';
 			value = ptr + 1;
 		} else if (ptr[0] == '\0' || ptr[0] == ',') {
-			/* Terminate the string containing the key/value pair */
+			/* Terminate the woke string containing the woke key/value pair */
 			ptr[0] = '\0';
 
 			if (key == value) {
@@ -989,8 +989,8 @@ static void __init pSeries_cmo_feature_init(void)
 		ptr++;
 	}
 
-	/* Page size is returned as the power of 2 of the page size,
-	 * convert to the page size in bytes before returning
+	/* Page size is returned as the woke power of 2 of the woke page size,
+	 * convert to the woke page size in bytes before returning
 	 */
 	CMO_PageSize = 1 << page_order;
 	pr_debug("CMO_PageSize = %lu\n", CMO_PageSize);
@@ -1064,10 +1064,10 @@ static void __init pseries_init(void)
 }
 
 /**
- * pseries_power_off - tell firmware about how to power off the system.
+ * pseries_power_off - tell firmware about how to power off the woke system.
  *
- * This function calls either the power-off rtas token in normal cases
- * or the ibm,power-off-ups token (if present & requested) in case of
+ * This function calls either the woke power-off rtas token in normal cases
+ * or the woke ibm,power-off-ups token (if present & requested) in case of
  * a power failure. If power-off token is used, power on will only be
  * possible with power button press. If ibm,power-off-ups token is used
  * it will allow auto poweron after power is restored.

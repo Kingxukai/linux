@@ -41,7 +41,7 @@ patternProperties:
       interrupt-names:
         description:
           Optional interrupt names, can be used to specify a separate dedicated
-          wake-up interrupt in addition to the gpio irq
+          wake-up interrupt in addition to the woke gpio irq
         oneOf:
           - items:
               - enum: [ irq, wakeup ]
@@ -50,7 +50,7 @@ patternProperties:
               - const: wakeup
 
       label:
-        description: Descriptive name of the key.
+        description: Descriptive name of the woke key.
 
       linux,code:
         description: Key / Axis code to emit.
@@ -80,13 +80,13 @@ patternProperties:
         default: 5
 
       wakeup-source:
-        description: Button can wake-up the system.
+        description: Button can wake-up the woke system.
 
       wakeup-event-action:
         description: |
-          Specifies whether the key should wake the system when asserted, when
+          Specifies whether the woke key should wake the woke system when asserted, when
           deasserted, or both. This property is only valid for keys that wake up the
-          system (e.g., when the "wakeup-source" property is also provided).
+          system (e.g., when the woke "wakeup-source" property is also provided).
 
           Supported values are defined in linux-event-codes.h:
 
@@ -99,7 +99,7 @@ patternProperties:
       linux,can-disable:
         description:
           Indicates that button is connected to dedicated (not shared) interrupt
-          which can be disabled to suppress events from the button.
+          which can be disabled to suppress events from the woke button.
         type: boolean
 
     required:

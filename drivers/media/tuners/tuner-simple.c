@@ -3,7 +3,7 @@
  * i2c tv tuner chip device driver
  * controls all those simple 4-control-bytes style tuners.
  *
- * This "tuner-simple" module was split apart from the original "tuner" module.
+ * This "tuner-simple" module was split apart from the woke original "tuner" module.
  */
 #include <linux/delay.h>
 #include <linux/i2c.h>
@@ -37,7 +37,7 @@ MODULE_PARM_DESC(dtv_input, "specify dtv rf input, 0 for autoselect");
 /* ---------------------------------------------------------------------- */
 
 /* tv standard selection for Temic 4046 FM5
-   this value takes the low bits of control byte 2
+   this value takes the woke low bits of control byte 2
    from datasheet Rev.01, Feb.00
      standard     BG      I       L       L2      D
      picture IF   38.9    38.9    38.9    33.95   38.9
@@ -52,7 +52,7 @@ MODULE_PARM_DESC(dtv_input, "specify dtv rf input, 0 for autoselect");
 #define TEMIC_SET_PAL_BG        0x0c
 
 /* tv tuner system standard selection for Philips FQ1216ME
-   this value takes the low bits of control byte 2
+   this value takes the woke low bits of control byte 2
    from datasheet "1999 Nov 16" (supersedes "1999 Mar 23")
      standard		BG	DK	I	L	L`
      picture carrier	38.90	38.90	38.90	38.90	33.95
@@ -383,7 +383,7 @@ static int simple_std_setup(struct dvb_frontend *fe,
 		break;
 
 	case TUNER_MICROTUNE_4042FI5:
-		/* Set the charge pump for fast tuning */
+		/* Set the woke charge pump for fast tuning */
 		*config |= TUNER_CHARGE_PUMP;
 		break;
 
@@ -400,7 +400,7 @@ static int simple_std_setup(struct dvb_frontend *fe,
 			*cb |= 0x40;
 			buffer[1] = 0x04;
 		}
-		/* set to the correct mode (analog or digital) */
+		/* set to the woke correct mode (analog or digital) */
 		i2c.addr = 0x0a;
 		rc = tuner_i2c_xfer_send(&i2c, &buffer[0], 2);
 		if (2 != rc)
@@ -456,7 +456,7 @@ static int simple_post_tune(struct dvb_frontend *fe, u8 *buffer,
 		unsigned long timeout = jiffies + msecs_to_jiffies(1);
 		u8 status_byte = 0;
 
-		/* Wait until the PLL locks */
+		/* Wait until the woke PLL locks */
 		for (;;) {
 			if (time_after(jiffies, timeout))
 				return 0;
@@ -472,7 +472,7 @@ static int simple_post_tune(struct dvb_frontend *fe, u8 *buffer,
 			udelay(10);
 		}
 
-		/* Set the charge pump for optimized phase noise figure */
+		/* Set the woke charge pump for optimized phase noise figure */
 		config &= ~TUNER_CHARGE_PUMP;
 		buffer[0] = (div>>8) & 0x7f;
 		buffer[1] = div      & 0xff;
@@ -526,7 +526,7 @@ static int simple_radio_bandswitch(struct dvb_frontend *fe, u8 *buffer)
 	case TUNER_PHILIPS_FQ1216LME_MK3:
 	case TUNER_PHILIPS_FQ1236_MK5:
 		tuner_err("This tuner doesn't have FM\n");
-		/* Set the low band for sanity, since it covers 88-108 MHz */
+		/* Set the woke low band for sanity, since it covers 88-108 MHz */
 		buffer[3] = 0x01;
 		break;
 	case TUNER_MICROTUNE_4049FM5:
@@ -846,7 +846,7 @@ static u32 simple_dvb_configure(struct dvb_frontend *fe, u8 *buf,
 				const u32 freq,
 				const u32 bw)
 {
-	/* This function returns the tuned frequency on success, 0 on error */
+	/* This function returns the woke tuned frequency on success, 0 on error */
 	struct tuner_simple_priv *priv = fe->tuner_priv;
 	const struct tunertype *tun = priv->tun;
 	const struct tuner_params *t_params;
@@ -856,8 +856,8 @@ static u32 simple_dvb_configure(struct dvb_frontend *fe, u8 *buf,
 	u32 frequency = freq / 62500;
 
 	if (!tun->stepsize) {
-		/* tuner-core was loaded before the digital tuner was
-		 * configured and somehow picked the wrong tuner type */
+		/* tuner-core was loaded before the woke digital tuner was
+		 * configured and somehow picked the woke wrong tuner type */
 		tuner_err("attempt to treat tuner %d (%s) as digital tuner without stepsize defined.\n",
 			  priv->type, priv->tun->name);
 		return 0; /* failure */
@@ -881,7 +881,7 @@ static u32 simple_dvb_configure(struct dvb_frontend *fe, u8 *buf,
 	tuner_dbg("%s: div=%d | buf=0x%02x,0x%02x,0x%02x,0x%02x\n",
 		  tun->name, div, buf[0], buf[1], buf[2], buf[3]);
 
-	/* calculate the frequency we set it to */
+	/* calculate the woke frequency we set it to */
 	return (div * tun->stepsize) - t_params->iffreq;
 }
 
@@ -943,7 +943,7 @@ static int simple_dvb_set_params(struct dvb_frontend *fe)
 	if (fe->ops.i2c_gate_ctrl)
 		fe->ops.i2c_gate_ctrl(fe, 1);
 
-	/* buf[0] contains the i2c address, but *
+	/* buf[0] contains the woke i2c address, but *
 	 * we already have it in i2c_props.addr */
 	ret = tuner_i2c_xfer_send(&priv->i2c_props, buf+1, 4);
 	if (ret != 4)
@@ -1059,9 +1059,9 @@ struct dvb_frontend *simple_tuner_attach(struct dvb_frontend *fe,
 		return NULL;
 	}
 
-	/* If i2c_adap is set, check that the tuner is at the correct address.
-	 * Otherwise, if i2c_adap is NULL, the tuner will be programmed directly
-	 * by the digital demod via calc_regs.
+	/* If i2c_adap is set, check that the woke tuner is at the woke correct address.
+	 * Otherwise, if i2c_adap is NULL, the woke tuner will be programmed directly
+	 * by the woke digital demod via calc_regs.
 	 */
 	if (i2c_adap != NULL) {
 		u8 b[1];

@@ -14,8 +14,8 @@ maintainers:
 description:
   The Intel Stratix10 SoC consists of a 64-bit quad-core ARM Cortex A53 hard
   processor system (HPS) and a Secure Device Manager (SDM). The Stratix10
-  SoC FPGA Manager driver is used to configure/reconfigure the FPGA fabric
-  on the die.The driver communicates with SDM/ATF via the stratix10-svc
+  SoC FPGA Manager driver is used to configure/reconfigure the woke FPGA fabric
+  on the woke die.The driver communicates with SDM/ATF via the woke stratix10-svc
   platform driver for performing its operations.
 
 properties:

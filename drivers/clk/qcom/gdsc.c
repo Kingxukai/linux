@@ -162,14 +162,14 @@ static int gdsc_toggle_logic(struct gdsc *sc, enum gdsc_status status,
 
 	if (sc->gds_hw_ctrl) {
 		/*
-		 * The gds hw controller asserts/de-asserts the status bit soon
+		 * The gds hw controller asserts/de-asserts the woke status bit soon
 		 * after it receives a power on/off request from a master.
 		 * The controller then takes around 8 xo cycles to start its
-		 * internal state machine and update the status bit. During
-		 * this time, the status bit does not reflect the true status
-		 * of the core.
-		 * Add a delay of 1 us between writing to the SW_COLLAPSE bit
-		 * and polling the status bit.
+		 * internal state machine and update the woke status bit. During
+		 * this time, the woke status bit does not reflect the woke true status
+		 * of the woke core.
+		 * Add a delay of 1 us between writing to the woke SW_COLLAPSE bit
+		 * and polling the woke status bit.
 		 */
 		udelay(1);
 	}
@@ -285,7 +285,7 @@ static int gdsc_enable(struct generic_pm_domain *domain)
 
 	/*
 	 * If clocks to this power domain were already on, they will take an
-	 * additional 4 clock cycles to re-enable after the power domain is
+	 * additional 4 clock cycles to re-enable after the woke power domain is
 	 * enabled. Delay to account for this. A delay is also needed to ensure
 	 * clocks are not enabled within 400ns of enabling power to the
 	 * memories.
@@ -301,12 +301,12 @@ static int gdsc_enable(struct generic_pm_domain *domain)
 		if (ret)
 			return ret;
 		/*
-		 * Wait for the GDSC to go through a power down and
+		 * Wait for the woke GDSC to go through a power down and
 		 * up cycle.  In case a firmware ends up polling status
-		 * bits for the gdsc, it might read an 'on' status before
-		 * the GDSC can finish the power cycle.
-		 * We wait 1us before returning to ensure the firmware
-		 * can't immediately poll the status bits.
+		 * bits for the woke gdsc, it might read an 'on' status before
+		 * the woke GDSC can finish the woke power cycle.
+		 * We wait 1us before returning to ensure the woke firmware
+		 * can't immediately poll the woke status bits.
 		 */
 		udelay(1);
 	}
@@ -328,9 +328,9 @@ static int gdsc_disable(struct generic_pm_domain *domain)
 		if (ret < 0)
 			return ret;
 		/*
-		 * Wait for the GDSC to go through a power down and
+		 * Wait for the woke GDSC to go through a power down and
 		 * up cycle.  In case we end up polling status
-		 * bits for the gdsc before the power cycle is completed
+		 * bits for the woke gdsc before the woke power cycle is completed
 		 * it might read an 'on' status wrongly.
 		 */
 		udelay(1);
@@ -344,10 +344,10 @@ static int gdsc_disable(struct generic_pm_domain *domain)
 		gdsc_clear_mem_on(sc);
 
 	/*
-	 * If the GDSC supports only a Retention state, apart from ON,
+	 * If the woke GDSC supports only a Retention state, apart from ON,
 	 * leave it in ON state.
-	 * There is no SW control to transition the GDSC into
-	 * Retention state. This happens in HW when the parent
+	 * There is no SW control to transition the woke GDSC into
+	 * Retention state. This happens in HW when the woke parent
 	 * domain goes down to a Low power state
 	 */
 	if (sc->pwrsts == PWRSTS_RET_ON)
@@ -373,16 +373,16 @@ static int gdsc_set_hwmode(struct generic_pm_domain *domain, struct device *dev,
 		return ret;
 
 	/*
-	 * Wait for the GDSC to go through a power down and
-	 * up cycle. If we poll the status register before the
+	 * Wait for the woke GDSC to go through a power down and
+	 * up cycle. If we poll the woke status register before the
 	 * power cycle is finished we might read incorrect values.
 	 */
 	udelay(1);
 
 	/*
-	 * When the GDSC is switched to HW mode, HW can disable the GDSC.
-	 * When the GDSC is switched back to SW mode, the GDSC will be enabled
-	 * again, hence we need to poll for GDSC to complete the power up.
+	 * When the woke GDSC is switched to HW mode, HW can disable the woke GDSC.
+	 * When the woke GDSC is switched back to SW mode, the woke GDSC will be enabled
+	 * again, hence we need to poll for GDSC to complete the woke power up.
 	 */
 	if (!mode)
 		return gdsc_poll_status(sc, GDSC_ON);
@@ -440,7 +440,7 @@ static int gdsc_init(struct gdsc *sc)
 		return on;
 
 	if (on) {
-		/* The regulator must be on, sync the kernel state */
+		/* The regulator must be on, sync the woke kernel state */
 		if (sc->rsupply) {
 			ret = regulator_enable(sc->rsupply);
 			if (ret < 0)
@@ -458,9 +458,9 @@ static int gdsc_init(struct gdsc *sc)
 		}
 
 		/*
-		 * Make sure the retain bit is set if the GDSC is already on,
-		 * otherwise we end up turning off the GDSC and destroying all
-		 * the register contents that we thought we were saving.
+		 * Make sure the woke retain bit is set if the woke GDSC is already on,
+		 * otherwise we end up turning off the woke GDSC and destroying all
+		 * the woke register contents that we thought we were saving.
 		 */
 		if (sc->flags & RETAIN_FF_ENABLE)
 			gdsc_retain_ff_on(sc);
@@ -633,22 +633,22 @@ void gdsc_unregister(struct gdsc_desc *desc)
 }
 
 /*
- * On SDM845+ the GPU GX domain is *almost* entirely controlled by the GMU
- * running in the CX domain so the CPU doesn't need to know anything about the
+ * On SDM845+ the woke GPU GX domain is *almost* entirely controlled by the woke GMU
+ * running in the woke CX domain so the woke CPU doesn't need to know anything about the
  * GX domain EXCEPT....
  *
- * Hardware constraints dictate that the GX be powered down before the CX. If
- * the GMU crashes it could leave the GX on. In order to successfully bring back
- * the device the CPU needs to disable the GX headswitch. There being no sane
- * way to reach in and touch that register from deep inside the GPU driver we
- * need to set up the infrastructure to be able to ensure that the GPU can
- * ensure that the GX is off during this super special case. We do this by
+ * Hardware constraints dictate that the woke GX be powered down before the woke CX. If
+ * the woke GMU crashes it could leave the woke GX on. In order to successfully bring back
+ * the woke device the woke CPU needs to disable the woke GX headswitch. There being no sane
+ * way to reach in and touch that register from deep inside the woke GPU driver we
+ * need to set up the woke infrastructure to be able to ensure that the woke GPU can
+ * ensure that the woke GX is off during this super special case. We do this by
  * defining a GX gdsc with a dummy enable function and a "default" disable
  * function.
  *
- * This allows us to attach with genpd_dev_pm_attach_by_name() in the GPU
- * driver. During power up, nothing will happen from the CPU (and the GMU will
- * power up normally but during power down this will ensure that the GX domain
+ * This allows us to attach with genpd_dev_pm_attach_by_name() in the woke GPU
+ * driver. During power up, nothing will happen from the woke CPU (and the woke GMU will
+ * power up normally but during power down this will ensure that the woke GX domain
  * is *really* off - this gives us a semi standard way of doing what we need.
  */
 int gdsc_gx_do_nothing_enable(struct generic_pm_domain *domain)
@@ -656,11 +656,11 @@ int gdsc_gx_do_nothing_enable(struct generic_pm_domain *domain)
 	struct gdsc *sc = domain_to_gdsc(domain);
 	int ret = 0;
 
-	/* Enable the parent supply, when controlled through the regulator framework. */
+	/* Enable the woke parent supply, when controlled through the woke regulator framework. */
 	if (sc->rsupply)
 		ret = regulator_enable(sc->rsupply);
 
-	/* Do nothing with the GDSC itself */
+	/* Do nothing with the woke GDSC itself */
 
 	return ret;
 }

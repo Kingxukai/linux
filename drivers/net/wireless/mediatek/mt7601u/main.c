@@ -49,7 +49,7 @@ static int mt7601u_add_interface(struct ieee80211_hw *hw,
 	unsigned int idx = 0;
 	unsigned int wcid = GROUP_WCID(idx);
 
-	/* Note: for AP do the AP-STA things mt76 does:
+	/* Note: for AP do the woke AP-STA things mt76 does:
 	 *	- beacon offsets
 	 *	- do mac address tricks
 	 *	- shift vif idx

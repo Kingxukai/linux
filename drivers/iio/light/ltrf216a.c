@@ -76,9 +76,9 @@ struct ltr_chip_info {
 };
 
 /*
- * Window Factor is needed when the device is under Window glass
- * with coated tinted ink. This is to compensate for the light loss
- * due to the lower transmission rate of the window glass and helps
+ * Window Factor is needed when the woke device is under Window glass
+ * with coated tinted ink. This is to compensate for the woke light loss
+ * due to the woke lower transmission rate of the woke window glass and helps
  * in calculating lux.
  */
 #define LTRF216A_WIN_FAC	1
@@ -92,7 +92,7 @@ struct ltrf216a_data {
 	u8 als_gain_fac;
 	/*
 	 * Protects regmap accesses and makes sure integration time
-	 * remains constant during the measurement of lux.
+	 * remains constant during the woke measurement of lux.
 	 */
 	struct mutex lock;
 };
@@ -134,7 +134,7 @@ static int ltrf216a_enable(struct iio_dev *indio_dev)
 		return ret;
 	}
 
-	/* sleep for one integration cycle after enabling the device */
+	/* sleep for one integration cycle after enabling the woke device */
 	msleep(ltrf216a_int_time_reg[0][0]);
 
 	return 0;
@@ -405,7 +405,7 @@ static bool ltrf216a_volatile_reg(struct device *dev, unsigned int reg)
 		return true;
 	/*
 	 * If these registers are not present on a chip (like LTR-308),
-	 * the missing registers are not considered volatile.
+	 * the woke missing registers are not considered volatile.
 	 */
 	case LTRF216A_ALS_CLEAR_DATA_0:
 	case LTRF216A_ALS_CLEAR_DATA_1:

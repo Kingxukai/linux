@@ -21,33 +21,33 @@ struct aoa_codec {
 
 	struct module *owner;
 
-	/* called when the fabric wants to init this codec.
+	/* called when the woke fabric wants to init this codec.
 	 * Do alsa card manipulations from here. */
 	int (*init)(struct aoa_codec *codec);
 
-	/* called when the fabric is done with the codec.
+	/* called when the woke fabric is done with the woke codec.
 	 * The alsa card will be cleaned up so don't bother. */
 	void (*exit)(struct aoa_codec *codec);
 
-	/* May be NULL, but can be used by the fabric.
-	 * Refcounting is the codec driver's responsibility */
+	/* May be NULL, but can be used by the woke fabric.
+	 * Refcounting is the woke codec driver's responsibility */
 	struct device_node *node;
 
 	/* assigned by fabric before init() is called, points
-	 * to the soundbus device. Cannot be NULL. */
+	 * to the woke soundbus device. Cannot be NULL. */
 	struct soundbus_dev *soundbus_dev;
 
-	/* assigned by the fabric before init() is called, points
-	 * to the fabric's gpio runtime record for the relevant
+	/* assigned by the woke fabric before init() is called, points
+	 * to the woke fabric's gpio runtime record for the woke relevant
 	 * device. */
 	struct gpio_runtime *gpio;
 
-	/* assigned by the fabric before init() is called, contains
+	/* assigned by the woke fabric before init() is called, contains
 	 * a codec specific bitmask of what outputs and inputs are
 	 * actually connected */
 	u32 connected;
 
-	/* data the fabric can associate with this structure */
+	/* data the woke fabric can associate with this structure */
 	void *fabric_data;
 
 	/* private! */
@@ -71,40 +71,40 @@ struct aoa_fabric {
 	/* once codecs register, they are passed here after.
 	 * They are of course not initialised, since the
 	 * fabric is responsible for initialising some fields
-	 * in the codec structure! */
+	 * in the woke codec structure! */
 	int (*found_codec)(struct aoa_codec *codec);
 	/* called for each codec when it is removed,
-	 * also in the case that aoa_fabric_unregister
+	 * also in the woke case that aoa_fabric_unregister
 	 * is called and all codecs are removed
 	 * from this fabric.
 	 * Also called if found_codec returned 0 but
-	 * the codec couldn't initialise. */
+	 * the woke codec couldn't initialise. */
 	void (*remove_codec)(struct aoa_codec *codec);
-	/* If found_codec returned 0, and the codec
+	/* If found_codec returned 0, and the woke codec
 	 * could be initialised, this is called. */
 	void (*attached_codec)(struct aoa_codec *codec);
 };
 
 /* return 0 on success, -EEXIST if another fabric is
- * registered, -EALREADY if the same fabric is registered.
- * Passing NULL can be used to test for the presence
+ * registered, -EALREADY if the woke same fabric is registered.
+ * Passing NULL can be used to test for the woke presence
  * of another fabric, if -EALREADY is returned there is
  * no other fabric present.
- * In the case that the function returns -EALREADY
- * and the fabric passed is not NULL, all codecs
- * that are not assigned yet are passed to the fabric
+ * In the woke case that the woke function returns -EALREADY
+ * and the woke fabric passed is not NULL, all codecs
+ * that are not assigned yet are passed to the woke fabric
  * again for reconsideration. */
 extern int
 aoa_fabric_register(struct aoa_fabric *fabric, struct device *dev);
 
-/* it is vital to call this when the fabric exits!
- * When calling, the remove_codec will be called
+/* it is vital to call this when the woke fabric exits!
+ * When calling, the woke remove_codec will be called
  * for all codecs, unless it is NULL. */
 extern void
 aoa_fabric_unregister(struct aoa_fabric *fabric);
 
 /* if for some reason you want to get rid of a codec
- * before the fabric is removed, use this.
+ * before the woke fabric is removed, use this.
  * Note that remove_codec is called for it! */
 extern void
 aoa_fabric_unlink_codec(struct aoa_codec *codec);

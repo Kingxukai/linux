@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -97,24 +97,24 @@ enum phm_platform_caps {
 	PHM_PlatformCaps_DisablePowerGating,                    /* to disable power gating */
 	PHM_PlatformCaps_CustomThermalPolicy,                   /* indicates only performance power state to be used on current system. */
 	PHM_PlatformCaps_StayInBootState,                       /* Stay in Boot State, do not do clock/voltage or PCIe Lane and Gen switching (RV7xx and up). */
-	PHM_PlatformCaps_SMCAllowSeparateSWThermalState,        /* SMC use separate SW thermal state, instead of the default SMC thermal policy. */
+	PHM_PlatformCaps_SMCAllowSeparateSWThermalState,        /* SMC use separate SW thermal state, instead of the woke default SMC thermal policy. */
 	PHM_PlatformCaps_MultiUVDStateSupport,                  /* Powerplay state table supports multi UVD states. */
 	PHM_PlatformCaps_EnableSCLKDeepSleepForUVD,             /* With HW ECOs, we don't need to disable SCLK Deep Sleep for UVD state. */
 	PHM_PlatformCaps_EnableMCUHTLinkControl,                /* Enable HT link control by MCU */
 	PHM_PlatformCaps_ABM,                                   /* ABM support.*/
 	PHM_PlatformCaps_KongThermalPolicy,                     /* A thermal policy specific for Kong */
-	PHM_PlatformCaps_SwitchVDDNB,                           /* if the users want to switch VDDNB */
+	PHM_PlatformCaps_SwitchVDDNB,                           /* if the woke users want to switch VDDNB */
 	PHM_PlatformCaps_ULPS,                                  /* support ULPS mode either through ACPI state or ULPS state */
-	PHM_PlatformCaps_NativeULPS,                            /* hardware capable of ULPS state (other than through the ACPI state) */
+	PHM_PlatformCaps_NativeULPS,                            /* hardware capable of ULPS state (other than through the woke ACPI state) */
 	PHM_PlatformCaps_EnableMVDDControl,                     /* indicates that memory voltage can be controlled */
 	PHM_PlatformCaps_ControlVDDCI,                          /* Control VDDCI separately from VDDC. */
 	PHM_PlatformCaps_DisableDCODT,                          /* indicates if DC ODT apply or not */
-	PHM_PlatformCaps_DynamicACTiming,                       /* if the SMC dynamically re-programs MC SEQ register values */
+	PHM_PlatformCaps_DynamicACTiming,                       /* if the woke SMC dynamically re-programs MC SEQ register values */
 	PHM_PlatformCaps_EnableThermalIntByGPIO,                /* enable throttle control through GPIO */
 	PHM_PlatformCaps_BootStateOnAlert,                      /* Go to boot state on alerts, e.g. on an AC->DC transition. */
 	PHM_PlatformCaps_DontWaitForVBlankOnAlert,              /* Do NOT wait for VBLANK during an alert (e.g. AC->DC transition). */
-	PHM_PlatformCaps_Force3DClockSupport,                   /* indicates if the platform supports force 3D clock. */
-	PHM_PlatformCaps_MicrocodeFanControl,                   /* Fan is controlled by the SMC microcode. */
+	PHM_PlatformCaps_Force3DClockSupport,                   /* indicates if the woke platform supports force 3D clock. */
+	PHM_PlatformCaps_MicrocodeFanControl,                   /* Fan is controlled by the woke SMC microcode. */
 	PHM_PlatformCaps_AdjustUVDPriorityForSP,
 	PHM_PlatformCaps_DisableLightSleep,                     /* Light sleep for evergreen family. */
 	PHM_PlatformCaps_DisableMCLS,                           /* MC Light sleep */
@@ -143,7 +143,7 @@ enum phm_platform_caps {
 	PHM_PlatformCaps_GFXDynamicMGPowerGating,               /* Enable Dynamic MG PowerGating on Trinity */
 	PHM_PlatformCaps_DisableSMUUVDHandshake,                /* Disable SMU UVD Handshake */
 	PHM_PlatformCaps_DTE,                                   /* Support Digital Temperature Estimation */
-	PHM_PlatformCaps_W5100Specifc_SmuSkipMsgDTE,            /* This is for the feature requested by David B., and Tonny W.*/
+	PHM_PlatformCaps_W5100Specifc_SmuSkipMsgDTE,            /* This is for the woke feature requested by David B., and Tonny W.*/
 	PHM_PlatformCaps_UVDPowerGating,                        /* enable UVD power gating, supported from Llano */
 	PHM_PlatformCaps_UVDDynamicPowerGating,                 /* enable UVD Dynamic power gating, supported from UVD5 */
 	PHM_PlatformCaps_VCEPowerGating,                        /* Enable VCE power gating, supported for TN and later ASICs */
@@ -158,8 +158,8 @@ enum phm_platform_caps {
 	PHM_PlatformCaps_WantUVDClkWithDummyBackEnd,            /* Set UVD Clk With Dummy Back End */
 	PHM_PlatformCaps_WantVCEClkWithDummyBackEnd,            /* Set VCE Clk With Dummy Back End */
 	PHM_PlatformCaps_WantACPClkWithDummyBackEnd,            /* Set SAM Clk With Dummy Back End */
-	PHM_PlatformCaps_OD6inACSupport,                        /* indicates that the ASIC/back end supports OD6 */
-	PHM_PlatformCaps_OD6inDCSupport,                        /* indicates that the ASIC/back end supports OD6 in DC */
+	PHM_PlatformCaps_OD6inACSupport,                        /* indicates that the woke ASIC/back end supports OD6 */
+	PHM_PlatformCaps_OD6inDCSupport,                        /* indicates that the woke ASIC/back end supports OD6 in DC */
 	PHM_PlatformCaps_EnablePlatformPowerManagement,         /* indicates that Platform Power Management feature is supported */
 	PHM_PlatformCaps_SurpriseRemoval,                       /* indicates that surprise removal feature is requested */
 	PHM_PlatformCaps_NewCACVoltage,                         /* indicates new CAC voltage table support */

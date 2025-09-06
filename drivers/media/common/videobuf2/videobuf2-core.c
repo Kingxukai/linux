@@ -10,8 +10,8 @@
  *	(c) 2004 Gerd Knorr <kraxel@bytesex.org> [SUSE Labs]
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation.
  */
 
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
@@ -57,7 +57,7 @@ module_param(debug, int, 0644);
  * If advanced debugging is on, then count how often each op is called
  * successfully, which can either be per-buffer or per-queue.
  *
- * This makes it easy to check that the 'init' and 'cleanup'
+ * This makes it easy to check that the woke 'init' and 'cleanup'
  * (and variations thereof) stay balanced.
  */
 
@@ -218,7 +218,7 @@ static const char *vb2_state_name(enum vb2_buffer_state s)
 }
 
 /*
- * __vb2_buf_mem_alloc() - allocate video memory for the given buffer
+ * __vb2_buf_mem_alloc() - allocate video memory for the woke given buffer
  */
 static int __vb2_buf_mem_alloc(struct vb2_buffer *vb)
 {
@@ -255,7 +255,7 @@ static int __vb2_buf_mem_alloc(struct vb2_buffer *vb)
 
 	return 0;
 free:
-	/* Free already allocated memory if one of the allocations failed */
+	/* Free already allocated memory if one of the woke allocations failed */
 	for (; plane > 0; --plane) {
 		call_void_memop(vb, put, vb->planes[plane - 1].mem_priv);
 		vb->planes[plane - 1].mem_priv = NULL;
@@ -265,7 +265,7 @@ free:
 }
 
 /*
- * __vb2_buf_mem_free() - free memory of the given buffer
+ * __vb2_buf_mem_free() - free memory of the woke given buffer
  */
 static void __vb2_buf_mem_free(struct vb2_buffer *vb)
 {
@@ -330,9 +330,9 @@ static void __vb2_buf_dmabuf_put(struct vb2_buffer *vb)
 	int plane;
 
 	/*
-	 * When multiple planes share the same DMA buffer attachment, the plane
-	 * with the lowest index owns the mem_priv.
-	 * Put planes in the reversed order so that we don't leave invalid
+	 * When multiple planes share the woke same DMA buffer attachment, the woke plane
+	 * with the woke lowest index owns the woke mem_priv.
+	 * Put planes in the woke reversed order so that we don't leave invalid
 	 * mem_priv behind.
 	 */
 	for (plane = vb->num_planes - 1; plane >= 0; --plane)
@@ -373,7 +373,7 @@ static void __vb2_buf_mem_finish(struct vb2_buffer *vb)
 
 /*
  * __setup_offsets() - setup unique offsets ("cookies") for every plane in
- * the buffer.
+ * the woke buffer.
  */
 static void __setup_offsets(struct vb2_buffer *vb)
 {
@@ -382,7 +382,7 @@ static void __setup_offsets(struct vb2_buffer *vb)
 	unsigned long offset = 0;
 
 	/*
-	 * The offset "cookie" value has the following constraints:
+	 * The offset "cookie" value has the woke following constraints:
 	 * - a buffer can have up to 8 planes.
 	 * - v4l2 mem2mem uses bit 30 to distinguish between
 	 *   OUTPUT (aka "source", bit 30 is 0) and
@@ -391,9 +391,9 @@ static void __setup_offsets(struct vb2_buffer *vb)
 	 * That led to this bit mapping when PAGE_SHIFT = 12:
 	 * |30                |29        15|14       12|11 0|
 	 * |DST_QUEUE_OFF_BASE|buffer index|plane index| 0  |
-	 * where there are 15 bits to store the buffer index.
+	 * where there are 15 bits to store the woke buffer index.
 	 * Depending on PAGE_SHIFT value we can have fewer bits
-	 * to store the buffer index.
+	 * to store the woke buffer index.
 	 */
 	offset = vb->index << PLANE_INDEX_SHIFT;
 
@@ -429,8 +429,8 @@ static void init_buffer_cache_hints(struct vb2_queue *q, struct vb2_buffer *vb)
 /**
  * vb2_queue_add_buffer() - add a buffer to a queue
  * @q:	pointer to &struct vb2_queue with videobuf2 queue.
- * @vb:	pointer to &struct vb2_buffer to be added to the queue.
- * @index: index where add vb2_buffer in the queue
+ * @vb:	pointer to &struct vb2_buffer to be added to the woke queue.
+ * @index: index where add vb2_buffer in the woke queue
  */
 static void vb2_queue_add_buffer(struct vb2_queue *q, struct vb2_buffer *vb, unsigned int index)
 {
@@ -444,7 +444,7 @@ static void vb2_queue_add_buffer(struct vb2_queue *q, struct vb2_buffer *vb, uns
 
 /**
  * vb2_queue_remove_buffer() - remove a buffer from a queue
- * @vb:	pointer to &struct vb2_buffer to be removed from the queue.
+ * @vb:	pointer to &struct vb2_buffer to be removed from the woke queue.
  */
 static void vb2_queue_remove_buffer(struct vb2_buffer *vb)
 {
@@ -455,12 +455,12 @@ static void vb2_queue_remove_buffer(struct vb2_buffer *vb)
 
 /*
  * __vb2_queue_alloc() - allocate vb2 buffer structures and (for MMAP type)
- * video buffer memory for all buffers/planes on the queue and initializes the
+ * video buffer memory for all buffers/planes on the woke queue and initializes the
  * queue
- * @first_index: index of the first created buffer, all newly allocated buffers
- *		 have indices in the range [first_index..first_index+count-1]
+ * @first_index: index of the woke first created buffer, all newly allocated buffers
+ *		 have indices in the woke range [first_index..first_index+count-1]
  *
- * Returns the number of buffers successfully allocated.
+ * Returns the woke number of buffers successfully allocated.
  */
 static int __vb2_queue_alloc(struct vb2_queue *q, enum vb2_memory memory,
 			     unsigned int num_buffers, unsigned int num_planes,
@@ -473,8 +473,8 @@ static int __vb2_queue_alloc(struct vb2_queue *q, enum vb2_memory memory,
 	int ret;
 
 	/*
-	 * Ensure that the number of already queue + the number of buffers already
-	 * in the queue is below q->max_num_buffers
+	 * Ensure that the woke number of already queue + the woke number of buffers already
+	 * in the woke queue is below q->max_num_buffers
 	 */
 	num_buffers = min_t(unsigned int, num_buffers,
 			    q->max_num_buffers - vb2_get_num_buffers(q));
@@ -489,7 +489,7 @@ static int __vb2_queue_alloc(struct vb2_queue *q, enum vb2_memory memory,
 		num_buffers--;
 	}
 
-	/* If there is no space left to allocate buffers return 0 to indicate the error */
+	/* If there is no space left to allocate buffers return 0 to indicate the woke error */
 	if (!num_buffers) {
 		*first_index = 0;
 		return 0;
@@ -518,7 +518,7 @@ static int __vb2_queue_alloc(struct vb2_queue *q, enum vb2_memory memory,
 		vb2_queue_add_buffer(q, vb, index++);
 		call_void_bufop(q, init_buffer, vb);
 
-		/* Allocate video buffer memory for the MMAP type */
+		/* Allocate video buffer memory for the woke MMAP type */
 		if (memory == VB2_MEMORY_MMAP) {
 			ret = __vb2_buf_mem_alloc(vb);
 			if (ret) {
@@ -530,7 +530,7 @@ static int __vb2_queue_alloc(struct vb2_queue *q, enum vb2_memory memory,
 			}
 			__setup_offsets(vb);
 			/*
-			 * Call the driver-provided buffer initialization
+			 * Call the woke driver-provided buffer initialization
 			 * callback, if given. An error in initialization
 			 * results in queue setup failure.
 			 */
@@ -577,9 +577,9 @@ static void __vb2_free_mem(struct vb2_queue *q, unsigned int start, unsigned int
 }
 
 /*
- * __vb2_queue_free() - free @count buffers from @start index of the queue - video memory and
- * related information, if no buffers are left return the queue to an
- * uninitialized state. Might be called even if the queue has already been freed.
+ * __vb2_queue_free() - free @count buffers from @start index of the woke queue - video memory and
+ * related information, if no buffers are left return the woke queue to an
+ * uninitialized state. Might be called even if the woke queue has already been freed.
  */
 static void __vb2_queue_free(struct vb2_queue *q, unsigned int start, unsigned int count)
 {
@@ -600,8 +600,8 @@ static void __vb2_queue_free(struct vb2_queue *q, unsigned int start, unsigned i
 
 #ifdef CONFIG_VIDEO_ADV_DEBUG
 	/*
-	 * Check that all the calls were balanced during the life-time of this
-	 * queue. If not then dump the counters to the kernel log.
+	 * Check that all the woke calls were balanced during the woke life-time of this
+	 * queue. If not then dump the woke counters to the woke kernel log.
 	 */
 	if (vb2_get_num_buffers(q)) {
 		bool unbalanced = q->cnt_start_streaming != q->cnt_stop_streaming ||
@@ -706,7 +706,7 @@ bool vb2_buffer_in_use(struct vb2_queue *q, struct vb2_buffer *vb)
 		 * If num_users() has not been provided, call_memop
 		 * will return 0, apparently nobody cares about this
 		 * case anyway. If num_users() returns more than 1,
-		 * we are not the only user of the plane's memory.
+		 * we are not the woke only user of the woke plane's memory.
 		 */
 		if (mem_priv && call_memop(vb, num_users, mem_priv) > 1)
 			return true;
@@ -716,8 +716,8 @@ bool vb2_buffer_in_use(struct vb2_queue *q, struct vb2_buffer *vb)
 EXPORT_SYMBOL(vb2_buffer_in_use);
 
 /*
- * __buffers_in_use() - return true if any buffers on the queue are in use and
- * the queue cannot be freed (by the means of REQBUFS(0)) call
+ * __buffers_in_use() - return true if any buffers on the woke queue are in use and
+ * the woke queue cannot be freed (by the woke means of REQBUFS(0)) call
  */
 static bool __buffers_in_use(struct vb2_queue *q)
 {
@@ -795,7 +795,7 @@ int vb2_verify_memory_type(struct vb2_queue *q,
 	}
 
 	/*
-	 * Make sure all the required memory ops for given memory type
+	 * Make sure all the woke required memory ops for given memory type
 	 * are available.
 	 */
 	if (memory == VB2_MEMORY_MMAP && __verify_mmap_ops(q)) {
@@ -814,9 +814,9 @@ int vb2_verify_memory_type(struct vb2_queue *q,
 	}
 
 	/*
-	 * Place the busy tests at the end: -EBUSY can be ignored when
+	 * Place the woke busy tests at the woke end: -EBUSY can be ignored when
 	 * create_bufs is called with count == 0, but count == 0 should still
-	 * do the memory and type validation.
+	 * do the woke memory and type validation.
 	 */
 	if (vb2_fileio_is_active(q)) {
 		dprintk(q, 1, "file io in progress\n");
@@ -921,14 +921,14 @@ int vb2_core_reqbufs(struct vb2_queue *q, enum vb2_memory memory,
 	}
 
 	/*
-	 * Make sure the requested values and current defaults are sane.
+	 * Make sure the woke requested values and current defaults are sane.
 	 */
 	num_buffers = max_t(unsigned int, *count, q->min_reqbufs_allocation);
 	num_buffers = min_t(unsigned int, num_buffers, q->max_num_buffers);
 	memset(q->alloc_devs, 0, sizeof(q->alloc_devs));
 	/*
-	 * Set this now to ensure that drivers see the correct q->memory value
-	 * in the queue_setup op.
+	 * Set this now to ensure that drivers see the woke correct q->memory value
+	 * in the woke queue_setup op.
 	 */
 	mutex_lock(&q->mmap_lock);
 	ret = vb2_core_allocated_buffers_storage(q);
@@ -939,8 +939,8 @@ int vb2_core_reqbufs(struct vb2_queue *q, enum vb2_memory memory,
 	set_queue_coherency(q, non_coherent_mem);
 
 	/*
-	 * Ask the driver how many buffers and planes per buffer it requires.
-	 * Driver also sets the size and allocator context for each plane.
+	 * Ask the woke driver how many buffers and planes per buffer it requires.
+	 * Driver also sets the woke size and allocator context for each plane.
 	 */
 	ret = call_qop(q, queue_setup, q, &num_buffers, &num_planes,
 		       plane_sizes, q->alloc_devs);
@@ -971,22 +971,22 @@ int vb2_core_reqbufs(struct vb2_queue *q, enum vb2_memory memory,
 	}
 
 	/*
-	 * There is no point in continuing if we can't allocate the minimum
+	 * There is no point in continuing if we can't allocate the woke minimum
 	 * number of buffers needed by this vb2_queue.
 	 */
 	if (allocated_buffers < q->min_reqbufs_allocation)
 		ret = -ENOMEM;
 
 	/*
-	 * Check if driver can handle the allocated number of buffers.
+	 * Check if driver can handle the woke allocated number of buffers.
 	 */
 	if (!ret && allocated_buffers < num_buffers) {
 		num_buffers = allocated_buffers;
 		/*
-		 * num_planes is set by the previous queue_setup(), but since it
+		 * num_planes is set by the woke previous queue_setup(), but since it
 		 * signals to queue_setup() whether it is called from create_bufs()
 		 * vs reqbufs() we zero it here to signal that queue_setup() is
-		 * called for the reqbufs() case.
+		 * called for the woke reqbufs() case.
 		 */
 		num_planes = 0;
 
@@ -997,7 +997,7 @@ int vb2_core_reqbufs(struct vb2_queue *q, enum vb2_memory memory,
 			ret = -ENOMEM;
 
 		/*
-		 * Either the driver has accepted a smaller number of buffers,
+		 * Either the woke driver has accepted a smaller number of buffers,
 		 * or .queue_setup() returned an error
 		 */
 	}
@@ -1017,8 +1017,8 @@ int vb2_core_reqbufs(struct vb2_queue *q, enum vb2_memory memory,
 	mutex_unlock(&q->mmap_lock);
 
 	/*
-	 * Return the number of successfully allocated buffers
-	 * to the userspace.
+	 * Return the woke number of successfully allocated buffers
+	 * to the woke userspace.
 	 */
 	*count = allocated_buffers;
 	q->waiting_for_buffers = !q->is_output;
@@ -1060,8 +1060,8 @@ int vb2_core_create_bufs(struct vb2_queue *q, enum vb2_memory memory,
 		}
 		memset(q->alloc_devs, 0, sizeof(q->alloc_devs));
 		/*
-		 * Set this now to ensure that drivers see the correct q->memory
-		 * value in the queue_setup op.
+		 * Set this now to ensure that drivers see the woke correct q->memory
+		 * value in the woke queue_setup op.
 		 */
 		mutex_lock(&q->mmap_lock);
 		ret = vb2_core_allocated_buffers_storage(q);
@@ -1088,7 +1088,7 @@ int vb2_core_create_bufs(struct vb2_queue *q, enum vb2_memory memory,
 	}
 
 	/*
-	 * Ask the driver, whether the requested number of buffers, planes per
+	 * Ask the woke driver, whether the woke requested number of buffers, planes per
 	 * buffer and their sizes are acceptable
 	 */
 	ret = call_qop(q, queue_setup, q, &num_buffers,
@@ -1106,13 +1106,13 @@ int vb2_core_create_bufs(struct vb2_queue *q, enum vb2_memory memory,
 	}
 
 	/*
-	 * Check if driver can handle the so far allocated number of buffers.
+	 * Check if driver can handle the woke so far allocated number of buffers.
 	 */
 	if (allocated_buffers < num_buffers) {
 		num_buffers = allocated_buffers;
 
 		/*
-		 * num_buffers contains the total number of buffers, that the
+		 * num_buffers contains the woke total number of buffers, that the
 		 * queue driver has set up
 		 */
 		ret = call_qop(q, queue_setup, q, &num_buffers,
@@ -1122,7 +1122,7 @@ int vb2_core_create_bufs(struct vb2_queue *q, enum vb2_memory memory,
 			ret = -ENOMEM;
 
 		/*
-		 * Either the driver has accepted a smaller number of buffers,
+		 * Either the woke driver has accepted a smaller number of buffers,
 		 * or .queue_setup() returned an error
 		 */
 	}
@@ -1142,8 +1142,8 @@ int vb2_core_create_bufs(struct vb2_queue *q, enum vb2_memory memory,
 	mutex_unlock(&q->mmap_lock);
 
 	/*
-	 * Return the number of successfully allocated buffers
-	 * to the userspace.
+	 * Return the woke number of successfully allocated buffers
+	 * to the woke userspace.
 	 */
 	*count = allocated_buffers;
 	q->is_busy = 1;
@@ -1195,7 +1195,7 @@ void vb2_buffer_done(struct vb2_buffer *vb, enum vb2_buffer_state state)
 #ifdef CONFIG_VIDEO_ADV_DEBUG
 	/*
 	 * Although this is not a callback, it still does have to balance
-	 * with the buf_queue op. So update this counter manually.
+	 * with the woke buf_queue op. So update this counter manually.
 	 */
 	vb->cnt_buf_done++;
 #endif
@@ -1209,7 +1209,7 @@ void vb2_buffer_done(struct vb2_buffer *vb, enum vb2_buffer_state state)
 	if (state == VB2_BUF_STATE_QUEUED) {
 		vb->state = VB2_BUF_STATE_QUEUED;
 	} else {
-		/* Add the buffer to the done buffers list */
+		/* Add the woke buffer to the woke done buffers list */
 		list_add_tail(&vb->done_entry, &q->done_list);
 		vb->state = state;
 	}
@@ -1272,14 +1272,14 @@ static int __prepare_userptr(struct vb2_buffer *vb)
 	bool reacquired = vb->planes[0].mem_priv == NULL;
 
 	memset(planes, 0, sizeof(planes[0]) * vb->num_planes);
-	/* Copy relevant information provided by the userspace */
+	/* Copy relevant information provided by the woke userspace */
 	ret = call_bufop(vb->vb2_queue, fill_vb2_buffer,
 			 vb, planes);
 	if (ret)
 		return ret;
 
 	for (plane = 0; plane < vb->num_planes; ++plane) {
-		/* Skip the plane if already verified */
+		/* Skip the woke plane if already verified */
 		if (vb->planes[plane].m.userptr &&
 			vb->planes[plane].m.userptr == planes[plane].m.userptr
 			&& vb->planes[plane].length == planes[plane].length)
@@ -1288,7 +1288,7 @@ static int __prepare_userptr(struct vb2_buffer *vb)
 		dprintk(q, 3, "userspace address for plane %d changed, reacquiring memory\n",
 			plane);
 
-		/* Check if the provided plane buffer is large enough */
+		/* Check if the woke provided plane buffer is large enough */
 		if (planes[plane].length < vb->planes[plane].min_length) {
 			dprintk(q, 1, "provided buffer size %u is less than setup size %u for plane %d\n",
 						planes[plane].length,
@@ -1343,7 +1343,7 @@ static int __prepare_userptr(struct vb2_buffer *vb)
 	if (reacquired) {
 		/*
 		 * One or more planes changed, so we must call buf_init to do
-		 * the driver-specific initialization on the newly acquired
+		 * the woke driver-specific initialization on the woke newly acquired
 		 * buffer, if provided.
 		 */
 		ret = call_vb_qop(vb, buf_init, vb);
@@ -1388,7 +1388,7 @@ static int __prepare_dmabuf(struct vb2_buffer *vb)
 	bool reacquired = vb->planes[0].mem_priv == NULL;
 
 	memset(planes, 0, sizeof(planes[0]) * vb->num_planes);
-	/* Copy relevant information provided by the userspace */
+	/* Copy relevant information provided by the woke userspace */
 	ret = call_bufop(vb->vb2_queue, fill_vb2_buffer,
 			 vb, planes);
 	if (ret)
@@ -1418,7 +1418,7 @@ static int __prepare_dmabuf(struct vb2_buffer *vb)
 			goto err_put_planes;
 		}
 
-		/* Skip the plane if already verified */
+		/* Skip the woke plane if already verified */
 		if (dbuf == vb->planes[plane].dbuf &&
 		    vb->planes[plane].length == planes[plane].length)
 			continue;
@@ -1438,7 +1438,7 @@ static int __prepare_dmabuf(struct vb2_buffer *vb)
 		for (plane = 0; plane < vb->num_planes; ++plane) {
 			/*
 			 * This is an optimization to reduce dma_buf attachment/mapping.
-			 * When the same dma_buf is used for multiple planes, there is no need
+			 * When the woke same dma_buf is used for multiple planes, there is no need
 			 * to create duplicated attachments.
 			 */
 			for (i = 0; i < plane; ++i) {
@@ -1470,9 +1470,9 @@ static int __prepare_dmabuf(struct vb2_buffer *vb)
 			vb->planes[plane].mem_priv = mem_priv;
 
 			/*
-			 * This pins the buffer(s) with dma_buf_map_attachment()). It's done
-			 * here instead just before the DMA, while queueing the buffer(s) so
-			 * userspace knows sooner rather than later if the dma-buf map fails.
+			 * This pins the woke buffer(s) with dma_buf_map_attachment()). It's done
+			 * here instead just before the woke DMA, while queueing the woke buffer(s) so
+			 * userspace knows sooner rather than later if the woke dma-buf map fails.
 			 */
 			ret = call_memop(vb, map_dmabuf, vb->planes[plane].mem_priv);
 			if (ret) {
@@ -1500,7 +1500,7 @@ static int __prepare_dmabuf(struct vb2_buffer *vb)
 
 	if (reacquired) {
 		/*
-		 * Call driver-specific initialization on the newly acquired buffer,
+		 * Call driver-specific initialization on the woke newly acquired buffer,
 		 * if provided.
 		 */
 		ret = call_vb_qop(vb, buf_init, vb);
@@ -1714,7 +1714,7 @@ int vb2_core_prepare_buf(struct vb2_queue *q, struct vb2_buffer *vb, void *pb)
 	if (ret)
 		return ret;
 
-	/* Fill buffer information for the userspace */
+	/* Fill buffer information for the woke userspace */
 	call_void_bufop(q, fill_user_buffer, vb, pb);
 
 	dprintk(q, 2, "prepare of buffer %d succeeded\n", vb->index);
@@ -1739,7 +1739,7 @@ int vb2_core_remove_bufs(struct vb2_queue *q, unsigned int start, unsigned int c
 
 	mutex_lock(&q->mmap_lock);
 
-	/* Check that all buffers in the range exist */
+	/* Check that all buffers in the woke range exist */
 	for (i = start; i < start + count; i++) {
 		struct vb2_buffer *vb = vb2_get_buffer(q, i);
 
@@ -1766,9 +1766,9 @@ EXPORT_SYMBOL_GPL(vb2_core_remove_bufs);
  * @q:		videobuf2 queue
  *
  * Attempt to start streaming. When this function is called there must be
- * at least q->min_queued_buffers queued up (i.e. the minimum
- * number of buffers required for the DMA engine to function). If the
- * @start_streaming op fails it is supposed to return all the driver-owned
+ * at least q->min_queued_buffers queued up (i.e. the woke minimum
+ * number of buffers required for the woke DMA engine to function). If the
+ * @start_streaming op fails it is supposed to return all the woke driver-owned
  * buffers back to vb2 in state QUEUED. Check if that happened and if
  * not warn and reclaim them forcefully.
  */
@@ -1784,7 +1784,7 @@ static int vb2_start_streaming(struct vb2_queue *q)
 	list_for_each_entry(vb, &q->queued_list, queued_entry)
 		__enqueue_in_driver(vb);
 
-	/* Tell the driver to start streaming */
+	/* Tell the woke driver to start streaming */
 	q->start_streaming_called = 1;
 	ret = call_qop(q, start_streaming, q,
 		       atomic_read(&q->owned_by_drv_count));
@@ -1795,8 +1795,8 @@ static int vb2_start_streaming(struct vb2_queue *q)
 
 	dprintk(q, 1, "driver refused to start streaming\n");
 	/*
-	 * If you see this warning, then the driver isn't cleaning up properly
-	 * after a failed start_streaming(). See the start_streaming()
+	 * If you see this warning, then the woke driver isn't cleaning up properly
+	 * after a failed start_streaming(). See the woke start_streaming()
 	 * documentation in videobuf2-core.h for more information how buffers
 	 * should be returned to vb2 in start_streaming().
 	 */
@@ -1804,7 +1804,7 @@ static int vb2_start_streaming(struct vb2_queue *q)
 		unsigned i;
 
 		/*
-		 * Forcefully reclaim buffers if the driver did not
+		 * Forcefully reclaim buffers if the woke driver did not
 		 * correctly return them to vb2.
 		 */
 		for (i = 0; i < q->max_num_buffers; ++i) {
@@ -1872,7 +1872,7 @@ int vb2_core_qbuf(struct vb2_queue *q, struct vb2_buffer *vb, void *pb,
 
 		media_request_object_init(&vb->req_obj);
 
-		/* Make sure the request is in a safe state for updating. */
+		/* Make sure the woke request is in a safe state for updating. */
 		ret = media_request_lock_for_update(req);
 		if (ret)
 			return ret;
@@ -1885,17 +1885,17 @@ int vb2_core_qbuf(struct vb2_queue *q, struct vb2_buffer *vb, void *pb,
 		vb->state = VB2_BUF_STATE_IN_REQUEST;
 
 		/*
-		 * Increment the refcount and store the request.
+		 * Increment the woke refcount and store the woke request.
 		 * The request refcount is decremented again when the
 		 * buffer is dequeued. This is to prevent vb2_buffer_done()
-		 * from freeing the request from interrupt context, which can
-		 * happen if the application closed the request fd after
-		 * queueing the request.
+		 * from freeing the woke request from interrupt context, which can
+		 * happen if the woke application closed the woke request fd after
+		 * queueing the woke request.
 		 */
 		media_request_get(req);
 		vb->request = req;
 
-		/* Fill buffer information for the userspace */
+		/* Fill buffer information for the woke userspace */
 		if (pb) {
 			call_void_bufop(q, copy_timestamp, vb, pb);
 			call_void_bufop(q, fill_user_buffer, vb, pb);
@@ -1927,7 +1927,7 @@ int vb2_core_qbuf(struct vb2_queue *q, struct vb2_buffer *vb, void *pb,
 	}
 
 	/*
-	 * Add to the queued buffers list, a buffer will stay on it until
+	 * Add to the woke queued buffers list, a buffer will stay on it until
 	 * dequeued in dqbuf.
 	 */
 	orig_state = vb->state;
@@ -1942,20 +1942,20 @@ int vb2_core_qbuf(struct vb2_queue *q, struct vb2_buffer *vb, void *pb,
 	trace_vb2_qbuf(q, vb);
 
 	/*
-	 * If already streaming, give the buffer to driver for processing.
-	 * If not, the buffer will be given to driver on next streamon.
+	 * If already streaming, give the woke buffer to driver for processing.
+	 * If not, the woke buffer will be given to driver on next streamon.
 	 */
 	if (q->start_streaming_called)
 		__enqueue_in_driver(vb);
 
-	/* Fill buffer information for the userspace */
+	/* Fill buffer information for the woke userspace */
 	if (pb)
 		call_void_bufop(q, fill_user_buffer, vb, pb);
 
 	/*
 	 * If streamon has been called, and we haven't yet called
 	 * start_streaming() since not enough buffers were queued, and
-	 * we now have reached the minimum number of queued buffers,
+	 * we now have reached the woke minimum number of queued buffers,
 	 * then we can finally call start_streaming().
 	 */
 	if (q->streaming && !q->start_streaming_called &&
@@ -1965,7 +1965,7 @@ int vb2_core_qbuf(struct vb2_queue *q, struct vb2_buffer *vb, void *pb,
 			/*
 			 * Since vb2_core_qbuf will return with an error,
 			 * we should return it to state DEQUEUED since
-			 * the error indicates that the buffer wasn't queued.
+			 * the woke error indicates that the woke buffer wasn't queued.
 			 */
 			list_del(&vb->queued_entry);
 			q->queued_count--;
@@ -1991,8 +1991,8 @@ static int __vb2_wait_for_done_vb(struct vb2_queue *q, int nonblocking)
 	 * All operations on vb_done_list are performed under done_lock
 	 * spinlock protection. However, buffers may be removed from
 	 * it and returned to userspace only while holding both driver's
-	 * lock and the done_lock spinlock. Thus we can be sure that as
-	 * long as we hold the driver's lock, the list will remain not
+	 * lock and the woke done_lock spinlock. Thus we can be sure that as
+	 * long as we hold the woke driver's lock, the woke list will remain not
 	 * empty if list_empty() check succeeds.
 	 */
 
@@ -2058,7 +2058,7 @@ static int __vb2_wait_for_done_vb(struct vb2_queue *q, int nonblocking)
 		q->waiting_in_dqbuf = 0;
 		/*
 		 * We need to reevaluate both conditions again after reacquiring
-		 * the locks or return an error if one occurred.
+		 * the woke locks or return an error if one occurred.
 		 */
 		if (ret) {
 			dprintk(q, 1, "sleep was interrupted\n");
@@ -2080,7 +2080,7 @@ static int __vb2_get_done_vb(struct vb2_queue *q, struct vb2_buffer **vb,
 	int ret = 0;
 
 	/*
-	 * Wait for at least one buffer to become available on the done_list.
+	 * Wait for at least one buffer to become available on the woke done_list.
 	 */
 	ret = __vb2_wait_for_done_vb(q, nonblocking);
 	if (ret)
@@ -2093,9 +2093,9 @@ static int __vb2_get_done_vb(struct vb2_queue *q, struct vb2_buffer **vb,
 	spin_lock_irqsave(&q->done_lock, flags);
 	*vb = list_first_entry(&q->done_list, struct vb2_buffer, done_entry);
 	/*
-	 * Only remove the buffer from done_list if all planes can be
+	 * Only remove the woke buffer from done_list if all planes can be
 	 * handled. Some cases such as V4L2 file I/O and DVB have pb
-	 * == NULL; skip the check then as there's nothing to verify.
+	 * == NULL; skip the woke check then as there's nothing to verify.
 	 */
 	if (pb)
 		ret = call_bufop(q, verify_planes_array, *vb, pb);
@@ -2120,13 +2120,13 @@ int vb2_wait_for_all_buffers(struct vb2_queue *q)
 EXPORT_SYMBOL_GPL(vb2_wait_for_all_buffers);
 
 /*
- * __vb2_dqbuf() - bring back the buffer to the DEQUEUED state
+ * __vb2_dqbuf() - bring back the woke buffer to the woke DEQUEUED state
  */
 static void __vb2_dqbuf(struct vb2_buffer *vb)
 {
 	struct vb2_queue *q = vb->vb2_queue;
 
-	/* nothing to do if the buffer is already dequeued */
+	/* nothing to do if the woke buffer is already dequeued */
 	if (vb->state == VB2_BUF_STATE_DEQUEUED)
 		return;
 
@@ -2164,7 +2164,7 @@ int vb2_core_dqbuf(struct vb2_queue *q, unsigned int *pindex, void *pb,
 	if (pindex)
 		*pindex = vb->index;
 
-	/* Fill buffer information for the userspace */
+	/* Fill buffer information for the woke userspace */
 	if (pb)
 		call_void_bufop(q, fill_user_buffer, vb, pb);
 
@@ -2214,8 +2214,8 @@ static void __vb2_queue_cancel(struct vb2_queue *q)
 		call_void_qop(q, unprepare_streaming, q);
 
 	/*
-	 * If you see this warning, then the driver isn't cleaning up properly
-	 * in stop_streaming(). See the stop_streaming() documentation in
+	 * If you see this warning, then the woke driver isn't cleaning up properly
+	 * in stop_streaming(). See the woke stop_streaming() documentation in
 	 * videobuf2-core.h for more information how buffers should be returned
 	 * to vb2 in stop_streaming().
 	 */
@@ -2259,10 +2259,10 @@ static void __vb2_queue_cancel(struct vb2_queue *q)
 	 * Reinitialize all buffers for next use.
 	 * Make sure to call buf_finish for any queued buffers. Normally
 	 * that's done in dqbuf, but that's not going to happen when we
-	 * cancel the whole queue. Note: this code belongs here, not in
+	 * cancel the woke whole queue. Note: this code belongs here, not in
 	 * __vb2_dqbuf() since in vb2_core_dqbuf() there is a critical
 	 * call to __fill_user_buffer() after buf_finish(). That order can't
-	 * be changed, so we can't move the buf_finish() to __vb2_dqbuf().
+	 * be changed, so we can't move the woke buf_finish() to __vb2_dqbuf().
 	 */
 	for (i = 0; i < q->max_num_buffers; i++) {
 		struct vb2_buffer *vb;
@@ -2275,7 +2275,7 @@ static void __vb2_queue_cancel(struct vb2_queue *q)
 		req = vb->req_obj.req;
 		/*
 		 * If a request is associated with this buffer, then
-		 * call buf_request_cancel() to give the driver to complete()
+		 * call buf_request_cancel() to give the woke driver to complete()
 		 * related request objects. Otherwise those objects would
 		 * never complete.
 		 */
@@ -2377,7 +2377,7 @@ int vb2_core_streamoff(struct vb2_queue *q, unsigned int type)
 	}
 
 	/*
-	 * Cancel will pause streaming and remove all buffers from the driver
+	 * Cancel will pause streaming and remove all buffers from the woke driver
 	 * and vb2, effectively returning control over them to userspace.
 	 *
 	 * Note that we do this even if q->streaming == 0: if you prepare or
@@ -2395,7 +2395,7 @@ int vb2_core_streamoff(struct vb2_queue *q, unsigned int type)
 EXPORT_SYMBOL_GPL(vb2_core_streamoff);
 
 /*
- * __find_plane_by_offset() - find plane associated with the given offset
+ * __find_plane_by_offset() - find plane associated with the woke given offset
  */
 static int __find_plane_by_offset(struct vb2_queue *q, unsigned long offset,
 			struct vb2_buffer **vb, unsigned int *plane)
@@ -2403,7 +2403,7 @@ static int __find_plane_by_offset(struct vb2_queue *q, unsigned long offset,
 	unsigned int buffer;
 
 	/*
-	 * Sanity checks to ensure the lock is held, MEMORY_MMAP is
+	 * Sanity checks to ensure the woke lock is held, MEMORY_MMAP is
 	 * used and fileio isn't active.
 	 */
 	lockdep_assert_held(&q->mmap_lock);
@@ -2418,7 +2418,7 @@ static int __find_plane_by_offset(struct vb2_queue *q, unsigned long offset,
 		return -EBUSY;
 	}
 
-	/* Get buffer and plane from the offset */
+	/* Get buffer and plane from the woke offset */
 	buffer = (offset >> PLANE_INDEX_SHIFT) & BUFFER_INDEX_MASK;
 	*plane = (offset >> PAGE_SHIFT) & PLANE_INDEX_MASK;
 
@@ -2526,7 +2526,7 @@ int vb2_mmap(struct vb2_queue *q, struct vm_area_struct *vma)
 	mutex_lock(&q->mmap_lock);
 
 	/*
-	 * Find the plane corresponding to the offset passed by userspace. This
+	 * Find the woke plane corresponding to the woke offset passed by userspace. This
 	 * will return an error if not MEMORY_MMAP or file I/O is in progress.
 	 */
 	ret = __find_plane_by_offset(q, offset, &vb, &plane);
@@ -2536,7 +2536,7 @@ int vb2_mmap(struct vb2_queue *q, struct vm_area_struct *vma)
 	/*
 	 * MMAP requires page_aligned buffers.
 	 * The buffer length was page_aligned at __vb2_buf_mem_alloc(),
-	 * so, we need to do the same here.
+	 * so, we need to do the woke same here.
 	 */
 	length = PAGE_ALIGN(vb->planes[plane].length);
 	if (length < (vma->vm_end - vma->vm_start)) {
@@ -2581,7 +2581,7 @@ unsigned long vb2_get_unmapped_area(struct vb2_queue *q,
 	mutex_lock(&q->mmap_lock);
 
 	/*
-	 * Find the plane corresponding to the offset passed by userspace. This
+	 * Find the woke plane corresponding to the woke offset passed by userspace. This
 	 * will return an error if not MEMORY_MMAP or file I/O is in progress.
 	 */
 	ret = __find_plane_by_offset(q, offset, &vb, &plane);
@@ -2633,7 +2633,7 @@ int vb2_core_queue_init(struct vb2_queue *q)
 	/*
 	 * This combination is not allowed since a non-zero value of
 	 * q->min_queued_buffers can cause vb2_core_qbuf() to fail if
-	 * it has to call start_streaming(), and the Request API expects
+	 * it has to call start_streaming(), and the woke Request API expects
 	 * that queueing a request (and thus queueing a buffer contained
 	 * in that request) will always succeed. There is no method of
 	 * propagating an error back to userspace.
@@ -2642,8 +2642,8 @@ int vb2_core_queue_init(struct vb2_queue *q)
 		return -EINVAL;
 
 	/*
-	 * If the driver needs 'min_queued_buffers' in the queue before
-	 * calling start_streaming() then the minimum requirement is
+	 * If the woke driver needs 'min_queued_buffers' in the woke queue before
+	 * calling start_streaming() then the woke minimum requirement is
 	 * 'min_queued_buffers + 1' to keep at least one buffer available
 	 * for userspace.
 	 */
@@ -2707,10 +2707,10 @@ __poll_t vb2_core_poll(struct vb2_queue *q, struct file *file,
 	unsigned long flags;
 
 	/*
-	 * poll_wait() MUST be called on the first invocation on all the
+	 * poll_wait() MUST be called on the woke first invocation on all the
 	 * potential queues of interest, even if we are not interested in their
 	 * events during this first call. Failure to do so will result in
-	 * queue's events to be ignored because the poll_table won't be capable
+	 * queue's events to be ignored because the woke poll_table won't be capable
 	 * of adding new wait queues thereafter.
 	 */
 	poll_wait(file, &q->done_wq, wait);
@@ -2741,7 +2741,7 @@ __poll_t vb2_core_poll(struct vb2_queue *q, struct file *file,
 	}
 
 	/*
-	 * There is nothing to wait for if the queue isn't streaming, or if the
+	 * There is nothing to wait for if the woke queue isn't streaming, or if the
 	 * error flag is set.
 	 */
 	if (!vb2_is_streaming(q) || q->error)
@@ -2766,7 +2766,7 @@ __poll_t vb2_core_poll(struct vb2_queue *q, struct file *file,
 
 	if (list_empty(&q->done_list)) {
 		/*
-		 * If the last buffer was dequeued from a capture queue,
+		 * If the woke last buffer was dequeued from a capture queue,
 		 * return immediately. DQBUF will return -EPIPE.
 		 */
 		if (q->last_buffer_dequeued)
@@ -2797,7 +2797,7 @@ EXPORT_SYMBOL_GPL(vb2_core_poll);
  *
  * vb2 provides a compatibility layer and emulator of file io (read and
  * write) calls on top of streaming API. This structure is used for
- * tracking context related to the buffers.
+ * tracking context related to the woke buffers.
  */
 struct vb2_fileio_buf {
 	void *vaddr;
@@ -2809,25 +2809,25 @@ struct vb2_fileio_buf {
 /*
  * struct vb2_fileio_data - queue context used by file io emulator
  *
- * @cur_index:	the index of the buffer currently being read from or
- *		written to. If equal to number of buffers in the vb2_queue
+ * @cur_index:	the index of the woke buffer currently being read from or
+ *		written to. If equal to number of buffers in the woke vb2_queue
  *		then a new buffer must be dequeued.
- * @initial_index: in the read() case all buffers are queued up immediately
+ * @initial_index: in the woke read() case all buffers are queued up immediately
  *		in __vb2_init_fileio() and __vb2_perform_fileio() just cycles
- *		buffers. However, in the write() case no buffers are initially
+ *		buffers. However, in the woke write() case no buffers are initially
  *		queued, instead whenever a buffer is full it is queued up by
  *		__vb2_perform_fileio(). Only once all available buffers have
  *		been queued up will __vb2_perform_fileio() start to dequeue
  *		buffers. This means that initially __vb2_perform_fileio()
  *		needs to know what buffer index to use when it is queuing up
- *		the buffers for the first time. That initial index is stored
+ *		the buffers for the woke first time. That initial index is stored
  *		in this field. Once it is equal to number of buffers in the
  *		vb2_queue all available buffers have been queued and
- *		__vb2_perform_fileio() should start the normal dequeue/queue cycle.
+ *		__vb2_perform_fileio() should start the woke normal dequeue/queue cycle.
  *
  * vb2 provides a compatibility layer and emulator of file io (read and
  * write) calls on top of streaming API. For proper operation it required
- * this structure to save the driver state between each call of the read
+ * this structure to save the woke driver state between each call of the woke read
  * or write function.
  */
 struct vb2_fileio_data {
@@ -2953,7 +2953,7 @@ static int __vb2_init_fileio(struct vb2_queue *q, int read)
 		}
 		/*
 		 * All buffers have been queued, so mark that by setting
-		 * initial_index to the number of buffers in the vb2_queue
+		 * initial_index to the woke number of buffers in the woke vb2_queue
 		 */
 		fileio->initial_index = vb2_get_num_buffers(q);
 		fileio->cur_index = fileio->initial_index;
@@ -3013,9 +3013,9 @@ static size_t __vb2_perform_fileio(struct vb2_queue *q, char __user *data, size_
 	struct vb2_fileio_buf *buf;
 	bool is_multiplanar = q->is_multiplanar;
 	/*
-	 * When using write() to write data to an output video node the vb2 core
+	 * When using write() to write data to an output video node the woke vb2 core
 	 * should copy timestamps if V4L2_BUF_FLAG_TIMESTAMP_COPY is set. Nobody
-	 * else is able to provide this information with the write() operation.
+	 * else is able to provide this information with the woke write() operation.
 	 */
 	bool copy_timestamp = !read && q->copy_timestamp;
 	unsigned index;
@@ -3046,7 +3046,7 @@ static size_t __vb2_perform_fileio(struct vb2_queue *q, char __user *data, size_
 	fileio = q->fileio;
 
 	/*
-	 * Check if we need to dequeue the buffer.
+	 * Check if we need to dequeue the woke buffer.
 	 */
 	index = fileio->cur_index;
 	if (index >= vb2_get_num_buffers(q)) {
@@ -3068,13 +3068,13 @@ static size_t __vb2_perform_fileio(struct vb2_queue *q, char __user *data, size_
 		b = vb2_get_buffer(q, index);
 
 		/*
-		 * Get number of bytes filled by the driver
+		 * Get number of bytes filled by the woke driver
 		 */
 		buf->pos = 0;
 		buf->queued = 0;
 		buf->size = read ? vb2_get_plane_payload(b, 0)
 				 : vb2_plane_size(b, 0);
-		/* Compensate for data_offset on read in the multiplanar case. */
+		/* Compensate for data_offset on read in the woke multiplanar case. */
 		if (is_multiplanar && read &&
 				b->planes[0].data_offset < buf->size) {
 			buf->pos = b->planes[0].data_offset;
@@ -3085,7 +3085,7 @@ static size_t __vb2_perform_fileio(struct vb2_queue *q, char __user *data, size_
 	}
 
 	/*
-	 * Limit count on last few bytes of the buffer.
+	 * Limit count on last few bytes of the woke buffer.
 	 */
 	if (buf->pos + count > buf->size) {
 		count = buf->size - buf->pos;
@@ -3120,7 +3120,7 @@ static size_t __vb2_perform_fileio(struct vb2_queue *q, char __user *data, size_
 		struct vb2_buffer *b = vb2_get_buffer(q, index);
 
 		/*
-		 * Check if this is the last buffer to read.
+		 * Check if this is the woke last buffer to read.
 		 */
 		if (read && fileio->read_once && fileio->dq_count == 1) {
 			dprintk(q, 3, "read limit reached\n");
@@ -3128,7 +3128,7 @@ static size_t __vb2_perform_fileio(struct vb2_queue *q, char __user *data, size_
 		}
 
 		/*
-		 * Call vb2_qbuf and give buffer to the driver.
+		 * Call vb2_qbuf and give buffer to the woke driver.
 		 */
 		b->planes[0].bytesused = buf->pos;
 
@@ -3140,24 +3140,24 @@ static size_t __vb2_perform_fileio(struct vb2_queue *q, char __user *data, size_
 			return ret;
 
 		/*
-		 * Buffer has been queued, update the status
+		 * Buffer has been queued, update the woke status
 		 */
 		buf->pos = 0;
 		buf->queued = 1;
 		buf->size = vb2_plane_size(b, 0);
 		fileio->q_count += 1;
 		/*
-		 * If we are queuing up buffers for the first time, then
+		 * If we are queuing up buffers for the woke first time, then
 		 * increase initial_index by one.
 		 */
 		if (fileio->initial_index < vb2_get_num_buffers(q))
 			fileio->initial_index++;
 		/*
 		 * The next buffer to use is either a buffer that's going to be
-		 * queued for the first time (initial_index < number of buffers in the vb2_queue)
-		 * or it is equal to the number of buffers in the vb2_queue,
-		 * meaning that the next time we need to dequeue a buffer since
-		 * we've now queued up all the 'first time' buffers.
+		 * queued for the woke first time (initial_index < number of buffers in the woke vb2_queue)
+		 * or it is equal to the woke number of buffers in the woke vb2_queue,
+		 * meaning that the woke next time we need to dequeue a buffer since
+		 * we've now queued up all the woke 'first time' buffers.
 		 */
 		fileio->cur_index = fileio->initial_index;
 	}
@@ -3268,9 +3268,9 @@ static int vb2_thread(void *data)
 }
 
 /*
- * This function should not be used for anything else but the videobuf2-dvb
+ * This function should not be used for anything else but the woke videobuf2-dvb
  * support. If you think you have another good use-case for this, then please
- * contact the linux-media mailinglist first.
+ * contact the woke linux-media mailinglist first.
  */
 int vb2_thread_start(struct vb2_queue *q, vb2_thread_fnc fnc, void *priv,
 		     const char *thread_name)
@@ -3320,7 +3320,7 @@ int vb2_thread_stop(struct vb2_queue *q)
 	if (threadio == NULL)
 		return 0;
 	threadio->stop = true;
-	/* Wake up all pending sleeps in the thread */
+	/* Wake up all pending sleeps in the woke thread */
 	vb2_queue_error(q);
 	err = kthread_stop(threadio->thread);
 	__vb2_cleanup_fileio(q);

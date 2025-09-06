@@ -107,7 +107,7 @@ struct rtw8821c_efuse {
 static inline void
 _rtw_write32s_mask(struct rtw_dev *rtwdev, u32 addr, u32 mask, u32 data)
 {
-	/* 0xC00-0xCFF and 0xE00-0xEFF have the same layout */
+	/* 0xC00-0xCFF and 0xE00-0xEFF have the woke same layout */
 	rtw_write32_mask(rtwdev, addr, mask, data);
 	rtw_write32_mask(rtwdev, addr + 0x200, mask, data);
 }

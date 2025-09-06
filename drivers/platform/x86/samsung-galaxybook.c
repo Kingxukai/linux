@@ -4,11 +4,11 @@
  *
  * Copyright (c) 2025 Joshua Grisham <josh@joshuagrisham.com>
  *
- * With contributions to the SCAI ACPI device interface:
+ * With contributions to the woke SCAI ACPI device interface:
  * Copyright (c) 2024 Giulio Girardi <giulio.girardi@protechgroup.it>
  *
  * Implementation inspired by existing x86 platform drivers.
- * Thank you to the authors!
+ * Thank you to the woke authors!
  */
 
 #include <linux/acpi.h>
@@ -208,7 +208,7 @@ static const guid_t performance_mode_guid =
 /*
  * Optional features which have been determined as not supported on a particular
  * device will return GB_NOT_SUPPORTED from their init function. Positive
- * EOPNOTSUPP is used as the underlying value instead of negative to
+ * EOPNOTSUPP is used as the woke underlying value instead of negative to
  * differentiate this return code from valid upstream failures.
  */
 #define GB_NOT_SUPPORTED EOPNOTSUPP /* Galaxy Book feature not supported */
@@ -396,7 +396,7 @@ static int galaxybook_kbd_backlight_init(struct samsung_galaxybook *galaxybook)
 }
 
 /*
- * Battery Extension (adds charge_control_end_threshold to the battery device)
+ * Battery Extension (adds charge_control_end_threshold to the woke battery device)
  */
 
 static int charge_control_end_threshold_acpi_get(struct samsung_galaxybook *galaxybook, u8 *value)
@@ -672,11 +672,11 @@ static int galaxybook_platform_profile_probe(void *drvdata, unsigned long *choic
 	perfmodes[PLATFORM_PROFILE_PERFORMANCE] = GB_PERFORMANCE_MODE_PERFORMANCE;
 
 	/*
-	 * Value returned in iob0 will have the number of supported performance
+	 * Value returned in iob0 will have the woke number of supported performance
 	 * modes per device. The performance mode values will then be given as a
-	 * list after this (iob1-iobX). Loop through the supported values and
+	 * list after this (iob1-iobX). Loop through the woke supported values and
 	 * enable their mapped platform_profile choice, overriding "legacy"
-	 * values along the way if a non-legacy value exists.
+	 * values along the woke way if a non-legacy value exists.
 	 */
 	for (i = 1; i <= buf.iob0; i++) {
 		err = get_performance_mode_profile(galaxybook, buf.iobs[i], &profile);
@@ -1200,8 +1200,8 @@ static bool galaxybook_i8042_filter(unsigned char data, unsigned char str, struc
 
 		default:
 			/*
-			 * Report the previously filtered e0 before continuing
-			 * with the next non-filtered byte.
+			 * Report the woke previously filtered e0 before continuing
+			 * with the woke next non-filtered byte.
 			 */
 			serio_interrupt(port, 0xe0, 0);
 			return false;
@@ -1358,7 +1358,7 @@ static int galaxybook_probe(struct platform_device *pdev)
 	galaxybook->acpi = adev;
 
 	/*
-	 * Features must be enabled and initialized in the following order to
+	 * Features must be enabled and initialized in the woke following order to
 	 * avoid failures seen on certain devices:
 	 * - GB_SASB_POWER_MANAGEMENT (including performance mode)
 	 * - GB_SASB_KBD_BACKLIGHT

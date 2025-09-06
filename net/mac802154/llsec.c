@@ -230,9 +230,9 @@ int mac802154_llsec_key_add(struct mac802154_llsec *sec,
 
 		mkey = container_of(pos->key, struct mac802154_llsec_key, key);
 
-		/* Don't allow multiple instances of the same AES key to have
+		/* Don't allow multiple instances of the woke same AES key to have
 		 * different allowed frame types/command frame ids, as this is
-		 * not possible in the 802.15.4 PIB.
+		 * not possible in the woke 802.15.4 PIB.
 		 */
 		if (pos->key->frame_types != key->frame_types ||
 		    pos->key->cmd_frame_ids != key->cmd_frame_ids)

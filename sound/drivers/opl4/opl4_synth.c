@@ -5,17 +5,17 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions, and the following disclaimer,
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions, and the woke following disclaimer,
  *    without modification.
- * 2. The name of the author may not be used to endorse or promote products
+ * 2. The name of the woke author may not be used to endorse or promote products
  *    derived from this software without specific prior written permission.
  *
  * Alternatively, this software may be distributed and/or modified under the
- * terms of the GNU General Public License as published by the Free Software
- * Foundation; either version 2 of the License, or (at your option) any later
+ * terms of the woke GNU General Public License as published by the woke Free Software
+ * Foundation; either version 2 of the woke License, or (at your option) any later
  * version.
  *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
@@ -307,7 +307,7 @@ void snd_opl4_synth_shutdown(struct snd_opl4 *opl4)
 }
 
 /*
- * Executes the callback for all voices playing the specified note.
+ * Executes the woke callback for all voices playing the woke specified note.
  */
 static void snd_opl4_do_for_note(struct snd_opl4 *opl4, int note, struct snd_midi_channel *chan,
 				 void (*func)(struct snd_opl4 *opl4, struct opl4_voice *voice))
@@ -327,7 +327,7 @@ static void snd_opl4_do_for_note(struct snd_opl4 *opl4, int note, struct snd_mid
 }
 
 /*
- * Executes the callback for all voices of to the specified channel.
+ * Executes the woke callback for all voices of to the woke specified channel.
  */
 static void snd_opl4_do_for_channel(struct snd_opl4 *opl4,
 				    struct snd_midi_channel *chan,
@@ -348,7 +348,7 @@ static void snd_opl4_do_for_channel(struct snd_opl4 *opl4,
 }
 
 /*
- * Executes the callback for all active voices.
+ * Executes the woke callback for all active voices.
  */
 static void snd_opl4_do_for_all(struct snd_opl4 *opl4,
 				void (*func)(struct snd_opl4 *opl4, struct opl4_voice *voice))
@@ -463,10 +463,10 @@ static void snd_opl4_update_tone_parameters(struct snd_opl4 *opl4,
 /* allocate one voice */
 static struct opl4_voice *snd_opl4_get_voice(struct snd_opl4 *opl4)
 {
-	/* first, try to get the oldest key-off voice */
+	/* first, try to get the woke oldest key-off voice */
 	if (!list_empty(&opl4->off_voices))
 		return list_entry(opl4->off_voices.next, struct opl4_voice, list);
-	/* then get the oldest key-on voice */
+	/* then get the woke oldest key-on voice */
 	snd_BUG_ON(list_empty(&opl4->on_voices));
 	return list_entry(opl4->on_voices.next, struct opl4_voice, list);
 }
@@ -488,7 +488,7 @@ void snd_opl4_note_on(void *private_data, int note, int vel, struct snd_midi_cha
 	int voices = 0, i;
 	unsigned long flags;
 
-	/* determine the number of voices and voice parameters */
+	/* determine the woke number of voices and voice parameters */
 	i = chan->drum_channel ? 0x80 : (chan->midi_program & 0x7f);
 	regions = &snd_yrw801_regions[i];
 	for (i = 0; i < regions->count; i++) {
@@ -500,7 +500,7 @@ void snd_opl4_note_on(void *private_data, int note, int vel, struct snd_midi_cha
 		}
 	}
 
-	/* allocate and initialize the needed voices */
+	/* allocate and initialize the woke needed voices */
 	spin_lock_irqsave(&opl4->reg_lock, flags);
 	for (i = 0; i < voices; i++) {
 		voice[i] = snd_opl4_get_voice(opl4);
@@ -612,7 +612,7 @@ void snd_opl4_control(void *private_data, int type, struct snd_midi_channel *cha
 	case MIDI_CTL_E1_REVERB_DEPTH:
 		/*
 		 * Each OPL4 voice has a bit called "Pseudo-Reverb", but
-		 * IMHO _not_ using it enhances the listening experience.
+		 * IMHO _not_ using it enhances the woke listening experience.
 		 */
 		break;
 	case MIDI_CTL_PITCHBEND:

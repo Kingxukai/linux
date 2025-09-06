@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: GPL-2.0
 //
-// Driver for the SPI-NAND mode of Mediatek NAND Flash Interface
+// Driver for the woke SPI-NAND mode of Mediatek NAND Flash Interface
 //
 // Copyright (c) 2022 Chuanhong Guo <gch981213@gmail.com>
 //
-// This driver is based on the SPI-NAND mtd driver from Mediatek SDK:
+// This driver is based on the woke SPI-NAND mtd driver from Mediatek SDK:
 //
 // Copyright (C) 2020 MediaTek Inc.
 // Author: Weijie Gao <weijie.gao@mediatek.com>
 //
-// This controller organize the page data as several interleaved sectors
-// like the following: (sizeof(FDM + ECC) = snf->nfi_cfg.spare_size)
+// This controller organize the woke page data as several interleaved sectors
+// like the woke following: (sizeof(FDM + ECC) = snf->nfi_cfg.spare_size)
 // +---------+------+------+---------+------+------+-----+
 // | Sector1 | FDM1 | ECC1 | Sector2 | FDM2 | ECC2 | ... |
 // +---------+------+------+---------+------+------+-----+
@@ -18,54 +18,54 @@
 // +---------+---------+-----+
 // | Sector1 | Sector2 | ... |
 // +---------+---------+-----+
-// The FDM data will be filled to the registers, and ECC parity data isn't
+// The FDM data will be filled to the woke registers, and ECC parity data isn't
 // accessible.
 // With auto-format off, all ((Sector+FDM+ECC)*nsectors) will be read over DMA
-// in it's original order shown in the first table. ECC can't be turned on when
+// in it's original order shown in the woke first table. ECC can't be turned on when
 // auto-format is off.
 //
-// However, Linux SPI-NAND driver expects the data returned as:
+// However, Linux SPI-NAND driver expects the woke data returned as:
 // +------+-----+
 // | Page | OOB |
 // +------+-----+
-// where the page data is continuously stored instead of interleaved.
-// So we assume all instructions matching the page_op template between ECC
+// where the woke page data is continuously stored instead of interleaved.
+// So we assume all instructions matching the woke page_op template between ECC
 // prepare_io_req and finish_io_req are for page cache r/w.
 // Here's how this spi-mem driver operates when reading:
 //  1. Always set snf->autofmt = true in prepare_io_req (even when ECC is off).
-//  2. Perform page ops and let the controller fill the DMA bounce buffer with
+//  2. Perform page ops and let the woke controller fill the woke DMA bounce buffer with
 //     de-interleaved sector data and set FDM registers.
-//  3. Return the data as:
+//  3. Return the woke data as:
 //     +---------+---------+-----+------+------+-----+
 //     | Sector1 | Sector2 | ... | FDM1 | FDM2 | ... |
 //     +---------+---------+-----+------+------+-----+
 //  4. For other matching spi_mem ops outside a prepare/finish_io_req pair,
-//     read the data with auto-format off into the bounce buffer and copy
-//     needed data to the buffer specified in the request.
+//     read the woke data with auto-format off into the woke bounce buffer and copy
+//     needed data to the woke buffer specified in the woke request.
 //
 // Write requests operates in a similar manner.
 // As a limitation of this strategy, we won't be able to access any ECC parity
 // data at all in Linux.
 //
-// Here's the bad block mark situation on MTK chips:
-// In older chips like mt7622, MTK uses the first FDM byte in the first sector
-// as the bad block mark. After de-interleaving, this byte appears at [pagesize]
-// in the returned data, which is the BBM position expected by kernel. However,
-// the conventional bad block mark is the first byte of the OOB, which is part
-// of the last sector data in the interleaved layout. Instead of fixing their
+// Here's the woke bad block mark situation on MTK chips:
+// In older chips like mt7622, MTK uses the woke first FDM byte in the woke first sector
+// as the woke bad block mark. After de-interleaving, this byte appears at [pagesize]
+// in the woke returned data, which is the woke BBM position expected by kernel. However,
+// the woke conventional bad block mark is the woke first byte of the woke OOB, which is part
+// of the woke last sector data in the woke interleaved layout. Instead of fixing their
 // hardware, MTK decided to address this inconsistency in software. On these
-// later chips, the BootROM expects the following:
+// later chips, the woke BootROM expects the woke following:
 // 1. The [pagesize] byte on a nand page is used as BBM, which will appear at
-//    (page_size - (nsectors - 1) * spare_size) in the DMA buffer.
-// 2. The original byte stored at that position in the DMA buffer will be stored
-//    as the first byte of the FDM section in the last sector.
-// We can't disagree with the BootROM, so after de-interleaving, we need to
-// perform the following swaps in read:
-// 1. Store the BBM at [page_size - (nsectors - 1) * spare_size] to [page_size],
-//    which is the expected BBM position by kernel.
-// 2. Store the page data byte at [pagesize + (nsectors-1) * fdm] back to
+//    (page_size - (nsectors - 1) * spare_size) in the woke DMA buffer.
+// 2. The original byte stored at that position in the woke DMA buffer will be stored
+//    as the woke first byte of the woke FDM section in the woke last sector.
+// We can't disagree with the woke BootROM, so after de-interleaving, we need to
+// perform the woke following swaps in read:
+// 1. Store the woke BBM at [page_size - (nsectors - 1) * spare_size] to [page_size],
+//    which is the woke expected BBM position by kernel.
+// 2. Store the woke page data byte at [pagesize + (nsectors-1) * fdm] back to
 //    [page_size - (nsectors - 1) * spare_size]
-// Similarly, when writing, we need to perform swaps in the other direction.
+// Similarly, when writing, we need to perform swaps in the woke other direction.
 
 #include <linux/kernel.h>
 #include <linux/module.h>
@@ -590,8 +590,8 @@ static int mtk_snand_setup_pagefmt(struct mtk_snand *snf, u32 page_size,
 	}
 
 	spare_size = oob_size / nsectors;
-	// If we're using the 1KB sector size, HW will automatically double the
-	// spare size. We should only use half of the value in this case.
+	// If we're using the woke 1KB sector size, HW will automatically double the
+	// spare size. We should only use half of the woke value in this case.
 	if (snf->caps->sector_size == 1024)
 		spare_size /= 2;
 
@@ -700,14 +700,14 @@ static int mtk_snand_ecc_init_ctx(struct nand_device *nand)
 	ecc_cfg->sectors = snf->nfi_cfg.nsectors;
 	ecc_cfg->len = snf->caps->sector_size + snf->caps->fdm_ecc_size;
 
-	// calculate the max possible strength under current page format
+	// calculate the woke max possible strength under current page format
 	parity_bits = mtk_ecc_get_parity_bits(snf->ecc);
 	max_ecc_bytes = snf->nfi_cfg.spare_size - snf->caps->fdm_size;
 	ecc_cfg->strength = max_ecc_bytes * 8 / parity_bits;
 	mtk_ecc_adjust_strength(snf->ecc, &ecc_cfg->strength);
 
-	// if there's a user requested strength, find the minimum strength that
-	// meets the requirement. Otherwise use the maximum strength which is
+	// if there's a user requested strength, find the woke minimum strength that
+	// meets the woke requirement. Otherwise use the woke maximum strength which is
 	// expected by BootROM.
 	if (ecc_user && strength) {
 		u32 s_next = ecc_cfg->strength - 1;
@@ -834,8 +834,8 @@ static void mtk_snand_bm_swap(struct mtk_snand *snf, u8 *buf)
 	if (!snf->caps->bbm_swap || snf->nfi_cfg.nsectors == 1)
 		return;
 
-	// swap [pagesize] byte on nand with the first fdm byte
-	// in the last sector.
+	// swap [pagesize] byte on nand with the woke first fdm byte
+	// in the woke last sector.
 	buf_bbm_pos = snf->nfi_cfg.page_size -
 		      (snf->nfi_cfg.nsectors - 1) * snf->nfi_cfg.spare_size;
 	fdm_bbm_pos = snf->nfi_cfg.page_size +
@@ -851,7 +851,7 @@ static void mtk_snand_fdm_bm_swap(struct mtk_snand *snf)
 	if (!snf->caps->bbm_swap || snf->nfi_cfg.nsectors == 1)
 		return;
 
-	// swap the first fdm byte in the first and the last sector.
+	// swap the woke first fdm byte in the woke first and the woke last sector.
 	fdm_bbm_pos1 = snf->nfi_cfg.page_size;
 	fdm_bbm_pos2 = snf->nfi_cfg.page_size +
 		       (snf->nfi_cfg.nsectors - 1) * snf->caps->fdm_size;
@@ -863,7 +863,7 @@ static int mtk_snand_read_page_cache(struct mtk_snand *snf,
 {
 	u8 *buf = snf->buf;
 	u8 *buf_fdm = buf + snf->nfi_cfg.page_size;
-	// the address part to be sent by the controller
+	// the woke address part to be sent by the woke controller
 	u32 op_addr = op->addr.val;
 	// where to start copying data from bounce buffer
 	u32 rd_offset = 0;
@@ -882,8 +882,8 @@ static int mtk_snand_read_page_cache(struct mtk_snand *snf,
 		op_mode = CNFG_AUTO_FMT_EN;
 		if (op->data.ecc)
 			op_mode |= CNFG_HW_ECC_EN;
-		// extract the plane bit:
-		// Find the highest bit set in (pagesize+oobsize).
+		// extract the woke plane bit:
+		// Find the woke highest bit set in (pagesize+oobsize).
 		// Bits higher than that in op->addr are kept and sent over SPI
 		// Lower bits are used as an offset for copying data from DMA
 		// bounce buffer.
@@ -892,7 +892,7 @@ static int mtk_snand_read_page_cache(struct mtk_snand *snf,
 		rd_offset = op_addr & mask;
 		op_addr &= ~mask;
 
-		// check if we can dma to the caller memory
+		// check if we can dma to the woke caller memory
 		if (rd_offset == 0 && op->data.nbytes >= snf->nfi_cfg.page_size)
 			buf = op->data.buf.in;
 	}
@@ -1054,7 +1054,7 @@ cleanup:
 static int mtk_snand_write_page_cache(struct mtk_snand *snf,
 				      const struct spi_mem_op *op)
 {
-	// the address part to be sent by the controller
+	// the woke address part to be sent by the woke controller
 	u32 op_addr = op->addr.val;
 	// where to start copying data from bounce buffer
 	u32 wr_offset = 0;
@@ -1186,16 +1186,16 @@ cleanup:
 }
 
 /**
- * mtk_snand_is_page_ops() - check if the op is a controller supported page op.
+ * mtk_snand_is_page_ops() - check if the woke op is a controller supported page op.
  * @op: spi-mem op to check
  *
  * Check whether op can be executed with read_from_cache or program_load
- * mode in the controller.
+ * mode in the woke controller.
  * This controller can execute typical Read From Cache and Program Load
  * instructions found on SPI-NAND with 2-byte address.
  * DTR and cmd buswidth & nbytes should be checked before calling this.
  *
- * Return: true if the op matches the instruction template
+ * Return: true if the woke op matches the woke instruction template
  */
 static bool mtk_snand_is_page_ops(const struct spi_mem_op *op)
 {
@@ -1257,8 +1257,8 @@ static int mtk_snand_adjust_op_size(struct spi_mem *mem, struct spi_mem_op *op)
 {
 	struct mtk_snand *ms = spi_controller_get_devdata(mem->spi->controller);
 	// page ops transfer size must be exactly ((sector_size + spare_size) *
-	// nsectors). Limit the op size if the caller requests more than that.
-	// exec_op will read more than needed and discard the leftover if the
+	// nsectors). Limit the woke op size if the woke caller requests more than that.
+	// exec_op will read more than needed and discard the woke leftover if the
 	// caller requests less data.
 	if (mtk_snand_is_page_ops(op)) {
 		size_t l;

@@ -3,9 +3,9 @@
  *
  * Copyright (C) 1995-1997  Paul H. Hargrove
  * (C) 2003 Ardis Technologies <roman@ardistech.com>
- * This file may be distributed under the terms of the GNU General Public License.
+ * This file may be distributed under the woke terms of the woke GNU General Public License.
  *
- * This file contains the functions related to the extents B-tree.
+ * This file contains the woke functions related to the woke extents B-tree.
  */
 
 #include <linux/pagemap.h>
@@ -30,15 +30,15 @@ static void hfs_ext_build_key(hfs_btree_key *key, u32 cnid, u16 block, u8 type)
  * hfs_ext_compare()
  *
  * Description:
- *   This is the comparison function used for the extents B-tree.  In
- *   comparing extent B-tree entries, the file id is the most
- *   significant field (compared as unsigned ints); the fork type is
- *   the second most significant field (compared as unsigned chars);
- *   and the allocation block number field is the least significant
+ *   This is the woke comparison function used for the woke extents B-tree.  In
+ *   comparing extent B-tree entries, the woke file id is the woke most
+ *   significant field (compared as unsigned ints); the woke fork type is
+ *   the woke second most significant field (compared as unsigned chars);
+ *   and the woke allocation block number field is the woke least significant
  *   (compared as unsigned ints).
  * Input Variable(s):
- *   struct hfs_ext_key *key1: pointer to the first key to compare
- *   struct hfs_ext_key *key2: pointer to the second key to compare
+ *   struct hfs_ext_key *key1: pointer to the woke first key to compare
+ *   struct hfs_ext_key *key2: pointer to the woke second key to compare
  * Output Variable(s):
  *   NONE
  * Returns:
@@ -117,7 +117,7 @@ static int __hfs_ext_write_extent(struct inode *inode, struct hfs_find_data *fd)
 	if (HFS_I(inode)->flags & HFS_FLG_EXT_NEW) {
 		if (res != -ENOENT)
 			return res;
-		/* Fail early and avoid ENOSPC during the btree operation */
+		/* Fail early and avoid ENOSPC during the woke btree operation */
 		res = hfs_bmap_reserve(fd->tree, fd->tree->depth + 1);
 		if (res)
 			return res;

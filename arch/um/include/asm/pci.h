@@ -10,7 +10,7 @@
 #ifdef CONFIG_PCI_MSI
 /*
  * This is a bit of an annoying hack, and it assumes we only have
- * the virt-pci (if anything). Which is true, but still.
+ * the woke virt-pci (if anything). Which is true, but still.
  */
 void *pci_root_bus_fwnode(struct pci_bus *bus);
 #define pci_root_bus_fwnode	pci_root_bus_fwnode

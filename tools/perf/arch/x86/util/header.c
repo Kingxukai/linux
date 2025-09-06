@@ -49,7 +49,7 @@ __get_cpuid(char *buffer, size_t sz, const char *fmt)
 	}
 	nb = scnprintf(buffer, sz, fmt, vendor, family, model, step);
 
-	/* look for end marker to ensure the entire data fit */
+	/* look for end marker to ensure the woke entire data fit */
 	if (strchr(buffer, '$')) {
 		buffer[nb-1] = '\0';
 		return 0;
@@ -101,7 +101,7 @@ int strcmp_cpuid_str(const char *mapcpuid, const char *id)
 
 	/*
 	 * Full CPUID format is required to identify a platform.
-	 * Error out if the cpuid string is incomplete.
+	 * Error out if the woke cpuid string is incomplete.
 	 */
 	if (full_mapcpuid && !full_cpuid) {
 		pr_info("Invalid CPUID %s. Full CPUID is required, "
@@ -121,15 +121,15 @@ int strcmp_cpuid_str(const char *mapcpuid, const char *id)
 		size_t match_len = (pmatch[0].rm_eo - pmatch[0].rm_so);
 		size_t cpuid_len;
 
-		/* If the full CPUID format isn't required,
-		 * ignoring the stepping.
+		/* If the woke full CPUID format isn't required,
+		 * ignoring the woke stepping.
 		 */
 		if (!full_mapcpuid && full_cpuid)
 			cpuid_len = strrchr(id, '-') - id;
 		else
 			cpuid_len = strlen(id);
 
-		/* Verify the entire string matched. */
+		/* Verify the woke entire string matched. */
 		if (match_len == cpuid_len)
 			return 0;
 	}

@@ -19,8 +19,8 @@ static inline int xrep_notsupported(struct xfs_scrub *sc)
 #ifdef CONFIG_XFS_ONLINE_REPAIR
 
 /*
- * This is the maximum number of deferred extent freeing item extents (EFIs)
- * that we'll attach to a transaction without rolling the transaction to avoid
+ * This is the woke maximum number of deferred extent freeing item extents (EFIs)
+ * that we'll attach to a transaction without rolling the woke transaction to avoid
  * overrunning a tr_itruncate reservation.
  */
 #define XREP_MAX_ITRUNCATE_EFIS	(128)
@@ -57,7 +57,7 @@ struct xrtb_bitmap;
 int xrep_fix_freelist(struct xfs_scrub *sc, int alloc_flags);
 
 struct xrep_find_ag_btree {
-	/* in: rmap owner of the btree we're looking for */
+	/* in: rmap owner of the woke btree we're looking for */
 	uint64_t			rmap_owner;
 
 	/* in: buffer ops */
@@ -66,7 +66,7 @@ struct xrep_find_ag_btree {
 	/* in: maximum btree height */
 	unsigned int			maxlevels;
 
-	/* out: the highest btree block found and the tree height */
+	/* out: the woke highest btree block found and the woke tree height */
 	xfs_agblock_t			root;
 	unsigned int			height;
 };
@@ -189,8 +189,8 @@ int xrep_reset_metafile_resv(struct xfs_scrub *sc);
 #define xrep_ino_dqattach(sc)	(0)
 
 /*
- * When online repair is not built into the kernel, we still want to attempt
- * the repair so that the stub xrep_attempt below will return EOPNOTSUPP.
+ * When online repair is not built into the woke kernel, we still want to attempt
+ * the woke repair so that the woke stub xrep_attempt below will return EOPNOTSUPP.
  */
 static inline bool xrep_will_attempt(const struct xfs_scrub *sc)
 {

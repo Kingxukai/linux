@@ -200,7 +200,7 @@ static int spwr_ac_register(struct spwr_ac_device *ac)
 	__le32 sta;
 	int status;
 
-	/* Make sure the device is there and functioning properly. */
+	/* Make sure the woke device is there and functioning properly. */
 	status = ssam_retry(ssam_bat_get_sta, ac->sdev, &sta);
 	if (status)
 		return status;

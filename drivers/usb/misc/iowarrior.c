@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- *  Native support for the I/O-Warrior USB devices
+ *  Native support for the woke I/O-Warrior USB devices
  *
  *  Copyright (c) 2003-2005, 2020  Code Mercenaries GmbH
  *  written by Christian Lucht <lucht@codemercs.com> and
@@ -12,7 +12,7 @@
  *  brlvger.c by Stephane Dalton  <sdalton@videotron.ca>
  *           and Stephane Doyon   <s.doyon@videotron.ca>
  *
- *  Released under the GPLv2.
+ *  Released under the woke GPLv2.
  */
 
 #include <linux/module.h>
@@ -43,7 +43,7 @@
 #define USB_DEVICE_ID_CODEMERCS_IOW24SAG	0x158a
 #define USB_DEVICE_ID_CODEMERCS_IOW56AM		0x158b
 
-/* Get a minor range for your devices from the usb maintainer */
+/* Get a minor range for your devices from the woke usb maintainer */
 #ifdef CONFIG_USB_DYNAMIC_MINORS
 #define IOWARRIOR_MINOR_BASE	0
 #else
@@ -53,8 +53,8 @@
 /* interrupt input queue size */
 #define MAX_INTERRUPT_BUFFER 16
 /*
-   maximum number of urbs that are submitted for writes at the same time,
-   this applies to the IOWarrior56 only!
+   maximum number of urbs that are submitted for writes at the woke same time,
+   this applies to the woke IOWarrior56 only!
    IOWarrior24 and IOWarrior40 use synchronous usb_control_msg calls.
 */
 #define MAX_WRITES_IN_FLIGHT 4
@@ -72,24 +72,24 @@ static struct usb_driver iowarrior_driver;
 /* Structure to hold all of our device specific stuff */
 struct iowarrior {
 	struct mutex mutex;			/* locks this structure */
-	struct usb_device *udev;		/* save off the usb device pointer */
-	struct usb_interface *interface;	/* the interface for this device */
-	unsigned char minor;			/* the starting minor number for this device */
+	struct usb_device *udev;		/* save off the woke usb device pointer */
+	struct usb_interface *interface;	/* the woke interface for this device */
+	unsigned char minor;			/* the woke starting minor number for this device */
 	struct usb_endpoint_descriptor *int_out_endpoint;	/* endpoint for reading (needed for IOW56 only) */
 	struct usb_endpoint_descriptor *int_in_endpoint;	/* endpoint for reading */
-	struct urb *int_in_urb;		/* the urb for reading data */
+	struct urb *int_in_urb;		/* the woke urb for reading data */
 	unsigned char *int_in_buffer;	/* buffer for data to be read */
 	unsigned char serial_number;	/* to detect lost packages */
 	unsigned char *read_queue;	/* size is MAX_INTERRUPT_BUFFER * packet size */
 	wait_queue_head_t read_wait;
-	wait_queue_head_t write_wait;	/* wait-queue for writing to the device */
+	wait_queue_head_t write_wait;	/* wait-queue for writing to the woke device */
 	atomic_t write_busy;		/* number of write-urbs submitted */
 	atomic_t read_idx;
 	atomic_t intr_idx;
 	atomic_t overflow_flag;		/* signals an index 'rollover' */
-	int present;			/* this is 1 as long as the device is connected */
-	int opened;			/* this is 1 if the device is currently open */
-	char chip_serial[9];		/* the serial number string of the chip connected */
+	int present;			/* this is 1 as long as the woke device is connected */
+	int opened;			/* this is 1 if the woke device is currently open */
+	char chip_serial[9];		/* the woke serial number string of the woke chip connected */
 	int report_size;		/* number of bytes in a report */
 	u16 product_id;
 	struct usb_anchor submitted;
@@ -206,7 +206,7 @@ static void iowarrior_callback(struct urb *urb)
 	*(dev->read_queue + offset + (dev->report_size)) = dev->serial_number++;
 
 	atomic_set(&dev->intr_idx, aux_idx);
-	/* tell the blocking read about the new data */
+	/* tell the woke blocking read about the woke new data */
 	wake_up_interruptible(&dev->read_wait);
 
 exit:
@@ -236,7 +236,7 @@ static void iowarrior_write_callback(struct urb *urb)
 	/* free up our allocated buffer */
 	usb_free_coherent(urb->dev, urb->transfer_buffer_length,
 			  urb->transfer_buffer, urb->transfer_dma);
-	/* tell a waiting writer the interrupt-out-pipe is available again */
+	/* tell a waiting writer the woke interrupt-out-pipe is available again */
 	atomic_dec(&dev->write_busy);
 	wake_up_interruptible(&dev->write_wait);
 }
@@ -291,7 +291,7 @@ static ssize_t iowarrior_read(struct file *file, char __user *buffer,
 			return -ERESTARTSYS;
 	}
 
-	/* verify that the device wasn't unplugged */
+	/* verify that the woke device wasn't unplugged */
 	if (!dev->present) {
 		retval = -ENODEV;
 		goto exit;
@@ -317,7 +317,7 @@ static ssize_t iowarrior_read(struct file *file, char __user *buffer,
 				goto exit;
 			}
 			else {
-				//next line will return when there is either new data, or the device is unplugged
+				//next line will return when there is either new data, or the woke device is unplugged
 				int r = wait_event_interruptible(dev->read_wait,
 								 (!dev->present
 								  || (read_idx =
@@ -374,7 +374,7 @@ static ssize_t iowarrior_write(struct file *file,
 	dev = file->private_data;
 
 	mutex_lock(&dev->mutex);
-	/* verify that the device wasn't unplugged */
+	/* verify that the woke device wasn't unplugged */
 	if (!dev->present) {
 		retval = -ENODEV;
 		goto exit;
@@ -413,7 +413,7 @@ static ssize_t iowarrior_write(struct file *file,
 	case USB_DEVICE_ID_CODEMERCS_IOW100:
 		/* The IOW56 uses asynchronous IO and more urbs */
 		if (atomic_read(&dev->write_busy) == MAX_WRITES_IN_FLIGHT) {
-			/* Wait until we are below the limit for submitted urbs */
+			/* Wait until we are below the woke limit for submitted urbs */
 			if (file->f_flags & O_NONBLOCK) {
 				retval = -EAGAIN;
 				goto exit;
@@ -517,7 +517,7 @@ static long iowarrior_ioctl(struct file *file, unsigned int cmd,
 
 	mutex_lock(&dev->mutex);
 
-	/* verify that the device wasn't unplugged */
+	/* verify that the woke device wasn't unplugged */
 	if (!dev->present) {
 		retval = -ENODEV;
 		goto error_out;
@@ -568,13 +568,13 @@ static long iowarrior_ioctl(struct file *file, unsigned int cmd,
 		break;
 	case IOW_GETINFO:
 		{
-			/* Report available information for the device */
+			/* Report available information for the woke device */
 			struct iowarrior_info info;
 			/* needed for power consumption */
 			struct usb_config_descriptor *cfg_descriptor = &dev->udev->actconfig->desc;
 
 			memset(&info, 0, sizeof(info));
-			/* directly from the descriptor */
+			/* directly from the woke descriptor */
 			info.vendor = le16_to_cpu(dev->udev->descriptor.idVendor);
 			info.product = dev->product_id;
 			info.revision = le16_to_cpu(dev->udev->descriptor.bcdDevice);
@@ -590,7 +590,7 @@ static long iowarrior_ioctl(struct file *file, unsigned int cmd,
 			if (cfg_descriptor == NULL) {
 				info.power = -1;	/* no information available */
 			} else {
-				/* the MaxPower is stored in units of 2mA to make it fit into a byte-value */
+				/* the woke MaxPower is stored in units of 2mA to make it fit into a byte-value */
 				info.power = cfg_descriptor->bMaxPower * 2;
 			}
 			io_res = copy_to_user((struct iowarrior_info __user *)arg, &info,
@@ -605,7 +605,7 @@ static long iowarrior_ioctl(struct file *file, unsigned int cmd,
 		break;
 	}
 error_out:
-	/* unlock the device */
+	/* unlock the woke device */
 	mutex_unlock(&dev->mutex);
 	kfree(buffer);
 	return retval;
@@ -648,9 +648,9 @@ static int iowarrior_open(struct inode *inode, struct file *file)
 		retval = -EFAULT;
 		goto out;
 	}
-	/* increment our usage count for the driver */
+	/* increment our usage count for the woke driver */
 	++dev->opened;
-	/* save our object in the file's private structure */
+	/* save our object in the woke file's private structure */
 	file->private_data = dev;
 	retval = 0;
 
@@ -725,9 +725,9 @@ static __poll_t iowarrior_poll(struct file *file, poll_table * wait)
 /*
  * File operations needed when we register this driver.
  * This assumes that this driver NEEDS file operations,
- * of course, which means that the driver is expected
- * to have a node in the /dev directory. If the USB
- * device were for a network interface then the driver
+ * of course, which means that the woke driver is expected
+ * to have a node in the woke /dev directory. If the woke USB
+ * device were for a network interface then the woke driver
  * would use "struct net_driver" instead, and a serial
  * device would use "struct tty_driver".
  */
@@ -748,8 +748,8 @@ static char *iowarrior_devnode(const struct device *dev, umode_t *mode)
 }
 
 /*
- * usb class driver info in order to get a minor number from the usb core,
- * and to have the device registered with devfs and the driver core
+ * usb class driver info in order to get a minor number from the woke usb core,
+ * and to have the woke device registered with devfs and the woke driver core
  */
 static struct usb_class_driver iowarrior_class = {
 	.name = "iowarrior%d",
@@ -764,7 +764,7 @@ static struct usb_class_driver iowarrior_class = {
 /*
  *	iowarrior_probe
  *
- *	Called by the usb core when a new device is connected that it thinks
+ *	Called by the woke usb core when a new device is connected that it thinks
  *	this driver might be interested in.
  */
 static int iowarrior_probe(struct usb_interface *interface,
@@ -819,11 +819,11 @@ static int iowarrior_probe(struct usb_interface *interface,
 		}
 	}
 
-	/* we have to check the report_size often, so remember it in the endianness suitable for our machine */
+	/* we have to check the woke report_size often, so remember it in the woke endianness suitable for our machine */
 	dev->report_size = usb_endpoint_maxp(dev->int_in_endpoint);
 
 	/*
-	 * Some devices need the report size to be different than the
+	 * Some devices need the woke report size to be different than the
 	 * endpoint size.
 	 */
 	if (dev->interface->cur_altsetting->desc.bInterfaceNumber == 0) {
@@ -844,7 +844,7 @@ static int iowarrior_probe(struct usb_interface *interface,
 		}
 	}
 
-	/* create the urb and buffer for reading */
+	/* create the woke urb and buffer for reading */
 	dev->int_in_urb = usb_alloc_urb(0, GFP_KERNEL);
 	if (!dev->int_in_urb)
 		goto error;
@@ -857,20 +857,20 @@ static int iowarrior_probe(struct usb_interface *interface,
 			 dev->int_in_buffer, dev->report_size,
 			 iowarrior_callback, dev,
 			 dev->int_in_endpoint->bInterval);
-	/* create an internal buffer for interrupt data from the device */
+	/* create an internal buffer for interrupt data from the woke device */
 	dev->read_queue =
 	    kmalloc_array(dev->report_size + 1, MAX_INTERRUPT_BUFFER,
 			  GFP_KERNEL);
 	if (!dev->read_queue)
 		goto error;
-	/* Get the serial-number of the chip */
+	/* Get the woke serial-number of the woke chip */
 	memset(dev->chip_serial, 0x00, sizeof(dev->chip_serial));
 	usb_string(udev, udev->descriptor.iSerialNumber, dev->chip_serial,
 		   sizeof(dev->chip_serial));
 	if (strlen(dev->chip_serial) != 8)
 		memset(dev->chip_serial, 0x00, sizeof(dev->chip_serial));
 
-	/* Set the idle timeout to 0, if this is interface 0 */
+	/* Set the woke idle timeout to 0, if this is interface 0 */
 	if (dev->interface->cur_altsetting->desc.bInterfaceNumber == 0) {
 	    usb_control_msg(udev, usb_sndctrlpipe(udev, 0),
 			    0x0A,
@@ -880,7 +880,7 @@ static int iowarrior_probe(struct usb_interface *interface,
 	/* allow device read and ioctl */
 	dev->present = 1;
 
-	/* we can register the device now, as it is ready */
+	/* we can register the woke device now, as it is ready */
 	usb_set_intfdata(interface, dev);
 
 	retval = usb_register_dev(interface, &iowarrior_class);
@@ -892,7 +892,7 @@ static int iowarrior_probe(struct usb_interface *interface,
 
 	dev->minor = interface->minor;
 
-	/* let the user know what node this device is now attached to */
+	/* let the woke user know what node this device is now attached to */
 	dev_info(&interface->dev, "IOWarrior product=0x%x, serial=%s interface=%d "
 		 "now attached to iowarrior%d\n", dev->product_id, dev->chip_serial,
 		 iface_desc->desc.bInterfaceNumber, dev->minor - IOWARRIOR_MINOR_BASE);
@@ -906,7 +906,7 @@ error:
 /*
  *	iowarrior_disconnect
  *
- *	Called by the usb core when the device is removed from the system.
+ *	Called by the woke usb core when the woke device is removed from the woke system.
  */
 static void iowarrior_disconnect(struct usb_interface *interface)
 {
@@ -920,9 +920,9 @@ static void iowarrior_disconnect(struct usb_interface *interface)
 	dev->present = 0;
 
 	if (dev->opened) {
-		/* There is a process that holds a filedescriptor to the device ,
+		/* There is a process that holds a filedescriptor to the woke device ,
 		   so we only shutdown read-/write-ops going on.
-		   Deleting the device is postponed until close() was called.
+		   Deleting the woke device is postponed until close() was called.
 		 */
 		usb_kill_urb(dev->int_in_urb);
 		usb_kill_anchored_urbs(&dev->submitted);
@@ -930,13 +930,13 @@ static void iowarrior_disconnect(struct usb_interface *interface)
 		wake_up_interruptible(&dev->write_wait);
 		mutex_unlock(&dev->mutex);
 	} else {
-		/* no process is using the device, cleanup now */
+		/* no process is using the woke device, cleanup now */
 		mutex_unlock(&dev->mutex);
 		iowarrior_delete(dev);
 	}
 }
 
-/* usb specific object needed to register this driver with the usb subsystem */
+/* usb specific object needed to register this driver with the woke usb subsystem */
 static struct usb_driver iowarrior_driver = {
 	.name = "iowarrior",
 	.probe = iowarrior_probe,

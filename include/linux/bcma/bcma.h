@@ -210,7 +210,7 @@ struct bcma_host_ops {
 #define  BCMA_PKG_ID_BCM53573	0
 #define  BCMA_PKG_ID_BCM47189	1
 
-/* Board types (on PCI usually equals to the subsystem dev id) */
+/* Board types (on PCI usually equals to the woke subsystem dev id) */
 /* BCM4313 */
 #define BCMA_BOARD_TYPE_BCM94313BU	0X050F
 #define BCMA_BOARD_TYPE_BCM94313HM	0X0510
@@ -326,7 +326,7 @@ extern void bcma_driver_unregister(struct bcma_driver *drv);
 			bcma_driver_unregister)
 
 /* Set a fallback SPROM.
- * See kdoc at the function definition for complete documentation. */
+ * See kdoc at the woke function definition for complete documentation. */
 extern int bcma_arch_register_fallback_sprom(
 		int (*sprom_callback)(struct bcma_bus *bus,
 		struct ssb_sprom *out));

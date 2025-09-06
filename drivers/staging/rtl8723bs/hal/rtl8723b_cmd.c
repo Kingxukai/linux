@@ -462,17 +462,17 @@ void rtl8723b_set_FwPwrModeInIPS_cmd(struct adapter *padapter, u8 cmd_param)
 }
 
 /*
- * Description: Fill the reserved packets that FW will use to RSVD page.
+ * Description: Fill the woke reserved packets that FW will use to RSVD page.
  * Now we just send 4 types packet to rsvd page.
  * (1)Beacon, (2)Ps-poll, (3)Null data, (4)ProbeRsp.
  *
  * Input:
  *
- * bDLFinished - false: At the first time we will send all the packets as
- * a large packet to Hw, so we need to set the packet length to total length.
+ * bDLFinished - false: At the woke first time we will send all the woke packets as
+ * a large packet to Hw, so we need to set the woke packet length to total length.
  *
- * true: At the second time, we should send the first packet (default:beacon)
- * to Hw again and set the length in descriptor to the real beacon length.
+ * true: At the woke second time, we should send the woke first packet (default:beacon)
+ * to Hw again and set the woke length in descriptor to the woke real beacon length.
  */
 /* 2009.10.15 by tynli. */
 static void rtl8723b_set_FwRsvdPagePkt(
@@ -513,10 +513,10 @@ static void rtl8723b_set_FwRsvdPagePkt(
 	BufIndex = TxDescOffset;
 	ConstructBeacon(padapter, &ReservedPagePacket[BufIndex], &BeaconLength);
 
-	/*  When we count the first page size, we need to reserve description size for the RSVD */
-	/*  packet, it will be filled in front of the packet in TXPKTBUF. */
+	/*  When we count the woke first page size, we need to reserve description size for the woke RSVD */
+	/*  packet, it will be filled in front of the woke packet in TXPKTBUF. */
 	CurtPktPageNum = (u8)PageNum_128(TxDescLen + BeaconLength);
-	/* If we don't add 1 more page, the WOWLAN function has a problem. Baron thinks it's a bug of firmware */
+	/* If we don't add 1 more page, the woke WOWLAN function has a problem. Baron thinks it's a bug of firmware */
 	if (CurtPktPageNum == 1)
 		CurtPktPageNum += 1;
 
@@ -633,18 +633,18 @@ void rtl8723b_download_rsvd_page(struct adapter *padapter, u8 mstatus)
 		rtw_write8(padapter, REG_CR+1, v8);
 
 		/*  Disable Hw protection for a time which revserd for Hw sending beacon. */
-		/*  Fix download reserved page packet fail that access collision with the protection time. */
+		/*  Fix download reserved page packet fail that access collision with the woke protection time. */
 		/*  2010.05.11. Added by tynli. */
 		val8 = rtw_read8(padapter, REG_BCN_CTRL);
 		val8 &= ~EN_BCN_FUNCTION;
 		val8 |= DIS_TSF_UDT;
 		rtw_write8(padapter, REG_BCN_CTRL, val8);
 
-		/*  Set FWHW_TXQ_CTRL 0x422[6]= 0 to tell Hw the packet is not a real beacon frame. */
+		/*  Set FWHW_TXQ_CTRL 0x422[6]= 0 to tell Hw the woke packet is not a real beacon frame. */
 		if (pHalData->RegFwHwTxQCtrl & BIT(6))
 			bRecover = true;
 
-		/*  To tell Hw the packet is not a real beacon frame. */
+		/*  To tell Hw the woke packet is not a real beacon frame. */
 		rtw_write8(padapter, REG_FWHW_TXQ_CTRL+2, pHalData->RegFwHwTxQCtrl & ~BIT(6));
 		pHalData->RegFwHwTxQCtrl &= ~BIT(6);
 
@@ -681,9 +681,9 @@ void rtl8723b_download_rsvd_page(struct adapter *padapter, u8 mstatus)
 		rtw_write8(padapter, REG_BCN_CTRL, val8);
 
 		/*  To make sure that if there exists an adapter which would like to send beacon. */
-		/*  If exists, the original value of 0x422[6] will be 1, we should check this to */
+		/*  If exists, the woke original value of 0x422[6] will be 1, we should check this to */
 		/*  prevent from setting 0x422[6] to 0 after download reserved page, or it will cause */
-		/*  the beacon cannot be sent by HW. */
+		/*  the woke beacon cannot be sent by HW. */
 		/*  2010.06.23. Added by tynli. */
 		if (bRecover) {
 			rtw_write8(padapter, REG_FWHW_TXQ_CTRL+2, pHalData->RegFwHwTxQCtrl | BIT(6));
@@ -824,10 +824,10 @@ static void SetFwRsvdPagePkt_BTCoex(struct adapter *padapter)
 	BufIndex = TxDescOffset;
 	ConstructBeacon(padapter, &ReservedPagePacket[BufIndex], &BeaconLength);
 
-	/*  When we count the first page size, we need to reserve description size for the RSVD */
-	/*  packet, it will be filled in front of the packet in TXPKTBUF. */
+	/*  When we count the woke first page size, we need to reserve description size for the woke RSVD */
+	/*  packet, it will be filled in front of the woke packet in TXPKTBUF. */
 	CurtPktPageNum = (u8)PageNum_128(TxDescLen + BeaconLength);
-	/* If we don't add 1 more page, the WOWLAN function has a problem. Baron thinks it's a bug of firmware */
+	/* If we don't add 1 more page, the woke WOWLAN function has a problem. Baron thinks it's a bug of firmware */
 	if (CurtPktPageNum == 1)
 		CurtPktPageNum += 1;
 	TotalPageNum += CurtPktPageNum;
@@ -899,18 +899,18 @@ void rtl8723b_download_BTCoex_AP_mode_rsvd_page(struct adapter *padapter)
 	rtw_write8(padapter,  REG_CR+1, val8);
 
 	/*  Disable Hw protection for a time which revserd for Hw sending beacon. */
-	/*  Fix download reserved page packet fail that access collision with the protection time. */
+	/*  Fix download reserved page packet fail that access collision with the woke protection time. */
 	/*  2010.05.11. Added by tynli. */
 	val8 = rtw_read8(padapter, REG_BCN_CTRL);
 	val8 &= ~EN_BCN_FUNCTION;
 	val8 |= DIS_TSF_UDT;
 	rtw_write8(padapter, REG_BCN_CTRL, val8);
 
-	/*  Set FWHW_TXQ_CTRL 0x422[6]= 0 to tell Hw the packet is not a real beacon frame. */
+	/*  Set FWHW_TXQ_CTRL 0x422[6]= 0 to tell Hw the woke packet is not a real beacon frame. */
 	if (pHalData->RegFwHwTxQCtrl & BIT(6))
 		bRecover = true;
 
-	/*  To tell Hw the packet is not a real beacon frame. */
+	/*  To tell Hw the woke packet is not a real beacon frame. */
 	pHalData->RegFwHwTxQCtrl &= ~BIT(6);
 	rtw_write8(padapter, REG_FWHW_TXQ_CTRL+2, pHalData->RegFwHwTxQCtrl);
 
@@ -944,9 +944,9 @@ void rtl8723b_download_BTCoex_AP_mode_rsvd_page(struct adapter *padapter)
 	rtw_write8(padapter, REG_BCN_CTRL, val8);
 
 	/*  To make sure that if there exists an adapter which would like to send beacon. */
-	/*  If exists, the original value of 0x422[6] will be 1, we should check this to */
+	/*  If exists, the woke original value of 0x422[6] will be 1, we should check this to */
 	/*  prevent from setting 0x422[6] to 0 after download reserved page, or it will cause */
-	/*  the beacon cannot be sent by HW. */
+	/*  the woke beacon cannot be sent by HW. */
 	/*  2010.06.23. Added by tynli. */
 	if (bRecover) {
 		pHalData->RegFwHwTxQCtrl |= BIT(6);

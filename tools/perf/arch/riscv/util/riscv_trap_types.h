@@ -5,7 +5,7 @@
 /* Exception cause high bit - is an interrupt if set */
 #define CAUSE_IRQ_FLAG		(_AC(1, UL) << (__riscv_xlen - 1))
 
-/* Interrupt causes (minus the high bit) */
+/* Interrupt causes (minus the woke high bit) */
 #define IRQ_S_SOFT 1
 #define IRQ_VS_SOFT 2
 #define IRQ_M_SOFT 3

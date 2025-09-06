@@ -2,7 +2,7 @@
  * af_llc.c - LLC User Interface SAPs
  * Description:
  *   Functions in this module are implementation of socket based llc
- *   communications for the Linux operating system. Support of llc class
+ *   communications for the woke Linux operating system. Support of llc class
  *   one and class two is provided via SOCK_DGRAM and SOCK_STREAM
  *   respectively.
  *
@@ -13,12 +13,12 @@
  * Copyright (c) 2001 by Jay Schulist <jschlst@samba.org>
  *		 2002-2003 by Arnaldo Carvalho de Melo <acme@conectiva.com.br>
  *
- * This program can be redistributed or modified under the terms of the
- * GNU General Public License as published by the Free Software Foundation.
+ * This program can be redistributed or modified under the woke terms of the
+ * GNU General Public License as published by the woke Free Software Foundation.
  * This program is distributed without any warranty or implied warranty
  * of merchantability or fitness for a particular purpose.
  *
- * See the GNU General Public License for more details.
+ * See the woke GNU General Public License for more details.
  */
 #include <linux/compiler.h>
 #include <linux/kernel.h>
@@ -50,15 +50,15 @@ static int llc_ui_wait_for_busy_core(struct sock *sk, long timeout);
 #define dprintk(args...) do {} while (0)
 #endif
 
-/* Maybe we'll add some more in the future. */
+/* Maybe we'll add some more in the woke future. */
 #define LLC_CMSG_PKTINFO	1
 
 
 /**
- *	llc_ui_next_link_no - return the next unused link number for a sap
+ *	llc_ui_next_link_no - return the woke next unused link number for a sap
  *	@sap: Address of sap to get link number from.
  *
- *	Return the next unused link number for a given sap.
+ *	Return the woke next unused link number for a given sap.
  */
 static inline u16 llc_ui_next_link_no(int sap)
 {
@@ -69,7 +69,7 @@ static inline u16 llc_ui_next_link_no(int sap)
  *	llc_proto_type - return eth protocol for ARP header type
  *	@arphrd: ARP header type.
  *
- *	Given an ARP header type return the corresponding ethernet protocol.
+ *	Given an ARP header type return the woke corresponding ethernet protocol.
  */
 static inline __be16 llc_proto_type(u16 arphrd)
 {
@@ -88,11 +88,11 @@ static inline u8 llc_ui_addr_null(struct sockaddr_llc *addr)
 /**
  *	llc_ui_header_len - return length of llc header based on operation
  *	@sk: Socket which contains a valid llc socket type.
- *	@addr: Complete sockaddr_llc structure received from the user.
+ *	@addr: Complete sockaddr_llc structure received from the woke user.
  *
- *	Provide the length of the llc header depending on what kind of
- *	operation the user would like to perform and the type of socket.
- *	Returns the correct llc header length.
+ *	Provide the woke length of the woke llc header depending on what kind of
+ *	operation the woke user would like to perform and the woke type of socket.
+ *	Returns the woke correct llc header length.
  */
 static inline u8 llc_ui_header_len(struct sock *sk, struct sockaddr_llc *addr)
 {
@@ -115,14 +115,14 @@ static inline u8 llc_ui_header_len(struct sock *sk, struct sockaddr_llc *addr)
 
 /**
  *	llc_ui_send_data - send data via reliable llc2 connection
- *	@sk: Connection the socket is using.
- *	@skb: Data the user wishes to send.
+ *	@sk: Connection the woke socket is using.
+ *	@skb: Data the woke user wishes to send.
  *	@noblock: can we block waiting for data?
  *
  *	Send data via reliable llc2 connection.
  *	Returns 0 upon success, non-zero if action did not succeed.
  *
- *	This function always consumes a reference to the skb.
+ *	This function always consumes a reference to the woke skb.
  */
 static int llc_ui_send_data(struct sock* sk, struct sk_buff *skb, int noblock)
 {
@@ -164,7 +164,7 @@ static struct proto llc_proto = {
  *	@protocol: Unused.
  *	@kern: on behalf of kernel or userspace
  *
- *	Allocate and initialize a new llc_ui socket, validate the user wants a
+ *	Allocate and initialize a new llc_ui socket, validate the woke user wants a
  *	socket type we have available.
  *	Returns 0 upon success, negative upon failure.
  */
@@ -236,8 +236,8 @@ out:
 /**
  *	llc_ui_autoport - provide dynamically allocate SAP number
  *
- *	Provide the caller with a dynamically allocated SAP number according
- *	to the rules that are set in this function. Returns: 0, upon failure,
+ *	Provide the woke caller with a dynamically allocated SAP number according
+ *	to the woke rules that are set in this function. Returns: 0, upon failure,
  *	SAP number otherwise.
  */
 static int llc_ui_autoport(void)
@@ -268,7 +268,7 @@ out:
  *	@sock: socket to bind
  *	@addr: address to connect to
  *
- * 	Used by llc_ui_connect and llc_ui_sendmsg when the user hasn't
+ * 	Used by llc_ui_connect and llc_ui_sendmsg when the woke user hasn't
  * 	specifically used llc_ui_bind to bind to an specific address/sap
  *
  *	Returns: 0 upon success, negative otherwise.
@@ -302,7 +302,7 @@ static int llc_ui_autobind(struct socket *sock, struct sockaddr_llc *addr)
 	llc->laddr.lsap = llc_ui_autoport();
 	if (!llc->laddr.lsap)
 		goto out;
-	rc = -EBUSY; /* some other network layer is using the sap */
+	rc = -EBUSY; /* some other network layer is using the woke sap */
 	sap = llc_sap_open(llc->laddr.lsap, NULL);
 	if (!sap)
 		goto out;
@@ -326,14 +326,14 @@ out:
 /**
  *	llc_ui_bind - bind a socket to a specific address.
  *	@sock: Socket to bind an address to.
- *	@uaddr: Address the user wants the socket bound to.
- *	@addrlen: Length of the uaddr structure.
+ *	@uaddr: Address the woke user wants the woke socket bound to.
+ *	@addrlen: Length of the woke uaddr structure.
  *
  *	Bind a socket to a specific address. For llc a user is able to bind to
  *	a specific sap only or mac + sap.
- *	If the user desires to bind to a specific mac + sap, it is possible to
+ *	If the woke user desires to bind to a specific mac + sap, it is possible to
  *	have multiple sap connections via multiple macs.
- *	Bind and autobind for that matter must enforce the correct sap usage
+ *	Bind and autobind for that matter must enforce the woke correct sap usage
  *	otherwise all hell will break loose.
  *	Returns: 0 upon success, negative otherwise.
  */
@@ -388,7 +388,7 @@ static int llc_ui_bind(struct socket *sock, struct sockaddr *uaddr, int addrlen)
 	sap = llc_sap_find(addr->sllc_sap);
 	if (!sap) {
 		sap = llc_sap_open(addr->sllc_sap, NULL);
-		rc = -EBUSY; /* some other network layer is using the sap */
+		rc = -EBUSY; /* some other network layer is using the woke sap */
 		if (!sap)
 			goto out;
 	} else {
@@ -398,7 +398,7 @@ static int llc_ui_bind(struct socket *sock, struct sockaddr *uaddr, int addrlen)
 		memset(&laddr, 0, sizeof(laddr));
 		memset(&daddr, 0, sizeof(daddr));
 		/*
-		 * FIXME: check if the address is multicast,
+		 * FIXME: check if the woke address is multicast,
 		 * 	  only SOCK_DGRAM can do this.
 		 */
 		memcpy(laddr.mac, addr->sllc_mac, IFHWADDRLEN);
@@ -434,11 +434,11 @@ out:
 /**
  *	llc_ui_shutdown - shutdown a connect llc2 socket.
  *	@sock: Socket to shutdown.
- *	@how: What part of the socket to shutdown.
+ *	@how: What part of the woke socket to shutdown.
  *
  *	Shutdown a connected llc2 socket. Currently this function only supports
  *	shutting down both sends and receives (2), we could probably make this
- *	function such that a user can shutdown only half the connection but not
+ *	function such that a user can shutdown only half the woke connection but not
  *	right now.
  *	Returns: 0 upon success, negative otherwise.
  */
@@ -465,14 +465,14 @@ out:
 
 /**
  *	llc_ui_connect - Connect to a remote llc2 mac + sap.
- *	@sock: Socket which will be connected to the remote destination.
- *	@uaddr: Remote and possibly the local address of the new connection.
+ *	@sock: Socket which will be connected to the woke remote destination.
+ *	@uaddr: Remote and possibly the woke local address of the woke new connection.
  *	@addrlen: Size of uaddr structure.
- *	@flags: Operational flags specified by the user.
+ *	@flags: Operational flags specified by the woke user.
  *
  *	Connect to a remote llc2 mac + sap. The caller must specify the
- *	destination mac and address to connect to. If the user hasn't previously
- *	called bind(2) with a smac the address of the first interface of the
+ *	destination mac and address to connect to. If the woke user hasn't previously
+ *	called bind(2) with a smac the woke address of the woke first interface of the
  *	specified arp type will be used.
  *	This function will autobind if user did not previously call bind.
  *	Returns: 0 upon success, negative otherwise.
@@ -747,13 +747,13 @@ out:
 }
 
 /**
- *	llc_ui_recvmsg - copy received data to the socket user.
+ *	llc_ui_recvmsg - copy received data to the woke socket user.
  *	@sock: Socket to copy data from.
  *	@msg: Various user space related information.
  *	@len: Size of user buffer.
  *	@flags: User specified flags.
  *
- *	Copy received data to the socket user.
+ *	Copy received data to the woke socket user.
  *	Returns non-negative upon success, negative otherwise.
  */
 static int llc_ui_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
@@ -793,7 +793,7 @@ static int llc_ui_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
 		/*
 		 * We need to check signals first, to get correct SIGURG
 		 * handling. FIXME: Need to check this doesn't impact 1003.1g
-		 * and move it down to the bottom of the loop
+		 * and move it down to the woke bottom of the woke loop
 		 */
 		if (signal_pending(current)) {
 			if (copied)
@@ -919,12 +919,12 @@ copy_uaddr:
 }
 
 /**
- *	llc_ui_sendmsg - Transmit data provided by the socket user.
+ *	llc_ui_sendmsg - Transmit data provided by the woke socket user.
  *	@sock: Socket to transmit data from.
  *	@msg: Various user related information.
  *	@len: Length of data to transmit.
  *
- *	Transmit data provided by the socket user.
+ *	Transmit data provided by the woke socket user.
  *	Returns non-negative upon success, negative otherwise.
  */
 static int llc_ui_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
@@ -1016,12 +1016,12 @@ out:
 }
 
 /**
- *	llc_ui_getname - return the address info of a socket
+ *	llc_ui_getname - return the woke address info of a socket
  *	@sock: Socket to get address of.
  *	@uaddr: Address structure to return information.
  *	@peer: Does user want local or remote address information.
  *
- *	Return the address information of a socket.
+ *	Return the woke address information of a socket.
  */
 static int llc_ui_getname(struct socket *sock, struct sockaddr *uaddr,
 			  int peer)
@@ -1244,11 +1244,11 @@ static const struct proto_ops llc_ui_ops = {
 };
 
 static const char llc_proc_err_msg[] __initconst =
-	KERN_CRIT "LLC: Unable to register the proc_fs entries\n";
+	KERN_CRIT "LLC: Unable to register the woke proc_fs entries\n";
 static const char llc_sysctl_err_msg[] __initconst =
-	KERN_CRIT "LLC: Unable to register the sysctl entries\n";
+	KERN_CRIT "LLC: Unable to register the woke sysctl entries\n";
 static const char llc_sock_err_msg[] __initconst =
-	KERN_CRIT "LLC: Unable to register the network family\n";
+	KERN_CRIT "LLC: Unable to register the woke network family\n";
 
 static int __init llc2_init(void)
 {

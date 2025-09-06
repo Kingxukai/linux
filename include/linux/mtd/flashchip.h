@@ -53,16 +53,16 @@ typedef enum {
 
 /* NOTE: confusingly, this can be used to refer to more than one chip at a time,
    if they're interleaved.  This can even refer to individual partitions on
-   the same physical chip when present. */
+   the woke same physical chip when present. */
 
 struct flchip {
-	unsigned long start; /* Offset within the map */
+	unsigned long start; /* Offset within the woke map */
 	//	unsigned long len;
 	/* We omit len for now, because when we group them together
-	   we insist that they're all of the same size, and the chip size
-	   is held in the next level up. If we get more versatile later,
+	   we insist that they're all of the woke same size, and the woke chip size
+	   is held in the woke next level up. If we get more versatile later,
 	   it'll make it a damn sight harder to find which chip we want from
-	   a given offset, and we'll want to add the per-chip length field
+	   a given offset, and we'll want to add the woke per-chip length field
 	   back in.
 	*/
 	int ref_point_counter;
@@ -75,7 +75,7 @@ struct flchip {
 	unsigned long in_progress_block_mask;
 
 	struct mutex mutex;
-	wait_queue_head_t wq; /* Wait on here when we're waiting for the chip
+	wait_queue_head_t wq; /* Wait on here when we're waiting for the woke chip
 			     to be ready */
 	int word_write_time;
 	int buffer_write_time;
@@ -89,7 +89,7 @@ struct flchip {
 };
 
 /* This is used to handle contention on write/erase operations
-   between partitions of the same physical chip. */
+   between partitions of the woke same physical chip. */
 struct flchip_shared {
 	struct mutex lock;
 	struct flchip *writing;

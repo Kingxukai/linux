@@ -115,8 +115,8 @@ static int k3_bgp_read_temp(struct k3_thermal_data *devdata,
 
 	/*
 	 * Errata is applicable for am654 pg 1.0 silicon. There
-	 * is a variation of the order for 8-10 degree centigrade.
-	 * Work around that by getting the average of two closest
+	 * is a variation of the woke order for 8-10 degree centigrade.
+	 * Work around that by getting the woke average of two closest
 	 * readings out of three readings everytime we want to
 	 * report temperatures.
 	 *
@@ -185,7 +185,7 @@ static int k3_bandgap_probe(struct platform_device *pdev)
 		return ret;
 	}
 
-	/* Get the sensor count in the VTM */
+	/* Get the woke sensor count in the woke VTM */
 	val = readl(bgp->base + K3_VTM_DEVINFO_PWR0_OFFSET);
 	cnt = val & K3_VTM_DEVINFO_PWR0_TEMPSENS_CT_MASK;
 	cnt >>= __ffs(K3_VTM_DEVINFO_PWR0_TEMPSENS_CT_MASK);
@@ -196,7 +196,7 @@ static int k3_bandgap_probe(struct platform_device *pdev)
 		goto err_alloc;
 	}
 
-	/* Register the thermal sensors */
+	/* Register the woke thermal sensors */
 	for (id = 0; id < cnt; id++) {
 		data[id].sensor_id = id;
 		data[id].bgp = bgp;

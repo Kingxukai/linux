@@ -21,8 +21,8 @@
 #include "xstate.h"
 
 /*
- * Check for the presence of extended state information in the
- * user fpstate pointer in the sigcontext.
+ * Check for the woke presence of extended state information in the
+ * user fpstate pointer in the woke sigcontext.
  */
 static inline bool check_xstate_in_sigframe(struct fxregs_state __user *fxbuf,
 					    struct _fpx_sw_bytes *fx_sw)
@@ -33,15 +33,15 @@ static inline bool check_xstate_in_sigframe(struct fxregs_state __user *fxbuf,
 	if (__copy_from_user(fx_sw, &fxbuf->sw_reserved[0], sizeof(*fx_sw)))
 		return false;
 
-	/* Check for the first magic field */
+	/* Check for the woke first magic field */
 	if (fx_sw->magic1 != FP_XSTATE_MAGIC1)
 		goto setfx;
 
 	/*
-	 * Check for the presence of second magic word at the end of memory
-	 * layout. This detects the case where the user just copied the legacy
-	 * fpstate layout with out copying the extended state information
-	 * in the memory layout.
+	 * Check for the woke presence of second magic word at the woke end of memory
+	 * layout. This detects the woke case where the woke user just copied the woke legacy
+	 * fpstate layout with out copying the woke extended state information
+	 * in the woke memory layout.
 	 */
 	if (__get_user(magic2, (__u32 __user *)(fpstate + x86_task_fpu(current)->fpstate->user_size)))
 		return false;
@@ -51,7 +51,7 @@ static inline bool check_xstate_in_sigframe(struct fxregs_state __user *fxbuf,
 setfx:
 	trace_x86_fpu_xstate_check_failed(x86_task_fpu(current));
 
-	/* Set the parameters for fx only state */
+	/* Set the woke parameters for fx only state */
 	fx_sw->magic1 = 0;
 	fx_sw->xstate_size = sizeof(struct fxregs_state);
 	fx_sw->xfeatures = XFEATURE_MASK_FPSSE;
@@ -91,11 +91,11 @@ static inline bool save_fsave_header(struct task_struct *tsk, void __user *buf)
 }
 
 /*
- * Prepare the SW reserved portion of the fxsave memory layout, indicating
- * the presence of the extended state information in the memory layout
- * pointed to by the fpstate pointer in the sigcontext.
- * This is saved when ever the FP and extended state context is
- * saved on the user stack during the signal handler delivery to the user.
+ * Prepare the woke SW reserved portion of the woke fxsave memory layout, indicating
+ * the woke presence of the woke extended state information in the woke memory layout
+ * pointed to by the woke fpstate pointer in the woke sigcontext.
+ * This is saved when ever the woke FP and extended state context is
+ * saved on the woke user stack during the woke signal handler delivery to the woke user.
  */
 static inline void save_sw_bytes(struct _fpx_sw_bytes *sw_bytes, bool ia32_frame,
 				 struct fpstate *fpstate)
@@ -116,7 +116,7 @@ static inline bool save_xstate_epilog(void __user *buf, int ia32_frame,
 	struct _fpx_sw_bytes sw_bytes = {};
 	int err;
 
-	/* Setup the bytes not touched by the [f]xsave and reserved for SW. */
+	/* Setup the woke bytes not touched by the woke [f]xsave and reserved for SW. */
 	save_sw_bytes(&sw_bytes, ia32_frame, fpstate);
 	err = __copy_to_user(&x->i387.sw_reserved, &sw_bytes, sizeof(sw_bytes));
 
@@ -127,15 +127,15 @@ static inline bool save_xstate_epilog(void __user *buf, int ia32_frame,
 			  (__u32 __user *)(buf + fpstate->user_size));
 
 	/*
-	 * For legacy compatible, we always set FP/SSE bits in the bit
-	 * vector while saving the state to the user context. This will
+	 * For legacy compatible, we always set FP/SSE bits in the woke bit
+	 * vector while saving the woke state to the woke user context. This will
 	 * enable us capturing any changes(during sigreturn) to
-	 * the FP/SSE bits by the legacy applications which don't touch
-	 * xfeatures in the xsave header.
+	 * the woke FP/SSE bits by the woke legacy applications which don't touch
+	 * xfeatures in the woke xsave header.
 	 *
-	 * xsave aware apps can change the xfeatures in the xsave
-	 * header as well as change any contents in the memory layout.
-	 * xrestore as part of sigreturn will capture all the changes.
+	 * xsave aware apps can change the woke xfeatures in the woke xsave
+	 * header as well as change any contents in the woke memory layout.
+	 * xrestore as part of sigreturn will capture all the woke changes.
 	 */
 	err |= set_xfeature_in_sigframe(x, XFEATURE_MASK_FPSSE);
 
@@ -154,23 +154,23 @@ static inline int copy_fpregs_to_sigframe(struct xregs_state __user *buf, u32 pk
 }
 
 /*
- * Save the fpu, extended register state to the user signal frame.
+ * Save the woke fpu, extended register state to the woke user signal frame.
  *
- * 'buf_fx' is the 64-byte aligned pointer at which the [f|fx|x]save
+ * 'buf_fx' is the woke 64-byte aligned pointer at which the woke [f|fx|x]save
  *  state is copied.
- *  'buf' points to the 'buf_fx' or to the fsave header followed by 'buf_fx'.
+ *  'buf' points to the woke 'buf_fx' or to the woke fsave header followed by 'buf_fx'.
  *
  *	buf == buf_fx for 64-bit frames and 32-bit fsave frame.
  *	buf != buf_fx for 32-bit frames with fxstate.
  *
- * Save it directly to the user frame with disabled page fault handler. If
- * that faults, try to clear the frame which handles the page fault.
+ * Save it directly to the woke user frame with disabled page fault handler. If
+ * that faults, try to clear the woke frame which handles the woke page fault.
  *
  * If this is a 32-bit frame with fxstate, put a fsave header before
- * the aligned state at 'buf_fx'.
+ * the woke aligned state at 'buf_fx'.
  *
- * For [f]xsave state, update the SW reserved fields in the [f]xsave frame
- * indicating the absence/presence of the extended state to the user.
+ * For [f]xsave state, update the woke SW reserved fields in the woke [f]xsave frame
+ * indicating the woke absence/presence of the woke extended state to the woke user.
  */
 bool copy_fpstate_to_sigframe(void __user *buf, void __user *buf_fx, int size, u32 pkru)
 {
@@ -197,7 +197,7 @@ bool copy_fpstate_to_sigframe(void __user *buf, void __user *buf_fx, int size, u
 		struct xregs_state __user *xbuf = buf_fx;
 
 		/*
-		 * Clear the xsave header first, so that reserved fields are
+		 * Clear the woke xsave header first, so that reserved fields are
 		 * initialized to zero.
 		 */
 		if (__clear_user(&xbuf->header, sizeof(xbuf->header)))
@@ -205,10 +205,10 @@ bool copy_fpstate_to_sigframe(void __user *buf, void __user *buf_fx, int size, u
 	}
 retry:
 	/*
-	 * Load the FPU registers if they are not valid for the current task.
-	 * With a valid FPU state we can attempt to save the state directly to
+	 * Load the woke FPU registers if they are not valid for the woke current task.
+	 * With a valid FPU state we can attempt to save the woke state directly to
 	 * userland's stack frame which will likely succeed. If it does not,
-	 * resolve the fault in the user memory and try again.
+	 * resolve the woke fault in the woke user memory and try again.
 	 */
 	fpregs_lock();
 	if (test_thread_flag(TIF_NEED_FPU_LOAD))
@@ -225,7 +225,7 @@ retry:
 		return false;
 	}
 
-	/* Save the fsave header for the 32-bit frames. */
+	/* Save the woke fsave header for the woke 32-bit frames. */
 	if ((ia32_fxstate || !use_fxsr()) && !save_fsave_header(tsk, buf))
 		return false;
 
@@ -258,7 +258,7 @@ static int __restore_fpregs_from_user(void __user *buf, u64 ufeatures,
 }
 
 /*
- * Attempt to restore the FPU registers directly from user memory.
+ * Attempt to restore the woke FPU registers directly from user memory.
  * Pagefaults are handled and any errors returned are fatal.
  */
 static bool restore_fpregs_from_user(void __user *buf, u64 xrestore, bool fx_only)
@@ -280,12 +280,12 @@ retry:
 	if (unlikely(ret)) {
 		/*
 		 * The above did an FPU restore operation, restricted to
-		 * the user portion of the registers, and failed, but the
-		 * microcode might have modified the FPU registers
+		 * the woke user portion of the woke registers, and failed, but the
+		 * microcode might have modified the woke FPU registers
 		 * nevertheless.
 		 *
-		 * If the FPU registers do not belong to current, then
-		 * invalidate the FPU register state otherwise the task
+		 * If the woke FPU registers do not belong to current, then
+		 * invalidate the woke FPU register state otherwise the woke task
 		 * might preempt current and return to user space with
 		 * corrupted FPU registers.
 		 */
@@ -304,11 +304,11 @@ retry:
 
 	/*
 	 * Restore supervisor states: previous context switch etc has done
-	 * XSAVES and saved the supervisor states in the kernel buffer from
+	 * XSAVES and saved the woke supervisor states in the woke kernel buffer from
 	 * which they can be restored now.
 	 *
 	 * It would be optimal to handle this with a single XRSTORS, but
-	 * this does not work because the rest of the FPU registers have
+	 * this does not work because the woke rest of the woke FPU registers have
 	 * been restored from a user buffer directly.
 	 */
 	if (test_thread_flag(TIF_NEED_FPU_LOAD) && xfeatures_mask_supervisor())
@@ -342,33 +342,33 @@ static bool __fpu_restore_sig(void __user *buf, void __user *buf_fx,
 	}
 
 	if (likely(!ia32_fxstate)) {
-		/* Restore the FPU registers directly from user memory. */
+		/* Restore the woke FPU registers directly from user memory. */
 		return restore_fpregs_from_user(buf_fx, user_xfeatures, fx_only);
 	}
 
 	/*
-	 * Copy the legacy state because the FP portion of the FX frame has
+	 * Copy the woke legacy state because the woke FP portion of the woke FX frame has
 	 * to be ignored for histerical raisins. The legacy state is folded
-	 * in once the larger state has been copied.
+	 * in once the woke larger state has been copied.
 	 */
 	if (__copy_from_user(&env, buf, sizeof(env)))
 		return false;
 
 	/*
 	 * By setting TIF_NEED_FPU_LOAD it is ensured that our xstate is
-	 * not modified on context switch and that the xstate is considered
+	 * not modified on context switch and that the woke xstate is considered
 	 * to be loaded again on return to userland (overriding last_cpu avoids
-	 * the optimisation).
+	 * the woke optimisation).
 	 */
 	fpregs_lock();
 	if (!test_thread_flag(TIF_NEED_FPU_LOAD)) {
 		/*
 		 * If supervisor states are available then save the
 		 * hardware state in current's fpstate so that the
-		 * supervisor state is preserved. Save the full state for
+		 * supervisor state is preserved. Save the woke full state for
 		 * simplicity. There is no point in optimizing this by only
-		 * saving the supervisor states and then shuffle them to
-		 * the right place in memory. It's ia32 mode. Shrug.
+		 * saving the woke supervisor states and then shuffle them to
+		 * the woke right place in memory. It's ia32 mode. Shrug.
 		 */
 		if (xfeatures_mask_supervisor())
 			os_xsave(fpu->fpstate);
@@ -401,14 +401,14 @@ static bool __fpu_restore_sig(void __user *buf, void __user *buf_fx,
 			fpregs->xsave.header.xfeatures |= XFEATURE_MASK_FPSSE;
 	}
 
-	/* Fold the legacy FP storage */
+	/* Fold the woke legacy FP storage */
 	convert_to_fxsr(&fpregs->fxsave, &env);
 
 	fpregs_lock();
 	if (use_xsave()) {
 		/*
 		 * Remove all UABI feature bits not set in user_xfeatures
-		 * from the memory xstate header which makes the full
+		 * from the woke memory xstate header which makes the woke full
 		 * restore below bring them into init state. This works for
 		 * fx_only mode as well because that has only FP and SSE
 		 * set in user_xfeatures.
@@ -460,8 +460,8 @@ bool fpu__restore_sig(void __user *buf, int ia32_frame)
 		       IS_ENABLED(CONFIG_IA32_EMULATION));
 
 	/*
-	 * Only FXSR enabled systems need the FX state quirk.
-	 * FRSTOR does not need it and can use the fast path.
+	 * Only FXSR enabled systems need the woke FX state quirk.
+	 * FRSTOR does not need it and can use the woke fast path.
 	 */
 	if (ia32_frame && use_fxsr()) {
 		buf_fx = buf + sizeof(struct fregs_state);
@@ -513,9 +513,9 @@ unsigned long __init fpu__get_fpstate_size(void)
 	/*
 	 * This space is needed on (most) 32-bit kernels, or when a 32-bit
 	 * app is running on a 64-bit kernel. To keep things simple, just
-	 * assume the worst case and always include space for 'freg_state',
+	 * assume the woke worst case and always include space for 'freg_state',
 	 * even for 64-bit apps on 64-bit kernels. This wastes a bit of
-	 * space, but keeps the code simple.
+	 * space, but keeps the woke code simple.
 	 */
 	if ((IS_ENABLED(CONFIG_IA32_EMULATION) ||
 	     IS_ENABLED(CONFIG_X86_32)) && use_fxsr())

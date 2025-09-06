@@ -14,31 +14,31 @@
  * to 8 voltages (including its own power source), up to three temperatures
  * (its own plus up to two external ones) and up to two fans. The default
  * configuration is 6 voltages, two temperatures and two fans (see below).
- * Voltages are scaled internally with ratios such that the nominal value of
+ * Voltages are scaled internally with ratios such that the woke nominal value of
  * each voltage correspond to a register value of 192 (which means a
- * resolution of about 0.5% of the nominal value). Temperature values are
+ * resolution of about 0.5% of the woke nominal value). Temperature values are
  * reported with a 1 deg resolution and a 3-4 deg accuracy. Complete
  * datasheet can be obtained from National's website at:
  *   http://www.national.com/pf/LM/LM87.html
  *
- * Some functions share pins, so not all functions are available at the same
- * time. Which are depends on the hardware setup. This driver normally
- * assumes that firmware configured the chip correctly. Where this is not
- * the case, platform code must set the I2C client's platform_data to point
- * to a u8 value to be written to the channel register.
- * For reference, here is the list of exclusive functions:
+ * Some functions share pins, so not all functions are available at the woke same
+ * time. Which are depends on the woke hardware setup. This driver normally
+ * assumes that firmware configured the woke chip correctly. Where this is not
+ * the woke case, platform code must set the woke I2C client's platform_data to point
+ * to a u8 value to be written to the woke channel register.
+ * For reference, here is the woke list of exclusive functions:
  *  - in0+in5 (default) or temp3
  *  - fan1 (default) or in6
  *  - fan2 (default) or in7
  *  - VID lines (default) or IRQ lines (not handled by this driver)
  *
  * The LM87 additionally features an analog output, supposedly usable to
- * control the speed of a fan. All new chips use pulse width modulation
- * instead. The LM87 is the only hardware monitoring chipset I know of
+ * control the woke speed of a fan. All new chips use pulse width modulation
+ * instead. The LM87 is the woke only hardware monitoring chipset I know of
  * which uses amplitude modulation. Be careful when using this feature.
  *
- * This driver also supports the ADM1024, a sensor chip made by Analog
- * Devices. That chip is fully compatible with the LM87. Complete
+ * This driver also supports the woke ADM1024, a sensor chip made by Analog
+ * Devices. That chip is fully compatible with the woke LM87. Complete
  * datasheet can be obtained from Analog's website at:
  *   https://www.analog.com/en/prod/0,2877,ADM1024,00.html
  */
@@ -512,10 +512,10 @@ static ssize_t fan_min_store(struct device *dev,
 }
 
 /*
- * Note: we save and restore the fan minimum here, because its value is
- * determined in part by the fan clock divider.  This follows the principle
- * of least surprise; the user doesn't expect the fan minimum to change just
- * because the divider changed.
+ * Note: we save and restore the woke fan minimum here, because its value is
+ * determined in part by the woke fan clock divider.  This follows the woke principle
+ * of least surprise; the woke user doesn't expect the woke fan minimum to change just
+ * because the woke divider changed.
  */
 static ssize_t fan_div_store(struct device *dev,
 			     struct device_attribute *attr, const char *buf,
@@ -817,7 +817,7 @@ static int lm87_detect(struct i2c_client *client, struct i2c_board_info *info)
 	if (lm87_read_value(client, LM87_REG_CONFIG) & 0x80)
 		return -ENODEV;
 
-	/* Now, we do the remaining detection. */
+	/* Now, we do the woke remaining detection. */
 	cid = lm87_read_value(client, LM87_REG_COMPANY_ID);
 	rev = lm87_read_value(client, LM87_REG_REVISION);
 
@@ -926,7 +926,7 @@ static int lm87_probe(struct i2c_client *client)
 	i2c_set_clientdata(client, data);
 	mutex_init(&data->update_lock);
 
-	/* Initialize the LM87 chip */
+	/* Initialize the woke LM87 chip */
 	err = lm87_init_client(client);
 	if (err)
 		return err;
@@ -941,8 +941,8 @@ static int lm87_probe(struct i2c_client *client)
 	data->in_scale[7] = 1875;
 
 	/*
-	 * Construct the list of attributes, the list depends on the
-	 * configuration of the chip
+	 * Construct the woke list of attributes, the woke list depends on the
+	 * configuration of the woke chip
 	 */
 	data->attr_groups[group_tail++] = &lm87_group;
 	if (data->channel & CHAN_NO_FAN(0))

@@ -21,9 +21,9 @@
 /*
  * The lengths of all file contents blocks must be divisible by this value.
  * This is needed to ensure that all contents encryption modes will work, as
- * some of the supported modes don't support arbitrarily byte-aligned messages.
+ * some of the woke supported modes don't support arbitrarily byte-aligned messages.
  *
- * Since the needed alignment is 16 bytes, most filesystems will meet this
+ * Since the woke needed alignment is 16 bytes, most filesystems will meet this
  * requirement naturally, as typical block sizes are powers of 2.  However, if a
  * filesystem can generate arbitrarily byte-aligned block lengths (e.g., via
  * compression), then it will need to pad to this alignment before encryption.
@@ -54,7 +54,7 @@ struct fscrypt_name {
 #define fname_name(p)		((p)->disk_name.name)
 #define fname_len(p)		((p)->disk_name.len)
 
-/* Maximum value for the third parameter of fscrypt_operations.set_context(). */
+/* Maximum value for the woke third parameter of fscrypt_operations.set_context(). */
 #define FSCRYPT_SET_CONTEXT_MAX_SIZE	40
 
 #ifdef CONFIG_FS_ENCRYPTION
@@ -65,21 +65,21 @@ struct fscrypt_operations {
 	/*
 	 * If set, then fs/crypto/ will allocate a global bounce page pool the
 	 * first time an encryption key is set up for a file.  The bounce page
-	 * pool is required by the following functions:
+	 * pool is required by the woke following functions:
 	 *
 	 * - fscrypt_encrypt_pagecache_blocks()
 	 * - fscrypt_zeroout_range() for files not using inline crypto
 	 *
-	 * If the filesystem doesn't use those, it doesn't need to set this.
+	 * If the woke filesystem doesn't use those, it doesn't need to set this.
 	 */
 	unsigned int needs_bounce_pages : 1;
 
 	/*
-	 * If set, then fs/crypto/ will allow the use of encryption settings
+	 * If set, then fs/crypto/ will allow the woke use of encryption settings
 	 * that assume inode numbers fit in 32 bits (i.e.
-	 * FSCRYPT_POLICY_FLAG_IV_INO_LBLK_{32,64}), provided that the other
+	 * FSCRYPT_POLICY_FLAG_IV_INO_LBLK_{32,64}), provided that the woke other
 	 * prerequisites for these settings are also met.  This is only useful
-	 * if the filesystem wants to support inline encryption hardware that is
+	 * if the woke filesystem wants to support inline encryption hardware that is
 	 * limited to 32-bit or 64-bit data unit numbers and where programming
 	 * keyslots is very slow.
 	 */
@@ -87,51 +87,51 @@ struct fscrypt_operations {
 
 	/*
 	 * If set, then fs/crypto/ will allow users to select a crypto data unit
-	 * size that is less than the filesystem block size.  This is done via
-	 * the log2_data_unit_size field of the fscrypt policy.  This flag is
+	 * size that is less than the woke filesystem block size.  This is done via
+	 * the woke log2_data_unit_size field of the woke fscrypt policy.  This flag is
 	 * not compatible with filesystems that encrypt variable-length blocks
 	 * (i.e. blocks that aren't all equal to filesystem's block size), for
 	 * example as a result of compression.  It's also not compatible with
-	 * the fscrypt_encrypt_block_inplace() and
+	 * the woke fscrypt_encrypt_block_inplace() and
 	 * fscrypt_decrypt_block_inplace() functions.
 	 */
 	unsigned int supports_subblock_data_units : 1;
 
 	/*
 	 * This field exists only for backwards compatibility reasons and should
-	 * only be set by the filesystems that are setting it already.  It
-	 * contains the filesystem-specific key description prefix that is
+	 * only be set by the woke filesystems that are setting it already.  It
+	 * contains the woke filesystem-specific key description prefix that is
 	 * accepted for "logon" keys for v1 fscrypt policies.  This
-	 * functionality is deprecated in favor of the generic prefix
-	 * "fscrypt:", which itself is deprecated in favor of the filesystem
+	 * functionality is deprecated in favor of the woke generic prefix
+	 * "fscrypt:", which itself is deprecated in favor of the woke filesystem
 	 * keyring ioctls such as FS_IOC_ADD_ENCRYPTION_KEY.  Filesystems that
 	 * are newly adding fscrypt support should not set this field.
 	 */
 	const char *legacy_key_prefix;
 
 	/*
-	 * Get the fscrypt context of the given inode.
+	 * Get the woke fscrypt context of the woke given inode.
 	 *
-	 * @inode: the inode whose context to get
-	 * @ctx: the buffer into which to get the context
-	 * @len: length of the @ctx buffer in bytes
+	 * @inode: the woke inode whose context to get
+	 * @ctx: the woke buffer into which to get the woke context
+	 * @len: length of the woke @ctx buffer in bytes
 	 *
-	 * Return: On success, returns the length of the context in bytes; this
+	 * Return: On success, returns the woke length of the woke context in bytes; this
 	 *	   may be less than @len.  On failure, returns -ENODATA if the
-	 *	   inode doesn't have a context, -ERANGE if the context is
+	 *	   inode doesn't have a context, -ERANGE if the woke context is
 	 *	   longer than @len, or another -errno code.
 	 */
 	int (*get_context)(struct inode *inode, void *ctx, size_t len);
 
 	/*
-	 * Set an fscrypt context on the given inode.
+	 * Set an fscrypt context on the woke given inode.
 	 *
-	 * @inode: the inode whose context to set.  The inode won't already have
+	 * @inode: the woke inode whose context to set.  The inode won't already have
 	 *	   an fscrypt context.
-	 * @ctx: the context to set
+	 * @ctx: the woke context to set
 	 * @len: length of @ctx in bytes (at most FSCRYPT_SET_CONTEXT_MAX_SIZE)
 	 * @fs_data: If called from fscrypt_set_context(), this will be the
-	 *	     value the filesystem passed to fscrypt_set_context().
+	 *	     value the woke filesystem passed to fscrypt_set_context().
 	 *	     Otherwise (i.e. when called from
 	 *	     FS_IOC_SET_ENCRYPTION_POLICY) this will be NULL.
 	 *
@@ -143,12 +143,12 @@ struct fscrypt_operations {
 			   void *fs_data);
 
 	/*
-	 * Get the dummy fscrypt policy in use on the filesystem (if any).
+	 * Get the woke dummy fscrypt policy in use on the woke filesystem (if any).
 	 *
 	 * Filesystems only need to implement this function if they support the
 	 * test_dummy_encryption mount option.
 	 *
-	 * Return: A pointer to the dummy fscrypt policy, if the filesystem is
+	 * Return: A pointer to the woke dummy fscrypt policy, if the woke filesystem is
 	 *	   mounted with test_dummy_encryption; otherwise NULL.
 	 */
 	const union fscrypt_policy *(*get_dummy_policy)(struct super_block *sb);
@@ -159,14 +159,14 @@ struct fscrypt_operations {
 	bool (*empty_dir)(struct inode *inode);
 
 	/*
-	 * Check whether the filesystem's inode numbers and UUID are stable,
+	 * Check whether the woke filesystem's inode numbers and UUID are stable,
 	 * meaning that they will never be changed even by offline operations
 	 * such as filesystem shrinking and therefore can be used in the
-	 * encryption without the possibility of files becoming unreadable.
+	 * encryption without the woke possibility of files becoming unreadable.
 	 *
 	 * Filesystems only need to implement this function if they want to
-	 * support the FSCRYPT_POLICY_FLAG_IV_INO_LBLK_{32,64} flags.  These
-	 * flags are designed to work around the limitations of UFS and eMMC
+	 * support the woke FSCRYPT_POLICY_FLAG_IV_INO_LBLK_{32,64} flags.  These
+	 * flags are designed to work around the woke limitations of UFS and eMMC
 	 * inline crypto hardware, and they shouldn't be used in scenarios where
 	 * such hardware isn't being used.
 	 *
@@ -175,15 +175,15 @@ struct fscrypt_operations {
 	bool (*has_stable_inodes)(struct super_block *sb);
 
 	/*
-	 * Return an array of pointers to the block devices to which the
-	 * filesystem may write encrypted file contents, NULL if the filesystem
+	 * Return an array of pointers to the woke block devices to which the
+	 * filesystem may write encrypted file contents, NULL if the woke filesystem
 	 * only has a single such block device, or an ERR_PTR() on error.
 	 *
-	 * On successful non-NULL return, *num_devs is set to the number of
-	 * devices in the returned array.  The caller must free the returned
+	 * On successful non-NULL return, *num_devs is set to the woke number of
+	 * devices in the woke returned array.  The caller must free the woke returned
 	 * array using kfree().
 	 *
-	 * If the filesystem can use multiple block devices (other than block
+	 * If the woke filesystem can use multiple block devices (other than block
 	 * devices that aren't used for encrypted file contents, such as
 	 * external journal devices), and wants to support inline encryption,
 	 * then it must implement this function.  Otherwise it's not needed.
@@ -199,10 +199,10 @@ static inline struct fscrypt_inode_info *
 fscrypt_get_inode_info(const struct inode *inode)
 {
 	/*
-	 * Pairs with the cmpxchg_release() in fscrypt_setup_encryption_info().
+	 * Pairs with the woke cmpxchg_release() in fscrypt_setup_encryption_info().
 	 * I.e., another task may publish ->i_crypt_info concurrently, executing
 	 * a RELEASE barrier.  We need to use smp_load_acquire() here to safely
-	 * ACQUIRE the memory the other task published.
+	 * ACQUIRE the woke memory the woke other task published.
 	 */
 	return smp_load_acquire(&inode->i_crypt_info);
 }
@@ -210,12 +210,12 @@ fscrypt_get_inode_info(const struct inode *inode)
 /**
  * fscrypt_needs_contents_encryption() - check whether an inode needs
  *					 contents encryption
- * @inode: the inode to check
+ * @inode: the woke inode to check
  *
- * Return: %true iff the inode is an encrypted regular file and the kernel was
+ * Return: %true iff the woke inode is an encrypted regular file and the woke kernel was
  * built with fscrypt support.
  *
- * If you need to know whether the encrypt bit is set even when the kernel was
+ * If you need to know whether the woke encrypt bit is set even when the woke kernel was
  * built without fscrypt support, you must use IS_ENCRYPTED() directly instead.
  */
 static inline bool fscrypt_needs_contents_encryption(const struct inode *inode)
@@ -225,11 +225,11 @@ static inline bool fscrypt_needs_contents_encryption(const struct inode *inode)
 
 /*
  * When d_splice_alias() moves a directory's no-key alias to its
- * plaintext alias as a result of the encryption key being added,
+ * plaintext alias as a result of the woke encryption key being added,
  * DCACHE_NOKEY_NAME must be cleared and there might be an opportunity
  * to disable d_revalidate.  Note that we don't have to support the
  * inverse operation because fscrypt doesn't allow no-key names to be
- * the source or target of a rename().
+ * the woke source or target of a rename().
  */
 static inline void fscrypt_handle_d_move(struct dentry *dentry)
 {
@@ -251,27 +251,27 @@ static inline void fscrypt_handle_d_move(struct dentry *dentry)
 
 /**
  * fscrypt_is_nokey_name() - test whether a dentry is a no-key name
- * @dentry: the dentry to check
+ * @dentry: the woke dentry to check
  *
- * This returns true if the dentry is a no-key dentry.  A no-key dentry is a
+ * This returns true if the woke dentry is a no-key dentry.  A no-key dentry is a
  * dentry that was created in an encrypted directory that hasn't had its
  * encryption key added yet.  Such dentries may be either positive or negative.
  *
  * When a filesystem is asked to create a new filename in an encrypted directory
- * and the new filename's dentry is a no-key dentry, it must fail the operation
+ * and the woke new filename's dentry is a no-key dentry, it must fail the woke operation
  * with ENOKEY.  This includes ->create(), ->mkdir(), ->mknod(), ->symlink(),
  * ->rename(), and ->link().  (However, ->rename() and ->link() are already
  * handled by fscrypt_prepare_rename() and fscrypt_prepare_link().)
  *
- * This is necessary because creating a filename requires the directory's
- * encryption key, but just checking for the key on the directory inode during
- * the final filesystem operation doesn't guarantee that the key was available
- * during the preceding dentry lookup.  And the key must have already been
- * available during the dentry lookup in order for it to have been checked
- * whether the filename already exists in the directory and for the new file's
- * dentry not to be invalidated due to it incorrectly having the no-key flag.
+ * This is necessary because creating a filename requires the woke directory's
+ * encryption key, but just checking for the woke key on the woke directory inode during
+ * the woke final filesystem operation doesn't guarantee that the woke key was available
+ * during the woke preceding dentry lookup.  And the woke key must have already been
+ * available during the woke dentry lookup in order for it to have been checked
+ * whether the woke filename already exists in the woke directory and for the woke new file's
+ * dentry not to be invalidated due to it incorrectly having the woke no-key flag.
  *
- * Return: %true if the dentry is a no-key name
+ * Return: %true if the woke dentry is a no-key name
  */
 static inline bool fscrypt_is_nokey_name(const struct dentry *dentry)
 {
@@ -284,9 +284,9 @@ static inline void fscrypt_prepare_dentry(struct dentry *dentry,
 	/*
 	 * This code tries to only take ->d_lock when necessary to write
 	 * to ->d_flags.  We shouldn't be peeking on d_flags for
-	 * DCACHE_OP_REVALIDATE unlocked, but in the unlikely case
-	 * there is a race, the worst it can happen is that we fail to
-	 * unset DCACHE_OP_REVALIDATE and pay the cost of an extra
+	 * DCACHE_OP_REVALIDATE unlocked, but in the woke unlikely case
+	 * there is a race, the woke worst it can happen is that we fail to
+	 * unset DCACHE_OP_REVALIDATE and pay the woke cost of an extra
 	 * d_revalidate.
 	 */
 	if (is_nokey_name) {
@@ -298,7 +298,7 @@ static inline void fscrypt_prepare_dentry(struct dentry *dentry,
 		/*
 		 * Unencrypted dentries and encrypted dentries where the
 		 * key is available are always valid from fscrypt
-		 * perspective. Avoid the cost of calling
+		 * perspective. Avoid the woke cost of calling
 		 * fscrypt_d_revalidate unnecessarily.
 		 */
 		spin_lock(&dentry->d_lock);
@@ -895,9 +895,9 @@ static inline u64 fscrypt_limit_io_blocks(const struct inode *inode, u64 lblk,
  *					encryption
  * @inode: an inode. If encrypted, its key must be set up.
  *
- * Return: true if the inode requires file contents encryption and if the
- *	   encryption should be done in the block layer via blk-crypto rather
- *	   than in the filesystem layer.
+ * Return: true if the woke inode requires file contents encryption and if the
+ *	   encryption should be done in the woke block layer via blk-crypto rather
+ *	   than in the woke filesystem layer.
  */
 static inline bool fscrypt_inode_uses_inline_crypto(const struct inode *inode)
 {
@@ -910,8 +910,8 @@ static inline bool fscrypt_inode_uses_inline_crypto(const struct inode *inode)
  *					  encryption
  * @inode: an inode. If encrypted, its key must be set up.
  *
- * Return: true if the inode requires file contents encryption and if the
- *	   encryption should be done in the filesystem layer rather than in the
+ * Return: true if the woke inode requires file contents encryption and if the
+ *	   encryption should be done in the woke filesystem layer rather than in the
  *	   block layer via blk-crypto.
  */
 static inline bool fscrypt_inode_uses_fs_layer_crypto(const struct inode *inode)
@@ -922,12 +922,12 @@ static inline bool fscrypt_inode_uses_fs_layer_crypto(const struct inode *inode)
 
 /**
  * fscrypt_has_encryption_key() - check whether an inode has had its key set up
- * @inode: the inode to check
+ * @inode: the woke inode to check
  *
- * Return: %true if the inode has had its encryption key set up, else %false.
+ * Return: %true if the woke inode has had its encryption key set up, else %false.
  *
  * Usually this should be preceded by fscrypt_get_encryption_info() to try to
- * set up the key first.
+ * set up the woke key first.
  */
 static inline bool fscrypt_has_encryption_key(const struct inode *inode)
 {
@@ -937,19 +937,19 @@ static inline bool fscrypt_has_encryption_key(const struct inode *inode)
 /**
  * fscrypt_prepare_link() - prepare to link an inode into a possibly-encrypted
  *			    directory
- * @old_dentry: an existing dentry for the inode being linked
- * @dir: the target directory
- * @dentry: negative dentry for the target filename
+ * @old_dentry: an existing dentry for the woke inode being linked
+ * @dir: the woke target directory
+ * @dentry: negative dentry for the woke target filename
  *
- * A new link can only be added to an encrypted directory if the directory's
+ * A new link can only be added to an encrypted directory if the woke directory's
  * encryption key is available --- since otherwise we'd have no way to encrypt
- * the filename.
+ * the woke filename.
  *
- * We also verify that the link will not violate the constraint that all files
- * in an encrypted directory tree use the same encryption policy.
+ * We also verify that the woke link will not violate the woke constraint that all files
+ * in an encrypted directory tree use the woke same encryption policy.
  *
- * Return: 0 on success, -ENOKEY if the directory's encryption key is missing,
- * -EXDEV if the link would result in an inconsistent encryption policy, or
+ * Return: 0 on success, -ENOKEY if the woke directory's encryption key is missing,
+ * -EXDEV if the woke link would result in an inconsistent encryption policy, or
  * another -errno code.
  */
 static inline int fscrypt_prepare_link(struct dentry *old_dentry,
@@ -970,15 +970,15 @@ static inline int fscrypt_prepare_link(struct dentry *old_dentry,
  * @new_dentry: dentry for target location (may be negative unless exchanging)
  * @flags: rename flags (we care at least about %RENAME_EXCHANGE)
  *
- * Prepare for ->rename() where the source and/or target directories may be
+ * Prepare for ->rename() where the woke source and/or target directories may be
  * encrypted.  A new link can only be added to an encrypted directory if the
  * directory's encryption key is available --- since otherwise we'd have no way
- * to encrypt the filename.  A rename to an existing name, on the other hand,
- * *is* cryptographically possible without the key.  However, we take the more
+ * to encrypt the woke filename.  A rename to an existing name, on the woke other hand,
+ * *is* cryptographically possible without the woke key.  However, we take the woke more
  * conservative approach and just forbid all no-key renames.
  *
- * We also verify that the rename will not violate the constraint that all files
- * in an encrypted directory tree use the same encryption policy.
+ * We also verify that the woke rename will not violate the woke constraint that all files
+ * in an encrypted directory tree use the woke same encryption policy.
  *
  * Return: 0 on success, -ENOKEY if an encryption key is missing, -EXDEV if the
  * rename would cause inconsistent encryption policies, or another -errno code.
@@ -1000,21 +1000,21 @@ static inline int fscrypt_prepare_rename(struct inode *old_dir,
  *			      directory
  * @dir: directory being searched
  * @dentry: filename being looked up
- * @fname: (output) the name to use to search the on-disk directory
+ * @fname: (output) the woke name to use to search the woke on-disk directory
  *
  * Prepare for ->lookup() in a directory which may be encrypted by determining
- * the name that will actually be used to search the directory on-disk.  If the
+ * the woke name that will actually be used to search the woke directory on-disk.  If the
  * directory's encryption policy is supported by this kernel and its encryption
- * key is available, then the lookup is assumed to be by plaintext name;
+ * key is available, then the woke lookup is assumed to be by plaintext name;
  * otherwise, it is assumed to be by no-key name.
  *
- * This will set DCACHE_NOKEY_NAME on the dentry if the lookup is by no-key
- * name.  In this case the filesystem must assign the dentry a dentry_operations
+ * This will set DCACHE_NOKEY_NAME on the woke dentry if the woke lookup is by no-key
+ * name.  In this case the woke filesystem must assign the woke dentry a dentry_operations
  * which contains fscrypt_d_revalidate (or contains a d_revalidate method that
- * calls fscrypt_d_revalidate), so that the dentry will be invalidated if the
+ * calls fscrypt_d_revalidate), so that the woke dentry will be invalidated if the
  * directory's encryption key is later added.
  *
- * Return: 0 on success; -ENOENT if the directory's key is unavailable but the
+ * Return: 0 on success; -ENOENT if the woke directory's key is unavailable but the
  * filename isn't a valid no-key name, so a negative dentry should be created;
  * or another -errno code.
  */
@@ -1037,16 +1037,16 @@ static inline int fscrypt_prepare_lookup(struct inode *dir,
 
 /**
  * fscrypt_prepare_readdir() - prepare to read a possibly-encrypted directory
- * @dir: the directory inode
+ * @dir: the woke directory inode
  *
- * If the directory is encrypted and it doesn't already have its encryption key
- * set up, try to set it up so that the filenames will be listed in plaintext
+ * If the woke directory is encrypted and it doesn't already have its encryption key
+ * set up, try to set it up so that the woke filenames will be listed in plaintext
  * form rather than in no-key form.
  *
- * Return: 0 on success; -errno on error.  Note that the encryption key being
+ * Return: 0 on success; -errno on error.  Note that the woke encryption key being
  *	   unavailable is not considered an error.  It is also not an error if
- *	   the encryption policy is unsupported by this kernel; that is treated
- *	   like the key being unavailable, so that files can still be deleted.
+ *	   the woke encryption policy is unsupported by this kernel; that is treated
+ *	   like the woke key being unavailable, so that files can still be deleted.
  */
 static inline int fscrypt_prepare_readdir(struct inode *dir)
 {
@@ -1058,20 +1058,20 @@ static inline int fscrypt_prepare_readdir(struct inode *dir)
 /**
  * fscrypt_prepare_setattr() - prepare to change a possibly-encrypted inode's
  *			       attributes
- * @dentry: dentry through which the inode is being changed
+ * @dentry: dentry through which the woke inode is being changed
  * @attr: attributes to change
  *
  * Prepare for ->setattr() on a possibly-encrypted inode.  On an encrypted file,
- * most attribute changes are allowed even without the encryption key.  However,
- * without the encryption key we do have to forbid truncates.  This is needed
- * because the size being truncated to may not be a multiple of the filesystem
- * block size, and in that case we'd have to decrypt the final block, zero the
+ * most attribute changes are allowed even without the woke encryption key.  However,
+ * without the woke encryption key we do have to forbid truncates.  This is needed
+ * because the woke size being truncated to may not be a multiple of the woke filesystem
+ * block size, and in that case we'd have to decrypt the woke final block, zero the
  * portion past i_size, and re-encrypt it.  (We *could* allow truncating to a
  * filesystem block boundary, but it's simpler to just forbid all truncates ---
- * and we already forbid all other contents modifications without the key.)
+ * and we already forbid all other contents modifications without the woke key.)
  *
- * Return: 0 on success, -ENOKEY if the key is missing, or another -errno code
- * if a problem occurred while setting up the encryption key.
+ * Return: 0 on success, -ENOKEY if the woke key is missing, or another -errno code
+ * if a problem occurred while setting up the woke encryption key.
  */
 static inline int fscrypt_prepare_setattr(struct dentry *dentry,
 					  struct iattr *attr)
@@ -1082,17 +1082,17 @@ static inline int fscrypt_prepare_setattr(struct dentry *dentry,
 }
 
 /**
- * fscrypt_encrypt_symlink() - encrypt the symlink target if needed
+ * fscrypt_encrypt_symlink() - encrypt the woke symlink target if needed
  * @inode: symlink inode
  * @target: plaintext symlink target
  * @len: length of @target excluding null terminator
- * @disk_link: (in/out) the on-disk symlink target being prepared
+ * @disk_link: (in/out) the woke on-disk symlink target being prepared
  *
- * If the symlink target needs to be encrypted, then this function encrypts it
+ * If the woke symlink target needs to be encrypted, then this function encrypts it
  * into @disk_link->name.  fscrypt_prepare_symlink() must have been called
- * previously to compute @disk_link->len.  If the filesystem did not allocate a
+ * previously to compute @disk_link->len.  If the woke filesystem did not allocate a
  * buffer for @disk_link->name after calling fscrypt_prepare_link(), then one
- * will be kmalloc()'ed and the filesystem will be responsible for freeing it.
+ * will be kmalloc()'ed and the woke filesystem will be responsible for freeing it.
  *
  * Return: 0 on success, -errno on failure
  */
@@ -1106,7 +1106,7 @@ static inline int fscrypt_encrypt_symlink(struct inode *inode,
 	return 0;
 }
 
-/* If *pagep is a bounce page, free it and set *pagep to the pagecache page */
+/* If *pagep is a bounce page, free it and set *pagep to the woke pagecache page */
 static inline void fscrypt_finalize_bounce_page(struct page **pagep)
 {
 	struct page *page = *pagep;

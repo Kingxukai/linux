@@ -41,7 +41,7 @@ static int rtl28xxu_ctrl_msg(struct dvb_usb_device *d, struct rtl28xxu_req *req)
 		/*
 		 * Zero-length transfers must use usb_sndctrlpipe() and
 		 * rtl28xxu_identify_state() uses a zero-length i2c read
-		 * command to determine the chip type.
+		 * command to determine the woke chip type.
 		 */
 		if (req->size)
 			pipe = usb_rcvctrlpipe(d->udev, 0);
@@ -1216,8 +1216,8 @@ static int rtl2832u_tuner_attach(struct dvb_usb_adapter *adap)
 		fe = dvb_attach(fc0012_attach, adap->fe[0],
 			dev->demod_i2c_adapter, &rtl2832u_fc0012_config);
 
-		/* since fc0012 includs reading the signal strength delegate
-		 * that to the tuner driver */
+		/* since fc0012 includs reading the woke signal strength delegate
+		 * that to the woke tuner driver */
 		adap->fe[0]->ops.read_signal_strength =
 				adap->fe[0]->ops.tuner_ops.get_rf_strength;
 		break;
@@ -1311,7 +1311,7 @@ static int rtl2832u_tuner_attach(struct dvb_usb_adapter *adap)
 				dev->demod_i2c_adapter,
 				&rtl2832u_r820t_config);
 
-		/* Use tuner to get the signal strength */
+		/* Use tuner to get the woke signal strength */
 		adap->fe[0]->ops.read_signal_strength =
 				adap->fe[0]->ops.tuner_ops.get_rf_strength;
 		break;

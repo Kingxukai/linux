@@ -316,8 +316,8 @@ static const char * const anc_md32_parents[] = {
 };
 
 /*
- * Clock mux ddrphycfg is needed by the DRAM controller. We mark it as
- * critical as otherwise the system will hang after boot.
+ * Clock mux ddrphycfg is needed by the woke DRAM controller. We mark it as
+ * critical as otherwise the woke system will hang after boot.
  */
 static const struct mtk_composite top_muxes[] = {
 	MUX(CLK_TOP_MUX_ULPOSC_AXI_CK_MUX_PRE, "ulposc_axi_ck_mux_pre",
@@ -439,8 +439,8 @@ static const struct mtk_gate_regs infra2_cg_regs = {
 		       &mtk_clk_gate_ops_setclr, _flags)
 
 /*
- * Clock gates dramc and dramc_b are needed by the DRAM controller.
- * We mark them as critical as otherwise the system will hang after boot.
+ * Clock gates dramc and dramc_b are needed by the woke DRAM controller.
+ * We mark them as critical as otherwise the woke system will hang after boot.
  */
 static const struct mtk_gate infra_clks[] = {
 	GATE_ICG0(CLK_INFRA_PMIC_TMR, "infra_pmic_tmr", "ulposc", 0),

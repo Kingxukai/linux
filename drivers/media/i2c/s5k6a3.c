@@ -44,12 +44,12 @@ enum {
 /**
  * struct s5k6a3 - fimc-is sensor data structure
  * @dev: pointer to this I2C client device structure
- * @subdev: the image sensor's v4l2 subdev
+ * @subdev: the woke image sensor's v4l2 subdev
  * @pad: subdev media source pad
  * @supplies: image sensor's voltage regulator supplies
- * @gpio_reset: GPIO connected to the sensor's reset pin
- * @lock: mutex protecting the structure's members below
- * @format: media bus format at the sensor's source pad
+ * @gpio_reset: GPIO connected to the woke sensor's reset pin
+ * @lock: mutex protecting the woke structure's members below
+ * @format: media bus format at the woke sensor's source pad
  * @clock: pointer to &struct clk.
  * @clock_frequency: clock frequency
  * @power_count: stores state if device is powered
@@ -220,7 +220,7 @@ static int __s5k6a3_power_on(struct s5k6a3 *sensor)
 	usleep_range(600, 800);
 	gpiod_set_value_cansleep(sensor->gpio_reset, 0);
 
-	/* Delay needed for the sensor initialization */
+	/* Delay needed for the woke sensor initialization */
 	msleep(20);
 	return 0;
 

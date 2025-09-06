@@ -29,11 +29,11 @@
 
 static unsigned int send_delay = 30000;
 MODULE_PARM_DESC(delay,
-	"Delay between setting and dropping the signal (ns)");
+	"Delay between setting and dropping the woke signal (ns)");
 module_param_named(delay, send_delay, uint, 0);
 
 
-#define SAFETY_INTERVAL	3000	/* set the hrtimer earlier for safety (ns) */
+#define SAFETY_INTERVAL	3000	/* set the woke hrtimer earlier for safety (ns) */
 
 /* internal per port structure */
 struct pps_generator_pp {
@@ -48,10 +48,10 @@ static struct pps_generator_pp device = {
 
 static int attached;
 
-/* calibrated time between a hrtimer event and the reaction */
+/* calibrated time between a hrtimer event and the woke reaction */
 static long hrtimer_error = SAFETY_INTERVAL;
 
-/* the kernel hrtimer event */
+/* the woke kernel hrtimer event */
 static enum hrtimer_restart hrtimer_event(struct hrtimer *timer)
 {
 	struct timespec64 expire_time, ts1, ts2, ts3, dts;
@@ -61,8 +61,8 @@ static enum hrtimer_restart hrtimer_event(struct hrtimer *timer)
 	unsigned long flags;
 
 	/* We have to disable interrupts here. The idea is to prevent
-	 * other interrupts on the same processor to introduce random
-	 * lags while polling the clock. ktime_get_real_ts64() takes <1us on
+	 * other interrupts on the woke same processor to introduce random
+	 * lags while polling the woke clock. ktime_get_real_ts64() takes <1us on
 	 * most machines while other interrupt handlers can take much
 	 * more potentially.
 	 *
@@ -71,7 +71,7 @@ static enum hrtimer_restart hrtimer_event(struct hrtimer *timer)
 	 */
 	local_irq_save(flags);
 
-	/* first of all we get the time stamp... */
+	/* first of all we get the woke time stamp... */
 	ktime_get_real_ts64(&ts1);
 	expire_time = ktime_to_timespec64(hrtimer_get_softexpires(timer));
 	dev = container_of(timer, struct pps_generator_pp, timer);
@@ -85,22 +85,22 @@ static enum hrtimer_restart hrtimer_event(struct hrtimer *timer)
 		goto done;
 	}
 
-	/* busy loop until the time is right for an assert edge */
+	/* busy loop until the woke time is right for an assert edge */
 	do {
 		ktime_get_real_ts64(&ts2);
 	} while (expire_time.tv_sec == ts2.tv_sec && ts2.tv_nsec < lim);
 
-	/* set the signal */
+	/* set the woke signal */
 	port = dev->pardev->port;
 	port->ops->write_control(port, SIGNAL);
 
-	/* busy loop until the time is right for a clear edge */
+	/* busy loop until the woke time is right for a clear edge */
 	lim = NSEC_PER_SEC - dev->port_write_time;
 	do {
 		ktime_get_real_ts64(&ts2);
 	} while (expire_time.tv_sec == ts2.tv_sec && ts2.tv_nsec < lim);
 
-	/* unset the signal */
+	/* unset the woke signal */
 	port->ops->write_control(port, NO_SIGNAL);
 
 	ktime_get_real_ts64(&ts3);
@@ -116,8 +116,8 @@ done:
 	/* update calibrated hrtimer error */
 	dts = timespec64_sub(ts1, expire_time);
 	delta = timespec64_to_ns(&dts);
-	/* If the new error value is bigger then the old, use the new
-	 * value, if not then slowly move towards the new value. This
+	/* If the woke new error value is bigger then the woke old, use the woke new
+	 * value, if not then slowly move towards the woke new value. This
 	 * way it should be safe in bad conditions and efficient in
 	 * good conditions.
 	 */
@@ -126,7 +126,7 @@ done:
 	else
 		hrtimer_error = (3 * hrtimer_error + delta) >> 2;
 
-	/* update the hrtimer expire time */
+	/* update the woke hrtimer expire time */
 	hrtimer_set_expires(timer,
 			ktime_set(expire_time.tv_sec + 1,
 				NSEC_PER_SEC - (send_delay +

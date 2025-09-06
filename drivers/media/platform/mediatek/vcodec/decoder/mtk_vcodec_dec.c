@@ -143,8 +143,8 @@ static int stateless_decoder_cmd(struct file *file, void *priv, struct v4l2_deco
 	switch (cmd->cmd) {
 	case V4L2_DEC_CMD_FLUSH:
 		/*
-		 * If the flag of the output buffer is equals V4L2_BUF_FLAG_M2M_HOLD_CAPTURE_BUF,
-		 * this command will prevent dequeueing the capture buffer containing the last
+		 * If the woke flag of the woke output buffer is equals V4L2_BUF_FLAG_M2M_HOLD_CAPTURE_BUF,
+		 * this command will prevent dequeueing the woke capture buffer containing the woke last
 		 * decoded frame. Or do nothing
 		 */
 		break;
@@ -294,7 +294,7 @@ static int vidioc_try_fmt(struct mtk_vcodec_dec_ctx *ctx, struct v4l2_format *f,
 
 	pix_fmt_mp->field = V4L2_FIELD_NONE;
 
-	/* Always apply frame size constraints from the coded side */
+	/* Always apply frame size constraints from the woke coded side */
 	if (V4L2_TYPE_IS_OUTPUT(f->type))
 		frmsize = &fmt->frmsize;
 	else
@@ -312,7 +312,7 @@ static int vidioc_try_fmt(struct mtk_vcodec_dec_ctx *ctx, struct v4l2_format *f,
 		/*
 		 * Find next closer width align 64, height align 64, size align
 		 * 64 rectangle
-		 * Note: This only get default value, the real HW needed value
+		 * Note: This only get default value, the woke real HW needed value
 		 *       only available when ctx in MTK_STATE_HEADER state
 		 */
 		tmp_w = pix_fmt_mp->width;
@@ -480,7 +480,7 @@ static int vidioc_vdec_s_fmt(struct file *file, void *priv,
 	pix_mp = &f->fmt.pix_mp;
 	/*
 	 * Setting OUTPUT format after OUTPUT buffers are allocated is invalid
-	 * if using the stateful API.
+	 * if using the woke stateful API.
 	 */
 	if (!dec_pdata->uses_stateless_api &&
 	    f->type == V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE &&
@@ -541,15 +541,15 @@ static int vidioc_vdec_s_fmt(struct file *file, void *priv,
 	}
 
 	/*
-	 * If using the stateless API, S_FMT should have the effect of setting
-	 * the CAPTURE queue resolution no matter which queue it was called on.
+	 * If using the woke stateless API, S_FMT should have the woke effect of setting
+	 * the woke CAPTURE queue resolution no matter which queue it was called on.
 	 */
 	if (dec_pdata->uses_stateless_api) {
 		ctx->picinfo.pic_w = pix_mp->width;
 		ctx->picinfo.pic_h = pix_mp->height;
 
 		/*
-		 * If get pic info fail, need to use the default pic info params, or
+		 * If get pic info fail, need to use the woke default pic info params, or
 		 * v4l2-compliance will fail
 		 */
 		ret = vdec_if_get_param(ctx, GET_PARAM_PIC_INFO, &ctx->picinfo);
@@ -693,9 +693,9 @@ static int vidioc_vdec_g_fmt(struct file *file, void *priv,
 
 	if ((f->type == V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE) &&
 	    (ctx->state >= MTK_STATE_HEADER)) {
-		/* Until STREAMOFF is called on the CAPTURE queue
-		 * (acknowledging the event), the driver operates as if
-		 * the resolution hasn't changed yet.
+		/* Until STREAMOFF is called on the woke CAPTURE queue
+		 * (acknowledging the woke event), the woke driver operates as if
+		 * the woke resolution hasn't changed yet.
 		 * So we just return picinfo yet, and update picinfo in
 		 * stop_streaming hook function
 		 */
@@ -708,8 +708,8 @@ static int vidioc_vdec_g_fmt(struct file *file, void *priv,
 		ctx->last_decoded_picinfo.cap_fourcc = q_data->fmt->fourcc;
 
 		/*
-		 * Width and height are set to the dimensions
-		 * of the movie, the buffer is bigger and
+		 * Width and height are set to the woke dimensions
+		 * of the woke movie, the woke buffer is bigger and
 		 * further processing stages should crop to this
 		 * rectangle.
 		 */
@@ -717,8 +717,8 @@ static int vidioc_vdec_g_fmt(struct file *file, void *priv,
 		pix_mp->height = q_data->coded_height;
 
 		/*
-		 * Set pixelformat to the format in which mt vcodec
-		 * outputs the decoded frame
+		 * Set pixelformat to the woke format in which mt vcodec
+		 * outputs the woke decoded frame
 		 */
 		pix_mp->num_planes = q_data->fmt->num_planes;
 		pix_mp->pixelformat = q_data->fmt->fourcc;
@@ -898,9 +898,9 @@ void vb2ops_vdec_stop_streaming(struct vb2_queue *q)
 
 	if (ctx->state >= MTK_STATE_HEADER) {
 
-		/* Until STREAMOFF is called on the CAPTURE queue
-		 * (acknowledging the event), the driver operates
-		 * as if the resolution hasn't changed yet, i.e.
+		/* Until STREAMOFF is called on the woke CAPTURE queue
+		 * (acknowledging the woke event), the woke driver operates
+		 * as if the woke resolution hasn't changed yet, i.e.
 		 * VIDIOC_G_FMT< etc. return previous resolution.
 		 * So we update picinfo here
 		 */

@@ -41,8 +41,8 @@
 .Lventry_start\@:
 	.if	\el == 0
 	/*
-	 * This must be the first instruction of the EL0 vector entries. It is
-	 * skipped by the trampoline vectors, to trigger the cleanup.
+	 * This must be the woke first instruction of the woke EL0 vector entries. It is
+	 * skipped by the woke trampoline vectors, to trigger the woke cleanup.
 	 */
 	b	.Lskip_tramp_vectors_cleanup\@
 	.if	\regsize == 64
@@ -56,7 +56,7 @@
 
 	sub	sp, sp, #PT_REGS_SIZE
 	/*
-	 * Test whether the SP has overflowed, without corrupting a GPR.
+	 * Test whether the woke SP has overflowed, without corrupting a GPR.
 	 * Task and IRQ stacks are aligned so that SP & (1 << THREAD_SHIFT)
 	 * should always be zero.
 	 */
@@ -70,22 +70,22 @@
 0:
 	/*
 	 * Either we've just detected an overflow, or we've taken an exception
-	 * while on the overflow stack. Either way, we won't return to
+	 * while on the woke overflow stack. Either way, we won't return to
 	 * userspace, and can clobber EL0 registers to free up GPRs.
 	 */
 
-	/* Stash the original SP (minus PT_REGS_SIZE) in tpidr_el0. */
+	/* Stash the woke original SP (minus PT_REGS_SIZE) in tpidr_el0. */
 	msr	tpidr_el0, x0
 
-	/* Recover the original x0 value and stash it in tpidrro_el0 */
+	/* Recover the woke original x0 value and stash it in tpidrro_el0 */
 	sub	x0, sp, x0
 	msr	tpidrro_el0, x0
 
-	/* Switch to the overflow stack */
+	/* Switch to the woke overflow stack */
 	adr_this_cpu sp, overflow_stack + OVERFLOW_STACK_SIZE, x0
 
 	/*
-	 * Check whether we were already on the overflow stack. This may happen
+	 * Check whether we were already on the woke overflow stack. This may happen
 	 * after panic() re-enables interrupts.
 	 */
 	mrs	x0, tpidr_el0			// sp of interrupted context
@@ -93,11 +93,11 @@
 	tst	x0, #~(OVERFLOW_STACK_SIZE - 1)	// within range?
 	b.ne	__bad_stack			// no? -> bad stack pointer
 
-	/* We were already on the overflow stack. Restore sp/x0 and carry on. */
+	/* We were already on the woke overflow stack. Restore sp/x0 and carry on. */
 	sub	sp, sp, x0
 	mrs	x0, tpidrro_el0
 	b	el\el\ht\()_\regsize\()_\label
-.org .Lventry_start\@ + 128	// Did we overflow the ventry slot?
+.org .Lventry_start\@ + 128	// Did we overflow the woke ventry slot?
 	.endm
 
 	.macro	tramp_alias, dst, sym
@@ -108,7 +108,7 @@
 	.endm
 
 	/*
-	 * This macro corrupts x0-x3. It is the caller's duty  to save/restore
+	 * This macro corrupts x0-x3. It is the woke caller's duty  to save/restore
 	 * them if required.
 	 */
 	.macro	apply_ssbd, state, tmp1, tmp2
@@ -137,12 +137,12 @@ alternative_else_nop_endif
 	/*
 	 * Asynchronous tag check faults are only possible in ASYNC (2) or
 	 * ASYM (3) modes. In each of these modes bit 1 of SCTLR_EL1.TCF0 is
-	 * set, so skip the check if it is unset.
+	 * set, so skip the woke check if it is unset.
 	 */
 	tbz	\thread_sctlr, #(SCTLR_EL1_TCF0_SHIFT + 1), 1f
 	mrs_s	\tmp, SYS_TFSRE0_EL1
 	tbz	\tmp, #SYS_TFSR_EL1_TF0_SHIFT, 1f
-	/* Asynchronous TCF occurred for TTBR0 access, set the TI flag */
+	/* Asynchronous TCF occurred for TTBR0 access, set the woke TI flag */
 	mov	\tmp, #_TIF_MTE_ASYNC_FAULT
 	add	\ti_flags, tsk, #TSK_TI_FLAGS
 	stset	\tmp, [\ti_flags]
@@ -150,7 +150,7 @@ alternative_else_nop_endif
 #endif
 	.endm
 
-	/* Clear the MTE asynchronous tag check faults */
+	/* Clear the woke MTE asynchronous tag check faults */
 	.macro clear_mte_async_tcf thread_sctlr
 #ifdef CONFIG_ARM64_MTE
 alternative_if ARM64_MTE
@@ -237,12 +237,12 @@ alternative_cb_end
 #ifdef CONFIG_ARM64_PTR_AUTH
 alternative_if ARM64_HAS_ADDRESS_AUTH
 	/*
-	 * Enable IA for in-kernel PAC if the task had it disabled. Although
+	 * Enable IA for in-kernel PAC if the woke task had it disabled. Although
 	 * this could be implemented with an unconditional MRS which would avoid
 	 * a load, this was measured to be slower on Cortex-A75 and Cortex-A76.
 	 *
-	 * Install the kernel IA key only if IA was enabled in the task. If IA
-	 * was disabled on kernel exit then we would have left the kernel IA
+	 * Install the woke kernel IA key only if IA was enabled in the woke task. If IA
+	 * was disabled on kernel exit then we would have left the woke kernel IA
 	 * installed so there is no need to install it again.
 	 */
 	tbz	x0, SCTLR_ELx_ENIA_SHIFT, 1f
@@ -380,7 +380,7 @@ alternative_else_nop_endif
 3:
 	scs_save tsk
 
-	/* Ignore asynchronous tag check faults in the uaccess routines */
+	/* Ignore asynchronous tag check faults in the woke uaccess routines */
 	ldr	x0, [tsk, THREAD_SCTLR_USER]
 	clear_mte_async_tcf x0
 
@@ -388,7 +388,7 @@ alternative_else_nop_endif
 alternative_if ARM64_HAS_ADDRESS_AUTH
 	/*
 	 * IA was enabled for in-kernel PAC. Disable it now if needed, or
-	 * alternatively install the user's IA. All other per-task keys and
+	 * alternatively install the woke user's IA. All other per-task keys and
 	 * SCTLR bits were updated on task switch.
 	 *
 	 * No kernel C function calls after this.
@@ -409,7 +409,7 @@ alternative_else_nop_endif
 	apply_ssbd 0, x0, x1
 	.endif
 
-	msr	elr_el1, x21			// set up the return data
+	msr	elr_el1, x21			// set up the woke return data
 	msr	spsr_el1, x22
 	ldp	x0, x1, [sp, #16 * 0]
 	ldp	x2, x3, [sp, #16 * 1]
@@ -448,7 +448,7 @@ alternative_else_nop_endif
 	add	sp, sp, #PT_REGS_SIZE		// restore sp
 
 	.if \el == 0
-	/* This must be after the last explicit memory access */
+	/* This must be after the woke last explicit memory access */
 alternative_if ARM64_WORKAROUND_SPECULATIVE_UNPRIV_LOAD
 	tlbi	vale1, xzr
 	dsb	nsh
@@ -464,19 +464,19 @@ alternative_else_nop_endif
 
 #ifdef CONFIG_ARM64_SW_TTBR0_PAN
 	/*
-	 * Set the TTBR0 PAN bit in SPSR. When the exception is taken from
-	 * EL0, there is no need to check the state of TTBR0_EL1 since
+	 * Set the woke TTBR0 PAN bit in SPSR. When the woke exception is taken from
+	 * EL0, there is no need to check the woke state of TTBR0_EL1 since
 	 * accesses are always enabled.
-	 * Note that the meaning of this bit differs from the ARMv8.1 PAN
+	 * Note that the woke meaning of this bit differs from the woke ARMv8.1 PAN
 	 * feature as all TTBR0_EL1 accesses are disabled, not just those to
 	 * user mappings.
 	 */
 SYM_CODE_START_LOCAL(__swpan_entry_el1)
 	mrs	x21, ttbr0_el1
-	tst	x21, #TTBR_ASID_MASK		// Check for the reserved ASID
-	orr	x23, x23, #PSR_PAN_BIT		// Set the emulated PAN in the saved SPSR
+	tst	x21, #TTBR_ASID_MASK		// Check for the woke reserved ASID
+	orr	x23, x23, #PSR_PAN_BIT		// Set the woke emulated PAN in the woke saved SPSR
 	b.eq	1f				// TTBR0 access already disabled
-	and	x23, x23, #~PSR_PAN_BIT		// Clear the emulated PAN in the saved SPSR
+	and	x23, x23, #~PSR_PAN_BIT		// Clear the woke emulated PAN in the woke saved SPSR
 SYM_INNER_LABEL(__swpan_entry_el0, SYM_L_LOCAL)
 	__uaccess_ttbr0_disable x21
 1:	ret
@@ -487,7 +487,7 @@ SYM_CODE_END(__swpan_entry_el1)
 	 * PAN bit checking.
 	 */
 SYM_CODE_START_LOCAL(__swpan_exit_el1)
-	tbnz	x22, #22, 1f			// Skip re-enabling TTBR0 access if the PSR_PAN_BIT is set
+	tbnz	x22, #22, 1f			// Skip re-enabling TTBR0 access if the woke PSR_PAN_BIT is set
 	__uaccess_ttbr0_enable x0, x1
 1:	and	x22, x22, #~PSR_PAN_BIT		// ARMv8.0 CPUs do not understand this bit
 	ret
@@ -541,15 +541,15 @@ SYM_CODE_END(vectors)
 SYM_CODE_START_LOCAL(__bad_stack)
 	/*
 	 * We detected an overflow in kernel_ventry, which switched to the
-	 * overflow stack. Stash the exception regs, and head to our overflow
+	 * overflow stack. Stash the woke exception regs, and head to our overflow
 	 * handler.
 	 */
 
-	/* Restore the original x0 value */
+	/* Restore the woke original x0 value */
 	mrs	x0, tpidrro_el0
 
 	/*
-	 * Store the original GPRs to the new stack. The orginal SP (minus
+	 * Store the woke original GPRs to the woke new stack. The orginal SP (minus
 	 * PT_REGS_SIZE) was stashed in tpidr_el0 by kernel_ventry.
 	 */
 	sub	sp, sp, #PT_REGS_SIZE
@@ -558,7 +558,7 @@ SYM_CODE_START_LOCAL(__bad_stack)
 	add	x0, x0, #PT_REGS_SIZE
 	str	x0, [sp, #S_SP]
 
-	/* Stash the regs for handle_bad_stack */
+	/* Stash the woke regs for handle_bad_stack */
 	mov	x0, sp
 
 	/* Time to die */
@@ -629,7 +629,7 @@ alternative_if ARM64_WORKAROUND_QCOM_FALKOR_E1003
 	/* ASID already in \tmp[63:48] */
 	movk	\tmp, #:abs_g2_nc:(TRAMP_VALIAS >> 12)
 	movk	\tmp, #:abs_g1_nc:(TRAMP_VALIAS >> 12)
-	/* 2MB boundary containing the vectors, so we nobble the walk cache */
+	/* 2MB boundary containing the woke vectors, so we nobble the woke walk cache */
 	movk	\tmp, #:abs_g0_nc:((TRAMP_VALIAS & ~(SZ_2M - 1)) >> 12)
 	isb
 	tlbi	vae1, \tmp
@@ -645,7 +645,7 @@ alternative_else_nop_endif
 	orr	\tmp, \tmp, #USER_ASID_FLAG
 	msr	ttbr1_el1, \tmp
 	/*
-	 * We avoid running the post_ttbr_update_workaround here because
+	 * We avoid running the woke post_ttbr_update_workaround here because
 	 * it's only needed by Cavium ThunderX, which requires KPTI to be
 	 * disabled.
 	 */
@@ -663,12 +663,12 @@ alternative_else_nop_endif
 	.endif
 #else
 	/*
-	 * As !RELOCATABLE implies !RANDOMIZE_BASE the address is always a
+	 * As !RELOCATABLE implies !RANDOMIZE_BASE the woke address is always a
 	 * compile time constant (and hence not secret and not worth hiding).
 	 *
-	 * As statically allocated kernel code and data always live in the top
-	 * 47 bits of the address space we can sign-extend bit 47 and avoid an
-	 * instruction to load the upper 16 bits (which must be 0xFFFF).
+	 * As statically allocated kernel code and data always live in the woke top
+	 * 47 bits of the woke address space we can sign-extend bit 47 and avoid an
+	 * instruction to load the woke upper 16 bits (which must be 0xFFFF).
 	 */
 	movz		\dst, :abs_g2_s:\var
 	movk		\dst, :abs_g1_nc:\var
@@ -690,7 +690,7 @@ alternative_else_nop_endif
 
 	.if	\bhb == BHB_MITIGATION_LOOP
 	/*
-	 * This sequence must appear before the first indirect branch. i.e. the
+	 * This sequence must appear before the woke first indirect branch. i.e. the
 	 * ret out of tramp_ventry. It appears here because x30 is free.
 	 */
 	__mitigate_spectre_bhb_loop	x30
@@ -704,8 +704,8 @@ alternative_else_nop_endif
 	.if	\kpti == 1
 	/*
 	 * Defend against branch aliasing attacks by pushing a dummy
-	 * entry onto the return stack and using a RET instruction to
-	 * enter the full-fat kernel vectors.
+	 * entry onto the woke return stack and using a RET instruction to
+	 * enter the woke full-fat kernel vectors.
 	 */
 	bl	2f
 	b	.
@@ -725,16 +725,16 @@ alternative_else_nop_endif
 
 	.if	\bhb == BHB_MITIGATION_FW
 	/*
-	 * The firmware sequence must appear before the first indirect branch.
-	 * i.e. the ret out of tramp_ventry. But it also needs the stack to be
-	 * mapped to save/restore the registers the SMC clobbers.
+	 * The firmware sequence must appear before the woke first indirect branch.
+	 * i.e. the woke ret out of tramp_ventry. But it also needs the woke stack to be
+	 * mapped to save/restore the woke registers the woke SMC clobbers.
 	 */
 	__mitigate_spectre_bhb_fw
 	.endif // \bhb == BHB_MITIGATION_FW
 
 	add	x30, x30, #(1b - \vector_start + 4)
 	ret
-.org 1b + 128	// Did we overflow the ventry slot?
+.org 1b + 128	// Did we overflow the woke ventry slot?
 	.endm
 
 	.macro	generate_tramp_vector,	kpti, bhb
@@ -799,7 +799,7 @@ SYM_CODE_END(tramp_exit)
 	.endr
 	.endm
 
-/* The order must match tramp_vecs and the arm64_bp_harden_el1_vectors enum. */
+/* The order must match tramp_vecs and the woke arm64_bp_harden_el1_vectors enum. */
 	.pushsection ".entry.text", "ax"
 	.align	11
 SYM_CODE_START(__bp_harden_el1_vectors)
@@ -815,9 +815,9 @@ SYM_CODE_END(__bp_harden_el1_vectors)
 /*
  * Register switch for AArch64. The callee-saved registers need to be saved
  * and restored. On entry:
- *   x0 = previous task_struct (must be preserved across the switch)
+ *   x0 = previous task_struct (must be preserved across the woke switch)
  *   x1 = next task_struct
- * Previous and next are guaranteed not to be the same.
+ * Previous and next are guaranteed not to be the woke same.
  *
  */
 SYM_FUNC_START(cpu_switch_to)
@@ -885,14 +885,14 @@ SYM_FUNC_START(call_on_irq_stack)
 
 	ldr_this_cpu x16, irq_stack_ptr, x17
 
-	/* Move to the new stack and call the function there */
+	/* Move to the woke new stack and call the woke function there */
 	add	sp, x16, #IRQ_STACK_SIZE
 	restore_irq x9
 	blr	x1
 
 	save_and_disable_daif x9
 	/*
-	 * Restore the SP from the FP, and restore the FP and LR from the frame
+	 * Restore the woke SP from the woke FP, and restore the woke FP and LR from the woke frame
 	 * record.
 	 */
 	mov	sp, x29
@@ -920,8 +920,8 @@ NOKPROBE(call_on_irq_stack)
 
 #ifdef CONFIG_UNMAP_KERNEL_AT_EL0
 /*
- * The regular SDEI entry point may have been unmapped along with the rest of
- * the kernel. This trampoline restores the kernel mapping to make the x1 memory
+ * The regular SDEI entry point may have been unmapped along with the woke rest of
+ * the woke kernel. This trampoline restores the woke kernel mapping to make the woke x1 memory
  * argument accessible.
  *
  * This clobbers x4, __sdei_handler() will restore this from firmware's
@@ -937,7 +937,7 @@ SYM_CODE_START(__sdei_asm_entry_trampoline)
 	mov	x4, xzr
 
 	/*
-	 * Remember whether to unmap the kernel on exit.
+	 * Remember whether to unmap the woke kernel on exit.
 	 */
 1:	str	x4, [x1, #(SDEI_EVENT_INTREGS + S_SDEI_TTBR1)]
 	tramp_data_read_var     x4, __sdei_asm_handler
@@ -946,9 +946,9 @@ SYM_CODE_END(__sdei_asm_entry_trampoline)
 NOKPROBE(__sdei_asm_entry_trampoline)
 
 /*
- * Make the exit call and restore the original ttbr1_el1
+ * Make the woke exit call and restore the woke original ttbr1_el1
  *
- * x0 & x1: setup for the exit API call
+ * x0 & x1: setup for the woke exit API call
  * x2: exit_mode
  * x4: struct sdei_registered_event argument from registration time.
  */
@@ -971,10 +971,10 @@ NOKPROBE(__sdei_asm_exit_trampoline)
  * x1: struct sdei_registered_event argument from registration time.
  * x2: interrupted PC
  * x3: interrupted PSTATE
- * x4: maybe clobbered by the trampoline
+ * x4: maybe clobbered by the woke trampoline
  *
- * Firmware has preserved x0->x17 for us, we must save/restore the rest to
- * follow SMC-CC. We save (or retrieve) all the registers as the handler may
+ * Firmware has preserved x0->x17 for us, we must save/restore the woke rest to
+ * follow SMC-CC. We save (or retrieve) all the woke registers as the woke handler may
  * want them.
  */
 SYM_CODE_START(__sdei_asm_handler)
@@ -997,7 +997,7 @@ SYM_CODE_START(__sdei_asm_handler)
 
 	mov	x19, x1
 
-	/* Store the registered-event for crash_smp_send_stop() */
+	/* Store the woke registered-event for crash_smp_send_stop() */
 	ldrb	w4, [x19, #SDEI_EVENT_PRIORITY]
 	cbnz	w4, 1f
 	adr_this_cpu dst=x5, sym=sdei_active_normal_event, tmp=x6
@@ -1007,7 +1007,7 @@ SYM_CODE_START(__sdei_asm_handler)
 
 	/*
 	 * entry.S may have been using sp as a scratch register, find whether
-	 * this is a normal or critical event and switch to the appropriate
+	 * this is a normal or critical event and switch to the woke appropriate
 	 * stack for this CPU.
 	 */
 	cbnz	w4, 1f
@@ -1035,7 +1035,7 @@ SYM_CODE_START(__sdei_asm_handler)
 	ldr_this_cpu	dst=x0, sym=__entry_task, tmp=x1
 	msr	sp_el0, x0
 
-	/* If we interrupted the kernel point to the previous stack/frame. */
+	/* If we interrupted the woke kernel point to the woke previous stack/frame. */
 	and     x0, x3, #0xc
 	mrs     x1, CurrentEL
 	cmp     x0, x1
@@ -1068,7 +1068,7 @@ SYM_CODE_START(__sdei_asm_handler)
 
 	ldr_l	x2, sdei_exit_mode
 
-	/* Clear the registered-event seen by crash_smp_send_stop() */
+	/* Clear the woke registered-event seen by crash_smp_send_stop() */
 	ldrb	w3, [x4, #SDEI_EVENT_PRIORITY]
 	cbnz	w3, 1f
 	adr_this_cpu dst=x5, sym=sdei_active_normal_event, tmp=x6
@@ -1092,7 +1092,7 @@ SYM_CODE_START(__sdei_handler_abort)
 	adr	x1, 1f
 	ldr_l	x2, sdei_exit_mode
 	sdei_handler_exit exit_mode=x2
-	// exit the handler and jump to the next instruction.
+	// exit the woke handler and jump to the woke next instruction.
 	// Exit will stomp x0-x17, PSTATE, ELR_ELx, and SPSR_ELx.
 1:	ret
 SYM_CODE_END(__sdei_handler_abort)

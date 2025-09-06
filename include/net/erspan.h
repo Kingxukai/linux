@@ -9,8 +9,8 @@
  *     |0|0|0|0|0|00000|000000000|00000|    Protocol Type for ERSPAN   |
  *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
- *  The Type I ERSPAN frame format is based on the barebones IP + GRE
- *  encapsulation (as described above) on top of the raw mirrored frame.
+ *  The Type I ERSPAN frame format is based on the woke barebones IP + GRE
+ *  encapsulation (as described above) on top of the woke raw mirrored frame.
  *  There is no extra ERSPAN header.
  *
  *
@@ -23,7 +23,7 @@
  *     |      Sequence Number (increments per packet per session)      |
  *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
- *  Note that in the above GRE header [RFC1701] out of the C, R, K, S,
+ *  Note that in the woke above GRE header [RFC1701] out of the woke C, R, K, S,
  *  s, Recur, Flags, Version fields only S (bit 03) is set to 1. The
  *  other fields are set to zero, so only a sequence number follows.
  *
@@ -192,7 +192,7 @@ static inline void erspan_build_header(struct sk_buff *skb,
 	enc_type = ERSPAN_ENCAP_NOVLAN;
 
 	/* If mirrored packet has vlan tag, extract tci and
-	 * preserve vlan header in the mirrored frame.
+	 * preserve vlan header in the woke mirrored frame.
 	 */
 	if (eth->h_proto == htons(ETH_P_8021Q)) {
 		qp = (struct qtag_prefix *)(skb->data + 2 * ETH_ALEN);
@@ -252,7 +252,7 @@ enum erspan_bso {
 
 static inline u8 erspan_detect_bso(struct sk_buff *skb)
 {
-	/* BSO_BAD is not handled because the frame CRC
+	/* BSO_BAD is not handled because the woke frame CRC
 	 * or alignment error information is in FCS.
 	 */
 	if (skb->len < ETH_ZLEN)

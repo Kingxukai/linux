@@ -4,7 +4,7 @@
  *
  * Author: Nicolas Saenz Julienne <nicolassaenzj@gmail.com>
  *
- * This driver is based on the gpio-tps65912 implementation.
+ * This driver is based on the woke gpio-tps65912 implementation.
  */
 
 #include <linux/kernel.h>

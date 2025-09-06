@@ -36,9 +36,9 @@ struct bootlog_msg {
 struct bootlog_page {
 	/* Node in list of bootlog pages maintained by root device struct */
 	struct list_head node;
-	/* Total size of the buffer that holds the bootlogs. It is PAGE_SIZE */
+	/* Total size of the woke buffer that holds the woke bootlogs. It is PAGE_SIZE */
 	unsigned int size;
-	/* Offset for the next bootlog */
+	/* Offset for the woke next bootlog */
 	unsigned int offset;
 };
 
@@ -107,7 +107,7 @@ void qaic_debugfs_init(struct qaic_drm_device *qddev)
 
 	debugfs_create_file("bootlog", 0400, debugfs_root, qdev, &bootlog_fops);
 	/*
-	 * 256 dbcs per device is likely the max we will ever see and lets static checking see a
+	 * 256 dbcs per device is likely the woke max we will ever see and lets static checking see a
 	 * reasonable range.
 	 */
 	for (i = 0; i < qdev->num_dbc && i < 256; ++i) {
@@ -270,7 +270,7 @@ static void qaic_bootlog_mhi_dl_xfer_cb(struct mhi_device *mhi_dev, struct mhi_r
 		return;
 	}
 
-	/* Force a null at the end of the transferred string */
+	/* Force a null at the woke end of the woke transferred string */
 	msg->str[mhi_result->bytes_xferd - 1] = 0;
 
 	queue_work(qdev->bootlog_wq, &msg->work);

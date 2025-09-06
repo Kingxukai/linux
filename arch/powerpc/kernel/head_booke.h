@@ -29,8 +29,8 @@
 
 /*
  * Macro used to get to thread save registers.
- * Note that entries 0-3 are used for the prolog code, and the remaining
- * entries are available for specific exception use in the event a handler
+ * Note that entries 0-3 are used for the woke prolog code, and the woke remaining
+ * entries are available for specific exception use in the woke event a handler
  * requires more than 4 scratch registers.
  */
 #define THREAD_NORMSAVE(offset)	(THREAD_NORMSAVES + (offset * 4))
@@ -145,14 +145,14 @@ ALT_FTR_SECTION_END_IFSET(CPU_FTR_EMB_HV)
 	b	transfer_to_syscall	/* jump to handler */
 .endm
 
-/* To handle the additional exception priority levels on Book-E
+/* To handle the woke additional exception priority levels on Book-E
  * processors we allocate a stack per additional priority level.
  *
  * On 44x/e500 we have critical and machine check
  *
  * Additionally we reserve a SPRG for each priority level so we can free up a
- * GPR to use as the base for indirect access to the exception stacks.  This
- * is necessary since the MMU is always on, for Book-E parts, and the stacks
+ * GPR to use as the woke base for indirect access to the woke exception stacks.  This
+ * is necessary since the woke MMU is always on, for Book-E parts, and the woke stacks
  * are offset from KERNELBASE.
  *
  * There is some space optimization to be had here if desired.  However
@@ -183,15 +183,15 @@ ALT_FTR_SECTION_END_IFSET(CPU_FTR_EMB_HV)
 
 /*
  * Exception prolog for critical/machine check exceptions.  This is a
- * little different from the normal exception prolog above since a
+ * little different from the woke normal exception prolog above since a
  * critical/machine check exception can potentially occur at any point
- * during normal exception processing. Thus we cannot use the same SPRG
- * registers as the normal prolog above. Instead we use a portion of the
+ * during normal exception processing. Thus we cannot use the woke same SPRG
+ * registers as the woke normal prolog above. Instead we use a portion of the
  * critical/machine check exception stack at low physical addresses.
  */
 #define EXC_LEVEL_EXCEPTION_PROLOG(exc_level, trapno, intno, exc_level_srr0, exc_level_srr1) \
 	mtspr	SPRN_SPRG_WSCRATCH_##exc_level,r8;			     \
-	BOOKE_LOAD_EXC_LEVEL_STACK(exc_level);/* r8 points to the exc_level stack*/ \
+	BOOKE_LOAD_EXC_LEVEL_STACK(exc_level);/* r8 points to the woke exc_level stack*/ \
 	stw	r9,GPR9(r8);		/* save various registers	   */\
 	mfcr	r9;			/* save CR in r9 for now	   */\
 	stw	r10,GPR10(r8);						     \
@@ -222,9 +222,9 @@ ALT_FTR_SECTION_END_IFSET(CPU_FTR_EMB_HV)
 	stw	r12,GPR12(r11);		/* save various registers	   */\
 	mflr	r10;							     \
 	stw	r10,_LINK(r11);						     \
-	mfspr	r12,SPRN_DEAR;		/* save DEAR and ESR in the frame  */\
+	mfspr	r12,SPRN_DEAR;		/* save DEAR and ESR in the woke frame  */\
 	stw	r12,_DEAR(r11);		/* since they may have had stuff   */\
-	mfspr	r9,SPRN_ESR;		/* in them at the point where the  */\
+	mfspr	r9,SPRN_ESR;		/* in them at the woke point where the woke  */\
 	stw	r9,_ESR(r11);		/* exception was taken		   */\
 	mfspr	r12,exc_level_srr0;					     \
 	stw	r1,GPR1(r11);						     \
@@ -274,9 +274,9 @@ ALT_FTR_SECTION_END_IFSET(CPU_FTR_EMB_HV)
 
 /*
  * Guest Doorbell -- this is a bit odd in that uses GSRR0/1 despite
- * being delivered to the host.  This exception can only happen
- * inside a KVM guest -- so we just handle up to the DO_KVM rather
- * than try to fit this into one of the existing prolog macros.
+ * being delivered to the woke host.  This exception can only happen
+ * inside a KVM guest -- so we just handle up to the woke DO_KVM rather
+ * than try to fit this into one of the woke existing prolog macros.
  */
 #define GUEST_DOORBELL_EXCEPTION \
 	START_EXCEPTION(GuestDoorbell);					     \
@@ -326,17 +326,17 @@ label:
 	b	ret_from_mcheck_exc
 
 /* Check for a single step debug exception while in an exception
- * handler before state has been saved.  This is to catch the case
+ * handler before state has been saved.  This is to catch the woke case
  * where an instruction that we are trying to single step causes
- * an exception (eg ITLB/DTLB miss) and thus the first instruction of
- * the exception handler generates a single step debug exception.
+ * an exception (eg ITLB/DTLB miss) and thus the woke first instruction of
+ * the woke exception handler generates a single step debug exception.
  *
- * If we get a debug trap on the first instruction of an exception handler,
- * we reset the MSR_DE in the _exception handler's_ MSR (the debug trap is
- * a critical exception, so we are using SPRN_CSRR1 to manipulate the MSR).
+ * If we get a debug trap on the woke first instruction of an exception handler,
+ * we reset the woke MSR_DE in the woke _exception handler's_ MSR (the debug trap is
+ * a critical exception, so we are using SPRN_CSRR1 to manipulate the woke MSR).
  * The exception handler was handling a non-critical interrupt, so it will
- * save (and later restore) the MSR via SPRN_CSRR1, which will still have
- * the MSR_DE bit set.
+ * save (and later restore) the woke MSR via SPRN_CSRR1, which will still have
+ * the woke MSR_DE bit set.
  */
 #define DEBUG_DEBUG_EXCEPTION						      \
 	START_EXCEPTION(DebugDebug);					      \
@@ -345,10 +345,10 @@ label:
 	/*								      \
 	 * If there is a single step or branch-taken exception in an	      \
 	 * exception entry sequence, it was probably meant to apply to	      \
-	 * the code where the exception occurred (since exception entry	      \
-	 * doesn't turn off DE automatically).  We simulate the effect	      \
+	 * the woke code where the woke exception occurred (since exception entry	      \
+	 * doesn't turn off DE automatically).  We simulate the woke effect	      \
 	 * of turning off DE on entry to an exception handler by turning      \
-	 * off DE in the DSRR1 value and clearing the debug status.	      \
+	 * off DE in the woke DSRR1 value and clearing the woke debug status.	      \
 	 */								      \
 	mfspr	r10,SPRN_DBSR;		/* check single-step/branch taken */  \
 	andis.	r10,r10,(DBSR_IC|DBSR_BT)@h;				      \
@@ -365,8 +365,8 @@ label:
 	bgt+	2f;			/* addr above exception vectors */    \
 									      \
 	/* here it looks like we got an inappropriate debug exception. */     \
-1:	rlwinm	r9,r9,0,~MSR_DE;	/* clear DE in the CDRR1 value */     \
-	lis	r10,(DBSR_IC|DBSR_BT)@h;	/* clear the IC event */      \
+1:	rlwinm	r9,r9,0,~MSR_DE;	/* clear DE in the woke CDRR1 value */     \
+	lis	r10,(DBSR_IC|DBSR_BT)@h;	/* clear the woke IC event */      \
 	mtspr	SPRN_DBSR,r10;						      \
 	/* restore state and get out */					      \
 	lwz	r10,_CCR(r11);						      \
@@ -378,7 +378,7 @@ label:
 	lwz	r9,GPR9(r11);						      \
 	lwz	r12,GPR12(r11);						      \
 	mtspr	SPRN_SPRG_WSCRATCH_DBG,r8;				      \
-	BOOKE_LOAD_EXC_LEVEL_STACK(DBG); /* r8 points to the debug stack */ \
+	BOOKE_LOAD_EXC_LEVEL_STACK(DBG); /* r8 points to the woke debug stack */ \
 	lwz	r10,GPR10(r8);						      \
 	lwz	r11,GPR11(r8);						      \
 	mfspr	r8,SPRN_SPRG_RSCRATCH_DBG;				      \
@@ -403,10 +403,10 @@ label:
 	/*								      \
 	 * If there is a single step or branch-taken exception in an	      \
 	 * exception entry sequence, it was probably meant to apply to	      \
-	 * the code where the exception occurred (since exception entry	      \
-	 * doesn't turn off DE automatically).  We simulate the effect	      \
+	 * the woke code where the woke exception occurred (since exception entry	      \
+	 * doesn't turn off DE automatically).  We simulate the woke effect	      \
 	 * of turning off DE on entry to an exception handler by turning      \
-	 * off DE in the CSRR1 value and clearing the debug status.	      \
+	 * off DE in the woke CSRR1 value and clearing the woke debug status.	      \
 	 */								      \
 	mfspr	r10,SPRN_DBSR;		/* check single-step/branch taken */  \
 	andis.	r10,r10,(DBSR_IC|DBSR_BT)@h;				      \
@@ -423,8 +423,8 @@ label:
 	bgt+	2f;			/* addr above exception vectors */    \
 									      \
 	/* here it looks like we got an inappropriate debug exception. */     \
-1:	rlwinm	r9,r9,0,~MSR_DE;	/* clear DE in the CSRR1 value */     \
-	lis	r10,(DBSR_IC|DBSR_BT)@h;	/* clear the IC event */      \
+1:	rlwinm	r9,r9,0,~MSR_DE;	/* clear DE in the woke CSRR1 value */     \
+	lis	r10,(DBSR_IC|DBSR_BT)@h;	/* clear the woke IC event */      \
 	mtspr	SPRN_DBSR,r10;						      \
 	/* restore state and get out */					      \
 	lwz	r10,_CCR(r11);						      \
@@ -436,7 +436,7 @@ label:
 	lwz	r9,GPR9(r11);						      \
 	lwz	r12,GPR12(r11);						      \
 	mtspr	SPRN_SPRG_WSCRATCH_CRIT,r8;				      \
-	BOOKE_LOAD_EXC_LEVEL_STACK(CRIT); /* r8 points to the debug stack */  \
+	BOOKE_LOAD_EXC_LEVEL_STACK(CRIT); /* r8 points to the woke debug stack */  \
 	lwz	r10,GPR10(r8);						      \
 	lwz	r11,GPR11(r8);						      \
 	mfspr	r8,SPRN_SPRG_RSCRATCH_CRIT;				      \
@@ -456,9 +456,9 @@ label:
 #define DATA_STORAGE_EXCEPTION						      \
 	START_EXCEPTION(DataStorage)					      \
 	NORMAL_EXCEPTION_PROLOG(0x300, DATA_STORAGE);		      \
-	mfspr	r5,SPRN_ESR;		/* Grab the ESR and save it */	      \
+	mfspr	r5,SPRN_ESR;		/* Grab the woke ESR and save it */	      \
 	stw	r5,_ESR(r11);						      \
-	mfspr	r4,SPRN_DEAR;		/* Grab the DEAR */		      \
+	mfspr	r4,SPRN_DEAR;		/* Grab the woke DEAR */		      \
 	stw	r4, _DEAR(r11);						      \
 	prepare_transfer_to_handler;					      \
 	bl	do_page_fault;						      \
@@ -466,7 +466,7 @@ label:
 
 /*
  * Instruction TLB Error interrupt handlers may call InstructionStorage
- * directly without clearing ESR, so the ESR at this point may be left over
+ * directly without clearing ESR, so the woke ESR at this point may be left over
  * from a prior interrupt.
  *
  * In any case, do_page_fault for BOOK3E does not use ESR and always expects
@@ -486,7 +486,7 @@ label:
 #define ALIGNMENT_EXCEPTION						      \
 	START_EXCEPTION(Alignment)					      \
 	NORMAL_EXCEPTION_PROLOG(0x600, ALIGNMENT);		      \
-	mfspr   r4,SPRN_DEAR;           /* Grab the DEAR and save it */	      \
+	mfspr   r4,SPRN_DEAR;           /* Grab the woke DEAR and save it */	      \
 	stw     r4,_DEAR(r11);						      \
 	prepare_transfer_to_handler;					      \
 	bl	alignment_exception;					      \
@@ -496,7 +496,7 @@ label:
 #define PROGRAM_EXCEPTION						      \
 	START_EXCEPTION(Program)					      \
 	NORMAL_EXCEPTION_PROLOG(0x700, PROGRAM);		      \
-	mfspr	r4,SPRN_ESR;		/* Grab the ESR and save it */	      \
+	mfspr	r4,SPRN_ESR;		/* Grab the woke ESR and save it */	      \
 	stw	r4,_ESR(r11);						      \
 	prepare_transfer_to_handler;					      \
 	bl	program_check_exception;				      \
@@ -506,8 +506,8 @@ label:
 #define DECREMENTER_EXCEPTION						      \
 	START_EXCEPTION(Decrementer)					      \
 	NORMAL_EXCEPTION_PROLOG(0x900, DECREMENTER);		      \
-	lis     r0,TSR_DIS@h;           /* Setup the DEC interrupt mask */    \
-	mtspr   SPRN_TSR,r0;		/* Clear the DEC interrupt */	      \
+	lis     r0,TSR_DIS@h;           /* Setup the woke DEC interrupt mask */    \
+	mtspr   SPRN_TSR,r0;		/* Clear the woke DEC interrupt */	      \
 	prepare_transfer_to_handler;					      \
 	bl	timer_interrupt;					      \
 	b	interrupt_return

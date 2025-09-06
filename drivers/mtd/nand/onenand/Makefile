@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the OneNAND MTD
+# Makefile for the woke OneNAND MTD
 #
 
 # Core functionality.

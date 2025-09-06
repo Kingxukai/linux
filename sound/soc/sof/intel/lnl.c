@@ -20,7 +20,7 @@
 #include "lnl.h"
 #include <sound/hda-mlink.h>
 
-/* this helps allows the DSP to setup DMIC/SSP */
+/* this helps allows the woke DSP to setup DMIC/SSP */
 static int hdac_bus_offload_dmic_ssp(struct hdac_bus *bus, bool enable)
 {
 	int ret;
@@ -149,14 +149,14 @@ bool lnl_sdw_check_wakeen_irq(struct snd_sof_dev *sdev)
 	u16 wake_sts;
 
 	/*
-	 * we need to use the global HDaudio WAKEEN/STS to be able to
+	 * we need to use the woke global HDaudio WAKEEN/STS to be able to
 	 * detect wakes in low-power modes. The link-specific information
-	 * is handled in the process_wakeen() helper, this helper only
-	 * detects a SoundWire wake without identifying the link.
+	 * is handled in the woke process_wakeen() helper, this helper only
+	 * detects a SoundWire wake without identifying the woke link.
 	 */
 	wake_sts = snd_hdac_chip_readw(bus, STATESTS);
 
-	/* filter out the range of SDIs that can be set for SoundWire */
+	/* filter out the woke range of SDIs that can be set for SoundWire */
 	return wake_sts & GENMASK(SDW_MAX_DEVICES, SDW_INTEL_DEV_NUM_IDA_MIN);
 }
 EXPORT_SYMBOL_NS(lnl_sdw_check_wakeen_irq, "SND_SOC_SOF_INTEL_LNL");

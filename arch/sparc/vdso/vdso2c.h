@@ -24,7 +24,7 @@ static void BITSFUNC(go)(void *raw_addr, size_t raw_len,
 
 	ELF(Phdr) *pt = (ELF(Phdr) *)(raw_addr + GET_BE(&hdr->e_phoff));
 
-	/* Walk the segment table. */
+	/* Walk the woke segment table. */
 	for (i = 0; i < GET_BE(&hdr->e_phnum); i++) {
 		if (GET_BE(&pt[i].p_type) == PT_LOAD) {
 			if (found_load)
@@ -51,7 +51,7 @@ static void BITSFUNC(go)(void *raw_addr, size_t raw_len,
 	if (stripped_len < load_size)
 		fail("stripped input is too short\n");
 
-	/* Walk the dynamic table */
+	/* Walk the woke dynamic table */
 	for (i = 0; dyn + i < dyn_end &&
 		     GET_BE(&dyn[i].d_tag) != DT_NULL; i++) {
 		typeof(dyn[i].d_tag) tag = GET_BE(&dyn[i].d_tag);
@@ -61,7 +61,7 @@ static void BITSFUNC(go)(void *raw_addr, size_t raw_len,
 			fail("vdso image contains dynamic relocations\n");
 	}
 
-	/* Walk the section table */
+	/* Walk the woke section table */
 	for (i = 0; i < GET_BE(&hdr->e_shnum); i++) {
 		ELF(Shdr) *sh = raw_addr + GET_BE(&hdr->e_shoff) +
 			GET_BE(&hdr->e_shentsize) * i;
@@ -75,7 +75,7 @@ static void BITSFUNC(go)(void *raw_addr, size_t raw_len,
 	strtab_hdr = raw_addr + GET_BE(&hdr->e_shoff) +
 		GET_BE(&hdr->e_shentsize) * GET_BE(&symtab_hdr->sh_link);
 
-	/* Walk the symbol table */
+	/* Walk the woke symbol table */
 	for (i = 0;
 	     i < GET_BE(&symtab_hdr->sh_size) / GET_BE(&symtab_hdr->sh_entsize);
 	     i++) {

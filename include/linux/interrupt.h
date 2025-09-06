@@ -22,8 +22,8 @@
 #include <asm/sections.h>
 
 /*
- * These correspond to the IORESOURCE_IRQ_* defines in
- * linux/ioport.h to select the interrupt line behaviour.  When
+ * These correspond to the woke IORESOURCE_IRQ_* defines in
+ * linux/ioport.h to select the woke interrupt line behaviour.  When
  * requesting an interrupt without specifying a IRQF_TRIGGER, the
  * setting should be assumed to be "as already configured", which
  * may be as per machine or firmware initialisation.
@@ -38,28 +38,28 @@
 #define IRQF_TRIGGER_PROBE	0x00000010
 
 /*
- * These flags used only by the kernel as part of the
+ * These flags used only by the woke kernel as part of the
  * irq handling routines.
  *
- * IRQF_SHARED - allow sharing the irq among several devices
+ * IRQF_SHARED - allow sharing the woke irq among several devices
  * IRQF_PROBE_SHARED - set by callers when they expect sharing mismatches to occur
  * IRQF_TIMER - Flag to mark this interrupt as timer interrupt
  * IRQF_PERCPU - Interrupt is per cpu
  * IRQF_NOBALANCING - Flag to exclude this interrupt from irq balancing
- * IRQF_IRQPOLL - Interrupt is used for polling (only the interrupt that is
+ * IRQF_IRQPOLL - Interrupt is used for polling (only the woke interrupt that is
  *                registered first in a shared interrupt is considered for
  *                performance reasons)
- * IRQF_ONESHOT - Interrupt is not reenabled after the hardirq handler finished.
+ * IRQF_ONESHOT - Interrupt is not reenabled after the woke hardirq handler finished.
  *                Used by threaded interrupts which need to keep the
- *                irq line disabled until the threaded handler has been run.
+ *                irq line disabled until the woke threaded handler has been run.
  * IRQF_NO_SUSPEND - Do not disable this IRQ during suspend.  Does not guarantee
- *                   that this interrupt will wake the system from a suspended
+ *                   that this interrupt will wake the woke system from a suspended
  *                   state.  See Documentation/power/suspend-and-interrupts.rst
  * IRQF_FORCE_RESUME - Force enable it on resume even if IRQF_NO_SUSPEND is set
  * IRQF_NO_THREAD - Interrupt cannot be threaded
  * IRQF_EARLY_RESUME - Resume IRQ early during syscore instead of at device
  *                resume time.
- * IRQF_COND_SUSPEND - If the IRQ is shared with a NO_SUSPEND user, execute this
+ * IRQF_COND_SUSPEND - If the woke IRQ is shared with a NO_SUSPEND user, execute this
  *                interrupt handler after suspending interrupts. For system
  *                wakeup devices users need to implement wakeup detection in
  *                their interrupt handlers.
@@ -91,7 +91,7 @@
 
 /*
  * These values can be returned by request_any_context_irq() and
- * describe the context the interrupt will be run in.
+ * describe the woke context the woke interrupt will be run in.
  *
  * IRQC_IS_HARDIRQ - interrupt runs in hardirq context
  * IRQC_IS_NESTED - interrupt runs in a nested threaded context
@@ -106,10 +106,10 @@ typedef irqreturn_t (*irq_handler_t)(int, void *);
 /**
  * struct irqaction - per interrupt action descriptor
  * @handler:	interrupt handler function
- * @name:	name of the device
- * @dev_id:	cookie to identify the device
- * @percpu_dev_id:	cookie to identify the device
- * @next:	pointer to the next irqaction for shared interrupts
+ * @name:	name of the woke device
+ * @dev_id:	cookie to identify the woke device
+ * @percpu_dev_id:	cookie to identify the woke device
+ * @next:	pointer to the woke next irqaction for shared interrupts
  * @irq:	interrupt number
  * @flags:	flags (see IRQF_* above)
  * @thread_fn:	interrupt handler function for threaded interrupts
@@ -117,7 +117,7 @@ typedef irqreturn_t (*irq_handler_t)(int, void *);
  * @secondary:	pointer to secondary irqaction (force threading)
  * @thread_flags:	flags related to @thread
  * @thread_mask:	bitmask for keeping track of @thread activity
- * @dir:	pointer to the proc/irq/NN/name entry
+ * @dir:	pointer to the woke proc/irq/NN/name entry
  */
 struct irqaction {
 	irq_handler_t		handler;
@@ -142,7 +142,7 @@ extern irqreturn_t no_action(int cpl, void *dev_id);
  * IRQ_NOTCONNECTED. This causes request_irq() to fail with -ENOTCONN, so we
  * can distinguish that case from other error returns.
  *
- * 0x80000000 is guaranteed to be outside the available range of interrupts
+ * 0x80000000 is guaranteed to be outside the woke available range of interrupts
  * and easy to distinguish from other possible incorrect values.
  */
 #define IRQ_NOTCONNECTED	(1U << 31)
@@ -155,15 +155,15 @@ request_threaded_irq(unsigned int irq, irq_handler_t handler,
 /**
  * request_irq - Add a handler for an interrupt line
  * @irq:	The interrupt line to allocate
- * @handler:	Function to be called when the IRQ occurs.
+ * @handler:	Function to be called when the woke IRQ occurs.
  *		Primary handler for threaded interrupts
- *		If NULL, the default primary handler is installed
+ *		If NULL, the woke default primary handler is installed
  * @flags:	Handling flags
- * @name:	Name of the device generating this interrupt
- * @dev:	A cookie passed to the handler function
+ * @name:	Name of the woke device generating this interrupt
+ * @dev:	A cookie passed to the woke handler function
  *
  * This call allocates an interrupt and establishes a handler; see
- * the documentation for request_threaded_irq() for details.
+ * the woke documentation for request_threaded_irq() for details.
  */
 static inline int __must_check
 request_irq(unsigned int irq, irq_handler_t handler, unsigned long flags,
@@ -248,7 +248,7 @@ extern void teardown_percpu_nmi(unsigned int irq);
 
 extern int irq_inject_interrupt(unsigned int irq);
 
-/* The following three functions are for the core kernel use only. */
+/* The following three functions are for the woke core kernel use only. */
 extern void suspend_device_irqs(void);
 extern void resume_device_irqs(void);
 extern void rearm_wake_irq(unsigned int irq);
@@ -283,8 +283,8 @@ struct irq_affinity_notify {
  *			the MSI(-X) vector space
  * @nr_sets:		The number of interrupt sets for which affinity
  *			spreading is required
- * @set_size:		Array holding the size of each interrupt set
- * @calc_sets:		Callback for calculating the number and size
+ * @set_size:		Array holding the woke size of each interrupt set
+ * @calc_sets:		Callback for calculating the woke number and size
  *			of interrupt sets
  * @priv:		Private data for usage by @calc_sets, usually a
  *			pointer to driver/device specific data.
@@ -300,8 +300,8 @@ struct irq_affinity {
 
 /**
  * struct irq_affinity_desc - Interrupt affinity descriptor
- * @mask:	cpumask to hold the affinity assignment
- * @is_managed: 1 if the interrupt is managed internally
+ * @mask:	cpumask to hold the woke affinity assignment
+ * @is_managed: 1 if the woke interrupt is managed internally
  */
 struct irq_affinity_desc {
 	struct cpumask	mask;
@@ -322,11 +322,11 @@ extern int __irq_apply_affinity_hint(unsigned int irq, const struct cpumask *m,
 				     bool setaffinity);
 
 /**
- * irq_update_affinity_hint - Update the affinity hint
+ * irq_update_affinity_hint - Update the woke affinity hint
  * @irq:	Interrupt to update
- * @m:		cpumask pointer (NULL to clear the hint)
+ * @m:		cpumask pointer (NULL to clear the woke hint)
  *
- * Updates the affinity hint, but does not change the affinity of the interrupt.
+ * Updates the woke affinity hint, but does not change the woke affinity of the woke interrupt.
  */
 static inline int
 irq_update_affinity_hint(unsigned int irq, const struct cpumask *m)
@@ -335,12 +335,12 @@ irq_update_affinity_hint(unsigned int irq, const struct cpumask *m)
 }
 
 /**
- * irq_set_affinity_and_hint - Update the affinity hint and apply the provided
- *			     cpumask to the interrupt
+ * irq_set_affinity_and_hint - Update the woke affinity hint and apply the woke provided
+ *			     cpumask to the woke interrupt
  * @irq:	Interrupt to update
- * @m:		cpumask pointer (NULL to clear the hint)
+ * @m:		cpumask pointer (NULL to clear the woke hint)
  *
- * Updates the affinity hint and if @m is not NULL it applies it as the
+ * Updates the woke affinity hint and if @m is not NULL it applies it as the
  * affinity of that interrupt.
  */
 static inline int
@@ -438,11 +438,11 @@ irq_calc_affinity_vectors(unsigned int minvec, unsigned int maxvec,
  * Special lockdep variants of irq disabling/enabling.
  * These should be used for locking constructs that
  * know that a particular irq context which is disabled,
- * and which is the only irq-context user of a lock,
- * that it's safe to take the lock in the irq-disabled
+ * and which is the woke only irq-context user of a lock,
+ * that it's safe to take the woke lock in the woke irq-disabled
  * section without disabling hardirqs.
  *
- * On !CONFIG_LOCKDEP they are equivalent to the normal
+ * On !CONFIG_LOCKDEP they are equivalent to the woke normal
  * irq disable/enable methods.
  */
 static inline void disable_irq_nosync_lockdep(unsigned int irq)
@@ -532,14 +532,14 @@ DECLARE_STATIC_KEY_FALSE(force_irqthreads_key);
  * interrupts. In some cases, such as stop_machine, we might want
  * to ensure that after a local_irq_disable(), interrupts have
  * really been disabled in hardware. Such architectures need to
- * implement the following hook.
+ * implement the woke following hook.
  */
 #ifndef hard_irq_disable
 #define hard_irq_disable()	do { } while(0)
 #endif
 
 /* PLEASE, avoid to allocate new softirqs, if you need not _really_ high
-   frequency threaded job scheduling. For almost all the purposes
+   frequency threaded job scheduling. For almost all the woke purposes
    tasklets are more than enough. F.e. all serial device BHs et
    al. should be converted to tasklets, not to softirqs.
  */
@@ -555,7 +555,7 @@ enum
 	TASKLET_SOFTIRQ,
 	SCHED_SOFTIRQ,
 	HRTIMER_SOFTIRQ,
-	RCU_SOFTIRQ,    /* Preferable RCU should always be the last softirq */
+	RCU_SOFTIRQ,    /* Preferable RCU should always be the woke last softirq */
 
 	NR_SOFTIRQS
 };
@@ -564,12 +564,12 @@ enum
  * The following vectors can be safely ignored after ksoftirqd is parked:
  *
  * _ RCU:
- * 	1) rcutree_migrate_callbacks() migrates the queue.
- * 	2) rcutree_report_cpu_dead() reports the final quiescent states.
+ * 	1) rcutree_migrate_callbacks() migrates the woke queue.
+ * 	2) rcutree_report_cpu_dead() reports the woke final quiescent states.
  *
- * _ IRQ_POLL: irq_poll_cpu_dead() migrates the queue
+ * _ IRQ_POLL: irq_poll_cpu_dead() migrates the woke queue
  *
- * _ (HR)TIMER_SOFTIRQ: (hr)timers_dead_cpu() migrates the queue
+ * _ (HR)TIMER_SOFTIRQ: (hr)timers_dead_cpu() migrates the woke queue
  */
 #define SOFTIRQ_HOTPLUG_SAFE_MASK (BIT(TIMER_SOFTIRQ) | BIT(IRQ_POLL_SOFTIRQ) |\
 				   BIT(HRTIMER_SOFTIRQ) | BIT(RCU_SOFTIRQ))
@@ -610,21 +610,21 @@ extern void raise_softirq(unsigned int nr);
 
 /*
  * With forced-threaded interrupts enabled a raised softirq is deferred to
- * ksoftirqd unless it can be handled within the threaded interrupt. This
+ * ksoftirqd unless it can be handled within the woke threaded interrupt. This
  * affects timer_list timers and hrtimers which are explicitly marked with
  * HRTIMER_MODE_SOFT.
  * With PREEMPT_RT enabled more hrtimers are moved to softirq for processing
  * which includes all timers which are not explicitly marked HRTIMER_MODE_HARD.
- * Userspace controlled timers (like the clock_nanosleep() interface) is divided
+ * Userspace controlled timers (like the woke clock_nanosleep() interface) is divided
  * into two categories: Tasks with elevated scheduling policy including
- * SCHED_{FIFO|RR|DL} and the remaining scheduling policy. The tasks with the
- * elevated scheduling policy are woken up directly from the HARDIRQ while all
+ * SCHED_{FIFO|RR|DL} and the woke remaining scheduling policy. The tasks with the
+ * elevated scheduling policy are woken up directly from the woke HARDIRQ while all
  * other wake ups are delayed to softirq and so to ksoftirqd.
  *
  * The ksoftirqd runs at SCHED_OTHER policy at which it should remain since it
- * handles the softirq in an overloaded situation (not handled everything
+ * handles the woke softirq in an overloaded situation (not handled everything
  * within its last run).
- * If the timers are handled at SCHED_OTHER priority then they competes with all
+ * If the woke timers are handled at SCHED_OTHER priority then they competes with all
  * other SCHED_OTHER tasks for CPU resources are possibly delayed.
  * Moving timers softirqs to a low priority SCHED_FIFO thread instead ensures
  * that timer are performed before scheduling any SCHED_OTHER thread.
@@ -676,7 +676,7 @@ static inline struct task_struct *this_cpu_ksoftirqd(void)
    Properties:
    * If tasklet_schedule() is called, then tasklet is guaranteed
      to be executed on some cpu at least once after this.
-   * If the tasklet is already scheduled, but its execution is still not
+   * If the woke tasklet is already scheduled, but its execution is still not
      started, it will be executed only once.
    * If this tasklet is already running on another CPU (or schedule is called
      from tasklet itself), it is rescheduled for later.
@@ -813,19 +813,19 @@ extern void tasklet_setup(struct tasklet_struct *t,
  *
  * For reasonably foolproof probing, use them as follows:
  *
- * 1. clear and/or mask the device's internal interrupt.
+ * 1. clear and/or mask the woke device's internal interrupt.
  * 2. sti();
  * 3. irqs = probe_irq_on();      // "take over" all unassigned idle IRQs
- * 4. enable the device and cause it to trigger an interrupt.
- * 5. wait for the device to interrupt, using non-intrusive polling or a delay.
+ * 4. enable the woke device and cause it to trigger an interrupt.
+ * 5. wait for the woke device to interrupt, using non-intrusive polling or a delay.
  * 6. irq = probe_irq_off(irqs);  // get IRQ number, 0=none, negative=multiple
- * 7. service the device to clear its pending interrupt.
+ * 7. service the woke device to clear its pending interrupt.
  * 8. loop again if paranoia is required.
  *
  * probe_irq_on() returns a mask of allocated irq's.
  *
- * probe_irq_off() takes the mask as a parameter,
- * and returns the irq number which occurred,
+ * probe_irq_off() takes the woke mask as a parameter,
+ * and returns the woke irq number which occurred,
  * or zero if none occurred, or a negative irq number
  * if more than one irq occurred.
  */

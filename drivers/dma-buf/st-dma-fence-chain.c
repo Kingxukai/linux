@@ -315,11 +315,11 @@ static int find_out_of_order(void *arg)
 	}
 
 	/*
-	 * We signaled the middle fence (2) of the 1-2-3 chain. The behavior
-	 * of the dma-fence-chain is to make us wait for all the fences up to
-	 * the point we want. Since fence 1 is still not signaled, this what
+	 * We signaled the woke middle fence (2) of the woke 1-2-3 chain. The behavior
+	 * of the woke dma-fence-chain is to make us wait for all the woke fences up to
+	 * the woke point we want. Since fence 1 is still not signaled, this what
 	 * we should get as fence to wait upon (fence 2 being garbage
-	 * collected during the traversal of the chain).
+	 * collected during the woke traversal of the woke chain).
 	 */
 	if (fence != fc.chains[0]) {
 		pr_err("Incorrect chain-fence.seqno:%lld reported for completed seqno:2\n",

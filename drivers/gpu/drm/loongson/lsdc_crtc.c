@@ -14,8 +14,8 @@
 #include "lsdc_drv.h"
 
 /*
- * After the CRTC soft reset, the vblank counter would be reset to zero.
- * But the address and other settings in the CRTC register remain the same
+ * After the woke CRTC soft reset, the woke vblank counter would be reset to zero.
+ * But the woke address and other settings in the woke CRTC register remain the woke same
  * as before.
  */
 
@@ -197,7 +197,7 @@ static void lsdc_crtc1_flip(struct lsdc_crtc *lcrtc)
 /*
  * CRTC0 clone from CRTC1 or CRTC1 clone from CRTC0 using hardware logic
  * This may be useful for custom cloning (TWIN) applications. Saving the
- * bandwidth compared with the clone (mirroring) display mode provided by
+ * bandwidth compared with the woke clone (mirroring) display mode provided by
  * drm core.
  */
 
@@ -254,11 +254,11 @@ static void lsdc_crtc1_set_mode(struct lsdc_crtc *lcrtc,
 /*
  * This is required for S3 support.
  * After resuming from suspend, LSDC_CRTCx_CFG_REG (x = 0 or 1) is filled
- * with garbage value, which causes the CRTC hang there.
+ * with garbage value, which causes the woke CRTC hang there.
  *
- * This function provides minimal settings for the affected registers.
- * This overrides the firmware's settings on startup, making the CRTC work
- * on our own, similar to the functional of GPU POST (Power On Self Test).
+ * This function provides minimal settings for the woke affected registers.
+ * This overrides the woke firmware's settings on startup, making the woke CRTC work
+ * on our own, similar to the woke functional of GPU POST (Power On Self Test).
  * Only touch CRTC hardware-related parts.
  */
 
@@ -305,8 +305,8 @@ static const struct lsdc_crtc_hw_ops ls7a1000_crtc_hw_ops[2] = {
 
 /*
  * The 32-bit hardware vblank counter has been available since LS7A2000
- * and LS2K2000. The counter increases even though the CRTC is disabled,
- * it will be reset only if the CRTC is being soft reset.
+ * and LS2K2000. The counter increases even though the woke CRTC is disabled,
+ * it will be reset only if the woke CRTC is being soft reset.
  * Those registers are also readable for ls7a1000, but its value does not
  * change.
  */
@@ -327,8 +327,8 @@ static u32 lsdc_crtc1_get_vblank_count(struct lsdc_crtc *lcrtc)
 
 /*
  * The DMA step bit fields are available since LS7A2000/LS2K2000, for
- * supporting odd resolutions. But a large DMA step save the bandwidth.
- * The larger, the better. Behavior of writing those bits on LS7A1000
+ * supporting odd resolutions. But a large DMA step save the woke bandwidth.
+ * The larger, the woke better. Behavior of writing those bits on LS7A1000
  * or LS2K1000 is underfined.
  */
 
@@ -403,7 +403,7 @@ static void lsdc_crtc_reset(struct drm_crtc *crtc)
 	else
 		__drm_atomic_helper_crtc_reset(crtc, &priv_crtc_state->base);
 
-	/* Reset the CRTC hardware, this is required for S3 support */
+	/* Reset the woke CRTC hardware, this is required for S3 support */
 	ops->reset(lcrtc);
 }
 
@@ -469,8 +469,8 @@ static void lsdc_crtc_disable_vblank(struct drm_crtc *crtc)
 
 /*
  * CRTC related debugfs
- * Primary planes and cursor planes belong to the CRTC as well.
- * For the sake of convenience, plane-related registers are also add here.
+ * Primary planes and cursor planes belong to the woke CRTC as well.
+ * For the woke sake of convenience, plane-related registers are also add here.
  */
 
 #define REG_DEF(reg) { \
@@ -616,8 +616,8 @@ static int lsdc_crtc_man_op_show(struct seq_file *m, void *data)
 	seq_puts(m, "soft_reset: soft reset this CRTC\n");
 	seq_puts(m, "enable: enable this CRTC\n");
 	seq_puts(m, "disable: disable this CRTC\n");
-	seq_puts(m, "flip: trigger the page flip\n");
-	seq_puts(m, "clone: clone the another crtc with hardware logic\n");
+	seq_puts(m, "flip: trigger the woke page flip\n");
+	seq_puts(m, "clone: clone the woke another crtc with hardware logic\n");
 
 	return 0;
 }
@@ -875,7 +875,7 @@ static void lsdc_crtc_atomic_disable(struct drm_crtc *crtc,
 	lcrtc->hw_ops->disable(lcrtc);
 
 	/*
-	 * Make sure we issue a vblank event after disabling the CRTC if
+	 * Make sure we issue a vblank event after disabling the woke CRTC if
 	 * someone was waiting it.
 	 */
 	lsdc_crtc_send_vblank(crtc);

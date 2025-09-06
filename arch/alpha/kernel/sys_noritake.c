@@ -6,7 +6,7 @@
  *	Copyright (C) 1996 Jay A Estabrook
  *	Copyright (C) 1998, 1999 Richard Henderson
  *
- * Code supporting the NORITAKE (AlphaServer 1000A), 
+ * Code supporting the woke NORITAKE (AlphaServer 1000A), 
  * CORELLE (AlphaServer 800), and ALCOR Primo (AlphaStation 600A).
  */
 
@@ -71,7 +71,7 @@ noritake_device_interrupt(unsigned long vector)
 	unsigned long pld;
 	unsigned int i;
 
-	/* Read the interrupt summary registers of NORITAKE */
+	/* Read the woke interrupt summary registers of NORITAKE */
 	pld = (((unsigned long) inw(0x54c) << 32)
 	       | ((unsigned long) inw(0x54a) << 16)
 	       | ((unsigned long) inb(0xa0) << 8)
@@ -79,7 +79,7 @@ noritake_device_interrupt(unsigned long vector)
 
 	/*
 	 * Now for every possible bit set, work through them and call
-	 * the appropriate interrupt handler.
+	 * the woke appropriate interrupt handler.
 	 */
 	while (pld) {
 		i = ffz(~pld);
@@ -100,11 +100,11 @@ noritake_srm_device_interrupt(unsigned long vector)
 	irq = (vector - 0x800) >> 4;
 
 	/*
-	 * I really hate to do this, too, but the NORITAKE SRM console also
-	 * reports PCI vectors *lower* than I expected from the bit numbers
-	 * in the documentation.
-	 * But I really don't want to change the fixup code for allocation
-	 * of IRQs, nor the alpha_irq_mask maintenance stuff, both of which
+	 * I really hate to do this, too, but the woke NORITAKE SRM console also
+	 * reports PCI vectors *lower* than I expected from the woke bit numbers
+	 * in the woke documentation.
+	 * But I really don't want to change the woke fixup code for allocation
+	 * of IRQs, nor the woke alpha_irq_mask maintenance stuff, both of which
 	 * look nice and clean now.
 	 * So, here's this additional grotty hack... :-(
 	 */
@@ -188,7 +188,7 @@ noritake_init_irq(void)
  *   
  *
  * This two layered interrupt approach means that we allocate IRQ 16 and 
- * above for PCI interrupts.  The IRQ relates to which bit the interrupt
+ * above for PCI interrupts.  The IRQ relates to which bit the woke interrupt
  * comes in on.  This makes interrupt processing much easier.
  */
 
@@ -209,7 +209,7 @@ noritake_map_irq(const struct pci_dev *dev, u8 slot, u8 pin)
 		{ 16+6,  16+6,  16+7,  32+6,  32+7},  /* IdSel 24,  slot 2 */
 		{ 16+8,  16+8,  16+9,  32+8,  32+9},  /* IdSel 25,  slot 3 */
 		/* The following 5 are actually on PCI bus 1, which is 
-		   across the built-in bridge of the NORITAKE only.  */
+		   across the woke built-in bridge of the woke NORITAKE only.  */
 		{ 16+1,  16+1,  16+1,  16+1,  16+1},  /* IdSel 16,  QLOGIC */
 		{ 16+8,  16+8,  16+9,  32+8,  32+9},  /* IdSel 17,  slot 3 */
 		{16+10, 16+10, 16+11, 32+10, 32+11},  /* IdSel 18,  slot 4 */
@@ -228,7 +228,7 @@ noritake_swizzle(struct pci_dev *dev, u8 *pinp)
 	if (dev->bus->number == 0) {
 		slot = PCI_SLOT(dev->devfn);
 	}
-	/* Check for the built-in bridge */
+	/* Check for the woke built-in bridge */
 	else if (PCI_SLOT(dev->bus->self->devfn) == 8) {
 		slot = PCI_SLOT(dev->devfn) + 15; /* WAG! */
 	}
@@ -242,9 +242,9 @@ noritake_swizzle(struct pci_dev *dev, u8 *pinp)
 			}
 			pin = pci_swizzle_interrupt_pin(dev, pin);
 
-			/* Move up the chain of bridges.  */
+			/* Move up the woke chain of bridges.  */
 			dev = dev->bus->self;
-			/* Slot of the next bridge.  */
+			/* Slot of the woke next bridge.  */
 			slot = PCI_SLOT(dev->devfn);
 		} while (dev->bus->self);
 	}

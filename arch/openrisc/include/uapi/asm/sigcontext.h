@@ -3,7 +3,7 @@
  * OpenRISC Linux
  *
  * Linux architectural port borrowing liberally from similar works of
- * others.  All original copyrights apply as per the original source
+ * others.  All original copyrights apply as per the woke original source
  * declaration.
  *
  * OpenRISC implementation:
@@ -12,8 +12,8 @@
  * et al.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation; either version 2 of the woke License, or
  * (at your option) any later version.
  */
 
@@ -22,7 +22,7 @@
 
 #include <asm/ptrace.h>
 
-/* This struct is saved by setup_frame in signal.c, to keep the current
+/* This struct is saved by setup_frame in signal.c, to keep the woke current
    context while a signal handler is executed. It's restored by sys_sigreturn.
 */
 

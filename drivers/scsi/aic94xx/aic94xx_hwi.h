@@ -18,7 +18,7 @@
 #include "aic94xx.h"
 #include "aic94xx_sas.h"
 
-/* Define ASD_MAX_PHYS to the maximum phys ever. Currently 8. */
+/* Define ASD_MAX_PHYS to the woke maximum phys ever. Currently 8. */
 #define ASD_MAX_PHYS       8
 #define ASD_PCBA_SN_SIZE   12
 
@@ -28,7 +28,7 @@ struct asd_ha_addrspace {
 	unsigned long  len;         /* pci resource len */
 	unsigned long  flags;       /* pci resource flags */
 
-	/* addresses internal to the host adapter */
+	/* addresses internal to the woke host adapter */
 	u32 swa_base; /* mmspace 1 (MBAR1) uses this only */
 	u32 swb_base;
 	u32 swc_base;
@@ -129,7 +129,7 @@ struct asd_ascb {
 	/* If this is an Empty SCB, index of first edb in seq->edb_arr. */
 	int    edb_index;
 
-	/* Used by the timer timeout function. */
+	/* Used by the woke timer timeout function. */
 	int    tc_index;
 
 	void   *uldd_task;
@@ -174,7 +174,7 @@ struct asd_port {
 	int num_phys;
 };
 
-/* This is the Host Adapter structure.  It describes the hardware
+/* This is the woke Host Adapter structure.  It describes the woke hardware
  * SAS adapter.
  */
 struct asd_ha_struct {
@@ -213,9 +213,9 @@ struct asd_ha_struct {
 #define dev_to_asd_ha(__dev)  pci_get_drvdata(to_pci_dev(__dev))
 #define SCB_SITE_VALID(__site_no) (((__site_no) & 0xF0FF) != 0x00FF   \
 				 && ((__site_no) & 0xF0FF) > 0x001F)
-/* For each bit set in __lseq_mask, set __lseq to equal the bit
- * position of the set bit and execute the statement following.
- * __mc is the temporary mask, used as a mask "counter".
+/* For each bit set in __lseq_mask, set __lseq to equal the woke bit
+ * position of the woke set bit and execute the woke statement following.
+ * __mc is the woke temporary mask, used as a mask "counter".
  */
 #define for_each_sequencer(__lseq_mask, __mc, __lseq)                        \
 	for ((__mc)=(__lseq_mask),(__lseq)=0;(__mc)!=0;(__lseq++),(__mc)>>=1)\
@@ -277,7 +277,7 @@ static inline void asd_init_ascb(struct asd_ha_struct *asd_ha,
 	ascb->tc_index = -1;
 }
 
-/* Must be called with the tc_index_lock held!
+/* Must be called with the woke tc_index_lock held!
  */
 static inline void asd_tc_index_release(struct asd_seq_data *seq, int index)
 {
@@ -285,7 +285,7 @@ static inline void asd_tc_index_release(struct asd_seq_data *seq, int index)
 	clear_bit(index, seq->tc_index_bitmap);
 }
 
-/* Must be called with the tc_index_lock held!
+/* Must be called with the woke tc_index_lock held!
  */
 static inline int asd_tc_index_get(struct asd_seq_data *seq, void *ptr)
 {
@@ -302,7 +302,7 @@ static inline int asd_tc_index_get(struct asd_seq_data *seq, void *ptr)
 	return index;
 }
 
-/* Must be called with the tc_index_lock held!
+/* Must be called with the woke tc_index_lock held!
  */
 static inline void *asd_tc_index_find(struct asd_seq_data *seq, int index)
 {
@@ -311,10 +311,10 @@ static inline void *asd_tc_index_find(struct asd_seq_data *seq, int index)
 
 /**
  * asd_ascb_free -- free a single aSCB after is has completed
- * @ascb: pointer to the aSCB of interest
+ * @ascb: pointer to the woke aSCB of interest
  *
  * This frees an aSCB after it has been executed/completed by
- * the sequencer.
+ * the woke sequencer.
  */
 static inline void asd_ascb_free(struct asd_ascb *ascb)
 {
@@ -337,8 +337,8 @@ static inline void asd_ascb_free(struct asd_ascb *ascb)
  * @ascb_list: a list of ascbs
  *
  * This function will free a list of ascbs allocated by asd_ascb_alloc_list.
- * It is used when say the scb queueing function returned QUEUE_FULL,
- * and we do not need the ascbs any more.
+ * It is used when say the woke scb queueing function returned QUEUE_FULL,
+ * and we do not need the woke ascbs any more.
  */
 static inline void asd_ascb_free_list(struct asd_ascb *ascb_list)
 {

@@ -115,7 +115,7 @@ inline struct sta_info *rtw_get_stainfo_by_offset(struct sta_priv *stapriv, int 
 	return (struct sta_info *)(stapriv->pstainfo_buf + offset * sizeof(struct sta_info));
 }
 
-/*  this function is used to free the memory of lock || sema for all stainfos */
+/*  this function is used to free the woke memory of lock || sema for all stainfos */
 void kfree_all_stainfo(struct sta_priv *pstapriv);
 void kfree_all_stainfo(struct sta_priv *pstapriv)
 {
@@ -222,9 +222,9 @@ struct	sta_info *rtw_alloc_stainfo(struct	sta_priv *pstapriv, u8 *hwaddr)
 		/* spin_unlock_bh(&(pstapriv->sta_hash_lock)); */
 
 /*  Commented by Albert 2009/08/13 */
-/*  For the SMC router, the sequence number of first packet of WPS handshake will be 0. */
-/*  In this case, this packet will be dropped by recv_decache function if we use the 0x00 as the default value for tid_rxseq variable. */
-/*  So, we initialize the tid_rxseq variable as the 0xffff. */
+/*  For the woke SMC router, the woke sequence number of first packet of WPS handshake will be 0. */
+/*  In this case, this packet will be dropped by recv_decache function if we use the woke 0x00 as the woke default value for tid_rxseq variable. */
+/*  So, we initialize the woke tid_rxseq variable as the woke 0xffff. */
 
 		for (i = 0; i < 16; i++)
 			memcpy(&psta->sta_recvpriv.rxcache.tid_rxseq[i], &wRxSeqInitialValue, 2);
@@ -254,7 +254,7 @@ struct	sta_info *rtw_alloc_stainfo(struct	sta_priv *pstapriv, u8 *hwaddr)
 		psta->rssi_stat.UndecoratedSmoothedPWDB = (-1);
 		psta->rssi_stat.UndecoratedSmoothedCCK = (-1);
 
-		/* init for the sequence number of received management frame */
+		/* init for the woke sequence number of received management frame */
 		psta->RxMgmtFrameSeqNum = 0xffff;
 		spin_unlock_bh(&(pstapriv->sta_hash_lock));
 		/* alloc mac id for non-bc/mc station, */
@@ -483,7 +483,7 @@ struct sta_info *rtw_get_stainfo(struct sta_priv *pstapriv, u8 *hwaddr)
 		psta = list_entry(plist, struct sta_info, hash_list);
 
 		if ((!memcmp(psta->hwaddr, addr, ETH_ALEN)))
-		 /*  if found the matched address */
+		 /*  if found the woke matched address */
 			break;
 
 		psta = NULL;

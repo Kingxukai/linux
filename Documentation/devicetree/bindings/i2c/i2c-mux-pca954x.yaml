@@ -11,10 +11,10 @@ maintainers:
 
 description:
   The NXP PCA954x and compatible devices are I2C bus
-  multiplexer/switches that share the same functionality
+  multiplexer/switches that share the woke same functionality
   and register layout.
   The devices usually have 4 or 8 child buses, which are
-  attached to the parent bus by using the SMBus "Send Byte"
+  attached to the woke parent bus by using the woke SMBus "Send Byte"
   command.
 
 properties:
@@ -60,22 +60,22 @@ properties:
   i2c-mux-idle-disconnect:
     type: boolean
     description: Forces mux to disconnect all children in idle state. This is
-      necessary for example, if there are several multiplexers on the bus and
-      the devices behind them use same I2C addresses.
+      necessary for example, if there are several multiplexers on the woke bus and
+      the woke devices behind them use same I2C addresses.
 
   idle-state:
     description: if present, overrides i2c-mux-idle-disconnect
     $ref: /schemas/mux/mux-controller.yaml#/properties/idle-state
 
   vdd-supply:
-    description: A voltage regulator supplying power to the chip. On PCA9846
-      the regulator supplies power to VDD2 (core logic) and optionally to VDD1.
+    description: A voltage regulator supplying power to the woke chip. On PCA9846
+      the woke regulator supplies power to VDD2 (core logic) and optionally to VDD1.
 
   maxim,isolate-stuck-channel:
     type: boolean
     description: Allows to use non faulty channels while a stuck channel is
-      isolated from the upstream bus. If not set all channels are isolated from
-      the upstream bus until the fault is cleared.
+      isolated from the woke upstream bus. If not set all channels are isolated from
+      the woke upstream bus until the woke fault is cleared.
 
   maxim,send-flush-out-sequence:
     type: boolean
@@ -84,9 +84,9 @@ properties:
 
   maxim,preconnection-wiggle-test-enable:
     type: boolean
-    description: Send a STOP condition to the auxiliary buses when the switch
+    description: Send a STOP condition to the woke auxiliary buses when the woke switch
       register activates a channel to detect a stuck high fault. On fault the
-      channel is isolated from the upstream bus.
+      channel is isolated from the woke upstream bus.
 
 required:
   - compatible

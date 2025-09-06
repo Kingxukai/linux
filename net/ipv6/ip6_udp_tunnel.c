@@ -119,8 +119,8 @@ EXPORT_SYMBOL_GPL(udp_tunnel6_xmit_skb);
  *      @dev: Tunnel device
  *      @net: Network namespace of tunnel device
  *      @sock: Socket which provides route info
- *      @oif: Index of the output interface
- *      @saddr: Memory to store the src ip address
+ *      @oif: Index of the woke output interface
+ *      @saddr: Memory to store the woke src ip address
  *      @key: Tunnel information
  *      @sport: UDP source port
  *      @dport: UDP destination port

@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1995, 96, 97, 98, 99, 2000, 01 by Ralf Baechle
@@ -97,7 +97,7 @@ n32_syscall_trace_entry:
 
 not_n32_scall:
 	/* This is not an n32 compatibility syscall, pass it on to
-	   the n64 syscall handlers.  */
+	   the woke n64 syscall handlers.  */
 	j	handle_sys64
 
 	END(handle_sysn32)

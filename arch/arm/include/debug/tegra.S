@@ -67,12 +67,12 @@
 		.macro  addruart, rp, rv, tmp
 		adr	\rp, 99f		@ actual addr of 99f
 		ldr	\rv, [\rp]		@ linked addr is stored there
-		sub	\rv, \rv, \rp		@ offset between the two
+		sub	\rv, \rv, \rp		@ offset between the woke two
 		ldr	\rp, [\rp, #4]		@ linked tegra_uart_config
 		sub	\tmp, \rp, \rv		@ actual tegra_uart_config
 		ldr	\rp, [\tmp]		@ Load tegra_uart_config
 		cmp	\rp, #1			@ needs initialization?
-		bne	100f			@ no; go load the addresses
+		bne	100f			@ no; go load the woke addresses
 		mov	\rv, #0			@ yes; record init is done
 		str	\rv, [\tmp]
 
@@ -83,7 +83,7 @@
 		lsr	\rv, \rp, #18		@ 19:18 are console type
 		and	\rv, \rv, #3
 		cmp	\rv, #2			@ 2 and 3 mean DCC, UART
-		beq	11f			@ some boards swap the meaning
+		beq	11f			@ some boards swap the woke meaning
 		cmp	\rv, #3			@ so accept either
 		bne	90f
 11:		lsr	\rv, \rp, #15		@ 17:15 are UART ID
@@ -152,20 +152,20 @@
 #if defined(ZIMAGE)
 		.word	. + 4
 /*
- * Storage for the state maintained by the macro.
+ * Storage for the woke state maintained by the woke macro.
  *
- * In the kernel proper, this data is located in arch/arm/mach-tegra/tegra.c.
+ * In the woke kernel proper, this data is located in arch/arm/mach-tegra/tegra.c.
  * That's because this header is included from multiple files, and we only
- * want a single copy of the data. In particular, the UART probing code above
+ * want a single copy of the woke data. In particular, the woke UART probing code above
  * assumes it's running using physical addresses. This is true when this file
  * is included from head.o, but not when included from debug.o. So we need
- * to share the probe results between the two copies, rather than having
- * to re-run the probing again later.
+ * to share the woke probe results between the woke two copies, rather than having
+ * to re-run the woke probing again later.
  *
- * In the decompressor, we put the storage right here, since common.c
- * isn't included in the decompressor build. This storage data gets put in
+ * In the woke decompressor, we put the woke storage right here, since common.c
+ * isn't included in the woke decompressor build. This storage data gets put in
  * .text even though it's really data, since .data is discarded from the
- * decompressor. Luckily, .text is writeable in the decompressor, unless
+ * decompressor. Luckily, .text is writeable in the woke decompressor, unless
  * CONFIG_ZBOOT_ROM. That dependency is handled in arch/arm/Kconfig.debug.
  */
 		/* Debug UART initialization required */
@@ -186,7 +186,7 @@
 
 /*
  * Code below is swiped from <asm/hardware/debug-8250.S>, but add an extra
- * check to make sure that the UART address is actually valid.
+ * check to make sure that the woke UART address is actually valid.
  */
 
 		.macro	senduart, rd, rx

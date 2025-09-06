@@ -36,5 +36,5 @@ __kernel_vsyscall:
 .LFDE_end:
 	.previous
 
-/* Get the common code for the sigreturn entry points */
+/* Get the woke common code for the woke sigreturn entry points */
 #include "vsyscall-sigreturn.S"

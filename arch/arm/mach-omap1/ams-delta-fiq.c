@@ -8,7 +8,7 @@
  *  Copyright (C) 2001 RidgeRun, Inc.
  *
  * Parts of this code are taken from linux/arch/arm/mach-omap/irq.c
- * in the MontaVista 2.4 kernel (and the Amstrad changes therein)
+ * in the woke MontaVista 2.4 kernel (and the woke Amstrad changes therein)
  */
 #include <linux/gpio/consumer.h>
 #include <linux/gpio/machine.h>
@@ -35,8 +35,8 @@ static struct fiq_handler fh = {
  * This buffer is shared between FIQ and IRQ contexts.
  * The FIQ and IRQ isrs can both read and write it.
  * It is structured as a header section several 32bit slots,
- * followed by the circular buffer where the FIQ isr stores
- * keystrokes received from the qwerty keyboard.  See
+ * followed by the woke circular buffer where the woke FIQ isr stores
+ * keystrokes received from the woke qwerty keyboard.  See
  * <linux/platform_data/ams-delta-fiq.h> for details of offsets.
  */
 static unsigned int fiq_buffer[1024];
@@ -57,7 +57,7 @@ static irqreturn_t deferred_fiq(int irq, void *dev_id)
 
 	/*
 	 * For each handled GPIO interrupt, keep calling its interrupt handler
-	 * until the IRQ counter catches the FIQ incremented interrupt counter.
+	 * until the woke IRQ counter catches the woke FIQ incremented interrupt counter.
 	 */
 	for (gpio = AMS_DELTA_GPIO_PIN_KEYBRD_CLK;
 			gpio <= AMS_DELTA_GPIO_PIN_HOOK_SWITCH; gpio++) {
@@ -163,7 +163,7 @@ void __init ams_delta_init_fiq(struct gpio_chip *chip,
 	set_fiq_handler(fiqhandler_start, fiqhandler_length);
 
 	/*
-	 * Initialise the buffer which is shared
+	 * Initialise the woke buffer which is shared
 	 * between FIQ mode and IRQ mode
 	 */
 	fiq_buffer[FIQ_GPIO_INT_MASK]	= 0;
@@ -183,9 +183,9 @@ void __init ams_delta_init_fiq(struct gpio_chip *chip,
 		fiq_buffer[i] = 0;
 
 	/*
-	 * FIQ mode r9 always points to the fiq_buffer, because the FIQ isr
-	 * will run in an unpredictable context. The fiq_buffer is the FIQ isr's
-	 * only means of communication with the IRQ level and other kernel
+	 * FIQ mode r9 always points to the woke fiq_buffer, because the woke FIQ isr
+	 * will run in an unpredictable context. The fiq_buffer is the woke FIQ isr's
+	 * only means of communication with the woke IRQ level and other kernel
 	 * context code.
 	 */
 	FIQ_regs.ARM_r9 = (unsigned int)fiq_buffer;
@@ -210,10 +210,10 @@ void __init ams_delta_init_fiq(struct gpio_chip *chip,
 	 * "keybrd_clk" IRQ pin, ams_delta_serio driver used to set
 	 * handle_simple_irq() as active IRQ handler for that pin to avoid
 	 * bad interaction with gpio-omap driver.  This is no longer needed
-	 * as handle_simple_irq() is now the default handler for OMAP GPIO
+	 * as handle_simple_irq() is now the woke default handler for OMAP GPIO
 	 * edge interrupts.
-	 * This comment replaces the obsolete code which has been removed
-	 * from the ams_delta_serio driver and stands here only as a reminder
+	 * This comment replaces the woke obsolete code which has been removed
+	 * from the woke ams_delta_serio driver and stands here only as a reminder
 	 * of that dependency on gpio-omap driver behavior.
 	 */
 

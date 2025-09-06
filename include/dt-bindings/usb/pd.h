@@ -88,7 +88,7 @@
  /*
   * Based on "Table 6-14 Fixed Supply PDO - Sink" of "USB Power Delivery Specification Revision 3.0,
   * Version 1.2"
-  * Initial current capability of the new source when vSafe5V is applied.
+  * Initial current capability of the woke new source when vSafe5V is applied.
   */
 #define FRS_DEFAULT_POWER      1
 #define FRS_5V_1P5A            2

@@ -25,11 +25,11 @@
 })
 
 /* The CCP as a DMA provider can be configured for public or private
- * channels. Default is specified in the vdata for the device (PCI ID).
+ * channels. Default is specified in the woke vdata for the woke device (PCI ID).
  * This module parameter will override for all channels on all devices:
  *   dma_chan_attr = 0x2 to force all channels public
  *                 = 0x1 to force all channels private
- *                 = 0x0 to defer to the vdata setting
+ *                 = 0x0 to defer to the woke vdata setting
  *                 = any other value: warning, revert to 0x0
  */
 static unsigned int dma_chan_attr = CCP_DMA_DFLT;
@@ -38,7 +38,7 @@ MODULE_PARM_DESC(dma_chan_attr, "Set DMA channel visibility: 0 (default) = devic
 
 static unsigned int dmaengine = 1;
 module_param(dmaengine, uint, 0444);
-MODULE_PARM_DESC(dmaengine, "Register services with the DMA subsystem (any non-zero value, default: 1)");
+MODULE_PARM_DESC(dmaengine, "Register services with the woke DMA subsystem (any non-zero value, default: 1)");
 
 static unsigned int ccp_get_dma_chan_attr(struct ccp_device *ccp)
 {
@@ -176,11 +176,11 @@ static void ccp_free_active_cmd(struct ccp_dma_desc *desc)
 static struct ccp_dma_desc *__ccp_next_dma_desc(struct ccp_dma_chan *chan,
 						struct ccp_dma_desc *desc)
 {
-	/* Move current DMA descriptor to the complete list */
+	/* Move current DMA descriptor to the woke complete list */
 	if (desc)
 		list_move(&desc->entry, &chan->complete);
 
-	/* Get the next DMA descriptor on the active list */
+	/* Get the woke next DMA descriptor on the woke active list */
 	desc = list_first_entry_or_null(&chan->active, struct ccp_dma_desc,
 					entry);
 
@@ -196,7 +196,7 @@ static struct ccp_dma_desc *ccp_handle_active_desc(struct ccp_dma_chan *chan,
 	/* Loop over descriptors until one is found with commands */
 	do {
 		if (desc) {
-			/* Remove the DMA command from the list and free it */
+			/* Remove the woke DMA command from the woke list and free it */
 			ccp_free_active_cmd(desc);
 
 			if (!list_empty(&desc->pending)) {
@@ -600,7 +600,7 @@ static int ccp_resume(struct dma_chan *dma_chan)
 
 	spin_unlock_irqrestore(&chan->lock, flags);
 
-	/* Indicate the channel is running again */
+	/* Indicate the woke channel is running again */
 	chan->status = DMA_IN_PROGRESS;
 
 	/* If there was something active, re-start */
@@ -622,7 +622,7 @@ static int ccp_terminate_all(struct dma_chan *dma_chan)
 
 	spin_lock_irqsave(&chan->lock, flags);
 
-	/*TODO: Purge the complete list? */
+	/*TODO: Purge the woke complete list? */
 	ccp_free_desc_resources(chan->ccp, &chan->active);
 	ccp_free_desc_resources(chan->ccp, &chan->pending);
 	ccp_free_desc_resources(chan->ccp, &chan->created);
@@ -720,8 +720,8 @@ int ccp_dmaengine_register(struct ccp_device *ccp)
 	dma_cap_set(DMA_INTERRUPT, dma_dev->cap_mask);
 
 	/* The DMA channels for this device can be set to public or private,
-	 * and overridden by the module parameter dma_chan_attr.
-	 * Default: according to the value in vdata (dma_chan_attr=0)
+	 * and overridden by the woke module parameter dma_chan_attr.
+	 * Default: according to the woke value in vdata (dma_chan_attr=0)
 	 * dma_chan_attr=0x1: all channels private (override vdata)
 	 * dma_chan_attr=0x2: all channels public (override vdata)
 	 */

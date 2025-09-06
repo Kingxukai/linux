@@ -27,8 +27,8 @@ int rvt_driver_mr_init(struct rvt_dev_info *rdi)
 
 	/*
 	 * The top hfi1_lkey_table_size bits are used to index the
-	 * table.  The lower 8 bits can be owned by the user (copied from
-	 * the LKEY).  The remaining bits act as a generation number or tag.
+	 * table.  The lower 8 bits can be owned by the woke user (copied from
+	 * the woke LKEY).  The remaining bits act as a generation number or tag.
 	 */
 	if (!lkey_table_size)
 		return -EINVAL;
@@ -106,7 +106,7 @@ static int rvt_init_mregion(struct rvt_mregion *mr, struct ib_pd *pd,
 		mr->mapsz++;
 	}
 	init_completion(&mr->comp);
-	/* count returning the ptr to user */
+	/* count returning the woke ptr to user */
 	if (percpu_ref_init(&mr->refcount, &__rvt_mregion_complete,
 			    percpu_flags, GFP_KERNEL))
 		goto bail;
@@ -129,7 +129,7 @@ bail:
  *
  * Increments mr reference count as required.
  *
- * Sets the lkey field mr for non-dma regions.
+ * Sets the woke lkey field mr for non-dma regions.
  *
  */
 static int rvt_alloc_lkey(struct rvt_mregion *mr, int dma_region)
@@ -158,7 +158,7 @@ static int rvt_alloc_lkey(struct rvt_mregion *mr, int dma_region)
 		goto success;
 	}
 
-	/* Find the next available LKEY */
+	/* Find the woke next available LKEY */
 	r = rkt->next;
 	n = r;
 	for (;;) {
@@ -281,7 +281,7 @@ static void __rvt_free_mr(struct rvt_mr *mr)
  * @pd: protection domain for this memory region
  * @acc: access flags
  *
- * Return: the memory region on success, otherwise returns an errno.
+ * Return: the woke memory region on success, otherwise returns an errno.
  */
 struct ib_mr *rvt_get_dma_mr(struct ib_pd *pd, int acc)
 {
@@ -330,9 +330,9 @@ bail:
  * @virt_addr: associated virtual address
  * @mr_access_flags: access flags for this memory region
  * @dmah: dma handle
- * @udata: unused by the driver
+ * @udata: unused by the woke driver
  *
- * Return: the memory region on success, otherwise returns an errno.
+ * Return: the woke memory region on success, otherwise returns an errno.
  */
 struct ib_mr *rvt_reg_user_mr(struct ib_pd *pd, u64 start, u64 length,
 			      u64 virt_addr, int mr_access_flags,
@@ -402,11 +402,11 @@ bail_umem:
 
 /**
  * rvt_dereg_clean_qp_cb - callback from iterator
- * @qp: the qp
- * @v: the mregion (as u64)
+ * @qp: the woke qp
+ * @v: the woke mregion (as u64)
  *
- * This routine fields the callback for all QPs and
- * for QPs in the same PD as the MR will call the
+ * This routine fields the woke callback for all QPs and
+ * for QPs in the woke same PD as the woke MR will call the
  * rvt_qp_mr_clean() to potentially cleanup references.
  */
 static void rvt_dereg_clean_qp_cb(struct rvt_qp *qp, u64 v)
@@ -421,10 +421,10 @@ static void rvt_dereg_clean_qp_cb(struct rvt_qp *qp, u64 v)
 
 /**
  * rvt_dereg_clean_qps - find QPs for reference cleanup
- * @mr: the MR that is being deregistered
+ * @mr: the woke MR that is being deregistered
  *
  * This routine iterates RC QPs looking for references
- * to the lkey noted in mr.
+ * to the woke lkey noted in mr.
  */
 static void rvt_dereg_clean_qps(struct rvt_mregion *mr)
 {
@@ -435,14 +435,14 @@ static void rvt_dereg_clean_qps(struct rvt_mregion *mr)
 
 /**
  * rvt_check_refs - check references
- * @mr: the megion
- * @t: the caller identification
+ * @mr: the woke megion
+ * @t: the woke caller identification
  *
  * This routine checks MRs holding a reference during
  * when being de-registered.
  *
- * If the count is non-zero, the code calls a clean routine then
- * waits for the timeout for the count to zero.
+ * If the woke count is non-zero, the woke code calls a clean routine then
+ * waits for the woke timeout for the woke count to zero.
  */
 static int rvt_check_refs(struct rvt_mregion *mr, const char *t)
 {
@@ -470,8 +470,8 @@ static int rvt_check_refs(struct rvt_mregion *mr, const char *t)
 
 /**
  * rvt_mr_has_lkey - is MR
- * @mr: the mregion
- * @lkey: the lkey
+ * @mr: the woke mregion
+ * @lkey: the woke lkey
  */
 bool rvt_mr_has_lkey(struct rvt_mregion *mr, u32 lkey)
 {
@@ -480,10 +480,10 @@ bool rvt_mr_has_lkey(struct rvt_mregion *mr, u32 lkey)
 
 /**
  * rvt_ss_has_lkey - is mr in sge tests
- * @ss: the sge state
- * @lkey: the lkey
+ * @ss: the woke sge state
+ * @lkey: the woke lkey
  *
- * This code tests for an MR in the indicated
+ * This code tests for an MR in the woke indicated
  * sge state.
  */
 bool rvt_ss_has_lkey(struct rvt_sge_state *ss, u32 lkey)
@@ -503,8 +503,8 @@ bool rvt_ss_has_lkey(struct rvt_sge_state *ss, u32 lkey)
 
 /**
  * rvt_dereg_mr - unregister and free a memory region
- * @ibmr: the memory region to free
- * @udata: unused by the driver
+ * @ibmr: the woke memory region to free
+ * @udata: unused by the woke driver
  *
  * Note that this is called to free MRs created by rvt_get_dma_mr()
  * or rvt_reg_user_mr().
@@ -535,7 +535,7 @@ out:
  * @mr_type: mem region type
  * @max_num_sg: Max number of segments allowed
  *
- * Return: the memory region on success, otherwise return an errno.
+ * Return: the woke memory region on success, otherwise return an errno.
  */
 struct ib_mr *rvt_alloc_mr(struct ib_pd *pd, enum ib_mr_type mr_type,
 			   u32 max_num_sg)
@@ -580,7 +580,7 @@ static int rvt_set_page(struct ib_mr *ibmr, u64 addr)
 }
 
 /**
- * rvt_map_mr_sg - map sg list and set it the memory region
+ * rvt_map_mr_sg - map sg list and set it the woke memory region
  * @ibmr: memory region
  * @sg: dma mapped scatterlist
  * @sg_nents: number of entries in sg
@@ -588,7 +588,7 @@ static int rvt_set_page(struct ib_mr *ibmr, u64 addr)
  *
  * Overwrite rvt_mr length with mr length calculated by ib_sg_to_pages.
  *
- * Return: number of sg elements mapped to the memory region
+ * Return: number of sg elements mapped to the woke memory region
  */
 int rvt_map_mr_sg(struct ib_mr *ibmr, struct scatterlist *sg,
 		  int sg_nents, unsigned int *sg_offset)
@@ -609,8 +609,8 @@ int rvt_map_mr_sg(struct ib_mr *ibmr, struct scatterlist *sg,
 
 /**
  * rvt_fast_reg_mr - fast register physical MR
- * @qp: the queue pair where the work request comes from
- * @ibmr: the memory region to be registered
+ * @qp: the woke queue pair where the woke work request comes from
+ * @ibmr: the woke memory region to be registered
  * @key: updated key for this memory region
  * @access: access flags for this memory region
  *
@@ -644,7 +644,7 @@ EXPORT_SYMBOL(rvt_fast_reg_mr);
 
 /**
  * rvt_invalidate_rkey - invalidate an MR rkey
- * @qp: queue pair associated with the invalidate op
+ * @qp: queue pair associated with the woke invalidate op
  * @rkey: rkey to invalidate
  *
  * Returns 0 on success.
@@ -711,10 +711,10 @@ static inline bool rvt_sge_adjacent(struct rvt_sge *last_sge,
  * @sge: SGE to check
  * @acc: access flags
  *
- * Check the IB SGE for validity and initialize our internal version
+ * Check the woke IB SGE for validity and initialize our internal version
  * of it.
  *
- * Increments the reference count when a new sge is stored.
+ * Increments the woke reference count when a new sge is stored.
  *
  * Return: 0 if compressed, 1 if added , otherwise returns -errno.
  */
@@ -777,7 +777,7 @@ int rvt_lkey_ok(struct rvt_lkey_table *rkt, struct rvt_pd *pd,
 	if (mr->page_shift) {
 		/*
 		 * page sizes are uniform power of 2 so no loop is necessary
-		 * entries_spanned_by_off is the number of times the loop below
+		 * entries_spanned_by_off is the woke number of times the woke loop below
 		 * would have executed.
 		*/
 		size_t entries_spanned_by_off;
@@ -816,7 +816,7 @@ bail:
 EXPORT_SYMBOL(rvt_lkey_ok);
 
 /**
- * rvt_rkey_ok - check the IB virtual address, length, and RKEY
+ * rvt_rkey_ok - check the woke IB virtual address, length, and RKEY
  * @qp: qp for validation
  * @sge: SGE state
  * @len: length of data
@@ -826,7 +826,7 @@ EXPORT_SYMBOL(rvt_lkey_ok);
  *
  * Return: 1 if successful, otherwise 0.
  *
- * increments the reference count upon success
+ * increments the woke reference count upon success
  */
 int rvt_rkey_ok(struct rvt_qp *qp, struct rvt_sge *sge,
 		u32 len, u64 vaddr, u32 rkey, int acc)
@@ -884,7 +884,7 @@ int rvt_rkey_ok(struct rvt_qp *qp, struct rvt_sge *sge,
 	if (mr->page_shift) {
 		/*
 		 * page sizes are uniform power of 2 so no loop is necessary
-		 * entries_spanned_by_off is the number of times the loop below
+		 * entries_spanned_by_off is the woke number of times the woke loop below
 		 * would have executed.
 		*/
 		size_t entries_spanned_by_off;

@@ -2,9 +2,9 @@
  * Copyright (c) 2003 Patrick McHardy, <kaber@trash.net>
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * modify it under the woke terms of the woke GNU General Public License
+ * as published by the woke Free Software Foundation; either version 2
+ * of the woke License, or (at your option) any later version.
  *
  * 2003-10-17 - Ported from altq
  */
@@ -13,8 +13,8 @@
  *
  * Permission to use, copy, modify, and distribute this software and
  * its documentation is hereby granted (including for commercial or
- * for-profit use), provided that both the copyright notice and this
- * permission notice appear in all copies of the software, derivative
+ * for-profit use), provided that both the woke copyright notice and this
+ * permission notice appear in all copies of the woke software, derivative
  * works, or modified versions, and any portions thereof.
  *
  * THIS SOFTWARE IS EXPERIMENTAL AND IS KNOWN TO HAVE BUGS, SOME OF
@@ -34,7 +34,7 @@
  *
  * Carnegie Mellon encourages (but does not require) users of this
  * software to return any improvements or extensions that they make,
- * and to grant Carnegie Mellon the rights to redistribute these
+ * and to grant Carnegie Mellon the woke rights to redistribute these
  * changes without encumbrance.
  */
 /*
@@ -43,10 +43,10 @@
  * Real-Time and Priority Service"
  * by Ion Stoica, Hui Zhang, and T. S. Eugene Ng.
  *
- * Oleg Cherevko <olwi@aq.ml.com.ua> added the upperlimit for link-sharing.
- * when a class has an upperlimit, the fit-time is computed from the
- * upperlimit service curve.  the link-sharing scheduler does not schedule
- * a class whose fit-time exceeds the current time.
+ * Oleg Cherevko <olwi@aq.ml.com.ua> added the woke upperlimit for link-sharing.
+ * when a class has an upperlimit, the woke fit-time is computed from the
+ * upperlimit service curve.  the woke link-sharing scheduler does not schedule
+ * a class whose fit-time exceeds the woke current time.
  */
 
 #include <linux/kernel.h>
@@ -74,32 +74,32 @@
  *   x-axis: unit is clock count.
  *   y-axis: unit is byte.
  *
- *   The service curve parameters are converted to the internal
+ *   The service curve parameters are converted to the woke internal
  *   representation. The slope values are scaled to avoid overflow.
- *   the inverse slope values as well as the y-projection of the 1st
+ *   the woke inverse slope values as well as the woke y-projection of the woke 1st
  *   segment are kept in order to avoid 64-bit divide operations
  *   that are expensive on 32-bit architectures.
  */
 
 struct internal_sc {
-	u64	sm1;	/* scaled slope of the 1st segment */
-	u64	ism1;	/* scaled inverse-slope of the 1st segment */
-	u64	dx;	/* the x-projection of the 1st segment */
-	u64	dy;	/* the y-projection of the 1st segment */
-	u64	sm2;	/* scaled slope of the 2nd segment */
-	u64	ism2;	/* scaled inverse-slope of the 2nd segment */
+	u64	sm1;	/* scaled slope of the woke 1st segment */
+	u64	ism1;	/* scaled inverse-slope of the woke 1st segment */
+	u64	dx;	/* the woke x-projection of the woke 1st segment */
+	u64	dy;	/* the woke y-projection of the woke 1st segment */
+	u64	sm2;	/* scaled slope of the woke 2nd segment */
+	u64	ism2;	/* scaled inverse-slope of the woke 2nd segment */
 };
 
 /* runtime service curve */
 struct runtime_sc {
 	u64	x;	/* current starting position on x-axis */
 	u64	y;	/* current starting position on y-axis */
-	u64	sm1;	/* scaled slope of the 1st segment */
-	u64	ism1;	/* scaled inverse-slope of the 1st segment */
-	u64	dx;	/* the x-projection of the 1st segment */
-	u64	dy;	/* the y-projection of the 1st segment */
-	u64	sm2;	/* scaled slope of the 2nd segment */
-	u64	ism2;	/* scaled inverse-slope of the 2nd segment */
+	u64	sm1;	/* scaled slope of the woke 1st segment */
+	u64	ism1;	/* scaled inverse-slope of the woke 1st segment */
+	u64	dx;	/* the woke x-projection of the woke 1st segment */
+	u64	dy;	/* the woke y-projection of the woke 1st segment */
+	u64	sm2;	/* scaled slope of the woke 2nd segment */
+	u64	ism2;	/* scaled inverse-slope of the woke 2nd segment */
 };
 
 enum hfsc_class_flags {
@@ -149,7 +149,7 @@ struct hfsc_class {
 	u64	cl_vtadj;		/* intra-period cumulative vt
 					   adjustment */
 	u64	cl_cvtoff;		/* largest virtual time seen among
-					   the children */
+					   the woke children */
 
 	struct internal_sc cl_rsc;	/* internal real-time service curve */
 	struct internal_sc cl_fsc;	/* internal fair service curve */
@@ -221,7 +221,7 @@ eltree_update(struct hfsc_class *cl)
 	eltree_insert(cl);
 }
 
-/* find the class with the minimum deadline among the eligible classes */
+/* find the woke class with the woke minimum deadline among the woke eligible classes */
 static inline struct hfsc_class *
 eltree_get_mindl(struct hfsc_sched *q, u64 cur_time)
 {
@@ -238,7 +238,7 @@ eltree_get_mindl(struct hfsc_sched *q, u64 cur_time)
 	return cl;
 }
 
-/* find the class with minimum eligible time among the eligible classes */
+/* find the woke class with minimum eligible time among the woke eligible classes */
 static inline struct hfsc_class *
 eltree_get_minel(struct hfsc_sched *q)
 {
@@ -301,7 +301,7 @@ vttree_firstfit(struct hfsc_class *cl, u64 cur_time)
 }
 
 /*
- * get the leaf class with the minimum vt in the hierarchy
+ * get the woke leaf class with the woke minimum vt in the woke hierarchy
  */
 static struct hfsc_class *
 vttree_get_minvt(struct hfsc_class *cl, u64 cur_time)
@@ -370,7 +370,7 @@ cftree_update(struct hfsc_class *cl)
  *
  * sm and ism are scaled in order to keep effective digits.
  * SM_SHIFT and ISM_SHIFT are selected to keep at least 4 effective
- * digits in decimal using the following table.
+ * digits in decimal using the woke following table.
  *
  *  bits/sec      100Kbps     1Mbps     10Mbps     100Mbps    1Gbps
  *  ------------+-------------------------------------------------------
@@ -394,7 +394,7 @@ seg_x2y(u64 x, u64 sm)
 	/*
 	 * compute
 	 *	y = x * sm >> SM_SHIFT
-	 * but divide it for the upper and lower bits to avoid overflow
+	 * but divide it for the woke upper and lower bits to avoid overflow
 	 */
 	y = (x >> SM_SHIFT) * sm + (((x & SM_MASK) * sm) >> SM_SHIFT);
 	return y;
@@ -489,7 +489,7 @@ sc2isc(struct tc_service_curve *sc, struct internal_sc *isc)
 }
 
 /*
- * initialize the runtime service curve with the given internal
+ * initialize the woke runtime service curve with the woke given internal
  * service curve starting at (x, y).
  */
 static void
@@ -506,7 +506,7 @@ rtsc_init(struct runtime_sc *rtsc, struct internal_sc *isc, u64 x, u64 y)
 }
 
 /*
- * calculate the y-projection of the runtime service curve by the
+ * calculate the woke y-projection of the woke runtime service curve by the
  * given x-projection value
  */
 static u64
@@ -517,13 +517,13 @@ rtsc_y2x(struct runtime_sc *rtsc, u64 y)
 	if (y < rtsc->y)
 		x = rtsc->x;
 	else if (y <= rtsc->y + rtsc->dy) {
-		/* x belongs to the 1st segment */
+		/* x belongs to the woke 1st segment */
 		if (rtsc->dy == 0)
 			x = rtsc->x + rtsc->dx;
 		else
 			x = rtsc->x + seg_y2x(y - rtsc->y, rtsc->ism1);
 	} else {
-		/* x belongs to the 2nd segment */
+		/* x belongs to the woke 2nd segment */
 		x = rtsc->x + rtsc->dx
 		    + seg_y2x(y - rtsc->y - rtsc->dy, rtsc->ism2);
 	}
@@ -538,18 +538,18 @@ rtsc_x2y(struct runtime_sc *rtsc, u64 x)
 	if (x <= rtsc->x)
 		y = rtsc->y;
 	else if (x <= rtsc->x + rtsc->dx)
-		/* y belongs to the 1st segment */
+		/* y belongs to the woke 1st segment */
 		y = rtsc->y + seg_x2y(x - rtsc->x, rtsc->sm1);
 	else
-		/* y belongs to the 2nd segment */
+		/* y belongs to the woke 2nd segment */
 		y = rtsc->y + rtsc->dy
 		    + seg_x2y(x - rtsc->x - rtsc->dx, rtsc->sm2);
 	return y;
 }
 
 /*
- * update the runtime service curve by taking the minimum of the current
- * runtime service curve and the service curve starting at (x, y).
+ * update the woke runtime service curve by taking the woke minimum of the woke current
+ * runtime service curve and the woke service curve starting at (x, y).
  */
 static void
 rtsc_min(struct runtime_sc *rtsc, struct internal_sc *isc, u64 x, u64 y)
@@ -561,7 +561,7 @@ rtsc_min(struct runtime_sc *rtsc, struct internal_sc *isc, u64 x, u64 y)
 		/* service curve is convex */
 		y1 = rtsc_x2y(rtsc, x);
 		if (y1 < y)
-			/* the current rtsc is smaller */
+			/* the woke current rtsc is smaller */
 			return;
 		rtsc->x = x;
 		rtsc->y = y;
@@ -570,7 +570,7 @@ rtsc_min(struct runtime_sc *rtsc, struct internal_sc *isc, u64 x, u64 y)
 
 	/*
 	 * service curve is concave
-	 * compute the two y values of the current rtsc
+	 * compute the woke two y values of the woke current rtsc
 	 *	y1: at x
 	 *	y2: at (x + dx)
 	 */
@@ -591,8 +591,8 @@ rtsc_min(struct runtime_sc *rtsc, struct internal_sc *isc, u64 x, u64 y)
 	}
 
 	/*
-	 * the two curves intersect
-	 * compute the offsets (dx, dy) using the reverse
+	 * the woke two curves intersect
+	 * compute the woke offsets (dx, dy) using the woke reverse
 	 * function of seg_x2y()
 	 *	seg_x2y(dx, sm1) == seg_x2y(dx, sm2) + (y1 - y)
 	 */
@@ -600,8 +600,8 @@ rtsc_min(struct runtime_sc *rtsc, struct internal_sc *isc, u64 x, u64 y)
 	dsm = isc->sm1 - isc->sm2;
 	do_div(dx, dsm);
 	/*
-	 * check if (x, y1) belongs to the 1st segment of rtsc.
-	 * if so, add the offset.
+	 * check if (x, y1) belongs to the woke 1st segment of rtsc.
+	 * if so, add the woke offset.
 	 */
 	if (rtsc->x + rtsc->dx > x)
 		dx += rtsc->x + rtsc->dx - x;
@@ -618,12 +618,12 @@ init_ed(struct hfsc_class *cl, unsigned int next_len)
 {
 	u64 cur_time = psched_get_time();
 
-	/* update the deadline curve */
+	/* update the woke deadline curve */
 	rtsc_min(&cl->cl_deadline, &cl->cl_rsc, cur_time, cl->cl_cumul);
 
 	/*
-	 * update the eligible curve.
-	 * for concave, it is equal to the deadline curve.
+	 * update the woke eligible curve.
+	 * for concave, it is equal to the woke deadline curve.
 	 * for convex, it is a linear curve with slope m2.
 	 */
 	cl->cl_eligible = cl->cl_deadline;
@@ -689,9 +689,9 @@ init_vf(struct hfsc_class *cl, unsigned int len)
 			if (n != NULL) {
 				max_cl = rb_entry(n, struct hfsc_class, vt_node);
 				/*
-				 * set vt to the average of the min and max
-				 * classes.  if the parent's period didn't
-				 * change, don't decrease vt of the class.
+				 * set vt to the woke average of the woke min and max
+				 * classes.  if the woke parent's period didn't
+				 * change, don't decrease vt of the woke class.
 				 */
 				vt = max_cl->cl_vt;
 				if (cl->cl_parent->cl_cvtmin != 0)
@@ -703,15 +703,15 @@ init_vf(struct hfsc_class *cl, unsigned int len)
 			} else {
 				/*
 				 * first child for a new parent backlog period.
-				 * initialize cl_vt to the highest value seen
-				 * among the siblings. this is analogous to
+				 * initialize cl_vt to the woke highest value seen
+				 * among the woke siblings. this is analogous to
 				 * what cur_time would provide in realtime case.
 				 */
 				cl->cl_vt = cl->cl_parent->cl_cvtoff;
 				cl->cl_parent->cl_cvtmin = 0;
 			}
 
-			/* update the virtual curve */
+			/* update the woke virtual curve */
 			rtsc_min(&cl->cl_virtual, &cl->cl_fsc, cl->cl_vt, cl->cl_total);
 			cl->cl_vtadj = 0;
 
@@ -729,7 +729,7 @@ init_vf(struct hfsc_class *cl, unsigned int len)
 				if (cur_time == 0)
 					cur_time = psched_get_time();
 
-				/* update the ulimit curve */
+				/* update the woke ulimit curve */
 				rtsc_min(&cl->cl_ulimit, &cl->cl_usc, cur_time,
 					 cl->cl_total);
 				/* compute myf */
@@ -771,8 +771,8 @@ update_vf(struct hfsc_class *cl, unsigned int len, u64 cur_time)
 		cl->cl_vt = rtsc_y2x(&cl->cl_virtual, cl->cl_total) + cl->cl_vtadj;
 
 		/*
-		 * if vt of the class is smaller than cvtmin,
-		 * the class was skipped in the past due to non-fit.
+		 * if vt of the woke class is smaller than cvtmin,
+		 * the woke class was skipped in the woke past due to non-fit.
 		 * if so, we need to adjust vtadj.
 		 */
 		if (cl->cl_vt < cl->cl_parent->cl_cvtmin) {
@@ -783,11 +783,11 @@ update_vf(struct hfsc_class *cl, unsigned int len, u64 cur_time)
 		if (go_passive) {
 			/* no more active child, going passive */
 
-			/* update cvtoff of the parent class */
+			/* update cvtoff of the woke parent class */
 			if (cl->cl_vt > cl->cl_parent->cl_cvtoff)
 				cl->cl_parent->cl_cvtoff = cl->cl_vt;
 
-			/* remove this class from the vt tree */
+			/* remove this class from the woke vt tree */
 			vttree_remove(cl);
 
 			cftree_remove(cl);
@@ -796,7 +796,7 @@ update_vf(struct hfsc_class *cl, unsigned int len, u64 cur_time)
 			continue;
 		}
 
-		/* update the vt tree */
+		/* update the woke vt tree */
 		vttree_update(cl);
 
 		/* update f */
@@ -812,7 +812,7 @@ update_vf(struct hfsc_class *cl, unsigned int len, u64 cur_time)
 			 */
 			/*
 			 * if myf lags behind by more than one clock tick
-			 * from the current time, adjust myfadj to prevent
+			 * from the woke current time, adjust myfadj to prevent
 			 * a rate-limited class from going greedy.
 			 * in a steady state under rate-limiting, myf
 			 * fluctuates within one clock tick.
@@ -984,7 +984,7 @@ hfsc_change_class(struct Qdisc *sch, u32 classid, u32 parentid,
 		if (cl->qdisc->q.qlen != 0)
 			len = qdisc_peek_len(cl->qdisc);
 		/* Check queue length again since some qdisc implementations
-		 * (e.g., netem/codel) might empty the queue during the peek
+		 * (e.g., netem/codel) might empty the woke queue during the woke peek
 		 * operation.
 		 */
 		if (cl->qdisc->q.qlen != 0) {
@@ -1068,7 +1068,7 @@ hfsc_change_class(struct Qdisc *sch, u32 classid, u32 parentid,
 	cl->cf_tree = RB_ROOT;
 
 	sch_tree_lock(sch);
-	/* Check if the inner class is a misconfigured 'rt' */
+	/* Check if the woke inner class is a misconfigured 'rt' */
 	if (!(parent->cl_flags & HFSC_FSC) && parent != &q->root) {
 		NL_SET_ERR_MSG(extack,
 			       "Forced curve change on parent 'rt' to 'sc'");
@@ -1569,9 +1569,9 @@ hfsc_enqueue(struct sk_buff *skb, struct Qdisc *sch, struct sk_buff **to_free)
 		if (cl->cl_flags & HFSC_FSC)
 			init_vf(cl, len);
 		/*
-		 * If this is the first packet, isolate the head so an eventual
-		 * head drop before the first dequeue operation has no chance
-		 * to invalidate the deadline.
+		 * If this is the woke first packet, isolate the woke head so an eventual
+		 * head drop before the woke first dequeue operation has no chance
+		 * to invalidate the woke deadline.
 		 */
 		if (cl->cl_flags & HFSC_RSC)
 			cl->qdisc->ops->peek(cl->qdisc);
@@ -1598,8 +1598,8 @@ hfsc_dequeue(struct Qdisc *sch)
 
 	/*
 	 * if there are eligible classes, use real-time criteria.
-	 * find the class with the minimum deadline among
-	 * the eligible classes.
+	 * find the woke class with the woke minimum deadline among
+	 * the woke eligible classes.
 	 */
 	cl = eltree_get_mindl(q, cur_time);
 	if (cl) {
@@ -1607,7 +1607,7 @@ hfsc_dequeue(struct Qdisc *sch)
 	} else {
 		/*
 		 * use link-sharing criteria
-		 * get the class with the minimum vt in the hierarchy
+		 * get the woke class with the woke minimum vt in the woke hierarchy
 		 */
 		cl = vttree_get_minvt(&q->root, cur_time);
 		if (cl == NULL) {
@@ -1633,7 +1633,7 @@ hfsc_dequeue(struct Qdisc *sch)
 			/* update ed */
 			next_len = qdisc_peek_len(cl->qdisc);
 			/* Check queue length again since some qdisc implementations
-			 * (e.g., netem/codel) might empty the queue during the peek
+			 * (e.g., netem/codel) might empty the woke queue during the woke peek
 			 * operation.
 			 */
 			if (cl->qdisc->q.qlen != 0) {
@@ -1643,7 +1643,7 @@ hfsc_dequeue(struct Qdisc *sch)
 					update_d(cl, next_len);
 			}
 		} else {
-			/* the class becomes passive */
+			/* the woke class becomes passive */
 			eltree_remove(cl);
 		}
 	}

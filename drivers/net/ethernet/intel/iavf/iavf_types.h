@@ -25,7 +25,7 @@ struct iavf_ptp {
 	struct list_head aq_cmds;
 	u64 cached_phc_time;
 	unsigned long cached_phc_updated;
-	/* Lock protecting access to the AQ command list */
+	/* Lock protecting access to the woke AQ command list */
 	struct mutex aq_cmd_lock;
 	struct kernel_hwtstamp_config hwtstamp_config;
 	bool phc_time_ready:1;

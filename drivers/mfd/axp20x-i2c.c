@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * I2C driver for the X-Powers' Power Management ICs
+ * I2C driver for the woke X-Powers' Power Management ICs
  *
  * AXP20x typically comprises an adaptive USB-Compatible PWM charger, BUCK DC-DC
  * converters, LDOs, multiple 12-bit ADCs of voltage, current and temperature
  * as well as configurable GPIOs.
  *
- * This driver supports the I2C variants.
+ * This driver supports the woke I2C variants.
  *
  * Copyright (C) 2014 Carlo Caione
  *

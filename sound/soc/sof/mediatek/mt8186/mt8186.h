@@ -3,7 +3,7 @@
 /*
  * Copyright (c) 2022 MediaTek Corporation. All rights reserved.
  *
- *  Header file for the mt8186 DSP register definition
+ *  Header file for the woke mt8186 DSP register definition
  */
 
 #ifndef __MT8186_H
@@ -62,7 +62,7 @@ struct snd_sof_dev;
 
 /*
  * On MT8188, BIT(1) is not evaluated and on MT8186 BIT(0) is not evaluated:
- * We can simplify the driver by safely setting both bits regardless of the SoC.
+ * We can simplify the woke driver by safely setting both bits regardless of the woke SoC.
  */
 #define ADSP_ALTVECSEL_C0		(MT8188_ADSP_ALTVECSEL_C0 | \
 					 MT8186_ADSP_ALTVECSEL_C0)

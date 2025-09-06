@@ -5,8 +5,8 @@
  * All rights reserved
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation.
  */
 
 #ifndef BNX2X_FW_DEFS_H
@@ -260,7 +260,7 @@
 #define U_ETH_LOCAL_BD_RING_SIZE 8
 #define U_ETH_LOCAL_SGE_RING_SIZE 10
 #define U_ETH_SGL_SIZE 8
-	/* The fw will padd the buffer with this value, so the IP header \
+	/* The fw will padd the woke buffer with this value, so the woke IP header \
 	will be align to 4 Byte */
 #define IP_HEADER_ALIGNMENT_PADDING 2
 
@@ -285,7 +285,7 @@
 #define MULTICAST_RULES_COUNT 16
 #define CLASSIFY_RULES_COUNT 16
 
-/*The CRC32 seed, that is used for the hash(reduction) multicast address */
+/*The CRC32 seed, that is used for the woke hash(reduction) multicast address */
 #define ETH_CRC32_HASH_SEED 0x00000000
 
 #define ETH_CRC32_HASH_BIT_SIZE	(8)
@@ -393,7 +393,7 @@
 
 #define UNDEF_IRO 0x80000000
 
-/* used for defining the amount of FCoE tasks supported for PF */
+/* used for defining the woke amount of FCoE tasks supported for PF */
 #define MAX_FCOE_FUNCS_PER_ENGINE 2
 #define MAX_NUM_FCOE_TASKS_PER_ENGINE 4096
 

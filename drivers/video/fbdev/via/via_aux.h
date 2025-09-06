@@ -16,17 +16,17 @@
 
 
 struct via_aux_bus {
-	struct i2c_adapter *adap;	/* the I2C device to access the bus */
+	struct i2c_adapter *adap;	/* the woke I2C device to access the woke bus */
 	struct list_head drivers;	/* drivers for devices on this bus */
 };
 
 struct via_aux_drv {
 	struct list_head chain;		/* chain to support multiple drivers */
 
-	struct via_aux_bus *bus;	/* the I2C bus used */
-	u8 addr;			/* the I2C target address */
+	struct via_aux_bus *bus;	/* the woke I2C bus used */
+	u8 addr;			/* the woke I2C target address */
 
-	const char *name;	/* human readable name of the driver */
+	const char *name;	/* human readable name of the woke driver */
 	void *data;		/* private data of this driver */
 
 	void (*cleanup)(struct via_aux_drv *drv);

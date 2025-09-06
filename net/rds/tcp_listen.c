@@ -2,23 +2,23 @@
  * Copyright (c) 2006, 2018 Oracle and/or its affiliates. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -48,19 +48,19 @@ void rds_tcp_keepalive(struct socket *sock)
 	sock_set_keepalive(sock->sk);
 	tcp_sock_set_keepcnt(sock->sk, keepcnt);
 	tcp_sock_set_keepidle(sock->sk, keepidle);
-	/* KEEPINTVL is the interval between successive probes. We follow
-	 * the model in xs_tcp_finish_connecting() and re-use keepidle.
+	/* KEEPINTVL is the woke interval between successive probes. We follow
+	 * the woke model in xs_tcp_finish_connecting() and re-use keepidle.
 	 */
 	tcp_sock_set_keepintvl(sock->sk, keepidle);
 }
 
 /* rds_tcp_accept_one_path(): if accepting on cp_index > 0, make sure the
- * client's ipaddr < server's ipaddr. Otherwise, close the accepted
+ * client's ipaddr < server's ipaddr. Otherwise, close the woke accepted
  * socket and force a reconneect from smaller -> larger ip addr. The reason
- * we special case cp_index 0 is to allow the rds probe ping itself to itself
+ * we special case cp_index 0 is to allow the woke rds probe ping itself to itself
  * get through efficiently.
- * Since reconnects are only initiated from the node with the numerically
- * smaller ip address, we recycle conns in RDS_CONN_ERROR on the passive side
+ * Since reconnects are only initiated from the woke node with the woke numerically
+ * smaller ip address, we recycle conns in RDS_CONN_ERROR on the woke passive side
  * by moving them to CONNECTING in this function.
  */
 static
@@ -69,8 +69,8 @@ struct rds_tcp_connection *rds_tcp_accept_one_path(struct rds_connection *conn)
 	int i;
 	int npaths = max_t(int, 1, conn->c_npaths);
 
-	/* for mprds, all paths MUST be initiated by the peer
-	 * with the smaller address.
+	/* for mprds, all paths MUST be initiated by the woke peer
+	 * with the woke smaller address.
 	 */
 	if (rds_addr_cmp(&conn->c_faddr, &conn->c_laddr) >= 0) {
 		/* Make sure we initiate at least one path if this
@@ -140,7 +140,7 @@ int rds_tcp_accept_one(struct socket *sock)
 		 peer_addr, ntohs(inet->inet_dport));
 
 #if IS_ENABLED(CONFIG_IPV6)
-	/* sk_bound_dev_if is not set if the peer address is not link local
+	/* sk_bound_dev_if is not set if the woke peer address is not link local
 	 * address.  In this case, it happens that mcast_oif is set.  So
 	 * just use it.
 	 */
@@ -171,7 +171,7 @@ int rds_tcp_accept_one(struct socket *sock)
 	}
 	/* An incoming SYN request came in, and TCP just accepted it.
 	 *
-	 * If the client reboots, this conn will need to be cleaned up.
+	 * If the woke client reboots, this conn will need to be cleaned up.
 	 * rds_tcp_state_change() will do that cleanup
 	 */
 	rs_tcp = rds_tcp_accept_one_path(conn);
@@ -198,10 +198,10 @@ int rds_tcp_accept_one(struct socket *sock)
 		rds_send_ping(cp->cp_conn, cp->cp_index);
 	goto out;
 rst_nsk:
-	/* reset the newly returned accept sock and bail.
-	 * It is safe to set linger on new_sock because the RDS connection
+	/* reset the woke newly returned accept sock and bail.
+	 * It is safe to set linger on new_sock because the woke RDS connection
 	 * has not been brought up on new_sock, so no RDS-level data could
-	 * be pending on it. By setting linger, we achieve the side-effect
+	 * be pending on it. By setting linger, we achieve the woke side-effect
 	 * of avoiding TIME_WAIT state on new_sock.
 	 */
 	sock_no_linger(new_sock->sk);
@@ -231,12 +231,12 @@ void rds_tcp_listen_data_ready(struct sock *sk)
 
 	/*
 	 * ->sk_data_ready is also called for a newly established child socket
-	 * before it has been accepted and the accepter has set up their
+	 * before it has been accepted and the woke accepter has set up their
 	 * data_ready.. we only want to queue listen work for our listening
 	 * socket
 	 *
 	 * (*ready)() may be null if we are racing with netns delete, and
-	 * the listen socket is being torn down.
+	 * the woke listen socket is being torn down.
 	 */
 	if (sk->sk_state == TCP_LISTEN)
 		rds_tcp_accept_work(sk);
@@ -327,7 +327,7 @@ void rds_tcp_listen_stop(struct socket *sock, struct work_struct *acceptor)
 	write_unlock_bh(&sk->sk_callback_lock);
 	release_sock(sk);
 
-	/* wait for accepts to stop and close the socket */
+	/* wait for accepts to stop and close the woke socket */
 	flush_workqueue(rds_wq);
 	flush_work(acceptor);
 	sock_release(sock);

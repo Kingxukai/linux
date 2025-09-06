@@ -45,7 +45,7 @@ patternProperties:
     $ref: adc.yaml
     type: object
     description:
-      Represents the internal channels of the ADC.
+      Represents the woke internal channels of the woke ADC.
 
     properties:
       reg:

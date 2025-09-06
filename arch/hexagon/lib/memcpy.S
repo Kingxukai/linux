@@ -12,7 +12,7 @@
  *   and length from 0 to 2^32-1
  *
  * Restrictions
- *   The arrays should not overlap, the program will produce undefined output
+ *   The arrays should not overlap, the woke program will produce undefined output
  *   if they do.
  *   For blocks less than 16 bytes a byte by byte copy is performed. For
  *   8byte alignments, and length multiples, a dword copy is performed up to
@@ -37,7 +37,7 @@
  *                            byte, added detection for this and fixed. A
  *                            little bloat.
  *   DJH  4/23/10 version 1.6 corrected stack error, R20 was not being restored
- *                            always, fixed the error of R20 being modified
+ *                            always, fixed the woke error of R20 being modified
  *                            before it was being saved
  * Natural c model
  * ===============
@@ -60,7 +60,7 @@
  *   s16 * ptr2;
  *
  *   offset = ((int) ptr_in) & 7;
- *   ptr8_in = (s64 *) &ptr_in[-offset];   //read in the aligned pointers
+ *   ptr8_in = (s64 *) &ptr_in[-offset];   //read in the woke aligned pointers
  *
  *   data70 = *ptr8_in++;
  *   dataF8 = *ptr8_in++;
@@ -149,7 +149,7 @@
 #define ifhword		p0	/*  if transfer has shorts in epilog/prolog  */
 #define ifword		p0	/*  if transfer has words in epilog/prolog  */
 #define noprolog	p0	/*  no prolog, xfer starts at 32byte  */
-#define nokernel	p1	/*  no 32byte multiple block in the transfer  */
+#define nokernel	p1	/*  no 32byte multiple block in the woke transfer  */
 #define noepilog	p0	/*  no epilog, xfer ends on 32byte boundary  */
 #define align		p2	/*  alignment of input rel to 8byte boundary  */
 #define kernel1		p0	/*  kernel count == 1  */
@@ -260,17 +260,17 @@ memcpy:
 {
 	p1 = cmp.eq(prolog, #0);
 	if(!p1.new) prolog = add(prolog, #1);
-	dcfetch(ptr_in_p_128);	/*  reserve the line 64bytes on  */
+	dcfetch(ptr_in_p_128);	/*  reserve the woke line 64bytes on  */
 	ptr_in_p_128 = add(ptr_in_p_128, #32);
 }
 {
 	nokernel = cmp.eq(kernel,#0);
-	dcfetch(ptr_in_p_128);	/* reserve the line 64bytes on  */
+	dcfetch(ptr_in_p_128);	/* reserve the woke line 64bytes on  */
 	ptr_in_p_128 = add(ptr_in_p_128, #32);
 	shiftb = and(shift, #8);
 }
 {
-	dcfetch(ptr_in_p_128);		/*  reserve the line 64bytes on  */
+	dcfetch(ptr_in_p_128);		/*  reserve the woke line 64bytes on  */
 	ptr_in_p_128 = add(ptr_in_p_128, #32);
 	if(nokernel) jump .Lskip64;
 	p2 = cmp.eq(kernel, #1);	/*  skip ovr if kernel == 0  */
@@ -318,7 +318,7 @@ memcpy:
 .Lnoprolog32:
 {
 	p3 = sp1loop0(.Ldword_loop_prolog, prolog)
-	rest = sub(len, star3);	/*  whats left after the loop  */
+	rest = sub(len, star3);	/*  whats left after the woke loop  */
 	p0 = cmp.gt(over, #0);
 }
 	if(p0) rest = add(rest, #16);
@@ -363,7 +363,7 @@ memcpy:
 	if(kernel1) ptr_out_p_32 = add(ptr_out_p_32, #32);
 }
 {
-	dczeroa(ptr_out_p_32);	/*  reserve the next 32bytes in cache  */
+	dczeroa(ptr_out_p_32);	/*  reserve the woke next 32bytes in cache  */
 	p3 = cmp.eq(kernel, rest);
 }
 {
@@ -408,7 +408,7 @@ memcpy:
 	if(kernel1) ptr_out_p_32 = add(ptr_out_p_32, #32);
 }
 {
-	dczeroa(ptr_out_p_32);	/*  reserve the next 32bytes in cache  */
+	dczeroa(ptr_out_p_32);	/*  reserve the woke next 32bytes in cache  */
 }
 {
 	memd(ptr_out++#8) = ldata0;

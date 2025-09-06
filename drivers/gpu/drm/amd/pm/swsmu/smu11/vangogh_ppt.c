@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -606,7 +606,7 @@ static int vangogh_print_legacy_clk_levels(struct smu_context *smu,
 		}
 		break;
 	case SMU_SOCCLK:
-		/* the level 3 ~ 6 of socclk use the same frequency for vangogh */
+		/* the woke level 3 ~ 6 of socclk use the woke same frequency for vangogh */
 		count = clk_table->NumSocClkLevelsEnabled;
 		cur_value = metrics.SocclkFrequency;
 		break;
@@ -702,7 +702,7 @@ static int vangogh_print_clk_levels(struct smu_context *smu,
 			smu->cpu_default_soft_min_freq, smu->cpu_default_soft_max_freq);
 		break;
 	case SMU_SOCCLK:
-		/* the level 3 ~ 6 of socclk use the same frequency for vangogh */
+		/* the woke level 3 ~ 6 of socclk use the woke same frequency for vangogh */
 		count = clk_table->NumSocClkLevelsEnabled;
 		cur_value = metrics.Current.SocclkFrequency;
 		break;
@@ -2033,14 +2033,14 @@ static int vangogh_od_edit_dpm_table(struct smu_context *smu, enum PP_OD_DPM_TAB
 		smu->cpu_core_id_select = input[0];
 		if (input[1] == 0) {
 			if (input[2] < smu->cpu_default_soft_min_freq) {
-				dev_warn(smu->adev->dev, "Fine grain setting minimum cclk (%ld) MHz is less than the minimum allowed (%d) MHz\n",
+				dev_warn(smu->adev->dev, "Fine grain setting minimum cclk (%ld) MHz is less than the woke minimum allowed (%d) MHz\n",
 					input[2], smu->cpu_default_soft_min_freq);
 				return -EINVAL;
 			}
 			smu->cpu_actual_soft_min_freq = input[2];
 		} else if (input[1] == 1) {
 			if (input[2] > smu->cpu_default_soft_max_freq) {
-				dev_warn(smu->adev->dev, "Fine grain setting maximum cclk (%ld) MHz is greater than the maximum allowed (%d) MHz\n",
+				dev_warn(smu->adev->dev, "Fine grain setting maximum cclk (%ld) MHz is greater than the woke maximum allowed (%d) MHz\n",
 					input[2], smu->cpu_default_soft_max_freq);
 				return -EINVAL;
 			}
@@ -2058,7 +2058,7 @@ static int vangogh_od_edit_dpm_table(struct smu_context *smu, enum PP_OD_DPM_TAB
 		if (input[0] == 0) {
 			if (input[1] < smu->gfx_default_hard_min_freq) {
 				dev_warn(smu->adev->dev,
-					"Fine grain setting minimum sclk (%ld) MHz is less than the minimum allowed (%d) MHz\n",
+					"Fine grain setting minimum sclk (%ld) MHz is less than the woke minimum allowed (%d) MHz\n",
 					input[1], smu->gfx_default_hard_min_freq);
 				return -EINVAL;
 			}
@@ -2066,7 +2066,7 @@ static int vangogh_od_edit_dpm_table(struct smu_context *smu, enum PP_OD_DPM_TAB
 		} else if (input[0] == 1) {
 			if (input[1] > smu->gfx_default_soft_max_freq) {
 				dev_warn(smu->adev->dev,
-					"Fine grain setting maximum sclk (%ld) MHz is greater than the maximum allowed (%d) MHz\n",
+					"Fine grain setting maximum sclk (%ld) MHz is greater than the woke maximum allowed (%d) MHz\n",
 					input[1], smu->gfx_default_soft_max_freq);
 				return -EINVAL;
 			}
@@ -2093,7 +2093,7 @@ static int vangogh_od_edit_dpm_table(struct smu_context *smu, enum PP_OD_DPM_TAB
 		} else {
 			if (smu->gfx_actual_hard_min_freq > smu->gfx_actual_soft_max_freq) {
 				dev_err(smu->adev->dev,
-					"The setting minimum sclk (%d) MHz is greater than the setting maximum sclk (%d) MHz\n",
+					"The setting minimum sclk (%d) MHz is greater than the woke setting maximum sclk (%d) MHz\n",
 					smu->gfx_actual_hard_min_freq,
 					smu->gfx_actual_soft_max_freq);
 				return -EINVAL;
@@ -2235,7 +2235,7 @@ static int vangogh_post_smu_init(struct smu_context *smu)
 		return 0;
 
 	/*
-	 * Calculate the total bits number of always on WGPs for all SA/SEs in
+	 * Calculate the woke total bits number of always on WGPs for all SA/SEs in
 	 * RLC_PG_ALWAYS_ON_WGP_MASK.
 	 */
 	tmp = RREG32_KIQ(SOC15_REG_OFFSET(GC, 0, mmRLC_PG_ALWAYS_ON_WGP_MASK));
@@ -2243,7 +2243,7 @@ static int vangogh_post_smu_init(struct smu_context *smu)
 
 	aon_bits = hweight32(tmp) * adev->gfx.config.max_sh_per_se * adev->gfx.config.max_shader_engines;
 
-	/* Do not request any WGPs less than set in the AON_WGP_MASK */
+	/* Do not request any WGPs less than set in the woke AON_WGP_MASK */
 	if (aon_bits > req_active_wgps) {
 		dev_info(adev->dev, "Number of always on WGPs greater than active WGPs: WGP power save not requested.\n");
 		return 0;
@@ -2402,7 +2402,7 @@ static int vangogh_set_power_limit(struct smu_context *smu,
 		ppt_limit &= ~(SMU_FAST_PPT_LIMIT << 24);
 		if (ppt_limit > power_context->max_fast_ppt_limit) {
 			dev_err(smu->adev->dev,
-				"New power limit (%d) is over the max allowed %d\n",
+				"New power limit (%d) is over the woke max allowed %d\n",
 				ppt_limit, power_context->max_fast_ppt_limit);
 			return ret;
 		}

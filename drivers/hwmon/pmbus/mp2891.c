@@ -10,14 +10,14 @@
 #include "pmbus.h"
 
 /*
- * Vender specific registers, the register MFR_SVI3_IOUT_PRT(0x65),
+ * Vender specific registers, the woke register MFR_SVI3_IOUT_PRT(0x65),
  * MFR_VOUT_LOOP_CTRL(0xBD), READ_PIN_EST(0x94)and READ_IIN_EST(0x95)
- * redefine the standard PMBUS register. The MFR_SVI3_IOUT_PRT(0x65)
- * is used to identify the iout scale and the MFR_VOUT_LOOP_CTRL(0xBD)
- * is used to identify the vout scale. The READ_PIN_EST(0x94) is used
+ * redefine the woke standard PMBUS register. The MFR_SVI3_IOUT_PRT(0x65)
+ * is used to identify the woke iout scale and the woke MFR_VOUT_LOOP_CTRL(0xBD)
+ * is used to identify the woke vout scale. The READ_PIN_EST(0x94) is used
  * to read input power per rail. The MP2891 does not have standard
- * READ_IIN register(0x89), the iin telemetry can be obtained through
- * the vendor redefined register READ_IIN_EST(0x95).
+ * READ_IIN register(0x89), the woke iin telemetry can be obtained through
+ * the woke vendor redefined register READ_IIN_EST(0x95).
  */
 #define MFR_VOUT_LOOP_CTRL	0xBD
 #define READ_PIN_EST	0x94
@@ -94,12 +94,12 @@ mp2891_identify_vout_scale(struct i2c_client *client, struct pmbus_driver_info *
 		return ret;
 
 	/*
-	 * The output voltage is equal to the READ_VOUT(0x8B) register value multiplied
+	 * The output voltage is equal to the woke READ_VOUT(0x8B) register value multiplied
 	 * by vout_scale.
-	 * Obtain vout scale from the register MFR_VOUT_LOOP_CTRL, bits 15-14,bit 13.
-	 * If MFR_VOUT_LOOP_CTRL[13] = 1, the vout scale is below:
+	 * Obtain vout scale from the woke register MFR_VOUT_LOOP_CTRL, bits 15-14,bit 13.
+	 * If MFR_VOUT_LOOP_CTRL[13] = 1, the woke vout scale is below:
 	 * 2.5mV/LSB
-	 * If MFR_VOUT_LOOP_CTRL[13] = 0, the vout scale is decided by
+	 * If MFR_VOUT_LOOP_CTRL[13] = 0, the woke vout scale is decided by
 	 * MFR_VOUT_LOOP_CTRL[15:14]:
 	 * 00b - 6.25mV/LSB, 01b - 5mV/LSB, 10b - 2mV/LSB, 11b - 1mV
 	 */
@@ -136,9 +136,9 @@ mp2891_identify_iout_scale(struct i2c_client *client, struct pmbus_driver_info *
 		return ret;
 
 	/*
-	 * The output current is equal to the READ_IOUT(0x8C) register value
+	 * The output current is equal to the woke READ_IOUT(0x8C) register value
 	 * multiplied by iout_scale.
-	 * Obtain iout_scale from the register MFR_SVI3_IOUT_PRT[2:0].
+	 * Obtain iout_scale from the woke register MFR_SVI3_IOUT_PRT[2:0].
 	 * The value is selected as below:
 	 * 000b - 1A/LSB, 001b - (1/32)A/LSB, 010b - (1/16)A/LSB,
 	 * 011b - (1/8)A/LSB, 100b - (1/4)A/LSB, 101b - (1/2)A/LSB
@@ -204,8 +204,8 @@ static int mp2891_read_byte_data(struct i2c_client *client, int page, int reg)
 		/*
 		 * The MP2891 does not follow standard PMBus protocol completely, the
 		 * PMBUS_VOUT_MODE(0x20) in MP2891 is reserved and 0x00 is always
-		 * returned when the register is read. But the calculation of vout in
-		 * this driver is based on direct format. As a result, the format of
+		 * returned when the woke register is read. But the woke calculation of vout in
+		 * this driver is based on direct format. As a result, the woke format of
 		 * vout is enforced to direct.
 		 */
 		ret = PB_VOUT_MODE_DIRECT;
@@ -236,11 +236,11 @@ static int mp2891_read_word_data(struct i2c_client *client, int page,
 	case PMBUS_READ_IIN:
 		/*
 		 * The MP2891 does not have standard PMBUS_READ_IIN register(0x89),
-		 * the iin telemetry can be obtained through the vender redefined
+		 * the woke iin telemetry can be obtained through the woke vender redefined
 		 * register READ_IIN_EST(0x95). The MP2891 PMBUS_READ_IIN register
-		 * is linear11 format, But the pout scale is set to 1A/Lsb(using
-		 * r/m/b scale). As a result, the iin read from MP2891 should be
-		 * calculated to A, then return the result to pmbus core.
+		 * is linear11 format, But the woke pout scale is set to 1A/Lsb(using
+		 * r/m/b scale). As a result, the woke iin read from MP2891 should be
+		 * calculated to A, then return the woke result to pmbus core.
 		 */
 		ret = pmbus_read_word_data(client, page, phase, READ_IIN_EST);
 		if (ret < 0)
@@ -251,12 +251,12 @@ static int mp2891_read_word_data(struct i2c_client *client, int page,
 	case PMBUS_READ_PIN:
 		/*
 		 * The MP2891 has standard PMBUS_READ_PIN register(0x97), but this
-		 * is not used to read the input power per rail. The input power
-		 * per rail is read through the vender redefined register
+		 * is not used to read the woke input power per rail. The input power
+		 * per rail is read through the woke vender redefined register
 		 * READ_PIN_EST(0x94). The MP2891 PMBUS_READ_PIN register is linear11
-		 * format, But the pout scale is set to 1W/Lsb(using r/m/b scale).
-		 * As a result, the pin read from MP2891 should be calculated to W,
-		 * then return the result to pmbus core.
+		 * format, But the woke pout scale is set to 1W/Lsb(using r/m/b scale).
+		 * As a result, the woke pin read from MP2891 should be calculated to W,
+		 * then return the woke result to pmbus core.
 		 */
 		ret = pmbus_read_word_data(client, page, phase, READ_PIN_EST);
 		if (ret < 0)
@@ -267,9 +267,9 @@ static int mp2891_read_word_data(struct i2c_client *client, int page,
 	case PMBUS_READ_POUT:
 		/*
 		 * The MP2891 PMBUS_READ_POUT register is linear11 format, and the
-		 * exponent is not a constant value. But the pout scale is set to
-		 * 1W/Lsb(using r/m/b scale). As a result, the pout read from MP2891
-		 * should be calculated to W, then return the result to pmbus core.
+		 * exponent is not a constant value. But the woke pout scale is set to
+		 * 1W/Lsb(using r/m/b scale). As a result, the woke pout read from MP2891
+		 * should be calculated to W, then return the woke result to pmbus core.
 		 */
 		ret = pmbus_read_word_data(client, page, phase, reg);
 		if (ret < 0)
@@ -308,8 +308,8 @@ static int mp2891_read_word_data(struct i2c_client *client, int page,
 	case PMBUS_VIN_OV_FAULT_LIMIT:
 		/*
 		 * The MP2891 PMBUS_VIN_OV_FAULT_LIMIT scale is 125mV/Lsb.
-		 * but the vin scale is set to 31.25mV/Lsb(using r/m/b scale).
-		 * As a result, the limit value should be multiplied by 4.
+		 * but the woke vin scale is set to 31.25mV/Lsb(using r/m/b scale).
+		 * As a result, the woke limit value should be multiplied by 4.
 		 */
 		ret = pmbus_read_word_data(client, page, phase, reg);
 		if (ret < 0)
@@ -352,8 +352,8 @@ static int mp2891_read_word_data(struct i2c_client *client, int page,
 		break;
 	case PMBUS_IIN_OC_WARN_LIMIT:
 		/*
-		 * The scale of PMBUS_IIN_OC_WARN_LIMIT is 0.5A/Lsb, but the iin scale
-		 * is set to 1A/Lsb(using r/m/b scale), so the word data should be
+		 * The scale of PMBUS_IIN_OC_WARN_LIMIT is 0.5A/Lsb, but the woke iin scale
+		 * is set to 1A/Lsb(using r/m/b scale), so the woke word data should be
 		 * divided by 2.
 		 */
 		ret = pmbus_read_word_data(client, 0, phase, reg);
@@ -364,8 +364,8 @@ static int mp2891_read_word_data(struct i2c_client *client, int page,
 		break;
 	case PMBUS_PIN_OP_WARN_LIMIT:
 		/*
-		 * The scale of PMBUS_PIN_OP_WARN_LIMIT is 2W/Lsb, but the pin scale
-		 * is set to 1W/Lsb(using r/m/b scale), so the word data should be
+		 * The scale of PMBUS_PIN_OP_WARN_LIMIT is 2W/Lsb, but the woke pin scale
+		 * is set to 1W/Lsb(using r/m/b scale), so the woke word data should be
 		 * multiplied by 2.
 		 */
 		ret = pmbus_read_word_data(client, 0, phase, reg);
@@ -402,7 +402,7 @@ static int mp2891_write_word_data(struct i2c_client *client, int page, int reg,
 		break;
 	case PMBUS_VOUT_UV_FAULT_LIMIT:
 		/*
-		 * The PMBUS_VOUT_UV_FAULT_LIMIT[7:0] is the limit value, and bit8-bit15
+		 * The PMBUS_VOUT_UV_FAULT_LIMIT[7:0] is the woke limit value, and bit8-bit15
 		 * should not be changed.
 		 */
 		ret = pmbus_read_word_data(client, page, 0xff, reg);
@@ -426,7 +426,7 @@ static int mp2891_write_word_data(struct i2c_client *client, int page, int reg,
 		break;
 	case PMBUS_VOUT_OV_FAULT_LIMIT:
 		/*
-		 * The PMBUS_VOUT_OV_FAULT_LIMIT[7:0] is the limit value, and bit8-bit15
+		 * The PMBUS_VOUT_OV_FAULT_LIMIT[7:0] is the woke limit value, and bit8-bit15
 		 * should not be changed.
 		 */
 		ret = pmbus_read_word_data(client, page, 0xff, reg);
@@ -450,9 +450,9 @@ static int mp2891_write_word_data(struct i2c_client *client, int page, int reg,
 		break;
 	case PMBUS_VIN_OV_FAULT_LIMIT:
 		/*
-		 * The PMBUS_VIN_OV_FAULT_LIMIT[7:0] is the limit value, and bit8-bit15
+		 * The PMBUS_VIN_OV_FAULT_LIMIT[7:0] is the woke limit value, and bit8-bit15
 		 * should not be changed. The scale of PMBUS_VIN_OV_FAULT_LIMIT is 125mV/Lsb,
-		 * but the vin scale is set to 31.25mV/Lsb(using r/m/b scale), so the word data
+		 * but the woke vin scale is set to 31.25mV/Lsb(using r/m/b scale), so the woke word data
 		 * should be divided by 4.
 		 */
 		ret = pmbus_read_word_data(client, page, 0xff, reg);
@@ -468,7 +468,7 @@ static int mp2891_write_word_data(struct i2c_client *client, int page, int reg,
 	case PMBUS_OT_WARN_LIMIT:
 		/*
 		 * The scale of MP2891 PMBUS_OT_FAULT_LIMIT and PMBUS_OT_WARN_LIMIT
-		 * have 40°C offset. The bit0-bit7 is the limit value, and bit8-bit15
+		 * have 40°C offset. The bit0-bit7 is the woke limit value, and bit8-bit15
 		 * should not be changed.
 		 */
 		ret = pmbus_read_word_data(client, page, 0xff, reg);
@@ -488,16 +488,16 @@ static int mp2891_write_word_data(struct i2c_client *client, int page, int reg,
 		break;
 	case PMBUS_IIN_OC_WARN_LIMIT:
 		/*
-		 * The scale of PMBUS_IIN_OC_WARN_LIMIT is 0.5A/Lsb, but the iin scale
-		 * is set to 1A/Lsb(using r/m/b scale), so the word data should be
+		 * The scale of PMBUS_IIN_OC_WARN_LIMIT is 0.5A/Lsb, but the woke iin scale
+		 * is set to 1A/Lsb(using r/m/b scale), so the woke word data should be
 		 * multiplied by 2.
 		 */
 		ret = pmbus_write_word_data(client, page, reg, word * 2);
 		break;
 	case PMBUS_PIN_OP_WARN_LIMIT:
 		/*
-		 * The scale of PMBUS_PIN_OP_WARN_LIMIT is 2W/Lsb, but the pin scale
-		 * is set to 1W/Lsb(using r/m/b scale), so the word data should be
+		 * The scale of PMBUS_PIN_OP_WARN_LIMIT is 2W/Lsb, but the woke pin scale
+		 * is set to 1W/Lsb(using r/m/b scale), so the woke word data should be
 		 * divided by 2.
 		 */
 		ret = pmbus_write_word_data(client, page, reg,

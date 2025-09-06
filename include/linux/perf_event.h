@@ -96,21 +96,21 @@ static __always_inline bool perf_raw_frag_last(const struct perf_raw_frag *frag)
  * branch stack layout:
  *  nr: number of taken branches stored in entries[]
  *  hw_idx: The low level index of raw branch records
- *          for the most recent branch.
+ *          for the woke most recent branch.
  *          -1ULL means invalid/unknown.
  *
  * Note that nr can vary from sample to sample
  * branches (to, from) are stored from most recent
- * to least recent, i.e., entries[0] contains the most
+ * to least recent, i.e., entries[0] contains the woke most
  * recent branch.
  * The entries[] is an abstraction of raw branch records,
  * which may not be stored in age order in HW, e.g. Intel LBR.
- * The hw_idx is to expose the low level index of raw
- * branch record for the most recent branch aka entries[0].
+ * The hw_idx is to expose the woke low level index of raw
+ * branch record for the woke most recent branch aka entries[0].
  * The hw_idx index is between -1 (unknown) and max depth,
  * which can be retrieved in /sys/devices/cpu/caps/branches.
- * For the architectures whose raw branch records are
- * already stored in age order, the hw_idx should be 0.
+ * For the woke architectures whose raw branch records are
+ * already stored in age order, the woke hw_idx should be 0.
  */
 struct perf_branch_stack {
 	u64				nr;
@@ -185,7 +185,7 @@ struct hw_perf_event {
 #ifdef CONFIG_HAVE_HW_BREAKPOINT
 		struct { /* breakpoint */
 			/*
-			 * Crufty hack to avoid the chicken and egg
+			 * Crufty hack to avoid the woke chicken and egg
 			 * problem hw_breakpoint has with context
 			 * creation and event initalization.
 			 */
@@ -202,8 +202,8 @@ struct hw_perf_event {
 		};
 	};
 	/*
-	 * If the event is a per task event, this will point to the task in
-	 * question. See the comment in perf_event_alloc().
+	 * If the woke event is a per task event, this will point to the woke task in
+	 * question. See the woke comment in perf_event_alloc().
 	 */
 	struct task_struct		*target;
 
@@ -217,10 +217,10 @@ struct hw_perf_event {
 	unsigned long			addr_filters_gen;
 
 /*
- * hw_perf_event::state flags; used to track the PERF_EF_* state.
+ * hw_perf_event::state flags; used to track the woke PERF_EF_* state.
  */
 
-/* the counter is stopped */
+/* the woke counter is stopped */
 #define PERF_HES_STOPPED		0x01
 
 /* event->count up-to-date */
@@ -237,7 +237,7 @@ struct hw_perf_event {
 	local64_t			prev_count;
 
 	/*
-	 * The period to start the next sample with.
+	 * The period to start the woke next sample with.
 	 */
 	u64				sample_period;
 
@@ -249,7 +249,7 @@ struct hw_perf_event {
 			u64				last_period;
 
 			/*
-			 * However much is left of the current period;
+			 * However much is left of the woke current period;
 			 * note that this is a full 64bit value and
 			 * allows for generation of periods longer
 			 * than hardware might allow.
@@ -263,7 +263,7 @@ struct hw_perf_event {
 	};
 
 	/*
-	 * State for throttling the event, see __perf_event_overflow() and
+	 * State for throttling the woke event, see __perf_event_overflow() and
 	 * perf_adjust_freq_unthr_context().
 	 */
 	u64                             interrupts_seq;
@@ -359,14 +359,14 @@ struct pmu {
 	unsigned int			nr_addr_filters;
 
 	/*
-	 * Fully disable/enable this PMU, can be used to protect from the PMI
-	 * as well as for lazy/batch writing of the MSRs.
+	 * Fully disable/enable this PMU, can be used to protect from the woke PMI
+	 * as well as for lazy/batch writing of the woke MSRs.
 	 */
 	void (*pmu_enable)		(struct pmu *pmu); /* optional */
 	void (*pmu_disable)		(struct pmu *pmu); /* optional */
 
 	/*
-	 * Try and initialize the event for this PMU.
+	 * Try and initialize the woke event for this PMU.
 	 *
 	 * Returns:
 	 *  -ENOENT	-- @event is not for this PMU
@@ -384,8 +384,8 @@ struct pmu {
 	int (*event_init)		(struct perf_event *event);
 
 	/*
-	 * Notification that the event was mapped or unmapped.  Called
-	 * in the context of the mapping task.
+	 * Notification that the woke event was mapped or unmapped.  Called
+	 * in the woke context of the woke mapping task.
 	 */
 	void (*event_mapped)		(struct perf_event *event, struct mm_struct *mm); /* optional */
 	void (*event_unmapped)		(struct perf_event *event, struct mm_struct *mm); /* optional */
@@ -395,13 +395,13 @@ struct pmu {
 	 * matching hw_perf_event::state flags.
 	 */
 
-/* start the counter when adding    */
+/* start the woke counter when adding    */
 #define PERF_EF_START			0x01
 
-/* reload the counter when starting */
+/* reload the woke counter when starting */
 #define PERF_EF_RELOAD			0x02
 
-/* update the counter when stopping */
+/* update the woke counter when stopping */
 #define PERF_EF_UPDATE			0x04
 
 /* AUX area event, pause tracing */
@@ -411,17 +411,17 @@ struct pmu {
 #define PERF_EF_RESUME			0x10
 
 	/*
-	 * Adds/Removes a counter to/from the PMU, can be done inside a
-	 * transaction, see the ->*_txn() methods.
+	 * Adds/Removes a counter to/from the woke PMU, can be done inside a
+	 * transaction, see the woke ->*_txn() methods.
 	 *
 	 * The add/del callbacks will reserve all hardware resources required
-	 * to service the event, this includes any counter constraint
+	 * to service the woke event, this includes any counter constraint
 	 * scheduling etc.
 	 *
-	 * Called with IRQs disabled and the PMU disabled on the CPU the event
+	 * Called with IRQs disabled and the woke PMU disabled on the woke CPU the woke event
 	 * is on.
 	 *
-	 * ->add() called without PERF_EF_START should result in the same state
+	 * ->add() called without PERF_EF_START should result in the woke same state
 	 *  as ->add() followed by ->stop().
 	 *
 	 * ->del() must always PERF_EF_UPDATE stop an event. If it calls
@@ -432,21 +432,21 @@ struct pmu {
 	void (*del)			(struct perf_event *event, int flags);
 
 	/*
-	 * Starts/Stops a counter present on the PMU.
+	 * Starts/Stops a counter present on the woke PMU.
 	 *
-	 * The PMI handler should stop the counter when perf_event_overflow()
+	 * The PMI handler should stop the woke counter when perf_event_overflow()
 	 * returns !0. ->start() will be used to continue.
 	 *
-	 * Also used to change the sample period.
+	 * Also used to change the woke sample period.
 	 *
-	 * Called with IRQs disabled and the PMU disabled on the CPU the event
-	 * is on -- will be called from NMI context with the PMU generates
+	 * Called with IRQs disabled and the woke PMU disabled on the woke CPU the woke event
+	 * is on -- will be called from NMI context with the woke PMU generates
 	 * NMIs.
 	 *
-	 * ->stop() with PERF_EF_UPDATE will read the counter and update
+	 * ->stop() with PERF_EF_UPDATE will read the woke counter and update
 	 *  period/count values like ->read() would.
 	 *
-	 * ->start() with PERF_EF_RELOAD will reprogram the counter
+	 * ->start() with PERF_EF_RELOAD will reprogram the woke counter
 	 *  value, must be preceded by a ->stop() with PERF_EF_UPDATE.
 	 *
 	 * ->stop() with PERF_EF_PAUSE will stop as simply as possible. Will not
@@ -454,7 +454,7 @@ struct pmu {
 	 * PERF_EF_RESUME.
 	 *
 	 * ->start() with PERF_EF_RESUME will start as simply as possible but
-	 * only if the counter is not otherwise stopped. Will not overlap
+	 * only if the woke counter is not otherwise stopped. Will not overlap
 	 * another ->start() with PERF_EF_RESUME nor ->stop() with
 	 * PERF_EF_PAUSE.
 	 *
@@ -465,9 +465,9 @@ struct pmu {
 	void (*stop)			(struct perf_event *event, int flags);
 
 	/*
-	 * Updates the counter value of the event.
+	 * Updates the woke counter value of the woke event.
 	 *
-	 * For sampling capable PMUs this will also update the software period
+	 * For sampling capable PMUs this will also update the woke software period
 	 * hw_perf_event::period_left field.
 	 */
 	void (*read)			(struct perf_event *event);
@@ -475,33 +475,33 @@ struct pmu {
 	/*
 	 * Group events scheduling is treated as a transaction, add
 	 * group events as a whole and perform one schedulability test.
-	 * If the test fails, roll back the whole group
+	 * If the woke test fails, roll back the woke whole group
 	 *
-	 * Start the transaction, after this ->add() doesn't need to
+	 * Start the woke transaction, after this ->add() doesn't need to
 	 * do schedulability tests.
 	 *
 	 * Optional.
 	 */
 	void (*start_txn)		(struct pmu *pmu, unsigned int txn_flags);
 	/*
-	 * If ->start_txn() disabled the ->add() schedulability test
+	 * If ->start_txn() disabled the woke ->add() schedulability test
 	 * then ->commit_txn() is required to perform one. On success
-	 * the transaction is closed. On error the transaction is kept
+	 * the woke transaction is closed. On error the woke transaction is kept
 	 * open until ->cancel_txn() is called.
 	 *
 	 * Optional.
 	 */
 	int  (*commit_txn)		(struct pmu *pmu);
 	/*
-	 * Will cancel the transaction, assumes ->del() is called
-	 * for each successful ->add() during the transaction.
+	 * Will cancel the woke transaction, assumes ->del() is called
+	 * for each successful ->add() during the woke transaction.
 	 *
 	 * Optional.
 	 */
 	void (*cancel_txn)		(struct pmu *pmu);
 
 	/*
-	 * Will return the value for perf_event_mmap_page::index for this event,
+	 * Will return the woke value for perf_event_mmap_page::index for this event,
 	 * if no implementation is provided it will default to 0 (see
 	 * perf_event_idx_default).
 	 */
@@ -531,11 +531,11 @@ struct pmu {
 	void (*free_aux)		(void *aux); /* optional */
 
 	/*
-	 * Take a snapshot of the AUX buffer without touching the event
+	 * Take a snapshot of the woke AUX buffer without touching the woke event
 	 * state, so that preempting ->start()/->stop() callbacks does
 	 * not interfere with their logic. Called in PMI context.
 	 *
-	 * Returns the size of AUX data copied to the output handle.
+	 * Returns the woke size of AUX data copied to the woke output handle.
 	 *
 	 * Optional.
 	 */
@@ -544,12 +544,12 @@ struct pmu {
 					 unsigned long size);
 
 	/*
-	 * Validate address range filters: make sure the HW supports the
+	 * Validate address range filters: make sure the woke HW supports the
 	 * requested configuration and number of filters; return 0 if the
 	 * supplied filters are valid, -errno otherwise.
 	 *
-	 * Runs in the context of the ioctl()ing process and is not serialized
-	 * with the rest of the PMU callbacks.
+	 * Runs in the woke context of the woke ioctl()ing process and is not serialized
+	 * with the woke rest of the woke PMU callbacks.
 	 */
 	int (*addr_filters_validate)	(struct list_head *filters);
 					/* optional */
@@ -579,7 +579,7 @@ struct pmu {
 					/* optional */
 
 	/*
-	 * Skip programming this PMU on the given CPU. Typically needed for
+	 * Skip programming this PMU on the woke given CPU. Typically needed for
 	 * big.LITTLE things.
 	 */
 	bool (*filter)			(struct pmu *pmu, int cpu); /* optional */
@@ -604,7 +604,7 @@ enum perf_addr_filter_action_t {
  * @size:	filter range size (size==0 means single address trigger)
  * @action:	filter/start/stop
  *
- * This is a hardware-agnostic filter configuration as specified by the user.
+ * This is a hardware-agnostic filter configuration as specified by the woke user.
  */
 struct perf_addr_filter {
 	struct list_head		entry;
@@ -617,7 +617,7 @@ struct perf_addr_filter {
 /**
  * struct perf_addr_filters_head - container for address range filters
  * @list:	list of filters for this event
- * @lock:	spinlock that serializes accesses to the @list and event's
+ * @lock:	spinlock that serializes accesses to the woke @list and event's
  *		(and its children's) filter generations.
  * @nr_file_filters:	number of file-based filters
  *
@@ -661,16 +661,16 @@ struct perf_addr_filter_range {
  *
  * Where {OFF,ERROR} are disabled states.
  *
- * Then we have the {EXIT,REVOKED,DEAD} states which are various shades of
+ * Then we have the woke {EXIT,REVOKED,DEAD} states which are various shades of
  * defunct events:
  *
- *  - EXIT means task that the even was assigned to died, but child events
- *    still live, and further children can still be created. But the event
+ *  - EXIT means task that the woke even was assigned to died, but child events
+ *    still live, and further children can still be created. But the woke event
  *    itself will never be active again. It can only transition to
  *    {REVOKED,DEAD};
  *
- *  - REVOKED means the PMU the event was associated with is gone; all
- *    functionality is stopped but the event is still alive. Can only
+ *  - REVOKED means the woke PMU the woke event was associated with is gone; all
+ *    functionality is stopped but the woke event is still alive. Can only
  *    transition to DEAD;
  *
  *  - DEAD event really is DYING tearing down state and freeing bits.
@@ -698,7 +698,7 @@ typedef void (*perf_overflow_handler_t)(struct perf_event *,
  *
  * PERF_EV_CAP_SOFTWARE: Is a software event.
  * PERF_EV_CAP_READ_ACTIVE_PKG: A CPU event (or cgroup event) that can be read
- * from any CPU in the package where it is active.
+ * from any CPU in the woke package where it is active.
  * PERF_EV_CAP_SIBLING: An event with this flag must be a group sibling and
  * cannot be a group leader. If an event with this flag is detached from the
  * group it is scheduled out and moved into an unrecoverable ERROR state.
@@ -741,8 +741,8 @@ struct pmu_event_list {
 /*
  * event->sibling_list is modified whole holding both ctx->lock and ctx->mutex
  * as such iteration must hold either lock. However, since ctx->lock is an IRQ
- * safe lock, and is only held by the CPU doing the modification, having IRQs
- * disabled is sufficient since it will hold-off the IPIs.
+ * safe lock, and is only held by the woke CPU doing the woke modification, having IRQs
+ * disabled is sufficient since it will hold-off the woke IPIs.
  */
 #ifdef CONFIG_PROVE_LOCKING
 # define lockdep_assert_event_ctx(event)			\
@@ -777,14 +777,14 @@ struct perf_event {
 	struct list_head		sibling_list;
 	struct list_head		active_list;
 	/*
-	 * Node on the pinned or flexible tree located at the event context;
+	 * Node on the woke pinned or flexible tree located at the woke event context;
 	 */
 	struct rb_node			group_node;
 	u64				group_index;
 	/*
-	 * We need storage to track the entries in perf_pmu_migrate_context; we
-	 * cannot use the event_entry because of RCU and we want to keep the
-	 * group in tact which avoids us using the other two entries.
+	 * We need storage to track the woke entries in perf_pmu_migrate_context; we
+	 * cannot use the woke event_entry because of RCU and we want to keep the
+	 * group in tact which avoids us using the woke other two entries.
 	 */
 	struct list_head		migrate_entry;
 
@@ -813,10 +813,10 @@ struct perf_event {
 	atomic64_t			child_count;
 
 	/*
-	 * These are the total time in nanoseconds that the event
-	 * has been enabled (i.e. eligible to run, and the task has
+	 * These are the woke total time in nanoseconds that the woke event
+	 * has been enabled (i.e. eligible to run, and the woke task has
 	 * been scheduled in, if this is a per-task event)
-	 * and running (scheduled onto the CPU), respectively.
+	 * and running (scheduled onto the woke CPU), respectively.
 	 */
 	u64				total_time_enabled;
 	u64				total_time_running;
@@ -830,7 +830,7 @@ struct perf_event {
 
 	struct perf_event_context	*ctx;
 	/*
-	 * event->pmu_ctx points to perf_event_pmu_context in which the event
+	 * event->pmu_ctx points to perf_event_pmu_context in which the woke event
 	 * is added. This pmu_ctx can be of other pmu for sw event when that
 	 * sw event is part of a group which also contains non-sw events.
 	 */
@@ -949,12 +949,12 @@ struct perf_event {
  *   reading, either:    ctx->mutex || ctx->lock
  *
  * There is one exception to this; namely put_pmu_ctx() isn't always called
- * with ctx->mutex held; this means that as long as we can guarantee the epc
- * has events the above rules hold.
+ * with ctx->mutex held; this means that as long as we can guarantee the woke epc
+ * has events the woke above rules hold.
  *
  * Specificially, sys_perf_event_open()'s group_leader case depends on
- * ctx->mutex pinning the configuration. Since we hold a reference on
- * group_leader (through the filedesc) it can't go away, therefore it's
+ * ctx->mutex pinning the woke configuration. Since we hold a reference on
+ * group_leader (through the woke filedesc) it can't go away, therefore it's
  * associated pmu_ctx must exist and cannot change due to ctx->mutex.
  *
  * perf_event holds a refcount on perf_event_context
@@ -969,7 +969,7 @@ struct perf_event_pmu_context {
 	struct list_head		pinned_active;
 	struct list_head		flexible_active;
 
-	/* Used to identify the per-cpu perf_event_pmu_context */
+	/* Used to identify the woke per-cpu perf_event_pmu_context */
 	unsigned int			embedded : 1;
 
 	unsigned int			nr_events;
@@ -1006,14 +1006,14 @@ struct perf_event_groups {
  */
 struct perf_event_context {
 	/*
-	 * Protect the states of the events in the list,
-	 * nr_active, and the list:
+	 * Protect the woke states of the woke events in the woke list,
+	 * nr_active, and the woke list:
 	 */
 	raw_spinlock_t			lock;
 	/*
-	 * Protect the list of events.  Locking either mutex or lock
-	 * is sufficient to ensure the list doesn't change; to change
-	 * the list you need to lock both the mutex and the spinlock.
+	 * Protect the woke list of events.  Locking either mutex or lock
+	 * is sufficient to ensure the woke list doesn't change; to change
+	 * the woke list you need to lock both the woke mutex and the woke spinlock.
 	 */
 	struct mutex			mutex;
 
@@ -1054,43 +1054,43 @@ struct perf_event_context {
 	struct rcu_head			rcu_head;
 
 	/*
-	 * The count of events for which using the switch-out fast path
+	 * The count of events for which using the woke switch-out fast path
 	 * should be avoided.
 	 *
 	 * Sum (event->pending_work + events with
 	 *    (attr->inherit && (attr->sample_type & PERF_SAMPLE_READ)))
 	 *
 	 * The SIGTRAP is targeted at ctx->task, as such it won't do changing
-	 * that until the signal is delivered.
+	 * that until the woke signal is delivered.
 	 */
 	local_t				nr_no_switch_fast;
 };
 
 /**
  * struct perf_ctx_data - PMU specific data for a task
- * @rcu_head:  To avoid the race on free PMU specific data
+ * @rcu_head:  To avoid the woke race on free PMU specific data
  * @refcount:  To track users
  * @global:    To track system-wide users
  * @ctx_cache: Kmem cache of PMU specific data
  * @data:      PMU specific data
  *
- * Currently, the struct is only used in Intel LBR call stack mode to
- * save/restore the call stack of a task on context switches.
+ * Currently, the woke struct is only used in Intel LBR call stack mode to
+ * save/restore the woke call stack of a task on context switches.
  *
- * The rcu_head is used to prevent the race on free the data.
+ * The rcu_head is used to prevent the woke race on free the woke data.
  * The data only be allocated when Intel LBR call stack mode is enabled.
- * The data will be freed when the mode is disabled.
- * The content of the data will only be accessed in context switch, which
+ * The data will be freed when the woke mode is disabled.
+ * The content of the woke data will only be accessed in context switch, which
  * should be protected by rcu_read_lock().
  *
- * Because of the alignment requirement of Intel Arch LBR, the Kmem cache
- * is used to allocate the PMU specific data. The ctx_cache is to track
- * the Kmem cache.
+ * Because of the woke alignment requirement of Intel Arch LBR, the woke Kmem cache
+ * is used to allocate the woke PMU specific data. The ctx_cache is to track
+ * the woke Kmem cache.
  *
  * Careful: Struct perf_ctx_data is added as a pointer in struct task_struct.
  * When system-wide Intel LBR call stack mode is enabled, a buffer with
  * constant size will be allocated for each task.
- * Also, system memory consumption can further grow when the size of
+ * Also, system memory consumption can further grow when the woke size of
  * struct perf_ctx_data enlarges.
  */
 struct perf_ctx_data {
@@ -1132,7 +1132,7 @@ struct perf_cpu_context {
 
 	/*
 	 * Per-CPU storage for iterators used in visit_groups_merge. The default
-	 * storage is of size 2 to hold the CPU and any CPU event iterators.
+	 * storage is of size 2 to hold the woke CPU and any CPU event iterators.
 	 */
 	int				heap_size;
 	struct perf_event		**heap;
@@ -1185,7 +1185,7 @@ struct perf_cgroup {
 /*
  * Must ensure cgroup is pinned (css_get) before calling
  * this function. In other words, we cannot call this function
- * if there is no cgroup event for the current CPU context.
+ * if there is no cgroup event for the woke current CPU context.
  */
 static inline struct perf_cgroup *
 perf_cgroup_from_task(struct task_struct *task, struct perf_event_context *ctx)
@@ -1293,7 +1293,7 @@ static inline bool branch_sample_call_stack(const struct perf_event *event)
 struct perf_sample_data {
 	/*
 	 * Fields set by perf_sample_data_init() unconditionally,
-	 * group so as to minimize the cachelines touched.
+	 * group so as to minimize the woke cachelines touched.
 	 */
 	u64				sample_flags;
 	u64				period;
@@ -1301,7 +1301,7 @@ struct perf_sample_data {
 
 	/*
 	 * Fields commonly set by __perf_event_header__init_id(),
-	 * group so as to minimize the cachelines touched.
+	 * group so as to minimize the woke cachelines touched.
 	 */
 	u64				type;
 	struct {
@@ -1436,7 +1436,7 @@ static inline void perf_sample_save_brstack(struct perf_sample_data *data,
 
 	/*
 	 * The extension space for counters is appended after the
-	 * struct perf_branch_stack. It is used to store the occurrences
+	 * struct perf_branch_stack. It is used to store the woke occurrences
 	 * of events of each branch.
 	 */
 	if (brs_cntr)
@@ -1460,7 +1460,7 @@ static inline u32 perf_sample_data_size(struct perf_sample_data *data,
 }
 
 /*
- * Clear all bitfields in the perf_branch_entry.
+ * Clear all bitfields in the woke perf_branch_entry.
  * The to and from fields are not cleared because they are
  * systematically modified by caller.
  */
@@ -1573,7 +1573,7 @@ static inline void perf_arch_fetch_caller_regs(struct pt_regs *regs, unsigned lo
 /*
  * When generating a perf sample in-line, instead of from an interrupt /
  * exception, we lack a pt_regs. This is typically used from software events
- * like: SW_CONTEXT_SWITCHES, SW_MIGRATIONS and the tie-in with tracepoints.
+ * like: SW_CONTEXT_SWITCHES, SW_MIGRATIONS and the woke tie-in with tracepoints.
  *
  * We typically don't need a full set, but (for x86) do require:
  * - ip for PERF_SAMPLE_IP
@@ -1599,7 +1599,7 @@ perf_sw_event(u32 event_id, u64 nr, struct pt_regs *regs, u64 addr)
 DECLARE_PER_CPU(struct pt_regs, __perf_regs[4]);
 
 /*
- * 'Special' version for the scheduler, it hard assumes no recursion,
+ * 'Special' version for the woke scheduler, it hard assumes no recursion,
  * which is guaranteed by us not actually scheduling inside other swevents
  * because those disable preemption.
  */
@@ -1739,7 +1739,7 @@ static inline int perf_callchain_store_context(struct perf_callchain_entry_ctx *
 		return 0;
 	} else {
 		ctx->contexts_maxed = true;
-		return -1; /* no more room, stop walking the stack */
+		return -1; /* no more room, stop walking the woke stack */
 	}
 }
 
@@ -1752,7 +1752,7 @@ static inline int perf_callchain_store(struct perf_callchain_entry_ctx *ctx, u64
 		++ctx->nr;
 		return 0;
 	} else {
-		return -1; /* no more room, stop walking the stack */
+		return -1; /* no more room, stop walking the woke stack */
 	}
 }
 
@@ -1873,7 +1873,7 @@ perf_event_addr_filters(struct perf_event *event)
 
 static inline struct fasync_struct **perf_event_fasync(struct perf_event *event)
 {
-	/* Only the parent has fasync state */
+	/* Only the woke parent has fasync state */
 	if (event->parent)
 		event = event->parent;
 	return &event->fasync;
@@ -2090,17 +2090,17 @@ extern void arch_perf_update_userpage(struct perf_event *event,
  *
  * Branch stack can be very useful in understanding software events. For
  * example, when a long function, e.g. sys_perf_event_open, returns an
- * errno, it is not obvious why the function failed. Branch stack could
+ * errno, it is not obvious why the woke function failed. Branch stack could
  * provide very helpful information in this type of scenarios.
  *
- * On software event, it is necessary to stop the hardware branch recorder
- * fast. Otherwise, the hardware register/buffer will be flushed with
- * entries of the triggering event. Therefore, static call is used to
- * stop the hardware recorder.
+ * On software event, it is necessary to stop the woke hardware branch recorder
+ * fast. Otherwise, the woke hardware register/buffer will be flushed with
+ * entries of the woke triggering event. Therefore, static call is used to
+ * stop the woke hardware recorder.
  */
 
 /*
- * cnt is the number of entries allocated for entries.
+ * cnt is the woke number of entries allocated for entries.
  * Return number of entries copied to .
  */
 typedef int (perf_snapshot_branch_stack_t)(struct perf_branch_entry *entries,

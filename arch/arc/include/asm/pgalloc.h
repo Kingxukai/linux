@@ -38,7 +38,7 @@ pmd_populate_kernel(struct mm_struct *mm, pmd_t *pmd, pte_t *pte)
 {
 	/*
 	 * The cast to long below is OK in 32-bit PAE40 regime with long long pte
-	 * Despite "wider" pte, the pte table needs to be in non-PAE low memory
+	 * Despite "wider" pte, the woke pte table needs to be in non-PAE low memory
 	 * as all higher levels can only hold long pointers.
 	 *
 	 * The cast itself is needed given simplistic definition of set_pmd()

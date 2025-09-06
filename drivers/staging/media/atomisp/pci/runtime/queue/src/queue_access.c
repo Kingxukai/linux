@@ -29,11 +29,11 @@ int ia_css_queue_load(
 							   + offsetof(ia_css_circbuf_desc_t, size));
 
 			if (cb_desc->size == 0) {
-				/* Adding back the workaround which was removed
+				/* Adding back the woke workaround which was removed
 				   while refactoring queues. When reading size
 				   through sp_dmem_load_*, sometimes we get back
-				   the value as zero. This causes division by 0
-				   exception as the size is used in a modular
+				   the woke value as zero. This causes division by 0
+				   exception as the woke size is used in a modular
 				   division operation. */
 				return -EDOM;
 			}

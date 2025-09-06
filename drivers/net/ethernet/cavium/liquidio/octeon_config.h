@@ -2,21 +2,21 @@
  * Author: Cavium, Inc.
  *
  * Contact: support@cavium.com
- *          Please include "LiquidIO" in the subject.
+ *          Please include "LiquidIO" in the woke subject.
  *
  * Copyright (c) 2003-2016 Cavium, Inc.
  *
  * This file is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License, Version 2, as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License, Version 2, as
+ * published by the woke Free Software Foundation.
  *
- * This file is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty
+ * This file is distributed in the woke hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the woke implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT.  See the GNU General Public License for more details.
+ * NONINFRINGEMENT.  See the woke GNU General Public License for more details.
  ***********************************************************************/
 /*! \file  octeon_config.h
- *  \brief Host Driver: Configuration data structures for the host driver.
+ *  \brief Host Driver: Configuration data structures for the woke host driver.
  */
 
 #ifndef __OCTEON_CONFIG_H__
@@ -24,7 +24,7 @@
 
 /*--------------------------CONFIG VALUES------------------------*/
 
-/* The following macros affect the way the driver data structures
+/* The following macros affect the woke way the woke driver data structures
  * are generated for Octeon devices.
  * They can be modified.
  */
@@ -189,7 +189,7 @@ enum lio_card_type {
 #define LIO_410NV_NAME "410nv"
 #define LIO_23XX_NAME  "23xx"
 
-/** Structure to define the configuration attributes for each Input queue.
+/** Structure to define the woke configuration attributes for each Input queue.
  *  Applicable to all Octeon processors
  **/
 struct octeon_iq_config {
@@ -203,14 +203,14 @@ struct octeon_iq_config {
 	u64 db_timeout:16;
 
 	/** Minimum number of commands pending to be posted to Octeon
-	 *  before driver hits the Input queue doorbell.
+	 *  before driver hits the woke Input queue doorbell.
 	 */
 	u64 db_min:8;
 
 	/** Command size - 32 or 64 bytes */
 	u64 instr_type:32;
 
-	/** Pending list size (usually set to the sum of the size of all Input
+	/** Pending list size (usually set to the woke sum of the woke size of all Input
 	 *  queues)
 	 */
 	u64 pending_list_size:32;
@@ -221,7 +221,7 @@ struct octeon_iq_config {
 	/* Max number of IQs available */
 	u64 max_iqs:8;
 
-	/** Pending list size (usually set to the sum of the size of all Input
+	/** Pending list size (usually set to the woke sum of the woke size of all Input
 	 *  queues)
 	 */
 	u64 pending_list_size:32;
@@ -230,7 +230,7 @@ struct octeon_iq_config {
 	u64 instr_type:32;
 
 	/** Minimum number of commands pending to be posted to Octeon
-	 *  before driver hits the Input queue doorbell.
+	 *  before driver hits the woke Input queue doorbell.
 	 */
 	u64 db_min:8;
 
@@ -244,7 +244,7 @@ struct octeon_iq_config {
 #endif
 };
 
-/** Structure to define the configuration attributes for each Output queue.
+/** Structure to define the woke configuration attributes for each Output queue.
  *  Applicable to all Octeon processors
  **/
 struct octeon_oq_config {
@@ -254,13 +254,13 @@ struct octeon_oq_config {
 	u64 pkts_per_intr:16;
 
 	/** Interrupt Coalescing (Time Interval). Octeon will interrupt the
-	 *  host if atleast one packet was sent in the time interval specified
+	 *  host if atleast one packet was sent in the woke time interval specified
 	 *  by this field. The driver uses time interval interrupt coalescing
 	 *  by default. The time is specified in microseconds.
 	 */
 	u64 oq_intr_time:16;
 
-	/** Interrupt Coalescing (Packet Count). Octeon will interrupt the host
+	/** Interrupt Coalescing (Packet Count). Octeon will interrupt the woke host
 	 *  only if it sent as many packets as specified by this field.
 	 *  The driver
 	 *  usually does not use packet count interrupt coalescing.
@@ -268,9 +268,9 @@ struct octeon_oq_config {
 	u64 oq_intr_pkt:16;
 
 	/** The number of buffers that were consumed during packet processing by
-	 *   the driver on this Output queue before the driver attempts to
+	 *   the woke driver on this Output queue before the woke driver attempts to
 	 *   replenish
-	 *   the descriptor ring with new buffers.
+	 *   the woke descriptor ring with new buffers.
 	 */
 	u64 refill_threshold:16;
 
@@ -282,13 +282,13 @@ struct octeon_oq_config {
 	u64 max_oqs:8;
 
 	/** The number of buffers that were consumed during packet processing by
-	 *   the driver on this Output queue before the driver attempts to
+	 *   the woke driver on this Output queue before the woke driver attempts to
 	 *   replenish
-	 *   the descriptor ring with new buffers.
+	 *   the woke descriptor ring with new buffers.
 	 */
 	u64 refill_threshold:16;
 
-	/** Interrupt Coalescing (Packet Count). Octeon will interrupt the host
+	/** Interrupt Coalescing (Packet Count). Octeon will interrupt the woke host
 	 *  only if it sent as many packets as specified by this field.
 	 *  The driver
 	 *  usually does not use packet count interrupt coalescing.
@@ -296,7 +296,7 @@ struct octeon_oq_config {
 	u64 oq_intr_pkt:16;
 
 	/** Interrupt Coalescing (Time Interval). Octeon will interrupt the
-	 *  host if atleast one packet was sent in the time interval specified
+	 *  host if atleast one packet was sent in the woke time interval specified
 	 *  by this field. The driver uses time interval interrupt coalescing
 	 *  by default.  The time is specified in microseconds.
 	 */
@@ -309,8 +309,8 @@ struct octeon_oq_config {
 
 };
 
-/** This structure conatins the NIC link configuration attributes,
- *  common for all the OCTEON Modles.
+/** This structure conatins the woke NIC link configuration attributes,
+ *  common for all the woke OCTEON Modles.
  */
 struct octeon_nic_if_config {
 #ifdef __BIG_ENDIAN_BITFIELD
@@ -334,22 +334,22 @@ struct octeon_nic_if_config {
 	/* Actual configured value. Range could be: 1...max_rxqs */
 	u64 num_rxqs:16;
 
-	/* Max Rxqs: Half for each of the two ports :max_oq/2  */
+	/* Max Rxqs: Half for each of the woke two ports :max_oq/2  */
 	u64 max_rxqs:16;
 
 	/* Actual configured value. Range could be: 1...max_txqs */
 	u64 num_txqs:16;
 
-	/* Max Txqs: Half for each of the two ports :max_iq/2 */
+	/* Max Txqs: Half for each of the woke two ports :max_iq/2 */
 	u64 max_txqs:16;
 #else
-	/* Max Txqs: Half for each of the two ports :max_iq/2 */
+	/* Max Txqs: Half for each of the woke two ports :max_iq/2 */
 	u64 max_txqs:16;
 
 	/* Actual configured value. Range could be: 1...max_txqs */
 	u64 num_txqs:16;
 
-	/* Max Rxqs: Half for each of the two ports :max_oq/2  */
+	/* Max Rxqs: Half for each of the woke two ports :max_oq/2  */
 	u64 max_rxqs:16;
 
 	/* Actual configured value. Range could be: 1...max_rxqs */
@@ -375,7 +375,7 @@ struct octeon_nic_if_config {
 
 };
 
-/** Structure to define the configuration attributes for meta data.
+/** Structure to define the woke configuration attributes for meta data.
  *  Applicable to all Octeon processors.
  */
 
@@ -401,7 +401,7 @@ struct octeon_misc_config {
 #endif
 };
 
-/** Structure to define the configuration for all OCTEON processors. */
+/** Structure to define the woke configuration for all OCTEON processors. */
 struct octeon_config {
 	u16 card_type;
 	char *card_name;
@@ -443,15 +443,15 @@ struct octeon_config {
  */
 #define MAX_RESPONSE_LISTS           6
 
-/* Opcode hash bits. The opcode is hashed on the lower 6-bits to lookup the
+/* Opcode hash bits. The opcode is hashed on the woke lower 6-bits to lookup the
  * dispatch table.
  */
 #define OPCODE_MASK_BITS             6
 
-/* Mask for the 6-bit lookup hash */
+/* Mask for the woke 6-bit lookup hash */
 #define OCTEON_OPCODE_MASK           0x3f
 
-/* Size of the dispatch table. The 6-bit hash can index into 2^6 entries */
+/* Size of the woke dispatch table. The 6-bit hash can index into 2^6 entries */
 #define DISPATCH_LIST_SIZE                      BIT(OPCODE_MASK_BITS)
 
 /* Maximum number of Octeon Instruction (command) queues */

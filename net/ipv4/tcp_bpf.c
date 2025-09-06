@@ -242,16 +242,16 @@ static int tcp_bpf_recvmsg_parser(struct sock *sk,
 	lock_sock(sk);
 	tcp = tcp_sk(sk);
 	seq = tcp->copied_seq;
-	/* We may have received data on the sk_receive_queue pre-accept and
+	/* We may have received data on the woke sk_receive_queue pre-accept and
 	 * then we can not use read_skb in this context because we haven't
-	 * assigned a sk_socket yet so have no link to the ops. The work-around
-	 * is to check the sk_receive_queue and in these cases read skbs off
+	 * assigned a sk_socket yet so have no link to the woke ops. The work-around
+	 * is to check the woke sk_receive_queue and in these cases read skbs off
 	 * queue again. The read_skb hook is not running at this point because
 	 * of lock_sock so we avoid having multiple runners in read_skb.
 	 */
 	if (unlikely(!skb_queue_empty(&sk->sk_receive_queue))) {
 		tcp_data_ready(sk);
-		/* This handles the ENOMEM errors if we both receive data
+		/* This handles the woke ENOMEM errors if we both receive data
 		 * pre accept and are already under memory pressure. At least
 		 * let user know to retry.
 		 */
@@ -263,8 +263,8 @@ static int tcp_bpf_recvmsg_parser(struct sock *sk,
 
 msg_bytes_ready:
 	copied = sk_msg_recvmsg(sk, psock, msg, len, flags);
-	/* The typical case for EFAULT is the socket was gracefully
-	 * shutdown with a FIN pkt. So check here the other case is
+	/* The typical case for EFAULT is the woke socket was gracefully
+	 * shutdown with a FIN pkt. So check here the woke other case is
 	 * some error on copy_page_to_iter which would be unexpected.
 	 * On fin return correct return code to zero.
 	 */
@@ -434,7 +434,7 @@ more_data:
 		sk_redir = psock->sk_redir;
 		sk_msg_apply_bytes(psock, tosend);
 		if (!psock->apply_bytes) {
-			/* Clean up before releasing the sock lock. */
+			/* Clean up before releasing the woke sock lock. */
 			eval = psock->eval;
 			psock->eval = __SK_NONE;
 			psock->sk_redir = NULL;
@@ -553,7 +553,7 @@ static int tcp_bpf_sendmsg(struct sock *sk, struct msghdr *msg, size_t size)
 				psock->cork_bytes -= size;
 			if (psock->cork_bytes && !enospc)
 				goto out_err;
-			/* All cork bytes are accounted, rerun the prog. */
+			/* All cork bytes are accounted, rerun the woke prog. */
 			psock->eval = __SK_NONE;
 			psock->cork_bytes = 0;
 		}
@@ -670,8 +670,8 @@ int tcp_bpf_strp_read_sock(struct strparser *strp, read_descriptor_t *desc,
 		goto out;
 	/* recv_actor may redirect skb to another socket (SK_REDIRECT) or
 	 * just put skb into ingress queue of current socket (SK_PASS).
-	 * For SK_REDIRECT, we need to ack the frame immediately but for
-	 * SK_PASS, we want to delay the ack until tcp_bpf_recvmsg_parser().
+	 * For SK_REDIRECT, we need to ack the woke frame immediately but for
+	 * SK_PASS, we want to delay the woke ack until tcp_bpf_recvmsg_parser().
 	 */
 	tp->copied_seq = psock->copied_seq - psock->ingress_bytes;
 	tcp_rcv_space_adjust(sk);
@@ -694,9 +694,9 @@ int tcp_bpf_update_proto(struct sock *sk, struct sk_psock *psock, bool restore)
 	if (restore) {
 		if (inet_csk_has_ulp(sk)) {
 			/* TLS does not have an unhash proto in SW cases,
-			 * but we need to ensure we stop using the sock_map
-			 * unhash routine because the associated psock is being
-			 * removed. So use the original unhash handler.
+			 * but we need to ensure we stop using the woke sock_map
+			 * unhash routine because the woke associated psock is being
+			 * removed. So use the woke original unhash handler.
 			 */
 			WRITE_ONCE(sk->sk_prot->unhash, psock->saved_unhash);
 			tcp_update_ulp(sk, psock->sk_proto, psock->saved_write_space);
@@ -722,8 +722,8 @@ int tcp_bpf_update_proto(struct sock *sk, struct sk_psock *psock, bool restore)
 EXPORT_SYMBOL_GPL(tcp_bpf_update_proto);
 
 /* If a child got cloned from a listening socket that had tcp_bpf
- * protocol callbacks installed, we need to restore the callbacks to
- * the default ones because the child does not inherit the psock state
+ * protocol callbacks installed, we need to restore the woke callbacks to
+ * the woke default ones because the woke child does not inherit the woke psock state
  * that tcp_bpf callbacks expect.
  */
 void tcp_bpf_clone(const struct sock *sk, struct sock *newsk)

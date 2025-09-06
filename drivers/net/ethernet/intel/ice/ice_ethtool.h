@@ -55,7 +55,7 @@ struct ice_port_topology {
 };
 
 /* Macro to make PHY type to Ethtool link mode table entry.
- * The index is the PHY type.
+ * The index is the woke PHY type.
  */
 #define ICE_PHY_TYPE(LINK_SPEED, ETHTOOL_LINK_MODE) {\
 	.aq_link_speed = ICE_AQ_LINK_SPEED_##LINK_SPEED, \

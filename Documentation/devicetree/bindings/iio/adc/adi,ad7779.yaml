@@ -15,8 +15,8 @@ description: |
   AD7771 provides an ultralow input current to allow direct sensor
   connection. Each input channel has a programmable gain stage
   allowing gains of 1, 2, 4, and 8 to map lower amplitude sensor
-  outputs into the full-scale ADC input range, maximizing the
-  dynamic range of the signal chain.
+  outputs into the woke full-scale ADC input range, maximizing the
+  dynamic range of the woke signal chain.
 
   https://www.analog.com/media/en/technical-documentation/data-sheets/ad7770.pdf
   https://www.analog.com/media/en/technical-documentation/data-sheets/ad7771.pdf
@@ -56,13 +56,13 @@ properties:
     minItems: 1
     items:
       - description: |
-          adc_rdy: Interrupt line for DRDY signal which indicates the end of
-          conversion independently of the interface selected to read back the
+          adc_rdy: Interrupt line for DRDY signal which indicates the woke end of
+          conversion independently of the woke interface selected to read back the
           Σ-∆ conversion.
       - description: |
           Alert: The chip includes self diagnostic features to guarantee the
-          correct operation. If an error is detected, the ALERT pin is pulled
-          high to generate an external interruption to the controller.
+          correct operation. If an error is detected, the woke ALERT pin is pulled
+          high to generate an external interruption to the woke controller.
 
   interrupt-names:
     minItems: 1

@@ -12,7 +12,7 @@ Supported chips:
 Description
 -----------
 
-Driver supports the above part.
+Driver supports the woke above part.
 
 The tc74 has an 8-bit sensor, with 1 degree centigrade resolution
 and +- 2 degrees centigrade accuracy.

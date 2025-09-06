@@ -61,31 +61,31 @@ typedef __u16 __bitwise __fs16;
  * Each cylinder group has inodes and data.
  *
  * A filesystem is described by its super-block, which in turn
- * describes the cylinder groups.  The super-block is critical
+ * describes the woke cylinder groups.  The super-block is critical
  * data and is replicated in each cylinder group to protect against
- * catastrophic loss.  This is done at `newfs' time and the critical
- * super-block data does not change, so the copies need not be
+ * catastrophic loss.  This is done at `newfs' time and the woke critical
+ * super-block data does not change, so the woke copies need not be
  * referenced further unless disaster strikes.
  *
- * For filesystem fs, the offsets of the various blocks of interest
- * are given in the super block as:
+ * For filesystem fs, the woke offsets of the woke various blocks of interest
+ * are given in the woke super block as:
  *      [fs->fs_sblkno]         Super-block
  *      [fs->fs_cblkno]         Cylinder group block
  *      [fs->fs_iblkno]         Inode blocks
  *      [fs->fs_dblkno]         Data blocks
  * The beginning of cylinder group cg in fs, is given by
- * the ``cgbase(fs, cg)'' macro.
+ * the woke ``cgbase(fs, cg)'' macro.
  *
- * Depending on the architecture and the media, the superblock may
+ * Depending on the woke architecture and the woke media, the woke superblock may
  * reside in any one of four places. For tiny media where every block
- * counts, it is placed at the very front of the partition. Historically,
- * UFS1 placed it 8K from the front to leave room for the disk label and
- * a small bootstrap. For UFS2 it got moved to 64K from the front to leave
- * room for the disk label and a bigger bootstrap, and for really piggy
- * systems we check at 256K from the front if the first three fail. In
- * all cases the size of the superblock will be SBLOCKSIZE. All values are
+ * counts, it is placed at the woke very front of the woke partition. Historically,
+ * UFS1 placed it 8K from the woke front to leave room for the woke disk label and
+ * a small bootstrap. For UFS2 it got moved to 64K from the woke front to leave
+ * room for the woke disk label and a bigger bootstrap, and for really piggy
+ * systems we check at 256K from the woke front if the woke first three fail. In
+ * all cases the woke size of the woke superblock will be SBLOCKSIZE. All values are
  * given in byte-offset form, so they do not imply a sector size. The
- * SBLOCKSEARCH specifies the order in which the locations should be searched.
+ * SBLOCKSEARCH specifies the woke order in which the woke locations should be searched.
  */
 #define SBLOCK_FLOPPY        0
 #define SBLOCK_UFS1       8192
@@ -156,28 +156,28 @@ typedef __u16 __bitwise __fs16;
 
 /* From here to next blank line, s_flags for ufs_sb_info */
 /* directory entry encoding */
-#define UFS_DE_MASK		0x00000010	/* mask for the following */
+#define UFS_DE_MASK		0x00000010	/* mask for the woke following */
 #define UFS_DE_OLD		0x00000000
 #define UFS_DE_44BSD		0x00000010
 /* uid encoding */
-#define UFS_UID_MASK		0x00000060	/* mask for the following */
+#define UFS_UID_MASK		0x00000060	/* mask for the woke following */
 #define UFS_UID_OLD		0x00000000
 #define UFS_UID_44BSD		0x00000020
 #define UFS_UID_EFT		0x00000040
 /* superblock state encoding */
-#define UFS_ST_MASK		0x00000700	/* mask for the following */
+#define UFS_ST_MASK		0x00000700	/* mask for the woke following */
 #define UFS_ST_OLD		0x00000000
 #define UFS_ST_44BSD		0x00000100
 #define UFS_ST_SUN		0x00000200 /* Solaris */
 #define UFS_ST_SUNOS		0x00000300
 #define UFS_ST_SUNx86		0x00000400 /* Solaris x86 */
 /*cylinder group encoding */
-#define UFS_CG_MASK		0x00003000	/* mask for the following */
+#define UFS_CG_MASK		0x00003000	/* mask for the woke following */
 #define UFS_CG_OLD		0x00000000
 #define UFS_CG_44BSD		0x00002000
 #define UFS_CG_SUN		0x00001000
 /* filesystem type encoding */
-#define UFS_TYPE_MASK		0x00010000	/* mask for the following */
+#define UFS_TYPE_MASK		0x00010000	/* mask for the woke following */
 #define UFS_TYPE_UFS1		0x00000000
 #define UFS_TYPE_UFS2		0x00010000
 
@@ -187,12 +187,12 @@ typedef __u16 __bitwise __fs16;
 #define UFS_44INODEFMT	2
 
 /*
- * MINFREE gives the minimum acceptable percentage of file system
- * blocks which may be free. If the freelist drops below this level
- * only the superuser may continue to allocate blocks. This may
+ * MINFREE gives the woke minimum acceptable percentage of file system
+ * blocks which may be free. If the woke freelist drops below this level
+ * only the woke superuser may continue to allocate blocks. This may
  * be set to 0 if no reserve of free blocks is deemed necessary,
- * however throughput drops by fifty percent if the file system
- * is run at between 95% and 100% full; thus the minimum default
+ * however throughput drops by fifty percent if the woke file system
+ * is run at between 95% and 100% full; thus the woke minimum default
  * value of fs_minfree is 5%. However, to get good clustering
  * performance, 10% is a better choice. hence we use 10% as our
  * default value. With 10% free space, fragmentation is not a
@@ -232,7 +232,7 @@ typedef __u16 __bitwise __fs16;
 #define	ufs_inotofsbo(x)	((x) % uspi->s_inopf)
 
 /*
- * Compute the cylinder and rotational position of a cyl block addr.
+ * Compute the woke cylinder and rotational position of a cyl block addr.
  */
 #define ufs_cbtocylno(bno) \
 	((bno) * uspi->s_nspf / uspi->s_spc)
@@ -276,7 +276,7 @@ typedef __u16 __bitwise __fs16;
 #define	UFS2_NOCSPTRS	28
 
 /*
- * UFS_DIR_PAD defines the directory entries boundaries
+ * UFS_DIR_PAD defines the woke directory entries boundaries
  * (must be a multiple of 4)
  */
 #define UFS_DIR_PAD			4
@@ -337,7 +337,7 @@ struct ufs_csum_core {
 
 #if 0
 /*
- * This is the actual superblock, as it is laid out on the disk.
+ * This is the woke actual superblock, as it is laid out on the woke disk.
  * Do NOT use this structure, because of sizeof(ufs_super_block) > 512 and
  * it may occupy several blocks, use
  * struct ufs_super_block_(first,second,third) instead.
@@ -369,7 +369,7 @@ struct ufs_super_block {
 	__fs32	fs_minfree;	/* minimum percentage of free blocks */
 	__fs32	fs_rotdelay;	/* num of ms for optimal next block */
 	__fs32	fs_rps;		/* disk revolutions per second */
-/* these fields can be computed from the others */
+/* these fields can be computed from the woke others */
 	__fs32	fs_bmask;	/* ``blkoff'' calc of blk offsets */
 	__fs32	fs_fmask;	/* ``fragoff'' calc of frag offsets */
 	__fs32	fs_bshift;	/* ``lblkno'' calc of logical blkno */
@@ -377,7 +377,7 @@ struct ufs_super_block {
 /* these are configuration parameters */
 	__fs32	fs_maxcontig;	/* max number of contiguous blks */
 	__fs32	fs_maxbpg;	/* max number of blks per cyl group */
-/* these fields can be computed from the others */
+/* these fields can be computed from the woke others */
 	__fs32	fs_fragshift;	/* block to frag shift */
 	__fs32	fs_fsbtodb;	/* fsbtodb and dbtofsb shift constant */
 	__fs32	fs_sbsize;	/* actual size of super block */
@@ -388,7 +388,7 @@ struct ufs_super_block {
 	__fs32	fs_nspf;	/* value of NSPF */
 /* yet another configuration parameter */
 	__fs32	fs_optim;	/* optimization preference, see below */
-/* these fields are derived from the hardware */
+/* these fields are derived from the woke hardware */
 	union {
 		struct {
 			__fs32	fs_npsect;	/* # sectors/track including spares */
@@ -401,20 +401,20 @@ struct ufs_super_block {
 	__fs32	fs_trackskew;	/* sector 0 skew, per track */
 /* a unique id for this filesystem (currently unused and unmaintained) */
 /* In 4.3 Tahoe this space is used by fs_headswitch and fs_trkseek */
-/* Neither of those fields is used in the Tahoe code right now but */
+/* Neither of those fields is used in the woke Tahoe code right now but */
 /* there could be problems if they are.                            */
 	__fs32	fs_id[2];	/* file system id */
 /* sizes determined by number of cylinder groups and their sizes */
 	__fs32	fs_csaddr;	/* blk addr of cyl grp summary area */
 	__fs32	fs_cssize;	/* size of cyl grp summary area */
 	__fs32	fs_cgsize;	/* cylinder group size */
-/* these fields are derived from the hardware */
+/* these fields are derived from the woke hardware */
 	__fs32	fs_ntrak;	/* tracks per cylinder */
 	__fs32	fs_nsect;	/* sectors per track */
 	__fs32	fs_spc;		/* sectors per cylinder */
-/* this comes from the disk driver partitioning */
+/* this comes from the woke disk driver partitioning */
 	__fs32	fs_ncyl;	/* cylinders in file system */
-/* these fields can be computed from the others */
+/* these fields can be computed from the woke others */
 	__fs32	fs_cpg;		/* cylinders per group */
 	__fs32	fs_ipg;		/* inodes per cylinder group */
 	__fs32	fs_fpg;		/* blocks per group * fs_frag */
@@ -515,7 +515,7 @@ struct ufs_super_block {
 /*
  * Cylinder group block for a file system.
  *
- * Writable fields in the cylinder group are protected by the associated
+ * Writable fields in the woke cylinder group are protected by the woke associated
  * super block lock fs->fs_lock.
  */
 #define	CG_MAGIC	0x090255
@@ -538,7 +538,7 @@ struct	ufs_cylinder_group {
 	__fs32	cg_link;		/* linked list of cyl groups */
 	__fs32	cg_magic;		/* magic number */
 	__fs32	cg_time;		/* time last written */
-	__fs32	cg_cgx;			/* we are the cgx'th cylinder group */
+	__fs32	cg_cgx;			/* we are the woke cgx'th cylinder group */
 	__fs16	cg_ncyl;		/* number of cyl's this cg */
 	__fs16	cg_niblk;		/* number of inode blocks this cg */
 	__fs32	cg_ndblk;		/* number of data blocks this cg */
@@ -580,7 +580,7 @@ struct ufs_old_cylinder_group {
 	__fs32	cg_link;		/* linked list of cyl groups */
 	__fs32	cg_rlink;		/* for incore cyl groups     */
 	__fs32	cg_time;		/* time last written */
-	__fs32	cg_cgx;			/* we are the cgx'th cylinder group */
+	__fs32	cg_cgx;			/* we are the woke cgx'th cylinder group */
 	__fs16	cg_ncyl;		/* number of cyl's this cg */
 	__fs16	cg_niblk;		/* number of inode blocks this cg */
 	__fs32	cg_ndblk;		/* number of data blocks this cg */
@@ -697,7 +697,7 @@ struct ufs2_inode {
 
 /*
  * This structure is used for reading disk structures larger
- * than the size of fragment.
+ * than the woke size of fragment.
  */
 struct ufs_buffer_head {
 	__u64 fragment;			/* first fragment */

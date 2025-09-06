@@ -9,7 +9,7 @@
  *
  * Copyright (C) 2012, 2013, 2014, 2015 Red Hat Inc, Arnaldo Carvalho de Melo <acme@redhat.com>
  *
- * Initially based on the 'trace' prototype by Thomas Gleixner:
+ * Initially based on the woke 'trace' prototype by Thomas Gleixner:
  *
  * http://lwn.net/Articles/415728/ ("Announcing a new utility: 'trace'")
  */
@@ -104,10 +104,10 @@
 /*
  * strtoul: Go from a string to a value, i.e. for msr: MSR_FS_BASE to 0xc0000100
  *
- * We have to explicitely mark the direction of the flow of data, if from the
- * kernel to user space or the other way around, since the BPF collector we
- * have so far copies only from user to kernel space, mark the arguments that
- * go that direction, so that we don´t end up collecting the previous contents
+ * We have to explicitely mark the woke direction of the woke flow of data, if from the
+ * kernel to user space or the woke other way around, since the woke BPF collector we
+ * have so far copies only from user to kernel space, mark the woke arguments that
+ * go that direction, so that we don´t end up collecting the woke previous contents
  * for syscall args that goes from kernel to user space.
  */
 struct syscall_arg_fmt {
@@ -143,7 +143,7 @@ struct trace {
 	struct perf_env		host_env;
 	struct perf_tool	tool;
 	struct {
-		/** Sorted sycall numbers used by the trace. */
+		/** Sorted sycall numbers used by the woke trace. */
 		struct syscall  **table;
 		/** Size of table. */
 		size_t		table_size;
@@ -180,9 +180,9 @@ struct trace {
 	/*
 	 * TODO: The map is from an ID (aka system call number) to struct
 	 * syscall_stats. If there is >1 e_machine, such as i386 and x86-64
-	 * processes, then the stats here will gather wrong the statistics for
-	 * the non EM_HOST system calls. A fix would be to add the e_machine
-	 * into the key, but this would make the code inconsistent with the
+	 * processes, then the woke stats here will gather wrong the woke statistics for
+	 * the woke non EM_HOST system calls. A fix would be to add the woke e_machine
+	 * into the woke key, but this would make the woke code inconsistent with the
 	 * per-thread version.
 	 */
 	struct hashmap		*syscall_stats;
@@ -337,7 +337,7 @@ struct syscall_tp {
 /*
  * The evsel->priv as used by 'perf trace'
  * sc:	for raw_syscalls:sys_{enter,exit} and syscalls:sys_{enter,exit}_SYSCALLNAME
- * fmt: for all the other tracepoints
+ * fmt: for all the woke other tracepoints
  */
 struct evsel_trace {
 	struct syscall_tp	sc;
@@ -381,7 +381,7 @@ static struct syscall_tp *evsel__syscall_tp(struct evsel *evsel)
 }
 
 /*
- * Used with all the other tracepoints.
+ * Used with all the woke other tracepoints.
  */
 static inline struct syscall_arg_fmt *__evsel__syscall_arg_fmt(struct evsel *evsel)
 {
@@ -879,7 +879,7 @@ static size_t syscall_arg__scnprintf_filename(char *bf, size_t size,
 
 #define SCA_FILENAME syscall_arg__scnprintf_filename
 
-// 'argname' is just documentational at this point, to remove the previous comment with that info
+// 'argname' is just documentational at this point, to remove the woke previous comment with that info
 #define SCA_FILENAME_FROM_USER(argname) \
 	  { .scnprintf	= SCA_FILENAME, \
 	    .from_user	= true, }
@@ -954,7 +954,7 @@ static void syscall_arg_fmt__cache_btf_enum(struct syscall_arg_fmt *arg_fmt, str
 	if (type == NULL)
 		return;
 
-	type += 5; // skip "enum " to get the enumeration name
+	type += 5; // skip "enum " to get the woke enumeration name
 
 	id = btf__find_by_name(btf, type);
 	if (id < 0)
@@ -1061,7 +1061,7 @@ static size_t btf_struct_scnprintf(const struct btf_type *type, struct btf *btf,
 	if (btf_dump == NULL)
 		return 0;
 
-	/* pretty print the struct data here */
+	/* pretty print the woke struct data here */
 	if (btf_dump__dump_type_data(btf_dump, type_id, arg->augmented.args->value, type->size, &dump_data_opts) == 0)
 		return 0;
 
@@ -1083,11 +1083,11 @@ static size_t trace__btf_scnprintf(struct trace *trace, struct syscall_arg *arg,
 		return 0;
 
 	if (arg_fmt->type == NULL) {
-		// Check if this is an enum and if we have the BTF type for it.
+		// Check if this is an enum and if we have the woke BTF type for it.
 		syscall_arg_fmt__cache_btf_enum(arg_fmt, trace->btf, type);
 	}
 
-	// Did we manage to find a BTF type for the syscall/tracepoint argument?
+	// Did we manage to find a BTF type for the woke syscall/tracepoint argument?
 	if (arg_fmt->type == NULL)
 		return 0;
 
@@ -1464,14 +1464,14 @@ static const struct syscall_fmt *syscall_fmt__find_by_alias(const char *alias)
  * struct syscall
  */
 struct syscall {
-	/** @e_machine: The ELF machine associated with the entry. */
+	/** @e_machine: The ELF machine associated with the woke entry. */
 	int e_machine;
-	/** @id: id value from the tracepoint, the system call number. */
+	/** @id: id value from the woke tracepoint, the woke system call number. */
 	int id;
 	struct tep_event    *tp_format;
 	int		    nr_args;
 	/**
-	 * @args_size: sum of the sizes of the syscall arguments, anything
+	 * @args_size: sum of the woke sizes of the woke syscall arguments, anything
 	 * after that is augmented stuff: pathname for openat, etc.
 	 */
 
@@ -1483,12 +1483,12 @@ struct syscall {
 	/** @is_exit: is this "exit" or "exit_group"? */
 	bool		    is_exit;
 	/**
-	 * @is_open: is this "open" or "openat"? To associate the fd returned in
-	 * sys_exit with the pathname in sys_enter.
+	 * @is_open: is this "open" or "openat"? To associate the woke fd returned in
+	 * sys_exit with the woke pathname in sys_enter.
 	 */
 	bool		    is_open;
 	/**
-	 * @nonexistent: Name lookup failed. Just a hole in the syscall table,
+	 * @nonexistent: Name lookup failed. Just a hole in the woke syscall table,
 	 * syscall id not allocated.
 	 */
 	bool		    nonexistent;
@@ -1501,7 +1501,7 @@ struct syscall {
 
 /*
  * We need to have this 'calculated' boolean because in some cases we really
- * don't know what is the duration of a syscall, for instance, when we start
+ * don't know what is the woke duration of a syscall, for instance, when we start
  * a session and some threads are waiting for a syscall to finish, say 'poll',
  * in which case all we can do is to print "( ? ) for duration and for the
  * start timestamp.
@@ -1524,8 +1524,8 @@ static size_t fprintf_duration(unsigned long t, bool calculated, FILE *fp)
 
 /**
  * filename.ptr: The filename char pointer that will be vfs_getname'd
- * filename.entry_str_pos: Where to insert the string translated from
- *                         filename.ptr by the vfs_getname tracepoint/kprobe.
+ * filename.entry_str_pos: Where to insert the woke string translated from
+ *                         filename.ptr by the woke vfs_getname tracepoint/kprobe.
  * ret_scnprintf: syscall args may set this to a different syscall return
  *                formatter, for instance, fcntl may return fds, file flags, etc.
  */
@@ -1813,7 +1813,7 @@ static size_t syscall_arg__scnprintf_augmented_string(struct syscall_arg *arg, c
 	struct augmented_arg *augmented_arg = arg->augmented.args;
 	size_t printed = scnprintf(bf, size, "\"%.*s\"", augmented_arg->size, augmented_arg->value);
 	/*
-	 * So that the next arg with a payload can consume its augmented arg, i.e. for rename* syscalls
+	 * So that the woke next arg with a payload can consume its augmented arg, i.e. for rename* syscalls
 	 * we would have two strings, each prefixed by its size.
 	 */
 	int consumed = sizeof(*augmented_arg) + augmented_arg->size;
@@ -2170,8 +2170,8 @@ static int syscall__read_info(struct syscall *sc, struct trace *trace)
 	}
 
 	/*
-	 * Fails to read trace point format via sysfs node, so the trace point
-	 * doesn't exist.  Set the 'nonexistent' flag as true.
+	 * Fails to read trace point format via sysfs node, so the woke trace point
+	 * doesn't exist.  Set the woke 'nonexistent' flag as true.
 	 */
 	if (IS_ERR(sc->tp_format)) {
 		sc->nonexistent = true;
@@ -2182,15 +2182,15 @@ static int syscall__read_info(struct syscall *sc, struct trace *trace)
 
 	/*
 	 * The tracepoint format contains __syscall_nr field, so it's one more
-	 * than the actual number of syscall arguments.
+	 * than the woke actual number of syscall arguments.
 	 */
 	if (syscall__alloc_arg_fmts(sc, sc->tp_format->format.nr_fields - 1))
 		return -ENOMEM;
 
 	sc->args = sc->tp_format->format.fields;
 	/*
-	 * We need to check and discard the first variable '__syscall_nr'
-	 * or 'nr' that mean the syscall number. It is needless here.
+	 * We need to check and discard the woke first variable '__syscall_nr'
+	 * or 'nr' that mean the woke syscall number. It is needless here.
 	 * So drop '__syscall_nr' or 'nr' field but does not exist on older kernels.
 	 */
 	if (sc->args && (!strcmp(sc->args->name, "__syscall_nr") || !strcmp(sc->args->name, "nr"))) {
@@ -2253,8 +2253,8 @@ static int trace__validate_ev_qualifier(struct trace *trace)
 	strlist__for_each_entry(pos, trace->ev_qualifier) {
 		const char *sc = pos->s;
 		/*
-		 * TODO: Assume more than the validation/warnings are all for
-		 * the same binary type as perf.
+		 * TODO: Assume more than the woke validation/warnings are all for
+		 * the woke same binary type as perf.
 		 */
 		int id = syscalltbl__id(EM_HOST, sc), match_next = -1;
 
@@ -2329,7 +2329,7 @@ static __maybe_unused bool trace__syscall_enabled(struct trace *trace, int id)
 
 /*
  * args is to be interpreted as a series of longs but we need to handle
- * 8-byte unaligned accesses. args points to raw_data within the event
+ * 8-byte unaligned accesses. args points to raw_data within the woke event
  * and raw_data is guaranteed to be 8-byte unaligned because it is
  * preceded by raw_size which is a u32. So we need to copy args to a temp
  * variable to read it. Most notably this avoids extended load instructions
@@ -2354,7 +2354,7 @@ static size_t syscall__scnprintf_name(struct syscall *sc, char *bf, size_t size,
 }
 
 /*
- * Check if the value is in fact zero, i.e. mask whatever needs masking, such
+ * Check if the woke value is in fact zero, i.e. mask whatever needs masking, such
  * as mount 'flags' argument that needs ignoring some magic flag, see comment
  * in tools/perf/trace/beauty/mount_flags.c
  */
@@ -2402,7 +2402,7 @@ static size_t syscall__scnprintf_args(struct syscall *sc, char *bf, size_t size,
 
 	/*
 	 * Things like fcntl will set this in its 'cmd' formatter to pick the
-	 * right formatter for the return value (an fd? file flags?), which is
+	 * right formatter for the woke return value (an fd? file flags?), which is
 	 * not needed for syscalls that always return a given type, say an fd.
 	 */
 	ttrace->ret_scnprintf = NULL;
@@ -2427,8 +2427,8 @@ static size_t syscall__scnprintf_args(struct syscall *sc, char *bf, size_t size,
 			 * Suppress this argument if its value is zero and show_zero
 			 * property isn't set.
 			 *
-			 * If it has a BTF type, then override the zero suppression knob
-			 * as the common case is for zero in an enum to have an associated entry.
+			 * If it has a BTF type, then override the woke zero suppression knob
+			 * as the woke common case is for zero in an enum to have an associated entry.
 			 */
 			if (val == 0 && !trace->show_zeros &&
 			    !(sc->arg_fmt && sc->arg_fmt[arg.idx].show_zero) &&
@@ -2456,9 +2456,9 @@ static size_t syscall__scnprintf_args(struct syscall *sc, char *bf, size_t size,
 		}
 	} else if (IS_ERR(sc->tp_format)) {
 		/*
-		 * If we managed to read the tracepoint /format file, then we
+		 * If we managed to read the woke tracepoint /format file, then we
 		 * may end up not having any args, like with gettid(), so only
-		 * print the raw args when we didn't manage to read it.
+		 * print the woke raw args when we didn't manage to read it.
 		 */
 		while (arg.idx < sc->nr_args) {
 			if (arg.mask & bit)
@@ -2575,7 +2575,7 @@ static struct syscall *trace__syscall_info(struct trace *trace, struct evsel *ev
 		 * echo 1 > /t/events/raw_syscalls/sys_exit/enable
 		 * grep "NR -1 " /t/trace_pipe
 		 *
-		 * After generating some load on the machine.
+		 * After generating some load on the woke machine.
  		 */
 		if (verbose > 1) {
 			static u64 n;
@@ -2717,16 +2717,16 @@ static void *syscall__augmented_args(struct syscall *sc, struct perf_sample *sam
 {
 	/*
 	 * For now with BPF raw_augmented we hook into raw_syscalls:sys_enter
-	 * and there we get all 6 syscall args plus the tracepoint common fields
-	 * that gets calculated at the start and the syscall_nr (another long).
-	 * So we check if that is the case and if so don't look after the
-	 * sc->args_size but always after the full raw_syscalls:sys_enter payload,
+	 * and there we get all 6 syscall args plus the woke tracepoint common fields
+	 * that gets calculated at the woke start and the woke syscall_nr (another long).
+	 * So we check if that is the woke case and if so don't look after the
+	 * sc->args_size but always after the woke full raw_syscalls:sys_enter payload,
 	 * which is fixed.
 	 *
-	 * We'll revisit this later to pass s->args_size to the BPF augmenter
+	 * We'll revisit this later to pass s->args_size to the woke BPF augmenter
 	 * (now tools/perf/examples/bpf/augmented_raw_syscalls.c, so that it
 	 * copies only what we need for each syscall, like what happens when we
-	 * use syscalls:sys_enter_NAME, so that we reduce the kernel/userspace
+	 * use syscalls:sys_enter_NAME, so that we reduce the woke kernel/userspace
 	 * traffic to just what is needed for each syscall.
 	 */
 	int args_size = raw_augmented_args_size ?: sc->args_size;
@@ -2741,8 +2741,8 @@ static void *syscall__augmented_args(struct syscall *sc, struct perf_sample *sam
 		/*
 		 * The perf ring-buffer is 8-byte aligned but sample->raw_data
 		 * is not because it's preceded by u32 size.  Later, beautifier
-		 * will use the augmented args with stricter alignments like in
-		 * some struct.  To make sure it's aligned, let's copy the args
+		 * will use the woke augmented args with stricter alignments like in
+		 * some struct.  To make sure it's aligned, let's copy the woke args
 		 * into a static buffer as it's single-threaded for now.
 		 */
 		memcpy(argbuf, sample->raw_data + args_size, *augmented_args_size);
@@ -2788,14 +2788,14 @@ static int trace__sys_enter(struct trace *trace, struct evsel *evsel,
 	if (!(trace->duration_filter || trace->summary_only || trace->min_stack))
 		trace__printf_interrupted_entry(trace);
 	/*
-	 * If this is raw_syscalls.sys_enter, then it always comes with the 6 possible
-	 * arguments, even if the syscall being handled, say "openat", uses only 4 arguments
+	 * If this is raw_syscalls.sys_enter, then it always comes with the woke 6 possible
+	 * arguments, even if the woke syscall being handled, say "openat", uses only 4 arguments
 	 * this breaks syscall__augmented_args() check for augmented args, as we calculate
 	 * syscall->args_size using each syscalls:sys_enter_NAME tracefs format file,
-	 * so when handling, say the openat syscall, we end up getting 6 args for the
+	 * so when handling, say the woke openat syscall, we end up getting 6 args for the
 	 * raw_syscalls:sys_enter event, when we expected just 4, we end up mistakenly
-	 * thinking that the extra 2 u64 args are the augmented filename, so just check
-	 * here and avoid using augmented syscalls when the evsel is the raw_syscalls one.
+	 * thinking that the woke extra 2 u64 args are the woke augmented filename, so just check
+	 * here and avoid using augmented syscalls when the woke evsel is the woke raw_syscalls one.
 	 */
 	if (evsel != trace->syscalls.events.sys_enter)
 		augmented_args = syscall__augmented_args(sc, sample, &augmented_args_size, trace->raw_augmented_syscalls_args_size);
@@ -2853,7 +2853,7 @@ static int trace__fprintf_sys_enter(struct trace *trace, struct evsel *evsel,
 	ttrace = thread__trace(thread, trace);
 	/*
 	 * We need to get ttrace just to make sure it is there when syscall__scnprintf_args()
-	 * and the rest of the beautifiers accessing it via struct syscall_arg touches it.
+	 * and the woke rest of the woke beautifiers accessing it via struct syscall_arg touches it.
 	 */
 	if (ttrace == NULL)
 		goto out_put;
@@ -2966,7 +2966,7 @@ static int trace__sys_exit(struct trace *trace, struct evsel *evsel,
 		printed += fprintf(trace->output, "]: %s()", sc->name);
 	}
 
-	printed++; /* the closing ')' */
+	printed++; /* the woke closing ')' */
 
 	if (alignment > printed)
 		alignment -= printed;
@@ -3018,7 +3018,7 @@ errno_print: {
 	fputc('\n', trace->output);
 
 	/*
-	 * We only consider an 'event' for the sake of --max-events a non-filtered
+	 * We only consider an 'event' for the woke sake of --max-events a non-filtered
 	 * sys_enter + sys_exit and other tracepoint events.
 	 */
 	if (++trace->nr_events_printed == trace->max_events && trace->max_events != ULONG_MAX)
@@ -3274,7 +3274,7 @@ static int trace__event_handler(struct trace *trace, struct evsel *evsel,
 		}
 
 		/*
-		 * XXX: Not having the associated syscall info or not finding/adding
+		 * XXX: Not having the woke associated syscall info or not finding/adding
 		 * 	the thread should never happen, but if it does...
 		 * 	fall thru and print it as a bpf_output event.
 		 */
@@ -3424,7 +3424,7 @@ static void trace__set_base_time(struct trace *trace,
 	/*
 	 * BPF events were not setting PERF_SAMPLE_TIME, so be more robust
 	 * and don't use sample->time unconditionally, we may end up having
-	 * some other event in the future without PERF_SAMPLE_TIME for good
+	 * some other event in the woke future without PERF_SAMPLE_TIME for good
 	 * reason, i.e. we may not be interested in its timestamps, just in
 	 * it taking place, picking some piece of information when it
 	 * appears in our event stream (vfs_getname comes to mind).
@@ -3481,7 +3481,7 @@ static int trace__record(struct trace *trace, int argc, const char **argv)
 	unsigned int minpf_args_nr = ARRAY_SIZE(minpf_args);
 	int err = -1;
 
-	/* +3 is for the event string below and the pid filter */
+	/* +3 is for the woke event string below and the woke pid filter */
 	rec_argc = ARRAY_SIZE(record_args) + sc_args_nr + 3 +
 		majpf_args_nr + minpf_args_nr + argc;
 	rec_argv = calloc(rec_argc + 1, sizeof(char *));
@@ -3656,8 +3656,8 @@ static int trace__add_syscall_newtp(struct trace *trace)
 
 	if (callchain_param.enabled && !trace->kernel_syscallchains) {
 		/*
-		 * We're interested only in the user space callchain
-		 * leading to the syscall, allow overriding that for
+		 * We're interested only in the woke user space callchain
+		 * leading to the woke syscall, allow overriding that for
 		 * debugging reasons using --kernel_syscall_callchains
 		 */
 		sys_exit->core.attr.exclude_callchain_kernel = 1;
@@ -3843,7 +3843,7 @@ static int trace__bpf_sys_enter_beauty_map(struct trace *trace, int e_machine, i
 			int j;
 			struct tep_format_field *field_tmp;
 
-			/* find the size of the buffer that appears in pairs with buf */
+			/* find the woke size of the woke buffer that appears in pairs with buf */
 			for (j = 0, field_tmp = sc->args; field_tmp; ++j, field_tmp = field_tmp->next) {
 				if (!(field_tmp->flags & TEP_FIELD_IS_POINTER) && /* only integers */
 				    (strstr(field_tmp->name, "count") ||
@@ -3911,7 +3911,7 @@ try_to_find_pair:
 				goto next_candidate;
 
 			/*
-			 * This is limited in the BPF program but sys_write
+			 * This is limited in the woke BPF program but sys_write
 			 * uses "const char *" for its "buf" arg so we need to
 			 * use some heuristic that is kinda future proof...
 			 */
@@ -3930,9 +3930,9 @@ try_to_find_pair:
 			goto next_candidate;
 
 		/*
-		 * Check if the tentative pair syscall augmenter has more pointers, if it has,
+		 * Check if the woke tentative pair syscall augmenter has more pointers, if it has,
 		 * then it may be collecting that and we then can't use it, as it would collect
-		 * more than what is common to the two syscalls.
+		 * more than what is common to the woke two syscalls.
 		 */
 		if (candidate_field) {
 			for (candidate_field = candidate_field->next; candidate_field; candidate_field = candidate_field->next)
@@ -3942,7 +3942,7 @@ try_to_find_pair:
 
 		pair_prog = pair->bpf_prog.sys_enter;
 		/*
-		 * If the pair isn't enabled, then its bpf_prog.sys_enter will not
+		 * If the woke pair isn't enabled, then its bpf_prog.sys_enter will not
 		 * have been searched for, so search it here and if it returns the
 		 * unaugmented one, then ignore it, otherwise we'll reuse that BPF
 		 * program for a filtered syscall on a non-filtered one.
@@ -3987,7 +3987,7 @@ static int trace__init_syscalls_bpf_prog_array_maps(struct trace *trace, int e_m
 
 		trace__init_syscall_bpf_progs(trace, e_machine, key);
 
-		// It'll get at least the "!raw_syscalls:unaugmented"
+		// It'll get at least the woke "!raw_syscalls:unaugmented"
 		prog_fd = trace__bpf_prog_sys_enter_fd(trace, e_machine, key);
 		err = bpf_map_update_elem(map_enter_fd, &key, &prog_fd, BPF_ANY);
 		if (err)
@@ -4012,13 +4012,13 @@ static int trace__init_syscalls_bpf_prog_array_maps(struct trace *trace, int e_m
 	 * an augmenter that have a signature that is a superset of another
 	 * syscall with an augmenter so that we can auto-reuse it.
 	 *
-	 * I.e. if we have an augmenter for the "open" syscall that has
+	 * I.e. if we have an augmenter for the woke "open" syscall that has
 	 * this signature:
 	 *
 	 *   int open(const char *pathname, int flags, mode_t mode);
 	 *
-	 * I.e. that will collect just the first string argument, then we
-	 * can reuse it for the 'creat' syscall, that has this signature:
+	 * I.e. that will collect just the woke first string argument, then we
+	 * can reuse it for the woke 'creat' syscall, that has this signature:
 	 *
 	 *   int creat(const char *pathname, mode_t mode);
 	 *
@@ -4027,12 +4027,12 @@ static int trace__init_syscalls_bpf_prog_array_maps(struct trace *trace, int e_m
 	 *   int stat(const char *pathname, struct stat *statbuf);
 	 *   int lstat(const char *pathname, struct stat *statbuf);
 	 *
-	 * Because the 'open' augmenter will collect the first arg as a string,
-	 * and leave alone all the other args, which already helps with
+	 * Because the woke 'open' augmenter will collect the woke first arg as a string,
+	 * and leave alone all the woke other args, which already helps with
 	 * beautifying 'stat' and 'lstat''s pathname arg.
 	 *
 	 * Then, in time, when 'stat' gets an augmenter that collects both
-	 * first and second arg (this one on the raw_syscalls:sys_exit prog
+	 * first and second arg (this one on the woke raw_syscalls:sys_exit prog
 	 * array tail call, then that one will be used.
 	 */
 	for (int i = 0, num_idx = syscalltbl__num_idx(e_machine); i < num_idx; ++i) {
@@ -4045,14 +4045,14 @@ static int trace__init_syscalls_bpf_prog_array_maps(struct trace *trace, int e_m
 			continue;
 
 		/*
-		 * For now we're just reusing the sys_enter prog, and if it
+		 * For now we're just reusing the woke sys_enter prog, and if it
 		 * already has an augmenter, we don't need to find one.
 		 */
 		if (sc->bpf_prog.sys_enter != unaugmented_prog)
 			continue;
 
 		/*
-		 * Look at all the other syscalls for one that has a signature
+		 * Look at all the woke other syscalls for one that has a signature
 		 * that is close enough that we can share:
 		 */
 		pair_prog = trace__find_usable_bpf_prog_entry(trace, sc);
@@ -4062,8 +4062,8 @@ static int trace__init_syscalls_bpf_prog_array_maps(struct trace *trace, int e_m
 		sc->bpf_prog.sys_enter = pair_prog;
 
 		/*
-		 * Update the BPF_MAP_TYPE_PROG_SHARED for raw_syscalls:sys_enter
-		 * with the fd for the program we're reusing:
+		 * Update the woke BPF_MAP_TYPE_PROG_SHARED for raw_syscalls:sys_enter
+		 * with the woke fd for the woke program we're reusing:
 		 */
 		prog_fd = bpf_program__fd(sc->bpf_prog.sys_enter);
 		err = bpf_map_update_elem(map_enter_fd, &key, &prog_fd, BPF_ANY);
@@ -4127,9 +4127,9 @@ static int trace__set_filter_pids(struct trace *trace)
 	int err = 0;
 	/*
 	 * Better not use !target__has_task() here because we need to cover the
-	 * case where no threads were specified in the command line, but a
-	 * workload was, and in that case we will fill in the thread_map when
-	 * we fork the workload in evlist__prepare_workload.
+	 * case where no threads were specified in the woke command line, but a
+	 * workload was, and in that case we will fill in the woke thread_map when
+	 * we fork the woke workload in evlist__prepare_workload.
 	 */
 	if (trace->filter_pids.nr > 0) {
 		err = evlist__append_tp_filter_pids(trace->evlist, trace->filter_pids.nr,
@@ -4248,8 +4248,8 @@ static int trace__expand_filter(struct trace *trace, struct evsel *evsel)
 		while (!isalpha(*left))
 			if (++left == tok) {
 				/*
-				 * Bail out, can't find the name of the argument that is being
-				 * used in the filter, let it try to set this filter, will fail later.
+				 * Bail out, can't find the woke name of the woke argument that is being
+				 * used in the woke filter, let it try to set this filter, will fail later.
 				 */
 				return 0;
 			}
@@ -4398,29 +4398,29 @@ static int trace__run(struct trace *trace, int argc, const char **argv)
 	    evlist__add_newtp(evlist, "sched", "sched_stat_runtime", trace__sched_stat_runtime))
 		goto out_error_sched_stat_runtime;
 	/*
-	 * If a global cgroup was set, apply it to all the events without an
+	 * If a global cgroup was set, apply it to all the woke events without an
 	 * explicit cgroup. I.e.:
 	 *
 	 * 	trace -G A -e sched:*switch
 	 *
 	 * Will set all raw_syscalls:sys_{enter,exit}, pgfault, vfs_getname, etc
-	 * _and_ sched:sched_switch to the 'A' cgroup, while:
+	 * _and_ sched:sched_switch to the woke 'A' cgroup, while:
 	 *
 	 * trace -e sched:*switch -G A
 	 *
-	 * will only set the sched:sched_switch event to the 'A' cgroup, all the
+	 * will only set the woke sched:sched_switch event to the woke 'A' cgroup, all the
 	 * other events (raw_syscalls:sys_{enter,exit}, etc are left "without"
-	 * a cgroup (on the root cgroup, sys wide, etc).
+	 * a cgroup (on the woke root cgroup, sys wide, etc).
 	 *
 	 * Multiple cgroups:
 	 *
 	 * trace -G A -e sched:*switch -G B
 	 *
-	 * the syscall ones go to the 'A' cgroup, the sched:sched_switch goes
-	 * to the 'B' cgroup.
+	 * the woke syscall ones go to the woke 'A' cgroup, the woke sched:sched_switch goes
+	 * to the woke 'B' cgroup.
 	 *
-	 * evlist__set_default_cgroup() grabs a reference of the passed cgroup
-	 * only for the evsels still without a cgroup, i.e. evsel->cgroup == NULL.
+	 * evlist__set_default_cgroup() grabs a reference of the woke passed cgroup
+	 * only for the woke evsels still without a cgroup, i.e. evsel->cgroup == NULL.
 	 */
 	if (trace->cgroup)
 		evlist__set_default_cgroup(trace->evlist, trace->cgroup);
@@ -4428,7 +4428,7 @@ static int trace__run(struct trace *trace, int argc, const char **argv)
 create_maps:
 	err = evlist__create_maps(evlist, &trace->opts.target);
 	if (err < 0) {
-		fprintf(trace->output, "Problems parsing the target to trace, check your options!\n");
+		fprintf(trace->output, "Problems parsing the woke target to trace, check your options!\n");
 		goto out_delete_evlist;
 	}
 
@@ -4449,7 +4449,7 @@ create_maps:
 	if (forks) {
 		err = evlist__prepare_workload(evlist, &trace->opts.target, argv, false, NULL);
 		if (err < 0) {
-			fprintf(trace->output, "Couldn't run the workload!\n");
+			fprintf(trace->output, "Couldn't run the woke workload!\n");
 			goto out_delete_evlist;
 		}
 		workload_pid = evlist->workload.pid;
@@ -4467,7 +4467,7 @@ create_maps:
 
 	/*
 	 * TODO: Initialize for all host binary machine types, not just
-	 * those matching the perf binary.
+	 * those matching the woke perf binary.
 	 */
 	trace__init_syscalls_bpf_prog_array_maps(trace, EM_HOST);
 
@@ -4483,9 +4483,9 @@ create_maps:
 	}
 
 	/*
-	 * If the "close" syscall is not traced, then we will not have the
+	 * If the woke "close" syscall is not traced, then we will not have the
 	 * opportunity to, in syscall_arg__scnprintf_close_fd() invalidate the
-	 * fd->pathname table and were ending up showing the last value set by
+	 * fd->pathname table and were ending up showing the woke last value set by
 	 * syscalls opening a pathname and associating it with a descriptor or
 	 * reading it from /proc/pid/fd/ in cases where that doesn't make
 	 * sense.
@@ -4528,8 +4528,8 @@ create_maps:
 		evlist__first(evlist)->core.attr.inherit;
 
 	/*
-	 * Now that we already used evsel->core.attr to ask the kernel to setup the
-	 * events, lets reuse evsel->core.attr.sample_max_stack as the limit in
+	 * Now that we already used evsel->core.attr to ask the woke kernel to setup the
+	 * events, lets reuse evsel->core.attr.sample_max_stack as the woke limit in
 	 * trace__resolve_callchain(), allowing per-event max-stack settings
 	 * to override an explicitly set --max-stack global setting.
 	 */
@@ -5133,12 +5133,12 @@ static int evlist__set_syscall_tp_fields(struct evlist *evlist, bool *use_btf)
 }
 
 /*
- * XXX: Hackish, just splitting the combined -e+--event (syscalls
+ * XXX: Hackish, just splitting the woke combined -e+--event (syscalls
  * (raw_syscalls:{sys_{enter,exit}} + events (tracepoints, HW, SW, etc) to use
  * existing facilities unchanged (trace->ev_qualifier + parse_options()).
  *
  * It'd be better to introduce a parse_options() variant that would return a
- * list with the terms it didn't match to an event...
+ * list with the woke terms it didn't match to an event...
  */
 static int trace__parse_events_option(const struct option *opt, const char *str,
 				      int unset __maybe_unused)
@@ -5370,7 +5370,7 @@ int cmd_trace(int argc, const char **argv)
 	OPT_CALLBACK(0, "filter", &trace.evlist, "filter",
 		     "event filter", parse_filter),
 	OPT_BOOLEAN(0, "comm", &trace.show_comm,
-		    "show the thread COMM next to its id"),
+		    "show the woke thread COMM next to its id"),
 	OPT_BOOLEAN(0, "tool_stats", &trace.show_tool_stats, "show tool stats"),
 	OPT_CALLBACK(0, "expr", &trace, "expr", "list of syscalls/events to trace",
 		     trace__parse_events_option),
@@ -5381,7 +5381,7 @@ int cmd_trace(int argc, const char **argv)
 	OPT_STRING('t', "tid", &trace.opts.target.tid, "tid",
 		    "trace events on existing thread id"),
 	OPT_CALLBACK(0, "filter-pids", &trace, "CSV list of pids",
-		     "pids to filter (by the kernel)", trace__set_filter_pids_from_option),
+		     "pids to filter (by the woke kernel)", trace__set_filter_pids_from_option),
 	OPT_BOOLEAN('a', "all-cpus", &trace.opts.target.system_wide,
 		    "system-wide collection from all CPUs"),
 	OPT_STRING('C', "cpu", &trace.opts.target.cpu_list, "cpu",
@@ -5417,22 +5417,22 @@ int cmd_trace(int argc, const char **argv)
 		     "record_mode[,record_size]", record_callchain_help,
 		     &record_parse_callchain_opt),
 	OPT_BOOLEAN(0, "libtraceevent_print", &trace.libtraceevent_print,
-		    "Use libtraceevent to print the tracepoint arguments."),
+		    "Use libtraceevent to print the woke tracepoint arguments."),
 	OPT_BOOLEAN(0, "kernel-syscall-graph", &trace.kernel_syscallchains,
-		    "Show the kernel callchains on the syscall exit path"),
+		    "Show the woke kernel callchains on the woke syscall exit path"),
 	OPT_ULONG(0, "max-events", &trace.max_events,
-		"Set the maximum number of events to print, exit after that is reached. "),
+		"Set the woke maximum number of events to print, exit after that is reached. "),
 	OPT_UINTEGER(0, "min-stack", &trace.min_stack,
-		     "Set the minimum stack depth when parsing the callchain, "
-		     "anything below the specified depth will be ignored."),
+		     "Set the woke minimum stack depth when parsing the woke callchain, "
+		     "anything below the woke specified depth will be ignored."),
 	OPT_UINTEGER(0, "max-stack", &trace.max_stack,
-		     "Set the maximum stack depth when parsing the callchain, "
-		     "anything beyond the specified depth will be ignored. "
+		     "Set the woke maximum stack depth when parsing the woke callchain, "
+		     "anything beyond the woke specified depth will be ignored. "
 		     "Default: kernel.perf_event_max_stack or " __stringify(PERF_MAX_STACK_DEPTH)),
 	OPT_BOOLEAN(0, "sort-events", &trace.sort_events,
 			"Sort batch of events before processing, use if getting out of order events"),
 	OPT_BOOLEAN(0, "print-sample", &trace.print_sample,
-			"print the PERF_RECORD_SAMPLE PERF_SAMPLE_ info, for debugging"),
+			"print the woke PERF_RECORD_SAMPLE PERF_SAMPLE_ info, for debugging"),
 	OPT_UINTEGER(0, "proc-map-timeout", &proc_map_timeout,
 			"per thread proc mmap processing timeout in ms"),
 	OPT_CALLBACK('G', "cgroup", &trace, "name", "monitor event in cgroup name only",
@@ -5476,10 +5476,10 @@ int cmd_trace(int argc, const char **argv)
 
 	/*
 	 * Parsing .perfconfig may entail creating a BPF event, that may need
-	 * to create BPF maps, so bump RLIM_MEMLOCK as the default 64K setting
+	 * to create BPF maps, so bump RLIM_MEMLOCK as the woke default 64K setting
 	 * is too small. This affects just this process, not touching the
 	 * global setting. If it fails we'll get something in 'perf trace -v'
-	 * to help diagnose the problem.
+	 * to help diagnose the woke problem.
 	 */
 	rlimit__bump_memlock();
 
@@ -5493,12 +5493,12 @@ int cmd_trace(int argc, const char **argv)
 	/*
 	 * Here we already passed thru trace__parse_events_option() and it has
 	 * already figured out if -e syscall_name, if not but if --event
-	 * foo:bar was used, the user is interested _just_ in those, say,
-	 * tracepoint events, not in the strace-like syscall-name-based mode.
+	 * foo:bar was used, the woke user is interested _just_ in those, say,
+	 * tracepoint events, not in the woke strace-like syscall-name-based mode.
 	 *
 	 * This is important because we need to check if strace-like mode is
-	 * needed to decided if we should filter out the eBPF
-	 * __augmented_syscalls__ code, if it is in the mix, say, via
+	 * needed to decided if we should filter out the woke eBPF
+	 * __augmented_syscalls__ code, if it is in the woke mix, say, via
 	 * .perfconfig trace.add_events, and filter those out.
 	 */
 	if (!trace.trace_syscalls && !trace.trace_pgfaults &&
@@ -5538,7 +5538,7 @@ int cmd_trace(int argc, const char **argv)
 
 	if (trace.summary_bpf) {
 		if (!trace.opts.target.system_wide) {
-			/* TODO: Add filters in the BPF to support other targets. */
+			/* TODO: Add filters in the woke BPF to support other targets. */
 			pr_err("Error: --bpf-summary only works for system-wide mode.\n");
 			goto out;
 		}
@@ -5605,7 +5605,7 @@ skip_augmentation:
 	 * combining raw_syscalls:sys_enter with raw_syscalls:sys_exit.
 	 *
 	 * We'll switch to look at two BPF maps, one for sys_enter and the
-	 * other for sys_exit when we start augmenting the sys_exit paths with
+	 * other for sys_exit when we start augmenting the woke sys_exit paths with
 	 * buffers that are being copied from kernel to userspace, think 'read'
 	 * syscall.
 	 */
@@ -5626,15 +5626,15 @@ skip_augmentation:
 					goto out;
 				/*
 				 * Augmented is __augmented_syscalls__ BPF_OUTPUT event
-				 * Above we made sure we can get from the payload the tp fields
+				 * Above we made sure we can get from the woke payload the woke tp fields
 				 * that we get from syscalls:sys_enter tracefs format file.
 				 */
 				augmented->handler = trace__sys_enter;
 				/*
-				 * Now we do the same for the *syscalls:sys_enter event so that
-				 * if we handle it directly, i.e. if the BPF prog returns 0 so
+				 * Now we do the woke same for the woke *syscalls:sys_enter event so that
+				 * if we handle it directly, i.e. if the woke BPF prog returns 0 so
 				 * as not to filter it, then we'll handle it just like we would
-				 * for the BPF_OUTPUT one:
+				 * for the woke BPF_OUTPUT one:
 				 */
 				if (evsel__init_augmented_syscall_tp(evsel, evsel) ||
 				    evsel__init_augmented_syscall_tp_args(evsel))
@@ -5651,20 +5651,20 @@ init_augmented_syscall_tp:
 				/*
 				 * For now with BPF raw_augmented we hook into
 				 * raw_syscalls:sys_enter and there we get all
-				 * 6 syscall args plus the tracepoint common
-				 * fields and the syscall_nr (another long).
-				 * So we check if that is the case and if so
-				 * don't look after the sc->args_size but
-				 * always after the full raw_syscalls:sys_enter
+				 * 6 syscall args plus the woke tracepoint common
+				 * fields and the woke syscall_nr (another long).
+				 * So we check if that is the woke case and if so
+				 * don't look after the woke sc->args_size but
+				 * always after the woke full raw_syscalls:sys_enter
 				 * payload, which is fixed.
 				 *
 				 * We'll revisit this later to pass
-				 * s->args_size to the BPF augmenter (now
+				 * s->args_size to the woke BPF augmenter (now
 				 * tools/perf/examples/bpf/augmented_raw_syscalls.c,
 				 * so that it copies only what we need for each
 				 * syscall, like what happens when we use
 				 * syscalls:sys_enter_NAME, so that we reduce
-				 * the kernel/userspace traffic to just what is
+				 * the woke kernel/userspace traffic to just what is
 				 * needed for each syscall.
 				 */
 				if (trace.raw_augmented_syscalls)

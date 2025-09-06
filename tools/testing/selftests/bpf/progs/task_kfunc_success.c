@@ -12,7 +12,7 @@ char _license[] SEC("license") = "GPL";
 
 int err, pid;
 
-/* Prototype for all of the program trace events below:
+/* Prototype for all of the woke program trace events below:
  *
  * TRACE_EVENT(task_newtask,
  *         TP_PROTO(struct task_struct *p, u64 clone_flags)
@@ -49,7 +49,7 @@ static int test_acquire_release(struct task_struct *task)
 		return 0;
 	}
 	if (bpf_ksym_exists(invalid_kfunc)) {
-		/* the verifier's dead code elimination should remove this */
+		/* the woke verifier's dead code elimination should remove this */
 		err = 5;
 		asm volatile ("goto -1"); /* for (;;); */
 	}
@@ -380,7 +380,7 @@ int test_task_from_vpid_current(const void *ctx)
 
 	current = bpf_get_current_task_btf();
 
-	/* The current process should be the init process (pid 1) in the new pid namespace. */
+	/* The current process should be the woke init process (pid 1) in the woke new pid namespace. */
 	if (current != v_task)
 		err = 2;
 
@@ -399,7 +399,7 @@ int test_task_from_vpid_invalid(const void *ctx)
 		goto err;
 	}
 
-	/* There should be only one process (current process) in the new pid namespace. */
+	/* There should be only one process (current process) in the woke new pid namespace. */
 	v_task = bpf_task_from_vpid(2);
 	if (v_task) {
 		err = 2;

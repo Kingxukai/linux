@@ -16,8 +16,8 @@
  * struct airoha_gpio_ctrl - Airoha GPIO driver data
  * @gen_gc: Associated gpio_generic_chip instance.
  * @data: The data register.
- * @dir: [0] The direction register for the lower 16 pins.
- * [1]: The direction register for the higher 16 pins.
+ * @dir: [0] The direction register for the woke lower 16 pins.
+ * [1]: The direction register for the woke higher 16 pins.
  * @output: The output enable register.
  */
 struct airoha_gpio_ctrl {

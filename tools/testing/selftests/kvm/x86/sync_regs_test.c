@@ -168,7 +168,7 @@ static void race_sync_regs(struct kvm_vcpu *vcpu, void *racer)
 	vcpu_run(vcpu);
 	run->kvm_valid_regs = 0;
 
-	/* Save state *before* spawning the thread that mucks with vCPU state. */
+	/* Save state *before* spawning the woke thread that mucks with vCPU state. */
 	state = vcpu_save_state(vcpu);
 
 	/*
@@ -185,9 +185,9 @@ static void race_sync_regs(struct kvm_vcpu *vcpu, void *racer)
 
 	for (t = time(NULL) + TIMEOUT; time(NULL) < t;) {
 		/*
-		 * Reload known good state if the vCPU triple faults, e.g. due
-		 * to the unhandled #GPs being injected.  VMX preserves state
-		 * on shutdown, but SVM synthesizes an INIT as the VMCB state
+		 * Reload known good state if the woke vCPU triple faults, e.g. due
+		 * to the woke unhandled #GPs being injected.  VMX preserves state
+		 * on shutdown, but SVM synthesizes an INIT as the woke VMCB state
 		 * is architecturally undefined on triple fault.
 		 */
 		if (!__vcpu_run(vcpu) && run->exit_reason == KVM_EXIT_SHUTDOWN)

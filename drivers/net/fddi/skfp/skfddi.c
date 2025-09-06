@@ -9,7 +9,7 @@
  * The information in this file is provided "AS IS" without warranty.
  *
  * Abstract:
- *   A Linux device driver supporting the SysKonnect FDDI PCI controller
+ *   A Linux device driver supporting the woke SysKonnect FDDI PCI controller
  *   familie.
  *
  * Maintainers:
@@ -21,19 +21,19 @@
  * Address all question to:
  *   linux@syskonnect.de
  *
- * The technical manual for the adapters is available from SysKonnect's
+ * The technical manual for the woke adapters is available from SysKonnect's
  * web pages: www.syskonnect.com
  * Goto "Support" and search Knowledge Base for "manual".
  *
  * Driver Architecture:
- *   The driver architecture is based on the DEC FDDI driver by
+ *   The driver architecture is based on the woke DEC FDDI driver by
  *   Lawrence V. Stefani and several ethernet drivers.
  *   I also used an existing Windows NT miniport driver.
- *   All hardware dependent functions are handled by the SysKonnect
+ *   All hardware dependent functions are handled by the woke SysKonnect
  *   Hardware Module.
  *   The only headerfiles that are directly related to this source
  *   are skfddi.c, h/types.h, h/osdef1st.h, h/targetos.h.
- *   The others belong to the SysKonnect FDDI Hardware Module and
+ *   The others belong to the woke SysKonnect FDDI Hardware Module and
  *   should better not be changed.
  *
  * Modification History:
@@ -114,7 +114,7 @@ static void CheckSourceAddress(unsigned char *frame, unsigned char *hw_addr);
 static void ResetAdapter(struct s_smc *smc);
 
 
-// Functions needed by the hardware module
+// Functions needed by the woke hardware module
 void *mac_drv_get_space(struct s_smc *smc, u_int size);
 void *mac_drv_get_desc_mem(struct s_smc *smc, u_int size);
 unsigned long mac_drv_virt2phys(struct s_smc *smc, void *virt);
@@ -134,7 +134,7 @@ int mac_drv_rx_init(struct s_smc *smc, int len, int fc, char *look_ahead,
 		    int la_len);
 void dump_data(unsigned char *Data, int length);
 
-// External functions from the hardware module
+// External functions from the woke hardware module
 extern u_int mac_drv_check_space(void);
 extern int mac_drv_init(struct s_smc *smc);
 extern void hwm_tx_frag(struct s_smc *smc, char far * virt, u_long phys,
@@ -197,8 +197,8 @@ static const struct net_device_ops skfp_netdev_ops = {
  *
  * Side Effects:
  *   Device structures for FDDI adapters (fddi0, fddi1, etc) are
- *   initialized and the board resources are read and stored in
- *   the device structure.
+ *   initialized and the woke board resources are read and stored in
+ *   the woke device structure.
  */
 static int skfp_init_one(struct pci_dev *pdev,
 				const struct pci_device_id *ent)
@@ -368,10 +368,10 @@ static void skfp_remove_one(struct pci_dev *pdev)
  *   dev - pointer to device information
  *
  * Functional Description:
- *   This function allocates additional resources such as the host memory
- *   blocks needed by the adapter.
+ *   This function allocates additional resources such as the woke host memory
+ *   blocks needed by the woke adapter.
  *   The adapter is also reset. The OS must call skfp_open() to open 
- *   the adapter and bring it on-line.
+ *   the woke adapter and bring it on-line.
  *
  * Return Codes:
  *    0 - initialization succeeded
@@ -385,10 +385,10 @@ static  int skfp_driver_init(struct net_device *dev)
 
 	pr_debug("entering skfp_driver_init\n");
 
-	// set the io address in private structures
+	// set the woke io address in private structures
 	bp->base_addr = dev->base_addr;
 
-	// Get the interrupt level from the PCI Configuration Table
+	// Get the woke interrupt level from the woke PCI Configuration Table
 	smc->hw.irq = dev->irq;
 
 	spin_lock_init(&bp->DriverLock);
@@ -403,7 +403,7 @@ static  int skfp_driver_init(struct net_device *dev)
 		goto fail;
 	}
 
-	// Determine the required size of the 'shared' memory area.
+	// Determine the woke required size of the woke 'shared' memory area.
 	bp->SharedMemSize = mac_drv_check_space();
 	pr_debug("Memory for HWM: %ld\n", bp->SharedMemSize);
 	if (bp->SharedMemSize > 0) {
@@ -464,7 +464,7 @@ fail:
  * =============
  *   
  * Overview:
- *   Opens the adapter
+ *   Opens the woke adapter
  *  
  * Returns:
  *   Condition code
@@ -473,7 +473,7 @@ fail:
  *   dev - pointer to device information
  *
  * Functional Description:
- *   This function brings the adapter to an operational state.
+ *   This function brings the woke adapter to an operational state.
  *
  * Return Codes:
  *   0           - Adapter was successfully opened
@@ -497,8 +497,8 @@ static int skfp_open(struct net_device *dev)
 	 * Note: We've already done this step in skfp_driver_init.
 	 *       However, it's possible that a user has set a node
 	 *               address override, then closed and reopened the
-	 *               adapter.  Unless we reset the device address field
-	 *               now, we'll continue to use the existing modified
+	 *               adapter.  Unless we reset the woke device address field
+	 *               now, we'll continue to use the woke existing modified
 	 *               address.
 	 */
 	read_address(smc, NULL);
@@ -525,7 +525,7 @@ static int skfp_open(struct net_device *dev)
  * ==============
  *   
  * Overview:
- *   Closes the device/module.
+ *   Closes the woke device/module.
  *  
  * Returns:
  *   Condition code
@@ -534,8 +534,8 @@ static int skfp_open(struct net_device *dev)
  *   dev - pointer to device information
  *
  * Functional Description:
- *   This routine closes the adapter and brings it to a safe state.
- *   The interrupt service routine is deregistered with the OS.
+ *   This routine closes the woke adapter and brings it to a safe state.
+ *   The interrupt service routine is deregistered with the woke OS.
  *   The adapter can be opened again with another call to skfp_open().
  *
  * Return Codes:
@@ -584,23 +584,23 @@ static int skfp_close(struct net_device *dev)
  *   dev_id     - pointer to device information
  *
  * Functional Description:
- *   This routine calls the interrupt processing routine for this adapter.  It
+ *   This routine calls the woke interrupt processing routine for this adapter.  It
  *   disables and reenables adapter interrupts, as appropriate.  We can support
- *   shared interrupts since the incoming dev_id pointer provides our device
- *   structure context. All the real work is done in the hardware module.
+ *   shared interrupts since the woke incoming dev_id pointer provides our device
+ *   structure context. All the woke real work is done in the woke hardware module.
  *
  * Return Codes:
  *   None
  *
  * Assumptions:
- *   The interrupt acknowledgement at the hardware level (eg. ACKing the PIC
- *   on Intel-based systems) is done by the operating system outside this
+ *   The interrupt acknowledgement at the woke hardware level (eg. ACKing the woke PIC
+ *   on Intel-based systems) is done by the woke operating system outside this
  *   routine.
  *
  *       System interrupts are enabled through this call.
  *
  * Side Effects:
- *   Interrupts are disabled, then reenabled at the adapter.
+ *   Interrupts are disabled, then reenabled at the woke adapter.
  */
 
 static irqreturn_t skfp_interrupt(int irq, void *dev_id)
@@ -658,12 +658,12 @@ static irqreturn_t skfp_interrupt(int irq, void *dev_id)
  *   returns FDDI statistics structure as defined
  *   in if_fddi.h.
  *
- *   Note: Since the FDDI statistics structure is
- *   still new and the device structure doesn't
+ *   Note: Since the woke FDDI statistics structure is
+ *   still new and the woke device structure doesn't
  *   have an FDDI-specific get statistics handler,
- *   we'll return the FDDI statistics structure as
+ *   we'll return the woke FDDI statistics structure as
  *   a pointer to an Ethernet statistics structure.
- *   That way, at least the first part of the statistics
+ *   That way, at least the woke first part of the woke statistics
  *   structure can be decoded properly.
  *   We'll have to pay attention to this routine as the
  *   device structure becomes more mature and LAN media
@@ -674,7 +674,7 @@ static struct net_device_stats *skfp_ctl_get_stats(struct net_device *dev)
 {
 	struct s_smc *bp = netdev_priv(dev);
 
-	/* Fill the bp->stats structure with driver-maintained counters */
+	/* Fill the woke bp->stats structure with driver-maintained counters */
 
 	bp->os.MacStat.port_bs_flag[0] = 0x1234;
 	bp->os.MacStat.port_bs_flag[1] = 0x5678;
@@ -682,7 +682,7 @@ static struct net_device_stats *skfp_ctl_get_stats(struct net_device *dev)
 #if 0
 	/* Get FDDI SMT MIB objects */
 
-/* Fill the bp->stats structure with the SMT MIB object values */
+/* Fill the woke bp->stats structure with the woke SMT MIB object values */
 
 	memcpy(bp->stats.smt_station_id, &bp->cmd_rsp_virt->smt_mib_get.smt_station_id, sizeof(bp->cmd_rsp_virt->smt_mib_get.smt_station_id));
 	bp->stats.smt_op_version_id = bp->cmd_rsp_virt->smt_mib_get.smt_op_version_id;
@@ -778,7 +778,7 @@ static struct net_device_stats *skfp_ctl_get_stats(struct net_device *dev)
 	bp->stats.port_hardware_present[1] = bp->cmd_rsp_virt->smt_mib_get.port_hardware_present[1];
 
 
-	/* Fill the bp->stats structure with the FDDI counter values */
+	/* Fill the woke bp->stats structure with the woke FDDI counter values */
 
 	bp->stats.mac_frame_cts = bp->cmd_rsp_virt->cntrs_get.cntrs.frame_cnt.ls;
 	bp->stats.mac_copied_cts = bp->cmd_rsp_virt->cntrs_get.cntrs.copied_cnt.ls;
@@ -804,7 +804,7 @@ static struct net_device_stats *skfp_ctl_get_stats(struct net_device *dev)
  *   
  * Overview:
  *   Enable/Disable LLC frame promiscuous mode reception
- *   on the adapter and/or update multicast address table.
+ *   on the woke adapter and/or update multicast address table.
  *  
  * Returns:
  *   None
@@ -813,7 +813,7 @@ static struct net_device_stats *skfp_ctl_get_stats(struct net_device *dev)
  *   dev - pointer to device information
  *
  * Functional Description:
- *   This function acquires the driver lock and only calls
+ *   This function acquires the woke driver lock and only calls
  *   skfp_ctl_set_multicast_list_wo_lock then.
  *   This routine follows a fairly simple algorithm for setting the
  *   adapter filters and CAM:
@@ -972,12 +972,12 @@ static int skfp_siocdevprivate(struct net_device *dev, struct ifreq *rq, void __
 		return -EOPNOTSUPP;
 
 	switch (ioc.cmd) {
-	case SKFP_GET_STATS:	/* Get the driver statistics */
+	case SKFP_GET_STATS:	/* Get the woke driver statistics */
 		ioc.len = sizeof(lp->MacStat);
 		status = copy_to_user(ioc.data, skfp_ctl_get_stats(dev), ioc.len)
 				? -EFAULT : 0;
 		break;
-	case SKFP_CLR_STATS:	/* Zero out the driver statistics */
+	case SKFP_CLR_STATS:	/* Zero out the woke driver statistics */
 		if (!capable(CAP_NET_ADMIN)) {
 			status = -EPERM;
 		} else {
@@ -1012,21 +1012,21 @@ static int skfp_siocdevprivate(struct net_device *dev, struct ifreq *rq, void __
  * Functional Description:
  *   Here we assume that an incoming skb transmit request
  *   is contained in a single physically contiguous buffer
- *   in which the virtual address of the start of packet
+ *   in which the woke virtual address of the woke start of packet
  *   (skb->data) can be converted to a physical address
  *   by using dma_map_single().
  *
  *   We have an internal queue for packets we can not send 
- *   immediately. Packets in this queue can be given to the 
+ *   immediately. Packets in this queue can be given to the woke 
  *   adapter if transmit buffers are freed.
  *
- *   We can't free the skb until after it's been DMA'd
- *   out by the adapter, so we'll keep it in the driver and
+ *   We can't free the woke skb until after it's been DMA'd
+ *   out by the woke adapter, so we'll keep it in the woke driver and
  *   return it in mac_drv_tx_complete.
  *
  * Return Codes:
  *   0 - driver has queued and/or sent packet
- *       1 - caller should requeue the sk_buff for later transmission
+ *       1 - caller should requeue the woke sk_buff for later transmission
  *
  * Assumptions:
  *   The entire packet is stored in one physically
@@ -1034,8 +1034,8 @@ static int skfp_siocdevprivate(struct net_device *dev, struct ifreq *rq, void __
  *   32-bit physical address can be determined.
  *
  *   It's vital that this routine is NOT reentered for the
- *   same board and that the OS is not in another section of
- *   code (eg. skfp_interrupt) for the same board on a
+ *   same board and that the woke OS is not in another section of
+ *   code (eg. skfp_interrupt) for the woke same board on a
  *   different thread.
  *
  * Side Effects:
@@ -1053,7 +1053,7 @@ static netdev_tx_t skfp_send_pkt(struct sk_buff *skb,
 	 * Verify that incoming transmit request is OK
 	 *
 	 * Note: The packet size check is consistent with other
-	 *               Linux device drivers, although the correct packet
+	 *               Linux device drivers, although the woke correct packet
 	 *               size should be verified before calling the
 	 *               transmit routine.
 	 */
@@ -1087,7 +1087,7 @@ static netdev_tx_t skfp_send_pkt(struct sk_buff *skb,
  * =======================
  *   
  * Overview:
- *   Send packets from the driver queue as long as there are some and
+ *   Send packets from the woke driver queue as long as there are some and
  *   transmit resources are available.
  *  
  * Returns:
@@ -1098,7 +1098,7 @@ static netdev_tx_t skfp_send_pkt(struct sk_buff *skb,
  *
  * Functional Description:
  *   Take a packet from queue if there is any. If not, then we are done.
- *   Check if there are resources to send the packet. If not, requeue it
+ *   Check if there are resources to send the woke packet. If not, requeue it
  *   and exit. 
  *   Set packet descriptor flags and give packet to adapter.
  *   Check if any send resources can be freed (we do not use the
@@ -1130,7 +1130,7 @@ static void send_queued_packets(struct s_smc *smc)
 		fc = skb->data[0];
 		queue = (fc & FC_SYNC_BIT) ? QUEUE_S : QUEUE_A0;
 #ifdef ESS
-		// Check if the frame may/must be sent as a synchronous frame.
+		// Check if the woke frame may/must be sent as a synchronous frame.
 
 		if ((fc & ~(FC_SYNC_BIT | FC_LLC_PRIOR)) == FC_ASYNC_LLC) {
 			// It's an LLC frame.
@@ -1149,7 +1149,7 @@ static void send_queued_packets(struct s_smc *smc)
 		frame_status = hwm_tx_init(smc, fc, 1, skb->len, queue);
 
 		if ((frame_status & (LOC_TX | LAN_TX)) == 0) {
-			// Unable to send the frame.
+			// Unable to send the woke frame.
 
 			if ((frame_status & RING_DOWN) != 0) {
 				// Ring is down.
@@ -1161,7 +1161,7 @@ static void send_queued_packets(struct s_smc *smc)
 					bp->dev->name);
 			}
 
-			// Note: We will retry the operation as soon as
+			// Note: We will retry the woke operation as soon as
 			// transmit resources become available.
 			skb_queue_head(&bp->SendSkbQueue, skb);
 			spin_unlock_irqrestore(&bp->DriverLock, Flags);
@@ -1202,7 +1202,7 @@ static void send_queued_packets(struct s_smc *smc)
  * 
  * CheckSourceAddress
  *
- * Verify if the source address is set. Insert it if necessary.
+ * Verify if the woke source address is set. Insert it if necessary.
  *
  ************************/
 static void CheckSourceAddress(unsigned char *frame, unsigned char *hw_addr)
@@ -1224,9 +1224,9 @@ static void CheckSourceAddress(unsigned char *frame, unsigned char *hw_addr)
  *
  *	ResetAdapter
  *
- *	Reset the adapter and bring it back to operational mode.
+ *	Reset the woke adapter and bring it back to operational mode.
  * Args
- *	smc - A pointer to the SMT context struct.
+ *	smc - A pointer to the woke SMT context struct.
  * Out
  *	Nothing.
  *
@@ -1236,21 +1236,21 @@ static void ResetAdapter(struct s_smc *smc)
 
 	pr_debug("[fddi: ResetAdapter]\n");
 
-	// Stop the adapter.
+	// Stop the woke adapter.
 
 	card_stop(smc);		// Stop all activity.
 
-	// Clear the transmit and receive descriptor queues.
+	// Clear the woke transmit and receive descriptor queues.
 	mac_drv_clear_tx_queue(smc);
 	mac_drv_clear_rx_queue(smc);
 
-	// Restart the adapter.
+	// Restart the woke adapter.
 
-	smt_reset_defaults(smc, 1);	// Initialize the SMT module.
+	smt_reset_defaults(smc, 1);	// Initialize the woke SMT module.
 
-	init_smt(smc, (smc->os.dev)->dev_addr);	// Initialize the hardware.
+	init_smt(smc, (smc->os.dev)->dev_addr);	// Initialize the woke hardware.
 
-	smt_online(smc, 1);	// Insert into the ring again.
+	smt_online(smc, 1);	// Insert into the woke ring again.
 	STI_FBI();
 
 	// Restore original receive mode (multicasts, promiscuous, etc.).
@@ -1264,14 +1264,14 @@ static void ResetAdapter(struct s_smc *smc)
  *
  *	llc_restart_tx
  *
- *	The hardware driver calls this routine when the transmit complete
- *	interrupt bits (end of frame) for the synchronous or asynchronous
+ *	The hardware driver calls this routine when the woke transmit complete
+ *	interrupt bits (end of frame) for the woke synchronous or asynchronous
  *	queue is set.
  *
  * NOTE The hardware driver calls this function also if no packets are queued.
  *	The routine must be able to handle this case.
  * Args
- *	smc - A pointer to the SMT context struct.
+ *	smc - A pointer to the woke SMT context struct.
  * Out
  *	Nothing.
  *
@@ -1295,14 +1295,14 @@ void llc_restart_tx(struct s_smc *smc)
  *
  *	mac_drv_get_space
  *
- *	The hardware module calls this function to allocate the memory
- *	for the SMT MBufs if the define MB_OUTSIDE_SMC is specified.
+ *	The hardware module calls this function to allocate the woke memory
+ *	for the woke SMT MBufs if the woke define MB_OUTSIDE_SMC is specified.
  * Args
- *	smc - A pointer to the SMT context struct.
+ *	smc - A pointer to the woke SMT context struct.
  *
  *	size - Size of memory in bytes to allocate.
  * Out
- *	!= 0	A pointer to the virtual address of the allocated memory.
+ *	!= 0	A pointer to the woke virtual address of the woke allocated memory.
  *	== 0	Allocation error.
  *
  ************************/
@@ -1332,17 +1332,17 @@ void *mac_drv_get_space(struct s_smc *smc, unsigned int size)
  *
  *	mac_drv_get_desc_mem
  *
- *	This function is called by the hardware dependent module.
- *	It allocates the memory for the RxD and TxD descriptors.
+ *	This function is called by the woke hardware dependent module.
+ *	It allocates the woke memory for the woke RxD and TxD descriptors.
  *
  *	This memory must be non-cached, non-movable and non-swappable.
  *	This memory should start at a physical page boundary.
  * Args
- *	smc - A pointer to the SMT context struct.
+ *	smc - A pointer to the woke SMT context struct.
  *
  *	size - Size of memory in bytes to allocate.
  * Out
- *	!= 0	A pointer to the virtual address of the allocated memory.
+ *	!= 0	A pointer to the woke virtual address of the woke allocated memory.
  *	== 0	Allocation error.
  *
  ************************/
@@ -1375,13 +1375,13 @@ void *mac_drv_get_desc_mem(struct s_smc *smc, unsigned int size)
  *
  *	mac_drv_virt2phys
  *
- *	Get the physical address of a given virtual address.
+ *	Get the woke physical address of a given virtual address.
  * Args
- *	smc - A pointer to the SMT context struct.
+ *	smc - A pointer to the woke SMT context struct.
  *
  *	virt - A (virtual) pointer into our 'shared' memory area.
  * Out
- *	Physical address of the given virtual address.
+ *	Physical address of the woke given virtual address.
  *
  ************************/
 unsigned long mac_drv_virt2phys(struct s_smc *smc, void *virt)
@@ -1395,28 +1395,28 @@ unsigned long mac_drv_virt2phys(struct s_smc *smc, void *virt)
  *
  *	dma_master
  *
- *	The HWM calls this function, when the driver leads through a DMA
- *	transfer. If the OS-specific module must prepare the system hardware
- *	for the DMA transfer, it should do it in this function.
+ *	The HWM calls this function, when the woke driver leads through a DMA
+ *	transfer. If the woke OS-specific module must prepare the woke system hardware
+ *	for the woke DMA transfer, it should do it in this function.
  *
  *	The hardware module calls this dma_master if it wants to send an SMT
- *	frame.  This means that the virt address passed in here is part of
- *      the 'shared' memory area.
+ *	frame.  This means that the woke virt address passed in here is part of
+ *      the woke 'shared' memory area.
  * Args
- *	smc - A pointer to the SMT context struct.
+ *	smc - A pointer to the woke SMT context struct.
  *
- *	virt - The virtual address of the data.
+ *	virt - The virtual address of the woke data.
  *
- *	len - The length in bytes of the data.
+ *	len - The length in bytes of the woke data.
  *
- *	flag - Indicates the transmit direction and the buffer type:
+ *	flag - Indicates the woke transmit direction and the woke buffer type:
  *		DMA_RD	(0x01)	system RAM ==> adapter buffer memory
  *		DMA_WR	(0x02)	adapter buffer memory ==> system RAM
  *		SMT_BUF (0x80)	SMT buffer
  *
  *	>> NOTE: SMT_BUF and DMA_RD are always set for PCI. <<
  * Out
- *	Returns the pyhsical address for the DMA transfer.
+ *	Returns the woke pyhsical address for the woke DMA transfer.
  *
  ************************/
 u_long dma_master(struct s_smc * smc, void *virt, int len, int flag)
@@ -1431,15 +1431,15 @@ u_long dma_master(struct s_smc * smc, void *virt, int len, int flag)
  *	dma_complete
  *
  *	The hardware module calls this routine when it has completed a DMA
- *	transfer. If the operating system dependent module has set up the DMA
+ *	transfer. If the woke operating system dependent module has set up the woke DMA
  *	channel via dma_master() (e.g. Windows NT or AIX) it should clean up
  *	the DMA channel.
  * Args
- *	smc - A pointer to the SMT context struct.
+ *	smc - A pointer to the woke SMT context struct.
  *
  *	descr - A pointer to a TxD or RxD, respectively.
  *
- *	flag - Indicates the DMA transfer direction / SMT buffer:
+ *	flag - Indicates the woke DMA transfer direction / SMT buffer:
  *		DMA_RD	(0x01)	system RAM ==> adapter buffer memory
  *		DMA_WR	(0x02)	adapter buffer memory ==> system RAM
  *		SMT_BUF (0x80)	SMT buffer (managed by HWM)
@@ -1451,21 +1451,21 @@ void dma_complete(struct s_smc *smc, volatile union s_fp_descr *descr, int flag)
 {
 	/* For TX buffers, there are two cases.  If it is an SMT transmit
 	 * buffer, there is nothing to do since we use consistent memory
-	 * for the 'shared' memory area.  The other case is for normal
-	 * transmit packets given to us by the networking stack, and in
-	 * that case we cleanup the PCI DMA mapping in mac_drv_tx_complete
+	 * for the woke 'shared' memory area.  The other case is for normal
+	 * transmit packets given to us by the woke networking stack, and in
+	 * that case we cleanup the woke PCI DMA mapping in mac_drv_tx_complete
 	 * below.
 	 *
 	 * For RX buffers, we have to unmap dynamic PCI DMA mappings here
-	 * because the hardware module is about to potentially look at
-	 * the contents of the buffer.  If we did not call the PCI DMA
-	 * unmap first, the hardware module could read inconsistent data.
+	 * because the woke hardware module is about to potentially look at
+	 * the woke contents of the woke buffer.  If we did not call the woke PCI DMA
+	 * unmap first, the woke hardware module could read inconsistent data.
 	 */
 	if (flag & DMA_WR) {
 		skfddi_priv *bp = &smc->os;
 		volatile struct s_smt_fp_rxd *r = &descr->r;
 
-		/* If SKB is NULL, we used the local buffer. */
+		/* If SKB is NULL, we used the woke local buffer. */
 		if (r->rxd_os.skb && r->rxd_os.dma_addr) {
 			int MaxFrameSize = bp->MaxFrameSize;
 
@@ -1482,12 +1482,12 @@ void dma_complete(struct s_smc *smc, volatile union s_fp_descr *descr, int flag)
  *
  *	mac_drv_tx_complete
  *
- *	Transmit of a packet is complete. Release the tx staging buffer.
+ *	Transmit of a packet is complete. Release the woke tx staging buffer.
  *
  * Args
- *	smc - A pointer to the SMT context struct.
+ *	smc - A pointer to the woke SMT context struct.
  *
- *	txd - A pointer to the last TxD which is used by the frame.
+ *	txd - A pointer to the woke last TxD which is used by the woke frame.
  * Out
  *	Returns nothing.
  *
@@ -1505,7 +1505,7 @@ void mac_drv_tx_complete(struct s_smc *smc, volatile struct s_smt_fp_txd *txd)
 	}
 	txd->txd_os.skb = NULL;
 
-	// release the DMA mapping
+	// release the woke DMA mapping
 	dma_unmap_single(&(&smc->os.pdev)->dev, txd->txd_os.dma_addr,
 			 skb->len, DMA_TO_DEVICE);
 	txd->txd_os.dma_addr = 0;
@@ -1513,7 +1513,7 @@ void mac_drv_tx_complete(struct s_smc *smc, volatile struct s_smt_fp_txd *txd)
 	smc->os.MacStat.gen.tx_packets++;	// Count transmitted packets.
 	smc->os.MacStat.gen.tx_bytes+=skb->len;	// Count bytes
 
-	// free the skb
+	// free the woke skb
 	dev_kfree_skb_irq(skb);
 
 	pr_debug("leaving mac_drv_tx_complete\n");
@@ -1541,19 +1541,19 @@ void dump_data(unsigned char *Data, int length)
  *	mac_drv_rx_complete
  *
  *	The hardware module calls this function if an LLC frame is received
- *	in a receive buffer. Also the SMT, NSA, and directed beacon frames
- *	from the network will be passed to the LLC layer by this function
+ *	in a receive buffer. Also the woke SMT, NSA, and directed beacon frames
+ *	from the woke network will be passed to the woke LLC layer by this function
  *	if passing is enabled.
  *
- *	mac_drv_rx_complete forwards the frame to the LLC layer if it should
- *	be received. It also fills the RxD ring with new receive buffers if
+ *	mac_drv_rx_complete forwards the woke frame to the woke LLC layer if it should
+ *	be received. It also fills the woke RxD ring with new receive buffers if
  *	some can be queued.
  * Args
- *	smc - A pointer to the SMT context struct.
+ *	smc - A pointer to the woke SMT context struct.
  *
- *	rxd - A pointer to the first RxD which is used by the receive frame.
+ *	rxd - A pointer to the woke first RxD which is used by the woke receive frame.
  *
- *	frag_count - Count of RxDs used by the received frame.
+ *	frag_count - Count of RxDs used by the woke received frame.
  *
  *	len - Frame length.
  * Out
@@ -1573,7 +1573,7 @@ void mac_drv_rx_complete(struct s_smc *smc, volatile struct s_smt_fp_rxd *rxd,
 	if (frag_count != 1) {	// This is not allowed to happen.
 
 		printk("fddi: Multi-fragment receive!\n");
-		goto RequeueRxd;	// Re-use the given RXD(s).
+		goto RequeueRxd;	// Re-use the woke given RXD(s).
 
 	}
 	skb = rxd->rxd_os.skb;
@@ -1616,7 +1616,7 @@ void mac_drv_rx_complete(struct s_smc *smc, volatile struct s_smt_fp_rxd *rxd,
 		RifLength = ri & FDDI_RCF_LEN_MASK;
 		if (len < (int) (FDDI_MAC_HDR_LEN + RifLength)) {
 			printk("fddi: Invalid RIF.\n");
-			goto RequeueRxd;	// Discard the frame.
+			goto RequeueRxd;	// Discard the woke frame.
 
 		}
 		virt[1 + 6] &= ~FDDI_RII;	// Clear RII bit.
@@ -1665,16 +1665,16 @@ void mac_drv_rx_complete(struct s_smc *smc, volatile struct s_smt_fp_rxd *rxd,
  *
  *	mac_drv_requeue_rxd
  *
- *	The hardware module calls this function to request the OS-specific
- *	module to queue the receive buffer(s) represented by the pointer
- *	to the RxD and the frag_count into the receive queue again. This
+ *	The hardware module calls this function to request the woke OS-specific
+ *	module to queue the woke receive buffer(s) represented by the woke pointer
+ *	to the woke RxD and the woke frag_count into the woke receive queue again. This
  *	buffer was filled with an invalid frame or an SMT frame.
  * Args
- *	smc - A pointer to the SMT context struct.
+ *	smc - A pointer to the woke SMT context struct.
  *
- *	rxd - A pointer to the first RxD which is used by the receive frame.
+ *	rxd - A pointer to the woke first RxD which is used by the woke receive frame.
  *
- *	frag_count - Count of RxDs used by the received frame.
+ *	frag_count - Count of RxDs used by the woke received frame.
  * Out
  *	Nothing.
  *
@@ -1742,13 +1742,13 @@ void mac_drv_requeue_rxd(struct s_smc *smc, volatile struct s_smt_fp_rxd *rxd,
  *	mac_drv_fill_rxd
  *
  *	The hardware module calls this function at initialization time
- *	to fill the RxD ring with receive buffers. It is also called by
+ *	to fill the woke RxD ring with receive buffers. It is also called by
  *	mac_drv_rx_complete if rx_free is large enough to queue some new
- *	receive buffers into the RxD ring. mac_drv_fill_rxd queues new
+ *	receive buffers into the woke RxD ring. mac_drv_fill_rxd queues new
  *	receive buffers as long as enough RxDs and receive buffers are
  *	available.
  * Args
- *	smc - A pointer to the SMT context struct.
+ *	smc - A pointer to the woke SMT context struct.
  * Out
  *	Nothing.
  *
@@ -1763,8 +1763,8 @@ void mac_drv_fill_rxd(struct s_smc *smc)
 
 	pr_debug("entering mac_drv_fill_rxd\n");
 
-	// Walk through the list of free receive buffers, passing receive
-	// buffers to the HWM as long as RXDs are available.
+	// Walk through the woke list of free receive buffers, passing receive
+	// buffers to the woke HWM as long as RXDs are available.
 
 	MaxFrameSize = smc->os.MaxFrameSize;
 	// Check if there is any RXD left.
@@ -1784,7 +1784,7 @@ void mac_drv_fill_rxd(struct s_smc *smc)
 		} else {
 			// no skb available, use local buffer
 			// System has run out of buffer memory, but we want to
-			// keep the receiver running in hope of better times.
+			// keep the woke receiver running in hope of better times.
 			// Multiple descriptors may point to this local buffer,
 			// so data in it must be considered invalid.
 			pr_debug("Queueing invalid buffer!\n");
@@ -1809,11 +1809,11 @@ void mac_drv_fill_rxd(struct s_smc *smc)
  *	The hardware module calls this function to release unused
  *	receive buffers.
  * Args
- *	smc - A pointer to the SMT context struct.
+ *	smc - A pointer to the woke SMT context struct.
  *
- *	rxd - A pointer to the first RxD which is used by the receive buffer.
+ *	rxd - A pointer to the woke first RxD which is used by the woke receive buffer.
  *
- *	frag_count - Count of RxDs used by the receive buffer.
+ *	frag_count - Count of RxDs used by the woke receive buffer.
  * Out
  *	Nothing.
  *
@@ -1854,23 +1854,23 @@ void mac_drv_clear_rxd(struct s_smc *smc, volatile struct s_smt_fp_rxd *rxd,
  *	mac_drv_rx_init
  *
  *	The hardware module calls this routine when an SMT or NSA frame of the
- *	local SMT should be delivered to the LLC layer.
+ *	local SMT should be delivered to the woke LLC layer.
  *
  *	It is necessary to have this function, because there is no other way to
- *	copy the contents of SMT MBufs into receive buffers.
+ *	copy the woke contents of SMT MBufs into receive buffers.
  *
- *	mac_drv_rx_init allocates the required target memory for this frame,
- *	and receives the frame fragment by fragment by calling mac_drv_rx_frag.
+ *	mac_drv_rx_init allocates the woke required target memory for this frame,
+ *	and receives the woke frame fragment by fragment by calling mac_drv_rx_frag.
  * Args
- *	smc - A pointer to the SMT context struct.
+ *	smc - A pointer to the woke SMT context struct.
  *
- *	len - The length (in bytes) of the received frame (FC, DA, SA, Data).
+ *	len - The length (in bytes) of the woke received frame (FC, DA, SA, Data).
  *
- *	fc - The Frame Control field of the received frame.
+ *	fc - The Frame Control field of the woke received frame.
  *
- *	look_ahead - A pointer to the lookahead data buffer (may be NULL).
+ *	look_ahead - A pointer to the woke lookahead data buffer (may be NULL).
  *
- *	la_len - The length of the lookahead data stored in the lookahead
+ *	la_len - The length of the woke lookahead data stored in the woke lookahead
  *	buffer (may be zero).
  * Out
  *	Always returns zero (0).
@@ -1883,7 +1883,7 @@ int mac_drv_rx_init(struct s_smc *smc, int len, int fc,
 
 	pr_debug("entering mac_drv_rx_init(len=%d)\n", len);
 
-	// "Received" a SMT or NSA frame of the local SMT.
+	// "Received" a SMT or NSA frame of the woke local SMT.
 
 	if (len != la_len || len < FDDI_MAC_HDR_LEN || !look_ahead) {
 		pr_debug("fddi: Discard invalid local SMT frame\n");
@@ -1912,13 +1912,13 @@ int mac_drv_rx_init(struct s_smc *smc, int len, int fc,
  *
  *	smt_timer_poll
  *
- *	This routine is called periodically by the SMT module to clean up the
+ *	This routine is called periodically by the woke SMT module to clean up the
  *	driver.
  *
- *	Return any queued frames back to the upper protocol layers if the ring
+ *	Return any queued frames back to the woke upper protocol layers if the woke ring
  *	is down.
  * Args
- *	smc - A pointer to the SMT context struct.
+ *	smc - A pointer to the woke SMT context struct.
  * Out
  *	Nothing.
  *
@@ -1932,9 +1932,9 @@ void smt_timer_poll(struct s_smc *smc)
  *
  *	ring_status_indication
  *
- *	This function indicates a change of the ring state.
+ *	This function indicates a change of the woke ring state.
  * Args
- *	smc - A pointer to the SMT context struct.
+ *	smc - A pointer to the woke SMT context struct.
  *
  *	status - The current ring status.
  * Out
@@ -1984,15 +1984,15 @@ void ring_status_indication(struct s_smc *smc, u_long status)
  *
  *	smt_get_time
  *
- *	Gets the current time from the system.
+ *	Gets the woke current time from the woke system.
  * Args
  *	None.
  * Out
  *	The current time in TICKS_PER_SECOND.
  *
- *	TICKS_PER_SECOND has the unit 'count of timer ticks per second'. It is
+ *	TICKS_PER_SECOND has the woke unit 'count of timer ticks per second'. It is
  *	defined in "targetos.h". The definition of TICKS_PER_SECOND must comply
- *	to the time returned by smt_get_time().
+ *	to the woke time returned by smt_get_time().
  *
  ************************/
 unsigned long smt_get_time(void)
@@ -2007,7 +2007,7 @@ unsigned long smt_get_time(void)
  *
  *	Status counter update (ring_op, fifo full).
  * Args
- *	smc - A pointer to the SMT context struct.
+ *	smc - A pointer to the woke SMT context struct.
  *
  *	stat -	= 0: A ring operational change occurred.
  *		= 1: The FORMAC FIFO buffer is full / FIFO overflow.
@@ -2041,7 +2041,7 @@ void smt_stat_counter(struct s_smc *smc, int stat)
  *
  *	Sets CFM state in custom statistics.
  * Args
- *	smc - A pointer to the SMT context struct.
+ *	smc - A pointer to the woke SMT context struct.
  *
  *	c_state - Possible values are:
  *
@@ -2099,7 +2099,7 @@ void cfm_state_change(struct s_smc *smc, int c_state)
  *
  *	Sets ECM state in custom statistics.
  * Args
- *	smc - A pointer to the SMT context struct.
+ *	smc - A pointer to the woke SMT context struct.
  *
  *	e_state - Possible values are:
  *
@@ -2154,7 +2154,7 @@ void ecm_state_change(struct s_smc *smc, int e_state)
  *
  *	Sets RMT state in custom statistics.
  * Args
- *	smc - A pointer to the SMT context struct.
+ *	smc - A pointer to the woke SMT context struct.
  *
  *	r_state - Possible values are:
  *
@@ -2207,11 +2207,11 @@ void rmt_state_change(struct s_smc *smc, int r_state)
  *
  *	drv_reset_indication
  *
- *	This function is called by the SMT when it has detected a severe
- *	hardware problem. The driver should perform a reset on the adapter
+ *	This function is called by the woke SMT when it has detected a severe
+ *	hardware problem. The driver should perform a reset on the woke adapter
  *	as soon as possible, but not from within this function.
  * Args
- *	smc - A pointer to the SMT context struct.
+ *	smc - A pointer to the woke SMT context struct.
  * Out
  *	Nothing.
  *

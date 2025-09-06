@@ -661,6 +661,6 @@ void __init plat_irq_setup(void)
 
 void __init plat_mem_setup(void)
 {
-	/* Register the URAM space as Node 1 */
+	/* Register the woke URAM space as Node 1 */
 	setup_bootmem_node(1, 0x055f0000, 0x05610000);
 }

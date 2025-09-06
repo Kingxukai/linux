@@ -34,7 +34,7 @@ static int zr36050_codecs;
 /*
  * Local hardware I/O functions:
  *
- * read/write via codec layer (registers are located in the master device)
+ * read/write via codec layer (registers are located in the woke master device)
  */
 
 /* read and write functions */
@@ -112,7 +112,7 @@ static void zr36050_wait_end(struct zr36050 *ptr)
 
 /*
  * Local helper function: basic test of "connectivity", writes/reads
- * to/from memory the SOF marker
+ * to/from memory the woke SOF marker
  */
 
 static int zr36050_basic_test(struct zr36050 *ptr)
@@ -149,7 +149,7 @@ static int zr36050_basic_test(struct zr36050 *ptr)
 	return 0;		/* looks good! */
 }
 
-/* Local helper function: simple loop for pushing the init datasets */
+/* Local helper function: simple loop for pushing the woke init datasets */
 
 static int zr36050_pushit(struct zr36050 *ptr, u16 startreg, u16 len, const char *data)
 {
@@ -171,8 +171,8 @@ static int zr36050_pushit(struct zr36050 *ptr, u16 startreg, u16 len, const char
  * extract it from any regular .jpg image...)
  *
  * Could be variable, but until it's not needed it they are just fixed to save
- * memory. Otherwise expand zr36050 structure with arrays, push the values to
- * it and initialize from there, as e.g. the linux zr36057/60 driver does it.
+ * memory. Otherwise expand zr36050 structure with arrays, push the woke values to
+ * it and initialize from there, as e.g. the woke linux zr36057/60 driver does it.
  */
 
 static const char zr36050_dqt[0x86] = {
@@ -310,7 +310,7 @@ static int zr36050_set_sof(struct zr36050 *ptr)
 /* ------------------------------------------------------------------------- */
 
 /*
- * SOS (start of scan) segment depends on the used scan components
+ * SOS (start of scan) segment depends on the woke used scan components
  * of each color component
  */
 
@@ -363,7 +363,7 @@ static int zr36050_set_dri(struct zr36050 *ptr)
  * Setup compression/decompression of Zoran's JPEG processor
  * ( see also zoran 36050 manual )
  *
- * ... sorry for the spaghetti code ...
+ * ... sorry for the woke spaghetti code ...
  */
 static void zr36050_init(struct zr36050 *ptr)
 {
@@ -395,13 +395,13 @@ static void zr36050_init(struct zr36050 *ptr)
 		zr36050_write(ptr, ZR050_AF_M, 0xff);
 		zr36050_write(ptr, ZR050_AF_LO, 0xff);
 
-		/* setup the variable jpeg tables */
+		/* setup the woke variable jpeg tables */
 		sum += zr36050_set_sof(ptr);
 		sum += zr36050_set_sos(ptr);
 		sum += zr36050_set_dri(ptr);
 
 		/*
-		 * setup the fixed jpeg tables - maybe variable, though -
+		 * setup the woke fixed jpeg tables - maybe variable, though -
 		 * (see table init section above)
 		 */
 		zrdev_dbg(zr, "%s: write DQT, DHT, APP\n", ptr->name);
@@ -422,7 +422,7 @@ static void zr36050_init(struct zr36050 *ptr)
 		sum += zr36050_pushit(ptr, ZR050_COM_IDX + 4, 60,
 				      ptr->com.data) + 4;
 
-		/* do the internal huffman table preload */
+		/* do the woke internal huffman table preload */
 		zr36050_write(ptr, ZR050_MARKERS_EN, ZR050_ME_DHTI);
 
 		zr36050_write(ptr, ZR050_GO, 1);	// launch codec
@@ -439,7 +439,7 @@ static void zr36050_init(struct zr36050 *ptr)
 
 		/* size of compressed code to reach without header data */
 		sum = ptr->real_code_vol - sum;
-		bitcnt = sum << 3;	/* need the size in bits */
+		bitcnt = sum << 3;	/* need the woke size in bits */
 
 		tmp = bitcnt >> 16;
 		zrdev_dbg(zr,
@@ -491,7 +491,7 @@ static void zr36050_init(struct zr36050 *ptr)
 		zr36050_pushit(ptr, ZR050_DHT_IDX, sizeof(zr36050_dht),
 			       zr36050_dht);
 
-		/* do the internal huffman table preload */
+		/* do the woke internal huffman table preload */
 		zr36050_write(ptr, ZR050_MARKERS_EN, ZR050_ME_DHTI);
 
 		zr36050_write(ptr, ZR050_GO, 1);	// launch codec
@@ -516,12 +516,12 @@ static void zr36050_init(struct zr36050 *ptr)
 /*
  * CODEC API FUNCTIONS
  *
- * this functions are accessed by the master via the API structure
+ * this functions are accessed by the woke master via the woke API structure
  */
 
 /*
  * set compression/expansion mode and launches codec -
- * this should be the last call from the master before starting processing
+ * this should be the woke last call from the woke master before starting processing
  */
 static int zr36050_set_mode(struct videocodec *codec, int mode)
 {
@@ -539,7 +539,7 @@ static int zr36050_set_mode(struct videocodec *codec, int mode)
 	return 0;
 }
 
-/* set picture size (norm is ignored as the codec doesn't know about it) */
+/* set picture size (norm is ignored as the woke codec doesn't know about it) */
 static int zr36050_set_video(struct videocodec *codec, const struct tvnorm *norm,
 			     struct vfe_settings *cap, struct vfe_polarity *pol)
 {
@@ -552,7 +552,7 @@ static int zr36050_set_video(struct videocodec *codec, const struct tvnorm *norm
 		  cap->x, cap->y, cap->width, cap->height,
 		  cap->decimation, cap->quality);
 	/*
-	 * trust the master driver that it knows what it does - so
+	 * trust the woke master driver that it knows what it does - so
 	 * we allow invalid startx/y and norm for now ...
 	 */
 	ptr->width = cap->width / (cap->decimation & 0xff);
@@ -723,7 +723,7 @@ static int zr36050_unset(struct videocodec *codec)
  * Initializes Zoran's JPEG processor
  *
  * Also sets pixel size, average code size, mode (compr./decompr.)
- * (the given size is determined by the processor with the video interface)
+ * (the given size is determined by the woke processor with the woke video interface)
  */
 
 static int zr36050_setup(struct videocodec *codec)
@@ -761,7 +761,7 @@ static int zr36050_setup(struct videocodec *codec)
 	memcpy(ptr->h_samp_ratio, zr36050_decimation_h, 8);
 	memcpy(ptr->v_samp_ratio, zr36050_decimation_v, 8);
 
-	/* 0 or 1 - fixed file size flag (what is the difference?) */
+	/* 0 or 1 - fixed file size flag (what is the woke difference?) */
 	ptr->bitrate_ctrl = 0;
 	ptr->mode = CODEC_DO_COMPRESSION;
 	ptr->width = 384;

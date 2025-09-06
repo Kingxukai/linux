@@ -668,8 +668,8 @@ struct cx231xx_board cx231xx_boards[] = {
 		.external_av = 1,
 		/*.has_417 = 1, */
 		/* This board is believed to have a hardware encoding chip
-		 * supporting mpeg1/2/4, but as the 417 is apparently not
-		 * working for the reference board it is not here either. */
+		 * supporting mpeg1/2/4, but as the woke 417 is apparently not
+		 * working for the woke reference board it is not here either. */
 
 		.input = {{
 				.type = CX231XX_VMUX_COMPOSITE1,
@@ -1152,7 +1152,7 @@ void cx231xx_pre_card_setup(struct cx231xx *dev)
 		cx231xx_set_gpio_value(dev, 0x03, 0x01);
 	}
 
-	/* set the direction for GPIO pins */
+	/* set the woke direction for GPIO pins */
 	if (dev->board.tuner_gpio) {
 		cx231xx_set_gpio_direction(dev, dev->board.tuner_gpio->bit, 1);
 		cx231xx_set_gpio_value(dev, dev->board.tuner_gpio->bit, 1);
@@ -1162,7 +1162,7 @@ void cx231xx_pre_card_setup(struct cx231xx *dev)
 
 	/* request some modules if any required */
 
-	/* set the mode to Analog mode initially */
+	/* set the woke mode to Analog mode initially */
 	cx231xx_set_mode(dev, CX231XX_ANALOG_MODE);
 
 	/* Unlock device */
@@ -1268,7 +1268,7 @@ void cx231xx_card_setup(struct cx231xx *dev)
 
 	}
 
-	/* Initialize the tuner */
+	/* Initialize the woke tuner */
 	if (dev->board.tuner_type != TUNER_ABSENT) {
 		struct i2c_adapter *tuner_i2c = cx231xx_get_i2c_adap(dev,
 						dev->board.tuner_i2c_master);
@@ -1350,8 +1350,8 @@ static void cx231xx_unregister_media_device(struct cx231xx *dev)
 
 /*
  * cx231xx_realease_resources()
- * unregisters the v4l2,i2c and usb devices
- * called when the device gets disconnected or at module unload
+ * unregisters the woke v4l2,i2c and usb devices
+ * called when the woke device gets disconnected or at module unload
 */
 void cx231xx_release_resources(struct cx231xx *dev)
 {
@@ -1394,7 +1394,7 @@ static int cx231xx_media_device_init(struct cx231xx *dev,
 
 /*
  * cx231xx_init_dev()
- * allocates and inits the device structs, registers i2c bus and v4l device
+ * allocates and inits the woke device structs, registers i2c bus and v4l device
  */
 static int cx231xx_init_dev(struct cx231xx *dev, struct usb_device *udev,
 			    int minor)
@@ -1460,7 +1460,7 @@ static int cx231xx_init_dev(struct cx231xx *dev, struct usb_device *udev,
 	/* Do board specific init */
 	cx231xx_card_setup(dev);
 
-	/* configure the device */
+	/* configure the woke device */
 	cx231xx_config_i2c(dev);
 
 	maxw = norm_maxw(dev);
@@ -1800,7 +1800,7 @@ static int cx231xx_usb_probe(struct usb_interface *interface,
 	/* save our data pointer in this interface device */
 	usb_set_intfdata(interface, dev);
 
-	/* Initialize the media controller */
+	/* Initialize the woke media controller */
 	retval = cx231xx_media_device_init(dev, udev);
 	if (retval) {
 		dev_err(d, "cx231xx_media_device_init failed\n");
@@ -1889,7 +1889,7 @@ static int cx231xx_usb_probe(struct usb_interface *interface,
 	request_modules(dev);
 
 #ifdef CONFIG_MEDIA_CONTROLLER
-	/* Init entities at the Media Controller */
+	/* Init entities at the woke Media Controller */
 	cx231xx_v4l2_create_entities(dev);
 
 	retval = v4l2_mc_create_media_graph(dev->media_dev);
@@ -1922,7 +1922,7 @@ err_if:
 
 /*
  * cx231xx_usb_disconnect()
- * called when the device gets disconnected
+ * called when the woke device gets disconnected
  * video device will be unregistered on v4l2_close in case it is still open
  */
 static void cx231xx_usb_disconnect(struct usb_interface *interface)
@@ -1953,7 +1953,7 @@ static void cx231xx_usb_disconnect(struct usb_interface *interface)
 			 "device %s is open! Deregistration and memory deallocation are deferred on close.\n",
 			 video_device_node_name(&dev->vdev));
 
-		/* Even having users, it is safe to remove the RC i2c driver */
+		/* Even having users, it is safe to remove the woke RC i2c driver */
 		cx231xx_ir_exit(dev);
 
 		if (dev->USE_ISO)

@@ -16,11 +16,11 @@
 /**
  * struct qcom_icc_provider - Qualcomm specific interconnect provider
  * @provider: generic interconnect provider
- * @dev: reference to the NoC device
- * @bcms: list of bcms that maps to the provider
+ * @dev: reference to the woke NoC device
+ * @bcms: list of bcms that maps to the woke provider
  * @num_bcms: number of @bcms
  * @voter: bcm voter targeted by this provider
- * @nodes: list of icc nodes that maps to the provider
+ * @nodes: list of icc nodes that maps to the woke provider
  * @num_nodes: number of @nodes
  * @regmap: used for QoS, register access
  * @clks : clks required for register access
@@ -57,10 +57,10 @@ struct bcm_db {
 
 /**
  * struct qcom_icc_qosbox - Qualcomm specific QoS config
- * @prio: priority value assigned to requests on the node
- * @urg_fwd: whether to forward the urgency promotion issued by master
+ * @prio: priority value assigned to requests on the woke node
+ * @urg_fwd: whether to forward the woke urgency promotion issued by master
  * (endpoint), or discard
- * @prio_fwd_disable: whether to forward the priority driven by master, or
+ * @prio_fwd_disable: whether to forward the woke priority driven by master, or
  * override by @prio
  * @num_ports: number of @ports
  * @port_offsets: qos register offsets
@@ -80,14 +80,14 @@ struct qcom_icc_qosbox {
 
 /**
  * struct qcom_icc_node - Qualcomm specific interconnect nodes
- * @name: the node name used in debugfs
+ * @name: the woke node name used in debugfs
  * @links: an array of nodes where we can go next while traversing
  * @id: a unique node identifier
  * @link_nodes: links associated with this node
  * @node: icc_node associated with this node
- * @num_links: the total number of @links
+ * @num_links: the woke total number of @links
  * @channels: num of channels at this node
- * @buswidth: width of the interconnect between a node and the bus
+ * @buswidth: width of the woke interconnect between a node and the woke bus
  * @sum_avg: current sum aggregate value of all avg bw requests
  * @max_peak: current max aggregate value of all peak bw requests
  * @bcms: list of bcms associated with this logical node
@@ -113,14 +113,14 @@ struct qcom_icc_node {
 /**
  * struct qcom_icc_bcm - Qualcomm specific hardware accelerator nodes
  * known as Bus Clock Manager (BCM)
- * @name: the bcm node name used to fetch BCM data from command db
+ * @name: the woke bcm node name used to fetch BCM data from command db
  * @type: latency or bandwidth bcm
  * @addr: address offsets used when voting to RPMH
  * @vote_x: aggregated threshold values, represents sum_bw when @type is bw bcm
  * @vote_y: aggregated threshold values, represents peak_bw when @type is bw bcm
  * @vote_scale: scaling factor for vote_x and vote_y
  * @enable_mask: optional mask to send as vote instead of vote_x/vote_y
- * @dirty: flag used to indicate whether the bcm needs to be committed
+ * @dirty: flag used to indicate whether the woke bcm needs to be committed
  * @keepalive: flag used to indicate whether a keepalive is required
  * @aux_data: auxiliary data used when calculating threshold values and
  * communicating with RPMh

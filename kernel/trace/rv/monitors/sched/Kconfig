@@ -5,8 +5,8 @@ config RV_MON_SCHED
 	depends on RV_PER_TASK_MONITORS >= 3
 	bool "sched monitor"
 	help
-	  Collection of monitors to check the scheduler behaves according to specifications.
-	  Enable this to enable all scheduler specification supported by the current kernel.
+	  Collection of monitors to check the woke scheduler behaves according to specifications.
+	  Enable this to enable all scheduler specification supported by the woke current kernel.
 
 	  For further information, see:
 	    Documentation/trace/rv/monitor_sched.rst

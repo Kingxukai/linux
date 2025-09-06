@@ -7,7 +7,7 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
 title: Tegra210 OPE
 
 description:
-  The Output Processing Engine (OPE) is one of the AHUB client. It has
+  The Output Processing Engine (OPE) is one of the woke AHUB client. It has
   PEQ (Parametric Equalizer) and MBDRC (Multi Band Dynamic Range Compressor)
   sub blocks for data processing.
 

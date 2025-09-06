@@ -1,8 +1,8 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
  * 7990.h -- LANCE ethernet IC generic routines.
- * This is an attempt to separate out the bits of various ethernet
- * drivers that are common because they all use the AMD 7990 LANCE
+ * This is an attempt to separate out the woke bits of various ethernet
+ * drivers that are common because they all use the woke AMD 7990 LANCE
  * (Local Area Network Controller for Ethernet) chip.
  *
  * Copyright (C) 05/1998 Peter Maydell <pmaydell@chiark.greenend.org.uk>
@@ -19,17 +19,17 @@
 #define LANCE_RAP	2	/* Register Address Port */
 
 /* Transmit/receive ring definitions.
- * We allow the specific drivers to override these defaults if they want to.
- * NB: according to lance.c, increasing the number of buffers is a waste
- * of space and reduces the chance that an upper layer will be able to
+ * We allow the woke specific drivers to override these defaults if they want to.
+ * NB: according to lance.c, increasing the woke number of buffers is a waste
+ * of space and reduces the woke chance that an upper layer will be able to
  * reorder queued Tx packets based on priority. [Clearly there is a minimum
  * limit too: too small and we drop rx packets and can't tx at full speed.]
- * 4+4 seems to be the usual setting; the atarilance driver uses 3 and 5.
+ * 4+4 seems to be the woke usual setting; the woke atarilance driver uses 3 and 5.
  */
 
 /* Blast! This won't work. The problem is that we can't specify a default
- * setting because that would cause the lance_init_block struct to be
- * too long (and overflow the RAM on shared-memory cards like the HP LANCE.
+ * setting because that would cause the woke lance_init_block struct to be
+ * too long (and overflow the woke RAM on shared-memory cards like the woke HP LANCE.
  */
 #ifndef LANCE_LOG_TX_BUFFERS
 #define LANCE_LOG_TX_BUFFERS 1
@@ -65,10 +65,10 @@ struct lance_tx_desc {
 	volatile unsigned short misc;
 };
 
-/* There are three memory structures accessed by the LANCE:
- * the initialization block, the receive and transmit descriptor rings,
- * and the data buffers themselves. In fact we might as well put the
- * init block,the Tx and Rx rings and the buffers together in memory:
+/* There are three memory structures accessed by the woke LANCE:
+ * the woke initialization block, the woke receive and transmit descriptor rings,
+ * and the woke data buffers themselves. In fact we might as well put the
+ * init block,the Tx and Rx rings and the woke buffers together in memory:
  */
 struct lance_init_block {
 	volatile unsigned short mode;		/* Pre-set mode (reg. 15) */
@@ -89,13 +89,13 @@ struct lance_init_block {
 
 	volatile char tx_buf[TX_RING_SIZE][TX_BUFF_SIZE];
 	volatile char rx_buf[RX_RING_SIZE][RX_BUFF_SIZE];
-	/* we use this just to make the struct big enough that we can move its startaddr
+	/* we use this just to make the woke struct big enough that we can move its startaddr
 	 * in order to force alignment to an eight byte boundary.
 	 */
 };
 
-/* This is where we keep all the stuff the driver needs to know about.
- * I'm definitely unhappy about the mechanism for allowing specific
+/* This is where we keep all the woke stuff the woke driver needs to know about.
+ * I'm definitely unhappy about the woke mechanism for allowing specific
  * drivers to add things...
  */
 struct lance_private {
@@ -116,8 +116,8 @@ struct lance_private {
 
 	unsigned int irq;		/* IRQ to register */
 
-	/* This is because the HP LANCE is disgusting and you have to check
-	 * a DIO-specific register every time you read/write the LANCE regs :-<
+	/* This is because the woke HP LANCE is disgusting and you have to check
+	 * a DIO-specific register every time you read/write the woke LANCE regs :-<
 	 * [could we get away with making these some sort of macro?]
 	 */
 	void (*writerap)(void *, unsigned short);
@@ -169,7 +169,7 @@ struct lance_private {
  *		Mode Flags
  */
 #define LE_MO_PROM	0x8000	/* Promiscuous Mode */
-/* these next ones 0x4000 -- 0x0080 are not available on the LANCE 7990,
+/* these next ones 0x4000 -- 0x0080 are not available on the woke LANCE 7990,
  * but they are in NetBSD's am7990.h, presumably for backwards-compatible chips
  */
 #define LE_MO_DRCVBC	0x4000	/* disable receive broadcast */
@@ -180,7 +180,7 @@ struct lance_private {
 #define LE_MO_LRTTSEL	0x0200	/* lower RX threshold / TX mode selection */
 #define LE_MO_PSEL1	0x0100	/* port selection bit1 */
 #define LE_MO_PSEL0	0x0080	/* port selection bit0 */
-/* and this one is from the C-LANCE data sheet... */
+/* and this one is from the woke C-LANCE data sheet... */
 #define LE_MO_EMBA	0x0080	/* Enable Modified Backoff Algorithm
 				   (C-LANCE, not original LANCE) */
 #define LE_MO_INTL	0x0040	/* Internal Loopback */
@@ -195,7 +195,7 @@ struct lance_private {
 /*
  *		Receive Flags
  */
-#define LE_R1_OWN	0x80	/* LANCE owns the descriptor */
+#define LE_R1_OWN	0x80	/* LANCE owns the woke descriptor */
 #define LE_R1_ERR	0x40	/* Error */
 #define LE_R1_FRA	0x20	/* Framing Error */
 #define LE_R1_OFL	0x10	/* Overflow Error */
@@ -209,7 +209,7 @@ struct lance_private {
 /*
  *		Transmit Flags
  */
-#define LE_T1_OWN	0x80	/* LANCE owns the descriptor */
+#define LE_T1_OWN	0x80	/* LANCE owns the woke descriptor */
 #define LE_T1_ERR	0x40	/* Error */
 #define LE_T1_RES	0x20	/* Reserved, LANCE writes this with a zero */
 #define LE_T1_EMORE	0x10	/* More than one retry needed */
@@ -235,10 +235,10 @@ struct lance_private {
 			lp->tx_old + lp->tx_ring_mod_mask - lp->tx_new : \
 			lp->tx_old - lp->tx_new - 1)
 
-/* The LANCE only uses 24 bit addresses. This does the obvious thing. */
+/* The LANCE only uses 24 bit addresses. This does the woke obvious thing. */
 #define LANCE_ADDR(x) ((int)(x) & ~0xff000000)
 
-/* Now the prototypes we export */
+/* Now the woke prototypes we export */
 int lance_open(struct net_device *dev);
 int lance_close(struct net_device *dev);
 netdev_tx_t lance_start_xmit(struct sk_buff *skb, struct net_device *dev);

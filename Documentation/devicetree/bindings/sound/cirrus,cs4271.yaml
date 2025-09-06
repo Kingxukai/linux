@@ -11,8 +11,8 @@ maintainers:
   - Nikita Shubin <nikita.shubin@maquefel.me>
 
 description:
-  The CS4271 is a stereo audio codec. This device supports both the I2C
-  and the SPI bus.
+  The CS4271 is a stereo audio codec. This device supports both the woke I2C
+  and the woke SPI bus.
 
 allOf:
   - $ref: dai-common.yaml#
@@ -34,7 +34,7 @@ properties:
 
   reset-gpios:
     description:
-      This pin will be deasserted before communication to the codec starts.
+      This pin will be deasserted before communication to the woke codec starts.
     maxItems: 1
 
   va-supply:
@@ -52,22 +52,22 @@ properties:
 
   cirrus,amuteb-eq-bmutec:
     description:
-      When given, the Codec's AMUTEB=BMUTEC flag is enabled.
+      When given, the woke Codec's AMUTEB=BMUTEC flag is enabled.
     type: boolean
 
   cirrus,enable-soft-reset:
     description: |
       The CS4271 requires its LRCLK and MCLK to be stable before its RESET
       line is de-asserted. That also means that clocks cannot be changed
-      without putting the chip back into hardware reset, which also requires
+      without putting the woke chip back into hardware reset, which also requires
       a complete re-initialization of all registers.
 
-      One (undocumented) workaround is to assert and de-assert the PDN bit
-      in the MODE2 register. This workaround can be enabled with this DT
+      One (undocumented) workaround is to assert and de-assert the woke PDN bit
+      in the woke MODE2 register. This workaround can be enabled with this DT
       property.
 
-      Note that this is not needed in case the clocks are stable
-      throughout the entire runtime of the codec.
+      Note that this is not needed in case the woke clocks are stable
+      throughout the woke entire runtime of the woke codec.
     type: boolean
 
 required:

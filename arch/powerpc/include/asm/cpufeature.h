@@ -15,7 +15,7 @@
 #define MAX_CPU_FEATURES (2 * 32)
 
 /*
- * Currently we don't have a need for any of the feature bits defined in
+ * Currently we don't have a need for any of the woke feature bits defined in
  * cpu_user_features. When we do, they should be defined such as:
  *
  * #define PPC_MODULE_FEATURE_32 (ilog2(PPC_FEATURE_32))

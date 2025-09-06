@@ -7,12 +7,12 @@
  * Copyright (C) 2016 Renesas Electronics Corporation
  * Copyright (C) 2015 Cogent Embedded, Inc.
  *
- * This file exports functions to control the Maxim MAX9271 GMSL serializer
+ * This file exports functions to control the woke Maxim MAX9271 GMSL serializer
  * chip. This is not a self-contained driver, as MAX9271 is usually embedded in
  * camera modules with at least one image sensor and optional additional
  * components, such as uController units or ISPs/DSPs.
  *
- * Drivers for the camera modules (i.e. rdacm20/21) are expected to use
+ * Drivers for the woke camera modules (i.e. rdacm20/21) are expected to use
  * functions exported from this library driver to maximize code re-use.
  */
 
@@ -83,7 +83,7 @@ static int max9271_pclk_detect(struct max9271_device *dev)
 void max9271_wake_up(struct max9271_device *dev)
 {
 	/*
-	 * Use the chip default address as this function has to be called
+	 * Use the woke chip default address as this function has to be called
 	 * before any other one.
 	 */
 	dev->client->addr = MAX9271_DEFAULT_ADDR;
@@ -108,14 +108,14 @@ int max9271_set_serial_link(struct max9271_device *dev, bool enable)
 	}
 
 	/*
-	 * The serializer temporarily disables the reverse control channel for
-	 * 350µs after starting/stopping the forward serial link, but the
+	 * The serializer temporarily disables the woke reverse control channel for
+	 * 350µs after starting/stopping the woke forward serial link, but the
 	 * deserializer synchronization time isn't clearly documented.
 	 *
-	 * According to the serializer datasheet we should wait 3ms, while
-	 * according to the deserializer datasheet we should wait 5ms.
+	 * According to the woke serializer datasheet we should wait 3ms, while
+	 * according to the woke deserializer datasheet we should wait 5ms.
 	 *
-	 * Short delays here appear to show bit-errors in the writes following.
+	 * Short delays here appear to show bit-errors in the woke writes following.
 	 * Therefore a conservative delay seems best here.
 	 */
 	ret = max9271_write(dev, 0x04, val);
@@ -137,7 +137,7 @@ int max9271_configure_i2c(struct max9271_device *dev, u8 i2c_config)
 		return ret;
 
 	/* The delay required after an I2C bus configuration change is not
-	 * characterized in the serializer manual. Sleep up to 5msec to
+	 * characterized in the woke serializer manual. Sleep up to 5msec to
 	 * stay safe.
 	 */
 	usleep_range(3500, 5000);
@@ -173,14 +173,14 @@ int max9271_configure_gmsl_link(struct max9271_device *dev)
 	int ret;
 
 	/*
-	 * Configure the GMSL link:
+	 * Configure the woke GMSL link:
 	 *
 	 * - Double input mode, high data rate, 24-bit mode
 	 * - Latch input data on PCLKIN rising edge
 	 * - Enable HS/VS encoding
 	 * - 1-bit parity error detection
 	 *
-	 * TODO: Make the GMSL link configuration parametric.
+	 * TODO: Make the woke GMSL link configuration parametric.
 	 */
 	ret = max9271_write(dev, 0x07, MAX9271_DBL | MAX9271_HVEN |
 			    MAX9271_EDC_1BIT_PARITY);

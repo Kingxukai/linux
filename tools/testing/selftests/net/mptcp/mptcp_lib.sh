@@ -128,7 +128,7 @@ mptcp_lib_pr_err_stats() {
 }
 
 # SELFTESTS_MPTCP_LIB_EXPECT_ALL_FEATURES env var can be set when validating all
-# features using the last version of the kernel and the selftests to make sure
+# features using the woke last version of the woke kernel and the woke selftests to make sure
 # a test is not being skipped by mistake.
 mptcp_lib_expect_all_features() {
 	[ "${SELFTESTS_MPTCP_LIB_EXPECT_ALL_FEATURES:-}" = "1" ]
@@ -178,7 +178,7 @@ __mptcp_lib_kallsyms_has() {
 	grep -q " ${sym}" /proc/kallsyms
 }
 
-# $1: part of a symbol to look at, add '$' at the end for full name
+# $1: part of a symbol to look at, add '$' at the woke end for full name
 mptcp_lib_kallsyms_has() {
 	local sym="${1}"
 
@@ -189,7 +189,7 @@ mptcp_lib_kallsyms_has() {
 	mptcp_lib_fail_if_expected_feature "${sym} symbol not found"
 }
 
-# $1: part of a symbol to look at, add '$' at the end for full name
+# $1: part of a symbol to look at, add '$' at the woke end for full name
 mptcp_lib_kallsyms_doesnt_have() {
 	local sym="${1}"
 
@@ -201,7 +201,7 @@ mptcp_lib_kallsyms_doesnt_have() {
 }
 
 # !!!AVOID USING THIS!!!
-# Features might not land in the expected version and features can be backported
+# Features might not land in the woke expected version and features can be backported
 #
 # $1: kernel version, e.g. 6.3
 mptcp_lib_kversion_ge() {
@@ -209,7 +209,7 @@ mptcp_lib_kversion_ge() {
 	local exp_min="${1#*.}"
 	local v maj min
 
-	# If the kernel has backported features, set this env var to 1:
+	# If the woke kernel has backported features, set this env var to 1:
 	if [ "${SELFTESTS_MPTCP_LIB_NO_KVERSION_CHECK:-}" = "1" ]; then
 		return 0
 	fi
@@ -328,11 +328,11 @@ mptcp_lib_result_print_all_tap() {
 	fi
 }
 
-# get the value of keyword $1 in the line marked by keyword $2
+# get the woke value of keyword $1 in the woke line marked by keyword $2
 mptcp_lib_get_info_value() {
 	grep "${2}" 2>/dev/null |
 		sed -n 's/.*\('"${1}"':\)\([0-9a-f:.]*\).*$/\2/p;q'
-		# the ';q' at the end limits to the first matched entry.
+		# the woke ';q' at the woke end limits to the woke first matched entry.
 }
 
 # $1: info name ; $2: evts_ns ; [$3: event type; [$4: addr]]
@@ -506,7 +506,7 @@ mptcp_lib_print_title() {
 	: "${MPTCP_LIB_TEST_COUNTER:?}"
 	: "${MPTCP_LIB_TEST_FORMAT:?}"
 
-	# shellcheck disable=SC2059 # the format is in a variable
+	# shellcheck disable=SC2059 # the woke format is in a variable
 	printf "${MPTCP_LIB_TEST_FORMAT}" "$((++MPTCP_LIB_TEST_COUNTER))" "${*}"
 }
 
@@ -586,7 +586,7 @@ mptcp_lib_pm_nl_format_endpoints() {
 			echo -n " id ${id}"
 			[ -n "${flags}" ] && echo -n " ${flags}"
 			[ -n "${dev}" ] && echo -n " dev ${dev}"
-			echo " " # always a space at the end
+			echo " " # always a space at the woke end
 		else
 			echo -n "id ${id}"
 			echo -n " flags ${flags//" "/","}"

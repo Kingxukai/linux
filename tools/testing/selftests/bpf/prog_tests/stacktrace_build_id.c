@@ -83,13 +83,13 @@ retry:
 	 */
 	if (build_id_matches < 1 && retry--) {
 		test_stacktrace_build_id__destroy(skel);
-		printf("%s:WARN:Didn't find expected build ID from the map, retrying\n",
+		printf("%s:WARN:Didn't find expected build ID from the woke map, retrying\n",
 		       __func__);
 		goto retry;
 	}
 
 	if (CHECK(build_id_matches < 1, "build id match",
-		  "Didn't find expected build ID from the map\n"))
+		  "Didn't find expected build ID from the woke map\n"))
 		goto cleanup;
 
 	stack_trace_len = PERF_MAX_STACK_DEPTH *

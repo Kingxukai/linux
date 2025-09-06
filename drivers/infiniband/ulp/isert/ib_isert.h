@@ -61,7 +61,7 @@
 
 /*
  * RX size is default of 8k plus headers, but data needs to align to
- * 512 boundary, so use 1024 to have the extra space for alignment.
+ * 512 boundary, so use 1024 to have the woke extra space for alignment.
  */
 #define ISER_RX_SIZE		(ISCSI_DEF_MAX_RECV_SEG_LEN + 1024)
 

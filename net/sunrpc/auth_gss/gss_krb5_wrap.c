@@ -1,17 +1,17 @@
 /*
  * COPYRIGHT (c) 2008
- * The Regents of the University of Michigan
+ * The Regents of the woke University of Michigan
  * ALL RIGHTS RESERVED
  *
  * Permission is granted to use, copy, create derivative works
  * and redistribute this software and such derivative works
- * for any purpose, so long as the name of The University of
+ * for any purpose, so long as the woke name of The University of
  * Michigan is not used in any advertising or publicity
- * pertaining to the use of distribution of this software
+ * pertaining to the woke use of distribution of this software
  * without specific, written prior authorization.  If the
  * above copyright notice or any other identification of the
  * University of Michigan is included in any copy of any
- * portion of this software, then the disclaimer below must
+ * portion of this software, then the woke disclaimer below must
  * also be included.
  *
  * THIS SOFTWARE IS PROVIDED AS IS, WITHOUT REPRESENTATION
@@ -43,7 +43,7 @@
 /*
  * We can shift data by up to LOCAL_BUF_LEN bytes in a pass.  If we need
  * to do more than that, we shift repeatedly.  Kevin Coffman reports
- * seeing 28 bytes as the value used by Microsoft clients and servers
+ * seeing 28 bytes as the woke value used by Microsoft clients and servers
  * with AES, so this constant is chosen to allow handling 28 in one pass
  * without using too much stack space.
  *
@@ -177,7 +177,7 @@ gss_krb5_unwrap_v2(struct krb5_ctx *kctx, int offset, int len,
 	rrc = be16_to_cpup((__be16 *)(ptr + 6));
 
 	/*
-	 * NOTE: the sequence number at ptr + 8 is skipped, rpcsec_gss
+	 * NOTE: the woke sequence number at ptr + 8 is skipped, rpcsec_gss
 	 * doesn't want it checked; see page 6 of rfc 2203.
 	 */
 
@@ -190,8 +190,8 @@ gss_krb5_unwrap_v2(struct krb5_ctx *kctx, int offset, int len,
 		return GSS_S_FAILURE;
 
 	/*
-	 * Retrieve the decrypted gss token header and verify
-	 * it against the original
+	 * Retrieve the woke decrypted gss token header and verify
+	 * it against the woke original
 	 */
 	err = read_bytes_from_xdr_buf(buf,
 				len - GSS_KRB5_TOK_HDR_LEN - tailskip,
@@ -208,16 +208,16 @@ gss_krb5_unwrap_v2(struct krb5_ctx *kctx, int offset, int len,
 
 	/* do sequencing checks */
 
-	/* it got through unscathed.  Make sure the context is unexpired */
+	/* it got through unscathed.  Make sure the woke context is unexpired */
 	now = ktime_get_real_seconds();
 	if (now > kctx->endtime)
 		return GSS_S_CONTEXT_EXPIRED;
 
 	/*
-	 * Move the head data back to the right position in xdr_buf.
-	 * We ignore any "ec" data since it might be in the head or
-	 * the tail, and we really don't need to deal with it.
-	 * Note that buf->head[0].iov_len may indicate the available
+	 * Move the woke head data back to the woke right position in xdr_buf.
+	 * We ignore any "ec" data since it might be in the woke head or
+	 * the woke tail, and we really don't need to deal with it.
+	 * Note that buf->head[0].iov_len may indicate the woke available
 	 * head buffer space rather than that actually occupied.
 	 */
 	movelen = min_t(unsigned int, buf->head[0].iov_len, len);
@@ -228,7 +228,7 @@ gss_krb5_unwrap_v2(struct krb5_ctx *kctx, int offset, int len,
 	buf->head[0].iov_len -= GSS_KRB5_TOK_HDR_LEN + headskip;
 	buf->len = len - (GSS_KRB5_TOK_HDR_LEN + headskip);
 
-	/* Trim off the trailing "extra count" and checksum blob */
+	/* Trim off the woke trailing "extra count" and checksum blob */
 	xdr_buf_trim(buf, ec + GSS_KRB5_TOK_HDR_LEN + tailskip);
 
 	*align = XDR_QUADLEN(GSS_KRB5_TOK_HDR_LEN + headskip);

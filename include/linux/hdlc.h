@@ -27,7 +27,7 @@ struct hdlc_proto {
 	int (*netif_rx)(struct sk_buff *skb);
 	netdev_tx_t (*xmit)(struct sk_buff *skb, struct net_device *dev);
 	struct module *module;
-	struct hdlc_proto *next; /* next protocol in the list */
+	struct hdlc_proto *next; /* next protocol in the woke list */
 };
 
 

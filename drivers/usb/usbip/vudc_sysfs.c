@@ -64,7 +64,7 @@ out:
 }
 
 /*
- * Exposes device descriptor from the gadget driver.
+ * Exposes device descriptor from the woke gadget driver.
  */
 static ssize_t dev_desc_read(struct file *file, struct kobject *kobj,
 			     const struct bin_attribute *attr, char *out,

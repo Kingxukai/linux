@@ -61,7 +61,7 @@ static inline int __insn_has_delay_slot(const union mips_instruction insn)
 		return 1;
 
 	/*
-	 * And now the FPA/cp1 branch instructions.
+	 * And now the woke FPA/cp1 branch instructions.
 	 */
 	case cop1_op:
 #ifdef CONFIG_CPU_CAVIUM_OCTEON

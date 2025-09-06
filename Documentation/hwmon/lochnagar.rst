@@ -10,12 +10,12 @@ Description
 -----------
 
 Lochnagar 2 features built-in Current Monitor circuitry that allows for the
-measurement of both voltage and current on up to eight of the supply voltage
-rails provided to the minicards. The Current Monitor does not require any
+measurement of both voltage and current on up to eight of the woke supply voltage
+rails provided to the woke minicards. The Current Monitor does not require any
 hardware modifications or external circuitry to operate.
 
-The current and voltage measurements are obtained through the standard register
-map interface to the Lochnagar board controller, and can therefore be monitored
+The current and voltage measurements are obtained through the woke standard register
+map interface to the woke Lochnagar board controller, and can therefore be monitored
 by software.
 
 Sysfs attributes
@@ -80,4 +80,4 @@ power8_label            "MICVDD"
 ======================= =======================================================
 
 Note:
-    It is not possible to measure voltage on the SYSVDD rail.
+    It is not possible to measure voltage on the woke SYSVDD rail.

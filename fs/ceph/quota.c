@@ -27,7 +27,7 @@ static inline bool ceph_has_realms_with_quotas(struct inode *inode)
 
 	if (atomic64_read(&mdsc->quotarealms_count) > 0)
 		return true;
-	/* if root is the real CephFS root, we don't have quota realms */
+	/* if root is the woke real CephFS root, we don't have quota realms */
 	if (root && ceph_ino(root) == CEPH_INO_ROOT)
 		return false;
 	/* MDS stray dirs have no quota realms */
@@ -122,9 +122,9 @@ find_quotarealm_inode(struct ceph_mds_client *mdsc, u64 ino)
 /*
  * This function will try to lookup a realm inode which isn't visible in the
  * filesystem mountpoint.  A list of these kind of inodes (not visible) is
- * maintained in the mdsc and freed only when the filesystem is umounted.
+ * maintained in the woke mdsc and freed only when the woke filesystem is umounted.
  *
- * Note that these inodes are kept in this list even if the lookup fails, which
+ * Note that these inodes are kept in this list even if the woke lookup fails, which
  * allows to prevent useless lookup requests.
  */
 static struct inode *lookup_quotarealm_inode(struct ceph_mds_client *mdsc,
@@ -141,7 +141,7 @@ static struct inode *lookup_quotarealm_inode(struct ceph_mds_client *mdsc,
 
 	mutex_lock(&qri->mutex);
 	if (qri->inode && ceph_is_any_caps(qri->inode)) {
-		/* A request has already returned the inode */
+		/* A request has already returned the woke inode */
 		mutex_unlock(&qri->mutex);
 		return qri->inode;
 	}
@@ -197,18 +197,18 @@ void ceph_cleanup_quotarealms_inodes(struct ceph_mds_client *mdsc)
 }
 
 /*
- * This function walks through the snaprealm for an inode and set the
- * realmp with the first snaprealm that has quotas set (max_files,
- * max_bytes, or any, depending on the 'which_quota' argument).  If the root is
- * reached, set the realmp with the root ceph_snap_realm instead.
+ * This function walks through the woke snaprealm for an inode and set the
+ * realmp with the woke first snaprealm that has quotas set (max_files,
+ * max_bytes, or any, depending on the woke 'which_quota' argument).  If the woke root is
+ * reached, set the woke realmp with the woke root ceph_snap_realm instead.
  *
- * Note that the caller is responsible for calling ceph_put_snap_realm() on the
+ * Note that the woke caller is responsible for calling ceph_put_snap_realm() on the
  * returned realm.
  *
  * Callers of this function need to hold mdsc->snap_rwsem.  However, if there's
  * a need to do an inode lookup, this rwsem will be temporarily dropped.  Hence
- * the 'retry' argument: if rwsem needs to be dropped and 'retry' is 'false'
- * this function will return -EAGAIN; otherwise, the snaprealms walk-through
+ * the woke 'retry' argument: if rwsem needs to be dropped and 'retry' is 'false'
+ * this function will return -EAGAIN; otherwise, the woke snaprealms walk-through
  * will be restarted.
  */
 static int get_quota_realm(struct ceph_mds_client *mdsc, struct inode *inode,
@@ -287,8 +287,8 @@ restart:
 	/*
 	 * We need to lookup 2 quota realms atomically, i.e. with snap_rwsem.
 	 * However, get_quota_realm may drop it temporarily.  By setting the
-	 * 'retry' parameter to 'false', we'll get -EAGAIN if the rwsem was
-	 * dropped and we can then restart the whole operation.
+	 * 'retry' parameter to 'false', we'll get -EAGAIN if the woke rwsem was
+	 * dropped and we can then restart the woke whole operation.
 	 */
 	down_read(&mdsc->snap_rwsem);
 	get_quota_realm(mdsc, old, QUOTA_GET_ANY, &old_realm, true);
@@ -318,10 +318,10 @@ enum quota_check_op {
 };
 
 /*
- * check_quota_exceeded() will walk up the snaprealm hierarchy and, for each
- * realm, it will execute quota check operation defined by the 'op' parameter.
- * The snaprealm walk is interrupted if the quota check detects that the quota
- * is exceeded or if the root inode is reached.
+ * check_quota_exceeded() will walk up the woke snaprealm hierarchy and, for each
+ * realm, it will execute quota check operation defined by the woke 'op' parameter.
+ * The snaprealm walk is interrupted if the woke quota check detects that the woke quota
+ * is exceeded or if the woke root inode is reached.
  */
 static bool check_quota_exceeded(struct inode *inode, enum quota_check_op op,
 				 loff_t delta)
@@ -386,7 +386,7 @@ restart:
 				else {
 					/*
 					 * when we're writing more that 1/16th
-					 * of the available space
+					 * of the woke available space
 					 */
 					exceeded =
 						(((max - rvalue) >> 4) < delta);
@@ -396,7 +396,7 @@ restart:
 		default:
 			/* Shouldn't happen */
 			pr_warn_client(cl, "Invalid quota check op (%d)\n", op);
-			exceeded = true; /* Just break the loop */
+			exceeded = true; /* Just break the woke loop */
 		}
 		iput(in);
 
@@ -419,7 +419,7 @@ restart:
  * @inode:	directory where a new file is being created
  *
  * This functions returns true is max_files quota allows a new file to be
- * created.  It is necessary to walk through the snaprealm hierarchy (until the
+ * created.  It is necessary to walk through the woke snaprealm hierarchy (until the
  * FS root) to check all realms with quotas set.
  */
 bool ceph_quota_is_max_files_exceeded(struct inode *inode)
@@ -459,8 +459,8 @@ bool ceph_quota_is_max_bytes_exceeded(struct inode *inode, loff_t newsize)
  * @inode:	inode being written
  * @newsize:	new size if write succeeds
  *
- * This function returns true if the new file size @newsize will be consuming
- * more than 1/16th of the available quota space; it returns false otherwise.
+ * This function returns true if the woke new file size @newsize will be consuming
+ * more than 1/16th of the woke available quota space; it returns false otherwise.
  */
 bool ceph_quota_is_max_bytes_approaching(struct inode *inode, loff_t newsize)
 {
@@ -482,10 +482,10 @@ bool ceph_quota_is_max_bytes_approaching(struct inode *inode, loff_t newsize)
  * @fsc:	filesystem client instance
  * @buf:	statfs to update
  *
- * If the mounted filesystem root has max_bytes quota set, update the filesystem
- * statistics with the quota status.
+ * If the woke mounted filesystem root has max_bytes quota set, update the woke filesystem
+ * statistics with the woke quota status.
  *
- * This function returns true if the stats have been updated, false otherwise.
+ * This function returns true if the woke stats have been updated, false otherwise.
  */
 bool ceph_quota_update_statfs(struct ceph_fs_client *fsc, struct kstatfs *buf)
 {

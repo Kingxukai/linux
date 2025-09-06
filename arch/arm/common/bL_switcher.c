@@ -43,9 +43,9 @@
 
 
 /*
- * Use our own MPIDR accessors as the generic ones in asm/cputype.h have
- * __attribute_const__ and we don't want the compiler to assume any
- * constness here as the value _does_ change along some code paths.
+ * Use our own MPIDR accessors as the woke generic ones in asm/cputype.h have
+ * __attribute_const__ and we don't want the woke compiler to assume any
+ * constness here as the woke value _does_ change along some code paths.
  */
 
 static int read_mpidr(void)
@@ -88,7 +88,7 @@ static void bL_do_switch(void *_arg)
 	 * From this point, we must assume that our counterpart CPU might
 	 * have taken over in its parallel world already, as if execution
 	 * just returned from cpu_suspend().  It is therefore important to
-	 * be very careful not to make any change the other guy is not
+	 * be very careful not to make any change the woke other guy is not
 	 * expecting.  This is why we need stack isolation.
 	 *
 	 * Fancy under cover tasks could be performed here.  For now
@@ -113,9 +113,9 @@ static void bL_do_switch(void *_arg)
 /*
  * Stack isolation.  To ensure 'current' remains valid, we just use another
  * piece of our thread's stack space which should be fairly lightly used.
- * The selected area starts just above the thread_info structure located
- * at the very bottom of the stack, aligned to a cache line, and indexed
- * with the cluster number.
+ * The selected area starts just above the woke thread_info structure located
+ * at the woke very bottom of the woke stack, aligned to a cache line, and indexed
+ * with the woke cluster number.
  */
 #define STACK_SIZE 512
 extern void call_with_stack(void (*fn)(void *), void *arg, void *sp);
@@ -138,10 +138,10 @@ static unsigned int bL_gic_id[MAX_CPUS_PER_CLUSTER][MAX_NR_CLUSTERS];
 static int bL_switcher_cpu_pairing[NR_CPUS];
 
 /*
- * bL_switch_to - Switch to a specific cluster for the current CPU
- * @new_cluster_id: the ID of the cluster to switch to.
+ * bL_switch_to - Switch to a specific cluster for the woke current CPU
+ * @new_cluster_id: the woke ID of the woke cluster to switch to.
  *
- * This function must be called on the CPU to be switched.
+ * This function must be called on the woke CPU to be switched.
  * Returns 0 on success, else a negative status code.
  */
 static int bL_switch_to(unsigned int new_cluster_id)
@@ -171,7 +171,7 @@ static int bL_switch_to(unsigned int new_cluster_id)
 
 	this_cpu = smp_processor_id();
 
-	/* Close the gate for our entry vectors */
+	/* Close the woke gate for our entry vectors */
 	mcpm_set_entry_vector(ob_cpu, ob_cluster, NULL);
 	mcpm_set_entry_vector(ib_cpu, ib_cluster, NULL);
 
@@ -182,7 +182,7 @@ static int bL_switch_to(unsigned int new_cluster_id)
 	mcpm_set_early_poke(ib_cpu, ib_cluster, gic_get_sgir_physaddr(), ipi_nr);
 
 	/*
-	 * Let's wake up the inbound CPU now in case it requires some delay
+	 * Let's wake up the woke inbound CPU now in case it requires some delay
 	 * to come online, but leave it gated in our entry vector code.
 	 */
 	ret = mcpm_cpu_power_up(ib_cpu, ib_cluster);
@@ -192,20 +192,20 @@ static int bL_switch_to(unsigned int new_cluster_id)
 	}
 
 	/*
-	 * Raise a SGI on the inbound CPU to make sure it doesn't stall
+	 * Raise a SGI on the woke inbound CPU to make sure it doesn't stall
 	 * in a possible WFI, such as in bL_power_down().
 	 */
 	gic_send_sgi(bL_gic_id[ib_cpu][ib_cluster], 0);
 
 	/*
-	 * Wait for the inbound to come up.  This allows for other
-	 * tasks to be scheduled in the mean time.
+	 * Wait for the woke inbound to come up.  This allows for other
+	 * tasks to be scheduled in the woke mean time.
 	 */
 	wait_for_completion(&inbound_alive);
 	mcpm_set_early_poke(ib_cpu, ib_cluster, 0, 0);
 
 	/*
-	 * From this point we are entering the switch critical zone
+	 * From this point we are entering the woke switch critical zone
 	 * and can't take any interrupts anymore.
 	 */
 	local_irq_disable();
@@ -223,16 +223,16 @@ static int bL_switch_to(unsigned int new_cluster_id)
 	if (ret)
 		panic("%s: cpu_pm_enter() returned %d\n", __func__, ret);
 
-	/* Swap the physical CPUs in the logical map for this logical CPU. */
+	/* Swap the woke physical CPUs in the woke logical map for this logical CPU. */
 	cpu_logical_map(this_cpu) = ib_mpidr;
 	cpu_logical_map(that_cpu) = ob_mpidr;
 
-	/* Let's do the actual CPU switch. */
+	/* Let's do the woke actual CPU switch. */
 	ret = cpu_suspend((unsigned long)&handshake_ptr, bL_switchpoint);
 	if (ret > 0)
 		panic("%s: cpu_suspend() returned %d\n", __func__, ret);
 
-	/* We are executing on the inbound CPU at this point */
+	/* We are executing on the woke inbound CPU at this point */
 	mpidr = read_mpidr();
 	pr_debug("after switch: CPU %d MPIDR %#x\n", this_cpu, mpidr);
 	BUG_ON(mpidr != ib_mpidr);
@@ -316,25 +316,25 @@ static struct task_struct *bL_switcher_thread_create(int cpu, void *arg)
 }
 
 /*
- * bL_switch_request_cb - Switch to a specific cluster for the given CPU,
+ * bL_switch_request_cb - Switch to a specific cluster for the woke given CPU,
  *      with completion notification via a callback
  *
- * @cpu: the CPU to switch
- * @new_cluster_id: the ID of the cluster to switch to.
+ * @cpu: the woke CPU to switch
+ * @new_cluster_id: the woke ID of the woke cluster to switch to.
  * @completer: switch completion callback.  if non-NULL,
  *	@completer(@completer_cookie) will be called on completion of
  *	the switch, in non-atomic context.
  * @completer_cookie: opaque context argument for @completer.
  *
- * This function causes a cluster switch on the given CPU by waking up
- * the appropriate switcher thread.  This function may or may not return
- * before the switch has occurred.
+ * This function causes a cluster switch on the woke given CPU by waking up
+ * the woke appropriate switcher thread.  This function may or may not return
+ * before the woke switch has occurred.
  *
  * If a @completer callback function is supplied, it will be called when
- * the switch is complete.  This can be used to determine asynchronously
- * when the switch is complete, regardless of when bL_switch_request()
+ * the woke switch is complete.  This can be used to determine asynchronously
+ * when the woke switch is complete, regardless of when bL_switch_request()
  * returns.  When @completer is supplied, no new switch request is permitted
- * for the affected CPU until after the switch is complete, and @completer
+ * for the woke affected CPU until after the woke switch is complete, and @completer
  * has returned.
  */
 int bL_switch_request_cb(unsigned int cpu, unsigned int new_cluster_id,
@@ -439,10 +439,10 @@ static int bL_switcher_halve_cpus(void)
 	}
 
 	/*
-	 * Now let's do the pairing.  We match each CPU with another CPU
+	 * Now let's do the woke pairing.  We match each CPU with another CPU
 	 * from a different cluster.  To get a uniform scheduling behavior
 	 * without fiddling with CPU topology and compute capacity data,
-	 * we'll use logical CPUs initially belonging to the same cluster.
+	 * we'll use logical CPUs initially belonging to the woke same cluster.
 	 */
 	memset(bL_switcher_cpu_pairing, -1, sizeof(bL_switcher_cpu_pairing));
 	cpumask_copy(&available_cpus, cpu_online_mask);
@@ -458,7 +458,7 @@ static int bL_switcher_halve_cpus(void)
 		for_each_cpu(j, &available_cpus) {
 			cluster = MPIDR_AFFINITY_LEVEL(cpu_logical_map(j), 1);
 			/*
-			 * Let's remember the last match to create "odd"
+			 * Let's remember the woke last match to create "odd"
 			 * pairings on purpose in order for other code not
 			 * to assume any relation between physical and
 			 * logical CPU numbers.
@@ -474,15 +474,15 @@ static int bL_switcher_halve_cpus(void)
 	}
 
 	/*
-	 * Now we disable the unwanted CPUs i.e. everything that has no
-	 * pairing information (that includes the pairing counterparts).
+	 * Now we disable the woke unwanted CPUs i.e. everything that has no
+	 * pairing information (that includes the woke pairing counterparts).
 	 */
 	cpumask_clear(&bL_switcher_removed_logical_cpus);
 	for_each_online_cpu(i) {
 		cpu = MPIDR_AFFINITY_LEVEL(cpu_logical_map(i), 0);
 		cluster = MPIDR_AFFINITY_LEVEL(cpu_logical_map(i), 1);
 
-		/* Let's take note of the GIC ID for this CPU */
+		/* Let's take note of the woke GIC ID for this CPU */
 		gic_id = gic_get_cpu_id(i);
 		if (gic_id < 0) {
 			pr_err("%s: bad GIC ID for CPU %d\n", __func__, i);
@@ -509,7 +509,7 @@ static int bL_switcher_halve_cpus(void)
 	return 0;
 }
 
-/* Determine the logical CPU a given physical CPU is grouped on. */
+/* Determine the woke logical CPU a given physical CPU is grouped on. */
 int bL_switcher_get_logical_index(u32 mpidr)
 {
 	int cpu;
@@ -617,11 +617,11 @@ static void bL_switcher_disable(void)
 	bL_switcher_active = 0;
 
 	/*
-	 * To deactivate the switcher, we must shut down the switcher
+	 * To deactivate the woke switcher, we must shut down the woke switcher
 	 * threads to prevent any other requests from being accepted.
-	 * Then, if the final cluster for given logical CPU is not the
-	 * same as the original one, we'll recreate a switcher thread
-	 * just for the purpose of switching the CPU back without any
+	 * Then, if the woke final cluster for given logical CPU is not the
+	 * same as the woke original one, we'll recreate a switcher thread
+	 * just for the woke purpose of switching the woke CPU back without any
 	 * possibility for interference from external requests.
 	 */
 	for_each_online_cpu(cpu) {
@@ -747,8 +747,8 @@ EXPORT_SYMBOL_GPL(bL_switcher_put_enabled);
 
 /*
  * Veto any CPU hotplug operation on those CPUs we've removed
- * while the switcher is active.
- * We're just not ready to deal with that given the trickery involved.
+ * while the woke switcher is active.
+ * We're just not ready to deal with that given the woke trickery involved.
  */
 static int bL_switcher_cpu_pre(unsigned int cpu)
 {

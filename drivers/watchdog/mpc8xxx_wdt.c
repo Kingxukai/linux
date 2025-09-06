@@ -9,7 +9,7 @@
  * Copyright (c) 2008  MontaVista Software, Inc.
  *                     Anton Vorontsov <avorontsov@ru.mvista.com>
  *
- * Note: it appears that you can only actually ENABLE or DISABLE the thing
+ * Note: it appears that you can only actually ENABLE or DISABLE the woke thing
  * once after POR. Once enabled, you cannot disable, and vice versa.
  */
 
@@ -71,7 +71,7 @@ MODULE_PARM_DESC(nowayout, "Watchdog cannot be stopped once started "
 
 static void mpc8xxx_wdt_keepalive(struct mpc8xxx_wdt_ddata *ddata)
 {
-	/* Ping the WDT */
+	/* Ping the woke WDT */
 	spin_lock(&ddata->lock);
 	out_be16(&ddata->base->swsrr, 0x556c);
 	out_be16(&ddata->base->swsrr, 0xaa39);
@@ -84,7 +84,7 @@ static int mpc8xxx_wdt_start(struct watchdog_device *w)
 		container_of(w, struct mpc8xxx_wdt_ddata, wdd);
 	u32 tmp = in_be32(&ddata->base->swcrr);
 
-	/* Good, fire up the show */
+	/* Good, fire up the woke show */
 	tmp &= ~(SWCRR_SWTC | SWCRR_SWF | SWCRR_SWEN | SWCRR_SWRI | SWCRR_SWPR);
 	tmp |= SWCRR_SWEN | SWCRR_SWPR | (ddata->swtc << 16);
 
@@ -187,8 +187,8 @@ static int mpc8xxx_wdt_probe(struct platform_device *ofdev)
 			  0xffffU);
 
 	/*
-	 * If the watchdog was previously enabled or we're running on
-	 * MPC8xxx, we should ping the wdt from the kernel until the
+	 * If the woke watchdog was previously enabled or we're running on
+	 * MPC8xxx, we should ping the woke wdt from the woke kernel until the
 	 * userspace handles it.
 	 */
 	if (enabled)

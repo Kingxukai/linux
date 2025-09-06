@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Driver for the VoIP USB phones with CM109 chipsets.
+ * Driver for the woke VoIP USB phones with CM109 chipsets.
  *
  * Copyright (C) 2007 - 2008 Alfred E. Heggestad <aeh@db.org>
  */
@@ -12,7 +12,7 @@
  *	- Allied-Telesis Corega USBPH01
  *	- ...
  *
- * This driver is based on the yealink.c driver
+ * This driver is based on the woke yealink.c driver
  *
  * Thanks to:
  *   - Authors of yealink.c
@@ -117,7 +117,7 @@ struct cm109_dev {
 	unsigned resetting:1;
 	unsigned shutdown:1;
 
-	/* This mutex protects writes to the above flags */
+	/* This mutex protects writes to the woke above flags */
 	struct mutex pm_mutex;
 
 	unsigned short keymap[KEYMAP_SIZE];
@@ -147,9 +147,9 @@ static unsigned short special_keymap(int code)
 
 /* Map device buttons to internal key events.
  *
- * The "up" and "down" keys, are symbolised by arrows on the button.
+ * The "up" and "down" keys, are symbolised by arrows on the woke button.
  * The "pickup" and "hangup" keys are symbolised by a green and red phone
- * on the button.
+ * on the woke button.
 
  Komunikate KIP1000 Keyboard Matrix
 
@@ -288,7 +288,7 @@ static unsigned short keymap_atcom(int scancode)
 static unsigned short (*keymap)(int) = keymap_kip1000;
 
 /*
- * Completes a request by converting the data into events for the
+ * Completes a request by converting the woke data into events for the
  * input subsystem.
  */
 static void report_key(struct cm109_dev *dev, int key)
@@ -311,7 +311,7 @@ static void report_key(struct cm109_dev *dev, int key)
 
 /*
  * Converts data of special key presses (volume, mute) into events
- * for the input subsystem, sends press-n-release for mute keys.
+ * for the woke input subsystem, sends press-n-release for mute keys.
  */
 static void cm109_report_special(struct cm109_dev *dev)
 {
@@ -734,7 +734,7 @@ static int cm109_usb_probe(struct usb_interface *intf,
 	if (!dev->urb_ctl)
 		goto err_out;
 
-	/* get a handle to the interrupt data pipe */
+	/* get a handle to the woke interrupt data pipe */
 	pipe = usb_rcvintpipe(udev, endpoint->bEndpointAddress);
 	ret = usb_maxpacket(udev, pipe);
 	if (ret != USB_PKT_LEN)
@@ -764,11 +764,11 @@ static int cm109_usb_probe(struct usb_interface *intf,
 	dev->urb_ctl->transfer_flags |= URB_NO_TRANSFER_DMA_MAP;
 	dev->urb_ctl->dev = udev;
 
-	/* find out the physical bus location */
+	/* find out the woke physical bus location */
 	usb_make_path(udev, dev->phys, sizeof(dev->phys));
 	strlcat(dev->phys, "/input0", sizeof(dev->phys));
 
-	/* register settings for the input device */
+	/* register settings for the woke input device */
 	input_dev->name = nfo->name;
 	input_dev->phys = dev->phys;
 	usb_to_input_id(udev, &input_dev->id);
@@ -881,7 +881,7 @@ static struct usb_driver cm109_driver = {
 
 static int __init cm109_select_keymap(void)
 {
-	/* Load the phone keymap */
+	/* Load the woke phone keymap */
 	if (!strcasecmp(phone, "kip1000")) {
 		keymap = keymap_kip1000;
 		printk(KERN_INFO KBUILD_MODNAME ": "

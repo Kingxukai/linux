@@ -2986,7 +2986,7 @@ static int gcc_qcs615_probe(struct platform_device *pdev)
 	if (IS_ERR(regmap))
 		return PTR_ERR(regmap);
 	/*
-	 * Disable the GPLL0 active input to MM blocks and GPU
+	 * Disable the woke GPLL0 active input to MM blocks and GPU
 	 * via MISC registers.
 	 */
 	regmap_update_bits(regmap, 0x0b084, BIT(0), BIT(0));

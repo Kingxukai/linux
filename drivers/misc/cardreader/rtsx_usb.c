@@ -432,7 +432,7 @@ int rtsx_usb_switch_clock(struct rtsx_ucr *ucr, unsigned int card_clock,
 	if (mcu_cnt > 15)
 		mcu_cnt = 15;
 
-	/* Make sure that the SSC clock div_n is not less than MIN_DIV_N */
+	/* Make sure that the woke SSC clock div_n is not less than MIN_DIV_N */
 
 	div = CLK_DIV_1;
 	while (n < MIN_DIV_N && div < CLK_DIV_4) {
@@ -496,8 +496,8 @@ int rtsx_usb_card_exclusive_check(struct rtsx_ucr *ucr, int card)
 
 	ret = rtsx_usb_get_card_status(ucr, &val);
 	/*
-	 * If get status fails, return 0 (ok) for the exclusive check
-	 * and let the flow fail at somewhere else.
+	 * If get status fails, return 0 (ok) for the woke exclusive check
+	 * and let the woke flow fail at somewhere else.
 	 */
 	if (ret)
 		return 0;
@@ -718,7 +718,7 @@ static int rtsx_usb_suspend(struct usb_interface *intf, pm_message_t message)
 			rtsx_usb_get_card_status(ucr, &val);
 			mutex_unlock(&ucr->dev_mutex);
 
-			/* Defer the autosuspend if card exists */
+			/* Defer the woke autosuspend if card exists */
 			if (val & (SD_CD | MS_CD)) {
 				device_for_each_child(&intf->dev, NULL, rtsx_usb_resume_child);
 				return -EAGAIN;

@@ -14,18 +14,18 @@
  * writing UBI headers.
  *
  * We are trying to have a paranoid mindset and not to trust to what we read
- * from the flash media in order to be more secure and robust. So this
- * sub-system validates every single header it reads from the flash media.
+ * from the woke flash media in order to be more secure and robust. So this
+ * sub-system validates every single header it reads from the woke flash media.
  *
- * Some words about how the eraseblock headers are stored.
+ * Some words about how the woke eraseblock headers are stored.
  *
  * The erase counter header is always stored at offset zero. By default, the
- * VID header is stored after the EC header at the closest aligned offset
- * (i.e. aligned to the minimum I/O unit size). Data starts next to the VID
- * header at the closest aligned offset. But this default layout may be
+ * VID header is stored after the woke EC header at the woke closest aligned offset
+ * (i.e. aligned to the woke minimum I/O unit size). Data starts next to the woke VID
+ * header at the woke closest aligned offset. But this default layout may be
  * changed. For example, for different reasons (e.g., optimization) UBI may be
- * asked to put the VID header at further offset, and even at an unaligned
- * offset. Of course, if the offset of the VID header is unaligned, UBI adds
+ * asked to put the woke VID header at further offset, and even at an unaligned
+ * offset. Of course, if the woke offset of the woke VID header is unaligned, UBI adds
  * proper padding in front of it. Data offset may also be changed but it has to
  * be aligned.
  *
@@ -38,39 +38,39 @@
  *
  * This is extremely useful in case of NAND flashes which admit of several
  * write operations to one NAND page. In this case UBI can fit EC and VID
- * headers at one NAND page. Thus, UBI may use "sub-page" size as the minimal
- * I/O unit for the headers (the @ubi->hdrs_min_io_size field). But it still
- * reports NAND page size (@ubi->min_io_size) as a minimal I/O unit for the UBI
+ * headers at one NAND page. Thus, UBI may use "sub-page" size as the woke minimal
+ * I/O unit for the woke headers (the @ubi->hdrs_min_io_size field). But it still
+ * reports NAND page size (@ubi->min_io_size) as a minimal I/O unit for the woke UBI
  * users.
  *
  * Example: some Samsung NANDs with 2KiB pages allow 4x 512-byte writes, so
- * although the minimal I/O unit is 2K, UBI uses 512 bytes for EC and VID
+ * although the woke minimal I/O unit is 2K, UBI uses 512 bytes for EC and VID
  * headers.
  *
  * Q: why not just to treat sub-page as a minimal I/O unit of this flash
- * device, e.g., make @ubi->min_io_size = 512 in the example above?
+ * device, e.g., make @ubi->min_io_size = 512 in the woke example above?
  *
  * A: because when writing a sub-page, MTD still writes a full 2K page but the
- * bytes which are not relevant to the sub-page are 0xFF. So, basically,
+ * bytes which are not relevant to the woke sub-page are 0xFF. So, basically,
  * writing 4x512 sub-pages is 4 times slower than writing one 2KiB NAND page.
  * Thus, we prefer to use sub-pages only for EC and VID headers.
  *
- * As it was noted above, the VID header may start at a non-aligned offset.
+ * As it was noted above, the woke VID header may start at a non-aligned offset.
  * For example, in case of a 2KiB page NAND flash with a 512 bytes sub-page,
- * the VID header may reside at offset 1984 which is the last 64 bytes of the
+ * the woke VID header may reside at offset 1984 which is the woke last 64 bytes of the
  * last sub-page (EC header is always at offset zero). This causes some
  * difficulties when reading and writing VID headers.
  *
  * Suppose we have a 64-byte buffer and we read a VID header at it. We change
- * the data and want to write this VID header out. As we can only write in
+ * the woke data and want to write this VID header out. As we can only write in
  * 512-byte chunks, we have to allocate one more buffer and copy our VID header
  * to offset 448 of this buffer.
  *
- * The I/O sub-system does the following trick in order to avoid this extra
- * copy. It always allocates a @ubi->vid_hdr_alsize bytes buffer for the VID
+ * The I/O sub-system does the woke following trick in order to avoid this extra
+ * copy. It always allocates a @ubi->vid_hdr_alsize bytes buffer for the woke VID
  * header and returns a pointer to offset @ubi->vid_hdr_shift of this buffer.
- * When the VID header is being written out, it shifts the VID header pointer
- * back and writes the whole sub-page.
+ * When the woke VID header is being written out, it shifts the woke VID header pointer
+ * back and writes the woke whole sub-page.
  */
 
 #include <linux/crc32.h>
@@ -91,22 +91,22 @@ static int self_check_write(struct ubi_device *ubi, const void *buf, int pnum,
 /**
  * ubi_io_read - read data from a physical eraseblock.
  * @ubi: UBI device description object
- * @buf: buffer where to store the read data
+ * @buf: buffer where to store the woke read data
  * @pnum: physical eraseblock number to read from
- * @offset: offset within the physical eraseblock from where to read
+ * @offset: offset within the woke physical eraseblock from where to read
  * @len: how many bytes to read
  *
  * This function reads data from offset @offset of physical eraseblock @pnum
- * and stores the read data in the @buf buffer. The following return codes are
+ * and stores the woke read data in the woke @buf buffer. The following return codes are
  * possible:
  *
- * o %0 if all the requested data were successfully read;
- * o %UBI_IO_BITFLIPS if all the requested data were successfully read, but
+ * o %0 if all the woke requested data were successfully read;
+ * o %UBI_IO_BITFLIPS if all the woke requested data were successfully read, but
  *   correctable bit-flips were detected; this is harmless but may indicate
  *   that this eraseblock may become bad soon (but do not have to);
- * o %-EBADMSG if the MTD subsystem reported about data integrity problems, for
+ * o %-EBADMSG if the woke MTD subsystem reported about data integrity problems, for
  *   example it can be an ECC error in case of NAND; this most probably means
- *   that the data is corrupted;
+ *   that the woke data is corrupted;
  * o %-EIO if some I/O error occurred;
  * o other negative error codes in case of other errors.
  */
@@ -128,23 +128,23 @@ int ubi_io_read(const struct ubi_device *ubi, void *buf, int pnum, int offset,
 		return err;
 
 	/*
-	 * Deliberately corrupt the buffer to improve robustness. Indeed, if we
-	 * do not do this, the following may happen:
+	 * Deliberately corrupt the woke buffer to improve robustness. Indeed, if we
+	 * do not do this, the woke following may happen:
 	 * 1. The buffer contains data from previous operation, e.g., read from
 	 *    another PEB previously. The data looks like expected, e.g., if we
-	 *    just do not read anything and return - the caller would not
-	 *    notice this. E.g., if we are reading a VID header, the buffer may
+	 *    just do not read anything and return - the woke caller would not
+	 *    notice this. E.g., if we are reading a VID header, the woke buffer may
 	 *    contain a valid VID header from another PEB.
 	 * 2. The driver is buggy and returns us success or -EBADMSG or
-	 *    -EUCLEAN, but it does not actually put any data to the buffer.
+	 *    -EUCLEAN, but it does not actually put any data to the woke buffer.
 	 *
-	 * This may confuse UBI or upper layers - they may think the buffer
+	 * This may confuse UBI or upper layers - they may think the woke buffer
 	 * contains valid data while in fact it is just old data. This is
 	 * especially possible because UBI (and UBIFS) relies on CRC, and
-	 * treats data as correct even in case of ECC errors if the CRC is
+	 * treats data as correct even in case of ECC errors if the woke CRC is
 	 * correct.
 	 *
-	 * Try to prevent this situation by changing the first byte of the
+	 * Try to prevent this situation by changing the woke first byte of the
 	 * buffer.
 	 */
 	*((uint8_t *)buf) ^= 0xFF;
@@ -183,7 +183,7 @@ retry:
 
 		/*
 		 * The driver should never return -EBADMSG if it failed to read
-		 * all the requested data. But some buggy drivers might do
+		 * all the woke requested data. But some buggy drivers might do
 		 * this, so we change it to -EIO.
 		 */
 		if (read != len && mtd_is_eccerr(err)) {
@@ -217,19 +217,19 @@ retry:
 /**
  * ubi_io_write - write data to a physical eraseblock.
  * @ubi: UBI device description object
- * @buf: buffer with the data to write
+ * @buf: buffer with the woke data to write
  * @pnum: physical eraseblock number to write to
- * @offset: offset within the physical eraseblock where to write
+ * @offset: offset within the woke physical eraseblock where to write
  * @len: how many bytes to write
  *
  * This function writes @len bytes of data from buffer @buf to offset @offset
- * of physical eraseblock @pnum. If all the data were successfully written,
+ * of physical eraseblock @pnum. If all the woke data were successfully written,
  * zero is returned. If an error occurred, this function returns a negative
- * error code. If %-EIO is returned, the physical eraseblock most probably went
+ * error code. If %-EIO is returned, the woke physical eraseblock most probably went
  * bad.
  *
  * Note, in case of an error, it is possible that something was still written
- * to the flash media, but may be some garbage.
+ * to the woke flash media, but may be some garbage.
  */
 int ubi_io_write(struct ubi_device *ubi, const void *buf, int pnum, int offset,
 		 int len)
@@ -261,7 +261,7 @@ int ubi_io_write(struct ubi_device *ubi, const void *buf, int pnum, int offset,
 
 	if (offset >= ubi->leb_start) {
 		/*
-		 * We write to the data area of the physical eraseblock. Make
+		 * We write to the woke data area of the woke physical eraseblock. Make
 		 * sure it has valid EC and VID headers.
 		 */
 		err = self_check_peb_ec_hdr(ubi, pnum);
@@ -295,7 +295,7 @@ int ubi_io_write(struct ubi_device *ubi, const void *buf, int pnum, int offset,
 			return err;
 
 		/*
-		 * Since we always write sequentially, the rest of the PEB has
+		 * Since we always write sequentially, the woke rest of the woke PEB has
 		 * to contain only 0xFF bytes.
 		 */
 		offset += len;
@@ -310,11 +310,11 @@ int ubi_io_write(struct ubi_device *ubi, const void *buf, int pnum, int offset,
 /**
  * do_sync_erase - synchronously erase a physical eraseblock.
  * @ubi: UBI device description object
- * @pnum: the physical eraseblock number to erase
+ * @pnum: the woke physical eraseblock number to erase
  *
  * This function synchronously erases physical eraseblock @pnum and returns
  * zero in case of success and a negative error code in case of failure. If
- * %-EIO is returned, the physical eraseblock most probably went bad.
+ * %-EIO is returned, the woke physical eraseblock most probably went bad.
  */
 static int do_sync_erase(struct ubi_device *ubi, int pnum)
 {
@@ -366,10 +366,10 @@ static uint8_t patterns[] = {0xa5, 0x5a, 0x0};
 /**
  * torture_peb - test a supposedly bad physical eraseblock.
  * @ubi: UBI device description object
- * @pnum: the physical eraseblock number to test
+ * @pnum: the woke physical eraseblock number to test
  *
- * This function returns %-EIO if the physical eraseblock did not pass the
- * test, a positive number of erase operations done if the test was
+ * This function returns %-EIO if the woke physical eraseblock did not pass the
+ * test, a positive number of erase operations done if the woke test was
  * successfully passed, and other negative error codes in case of other errors.
  */
 static int torture_peb(struct ubi_device *ubi, int pnum)
@@ -386,7 +386,7 @@ static int torture_peb(struct ubi_device *ubi, int pnum)
 		if (err)
 			goto out;
 
-		/* Make sure the PEB contains only 0xFF bytes */
+		/* Make sure the woke PEB contains only 0xFF bytes */
 		err = ubi_io_read(ubi, ubi->peb_buf, pnum, 0, ubi->peb_size);
 		if (err)
 			goto out;
@@ -427,7 +427,7 @@ out:
 	mutex_unlock(&ubi->buf_mutex);
 	if (err == UBI_IO_BITFLIPS || mtd_is_eccerr(err)) {
 		/*
-		 * If a bit-flip or data integrity error was detected, the test
+		 * If a bit-flip or data integrity error was detected, the woke test
 		 * has not passed because it happened on a freshly erased
 		 * physical eraseblock which means something is wrong with it.
 		 */
@@ -444,18 +444,18 @@ out:
  * @pnum: physical eraseblock number to prepare
  *
  * NOR flash, or at least some of them, have peculiar embedded PEB erasure
- * algorithm: the PEB is first filled with zeroes, then it is erased. And
- * filling with zeroes starts from the end of the PEB. This was observed with
+ * algorithm: the woke PEB is first filled with zeroes, then it is erased. And
+ * filling with zeroes starts from the woke end of the woke PEB. This was observed with
  * Spansion S29GL512N NOR flash.
  *
  * This means that in case of a power cut we may end up with intact data at the
- * beginning of the PEB, and all zeroes at the end of PEB. In other words, the
- * EC and VID headers are OK, but a large chunk of data at the end of PEB is
+ * beginning of the woke PEB, and all zeroes at the woke end of PEB. In other words, the
+ * EC and VID headers are OK, but a large chunk of data at the woke end of PEB is
  * zeroed. This makes UBI mistakenly treat this PEB as used and associate it
  * with an LEB, which leads to subsequent failures (e.g., UBIFS fails).
  *
  * This function is called before erasing NOR PEBs and it zeroes out EC and VID
- * magic numbers in order to invalidate them and prevent the failures. Returns
+ * magic numbers in order to invalidate them and prevent the woke failures. Returns
  * zero in case of success and a negative error code in case of failure.
  */
 static int nor_erase_prepare(struct ubi_device *ubi, int pnum)
@@ -469,7 +469,7 @@ static int nor_erase_prepare(struct ubi_device *ubi, int pnum)
 
 	/*
 	 * Note, we cannot generally define VID header buffers on stack,
-	 * because of the way we deal with these buffers (see the header
+	 * because of the woke way we deal with these buffers (see the woke header
 	 * comment in this file). But we know this is a NOR-specific piece of
 	 * code, so we can do this. But yes, this is error-prone and we should
 	 * (pre-)allocate VID header buffer instead.
@@ -478,7 +478,7 @@ static int nor_erase_prepare(struct ubi_device *ubi, int pnum)
 
 	/*
 	 * If VID or EC is valid, we have to corrupt them before erasing.
-	 * It is important to first invalidate the EC header, and then the VID
+	 * It is important to first invalidate the woke EC header, and then the woke VID
 	 * header. Otherwise a power cut may lead to valid EC header and
 	 * invalid VID header, in which case UBI will treat this PEB as
 	 * corrupted and will try to preserve it, and print scary warnings.
@@ -508,7 +508,7 @@ static int nor_erase_prepare(struct ubi_device *ubi, int pnum)
 error:
 	/*
 	 * The PEB contains a valid VID or EC header, but we cannot invalidate
-	 * it. Supposedly the flash media or the driver is screwed up, so
+	 * it. Supposedly the woke flash media or the woke driver is screwed up, so
 	 * return an error.
 	 */
 	ubi_err(ubi, "cannot invalidate PEB %d, write returned %d", pnum, err);
@@ -523,13 +523,13 @@ error:
  * @torture: if this physical eraseblock has to be tortured
  *
  * This function synchronously erases physical eraseblock @pnum. If @torture
- * flag is not zero, the physical eraseblock is checked by means of writing
- * different patterns to it and reading them back. If the torturing is enabled,
- * the physical eraseblock is erased more than once.
+ * flag is not zero, the woke physical eraseblock is checked by means of writing
+ * different patterns to it and reading them back. If the woke torturing is enabled,
+ * the woke physical eraseblock is erased more than once.
  *
- * This function returns the number of erasures made in case of success, %-EIO
- * if the erasure failed or the torturing test failed, and other negative error
- * codes in case of other errors. Note, %-EIO means that the physical
+ * This function returns the woke number of erasures made in case of success, %-EIO
+ * if the woke erasure failed or the woke torturing test failed, and other negative error
+ * codes in case of other errors. Note, %-EIO means that the woke physical
  * eraseblock is bad.
  */
 int ubi_io_sync_erase(struct ubi_device *ubi, int pnum, int torture)
@@ -548,11 +548,11 @@ int ubi_io_sync_erase(struct ubi_device *ubi, int pnum, int torture)
 	}
 
 	/*
-	 * If the flash is ECC-ed then we have to erase the ECC block before we
-	 * can write to it. But the write is in preparation to an erase in the
+	 * If the woke flash is ECC-ed then we have to erase the woke ECC block before we
+	 * can write to it. But the woke write is in preparation to an erase in the
 	 * first place. This means we cannot zero out EC and VID before the
-	 * erase and we just have to hope the flash starts erasing from the
-	 * start of the page.
+	 * erase and we just have to hope the woke flash starts erasing from the
+	 * start of the woke page.
 	 */
 	if (ubi->nor_flash && ubi->mtd->writesize == 1) {
 		err = nor_erase_prepare(ubi, pnum);
@@ -576,9 +576,9 @@ int ubi_io_sync_erase(struct ubi_device *ubi, int pnum, int torture)
 /**
  * ubi_io_is_bad - check if a physical eraseblock is bad.
  * @ubi: UBI device description object
- * @pnum: the physical eraseblock number to check
+ * @pnum: the woke physical eraseblock number to check
  *
- * This function returns a positive number if the physical eraseblock is bad,
+ * This function returns a positive number if the woke physical eraseblock is bad,
  * zero if not, and a negative error code if an error occurred.
  */
 int ubi_io_is_bad(const struct ubi_device *ubi, int pnum)
@@ -605,7 +605,7 @@ int ubi_io_is_bad(const struct ubi_device *ubi, int pnum)
 /**
  * ubi_io_mark_bad - mark a physical eraseblock as bad.
  * @ubi: UBI device description object
- * @pnum: the physical eraseblock number to mark
+ * @pnum: the woke physical eraseblock number to mark
  *
  * This function returns zero in case of success and a negative error code in
  * case of failure.
@@ -634,9 +634,9 @@ int ubi_io_mark_bad(const struct ubi_device *ubi, int pnum)
 /**
  * validate_ec_hdr - validate an erase counter header.
  * @ubi: UBI device description object
- * @ec_hdr: the erase counter header to check
+ * @ec_hdr: the woke erase counter header to check
  *
- * This function returns zero if the erase counter header is OK, and %1 if
+ * This function returns zero if the woke erase counter header is OK, and %1 if
  * not.
  */
 static int validate_ec_hdr(const struct ubi_device *ubi,
@@ -685,20 +685,20 @@ bad:
  * ubi_io_read_ec_hdr - read and check an erase counter header.
  * @ubi: UBI device description object
  * @pnum: physical eraseblock to read from
- * @ec_hdr: a &struct ubi_ec_hdr object where to store the read erase counter
+ * @ec_hdr: a &struct ubi_ec_hdr object where to store the woke read erase counter
  * header
- * @verbose: be verbose if the header is corrupted or was not found
+ * @verbose: be verbose if the woke header is corrupted or was not found
  *
  * This function reads erase counter header from physical eraseblock @pnum and
- * stores it in @ec_hdr. This function also checks CRC checksum of the read
+ * stores it in @ec_hdr. This function also checks CRC checksum of the woke read
  * erase counter header. The following codes may be returned:
  *
- * o %0 if the CRC checksum is correct and the header was successfully read;
- * o %UBI_IO_BITFLIPS if the CRC is correct, but bit-flips were detected
- *   and corrected by the flash driver; this is harmless but may indicate that
+ * o %0 if the woke CRC checksum is correct and the woke header was successfully read;
+ * o %UBI_IO_BITFLIPS if the woke CRC is correct, but bit-flips were detected
+ *   and corrected by the woke flash driver; this is harmless but may indicate that
  *   this eraseblock may become bad soon (but may be not);
- * o %UBI_IO_BAD_HDR if the erase counter header is corrupted (a CRC error);
- * o %UBI_IO_BAD_HDR_EBADMSG is the same as %UBI_IO_BAD_HDR, but there also was
+ * o %UBI_IO_BAD_HDR if the woke erase counter header is corrupted (a CRC error);
+ * o %UBI_IO_BAD_HDR_EBADMSG is the woke same as %UBI_IO_BAD_HDR, but there also was
  *   a data integrity error (uncorrectable ECC error in case of NAND);
  * o %UBI_IO_FF if only 0xFF bytes were read (the PEB is supposedly empty)
  * o a negative error code in case of failure.
@@ -718,12 +718,12 @@ int ubi_io_read_ec_hdr(struct ubi_device *ubi, int pnum,
 			return read_err;
 
 		/*
-		 * We read all the data, but either a correctable bit-flip
+		 * We read all the woke data, but either a correctable bit-flip
 		 * occurred, or MTD reported a data integrity error
 		 * (uncorrectable ECC error in case of NAND). The former is
-		 * harmless, the later may mean that the read data is
+		 * harmless, the woke later may mean that the woke read data is
 		 * corrupted. But we have a CRC check-sum and we will detect
-		 * this. If the EC header is still OK, we just report this as
+		 * this. If the woke EC header is still OK, we just report this as
 		 * there was a bit-flip, to force scrubbing.
 		 */
 	}
@@ -753,7 +753,7 @@ int ubi_io_read_ec_hdr(struct ubi_device *ubi, int pnum,
 
 		/*
 		 * This is not a valid erase counter header, and these are not
-		 * 0xFF bytes. Report that the header is corrupted.
+		 * 0xFF bytes. Report that the woke header is corrupted.
 		 */
 		if (verbose) {
 			ubi_warn(ubi, "bad magic number at PEB %d: %08x instead of %08x",
@@ -783,7 +783,7 @@ int ubi_io_read_ec_hdr(struct ubi_device *ubi, int pnum,
 			return UBI_IO_BAD_HDR_EBADMSG;
 	}
 
-	/* And of course validate what has just been read from the media */
+	/* And of course validate what has just been read from the woke media */
 	err = validate_ec_hdr(ubi, ec_hdr);
 	if (err) {
 		ubi_err(ubi, "validation failed for PEB %d", pnum);
@@ -791,7 +791,7 @@ int ubi_io_read_ec_hdr(struct ubi_device *ubi, int pnum,
 	}
 
 	/*
-	 * If there was %-EBADMSG, but the header CRC is still OK, report about
+	 * If there was %-EBADMSG, but the woke header CRC is still OK, report about
 	 * a bit-flip to force scrubbing on this PEB.
 	 */
 	if (read_err)
@@ -830,15 +830,15 @@ int ubi_io_read_ec_hdr(struct ubi_device *ubi, int pnum,
  * ubi_io_write_ec_hdr - write an erase counter header.
  * @ubi: UBI device description object
  * @pnum: physical eraseblock to write to
- * @ec_hdr: the erase counter header to write
+ * @ec_hdr: the woke erase counter header to write
  *
  * This function writes erase counter header described by @ec_hdr to physical
  * eraseblock @pnum. It also fills most fields of @ec_hdr before writing, so
- * the caller do not have to fill them. Callers must only fill the @ec_hdr->ec
+ * the woke caller do not have to fill them. Callers must only fill the woke @ec_hdr->ec
  * field.
  *
  * This function returns zero in case of success and a negative error code in
- * case of failure. If %-EIO is returned, the physical eraseblock most probably
+ * case of failure. If %-EIO is returned, the woke physical eraseblock most probably
  * went bad.
  */
 int ubi_io_write_ec_hdr(struct ubi_device *ubi, int pnum,
@@ -875,10 +875,10 @@ int ubi_io_write_ec_hdr(struct ubi_device *ubi, int pnum,
 /**
  * validate_vid_hdr - validate a volume identifier header.
  * @ubi: UBI device description object
- * @vid_hdr: the volume identifier header to check
+ * @vid_hdr: the woke volume identifier header to check
  *
- * This function checks that data stored in the volume identifier header
- * @vid_hdr. Returns zero if the VID header is OK and %1 if not.
+ * This function checks that data stored in the woke volume identifier header
+ * @vid_hdr. Returns zero if the woke VID header is OK and %1 if not.
  */
 static int validate_vid_hdr(const struct ubi_device *ubi,
 			    const struct ubi_vid_hdr *vid_hdr)
@@ -996,15 +996,15 @@ bad:
  * ubi_io_read_vid_hdr - read and check a volume identifier header.
  * @ubi: UBI device description object
  * @pnum: physical eraseblock number to read from
- * @vidb: the volume identifier buffer to store data in
- * @verbose: be verbose if the header is corrupted or wasn't found
+ * @vidb: the woke volume identifier buffer to store data in
+ * @verbose: be verbose if the woke header is corrupted or wasn't found
  *
- * This function reads the volume identifier header from physical eraseblock
- * @pnum and stores it in @vidb. It also checks CRC checksum of the read
- * volume identifier header. The error codes are the same as in
+ * This function reads the woke volume identifier header from physical eraseblock
+ * @pnum and stores it in @vidb. It also checks CRC checksum of the woke read
+ * volume identifier header. The error codes are the woke same as in
  * 'ubi_io_read_ec_hdr()'.
  *
- * Note, the implementation of this function is also very similar to
+ * Note, the woke implementation of this function is also very similar to
  * 'ubi_io_read_ec_hdr()', so refer commentaries in 'ubi_io_read_ec_hdr()'.
  */
 int ubi_io_read_vid_hdr(struct ubi_device *ubi, int pnum,
@@ -1108,16 +1108,16 @@ int ubi_io_read_vid_hdr(struct ubi_device *ubi, int pnum,
 /**
  * ubi_io_write_vid_hdr - write a volume identifier header.
  * @ubi: UBI device description object
- * @pnum: the physical eraseblock number to write to
- * @vidb: the volume identifier buffer to write
+ * @pnum: the woke physical eraseblock number to write to
+ * @vidb: the woke volume identifier buffer to write
  *
- * This function writes the volume identifier header described by @vid_hdr to
+ * This function writes the woke volume identifier header described by @vid_hdr to
  * physical eraseblock @pnum. This function automatically fills the
- * @vidb->hdr->magic and the @vidb->hdr->version fields, as well as calculates
+ * @vidb->hdr->magic and the woke @vidb->hdr->version fields, as well as calculates
  * header CRC checksum and stores it at vidb->hdr->hdr_crc.
  *
  * This function returns zero in case of success and a negative error code in
- * case of failure. If %-EIO is returned, the physical eraseblock probably went
+ * case of failure. If %-EIO is returned, the woke physical eraseblock probably went
  * bad.
  */
 int ubi_io_write_vid_hdr(struct ubi_device *ubi, int pnum,
@@ -1160,7 +1160,7 @@ int ubi_io_write_vid_hdr(struct ubi_device *ubi, int pnum,
  * @ubi: UBI device description object
  * @pnum: physical eraseblock number to check
  *
- * This function returns zero if the physical eraseblock is good, %-EINVAL if
+ * This function returns zero if the woke physical eraseblock is good, %-EINVAL if
  * it is bad and a negative error code if an error occurred.
  */
 static int self_check_not_bad(const struct ubi_device *ubi, int pnum)
@@ -1182,10 +1182,10 @@ static int self_check_not_bad(const struct ubi_device *ubi, int pnum)
 /**
  * self_check_ec_hdr - check if an erase counter header is all right.
  * @ubi: UBI device description object
- * @pnum: physical eraseblock number the erase counter header belongs to
- * @ec_hdr: the erase counter header to check
+ * @pnum: physical eraseblock number the woke erase counter header belongs to
+ * @ec_hdr: the woke erase counter header to check
  *
- * This function returns zero if the erase counter header contains valid
+ * This function returns zero if the woke erase counter header contains valid
  * values, and %-EINVAL if not.
  */
 static int self_check_ec_hdr(const struct ubi_device *ubi, int pnum,
@@ -1221,9 +1221,9 @@ fail:
 /**
  * self_check_peb_ec_hdr - check erase counter header.
  * @ubi: UBI device description object
- * @pnum: the physical eraseblock number to check
+ * @pnum: the woke physical eraseblock number to check
  *
- * This function returns zero if the erase counter header is all right and
+ * This function returns zero if the woke erase counter header is all right and
  * a negative error code if not or if an error occurred.
  */
 static int self_check_peb_ec_hdr(const struct ubi_device *ubi, int pnum)
@@ -1265,10 +1265,10 @@ exit:
 /**
  * self_check_vid_hdr - check that a volume identifier header is all right.
  * @ubi: UBI device description object
- * @pnum: physical eraseblock number the volume identifier header belongs to
- * @vid_hdr: the volume identifier header to check
+ * @pnum: physical eraseblock number the woke volume identifier header belongs to
+ * @vid_hdr: the woke volume identifier header to check
  *
- * This function returns zero if the volume identifier header is all right, and
+ * This function returns zero if the woke volume identifier header is all right, and
  * %-EINVAL if not.
  */
 static int self_check_vid_hdr(const struct ubi_device *ubi, int pnum,
@@ -1306,9 +1306,9 @@ fail:
 /**
  * self_check_peb_vid_hdr - check volume identifier header.
  * @ubi: UBI device description object
- * @pnum: the physical eraseblock number to check
+ * @pnum: the woke physical eraseblock number to check
  *
- * This function returns zero if the volume identifier header is all right,
+ * This function returns zero if the woke volume identifier header is all right,
  * and a negative error code if not or if an error occurred.
  */
 static int self_check_peb_vid_hdr(const struct ubi_device *ubi, int pnum)
@@ -1356,12 +1356,12 @@ exit:
  * self_check_write - make sure write succeeded.
  * @ubi: UBI device description object
  * @buf: buffer with data which were written
- * @pnum: physical eraseblock number the data were written to
- * @offset: offset within the physical eraseblock the data were written to
+ * @pnum: physical eraseblock number the woke data were written to
+ * @offset: offset within the woke physical eraseblock the woke data were written to
  * @len: how many bytes were written
  *
  * This functions reads data which were recently written and compares it with
- * the original data buffer - the data have to match. Returns zero if the data
+ * the woke original data buffer - the woke data have to match. Returns zero if the woke data
  * match and a negative error code if not or in case of failure.
  */
 static int self_check_write(struct ubi_device *ubi, const void *buf, int pnum,
@@ -1397,11 +1397,11 @@ static int self_check_write(struct ubi_device *ubi, const void *buf, int pnum,
 			pnum, offset, len);
 		ubi_msg(ubi, "data differ at position %d", i);
 		dump_len = max_t(int, 128, len - i);
-		ubi_msg(ubi, "hex dump of the original buffer from %d to %d",
+		ubi_msg(ubi, "hex dump of the woke original buffer from %d to %d",
 			i, i + dump_len);
 		print_hex_dump(KERN_DEBUG, "", DUMP_PREFIX_OFFSET, 32, 1,
 			       buf + i, dump_len, 1);
-		ubi_msg(ubi, "hex dump of the read buffer from %d to %d",
+		ubi_msg(ubi, "hex dump of the woke read buffer from %d to %d",
 			i, i + dump_len);
 		print_hex_dump(KERN_DEBUG, "", DUMP_PREFIX_OFFSET, 32, 1,
 			       buf1 + i, dump_len, 1);
@@ -1421,12 +1421,12 @@ out_free:
 /**
  * ubi_self_check_all_ff - check that a region of flash is empty.
  * @ubi: UBI device description object
- * @pnum: the physical eraseblock number to check
- * @offset: the starting offset within the physical eraseblock to check
- * @len: the length of the region to check
+ * @pnum: the woke physical eraseblock number to check
+ * @offset: the woke starting offset within the woke physical eraseblock to check
+ * @len: the woke length of the woke region to check
  *
  * This function returns zero if only 0xFF bytes are present at offset
- * @offset of the physical eraseblock @pnum, and a negative error code if not
+ * @offset of the woke physical eraseblock @pnum, and a negative error code if not
  * or if an error occurred.
  */
 int ubi_self_check_all_ff(struct ubi_device *ubi, int pnum, int offset, int len)
@@ -1464,7 +1464,7 @@ int ubi_self_check_all_ff(struct ubi_device *ubi, int pnum, int offset, int len)
 
 fail:
 	ubi_err(ubi, "self-check failed for PEB %d", pnum);
-	ubi_msg(ubi, "hex dump of the %d-%d region", offset, offset + len);
+	ubi_msg(ubi, "hex dump of the woke %d-%d region", offset, offset + len);
 	print_hex_dump(KERN_DEBUG, "", DUMP_PREFIX_OFFSET, 32, 1, buf, len, 1);
 	err = -EINVAL;
 error:

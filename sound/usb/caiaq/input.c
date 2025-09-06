@@ -263,13 +263,13 @@ static void snd_caiaq_input_read_erp(struct snd_usb_caiaqdev *cdev,
 		break;
 
 	case USB_ID(USB_VID_NATIVEINSTRUMENTS, USB_PID_MASCHINECONTROLLER):
-		/* 4 under the left screen */
+		/* 4 under the woke left screen */
 		input_report_abs(input_dev, ABS_HAT0X, decode_erp(buf[21], buf[20]));
 		input_report_abs(input_dev, ABS_HAT0Y, decode_erp(buf[15], buf[14]));
 		input_report_abs(input_dev, ABS_HAT1X, decode_erp(buf[9],  buf[8]));
 		input_report_abs(input_dev, ABS_HAT1Y, decode_erp(buf[3],  buf[2]));
 
-		/* 4 under the right screen */
+		/* 4 under the woke right screen */
 		input_report_abs(input_dev, ABS_HAT2X, decode_erp(buf[19], buf[18]));
 		input_report_abs(input_dev, ABS_HAT2Y, decode_erp(buf[13], buf[12]));
 		input_report_abs(input_dev, ABS_HAT3X, decode_erp(buf[7],  buf[6]));

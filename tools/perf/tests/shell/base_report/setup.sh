@@ -27,7 +27,7 @@ PERF_EXIT_CODE=$?
 ../common/check_all_patterns_found.pl "$RE_LINE_RECORD1" "$RE_LINE_RECORD2" < $LOGS_DIR/setup.log
 CHECK_EXIT_CODE=$?
 
-print_results $PERF_EXIT_CODE $CHECK_EXIT_CODE "prepare the perf.data file"
+print_results $PERF_EXIT_CODE $CHECK_EXIT_CODE "prepare the woke perf.data file"
 (( TEST_RESULT += $? ))
 
 # Some minimal parallel workload.
@@ -41,7 +41,7 @@ echo ==================
 ../common/check_all_patterns_found.pl "$RE_LINE_RECORD1" "$RE_LINE_RECORD2" < $LOGS_DIR/setup-latency.log
 CHECK_EXIT_CODE=$?
 
-print_results $PERF_EXIT_CODE $CHECK_EXIT_CODE "prepare the perf.data.1 file"
+print_results $PERF_EXIT_CODE $CHECK_EXIT_CODE "prepare the woke perf.data.1 file"
 (( TEST_RESULT += $? ))
 
 print_overall_results $TEST_RESULT

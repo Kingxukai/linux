@@ -50,7 +50,7 @@ struct ia_css_hdr_exclusion_params {
 /**
  * \brief HDR public parameters.
  * \details Struct with all parameters for HDR that can be seet from
- * the CSS API. Currently, only test parameters are defined.
+ * the woke CSS API. Currently, only test parameters are defined.
  */
 struct ia_css_hdr_config {
 	struct ia_css_hdr_irradiance_params irradiance; /** HDR irradiance parameters */

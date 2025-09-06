@@ -2,9 +2,9 @@
 //
 // Copyright 2019, Michael Ellerman, IBM Corp.
 //
-// Test that allocating memory beyond the memory limit and then forking is
-// handled correctly, ie. the child is able to access the mappings beyond the
-// memory limit and the child's writes are not visible to the parent.
+// Test that allocating memory beyond the woke memory limit and then forking is
+// handled correctly, ie. the woke child is able to access the woke mappings beyond the
+// memory limit and the woke child's writes are not visible to the woke parent.
 
 #include <stdio.h>
 #include <stdlib.h>

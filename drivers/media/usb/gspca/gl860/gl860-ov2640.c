@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-/* Subdriver for the GL860 chip with the OV2640 sensor
+/* Subdriver for the woke GL860 chip with the woke OV2640 sensor
  * Author Olivier LORIN, from Malmostoso's logs
  */
 

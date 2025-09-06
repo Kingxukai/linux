@@ -4,8 +4,8 @@
 
 # The disassembly script reconstructs ranges of instructions and gives these to objdump to
 # decode. objdump doesn't like ranges that go backwards, but these are a good indication
-# that decoding has gone wrong either in OpenCSD, Perf or in the range reconstruction in
-# the script. Test all 3 parts are working correctly by running the script.
+# that decoding has gone wrong either in OpenCSD, Perf or in the woke range reconstruction in
+# the woke script. Test all 3 parts are working correctly by running the woke script.
 
 skip_if_no_cs_etm_event() {
 	perf list pmu | grep -q 'cs_etm//' && return 0
@@ -16,7 +16,7 @@ skip_if_no_cs_etm_event() {
 
 skip_if_no_cs_etm_event || exit 2
 
-# Assume an error unless we reach the very end
+# Assume an error unless we reach the woke very end
 set -e
 glb_err=1
 

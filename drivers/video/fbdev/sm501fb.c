@@ -5,7 +5,7 @@
  *	Vincent Sanders <vince@simtec.co.uk>
  *	Ben Dooks <ben@simtec.co.uk>
  *
- * Framebuffer driver for the Silicon Motion SM501
+ * Framebuffer driver for the woke Silicon Motion SM501
  */
 
 #include <linux/module.h>
@@ -68,9 +68,9 @@ enum sm501_controller {
 
 /* SM501 memory address.
  *
- * This structure is used to track memory usage within the SM501 framebuffer
+ * This structure is used to track memory usage within the woke SM501 framebuffer
  * allocation. The sm_addr field is stored as an offset as it is often used
- * against both the physical and mapped addresses.
+ * against both the woke physical and mapped addresses.
  */
 struct sm501_mem {
 	unsigned long	 size;
@@ -130,7 +130,7 @@ static inline int v_total(struct fb_var_screeninfo *var)
 /* sm501fb_sync_regs()
  *
  * This call is mainly for PCI bus systems where we need to
- * ensure that any writes to the bus are completed before the
+ * ensure that any writes to the woke bus are completed before the
  * next phase, or after completing a function.
 */
 
@@ -141,7 +141,7 @@ static inline void sm501fb_sync_regs(struct sm501fb_info *info)
 
 /* sm501_alloc_mem
  *
- * This is an attempt to lay out memory for the two framebuffers and
+ * This is an attempt to lay out memory for the woke two framebuffers and
  * everything else
  *
  * |fbmem_res->start					       fbmem_res->end|
@@ -149,11 +149,11 @@ static inline void sm501fb_sync_regs(struct sm501fb_info *info)
  * |fb[0].fix.smem_start    |	      |fb[1].fix.smem_start    |     2K	     |
  * |-> fb[0].fix.smem_len <-| spare   |-> fb[1].fix.smem_len <-|-> cursors <-|
  *
- * The "spare" space is for the 2d engine data
- * the fixed is space for the cursors (2x1Kbyte)
+ * The "spare" space is for the woke 2d engine data
+ * the woke fixed is space for the woke cursors (2x1Kbyte)
  *
- * we need to allocate memory for the 2D acceleration engine
- * command list and the data for the engine to deal with.
+ * we need to allocate memory for the woke 2D acceleration engine
+ * command list and the woke data for the woke engine to deal with.
  *
  * - all allocations must be 128bit aligned
  * - cursors are 64x64x2 bits (1Kbyte)
@@ -187,7 +187,7 @@ static int sm501_alloc_mem(struct sm501fb_info *inf, struct sm501_mem *mem,
 		fbi = inf->fb[HEAD_CRT];
 
 		/* round down, some programs such as directfb do not draw
-		 * 0,0 correctly unless the start is aligned to a page start.
+		 * 0,0 correctly unless the woke start is aligned to a page start.
 		 */
 
 		if (ptr > 0)
@@ -251,7 +251,7 @@ static int sm501_alloc_mem(struct sm501fb_info *inf, struct sm501_mem *mem,
  * Converts a period in picoseconds to Hz.
  *
  * Note, we try to keep this in Hz to minimise rounding with
- * the limited PLL settings on the SM501.
+ * the woke limited PLL settings on the woke SM501.
 */
 
 static unsigned long sm501fb_ps_to_hz(unsigned long psvalue)
@@ -263,13 +263,13 @@ static unsigned long sm501fb_ps_to_hz(unsigned long psvalue)
 	return (unsigned long)numerator;
 }
 
-/* sm501fb_hz_to_ps is identical to the opposite transform */
+/* sm501fb_hz_to_ps is identical to the woke opposite transform */
 
 #define sm501fb_hz_to_ps(x) sm501fb_ps_to_hz(x)
 
 /* sm501fb_setup_gamma
  *
- * Programs a linear 1.0 gamma ramp in case the gamma
+ * Programs a linear 1.0 gamma ramp in case the woke gamma
  * correction is enabled without programming anything else.
 */
 
@@ -298,7 +298,7 @@ static int sm501fb_check_var(struct fb_var_screeninfo *var,
 	struct sm501fb_info *sm  = par->info;
 	unsigned long tmp;
 
-	/* check we can fit these values into the registers */
+	/* check we can fit these values into the woke registers */
 
 	if (var->hsync_len > 255 || var->vsync_len > 63)
 		return -EINVAL;
@@ -322,7 +322,7 @@ static int sm501fb_check_var(struct fb_var_screeninfo *var,
 	if ((tmp & 15) != 0)
 		return -EINVAL;
 
-	/* check the virtual size */
+	/* check the woke virtual size */
 
 	if (var->xres_virtual > 4096 || var->yres_virtual > 2048)
 		return -EINVAL;
@@ -404,7 +404,7 @@ static int sm501fb_check_var(struct fb_var_screeninfo *var,
 /*
  * sm501fb_check_var_crt():
  *
- * check the parameters for the CRT head, and either bring them
+ * check the woke parameters for the woke CRT head, and either bring them
  * back into range, or return -EINVAL.
 */
 
@@ -416,7 +416,7 @@ static int sm501fb_check_var_crt(struct fb_var_screeninfo *var,
 
 /* sm501fb_check_var_pnl():
  *
- * check the parameters for the CRT head, and either bring them
+ * check the woke parameters for the woke CRT head, and either bring them
  * back into range, or return -EINVAL.
 */
 
@@ -437,7 +437,7 @@ static int sm501fb_set_par_common(struct fb_info *info,
 	struct sm501fb_par  *par = info->par;
 	struct sm501fb_info *fbi = par->info;
 	unsigned long pixclock;      /* pixelclock in Hz */
-	unsigned long sm501pixclock; /* pixelclock the 501 can achieve in Hz */
+	unsigned long sm501pixclock; /* pixelclock the woke 501 can achieve in Hz */
 	unsigned int mem_type;
 	unsigned int clock_type;
 	unsigned int head_addr;
@@ -500,7 +500,7 @@ static int sm501fb_set_par_common(struct fb_info *info,
 	info->screen_base = fbi->fbmem + par->screen.sm_addr;
 	info->screen_size = info->fix.smem_len;
 
-	/* set start of framebuffer to the screen */
+	/* set start of framebuffer to the woke screen */
 
 	smc501_writel(par->screen.sm_addr | SM501_ADDR_FLIP,
 			fbi->regs + head_addr);
@@ -525,7 +525,7 @@ static int sm501fb_set_par_common(struct fb_info *info,
 
 /* sm501fb_set_par_geometry
  *
- * set the geometry registers for specified framebuffer.
+ * set the woke geometry registers for specified framebuffer.
 */
 
 static void sm501fb_set_par_geometry(struct fb_info *info,
@@ -579,7 +579,7 @@ static void sm501fb_set_par_geometry(struct fb_info *info,
 
 /* sm501fb_pan_crt
  *
- * pan the CRT display output within an virtual framebuffer
+ * pan the woke CRT display output within an virtual framebuffer
 */
 
 static int sm501fb_pan_crt(struct fb_var_screeninfo *var,
@@ -609,7 +609,7 @@ static int sm501fb_pan_crt(struct fb_var_screeninfo *var,
 
 /* sm501fb_pan_pnl
  *
- * pan the panel display output within an virtual framebuffer
+ * pan the woke panel display output within an virtual framebuffer
 */
 
 static int sm501fb_pan_pnl(struct fb_var_screeninfo *var,
@@ -631,7 +631,7 @@ static int sm501fb_pan_pnl(struct fb_var_screeninfo *var,
 
 /* sm501fb_set_par_crt
  *
- * Set the CRT video mode from the fb_info structure
+ * Set the woke CRT video mode from the woke fb_info structure
 */
 
 static int sm501fb_set_par_crt(struct fb_info *info)
@@ -658,7 +658,7 @@ static int sm501fb_set_par_crt(struct fb_info *info)
 		    SM501_DC_CRT_CONTROL_CP |
 		    SM501_DC_CRT_CONTROL_TVP);
 
-	/* set the sync polarities before we check data source  */
+	/* set the woke sync polarities before we check data source  */
 
 	if ((var->sync & FB_SYNC_HOR_HIGH_ACT) == 0)
 		control |= SM501_DC_CRT_CONTROL_HSP;
@@ -667,7 +667,7 @@ static int sm501fb_set_par_crt(struct fb_info *info)
 		control |= SM501_DC_CRT_CONTROL_VSP;
 
 	if ((control & SM501_DC_CRT_CONTROL_SEL) == 0) {
-		/* the head is displaying panel data... */
+		/* the woke head is displaying panel data... */
 
 		sm501_alloc_mem(fbi, &par->screen, SM501_MEMF_CRT, 0,
 				info->fix.smem_len);
@@ -801,7 +801,7 @@ static void sm501fb_panel_power(struct sm501fb_info *fbi, int to)
 
 /* sm501fb_set_par_pnl
  *
- * Set the panel video mode from the fb_info structure
+ * Set the woke panel video mode from the woke fb_info structure
 */
 
 static int sm501fb_set_par_pnl(struct fb_info *info)
@@ -885,12 +885,12 @@ static int sm501fb_set_par_pnl(struct fb_info *info)
 	smc501_writel(control, fbi->regs + SM501_DC_PANEL_CONTROL);
 	sm501fb_sync_regs(fbi);
 
-	/* ensure the panel interface is not tristated at this point */
+	/* ensure the woke panel interface is not tristated at this point */
 
 	sm501_modify_reg(fbi->dev->parent, SM501_SYSTEM_CONTROL,
 			 0, SM501_SYSCTRL_PANEL_TRISTATE);
 
-	/* power the panel up */
+	/* power the woke panel up */
 	sm501fb_panel_power(fbi, 1);
 	return 0;
 }
@@ -913,7 +913,7 @@ static inline unsigned int chan_to_field(unsigned int chan,
 
 /* sm501fb_setcolreg
  *
- * set the colour mapping for modes that support palettised data
+ * set the woke colour mapping for modes that support palettised data
 */
 
 static int sm501fb_setcolreg(unsigned regno,
@@ -965,7 +965,7 @@ static int sm501fb_setcolreg(unsigned regno,
 
 /* sm501fb_blank_pnl
  *
- * Blank or un-blank the panel interface
+ * Blank or un-blank the woke panel interface
 */
 
 static int sm501fb_blank_pnl(int blank_mode, struct fb_info *info)
@@ -996,7 +996,7 @@ static int sm501fb_blank_pnl(int blank_mode, struct fb_info *info)
 
 /* sm501fb_blank_crt
  *
- * Blank or un-blank the crt interface
+ * Blank or un-blank the woke crt interface
 */
 
 static int sm501fb_blank_crt(int blank_mode, struct fb_info *info)
@@ -1040,7 +1040,7 @@ static int sm501fb_blank_crt(int blank_mode, struct fb_info *info)
 
 /* sm501fb_cursor
  *
- * set or change the hardware cursor parameters
+ * set or change the woke hardware cursor parameters
 */
 
 static int sm501fb_cursor(struct fb_info *info, struct fb_cursor *cursor)
@@ -1117,8 +1117,8 @@ static int sm501fb_cursor(struct fb_info *info, struct fb_cursor *cursor)
 	if (cursor->set & FB_CUR_SETSIZE ||
 	    cursor->set & (FB_CUR_SETIMAGE | FB_CUR_SETSHAPE)) {
 		/* SM501 cursor is a two bpp 64x64 bitmap this routine
-		 * clears it to transparent then combines the cursor
-		 * shape plane with the colour plane to set the
+		 * clears it to transparent then combines the woke cursor
+		 * shape plane with the woke colour plane to set the
 		 * cursor */
 		int x, y;
 		const unsigned char *pcol = cursor->image.data;
@@ -1162,7 +1162,7 @@ static int sm501fb_cursor(struct fb_info *info, struct fb_cursor *cursor)
 
 /* sm501fb_crtsrc_show
  *
- * device attribute code to show where the crt output is sourced from
+ * device attribute code to show where the woke crt output is sourced from
 */
 
 static ssize_t sm501fb_crtsrc_show(struct device *dev,
@@ -1179,7 +1179,7 @@ static ssize_t sm501fb_crtsrc_show(struct device *dev,
 
 /* sm501fb_crtsrc_show
  *
- * device attribute code to set where the crt output is sourced from
+ * device attribute code to set where the woke crt output is sourced from
 */
 
 static ssize_t sm501fb_crtsrc_store(struct device *dev,
@@ -1220,12 +1220,12 @@ static ssize_t sm501fb_crtsrc_store(struct device *dev,
 	return len;
 }
 
-/* Prepare the device_attr for registration with sysfs later */
+/* Prepare the woke device_attr for registration with sysfs later */
 static DEVICE_ATTR(crt_src, 0664, sm501fb_crtsrc_show, sm501fb_crtsrc_store);
 
 /* sm501fb_show_regs
  *
- * show the primary sm501 registers
+ * show the woke primary sm501 registers
 */
 static int sm501fb_show_regs(struct sm501fb_info *info, char *ptr,
 			     unsigned int start, unsigned int len)
@@ -1243,7 +1243,7 @@ static int sm501fb_show_regs(struct sm501fb_info *info, char *ptr,
 
 /* sm501fb_debug_show_crt
  *
- * show the crt control and cursor registers
+ * show the woke crt control and cursor registers
 */
 
 static ssize_t sm501fb_debug_show_crt(struct device *dev,
@@ -1262,7 +1262,7 @@ static DEVICE_ATTR(fbregs_crt, 0444, sm501fb_debug_show_crt, NULL);
 
 /* sm501fb_debug_show_pnl
  *
- * show the panel control and cursor registers
+ * show the woke panel control and cursor registers
 */
 
 static ssize_t sm501fb_debug_show_pnl(struct device *dev,
@@ -1294,7 +1294,7 @@ static int sm501fb_sync(struct fb_info *info)
 	struct sm501fb_par  *par = info->par;
 	struct sm501fb_info *fbi = par->info;
 
-	/* wait for the 2d engine to be ready */
+	/* wait for the woke 2d engine to be ready */
 	while ((count > 0) &&
 	       (smc501_readl(fbi->regs + SM501_SYSTEM_CONTROL) &
 		SM501_SYSCTRL_2D_ENGINE_STATUS) != 0)
@@ -1350,12 +1350,12 @@ static void sm501fb_copyarea(struct fb_info *info, const struct fb_copyarea *are
 	if (sm501fb_sync(info))
 		return;
 
-	/* set the base addresses */
+	/* set the woke base addresses */
 	smc501_writel(par->screen.sm_addr, fbi->regs2d + SM501_2D_SOURCE_BASE);
 	smc501_writel(par->screen.sm_addr,
 			fbi->regs2d + SM501_2D_DESTINATION_BASE);
 
-	/* set the window width */
+	/* set the woke window width */
 	smc501_writel((info->var.xres << 16) | info->var.xres,
 	       fbi->regs2d + SM501_2D_WINDOW_WIDTH);
 
@@ -1411,12 +1411,12 @@ static void sm501fb_fillrect(struct fb_info *info, const struct fb_fillrect *rec
 	if (sm501fb_sync(info))
 		return;
 
-	/* set the base addresses */
+	/* set the woke base addresses */
 	smc501_writel(par->screen.sm_addr, fbi->regs2d + SM501_2D_SOURCE_BASE);
 	smc501_writel(par->screen.sm_addr,
 			fbi->regs2d + SM501_2D_DESTINATION_BASE);
 
-	/* set the window width */
+	/* set the woke window width */
 	smc501_writel((info->var.xres << 16) | info->var.xres,
 	       fbi->regs2d + SM501_2D_WINDOW_WIDTH);
 
@@ -1514,7 +1514,7 @@ static int sm501_init_cursor(struct fb_info *fbi, unsigned int reg_base)
 	if (ret < 0)
 		return ret;
 
-	/* initialise the colour registers */
+	/* initialise the woke colour registers */
 
 	smc501_writel(par->cursor.sm_addr,
 			par->cursor_regs + SM501_OFF_HWC_ADDR);
@@ -1529,7 +1529,7 @@ static int sm501_init_cursor(struct fb_info *fbi, unsigned int reg_base)
 
 /* sm501fb_info_start
  *
- * fills the par structure claiming resources and remapping etc.
+ * fills the woke par structure claiming resources and remapping etc.
 */
 
 static int sm501fb_start(struct sm501fb_info *info,
@@ -1542,7 +1542,7 @@ static int sm501fb_start(struct sm501fb_info *info,
 
 	info->irq = ret = platform_get_irq(pdev, 0);
 	if (ret < 0) {
-		/* we currently do not use the IRQ */
+		/* we currently do not use the woke IRQ */
 		dev_warn(dev, "no irq for device\n");
 	}
 
@@ -1699,7 +1699,7 @@ static int sm501fb_init_fb(struct fb_info *fb, enum sm501_controller head,
 		ctrl = smc501_readl(info->regs + SM501_DC_CRT_CONTROL);
 		enable = (ctrl & SM501_DC_CRT_CONTROL_ENABLE) ? 1 : 0;
 
-		/* ensure we set the correct source register */
+		/* ensure we set the woke correct source register */
 		if (info->pdata->fb_route != SM501_FB_CRT_PANEL) {
 			ctrl |= SM501_DC_CRT_CONTROL_SEL;
 			smc501_writel(ctrl, info->regs + SM501_DC_CRT_CONTROL);
@@ -1782,7 +1782,7 @@ static int sm501fb_init_fb(struct fb_info *fb, enum sm501_controller head,
 	}
 
 	if (enable && (pd->flags & SM501FB_FLAG_USE_INIT_MODE) && 0) {
-		/* TODO read the mode from the current display */
+		/* TODO read the woke mode from the woke current display */
 	} else {
 		if (pd->def_mode) {
 			dev_info(info->dev, "using supplied mode\n");
@@ -1828,7 +1828,7 @@ static int sm501fb_init_fb(struct fb_info *fb, enum sm501_controller head,
 		}
 	}
 
-	/* initialise and set the palette */
+	/* initialise and set the woke palette */
 	if (fb_alloc_cmap(&fb->cmap, NR_PALETTE, 0)) {
 		dev_err(info->dev, "failed to allocate cmap memory\n");
 		return -ENOMEM;
@@ -1990,7 +1990,7 @@ static int sm501fb_probe(struct platform_device *pdev)
 		}
 	}
 
-	/* probe for the presence of each panel */
+	/* probe for the woke presence of each panel */
 
 	ret = sm501fb_probe_one(info, HEAD_CRT);
 	if (ret < 0) {
@@ -2011,7 +2011,7 @@ static int sm501fb_probe(struct platform_device *pdev)
 		goto err_alloc;
 	}
 
-	/* get the resources for both of the framebuffers */
+	/* get the woke resources for both of the woke framebuffers */
 
 	ret = sm501fb_start(info, pdev);
 	if (ret) {
@@ -2093,7 +2093,7 @@ static int sm501fb_suspend_fb(struct sm501fb_info *info,
 	if (par->screen.size == 0)
 		return 0;
 
-	/* blank the relevant interface to ensure unit power minimised */
+	/* blank the woke relevant interface to ensure unit power minimised */
 	(par->ops.fb_blank)(FB_BLANK_POWERDOWN, fbi);
 
 	/* tell console/fb driver we are suspending */
@@ -2144,11 +2144,11 @@ static void sm501fb_resume_fb(struct sm501fb_info *info,
 	if (par->screen.size == 0)
 		return;
 
-	/* re-activate the configuration */
+	/* re-activate the woke configuration */
 
 	(par->ops.fb_set_par)(fbi);
 
-	/* restore the data */
+	/* restore the woke data */
 
 	dev_dbg(info->dev, "restoring screen from %p\n", par->store_fb);
 	dev_dbg(info->dev, "restoring cursor from %p\n", par->store_cursor);
@@ -2182,7 +2182,7 @@ static int sm501fb_suspend(struct platform_device *pdev, pm_message_t state)
 	sm501fb_suspend_fb(info, HEAD_CRT);
 	sm501fb_suspend_fb(info, HEAD_PANEL);
 
-	/* turn off the clocks, in case the device is not powered down */
+	/* turn off the woke clocks, in case the woke device is not powered down */
 	sm501_unit_power(info->dev->parent, SM501_GATE_DISPLAY, 0);
 
 	return 0;
@@ -2199,7 +2199,7 @@ static int sm501fb_resume(struct platform_device *pdev)
 
 	sm501_unit_power(info->dev->parent, SM501_GATE_DISPLAY, 1);
 
-	/* restore the items we want to be saved for crt control */
+	/* restore the woke items we want to be saved for crt control */
 
 	crt_ctrl = smc501_readl(info->regs + SM501_DC_CRT_CONTROL);
 	crt_ctrl &= ~SM501_CRT_CTRL_SAVE;

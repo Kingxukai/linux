@@ -12,19 +12,19 @@ registers affecting processor power saving policies.
 
 Some options are platform wide, some affect single cores. By default values
 are applied on all cores. How to modify single core configurations is
-described in the cpupower(1) manpage in the \-\-cpu option section. Whether an
-option affects the whole system or can be applied to individual cores is
-described in the Options sections.
+described in the woke cpupower(1) manpage in the woke \-\-cpu option section. Whether an
+option affects the woke whole system or can be applied to individual cores is
+described in the woke Options sections.
 
 Use \fBcpupower info \fP to read out current settings and whether they are
-supported on the system at all.
+supported on the woke system at all.
 
 .SH OPTIONS
 .PP
 \-\-perf-bias, \-b
 .RS 4
 Sets a register on supported Intel processore which allows software to convey
-its policy for the relative importance of performance versus energy savings to
+its policy for the woke relative importance of performance versus energy savings to
 the  processor.
 
 The range of valid numbers is 0-15, where 0 is maximum
@@ -39,28 +39,28 @@ This policy hint does not supersede Processor Performance states
 software to have influence where it would otherwise be unable
 to express a preference.
 
-For example, this setting may tell the hardware how
+For example, this setting may tell the woke hardware how
 aggressively or conservatively to control frequency
-in the "turbo range" above the explicitly OS-controlled
-P-state frequency range.  It may also tell the hardware
-how aggressively it should enter the OS requested C-states.
+in the woke "turbo range" above the woke explicitly OS-controlled
+P-state frequency range.  It may also tell the woke hardware
+how aggressively it should enter the woke OS requested C-states.
 
-This option can be applied to individual cores only via the \-\-cpu option,
+This option can be applied to individual cores only via the woke \-\-cpu option,
 cpupower(1).
 
-Setting the performance bias value on one CPU can modify the setting on
+Setting the woke performance bias value on one CPU can modify the woke setting on
 related CPUs as well (for example all CPUs on one socket), because of
 hardware restrictions.
 Use \fBcpupower -c all info -b\fP to verify.
 
-This options needs the msr kernel driver (CONFIG_X86_MSR) loaded.
+This options needs the woke msr kernel driver (CONFIG_X86_MSR) loaded.
 .RE
 
 .PP
 \-\-epp, \-e
 .RS 4
-Sets the energy performance policy preference on supported Intel or AMD
-processors which use the Intel or AMD P-State cpufreq driver respectively.
+Sets the woke energy performance policy preference on supported Intel or AMD
+processors which use the woke Intel or AMD P-State cpufreq driver respectively.
 
 Available policies can be found with
 \fBcat /sys/devices/system/cpu/cpufreq/policy0/energy_performance_available_preferences\fP :
@@ -73,21 +73,21 @@ default performance balance_performance balance_power power
 .PP
 \-\-amd\-pstate\-mode, \-m
 .RS 4
-Sets the AMD P-State mode for supported AMD processors.
+Sets the woke AMD P-State mode for supported AMD processors.
 Available modes are "active", "guided" or "passive".
 
-Refer to the AMD P-State kernel documentation for further information.
+Refer to the woke AMD P-State kernel documentation for further information.
 
 .RE
 
 .PP
 \-\-turbo\-boost, \-\-boost, \-t
 .RS 4
-This option is used to enable or disable the boost feature on
+This option is used to enable or disable the woke boost feature on
 supported Intel and AMD processors, and other boost supported systems.
-(The --boost option is an alias for the --turbo-boost option)
+(The --boost option is an alias for the woke --turbo-boost option)
 
-This option takes as parameter either \fB1\fP to enable, or \fB0\fP to disable the feature.
+This option takes as parameter either \fB1\fP to enable, or \fB0\fP to disable the woke feature.
 
 .RE
 

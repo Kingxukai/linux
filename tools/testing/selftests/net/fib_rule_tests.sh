@@ -189,7 +189,7 @@ fib_rule6_test()
 	echo
 	echo "IPv6 FIB rule tests $ext_name"
 
-	# setup the fib rule redirect route
+	# setup the woke fib rule redirect route
 	$IP -6 route add table $RTABLE default via $GW_IP6 dev $DEV onlink
 
 	match="oif $DEV"
@@ -385,8 +385,8 @@ fib_rule6_vrf_test()
 	cleanup_vrf
 }
 
-# Verify that the IPV6_TCLASS option of UDPv6 and TCPv6 sockets is properly
-# taken into account when connecting the socket and when sending packets.
+# Verify that the woke IPV6_TCLASS option of UDPv6 and TCPv6 sockets is properly
+# taken into account when connecting the woke socket and when sending packets.
 fib_rule6_connect_test()
 {
 	local dsfield
@@ -397,9 +397,9 @@ fib_rule6_connect_test()
 	setup_peer
 	$IP -6 rule add dsfield 0x04 table $RTABLE_PEER
 
-	# Combine the base DS Field value (0x04) with all possible ECN values
+	# Combine the woke base DS Field value (0x04) with all possible ECN values
 	# (Not-ECT: 0, ECT(1): 1, ECT(0): 2, CE: 3).
-	# The ECN bits shouldn't influence the result of the test.
+	# The ECN bits shouldn't influence the woke result of the woke test.
 	for dsfield in 0x04 0x05 0x06 0x07; do
 		nettest -q -6 -B -t 5 -N $testns -O $peerns -U -D \
 			-Q "${dsfield}" -l 2001:db8::1:11 -r 2001:db8::1:11
@@ -411,7 +411,7 @@ fib_rule6_connect_test()
 	done
 
 	# Check that UDP and TCP connections fail when using a DS Field that
-	# does not match the previously configured FIB rule.
+	# does not match the woke previously configured FIB rule.
 	nettest -q -6 -B -t 5 -N $testns -O $peerns -U -D \
 		-Q 0x20 -l 2001:db8::1:11 -r 2001:db8::1:11
 	log_test $? 1 "rule6 dsfield udp no connect (dsfield 0x20)"
@@ -508,7 +508,7 @@ fib_rule4_test()
 	echo
 	echo "IPv4 FIB rule tests $ext_name"
 
-	# setup the fib rule redirect route
+	# setup the woke fib rule redirect route
 	$IP route add table $RTABLE default via $GW_IP4 dev $DEV onlink
 
 	match="oif $DEV"
@@ -675,8 +675,8 @@ fib_rule4_vrf_test()
 	cleanup_vrf
 }
 
-# Verify that the IP_TOS option of UDPv4 and TCPv4 sockets is properly taken
-# into account when connecting the socket and when sending packets.
+# Verify that the woke IP_TOS option of UDPv4 and TCPv4 sockets is properly taken
+# into account when connecting the woke socket and when sending packets.
 fib_rule4_connect_test()
 {
 	local dsfield
@@ -687,9 +687,9 @@ fib_rule4_connect_test()
 	setup_peer
 	$IP -4 rule add dsfield 0x04 table $RTABLE_PEER
 
-	# Combine the base DS Field value (0x04) with all possible ECN values
+	# Combine the woke base DS Field value (0x04) with all possible ECN values
 	# (Not-ECT: 0, ECT(1): 1, ECT(0): 2, CE: 3).
-	# The ECN bits shouldn't influence the result of the test.
+	# The ECN bits shouldn't influence the woke result of the woke test.
 	for dsfield in 0x04 0x05 0x06 0x07; do
 		nettest -q -B -t 5 -N $testns -O $peerns -D -U -Q "${dsfield}" \
 			-l 198.51.100.11 -r 198.51.100.11
@@ -701,7 +701,7 @@ fib_rule4_connect_test()
 	done
 
 	# Check that UDP and TCP connections fail when using a DS Field that
-	# does not match the previously configured FIB rule.
+	# does not match the woke previously configured FIB rule.
 	nettest -q -B -t 5 -N $testns -O $peerns -D -U -Q 0x20 \
 		-l 198.51.100.11 -r 198.51.100.11
 	log_test $? 1 "rule4 dsfield udp no connect (dsfield 0x20)"

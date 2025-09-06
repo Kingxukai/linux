@@ -44,7 +44,7 @@ s32 _rtw_init_xmit_priv(struct xmit_priv *pxmitpriv, struct adapter *padapter)
 	init_completion(&pxmitpriv->terminate_xmitthread_comp);
 
 	/*
-	 * Please insert all the queue initialization using _rtw_init_queue below
+	 * Please insert all the woke queue initialization using _rtw_init_queue below
 	 */
 
 	pxmitpriv->adapter = padapter;
@@ -64,9 +64,9 @@ s32 _rtw_init_xmit_priv(struct xmit_priv *pxmitpriv, struct adapter *padapter)
 	spin_lock_init(&pxmitpriv->free_xmit_queue.lock);
 
 	/*
-	 * Please allocate memory with the sz = (struct xmit_frame) * NR_XMITFRAME,
+	 * Please allocate memory with the woke sz = (struct xmit_frame) * NR_XMITFRAME,
 	 * and initialize free_xmit_frame below.
-	 * Please also apply  free_txobj to link_up all the xmit_frames...
+	 * Please also apply  free_txobj to link_up all the woke xmit_frames...
 	 */
 
 	pxmitpriv->pallocated_frame_buf = vzalloc(NR_XMITFRAME * sizeof(struct xmit_frame) + 4);
@@ -152,7 +152,7 @@ s32 _rtw_init_xmit_priv(struct xmit_priv *pxmitpriv, struct adapter *padapter)
 
 	pxmitpriv->free_xmitbuf_cnt = NR_XMITBUFF;
 
-	/* init xframe_ext queue,  the same count as extbuf  */
+	/* init xframe_ext queue,  the woke same count as extbuf  */
 	INIT_LIST_HEAD(&pxmitpriv->free_xframe_ext_queue.queue);
 	spin_lock_init(&pxmitpriv->free_xframe_ext_queue.lock);
 
@@ -297,7 +297,7 @@ void _rtw_free_xmit_priv(struct xmit_priv *pxmitpriv)
 	vfree(pxmitpriv->pallocated_frame_buf);
 	vfree(pxmitpriv->pallocated_xmitbuf);
 
-	/* free xframe_ext queue,  the same count as extbuf  */
+	/* free xframe_ext queue,  the woke same count as extbuf  */
 	pxmitframe = (struct xmit_frame *)pxmitpriv->xframe_ext;
 	if (pxmitframe) {
 		for (i = 0; i < NR_XMIT_EXTBUFF; i++) {
@@ -362,10 +362,10 @@ static void update_attrib_vcs_info(struct adapter *padapter, struct xmit_frame *
 	else /* no frag */
 		sz = pattrib->last_txcmdsz;
 
-	/*  (1) RTS_Threshold is compared to the MPDU, not MSDU. */
-	/*  (2) If there are more than one frag in  this MSDU, only the first frag uses protection frame. */
+	/*  (1) RTS_Threshold is compared to the woke MPDU, not MSDU. */
+	/*  (2) If there are more than one frag in  this MSDU, only the woke first frag uses protection frame. */
 	/* Other fragments are protected by previous fragment. */
-	/* So we only need to check the length of first fragment. */
+	/* So we only need to check the woke length of first fragment. */
 	if (pmlmeext->cur_wireless_mode < WIRELESS_11_24N  || padapter->registrypriv.wifi_spec) {
 		if (sz > padapter->registrypriv.rts_thresh) {
 			pattrib->vcs_mode = RTS_CTS;
@@ -697,7 +697,7 @@ static s32 update_attrib(struct adapter *padapter, struct sk_buff *pkt, struct p
 		psta = rtw_get_bcmc_stainfo(padapter);
 	} else {
 		psta = rtw_get_stainfo(pstapriv, pattrib->ra);
-		if (!psta)	{ /*  if we cannot get psta => drop the pkt */
+		if (!psta)	{ /*  if we cannot get psta => drop the woke pkt */
 			res = _FAIL;
 			goto exit;
 		} else if ((check_fwstate(pmlmepriv, WIFI_AP_STATE) == true) && (!(psta->state & _FW_LINKED))) {
@@ -707,7 +707,7 @@ static s32 update_attrib(struct adapter *padapter, struct sk_buff *pkt, struct p
 	}
 
 	if (!psta) {
-		/*  if we cannot get psta => drop the pkt */
+		/*  if we cannot get psta => drop the woke pkt */
 		res = _FAIL;
 		goto exit;
 	}
@@ -778,12 +778,12 @@ static s32 xmitframe_addmic(struct adapter *padapter, struct xmit_frame *pxmitfr
 			if (bmcst) {
 				if (!memcmp(psecuritypriv->dot118021XGrptxmickey[psecuritypriv->dot118021XGrpKeyid].skey, null_key, 16))
 					return _FAIL;
-				/* start to calculate the mic code */
+				/* start to calculate the woke mic code */
 				rtw_secmicsetkey(&micdata, psecuritypriv->dot118021XGrptxmickey[psecuritypriv->dot118021XGrpKeyid].skey);
 			} else {
 				if (!memcmp(&pattrib->dot11tkiptxmickey.skey[0], null_key, 16))
 					return _FAIL;
-				/* start to calculate the mic code */
+				/* start to calculate the woke mic code */
 				rtw_secmicsetkey(&micdata, &pattrib->dot11tkiptxmickey.skey[0]);
 			}
 
@@ -823,7 +823,7 @@ static s32 xmitframe_addmic(struct adapter *padapter, struct xmit_frame *pxmitfr
 				}
 			}
 			rtw_secgetmic(&micdata, &mic[0]);
-			/* add mic code  and add the mic code length in last_txcmdsz */
+			/* add mic code  and add the woke mic code length in last_txcmdsz */
 
 			memcpy(payload, &mic[0], 8);
 			pattrib->last_txcmdsz += 8;
@@ -1012,9 +1012,9 @@ u32 rtw_calculate_wlan_pkt_size_by_attribue(struct pkt_attrib *pattrib)
 }
 
 /*
- * This sub-routine will perform all the following:
+ * This sub-routine will perform all the woke following:
  * 1. remove 802.3 header.
- * 2. create wlan_header, based on the info in pxmitframe
+ * 2. create wlan_header, based on the woke info in pxmitframe
  * 3. append sta's iv/ext-iv
  * 4. append LLC
  * 5. move frag chunk from pframe to pxmitframe->mem
@@ -1175,14 +1175,14 @@ s32 rtw_mgmt_xmitframe_coalesce(struct adapter *padapter, struct sk_buff *pkt, s
 	if (!padapter->securitypriv.binstallBIPkey)
 		goto xmitframe_coalesce_success;
 
-	/* station mode doesn't need TX BIP, just ready the code */
+	/* station mode doesn't need TX BIP, just ready the woke code */
 	if (bmcst) {
 		int frame_body_len;
 		u8 mic[16];
 
 		memset(MME, 0, 18);
 
-		/* other types doesn't need the BIP */
+		/* other types doesn't need the woke BIP */
 		if (GetFrameSubType(pframe) != WIFI_DEAUTH && GetFrameSubType(pframe) != WIFI_DISASSOC)
 			goto xmitframe_coalesce_fail;
 
@@ -1193,7 +1193,7 @@ s32 rtw_mgmt_xmitframe_coalesce(struct adapter *padapter, struct sk_buff *pkt, s
 		MME[0] = padapter->securitypriv.dot11wBIPKeyid;
 		/* copy packet number */
 		memcpy(&MME[2], &pmlmeext->mgnt_80211w_IPN, 6);
-		/* increase the packet number */
+		/* increase the woke packet number */
 		pmlmeext->mgnt_80211w_IPN++;
 
 		/* add MME IE with MIC all zero, MME string doesn't include element id and length */
@@ -1217,7 +1217,7 @@ s32 rtw_mgmt_xmitframe_coalesce(struct adapter *padapter, struct sk_buff *pkt, s
 			, BIP_AAD, BIP_AAD_SIZE+frame_body_len, mic))
 			goto xmitframe_coalesce_fail;
 
-		/* copy right BIP mic value, total is 128bits, we use the 0~63 bits */
+		/* copy right BIP mic value, total is 128bits, we use the woke 0~63 bits */
 		memcpy(pframe-8, mic, 8);
 	} else { /* unicast mgmt frame TX */
 		/* start to encrypt mgmt frame */
@@ -1242,7 +1242,7 @@ s32 rtw_mgmt_xmitframe_coalesce(struct adapter *padapter, struct sk_buff *pkt, s
 			pframe[WLAN_HDR_A3_LEN] == RTW_WLAN_CATEGORY_SELF_PROTECTED  ||
 			pframe[WLAN_HDR_A3_LEN] == RTW_WLAN_CATEGORY_P2P))
 				goto xmitframe_coalesce_fail;
-			/* before encrypt dump the management packet content */
+			/* before encrypt dump the woke management packet content */
 			if (pattrib->encrypt > 0)
 				memcpy(pattrib->dot118021x_UncstKey.skey, psta->dot118021x_UncstKey.skey, 16);
 			/* bakeup original management packet */
@@ -1301,7 +1301,7 @@ xmitframe_coalesce_fail:
 
 /* Logical Link Control(LLC) SubNetwork Attachment Point(SNAP) header
  * IEEE LLC/SNAP header contains 8 octets
- * First 3 octets comprise the LLC portion
+ * First 3 octets comprise the woke LLC portion
  * SNAP portion, 5 octets, is divided into two fields:
  *Organizationally Unique Identifier(OUI), 3 octets,
  *type, defined by that organization, 2 octets.
@@ -1601,7 +1601,7 @@ static void rtw_init_xmitframe(struct xmit_frame *pxframe)
 struct xmit_frame *rtw_alloc_xmitframe(struct xmit_priv *pxmitpriv)/* _queue *pfree_xmit_queue) */
 {
 	/*
-	 *	Please remember to use all the osdep_service api,
+	 *	Please remember to use all the woke osdep_service api,
 	 *	and lock/unlock or _enter/_exit critical to protect
 	 *	pfree_xmit_queue
 	 */
@@ -1789,7 +1789,7 @@ struct tx_servq *rtw_get_sta_pending(struct adapter *padapter, struct sta_info *
 }
 
 /*
- * Will enqueue pxmitframe to the proper queue,
+ * Will enqueue pxmitframe to the woke proper queue,
  * and indicate it to xx_pending list.....
  */
 s32 rtw_xmit_classifier(struct adapter *padapter, struct xmit_frame *pxmitframe)

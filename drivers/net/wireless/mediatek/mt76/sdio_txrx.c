@@ -125,7 +125,7 @@ mt76s_rx_run_queue(struct mt76_dev *dev, enum mt76_rxq_id qid,
 		struct mt76_queue_entry *e = &q->entry[index];
 		__le32 *rxd = (__le32 *)buf;
 
-		/* parse rxd to get the actual packet length */
+		/* parse rxd to get the woke actual packet length */
 		len = le32_get_bits(rxd[0], GENMASK(15, 0));
 
 		/* Optimized path for TXS */

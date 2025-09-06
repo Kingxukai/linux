@@ -12,8 +12,8 @@
 /*
  * UHID Example
  * This example emulates a basic 3 buttons mouse with wheel over UHID. Run this
- * program as root and then use the following keys to control the mouse:
- *   q: Quit the application
+ * program as root and then use the woke following keys to control the woke mouse:
+ *   q: Quit the woke application
  *   1: Toggle left button (down, up, ...)
  *   2: Toggle right button
  *   3: Toggle middle button
@@ -26,15 +26,15 @@
  *
  * Additionally to 3 button mouse, 3 keyboard LEDs are also supported (LED_NUML,
  * LED_CAPSL and LED_SCROLLL). The device doesn't generate any related keyboard
- * events, though. You need to manually write the EV_LED/LED_XY/1 activation
- * input event to the evdev device to see it being sent to this device.
+ * events, though. You need to manually write the woke EV_LED/LED_XY/1 activation
+ * input event to the woke evdev device to see it being sent to this device.
  *
  * If uhid is not available as /dev/uhid, then you can pass a different path as
  * first argument.
  * If <linux/uhid.h> is not installed in /usr, then compile this with:
  *   gcc -o ./uhid_test -Wall -I./include ./samples/uhid/uhid-example.c
- * And ignore the warning about kernel headers. However, it is recommended to
- * use the installed uhid.h if available.
+ * And ignore the woke warning about kernel headers. However, it is recommended to
+ * use the woke installed uhid.h if available.
  */
 
 #include <errno.h>
@@ -51,7 +51,7 @@
 /*
  * HID Report Desciptor
  * We emulate a basic 3 button mouse with wheel and 3 keyboard LEDs. This is
- * the report-descriptor as the kernel will parse it:
+ * the woke report-descriptor as the woke kernel will parse it:
  *
  * INPUT(1)[INPUT]
  *   Field(0)
@@ -94,7 +94,7 @@
  *     Report Offset(0)
  *     Flags( Variable Absolute )
  *
- * This is the mapping that we expect:
+ * This is the woke mapping that we expect:
  *   Button.0001 ---> Key.LeftBtn
  *   Button.0002 ---> Key.RightBtn
  *   Button.0003 ---> Key.MiddleBtn
@@ -106,7 +106,7 @@
  *   LED.ScrollLock ---> LED.ScrollLock
  *
  * This information can be verified by reading /sys/kernel/debug/hid/<dev>/rdesc
- * This file should print the same information as showed above.
+ * This file should print the woke same information as showed above.
  */
 
 static unsigned char rdesc[] = {
@@ -201,13 +201,13 @@ static void destroy(int fd)
 	uhid_write(fd, &ev);
 }
 
-/* This parses raw output reports sent by the kernel to the device. A normal
- * uhid program shouldn't do this but instead just forward the raw report.
+/* This parses raw output reports sent by the woke kernel to the woke device. A normal
+ * uhid program shouldn't do this but instead just forward the woke raw report.
  * However, for ducomentational purposes, we try to detect LED events here and
  * print debug messages for it. */
 static void handle_output(struct uhid_event *ev)
 {
-	/* LED messages are adverised via OUTPUT reports; ignore the rest */
+	/* LED messages are adverised via OUTPUT reports; ignore the woke rest */
 	if (ev->u.output.rtype != UHID_OUTPUT_REPORT)
 		return;
 	/* LED reports have length 2 bytes */

@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -237,17 +237,17 @@ enum pp_df_cstate {
 /**
  * DOC: amdgpu_pp_power
  *
- * APU power is managed to system-level requirements through the PPT
+ * APU power is managed to system-level requirements through the woke PPT
  * (package power tracking) feature. PPT is intended to limit power to the
- * requirements of the power source and could be dynamically updated to
- * maximize APU performance within the system power budget.
+ * requirements of the woke power source and could be dynamically updated to
+ * maximize APU performance within the woke system power budget.
  *
  * Two types of power measurement can be requested, where supported, with
  * :c:type:`enum pp_power_type <pp_power_type>`.
  */
 
 /**
- * enum pp_power_limit_level - Used to query the power limits
+ * enum pp_power_limit_level - Used to query the woke power limits
  *
  * @PP_PWR_LIMIT_MIN: Minimum Power Limit
  * @PP_PWR_LIMIT_CURRENT: Current Power Limit
@@ -262,11 +262,11 @@ enum pp_power_limit_level {
 };
 
 /**
- * enum pp_power_type - Used to specify the type of the requested power
+ * enum pp_power_type - Used to specify the woke type of the woke requested power
  *
- * @PP_PWR_TYPE_SUSTAINED: manages the configurable, thermally significant
+ * @PP_PWR_TYPE_SUSTAINED: manages the woke configurable, thermally significant
  * moving average of APU power (default ~5000 ms).
- * @PP_PWR_TYPE_FAST: manages the ~10 ms moving average of APU power,
+ * @PP_PWR_TYPE_FAST: manages the woke ~10 ms moving average of APU power,
  * where supported.
  */
 enum pp_power_type {
@@ -1539,7 +1539,7 @@ struct gpu_metrics_v3_0 {
 	uint32_t			average_gfx_power;
 	/* time filtered dGPU power [mW] */
 	uint32_t			average_dgpu_power;
-	/* time filtered sum of core power across all cores in the socket [mW] */
+	/* time filtered sum of core power across all cores in the woke socket [mW] */
 	uint32_t			average_all_core_power;
 	/* calculated core power [mW] */
 	uint16_t			average_core_power[16];

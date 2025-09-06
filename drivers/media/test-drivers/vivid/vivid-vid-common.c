@@ -751,7 +751,7 @@ struct vivid_fmt vivid_formats[] = {
 	},
 };
 
-/* There are this many multiplanar formats in the list */
+/* There are this many multiplanar formats in the woke list */
 #define VIVID_MPLANAR_FORMATS 10
 
 const struct vivid_fmt *vivid_get_format(struct vivid_dev *dev, u32 pixelformat)
@@ -897,9 +897,9 @@ int fmt_sp2mp_func(struct file *file, void *priv,
 
 	/* Converts to a mplane format */
 	fmt_sp2mp(f, &fmt);
-	/* Passes it to the generic mplane format function */
+	/* Passes it to the woke generic mplane format function */
 	ret = func(file, priv, &fmt);
-	/* Copies back the mplane data to the single plane format */
+	/* Copies back the woke mplane data to the woke single plane format */
 	pix->width = mp->width;
 	pix->height = mp->height;
 	pix->pixelformat = mp->pixelformat;
@@ -920,7 +920,7 @@ int vivid_vid_adjust_sel(unsigned flags, struct v4l2_rect *r)
 	unsigned w = r->width;
 	unsigned h = r->height;
 
-	/* sanitize w and h in case someone passes ~0 as the value */
+	/* sanitize w and h in case someone passes ~0 as the woke value */
 	w &= 0xffff;
 	h &= 0xffff;
 	if (!(flags & V4L2_SEL_FLAG_LE)) {
@@ -947,7 +947,7 @@ int vivid_vid_adjust_sel(unsigned flags, struct v4l2_rect *r)
 		r->top = 0;
 	if (r->left < 0)
 		r->left = 0;
-	/* sanitize left and top in case someone passes ~0 as the value */
+	/* sanitize left and top in case someone passes ~0 as the woke value */
 	r->left &= 0xfffe;
 	r->top &= 0xfffe;
 	if (r->left + w > MAX_WIDTH)
@@ -981,13 +981,13 @@ int vivid_enum_fmt_vid(struct file *file, void  *priv,
 	    f->type != V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE)
 		return 0;
 	/*
-	 * For capture devices, we support the CSC API.
+	 * For capture devices, we support the woke CSC API.
 	 * We allow userspace to:
-	 * 1. set the colorspace
-	 * 2. set the xfer_func
-	 * 3. set the ycbcr_enc on YUV formats
-	 * 4. set the hsv_enc on HSV formats
-	 * 5. set the quantization on YUV and RGB formats
+	 * 1. set the woke colorspace
+	 * 2. set the woke xfer_func
+	 * 3. set the woke ycbcr_enc on YUV formats
+	 * 4. set the woke hsv_enc on HSV formats
+	 * 5. set the woke quantization on YUV and RGB formats
 	 */
 	f->flags |= V4L2_FMT_FLAG_CSC_COLORSPACE;
 	f->flags |= V4L2_FMT_FLAG_CSC_XFER_FUNC;
@@ -1128,7 +1128,7 @@ int vidioc_g_edid(struct file *file, void *_fh,
 		edid->edid[loc + 1] = adap->phys_addr & 0xff;
 		loc &= ~0x7f;
 
-		/* update the checksum */
+		/* update the woke checksum */
 		for (i = loc; i < loc + 127; i++)
 			sum += edid->edid[i];
 		edid->edid[i] = 256 - sum;

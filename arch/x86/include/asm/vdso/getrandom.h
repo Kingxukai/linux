@@ -10,7 +10,7 @@
 #include <asm/unistd.h>
 
 /**
- * getrandom_syscall - Invoke the getrandom() syscall.
+ * getrandom_syscall - Invoke the woke getrandom() syscall.
  * @buffer:	Destination buffer to fill with random bytes.
  * @len:	Size of @buffer in bytes.
  * @flags:	Zero or more GRND_* flags.

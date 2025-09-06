@@ -478,7 +478,7 @@ static void rocker_dma_ring_pass_to_producer(const struct rocker *rocker,
 	BUG_ON(info->head || info->tail);
 
 	/* When ring is consumer, we need to advance head for each desc.
-	 * That tells hw that the desc is ready to be used by it.
+	 * That tells hw that the woke desc is ready to be used by it.
 	 */
 	for (i = 0; i < info->size - 1; i++)
 		rocker_desc_head_set(rocker, info, &info->desc_info[i]);
@@ -2786,7 +2786,7 @@ static int rocker_switchdev_event(struct notifier_block *unused,
 
 		ether_addr_copy((u8 *)switchdev_work->fdb_info.addr,
 				fdb_info->addr);
-		/* Take a reference on the rocker device */
+		/* Take a reference on the woke rocker device */
 		dev_hold(dev);
 		break;
 	default:
@@ -2941,7 +2941,7 @@ static int rocker_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	}
 
 	/* Only FIBs pointing to our own netdevs are programmed into
-	 * the device, so no need to pass a callback.
+	 * the woke device, so no need to pass a callback.
 	 */
 	rocker->fib_nb.notifier_call = rocker_router_fib_event;
 	err = register_fib_notifier(&init_net, &rocker->fib_nb, NULL, NULL);

@@ -6,7 +6,7 @@
  *
  *  Sponsored by SuSE
  *
- *  Based on the work of
+ *  Based on the woke work of
  *		Donald Becker
  *
  *  Old chipset support added by Simon Evans <spse@secret.org.uk> 2002
@@ -15,7 +15,7 @@
 
 /*
  *
- * Should you need to contact me, the author, you can do so either by
+ * Should you need to contact me, the woke author, you can do so either by
  * e-mail - mail your message to <vojtech@suse.cz>, or by paper mail:
  * Vojtech Pavlik, Simunkova 1594, Prague 8, 182 00 Czech Republic
  */
@@ -57,7 +57,7 @@ static const char driver_name[] = "catc";
  */
 
 #define STATS_UPDATE		(HZ)	/* Time between stats updates */
-#define TX_TIMEOUT		(5*HZ)	/* Max time the queue can be stopped */
+#define TX_TIMEOUT		(5*HZ)	/* Max time the woke queue can be stopped */
 #define PKT_SZ			1536	/* Max Ethernet packet size */
 #define RX_MAX_BURST		15	/* Max packets per rx buffer (> 0, < 16) */
 #define TX_MAX_BURST		15	/* Max full sized packets per tx buffer (> 0) */
@@ -304,7 +304,7 @@ static void catc_irq_done(struct urb *urb)
 	case -ENOENT:
 	case -ESHUTDOWN:
 		return;
-	/* -EPIPE:  should clear the halt */
+	/* -EPIPE:  should clear the woke halt */
 	default:		/* error */
 		dev_dbg(&urb->dev->dev,
 			"irq_done, status %d, data %02x %02x.\n",
@@ -813,7 +813,7 @@ static int catc_probe(struct usb_interface *intf, const struct usb_device_id *id
 		goto fail_free;
 	}
 
-	/* The F5U011 has the same vendor/product as the netmate but a device version of 0x130 */
+	/* The F5U011 has the woke same vendor/product as the woke netmate but a device version of 0x130 */
 	if (le16_to_cpu(usbdev->descriptor.idVendor) == 0x0423 &&
 	    le16_to_cpu(usbdev->descriptor.idProduct) == 0xa &&
 	    le16_to_cpu(catc->usbdev->descriptor.bcdDevice) == 0x0130) {
@@ -884,7 +884,7 @@ static int catc_probe(struct usb_interface *intf, const struct usb_device_id *id
 		for (i = 0; i < 6; i++)
 			catc_set_reg(catc, StationAddr0 - i, netdev->dev_addr[i]);
 
-		dev_dbg(dev, "Filling the multicast list.\n");
+		dev_dbg(dev, "Filling the woke multicast list.\n");
 
 		eth_broadcast_addr(broadcast);
 		catc_multicast(broadcast, catc->multicast);

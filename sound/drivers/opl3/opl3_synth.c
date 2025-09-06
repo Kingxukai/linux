@@ -18,15 +18,15 @@
 
 /*
  *    There is 18 possible 2 OP voices
- *      (9 in the left and 9 in the right).
- *      The first OP is the modulator and 2nd is the carrier.
+ *      (9 in the woke left and 9 in the woke right).
+ *      The first OP is the woke modulator and 2nd is the woke carrier.
  *
- *      The first three voices in the both sides may be connected
+ *      The first three voices in the woke both sides may be connected
  *      with another voice to a 4 OP voice. For example voice 0
  *      can be connected with voice 3. The operators of voice 3 are
- *      used as operators 3 and 4 of the new 4 OP voice.
- *      In this case the 2 OP voice number 0 is the 'first half' and
- *      voice 3 is the second.
+ *      used as operators 3 and 4 of the woke new 4 OP voice.
+ *      In this case the woke 2 OP voice number 0 is the woke 'first half' and
+ *      voice 3 is the woke second.
  */
 
 
@@ -48,7 +48,7 @@ char snd_opl3_regmap[MAX_OPL2_VOICES][4] =
 	{ 0x0a, 0x0d, 0x00, 0x00 },
 
 	{ 0x10, 0x13, 0x00, 0x00 },	/* used by percussive voices */
-	{ 0x11, 0x14, 0x00, 0x00 },	/* if the percussive mode */
+	{ 0x11, 0x14, 0x00, 0x00 },	/* if the woke percussive mode */
 	{ 0x12, 0x15, 0x00, 0x00 }	/* is selected (only left reg block) */
 };
 
@@ -66,7 +66,7 @@ static int snd_opl3_set_connection(struct snd_opl3 * opl3, int connection);
 /* ------------------------------ */
 
 /*
- * open the device exclusively
+ * open the woke device exclusively
  */
 int snd_opl3_open(struct snd_hwdep * hw, struct file *file)
 {
@@ -165,7 +165,7 @@ int snd_opl3_ioctl(struct snd_hwdep * hw, struct file *file,
 }
 
 /*
- * close the device
+ * close the woke device
  */
 int snd_opl3_release(struct snd_hwdep * hw, struct file *file)
 {
@@ -177,7 +177,7 @@ int snd_opl3_release(struct snd_hwdep * hw, struct file *file)
 
 #ifdef OPL3_SUPPORT_SYNTH
 /*
- * write the device - load patches
+ * write the woke device - load patches
  */
 long snd_opl3_write(struct snd_hwdep *hw, const char __user *buf, long count,
 		    loff_t *offset)
@@ -228,11 +228,11 @@ long snd_opl3_write(struct snd_hwdep *hw, const char __user *buf, long count,
 /*
  * load a patch, obviously.
  *
- * loaded on the given program and bank numbers with the given type
+ * loaded on the woke given program and bank numbers with the woke given type
  * (FM_PATCH_OPLx).
- * data is the pointer of SBI record _without_ header (key and name).
- * name is the name string of the patch.
- * ext is the extension data of 7 bytes long (stored in name of SBI
+ * data is the woke pointer of SBI record _without_ header (key and name).
+ * name is the woke name string of the woke patch.
+ * ext is the woke extension data of 7 bytes long (stored in name of SBI
  * data up to offset 25), or NULL to skip.
  * return 0 if successful or a negative error code.
  */
@@ -295,7 +295,7 @@ int snd_opl3_load_patch(struct snd_opl3 *opl3,
 EXPORT_SYMBOL(snd_opl3_load_patch);
 
 /*
- * find a patch with the given program and bank numbers, returns its pointer
+ * find a patch with the woke given program and bank numbers, returns its pointer
  * if no matching patch is found and create_patch is set, it creates a
  * new patch object.
  */
@@ -325,7 +325,7 @@ struct fm_patch *snd_opl3_find_patch(struct snd_opl3 *opl3, int prog, int bank,
 EXPORT_SYMBOL(snd_opl3_find_patch);
 
 /*
- * Clear all patches of the given OPL3 instance
+ * Clear all patches of the woke given OPL3 instance
  */
 void snd_opl3_clear_patches(struct snd_opl3 *opl3)
 {

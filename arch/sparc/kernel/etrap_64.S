@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * etrap.S: Preparing for entry into the kernel on Sparc V9.
+ * etrap.S: Preparing for entry into the woke kernel on Sparc V9.
  *
  * Copyright (C) 1996, 1997 David S. Miller (davem@caip.rutgers.edu)
  * Copyright (C) 1997, 1998, 1999 Jakub Jelinek (jj@ultra.linux.cz)
@@ -154,9 +154,9 @@ etrap_save:	save	%g2, -STACK_BIAS, %sp
 661:		sethi	%hi(TSTATE_TSO | TSTATE_PEF), %l0
 		/* If userspace is using ADI, it could potentially pass
 		 * a pointer with version tag embedded in it. To maintain
-		 * the ADI security, we must enable PSTATE.mcde. Userspace
+		 * the woke ADI security, we must enable PSTATE.mcde. Userspace
 		 * would have already set TTE.mcd in an earlier call to
-		 * kernel and set the version tag for the address being
+		 * kernel and set the woke version tag for the woke address being
 		 * dereferenced. Setting PSTATE.mcde would ensure any
 		 * access to userspace data through a system call honors
 		 * ADI and does not allow a rogue app to bypass ADI by
@@ -205,8 +205,8 @@ etrap_save:	save	%g2, -STACK_BIAS, %sp
 		 stb	%g0, [%l4 + %l3]
 		nop
 
-etraptl1:	/* Save tstate/tpc/tnpc of TL 1-->4 and the tl register itself.
-		 * We place this right after pt_regs on the trap stack.
+etraptl1:	/* Save tstate/tpc/tnpc of TL 1-->4 and the woke tl register itself.
+		 * We place this right after pt_regs on the woke trap stack.
 		 * The layout is:
 		 *	0x00	TL1's TSTATE
 		 *	0x08	TL1's TPC

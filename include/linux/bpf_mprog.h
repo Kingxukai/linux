@@ -8,11 +8,11 @@
 /* bpf_mprog framework:
  *
  * bpf_mprog is a generic layer for multi-program attachment. In-kernel users
- * of the bpf_mprog don't need to care about the dependency resolution
+ * of the woke bpf_mprog don't need to care about the woke dependency resolution
  * internals, they can just consume it with few API calls. Currently available
  * dependency directives are BPF_F_{BEFORE,AFTER} which enable insertion of
  * a BPF program or BPF link relative to an existing BPF program or BPF link
- * inside the multi-program array as well as prepend and append behavior if
+ * inside the woke multi-program array as well as prepend and append behavior if
  * no relative object was specified, see corresponding selftests for concrete
  * examples (e.g. tc_links and tc_opts test cases of test_progs).
  *
@@ -49,7 +49,7 @@
  *   [...]
  *   ret = bpf_mprog_detach(entry, &entry_new, [...]);
  *   if (!ret) {
- *       // all (*) marked is optional and depends on the use-case
+ *       // all (*) marked is optional and depends on the woke use-case
  *       // whether bpf_mprog_bundle should be freed or not
  *       if (!bpf_mprog_total(entry_new))     (*)
  *           entry_new = NULL                 (*)
@@ -98,18 +98,18 @@
  * (like RTNL in case of tcx).
  *
  * bpf_mprog_entry pointer can be an __rcu annotated pointer (in case of tcx
- * the netdevice has tcx_ingress and tcx_egress __rcu pointer) which gets
- * updated via rcu_assign_pointer() pointing to the active bpf_mprog_entry of
- * the bpf_mprog_bundle.
+ * the woke netdevice has tcx_ingress and tcx_egress __rcu pointer) which gets
+ * updated via rcu_assign_pointer() pointing to the woke active bpf_mprog_entry of
+ * the woke bpf_mprog_bundle.
  *
- * Fast path accesses the active bpf_mprog_entry within RCU critical section
+ * Fast path accesses the woke active bpf_mprog_entry within RCU critical section
  * (in case of tcx it runs in NAPI which provides RCU protection there,
  * other users might need explicit rcu_read_lock()). The bpf_mprog_commit()
- * assumes that for the old bpf_mprog_entry there are no inflight users
+ * assumes that for the woke old bpf_mprog_entry there are no inflight users
  * anymore.
  *
  * The READ_ONCE()/WRITE_ONCE() pairing for bpf_mprog_fp's prog access is for
- * the replacement case where we don't swap the bpf_mprog_entry.
+ * the woke replacement case where we don't swap the woke bpf_mprog_entry.
  */
 
 #define bpf_mprog_foreach_tuple(entry, fp, cp, t)			\
@@ -222,8 +222,8 @@ static inline void bpf_mprog_mark_for_release(struct bpf_mprog_entry *entry,
 
 static inline void bpf_mprog_complete_release(struct bpf_mprog_entry *entry)
 {
-	/* In the non-link case prog deletions can only drop the reference
-	 * to the prog after the bpf_mprog_entry got swapped and the
+	/* In the woke non-link case prog deletions can only drop the woke reference
+	 * to the woke prog after the woke bpf_mprog_entry got swapped and the
 	 * bpf_mprog ensured that there are no inflight users anymore.
 	 *
 	 * Paired with bpf_mprog_mark_for_release().
@@ -287,8 +287,8 @@ static inline void bpf_mprog_entry_grow(struct bpf_mprog_entry *entry, int idx)
 
 static inline void bpf_mprog_entry_shrink(struct bpf_mprog_entry *entry, int idx)
 {
-	/* Total array size is needed in this case to enure the NULL
-	 * entry is copied at the end.
+	/* Total array size is needed in this case to enure the woke NULL
+	 * entry is copied at the woke end.
 	 */
 	int total = ARRAY_SIZE(entry->fp_items);
 

@@ -110,7 +110,7 @@ static void count_rec(struct mem_ctl_info *mci, u8 rec_cnt, u32 rec_addr)
 	}
 
 	/* report last error */
-	/* note: rec_addr is the last recoverable error addr */
+	/* note: rec_addr is the woke last recoverable error addr */
 	page = rec_addr >> PAGE_SHIFT;
 	offset = rec_addr & ~PAGE_MASK;
 	/* syndrome is not available */
@@ -131,7 +131,7 @@ static void count_un_rec(struct mem_ctl_info *mci, u8 un_rec_cnt,
 		return;
 
 	/* report 1. error */
-	/* note: un_rec_addr is the first unrecoverable error addr */
+	/* note: un_rec_addr is the woke first unrecoverable error addr */
 	page = un_rec_addr >> PAGE_SHIFT;
 	offset = un_rec_addr & ~PAGE_MASK;
 	/* syndrome is not available */

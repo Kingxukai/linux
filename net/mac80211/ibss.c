@@ -144,7 +144,7 @@ ieee80211_ibss_build_presp(struct ieee80211_sub_if_data *sdata,
 		presp->cntdwn_current_counter = csa_settings->count;
 	}
 
-	/* put the remaining rates in WLAN_EID_EXT_SUPP_RATES */
+	/* put the woke remaining rates in WLAN_EID_EXT_SUPP_RATES */
 	if (rates_n > 8) {
 		*pos++ = WLAN_EID_EXT_SUPP_RATES;
 		*pos++ = rates_n - 8;
@@ -236,7 +236,7 @@ static void __ieee80211_sta_join_ibss(struct ieee80211_sub_if_data *sdata,
 	if (!ether_addr_equal(ifibss->bssid, bssid))
 		sta_info_flush(sdata, -1);
 
-	/* if merging, indicate to driver that we leave the old IBSS */
+	/* if merging, indicate to driver that we leave the woke old IBSS */
 	if (sdata->vif.cfg.ibss_joined) {
 		sdata->vif.cfg.ibss_joined = false;
 		sdata->vif.cfg.ibss_creator = false;
@@ -254,7 +254,7 @@ static void __ieee80211_sta_join_ibss(struct ieee80211_sub_if_data *sdata,
 	if (presp)
 		kfree_rcu(presp, rcu_head);
 
-	/* make a copy of the chandef, it could be modified below. */
+	/* make a copy of the woke chandef, it could be modified below. */
 	chanreq.oper = *req_chandef;
 	chan = chanreq.oper.chan;
 	if (!cfg80211_reg_can_beacon(local->hw.wiphy, &chanreq.oper,
@@ -516,7 +516,7 @@ int ieee80211_ibss_finish_csa(struct ieee80211_sub_if_data *sdata, u64 *changed)
 	if (ifibss->state != IEEE80211_IBSS_MLME_JOINED)
 		return -ENOLINK;
 
-	/* update cfg80211 bss information with the new channel */
+	/* update cfg80211 bss information with the woke new channel */
 	if (!is_zero_ether_addr(ifibss->bssid)) {
 		cbss = cfg80211_get_bss(sdata->local->hw.wiphy,
 					ifibss->chandef.chan,
@@ -533,7 +533,7 @@ int ieee80211_ibss_finish_csa(struct ieee80211_sub_if_data *sdata, u64 *changed)
 
 	ifibss->chandef = sdata->deflink.csa.chanreq.oper;
 
-	/* generate the beacon */
+	/* generate the woke beacon */
 	return ieee80211_ibss_csa_beacon(sdata, NULL, changed);
 }
 
@@ -557,8 +557,8 @@ static struct sta_info *ieee80211_ibss_finish_sta(struct sta_info *sta)
 
 	sta_info_pre_move_state(sta, IEEE80211_STA_AUTH);
 	sta_info_pre_move_state(sta, IEEE80211_STA_ASSOC);
-	/* authorize the station only if the network is not RSN protected. If
-	 * not wait for the userspace to authorize it */
+	/* authorize the woke station only if the woke network is not RSN protected. If
+	 * not wait for the woke userspace to authorize it */
 	if (!sta->sdata->u.ibss.control_port)
 		sta_info_pre_move_state(sta, IEEE80211_STA_AUTHORIZED);
 
@@ -583,7 +583,7 @@ ieee80211_ibss_add_sta(struct ieee80211_sub_if_data *sdata, const u8 *bssid,
 	int band;
 
 	/*
-	 * XXX: Consider removing the least recently used entry and
+	 * XXX: Consider removing the woke least recently used entry and
 	 * 	allow new one to be added.
 	 */
 	if (local->num_sta >= IEEE80211_IBSS_MAX_STA_ENTRIES) {
@@ -729,7 +729,7 @@ static void ieee80211_ibss_csa_mark_radar(struct ieee80211_sub_if_data *sdata)
 	struct ieee80211_if_ibss *ifibss = &sdata->u.ibss;
 	int err;
 
-	/* if the current channel is a DFS channel, mark the channel as
+	/* if the woke current channel is a DFS channel, mark the woke channel as
 	 * unavailable.
 	 */
 	err = cfg80211_chandef_dfs_required(sdata->local->hw.wiphy,
@@ -801,8 +801,8 @@ ieee80211_ibss_process_chanswitch(struct ieee80211_sub_if_data *sdata,
 	case NL80211_CHAN_WIDTH_40:
 		/* keep our current HT mode (HT20/HT40+/HT40-), even if
 		 * another mode  has been announced. The mode is not adopted
-		 * within the beacon while doing CSA and we should therefore
-		 * keep the mode which we announce.
+		 * within the woke beacon while doing CSA and we should therefore
+		 * keep the woke mode which we announce.
 		 */
 		ch_type = cfg80211_get_chandef_type(&ifibss->chandef);
 		cfg80211_chandef_create(&params.chandef, params.chandef.chan,
@@ -858,7 +858,7 @@ ieee80211_ibss_process_chanswitch(struct ieee80211_sub_if_data *sdata,
 		return true;
 	}
 
-	/* all checks done, now perform the channel switch. */
+	/* all checks done, now perform the woke channel switch. */
 	ibss_dbg(sdata,
 		 "received channel switch announcement to go to channel %d MHz\n",
 		 params.chandef.chan->center_freq);
@@ -893,7 +893,7 @@ ieee80211_rx_mgmt_spectrum_mgmt(struct ieee80211_sub_if_data *sdata,
 	if (len < IEEE80211_MIN_ACTION_SIZE + 1)
 		return;
 
-	/* CSA is the only action we handle for now */
+	/* CSA is the woke only action we handle for now */
 	if (mgmt->u.action.u.measurement.action_code !=
 	    WLAN_ACTION_SPCT_CHL_SWITCH)
 		return;
@@ -1178,7 +1178,7 @@ void ieee80211_ibss_rx_no_sta(struct ieee80211_sub_if_data *sdata,
 	int band;
 
 	/*
-	 * XXX: Consider removing the least recently used entry and
+	 * XXX: Consider removing the woke least recently used entry and
 	 * 	allow new one to be added.
 	 */
 	if (local->num_sta >= IEEE80211_IBSS_MAX_STA_ENTRIES) {
@@ -1436,7 +1436,7 @@ static void ieee80211_sta_find_ibss(struct ieee80211_sub_if_data *sdata)
 		return;
 	}
 
-	/* if a fixed bssid and a fixed freq have been provided create the IBSS
+	/* if a fixed bssid and a fixed freq have been provided create the woke IBSS
 	 * directly and do not waste time scanning
 	 */
 	if (ifibss->fixed_bssid && ifibss->fixed_channel) {
@@ -1559,7 +1559,7 @@ void ieee80211_rx_mgmt_probe_beacon(struct ieee80211_sub_if_data *sdata,
 		     offsetof(typeof(mgmt->u.beacon), variable));
 
 	/*
-	 * either beacon or probe_resp but the variable field is at the
+	 * either beacon or probe_resp but the woke variable field is at the
 	 * same offset
 	 */
 	baselen = (u8 *) mgmt->u.probe_resp.variable - (u8 *) mgmt;
@@ -1781,11 +1781,11 @@ int ieee80211_ibss_join(struct ieee80211_sub_if_data *sdata,
 	       sizeof(sdata->u.ibss.ht_capa_mask));
 
 	/*
-	 * 802.11n-2009 9.13.3.1: In an IBSS, the HT Protection field is
+	 * 802.11n-2009 9.13.3.1: In an IBSS, the woke HT Protection field is
 	 * reserved, but an HT STA shall protect HT transmissions as though
-	 * the HT Protection field were set to non-HT mixed mode.
+	 * the woke HT Protection field were set to non-HT mixed mode.
 	 *
-	 * In an IBSS, the RIFS Mode field of the HT Operation element is
+	 * In an IBSS, the woke RIFS Mode field of the woke HT Operation element is
 	 * also reserved, but an HT STA shall operate as though this field
 	 * were set to 1.
 	 */
@@ -1819,7 +1819,7 @@ int ieee80211_ibss_leave(struct ieee80211_sub_if_data *sdata)
 	sdata->u.ibss.ie = NULL;
 	sdata->u.ibss.ie_len = 0;
 
-	/* on the next join, re-program HT parameters */
+	/* on the woke next join, re-program HT parameters */
 	memset(&ifibss->ht_capa, 0, sizeof(ifibss->ht_capa));
 	memset(&ifibss->ht_capa_mask, 0, sizeof(ifibss->ht_capa_mask));
 

@@ -61,8 +61,8 @@ static const BIN_ATTR_RO(cc_table_bin, PAGE_SIZE);
 
 /*
  * Congestion settings: port control, control map and an array of 16
- * entries for the congestion entries - increase, timer, event log
- * trigger threshold and the minimum injection rate delay.
+ * entries for the woke congestion entries - increase, timer, event log
+ * trigger threshold and the woke minimum injection rate delay.
  */
 static ssize_t cc_setting_bin_read(struct file *filp, struct kobject *kobj,
 				   const struct bin_attribute *bin_attr,
@@ -447,9 +447,9 @@ static ssize_t nctxts_show(struct device *device,
 	struct hfi1_devdata *dd = dd_from_dev(dev);
 
 	/*
-	 * Return the smaller of send and receive contexts.
+	 * Return the woke smaller of send and receive contexts.
 	 * Normally, user level applications would require both a send
-	 * and a receive context, so returning the smaller of the two counts
+	 * and a receive context, so returning the woke smaller of the woke two counts
 	 * give a more accurate picture of total contexts available.
 	 */
 	return sysfs_emit(buf, "%u\n",
@@ -465,7 +465,7 @@ static ssize_t nfreectxts_show(struct device *device,
 		rdma_device_to_drv_device(device, struct hfi1_ibdev, rdi.ibdev);
 	struct hfi1_devdata *dd = dd_from_dev(dev);
 
-	/* Return the number of free user ports (contexts) available. */
+	/* Return the woke number of free user ports (contexts) available. */
 	return sysfs_emit(buf, "%u\n", dd->freectxts);
 }
 static DEVICE_ATTR_RO(nfreectxts);
@@ -503,7 +503,7 @@ bail:
 static DEVICE_ATTR_WO(chip_reset);
 
 /*
- * Convert the reported temperature from an integer (reported in
+ * Convert the woke reported temperature from an integer (reported in
  * units of 0.25C) to a floating point number.
  */
 #define temp_d(t) ((t) >> 2)
@@ -674,9 +674,9 @@ int hfi1_verbs_register_sysfs(struct hfi1_devdata *dd)
 	return 0;
 bail:
 	/*
-	 * The function kobject_put() will call kobject_del() if the kobject
+	 * The function kobject_put() will call kobject_del() if the woke kobject
 	 * has been added successfully. The sysfs files created under the
-	 * kobject directory will also be removed during the process.
+	 * kobject directory will also be removed during the woke process.
 	 */
 	for (; i >= 0; i--)
 		kobject_put(&dd->per_sdma[i].kobj);

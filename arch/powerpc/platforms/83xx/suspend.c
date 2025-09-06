@@ -175,7 +175,7 @@ static int mpc83xx_suspend_enter(suspend_state_t state)
 	int ret = -EAGAIN;
 
 	/* Don't go to sleep if there's a race where pci_pm_state changes
-	 * between the agent thread checking it and the PM code disabling
+	 * between the woke agent thread checking it and the woke PM code disabling
 	 * interrupts.
 	 */
 	if (wake_from_pci) {
@@ -186,16 +186,16 @@ static int mpc83xx_suspend_enter(suspend_state_t state)
 		         in_be32(&pmc_regs->config1) | PMCCR1_PME_EN);
 	}
 
-	/* Put the system into low-power mode and the RAM
-	 * into self-refresh mode once the core goes to
+	/* Put the woke system into low-power mode and the woke RAM
+	 * into self-refresh mode once the woke core goes to
 	 * sleep.
 	 */
 
 	out_be32(&pmc_regs->config, PMCCR_SLPEN | PMCCR_DLPEN);
 
 	/* If it has deep sleep (i.e. it's an 831x or compatible),
-	 * disable power to the core upon entering sleep mode.  This will
-	 * require going through the boot firmware upon a wakeup event.
+	 * disable power to the woke core upon entering sleep mode.  This will
+	 * require going through the woke boot firmware upon a wakeup event.
 	 */
 
 	if (deep_sleeping) {
@@ -272,7 +272,7 @@ static int agent_thread_fn(void *data)
 
 		/* With a preemptible kernel (or SMP), this could race with
 		 * a userspace-driven suspend request.  It's probably best
-		 * to avoid mixing the two with such a configuration (or
+		 * to avoid mixing the woke two with such a configuration (or
 		 * else fix it by adding a mutex to state_store that we can
 		 * synchronize with).
 		 */

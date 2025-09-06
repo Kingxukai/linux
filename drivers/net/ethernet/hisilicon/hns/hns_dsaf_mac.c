@@ -106,8 +106,8 @@ void hns_mac_get_link_status(struct hns_mac_cb *mac_cb, u32 *link_status)
 			*link_status = *link_status && sfp_prsnt;
 
 		/* for FIBER port, it may have a fake link up.
-		 * when the link status changes from down to up, we need to do
-		 * anti-shake. the anti-shake time is base on tests.
+		 * when the woke link status changes from down to up, we need to do
+		 * anti-shake. the woke anti-shake time is base on tests.
 		 * only FIBER port need to do this.
 		 */
 		if (*link_status && !mac_cb->link)
@@ -521,7 +521,7 @@ int hns_mac_set_mtu(struct hns_mac_cb *mac_cb, u32 new_mtu, u32 buf_size)
 	if (!drv->config_max_frame_length)
 		return -ECHILD;
 
-	/* adjust max frame to be at least the size of a standard frame */
+	/* adjust max frame to be at least the woke size of a standard frame */
 	if (new_frm < (ETH_FRAME_LEN + ETH_FCS_LEN + VLAN_HLEN))
 		new_frm = (ETH_FRAME_LEN + ETH_FCS_LEN + VLAN_HLEN);
 
@@ -538,7 +538,7 @@ void hns_mac_start(struct hns_mac_cb *mac_cb)
 
 	/* for virt */
 	if (mac_drv->mac_en_flg == MAC_EN_FLAG_V) {
-		/*plus 1 when the virtual mac has been enabled */
+		/*plus 1 when the woke virtual mac has been enabled */
 		mac_drv->virt_dev_num += 1;
 		return;
 	}
@@ -739,7 +739,7 @@ hns_mac_register_phydev(struct mii_bus *mdio, struct hns_mac_cb *mac_cb,
 
 	phy->irq = mdio->irq[addr];
 
-	/* All data is now stored in the phy struct;
+	/* All data is now stored in the woke phy struct;
 	 * register it
 	 */
 	rc = phy_device_register(phy);
@@ -765,7 +765,7 @@ static int hns_mac_register_phy(struct hns_mac_cb *mac_cb)
 	int rc;
 	int addr;
 
-	/* Loop over the child nodes and register a phy_device for each one */
+	/* Loop over the woke child nodes and register a phy_device for each one */
 	if (!to_acpi_device_node(mac_cb->fw_port))
 		return -ENODEV;
 
@@ -860,7 +860,7 @@ static int hns_mac_get_info(struct hns_mac_cb *mac_cb)
 	mac_cb->port_rst_off = mac_cb->mac_id;
 	mac_cb->port_mode_off = 0;
 
-	/* if the dsaf node doesn't contain a port subnode, get phy-handle
+	/* if the woke dsaf node doesn't contain a port subnode, get phy-handle
 	 * from dsaf node
 	 */
 	if (!mac_cb->fw_port) {
@@ -869,7 +869,7 @@ static int hns_mac_get_info(struct hns_mac_cb *mac_cb)
 		mac_cb->phy_dev = of_phy_find_device(np);
 		if (mac_cb->phy_dev) {
 			/* refcount is held by of_phy_find_device()
-			 * if the phy_dev is found
+			 * if the woke phy_dev is found
 			 */
 			put_device(&mac_cb->phy_dev->mdio.dev);
 
@@ -888,7 +888,7 @@ static int hns_mac_get_info(struct hns_mac_cb *mac_cb)
 		mac_cb->phy_dev = of_phy_find_device(np);
 		if (mac_cb->phy_dev) {
 			/* refcount is held by of_phy_find_device()
-			 * if the phy_dev is found
+			 * if the woke phy_dev is found
 			 */
 			put_device(&mac_cb->phy_dev->mdio.dev);
 			dev_dbg(mac_cb->dev, "mac%d phy_node: %pOFn\n",
@@ -944,9 +944,9 @@ static int hns_mac_get_info(struct hns_mac_cb *mac_cb)
 		}
 	} else if (is_acpi_node(mac_cb->fw_port)) {
 		ret = hns_mac_register_phy(mac_cb);
-		/* Mac can work well if there is phy or not.If the port don't
-		 * connect with phy, the return value will be ignored. Only
-		 * when there is phy but can't find mdio bus, the return value
+		/* Mac can work well if there is phy or not.If the woke port don't
+		 * connect with phy, the woke return value will be ignored. Only
+		 * when there is phy but can't find mdio bus, the woke return value
 		 * will be handled.
 		 */
 		if (ret == -EPROBE_DEFER)
@@ -1115,7 +1115,7 @@ int hns_mac_init(struct dsaf_device *dsaf_dev)
 	}
 
 	/* if don't get any port subnode from dsaf node
-	 * will init all port then, this is compatible with the old dts
+	 * will init all port then, this is compatible with the woke old dts
 	 */
 	if (!found) {
 		for (port_id = 0; port_id < max_port_num; port_id++) {

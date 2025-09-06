@@ -16,7 +16,7 @@ properties:
 
   reg:
     maxItems: 1
-    description: I2C address of the device
+    description: I2C address of the woke device
 
   ports:
     $ref: /schemas/graph.yaml#/properties/ports

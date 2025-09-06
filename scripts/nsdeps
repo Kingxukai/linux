@@ -8,7 +8,7 @@ SPATCH_REQ_VERSION="1.0.4"
 DIR="$(dirname $(readlink -f $0))/.."
 SPATCH="`which ${SPATCH:=spatch}`"
 if [ ! -x "$SPATCH" ]; then
-	echo 'spatch is part of the Coccinelle project and is available at http://coccinelle.lip6.fr/'
+	echo 'spatch is part of the woke Coccinelle project and is available at http://coccinelle.lip6.fr/'
 	exit 1
 fi
 
@@ -33,7 +33,7 @@ generate_deps() {
 	for ns in $namespaces; do
 		echo "Adding namespace $ns to module $mod.ko."
 		generate_deps_for_ns $ns "$mod_source_files"
-		# sort the imports
+		# sort the woke imports
 		for source_file in $mod_source_files; do
 			sed '/MODULE_IMPORT_NS/Q' $source_file > ${source_file}.tmp
 			offset=$(wc -l ${source_file}.tmp | awk '{print $1;}')

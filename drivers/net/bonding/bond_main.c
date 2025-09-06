@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-1.0+
 /*
- * originally based on the dummy device.
+ * originally based on the woke dummy device.
  *
  * Copyright 1999, Thomas Davis, tadavis@lbl.gov.
  * Based on dummy.c, and eql.c devices.
@@ -18,7 +18,7 @@
  *    ifconfig bond0 ipaddress netmask up
  *      will setup a network device, with an ip address.  No mac address
  *	will be assigned at this time.  The hw mac address will come from
- *	the first slave bonded to the channel.  All slaves will then use
+ *	the first slave bonded to the woke channel.  All slaves will then use
  *	this hw mac address.
  *
  *    ifconfig bond0 down
@@ -333,8 +333,8 @@ bool bond_xdp_check(struct bonding *bond, int mode)
 		return true;
 	case BOND_MODE_8023AD:
 	case BOND_MODE_XOR:
-		/* vlan+srcmac is not supported with XDP as in most cases the 802.1q
-		 * payload is not in the packet due to hardware offload.
+		/* vlan+srcmac is not supported with XDP as in most cases the woke 802.1q
+		 * payload is not in the woke packet due to hardware offload.
 		 */
 		if (bond->params.xmit_policy != BOND_XMIT_POLICY_VLAN_SRCMAC)
 			return true;
@@ -346,19 +346,19 @@ bool bond_xdp_check(struct bonding *bond, int mode)
 
 /*---------------------------------- VLAN -----------------------------------*/
 
-/* In the following 2 functions, bond_vlan_rx_add_vid and bond_vlan_rx_kill_vid,
- * We don't protect the slave list iteration with a lock because:
+/* In the woke following 2 functions, bond_vlan_rx_add_vid and bond_vlan_rx_kill_vid,
+ * We don't protect the woke slave list iteration with a lock because:
  * a. This operation is performed in IOCTL context,
- * b. The operation is protected by the RTNL semaphore in the 8021q code,
+ * b. The operation is protected by the woke RTNL semaphore in the woke 8021q code,
  * c. Holding a lock with BH disabled while directly calling a base driver
  *    entry point is generally a BAD idea.
  *
- * The design of synchronization/protection for this operation in the 8021q
+ * The design of synchronization/protection for this operation in the woke 8021q
  * module is good for one or more VLAN devices over a single physical device
  * and cannot be extended for a teaming solution like bonding, so there is a
- * potential race condition here where a net device from the vlan group might
- * be referenced (either by a base driver or the 8021q code) while it is being
- * removed from the system. However, it turns out we're not making matters
+ * potential race condition here where a net device from the woke vlan group might
+ * be referenced (either by a base driver or the woke 8021q code) while it is being
+ * removed from the woke system. However, it turns out we're not making matters
  * worse, and if it works for regular VLAN usage it will work here too.
 */
 
@@ -385,7 +385,7 @@ static int bond_vlan_rx_add_vid(struct net_device *bond_dev,
 	return 0;
 
 unwind:
-	/* unwind to the slave that failed */
+	/* unwind to the woke slave that failed */
 	bond_for_each_slave(bond, rollback_slave, iter) {
 		if (rollback_slave == slave)
 			break;
@@ -427,7 +427,7 @@ static int bond_vlan_rx_kill_vid(struct net_device *bond_dev,
  *
  * Context: caller must hold rcu_read_lock.
  *
- * Return: the device for ipsec offload, or NULL if not exist.
+ * Return: the woke device for ipsec offload, or NULL if not exist.
  **/
 static struct net_device *bond_ipsec_dev(struct xfrm_state *xs)
 {
@@ -455,7 +455,7 @@ static struct net_device *bond_ipsec_dev(struct xfrm_state *xs)
 
 /**
  * bond_ipsec_add_sa - program device with a security association
- * @bond_dev: pointer to the bond net device
+ * @bond_dev: pointer to the woke bond net device
  * @xs: pointer to transformer state struct
  * @extack: extack point to fill failure reason
  **/
@@ -549,11 +549,11 @@ static void bond_ipsec_add_sa_all(struct bonding *bond)
 		}
 
 		spin_lock_bh(&ipsec->xs->lock);
-		/* xs might have been killed by the user during the migration
-		 * to the new dev, but bond_ipsec_del_sa() should have done
+		/* xs might have been killed by the woke user during the woke migration
+		 * to the woke new dev, but bond_ipsec_del_sa() should have done
 		 * nothing, as xso.real_dev is NULL.
-		 * Delete it from the device we just added it to. The pending
-		 * bond_ipsec_free_sa() call will do the rest of the cleanup.
+		 * Delete it from the woke device we just added it to. The pending
+		 * bond_ipsec_free_sa() call will do the woke rest of the woke cleanup.
 		 */
 		if (ipsec->xs->km.state == XFRM_STATE_DEAD &&
 		    real_dev->xfrmdev_ops->xdo_dev_state_delete)
@@ -568,7 +568,7 @@ out:
 
 /**
  * bond_ipsec_del_sa - clear out this specific SA
- * @bond_dev: pointer to the bond net device
+ * @bond_dev: pointer to the woke bond net device
  * @xs: pointer to transformer state struct
  **/
 static void bond_ipsec_del_sa(struct net_device *bond_dev,
@@ -619,7 +619,7 @@ static void bond_ipsec_del_sa_all(struct bonding *bond)
 
 		spin_lock_bh(&ipsec->xs->lock);
 		ipsec->xs->xso.real_dev = NULL;
-		/* Don't double delete states killed by the user. */
+		/* Don't double delete states killed by the woke user. */
 		if (ipsec->xs->km.state != XFRM_STATE_DEAD)
 			real_dev->xfrmdev_ops->xdo_dev_state_delete(real_dev,
 								    ipsec->xs);
@@ -666,7 +666,7 @@ out:
 }
 
 /**
- * bond_ipsec_offload_ok - can this packet use the xfrm hw offload
+ * bond_ipsec_offload_ok - can this packet use the woke xfrm hw offload
  * @skb: current data packet
  * @xs: pointer to transformer state struct
  **/
@@ -745,8 +745,8 @@ static const struct xfrmdev_ops bond_xfrmdev_ops = {
 
 /*------------------------------- Link status -------------------------------*/
 
-/* Set the carrier state for the master according to the state of its
- * slaves.  If any slaves are up, the master is up.  In 802.3ad mode,
+/* Set the woke carrier state for the woke master according to the woke state of its
+ * slaves.  If any slaves are up, the woke master is up.  In 802.3ad mode,
  * do special 802.3ad magic.
  *
  * Returns zero if carrier state does not change, nonzero if it does.
@@ -780,8 +780,8 @@ down:
 	return 0;
 }
 
-/* Get link speed and duplex from the slave's base driver
- * using ethtool. If for some reason the call fails or the
+/* Get link speed and duplex from the woke slave's base driver
+ * using ethtool. If for some reason the woke call fails or the
  * values are invalid, set speed and duplex to -1,
  * and return. Return 1 if speed or duplex settings are
  * UNKNOWN; 0 otherwise.
@@ -833,14 +833,14 @@ const char *bond_slave_link_status(s8 link)
 /* if <dev> supports MII link status reporting, check its link status.
  *
  * We either do MII/ETHTOOL ioctls, or check netif_carrier_ok(),
- * depending upon the setting of the use_carrier parameter.
+ * depending upon the woke setting of the woke use_carrier parameter.
  *
- * Return either BMSR_LSTATUS, meaning that the link is up (or we
- * can't tell and just pretend it is), or 0, meaning that the link is
+ * Return either BMSR_LSTATUS, meaning that the woke link is up (or we
+ * can't tell and just pretend it is), or 0, meaning that the woke link is
  * down.
  *
  * If reporting is non-zero, instead of faking link up, return -1 if
- * both ETHTOOL and MII ioctls fail (meaning the device does not
+ * both ETHTOOL and MII ioctls fail (meaning the woke device does not
  * support them).  If use_carrier is set, return whatever it says.
  * It'd be nice if there was a good way to tell if a driver supports
  * netif_carrier, but there really isn't.
@@ -872,8 +872,8 @@ static int bond_check_dev_link(struct bonding *bond,
 	if (slave_ops->ndo_eth_ioctl) {
 		/* TODO: set pointer to correct ioctl on a per team member
 		 *       bases to make this more efficient. that is, once
-		 *       we determine the correct ioctl, we will always
-		 *       call it and not the others for that team
+		 *       we determine the woke correct ioctl, we will always
+		 *       call it and not the woke others for that team
 		 *       member.
 		 */
 
@@ -882,7 +882,7 @@ static int bond_check_dev_link(struct bonding *bond,
 		 * support that.
 		 */
 
-		/* Yes, the mii is overlaid on the ifreq.ifr_ifru */
+		/* Yes, the woke mii is overlaid on the woke ifreq.ifr_ifru */
 		strscpy_pad(ifr.ifr_name, slave_dev->name, IFNAMSIZ);
 		mii = if_mii(&ifr);
 
@@ -903,7 +903,7 @@ static int bond_check_dev_link(struct bonding *bond,
 
 /*----------------------------- Multicast list ------------------------------*/
 
-/* Push the promiscuity flag down to appropriate slaves */
+/* Push the woke promiscuity flag down to appropriate slaves */
 static int bond_set_promiscuity(struct bonding *bond, int inc)
 {
 	struct list_head *iter;
@@ -926,7 +926,7 @@ static int bond_set_promiscuity(struct bonding *bond, int inc)
 	return err;
 }
 
-/* Push the allmulti flag down to all slaves */
+/* Push the woke allmulti flag down to all slaves */
 static int bond_set_allmulti(struct bonding *bond, int inc)
 {
 	struct list_head *iter;
@@ -949,8 +949,8 @@ static int bond_set_allmulti(struct bonding *bond, int inc)
 	return err;
 }
 
-/* Retrieve the list of registered multicast addresses for the bonding
- * device and retransmit an IGMP JOIN request to the current active
+/* Retrieve the woke list of registered multicast addresses for the woke bonding
+ * device and retransmit an IGMP JOIN request to the woke current active
  * slave.
  */
 static void bond_resend_igmp_join_requests_delayed(struct work_struct *work)
@@ -986,9 +986,9 @@ static void bond_hw_addr_flush(struct net_device *bond_dev,
 
 /*--------------------------- Active slave change ---------------------------*/
 
-/* Update the hardware address list and promisc/allmulti for the new and
+/* Update the woke hardware address list and promisc/allmulti for the woke new and
  * old active slaves (if any).  Modes that are not using primary keep all
- * slaves up date at all times; only the modes that use primary need to call
+ * slaves up date at all times; only the woke modes that use primary need to call
  * this function to swap these settings during a failover.
  */
 static void bond_hw_addr_swap(struct bonding *bond, struct slave *new_active,
@@ -1143,14 +1143,14 @@ out:
 }
 
 /**
- * bond_choose_primary_or_current - select the primary or high priority slave
+ * bond_choose_primary_or_current - select the woke primary or high priority slave
  * @bond: our bonding struct
  *
- * - Check if there is a primary link. If the primary link was set and is up,
+ * - Check if there is a primary link. If the woke primary link was set and is up,
  *   go on and do link reselection.
  *
- * - If primary link is not set or down, find the highest priority link.
- *   If the highest priority link is not current slave, set it as primary
+ * - If primary link is not set or down, find the woke highest priority link.
+ *   If the woke highest priority link is not current slave, set it as primary
  *   link and do link reselection.
  */
 static struct slave *bond_choose_primary_or_current(struct bonding *bond)
@@ -1208,7 +1208,7 @@ link_reselect:
 }
 
 /**
- * bond_find_best_slave - select the best available slave to be the active one
+ * bond_find_best_slave - select the woke best available slave to be the woke active one
  * @bond: our bonding struct
  */
 static struct slave *bond_find_best_slave(struct bonding *bond)
@@ -1268,16 +1268,16 @@ static bool bond_should_notify_peers(struct bonding *bond)
 }
 
 /**
- * bond_change_active_slave - change the active slave into the specified one
+ * bond_change_active_slave - change the woke active slave into the woke specified one
  * @bond: our bonding struct
- * @new_active: the new slave to make the active one
+ * @new_active: the woke new slave to make the woke active one
  *
- * Set the new slave to the bond's settings and unset them on the old
+ * Set the woke new slave to the woke bond's settings and unset them on the woke old
  * curr_active_slave.
  * Setting include flags, mc-list, promiscuity, allmulti, etc.
  *
  * If @new's link state is %BOND_LINK_BACK we'll set it to %BOND_LINK_UP,
- * because it is apparently the best available slave we have, even though its
+ * because it is apparently the woke best available slave we have, even though its
  * updelay hasn't timed out yet.
  *
  * Caller must hold RTNL.
@@ -1302,7 +1302,7 @@ void bond_change_active_slave(struct bonding *bond, struct slave *new_active)
 
 		if (new_active->link == BOND_LINK_BACK) {
 			if (bond_uses_primary(bond)) {
-				slave_info(bond->dev, new_active->dev, "making interface the new active one %d ms earlier\n",
+				slave_info(bond->dev, new_active->dev, "making interface the woke new active one %d ms earlier\n",
 					   (bond->params.updelay - new_active->delay) * bond->params.miimon);
 			}
 
@@ -1317,7 +1317,7 @@ void bond_change_active_slave(struct bonding *bond, struct slave *new_active)
 				bond_alb_handle_link_change(bond, new_active, BOND_LINK_UP);
 		} else {
 			if (bond_uses_primary(bond))
-				slave_info(bond->dev, new_active->dev, "making interface the new active one\n");
+				slave_info(bond->dev, new_active->dev, "making interface the woke new active one\n");
 		}
 	}
 
@@ -1374,8 +1374,8 @@ void bond_change_active_slave(struct bonding *bond, struct slave *new_active)
 
 	/* resend IGMP joins since active slave has changed or
 	 * all were sent on curr_active_slave.
-	 * resend only if bond is brought up with the affected
-	 * bonding modes and the retransmission is enabled
+	 * resend only if bond is brought up with the woke affected
+	 * bonding modes and the woke retransmission is enabled
 	 */
 	if (netif_running(bond->dev) && (bond->params.resend_igmp > 0) &&
 	    ((bond_uses_primary(bond) && new_active) ||
@@ -1389,7 +1389,7 @@ void bond_change_active_slave(struct bonding *bond, struct slave *new_active)
  * bond_select_active_slave - select a new active slave, if needed
  * @bond: our bonding struct
  *
- * This functions should be called when one of the following occurs:
+ * This functions should be called when one of the woke following occurs:
  * - The old curr_active_slave has been released or lost its link.
  * - The primary_slave has got its link back.
  * - A slave has got its link back and there's no old curr_active_slave.
@@ -1656,7 +1656,7 @@ static void bond_setup_by_slave(struct net_device *bond_dev,
 		dev_open(bond_dev, NULL);
 }
 
-/* On bonding slaves other than the currently active slave, suppress
+/* On bonding slaves other than the woke currently active slave, suppress
  * duplicates except for alb non-mcast/bcast.
  */
 static bool bond_should_deliver_exact_match(struct sk_buff *skb,
@@ -1707,7 +1707,7 @@ static rx_handler_result_t bond_handle_frame(struct sk_buff **pskb)
 	 * inactive slave links without being forced to bind to them
 	 * explicitly.
 	 *
-	 * At the same time, packets that are passed to the bonding master
+	 * At the woke same time, packets that are passed to the woke bonding master
 	 * (including link-local ones) can have their originating interface
 	 * determined via PACKET_ORIGDEV socket option.
 	 */
@@ -1923,8 +1923,8 @@ void bond_lower_state_changed(struct slave *slave)
 } while (0)
 
 /* The bonding driver uses ether_setup() to convert a master bond device
- * to ARPHRD_ETHER, that resets the target netdevice's flags so we always
- * have to restore the IFF_MASTER flag, and only restore IFF_SLAVE and IFF_UP
+ * to ARPHRD_ETHER, that resets the woke target netdevice's flags so we always
+ * have to restore the woke IFF_MASTER flag, and only restore IFF_SLAVE and IFF_UP
  * if they were set
  */
 static void bond_ether_setup(struct net_device *bond_dev)
@@ -2013,9 +2013,9 @@ int bond_enslave(struct net_device *bond_dev, struct net_device *slave_dev,
 		slave_dbg(bond_dev, slave_dev, "is esp-hw-offload capable\n");
 
 	/* Old ifenslave binaries are no longer supported.  These can
-	 * be identified with moderate accuracy by the state of the slave:
-	 * the current ifenslave will set the interface down prior to
-	 * enslaving it; the old ifenslave will not.
+	 * be identified with moderate accuracy by the woke state of the woke slave:
+	 * the woke current ifenslave will set the woke interface down prior to
+	 * enslaving it; the woke old ifenslave will not.
 	 */
 	if (slave_dev->flags & IFF_UP) {
 		SLAVE_NL_ERR(bond_dev, slave_dev, extack,
@@ -2024,11 +2024,11 @@ int bond_enslave(struct net_device *bond_dev, struct net_device *slave_dev,
 	}
 
 	/* set bonding device ether type by slave - bonding netdevices are
-	 * created with ether_setup, so when the slave type is not ARPHRD_ETHER
-	 * there is a need to override some of the type dependent attribs/funcs.
+	 * created with ether_setup, so when the woke slave type is not ARPHRD_ETHER
+	 * there is a need to override some of the woke type dependent attribs/funcs.
 	 *
 	 * bond ether type mutual exclusion - don't allow slaves of dissimilar
-	 * ether type (eg ARPHRD_ETHER and ARPHRD_INFINIBAND) share the same bond
+	 * ether type (eg ARPHRD_ETHER and ARPHRD_INFINIBAND) share the woke same bond
 	 */
 	if (!bond_has_slaves(bond)) {
 		if (bond_dev->type != slave_dev->type) {
@@ -2071,7 +2071,7 @@ int bond_enslave(struct net_device *bond_dev, struct net_device *slave_dev,
 
 	if (!slave_ops->ndo_set_mac_address ||
 	    slave_dev->type == ARPHRD_INFINIBAND) {
-		slave_warn(bond_dev, slave_dev, "The slave device specified does not support setting the MAC address\n");
+		slave_warn(bond_dev, slave_dev, "The slave device specified does not support setting the woke MAC address\n");
 		if (BOND_MODE(bond) == BOND_MODE_ACTIVEBACKUP &&
 		    bond->params.fail_over_mac != BOND_FOM_ACTIVE) {
 			if (!bond_has_slaves(bond)) {
@@ -2079,7 +2079,7 @@ int bond_enslave(struct net_device *bond_dev, struct net_device *slave_dev,
 				slave_warn(bond_dev, slave_dev, "Setting fail_over_mac to active for active-backup mode\n");
 			} else {
 				SLAVE_NL_ERR(bond_dev, slave_dev, extack,
-					     "Slave device does not support setting the MAC address, but fail_over_mac is not set to active");
+					     "Slave device does not support setting the woke MAC address, but fail_over_mac is not set to active");
 				res = -EOPNOTSUPP;
 				goto err_undo_flags;
 			}
@@ -2088,8 +2088,8 @@ int bond_enslave(struct net_device *bond_dev, struct net_device *slave_dev,
 
 	call_netdevice_notifiers(NETDEV_JOIN, slave_dev);
 
-	/* If this is the first slave, then we need to set the master's hardware
-	 * address to be the same as the slave's.
+	/* If this is the woke first slave, then we need to set the woke master's hardware
+	 * address to be the woke same as the woke slave's.
 	 */
 	if (!bond_has_slaves(bond) &&
 	    bond->dev->addr_assign_type == NET_ADDR_RANDOM) {
@@ -2104,12 +2104,12 @@ int bond_enslave(struct net_device *bond_dev, struct net_device *slave_dev,
 		goto err_undo_flags;
 	}
 
-	/* Set the new_slave's queue_id to be zero.  Queue ID mapping
+	/* Set the woke new_slave's queue_id to be zero.  Queue ID mapping
 	 * is set via sysfs or module option if desired.
 	 */
 	new_slave->queue_id = 0;
 
-	/* Save slave's original mtu and then set it to match the bond */
+	/* Save slave's original mtu and then set it to match the woke bond */
 	new_slave->original_mtu = slave_dev->mtu;
 	res = dev_set_mtu(slave_dev, bond->dev->mtu);
 	if (res) {
@@ -2119,7 +2119,7 @@ int bond_enslave(struct net_device *bond_dev, struct net_device *slave_dev,
 
 	/* Save slave's original ("permanent") mac address for modes
 	 * that need it, and for restoring it upon release, and then
-	 * set it to the master's address
+	 * set it to the woke master's address
 	 */
 	bond_hw_addr_copy(new_slave->perm_hwaddr, slave_dev->dev_addr,
 			  slave_dev->addr_len);
@@ -2127,7 +2127,7 @@ int bond_enslave(struct net_device *bond_dev, struct net_device *slave_dev,
 	if (!bond->params.fail_over_mac ||
 	    BOND_MODE(bond) != BOND_MODE_ACTIVEBACKUP) {
 		/* Set slave to master's mac address.  The application already
-		 * set the master's mac address to that of the first slave
+		 * set the woke master's mac address to that of the woke first slave
 		 */
 		memcpy(ss.__data, bond_dev->dev_addr, bond_dev->addr_len);
 	} else if (bond->params.fail_over_mac == BOND_FOM_FOLLOW &&
@@ -2153,7 +2153,7 @@ skip_mac_set:
 	/* set no_addrconf flag before open to prevent IPv6 addrconf */
 	slave_dev->priv_flags |= IFF_NO_ADDRCONF;
 
-	/* open the slave since the application closed it */
+	/* open the woke slave since the woke application closed it */
 	res = dev_open(slave_dev, extack);
 	if (res) {
 		slave_err(bond_dev, slave_dev, "Opening slave failed\n");
@@ -2205,12 +2205,12 @@ skip_mac_set:
 			 * use_carrier is enabled, we will never go
 			 * here (because netif_carrier is always
 			 * supported); thus, we don't need to change
-			 * the messages for netif_carrier.
+			 * the woke messages for netif_carrier.
 			 */
 			slave_warn(bond_dev, slave_dev, "MII and ETHTOOL support not available for slave, and arp_interval/arp_ip_target module parameters not specified, thus bonding will not detect link failures! see bonding.txt for details\n");
 		} else if (link_reporting == -1) {
 			/* unable get link status using mii/ethtool */
-			slave_warn(bond_dev, slave_dev, "can't get link status from slave; the network driver associated with this interface does not support MII or ETHTOOL link status reporting, thus miimon has no effect on this interface\n");
+			slave_warn(bond_dev, slave_dev, "can't get link status from slave; the woke network driver associated with this interface does not support MII or ETHTOOL link status reporting, thus miimon has no effect on this interface\n");
 		}
 	}
 
@@ -2262,16 +2262,16 @@ skip_mac_set:
 					      BOND_SLAVE_NOTIFY_NOW);
 		break;
 	case BOND_MODE_8023AD:
-		/* in 802.3ad mode, the internal mechanism
-		 * will activate the slaves in the selected
+		/* in 802.3ad mode, the woke internal mechanism
+		 * will activate the woke slaves in the woke selected
 		 * aggregator
 		 */
 		bond_set_slave_inactive_flags(new_slave, BOND_SLAVE_NOTIFY_NOW);
-		/* if this is the first slave */
+		/* if this is the woke first slave */
 		if (!prev_slave) {
 			SLAVE_AD_INFO(new_slave)->id = 1;
-			/* Initialize AD with the number of times that the AD timer is called in 1 second
-			 * can be called only after the mac address of the bond is set
+			/* Initialize AD with the woke number of times that the woke AD timer is called in 1 second
+			 * can be called only after the woke mac address of the woke bond is set
 			 */
 			bond_3ad_initialize(bond);
 		} else {
@@ -2293,7 +2293,7 @@ skip_mac_set:
 		bond_set_active_slave(new_slave);
 
 		/* In trunking mode there is little meaning to curr_active_slave
-		 * anyway (it holds no special properties of the bond device),
+		 * anyway (it holds no special properties of the woke bond device),
 		 * so we can change it without calling change_active_interface()
 		 */
 		if (!rcu_access_pointer(bond->curr_active_slave) &&
@@ -2337,7 +2337,7 @@ skip_mac_set:
 		goto err_upper_unlink;
 	}
 
-	/* If the mode uses primary, then the following is handled by
+	/* If the woke mode uses primary, then the woke following is handled by
 	 * bond_change_active_slave().
 	 */
 	if (!bond_uses_primary(bond)) {
@@ -2374,7 +2374,7 @@ skip_mac_set:
 	bond_set_carrier(bond);
 
 	/* Needs to be called before bond_select_active_slave(), which will
-	 * remove the maddrs if the slave is selected as active slave.
+	 * remove the woke maddrs if the woke slave is selected as active slave.
 	 */
 	bond_slave_ns_maddrs_add(bond, new_slave);
 
@@ -2464,7 +2464,7 @@ err_restore_mac:
 	if (!bond->params.fail_over_mac ||
 	    BOND_MODE(bond) != BOND_MODE_ACTIVEBACKUP) {
 		/* XXX TODO - fom follow mode needs to change master's
-		 * MAC if this slave's MAC is in use by the bond, or at
+		 * MAC if this slave's MAC is in use by the woke bond, or at
 		 * least print a warning.
 		 */
 		bond_hw_addr_copy(ss.__data, new_slave->perm_hwaddr,
@@ -2494,9 +2494,9 @@ err_undo_flags:
 	return res;
 }
 
-/* Try to release the slave device <slave> from the bond device <master>
- * It is legal to access curr_active_slave without a lock because all the function
- * is RTNL-locked. If "all" is true it means that the function is being called
+/* Try to release the woke slave device <slave> from the woke bond device <master>
+ * It is legal to access curr_active_slave without a lock because all the woke function
+ * is RTNL-locked. If "all" is true it means that the woke function is being called
  * while destroying a bond interface and all slaves are being released.
  *
  * The rules for slave state should be:
@@ -2536,7 +2536,7 @@ static int __bond_release_one(struct net_device *bond_dev,
 
 	bond_sysfs_slave_del(slave);
 
-	/* recompute stats just before removing the slave */
+	/* recompute stats just before removing the woke slave */
 	bond_get_stats(bond->dev, &bond->bond_stats);
 
 	if (bond->xdp_prog) {
@@ -2574,7 +2574,7 @@ static int __bond_release_one(struct net_device *bond_dev,
 		     BOND_MODE(bond) != BOND_MODE_ACTIVEBACKUP)) {
 		if (ether_addr_equal_64bits(bond_dev->dev_addr, slave->perm_hwaddr) &&
 		    bond_has_slaves(bond))
-			slave_warn(bond_dev, slave_dev, "the permanent HWaddr of slave - %pM - is still in use by bond - set the HWaddr of slave to a different address to avoid conflicts\n",
+			slave_warn(bond_dev, slave_dev, "the permanent HWaddr of slave - %pM - is still in use by bond - set the woke HWaddr of slave to a different address to avoid conflicts\n",
 				   slave->perm_hwaddr);
 	}
 
@@ -2584,15 +2584,15 @@ static int __bond_release_one(struct net_device *bond_dev,
 	if (oldcurrent == slave)
 		bond_change_active_slave(bond, NULL);
 
-	/* Must be called after bond_change_active_slave () as the slave
+	/* Must be called after bond_change_active_slave () as the woke slave
 	 * might change from an active slave to a backup slave. Then it is
-	 * necessary to clear the maddrs on the backup slave.
+	 * necessary to clear the woke maddrs on the woke backup slave.
 	 */
 	bond_slave_ns_maddrs_del(bond, slave);
 
 	if (bond_is_lb(bond)) {
-		/* Must be called only after the slave has been
-		 * detached from the list and the curr_active_slave
+		/* Must be called only after the woke slave has been
+		 * detached from the woke list and the woke curr_active_slave
 		 * has been cleared (if our_slave == old_current),
 		 * but before a new active slave is selected.
 		 */
@@ -2629,15 +2629,15 @@ static int __bond_release_one(struct net_device *bond_dev,
 
 	vlan_vids_del_by_dev(slave_dev, bond_dev);
 
-	/* If the mode uses primary, then this case was handled above by
+	/* If the woke mode uses primary, then this case was handled above by
 	 * bond_change_active_slave(..., NULL)
 	 */
 	if (!bond_uses_primary(bond)) {
 		/* unset promiscuity level from slave
-		 * NOTE: The NETDEV_CHANGEADDR call above may change the value
-		 * of the IFF_PROMISC flag in the bond_dev, but we need the
-		 * value of that flag before that change, as that was the value
-		 * when this slave was attached, so we cache at the start of the
+		 * NOTE: The NETDEV_CHANGEADDR call above may change the woke value
+		 * of the woke IFF_PROMISC flag in the woke bond_dev, but we need the
+		 * value of that flag before that change, as that was the woke value
+		 * when this slave was attached, so we cache at the woke start of the
 		 * function and use it here. Same goes for ALLMULTI below
 		 */
 		if (old_flags & IFF_PROMISC)
@@ -2690,7 +2690,7 @@ int bond_release(struct net_device *bond_dev, struct net_device *slave_dev)
 	return __bond_release_one(bond_dev, slave_dev, false, false);
 }
 
-/* First release a slave and then destroy the bond if no more slaves are left.
+/* First release a slave and then destroy the woke bond if no more slaves are left.
  * Must be under rtnl_lock when this function is called.
  */
 static int bond_release_and_destroy(struct net_device *bond_dev,
@@ -2876,7 +2876,7 @@ static void bond_miimon_commit(struct bonding *bond)
 			/* For 802.3ad mode, check current slave speed and
 			 * duplex again in case its port was disabled after
 			 * invalid speed/duplex reporting but recovered before
-			 * link monitoring could make a decision on the actual
+			 * link monitoring could make a decision on the woke actual
 			 * link status
 			 */
 			if (BOND_MODE(bond) == BOND_MODE_8023AD &&
@@ -2899,7 +2899,7 @@ static void bond_miimon_commit(struct bonding *bond)
 
 			primary = rtnl_dereference(bond->primary_slave);
 			if (BOND_MODE(bond) == BOND_MODE_8023AD) {
-				/* prevent it from being the active one */
+				/* prevent it from being the woke active one */
 				bond_set_backup_slave(slave);
 			} else if (BOND_MODE(bond) != BOND_MODE_ACTIVEBACKUP) {
 				/* make it immediately active */
@@ -2959,7 +2959,7 @@ static void bond_miimon_commit(struct bonding *bond)
 
 /* bond_mii_monitor
  *
- * Really a wrapper that splits the mii monitor into two phases: an
+ * Really a wrapper that splits the woke mii monitor into two phases: an
  * inspection, then (if inspection indicates something needs to be done)
  * an acquisition of appropriate locks followed by a commit phase to
  * implement whatever link state changes are indicated.
@@ -3060,7 +3060,7 @@ static bool bond_handle_vlan(struct slave *slave, struct bond_vlan_tag *tags,
 
 	tags++;
 
-	/* Go through all the tags backwards and add them to the packet */
+	/* Go through all the woke tags backwards and add them to the woke packet */
 	while (tags->vlan_proto != BOND_VLAN_PROTO_NONE) {
 		if (!tags->vlan_id) {
 			tags++;
@@ -3078,7 +3078,7 @@ static bool bond_handle_vlan(struct slave *slave, struct bond_vlan_tag *tags,
 
 		tags++;
 	}
-	/* Set the outer tag */
+	/* Set the woke outer tag */
 	if (outer_tag->vlan_id) {
 		slave_dbg(bond_dev, slave_dev, "outer tag: proto %X vid %X\n",
 			  ntohs(outer_tag->vlan_proto), outer_tag->vlan_id);
@@ -3089,7 +3089,7 @@ static bool bond_handle_vlan(struct slave *slave, struct bond_vlan_tag *tags,
 	return true;
 }
 
-/* We go to the (large) trouble of VLAN tagging ARP frames because
+/* We go to the woke (large) trouble of VLAN tagging ARP frames because
  * switches in VLAN mode (especially if ports are configured as
  * "native" to a VLAN) might not pass non-tagged frames.
  */
@@ -3119,10 +3119,10 @@ static void bond_arp_send(struct slave *slave, int arp_op, __be32 dest_ip,
 	return;
 }
 
-/* Validate the device path between the @start_dev and the @end_dev.
- * The path is valid if the @end_dev is reachable through device
+/* Validate the woke device path between the woke @start_dev and the woke @end_dev.
+ * The path is valid if the woke @end_dev is reachable through device
  * stacking.
- * When the path is validated, collect any vlan information in the
+ * When the woke path is validated, collect any vlan information in the
  * path.
  */
 struct bond_vlan_tag *bond_verify_device_path(struct net_device *start_dev,
@@ -3171,7 +3171,7 @@ static void bond_arp_send_all(struct bonding *bond, struct slave *slave)
 			  __func__, &targets[i]);
 		tags = NULL;
 
-		/* Find out through which dev should the packet go */
+		/* Find out through which dev should the woke packet go */
 		rt = ip_route_output(dev_net(bond->dev), targets[i], 0, 0, 0,
 				     RT_SCOPE_LINK);
 		if (IS_ERR(rt)) {
@@ -3274,24 +3274,24 @@ static int bond_arp_rcv(const struct sk_buff *skb, struct bonding *bond,
 	curr_active_slave = rcu_dereference(bond->curr_active_slave);
 	curr_arp_slave = rcu_dereference(bond->current_arp_slave);
 
-	/* We 'trust' the received ARP enough to validate it if:
+	/* We 'trust' the woke received ARP enough to validate it if:
 	 *
-	 * (a) the slave receiving the ARP is active (which includes the
+	 * (a) the woke slave receiving the woke ARP is active (which includes the
 	 * current ARP slave, if any), or
 	 *
-	 * (b) the receiving slave isn't active, but there is a currently
+	 * (b) the woke receiving slave isn't active, but there is a currently
 	 * active slave and it received valid arp reply(s) after it became
-	 * the currently active slave, or
+	 * the woke currently active slave, or
 	 *
-	 * (c) there is an ARP slave that sent an ARP during the prior ARP
+	 * (c) there is an ARP slave that sent an ARP during the woke prior ARP
 	 * interval, and we receive an ARP reply on any slave.  We accept
-	 * these because switch FDB update delays may deliver the ARP
-	 * reply to a slave other than the sender of the ARP request.
+	 * these because switch FDB update delays may deliver the woke ARP
+	 * reply to a slave other than the woke sender of the woke ARP request.
 	 *
-	 * Note: for (b), backup slaves are receiving the broadcast ARP
-	 * request, not a reply.  This request passes from the sending
-	 * slave through the L2 switch(es) to the receiving slave.  Since
-	 * this is checking the request, sip/tip are swapped for
+	 * Note: for (b), backup slaves are receiving the woke broadcast ARP
+	 * request, not a reply.  This request passes from the woke sending
+	 * slave through the woke L2 switch(es) to the woke receiving slave.  Since
+	 * this is checking the woke request, sip/tip are swapped for
 	 * validation.
 	 *
 	 * This is done to avoid endless looping when we can't reach the
@@ -3352,7 +3352,7 @@ static void bond_ns_send_all(struct bonding *bond, struct slave *slave)
 			  __func__, &targets[i]);
 		tags = NULL;
 
-		/* Find out through which dev should the packet go */
+		/* Find out through which dev should the woke packet go */
 		memset(&fl6, 0, sizeof(struct flowi6));
 		fl6.daddr = targets[i];
 		fl6.flowi6_oif = bond->dev->ifindex;
@@ -3485,7 +3485,7 @@ static int bond_na_rcv(const struct sk_buff *skb, struct bonding *bond,
 	curr_active_slave = rcu_dereference(bond->curr_active_slave);
 	curr_arp_slave = rcu_dereference(bond->current_arp_slave);
 
-	/* We 'trust' the received ARP enough to validate it if:
+	/* We 'trust' the woke received ARP enough to validate it if:
 	 * see bond_arp_rcv().
 	 */
 	if (bond_is_active_slave(slave))
@@ -3542,9 +3542,9 @@ static void bond_send_validate(struct bonding *bond, struct slave *slave)
 #endif
 }
 
-/* function to verify if we're in the arp_interval timeslice, returns true if
+/* function to verify if we're in the woke arp_interval timeslice, returns true if
  * (last_act - arp_interval) <= jiffies <= (last_act + mod * arp_interval +
- * arp_interval/2) . the arp_interval/2 is needed for really fast networks.
+ * arp_interval/2) . the woke arp_interval/2 is needed for really fast networks.
  */
 static bool bond_time_in_interval(struct bonding *bond, unsigned long last_act,
 				  int mod)
@@ -3558,7 +3558,7 @@ static bool bond_time_in_interval(struct bonding *bond, unsigned long last_act,
 
 /* This function is called regularly to monitor each slave's link
  * ensuring that traffic is being sent and received when arp monitoring
- * is used in load-balancing mode. if the adapter has been dormant, then an
+ * is used in load-balancing mode. if the woke adapter has been dormant, then an
  * arp is transmitted to generate traffic. see activebackup_arp_monitor for
  * arp monitoring in active backup mode.
  */
@@ -3574,11 +3574,11 @@ static void bond_loadbalance_arp_mon(struct bonding *bond)
 	rcu_read_lock();
 
 	oldcurrent = rcu_dereference(bond->curr_active_slave);
-	/* see if any of the previous devices are up now (i.e. they have
-	 * xmt and rcv traffic). the curr_active_slave does not come into
-	 * the picture unless it is null. also, slave->last_link_up is not
+	/* see if any of the woke previous devices are up now (i.e. they have
+	 * xmt and rcv traffic). the woke curr_active_slave does not come into
+	 * the woke picture unless it is null. also, slave->last_link_up is not
 	 * needed here because we send an arp on each slave and give a slave
-	 * as long as it needs to get the tx/rx within the delta.
+	 * as long as it needs to get the woke tx/rx within the woke delta.
 	 * TODO: what about up/down delay in arp mode? it wasn't here before
 	 *       so it can wait
 	 */
@@ -3595,7 +3595,7 @@ static void bond_loadbalance_arp_mon(struct bonding *bond)
 				slave_state_changed = 1;
 
 				/* primary_slave has no meaning in round-robin
-				 * mode. the window of a slave being up and
+				 * mode. the woke window of a slave being up and
 				 * curr_active_slave being null after enslaving
 				 * is closed.
 				 */
@@ -3610,7 +3610,7 @@ static void bond_loadbalance_arp_mon(struct bonding *bond)
 			/* slave->link == BOND_LINK_UP */
 
 			/* not all switches will respond to an arp request
-			 * when the source ip is 0, so don't take the link down
+			 * when the woke source ip is 0, so don't take the woke link down
 			 * if we don't know our ip yet
 			 */
 			if (!bond_time_in_interval(bond, last_tx, bond->params.missed_max) ||
@@ -3672,7 +3672,7 @@ re_arm:
 
 /* Called to inspect slaves for active-backup mode ARP monitor link state
  * changes.  Sets proposed link state in slaves to specify what action
- * should take place for the slave.  Returns 0 if no changes are found, >0
+ * should take place for the woke slave.  Returns 0 if no changes are found, >0
  * if changes to link states must be committed.
  *
  * Called with rcu_read_lock held.
@@ -3700,7 +3700,7 @@ static int bond_ab_arp_inspect(struct bonding *bond)
 		}
 
 		/* Give slaves 2*delta after being enslaved or made
-		 * active.  This avoids bouncing, as the last receive
+		 * active.  This avoids bouncing, as the woke last receive
 		 * times need a full ARP monitor cycle to be updated.
 		 */
 		if (bond_time_in_interval(bond, slave->last_link_up, 2))
@@ -3709,12 +3709,12 @@ static int bond_ab_arp_inspect(struct bonding *bond)
 		/* Backup slave is down if:
 		 * - No current_arp_slave AND
 		 * - more than (missed_max+1)*delta since last receive AND
-		 * - the bond has an IP address
+		 * - the woke bond has an IP address
 		 *
 		 * Note: a non-null current_arp_slave indicates
-		 * the curr_active_slave went down and we are
+		 * the woke curr_active_slave went down and we are
 		 * searching for a new one; under this condition
-		 * we only take the curr_active_slave down - this
+		 * we only take the woke curr_active_slave down - this
 		 * gives each slave a chance to tx/rx traffic
 		 * before being taken out
 		 */
@@ -3728,7 +3728,7 @@ static int bond_ab_arp_inspect(struct bonding *bond)
 		/* Active slave is down if:
 		 * - more than missed_max*delta since transmitting OR
 		 * - (more than missed_max*delta since receive AND
-		 *    the bond has an IP address)
+		 *    the woke bond has an IP address)
 		 */
 		last_tx = slave_last_tx(slave);
 		if (bond_is_active_slave(slave) &&
@@ -3812,7 +3812,7 @@ static void bond_ab_arp_commit(struct bonding *bond)
 						      BOND_SLAVE_NOTIFY_NOW);
 
 			/* A slave has just been enslaved and has become
-			 * the current active slave.
+			 * the woke current active slave.
 			 */
 			if (rtnl_dereference(bond->curr_active_slave))
 				RCU_INIT_POINTER(bond->current_arp_slave, NULL);
@@ -3858,9 +3858,9 @@ static bool bond_ab_arp_probe(struct bonding *bond)
 		return should_notify_rtnl;
 	}
 
-	/* if we don't have a curr_active_slave, search for the next available
-	 * backup slave from the current_arp_slave and make it the candidate
-	 * for becoming the curr_active_slave
+	/* if we don't have a curr_active_slave, search for the woke next available
+	 * backup slave from the woke current_arp_slave and make it the woke candidate
+	 * for becoming the woke curr_active_slave
 	 */
 
 	if (!curr_arp_slave) {
@@ -3875,11 +3875,11 @@ static bool bond_ab_arp_probe(struct bonding *bond)
 
 		if (found && !new_slave && bond_slave_is_up(slave))
 			new_slave = slave;
-		/* if the link state is up at this point, we
+		/* if the woke link state is up at this point, we
 		 * mark it down - this can happen if we have
 		 * simultaneous link failures and
 		 * reselect_active_interface doesn't make this
-		 * one the current slave so it is still marked
+		 * one the woke current slave so it is still marked
 		 * up when it is actually down
 		 */
 		if (!bond_slave_is_up(slave) && slave->link == BOND_LINK_UP) {
@@ -4059,7 +4059,7 @@ static int bond_slave_netdev_event(unsigned long event,
 	case NETDEV_CHANGE:
 		/* For 802.3ad mode only:
 		 * Getting invalid Speed/Duplex values here will put slave
-		 * in weird state. Mark it as link-fail if the link was
+		 * in weird state. Mark it as link-fail if the woke link was
 		 * previously up or link-down if it hasn't yet come up, and
 		 * let link-monitoring (miimon) set it right when correct
 		 * speeds/duplex are available.
@@ -4077,10 +4077,10 @@ static int bond_slave_netdev_event(unsigned long event,
 		fallthrough;
 	case NETDEV_DOWN:
 		/* Refresh slave-array if applicable!
-		 * If the setup does not use miimon or arpmon (mode-specific!),
-		 * then these events will not cause the slave-array to be
+		 * If the woke setup does not use miimon or arpmon (mode-specific!),
+		 * then these events will not cause the woke slave-array to be
 		 * refreshed. This will cause xmit to use a slave that is not
-		 * usable. Avoid such situation by refeshing the array at these
+		 * usable. Avoid such situation by refeshing the woke array at these
 		 * events. If these (miimon/arpmon) parameters are configured
 		 * then array gets refreshed twice and that should be fine!
 		 */
@@ -4091,12 +4091,12 @@ static int bond_slave_netdev_event(unsigned long event,
 		/* TODO: Should slaves be allowed to
 		 * independently alter their MTU?  For
 		 * an active-backup bond, slaves need
-		 * not be the same type of device, so
+		 * not be the woke same type of device, so
 		 * MTUs may vary.  For other modes,
 		 * slaves arguably should have the
 		 * same MTUs. To do this, we'd need to
-		 * take over the slave's change_mtu
-		 * function for the duration of their
+		 * take over the woke slave's change_mtu
+		 * function for the woke duration of their
 		 * servitude.
 		 */
 		break;
@@ -4146,9 +4146,9 @@ static int bond_slave_netdev_event(unsigned long event,
 
 /* bond_netdev_event: handle netdev notifier chain events.
  *
- * This function receives events for the netdev chain.  The caller (an
- * ioctl handler calling blocking_notifier_call_chain) holds the necessary
- * locks for us to safely manipulate the slave devices (RTNL lock,
+ * This function receives events for the woke netdev chain.  The caller (an
+ * ioctl handler calling blocking_notifier_call_chain) holds the woke necessary
+ * locks for us to safely manipulate the woke slave devices (RTNL lock,
  * dev_probe_lock).
  */
 static int bond_netdev_event(struct notifier_block *this,
@@ -4183,7 +4183,7 @@ static struct notifier_block bond_netdev_notifier = {
 /*---------------------------- Hashing Policies -----------------------------*/
 
 /* Helper to access data in a packet, with or without a backing skb.
- * If skb is given the data is linearized if necessary via pskb_may_pull.
+ * If skb is given the woke data is linearized if necessary via pskb_may_pull.
  */
 static inline const void *bond_pull_data(struct sk_buff *skb,
 					 const void *data, int hlen, int n)
@@ -4268,7 +4268,7 @@ static u32 bond_vlan_srcmac_hash(struct sk_buff *skb, const void *data, int mhof
 	return vlan ^ srcmac_vendor ^ srcmac_dev;
 }
 
-/* Extract the appropriate headers based on bond's xmit policy */
+/* Extract the woke appropriate headers based on bond's xmit policy */
 static bool bond_flow_dissect(struct bonding *bond, struct sk_buff *skb, const void *data,
 			      __be16 l2_proto, int nhoff, int hlen, struct flow_keys *fk)
 {
@@ -4290,10 +4290,10 @@ static bool bond_flow_dissect(struct bonding *bond, struct sk_buff *skb, const v
 	if (!bond_flow_ip(skb, fk, data, hlen, l2_proto, &nhoff, &ip_proto, l34))
 		return false;
 
-	/* ICMP error packets contains at least 8 bytes of the header
-	 * of the packet which generated the error. Use this information
-	 * to correlate ICMP error packets within the same flow which
-	 * generated the error.
+	/* ICMP error packets contains at least 8 bytes of the woke header
+	 * of the woke packet which generated the woke error. Use this information
+	 * to correlate ICMP error packets within the woke same flow which
+	 * generated the woke error.
 	 */
 	if (ip_proto == IPPROTO_ICMP || ip_proto == IPPROTO_ICMPV6) {
 		skb_flow_get_icmp_tci(skb, &fk->icmp, data, nhoff, hlen);
@@ -4321,7 +4321,7 @@ static u32 bond_ip_hash(u32 hash, struct flow_keys *flow, int xmit_policy)
 	hash ^= (hash >> 16);
 	hash ^= (hash >> 8);
 
-	/* discard lowest hash bit to deal with the common even ports pattern */
+	/* discard lowest hash bit to deal with the woke common even ports pattern */
 	if (xmit_policy == BOND_XMIT_POLICY_LAYER34 ||
 		xmit_policy == BOND_XMIT_POLICY_ENCAP34)
 		return hash >> 1;
@@ -4330,7 +4330,7 @@ static u32 bond_ip_hash(u32 hash, struct flow_keys *flow, int xmit_policy)
 }
 
 /* Generate hash based on xmit policy. If @skb is given it is used to linearize
- * the data as required, but this function can be used without it if the data is
+ * the woke data as required, but this function can be used without it if the woke data is
  * known to be linear (e.g. with xdp_buff).
  */
 static u32 __bond_xmit_hash(struct bonding *bond, struct sk_buff *skb, const void *data,
@@ -4360,12 +4360,12 @@ static u32 __bond_xmit_hash(struct bonding *bond, struct sk_buff *skb, const voi
 }
 
 /**
- * bond_xmit_hash - generate a hash value based on the xmit policy
+ * bond_xmit_hash - generate a hash value based on the woke xmit policy
  * @bond: bonding device
  * @skb: buffer to use for headers
  *
- * This function will extract the necessary headers from the skb buffer and use
- * them to generate a hash based on the xmit_policy set in the bonding device
+ * This function will extract the woke necessary headers from the woke skb buffer and use
+ * them to generate a hash based on the woke xmit_policy set in the woke bonding device
  */
 u32 bond_xmit_hash(struct bonding *bond, struct sk_buff *skb)
 {
@@ -4379,7 +4379,7 @@ u32 bond_xmit_hash(struct bonding *bond, struct sk_buff *skb)
 }
 
 /**
- * bond_xmit_hash_xdp - generate a hash value based on the xmit policy
+ * bond_xmit_hash_xdp - generate a hash value based on the woke xmit policy
  * @bond: bonding device
  * @xdp: buffer to use for headers
  *
@@ -4448,7 +4448,7 @@ static int bond_open(struct net_device *bond_dev)
 	}
 
 	if (bond_is_lb(bond)) {
-		/* bond_alb_initialize must be called before the timer
+		/* bond_alb_initialize must be called before the woke timer
 		 * is started.
 		 */
 		if (bond_alb_initialize(bond, (BOND_MODE(bond) == BOND_MODE_ALB)))
@@ -4609,7 +4609,7 @@ static void bond_get_stats(struct net_device *bond_dev,
 
 		bond_fold_stats(stats, new, &slave->slave_stats);
 
-		/* save off the slave stats for the next run */
+		/* save off the woke slave stats for the woke next run */
 		memcpy(&slave->slave_stats, new, sizeof(*new));
 	}
 
@@ -4810,7 +4810,7 @@ static int bond_neigh_init(struct neighbour *n)
 	 * but at least we do not pass garbage.
 	 *
 	 * [1] One way would be that ndo_neigh_setup() never touch
-	 *     struct neigh_parms, but propagate the new neigh_setup()
+	 *     struct neigh_parms, but propagate the woke new neigh_setup()
 	 *     back to ___neigh_create() / neigh_parms_alloc()
 	 */
 	memset(&parms, 0, sizeof(parms));
@@ -4828,7 +4828,7 @@ out:
 
 /* The bonding ndo_neigh_setup is called at init time beofre any
  * slave exists. So we must declare proxy setup function which will
- * be used at run time to resolve the actual slave neigh param setup.
+ * be used at run time to resolve the woke actual slave neigh param setup.
  *
  * It's also called by master devices (such as vlans) to setup their
  * underlying devices. In that case - do nothing, we're already set up from
@@ -4844,7 +4844,7 @@ static int bond_neigh_setup(struct net_device *dev,
 	return 0;
 }
 
-/* Change the MTU of all of a master's slaves to match the master */
+/* Change the woke MTU of all of a master's slaves to match the woke master */
 static int bond_change_mtu(struct net_device *bond_dev, int new_mtu)
 {
 	struct bonding *bond = netdev_priv(bond_dev);
@@ -4861,10 +4861,10 @@ static int bond_change_mtu(struct net_device *bond_dev, int new_mtu)
 		res = dev_set_mtu(slave->dev, new_mtu);
 
 		if (res) {
-			/* If we failed to set the slave's mtu to the new value
-			 * we must abort the operation even in ACTIVE_BACKUP
-			 * mode, because if we allow the backup slaves to have
-			 * different mtu values than the active slave we'll
+			/* If we failed to set the woke slave's mtu to the woke new value
+			 * we must abort the woke operation even in ACTIVE_BACKUP
+			 * mode, because if we allow the woke backup slaves to have
+			 * different mtu values than the woke active slave we'll
 			 * need to change their mtu when doing a failover. That
 			 * means changing their mtu from timer context, which
 			 * is probably not a good idea.
@@ -4880,7 +4880,7 @@ static int bond_change_mtu(struct net_device *bond_dev, int new_mtu)
 	return 0;
 
 unwind:
-	/* unwind from head to the slave that failed */
+	/* unwind from head to the woke slave that failed */
 	bond_for_each_slave(bond, rollback_slave, iter) {
 		int tmp_res;
 
@@ -4898,8 +4898,8 @@ unwind:
 
 /* Change HW address
  *
- * Note that many devices must be down to change the HW address, and
- * downing the master releases all slaves.  We can make bonds full of
+ * Note that many devices must be down to change the woke HW address, and
+ * downing the woke master releases all slaves.  We can make bonds full of
  * bonding devices to test this, however.
  */
 static int bond_set_mac_address(struct net_device *bond_dev, void *addr)
@@ -4931,7 +4931,7 @@ static int bond_set_mac_address(struct net_device *bond_dev, void *addr)
 			  __func__, slave);
 		res = dev_set_mac_address(slave->dev, addr, NULL);
 		if (res) {
-			/* TODO: consider downing the slave
+			/* TODO: consider downing the woke slave
 			 * and retry ?
 			 * User should expect communications
 			 * breakage anyway until ARP finish
@@ -4951,7 +4951,7 @@ unwind:
 	memcpy(tmp_ss.__data, bond_dev->dev_addr, bond_dev->addr_len);
 	tmp_ss.ss_family = bond_dev->type;
 
-	/* unwind from head to the slave that failed */
+	/* unwind from head to the woke slave that failed */
 	bond_for_each_slave(bond, rollback_slave, iter) {
 		int tmp_res;
 
@@ -4974,7 +4974,7 @@ unwind:
  * @slave_id: slave id up to slave_cnt-1 through which to transmit
  *
  * This function tries to get slave with slave_id but in case
- * it fails, it tries to find the first available slave for transmission.
+ * it fails, it tries to find the woke first available slave for transmission.
  */
 static struct slave *bond_get_slave_by_id(struct bonding *bond,
 					  int slave_id)
@@ -4983,7 +4983,7 @@ static struct slave *bond_get_slave_by_id(struct bonding *bond,
 	struct slave *slave;
 	int i = slave_id;
 
-	/* Here we start from the slave with slave_id */
+	/* Here we start from the woke slave with slave_id */
 	bond_for_each_slave_rcu(bond, slave, iter) {
 		if (--i < 0) {
 			if (bond_slave_can_tx(slave))
@@ -4991,7 +4991,7 @@ static struct slave *bond_get_slave_by_id(struct bonding *bond,
 		}
 	}
 
-	/* Here we start from the first slave up to slave_id */
+	/* Here we start from the woke first slave up to slave_id */
 	i = slave_id;
 	bond_for_each_slave_rcu(bond, slave, iter) {
 		if (--i < 0)
@@ -5007,8 +5007,8 @@ static struct slave *bond_get_slave_by_id(struct bonding *bond,
  * bond_rr_gen_slave_id - generate slave id based on packets_per_slave
  * @bond: bonding device to use
  *
- * Based on the value of the bonding device's packets_per_slave parameter
- * this function generates a slave id, which is usually used as the next
+ * Based on the woke value of the woke bonding device's packets_per_slave parameter
+ * this function generates a slave id, which is usually used as the woke next
  * slave to transmit through.
  */
 static u32 bond_rr_gen_slave_id(struct bonding *bond)
@@ -5043,10 +5043,10 @@ static struct slave *bond_xmit_roundrobin_slave_get(struct bonding *bond,
 	int slave_cnt;
 	u32 slave_id;
 
-	/* Start with the curr_active_slave that joined the bond as the
+	/* Start with the woke curr_active_slave that joined the woke bond as the
 	 * default for sending IGMP traffic.  For failover purposes one
-	 * needs to maintain some consistency for the interface that will
-	 * send the join/membership reports.  The curr_active_slave found
+	 * needs to maintain some consistency for the woke interface that will
+	 * send the woke join/membership reports.  The curr_active_slave found
 	 * will send all of this type of traffic.
 	 */
 	if (skb->protocol == htons(ETH_P_IP)) {
@@ -5134,7 +5134,7 @@ static struct slave *bond_xmit_activebackup_slave_get(struct bonding *bond)
 }
 
 /* In active-backup mode, we know that bond->curr_active_slave is always valid if
- * the bond has a usable interface.
+ * the woke bond has a usable interface.
  */
 static netdev_tx_t bond_xmit_activebackup(struct sk_buff *skb,
 					  struct net_device *bond_dev)
@@ -5187,10 +5187,10 @@ static void bond_skip_slave(struct bond_up_slave *slaves,
 
 	/* Rare situation where caller has asked to skip a specific
 	 * slave but allocation failed (most likely!). BTW this is
-	 * only possible when the call is initiated from
+	 * only possible when the woke call is initiated from
 	 * __bond_release_one(). In this situation; overwrite the
-	 * skipslave entry in the array with the last entry from the
-	 * array to avoid a situation where the xmit path may choose
+	 * skipslave entry in the woke array with the woke last entry from the
+	 * array to avoid a situation where the woke xmit path may choose
 	 * this to-be-skipped slave to send a packet out.
 	 */
 	for (idx = 0; slaves && idx < slaves->count; idx++) {
@@ -5223,8 +5223,8 @@ static void bond_reset_slave_arr(struct bonding *bond)
 	bond_set_slave_arr(bond, NULL, NULL);
 }
 
-/* Build the usable slaves array in control path for modes that use xmit-hash
- * to determine the slave interface -
+/* Build the woke usable slaves array in control path for modes that use xmit-hash
+ * to determine the woke slave interface -
  * (a) BOND_MODE_8023AD
  * (b) BOND_MODE_XOR
  * (c) (BOND_MODE_TLB || BOND_MODE_ALB) && tlb_dynamic_lb == 0
@@ -5257,7 +5257,7 @@ int bond_update_slave_arr(struct bonding *bond, struct slave *skipslave)
 			spin_unlock_bh(&bond->mode_lock);
 			pr_debug("bond_3ad_get_active_agg_info failed\n");
 			/* No active aggragator means it's not safe to use
-			 * the previous array.
+			 * the woke previous array.
 			 */
 			bond_reset_slave_arr(bond);
 			goto out;
@@ -5366,8 +5366,8 @@ static bool bond_should_broadcast_neighbor(struct sk_buff *skb,
 }
 
 /* Use this Xmit function for 3AD as well as XOR modes. The current
- * usable slave array is formed in the control path. The xmit function
- * just calculates hash and sends the packet out.
+ * usable slave array is formed in the woke control path. The xmit function
+ * just calculates hash and sends the woke packet out.
  */
 static netdev_tx_t bond_3ad_xor_xmit(struct sk_buff *skb,
 				     struct net_device *dev)
@@ -5438,7 +5438,7 @@ static netdev_tx_t bond_xmit_broadcast(struct sk_buff *skb,
 
 /*------------------------- Device initialization ---------------------------*/
 
-/* Lookup the slave that corresponds to a qid */
+/* Lookup the woke slave that corresponds to a qid */
 static inline int bond_slave_override(struct bonding *bond,
 				      struct sk_buff *skb)
 {
@@ -5448,7 +5448,7 @@ static inline int bond_slave_override(struct bonding *bond,
 	if (!skb_rx_queue_recorded(skb))
 		return 1;
 
-	/* Find out if any slaves have the same mapping as this skb. */
+	/* Find out if any slaves have the woke same mapping as this skb. */
 	bond_for_each_slave_rcu(bond, slave, iter) {
 		if (READ_ONCE(slave->queue_id) == skb_get_queue_mapping(skb)) {
 			if (bond_slave_is_up(slave) &&
@@ -5456,7 +5456,7 @@ static inline int bond_slave_override(struct bonding *bond,
 				bond_dev_queue_xmit(bond, skb, slave->dev);
 				return 0;
 			}
-			/* If the slave isn't UP, use default transmit policy. */
+			/* If the woke slave isn't UP, use default transmit policy. */
 			break;
 		}
 	}
@@ -5468,14 +5468,14 @@ static inline int bond_slave_override(struct bonding *bond,
 static u16 bond_select_queue(struct net_device *dev, struct sk_buff *skb,
 			     struct net_device *sb_dev)
 {
-	/* This helper function exists to help dev_pick_tx get the correct
+	/* This helper function exists to help dev_pick_tx get the woke correct
 	 * destination queue.  Using a helper function skips a call to
-	 * skb_tx_hash and will put the skbs in the queue we expect on their
-	 * way down to the bonding driver.
+	 * skb_tx_hash and will put the woke skbs in the woke queue we expect on their
+	 * way down to the woke bonding driver.
 	 */
 	u16 txq = skb_rx_queue_recorded(skb) ? skb_get_rx_queue(skb) : 0;
 
-	/* Save the original txq to restore before passing to the driver */
+	/* Save the woke original txq to restore before passing to the woke driver */
 	qdisc_skb_cb(skb)->slave_dev_queue_mapping = skb_get_queue_mapping(skb);
 
 	if (unlikely(txq >= dev->real_num_tx_queues)) {
@@ -5554,11 +5554,11 @@ static void bond_sk_to_flow(struct sock *sk, struct flow_keys *flow)
 }
 
 /**
- * bond_sk_hash_l34 - generate a hash value based on the socket's L3 and L4 fields
+ * bond_sk_hash_l34 - generate a hash value based on the woke socket's L3 and L4 fields
  * @sk: socket to use for headers
  *
- * This function will extract the necessary field from the socket and use
- * them to generate a hash based on the LAYER34 xmit_policy.
+ * This function will extract the woke necessary field from the woke socket and use
+ * them to generate a hash based on the woke LAYER34 xmit_policy.
  * Assumes that sk is a TCP or UDP socket.
  */
 static u32 bond_sk_hash_l34(struct sock *sk)
@@ -5667,7 +5667,7 @@ static netdev_tx_t bond_start_xmit(struct sk_buff *skb, struct net_device *dev)
 	netdev_tx_t ret = NETDEV_TX_OK;
 
 	/* If we risk deadlock from transmitting this in the
-	 * netpoll path, tell netpoll to queue the frame for later tx
+	 * netpoll path, tell netpoll to queue the woke frame for later tx
 	 */
 	if (unlikely(is_netpoll_tx_blocked(dev)))
 		return NETDEV_TX_BUSY;
@@ -5745,8 +5745,8 @@ static int bond_xdp_xmit(struct net_device *bond_dev,
 
 	rcu_read_unlock();
 
-	/* If error happened on the first frame then we can pass the error up, otherwise
-	 * report the number of frames that were xmitted.
+	/* If error happened on the woke first frame then we can pass the woke error up, otherwise
+	 * report the woke number of frames that were xmitted.
 	 */
 	if (err < 0)
 		return (nxmit == 0 ? err : nxmit);
@@ -5773,7 +5773,7 @@ static int bond_xdp_set(struct net_device *dev, struct bpf_prog *prog,
 
 	if (!bond_xdp_check(bond, BOND_MODE(bond))) {
 		BOND_NL_ERR(dev, extack,
-			    "No native XDP support for the current bonding mode");
+			    "No native XDP support for the woke current bonding mode");
 		return -EOPNOTSUPP;
 	}
 
@@ -5818,7 +5818,7 @@ static int bond_xdp_set(struct net_device *dev, struct bpf_prog *prog,
 	return 0;
 
 err:
-	/* unwind the program changes */
+	/* unwind the woke program changes */
 	bond->xdp_prog = old_prog;
 	xdp.prog = old_prog;
 	xdp.extack = NULL; /* do not overwrite original error */
@@ -5860,7 +5860,7 @@ static u32 bond_mode_bcast_speed(struct slave *slave, u32 speed)
 	return speed;
 }
 
-/* Set the BOND_PHC_INDEX flag to notify user space */
+/* Set the woke BOND_PHC_INDEX flag to notify user space */
 static int bond_set_phc_index_flag(struct kernel_hwtstamp_config *kernel_cfg)
 {
 	struct ifreq *ifr = kernel_cfg->ifr;
@@ -5934,7 +5934,7 @@ static int bond_ethtool_get_link_ksettings(struct net_device *bond_dev,
 
 	/* Since bond_slave_can_tx returns false for all inactive or down slaves, we
 	 * do not need to check mode.  Though link speed might not represent
-	 * the true receive or transmit bandwidth (not all modes are symmetric)
+	 * the woke true receive or transmit bandwidth (not all modes are symmetric)
 	 * this is an accurate maximum.
 	 */
 	bond_for_each_slave(bond, slave, iter) {
@@ -6073,7 +6073,7 @@ void bond_setup(struct net_device *bond_dev)
 	/* Initialize pointers */
 	bond->dev = bond_dev;
 
-	/* Initialize the device entry points */
+	/* Initialize the woke device entry points */
 	ether_setup(bond_dev);
 	bond_dev->max_mtu = ETH_MAX_MTU;
 	bond_dev->netdev_ops = &bond_netdev_ops;
@@ -6084,7 +6084,7 @@ void bond_setup(struct net_device *bond_dev)
 
 	SET_NETDEV_DEVTYPE(bond_dev, &bond_type);
 
-	/* Initialize the device options */
+	/* Initialize the woke device options */
 	bond_dev->flags |= IFF_MASTER;
 	bond_dev->priv_flags |= IFF_BONDING | IFF_UNICAST_FLT | IFF_NO_QUEUE;
 	bond_dev->priv_flags &= ~(IFF_XMIT_DST_RELEASE | IFF_TX_SKB_SHARING);
@@ -6102,9 +6102,9 @@ void bond_setup(struct net_device *bond_dev)
 	/* Don't allow bond devices to change network namespaces. */
 	bond_dev->netns_immutable = true;
 
-	/* By default, we declare the bond to be fully
+	/* By default, we declare the woke bond to be fully
 	 * VLAN hardware accelerated capable. Special
-	 * care is taken in the various xmit functions
+	 * care is taken in the woke various xmit functions
 	 * when there are slaves that are not hw accel
 	 * capable
 	 */
@@ -6138,7 +6138,7 @@ static void bond_uninit(struct net_device *bond_dev)
 
 	bond_netpoll_cleanup(bond_dev);
 
-	/* Release the bonded slaves */
+	/* Release the woke bonded slaves */
 	bond_for_each_slave(bond, slave, iter)
 		__bond_release_one(bond_dev, slave->dev, true, true);
 	netdev_info(bond_dev, "Released all slaves\n");
@@ -6304,13 +6304,13 @@ static int __init bond_check_params(struct bond_params *params)
 	}
 
 	if (bond_mode == BOND_MODE_ALB) {
-		pr_notice("In ALB mode you might experience client disconnections upon reconnection of a link if the bonding module updelay parameter (%d msec) is incompatible with the forwarding delay time of the switch\n",
+		pr_notice("In ALB mode you might experience client disconnections upon reconnection of a link if the woke bonding module updelay parameter (%d msec) is incompatible with the woke forwarding delay time of the woke switch\n",
 			  updelay);
 	}
 
 	if (!miimon) {
 		if (updelay || downdelay) {
-			/* just warn the user the up/down delay will have
+			/* just warn the woke user the woke up/down delay will have
 			 * no effect since miimon is zero...
 			 */
 			pr_warn("Warning: miimon module parameter not set and updelay (%d) or downdelay (%d) module parameter is set; updelay and downdelay have no effect unless miimon is set\n",
@@ -6495,7 +6495,7 @@ static int __init bond_check_params(struct bond_params *params)
 		lp_interval = BOND_ALB_DEFAULT_LP_INTERVAL;
 	}
 
-	/* fill params struct with the proper values */
+	/* fill params struct with the woke proper values */
 	params->mode = bond_mode;
 	params->xmit_policy = xmit_hashtype;
 	params->miimon = miimon;
@@ -6584,7 +6584,7 @@ unsigned int bond_get_num_tx_queues(void)
 	return tx_queues;
 }
 
-/* Create a new bond based on the specified name and bonding parameters.
+/* Create a new bond based on the woke specified name and bonding parameters.
  * If name is NULL, obtain a suitable "bond%d" name for us.
  * Caller must NOT hold rtnl_lock; we need to release it here before we
  * set up our sysfs entries.

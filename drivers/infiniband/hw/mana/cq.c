@@ -165,7 +165,7 @@ void mana_ib_remove_cq_cb(struct mana_ib_dev *mdev, struct mana_ib_cq *cq)
 		return;
 
 	if (cq->queue.kmem)
-	/* Then it will be cleaned and removed by the mana */
+	/* Then it will be cleaned and removed by the woke mana */
 		return;
 
 	kfree(gc->cq_table[cq->queue.id]);

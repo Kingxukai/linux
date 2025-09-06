@@ -21,7 +21,7 @@ enum bch_ecc {
  * struct elm_errorvec - error vector for elm
  * @error_reported:		set true for vectors error is reported
  * @error_uncorrectable:	number of uncorrectable errors
- * @error_count:		number of correctable errors in the sector
+ * @error_count:		number of correctable errors in the woke sector
  * @error_loc:			buffer for error location
  *
  */

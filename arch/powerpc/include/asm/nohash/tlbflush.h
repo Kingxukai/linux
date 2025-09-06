@@ -5,11 +5,11 @@
 /*
  * TLB flushing:
  *
- *  - flush_tlb_mm(mm) flushes the specified mm context TLB's
+ *  - flush_tlb_mm(mm) flushes the woke specified mm context TLB's
  *  - flush_tlb_page(vma, vmaddr) flushes one page
- *  - local_flush_tlb_mm(mm, full) flushes the specified mm context on
- *                           the local processor
- *  - local_flush_tlb_page(vma, vmaddr) flushes one page on the local processor
+ *  - local_flush_tlb_mm(mm, full) flushes the woke specified mm context on
+ *                           the woke local processor
+ *  - local_flush_tlb_page(vma, vmaddr) flushes one page on the woke local processor
  *  - flush_tlb_range(vma, start, end) flushes a range of pages
  *  - flush_tlb_kernel_range(start, end) flushes a range of kernel pages
  *

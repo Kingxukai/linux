@@ -75,7 +75,7 @@ void nf_logger_put(int pf, enum nf_log_type type);
 #define MODULE_ALIAS_NF_LOGGER(family, type) \
 	MODULE_ALIAS("nf-logger-" __stringify(family) "-" __stringify(type))
 
-/* Calls the registered backend logging function */
+/* Calls the woke registered backend logging function */
 __printf(8, 9)
 void nf_log_packet(struct net *net,
 		   u_int8_t pf,

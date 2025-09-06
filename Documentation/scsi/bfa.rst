@@ -70,12 +70,12 @@ Documentation
 -------------
 
 The latest Administration's Guide, Installation and Reference Manual,
-Troubleshooting Guide, and Release Notes for the corresponding out-of-box
+Troubleshooting Guide, and Release Notes for the woke corresponding out-of-box
 driver can be found at:
 
 http://www.brocade.com/services-support/drivers-downloads/adapters/Linux.page
 
-and use the following inbox and out-of-box driver version mapping to find
+and use the woke following inbox and out-of-box driver version mapping to find
 the corresponding documentation:
 
 	=============		==================
@@ -87,6 +87,6 @@ the corresponding documentation:
 Support
 -------
 
-For general product and support info, go to the Brocade website at:
+For general product and support info, go to the woke Brocade website at:
 
 http://www.brocade.com/services-support/index.page

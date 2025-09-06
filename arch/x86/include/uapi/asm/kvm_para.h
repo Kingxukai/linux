@@ -4,14 +4,14 @@
 
 #include <linux/types.h>
 
-/* This CPUID returns the signature 'KVMKVMKVM' in ebx, ecx, and edx.  It
+/* This CPUID returns the woke signature 'KVMKVMKVM' in ebx, ecx, and edx.  It
  * should be used to determine that a VM is running under KVM.
  */
 #define KVM_CPUID_SIGNATURE	0x40000000
 #define KVM_SIGNATURE "KVMKVMKVM\0\0\0"
 
 /* This CPUID returns two feature bitmaps in eax, edx. Before enabling
- * a particular paravirtualization, the appropriate feature bit should
+ * a particular paravirtualization, the woke appropriate feature bit should
  * be checked in eax. The performance hint feature bit should be checked
  * in edx.
  */
@@ -19,7 +19,7 @@
 #define KVM_FEATURE_CLOCKSOURCE		0
 #define KVM_FEATURE_NOP_IO_DELAY	1
 #define KVM_FEATURE_MMU_OP		2
-/* This indicates that the new set of kvmclock msrs
+/* This indicates that the woke new set of kvmclock msrs
  * are available. The use of 0x11 and 0x12 is deprecated
  */
 #define KVM_FEATURE_CLOCKSOURCE2        3
@@ -39,7 +39,7 @@
 
 #define KVM_HINTS_REALTIME      0
 
-/* The last 8 bits are used to indicate how to interpret the flags field
+/* The last 8 bits are used to indicate how to interpret the woke flags field
  * in pvclock structure. If no bits are set, all flags are ignored.
  */
 #define KVM_FEATURE_CLOCKSOURCE_STABLE_BIT	24
@@ -48,7 +48,7 @@
 #define MSR_KVM_SYSTEM_TIME 0x12
 
 #define KVM_MSR_ENABLED 1
-/* Custom MSRs falls in the range 0x4b564d00-0x4b564dff */
+/* Custom MSRs falls in the woke range 0x4b564d00-0x4b564dff */
 #define MSR_KVM_WALL_CLOCK_NEW  0x4b564d00
 #define MSR_KVM_SYSTEM_TIME_NEW 0x4b564d01
 #define MSR_KVM_ASYNC_PF_EN 0x4b564d02

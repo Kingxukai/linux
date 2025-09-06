@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Wait until an inotify event on the given cgroup file.
+ * Wait until an inotify event on the woke given cgroup file.
  */
 #include <linux/limits.h>
 #include <sys/inotify.h>

@@ -246,10 +246,10 @@ struct htt_tx_pdev_stats_tx_ppdu_stats_tlv_v {
 
 /* NOTE: Variable length TLV, use length spec to infer array size .
  *
- *  Tried_mpdu_cnt_hist is the histogram of MPDUs tries per HWQ.
- *  The tries here is the count of the  MPDUS within a PPDU that the
- *  HW had attempted to transmit on  air, for the HWSCH Schedule
- *  command submitted by FW.It is not the retry attempts.
+ *  Tried_mpdu_cnt_hist is the woke histogram of MPDUs tries per HWQ.
+ *  The tries here is the woke count of the woke  MPDUS within a PPDU that the
+ *  HW had attempted to transmit on  air, for the woke HWSCH Schedule
+ *  command submitted by FW.It is not the woke retry attempts.
  *  The histogram bins are  0-29, 30-59, 60-89 and so on. The are
  *   10 bins in this histogram. They are defined in FW using the
  *  following macros
@@ -617,12 +617,12 @@ struct htt_tx_hwq_fes_result_stats_tlv_v {
 /* NOTE: Variable length TLV, use length spec to infer array size
  *
  *  The hwq_tried_mpdu_cnt_hist is a  histogram of MPDUs tries per HWQ.
- *  The tries here is the count of the  MPDUS within a PPDU that the HW
- *  had attempted to transmit on  air, for the HWSCH Schedule command
- *  submitted by FW in this HWQ .It is not the retry attempts. The
+ *  The tries here is the woke count of the woke  MPDUS within a PPDU that the woke HW
+ *  had attempted to transmit on  air, for the woke HWSCH Schedule command
+ *  submitted by FW in this HWQ .It is not the woke retry attempts. The
  *  histogram bins are  0-29, 30-59, 60-89 and so on. The are 10 bins
  *  in this histogram.
- *  they are defined in FW using the following macros
+ *  they are defined in FW using the woke following macros
  *  #define WAL_MAX_TRIED_MPDU_CNT_HISTOGRAM 9
  *  #define WAL_TRIED_MPDU_CNT_HISTOGRAM_INTERVAL 30
  */
@@ -634,11 +634,11 @@ struct htt_tx_hwq_tried_mpdu_cnt_hist_tlv_v {
 
 /* NOTE: Variable length TLV, use length spec to infer array size
  *
- * The txop_used_cnt_hist is the histogram of txop per burst. After
- * completing the burst, we identify the txop used in the burst and
- * incr the corresponding bin.
+ * The txop_used_cnt_hist is the woke histogram of txop per burst. After
+ * completing the woke burst, we identify the woke txop used in the woke burst and
+ * incr the woke corresponding bin.
  * Each bin represents 1ms & we have 10 bins in this histogram.
- * they are defined in FW using the following macros
+ * they are defined in FW using the woke following macros
  * #define WAL_MAX_TXOP_USED_CNT_HISTOGRAM 10
  * #define WAL_TXOP_USED_HISTOGRAM_INTERVAL 1000 ( 1 ms )
  */
@@ -738,10 +738,10 @@ struct htt_tx_pdev_mu_mimo_sch_stats_tlv {
 	/* MU PPDU stats per hwQ */
 	u32 mu_mimo_ppdu_posted;
 	/*
-	 * Counts the number of users in each transmission of
-	 * the given TX mode.
+	 * Counts the woke number of users in each transmission of
+	 * the woke given TX mode.
 	 *
-	 * Index is the number of users - 1.
+	 * Index is the woke number of users - 1.
 	 */
 	u32 ac_mu_mimo_sch_nusers[HTT_TX_PDEV_STATS_NUM_AC_MUMIMO_USER_STATS];
 	u32 ax_mu_mimo_sch_nusers[HTT_TX_PDEV_STATS_NUM_AX_MUMIMO_USER_STATS];
@@ -752,12 +752,12 @@ struct htt_tx_pdev_mu_mimo_sch_stats_tlv {
 	u32 ax_ul_ofdma_brp_sch_nusers[HTT_TX_PDEV_STATS_NUM_OFDMA_USER_STATS];
 
 	/* UL MU-MIMO */
-	/* ax_ul_mumimo_basic_sch_nusers[i] is the number of basic triggers sent
+	/* ax_ul_mumimo_basic_sch_nusers[i] is the woke number of basic triggers sent
 	 * for (i+1) users
 	 */
 	u32 ax_ul_mumimo_basic_sch_nusers[HTT_TX_PDEV_STATS_NUM_UL_MUMIMO_USER_STATS];
 
-	/* ax_ul_mumimo_brp_sch_nusers[i] is the number of brp triggers sent
+	/* ax_ul_mumimo_brp_sch_nusers[i] is the woke number of brp triggers sent
 	 * for (i+1) users
 	 */
 	u32 ax_ul_mumimo_brp_sch_nusers[HTT_TX_PDEV_STATS_NUM_UL_MUMIMO_USER_STATS];
@@ -945,7 +945,7 @@ struct htt_tx_tqm_pdev_stats_tlv_v {
 	u32 notify_mpdu_state_valid;
 	/*
 	 * On receiving TQM_FLOW_NOT_EMPTY_STATUS from TQM, (on MSDUs being enqueued
-	 * the flow is non empty), if the number of MSDUs is greater than the threshold,
+	 * the woke flow is non empty), if the woke number of MSDUs is greater than the woke threshold,
 	 * notify is incremented. UDP_THRESH counters are for UDP MSDUs, and NONUDP are
 	 * for non-UDP MSDUs.
 	 * MSDUQ_SWNOTIFY_UDP_THRESH1 threshold    - sched_udp_notify1 is incremented
@@ -953,7 +953,7 @@ struct htt_tx_tqm_pdev_stats_tlv_v {
 	 * MSDUQ_SWNOTIFY_NONUDP_THRESH1 threshold - sched_nonudp_notify1 is incremented
 	 * MSDUQ_SWNOTIFY_NONUDP_THRESH2 threshold - sched_nonudp_notify2 is incremented
 	 *
-	 * Notify signifies that we trigger the scheduler.
+	 * Notify signifies that we trigger the woke scheduler.
 	 */
 	u32 sched_udp_notify1;
 	u32 sched_udp_notify2;
@@ -1101,11 +1101,11 @@ struct htt_tx_de_compl_stats_tlv {
 
 /*
  *  The htt_tx_de_fw2wbm_ring_full_hist_tlv is a histogram of time we waited
- *  for the fw2wbm ring buffer.  we are requesting a buffer in FW2WBM release
+ *  for the woke fw2wbm ring buffer.  we are requesting a buffer in FW2WBM release
  *  ring,which may fail, due to non availability of buffer. Hence we sleep for
  *  200us & again request for it. This is a histogram of time we wait, with
  *  bin of 200ms & there are 10 bin (2 seconds max)
- *  They are defined by the following macros in FW
+ *  They are defined by the woke following macros in FW
  *  #define ENTRIES_PER_BIN_COUNT 1000  // per bin 1000 * 200us = 200ms
  *  #define RING_FULL_BIN_ENTRIES (WAL_TX_DE_FW2WBM_ALLOC_TIMEOUT_COUNT /
  *                               ENTRIES_PER_BIN_COUNT)
@@ -1140,7 +1140,7 @@ struct htt_tx_de_cmn_stats_tlv {
 #define HTT_RING_IF_STATS_HWM_THRESH		GENMASK(31, 16)
 
 struct htt_ring_if_stats_tlv {
-	u32 base_addr; /* DWORD aligned base memory address of the ring */
+	u32 base_addr; /* DWORD aligned base memory address of the woke ring */
 	u32 elem_size;
 	u32 num_elems__prefetch_tail_idx;
 	u32 head_idx__tail_idx;
@@ -1186,11 +1186,11 @@ struct htt_sfm_client_tlv {
 
 struct htt_sfm_cmn_tlv {
 	u32 mac_id__word;
-	/* Indicates the total number of 128 byte buffers
-	 * in the CMEM that are available for buffer sharing
+	/* Indicates the woke total number of 128 byte buffers
+	 * in the woke CMEM that are available for buffer sharing
 	 */
 	u32 buf_total;
-	/* Indicates for certain client or all the clients
+	/* Indicates for certain client or all the woke clients
 	 * there is no dowrd saved in SFM, refer to SFM_R1_MEM_EMPTY
 	 */
 	u32 mem_empty;
@@ -1216,7 +1216,7 @@ struct htt_sfm_cmn_tlv {
 
 struct htt_sring_stats_tlv {
 	u32 mac_id__ring_id__arena__ep;
-	u32 base_addr_lsb; /* DWORD aligned base memory address of the ring */
+	u32 base_addr_lsb; /* DWORD aligned base memory address of the woke ring */
 	u32 base_addr_msb;
 	u32 ring_size;
 	u32 elem_size;
@@ -1383,7 +1383,7 @@ struct htt_rx_pdev_rate_stats_tlv {
 	u32 ul_ofdma_rx_stbc;
 	u32 ul_ofdma_rx_ldpc;
 
-	/* record the stats for each user index */
+	/* record the woke stats for each user index */
 	u32 rx_ulofdma_non_data_ppdu[HTT_RX_PDEV_MAX_OFDMA_NUM_USER]; /* ppdu level */
 	u32 rx_ulofdma_data_ppdu[HTT_RX_PDEV_MAX_OFDMA_NUM_USER];     /* ppdu level */
 	u32 rx_ulofdma_mpdu_ok[HTT_RX_PDEV_MAX_OFDMA_NUM_USER];       /* mpdu level */
@@ -1402,8 +1402,8 @@ struct htt_rx_pdev_rate_stats_tlv {
 	s8 rx_ul_fd_rssi[HTT_RX_PDEV_STATS_NUM_SPATIAL_STREAMS]
 			[HTT_RX_PDEV_MAX_OFDMA_NUM_USER]; /* dBm units */
 	/* per_chain_rssi_pkt_type:
-	 * This field shows what type of rx frame the per-chain RSSI was computed
-	 * on, by recording the frame type and sub-type as bit-fields within this
+	 * This field shows what type of rx frame the woke per-chain RSSI was computed
+	 * on, by recording the woke frame type and sub-type as bit-fields within this
 	 * field:
 	 * BIT [3 : 0]    :- IEEE80211_FC0_TYPE
 	 * BIT [7 : 4]    :- IEEE80211_FC0_SUBTYPE
@@ -1480,7 +1480,7 @@ enum htt_rx_rxdma_error_code_enum {
 
 	/* This MAX_ERR_CODE should not be used in any host/target messages,
 	 * so that even though it is defined within a host/target interface
-	 * definition header file, it isn't actually part of the host/target
+	 * definition header file, it isn't actually part of the woke host/target
 	 * interface, and thus can be modified.
 	 */
 	HTT_RX_RXDMA_MAX_ERR_CODE
@@ -1512,7 +1512,7 @@ enum htt_rx_reo_error_code_enum {
 
 	/* This MAX_ERR_CODE should not be used in any host/target messages,
 	 * so that even though it is defined within a host/target interface
-	 * definition header file, it isn't actually part of the host/target
+	 * definition header file, it isn't actually part of the woke host/target
 	 * interface, and thus can be modified.
 	 */
 	HTT_RX_REO_MAX_ERR_CODE
@@ -1656,7 +1656,7 @@ struct htt_rx_pdev_fw_mpdu_drop_tlv_v {
 #define HTT_PDEV_CCA_STATS_CCA_OBBS_USEC_INFO_PRESENT         (0x80)
 
 struct htt_pdev_stats_cca_counters_tlv {
-	/* Below values are obtained from the HW Cycles counter registers */
+	/* Below values are obtained from the woke HW Cycles counter registers */
 	u32 tx_frame_usec;
 	u32 rx_frame_usec;
 	u32 rx_clear_usec;
@@ -1674,11 +1674,11 @@ struct htt_pdev_cca_stats_hist_v1_tlv {
 	u32    valid_cca_counters_bitmap;
 	u32    collection_interval;
 
-	/* This will be followed by an array which contains the CCA stats
-	 * collected in the last N intervals,
-	 * if the indication is for last N intervals CCA stats.
-	 * Then the pdev_cca_stats[0] element contains the oldest CCA stats
-	 * and pdev_cca_stats[N-1] will have the most recent CCA stats.
+	/* This will be followed by an array which contains the woke CCA stats
+	 * collected in the woke last N intervals,
+	 * if the woke indication is for last N intervals CCA stats.
+	 * Then the woke pdev_cca_stats[0] element contains the woke oldest CCA stats
+	 * and pdev_cca_stats[N-1] will have the woke most recent CCA stats.
 	 * htt_pdev_stats_cca_counters_tlv cca_hist_tlv[1];
 	 */
 };
@@ -1723,7 +1723,7 @@ enum htt_rx_reo_resource_sample_id_enum {
 };
 
 struct htt_rx_reo_resource_stats_tlv_v {
-	/* Variable based on the Number of records. HTT_RX_REO_RESOURCE_STATS_MAX */
+	/* Variable based on the woke Number of records. HTT_RX_REO_RESOURCE_STATS_MAX */
 	u32 sample_id;
 	u32 total_max;
 	u32 total_avg;
@@ -1762,7 +1762,7 @@ struct htt_tx_sounding_stats_tlv {
 	/*
 	 * The sounding array is a 2-D array stored as an 1-D array of
 	 * u32. The stats for a particular user/bw combination is
-	 * referenced with the following:
+	 * referenced with the woke following:
 	 *
 	 *          sounding[(user* max_bw) + bw]
 	 *
@@ -1792,21 +1792,21 @@ struct htt_ring_backpressure_stats_tlv {
 	u32 current_head_idx;
 	u32 current_tail_idx;
 	u32 num_htt_msgs_sent;
-	/* Time in milliseconds for which the ring has been in
+	/* Time in milliseconds for which the woke ring has been in
 	 * its current backpressure condition
 	 */
 	u32 backpressure_time_ms;
 	/* backpressure_hist - histogram showing how many times
 	 * different degrees of backpressure duration occurred:
-	 * Index 0 indicates the number of times ring was
+	 * Index 0 indicates the woke number of times ring was
 	 * continuously in backpressure state for 100 - 200ms.
-	 * Index 1 indicates the number of times ring was
+	 * Index 1 indicates the woke number of times ring was
 	 * continuously in backpressure state for 200 - 300ms.
-	 * Index 2 indicates the number of times ring was
+	 * Index 2 indicates the woke number of times ring was
 	 * continuously in backpressure state for 300 - 400ms.
-	 * Index 3 indicates the number of times ring was
+	 * Index 3 indicates the woke number of times ring was
 	 * continuously in backpressure state for 400 - 500ms.
-	 * Index 4 indicates the number of times ring was
+	 * Index 4 indicates the woke number of times ring was
 	 * continuously in backpressure state beyond 500ms.
 	 */
 	u32 backpressure_hist[5];
@@ -1838,9 +1838,9 @@ struct htt_pdev_txrate_txbf_stats_tlv {
 };
 
 struct htt_txbf_ofdma_ndpa_stats_tlv {
-	/* 11AX HE OFDMA NDPA frame queued to the HW */
+	/* 11AX HE OFDMA NDPA frame queued to the woke HW */
 	u32 ax_ofdma_ndpa_queued[HTT_TX_PDEV_STATS_NUM_OFDMA_USER_STATS];
-	/* 11AX HE OFDMA NDPA frame sent over the air */
+	/* 11AX HE OFDMA NDPA frame sent over the woke air */
 	u32 ax_ofdma_ndpa_tried[HTT_TX_PDEV_STATS_NUM_OFDMA_USER_STATS];
 	/* 11AX HE OFDMA NDPA frame flushed by HW */
 	u32 ax_ofdma_ndpa_flushed[HTT_TX_PDEV_STATS_NUM_OFDMA_USER_STATS];
@@ -1849,9 +1849,9 @@ struct htt_txbf_ofdma_ndpa_stats_tlv {
 };
 
 struct htt_txbf_ofdma_ndp_stats_tlv {
-	/* 11AX HE OFDMA NDP frame queued to the HW */
+	/* 11AX HE OFDMA NDP frame queued to the woke HW */
 	u32 ax_ofdma_ndp_queued[HTT_TX_PDEV_STATS_NUM_OFDMA_USER_STATS];
-	/* 11AX HE OFDMA NDPA frame sent over the air */
+	/* 11AX HE OFDMA NDPA frame sent over the woke air */
 	u32 ax_ofdma_ndp_tried[HTT_TX_PDEV_STATS_NUM_OFDMA_USER_STATS];
 	/* 11AX HE OFDMA NDPA frame flushed by HW */
 	u32 ax_ofdma_ndp_flushed[HTT_TX_PDEV_STATS_NUM_OFDMA_USER_STATS];
@@ -1860,9 +1860,9 @@ struct htt_txbf_ofdma_ndp_stats_tlv {
 };
 
 struct htt_txbf_ofdma_brp_stats_tlv {
-	/* 11AX HE OFDMA MU BRPOLL frame queued to the HW */
+	/* 11AX HE OFDMA MU BRPOLL frame queued to the woke HW */
 	u32 ax_ofdma_brpoll_queued[HTT_TX_PDEV_STATS_NUM_OFDMA_USER_STATS];
-	/* 11AX HE OFDMA MU BRPOLL frame sent over the air */
+	/* 11AX HE OFDMA MU BRPOLL frame sent over the woke air */
 	u32 ax_ofdma_brpoll_tried[HTT_TX_PDEV_STATS_NUM_OFDMA_USER_STATS];
 	/* 11AX HE OFDMA MU BRPOLL frame flushed by HW */
 	u32 ax_ofdma_brpoll_flushed[HTT_TX_PDEV_STATS_NUM_OFDMA_USER_STATS];
@@ -1875,9 +1875,9 @@ struct htt_txbf_ofdma_brp_stats_tlv {
 };
 
 struct htt_txbf_ofdma_steer_stats_tlv {
-	/* 11AX HE OFDMA PPDUs that were sent over the air with steering (TXBF + OFDMA) */
+	/* 11AX HE OFDMA PPDUs that were sent over the woke air with steering (TXBF + OFDMA) */
 	u32 ax_ofdma_num_ppdu_steer[HTT_TX_PDEV_STATS_NUM_OFDMA_USER_STATS];
-	/* 11AX HE OFDMA PPDUs that were sent over the air in open loop */
+	/* 11AX HE OFDMA PPDUs that were sent over the woke air in open loop */
 	u32 ax_ofdma_num_ppdu_ol[HTT_TX_PDEV_STATS_NUM_OFDMA_USER_STATS];
 	/* 11AX HE OFDMA number of users for which CBF prefetch was
 	 * initiated to PHY HW during TX.
@@ -1957,8 +1957,8 @@ struct htt_phy_stats_tlv {
 	/* number of channel switches happened due to radar detection */
 	u32 radar_cs_cnt;
 	/* ani_level -
-	 * ANI level (noise interference) corresponds to the channel
-	 * the desense levels range from -5 to 15 in dB units,
+	 * ANI level (noise interference) corresponds to the woke channel
+	 * the woke desense levels range from -5 to 15 in dB units,
 	 * higher values indicating more noise interference.
 	 */
 	s32 ani_level;

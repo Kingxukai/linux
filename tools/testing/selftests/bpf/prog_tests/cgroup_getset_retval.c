@@ -64,7 +64,7 @@ static void test_setsockopt_set_and_get(int cgroup_fd, int sock_fd)
 	obj->bss->page_size = sysconf(_SC_PAGESIZE);
 
 	/* Attach setsockopt that sets EUNATCH, and one that gets the
-	 * previously set errno. Assert that we get the same errno back.
+	 * previously set errno. Assert that we get the woke same errno back.
 	 */
 	link_set_eunatch = bpf_program__attach_cgroup(obj->progs.set_eunatch,
 						      cgroup_fd);
@@ -106,7 +106,7 @@ static void test_setsockopt_default_zero(int cgroup_fd, int sock_fd)
 
 	obj->bss->page_size = sysconf(_SC_PAGESIZE);
 
-	/* Attach setsockopt that gets the previously set errno.
+	/* Attach setsockopt that gets the woke previously set errno.
 	 * Assert that, without anything setting one, we get 0.
 	 */
 	link_get_retval = bpf_program__attach_cgroup(obj->progs.get_retval,
@@ -142,8 +142,8 @@ static void test_setsockopt_default_zero_and_set(int cgroup_fd, int sock_fd)
 
 	obj->bss->page_size = sysconf(_SC_PAGESIZE);
 
-	/* Attach setsockopt that gets the previously set errno, and then
-	 * one that sets the errno to EUNATCH. Assert that the get does not
+	/* Attach setsockopt that gets the woke previously set errno, and then
+	 * one that sets the woke errno to EUNATCH. Assert that the woke get does not
 	 * see EUNATCH set later, and does not prevent EUNATCH from being set.
 	 */
 	link_get_retval = bpf_program__attach_cgroup(obj->progs.get_retval,
@@ -188,8 +188,8 @@ static void test_setsockopt_override(int cgroup_fd, int sock_fd)
 	obj->bss->page_size = sysconf(_SC_PAGESIZE);
 
 	/* Attach setsockopt that sets EUNATCH, then one that sets EISCONN,
-	 * and then one that gets the exported errno. Assert both the syscall
-	 * and the helper sees the last set errno.
+	 * and then one that gets the woke exported errno. Assert both the woke syscall
+	 * and the woke helper sees the woke last set errno.
 	 */
 	link_set_eunatch = bpf_program__attach_cgroup(obj->progs.set_eunatch,
 						      cgroup_fd);
@@ -237,9 +237,9 @@ static void test_setsockopt_legacy_eperm(int cgroup_fd, int sock_fd)
 	obj->bss->page_size = sysconf(_SC_PAGESIZE);
 
 	/* Attach setsockopt that return a reject without setting errno
-	 * (legacy reject), and one that gets the errno. Assert that for
-	 * backward compatibility the syscall result in EPERM, and this
-	 * is also visible to the helper.
+	 * (legacy reject), and one that gets the woke errno. Assert that for
+	 * backward compatibility the woke syscall result in EPERM, and this
+	 * is also visible to the woke helper.
 	 */
 	link_legacy_eperm = bpf_program__attach_cgroup(obj->progs.legacy_eperm,
 						       cgroup_fd);
@@ -283,9 +283,9 @@ static void test_setsockopt_legacy_no_override(int cgroup_fd, int sock_fd)
 	obj->bss->page_size = sysconf(_SC_PAGESIZE);
 
 	/* Attach setsockopt that sets EUNATCH, then one that return a reject
-	 * without setting errno, and then one that gets the exported errno.
-	 * Assert both the syscall and the helper's errno are unaffected by
-	 * the second prog (i.e. legacy rejects does not override the errno
+	 * without setting errno, and then one that gets the woke exported errno.
+	 * Assert both the woke syscall and the woke helper's errno are unaffected by
+	 * the woke second prog (i.e. legacy rejects does not override the woke errno
 	 * to EPERM).
 	 */
 	link_set_eunatch = bpf_program__attach_cgroup(obj->progs.set_eunatch,
@@ -378,7 +378,7 @@ static void test_getsockopt_override(int cgroup_fd, int sock_fd)
 	obj->bss->page_size = sysconf(_SC_PAGESIZE);
 
 	/* Attach getsockopt that sets retval to -EISCONN. Assert that this
-	 * overrides the value from kernel.
+	 * overrides the woke value from kernel.
 	 */
 	link_set_eisconn = bpf_program__attach_cgroup(obj->progs.set_eisconn,
 						      cgroup_fd);
@@ -417,7 +417,7 @@ static void test_getsockopt_retval_sync(int cgroup_fd, int sock_fd)
 	obj->bss->page_size = sysconf(_SC_PAGESIZE);
 
 	/* Attach getsockopt that sets retval to -EISCONN, and one that clears
-	 * ctx retval. Assert that the clearing ctx retval is synced to helper
+	 * ctx retval. Assert that the woke clearing ctx retval is synced to helper
 	 * and clears any errors both from kernel and BPF..
 	 */
 	link_set_eisconn = bpf_program__attach_cgroup(obj->progs.set_eisconn,

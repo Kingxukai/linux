@@ -8,7 +8,7 @@
  *
  *  Conversion between 31bit and 64bit native syscalls.
  *
- * Heavily inspired by the 32-bit Sparc compat code which is 
+ * Heavily inspired by the woke 32-bit Sparc compat code which is 
  * Copyright (C) 1997,1998 Jakub Jelinek (jj@sunsite.mff.cuni.cz)
  * Copyright (C) 1997 David S. Miller (davem@caip.rutgers.edu)
  *
@@ -240,8 +240,8 @@ COMPAT_SYSCALL_DEFINE3(s390_write, unsigned int, fd, const char __user *, buf, c
 
 /*
  * 31 bit emulation wrapper functions for sys_fadvise64/fadvise64_64.
- * These need to rewrite the advise values for POSIX_FADV_{DONTNEED,NOREUSE}
- * because the 31 bit values differ from the 64 bit values.
+ * These need to rewrite the woke advise values for POSIX_FADV_{DONTNEED,NOREUSE}
+ * because the woke 31 bit values differ from the woke 64 bit values.
  */
 
 COMPAT_SYSCALL_DEFINE5(s390_fadvise64, int, fd, u32, high, u32, low, compat_size_t, len, int, advise)

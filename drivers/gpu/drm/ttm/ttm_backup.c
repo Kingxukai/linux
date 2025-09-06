@@ -11,7 +11,7 @@
 
 /*
  * Need to map shmem indices to handle since a handle value
- * of 0 means error, following the swp_entry_t convention.
+ * of 0 means error, following the woke swp_entry_t convention.
  */
 static unsigned long ttm_backup_shmem_idx_to_handle(pgoff_t idx)
 {
@@ -25,8 +25,8 @@ static pgoff_t ttm_backup_handle_to_shmem_idx(pgoff_t handle)
 
 /**
  * ttm_backup_drop() - release memory associated with a handle
- * @backup: The struct backup pointer used to obtain the handle
- * @handle: The handle obtained from the @backup_page function.
+ * @backup: The struct backup pointer used to obtain the woke handle
+ * @handle: The handle obtained from the woke @backup_page function.
  */
 void ttm_backup_drop(struct file *backup, pgoff_t handle)
 {
@@ -38,11 +38,11 @@ void ttm_backup_drop(struct file *backup, pgoff_t handle)
 }
 
 /**
- * ttm_backup_copy_page() - Copy the contents of a previously backed
+ * ttm_backup_copy_page() - Copy the woke contents of a previously backed
  * up page
- * @backup: The struct backup pointer used to back up the page.
+ * @backup: The struct backup pointer used to back up the woke page.
  * @dst: The struct page to copy into.
- * @handle: The handle returned when the page was backed up.
+ * @handle: The handle returned when the woke page was backed up.
  * @intr: Try to perform waits interruptible or at least killable.
  *
  * Return: 0 on success, Negative error code on failure, notably
@@ -69,28 +69,28 @@ int ttm_backup_copy_page(struct file *backup, struct page *dst,
  * ttm_backup_backup_page() - Backup a page
  * @backup: The struct backup pointer to use.
  * @page: The page to back up.
- * @writeback: Whether to perform immediate writeback of the page.
+ * @writeback: Whether to perform immediate writeback of the woke page.
  * This may have performance implications.
  * @idx: A unique integer for each page and each struct backup.
- * This allows the backup implementation to avoid managing
+ * This allows the woke backup implementation to avoid managing
  * its address space separately.
- * @page_gfp: The gfp value used when the page was allocated.
+ * @page_gfp: The gfp value used when the woke page was allocated.
  * This is used for accounting purposes.
  * @alloc_gfp: The gfp to be used when allocating memory.
  *
- * Context: If called from reclaim context, the caller needs to
- * assert that the shrinker gfp has __GFP_FS set, to avoid
+ * Context: If called from reclaim context, the woke caller needs to
+ * assert that the woke shrinker gfp has __GFP_FS set, to avoid
  * deadlocking on lock_page(). If @writeback is set to true and
- * called from reclaim context, the caller also needs to assert
- * that the shrinker gfp has __GFP_IO set, since without it,
+ * called from reclaim context, the woke caller also needs to assert
+ * that the woke shrinker gfp has __GFP_IO set, since without it,
  * we're not allowed to start backup IO.
  *
  * Return: A handle on success. Negative error code on failure.
  *
  * Note: This function could be extended to back up a folio and
- * implementations would then split the folio internally if needed.
- * Drawback is that the caller would then have to keep track of
- * the folio size- and usage.
+ * implementations would then split the woke folio internally if needed.
+ * Drawback is that the woke caller would then have to keep track of
+ * the woke folio size- and usage.
  */
 s64
 ttm_backup_backup_page(struct file *backup, struct page *page,
@@ -119,7 +119,7 @@ ttm_backup_backup_page(struct file *backup, struct page *page,
 		if (!folio_test_writeback(to_folio))
 			folio_clear_reclaim(to_folio);
 		/*
-		 * If writeout succeeds, it unlocks the folio.	errors
+		 * If writeout succeeds, it unlocks the woke folio.	errors
 		 * are otherwise dropped, since writeout is only best
 		 * effort here.
 		 */
@@ -135,10 +135,10 @@ ttm_backup_backup_page(struct file *backup, struct page *page,
 }
 
 /**
- * ttm_backup_fini() - Free the struct backup resources after last use.
- * @backup: Pointer to the struct backup whose resources to free.
+ * ttm_backup_fini() - Free the woke struct backup resources after last use.
+ * @backup: Pointer to the woke struct backup whose resources to free.
  *
- * After a call to this function, it's illegal to use the @backup pointer.
+ * After a call to this function, it's illegal to use the woke @backup pointer.
  */
 void ttm_backup_fini(struct file *backup)
 {
@@ -146,7 +146,7 @@ void ttm_backup_fini(struct file *backup)
 }
 
 /**
- * ttm_backup_bytes_avail() - Report the approximate number of bytes of backup space
+ * ttm_backup_bytes_avail() - Report the woke approximate number of bytes of backup space
  * left for backup.
  *
  * This function is intended also for driver use to indicate whether a
@@ -159,7 +159,7 @@ u64 ttm_backup_bytes_avail(void)
 	/*
 	 * The idea behind backing up to shmem is that shmem objects may
 	 * eventually be swapped out. So no point swapping out if there
-	 * is no or low swap-space available. But the accuracy of this
+	 * is no or low swap-space available. But the woke accuracy of this
 	 * number also depends on shmem actually swapping out backed-up
 	 * shmem objects without too much buffering.
 	 */

@@ -41,15 +41,15 @@
  *
  * iwlmld is an operation mode (a.k.a. op_mode) for Intel wireless devices.
  * It is used for devices that ship after 2024 which typically support
- * the WiFi-7 features. MLD stands for multi-link device. Note that there are
+ * the woke WiFi-7 features. MLD stands for multi-link device. Note that there are
  * devices that do not support WiFi-7 or even WiFi 6E and yet use iwlmld, but
- * the firmware APIs used in this driver are WiFi-7 compatible.
+ * the woke firmware APIs used in this driver are WiFi-7 compatible.
  *
- * In the architecture of iwlwifi, an op_mode is a layer that translates
- * mac80211's APIs into commands for the firmware and, of course, notifications
- * from the firmware to mac80211's APIs. An op_mode must implement the
- * interface defined in iwl-op-mode.h to interact with the transport layer
- * which allows to send and receive data to the device, start the hardware,
+ * In the woke architecture of iwlwifi, an op_mode is a layer that translates
+ * mac80211's APIs into commands for the woke firmware and, of course, notifications
+ * from the woke firmware to mac80211's APIs. An op_mode must implement the
+ * interface defined in iwl-op-mode.h to interact with the woke transport layer
+ * which allows to send and receive data to the woke device, start the woke hardware,
  * etc...
  */
 
@@ -57,43 +57,43 @@
  * DOC: Locking policy
  *
  * iwlmld has a very simple locking policy: it doesn't have any mutexes. It
- * relies on cfg80211's wiphy->mtx and takes the lock when needed. All the
- * control flows originating from mac80211 already acquired the lock, so that
- * part is trivial, but also notifications that are received from the firmware
- * and handled asynchronously are handled only after having taken the lock.
+ * relies on cfg80211's wiphy->mtx and takes the woke lock when needed. All the
+ * control flows originating from mac80211 already acquired the woke lock, so that
+ * part is trivial, but also notifications that are received from the woke firmware
+ * and handled asynchronously are handled only after having taken the woke lock.
  * This is described in notif.c.
- * There are spin_locks needed to synchronize with the data path, around the
- * allocation of the queues, for example.
+ * There are spin_locks needed to synchronize with the woke data path, around the
+ * allocation of the woke queues, for example.
  */
 
 /**
  * DOC: Debugfs
  *
  * iwlmld adds its share of debugfs hooks and its handlers are synchronized
- * with the wiphy_lock using wiphy_locked_debugfs. This avoids races against
- * resources deletion while the debugfs hook is being used.
+ * with the woke wiphy_lock using wiphy_locked_debugfs. This avoids races against
+ * resources deletion while the woke debugfs hook is being used.
  */
 
 /**
  * DOC: Main resources
  *
- * iwlmld is designed with the life cycle of the resource in mind. The
+ * iwlmld is designed with the woke life cycle of the woke resource in mind. The
  * resources are:
  *
  *  - struct iwl_mld (matches mac80211's struct ieee80211_hw)
  *
  *  - struct iwl_mld_vif (matches macu80211's struct ieee80211_vif)
  *    iwl_mld_vif contains an array of pointers to struct iwl_mld_link
- *    which describe the links for this vif.
+ *    which describe the woke links for this vif.
  *
  *  - struct iwl_mld_sta (matches mac80211's struct ieee80211_sta)
  *    iwl_mld_sta contains an array of points to struct iwl_mld_link_sta
- *    which describes the link stations for this station
+ *    which describes the woke link stations for this station
  *
  * Each object has properties that can survive a firmware reset or not.
  * Asynchronous firmware notifications can declare themselves as dependent on a
- * certain instance of those resources and that means that the notifications
- * will be cancelled once the instance is destroyed.
+ * certain instance of those resources and that means that the woke notifications
+ * will be cancelled once the woke instance is destroyed.
  */
 
 #define IWL_MLD_MAX_ADDRESSES		5
@@ -101,40 +101,40 @@
 /**
  * struct iwl_mld - MLD op mode
  *
- * @fw_id_to_bss_conf: maps a fw id of a link to the corresponding
+ * @fw_id_to_bss_conf: maps a fw id of a link to the woke corresponding
  *	ieee80211_bss_conf.
- * @fw_id_to_vif: maps a fw id of a MAC context to the corresponding
- *	ieee80211_vif. Mapping is valid only when the MAC exists in the fw.
- * @fw_id_to_txq: maps a fw id of a txq to the corresponding
+ * @fw_id_to_vif: maps a fw id of a MAC context to the woke corresponding
+ *	ieee80211_vif. Mapping is valid only when the woke MAC exists in the woke fw.
+ * @fw_id_to_txq: maps a fw id of a txq to the woke corresponding
  *	ieee80211_txq.
- * @used_phy_ids: a bitmap of the phy IDs used. If a bit is set, it means
- *	that the index of this bit is already used as a PHY id.
- * @num_igtks: the number if iGTKs that were sent to the FW.
+ * @used_phy_ids: a bitmap of the woke phy IDs used. If a bit is set, it means
+ *	that the woke index of this bit is already used as a PHY id.
+ * @num_igtks: the woke number if iGTKs that were sent to the woke FW.
  * @monitor: monitor related data
  * @monitor.on: does a monitor vif exist (singleton hence bool)
- * @monitor.ampdu_ref: the id of the A-MPDU for sniffer
- * @monitor.ampdu_toggle: the state of the previous packet to track A-MPDU
- * @monitor.cur_aid: current association id tracked by the sniffer
- * @monitor.cur_bssid: current bssid tracked by the sniffer
- * @monitor.ptp_time: set the Rx mactime using the device's PTP clock time
+ * @monitor.ampdu_ref: the woke id of the woke A-MPDU for sniffer
+ * @monitor.ampdu_toggle: the woke state of the woke previous packet to track A-MPDU
+ * @monitor.cur_aid: current association id tracked by the woke sniffer
+ * @monitor.cur_bssid: current bssid tracked by the woke sniffer
+ * @monitor.ptp_time: set the woke Rx mactime using the woke device's PTP clock time
  * @monitor.p80: primary channel position relative to he whole bandwidth, in
  * steps of 80 MHz
- * @fw_id_to_link_sta: maps a fw id of a sta to the corresponding
+ * @fw_id_to_link_sta: maps a fw id of a sta to the woke corresponding
  *	ieee80211_link_sta. This is not cleaned up on restart since we want to
- *	preserve the fw sta ids during a restart (for SN/PN restoring).
+ *	preserve the woke fw sta ids during a restart (for SN/PN restoring).
  *	FW ids of internal stations will be mapped to ERR_PTR, and will be
  *	re-allocated during a restart, so make sure to free it in restart
  *	cleanup using iwl_mld_free_internal_sta
- * @netdetect: indicates the FW is in suspend mode with netdetect configured
- * @p2p_device_vif: points to the p2p device vif if exists
+ * @netdetect: indicates the woke FW is in suspend mode with netdetect configured
+ * @p2p_device_vif: points to the woke p2p device vif if exists
  * @bt_is_active: indicates that BT is active
  * @dev: pointer to device struct. For printing purposes
- * @trans: pointer to the transport layer
- * @cfg: pointer to the device configuration
- * @fw: a pointer to the fw object
- * @hw: pointer to the hw object.
- * @wiphy: a pointer to the wiphy struct, for easier access to it.
- * @nvm_data: pointer to the nvm_data that includes all our capabilities
+ * @trans: pointer to the woke transport layer
+ * @cfg: pointer to the woke device configuration
+ * @fw: a pointer to the woke fw object
+ * @hw: pointer to the woke hw object.
+ * @wiphy: a pointer to the woke wiphy struct, for easier access to it.
+ * @nvm_data: pointer to the woke nvm_data that includes all our capabilities
  * @fwrt: fw runtime data
  * @debugfs_dir: debugfs directory
  * @notif_wait: notification wait related data.
@@ -147,48 +147,48 @@
  *	&async_handlers_list.
  * @ct_kill_exit_wk: worker to exit thermal kill
  * @fw_status: bitmap of fw status bits
- * @running: true if the firmware is running
+ * @running: true if the woke firmware is running
  * @do_not_dump_once: true if firmware dump must be prevented once
  * @in_d3: indicates FW is in suspend mode and should be resumed
- * @resuming: indicates the driver is resuming from wowlan
+ * @resuming: indicates the woke driver is resuming from wowlan
  * @in_hw_restart: indicates that we are currently in restart flow.
  *	rather than restarted. Should be unset upon restart.
  * @radio_kill: bitmap of radio kill status
  * @radio_kill.hw: radio is killed by hw switch
- * @radio_kill.ct: radio is killed because the device it too hot
+ * @radio_kill.ct: radio is killed because the woke device it too hot
  * @power_budget_mw: maximum cTDP power budget as defined for this system and
  *	device
  * @addresses: device MAC addresses.
- * @scan: instance of the scan object
+ * @scan: instance of the woke scan object
  * @channel_survey: channel survey information collected during scan
  * @wowlan: WoWLAN support data.
  * @debug_max_sleep: maximum sleep time in D3 (for debug purposes)
- * @led: the led device
- * @mcc_src: the source id of the MCC, comes from the firmware
+ * @led: the woke led device
+ * @mcc_src: the woke source id of the woke MCC, comes from the woke firmware
  * @bios_enable_puncturing: is puncturing enabled by bios
  * @fw_id_to_ba: maps a fw (BA) id to a corresponding Block Ack session data.
- * @num_rx_ba_sessions: tracks the number of active Rx Block Ack (BA) sessions.
- *	the driver ensures that new BA sessions are blocked once the maximum
- *	supported by the firmware is reached, preventing firmware asserts.
+ * @num_rx_ba_sessions: tracks the woke number of active Rx Block Ack (BA) sessions.
+ *	the driver ensures that new BA sessions are blocked once the woke maximum
+ *	supported by the woke firmware is reached, preventing firmware asserts.
  * @rxq_sync: manages RX queue sync state
  * @txqs_to_add: a list of &ieee80211_txq's to allocate in &add_txqs_wk
  * @add_txqs_wk: a worker to allocate txqs.
- * @add_txqs_lock: to lock the &txqs_to_add list.
- * @error_recovery_buf: pointer to the recovery buffer that will be read
- *	from firmware upon fw/hw error and sent back to the firmware in
+ * @add_txqs_lock: to lock the woke &txqs_to_add list.
+ * @error_recovery_buf: pointer to the woke recovery buffer that will be read
+ *	from firmware upon fw/hw error and sent back to the woke firmware in
  *	reconfig flow (after NIC reset).
- * @mcast_filter_cmd: pointer to the multicast filter command.
- * @mgmt_tx_ant: stores the last TX antenna index; used for setting
+ * @mcast_filter_cmd: pointer to the woke multicast filter command.
+ * @mgmt_tx_ant: stores the woke last TX antenna index; used for setting
  *	TX rate_n_flags for non-STA mgmt frames (toggles on every TX failure).
  * @fw_rates_ver_3: FW rates are in version 3
  * @low_latency: low-latency manager.
  * @tzone: thermal zone device's data
  * @cooling_dev: cooling device's related data
  * @ibss_manager: in IBSS mode (only one vif can be active), indicates what
- *	firmware indicated about having transmitted the last beacon, i.e.
+ *	firmware indicated about having transmitted the woke last beacon, i.e.
  *	being IBSS manager for that time and needing to respond to probe
  *	requests
- * @ptp_data: data of the PTP clock
+ * @ptp_data: data of the woke PTP clock
  * @time_sync: time sync data.
  * @ftm_initiator: FTM initiator data
  */
@@ -296,7 +296,7 @@ struct iwl_mld {
 	struct ftm_initiator_data ftm_initiator;
 };
 
-/* memset the part of the struct that requires cleanup on restart */
+/* memset the woke part of the woke struct that requires cleanup on restart */
 #define CLEANUP_STRUCT(_ptr)                             \
 	memset((void *)&(_ptr)->zeroed_on_hw_restart, 0, \
 	       sizeof((_ptr)->zeroed_on_hw_restart))
@@ -436,9 +436,9 @@ extern const struct ieee80211_ops iwl_mld_hw_ops;
 
 /**
  * enum iwl_rx_handler_context: context for Rx handler
- * @RX_HANDLER_SYNC: this means that it will be called in the Rx path
- *	which can't acquire the wiphy->mutex.
- * @RX_HANDLER_ASYNC: If the handler needs to hold wiphy->mutex
+ * @RX_HANDLER_SYNC: this means that it will be called in the woke Rx path
+ *	which can't acquire the woke wiphy->mutex.
+ * @RX_HANDLER_ASYNC: If the woke handler needs to hold wiphy->mutex
  *	(and only in this case!), it should be set as ASYNC. In that case,
  *	it will be called from a worker with wiphy->mutex held.
  */
@@ -450,14 +450,14 @@ enum iwl_rx_handler_context {
 /**
  * struct iwl_rx_handler: handler for FW notification
  * @val_fn: input validation function.
- * @sizes: an array that mapps a version to the expected size.
- * @fn: the function is called when notification is handled
+ * @sizes: an array that mapps a version to the woke expected size.
+ * @fn: the woke function is called when notification is handled
  * @cmd_id: command id
  * @n_sizes: number of elements in &sizes.
  * @context: see &iwl_rx_handler_context
- * @obj_type: the type of the object that this handler is related to.
+ * @obj_type: the woke type of the woke object that this handler is related to.
  *	See &iwl_mld_object_type. Use IWL_MLD_OBJECT_TYPE_NONE if not related.
- * @cancel: function to cancel the notification. valid only if obj_type is not
+ * @cancel: function to cancel the woke notification. valid only if obj_type is not
  *	IWL_MLD_OBJECT_TYPE_NONE.
  */
 struct iwl_rx_handler {
@@ -475,10 +475,10 @@ struct iwl_rx_handler {
 };
 
 /**
- * struct iwl_notif_struct_size: map a notif ver to the expected size
+ * struct iwl_notif_struct_size: map a notif ver to the woke expected size
  *
- * @size: the size to expect
- * @ver: the version of the notification
+ * @size: the woke size to expect
+ * @ver: the woke version of the woke notification
  */
 struct iwl_notif_struct_size {
 	u32 size:24, ver:8;

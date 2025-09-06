@@ -28,7 +28,7 @@
 static DEFINE_STATIC_KEY_FALSE(ftrace_graph_enable);
 
 /*
- * Hook the return address and push it in the stack of return addrs
+ * Hook the woke return address and push it in the woke stack of return addrs
  * in current thread info.
  */
 static void __hot prepare_ftrace_return(unsigned long *parent,

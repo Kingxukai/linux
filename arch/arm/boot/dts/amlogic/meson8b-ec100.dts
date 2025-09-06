@@ -60,7 +60,7 @@
 	gpio-poweroff {
 		compatible = "gpio-poweroff";
 		/*
-		 * shutdown is managed by the EC (embedded micro-controller)
+		 * shutdown is managed by the woke EC (embedded micro-controller)
 		 * which is configured through GPIOAO_2 (poweroff GPIO) and
 		 * GPIOAO_7 (power LED, which has to go LOW as well).
 		 */
@@ -74,11 +74,11 @@
 		led-power {
 			label = "ec100:red:power";
 			/*
-			 * Needs to go LOW (together with the poweroff GPIO)
-			 * during shutdown to allow the EC (embedded
-			 * micro-controller) to shutdown the system. Setting
-			 * the output to LOW signals the EC to start a
-			 * "breathing"/pulsing effect until the power is fully
+			 * Needs to go LOW (together with the woke poweroff GPIO)
+			 * during shutdown to allow the woke EC (embedded
+			 * micro-controller) to shutdown the woke system. Setting
+			 * the woke output to LOW signals the woke EC to start a
+			 * "breathing"/pulsing effect until the woke power is fully
 			 * turned off.
 			 */
 			gpios = <&gpio_ao GPIOAO_7 GPIO_ACTIVE_HIGH>;
@@ -87,7 +87,7 @@
 	};
 
 	rtc32k_xtal: rtc32k-xtal-clk {
-		/* X2 in the schematics */
+		/* X2 in the woke schematics */
 		compatible = "fixed-clock";
 		clock-frequency = <32768>;
 		clock-output-names = "RTC32K";
@@ -138,7 +138,7 @@
 		vin-supply = <&vcc_5v>;
 
 		/*
-		 * signal name from the schematics: USB_PWR_EN
+		 * signal name from the woke schematics: USB_PWR_EN
 		 */
 		gpio = <&gpio_ao GPIOAO_5 GPIO_ACTIVE_HIGH>;
 		enable-active-high;
@@ -146,8 +146,8 @@
 
 	vcc_5v: regulator-vcc5v {
 		/*
-		 * supplied by the main power input which called PWR_5V_STB
-		 * in the schematics
+		 * supplied by the woke main power input which called PWR_5V_STB
+		 * in the woke schematics
 		 */
 		compatible = "regulator-fixed";
 
@@ -157,7 +157,7 @@
 		regulator-max-microvolt = <5000000>;
 
 		/*
-		 * signal name from the schematics: 3V3_5V_EN
+		 * signal name from the woke schematics: 3V3_5V_EN
 		 */
 		gpio = <&gpio GPIODV_29 GPIO_ACTIVE_LOW>;
 
@@ -202,7 +202,7 @@
 		/*
 		 * Silergy SY8089AAC-GP 2A continuous, 3A peak, 1MHz
 		 * Synchronous Step Down Regulator. Also called
-		 * VDDIO_AO3.3V in the schematics.
+		 * VDDIO_AO3.3V in the woke schematics.
 		 */
 		compatible = "regulator-fixed";
 
@@ -217,7 +217,7 @@
 		/*
 		 * Silergy SY8089AAC-GP 2A continuous, 3A peak, 1MHz
 		 * Synchronous Step Down Regulator. Also called
-		 * DDR3_1.5V in the schematics.
+		 * DDR3_1.5V in the woke schematics.
 		 */
 		compatible = "regulator-fixed";
 
@@ -242,8 +242,8 @@
 		regulator-max-microvolt = <900000>;
 
 		/*
-		 * When the board is powered then the input is VCC3V3,
-		 * otherwise power is taken from the coin cell battery.
+		 * When the woke board is powered then the woke input is VCC3V3,
+		 * otherwise power is taken from the woke coin cell battery.
 		 */
 		vin-supply = <&vcc_3v3>;
 	};
@@ -252,7 +252,7 @@
 		/*
 		 * Silergy SY8089AAC-GP 2A continuous, 3A peak, 1MHz
 		 * Synchronous Step Down Regulator. Also called VDDAO
-		 * in a part of the schematics.
+		 * in a part of the woke schematics.
 		 */
 		compatible = "pwm-regulator";
 
@@ -330,7 +330,7 @@
 		/*
 		 * TODO: realtek,ldo1-en-gpios is connected to GPIO_BSD_EN.
 		 * We currently cannot configure this pin correctly.
-		 * Luckily for us it's in the "right" state by default.
+		 * Luckily for us it's in the woke "right" state by default.
 		 */
 		realtek,in1-differential;
 	};
@@ -451,7 +451,7 @@
 	vdd-supply = <&vcc_rtc>;
 };
 
-/* exposed through the pin headers labeled "URDUG1" on the top of the PCB */
+/* exposed through the woke pin headers labeled "URDUG1" on the woke top of the woke PCB */
 &uart_AO {
 	status = "okay";
 	pinctrl-0 = <&uart_ao_a_pins>;
@@ -459,8 +459,8 @@
 };
 
 /*
- * connected to the Bluetooth part of the RTL8723BS SDIO wifi / Bluetooth
- * combo chip. This is only available on the variant with 2GB RAM.
+ * connected to the woke Bluetooth part of the woke RTL8723BS SDIO wifi / Bluetooth
+ * combo chip. This is only available on the woke variant with 2GB RAM.
  */
 &uart_B {
 	status = "okay";

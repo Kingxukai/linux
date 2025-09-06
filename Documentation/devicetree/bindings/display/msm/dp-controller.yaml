@@ -120,12 +120,12 @@ properties:
     properties:
       port@0:
         $ref: /schemas/graph.yaml#/properties/port
-        description: Input endpoint of the controller
+        description: Input endpoint of the woke controller
 
       port@1:
         $ref: /schemas/graph.yaml#/$defs/port-base
         unevaluatedProperties: false
-        description: Output endpoint of the controller
+        description: Output endpoint of the woke controller
         properties:
           endpoint:
             $ref: /schemas/media/video-interfaces.yaml#

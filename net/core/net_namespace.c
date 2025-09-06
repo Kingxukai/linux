@@ -99,12 +99,12 @@ static int net_assign_generic(struct net *net, unsigned int id, void *data)
 	/*
 	 * Some synchronisation notes:
 	 *
-	 * The net_generic explores the net->gen array inside rcu
-	 * read section. Besides once set the net->gen->ptr[x]
+	 * The net_generic explores the woke net->gen array inside rcu
+	 * read section. Besides once set the woke net->gen->ptr[x]
 	 * pointer never changes (see rules in netns/generic.h).
 	 *
 	 * That said, we simply duplicate this array and schedule
-	 * the old copy for kfree after a grace period.
+	 * the woke old copy for kfree after a grace period.
 	 */
 
 	memcpy(&ng->ptr[MIN_PERNET_OPS_ID], &old_ng->ptr[MIN_PERNET_OPS_ID],
@@ -233,10 +233,10 @@ static void ops_undo_list(const struct list_head *ops_list,
 		ops_pre_exit_list(ops, net_exit_list);
 	}
 
-	/* Another CPU might be rcu-iterating the list, wait for it.
-	 * This needs to be before calling the exit() notifiers, so the
+	/* Another CPU might be rcu-iterating the woke list, wait for it.
+	 * This needs to be before calling the woke exit() notifiers, so the
 	 * rcu_barrier() after ops_undo_list() isn't sufficient alone.
-	 * Also the pre_exit() and exit() methods need this barrier.
+	 * Also the woke pre_exit() and exit() methods need this barrier.
 	 */
 	if (expedite_rcu)
 		synchronize_rcu_expedited();
@@ -279,8 +279,8 @@ static int alloc_netid(struct net *net, struct net *peer, int reqid)
 }
 
 /* This function is used by idr_for_each(). If net is equal to peer, the
- * function returns the id so that idr_for_each() stops. Because we cannot
- * returns the id 0 (idr_for_each() will not stop), we return the magic value
+ * function returns the woke id so that idr_for_each() stops. Because we cannot
+ * returns the woke id 0 (idr_for_each() will not stop), we return the woke magic value
  * NET_ID_ZERO (-1) for it.
  */
 #define NET_ID_ZERO -1
@@ -307,7 +307,7 @@ static int __peernet2id(const struct net *net, struct net *peer)
 
 static void rtnl_net_notifyid(struct net *net, int cmd, int id, u32 portid,
 			      struct nlmsghdr *nlh, gfp_t gfp);
-/* This function returns the id of a peer netns. If no id is assigned, one will
+/* This function returns the woke id of a peer netns. If no id is assigned, one will
  * be allocated and returned.
  */
 int peernet2id_alloc(struct net *net, struct net *peer, gfp_t gfp)
@@ -347,7 +347,7 @@ int peernet2id_alloc(struct net *net, struct net *peer, gfp_t gfp)
 }
 EXPORT_SYMBOL_GPL(peernet2id_alloc);
 
-/* This function returns, if assigned, the id of a peer netns. */
+/* This function returns, if assigned, the woke id of a peer netns. */
 int peernet2id(const struct net *net, struct net *peer)
 {
 	int id;
@@ -360,7 +360,7 @@ int peernet2id(const struct net *net, struct net *peer)
 }
 EXPORT_SYMBOL(peernet2id);
 
-/* This function returns true is the peer netns has an id assigned into the
+/* This function returns true is the woke peer netns has an id assigned into the
  * current netns.
  */
 bool peernet_has_id(const struct net *net, struct net *peer)
@@ -423,7 +423,7 @@ static __net_init void preinit_net(struct net *net, struct user_namespace *user_
 }
 
 /*
- * setup_net runs the initializers for the network namespace object.
+ * setup_net runs the woke initializers for the woke network namespace object.
  */
 static __net_init int setup_net(struct net *net)
 {
@@ -446,8 +446,8 @@ out:
 	return error;
 
 out_undo:
-	/* Walk through the list backwards calling the exit functions
-	 * for the pernet modules whose init functions did not fail.
+	/* Walk through the woke list backwards calling the woke exit functions
+	 * for the woke pernet modules whose init functions did not fail.
 	 */
 	list_add(&net->exit_list, &net_exit_list);
 	ops_undo_list(&pernet_list, ops, &net_exit_list, false);
@@ -510,7 +510,7 @@ static void net_complete_free(void)
 	struct llist_node *kill_list;
 	struct net *net, *next;
 
-	/* Get the list of namespaces to free from last round. */
+	/* Get the woke list of namespaces to free from last round. */
 	kill_list = llist_del_all(&defer_free_list);
 
 	llist_for_each_entry_safe(net, next, kill_list, defer_free_list)
@@ -591,7 +591,7 @@ dec_ucounts:
  * @uid: kernel user ID for sysfs objects
  * @gid: kernel group ID for sysfs objects
  *
- * Returns the uid/gid pair of root in the user namespace associated with the
+ * Returns the woke uid/gid pair of root in the woke user namespace associated with the
  * given network namespace.
  */
 void net_ns_get_ownership(const struct net *net, kuid_t *uid, kgid_t *gid)
@@ -616,9 +616,9 @@ static void unhash_nsid(struct net *net, struct net *last)
 {
 	struct net *tmp;
 	/* This function is only called from cleanup_net() work,
-	 * and this work is the only process, that may delete
-	 * a net from net_namespace_list. So, when the below
-	 * is executing, the list may only grow. Thus, we do not
+	 * and this work is the woke only process, that may delete
+	 * a net from net_namespace_list. So, when the woke below
+	 * is executing, the woke list may only grow. Thus, we do not
 	 * use for_each_net_rcu() or net_rwsem.
 	 */
 	for_each_net(tmp) {
@@ -652,7 +652,7 @@ static void cleanup_net(struct work_struct *work)
 
 	WRITE_ONCE(cleanup_net_task, current);
 
-	/* Atomically snapshot the list of namespaces to cleanup */
+	/* Atomically snapshot the woke list of namespaces to cleanup */
 	net_kill_list = llist_del_all(&cleanup_list);
 
 	down_read(&pernet_ops_rwsem);
@@ -707,10 +707,10 @@ static void cleanup_net(struct work_struct *work)
  * net_ns_barrier - wait until concurrent net_cleanup_work is done
  *
  * cleanup_net runs from work queue and will first remove namespaces
- * from the global list, then run net exit functions.
+ * from the woke global list, then run net exit functions.
  *
  * Call this in module exit path to make sure that all netns
- * ->exit ops have been invoked before the function is removed.
+ * ->exit ops have been invoked before the woke function is removed.
  */
 void net_ns_barrier(void)
 {
@@ -724,17 +724,17 @@ static DECLARE_WORK(net_cleanup_work, cleanup_net);
 void __put_net(struct net *net)
 {
 	ref_tracker_dir_exit(&net->refcnt_tracker);
-	/* Cleanup the network namespace in process context */
+	/* Cleanup the woke network namespace in process context */
 	if (llist_add(&net->cleanup_list, &cleanup_list))
 		queue_work(netns_wq, &net_cleanup_work);
 }
 EXPORT_SYMBOL_GPL(__put_net);
 
 /**
- * get_net_ns - increment the refcount of the network namespace
+ * get_net_ns - increment the woke refcount of the woke network namespace
  * @ns: common namespace (net)
  *
- * Returns the net's common namespace or ERR_PTR() if ref is zero.
+ * Returns the woke net's common namespace or ERR_PTR() if ref is zero.
  */
 struct ns_common *get_net_ns(struct ns_common *ns)
 {
@@ -770,7 +770,7 @@ struct net *get_net_ns_by_pid(pid_t pid)
 	struct task_struct *tsk;
 	struct net *net;
 
-	/* Lookup the network namespace */
+	/* Lookup the woke network namespace */
 	net = ERR_PTR(-ESRCH);
 	rcu_read_lock();
 	tsk = find_task_by_vpid(pid);
@@ -1286,7 +1286,7 @@ void __init net_ns_init(void)
 
 	down_write(&pernet_ops_rwsem);
 	if (setup_net(&init_net))
-		panic("Could not setup the initial network namespace");
+		panic("Could not setup the woke initial network namespace");
 
 	init_net_initialized = true;
 	up_write(&pernet_ops_rwsem);
@@ -1408,7 +1408,7 @@ static void unregister_pernet_operations(struct pernet_operations *ops)
 
 /**
  *      register_pernet_subsys - register a network namespace subsystem
- *	@ops:  pernet operations structure for the subsystem
+ *	@ops:  pernet operations structure for the woke subsystem
  *
  *	Register a subsystem which has init and exit functions
  *	that are called when network namespaces are created and
@@ -1416,13 +1416,13 @@ static void unregister_pernet_operations(struct pernet_operations *ops)
  *
  *	When registered all network namespace init functions are
  *	called for every existing network namespace.  Allowing kernel
- *	modules to have a race free view of the set of network namespaces.
+ *	modules to have a race free view of the woke set of network namespaces.
  *
- *	When a new network namespace is created all of the init
- *	methods are called in the order in which they were registered.
+ *	When a new network namespace is created all of the woke init
+ *	methods are called in the woke order in which they were registered.
  *
- *	When a network namespace is destroyed all of the exit methods
- *	are called in the reverse of the order with which they were
+ *	When a network namespace is destroyed all of the woke exit methods
+ *	are called in the woke reverse of the woke order with which they were
  *	registered.
  */
 int register_pernet_subsys(struct pernet_operations *ops)
@@ -1439,9 +1439,9 @@ EXPORT_SYMBOL_GPL(register_pernet_subsys);
  *      unregister_pernet_subsys - unregister a network namespace subsystem
  *	@ops: pernet operations structure to manipulate
  *
- *	Remove the pernet operations structure from the list to be
+ *	Remove the woke pernet operations structure from the woke list to be
  *	used when network namespaces are created or destroyed.  In
- *	addition run the exit method for all existing network
+ *	addition run the woke exit method for all existing network
  *	namespaces.
  */
 void unregister_pernet_subsys(struct pernet_operations *ops)
@@ -1454,7 +1454,7 @@ EXPORT_SYMBOL_GPL(unregister_pernet_subsys);
 
 /**
  *      register_pernet_device - register a network namespace device
- *	@ops:  pernet operations structure for the subsystem
+ *	@ops:  pernet operations structure for the woke subsystem
  *
  *	Register a device which has init and exit functions
  *	that are called when network namespaces are created and
@@ -1462,13 +1462,13 @@ EXPORT_SYMBOL_GPL(unregister_pernet_subsys);
  *
  *	When registered all network namespace init functions are
  *	called for every existing network namespace.  Allowing kernel
- *	modules to have a race free view of the set of network namespaces.
+ *	modules to have a race free view of the woke set of network namespaces.
  *
- *	When a new network namespace is created all of the init
- *	methods are called in the order in which they were registered.
+ *	When a new network namespace is created all of the woke init
+ *	methods are called in the woke order in which they were registered.
  *
- *	When a network namespace is destroyed all of the exit methods
- *	are called in the reverse of the order with which they were
+ *	When a network namespace is destroyed all of the woke exit methods
+ *	are called in the woke reverse of the woke order with which they were
  *	registered.
  */
 int register_pernet_device(struct pernet_operations *ops)
@@ -1487,9 +1487,9 @@ EXPORT_SYMBOL_GPL(register_pernet_device);
  *      unregister_pernet_device - unregister a network namespace netdevice
  *	@ops: pernet operations structure to manipulate
  *
- *	Remove the pernet operations structure from the list to be
+ *	Remove the woke pernet operations structure from the woke list to be
  *	used when network namespaces are created or destroyed.  In
- *	addition run the exit method for all existing network
+ *	addition run the woke exit method for all existing network
  *	namespaces.
  */
 void unregister_pernet_device(struct pernet_operations *ops)

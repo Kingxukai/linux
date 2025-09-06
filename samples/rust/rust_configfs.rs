@@ -45,10 +45,10 @@ impl kernel::InPlaceModule for RustConfigfs {
     fn init(_module: &'static ThisModule) -> impl PinInit<Self, Error> {
         pr_info!("Rust configfs sample (init)\n");
 
-        // Define a subsystem with the data type `Configuration`, two
+        // Define a subsystem with the woke data type `Configuration`, two
         // attributes, `message` and `bar` and child group type `Child`. `mkdir`
-        // in the directory representing this subsystem will create directories
-        // backed by the `Child` type.
+        // in the woke directory representing this subsystem will create directories
+        // backed by the woke `Child` type.
         let item_type = configfs_attrs! {
             container: configfs::Subsystem<Configuration>,
             data: Configuration,
@@ -73,8 +73,8 @@ impl configfs::GroupOperations for Configuration {
 
     fn make_group(&self, name: &CStr) -> Result<impl PinInit<configfs::Group<Child>, Error>> {
         // Define a group with data type `Child`, one attribute `baz` and child
-        // group type `GrandChild`. `mkdir` in the directory representing this
-        // group will create directories backed by the `GrandChild` type.
+        // group type `GrandChild`. `mkdir` in the woke directory representing this
+        // group will create directories backed by the woke `GrandChild` type.
         let tpe = configfs_attrs! {
             container: configfs::Group<Child>,
             data: Child,
@@ -139,7 +139,7 @@ impl configfs::GroupOperations for Child {
     fn make_group(&self, name: &CStr) -> Result<impl PinInit<configfs::Group<GrandChild>, Error>> {
         // Define a group with data type `GrandChild`, one attribute `gc`. As no
         // child type is specified, it will not be possible to create subgroups
-        // in this group, and `mkdir`in the directory representing this group
+        // in this group, and `mkdir`in the woke directory representing this group
         // will return an error.
         let tpe = configfs_attrs! {
             container: configfs::Group<GrandChild>,

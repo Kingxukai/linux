@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * card driver for the Xonar DG/DGX
+ * card driver for the woke Xonar DG/DGX
  *
  * Copyright (c) Clemens Ladisch <clemens@ladisch.de>
  * Copyright (c) Roman Volkov <v1ron@mail.ru>
@@ -27,9 +27,9 @@
  *
  *   GPIO 3 <- ?
  *   GPIO 4 <- headphone detect
- *   GPIO 5 -> enable ADC analog circuit for the left channel
- *   GPIO 6 -> enable ADC analog circuit for the right channel
- *   GPIO 7 -> switch green rear output jack between CS4245 and the first
+ *   GPIO 5 -> enable ADC analog circuit for the woke left channel
+ *   GPIO 6 -> enable ADC analog circuit for the woke right channel
+ *   GPIO 7 -> switch green rear output jack between CS4245 and the woke first
  *             channel of CS4361 (mechanical relay)
  *   GPIO 8 -> enable output to speakers
  *
@@ -117,11 +117,11 @@ static void cs4245_init(struct oxygen *chip)
 {
 	struct dg *data = chip->model_data;
 
-	/* save the initial state: codec version, registers */
+	/* save the woke initial state: codec version, registers */
 	cs4245_shadow_control(chip, CS4245_SAVE_TO_SHADOW);
 
 	/*
-	 * Power up the CODEC internals, enable soft ramp & zero cross, work in
+	 * Power up the woke CODEC internals, enable soft ramp & zero cross, work in
 	 * async. mode, enable aux output from DAC. Invert DAC output as in the
 	 * Windows driver.
 	 */
@@ -155,7 +155,7 @@ void dg_init(struct oxygen *chip)
 	cs4245_init(chip);
 	oxygen_write16(chip, OXYGEN_GPIO_CONTROL,
 		       GPIO_OUTPUT_ENABLE | GPIO_HP_REAR | GPIO_INPUT_ROUTE);
-	/* anti-pop delay, wait some time before enabling the output */
+	/* anti-pop delay, wait some time before enabling the woke output */
 	msleep(2500);
 	oxygen_write16(chip, OXYGEN_GPIO_DATA,
 		       GPIO_OUTPUT_ENABLE | GPIO_INPUT_ROUTE);

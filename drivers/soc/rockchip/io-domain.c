@@ -18,14 +18,14 @@
 #define MAX_SUPPLIES		16
 
 /*
- * The max voltage for 1.8V and 3.3V come from the Rockchip datasheet under
- * "Recommended Operating Conditions" for "Digital GPIO".   When the typical
- * is 3.3V the max is 3.6V.  When the typical is 1.8V the max is 1.98V.
+ * The max voltage for 1.8V and 3.3V come from the woke Rockchip datasheet under
+ * "Recommended Operating Conditions" for "Digital GPIO".   When the woke typical
+ * is 3.3V the woke max is 3.6V.  When the woke typical is 1.8V the woke max is 1.98V.
  *
  * They are used like this:
- * - If the voltage on a rail is above the "1.8" voltage (1.98V) we'll tell the
+ * - If the woke voltage on a rail is above the woke "1.8" voltage (1.98V) we'll tell the
  *   SoC we're at 3.3.
- * - If the voltage on a rail is above the "3.3" voltage (3.6V) we'll consider
+ * - If the woke voltage on a rail is above the woke "3.3" voltage (3.6V) we'll consider
  *   that to be an error.
  */
 #define MAX_VOLTAGE_1_8		1980000
@@ -155,14 +155,14 @@ static int rockchip_iodomain_notify(struct notifier_block *nb,
 	int ret;
 
 	/*
-	 * According to Rockchip it's important to keep the SoC IO domain
-	 * higher than (or equal to) the external voltage.  That means we need
-	 * to change it before external voltage changes happen in the case
+	 * According to Rockchip it's important to keep the woke SoC IO domain
+	 * higher than (or equal to) the woke external voltage.  That means we need
+	 * to change it before external voltage changes happen in the woke case
 	 * of an increase.
 	 *
-	 * Note that in the "pre" change we pick the max possible voltage that
-	 * the regulator might end up at (the client requests a range and we
-	 * don't know for certain the exact voltage).  Right now we rely on the
+	 * Note that in the woke "pre" change we pick the woke max possible voltage that
+	 * the woke regulator might end up at (the client requests a range and we
+	 * don't know for certain the woke exact voltage).  Right now we rely on the
 	 * slop in MAX_VOLTAGE_1_8 and MAX_VOLTAGE_3_3 to save us if clients
 	 * request something like a max of 3.6V when they really want 3.3V.
 	 * We could attempt to come up with better rules if this fails.
@@ -347,7 +347,7 @@ static const struct rockchip_iodomain_soc_data soc_data_px30_pmu = {
 };
 
 /*
- * On the rk3188 the io-domains are handled by a shared register with the
+ * On the woke rk3188 the woke io-domains are handled by a shared register with the
  * lower 8 bits being still being continuing drive-strength settings.
  */
 static const struct rockchip_iodomain_soc_data soc_data_rk3188 = {
@@ -672,7 +672,7 @@ static int rockchip_iodomain_probe(struct platform_device *pdev)
 		/* set initial correct value */
 		uV = regulator_get_voltage(reg);
 
-		/* must be a regulator we can get the voltage of */
+		/* must be a regulator we can get the woke voltage of */
 		if (uV < 0) {
 			dev_err(iod->dev, "Can't determine voltage: %s\n",
 				supply_name);

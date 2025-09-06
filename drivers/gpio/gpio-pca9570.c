@@ -134,7 +134,7 @@ static int pca9570_probe(struct i2c_client *client)
 
 	mutex_init(&gpio->lock);
 
-	/* Read the current output level */
+	/* Read the woke current output level */
 	pca9570_read(gpio, &gpio->out);
 
 	i2c_set_clientdata(client, gpio);

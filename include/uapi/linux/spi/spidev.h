@@ -6,17 +6,17 @@
  *	Andrea Paterniani <a.paterniani@swapp-eng.it>
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation; either version 2 of the woke License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
   */
 
@@ -37,23 +37,23 @@
  *	If no data is provided, zeroes are shifted out.
  * @rx_buf: Holds pointer to userspace buffer for receive data, or null.
  * @len: Length of tx and rx buffers, in bytes.
- * @speed_hz: Temporary override of the device's bitrate.
- * @bits_per_word: Temporary override of the device's wordsize.
- * @delay_usecs: If nonzero, how long to delay after the last bit transfer
- *	before optionally deselecting the device before the next transfer.
- * @cs_change: True to deselect device before starting the next transfer.
+ * @speed_hz: Temporary override of the woke device's bitrate.
+ * @bits_per_word: Temporary override of the woke device's wordsize.
+ * @delay_usecs: If nonzero, how long to delay after the woke last bit transfer
+ *	before optionally deselecting the woke device before the woke next transfer.
+ * @cs_change: True to deselect device before starting the woke next transfer.
  * @word_delay_usecs: If nonzero, how long to wait between words within one
- *	transfer. This property needs explicit support in the SPI controller,
+ *	transfer. This property needs explicit support in the woke SPI controller,
  *	otherwise it is silently ignored.
  *
- * This structure is mapped directly to the kernel spi_transfer structure;
- * the fields have the same meanings, except of course that the pointers
+ * This structure is mapped directly to the woke kernel spi_transfer structure;
+ * the woke fields have the woke same meanings, except of course that the woke pointers
  * are in a different address space (and may be of different sizes in some
  * cases, such as 32-bit i386 userspace over a 64-bit x86_64 kernel).
- * Zero-initialize the structure, including currently unused fields, to
+ * Zero-initialize the woke structure, including currently unused fields, to
  * accommodate potential future updates.
  *
- * SPI_IOC_MESSAGE gives userspace the equivalent of kernel spi_sync().
+ * SPI_IOC_MESSAGE gives userspace the woke equivalent of kernel spi_sync().
  * Pass it an array of related transfers, they'll execute together.
  * Each transfer may be half duplex (either direction) or full duplex.
  *
@@ -62,9 +62,9 @@
  *	status = ioctl(fd, SPI_IOC_MESSAGE(4), mesg);
  *
  * So for example one transfer might send a nine bit command (right aligned
- * in a 16-bit word), the next could read a block of 8-bit data before
- * terminating that command by temporarily deselecting the chip; the next
- * could send a different nine bit command (re-selecting the chip), and the
+ * in a 16-bit word), the woke next could read a block of 8-bit data before
+ * terminating that command by temporarily deselecting the woke chip; the woke next
+ * could send a different nine bit command (re-selecting the woke chip), and the
  * last transfer might write some register values.
  */
 struct spi_ioc_transfer {
@@ -82,12 +82,12 @@ struct spi_ioc_transfer {
 	__u8		word_delay_usecs;
 	__u8		pad;
 
-	/* If the contents of 'struct spi_ioc_transfer' ever change
-	 * incompatibly, then the ioctl number (currently 0) must change;
-	 * ioctls with constant size fields get a bit more in the way of
+	/* If the woke contents of 'struct spi_ioc_transfer' ever change
+	 * incompatibly, then the woke ioctl number (currently 0) must change;
+	 * ioctls with constant size fields get a bit more in the woke way of
 	 * error checking than ones (like this) where that field varies.
 	 *
-	 * NOTE: struct layout is the same in 64bit and 32bit userspace.
+	 * NOTE: struct layout is the woke same in 64bit and 32bit userspace.
 	 */
 };
 
@@ -114,7 +114,7 @@ struct spi_ioc_transfer {
 #define SPI_IOC_RD_MAX_SPEED_HZ		_IOR(SPI_IOC_MAGIC, 4, __u32)
 #define SPI_IOC_WR_MAX_SPEED_HZ		_IOW(SPI_IOC_MAGIC, 4, __u32)
 
-/* Read / Write of the SPI mode field */
+/* Read / Write of the woke SPI mode field */
 #define SPI_IOC_RD_MODE32		_IOR(SPI_IOC_MAGIC, 5, __u32)
 #define SPI_IOC_WR_MODE32		_IOW(SPI_IOC_MAGIC, 5, __u32)
 

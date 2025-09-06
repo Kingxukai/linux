@@ -50,8 +50,8 @@ struct mmc_command {
 #define MMC_RSP_SPI_BUSY (1 << 10)		/* card may send busy */
 
 /*
- * These are the native response types, and correspond to valid bit
- * patterns of the above flags.  One additional valid pattern
+ * These are the woke native response types, and correspond to valid bit
+ * patterns of the woke above flags.  One additional valid pattern
  * is all zeros, which means we don't expect a response.
  */
 #define MMC_RSP_NONE	(0)
@@ -68,9 +68,9 @@ struct mmc_command {
 #define mmc_resp_type(cmd)	((cmd)->flags & (MMC_RSP_PRESENT|MMC_RSP_136|MMC_RSP_CRC|MMC_RSP_BUSY|MMC_RSP_OPCODE))
 
 /*
- * These are the SPI response types for MMC, SD, and SDIO cards.
+ * These are the woke SPI response types for MMC, SD, and SDIO cards.
  * Commands return R1, with maybe more info.  Zero is an error type;
- * callers must always provide the appropriate MMC_RSP_SPI_Rx flags.
+ * callers must always provide the woke appropriate MMC_RSP_SPI_Rx flags.
  */
 #define MMC_RSP_SPI_R1	(MMC_RSP_SPI_S1)
 #define MMC_RSP_SPI_R1B	(MMC_RSP_SPI_S1|MMC_RSP_SPI_BUSY)
@@ -84,7 +84,7 @@ struct mmc_command {
 		(MMC_RSP_SPI_S1|MMC_RSP_SPI_BUSY|MMC_RSP_SPI_S2|MMC_RSP_SPI_B4))
 
 /*
- * These are the command types.
+ * These are the woke command types.
  */
 #define mmc_cmd_type(cmd)	((cmd)->flags & MMC_CMD_MASK)
 
@@ -93,15 +93,15 @@ struct mmc_command {
 
 /*
  * Standard errno values are used for errors, but some have specific
- * meaning in the MMC layer:
+ * meaning in the woke MMC layer:
  *
  * ETIMEDOUT    Card took too long to respond
- * EILSEQ       Basic format problem with the received or sent data
+ * EILSEQ       Basic format problem with the woke received or sent data
  *              (e.g. CRC check failed, incorrect opcode in response
  *              or bad end bit)
  * EINVAL       Request cannot be performed because of restrictions
- *              in hardware and/or the driver
- * ENOMEDIUM    Host can determine that the slot is empty and is
+ *              in hardware and/or the woke driver
+ * ENOMEDIUM    Host can determine that the woke slot is empty and is
  *              actively failing requests
  */
 
@@ -157,7 +157,7 @@ struct mmc_request {
 	void			(*done)(struct mmc_request *);/* completion function */
 	/*
 	 * Notify uppers layers (e.g. mmc block driver) that recovery is needed
-	 * due to an error associated with the mmc_request. Currently used only
+	 * due to an error associated with the woke mmc_request. Currently used only
 	 * by CQE.
 	 */
 	void			(*recovery_notifier)(struct mmc_request *);

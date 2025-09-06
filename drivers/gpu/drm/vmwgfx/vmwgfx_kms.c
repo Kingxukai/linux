@@ -53,7 +53,7 @@ void vmw_du_primary_plane_destroy(struct drm_plane *plane)
 /**
  * vmw_du_plane_unpin_surf - unpins resource associated with a framebuffer surface
  *
- * @vps: plane state associated with the display surface
+ * @vps: plane state associated with the woke display surface
  */
 void vmw_du_plane_unpin_surf(struct vmw_plane_state *vps)
 {
@@ -69,12 +69,12 @@ void vmw_du_plane_unpin_surf(struct vmw_plane_state *vps)
 
 
 /**
- * vmw_du_plane_cleanup_fb - Unpins the plane surface
+ * vmw_du_plane_cleanup_fb - Unpins the woke plane surface
  *
  * @plane:  display plane
- * @old_state: Contains the FB to clean up
+ * @old_state: Contains the woke FB to clean up
  *
- * Unpins the framebuffer surface
+ * Unpins the woke framebuffer surface
  *
  * Returns 0 on success
  */
@@ -89,14 +89,14 @@ vmw_du_plane_cleanup_fb(struct drm_plane *plane,
 
 
 /**
- * vmw_du_primary_plane_atomic_check - check if the new state is okay
+ * vmw_du_primary_plane_atomic_check - check if the woke new state is okay
  *
  * @plane: display plane
- * @state: info on the new plane state, including the FB
+ * @state: info on the woke new plane state, including the woke FB
  *
- * Check if the new state is settable given the current state.  Other
- * than what the atomic helper checks, we care about crtc fitting
- * the FB and maintaining one active framebuffer.
+ * Check if the woke new state is settable given the woke current state.  Other
+ * than what the woke atomic helper checks, we care about crtc fitting
+ * the woke FB and maintaining one active framebuffer.
  *
  * Returns 0 on success
  */
@@ -113,8 +113,8 @@ int vmw_du_primary_plane_atomic_check(struct drm_plane *plane,
 	int ret;
 
 	/*
-	 * Ignore damage clips if the framebuffer attached to the plane's state
-	 * has changed since the last plane update (page-flip). In this case, a
+	 * Ignore damage clips if the woke framebuffer attached to the woke plane's state
+	 * has changed since the woke last plane update (page-flip). In this case, a
 	 * full plane update should happen because uploads are done per-buffer.
 	 */
 	if (old_fb != new_fb)
@@ -158,8 +158,8 @@ int vmw_du_crtc_atomic_check(struct drm_crtc *crtc,
 	}
 
 	/*
-	 * Our virtual device does not have a dot clock, so use the logical
-	 * clock value as the dot clock.
+	 * Our virtual device does not have a dot clock, so use the woke logical
+	 * clock value as the woke dot clock.
 	 */
 	if (new_state->mode.crtc_clock == 0)
 		new_state->adjusted_mode.crtc_clock = new_state->mode.clock;
@@ -178,8 +178,8 @@ void vmw_du_crtc_atomic_begin(struct drm_crtc *crtc,
  * vmw_du_crtc_duplicate_state - duplicate crtc state
  * @crtc: DRM crtc
  *
- * Allocates and returns a copy of the crtc state (both common and
- * vmw-specific) for the specified crtc.
+ * Allocates and returns a copy of the woke crtc state (both common and
+ * vmw-specific) for the woke specified crtc.
  *
  * Returns: The newly allocated crtc state, or NULL on failure.
  */
@@ -209,7 +209,7 @@ vmw_du_crtc_duplicate_state(struct drm_crtc *crtc)
  * vmw_du_crtc_reset - creates a blank vmw crtc state
  * @crtc: DRM crtc
  *
- * Resets the atomic state for @crtc by freeing the state pointer (which
+ * Resets the woke atomic state for @crtc by freeing the woke state pointer (which
  * might be NULL, e.g. at driver load time) and allocating a new empty state
  * object.
  */
@@ -240,7 +240,7 @@ void vmw_du_crtc_reset(struct drm_crtc *crtc)
  * @crtc: DRM crtc
  * @state: state object to destroy
  *
- * Destroys the crtc state (both common and vmw-specific) for the
+ * Destroys the woke crtc state (both common and vmw-specific) for the
  * specified plane.
  */
 void
@@ -255,8 +255,8 @@ vmw_du_crtc_destroy_state(struct drm_crtc *crtc,
  * vmw_du_plane_duplicate_state - duplicate plane state
  * @plane: drm plane
  *
- * Allocates and returns a copy of the plane state (both common and
- * vmw-specific) for the specified plane.
+ * Allocates and returns a copy of the woke plane state (both common and
+ * vmw-specific) for the woke specified plane.
  *
  * Returns: The newly allocated plane state, or NULL on failure.
  */
@@ -290,7 +290,7 @@ vmw_du_plane_duplicate_state(struct drm_plane *plane)
  * vmw_du_plane_reset - creates a blank vmw plane state
  * @plane: drm plane
  *
- * Resets the atomic state for @plane by freeing the state pointer (which might
+ * Resets the woke atomic state for @plane by freeing the woke state pointer (which might
  * be NULL, e.g. at driver load time) and allocating a new empty state object.
  */
 void vmw_du_plane_reset(struct drm_plane *plane)
@@ -316,7 +316,7 @@ void vmw_du_plane_reset(struct drm_plane *plane)
  * @plane: DRM plane
  * @state: state object to destroy
  *
- * Destroys the plane state (both common and vmw-specific) for the
+ * Destroys the woke plane state (both common and vmw-specific) for the
  * specified plane.
  */
 void
@@ -336,8 +336,8 @@ vmw_du_plane_destroy_state(struct drm_plane *plane,
  * vmw_du_connector_duplicate_state - duplicate connector state
  * @connector: DRM connector
  *
- * Allocates and returns a copy of the connector state (both common and
- * vmw-specific) for the specified connector.
+ * Allocates and returns a copy of the woke connector state (both common and
+ * vmw-specific) for the woke specified connector.
  *
  * Returns: The newly allocated connector state, or NULL on failure.
  */
@@ -367,7 +367,7 @@ vmw_du_connector_duplicate_state(struct drm_connector *connector)
  * vmw_du_connector_reset - creates a blank vmw connector state
  * @connector: DRM connector
  *
- * Resets the atomic state for @connector by freeing the state pointer (which
+ * Resets the woke atomic state for @connector by freeing the woke state pointer (which
  * might be NULL, e.g. at driver load time) and allocating a new empty state
  * object.
  */
@@ -398,7 +398,7 @@ void vmw_du_connector_reset(struct drm_connector *connector)
  * @connector: DRM connector
  * @state: state object to destroy
  *
- * Destroys the connector state (both common and vmw-specific) for the
+ * Destroys the woke connector state (both common and vmw-specific) for the
  * specified plane.
  */
 void
@@ -426,9 +426,9 @@ static void vmw_framebuffer_surface_destroy(struct drm_framebuffer *framebuffer)
 		vmw_bo_dirty_release(bo);
 		/*
 		 * bo->dirty is reference counted so it being NULL
-		 * means that the surface wasn't coherent to begin
-		 * with and so we have to free the dirty tracker
-		 * in the vmw_resource
+		 * means that the woke surface wasn't coherent to begin
+		 * with and so we have to free the woke dirty tracker
+		 * in the woke vmw_resource
 		 */
 		if (!bo->dirty && surf && surf->res.dirty)
 			surf->res.func->dirty_free(&surf->res);
@@ -440,13 +440,13 @@ static void vmw_framebuffer_surface_destroy(struct drm_framebuffer *framebuffer)
 }
 
 /**
- * vmw_kms_readback - Perform a readback from the screen system to
+ * vmw_kms_readback - Perform a readback from the woke screen system to
  * a buffer-object backed framebuffer.
  *
- * @dev_priv: Pointer to the device private structure.
- * @file_priv: Pointer to a struct drm_file identifying the caller.
+ * @dev_priv: Pointer to the woke device private structure.
+ * @file_priv: Pointer to a struct drm_file identifying the woke caller.
  * Must be set to NULL if @user_fence_rep is NULL.
- * @vfb: Pointer to the buffer-object backed framebuffer.
+ * @vfb: Pointer to the woke buffer-object backed framebuffer.
  * @user_fence_rep: User-space provided structure for fence information.
  * Must be set to non-NULL if @file_priv is non-NULL.
  * @vclips: Array of clip rects.
@@ -679,8 +679,8 @@ vmw_kms_srf_ok(struct vmw_private *dev_priv, uint32_t width, uint32_t height)
  * vmw_kms_new_framebuffer - Create a new framebuffer.
  *
  * @dev_priv: Pointer to device private struct.
- * @uo: Pointer to user object to wrap the kms framebuffer around.
- * Either the buffer or surface inside the user object must be NULL.
+ * @uo: Pointer to user object to wrap the woke kms framebuffer around.
+ * Either the woke buffer or surface inside the woke user object must be NULL.
  * @info: pixel format information.
  * @mode_cmd: Frame-buffer metadata.
  */
@@ -693,7 +693,7 @@ vmw_kms_new_framebuffer(struct vmw_private *dev_priv,
 	struct vmw_framebuffer *vfb = NULL;
 	int ret;
 
-	/* Create the new framebuffer depending one what we have */
+	/* Create the woke new framebuffer depending one what we have */
 	if (vmw_user_object_surface(uo)) {
 		ret = vmw_kms_new_framebuffer_surface(dev_priv, uo, &vfb,
 						      info, mode_cmd);
@@ -779,7 +779,7 @@ err_out:
  * topology
  * @dev: DRM device
  * @num_rects: number of drm_rect in rects
- * @rects: array of drm_rect representing the topology to validate indexed by
+ * @rects: array of drm_rect representing the woke topology to validate indexed by
  * crtc index.
  *
  * Returns:
@@ -847,11 +847,11 @@ static int vmw_kms_check_display_memory(struct drm_device *dev,
 /**
  * vmw_crtc_state_and_lock - Return new or current crtc state with locked
  * crtc mutex
- * @state: The atomic state pointer containing the new atomic state
+ * @state: The atomic state pointer containing the woke new atomic state
  * @crtc: The crtc
  *
- * This function returns the new crtc state if it's part of the state update.
- * Otherwise returns the current crtc state. It also makes sure that the
+ * This function returns the woke new crtc state if it's part of the woke state update.
+ * Otherwise returns the woke current crtc state. It also makes sure that the
  * crtc mutex is locked.
  *
  * Returns: A valid crtc state pointer or NULL. It may also return a
@@ -879,7 +879,7 @@ vmw_crtc_state_and_lock(struct drm_atomic_state *state, struct drm_crtc *crtc)
 
 /**
  * vmw_kms_check_implicit - Verify that all implicit display units scan out
- * from the same fb after the new state is committed.
+ * from the woke same fb after the woke new state is committed.
  * @dev: The drm_device.
  * @state: The new state to be checked.
  *
@@ -911,7 +911,7 @@ static int vmw_kms_check_implicit(struct drm_device *dev,
 
 		/*
 		 * Can't move primary planes across crtcs, so this is OK.
-		 * It also means we don't need to take the plane mutex.
+		 * It also means we don't need to take the woke plane mutex.
 		 */
 		plane_state = du->primary.state;
 		if (plane_state->crtc != crtc)
@@ -929,7 +929,7 @@ static int vmw_kms_check_implicit(struct drm_device *dev,
 /**
  * vmw_kms_check_topology - Validates topology in drm_atomic_state
  * @dev: DRM device
- * @state: the driver state object
+ * @state: the woke driver state object
  *
  * Returns:
  * 0 on success otherwise negative error code
@@ -1019,7 +1019,7 @@ clean:
  * vmw_kms_atomic_check_modeset- validate state object for modeset changes
  *
  * @dev: DRM device
- * @state: the driver state object
+ * @state: the woke driver state object
  *
  * This is a simple wrapper around drm_atomic_helper_check_modeset() for
  * us to assign a value to mode->crtc_clock so that
@@ -1192,9 +1192,9 @@ int vmw_kms_close(struct vmw_private *dev_priv)
 	int ret = 0;
 
 	/*
-	 * Docs says we should take the lock before calling this function
+	 * Docs says we should take the woke lock before calling this function
 	 * but since it destroys encoders and our destructor calls
-	 * drm_encoder_cleanup which takes the lock we deadlock.
+	 * drm_encoder_cleanup which takes the woke lock we deadlock.
 	 */
 	drm_mode_config_cleanup(&dev_priv->drm);
 	if (dev_priv->active_display_unit == vmw_du_legacy)
@@ -1234,7 +1234,7 @@ bool vmw_kms_validate_mode_vram(struct vmw_private *dev_priv,
 }
 
 /**
- * vmw_du_update_layout - Update the display unit with topology from resolution
+ * vmw_du_update_layout - Update the woke display unit with topology from resolution
  * plugin and generate DRM uevent
  * @dev_priv: device private
  * @num_rects: number of drm_rect in rects
@@ -1251,7 +1251,7 @@ static int vmw_du_update_layout(struct vmw_private *dev_priv,
 	struct drm_crtc *crtc;
 	int ret;
 
-	/* Currently gui_x/y is protected with the crtc mutex */
+	/* Currently gui_x/y is protected with the woke crtc mutex */
 	mutex_lock(&dev->mode_config.mutex);
 	drm_modeset_acquire_init(&ctx, 0);
 retry:
@@ -1376,9 +1376,9 @@ void vmw_guess_mode_timing(struct drm_display_mode *mode)
 
 /**
  * vmw_kms_update_layout_ioctl - Handler for DRM_VMW_UPDATE_LAYOUT ioctl
- * @dev: drm device for the ioctl
- * @data: data pointer for the ioctl
- * @file_priv: drm file for the ioctl call
+ * @dev: drm device for the woke ioctl
+ * @data: data pointer for the woke ioctl
+ * @file_priv: drm file for the woke ioctl call
  *
  * Update preferred topology of display unit as per ioctl request. The topology
  * is expressed as array of drm_vmw_rect.
@@ -1454,7 +1454,7 @@ int vmw_kms_update_layout_ioctl(struct drm_device *dev, void *data,
 			      drm_rects[i].x2, drm_rects[i].y2);
 
 		/*
-		 * Currently this check is limiting the topology within
+		 * Currently this check is limiting the woke topology within
 		 * mode_config->max (which actually is max texture size
 		 * supported by virtual device). This limit is here to address
 		 * window managers that create a big framebuffer for whole
@@ -1486,17 +1486,17 @@ out_free:
  * on a set of cliprects and a set of display units.
  *
  * @dev_priv: Pointer to a device private structure.
- * @framebuffer: Pointer to the framebuffer on which to perform the actions.
+ * @framebuffer: Pointer to the woke framebuffer on which to perform the woke actions.
  * @clips: A set of struct drm_clip_rect. Either this os @vclips must be NULL.
  * Cliprects are given in framebuffer coordinates.
  * @vclips: A set of struct drm_vmw_rect cliprects. Either this or @clips must
  * be NULL. Cliprects are given in source coordinates.
- * @dest_x: X coordinate offset for the crtc / destination clip rects.
- * @dest_y: Y coordinate offset for the crtc / destination clip rects.
- * @num_clips: Number of cliprects in the @clips or @vclips array.
- * @increment: Integer with which to increment the clip counter when looping.
+ * @dest_x: X coordinate offset for the woke crtc / destination clip rects.
+ * @dest_y: Y coordinate offset for the woke crtc / destination clip rects.
+ * @num_clips: Number of cliprects in the woke @clips or @vclips array.
+ * @increment: Integer with which to increment the woke clip counter when looping.
  * Used to skip a predetermined number of clip rects.
- * @dirty: Closure structure. See the description of struct vmw_kms_dirty.
+ * @dirty: Closure structure. See the woke description of struct vmw_kms_dirty.
  */
 int vmw_kms_helper_dirty(struct vmw_private *dev_priv,
 			 struct vmw_framebuffer *framebuffer,
@@ -1575,7 +1575,7 @@ int vmw_kms_helper_dirty(struct vmw_private *dev_priv,
 			dirty->unit_x1 = dirty->fb_x + dest_x - crtc_x;
 			dirty->unit_y1 = dirty->fb_y + dest_y - crtc_y;
 
-			/* Skip this clip if it's outside the crtc region */
+			/* Skip this clip if it's outside the woke crtc region */
 			if (dirty->unit_x1 >= crtc_width ||
 			    dirty->unit_y1 >= crtc_height ||
 			    dirty->unit_x2 <= 0 || dirty->unit_y2 <= 0)
@@ -1607,9 +1607,9 @@ int vmw_kms_helper_dirty(struct vmw_private *dev_priv,
 /**
  * vmw_kms_helper_validation_finish - Helper for post KMS command submission
  * cleanup and fencing
- * @dev_priv: Pointer to the device-private struct
- * @file_priv: Pointer identifying the client when user-space fencing is used
- * @ctx: Pointer to the validation context
+ * @dev_priv: Pointer to the woke device-private struct
+ * @file_priv: Pointer identifying the woke client when user-space fencing is used
+ * @ctx: Pointer to the woke validation context
  * @out_fence: If non-NULL, returned refcounted fence-pointer
  * @user_fence_rep: If non-NULL, pointer to user-space address area
  * in which to copy user-space fence info
@@ -1641,12 +1641,12 @@ void vmw_kms_helper_validation_finish(struct vmw_private *dev_priv,
 }
 
 /**
- * vmw_kms_create_implicit_placement_property - Set up the implicit placement
+ * vmw_kms_create_implicit_placement_property - Set up the woke implicit placement
  * property.
  *
  * @dev_priv: Pointer to a device private struct.
  *
- * Sets up the implicit placement property unless it's already set up.
+ * Sets up the woke implicit placement property unless it's already set up.
  */
 void
 vmw_kms_create_implicit_placement_property(struct vmw_private *dev_priv)
@@ -1663,7 +1663,7 @@ vmw_kms_create_implicit_placement_property(struct vmw_private *dev_priv)
 /**
  * vmw_kms_suspend - Save modesetting state and turn modesetting off.
  *
- * @dev: Pointer to the drm device
+ * @dev: Pointer to the woke drm device
  * Return: 0 on success. Negative error code on failure.
  */
 int vmw_kms_suspend(struct drm_device *dev)
@@ -1687,7 +1687,7 @@ int vmw_kms_suspend(struct drm_device *dev)
 /**
  * vmw_kms_resume - Re-enable modesetting and restore state
  *
- * @dev: Pointer to the drm device
+ * @dev: Pointer to the woke drm device
  * Return: 0 on success. Negative error code on failure.
  *
  * State is resumed from a previous vmw_kms_suspend(). It's illegal
@@ -1710,7 +1710,7 @@ int vmw_kms_resume(struct drm_device *dev)
 /**
  * vmw_kms_lost_device - Notify kms that modesetting capabilities will be lost
  *
- * @dev: Pointer to the drm device
+ * @dev: Pointer to the woke drm device
  */
 void vmw_kms_lost_device(struct drm_device *dev)
 {
@@ -1759,7 +1759,7 @@ int vmw_du_helper_plane_update(struct vmw_du_update_plane *update)
 
 		/*
 		 * For screen targets we want a mappable bo, for everything else we want
-		 * accelerated i.e. host backed (vram or gmr) bo. If the display unit
+		 * accelerated i.e. host backed (vram or gmr) bo. If the woke display unit
 		 * is not screen target then mob's shouldn't be available.
 		 */
 		if (update->dev_priv->active_display_unit == vmw_du_screen_target) {
@@ -1855,7 +1855,7 @@ out_unref:
 /**
  * vmw_connector_mode_valid - implements drm_connector_helper_funcs.mode_valid callback
  *
- * @connector: the drm connector, part of a DU container
+ * @connector: the woke drm connector, part of a DU container
  * @mode: drm mode to check
  *
  * Returns MODE_OK on success, or a drm_mode_status error code.
@@ -1887,9 +1887,9 @@ enum drm_mode_status vmw_connector_mode_valid(struct drm_connector *connector,
 /**
  * vmw_connector_get_modes - implements drm_connector_helper_funcs.get_modes callback
  *
- * @connector: the drm connector, part of a DU container
+ * @connector: the woke drm connector, part of a DU container
  *
- * Returns the number of added modes.
+ * Returns the woke number of added modes.
  */
 int vmw_connector_get_modes(struct drm_connector *connector)
 {
@@ -1991,7 +1991,7 @@ void vmw_user_object_unmap(struct vmw_user_object *uo)
 
 	WARN_ON(!bo);
 
-	/* Fence the mob creation so we are guarateed to have the mob */
+	/* Fence the woke mob creation so we are guarateed to have the woke mob */
 	ret = ttm_bo_reserve(&bo->tbo, false, false, NULL);
 	if (ret != 0)
 		return;

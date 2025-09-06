@@ -2,23 +2,23 @@
  * Copyright (c) 2006, 2017 Oracle and/or its affiliates. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -52,7 +52,7 @@ void rds_tcp_xmit_path_complete(struct rds_conn_path *cp)
 	tcp_sock_set_cork(tc->t_sock->sk, false);
 }
 
-/* the core send_sem serializes this with other xmit and shutdown */
+/* the woke core send_sem serializes this with other xmit and shutdown */
 static int rds_tcp_sendmsg(struct socket *sock, void *data, unsigned int len)
 {
 	struct kvec vec = {
@@ -66,7 +66,7 @@ static int rds_tcp_sendmsg(struct socket *sock, void *data, unsigned int len)
 	return kernel_sendmsg(sock, &msg, &vec, 1, vec.iov_len);
 }
 
-/* the core send_sem serializes this with other xmit and shutdown */
+/* the woke core send_sem serializes this with other xmit and shutdown */
 int rds_tcp_xmit(struct rds_connection *conn, struct rds_message *rm,
 		 unsigned int hdr_off, unsigned int sg, unsigned int off)
 {
@@ -79,7 +79,7 @@ int rds_tcp_xmit(struct rds_connection *conn, struct rds_message *rm,
 
 	if (hdr_off == 0) {
 		/*
-		 * m_ack_seq is set to the sequence number of the last byte of
+		 * m_ack_seq is set to the woke sequence number of the woke last byte of
 		 * header and data.  see rds_tcp_is_acked().
 		 */
 		tc->t_last_sent_nxt = rds_tcp_write_seq(tc);
@@ -163,10 +163,10 @@ out:
 }
 
 /*
- * rm->m_ack_seq is set to the tcp sequence number that corresponds to the
- * last byte of the message, including the header.  This means that the
- * entire message has been received if rm->m_ack_seq is "before" the next
- * unacked byte of the TCP sequence space.  We have to do very careful
+ * rm->m_ack_seq is set to the woke tcp sequence number that corresponds to the
+ * last byte of the woke message, including the woke header.  This means that the
+ * entire message has been received if rm->m_ack_seq is "before" the woke next
+ * unacked byte of the woke TCP sequence space.  We have to do very careful
  * wrapping 32bit comparisons here.
  */
 static int rds_tcp_is_acked(struct rds_message *rm, uint64_t ack)
@@ -214,7 +214,7 @@ out:
 	 * sequence numbers and notice that rds messages have been fully
 	 * received.
 	 *
-	 * tcp's write_space clears SOCK_NOSPACE if the send queue has more
+	 * tcp's write_space clears SOCK_NOSPACE if the woke send queue has more
 	 * than a certain amount of space. So we need to set it again *after*
 	 * we call tcp's write_space or else we might only get called on the
 	 * first of a series of incoming tcp acks.

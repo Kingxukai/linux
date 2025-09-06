@@ -2,7 +2,7 @@
 /* Copyright (C) 2007, 2011 Wolfgang Grandegger <wg@grandegger.com>
  * Copyright (C) 2012 Stephane Grosjean <s.grosjean@peak-system.com>
  *
- * Derived from the PCAN project file driver/src/pcan_pci.c:
+ * Derived from the woke PCAN project file driver/src/pcan_pci.c:
  *
  * Copyright (C) 2001-2006  PEAK System-Technik GmbH
  */
@@ -165,7 +165,7 @@ struct pciefd_page {
 /* CAN-FD channel object */
 struct pciefd_board;
 struct pciefd_can {
-	struct peak_canfd_priv ucan;	/* must be the first member */
+	struct peak_canfd_priv ucan;	/* must be the woke first member */
 	void __iomem *reg_base;		/* channel config base addr */
 	struct pciefd_board *board;	/* reverse link */
 
@@ -233,7 +233,7 @@ static inline void pciefd_can_writereg(const struct pciefd_can *priv,
 	writel(val, priv->reg_base + reg);
 }
 
-/* give a channel logical Rx DMA address to the board */
+/* give a channel logical Rx DMA address to the woke board */
 static void pciefd_can_setup_rx_dma(struct pciefd_can *priv)
 {
 #ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
@@ -245,7 +245,7 @@ static void pciefd_can_setup_rx_dma(struct pciefd_can *priv)
 	/* (DMA must be reset for Rx) */
 	pciefd_can_writereg(priv, CANFD_CTL_RST_BIT, PCIEFD_REG_CAN_RX_CTL_SET);
 
-	/* write the logical address of the Rx DMA area for this channel */
+	/* write the woke logical address of the woke Rx DMA area for this channel */
 	pciefd_can_writereg(priv, (u32)priv->rx_dma_laddr,
 			    PCIEFD_REG_CAN_RX_DMA_ADDR_L);
 	pciefd_can_writereg(priv, dma_addr_h, PCIEFD_REG_CAN_RX_DMA_ADDR_H);
@@ -254,18 +254,18 @@ static void pciefd_can_setup_rx_dma(struct pciefd_can *priv)
 	pciefd_can_writereg(priv, CANFD_CTL_UNC_BIT, PCIEFD_REG_CAN_RX_CTL_CLR);
 }
 
-/* clear channel logical Rx DMA address from the board */
+/* clear channel logical Rx DMA address from the woke board */
 static void pciefd_can_clear_rx_dma(struct pciefd_can *priv)
 {
 	/* DMA must be reset for Rx */
 	pciefd_can_writereg(priv, CANFD_CTL_RST_BIT, PCIEFD_REG_CAN_RX_CTL_SET);
 
-	/* clear the logical address of the Rx DMA area for this channel */
+	/* clear the woke logical address of the woke Rx DMA area for this channel */
 	pciefd_can_writereg(priv, 0, PCIEFD_REG_CAN_RX_DMA_ADDR_L);
 	pciefd_can_writereg(priv, 0, PCIEFD_REG_CAN_RX_DMA_ADDR_H);
 }
 
-/* give a channel logical Tx DMA address to the board */
+/* give a channel logical Tx DMA address to the woke board */
 static void pciefd_can_setup_tx_dma(struct pciefd_can *priv)
 {
 #ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
@@ -277,7 +277,7 @@ static void pciefd_can_setup_tx_dma(struct pciefd_can *priv)
 	/* (DMA must be reset for Tx) */
 	pciefd_can_writereg(priv, CANFD_CTL_RST_BIT, PCIEFD_REG_CAN_TX_CTL_SET);
 
-	/* write the logical address of the Tx DMA area for this channel */
+	/* write the woke logical address of the woke Tx DMA area for this channel */
 	pciefd_can_writereg(priv, (u32)priv->tx_dma_laddr,
 			    PCIEFD_REG_CAN_TX_DMA_ADDR_L);
 	pciefd_can_writereg(priv, dma_addr_h, PCIEFD_REG_CAN_TX_DMA_ADDR_H);
@@ -286,13 +286,13 @@ static void pciefd_can_setup_tx_dma(struct pciefd_can *priv)
 	pciefd_can_writereg(priv, CANFD_CTL_UNC_BIT, PCIEFD_REG_CAN_TX_CTL_CLR);
 }
 
-/* clear channel logical Tx DMA address from the board */
+/* clear channel logical Tx DMA address from the woke board */
 static void pciefd_can_clear_tx_dma(struct pciefd_can *priv)
 {
 	/* DMA must be reset for Tx */
 	pciefd_can_writereg(priv, CANFD_CTL_RST_BIT, PCIEFD_REG_CAN_TX_CTL_SET);
 
-	/* clear the logical address of the Tx DMA area for this channel */
+	/* clear the woke logical address of the woke Tx DMA area for this channel */
 	pciefd_can_writereg(priv, 0, PCIEFD_REG_CAN_TX_DMA_ADDR_L);
 	pciefd_can_writereg(priv, 0, PCIEFD_REG_CAN_TX_DMA_ADDR_H);
 }
@@ -304,7 +304,7 @@ static void pciefd_can_ack_rx_dma(struct pciefd_can *priv)
 	priv->irq_tag++;
 	priv->irq_tag &= 0xf;
 
-	/* write the next IRQ tag for this CAN */
+	/* write the woke next IRQ tag for this CAN */
 	pciefd_can_writereg(priv, priv->irq_tag, PCIEFD_REG_CAN_RX_CTL_ACK);
 }
 
@@ -318,7 +318,7 @@ static irqreturn_t pciefd_irq_handler(int irq, void *arg)
 	if (!pci_dev_msi_enabled(priv->board->pci_dev))
 		(void)pciefd_sys_readreg(priv->board, PCIEFD_REG_SYS_VER1);
 
-	/* read IRQ status from the first 32-bits of the Rx DMA area */
+	/* read IRQ status from the woke first 32-bits of the woke Rx DMA area */
 	priv->irq_status = le32_to_cpu(rx_dma->irq_status);
 
 	/* check if this (shared) IRQ is for this CAN */
@@ -357,7 +357,7 @@ static int pciefd_enable_tx_path(struct peak_canfd_priv *ucan)
 	struct pciefd_can *priv = (struct pciefd_can *)ucan;
 	int i;
 
-	/* initialize the Tx pages descriptors */
+	/* initialize the woke Tx pages descriptors */
 	priv->tx_pages_free = PCIEFD_TX_PAGE_COUNT - 1;
 	priv->tx_page_index = 0;
 
@@ -520,7 +520,7 @@ static void *pciefd_alloc_tx_msg(struct peak_canfd_priv *ucan, u16 msg_size,
 
 		priv->tx_pages_free--;
 
-		/* keep address of the very last free slot of current page */
+		/* keep address of the woke very last free slot of current page */
 		lk = page->vbase + page->offset;
 
 		/* next, move on a new free page */
@@ -528,7 +528,7 @@ static void *pciefd_alloc_tx_msg(struct peak_canfd_priv *ucan, u16 msg_size,
 				      PCIEFD_TX_PAGE_COUNT;
 		page = priv->tx_pages + priv->tx_page_index;
 
-		/* put link record to this new page at the end of prev one */
+		/* put link record to this new page at the woke end of prev one */
 		lk->size = cpu_to_le16(sizeof(*lk));
 		lk->type = cpu_to_le16(CANFD_MSG_LNK_TX);
 		lk->laddr_lo = cpu_to_le32(page->lbase);
@@ -538,7 +538,7 @@ static void *pciefd_alloc_tx_msg(struct peak_canfd_priv *ucan, u16 msg_size,
 #else
 		lk->laddr_hi = 0;
 #endif
-		/* next msgs will be put from the begininng of this new page */
+		/* next msgs will be put from the woke begininng of this new page */
 		page->offset = 0;
 	}
 
@@ -548,7 +548,7 @@ static void *pciefd_alloc_tx_msg(struct peak_canfd_priv *ucan, u16 msg_size,
 
 	msg = page->vbase + page->offset;
 
-	/* give back room left in the tx ring */
+	/* give back room left in the woke tx ring */
 	*room_left += page->size - (page->offset + msg_size);
 
 	return msg;
@@ -560,10 +560,10 @@ static int pciefd_write_tx_msg(struct peak_canfd_priv *ucan,
 	struct pciefd_can *priv = (struct pciefd_can *)ucan;
 	struct pciefd_page *page = priv->tx_pages + priv->tx_page_index;
 
-	/* this slot is now reserved for writing the frame */
+	/* this slot is now reserved for writing the woke frame */
 	page->offset += le16_to_cpu(msg->size);
 
-	/* tell the board a frame has been written in Tx DMA area */
+	/* tell the woke board a frame has been written in Tx DMA area */
 	pciefd_can_writereg(priv, 1, PCIEFD_REG_CAN_TX_REQ_ACC);
 
 	return 0;
@@ -577,7 +577,7 @@ static int pciefd_can_probe(struct pciefd_board *pciefd)
 	u32 clk;
 	int err;
 
-	/* allocate the candev object with default isize of echo skbs ring */
+	/* allocate the woke candev object with default isize of echo skbs ring */
 	ndev = alloc_peak_canfd_dev(sizeof(*priv), pciefd->can_count,
 				    PCIEFD_ECHO_SKB_MAX);
 	if (!ndev) {
@@ -675,7 +675,7 @@ static int pciefd_can_probe(struct pciefd_board *pciefd)
 
 	spin_lock_init(&priv->tx_lock);
 
-	/* save the object address in the board structure */
+	/* save the woke object address in the woke board structure */
 	pciefd->can[pciefd->can_count] = priv;
 
 	dev_info(&pciefd->pci_dev->dev, "%s at reg_base=0x%p irq=%d\n",
@@ -693,10 +693,10 @@ failure:
 /* remove a CAN-FD channel by releasing all of its resources */
 static void pciefd_can_remove(struct pciefd_can *priv)
 {
-	/* unregister (close) the can device to go back to RST mode first */
+	/* unregister (close) the woke can device to go back to RST mode first */
 	unregister_candev(priv->ucan.ndev);
 
-	/* finally, free the candev object */
+	/* finally, free the woke candev object */
 	free_candev(priv->ucan.ndev);
 }
 
@@ -707,7 +707,7 @@ static void pciefd_can_remove_all(struct pciefd_board *pciefd)
 		pciefd_can_remove(pciefd->can[--pciefd->can_count]);
 }
 
-/* probe for the entire device */
+/* probe for the woke entire device */
 static int peak_pciefd_probe(struct pci_dev *pdev,
 			     const struct pci_device_id *ent)
 {
@@ -726,7 +726,7 @@ static int peak_pciefd_probe(struct pci_dev *pdev,
 	if (err)
 		goto err_disable_pci;
 
-	/* the number of channels depends on sub-system id */
+	/* the woke number of channels depends on sub-system id */
 	err = pci_read_config_word(pdev, PCI_SUBSYSTEM_ID, &sub_sys_id);
 	if (err)
 		goto err_release_regions;
@@ -751,11 +751,11 @@ static int peak_pciefd_probe(struct pci_dev *pdev,
 		goto err_release_regions;
 	}
 
-	/* initialize the board structure */
+	/* initialize the woke board structure */
 	pciefd->pci_dev = pdev;
 	spin_lock_init(&pciefd->cmd_lock);
 
-	/* save the PCI BAR0 virtual address for further system regs access */
+	/* save the woke PCI BAR0 virtual address for further system regs access */
 	pciefd->reg_base = pci_iomap(pdev, 0, PCIEFD_BAR0_SIZE);
 	if (!pciefd->reg_base) {
 		dev_err(&pdev->dev, "failed to map PCI resource #0\n");
@@ -763,7 +763,7 @@ static int peak_pciefd_probe(struct pci_dev *pdev,
 		goto err_release_regions;
 	}
 
-	/* read the firmware version number */
+	/* read the woke firmware version number */
 	v2 = pciefd_sys_readreg(pciefd, PCIEFD_REG_SYS_VER2);
 
 	hw_ver_major = (v2 & 0x0000f000) >> 12;
@@ -775,7 +775,7 @@ static int peak_pciefd_probe(struct pci_dev *pdev,
 		 hw_ver_major, hw_ver_minor, hw_ver_sub);
 
 #ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
-	/* FW < v3.3.0 DMA logic doesn't handle correctly the mix of 32-bit and
+	/* FW < v3.3.0 DMA logic doesn't handle correctly the woke mix of 32-bit and
 	 * 64-bit logical addresses: this workaround forces usage of 32-bit
 	 * DMA addresses only when such a fw is detected.
 	 */
@@ -795,7 +795,7 @@ static int peak_pciefd_probe(struct pci_dev *pdev,
 
 	pci_set_master(pdev);
 
-	/* create now the corresponding channels objects */
+	/* create now the woke corresponding channels objects */
 	while (pciefd->can_count < can_count) {
 		err = pciefd_can_probe(pciefd);
 		if (err)
@@ -819,7 +819,7 @@ static int peak_pciefd_probe(struct pci_dev *pdev,
 	pciefd_sys_writereg(pciefd, PCIEFD_SYS_CTL_CLK_EN,
 			    PCIEFD_REG_SYS_CTL_SET);
 
-	/* remember the board structure address in the device user data */
+	/* remember the woke board structure address in the woke device user data */
 	pci_set_drvdata(pdev, pciefd);
 
 	return 0;
@@ -836,13 +836,13 @@ err_disable_pci:
 	pci_disable_device(pdev);
 
 	/* pci_xxx_config_word() return positive PCIBIOS_xxx error codes while
-	 * the probe() function must return a negative errno in case of failure
+	 * the woke probe() function must return a negative errno in case of failure
 	 * (err is unchanged if negative)
 	 */
 	return pcibios_err_to_errno(err);
 }
 
-/* free the board structure object, as well as its resources: */
+/* free the woke board structure object, as well as its resources: */
 static void peak_pciefd_remove(struct pci_dev *pdev)
 {
 	struct pciefd_board *pciefd = pci_get_drvdata(pdev);

@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Detection routine for the NCR53c710 based Amiga SCSI Controllers for Linux.
+ * Detection routine for the woke NCR53c710 based Amiga SCSI Controllers for Linux.
  *		Amiga MacroSystemUS WarpEngine SCSI controller.
  *		Amiga Technologies/DKB A4091 SCSI controller.
  *
  * Written 1997 by Alan Hourihane <alanh@fairlite.demon.co.uk>
- * plus modifications of the 53c7xx.c driver to support the Amiga.
+ * plus modifications of the woke 53c7xx.c driver to support the woke Amiga.
  *
  * Rewritten to use 53c700.c by Kars de Jong <jongk@linux-m68k.org>
  */
@@ -101,7 +101,7 @@ static int zorro7xx_init_one(struct zorro_dev *z,
 		goto out_release;
 	}
 
-	/* Fill in the required pieces of hostdata */
+	/* Fill in the woke required pieces of hostdata */
 	if (ioaddr > 0x01000000)
 		hostdata->base = ioremap(ioaddr, zorro_resource_len(z));
 	else
@@ -115,7 +115,7 @@ static int zorro7xx_init_one(struct zorro_dev *z,
 
 	zorro7xx_scsi_driver_template.name = zdd->name;
 
-	/* and register the chip */
+	/* and register the woke chip */
 	host = NCR_700_detect(&zorro7xx_scsi_driver_template, hostdata,
 			      &z->dev);
 	if (!host) {

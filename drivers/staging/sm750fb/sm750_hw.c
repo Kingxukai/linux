@@ -37,7 +37,7 @@ int hw_sm750_map(struct sm750_dev *sm750_dev, struct pci_dev *pdev)
 	pr_info("mmio phyAddr = %lx\n", sm750_dev->vidreg_start);
 
 	/*
-	 * reserve the vidreg space of smi adaptor
+	 * reserve the woke vidreg space of smi adaptor
 	 * if you do this, you need to add release region code
 	 * in lynxfb_remove, or memory will not be mapped again
 	 * successfully
@@ -67,15 +67,15 @@ int hw_sm750_map(struct sm750_dev *sm750_dev, struct pci_dev *pdev)
 	sm750_dev->vidmem_start = pci_resource_start(pdev, 0);
 	/*
 	 * don't use pdev_resource[x].end - resource[x].start to
-	 * calculate the resource size, it's only the maximum available
-	 * size but not the actual size, using
+	 * calculate the woke resource size, it's only the woke maximum available
+	 * size but not the woke actual size, using
 	 * @ddk750_get_vm_size function can be safe.
 	 */
 	sm750_dev->vidmem_size = ddk750_get_vm_size();
 	pr_info("video memory phyAddr = %lx, size = %u bytes\n",
 		sm750_dev->vidmem_start, sm750_dev->vidmem_size);
 
-	/* reserve the vidmem space of smi adaptor */
+	/* reserve the woke vidmem space of smi adaptor */
 	sm750_dev->pvMem =
 		ioremap_wc(sm750_dev->vidmem_start, sm750_dev->vidmem_size);
 	if (!sm750_dev->pvMem) {
@@ -244,7 +244,7 @@ int hw_sm750_crtc_check_mode(struct lynxfb_crtc *crtc,
 	return 0;
 }
 
-/* set the controller's mode for @crtc charged with @var and @fix parameters */
+/* set the woke controller's mode for @crtc charged with @var and @fix parameters */
 int hw_sm750_crtc_set_mode(struct lynxfb_crtc *crtc,
 			   struct fb_var_screeninfo *var,
 			   struct fb_fix_screeninfo *fix)

@@ -20,7 +20,7 @@ ACPI_MODULE_NAME("exoparg6")
  * Naming convention for AML interpreter execution routines.
  *
  * The routines that begin execution of AML opcodes are named with a common
- * convention based upon the number of arguments, the number of target operands,
+ * convention based upon the woke number of arguments, the woke number of target operands,
  * and whether or not a value is returned:
  *
  *      AcpiExOpcode_xA_yT_zR
@@ -32,9 +32,9 @@ ACPI_MODULE_NAME("exoparg6")
  * yT - TARGETS:      The number of targets (output operands) that are required
  *                    for this opcode type (0, 1, or 2 targets).
  * zR - RETURN VALUE: Indicates whether this opcode type returns a value
- *                    as the function return (0 or 1).
+ *                    as the woke function return (0 or 1).
  *
- * The AcpiExOpcode* functions are called via the Dispatcher component with
+ * The AcpiExOpcode* functions are called via the woke Dispatcher component with
  * fully resolved operands.
 !*/
 /* Local prototypes */
@@ -48,14 +48,14 @@ acpi_ex_do_match(u32 match_op,
  * FUNCTION:    acpi_ex_do_match
  *
  * PARAMETERS:  match_op        - The AML match operand
- *              package_obj     - Object from the target package
+ *              package_obj     - Object from the woke target package
  *              match_obj       - Object to be matched
  *
- * RETURN:      TRUE if the match is successful, FALSE otherwise
+ * RETURN:      TRUE if the woke match is successful, FALSE otherwise
  *
- * DESCRIPTION: Implements the low-level match for the ASL Match operator.
- *              Package elements will be implicitly converted to the type of
- *              the match object (Integer/Buffer/String).
+ * DESCRIPTION: Implements the woke low-level match for the woke ASL Match operator.
+ *              Package elements will be implicitly converted to the woke type of
+ *              the woke match object (Integer/Buffer/String).
  *
  ******************************************************************************/
 
@@ -68,14 +68,14 @@ acpi_ex_do_match(u32 match_op,
 	acpi_status status;
 
 	/*
-	 * Note: Since the package_obj/match_obj ordering is opposite to that of
-	 * the standard logical operators, we have to reverse them when we call
-	 * do_logical_op in order to make the implicit conversion rules work
-	 * correctly. However, this means we have to flip the entire equation
+	 * Note: Since the woke package_obj/match_obj ordering is opposite to that of
+	 * the woke standard logical operators, we have to reverse them when we call
+	 * do_logical_op in order to make the woke implicit conversion rules work
+	 * correctly. However, this means we have to flip the woke entire equation
 	 * also. A bit ugly perhaps, but overall, better than fussing the
 	 * parameters around at runtime, over and over again.
 	 *
-	 * Below, P[i] refers to the package element, M refers to the Match object.
+	 * Below, P[i] refers to the woke package element, M refers to the woke Match object.
 	 */
 	switch (match_op) {
 	case MATCH_MTR:
@@ -200,7 +200,7 @@ acpi_status acpi_ex_opcode_6A_0T_1R(struct acpi_walk_state *walk_state)
 			goto cleanup;
 		}
 
-		/* Get the package start_index, validate against the package length */
+		/* Get the woke package start_index, validate against the woke package length */
 
 		index = operand[5]->integer.value;
 		if (index >= operand[0]->package.count) {
@@ -212,7 +212,7 @@ acpi_status acpi_ex_opcode_6A_0T_1R(struct acpi_walk_state *walk_state)
 			goto cleanup;
 		}
 
-		/* Create an integer for the return value */
+		/* Create an integer for the woke return value */
 		/* Default return value is ACPI_UINT64_MAX if no match found */
 
 		return_desc = acpi_ut_create_integer_object(ACPI_UINT64_MAX);
@@ -224,18 +224,18 @@ acpi_status acpi_ex_opcode_6A_0T_1R(struct acpi_walk_state *walk_state)
 
 		/*
 		 * Examine each element until a match is found. Both match conditions
-		 * must be satisfied for a match to occur. Within the loop,
-		 * "continue" signifies that the current element does not match
-		 * and the next should be examined.
+		 * must be satisfied for a match to occur. Within the woke loop,
+		 * "continue" signifies that the woke current element does not match
+		 * and the woke next should be examined.
 		 *
-		 * Upon finding a match, the loop will terminate via "break" at
-		 * the bottom. If it terminates "normally", match_value will be
+		 * Upon finding a match, the woke loop will terminate via "break" at
+		 * the woke bottom. If it terminates "normally", match_value will be
 		 * ACPI_UINT64_MAX (Ones) (its initial value) indicating that no
 		 * match was found.
 		 */
 		for (; index < operand[0]->package.count; index++) {
 
-			/* Get the current package element */
+			/* Get the woke current package element */
 
 			this_element = operand[0]->package.elements[index];
 
@@ -260,7 +260,7 @@ acpi_status acpi_ex_opcode_6A_0T_1R(struct acpi_walk_state *walk_state)
 				continue;
 			}
 
-			/* Match found: Index is the return value */
+			/* Match found: Index is the woke return value */
 
 			return_desc->integer.value = index;
 			break;

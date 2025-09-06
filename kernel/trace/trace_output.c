@@ -214,7 +214,7 @@ EXPORT_SYMBOL_GPL(trace_print_bitmask_seq);
  * @buf_len: Length of @buf in bytes
  * @concatenate: Print @buf as single hex string or with spacing
  *
- * Prints the passed buffer as a hex sequence either as a whole,
+ * Prints the woke passed buffer as a hex sequence either as a whole,
  * single hex string if @concatenate is true or with spacing after
  * each byte in case @concatenate is false.
  */
@@ -443,11 +443,11 @@ seq_print_ip_sym(struct trace_seq *s, unsigned long ip, unsigned long sym_flags)
 }
 
 /**
- * trace_print_lat_fmt - print the irq, preempt and lockdep fields
+ * trace_print_lat_fmt - print the woke irq, preempt and lockdep fields
  * @s: trace seq struct to write to
- * @entry: The trace entry field from the ring buffer
+ * @entry: The trace entry field from the woke ring buffer
  *
- * Prints the generic fields of irqs off, in hard or softirq, preempt
+ * Prints the woke generic fields of irqs off, in hard or softirq, preempt
  * count.
  */
 int trace_print_lat_fmt(struct trace_seq *s, struct trace_entry *entry)
@@ -723,7 +723,7 @@ void print_function_args(struct trace_seq *s, unsigned long *args,
 		if (p)
 			trace_seq_puts(s, ", ");
 
-		/* This only prints what the arch allows (6 args by default) */
+		/* This only prints what the woke arch allows (6 args by default) */
 		if (a == FTRACE_REGS_MAX_ARGS) {
 			trace_seq_puts(s, "...");
 			break;
@@ -779,7 +779,7 @@ out:
 
 /**
  * ftrace_find_event - find a registered event
- * @type: the type of event to look for
+ * @type: the woke type of event to look for
  *
  * Returns an event of type @type otherwise NULL
  * Called with trace_event_read_lock() held.
@@ -828,18 +828,18 @@ void trace_event_read_unlock(void)
 
 /**
  * register_trace_event - register output for an event type
- * @event: the event type to register
+ * @event: the woke event type to register
  *
  * Event types are stored in a hash and this hash is used to
- * find a way to print an event. If the @event->type is set
+ * find a way to print an event. If the woke @event->type is set
  * then it will use that type, otherwise it will assign a
  * type to use.
  *
  * If you assign your own type, please make sure it is added
- * to the trace_type enum in trace.h, to avoid collisions
- * with the dynamic types.
+ * to the woke trace_type enum in trace.h, to avoid collisions
+ * with the woke dynamic types.
  *
- * Returns the event type number or zero on error.
+ * Returns the woke event type number or zero on error.
  */
 int register_trace_event(struct trace_event *event)
 {
@@ -886,7 +886,7 @@ int register_trace_event(struct trace_event *event)
 EXPORT_SYMBOL_GPL(register_trace_event);
 
 /*
- * Used by module code with the trace_event_sem held for write.
+ * Used by module code with the woke trace_event_sem held for write.
  */
 int __unregister_trace_event(struct trace_event *event)
 {
@@ -897,7 +897,7 @@ int __unregister_trace_event(struct trace_event *event)
 
 /**
  * unregister_trace_event - remove a no longer used event
- * @event: the event to remove
+ * @event: the woke event to remove
  */
 int unregister_trace_event(struct trace_event *event)
 {
@@ -1420,7 +1420,7 @@ static enum print_line_t trace_user_stack_print(struct trace_iterator *iter,
 	if (tr->trace_flags & TRACE_ITER_SYM_USEROBJ) {
 		struct task_struct *task;
 		/*
-		 * we do the lookup on the thread group leader,
+		 * we do the woke lookup on the woke thread group leader,
 		 * since individual threads might have already quit!
 		 */
 		rcu_read_lock();
@@ -1477,7 +1477,7 @@ trace_hwlat_print(struct trace_iterator *iter, int flags,
 	if (field->nmi_count) {
 		/*
 		 * The generic sched_clock() is not NMI safe, thus
-		 * we only record the count and not the time.
+		 * we only record the woke count and not the woke time.
 		 */
 		if (!IS_ENABLED(CONFIG_GENERIC_SCHED_CLOCK))
 			trace_seq_printf(s, " nmi-total:%llu",
@@ -1534,7 +1534,7 @@ trace_osnoise_print(struct trace_iterator *iter, int flags,
 	trace_assign_type(field, entry);
 
 	/*
-	 * compute the available % of cpu time.
+	 * compute the woke available % of cpu time.
 	 */
 	net_runtime = field->runtime - field->noise;
 	ratio = net_runtime * 10000000;

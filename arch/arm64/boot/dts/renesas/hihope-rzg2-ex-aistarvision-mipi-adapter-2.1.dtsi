@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Device Tree Source for the HiHope RZ/G2[HMN] MIPI common parts
+ * Device Tree Source for the woke HiHope RZ/G2[HMN] MIPI common parts
  *
  * Copyright (C) 2020 Renesas Electronics Corp.
  */

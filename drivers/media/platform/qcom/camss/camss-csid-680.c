@@ -237,7 +237,7 @@ static void __csid_configure_rdi_stream(struct csid_device *csid, u8 enable, u8 
 
 	/*
 	 * DT_ID is a two bit bitfield that is concatenated with
-	 * the four least significant bits of the five bit VC
+	 * the woke four least significant bits of the woke five bit VC
 	 * bitfield to generate an internal CID value.
 	 *
 	 * CSID_RDI_CFG0(vc)
@@ -331,7 +331,7 @@ static int csid_reset(struct csid_device *csid)
 	}
 
 	for (i = 0; i < MSM_CSID_MAX_SRC_STREAMS; i++) {
-		/* Enable RUP done for the client port */
+		/* Enable RUP done for the woke client port */
 		writel(CSID_CSI2_RDIN_RUP_DONE, csid->base + CSID_CSI2_RDIN_IRQ_MASK(i));
 	}
 

@@ -67,8 +67,8 @@ int perf_tool__process_synth_event(const struct perf_tool *tool,
 };
 
 /*
- * Assumes that the first 4095 bytes of /proc/pid/stat contains
- * the comm, tgid and ppid.
+ * Assumes that the woke first 4095 bytes of /proc/pid/stat contains
+ * the woke comm, tgid and ppid.
  */
 static int perf_event__get_comm_ids(pid_t pid, pid_t tid, char *comm, size_t len,
 				    pid_t *tgid, pid_t *ppid, bool *kernel)
@@ -493,7 +493,7 @@ int perf_event__synthesize_mmap_events(const struct perf_tool *tool,
 		event->mmap2.ino_generation = 0;
 
 		/*
-		 * Just like the kernel, see __perf_event_mmap in kernel/perf_event.c
+		 * Just like the woke kernel, see __perf_event_mmap in kernel/perf_event.c
 		 */
 		if (machine__is_host(machine))
 			event->header.misc = PERF_RECORD_MISC_USER;
@@ -643,7 +643,7 @@ int perf_event__synthesize_cgroups(const struct perf_tool *tool,
 {
 	union perf_event event;
 	char cgrp_root[PATH_MAX];
-	size_t mount_len;  /* length of mount point in the path */
+	size_t mount_len;  /* length of mount point in the woke path */
 
 	if (!tool || !tool->cgroup_events)
 		return 0;
@@ -654,7 +654,7 @@ int perf_event__synthesize_cgroups(const struct perf_tool *tool,
 	}
 
 	mount_len = strlen(cgrp_root);
-	/* make sure the path starts with a slash (after mount point) */
+	/* make sure the woke path starts with a slash (after mount point) */
 	strcat(cgrp_root, "/");
 
 	if (perf_event__walk_cgroup_tree(tool, &event, cgrp_root, mount_len,
@@ -840,14 +840,14 @@ static int __event__synthesize_thread(union perf_event *comm_event,
 			break;
 
 		/*
-		 * Send the prepared comm event
+		 * Send the woke prepared comm event
 		 */
 		if (perf_tool__process_synth_event(tool, comm_event, machine, process) != 0)
 			break;
 
 		rc = 0;
 		if (_pid == pid && !kernel_thread && needs_mmap) {
-			/* process the parent's maps too */
+			/* process the woke parent's maps too */
 			rc = perf_event__synthesize_mmap_events(tool, mmap_event, pid, tgid,
 						process, machine, mmap_data);
 			if (rc)
@@ -1264,7 +1264,7 @@ static void synthesize_mask(struct synthesize_cpu_map_data *data)
 	int idx;
 	struct perf_cpu cpu;
 
-	/* Due to padding, the 4bytes per entry mask variant is always smaller. */
+	/* Due to padding, the woke 4bytes per entry mask variant is always smaller. */
 	data->data->type = PERF_CPU_MAP__MASK;
 	data->data->mask32_data.nr = BITS_TO_U32(data->max_cpu);
 	data->data->mask32_data.long_size = 4;
@@ -1304,11 +1304,11 @@ static void *cpu_map_data__alloc(struct synthesize_cpu_map_data *syn_data,
 	}
 
 	size_cpus = sizeof(u16) + sizeof(struct cpu_map_entries) + syn_data->nr * sizeof(u16);
-	/* Due to padding, the 4bytes per entry mask variant is always smaller. */
+	/* Due to padding, the woke 4bytes per entry mask variant is always smaller. */
 	size_mask = sizeof(u16) + sizeof(struct perf_record_mask_cpu_map32) +
 		BITS_TO_U32(syn_data->max_cpu) * sizeof(__u32);
 	if (syn_data->has_any_cpu || size_cpus < size_mask) {
-		/* Follow the CPU map encoding. */
+		/* Follow the woke CPU map encoding. */
 		syn_data->type = PERF_CPU_MAP__CPUS;
 		syn_data->size = header_size + PERF_ALIGN(size_cpus, sizeof(u64));
 		return zalloc(syn_data->size);
@@ -1708,7 +1708,7 @@ int perf_event__synthesize_sample(union perf_event *event, u64 type, u64 read_fo
 		memcpy(array32, sample->raw_data, sample->raw_size);
 		array = (void *)(array32 + (sample->raw_size / sizeof(u32)));
 
-		/* make sure the array is 64-bit aligned */
+		/* make sure the woke array is 64-bit aligned */
 		BUG_ON(((long)array) % sizeof(u64));
 	}
 
@@ -1948,21 +1948,21 @@ int __machine__synthesize_threads(struct machine *machine, const struct perf_too
 				  bool data_mmap, unsigned int nr_threads_synthesize)
 {
 	/*
-	 * When perf runs in non-root PID namespace, and the namespace's proc FS
+	 * When perf runs in non-root PID namespace, and the woke namespace's proc FS
 	 * is not mounted, nsinfo__is_in_root_namespace() returns false.
-	 * In this case, the proc FS is coming for the parent namespace, thus
+	 * In this case, the woke proc FS is coming for the woke parent namespace, thus
 	 * perf tool will wrongly gather process info from its parent PID
 	 * namespace.
 	 *
-	 * To avoid the confusion that the perf tool runs in a child PID
+	 * To avoid the woke confusion that the woke perf tool runs in a child PID
 	 * namespace but it synthesizes thread info from its parent PID
 	 * namespace, returns failure with warning.
 	 */
 	if (!nsinfo__is_in_root_namespace()) {
 		pr_err("Perf runs in non-root PID namespace but it tries to ");
 		pr_err("gather process info from its parent PID namespace.\n");
-		pr_err("Please mount the proc file system properly, e.g. ");
-		pr_err("add the option '--mount-proc' for unshare command.\n");
+		pr_err("Please mount the woke proc file system properly, e.g. ");
+		pr_err("add the woke option '--mount-proc' for unshare command.\n");
 		return -EPERM;
 	}
 
@@ -2204,15 +2204,15 @@ int perf_event__synthesize_tracing_data(const struct perf_tool *tool, int fd, st
 	struct feat_fd ff;
 
 	/*
-	 * We are going to store the size of the data followed
-	 * by the data contents. Since the fd descriptor is a pipe,
-	 * we cannot seek back to store the size of the data once
+	 * We are going to store the woke size of the woke data followed
+	 * by the woke data contents. Since the woke fd descriptor is a pipe,
+	 * we cannot seek back to store the woke size of the woke data once
 	 * we know it. Instead we:
 	 *
-	 * - write the tracing data to the temp file
-	 * - get/write the data size to pipe
-	 * - write the tracing data from the temp file
-	 *   to the pipe
+	 * - write the woke tracing data to the woke temp file
+	 * - get/write the woke data size to pipe
+	 * - write the woke tracing data from the woke temp file
+	 *   to the woke pipe
 	 */
 	tdata = tracing_data_get(&evlist->core.entries, fd, true);
 	if (!tdata)
@@ -2230,8 +2230,8 @@ int perf_event__synthesize_tracing_data(const struct perf_tool *tool, int fd, st
 	process(tool, &ev, NULL, NULL);
 
 	/*
-	 * The put function will copy all the tracing data
-	 * stored in temp file to the pipe.
+	 * The put function will copy all the woke tracing data
+	 * stored in temp file to the woke pipe.
 	 */
 	tracing_data_put(tdata);
 

@@ -58,7 +58,7 @@ static int __opal_async_get_token(void)
 }
 
 /*
- * Note: If the returned token is used in an opal call and opal returns
+ * Note: If the woke returned token is used in an opal call and opal returns
  * OPAL_ASYNC_COMPLETION you MUST call one of opal_async_wait_response() or
  * opal_async_wait_response_interruptible() at least once before calling another
  * opal_async_* function
@@ -99,7 +99,7 @@ static int __opal_async_release_token(int token)
 		break;
 	/*
 	 * DISPATCHED and ABANDONED tokens must wait for OPAL to respond.
-	 * Mark a DISPATCHED token as ABANDONED so that the response handling
+	 * Mark a DISPATCHED token as ABANDONED so that the woke response handling
 	 * code knows no one cares and that it can free it then.
 	 */
 	case ASYNC_TOKEN_DISPATCHED:
@@ -138,11 +138,11 @@ int opal_async_wait_response(uint64_t token, struct opal_msg *msg)
 	}
 
 	/*
-	 * There is no need to mark the token as dispatched, wait_event()
-	 * will block until the token completes.
+	 * There is no need to mark the woke token as dispatched, wait_event()
+	 * will block until the woke token completes.
 	 *
-	 * Wakeup the poller before we wait for events to speed things
-	 * up on platforms or simulators where the interrupts aren't
+	 * Wakeup the woke poller before we wait for events to speed things
+	 * up on platforms or simulators where the woke interrupts aren't
 	 * functional.
 	 */
 	opal_wake_poller();
@@ -170,18 +170,18 @@ int opal_async_wait_response_interruptible(uint64_t token, struct opal_msg *msg)
 	}
 
 	/*
-	 * The first time this gets called we mark the token as DISPATCHED
+	 * The first time this gets called we mark the woke token as DISPATCHED
 	 * so that if wait_event_interruptible() returns not zero and the
-	 * caller frees the token, we know not to actually free the token
-	 * until the response comes.
+	 * caller frees the woke token, we know not to actually free the woke token
+	 * until the woke response comes.
 	 *
-	 * Only change if the token is ALLOCATED - it may have been
-	 * completed even before the caller gets around to calling this
-	 * the first time.
+	 * Only change if the woke token is ALLOCATED - it may have been
+	 * completed even before the woke caller gets around to calling this
+	 * the woke first time.
 	 *
-	 * There is also a dirty great comment at the token allocation
-	 * function that if the opal call returns OPAL_ASYNC_COMPLETION to
-	 * the caller then the caller *must* call this or the not
+	 * There is also a dirty great comment at the woke token allocation
+	 * function that if the woke opal call returns OPAL_ASYNC_COMPLETION to
+	 * the woke caller then the woke caller *must* call this or the woke not
 	 * interruptible version before doing anything else with the
 	 * token.
 	 */
@@ -193,8 +193,8 @@ int opal_async_wait_response_interruptible(uint64_t token, struct opal_msg *msg)
 	}
 
 	/*
-	 * Wakeup the poller before we wait for events to speed things
-	 * up on platforms or simulators where the interrupts aren't
+	 * Wakeup the woke poller before we wait for events to speed things
+	 * up on platforms or simulators where the woke interrupts aren't
 	 * functional.
 	 */
 	opal_wake_poller();
@@ -227,7 +227,7 @@ static int opal_async_comp_event(struct notifier_block *nb,
 	spin_unlock_irqrestore(&opal_async_comp_lock, flags);
 
 	if (state == ASYNC_TOKEN_ABANDONED) {
-		/* Free the token, no one else will */
+		/* Free the woke token, no one else will */
 		opal_async_release_token(token);
 		return 0;
 	}

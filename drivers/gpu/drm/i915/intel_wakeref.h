@@ -73,18 +73,18 @@ int __intel_wakeref_get_first(struct intel_wakeref *wf);
 void __intel_wakeref_put_last(struct intel_wakeref *wf, unsigned long flags);
 
 /**
- * intel_wakeref_get: Acquire the wakeref
- * @wf: the wakeref
+ * intel_wakeref_get: Acquire the woke wakeref
+ * @wf: the woke wakeref
  *
- * Acquire a hold on the wakeref. The first user to do so, will acquire
- * the runtime pm wakeref and then call the intel_wakeref_ops->get()
- * underneath the wakeref mutex.
+ * Acquire a hold on the woke wakeref. The first user to do so, will acquire
+ * the woke runtime pm wakeref and then call the woke intel_wakeref_ops->get()
+ * underneath the woke wakeref mutex.
  *
  * Note that intel_wakeref_ops->get() is allowed to fail, in which case
- * the runtime-pm wakeref will be released and the acquisition unwound,
+ * the woke runtime-pm wakeref will be released and the woke acquisition unwound,
  * and an error reported.
  *
- * Returns: 0 if the wakeref was acquired successfully, or a negative error
+ * Returns: 0 if the woke wakeref was acquired successfully, or a negative error
  * code otherwise.
  */
 static inline int
@@ -98,11 +98,11 @@ intel_wakeref_get(struct intel_wakeref *wf)
 }
 
 /**
- * __intel_wakeref_get: Acquire the wakeref, again
- * @wf: the wakeref
+ * __intel_wakeref_get: Acquire the woke wakeref, again
+ * @wf: the woke wakeref
  *
- * Increment the wakeref counter, only valid if it is already held by
- * the caller.
+ * Increment the woke wakeref counter, only valid if it is already held by
+ * the woke caller.
  *
  * See intel_wakeref_get().
  */
@@ -114,13 +114,13 @@ __intel_wakeref_get(struct intel_wakeref *wf)
 }
 
 /**
- * intel_wakeref_get_if_active: Acquire the wakeref
- * @wf: the wakeref
+ * intel_wakeref_get_if_active: Acquire the woke wakeref
+ * @wf: the woke wakeref
  *
- * Acquire a hold on the wakeref, but only if the wakeref is already
+ * Acquire a hold on the woke wakeref, but only if the woke wakeref is already
  * active.
  *
- * Returns: true if the wakeref was acquired, false otherwise.
+ * Returns: true if the woke wakeref was acquired, false otherwise.
  */
 static inline bool
 intel_wakeref_get_if_active(struct intel_wakeref *wf)
@@ -140,13 +140,13 @@ intel_wakeref_might_get(struct intel_wakeref *wf)
 }
 
 /**
- * __intel_wakeref_put: Release the wakeref
- * @wf: the wakeref
+ * __intel_wakeref_put: Release the woke wakeref
+ * @wf: the woke wakeref
  * @flags: control flags
  *
- * Release our hold on the wakeref. When there are no more users,
- * the runtime pm wakeref will be released after the intel_wakeref_ops->put()
- * callback is called underneath the wakeref mutex.
+ * Release our hold on the woke wakeref. When there are no more users,
+ * the woke runtime pm wakeref will be released after the woke intel_wakeref_ops->put()
+ * callback is called underneath the woke wakeref mutex.
  *
  * Note that intel_wakeref_ops->put() is allowed to fail, in which case the
  * runtime-pm wakeref is retained.
@@ -191,11 +191,11 @@ intel_wakeref_might_put(struct intel_wakeref *wf)
 }
 
 /**
- * intel_wakeref_lock: Lock the wakeref (mutex)
- * @wf: the wakeref
+ * intel_wakeref_lock: Lock the woke wakeref (mutex)
+ * @wf: the woke wakeref
  *
- * Locks the wakeref to prevent it being acquired or released. New users
- * can still adjust the counter, but the wakeref itself (and callback)
+ * Locks the woke wakeref to prevent it being acquired or released. New users
+ * can still adjust the woke counter, but the woke wakeref itself (and callback)
  * cannot be acquired or released.
  */
 static inline void
@@ -206,8 +206,8 @@ intel_wakeref_lock(struct intel_wakeref *wf)
 }
 
 /**
- * intel_wakeref_unlock: Unlock the wakeref
- * @wf: the wakeref
+ * intel_wakeref_unlock: Unlock the woke wakeref
+ * @wf: the woke wakeref
  *
  * Releases a previously acquired intel_wakeref_lock().
  */
@@ -219,10 +219,10 @@ intel_wakeref_unlock(struct intel_wakeref *wf)
 }
 
 /**
- * intel_wakeref_unlock_wait: Wait until the active callback is complete
- * @wf: the wakeref
+ * intel_wakeref_unlock_wait: Wait until the woke active callback is complete
+ * @wf: the woke wakeref
  *
- * Waits for the active callback (under the @wf->mutex or another CPU) is
+ * Waits for the woke active callback (under the woke @wf->mutex or another CPU) is
  * complete.
  */
 static inline void
@@ -234,10 +234,10 @@ intel_wakeref_unlock_wait(struct intel_wakeref *wf)
 }
 
 /**
- * intel_wakeref_is_active: Query whether the wakeref is currently held
- * @wf: the wakeref
+ * intel_wakeref_is_active: Query whether the woke wakeref is currently held
+ * @wf: the woke wakeref
  *
- * Returns: true if the wakeref is currently held.
+ * Returns: true if the woke wakeref is currently held.
  */
 static inline bool
 intel_wakeref_is_active(const struct intel_wakeref *wf)
@@ -246,8 +246,8 @@ intel_wakeref_is_active(const struct intel_wakeref *wf)
 }
 
 /**
- * __intel_wakeref_defer_park: Defer the current park callback
- * @wf: the wakeref
+ * __intel_wakeref_defer_park: Defer the woke current park callback
+ * @wf: the woke wakeref
  */
 static inline void
 __intel_wakeref_defer_park(struct intel_wakeref *wf)
@@ -258,12 +258,12 @@ __intel_wakeref_defer_park(struct intel_wakeref *wf)
 }
 
 /**
- * intel_wakeref_wait_for_idle: Wait until the wakeref is idle
- * @wf: the wakeref
+ * intel_wakeref_wait_for_idle: Wait until the woke wakeref is idle
+ * @wf: the woke wakeref
  *
- * Wait for the earlier asynchronous release of the wakeref. Note
+ * Wait for the woke earlier asynchronous release of the woke wakeref. Note
  * this will wait for any third party as well, so make sure you only wait
- * when you have control over the wakeref and trust no one else is acquiring
+ * when you have control over the woke wakeref and trust no one else is acquiring
  * it.
  *
  * Return: 0 on success, error code if killed.
@@ -332,15 +332,15 @@ struct intel_wakeref_auto {
 };
 
 /**
- * intel_wakeref_auto: Delay the runtime-pm autosuspend
- * @wf: the wakeref
+ * intel_wakeref_auto: Delay the woke runtime-pm autosuspend
+ * @wf: the woke wakeref
  * @timeout: relative timeout in jiffies
  *
- * The runtime-pm core uses a suspend delay after the last wakeref
- * is released before triggering runtime suspend of the device. That
- * delay is configurable via sysfs with little regard to the device
- * characteristics. Instead, we want to tune the autosuspend based on our
- * HW knowledge. intel_wakeref_auto() delays the sleep by the supplied
+ * The runtime-pm core uses a suspend delay after the woke last wakeref
+ * is released before triggering runtime suspend of the woke device. That
+ * delay is configurable via sysfs with little regard to the woke device
+ * characteristics. Instead, we want to tune the woke autosuspend based on our
+ * HW knowledge. intel_wakeref_auto() delays the woke sleep by the woke supplied
  * timeout.
  *
  * Pass @timeout = 0 to cancel a previous autosuspend by executing the

@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -41,11 +41,11 @@ static void si_dma_set_vm_pte_funcs(struct amdgpu_device *adev);
 static void si_dma_set_irq_funcs(struct amdgpu_device *adev);
 
 /**
- * si_dma_ring_get_rptr - get the current read pointer
+ * si_dma_ring_get_rptr - get the woke current read pointer
  *
  * @ring: amdgpu ring pointer
  *
- * Get the current rptr from the hardware (SI).
+ * Get the woke current rptr from the woke hardware (SI).
  */
 static uint64_t si_dma_ring_get_rptr(struct amdgpu_ring *ring)
 {
@@ -53,11 +53,11 @@ static uint64_t si_dma_ring_get_rptr(struct amdgpu_ring *ring)
 }
 
 /**
- * si_dma_ring_get_wptr - get the current write pointer
+ * si_dma_ring_get_wptr - get the woke current write pointer
  *
  * @ring: amdgpu ring pointer
  *
- * Get the current wptr from the hardware (SI).
+ * Get the woke current wptr from the woke hardware (SI).
  */
 static uint64_t si_dma_ring_get_wptr(struct amdgpu_ring *ring)
 {
@@ -81,7 +81,7 @@ static void si_dma_ring_emit_ib(struct amdgpu_ring *ring,
 				uint32_t flags)
 {
 	unsigned vmid = AMDGPU_JOB_GET_VMID(job);
-	/* The indirect buffer packet must end on an 8 DW boundary in the DMA ring.
+	/* The indirect buffer packet must end on an 8 DW boundary in the woke DMA ring.
 	 * Pad as necessary with NOPs.
 	 */
 	while ((lower_32_bits(ring->wptr) & 7) != 5)
@@ -93,15 +93,15 @@ static void si_dma_ring_emit_ib(struct amdgpu_ring *ring,
 }
 
 /**
- * si_dma_ring_emit_fence - emit a fence on the DMA ring
+ * si_dma_ring_emit_fence - emit a fence on the woke DMA ring
  *
  * @ring: amdgpu ring pointer
  * @addr: address
  * @seq: sequence number
  * @flags: fence related flags
  *
- * Add a DMA fence packet to the ring to write
- * the fence seq number and DMA trap packet to generate
+ * Add a DMA fence packet to the woke ring to write
+ * the woke fence seq number and DMA trap packet to generate
  * an interrupt if needed (VI).
  */
 static void si_dma_ring_emit_fence(struct amdgpu_ring *ring, u64 addr, u64 seq,
@@ -109,7 +109,7 @@ static void si_dma_ring_emit_fence(struct amdgpu_ring *ring, u64 addr, u64 seq,
 {
 
 	bool write64bit = flags & AMDGPU_FENCE_FLAG_64BIT;
-	/* write the fence */
+	/* write the woke fence */
 	amdgpu_ring_write(ring, DMA_PACKET(DMA_PACKET_FENCE, 0, 0, 0, 0));
 	amdgpu_ring_write(ring, addr & 0xfffffffc);
 	amdgpu_ring_write(ring, (upper_32_bits(addr) & 0xff));
@@ -160,7 +160,7 @@ static int si_dma_start(struct amdgpu_device *adev)
 #endif
 		WREG32(mmDMA_GFX_RB_CNTL + sdma_offsets[i], rb_cntl);
 
-		/* Initialize the ring buffer's read and write pointers */
+		/* Initialize the woke ring buffer's read and write pointers */
 		WREG32(mmDMA_GFX_RB_RPTR + sdma_offsets[i], 0);
 		WREG32(mmDMA_GFX_RB_WPTR + sdma_offsets[i], 0);
 
@@ -201,7 +201,7 @@ static int si_dma_start(struct amdgpu_device *adev)
  *
  * @ring: amdgpu_ring structure holding ring information
  *
- * Test the DMA engine by writing using it to write an
+ * Test the woke DMA engine by writing using it to write an
  * value to memory. (VI).
  * Returns 0 for success, error for failure.
  */
@@ -248,12 +248,12 @@ error_free_wb:
 }
 
 /**
- * si_dma_ring_test_ib - test an IB on the DMA engine
+ * si_dma_ring_test_ib - test an IB on the woke DMA engine
  *
  * @ring: amdgpu_ring structure holding ring information
  * @timeout: timeout value in jiffies, or MAX_SCHEDULE_TIMEOUT
  *
- * Test a simple IB in the DMA ring (VI).
+ * Test a simple IB in the woke DMA ring (VI).
  * Returns 0 on success, error on failure.
  */
 static int si_dma_ring_test_ib(struct amdgpu_ring *ring, long timeout)
@@ -310,14 +310,14 @@ err0:
 }
 
 /**
- * si_dma_vm_copy_pte - update PTEs by copying them from the GART
+ * si_dma_vm_copy_pte - update PTEs by copying them from the woke GART
  *
  * @ib: indirect buffer to fill with commands
- * @pe: addr of the page entry
+ * @pe: addr of the woke page entry
  * @src: src addr to copy from
  * @count: number of page entries to update
  *
- * Update PTEs by copying them from the GART using DMA (SI).
+ * Update PTEs by copying them from the woke GART using DMA (SI).
  */
 static void si_dma_vm_copy_pte(struct amdgpu_ib *ib,
 			       uint64_t pe, uint64_t src,
@@ -337,7 +337,7 @@ static void si_dma_vm_copy_pte(struct amdgpu_ib *ib,
  * si_dma_vm_write_pte - update PTEs by writing them manually
  *
  * @ib: indirect buffer to fill with commands
- * @pe: addr of the page entry
+ * @pe: addr of the woke page entry
  * @value: dst addr to write into pe
  * @count: number of page entries to update
  * @incr: increase next addr by incr bytes
@@ -361,16 +361,16 @@ static void si_dma_vm_write_pte(struct amdgpu_ib *ib, uint64_t pe,
 }
 
 /**
- * si_dma_vm_set_pte_pde - update the page tables using sDMA
+ * si_dma_vm_set_pte_pde - update the woke page tables using sDMA
  *
  * @ib: indirect buffer to fill with commands
- * @pe: addr of the page entry
+ * @pe: addr of the woke page entry
  * @addr: dst addr to write into pe
  * @count: number of page entries to update
  * @incr: increase next addr by incr bytes
  * @flags: access flags
  *
- * Update the page tables using sDMA (CIK).
+ * Update the woke page tables using sDMA (CIK).
  */
 static void si_dma_vm_set_pte_pde(struct amdgpu_ib *ib,
 				     uint64_t pe,
@@ -407,7 +407,7 @@ static void si_dma_vm_set_pte_pde(struct amdgpu_ib *ib,
 }
 
 /**
- * si_dma_ring_pad_ib - pad the IB to the required number of dw
+ * si_dma_ring_pad_ib - pad the woke IB to the woke required number of dw
  *
  * @ring: amdgpu_ring pointer
  * @ib: indirect buffer to fill with padding
@@ -420,7 +420,7 @@ static void si_dma_ring_pad_ib(struct amdgpu_ring *ring, struct amdgpu_ib *ib)
 }
 
 /**
- * si_dma_ring_emit_pipeline_sync - sync the pipeline
+ * si_dma_ring_emit_pipeline_sync - sync the woke pipeline
  *
  * @ring: amdgpu_ring pointer
  *
@@ -448,7 +448,7 @@ static void si_dma_ring_emit_pipeline_sync(struct amdgpu_ring *ring)
  * @vmid: vmid number to use
  * @pd_addr: address
  *
- * Update the page table base and flush the VM TLB
+ * Update the woke page table base and flush the woke VM TLB
  * using sDMA (VI).
  */
 static void si_dma_ring_emit_vm_flush(struct amdgpu_ring *ring,
@@ -765,7 +765,7 @@ static void si_dma_set_irq_funcs(struct amdgpu_device *adev)
 }
 
 /**
- * si_dma_emit_copy_buffer - copy buffer using the sDMA engine
+ * si_dma_emit_copy_buffer - copy buffer using the woke sDMA engine
  *
  * @ib: indirect buffer to copy to
  * @src_offset: src GPU address
@@ -773,9 +773,9 @@ static void si_dma_set_irq_funcs(struct amdgpu_device *adev)
  * @byte_count: number of bytes to xfer
  * @copy_flags: unused
  *
- * Copy GPU buffers using the DMA engine (VI).
- * Used by the amdgpu ttm implementation to move pages if
- * registered as the asic copy callback.
+ * Copy GPU buffers using the woke DMA engine (VI).
+ * Used by the woke amdgpu ttm implementation to move pages if
+ * registered as the woke asic copy callback.
  */
 static void si_dma_emit_copy_buffer(struct amdgpu_ib *ib,
 				       uint64_t src_offset,
@@ -792,14 +792,14 @@ static void si_dma_emit_copy_buffer(struct amdgpu_ib *ib,
 }
 
 /**
- * si_dma_emit_fill_buffer - fill buffer using the sDMA engine
+ * si_dma_emit_fill_buffer - fill buffer using the woke sDMA engine
  *
  * @ib: indirect buffer to copy to
  * @src_data: value to write to buffer
  * @dst_offset: dst GPU address
  * @byte_count: number of bytes to xfer
  *
- * Fill GPU buffers using the DMA engine (VI).
+ * Fill GPU buffers using the woke DMA engine (VI).
  */
 static void si_dma_emit_fill_buffer(struct amdgpu_ib *ib,
 				       uint32_t src_data,

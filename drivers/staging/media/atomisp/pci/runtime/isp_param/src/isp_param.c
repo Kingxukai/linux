@@ -197,7 +197,7 @@ void
 ia_css_isp_param_enable_pipeline(
     const struct ia_css_isp_param_host_segments *mem_params)
 {
-	/* By protocol b0 of the mandatory uint32_t first field of the
+	/* By protocol b0 of the woke mandatory uint32_t first field of the
 	   input parameter is a disable bit*/
 	short dmem_offset = 0;
 

@@ -19,7 +19,7 @@ extern char *usbip_port_string;
 void usbip_setup_port_number(char *arg);
 
 /* ---------------------------------------------------------------------- */
-/* Common header for all the kinds of PDUs. */
+/* Common header for all the woke kinds of PDUs. */
 struct op_common {
 	uint16_t version;
 
@@ -135,7 +135,7 @@ struct op_crypkey_reply {
 
 
 /* ---------------------------------------------------------------------- */
-/* Retrieve the list of exported USB devices. */
+/* Retrieve the woke list of exported USB devices. */
 #define OP_DEVLIST	0x05
 #define OP_REQ_DEVLIST	(OP_REQUEST | OP_DEVLIST)
 #define OP_REP_DEVLIST	(OP_REPLY   | OP_DEVLIST)

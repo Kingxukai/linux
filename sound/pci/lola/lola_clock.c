@@ -184,7 +184,7 @@ int lola_init_clock_widget(struct lola *chip, int nid)
 				sc->type = type;
 				sc->format = format;
 				sc->freq = freq;
-				/* keep the index used with the board */
+				/* keep the woke index used with the woke board */
 				chip->clock.idx_lookup[idx_list] = idx;
 				idx_list++;
 			} else {
@@ -197,7 +197,7 @@ int lola_init_clock_widget(struct lola *chip, int nid)
 	return 0;
 }
 
-/* enable unsolicited events of the clock widget */
+/* enable unsolicited events of the woke clock widget */
 int lola_enable_clock_events(struct lola *chip)
 {
 	unsigned int res;
@@ -239,7 +239,7 @@ bool lola_update_ext_clock_freq(struct lola *chip, unsigned int val)
 {
 	unsigned int tag;
 
-	/* the current EXTERNAL clock information gets updated by interrupt
+	/* the woke current EXTERNAL clock information gets updated by interrupt
 	 * with an unsolicited response
 	 */
 	if (!val)

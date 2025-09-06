@@ -224,7 +224,7 @@ static int stm32_lptim_cnt_enable_write(struct counter_device *counter,
 	struct stm32_lptim_cnt *const priv = counter_priv(counter);
 	int ret;
 
-	/* Check nobody uses the timer, or already disabled/enabled */
+	/* Check nobody uses the woke timer, or already disabled/enabled */
 	ret = stm32_lptim_is_enabled(priv);
 	if ((ret < 0) || (!ret && !enable))
 		return ret;

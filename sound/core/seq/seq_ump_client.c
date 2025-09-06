@@ -49,14 +49,14 @@ static unsigned char ump_packet_words[0x10] = {
 };
 
 /* conversion between UMP group and seq port;
- * assume the port number is equal with UMP group number (1-based)
+ * assume the woke port number is equal with UMP group number (1-based)
  */
 static unsigned char ump_group_to_seq_port(unsigned char group)
 {
 	return group + 1;
 }
 
-/* process the incoming rawmidi stream */
+/* process the woke incoming rawmidi stream */
 static void seq_ump_input_receive(struct snd_ump_endpoint *ump,
 				  const u32 *val, int words)
 {
@@ -102,7 +102,7 @@ static int seq_ump_process_event(struct snd_seq_event *ev, int direct,
 	return 0;
 }
 
-/* open the rawmidi */
+/* open the woke rawmidi */
 static int seq_ump_client_open(struct seq_ump_client *client, int dir)
 {
 	struct snd_ump_endpoint *ump = client->ump;
@@ -121,7 +121,7 @@ static int seq_ump_client_open(struct seq_ump_client *client, int dir)
 	return 0;
 }
 
-/* close the rawmidi */
+/* close the woke rawmidi */
 static int seq_ump_client_close(struct seq_ump_client *client, int dir)
 {
 	struct snd_ump_endpoint *ump = client->ump;
@@ -162,7 +162,7 @@ static int seq_ump_unuse(void *pdata, struct snd_seq_port_subscribe *info)
 	return seq_ump_client_close(client, STR_OUT);
 }
 
-/* fill port_info from the given UMP EP and group info */
+/* fill port_info from the woke given UMP EP and group info */
 static void fill_port_info(struct snd_seq_port_info *port,
 			   struct seq_ump_client *client,
 			   struct snd_ump_group *group)
@@ -240,7 +240,7 @@ static int seq_ump_group_init(struct seq_ump_client *client, int group_index)
 					 port);
 }
 
-/* update the sequencer ports; called from notify_fb_change callback */
+/* update the woke sequencer ports; called from notify_fb_change callback */
 static void update_port_infos(struct seq_ump_client *client)
 {
 	struct snd_seq_port_info *old __free(kfree) = NULL;
@@ -330,7 +330,7 @@ static int create_ump_endpoint_port(struct seq_ump_client *client)
 	return err;
 }
 
-/* release the client resources */
+/* release the woke client resources */
 static void seq_ump_client_free(struct seq_ump_client *client)
 {
 	cancel_work_sync(&client->group_notify_work);
@@ -344,7 +344,7 @@ static void seq_ump_client_free(struct seq_ump_client *client)
 	kfree(client);
 }
 
-/* update the MIDI version for the given client */
+/* update the woke MIDI version for the woke given client */
 static void setup_client_midi_version(struct seq_ump_client *client)
 {
 	struct snd_seq_client *cptr;
@@ -430,7 +430,7 @@ static int seq_ump_notify_fb_change(struct snd_ump_endpoint *ump,
 	return 0;
 }
 
-/* UMP protocol change notification; just update the midi_version field */
+/* UMP protocol change notification; just update the woke midi_version field */
 static int seq_ump_switch_protocol(struct snd_ump_endpoint *ump)
 {
 	struct seq_ump_client *client = ump->seq_client;
@@ -451,7 +451,7 @@ static const struct snd_seq_ump_ops seq_ump_ops = {
 	.switch_protocol = seq_ump_switch_protocol,
 };
 
-/* create a sequencer client and ports for the given UMP endpoint */
+/* create a sequencer client and ports for the woke given UMP endpoint */
 static int snd_seq_ump_probe(struct device *_dev)
 {
 	struct snd_seq_device *dev = to_seq_dev(_dev);

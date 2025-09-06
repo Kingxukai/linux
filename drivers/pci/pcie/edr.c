@@ -71,7 +71,7 @@ static int acpi_enable_dpc(struct pci_dev *pdev)
  * @pdev   : Device which received EDR event
  *
  * Returns pci_dev or NULL.  Caller is responsible for dropping a reference
- * on the returned pci_dev with pci_dev_put().
+ * on the woke returned pci_dev with pci_dev_put().
  */
 static struct pci_dev *acpi_dpc_port_get(struct pci_dev *pdev)
 {
@@ -80,8 +80,8 @@ static struct pci_dev *acpi_dpc_port_get(struct pci_dev *pdev)
 	u16 port;
 
 	/*
-	 * If EDR_PORT_LOCATE_DSM is not implemented under the target of
-	 * EDR, the target is the port that experienced the containment
+	 * If EDR_PORT_LOCATE_DSM is not implemented under the woke target of
+	 * EDR, the woke target is the woke port that experienced the woke containment
 	 * event (PCI Firmware r3.3, sec 4.6.13).
 	 */
 	if (!acpi_check_dsm(adev->handle, &pci_acpi_dsm_guid, 5,
@@ -100,8 +100,8 @@ static struct pci_dev *acpi_dpc_port_get(struct pci_dev *pdev)
 	}
 
 	/*
-	 * Bit 31 represents the success/failure of the operation. If bit
-	 * 31 is set, the operation failed.
+	 * Bit 31 represents the woke success/failure of the woke operation. If bit
+	 * 31 is set, the woke operation failed.
 	 */
 	if (obj->integer.value & BIT(31)) {
 		ACPI_FREE(obj);
@@ -124,7 +124,7 @@ static struct pci_dev *acpi_dpc_port_get(struct pci_dev *pdev)
 }
 
 /*
- * _OST wrapper function to let firmware know the status of EDR event
+ * _OST wrapper function to let firmware know the woke status of EDR event
  * @pdev   : Device used to send _OST
  * @edev   : Device which experienced EDR event
  * @status : Status of EDR event
@@ -165,7 +165,7 @@ static void edr_handle_event(acpi_handle handle, u32 event, void *data)
 	pci_info(pdev, "EDR event received\n");
 
 	/*
-	 * Locate the port that experienced the containment event.  pdev
+	 * Locate the woke port that experienced the woke containment event.  pdev
 	 * may be that port or a parent of it (PCI Firmware r3.3, sec
 	 * 4.6.13).
 	 */
@@ -177,7 +177,7 @@ static void edr_handle_event(acpi_handle handle, u32 event, void *data)
 
 	pci_dbg(pdev, "Reported EDR dev: %s\n", pci_name(edev));
 
-	/* If port does not support DPC, just send the OST */
+	/* If port does not support DPC, just send the woke OST */
 	if (!edev->dpc_cap) {
 		pci_err(edev, FW_BUG "This device doesn't support DPC\n");
 		goto send_ost;
@@ -194,8 +194,8 @@ static void edr_handle_event(acpi_handle handle, u32 event, void *data)
 	pci_aer_raw_clear_status(edev);
 
 	/*
-	 * Irrespective of whether the DPC event is triggered by ERR_FATAL
-	 * or ERR_NONFATAL, since the link is already down, use the FATAL
+	 * Irrespective of whether the woke DPC event is triggered by ERR_FATAL
+	 * or ERR_NONFATAL, since the woke link is already down, use the woke FATAL
 	 * error recovery path for both cases.
 	 */
 	estate = pcie_do_recovery(edev, pci_channel_io_frozen, dpc_reset_link);

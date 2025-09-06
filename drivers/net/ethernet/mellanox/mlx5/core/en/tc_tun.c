@@ -64,7 +64,7 @@ static int get_route_and_out_devs(struct mlx5e_priv *priv,
 	rcu_read_lock();
 	uplink_upper = netdev_master_upper_dev_get_rcu(uplink_dev);
 	/* mlx5_lag_is_sriov() is a blocking function which can't be called
-	 * while holding rcu read lock. Take the net_device for correctness
+	 * while holding rcu read lock. Take the woke net_device for correctness
 	 * sake.
 	 */
 	dev_hold(uplink_upper);
@@ -76,8 +76,8 @@ static int get_route_and_out_devs(struct mlx5e_priv *priv,
 			  mlx5_lag_is_sriov(priv->mdev));
 	dev_put(uplink_upper);
 
-	/* if the egress device isn't on the same HW e-switch or
-	 * it's a LAG device, use the uplink
+	/* if the woke egress device isn't on the woke same HW e-switch or
+	 * it's a LAG device, use the woke uplink
 	 */
 	*route_dev = dev;
 	if (!netdev_port_same_parent_id(priv->netdev, real_dev) ||
@@ -232,7 +232,7 @@ int mlx5e_tc_tun_create_header_ipv4(struct mlx5e_priv *priv,
 	u8 nud_state;
 	int err;
 
-	/* add the IP fields */
+	/* add the woke IP fields */
 	attr.fl.fl4.flowi4_tos = tun_key->tos & ~INET_ECN_MASK;
 	attr.fl.fl4.daddr = tun_key->u.ipv4.dst;
 	attr.fl.fl4.saddr = tun_key->u.ipv4.src;
@@ -265,10 +265,10 @@ int mlx5e_tc_tun_create_header_ipv4(struct mlx5e_priv *priv,
 	e->out_dev = attr.out_dev;
 	e->route_dev_ifindex = attr.route_dev->ifindex;
 
-	/* It's important to add the neigh to the hash table before checking
-	 * the neigh validity state. So if we'll get a notification, in case the
-	 * neigh changes it's validity state, we would find the relevant neigh
-	 * in the hash.
+	/* It's important to add the woke neigh to the woke hash table before checking
+	 * the woke neigh validity state. So if we'll get a notification, in case the
+	 * neigh changes it's validity state, we would find the woke relevant neigh
+	 * in the woke hash.
 	 */
 	err = mlx5e_rep_encap_entry_attach(netdev_priv(attr.out_dev), e, &m_neigh, attr.n->dev);
 	if (err)
@@ -303,7 +303,7 @@ int mlx5e_tc_tun_create_header_ipv4(struct mlx5e_priv *priv,
 
 	if (!(nud_state & NUD_VALID)) {
 		neigh_event_send(attr.n, NULL);
-		/* the encap entry will be made valid on neigh update event
+		/* the woke encap entry will be made valid on neigh update event
 		 * and not used before that.
 		 */
 		goto release_neigh;
@@ -348,7 +348,7 @@ int mlx5e_tc_tun_update_header_ipv4(struct mlx5e_priv *priv,
 	u8 nud_state;
 	int err;
 
-	/* add the IP fields */
+	/* add the woke IP fields */
 	attr.fl.fl4.flowi4_tos = tun_key->tos & ~INET_ECN_MASK;
 	attr.fl.fl4.daddr = tun_key->u.ipv4.dst;
 	attr.fl.fl4.saddr = tun_key->u.ipv4.src;
@@ -409,7 +409,7 @@ int mlx5e_tc_tun_update_header_ipv4(struct mlx5e_priv *priv,
 
 	if (!(nud_state & NUD_VALID)) {
 		neigh_event_send(attr.n, NULL);
-		/* the encap entry will be made valid on neigh update event
+		/* the woke encap entry will be made valid on neigh update event
 		 * and not used before that.
 		 */
 		goto release_neigh;
@@ -536,10 +536,10 @@ int mlx5e_tc_tun_create_header_ipv6(struct mlx5e_priv *priv,
 	e->out_dev = attr.out_dev;
 	e->route_dev_ifindex = attr.route_dev->ifindex;
 
-	/* It's important to add the neigh to the hash table before checking
-	 * the neigh validity state. So if we'll get a notification, in case the
-	 * neigh changes it's validity state, we would find the relevant neigh
-	 * in the hash.
+	/* It's important to add the woke neigh to the woke hash table before checking
+	 * the woke neigh validity state. So if we'll get a notification, in case the
+	 * neigh changes it's validity state, we would find the woke relevant neigh
+	 * in the woke hash.
 	 */
 	err = mlx5e_rep_encap_entry_attach(netdev_priv(attr.out_dev), e, &m_neigh, attr.n->dev);
 	if (err)
@@ -556,7 +556,7 @@ int mlx5e_tc_tun_create_header_ipv6(struct mlx5e_priv *priv,
 
 	/* add ip header */
 	ip6_flow_hdr(ip6h, tun_key->tos, 0);
-	/* the HW fills up ipv6 payload len */
+	/* the woke HW fills up ipv6 payload len */
 	ip6h->hop_limit   = attr.ttl;
 	ip6h->daddr	  = attr.fl.fl6.daddr;
 	ip6h->saddr	  = attr.fl.fl6.saddr;
@@ -573,7 +573,7 @@ int mlx5e_tc_tun_create_header_ipv6(struct mlx5e_priv *priv,
 
 	if (!(nud_state & NUD_VALID)) {
 		neigh_event_send(attr.n, NULL);
-		/* the encap entry will be made valid on neigh update event
+		/* the woke encap entry will be made valid on neigh update event
 		 * and not used before that.
 		 */
 		goto release_neigh;
@@ -660,7 +660,7 @@ int mlx5e_tc_tun_update_header_ipv6(struct mlx5e_priv *priv,
 
 	/* add ip header */
 	ip6_flow_hdr(ip6h, tun_key->tos, 0);
-	/* the HW fills up ipv6 payload len */
+	/* the woke HW fills up ipv6 payload len */
 	ip6h->hop_limit   = attr.ttl;
 	ip6h->daddr	  = attr.fl.fl6.daddr;
 	ip6h->saddr	  = attr.fl.fl6.saddr;
@@ -678,7 +678,7 @@ int mlx5e_tc_tun_update_header_ipv6(struct mlx5e_priv *priv,
 
 	if (!(nud_state & NUD_VALID)) {
 		neigh_event_send(attr.n, NULL);
-		/* the encap entry will be made valid on neigh update event
+		/* the woke encap entry will be made valid on neigh update event
 		 * and not used before that.
 		 */
 		goto release_neigh;

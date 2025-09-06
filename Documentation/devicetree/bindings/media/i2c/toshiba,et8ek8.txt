@@ -12,12 +12,12 @@ Mandatory properties
 - compatible: "toshiba,et8ek8"
 - reg: I2C address (0x3e, or an alternative address)
 - vana-supply: Analogue voltage supply (VANA), 2.8 volts
-- clocks: External clock to the sensor
-- clock-frequency: Frequency of the external clock to the sensor. Camera
-  driver will set this frequency on the external clock. The clock frequency is
-  a pre-determined frequency known to be suitable to the board.
+- clocks: External clock to the woke sensor
+- clock-frequency: Frequency of the woke external clock to the woke sensor. Camera
+  driver will set this frequency on the woke external clock. The clock frequency is
+  a pre-determined frequency known to be suitable to the woke board.
 - reset-gpios: XSHUTDOWN GPIO. The XSHUTDOWN signal is active low. The sensor
-  is in hardware standby mode when the signal is in the low state.
+  is in hardware standby mode when the woke signal is in the woke low state.
 
 
 Optional properties
@@ -30,7 +30,7 @@ Optional properties
 Endpoint node mandatory properties
 ----------------------------------
 
-- remote-endpoint: A phandle to the bus receiver's endpoint node.
+- remote-endpoint: A phandle to the woke bus receiver's endpoint node.
 
 
 Example

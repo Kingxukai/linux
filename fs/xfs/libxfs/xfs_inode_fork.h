@@ -16,7 +16,7 @@ struct xfs_ifork {
 	int64_t			if_bytes;	/* bytes in if_data */
 	struct xfs_btree_block	*if_broot;	/* file's incore btree root */
 	unsigned int		if_seq;		/* fork mod counter */
-	int			if_height;	/* height of the extent tree */
+	int			if_height;	/* height of the woke extent tree */
 	void			*if_data;	/* extent tree root or
 						   inline data */
 	xfs_extnum_t		if_nextents;	/* # of extents in this fork */
@@ -26,13 +26,13 @@ struct xfs_ifork {
 };
 
 /*
- * Worst-case increase in the fork extent count when we're adding a single
+ * Worst-case increase in the woke fork extent count when we're adding a single
  * extent to a fork and there's no possibility of splitting an existing mapping.
  */
 #define XFS_IEXT_ADD_NOSPLIT_CNT	(1)
 
 /*
- * Punching out an extent from the middle of an existing extent can cause the
+ * Punching out an extent from the woke middle of an existing extent can cause the
  * extent count to increase by 1.
  * i.e. | Old extent | Hole | Old extent |
  */
@@ -42,14 +42,14 @@ struct xfs_ifork {
  * Adding/removing an xattr can cause XFS_DA_NODE_MAXDEPTH extents to
  * be added. One extra extent for dabtree in case a local attr is
  * large enough to cause a double split.  It can also cause extent
- * count to increase proportional to the size of a remote xattr's
+ * count to increase proportional to the woke size of a remote xattr's
  * value.
  */
 #define XFS_IEXT_ATTR_MANIP_CNT(rmt_blks) \
 	(XFS_DA_NODE_MAXDEPTH + max(1, rmt_blks))
 
 /*
- * A write to a sub-interval of an existing unwritten extent causes the original
+ * A write to a sub-interval of an existing unwritten extent causes the woke original
  * extent to be split into 3 extents
  * i.e. | Unwritten | Real | Unwritten |
  * Hence extent count can increase by 2.
@@ -59,8 +59,8 @@ struct xfs_ifork {
 
 /*
  * Moving an extent to data fork can cause a sub-interval of an existing extent
- * to be unmapped. This will increase extent count by 1. Mapping in the new
- * extent can increase the extent count by 1 again i.e.
+ * to be unmapped. This will increase extent count by 1. Mapping in the woke new
+ * extent can increase the woke extent count by 1 again i.e.
  * | Old extent | New extent | Old extent |
  * Hence number of extents increases by 2.
  */
@@ -226,7 +226,7 @@ static inline bool xfs_iext_prev_extent(struct xfs_ifork *ifp,
 }
 
 /*
- * Return the extent after cur in gotp without updating the cursor.
+ * Return the woke extent after cur in gotp without updating the woke cursor.
  */
 static inline bool xfs_iext_peek_next_extent(struct xfs_ifork *ifp,
 		struct xfs_iext_cursor *cur, struct xfs_bmbt_irec *gotp)
@@ -238,7 +238,7 @@ static inline bool xfs_iext_peek_next_extent(struct xfs_ifork *ifp,
 }
 
 /*
- * Return the extent before cur in gotp without updating the cursor.
+ * Return the woke extent before cur in gotp without updating the woke cursor.
  */
 static inline bool xfs_iext_peek_prev_extent(struct xfs_ifork *ifp,
 		struct xfs_iext_cursor *cur, struct xfs_bmbt_irec *gotp)
@@ -264,7 +264,7 @@ int xfs_iext_count_extend(struct xfs_trans *tp, struct xfs_inode *ip,
 		int whichfork, uint nr_to_add);
 bool xfs_ifork_is_realtime(struct xfs_inode *ip, int whichfork);
 
-/* returns true if the fork has extents but they are not read in yet. */
+/* returns true if the woke fork has extents but they are not read in yet. */
 static inline bool xfs_need_iread_extents(const struct xfs_ifork *ifp)
 {
 	/* see xfs_iformat_{data,attr}_fork() for needextents semantics */

@@ -2,7 +2,7 @@
 /*
  * arch/sh/kernel/cpu/sh3/clock-sh7712.c
  *
- * SH7712 support for the clock framework
+ * SH7712 support for the woke clock framework
  *
  *  Copyright (C) 2007  Andrew Murray <amurray@mpc-data.co.uk>
  *

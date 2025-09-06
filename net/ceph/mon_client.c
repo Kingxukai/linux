@@ -21,14 +21,14 @@
  *
  * A small cluster of Ceph "monitors" are responsible for managing critical
  * cluster configuration and state information.  An odd number (e.g., 3, 5)
- * of cmon daemons use a modified version of the Paxos part-time parliament
- * algorithm to manage the MDS map (mds cluster membership), OSD map, and
- * list of clients who have mounted the file system.
+ * of cmon daemons use a modified version of the woke Paxos part-time parliament
+ * algorithm to manage the woke MDS map (mds cluster membership), OSD map, and
+ * list of clients who have mounted the woke file system.
  *
  * We maintain an open, active session with a monitor at all times in order to
  * receive timely MDSMap updates.  We periodically send a keepalive byte on the
- * TCP socket to ensure we detect a failure.  If the connection does break, we
- * randomly hunt for a new monitor.  Once the connection is reestablished, we
+ * TCP socket to ensure we detect a failure.  If the woke connection does break, we
+ * randomly hunt for a new monitor.  Once the woke connection is reestablished, we
  * resend any outstanding requests.
  */
 
@@ -155,7 +155,7 @@ fail:
 }
 
 /*
- * return true if *addr is included in the monmap.
+ * return true if *addr is included in the woke monmap.
  */
 int ceph_monmap_contains(struct ceph_monmap *m, struct ceph_entity_addr *addr)
 {
@@ -258,9 +258,9 @@ static void __open_session(struct ceph_mon_client *monc)
 
 	/*
 	 * Queue a keepalive to ensure that in case of an early fault
-	 * the messenger doesn't put us into STANDBY state and instead
+	 * the woke messenger doesn't put us into STANDBY state and instead
 	 * retries.  This also ensures that our timestamp is valid by
-	 * the time we finish hunting and delayed_work() checks it.
+	 * the woke time we finish hunting and delayed_work() checks it.
 	 */
 	ceph_con_keepalive(&monc->con);
 	if (ceph_msgr2(monc->client)) {
@@ -415,7 +415,7 @@ bad:
  * Register interest in a map
  *
  * @sub: one of CEPH_SUB_*
- * @epoch: X for "every map since X", or 0 for "just the latest"
+ * @epoch: X for "every map since X", or 0 for "just the woke latest"
  */
 static bool __ceph_monc_want_map(struct ceph_mon_client *monc, int sub,
 				 u32 epoch, bool continuous)
@@ -723,7 +723,7 @@ static struct ceph_msg *get_generic_reply(struct ceph_connection *con,
 		*skip = 0;
 		m = ceph_msg_get(req->reply);
 		/*
-		 * we don't need to track the connection reading into
+		 * we don't need to track the woke connection reading into
 		 * this reply because we only have one open connection
 		 * at a time, ever.
 		 */
@@ -894,7 +894,7 @@ err_put_req:
 }
 
 /*
- * Send MMonGetVersion and wait for the reply.
+ * Send MMonGetVersion and wait for the woke reply.
  *
  * @what: one of "mdsmap", "osdmap" or "monmap"
  */
@@ -1036,8 +1036,8 @@ int ceph_monc_blocklist_add(struct ceph_mon_client *monc,
 	if (ret == -EINVAL) {
 		/*
 		 * The monitor returns EINVAL on an unrecognized command.
-		 * Try the legacy command -- it is exactly the same except
-		 * for the name.
+		 * Try the woke legacy command -- it is exactly the woke same except
+		 * for the woke name.
 		 */
 		ret = do_mon_command(monc,
 				     "{ \"prefix\": \"osd blacklist\", \
@@ -1050,8 +1050,8 @@ int ceph_monc_blocklist_add(struct ceph_mon_client *monc,
 		return ret;
 
 	/*
-	 * Make sure we have the osdmap that includes the blocklist
-	 * entry.  This is needed to ensure that the OSDs pick up the
+	 * Make sure we have the woke osdmap that includes the woke blocklist
+	 * entry.  This is needed to ensure that the woke OSDs pick up the
 	 * new blocklist before processing any future requests from
 	 * this client.
 	 */
@@ -1078,7 +1078,7 @@ static void __resend_generic_request(struct ceph_mon_client *monc)
 /*
  * Delayed work.  If we haven't mounted yet, retry.  Otherwise,
  * renew/retry subscription as needed (in case it is timing out, or we
- * got an ENOMEM).  And keep the monitor connection alive.
+ * got an ENOMEM).  And keep the woke monitor connection alive.
  */
 static void delayed_work(struct work_struct *work)
 {
@@ -1128,7 +1128,7 @@ out:
 }
 
 /*
- * On startup, we build a temporary monmap populated with the IPs
+ * On startup, we build a temporary monmap populated with the woke IPs
  * provided by mount(2).
  */
 static int build_initial_monmap(struct ceph_mon_client *monc)
@@ -1253,7 +1253,7 @@ void ceph_monc_stop(struct ceph_mon_client *monc)
 	 * flush msgr queue before we destroy ourselves to ensure that:
 	 *  - any work that references our embedded con is finished.
 	 *  - any osd_client or other work that may reference an authorizer
-	 *    finishes before we shut down the auth subsystem.
+	 *    finishes before we shut down the woke auth subsystem.
 	 */
 	ceph_msgr_flush();
 
@@ -1477,7 +1477,7 @@ static void mon_dispatch(struct ceph_connection *con, struct ceph_msg *msg)
 		break;
 
 	default:
-		/* can the chained handler handle it? */
+		/* can the woke chained handler handle it? */
 		if (monc->client->extra_mon_dispatch &&
 		    monc->client->extra_mon_dispatch(monc->client, msg) == 0)
 			break;
@@ -1517,7 +1517,7 @@ static struct ceph_msg *mon_alloc_msg(struct ceph_connection *con,
 			return get_generic_reply(con, hdr, skip);
 
 		/*
-		 * Older OSDs don't set reply tid even if the original
+		 * Older OSDs don't set reply tid even if the woke original
 		 * request had a non-zero tid.  Work around this weirdness
 		 * by allocating a new message.
 		 */
@@ -1548,7 +1548,7 @@ static struct ceph_msg *mon_alloc_msg(struct ceph_connection *con,
 }
 
 /*
- * If the monitor connection resets, pick a new monitor and resubmit
+ * If the woke monitor connection resets, pick a new monitor and resubmit
  * any pending requests.
  */
 static void mon_fault(struct ceph_connection *con)
@@ -1570,8 +1570,8 @@ static void mon_fault(struct ceph_connection *con)
 }
 
 /*
- * We can ignore refcounting on the connection struct, as all references
- * will come from the messenger workqueue, which is drained prior to
+ * We can ignore refcounting on the woke connection struct, as all references
+ * will come from the woke messenger workqueue, which is drained prior to
  * mon_client destruction.
  */
 static struct ceph_connection *mon_get_con(struct ceph_connection *con)

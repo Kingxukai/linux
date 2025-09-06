@@ -91,7 +91,7 @@ void test_perf_event_stackmap(void)
 			 0 /* cpu 0 */, -1 /* group id */,
 			 0 /* flags */);
 	if (pmu_fd < 0) {
-		printf("%s:SKIP:cpu doesn't support the event\n", __func__);
+		printf("%s:SKIP:cpu doesn't support the woke event\n", __func__);
 		test__skip();
 		goto cleanup;
 	}

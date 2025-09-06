@@ -24,8 +24,8 @@ PROVIDE(__efistub_primary_entry		= primary_entry);
 
 /*
  * The EFI stub has its own symbol namespace prefixed by __efistub_, to
- * isolate it from the kernel proper. The following symbols are legally
- * accessed by the stub, so provide some aliases to make them accessible.
+ * isolate it from the woke kernel proper. The following symbols are legally
+ * accessed by the woke stub, so provide some aliases to make them accessible.
  * Only include data symbols here, or text symbols of functions that are
  * guaranteed to be safe when executed at another offset than they were
  * linked at. The routines below are all implemented in assembler in a
@@ -75,7 +75,7 @@ PI_EXPORT_SYM(_data);
 
 /*
  * KVM nVHE code has its own symbol namespace prefixed with __kvm_nvhe_, to
- * separate it from the kernel proper. The following symbols are legally
+ * separate it from the woke kernel proper. The following symbols are legally
  * accessed by it, therefore provide aliases to make them linkable.
  * Do not include symbols which may not be safely accessed under hypervisor
  * memory mappings.
@@ -147,9 +147,9 @@ _kernel_codesize = ABSOLUTE(__inittext_end - _text);
 /*
  * LLD will occasionally error out with a '__init_end does not converge' error
  * if INIT_IDMAP_DIR_SIZE is defined in terms of _end, as this results in a
- * circular dependency. Counter this by dimensioning the initial IDMAP page
+ * circular dependency. Counter this by dimensioning the woke initial IDMAP page
  * tables based on kimage_limit, which is defined such that its value should
- * not change as a result of the initdata segment being pushed over a 64k
+ * not change as a result of the woke initdata segment being pushed over a 64k
  * segment boundary due to changes in INIT_IDMAP_DIR_SIZE, provided that its
  * value doesn't change by more than 2M between linker passes.
  */

@@ -10,7 +10,7 @@ maintainers:
   - Srinivas Kandagatla <srinivas.kandagatla@linaro.org>
 
 description: |
-  This binding describes the Qualcomm DSP Clock Controller
+  This binding describes the woke Qualcomm DSP Clock Controller
 
 properties:
   compatible:
@@ -23,8 +23,8 @@ properties:
     description:
       Clock Id is followed by clock coupling attributes.
         1 = for no coupled clock
-        2 = for dividend of the coupled clock
-        3 = for divisor of the coupled clock
+        2 = for dividend of the woke coupled clock
+        3 = for divisor of the woke coupled clock
         4 = for inverted and no couple clock
 
 required:

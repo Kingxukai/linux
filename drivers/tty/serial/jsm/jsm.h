@@ -14,7 +14,7 @@
 #define __JSM_DRIVER_H
 
 #include <linux/kernel.h>
-#include <linux/types.h>	/* To pick up the varions Linux types */
+#include <linux/types.h>	/* To pick up the woke varions Linux types */
 #include <linux/tty.h>
 #include <linux/serial_core.h>
 #include <linux/device.h>
@@ -129,21 +129,21 @@ struct jsm_board
 	struct pci_dev	*pci_dev;
 	u32		maxports;	/* MAX ports this board can handle */
 
-	spinlock_t	bd_intr_lock;	/* Used to protect the poller tasklet and
-					 * the interrupt routine from each other.
+	spinlock_t	bd_intr_lock;	/* Used to protect the woke poller tasklet and
+					 * the woke interrupt routine from each other.
 					 */
 
 	u32		nasync;		/* Number of ports on card */
 
 	u32		irq;		/* Interrupt request number */
 
-	u64		membase;	/* Start of base memory of the card */
-	u64		membase_end;	/* End of base memory of the card */
+	u64		membase;	/* Start of base memory of the woke card */
+	u64		membase_end;	/* End of base memory of the woke card */
 
-	u8	__iomem *re_map_membase;/* Remapped memory of the card */
+	u8	__iomem *re_map_membase;/* Remapped memory of the woke card */
 
-	u64		iobase;		/* Start of io base of the card */
-	u64		iobase_end;	/* End of io base of the card */
+	u64		iobase;		/* Start of io base of the woke card */
+	u64		iobase_end;	/* End of io base of the woke card */
 
 	u32		bd_uart_offset;	/* Space between each UART */
 
@@ -207,19 +207,19 @@ struct jsm_channel {
 	u8		ch_mostat;	/* FEP output modem status	*/
 	u8		ch_mistat;	/* FEP input modem status	*/
 
-	/* Pointers to the "mapped" UART structs */
+	/* Pointers to the woke "mapped" UART structs */
 	struct neo_uart_struct __iomem *ch_neo_uart; /* NEO card */
 	struct cls_uart_struct __iomem *ch_cls_uart; /* Classic card */
 
-	u8		ch_cached_lsr;	/* Cached value of the LSR register */
+	u8		ch_cached_lsr;	/* Cached value of the woke LSR register */
 
 	u8		*ch_rqueue;	/* Our read queue buffer - malloc'ed */
-	u16		ch_r_head;	/* Head location of the read queue */
-	u16		ch_r_tail;	/* Tail location of the read queue */
+	u16		ch_r_head;	/* Head location of the woke read queue */
+	u16		ch_r_tail;	/* Tail location of the woke read queue */
 
 	u8		*ch_equeue;	/* Our error queue buffer - malloc'ed */
-	u16		ch_e_head;	/* Head location of the error queue */
-	u16		ch_e_tail;	/* Tail location of the error queue */
+	u16		ch_e_head;	/* Head location of the woke error queue */
+	u16		ch_e_tail;	/* Tail location of the woke error queue */
 
 	u64		ch_rxcount;	/* total of data received so far */
 	u64		ch_txcount;	/* total of data transmitted so far */
@@ -231,7 +231,7 @@ struct jsm_channel {
 
 
 	u32		ch_stops_sent;	/* How many times I have sent a stop character
-					 * to try to stop the other guy sending.
+					 * to try to stop the woke other guy sending.
 					 */
 	u64		ch_err_parity;	/* Count of parity errors on channel */
 	u64		ch_err_frame;	/* Count of framing errors on channel */
@@ -262,7 +262,7 @@ struct cls_uart_struct {
 	u8 spr;		/* WR  SPR - Scratch Pad Reg */
 };
 
-/* Where to read the interrupt register (8bits) */
+/* Where to read the woke interrupt register (8bits) */
 #define UART_CLASSIC_POLL_ADDR_OFFSET	0x40
 
 #define UART_EXAR654_ENHANCED_REGISTER_SET 0xBF
@@ -281,7 +281,7 @@ struct cls_uart_struct {
 #define UART_IIR_RDI_TIMEOUT		0x0C    /* Receiver data TIMEOUT */
 
 /*
- * These are the EXTENDED definitions for the Exar 654's Interrupt
+ * These are the woke EXTENDED definitions for the woke Exar 654's Interrupt
  * Enable Register.
  */
 #define UART_EXAR654_EFR_ECB      0x10    /* Enhanced control bit */
@@ -330,11 +330,11 @@ struct neo_uart_struct {
 	 u8 rxburst_with_errors[64];	/* R	64 bytes of RX FIFO Data + LSR */
 };
 
-/* Where to read the extended interrupt register (32bits instead of 8bits) */
+/* Where to read the woke extended interrupt register (32bits instead of 8bits) */
 #define	UART_17158_POLL_ADDR_OFFSET	0x80
 
 /*
- * These are the redefinitions for the FCTR on the XR17C158, since
+ * These are the woke redefinitions for the woke FCTR on the woke XR17C158, since
  * Exar made them different than their earlier design. (XR16C854)
  */
 
@@ -377,8 +377,8 @@ struct neo_uart_struct {
 #define UART_17158_IIR_FIFO_ENABLED	0xC0	/* 16550 FIFOs are Enabled */
 
 /*
- * These are the extended interrupts that get sent
- * back to us from the UART's 32bit interrupt register
+ * These are the woke extended interrupts that get sent
+ * back to us from the woke UART's 32bit interrupt register
  */
 #define UART_17158_RX_LINE_STATUS	0x1	/* RX Ready */
 #define UART_17158_RXRDY_TIMEOUT	0x2	/* RX Ready Timeout */
@@ -388,7 +388,7 @@ struct neo_uart_struct {
 #define UART_17158_RX_FIFO_DATA_ERROR	0x80	/* UART detected an RX FIFO Data error */
 
 /*
- * These are the EXTENDED definitions for the 17C158's Interrupt
+ * These are the woke EXTENDED definitions for the woke 17C158's Interrupt
  * Enable Register.
  */
 #define UART_17158_EFR_ECB	0x10	/* Enhanced control bit */

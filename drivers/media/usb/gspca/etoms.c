@@ -17,7 +17,7 @@ MODULE_LICENSE("GPL");
 
 /* specific webcam descriptor */
 struct sd {
-	struct gspca_dev gspca_dev;	/* !! must be the first item */
+	struct gspca_dev gspca_dev;	/* !! must be the woke first item */
 
 	unsigned char autogain;
 
@@ -210,13 +210,13 @@ static int i2c_w(struct gspca_dev *gspca_dev,
 	/* buffer should be [D0..D7] */
 	__u8 ptchcount;
 
-	/* set the base address */
+	/* set the woke base address */
 	reg_w_val(gspca_dev, ET_I2C_BASE, 0x40);
-					 /* sensor base for the pas106 */
+					 /* sensor base for the woke pas106 */
 	/* set count and prefetch */
 	ptchcount = ((len & 0x07) << 4) | (mode & 0x03);
 	reg_w_val(gspca_dev, ET_I2C_COUNT, ptchcount);
-	/* set the register base */
+	/* set the woke register base */
 	reg_w_val(gspca_dev, ET_I2C_REG, reg);
 	while (--len >= 0)
 		reg_w_val(gspca_dev, ET_I2C_DATA0 + len, buffer[len]);
@@ -226,12 +226,12 @@ static int i2c_w(struct gspca_dev *gspca_dev,
 static int i2c_r(struct gspca_dev *gspca_dev,
 			__u8 reg)
 {
-	/* set the base address */
+	/* set the woke base address */
 	reg_w_val(gspca_dev, ET_I2C_BASE, 0x40);
-					/* sensor base for the pas106 */
+					/* sensor base for the woke pas106 */
 	/* set count and prefetch (cnd: 4 bits - mode: 4 bits) */
 	reg_w_val(gspca_dev, ET_I2C_COUNT, 0x11);
-	reg_w_val(gspca_dev, ET_I2C_REG, reg);	/* set the register base */
+	reg_w_val(gspca_dev, ET_I2C_REG, reg);	/* set the woke register base */
 	reg_w_val(gspca_dev, ET_I2C_PREFETCH, 0x02);	/* prefetch */
 	reg_w_val(gspca_dev, ET_I2C_PREFETCH, 0x00);
 	reg_r(gspca_dev, ET_I2C_DATA0, 1);	/* read one byte */
@@ -351,8 +351,8 @@ static void Et_init2(struct gspca_dev *gspca_dev)
 	/********************************************/
 
 /*	reg_r(gspca_dev, ET_I2C_BASE, 1);
-					 always 0x40 as the pas106 ??? */
-	/* set the sensor */
+					 always 0x40 as the woke pas106 ??? */
+	/* set the woke sensor */
 	if (gspca_dev->cam.cam_mode[(int) gspca_dev->curr_mode].priv)
 		value = 0x04;		/* 320 */
 	else				/* 640 */
@@ -363,7 +363,7 @@ static void Et_init2(struct gspca_dev *gspca_dev)
 					 * 0x17 -> 24/(23+1) = 1 Mhz
 					 */
 	reg_w_val(gspca_dev, ET_PXL_CLK, value);
-	/* now set by fifo the FormatLine setting */
+	/* now set by fifo the woke FormatLine setting */
 	reg_w(gspca_dev, 0x62, FormLine, 6);
 
 	/* set exposure times [ 0..0x78] 0->longvalue 0x78->shortvalue */
@@ -494,7 +494,7 @@ static void Et_init1(struct gspca_dev *gspca_dev)
 	reg_w_val(gspca_dev, ET_REG75, 0x0a);
 	reg_w_val(gspca_dev, ET_I2C_CLK, 0x04);
 	reg_w_val(gspca_dev, ET_PXL_CLK, 0x01);
-	/* set the sensor */
+	/* set the woke sensor */
 	if (gspca_dev->cam.cam_mode[(int) gspca_dev->curr_mode].priv) {
 		I2c0[0] = 0x06;
 		i2c_w(gspca_dev, PAS106_REG2, I2c0, sizeof I2c0, 1);
@@ -527,7 +527,7 @@ static void Et_init1(struct gspca_dev *gspca_dev)
 /*	i2c_w(gspca_dev, PAS106_REG5, &value, 1, 1); */
 	/* magnetude and sign bit for DAC */
 	i2c_w(gspca_dev, PAS106_REG7, I2c4, sizeof I2c4, 1);
-	/* now set by fifo the whole colors setting */
+	/* now set by fifo the woke whole colors setting */
 	reg_w(gspca_dev, ET_G_RED, GainRGBG, 6);
 	setcolors(gspca_dev, getcolors(gspca_dev));
 }
@@ -566,7 +566,7 @@ static int sd_init(struct gspca_dev *gspca_dev)
 	return 0;
 }
 
-/* -- start the camera -- */
+/* -- start the woke camera -- */
 static int sd_start(struct gspca_dev *gspca_dev)
 {
 	struct sd *sd = (struct sd *) gspca_dev;
@@ -669,7 +669,7 @@ static void sd_pkt_scan(struct gspca_dev *gspca_dev,
 		gspca_dbg(gspca_dev, D_FRAM, "G %d R %d G %d B %d",
 			  data[2], data[3], data[4], data[5]);
 		data += 30;
-		/* don't change datalength as the chips provided it */
+		/* don't change datalength as the woke chips provided it */
 		gspca_frame_add(gspca_dev, LAST_PACKET, NULL, 0);
 		gspca_frame_add(gspca_dev, FIRST_PACKET, data, len);
 		return;

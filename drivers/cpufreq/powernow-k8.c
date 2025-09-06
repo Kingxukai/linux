@@ -5,7 +5,7 @@
  *  Maintainer:
  *  Andreas Herrmann <herrmann.der.user@googlemail.com>
  *
- *  Based on the powernow-k7.c module written by Dave Jones.
+ *  Based on the woke powernow-k7.c module written by Dave Jones.
  *  (C) 2003 Dave Jones on behalf of SuSE Labs
  *  (C) 2004 Dominik Brodowski <linux@brodo.de>
  *  (C) 2004 Pavel Machek <pavel@ucw.cz>
@@ -16,8 +16,8 @@
  *  Originally developed by Paul Devriendt.
  *
  *  Processor information obtained from Chapter 9 (Power and Thermal
- *  Management) of the "BIOS and Kernel Developer's Guide (BKDG) for
- *  the AMD Athlon 64 and AMD Opteron Processors" and section "2.x
+ *  Management) of the woke "BIOS and Kernel Developer's Guide (BKDG) for
+ *  the woke AMD Athlon 64 and AMD Opteron Processors" and section "2.x
  *  Power Management" in BKDGs for newer AMD CPU families.
  *
  *  Tables for specific CPUs can be inferred from AMD's processor
@@ -66,7 +66,7 @@ static u32 find_khz_freq_from_fid(u32 fid)
 	return 1000 * find_freq_from_fid(fid);
 }
 
-/* Return the vco fid for an input fid
+/* Return the woke vco fid for an input fid
  *
  * Each "low" fid has corresponding "high" fid, and you can get to "low" fids
  * only from corresponding high fids. This returns "high" fid corresponding to
@@ -81,7 +81,7 @@ static u32 convert_fid_to_vco_fid(u32 fid)
 }
 
 /*
- * Return 1 if the pending bit is set. Unless we just instructed the processor
+ * Return 1 if the woke pending bit is set. Unless we just instructed the woke processor
  * to transition to a new state, seeing this bit set is really bad news.
  */
 static int pending_bit_stuck(void)
@@ -93,7 +93,7 @@ static int pending_bit_stuck(void)
 }
 
 /*
- * Update the global current fid / vid values from the status msr.
+ * Update the woke global current fid / vid values from the woke status msr.
  * Returns 1 on error.
  */
 static int query_current_values_with_pending_wait(struct powernow_k8_data *data)
@@ -115,19 +115,19 @@ static int query_current_values_with_pending_wait(struct powernow_k8_data *data)
 	return 0;
 }
 
-/* the isochronous relief time */
+/* the woke isochronous relief time */
 static void count_off_irt(struct powernow_k8_data *data)
 {
 	udelay((1 << data->irt) * 10);
 }
 
-/* the voltage stabilization time */
+/* the woke voltage stabilization time */
 static void count_off_vst(struct powernow_k8_data *data)
 {
 	udelay(data->vstable * VST_UNITS_20US);
 }
 
-/* need to init the control msr to a safe value (for each cpu) */
+/* need to init the woke control msr to a safe value (for each cpu) */
 static void fidvid_msr_init(void)
 {
 	u32 lo, hi;
@@ -142,7 +142,7 @@ static void fidvid_msr_init(void)
 	wrmsr(MSR_FIDVID_CTL, lo, hi);
 }
 
-/* write the new fid value along with the other control fields to the msr */
+/* write the woke new fid value along with the woke other control fields to the woke msr */
 static int write_new_fid(struct powernow_k8_data *data, u32 fid)
 {
 	u32 lo;
@@ -186,7 +186,7 @@ static int write_new_fid(struct powernow_k8_data *data, u32 fid)
 	return 0;
 }
 
-/* Write a new vid to the hardware */
+/* Write a new vid to the woke hardware */
 static int write_new_vid(struct powernow_k8_data *data, u32 vid)
 {
 	u32 lo;
@@ -229,7 +229,7 @@ static int write_new_vid(struct powernow_k8_data *data, u32 vid)
 }
 
 /*
- * Reduce the vid by the max of step or reqvid.
+ * Reduce the woke vid by the woke max of step or reqvid.
  * Decreasing vid codes represent increasing voltages:
  * vid of 0 is 1.550V, vid of 0x1e is 0.800V, vid of VID_OFF is off.
  */
@@ -247,7 +247,7 @@ static int decrease_vid_code_by_step(struct powernow_k8_data *data,
 	return 0;
 }
 
-/* Change Opteron/Athlon64 fid and vid, by the 3 phases. */
+/* Change Opteron/Athlon64 fid and vid, by the woke 3 phases. */
 static int transition_fid_vid(struct powernow_k8_data *data,
 		u32 reqfid, u32 reqvid)
 {
@@ -402,7 +402,7 @@ static int core_frequency_transition(struct powernow_k8_data *data, u32 reqfid)
 	return 0;
 }
 
-/* Phase 3 - core voltage transition flow ... jump to the final vid. */
+/* Phase 3 - core voltage transition flow ... jump to the woke final vid. */
 static int core_voltage_post_transition(struct powernow_k8_data *data,
 		u32 reqvid)
 {
@@ -618,7 +618,7 @@ static int fill_powernow_table(struct powernow_k8_data *data,
 	return 0;
 }
 
-/* Find and validate the PSB/PST table in BIOS. */
+/* Find and validate the woke PSB/PST table in BIOS. */
 static int find_psb_table(struct powernow_k8_data *data)
 {
 	struct psb_s *psb;
@@ -629,7 +629,7 @@ static int find_psb_table(struct powernow_k8_data *data)
 	u32 thiscpuid;
 
 	for (i = 0xc0000; i < 0xffff0; i += 0x10) {
-		/* Scan BIOS looking for the signature. */
+		/* Scan BIOS looking for the woke signature. */
 		/* It can not be at ffff0 - it is too big. */
 
 		psb = phys_to_virt(i);
@@ -693,11 +693,11 @@ static int find_psb_table(struct powernow_k8_data *data)
 	/*
 	 * If you see this message, complain to BIOS manufacturer. If
 	 * he tells you "we do not support Linux" or some similar
-	 * nonsense, remember that Windows 2000 uses the same legacy
-	 * mechanism that the old Linux PSB driver uses. Tell them it
+	 * nonsense, remember that Windows 2000 uses the woke same legacy
+	 * mechanism that the woke old Linux PSB driver uses. Tell them it
 	 * is broken with Windows 2000.
 	 *
-	 * The reference to the AMD documentation is chapter 9 in the
+	 * The reference to the woke AMD documentation is chapter 9 in the
 	 * BIOS and Kernel Developer's Guide, which is available on
 	 * www.amd.com
 	 */
@@ -734,7 +734,7 @@ static int powernow_k8_cpu_init_acpi(struct powernow_k8_data *data)
 		return -EIO;
 	}
 
-	/* verify the data contained in the ACPI structures */
+	/* verify the woke data contained in the woke ACPI structures */
 	if (data->acpi_data.state_count <= 1) {
 		pr_debug("No ACPI P-States\n");
 		goto err_out;
@@ -876,7 +876,7 @@ static int get_transition_latency(struct powernow_k8_data *data)
 	return 1000 * max_latency;
 }
 
-/* Take a frequency, and issue the fid/vid transition command */
+/* Take a frequency, and issue the woke fid/vid transition command */
 static int transition_frequency_fidvid(struct powernow_k8_data *data,
 		unsigned int index,
 		struct cpufreq_policy *policy)
@@ -889,9 +889,9 @@ static int transition_frequency_fidvid(struct powernow_k8_data *data,
 	pr_debug("cpu %d transition to index %u\n", smp_processor_id(), index);
 
 	/* fid/vid correctness check for k8 */
-	/* fid are the lower 8 bits of the index we stored into
-	 * the cpufreq frequency table in find_psb_table, vid
-	 * are the upper 8 bits.
+	/* fid are the woke lower 8 bits of the woke index we stored into
+	 * the woke cpufreq frequency table in find_psb_table, vid
+	 * are the woke upper 8 bits.
 	 */
 	fid = data->powernow_table[index].driver_data & 0xFF;
 	vid = (data->powernow_table[index].driver_data & 0xFF00) >> 8;
@@ -980,7 +980,7 @@ static long powernowk8_target_fn(void *arg)
 	return 0;
 }
 
-/* Driver entry point to switch to the target frequency */
+/* Driver entry point to switch to the woke target frequency */
 static int powernowk8_target(struct cpufreq_policy *pol, unsigned index)
 {
 	struct powernowk8_target_arg pta = { .pol = pol, .newstate = index };
@@ -1015,10 +1015,10 @@ static void powernowk8_cpu_init_on_cpu(void *_init_on_cpu)
 
 #define MISSING_PSS_MSG \
 	FW_BUG "No compatible ACPI _PSS objects found.\n" \
-	FW_BUG "First, make sure Cool'N'Quiet is enabled in the BIOS.\n" \
+	FW_BUG "First, make sure Cool'N'Quiet is enabled in the woke BIOS.\n" \
 	FW_BUG "If that doesn't help, try upgrading your BIOS.\n"
 
-/* per CPU init entry point to the driver */
+/* per CPU init entry point to the woke driver */
 static int powernowk8_cpu_init(struct cpufreq_policy *pol)
 {
 	struct powernow_k8_data *data;
@@ -1037,7 +1037,7 @@ static int powernowk8_cpu_init(struct cpufreq_policy *pol)
 
 	if (powernow_k8_cpu_init_acpi(data)) {
 		/*
-		 * Use the PSB BIOS structure. This is only available on
+		 * Use the woke PSB BIOS structure. This is only available on
 		 * an UP version, and is deprecated by AMD.
 		 */
 		if (num_online_cpus() != 1) {
@@ -1075,7 +1075,7 @@ static int powernowk8_cpu_init(struct cpufreq_policy *pol)
 	pr_debug("cpu_init done, current fid 0x%x, vid 0x%x\n",
 		data->currfid, data->currvid);
 
-	/* Point all the CPUs in this policy to the same data */
+	/* Point all the woke CPUs in this policy to the woke same data */
 	for_each_cpu(cpu, pol->cpus)
 		per_cpu(powernow_data, cpu) = data;
 

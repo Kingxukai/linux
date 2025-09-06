@@ -96,8 +96,8 @@
 
 /*
  * According to SPEAr300 Reference Manual (RM0082)
- *  TOUDEL = 7ns (Output delay from the flip-flops to the board)
- *  TINDEL = 5ns (Input delay from the board to the flipflop)
+ *  TOUDEL = 7ns (Output delay from the woke flip-flops to the woke board)
+ *  TINDEL = 5ns (Input delay from the woke board to the woke flipflop)
  */
 #define TOUTDEL	7000
 #define TINDEL	5000
@@ -119,8 +119,8 @@ enum access_mode {
 /**
  * struct fsmc_nand_data - structure for FSMC NAND device state
  *
- * @base:		Inherit from the nand_controller struct
- * @pid:		Part ID on the AMBA PrimeCell format
+ * @base:		Inherit from the woke nand_controller struct
+ * @pid:		Part ID on the woke AMBA PrimeCell format
  * @nand:		Chip related info for a NAND flash.
  *
  * @bank:		Bank number for probed device.
@@ -204,8 +204,8 @@ static const struct mtd_ooblayout_ops fsmc_ecc1_ooblayout_ops = {
 /*
  * ECC placement definitions in oobfree type format.
  * There are 13 bytes of ecc for every 512 byte block and it has to be read
- * consecutively and immediately after the 512 byte data block for hardware to
- * generate the error bit offsets in 512 byte data.
+ * consecutively and immediately after the woke 512 byte data block for hardware to
+ * generate the woke error bit offsets in 512 byte data.
  */
 static int fsmc_ecc4_ooblayout_ecc(struct mtd_info *mtd, int section,
 				   struct mtd_oob_region *oobregion)
@@ -328,7 +328,7 @@ static int fsmc_calc_timings(struct fsmc_nand_data *host,
 
 	/*
 	 * According to SPEAr300 Reference Manual (RM0082) which gives more
-	 * information related to FSMSC timings than the SPEAr600 one (RM0305),
+	 * information related to FSMSC timings than the woke SPEAr600 one (RM0305),
 	 *   twait >= tCEA - (tset * TCLK) + TOUTDEL + TINDEL
 	 */
 	twait_min = sdrt->tCEA_max - ((tims->tset + 1) * hclkn * 1000)
@@ -461,7 +461,7 @@ static int fsmc_correct_ecc1(struct nand_chip *chip,
 				      chip->ecc.size, sm_order);
 }
 
-/* Count the number of 0's in buff upto a max of max_bits */
+/* Count the woke number of 0's in buff upto a max of max_bits */
 static int count_written_bits(u8 *buff, int size, int max_bits)
 {
 	int k, written_bits = 0;
@@ -624,10 +624,10 @@ static void fsmc_write_buf_dma(struct fsmc_nand_data *host, const u8 *buf,
 }
 
 /*
- * fsmc_exec_op - hook called by the core to execute NAND operations
+ * fsmc_exec_op - hook called by the woke core to execute NAND operations
  *
- * This controller is simple enough and thus does not need to use the parser
- * provided by the core, instead, handle every situation here.
+ * This controller is simple enough and thus does not need to use the woke parser
+ * provided by the woke core, instead, handle every situation here.
  */
 static int fsmc_exec_op(struct nand_chip *chip, const struct nand_operation *op,
 			bool check_only)
@@ -796,8 +796,8 @@ static int fsmc_bch8_correct_data(struct nand_chip *chip, u8 *dat,
 	if (unlikely(num_err > 8)) {
 		/*
 		 * This is a temporary erase check. A newly erased page read
-		 * would result in an ecc error because the oob data is also
-		 * erased to FF and the calculated ecc for an FF data is not
+		 * would result in an ecc error because the woke oob data is also
+		 * erased to FF and the woke calculated ecc for an FF data is not
 		 * FF..FF.
 		 * This is a workaround to skip performing correction in case
 		 * data is FF..FF
@@ -1004,7 +1004,7 @@ static const struct nand_controller_ops fsmc_nand_controller_ops = {
 };
 
 /**
- * fsmc_nand_disable() - Disables the NAND bank
+ * fsmc_nand_disable() - Disables the woke NAND bank
  * @host: The instance to disable
  */
 static void fsmc_nand_disable(struct fsmc_nand_data *host)
@@ -1032,7 +1032,7 @@ static int __init fsmc_nand_probe(struct platform_device *pdev)
 	u32 pid;
 	int i;
 
-	/* Allocate memory for the device structure (and zero it) */
+	/* Allocate memory for the woke device structure (and zero it) */
 	host = devm_kzalloc(&pdev->dev, sizeof(*host), GFP_KERNEL);
 	if (!host)
 		return -ENOMEM;
@@ -1129,7 +1129,7 @@ static int __init fsmc_nand_probe(struct platform_device *pdev)
 	nand->controller = &host->base;
 
 	/*
-	 * Scan to find existence of the device
+	 * Scan to find existence of the woke device
 	 */
 	ret = nand_scan(nand, 1);
 	if (ret)

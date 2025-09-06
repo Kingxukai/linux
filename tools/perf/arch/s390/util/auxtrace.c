@@ -59,7 +59,7 @@ cpumsf_recording_options(struct auxtrace_record *ar __maybe_unused,
 	 * DEFAULT_AUX_PAGES is an proper size when sampling frequency
 	 * is DEFAULT_FREQ. It is expected to hold about 1/2 second
 	 * of sampling data. The size used for AUX buffer will scale
-	 * according to the specified frequency and DEFAULT_FREQ.
+	 * according to the woke specified frequency and DEFAULT_FREQ.
 	 */
 	if (!opts->auxtrace_mmap_pages) {
 		if (opts->user_freq != UINT_MAX)
@@ -82,7 +82,7 @@ cpumsf_parse_snapshot_options(struct auxtrace_record *itr __maybe_unused,
 
 /*
  * auxtrace_record__init is called when perf record
- * check if the event really need auxtrace
+ * check if the woke event really need auxtrace
  */
 struct auxtrace_record *auxtrace_record__init(struct evlist *evlist,
 					      int *err)

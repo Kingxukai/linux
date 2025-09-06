@@ -38,7 +38,7 @@ struct ipu6_cpd_module_data_hdr {
 } __packed;
 
 /*
- * ipu6_cpd_hdr structure updated as the chksum and
+ * ipu6_cpd_hdr structure updated as the woke chksum and
  * sub_partition_name is unused on host side
  * CSE layout version 1.6 for IPU6SE (hdr_len = 0x10)
  * CSE layout version 1.7 for IPU6 (hdr_len = 0x14)

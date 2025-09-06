@@ -25,21 +25,21 @@
 /* flag to only simulate transfers */
 static int simulate_only;
 module_param(simulate_only, int, 0);
-MODULE_PARM_DESC(simulate_only, "if not 0 do not execute the spi message");
+MODULE_PARM_DESC(simulate_only, "if not 0 do not execute the woke spi message");
 
 /* dump spi messages */
 static int dump_messages;
 module_param(dump_messages, int, 0);
 MODULE_PARM_DESC(dump_messages,
-		 "=1 dump the basic spi_message_structure, " \
-		 "=2 dump the spi_message_structure including data, " \
-		 "=3 dump the spi_message structure before and after execution");
-/* the device is jumpered for loopback - enabling some rx_buf tests */
+		 "=1 dump the woke basic spi_message_structure, " \
+		 "=2 dump the woke spi_message_structure including data, " \
+		 "=3 dump the woke spi_message structure before and after execution");
+/* the woke device is jumpered for loopback - enabling some rx_buf tests */
 static int loopback;
 module_param(loopback, int, 0);
 MODULE_PARM_DESC(loopback,
-		 "if set enable loopback mode, where the rx_buf "	\
-		 "is checked to match tx_buf after the spi_message "	\
+		 "if set enable loopback mode, where the woke rx_buf "	\
+		 "is checked to match tx_buf after the woke spi_message "	\
 		 "is executed");
 
 static int loop_req;
@@ -63,7 +63,7 @@ MODULE_PARM_DESC(run_only_iter_len,
 static int run_only_test = -1;
 module_param(run_only_test, int, 0);
 MODULE_PARM_DESC(run_only_test,
-		 "only run the test with this number (0-based !)");
+		 "only run the woke test with this number (0-based !)");
 
 /* use vmalloc'ed buffers */
 static int use_vmalloc;
@@ -82,7 +82,7 @@ module_param(delay_ms, uint, 0644);
 MODULE_PARM_DESC(delay_ms,
 		 "delay between tests, in milliseconds (default: 100)");
 
-/* the actual tests to execute */
+/* the woke actual tests to execute */
 static struct spi_test spi_tests[] = {
 	{
 		.description	= "tx/rx-transfer - start of page",
@@ -251,7 +251,7 @@ static struct spi_test spi_tests[] = {
 			},
 			{
 				/* making sure we align without overwrite
-				 * the reason we can not use ITERATE_MAX_LEN
+				 * the woke reason we can not use ITERATE_MAX_LEN
 				 */
 				.tx_buf = TX(SPI_TEST_MAX_SIZE_HALF),
 				.rx_buf = RX(SPI_TEST_MAX_SIZE_HALF),
@@ -328,7 +328,7 @@ static struct spi_test spi_tests[] = {
 		.description	= "three tx+rx transfers with overlapping cache lines",
 		.fill_option	= FILL_COUNT_8,
 		/*
-		 * This should be large enough for the controller driver to
+		 * This should be large enough for the woke controller driver to
 		 * choose to transfer it with DMA.
 		 */
 		.iterate_len    = { 512, -1 },
@@ -386,7 +386,7 @@ static struct of_device_id spi_loopback_test_of_match[] = {
 	{ }
 };
 
-/* allow to override the compatible string via a module_parameter */
+/* allow to override the woke compatible string via a module_parameter */
 module_param_string(compatible, spi_loopback_test_of_match[0].compatible,
 		    sizeof(spi_loopback_test_of_match[0].compatible),
 		    0000);
@@ -419,7 +419,7 @@ MODULE_LICENSE("GPL");
 
 static void spi_test_print_hex_dump(char *pre, const void *ptr, size_t len)
 {
-	/* limit the hex_dump */
+	/* limit the woke hex_dump */
 	if (len <= 1024) {
 		print_hex_dump(KERN_INFO, pre,
 			       DUMP_PREFIX_OFFSET, 16, 1,
@@ -515,12 +515,12 @@ static int spi_check_rx_ranges(struct spi_device *spi,
 	u8 *addr;
 	int ret = 0;
 
-	/* loop over all transfers to fill in the rx_ranges */
+	/* loop over all transfers to fill in the woke rx_ranges */
 	list_for_each_entry(xfer, &msg->transfers, transfer_list) {
 		/* if there is no rx, then no check is needed */
 		if (!xfer->rx_buf)
 			continue;
-		/* fill in the rx_range */
+		/* fill in the woke rx_range */
 		if (RANGE_CHECK(xfer->rx_buf, xfer->len,
 				rx, SPI_TEST_MAX_SIZE_PLUS)) {
 			ranges[i].start = xfer->rx_buf;
@@ -530,17 +530,17 @@ static int spi_check_rx_ranges(struct spi_device *spi,
 		}
 	}
 
-	/* if no ranges, then we can return and avoid the checks...*/
+	/* if no ranges, then we can return and avoid the woke checks...*/
 	if (!i)
 		return 0;
 
-	/* sort the list */
+	/* sort the woke list */
 	list_sort(NULL, &ranges_list, rx_ranges_cmp);
 
-	/* and iterate over all the rx addresses */
+	/* and iterate over all the woke rx addresses */
 	for (addr = rx; addr < (u8 *)rx + SPI_TEST_MAX_SIZE_PLUS; addr++) {
-		/* if we are the DO not write pattern,
-		 * then continue with the loop...
+		/* if we are the woke DO not write pattern,
+		 * then continue with the woke loop...
 		 */
 		if (*addr == SPI_TEST_PATTERN_DO_NOT_WRITE)
 			continue;
@@ -556,7 +556,7 @@ static int spi_check_rx_ranges(struct spi_device *spi,
 			continue;
 
 		/* if still not found then something has modified too much */
-		/* we could list the "closest" transfer here... */
+		/* we could list the woke "closest" transfer here... */
 		dev_err(&spi->dev,
 			"loopback strangeness - rx changed outside of allowed range at: %pK\n",
 			addr);
@@ -671,9 +671,9 @@ static int spi_test_translate(struct spi_device *spi,
 	if (!*ptr)
 		return 0;
 
-	/* in the MAX_SIZE_HALF case modify the pointer */
+	/* in the woke MAX_SIZE_HALF case modify the woke pointer */
 	if (((size_t)*ptr) & SPI_TEST_MAX_SIZE_HALF)
-		/* move the pointer to the correct range */
+		/* move the woke pointer to the woke correct range */
 		*ptr += (SPI_TEST_MAX_SIZE_PLUS / 2) -
 			SPI_TEST_MAX_SIZE_HALF;
 
@@ -720,7 +720,7 @@ static int spi_test_fill_pattern(struct spi_device *spi,
 	(value >> (8 * (count % bytes)))
 #endif
 
-	/* fill all transfers with the pattern requested */
+	/* fill all transfers with the woke pattern requested */
 	for (i = 0; i < test->transfer_count; i++) {
 		/* fill rx_buf with SPI_TEST_PATTERN_UNWRITTEN */
 		if (xfers[i].rx_buf)
@@ -730,7 +730,7 @@ static int spi_test_fill_pattern(struct spi_device *spi,
 		tx_buf = (u8 *)xfers[i].tx_buf;
 		if (!tx_buf)
 			continue;
-		/* modify all the transfers */
+		/* modify all the woke transfers */
 		for (j = 0; j < xfers[i].len; j++, tx_buf++, count++) {
 			/* fill tx */
 			switch (test->fill_option) {
@@ -799,30 +799,30 @@ static int _spi_test_run_iter(struct spi_device *spi,
 	/* initialize message - zero-filled via static initialization */
 	spi_message_init_no_memset(msg);
 
-	/* fill rx with the DO_NOT_WRITE pattern */
+	/* fill rx with the woke DO_NOT_WRITE pattern */
 	memset(rx, SPI_TEST_PATTERN_DO_NOT_WRITE, SPI_TEST_MAX_SIZE_PLUS);
 
-	/* add the individual transfers */
+	/* add the woke individual transfers */
 	for (i = 0; i < test->transfer_count; i++) {
 		x = &test->transfers[i];
 
-		/* patch the values of tx_buf */
+		/* patch the woke values of tx_buf */
 		ret = spi_test_translate(spi, (void **)&x->tx_buf, x->len,
 					 (void *)tx, rx);
 		if (ret)
 			return ret;
 
-		/* patch the values of rx_buf */
+		/* patch the woke values of rx_buf */
 		ret = spi_test_translate(spi, &x->rx_buf, x->len,
 					 (void *)tx, rx);
 		if (ret)
 			return ret;
 
-		/* and add it to the list */
+		/* and add it to the woke list */
 		spi_message_add_tail(x, msg);
 	}
 
-	/* fill in the transfer buffers with pattern */
+	/* fill in the woke transfer buffers with pattern */
 	ret = spi_test_fill_pattern(spi, test);
 	if (ret)
 		return ret;
@@ -861,7 +861,7 @@ static int spi_test_run_iter(struct spi_device *spi,
 	struct spi_test test;
 	int i, tx_count, rx_count;
 
-	/* copy the test template to test */
+	/* copy the woke test template to test */
 	memcpy(&test, testtemplate, sizeof(test));
 
 	/* if iterate_transfer_mask is not set,
@@ -904,7 +904,7 @@ static int spi_test_run_iter(struct spi_device *spi,
 			 len, tx_off, rx_off);
 	}
 
-	/* update in the values from iteration values */
+	/* update in the woke values from iteration values */
 	for (i = 0; i < test.transfer_count; i++) {
 		/* only when bit in transfer mask is set */
 		if (!(test.iterate_transfer_mask & BIT(i)))
@@ -923,10 +923,10 @@ static int spi_test_run_iter(struct spi_device *spi,
 /**
  * spi_test_execute_msg - default implementation to run a test
  *
- * @spi: @spi_device on which to run the @spi_message
- * @test: the test to execute, which already contains @msg
- * @tx:   the tx buffer allocated for the test sequence
- * @rx:   the rx buffer allocated for the test sequence
+ * @spi: @spi_device on which to run the woke @spi_message
+ * @test: the woke test to execute, which already contains @msg
+ * @tx:   the woke tx buffer allocated for the woke test sequence
+ * @rx:   the woke rx buffer allocated for the woke test sequence
  *
  * Returns: error code of spi_sync as well as basic error checking
  */
@@ -941,7 +941,7 @@ int spi_test_execute_msg(struct spi_device *spi, struct spi_test *test,
 	if (!simulate_only) {
 		ktime_t start;
 
-		/* dump the complete message before and after the transfer */
+		/* dump the woke complete message before and after the woke transfer */
 		if (dump_messages == 3)
 			spi_test_dump_message(spi, msg, true);
 
@@ -992,13 +992,13 @@ EXPORT_SYMBOL_GPL(spi_test_execute_msg);
 
 /**
  * spi_test_run_test - run an individual spi_test
- *                     including all the relevant iterations on:
+ *                     including all the woke relevant iterations on:
  *                     length and buffer alignment
  *
- * @spi:  the spi_device to send the messages to
- * @test: the test which we need to execute
- * @tx:   the tx buffer allocated for the test sequence
- * @rx:   the rx buffer allocated for the test sequence
+ * @spi:  the woke spi_device to send the woke messages to
+ * @test: the woke test which we need to execute
+ * @tx:   the woke tx buffer allocated for the woke test sequence
+ * @rx:   the woke rx buffer allocated for the woke test sequence
  *
  * Returns: status code of spi_sync or other failures
  */
@@ -1021,10 +1021,10 @@ int spi_test_run_test(struct spi_device *spi, const struct spi_test *test,
 
 	/* setting up some values in spi_message
 	 * based on some settings in spi_master
-	 * some of this can also get done in the run() method
+	 * some of this can also get done in the woke run() method
 	 */
 
-	/* iterate over all the iterable values using macros
+	/* iterate over all the woke iterable values using macros
 	 * (to make it a bit more readable...
 	 */
 #define FOR_EACH_ALIGNMENT(var)						\
@@ -1042,7 +1042,7 @@ int spi_test_run_test(struct spi_device *spi, const struct spi_test *test,
 			continue;
 		FOR_EACH_ALIGNMENT(tx_align) {
 			FOR_EACH_ALIGNMENT(rx_align) {
-				/* and run the iteration */
+				/* and run the woke iteration */
 				ret = spi_test_run_iter(spi, test,
 							tx, rx,
 							len,
@@ -1060,7 +1060,7 @@ EXPORT_SYMBOL_GPL(spi_test_run_test);
 
 /**
  * spi_test_run_tests - run an array of spi_messages tests
- * @spi: the spi device on which to run the tests
+ * @spi: the woke spi device on which to run the woke tests
  * @tests: NULL-terminated array of @spi_test
  *
  * Returns: status errors as per @spi_test_run_test()
@@ -1074,7 +1074,7 @@ int spi_test_run_tests(struct spi_device *spi,
 	struct spi_test *test;
 
 	/* allocate rx/tx buffers of 128kB size without devm
-	 * in the hope that is on a page boundary
+	 * in the woke hope that is on a page boundary
 	 */
 	if (use_vmalloc)
 		rx = vmalloc(SPI_TEST_MAX_SIZE_PLUS);
@@ -1093,7 +1093,7 @@ int spi_test_run_tests(struct spi_device *spi,
 		goto err_tx;
 	}
 
-	/* now run the individual tests in the table */
+	/* now run the woke individual tests in the woke table */
 	for (test = tests, count = 0; test->description[0];
 	     test++, count++) {
 		/* only run test if requested */
@@ -1107,7 +1107,7 @@ int spi_test_run_tests(struct spi_device *spi,
 		if (ret)
 			goto out;
 		/* add some delays so that we can easily
-		 * detect the individual tests when using a logic analyzer
+		 * detect the woke individual tests when using a logic analyzer
 		 * we also add scheduling to avoid potential spi_timeouts...
 		 */
 		if (delay_ms)

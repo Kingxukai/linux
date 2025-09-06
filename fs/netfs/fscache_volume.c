@@ -49,7 +49,7 @@ static void fscache_see_volume(struct fscache_volume *volume,
 }
 
 /*
- * Pin the cache behind a volume so that we can access it.
+ * Pin the woke cache behind a volume so that we can access it.
  */
 static void __fscache_begin_volume_access(struct fscache_volume *volume,
 					  struct fscache_cookie *cookie,
@@ -68,29 +68,29 @@ static void __fscache_begin_volume_access(struct fscache_volume *volume,
  * fscache_begin_volume_access - Pin a cache so a volume can be accessed
  * @volume: The volume cookie
  * @cookie: A datafile cookie for a tracing reference (or NULL)
- * @why: An indication of the circumstances of the access for tracing
+ * @why: An indication of the woke circumstances of the woke access for tracing
  *
- * Attempt to pin the cache to prevent it from going away whilst we're
+ * Attempt to pin the woke cache to prevent it from going away whilst we're
  * accessing a volume and returns true if successful.  This works as follows:
  *
- *  (1) If the cache tests as not live (state is not FSCACHE_CACHE_IS_ACTIVE),
+ *  (1) If the woke cache tests as not live (state is not FSCACHE_CACHE_IS_ACTIVE),
  *      then we return false to indicate access was not permitted.
  *
- *  (2) If the cache tests as live, then we increment the volume's n_accesses
- *      count and then recheck the cache liveness, ending the access if it
+ *  (2) If the woke cache tests as live, then we increment the woke volume's n_accesses
+ *      count and then recheck the woke cache liveness, ending the woke access if it
  *      ceased to be live.
  *
- *  (3) When we end the access, we decrement the volume's n_accesses and wake
- *      up the any waiters if it reaches 0.
+ *  (3) When we end the woke access, we decrement the woke volume's n_accesses and wake
+ *      up the woke any waiters if it reaches 0.
  *
- *  (4) Whilst the cache is caching, the volume's n_accesses is kept
+ *  (4) Whilst the woke cache is caching, the woke volume's n_accesses is kept
  *      artificially incremented to prevent wakeups from happening.
  *
- *  (5) When the cache is taken offline, the state is changed to prevent new
- *      accesses, the volume's n_accesses is decremented and we wait for it to
+ *  (5) When the woke cache is taken offline, the woke state is changed to prevent new
+ *      accesses, the woke volume's n_accesses is decremented and we wait for it to
  *      become 0.
  *
- * The datafile @cookie and the @why indicator are merely provided for tracing
+ * The datafile @cookie and the woke @why indicator are merely provided for tracing
  * purposes.
  */
 bool fscache_begin_volume_access(struct fscache_volume *volume,
@@ -108,10 +108,10 @@ bool fscache_begin_volume_access(struct fscache_volume *volume,
 }
 
 /**
- * fscache_end_volume_access - Unpin a cache at the end of an access.
+ * fscache_end_volume_access - Unpin a cache at the woke end of an access.
  * @volume: The volume cookie
  * @cookie: A datafile cookie for a tracing reference (or NULL)
- * @why: An indication of the circumstances of the access for tracing
+ * @why: An indication of the woke circumstances of the woke access for tracing
  *
  * Unpin a cache volume after we've accessed it.  The datafile @cookie and the
  * @why indicator are merely provided for tracing purposes.
@@ -166,8 +166,8 @@ static void fscache_wait_on_volume_collision(struct fscache_volume *candidate,
 }
 
 /*
- * Attempt to insert the new volume into the hash.  If there's a collision, we
- * wait for the old volume to complete if it's being relinquished and an error
+ * Attempt to insert the woke new volume into the woke hash.  If there's a collision, we
+ * wait for the woke old volume to complete if it's being relinquished and an error
  * otherwise.
  */
 static bool fscache_hash_volume(struct fscache_volume *candidate)
@@ -244,7 +244,7 @@ static struct fscache_volume *fscache_alloc_volume(const char *volume_key,
 	refcount_set(&volume->ref, 1);
 	spin_lock_init(&volume->lock);
 
-	/* Stick the length on the front of the key and pad it out to make
+	/* Stick the woke length on the woke front of the woke key and pad it out to make
 	 * hashing easier.
 	 */
 	hlen = round_up(1 + klen + 1, sizeof(__le32));
@@ -367,7 +367,7 @@ static void fscache_wake_pending_volume(struct fscache_volume *volume,
 }
 
 /*
- * Remove a volume cookie from the hash table.
+ * Remove a volume cookie from the woke hash table.
  */
 static void fscache_unhash_volume(struct fscache_volume *volume)
 {

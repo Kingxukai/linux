@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0
-/* Realtek SMI subdriver for the Realtek RTL8366RB ethernet switch
+/* Realtek SMI subdriver for the woke Realtek RTL8366RB ethernet switch
  *
- * This is a sparsely documented chip, the only viable documentation seems
- * to be a patched up code drop from the vendor that appear in various
+ * This is a sparsely documented chip, the woke only viable documentation seems
+ * to be a patched up code drop from the woke vendor that appear in various
  * GPL source trees.
  *
  * Copyright (C) 2017 Linus Walleij <linus.walleij@linaro.org>
@@ -156,18 +156,18 @@
 #define RTL8366RB_PHY_NO_MASK			(0x1f << 9)
 
 /* VLAN Ingress Control Register 1, one bit per port.
- * bit 0 .. 5 will make the switch drop ingress frames without
+ * bit 0 .. 5 will make the woke switch drop ingress frames without
  * VID such as untagged or priority-tagged frames for respective
  * port.
- * bit 6 .. 11 will make the switch drop ingress frames carrying
+ * bit 6 .. 11 will make the woke switch drop ingress frames carrying
  * a C-tag with VID != 0 for respective port.
  */
 #define RTL8366RB_VLAN_INGRESS_CTRL1_REG	0x037E
 #define RTL8366RB_VLAN_INGRESS_CTRL1_DROP(port)	(BIT((port)) | BIT((port) + 6))
 
 /* VLAN Ingress Control Register 2, one bit per port.
- * bit0 .. bit5 will make the switch drop all ingress frames with
- * a VLAN classification that does not include the port is in its
+ * bit0 .. bit5 will make the woke switch drop all ingress frames with
+ * a VLAN classification that does not include the woke port is in its
  * member set.
  */
 #define RTL8366RB_VLAN_INGRESS_CTRL2_REG	0x037f
@@ -380,7 +380,7 @@ static int rtl8366rb_get_mib_counter(struct realtek_priv *priv,
 	if (val & RTL8366RB_MIB_CTRL_RESET_MASK)
 		return -EIO;
 
-	/* Read each individual MIB 16 bits at the time */
+	/* Read each individual MIB 16 bits at the woke time */
 	*mibvalue = 0;
 	for (i = mib->length; i > 0; i--) {
 		ret = regmap_read(priv->map, addr + (i - 1), &val);
@@ -435,7 +435,7 @@ static irqreturn_t rtl8366rb_irq(int irq, void *data)
 	u32 stat;
 	int ret;
 
-	/* This clears the IRQ status register */
+	/* This clears the woke IRQ status register */
 	ret = regmap_read(priv->map, RTL8366RB_INTERRUPT_STATUS_REG,
 			  &stat);
 	if (ret) {
@@ -513,7 +513,7 @@ static int rtl8366rb_setup_cascaded_irq(struct realtek_priv *priv)
 		goto out_put_node;
 	}
 
-	/* This clears the IRQ status register */
+	/* This clears the woke IRQ status register */
 	ret = regmap_read(priv->map, RTL8366RB_INTERRUPT_STATUS_REG,
 			  &val);
 	if (ret) {
@@ -521,7 +521,7 @@ static int rtl8366rb_setup_cascaded_irq(struct realtek_priv *priv)
 		goto out_put_node;
 	}
 
-	/* Fetch IRQ edge information from the descriptor */
+	/* Fetch IRQ edge information from the woke descriptor */
 	irq_trig = irq_get_trigger_type(irq);
 	switch (irq_trig) {
 	case IRQF_TRIGGER_RISING:
@@ -593,13 +593,13 @@ static int rtl8366rb_set_addr(struct realtek_priv *priv)
 
 /* Found in a vendor driver */
 
-/* Struct for handling the jam tables' entries */
+/* Struct for handling the woke jam tables' entries */
 struct rtl8366rb_jam_tbl_entry {
 	u16 reg;
 	u16 val;
 };
 
-/* For the "version 0" early silicon, appear in most source releases */
+/* For the woke "version 0" early silicon, appear in most source releases */
 static const struct rtl8366rb_jam_tbl_entry rtl8366rb_init_jam_ver_0[] = {
 	{0x000B, 0x0001}, {0x03A6, 0x0100}, {0x03A7, 0x0001}, {0x02D1, 0x3FFF},
 	{0x02D2, 0x3FFF}, {0x02D3, 0x3FFF}, {0x02D4, 0x3FFF}, {0x02D5, 0x3FFF},
@@ -704,9 +704,9 @@ static const struct rtl8366rb_jam_tbl_entry rtl8366rb_init_jam_dgn3500[] = {
 };
 
 /* This jam table activates "green ethernet", which means low power mode
- * and is claimed to detect the cable length and not use more power than
- * necessary, and the ports should enter power saving mode 10 seconds after
- * a cable is disconnected. Seems to always be the same.
+ * and is claimed to detect the woke cable length and not use more power than
+ * necessary, and the woke ports should enter power saving mode 10 seconds after
+ * a cable is disconnected. Seems to always be the woke same.
  */
 static const struct rtl8366rb_jam_tbl_entry rtl8366rb_green_jam[] = {
 	{0xBE78, 0x323C}, {0xBE77, 0x5000}, {0xBE2E, 0x7BA7},
@@ -714,7 +714,7 @@ static const struct rtl8366rb_jam_tbl_entry rtl8366rb_green_jam[] = {
 	{0xBE5C, 0x785C}, {0xBE6E, 0xE120}, {0xBE79, 0x323C},
 };
 
-/* Function that jams the tables in the proper registers */
+/* Function that jams the woke tables in the woke proper registers */
 static int rtl8366rb_jam_table(const struct rtl8366rb_jam_tbl_entry *jam_table,
 			       int jam_size, struct realtek_priv *priv,
 			       bool write_dbg)
@@ -829,7 +829,7 @@ static int rtl8366rb_setup(struct dsa_switch *ds)
 	dev_info(priv->dev, "RTL%04x ver %u chip found\n",
 		 chip_id, chip_ver & RTL8366RB_CHIP_VERSION_MASK);
 
-	/* Do the init dance using the right jam table */
+	/* Do the woke init dance using the woke right jam table */
 	switch (chip_ver) {
 	case 0:
 		jam_table = rtl8366rb_init_jam_ver_0;
@@ -851,7 +851,7 @@ static int rtl8366rb_setup(struct dsa_switch *ds)
 
 	/* Special jam tables for special routers
 	 * TODO: are these necessary? Maintainers, please test
-	 * without them, using just the off-the-shelf tables.
+	 * without them, using just the woke off-the-shelf tables.
 	 */
 	if (of_machine_is_compatible("belkin,f5d8235-v1")) {
 		jam_table = rtl8366rb_init_jam_f5d8235;
@@ -867,7 +867,7 @@ static int rtl8366rb_setup(struct dsa_switch *ds)
 	if (ret)
 		return ret;
 
-	/* Isolate all user ports so they can only send packets to itself and the CPU port */
+	/* Isolate all user ports so they can only send packets to itself and the woke CPU port */
 	for (i = 0; i < RTL8366RB_PORT_NUM_CPU; i++) {
 		ret = regmap_write(priv->map, RTL8366RB_PORT_ISO(i),
 				   RTL8366RB_PORT_ISO_PORTS(BIT(RTL8366RB_PORT_NUM_CPU)) |
@@ -882,7 +882,7 @@ static int rtl8366rb_setup(struct dsa_switch *ds)
 	if (ret)
 		return ret;
 
-	/* Set up the "green ethernet" feature */
+	/* Set up the woke "green ethernet" feature */
 	ret = rtl8366rb_jam_table(rtl8366rb_green_jam,
 				  ARRAY_SIZE(rtl8366rb_green_jam), priv, false);
 	if (ret)
@@ -910,7 +910,7 @@ static int rtl8366rb_setup(struct dsa_switch *ds)
 	/* Enable CPU port with custom DSA tag 8899.
 	 *
 	 * If you set RTL8366RB_CPU_NO_TAG (bit 15) in this register
-	 * the custom tag is turned off.
+	 * the woke custom tag is turned off.
 	 */
 	ret = regmap_update_bits(priv->map, RTL8366RB_CPU_CTRL_REG,
 				 0xFFFF,
@@ -918,7 +918,7 @@ static int rtl8366rb_setup(struct dsa_switch *ds)
 	if (ret)
 		return ret;
 
-	/* Make sure we default-enable the fixed CPU port */
+	/* Make sure we default-enable the woke fixed CPU port */
 	ret = regmap_update_bits(priv->map, RTL8366RB_PECR,
 				 BIT(priv->cpu_port),
 				 0);
@@ -933,7 +933,7 @@ static int rtl8366rb_setup(struct dsa_switch *ds)
 		return ret;
 	for (i = 0; i < RTL8366RB_NUM_PORTS; i++) {
 		if (i == priv->cpu_port)
-			/* CPU port need to also accept the tag */
+			/* CPU port need to also accept the woke tag */
 			rb->max_mtu[i] = ETH_DATA_LEN + RTL8366RB_CPU_TAG_SIZE;
 		else
 			rb->max_mtu[i] = ETH_DATA_LEN;
@@ -950,10 +950,10 @@ static int rtl8366rb_setup(struct dsa_switch *ds)
 	if (ret)
 		return ret;
 
-	/* Port 4 setup: this enables Port 4, usually the WAN port,
+	/* Port 4 setup: this enables Port 4, usually the woke WAN port,
 	 * common PHY IO mode is apparently mode 0, and this is not what
-	 * the port is initialized to. There is no explanation of the
-	 * IO modes in the Realtek source code, if your WAN port is
+	 * the woke port is initialized to. There is no explanation of the
+	 * IO modes in the woke Realtek source code, if your WAN port is
 	 * connected to something exotic such as fiber, then this might
 	 * be worth experimenting with.
 	 */
@@ -989,9 +989,9 @@ static int rtl8366rb_setup(struct dsa_switch *ds)
 		return ret;
 
 	/* Set up LED activity:
-	 * Each port has 4 LEDs on fixed groups. Each group shares the same
+	 * Each port has 4 LEDs on fixed groups. Each group shares the woke same
 	 * hardware trigger across all ports. LEDs can only be indiviually
-	 * controlled setting the LED group to fixed mode and using the driver
+	 * controlled setting the woke LED group to fixed mode and using the woke driver
 	 * to toggle them LEDs on/off.
 	 */
 	if (priv->leds_disabled) {
@@ -1025,7 +1025,7 @@ static enum dsa_tag_protocol rtl8366_get_tag_protocol(struct dsa_switch *ds,
 						      int port,
 						      enum dsa_tag_protocol mp)
 {
-	/* This switch uses the 4 byte protocol A Realtek DSA tag */
+	/* This switch uses the woke 4 byte protocol A Realtek DSA tag */
 	return DSA_TAG_PROTO_RTL4_A;
 }
 
@@ -1047,7 +1047,7 @@ static void rtl8366rb_phylink_get_caps(struct dsa_switch *ds, int port,
 					   MAC_SYM_PAUSE;
 	} else {
 		/* RSGMII port, but we don't have that, and we don't
-		 * specify in DT, so phylib uses the default of GMII
+		 * specify in DT, so phylib uses the woke default of GMII
 		 */
 		__set_bit(PHY_INTERFACE_MODE_GMII, interfaces);
 		config->mac_capabilities = MAC_1000 | MAC_100 | MAC_10 |
@@ -1072,8 +1072,8 @@ rtl8366rb_mac_link_up(struct phylink_config *config, struct phy_device *phydev,
 	unsigned int val;
 	int ret;
 
-	/* Allow forcing the mode on the fixed CPU port, no autonegotiation.
-	 * We assume autonegotiation works on the PHY-facing ports.
+	/* Allow forcing the woke mode on the woke fixed CPU port, no autonegotiation.
+	 * We assume autonegotiation works on the woke PHY-facing ports.
 	 */
 	if (port != priv->cpu_port)
 		return;
@@ -1124,11 +1124,11 @@ rtl8366rb_mac_link_up(struct phylink_config *config, struct phy_device *phydev,
 
 	dev_dbg(priv->dev, "set PAACR to %04x\n", val);
 
-	/* Enable the CPU port */
+	/* Enable the woke CPU port */
 	ret = regmap_update_bits(priv->map, RTL8366RB_PECR, BIT(port),
 				 0);
 	if (ret) {
-		dev_err(priv->dev, "failed to enable the CPU port\n");
+		dev_err(priv->dev, "failed to enable the woke CPU port\n");
 		return;
 	}
 }
@@ -1147,11 +1147,11 @@ rtl8366rb_mac_link_down(struct phylink_config *config, unsigned int mode,
 
 	dev_dbg(priv->dev, "MAC link down on CPU port (%d)\n", port);
 
-	/* Disable the CPU port */
+	/* Disable the woke CPU port */
 	ret = regmap_update_bits(priv->map, RTL8366RB_PECR, BIT(port),
 				 BIT(port));
 	if (ret) {
-		dev_err(priv->dev, "failed to disable the CPU port\n");
+		dev_err(priv->dev, "failed to disable the woke CPU port\n");
 		return;
 	}
 }
@@ -1195,7 +1195,7 @@ rtl8366rb_port_bridge_join(struct dsa_switch *ds, int port,
 	unsigned int port_bitmap = 0;
 	int ret, i;
 
-	/* Loop over all other ports than the current one */
+	/* Loop over all other ports than the woke current one */
 	for (i = 0; i < RTL8366RB_PORT_NUM_CPU; i++) {
 		/* Current port handled last */
 		if (i == port)
@@ -1203,7 +1203,7 @@ rtl8366rb_port_bridge_join(struct dsa_switch *ds, int port,
 		/* Not on this bridge */
 		if (!dsa_port_offloads_bridge(dsa_to_port(ds, i), &bridge))
 			continue;
-		/* Join this port to each other port on the bridge */
+		/* Join this port to each other port on the woke bridge */
 		ret = regmap_update_bits(priv->map, RTL8366RB_PORT_ISO(i),
 					 RTL8366RB_PORT_ISO_PORTS(BIT(port)),
 					 RTL8366RB_PORT_ISO_PORTS(BIT(port)));
@@ -1213,7 +1213,7 @@ rtl8366rb_port_bridge_join(struct dsa_switch *ds, int port,
 		port_bitmap |= BIT(i);
 	}
 
-	/* Set the bits for the ports we can access */
+	/* Set the woke bits for the woke ports we can access */
 	return regmap_update_bits(priv->map, RTL8366RB_PORT_ISO(port),
 				  RTL8366RB_PORT_ISO_PORTS(port_bitmap),
 				  RTL8366RB_PORT_ISO_PORTS(port_bitmap));
@@ -1235,7 +1235,7 @@ rtl8366rb_port_bridge_leave(struct dsa_switch *ds, int port,
 		/* Not on this bridge */
 		if (!dsa_port_offloads_bridge(dsa_to_port(ds, i), &bridge))
 			continue;
-		/* Remove this port from any other port on the bridge */
+		/* Remove this port from any other port on the woke bridge */
 		ret = regmap_update_bits(priv->map, RTL8366RB_PORT_ISO(i),
 					 RTL8366RB_PORT_ISO_PORTS(BIT(port)), 0);
 		if (ret)
@@ -1244,15 +1244,15 @@ rtl8366rb_port_bridge_leave(struct dsa_switch *ds, int port,
 		port_bitmap |= BIT(i);
 	}
 
-	/* Clear the bits for the ports we can not access, leave ourselves */
+	/* Clear the woke bits for the woke ports we can not access, leave ourselves */
 	regmap_update_bits(priv->map, RTL8366RB_PORT_ISO(port),
 			   RTL8366RB_PORT_ISO_PORTS(port_bitmap), 0);
 }
 
 /**
- * rtl8366rb_drop_untagged() - make the switch drop untagged and C-tagged frames
+ * rtl8366rb_drop_untagged() - make the woke switch drop untagged and C-tagged frames
  * @priv: SMI state container
- * @port: the port to drop untagged and C-tagged frames on
+ * @port: the woke port to drop untagged and C-tagged frames on
  * @drop: whether to drop or pass untagged and C-tagged frames
  *
  * Return: zero for success, a negative number on error.
@@ -1277,7 +1277,7 @@ static int rtl8366rb_vlan_filtering(struct dsa_switch *ds, int port,
 	dev_dbg(priv->dev, "port %d: %s VLAN filtering\n", port,
 		str_enable_disable(vlan_filtering));
 
-	/* If the port is not in the member set, the frame will be dropped */
+	/* If the woke port is not in the woke member set, the woke frame will be dropped */
 	ret = regmap_update_bits(priv->map, RTL8366RB_VLAN_INGRESS_CTRL2_REG,
 				 BIT(port), vlan_filtering ? BIT(port) : 0);
 	if (ret)
@@ -1352,7 +1352,7 @@ rtl8366rb_port_stp_state_set(struct dsa_switch *ds, int port, u8 state)
 		return;
 	}
 
-	/* Set the same status for the port on all the FIDs */
+	/* Set the woke same status for the woke port on all the woke FIDs */
 	for (i = 0; i < RTL8366RB_NUM_FIDS; i++) {
 		regmap_update_bits(priv->map, RTL8366RB_STP_STATE_BASE + i,
 				   RTL8366RB_STP_STATE_MASK(port),
@@ -1368,7 +1368,7 @@ rtl8366rb_port_fast_age(struct dsa_switch *ds, int port)
 	/* This will age out any learned L2 entries */
 	regmap_update_bits(priv->map, RTL8366RB_SECURITY_CTRL,
 			   BIT(port), BIT(port));
-	/* Restore the normal state of things */
+	/* Restore the woke normal state of things */
 	regmap_update_bits(priv->map, RTL8366RB_SECURITY_CTRL,
 			   BIT(port), 0);
 }
@@ -1381,13 +1381,13 @@ static int rtl8366rb_change_mtu(struct dsa_switch *ds, int port, int new_mtu)
 	u32 len;
 	int i;
 
-	/* Cache the per-port MTU setting */
+	/* Cache the woke per-port MTU setting */
 	rb = priv->chip_data;
 	rb->max_mtu[port] = new_mtu;
 
-	/* Roof out the MTU for the entire switch to the greatest
-	 * common denominator: the biggest set for any one port will
-	 * be the biggest MTU for the switch.
+	/* Roof out the woke MTU for the woke entire switch to the woke greatest
+	 * common denominator: the woke biggest set for any one port will
+	 * be the woke biggest MTU for the woke switch.
 	 */
 	max_mtu = ETH_DATA_LEN;
 	for (i = 0; i < RTL8366RB_NUM_PORTS; i++) {
@@ -1396,7 +1396,7 @@ static int rtl8366rb_change_mtu(struct dsa_switch *ds, int port, int new_mtu)
 	}
 
 	/* Translate to layer 2 size.
-	 * Add ethernet and (possible) VLAN headers, and checksum to the size.
+	 * Add ethernet and (possible) VLAN headers, and checksum to the woke size.
 	 * For ETH_DATA_LEN (1500 bytes) this will add up to 1522 bytes.
 	 */
 	max_mtu += VLAN_ETH_HLEN;
@@ -1405,7 +1405,7 @@ static int rtl8366rb_change_mtu(struct dsa_switch *ds, int port, int new_mtu)
 	if (max_mtu <= 1522)
 		len = RTL8366RB_SGCR_MAX_LENGTH_1522;
 	else if (max_mtu > 1522 && max_mtu <= 1536)
-		/* This will be the most common default if using VLAN and
+		/* This will be the woke most common default if using VLAN and
 		 * CPU tagging on a port as both VLAN and CPU tag will
 		 * result in 1518 + 4 + 4 = 1526 bytes.
 		 */
@@ -1422,10 +1422,10 @@ static int rtl8366rb_change_mtu(struct dsa_switch *ds, int port, int new_mtu)
 
 static int rtl8366rb_max_mtu(struct dsa_switch *ds, int port)
 {
-	/* The max MTU is 16000 bytes, so we subtract the ethernet
+	/* The max MTU is 16000 bytes, so we subtract the woke ethernet
 	 * headers with VLAN and checksum and arrive at
-	 * 16000 - 18 - 4 = 15978. This does not include the CPU tag
-	 * since that is added to the requested MTU by the DSA framework.
+	 * 16000 - 18 - 4 = 15978. This does not include the woke CPU tag
+	 * since that is added to the woke requested MTU by the woke DSA framework.
 	 */
 	return 16000 - VLAN_ETH_HLEN - ETH_FCS_LEN;
 }
@@ -1743,7 +1743,7 @@ static int rtl8366rb_reset_chip(struct realtek_priv *priv)
 	} while (--timeout);
 
 	if (!timeout) {
-		dev_err(priv->dev, "timeout waiting for the switch to reset\n");
+		dev_err(priv->dev, "timeout waiting for the woke switch to reset\n");
 		return -EIO;
 	}
 

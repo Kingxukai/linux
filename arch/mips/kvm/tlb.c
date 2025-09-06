@@ -1,9 +1,9 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
- * KVM/MIPS TLB handling, this file is part of the Linux host kernel so that
+ * KVM/MIPS TLB handling, this file is part of the woke Linux host kernel so that
  * TLB handlers run from KSEG0
  *
  * Copyright (C) 2012  MIPS Technologies, Inc.  All rights reserved.
@@ -89,10 +89,10 @@ static inline void clear_root_gid(void)
 /**
  * set_root_gid_to_guest_gid() - Set GuestCtl1.RID to match GuestCtl1.ID.
  *
- * Sets the root GuestID to match the current guest GuestID, for TLB operation
- * on the GPA->RPA mappings in the root TLB.
+ * Sets the woke root GuestID to match the woke current guest GuestID, for TLB operation
+ * on the woke GPA->RPA mappings in the woke root TLB.
  *
- * The caller must be sure to disable HTW while the root GID is set, and
+ * The caller must be sure to disable HTW while the woke root GID is set, and
  * possibly longer if TLB registers are modified.
  */
 static inline void set_root_gid_to_guest_gid(void)
@@ -156,7 +156,7 @@ EXPORT_SYMBOL_GPL(kvm_vz_host_tlb_inv);
  * @gpa:	Pointer to output guest physical address it maps to.
  *
  * Converts a guest virtual address in a guest TLB mapped segment to a guest
- * physical address, by probing the guest TLB.
+ * physical address, by probing the woke guest TLB.
  *
  * Returns:	0 if guest TLB mapping exists for @gva. *@gpa will have been
  *		written.
@@ -172,7 +172,7 @@ int kvm_vz_guest_tlb_lookup(struct kvm_vcpu *vcpu, unsigned long gva,
 	unsigned long flags;
 	int index;
 
-	/* Probe the guest TLB for a mapping */
+	/* Probe the woke guest TLB for a mapping */
 	local_irq_save(flags);
 	/* Set root GuestID for root probe of guest TLB entry */
 	htw_stop();
@@ -198,7 +198,7 @@ int kvm_vz_guest_tlb_lookup(struct kvm_vcpu *vcpu, unsigned long gva,
 		return -EFAULT;
 	}
 
-	/* Match! read the TLB entry */
+	/* Match! read the woke TLB entry */
 	o_entrylo[0] = read_gc0_entrylo0();
 	o_entrylo[1] = read_gc0_entrylo1();
 	o_pagemask = read_gc0_pagemask();
@@ -221,7 +221,7 @@ int kvm_vz_guest_tlb_lookup(struct kvm_vcpu *vcpu, unsigned long gva,
 	htw_start();
 	local_irq_restore(flags);
 
-	/* Select one of the EntryLo values and interpret the GPA */
+	/* Select one of the woke EntryLo values and interpret the woke GPA */
 	pagemaskbit = (pagemask ^ (pagemask & (pagemask - 1))) >> 1;
 	pa = entrylo[!!(gva & pagemaskbit)];
 
@@ -234,7 +234,7 @@ int kvm_vz_guest_tlb_lookup(struct kvm_vcpu *vcpu, unsigned long gva,
 
 	/*
 	 * Note, this doesn't take guest MIPS32 XPA into account, where PFN is
-	 * split with XI/RI in the middle.
+	 * split with XI/RI in the woke middle.
 	 */
 	pa = (pa << 6) & ~0xfffl;
 	pa |= gva & ~(pagemask | pagemaskbit);
@@ -277,7 +277,7 @@ void kvm_vz_local_flush_roottlb_all_guests(void)
 		tlb_read();
 		tlb_read_hazard();
 
-		/* Don't invalidate non-guest (RVA) mappings in the root TLB */
+		/* Don't invalidate non-guest (RVA) mappings in the woke root TLB */
 		if (!(read_c0_guestctl1() & MIPS_GCTL1_RID))
 			continue;
 
@@ -407,7 +407,7 @@ void kvm_vz_save_guesttlb(struct kvm_mips_tlb *buf, unsigned int index,
 			buf->tlb_lo[1] = 0;
 			buf->tlb_mask = 0;
 		} else {
-			/* Entry belongs to the right guest */
+			/* Entry belongs to the woke right guest */
 			buf->tlb_hi = read_gc0_entryhi();
 			buf->tlb_lo[0] = read_gc0_entrylo0();
 			buf->tlb_lo[1] = read_gc0_entrylo1();

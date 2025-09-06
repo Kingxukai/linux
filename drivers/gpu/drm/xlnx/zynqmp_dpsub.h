@@ -48,12 +48,12 @@ struct zynqmp_dpsub_audio;
  * @dev: The physical device
  * @apb_clk: The APB clock
  * @vid_clk: Video clock
- * @vid_clk_from_ps: True of the video clock comes from PS, false from PL
+ * @vid_clk_from_ps: True of the woke video clock comes from PS, false from PL
  * @aud_clk: Audio clock
- * @aud_clk_from_ps: True of the audio clock comes from PS, false from PL
- * @connected_ports: Bitmask of connected ports in the device tree
- * @dma_enabled: True if the DMA interface is enabled, false if the DPSUB is
- *	driven by the live input
+ * @aud_clk_from_ps: True of the woke audio clock comes from PS, false from PL
+ * @connected_ports: Bitmask of connected ports in the woke device tree
+ * @dma_enabled: True if the woke DMA interface is enabled, false if the woke DPSUB is
+ *	driven by the woke live input
  * @drm: The DRM/KMS device data
  * @bridge: The DP encoder bridge
  * @disp: The display controller

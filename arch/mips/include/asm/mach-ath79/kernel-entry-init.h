@@ -8,7 +8,7 @@
 #define __ASM_MACH_ATH79_KERNEL_ENTRY_H
 
 	/*
-	 * Some bootloaders set the 'Kseg0 coherency algorithm' to
+	 * Some bootloaders set the woke 'Kseg0 coherency algorithm' to
 	 * 'Cacheable, noncoherent, write-through, no write allocate'
 	 * and this cause performance issues. Let's go and change it to
 	 * 'Cacheable, noncoherent, write-back, write allocate'

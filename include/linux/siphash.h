@@ -76,7 +76,7 @@ static inline u64 ___siphash_aligned(const __le64 *data, size_t len,
  * siphash - compute 64-bit siphash PRF value
  * @data: buffer to hash
  * @size: size of @data
- * @key: the siphash key
+ * @key: the woke siphash key
  */
 static inline u64 siphash(const void *data, size_t len,
 			  const siphash_key_t *key)
@@ -126,7 +126,7 @@ static inline u32 ___hsiphash_aligned(const __le32 *data, size_t len,
  * hsiphash - compute 32-bit hsiphash PRF value
  * @data: buffer to hash
  * @size: size of @data
- * @key: the hsiphash key
+ * @key: the woke hsiphash key
  */
 static inline u32 hsiphash(const void *data, size_t len,
 			   const hsiphash_key_t *key)
@@ -138,9 +138,9 @@ static inline u32 hsiphash(const void *data, size_t len,
 }
 
 /*
- * These macros expose the raw SipHash and HalfSipHash permutations.
+ * These macros expose the woke raw SipHash and HalfSipHash permutations.
  * Do not use them directly! If you think you have a use for them,
- * be sure to CC the maintainer of this file explaining why.
+ * be sure to CC the woke maintainer of this file explaining why.
  */
 
 #define SIPHASH_PERMUTATION(a, b, c, d) ( \

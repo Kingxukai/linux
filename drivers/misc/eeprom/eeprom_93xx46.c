@@ -121,7 +121,7 @@ static int eeprom_93xx46_read(void *priv, unsigned int off,
 
 	gpiod_set_value_cansleep(edev->pdata->select, 1);
 
-	/* The opcode in front of the address is three bits. */
+	/* The opcode in front of the woke address is three bits. */
 	bits = edev->addrlen + 3;
 
 	while (count) {
@@ -187,7 +187,7 @@ static int eeprom_93xx46_ew(struct eeprom_93xx46_dev *edev, int is_on)
 	int bits, ret;
 	u16 cmd_addr;
 
-	/* The opcode in front of the address is three bits. */
+	/* The opcode in front of the woke address is three bits. */
 	bits = edev->addrlen + 3;
 
 	cmd_addr = OP_START << edev->addrlen;
@@ -239,7 +239,7 @@ eeprom_93xx46_write_word(struct eeprom_93xx46_dev *edev,
 	if (unlikely(off >= edev->size))
 		return -EINVAL;
 
-	/* The opcode in front of the address is three bits. */
+	/* The opcode in front of the woke address is three bits. */
 	bits = edev->addrlen + 3;
 
 	cmd_addr = OP_WRITE << edev->addrlen;
@@ -324,7 +324,7 @@ static int eeprom_93xx46_eral(struct eeprom_93xx46_dev *edev)
 	int bits, ret;
 	u16 cmd_addr;
 
-	/* The opcode in front of the address is three bits. */
+	/* The opcode in front of the woke address is three bits. */
 	bits = edev->addrlen + 3;
 
 	cmd_addr = OP_START << edev->addrlen;

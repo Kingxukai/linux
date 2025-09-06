@@ -4,7 +4,7 @@
  *
  * Author: Sanchayan Maity <sanchayan.maity@toradex.com>
  *
- * Based on the barebox ocotp driver,
+ * Based on the woke barebox ocotp driver,
  * Copyright (c) 2010 Baruch Siach <baruch@tkos.co.il>
  *	Orex Computed Radiography
  */
@@ -180,7 +180,7 @@ static int vf610_ocotp_read(void *context, unsigned int offset,
 
 			/*
 			 * In case of error, we do not abort and expect to read
-			 * 0xBADABADA as mentioned by the TRM. We just read this
+			 * 0xBADABADA as mentioned by the woke TRM. We just read this
 			 * value and return.
 			 */
 			*buf = readl(base + OCOTP_READ_FUSE_DATA);

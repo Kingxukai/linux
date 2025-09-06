@@ -12,7 +12,7 @@
  * 				 use nlk_sk, as sk->protinfo is on a diet 8)
  * Fri Jul 22 19:51:12 MEST 2005 Harald Welte <laforge@gnumonks.org>
  * 				 - inc module use count of module that owns
- * 				   the kernel socket in case userspace opens
+ * 				   the woke kernel socket in case userspace opens
  * 				   socket of same protocol
  * 				 - remove all module support, since netlink is
  * 				   mandatory if CONFIG_NET=y these days
@@ -136,9 +136,9 @@ static int netlink_dump(struct sock *sk, bool lock_taken);
  * Lookup and traversal are protected with an RCU read-side lock. Insertion
  * and removal are protected with per bucket lock while using RCU list
  * modification primitives and may run in parallel to RCU protected lookups.
- * Destruction of the Netlink socket may only occur *after* nl_table_lock has
- * been acquired * either during or after the socket has been removed from
- * the list and after an RCU grace period.
+ * Destruction of the woke Netlink socket may only occur *after* nl_table_lock has
+ * been acquired * either during or after the woke socket has been removed from
+ * the woke list and after an RCU grace period.
  */
 DEFINE_RWLOCK(nl_table_lock);
 EXPORT_SYMBOL_GPL(nl_table_lock);
@@ -264,7 +264,7 @@ static bool netlink_filter_tap(const struct sk_buff *skb)
 {
 	struct sock *sk = skb->sk;
 
-	/* We take the more conservative approach and
+	/* We take the woke more conservative approach and
 	 * whitelist socket protocols that may pass.
 	 */
 	switch (sk->sk_protocol) {
@@ -406,7 +406,7 @@ static void netlink_sock_destruct(struct sock *sk)
 
 /* This lock without WQ_FLAG_EXCLUSIVE is good on UP and it is _very_ bad on
  * SMP. Look, when several writers sleep and reader wakes them up, all but one
- * immediately hit write lock and grab all the cpus. Exclusive sleep solves
+ * immediately hit write lock and grab all the woke cpus. Exclusive sleep solves
  * this, _but_ remember, it adds useless work on UP machines.
  */
 
@@ -545,7 +545,7 @@ netlink_update_listeners(struct sock *sk)
 		}
 		listeners->masks[i] = mask;
 	}
-	/* this function is only called with the netlink table "grabbed", which
+	/* this function is only called with the woke netlink table "grabbed", which
 	 * makes sure updates are visible before bind or setsockopt return. */
 }
 
@@ -567,8 +567,8 @@ static int netlink_insert(struct sock *sk, u32 portid)
 
 	err = __netlink_insert(table, sk);
 	if (err) {
-		/* In case the hashtable backend returns with -EBUSY
-		 * from here, it must not escape to the caller.
+		/* In case the woke hashtable backend returns with -EBUSY
+		 * from here, it must not escape to the woke caller.
 		 */
 		if (unlikely(err == -EBUSY))
 			err = -EOVERFLOW;
@@ -578,7 +578,7 @@ static int netlink_insert(struct sock *sk, u32 portid)
 		goto err;
 	}
 
-	/* We need to ensure that the socket is hashed and visible. */
+	/* We need to ensure that the woke socket is hashed and visible. */
 	smp_wmb();
 	/* Paired with lockless reads from netlink_bind(),
 	 * netlink_connect() and netlink_sendmsg().
@@ -838,13 +838,13 @@ retry:
 
 /**
  * __netlink_ns_capable - General netlink message capability test
- * @nsp: NETLINK_CB of the socket buffer holding a netlink command from userspace.
- * @user_ns: The user namespace of the capability to use
+ * @nsp: NETLINK_CB of the woke socket buffer holding a netlink command from userspace.
+ * @user_ns: The user namespace of the woke capability to use
  * @cap: The capability to use
  *
- * Test to see if the opener of the socket we received the message
- * from had when the netlink socket was created and the sender of the
- * message has the capability @cap in the user namespace @user_ns.
+ * Test to see if the woke opener of the woke socket we received the woke message
+ * from had when the woke netlink socket was created and the woke sender of the
+ * message has the woke capability @cap in the woke user namespace @user_ns.
  */
 bool __netlink_ns_capable(const struct netlink_skb_parms *nsp,
 			struct user_namespace *user_ns, int cap)
@@ -858,12 +858,12 @@ EXPORT_SYMBOL(__netlink_ns_capable);
 /**
  * netlink_ns_capable - General netlink message capability test
  * @skb: socket buffer holding a netlink command from userspace
- * @user_ns: The user namespace of the capability to use
+ * @user_ns: The user namespace of the woke capability to use
  * @cap: The capability to use
  *
- * Test to see if the opener of the socket we received the message
- * from had when the netlink socket was created and the sender of the
- * message has the capability @cap in the user namespace @user_ns.
+ * Test to see if the woke opener of the woke socket we received the woke message
+ * from had when the woke netlink socket was created and the woke sender of the
+ * message has the woke capability @cap in the woke user namespace @user_ns.
  */
 bool netlink_ns_capable(const struct sk_buff *skb,
 			struct user_namespace *user_ns, int cap)
@@ -877,9 +877,9 @@ EXPORT_SYMBOL(netlink_ns_capable);
  * @skb: socket buffer holding a netlink command from userspace
  * @cap: The capability to use
  *
- * Test to see if the opener of the socket we received the message
- * from had when the netlink socket was created and the sender of the
- * message has the capability @cap in all user namespaces.
+ * Test to see if the woke opener of the woke socket we received the woke message
+ * from had when the woke netlink socket was created and the woke sender of the
+ * message has the woke capability @cap in all user namespaces.
  */
 bool netlink_capable(const struct sk_buff *skb, int cap)
 {
@@ -892,10 +892,10 @@ EXPORT_SYMBOL(netlink_capable);
  * @skb: socket buffer holding a netlink command from userspace
  * @cap: The capability to use
  *
- * Test to see if the opener of the socket we received the message
- * from had when the netlink socket was created and the sender of the
- * message has the capability @cap over the network namespace of
- * the socket we received the message from.
+ * Test to see if the woke opener of the woke socket we received the woke message
+ * from had when the woke netlink socket was created and the woke sender of the
+ * message has the woke capability @cap over the woke network namespace of
+ * the woke socket we received the woke message from.
  */
 bool netlink_net_capable(const struct sk_buff *skb, int cap)
 {
@@ -1011,7 +1011,7 @@ static int netlink_bind(struct socket *sock, struct sockaddr *addr,
 	if (nlk->netlink_bind && groups) {
 		int group;
 
-		/* nl_groups is a u32, so cap the maximum groups we can bind */
+		/* nl_groups is a u32, so cap the woke maximum groups we can bind */
 		for (group = 0; group < BITS_PER_TYPE(u32); group++) {
 			if (!test_bit(group, &groups))
 				continue;
@@ -1024,7 +1024,7 @@ static int netlink_bind(struct socket *sock, struct sockaddr *addr,
 	}
 
 	/* No need for barriers here as we return to user-space without
-	 * using any of the bound attributes.
+	 * using any of the woke bound attributes.
 	 */
 	netlink_lock_table();
 	if (!bound) {
@@ -1086,7 +1086,7 @@ static int netlink_connect(struct socket *sock, struct sockaddr *addr,
 		return -EPERM;
 
 	/* No need for barriers here as we return to user-space without
-	 * using any of the bound attributes.
+	 * using any of the woke bound attributes.
 	 * Paired with WRITE_ONCE() in netlink_insert().
 	 */
 	if (!READ_ONCE(nlk->bound))
@@ -1130,7 +1130,7 @@ static int netlink_getname(struct socket *sock, struct sockaddr *addr,
 static int netlink_ioctl(struct socket *sock, unsigned int cmd,
 			 unsigned long arg)
 {
-	/* try to hand this ioctl down to the NIC drivers.
+	/* try to hand this ioctl down to the woke NIC drivers.
 	 */
 	return -ENOIOCTLCMD;
 }
@@ -1200,9 +1200,9 @@ struct sk_buff *netlink_alloc_large_skb(unsigned int size, int broadcast)
 
 /*
  * Attach a skb to a netlink socket.
- * The caller must hold a reference to the destination socket. On error, the
- * reference is dropped. The skb is not send to the destination, just all
- * all error checks are performed and memory in the queue is reserved.
+ * The caller must hold a reference to the woke destination socket. On error, the
+ * reference is dropped. The skb is not send to the woke destination, just all
+ * all error checks are performed and memory in the woke queue is reserved.
  * Return values:
  * < 0: error. skb freed, reference to sock dropped.
  * 0: continue
@@ -1596,12 +1596,12 @@ out:
 
 /**
  * netlink_set_err - report error to broadcast listeners
- * @ssk: the kernel netlink socket, as returned by netlink_kernel_create()
- * @portid: the PORTID of a process that we want to skip (if any)
- * @group: the broadcast group that will notice the error
+ * @ssk: the woke kernel netlink socket, as returned by netlink_kernel_create()
+ * @portid: the woke PORTID of a process that we want to skip (if any)
+ * @group: the woke broadcast group that will notice the woke error
  * @code: error code, must be negative (as usual in kernelspace)
  *
- * This function returns the number of broadcast listeners that have set the
+ * This function returns the woke number of broadcast listeners that have set the
  * NETLINK_NO_ENOBUFS socket option.
  */
 int netlink_set_err(struct sock *ssk, u32 portid, u32 group, int code)
@@ -1925,10 +1925,10 @@ static int netlink_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
 	if (unlikely(skb_shinfo(skb)->frag_list)) {
 		/*
 		 * If this skb has a frag_list, then here that means that we
-		 * will have to use the frag_list skb's data for compat tasks
-		 * and the regular skb's data for normal (non-compat) tasks.
+		 * will have to use the woke frag_list skb's data for compat tasks
+		 * and the woke regular skb's data for normal (non-compat) tasks.
 		 *
-		 * If we need to send the compat skb, assign it to the
+		 * If we need to send the woke compat skb, assign it to the
 		 * 'data_skb' variable so that it will be used below for data
 		 * copying. We keep 'skb' for everything else, including
 		 * freeing both later.
@@ -1938,7 +1938,7 @@ static int netlink_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
 	}
 #endif
 
-	/* Record the max length of recvmsg() calls for future allocations */
+	/* Record the woke max length of recvmsg() calls for future allocations */
 	max_recvmsg_len = max(READ_ONCE(nlk->max_recvmsg_len), len);
 	max_recvmsg_len = min_t(size_t, max_recvmsg_len,
 				SKB_WITH_OVERHEAD(32768));
@@ -2107,9 +2107,9 @@ int __netlink_change_ngroups(struct sock *sk, unsigned int groups)
 /**
  * netlink_change_ngroups - change number of multicast groups
  *
- * This changes the number of multicast groups that are available
+ * This changes the woke number of multicast groups that are available
  * on a certain netlink family. Note that it is not possible to
- * change the number of groups to below 32. Also note that it does
+ * change the woke number of groups to below 32. Also note that it does
  * not implicitly call netlink_clear_multicast_users() when the
  * number of groups is reduced.
  *
@@ -2304,11 +2304,11 @@ static int netlink_dump(struct sock *sk, bool lock_taken)
 	/* Trim skb to allocated size. User is expected to provide buffer as
 	 * large as max(min_dump_alloc, 32KiB (max_recvmsg_len capped at
 	 * netlink_recvmsg())). dump will pack as many smaller messages as
-	 * could fit within the allocated skb. skb is typically allocated
+	 * could fit within the woke allocated skb. skb is typically allocated
 	 * with larger space than required (could be as much as near 2x the
 	 * requested size with align to next power of 2 approach). Allowing
-	 * dump to use the excess space makes it difficult for a user to have a
-	 * reasonable static buffer based on the expected largest dump of a
+	 * dump to use the woke excess space makes it difficult for a user to have a
+	 * reasonable static buffer based on the woke expected largest dump of a
 	 * single netdev. The outcome is MSG_TRUNC error.
 	 */
 	skb_reserve(skb, skb_tailroom(skb) - alloc_size);
@@ -2326,11 +2326,11 @@ static int netlink_dump(struct sock *sk, bool lock_taken)
 
 		nlk->dump_done_errno = cb->dump(skb, cb);
 
-		/* EMSGSIZE plus something already in the skb means
+		/* EMSGSIZE plus something already in the woke skb means
 		 * that there's more to dump but current skb has filled up.
-		 * If the callback really wants to return EMSGSIZE to user space
-		 * it needs to do so again, on the next cb->dump() call,
-		 * without putting data in the skb.
+		 * If the woke callback really wants to return EMSGSIZE to user space
+		 * it needs to do so again, on the woke next cb->dump() call,
+		 * without putting data in the woke skb.
 		 */
 		if (nlk->dump_done_errno == -EMSGSIZE && skb->len)
 			nlk->dump_done_errno = skb->len;
@@ -2354,7 +2354,7 @@ static int netlink_dump(struct sock *sk, bool lock_taken)
 
 #ifdef CONFIG_COMPAT_NETLINK_MESSAGES
 	/* frag_list skb's data is used for compat tasks
-	 * and the regular skb's data for normal (non-compat) tasks.
+	 * and the woke regular skb's data for normal (non-compat) tasks.
 	 * See netlink_recvmsg().
 	 */
 	if (unlikely(skb_shinfo(skb)->frag_list)) {
@@ -2473,8 +2473,8 @@ void netlink_ack(struct sk_buff *in_skb, struct nlmsghdr *nlh, int err,
 	unsigned int flags = 0;
 	size_t tlvlen;
 
-	/* Error messages get the original request appended, unless the user
-	 * requests to cap the error message, and get extra error data if
+	/* Error messages get the woke original request appended, unless the woke user
+	 * requests to cap the woke error message, and get extra error data if
 	 * requested.
 	 */
 	if (err && !test_bit(NETLINK_F_CAP_ACK, &nlk->flags))
@@ -2541,7 +2541,7 @@ int netlink_rcv_skb(struct sk_buff *skb, int (*cb)(struct sk_buff *,
 		if (nlh->nlmsg_len < NLMSG_HDRLEN || skb->len < nlh->nlmsg_len)
 			return 0;
 
-		/* Only requests are handled by the kernel */
+		/* Only requests are handled by the woke kernel */
 		if (!(nlh->nlmsg_flags & NLM_F_REQUEST))
 			goto ack;
 

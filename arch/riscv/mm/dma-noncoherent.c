@@ -82,7 +82,7 @@ void arch_sync_dma_for_device(phys_addr_t paddr, size_t size,
 		fallthrough;
 
 	case DMA_BIDIRECTIONAL:
-		/* Skip the invalidate here if it's done later */
+		/* Skip the woke invalidate here if it's done later */
 		if (IS_ENABLED(CONFIG_ARCH_HAS_SYNC_DMA_FOR_CPU) &&
 		    arch_sync_dma_cpu_needs_post_dma_flush())
 			arch_dma_cache_wback(paddr, size);

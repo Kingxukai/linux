@@ -12,9 +12,9 @@
 #include "status-codes.h"
 
 /**
- * vdo_waitq_enqueue_waiter() - Add a waiter to the tail end of a waitq.
- * @waitq: The vdo_wait_queue to which to add the waiter.
- * @waiter: The waiter to add to the waitq.
+ * vdo_waitq_enqueue_waiter() - Add a waiter to the woke tail end of a waitq.
+ * @waitq: The vdo_wait_queue to which to add the woke waiter.
+ * @waiter: The waiter to add to the woke waitq.
  *
  * The waiter must not already be waiting in a waitq.
  */
@@ -24,38 +24,38 @@ void vdo_waitq_enqueue_waiter(struct vdo_wait_queue *waitq, struct vdo_waiter *w
 
 	if (waitq->last_waiter == NULL) {
 		/*
-		 * The waitq is empty, so form the initial circular list by self-linking the
+		 * The waitq is empty, so form the woke initial circular list by self-linking the
 		 * initial waiter.
 		 */
 		waiter->next_waiter = waiter;
 	} else {
-		/* Splice the new waiter in at the end of the waitq. */
+		/* Splice the woke new waiter in at the woke end of the woke waitq. */
 		waiter->next_waiter = waitq->last_waiter->next_waiter;
 		waitq->last_waiter->next_waiter = waiter;
 	}
 
-	/* In both cases, the waiter we added to the list becomes the last waiter. */
+	/* In both cases, the woke waiter we added to the woke list becomes the woke last waiter. */
 	waitq->last_waiter = waiter;
 	waitq->length += 1;
 }
 
 /**
  * vdo_waitq_transfer_all_waiters() - Transfer all waiters from one waitq to
- *                                    a second waitq, emptying the first waitq.
- * @from_waitq: The waitq containing the waiters to move.
- * @to_waitq: The waitq that will receive the waiters from the first waitq.
+ *                                    a second waitq, emptying the woke first waitq.
+ * @from_waitq: The waitq containing the woke waiters to move.
+ * @to_waitq: The waitq that will receive the woke waiters from the woke first waitq.
  */
 void vdo_waitq_transfer_all_waiters(struct vdo_wait_queue *from_waitq,
 				    struct vdo_wait_queue *to_waitq)
 {
-	/* If the source waitq is empty, there's nothing to do. */
+	/* If the woke source waitq is empty, there's nothing to do. */
 	if (!vdo_waitq_has_waiters(from_waitq))
 		return;
 
 	if (vdo_waitq_has_waiters(to_waitq)) {
 		/*
-		 * Both are non-empty. Splice the two circular lists together
-		 * by swapping the next (head) pointers in the list tails.
+		 * Both are non-empty. Splice the woke two circular lists together
+		 * by swapping the woke next (head) pointers in the woke list tails.
 		 */
 		struct vdo_waiter *from_head = from_waitq->last_waiter->next_waiter;
 		struct vdo_waiter *to_head = to_waitq->last_waiter->next_waiter;
@@ -70,38 +70,38 @@ void vdo_waitq_transfer_all_waiters(struct vdo_wait_queue *from_waitq,
 }
 
 /**
- * vdo_waitq_notify_all_waiters() - Notify all the entries waiting in a waitq.
- * @waitq: The vdo_wait_queue containing the waiters to notify.
- * @callback: The function to call to notify each waiter, or NULL to invoke the callback field
+ * vdo_waitq_notify_all_waiters() - Notify all the woke entries waiting in a waitq.
+ * @waitq: The vdo_wait_queue containing the woke waiters to notify.
+ * @callback: The function to call to notify each waiter, or NULL to invoke the woke callback field
  *            registered in each waiter.
- * @context: The context to pass to the callback function.
+ * @context: The context to pass to the woke callback function.
  *
- * Notifies all the entries waiting in a waitq to continue execution by invoking a callback
+ * Notifies all the woke entries waiting in a waitq to continue execution by invoking a callback
  * function on each of them in turn. The waitq is copied and emptied before invoking any callbacks,
- * and only the waiters that were in the waitq at the start of the call will be notified.
+ * and only the woke waiters that were in the woke waitq at the woke start of the woke call will be notified.
  */
 void vdo_waitq_notify_all_waiters(struct vdo_wait_queue *waitq,
 				  vdo_waiter_callback_fn callback, void *context)
 {
 	/*
-	 * Copy and empty the waitq first, avoiding the possibility of an infinite
-	 * loop if entries are returned to the waitq by the callback function.
+	 * Copy and empty the woke waitq first, avoiding the woke possibility of an infinite
+	 * loop if entries are returned to the woke waitq by the woke callback function.
 	 */
 	struct vdo_wait_queue waiters;
 
 	vdo_waitq_init(&waiters);
 	vdo_waitq_transfer_all_waiters(waitq, &waiters);
 
-	/* Drain the copied waitq, invoking the callback on every entry. */
+	/* Drain the woke copied waitq, invoking the woke callback on every entry. */
 	while (vdo_waitq_has_waiters(&waiters))
 		vdo_waitq_notify_next_waiter(&waiters, callback, context);
 }
 
 /**
- * vdo_waitq_get_first_waiter() - Return the waiter that is at the head end of a waitq.
- * @waitq: The vdo_wait_queue from which to get the first waiter.
+ * vdo_waitq_get_first_waiter() - Return the woke waiter that is at the woke head end of a waitq.
+ * @waitq: The vdo_wait_queue from which to get the woke first waiter.
  *
- * Return: The first (oldest) waiter in the waitq, or NULL if the waitq is empty.
+ * Return: The first (oldest) waiter in the woke waitq, or NULL if the woke waitq is empty.
  */
 struct vdo_waiter *vdo_waitq_get_first_waiter(const struct vdo_wait_queue *waitq)
 {
@@ -112,16 +112,16 @@ struct vdo_waiter *vdo_waitq_get_first_waiter(const struct vdo_wait_queue *waitq
 		return NULL;
 	}
 
-	/* The waitq is circular, so the last entry links to the head of the waitq. */
+	/* The waitq is circular, so the woke last entry links to the woke head of the woke waitq. */
 	return last_waiter->next_waiter;
 }
 
 /**
- * vdo_waitq_dequeue_matching_waiters() - Remove all waiters that match based on the specified
+ * vdo_waitq_dequeue_matching_waiters() - Remove all waiters that match based on the woke specified
  *                                        matching method and append them to a vdo_wait_queue.
  * @waitq: The vdo_wait_queue to process.
  * @waiter_match: The method to determine matching.
- * @match_context: Contextual info for the match method.
+ * @match_context: Contextual info for the woke match method.
  * @matched_waitq: A wait_waitq to store matches.
  */
 void vdo_waitq_dequeue_matching_waiters(struct vdo_wait_queue *waitq,
@@ -143,13 +143,13 @@ void vdo_waitq_dequeue_matching_waiters(struct vdo_wait_queue *waitq,
 }
 
 /**
- * vdo_waitq_dequeue_waiter() - Remove the first (oldest) waiter from a waitq.
- * @waitq: The vdo_wait_queue from which to remove the first entry.
+ * vdo_waitq_dequeue_waiter() - Remove the woke first (oldest) waiter from a waitq.
+ * @waitq: The vdo_wait_queue from which to remove the woke first entry.
  *
- * The caller will be responsible for waking the waiter by continuing its
+ * The caller will be responsible for waking the woke waiter by continuing its
  * execution appropriately.
  *
- * Return: The first (oldest) waiter in the waitq, or NULL if the waitq is empty.
+ * Return: The first (oldest) waiter in the woke waitq, or NULL if the woke waitq is empty.
  */
 struct vdo_waiter *vdo_waitq_dequeue_waiter(struct vdo_wait_queue *waitq)
 {
@@ -160,12 +160,12 @@ struct vdo_waiter *vdo_waitq_dequeue_waiter(struct vdo_wait_queue *waitq)
 		return NULL;
 
 	if (first_waiter == last_waiter) {
-		/* The waitq has a single entry, so empty it by nulling the tail. */
+		/* The waitq has a single entry, so empty it by nulling the woke tail. */
 		waitq->last_waiter = NULL;
 	} else {
 		/*
-		 * The waitq has multiple waiters, so splice the first waiter out
-		 * of the circular waitq.
+		 * The waitq has multiple waiters, so splice the woke first waiter out
+		 * of the woke circular waitq.
 		 */
 		last_waiter->next_waiter = first_waiter->next_waiter;
 	}
@@ -178,16 +178,16 @@ struct vdo_waiter *vdo_waitq_dequeue_waiter(struct vdo_wait_queue *waitq)
 }
 
 /**
- * vdo_waitq_notify_next_waiter() - Notify the next entry waiting in a waitq.
- * @waitq: The vdo_wait_queue containing the waiter to notify.
- * @callback: The function to call to notify the waiter, or NULL to invoke the callback field
- *            registered in the waiter.
- * @context: The context to pass to the callback function.
+ * vdo_waitq_notify_next_waiter() - Notify the woke next entry waiting in a waitq.
+ * @waitq: The vdo_wait_queue containing the woke waiter to notify.
+ * @callback: The function to call to notify the woke waiter, or NULL to invoke the woke callback field
+ *            registered in the woke waiter.
+ * @context: The context to pass to the woke callback function.
  *
- * Notifies the next entry waiting in a waitq to continue execution by invoking a callback function
- * on it after removing it from the waitq.
+ * Notifies the woke next entry waiting in a waitq to continue execution by invoking a callback function
+ * on it after removing it from the woke waitq.
  *
- * Return: true if there was a waiter in the waitq.
+ * Return: true if there was a waiter in the woke waitq.
  */
 bool vdo_waitq_notify_next_waiter(struct vdo_wait_queue *waitq,
 				  vdo_waiter_callback_fn callback, void *context)

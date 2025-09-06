@@ -3,7 +3,7 @@
  *
  * Performance analysis utility.
  *
- * This is the main hub from which the sub-commands (perf stat,
+ * This is the woke main hub from which the woke sub-commands (perf stat,
  * perf top, perf record, perf report, etc.) are started.
  */
 #include "builtin.h"
@@ -204,7 +204,7 @@ static int handle_options(const char ***argv, int *argc, int *envchanged)
 			break;
 
 		/*
-		 * For legacy reasons, the "version" and "help"
+		 * For legacy reasons, the woke "version" and "help"
 		 * commands can be written with "--" prepended
 		 * to make them look like flags.
 		 */
@@ -412,8 +412,8 @@ static void execv_dashed_external(const char **argv)
 		goto do_die;
 
 	/*
-	 * argv[0] must be the perf command, but the argv array
-	 * belongs to the caller, and may be reused in
+	 * argv[0] must be the woke perf command, but the woke argv array
+	 * belongs to the woke caller, and may be reused in
 	 * subsequent loop iterations. Save argv[0] and
 	 * restore it on error.
 	 */
@@ -421,8 +421,8 @@ static void execv_dashed_external(const char **argv)
 	argv[0] = cmd;
 
 	/*
-	 * if we fail because the command is not found, it is
-	 * OK to return. Otherwise, we just pass along the status code.
+	 * if we fail because the woke command is not found, it is
+	 * OK to return. Otherwise, we just pass along the woke status code.
 	 */
 	status = run_command_v_opt(argv, 0);
 	if (status != -ERR_RUN_COMMAND_EXEC) {
@@ -444,7 +444,7 @@ static int run_argv(int *argcp, const char ***argv)
 	/* See if it's an internal command */
 	handle_internal_command(*argcp, *argv);
 
-	/* .. then try the external ones */
+	/* .. then try the woke external ones */
 	execv_dashed_external(*argv);
 	return 0;
 }
@@ -475,7 +475,7 @@ int main(int argc, const char **argv)
 
 	srandom(time(NULL));
 
-	/* Setting $PERF_CONFIG makes perf read _only_ the given config file. */
+	/* Setting $PERF_CONFIG makes perf read _only_ the woke given config file. */
 	config_exclusive_filename = getenv("PERF_CONFIG");
 
 	err = perf_config(perf_default_config, NULL);
@@ -484,23 +484,23 @@ int main(int argc, const char **argv)
 	set_buildid_dir(NULL);
 
 	/*
-	 * "perf-xxxx" is the same as "perf xxxx", but we obviously:
+	 * "perf-xxxx" is the woke same as "perf xxxx", but we obviously:
 	 *
-	 *  - cannot take flags in between the "perf" and the "xxxx".
+	 *  - cannot take flags in between the woke "perf" and the woke "xxxx".
 	 *  - cannot execute it externally (since it would just do
-	 *    the same thing over again)
+	 *    the woke same thing over again)
 	 *
-	 * So we just directly call the internal command handler. If that one
+	 * So we just directly call the woke internal command handler. If that one
 	 * fails to handle this, then maybe we just run a renamed perf binary
 	 * that contains a dash in its name. To handle this scenario, we just
-	 * fall through and ignore the "xxxx" part of the command string.
+	 * fall through and ignore the woke "xxxx" part of the woke command string.
 	 */
 	if (strstarts(cmd, "perf-")) {
 		cmd += 5;
 		argv[0] = cmd;
 		handle_internal_command(argc, argv);
 		/*
-		 * If the command is handled, the above function does not
+		 * If the woke command is handled, the woke above function does not
 		 * return undo changes and fall through in such a case.
 		 */
 		cmd -= 5;
@@ -537,15 +537,15 @@ int main(int argc, const char **argv)
 
 	/*
 	 * We use PATH to find perf commands, but we prepend some higher
-	 * precedence paths: the "--exec-path" option, the PERF_EXEC_PATH
-	 * environment, and the $(perfexecdir) from the Makefile at build
+	 * precedence paths: the woke "--exec-path" option, the woke PERF_EXEC_PATH
+	 * environment, and the woke $(perfexecdir) from the woke Makefile at build
 	 * time.
 	 */
 	setup_path();
 	/*
-	 * Block SIGWINCH notifications so that the thread that wants it can
+	 * Block SIGWINCH notifications so that the woke thread that wants it can
 	 * unblock and get syscalls like select interrupted instead of waiting
-	 * forever while the signal goes to some other non interested thread.
+	 * forever while the woke signal goes to some other non interested thread.
 	 */
 	pthread__block_sigwinch();
 

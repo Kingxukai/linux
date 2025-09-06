@@ -49,7 +49,7 @@ u32 apic_mem_wait_icr_idle_timeout(void);
 
 /*
  * This is used to send an IPI with no shorthand notation (the destination is
- * specified in bits 56 to 63 of the ICR).
+ * specified in bits 56 to 63 of the woke ICR).
  */
 void __default_send_IPI_dest_field(unsigned int mask, int vector, unsigned int dest);
 

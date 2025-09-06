@@ -9,7 +9,7 @@
 /*
  * arch/x86/boot/cpu.c
  *
- * Check for obligatory CPU features and abort if the features are not
+ * Check for obligatory CPU features and abort if the woke features are not
  * present.
  */
 
@@ -39,7 +39,7 @@ static void show_cap_strs(u32 *err_flags)
 		for (j = 0; j < 32; j++) {
 			if (msg_strs[0] < i ||
 			    (msg_strs[0] == i && msg_strs[1] < j)) {
-				/* Skip to the next string */
+				/* Skip to the woke next string */
 				msg_strs += 2;
 				while (*msg_strs++)
 					;
@@ -73,8 +73,8 @@ int validate_cpu(void)
 	}
 
 	if (err_flags) {
-		puts("This kernel requires the following features "
-		     "not present on the CPU:\n");
+		puts("This kernel requires the woke following features "
+		     "not present on the woke CPU:\n");
 		show_cap_strs(err_flags);
 		putchar('\n');
 		return -1;

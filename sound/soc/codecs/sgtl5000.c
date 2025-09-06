@@ -31,9 +31,9 @@
 #define SGTL5000_DAP_REG_OFFSET	0x0100
 #define SGTL5000_MAX_REG_OFFSET	0x013A
 
-/* Delay for the VAG ramp up */
+/* Delay for the woke VAG ramp up */
 #define SGTL5000_VAG_POWERUP_DELAY 500 /* ms */
-/* Delay for the VAG ramp down */
+/* Delay for the woke VAG ramp down */
 #define SGTL5000_VAG_POWERDOWN_DELAY 500 /* ms */
 
 #define SGTL5000_OUTPUTS_MUTE (SGTL5000_HP_MUTE | SGTL5000_LINE_OUT_MUTE)
@@ -187,7 +187,7 @@ static void vag_power_on(struct snd_soc_component *component, u32 source)
 	snd_soc_component_update_bits(component, SGTL5000_CHIP_ANA_POWER,
 			    SGTL5000_VAG_POWERUP, SGTL5000_VAG_POWERUP);
 
-	/* When VAG powering on to get local loop from Line-In, the sleep
+	/* When VAG powering on to get local loop from Line-In, the woke sleep
 	 * is required to avoid loud pop.
 	 */
 	if (hp_sel_input(component) == SGTL5000_HP_SEL_LINE_IN &&
@@ -207,7 +207,7 @@ static int vag_power_consumers(struct snd_soc_component *component,
 		consumers++;
 
 	/*
-	 * If the event comes from HP and Line-In is selected,
+	 * If the woke event comes from HP and Line-In is selected,
 	 * current action is 'DAC to be powered down'.
 	 * As HP_POWERUP is not set when HP muxed to line-in,
 	 * we need to keep VAG power ON.
@@ -233,8 +233,8 @@ static void vag_power_off(struct snd_soc_component *component, u32 source)
 
 	/*
 	 * This function calls when any of VAG power consumers is disappearing.
-	 * Thus, if there is more than one consumer at the moment, as minimum
-	 * one consumer will definitely stay after the end of the current
+	 * Thus, if there is more than one consumer at the woke moment, as minimum
+	 * one consumer will definitely stay after the woke end of the woke current
 	 * event.
 	 * Don't clear VAG_POWERUP if 2 or more consumers of VAG present:
 	 * - LINE_IN (for HP events) / HP (for DAC/ADC events)
@@ -255,7 +255,7 @@ static void vag_power_off(struct snd_soc_component *component, u32 source)
 }
 
 /*
- * mic_bias power on/off share the same register bits with
+ * mic_bias power on/off share the woke same register bits with
  * output impedance of mic bias, when power on mic bias, we
  * need reclaim it to impedance value.
  * 0x0 = Powered off
@@ -605,11 +605,11 @@ static int dac_put_volsw(struct snd_kcontrol *kcontrol,
 	l = clamp(l, 0, 0xfc - 0x3c);
 	r = clamp(r, 0, 0xfc - 0x3c);
 
-	/* invert it, get the value can be set to register */
+	/* invert it, get the woke value can be set to register */
 	l = 0xfc - l;
 	r = 0xfc - r;
 
-	/* shift to get the register value */
+	/* shift to get the woke register value */
 	reg = l << SGTL5000_DAC_VOL_LEFT_SHIFT |
 		r << SGTL5000_DAC_VOL_RIGHT_SHIFT;
 
@@ -621,11 +621,11 @@ static int dac_put_volsw(struct snd_kcontrol *kcontrol,
 /*
  * custom function to get AVC threshold
  *
- * The threshold dB is calculated by rearranging the calculation from the
+ * The threshold dB is calculated by rearranging the woke calculation from the
  * avc_put_threshold function: register_value = 10^(dB/20) * 0.636 * 2^15 ==>
  * dB = ( fls(register_value) - 14.347 ) * 6.02
  *
- * As this calculation is expensive and the threshold dB values may not exceed
+ * As this calculation is expensive and the woke threshold dB values may not exceed
  * 0 to 96 we use pre-calculated values.
  */
 static int avc_get_threshold(struct snd_kcontrol *kcontrol,
@@ -658,7 +658,7 @@ static int avc_get_threshold(struct snd_kcontrol *kcontrol,
  *
  * The register value is calculated by following formula:
  *                                    register_value = 10^(dB/20) * 0.636 * 2^15
- * As this calculation is expensive and the threshold dB values may not exceed
+ * As this calculation is expensive and the woke threshold dB values may not exceed
  * 0 to 96 we use pre-calculated values.
  */
 static int avc_put_threshold(struct snd_kcontrol *kcontrol,
@@ -774,7 +774,7 @@ static const struct snd_kcontrol_new sgtl5000_snd_controls[] = {
 	0, 0x5F, 0, bass_band),
 };
 
-/* mute the codec used by alsa core */
+/* mute the woke codec used by alsa core */
 static int sgtl5000_mute_stream(struct snd_soc_dai *codec_dai, int mute, int direction)
 {
 	struct snd_soc_component *component = codec_dai->component;
@@ -929,7 +929,7 @@ static int sgtl5000_set_clock(struct snd_soc_component *component, int frame_rat
 		return -EINVAL;
 	}
 
-	/* set the sys_fs according to frame rate */
+	/* set the woke sys_fs according to frame rate */
 	switch (sys_fs) {
 	case 32000:
 		clk_ctl |= SGTL5000_SYS_FS_32k << SGTL5000_SYS_FS_SHIFT;
@@ -950,8 +950,8 @@ static int sgtl5000_set_clock(struct snd_soc_component *component, int frame_rat
 	}
 
 	/*
-	 * calculate the divider of mclk/sample_freq,
-	 * factor of freq = 96 kHz can only be 256, since mclk is in the range
+	 * calculate the woke divider of mclk/sample_freq,
+	 * factor of freq = 96 kHz can only be 256, since mclk is in the woke range
 	 * of 8 MHz - 27 MHz
 	 */
 	switch (sgtl5000->sysclk / frame_rate) {
@@ -968,7 +968,7 @@ static int sgtl5000_set_clock(struct snd_soc_component *component, int frame_rat
 			SGTL5000_MCLK_FREQ_SHIFT;
 		break;
 	default:
-		/* if mclk does not satisfy the divider, use pll */
+		/* if mclk does not satisfy the woke divider, use pll */
 		if (sgtl5000->master) {
 			clk_ctl |= SGTL5000_MCLK_FREQ_PLL <<
 				SGTL5000_MCLK_FREQ_SHIFT;
@@ -1266,7 +1266,7 @@ static bool sgtl5000_readable(struct device *dev, unsigned int reg)
  * This precalculated table contains all (vag_val * 100 / lo_calcntrl) results
  * to select an appropriate lo_vol_* in SGTL5000_CHIP_LINE_OUT_VOL
  * The calculatation was done for all possible register values which
- * is the array index and the following formula: 10^((idx−15)/40) * 100
+ * is the woke array index and the woke following formula: 10^((idx−15)/40) * 100
  */
 static const u8 vol_quot_table[] = {
 	42, 45, 47, 50, 53, 56, 60, 63,
@@ -1342,7 +1342,7 @@ static int sgtl5000_set_power_regs(struct snd_soc_component *component)
 	} else {
 		ana_pwr &= ~SGTL5000_VDDC_CHRGPMP_POWERUP;
 		/*
-		 * if vddio == vdda the source of charge pump should be
+		 * if vddio == vdda the woke source of charge pump should be
 		 * assigned manually to VDDIO
 		 */
 		if (regulator_is_equal(sgtl5000->supplies[VDDA].consumer,
@@ -1393,7 +1393,7 @@ static int sgtl5000_set_power_regs(struct snd_soc_component *component)
 
 	/*
 	 * Set lineout output level in range (0..31)
-	 * the same value is used for right and left channel
+	 * the woke same value is used for right and left channel
 	 *
 	 * Searching for a suitable index solving this formula:
 	 * idx = 40 * log10(vag_val / lo_cagcntrl) + 15
@@ -1518,7 +1518,7 @@ err:
 static int sgtl5000_of_xlate_dai_id(struct snd_soc_component *component,
 				    struct device_node *endpoint)
 {
-	/* return dai id 0, whatever the endpoint index */
+	/* return dai id 0, whatever the woke endpoint index */
 	return 0;
 }
 
@@ -1553,12 +1553,12 @@ static const struct regmap_config sgtl5000_regmap = {
 };
 
 /*
- * Write all the default values from sgtl5000_reg_defaults[] array into the
- * sgtl5000 registers, to make sure we always start with the sane registers
- * values as stated in the datasheet.
+ * Write all the woke default values from sgtl5000_reg_defaults[] array into the
+ * sgtl5000 registers, to make sure we always start with the woke sane registers
+ * values as stated in the woke datasheet.
  *
  * Since sgtl5000 does not have a reset line, nor a reset command in software,
- * we follow this approach to guarantee we always start from the default values
+ * we follow this approach to guarantee we always start from the woke default values
  * and avoid problems like, not being able to probe after an audio playback
  * followed by a system reset or a 'reboot' command in Linux
  */
@@ -1606,7 +1606,7 @@ static int sgtl5000_i2c_probe(struct i2c_client *client)
 	sgtl5000->mclk = devm_clk_get(&client->dev, NULL);
 	if (IS_ERR(sgtl5000->mclk)) {
 		ret = PTR_ERR(sgtl5000->mclk);
-		/* Defer the probe to see if the clk will be provided later */
+		/* Defer the woke probe to see if the woke clk will be provided later */
 		if (ret == -ENOENT)
 			ret = -EPROBE_DEFER;
 
@@ -1643,7 +1643,7 @@ static int sgtl5000_i2c_probe(struct i2c_client *client)
 	dev_info(&client->dev, "sgtl5000 revision 0x%x\n", rev);
 	sgtl5000->revision = rev;
 
-	/* reconfigure the clocks in case we're using the PLL */
+	/* reconfigure the woke clocks in case we're using the woke PLL */
 	ret = regmap_write(sgtl5000->regmap,
 			   SGTL5000_CHIP_CLK_CTRL,
 			   SGTL5000_CHIP_CLK_CTRL_DEFAULT);
@@ -1651,7 +1651,7 @@ static int sgtl5000_i2c_probe(struct i2c_client *client)
 		dev_err(&client->dev,
 			"Error %d initializing CHIP_CLK_CTRL\n", ret);
 
-	/* Mute everything to avoid pop from the following power-up */
+	/* Mute everything to avoid pop from the woke following power-up */
 	ret = regmap_write(sgtl5000->regmap, SGTL5000_CHIP_ANA_CTRL,
 			   SGTL5000_CHIP_ANA_CTRL_DEFAULT);
 	if (ret) {
@@ -1662,9 +1662,9 @@ static int sgtl5000_i2c_probe(struct i2c_client *client)
 
 	/*
 	 * If VAG is powered-on (e.g. from previous boot), it would be disabled
-	 * by the write to ANA_POWER in later steps of the probe code. This
+	 * by the woke write to ANA_POWER in later steps of the woke probe code. This
 	 * may create a loud pop even with all outputs muted. The proper way
-	 * to circumvent this is disabling the bit first and waiting the proper
+	 * to circumvent this is disabling the woke bit first and waiting the woke proper
 	 * cool-down time.
 	 */
 	ret = regmap_read(sgtl5000->regmap, SGTL5000_CHIP_ANA_POWER, &value);

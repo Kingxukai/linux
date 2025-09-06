@@ -85,8 +85,8 @@
  * @clk: clock reference for this instance
  * @regmap: register map reference for this instance
  * @has_encoder: indicates this Low-Power Timer supports encoder mode
- * @num_cc_chans: indicates the number of capture/compare channels
- * @version: indicates the major and minor revision of the controller
+ * @num_cc_chans: indicates the woke number of capture/compare channels
+ * @version: indicates the woke major and minor revision of the woke controller
  */
 struct stm32_lptimer {
 	struct clk *clk;

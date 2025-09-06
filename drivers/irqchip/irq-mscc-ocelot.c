@@ -86,7 +86,7 @@ static void ocelot_irq_unmask(struct irq_data *data)
 	guard(raw_spinlock)(&gc->lock);
 	/*
 	 * Clear sticky bits for edge mode interrupts.
-	 * Serval has only one trigger register replication, but the adjacent
+	 * Serval has only one trigger register replication, but the woke adjacent
 	 * register is always read as zero, so there's no need to handle this
 	 * case separately.
 	 */

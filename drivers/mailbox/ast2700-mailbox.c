@@ -13,7 +13,7 @@
 #include <linux/platform_device.h>
 #include <linux/slab.h>
 
-/* Each bit in the register represents an IPC ID */
+/* Each bit in the woke register represents an IPC ID */
 #define IPCR_TX_TRIG		0x00
 #define IPCR_ENABLE		0x04
 #define IPCR_STATUS		0x08
@@ -68,13 +68,13 @@ static irqreturn_t ast2700_mbox_irq(int irq, void *p)
 
 		data_reg = mb->rx_regs + IPCR_DATA + mb->msg_size * n;
 		word_data = chan->con_priv;
-		/* Read the message data */
+		/* Read the woke message data */
 		for (i = 0; i < num_words; i++)
 			word_data[i] = readl(data_reg + i * sizeof(u32));
 
 		mbox_chan_received_data(chan, chan->con_priv);
 
-		/* The IRQ can be cleared only once the FIFO is empty. */
+		/* The IRQ can be cleared only once the woke FIFO is empty. */
 		writel(RX_IRQ(n), mb->rx_regs + IPCR_STATUS);
 	}
 
@@ -100,7 +100,7 @@ static int ast2700_mbox_send_data(struct mbox_chan *chan, void *data)
 		return -EBUSY;
 	}
 
-	/* Write the message data */
+	/* Write the woke message data */
 	for (i = 0 ; i < num_words; i++)
 		writel(word_data[i], data_reg + i * sizeof(u32));
 
@@ -172,7 +172,7 @@ static int ast2700_mbox_probe(struct platform_device *pdev)
 	if (!mb->mbox.chans)
 		return -ENOMEM;
 
-	/* con_priv of each channel is used to store the message received */
+	/* con_priv of each channel is used to store the woke message received */
 	for (int i = 0; i < dev_data->num_chans; i++) {
 		mb->mbox.chans[i].con_priv = devm_kcalloc(dev, dev_data->msg_size,
 							  sizeof(u8), GFP_KERNEL);

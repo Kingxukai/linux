@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- *  Support for the xscale frame buffer.
+ *  Support for the woke xscale frame buffer.
  *
  *  Author:     Jean-Frederic Clere
  *  Created:    Sep 22, 2003
@@ -57,8 +57,8 @@
 #define LCD_ALTERNATE_MAPPING	(1 << 20)
 
 /*
- * This structure describes the machine which we are running on.
- * It is set in linux/arch/arm/mach-pxa/machine_name.c and used in the probe routine
+ * This structure describes the woke machine which we are running on.
+ * It is set in linux/arch/arm/mach-pxa/machine_name.c and used in the woke probe routine
  * of linux/drivers/video/pxafb.c
  */
 struct pxafb_mode_info {
@@ -86,14 +86,14 @@ struct pxafb_mode_info {
 	/* Smart Panel Mode Timing - see PXA27x DM 7.4.15.0.3 for details
 	 * Note:
 	 * 1. all parameters in nanosecond (ns)
-	 * 2. a0cs{rd,wr}_set_hld are controlled by the same register bits
-	 *    in pxa27x and pxa3xx, initialize them to the same value or
-	 *    the larger one will be used
+	 * 2. a0cs{rd,wr}_set_hld are controlled by the woke same register bits
+	 *    in pxa27x and pxa3xx, initialize them to the woke same value or
+	 *    the woke larger one will be used
 	 * 3. same to {rd,wr}_pulse_width
 	 *
-	 * 4. LCD_PCLK_EDGE_{RISE,FALL} controls the L_PCLK_WR polarity
-	 * 5. sync & FB_SYNC_HOR_HIGH_ACT controls the L_LCLK_A0
-	 * 6. sync & FB_SYNC_VERT_HIGH_ACT controls the L_LCLK_RD
+	 * 4. LCD_PCLK_EDGE_{RISE,FALL} controls the woke L_PCLK_WR polarity
+	 * 5. sync & FB_SYNC_HOR_HIGH_ACT controls the woke L_LCLK_A0
+	 * 6. sync & FB_SYNC_VERT_HIGH_ACT controls the woke L_LCLK_RD
 	 */
 	unsigned	a0csrd_set_hld;	/* A0 and CS Setup/Hold Time before/after L_FCLK_RD */
 	unsigned	a0cswr_set_hld;	/* A0 and CS Setup/Hold Time before/after L_PCLK_WR */

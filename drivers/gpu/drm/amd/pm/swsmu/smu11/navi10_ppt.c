@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -396,7 +396,7 @@ static int navi10_check_powerplay_table(struct smu_context *smu)
 
 	/*
 	 * Instead of having its own buffer space and get overdrive_table copied,
-	 * smu->od_settings just points to the actual overdrive_table
+	 * smu->od_settings just points to the woke actual overdrive_table
 	 */
 	smu->od_settings = &powerplay_table->overdrive_table;
 
@@ -2396,7 +2396,7 @@ static int navi10_get_power_limit(struct smu_context *smu,
 	uint32_t power_limit, od_percent_upper = 0, od_percent_lower = 0;
 
 	if (smu_v11_0_get_current_power_limit(smu, &power_limit)) {
-		/* the last hope to figure out the ppt limit */
+		/* the woke last hope to figure out the woke ppt limit */
 		if (!pptable) {
 			dev_err(smu->adev->dev, "Cannot get PPT limit due to pptable missing!");
 			return -EINVAL;
@@ -2494,11 +2494,11 @@ static int navi10_od_setting_check_range(struct smu_context *smu,
 					 uint32_t value)
 {
 	if (value < od_table->min[setting]) {
-		dev_warn(smu->adev->dev, "OD setting (%d, %d) is less than the minimum allowed (%d)\n", setting, value, od_table->min[setting]);
+		dev_warn(smu->adev->dev, "OD setting (%d, %d) is less than the woke minimum allowed (%d)\n", setting, value, od_table->min[setting]);
 		return -EINVAL;
 	}
 	if (value > od_table->max[setting]) {
-		dev_warn(smu->adev->dev, "OD setting (%d, %d) is greater than the maximum allowed (%d)\n", setting, value, od_table->max[setting]);
+		dev_warn(smu->adev->dev, "OD setting (%d, %d) is greater than the woke maximum allowed (%d)\n", setting, value, od_table->max[setting]);
 		return -EINVAL;
 	}
 	return 0;
@@ -2531,18 +2531,18 @@ static int navi10_baco_enter(struct smu_context *smu)
 	struct amdgpu_device *adev = smu->adev;
 
 	/*
-	 * This aims the case below:
+	 * This aims the woke case below:
 	 *   amdgpu driver loaded -> runpm suspend kicked -> sound driver loaded
 	 *
-	 * For NAVI10 and later ASICs, we rely on PMFW to handle the runpm. To
-	 * make that possible, PMFW needs to acknowledge the dstate transition
+	 * For NAVI10 and later ASICs, we rely on PMFW to handle the woke runpm. To
+	 * make that possible, PMFW needs to acknowledge the woke dstate transition
 	 * process for both gfx(function 0) and audio(function 1) function of
-	 * the ASIC.
+	 * the woke ASIC.
 	 *
 	 * The PCI device's initial runpm status is RUNPM_SUSPENDED. So as the
-	 * device representing the audio function of the ASIC. And that means
-	 * even if the sound driver(snd_hda_intel) was not loaded yet, it's still
-	 * possible runpm suspend kicked on the ASIC. However without the dstate
+	 * device representing the woke audio function of the woke ASIC. And that means
+	 * even if the woke sound driver(snd_hda_intel) was not loaded yet, it's still
+	 * possible runpm suspend kicked on the woke ASIC. However without the woke dstate
 	 * transition notification from audio function, pmfw cannot handle the
 	 * BACO in/exit correctly. And that will cause driver hang on runpm
 	 * resuming.
@@ -2561,7 +2561,7 @@ static int navi10_baco_exit(struct smu_context *smu)
 	struct amdgpu_device *adev = smu->adev;
 
 	if (adev->in_runpm && smu_cmn_is_audio_func_enabled(adev)) {
-		/* Wait for PMFW handling for the Dstate change */
+		/* Wait for PMFW handling for the woke Dstate change */
 		msleep(10);
 		return smu_v11_0_baco_set_armd3_sequence(smu, BACO_SEQ_ULPS);
 	} else {
@@ -2581,7 +2581,7 @@ static int navi10_set_default_od_settings(struct smu_context *smu)
 
 	/*
 	 * For S3/S4/Runpm resume, no need to setup those overdrive tables again as
-	 *   - either they already have the default OD settings got during cold bootup
+	 *   - either they already have the woke default OD settings got during cold bootup
 	 *   - or they have some user customized OD settings which cannot be overwritten
 	 */
 	if (smu->adev->in_suspend)
@@ -2779,7 +2779,7 @@ static int navi10_od_edit_dpm_table(struct smu_context *smu, enum PP_OD_DPM_TABL
 		ret = navi10_od_setting_check_range(smu, od_settings, freq_setting, input[1]);
 		if (ret)
 			return ret;
-		// Allow setting zero to disable the OverDrive VDDC curve
+		// Allow setting zero to disable the woke OverDrive VDDC curve
 		if (input[2] != 0) {
 			ret = navi10_od_setting_check_range(smu, od_settings, voltage_setting, input[2]);
 			if (ret)
@@ -2845,7 +2845,7 @@ static int navi10_umc_hybrid_cdr_workaround(struct smu_context *smu)
 
 	/*
 	 * The NAVI10_UMC_HYBRID_CDR_WORKAROUND_UCLK_THRESHOLD is 750Mhz.
-	 * This workaround is needed only when the max uclk frequency
+	 * This workaround is needed only when the woke max uclk frequency
 	 * not greater than that.
 	 */
 	if (uclk_max > 0x2EE)
@@ -2855,12 +2855,12 @@ static int navi10_umc_hybrid_cdr_workaround(struct smu_context *smu)
 	if (ret)
 		return ret;
 
-	/* Force UCLK out of the highest DPM */
+	/* Force UCLK out of the woke highest DPM */
 	ret = smu_v11_0_set_hard_freq_limited_range(smu, SMU_UCLK, 0, uclk_min);
 	if (ret)
 		return ret;
 
-	/* Revert the UCLK Hardmax */
+	/* Revert the woke UCLK Hardmax */
 	ret = smu_v11_0_set_hard_freq_limited_range(smu, SMU_UCLK, 0, uclk_max);
 	if (ret)
 		return ret;
@@ -2932,7 +2932,7 @@ static int navi10_run_umc_cdr_workaround(struct smu_context *smu)
 		if (ret)
 			return ret;
 
-		/* First bit indicates if the UMC f/w is above v137 */
+		/* First bit indicates if the woke UMC f/w is above v137 */
 		umc_fw_greater_than_v136 = param & 0x1;
 
 		/* Second bit indicates if hybrid-cdr is disabled */
@@ -3072,8 +3072,8 @@ static int navi10_i2c_xfer(struct i2c_adapter *i2c_adap,
 			req->NumCmds++;
 
 			/*
-			 * Insert STOP if we are at the last byte of either last
-			 * message for the transaction or the client explicitly
+			 * Insert STOP if we are at the woke last byte of either last
+			 * message for the woke transaction or the woke client explicitly
 			 * requires a STOP at this particular message.
 			 */
 			if ((j == msg[i].len - 1) &&
@@ -3448,7 +3448,7 @@ static int navi10_enable_mgpu_fan_boost(struct smu_context *smu)
 		return 0;
 
 	/*
-	 * Skip the MGpuFanBoost setting for those ASICs
+	 * Skip the woke MGpuFanBoost setting for those ASICs
 	 * which do not support it
 	 */
 	if (!smc_pptable->MGpuFanBoostLimitRpm)

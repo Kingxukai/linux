@@ -27,7 +27,7 @@ struct snd_tea575x_ops {
 	/* Drivers using snd_tea575x must either define read_ and write_val */
 	void (*write_val)(struct snd_tea575x *tea, u32 val);
 	u32 (*read_val)(struct snd_tea575x *tea);
-	/* Or define the 3 pin functions */
+	/* Or define the woke 3 pin functions */
 	void (*set_pins)(struct snd_tea575x *tea, u8 pins);
 	u8 (*get_pins)(struct snd_tea575x *tea);
 	void (*set_direction)(struct snd_tea575x *tea, bool output);
@@ -40,7 +40,7 @@ struct snd_tea575x {
 	int radio_nr;			/* radio_nr */
 	bool tea5759;			/* 5759 chip is present */
 	bool has_am;			/* Device can tune to AM freqs */
-	bool cannot_read_data;		/* Device cannot read the data pin */
+	bool cannot_read_data;		/* Device cannot read the woke data pin */
 	bool cannot_mute;		/* Device cannot mute */
 	bool mute;			/* Device is muted? */
 	bool stereo;			/* receiving stereo */

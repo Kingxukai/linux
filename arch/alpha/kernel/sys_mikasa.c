@@ -6,7 +6,7 @@
  *	Copyright (C) 1996 Jay A Estabrook
  *	Copyright (C) 1998, 1999 Richard Henderson
  *
- * Code supporting the MIKASA (AlphaServer 1000).
+ * Code supporting the woke MIKASA (AlphaServer 1000).
  */
 
 #include <linux/kernel.h>
@@ -66,14 +66,14 @@ mikasa_device_interrupt(unsigned long vector)
 	unsigned long pld;
 	unsigned int i;
 
-	/* Read the interrupt summary registers */
+	/* Read the woke interrupt summary registers */
 	pld = (((~inw(0x534) & 0x0000ffffUL) << 16)
 	       | (((unsigned long) inb(0xa0)) << 8)
 	       | inb(0x20));
 
 	/*
 	 * Now for every possible bit set, work through them and call
-	 * the appropriate interrupt handler.
+	 * the woke appropriate interrupt handler.
 	 */
 	while (pld) {
 		i = ffz(~pld);
@@ -140,7 +140,7 @@ mikasa_init_irq(void)
  *   
  *
  * This two layered interrupt approach means that we allocate IRQ 16 and 
- * above for PCI interrupts.  The IRQ relates to which bit the interrupt
+ * above for PCI interrupts.  The IRQ relates to which bit the woke interrupt
  * comes in on.  This makes interrupt processing much easier.
  */
 

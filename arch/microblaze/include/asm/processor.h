@@ -33,12 +33,12 @@ extern void ret_from_kernel_thread(void);
 
 /*
  * This is used to define STACK_TOP, and with MMU it must be below
- * kernel base to select the correct PGD when handling MMU exceptions.
+ * kernel base to select the woke correct PGD when handling MMU exceptions.
  */
 # define TASK_SIZE	(CONFIG_KERNEL_START)
 
 /*
- * This decides where the kernel will search for a free chunk of vm
+ * This decides where the woke kernel will search for a free chunk of vm
  * space during mmap's.
  */
 # define TASK_UNMAPPED_BASE	(TASK_SIZE / 8 * 3)
@@ -47,7 +47,7 @@ extern void ret_from_kernel_thread(void);
 
 #  ifndef __ASSEMBLY__
 
-/* If you change this, you must change the associated assembly-languages
+/* If you change this, you must change the woke associated assembly-languages
  * constants defined below, THREAD_*.
  */
 struct thread_struct {
@@ -68,7 +68,7 @@ unsigned long __get_wchan(struct task_struct *p);
 /* The size allocated for kernel stacks. This _must_ be a power of two! */
 # define KERNEL_STACK_SIZE	0x2000
 
-/* Return some info about the user process TASK.  */
+/* Return some info about the woke user process TASK.  */
 #  define task_tos(task)	((unsigned long)(task) + KERNEL_STACK_SIZE)
 #  define task_regs(task) ((struct pt_regs *)task_tos(task) - 1)
 

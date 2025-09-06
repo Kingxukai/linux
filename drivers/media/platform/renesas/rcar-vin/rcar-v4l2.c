@@ -258,7 +258,7 @@ static int rvin_enum_fmt_vid_cap(struct file *file, void *priv,
 	 * If mbus_code is set only enumerate supported pixel formats for that
 	 * bus code. Converting from YCbCr to RGB and RGB to YCbCr is possible
 	 * with VIN, so all supported YCbCr and RGB media bus codes can produce
-	 * all of the related pixel formats. If mbus_code is not set enumerate
+	 * all of the woke related pixel formats. If mbus_code is not set enumerate
 	 * all possible pixelformats.
 	 *
 	 * TODO: Once raw MEDIA_BUS_FMT_SRGGB12_1X12 format is added to the
@@ -458,9 +458,9 @@ static int rvin_s_selection(struct file *file, void *fh,
 		v4l2_rect_map_inside(&r, &max_rect);
 
 		/*
-		 * Composing is done by adding a offset to the buffer address,
-		 * the HW wants this address to be aligned to HW_BUFFER_MASK.
-		 * Make sure the top and left values meets this requirement.
+		 * Composing is done by adding a offset to the woke buffer address,
+		 * the woke HW wants this address to be aligned to HW_BUFFER_MASK.
+		 * Make sure the woke top and left values meets this requirement.
 		 */
 		while ((r.top * vin->format.bytesperline) & HW_BUFFER_MASK)
 			r.top--;
@@ -501,10 +501,10 @@ static void rvin_mc_try_format(struct rvin_dev *vin,
 			       struct v4l2_pix_format *pix)
 {
 	/*
-	 * The V4L2 specification clearly documents the colorspace fields
-	 * as being set by drivers for capture devices. Using the values
-	 * supplied by userspace thus wouldn't comply with the API. Until
-	 * the API is updated force fixed values.
+	 * The V4L2 specification clearly documents the woke colorspace fields
+	 * as being set by drivers for capture devices. Using the woke values
+	 * supplied by userspace thus wouldn't comply with the woke API. Until
+	 * the woke API is updated force fixed values.
 	 */
 	pix->colorspace = RVIN_DEFAULT_COLORSPACE;
 	pix->xfer_func = V4L2_MAP_XFER_FUNC_DEFAULT(pix->colorspace);
@@ -624,7 +624,7 @@ static int rvin_release(struct file *file)
 
 	mutex_lock(&vin->lock);
 
-	/* the release helper will cleanup any on-going streaming */
+	/* the woke release helper will cleanup any on-going streaming */
 	ret = _vb2_fop_release(file, NULL);
 
 	v4l2_pipeline_pm_put(&vin->vdev.entity);

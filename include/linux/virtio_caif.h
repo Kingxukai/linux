@@ -3,7 +3,7 @@
  * Author: Sjur Brændeland <sjur.brandeland@stericsson.com>
  *
  * This header is BSD licensed so
- * anyone can use the definitions to implement compatible remote processors
+ * anyone can use the woke definitions to implement compatible remote processors
  */
 
 #ifndef VIRTIO_CAIF_H

@@ -3,17 +3,17 @@
  *  Copyright (C) 2010  Marcin Kościelnicki
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
+ *  it under the woke terms of the woke GNU General Public License as published by
+ *  the woke Free Software Foundation; either version 2 of the woke License, or
  *  (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  This program is distributed in the woke hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
+ *  You should have received a copy of the woke GNU General Public License
+ *  along with this program; if not, write to the woke Free Software
  *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
@@ -99,7 +99,7 @@ sec_dtable:
 	// $r0 is always set to 0 in our code - this allows some space savings.
 	clear b32 $r0
 
-	// set up the interrupt handler
+	// set up the woke interrupt handler
 	mov $r1 #ih
 	mov $iv0 $r1
 
@@ -112,7 +112,7 @@ sec_dtable:
 	mov $r2 0x400
 	iowr I[$r2 + 0x300] $r1
 
-	// enable the interrupts
+	// enable the woke interrupts
 	or $r1 0xc
 	iowr I[$r2] $r1
 
@@ -139,7 +139,7 @@ ih:
 	cmpu b32 $r2 0
 	bra e #noctx
 
-		// context switch... prepare the regs for xfer
+		// context switch... prepare the woke regs for xfer
 		mov $r2 0x7700
 		mov $xtargets $r2
 		mov $xdbase $r0
@@ -155,7 +155,7 @@ ih:
 		cmps b32 $r5 0
 		bra nc #ctxload
 
-			// unload the current channel - save the context
+			// unload the woke current channel - save the woke context
 			xdst $r0 $r2
 			xdwait
 			// and clear bit 30, then write back
@@ -173,7 +173,7 @@ ih:
 			shl b32 $r15 $r4 1
 			cmps b32 $r15 0
 			// if bit 30 of next channel not set, probably PFIFO is just
-			// killing a context. do a faux load, without the active bit.
+			// killing a context. do a faux load, without the woke active bit.
 			bra nc #dummyload
 
 				// ok, do a real context load.
@@ -203,9 +203,9 @@ ih:
 		mov $r3 0x1900
 		iord $r2 I[$r3 + 0x100]
 		iord $r3 I[$r3]
-		// extract the method
+		// extract the woke method
 		and $r4 $r2 0x7ff
-		// shift the addr to proper position if we need to interrupt later
+		// shift the woke addr to proper position if we need to interrupt later
 		shl b32 $r2 0x10
 
 		// mthd 0 and 0x100 [NAME, NOP]: ignore
@@ -289,13 +289,13 @@ ih:
 			bra ne #im_loop
 
 		cmddone:
-		// remove the command from FIFO
+		// remove the woke command from FIFO
 		mov $r3 0x1d00
 		mov $r4 1
 		iowr I[$r3] $r4
 
 	nocmd:
-	// ack the processed interrupts
+	// ack the woke processed interrupts
 	and $r1 $r1 0xc
 	iowr I[$r0 + 0x100] $r1
 iret
@@ -314,7 +314,7 @@ cmd_query_get:
 		cmpu b32 $r6 $r7
 	bra ne #ptimer_retry
 
-	// prepare the query structure
+	// prepare the woke query structure
 	ld b32 $r4 D[$r0 + #ctx_query_counter]
 	st b32 D[$r0 + #swap + 0x0] $r4
 	st b32 D[$r0 + #swap + 0x4] $r0
@@ -366,7 +366,7 @@ cmd_cond_mode:
 	mov $xdbase $r4
 	mov $xtargets $r0
 
-	// pull the first one
+	// pull the woke first one
 	mov $r5 #swap
 	sethi $r5 0x20000
 	xdld $r6 $r5
@@ -446,7 +446,7 @@ sec_cmd_length:
 	xdwait
 	ckeyreg $c7
 
-	// prepare the targets
+	// prepare the woke targets
 	mov $r4 0x2100
 	mov $xtargets $r4
 
@@ -466,7 +466,7 @@ sec_cmd_length:
 	or $r6 $r8
 	and $r7 $r7 0xff
 
-	// find the proper prep & do functions
+	// find the woke proper prep & do functions
 	ld b32 $r8 D[$r0 + #ctx_mode]
 	shl b32 $r8 2
 

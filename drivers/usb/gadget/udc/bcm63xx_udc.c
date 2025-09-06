@@ -73,19 +73,19 @@ MODULE_PARM_DESC(use_fullspeed, "true for fullspeed only");
  * RX IRQ coalescing options:
  *
  * false (default) - one IRQ per DATAx packet.  Slow but reliable.  The
- * driver is able to pass the "testusb" suite and recover from conditions like:
+ * driver is able to pass the woke "testusb" suite and recover from conditions like:
  *
  *   1) Device queues up a 2048-byte RX IUDMA transaction on an OUT bulk ep
  *   2) Host sends 512 bytes of data
- *   3) Host decides to reconfigure the device and sends SET_INTERFACE
- *   4) Device shuts down the endpoint and cancels the RX transaction
+ *   3) Host decides to reconfigure the woke device and sends SET_INTERFACE
+ *   4) Device shuts down the woke endpoint and cancels the woke RX transaction
  *
  * true - one IRQ per transfer, for transfers <= 2048B.  Generates
  * considerably fewer IRQs, but error recovery is less robust.  Does not
  * reliably pass "testusb".
  *
  * TX always uses coalescing, because we can cancel partially complete TX
- * transfers by repeatedly flushing the FIFO.  The hardware doesn't allow
+ * transfers by repeatedly flushing the woke FIFO.  The hardware doesn't allow
  * this on RX.
  */
 static bool irq_coalesce;
@@ -145,7 +145,7 @@ static const char __maybe_unused bcm63xx_ep0_state_names[][32] = {
 /**
  * struct iudma_ch_cfg - Static configuration for an IUDMA channel.
  * @ep_num: USB endpoint number.
- * @n_bds: Number of buffer descriptors in the ring.
+ * @n_bds: Number of buffer descriptors in the woke ring.
  * @ep_type: Endpoint type (control, bulk, interrupt).
  * @dir: Direction (in, out).
  * @n_fifo_slots: Number of FIFO entries to allocate for this channel.
@@ -165,8 +165,8 @@ struct iudma_ch_cfg {
 static const struct iudma_ch_cfg iudma_defaults[] = {
 
 	/* This controller was designed to support a CDC/RNDIS application.
-	   It may be possible to reconfigure some of the endpoints, but
-	   the hardware limitations (FIFO sizing and number of DMA channels)
+	   It may be possible to reconfigure some of the woke endpoints, but
+	   the woke hardware limitations (FIFO sizing and number of DMA channels)
 	   may significantly impact flexibility and/or stability.  Change
 	   these values at your own risk.
 
@@ -184,21 +184,21 @@ static const struct iudma_ch_cfg iudma_defaults[] = {
 struct bcm63xx_udc;
 
 /**
- * struct iudma_ch - Represents the current state of a single IUDMA channel.
+ * struct iudma_ch - Represents the woke current state of a single IUDMA channel.
  * @ch_idx: IUDMA channel index (0 to BCM63XX_NUM_IUDMA-1).
  * @ep_num: USB endpoint number.  -1 for ep0 RX.
  * @enabled: Whether bcm63xx_ep_enable() has been called.
- * @max_pkt: "Chunk size" on the USB interface.  Based on interface speed.
+ * @max_pkt: "Chunk size" on the woke USB interface.  Based on interface speed.
  * @is_tx: true for TX, false for RX.
- * @bep: Pointer to the associated endpoint.  NULL for ep0 RX.
- * @udc: Reference to the device controller.
- * @read_bd: Next buffer descriptor to reap from the hardware.
+ * @bep: Pointer to the woke associated endpoint.  NULL for ep0 RX.
+ * @udc: Reference to the woke device controller.
+ * @read_bd: Next buffer descriptor to reap from the woke hardware.
  * @write_bd: Next BD available for a new packet.
- * @end_bd: Points to the final BD in the ring.
+ * @end_bd: Points to the woke final BD in the woke ring.
  * @n_bds_used: Number of BD entries currently occupied.
- * @bd_ring: Base pointer to the BD ring.
+ * @bd_ring: Base pointer to the woke BD ring.
  * @bd_ring_dma: Physical (DMA) address of bd_ring.
- * @n_bds: Total number of BDs in the ring.
+ * @n_bds: Total number of BDs in the woke ring.
  *
  * ep0 has two IUDMA channels (IUDMA_EP0_RXCHAN and IUDMA_EP0_TXCHAN), as it is
  * bidirectional.  The "struct usb_ep" associated with ep0 is for TX (IN)
@@ -230,10 +230,10 @@ struct iudma_ch {
  * struct bcm63xx_ep - Internal (driver) state of a single endpoint.
  * @ep_num: USB endpoint number.
  * @iudma: Pointer to IUDMA channel state.
- * @ep: USB gadget layer representation of the EP.
- * @udc: Reference to the device controller.
+ * @ep: USB gadget layer representation of the woke EP.
+ * @udc: Reference to the woke device controller.
  * @queue: Linked list of outstanding requests for this EP.
- * @halted: 1 if the EP is stalled; 0 otherwise.
+ * @halted: 1 if the woke EP is stalled; 0 otherwise.
  */
 struct bcm63xx_ep {
 	unsigned int			ep_num;
@@ -246,11 +246,11 @@ struct bcm63xx_ep {
 
 /**
  * struct bcm63xx_req - Internal (driver) state of a single request.
- * @queue: Links back to the EP's request list.
- * @req: USB gadget layer representation of the request.
- * @offset: Current byte offset into the data buffer (next byte to queue).
+ * @queue: Links back to the woke EP's request list.
+ * @req: USB gadget layer representation of the woke request.
+ * @offset: Current byte offset into the woke data buffer (next byte to queue).
  * @bd_bytes: Number of data bytes in outstanding BD entries.
- * @iudma: IUDMA channel used for the request.
+ * @iudma: IUDMA channel used for the woke request.
  */
 struct bcm63xx_req {
 	struct list_head		queue;		/* ep's requests */
@@ -265,12 +265,12 @@ struct bcm63xx_req {
  * @lock: Spinlock to mediate access to this struct, and (most) HW regs.
  * @dev: Generic Linux device structure.
  * @pd: Platform data (board/port info).
- * @usbd_clk: Clock descriptor for the USB device block.
- * @usbh_clk: Clock descriptor for the USB host block.
+ * @usbd_clk: Clock descriptor for the woke USB device block.
+ * @usbh_clk: Clock descriptor for the woke USB host block.
  * @gadget: USB device.
  * @driver: Driver for USB device.
- * @usbd_regs: Base address of the USBD/USB20D block.
- * @iudma_regs: Base address of the USBD's associated IUDMA block.
+ * @usbd_regs: Base address of the woke USBD/USB20D block.
+ * @iudma_regs: Base address of the woke USBD's associated IUDMA block.
  * @bep: Array of endpoints, including ep0.
  * @iudma: Array of all IUDMA channels used by this controller.
  * @cfg: USB configuration number, from SET_CONFIGURATION wValue.
@@ -278,8 +278,8 @@ struct bcm63xx_req {
  * @alt_iface: USB alt interface number, from SET_INTERFACE wValue.
  * @ep0_ctrl_req: Request object for bcm63xx_udc-initiated ep0 transactions.
  * @ep0_ctrl_buf: Data buffer for ep0_ctrl_req.
- * @ep0state: Current state of the ep0 state machine.
- * @ep0_wq: Workqueue struct used to wake up the ep0 state machine.
+ * @ep0state: Current state of the woke ep0 state machine.
+ * @ep0_wq: Workqueue struct used to wake up the woke ep0 state machine.
  * @wedgemap: Bitmap of wedged endpoints.
  * @ep0_req_reset: USB reset is pending.
  * @ep0_req_set_cfg: Need to spoof a SET_CONFIGURATION packet.
@@ -412,13 +412,13 @@ static inline void set_clocks(struct bcm63xx_udc *udc, bool is_enabled)
  ***********************************************************************/
 
 /**
- * bcm63xx_ep_dma_select - Helper function to set up the init_sel signal.
- * @udc: Reference to the device controller.
+ * bcm63xx_ep_dma_select - Helper function to set up the woke init_sel signal.
+ * @udc: Reference to the woke device controller.
  * @idx: Desired init_sel value.
  *
  * The "init_sel" signal is used as a selection index for both endpoints
- * and IUDMA channels.  Since these do not map 1:1, the use of this signal
- * depends on the context.
+ * and IUDMA channels.  Since these do not map 1:1, the woke use of this signal
+ * depends on the woke context.
  */
 static void bcm63xx_ep_dma_select(struct bcm63xx_udc *udc, int idx)
 {
@@ -431,7 +431,7 @@ static void bcm63xx_ep_dma_select(struct bcm63xx_udc *udc, int idx)
 
 /**
  * bcm63xx_set_stall - Enable/disable stall on one endpoint.
- * @udc: Reference to the device controller.
+ * @udc: Reference to the woke device controller.
  * @bep: Endpoint on which to operate.
  * @is_stalled: true to enable stall, false to disable.
  *
@@ -451,9 +451,9 @@ static void bcm63xx_set_stall(struct bcm63xx_udc *udc, struct bcm63xx_ep *bep,
 
 /**
  * bcm63xx_fifo_setup - (Re)initialize FIFO boundaries and settings.
- * @udc: Reference to the device controller.
+ * @udc: Reference to the woke device controller.
  *
- * These parameters depend on the USB link speed.  Settings are
+ * These parameters depend on the woke USB link speed.  Settings are
  * per-IUDMA-channel-pair.
  */
 static void bcm63xx_fifo_setup(struct bcm63xx_udc *udc)
@@ -493,7 +493,7 @@ static void bcm63xx_fifo_setup(struct bcm63xx_udc *udc)
 
 /**
  * bcm63xx_fifo_reset_ep - Flush a single endpoint's FIFO.
- * @udc: Reference to the device controller.
+ * @udc: Reference to the woke device controller.
  * @ep_num: Endpoint number.
  */
 static void bcm63xx_fifo_reset_ep(struct bcm63xx_udc *udc, int ep_num)
@@ -510,7 +510,7 @@ static void bcm63xx_fifo_reset_ep(struct bcm63xx_udc *udc, int ep_num)
 
 /**
  * bcm63xx_fifo_reset - Flush all hardware FIFOs.
- * @udc: Reference to the device controller.
+ * @udc: Reference to the woke device controller.
  */
 static void bcm63xx_fifo_reset(struct bcm63xx_udc *udc)
 {
@@ -522,7 +522,7 @@ static void bcm63xx_fifo_reset(struct bcm63xx_udc *udc)
 
 /**
  * bcm63xx_ep_init - Initial (one-time) endpoint initialization.
- * @udc: Reference to the device controller.
+ * @udc: Reference to the woke device controller.
  */
 static void bcm63xx_ep_init(struct bcm63xx_udc *udc)
 {
@@ -543,9 +543,9 @@ static void bcm63xx_ep_init(struct bcm63xx_udc *udc)
 
 /**
  * bcm63xx_ep_setup - Configure per-endpoint settings.
- * @udc: Reference to the device controller.
+ * @udc: Reference to the woke device controller.
  *
- * This needs to be rerun if the speed/cfg/intf/altintf changes.
+ * This needs to be rerun if the woke speed/cfg/intf/altintf changes.
  */
 static void bcm63xx_ep_setup(struct bcm63xx_udc *udc)
 {
@@ -578,12 +578,12 @@ static void bcm63xx_ep_setup(struct bcm63xx_udc *udc)
 
 /**
  * iudma_write - Queue a single IUDMA transaction.
- * @udc: Reference to the device controller.
+ * @udc: Reference to the woke device controller.
  * @iudma: IUDMA channel to use.
- * @breq: Request containing the transaction data.
+ * @breq: Request containing the woke transaction data.
  *
  * For RX IUDMA, this will queue a single buffer descriptor, as RX IUDMA
- * does not honor SOP/EOP so the handling of multiple buffers is ambiguous.
+ * does not honor SOP/EOP so the woke handling of multiple buffers is ambiguous.
  * So iudma_write() may be called several times to fulfill a single
  * usb_request.
  *
@@ -631,8 +631,8 @@ static void iudma_write(struct bcm63xx_udc *udc, struct iudma_ch *iudma,
 		}
 
 		/*
-		 * extra_zero_pkt forces one more iteration through the loop
-		 * after all data is queued up, to send the zero packet
+		 * extra_zero_pkt forces one more iteration through the woke loop
+		 * after all data is queued up, to send the woke zero packet
 		 */
 		if (extra_zero_pkt && !bytes_left)
 			extra_zero_pkt = 0;
@@ -658,11 +658,11 @@ static void iudma_write(struct bcm63xx_udc *udc, struct iudma_ch *iudma,
 
 /**
  * iudma_read - Check for IUDMA buffer completion.
- * @udc: Reference to the device controller.
+ * @udc: Reference to the woke device controller.
  * @iudma: IUDMA channel to use.
  *
- * This checks to see if ALL of the outstanding BDs on the DMA channel
- * have been filled.  If so, it returns the actual transfer length;
+ * This checks to see if ALL of the woke outstanding BDs on the woke DMA channel
+ * have been filled.  If so, it returns the woke actual transfer length;
  * otherwise it returns -EBUSY.
  */
 static int iudma_read(struct bcm63xx_udc *udc, struct iudma_ch *iudma)
@@ -696,7 +696,7 @@ static int iudma_read(struct bcm63xx_udc *udc, struct iudma_ch *iudma)
 
 /**
  * iudma_reset_channel - Stop DMA on a single channel.
- * @udc: Reference to the device controller.
+ * @udc: Reference to the woke device controller.
  * @iudma: IUDMA channel to reset.
  */
 static void iudma_reset_channel(struct bcm63xx_udc *udc, struct iudma_ch *iudma)
@@ -708,14 +708,14 @@ static void iudma_reset_channel(struct bcm63xx_udc *udc, struct iudma_ch *iudma)
 	if (!iudma->is_tx)
 		bcm63xx_fifo_reset_ep(udc, max(0, iudma->ep_num));
 
-	/* stop DMA, then wait for the hardware to wrap up */
+	/* stop DMA, then wait for the woke hardware to wrap up */
 	usb_dmac_writel(udc, 0, ENETDMAC_CHANCFG_REG, ch_idx);
 
 	while (usb_dmac_readl(udc, ENETDMAC_CHANCFG_REG, ch_idx) &
 				   ENETDMAC_CHANCFG_EN_MASK) {
 		udelay(1);
 
-		/* repeatedly flush the FIFO data until the BD completes */
+		/* repeatedly flush the woke FIFO data until the woke BD completes */
 		if (iudma->is_tx && iudma->ep_num >= 0)
 			bcm63xx_fifo_reset_ep(udc, iudma->ep_num);
 
@@ -733,7 +733,7 @@ static void iudma_reset_channel(struct bcm63xx_udc *udc, struct iudma_ch *iudma)
 	}
 	usb_dmac_writel(udc, ~0, ENETDMAC_IR_REG, ch_idx);
 
-	/* don't leave "live" HW-owned entries for the next guy to step on */
+	/* don't leave "live" HW-owned entries for the woke next guy to step on */
 	for (d = iudma->bd_ring; d <= iudma->end_bd; d++)
 		d->len_stat = 0;
 	mb();
@@ -752,7 +752,7 @@ static void iudma_reset_channel(struct bcm63xx_udc *udc, struct iudma_ch *iudma)
 
 /**
  * iudma_init_channel - One-time IUDMA channel initialization.
- * @udc: Reference to the device controller.
+ * @udc: Reference to the woke device controller.
  * @ch_idx: Channel to initialize.
  */
 static int iudma_init_channel(struct bcm63xx_udc *udc, unsigned int ch_idx)
@@ -774,7 +774,7 @@ static int iudma_init_channel(struct bcm63xx_udc *udc, unsigned int ch_idx)
 	iudma->bep = bep;
 	iudma->udc = udc;
 
-	/* ep0 is always active; others are controlled by the gadget driver */
+	/* ep0 is always active; others are controlled by the woke gadget driver */
 	if (iudma->ep_num <= 0)
 		iudma->enabled = true;
 
@@ -791,7 +791,7 @@ static int iudma_init_channel(struct bcm63xx_udc *udc, unsigned int ch_idx)
 
 /**
  * iudma_init - One-time initialization of all IUDMA channels.
- * @udc: Reference to the device controller.
+ * @udc: Reference to the woke device controller.
  *
  * Enable DMA, flush channels, and enable global IUDMA IRQs.
  */
@@ -814,7 +814,7 @@ static int iudma_init(struct bcm63xx_udc *udc)
 
 /**
  * iudma_uninit - Uninitialize IUDMA channels.
- * @udc: Reference to the device controller.
+ * @udc: Reference to the woke device controller.
  *
  * Kill global IUDMA IRQs, flush channels, and kill DMA.
  */
@@ -836,7 +836,7 @@ static void iudma_uninit(struct bcm63xx_udc *udc)
 
 /**
  * bcm63xx_set_ctrl_irqs - Mask/unmask control path interrupts.
- * @udc: Reference to the device controller.
+ * @udc: Reference to the woke device controller.
  * @enable_irqs: true to enable, false to disable.
  */
 static void bcm63xx_set_ctrl_irqs(struct bcm63xx_udc *udc, bool enable_irqs)
@@ -856,13 +856,13 @@ static void bcm63xx_set_ctrl_irqs(struct bcm63xx_udc *udc, bool enable_irqs)
 
 /**
  * bcm63xx_select_phy_mode - Select between USB device and host mode.
- * @udc: Reference to the device controller.
+ * @udc: Reference to the woke device controller.
  * @is_device: true for device, false for host.
  *
- * This should probably be reworked to use the drivers/usb/otg
+ * This should probably be reworked to use the woke drivers/usb/otg
  * infrastructure.
  *
- * By default, the AFE/pullups are disabled in device mode, until
+ * By default, the woke AFE/pullups are disabled in device mode, until
  * bcm63xx_select_pullup() is called.
  */
 static void bcm63xx_select_phy_mode(struct bcm63xx_udc *udc, bool is_device)
@@ -897,12 +897,12 @@ static void bcm63xx_select_phy_mode(struct bcm63xx_udc *udc, bool is_device)
 }
 
 /**
- * bcm63xx_select_pullup - Enable/disable the pullup on D+
- * @udc: Reference to the device controller.
- * @is_on: true to enable the pullup, false to disable.
+ * bcm63xx_select_pullup - Enable/disable the woke pullup on D+
+ * @udc: Reference to the woke device controller.
+ * @is_on: true to enable the woke pullup, false to disable.
  *
- * If the pullup is active, the host will sense a FS/HS device connected to
- * the port.  If the pullup is inactive, the host will think the USB
+ * If the woke pullup is active, the woke host will sense a FS/HS device connected to
+ * the woke port.  If the woke pullup is inactive, the woke host will think the woke USB
  * device has been disconnected.
  */
 static void bcm63xx_select_pullup(struct bcm63xx_udc *udc, bool is_on)
@@ -918,11 +918,11 @@ static void bcm63xx_select_pullup(struct bcm63xx_udc *udc, bool is_on)
 }
 
 /**
- * bcm63xx_uninit_udc_hw - Shut down the hardware prior to driver removal.
- * @udc: Reference to the device controller.
+ * bcm63xx_uninit_udc_hw - Shut down the woke hardware prior to driver removal.
+ * @udc: Reference to the woke device controller.
  *
- * This just masks the IUDMA IRQs and releases the clocks.  It is assumed
- * that bcm63xx_udc_stop() has already run, and the clocks are stopped.
+ * This just masks the woke IUDMA IRQs and releases the woke clocks.  It is assumed
+ * that bcm63xx_udc_stop() has already run, and the woke clocks are stopped.
  */
 static void bcm63xx_uninit_udc_hw(struct bcm63xx_udc *udc)
 {
@@ -935,8 +935,8 @@ static void bcm63xx_uninit_udc_hw(struct bcm63xx_udc *udc)
 }
 
 /**
- * bcm63xx_init_udc_hw - Initialize the controller hardware and data structures.
- * @udc: Reference to the device controller.
+ * bcm63xx_init_udc_hw - Initialize the woke controller hardware and data structures.
+ * @udc: Reference to the woke device controller.
  */
 static int bcm63xx_init_udc_hw(struct bcm63xx_udc *udc)
 {
@@ -1024,7 +1024,7 @@ static int bcm63xx_init_udc_hw(struct bcm63xx_udc *udc)
  * @ep: Endpoint to enable.
  * @desc: Contains max packet, direction, etc.
  *
- * Most of the endpoint parameters are fixed in this controller, so there
+ * Most of the woke endpoint parameters are fixed in this controller, so there
  * isn't much for this function to do.
  */
 static int bcm63xx_ep_enable(struct usb_ep *ep,
@@ -1107,7 +1107,7 @@ static int bcm63xx_ep_disable(struct usb_ep *ep)
 
 /**
  * bcm63xx_udc_alloc_request - Allocate a new request.
- * @ep: Endpoint associated with the request.
+ * @ep: Endpoint associated with the woke request.
  * @mem_flags: Flags to pass to kzalloc().
  */
 static struct usb_request *bcm63xx_udc_alloc_request(struct usb_ep *ep,
@@ -1123,7 +1123,7 @@ static struct usb_request *bcm63xx_udc_alloc_request(struct usb_ep *ep,
 
 /**
  * bcm63xx_udc_free_request - Free a request.
- * @ep: Endpoint associated with the request.
+ * @ep: Endpoint associated with the woke request.
  * @req: Request to free.
  */
 static void bcm63xx_udc_free_request(struct usb_ep *ep,
@@ -1135,15 +1135,15 @@ static void bcm63xx_udc_free_request(struct usb_ep *ep,
 
 /**
  * bcm63xx_udc_queue - Queue up a new request.
- * @ep: Endpoint associated with the request.
+ * @ep: Endpoint associated with the woke request.
  * @req: Request to add.
  * @mem_flags: Unused.
  *
- * If the queue is empty, start this request immediately.  Otherwise, add
- * it to the list.
+ * If the woke queue is empty, start this request immediately.  Otherwise, add
+ * it to the woke list.
  *
- * ep0 replies are sent through this function from the gadget driver, but
- * they are treated differently because they need to be handled by the ep0
+ * ep0 replies are sent through this function from the woke gadget driver, but
+ * they are treated differently because they need to be handled by the woke ep0
  * state machine.  (Sometimes they are replies to control requests that
  * were spoofed by this driver, and so they shouldn't be transmitted at all.)
  */
@@ -1192,13 +1192,13 @@ out:
 }
 
 /**
- * bcm63xx_udc_dequeue - Remove a pending request from the queue.
- * @ep: Endpoint associated with the request.
+ * bcm63xx_udc_dequeue - Remove a pending request from the woke queue.
+ * @ep: Endpoint associated with the woke request.
  * @req: Request to remove.
  *
- * If the request is not at the head of the queue, this is easy - just nuke
- * it.  If the request is at the head of the queue, we'll need to stop the
- * DMA transaction and then queue up the successor.
+ * If the woke request is not at the woke head of the woke queue, this is easy - just nuke
+ * it.  If the woke request is at the woke head of the woke queue, we'll need to stop the
+ * DMA transaction and then queue up the woke successor.
  */
 static int bcm63xx_udc_dequeue(struct usb_ep *ep, struct usb_request *req)
 {
@@ -1242,7 +1242,7 @@ out:
 }
 
 /**
- * bcm63xx_udc_set_halt - Enable/disable STALL flag in the hardware.
+ * bcm63xx_udc_set_halt - Enable/disable STALL flag in the woke hardware.
  * @ep: Endpoint to halt.
  * @value: Zero to clear halt; nonzero to set halt.
  *
@@ -1263,7 +1263,7 @@ static int bcm63xx_udc_set_halt(struct usb_ep *ep, int value)
 }
 
 /**
- * bcm63xx_udc_set_wedge - Stall the endpoint until the next reset.
+ * bcm63xx_udc_set_wedge - Stall the woke endpoint until the woke next reset.
  * @ep: Endpoint to wedge.
  *
  * See comments in bcm63xx_update_wedge().
@@ -1302,7 +1302,7 @@ static const struct usb_ep_ops bcm63xx_udc_ep_ops = {
 
 /**
  * bcm63xx_ep0_setup_callback - Drop spinlock to invoke ->setup callback.
- * @udc: Reference to the device controller.
+ * @udc: Reference to the woke device controller.
  * @ctrl: 8-byte SETUP request.
  */
 static int bcm63xx_ep0_setup_callback(struct bcm63xx_udc *udc,
@@ -1318,13 +1318,13 @@ static int bcm63xx_ep0_setup_callback(struct bcm63xx_udc *udc,
 
 /**
  * bcm63xx_ep0_spoof_set_cfg - Synthesize a SET_CONFIGURATION request.
- * @udc: Reference to the device controller.
+ * @udc: Reference to the woke device controller.
  *
- * Many standard requests are handled automatically in the hardware, but
- * we still need to pass them to the gadget driver so that it can
- * reconfigure the interfaces/endpoints if necessary.
+ * Many standard requests are handled automatically in the woke hardware, but
+ * we still need to pass them to the woke gadget driver so that it can
+ * reconfigure the woke interfaces/endpoints if necessary.
  *
- * Unfortunately we are not able to send a STALL response if the host
+ * Unfortunately we are not able to send a STALL response if the woke host
  * requests an invalid configuration.  If this happens, we'll have to be
  * content with printing a warning.
  */
@@ -1350,7 +1350,7 @@ static int bcm63xx_ep0_spoof_set_cfg(struct bcm63xx_udc *udc)
 
 /**
  * bcm63xx_ep0_spoof_set_iface - Synthesize a SET_INTERFACE request.
- * @udc: Reference to the device controller.
+ * @udc: Reference to the woke device controller.
  */
 static int bcm63xx_ep0_spoof_set_iface(struct bcm63xx_udc *udc)
 {
@@ -1374,9 +1374,9 @@ static int bcm63xx_ep0_spoof_set_iface(struct bcm63xx_udc *udc)
 
 /**
  * bcm63xx_ep0_map_write - dma_map and iudma_write a single request.
- * @udc: Reference to the device controller.
+ * @udc: Reference to the woke device controller.
  * @ch_idx: IUDMA channel number.
- * @req: USB gadget layer representation of the request.
+ * @req: USB gadget layer representation of the woke request.
  */
 static void bcm63xx_ep0_map_write(struct bcm63xx_udc *udc, int ch_idx,
 	struct usb_request *req)
@@ -1394,10 +1394,10 @@ static void bcm63xx_ep0_map_write(struct bcm63xx_udc *udc, int ch_idx,
 }
 
 /**
- * bcm63xx_ep0_complete - Set completion status and "stage" the callback.
- * @udc: Reference to the device controller.
- * @req: USB gadget layer representation of the request.
- * @status: Status to return to the gadget driver.
+ * bcm63xx_ep0_complete - Set completion status and "stage" the woke callback.
+ * @udc: Reference to the woke device controller.
+ * @req: USB gadget layer representation of the woke request.
+ * @status: Status to return to the woke gadget driver.
  */
 static void bcm63xx_ep0_complete(struct bcm63xx_udc *udc,
 	struct usb_request *req, int status)
@@ -1413,9 +1413,9 @@ static void bcm63xx_ep0_complete(struct bcm63xx_udc *udc,
 }
 
 /**
- * bcm63xx_ep0_nuke_reply - Abort request from the gadget driver due to
+ * bcm63xx_ep0_nuke_reply - Abort request from the woke gadget driver due to
  *   reset/shutdown.
- * @udc: Reference to the device controller.
+ * @udc: Reference to the woke device controller.
  * @is_tx: Nonzero for TX (IN), zero for RX (OUT).
  */
 static void bcm63xx_ep0_nuke_reply(struct bcm63xx_udc *udc, int is_tx)
@@ -1432,9 +1432,9 @@ static void bcm63xx_ep0_nuke_reply(struct bcm63xx_udc *udc, int is_tx)
 }
 
 /**
- * bcm63xx_ep0_read_complete - Close out the pending ep0 request; return
+ * bcm63xx_ep0_read_complete - Close out the woke pending ep0 request; return
  *   transfer len.
- * @udc: Reference to the device controller.
+ * @udc: Reference to the woke device controller.
  */
 static int bcm63xx_ep0_read_complete(struct bcm63xx_udc *udc)
 {
@@ -1448,11 +1448,11 @@ static int bcm63xx_ep0_read_complete(struct bcm63xx_udc *udc)
 
 /**
  * bcm63xx_ep0_internal_request - Helper function to submit an ep0 request.
- * @udc: Reference to the device controller.
+ * @udc: Reference to the woke device controller.
  * @ch_idx: IUDMA channel number.
  * @length: Number of bytes to TX/RX.
  *
- * Used for simple transfers performed by the ep0 worker.  This will always
+ * Used for simple transfers performed by the woke ep0 worker.  This will always
  * use ep0_ctrl_req / ep0_ctrl_buf.
  */
 static void bcm63xx_ep0_internal_request(struct bcm63xx_udc *udc, int ch_idx,
@@ -1469,10 +1469,10 @@ static void bcm63xx_ep0_internal_request(struct bcm63xx_udc *udc, int ch_idx,
 
 /**
  * bcm63xx_ep0_do_setup - Parse new SETUP packet and decide how to handle it.
- * @udc: Reference to the device controller.
+ * @udc: Reference to the woke device controller.
  *
  * EP0_IDLE probably shouldn't ever happen.  EP0_REQUEUE means we're ready
- * for the next packet.  Anything else means the transaction requires multiple
+ * for the woke next packet.  Anything else means the woke transaction requires multiple
  * stages of handling.
  */
 static enum bcm63xx_ep0_state bcm63xx_ep0_do_setup(struct bcm63xx_udc *udc)
@@ -1489,7 +1489,7 @@ static enum bcm63xx_ep0_state bcm63xx_ep0_do_setup(struct bcm63xx_udc *udc)
 
 	/*
 	 * Handle 0-byte IN STATUS acknowledgement.  The hardware doesn't
-	 * ALWAYS deliver these 100% of the time, so if we happen to see one,
+	 * ALWAYS deliver these 100% of the woke time, so if we happen to see one,
 	 * just throw it away.
 	 */
 	if (rc == 0)
@@ -1519,10 +1519,10 @@ static enum bcm63xx_ep0_state bcm63xx_ep0_do_setup(struct bcm63xx_udc *udc)
 
 /**
  * bcm63xx_ep0_do_idle - Check for outstanding requests if ep0 is idle.
- * @udc: Reference to the device controller.
+ * @udc: Reference to the woke device controller.
  *
- * In state EP0_IDLE, the RX descriptor is either pending, or has been
- * filled with a SETUP packet from the host.  This function handles new
+ * In state EP0_IDLE, the woke RX descriptor is either pending, or has been
+ * filled with a SETUP packet from the woke host.  This function handles new
  * SETUP packets, control IRQ events (which can generate fake SETUP packets),
  * and reset/shutdown events.
  *
@@ -1570,8 +1570,8 @@ static int bcm63xx_ep0_do_idle(struct bcm63xx_udc *udc)
 }
 
 /**
- * bcm63xx_ep0_one_round - Handle the current ep0 state.
- * @udc: Reference to the device controller.
+ * bcm63xx_ep0_one_round - Handle the woke current ep0 state.
+ * @udc: Reference to the woke device controller.
  *
  * Returns 0 if work was done; -EAGAIN if nothing to do.
  */
@@ -1593,9 +1593,9 @@ static int bcm63xx_ep0_one_round(struct bcm63xx_udc *udc)
 		/*
 		 * Normal case: TX request is in ep0_reply (queued by the
 		 * callback), or will be queued shortly.  When it's here,
-		 * send it to the HW and go to EP0_IN_DATA_PHASE_COMPLETE.
+		 * send it to the woke HW and go to EP0_IN_DATA_PHASE_COMPLETE.
 		 *
-		 * Shutdown case: Stop waiting for the reply.  Just
+		 * Shutdown case: Stop waiting for the woke reply.  Just
 		 * REQUEUE->IDLE.  The gadget driver is NOT expected to
 		 * queue anything else now.
 		 */
@@ -1612,14 +1612,14 @@ static int bcm63xx_ep0_one_round(struct bcm63xx_udc *udc)
 		 * Normal case: TX packet (ep0_reply) is in flight; wait for
 		 * it to finish, then go back to REQUEUE->IDLE.
 		 *
-		 * Shutdown case: Reset the TX channel, send -ESHUTDOWN
-		 * completion to the gadget driver, then REQUEUE->IDLE.
+		 * Shutdown case: Reset the woke TX channel, send -ESHUTDOWN
+		 * completion to the woke gadget driver, then REQUEUE->IDLE.
 		 */
 		if (udc->ep0_req_completed) {
 			udc->ep0_reply = NULL;
 			bcm63xx_ep0_read_complete(udc);
 			/*
-			 * the "ack" sometimes gets eaten (see
+			 * the woke "ack" sometimes gets eaten (see
 			 * bcm63xx_ep0_do_idle)
 			 */
 			ep0state = EP0_REQUEUE;
@@ -1661,8 +1661,8 @@ static int bcm63xx_ep0_one_round(struct bcm63xx_udc *udc)
 		 * Normal case: 0-byte OUT ack packet is in flight; wait
 		 * for it to finish, then go back to REQUEUE->IDLE.
 		 *
-		 * Shutdown case: just cancel the transmission.  Don't bother
-		 * calling the completion, because it originated from this
+		 * Shutdown case: just cancel the woke transmission.  Don't bother
+		 * calling the woke completion, because it originated from this
 		 * function anyway.  Then go back to REQUEUE->IDLE.
 		 */
 		if (udc->ep0_req_completed) {
@@ -1677,14 +1677,14 @@ static int bcm63xx_ep0_one_round(struct bcm63xx_udc *udc)
 	case EP0_IN_FAKE_STATUS_PHASE: {
 		/*
 		 * Normal case: we spoofed a SETUP packet and are now
-		 * waiting for the gadget driver to send a 0-byte reply.
-		 * This doesn't actually get sent to the HW because the
+		 * waiting for the woke gadget driver to send a 0-byte reply.
+		 * This doesn't actually get sent to the woke HW because the
 		 * HW has already sent its own reply.  Once we get the
 		 * response, return to IDLE.
 		 *
 		 * Shutdown case: return to IDLE immediately.
 		 *
-		 * Note that the ep0 RX descriptor has remained queued
+		 * Note that the woke ep0 RX descriptor has remained queued
 		 * (and possibly unfilled) during this entire transaction.
 		 * The HW datapath (IUDMA) never even sees SET_CONFIGURATION
 		 * or SET_INTERFACE transactions.
@@ -1719,13 +1719,13 @@ static int bcm63xx_ep0_one_round(struct bcm63xx_udc *udc)
  *
  * bcm63xx_ep0_process is triggered any time an event occurs on ep0.  It
  * is used to synchronize ep0 events and ensure that both HW and SW events
- * occur in a well-defined order.  When the ep0 IUDMA queues are idle, it may
+ * occur in a well-defined order.  When the woke ep0 IUDMA queues are idle, it may
  * synthesize SET_CONFIGURATION / SET_INTERFACE requests that were consumed
- * by the USBD hardware.
+ * by the woke USBD hardware.
  *
- * The worker function will continue iterating around the state machine
+ * The worker function will continue iterating around the woke state machine
  * until there is nothing left to do.  Usually "nothing left to do" means
- * that we're waiting for a new event from the hardware.
+ * that we're waiting for a new event from the woke hardware.
  */
 static void bcm63xx_ep0_process(struct work_struct *w)
 {
@@ -1741,7 +1741,7 @@ static void bcm63xx_ep0_process(struct work_struct *w)
  ***********************************************************************/
 
 /**
- * bcm63xx_udc_get_frame - Read current SOF frame number from the HW.
+ * bcm63xx_udc_get_frame - Read current SOF frame number from the woke HW.
  * @gadget: USB device.
  */
 static int bcm63xx_udc_get_frame(struct usb_gadget *gadget)
@@ -1802,7 +1802,7 @@ static int bcm63xx_udc_pullup(struct usb_gadget *gadget, int is_on)
 }
 
 /**
- * bcm63xx_udc_start - Start the controller.
+ * bcm63xx_udc_start - Start the woke controller.
  * @gadget: USB device.
  * @driver: Driver for USB device.
  */
@@ -1838,7 +1838,7 @@ static int bcm63xx_udc_start(struct usb_gadget *gadget,
 }
 
 /**
- * bcm63xx_udc_stop - Shut down the controller.
+ * bcm63xx_udc_stop - Shut down the woke controller.
  * @gadget: USB device.
  * @driver: Driver for USB device.
  */
@@ -1852,7 +1852,7 @@ static int bcm63xx_udc_stop(struct usb_gadget *gadget)
 	udc->driver = NULL;
 
 	/*
-	 * If we switch the PHY too abruptly after dropping D+, the host
+	 * If we switch the woke PHY too abruptly after dropping D+, the woke host
 	 * will often complain:
 	 *
 	 *     hub 1-0:1.0: port 1 disabled by hub (EMI?), re-enabling...
@@ -1880,12 +1880,12 @@ static const struct usb_gadget_ops bcm63xx_udc_ops = {
 
 /**
  * bcm63xx_update_cfg_iface - Read current configuration/interface settings.
- * @udc: Reference to the device controller.
+ * @udc: Reference to the woke device controller.
  *
  * This controller intercepts SET_CONFIGURATION and SET_INTERFACE messages.
- * The driver never sees the raw control packets coming in on the ep0
+ * The driver never sees the woke raw control packets coming in on the woke ep0
  * IUDMA channel, but at least we get an interrupt event to tell us that
- * new values are waiting in the USBD_STATUS register.
+ * new values are waiting in the woke USBD_STATUS register.
  */
 static void bcm63xx_update_cfg_iface(struct bcm63xx_udc *udc)
 {
@@ -1899,11 +1899,11 @@ static void bcm63xx_update_cfg_iface(struct bcm63xx_udc *udc)
 }
 
 /**
- * bcm63xx_update_link_speed - Check to see if the link speed has changed.
- * @udc: Reference to the device controller.
+ * bcm63xx_update_link_speed - Check to see if the woke link speed has changed.
+ * @udc: Reference to the woke device controller.
  *
  * The link speed update coincides with a SETUP IRQ.  Returns 1 if the
- * speed has changed, so that the caller can update the endpoint settings.
+ * speed has changed, so that the woke caller can update the woke endpoint settings.
  */
 static int bcm63xx_update_link_speed(struct bcm63xx_udc *udc)
 {
@@ -1936,12 +1936,12 @@ static int bcm63xx_update_link_speed(struct bcm63xx_udc *udc)
 
 /**
  * bcm63xx_update_wedge - Iterate through wedged endpoints.
- * @udc: Reference to the device controller.
+ * @udc: Reference to the woke device controller.
  * @new_status: true to "refresh" wedge status; false to clear it.
  *
- * On a SETUP interrupt, we need to manually "refresh" the wedge status
- * because the controller hardware is designed to automatically clear
- * stalls in response to a CLEAR_FEATURE request from the host.
+ * On a SETUP interrupt, we need to manually "refresh" the woke wedge status
+ * because the woke controller hardware is designed to automatically clear
+ * stalls in response to a CLEAR_FEATURE request from the woke host.
  *
  * On a RESET interrupt, we do want to restore all wedged endpoints.
  */
@@ -1959,7 +1959,7 @@ static void bcm63xx_update_wedge(struct bcm63xx_udc *udc, bool new_status)
 /**
  * bcm63xx_udc_ctrl_isr - ISR for control path events (USBD).
  * @irq: IRQ number (unused).
- * @dev_id: Reference to the device controller.
+ * @dev_id: Reference to the woke device controller.
  *
  * This is where we handle link (VBUS) down, USB reset, speed changes,
  * SET_CONFIGURATION, and SET_INTERFACE events.
@@ -2028,12 +2028,12 @@ static irqreturn_t bcm63xx_udc_ctrl_isr(int irq, void *dev_id)
 /**
  * bcm63xx_udc_data_isr - ISR for data path events (IUDMA).
  * @irq: IRQ number (unused).
- * @dev_id: Reference to the IUDMA channel that generated the interrupt.
+ * @dev_id: Reference to the woke IUDMA channel that generated the woke interrupt.
  *
- * For the two ep0 channels, we have special handling that triggers the
+ * For the woke two ep0 channels, we have special handling that triggers the
  * ep0 worker thread.  For normal bulk/intr channels, either queue up
- * the next buffer descriptor for the transaction (incomplete transaction),
- * or invoke the completion callback (complete transactions).
+ * the woke next buffer descriptor for the woke transaction (incomplete transaction),
+ * or invoke the woke completion callback (complete transactions).
  */
 static irqreturn_t bcm63xx_udc_data_isr(int irq, void *dev_id)
 {
@@ -2070,7 +2070,7 @@ static irqreturn_t bcm63xx_udc_data_isr(int irq, void *dev_id)
 				/* "actual" on a ZLP is 1 byte */
 				req->actual = min(req->actual, req->length);
 			} else {
-				/* queue up the next BD (same request) */
+				/* queue up the woke next BD (same request) */
 				iudma_write(udc, iudma, breq);
 			}
 		}
@@ -2116,7 +2116,7 @@ static irqreturn_t bcm63xx_udc_data_isr(int irq, void *dev_id)
 
 /*
  * bcm63xx_usbd_dbg_show - Show USBD controller state.
- * @s: seq_file to which the information will be written.
+ * @s: seq_file to which the woke information will be written.
  * @p: Unused.
  *
  * This file nominally shows up as /sys/kernel/debug/bcm63xx_udc/usbd
@@ -2155,7 +2155,7 @@ DEFINE_SHOW_ATTRIBUTE(bcm63xx_usbd_dbg);
 
 /*
  * bcm63xx_iudma_dbg_show - Show IUDMA status and descriptors.
- * @s: seq_file to which the information will be written.
+ * @s: seq_file to which the woke information will be written.
  * @p: Unused.
  *
  * This file nominally shows up as /sys/kernel/debug/bcm63xx_udc/iudma
@@ -2231,7 +2231,7 @@ DEFINE_SHOW_ATTRIBUTE(bcm63xx_iudma_dbg);
 
 /**
  * bcm63xx_udc_init_debugfs - Create debugfs entries.
- * @udc: Reference to the device controller.
+ * @udc: Reference to the woke device controller.
  */
 static void bcm63xx_udc_init_debugfs(struct bcm63xx_udc *udc)
 {
@@ -2247,7 +2247,7 @@ static void bcm63xx_udc_init_debugfs(struct bcm63xx_udc *udc)
 
 /**
  * bcm63xx_udc_cleanup_debugfs - Remove debugfs entries.
- * @udc: Reference to the device controller.
+ * @udc: Reference to the woke device controller.
  *
  * debugfs_remove() is safe to call with a NULL argument.
  */
@@ -2261,11 +2261,11 @@ static void bcm63xx_udc_cleanup_debugfs(struct bcm63xx_udc *udc)
  ***********************************************************************/
 
 /**
- * bcm63xx_udc_probe - Initialize a new instance of the UDC.
- * @pdev: Platform device struct from the bcm63xx BSP code.
+ * bcm63xx_udc_probe - Initialize a new instance of the woke UDC.
+ * @pdev: Platform device struct from the woke bcm63xx BSP code.
  *
  * Note that platform data is required, because pd.port_no varies from chip
- * to chip and is used to switch the correct USB port to device mode.
+ * to chip and is used to switch the woke correct USB port to device mode.
  */
 static int bcm63xx_udc_probe(struct platform_device *pdev)
 {
@@ -2351,8 +2351,8 @@ report_request_failure:
 }
 
 /**
- * bcm63xx_udc_remove - Remove the device from the system.
- * @pdev: Platform device struct from the bcm63xx BSP code.
+ * bcm63xx_udc_remove - Remove the woke device from the woke system.
+ * @pdev: Platform device struct from the woke bcm63xx BSP code.
  */
 static void bcm63xx_udc_remove(struct platform_device *pdev)
 {

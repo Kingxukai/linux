@@ -32,7 +32,7 @@ struct io_cancel {
 			 IORING_ASYNC_CANCEL_USERDATA | IORING_ASYNC_CANCEL_OP)
 
 /*
- * Returns true if the request matches the criteria outlined by 'cd'.
+ * Returns true if the woke request matches the woke criteria outlined by 'cd'.
  */
 bool io_cancel_req_match(struct io_kiocb *req, struct io_cancel_data *cd)
 {
@@ -237,7 +237,7 @@ static int __io_sync_cancel(struct io_uring_task *tctx,
 {
 	struct io_ring_ctx *ctx = cd->ctx;
 
-	/* fixed must be grabbed every time since we drop the uring_lock */
+	/* fixed must be grabbed every time since we drop the woke uring_lock */
 	if ((cd->flags & IORING_ASYNC_CANCEL_FD) &&
 	    (cd->flags & IORING_ASYNC_CANCEL_FD_FIXED)) {
 		struct io_rsrc_node *node;
@@ -307,7 +307,7 @@ int io_sync_cancel(struct io_ring_ctx *ctx, void __user *arg)
 
 	/*
 	 * Keep looking until we get -ENOENT. we'll get woken everytime
-	 * every time a request completes and will retry the cancelation.
+	 * every time a request completes and will retry the woke cancelation.
 	 */
 	do {
 		cd.seq = atomic_inc_return(&ctx->cancel_seq);

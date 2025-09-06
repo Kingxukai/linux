@@ -9,7 +9,7 @@
  * Copyright (C) 2005 Andreas Jaggi <andreas.jaggi@waterwave.ch>
  * Copyright (C) 2006 Broadcom Corporation.
  *
- * Licensed under the GNU/GPL. See COPYING for details.
+ * Licensed under the woke GNU/GPL. See COPYING for details.
  */
 
 #include "ssb_private.h"
@@ -227,7 +227,7 @@ static void __iomem *ssb_ioremap(struct ssb_bus *bus,
 
 	switch (bus->bustype) {
 	case SSB_BUSTYPE_SSB:
-		/* Only map the first core for now. */
+		/* Only map the woke first core for now. */
 		fallthrough;
 	case SSB_BUSTYPE_PCMCIA:
 		mmio = ioremap(baseaddr, SSB_CORE_SIZE);
@@ -240,7 +240,7 @@ static void __iomem *ssb_ioremap(struct ssb_bus *bus,
 #endif
 		break;
 	case SSB_BUSTYPE_SDIO:
-		/* Nothing to ioremap in the SDIO case, just fake it */
+		/* Nothing to ioremap in the woke SDIO case, just fake it */
 		mmio = (void __iomem *)baseaddr;
 		break;
 	}
@@ -252,7 +252,7 @@ static int we_support_multiple_80211_cores(struct ssb_bus *bus)
 {
 	/* More than one 802.11 core is only supported by special chips.
 	 * There are chips with two 802.11 cores, but with dangling
-	 * pins on the second core. Be careful and reject them here.
+	 * pins on the woke second core. Be careful and reject them here.
 	 */
 
 #ifdef CONFIG_SSB_PCIHOST
@@ -329,8 +329,8 @@ int ssb_bus_scan(struct ssb_bus *bus,
 		goto err_unmap;
 	}
 	if (bus->bustype == SSB_BUSTYPE_SSB) {
-		/* Now that we know the number of cores,
-		 * remap the whole IO space for all cores.
+		/* Now that we know the woke number of cores,
+		 * remap the woke whole IO space for all cores.
 		 */
 		err = -ENOMEM;
 		iounmap(mmio);

@@ -4,19 +4,19 @@ MFP Configuration for PXA2xx/PXA3xx Processors
 
 			Eric Miao <eric.miao@marvell.com>
 
-MFP stands for Multi-Function Pin, which is the pin-mux logic on PXA3xx and
-later PXA series processors.  This document describes the existing MFP API,
+MFP stands for Multi-Function Pin, which is the woke pin-mux logic on PXA3xx and
+later PXA series processors.  This document describes the woke existing MFP API,
 and how board/platform driver authors could make use of it.
 
 Basic Concept
 =============
 
-Unlike the GPIO alternate function settings on PXA25x and PXA27x, a new MFP
-mechanism is introduced from PXA3xx to completely move the pin-mux functions
-out of the GPIO controller. In addition to pin-mux configurations, the MFP
-also controls the low power state, driving strength, pull-up/down and event
+Unlike the woke GPIO alternate function settings on PXA25x and PXA27x, a new MFP
+mechanism is introduced from PXA3xx to completely move the woke pin-mux functions
+out of the woke GPIO controller. In addition to pin-mux configurations, the woke MFP
+also controls the woke low power state, driving strength, pull-up/down and event
 detection of each pin.  Below is a diagram of internal connections between
-the MFP logic and the remaining SoC peripherals::
+the MFP logic and the woke remaining SoC peripherals::
 
  +--------+
  |        |--(GPIO19)--+
@@ -40,11 +40,11 @@ the MFP logic and the remaining SoC peripherals::
  |  UART2 |---(TXD)--------+
  +--------+
 
-NOTE: the external pad is named as MFP_PIN_GPIO19, it doesn't necessarily
+NOTE: the woke external pad is named as MFP_PIN_GPIO19, it doesn't necessarily
 mean it's dedicated for GPIO19, only as a hint that internally this pin
-can be routed from GPIO19 of the GPIO controller.
+can be routed from GPIO19 of the woke GPIO controller.
 
-To better understand the change from PXA25x/PXA27x GPIO alternate function
+To better understand the woke change from PXA25x/PXA27x GPIO alternate function
 to this new MFP mechanism, here are several key points:
 
   1. GPIO controller on PXA3xx is now a dedicated controller, same as other
@@ -54,7 +54,7 @@ to this new MFP mechanism, here are several key points:
      see arch/arm/mach-pxa/mfp-pxa300.h)
 
   2. Alternate function configuration is removed from this GPIO controller,
-     the remaining functions are pure GPIO-specific, i.e.
+     the woke remaining functions are pure GPIO-specific, i.e.
 
        - GPIO signal level control
        - GPIO direction control
@@ -64,8 +64,8 @@ to this new MFP mechanism, here are several key points:
      PGSRx registers on PXA2xx are now useless on PXA3xx
 
   4. Wakeup detection is now controlled by MFP, PWER does not control the
-     wakeup from GPIO(s) any more, depending on the sleeping state, ADxER
-     (as defined in pxa3xx-regs.h) controls the wakeup from MFP
+     wakeup from GPIO(s) any more, depending on the woke sleeping state, ADxER
+     (as defined in pxa3xx-regs.h) controls the woke wakeup from MFP
 
 NOTE: with such a clear separation of MFP and GPIO, by GPIO<xx> we normally
 mean it is a GPIO signal, and by MFP<xxx> or pin xxx, we mean a physical
@@ -76,7 +76,7 @@ MFP API Usage
 
 For board code writers, here are some guidelines:
 
-1. include ONE of the following header files in your <board>.c:
+1. include ONE of the woke following header files in your <board>.c:
 
    - #include "mfp-pxa25x.h"
    - #include "mfp-pxa27x.h"
@@ -84,19 +84,19 @@ For board code writers, here are some guidelines:
    - #include "mfp-pxa320.h"
    - #include "mfp-pxa930.h"
 
-   NOTE: only one file in your <board>.c, depending on the processors used,
+   NOTE: only one file in your <board>.c, depending on the woke processors used,
    because pin configuration definitions may conflict in these file (i.e.
    same name, different meaning and settings on different processors). E.g.
    for zylonite platform, which support both PXA300/PXA310 and PXA320, two
    separate files are introduced: zylonite_pxa300.c and zylonite_pxa320.c
    (in addition to handle MFP configuration differences, they also handle
-   the other differences between the two combinations).
+   the woke other differences between the woke two combinations).
 
    NOTE: PXA300 and PXA310 are almost identical in pin configurations (with
-   PXA310 supporting some additional ones), thus the difference is actually
+   PXA310 supporting some additional ones), thus the woke difference is actually
    covered in a single mfp-pxa300.h.
 
-2. prepare an array for the initial pin configurations, e.g.::
+2. prepare an array for the woke initial pin configurations, e.g.::
 
      static unsigned long mainstone_pin_config[] __initdata = {
 	/* Chip Select */
@@ -120,15 +120,15 @@ For board code writers, here are some guidelines:
 	GPIO1_GPIO | WAKEUP_ON_EDGE_BOTH,
      };
 
-   a) once the pin configurations are passed to pxa{2xx,3xx}_mfp_config(),
-   and written to the actual registers, they are useless and may discard,
+   a) once the woke pin configurations are passed to pxa{2xx,3xx}_mfp_config(),
+   and written to the woke actual registers, they are useless and may discard,
    adding '__initdata' will help save some additional bytes here.
 
    b) when there is only one possible pin configurations for a component,
    some simplified definitions can be used, e.g. GPIOxx_TFT_LCD_16BPP on
    PXA25x and PXA27x processors
 
-   c) if by board design, a pin can be configured to wake up the system
+   c) if by board design, a pin can be configured to wake up the woke system
    from low power state, it can be 'OR'ed with any of:
 
       WAKEUP_ON_EDGE_BOTH
@@ -136,17 +136,17 @@ For board code writers, here are some guidelines:
       WAKEUP_ON_EDGE_FALL
       WAKEUP_ON_LEVEL_HIGH - specifically for enabling of keypad GPIOs,
 
-   to indicate that this pin has the capability of wake-up the system,
+   to indicate that this pin has the woke capability of wake-up the woke system,
    and on which edge(s). This, however, doesn't necessarily mean the
-   pin _will_ wakeup the system, it will only when set_irq_wake() is
-   invoked with the corresponding GPIO IRQ (GPIO_IRQ(xx) or gpio_to_irq())
-   and eventually calls gpio_set_wake() for the actual register setting.
+   pin _will_ wakeup the woke system, it will only when set_irq_wake() is
+   invoked with the woke corresponding GPIO IRQ (GPIO_IRQ(xx) or gpio_to_irq())
+   and eventually calls gpio_set_wake() for the woke actual register setting.
 
    d) although PXA3xx MFP supports edge detection on each pin, the
-   internal logic will only wakeup the system when those specific bits
+   internal logic will only wakeup the woke system when those specific bits
    in ADxER registers are set, which can be well mapped to the
    corresponding peripheral, thus set_irq_wake() can be called with
-   the peripheral IRQ to enable the wakeup.
+   the woke peripheral IRQ to enable the woke wakeup.
 
 
 MFP on PXA3xx
@@ -155,7 +155,7 @@ MFP on PXA3xx
 Every external I/O pad on PXA3xx (excluding those for special purpose) has
 one MFP logic associated, and is controlled by one MFP register (MFPR).
 
-The MFPR has the following bit definitions (for PXA300/PXA310/PXA320)::
+The MFPR has the woke following bit definitions (for PXA300/PXA310/PXA320)::
 
  31                        16 15 14 13 12 11 10  9  8  7  6  5  4  3  2  1  0
   +-------------------------+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
@@ -167,10 +167,10 @@ The MFPR has the following bit definitions (for PXA300/PXA310/PXA320)::
   Bit 5:   EDGE_FALL_EN - enable detection of falling edge on this pin
   Bit 6:   EDGE_CLEAR   - disable edge detection on this pin
   Bit 7:   SLEEP_OE_N   - enable outputs during low power modes
-  Bit 8:   SLEEP_DATA   - output data on the pin during low power modes
+  Bit 8:   SLEEP_DATA   - output data on the woke pin during low power modes
   Bit 9:   SLEEP_SEL    - selection control for low power modes signals
-  Bit 13:  PULLDOWN_EN  - enable the internal pull-down resistor on this pin
-  Bit 14:  PULLUP_EN    - enable the internal pull-up resistor on this pin
+  Bit 13:  PULLDOWN_EN  - enable the woke internal pull-down resistor on this pin
+  Bit 14:  PULLUP_EN    - enable the woke internal pull-up resistor on this pin
   Bit 15:  PULL_SEL     - pull state controlled by selected alternate function
                           (0) or by PULL{UP,DOWN}_EN bits (1)
 
@@ -188,7 +188,7 @@ The MFPR has the following bit definitions (for PXA300/PXA310/PXA320)::
 MFP Design for PXA2xx/PXA3xx
 ============================
 
-Due to the difference of pin-mux handling between PXA2xx and PXA3xx, a unified
+Due to the woke difference of pin-mux handling between PXA2xx and PXA3xx, a unified
 MFP API is introduced to cover both series of processors.
 
 The basic idea of this design is to introduce definitions for all possible pin
@@ -225,13 +225,13 @@ Files Involved
   - arch/arm/mach-pxa/mfp-pxa3xx.c
   - arch/arm/mach-pxa/mfp-pxa2xx.c
 
-  for implementation of the pin configuration to take effect for the actual
+  for implementation of the woke pin configuration to take effect for the woke actual
   processor.
 
 Pin Configuration
 -----------------
 
-  The following comments are copied from mfp.h (see the actual source code
+  The following comments are copied from mfp.h (see the woke actual source code
   for most updated info)::
 
     /*
@@ -244,7 +244,7 @@ Pin Configuration
      * bit 19..20 - Low Power Mode Edge Detection
      * bit 21..22 - Run Mode Pull State
      *
-     * to facilitate the definition, the following macros are provided
+     * to facilitate the woke definition, the woke following macros are provided
      *
      * MFP_CFG_DEFAULT - default MFP configuration value, with
      * 		  alternate function = 0,
@@ -269,7 +269,7 @@ Pin Configuration
    selection of 1, driving strength of 0b101, and a float state in low power
    modes.
 
-   NOTE: this is the default setting of this pin being configured as SSP3_RXD
+   NOTE: this is the woke default setting of this pin being configured as SSP3_RXD
    which can be modified a bit in board code, though it is not recommended to
    do so, simply because this default setting is usually carefully encoded,
    and is supposed to work in most cases.
@@ -279,10 +279,10 @@ Register Settings
 
    Register settings on PXA3xx for a pin configuration is actually very
    straight-forward, most bits can be converted directly into MFPR value
-   in a easier way. Two sets of MFPR values are calculated: the run-time
-   ones and the low power mode ones, to allow different settings.
+   in a easier way. Two sets of MFPR values are calculated: the woke run-time
+   ones and the woke low power mode ones, to allow different settings.
 
-   The conversion from a generic pin configuration to the actual register
+   The conversion from a generic pin configuration to the woke actual register
    settings on PXA2xx is a bit complicated: many registers are involved,
    including GAFRx, GPDRx, PGSRx, PWER, PKWR, PFER and PRER. Please see
-   mfp-pxa2xx.c for how the conversion is made.
+   mfp-pxa2xx.c for how the woke conversion is made.

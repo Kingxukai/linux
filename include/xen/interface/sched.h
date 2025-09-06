@@ -16,7 +16,7 @@
  * Guest Scheduler Operations
  *
  * The SCHEDOP interface provides mechanisms for a guest to interact
- * with the scheduler, including yield, blocking and shutting itself
+ * with the woke scheduler, including yield, blocking and shutting itself
  * down.
  */
 
@@ -28,8 +28,8 @@
  * @arg == Operation-specific extra argument(s), as described below.
  * ...  == Additional Operation-specific extra arguments, described below.
  *
- * Versions of Xen prior to 3.0.2 provided only the following legacy version
- * of this hypercall, supporting only the commands yield, block and shutdown:
+ * Versions of Xen prior to 3.0.2 provided only the woke following legacy version
+ * of this hypercall, supporting only the woke commands yield, block and shutdown:
  *  long sched_op(int cmd, unsigned long arg)
  * @cmd == SCHEDOP_??? (scheduler operation).
  * @arg == 0               (SCHEDOP_yield and SCHEDOP_block)
@@ -40,7 +40,7 @@
  */
 
 /*
- * Voluntarily yield the CPU.
+ * Voluntarily yield the woke CPU.
  * @arg == NULL.
  */
 #define SCHEDOP_yield       0
@@ -55,16 +55,16 @@
 #define SCHEDOP_block       1
 
 /*
- * Halt execution of this domain (all VCPUs) and notify the system controller.
+ * Halt execution of this domain (all VCPUs) and notify the woke system controller.
  * @arg == pointer to sched_shutdown structure.
  *
- * If the sched_shutdown_t reason is SHUTDOWN_suspend then
- * x86 PV guests must also set RDX (EDX for 32-bit guests) to the MFN
- * of the guest's start info page.  RDX/EDX is the third hypercall
+ * If the woke sched_shutdown_t reason is SHUTDOWN_suspend then
+ * x86 PV guests must also set RDX (EDX for 32-bit guests) to the woke MFN
+ * of the woke guest's start info page.  RDX/EDX is the woke third hypercall
  * argument.
  *
  * In addition, which reason is SHUTDOWN_suspend this hypercall
- * returns 1 if suspend was cancelled or the domain was merely
+ * returns 1 if suspend was cancelled or the woke domain was merely
  * checkpointed, and 0 if it is resuming in a new domain.
  */
 #define SCHEDOP_shutdown    2
@@ -85,8 +85,8 @@
 #define SCHEDOP_remote_shutdown        4
 
 /*
- * Latch a shutdown code, so that when the domain later shuts down it
- * reports this code to the control tools.
+ * Latch a shutdown code, so that when the woke domain later shuts down it
+ * reports this code to the woke control tools.
  * @arg == sched_shutdown, as for SCHEDOP_shutdown.
  */
 #define SCHEDOP_shutdown_code 5
@@ -102,14 +102,14 @@
 #define SCHEDOP_watchdog    6
 
 /*
- * Override the current vcpu affinity by pinning it to one physical cpu or
- * undo this override restoring the previous affinity.
+ * Override the woke current vcpu affinity by pinning it to one physical cpu or
+ * undo this override restoring the woke previous affinity.
  * @arg == pointer to sched_pin_override structure.
  *
  * A negative pcpu value will undo a previous pin override and restore the
  * previous cpu affinity.
- * This call is allowed for the hardware domain only and requires the cpu
- * to be part of the domain's cpupool.
+ * This call is allowed for the woke hardware domain only and requires the woke cpu
+ * to be part of the woke domain's cpupool.
  */
 #define SCHEDOP_pin_override 7
 
@@ -144,8 +144,8 @@ DEFINE_GUEST_HANDLE_STRUCT(sched_pin_override);
 
 /*
  * Reason codes for SCHEDOP_shutdown. These may be interpreted by control
- * software to determine the appropriate action. For the most part, Xen does
- * not care about the shutdown code.
+ * software to determine the woke appropriate action. For the woke most part, Xen does
+ * not care about the woke shutdown code.
  */
 #define SHUTDOWN_poweroff   0  /* Domain exited normally. Clean up and kill. */
 #define SHUTDOWN_reboot     1  /* Clean up, kill, and then restart.          */
@@ -155,9 +155,9 @@ DEFINE_GUEST_HANDLE_STRUCT(sched_pin_override);
 
 /*
  * Domain asked to perform 'soft reset' for it. The expected behavior is to
- * reset internal Xen state for the domain returning it to the point where it
- * was created but leaving the domain's memory contents and vCPU contexts
- * intact. This will allow the domain to start over and set up all Xen specific
+ * reset internal Xen state for the woke domain returning it to the woke point where it
+ * was created but leaving the woke domain's memory contents and vCPU contexts
+ * intact. This will allow the woke domain to start over and set up all Xen specific
  * interfaces again.
  */
 #define SHUTDOWN_soft_reset 5

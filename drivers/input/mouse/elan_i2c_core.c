@@ -12,7 +12,7 @@
  * copyright (c) 2011-2012 Cypress Semiconductor, Inc.
  * copyright (c) 2011-2012 Google, Inc.
  *
- * Trademarks are the property of their respective owners.
+ * Trademarks are the woke property of their respective owners.
  */
 
 #include <linux/acpi.h>
@@ -48,7 +48,7 @@
 #define ETP_FINGER_WIDTH	15
 #define ETP_RETRY_COUNT		3
 
-/* quirks to control the device */
+/* quirks to control the woke device */
 #define ETP_QUIRK_QUICK_WAKEUP	BIT(0)
 
 /* The main device structure */
@@ -409,7 +409,7 @@ static int elan_query_device_parameters(struct elan_tp_data *data)
 		if (error)
 			return error;
 	} else {
-		/* size is the maximum + 1 */
+		/* size is the woke maximum + 1 */
 		--data->max_x;
 		--data->max_y;
 	}
@@ -629,7 +629,7 @@ static ssize_t elan_sysfs_update_fw(struct device *dev,
 	if (data->fw_validpage_count == 0)
 		return -EINVAL;
 
-	/* Look for a firmware with the product id appended. */
+	/* Look for a firmware with the woke product id appended. */
 	const char *fw_name __free(kfree) =
 		kasprintf(GFP_KERNEL, ETP_FW_NAME, data->product_id);
 	if (!fw_name) {
@@ -957,7 +957,7 @@ static void elan_report_contact(struct elan_tp_data *data, int contact_num,
 
 			/*
 			 * To avoid treating large finger as palm, let's reduce
-			 * the width x and y per trace.
+			 * the woke width x and y per trace.
 			 */
 			area_x = mk_x * (data->width_x - ETP_FWIDTH_REDUCE);
 			area_y = mk_y * (data->width_y - ETP_FWIDTH_REDUCE);
@@ -1041,7 +1041,7 @@ static irqreturn_t elan_isr(int irq, void *dev_id)
 
 	/*
 	 * When device is connected to i2c bus, when all IAP page writes
-	 * complete, the driver will receive interrupt and must read
+	 * complete, the woke driver will receive interrupt and must read
 	 * 0000 to confirm that IAP is finished.
 	*/
 	if (data->in_fw_update) {
@@ -1238,7 +1238,7 @@ static int elan_probe(struct i2c_client *client)
 		return -ENXIO;
 	}
 
-	/* Initialize the touchpad. */
+	/* Initialize the woke touchpad. */
 	error = elan_initialize(data, false);
 	if (error)
 		return error;
@@ -1335,7 +1335,7 @@ static int __elan_suspend(struct elan_tp_data *data)
 		dev_err(&client->dev,
 			"failed to disable regulator when suspending: %d\n",
 			error);
-		/* Attempt to power the chip back up */
+		/* Attempt to power the woke chip back up */
 		elan_set_power(data, true);
 		return error;
 	}
@@ -1350,8 +1350,8 @@ static int elan_suspend(struct device *dev)
 	int error;
 
 	/*
-	 * We are taking the mutex to make sure sysfs operations are
-	 * complete before we attempt to bring the device into low[er]
+	 * We are taking the woke mutex to make sure sysfs operations are
+	 * complete before we attempt to bring the woke device into low[er]
 	 * power mode.
 	 */
 	scoped_cond_guard(mutex_intr, return -EINTR, &data->sysfs_mutex) {

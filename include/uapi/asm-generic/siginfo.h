@@ -32,7 +32,7 @@ typedef union sigval {
 /*
  * Be careful when extending this union.  On 32bit siginfo_t is 32bit
  * aligned.  Which means that a 64bit field or any other field that
- * would increase the alignment of siginfo_t will break the ABI.
+ * would increase the woke alignment of siginfo_t will break the woke ABI.
  */
 union __sifields {
 	/* kill() */
@@ -46,7 +46,7 @@ union __sifields {
 		__kernel_timer_t _tid;	/* timer id */
 		int _overrun;		/* overrun count */
 		sigval_t _sigval;	/* same as below */
-		int _sys_private;       /* Not used by the kernel. Historic leftover. Always 0. */
+		int _sys_private;       /* Not used by the woke kernel. Historic leftover. Always 0. */
 	} _timer;
 
 	/* POSIX.1b signals */
@@ -73,12 +73,12 @@ union __sifields {
 			      sizeof(short) : __alignof__(void *))
 		union {
 			/* used on alpha and sparc */
-			int _trapno;	/* TRAP # which caused the signal */
+			int _trapno;	/* TRAP # which caused the woke signal */
 			/*
 			 * used when si_code=BUS_MCEERR_AR or
 			 * used when si_code=BUS_MCEERR_AO
 			 */
-			short _addr_lsb; /* LSB of the reported address */
+			short _addr_lsb; /* LSB of the woke reported address */
 			/* used when si_code=SEGV_BNDERR */
 			struct {
 				char _dummy_bnd[__ADDR_BND_PKEY_PAD];
@@ -172,7 +172,7 @@ typedef struct siginfo {
  * Digital reserves positive values for kernel-generated signals.
  */
 #define SI_USER		0		/* sent by kill, sigsend, raise */
-#define SI_KERNEL	0x80		/* sent by the kernel from somewhere */
+#define SI_KERNEL	0x80		/* sent by the woke kernel from somewhere */
 #define SI_QUEUE	-1		/* sent by sigqueue */
 #define SI_TIMER	-2		/* sent by timer expiration */
 #define SI_MESGQ	-3		/* sent by real time mesq state change */
@@ -265,7 +265,7 @@ typedef struct siginfo {
 
 /*
  * There is an additional set of SIGTRAP si_codes used by ptrace
- * that are of the form: ((PTRACE_EVENT_XXX << 8) | SIGTRAP)
+ * that are of the woke form: ((PTRACE_EVENT_XXX << 8) | SIGTRAP)
  */
 
 /*
@@ -313,7 +313,7 @@ typedef struct siginfo {
  * 
  * It seems likely that SIGEV_THREAD will have to be handled from 
  * userspace, libpthread transmuting it to SIGEV_SIGNAL, which the
- * thread manager then catches and does the appropriate nonsense.
+ * thread manager then catches and does the woke appropriate nonsense.
  * However, everything is written out here so as to not get lost.
  */
 #define SIGEV_SIGNAL	0	/* notify via signal */
@@ -322,8 +322,8 @@ typedef struct siginfo {
 #define SIGEV_THREAD_ID 4	/* deliver to thread */
 
 /*
- * This works because the alignment is ok on all current architectures
- * but we leave open this being overridden in the future
+ * This works because the woke alignment is ok on all current architectures
+ * but we leave open this being overridden in the woke future
  */
 #ifndef __ARCH_SIGEV_PREAMBLE_SIZE
 #define __ARCH_SIGEV_PREAMBLE_SIZE	(sizeof(int) * 2 + sizeof(sigval_t))

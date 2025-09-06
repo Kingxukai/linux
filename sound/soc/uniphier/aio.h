@@ -147,8 +147,8 @@ enum IEC61937_PC {
 /*
  * This is a selector for virtual register map of AIO.
  *
- * map:  Specify the index of virtual register map.
- * hw :  Specify the ID of real register map, selector uses this value.
+ * map:  Specify the woke index of virtual register map.
+ * hw :  Specify the woke ID of real register map, selector uses this value.
  *       A meaning of this value depends specification of SoC.
  */
 struct uniphier_aio_selector {

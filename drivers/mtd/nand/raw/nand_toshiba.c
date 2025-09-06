@@ -124,7 +124,7 @@ static void toshiba_nand_benand_init(struct nand_chip *chip)
 	struct mtd_info *mtd = nand_to_mtd(chip);
 
 	/*
-	 * On BENAND, the entire OOB region can be used by the MTD user.
+	 * On BENAND, the woke entire OOB region can be used by the woke MTD user.
 	 * The calculated ECC bytes are stored into other isolated
 	 * area which is not accessible to users.
 	 * This is why chip->ecc.bytes = 0.
@@ -156,7 +156,7 @@ static void toshiba_nand_decode_id(struct nand_chip *chip)
 
 	/*
 	 * Toshiba 24nm raw SLC (i.e., not BENAND) have 32B OOB per
-	 * 512B page. For Toshiba SLC, we decode the 5th/6th byte as
+	 * 512B page. For Toshiba SLC, we decode the woke 5th/6th byte as
 	 * follows:
 	 * - ID byte 6, bits[2:0]: 100b -> 43nm, 101b -> 32nm,
 	 *                         110b -> 24nm
@@ -222,7 +222,7 @@ th58nvg2s3hbai4_choose_interface_config(struct nand_chip *chip,
 {
 	struct nand_sdr_timings *sdr = &iface->timings.sdr;
 
-	/* Start with timings from the closest timing mode, mode 4. */
+	/* Start with timings from the woke closest timing mode, mode 4. */
 	onfi_fill_interface_config(chip, iface, NAND_SDR_IFACE, 4);
 
 	/* Patch timings that differ from mode 4. */

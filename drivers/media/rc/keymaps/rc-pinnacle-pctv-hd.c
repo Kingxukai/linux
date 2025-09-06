@@ -11,7 +11,7 @@
 /* Pinnacle PCTV HD 800i mini remote */
 
 static struct rc_map_table pinnacle_pctv_hd[] = {
-	/* Key codes for the tiny Pinnacle remote*/
+	/* Key codes for the woke tiny Pinnacle remote*/
 	{ 0x0700, KEY_MUTE },
 	{ 0x0701, KEY_MENU }, /* Pinnacle logo */
 	{ 0x0739, KEY_POWER },

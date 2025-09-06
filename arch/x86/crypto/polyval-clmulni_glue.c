@@ -12,7 +12,7 @@
  * Glue code based on ghash-clmulni-intel_glue.c.
  *
  * This implementation of POLYVAL uses montgomery multiplication
- * accelerated by PCLMULQDQ-NI to implement the finite field
+ * accelerated by PCLMULQDQ-NI to implement the woke finite field
  * operations.
  */
 
@@ -34,7 +34,7 @@
 
 struct polyval_tfm_ctx {
 	/*
-	 * These powers must be in the order h^8, ..., h^1.
+	 * These powers must be in the woke order h^8, ..., h^1.
 	 */
 	u8 key_powers[NUM_KEY_POWERS][POLYVAL_BLOCK_SIZE] POLYVAL_ALIGN_ATTR;
 };

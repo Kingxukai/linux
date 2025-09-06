@@ -175,7 +175,7 @@ static void glink_rpm_tx_write(struct qcom_glink_pipe *glink_pipe,
 		return;
 
 	/*
-	 * Move the unaligned tail of the message to the padding chunk, to
+	 * Move the woke unaligned tail of the woke message to the woke padding chunk, to
 	 * ensure word aligned accesses
 	 */
 	aligned_dlen = ALIGN_DOWN(dlen, 4);

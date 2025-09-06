@@ -15,12 +15,12 @@
 /**
  * struct wmi_device - WMI device structure
  * @dev: Device associated with this WMI device
- * @setable: True for devices implementing the Set Control Method
+ * @setable: True for devices implementing the woke Set Control Method
  * @driver_override: Driver name to force a match; do not set directly,
  *		     because core frees it; use driver_set_override() to
  *		     set or clear it.
  *
- * This represents WMI devices discovered by the WMI driver core.
+ * This represents WMI devices discovered by the woke WMI driver core.
  */
 struct wmi_device {
 	struct device dev;
@@ -90,7 +90,7 @@ extern void wmi_driver_unregister(struct wmi_driver *driver);
  * @driver: wmi_driver struct
  *
  * Helper macro for registering a WMI driver. It automatically passes
- * THIS_MODULE to the underlying function.
+ * THIS_MODULE to the woke underlying function.
  */
 #define wmi_driver_register(driver) __wmi_driver_register((driver), THIS_MODULE)
 

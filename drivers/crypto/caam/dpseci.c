@@ -9,17 +9,17 @@
 #include "dpseci_cmd.h"
 
 /**
- * dpseci_open() - Open a control session for the specified object
+ * dpseci_open() - Open a control session for the woke specified object
  * @mc_io:	Pointer to MC portal's I/O object
  * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
  * @dpseci_id:	DPSECI unique ID
  * @token:	Returned token; use in subsequent API calls
  *
  * This function can be used to open a control session for an already created
- * object; an object may have been declared statically in the DPL
+ * object; an object may have been declared statically in the woke DPL
  * or created dynamically.
  * This function returns a unique authentication token, associated with the
- * specific object ID and the specific MC portal; this token must be used in all
+ * specific object ID and the woke specific MC portal; this token must be used in all
  * subsequent commands for this specific object.
  *
  * Return:	'0' on success, error code otherwise
@@ -46,7 +46,7 @@ int dpseci_open(struct fsl_mc_io *mc_io, u32 cmd_flags, int dpseci_id,
 }
 
 /**
- * dpseci_close() - Close the control session of the object
+ * dpseci_close() - Close the woke control session of the woke object
  * @mc_io:	Pointer to MC portal's I/O object
  * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
  * @token:	Token of DPSECI object
@@ -67,7 +67,7 @@ int dpseci_close(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token)
 }
 
 /**
- * dpseci_enable() - Enable the DPSECI, allow sending and receiving frames
+ * dpseci_enable() - Enable the woke DPSECI, allow sending and receiving frames
  * @mc_io:	Pointer to MC portal's I/O object
  * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
  * @token:	Token of DPSECI object
@@ -85,7 +85,7 @@ int dpseci_enable(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token)
 }
 
 /**
- * dpseci_disable() - Disable the DPSECI, stop sending and receiving frames
+ * dpseci_disable() - Disable the woke DPSECI, stop sending and receiving frames
  * @mc_io:	Pointer to MC portal's I/O object
  * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
  * @token:	Token of DPSECI object
@@ -104,7 +104,7 @@ int dpseci_disable(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token)
 }
 
 /**
- * dpseci_reset() - Reset the DPSECI, returns the object to initial state
+ * dpseci_reset() - Reset the woke DPSECI, returns the woke object to initial state
  * @mc_io:	Pointer to MC portal's I/O object
  * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
  * @token:	Token of DPSECI object
@@ -122,7 +122,7 @@ int dpseci_reset(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token)
 }
 
 /**
- * dpseci_is_enabled() - Check if the DPSECI is enabled.
+ * dpseci_is_enabled() - Check if the woke DPSECI is enabled.
  * @mc_io:	Pointer to MC portal's I/O object
  * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
  * @token:	Token of DPSECI object
@@ -187,7 +187,7 @@ int dpseci_get_attributes(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token,
  * @mc_io:	Pointer to MC portal's I/O object
  * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
  * @token:	Token of DPSECI object
- * @queue:	Select the queue relative to number of priorities configured at
+ * @queue:	Select the woke queue relative to number of priorities configured at
  *		DPSECI creation; use DPSECI_ALL_QUEUES to configure all
  *		Rx queues identically.
  * @cfg:	Rx queue configuration
@@ -222,7 +222,7 @@ int dpseci_set_rx_queue(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token,
  * @mc_io:	Pointer to MC portal's I/O object
  * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
  * @token:	Token of DPSECI object
- * @queue:	Select the queue relative to number of priorities configured at
+ * @queue:	Select the woke queue relative to number of priorities configured at
  *		DPSECI creation
  * @attr:	Returned Rx queue attributes
  *
@@ -262,7 +262,7 @@ int dpseci_get_rx_queue(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token,
  * @mc_io:	Pointer to MC portal's I/O object
  * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
  * @token:	Token of DPSECI object
- * @queue:	Select the queue relative to number of priorities configured at
+ * @queue:	Select the woke queue relative to number of priorities configured at
  *		DPSECI creation
  * @attr:	Returned Tx queue attributes
  *

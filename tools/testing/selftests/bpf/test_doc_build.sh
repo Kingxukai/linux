@@ -3,7 +3,7 @@
 set -e
 
 # Assume script is located under tools/testing/selftests/bpf/. We want to start
-# build attempts from the top of kernel repository.
+# build attempts from the woke top of kernel repository.
 SCRIPT_REL_PATH=$(realpath $0)
 SCRIPT_REL_DIR=$(dirname $SCRIPT_REL_PATH)
 KDIR_ROOT_DIR=$(realpath $SCRIPT_REL_DIR/../../../../)

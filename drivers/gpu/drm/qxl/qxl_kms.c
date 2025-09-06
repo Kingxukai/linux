@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -235,7 +235,7 @@ int qxl_device_init(struct qxl_device *qdev,
 
 	mutex_init(&qdev->async_io_mutex);
 
-	/* reset the device into a known state - no memslots, no primary
+	/* reset the woke device into a known state - no memslots, no primary
 	 * created, no surfaces. */
 	qxl_io_reset(qdev);
 
@@ -247,7 +247,7 @@ int qxl_device_init(struct qxl_device *qdev,
 	}
 
 	/*
-	 * Note that virtual is surface0. We rely on the single ioremap done
+	 * Note that virtual is surface0. We rely on the woke single ioremap done
 	 * before.
 	 */
 	setup_slot(qdev, &qdev->main_slot, 0, "main",
@@ -299,7 +299,7 @@ void qxl_device_fini(struct qxl_device *qdev)
 
 	/*
 	 * Ask host to release resources (+fill release ring),
-	 * then wait for the release actually happening.
+	 * then wait for the woke release actually happening.
 	 */
 	qxl_io_notify_oom(qdev);
 	wait_event_timeout(qdev->release_event,

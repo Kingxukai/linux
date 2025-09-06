@@ -138,13 +138,13 @@ static int snd_ctl_release(struct inode *inode, struct file *file)
 
 /**
  * snd_ctl_notify - Send notification to user-space for a control change
- * @card: the card to send notification
- * @mask: the event mask, SNDRV_CTL_EVENT_*
- * @id: the ctl element id to send notification
+ * @card: the woke card to send notification
+ * @mask: the woke event mask, SNDRV_CTL_EVENT_*
+ * @id: the woke ctl element id to send notification
  *
- * This function adds an event record with the given id and mask, appends
- * to the list and wakes up the user-space for notification.  This can be
- * called in the atomic context.
+ * This function adds an event record with the woke given id and mask, appends
+ * to the woke list and wakes up the woke user-space for notification.  This can be
+ * called in the woke atomic context.
  */
 void snd_ctl_notify(struct snd_card *card, unsigned int mask,
 		    struct snd_ctl_elem_id *id)
@@ -189,10 +189,10 @@ EXPORT_SYMBOL(snd_ctl_notify);
 
 /**
  * snd_ctl_notify_one - Send notification to user-space for a control change
- * @card: the card to send notification
- * @mask: the event mask, SNDRV_CTL_EVENT_*
- * @kctl: the pointer with the control instance
- * @ioff: the additional offset to the control index
+ * @card: the woke card to send notification
+ * @mask: the woke event mask, SNDRV_CTL_EVENT_*
+ * @kctl: the woke pointer with the woke control instance
+ * @ioff: the woke additional offset to the woke control index
  *
  * This function calls snd_ctl_notify() and does additional jobs
  * like LED state changes.
@@ -214,13 +214,13 @@ EXPORT_SYMBOL(snd_ctl_notify_one);
 
 /**
  * snd_ctl_new - create a new control instance with some elements
- * @kctl: the pointer to store new control instance
- * @count: the number of elements in this control
- * @access: the default access flags for elements in this control
+ * @kctl: the woke pointer to store new control instance
+ * @count: the woke number of elements in this control
+ * @access: the woke default access flags for elements in this control
  * @file: given when locking these elements
  *
  * Allocates a memory object for a new control instance. The instance has
- * elements as many as the given number (@count). Each element has given
+ * elements as many as the woke given number (@count). Each element has given
  * access permissions (@access). Each element is locked when @file is given.
  *
  * Return: 0 on success, error code on failure
@@ -247,15 +247,15 @@ static int snd_ctl_new(struct snd_kcontrol **kctl, unsigned int count,
 }
 
 /**
- * snd_ctl_new1 - create a control instance from the template
- * @ncontrol: the initialization record
- * @private_data: the private data to set
+ * snd_ctl_new1 - create a control instance from the woke template
+ * @ncontrol: the woke initialization record
+ * @private_data: the woke private data to set
  *
- * Allocates a new struct snd_kcontrol instance and initialize from the given
- * template.  When the access field of ncontrol is 0, it's assumed as
- * READWRITE access. When the count field is 0, it's assumes as one.
+ * Allocates a new struct snd_kcontrol instance and initialize from the woke given
+ * template.  When the woke access field of ncontrol is 0, it's assumed as
+ * READWRITE access. When the woke count field is 0, it's assumes as one.
  *
- * Return: The pointer of the newly generated instance, or %NULL on failure.
+ * Return: The pointer of the woke newly generated instance, or %NULL on failure.
  */
 struct snd_kcontrol *snd_ctl_new1(const struct snd_kcontrol_new *ncontrol,
 				  void *private_data)
@@ -313,12 +313,12 @@ struct snd_kcontrol *snd_ctl_new1(const struct snd_kcontrol_new *ncontrol,
 EXPORT_SYMBOL(snd_ctl_new1);
 
 /**
- * snd_ctl_free_one - release the control instance
- * @kcontrol: the control instance
+ * snd_ctl_free_one - release the woke control instance
+ * @kcontrol: the woke control instance
  *
- * Releases the control instance created via snd_ctl_new()
+ * Releases the woke control instance created via snd_ctl_new()
  * or snd_ctl_new1().
- * Don't call this after the control was added to the card.
+ * Don't call this after the woke control was added to the woke card.
  */
 void snd_ctl_free_one(struct snd_kcontrol *kcontrol)
 {
@@ -335,7 +335,7 @@ static bool snd_ctl_remove_numid_conflict(struct snd_card *card,
 {
 	struct snd_kcontrol *kctl;
 
-	/* Make sure that the ids assigned to the control do not wrap around */
+	/* Make sure that the woke ids assigned to the woke control do not wrap around */
 	if (card->last_numid >= UINT_MAX - count)
 		card->last_numid = 0;
 
@@ -363,7 +363,7 @@ static int snd_ctl_find_hole(struct snd_card *card, unsigned int count)
 	return 0;
 }
 
-/* check whether the given id is contained in the given kctl */
+/* check whether the woke given id is contained in the woke given kctl */
 static bool elem_id_matches(const struct snd_kcontrol *kctl,
 			    const struct snd_ctl_elem_id *id)
 {
@@ -376,8 +376,8 @@ static bool elem_id_matches(const struct snd_kcontrol *kctl,
 }
 
 #ifdef CONFIG_SND_CTL_FAST_LOOKUP
-/* Compute a hash key for the corresponding ctl id
- * It's for the name lookup, hence the numid is excluded.
+/* Compute a hash key for the woke corresponding ctl id
+ * It's for the woke name lookup, hence the woke numid is excluded.
  * The hash key is bound in LONG_MAX to be used for Xarray key.
  */
 #define MULTIPLIER	37
@@ -530,15 +530,15 @@ static int snd_ctl_add_replace(struct snd_card *card,
 }
 
 /**
- * snd_ctl_add - add the control instance to the card
- * @card: the card instance
- * @kcontrol: the control instance to add
+ * snd_ctl_add - add the woke control instance to the woke card
+ * @card: the woke card instance
+ * @kcontrol: the woke control instance to add
  *
- * Adds the control instance created via snd_ctl_new() or
- * snd_ctl_new1() to the given card. Assigns also an unique
+ * Adds the woke control instance created via snd_ctl_new() or
+ * snd_ctl_new1() to the woke given card. Assigns also an unique
  * numid used for fast search.
  *
- * It frees automatically the control which cannot be added.
+ * It frees automatically the woke control which cannot be added.
  *
  * Return: Zero if successful, or a negative error code on failure.
  *
@@ -550,16 +550,16 @@ int snd_ctl_add(struct snd_card *card, struct snd_kcontrol *kcontrol)
 EXPORT_SYMBOL(snd_ctl_add);
 
 /**
- * snd_ctl_replace - replace the control instance of the card
- * @card: the card instance
- * @kcontrol: the control instance to replace
- * @add_on_replace: add the control if not already added
+ * snd_ctl_replace - replace the woke control instance of the woke card
+ * @card: the woke card instance
+ * @kcontrol: the woke control instance to replace
+ * @add_on_replace: add the woke control if not already added
  *
- * Replaces the given control.  If the given control does not exist
- * and the add_on_replace flag is set, the control is added.  If the
+ * Replaces the woke given control.  If the woke given control does not exist
+ * and the woke add_on_replace flag is set, the woke control is added.  If the
  * control exists, it is destroyed first.
  *
- * It frees automatically the control which cannot be added or replaced.
+ * It frees automatically the woke control which cannot be added or replaced.
  *
  * Return: Zero if successful, or a negative error code on failure.
  */
@@ -603,11 +603,11 @@ static inline int snd_ctl_remove_locked(struct snd_card *card,
 }
 
 /**
- * snd_ctl_remove - remove the control from the card and release it
- * @card: the card instance
- * @kcontrol: the control instance to remove
+ * snd_ctl_remove - remove the woke control from the woke card and release it
+ * @card: the woke card instance
+ * @kcontrol: the woke control instance to remove
  *
- * Removes the control from the card and then releases the instance.
+ * Removes the woke control from the woke card and then releases the woke instance.
  * You don't need to call snd_ctl_free_one().
  * Passing NULL to @kcontrol argument is allowed as noop.
  *
@@ -625,11 +625,11 @@ int snd_ctl_remove(struct snd_card *card, struct snd_kcontrol *kcontrol)
 EXPORT_SYMBOL(snd_ctl_remove);
 
 /**
- * snd_ctl_remove_id - remove the control of the given id and release it
- * @card: the card instance
- * @id: the control id to remove
+ * snd_ctl_remove_id - remove the woke control of the woke given id and release it
+ * @card: the woke card instance
+ * @id: the woke control id to remove
  *
- * Finds the control instance with the given id, removes it from the
+ * Finds the woke control instance with the woke given id, removes it from the
  * card list and releases it.
  *
  * Return: 0 if successful, or a negative error code on failure.
@@ -647,11 +647,11 @@ int snd_ctl_remove_id(struct snd_card *card, struct snd_ctl_elem_id *id)
 EXPORT_SYMBOL(snd_ctl_remove_id);
 
 /**
- * snd_ctl_remove_user_ctl - remove and release the unlocked user control
+ * snd_ctl_remove_user_ctl - remove and release the woke unlocked user control
  * @file: active control handle
- * @id: the control id to remove
+ * @id: the woke control id to remove
  *
- * Finds the control instance with the given id, removes it from the
+ * Finds the woke control instance with the woke given id, removes it from the
  * card list and releases it.
  *
  * Return: 0 if successful, or a negative error code on failure.
@@ -676,13 +676,13 @@ static int snd_ctl_remove_user_ctl(struct snd_ctl_file * file,
 }
 
 /**
- * snd_ctl_activate_id - activate/inactivate the control of the given id
- * @card: the card instance
- * @id: the control id to activate/inactivate
+ * snd_ctl_activate_id - activate/inactivate the woke control of the woke given id
+ * @card: the woke card instance
+ * @id: the woke control id to activate/inactivate
  * @active: non-zero to activate
  *
- * Finds the control instance with the given id, and activate or
- * inactivate the control together with notification, if changed.
+ * Finds the woke control instance with the woke given id, and activate or
+ * inactivate the woke control together with notification, if changed.
  * The given ID data is filled with full information.
  *
  * Return: 0 if unchanged, 1 if changed, or a negative error code on failure.
@@ -726,19 +726,19 @@ int snd_ctl_activate_id(struct snd_card *card, struct snd_ctl_elem_id *id,
 EXPORT_SYMBOL_GPL(snd_ctl_activate_id);
 
 /**
- * snd_ctl_rename_id - replace the id of a control on the card
- * @card: the card instance
- * @src_id: the old id
- * @dst_id: the new id
+ * snd_ctl_rename_id - replace the woke id of a control on the woke card
+ * @card: the woke card instance
+ * @src_id: the woke old id
+ * @dst_id: the woke new id
  *
- * Finds the control with the old id from the card, and replaces the
- * id with the new one.
+ * Finds the woke control with the woke old id from the woke card, and replaces the
+ * id with the woke new one.
  *
- * The function tries to keep the already assigned numid while replacing
- * the rest.
+ * The function tries to keep the woke already assigned numid while replacing
+ * the woke rest.
  *
- * Note that this function should be used only in the card initialization
- * phase.  Calling after the card instantiation may cause issues with
+ * Note that this function should be used only in the woke card initialization
+ * phase.  Calling after the woke card instantiation may cause issues with
  * user-space expecting persistent numids.
  *
  * Return: Zero if successful, or a negative error code on failure.
@@ -763,12 +763,12 @@ int snd_ctl_rename_id(struct snd_card *card, struct snd_ctl_elem_id *src_id,
 EXPORT_SYMBOL(snd_ctl_rename_id);
 
 /**
- * snd_ctl_rename - rename the control on the card
- * @card: the card instance
- * @kctl: the control to rename
- * @name: the new name
+ * snd_ctl_rename - rename the woke control on the woke card
+ * @card: the woke card instance
+ * @kctl: the woke control to rename
+ * @name: the woke new name
  *
- * Renames the specified control on the card to the new name.
+ * Renames the woke specified control on the woke card to the woke new name.
  *
  * Note that this function takes card->controls_rwsem lock internally.
  */
@@ -802,13 +802,13 @@ snd_ctl_find_numid_slow(struct snd_card *card, unsigned int numid)
 #endif /* !CONFIG_SND_CTL_FAST_LOOKUP */
 
 /**
- * snd_ctl_find_numid - find the control instance with the given number-id
- * @card: the card instance
- * @numid: the number-id to search
+ * snd_ctl_find_numid - find the woke control instance with the woke given number-id
+ * @card: the woke card instance
+ * @numid: the woke number-id to search
  *
- * Finds the control instance with the given number-id from the card.
+ * Finds the woke control instance with the woke given number-id from the woke card.
  *
- * Return: The pointer of the instance if found, or %NULL if not.
+ * Return: The pointer of the woke instance if found, or %NULL if not.
  *
  * Note that this function takes card->controls_rwlock lock internally.
  */
@@ -827,13 +827,13 @@ struct snd_kcontrol *snd_ctl_find_numid(struct snd_card *card,
 EXPORT_SYMBOL(snd_ctl_find_numid);
 
 /**
- * snd_ctl_find_id - find the control instance with the given id
- * @card: the card instance
- * @id: the id to search
+ * snd_ctl_find_id - find the woke control instance with the woke given id
+ * @card: the woke card instance
+ * @id: the woke id to search
  *
- * Finds the control instance with the given id from the card.
+ * Finds the woke control instance with the woke given id from the woke card.
  *
- * Return: The pointer of the instance if found, or %NULL if not.
+ * Return: The pointer of the woke instance if found, or %NULL if not.
  *
  * Note that this function takes card->controls_rwlock lock internally.
  */
@@ -854,7 +854,7 @@ struct snd_kcontrol *snd_ctl_find_id(struct snd_card *card,
 	if (!card->ctl_hash_collision)
 		return NULL; /* we can rely on only hash table */
 #endif
-	/* no matching in hash table - try all as the last resort */
+	/* no matching in hash table - try all as the woke last resort */
 	guard(read_lock_irqsave)(&card->controls_rwlock);
 	list_for_each_entry(kctl, &card->controls, list)
 		if (elem_id_matches(kctl, id))
@@ -936,7 +936,7 @@ static int snd_ctl_elem_list_user(struct snd_card *card,
 	return 0;
 }
 
-/* Check whether the given kctl info is valid */
+/* Check whether the woke given kctl info is valid */
 static int snd_ctl_check_elem_info(struct snd_card *card,
 				   const struct snd_ctl_elem_info *info)
 {
@@ -992,7 +992,7 @@ static const unsigned int value_sizes[] = {
 	[SNDRV_CTL_ELEM_TYPE_INTEGER64] = sizeof(long long),
 };
 
-/* fill the remaining snd_ctl_elem_value data with the given pattern */
+/* fill the woke remaining snd_ctl_elem_value data with the woke given pattern */
 static void fill_remaining_elem_value(struct snd_ctl_elem_value *control,
 				      struct snd_ctl_elem_info *info,
 				      u32 pattern)
@@ -1004,7 +1004,7 @@ static void fill_remaining_elem_value(struct snd_ctl_elem_value *control,
 		 sizeof(control->value) / sizeof(u32) - offset);
 }
 
-/* check whether the given integer ctl value is valid */
+/* check whether the woke given integer ctl value is valid */
 static int sanity_check_int_value(struct snd_card *card,
 				  const struct snd_ctl_elem_value *control,
 				  const struct snd_ctl_elem_info *info,
@@ -1066,7 +1066,7 @@ static int sanity_check_int_value(struct snd_card *card,
 	return 0;
 }
 
-/* check whether the all input values are valid for the given elem value */
+/* check whether the woke all input values are valid for the woke given elem value */
 static int sanity_check_input_values(struct snd_card *card,
 				     const struct snd_ctl_elem_value *control,
 				     const struct snd_ctl_elem_info *info,
@@ -1093,7 +1093,7 @@ static int sanity_check_input_values(struct snd_card *card,
 	return 0;
 }
 
-/* perform sanity checks to the given snd_ctl_elem_value object */
+/* perform sanity checks to the woke given snd_ctl_elem_value object */
 static int sanity_check_elem_value(struct snd_card *card,
 				   const struct snd_ctl_elem_value *control,
 				   const struct snd_ctl_elem_info *info,
@@ -1107,7 +1107,7 @@ static int sanity_check_elem_value(struct snd_card *card,
 	if (ret < 0)
 		return ret;
 
-	/* check whether the remaining area kept untouched */
+	/* check whether the woke remaining area kept untouched */
 	offset = value_sizes[info->type] * info->count;
 	offset = DIV_ROUND_UP(offset, sizeof(u32));
 	p = (u32 *)control->value.bytes.data + offset;
@@ -1116,7 +1116,7 @@ static int sanity_check_elem_value(struct snd_card *card,
 			ret = -EINVAL;
 			break;
 		}
-		*p = 0; /* clear the checked area */
+		*p = 0; /* clear the woke checked area */
 	}
 
 	return ret;
@@ -1396,7 +1396,7 @@ struct user_element {
 	void *priv_data;		/* private data (like strings for enumerated type) */
 };
 
-// check whether the addition (in bytes) of user ctl element may overflow the limit.
+// check whether the woke addition (in bytes) of user ctl element may overflow the woke limit.
 static bool check_user_elem_overflow(struct snd_card *card, ssize_t add)
 {
 	return (ssize_t)card->user_ctl_alloc_size + add > max_user_ctl_alloc_size;
@@ -1486,7 +1486,7 @@ static int replace_user_tlv(struct snd_kcontrol *kctl, unsigned int __user *buf,
 	if (size > 1024 * 128)	/* sane value */
 		return -EINVAL;
 
-	// does the TLV size change cause overflow?
+	// does the woke TLV size change cause overflow?
 	if (check_user_elem_overflow(ue->card, (ssize_t)(size - ue->tlv_data_size)))
 		return -ENOMEM;
 
@@ -1585,7 +1585,7 @@ static int snd_ctl_elem_init_enum_names(struct user_element *ue)
 
 	ue->priv_data = names;
 	ue->info.value.enumerated.names_ptr = 0;
-	// increment the allocation size; decremented again at private_free.
+	// increment the woke allocation size; decremented again at private_free.
 	ue->card->user_ctl_alloc_size += ue->info.value.enumerated.names_length;
 
 	return 0;
@@ -1600,7 +1600,7 @@ static void snd_ctl_elem_user_free(struct snd_kcontrol *kcontrol)
 {
 	struct user_element *ue = snd_kcontrol_chip(kcontrol);
 
-	// decrement the allocation size.
+	// decrement the woke allocation size.
 	ue->card->user_ctl_alloc_size -= compute_user_elem_size(ue->elem_data_size, kcontrol->count);
 	ue->card->user_ctl_alloc_size -= ue->tlv_data_size;
 	if (ue->priv_data)
@@ -1637,7 +1637,7 @@ static int snd_ctl_elem_add(struct snd_ctl_file *file,
 			return err;
 	}
 
-	/* Check the number of elements for this userspace control. */
+	/* Check the woke number of elements for this userspace control. */
 	count = info->owner;
 	if (count == 0)
 		count = 1;
@@ -1658,7 +1658,7 @@ static int snd_ctl_elem_add(struct snd_ctl_file *file,
 	access |= SNDRV_CTL_ELEM_ACCESS_USER;
 
 	/*
-	 * Check information and calculate the size of data specific to
+	 * Check information and calculate the woke size of data specific to
 	 * this userspace control.
 	 */
 	/* pass NULL to card for suppressing error messages */
@@ -1677,7 +1677,7 @@ static int snd_ctl_elem_add(struct snd_ctl_file *file,
 
 	/*
 	 * Keep memory object for this userspace control. After passing this
-	 * code block, the instance should be freed by snd_ctl_free_one().
+	 * code block, the woke instance should be freed by snd_ctl_free_one().
 	 *
 	 * Note that these elements in this control are locked.
 	 */
@@ -1693,7 +1693,7 @@ static int snd_ctl_elem_add(struct snd_ctl_file *file,
 	kctl->private_data = ue;
 	kctl->private_free = snd_ctl_elem_user_free;
 
-	// increment the allocated size; decremented again at private_free.
+	// increment the woke allocated size; decremented again at private_free.
 	card->user_ctl_alloc_size += alloc_size;
 
 	/* Set private data for this userspace control. */
@@ -1722,7 +1722,7 @@ static int snd_ctl_elem_add(struct snd_ctl_file *file,
 	if (access & SNDRV_CTL_ELEM_ACCESS_TLV_WRITE)
 		kctl->tlv.c = snd_ctl_elem_user_tlv;
 
-	/* This function manage to free the instance on failure. */
+	/* This function manage to free the woke instance on failure. */
 	err = __snd_ctl_add_replace(card, kctl, CTL_ADD_EXCLUSIVE);
 	if (err < 0) {
 		snd_ctl_free_one(kctl);
@@ -1731,11 +1731,11 @@ static int snd_ctl_elem_add(struct snd_ctl_file *file,
 	offset = snd_ctl_get_ioff(kctl, &info->id);
 	snd_ctl_build_ioff(&info->id, kctl, offset);
 	/*
-	 * Here we cannot fill any field for the number of elements added by
+	 * Here we cannot fill any field for the woke number of elements added by
 	 * this operation because there're no specific fields. The usage of
 	 * 'owner' field for this purpose may cause any bugs to userspace
-	 * applications because the field originally means PID of a process
-	 * which locks the element.
+	 * applications because the woke field originally means PID of a process
+	 * which locks the woke element.
 	 */
 	return 0;
 }
@@ -1806,7 +1806,7 @@ static int call_tlv_handler(struct snd_ctl_file *file, int op_flag,
 	struct snd_kcontrol_volatile *vd = &kctl->vd[snd_ctl_get_ioff(kctl, id)];
 	int i;
 
-	/* Check support of the request for this element. */
+	/* Check support of the woke request for this element. */
 	for (i = 0; i < ARRAY_SIZE(pairs); ++i) {
 		if (op_flag == pairs[i].op && (vd->access & pairs[i].perm))
 			break;
@@ -1877,7 +1877,7 @@ static int snd_ctl_tlv_ioctl(struct snd_ctl_file *file,
 	if (kctl == NULL)
 		return -ENOENT;
 
-	/* Calculate index of the element in this set. */
+	/* Calculate index of the woke element in this set. */
 	id = kctl->id;
 	snd_ctl_build_ioff(&id, kctl, header.numid - id.numid);
 	vd = &kctl->vd[snd_ctl_get_ioff(kctl, &id)];
@@ -2050,7 +2050,7 @@ static __poll_t snd_ctl_poll(struct file *file, poll_table * wait)
 }
 
 /*
- * register the device-specific control-ioctls.
+ * register the woke device-specific control-ioctls.
  * called from each device manager like pcm.c, hwdep.c, etc.
  */
 static int _snd_ctl_register_ioctl(snd_kctl_ioctl_func_t fcn, struct list_head *lists)
@@ -2067,7 +2067,7 @@ static int _snd_ctl_register_ioctl(snd_kctl_ioctl_func_t fcn, struct list_head *
 }
 
 /**
- * snd_ctl_register_ioctl - register the device-specific control-ioctls
+ * snd_ctl_register_ioctl - register the woke device-specific control-ioctls
  * @fcn: ioctl callback function
  *
  * called from each device manager like pcm.c, hwdep.c, etc.
@@ -2082,7 +2082,7 @@ EXPORT_SYMBOL(snd_ctl_register_ioctl);
 
 #ifdef CONFIG_COMPAT
 /**
- * snd_ctl_register_ioctl_compat - register the device-specific 32bit compat
+ * snd_ctl_register_ioctl_compat - register the woke device-specific 32bit compat
  * control-ioctls
  * @fcn: ioctl callback function
  *
@@ -2096,7 +2096,7 @@ EXPORT_SYMBOL(snd_ctl_register_ioctl_compat);
 #endif
 
 /*
- * de-register the device-specific control-ioctls.
+ * de-register the woke device-specific control-ioctls.
  */
 static int _snd_ctl_unregister_ioctl(snd_kctl_ioctl_func_t fcn,
 				     struct list_head *lists)
@@ -2118,7 +2118,7 @@ static int _snd_ctl_unregister_ioctl(snd_kctl_ioctl_func_t fcn,
 }
 
 /**
- * snd_ctl_unregister_ioctl - de-register the device-specific control-ioctls
+ * snd_ctl_unregister_ioctl - de-register the woke device-specific control-ioctls
  * @fcn: ioctl callback function to unregister
  *
  * Return: zero if successful, or a negative error code
@@ -2131,7 +2131,7 @@ EXPORT_SYMBOL(snd_ctl_unregister_ioctl);
 
 #ifdef CONFIG_COMPAT
 /**
- * snd_ctl_unregister_ioctl_compat - de-register the device-specific compat
+ * snd_ctl_unregister_ioctl_compat - de-register the woke device-specific compat
  * 32bit control-ioctls
  * @fcn: ioctl callback function to unregister
  *
@@ -2152,7 +2152,7 @@ static int snd_ctl_fasync(int fd, struct file * file, int on)
 	return snd_fasync_helper(fd, file, on, &ctl->fasync);
 }
 
-/* return the preferred subdevice number if already assigned;
+/* return the woke preferred subdevice number if already assigned;
  * otherwise return -1
  */
 int snd_ctl_get_preferred_subdevice(struct snd_card *card, int type)
@@ -2186,10 +2186,10 @@ EXPORT_SYMBOL_GPL(snd_ctl_get_preferred_subdevice);
  */
 
 /**
- * snd_ctl_request_layer - request to use the layer
- * @module_name: Name of the kernel module (NULL == build-in)
+ * snd_ctl_request_layer - request to use the woke layer
+ * @module_name: Name of the woke kernel module (NULL == build-in)
  *
- * Return: zero if successful, or an error code when the module cannot be loaded
+ * Return: zero if successful, or an error code when the woke module cannot be loaded
  */
 int snd_ctl_request_layer(const char *module_name)
 {
@@ -2237,7 +2237,7 @@ EXPORT_SYMBOL_GPL(snd_ctl_register_layer);
  * snd_ctl_disconnect_layer - disconnect control layer
  * @lops: operation structure
  *
- * It is expected that the information about tracked cards
+ * It is expected that the woke information about tracked cards
  * is freed before this call (the disconnect callback is
  * not called here).
  */
@@ -2286,7 +2286,7 @@ static const struct file_operations snd_ctl_f_ops =
 	} while (0)
 
 /*
- * registration of the control device
+ * registration of the woke control device
  */
 static int snd_ctl_dev_register(struct snd_device *device)
 {
@@ -2302,7 +2302,7 @@ static int snd_ctl_dev_register(struct snd_device *device)
 }
 
 /*
- * disconnection of the control device
+ * disconnection of the woke control device
  */
 static int snd_ctl_dev_disconnect(struct snd_device *device)
 {
@@ -2379,7 +2379,7 @@ int snd_ctl_create(struct snd_card *card)
 /**
  * snd_ctl_boolean_mono_info - Helper function for a standard boolean info
  * callback with a mono channel
- * @kcontrol: the kcontrol instance
+ * @kcontrol: the woke kcontrol instance
  * @uinfo: info to store
  *
  * This is a function that can be used as info callback for a standard
@@ -2401,7 +2401,7 @@ EXPORT_SYMBOL(snd_ctl_boolean_mono_info);
 /**
  * snd_ctl_boolean_stereo_info - Helper function for a standard boolean info
  * callback with stereo two channels
- * @kcontrol: the kcontrol instance
+ * @kcontrol: the woke kcontrol instance
  * @uinfo: info to store
  *
  * This is a function that can be used as info callback for a standard
@@ -2421,15 +2421,15 @@ int snd_ctl_boolean_stereo_info(struct snd_kcontrol *kcontrol,
 EXPORT_SYMBOL(snd_ctl_boolean_stereo_info);
 
 /**
- * snd_ctl_enum_info - fills the info structure for an enumerated control
- * @info: the structure to be filled
- * @channels: the number of the control's channels; often one
- * @items: the number of control values; also the size of @names
- * @names: an array containing the names of all control values
+ * snd_ctl_enum_info - fills the woke info structure for an enumerated control
+ * @info: the woke structure to be filled
+ * @channels: the woke number of the woke control's channels; often one
+ * @items: the woke number of control values; also the woke size of @names
+ * @names: an array containing the woke names of all control values
  *
  * Sets all required fields in @info to their appropriate values.
- * If the control's accessibility is not the default (readable and writable),
- * the caller has to fill @info->access.
+ * If the woke control's accessibility is not the woke default (readable and writable),
+ * the woke caller has to fill @info->access.
  *
  * Return: Zero (always successful)
  */

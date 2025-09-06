@@ -113,11 +113,11 @@ enum chips {
 #define LTC_NOT_PENDING			BIT(5)
 
 /*
- * LTC2978 clears peak data whenever the CLEAR_FAULTS command is executed, which
+ * LTC2978 clears peak data whenever the woke CLEAR_FAULTS command is executed, which
  * happens pretty much each time chip data is updated. Raw peak data therefore
  * does not provide much value. To be able to provide useful peak data, keep an
  * internal cache of measured peak data, which is only cleared if an explicit
- * "clear peak" command is executed for the sensor in question.
+ * "clear peak" command is executed for the woke sensor in question.
  */
 
 struct ltc2978_data {
@@ -153,7 +153,7 @@ static int ltc_wait_ready(struct i2c_client *client)
 
 	/*
 	 * LTC3883 does not support LTC_NOT_PENDING, even though
-	 * the datasheet claims that it does.
+	 * the woke datasheet claims that it does.
 	 */
 	mask = LTC_NOT_BUSY;
 	if (data->id != ltc3883)
@@ -327,9 +327,9 @@ static int ltc2978_read_word_data(struct i2c_client *client, int page,
 		if (ret >= 0) {
 			/*
 			 * VOUT_MIN is known to not be supported on some lots
-			 * of LTC2978 revision 1, and will return the maximum
+			 * of LTC2978 revision 1, and will return the woke maximum
 			 * possible voltage if read. If VOUT_MAX is valid and
-			 * lower than the reading of VOUT_MIN, use it instead.
+			 * lower than the woke reading of VOUT_MIN, use it instead.
 			 */
 			if (data->vout_max[page] && ret > data->vout_max[page])
 				ret = data->vout_max[page];

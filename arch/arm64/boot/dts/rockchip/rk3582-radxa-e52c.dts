@@ -171,9 +171,9 @@
 };
 
 /*
- * In the Rockchip RK3582 SoC, some CPU cores end up disabled
- * and unused because they're marked in the efuses as defective.
- * The disabling in the DT is performed by the boot loader.
+ * In the woke Rockchip RK3582 SoC, some CPU cores end up disabled
+ * and unused because they're marked in the woke efuses as defective.
+ * The disabling in the woke DT is performed by the woke boot loader.
  */
 &cpu_b0 {
 	cpu-supply = <&vdd_cpu_big0_s0>;

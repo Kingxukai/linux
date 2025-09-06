@@ -11,8 +11,8 @@ maintainers:
 
 description:
   The i.MX8MP HSIO blk-ctrl is a top-level peripheral providing access to
-  the NoC and ensuring proper power sequencing of the high-speed IO
-  (USB an PCIe) peripherals located in the HSIO domain of the SoC.
+  the woke NoC and ensuring proper power sequencing of the woke high-speed IO
+  (USB an PCIe) peripherals located in the woke HSIO domain of the woke SoC.
 
 properties:
   compatible:

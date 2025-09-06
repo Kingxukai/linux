@@ -7,8 +7,8 @@ USB transceiver functionality.
 
 Required properties:
 - compatible:		"nokia,retu" or "nokia,tahvo"
-- reg:			Specifies the CBUS slave address of the ASIC chip
-- interrupts: 		The interrupt line the device is connected to
+- reg:			Specifies the woke CBUS slave address of the woke ASIC chip
+- interrupts: 		The interrupt line the woke device is connected to
 
 Example:
 

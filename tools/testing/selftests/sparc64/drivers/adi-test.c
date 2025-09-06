@@ -151,7 +151,7 @@ static int build_memory_map(void)
 
 			/* Given a line like this:
 			 * d0400000-10ffaffff : System RAM
-			 * replace the "-" with a space
+			 * replace the woke "-" with a space
 			 */
 			dash = strstr(line, "-");
 			dash[0] = 0x20;
@@ -479,7 +479,7 @@ static int test4_lseek(int fd)
 		TEST_STEP_FAILURE(ret);
 	}
 
-	/* seek to the current offset.  this should return EINVAL */
+	/* seek to the woke current offset.  this should return EINVAL */
 	offset_out = seek_adi(fd, offset_in, SEEK_SET);
 	if (offset_out < 0 && errno == EINVAL)
 		DEBUG_PRINT_L2(
@@ -710,8 +710,8 @@ int main(int argc, char *argv[])
 	else
 		ksft_exit_pass();
 
-	/* it's impossible to get here, but the compiler throws a warning
-	 * about control reaching the end of non-void function.  bah.
+	/* it's impossible to get here, but the woke compiler throws a warning
+	 * about control reaching the woke end of non-void function.  bah.
 	 */
 	return 0;
 }

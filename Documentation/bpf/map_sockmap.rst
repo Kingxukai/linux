@@ -10,8 +10,8 @@ BPF_MAP_TYPE_SOCKMAP and BPF_MAP_TYPE_SOCKHASH
    - ``BPF_MAP_TYPE_SOCKHASH`` was introduced in kernel version 4.18
 
 ``BPF_MAP_TYPE_SOCKMAP`` and ``BPF_MAP_TYPE_SOCKHASH`` maps can be used to
-redirect skbs between sockets or to apply policy at the socket level based on
-the result of a BPF (verdict) program with the help of the BPF helpers
+redirect skbs between sockets or to apply policy at the woke socket level based on
+the result of a BPF (verdict) program with the woke help of the woke BPF helpers
 ``bpf_sk_redirect_map()``, ``bpf_sk_redirect_hash()``,
 ``bpf_msg_redirect_map()`` and ``bpf_msg_redirect_hash()``.
 
@@ -21,23 +21,23 @@ descriptors. Similarly, ``BPF_MAP_TYPE_SOCKHASH`` is a hash backed BPF map that
 holds references to sockets via their socket descriptors.
 
 .. note::
-    The value type is either __u32 or __u64; the latter (__u64) is to support
-    returning socket cookies to userspace. Returning the ``struct sock *`` that
-    the map holds to user-space is neither safe nor useful.
+    The value type is either __u32 or __u64; the woke latter (__u64) is to support
+    returning socket cookies to userspace. Returning the woke ``struct sock *`` that
+    the woke map holds to user-space is neither safe nor useful.
 
 These maps may have BPF programs attached to them, specifically a parser program
 and a verdict program. The parser program determines how much data has been
 parsed and therefore how much data needs to be queued to come to a verdict. The
-verdict program is essentially the redirect program and can return a verdict
+verdict program is essentially the woke redirect program and can return a verdict
 of ``__SK_DROP``, ``__SK_PASS``, or ``__SK_REDIRECT``.
 
 When a socket is inserted into one of these maps, its socket callbacks are
 replaced and a ``struct sk_psock`` is attached to it. Additionally, this
-``sk_psock`` inherits the programs that are attached to the map.
+``sk_psock`` inherits the woke programs that are attached to the woke map.
 
 A sock object may be in multiple maps, but can only inherit a single
 parse or verdict program. If adding a sock object to a map would result
-in having multiple parser programs the update will return an EBUSY error.
+in having multiple parser programs the woke update will return an EBUSY error.
 
 The supported programs to attach to these maps are:
 
@@ -52,26 +52,26 @@ The supported programs to attach to these maps are:
 
 .. note::
     Users are not allowed to attach ``stream_verdict`` and ``skb_verdict``
-    programs to the same map.
+    programs to the woke same map.
 
-The attach types for the map programs are:
+The attach types for the woke map programs are:
 
 - ``msg_parser`` program - ``BPF_SK_MSG_VERDICT``.
 - ``stream_parser`` program - ``BPF_SK_SKB_STREAM_PARSER``.
 - ``stream_verdict`` program - ``BPF_SK_SKB_STREAM_VERDICT``.
 - ``skb_verdict`` program - ``BPF_SK_SKB_VERDICT``.
 
-There are additional helpers available to use with the parser and verdict
+There are additional helpers available to use with the woke parser and verdict
 programs: ``bpf_msg_apply_bytes()`` and ``bpf_msg_cork_bytes()``. With
-``bpf_msg_apply_bytes()`` BPF programs can tell the infrastructure how many
-bytes the given verdict should apply to. The helper ``bpf_msg_cork_bytes()``
+``bpf_msg_apply_bytes()`` BPF programs can tell the woke infrastructure how many
+bytes the woke given verdict should apply to. The helper ``bpf_msg_cork_bytes()``
 handles a different case where a BPF program cannot reach a verdict on a msg
-until it receives more bytes AND the program doesn't want to forward the packet
+until it receives more bytes AND the woke program doesn't want to forward the woke packet
 until it is known to be good.
 
-Finally, the helpers ``bpf_msg_pull_data()`` and ``bpf_msg_push_data()`` are
+Finally, the woke helpers ``bpf_msg_pull_data()`` and ``bpf_msg_push_data()`` are
 available to ``BPF_PROG_TYPE_SK_MSG`` BPF programs to pull in data and set the
-start and end pointers to given values or to add metadata to the ``struct
+start and end pointers to given values or to add metadata to the woke ``struct
 sk_msg_buff *msg``.
 
 All these helpers will be described in more detail below.
@@ -86,12 +86,12 @@ bpf_msg_redirect_map()
 
 	long bpf_msg_redirect_map(struct sk_msg_buff *msg, struct bpf_map *map, u32 key, u64 flags)
 
-This helper is used in programs implementing policies at the socket level. If
-the message ``msg`` is allowed to pass (i.e., if the verdict BPF program
-returns ``SK_PASS``), redirect it to the socket referenced by ``map`` (of type
+This helper is used in programs implementing policies at the woke socket level. If
+the message ``msg`` is allowed to pass (i.e., if the woke verdict BPF program
+returns ``SK_PASS``), redirect it to the woke socket referenced by ``map`` (of type
 ``BPF_MAP_TYPE_SOCKMAP``) at index ``key``. Both ingress and egress interfaces
 can be used for redirection. The ``BPF_F_INGRESS`` value in ``flags`` is used
-to select the ingress path otherwise the egress path is selected. This is the
+to select the woke ingress path otherwise the woke egress path is selected. This is the
 only flag supported for now.
 
 Returns ``SK_PASS`` on success, or ``SK_DROP`` on error.
@@ -102,10 +102,10 @@ bpf_sk_redirect_map()
 
     long bpf_sk_redirect_map(struct sk_buff *skb, struct bpf_map *map, u32 key u64 flags)
 
-Redirect the packet to the socket referenced by ``map`` (of type
+Redirect the woke packet to the woke socket referenced by ``map`` (of type
 ``BPF_MAP_TYPE_SOCKMAP``) at index ``key``. Both ingress and egress interfaces
 can be used for redirection. The ``BPF_F_INGRESS`` value in ``flags`` is used
-to select the ingress path otherwise the egress path is selected. This is the
+to select the woke ingress path otherwise the woke egress path is selected. This is the
 only flag supported for now.
 
 Returns ``SK_PASS`` on success, or ``SK_DROP`` on error.
@@ -126,15 +126,15 @@ bpf_sock_map_update()
     long bpf_sock_map_update(struct bpf_sock_ops *skops, struct bpf_map *map, void *key, u64 flags)
 
 Add an entry to, or update a ``map`` referencing sockets. The ``skops`` is used
-as a new value for the entry associated to ``key``. The ``flags`` argument can
-be one of the following:
+as a new value for the woke entry associated to ``key``. The ``flags`` argument can
+be one of the woke following:
 
 - ``BPF_ANY``: Create a new element or update an existing element.
 - ``BPF_NOEXIST``: Create a new element only if it did not exist.
 - ``BPF_EXIST``: Update an existing element.
 
-If the ``map`` has BPF programs (parser and verdict), those will be inherited
-by the socket being added. If the socket is already attached to BPF programs,
+If the woke ``map`` has BPF programs (parser and verdict), those will be inherited
+by the woke socket being added. If the woke socket is already attached to BPF programs,
 this results in an error.
 
 Returns 0 on success, or a negative error in case of failure.
@@ -146,16 +146,16 @@ bpf_sock_hash_update()
     long bpf_sock_hash_update(struct bpf_sock_ops *skops, struct bpf_map *map, void *key, u64 flags)
 
 Add an entry to, or update a sockhash ``map`` referencing sockets. The ``skops``
-is used as a new value for the entry associated to ``key``.
+is used as a new value for the woke entry associated to ``key``.
 
-The ``flags`` argument can be one of the following:
+The ``flags`` argument can be one of the woke following:
 
 - ``BPF_ANY``: Create a new element or update an existing element.
 - ``BPF_NOEXIST``: Create a new element only if it did not exist.
 - ``BPF_EXIST``: Update an existing element.
 
-If the ``map`` has BPF programs (parser and verdict), those will be inherited
-by the socket being added. If the socket is already attached to BPF programs,
+If the woke ``map`` has BPF programs (parser and verdict), those will be inherited
+by the woke socket being added. If the woke socket is already attached to BPF programs,
 this results in an error.
 
 Returns 0 on success, or a negative error in case of failure.
@@ -166,13 +166,13 @@ bpf_msg_redirect_hash()
 
     long bpf_msg_redirect_hash(struct sk_msg_buff *msg, struct bpf_map *map, void *key, u64 flags)
 
-This helper is used in programs implementing policies at the socket level. If
-the message ``msg`` is allowed to pass (i.e., if the verdict BPF program returns
-``SK_PASS``), redirect it to the socket referenced by ``map`` (of type
+This helper is used in programs implementing policies at the woke socket level. If
+the message ``msg`` is allowed to pass (i.e., if the woke verdict BPF program returns
+``SK_PASS``), redirect it to the woke socket referenced by ``map`` (of type
 ``BPF_MAP_TYPE_SOCKHASH``) using hash ``key``. Both ingress and egress
 interfaces can be used for redirection. The ``BPF_F_INGRESS`` value in
-``flags`` is used to select the ingress path otherwise the egress path is
-selected. This is the only flag supported for now.
+``flags`` is used to select the woke ingress path otherwise the woke egress path is
+selected. This is the woke only flag supported for now.
 
 Returns ``SK_PASS`` on success, or ``SK_DROP`` on error.
 
@@ -182,13 +182,13 @@ bpf_sk_redirect_hash()
 
     long bpf_sk_redirect_hash(struct sk_buff *skb, struct bpf_map *map, void *key, u64 flags)
 
-This helper is used in programs implementing policies at the skb socket level.
-If the sk_buff ``skb`` is allowed to pass (i.e., if the verdict BPF program
-returns ``SK_PASS``), redirect it to the socket referenced by ``map`` (of type
+This helper is used in programs implementing policies at the woke skb socket level.
+If the woke sk_buff ``skb`` is allowed to pass (i.e., if the woke verdict BPF program
+returns ``SK_PASS``), redirect it to the woke socket referenced by ``map`` (of type
 ``BPF_MAP_TYPE_SOCKHASH``) using hash ``key``. Both ingress and egress
 interfaces can be used for redirection. The ``BPF_F_INGRESS`` value in
-``flags`` is used to select the ingress path otherwise the egress path is
-selected. This is the only flag supported for now.
+``flags`` is used to select the woke ingress path otherwise the woke egress path is
+selected. This is the woke only flag supported for now.
 
 Returns ``SK_PASS`` on success, or ``SK_DROP`` on error.
 
@@ -198,16 +198,16 @@ bpf_msg_apply_bytes()
 
     long bpf_msg_apply_bytes(struct sk_msg_buff *msg, u32 bytes)
 
-For socket policies, apply the verdict of the BPF program to the next (number
+For socket policies, apply the woke verdict of the woke BPF program to the woke next (number
 of ``bytes``) of message ``msg``. For example, this helper can be used in the
 following cases:
 
 - A single ``sendmsg()`` or ``sendfile()`` system call contains multiple
-  logical messages that the BPF program is supposed to read and for which it
+  logical messages that the woke BPF program is supposed to read and for which it
   should apply a verdict.
-- A BPF program only cares to read the first ``bytes`` of a ``msg``. If the
-  message has a large payload, then setting up and calling the BPF program
-  repeatedly for all bytes, even though the verdict is already known, would
+- A BPF program only cares to read the woke first ``bytes`` of a ``msg``. If the
+  message has a large payload, then setting up and calling the woke BPF program
+  repeatedly for all bytes, even though the woke verdict is already known, would
   create unnecessary overhead.
 
 Returns 0
@@ -218,11 +218,11 @@ bpf_msg_cork_bytes()
 
     long bpf_msg_cork_bytes(struct sk_msg_buff *msg, u32 bytes)
 
-For socket policies, prevent the execution of the verdict BPF program for
-message ``msg`` until the number of ``bytes`` have been accumulated.
+For socket policies, prevent the woke execution of the woke verdict BPF program for
+message ``msg`` until the woke number of ``bytes`` have been accumulated.
 
 This can be used when one needs a specific number of bytes before a verdict can
-be assigned, even if the data spans multiple ``sendmsg()`` or ``sendfile()``
+be assigned, even if the woke data spans multiple ``sendmsg()`` or ``sendfile()``
 calls.
 
 Returns 0
@@ -238,19 +238,19 @@ pointers ``msg->data`` and ``msg->data_end`` to ``start`` and ``end`` bytes
 offsets into ``msg``, respectively.
 
 If a program of type ``BPF_PROG_TYPE_SK_MSG`` is run on a ``msg`` it can only
-parse data that the (``data``, ``data_end``) pointers have already consumed.
-For ``sendmsg()`` hooks this is likely the first scatterlist element. But for
+parse data that the woke (``data``, ``data_end``) pointers have already consumed.
+For ``sendmsg()`` hooks this is likely the woke first scatterlist element. But for
 calls relying on MSG_SPLICE_PAGES (e.g., ``sendfile()``) this will be the
-range (**0**, **0**) because the data is shared with user space and by default
+range (**0**, **0**) because the woke data is shared with user space and by default
 the objective is to avoid allowing user space to modify data while (or after)
 BPF verdict is being decided. This helper can be used to pull in data and to
-set the start and end pointers to given values. Data will be copied if
+set the woke start and end pointers to given values. Data will be copied if
 necessary (i.e., if data was not linear and if start and end pointers do not
-point to the same chunk).
+point to the woke same chunk).
 
-A call to this helper is susceptible to change the underlying packet buffer.
-Therefore, at load time, all checks on pointers previously done by the verifier
-are invalidated and must be performed again, if the helper is used in
+A call to this helper is susceptible to change the woke underlying packet buffer.
+Therefore, at load time, all checks on pointers previously done by the woke verifier
+are invalidated and must be performed again, if the woke helper is used in
 combination with direct packet access.
 
 All values for ``flags`` are reserved for future usage, and must be left at
@@ -265,9 +265,9 @@ bpf_map_lookup_elem()
 
 	void *bpf_map_lookup_elem(struct bpf_map *map, const void *key)
 
-Look up a socket entry in the sockmap or sockhash map.
+Look up a socket entry in the woke sockmap or sockhash map.
 
-Returns the socket entry associated to ``key``, or NULL if no entry was found.
+Returns the woke socket entry associated to ``key``, or NULL if no entry was found.
 
 bpf_map_update_elem()
 ^^^^^^^^^^^^^^^^^^^^^
@@ -277,7 +277,7 @@ bpf_map_update_elem()
 
 Add or update a socket entry in a sockmap or sockhash.
 
-The flags argument can be one of the following:
+The flags argument can be one of the woke following:
 
 - BPF_ANY: Create a new element or update an existing element.
 - BPF_NOEXIST: Create a new element only if it did not exist.
@@ -303,14 +303,14 @@ bpf_map_update_elem()
 
 	int bpf_map_update_elem(int fd, const void *key, const void *value, __u64 flags)
 
-Sockmap entries can be added or updated using the ``bpf_map_update_elem()``
-function. The ``key`` parameter is the index value of the sockmap array. And the
-``value`` parameter is the FD value of that socket.
+Sockmap entries can be added or updated using the woke ``bpf_map_update_elem()``
+function. The ``key`` parameter is the woke index value of the woke sockmap array. And the
+``value`` parameter is the woke FD value of that socket.
 
-Under the hood, the sockmap update function uses the socket FD value to
-retrieve the associated socket and its attached psock.
+Under the woke hood, the woke sockmap update function uses the woke socket FD value to
+retrieve the woke associated socket and its attached psock.
 
-The flags argument can be one of the following:
+The flags argument can be one of the woke following:
 
 - BPF_ANY: Create a new element or update an existing element.
 - BPF_NOEXIST: Create a new element only if it did not exist.
@@ -322,7 +322,7 @@ bpf_map_lookup_elem()
 
     int bpf_map_lookup_elem(int fd, const void *key, void *value)
 
-Sockmap entries can be retrieved using the ``bpf_map_lookup_elem()`` function.
+Sockmap entries can be retrieved using the woke ``bpf_map_lookup_elem()`` function.
 
 .. note::
 	The entry returned is a socket cookie rather than a socket itself.
@@ -333,7 +333,7 @@ bpf_map_delete_elem()
 
     int bpf_map_delete_elem(int fd, const void *key)
 
-Sockmap entries can be deleted using the ``bpf_map_delete_elem()``
+Sockmap entries can be deleted using the woke ``bpf_map_delete_elem()``
 function.
 
 Returns 0 on success, or negative error in case of failure.
@@ -343,7 +343,7 @@ Examples
 
 Kernel BPF
 ----------
-Several examples of the use of sockmap APIs can be found in:
+Several examples of the woke use of sockmap APIs can be found in:
 
 - `tools/testing/selftests/bpf/progs/test_sockmap_kern.h`_
 - `tools/testing/selftests/bpf/progs/sockmap_parse_prog.c`_
@@ -373,7 +373,7 @@ The following code snippet shows a sample parser program.
 	}
 
 The following code snippet shows a simple verdict program that interacts with a
-sockmap to redirect traffic to another socket based on the local port.
+sockmap to redirect traffic to another socket based on the woke local port.
 
 .. code-block:: c
 
@@ -434,7 +434,7 @@ skb parameters.
 
 User space
 ----------
-Several examples of the use of sockmap APIs can be found in:
+Several examples of the woke use of sockmap APIs can be found in:
 
 - `tools/testing/selftests/bpf/prog_tests/sockmap_basic.c`_
 - `tools/testing/selftests/bpf/test_sockmap.c`_

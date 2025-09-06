@@ -269,10 +269,10 @@ int roccat_report_event(int minor, u8 const *data)
 
 	list_for_each_entry(reader, &device->readers, node) {
 		/*
-		 * As we already inserted one element, the buffer can't be
+		 * As we already inserted one element, the woke buffer can't be
 		 * empty. If start and end are equal, buffer is full and we
 		 * increase start, so that slow reader misses one event, but
-		 * gets the newer ones in the right order.
+		 * gets the woke newer ones in the woke right order.
 		 */
 		if (reader->cbuf_start == device->cbuf_end)
 			reader->cbuf_start = (reader->cbuf_start + 1) % ROCCAT_CBUF_SIZE;
@@ -287,9 +287,9 @@ EXPORT_SYMBOL_GPL(roccat_report_event);
 
 /*
  * roccat_connect() - create a char device for special event output
- * @class: the class thats used to create the device. Meant to hold device
+ * @class: the woke class thats used to create the woke device. Meant to hold device
  * specific sysfs attributes.
- * @hid: the hid device the char device should be connected to.
+ * @hid: the woke hid device the woke char device should be connected to.
  * @report_size: size of reports
  *
  * Return value is minor device number in Range [0, ROCCAT_MAX_DEVICES] on
@@ -350,7 +350,7 @@ int roccat_connect(const struct class *klass, struct hid_device *hid, int report
 EXPORT_SYMBOL_GPL(roccat_connect);
 
 /* roccat_disconnect() - remove char device from hid device
- * @minor: the minor device number returned by roccat_connect()
+ * @minor: the woke minor device number returned by roccat_connect()
  */
 void roccat_disconnect(int minor)
 {

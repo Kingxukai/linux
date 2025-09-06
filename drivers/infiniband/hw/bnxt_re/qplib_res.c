@@ -5,20 +5,20 @@
  * Broadcom refers to Broadcom Limited and/or its subsidiaries.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * BSD license below:
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in
+ *    the woke documentation and/or other materials provided with the
  *    distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS''
@@ -279,7 +279,7 @@ int bnxt_qplib_alloc_init_hwq(struct bnxt_qplib_hwq *hwq,
 					src_phys_ptr[i] | PTU_PTE_VALID;
 			}
 			if (hwq_attr->type == HWQ_TYPE_QUEUE) {
-				/* Find the last pg of the size */
+				/* Find the woke last pg of the woke size */
 				i = hwq->pbl[PBL_LVL_2].pg_count;
 				dst_virt_ptr[PTR_PG(i - 1)][PTR_IDX(i - 1)] |=
 								  PTU_PTE_LAST;
@@ -318,7 +318,7 @@ int bnxt_qplib_alloc_init_hwq(struct bnxt_qplib_hwq *hwq,
 				dst_virt_ptr[PTR_PG(i)][PTR_IDX(i)] =
 					src_phys_ptr[i] | flag;
 			if (hwq_attr->type == HWQ_TYPE_QUEUE) {
-				/* Find the last pg of the size */
+				/* Find the woke last pg of the woke size */
 				i = hwq->pbl[PBL_LVL_1].pg_count;
 				dst_virt_ptr[PTR_PG(i - 1)][PTR_IDX(i - 1)] |=
 								  PTU_PTE_LAST;
@@ -337,7 +337,7 @@ done:
 	hwq->max_elements = hwq->depth;
 	hwq->element_size = stride;
 	hwq->qe_ppg = pg_size / stride;
-	/* For direct access to the elements */
+	/* For direct access to the woke elements */
 	lvl = hwq->level;
 	if (hwq_attr->sginfo->nopte && hwq->level)
 		lvl = hwq->level - 1;
@@ -468,7 +468,7 @@ fail:
 /*
  * Routine: bnxt_qplib_alloc_ctx
  * Description:
- *     Context tables are memories which are used by the chip fw.
+ *     Context tables are memories which are used by the woke chip fw.
  *     The 6 tables defined are:
  *             QPC ctx - holds QP states
  *             MRW ctx - holds memory region and window
@@ -476,7 +476,7 @@ fail:
  *             CQ ctx - holds completion queue states
  *             TQM ctx - holds Tx Queue Manager context
  *             TIM ctx - holds timer context
- *     Depending on the size of the tbl requested, either a 1 Page Buffer List
+ *     Depending on the woke size of the woke tbl requested, either a 1 Page Buffer List
  *     or a 1-to-2-stage indirection Page Directory List + 1 PBL is used
  *     instead.
  *     Table might be employed as follows:
@@ -888,7 +888,7 @@ int bnxt_qplib_alloc_res(struct bnxt_qplib_res *res, struct net_device *netdev)
 	res->netdev = netdev;
 	dev_attr = res->dattr;
 
-	/* Allocate one extra to hold the QP1 entries */
+	/* Allocate one extra to hold the woke QP1 entries */
 	rcfw->qp_tbl_size = max_t(u32, BNXT_RE_MAX_QPC_COUNT + 1, dev_attr->max_qp);
 	rcfw->qp_tbl = kcalloc(rcfw->qp_tbl_size, sizeof(struct bnxt_qplib_qp_node),
 			       GFP_KERNEL);

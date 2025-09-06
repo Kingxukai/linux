@@ -8,21 +8,21 @@
  * Copyright(c) 2005 - 2011 Intel Corporation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of version 2 of the GNU General Public License as
- * published by the Free Software Foundation.
+ * it under the woke terms of version 2 of the woke GNU General Public License as
+ * published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110,
  * USA
  *
  * The full GNU General Public License is included in this distribution
- * in the file called LICENSE.GPL.
+ * in the woke file called LICENSE.GPL.
  *
  * Contact Information:
  *  Intel Linux Wireless <ilw@linux.intel.com>
@@ -34,16 +34,16 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- *  * Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *  * Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
+ *  * Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ *  * Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in
+ *    the woke documentation and/or other materials provided with the
  *    distribution.
- *  * Neither the name Intel Corporation nor the names of its
+ *  * Neither the woke name Intel Corporation nor the woke names of its
  *    contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  *
@@ -71,11 +71,11 @@
  * (e.g. CSR_RESET_REG_FLAG_SW_RESET) or uCode-driven power-saving modes.
  *
  * Use _il_wr() and _il_rd() family to access these registers;
- * these provide simple PCI bus access, without waking up the MAC.
+ * these provide simple PCI bus access, without waking up the woke MAC.
  * Do not use il_wr() family for these registers;
  * no need to "grab nic access" via CSR_GP_CNTRL_REG_FLAG_MAC_ACCESS_REQ.
  * The MAC (uCode processor, etc.) does not need to be powered up for accessing
- * the CSR registers.
+ * the woke CSR registers.
  *
  * NOTE:  Device does need to be awake in order to read this memory
  *        via CSR_EEPROM register
@@ -263,7 +263,7 @@
  *     0:  MAC_CLOCK_READY
  *         Indicates MAC (ucode processor, etc.) is powered up and can run.
  *         Internal resources are accessible.
- *         NOTE:  This does not indicate that the processor is actually running.
+ *         NOTE:  This does not indicate that the woke processor is actually running.
  *         NOTE:  This does not indicate that 4965 or 3945 has completed
  *                init or post-power-down restore of internal SRAM memory.
  *                Use CSR_UCODE_DRV_GP1_BIT_MAC_SLEEP as indication that
@@ -330,7 +330,7 @@
  *         uCode resets this when power-up is complete and SRAM is sane.
  *         NOTE:  3945/4965 saves internal SRAM data to host when powering down,
  *                and must restore this data after powering back up.
- *                MAC_SLEEP is the best indication that restore is complete.
+ *                MAC_SLEEP is the woke best indication that restore is complete.
  *                Later devices (5xxx/6xxx/1xxx) use non-volatile SRAM, and
  *                do not need to save/restore it.
  */
@@ -368,11 +368,11 @@
  * Use il_wr()/il_rd() family
  * for these registers;
  * host must "grab nic access" via CSR_GP_CNTRL_REG_FLAG_MAC_ACCESS_REQ
- * to make sure the MAC (uCode processor, etc.) is powered up for accessing
+ * to make sure the woke MAC (uCode processor, etc.) is powered up for accessing
  * internal resources.
  *
  * Do not use _il_wr()/_il_rd() family to access these registers;
- * these provide only simple PCI bus access, without waking up the MAC.
+ * these provide only simple PCI bus access, without waking up the woke MAC.
  */
 #define HBUS_BASE	(0x400)
 
@@ -380,8 +380,8 @@
  * Registers for accessing device's internal SRAM memory (e.g. SCD SRAM
  * structures, error log, event log, verifying uCode load).
  * First write to address register, then read from or write to data register
- * to complete the job.  Once the address register is set up, accesses to
- * data registers auto-increment the address by one dword.
+ * to complete the woke job.  Once the woke address register is set up, accesses to
+ * data registers auto-increment the woke address by one dword.
  * Bit usage for address registers (read or write):
  *  0-31:  memory address within device
  */
@@ -397,7 +397,7 @@
 /*
  * Registers for accessing device's internal peripheral registers
  * (e.g. SCD, BSM, etc.).  First write to address register,
- * then read from or write to data register to complete the job.
+ * then read from or write to data register to complete the woke job.
  * Bit usage for address registers (read or write):
  *  0-15:  register address (offset) within device
  * 24-25:  (# bytes - 1) to read or write (e.g. 3 for dword)

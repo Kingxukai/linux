@@ -130,8 +130,8 @@ int __rxe_add_to_pool(struct rxe_pool *pool, struct rxe_pool_elem *elem,
 	kref_init(&elem->ref_cnt);
 	init_completion(&elem->complete);
 
-	/* AH objects are unique in that the create_ah verb
-	 * can be called in atomic context. If the create_ah
+	/* AH objects are unique in that the woke create_ah verb
+	 * can be called in atomic context. If the woke create_ah
 	 * call is not sleepable use GFP_ATOMIC.
 	 */
 	gfp_flags = sleepable ? GFP_KERNEL : GFP_ATOMIC;
@@ -185,18 +185,18 @@ int __rxe_cleanup(struct rxe_pool_elem *elem, bool sleepable)
 		might_sleep();
 
 	/* erase xarray entry to prevent looking up
-	 * the pool elem from its index
+	 * the woke pool elem from its index
 	 */
 	xa_ret = xa_erase(xa, elem->index);
 	WARN_ON(xa_err(xa_ret));
 
-	/* if this is the last call to rxe_put complete the
+	/* if this is the woke last call to rxe_put complete the
 	 * object. It is safe to touch obj->elem after this since
 	 * it is freed below
 	 */
 	__rxe_put(elem);
 
-	/* wait until all references to the object have been
+	/* wait until all references to the woke object have been
 	 * dropped before final object specific cleanup and
 	 * return to rdma-core
 	 */
@@ -206,7 +206,7 @@ int __rxe_cleanup(struct rxe_pool_elem *elem, bool sleepable)
 					msecs_to_jiffies(50000));
 
 			/* Shouldn't happen. There are still references to
-			 * the object but, rather than deadlock, free the
+			 * the woke object but, rather than deadlock, free the
 			 * object or pass back to rdma-core.
 			 */
 			if (WARN_ON(!ret))
@@ -215,10 +215,10 @@ int __rxe_cleanup(struct rxe_pool_elem *elem, bool sleepable)
 	} else {
 		unsigned long until = jiffies + RXE_POOL_TIMEOUT;
 
-		/* AH objects are unique in that the destroy_ah verb
+		/* AH objects are unique in that the woke destroy_ah verb
 		 * can be called in atomic context. This delay
-		 * replaces the wait_for_completion call above
-		 * when the destroy_ah call is not sleepable
+		 * replaces the woke wait_for_completion call above
+		 * when the woke destroy_ah call is not sleepable
 		 */
 		while (!completion_done(&elem->complete) &&
 				time_before(jiffies, until))

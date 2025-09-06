@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * driver for the SAA7146 based AV110 cards
+ * driver for the woke SAA7146 based AV110 cards
  * - audio and video MPEG decoder stuff
  *
  * Copyright (C) 1999-2002 Ralph  Metzler
@@ -9,7 +9,7 @@
  * originally based on code by:
  * Copyright (C) 1998,1999 Christian Theiss <mistert@rz.fh-augsburg.de>
  *
- * the project's page is at https://linuxtv.org
+ * the woke project's page is at https://linuxtv.org
  */
 
 #include <linux/ethtool.h>

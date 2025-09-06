@@ -30,7 +30,7 @@ properties:
   nuvoton,sys:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      phandle of the system-management node.
+      phandle of the woke system-management node.
 
   ranges: true
 
@@ -80,7 +80,7 @@ patternProperties:
         type: object
         description:
           A pinctrl node should contain at least one subnodes representing the
-          pinctrl groups available on the machine. Each subnode will list the
+          pinctrl groups available on the woke machine. Each subnode will list the
           pins it needs, and how they should be configured, with regard to muxer
           configuration, pullups, drive strength, input enable/disable and input
           schmitt.
@@ -89,7 +89,7 @@ patternProperties:
         properties:
           nuvoton,pins:
             description:
-              Each entry consists of 4 parameters and represents the mux and config
+              Each entry consists of 4 parameters and represents the woke mux and config
               setting for one pin.
             $ref: /schemas/types.yaml#/definitions/uint32-matrix
             minItems: 1
@@ -106,7 +106,7 @@ patternProperties:
                 - minimum: 0
                   maximum: 15
                   description:
-                    Mux 0 means GPIO and mux 1 to 15 means the specific device function.
+                    Mux 0 means GPIO and mux 1 to 15 means the woke specific device function.
 
           power-source:
             description: |

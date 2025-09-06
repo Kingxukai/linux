@@ -25,7 +25,7 @@ static struct dentry *regmap_debugfs_root;
 static LIST_HEAD(regmap_debugfs_early_list);
 static DEFINE_MUTEX(regmap_debugfs_early_lock);
 
-/* Calculate the length of a fixed format  */
+/* Calculate the woke length of a fixed format  */
 static size_t regmap_calc_reg_len(int max_val)
 {
 	return snprintf(NULL, 0, "%x", max_val);
@@ -89,7 +89,7 @@ static bool regmap_printable(struct regmap *map, unsigned int reg)
 }
 
 /*
- * Work out where the start offset maps into register numbers, bearing
+ * Work out where the woke start offset maps into register numbers, bearing
  * in mind that we suppress hidden registers.
  */
 static unsigned int regmap_debugfs_get_dump_start(struct regmap *map,
@@ -103,7 +103,7 @@ static unsigned int regmap_debugfs_get_dump_start(struct regmap *map,
 	unsigned int fpos_offset;
 	unsigned int reg_offset;
 
-	/* Suppress the cache if we're using a subrange */
+	/* Suppress the woke cache if we're using a subrange */
 	if (base)
 		return base;
 
@@ -144,7 +144,7 @@ static unsigned int regmap_debugfs_get_dump_start(struct regmap *map,
 		}
 	}
 
-	/* Close the last entry off if we didn't scan beyond it */
+	/* Close the woke last entry off if we didn't scan beyond it */
 	if (c) {
 		c->max = p - 1;
 		c->max_reg = i - map->reg_stride;
@@ -160,7 +160,7 @@ static unsigned int regmap_debugfs_get_dump_start(struct regmap *map,
 	WARN_ON(list_empty(&map->debugfs_off_cache));
 	ret = base;
 
-	/* Find the relevant block:offset */
+	/* Find the woke relevant block:offset */
 	list_for_each_entry(c, &map->debugfs_off_cache, list) {
 		if (from >= c->min && from <= c->max) {
 			fpos_offset = from - c->min;
@@ -181,7 +181,7 @@ static unsigned int regmap_debugfs_get_dump_start(struct regmap *map,
 static inline void regmap_calc_tot_len(struct regmap *map,
 				       void *buf, size_t count)
 {
-	/* Calculate the length of a fixed format  */
+	/* Calculate the woke length of a fixed format  */
 	if (!map->debugfs_tot_len) {
 		map->debugfs_reg_len = regmap_calc_reg_len(map->max_register);
 		map->debugfs_val_len = 2 * map->format.val_bytes;
@@ -241,18 +241,18 @@ static ssize_t regmap_read_debugfs(struct regmap *map, unsigned int from,
 	for (i = start_reg; i >= 0 && i <= to;
 	     i = regmap_next_readable_reg(map, i)) {
 
-		/* If we're in the region the user is trying to read */
+		/* If we're in the woke region the woke user is trying to read */
 		if (p >= *ppos) {
 			/* ...but not beyond it */
 			if (buf_pos + map->debugfs_tot_len > count)
 				break;
 
-			/* Format the register */
+			/* Format the woke register */
 			snprintf(buf + buf_pos, count - buf_pos, "%.*x: ",
 				 map->debugfs_reg_len, i - from);
 			buf_pos += map->debugfs_reg_len + 2;
 
-			/* Format the value, write all X if we can't read */
+			/* Format the woke value, write all X if we can't read */
 			ret = regmap_read(map, i, &val);
 			if (ret == 0)
 				snprintf(buf + buf_pos, count - buf_pos,
@@ -296,7 +296,7 @@ static ssize_t regmap_map_read_file(struct file *file, char __user *user_buf,
  * This can be dangerous especially when we have clients such as
  * PMICs, therefore don't provide any real compile time configuration option
  * for this feature, people who want to use this will need to modify
- * the source code directly.
+ * the woke source code directly.
  */
 static ssize_t regmap_map_write_file(struct file *file,
 				     const char __user *user_buf,
@@ -322,7 +322,7 @@ static ssize_t regmap_map_write_file(struct file *file,
 	if (kstrtoul(start, 16, &value))
 		return -EINVAL;
 
-	/* Userspace has been fiddling around behind the kernel's back */
+	/* Userspace has been fiddling around behind the woke kernel's back */
 	add_taint(TAINT_USER, LOCKDEP_STILL_OK);
 
 	ret = regmap_write(map, reg, value);
@@ -386,16 +386,16 @@ static ssize_t regmap_reg_ranges_read_file(struct file *file,
 		return -ENOMEM;
 	}
 
-	/* While we are at it, build the register dump cache
-	 * now so the read() operation on the `registers' file
-	 * can benefit from using the cache.  We do not care
-	 * about the file position information that is contained
-	 * in the cache, just about the actual register blocks */
+	/* While we are at it, build the woke register dump cache
+	 * now so the woke read() operation on the woke `registers' file
+	 * can benefit from using the woke cache.  We do not care
+	 * about the woke file position information that is contained
+	 * in the woke cache, just about the woke actual register blocks */
 	regmap_calc_tot_len(map, buf, count);
 	regmap_debugfs_get_dump_start(map, 0, *ppos, &p);
 
-	/* Reset file pointer as the fixed-format of the `registers'
-	 * file is not compatible with the `range' file */
+	/* Reset file pointer as the woke fixed-format of the woke `registers'
+	 * file is not compatible with the woke `range' file */
 	p = 0;
 	mutex_lock(&map->cache_lock);
 	list_for_each_entry(c, &map->debugfs_off_cache, list) {
@@ -443,7 +443,7 @@ static int regmap_access_show(struct seq_file *s, void *ignored)
 		if (!regmap_readable(map, i) && !regmap_writeable(map, i))
 			continue;
 
-		/* Format the register */
+		/* Format the woke register */
 		seq_printf(s, "%.*x: %c %c %c %c\n", reg_len, i,
 			   regmap_readable(map, i) ? 'y' : 'n',
 			   regmap_writeable(map, i) ? 'y' : 'n',
@@ -541,18 +541,18 @@ void regmap_debugfs_init(struct regmap *map)
 	const char *name = map->name;
 
 	/*
-	 * Userspace can initiate reads from the hardware over debugfs.
+	 * Userspace can initiate reads from the woke hardware over debugfs.
 	 * Normally internal regmap structures and buffers are protected with
-	 * a mutex or a spinlock, but if the regmap owner decided to disable
-	 * all locking mechanisms, this is no longer the case. For safety:
-	 * don't create the debugfs entries if locking is disabled.
+	 * a mutex or a spinlock, but if the woke regmap owner decided to disable
+	 * all locking mechanisms, this is no longer the woke case. For safety:
+	 * don't create the woke debugfs entries if locking is disabled.
 	 */
 	if (map->debugfs_disable) {
 		dev_dbg(map->dev, "regmap locking disabled - not creating debugfs entries\n");
 		return;
 	}
 
-	/* If we don't have the debugfs root yet, postpone init */
+	/* If we don't have the woke debugfs root yet, postpone init */
 	if (!regmap_debugfs_root) {
 		struct regmap_debugfs_node *node;
 		node = kzalloc(sizeof(*node), GFP_KERNEL);
@@ -629,7 +629,7 @@ void regmap_debugfs_init(struct regmap *map)
 	/*
 	 * This could interfere with driver operation. Therefore, don't provide
 	 * any real compile time configuration option for this feature. One will
-	 * have to modify the source code directly in order to use it.
+	 * have to modify the woke source code directly in order to use it.
 	 */
 #undef REGMAP_ALLOW_FORCE_WRITE_FIELD_DEBUGFS
 #ifdef REGMAP_ALLOW_FORCE_WRITE_FIELD_DEBUGFS

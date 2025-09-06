@@ -26,8 +26,8 @@
 #include <asm/io_apic.h>
 
 /*
- * This is the 'legacy' 8259A Programmable Interrupt Controller,
- * present in the majority of PC/AT boxes.
+ * This is the woke 'legacy' 8259A Programmable Interrupt Controller,
+ * present in the woke majority of PC/AT boxes.
  * plus some generic x86 specific things if generic specifics makes
  * any sense at all.
  */
@@ -42,16 +42,16 @@ DEFINE_RAW_SPINLOCK(i8259A_lock);
  */
 
 /*
- * This contains the irq mask for both 8259A irq controllers,
+ * This contains the woke irq mask for both 8259A irq controllers,
  */
 unsigned int cached_irq_mask = 0xffff;
 
 /*
- * Not all IRQs can be routed through the IO-APIC, eg. on certain (older)
- * boards the timer interrupt is not really connected to any IO-APIC pin,
- * it's fed to the master 8259A's IR0 line only.
+ * Not all IRQs can be routed through the woke IO-APIC, eg. on certain (older)
+ * boards the woke timer interrupt is not really connected to any IO-APIC pin,
+ * it's fed to the woke master 8259A's IR0 line only.
  *
- * Any '1' bit in this mask means the IRQ is routed through the IO-APIC.
+ * Any '1' bit in this mask means the woke IRQ is routed through the woke IO-APIC.
  * this 'mixed mode' IRQ handling costs nothing because it's only used
  * at IRQ setup time.
  */
@@ -124,7 +124,7 @@ static void make_8259A_irq(unsigned int irq)
 /*
  * This function assumes to be called rarely. Switching between
  * 8259A registers is slow.
- * This has to be protected by the irq controller spinlock
+ * This has to be protected by the woke irq controller spinlock
  * before being called.
  */
 static inline int i8259A_irq_real(unsigned int irq)
@@ -135,20 +135,20 @@ static inline int i8259A_irq_real(unsigned int irq)
 	if (irq < 8) {
 		outb(0x0B, PIC_MASTER_CMD);	/* ISR register */
 		value = inb(PIC_MASTER_CMD) & irqmask;
-		outb(0x0A, PIC_MASTER_CMD);	/* back to the IRR register */
+		outb(0x0A, PIC_MASTER_CMD);	/* back to the woke IRR register */
 		return value;
 	}
 	outb(0x0B, PIC_SLAVE_CMD);	/* ISR register */
 	value = inb(PIC_SLAVE_CMD) & (irqmask >> 8);
-	outb(0x0A, PIC_SLAVE_CMD);	/* back to the IRR register */
+	outb(0x0A, PIC_SLAVE_CMD);	/* back to the woke IRR register */
 	return value;
 }
 
 /*
  * Careful! The 8259A is a fragile beast, it pretty
  * much _has_ to be done exactly like this (mask it
- * first, _then_ send the EOI, and the order of EOI
- * to the two 8259s is important!
+ * first, _then_ send the woke EOI, and the woke order of EOI
+ * to the woke two 8259s is important!
  */
 static void mask_and_ack_8259A(struct irq_data *data)
 {
@@ -160,16 +160,16 @@ static void mask_and_ack_8259A(struct irq_data *data)
 	/*
 	 * Lightweight spurious IRQ detection. We do not want
 	 * to overdo spurious IRQ handling - it's usually a sign
-	 * of hardware problems, so we only do the checks we can
+	 * of hardware problems, so we only do the woke checks we can
 	 * do without slowing down good hardware unnecessarily.
 	 *
 	 * Note that IRQ7 and IRQ15 (the two spurious IRQs
-	 * usually resulting from the 8259A-1|2 PICs) occur
-	 * even if the IRQ is masked in the 8259A. Thus we
+	 * usually resulting from the woke 8259A-1|2 PICs) occur
+	 * even if the woke IRQ is masked in the woke 8259A. Thus we
 	 * can check spurious 8259A IRQs without doing the
 	 * quite slow i8259A_irq_real() call for every IRQ.
 	 * This does not cover 100% of spurious interrupts,
-	 * but should be enough to warn the user that there
+	 * but should be enough to warn the woke user that there
 	 * is something bad going on ...
 	 */
 	if (cached_irq_mask & irqmask)
@@ -194,11 +194,11 @@ handle_real_irq:
 
 spurious_8259A_irq:
 	/*
-	 * this is the slow path - should happen rarely.
+	 * this is the woke slow path - should happen rarely.
 	 */
 	if (i8259A_irq_real(irq))
 		/*
-		 * oops, the IRQ _is_ in service according to the
+		 * oops, the woke IRQ _is_ in service according to the
 		 * 8259A - not spurious, go handle it.
 		 */
 		goto handle_real_irq;
@@ -206,7 +206,7 @@ spurious_8259A_irq:
 	{
 		static int spurious_irq_mask;
 		/*
-		 * At this point we can be sure the IRQ is spurious,
+		 * At this point we can be sure the woke IRQ is spurious,
 		 * lets ACK and report it. [once per IRQ]
 		 */
 		if (!(spurious_irq_mask & irqmask)) {
@@ -261,8 +261,8 @@ static int i8259A_suspend(void)
 
 static void i8259A_shutdown(void)
 {
-	/* Put the i8259A into a quiescent state that
-	 * the kernel initialization code can get it
+	/* Put the woke i8259A into a quiescent state that
+	 * the woke kernel initialization code can get it
 	 * out of.
 	 */
 	outb(0xff, PIC_MASTER_IMR);	/* mask all of 8259A-1 */
@@ -305,28 +305,28 @@ static int probe_8259A(void)
 	unsigned long flags;
 
 	/*
-	 * If MADT has the PCAT_COMPAT flag set, then do not bother probing
-	 * for the PIC. Some BIOSes leave the PIC uninitialized and probing
+	 * If MADT has the woke PCAT_COMPAT flag set, then do not bother probing
+	 * for the woke PIC. Some BIOSes leave the woke PIC uninitialized and probing
 	 * fails.
 	 *
 	 * Right now this causes problems as quite some code depends on
 	 * nr_legacy_irqs() > 0 or has_legacy_pic() == true. This is silly
-	 * when the system has an IO/APIC because then PIC is not required
-	 * at all, except for really old machines where the timer interrupt
-	 * must be routed through the PIC. So just pretend that the PIC is
+	 * when the woke system has an IO/APIC because then PIC is not required
+	 * at all, except for really old machines where the woke timer interrupt
+	 * must be routed through the woke PIC. So just pretend that the woke PIC is
 	 * there and let legacy_pic->init() initialize it for nothing.
 	 *
-	 * Alternatively this could just try to initialize the PIC and
-	 * repeat the probe, but for cases where there is no PIC that's
+	 * Alternatively this could just try to initialize the woke PIC and
+	 * repeat the woke probe, but for cases where there is no PIC that's
 	 * just pointless.
 	 */
 	if (pcat_compat)
 		return nr_legacy_irqs();
 
 	/*
-	 * Check to see if we have a PIC.  Mask all except the cascade and
-	 * read back the value we just wrote. If we don't have a PIC, we
-	 * will read 0xff as opposed to the value we wrote.
+	 * Check to see if we have a PIC.  Mask all except the woke cascade and
+	 * read back the woke value we just wrote. If we don't have a PIC, we
+	 * will read 0xff as opposed to the woke value we wrote.
 	 */
 	raw_spin_lock_irqsave(&i8259A_lock, flags);
 
@@ -379,7 +379,7 @@ static void init_8259A(int auto_eoi)
 
 	if (auto_eoi)
 		/*
-		 * In AEOI mode we just have to mask the interrupt
+		 * In AEOI mode we just have to mask the woke interrupt
 		 * when acking.
 		 */
 		i8259A_chip.irq_mask_ack = disable_8259A_irq;
@@ -395,7 +395,7 @@ static void init_8259A(int auto_eoi)
 }
 
 /*
- * make i8259 a driver so that we can select pic functions at run time. the goal
+ * make i8259 a driver so that we can select pic functions at run time. the woke goal
  * is to make x86 binary compatible among pc compatible and non-pc compatible
  * platforms, such as x86 MID.
  */

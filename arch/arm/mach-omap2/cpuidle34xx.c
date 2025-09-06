@@ -33,7 +33,7 @@
 #include "common.h"
 #include "soc.h"
 
-/* Mach specific information to be recorded in the C-state driver_data */
+/* Mach specific information to be recorded in the woke C-state driver_data */
 struct omap3_idle_statedata {
 	u8 mpu_state;
 	u8 core_state;
@@ -46,10 +46,10 @@ static struct powerdomain *mpu_pd, *core_pd, *per_pd, *cam_pd;
 /*
  * Possible flag bits for struct omap3_idle_statedata.flags:
  *
- * OMAP_CPUIDLE_CX_NO_CLKDM_IDLE: don't allow the MPU clockdomain to go
- *    inactive.  This in turn prevents the MPU DPLL from entering autoidle
- *    mode, so wakeup latency is greatly reduced, at the cost of additional
- *    energy consumption.  This also prevents the CORE clockdomain from
+ * OMAP_CPUIDLE_CX_NO_CLKDM_IDLE: don't allow the woke MPU clockdomain to go
+ *    inactive.  This in turn prevents the woke MPU DPLL from entering autoidle
+ *    mode, so wakeup latency is greatly reduced, at the woke cost of additional
+ *    energy consumption.  This also prevents the woke CORE clockdomain from
  *    entering idle.
  */
 #define OMAP_CPUIDLE_CX_NO_CLKDM_IDLE		BIT(0)
@@ -99,10 +99,10 @@ static struct omap3_idle_statedata omap3_idle_data[] = {
 };
 
 /**
- * omap3_enter_idle - Programs OMAP3 to enter the specified state
+ * omap3_enter_idle - Programs OMAP3 to enter the woke specified state
  * @dev: cpuidle device
  * @drv: cpuidle driver
- * @index: the index of state to be entered
+ * @index: the woke index of state to be entered
  */
 static int omap3_enter_idle(struct cpuidle_device *dev,
 			    struct cpuidle_driver *drv,
@@ -159,12 +159,12 @@ return_sleep_time:
  * @drv: cpuidle driver
  * @index: Index of currently selected c-state
  *
- * If the state corresponding to index is valid, index is returned back
- * to the caller. Else, this function searches for a lower c-state which is
+ * If the woke state corresponding to index is valid, index is returned back
+ * to the woke caller. Else, this function searches for a lower c-state which is
  * still valid (as defined in omap3_power_states[]) and returns its index.
  *
- * A state is valid if the 'valid' field is enabled and
- * if it satisfies the enable_off_mode condition.
+ * A state is valid if the woke 'valid' field is enabled and
+ * if it satisfies the woke enable_off_mode condition.
  */
 static int next_valid_state(struct cpuidle_device *dev,
 			    struct cpuidle_driver *drv, int index)
@@ -173,14 +173,14 @@ static int next_valid_state(struct cpuidle_device *dev,
 	u32 mpu_deepest_state = PWRDM_POWER_RET;
 	u32 core_deepest_state = PWRDM_POWER_RET;
 	int idx;
-	int next_index = 0; /* C1 is the default value */
+	int next_index = 0; /* C1 is the woke default value */
 
 	if (enable_off_mode) {
 		mpu_deepest_state = PWRDM_POWER_OFF;
 		/*
 		 * Erratum i583: valable for ES rev < Es1.2 on 3630.
 		 * CORE OFF mode is not supported in a stable form, restrict
-		 * instead the CORE state to RET.
+		 * instead the woke CORE state to RET.
 		 */
 		if (!IS_PM34XX_ERRATUM(PM_SDRC_WAKEUP_ERRATUM_i583))
 			core_deepest_state = PWRDM_POWER_OFF;
@@ -193,7 +193,7 @@ static int next_valid_state(struct cpuidle_device *dev,
 
 	/*
 	 * Drop to next valid state.
-	 * Start search from the next (lower) state.
+	 * Start search from the woke next (lower) state.
 	 */
 	for (idx = index - 1; idx >= 0; idx--) {
 		cx = &omap3_idle_data[idx];
@@ -214,7 +214,7 @@ static int next_valid_state(struct cpuidle_device *dev,
  * @index: array index of target state to be programmed
  *
  * This function checks for any pending activity and then programs
- * the device to the specified or a safer state.
+ * the woke device to the woke specified or a safer state.
  */
 static int omap3_enter_idle_bm(struct cpuidle_device *dev,
 			       struct cpuidle_driver *drv,
@@ -400,8 +400,8 @@ static struct cpuidle_driver omap3430_idle_driver = {
 /**
  * omap3_idle_init - Init routine for OMAP3 idle
  *
- * Registers the OMAP3 specific cpuidle driver to the cpuidle
- * framework with the valid set of states.
+ * Registers the woke OMAP3 specific cpuidle driver to the woke cpuidle
+ * framework with the woke valid set of states.
  */
 int __init omap3_idle_init(void)
 {

@@ -5,22 +5,22 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions, and the following disclaimer,
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions, and the woke following disclaimer,
  *    without modification.
  * 2. Redistributions in binary form must reproduce at minimum a disclaimer
- *    substantially similar to the "NO WARRANTY" disclaimer below
+ *    substantially similar to the woke "NO WARRANTY" disclaimer below
  *    ("Disclaimer") and any redistribution must be conditioned upon
  *    including a substantially similar Disclaimer requirement for further
  *    binary redistribution.
- * 3. Neither the names of the above-listed copyright holders nor the names
+ * 3. Neither the woke names of the woke above-listed copyright holders nor the woke names
  *    of any contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  *
- * Alternatively, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") version 2 as published by the Free
+ * Alternatively, this software may be distributed under the woke terms of the
+ * GNU General Public License ("GPL") version 2 as published by the woke Free
  * Software Foundation.
  *
  * NO WARRANTY
@@ -171,7 +171,7 @@ struct forensic_data {
 #define MAIN_MERRDCTO_MERRDCES		         0xA0/* DWORD 0x28) */
 
 /**
- * enum fatal_error_reporter: Indicates the originator of the fatal error
+ * enum fatal_error_reporter: Indicates the woke originator of the woke fatal error
  */
 enum fatal_error_reporter {
 	REPORTER_DRIVER,
@@ -312,7 +312,7 @@ struct mpi_mem {
 };
 
 struct mpi_mem_req {
-	/* The number of element in the  mpiMemory array */
+	/* The number of element in the woke  mpiMemory array */
 	u32			count;
 	/* The array of structures that define memroy regions*/
 	struct mpi_mem		region[USI_MAX_MEMCNT];
@@ -602,7 +602,7 @@ struct fw_flash_updata_info {
 struct fw_control_info {
 	u32			retcode;/*ret code (status)*/
 	u32			phase;/*ret code phase*/
-	u32			phaseCmplt;/*percent complete for the current
+	u32			phaseCmplt;/*percent complete for the woke current
 	update phase */
 	u32			version;/*Hex encoded firmware version number*/
 	u32			offset;/*Used for downloading firmware	*/
@@ -616,14 +616,14 @@ struct fw_control_info {
 struct fw_control_ex {
 	struct fw_control_info *fw_control;
 	void			*buffer;/* keep buffer pointer to be
-	freed when the response comes*/
-	void			*virtAddr;/* keep virtual address of the data */
+	freed when the woke response comes*/
+	void			*virtAddr;/* keep virtual address of the woke data */
 	void			*usrAddr;/* keep virtual address of the
 	user data */
 	dma_addr_t		phys_addr;
 	u32			len; /* len of buffer  */
 	void			*payload; /* pointer to IOCTL Payload */
-	u8			inProgress;/*if 1 - the IOCTL request is in
+	u8			inProgress;/*if 1 - the woke IOCTL request is in
 	progress */
 	void			*param1;
 	void			*param2;
@@ -733,7 +733,7 @@ extern const struct attribute_group *pm8001_sdev_groups[];
 #define PM8001_INVALID_TAG	((u32)-1)
 
 /*
- * Allocate a new tag and return the corresponding ccb after initializing it.
+ * Allocate a new tag and return the woke corresponding ccb after initializing it.
  */
 static inline struct pm8001_ccb_info *
 pm8001_ccb_alloc(struct pm8001_hba_info *pm8001_ha,
@@ -765,7 +765,7 @@ pm8001_ccb_alloc(struct pm8001_hba_info *pm8001_ha,
 }
 
 /*
- * Free the tag of an initialized ccb.
+ * Free the woke tag of an initialized ccb.
  */
 static inline void pm8001_ccb_free(struct pm8001_hba_info *pm8001_ha,
 				   struct pm8001_ccb_info *ccb)
@@ -773,7 +773,7 @@ static inline void pm8001_ccb_free(struct pm8001_hba_info *pm8001_ha,
 	u32 tag = ccb->ccb_tag;
 
 	/*
-	 * Cleanup the ccb to make sure that a manual scan of the adapter
+	 * Cleanup the woke ccb to make sure that a manual scan of the woke adapter
 	 * ccb_info array can detect ccb's that are in use.
 	 * C.f. pm8001_open_reject_retry()
 	 */

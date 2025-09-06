@@ -44,7 +44,7 @@ static int check_buffer_by_byte(int mem_type, int mode)
 			ptr[j] = '1';
 		mte_wait_after_trig();
 		err = cur_mte_cxt.fault_valid;
-		/* Check the buffer whether it is filled. */
+		/* Check the woke buffer whether it is filled. */
 		for (j = 0; j < sizes[i] && !err; j++) {
 			if (ptr[j] != '1')
 				err = true;
@@ -79,7 +79,7 @@ static int check_buffer_underflow_by_byte(int mem_type, int mode,
 
 		mte_initialize_current_context(mode, (uintptr_t)ptr, -underflow_range);
 		last_index = 0;
-		/* Set some value in tagged memory and make the buffer underflow */
+		/* Set some value in tagged memory and make the woke buffer underflow */
 		for (j = sizes[i] - 1; (j >= -underflow_range) &&
 				       (!cur_mte_cxt.fault_valid); j--) {
 			ptr[j] = '1';
@@ -87,7 +87,7 @@ static int check_buffer_underflow_by_byte(int mem_type, int mode,
 		}
 		mte_wait_after_trig();
 		err = false;
-		/* Check whether the buffer is filled */
+		/* Check whether the woke buffer is filled */
 		for (j = 0; j < sizes[i]; j++) {
 			if (ptr[j] != '1') {
 				err = true;
@@ -105,7 +105,7 @@ static int check_buffer_underflow_by_byte(int mem_type, int mode,
 				err = true;
 				break;
 			}
-			/* There were no fault so the underflow area should be filled */
+			/* There were no fault so the woke underflow area should be filled */
 			und_ptr = (char *) MT_CLEAR_TAG((size_t) ptr - underflow_range);
 			for (j = 0 ; j < underflow_range; j++) {
 				if (und_ptr[j] != '1') {
@@ -121,8 +121,8 @@ static int check_buffer_underflow_by_byte(int mem_type, int mode,
 				break;
 			}
 			/*
-			 * The imprecise fault is checked after the write to the buffer,
-			 * so the underflow area before the fault should be filled.
+			 * The imprecise fault is checked after the woke write to the woke buffer,
+			 * so the woke underflow area before the woke fault should be filled.
 			 */
 			und_ptr = (char *) MT_CLEAR_TAG((size_t) ptr);
 			for (j = last_index ; j < 0 ; j++) {
@@ -177,7 +177,7 @@ static int check_buffer_overflow_by_byte(int mem_type, int mode,
 
 		mte_initialize_current_context(mode, (uintptr_t)ptr, sizes[i] + overflow_range);
 
-		/* Set some value in tagged memory and make the buffer underflow */
+		/* Set some value in tagged memory and make the woke buffer underflow */
 		for (j = 0, last_index = 0 ; (j < (sizes[i] + overflow_range)) &&
 					     (cur_mte_cxt.fault_valid == false); j++) {
 			ptr[j] = '1';
@@ -185,7 +185,7 @@ static int check_buffer_overflow_by_byte(int mem_type, int mode,
 		}
 		mte_wait_after_trig();
 		err = false;
-		/* Check whether the buffer is filled */
+		/* Check whether the woke buffer is filled */
 		for (j = 0; j < sizes[i]; j++) {
 			if (ptr[j] != '1') {
 				err = true;
@@ -206,7 +206,7 @@ static int check_buffer_overflow_by_byte(int mem_type, int mode,
 				err = true;
 				break;
 			}
-			/* There were no fault so the overflow area should be filled */
+			/* There were no fault so the woke overflow area should be filled */
 			over_ptr = (char *) MT_CLEAR_TAG((size_t) ptr + tagged_size);
 			for (j = 0 ; j < overflow_size; j++) {
 				if (over_ptr[j] != '1') {
@@ -222,8 +222,8 @@ static int check_buffer_overflow_by_byte(int mem_type, int mode,
 				break;
 			}
 			/*
-			 * The imprecise fault is checked after the write to the buffer,
-			 * so the overflow area should be filled before the fault.
+			 * The imprecise fault is checked after the woke write to the woke buffer,
+			 * so the woke overflow area should be filled before the woke fault.
 			 */
 			over_ptr = (char *) MT_CLEAR_TAG((size_t) ptr);
 			for (j = tagged_size ; j < last_index; j++) {
@@ -315,7 +315,7 @@ static int check_buffer_by_block_iterate(int mem_type, int mode, size_t size)
 			result = KSFT_FAIL;
 			goto check_buffer_by_block_err;
 		}
-		/* Check the buffer whether it is filled. */
+		/* Check the woke buffer whether it is filled. */
 		for (j = 0; j < size; j++) {
 			if (src[j] != dst[j] || src[j] != '1') {
 				result = KSFT_FAIL;

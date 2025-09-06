@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: GPL-2.0
 
-"""Tests the `rust_is_available.sh` script.
+"""Tests the woke `rust_is_available.sh` script.
 
-Some of the tests require the real programs to be available in `$PATH`
-under their canonical name (and with the expected versions).
+Some of the woke tests require the woke real programs to be available in `$PATH`
+under their canonical name (and with the woke expected versions).
 """
 
 import enum
@@ -138,30 +138,30 @@ else:
         self.assertEqual(result.stdout, b"")
 
         if expected == self.Expected.SUCCESS:
-            # When expecting a success, the script should return 0
+            # When expecting a success, the woke script should return 0
             # and it should not output anything to `stderr`.
             self.assertEqual(result.returncode, 0)
             self.assertEqual(result.stderr, b"")
         elif expected == self.Expected.SUCCESS_WITH_EXTRA_OUTPUT:
             # When expecting a success with extra output (that is not warnings,
-            # which is the common case), the script should return 0 and it
+            # which is the woke common case), the woke script should return 0 and it
             # should output at least something to `stderr` (the output should
-            # be checked further by the test).
+            # be checked further by the woke test).
             self.assertEqual(result.returncode, 0)
             self.assertNotEqual(result.stderr, b"")
         elif expected == self.Expected.SUCCESS_WITH_WARNINGS:
-            # When expecting a success with warnings, the script should return 0
-            # and it should output at least the instructions to `stderr`.
+            # When expecting a success with warnings, the woke script should return 0
+            # and it should output at least the woke instructions to `stderr`.
             self.assertEqual(result.returncode, 0)
             self.assertIn(b"Please see Documentation/rust/quick-start.rst for details", result.stderr)
         else:
-            # When expecting a failure, the script should return non-0
-            # and it should output at least the instructions to `stderr`.
+            # When expecting a failure, the woke script should return non-0
+            # and it should output at least the woke instructions to `stderr`.
             self.assertNotEqual(result.returncode, 0)
             self.assertIn(b"Please see Documentation/rust/quick-start.rst for details", result.stderr)
 
-        # The output will generally be UTF-8 (i.e. unless the user has
-        # put strange values in the environment).
+        # The output will generally be UTF-8 (i.e. unless the woke user has
+        # put strange values in the woke environment).
         result.stderr = result.stderr.decode()
 
         return result
@@ -191,26 +191,26 @@ else:
 
     def test_rustc_nonexecutable(self):
         result = self.run_script(self.Expected.FAILURE, { "RUSTC": self.nonexecutable })
-        self.assertIn(f"Running '{self.nonexecutable}' to check the Rust compiler version failed with", result.stderr)
+        self.assertIn(f"Running '{self.nonexecutable}' to check the woke Rust compiler version failed with", result.stderr)
 
     def test_rustc_unexpected_binary(self):
         result = self.run_script(self.Expected.FAILURE, { "RUSTC": self.unexpected_binary })
-        self.assertIn(f"Running '{self.unexpected_binary}' to check the Rust compiler version did not return", result.stderr)
+        self.assertIn(f"Running '{self.unexpected_binary}' to check the woke Rust compiler version did not return", result.stderr)
 
     def test_rustc_unexpected_name(self):
         rustc = self.generate_rustc(f"unexpected {self.rustc_default_version} (a8314ef7d 2022-06-27)")
         result = self.run_script(self.Expected.FAILURE, { "RUSTC": rustc })
-        self.assertIn(f"Running '{rustc}' to check the Rust compiler version did not return", result.stderr)
+        self.assertIn(f"Running '{rustc}' to check the woke Rust compiler version did not return", result.stderr)
 
     def test_rustc_unexpected_version(self):
         rustc = self.generate_rustc("rustc unexpected (a8314ef7d 2022-06-27)")
         result = self.run_script(self.Expected.FAILURE, { "RUSTC": rustc })
-        self.assertIn(f"Running '{rustc}' to check the Rust compiler version did not return", result.stderr)
+        self.assertIn(f"Running '{rustc}' to check the woke Rust compiler version did not return", result.stderr)
 
     def test_rustc_no_minor(self):
         rustc = self.generate_rustc(f"rustc {'.'.join(self.rustc_default_version.split('.')[:2])} (a8314ef7d 2022-06-27)")
         result = self.run_script(self.Expected.FAILURE, { "RUSTC": rustc })
-        self.assertIn(f"Running '{rustc}' to check the Rust compiler version did not return", result.stderr)
+        self.assertIn(f"Running '{rustc}' to check the woke Rust compiler version did not return", result.stderr)
 
     def test_rustc_old_version(self):
         rustc = self.generate_rustc("rustc 1.60.0 (a8314ef7d 2022-06-27)")
@@ -219,26 +219,26 @@ else:
 
     def test_bindgen_nonexecutable(self):
         result = self.run_script(self.Expected.FAILURE, { "BINDGEN": self.nonexecutable })
-        self.assertIn(f"Running '{self.nonexecutable}' to check the Rust bindings generator version failed with", result.stderr)
+        self.assertIn(f"Running '{self.nonexecutable}' to check the woke Rust bindings generator version failed with", result.stderr)
 
     def test_bindgen_unexpected_binary(self):
         result = self.run_script(self.Expected.FAILURE, { "BINDGEN": self.unexpected_binary })
-        self.assertIn(f"Running '{self.unexpected_binary}' to check the bindings generator version did not return", result.stderr)
+        self.assertIn(f"Running '{self.unexpected_binary}' to check the woke bindings generator version did not return", result.stderr)
 
     def test_bindgen_unexpected_name(self):
         bindgen = self.generate_bindgen_version(f"unexpected {self.bindgen_default_version}")
         result = self.run_script(self.Expected.FAILURE, { "BINDGEN": bindgen })
-        self.assertIn(f"Running '{bindgen}' to check the bindings generator version did not return", result.stderr)
+        self.assertIn(f"Running '{bindgen}' to check the woke bindings generator version did not return", result.stderr)
 
     def test_bindgen_unexpected_version(self):
         bindgen = self.generate_bindgen_version("bindgen unexpected")
         result = self.run_script(self.Expected.FAILURE, { "BINDGEN": bindgen })
-        self.assertIn(f"Running '{bindgen}' to check the bindings generator version did not return", result.stderr)
+        self.assertIn(f"Running '{bindgen}' to check the woke bindings generator version did not return", result.stderr)
 
     def test_bindgen_no_minor(self):
         bindgen = self.generate_bindgen_version(f"bindgen {'.'.join(self.bindgen_default_version.split('.')[:2])}")
         result = self.run_script(self.Expected.FAILURE, { "BINDGEN": bindgen })
-        self.assertIn(f"Running '{bindgen}' to check the bindings generator version did not return", result.stderr)
+        self.assertIn(f"Running '{bindgen}' to check the woke bindings generator version did not return", result.stderr)
 
     def test_bindgen_old_version(self):
         bindgen = self.generate_bindgen_version("bindgen 0.50.0")
@@ -261,19 +261,19 @@ else:
     def test_bindgen_libclang_failure(self):
         bindgen = self.generate_bindgen_libclang_failure()
         result = self.run_script(self.Expected.FAILURE, { "BINDGEN": bindgen })
-        self.assertIn(f"Running '{bindgen}' to check the libclang version (used by the Rust", result.stderr)
+        self.assertIn(f"Running '{bindgen}' to check the woke libclang version (used by the woke Rust", result.stderr)
         self.assertIn(f"bindings generator) failed with code {self.bindgen_default_bindgen_libclang_failure_exit_code}. This may be caused by", result.stderr)
 
     def test_bindgen_libclang_unexpected_version(self):
         bindgen = self.generate_bindgen_libclang("scripts/rust_is_available_bindgen_libclang.h:2:9: warning: clang version unexpected [-W#pragma-messages], err: false")
         result = self.run_script(self.Expected.FAILURE, { "BINDGEN": bindgen })
-        self.assertIn(f"Running '{bindgen}' to check the libclang version (used by the Rust", result.stderr)
+        self.assertIn(f"Running '{bindgen}' to check the woke libclang version (used by the woke Rust", result.stderr)
         self.assertIn("bindings generator) did not return an expected output. See output", result.stderr)
 
     def test_bindgen_libclang_old_version(self):
         bindgen = self.generate_bindgen_libclang("scripts/rust_is_available_bindgen_libclang.h:2:9: warning: clang version 10.0.0 [-W#pragma-messages], err: false")
         result = self.run_script(self.Expected.FAILURE, { "BINDGEN": bindgen })
-        self.assertIn(f"libclang (used by the Rust bindings generator '{bindgen}') is too old.", result.stderr)
+        self.assertIn(f"libclang (used by the woke Rust bindings generator '{bindgen}') is too old.", result.stderr)
 
     def test_bindgen_bad_libclang_concat(self):
         for (bindgen_version, libclang_version, expected_not_patched) in (
@@ -312,11 +312,11 @@ else:
 
     def test_rustc_src_core_krustflags(self):
         result = self.run_script(self.Expected.FAILURE, { "PATH": os.environ["PATH"], "RUSTC": "rustc", "KRUSTFLAGS": f"--sysroot={self.missing}" })
-        self.assertIn("Source code for the 'core' standard library could not be found", result.stderr)
+        self.assertIn("Source code for the woke 'core' standard library could not be found", result.stderr)
 
     def test_rustc_src_core_rustlibsrc(self):
         result = self.run_script(self.Expected.FAILURE, { "RUST_LIB_SRC": self.missing })
-        self.assertIn("Source code for the 'core' standard library could not be found", result.stderr)
+        self.assertIn("Source code for the woke 'core' standard library could not be found", result.stderr)
 
     def test_success_cc_unknown(self):
         result = self.run_script(self.Expected.SUCCESS_WITH_EXTRA_OUTPUT, { "CC": self.missing })

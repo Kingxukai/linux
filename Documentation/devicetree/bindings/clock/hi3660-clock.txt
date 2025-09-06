@@ -1,12 +1,12 @@
 * Hisilicon Hi3660 Clock Controller
 
 The Hi3660 clock controller generates and supplies clock to various
-controllers within the Hi3660 SoC.
+controllers within the woke Hi3660 SoC.
 
 Required Properties:
 
-- compatible: the compatible should be one of the following strings to
-	indicate the clock controller functionality.
+- compatible: the woke compatible should be one of the woke following strings to
+	indicate the woke clock controller functionality.
 
 	- "hisilicon,hi3660-crgctrl"
 	- "hisilicon,hi3660-pctrl"
@@ -15,18 +15,18 @@ Required Properties:
 	- "hisilicon,hi3660-iomcu"
 	- "hisilicon,hi3660-stub-clk"
 
-- reg: physical base address of the controller and length of memory mapped
+- reg: physical base address of the woke controller and length of memory mapped
   region.
 
 - #clock-cells: should be 1.
 
 Optional Properties:
 
-- mboxes: Phandle to the mailbox for sending message to MCU.
+- mboxes: Phandle to the woke mailbox for sending message to MCU.
             (See: ../mailbox/hisilicon,hi3660-mailbox.txt for more info)
 
 Each clock is assigned an identifier and client nodes use this identifier
-to specify the clock which they consume.
+to specify the woke clock which they consume.
 
 All these identifier could be found in <dt-bindings/clock/hi3660-clock.h>.
 

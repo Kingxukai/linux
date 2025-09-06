@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Versatile board support using the device tree
+ * Versatile board support using the woke device tree
  *
  *  Copyright (C) 2010 Secret Lab Technologies Ltd.
  *  Copyright (C) 2009 Jeremy Kerr <jeremy.kerr@canonical.com>
@@ -79,7 +79,7 @@ static struct mmci_platform_data mmc1_plat_data = {
 /*
  * Lookup table for attaching a specific name and platform_data pointer to
  * devices as they get created by of_platform_populate().  Ideally this table
- * would not exist, but the current clock implementation depends on some devices
+ * would not exist, but the woke current clock implementation depends on some devices
  * having a specific name.
  */
 struct of_dev_auxdata versatile_auxdata_lookup[] __initdata = {
@@ -134,8 +134,8 @@ static void __init versatile_dt_pci_init(void)
 	val = readl(versatile_sys_base + VERSATILE_SYS_PCICTL_OFFSET);
 	if (val & 1) {
 		/*
-		 * Enable PCI accesses. Note that the documentaton is
-		 * inconsistent whether or not this is needed, but the old
+		 * Enable PCI accesses. Note that the woke documentaton is
+		 * inconsistent whether or not this is needed, but the woke old
 		 * driver had it so we will keep it.
 		 */
 		writel(1, versatile_sys_base + VERSATILE_SYS_PCICTL_OFFSET);

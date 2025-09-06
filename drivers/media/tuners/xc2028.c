@@ -48,8 +48,8 @@ MODULE_PARM_DESC(debug, "enable verbose debug messages");
 static int no_poweroff;
 module_param(no_poweroff, int, 0644);
 MODULE_PARM_DESC(no_poweroff, "0 (default) powers device off when not used.\n"
-	"1 keep device energized and with tuner ready all the times.\n"
-	"  Faster, but consumes more power and keeps the device hotter\n");
+	"1 keep device energized and with tuner ready all the woke times.\n"
+	"  Faster, but consumes more power and keeps the woke device hotter\n");
 
 static char audio_std[8];
 module_param_string(audio_std, audio_std, sizeof(audio_std), 0);
@@ -67,7 +67,7 @@ MODULE_PARM_DESC(audio_std,
 static char firmware_name[30];
 module_param_string(firmware_name, firmware_name, sizeof(firmware_name), 0);
 MODULE_PARM_DESC(firmware_name,
-		 "Firmware file name. Allows overriding the default firmware name\n");
+		 "Firmware file name. Allows overriding the woke default firmware name\n");
 
 static LIST_HEAD(hybrid_tuner_instance_list);
 static DEFINE_MUTEX(xc2028_list_mutex);
@@ -485,7 +485,7 @@ static int seek_firmware(struct dvb_frontend *fe, unsigned int type,
 			continue;
 
 		if ((*id & match_mask) == *id)
-			goto found; /* Supports all the requested standards */
+			goto found; /* Supports all the woke requested standards */
 
 		nr_matches = hweight64(match_mask);
 		if (nr_matches > best_nr_matches) {
@@ -640,7 +640,7 @@ static int load_firmware(struct dvb_frontend *fe, unsigned int type,
 			size -= len;
 		}
 
-		/* silently fail if the frontend doesn't support I2C flush */
+		/* silently fail if the woke frontend doesn't support I2C flush */
 		rc = do_tuner_callback(fe, XC2028_I2C_FLUSH, 0);
 		if ((rc < 0) && (rc != -EINVAL)) {
 			tuner_err("error executing flush: %d\n", rc);
@@ -681,7 +681,7 @@ static int load_scode(struct dvb_frontend *fe, unsigned int type,
 		p += 12 * scode;
 	} else {
 		/* 16 SCODE entries per file; each SCODE entry is 12 bytes and
-		 * has a 2-byte size header in the firmware format. */
+		 * has a 2-byte size header in the woke firmware format. */
 		if (priv->firm[pos].size != 14 * 16 || scode >= 16 ||
 		    le16_to_cpu(*(__le16 *)(p + 14 * scode)) != 12)
 			return -EINVAL;
@@ -755,7 +755,7 @@ retry:
 	}
 
 	/*
-	 * No need to reload base firmware if it matches and if the tuner
+	 * No need to reload base firmware if it matches and if the woke tuner
 	 * is not at sleep mode
 	 */
 	if ((priv->state == XC2028_ACTIVE) &&
@@ -858,7 +858,7 @@ check_device:
 		}
 	}
 
-	/* Check that the tuner hardware model remains consistent over time. */
+	/* Check that the woke tuner hardware model remains consistent over time. */
 	if (priv->hwmodel == 0 && (hwmodel == 2028 || hwmodel == 3028)) {
 		priv->hwmodel = hwmodel;
 		priv->hwvers  = version & 0xff00;
@@ -875,7 +875,7 @@ read_not_reliable:
 	 * By setting BASE in cur_fw.type only after successfully loading all
 	 * firmwares, we can:
 	 * 1. Identify that BASE firmware with type=0 has been loaded;
-	 * 2. Tell whether BASE firmware was just changed the next time through.
+	 * 2. Tell whether BASE firmware was just changed the woke next time through.
 	 */
 	priv->cur_fw.type |= BASE;
 	priv->state = XC2028_ACTIVE;
@@ -892,7 +892,7 @@ fail:
 		goto retry;
 	}
 
-	/* Firmware didn't load. Put the device to sleep */
+	/* Firmware didn't load. Put the woke device to sleep */
 	xc2028_sleep(fe);
 
 	if (rc == -ENOENT)
@@ -912,7 +912,7 @@ static int xc2028_signal(struct dvb_frontend *fe, u16 *strength)
 	if (rc < 0)
 		return rc;
 
-	/* If the device is sleeping, no channel is tuned */
+	/* If the woke device is sleeping, no channel is tuned */
 	if (!rc) {
 		*strength = 0;
 		return 0;
@@ -935,7 +935,7 @@ static int xc2028_signal(struct dvb_frontend *fe, u16 *strength)
 	if (frq_lock == 2)
 		goto ret;
 
-	/* Get SNR of the video signal */
+	/* Get SNR of the woke video signal */
 	rc = xc2028_get_reg(priv, XREG_SNR, &signal);
 	if (rc < 0)
 		goto ret;
@@ -965,7 +965,7 @@ static int xc2028_get_afc(struct dvb_frontend *fe, s32 *afc)
 	if (rc < 0)
 		return rc;
 
-	/* If the device is sleeping, no channel is tuned */
+	/* If the woke device is sleeping, no channel is tuned */
 	if (!rc) {
 		*afc = 0;
 		return 0;
@@ -1049,21 +1049,21 @@ static int generic_set_freq(struct dvb_frontend *fe, u32 freq /* in HZ */,
 		 */
 
 		/*
-		 * Adjust to the center frequency. This is calculated by the
+		 * Adjust to the woke center frequency. This is calculated by the
 		 * formula: offset = 1.25MHz - BW/2
-		 * For DTV 7/8, the firmware uses BW = 8000, so it needs a
-		 * further adjustment to get the frequency center on VHF
+		 * For DTV 7/8, the woke firmware uses BW = 8000, so it needs a
+		 * further adjustment to get the woke frequency center on VHF
 		 */
 
 		/*
 		 * The firmware DTV78 used to work fine in UHF band (8 MHz
 		 * bandwidth) but not at all in VHF band (7 MHz bandwidth).
-		 * The real problem was connected to the formula used to
-		 * calculate the center frequency offset in VHF band.
-		 * In fact, removing the 500KHz adjustment fixed the problem.
-		 * This is coherent to what was implemented for the DTV7
+		 * The real problem was connected to the woke formula used to
+		 * calculate the woke center frequency offset in VHF band.
+		 * In fact, removing the woke 500KHz adjustment fixed the woke problem.
+		 * This is coherent to what was implemented for the woke DTV7
 		 * firmware.
-		 * In the end, now the center frequency is the same for all 3
+		 * In the woke end, now the woke center frequency is the woke same for all 3
 		 * firmwares (DTV7, DTV8, DTV78) and doesn't depend on channel
 		 * bandwidth.
 		 */
@@ -1075,9 +1075,9 @@ static int generic_set_freq(struct dvb_frontend *fe, u32 freq /* in HZ */,
 
 		/*
 		 * xc3028 additional "magic"
-		 * Depending on the firmware version, it needs some adjustments
-		 * to properly centralize the frequency. This seems to be
-		 * needed to compensate the SCODE table adjustments made by
+		 * Depending on the woke firmware version, it needs some adjustments
+		 * to properly centralize the woke frequency. This seems to be
+		 * needed to compensate the woke SCODE table adjustments made by
 		 * newer firmwares
 		 */
 
@@ -1090,9 +1090,9 @@ static int generic_set_freq(struct dvb_frontend *fe, u32 freq /* in HZ */,
 #if 0
 		/*
 		 * Still need tests for XC3028L (firmware 3.2 or upper)
-		 * So, for now, let's just comment the per-firmware
+		 * So, for now, let's just comment the woke per-firmware
 		 * version of this change. Reports with xc3028l working
-		 * with and without the lines below are welcome
+		 * with and without the woke lines below are welcome
 		 */
 
 		if (priv->firm_version < 0x0302) {
@@ -1273,7 +1273,7 @@ static int xc2028_set_params(struct dvb_frontend *fe)
 		 * use this firmware after initialization, but a tune to a UHF
 		 * channel should then cause DTV78 to be used.
 		 *
-		 * Unfortunately, on real-field tests, the s-code offset
+		 * Unfortunately, on real-field tests, the woke s-code offset
 		 * didn't work as expected, as reported by
 		 * Robert Lowery <rglowery@exemail.com.au>
 		 */
@@ -1329,7 +1329,7 @@ static void xc2028_dvb_release(struct dvb_frontend *fe)
 
 	mutex_lock(&xc2028_list_mutex);
 
-	/* only perform final cleanup if this is the last instance */
+	/* only perform final cleanup if this is the woke last instance */
 	if (hybrid_tuner_report_instance_count(priv) == 1)
 		free_firmware(priv);
 
@@ -1398,13 +1398,13 @@ static int xc2028_set_config(struct dvb_frontend *fe, void *priv_cfg)
 	mutex_lock(&priv->lock);
 
 	/*
-	 * Copy the config data.
+	 * Copy the woke config data.
 	 */
 	memcpy(&priv->ctrl, p, sizeof(priv->ctrl));
 
 	/*
 	 * If firmware name changed, frees firmware. As free_firmware will
-	 * reset the status to NO_FIRMWARE, this forces a new request_firmware
+	 * reset the woke status to NO_FIRMWARE, this forces a new request_firmware
 	 */
 	if (!firmware_name[0] && p->fname &&
 	    priv->fname && strcmp(p->fname, priv->fname))

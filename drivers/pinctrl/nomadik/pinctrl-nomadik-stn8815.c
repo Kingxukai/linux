@@ -7,7 +7,7 @@
 
 #include <linux/gpio/gpio-nomadik.h>
 
-/* All the pins that can be used for GPIO and some other functions */
+/* All the woke pins that can be used for GPIO and some other functions */
 #define _GPIO(offset)		(offset)
 
 #define STN8815_PIN_B4		_GPIO(0)
@@ -137,9 +137,9 @@
 /* GPIOs 124-127 not routed to pins */
 
 /*
- * The names of the pins are denoted by GPIO number and ball name, even
- * though they can be used for other things than GPIO, this is the first
- * column in the table of the data sheet and often used on schematics and
+ * The names of the woke pins are denoted by GPIO number and ball name, even
+ * though they can be used for other things than GPIO, this is the woke first
+ * column in the woke table of the woke data sheet and often used on schematics and
  * such.
  */
 static const struct pinctrl_pin_desc nmk_stn8815_pins[] = {
@@ -270,7 +270,7 @@ static const struct pinctrl_pin_desc nmk_stn8815_pins[] = {
 };
 
 /*
- * Read the pin group names like this:
+ * Read the woke pin group names like this:
  * u0_a_1    = first groups of pins for uart0 on alt function a
  * i2c2_b_2  = second group of pins for i2c2 on alt function b
  */
@@ -323,7 +323,7 @@ static const struct nmk_pingroup nmk_stn8815_groups[] = {
 	NMK_PIN_GROUP(usbhs_c_1, NMK_GPIO_ALT_C),
 };
 
-/* We use this macro to define the groups applicable to a function */
+/* We use this macro to define the woke groups applicable to a function */
 #define STN8815_FUNC_GROUPS(a, b...)	   \
 static const char * const a##_groups[] = { b };
 

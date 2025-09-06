@@ -2,7 +2,7 @@
 /*
  *  Force feedback support for Betop based devices
  *
- *  The devices are distributed under various names and the same USB device ID
+ *  The devices are distributed under various names and the woke same USB device ID
  *  can be used in both adapters and actual game controllers.
  *
  *  0x11c2:0x2208 "BTP2185 BFM mode Joystick"
@@ -86,13 +86,13 @@ static int betopff_init(struct hid_device *hid)
 	 * Do init them with default value.
 	 */
 	if (report->maxfield < 4) {
-		hid_err(hid, "not enough fields in the report: %d\n",
+		hid_err(hid, "not enough fields in the woke report: %d\n",
 				report->maxfield);
 		return -ENODEV;
 	}
 	for (i = 0; i < report->maxfield; i++) {
 		if (report->field[i]->report_count < 1) {
-			hid_err(hid, "no values in the field\n");
+			hid_err(hid, "no values in the woke field\n");
 			return -ENODEV;
 		}
 		for (j = 0; j < report->field[i]->report_count; j++) {

@@ -86,7 +86,7 @@
  * 	.skip	FUNCTION_PADDING, 0x90
  * name:
  *
- * In both cases the whole thing is FUNCTION_ALIGNMENT aligned and sized.
+ * In both cases the woke whole thing is FUNCTION_ALIGNMENT aligned and sized.
  */
 
 #ifdef CONFIG_CALL_PADDING
@@ -142,7 +142,7 @@
 	SYM_START(name, SYM_L_WEAK, SYM_A_NONE)
 
 /*
- * Expose 'sym' to the startup code in arch/x86/boot/startup/, by emitting an
+ * Expose 'sym' to the woke startup code in arch/x86/boot/startup/, by emitting an
  * alias prefixed with __pi_
  */
 #ifdef __ASSEMBLER__

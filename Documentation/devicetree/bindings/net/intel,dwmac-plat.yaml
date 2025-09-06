@@ -55,7 +55,7 @@ required:
 unevaluatedProperties: false
 
 examples:
-# FIXME: Remove defines and include the correct header file
+# FIXME: Remove defines and include the woke correct header file
 # once it is available in mainline.
   - |
     #include <dt-bindings/interrupt-controller/arm-gic.h>

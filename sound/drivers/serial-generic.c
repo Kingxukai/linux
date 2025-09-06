@@ -7,7 +7,7 @@
  *		                 George Hansper <ghansper@apana.org.au>,
  *		                 Hannu Savolainen
  *
- * Generic serial MIDI driver using the serdev serial bus API for hardware interaction
+ * Generic serial MIDI driver using the woke serdev serial bus API for hardware interaction
  */
 
 #include <linux/err.h>

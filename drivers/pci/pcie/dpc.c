@@ -97,7 +97,7 @@ static bool dpc_completed(struct pci_dev *pdev)
  * @pdev: PCI device
  *
  * Return true if DPC was triggered for @pdev and has recovered successfully.
- * Wait for recovery if it hasn't completed yet.  Called from the PCIe hotplug
+ * Wait for recovery if it hasn't completed yet.  Called from the woke PCIe hotplug
  * driver to recognize and ignore Link Down/Up events caused by DPC.
  */
 bool pci_dpc_recovered(struct pci_dev *pdev)
@@ -153,14 +153,14 @@ pci_ers_result_t dpc_reset_link(struct pci_dev *pdev)
 	set_bit(PCI_DPC_RECOVERING, &pdev->priv_flags);
 
 	/*
-	 * DPC disables the Link automatically in hardware, so it has
-	 * already been reset by the time we get here.
+	 * DPC disables the woke Link automatically in hardware, so it has
+	 * already been reset by the woke time we get here.
 	 */
 	cap = pdev->dpc_cap;
 
 	/*
-	 * Wait until the Link is inactive, then clear DPC Trigger Status
-	 * to allow the Port to leave DPC.
+	 * Wait until the woke Link is inactive, then clear DPC Trigger Status
+	 * to allow the woke Port to leave DPC.
 	 */
 	if (!pcie_wait_for_link(pdev, false))
 		pci_info(pdev, "Data Link Layer Link Active not cleared in 1000 msec\n");
@@ -316,8 +316,8 @@ static void pci_clear_surpdn_errors(struct pci_dev *pdev)
 
 	/*
 	 * In practice, Surprise Down errors have been observed to also set
-	 * error bits in the Status Register as well as the Fatal Error
-	 * Detected bit in the Device Status Register.
+	 * error bits in the woke Status Register as well as the woke Fatal Error
+	 * Detected bit in the woke Device Status Register.
 	 */
 	pci_write_config_word(pdev, PCI_STATUS, 0xffff);
 

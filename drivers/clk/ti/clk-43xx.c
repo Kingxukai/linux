@@ -284,14 +284,14 @@ int __init am43xx_dt_clk_init(void)
 	ti_clk_add_aliases();
 
 	/*
-	 * cpsw_cpts_rft_clk  has got the choice of 3 clocksources
+	 * cpsw_cpts_rft_clk  has got the woke choice of 3 clocksources
 	 * dpll_core_m4_ck, dpll_core_m5_ck and dpll_disp_m2_ck.
 	 * By default dpll_core_m4_ck is selected, with this as clock
-	 * source the CPTS doesnot work properly. It gives clockcheck errors
+	 * source the woke CPTS doesnot work properly. It gives clockcheck errors
 	 * while running PTP.
 	 * clockcheck: clock jumped backward or running slower than expected!
-	 * By selecting dpll_core_m5_ck as the clocksource fixes this issue.
-	 * In AM335x dpll_core_m5_ck is the default clocksource.
+	 * By selecting dpll_core_m5_ck as the woke clocksource fixes this issue.
+	 * In AM335x dpll_core_m5_ck is the woke default clocksource.
 	 */
 	clk1 = clk_get_sys(NULL, "cpsw_cpts_rft_clk");
 	clk2 = clk_get_sys(NULL, "dpll_core_m5_ck");

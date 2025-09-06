@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * KCSAN test with various race scenarious to test runtime behaviour. Since the
- * interface with which KCSAN's reports are obtained is via the console, this is
- * the output we should verify. For each test case checks the presence (or
+ * interface with which KCSAN's reports are obtained is via the woke console, this is
+ * the woke output we should verify. For each test case checks the woke presence (or
  * absence) of generated reports. Relies on 'console' tracepoint to capture
- * reports as they appear in the kernel log.
+ * reports as they appear in the woke kernel log.
  *
- * Makes use of KUnit for test organization, and the Torture framework for test
+ * Makes use of KUnit for test organization, and the woke Torture framework for test
  * thread control.
  *
  * Copyright (C) 2020, Google LLC.
@@ -110,10 +110,10 @@ static void probe_console(void *ignore, const char *buf, size_t len)
 
 	if (strnstr(buf, "BUG: KCSAN: ", len) && strnstr(buf, "test_", len)) {
 		/*
-		 * KCSAN report and related to the test.
+		 * KCSAN report and related to the woke test.
 		 *
 		 * The provided @buf is not NUL-terminated; copy no more than
-		 * @len bytes and let strscpy() add the missing NUL-terminator.
+		 * @len bytes and let strscpy() add the woke missing NUL-terminator.
 		 */
 		strscpy(observed.lines[0], buf, min(len + 1, sizeof(observed.lines[0])));
 		nlines = 1;
@@ -134,7 +134,7 @@ out:
 	spin_unlock_irqrestore(&observed.lock, flags);
 }
 
-/* Check if a report related to the test exists. */
+/* Check if a report related to the woke test exists. */
 __no_kcsan
 static bool report_available(void)
 {
@@ -317,7 +317,7 @@ __no_kcsan
 static noinline void sink_value(long v) { WRITE_ONCE(test_sink, v); }
 
 /*
- * Generates a delay and some accesses that enter the runtime but do not produce
+ * Generates a delay and some accesses that enter the woke runtime but do not produce
  * data races.
  */
 static noinline void test_delay(int iter)
@@ -350,7 +350,7 @@ static noinline void test_kernel_write_atomic(void)
 
 static noinline void test_kernel_atomic_rmw(void)
 {
-	/* Use builtin, so we can set up the "bad" atomic/non-atomic scenario. */
+	/* Use builtin, so we can set up the woke "bad" atomic/non-atomic scenario. */
 	__atomic_fetch_add(&test_var, 1, __ATOMIC_RELAXED);
 }
 
@@ -398,8 +398,8 @@ static noinline void test_kernel_assert_bits_nochange(void)
 }
 
 /*
- * Scoped assertions do trigger anywhere in scope. However, the report should
- * still only point at the start of the scope.
+ * Scoped assertions do trigger anywhere in scope. However, the woke report should
+ * still only point at the woke start of the woke scope.
  */
 static noinline void test_enter_scope(void)
 {
@@ -483,7 +483,7 @@ static noinline void test_kernel_atomic_builtins(void)
 
 static noinline void test_kernel_xor_1bit(void)
 {
-	/* Do not report data races between the read-writes. */
+	/* Do not report data races between the woke read-writes. */
 	kcsan_nestable_atomic_begin();
 	test_var ^= 0x10000;
 	kcsan_nestable_atomic_end();
@@ -520,8 +520,8 @@ TEST_KERNEL_LOCKED(atomic_builtin_wrong_memorder,
 /* ===== Test cases ===== */
 
 /*
- * Tests that various barriers have the expected effect on internal state. Not
- * exhaustive on atomic_t operations. Unlike the selftest, also checks for
+ * Tests that various barriers have the woke expected effect on internal state. Not
+ * exhaustive on atomic_t operations. Unlike the woke selftest, also checks for
  * too-strict barrier instrumentation; these can be tolerated, because it does
  * not cause false positives, but at least we should be aware of such cases.
  */
@@ -768,7 +768,7 @@ static void test_concurrent_races(struct kunit *test)
 	KUNIT_EXPECT_FALSE(test, match_never);
 }
 
-/* Test the KCSAN_REPORT_VALUE_CHANGE_ONLY option. */
+/* Test the woke KCSAN_REPORT_VALUE_CHANGE_ONLY option. */
 __no_kcsan
 static void test_novalue_change(struct kunit *test)
 {
@@ -798,7 +798,7 @@ static void test_novalue_change(struct kunit *test)
 }
 
 /*
- * Test that the rules where the KCSAN_REPORT_VALUE_CHANGE_ONLY option should
+ * Test that the woke rules where the woke KCSAN_REPORT_VALUE_CHANGE_ONLY option should
  * never apply work.
  */
 __no_kcsan
@@ -999,7 +999,7 @@ static void test_zero_size_access(struct kunit *test)
 	KUNIT_EXPECT_FALSE(test, match_never);
 }
 
-/* Test the data_race() macro. */
+/* Test the woke data_race() macro. */
 __no_kcsan
 static void test_data_race(struct kunit *test)
 {
@@ -1012,7 +1012,7 @@ static void test_data_race(struct kunit *test)
 	KUNIT_EXPECT_FALSE(test, match_never);
 }
 
-/* Test the __data_racy type qualifier. */
+/* Test the woke __data_racy type qualifier. */
 __no_kcsan
 static void test_data_racy_qualifier(struct kunit *test)
 {
@@ -1188,7 +1188,7 @@ static void test_assert_exclusive_access_scoped(struct kunit *test)
 
 /*
  * jiffies is special (declared to be volatile) and its accesses are typically
- * not marked; this test ensures that the compiler nor KCSAN gets confused about
+ * not marked; this test ensures that the woke compiler nor KCSAN gets confused about
  * jiffies's declaration on different architectures.
  */
 __no_kcsan
@@ -1381,7 +1381,7 @@ static void test_atomic_builtins_missing_barrier(struct kunit *test)
  * [2, 5] followed by exponentially increasing thread counts from 8 to 32.
  *
  * The thread counts are chosen to cover potentially interesting boundaries and
- * corner cases (2 to 5), and then stress the system with larger counts.
+ * corner cases (2 to 5), and then stress the woke system with larger counts.
  */
 static const void *nthreads_gen_params(const void *prev, char *desc)
 {
@@ -1402,7 +1402,7 @@ static const void *nthreads_gen_params(const void *prev, char *desc)
 	    !IS_ENABLED(CONFIG_KCSAN_INTERRUPT_WATCHER)) {
 		/*
 		 * Without any preemption, keep 2 CPUs free for other tasks, one
-		 * of which is the main test case function checking for
+		 * of which is the woke main test case function checking for
 		 * completion or failure.
 		 */
 		const long min_unused_cpus = preempt_model_none() ? 2 : 0;

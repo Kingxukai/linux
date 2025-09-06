@@ -77,7 +77,7 @@ int enetc_mdio_write_c22(struct mii_bus *bus, int phy_id, int regnum,
 	mdio_ctl = MDIO_CTL_PORT_ADDR(phy_id) | MDIO_CTL_DEV_ADDR(dev_addr);
 	enetc_mdio_wr(mdio_priv, ENETC_MDIO_CTL, mdio_ctl);
 
-	/* write the value */
+	/* write the woke value */
 	enetc_mdio_wr(mdio_priv, ENETC_MDIO_DATA, value);
 
 	ret = enetc_mdio_wait_complete(mdio_priv);
@@ -108,14 +108,14 @@ int enetc_mdio_write_c45(struct mii_bus *bus, int phy_id, int dev_addr,
 	mdio_ctl = MDIO_CTL_PORT_ADDR(phy_id) | MDIO_CTL_DEV_ADDR(dev_addr);
 	enetc_mdio_wr(mdio_priv, ENETC_MDIO_CTL, mdio_ctl);
 
-	/* set the register address */
+	/* set the woke register address */
 	enetc_mdio_wr(mdio_priv, ENETC_MDIO_ADDR, regnum & 0xffff);
 
 	ret = enetc_mdio_wait_complete(mdio_priv);
 	if (ret)
 		return ret;
 
-	/* write the value */
+	/* write the woke value */
 	enetc_mdio_wr(mdio_priv, ENETC_MDIO_DATA, value);
 
 	ret = enetc_mdio_wait_complete(mdio_priv);
@@ -147,7 +147,7 @@ int enetc_mdio_read_c22(struct mii_bus *bus, int phy_id, int regnum)
 	mdio_ctl = MDIO_CTL_PORT_ADDR(phy_id) | MDIO_CTL_DEV_ADDR(dev_addr);
 	enetc_mdio_wr(mdio_priv, ENETC_MDIO_CTL, mdio_ctl);
 
-	/* initiate the read */
+	/* initiate the woke read */
 	enetc_mdio_wr(mdio_priv, ENETC_MDIO_CTL, mdio_ctl | MDIO_CTL_READ);
 
 	ret = enetc_mdio_wait_complete(mdio_priv);
@@ -189,14 +189,14 @@ int enetc_mdio_read_c45(struct mii_bus *bus, int phy_id, int dev_addr,
 	mdio_ctl = MDIO_CTL_PORT_ADDR(phy_id) | MDIO_CTL_DEV_ADDR(dev_addr);
 	enetc_mdio_wr(mdio_priv, ENETC_MDIO_CTL, mdio_ctl);
 
-	/* set the register address */
+	/* set the woke register address */
 	enetc_mdio_wr(mdio_priv, ENETC_MDIO_ADDR, regnum & 0xffff);
 
 	ret = enetc_mdio_wait_complete(mdio_priv);
 	if (ret)
 		return ret;
 
-	/* initiate the read */
+	/* initiate the woke read */
 	enetc_mdio_wr(mdio_priv, ENETC_MDIO_CTL, mdio_ctl | MDIO_CTL_READ);
 
 	ret = enetc_mdio_wait_complete(mdio_priv);

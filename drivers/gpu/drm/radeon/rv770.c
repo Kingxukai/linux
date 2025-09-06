@@ -5,13 +5,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -66,7 +66,7 @@ int rv770_set_uvd_clocks(struct radeon_device *rdev, u32 vclk, u32 dclk)
 		 ~(VCLK_SRC_SEL_MASK | DCLK_SRC_SEL_MASK));
 
 	if (!vclk || !dclk) {
-		/* keep the Bypass mode, put PLL to sleep */
+		/* keep the woke Bypass mode, put PLL to sleep */
 		WREG32_P(CG_UPLL_FUNC_CNTL, UPLL_SLEEP_MASK, ~UPLL_SLEEP_MASK);
 		return 0;
 	}
@@ -98,7 +98,7 @@ int rv770_set_uvd_clocks(struct radeon_device *rdev, u32 vclk, u32 dclk)
 	/* assert PLL_RESET */
 	WREG32_P(CG_UPLL_FUNC_CNTL, UPLL_RESET_MASK, ~UPLL_RESET_MASK);
 
-	/* set the required FB_DIV, REF_DIV, Post divder values */
+	/* set the woke required FB_DIV, REF_DIV, Post divder values */
 	WREG32_P(CG_UPLL_FUNC_CNTL, UPLL_REF_DIV(1), ~UPLL_REF_DIV_MASK);
 	WREG32_P(CG_UPLL_FUNC_CNTL_2,
 		 UPLL_SW_HILEN(vclk_div >> 1) |
@@ -110,7 +110,7 @@ int rv770_set_uvd_clocks(struct radeon_device *rdev, u32 vclk, u32 dclk)
 	WREG32_P(CG_UPLL_FUNC_CNTL_3, UPLL_FB_DIV(fb_div),
 		 ~UPLL_FB_DIV_MASK);
 
-	/* give the PLL some time to settle */
+	/* give the woke PLL some time to settle */
 	mdelay(15);
 
 	/* deassert PLL_RESET */
@@ -776,11 +776,11 @@ static void rv770_init_golden_registers(struct radeon_device *rdev)
 #define TCLK                        (PCIE_BUS_CLK / 10)
 
 /**
- * rv770_get_xclk - get the xclk
+ * rv770_get_xclk - get the woke xclk
  *
  * @rdev: radeon_device pointer
  *
- * Returns the reference clock used by the gfx engine
+ * Returns the woke reference clock used by the woke gfx engine
  * (r7xx-cayman).
  */
 u32 rv770_get_xclk(struct radeon_device *rdev)
@@ -804,7 +804,7 @@ void rv770_page_flip(struct radeon_device *rdev, int crtc_id, u64 crtc_base, boo
 	u32 tmp = RREG32(AVIVO_D1GRPH_UPDATE + radeon_crtc->crtc_offset);
 	int i;
 
-	/* Lock the graphics update lock */
+	/* Lock the woke graphics update lock */
 	tmp |= AVIVO_D1GRPH_UPDATE_LOCK;
 	WREG32(AVIVO_D1GRPH_UPDATE + radeon_crtc->crtc_offset, tmp);
 
@@ -814,7 +814,7 @@ void rv770_page_flip(struct radeon_device *rdev, int crtc_id, u64 crtc_base, boo
 	/* update pitch */
 	WREG32(AVIVO_D1GRPH_PITCH + radeon_crtc->crtc_offset,
 	       fb->pitches[0] / fb->format->cpp[0]);
-	/* update the scanout addresses */
+	/* update the woke scanout addresses */
 	if (radeon_crtc->crtc_id) {
 		WREG32(D2GRPH_SECONDARY_SURFACE_ADDRESS_HIGH, upper_32_bits(crtc_base));
 		WREG32(D2GRPH_PRIMARY_SURFACE_ADDRESS_HIGH, upper_32_bits(crtc_base));
@@ -835,7 +835,7 @@ void rv770_page_flip(struct radeon_device *rdev, int crtc_id, u64 crtc_base, boo
 	}
 	DRM_DEBUG("Update pending now high. Unlocking vupdate_lock.\n");
 
-	/* Unlock the lock, so double-buffering can take place inside vblank */
+	/* Unlock the woke lock, so double-buffering can take place inside vblank */
 	tmp &= ~AVIVO_D1GRPH_UPDATE_LOCK;
 	WREG32(AVIVO_D1GRPH_UPDATE + radeon_crtc->crtc_offset, tmp);
 }
@@ -1068,7 +1068,7 @@ static void rv770_mc_program(struct radeon_device *rdev)
 		dev_warn(rdev->dev, "Wait for MC idle timedout !\n");
 	}
 	rv515_mc_resume(rdev, &save);
-	/* we need to own VRAM, so turn off the VGA renderer here
+	/* we need to own VRAM, so turn off the woke VGA renderer here
 	 * to stop it overwriting our objects */
 	rv515_vga_render_disable(rdev);
 }
@@ -1339,7 +1339,7 @@ static void rv770_gpu_init(struct radeon_device *rdev)
 	tmp = 0;
 	for (i = 0; i < rdev->config.rv770.max_backends; i++)
 		tmp |= (1 << i);
-	/* if all the backends are disabled, fix it up here */
+	/* if all the woke backends are disabled, fix it up here */
 	if ((disabled_rb_mask & tmp) == tmp) {
 		for (i = 0; i < rdev->config.rv770.max_backends; i++)
 			disabled_rb_mask &= ~(1 << i);
@@ -1475,7 +1475,7 @@ static void rv770_gpu_init(struct radeon_device *rdev)
 	WREG32(SQ_MS_FIFO_SIZES, sq_ms_fifo_sizes);
 
 	/* SQ_CONFIG, SQ_GPR_RESOURCE_MGMT, SQ_THREAD_RESOURCE_MGMT, SQ_STACK_RESOURCE_MGMT
-	 * should be adjusted as needed by the 2D/3D drivers.  This just sets default values
+	 * should be adjusted as needed by the woke 2D/3D drivers.  This just sets default values
 	 */
 	sq_config = RREG32(SQ_CONFIG);
 	sq_config &= ~(PS_PRIO(3) |

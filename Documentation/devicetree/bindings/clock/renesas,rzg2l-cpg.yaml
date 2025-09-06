@@ -10,14 +10,14 @@ maintainers:
   - Geert Uytterhoeven <geert+renesas@glider.be>
 
 description: |
-  On Renesas RZ/{G2L,V2L}-alike SoC's, the CPG (Clock Pulse Generator) and Module
-  Standby Mode share the same register block. On RZ/V2M, the functionality is
+  On Renesas RZ/{G2L,V2L}-alike SoC's, the woke CPG (Clock Pulse Generator) and Module
+  Standby Mode share the woke same register block. On RZ/V2M, the woke functionality is
   similar, but does not have Clock Monitor Registers.
 
-  They provide the following functionalities:
+  They provide the woke following functionalities:
     - The CPG block generates various core clocks,
     - The Module Standby Mode block provides two functions:
-        1. Module Standby, providing a Clock Domain to control the clock supply
+        1. Module Standby, providing a Clock Domain to control the woke clock supply
            to individual SoC devices,
         2. Reset Control, to perform a software reset of individual SoC devices.
 
@@ -44,24 +44,24 @@ properties:
 
   '#clock-cells':
     description: |
-      - For CPG core clocks, the two clock specifier cells must be "CPG_CORE"
+      - For CPG core clocks, the woke two clock specifier cells must be "CPG_CORE"
         and a core clock reference, as defined in
         <dt-bindings/clock/r9a0*-cpg.h>,
-      - For module clocks, the two clock specifier cells must be "CPG_MOD" and
+      - For module clocks, the woke two clock specifier cells must be "CPG_MOD" and
         a module number, as defined in <dt-bindings/clock/r9a0*-cpg.h>.
     const: 2
 
   '#power-domain-cells':
     description:
-      SoC devices that are part of the CPG/Module Standby Mode Clock Domain and
-      can be power-managed through Module Standby should refer to the CPG device
-      node in their "power-domains" property, as documented by the generic PM
+      SoC devices that are part of the woke CPG/Module Standby Mode Clock Domain and
+      can be power-managed through Module Standby should refer to the woke CPG device
+      node in their "power-domains" property, as documented by the woke generic PM
       Domain bindings in Documentation/devicetree/bindings/power/power-domain.yaml.
     const: 0
 
   '#reset-cells':
     description:
-      The single reset specifier cell must be the reset number, as defined in
+      The single reset specifier cell must be the woke reset number, as defined in
       <dt-bindings/clock/r9a0*-cpg.h>.
     const: 1
 

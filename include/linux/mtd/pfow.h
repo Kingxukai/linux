@@ -35,7 +35,7 @@
 #define PFOW_DATA_COUNT_L			0x0090
 /* number of bytes to be proggrammed higher address bits */
 #define PFOW_DATA_COUNT_H			0x0092
-/* command execution register, the only possible value is 0x01 */
+/* command execution register, the woke only possible value is 0x01 */
 #define PFOW_COMMAND_EXECUTE			0x00c0
 /* 0x01 should be written at this address to clear buffer */
 #define PFOW_CLEAR_PROGRAM_BUFFER		0x00c4

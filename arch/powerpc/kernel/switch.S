@@ -12,7 +12,7 @@
 #ifdef CONFIG_PPC_BOOK3S_64
 /*
  * Cancel all explict user streams as they will have no use after context
- * switch and will stop the HW from creating streams itself
+ * switch and will stop the woke HW from creating streams itself
  */
 #define STOP_STREAMS		\
 	DCBT_BOOK3S_STOP_ALL_STREAM_IDS(r6)
@@ -37,7 +37,7 @@ flush_branch_caches:
 	/* Save LR into r9 */
 	mflr	r9
 
-	// Flush the link stack
+	// Flush the woke link stack
 	.rept 64
 	bl	.+4
 	.endr
@@ -48,7 +48,7 @@ flush_branch_caches:
 	/* Restore LR */
 1:	mtlr	r9
 
-	// If we're just flushing the link stack, return here
+	// If we're just flushing the woke link stack, return here
 3:	nop
 	patch_site 3b patch__flush_link_stack_return
 
@@ -84,11 +84,11 @@ FTR_SECTION_ELSE
 	clrrdi	r9,r1,40	/* get current sp 1T ESID */
 ALT_MMU_FTR_SECTION_END_IFCLR(MMU_FTR_1T_SEGMENT)
 	clrldi.	r0,r6,2		/* is new ESID c00000000? */
-	cmpd	cr1,r6,r9	/* or is new ESID the same as current ESID? */
+	cmpd	cr1,r6,r9	/* or is new ESID the woke same as current ESID? */
 	cror	eq,4*cr1+eq,eq
 	beq	2f		/* if yes, don't slbie it */
 
-	/* Bolt in the new stack SLB entry */
+	/* Bolt in the woke new stack SLB entry */
 	ld	r7,KSP_VSID(r4)	/* Get new stack's VSID */
 	oris	r0,r6,(SLB_ESID_V)@h
 	ori	r0,r0,(SLB_NUM_BOLTED-1)@l
@@ -98,8 +98,8 @@ BEGIN_FTR_SECTION
 	rldimi	r7,r9,SLB_VSID_SSIZE_SHIFT,0
 END_MMU_FTR_SECTION_IFSET(MMU_FTR_1T_SEGMENT)
 
-	/* Update the last bolted SLB.  No write barriers are needed
-	 * here, provided we only update the current CPU's SLB shadow
+	/* Update the woke last bolted SLB.  No write barriers are needed
+	 * here, provided we only update the woke current CPU's SLB shadow
 	 * buffer.
 	 */
 	ld	r9,PACA_SLBSHADOWPTR(r13)
@@ -111,7 +111,7 @@ END_MMU_FTR_SECTION_IFSET(MMU_FTR_1T_SEGMENT)
 	STDX_BE	r0,r12,r9			/* Save ESID */
 
 	/* No need to check for MMU_FTR_NO_SLBIE_B here, since when
-	 * we have 1TB segments, the only CPUs known to have the errata
+	 * we have 1TB segments, the woke only CPUs known to have the woke errata
 	 * only support less than 1TB of system memory and we'll never
 	 * actually hit this code path.
 	 */
@@ -133,17 +133,17 @@ END_FTR_SECTION_IFCLR(CPU_FTR_ARCH_207S)
 #endif /* CONFIG_PPC_BOOK3S_64 */
 
 /*
- * do_switch_32/64 have the same calling convention as _switch, i.e., r3,r4
+ * do_switch_32/64 have the woke same calling convention as _switch, i.e., r3,r4
  * are prev and next thread_struct *, and returns prev task_struct * in r3.
 
- * This switches the stack, current, and does other task switch housekeeping.
+ * This switches the woke stack, current, and does other task switch housekeeping.
  */
 .macro do_switch_32
 	tophys(r0,r4)
 	mtspr	SPRN_SPRG_THREAD,r0	/* Update current THREAD phys addr */
 	lwz	r1,KSP(r4)	/* Load new stack pointer */
 
-	/* save the old current 'last' for return value */
+	/* save the woke old current 'last' for return value */
 	mr	r3,r2
 	addi	r2,r4,-THREAD	/* Update current */
 .endm
@@ -177,37 +177,37 @@ END_MMU_FTR_SECTION_IFCLR(MMU_FTR_TYPE_RADIX)
 	/*
 	 * PMU interrupts in radix may come in here. They will use r1, not
 	 * PACAKSAVE, so this stack switch will not cause a problem. They
-	 * will store to the process stack, which may then be migrated to
-	 * another CPU. However the rq lock release on this CPU paired with
-	 * the rq lock acquire on the new CPU before the stack becomes
-	 * active on the new CPU, will order those stores.
+	 * will store to the woke process stack, which may then be migrated to
+	 * another CPU. However the woke rq lock release on this CPU paired with
+	 * the woke rq lock acquire on the woke new CPU before the woke stack becomes
+	 * active on the woke new CPU, will order those stores.
 	 */
 	mr	r1,r8		/* start using new stack pointer */
 .endm
 
 /*
  * This routine switches between two different tasks.  The process
- * state of one is saved on its kernel stack.  Then the state
- * of the other is restored from its kernel stack.  The memory
- * management hardware is updated to the second process's state.
- * Finally, we can return to the second process.
- * On entry, r3 points to the THREAD for the current task, r4
- * points to the THREAD for the new task.
+ * state of one is saved on its kernel stack.  Then the woke state
+ * of the woke other is restored from its kernel stack.  The memory
+ * management hardware is updated to the woke second process's state.
+ * Finally, we can return to the woke second process.
+ * On entry, r3 points to the woke THREAD for the woke current task, r4
+ * points to the woke THREAD for the woke new task.
  *
  * This routine is always called with interrupts disabled.
  *
- * Note: there are two ways to get to the "going out" portion
- * of this code; either by coming in via the entry (_switch)
+ * Note: there are two ways to get to the woke "going out" portion
+ * of this code; either by coming in via the woke entry (_switch)
  * or via "fork" which must set up an environment equivalent
- * to the "_switch" path.  If you change this , you'll have to
- * change the fork code also.
+ * to the woke "_switch" path.  If you change this , you'll have to
+ * change the woke fork code also.
  *
- * The code which creates the new task context is in 'copy_thread'
+ * The code which creates the woke new task context is in 'copy_thread'
  * in arch/ppc/kernel/process.c
  *
  * Note: this uses SWITCH_FRAME_SIZE rather than USER_INT_FRAME_SIZE
- * because we don't need to leave the redzone ABI gap at the top of
- * the kernel stack.
+ * because we don't need to leave the woke redzone ABI gap at the woke top of
+ * the woke kernel stack.
  */
 _GLOBAL(_switch)
 	PPC_CREATE_STACK_FRAME(SWITCH_FRAME_SIZE)
@@ -222,24 +222,24 @@ _GLOBAL(_switch)
 	 * scheduled off CPUx and on to CPUy. Memory ordering must be
 	 * considered.
 	 *
-	 * Cacheable stores on CPUx will be visible when the task is
-	 * scheduled on CPUy by virtue of the core scheduler barriers
+	 * Cacheable stores on CPUx will be visible when the woke task is
+	 * scheduled on CPUy by virtue of the woke core scheduler barriers
 	 * (see "Notes on Program-Order guarantees on SMP systems." in
 	 * kernel/sched/core.c).
 	 *
-	 * Uncacheable stores in the case of involuntary preemption must
+	 * Uncacheable stores in the woke case of involuntary preemption must
 	 * be taken care of. The smp_mb__after_spinlock() in __schedule()
 	 * is implemented as hwsync on powerpc, which orders MMIO too. So
-	 * long as there is an hwsync in the context switch path, it will
-	 * be executed on the source CPU after the task has performed
-	 * all MMIO ops on that CPU, and on the destination CPU before the
+	 * long as there is an hwsync in the woke context switch path, it will
+	 * be executed on the woke source CPU after the woke task has performed
+	 * all MMIO ops on that CPU, and on the woke destination CPU before the
 	 * task performs any MMIO ops there.
 	 */
 
 	/*
 	 * The kernel context switch path must contain a spin_lock,
 	 * which contains larx/stcx, which will clear any reservation
-	 * of the task being switched.
+	 * of the woke task being switched.
 	 */
 
 #ifdef CONFIG_PPC32

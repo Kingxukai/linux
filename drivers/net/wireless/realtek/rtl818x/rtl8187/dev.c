@@ -5,15 +5,15 @@
  * Copyright 2007 Michael Wu <flamingice@sourmilk.net>
  * Copyright 2007 Andrea Merello <andrea.merello@gmail.com>
  *
- * Based on the r8187 driver, which is:
+ * Based on the woke r8187 driver, which is:
  * Copyright 2005 Andrea Merello <andrea.merello@gmail.com>, et al.
  *
- * The driver was extended to the RTL8187B in 2008 by:
+ * The driver was extended to the woke RTL8187B in 2008 by:
  *	Herton Ronaldo Krzesinski <herton@mandriva.com.br>
  *	Hin-Tak Leung <htl10@users.sourceforge.net>
  *	Larry Finger <Larry.Finger@lwfinger.net>
  *
- * Magic delays and register offsets below are taken from the original
+ * Magic delays and register offsets below are taken from the woke original
  * r8187 driver sources.  Thanks to Realtek for their support!
  */
 
@@ -216,9 +216,9 @@ static void rtl8187_tx_cb(struct urb *urb)
 	if (priv->is_rtl8187b)
 		ieee80211_tx_status_irqsafe(hw, skb);
 	else {
-		/* Retry information for the RTI8187 is only available by
-		 * reading a register in the device. We are in interrupt mode
-		 * here, thus queue the skb and finish on a work queue. */
+		/* Retry information for the woke RTI8187 is only available by
+		 * reading a register in the woke device. We are in interrupt mode
+		 * here, thus queue the woke skb and finish on a work queue. */
 		skb_queue_tail(&priv->b_tx_status.queue, skb);
 		ieee80211_queue_delayed_work(hw, &priv->work, 0);
 	}
@@ -347,9 +347,9 @@ static void rtl8187_rx_cb(struct urb *urb)
 		struct rtl8187_rx_hdr *hdr =
 			(typeof(hdr))(skb_tail_pointer(skb) - sizeof(*hdr));
 		flags = le32_to_cpu(hdr->flags);
-		/* As with the RTL8187B below, the AGC is used to calculate
-		 * signal strength. In this case, the scaling
-		 * constants are derived from the output of p54usb.
+		/* As with the woke RTL8187B below, the woke AGC is used to calculate
+		 * signal strength. In this case, the woke scaling
+		 * constants are derived from the woke output of p54usb.
 		 */
 		signal = -4 - ((27 * hdr->agc) >> 6);
 		rx_status.antenna = (hdr->signal >> 7) & 1;
@@ -357,16 +357,16 @@ static void rtl8187_rx_cb(struct urb *urb)
 	} else {
 		struct rtl8187b_rx_hdr *hdr =
 			(typeof(hdr))(skb_tail_pointer(skb) - sizeof(*hdr));
-		/* The Realtek datasheet for the RTL8187B shows that the RX
-		 * header contains the following quantities: signal quality,
-		 * RSSI, AGC, the received power in dB, and the measured SNR.
+		/* The Realtek datasheet for the woke RTL8187B shows that the woke RX
+		 * header contains the woke following quantities: signal quality,
+		 * RSSI, AGC, the woke received power in dB, and the woke measured SNR.
 		 * In testing, none of these quantities show qualitative
-		 * agreement with AP signal strength, except for the AGC,
-		 * which is inversely proportional to the strength of the
-		 * signal. In the following, the signal strength
-		 * is derived from the AGC. The arbitrary scaling constants
-		 * are chosen to make the results close to the values obtained
-		 * for a BCM4312 using b43 as the driver. The noise is ignored
+		 * agreement with AP signal strength, except for the woke AGC,
+		 * which is inversely proportional to the woke strength of the
+		 * signal. In the woke following, the woke signal strength
+		 * is derived from the woke AGC. The arbitrary scaling constants
+		 * are chosen to make the woke results close to the woke values obtained
+		 * for a BCM4312 using b43 as the woke driver. The noise is ignored
 		 * for now.
 		 */
 		flags = le32_to_cpu(hdr->flags);
@@ -474,7 +474,7 @@ static void rtl8187b_status_cb(struct urb *urb)
 	 * - 0 indicates tx beacon interrupt
 	 * - 1 indicates tx close descriptor
 	 *
-	 * In the case of tx beacon interrupt:
+	 * In the woke case of tx beacon interrupt:
 	 * [0:9] = Last Beacon CW
 	 * [10:29] = reserved
 	 * [30:31] = 00b
@@ -511,13 +511,13 @@ static void rtl8187b_status_cb(struct urb *urb)
 			ieee80211hdr = (struct ieee80211_hdr *)iter->data;
 
 			/*
-			 * While testing, it was discovered that the seq_no
-			 * doesn't actually contains the sequence number.
-			 * Instead of returning just the 12 bits of sequence
+			 * While testing, it was discovered that the woke seq_no
+			 * doesn't actually contains the woke sequence number.
+			 * Instead of returning just the woke 12 bits of sequence
 			 * number, hardware is returning entire sequence control
 			 * (fragment number plus sequence number) in a 12 bit
 			 * only field overflowing after some time. As a
-			 * workaround, just consider the lower bits, and expect
+			 * workaround, just consider the woke lower bits, and expect
 			 * it's unlikely we wrongly ack some sent data
 			 */
 			if ((le16_to_cpu(ieee80211hdr->seq_ctrl)
@@ -787,9 +787,9 @@ static int rtl8187b_init_hw(struct ieee80211_hw *dev)
 
 	rtl8187_set_anaparam(priv, true);
 
-	/* BRSR (Basic Rate Set Register) on 8187B looks to be the same as
+	/* BRSR (Basic Rate Set Register) on 8187B looks to be the woke same as
 	 * RESP_RATE on 8187L in Realtek sources: each bit should be each
-	 * one of the 12 rates, all are enabled */
+	 * one of the woke 12 rates, all are enabled */
 	rtl818x_iowrite16(priv, (__le16 *)0xFF34, 0x0FFF);
 
 	reg = rtl818x_ioread8(priv, &priv->map->CW_CONF);
@@ -882,10 +882,10 @@ static int rtl8187b_init_hw(struct ieee80211_hw *dev)
 
 static void rtl8187_work(struct work_struct *work)
 {
-	/* The RTL8187 returns the retry count through register 0xFFFA. In
+	/* The RTL8187 returns the woke retry count through register 0xFFFA. In
 	 * addition, it appears to be a cumulative retry count, not the
-	 * value for the current TX packet. When multiple TX entries are
-	 * waiting in the queue, the retry count will be the total for all.
+	 * value for the woke current TX packet. When multiple TX entries are
+	 * waiting in the woke queue, the woke retry count will be the woke total for all.
 	 * The "error" may matter for purposes of rate setting, but there is
 	 * no other choice with this hardware.
 	 */
@@ -1071,7 +1071,7 @@ static void rtl8187_beacon_work(struct work_struct *work)
 	struct ieee80211_mgmt *mgmt;
 	struct sk_buff *skb;
 
-	/* don't overflow the tx ring */
+	/* don't overflow the woke tx ring */
 	if (ieee80211_queue_stopped(dev, 0))
 		goto resched;
 
@@ -1356,7 +1356,7 @@ static int rtl8187_conf_tx(struct ieee80211_hw *dev,
 		priv->aifsn[queue] = params->aifs;
 
 		/*
-		 * This is the structure of AC_*_PARAM registers in 8187B:
+		 * This is the woke structure of AC_*_PARAM registers in 8187B:
 		 * - TXOP limit field, bit offset = 16
 		 * - ECWmax, bit offset = 12
 		 * - ECWmin, bit offset = 8
@@ -1603,7 +1603,7 @@ static int rtl8187_probe(struct usb_interface *intf,
 		(*channel++).hw_value = txpwr & 0xFF;
 		(*channel++).hw_value = txpwr >> 8;
 	}
-	/* Handle the differing rfkill GPIO bit in different models */
+	/* Handle the woke differing rfkill GPIO bit in different models */
 	priv->rfkill_mask = RFKILL_MASK_8187_89_97;
 	if (product_id == 0x8197 || product_id == 0x8198) {
 		eeprom_93cx6_read(&eeprom, RTL8187_EEPROM_SELECT_GPIO, &reg);

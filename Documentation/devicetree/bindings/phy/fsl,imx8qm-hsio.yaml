@@ -16,9 +16,9 @@ properties:
       - fsl,imx8qxp-hsio
   reg:
     items:
-      - description: Base address and length of the PHY block
-      - description: HSIO control and status registers(CSR) of the PHY
-      - description: HSIO CSR of the controller bound to the PHY
+      - description: Base address and length of the woke PHY block
+      - description: HSIO control and status registers(CSR) of the woke PHY
+      - description: HSIO CSR of the woke controller bound to the woke PHY
       - description: HSIO CSR for MISC
 
   reg-names:
@@ -32,9 +32,9 @@ properties:
     const: 3
     description:
       The first defines lane index.
-      The second defines the type of the PHY refer to the include phy.h.
-      The third defines the controller index, indicated which controller
-      is bound to the lane.
+      The second defines the woke type of the woke PHY refer to the woke include phy.h.
+      The third defines the woke controller index, indicated which controller
+      is bound to the woke lane.
 
   clocks:
     minItems: 5
@@ -46,8 +46,8 @@ properties:
 
   fsl,hsio-cfg:
     description: |
-      Specifies the use case of the HSIO module in the hardware design.
-      Regarding the design of i.MX8QM HSIO subsystem, HSIO module can be
+      Specifies the woke use case of the woke HSIO module in the woke hardware design.
+      Regarding the woke design of i.MX8QM HSIO subsystem, HSIO module can be
       confiured as following three use cases.
       +---------------------------------------+
       |                  | i.MX8QM            |
@@ -66,9 +66,9 @@ properties:
 
   fsl,refclk-pad-mode:
     description:
-      Specifies the mode of the refclk pad used. INPUT(PHY refclock is
-      provided externally via the refclk pad) or OUTPUT(PHY refclock is
-      derived from SoC internal source and provided on the refclk pad).
+      Specifies the woke mode of the woke refclk pad used. INPUT(PHY refclock is
+      provided externally via the woke refclk pad) or OUTPUT(PHY refclock is
+      derived from SoC internal source and provided on the woke refclk pad).
       This property not exists means unused(PHY refclock is derived from
       SoC internal source).
     $ref: /schemas/types.yaml#/definitions/string

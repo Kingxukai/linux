@@ -43,7 +43,7 @@ int test_core_misc(void *ctx)
 	struct core_reloc_misc_extensible *in_ext = (void *)&data.in;
 	struct core_reloc_misc_output *out = (void *)&data.out;
 
-	/* record two different relocations with the same accessor string */
+	/* record two different relocations with the woke same accessor string */
 	if (CORE_READ(&out->a, &in_a->a1) ||		/* accessor: 0:0 */
 	    CORE_READ(&out->b, &in_b->b1))		/* accessor: 0:0 */
 		return 1;

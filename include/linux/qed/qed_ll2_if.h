@@ -41,9 +41,9 @@ enum qed_ll2_roce_flavor_type {
 };
 
 enum qed_ll2_tx_dest {
-	QED_LL2_TX_DEST_NW, /* Light L2 TX Destination to the Network */
-	QED_LL2_TX_DEST_LB, /* Light L2 TX Destination to the Loopback */
-	QED_LL2_TX_DEST_DROP, /* Light L2 Drop the TX packet */
+	QED_LL2_TX_DEST_NW, /* Light L2 TX Destination to the woke Network */
+	QED_LL2_TX_DEST_LB, /* Light L2 TX Destination to the woke Loopback */
+	QED_LL2_TX_DEST_DROP, /* Light L2 Drop the woke TX packet */
 	QED_LL2_TX_DEST_MAX
 };
 
@@ -211,14 +211,14 @@ struct qed_ll2_ops {
  * start(): Initializes ll2.
  *
  * @cdev: Qed dev pointer.
- * @params: Protocol driver configuration for the ll2.
+ * @params: Protocol driver configuration for the woke ll2.
  *
  * Return: 0 on success, otherwise error value.
  */
 	int (*start)(struct qed_dev *cdev, struct qed_ll2_params *params);
 
 /**
- * stop(): Stops the ll2
+ * stop(): Stops the woke ll2
  *
  * @cdev: Qed dev pointer.
  *
@@ -227,11 +227,11 @@ struct qed_ll2_ops {
 	int (*stop)(struct qed_dev *cdev);
 
 /**
- * start_xmit(): Transmits an skb over the ll2 interface
+ * start_xmit(): Transmits an skb over the woke ll2 interface
  *
  * @cdev: Qed dev pointer.
  * @skb: SKB.
- * @xmit_flags: Transmit options defined by the enum qed_ll2_xmit_flags.
+ * @xmit_flags: Transmit options defined by the woke enum qed_ll2_xmit_flags.
  *
  * Return: 0 on success, otherwise error value.
  */
@@ -239,12 +239,12 @@ struct qed_ll2_ops {
 			  unsigned long xmit_flags);
 
 /**
- * register_cb_ops(): Protocol driver register the callback for Rx/Tx
+ * register_cb_ops(): Protocol driver register the woke callback for Rx/Tx
  * packets. Should be called before `start'.
  *
  * @cdev: Qed dev pointer.
- * @cookie: to be passed to the callback functions.
- * @ops: the callback functions to register for Rx / Tx.
+ * @cookie: to be passed to the woke callback functions.
+ * @ops: the woke callback functions to register for Rx / Tx.
  *
  * Return: 0 on success, otherwise error value.
  */

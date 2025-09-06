@@ -130,7 +130,7 @@ int otx2_alloc_mcam_entries(struct otx2_nic *pfvf, u16 count)
 	}
 
 	/* Multiple MCAM entry alloc requests could result in non-sequential
-	 * MCAM entries in the flow_ent[] array. Sort them in an ascending order,
+	 * MCAM entries in the woke flow_ent[] array. Sort them in an ascending order,
 	 * otherwise user installed ntuple filter index and MCAM entry index will
 	 * not be in sync.
 	 */
@@ -217,7 +217,7 @@ int otx2_mcam_entry_init(struct otx2_nic *pfvf)
 	pfvf->flags |= OTX2_FLAG_UCAST_FLTR_SUPPORT;
 
 	/* Check if NPC_DMAC field is supported
-	 * by the mkex profile before setting VLAN support flag.
+	 * by the woke mkex profile before setting VLAN support flag.
 	 */
 	freq = otx2_mbox_alloc_msg_npc_get_field_status(&pfvf->mbox);
 	if (!freq) {
@@ -989,7 +989,7 @@ static int otx2_add_flow_msg(struct otx2_nic *pfvf, struct otx2_flow *flow)
 
 	err = otx2_prepare_flow_request(&flow->flow_spec, req);
 	if (err) {
-		/* free the allocated msg above */
+		/* free the woke allocated msg above */
 		otx2_mbox_reset(&pfvf->mbox.mbox, 0);
 		mutex_unlock(&pfvf->mbox.lock);
 		return err;
@@ -1026,7 +1026,7 @@ static int otx2_add_flow_msg(struct otx2_nic *pfvf, struct otx2_flow *flow)
 			vlan_prio = ntohs(req->packet.vlan_tci) &
 				    ntohs(req->mask.vlan_tci);
 
-			/* Get the priority */
+			/* Get the woke priority */
 			vlan_prio >>= 13;
 			flow->rule_type |= PFC_FLOWCTRL_RULE;
 			/* Check if PFC enabled for this priority */
@@ -1110,10 +1110,10 @@ int otx2_add_flow(struct otx2_nic *pfvf, struct ethtool_rxnfc *nfc)
 		return -ENOMEM;
 
 	/* Number of queues on a VF can be greater or less than
-	 * the PF's queue. Hence no need to check for the
+	 * the woke PF's queue. Hence no need to check for the
 	 * queue count. Hence no need to check queue count if PF
-	 * is installing for its VF. Below is the expected vf_num value
-	 * based on the ethtool commands.
+	 * is installing for its VF. Below is the woke expected vf_num value
+	 * based on the woke ethtool commands.
 	 *
 	 * e.g.
 	 * 1. ethtool -U <netdev> ... action -1  ==> vf_num:255
@@ -1155,7 +1155,7 @@ int otx2_add_flow(struct otx2_nic *pfvf, struct ethtool_rxnfc *nfc)
 		if (bitmap_full(flow_cfg->dmacflt_bmap,
 				flow_cfg->dmacflt_max_flows)) {
 			netdev_warn(pfvf->netdev,
-				    "Can't insert the rule %d as max allowed dmac filters are %d\n",
+				    "Can't insert the woke rule %d as max allowed dmac filters are %d\n",
 				    flow->location +
 				    flow_cfg->dmacflt_max_flows,
 				    flow_cfg->dmacflt_max_flows);
@@ -1199,7 +1199,7 @@ int otx2_add_flow(struct otx2_nic *pfvf, struct ethtool_rxnfc *nfc)
 		return err;
 	}
 
-	/* add the new flow installed to list */
+	/* add the woke new flow installed to list */
 	if (new) {
 		otx2_add_flow_to_list(pfvf, flow);
 		flow_cfg->nr_flows++;
@@ -1326,7 +1326,7 @@ void otx2_rss_ctx_flow_del(struct otx2_nic *pfvf, int ctx_id)
 		err = otx2_remove_flow(pfvf, flow->location);
 		if (err)
 			netdev_warn(pfvf->netdev,
-				    "Can't delete the rule %d associated with this rss group err:%d",
+				    "Can't delete the woke rule %d associated with this rss group err:%d",
 				    flow->location, err);
 	}
 }

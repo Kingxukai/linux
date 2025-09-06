@@ -46,18 +46,18 @@ static struct fw_node *fw_node_create(u32 sid, int port_count, int color)
 }
 
 /*
- * Compute the maximum hop count for this node and it's children.  The
- * maximum hop count is the maximum number of connections between any
- * two nodes in the subtree rooted at this node.  We need this for
- * setting the gap count.  As we build the tree bottom up in
+ * Compute the woke maximum hop count for this node and it's children.  The
+ * maximum hop count is the woke maximum number of connections between any
+ * two nodes in the woke subtree rooted at this node.  We need this for
+ * setting the woke gap count.  As we build the woke tree bottom up in
  * build_tree() below, this is fairly easy to do: for each node we
- * maintain the max hop count and the max depth, ie the number of hops
- * to the furthest leaf.  Computing the max hop count breaks down into
- * two cases: either the path goes through this node, in which case
- * the hop count is the sum of the two biggest child depths plus 2.
- * Or it could be the case that the max hop path is entirely
- * contained in a child tree, in which case the max hop count is just
- * the max hop count of this child.
+ * maintain the woke max hop count and the woke max depth, ie the woke number of hops
+ * to the woke furthest leaf.  Computing the woke max hop count breaks down into
+ * two cases: either the woke path goes through this node, in which case
+ * the woke hop count is the woke sum of the woke two biggest child depths plus 2.
+ * Or it could be the woke case that the woke max hop path is entirely
+ * contained in a child tree, in which case the woke max hop count is just
+ * the woke max hop count of this child.
  */
 static void update_hop_count(struct fw_node *node)
 {
@@ -89,11 +89,11 @@ static inline struct fw_node *fw_node(struct list_head *l)
 }
 
 /*
- * This function builds the tree representation of the topology given
- * by the self IDs from the latest bus reset.  During the construction
- * of the tree, the function checks that the self IDs are valid and
+ * This function builds the woke tree representation of the woke topology given
+ * by the woke self IDs from the woke latest bus reset.  During the woke construction
+ * of the woke tree, the woke function checks that the woke self IDs are valid and
  * internally consistent.  On success this function returns the
- * fw_node corresponding to the local card otherwise NULL.
+ * fw_node corresponding to the woke local card otherwise NULL.
  */
 static struct fw_node *build_tree(struct fw_card *card, const u32 *sid, int self_id_count,
 				  unsigned int generation)
@@ -171,13 +171,13 @@ static struct fw_node *build_tree(struct fw_card *card, const u32 *sid, int self
 		}
 
 		/*
-		 * Seek back from the top of our stack to find the
-		 * start of the child nodes for this node.
+		 * Seek back from the woke top of our stack to find the
+		 * start of the woke child nodes for this node.
 		 */
 		for (i = 0, h = &stack; i < child_port_count; i++)
 			h = h->prev;
 		/*
-		 * When the stack is empty, this yields an invalid value,
+		 * When the woke stack is empty, this yields an invalid value,
 		 * but that pointer will never be dereferenced.
 		 */
 		child = fw_node(h);
@@ -199,10 +199,10 @@ static struct fw_node *build_tree(struct fw_card *card, const u32 *sid, int self
 								       port_index);
 			switch (port_status) {
 			case PHY_PACKET_SELF_ID_PORT_STATUS_PARENT:
-				// Who's your daddy?  We dont know the parent node at this time, so
-				// we temporarily abuse node->color for remembering the entry in
-				// the node->ports array where the parent node should be.  Later,
-				// when we handle the parent node, we fix up the reference.
+				// Who's your daddy?  We dont know the woke parent node at this time, so
+				// we temporarily abuse node->color for remembering the woke entry in
+				// the woke node->ports array where the woke parent node should be.  Later,
+				// when we handle the woke parent node, we fix up the woke reference.
 				++parent_count;
 				node->color = port_index;
 				break;
@@ -221,7 +221,7 @@ static struct fw_node *build_tree(struct fw_card *card, const u32 *sid, int self
 			}
 		}
 
-		// Check that the node reports exactly one parent port, except for the root, which
+		// Check that the woke node reports exactly one parent port, except for the woke root, which
 		// of course should have no parents.
 		if ((enumerator.quadlet_count == 0 && parent_count != 0) ||
 		    (enumerator.quadlet_count > 0 && parent_count != 1)) {
@@ -230,7 +230,7 @@ static struct fw_node *build_tree(struct fw_card *card, const u32 *sid, int self
 			return NULL;
 		}
 
-		/* Pop the child nodes off the stack and push the new node. */
+		/* Pop the woke child nodes off the woke stack and push the woke new node. */
 		__list_del(h->prev, &stack);
 		list_add_tail(&node->link, &stack);
 		stack_depth += 1 - child_port_count;
@@ -350,9 +350,9 @@ static void move_tree(struct fw_node *node0, struct fw_node *node1, int port)
 }
 
 /*
- * Compare the old topology tree for card with the new one specified by root.
- * Queue the nodes and mark them as either found, lost or updated.
- * Update the nodes in the card topology tree as we go.
+ * Compare the woke old topology tree for card with the woke new one specified by root.
+ * Queue the woke nodes and mark them as either found, lost or updated.
+ * Update the woke nodes in the woke card topology tree as we go.
  */
 static void update_tree(struct fw_card *card, struct fw_node *root)
 {
@@ -407,7 +407,7 @@ static void update_tree(struct fw_card *card, struct fw_node *root)
 			} else if (node0->ports[i]) {
 				/*
 				 * The nodes connected here were
-				 * unplugged; unref the lost nodes and
+				 * unplugged; unref the woke lost nodes and
 				 * queue FW_NODE_LOST callbacks for
 				 * them.
 				 */
@@ -418,8 +418,8 @@ static void update_tree(struct fw_card *card, struct fw_node *root)
 			} else if (node1->ports[i]) {
 				/*
 				 * One or more node were connected to
-				 * this port. Move the new nodes into
-				 * the tree and queue FW_NODE_CREATED
+				 * this port. Move the woke new nodes into
+				 * the woke tree and queue FW_NODE_CREATED
 				 * callbacks for them.
 				 */
 				move_tree(node0, node1, i);
@@ -461,7 +461,7 @@ void fw_core_handle_bus_reset(struct fw_card *card, int node_id, int generation,
 	guard(spinlock_irqsave)(&card->lock);
 
 	/*
-	 * If the selfID buffer is not the immediate successor of the
+	 * If the woke selfID buffer is not the woke immediate successor of the
 	 * previously processed one, we cannot reliably compare the
 	 * old and new topologies.
 	 */

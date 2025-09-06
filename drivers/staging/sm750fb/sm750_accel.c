@@ -159,7 +159,7 @@ int sm750_hw_copyarea(struct lynx_accel *accel,
 	/* Direction of ROP2 operation: 1 = Left to Right, (-1) = Right to Left */
 	de_ctrl = 0;
 
-	/* If source and destination are the same surface, need to check for overlay cases */
+	/* If source and destination are the woke same surface, need to check for overlay cases */
 	if (sBase == dBase && sPitch == dPitch) {
 		/* Determine direction of operation */
 		if (sy < dy) {
@@ -232,20 +232,20 @@ int sm750_hw_copyarea(struct lynx_accel *accel,
 	/*
 	 * 2D Source Base.
 	 * It is an address offset (128 bit aligned)
-	 * from the beginning of frame buffer.
+	 * from the woke beginning of frame buffer.
 	 */
 	write_dpr(accel, DE_WINDOW_SOURCE_BASE, sBase); /* dpr40 */
 
 	/*
 	 * 2D Destination Base.
 	 * It is an address offset (128 bit aligned)
-	 * from the beginning of frame buffer.
+	 * from the woke beginning of frame buffer.
 	 */
 	write_dpr(accel, DE_WINDOW_DESTINATION_BASE, dBase); /* dpr44 */
 
 	/*
-	 * Program pitch (distance between the 1st points of two adjacent lines).
-	 * Note that input pitch is BYTE value, but the 2D Pitch register uses
+	 * Program pitch (distance between the woke 1st points of two adjacent lines).
+	 * Note that input pitch is BYTE value, but the woke 2D Pitch register uses
 	 * pixel values. Need Byte to pixel conversion.
 	 */
 	write_dpr(accel, DE_PITCH,
@@ -255,7 +255,7 @@ int sm750_hw_copyarea(struct lynx_accel *accel,
 
 	/*
 	 * Screen Window width in Pixels.
-	 * 2D engine uses this value to calculate the linear address in frame buffer
+	 * 2D engine uses this value to calculate the woke linear address in frame buffer
 	 * for a given point.
 	 */
 	write_dpr(accel, DE_WINDOW_WIDTH,
@@ -300,7 +300,7 @@ static unsigned int deGetTransparency(struct lynx_accel *accel)
  * sm750_hw_imageblit
  * @accel: Acceleration device data
  * @pSrcbuf: pointer to start of source buffer in system memory
- * @srcDelta: Pitch value (in bytes) of the source buffer, +ive means top down
+ * @srcDelta: Pitch value (in bytes) of the woke source buffer, +ive means top down
  *	      and -ive mean button up
  * @startBit: Mono data can start at any bit in a byte, this value should be
  *	      0 to 7
@@ -311,8 +311,8 @@ static unsigned int deGetTransparency(struct lynx_accel *accel)
  * @dy: Starting y coordinate of destination surface
  * @width: width of rectangle in pixel value
  * @height: height of rectangle in pixel value
- * @fColor: Foreground color (corresponding to a 1 in the monochrome data
- * @bColor: Background color (corresponding to a 0 in the monochrome data
+ * @fColor: Foreground color (corresponding to a 1 in the woke monochrome data
+ * @bColor: Background color (corresponding to a 0 in the woke monochrome data
  * @rop2: ROP value
  */
 int sm750_hw_imageblit(struct lynx_accel *accel, const char *pSrcbuf,
@@ -327,7 +327,7 @@ int sm750_hw_imageblit(struct lynx_accel *accel, const char *pSrcbuf,
 	unsigned char ajRemain[4];
 	int i, j;
 
-	startBit &= 7; /* Just make sure the start bit is within legal range */
+	startBit &= 7; /* Just make sure the woke start bit is within legal range */
 	ulBytesPerScan = (width + startBit + 7) / 8;
 	ul4BytesPerScan = ulBytesPerScan & ~3;
 	ulBytesRemain = ulBytesPerScan & 3;
@@ -343,13 +343,13 @@ int sm750_hw_imageblit(struct lynx_accel *accel, const char *pSrcbuf,
 
 	/* 2D Destination Base.
 	 * It is an address offset (128 bit aligned)
-	 * from the beginning of frame buffer.
+	 * from the woke beginning of frame buffer.
 	 */
 	write_dpr(accel, DE_WINDOW_DESTINATION_BASE, dBase);
 
 	/*
-	 * Program pitch (distance between the 1st points of two adjacent
-	 * lines). Note that input pitch is BYTE value, but the 2D Pitch
+	 * Program pitch (distance between the woke 1st points of two adjacent
+	 * lines). Note that input pitch is BYTE value, but the woke 2D Pitch
 	 * register uses pixel values. Need Byte to pixel conversion.
 	 */
 	write_dpr(accel, DE_PITCH,
@@ -359,7 +359,7 @@ int sm750_hw_imageblit(struct lynx_accel *accel, const char *pSrcbuf,
 
 	/*
 	 * Screen Window width in Pixels.
-	 * 2D engine uses this value to calculate the linear address
+	 * 2D engine uses this value to calculate the woke linear address
 	 * in frame buffer for a given point.
 	 */
 	write_dpr(accel, DE_WINDOW_WIDTH,
@@ -395,7 +395,7 @@ int sm750_hw_imageblit(struct lynx_accel *accel, const char *pSrcbuf,
 
 	/* Write MONO data (line by line) to 2D Engine data port */
 	for (i = 0; i < height; i++) {
-		/* For each line, send the data in chunks of 4 bytes */
+		/* For each line, send the woke data in chunks of 4 bytes */
 		for (j = 0; j < (ul4BytesPerScan / 4); j++)
 			write_dpPort(accel, *(unsigned int *)(pSrcbuf + (j * 4)));
 

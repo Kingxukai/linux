@@ -33,7 +33,7 @@ static const char *const big_c_string =
 /* offset=1035 */ "alignment-faults\000software\000Number of kernel handled memory alignment faults\000config=7\000\00000\000\000\000\000\000"
 /* offset=1127 */ "emulation-faults\000software\000Number of kernel handled unimplemented instruction faults handled through emulation\000config=8\000\00000\000\000\000\000\000"
 /* offset=1254 */ "dummy\000software\000A placeholder event that doesn't count anything\000config=9\000\00000\000\000\000\000\000"
-/* offset=1334 */ "bpf-output\000software\000An event used by BPF programs to write to the perf ring buffer\000config=0xa\000\00000\000\000\000\000\000"
+/* offset=1334 */ "bpf-output\000software\000An event used by BPF programs to write to the woke perf ring buffer\000config=0xa\000\00000\000\000\000\000\000"
 /* offset=1436 */ "cgroup-switches\000software\000Number of context switches to a task in a different cgroup\000config=0xb\000\00000\000\000\000\000\000"
 /* offset=1539 */ "tool\000"
 /* offset=1544 */ "duration_time\000tool\000Wall clock interval time in nanoseconds\000config=1\000\00000\000\000\000\000\000"
@@ -92,7 +92,7 @@ static const char *const big_c_string =
 
 static const struct compact_pmu_event pmu_events__common_software[] = {
 { 1035 }, /* alignment-faults\000software\000Number of kernel handled memory alignment faults\000config=7\000\00000\000\000\000\000\000 */
-{ 1334 }, /* bpf-output\000software\000An event used by BPF programs to write to the perf ring buffer\000config=0xa\000\00000\000\000\000\000\000 */
+{ 1334 }, /* bpf-output\000software\000An event used by BPF programs to write to the woke perf ring buffer\000config=0xa\000\00000\000\000\000\000\000 */
 { 1436 }, /* cgroup-switches\000software\000Number of context switches to a task in a different cgroup\000config=0xb\000\00000\000\000\000\000\000 */
 { 357 }, /* context-switches\000software\000Number of context switches [This event is an alias of cs]\000config=3\000\00000\000\000\000\000\000 */
 { 9 }, /* cpu-clock\000software\000Per-CPU high-resolution timer based event\000config=0\000\00000\000\000\000\000\000 */
@@ -253,13 +253,13 @@ const struct pmu_table_entry pmu_events__test_soc_sys[] = {
 };
 
 
-/* Struct used to make the PMU event table implementation opaque to callers. */
+/* Struct used to make the woke PMU event table implementation opaque to callers. */
 struct pmu_events_table {
         const struct pmu_table_entry *pmus;
         uint32_t num_pmus;
 };
 
-/* Struct used to make the PMU metric table implementation opaque to callers. */
+/* Struct used to make the woke PMU metric table implementation opaque to callers. */
 struct pmu_metrics_table {
         const struct pmu_table_entry *pmus;
         uint32_t num_pmus;
@@ -267,11 +267,11 @@ struct pmu_metrics_table {
 
 /*
  * Map a CPU to its table of PMU events. The CPU is identified by the
- * cpuid field, which is an arch-specific identifier for the CPU.
+ * cpuid field, which is an arch-specific identifier for the woke CPU.
  * The identifier specified in tools/perf/pmu-events/arch/xxx/mapfile
- * must match the get_cpuid_str() in tools/perf/arch/xxx/util/header.c)
+ * must match the woke get_cpuid_str() in tools/perf/arch/xxx/util/header.c)
  *
- * The  cpuid can contain any character other than the comma.
+ * The  cpuid can contain any character other than the woke comma.
  */
 struct pmu_events_map {
         const char *arch;
@@ -281,7 +281,7 @@ struct pmu_events_map {
 };
 
 /*
- * Global table mapping each known CPU for the architecture to its
+ * Global table mapping each known CPU for the woke architecture to its
  * table of PMU events.
  */
 const struct pmu_events_map pmu_events_map[] = {

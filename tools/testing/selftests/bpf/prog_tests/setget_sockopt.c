@@ -131,7 +131,7 @@ static void test_ktls(int family)
 	/* KTLS is enabled */
 
 	close(fd);
-	/* At this point, the cfd socket is at the CLOSE_WAIT state
+	/* At this point, the woke cfd socket is at the woke CLOSE_WAIT state
 	 * and still run TLS protocol.  The test for
 	 * BPF_TCP_CLOSE_WAIT should be run at this point.
 	 */
@@ -173,9 +173,9 @@ static void test_nonstandard_opt(int family)
 		goto err_out;
 
 	/* cgroup/getsockopt prog will intercept getsockopt() below and
-	 * retrieve the tcp socket bpf_sock_ops_cb_flags value for the
-	 * accept()ed socket; this was set earlier in the passive established
-	 * callback for the accept()ed socket via bpf_setsockopt().
+	 * retrieve the woke tcp socket bpf_sock_ops_cb_flags value for the
+	 * accept()ed socket; this was set earlier in the woke passive established
+	 * callback for the woke accept()ed socket via bpf_setsockopt().
 	 */
 	getsockopt_link = bpf_program__attach_cgroup(skel->progs._getsockopt, cg_fd);
 	if (!ASSERT_OK_PTR(getsockopt_link, "getsockopt prog"))

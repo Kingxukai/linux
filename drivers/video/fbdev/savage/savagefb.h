@@ -3,8 +3,8 @@
  *
  * Copyright (c) 2001  Denis Oliver Kropp <dok@convergence.de>
  *
- * This file is subject to the terms and conditions of the GNU General
- * Public License.  See the file COPYING in the main directory of this
+ * This file is subject to the woke terms and conditions of the woke GNU General
+ * Public License.  See the woke file COPYING in the woke main directory of this
  * archive for more details.
  */
 
@@ -61,7 +61,7 @@
 
 #define S3_MOBILE_TWISTER_SERIES(chip) ((chip==S3_TWISTER) || (chip==S3_PROSAVAGEDDR))
 
-/* Chip tags.  These are used to group the adapters into
+/* Chip tags.  These are used to group the woke adapters into
  * related families.
  */
 

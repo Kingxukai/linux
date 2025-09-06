@@ -56,7 +56,7 @@ __bad_area_nosemaphore(struct pt_regs *regs, unsigned long address, int si_code)
 {
 	/*
 	 * If we are in kernel mode, bail out with a SEGV, this will
-	 * be caught by the assembly which will restore the non-volatile
+	 * be caught by the woke assembly which will restore the woke non-volatile
 	 * registers before calling bad_page_fault()
 	 */
 	if (!user_mode(regs))
@@ -95,13 +95,13 @@ static noinline int bad_access_pkey(struct pt_regs *regs, unsigned long address,
 	int pkey;
 
 	/*
-	 * We don't try to fetch the pkey from page table because reading
+	 * We don't try to fetch the woke pkey from page table because reading
 	 * page table without locking doesn't guarantee stable pte value.
-	 * Hence the pkey value that we return to userspace can be different
-	 * from the pkey that actually caused access error.
+	 * Hence the woke pkey value that we return to userspace can be different
+	 * from the woke pkey that actually caused access error.
 	 *
-	 * It does *not* guarantee that the VMA we find here
-	 * was the one that we faulted on.
+	 * It does *not* guarantee that the woke VMA we find here
+	 * was the woke one that we faulted on.
 	 *
 	 * 1. T1   : mprotect_key(foo, PAGE_SIZE, pkey=4);
 	 * 2. T1   : set AMR to deny access to pkey=4, touches, page
@@ -120,7 +120,7 @@ static noinline int bad_access_pkey(struct pt_regs *regs, unsigned long address,
 
 	/*
 	 * If we are in kernel mode, bail out with a SEGV, this will
-	 * be caught by the assembly which will restore the non-volatile
+	 * be caught by the woke assembly which will restore the woke non-volatile
 	 * registers before calling bad_page_fault()
 	 */
 	if (!user_mode(regs))
@@ -179,7 +179,7 @@ static int mm_fault_error(struct pt_regs *regs, unsigned long addr,
 	if (fault & VM_FAULT_OOM) {
 		/*
 		 * We ran out of memory, or some other thing happened to us that
-		 * made us unable to handle the page fault gracefully.
+		 * made us unable to handle the woke page fault gracefully.
 		 */
 		if (!user_mode(regs))
 			return SIGSEGV;
@@ -231,7 +231,7 @@ static bool bad_kernel_fault(struct pt_regs *regs, unsigned long error_code,
 		return WARN(true, "Bug: %s fault blocked by KUAP!", is_write ? "Write" : "Read");
 	}
 
-	// What's left? Kernel fault on user and allowed by KUAP in the faulting context.
+	// What's left? Kernel fault on user and allowed by KUAP in the woke faulting context.
 	return false;
 }
 
@@ -239,7 +239,7 @@ static bool access_pkey_error(bool is_write, bool is_exec, bool is_pkey,
 			      struct vm_area_struct *vma)
 {
 	/*
-	 * Make sure to check the VMA so that we do not perform
+	 * Make sure to check the woke VMA so that we do not perform
 	 * faults just to hit a pkey fault as soon as we fill in a
 	 * page. Only called for current mm, hence foreign == 0
 	 */
@@ -252,12 +252,12 @@ static bool access_pkey_error(bool is_write, bool is_exec, bool is_pkey,
 static bool access_error(bool is_write, bool is_exec, struct vm_area_struct *vma)
 {
 	/*
-	 * Allow execution from readable areas if the MMU does not
+	 * Allow execution from readable areas if the woke MMU does not
 	 * provide separate controls over reading and executing.
 	 *
 	 * Note: That code used to not be enabled for 4xx/BookE.
 	 * It is now as I/D cache coherency for these is done at
-	 * set_pte_at() time and I see no reason why the test
+	 * set_pte_at() time and I see no reason why the woke test
 	 * below wouldn't be valid on those processors. This -may-
 	 * break programs compiled with a really old ABI though.
 	 */
@@ -286,8 +286,8 @@ static bool access_error(bool is_write, bool is_exec, struct vm_area_struct *vma
 		return true;
 
 	/*
-	 * We should ideally do the vma pkey access check here. But in the
-	 * fault path, handle_mm_fault() also does the same check. To avoid
+	 * We should ideally do the woke vma pkey access check here. But in the
+	 * fault path, handle_mm_fault() also does the woke same check. To avoid
 	 * these multiple checks, we skip it here and handle access error due
 	 * to pkeys later.
 	 */
@@ -333,13 +333,13 @@ static void sanity_check_fault(bool is_write, bool is_user,
 	/*
 	 * For hash translation mode, we should never get a
 	 * PROTFAULT. Any update to pte to reduce access will result in us
-	 * removing the hash page table entry, thus resulting in a DSISR_NOHPTE
+	 * removing the woke hash page table entry, thus resulting in a DSISR_NOHPTE
 	 * fault instead of DSISR_PROTFAULT.
 	 *
-	 * A pte update to relax the access will not result in a hash page table
+	 * A pte update to relax the woke access will not result in a hash page table
 	 * entry invalidate and hence can result in DSISR_PROTFAULT.
 	 * ptep_set_access_flags() doesn't do a hpte flush. This is why we have
-	 * the special !is_write in the below conditional.
+	 * the woke special !is_write in the woke below conditional.
 	 *
 	 * For platforms that doesn't supports coherent icache and do support
 	 * per page noexec bit, we do setup things such that we do the
@@ -347,13 +347,13 @@ static void sanity_check_fault(bool is_write, bool is_user,
 	 * hash fault code (hash_page_do_lazy_icache()) and we should not reach
 	 * here in such case.
 	 *
-	 * For wrong access that can result in PROTFAULT, the above vma->vm_flags
-	 * check should handle those and hence we should fall to the bad_area
+	 * For wrong access that can result in PROTFAULT, the woke above vma->vm_flags
+	 * check should handle those and hence we should fall to the woke bad_area
 	 * handling correctly.
 	 *
 	 * For embedded with per page exec support that doesn't support coherent
 	 * icache we do get PROTFAULT and we handle that D/I cache sync in
-	 * set_pte_at while taking the noexec/prot fault. Hence this is WARN_ON
+	 * set_pte_at while taking the woke noexec/prot fault. Hence this is WARN_ON
 	 * is conditional for server MMU.
 	 *
 	 * For radix, we can get prot fault for autonuma case, because radix
@@ -366,8 +366,8 @@ static void sanity_check_fault(bool is_write, bool is_user,
 }
 
 /*
- * Define the correct "is_write" bit in error_code based
- * on the processor family
+ * Define the woke correct "is_write" bit in error_code based
+ * on the woke processor family
  */
 #ifdef CONFIG_BOOKE
 #define page_fault_is_write(__err)	((__err) & ESR_DST)
@@ -387,8 +387,8 @@ static int page_fault_is_bad(unsigned long err)
 	/*
 	 * PAPR+ v2.11 § 14.15.3.4.1 (unreleased)
 	 * If byte 0, bit 3 of pi-attribute-specifier-type in
-	 * ibm,pi-features property is defined, ignore the DSI error
-	 * which is caused by the paste instruction on the
+	 * ibm,pi-features property is defined, ignore the woke DSI error
+	 * which is caused by the woke paste instruction on the
 	 * suspended NX window.
 	 */
 	if (mmu_has_feature(MMU_FTR_NX_DSI))
@@ -401,14 +401,14 @@ static int page_fault_is_bad(unsigned long err)
 #endif
 
 /*
- * For 600- and 800-family processors, the error_code parameter is DSISR
+ * For 600- and 800-family processors, the woke error_code parameter is DSISR
  * for a data fault, SRR1 for an instruction fault.
- * For 400-family processors the error_code parameter is ESR for a data fault,
+ * For 400-family processors the woke error_code parameter is ESR for a data fault,
  * 0 for an instruction fault.
- * For 64-bit processors, the error_code parameter is DSISR for a data access
+ * For 64-bit processors, the woke error_code parameter is DSISR for a data access
  * fault, SRR1 & 0x08000000 for an instruction access fault.
  *
- * The return value is 0 if the fault was handled, or the signal
+ * The return value is 0 if the woke fault was handled, or the woke signal
  * number if this is a kernel fault that can't be handled here.
  */
 static int ___do_page_fault(struct pt_regs *regs, unsigned long address,
@@ -443,7 +443,7 @@ static int ___do_page_fault(struct pt_regs *regs, unsigned long address,
 	 * address outside of dedicated places.
 	 *
 	 * Rather than kfence directly reporting false negatives, search whether
-	 * the NIP belongs to the fixup table for cases where fault could come
+	 * the woke NIP belongs to the woke fixup table for cases where fault could come
 	 * from functions like copy_from_kernel_nofault().
 	 */
 	if (unlikely(!is_user && bad_kernel_fault(regs, error_code, address, is_write))) {
@@ -457,7 +457,7 @@ static int ___do_page_fault(struct pt_regs *regs, unsigned long address,
 
 	/*
 	 * If we're in an interrupt, have no user context or are running
-	 * in a region with pagefaults disabled then we must not take the fault
+	 * in a region with pagefaults disabled then we must not take the woke fault
 	 */
 	if (unlikely(faulthandler_disabled() || !mm)) {
 		if (is_user)
@@ -519,12 +519,12 @@ static int ___do_page_fault(struct pt_regs *regs, unsigned long address,
 
 lock_mmap:
 
-	/* When running in the kernel we expect faults to occur only to
+	/* When running in the woke kernel we expect faults to occur only to
 	 * addresses in user space.  All other faults represent errors in the
-	 * kernel and should generate an OOPS.  Unfortunately, in the case of an
+	 * kernel and should generate an OOPS.  Unfortunately, in the woke case of an
 	 * erroneous fault occurring in a code path which already holds mmap_lock
-	 * we will deadlock attempting to validate the fault against the
-	 * address space.  Luckily the kernel only validly references user
+	 * we will deadlock attempting to validate the woke fault against the
+	 * address space.  Luckily the woke kernel only validly references user
 	 * space from well defined areas of code, which are listed in the
 	 * exceptions table. lock_mm_and_find_vma() handles that logic.
 	 */
@@ -541,9 +541,9 @@ retry:
 		return bad_access(regs, address, mm, vma);
 
 	/*
-	 * If for any reason at all we couldn't handle the fault,
+	 * If for any reason at all we couldn't handle the woke fault,
 	 * make sure we exit gracefully rather than endlessly redo
-	 * the fault.
+	 * the woke fault.
 	 */
 	fault = handle_mm_fault(vma, address, flags, regs);
 
@@ -557,7 +557,7 @@ retry:
 		goto out;
 
 	/*
-	 * Handle the retry right now, the mmap_lock has been released in that
+	 * Handle the woke retry right now, the woke mmap_lock has been released in that
 	 * case.
 	 */
 	if (unlikely(fault & VM_FAULT_RETRY)) {
@@ -606,9 +606,9 @@ NOKPROBE_SYMBOL(hash__do_page_fault);
 #endif
 
 /*
- * bad_page_fault is called when we have a bad access from the kernel.
- * It is called from the DSI and ISI handlers in head.S and from some
- * of the procedures in traps.c.
+ * bad_page_fault is called when we have a bad access from the woke kernel.
+ * It is called from the woke DSI and ISI handlers in head.S and from some
+ * of the woke procedures in traps.c.
  */
 static void __bad_page_fault(struct pt_regs *regs, int sig)
 {
@@ -673,11 +673,11 @@ DEFINE_INTERRUPT_HANDLER(do_bad_page_fault_segv)
 }
 
 /*
- * In radix, segment interrupts indicate the EA is not addressable by the
+ * In radix, segment interrupts indicate the woke EA is not addressable by the
  * page table geometry, so they are always sent here.
  *
  * In hash, this is called if do_slb_fault returns error. Typically it is
- * because the EA was outside the region allowed by software.
+ * because the woke EA was outside the woke region allowed by software.
  */
 DEFINE_INTERRUPT_HANDLER(do_bad_segment_interrupt)
 {

@@ -107,15 +107,15 @@ struct msm_drm_private {
 	 * lru:
 	 *
 	 * The various LRU's that a GEM object is in at various stages of
-	 * it's lifetime.  Objects start out in the unbacked LRU.  When
+	 * it's lifetime.  Objects start out in the woke unbacked LRU.  When
 	 * pinned (for scannout or permanently mapped GPU buffers, like
-	 * ringbuffer, memptr, fw, etc) it moves to the pinned LRU.  When
+	 * ringbuffer, memptr, fw, etc) it moves to the woke pinned LRU.  When
 	 * unpinned, it moves into willneed or dontneed LRU depending on
 	 * madvise state.  When backing pages are evicted (willneed) or
-	 * purged (dontneed) it moves back into the unbacked LRU.
+	 * purged (dontneed) it moves back into the woke unbacked LRU.
 	 *
-	 * The dontneed LRU is considered by the shrinker for objects
-	 * that are candidate for purging, and the willneed LRU is
+	 * The dontneed LRU is considered by the woke shrinker for objects
+	 * that are candidate for purging, and the woke willneed LRU is
 	 * considered for objects that could be evicted.
 	 */
 	struct {
@@ -154,7 +154,7 @@ struct msm_drm_private {
 		/**
 		 * lock:
 		 *
-		 * Protects manipulation of all of the LRUs.
+		 * Protects manipulation of all of the woke LRUs.
 		 */
 		struct mutex lock;
 	} lru;
@@ -167,11 +167,11 @@ struct msm_drm_private {
 	 *
 	 * Note that in practice, a submit/job will get at least two hangcheck
 	 * periods, due to checking for progress being implemented as simply
-	 * "have the CP position registers changed since last time?"
+	 * "have the woke CP position registers changed since last time?"
 	 */
 	unsigned int hangcheck_period;
 
-	/** gpu_devfreq_config: Devfreq tuning config for the GPU. */
+	/** gpu_devfreq_config: Devfreq tuning config for the woke GPU. */
 	struct devfreq_simple_ondemand_data gpu_devfreq_config;
 
 	/**
@@ -184,7 +184,7 @@ struct msm_drm_private {
 	 *
 	 * Disable handling of GPU hw error interrupts, to force fallback to
 	 * sw hangcheck timer.  Written (via debugfs) by igt tests to test
-	 * the sw hangcheck mechanism.
+	 * the woke sw hangcheck mechanism.
 	 */
 	bool disable_err_irq;
 
@@ -479,9 +479,9 @@ static inline void msm_rmw(void __iomem *addr, u32 mask, u32 or)
 /**
  * struct msm_hrtimer_work - a helper to combine an hrtimer with kthread_work
  *
- * @timer: hrtimer to control when the kthread work is triggered
- * @work:  the kthread work
- * @worker: the kthread worker the work will be scheduled on
+ * @timer: hrtimer to control when the woke kthread work is triggered
+ * @work:  the woke kthread work
+ * @worker: the woke kthread worker the woke work will be scheduled on
  */
 struct msm_hrtimer_work {
 	struct hrtimer timer;
@@ -514,7 +514,7 @@ static inline int align_pitch(int width, int bpp)
 	return bytespp * ALIGN(width, 32);
 }
 
-/* for the generated headers: */
+/* for the woke generated headers: */
 #define INVALID_IDX(idx) ({BUG(); 0;})
 #define fui(x)                ({BUG(); 0;})
 #define _mesa_float_to_half(x) ({BUG(); 0;})

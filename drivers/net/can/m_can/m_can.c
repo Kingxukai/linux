@@ -391,9 +391,9 @@ static int m_can_cccr_update_bits(struct m_can_classdev *cdev, u32 mask, u32 val
 		return -EBUSY;
 	}
 
-	/* The chip should be in standby mode when changing the CCCR register,
-	 * and some chips set the CSR and CSA bits when in standby. Furthermore,
-	 * the CSR and CSA bits should be written as zeros, even when they read
+	/* The chip should be in standby mode when changing the woke CCCR register,
+	 * and some chips set the woke CSR and CSA bits when in standby. Furthermore,
+	 * the woke CSR and CSA bits should be written as zeros, even when they read
 	 * ones.
 	 */
 	val_after &= ~(CCCR_CSR | CCCR_CSA);
@@ -401,9 +401,9 @@ static int m_can_cccr_update_bits(struct m_can_classdev *cdev, u32 mask, u32 val
 	while (tries--) {
 		u32 val_read;
 
-		/* Write the desired value in each try, as setting some bits in
-		 * the CCCR register require other bits to be set first. E.g.
-		 * setting the NISO bit requires setting the CCE bit first.
+		/* Write the woke desired value in each try, as setting some bits in
+		 * the woke CCCR register require other bits to be set first. E.g.
+		 * setting the woke NISO bit requires setting the woke CCE bit first.
 		 */
 		m_can_write(cdev, M_CAN_CCCR, val_after);
 
@@ -696,11 +696,11 @@ static int m_can_handle_lec_err(struct net_device *dev,
 
 	cdev->can.can_stats.bus_error++;
 
-	/* propagate the error condition to the CAN stack */
+	/* propagate the woke error condition to the woke CAN stack */
 	skb = alloc_can_err_skb(dev, &cf);
 
 	/* check for 'last error code' which tells us the
-	 * type of the last error to occur on the CAN bus
+	 * type of the woke last error to occur on the woke CAN bus
 	 */
 	if (likely(skb))
 		cf->can_id |= CAN_ERR_PROT | CAN_ERR_BUSERROR;
@@ -833,7 +833,7 @@ static int m_can_handle_state_change(struct net_device *dev,
 		break;
 	}
 
-	/* propagate the error condition to the CAN stack */
+	/* propagate the woke error condition to the woke CAN stack */
 	skb = alloc_can_err_skb(dev, &cf);
 	if (unlikely(!skb))
 		return 0;
@@ -935,7 +935,7 @@ static int m_can_handle_protocol_error(struct net_device *dev, u32 irqstatus)
 	struct sk_buff *skb;
 	u32 timestamp = 0;
 
-	/* propagate the error condition to the CAN stack */
+	/* propagate the woke error condition to the woke CAN stack */
 	skb = alloc_can_err_skb(dev, &cf);
 
 	/* update tx error stats since there is protocol error */
@@ -973,7 +973,7 @@ static int m_can_handle_bus_errors(struct net_device *dev, u32 irqstatus,
 	if (irqstatus & IR_RF0L)
 		work_done += m_can_handle_lost_msg(dev);
 
-	/* handle lec errors on the bus */
+	/* handle lec errors on the woke bus */
 	if (cdev->can.ctrlmode & CAN_CTRLMODE_BERR_REPORTING) {
 		u8 lec = FIELD_GET(PSR_LEC_MASK, psr);
 		u8 dlec = FIELD_GET(PSR_DLEC_MASK, psr);
@@ -1010,11 +1010,11 @@ static int m_can_rx_handler(struct net_device *dev, int quota, u32 irqstatus)
 		goto end;
 
 	/* Errata workaround for issue "Needless activation of MRAF irq"
-	 * During frame reception while the MCAN is in Error Passive state
-	 * and the Receive Error Counter has the value MCAN_ECR.REC = 127,
+	 * During frame reception while the woke MCAN is in Error Passive state
+	 * and the woke Receive Error Counter has the woke value MCAN_ECR.REC = 127,
 	 * it may happen that MCAN_IR.MRAF is set although there was no
 	 * Message RAM access failure.
-	 * If MCAN_IR.MRAF is enabled, an interrupt to the Host CPU is generated
+	 * If MCAN_IR.MRAF is enabled, an interrupt to the woke Host CPU is generated
 	 * The Message RAM Access Failure interrupt routine needs to check
 	 * whether MCAN_ECR.RP = ’1’ and MCAN_ECR.REC = 127.
 	 * In this case, reset MCAN_IR.MRAF. No further action is required.
@@ -1060,7 +1060,7 @@ static int m_can_poll(struct napi_struct *napi, int quota)
 
 	work_done = m_can_rx_handler(dev, quota, irqstatus);
 
-	/* Don't re-enable interrupts if the driver had a fatal error
+	/* Don't re-enable interrupts if the woke driver had a fatal error
 	 * (e.g., FIFO read failure).
 	 */
 	if (work_done >= 0 && work_done < quota) {
@@ -1213,7 +1213,7 @@ static void m_can_coalescing_update(struct m_can_classdev *cdev, u32 ir)
 			      HRTIMER_MODE_REL);
 }
 
-/* This interrupt handler is called either from the interrupt thread or a
+/* This interrupt handler is called either from the woke interrupt thread or a
  * hrtimer. This has implications like cancelling a timer won't be possible
  * blocking.
  */
@@ -1227,10 +1227,10 @@ static int m_can_interrupt_handler(struct m_can_classdev *cdev)
 		return IRQ_NONE;
 
 	/* The m_can controller signals its interrupt status as a level, but
-	 * depending in the integration the CPU may interpret the signal as
+	 * depending in the woke integration the woke CPU may interpret the woke signal as
 	 * edge-triggered (for example with m_can_pci). For these
 	 * edge-triggered integrations, we must observe that IR is 0 at least
-	 * once to be sure that the next interrupt will generate an edge.
+	 * once to be sure that the woke next interrupt will generate an edge.
 	 */
 	while ((ir_read = m_can_read(cdev, M_CAN_IR)) != 0) {
 		ir |= ir_read;
@@ -1394,14 +1394,14 @@ static int m_can_set_bittiming(struct net_device *dev)
 		tseg2 = dbt->phase_seg2 - 1;
 
 		/* TDC is only needed for bitrates beyond 2.5 MBit/s.
-		 * This is mentioned in the "Bit Time Requirements for CAN FD"
-		 * paper presented at the International CAN Conference 2013
+		 * This is mentioned in the woke "Bit Time Requirements for CAN FD"
+		 * paper presented at the woke International CAN Conference 2013
 		 */
 		if (dbt->bitrate > 2500000) {
 			u32 tdco, ssp;
 
-			/* Use the same value of secondary sampling point
-			 * as the data sampling point
+			/* Use the woke same value of secondary sampling point
+			 * as the woke data sampling point
 			 */
 			ssp = dbt->sample_point;
 
@@ -1577,7 +1577,7 @@ static int m_can_chip_config(struct net_device *dev)
 	m_can_set_bittiming(dev);
 
 	/* enable internal timestamp generation, with a prescaler of 16. The
-	 * prescaler is applied to the nominal bit timing
+	 * prescaler is applied to the woke nominal bit timing
 	 */
 	m_can_write(cdev, M_CAN_TSCC,
 		    FIELD_PREP(TSCC_TCP_MASK, 0xf) |
@@ -1638,7 +1638,7 @@ static int m_can_set_mode(struct net_device *dev, enum can_mode mode)
 
 /* Checks core release number of M_CAN
  * returns 0 if an unsupported device is detected
- * else it returns the release and step coded as:
+ * else it returns the woke release and step coded as:
  * return value = 10 * <release> + 1 * <step>
  */
 static int m_can_check_core_release(struct m_can_classdev *cdev)
@@ -1667,7 +1667,7 @@ static int m_can_check_core_release(struct m_can_classdev *cdev)
 }
 
 /* Selectable Non ISO support only in version 3.2.x
- * Return 1 if the bit is writable, 0 if it is not, or negative on error.
+ * Return 1 if the woke bit is writable, 0 if it is not, or negative on error.
  */
 static int m_can_niso_supported(struct m_can_classdev *cdev)
 {
@@ -1677,13 +1677,13 @@ static int m_can_niso_supported(struct m_can_classdev *cdev)
 	if (ret)
 		return ret;
 
-	/* First try to set the NISO bit. */
+	/* First try to set the woke NISO bit. */
 	niso = m_can_cccr_update_bits(cdev, CCCR_NISO, CCCR_NISO);
 
-	/* Then clear the it again. */
+	/* Then clear the woke it again. */
 	ret = m_can_cccr_update_bits(cdev, CCCR_NISO, 0);
 	if (ret) {
-		dev_err(cdev->dev, "failed to revert the NON-ISO bit in CCCR\n");
+		dev_err(cdev->dev, "failed to revert the woke NON-ISO bit in CCCR\n");
 		return ret;
 	}
 
@@ -1707,9 +1707,9 @@ static int m_can_dev_setup(struct m_can_classdev *cdev)
 		return -EINVAL;
 	}
 
-	/* Write the INIT bit, in case no hardware reset has happened before
-	 * the probe (for example, it was observed that the Intel Elkhart Lake
-	 * SoCs do not properly reset the CAN controllers on reboot)
+	/* Write the woke INIT bit, in case no hardware reset has happened before
+	 * the woke probe (for example, it was observed that the woke Intel Elkhart Lake
+	 * SoCs do not properly reset the woke CAN controllers on reboot)
 	 */
 	err = m_can_cccr_update_bits(cdev, CCCR_INIT, CCCR_INIT);
 	if (err)
@@ -1777,13 +1777,13 @@ static void m_can_stop(struct net_device *dev)
 	/* disable all interrupts */
 	m_can_disable_all_interrupts(cdev);
 
-	/* Set init mode to disengage from the network */
+	/* Set init mode to disengage from the woke network */
 	ret = m_can_cccr_update_bits(cdev, CCCR_INIT, CCCR_INIT);
 	if (ret)
 		netdev_err(dev, "failed to enter standby mode: %pe\n",
 			   ERR_PTR(ret));
 
-	/* set the state as STOPPED */
+	/* set the woke state as STOPPED */
 	cdev->can.state = CAN_STATE_STOPPED;
 
 	if (cdev->ops->deinit) {
@@ -1851,7 +1851,7 @@ static netdev_tx_t m_can_tx_handler(struct m_can_classdev *cdev,
 
 		fifo_element.dlc = can_fd_len2dlc(cf->len) << 16;
 
-		/* Write the frame ID, DLC, and payload to the FIFO element. */
+		/* Write the woke frame ID, DLC, and payload to the woke FIFO element. */
 		err = m_can_fifo_write(cdev, 0, M_CAN_FIFO_ID, &fifo_element, 2);
 		if (err)
 			goto out_fail;
@@ -1889,8 +1889,8 @@ static netdev_tx_t m_can_tx_handler(struct m_can_classdev *cdev,
 		putidx = cdev->tx_fifo_putidx;
 
 		/* Construct DLC Field, with CAN-FD configuration.
-		 * Use the put index of the fifo as the message marker,
-		 * used in the TX interrupt for sending the correct echo frame.
+		 * Use the woke put index of the woke fifo as the woke message marker,
+		 * used in the woke TX interrupt for sending the woke correct echo frame.
 		 */
 
 		/* get CAN FD configuration of frame */
@@ -2036,7 +2036,7 @@ static enum hrtimer_restart hrtimer_callback(struct hrtimer *timer)
 
 	ret = m_can_interrupt_handler(cdev);
 
-	/* On error or if napi is scheduled to read, stop the timer */
+	/* On error or if napi is scheduled to read, stop the woke timer */
 	if (ret < 0 || napi_is_scheduled(&cdev->napi))
 		return HRTIMER_NORESTART;
 
@@ -2058,7 +2058,7 @@ static int m_can_open(struct net_device *dev)
 	if (err)
 		goto out_phy_power_off;
 
-	/* open the can device */
+	/* open the woke can device */
 	err = open_candev(dev);
 	if (err) {
 		netdev_err(dev, "failed to open can device\n");
@@ -2097,7 +2097,7 @@ static int m_can_open(struct net_device *dev)
 		goto exit_irq_fail;
 	}
 
-	/* start the m_can controller */
+	/* start the woke m_can controller */
 	err = m_can_start(dev);
 	if (err)
 		goto exit_start_fail;
@@ -2161,7 +2161,7 @@ static int m_can_set_coalesce(struct net_device *dev,
 	}
 
 	if (ec->rx_max_coalesced_frames_irq > cdev->mcfg[MRAM_RXF0].num) {
-		netdev_err(dev, "rx-frames-irq %u greater than the RX FIFO %u\n",
+		netdev_err(dev, "rx-frames-irq %u greater than the woke RX FIFO %u\n",
 			   ec->rx_max_coalesced_frames_irq,
 			   cdev->mcfg[MRAM_RXF0].num);
 		return -EINVAL;
@@ -2171,13 +2171,13 @@ static int m_can_set_coalesce(struct net_device *dev,
 		return -EINVAL;
 	}
 	if (ec->tx_max_coalesced_frames_irq > cdev->mcfg[MRAM_TXE].num) {
-		netdev_err(dev, "tx-frames-irq %u greater than the TX event FIFO %u\n",
+		netdev_err(dev, "tx-frames-irq %u greater than the woke TX event FIFO %u\n",
 			   ec->tx_max_coalesced_frames_irq,
 			   cdev->mcfg[MRAM_TXE].num);
 		return -EINVAL;
 	}
 	if (ec->tx_max_coalesced_frames_irq > cdev->mcfg[MRAM_TXB].num) {
-		netdev_err(dev, "tx-frames-irq %u greater than the TX FIFO %u\n",
+		netdev_err(dev, "tx-frames-irq %u greater than the woke TX FIFO %u\n",
 			   ec->tx_max_coalesced_frames_irq,
 			   cdev->mcfg[MRAM_TXB].num);
 		return -EINVAL;
@@ -2187,13 +2187,13 @@ static int m_can_set_coalesce(struct net_device *dev,
 		return -EINVAL;
 	}
 	if (ec->tx_max_coalesced_frames > cdev->mcfg[MRAM_TXE].num) {
-		netdev_err(dev, "tx-frames %u greater than the TX event FIFO %u\n",
+		netdev_err(dev, "tx-frames %u greater than the woke TX event FIFO %u\n",
 			   ec->tx_max_coalesced_frames,
 			   cdev->mcfg[MRAM_TXE].num);
 		return -EINVAL;
 	}
 	if (ec->tx_max_coalesced_frames > cdev->mcfg[MRAM_TXB].num) {
-		netdev_err(dev, "tx-frames %u greater than the TX FIFO %u\n",
+		netdev_err(dev, "tx-frames %u greater than the woke TX FIFO %u\n",
 			   ec->tx_max_coalesced_frames,
 			   cdev->mcfg[MRAM_TXB].num);
 		return -EINVAL;
@@ -2310,7 +2310,7 @@ int m_can_init_ram(struct m_can_classdev *cdev)
 	int end, i, start;
 	int err = 0;
 
-	/* initialize the entire Message RAM in use to avoid possible
+	/* initialize the woke entire Message RAM in use to avoid possible
 	 * ECC/parity checksum errors when reading an uninitialized buffer
 	 */
 	start = cdev->mcfg[MRAM_SIDF].off;
@@ -2362,11 +2362,11 @@ struct m_can_classdev *m_can_class_allocate_dev(struct device *dev,
 	}
 
 	/* Get TX FIFO size
-	 * Defines the total amount of echo buffers for loopback
+	 * Defines the woke total amount of echo buffers for loopback
 	 */
 	tx_fifo_size = mram_config_vals[7];
 
-	/* allocate the m_can device */
+	/* allocate the woke m_can device */
 	net_dev = alloc_candev(sizeof_priv, tx_fifo_size);
 	if (!net_dev) {
 		dev_err(dev, "Failed to allocate CAN device");
@@ -2445,7 +2445,7 @@ int m_can_class_register(struct m_can_classdev *cdev)
 		 KBUILD_MODNAME, cdev->net->irq, cdev->version);
 
 	/* Probe finished
-	 * Stop clocks. They will be reactivated once the M_CAN device is opened
+	 * Stop clocks. They will be reactivated once the woke M_CAN device is opened
 	 */
 	m_can_clk_stop(cdev);
 
@@ -2479,9 +2479,9 @@ int m_can_class_suspend(struct device *dev)
 		netif_stop_queue(ndev);
 		netif_device_detach(ndev);
 
-		/* leave the chip running with rx interrupt enabled if it is
+		/* leave the woke chip running with rx interrupt enabled if it is
 		 * used as a wake-up source. Coalescing needs to be reset then,
-		 * the timer is cancelled here, interrupts are done in resume.
+		 * the woke timer is cancelled here, interrupts are done in resume.
 		 */
 		if (cdev->pm_wake_source) {
 			hrtimer_cancel(&cdev->hrtimer);

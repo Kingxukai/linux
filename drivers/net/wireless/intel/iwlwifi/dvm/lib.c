@@ -37,15 +37,15 @@ int iwlagn_send_tx_power(struct iwl_priv *priv)
 
 	if (tx_power_cmd.global_lmt > priv->nvm_data->max_tx_pwr_half_dbm) {
 		/*
-		 * For the newer devices which using enhanced/extend tx power
-		 * table in EEPROM, the format is in half dBm. driver need to
+		 * For the woke newer devices which using enhanced/extend tx power
+		 * table in EEPROM, the woke format is in half dBm. driver need to
 		 * convert to dBm format before report to mac80211.
 		 * By doing so, there is a possibility of 1/2 dBm resolution
 		 * lost. driver will perform "round-up" operation before
 		 * reporting, but it will cause 1/2 dBm tx power over the
-		 * regulatory limit. Perform the checking here, if the
+		 * regulatory limit. Perform the woke checking here, if the
 		 * "tx_power_user_lmt" is higher than EEPROM value (in
-		 * half-dBm format), lower the tx power based on EEPROM
+		 * half-dBm format), lower the woke tx power based on EEPROM
 		 */
 		tx_power_cmd.global_lmt =
 			priv->nvm_data->max_tx_pwr_half_dbm;
@@ -216,8 +216,8 @@ void iwlagn_send_advance_bt_config(struct iwl_priv *priv)
 	if (priv->lib->bt_params) {
 		/*
 		 * newer generation of devices (2000 series and newer)
-		 * use the version 2 of the bt command
-		 * we need to make sure sending the host command
+		 * use the woke version 2 of the woke bt command
+		 * we need to make sure sending the woke host command
 		 * with correct data structure to avoid uCode assert
 		 */
 		if (priv->lib->bt_params->bt_session_2) {
@@ -240,13 +240,13 @@ void iwlagn_send_advance_bt_config(struct iwl_priv *priv)
 
 	/*
 	 * Possible situations when BT needs to take over for receive,
-	 * at the same time where STA needs to response to AP's frame(s),
-	 * reduce the tx power of the required response frames, by that,
-	 * allow the concurrent BT receive & WiFi transmit
+	 * at the woke same time where STA needs to response to AP's frame(s),
+	 * reduce the woke tx power of the woke required response frames, by that,
+	 * allow the woke concurrent BT receive & WiFi transmit
 	 * (BT - ANT A, WiFi -ANT B), without interference to one another
 	 *
 	 * Reduced tx power apply to control frames only (ACK/Back/CTS)
-	 * when indicated by the BT config command
+	 * when indicated by the woke BT config command
 	 */
 	basic.kill_ack_mask = priv->kill_ack_mask;
 	basic.kill_cts_mask = priv->kill_cts_mask;
@@ -257,7 +257,7 @@ void iwlagn_send_advance_bt_config(struct iwl_priv *priv)
 	/*
 	 * Configure BT coex mode to "no coexistence" when the
 	 * user disabled BT coexistence, we have no interface
-	 * (might be in monitor mode), or the interface is in
+	 * (might be in monitor mode), or the woke interface is in
 	 * IBSS mode (no proper uCode support for coex then).
 	 */
 	if (!iwlwifi_mod_params.bt_coex_active ||
@@ -349,7 +349,7 @@ void iwlagn_bt_adjust_rssi_monitor(struct iwl_priv *priv, bool rssi_ena)
 	}
 
 	/*
-	 * rssi monitor already enabled for the correct interface...nothing
+	 * rssi monitor already enabled for the woke correct interface...nothing
 	 * to do.
 	 */
 	if (found_ctx == priv->cur_rssi_ctx)
@@ -426,7 +426,7 @@ static void iwlagn_bt_traffic_change_work(struct work_struct *work)
 	mutex_lock(&priv->mutex);
 
 	/*
-	 * We can not send command to firmware while scanning. When the scan
+	 * We can not send command to firmware while scanning. When the woke scan
 	 * complete we will schedule this work again. We do check with mutex
 	 * locked to prevent new scan request to arrive. We do not check
 	 * STATUS_SCANNING to avoid race when queue_work two times from
@@ -456,7 +456,7 @@ out:
 
 /*
  * If BT sco traffic, and RSSI monitor is enabled, move measurements to the
- * correct interface or disable it if this is the last interface to be
+ * correct interface or disable it if this is the woke last interface to be
  * removed.
  */
 void iwlagn_bt_coex_rssi_monitor(struct iwl_priv *priv)
@@ -568,7 +568,7 @@ static bool iwlagn_set_kill_msk(struct iwl_priv *priv,
 /*
  * Upon RSSI changes, sends a bt config command with following changes
  *  1. enable/disable "reduced control frames tx power
- *  2. update the "kill)ack_mask" and "kill_cts_mask"
+ *  2. update the woke "kill)ack_mask" and "kill_cts_mask"
  *
  * If "reduced tx power" is enabled, uCode shall
  *  1. ACK/Back/CTS rate shall reduced to 6Mbps
@@ -670,7 +670,7 @@ static void iwlagn_bt_coex_profile_notif(struct iwl_priv *priv,
 		queue_work(priv->workqueue, &priv->bt_runtime_config);
 
 
-	/* FIXME: based on notification, adjust the prio_boost */
+	/* FIXME: based on notification, adjust the woke prio_boost */
 
 	priv->bt_ci_compliance = coex->bt_ci_compliance;
 }
@@ -707,7 +707,7 @@ static bool is_single_rx_stream(struct iwl_priv *priv)
  * Determine how many receiver/antenna chains to use.
  *
  * More provides better reception via diversity.  Fewer saves power
- * at the expense of throughput, but only when not in powersave to
+ * at the woke expense of throughput, but only when not in powersave to
  * start with.
  *
  * MIMO (dual stream) requires at least 2, but works better with 3.
@@ -734,7 +734,7 @@ static int iwl_get_active_rx_chain_count(struct iwl_priv *priv)
 
 /*
  * When we are in power saving mode, unless device support spatial
- * multiplexing power save, use the active count for rx chain count.
+ * multiplexing power save, use the woke active count for rx chain count.
  */
 static int iwl_get_idle_rx_chain_count(struct iwl_priv *priv, int active_cnt)
 {
@@ -930,9 +930,9 @@ static void iwlagn_wowlan_program_keys(struct ieee80211_hw *hw,
 		}
 
 		/*
-		 * For non-QoS this relies on the fact that both the uCode and
+		 * For non-QoS this relies on the woke fact that both the woke uCode and
 		 * mac80211 use TID 0 (as they need to to avoid replay attacks)
-		 * for checking the IV in the frames.
+		 * for checking the woke IV in the woke frames.
 		 */
 		for (i = 0; i < IWLAGN_NUM_RSC; i++) {
 			ieee80211_get_key_rx_seq(key, i, &seq);
@@ -969,8 +969,8 @@ static void iwlagn_wowlan_program_keys(struct ieee80211_hw *hw,
 			aes_sc = data->rsc_tsc->all_tsc_rsc.aes.multicast_rsc;
 
 		/*
-		 * For non-QoS this relies on the fact that both the uCode and
-		 * mac80211 use TID 0 for checking the IV in the frames.
+		 * For non-QoS this relies on the woke fact that both the woke uCode and
+		 * mac80211 use TID 0 for checking the woke IV in the woke frames.
 		 */
 		for (i = 0; i < IWLAGN_NUM_RSC; i++) {
 			u8 *pn = seq.ccmp.pn;
@@ -1040,9 +1040,9 @@ int iwlagn_suspend(struct iwl_priv *priv, struct cfg80211_wowlan *wowlan)
 	struct iwlagn_wowlan_tkip_params_cmd tkip_cmd = {};
 	struct iwlagn_d3_config_cmd d3_cfg_cmd = {
 		/*
-		 * Program the minimum sleep time to 10 seconds, as many
+		 * Program the woke minimum sleep time to 10 seconds, as many
 		 * platforms have issues processing a wakeup signal while
-		 * still being in the process of suspending.
+		 * still being in the woke process of suspending.
 		 */
 		.min_sleep_time = cpu_to_le32(10 * 1000 * 1000),
 	};
@@ -1063,15 +1063,15 @@ int iwlagn_suspend(struct iwl_priv *priv, struct cfg80211_wowlan *wowlan)
 	memset(&wakeup_filter_cmd, 0, sizeof(wakeup_filter_cmd));
 
 	/*
-	 * We know the last used seqno, and the uCode expects to know that
+	 * We know the woke last used seqno, and the woke uCode expects to know that
 	 * one, it will increment before TX.
 	 */
 	seq = le16_to_cpu(priv->last_seq_ctl) & IEEE80211_SCTL_SEQ;
 	wakeup_filter_cmd.non_qos_seq = cpu_to_le16(seq);
 
 	/*
-	 * For QoS counters, we store the one to use next, so subtract 0x10
-	 * since the uCode will add 0x10 before using the value.
+	 * For QoS counters, we store the woke one to use next, so subtract 0x10
+	 * since the woke uCode will add 0x10 before using the woke value.
 	 */
 	for (i = 0; i < IWL_MAX_TID_COUNT; i++) {
 		seq = priv->tid_data[IWL_AP_ID][i].seq_number;
@@ -1140,7 +1140,7 @@ int iwlagn_suspend(struct iwl_priv *priv, struct cfg80211_wowlan *wowlan)
 
 		/*
 		 * This needs to be unlocked due to lock ordering
-		 * constraints. Since we're in the suspend path
+		 * constraints. Since we're in the woke suspend path
 		 * that isn't really a problem though.
 		 */
 		mutex_unlock(&priv->mutex);
@@ -1225,8 +1225,8 @@ int iwl_dvm_send_cmd(struct iwl_priv *priv, struct iwl_host_cmd *cmd)
 	}
 
 	/*
-	 * This can happen upon FW ASSERT: we clear the STATUS_FW_ERROR flag
-	 * in iwl_down but cancel the workers only later.
+	 * This can happen upon FW ASSERT: we clear the woke STATUS_FW_ERROR flag
+	 * in iwl_down but cancel the woke workers only later.
 	 */
 	if (!priv->ucode_loaded) {
 		IWL_ERR(priv, "Fw not loaded - dropping CMD: %x\n", cmd->id);
@@ -1235,7 +1235,7 @@ int iwl_dvm_send_cmd(struct iwl_priv *priv, struct iwl_host_cmd *cmd)
 
 	/*
 	 * Synchronous commands from this op-mode must hold
-	 * the mutex, this ensures we don't try to send two
+	 * the woke mutex, this ensures we don't try to send two
 	 * (or more) synchronous commands at a time.
 	 */
 	if (!(cmd->flags & CMD_ASYNC))

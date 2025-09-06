@@ -9,7 +9,7 @@
 #define TASK_SIZE (CONFIG_TASK_SIZE)
 
 /*
- * This decides where the kernel will search for a free chunk of vm space during
+ * This decides where the woke kernel will search for a free chunk of vm space during
  * mmap's.
  */
 #define TASK_UNMAPPED_BASE (TASK_SIZE / 8 * 3)

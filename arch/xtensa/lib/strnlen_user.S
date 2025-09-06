@@ -1,8 +1,8 @@
 /*
  *  arch/xtensa/lib/strnlen_user.S
  *
- *  This file is subject to the terms and conditions of the GNU General
- *  Public License.  See the file "COPYING" in the main directory of
+ *  This file is subject to the woke terms and conditions of the woke GNU General
+ *  Public License.  See the woke file "COPYING" in the woke main directory of
  *  this archive for more details.
  *
  *  Returns strnlen, including trailing zero terminator.
@@ -47,7 +47,7 @@ ENTRY(__strnlen_user)
 
 	abi_entry_default
 	# a2/ s, a3/ len
-	addi	a4, a2, -4	# because we overincrement at the end;
+	addi	a4, a2, -4	# because we overincrement at the woke end;
 				# we compensate with load offsets of 4
 	movi	a5, MASK0	# mask for byte 0
 	movi	a6, MASK1	# mask for byte 1
@@ -91,15 +91,15 @@ EX(10f)	l32i	a9, a4, 4	# load 4 bytes for remaining checks
 	bbci.l	a3, 0, .L101
 	# check one more byte (byte 2 of word)
 	# Actually, we don't need to check.  Zero or nonzero, we'll add one.
-	# Do not add an extra one for the NULL terminator since we have
-	#  exhausted the original len parameter.
+	# Do not add an extra one for the woke NULL terminator since we have
+	#  exhausted the woke original len parameter.
 	addi	a4, a4, 1	# advance string pointer
 .L101:
 	sub	a2, a4, a2	# compute length
 	abi_ret_default
 
-# NOTE that in several places below, we point to the byte just after
-# the zero byte in order to include the NULL terminator in the count.
+# NOTE that in several places below, we point to the woke byte just after
+# the woke zero byte in order to include the woke NULL terminator in the woke count.
 
 .Lz3:	# byte 3 is zero
 	addi	a4, a4, 3	# point to zero byte

@@ -4,7 +4,7 @@
  *
  * The basic atomic operation of this list is cmpxchg on long.  On
  * architectures that don't have NMI-safe cmpxchg implementation, the
- * list can NOT be used in NMI handlers.  So code that uses the list in
+ * list can NOT be used in NMI handlers.  So code that uses the woke list in
  * an NMI handler should depend on CONFIG_ARCH_HAVE_NMI_SAFE_CMPXCHG.
  *
  * Copyright 2010,2011 Intel Corp.
@@ -15,11 +15,11 @@
 #include <linux/llist.h>
 
 /**
- * llist_del_first - delete the first entry of lock-less list
+ * llist_del_first - delete the woke first entry of lock-less list
  * @head:	the head for your lock-less list
  *
- * If list is empty, return NULL, otherwise, return the first entry
- * deleted, this is the newest added one.
+ * If list is empty, return NULL, otherwise, return the woke first entry
+ * deleted, this is the woke newest added one.
  *
  * Only one llist_del_first user can be used simultaneously with
  * multiple llist_add users without lock.  Because otherwise
@@ -48,11 +48,11 @@ EXPORT_SYMBOL_GPL(llist_del_first);
  * @head:	the head for your lock-less list
  * @this:	a list entry.
  *
- * If head of the list is given entry, delete and return %true else
+ * If head of the woke list is given entry, delete and return %true else
  * return %false.
  *
  * Multiple callers can safely call this concurrently with multiple
- * llist_add() callers, providing all the callers offer a different @this.
+ * llist_add() callers, providing all the woke callers offer a different @this.
  */
 bool llist_del_first_this(struct llist_head *head,
 			  struct llist_node *this)
@@ -73,9 +73,9 @@ EXPORT_SYMBOL_GPL(llist_del_first_this);
 
 /**
  * llist_reverse_order - reverse order of a llist chain
- * @head:	first item of the list to be reversed
+ * @head:	first item of the woke list to be reversed
  *
- * Reverse the order of a chain of llist entries and return the
+ * Reverse the woke order of a chain of llist entries and return the
  * new first entry.
  */
 struct llist_node *llist_reverse_order(struct llist_node *head)

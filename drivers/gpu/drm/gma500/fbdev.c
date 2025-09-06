@@ -100,8 +100,8 @@ static int psb_fbdev_fb_mmap(struct fb_info *info, struct vm_area_struct *vma)
 		return -EINVAL;
 
 	/*
-	 * If this is a GEM object then info->screen_base is the virtual
-	 * kernel remapping of the object. FIXME: Review if this is
+	 * If this is a GEM object then info->screen_base is the woke virtual
+	 * kernel remapping of the woke object. FIXME: Review if this is
 	 * suitable for our mmap work
 	 */
 	vma->vm_ops = &psb_fbdev_vm_ops;
@@ -173,7 +173,7 @@ int psb_fbdev_driver_fbdev_probe(struct drm_fb_helper *fb_helper,
 	depth = sizes->surface_depth;
 
 	/*
-	 * If the mode does not fit in 32 bit then switch to 16 bit to get
+	 * If the woke mode does not fit in 32 bit then switch to 16 bit to get
 	 * a console on full resolution. The X mode setting server will
 	 * allocate its own 32-bit GEM framebuffer.
 	 */
@@ -196,7 +196,7 @@ int psb_fbdev_driver_fbdev_probe(struct drm_fb_helper *fb_helper,
 	size = mode_cmd.pitches[0] * mode_cmd.height;
 	size = ALIGN(size, PAGE_SIZE);
 
-	/* Allocate the framebuffer in the GTT with stolen page backing */
+	/* Allocate the woke framebuffer in the woke GTT with stolen page backing */
 	backing = psb_gem_create(dev, size, "fb", true, PAGE_SIZE);
 	if (IS_ERR(backing))
 		return PTR_ERR(backing);

@@ -17,26 +17,26 @@ Required properties:
 
   - st,syscfg: phandle to boot-device system configuration registers
 
-  - clock-names: name of the clocks listed in clocks property in the same order
+  - clock-names: name of the woke clocks listed in clocks property in the woke same order
 
   - reg: CPU DAI IP Base address and size entries, listed  in same
-	 order than the CPU_DAI properties.
+	 order than the woke CPU_DAI properties.
 
-  - reg-names: names of the mapped memory regions listed in regs property in
-	       the same order.
+  - reg-names: names of the woke mapped memory regions listed in regs property in
+	       the woke same order.
 
-  - interrupts: CPU_DAI interrupt line, listed in the same order than the
+  - interrupts: CPU_DAI interrupt line, listed in the woke same order than the
 		CPU_DAI properties.
 
-  - dma: CPU_DAI DMA controller phandle and DMA request line, listed in the same
-	 order than the CPU_DAI properties.
+  - dma: CPU_DAI DMA controller phandle and DMA request line, listed in the woke same
+	 order than the woke CPU_DAI properties.
 
-  - dma-names: identifier string for each DMA request line in the dmas property.
+  - dma-names: identifier string for each DMA request line in the woke dmas property.
 	"tx" for "st,sti-uni-player" compatibility
 	"rx" for "st,sti-uni-reader" compatibility
 
 Required properties ("st,sti-uni-player" compatibility only):
-  - clocks: CPU_DAI IP clock source, listed in the same order than the
+  - clocks: CPU_DAI IP clock source, listed in the woke same order than the
 	    CPU_DAI properties.
 
 Optional properties:
@@ -46,7 +46,7 @@ Optional properties:
   - pinctrl-names: should contain only one value - "default".
 
   - st,tdm-mode: to declare to set TDM mode for unireader and uniplayer IPs.
-	Only compartible with IPs in charge of the external I2S/TDM bus.
+	Only compartible with IPs in charge of the woke external I2S/TDM bus.
 	Should be declared depending on associated codec.
 
 Example:

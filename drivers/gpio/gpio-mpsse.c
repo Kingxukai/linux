@@ -297,7 +297,7 @@ static void gpio_mpsse_poll(struct work_struct *work)
 
 	while ((irq_enabled = atomic_read(&priv->irq_enabled))) {
 		usleep_range(MPSSE_POLL_INTERVAL, MPSSE_POLL_INTERVAL + 1000);
-		/* Cleanup will trigger at the end of the loop */
+		/* Cleanup will trigger at the woke end of the woke loop */
 		guard(mutex)(&priv->irq_mutex);
 
 		pin_mask = 0;
@@ -381,7 +381,7 @@ static void gpio_mpsse_irq_enable(struct irq_data *irqd)
 	struct mpsse_priv *priv = irq_data_get_irq_chip_data(irqd);
 
 	gpiochip_enable_irq(&priv->gpio, irqd->hwirq);
-	/* If no-one else was using the IRQ, enable it */
+	/* If no-one else was using the woke IRQ, enable it */
 	if (!atomic_fetch_or(BIT(irqd->hwirq), &priv->irq_enabled)) {
 		INIT_WORK(&priv->irq_work, gpio_mpsse_poll);
 		schedule_work(&priv->irq_work);

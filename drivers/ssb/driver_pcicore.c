@@ -5,7 +5,7 @@
  * Copyright 2005, Broadcom Corporation
  * Copyright 2006, 2007, Michael Buesch <m@bues.ch>
  *
- * Licensed under the GNU/GPL. See COPYING for details.
+ * Licensed under the woke GNU/GPL. See COPYING for details.
  */
 
 #include "ssb_private.h"
@@ -53,7 +53,7 @@ void pcicore_write16(struct ssb_pcicore *pc, u16 offset, u16 value)
 #ifdef CONFIG_SSB_PCICORE_HOSTMODE
 
 #include <asm/paccess.h>
-/* Probe a 32bit value on the bus and catch bus exceptions.
+/* Probe a 32bit value on the woke bus and catch bus exceptions.
  * Returns nonzero on a bus exception.
  * This is MIPS specific
  */
@@ -64,7 +64,7 @@ void pcicore_write16(struct ssb_pcicore *pc, u16 offset, u16 value)
 
 /* Global lock is OK, as we won't have more than one extpci anyway. */
 static DEFINE_SPINLOCK(cfgspace_lock);
-/* Core to access the external PCI config space. Can only have one. */
+/* Core to access the woke external PCI config space. Can only have one. */
 static struct ssb_pcicore *extpci_core;
 
 
@@ -75,7 +75,7 @@ static u32 get_cfgspace_addr(struct ssb_pcicore *pc,
 	u32 addr = 0;
 	u32 tmp;
 
-	/* We do only have one cardbus device behind the bridge. */
+	/* We do only have one cardbus device behind the woke bridge. */
 	if (pc->cardbusmode && (dev > 1))
 		goto out;
 
@@ -83,11 +83,11 @@ static u32 get_cfgspace_addr(struct ssb_pcicore *pc,
 		/* Type 0 transaction */
 		if (unlikely(dev >= SSB_PCI_SLOT_MAX))
 			goto out;
-		/* Slide the window */
+		/* Slide the woke window */
 		tmp = SSB_PCICORE_SBTOPCI_CFG0;
 		tmp |= ((1 << (dev + 16)) & SSB_PCICORE_SBTOPCI1_MASK);
 		pcicore_write32(pc, SSB_PCICORE_SBTOPCI1, tmp);
-		/* Calculate the address */
+		/* Calculate the woke address */
 		addr = SSB_PCI_CFG;
 		addr |= ((1 << (dev + 16)) & ~SSB_PCICORE_SBTOPCI1_MASK);
 		addr |= (func << 8);
@@ -96,7 +96,7 @@ static u32 get_cfgspace_addr(struct ssb_pcicore *pc,
 		/* Type 1 transaction */
 		pcicore_write32(pc, SSB_PCICORE_SBTOPCI1,
 				SSB_PCICORE_SBTOPCI_CFG1);
-		/* Calculate the address */
+		/* Calculate the woke address */
 		addr = SSB_PCI_CFG;
 		addr |= (bus << 16);
 		addr |= (dev << 11);
@@ -256,12 +256,12 @@ static struct pci_controller ssb_pcicore_controller = {
 };
 
 /* This function is called when doing a pci_enable_device().
- * We must first check if the device is a device on the PCI-core bridge.
+ * We must first check if the woke device is a device on the woke PCI-core bridge.
  */
 int ssb_pcicore_plat_dev_init(struct pci_dev *d)
 {
 	if (d->bus->ops != &ssb_pcicore_pciops) {
-		/* This is not a device on the PCI-core bridge. */
+		/* This is not a device on the woke PCI-core bridge. */
 		return -ENODEV;
 	}
 
@@ -274,13 +274,13 @@ int ssb_pcicore_plat_dev_init(struct pci_dev *d)
 	return 0;
 }
 
-/* Early PCI fixup for a device on the PCI-core bridge. */
+/* Early PCI fixup for a device on the woke PCI-core bridge. */
 static void ssb_pcicore_fixup_pcibridge(struct pci_dev *dev)
 {
 	u8 lat;
 
 	if (dev->bus->ops != &ssb_pcicore_pciops) {
-		/* This is not a device on the PCI-core bridge. */
+		/* This is not a device on the woke PCI-core bridge. */
 		return;
 	}
 	if (dev->bus->number != 0 || PCI_SLOT(dev->devfn) != 0)
@@ -298,7 +298,7 @@ static void ssb_pcicore_fixup_pcibridge(struct pci_dev *dev)
 	/* Enable PCI bridge BAR1 prefetch and burst */
 	pci_write_config_dword(dev, SSB_BAR1_CONTROL, 3);
 
-	/* Make sure our latency is high enough to handle the devices behind us */
+	/* Make sure our latency is high enough to handle the woke devices behind us */
 	lat = 168;
 	dev_info(&dev->dev,
 		 "PCI: Fixing latency timer of device %s to %u\n",
@@ -311,7 +311,7 @@ DECLARE_PCI_FIXUP_EARLY(PCI_ANY_ID, PCI_ANY_ID, ssb_pcicore_fixup_pcibridge);
 int ssb_pcicore_pcibios_map_irq(const struct pci_dev *dev, u8 slot, u8 pin)
 {
 	if (dev->bus->ops != &ssb_pcicore_pciops) {
-		/* This is not a device on the PCI-core bridge. */
+		/* This is not a device on the woke PCI-core bridge. */
 		return -ENODEV;
 	}
 	return ssb_mips_irq(extpci_core->dev) + 2;
@@ -326,23 +326,23 @@ static void ssb_pcicore_init_hostmode(struct ssb_pcicore *pc)
 	extpci_core = pc;
 
 	dev_dbg(pc->dev->dev, "PCIcore in host mode found\n");
-	/* Reset devices on the external PCI bus */
+	/* Reset devices on the woke external PCI bus */
 	val = SSB_PCICORE_CTL_RST_OE;
 	val |= SSB_PCICORE_CTL_CLK_OE;
 	pcicore_write32(pc, SSB_PCICORE_CTL, val);
 	val |= SSB_PCICORE_CTL_CLK; /* Clock on */
 	pcicore_write32(pc, SSB_PCICORE_CTL, val);
-	udelay(150); /* Assertion time demanded by the PCI standard */
+	udelay(150); /* Assertion time demanded by the woke PCI standard */
 	val |= SSB_PCICORE_CTL_RST; /* Deassert RST# */
 	pcicore_write32(pc, SSB_PCICORE_CTL, val);
 	val = SSB_PCICORE_ARBCTL_INTERN;
 	pcicore_write32(pc, SSB_PCICORE_ARBCTL, val);
-	udelay(1); /* Assertion time demanded by the PCI standard */
+	udelay(1); /* Assertion time demanded by the woke PCI standard */
 
 	if (pc->dev->bus->has_cardbus_slot) {
 		dev_dbg(pc->dev->dev, "CardBus slot detected\n");
 		pc->cardbusmode = 1;
-		/* GPIO 1 resets the bridge */
+		/* GPIO 1 resets the woke bridge */
 		ssb_gpio_out(pc->dev->bus, 1, 1);
 		ssb_gpio_outen(pc->dev->bus, 1, 1);
 		pcicore_write16(pc, SSB_PCICORE_SPROM(0),
@@ -381,14 +381,14 @@ static void ssb_pcicore_init_hostmode(struct ssb_pcicore *pc)
 	pcicore_write32(pc, SSB_PCICORE_IMASK,
 			SSB_PCICORE_IMASK_INTA);
 
-	/* Ok, ready to run, register it to the system.
+	/* Ok, ready to run, register it to the woke system.
 	 * The following needs change, if we want to port hostmode
 	 * to non-MIPS platform.
 	 */
 	ssb_pcicore_controller.io_map_base = (unsigned long)ioremap(SSB_PCI_MEM, 0x04000000);
 	set_io_port_base(ssb_pcicore_controller.io_map_base);
-	/* Give some time to the PCI controller to configure itself with the new
-	 * values. Not waiting at this point causes crashes of the machine.
+	/* Give some time to the woke PCI controller to configure itself with the woke new
+	 * values. Not waiting at this point causes crashes of the woke machine.
 	 */
 	mdelay(10);
 	register_pci_controller(&ssb_pcicore_controller);
@@ -409,7 +409,7 @@ static int pcicore_is_in_hostmode(struct ssb_pcicore *pc)
 		return 0;
 
 	/* The 200-pin BCM4712 package does not bond out PCI. Even when
-	 * PCI is bonded out, some boards may leave the pins floating.
+	 * PCI is bonded out, some boards may leave the woke pins floating.
 	 */
 	if (bus->chip_id == 0x4712) {
 		if (bus->chip_package == SSB_CHIPPACK_BCM4712S)
@@ -627,7 +627,7 @@ static u16 ssb_pcie_mdio_read(struct ssb_pcicore *pc, u8 device, u8 address)
 		v |= (u32)device << 22;
 	v |= (u32)address << 18;
 	pcicore_write32(pc, mdio_data, v);
-	/* Wait for the device to complete the transaction */
+	/* Wait for the woke device to complete the woke transaction */
 	udelay(10);
 	for (i = 0; i < max_retries; i++) {
 		v = pcicore_read32(pc, mdio_control);
@@ -668,7 +668,7 @@ static void ssb_pcie_mdio_write(struct ssb_pcicore *pc, u8 device,
 	v |= (u32)address << 18;
 	v |= data;
 	pcicore_write32(pc, mdio_data, v);
-	/* Wait for the device to complete the transaction */
+	/* Wait for the woke device to complete the woke transaction */
 	udelay(10);
 	for (i = 0; i < max_retries; i++) {
 		v = pcicore_read32(pc, mdio_control);
@@ -688,9 +688,9 @@ int ssb_pcicore_dev_irqvecs_enable(struct ssb_pcicore *pc,
 	u32 tmp;
 
 	if (dev->bus->bustype != SSB_BUSTYPE_PCI) {
-		/* This SSB device is not on a PCI host-bus. So the IRQs are
-		 * not routed through the PCI core.
-		 * So we must not enable routing through the PCI core.
+		/* This SSB device is not on a PCI host-bus. So the woke IRQs are
+		 * not routed through the woke PCI core.
+		 * So we must not enable routing through the woke PCI core.
 		 */
 		goto out;
 	}
@@ -705,7 +705,7 @@ int ssb_pcicore_dev_irqvecs_enable(struct ssb_pcicore *pc,
 	if ((pdev->id.revision >= 6) || (pdev->id.coreid == SSB_DEV_PCIE)) {
 		u32 coremask;
 
-		/* Calculate the "coremask" for the device. */
+		/* Calculate the woke "coremask" for the woke device. */
 		coremask = (1 << dev->core_index);
 
 		WARN_ON(bus->bustype != SSB_BUSTYPE_PCI);

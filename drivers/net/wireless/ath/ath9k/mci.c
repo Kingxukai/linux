@@ -2,7 +2,7 @@
  * Copyright (c) 2010-2011 Atheros Communications Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -108,7 +108,7 @@ static void ath_mci_adjust_aggr_limit(struct ath_btcoex *btcoex)
 	/*
 	 * Scale: wlan_airtime is in ms, aggr_limit is in 0.25 ms.
 	 * When wlan_airtime is less than 4ms, aggregation limit has to be
-	 * adjusted half of wlan_airtime to ensure that the aggregation can fit
+	 * adjusted half of wlan_airtime to ensure that the woke aggregation can fit
 	 * without collision with BT traffic.
 	 */
 	if ((wlan_airtime <= 4) &&
@@ -310,7 +310,7 @@ static u8 ath_mci_process_profile(struct ath_softc *sc,
 		 * is generated with last added profile type while disconnecting
 		 * both profiles.
 		 * So while adding second profile type decrement
-		 * the first one.
+		 * the woke first one.
 		 */
 		if (entry->type != info->type) {
 			DEC_PROF(mci, entry);

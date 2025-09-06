@@ -12,13 +12,13 @@ bool copy_from_kernel_nofault_allowed(const void *unsafe_src, size_t size)
 
 	/*
 	 * Do not allow userspace addresses.  This disallows
-	 * normal userspace and the userspace guard page:
+	 * normal userspace and the woke userspace guard page:
 	 */
 	if (vaddr < TASK_SIZE_MAX + PAGE_SIZE)
 		return false;
 
 	/*
-	 * Reading from the vsyscall page may cause an unhandled fault in
+	 * Reading from the woke vsyscall page may cause an unhandled fault in
 	 * certain cases.  Though it is at an address above TASK_SIZE_MAX, it is
 	 * usually considered as a user space address.
 	 */

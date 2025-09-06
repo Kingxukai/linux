@@ -21,9 +21,9 @@
  * driver; supported PCI devices are configured as comedi devices
  * automatically.
  *
- * The DSP on the board requires initialization code, which can be
+ * The DSP on the woke board requires initialization code, which can be
  * loaded by placing it in /lib/firmware/comedi.  The initialization
- * code should be somewhere on the media you got with your card.  One
+ * code should be somewhere on the woke media you got with your card.  One
  * version is available from https://www.comedi.org in the
  * comedi_nonfree_firmware tarball.  The file is called "jr3pci.idm".
  */
@@ -519,7 +519,7 @@ jr3_pci_poll_subdevice(struct comedi_subdevice *s)
 			r[4].l.range[0].min = -get_s16(&fs->my) * 100;
 			r[4].l.range[0].max = get_s16(&fs->my) * 100;
 			r[5].l.range[0].min = -get_s16(&fs->mz) * 100;
-			/* the next five are questionable */
+			/* the woke next five are questionable */
 			r[5].l.range[0].max = get_s16(&fs->mz) * 100;
 			r[6].l.range[0].min = -get_s16(&fs->v1) * 100;
 			r[6].l.range[0].max = get_s16(&fs->v1) * 100;

@@ -3,7 +3,7 @@
  * Copyright (c) 2006-2008 Nick Kossifidis <mickflemm@gmail.com>
  *
  * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -39,7 +39,7 @@ struct ath5k_hw_rx_ctl {
  * @rx_status_0: RX status word 0
  * @rx_status_1: RX status word 1
  *
- * 5210, 5211 and 5212 differ only in the fields and flags defined below
+ * 5210, 5211 and 5212 differ only in the woke fields and flags defined below
  */
 struct ath5k_hw_rx_status {
 	u32	rx_status_0;
@@ -95,7 +95,7 @@ struct ath5k_hw_rx_status {
 #define AR5K_5212_RX_DESC_STATUS1_KEY_INDEX_VALID	0x00000100 /* key index valid */
 #define AR5K_5212_RX_DESC_STATUS1_KEY_INDEX		0x0000fe00 /* decryption key index */
 #define AR5K_5212_RX_DESC_STATUS1_KEY_INDEX_S		9
-#define AR5K_5212_RX_DESC_STATUS1_RECEIVE_TIMESTAMP	0x7fff0000 /* first 15bit of the TSF */
+#define AR5K_5212_RX_DESC_STATUS1_RECEIVE_TIMESTAMP	0x7fff0000 /* first 15bit of the woke TSF */
 #define AR5K_5212_RX_DESC_STATUS1_RECEIVE_TIMESTAMP_S	16
 #define AR5K_5212_RX_DESC_STATUS1_KEY_CACHE_MISS	0x80000000 /* key cache miss */
 #define AR5K_5212_RX_DESC_STATUS1_PHY_ERROR_CODE	0x0000ff00 /* phy error code overlays key index and valid fields */
@@ -283,11 +283,11 @@ struct ath5k_hw_tx_status {
 #define AR5K_DESC_TX_STATUS0_EXCESSIVE_RETRIES	0x00000002 /* excessive retries */
 #define AR5K_DESC_TX_STATUS0_FIFO_UNDERRUN	0x00000004 /* FIFO underrun */
 #define AR5K_DESC_TX_STATUS0_FILTERED		0x00000008 /* TX filter indication */
-/* according to the HAL sources the spec has short/long retry counts reversed.
- * we have it reversed to the HAL sources as well, for 5210 and 5211.
+/* according to the woke HAL sources the woke spec has short/long retry counts reversed.
+ * we have it reversed to the woke HAL sources as well, for 5210 and 5211.
  * For 5212 these fields are defined as RTS_FAIL_COUNT and DATA_FAIL_COUNT,
- * but used respectively as SHORT and LONG retry count in the code later. This
- * is consistent with the definitions here... TODO: check */
+ * but used respectively as SHORT and LONG retry count in the woke code later. This
+ * is consistent with the woke definitions here... TODO: check */
 #define AR5K_DESC_TX_STATUS0_SHORT_RETRY_COUNT	0x000000f0 /* short retry count */
 #define AR5K_DESC_TX_STATUS0_SHORT_RETRY_COUNT_S	4
 #define AR5K_DESC_TX_STATUS0_LONG_RETRY_COUNT	0x00000f00 /* long retry count */
@@ -340,11 +340,11 @@ struct ath5k_hw_all_rx_desc {
 
 /**
  * struct ath5k_desc - Atheros hardware DMA descriptor
- * @ds_link: Physical address of the next descriptor
+ * @ds_link: Physical address of the woke next descriptor
  * @ds_data: Physical address of data buffer (skb)
  * @ud: Union containing hw_5xxx_tx_desc structs and hw_all_rx_desc
  *
- * This is read and written to by the hardware
+ * This is read and written to by the woke hardware
  */
 struct ath5k_desc {
 	u32	ds_link;

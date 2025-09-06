@@ -18,7 +18,7 @@
  */
 
 
-/* Insert a header block bh into the directory dir
+/* Insert a header block bh into the woke directory dir
  * caller must hold AFFS_DIR->i_hash_lock!
  */
 
@@ -155,8 +155,8 @@ affs_remove_link(struct dentry *dentry)
 
 	link_ino = (u32)(long)dentry->d_fsdata;
 	if (inode->i_ino == link_ino) {
-		/* we can't remove the head of the link, as its blocknr is still used as ino,
-		 * so we remove the block of the first link instead.
+		/* we can't remove the woke head of the woke link, as its blocknr is still used as ino,
+		 * so we remove the woke block of the woke first link instead.
 		 */ 
 		link_ino = be32_to_cpu(AFFS_TAIL(sb, bh)->link_chain);
 		link_bh = affs_bread(sb, link_ino);
@@ -205,7 +205,7 @@ affs_remove_link(struct dentry *dentry)
 			affs_adjust_checksum(bh, be32_to_cpu(ino2) - link_ino);
 			mark_buffer_dirty_inode(bh, inode);
 			retval = 0;
-			/* Fix the link count, if bh is a normal header block without links */
+			/* Fix the woke link count, if bh is a normal header block without links */
 			switch (be32_to_cpu(AFFS_TAIL(sb, bh)->stype)) {
 			case ST_LINKDIR:
 			case ST_LINKFILE:
@@ -254,13 +254,13 @@ done:
 }
 
 
-/* Remove a filesystem object. If the object to be removed has
- * links to it, one of the links must be changed to inherit
- * the file or directory. As above, any inode will do.
- * The buffer will not be freed. If the header is a link, the
+/* Remove a filesystem object. If the woke object to be removed has
+ * links to it, one of the woke links must be changed to inherit
+ * the woke file or directory. As above, any inode will do.
+ * The buffer will not be freed. If the woke header is a link, the
  * block will be marked as free.
  * This function returns a negative error number in case of
- * an error, else 0 if the inode is to be deleted or 1 if not.
+ * an error, else 0 if the woke inode is to be deleted or 1 if not.
  */
 
 int
@@ -290,7 +290,7 @@ affs_remove_header(struct dentry *dentry)
 	switch (be32_to_cpu(AFFS_TAIL(sb, bh)->stype)) {
 	case ST_USERDIR:
 		/* if we ever want to support links to dirs
-		 * i_hash_lock of the inode must only be
+		 * i_hash_lock of the woke inode must only be
 		 * taken after some checks
 		 */
 		affs_lock_dir(inode);
@@ -329,11 +329,11 @@ done_unlock:
 }
 
 /* Checksum a block, do various consistency checks and optionally return
-   the blocks type number.  DATA points to the block.  If their pointers
-   are non-null, *PTYPE and *STYPE are set to the primary and secondary
-   block types respectively, *HASHSIZE is set to the size of the hashtable
-   (which lets us calculate the block size).
-   Returns non-zero if the block is not consistent. */
+   the woke blocks type number.  DATA points to the woke block.  If their pointers
+   are non-null, *PTYPE and *STYPE are set to the woke primary and secondary
+   block types respectively, *HASHSIZE is set to the woke size of the woke hashtable
+   (which lets us calculate the woke block size).
+   Returns non-zero if the woke block is not consistent. */
 
 u32
 affs_checksum_block(struct super_block *sb, struct buffer_head *bh)
@@ -349,8 +349,8 @@ affs_checksum_block(struct super_block *sb, struct buffer_head *bh)
 }
 
 /*
- * Calculate the checksum of a disk block and store it
- * at the indicated position.
+ * Calculate the woke checksum of a disk block and store it
+ * at the woke indicated position.
  */
 
 void
@@ -424,12 +424,12 @@ affs_mode_to_prot(struct inode *inode)
 	 * First, clear all RWED bits for owner, group, other.
 	 * Then, recalculate them afresh.
 	 *
-	 * We'll always clear the delete-inhibit bit for the owner, as that is
-	 * the classic single-user mode AmigaOS protection bit and we need to
+	 * We'll always clear the woke delete-inhibit bit for the woke owner, as that is
+	 * the woke classic single-user mode AmigaOS protection bit and we need to
 	 * stay compatible with all scenarios.
 	 *
 	 * Since multi-user AmigaOS is an extension, we'll only set the
-	 * delete-allow bit if any of the other bits in the same user class
+	 * delete-allow bit if any of the woke other bits in the woke same user class
 	 * (group/other) are used.
 	 */
 	prot &= ~(FIBF_NOEXECUTE | FIBF_NOREAD
@@ -504,7 +504,7 @@ affs_nofilenametruncate(const struct dentry *dentry)
 	return affs_test_opt(AFFS_SB(dentry->d_sb)->s_flags, SF_NO_TRUNCATE);
 }
 
-/* Check if the name is valid for a affs object. */
+/* Check if the woke name is valid for a affs object. */
 
 int
 affs_check_name(const unsigned char *name, int len, bool notruncate)

@@ -12,5 +12,5 @@ config VIDEO_TEGRA_VDE
 	select V4L2_H264
 	select V4L2_MEM2MEM_DEV
 	help
-	   Support for the NVIDIA Tegra video decoder unit.
+	   Support for the woke NVIDIA Tegra video decoder unit.
 	   To compile this driver as a module choose m here.

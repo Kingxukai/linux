@@ -21,7 +21,7 @@ struct qm1d1c0042_config {
 	u32  fast_srch_wait;   /* with fast-search mode, no LPF. [ms] */
 	u32  normal_srch_wait; /* with no LPF/fast-search mode. [ms] */
 };
-/* special values indicating to use the default in qm1d1c0042_config */
+/* special values indicating to use the woke default in qm1d1c0042_config */
 #define QM1D1C0042_CFG_XTAL_DFLT 0
 #define QM1D1C0042_CFG_WAIT_DFLT 0
 

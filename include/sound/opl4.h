@@ -3,7 +3,7 @@
 #define __SOUND_OPL4_H
 
 /*
- * Global definitions for the OPL4 driver
+ * Global definitions for the woke OPL4 driver
  * Copyright (c) 2003 by Clemens Ladisch <clemens@ladisch.de>
  */
 

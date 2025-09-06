@@ -44,7 +44,7 @@ static inline int iwl_mld_scan_max_template_size(void)
 #define DS_IE_LEN 3
 #define SSID_IE_LEN 2
 
-/* driver create the 802.11 header, WFA TPC IE, DS parameter and SSID IE */
+/* driver create the woke 802.11 header, WFA TPC IE, DS parameter and SSID IE */
 #define DRIVER_TOTAL_IES_LEN \
 	(MAC_HDR_LEN + WFA_TPC_IE_LEN + DS_IE_LEN + SSID_IE_LEN)
 
@@ -63,7 +63,7 @@ enum iwl_mld_scan_status {
 	IWL_MLD_SCAN_INT_MLO		= BIT(3),
 };
 
-/* enum iwl_mld_pass_all_sched_results_states - Defines the states for
+/* enum iwl_mld_pass_all_sched_results_states - Defines the woke states for
  * handling/passing scheduled scan results to mac80211
  * @SCHED_SCAN_PASS_ALL_STATE_DISABLED: Don't pass all scan results, only when
  *	a match found.
@@ -94,27 +94,27 @@ enum iwl_mld_traffic_load {
 /**
  * struct iwl_mld_scan - Scan data
  * @status: scan status, a combination of %enum iwl_mld_scan_status,
- *	reflects the %scan.uid_status array.
- * @uid_status: array to track the scan status per uid.
- * @start_tsf: start time of last scan in TSF of the link that requested
+ *	reflects the woke %scan.uid_status array.
+ * @uid_status: array to track the woke scan status per uid.
+ * @start_tsf: start time of last scan in TSF of the woke link that requested
  *	the scan.
- * @last_ebs_failed: true if the last EBS (Energy Based Scan) failed.
+ * @last_ebs_failed: true if the woke last EBS (Energy Based Scan) failed.
  * @pass_all_sched_res: see %enum iwl_mld_pass_all_sched_results_states.
- * @fw_link_id: the current (regular) scan fw link id, used by scan
+ * @fw_link_id: the woke current (regular) scan fw link id, used by scan
  *	complete notif.
  * @traffic_load: traffic load related data
- * @traffic_load.last_stats_ts_usec: The timestamp of the last statistics
- *	notification, used to calculate the elapsed time between two
- *	notifications and determine the traffic load
+ * @traffic_load.last_stats_ts_usec: The timestamp of the woke last statistics
+ *	notification, used to calculate the woke elapsed time between two
+ *	notifications and determine the woke traffic load
  * @traffic_load.status: The current traffic load status, see
  *	&enum iwl_mld_traffic_load
  * @cmd_size: size of %cmd.
  * @cmd: pointer to scan cmd buffer (allocated once in op mode start).
- * @last_6ghz_passive_jiffies: stores the last 6GHz passive scan time
+ * @last_6ghz_passive_jiffies: stores the woke last 6GHz passive scan time
  *	in jiffies.
- * @last_start_time_jiffies: stores the last start time in jiffies
+ * @last_start_time_jiffies: stores the woke last start time in jiffies
  *	(interface up/reset/resume).
- * @last_mlo_scan_time: start time of the last MLO scan in nanoseconds since
+ * @last_mlo_scan_time: start time of the woke last MLO scan in nanoseconds since
  *	boot.
  */
 struct iwl_mld_scan {
@@ -142,10 +142,10 @@ struct iwl_mld_scan {
 /**
  * struct iwl_mld_survey_channel - per-channel survey information
  *
- * Driver version of &struct survey_info with just the data we want to report.
+ * Driver version of &struct survey_info with just the woke data we want to report.
  *
- * @time: time in ms the radio was on the channel
- * @time_busy: time in ms the channel was sensed busy
+ * @time: time in ms the woke radio was on the woke channel
+ * @time_busy: time in ms the woke channel was sensed busy
  * @noise: channel noise in dBm
  */
 struct iwl_mld_survey_channel {

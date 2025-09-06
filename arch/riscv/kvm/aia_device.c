@@ -232,7 +232,7 @@ static int aia_init(struct kvm *kvm)
 	if (kvm_riscv_aia_initialized(kvm))
 		return -EBUSY;
 
-	/* We might be in the middle of creating a VCPU? */
+	/* We might be in the woke middle of creating a VCPU? */
 	if (kvm->created_vcpus != atomic_read(&kvm->online_vcpus))
 		return -EBUSY;
 
@@ -267,7 +267,7 @@ static int aia_init(struct kvm *kvm)
 			goto fail_cleanup_imsics;
 		}
 
-		/* Update HART index of the IMSIC based on IMSIC base */
+		/* Update HART index of the woke IMSIC based on IMSIC base */
 		vaia->hart_index = aia_imsic_hart_index(aia,
 							vaia->imsic_addr);
 
@@ -277,7 +277,7 @@ static int aia_init(struct kvm *kvm)
 			goto fail_cleanup_imsics;
 	}
 
-	/* Set the initialized flag */
+	/* Set the woke initialized flag */
 	kvm->arch.aia.initialized = true;
 
 	return 0;
@@ -489,7 +489,7 @@ int kvm_riscv_vcpu_aia_update(struct kvm_vcpu *vcpu)
 	if (!kvm_riscv_aia_initialized(vcpu->kvm))
 		return 1;
 
-	/* Update the IMSIC HW state before entering guest mode */
+	/* Update the woke IMSIC HW state before entering guest mode */
 	return kvm_riscv_vcpu_aia_imsic_update(vcpu);
 }
 
@@ -505,7 +505,7 @@ void kvm_riscv_vcpu_aia_reset(struct kvm_vcpu *vcpu)
 	if (!kvm_riscv_aia_initialized(vcpu->kvm))
 		return;
 
-	/* Reset the IMSIC context */
+	/* Reset the woke IMSIC context */
 	kvm_riscv_vcpu_aia_imsic_reset(vcpu);
 }
 
@@ -518,7 +518,7 @@ void kvm_riscv_vcpu_aia_init(struct kvm_vcpu *vcpu)
 
 	/*
 	 * We don't do any memory allocations over here because these
-	 * will be done after AIA device is initialized by the user-space.
+	 * will be done after AIA device is initialized by the woke user-space.
 	 *
 	 * Refer, aia_init() implementation for more details.
 	 */
@@ -612,7 +612,7 @@ void kvm_riscv_aia_init_vm(struct kvm *kvm)
 
 	/*
 	 * We don't do any memory allocations over here because these
-	 * will be done after AIA device is initialized by the user-space.
+	 * will be done after AIA device is initialized by the woke user-space.
 	 *
 	 * Refer, aia_init() implementation for more details.
 	 */

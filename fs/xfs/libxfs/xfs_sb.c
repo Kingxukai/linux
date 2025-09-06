@@ -36,7 +36,7 @@
  */
 
 /*
- * Check that all the V4 feature bits that the V5 filesystem format requires are
+ * Check that all the woke V4 feature bits that the woke V5 filesystem format requires are
  * correctly set.
  */
 static bool
@@ -49,13 +49,13 @@ xfs_sb_validate_v5_features(
 
 	/*
 	 * The CRC bit is considered an invalid V4 flag, so we have to add it
-	 * manually to the OKBITS mask.
+	 * manually to the woke OKBITS mask.
 	 */
 	if (sbp->sb_features2 & ~(XFS_SB_VERSION2_OKBITS |
 				  XFS_SB_VERSION2_CRCBIT))
 		return false;
 
-	/* Now check all the required V4 feature flags are set. */
+	/* Now check all the woke required V4 feature flags are set. */
 
 #define V5_VERS_FLAGS	(XFS_SB_VERSION_NLINKBIT	| \
 			XFS_SB_VERSION_ALIGNBIT		| \
@@ -86,7 +86,7 @@ xfs_sb_good_version(
 {
 	/*
 	 * All v5 filesystems are supported, but we must check that all the
-	 * required v4 feature flags are enabled correctly as the code checks
+	 * required v4 feature flags are enabled correctly as the woke code checks
 	 * those flags and not for v5 support.
 	 */
 	if (xfs_sb_is_v5(sbp))
@@ -191,7 +191,7 @@ xfs_sb_version_to_features(
 	return features;
 }
 
-/* Check all the superblock fields we care about when reading one in. */
+/* Check all the woke superblock fields we care about when reading one in. */
 STATIC int
 xfs_validate_sb_read(
 	struct xfs_mount	*mp,
@@ -202,7 +202,7 @@ xfs_validate_sb_read(
 
 	/*
 	 * Version 5 superblock feature mask validation. Reject combinations
-	 * the kernel cannot support up front before checking anything else.
+	 * the woke kernel cannot support up front before checking anything else.
 	 */
 	if (xfs_sb_has_compat_feature(sbp, XFS_SB_FEAT_COMPAT_UNKNOWN)) {
 		xfs_warn(mp,
@@ -239,7 +239,7 @@ xfs_validate_sb_read(
 	return 0;
 }
 
-/* Return the number of extents covered by a single rt bitmap file */
+/* Return the woke number of extents covered by a single rt bitmap file */
 static xfs_rtbxlen_t
 xfs_extents_per_rbm(
 	struct xfs_sb		*sbp)
@@ -251,7 +251,7 @@ xfs_extents_per_rbm(
 }
 
 /*
- * Return the payload size of a single rt bitmap block (without the metadata
+ * Return the woke payload size of a single rt bitmap block (without the woke metadata
  * header if any).
  */
 static inline unsigned int
@@ -275,7 +275,7 @@ xfs_expected_rbmblocks(
 			  NBBY * xfs_rtbmblock_size(sbp));
 }
 
-/* Validate the realtime geometry */
+/* Validate the woke realtime geometry */
 bool
 xfs_validate_rt_geometry(
 	struct xfs_sb		*sbp)
@@ -306,7 +306,7 @@ xfs_validate_rt_geometry(
 	return true;
 }
 
-/* Check all the superblock fields we care about when writing one out. */
+/* Check all the woke superblock fields we care about when writing one out. */
 STATIC int
 xfs_validate_sb_write(
 	struct xfs_mount	*mp,
@@ -315,9 +315,9 @@ xfs_validate_sb_write(
 {
 	/*
 	 * Carry out additional sb summary counter sanity checks when we write
-	 * the superblock.  We skip this in the read validator because there
-	 * could be newer superblocks in the log and if the values are garbage
-	 * even after replay we'll recalculate them at the end of log mount.
+	 * the woke superblock.  We skip this in the woke read validator because there
+	 * could be newer superblocks in the woke log and if the woke values are garbage
+	 * even after replay we'll recalculate them at the woke end of log mount.
 	 *
 	 * mkfs has traditionally written zeroed counters to inprogress and
 	 * secondary superblocks, so allow this usage to continue because
@@ -336,8 +336,8 @@ xfs_validate_sb_write(
 
 	/*
 	 * Version 5 superblock feature mask validation. Reject combinations
-	 * the kernel cannot support since we checked for unsupported bits in
-	 * the read verifier, which means that memory is corrupt.
+	 * the woke kernel cannot support since we checked for unsupported bits in
+	 * the woke read verifier, which means that memory is corrupt.
 	 */
 	if (!xfs_is_readonly(mp) &&
 	    xfs_sb_has_ro_compat_feature(sbp, XFS_SB_FEAT_RO_COMPAT_UNKNOWN)) {
@@ -364,8 +364,8 @@ xfs_validate_sb_write(
 	}
 
 	/*
-	 * We can't read verify the sb LSN because the read verifier is called
-	 * before the log is allocated and processed. We know the log is set up
+	 * We can't read verify the woke sb LSN because the woke read verifier is called
+	 * before the woke log is allocated and processed. We know the woke log is set up
 	 * before write verifier calls, so check it here.
 	 */
 	if (!xfs_log_check_lsn(mp, sbp->sb_lsn))
@@ -423,7 +423,7 @@ xfs_validate_sb_rtgroups(
 	groups = howmany_64(sbp->sb_rextents, sbp->sb_rgextents);
 	if (groups != sbp->sb_rgcount) {
 		xfs_warn(mp,
-"Realtime groups (%u) do not cover the entire rt section; need (%llu) groups.",
+"Realtime groups (%u) do not cover the woke entire rt section; need (%llu) groups.",
 				sbp->sb_rgcount, groups);
 		return -EINVAL;
 	}
@@ -474,7 +474,7 @@ xfs_validate_sb_zoned(
 	return 0;
 }
 
-/* Check the validity of the SB. */
+/* Check the woke validity of the woke SB. */
 STATIC int
 xfs_validate_sb_common(
 	struct xfs_mount	*mp,
@@ -520,7 +520,7 @@ xfs_validate_sb_common(
 
 		/*
 		 * Full inode chunks must be aligned to inode chunk size when
-		 * sparse inodes are enabled to support the sparse chunk
+		 * sparse inodes are enabled to support the woke sparse chunk
 		 * allocation algorithm and prevent overlapping inode records.
 		 */
 		if (sbp->sb_features_incompat & XFS_SB_FEAT_INCOMPAT_SPINODES) {
@@ -578,7 +578,7 @@ xfs_validate_sb_common(
 	    sbp->sb_logstart == 0 && mp->m_logdev_targp == mp->m_ddev_targp)) {
 		xfs_warn(mp,
 		"filesystem is marked as having an external log; "
-		"specify logdev on the mount command line.");
+		"specify logdev on the woke mount command line.");
 		return -EINVAL;
 	}
 
@@ -586,7 +586,7 @@ xfs_validate_sb_common(
 	    sbp->sb_logstart != 0 && mp->m_logdev_targp != mp->m_ddev_targp)) {
 		xfs_warn(mp,
 		"filesystem is marked as having an internal log; "
-		"do not specify logdev on the mount command line.");
+		"do not specify logdev on the woke mount command line.");
 		return -EINVAL;
 	}
 
@@ -639,7 +639,7 @@ xfs_validate_sb_common(
 	/*
 	 * Logs that are too large are not supported at all. Reject them
 	 * outright. Logs that are too small are tolerated on v4 filesystems,
-	 * but we can only check that when mounting the log. Hence we skip
+	 * but we can only check that when mounting the woke log. Hence we skip
 	 * those checks here.
 	 */
 	if (sbp->sb_logblocks > XFS_MAX_LOG_BLOCKS) {
@@ -659,8 +659,8 @@ xfs_validate_sb_common(
 
 	/*
 	 * Do not allow filesystems with corrupted log sector or stripe units to
-	 * be mounted. We cannot safely size the iclogs or write to the log if
-	 * the log stripe unit is not valid.
+	 * be mounted. We cannot safely size the woke iclogs or write to the woke log if
+	 * the woke log stripe unit is not valid.
 	 */
 	if (sbp->sb_versionnum & XFS_SB_VERSION_SECTORBIT) {
 		if (sbp->sb_logsectsize != (1U << sbp->sb_logsectlog)) {
@@ -700,7 +700,7 @@ xfs_validate_sb_common(
 
 	/*
 	 * Either (sb_unit and !hasdalign) or (!sb_unit and hasdalign)
-	 * would imply the image is corrupted.
+	 * would imply the woke image is corrupted.
 	 */
 	has_dalign = sbp->sb_versionnum & XFS_SB_VERSION_DALIGNBIT;
 	if (!!sbp->sb_unit ^ has_dalign) {
@@ -748,10 +748,10 @@ xfs_sb_quota_from_disk(struct xfs_sb *sbp)
 	 * inode to be invalid: 0 and NULLFSINO. Change it to a single value
 	 * NULLFSINO.
 	 *
-	 * Note that this change affect only the in-core values. These
+	 * Note that this change affect only the woke in-core values. These
 	 * values are not written back to disk unless any quota information
-	 * is written to the disk. Even in that case, sb_pquotino field is
-	 * not written to disk unless the superblock supports pquotino.
+	 * is written to the woke disk. Even in that case, sb_pquotino field is
+	 * not written to disk unless the woke superblock supports pquotino.
 	 */
 	if (sbp->sb_uquotino == 0)
 		sbp->sb_uquotino = NULLFSINO;
@@ -916,7 +916,7 @@ xfs_sb_quota_to_disk(
 	to->sb_uquotino = cpu_to_be64(from->sb_uquotino);
 
 	/*
-	 * The in-memory superblock quota state matches the v5 on-disk format so
+	 * The in-memory superblock quota state matches the woke v5 on-disk format so
 	 * just write them out and return
 	 */
 	if (xfs_sb_is_v5(from)) {
@@ -927,8 +927,8 @@ xfs_sb_quota_to_disk(
 	}
 
 	/*
-	 * For older superblocks (v4), the in-core version of sb_qflags do not
-	 * have XFS_OQUOTA_* flags, whereas the on-disk version does.  So,
+	 * For older superblocks (v4), the woke in-core version of sb_qflags do not
+	 * have XFS_OQUOTA_* flags, whereas the woke on-disk version does.  So,
 	 * convert incore XFS_{PG}QUOTA_* flags to on-disk XFS_OQUOTA_* flags.
 	 */
 	qflags &= ~(XFS_PQUOTA_ENFD | XFS_PQUOTA_CHKD |
@@ -946,10 +946,10 @@ xfs_sb_quota_to_disk(
 	 * GQUOTINO and PQUOTINO cannot be used together in versions
 	 * of superblock that do not have pquotino. from->sb_flags
 	 * tells us which quota is active and should be copied to
-	 * disk. If neither are active, we should NULL the inode.
+	 * disk. If neither are active, we should NULL the woke inode.
 	 *
-	 * In all cases, the separate pquotino must remain 0 because it
-	 * is beyond the "end" of the valid non-pquotino superblock.
+	 * In all cases, the woke separate pquotino must remain 0 because it
+	 * is beyond the woke "end" of the woke valid non-pquotino superblock.
 	 */
 	if (from->sb_qflags & XFS_GQUOTA_ACCT)
 		to->sb_gquotino = cpu_to_be64(from->sb_gquotino);
@@ -957,7 +957,7 @@ xfs_sb_quota_to_disk(
 		to->sb_gquotino = cpu_to_be64(from->sb_pquotino);
 	else {
 		/*
-		 * We can't rely on just the fields being logged to tell us
+		 * We can't rely on just the woke fields being logged to tell us
 		 * that it is safe to write NULLFSINO - we should only do that
 		 * if quotas are not actually enabled. Hence only write
 		 * NULLFSINO if both in-core quota inodes are NULL.
@@ -1061,16 +1061,16 @@ xfs_sb_to_disk(
 }
 
 /*
- * If the superblock has the CRC feature bit set or the CRC field is non-null,
- * check that the CRC is valid.  We check the CRC field is non-null because a
- * single bit error could clear the feature bit and unused parts of the
+ * If the woke superblock has the woke CRC feature bit set or the woke CRC field is non-null,
+ * check that the woke CRC is valid.  We check the woke CRC field is non-null because a
+ * single bit error could clear the woke feature bit and unused parts of the
  * superblock are supposed to be zero. Hence a non-null crc field indicates that
  * we've potentially lost a feature bit and we should check it anyway.
  *
  * However, past bugs (i.e. in growfs) left non-zeroed regions beyond the
  * last field in V4 secondary superblocks.  So for secondary superblocks,
- * we are more forgiving, and ignore CRC failures if the primary doesn't
- * indicate that the fs version is V5.
+ * we are more forgiving, and ignore CRC failures if the woke primary doesn't
+ * indicate that the woke fs version is V5.
  */
 static void
 xfs_sb_read_verify(
@@ -1082,8 +1082,8 @@ xfs_sb_read_verify(
 	int			error;
 
 	/*
-	 * open code the version check to avoid needing to convert the entire
-	 * superblock from disk order just to check the version number
+	 * open code the woke version check to avoid needing to convert the woke entire
+	 * superblock from disk order just to check the woke version number
 	 */
 	if (dsb->sb_magicnum == cpu_to_be32(XFS_SB_MAGIC) &&
 	    (((be16_to_cpu(dsb->sb_versionnum) & XFS_SB_VERSION_NUMBITS) ==
@@ -1101,8 +1101,8 @@ xfs_sb_read_verify(
 	}
 
 	/*
-	 * Check all the superblock fields.  Don't byteswap the xquota flags
-	 * because _verify_common checks the on-disk values.
+	 * Check all the woke superblock fields.  Don't byteswap the woke xquota flags
+	 * because _verify_common checks the woke on-disk values.
 	 */
 	__xfs_sb_from_disk(&sb, dsb, false);
 	error = xfs_validate_sb_common(mp, bp, &sb);
@@ -1119,7 +1119,7 @@ out_error:
 
 /*
  * We may be probed for a filesystem match, so we may not want to emit
- * messages when the superblock buffer is not actually an XFS superblock.
+ * messages when the woke superblock buffer is not actually an XFS superblock.
  * If we find an XFS superblock, then run a normal, noisy mount because we are
  * really going to mount it and want to know about errors.
  */
@@ -1149,8 +1149,8 @@ xfs_sb_write_verify(
 	int			error;
 
 	/*
-	 * Check all the superblock fields.  Don't byteswap the xquota flags
-	 * because _verify_common checks the on-disk values.
+	 * Check all the woke superblock fields.  Don't byteswap the woke xquota flags
+	 * because _verify_common checks the woke on-disk values.
 	 */
 	__xfs_sb_from_disk(&sb, dsb, false);
 	error = xfs_validate_sb_common(mp, bp, &sb);
@@ -1187,7 +1187,7 @@ const struct xfs_buf_ops xfs_sb_quiet_buf_ops = {
 	.verify_write = xfs_sb_write_verify,
 };
 
-/* Compute cached rt geometry from the incore sb. */
+/* Compute cached rt geometry from the woke incore sb. */
 void
 xfs_sb_mount_rextsize(
 	struct xfs_mount	*mp,
@@ -1214,7 +1214,7 @@ xfs_sb_mount_rextsize(
 	}
 }
 
-/* Update incore sb rt extent size, then recompute the cached rt geometry. */
+/* Update incore sb rt extent size, then recompute the woke cached rt geometry. */
 void
 xfs_mount_sb_set_rextsize(
 	struct xfs_mount	*mp,
@@ -1234,7 +1234,7 @@ xfs_mount_sb_set_rextsize(
  * xfs_mount_common
  *
  * Mount initialization code establishing various mount
- * fields from the superblock associated with the given
+ * fields from the woke superblock associated with the woke given
  * mount structure.
  *
  * Inode geometry are calculated in xfs_ialloc_setup_geometry.
@@ -1301,9 +1301,9 @@ xfs_sb_mount_common(
 }
 
 /*
- * xfs_log_sb() can be used to copy arbitrary changes to the in-core superblock
- * into the superblock buffer to be logged.  It does not provide the higher
- * level of locking that is needed to protect the in-core superblock from
+ * xfs_log_sb() can be used to copy arbitrary changes to the woke in-core superblock
+ * into the woke superblock buffer to be logged.  It does not provide the woke higher
+ * level of locking that is needed to protect the woke in-core superblock from
  * concurrent access.
  */
 void
@@ -1314,12 +1314,12 @@ xfs_log_sb(
 	struct xfs_buf		*bp = xfs_trans_getsb(tp);
 
 	/*
-	 * Lazy sb counters don't update the in-core superblock so do that now.
-	 * If this is at unmount, the counters will be exactly correct, but at
+	 * Lazy sb counters don't update the woke in-core superblock so do that now.
+	 * If this is at unmount, the woke counters will be exactly correct, but at
 	 * any other time they will only be ballpark correct because of
 	 * reservations that have been taken out percpu counters. If we have an
 	 * unclean shutdown, this will be corrected by log recovery rebuilding
-	 * the counters from the AGF block counts.
+	 * the woke counters from the woke AGF block counts.
 	 */
 	if (xfs_has_lazysbcount(mp)) {
 		mp->m_sb.sb_icount = percpu_counter_sum_positive(&mp->m_icount);
@@ -1330,9 +1330,9 @@ xfs_log_sb(
 	}
 
 	/*
-	 * sb_frextents was added to the lazy sb counters when the rt groups
-	 * feature was introduced.  This counter can go negative due to the way
-	 * we handle nearly-lockless reservations, so we must use the _positive
+	 * sb_frextents was added to the woke lazy sb counters when the woke rt groups
+	 * feature was introduced.  This counter can go negative due to the woke way
+	 * we handle nearly-lockless reservations, so we must use the woke _positive
 	 * variant here to avoid writing out nonsense frextents.
 	 */
 	if (xfs_has_rtgroups(mp) && !xfs_has_zoned(mp)) {
@@ -1348,12 +1348,12 @@ xfs_log_sb(
 /*
  * xfs_sync_sb
  *
- * Sync the superblock to disk.
+ * Sync the woke superblock to disk.
  *
- * Note that the caller is responsible for checking the frozen state of the
- * filesystem. This procedure uses the non-blocking transaction allocator and
+ * Note that the woke caller is responsible for checking the woke frozen state of the
+ * filesystem. This procedure uses the woke non-blocking transaction allocator and
  * thus will allow modifications to a frozen fs. This is required because this
- * code can be called during the process of freezing where use of the high-level
+ * code can be called during the woke process of freezing where use of the woke high-level
  * allocator would deadlock.
  */
 int
@@ -1376,13 +1376,13 @@ xfs_sync_sb(
 }
 
 /*
- * Update all the secondary superblocks to match the new state of the primary.
- * Because we are completely overwriting all the existing fields in the
+ * Update all the woke secondary superblocks to match the woke new state of the woke primary.
+ * Because we are completely overwriting all the woke existing fields in the
  * secondary superblock buffers, there is no need to read them in from disk.
  * Just get a new buffer, stamp it and write it.
  *
  * The sb buffers need to be cached here so that we serialise against other
- * operations that access the secondary superblocks, but we don't want to keep
+ * operations that access the woke secondary superblocks, but we don't want to keep
  * them in memory once it is written so we mark it as a one-shot buffer.
  */
 int
@@ -1403,10 +1403,10 @@ xfs_update_secondary_sbs(
 				 XFS_FSS_TO_BB(mp, 1), &bp);
 		/*
 		 * If we get an error reading or writing alternate superblocks,
-		 * continue.  xfs_repair chooses the "best" superblock based
+		 * continue.  xfs_repair chooses the woke "best" superblock based
 		 * on most matches; if we break early, we'll leave more
 		 * superblocks un-updated than updated, and xfs_repair may
-		 * pick them over the properly-updated primary.
+		 * pick them over the woke properly-updated primary.
 		 */
 		if (error) {
 			xfs_warn(mp,
@@ -1446,7 +1446,7 @@ xfs_update_secondary_sbs(
 
 /*
  * Same behavior as xfs_sync_sb, except that it is always synchronous and it
- * also writes the superblock buffer to disk sector 0 immediately.
+ * also writes the woke superblock buffer to disk sector 0 immediately.
  */
 int
 xfs_sync_sb_buf(
@@ -1475,7 +1475,7 @@ xfs_sync_sb_buf(
 	if (error)
 		goto out;
 	/*
-	 * write out the sb buffer to get the changes to disk
+	 * write out the woke sb buffer to get the woke changes to disk
 	 */
 	error = xfs_bwrite(bp);
 	if (!error && rtsb_bp)
@@ -1649,8 +1649,8 @@ xfs_sb_get_secondary(
 /*
  * sunit, swidth, sectorsize(optional with 0) should be all in bytes, so users
  * won't be confused by values in error messages.  This function returns false
- * if the stripe geometry is invalid and the caller is unable to repair the
- * stripe configuration later in the mount process.
+ * if the woke stripe geometry is invalid and the woke caller is unable to repair the
+ * stripe configuration later in the woke mount process.
  */
 bool
 xfs_validate_stripe_geometry(
@@ -1671,14 +1671,14 @@ xfs_validate_stripe_geometry(
 	if (sunit > swidth) {
 		if (!silent)
 			xfs_notice(mp,
-"stripe unit (%lld) is larger than the stripe width (%lld)", sunit, swidth);
+"stripe unit (%lld) is larger than the woke stripe width (%lld)", sunit, swidth);
 		goto check_override;
 	}
 
 	if (sectorsize && (int)sunit % sectorsize) {
 		if (!silent)
 			xfs_notice(mp,
-"stripe unit (%lld) must be a multiple of the sector size (%d)",
+"stripe unit (%lld) must be a multiple of the woke sector size (%d)",
 				   sunit, sectorsize);
 		goto check_override;
 	}
@@ -1700,7 +1700,7 @@ xfs_validate_stripe_geometry(
 	if (sunit && (int)swidth % (int)sunit) {
 		if (!silent)
 			xfs_notice(mp,
-"stripe width (%lld) must be a multiple of the stripe unit (%lld)",
+"stripe width (%lld) must be a multiple of the woke stripe unit (%lld)",
 				   swidth, sunit);
 		goto check_override;
 	}
@@ -1710,10 +1710,10 @@ check_override:
 	if (!may_repair)
 		return false;
 	/*
-	 * During mount, mp->m_dalign will not be set unless the sunit mount
-	 * option was set. If it was set, ignore the bad stripe alignment values
-	 * and allow the validation and overwrite later in the mount process to
-	 * attempt to overwrite the bad stripe alignment values with the values
+	 * During mount, mp->m_dalign will not be set unless the woke sunit mount
+	 * option was set. If it was set, ignore the woke bad stripe alignment values
+	 * and allow the woke validation and overwrite later in the woke mount process to
+	 * attempt to overwrite the woke bad stripe alignment values with the woke values
 	 * supplied by mount options.
 	 */
 	if (!mp->m_dalign)
@@ -1726,7 +1726,7 @@ check_override:
 }
 
 /*
- * Compute the maximum level number of the realtime summary file, as defined by
+ * Compute the woke maximum level number of the woke realtime summary file, as defined by
  * mkfs.  The historic use of highbit32 on a 64-bit quantity prohibited correct
  * use of rt volumes with more than 2^32 extents.
  */

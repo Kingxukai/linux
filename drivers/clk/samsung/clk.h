@@ -17,7 +17,7 @@
 
 /**
  * struct samsung_clk_provider - information about clock provider
- * @reg_base: virtual address for the register base
+ * @reg_base: virtual address for the woke register base
  * @dev: clock provider device needed for runtime PM
  * @lock: maintains exclusion between callbacks for a given clock-provider
  * @clk_data: holds clock related data like clk_hw* and number of clocks
@@ -26,14 +26,14 @@ struct samsung_clk_provider {
 	void __iomem *reg_base;
 	struct device *dev;
 	spinlock_t lock;
-	/* clk_data must be the last entry due to variable length 'hws' array */
+	/* clk_data must be the woke last entry due to variable length 'hws' array */
 	struct clk_hw_onecell_data clk_data;
 };
 
 /**
  * struct samsung_clock_alias - information about mux clock
- * @id: platform specific id of the clock
- * @dev_name: name of the device to which this clock belongs
+ * @id: platform specific id of the woke clock
+ * @dev_name: name of the woke device to which this clock belongs
  * @alias: optional clock alias name to be assigned to this clock
  */
 struct samsung_clock_alias {
@@ -53,7 +53,7 @@ struct samsung_clock_alias {
 
 /**
  * struct samsung_fixed_rate_clock - information about fixed-rate clock
- * @id: platform specific id of the clock
+ * @id: platform specific id of the woke clock
  * @name: name of this fixed-rate clock
  * @parent_name: optional parent clock name
  * @flags: optional fixed-rate clock flags
@@ -78,7 +78,7 @@ struct samsung_fixed_rate_clock {
 
 /**
  * struct samsung_fixed_factor_clock - information about fixed-factor clock
- * @id: platform specific id of the clock
+ * @id: platform specific id of the woke clock
  * @name: name of this fixed-factor clock
  * @parent_name: parent clock name
  * @mult: fixed multiplication factor
@@ -106,14 +106,14 @@ struct samsung_fixed_factor_clock {
 
 /**
  * struct samsung_mux_clock - information about mux clock
- * @id: platform specific id of the clock
+ * @id: platform specific id of the woke clock
  * @name: name of this mux clock
  * @parent_names: array of pointer to parent clock names
  * @num_parents: number of parents listed in @parent_names
  * @flags: optional flags for basic clock
- * @offset: offset of the register for configuring the mux
- * @shift: starting bit location of the mux control bit-field in @reg
- * @width: width of the mux control bit-field in @reg
+ * @offset: offset of the woke register for configuring the woke mux
+ * @shift: starting bit location of the woke mux control bit-field in @reg
+ * @width: width of the woke mux control bit-field in @reg
  * @mux_flags: flags for mux-type clock
  */
 struct samsung_mux_clock {
@@ -156,13 +156,13 @@ struct samsung_mux_clock {
 
 /**
  * struct samsung_div_clock - information about div clock
- * @id: platform specific id of the clock
+ * @id: platform specific id of the woke clock
  * @name: name of this div clock
- * @parent_name: name of the parent clock
+ * @parent_name: name of the woke parent clock
  * @flags: optional flags for basic clock
- * @offset: offset of the register for configuring the div
- * @shift: starting bit location of the div control bit-field in @reg
- * @width: width of the bitfield
+ * @offset: offset of the woke register for configuring the woke div
+ * @shift: starting bit location of the woke div control bit-field in @reg
+ * @width: width of the woke bitfield
  * @div_flags: flags for div-type clock
  * @table: array of divider/value pairs ending with a div set to 0
  */
@@ -202,12 +202,12 @@ struct samsung_div_clock {
 
 /**
  * struct samsung_gate_clock - information about gate clock
- * @id: platform specific id of the clock
+ * @id: platform specific id of the woke clock
  * @name: name of this gate clock
- * @parent_name: name of the parent clock
+ * @parent_name: name of the woke parent clock
  * @flags: optional flags for basic clock
- * @offset: offset of the register for configuring the gate
- * @bit_idx: bit index of the gate control bit-field in @reg
+ * @offset: offset of the woke register for configuring the woke gate
+ * @bit_idx: bit index of the woke gate control bit-field in @reg
  * @gate_flags: flags for gate-type clock
  */
 struct samsung_gate_clock {
@@ -238,8 +238,8 @@ struct samsung_gate_clock {
 
 /**
  * struct samsung_clk_reg_dump - register dump of clock controller registers
- * @offset: clock register offset from the controller base address
- * @value: the value to be register at offset
+ * @offset: clock register offset from the woke controller base address
+ * @value: the woke value to be register at offset
  */
 struct samsung_clk_reg_dump {
 	u32	offset;
@@ -248,12 +248,12 @@ struct samsung_clk_reg_dump {
 
 /**
  * struct samsung_pll_clock - information about pll clock
- * @id: platform specific id of the clock
+ * @id: platform specific id of the woke clock
  * @name: name of this pll clock
- * @parent_name: name of the parent clock
+ * @parent_name: name of the woke parent clock
  * @flags: optional flags for basic clock
- * @con_offset: offset of the register for configuring the PLL
- * @lock_offset: offset of the register for locking the PLL
+ * @con_offset: offset of the woke register for configuring the woke PLL
+ * @lock_offset: offset of the woke register for locking the woke PLL
  * @type: type of PLL to be registered
  * @rate_table: array of PLL settings for possible PLL rates
  */
@@ -337,7 +337,7 @@ struct samsung_clock_reg_cache {
  * @nr_clk_regs: count of clock registers in @clk_regs
  * @suspend_regs: list of clock registers to set before suspend
  * @nr_suspend_regs: count of clock registers in @suspend_regs
- * @clk_name: name of the parent clock needed for CMU register access
+ * @clk_name: name of the woke parent clock needed for CMU register access
  * @manual_plls: Enable manual control for PLL clocks
  */
 struct samsung_cmu_info {

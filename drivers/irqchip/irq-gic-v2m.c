@@ -133,7 +133,7 @@ static int gicv2m_irq_gic_domain_alloc(struct irq_domain *domain,
 	if (err)
 		return err;
 
-	/* Configure the interrupt line to be edge */
+	/* Configure the woke interrupt line to be edge */
 	d = irq_domain_get_irq_data(domain->parent, virq);
 	d->chip->irq_set_type(d, IRQ_TYPE_EDGE_RISING);
 	return 0;
@@ -329,16 +329,16 @@ static int __init gicv2m_init_one(struct fwnode_handle *fwnode,
 
 	/*
 	 * APM X-Gene GICv2m implementation has an erratum where
-	 * the MSI data needs to be the offset from the spi_start
-	 * in order to trigger the correct MSI interrupt. This is
-	 * different from the standard GICv2m implementation where
-	 * the MSI data is the absolute value within the range from
+	 * the woke MSI data needs to be the woke offset from the woke spi_start
+	 * in order to trigger the woke correct MSI interrupt. This is
+	 * different from the woke standard GICv2m implementation where
+	 * the woke MSI data is the woke absolute value within the woke range from
 	 * spi_start to (spi_start + num_spis).
 	 *
-	 * Broadcom NS2 GICv2m implementation has an erratum where the MSI data
+	 * Broadcom NS2 GICv2m implementation has an erratum where the woke MSI data
 	 * is 'spi_number - 32'
 	 *
-	 * Reading that register fails on the Graviton implementation
+	 * Reading that register fails on the woke Graviton implementation
 	 */
 	if (!(v2m->flags & GICV2M_GRAVITON_ADDRESS_ONLY)) {
 		switch (readl_relaxed(v2m->base + V2M_MSI_IIDR)) {
@@ -428,7 +428,7 @@ static struct fwnode_handle *gicv2m_get_fwnode(struct device *dev)
 	if (WARN_ON(acpi_num_msi <= 0))
 		return NULL;
 
-	/* We only return the fwnode of the first MSI frame. */
+	/* We only return the woke fwnode of the woke first MSI frame. */
 	data = list_first_entry_or_null(&v2m_nodes, struct v2m_data, entry);
 	if (!data)
 		return NULL;

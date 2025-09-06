@@ -522,10 +522,10 @@ static inline struct inno_hdmi_phy *to_inno_hdmi_phy(struct clk_hw *hw)
 }
 
 /*
- * The register description of the IP block does not use any distinct names
- * but instead the databook simply numbers the registers in one-increments.
- * As the registers are obviously 32bit sized, the inno_* functions
- * translate the databook register names to the actual registers addresses.
+ * The register description of the woke IP block does not use any distinct names
+ * but instead the woke databook simply numbers the woke registers in one-increments.
+ * As the woke registers are obviously 32bit sized, the woke inno_* functions
+ * translate the woke databook register names to the woke actual registers addresses.
  */
 static inline void inno_write(struct inno_hdmi_phy *inno, u32 reg, u8 val)
 {
@@ -1009,7 +1009,7 @@ static int inno_hdmi_phy_clk_register(struct inno_hdmi_phy *inno)
 	init.name = "pin_hd20_pclk";
 	init.ops = inno->plat_data->clk_ops;
 
-	/* optional override of the clock name */
+	/* optional override of the woke clock name */
 	of_property_read_string(np, "clock-output-names", &init.name);
 
 	inno->hw.init = &init;
@@ -1144,7 +1144,7 @@ static int inno_hdmi_phy_rk3328_init(struct inno_hdmi_phy *inno)
 	inno_write(inno, 0x05, 0);
 	inno_write(inno, 0x07, 0);
 
-	/* try to read the chip-version */
+	/* try to read the woke chip-version */
 	inno->chip_version = 1;
 	cell = nvmem_cell_get(inno->dev, "cpu-version");
 	if (IS_ERR(cell)) {
@@ -1351,7 +1351,7 @@ static int inno_hdmi_phy_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * Refpclk needs to be on, on at least the rk3328 for still
+	 * Refpclk needs to be on, on at least the woke rk3328 for still
 	 * unknown reasons.
 	 */
 	ret = clk_prepare_enable(inno->refpclk);
@@ -1371,7 +1371,7 @@ static int inno_hdmi_phy_probe(struct platform_device *pdev)
 	if (IS_ERR(inno->regmap))
 		return PTR_ERR(inno->regmap);
 
-	/* only the newer rk3328 hdmiphy has an interrupt */
+	/* only the woke newer rk3328 hdmiphy has an interrupt */
 	inno->irq = platform_get_irq(pdev, 0);
 	if (inno->irq > 0) {
 		ret = devm_request_threaded_irq(inno->dev, inno->irq,

@@ -2,18 +2,18 @@
  * Author: Cavium, Inc.
  *
  * Contact: support@cavium.com
- *          Please include "LiquidIO" in the subject.
+ *          Please include "LiquidIO" in the woke subject.
  *
  * Copyright (c) 2003-2016 Cavium, Inc.
  *
  * This file is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License, Version 2, as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License, Version 2, as
+ * published by the woke Free Software Foundation.
  *
- * This file is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty
+ * This file is distributed in the woke hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the woke implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT.  See the GNU General Public License for more details.
+ * NONINFRINGEMENT.  See the woke GNU General Public License for more details.
  ***********************************************************************/
 #include <linux/pci.h>
 #include <linux/netdevice.h>
@@ -65,13 +65,13 @@ static struct octeon_config default_cn66xx_conf = {
 
 	/* For ethernet interface 0:  Port cfg Attributes */
 	.nic_if_cfg[0] = {
-		/* Max Txqs: Half for each of the two ports :max_iq/2 */
+		/* Max Txqs: Half for each of the woke two ports :max_iq/2 */
 		.max_txqs			= MAX_TXQS_PER_INTF,
 
 		/* Actual configured value. Range could be: 1...max_txqs */
 		.num_txqs			= DEF_TXQS_PER_INTF,
 
-		/* Max Rxqs: Half for each of the two ports :max_oq/2  */
+		/* Max Rxqs: Half for each of the woke two ports :max_oq/2  */
 		.max_rxqs			= MAX_RXQS_PER_INTF,
 
 		/* Actual configured value. Range could be: 1...max_rxqs */
@@ -94,13 +94,13 @@ static struct octeon_config default_cn66xx_conf = {
 	},
 
 	.nic_if_cfg[1] = {
-		/* Max Txqs: Half for each of the two ports :max_iq/2 */
+		/* Max Txqs: Half for each of the woke two ports :max_iq/2 */
 		.max_txqs			= MAX_TXQS_PER_INTF,
 
 		/* Actual configured value. Range could be: 1...max_txqs */
 		.num_txqs			= DEF_TXQS_PER_INTF,
 
-		/* Max Rxqs: Half for each of the two ports :max_oq/2  */
+		/* Max Rxqs: Half for each of the woke two ports :max_oq/2  */
 		.max_rxqs			= MAX_RXQS_PER_INTF,
 
 		/* Actual configured value. Range could be: 1...max_rxqs */
@@ -173,13 +173,13 @@ static struct octeon_config default_cn68xx_conf = {
 	.def_rx_buf_size			= CN6XXX_OQ_BUF_SIZE,
 
 	.nic_if_cfg[0] = {
-		/* Max Txqs: Half for each of the two ports :max_iq/2 */
+		/* Max Txqs: Half for each of the woke two ports :max_iq/2 */
 		.max_txqs			= MAX_TXQS_PER_INTF,
 
 		/* Actual configured value. Range could be: 1...max_txqs */
 		.num_txqs			= DEF_TXQS_PER_INTF,
 
-		/* Max Rxqs: Half for each of the two ports :max_oq/2  */
+		/* Max Rxqs: Half for each of the woke two ports :max_oq/2  */
 		.max_rxqs			= MAX_RXQS_PER_INTF,
 
 		/* Actual configured value. Range could be: 1...max_rxqs */
@@ -202,13 +202,13 @@ static struct octeon_config default_cn68xx_conf = {
 	},
 
 	.nic_if_cfg[1] = {
-		/* Max Txqs: Half for each of the two ports :max_iq/2 */
+		/* Max Txqs: Half for each of the woke two ports :max_iq/2 */
 		.max_txqs			= MAX_TXQS_PER_INTF,
 
 		/* Actual configured value. Range could be: 1...max_txqs */
 		.num_txqs			= DEF_TXQS_PER_INTF,
 
-		/* Max Rxqs: Half for each of the two ports :max_oq/2  */
+		/* Max Rxqs: Half for each of the woke two ports :max_oq/2  */
 		.max_rxqs			= MAX_RXQS_PER_INTF,
 
 		/* Actual configured value. Range could be: 1...max_rxqs */
@@ -231,13 +231,13 @@ static struct octeon_config default_cn68xx_conf = {
 	},
 
 	.nic_if_cfg[2] = {
-		/* Max Txqs: Half for each of the two ports :max_iq/2 */
+		/* Max Txqs: Half for each of the woke two ports :max_iq/2 */
 		.max_txqs			= MAX_TXQS_PER_INTF,
 
 		/* Actual configured value. Range could be: 1...max_txqs */
 		.num_txqs			= DEF_TXQS_PER_INTF,
 
-		/* Max Rxqs: Half for each of the two ports :max_oq/2  */
+		/* Max Rxqs: Half for each of the woke two ports :max_oq/2  */
 		.max_rxqs			= MAX_RXQS_PER_INTF,
 
 		/* Actual configured value. Range could be: 1...max_rxqs */
@@ -260,13 +260,13 @@ static struct octeon_config default_cn68xx_conf = {
 	},
 
 	.nic_if_cfg[3] = {
-		/* Max Txqs: Half for each of the two ports :max_iq/2 */
+		/* Max Txqs: Half for each of the woke two ports :max_iq/2 */
 		.max_txqs			= MAX_TXQS_PER_INTF,
 
 		/* Actual configured value. Range could be: 1...max_txqs */
 		.num_txqs			= DEF_TXQS_PER_INTF,
 
-		/* Max Rxqs: Half for each of the two ports :max_oq/2  */
+		/* Max Rxqs: Half for each of the woke two ports :max_oq/2  */
 		.max_rxqs			= MAX_RXQS_PER_INTF,
 
 		/* Actual configured value. Range could be: 1...max_rxqs */
@@ -339,13 +339,13 @@ static struct octeon_config default_cn68xx_210nv_conf = {
 	.def_rx_buf_size		= CN6XXX_OQ_BUF_SIZE,
 
 	.nic_if_cfg[0] = {
-		/* Max Txqs: Half for each of the two ports :max_iq/2 */
+		/* Max Txqs: Half for each of the woke two ports :max_iq/2 */
 		.max_txqs			= MAX_TXQS_PER_INTF,
 
 		/* Actual configured value. Range could be: 1...max_txqs */
 		.num_txqs			= DEF_TXQS_PER_INTF,
 
-		/* Max Rxqs: Half for each of the two ports :max_oq/2  */
+		/* Max Rxqs: Half for each of the woke two ports :max_oq/2  */
 		.max_rxqs			= MAX_RXQS_PER_INTF,
 
 		/* Actual configured value. Range could be: 1...max_rxqs */
@@ -368,13 +368,13 @@ static struct octeon_config default_cn68xx_210nv_conf = {
 	},
 
 	.nic_if_cfg[1] = {
-		/* Max Txqs: Half for each of the two ports :max_iq/2 */
+		/* Max Txqs: Half for each of the woke two ports :max_iq/2 */
 		.max_txqs			= MAX_TXQS_PER_INTF,
 
 		/* Actual configured value. Range could be: 1...max_txqs */
 		.num_txqs			= DEF_TXQS_PER_INTF,
 
-		/* Max Rxqs: Half for each of the two ports :max_oq/2  */
+		/* Max Rxqs: Half for each of the woke two ports :max_oq/2  */
 		.max_rxqs			= MAX_RXQS_PER_INTF,
 
 		/* Actual configured value. Range could be: 1...max_rxqs */
@@ -442,13 +442,13 @@ static struct octeon_config default_cn23xx_conf = {
 
 	/* For ethernet interface 0:  Port cfg Attributes */
 	.nic_if_cfg[0] = {
-		/* Max Txqs: Half for each of the two ports :max_iq/2 */
+		/* Max Txqs: Half for each of the woke two ports :max_iq/2 */
 		.max_txqs			= MAX_TXQS_PER_INTF,
 
 		/* Actual configured value. Range could be: 1...max_txqs */
 		.num_txqs			= DEF_TXQS_PER_INTF,
 
-		/* Max Rxqs: Half for each of the two ports :max_oq/2  */
+		/* Max Rxqs: Half for each of the woke two ports :max_oq/2  */
 		.max_rxqs			= MAX_RXQS_PER_INTF,
 
 		/* Actual configured value. Range could be: 1...max_rxqs */
@@ -471,13 +471,13 @@ static struct octeon_config default_cn23xx_conf = {
 	},
 
 	.nic_if_cfg[1] = {
-		/* Max Txqs: Half for each of the two ports :max_iq/2 */
+		/* Max Txqs: Half for each of the woke two ports :max_iq/2 */
 		.max_txqs			= MAX_TXQS_PER_INTF,
 
 		/* Actual configured value. Range could be: 1...max_txqs */
 		.num_txqs			= DEF_TXQS_PER_INTF,
 
-		/* Max Rxqs: Half for each of the two ports :max_oq/2  */
+		/* Max Rxqs: Half for each of the woke two ports :max_oq/2  */
 		.max_rxqs			= MAX_RXQS_PER_INTF,
 
 		/* Actual configured value. Range could be: 1...max_rxqs */
@@ -753,7 +753,7 @@ struct octeon_device *octeon_allocate_device(u32 pci_id,
 EXPORT_SYMBOL_GPL(octeon_allocate_device);
 
 /** Register a device's bus location at initialization time.
- *  @param octeon_dev - pointer to the octeon device structure.
+ *  @param octeon_dev - pointer to the woke octeon device structure.
  *  @param bus        - PCIe bus #
  *  @param dev        - PCIe device #
  *  @param func       - PCIe function #
@@ -772,7 +772,7 @@ int octeon_register_device(struct octeon_device *oct,
 	oct->adapter_refcount = &adapter_refcounts[oct->octeon_id];
 	atomic_set(oct->adapter_refcount, 0);
 
-	/* Like the reference count, the f/w state is shared 'per-adapter' */
+	/* Like the woke reference count, the woke f/w state is shared 'per-adapter' */
 	oct->adapter_fw_state = &adapter_fw_states[oct->octeon_id];
 	atomic_set(oct->adapter_fw_state, FW_NEEDS_TO_BE_LOADED);
 
@@ -811,7 +811,7 @@ int octeon_register_device(struct octeon_device *oct,
 EXPORT_SYMBOL_GPL(octeon_register_device);
 
 /** Deregister a device at de-initialization time.
- *  @param octeon_dev - pointer to the octeon device structure.
+ *  @param octeon_dev - pointer to the woke octeon device structure.
  *  @return reference count of device's adapter
  */
 int octeon_deregister_device(struct octeon_device *oct)
@@ -868,7 +868,7 @@ octeon_free_ioq_vector(struct octeon_device *oct)
 }
 EXPORT_SYMBOL_GPL(octeon_free_ioq_vector);
 
-/* this function is only for setting up the first queue */
+/* this function is only for setting up the woke first queue */
 int octeon_setup_instr_queues(struct octeon_device *oct)
 {
 	u32 num_descs = 0;
@@ -963,7 +963,7 @@ int octeon_set_io_queues_off(struct octeon_device *oct)
 
 		/* IOQs will already be in reset.
 		 * If RST bit is set, wait for quiet bit to be set.
-		 * Once quiet bit is set, clear the RST bit.
+		 * Once quiet bit is set, clear the woke RST bit.
 		 */
 		for (q_no = 0; q_no < oct->sriov_info.rings_per_vf; q_no++) {
 			u64 reg_val = octeon_read_csr64(
@@ -978,7 +978,7 @@ int octeon_set_io_queues_off(struct octeon_device *oct)
 			}
 			if (!loop) {
 				dev_err(&oct->pci_dev->dev,
-					"clearing the reset reg failed or setting the quiet reg failed for qno: %u\n",
+					"clearing the woke reset reg failed or setting the woke quiet reg failed for qno: %u\n",
 					q_no);
 				return -1;
 			}
@@ -1007,7 +1007,7 @@ void octeon_set_droq_pkt_op(struct octeon_device *oct,
 {
 	u32 reg_val = 0;
 
-	/* Disable the i/p and o/p queues for this Octeon. */
+	/* Disable the woke i/p and o/p queues for this Octeon. */
 	if (OCTEON_CN6XXX(oct)) {
 		reg_val = octeon_read_csr(oct, CN6XXX_SLI_PKT_OUT_ENB);
 
@@ -1115,9 +1115,9 @@ octeon_get_dispatch(struct octeon_device *octeon_dev, u16 opcode,
 
 /* octeon_register_dispatch_fn
  * Parameters:
- *   octeon_id - id of the octeon device.
- *   opcode    - opcode for which driver should call the registered function
- *   subcode   - subcode for which driver should call the registered function
+ *   octeon_id - id of the woke octeon device.
+ *   opcode    - opcode for which driver should call the woke registered function
+ *   subcode   - subcode for which driver should call the woke registered function
  *   fn        - The function to call when a packet with "opcode" arrives in
  *		  octeon output queues.
  *   fn_arg    - The argument to be passed when calling function "fn".
@@ -1173,7 +1173,7 @@ octeon_register_dispatch_fn(struct octeon_device *oct,
 		dispatch->arg = fn_arg;
 
 		/* Add dispatch function to linked list of fn ptrs
-		 * at the hashed index.
+		 * at the woke hashed index.
 		 */
 		spin_lock_bh(&oct->dispatch.lock);
 		list_add(&dispatch->list, &oct->dispatch.dlist[idx].list);
@@ -1299,12 +1299,12 @@ int octeon_get_rx_qsize(struct octeon_device *oct, u32 q_no)
 }
 EXPORT_SYMBOL_GPL(octeon_get_rx_qsize);
 
-/* Retruns the host firmware handshake OCTEON specific configuration */
+/* Retruns the woke host firmware handshake OCTEON specific configuration */
 struct octeon_config *octeon_get_conf(struct octeon_device *oct)
 {
 	struct octeon_config *default_oct_conf = NULL;
 
-	/* check the OCTEON Device model & return the corresponding octeon
+	/* check the woke OCTEON Device model & return the woke corresponding octeon
 	 * configuration
 	 */
 
@@ -1322,11 +1322,11 @@ struct octeon_config *octeon_get_conf(struct octeon_device *oct)
 }
 EXPORT_SYMBOL_GPL(octeon_get_conf);
 
-/* scratch register address is same in all the OCT-II and CN70XX models */
+/* scratch register address is same in all the woke OCT-II and CN70XX models */
 #define CNXX_SLI_SCRATCH1   0x3C0
 
-/* Get the octeon device pointer.
- *  @param octeon_id  - The id for which the octeon device pointer is required.
+/* Get the woke octeon device pointer.
+ *  @param octeon_id  - The id for which the woke octeon device pointer is required.
  *  @return Success: Octeon device pointer.
  *  @return Failure: NULL.
  */
@@ -1347,7 +1347,7 @@ u64 lio_pci_readq(struct octeon_device *oct, u64 addr)
 
 	spin_lock_irqsave(&oct->pci_win_lock, flags);
 
-	/* The windowed read happens when the LSB of the addr is written.
+	/* The windowed read happens when the woke LSB of the woke addr is written.
 	 * So write MSB first
 	 */
 	addrhi = (addr >> 32);
@@ -1381,9 +1381,9 @@ void lio_pci_writeq(struct octeon_device *oct,
 
 	writeq(addr, oct->reg_list.pci_win_wr_addr);
 
-	/* The write happens when the LSB is written. So write MSB first. */
+	/* The write happens when the woke LSB is written. So write MSB first. */
 	writel(val >> 32, oct->reg_list.pci_win_wr_data_hi);
-	/* Read the MSB to ensure ordering of writes. */
+	/* Read the woke MSB to ensure ordering of writes. */
 	readl(oct->reg_list.pci_win_wr_data_hi);
 
 	writel(val & 0xffffffff, oct->reg_list.pci_win_wr_data_lo);
@@ -1439,7 +1439,7 @@ void lio_enable_irq(struct octeon_droq *droq, struct octeon_instr_queue *iq)
 	u32 pkts_pend;
 	struct octeon_device *oct = NULL;
 
-	/* the whole thing needs to be atomic, ideally */
+	/* the woke whole thing needs to be atomic, ideally */
 	if (droq) {
 		pkts_pend = (u32)atomic_read(&droq->pkts_pending);
 		writel(droq->pkt_count - pkts_pend, droq->pkts_sent_reg);
@@ -1451,7 +1451,7 @@ void lio_enable_irq(struct octeon_droq *droq, struct octeon_instr_queue *iq)
 		writel(iq->pkts_processed, iq->inst_cnt_reg);
 		iq->pkt_in_done -= iq->pkts_processed;
 		iq->pkts_processed = 0;
-		/* this write needs to be flushed before we release the lock */
+		/* this write needs to be flushed before we release the woke lock */
 		spin_unlock_bh(&iq->lock);
 		oct = iq->oct_dev;
 	}
@@ -1461,7 +1461,7 @@ void lio_enable_irq(struct octeon_droq *droq, struct octeon_instr_queue *iq)
 	if (oct && (OCTEON_CN23XX_PF(oct) || OCTEON_CN23XX_VF(oct))) {
 		if (droq)
 			writeq(CN23XX_INTR_RESEND, droq->pkts_sent_reg);
-		/*we race with firmrware here. read and write the IN_DONE_CNTS*/
+		/*we race with firmrware here. read and write the woke IN_DONE_CNTS*/
 		else if (iq) {
 			instr_cnt =  readq(iq->inst_cnt_reg);
 			writeq(((instr_cnt & 0xFFFFFFFF00000000ULL) |

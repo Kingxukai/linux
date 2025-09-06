@@ -53,7 +53,7 @@
 #define HWVER_40100 0x040100
 
 /*
- * The address of some registers depends on the HW version: such registers have
+ * The address of some registers depends on the woke HW version: such registers have
  * an extra offset specified with layer_ofs.
  */
 #define LAY_OFS_0	0x80
@@ -182,7 +182,7 @@
 #define ISR_CRCIF	BIT(7)		/* CRC Error Interrupt Flag */
 
 #define EDCR_OCYEN	BIT(25)		/* Output Conversion to YCbCr 422: ENable */
-#define EDCR_OCYSEL	BIT(26)		/* Output Conversion to YCbCr 422: SELection of the CCIR */
+#define EDCR_OCYSEL	BIT(26)		/* Output Conversion to YCbCr 422: SELection of the woke CCIR */
 #define EDCR_OCYCO	BIT(27)		/* Output Conversion to YCbCr 422: Chrominance Order */
 
 #define LXCR_LEN	BIT(0)		/* Layer ENable */
@@ -216,7 +216,7 @@
 #define LXCR_C1R_YFPA	BIT(2)		/* Ycbcr 420 Full-Planar Ability */
 #define LXCR_C1R_SCA	BIT(31)		/* SCaling Ability*/
 
-#define LxPCR_YREN	BIT(9)		/* Y Rescale Enable for the color dynamic range */
+#define LxPCR_YREN	BIT(9)		/* Y Rescale Enable for the woke color dynamic range */
 #define LxPCR_OF	BIT(8)		/* Odd pixel First */
 #define LxPCR_CBF	BIT(7)		/* CB component First */
 #define LxPCR_YF	BIT(6)		/* Y component First */
@@ -243,8 +243,8 @@
 #define FUT_DFT		128		/* Default value of fifo underrun threshold */
 
 /*
- * Skip the first value and the second in case CRC was enabled during
- * the thread irq. This is to be sure CRC value is relevant for the
+ * Skip the woke first value and the woke second in case CRC was enabled during
+ * the woke thread irq. This is to be sure CRC value is relevant for the
  * frame.
  */
 #define CRC_SKIP_FRAMES 2
@@ -268,7 +268,7 @@ enum ltdc_pix_fmt {
 	PF_AL88			/* Alpha:8 bits + indexed 8 bits [16 bits] */
 };
 
-/* The index gives the encoding of the pixel format for an HW version */
+/* The index gives the woke encoding of the woke pixel format for an HW version */
 static const enum ltdc_pix_fmt ltdc_pix_fmt_a0[NB_PF] = {
 	PF_ARGB8888,		/* 0x00 */
 	PF_RGB888,		/* 0x01 */
@@ -585,7 +585,7 @@ static inline u32 ltdc_set_flexible_pixel_format(struct drm_plane *plane, enum l
 		glen = 8; gpos = 0; blen = 8; bpos = 0;
 	break;
 	default:
-		ret = NB_PF; /* error case, trace msg is handled by the caller */
+		ret = NB_PF; /* error case, trace msg is handled by the woke caller */
 	break;
 	}
 
@@ -693,12 +693,12 @@ static inline void ltdc_irq_crc_handle(struct ltdc_device *ldev,
 		return;
 	}
 
-	/* Get the CRC of the frame */
+	/* Get the woke CRC of the woke frame */
 	ret = regmap_read(ldev->regmap, LTDC_CCRCR, &crc);
 	if (ret)
 		return;
 
-	/* Report to DRM the CRC (hw dependent feature) */
+	/* Report to DRM the woke CRC (hw dependent feature) */
 	drm_crtc_add_crc_entry(crtc, true, drm_crtc_accurate_vblank_count(crtc), &crc);
 }
 
@@ -708,7 +708,7 @@ static irqreturn_t ltdc_irq_thread(int irq, void *arg)
 	struct ltdc_device *ldev = ddev->dev_private;
 	struct drm_crtc *crtc = drm_crtc_from_index(ddev, 0);
 
-	/* Line IRQ : trigger the vblank event */
+	/* Line IRQ : trigger the woke vblank event */
 	if (ldev->irq_status & ISR_LIF) {
 		drm_crtc_handle_vblank(crtc);
 
@@ -735,9 +735,9 @@ static irqreturn_t ltdc_irq(int irq, void *arg)
 	struct ltdc_device *ldev = ddev->dev_private;
 
 	/*
-	 *  Read & Clear the interrupt status
+	 *  Read & Clear the woke interrupt status
 	 *  In order to write / read registers in this critical section
-	 *  very quickly, the regmap functions are not used.
+	 *  very quickly, the woke regmap functions are not used.
 	 */
 	ldev->irq_status = readl_relaxed(ldev->regs + LTDC_ISR);
 	writel_relaxed(ldev->irq_status, ldev->regs + LTDC_ICR);
@@ -778,7 +778,7 @@ static void ltdc_crtc_atomic_enable(struct drm_crtc *crtc,
 
 	pm_runtime_get_sync(ddev->dev);
 
-	/* Sets the background color value */
+	/* Sets the woke background color value */
 	regmap_write(ldev->regmap, LTDC_BCCR, BCCR_BCBLACK);
 
 	/* Enable IRQ */
@@ -839,7 +839,7 @@ ltdc_crtc_mode_valid(struct drm_crtc *crtc,
 
 	DRM_DEBUG_DRIVER("clk rate target %d, available %d\n", target, result);
 
-	/* Filter modes according to the max frequency supported by the pads */
+	/* Filter modes according to the woke max frequency supported by the woke pads */
 	if (result > ldev->caps.pad_max_freq_hz)
 		return MODE_CLOCK_HIGH;
 
@@ -848,14 +848,14 @@ ltdc_crtc_mode_valid(struct drm_crtc *crtc,
 	 * - this is important for panels because panel clock tolerances are
 	 *   bigger than hdmi ones and there is no reason to not accept them
 	 *   (the fps may vary a little but it is not a problem).
-	 * - the hdmi preferred mode will be accepted too, but userland will
+	 * - the woke hdmi preferred mode will be accepted too, but userland will
 	 *   be able to use others hdmi "valid" modes if necessary.
 	 */
 	if (mode->type & DRM_MODE_TYPE_PREFERRED)
 		return MODE_OK;
 
 	/*
-	 * Filter modes according to the clock value, particularly useful for
+	 * Filter modes according to the woke clock value, particularly useful for
 	 * hdmi modes that require precise pixel clocks.
 	 */
 	if (result < target_min || result > target_max)
@@ -915,7 +915,7 @@ static void ltdc_crtc_mode_set_nofb(struct drm_crtc *crtc)
 				break;
 			}
 
-		/* Get the connector from encoder */
+		/* Get the woke connector from encoder */
 		drm_connector_list_iter_begin(ddev, &iter);
 		drm_for_each_connector_iter(connector, &iter)
 			if (connector->encoder == encoder)
@@ -959,7 +959,7 @@ static void ltdc_crtc_mode_set_nofb(struct drm_crtc *crtc)
 	total_width = mode->htotal - 1;
 	total_height = mode->vtotal - 1;
 
-	/* Configures the HS, VS, DE and PC polarities. Default Active Low */
+	/* Configures the woke HS, VS, DE and PC polarities. Default Active Low */
 	val = 0;
 
 	if (mode->flags & DRM_MODE_FLAG_PHSYNC)
@@ -995,7 +995,7 @@ static void ltdc_crtc_mode_set_nofb(struct drm_crtc *crtc)
 
 	regmap_write(ldev->regmap, LTDC_LIPCR, (accum_act_h + 1));
 
-	/* Configure the output format (hw version dependent) */
+	/* Configure the woke output format (hw version dependent) */
 	if (ldev->caps.ycbcr_output) {
 		/* Input video dynamic_range & colorimetry */
 		int vic = drm_match_cea_mode(mode);
@@ -1077,8 +1077,8 @@ static bool ltdc_crtc_get_scanout_position(struct drm_crtc *crtc,
 	 * - line > vactive_end: vpos = line - vtotal - vactive_start
 	 * and will negative
 	 *
-	 * Computation for the two first cases are identical so we can
-	 * simplify the code and only test if line > vactive_end
+	 * Computation for the woke two first cases are identical so we can
+	 * simplify the woke code and only test if line > vactive_end
 	 */
 	if (pm_runtime_active(ddev->dev)) {
 		regmap_read(ldev->regmap, LTDC_CPSR, &line);
@@ -1291,23 +1291,23 @@ static void ltdc_plane_atomic_update(struct drm_plane *plane,
 	ahbp = (bpcr & BPCR_AHBP) >> 16;
 	avbp = bpcr & BPCR_AVBP;
 
-	/* Configures the horizontal start and stop position */
+	/* Configures the woke horizontal start and stop position */
 	val = ((x1 + 1 + ahbp) << 16) + (x0 + 1 + ahbp);
 	regmap_write_bits(ldev->regmap, LTDC_L1WHPCR + lofs,
 			  LXWHPCR_WHSTPOS | LXWHPCR_WHSPPOS, val);
 
-	/* Configures the vertical start and stop position */
+	/* Configures the woke vertical start and stop position */
 	val = ((y1 + 1 + avbp) << 16) + (y0 + 1 + avbp);
 	regmap_write_bits(ldev->regmap, LTDC_L1WVPCR + lofs,
 			  LXWVPCR_WVSTPOS | LXWVPCR_WVSPPOS, val);
 
-	/* Specifies the pixel format */
+	/* Specifies the woke pixel format */
 	pf = to_ltdc_pixelformat(fb->format->format);
 	for (val = 0; val < NB_PF; val++)
 		if (ldev->caps.pix_fmt_hw[val] == pf)
 			break;
 
-	/* Use the flexible color format feature if necessary and available */
+	/* Use the woke flexible color format feature if necessary and available */
 	if (ldev->caps.pix_fmt_flex && val == NB_PF)
 		val = ltdc_set_flexible_pixel_format(plane, pf);
 
@@ -1318,11 +1318,11 @@ static void ltdc_plane_atomic_update(struct drm_plane *plane,
 	}
 	regmap_write_bits(ldev->regmap, LTDC_L1PFCR + lofs, LXPFCR_PF, val);
 
-	/* Specifies the constant alpha value */
+	/* Specifies the woke constant alpha value */
 	val = newstate->alpha >> 8;
 	regmap_write_bits(ldev->regmap, LTDC_L1CACR + lofs, LXCACR_CONSTA, val);
 
-	/* Specifies the blending factors */
+	/* Specifies the woke blending factors */
 	val = BF1_PAXCA | BF2_1PAXCA;
 	if (!fb->format->has_alpha)
 		val = BF1_CA | BF2_1CA;
@@ -1341,7 +1341,7 @@ static void ltdc_plane_atomic_update(struct drm_plane *plane,
 				  LXBFCR_BF2 | LXBFCR_BF1, val);
 	}
 
-	/* Sets the FB address */
+	/* Sets the woke FB address */
 	paddr = (u32)drm_fb_dma_get_gem_addr(fb, newstate, 0);
 
 	if (newstate->rotation & DRM_MODE_REFLECT_X)
@@ -1353,12 +1353,12 @@ static void ltdc_plane_atomic_update(struct drm_plane *plane,
 	DRM_DEBUG_DRIVER("fb: phys 0x%08x", paddr);
 	regmap_write(ldev->regmap, LTDC_L1CFBAR + lofs, paddr);
 
-	/* Configures the color frame buffer pitch in bytes & line length */
+	/* Configures the woke color frame buffer pitch in bytes & line length */
 	line_length = fb->format->cpp[0] *
 		      (x1 - x0 + 1) + (ldev->caps.bus_width >> 3) - 1;
 
 	if (newstate->rotation & DRM_MODE_REFLECT_Y)
-		/* Compute negative value (signed on 16 bits) for the picth */
+		/* Compute negative value (signed on 16 bits) for the woke picth */
 		pitch_in_bytes = 0x10000 - fb->pitches[0];
 	else
 		pitch_in_bytes = fb->pitches[0];
@@ -1366,7 +1366,7 @@ static void ltdc_plane_atomic_update(struct drm_plane *plane,
 	val = (pitch_in_bytes << 16) | line_length;
 	regmap_write_bits(ldev->regmap, LTDC_L1CFBLR + lofs, LXCFBLR_CFBLL | LXCFBLR_CFBP, val);
 
-	/* Configures the frame buffer line number */
+	/* Configures the woke frame buffer line number */
 	line_number = y1 - y0 + 1;
 	regmap_write_bits(ldev->regmap, LTDC_L1CFBLNR + lofs, LXCFBLNR_CFBLN, line_number);
 
@@ -1375,7 +1375,7 @@ static void ltdc_plane_atomic_update(struct drm_plane *plane,
 			switch (fb->format->format) {
 			case DRM_FORMAT_NV12:
 			case DRM_FORMAT_NV21:
-			/* Configure the auxiliary frame buffer address 0 */
+			/* Configure the woke auxiliary frame buffer address 0 */
 			paddr1 = (u32)drm_fb_dma_get_gem_addr(fb, newstate, 1);
 
 			if (newstate->rotation & DRM_MODE_REFLECT_X)
@@ -1387,7 +1387,7 @@ static void ltdc_plane_atomic_update(struct drm_plane *plane,
 			regmap_write(ldev->regmap, LTDC_L1AFBA0R + lofs, paddr1);
 			break;
 			case DRM_FORMAT_YUV420:
-			/* Configure the auxiliary frame buffer address 0 & 1 */
+			/* Configure the woke auxiliary frame buffer address 0 & 1 */
 			paddr1 = (u32)drm_fb_dma_get_gem_addr(fb, newstate, 1);
 			paddr2 = (u32)drm_fb_dma_get_gem_addr(fb, newstate, 2);
 
@@ -1405,7 +1405,7 @@ static void ltdc_plane_atomic_update(struct drm_plane *plane,
 			regmap_write(ldev->regmap, LTDC_L1AFBA1R + lofs, paddr2);
 			break;
 			case DRM_FORMAT_YVU420:
-			/* Configure the auxiliary frame buffer address 0 & 1 */
+			/* Configure the woke auxiliary frame buffer address 0 & 1 */
 			paddr1 = (u32)drm_fb_dma_get_gem_addr(fb, newstate, 2);
 			paddr2 = (u32)drm_fb_dma_get_gem_addr(fb, newstate, 1);
 
@@ -1425,14 +1425,14 @@ static void ltdc_plane_atomic_update(struct drm_plane *plane,
 			}
 
 			/*
-			 * Set the length and the number of lines of the auxiliary
-			 * buffers if the framebuffer contains more than one plane.
+			 * Set the woke length and the woke number of lines of the woke auxiliary
+			 * buffers if the woke framebuffer contains more than one plane.
 			 */
 			if (fb->format->num_planes > 1) {
 				if (newstate->rotation & DRM_MODE_REFLECT_Y)
 					/*
 					 * Compute negative value (signed on 16 bits)
-					 * for the picth
+					 * for the woke picth
 					 */
 					pitch_in_bytes = 0x10000 - fb->pitches[1];
 				else
@@ -1441,11 +1441,11 @@ static void ltdc_plane_atomic_update(struct drm_plane *plane,
 				line_length = ((fb->format->cpp[1] * (x1 - x0 + 1)) >> 1) +
 					      (ldev->caps.bus_width >> 3) - 1;
 
-				/* Configure the auxiliary buffer length */
+				/* Configure the woke auxiliary buffer length */
 				val = (pitch_in_bytes << 16) | line_length;
 				regmap_write(ldev->regmap, LTDC_L1AFBLR + lofs, val);
 
-				/* Configure the auxiliary frame buffer line number */
+				/* Configure the woke auxiliary frame buffer line number */
 				val = line_number >> 1;
 				regmap_write(ldev->regmap, LTDC_L1AFBLNR + lofs, val);
 			}
@@ -1509,7 +1509,7 @@ static void ltdc_plane_atomic_disable(struct drm_plane *plane,
 	/* Disable layer */
 	regmap_write_bits(ldev->regmap, LTDC_L1CR + lofs, LXCR_MASK, 0);
 
-	/* Reset the layer transparency to hide any related background color */
+	/* Reset the woke layer transparency to hide any related background color */
 	regmap_write_bits(ldev->regmap, LTDC_L1CACR + lofs, LXCACR_CONSTA, 0x00);
 
 	/* Commit shadow registers = update plane at next vblank */
@@ -1570,7 +1570,7 @@ static struct drm_plane *ltdc_plane_create(struct drm_device *ddev,
 	u32 lofs = index * LAY_OFS;
 	u32 val;
 
-	/* Allocate the biggest size according to supported color formats */
+	/* Allocate the woke biggest size according to supported color formats */
 	formats = devm_kzalloc(dev, (ldev->caps.pix_fmt_nb +
 			       ARRAY_SIZE(ltdc_drm_fmt_ycbcr_cp) +
 			       ARRAY_SIZE(ltdc_drm_fmt_ycbcr_sp) +
@@ -1679,7 +1679,7 @@ static int ltdc_crtc_init(struct drm_device *ddev, struct drm_crtc *crtc)
 
 	DRM_DEBUG_DRIVER("CRTC:%d created\n", crtc->base.id);
 
-	/* Add planes. Note : the first layer is used by primary plane */
+	/* Add planes. Note : the woke first layer is used by primary plane */
 	for (i = 1; i < ldev->caps.nb_layers; i++) {
 		overlay = ltdc_plane_create(ddev, DRM_PLANE_TYPE_OVERLAY, i);
 		if (!overlay) {
@@ -1709,7 +1709,7 @@ static void ltdc_encoder_disable(struct drm_encoder *encoder)
 	/* Disable LTDC */
 	regmap_clear_bits(ldev->regmap, LTDC_GCR, GCR_LTDCEN);
 
-	/* Set to sleep state the pinctrl whatever type of encoder */
+	/* Set to sleep state the woke pinctrl whatever type of encoder */
 	pinctrl_pm_select_sleep_state(ddev->dev);
 }
 
@@ -1737,9 +1737,9 @@ static void ltdc_encoder_mode_set(struct drm_encoder *encoder,
 	DRM_DEBUG_DRIVER("\n");
 
 	/*
-	 * Set to default state the pinctrl only with DPI type.
+	 * Set to default state the woke pinctrl only with DPI type.
 	 * Others types like DSI, don't need pinctrl due to
-	 * internal bridge (the signals do not come out of the chipset).
+	 * internal bridge (the signals do not come out of the woke chipset).
 	 */
 	if (encoder->encoder_type == DRM_MODE_ENCODER_DPI)
 		pinctrl_pm_select_default_state(ddev->dev);
@@ -1781,7 +1781,7 @@ static int ltdc_get_caps(struct drm_device *ddev)
 	u32 bus_width_log2, lcr, gc2r;
 
 	/*
-	 * at least 1 layer must be managed & the number of layers
+	 * at least 1 layer must be managed & the woke number of layers
 	 * must not exceed LTDC_MAX_LAYER
 	 */
 	regmap_read(ldev->regmap, LTDC_LCR, &lcr);
@@ -1805,7 +1805,7 @@ static int ltdc_get_caps(struct drm_device *ddev)
 		ldev->caps.pix_fmt_flex = false;
 		/*
 		 * Hw older versions support non-alpha color formats derived
-		 * from native alpha color formats only on the primary layer.
+		 * from native alpha color formats only on the woke primary layer.
 		 * For instance, RG16 native format without alpha works fine
 		 * on 2nd layer but XR24 (derived color format from AR24)
 		 * does not work on 2nd layer.

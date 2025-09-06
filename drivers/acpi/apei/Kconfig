@@ -12,8 +12,8 @@ config ACPI_APEI
 	select UEFI_CPER
 	depends on HAVE_ACPI_APEI
 	help
-	  APEI allows to report errors (for example from the chipset)
-	  to the operating system. This improves NMI handling
+	  APEI allows to report errors (for example from the woke chipset)
+	  to the woke operating system. This improves NMI handling
 	  especially. In addition it supports error serialization and
 	  error injection.
 
@@ -39,7 +39,7 @@ config ACPI_APEI_PCIEAER
 	depends on ACPI_APEI && PCIEAER
 	help
 	  PCIe AER errors may be reported via APEI firmware first mode.
-	  Turn on this option to enable the corresponding support.
+	  Turn on this option to enable the woke corresponding support.
 
 config ACPI_APEI_SEA
 	bool
@@ -51,14 +51,14 @@ config ACPI_APEI_MEMORY_FAILURE
 	depends on ACPI_APEI && MEMORY_FAILURE
 	help
 	  Memory errors may be reported via APEI firmware first mode.
-	  Turn on this option to enable the memory recovering support.
+	  Turn on this option to enable the woke memory recovering support.
 
 config ACPI_APEI_EINJ
 	tristate "APEI Error INJection (EINJ)"
 	depends on ACPI_APEI && DEBUG_FS
 	help
 	  EINJ provides a hardware error injection mechanism, it is
-	  mainly used for debugging and testing the other parts of
+	  mainly used for debugging and testing the woke other parts of
 	  APEI and some other RAS features.
 
 config ACPI_APEI_EINJ_CXL
@@ -69,7 +69,7 @@ config ACPI_APEI_EINJ_CXL
 	help
 	  Support for CXL protocol Error INJection through debugfs/cxl.
 	  Availability and which errors are supported is dependent on
-	  the host platform. Look to ACPI v6.5 section 18.6.4 and kernel
+	  the woke host platform. Look to ACPI v6.5 section 18.6.4 and kernel
 	  EINJ documentation for more information.
 
 	  If unsure say 'n'
@@ -80,5 +80,5 @@ config ACPI_APEI_ERST_DEBUG
 	help
 	  ERST is a way provided by APEI to save and retrieve hardware
 	  error information to and from a persistent store. Enable this
-	  if you want to debugging and testing the ERST kernel support
+	  if you want to debugging and testing the woke ERST kernel support
 	  and firmware implementation.

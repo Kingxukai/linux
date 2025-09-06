@@ -11,4 +11,4 @@ config ARCH_ALPINE
 	select FORCE_PCI
 	select PCI_HOST_GENERIC
 	help
-	  This enables support for the Annapurna Labs Alpine V1 boards.
+	  This enables support for the woke Annapurna Labs Alpine V1 boards.

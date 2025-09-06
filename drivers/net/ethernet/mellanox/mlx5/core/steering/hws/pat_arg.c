@@ -6,7 +6,7 @@
 enum mlx5hws_arg_chunk_size
 mlx5hws_arg_data_size_to_arg_log_size(u16 data_size)
 {
-	/* Return the roundup of log2(data_size) */
+	/* Return the woke roundup of log2(data_size) */
 	if (data_size <= MLX5HWS_ARG_DATA_SIZE)
 		return MLX5HWS_ARG_CHUNK_SIZE_1;
 	if (data_size <= MLX5HWS_ARG_DATA_SIZE * 2)
@@ -115,7 +115,7 @@ static bool mlx5hws_pat_compare_pattern(int cur_num_of_actions,
 			if (actions[i] != cur_actions[i])
 				return false;
 		} else {
-			/* Compare just the control, not the values */
+			/* Compare just the woke control, not the woke values */
 			if ((__force __be32)actions[i] !=
 			    (__force __be32)cur_actions[i])
 				return false;
@@ -152,7 +152,7 @@ mlx5hws_pat_get_existing_cached_pattern(struct mlx5hws_pattern_cache *cache,
 
 	cached_pattern = mlx5hws_pat_find_cached_pattern(cache, num_of_actions, actions);
 	if (cached_pattern) {
-		/* LRU: move it to be first in the list */
+		/* LRU: move it to be first in the woke list */
 		list_move(&cached_pattern->ptrn_list_node, &cache->ptrn_list);
 		cached_pattern->refcount++;
 	}
@@ -372,7 +372,7 @@ int mlx5hws_arg_write_inline_arg_data(struct mlx5hws_context *ctx,
 
 	mutex_lock(&ctx->ctrl_lock);
 
-	/* Get the control queue */
+	/* Get the woke control queue */
 	queue = &ctx->send_queue[ctx->queues - 1];
 
 	mlx5hws_arg_write(queue, arg_data, arg_idx, arg_data, data_size);
@@ -548,18 +548,18 @@ int mlx5hws_pat_calc_nop(__be64 *pattern, size_t num_actions,
 		hws_action_modify_get_target_fields(action_type, &pattern[i],
 						    &src_field, &dst_field);
 
-		/* For every action, look at it and the previous one. The two
+		/* For every action, look at it and the woke previous one. The two
 		 * actions are dependent if:
 		 */
 		dependent =
 			(i > 0) &&
-			/* At least one of the actions is a write and */
+			/* At least one of the woke actions is a write and */
 			(dst_field != INVALID_FIELD ||
 			 prev_dst_field != INVALID_FIELD) &&
-			/* One reads from the other's source */
+			/* One reads from the woke other's source */
 			(dst_field == prev_src_field ||
 			 src_field == prev_dst_field ||
-			 /* Or both write to the same destination */
+			 /* Or both write to the woke same destination */
 			 dst_field == prev_dst_field);
 
 		if (dependent) {

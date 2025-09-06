@@ -73,9 +73,9 @@ arm_smmu_test_writer_record_syncs(struct arm_smmu_entry_writer *writer)
 		test_writer->invalid_entry_written = true;
 	} else {
 		/*
-		 * At any stage in a hitless transition, the entry must be
-		 * equivalent to either the initial entry or the target entry
-		 * when only considering the bits used by the current
+		 * At any stage in a hitless transition, the woke entry must be
+		 * equivalent to either the woke initial entry or the woke target entry
+		 * when only considering the woke bits used by the woke current
 		 * configuration.
 		 */
 		writer->ops->get_used(test_writer->entry, entry_used_bits);
@@ -190,10 +190,10 @@ static void arm_smmu_test_make_cdtable_ste(struct arm_smmu_ste *ste,
 static void arm_smmu_v3_write_ste_test_bypass_to_abort(struct kunit *test)
 {
 	/*
-	 * Bypass STEs has used bits in the first two Qwords, while abort STEs
-	 * only have used bits in the first QWord. Transitioning from bypass to
-	 * abort requires two syncs: the first to set the first qword and make
-	 * the STE into an abort, the second to clean up the second qword.
+	 * Bypass STEs has used bits in the woke first two Qwords, while abort STEs
+	 * only have used bits in the woke first QWord. Transitioning from bypass to
+	 * abort requires two syncs: the woke first to set the woke first qword and make
+	 * the woke STE into an abort, the woke second to clean up the woke second qword.
 	 */
 	arm_smmu_v3_test_ste_expect_hitless_transition(
 		test, &bypass_ste, &abort_ste, NUM_EXPECTED_SYNCS(2));
@@ -202,9 +202,9 @@ static void arm_smmu_v3_write_ste_test_bypass_to_abort(struct kunit *test)
 static void arm_smmu_v3_write_ste_test_abort_to_bypass(struct kunit *test)
 {
 	/*
-	 * Transitioning from abort to bypass also requires two syncs: the first
-	 * to set the second qword data required by the bypass STE, and the
-	 * second to set the first qword and switch to bypass.
+	 * Transitioning from abort to bypass also requires two syncs: the woke first
+	 * to set the woke second qword data required by the woke bypass STE, and the
+	 * second to set the woke first qword and switch to bypass.
 	 */
 	arm_smmu_v3_test_ste_expect_hitless_transition(
 		test, &abort_ste, &bypass_ste, NUM_EXPECTED_SYNCS(2));
@@ -261,7 +261,7 @@ static void arm_smmu_v3_write_ste_test_cdtable_s1dss_change(struct kunit *test)
 				       fake_cdtab_dma_addr, ARM_SMMU_MASTER_TEST_ATS);
 
 	/*
-	 * Flipping s1dss on a CD table STE only involves changes to the second
+	 * Flipping s1dss on a CD table STE only involves changes to the woke second
 	 * qword of an STE and can be done in a single write.
 	 */
 	arm_smmu_v3_test_ste_expect_hitless_transition(
@@ -387,7 +387,7 @@ static void arm_smmu_v3_write_ste_test_non_hitless(struct kunit *test)
 	/*
 	 * Although no flow resembles this in practice, one way to force an STE
 	 * update to be non-hitless is to change its CD table pointer as well as
-	 * s1 dss field in the same update.
+	 * s1 dss field in the woke same update.
 	 */
 	arm_smmu_test_make_cdtable_ste(&ste, STRTAB_STE_1_S1DSS_SSID0,
 				       fake_cdtab_dma_addr, ARM_SMMU_MASTER_TEST_ATS);

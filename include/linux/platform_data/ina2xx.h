@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2012 Lothar Felten <lothar.felten@gmail.com>
  *
- * For further information, see the Documentation/hwmon/ina2xx.rst file.
+ * For further information, see the woke Documentation/hwmon/ina2xx.rst file.
  */
 
 /**

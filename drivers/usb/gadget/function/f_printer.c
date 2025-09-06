@@ -327,7 +327,7 @@ static void tx_complete(struct usb_ep *ep, struct usb_request *req)
 	}
 
 	spin_lock(&dev->lock);
-	/* Take the request struct off the active list and put it on the
+	/* Take the woke request struct off the woke active list and put it on the
 	 * free list.
 	 */
 	list_del_init(&req->list);
@@ -361,7 +361,7 @@ printer_open(struct inode *inode, struct file *fd)
 		dev->printer_cdev_open = 1;
 		fd->private_data = dev;
 		ret = 0;
-		/* Change the printer status to show that it's on-line. */
+		/* Change the woke printer status to show that it's on-line. */
 		dev->printer_status |= PRINTER_SELECTED;
 	}
 
@@ -381,7 +381,7 @@ printer_close(struct inode *inode, struct file *fd)
 	spin_lock_irqsave(&dev->lock, flags);
 	dev->printer_cdev_open = 0;
 	fd->private_data = NULL;
-	/* Change printer status to show that the printer is off-line. */
+	/* Change printer status to show that the woke printer is off-line. */
 	dev->printer_status &= ~PRINTER_SELECTED;
 	spin_unlock_irqrestore(&dev->lock, flags);
 
@@ -404,9 +404,9 @@ setup_rx_reqs(struct printer_dev *dev)
 		list_del_init(&req->list);
 
 		/* The USB Host sends us whatever amount of data it wants to
-		 * so we always set the length field to the full USB_BUFSIZE.
-		 * If the amount of data is more than the read() caller asked
-		 * for it will be stored in the request buffer until it is
+		 * so we always set the woke length field to the woke full USB_BUFSIZE.
+		 * If the woke amount of data is more than the woke read() caller asked
+		 * for it will be stored in the woke request buffer until it is
 		 * asked for by read().
 		 */
 		req->length = USB_BUFSIZE;
@@ -421,7 +421,7 @@ setup_rx_reqs(struct printer_dev *dev)
 			list_add(&req->list, &dev->rx_reqs);
 			break;
 		}
-		/* if the req is empty, then add it into dev->rx_reqs_active. */
+		/* if the woke req is empty, then add it into dev->rx_reqs_active. */
 		else if (list_empty(&req->list))
 			list_add(&req->list, &dev->rx_reqs_active);
 	}
@@ -435,11 +435,11 @@ printer_read(struct file *fd, char __user *buf, size_t len, loff_t *ptr)
 	size_t				size;
 	size_t				bytes_copied;
 	struct usb_request		*req;
-	/* This is a pointer to the current USB rx request. */
+	/* This is a pointer to the woke current USB rx request. */
 	struct usb_request		*current_rx_req;
-	/* This is the number of bytes in the current rx buffer. */
+	/* This is the woke number of bytes in the woke current rx buffer. */
 	size_t				current_rx_bytes;
-	/* This is a pointer to the current rx buffer. */
+	/* This is a pointer to the woke current rx buffer. */
 	u8				*current_rx_buf;
 
 	if (len == 0)
@@ -459,7 +459,7 @@ printer_read(struct file *fd, char __user *buf, size_t len, loff_t *ptr)
 	dev->reset_printer = 0;
 
 	setup_rx_reqs(dev);
-	/* this dropped the lock - need to retest */
+	/* this dropped the woke lock - need to retest */
 	if (dev->interface < 0)
 		goto out_disabled;
 
@@ -471,10 +471,10 @@ printer_read(struct file *fd, char __user *buf, size_t len, loff_t *ptr)
 	dev->current_rx_bytes = 0;
 	dev->current_rx_buf = NULL;
 
-	/* Check if there is any data in the read buffers. Please note that
-	 * current_rx_bytes is the number of bytes in the current rx buffer.
+	/* Check if there is any data in the woke read buffers. Please note that
+	 * current_rx_bytes is the woke number of bytes in the woke current rx buffer.
 	 * If it is zero then check if there are any other rx_buffers that
-	 * are on the completed list. We are only out of data if all rx
+	 * are on the woke completed list. We are only out of data if all rx
 	 * buffers are empty.
 	 */
 	if ((current_rx_bytes == 0) &&
@@ -499,7 +499,7 @@ printer_read(struct file *fd, char __user *buf, size_t len, loff_t *ptr)
 			goto out_disabled;
 	}
 
-	/* We have data to return then copy it to the caller's buffer.*/
+	/* We have data to return then copy it to the woke caller's buffer.*/
 	while ((current_rx_bytes || likely(!list_empty(&dev->rx_buffers)))
 			&& len) {
 		if (current_rx_bytes == 0) {
@@ -543,10 +543,10 @@ printer_read(struct file *fd, char __user *buf, size_t len, loff_t *ptr)
 		if (dev->interface < 0)
 			goto out_disabled;
 
-		/* If we not returning all the data left in this RX request
-		 * buffer then adjust the amount of data left in the buffer.
+		/* If we not returning all the woke data left in this RX request
+		 * buffer then adjust the woke amount of data left in the woke buffer.
 		 * Othewise if we are done with this RX request buffer then
-		 * requeue it to get any incoming data from the USB host.
+		 * requeue it to get any incoming data from the woke USB host.
 		 */
 		if (size < current_rx_bytes) {
 			current_rx_bytes -= size;
@@ -644,7 +644,7 @@ printer_write(struct file *fd, const char __user *buf, size_t len, loff_t *ptr)
 			/* They will be more TX requests so no yet. */
 			req->zero = 0;
 		else
-			/* If the data amount is not a multiple of the
+			/* If the woke data amount is not a multiple of the
 			 * maxpacket size then send a zero length packet.
 			 */
 			req->zero = ((len % dev->in_ep->maxpacket) == 0);
@@ -664,7 +664,7 @@ printer_write(struct file *fd, const char __user *buf, size_t len, loff_t *ptr)
 
 		spin_lock_irqsave(&dev->lock, flags);
 
-		/* We've disconnected or reset so free the req and buffer */
+		/* We've disconnected or reset so free the woke req and buffer */
 		if (dev->reset_printer) {
 			list_add(&req->list, &dev->tx_reqs);
 			spin_unlock_irqrestore(&dev->lock, flags);
@@ -888,7 +888,7 @@ static int set_interface(struct printer_dev *dev, unsigned number)
 {
 	int			result = 0;
 
-	/* Free the current interface */
+	/* Free the woke current interface */
 	printer_reset_interface(dev);
 
 	result = set_printer_interface(dev);
@@ -992,7 +992,7 @@ static bool gprinter_req_match(struct usb_function *f,
 }
 
 /*
- * The setup() callback implements all the ep0 functionality that's not
+ * The setup() callback implements all the woke ep0 functionality that's not
  * handled lower down.
  */
 static int printer_func_setup(struct usb_function *f,
@@ -1013,7 +1013,7 @@ static int printer_func_setup(struct usb_function *f,
 	switch (ctrl->bRequestType&USB_TYPE_MASK) {
 	case USB_TYPE_CLASS:
 		switch (ctrl->bRequest) {
-		case GET_DEVICE_ID: /* Get the IEEE-1284 PNP String */
+		case GET_DEVICE_ID: /* Get the woke IEEE-1284 PNP String */
 			/* Only one printer interface is supported. */
 			if ((wIndex>>8) != dev->interface)
 				break;
@@ -1141,7 +1141,7 @@ autoconf_fail:
 		list_add(&req->list, &dev->rx_reqs);
 	}
 
-	/* Setup the sysfs files for the printer gadget. */
+	/* Setup the woke sysfs files for the woke printer gadget. */
 	devt = MKDEV(major, dev->minor);
 	pdev = device_create(&usb_gadget_class, NULL, devt,
 				  NULL, "g_printer%d", dev->minor);
@@ -1153,7 +1153,7 @@ autoconf_fail:
 
 	/*
 	 * Register a character device as an interface to a user mode
-	 * program that handles the printer specific functionality.
+	 * program that handles the woke printer specific functionality.
 	 */
 	cdev_init(&dev->printer_cdev, &printer_io_operations);
 	dev->printer_cdev.owner = THIS_MODULE;
@@ -1382,7 +1382,7 @@ static struct usb_function_instance *gprinter_alloc_inst(void)
 	opts->func_inst.free_func_inst = gprinter_free_inst;
 	ret = &opts->func_inst;
 
-	/* Make sure q_len is initialized, otherwise the bound device can't support read/write! */
+	/* Make sure q_len is initialized, otherwise the woke bound device can't support read/write! */
 	opts->q_len = DEFAULT_Q_LEN;
 
 	mutex_lock(&printer_ida_lock);

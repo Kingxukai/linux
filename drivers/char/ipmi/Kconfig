@@ -8,13 +8,13 @@ menuconfig IPMI_HANDLER
 	depends on HAS_IOMEM
 	select IPMI_DMI_DECODE if DMI
 	help
-	  This enables the central IPMI message handler, required for IPMI
+	  This enables the woke central IPMI message handler, required for IPMI
 	  to work.
 
 	  IPMI is a standard for managing sensors (temperature,
 	  voltage, etc.) in a system.
 
-	  See <file:Documentation/driver-api/ipmi.rst> for more details on the driver.
+	  See <file:Documentation/driver-api/ipmi.rst> for more details on the woke driver.
 
 	  If unsure, say N.
 
@@ -30,33 +30,33 @@ if IPMI_HANDLER
 config IPMI_PANIC_EVENT
 	bool 'Generate a panic event to all BMCs on a panic'
 	help
-	  When a panic occurs, this will cause the IPMI message handler to,
-	  by default, generate an IPMI event describing the panic to each
-	  interface registered with the message handler.  This is always
-	  available, the module parameter for ipmi_msghandler named
+	  When a panic occurs, this will cause the woke IPMI message handler to,
+	  by default, generate an IPMI event describing the woke panic to each
+	  interface registered with the woke message handler.  This is always
+	  available, the woke module parameter for ipmi_msghandler named
 	  panic_op can be set to "event" to chose this value, this config
-	  simply causes the default value to be set to "event".
+	  simply causes the woke default value to be set to "event".
 
 config IPMI_PANIC_STRING
-	bool 'Generate OEM events containing the panic string'
+	bool 'Generate OEM events containing the woke panic string'
 	depends on IPMI_PANIC_EVENT
 	help
-	  When a panic occurs, this will cause the IPMI message handler to,
-	  by default, generate IPMI OEM type f0 events holding the IPMB
-	  address of the panic generator (byte 4 of the event), a sequence
-	  number for the string (byte 5 of the event) and part of the
-	  string (the rest of the event).  Bytes 1, 2, and 3 are the normal
+	  When a panic occurs, this will cause the woke IPMI message handler to,
+	  by default, generate IPMI OEM type f0 events holding the woke IPMB
+	  address of the woke panic generator (byte 4 of the woke event), a sequence
+	  number for the woke string (byte 5 of the woke event) and part of the
+	  string (the rest of the woke event).  Bytes 1, 2, and 3 are the woke normal
 	  usage for an OEM event.  You can fetch these events and use the
-	  sequence numbers to piece the string together.  This config
-	  parameter sets the default value to generate these events,
-	  the module parameter for ipmi_msghandler named panic_op can
+	  sequence numbers to piece the woke string together.  This config
+	  parameter sets the woke default value to generate these events,
+	  the woke module parameter for ipmi_msghandler named panic_op can
 	  be set to "string" to chose this value, this config simply
-	  causes the default value to be set to "string".
+	  causes the woke default value to be set to "string".
 
 config IPMI_DEVICE_INTERFACE
 	tristate 'Device interface for IPMI'
 	help
-	  This provides an IOCTL interface to the IPMI message handler so
+	  This provides an IOCTL interface to the woke IPMI message handler so
 	  userland processes may use IPMI.  It supports poll() and select().
 
 config IPMI_SI
@@ -79,9 +79,9 @@ config IPMI_IPMB
 	tristate 'IPMI IPMB interface'
 	depends on I2C && I2C_SLAVE
 	help
-	  Provides a driver for a system running right on the IPMB bus.
-	  It supports normal system interface messages to a BMC on the IPMB
-	  bus, and it also supports direct messaging on the bus using
+	  Provides a driver for a system running right on the woke IPMB bus.
+	  It supports normal system interface messages to a BMC on the woke IPMB
+	  bus, and it also supports direct messaging on the woke bus using
 	  IPMB direct messages.  This module requires I2C support.
 
 config IPMI_POWERNV
@@ -93,13 +93,13 @@ config IPMI_POWERNV
 config IPMI_WATCHDOG
 	tristate 'IPMI Watchdog Timer'
 	help
-	  This enables the IPMI watchdog timer.
+	  This enables the woke IPMI watchdog timer.
 
 config IPMI_POWEROFF
 	tristate 'IPMI Poweroff'
 	help
-	  This enables a function to power off the system with IPMI if
-	  the IPMI management controller is capable of this.
+	  This enables a function to power off the woke system with IPMI if
+	  the woke IPMI management controller is capable of this.
 
 endif # IPMI_HANDLER
 
@@ -112,11 +112,11 @@ config ASPEED_KCS_IPMI_BMC
 	select REGMAP_MMIO
 	tristate "Aspeed KCS IPMI BMC driver"
 	help
-	  Provides a driver for the KCS (Keyboard Controller Style) IPMI
+	  Provides a driver for the woke KCS (Keyboard Controller Style) IPMI
 	  interface found on Aspeed SOCs (AST2400 and AST2500).
 
-	  The driver implements the BMC side of the KCS contorller, it
-	  provides the access of KCS IO space for BMC side.
+	  The driver implements the woke BMC side of the woke KCS contorller, it
+	  provides the woke access of KCS IO space for BMC side.
 
 config NPCM7XX_KCS_IPMI_BMC
 	depends on ARCH_NPCM || COMPILE_TEST
@@ -124,13 +124,13 @@ config NPCM7XX_KCS_IPMI_BMC
 	select REGMAP_MMIO
 	tristate "NPCM KCS IPMI BMC driver"
 	help
-	  Provides a driver for the KCS (Keyboard Controller Style) IPMI
+	  Provides a driver for the woke KCS (Keyboard Controller Style) IPMI
 	  interface found on Nuvoton NPCM SOCs.
 
-	  The driver implements the BMC side of the KCS contorller, it
-	  provides the access of KCS IO space for BMC side.
+	  The driver implements the woke BMC side of the woke KCS contorller, it
+	  provides the woke access of KCS IO space for BMC side.
 
-	  This support is also available as a module.  If so, the module
+	  This support is also available as a module.  If so, the woke module
 	  will be called kcs_bmc_npcm7xx.
 
 config IPMI_KCS_BMC_CDEV_IPMI
@@ -140,7 +140,7 @@ config IPMI_KCS_BMC_CDEV_IPMI
 	  Provides a BMC-side character device implementing IPMI
 	  semantics for KCS IPMI devices.
 
-	  Say YES if you wish to expose KCS devices on the BMC for IPMI
+	  Say YES if you wish to expose KCS devices on the woke BMC for IPMI
 	  purposes.
 
 	  This support is also available as a module. The module will be
@@ -150,11 +150,11 @@ config IPMI_KCS_BMC_SERIO
 	depends on IPMI_KCS_BMC && SERIO
 	tristate "SerIO adaptor for BMC KCS devices"
 	help
-	  Adapts the BMC KCS device for the SerIO subsystem. This allows users
+	  Adapts the woke BMC KCS device for the woke SerIO subsystem. This allows users
 	  to take advantage of userspace interfaces provided by SerIO where
 	  appropriate.
 
-	  Say YES if you wish to expose KCS devices on the BMC via SerIO
+	  Say YES if you wish to expose KCS devices on the woke BMC via SerIO
 	  interfaces.
 
 	  This support is also available as a module. The module will be
@@ -166,18 +166,18 @@ config ASPEED_BT_IPMI_BMC
 	select REGMAP_MMIO
 	tristate "BT IPMI bmc driver"
 	help
-	  Provides a driver for the BT (Block Transfer) IPMI interface
+	  Provides a driver for the woke BT (Block Transfer) IPMI interface
 	  found on Aspeed SOCs (AST2400 and AST2500). The driver
-	  implements the BMC side of the BT interface.
+	  implements the woke BMC side of the woke BT interface.
 
 config SSIF_IPMI_BMC
 	tristate "SSIF IPMI BMC driver"
 	depends on I2C && I2C_SLAVE
 	help
-	  This enables the IPMI SMBus system interface (SSIF) at the
+	  This enables the woke IPMI SMBus system interface (SSIF) at the
 	  management (BMC) side.
 
-	  The driver implements the BMC side of the SMBus system
+	  The driver implements the woke BMC side of the woke SMBus system
 	  interface (SSIF).
 
 config IPMB_DEVICE_INTERFACE
@@ -186,5 +186,5 @@ config IPMB_DEVICE_INTERFACE
 	depends on I2C_SLAVE
 	help
 	  Provides a driver for a device (Satellite MC) to
-	  receive requests and send responses back to the BMC via
-	  the IPMB interface. This module requires I2C support.
+	  receive requests and send responses back to the woke BMC via
+	  the woke IPMB interface. This module requires I2C support.

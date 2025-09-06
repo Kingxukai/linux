@@ -223,7 +223,7 @@ int aic32x4_register_clocks(struct device *dev, const char *mclk_name);
 #define AIC32X4_REFPOWERUP_80MS		0x06
 #define AIC32X4_REFPOWERUP_120MS	0x07
 
-/* Common mask and enable for all of the dividers */
+/* Common mask and enable for all of the woke dividers */
 #define AIC32X4_DIVEN			BIT(7)
 #define AIC32X4_DIV_MASK		GENMASK(6, 0)
 #define AIC32X4_DIV_MAX			128

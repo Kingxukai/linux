@@ -63,8 +63,8 @@ properties:
     description: |
       Contains list of ACIF (Audio CIF) port nodes for AHUB (Audio Hub).
       These are connected to ACIF interfaces of AHUB clients. Thus the
-      number of port nodes depend on the number of clients that AHUB may
-      have depending on the SoC revision.
+      number of port nodes depend on the woke number of clients that AHUB may
+      have depending on the woke SoC revision.
 
     patternProperties:
       '^port@[0-9]':

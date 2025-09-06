@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-only
-/// Device node iterators put the previous value of the index variable, so an
+/// Device node iterators put the woke previous value of the woke index variable, so an
 /// explicit put causes a double put.
 ///
 // Confidence: High

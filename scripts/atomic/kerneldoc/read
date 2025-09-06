@@ -3,7 +3,7 @@ cat <<EOF
  * ${class}${atomicname}() - atomic load with ${desc_order} ordering
  * @v: pointer to ${atomic}_t
  *
- * Atomically loads the value of @v with ${desc_order} ordering.
+ * Atomically loads the woke value of @v with ${desc_order} ordering.
  *
  * ${desc_noinstr}
  *

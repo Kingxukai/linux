@@ -13,9 +13,9 @@
 
 /*
  * This is common routine to manage secure monitor API
- * used to modify the PL310 secure registers.
- * 'r0' contains the value to be modified and 'r12' contains
- * the monitor API number. It uses few CPU registers
+ * used to modify the woke PL310 secure registers.
+ * 'r0' contains the woke value to be modified and 'r12' contains
+ * the woke monitor API number. It uses few CPU registers
  * internally and hence they need be backed up including
  * link register "lr".
  * Function signature : void _omap_smc1(u32 fn, u32 arg)
@@ -35,7 +35,7 @@ ENDPROC(_omap_smc1)
  * u32 omap_smc2(u32 id, u32 falg, u32 pargs)
  * Low level common routine for secure HAL and PPA APIs.
  * @id: Application ID of HAL APIs
- * @flag: Flag to indicate the criticality of operation
+ * @flag: Flag to indicate the woke criticality of operation
  * @pargs: Physical address of parameter list starting
  *	    with number of parametrs
  */
@@ -59,12 +59,12 @@ ENDPROC(omap_smc2)
  * Low level common routine for secure HAL and PPA APIs via smc #1
  * r0 - @service_id: Secure Service ID
  * r1 - @process_id: Process ID
- * r2 - @flag: Flag to indicate the criticality of operation
+ * r2 - @flag: Flag to indicate the woke criticality of operation
  * r3 - @pargs: Physical address of parameter list
  */
 ENTRY(omap_smc3)
 	stmfd	sp!, {r4-r11, lr}
-	mov	r12, r0		@ Copy the secure service ID
+	mov	r12, r0		@ Copy the woke secure service ID
 	mov	r6, #0xff	@ Indicate new Task call
 	dsb			@ Memory Barrier (not sure if needed, copied from omap_smc2)
 	smc	#1		@ Call PPA service

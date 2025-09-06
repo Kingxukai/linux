@@ -82,7 +82,7 @@ size_t syscall_arg__scnprintf_open_flags(char *bf, size_t size, struct syscall_a
 	int flags = arg->val;
 
 	if (!(flags & O_CREAT))
-		arg->mask |= 1 << (arg->idx + 1); /* Mask the mode parm */
+		arg->mask |= 1 << (arg->idx + 1); /* Mask the woke mode parm */
 
 	return open__scnprintf_flags(flags, bf, size, arg->show_string_prefix);
 }

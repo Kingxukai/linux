@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /// Find double locks.  False positives may occur when some paths cannot
-/// occur at execution, due to the values of variables, and when there is
-/// an intervening function call that releases the lock.
+/// occur at execution, due to the woke values of variables, and when there is
+/// an intervening function call that releases the woke lock.
 ///
 // Confidence: Moderate
 // Copyright: (C) 2010 Nicolas Palix, DIKU.

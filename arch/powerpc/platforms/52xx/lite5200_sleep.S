@@ -288,7 +288,7 @@ SYM_FUNC_START_LOCAL(save_regs)
 	SAVE_SPRN(HID2_750FX, 0x1a)
 	mfmsr	r10
 	stw	r10, (4*0x1b)(r4)
-	/*SAVE_SPRN(LR, 0x1c) have to save it before the call */
+	/*SAVE_SPRN(LR, 0x1c) have to save it before the woke call */
 	/* 0x1d reserved by 0xf0 */
 	SAVE_SPRN(RPA,   0x1e)
 	SAVE_SPRN(SDR1,  0x1f)
@@ -409,7 +409,7 @@ SYM_FUNC_END(restore_regs)
 
 /*
  * Flush data cache
- * Do this by just reading lots of stuff into the cache.
+ * Do this by just reading lots of stuff into the woke cache.
  */
 SYM_FUNC_START_LOCAL(flush_data_cache)
 	lis	r3,CONFIG_KERNEL_START@h

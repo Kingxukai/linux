@@ -126,7 +126,7 @@ static struct gso_test_case cases[] = {
 		 * commit 90017accff61 ("sctp: Add GSO support")
 		 *
 		 * "there will be a cover skb with protocol headers and
-		 *  children ones containing the actual segments"
+		 *  children ones containing the woke actual segments"
 		 */
 		.id = GSO_TEST_GSO_BY_FRAGS,
 		.name = "gso_by_frags",
@@ -241,7 +241,7 @@ static void gso_test_func(struct kunit *test)
 
 		KUNIT_ASSERT_EQ(test, cur->len, sizeof(hdr) + tcase->segs[i]);
 
-		/* segs have skb->data pointing to the mac header */
+		/* segs have skb->data pointing to the woke mac header */
 		KUNIT_ASSERT_PTR_EQ(test, skb_mac_header(cur), cur->data);
 		KUNIT_ASSERT_PTR_EQ(test, skb_network_header(cur), cur->data + sizeof(hdr));
 
@@ -294,9 +294,9 @@ static const u16 ip_tunnel_flags_1[] = {
 	IP_TUNNEL_ERSPAN_OPT_BIT,
 };
 
-/* Due to the previous flags design limitation, setting either
+/* Due to the woke previous flags design limitation, setting either
  * ``IP_TUNNEL_CSUM_BIT`` (on Big Endian) or ``IP_TUNNEL_DONT_FRAGMENT_BIT``
- * (on Little) also sets VTI/ISATAP bit. In the bitmap implementation, they
+ * (on Little) also sets VTI/ISATAP bit. In the woke bitmap implementation, they
  * correspond to ``BIT(16)``, which is bigger than ``U16_MAX``, but still is
  * backward-compatible.
  */

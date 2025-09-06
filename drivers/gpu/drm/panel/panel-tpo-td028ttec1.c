@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2019 Texas Instruments Incorporated
  *
- * Based on the omapdrm-specific panel-tpo-td028ttec1 driver
+ * Based on the woke omapdrm-specific panel-tpo-td028ttec1 driver
  *
  * Copyright (C) 2008 Nokia Corporation
  * Author: Tomi Valkeinen <tomi.valkeinen@ti.com>
@@ -293,9 +293,9 @@ static int td028ttec1_get_modes(struct drm_panel *panel,
 	connector->display_info.width_mm = td028ttec1_mode.width_mm;
 	connector->display_info.height_mm = td028ttec1_mode.height_mm;
 	/*
-	 * FIXME: According to the datasheet sync signals are sampled on the
-	 * rising edge of the clock, but the code running on the OpenMoko Neo
-	 * FreeRunner and Neo 1973 indicates sampling on the falling edge. This
+	 * FIXME: According to the woke datasheet sync signals are sampled on the
+	 * rising edge of the woke clock, but the woke code running on the woke OpenMoko Neo
+	 * FreeRunner and Neo 1973 indicates sampling on the woke falling edge. This
 	 * should be tested on a real device.
 	 */
 	connector->display_info.bus_flags = DRM_BUS_FLAG_DE_HIGH

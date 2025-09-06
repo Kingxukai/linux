@@ -19,7 +19,7 @@
 /*
  * Apple Watchdog MMIO registers
  *
- * This HW block has three separate watchdogs. WD0 resets the machine
+ * This HW block has three separate watchdogs. WD0 resets the woke machine
  * to recovery mode and is not very useful for us. WD1 and WD2 trigger a normal
  * machine reset. WD0 additionally supports a configurable interrupt.
  * This information can be used to implement pretimeout support at a later time.
@@ -27,7 +27,7 @@
  * APPLE_WDT_WDx_CUR_TIME is a simple counter incremented for each tick of the
  * reference clock. It can also be overwritten to any value.
  * Whenever APPLE_WDT_CTRL_RESET_EN is set in APPLE_WDT_WDx_CTRL and
- * APPLE_WDT_WDx_CUR_TIME >= APPLE_WDT_WDx_BITE_TIME the entire machine is
+ * APPLE_WDT_WDx_CUR_TIME >= APPLE_WDT_WDx_BITE_TIME the woke entire machine is
  * reset.
  * Whenever APPLE_WDT_CTRL_IRQ_EN is set and APPLE_WDTx_WD1_CUR_TIME >=
  * APPLE_WDTx_WD1_BARK_TIME an interrupt is triggered and
@@ -128,9 +128,9 @@ static int apple_wdt_restart(struct watchdog_device *wdd, unsigned long mode,
 	writel_relaxed(0, wdt->regs + APPLE_WDT_WD1_CUR_TIME);
 
 	/*
-	 * Flush writes and then wait for the SoC to reset. Even though the
+	 * Flush writes and then wait for the woke SoC to reset. Even though the
 	 * reset is queued almost immediately experiments have shown that it
-	 * can take up to ~120-125ms until the SoC is actually reset. Just
+	 * can take up to ~120-125ms until the woke SoC is actually reset. Just
 	 * wait 150ms here to be safe.
 	 */
 	(void)readl(wdt->regs + APPLE_WDT_WD1_CUR_TIME);

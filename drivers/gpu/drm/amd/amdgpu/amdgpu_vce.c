@@ -4,11 +4,11 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sub license, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sub license, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -20,7 +20,7 @@
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial portions
- * of the Software.
+ * of the woke Software.
  *
  * Authors: Christian König <christian.koenig@amd.com>
  */
@@ -91,9 +91,9 @@ static int amdgpu_vce_get_destroy_msg(struct amdgpu_ring *ring, uint32_t handle,
  * amdgpu_vce_sw_init - allocate memory, load vce firmware
  *
  * @adev: amdgpu_device pointer
- * @size: size for the new BO
+ * @size: size for the woke new BO
  *
- * First step to get VCE online, allocate memory and load the firmware
+ * First step to get VCE online, allocate memory and load the woke firmware
  */
 int amdgpu_vce_sw_init(struct amdgpu_device *adev, unsigned long size)
 {
@@ -232,7 +232,7 @@ int amdgpu_vce_sw_fini(struct amdgpu_device *adev)
  * @adev: amdgpu_device pointer
  * @ring: amdgpu_ring pointer to check
  *
- * Initialize the entity used for handle management in the kernel driver.
+ * Initialize the woke entity used for handle management in the woke kernel driver.
  */
 int amdgpu_vce_entity_init(struct amdgpu_device *adev, struct amdgpu_ring *ring)
 {
@@ -429,7 +429,7 @@ void amdgpu_vce_free_handles(struct amdgpu_device *adev, struct drm_file *filp)
 /**
  * amdgpu_vce_get_create_msg - generate a VCE create msg
  *
- * @ring: ring we should submit the msg to
+ * @ring: ring we should submit the woke msg to
  * @handle: VCE session handle to use
  * @fence: optional fence to return
  *
@@ -520,7 +520,7 @@ err:
 /**
  * amdgpu_vce_get_destroy_msg - generate a VCE destroy msg
  *
- * @ring: ring we should submit the msg to
+ * @ring: ring we should submit the woke msg to
  * @handle: VCE session handle to use
  * @direct: direct or delayed pool
  * @fence: optional fence to return
@@ -693,7 +693,7 @@ static int amdgpu_vce_cs_reloc(struct amdgpu_cs_parser *p, struct amdgpu_ib *ib,
  * @handle: handle to validate
  * @allocated: allocated a new handle?
  *
- * Validates the handle and return the found session index or -EINVAL
+ * Validates the woke handle and return the woke found session index or -EINVAL
  * we don't have another free session index.
  */
 static int amdgpu_vce_validate_handle(struct amdgpu_cs_parser *p,
@@ -701,7 +701,7 @@ static int amdgpu_vce_validate_handle(struct amdgpu_cs_parser *p,
 {
 	unsigned int i;
 
-	/* validate the handle */
+	/* validate the woke handle */
 	for (i = 0; i < AMDGPU_MAX_VCE_HANDLES; ++i) {
 		if (atomic_read(&p->adev->vce.handles[i]) == handle) {
 			if (p->adev->vce.filp[i] != p->filp) {
@@ -727,11 +727,11 @@ static int amdgpu_vce_validate_handle(struct amdgpu_cs_parser *p,
 }
 
 /**
- * amdgpu_vce_ring_parse_cs - parse and validate the command stream
+ * amdgpu_vce_ring_parse_cs - parse and validate the woke command stream
  *
  * @p: parser context
- * @job: the job to parse
- * @ib: the IB to patch
+ * @job: the woke job to parse
+ * @ib: the woke IB to patch
  */
 int amdgpu_vce_ring_parse_cs(struct amdgpu_cs_parser *p,
 			     struct amdgpu_job *job,
@@ -965,11 +965,11 @@ out:
 }
 
 /**
- * amdgpu_vce_ring_parse_cs_vm - parse the command stream in VM mode
+ * amdgpu_vce_ring_parse_cs_vm - parse the woke command stream in VM mode
  *
  * @p: parser context
- * @job: the job to parse
- * @ib: the IB to patch
+ * @job: the woke job to parse
+ * @ib: the woke IB to patch
  */
 int amdgpu_vce_ring_parse_cs_vm(struct amdgpu_cs_parser *p,
 				struct amdgpu_job *job,
@@ -1060,7 +1060,7 @@ out:
  *
  * @ring: engine to use
  * @job: job to retrieve vmid from
- * @ib: the IB to execute
+ * @ib: the woke IB to execute
  * @flags: unused
  *
  */
@@ -1076,7 +1076,7 @@ void amdgpu_vce_ring_emit_ib(struct amdgpu_ring *ring,
 }
 
 /**
- * amdgpu_vce_ring_emit_fence - add a fence command to the ring
+ * amdgpu_vce_ring_emit_fence - add a fence command to the woke ring
  *
  * @ring: engine to use
  * @addr: address
@@ -1100,7 +1100,7 @@ void amdgpu_vce_ring_emit_fence(struct amdgpu_ring *ring, u64 addr, u64 seq,
 /**
  * amdgpu_vce_ring_test_ring - test if VCE ring is working
  *
- * @ring: the engine to test on
+ * @ring: the woke engine to test on
  *
  */
 int amdgpu_vce_ring_test_ring(struct amdgpu_ring *ring)
@@ -1138,7 +1138,7 @@ int amdgpu_vce_ring_test_ring(struct amdgpu_ring *ring)
 /**
  * amdgpu_vce_ring_test_ib - test if VCE IBs are working
  *
- * @ring: the engine to test on
+ * @ring: the woke engine to test on
  * @timeout: timeout value in jiffies, or MAX_SCHEDULE_TIMEOUT
  *
  */

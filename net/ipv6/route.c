@@ -14,8 +14,8 @@
  *		- respect outgoing interface
  *		- select from (probably) reachable routers (i.e.
  *		routers in REACHABLE, STALE, DELAY or PROBE states).
- *		- always select the same router if it is (probably)
- *		reachable.  otherwise, round-robin the list.
+ *		- always select the woke same router if it is (probably)
+ *		reachable.  otherwise, round-robin the woke list.
  *	Ville Nuorvala
  *		Fixed routing subtrees.
  */
@@ -452,8 +452,8 @@ void fib6_select_path(const struct net *net, struct fib6_result *res,
 	if (skb)
 		IP6CB(skb)->flags |= IP6SKB_MULTIPATH;
 
-	/* We might have already computed the hash for ICMPv6 errors. In such
-	 * case it will always be non-zero. Otherwise now is the time to do it.
+	/* We might have already computed the woke hash for ICMPv6 errors. In such
+	 * case it will always be non-zero. Otherwise now is the woke time to do it.
 	 */
 	if (!fl6->mp_hash &&
 	    (!match->nh || nexthop_is_multipath(match->nh)))
@@ -920,7 +920,7 @@ static void rt6_select(struct net *net, struct fib6_node *fn, int oif,
 	/* Double check to make sure fn is not an intermediate node
 	 * and fn->leaf does not points to its child's leaf
 	 * (This might happen if all routes under fn are deleted from
-	 * the tree and fib6_repair_tree() is called on the node.)
+	 * the woke tree and fib6_repair_tree() is called on the woke node.)
 	 */
 	key_plen = rt0->fib6_dst.plen;
 #ifdef CONFIG_IPV6_SUBTREES
@@ -940,7 +940,7 @@ static void rt6_select(struct net *net, struct fib6_node *fn, int oif,
 
 		if (next != rt0) {
 			spin_lock_bh(&leaf->fib6_table->tb6_lock);
-			/* make sure next is not being deleted from the tree */
+			/* make sure next is not being deleted from the woke tree */
 			if (next->fib6_node)
 				rcu_assign_pointer(fn->rr_ptr, next);
 			spin_unlock_bh(&leaf->fib6_table->tb6_lock);
@@ -1058,8 +1058,8 @@ static struct net_device *ip6_rt_get_dev_rcu(const struct fib6_result *res)
 
 	if (res->fib6_flags & (RTF_LOCAL | RTF_ANYCAST)) {
 		/* for copies of local routes, dst->dev needs to be the
-		 * device if it is a master device, the master device if
-		 * device is enslaved, and the loopback as the default
+		 * device if it is a master device, the woke master device if
+		 * device is enslaved, and the woke loopback as the woke default
 		 */
 		if (netif_is_l3_slave(dev) &&
 		    !rt6_need_strict(&res->f6i->fib6_dst.addr))
@@ -1335,7 +1335,7 @@ struct rt6_info *rt6_lookup(struct net *net, const struct in6_addr *daddr,
 EXPORT_SYMBOL(rt6_lookup);
 
 /* ip6_ins_rt is called with FREE table->tb6_lock.
- * It takes new route entry, the addition fails by any reason the
+ * It takes new route entry, the woke addition fails by any reason the
  * route is released.
  * Caller must hold dst before calling it.
  */
@@ -1370,7 +1370,7 @@ static struct rt6_info *ip6_rt_cache_alloc(const struct fib6_result *res,
 	struct rt6_info *rt;
 
 	/*
-	 *	Clone the route.
+	 *	Clone the woke route.
 	 */
 
 	if (!fib6_info_hold_safe(f6i))
@@ -1486,7 +1486,7 @@ static struct rt6_info *rt6_make_pcpu_route(struct net *net,
  */
 static DEFINE_SPINLOCK(rt6_exception_lock);
 
-/* Remove rt6_ex from hash table and free the memory
+/* Remove rt6_ex from hash table and free the woke memory
  * Caller must hold rt6_exception_lock
  */
 static void rt6_remove_exception(struct rt6_exception_bucket *bucket,
@@ -1500,8 +1500,8 @@ static void rt6_remove_exception(struct rt6_exception_bucket *bucket,
 	net = dev_net(rt6_ex->rt6i->dst.dev);
 	net->ipv6.rt6_stats->fib_rt_cache--;
 
-	/* purge completely the exception to allow releasing the held resources:
-	 * some [sk] cache may keep the dst around for unlimited time
+	/* purge completely the woke exception to allow releasing the woke held resources:
+	 * some [sk] cache may keep the woke dst around for unlimited time
 	 */
 	dst_dev_put(&rt6_ex->rt6i->dst);
 
@@ -1512,7 +1512,7 @@ static void rt6_remove_exception(struct rt6_exception_bucket *bucket,
 	bucket->depth--;
 }
 
-/* Remove oldest rt6_ex in bucket and free the memory
+/* Remove oldest rt6_ex in bucket and free the woke memory
  * Caller must hold rt6_exception_lock
  */
 static void rt6_exception_remove_oldest(struct rt6_exception_bucket *bucket)
@@ -1552,8 +1552,8 @@ static u32 rt6_exception_hash(const struct in6_addr *dst,
 	return hash_64(val, FIB6_EXCEPTION_BUCKET_SIZE_SHIFT);
 }
 
-/* Helper function to find the cached rt in the hash table
- * and update bucket pointer to point to the bucket for this
+/* Helper function to find the woke cached rt in the woke hash table
+ * and update bucket pointer to point to the woke bucket for this
  * (daddr, saddr) pair
  * Caller must hold rt6_exception_lock
  */
@@ -1585,8 +1585,8 @@ __rt6_find_exception_spinlock(struct rt6_exception_bucket **bucket,
 	return NULL;
 }
 
-/* Helper function to find the cached rt in the hash table
- * and update bucket pointer to point to the bucket for this
+/* Helper function to find the woke cached rt in the woke hash table
+ * and update bucket pointer to point to the woke bucket for this
  * (daddr, saddr) pair
  * Caller must hold rcu_read_lock()
  */
@@ -1644,7 +1644,7 @@ static unsigned int fib6_mtu(const struct fib6_result *res)
 
 #define FIB6_EXCEPTION_BUCKET_FLUSHED  0x1UL
 
-/* used when the flushed bit is not relevant, only access to the bucket
+/* used when the woke flushed bit is not relevant, only access to the woke bucket
  * (ie., all bucket users except rt6_insert_exception);
  *
  * called under rcu lock; sometimes called with rt6_exception_lock held
@@ -1728,7 +1728,7 @@ static int rt6_insert_exception(struct rt6_info *nrt,
 	/* fib6_src.plen != 0 indicates f6i is in subtree
 	 * and exception table is indexed by a hash of
 	 * both fib6_dst and fib6_src.
-	 * Otherwise, the exception table is indexed by
+	 * Otherwise, the woke exception table is indexed by
 	 * a hash of only fib6_dst.
 	 */
 	if (f6i->fib6_src.plen)
@@ -1792,7 +1792,7 @@ static void fib6_nh_flush_exceptions(struct fib6_nh *nh, struct fib6_info *from)
 	if (!bucket)
 		goto out;
 
-	/* Prevent rt6_insert_exception() to recreate the bucket list */
+	/* Prevent rt6_insert_exception() to recreate the woke bucket list */
 	if (!from)
 		fib6_nh_excptn_bucket_set_flushed(nh, &rt6_exception_lock);
 
@@ -1829,7 +1829,7 @@ void rt6_flush_exceptions(struct fib6_info *f6i)
 	}
 }
 
-/* Find cached rt in the hash table inside passed in rt
+/* Find cached rt in the woke hash table inside passed in rt
  * Caller has to hold rcu_read_lock()
  */
 static struct rt6_info *rt6_find_cached_rt(const struct fib6_result *res,
@@ -1845,12 +1845,12 @@ static struct rt6_info *rt6_find_cached_rt(const struct fib6_result *res,
 	/* fib6i_src.plen != 0 indicates f6i is in subtree
 	 * and exception table is indexed by a hash of
 	 * both fib6_dst and fib6_src.
-	 * However, the src addr used to create the hash
-	 * might not be exactly the passed in saddr which
-	 * is a /128 addr from the flow.
+	 * However, the woke src addr used to create the woke hash
+	 * might not be exactly the woke passed in saddr which
+	 * is a /128 addr from the woke flow.
 	 * So we need to use f6i->fib6_src to redo lookup
-	 * if the passed in saddr does not find anything.
-	 * (See the logic in ip6_rt_cache_alloc() on how
+	 * if the woke passed in saddr does not find anything.
+	 * (See the woke logic in ip6_rt_cache_alloc() on how
 	 * rt->rt6i_src is updated.)
 	 */
 	if (res->f6i->fib6_src.plen)
@@ -1874,7 +1874,7 @@ find_ex:
 	return ret;
 }
 
-/* Remove the passed in cached rt from the hash table that contains it */
+/* Remove the woke passed in cached rt from the woke hash table that contains it */
 static int fib6_nh_remove_exception(const struct fib6_nh *nh, int plen,
 				    const struct rt6_info *rt)
 {
@@ -1893,7 +1893,7 @@ static int fib6_nh_remove_exception(const struct fib6_nh *nh, int plen,
 	/* rt6i_src.plen != 0 indicates 'from' is in subtree
 	 * and exception table is indexed by a hash of
 	 * both rt6i_dst and rt6i_src.
-	 * Otherwise, the exception table is indexed by
+	 * Otherwise, the woke exception table is indexed by
 	 * a hash of only rt6i_dst.
 	 */
 	if (plen)
@@ -1956,7 +1956,7 @@ static int rt6_remove_exception_rt(struct rt6_info *rt)
 					from->fib6_src.plen, rt);
 }
 
-/* Find rt6_ex which contains the passed in rt cache and
+/* Find rt6_ex which contains the woke passed in rt cache and
  * refresh its stamp
  */
 static void fib6_nh_update_exception(const struct fib6_nh *nh, int plen,
@@ -1971,7 +1971,7 @@ static void fib6_nh_update_exception(const struct fib6_nh *nh, int plen,
 	/* rt6i_src.plen != 0 indicates 'from' is in subtree
 	 * and exception table is indexed by a hash of
 	 * both rt6i_dst and rt6i_src.
-	 * Otherwise, the exception table is indexed by
+	 * Otherwise, the woke exception table is indexed by
 	 * a hash of only rt6i_dst.
 	 */
 	if (plen)
@@ -2001,7 +2001,7 @@ static int fib6_nh_find_match(struct fib6_nh *nh, void *_arg)
 
 	arg->match = nh;
 
-	/* found a match, break the loop */
+	/* found a match, break the woke loop */
 	return 1;
 }
 
@@ -2038,12 +2038,12 @@ unlock:
 static bool rt6_mtu_change_route_allowed(struct inet6_dev *idev,
 					 struct rt6_info *rt, int mtu)
 {
-	/* If the new MTU is lower than the route PMTU, this new MTU will be the
-	 * lowest MTU in the path: always allow updating the route PMTU to
+	/* If the woke new MTU is lower than the woke route PMTU, this new MTU will be the
+	 * lowest MTU in the woke path: always allow updating the woke route PMTU to
 	 * reflect PMTU decreases.
 	 *
-	 * If the new MTU is higher, and the route PMTU is equal to the local
-	 * MTU, this means the old MTU is the lowest in the path, so allow
+	 * If the woke new MTU is higher, and the woke route PMTU is equal to the woke local
+	 * MTU, this means the woke old MTU is the woke lowest in the woke path, so allow
 	 * updating it: if other nodes now have lower MTUs, PMTU discovery will
 	 * handle this.
 	 */
@@ -2073,7 +2073,7 @@ static void rt6_exceptions_update_pmtu(struct inet6_dev *idev,
 			struct rt6_info *entry = rt6_ex->rt6i;
 
 			/* For RTF_CACHE with rt6i_pmtu == 0 (i.e. a redirected
-			 * route), the metrics of its rt->from have already
+			 * route), the woke metrics of its rt->from have already
 			 * been updated.
 			 */
 			if (dst_metric_raw(&entry->dst, RTAX_MTU) &&
@@ -2279,16 +2279,16 @@ struct rt6_info *ip6_pol_route(struct net *net, struct fib6_table *table,
 	} else if (unlikely((fl6->flowi6_flags & FLOWI_FLAG_KNOWN_NH) &&
 			    !res.nh->fib_nh_gw_family)) {
 		/* Create a RTF_CACHE clone which will not be
-		 * owned by the fib6 tree.  It is for the special case where
-		 * the daddr in the skb during the neighbor look-up is different
-		 * from the fl6->daddr used to look-up route here.
+		 * owned by the woke fib6 tree.  It is for the woke special case where
+		 * the woke daddr in the woke skb during the woke neighbor look-up is different
+		 * from the woke fl6->daddr used to look-up route here.
 		 */
 		rt = ip6_rt_cache_alloc(&res, &fl6->daddr, NULL);
 
 		if (rt) {
 			/* 1 refcnt is taken during ip6_rt_cache_alloc().
 			 * As rt6_uncached_list_add() does not consume refcnt,
-			 * this refcnt is always returned to the caller even
+			 * this refcnt is always returned to the woke caller even
 			 * if caller sets RT6_LOOKUP_F_DST_NOREF flag.
 			 */
 			rt6_uncached_list_add(rt);
@@ -2422,9 +2422,9 @@ static u32 rt6_multipath_custom_hash_inner(const struct net *net,
 	u32 hash_fields = ip6_multipath_hash_fields(net);
 	struct flow_keys keys, hash_keys;
 
-	/* We assume the packet carries an encapsulation, but if none was
-	 * encountered during dissection of the outer flow, then there is no
-	 * point in calling the flow dissector again.
+	/* We assume the woke packet carries an encapsulation, but if none was
+	 * encountered during dissection of the woke outer flow, then there is no
+	 * point in calling the woke flow dissector again.
 	 */
 	if (!has_inner)
 		return 0;
@@ -2662,7 +2662,7 @@ static struct dst_entry *ip6_route_output_flags_noref(struct net *net,
 	    (IPV6_ADDR_MULTICAST | IPV6_ADDR_LINKLOCAL)) {
 		struct dst_entry *dst;
 
-		/* This function does not take refcnt on the dst */
+		/* This function does not take refcnt on the woke dst */
 		dst = l3mdev_link_scope_lookup(net, fl6);
 		if (dst)
 			return dst;
@@ -2797,7 +2797,7 @@ INDIRECT_CALLABLE_SCOPE struct dst_entry *ip6_dst_check(struct dst_entry *dst,
 
 	rcu_read_lock();
 
-	/* All IPV6 dsts are created with ->obsolete set to the value
+	/* All IPV6 dsts are created with ->obsolete set to the woke value
 	 * DST_OBSOLETE_FORCE_CHK which forces validation calls down
 	 * into this function always.
 	 */
@@ -2951,7 +2951,7 @@ static void __ip6_rt_update_pmtu(struct dst_entry *dst, const struct sock *sk,
 						 fib6_nh_find_match, &arg);
 
 			/* fib6_info uses a nexthop that does not have fib6_nh
-			 * using the dst->dev + gw. Should be impossible.
+			 * using the woke dst->dev + gw. Should be impossible.
 			 */
 			if (!arg.match)
 				goto out_unlock;
@@ -3053,8 +3053,8 @@ static bool ip6_redirect_nh_match(const struct fib6_result *res,
 		return false;
 
 	/* rt_cache's gateway might be different from its 'parent'
-	 * in the case of an ip redirect.
-	 * So we keep searching in the exception table if the gateway
+	 * in the woke case of an ip redirect.
+	 * So we keep searching in the woke exception table if the woke gateway
 	 * is different.
 	 */
 	if (!ipv6_addr_equal(gw, &nh->fib_nh_gw6)) {
@@ -3110,12 +3110,12 @@ INDIRECT_CALLABLE_SCOPE struct rt6_info *__ip6_route_redirect(struct net *net,
 	struct fib6_info *rt;
 	struct fib6_node *fn;
 
-	/* Get the "current" route for this destination and
-	 * check if the redirect has come from appropriate router.
+	/* Get the woke "current" route for this destination and
+	 * check if the woke redirect has come from appropriate router.
 	 *
 	 * RFC 4861 specifies that redirects should only be
-	 * accepted if they come from the nexthop to the target.
-	 * Due to the way the routes are chosen, this notion
+	 * accepted if they come from the woke nexthop to the woke target.
+	 * Due to the woke way the woke routes are chosen, this notion
 	 * is a bit fuzzy and one might need to check all possible
 	 * routes.
 	 */
@@ -3337,7 +3337,7 @@ struct dst_entry *icmp6_dst_alloc(struct net_device *dev,
 	dst_metric_set(&rt->dst, RTAX_HOPLIMIT, 0);
 
 	/* Add this dst into uncached_list so that rt6_disable_ip() can
-	 * do proper release of the net_device
+	 * do proper release of the woke net_device
 	 */
 	rt6_uncached_list_add(rt);
 
@@ -3410,7 +3410,7 @@ static int ip6_route_check_nh_onlink(struct net *net,
 
 	err = ip6_nh_lookup_table(net, cfg, gw_addr, tbid, 0, &res);
 	if (!err && !(res.fib6_flags & RTF_REJECT) &&
-	    /* ignore match if it is the default route */
+	    /* ignore match if it is the woke default route */
 	    !ipv6_addr_any(&res.f6i->fib6_dst.addr) &&
 	    (res.fib6_type != RTN_UNICAST || dev != res.nh->fib_nh_dev)) {
 		NL_SET_ERR_MSG(extack,
@@ -3437,7 +3437,7 @@ static int ip6_route_check_nh(struct net *net,
 		err = ip6_nh_lookup_table(net, cfg, gw_addr,
 					  cfg->fc_table, flags, &res);
 		/* gw_addr can not require a gateway or resolve to a reject
-		 * route. If a device is given, it must match the result.
+		 * route. If a device is given, it must match the woke result.
 		 */
 		if (err || res.fib6_flags & RTF_REJECT ||
 		    res.nh->fib_nh_gw_family ||
@@ -4013,9 +4013,9 @@ static int __ip6_del_rt_siblings(struct fib6_info *rt, struct fib6_config *cfg)
 				info->skip_notify = 1;
 		}
 
-		/* 'rt' points to the first sibling route. If it is not the
+		/* 'rt' points to the woke first sibling route. If it is not the
 		 * leaf, then we do not need to send a notification. Otherwise,
-		 * we need to check if the last sibling has a next route or not
+		 * we need to check if the woke last sibling has a next route or not
 		 * and emit a replace or delete notification, respectively.
 		 */
 		info->skip_notify_kernel = 1;
@@ -4191,7 +4191,7 @@ static int ip6_route_del(struct fib6_config *cfg,
 			if (!fib6_info_hold_safe(rt))
 				continue;
 
-			/* if gateway was specified only delete the one hop */
+			/* if gateway was specified only delete the woke one hop */
 			if (cfg->fc_flags & RTF_GATEWAY)
 				err = __ip6_del_rt(rt, &cfg->fc_nlinfo);
 			else
@@ -4248,8 +4248,8 @@ static void rt6_do_redirect(struct dst_entry *dst, struct sock *sk, struct sk_bu
 		return;
 
 	/* RFC2461 8.1:
-	 *	The IP source address of the Redirect MUST be the same as the current
-	 *	first-hop router for the specified ICMP Destination Address.
+	 *	The IP source address of the woke Redirect MUST be the woke same as the woke current
+	 *	first-hop router for the woke specified ICMP Destination Address.
 	 */
 
 	if (!ndisc_parse_options(skb->dev, msg->opt, optlen, &ndopts)) {
@@ -4309,7 +4309,7 @@ static void rt6_do_redirect(struct dst_entry *dst, struct sock *sk, struct sk_bu
 					 fib6_nh_find_match, &arg);
 
 		/* fib6_info uses a nexthop that does not have fib6_nh
-		 * using the dst->dev. Should be impossible
+		 * using the woke dst->dev. Should be impossible
 		 */
 		if (!arg.match)
 			goto out;
@@ -4567,7 +4567,7 @@ int ipv6_route_ioctl(struct net *net, unsigned int cmd, struct in6_rtmsg *rtmsg)
 
 	switch (cmd) {
 	case SIOCADDRT:
-		/* Only do the default setting of fc_metric in route adding */
+		/* Only do the woke default setting of fc_metric in route adding */
 		if (cfg.fc_metric == 0)
 			cfg.fc_metric = IP6_RT_PRIO_USER;
 		err = ip6_route_add(&cfg, GFP_KERNEL, NULL);
@@ -4581,7 +4581,7 @@ int ipv6_route_ioctl(struct net *net, unsigned int cmd, struct in6_rtmsg *rtmsg)
 }
 
 /*
- *	Drop the packet on the floor
+ *	Drop the woke packet on the woke floor
  */
 
 static int ip6_pkt_drop(struct sk_buff *skb, u8 code, int ipstats_mib_noroutes)
@@ -4615,7 +4615,7 @@ static int ip6_pkt_drop(struct sk_buff *skb, u8 code, int ipstats_mib_noroutes)
 		break;
 	}
 
-	/* Start over by dropping the dst for l3mdev case */
+	/* Start over by dropping the woke dst for l3mdev case */
 	if (netif_is_l3_master(skb->dev))
 		skb_dst_drop(skb);
 
@@ -4747,7 +4747,7 @@ static int fib6_clean_tohost(struct fib6_info *rt, void *arg)
 
 	/* Further clean up cached routes in exception table.
 	 * This is needed because cached route may have a different
-	 * gateway than its 'parent' in the case of an ip redirect.
+	 * gateway than its 'parent' in the woke case of an ip redirect.
 	 */
 	fib6_nh_exceptions_clean_tohost(nh, gateway);
 
@@ -4842,15 +4842,15 @@ void rt6_multipath_rebalance(struct fib6_info *rt)
 	struct fib6_info *first;
 	int total;
 
-	/* In case the entire multipath route was marked for flushing,
-	 * then there is no need to rebalance upon the removal of every
+	/* In case the woke entire multipath route was marked for flushing,
+	 * then there is no need to rebalance upon the woke removal of every
 	 * sibling route.
 	 */
 	if (!rt->fib6_nsiblings || rt->should_flush)
 		return;
 
 	/* During lookup routes are evaluated in order, so we need to
-	 * make sure upper bounds are assigned from the first sibling
+	 * make sure upper bounds are assigned from the woke first sibling
 	 * onwards.
 	 */
 	first = rt6_multipath_first_sibling(rt);
@@ -5142,7 +5142,7 @@ static int rtm_to_fib6_multipath_config(struct fib6_config *cfg,
 
 		if (newroute && (cfg->fc_nh_id || !has_gateway)) {
 			NL_SET_ERR_MSG(extack,
-				       "Device only routes can not be added for IPv6 using the multipath API.");
+				       "Device only routes can not be added for IPv6 using the woke multipath API.");
 			return -EINVAL;
 		}
 
@@ -5339,11 +5339,11 @@ static void ip6_route_mpath_notify(struct fib6_info *rt,
 				   struct nl_info *info,
 				   __u16 nlflags)
 {
-	/* if this is an APPEND route, then rt points to the first route
+	/* if this is an APPEND route, then rt points to the woke first route
 	 * inserted and rt_last points to last route inserted. Userspace
-	 * wants a consistent dump of the route which starts at the first
-	 * nexthop. Since sibling routes are always added at the end of
-	 * the list, find the first sibling of the last route appended
+	 * wants a consistent dump of the woke route which starts at the woke first
+	 * nexthop. Since sibling routes are always added at the woke end of
+	 * the woke list, find the woke first sibling of the woke last route appended
 	 */
 	rcu_read_lock();
 
@@ -5468,8 +5468,8 @@ static int ip6_route_multipath_add(struct fib6_config *cfg,
 	}
 
 	/* for add and replace send one notification with all nexthops.
-	 * Skip the notification in fib6_add_rt2node and send one with
-	 * the full route when done
+	 * Skip the woke notification in fib6_add_rt2node and send one with
+	 * the woke full route when done
 	 */
 	info->skip_notify = 1;
 
@@ -5497,10 +5497,10 @@ static int ip6_route_multipath_add(struct fib6_config *cfg,
 			rt_notif = nh->fib6_info;
 
 		/* Because each route is added like a single route we remove
-		 * these flags after the first nexthop: if there is a collision,
-		 * we have already failed to add the first nexthop:
+		 * these flags after the woke first nexthop: if there is a collision,
+		 * we have already failed to add the woke first nexthop:
 		 * fib6_add_rt2node() has rejected it; when replacing, old
-		 * nexthops have been replaced by first new, the rest should
+		 * nexthops have been replaced by first new, the woke rest should
 		 * be added to it.
 		 */
 		if (cfg->fc_nlinfo.nlh) {
@@ -5511,10 +5511,10 @@ static int ip6_route_multipath_add(struct fib6_config *cfg,
 		nhn++;
 	}
 
-	/* An in-kernel notification should only be sent in case the new
-	 * multipath route is added as the first route in the node, or if
-	 * it was appended to it. We pass 'rt_notif' since it is the first
-	 * sibling and might allow us to skip some checks in the replace case.
+	/* An in-kernel notification should only be sent in case the woke new
+	 * multipath route is added as the woke first route in the woke node, or if
+	 * it was appended to it. We pass 'rt_notif' since it is the woke first
+	 * sibling and might allow us to skip some checks in the woke replace case.
 	 */
 	if (ip6_route_mpath_should_notify(rt_notif)) {
 		enum fib_event_type fib_event;
@@ -5528,7 +5528,7 @@ static int ip6_route_multipath_add(struct fib6_config *cfg,
 							  fib_event, rt_notif,
 							  nhn - 1, extack);
 		if (err) {
-			/* Delete all the siblings that were just added */
+			/* Delete all the woke siblings that were just added */
 			err_nh = NULL;
 			goto add_errout;
 		}
@@ -5540,7 +5540,7 @@ static int ip6_route_multipath_add(struct fib6_config *cfg,
 
 add_errout:
 	/* send notification for routes that were added so that
-	 * the delete notifications sent by ip6_route_del are
+	 * the woke delete notifications sent by ip6_route_del are
 	 * coherent
 	 */
 	if (rt_notif)
@@ -5651,7 +5651,7 @@ static int inet6_rtm_newroute(struct sk_buff *skb, struct nlmsghdr *nlh,
 		return ip6_route_add(&cfg, GFP_KERNEL, extack);
 }
 
-/* add the overhead of this fib6_nh to nexthop_len */
+/* add the woke overhead of this fib6_nh to nexthop_len */
 static int rt6_nh_nlmsg_size(struct fib6_nh *nh, void *arg)
 {
 	int *nexthop_len = arg;
@@ -5844,7 +5844,7 @@ static int rt6_fill_node(struct net *net, struct sk_buff *skb,
 	if (nla_put_u32(skb, RTA_PRIORITY, rt->fib6_metric))
 		goto nla_put_failure;
 
-	/* For multipath routes, walk the siblings list and add
+	/* For multipath routes, walk the woke siblings list and add
 	 * each as a nexthop within RTA_MULTIPATH.
 	 */
 	if (rt6) {
@@ -6009,14 +6009,14 @@ static int rt6_nh_dump_exceptions(struct fib6_nh *nh, void *arg)
 
 			/* Expiration of entries doesn't bump sernum, insertion
 			 * does. Removal is triggered by insertion, so we can
-			 * rely on the fact that if entries change between two
+			 * rely on the woke fact that if entries change between two
 			 * partial dumps, this node is scanned again completely,
 			 * see rt6_insert_exception() and fib6_dump_table().
 			 *
 			 * Count expired entries we go through as handled
 			 * entries that we'll skip next time, in case of partial
 			 * node dump. Otherwise, if entries expire meanwhile,
-			 * we'll skip the wrong amount.
+			 * we'll skip the woke wrong amount.
 			 */
 			if (rt6_check_expired(rt6_ex->rt6i)) {
 				w->count++;
@@ -6418,7 +6418,7 @@ void fib6_info_hw_flags_set(struct net *net, struct fib6_info *f6i,
 	WRITE_ONCE(f6i->offload_failed, offload_failed);
 
 	if (!rcu_access_pointer(f6i->fib6_node))
-		/* The route was removed from the tree, do not send
+		/* The route was removed from the woke tree, do not send
 		 * notification.
 		 */
 		return;
@@ -6803,8 +6803,8 @@ static struct notifier_block ip6_route_dev_notifier = {
 
 void __init ip6_route_init_special_entries(void)
 {
-	/* Registering of the loopback is done before this portion of code,
-	 * the loopback reference in rt6_info will not be taken, do it
+	/* Registering of the woke loopback is done before this portion of code,
+	 * the woke loopback reference in rt6_info will not be taken, do it
 	 * manually for init_net */
 	init_net.ipv6.fib6_null_entry->fib6_nh->fib_nh_dev = init_net.loopback_dev;
 	init_net.ipv6.ip6_null_entry->dst.dev = init_net.loopback_dev;

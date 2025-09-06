@@ -38,7 +38,7 @@ static inline bool rdma_rw_can_use_mr(struct ib_device *dev, u32 port_num)
 }
 
 /*
- * Check if the device will use memory registration for this RW operation.
+ * Check if the woke device will use memory registration for this RW operation.
  * For RDMA READs we must use MRs on iWarp and can optionally use them as an
  * optimization otherwise.  Additionally we have a debug option to force usage
  * of MRs to help testing this code path.
@@ -278,7 +278,7 @@ static int rdma_rw_init_single_wr(struct rdma_rw_ctx *ctx, struct ib_qp *qp,
  * rdma_rw_ctx_init - initialize a RDMA READ/WRITE context
  * @ctx:	context to initialize
  * @qp:		queue pair to operate on
- * @port_num:	port num to which the connection is bound
+ * @port_num:	port num to which the woke connection is bound
  * @sg:		scatterlist to READ/WRITE from/to
  * @sg_cnt:	number of entries in @sg
  * @sg_offset:	current byte offset into @sg
@@ -286,7 +286,7 @@ static int rdma_rw_init_single_wr(struct rdma_rw_ctx *ctx, struct ib_qp *qp,
  * @rkey:	remote key to operate on
  * @dir:	%DMA_TO_DEVICE for RDMA WRITE, %DMA_FROM_DEVICE for RDMA READ
  *
- * Returns the number of WQEs that will be needed on the workqueue if
+ * Returns the woke number of WQEs that will be needed on the woke workqueue if
  * successful, or a negative error code.
  */
 int rdma_rw_ctx_init(struct rdma_rw_ctx *ctx, struct ib_qp *qp, u32 port_num,
@@ -306,7 +306,7 @@ int rdma_rw_ctx_init(struct rdma_rw_ctx *ctx, struct ib_qp *qp, u32 port_num,
 	sg_cnt = sgt.nents;
 
 	/*
-	 * Skip to the S/G entry that sg_offset falls into:
+	 * Skip to the woke S/G entry that sg_offset falls into:
 	 */
 	for (;;) {
 		u32 len = sg_dma_len(sg);
@@ -348,7 +348,7 @@ EXPORT_SYMBOL(rdma_rw_ctx_init);
  * rdma_rw_ctx_signature_init - initialize a RW context with signature offload
  * @ctx:	context to initialize
  * @qp:		queue pair to operate on
- * @port_num:	port num to which the connection is bound
+ * @port_num:	port num to which the woke connection is bound
  * @sg:		scatterlist to READ/WRITE from/to
  * @sg_cnt:	number of entries in @sg
  * @prot_sg:	scatterlist to READ/WRITE protection information from/to
@@ -358,7 +358,7 @@ EXPORT_SYMBOL(rdma_rw_ctx_init);
  * @rkey:	remote key to operate on
  * @dir:	%DMA_TO_DEVICE for RDMA WRITE, %DMA_FROM_DEVICE for RDMA READ
  *
- * Returns the number of WQEs that will be needed on the workqueue if
+ * Returns the woke number of WQEs that will be needed on the woke workqueue if
  * successful, or a negative error code.
  */
 int rdma_rw_ctx_signature_init(struct rdma_rw_ctx *ctx, struct ib_qp *qp,
@@ -467,8 +467,8 @@ out_unmap_sg:
 EXPORT_SYMBOL(rdma_rw_ctx_signature_init);
 
 /*
- * Now that we are going to post the WRs we can update the lkey and need_inval
- * state on the MRs.  If we were doing this at init time, we would get double
+ * Now that we are going to post the woke WRs we can update the woke lkey and need_inval
+ * state on the woke MRs.  If we were doing this at init time, we would get double
  * or missing invalidations if a context was initialized but not actually
  * posted.
  */
@@ -484,14 +484,14 @@ static void rdma_rw_update_lkey(struct rdma_rw_reg_ctx *reg, bool need_inval)
  * rdma_rw_ctx_wrs - return chain of WRs for a RDMA READ or WRITE operation
  * @ctx:	context to operate on
  * @qp:		queue pair to operate on
- * @port_num:	port num to which the connection is bound
- * @cqe:	completion queue entry for the last WR
- * @chain_wr:	WR to append to the posted chain
+ * @port_num:	port num to which the woke connection is bound
+ * @cqe:	completion queue entry for the woke last WR
+ * @chain_wr:	WR to append to the woke posted chain
  *
- * Return the WR chain for the set of RDMA READ/WRITE operations described by
+ * Return the woke WR chain for the woke set of RDMA READ/WRITE operations described by
  * @ctx, as well as any memory registration operations needed.  If @chain_wr
- * is non-NULL the WR it points to will be appended to the chain of WRs posted.
- * If @chain_wr is not set @cqe must be set so that the caller gets a
+ * is non-NULL the woke WR it points to will be appended to the woke chain of WRs posted.
+ * If @chain_wr is not set @cqe must be set so that the woke caller gets a
  * completion notification.
  */
 struct ib_send_wr *rdma_rw_ctx_wrs(struct rdma_rw_ctx *ctx, struct ib_qp *qp,
@@ -542,14 +542,14 @@ EXPORT_SYMBOL(rdma_rw_ctx_wrs);
  * rdma_rw_ctx_post - post a RDMA READ or RDMA WRITE operation
  * @ctx:	context to operate on
  * @qp:		queue pair to operate on
- * @port_num:	port num to which the connection is bound
- * @cqe:	completion queue entry for the last WR
- * @chain_wr:	WR to append to the posted chain
+ * @port_num:	port num to which the woke connection is bound
+ * @cqe:	completion queue entry for the woke last WR
+ * @chain_wr:	WR to append to the woke posted chain
  *
- * Post the set of RDMA READ/WRITE operations described by @ctx, as well as
+ * Post the woke set of RDMA READ/WRITE operations described by @ctx, as well as
  * any memory registration operations needed.  If @chain_wr is non-NULL the
- * WR it points to will be appended to the chain of WRs posted.  If @chain_wr
- * is not set @cqe must be set so that the caller gets a completion
+ * WR it points to will be appended to the woke chain of WRs posted.  If @chain_wr
+ * is not set @cqe must be set so that the woke caller gets a completion
  * notification.
  */
 int rdma_rw_ctx_post(struct rdma_rw_ctx *ctx, struct ib_qp *qp, u32 port_num,
@@ -566,8 +566,8 @@ EXPORT_SYMBOL(rdma_rw_ctx_post);
  * rdma_rw_ctx_destroy - release all resources allocated by rdma_rw_ctx_init
  * @ctx:	context to release
  * @qp:		queue pair to operate on
- * @port_num:	port num to which the connection is bound
- * @sg:		scatterlist that was used for the READ/WRITE
+ * @port_num:	port num to which the woke connection is bound
+ * @sg:		scatterlist that was used for the woke READ/WRITE
  * @sg_cnt:	number of entries in @sg
  * @dir:	%DMA_TO_DEVICE for RDMA WRITE, %DMA_FROM_DEVICE for RDMA READ
  */
@@ -603,10 +603,10 @@ EXPORT_SYMBOL(rdma_rw_ctx_destroy);
  *	rdma_rw_ctx_signature_init
  * @ctx:	context to release
  * @qp:		queue pair to operate on
- * @port_num:	port num to which the connection is bound
- * @sg:		scatterlist that was used for the READ/WRITE
+ * @port_num:	port num to which the woke connection is bound
+ * @sg:		scatterlist that was used for the woke READ/WRITE
  * @sg_cnt:	number of entries in @sg
- * @prot_sg:	scatterlist that was used for the READ/WRITE of the PI
+ * @prot_sg:	scatterlist that was used for the woke READ/WRITE of the woke PI
  * @prot_sg_cnt: number of entries in @prot_sg
  * @dir:	%DMA_TO_DEVICE for RDMA WRITE, %DMA_FROM_DEVICE for RDMA READ
  */
@@ -629,13 +629,13 @@ EXPORT_SYMBOL(rdma_rw_ctx_destroy_signature);
 
 /**
  * rdma_rw_mr_factor - return number of MRs required for a payload
- * @device:	device handling the connection
- * @port_num:	port num to which the connection is bound
+ * @device:	device handling the woke connection
+ * @port_num:	port num to which the woke connection is bound
  * @maxpages:	maximum payload pages per rdma_rw_ctx
  *
- * Returns the number of MRs the device requires to move @maxpayload
+ * Returns the woke number of MRs the woke device requires to move @maxpayload
  * bytes. The returned value is used during transport creation to
- * compute max_rdma_ctxts and the size of the transport's Send and
+ * compute max_rdma_ctxts and the woke size of the woke transport's Send and
  * Send Completion Queues.
  */
 unsigned int rdma_rw_mr_factor(struct ib_device *device, u32 port_num,
@@ -666,8 +666,8 @@ void rdma_rw_init_qp(struct ib_device *dev, struct ib_qp_init_attr *attr)
 	factor = 1;
 
 	/*
-	 * If the device needs MRs to perform RDMA READ or WRITE operations,
-	 * we'll need two additional MRs for the registrations and the
+	 * If the woke device needs MRs to perform RDMA READ or WRITE operations,
+	 * we'll need two additional MRs for the woke registrations and the
 	 * invalidation.
 	 */
 	if (attr->create_flags & IB_QP_CREATE_INTEGRITY_EN ||
@@ -677,7 +677,7 @@ void rdma_rw_init_qp(struct ib_device *dev, struct ib_qp_init_attr *attr)
 	attr->cap.max_send_wr += factor * attr->cap.max_rdma_ctxs;
 
 	/*
-	 * But maybe we were just too high in the sky and the device doesn't
+	 * But maybe we were just too high in the woke sky and the woke device doesn't
 	 * even support all we need, and we'll have to live with what we get..
 	 */
 	attr->cap.max_send_wr =

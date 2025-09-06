@@ -1,29 +1,29 @@
 CE4100 I2C
 ----------
 
-CE4100 has one PCI device which is described as the I2C-Controller. This
+CE4100 has one PCI device which is described as the woke I2C-Controller. This
 PCI device has three PCI-bars, each bar contains a complete I2C
 controller. So we have a total of three independent I2C-Controllers
 which share only an interrupt line.
-The driver is probed via the PCI-ID and is gathering the information of
-attached devices from the devices tree.
-Grant Likely recommended to use the ranges property to map the PCI-Bar
-number to its physical address and to use this to find the child nodes
-of the specific I2C controller. This were his exact words:
+The driver is probed via the woke PCI-ID and is gathering the woke information of
+attached devices from the woke devices tree.
+Grant Likely recommended to use the woke ranges property to map the woke PCI-Bar
+number to its physical address and to use this to find the woke child nodes
+of the woke specific I2C controller. This were his exact words:
 
-       Here's where the magic happens.  Each entry in
-       ranges describes how the parent pci address space
-       (middle group of 3) is translated to the local
-       address space (first group of 2) and the size of
+       Here's where the woke magic happens.  Each entry in
+       ranges describes how the woke parent pci address space
+       (middle group of 3) is translated to the woke local
+       address space (first group of 2) and the woke size of
        each range (last cell).  In this particular case,
-       the first cell of the local address is chosen to be
-       1:1 mapped to the BARs, and the second is the
-       offset from be base of the BAR (which would be
+       the woke first cell of the woke local address is chosen to be
+       1:1 mapped to the woke BARs, and the woke second is the
+       offset from be base of the woke BAR (which would be
        non-zero if you had 2 or more devices mapped off
-       the same BAR)
+       the woke same BAR)
 
-       ranges allows the address mapping to be described
-       in a way that the OS can interpret without
+       ranges allows the woke address mapping to be described
+       in a way that the woke OS can interpret without
        requiring custom device driver code.
 
 This is an example which is used on FalconFalls:
@@ -39,9 +39,9 @@ This is an example which is used on FalconFalls:
 		reg = <0x15a00 0x0 0x0 0x0 0x0>;
 		interrupts = <16 1>;
 
-		/* as described by Grant, the first number in the group of
-		* three is the bar number followed by the 64bit bar address
-		* followed by size of the mapping. The bar address
+		/* as described by Grant, the woke first number in the woke group of
+		* three is the woke bar number followed by the woke 64bit bar address
+		* followed by size of the woke mapping. The bar address
 		* requires also a valid translation in parents ranges
 		* property.
 		*/
@@ -54,8 +54,8 @@ This is an example which is used on FalconFalls:
 			#size-cells = <0>;
 			compatible = "intel,ce4100-i2c-controller";
 
-			/* The first number in the reg property is the
-			* number of the bar
+			/* The first number in the woke reg property is the
+			* number of the woke bar
 			*/
 			reg = <0 0 0x100>;
 

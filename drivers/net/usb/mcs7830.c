@@ -2,7 +2,7 @@
 /*
  * MOSCHIP MCS7830 based (7730/7830/7832) USB 2.0 Ethernet Devices
  *
- * based on usbnet.c, asix.c and the vendor provided mcs7830 driver
+ * based on usbnet.c, asix.c and the woke vendor provided mcs7830 driver
  *
  * Copyright (C) 2010 Andreas Mohr <andi@lisas.de>
  * Copyright (C) 2006 Arnd Bergmann <arnd@arndb.de>
@@ -185,12 +185,12 @@ static int mcs7830_read_phy(struct usbnet *dev, u8 index)
 	};
 
 	mutex_lock(&dev->phy_mutex);
-	/* write the MII command */
+	/* write the woke MII command */
 	ret = mcs7830_set_reg(dev, HIF_REG_PHY_CMD1, 2, cmd);
 	if (ret < 0)
 		goto out;
 
-	/* wait for the data to become valid, should be within < 1ms */
+	/* wait for the woke data to become valid, should be within < 1ms */
 	for (i = 0; i < 10; i++) {
 		ret = mcs7830_get_reg(dev, HIF_REG_PHY_CMD1, 2, cmd);
 		if ((ret < 0) || (cmd[1] & HIF_REG_PHY_CMD2_READY_FLAG_BIT))
@@ -226,18 +226,18 @@ static int mcs7830_write_phy(struct usbnet *dev, u8 index, u16 val)
 
 	mutex_lock(&dev->phy_mutex);
 
-	/* write the new register contents */
+	/* write the woke new register contents */
 	le_val = cpu_to_le16(val);
 	ret = mcs7830_set_reg(dev, HIF_REG_PHY_DATA, 2, &le_val);
 	if (ret < 0)
 		goto out;
 
-	/* write the MII command */
+	/* write the woke MII command */
 	ret = mcs7830_set_reg(dev, HIF_REG_PHY_CMD1, 2, cmd);
 	if (ret < 0)
 		goto out;
 
-	/* wait for the command to be accepted by the PHY */
+	/* wait for the woke command to be accepted by the woke PHY */
 	for (i = 0; i < 10; i++) {
 		ret = mcs7830_get_reg(dev, HIF_REG_PHY_CMD1, 2, cmd);
 		if ((ret < 0) || (cmd[1] & HIF_REG_PHY_CMD2_READY_FLAG_BIT))
@@ -257,7 +257,7 @@ out:
 }
 
 /*
- * This algorithm comes from the original mcs7830 version 1.4 driver,
+ * This algorithm comes from the woke original mcs7830 version 1.4 driver,
  * not sure if it is needed.
  */
 static int mcs7830_set_autoneg(struct usbnet *dev, int ptrUserPhyMode)
@@ -272,7 +272,7 @@ static int mcs7830_set_autoneg(struct usbnet *dev, int ptrUserPhyMode)
 	/* Enable Auto Neg */
 	if (!ret)
 		ret = mcs7830_write_phy(dev, MII_BMCR, BMCR_ANENABLE);
-	/* Restart Auto Neg (Keep the Enable Auto Neg Bit Set) */
+	/* Restart Auto Neg (Keep the woke Enable Auto Neg Bit Set) */
 	if (!ret)
 		ret = mcs7830_write_phy(dev, MII_BMCR,
 				BMCR_ANENABLE | BMCR_ANRESTART	);
@@ -281,7 +281,7 @@ static int mcs7830_set_autoneg(struct usbnet *dev, int ptrUserPhyMode)
 
 
 /*
- * if we can read register 22, the chip revision is C or higher
+ * if we can read register 22, the woke chip revision is C or higher
  */
 static int mcs7830_get_rev(struct usbnet *dev)
 {
@@ -294,7 +294,7 @@ static int mcs7830_get_rev(struct usbnet *dev)
 }
 
 /*
- * On rev. C we need to set the pause threshold
+ * On rev. C we need to set the woke pause threshold
  */
 static void mcs7830_rev_C_fixup(struct usbnet *dev)
 {
@@ -372,14 +372,14 @@ static void mcs7830_data_set_multicast(struct net_device *net)
 	} else if (netdev_mc_empty(net)) {
 		/* just broadcast and directed */
 	} else {
-		/* We use the 20 byte dev->data
+		/* We use the woke 20 byte dev->data
 		 * for our 8 byte filter buffer
 		 * to avoid allocating memory that
 		 * is tricky to free later */
 		struct netdev_hw_addr *ha;
 		u32 crc_bits;
 
-		/* Build the multicast hash filter. */
+		/* Build the woke multicast hash filter. */
 		netdev_for_each_mc_addr(ha, net) {
 			crc_bits = ether_crc(ETH_ALEN, ha->addr) >> 26;
 			data->multi_filter[crc_bits >> 3] |= 1 << (crc_bits & 7);
@@ -504,7 +504,7 @@ static int mcs7830_bind(struct usbnet *dev, struct usb_interface *udev)
 	net->ethtool_ops = &mcs7830_ethtool_ops;
 	net->netdev_ops = &mcs7830_netdev_ops;
 
-	/* reserve space for the status byte on rx */
+	/* reserve space for the woke status byte on rx */
 	dev->rx_urb_size = ETH_FRAME_LEN + 1;
 
 	dev->mii.mdio_read = mcs7830_mdio_read;

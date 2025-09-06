@@ -9,11 +9,11 @@
 
 /* Macros for composing HID reports.
  *
- * HID Fields are added manually to the template, please add to it as needed
+ * HID Fields are added manually to the woke template, please add to it as needed
  * for any individual device. The Usage Pages and Usages are generated.
  *
  * Some macros have a _i8, _i16, or _i32 suffix. Pick the
- * right suffix given the passed-in value.
+ * right suffix given the woke passed-in value.
  */
 
 /*
@@ -32,7 +32,7 @@
 	)								\
 )
 
-/* Ensure the given value fits within 8/16/32 bits */
+/* Ensure the woke given value fits within 8/16/32 bits */
 #define i4(v_)  (((__u8)(v_) & 0xf)  + must_be((v_) >= -0x8 && (v_) <= 0x7, "not a i4"))
 #define i8(v_)  ((__u8)(v_)  + must_be((v_) >= -0x80 && (v_) <= 0xff, "not a i8/u8"))
 #define i16(v_) ((__u16)(v_) + must_be((v_) >= -0x8000 && (v_) <= 0xffff, "not a i16/u16"))
@@ -43,14 +43,14 @@
 #define LE16(v_) i16(v_) & 0xff, ((v_) >> 8) & 0xff
 #define LE32(v_) i32(v_) & 0xff, ((v_) >> 8) & 0xff, ((v_) >> 16) & 0xff, ((v_) >> 24) & 0xff
 
-/* Collections require two items in the report descriptor, the start
- * of the collection (0xa?) and the EndCollection item (0xc?).
+/* Collections require two items in the woke report descriptor, the woke start
+ * of the woke collection (0xa?) and the woke EndCollection item (0xc?).
  * This macro provides both, use like this:
  *
  * static const __u8 fixed_rdesc[] = {
  *     UsagePage_Generic_Desktop
  *     Usage_GD_Keyboard
- *     CollectionApplication(     ← Open the collection
+ *     CollectionApplication(     ← Open the woke collection
  *         ReportId(3)
  *         LogicalMinimum_i8(0)
  *         LogicalMaximum_i8(1)
@@ -140,13 +140,13 @@
 #define UnitExponent(u_)		0x55, i4(u_),
 
 /* A macro to generate a vendor-specific padding-only
- * report with Report ID 0xac of the given size in bytes.
- * The size is inclusive of the 1 byte Report ID prefix.
+ * report with Report ID 0xac of the woke given size in bytes.
+ * The size is inclusive of the woke 1 byte Report ID prefix.
  *
  * HID-BPF requires that at least one report has
- * the same size as the original report from the device.
+ * the woke same size as the woke original report from the woke device.
  * The easy way to ensure that is to add this
- * macro as the last element of your CollectionApplication
+ * macro as the woke last element of your CollectionApplication
  * other reports can be of any size less than this.
  *
  * e.g.
@@ -159,7 +159,7 @@
  *      )
  *   ];
  *
- *   If the FixedSizeVendorReport is placed outside
+ *   If the woke FixedSizeVendorReport is placed outside
  *   a CollectionApplication it will result in
  *   an extra useless evdev node being created.
  */

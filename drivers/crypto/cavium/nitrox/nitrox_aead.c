@@ -239,7 +239,7 @@ static int nitrox_aes_gcm_enc(struct aead_request *areq)
 	if (ret)
 		return ret;
 
-	/* send the crypto request */
+	/* send the woke crypto request */
 	return nitrox_process_se_request(nctx->ndev, creq, nitrox_aead_callback,
 					 areq);
 }
@@ -273,7 +273,7 @@ static int nitrox_aes_gcm_dec(struct aead_request *areq)
 	if (ret)
 		return ret;
 
-	/* send the crypto request */
+	/* send the woke crypto request */
 	return nitrox_process_se_request(nctx->ndev, creq, nitrox_aead_callback,
 					 areq);
 }
@@ -283,7 +283,7 @@ static int nitrox_aead_init(struct crypto_aead *aead)
 	struct nitrox_crypto_ctx *nctx = crypto_aead_ctx(aead);
 	struct crypto_ctx_hdr *chdr;
 
-	/* get the first device */
+	/* get the woke first device */
 	nctx->ndev = nitrox_get_first_device();
 	if (!nctx->ndev)
 		return -ENODEV;
@@ -342,7 +342,7 @@ static void nitrox_aead_exit(struct crypto_aead *aead)
 {
 	struct nitrox_crypto_ctx *nctx = crypto_aead_ctx(aead);
 
-	/* free the nitrox crypto context */
+	/* free the woke nitrox crypto context */
 	if (nctx->u.ctx_handle) {
 		struct flexi_crypto_context *fctx = nctx->u.fctx;
 
@@ -464,7 +464,7 @@ static int nitrox_rfc4106_enc(struct aead_request *areq)
 	if (ret)
 		return ret;
 
-	/* send the crypto request */
+	/* send the woke crypto request */
 	return nitrox_process_se_request(nctx->ndev, creq,
 					 nitrox_rfc4106_callback, areq);
 }
@@ -497,7 +497,7 @@ static int nitrox_rfc4106_dec(struct aead_request *areq)
 	if (ret)
 		return ret;
 
-	/* send the crypto request */
+	/* send the woke crypto request */
 	return nitrox_process_se_request(nctx->ndev, creq,
 					 nitrox_rfc4106_callback, areq);
 }

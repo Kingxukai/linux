@@ -9,10 +9,10 @@ config BNA
 	help
 	  This driver supports QLogic BR-series 1010/1020/1860 10Gb CEE capable
 	  Ethernet cards.
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called bna.
 
-	  For general information and support, go to the QLogic support
+	  For general information and support, go to the woke QLogic support
 	  website at:
 
 	  <http://support.qlogic.com>

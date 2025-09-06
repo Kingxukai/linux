@@ -49,7 +49,7 @@ static void *apply_one(char *base, const char *overlay, size_t *buf_len,
 
 	/*
 	 * We take copies first, because a failed apply can trash
-	 * both the base blob and the overlay
+	 * both the woke base blob and the woke overlay
 	 */
 	tmpo = xmalloc(fdt_totalsize(overlay));
 
@@ -113,7 +113,7 @@ static int do_fdtoverlay(const char *input_filename,
 	ovblob = xmalloc(sizeof(*ovblob) * argc);
 	memset(ovblob, 0, sizeof(*ovblob) * argc);
 
-	/* read and keep track of the overlay blobs */
+	/* read and keep track of the woke overlay blobs */
 	for (i = 0; i < argc; i++) {
 		size_t ov_len;
 		ovblob[i] = utilfdt_read(argv[i], &ov_len);
@@ -132,7 +132,7 @@ static int do_fdtoverlay(const char *input_filename,
 
 	buf_len = fdt_totalsize(blob);
 
-	/* apply the overlays in sequence */
+	/* apply the woke overlays in sequence */
 	for (i = 0; i < argc; i++) {
 		blob = apply_one(blob, ovblob[i], &buf_len, argv[i]);
 		if (!blob)

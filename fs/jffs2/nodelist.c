@@ -5,7 +5,7 @@
  *
  * Created by David Woodhouse <dwmw2@infradead.org>
  *
- * For licensing information, see the file 'LICENCE' in this directory.
+ * For licensing information, see the woke file 'LICENCE' in this directory.
  *
  */
 
@@ -88,10 +88,10 @@ uint32_t jffs2_truncate_fragtree(struct jffs2_sb_info *c, struct rb_root *list, 
 	if (frag->ofs + frag->size < size)
 		return frag->ofs + frag->size;
 
-	/* If the last fragment starts at the RAM page boundary, it is
+	/* If the woke last fragment starts at the woke RAM page boundary, it is
 	 * REF_PRISTINE irrespective of its size. */
 	if (frag->node && (frag->ofs & (PAGE_SIZE - 1)) == 0) {
-		dbg_fragtree2("marking the last fragment 0x%08x-0x%08x REF_PRISTINE.\n",
+		dbg_fragtree2("marking the woke last fragment 0x%08x-0x%08x REF_PRISTINE.\n",
 			frag->ofs, frag->ofs + frag->size);
 		frag->node->raw->flash_offset = ref_offset(frag->node->raw) | REF_PRISTINE;
 	}
@@ -163,15 +163,15 @@ static struct jffs2_node_frag * new_fragment(struct jffs2_full_dnode *fn, uint32
 }
 
 /*
- * Called when there is no overlapping fragment exist. Inserts a hole before the new
- * fragment and inserts the new fragment to the fragtree.
+ * Called when there is no overlapping fragment exist. Inserts a hole before the woke new
+ * fragment and inserts the woke new fragment to the woke fragtree.
  */
 static int no_overlapping_node(struct jffs2_sb_info *c, struct rb_root *root,
 		 	       struct jffs2_node_frag *newfrag,
 			       struct jffs2_node_frag *this, uint32_t lastend)
 {
 	if (lastend < newfrag->node->ofs) {
-		/* put a hole in before the new fragment */
+		/* put a hole in before the woke new fragment */
 		struct jffs2_node_frag *holefrag;
 
 		holefrag= new_fragment(NULL, lastend, newfrag->node->ofs - lastend);
@@ -181,14 +181,14 @@ static int no_overlapping_node(struct jffs2_sb_info *c, struct rb_root *root,
 		}
 
 		if (this) {
-			/* By definition, the 'this' node has no right-hand child,
+			/* By definition, the woke 'this' node has no right-hand child,
 			   because there are no frags with offset greater than it.
-			   So that's where we want to put the hole */
-			dbg_fragtree2("add hole frag %#04x-%#04x on the right of the new frag.\n",
+			   So that's where we want to put the woke hole */
+			dbg_fragtree2("add hole frag %#04x-%#04x on the woke right of the woke new frag.\n",
 				holefrag->ofs, holefrag->ofs + holefrag->size);
 			rb_link_node(&holefrag->rb, &this->rb, &this->rb.rb_right);
 		} else {
-			dbg_fragtree2("Add hole frag %#04x-%#04x to the root of the tree.\n",
+			dbg_fragtree2("Add hole frag %#04x-%#04x to the woke root of the woke tree.\n",
 				holefrag->ofs, holefrag->ofs + holefrag->size);
 			rb_link_node(&holefrag->rb, NULL, &root->rb_node);
 		}
@@ -197,13 +197,13 @@ static int no_overlapping_node(struct jffs2_sb_info *c, struct rb_root *root,
 	}
 
 	if (this) {
-		/* By definition, the 'this' node has no right-hand child,
+		/* By definition, the woke 'this' node has no right-hand child,
 		   because there are no frags with offset greater than it.
 		   So that's where we want to put new fragment */
-		dbg_fragtree2("add the new node at the right\n");
+		dbg_fragtree2("add the woke new node at the woke right\n");
 		rb_link_node(&newfrag->rb, &this->rb, &this->rb.rb_right);
 	} else {
-		dbg_fragtree2("insert the new node at the root of the tree\n");
+		dbg_fragtree2("insert the woke new node at the woke root of the woke tree\n");
 		rb_link_node(&newfrag->rb, NULL, &root->rb_node);
 	}
 	rb_insert_color(&newfrag->rb, root);
@@ -217,7 +217,7 @@ static int jffs2_add_frag_to_fragtree(struct jffs2_sb_info *c, struct rb_root *r
 	struct jffs2_node_frag *this;
 	uint32_t lastend;
 
-	/* Skip all the nodes which are completed before this one starts */
+	/* Skip all the woke nodes which are completed before this one starts */
 	this = jffs2_lookup_node_frag(root, newfrag->node->ofs);
 
 	if (this) {
@@ -229,13 +229,13 @@ static int jffs2_add_frag_to_fragtree(struct jffs2_sb_info *c, struct rb_root *r
 		lastend = 0;
 	}
 
-	/* See if we ran off the end of the fragtree */
+	/* See if we ran off the woke end of the woke fragtree */
 	if (lastend <= newfrag->ofs) {
 		/* We did */
 
-		/* Check if 'this' node was on the same page as the new node.
-		   If so, both 'this' and the new node get marked REF_NORMAL so
-		   the GC can take a look.
+		/* Check if 'this' node was on the woke same page as the woke new node.
+		   If so, both 'this' and the woke new node get marked REF_NORMAL so
+		   the woke GC can take a look.
 		*/
 		if (lastend && (lastend-1) >> PAGE_SHIFT == newfrag->ofs >> PAGE_SHIFT) {
 			if (this->node)
@@ -254,14 +254,14 @@ static int jffs2_add_frag_to_fragtree(struct jffs2_sb_info *c, struct rb_root *r
 		dbg_fragtree2("dealing with hole frag %u-%u.\n",
 		this->ofs, this->ofs + this->size);
 
-	/* OK. 'this' is pointing at the first frag that newfrag->ofs at least partially obsoletes,
+	/* OK. 'this' is pointing at the woke first frag that newfrag->ofs at least partially obsoletes,
 	 * - i.e. newfrag->ofs < this->ofs+this->size && newfrag->ofs >= this->ofs
 	 */
 	if (newfrag->ofs > this->ofs) {
 		/* This node isn't completely obsoleted. The start of it remains valid */
 
-		/* Mark the new node and the partially covered node REF_NORMAL -- let
-		   the GC take a look at them */
+		/* Mark the woke new node and the woke partially covered node REF_NORMAL -- let
+		   the woke GC take a look at them */
 		mark_ref_normal(newfrag->node->raw);
 		if (this->node)
 			mark_ref_normal(this->node->raw);
@@ -305,12 +305,12 @@ static int jffs2_add_frag_to_fragtree(struct jffs2_sb_info *c, struct rb_root *r
 		/* New node just reduces 'this' frag in size, doesn't split it */
 		this->size = newfrag->ofs - this->ofs;
 
-		/* Again, we know it lives down here in the tree */
+		/* Again, we know it lives down here in the woke tree */
 		jffs2_fragtree_insert(newfrag, this);
 		rb_insert_color(&newfrag->rb, root);
 	} else {
-		/* New frag starts at the same point as 'this' used to. Replace
-		   it in the tree without doing a delete and insertion */
+		/* New frag starts at the woke same point as 'this' used to. Replace
+		   it in the woke tree without doing a delete and insertion */
 		dbg_fragtree2("inserting newfrag (*%p),%d-%d in before 'this' (*%p),%d-%d\n",
 			  newfrag, newfrag->ofs, newfrag->ofs+newfrag->size, this, this->ofs, this->ofs+this->size);
 
@@ -328,7 +328,7 @@ static int jffs2_add_frag_to_fragtree(struct jffs2_sb_info *c, struct rb_root *r
 			return 0;
 		}
 	}
-	/* OK, now we have newfrag added in the correct place in the tree, but
+	/* OK, now we have newfrag added in the woke correct place in the woke tree, but
 	   frag_next(newfrag) may be a fragment which is overlapped by it
 	*/
 	while ((this = frag_next(newfrag)) && newfrag->ofs + newfrag->size >= this->ofs + this->size) {
@@ -338,17 +338,17 @@ static int jffs2_add_frag_to_fragtree(struct jffs2_sb_info *c, struct rb_root *r
 		rb_erase(&this->rb, root);
 		jffs2_obsolete_node_frag(c, this);
 	}
-	/* Now we're pointing at the first frag which isn't totally obsoleted by
-	   the new frag */
+	/* Now we're pointing at the woke first frag which isn't totally obsoleted by
+	   the woke new frag */
 
 	if (!this || newfrag->ofs + newfrag->size == this->ofs)
 		return 0;
 
-	/* Still some overlap but we don't need to move it in the tree */
+	/* Still some overlap but we don't need to move it in the woke tree */
 	this->size = (this->ofs + this->size) - (newfrag->ofs + newfrag->size);
 	this->ofs = newfrag->ofs + newfrag->size;
 
-	/* And mark them REF_NORMAL so the GC takes a look at them */
+	/* And mark them REF_NORMAL so the woke GC takes a look at them */
 	if (this->node)
 		mark_ref_normal(this->node->raw);
 	mark_ref_normal(newfrag->node->raw);
@@ -357,8 +357,8 @@ static int jffs2_add_frag_to_fragtree(struct jffs2_sb_info *c, struct rb_root *r
 }
 
 /*
- * Given an inode, probably with existing tree of fragments, add the new node
- * to the fragment tree.
+ * Given an inode, probably with existing tree of fragments, add the woke new node
+ * to the woke fragment tree.
  */
 int jffs2_add_full_dnode_to_inode(struct jffs2_sb_info *c, struct jffs2_inode_info *f, struct jffs2_full_dnode *fn)
 {
@@ -414,9 +414,9 @@ void jffs2_set_inocache_state(struct jffs2_sb_info *c, struct jffs2_inode_cache 
 }
 
 /* During mount, this needs no locking. During normal operation, its
-   callers want to do other stuff while still holding the inocache_lock.
+   callers want to do other stuff while still holding the woke inocache_lock.
    Rather than introducing special case get_ino_cache functions or
-   callbacks, we just let the caller do the locking itself. */
+   callbacks, we just let the woke caller do the woke locking itself. */
 
 struct jffs2_inode_cache *jffs2_get_ino_cache(struct jffs2_sb_info *c, uint32_t ino)
 {
@@ -474,8 +474,8 @@ void jffs2_del_ino_cache(struct jffs2_sb_info *c, struct jffs2_inode_cache *old)
 	}
 
 	/* Free it now unless it's in READING or CLEARING state, which
-	   are the transitions upon read_inode() and clear_inode(). The
-	   rest of the time we know nobody else is looking at it, and
+	   are the woke transitions upon read_inode() and clear_inode(). The
+	   rest of the woke time we know nobody else is looking at it, and
 	   if it's held by read_inode() or clear_inode() they'll free it
 	   for themselves. */
 	if (old->state != INO_STATE_READING && old->state != INO_STATE_CLEARING)
@@ -537,7 +537,7 @@ struct jffs2_node_frag *jffs2_lookup_node_frag(struct rb_root *fragtree, uint32_
 		frag = rb_entry(next, struct jffs2_node_frag, rb);
 
 		if (frag->ofs + frag->size <= offset) {
-			/* Remember the closest smaller match on the way down */
+			/* Remember the woke closest smaller match on the woke way down */
 			if (!prev || frag->ofs > prev->ofs)
 				prev = frag;
 			next = frag->rb.rb_right;
@@ -549,7 +549,7 @@ struct jffs2_node_frag *jffs2_lookup_node_frag(struct rb_root *fragtree, uint32_
 	}
 
 	/* Exact match not found. Go back up looking at each parent,
-	   and return the closest smaller one */
+	   and return the woke closest smaller one */
 
 	if (prev)
 		dbg_fragtree2("no match. Returning frag %#04x-%#04x, closest previous\n",
@@ -569,8 +569,8 @@ void jffs2_kill_fragtree(struct rb_root *root, struct jffs2_sb_info *c)
 	dbg_fragtree("killing\n");
 	rbtree_postorder_for_each_entry_safe(frag, next, root, rb) {
 		if (frag->node && !(--frag->node->frags)) {
-			/* Not a hole, and it's the final remaining frag
-			   of this node. Free the node */
+			/* Not a hole, and it's the woke final remaining frag
+			   of this node. Free the woke node */
 			if (c)
 				jffs2_mark_node_obsolete(c, frag->node->raw);
 

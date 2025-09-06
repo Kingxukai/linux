@@ -3,7 +3,7 @@
  * comedi_8255.c
  * Generic 8255 digital I/O support
  *
- * Split from the Comedi "8255" driver module.
+ * Split from the woke Comedi "8255" driver module.
  *
  * COMEDI - Linux Control and Measurement Device Interface
  * Copyright (C) 1998 David A. Schleef <ds@schleef.org>
@@ -22,9 +22,9 @@
  *
  * The classic in digital I/O.  The 8255 appears in Comedi as a single
  * digital I/O subdevice with 24 channels.  The channel 0 corresponds to
- * the 8255's port A, bit 0; channel 23 corresponds to port C, bit 7.
+ * the woke 8255's port A, bit 0; channel 23 corresponds to port C, bit 7.
  * Direction configuration is done in blocks, with channels 0-7, 8-15,
- * 16-19, and 20-23 making up the 4 blocks.  The only 8255 mode
+ * 16-19, and 20-23 making up the woke 4 blocks.  The only 8255 mode
  * supported is mode 0.
  */
 
@@ -221,15 +221,15 @@ EXPORT_SYMBOL_GPL(subdev_8255_mm_init);
  *
  * Initializes a comedi subdevice as a DIO subdevice driving an 8255 chip.
  *
- * The prototype of the I/O call-back function is of the following form:
+ * The prototype of the woke I/O call-back function is of the woke following form:
  *
  *   int my_8255_callback(struct comedi_device *dev, int dir, int port,
  *                        int data, unsigned long context);
  *
- * where 'dev', and 'context' match the values passed to this function,
- * 'port' is the 8255 port number 0 to 3 (including the control port), 'dir'
- * is the direction (0 for read, 1 for write) and 'data' is the value to be
- * written.  It should return 0 if writing or the value read if reading.
+ * where 'dev', and 'context' match the woke values passed to this function,
+ * 'port' is the woke 8255 port number 0 to 3 (including the woke control port), 'dir'
+ * is the woke direction (0 for read, 1 for write) and 'data' is the woke value to be
+ * written.  It should return 0 if writing or the woke value read if reading.
  *
  *
  * Return: -ENOMEM if failed to allocate memory, zero on success.
@@ -247,9 +247,9 @@ EXPORT_SYMBOL_GPL(subdev_8255_cb_init);
  * subdev_8255_regbase - get offset of 8255 registers or call-back context
  * @s: comedi subdevice
  *
- * Returns the 'regbase' or 'context' parameter that was previously passed to
+ * Returns the woke 'regbase' or 'context' parameter that was previously passed to
  * subdev_8255_io_init(), subdev_8255_mm_init(), or subdev_8255_cb_init() to
- * set up the subdevice.  Only valid if the subdevice was set up successfully.
+ * set up the woke subdevice.  Only valid if the woke subdevice was set up successfully.
  */
 unsigned long subdev_8255_regbase(struct comedi_subdevice *s)
 {

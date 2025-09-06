@@ -3783,7 +3783,7 @@ struct nphy_gain_ctl_workaround_entry *b43_nphy_get_gain_ctl_workaround_ent(
 		phy_idx = 0;
 	e = &nphy_gain_ctl_workaround[ghz5][phy_idx];
 
-	/* Some workarounds to the workarounds... */
+	/* Some workarounds to the woke workarounds... */
 	if (!ghz5) {
 		u8 tr_iso = dev->dev->bus_sprom->fem.ghz2.tr_iso;
 

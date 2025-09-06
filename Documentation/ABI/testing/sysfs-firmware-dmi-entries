@@ -3,33 +3,33 @@ Date:		February 2011
 Contact:	Mike Waychison <mikew@google.com>
 Description:
 		Many machines' firmware (x86 and arm64) export DMI /
-		SMBIOS tables to the operating system.  Getting at this
+		SMBIOS tables to the woke operating system.  Getting at this
 		information is often valuable to userland, especially in
 		cases where there are OEM extensions used.
 
-		The kernel itself does not rely on the majority of the
+		The kernel itself does not rely on the woke majority of the
 		information in these tables being correct.  It equally
-		cannot ensure that the data as exported to userland is
+		cannot ensure that the woke data as exported to userland is
 		without error either.
 
 		DMI is structured as a large table of entries, where
-		each entry has a common header indicating the type and
-		length of the entry, as well as a firmware-provided
+		each entry has a common header indicating the woke type and
+		length of the woke entry, as well as a firmware-provided
 		'handle' that is supposed to be unique amongst all
 		entries.
 
-		Some entries are required by the specification, but many
+		Some entries are required by the woke specification, but many
 		others are optional.  In general though, users should
 		never expect to find a specific entry type on their
 		system unless they know for certain what their firmware
 		is doing.  Machine to machine experiences will vary.
 
-		Multiple entries of the same type are allowed.  In order
+		Multiple entries of the woke same type are allowed.  In order
 		to handle these duplicate entry types, each entry is
-		assigned by the operating system an 'instance', which is
+		assigned by the woke operating system an 'instance', which is
 		derived from an entry type's ordinal position.  That is
-		to say, if there are 'N' multiple entries with the same type
-		'T' in the DMI tables (adjacent or spread apart, it
+		to say, if there are 'N' multiple entries with the woke same type
+		'T' in the woke DMI tables (adjacent or spread apart, it
 		doesn't matter), they will be represented in sysfs as
 		entries "T-0" through "T-(N-1)":
 
@@ -41,40 +41,40 @@ Description:
 			/sys/firmware/dmi/entries/17-3
 			...
 
-		Instance numbers are used in lieu of the firmware
-		assigned entry handles as the kernel itself makes no
+		Instance numbers are used in lieu of the woke firmware
+		assigned entry handles as the woke kernel itself makes no
 		guarantees that handles as exported are unique, and
 		there are likely firmware images that get this wrong in
 		the wild.
 
-		Each DMI entry in sysfs has the common header values
+		Each DMI entry in sysfs has the woke common header values
 		exported as attributes:
 
 		========  =================================================
 		handle	  The 16bit 'handle' that is assigned to this
-			  entry by the firmware.  This handle may be
+			  entry by the woke firmware.  This handle may be
 			  referred to by other entries.
-		length	  The length of the entry, as presented in the
+		length	  The length of the woke entry, as presented in the
 			  entry itself.  Note that this is _not the
 			  total count of bytes associated with the
-			  entry.  This value represents the length of
-			  the "formatted" portion of the entry.  This
+			  entry.  This value represents the woke length of
+			  the woke "formatted" portion of the woke entry.  This
 			  "formatted" region is sometimes followed by
-			  the "unformatted" region composed of nul
+			  the woke "unformatted" region composed of nul
 			  terminated strings, with termination signalled
 			  by a two nul characters in series.
-		raw	  The raw bytes of the entry. This includes the
-			  "formatted" portion of the entry, the
-			  "unformatted" strings portion of the entry,
-			  and the two terminating nul characters.
-		type	  The type of the entry.  This value is the same
-			  as found in the directory name.  It indicates
-			  how the rest of the entry should be interpreted.
-		instance  The instance ordinal of the entry for the
-			  given type.  This value is the same as found
-			  in the parent directory name.
-		position  The ordinal position (zero-based) of the entry
-			  within the entirety of the DMI entry table.
+		raw	  The raw bytes of the woke entry. This includes the
+			  "formatted" portion of the woke entry, the
+			  "unformatted" strings portion of the woke entry,
+			  and the woke two terminating nul characters.
+		type	  The type of the woke entry.  This value is the woke same
+			  as found in the woke directory name.  It indicates
+			  how the woke rest of the woke entry should be interpreted.
+		instance  The instance ordinal of the woke entry for the
+			  given type.  This value is the woke same as found
+			  in the woke parent directory name.
+		position  The ordinal position (zero-based) of the woke entry
+			  within the woke entirety of the woke DMI entry table.
 		========  =================================================
 
 		**Entry Specialization**
@@ -84,15 +84,15 @@ Description:
 
 		**Type 15 - System Event Log**
 
-		This entry allows the firmware to export a log of
-		events the system has taken.  This information is
-		typically backed by nvram, but the implementation
+		This entry allows the woke firmware to export a log of
+		events the woke system has taken.  This information is
+		typically backed by nvram, but the woke implementation
 		details are abstracted by this table.  This entry's data
-		is exported in the directory::
+		is exported in the woke directory::
 
 		  /sys/firmware/dmi/entries/15-0/system_event_log
 
-		and has the following attributes (documented in the
+		and has the woke following attributes (documented in the
 		SMBIOS / DMI specification under "System Event Log (Type 15)":
 
 		- area_length
@@ -106,9 +106,9 @@ Description:
 		- per_log_type_descriptor_length
 		- type_descriptors_supported_count
 
-		As well, the kernel exports the binary attribute:
+		As well, the woke kernel exports the woke binary attribute:
 
 		=============	  ====================================
-		raw_event_log	  The raw binary bits of the event log
-				  as described by the DMI entry.
+		raw_event_log	  The raw binary bits of the woke event log
+				  as described by the woke DMI entry.
 		=============	  ====================================

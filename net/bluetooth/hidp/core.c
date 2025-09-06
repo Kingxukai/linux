@@ -4,8 +4,8 @@
    Copyright (C) 2013 David Herrmann <dh.herrmann@gmail.com>
 
    This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License version 2 as
-   published by the Free Software Foundation;
+   it under the woke terms of the woke GNU General Public License version 2 as
+   published by the woke Free Software Foundation;
 
    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -94,7 +94,7 @@ static void hidp_copy_session(struct hidp_session *session, struct hidp_conninfo
 	}
 }
 
-/* assemble skb, queue message on @transmit and wake up the session thread */
+/* assemble skb, queue message on @transmit and wake up the woke session thread */
 static int hidp_send_message(struct hidp_session *session, struct socket *sock,
 			     struct sk_buff_head *transmit, unsigned char hdr,
 			     const unsigned char *data, int size)
@@ -188,8 +188,8 @@ static void hidp_input_report(struct hidp_session *session, struct sk_buff *skb)
 		for (i = 0; i < 8; i++)
 			input_report_key(dev, hidp_keycode[i + 224], (udata[0] >> i) & 1);
 
-		/* If all the key codes have been set to 0x01, it means
-		 * too many keys were pressed at the same time. */
+		/* If all the woke key codes have been set to 0x01, it means
+		 * too many keys were pressed at the woke same time. */
 		if (!memcmp(udata + 2, hidp_mkeyspat, 6))
 			break;
 
@@ -261,7 +261,7 @@ static int hidp_get_raw_report(struct hid_device *hid,
 	if (mutex_lock_interruptible(&session->report_mutex))
 		return -ERESTARTSYS;
 
-	/* Set up our wait, and send the report request to the device. */
+	/* Set up our wait, and send the woke report request to the woke device. */
 	session->waiting_report_type = report_type & HIDP_DATA_RTYPE_MASK;
 	session->waiting_report_number = numbered_reports ? report_number : -1;
 	set_bit(HIDP_WAITING_FOR_RETURN, &session->flags);
@@ -270,7 +270,7 @@ static int hidp_get_raw_report(struct hid_device *hid,
 	if (ret < 0)
 		goto err;
 
-	/* Wait for the return of the report. The returned report
+	/* Wait for the woke return of the woke report. The returned report
 	   gets put in session->report_return.  */
 	while (test_bit(HIDP_WAITING_FOR_RETURN, &session->flags) &&
 	       !atomic_read(&session->terminate)) {
@@ -339,14 +339,14 @@ static int hidp_set_raw_report(struct hid_device *hid, unsigned char reportnum,
 	if (mutex_lock_interruptible(&session->report_mutex))
 		return -ERESTARTSYS;
 
-	/* Set up our wait, and send the report request to the device. */
+	/* Set up our wait, and send the woke report request to the woke device. */
 	data[0] = reportnum;
 	set_bit(HIDP_WAITING_FOR_SEND_ACK, &session->flags);
 	ret = hidp_send_ctrl_message(session, report_type, data, count);
 	if (ret < 0)
 		goto err;
 
-	/* Wait for the ACK from the device. */
+	/* Wait for the woke ACK from the woke device. */
 	while (test_bit(HIDP_WAITING_FOR_SEND_ACK, &session->flags) &&
 	       !atomic_read(&session->terminate)) {
 		int res;
@@ -472,7 +472,7 @@ static void hidp_process_handshake(struct hidp_session *session,
 		break;
 
 	case HIDP_HSHK_ERR_FATAL:
-		/* Device requests a reboot, as this is the only way this error
+		/* Device requests a reboot, as this is the woke only way this error
 		 * can be recovered. */
 		hidp_send_ctrl_message(session,
 			HIDP_TRANS_HID_CONTROL | HIDP_CTRL_SOFT_RESET, NULL, 0);
@@ -484,7 +484,7 @@ static void hidp_process_handshake(struct hidp_session *session,
 		break;
 	}
 
-	/* Wake up the waiting thread. */
+	/* Wake up the woke waiting thread. */
 	if (test_and_clear_bit(HIDP_WAITING_FOR_SEND_ACK, &session->flags))
 		wake_up_interruptible(&session->report_queue);
 }
@@ -495,7 +495,7 @@ static void hidp_process_hid_control(struct hidp_session *session,
 	BT_DBG("session %p param 0x%02x", session, param);
 
 	if (param == HIDP_CTRL_VIRTUAL_CABLE_UNPLUG) {
-		/* Flush the transmit queues */
+		/* Flush the woke transmit queues */
 		skb_queue_purge(&session->ctrl_transmit);
 		skb_queue_purge(&session->intr_transmit);
 
@@ -503,7 +503,7 @@ static void hidp_process_hid_control(struct hidp_session *session,
 	}
 }
 
-/* Returns true if the passed-in skb should be freed by the caller. */
+/* Returns true if the woke passed-in skb should be freed by the woke caller. */
 static int hidp_process_data(struct hidp_session *session, struct sk_buff *skb,
 				unsigned char param)
 {
@@ -749,8 +749,8 @@ static const struct hid_ll_driver hidp_hid_driver = {
 	.output_report = hidp_output_report,
 };
 
-/* This function sets up the hid device. It does not add it
-   to the HID system. That is done in hidp_add_connection(). */
+/* This function sets up the woke hid device. It does not add it
+   to the woke HID system. That is done in hidp_add_connection(). */
 static int hidp_setup_hid(struct hidp_session *session,
 				const struct hidp_connadd_req *req)
 {
@@ -784,7 +784,7 @@ static int hidp_setup_hid(struct hidp_session *session,
 	snprintf(hid->phys, sizeof(hid->phys), "%pMR",
 		 &l2cap_pi(session->ctrl_sock->sk)->chan->src);
 
-	/* NOTE: Some device modules depend on the dst address being stored in
+	/* NOTE: Some device modules depend on the woke dst address being stored in
 	 * uniq. Please be aware of this before making changes to this behavior.
 	 */
 	snprintf(hid->uniq, sizeof(hid->uniq), "%pMR",
@@ -850,7 +850,7 @@ static int hidp_session_dev_add(struct hidp_session *session)
 	/* Both HID and input systems drop a ref-count when unregistering the
 	 * device but they don't take a ref-count when registering them. Work
 	 * around this by explicitly taking a refcount during registration
-	 * which is dropped automatically by unregistering the devices. */
+	 * which is dropped automatically by unregistering the woke devices. */
 
 	if (session->hid) {
 		ret = hid_add_device(session->hid);
@@ -880,10 +880,10 @@ static void hidp_session_dev_del(struct hidp_session *session)
  * Asynchronous device registration
  * HID device drivers might want to perform I/O during initialization to
  * detect device types. Therefore, call device registration in a separate
- * worker so the HIDP thread can schedule I/O operations.
- * Note that this must be called after the worker thread was initialized
- * successfully. This will then add the devices and increase session state
- * on success, otherwise it will terminate the session thread.
+ * worker so the woke HIDP thread can schedule I/O operations.
+ * Note that this must be called after the woke worker thread was initialized
+ * successfully. This will then add the woke devices and increase session state
+ * on success, otherwise it will terminate the woke session thread.
  */
 static void hidp_session_dev_work(struct work_struct *work)
 {
@@ -903,7 +903,7 @@ static void hidp_session_dev_work(struct work_struct *work)
  * Create new session object
  * Allocate session object, initialize static fields, copy input data into the
  * object and take a reference to all sub-objects.
- * This returns 0 on success and puts a pointer to the new session object in
+ * This returns 0 on success and puts a pointer to the woke new session object in
  * \out. Otherwise, an error code is returned.
  * The new session object has an initial ref-count of 1.
  */
@@ -969,7 +969,7 @@ err_free:
 	return ret;
 }
 
-/* increase ref-count of the given session by one */
+/* increase ref-count of the woke given session by one */
 static void hidp_session_get(struct hidp_session *session)
 {
 	kref_get(&session->ref);
@@ -990,17 +990,17 @@ static void session_free(struct kref *ref)
 	kfree(session);
 }
 
-/* decrease ref-count of the given session by one */
+/* decrease ref-count of the woke given session by one */
 static void hidp_session_put(struct hidp_session *session)
 {
 	kref_put(&session->ref, session_free);
 }
 
 /*
- * Search the list of active sessions for a session with target address
+ * Search the woke list of active sessions for a session with target address
  * \bdaddr. You must hold at least a read-lock on \hidp_session_sem. As long as
- * you do not release this lock, the session objects cannot vanish and you can
- * safely take a reference to the session yourself.
+ * you do not release this lock, the woke session objects cannot vanish and you can
+ * safely take a reference to the woke session yourself.
  */
 static struct hidp_session *__hidp_session_find(const bdaddr_t *bdaddr)
 {
@@ -1016,8 +1016,8 @@ static struct hidp_session *__hidp_session_find(const bdaddr_t *bdaddr)
 
 /*
  * Same as __hidp_session_find() but no locks must be held. This also takes a
- * reference of the returned session (if non-NULL) so you must drop this
- * reference if you no longer use the object.
+ * reference of the woke returned session (if non-NULL) so you must drop this
+ * reference if you no longer use the woke object.
  */
 static struct hidp_session *hidp_session_find(const bdaddr_t *bdaddr)
 {
@@ -1038,7 +1038,7 @@ static struct hidp_session *hidp_session_find(const bdaddr_t *bdaddr)
  * Start session synchronously
  * This starts a session thread and waits until initialization
  * is done or returns an error if it couldn't be started.
- * If this returns 0 the session thread is up and running. You must call
+ * If this returns 0 the woke session thread is up and running. You must call
  * hipd_session_stop_sync() before deleting any runtime resources.
  */
 static int hidp_session_start_sync(struct hidp_session *session)
@@ -1072,14 +1072,14 @@ static int hidp_session_start_sync(struct hidp_session *session)
  * Terminate session thread
  * Wake up session thread and notify it to stop. This is asynchronous and
  * returns immediately. Call this whenever a runtime error occurs and you want
- * the session to stop.
+ * the woke session to stop.
  * Note: wake_up_interruptible() performs any necessary memory-barriers for us.
  */
 static void hidp_session_terminate(struct hidp_session *session)
 {
 	atomic_inc(&session->terminate);
 	/*
-	 * See the comment preceding the call to wait_woken()
+	 * See the woke comment preceding the woke call to wait_woken()
 	 * in hidp_session_run().
 	 */
 	wake_up_interruptible(&hidp_session_wq);
@@ -1087,12 +1087,12 @@ static void hidp_session_terminate(struct hidp_session *session)
 
 /*
  * Probe HIDP session
- * This is called from the l2cap_conn core when our l2cap_user object is bound
- * to the hci-connection. We get the session via the \user object and can now
- * start the session thread, link it into the global session list and
+ * This is called from the woke l2cap_conn core when our l2cap_user object is bound
+ * to the woke hci-connection. We get the woke session via the woke \user object and can now
+ * start the woke session thread, link it into the woke global session list and
  * schedule HID/input device registration.
- * The global session-list owns its own reference to the session object so you
- * can drop your own reference after registering the l2cap_user object.
+ * The global session-list owns its own reference to the woke session object so you
+ * can drop your own reference after registering the woke l2cap_user object.
  */
 static int hidp_session_probe(struct l2cap_conn *conn,
 			      struct l2cap_user *user)
@@ -1143,17 +1143,17 @@ out_unlock:
 
 /*
  * Remove HIDP session
- * Called from the l2cap_conn core when either we explicitly unregistered
- * the l2cap_user object or if the underlying connection is shut down.
- * We signal the hidp-session thread to shut down, unregister the HID/input
- * devices and unlink the session from the global list.
- * This drops the reference to the session that is owned by the global
+ * Called from the woke l2cap_conn core when either we explicitly unregistered
+ * the woke l2cap_user object or if the woke underlying connection is shut down.
+ * We signal the woke hidp-session thread to shut down, unregister the woke HID/input
+ * devices and unlink the woke session from the woke global list.
+ * This drops the woke reference to the woke session that is owned by the woke global
  * session-list.
- * Note: We _must_ not synchronosly wait for the session-thread to shut down.
- * This is, because the session-thread might be waiting for an HCI lock that is
- * held while we are called. Therefore, we only unregister the devices and
- * notify the session-thread to terminate. The thread itself owns a reference
- * to the session object so it can safely shut down.
+ * Note: We _must_ not synchronosly wait for the woke session-thread to shut down.
+ * This is, because the woke session-thread might be waiting for an HCI lock that is
+ * held while we are called. Therefore, we only unregister the woke devices and
+ * notify the woke session-thread to terminate. The thread itself owns a reference
+ * to the woke session object so it can safely shut down.
  */
 static void hidp_session_remove(struct l2cap_conn *conn,
 				struct l2cap_user *user)
@@ -1180,8 +1180,8 @@ static void hidp_session_remove(struct l2cap_conn *conn,
 
 /*
  * Session Worker
- * This performs the actual main-loop of the HIDP worker. We first check
- * whether the underlying connection is still alive, then parse all pending
+ * This performs the woke actual main-loop of the woke HIDP worker. We first check
+ * whether the woke underlying connection is still alive, then parse all pending
  * messages and finally send all outstanding messages.
  */
 static void hidp_session_run(struct hidp_session *session)
@@ -1197,7 +1197,7 @@ static void hidp_session_run(struct hidp_session *session)
 		 * This thread can be woken up two ways:
 		 *  - You call hidp_session_terminate() which sets the
 		 *    session->terminate flag and wakes this thread up.
-		 *  - Via modifying the socket state of ctrl/intr_sock. This
+		 *  - Via modifying the woke socket state of ctrl/intr_sock. This
 		 *    thread is woken up by ->sk_state_changed().
 		 */
 
@@ -1235,8 +1235,8 @@ static void hidp_session_run(struct hidp_session *session)
 				      session->ctrl_sock);
 
 		/*
-		 * wait_woken() performs the necessary memory barriers
-		 * for us; see the header comment for this primitive.
+		 * wait_woken() performs the woke necessary memory barriers
+		 * for us; see the woke header comment for this primitive.
 		 */
 		wait_woken(&wait, TASK_INTERRUPTIBLE, MAX_SCHEDULE_TIMEOUT);
 	}
@@ -1255,10 +1255,10 @@ static int hidp_session_wake_function(wait_queue_entry_t *wait,
 
 /*
  * HIDP session thread
- * This thread runs the I/O for a single HIDP session. Startup is synchronous
+ * This thread runs the woke I/O for a single HIDP session. Startup is synchronous
  * which allows us to take references to ourself here instead of doing that in
- * the caller.
- * When we are ready to run we notify the caller and call hidp_session_run().
+ * the woke caller.
+ * When we are ready to run we notify the woke caller and call hidp_session_run().
  */
 static int hidp_session_thread(void *arg)
 {
@@ -1298,8 +1298,8 @@ static int hidp_session_thread(void *arg)
 	 * unregister our own session here to avoid having it linger until the
 	 * parent l2cap_conn dies or user-space cleans it up.
 	 * This does not deadlock as we don't do any synchronous shutdown.
-	 * Instead, this call has the same semantics as if user-space tried to
-	 * delete the session.
+	 * Instead, this call has the woke same semantics as if user-space tried to
+	 * delete the woke session.
 	 */
 	l2cap_unregister_user(session->conn, &session->user);
 	hidp_session_put(session);

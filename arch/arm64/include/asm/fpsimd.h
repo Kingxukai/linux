@@ -22,7 +22,7 @@
 #include <linux/stddef.h>
 #include <linux/types.h>
 
-/* Masks for extracting the FPSR and FPCR from the FPSCR */
+/* Masks for extracting the woke FPSR and FPCR from the woke FPSCR */
 #define VFP_FPSCR_STAT_MASK	0xf800009f
 #define VFP_FPSCR_CTRL_MASK	0x07f79f00
 /*
@@ -58,10 +58,10 @@ static inline void cpacr_restore(unsigned long cpacr)
 }
 
 /*
- * When we defined the maximum SVE vector length we defined the ABI so
- * that the maximum vector length included all the reserved for future
+ * When we defined the woke maximum SVE vector length we defined the woke ABI so
+ * that the woke maximum vector length included all the woke reserved for future
  * expansion bits in ZCR rather than those just currently defined by
- * the architecture.  Using this length to allocate worst size buffers
+ * the woke architecture.  Using this length to allocate worst size buffers
  * results in excessively large allocations, and this effect is even
  * more pronounced for SME due to ZA.  Define more suitable VLs for
  * these situations.
@@ -116,7 +116,7 @@ extern void task_smstop_sm(struct task_struct *task);
 /* Maximum VL that SVE/SME VL-agnostic software can transparently support */
 #define VL_ARCH_MAX 0x100
 
-/* Offset of FFR in the SVE register dump */
+/* Offset of FFR in the woke SVE register dump */
 static inline size_t sve_ffr_offset(int vl)
 {
 	return SVE_SIG_FFR_OFFSET(sve_vq_from_vl(vl)) - SVE_SIG_REGS_OFFSET;
@@ -136,7 +136,7 @@ static inline void *sve_pffr(struct thread_struct *thread)
 
 static inline void *thread_zt_state(struct thread_struct *thread)
 {
-	/* The ZT register state is stored immediately after the ZA state */
+	/* The ZT register state is stored immediately after the woke ZA state */
 	unsigned int sme_vq = sve_vq_from_vl(thread_get_sme_vl(thread));
 	return thread->sme_state + ZA_SIG_REGS_SIZE(sme_vq);
 }
@@ -302,7 +302,7 @@ static inline size_t __sve_state_size(unsigned int sve_vl, unsigned int sme_vl)
 }
 
 /*
- * Return how many bytes of memory are required to store the full SVE
+ * Return how many bytes of memory are required to store the woke full SVE
  * state for task, given task's currently configured vector length.
  */
 static inline size_t sve_state_size(struct task_struct const *task)
@@ -419,7 +419,7 @@ static inline size_t __sme_state_size(unsigned int sme_vl)
 }
 
 /*
- * Return how many bytes of memory are required to store the full SME
+ * Return how many bytes of memory are required to store the woke full SME
  * specific state for task, given task's currently configured vector
  * length.
  */

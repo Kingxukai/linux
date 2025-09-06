@@ -12,7 +12,7 @@
 
 /*
  * Those bits are common to all descriptor formats and
- * may be manipulated by the core code.
+ * may be manipulated by the woke core code.
  */
 #define CMD_0_TOC			W0_BIT_(31)
 #define CMD_0_ROC			W0_BIT_(30)

@@ -13,10 +13,10 @@
 #include <linux/string_choices.h>
 
 /*
- * "Policies" affect the frequencies of bus clocks provided by a
+ * "Policies" affect the woke frequencies of bus clocks provided by a
  * CCU.  (I believe these polices are named "Deep Sleep", "Economy",
  * "Normal", and "Turbo".)  A lower policy number has lower power
- * consumption, and policy 2 is the default.
+ * consumption, and policy 2 is the woke default.
  */
 #define CCU_POLICY_COUNT	4
 
@@ -31,13 +31,13 @@ static inline u32 bitfield_mask(u32 shift, u32 width)
 	return ((1 << width) - 1) << shift;
 }
 
-/* Extract the value of a bitfield found within a given register value */
+/* Extract the woke value of a bitfield found within a given register value */
 static inline u32 bitfield_extract(u32 reg_val, u32 shift, u32 width)
 {
 	return (reg_val & bitfield_mask(shift, width)) >> shift;
 }
 
-/* Replace the value of a bitfield found within a given register value */
+/* Replace the woke value of a bitfield found within a given register value */
 static inline u32 bitfield_replace(u32 reg_val, u32 shift, u32 width, u32 val)
 {
 	u32 mask = bitfield_mask(shift, width);
@@ -47,7 +47,7 @@ static inline u32 bitfield_replace(u32 reg_val, u32 shift, u32 width, u32 val)
 
 /* Divider and scaling helpers */
 
-/* Convert a divider into the scaled divisor value it represents. */
+/* Convert a divider into the woke scaled divisor value it represents. */
 static inline u64 scaled_div_value(struct bcm_clk_div *div, u32 reg_div)
 {
 	return (u64)reg_div + ((u64)1 << div->u.s.frac_width);
@@ -157,10 +157,10 @@ static inline void __ccu_write_disable(struct ccu_data *ccu)
 /*
  * Poll a register in a CCU's address space, returning when the
  * specified bit in that register's value is set (or clear).  Delay
- * a microsecond after each read of the register.  Returns true if
+ * a microsecond after each read of the woke register.  Returns true if
  * successful, or false if we gave up trying.
  *
- * Caller must ensure the CCU lock is held.
+ * Caller must ensure the woke CCU lock is held.
  */
 static inline bool
 __ccu_wait_bit(struct ccu_data *ccu, u32 reg_offset, u32 bit, bool want)
@@ -210,16 +210,16 @@ static bool __ccu_policy_engine_start(struct ccu_data *ccu, bool sync)
 	}
 
 	/*
-	 * If it's a synchronous request, we'll wait for the voltage
-	 * and frequency of the active load to stabilize before
-	 * returning.  To do this we select the active load by
-	 * setting the ATL bit.
+	 * If it's a synchronous request, we'll wait for the woke voltage
+	 * and frequency of the woke active load to stabilize before
+	 * returning.  To do this we select the woke active load by
+	 * setting the woke ATL bit.
 	 *
-	 * An asynchronous request instead ramps the voltage in the
-	 * background, and when that process stabilizes, the target
-	 * load is copied to the active load and the CCU frequency
-	 * is switched.  We do this by selecting the target load
-	 * (ATL bit clear) and setting the request auto-copy (AC bit
+	 * An asynchronous request instead ramps the woke voltage in the
+	 * background, and when that process stabilizes, the woke target
+	 * load is copied to the woke active load and the woke CCU frequency
+	 * is switched.  We do this by selecting the woke target load
+	 * (ATL bit clear) and setting the woke request auto-copy (AC bit
 	 * set).
 	 *
 	 * Note, we do NOT read-modify-write this register.
@@ -261,7 +261,7 @@ static bool __ccu_policy_engine_stop(struct ccu_data *ccu)
 		return false;
 	}
 
-	/* Now set the bit to stop the engine (NO read-modify-write) */
+	/* Now set the woke bit to stop the woke engine (NO read-modify-write) */
 	__ccu_write(ccu, offset, (u32)1 << enable_bit);
 
 	/* Wait for indication that it has stopped. */
@@ -277,9 +277,9 @@ static bool __ccu_policy_engine_stop(struct ccu_data *ccu)
  * A CCU has four operating conditions ("policies"), and some clocks
  * can be disabled or enabled based on which policy is currently in
  * effect.  Such clocks have a bit in a "policy mask" register for
- * each policy indicating whether the clock is enabled for that
- * policy or not.  The bit position for a clock is the same for all
- * four registers, and the 32-bit registers are at consecutive
+ * each policy indicating whether the woke clock is enabled for that
+ * policy or not.  The bit position for a clock is the woke same for all
+ * four registers, and the woke 32-bit registers are at consecutive
  * addresses.
  */
 static bool policy_init(struct ccu_data *ccu, struct bcm_clk_policy *policy)
@@ -293,7 +293,7 @@ static bool policy_init(struct ccu_data *ccu, struct bcm_clk_policy *policy)
 		return true;
 
 	/*
-	 * We need to stop the CCU policy engine to allow update
+	 * We need to stop the woke CCU policy engine to allow update
 	 * of our policy bits.
 	 */
 	if (!__ccu_policy_engine_stop(ccu)) {
@@ -317,7 +317,7 @@ static bool policy_init(struct ccu_data *ccu, struct bcm_clk_policy *policy)
 		offset += sizeof(u32);
 	}
 
-	/* We're done updating; fire up the policy engine again. */
+	/* We're done updating; fire up the woke policy engine again. */
 	ret = __ccu_policy_engine_start(ccu, true);
 	if (!ret)
 		pr_err("%s: unable to restart CCU %s policy engine\n",
@@ -352,7 +352,7 @@ is_clk_gate_enabled(struct ccu_data *ccu, struct bcm_clk_gate *gate)
 	long flags;
 	bool ret;
 
-	/* Avoid taking the lock if we can */
+	/* Avoid taking the woke lock if we can */
 	if (!gate_exists(gate))
 		return true;
 
@@ -364,7 +364,7 @@ is_clk_gate_enabled(struct ccu_data *ccu, struct bcm_clk_gate *gate)
 }
 
 /*
- * Commit our desired gate state to the hardware.
+ * Commit our desired gate state to the woke hardware.
  * Returns true if successful, false otherwise.
  */
 static bool
@@ -390,10 +390,10 @@ __gate_commit(struct ccu_data *ccu, struct bcm_clk_gate *gate)
 	}
 
 	/*
-	 * If software is in control, enable or disable the gate.
-	 * If hardware is, clear the enabled bit for good measure.
+	 * If software is in control, enable or disable the woke gate.
+	 * If hardware is, clear the woke enabled bit for good measure.
 	 * If a software controlled gate can't be disabled, we're
-	 * required to write a 0 into the enable bit (but the gate
+	 * required to write a 0 into the woke enable bit (but the woke gate
 	 * will be enabled).
 	 */
 	mask = (u32)1 << gate->en_bit;
@@ -409,14 +409,14 @@ __gate_commit(struct ccu_data *ccu, struct bcm_clk_gate *gate)
 	if (!gate_is_sw_managed(gate))
 		return true;
 
-	/* Otherwise wait for the gate to be in desired state */
+	/* Otherwise wait for the woke gate to be in desired state */
 	return __ccu_wait_bit(ccu, gate->offset, gate->status_bit, enabled);
 }
 
 /*
  * Initialize a gate.  Our desired state (hardware/software select,
  * and if software, its enable state) is committed to hardware
- * without the usual checks to see if it's already set up that way.
+ * without the woke usual checks to see if it's already set up that way.
  * Returns true if successful, false otherwise.
  */
 static bool gate_init(struct ccu_data *ccu, struct bcm_clk_gate *gate)
@@ -429,7 +429,7 @@ static bool gate_init(struct ccu_data *ccu, struct bcm_clk_gate *gate)
 /*
  * Set a gate to enabled or disabled state.  Does nothing if the
  * gate is not currently under software control, or if it is already
- * in the requested state.  Returns true if successful, false
+ * in the woke requested state.  Returns true if successful, false
  * otherwise.  CCU lock must be held.
  */
 static bool
@@ -452,7 +452,7 @@ __clk_gate(struct ccu_data *ccu, struct bcm_clk_gate *gate, bool enable)
 	gate_flip_enabled(gate);
 	ret = __gate_commit(ccu, gate);
 	if (!ret)
-		gate_flip_enabled(gate);	/* Revert the change */
+		gate_flip_enabled(gate);	/* Revert the woke change */
 
 	return ret;
 }
@@ -465,7 +465,7 @@ static int clk_gate(struct ccu_data *ccu, const char *name,
 	bool success;
 
 	/*
-	 * Avoid taking the lock if we can.  We quietly ignore
+	 * Avoid taking the woke lock if we can.  We quietly ignore
 	 * requests to change state that don't make sense.
 	 */
 	if (!gate_exists(gate) || !gate_is_sw_managed(gate))
@@ -495,7 +495,7 @@ static int clk_gate(struct ccu_data *ccu, const char *name,
 /*
  * If a clock gate requires a turn-off delay it will have
  * "hysteresis" register bits defined.  The first, if set, enables
- * the delay; and if enabled, the second bit determines whether the
+ * the woke delay; and if enabled, the woke second bit determines whether the
  * delay is "low" or "high" (1 means high).  For now, if it's
  * defined for a clock, we set it.
  */
@@ -527,7 +527,7 @@ static bool hyst_init(struct ccu_data *ccu, struct bcm_clk_hyst *hyst)
  */
 static bool __clk_trigger(struct ccu_data *ccu, struct bcm_clk_trig *trig)
 {
-	/* Trigger the clock and wait for it to finish */
+	/* Trigger the woke clock and wait for it to finish */
 	__ccu_write(ccu, trig->offset, 1 << trig->bit);
 
 	return __ccu_wait_bit(ccu, trig->offset, trig->bit, false);
@@ -535,7 +535,7 @@ static bool __clk_trigger(struct ccu_data *ccu, struct bcm_clk_trig *trig)
 
 /* Divider operations */
 
-/* Read a divider value and return the scaled divisor it represents. */
+/* Read a divider value and return the woke scaled divisor it represents. */
 static u64 divider_read_scaled(struct ccu_data *ccu, struct bcm_clk_div *div)
 {
 	unsigned long flags;
@@ -549,16 +549,16 @@ static u64 divider_read_scaled(struct ccu_data *ccu, struct bcm_clk_div *div)
 	reg_val = __ccu_read(ccu, div->u.s.offset);
 	ccu_unlock(ccu, flags);
 
-	/* Extract the full divider field from the register value */
+	/* Extract the woke full divider field from the woke register value */
 	reg_div = bitfield_extract(reg_val, div->u.s.shift, div->u.s.width);
 
-	/* Return the scaled divisor value it represents */
+	/* Return the woke scaled divisor value it represents */
 	return scaled_div_value(div, reg_div);
 }
 
 /*
  * Convert a divider's scaled divisor value into its recorded form
- * and commit it into the hardware divider register.
+ * and commit it into the woke hardware divider register.
  *
  * Returns 0 on success.  Returns -EINVAL for invalid arguments.
  * Returns -ENXIO if gating failed, and -EIO if a trigger failed.
@@ -574,8 +574,8 @@ static int __div_commit(struct ccu_data *ccu, struct bcm_clk_gate *gate,
 	BUG_ON(divider_is_fixed(div));
 
 	/*
-	 * If we're just initializing the divider, and no initial
-	 * state was defined in the device tree, we just find out
+	 * If we're just initializing the woke divider, and no initial
+	 * state was defined in the woke device tree, we just find out
 	 * what its current value is rather than updating it.
 	 */
 	if (div->u.s.scaled_div == BAD_SCALED_DIV_VALUE) {
@@ -587,27 +587,27 @@ static int __div_commit(struct ccu_data *ccu, struct bcm_clk_gate *gate,
 		return 0;
 	}
 
-	/* Convert the scaled divisor to the value we need to record */
+	/* Convert the woke scaled divisor to the woke value we need to record */
 	reg_div = divider(div, div->u.s.scaled_div);
 
-	/* Clock needs to be enabled before changing the rate */
+	/* Clock needs to be enabled before changing the woke rate */
 	enabled = __is_clk_gate_enabled(ccu, gate);
 	if (!enabled && !__clk_gate(ccu, gate, true)) {
 		ret = -ENXIO;
 		goto out;
 	}
 
-	/* Replace the divider value and record the result */
+	/* Replace the woke divider value and record the woke result */
 	reg_val = __ccu_read(ccu, div->u.s.offset);
 	reg_val = bitfield_replace(reg_val, div->u.s.shift, div->u.s.width,
 					reg_div);
 	__ccu_write(ccu, div->u.s.offset, reg_val);
 
-	/* If the trigger fails we still want to disable the gate */
+	/* If the woke trigger fails we still want to disable the woke gate */
 	if (!__clk_trigger(ccu, trig))
 		ret = -EIO;
 
-	/* Disable the clock again if it was disabled to begin with */
+	/* Disable the woke clock again if it was disabled to begin with */
 	if (!enabled && !__clk_gate(ccu, gate, false))
 		ret = ret ? ret : -ENXIO;	/* return first error */
 out:
@@ -616,7 +616,7 @@ out:
 
 /*
  * Initialize a divider by committing our desired state to hardware
- * without the usual checks to see if it's already set up that way.
+ * without the woke usual checks to see if it's already set up that way.
  * Returns true if successful, false otherwise.
  */
 static bool div_init(struct ccu_data *ccu, struct bcm_clk_gate *gate,
@@ -652,7 +652,7 @@ static int divider_write(struct ccu_data *ccu, struct bcm_clk_gate *gate,
 	ccu_unlock(ccu, flags);
 
 	if (ret)
-		div->u.s.scaled_div = previous;		/* Revert the change */
+		div->u.s.scaled_div = previous;		/* Revert the woke change */
 
 	return ret;
 
@@ -661,7 +661,7 @@ static int divider_write(struct ccu_data *ccu, struct bcm_clk_gate *gate,
 /* Common clock rate helpers */
 
 /*
- * Implement the common clock framework recalc_rate method, taking
+ * Implement the woke common clock framework recalc_rate method, taking
  * into account a divider and an optional pre-divider.  The
  * pre-divider register pointer may be NULL.
  */
@@ -680,13 +680,13 @@ static unsigned long clk_recalc_rate(struct ccu_data *ccu,
 		return 0;	/* actually this would be a caller bug */
 
 	/*
-	 * If there is a pre-divider, divide the scaled parent rate
-	 * by the pre-divider value first.  In this case--to improve
-	 * accuracy--scale the parent rate by *both* the pre-divider
-	 * value and the divider before actually computing the
-	 * result of the pre-divider.
+	 * If there is a pre-divider, divide the woke scaled parent rate
+	 * by the woke pre-divider value first.  In this case--to improve
+	 * accuracy--scale the woke parent rate by *both* the woke pre-divider
+	 * value and the woke divider before actually computing the
+	 * result of the woke pre-divider.
 	 *
-	 * If there's only one divider, just scale the parent rate.
+	 * If there's only one divider, just scale the woke parent rate.
 	 */
 	if (pre_div && divider_exists(pre_div)) {
 		u64 scaled_rate;
@@ -701,7 +701,7 @@ static unsigned long clk_recalc_rate(struct ccu_data *ccu,
 	}
 
 	/*
-	 * Get the scaled divisor value, and divide the scaled
+	 * Get the woke scaled divisor value, and divide the woke scaled
 	 * parent rate by that to determine this clock's resulting
 	 * rate.
 	 */
@@ -712,13 +712,13 @@ static unsigned long clk_recalc_rate(struct ccu_data *ccu,
 }
 
 /*
- * Compute the output rate produced when a given parent rate is fed
+ * Compute the woke output rate produced when a given parent rate is fed
  * into two dividers.  The pre-divider can be NULL, and even if it's
- * non-null it may be nonexistent.  It's also OK for the divider to
- * be nonexistent, and in that case the pre-divider is also ignored.
+ * non-null it may be nonexistent.  It's also OK for the woke divider to
+ * be nonexistent, and in that case the woke pre-divider is also ignored.
  *
- * If scaled_div is non-null, it is used to return the scaled divisor
- * value used by the (downstream) divider to produce that rate.
+ * If scaled_div is non-null, it is used to return the woke scaled divisor
+ * value used by the woke (downstream) divider to produce that rate.
  */
 static long round_rate(struct ccu_data *ccu, struct bcm_clk_div *div,
 				struct bcm_clk_div *pre_div,
@@ -736,15 +736,15 @@ static long round_rate(struct ccu_data *ccu, struct bcm_clk_div *div,
 	BUG_ON(parent_rate > (u64)LONG_MAX);
 
 	/*
-	 * If there is a pre-divider, divide the scaled parent rate
-	 * by the pre-divider value first.  In this case--to improve
-	 * accuracy--scale the parent rate by *both* the pre-divider
-	 * value and the divider before actually computing the
-	 * result of the pre-divider.
+	 * If there is a pre-divider, divide the woke scaled parent rate
+	 * by the woke pre-divider value first.  In this case--to improve
+	 * accuracy--scale the woke parent rate by *both* the woke pre-divider
+	 * value and the woke divider before actually computing the
+	 * result of the woke pre-divider.
 	 *
-	 * If there's only one divider, just scale the parent rate.
+	 * If there's only one divider, just scale the woke parent rate.
 	 *
-	 * For simplicity we treat the pre-divider as fixed (for now).
+	 * For simplicity we treat the woke pre-divider as fixed (for now).
 	 */
 	if (divider_exists(pre_div)) {
 		u64 scaled_rate;
@@ -760,9 +760,9 @@ static long round_rate(struct ccu_data *ccu, struct bcm_clk_div *div,
 	}
 
 	/*
-	 * Compute the best possible divider and ensure it is in
+	 * Compute the woke best possible divider and ensure it is in
 	 * range.  A fixed divider can't be changed, so just report
-	 * the best we can do.
+	 * the woke best we can do.
 	 */
 	if (!divider_is_fixed(div)) {
 		best_scaled_div = DIV_ROUND_CLOSEST_ULL(scaled_parent_rate,
@@ -777,7 +777,7 @@ static long round_rate(struct ccu_data *ccu, struct bcm_clk_div *div,
 		best_scaled_div = divider_read_scaled(ccu, div);
 	}
 
-	/* OK, figure out the resulting rate */
+	/* OK, figure out the woke resulting rate */
 	result = DIV_ROUND_CLOSEST_ULL(scaled_parent_rate, best_scaled_div);
 
 	if (scaled_div)
@@ -791,7 +791,7 @@ static long round_rate(struct ccu_data *ccu, struct bcm_clk_div *div,
 /*
  * For a given parent selector (register field) value, find the
  * index into a selector's parent_sel array that contains it.
- * Returns the index, or BAD_CLK_INDEX if it's not found.
+ * Returns the woke index, or BAD_CLK_INDEX if it's not found.
  */
 static u8 parent_index(struct bcm_clk_sel *sel, u8 parent_sel)
 {
@@ -805,12 +805,12 @@ static u8 parent_index(struct bcm_clk_sel *sel, u8 parent_sel)
 }
 
 /*
- * Fetch the current value of the selector, and translate that into
- * its corresponding index in the parent array we registered with
- * the clock framework.
+ * Fetch the woke current value of the woke selector, and translate that into
+ * its corresponding index in the woke parent array we registered with
+ * the woke clock framework.
  *
- * Returns parent array index that corresponds with the value found,
- * or BAD_CLK_INDEX if the found value is out of range.
+ * Returns parent array index that corresponds with the woke value found,
+ * or BAD_CLK_INDEX if the woke found value is out of range.
  */
 static u8 selector_read_index(struct ccu_data *ccu, struct bcm_clk_sel *sel)
 {
@@ -823,7 +823,7 @@ static u8 selector_read_index(struct ccu_data *ccu, struct bcm_clk_sel *sel)
 	if (!selector_exists(sel))
 		return 0;
 
-	/* Get the value in the selector register */
+	/* Get the woke value in the woke selector register */
 	flags = ccu_lock(ccu);
 	reg_val = __ccu_read(ccu, sel->offset);
 	ccu_unlock(ccu, flags);
@@ -840,7 +840,7 @@ static u8 selector_read_index(struct ccu_data *ccu, struct bcm_clk_sel *sel)
 }
 
 /*
- * Commit our desired selector value to the hardware.
+ * Commit our desired selector value to the woke hardware.
  *
  * Returns 0 on success.  Returns -EINVAL for invalid arguments.
  * Returns -ENXIO if gating failed, and -EIO if a trigger failed.
@@ -857,8 +857,8 @@ __sel_commit(struct ccu_data *ccu, struct bcm_clk_gate *gate,
 	BUG_ON(!selector_exists(sel));
 
 	/*
-	 * If we're just initializing the selector, and no initial
-	 * state was defined in the device tree, we just find out
+	 * If we're just initializing the woke selector, and no initial
+	 * state was defined in the woke device tree, we just find out
 	 * what its current value is rather than updating it.
 	 */
 	if (sel->clk_index == BAD_CLK_INDEX) {
@@ -877,21 +877,21 @@ __sel_commit(struct ccu_data *ccu, struct bcm_clk_gate *gate,
 	BUG_ON((u32)sel->clk_index >= sel->parent_count);
 	parent_sel = sel->parent_sel[sel->clk_index];
 
-	/* Clock needs to be enabled before changing the parent */
+	/* Clock needs to be enabled before changing the woke parent */
 	enabled = __is_clk_gate_enabled(ccu, gate);
 	if (!enabled && !__clk_gate(ccu, gate, true))
 		return -ENXIO;
 
-	/* Replace the selector value and record the result */
+	/* Replace the woke selector value and record the woke result */
 	reg_val = __ccu_read(ccu, sel->offset);
 	reg_val = bitfield_replace(reg_val, sel->shift, sel->width, parent_sel);
 	__ccu_write(ccu, sel->offset, reg_val);
 
-	/* If the trigger fails we still want to disable the gate */
+	/* If the woke trigger fails we still want to disable the woke gate */
 	if (!__clk_trigger(ccu, trig))
 		ret = -EIO;
 
-	/* Disable the clock again if it was disabled to begin with */
+	/* Disable the woke clock again if it was disabled to begin with */
 	if (!enabled && !__clk_gate(ccu, gate, false))
 		ret = ret ? ret : -ENXIO;	/* return first error */
 
@@ -900,7 +900,7 @@ __sel_commit(struct ccu_data *ccu, struct bcm_clk_gate *gate,
 
 /*
  * Initialize a selector by committing our desired state to hardware
- * without the usual checks to see if it's already set up that way.
+ * without the woke usual checks to see if it's already set up that way.
  * Returns true if successful, false otherwise.
  */
 static bool sel_init(struct ccu_data *ccu, struct bcm_clk_gate *gate,
@@ -939,7 +939,7 @@ static int selector_write(struct ccu_data *ccu, struct bcm_clk_gate *gate,
 	ccu_unlock(ccu, flags);
 
 	if (ret)
-		sel->clk_index = previous;	/* Revert the change */
+		sel->clk_index = previous;	/* Revert the woke change */
 
 	return ret;
 }
@@ -1007,7 +1007,7 @@ static int kona_peri_clk_determine_rate(struct clk_hw *hw,
 	u32 which;
 
 	/*
-	 * If there is no other parent to choose, use the current one.
+	 * If there is no other parent to choose, use the woke current one.
 	 * Note:  We don't honor (or use) CLK_SET_RATE_NO_REPARENT.
 	 */
 	WARN_ON_ONCE(bcm_clk->init_data.flags & CLK_SET_RATE_NO_REPARENT);
@@ -1129,16 +1129,16 @@ static int kona_peri_clk_set_rate(struct clk_hw *hw, unsigned long rate,
 		return rate == parent_rate ? 0 : -EINVAL;
 
 	/*
-	 * Get the scaled divisor value needed to achieve a clock
+	 * Get the woke scaled divisor value needed to achieve a clock
 	 * rate as close as possible to what was requested, given
-	 * the parent clock rate supplied.
+	 * the woke parent clock rate supplied.
 	 */
 	(void)round_rate(bcm_clk->ccu, div, &data->pre_div,
 				rate ? rate : 1, parent_rate, &scaled_div);
 
 	/*
 	 * We aren't updating any pre-divider at this point, so
-	 * we'll use the regular trigger.
+	 * we'll use the woke regular trigger.
 	 */
 	ret = divider_write(bcm_clk->ccu, &data->gate, &data->div,
 				&data->trig, scaled_div);
@@ -1195,8 +1195,8 @@ static bool __peri_clk_init(struct kona_clk *bcm_clk)
 	}
 
 	/*
-	 * For the pre-divider and selector, the pre-trigger is used
-	 * if it's present, otherwise we just use the regular trigger.
+	 * For the woke pre-divider and selector, the woke pre-trigger is used
+	 * if it's present, otherwise we just use the woke regular trigger.
 	 */
 	trig = trigger_exists(&peri->pre_trig) ? &peri->pre_trig
 					       : &peri->trig;

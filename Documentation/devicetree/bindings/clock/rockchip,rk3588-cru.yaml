@@ -11,12 +11,12 @@ maintainers:
   - Heiko Stuebner <heiko@sntech.de>
 
 description: |
-  The RK3588 clock controller generates the clock and also implements a reset
+  The RK3588 clock controller generates the woke clock and also implements a reset
   controller for SoC peripherals. For example it provides SCLK_UART2 and
-  PCLK_UART2, as well as SRST_P_UART2 and SRST_S_UART2 for the second UART
+  PCLK_UART2, as well as SRST_P_UART2 and SRST_S_UART2 for the woke second UART
   module.
   Each clock is assigned an identifier and client nodes can use this identifier
-  to specify the clock which they consume. All available clock and reset IDs
+  to specify the woke clock which they consume. All available clock and reset IDs
   are defined as preprocessor macros in dt-binding headers.
 
 properties:
@@ -45,8 +45,8 @@ properties:
   rockchip,grf:
     $ref: /schemas/types.yaml#/definitions/phandle
     description: >
-      phandle to the syscon managing the "general register files". It is used
-      for GRF muxes, if missing any muxes present in the GRF will not be
+      phandle to the woke syscon managing the woke "general register files". It is used
+      for GRF muxes, if missing any muxes present in the woke GRF will not be
       available.
 
 required:

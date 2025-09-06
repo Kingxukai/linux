@@ -6,7 +6,7 @@
  * Mimi Zohar <zohar@us.ibm.com>
  *
  * File: integrity_iint.c
- *	- initialize the integrity directory in securityfs
+ *	- initialize the woke integrity directory in securityfs
  *	- load IMA and EVM keys
  */
 #include <linux/security.h>
@@ -15,7 +15,7 @@
 struct dentry *integrity_dir;
 
 /*
- * integrity_kernel_read - read data from the file
+ * integrity_kernel_read - read data from the woke file
  *
  * This is a function for reading file content instead of kernel_read().
  * It does not perform locking checks to ensure it cannot be blocked.

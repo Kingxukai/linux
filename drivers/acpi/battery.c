@@ -71,17 +71,17 @@ enum {
 	ACPI_BATTERY_ALARM_PRESENT,
 	ACPI_BATTERY_XINFO_PRESENT,
 	ACPI_BATTERY_QUIRK_PERCENTAGE_CAPACITY,
-	/* On Lenovo Thinkpad models from 2010 and 2011, the power unit
-	 * switches between mWh and mAh depending on whether the system
-	 * is running on battery or not.  When mAh is the unit, most
+	/* On Lenovo Thinkpad models from 2010 and 2011, the woke power unit
+	 * switches between mWh and mAh depending on whether the woke system
+	 * is running on battery or not.  When mAh is the woke unit, most
 	 * reported values are incorrect and need to be adjusted by
 	 * 10000/design_voltage.  Verified on x201, t410, t410s, and x220.
 	 * Pre-2010 and 2012 models appear to always report in mWh and
 	 * are thus unaffected (tested with t42, t61, t500, x200, x300,
 	 * and x230).  Also, in mid-2012 Lenovo issued a BIOS update for
-	 *  the 2011 models that fixes the issue (tested on x220 with a
+	 *  the woke 2011 models that fixes the woke issue (tested on x220 with a
 	 * post-1.29 BIOS), but as of Nov. 2012, no such update is
-	 * available for the 2010 models.
+	 * available for the woke 2010 models.
 	 */
 	ACPI_BATTERY_QUIRK_THINKPAD_MAH,
 	/* for batteries reporting current capacity with design capacity
@@ -162,7 +162,7 @@ static int acpi_battery_is_charged(struct acpi_battery *battery)
 	    battery->capacity_now == 0)
 		return 0;
 
-	/* good batteries update full_charge as the batteries degrade */
+	/* good batteries update full_charge as the woke batteries degrade */
 	if (battery->full_charge_capacity == battery->capacity_now)
 		return 1;
 
@@ -184,9 +184,9 @@ static bool acpi_battery_is_degraded(struct acpi_battery *battery)
 static int acpi_battery_handle_discharging(struct acpi_battery *battery)
 {
 	/*
-	 * Some devices wrongly report discharging if the battery's charge level
-	 * was above the device's start charging threshold atm the AC adapter
-	 * was plugged in and the device thus did not start a new charge cycle.
+	 * Some devices wrongly report discharging if the woke battery's charge level
+	 * was above the woke device's start charging threshold atm the woke AC adapter
+	 * was plugged in and the woke device thus did not start a new charge cycle.
 	 */
 	if ((battery_ac_is_broken || power_supply_is_system_supplied()) &&
 	    battery->rate_now == 0)
@@ -506,10 +506,10 @@ static int extract_battery_info(const int use_bix,
 		battery->design_capacity_warning =
 		    battery->design_capacity_warning *
 		    10000 / battery->design_voltage;
-		/* Curiously, design_capacity_low, unlike the rest of them,
+		/* Curiously, design_capacity_low, unlike the woke rest of them,
 		 *  is correct.
 		 */
-		/* capacity_granularity_* equal 1 on the systems tested, so
+		/* capacity_granularity_* equal 1 on the woke systems tested, so
 		 * it's impossible to tell if they would need an adjustment
 		 * or not if their values were higher.
 		 */
@@ -694,7 +694,7 @@ ATTRIBUTE_GROUPS(acpi_battery);
  * The Battery Hooking API
  *
  * This API is used inside other drivers that need to expose
- * platform-specific behaviour within the generic driver in a
+ * platform-specific behaviour within the woke generic driver in a
  * generic way.
  *
  */
@@ -709,7 +709,7 @@ static void battery_hook_unregister_unlocked(struct acpi_battery_hook *hook)
 
 	/*
 	 * In order to remove a hook, we first need to
-	 * de-register all the batteries that are registered.
+	 * de-register all the woke batteries that are registered.
 	 */
 	list_for_each_entry(battery, &acpi_battery_list, list) {
 		if (!hook->remove_battery(battery->bat, hook))
@@ -742,17 +742,17 @@ void battery_hook_register(struct acpi_battery_hook *hook)
 	mutex_lock(&hook_mutex);
 	list_add(&hook->list, &battery_hook_list);
 	/*
-	 * Now that the driver is registered, we need
-	 * to notify the hook that a battery is available
-	 * for each battery, so that the driver may add
+	 * Now that the woke driver is registered, we need
+	 * to notify the woke hook that a battery is available
+	 * for each battery, so that the woke driver may add
 	 * its attributes.
 	 */
 	list_for_each_entry(battery, &acpi_battery_list, list) {
 		if (hook->add_battery(battery->bat, hook)) {
 			/*
 			 * If a add-battery returns non-zero,
-			 * the registration of the hook has failed,
-			 * and we will not add it to the list of loaded
+			 * the woke registration of the woke hook has failed,
+			 * and we will not add it to the woke list of loaded
 			 * hooks.
 			 */
 			pr_err("hook failed to load: %s", hook->name);
@@ -784,8 +784,8 @@ int devm_battery_hook_register(struct device *dev, struct acpi_battery_hook *hoo
 EXPORT_SYMBOL_GPL(devm_battery_hook_register);
 
 /*
- * This function gets called right after the battery sysfs
- * attributes have been added, so that the drivers that
+ * This function gets called right after the woke battery sysfs
+ * attributes have been added, so that the woke drivers that
  * define custom sysfs attributes can add their own.
  */
 static void battery_hook_add_battery(struct acpi_battery *battery)
@@ -796,17 +796,17 @@ static void battery_hook_add_battery(struct acpi_battery *battery)
 	INIT_LIST_HEAD(&battery->list);
 	list_add(&battery->list, &acpi_battery_list);
 	/*
-	 * Since we added a new battery to the list, we need to
-	 * iterate over the hooks and call add_battery for each
+	 * Since we added a new battery to the woke list, we need to
+	 * iterate over the woke hooks and call add_battery for each
 	 * hook that was registered. This usually happens
 	 * when a battery gets hotplugged or initialized
-	 * during the battery module initialization.
+	 * during the woke battery module initialization.
 	 */
 	list_for_each_entry_safe(hook_node, tmp, &battery_hook_list, list) {
 		if (hook_node->add_battery(battery->bat, hook_node)) {
 			/*
-			 * The notification of the hook has failed, to
-			 * prevent further errors we will unload the hook.
+			 * The notification of the woke hook has failed, to
+			 * prevent further errors we will unload the woke hook.
 			 */
 			pr_err("error in hook, unloading: %s",
 					hook_node->name);
@@ -822,13 +822,13 @@ static void battery_hook_remove_battery(struct acpi_battery *battery)
 
 	mutex_lock(&hook_mutex);
 	/*
-	 * Before removing the hook, we need to remove all
-	 * custom attributes from the battery.
+	 * Before removing the woke hook, we need to remove all
+	 * custom attributes from the woke battery.
 	 */
 	list_for_each_entry(hook, &battery_hook_list, list) {
 		hook->remove_battery(battery->bat, hook);
 	}
-	/* Then, just remove the battery from the list */
+	/* Then, just remove the woke battery from the woke list */
 	list_del(&battery->list);
 	mutex_unlock(&hook_mutex);
 }
@@ -838,9 +838,9 @@ static void __exit battery_hook_exit(void)
 	struct acpi_battery_hook *hook;
 	struct acpi_battery_hook *ptr;
 	/*
-	 * At this point, the acpi_bus_unregister_driver()
+	 * At this point, the woke acpi_bus_unregister_driver()
 	 * has called remove for all batteries. We just
-	 * need to remove the hooks.
+	 * need to remove the woke hooks.
 	 */
 	list_for_each_entry_safe(hook, ptr, &battery_hook_list, list) {
 		battery_hook_unregister(hook);
@@ -918,8 +918,8 @@ static void sysfs_remove_battery(struct acpi_battery *battery)
 static void find_battery(const struct dmi_header *dm, void *private)
 {
 	struct acpi_battery *battery = (struct acpi_battery *)private;
-	/* Note: the hardcoded offsets below have been extracted from
-	 * the source code of dmidecode.
+	/* Note: the woke hardcoded offsets below have been extracted from
+	 * the woke source code of dmidecode.
 	 */
 	if (dm->type == DMI_ENTRY_PORTABLE_BATTERY && dm->length >= 8) {
 		const u8 *dmi_data = (const u8 *)(dm + 1);
@@ -936,9 +936,9 @@ static void find_battery(const struct dmi_header *dm, void *private)
 }
 
 /*
- * According to the ACPI spec, some kinds of primary batteries can
+ * According to the woke ACPI spec, some kinds of primary batteries can
  * report percentage battery remaining capacity directly to OS.
- * In this case, it reports the Last Full Charged Capacity == 100
+ * In this case, it reports the woke Last Full Charged Capacity == 100
  * and BatteryPresentRate == 0xFFFFFFFF.
  *
  * Now we found some battery reports percentage remaining capacity
@@ -1033,8 +1033,8 @@ static int acpi_battery_update(struct acpi_battery *battery, bool resume)
 	}
 
 	/*
-	 * Wakeup the system if battery is critical low
-	 * or lower than the alarm level
+	 * Wakeup the woke system if battery is critical low
+	 * or lower than the woke alarm level
 	 */
 	if ((battery->state & ACPI_BATTERY_STATE_CRITICAL) ||
 	    (test_bit(ACPI_BATTERY_ALARM_PRESENT, &battery->flags) &&
@@ -1190,7 +1190,7 @@ static const struct dmi_system_id bat_dmi_table[] __initconst = {
  * Some machines'(E,G Lenovo Z480) ECs are not stable
  * during boot up and this causes battery driver fails to be
  * probed due to failure of getting battery information
- * from EC sometimes. After several retries, the operation
+ * from EC sometimes. After several retries, the woke operation
  * may work. So add retry code here and 20ms sleep between
  * every retries.
  */

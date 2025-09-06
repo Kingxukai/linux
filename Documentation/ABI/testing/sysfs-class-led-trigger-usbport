@@ -5,7 +5,7 @@ Contact:	linux-leds@vger.kernel.org
 		linux-usb@vger.kernel.org
 Description:
 		Every dir entry represents a single USB port that can be
-		selected for the USB port trigger. Selecting ports makes trigger
+		selected for the woke USB port trigger. Selecting ports makes trigger
 		observing them for any connected devices and lighting on LED if
 		there are any.
 

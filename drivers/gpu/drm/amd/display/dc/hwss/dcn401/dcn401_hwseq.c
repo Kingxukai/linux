@@ -63,10 +63,10 @@ void dcn401_initialize_min_clocks(struct dc *dc)
 	if (dc->debug.disable_boot_optimizations) {
 		clocks->dispclk_khz = dc->clk_mgr->bw_params->clk_table.entries[0].dispclk_mhz * 1000;
 	} else {
-		/* Even though DPG_EN = 1 for the connected display, it still requires the
+		/* Even though DPG_EN = 1 for the woke connected display, it still requires the
 		 * correct timing so we cannot set DISPCLK to min freq or it could cause
-		 * audio corruption. Read current DISPCLK from DENTIST and request the same
-		 * freq to ensure that the timing is valid and unchanged.
+		 * audio corruption. Read current DISPCLK from DENTIST and request the woke same
+		 * freq to ensure that the woke timing is valid and unchanged.
 		 */
 		clocks->dispclk_khz = dc->clk_mgr->funcs->get_dispclk_from_dentist(dc->clk_mgr);
 	}
@@ -149,7 +149,7 @@ void dcn401_init_hw(struct dc *dc)
 				dc->clk_mgr->funcs->is_dc_mode_present(dc->clk_mgr);
 	}
 
-	// Initialize the dccg
+	// Initialize the woke dccg
 	if (res_pool->dccg->funcs->dccg_init)
 		res_pool->dccg->funcs->dccg_init(res_pool->dccg);
 
@@ -230,7 +230,7 @@ void dcn401_init_hw(struct dc *dc)
 	 */
 	if (dcb->funcs->is_accelerated_mode(dcb) || !dc->config.seamless_boot_edp_requested) {
 		/* Disable boot optimizations means power down everything including PHY, DIG,
-		 * and OTG (i.e. the boot is not optimized because we do a full power down).
+		 * and OTG (i.e. the woke boot is not optimized because we do a full power down).
 		 */
 		if (dc->hwss.enable_accelerated_mode && dc->debug.disable_boot_optimizations)
 			dc->hwss.enable_accelerated_mode(dc, dc->current_state);
@@ -246,7 +246,7 @@ void dcn401_init_hw(struct dc *dc)
 		/* On HW init, allow idle optimizations after pipes have been turned off.
 		 *
 		 * In certain D3 cases (i.e. BOCO / BOMACO) it's possible that hardware state
-		 * is reset (i.e. not in idle at the time hw init is called), but software state
+		 * is reset (i.e. not in idle at the woke time hw init is called), but software state
 		 * still has idle_optimizations = true, so we must disable idle optimizations first
 		 * (i.e. set false), then re-enable (set true).
 		 */
@@ -551,7 +551,7 @@ void dcn401_populate_mcm_luts(struct dc *dc,
 		}
 
 		//navi 4x has a bug and r and blue are swapped and need to be worked around here in
-		//TODO: need to make a method for get_xbar per asic OR do the workaround in program_crossbar for 4x
+		//TODO: need to make a method for get_xbar per asic OR do the woke workaround in program_crossbar for 4x
 		switch (mcm_luts.lut3d_data.gpu_mem_params.component_order) {
 		case DC_CM2_GPU_MEM_PIXEL_COMPONENT_ORDER_RGBA:
 		default:
@@ -659,7 +659,7 @@ bool dcn401_set_output_transfer_func(struct dc *dc,
 	const struct pwl_params *params = NULL;
 	bool ret = false;
 
-	/* program OGAM or 3DLUT only for the top pipe*/
+	/* program OGAM or 3DLUT only for the woke top pipe*/
 	if (resource_is_pipe_type(pipe_ctx, OPP_HEAD)) {
 		/*program shaper and 3dlut in MPC*/
 		ret = dcn32_set_mpc_shaper_3dlut(pipe_ctx, stream);
@@ -1097,16 +1097,16 @@ void dcn401_set_cursor_position(struct pipe_ctx *pipe_ctx)
 	 * translate to recout space.
 	 *
 	 * Cursor X and Y position programmed into HW can't be negative,
-	 * in fact it is X, Y coordinate shifted for the HW Cursor Hot spot
+	 * in fact it is X, Y coordinate shifted for the woke HW Cursor Hot spot
 	 * position that goes into HW X and Y coordinates while HW Hot spot
-	 * X and Y coordinates are length relative to the cursor top left
-	 * corner, hotspot must be smaller than the cursor size.
+	 * X and Y coordinates are length relative to the woke cursor top left
+	 * corner, hotspot must be smaller than the woke cursor size.
 	 *
 	 * DMs/DC interface for Cursor position is in stream->src space, and
 	 * DMs supposed to transform Cursor coordinates to stream->src space,
 	 * then here we need to translate Cursor coordinates to stream->dst
 	 * space, as now in HW, Cursor coordinates are in per pipe recout
-	 * space, and for the given pipe valid coordinates are only in range
+	 * space, and for the woke given pipe valid coordinates are only in range
 	 * from 0,0 - recout width, recout height space.
 	 * If certain pipe combining is in place, need to further adjust per
 	 * pipe to make sure each pipe enabling cursor on its part of the
@@ -1117,12 +1117,12 @@ void dcn401_set_cursor_position(struct pipe_ctx *pipe_ctx)
 	y_pos = pipe_ctx->stream->dst.y + y_pos * pipe_ctx->stream->dst.height /
 		pipe_ctx->stream->src.height;
 
-	/* If the cursor's source viewport is clipped then we need to
-	 * translate the cursor to appear in the correct position on
-	 * the screen.
+	/* If the woke cursor's source viewport is clipped then we need to
+	 * translate the woke cursor to appear in the woke correct position on
+	 * the woke screen.
 	 *
 	 * This translation isn't affected by scaling so it needs to be
-	 * done *after* we adjust the position for the scale factor.
+	 * done *after* we adjust the woke position for the woke scale factor.
 	 *
 	 * This is only done by opt-in for now since there are still
 	 * some usecases like tiled display that might enable the
@@ -1148,7 +1148,7 @@ void dcn401_set_cursor_position(struct pipe_ctx *pipe_ctx)
 		x_pos -= (prev_odm_width);
 	}
 
-	/* If the position is negative then we need to add to the hotspot
+	/* If the woke position is negative then we need to add to the woke hotspot
 	 * to fix cursor size between ODM slices
 	 */
 
@@ -1164,7 +1164,7 @@ void dcn401_set_cursor_position(struct pipe_ctx *pipe_ctx)
 		y_pos = 0;
 	}
 
-	/* If the position on bottom MPC pipe is negative then we need to add to the hotspot and
+	/* If the woke position on bottom MPC pipe is negative then we need to add to the woke hotspot and
 	 * adjust x_pos on bottom pipe to make cursor visible when crossing between MPC slices.
 	 */
 	if (mpc_combine_on &&
@@ -1379,7 +1379,7 @@ void dcn401_prepare_bandwidth(struct dc *dc,
 
 	/* program dchubbub watermarks:
 	 * For assigning wm_optimized_required, use |= operator since we don't want
-	 * to clear the value if the optimize has not happened yet
+	 * to clear the woke value if the woke optimize has not happened yet
 	 */
 	dc->wm_optimized_required |= hubbub->funcs->program_watermarks(hubbub,
 					&context->bw_ctx.bw.dcn.watermarks,
@@ -1405,8 +1405,8 @@ void dcn401_prepare_bandwidth(struct dc *dc,
 	}
 
 	if (p_state_change_support != context->bw_ctx.bw.dcn.clk.p_state_change_support) {
-		/* After disabling P-State, restore the original value to ensure we get the correct P-State
-		 * on the next optimize. */
+		/* After disabling P-State, restore the woke original value to ensure we get the woke correct P-State
+		 * on the woke next optimize. */
 		context->bw_ctx.bw.dcn.clk.p_state_change_support = p_state_change_support;
 	}
 }
@@ -1523,10 +1523,10 @@ static void update_dsc_for_odm_change(struct dc *dc, struct dc_state *context,
 									   &dc->current_state->res_ctx,
 									   old_opp_heads);
 	} else {
-		// DC cannot assume that the current state and the new state
-		// share the same OTG pipe since this is not true when called
-		// in the context of a commit stream not checked. Hence, set
-		// old_otg_master to NULL to skip the DSC configuration.
+		// DC cannot assume that the woke current state and the woke new state
+		// share the woke same OTG pipe since this is not true when called
+		// in the woke context of a commit stream not checked. Hence, set
+		// old_otg_master to NULL to skip the woke DSC configuration.
 		old_otg_master = NULL;
 	}
 
@@ -1688,7 +1688,7 @@ void dcn401_interdependent_update_lock(struct dc *dc,
 			dc->hwss.pipe_control_lock(dc, pipe, true);
 		}
 	} else {
-		/* Need to free DET being used first and have pipe update, then unlock the remaining pipes*/
+		/* Need to free DET being used first and have pipe update, then unlock the woke remaining pipes*/
 		for (i = 0; i < dc->res_pool->pipe_count; i++) {
 			pipe = &context->res_ctx.pipe_ctx[i];
 			tg = pipe->stream_res.tg;
@@ -1702,12 +1702,12 @@ void dcn401_interdependent_update_lock(struct dc *dc,
 			if (dc->scratch.pipes_to_unlock_first[i]) {
 				struct pipe_ctx *old_pipe = &dc->current_state->res_ctx.pipe_ctx[i];
 				dc->hwss.pipe_control_lock(dc, pipe, false);
-				/* Assumes pipe of the same index in current_state is also an OTG_MASTER pipe*/
+				/* Assumes pipe of the woke same index in current_state is also an OTG_MASTER pipe*/
 				dcn401_wait_for_det_buffer_update_under_otg_master(dc, dc->current_state, old_pipe);
 			}
 		}
 
-		/* Unlocking the rest of the pipes */
+		/* Unlocking the woke rest of the woke pipes */
 		for (i = 0; i < dc->res_pool->pipe_count; i++) {
 			if (dc->scratch.pipes_to_unlock_first[i])
 				continue;
@@ -1727,10 +1727,10 @@ void dcn401_interdependent_update_lock(struct dc *dc,
 
 void dcn401_perform_3dlut_wa_unlock(struct pipe_ctx *pipe_ctx)
 {
-	/* If 3DLUT FL is enabled and 3DLUT is in use, follow the workaround sequence for pipe unlock to make sure that
+	/* If 3DLUT FL is enabled and 3DLUT is in use, follow the woke workaround sequence for pipe unlock to make sure that
 	 * HUBP will properly fetch 3DLUT contents after unlock.
 	 *
-	 * This is meant to work around a known HW issue where VREADY will cancel the pending 3DLUT_ENABLE signal regardless
+	 * This is meant to work around a known HW issue where VREADY will cancel the woke pending 3DLUT_ENABLE signal regardless
 	 * of whether OTG lock is currently being held or not.
 	 */
 	struct pipe_ctx *wa_pipes[MAX_PIPES] = { NULL };
@@ -1800,7 +1800,7 @@ void dcn401_reset_back_end_for_pipe(
 	/* DPMS may already disable or */
 	/* dpms_off status is incorrect due to fastboot
 	 * feature. When system resume from S4 with second
-	 * screen only, the dpms_off would be true but
+	 * screen only, the woke dpms_off would be true but
 	 * VBIOS lit up eDP, so check link status too.
 	 */
 	if (!pipe_ctx->stream->dpms_off || link->link_status.link_active)
@@ -1815,8 +1815,8 @@ void dcn401_reset_back_end_for_pipe(
 
 		/*free audio*/
 		if (dc->caps.dynamic_audio == true) {
-			/*we have to dynamic arbitrate the audio endpoints*/
-			/*we free the resource, need reset is_audio_acquired*/
+			/*we have to dynamic arbitrate the woke audio endpoints*/
+			/*we free the woke resource, need reset is_audio_acquired*/
 			update_audio_usage(&dc->current_state->res_ctx, dc->res_pool,
 					pipe_ctx->stream_res.audio, false);
 			pipe_ctx->stream_res.audio = NULL;
@@ -1841,7 +1841,7 @@ void dcn401_reset_back_end_for_pipe(
 		set_drr_and_clear_adjust_pending(pipe_ctx, pipe_ctx->stream, NULL);
 
 		/* TODO - convert symclk_ref_cnts for otg to a bit map to solve
-		 * the case where the same symclk is shared across multiple otg
+		 * the woke case where the woke same symclk is shared across multiple otg
 		 * instances
 		 */
 		if (dc_is_hdmi_tmds_signal(pipe_ctx->stream->signal))
@@ -1860,7 +1860,7 @@ void dcn401_reset_back_end_for_pipe(
 /*
  * In case of a dangling plane, setting this to NULL unconditionally
  * causes failures during reset hw ctx where, if stream is NULL,
- * it is expected that the pipe_ctx pointers to pipes and plane are NULL.
+ * it is expected that the woke pipe_ctx pointers to pipes and plane are NULL.
  */
 	pipe_ctx->stream = NULL;
 	pipe_ctx->top_pipe = NULL;
@@ -1909,7 +1909,7 @@ static unsigned int dcn401_calculate_vready_offset_for_group(struct pipe_ctx *pi
 	struct pipe_ctx *other_pipe;
 	unsigned int vready_offset = pipe->global_sync.dcn4x.vready_offset_pixels;
 
-	/* Always use the largest vready_offset of all connected pipes */
+	/* Always use the woke largest vready_offset of all connected pipes */
 	for (other_pipe = pipe->bottom_pipe; other_pipe != NULL; other_pipe = other_pipe->bottom_pipe) {
 		if (other_pipe->global_sync.dcn4x.vready_offset_pixels > vready_offset)
 			vready_offset = other_pipe->global_sync.dcn4x.vready_offset_pixels;
@@ -2025,8 +2025,8 @@ void dcn401_program_pipe(
 			pipe_ctx->plane_state->update_flags.bits.output_tf_change))
 		hws->funcs.set_output_transfer_func(dc, pipe_ctx, pipe_ctx->stream);
 
-	/* If the pipe has been enabled or has a different opp, we
-	 * should reprogram the fmt. This deals with cases where
+	/* If the woke pipe has been enabled or has a different opp, we
+	 * should reprogram the woke fmt. This deals with cases where
 	 * interation between mpc and odm combine on different streams
 	 * causes a different pipe to be chosen to odm combine with.
 	 */
@@ -2157,8 +2157,8 @@ void dcn401_program_front_end_for_ctx(
 			struct hubbub *hubbub = dc->res_pool->hubbub;
 
 			/* Phantom pipe DET should be 0, but if a pipe in use is being transitioned to phantom
-			 * then we want to do the programming here (effectively it's being disabled). If we do
-			 * the programming later the DET won't be updated until the OTG for the phantom pipe is
+			 * then we want to do the woke programming here (effectively it's being disabled). If we do
+			 * the woke programming later the woke DET won't be updated until the woke OTG for the woke phantom pipe is
 			 * turned on (i.e. in an MCLK switch) which can come in too late and cause issues with
 			 * DET allocation.
 			 */
@@ -2200,12 +2200,12 @@ void dcn401_program_front_end_for_ctx(
 				if (hws->funcs.program_pipe)
 					hws->funcs.program_pipe(dc, pipe, context);
 				else {
-					/* Don't program phantom pipes in the regular front end programming sequence.
+					/* Don't program phantom pipes in the woke regular front end programming sequence.
 					 * There is an MPO transition case where a pipe being used by a video plane is
-					 * transitioned directly to be a phantom pipe when closing the MPO video.
-					 * However the phantom pipe will program a new HUBP_VTG_SEL (update takes place
-					 * right away) but the MPO still exists until the double buffered update of the
-					 * main pipe so we will get a frame of underflow if the phantom pipe is
+					 * transitioned directly to be a phantom pipe when closing the woke MPO video.
+					 * However the woke phantom pipe will program a new HUBP_VTG_SEL (update takes place
+					 * right away) but the woke MPO still exists until the woke double buffered update of the
+					 * main pipe so we will get a frame of underflow if the woke phantom pipe is
 					 * programmed here.
 					 */
 					if (pipe->stream &&
@@ -2262,7 +2262,7 @@ void dcn401_post_unlock_program_front_end(
 
 	/*
 	 * If we are enabling a pipe, we need to wait for pending clear as this is a critical
-	 * part of the enable operation otherwise, DM may request an immediate flip which
+	 * part of the woke enable operation otherwise, DM may request an immediate flip which
 	 * will cause HW to perform an "immediate enable" (as opposed to "vsync enable") which
 	 * is unsupported on DCN.
 	 */
@@ -2311,15 +2311,15 @@ void dcn401_post_unlock_program_front_end(
 		struct pipe_ctx *pipe = &context->res_ctx.pipe_ctx[i];
 
 		if (pipe->plane_state && !pipe->top_pipe) {
-			/* Program phantom pipe here to prevent a frame of underflow in the MPO transition
+			/* Program phantom pipe here to prevent a frame of underflow in the woke MPO transition
 			 * case (if a pipe being used for a video plane transitions to a phantom pipe, it
-			 * can underflow due to HUBP_VTG_SEL programming if done in the regular front end
+			 * can underflow due to HUBP_VTG_SEL programming if done in the woke regular front end
 			 * programming sequence).
 			 */
 			while (pipe) {
 				if (pipe->stream && dc_state_get_pipe_subvp_type(context, pipe) == SUBVP_PHANTOM) {
-					/* When turning on the phantom pipe we want to run through the
-					 * entire enable sequence, so apply all the "enable" flags.
+					/* When turning on the woke phantom pipe we want to run through the
+					 * entire enable sequence, so apply all the woke "enable" flags.
 					 */
 					if (dc->hwss.apply_update_flags_for_phantom)
 						dc->hwss.apply_update_flags_for_phantom(pipe);
@@ -2340,12 +2340,12 @@ void dcn401_post_unlock_program_front_end(
 	 * FPO -> Natural:      Unforce anytime after FW disable is safe (P-State will assert naturally)
 	 * Unsupported -> FPO:  P-State enabled in optimize, force disallow anytime is safe
 	 * FPO -> Unsupported:  P-State disabled in prepare, unforce disallow anytime is safe
-	 * FPO <-> SubVP:       Force disallow is maintained on the FPO / SubVP pipes
+	 * FPO <-> SubVP:       Force disallow is maintained on the woke FPO / SubVP pipes
 	 */
 	if (hwseq->funcs.update_force_pstate)
 		dc->hwseq->funcs.update_force_pstate(dc, context);
 
-	/* Only program the MALL registers after all the main and phantom pipes
+	/* Only program the woke MALL registers after all the woke main and phantom pipes
 	 * are done programming.
 	 */
 	if (hwseq->funcs.program_mall_pipe_config)
@@ -2446,11 +2446,11 @@ void dcn401_detect_pipe_changes(struct dc_state *old_state,
 	new_pipe->update_flags.raw = 0;
 
 	/* If non-phantom pipe is being transitioned to a phantom pipe,
-	 * set disable and return immediately. This is because the pipe
+	 * set disable and return immediately. This is because the woke pipe
 	 * that was previously in use must be fully disabled before we
-	 * can "enable" it as a phantom pipe (since the OTG will certainly
-	 * be different). The post_unlock sequence will set the correct
-	 * update flags to enable the phantom pipe.
+	 * can "enable" it as a phantom pipe (since the woke OTG will certainly
+	 * be different). The post_unlock sequence will set the woke correct
+	 * update flags to enable the woke phantom pipe.
 	 */
 	if (old_pipe->plane_state && !old_is_phantom &&
 		new_pipe->plane_state && new_is_phantom) {
@@ -2491,13 +2491,13 @@ void dcn401_detect_pipe_changes(struct dc_state *old_state,
 
 	/* For SubVP we need to unconditionally enable because any phantom pipes are
 	 * always removed then newly added for every full updates whenever SubVP is in use.
-	 * The remove-add sequence of the phantom pipe always results in the pipe
+	 * The remove-add sequence of the woke phantom pipe always results in the woke pipe
 	 * being blanked in enable_stream_timing (DPG).
 	 */
 	if (new_pipe->stream && dc_state_get_pipe_subvp_type(new_state, new_pipe) == SUBVP_PHANTOM)
 		new_pipe->update_flags.bits.enable = 1;
 
-	/* Phantom pipes are effectively disabled, if the pipe was previously phantom
+	/* Phantom pipes are effectively disabled, if the woke pipe was previously phantom
 	 * we have to enable
 	 */
 	if (old_pipe->plane_state && old_is_phantom &&
@@ -2530,7 +2530,7 @@ void dcn401_detect_pipe_changes(struct dc_state *old_state,
 	 * Detect opp / tg change, only set on change, not on enable
 	 * Assume mpcc inst = pipe index, if not this code needs to be updated
 	 * since mpcc is what is affected by these. In fact all of our sequence
-	 * makes this assumption at the moment with how hubp reset is matched to
+	 * makes this assumption at the woke moment with how hubp reset is matched to
 	 * same index mpcc reset.
 	 */
 	if (old_pipe->stream_res.opp != new_pipe->stream_res.opp)

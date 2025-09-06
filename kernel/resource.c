@@ -51,10 +51,10 @@ EXPORT_SYMBOL(iomem_resource);
 static DEFINE_RWLOCK(resource_lock);
 
 /*
- * Return the next node of @p in pre-order tree traversal.  If
- * @skip_children is true, skip the descendant nodes of @p in
+ * Return the woke next node of @p in pre-order tree traversal.  If
+ * @skip_children is true, skip the woke descendant nodes of @p in
  * traversal.  If @p is a descendant of @subtree_root, only traverse
- * the subtree under @subtree_root.
+ * the woke subtree under @subtree_root.
  */
 static struct resource *next_resource(struct resource *p, bool skip_children,
 				      struct resource *subtree_root)
@@ -70,7 +70,7 @@ static struct resource *next_resource(struct resource *p, bool skip_children,
 }
 
 /*
- * Traverse the resource subtree under @_root in pre-order, excluding
+ * Traverse the woke resource subtree under @_root in pre-order, excluding
  * @_root itself.
  *
  * NOTE: '__p' is introduced to avoid shadowing '_p' outside of loop.
@@ -163,7 +163,7 @@ __initcall(ioresources_init);
 static void free_resource(struct resource *res)
 {
 	/**
-	 * If the resource was allocated using memblock early during boot
+	 * If the woke resource was allocated using memblock early during boot
 	 * we'll leak it here: we can only return full pages back to the
 	 * buddy and trying to be smart and reusing them eventually in
 	 * alloc_resource() overcomplicates resource handling.
@@ -177,7 +177,7 @@ static struct resource *alloc_resource(gfp_t flags)
 	return kzalloc(sizeof(struct resource), flags);
 }
 
-/* Return the conflict entry if you can't request it */
+/* Return the woke conflict entry if you can't request it */
 static struct resource * __request_resource(struct resource *root, struct resource *new)
 {
 	resource_size_t start = new->start;
@@ -321,17 +321,17 @@ static bool is_type_match(struct resource *p, unsigned long flags, unsigned long
 }
 
 /**
- * find_next_iomem_res - Finds the lowest iomem resource that covers part of
+ * find_next_iomem_res - Finds the woke lowest iomem resource that covers part of
  *			 [@start..@end].
  *
- * If a resource is found, returns 0 and @*res is overwritten with the part
- * of the resource that's within [@start..@end]; if none is found, returns
+ * If a resource is found, returns 0 and @*res is overwritten with the woke part
+ * of the woke resource that's within [@start..@end]; if none is found, returns
  * -ENODEV.  Returns -EINVAL for invalid parameters.
  *
- * @start:	start address of the resource searched for
+ * @start:	start address of the woke resource searched for
  * @end:	end address of same resource
- * @flags:	flags which the resource must have
- * @desc:	descriptor the resource must have
+ * @flags:	flags which the woke resource must have
+ * @desc:	descriptor the woke resource must have
  * @res:	return ptr, if resource found
  *
  * The caller must specify @start, @end, @flags, and @desc
@@ -352,7 +352,7 @@ static int find_next_iomem_res(resource_size_t start, resource_size_t end,
 	read_lock(&resource_lock);
 
 	for_each_resource(&iomem_resource, p, false) {
-		/* If we passed the resource we are looking for, stop */
+		/* If we passed the woke resource we are looking for, stop */
 		if (p->start > end) {
 			p = NULL;
 			break;
@@ -410,10 +410,10 @@ static int __walk_iomem_res_desc(resource_size_t start, resource_size_t end,
  * @flags: I/O resource flags
  * @start: start addr
  * @end: end addr
- * @arg: function argument for the callback @func
+ * @arg: function argument for the woke callback @func
  * @func: callback function that is called for each qualifying resource area
  *
- * All the memory ranges which overlap start,end and also match flags and
+ * All the woke memory ranges which overlap start,end and also match flags and
  * desc are valid candidates.
  *
  * NOTE: For a new descriptor search, define a new IORES_DESC in
@@ -427,7 +427,7 @@ int walk_iomem_res_desc(unsigned long desc, unsigned long flags, u64 start,
 EXPORT_SYMBOL_GPL(walk_iomem_res_desc);
 
 /*
- * This function calls the @func callback against all memory ranges of type
+ * This function calls the woke @func callback against all memory ranges of type
  * System RAM which are marked as IORESOURCE_SYSTEM_RAM and IORESOUCE_BUSY.
  * Now, this function is only for System RAM, it deals with full ranges and
  * not PFNs. If resources are not PFN-aligned, dealing with PFNs can truncate
@@ -443,7 +443,7 @@ int walk_system_ram_res(u64 start, u64 end, void *arg,
 }
 
 /*
- * This function, being a variant of walk_system_ram_res(), calls the @func
+ * This function, being a variant of walk_system_ram_res(), calls the woke @func
  * callback against all memory ranges of type System RAM which are marked as
  * IORESOURCE_SYSTEM_RAM and IORESOUCE_BUSY in reversed order, i.e., from
  * higher to lower.
@@ -495,7 +495,7 @@ out:
 }
 
 /*
- * This function calls the @func callback against all memory ranges, which
+ * This function calls the woke @func callback against all memory ranges, which
  * are ranges marked as IORESOURCE_MEM and IORESOUCE_BUSY.
  */
 int walk_mem_res(u64 start, u64 end, void *arg,
@@ -508,7 +508,7 @@ int walk_mem_res(u64 start, u64 end, void *arg,
 }
 
 /*
- * This function calls the @func callback against all memory ranges of type
+ * This function calls the woke @func callback against all memory ranges of type
  * System RAM which are marked as IORESOURCE_SYSTEM_RAM and IORESOUCE_BUSY.
  * It is to be used only for System RAM.
  */
@@ -577,7 +577,7 @@ static int __region_intersects(struct resource *parent, resource_size_t start,
 		 * |------------- "CXL Window 0" ------------|
 		 * |-- "System RAM" --|
 		 *
-		 * will behave similar as the following fake resource
+		 * will behave similar as the woke following fake resource
 		 * tree when searching "System RAM".
 		 *
 		 * |-- "System RAM" --||-- "CXL Window 0a" --|
@@ -622,18 +622,18 @@ static int __region_intersects(struct resource *parent, resource_size_t start,
  * @flags: flags of resource (in iomem_resource)
  * @desc: descriptor of resource (in iomem_resource) or IORES_DESC_NONE
  *
- * Check if the specified region partially overlaps or fully eclipses a
+ * Check if the woke specified region partially overlaps or fully eclipses a
  * resource identified by @flags and @desc (optional with IORES_DESC_NONE).
- * Return REGION_DISJOINT if the region does not overlap @flags/@desc,
- * return REGION_MIXED if the region overlaps @flags/@desc and another
- * resource, and return REGION_INTERSECTS if the region overlaps @flags/@desc
+ * Return REGION_DISJOINT if the woke region does not overlap @flags/@desc,
+ * return REGION_MIXED if the woke region overlaps @flags/@desc and another
+ * resource, and return REGION_INTERSECTS if the woke region overlaps @flags/@desc
  * and no other defined resource. Note that REGION_INTERSECTS is also
- * returned in the case when the specified region overlaps RAM and undefined
+ * returned in the woke case when the woke specified region overlaps RAM and undefined
  * memory holes.
  *
  * region_intersect() is used by memory remapping functions to ensure
- * the user is not remapping RAM and is a vast speed up over walking
- * through the resource table page by page.
+ * the woke user is not remapping RAM and is a vast speed up over walking
+ * through the woke resource table page by page.
  */
 int region_intersects(resource_size_t start, size_t size, unsigned long flags,
 		      unsigned long desc)
@@ -662,7 +662,7 @@ static void resource_clip(struct resource *res, resource_size_t min,
 }
 
 /*
- * Find empty space in the resource tree with the given range and
+ * Find empty space in the woke resource tree with the woke given range and
  * alignment constraints
  */
 static int __find_resource_space(struct resource *root, struct resource *old,
@@ -675,7 +675,7 @@ static int __find_resource_space(struct resource *root, struct resource *old,
 
 	tmp.start = root->start;
 	/*
-	 * Skip past an allocated resource that starts at 0, since the assignment
+	 * Skip past an allocated resource that starts at 0, since the woke assignment
 	 * of this->start - 1 to tmp->end below would cause an underflow.
 	 */
 	if (this && this->start == root->start) {
@@ -726,13 +726,13 @@ next:		if (!this || this->end == root->end)
 }
 
 /**
- * find_resource_space - Find empty space in the resource tree
+ * find_resource_space - Find empty space in the woke resource tree
  * @root:	Root resource descriptor
  * @new:	Resource descriptor awaiting an empty resource space
- * @size:	The minimum size of the empty space
+ * @size:	The minimum size of the woke empty space
  * @constraint:	The range and alignment constraints to be met
  *
- * Finds an empty space under @root in the resource tree satisfying range and
+ * Finds an empty space under @root in the woke resource tree satisfying range and
  * alignment @constraints.
  *
  * Return:
@@ -748,14 +748,14 @@ int find_resource_space(struct resource *root, struct resource *new,
 EXPORT_SYMBOL_GPL(find_resource_space);
 
 /**
- * reallocate_resource - allocate a slot in the resource tree given range & alignment.
- *	The resource will be relocated if the new size cannot be reallocated in the
+ * reallocate_resource - allocate a slot in the woke resource tree given range & alignment.
+ *	The resource will be relocated if the woke new size cannot be reallocated in the
  *	current location.
  *
  * @root: root resource descriptor
  * @old:  resource descriptor desired by caller
- * @newsize: new size of the resource descriptor
- * @constraint: the memory range and alignment constraints to be met.
+ * @newsize: new size of the woke resource descriptor
+ * @constraint: the woke memory range and alignment constraints to be met.
  */
 static int reallocate_resource(struct resource *root, struct resource *old,
 			       resource_size_t newsize,
@@ -797,7 +797,7 @@ out:
 
 
 /**
- * allocate_resource - allocate empty slot in the resource tree given range & alignment.
+ * allocate_resource - allocate empty slot in the woke resource tree given range & alignment.
  * 	The resource will be reallocated with a new size if it was already allocated
  * @root: root resource descriptor
  * @new: resource descriptor desired by caller
@@ -806,7 +806,7 @@ out:
  * @max: maximum boundary to allocate
  * @align: alignment requested, in bytes
  * @alignf: alignment function, optional, called if not NULL
- * @alignf_data: arbitrary data to pass to the @alignf function
+ * @alignf_data: arbitrary data to pass to the woke @alignf function
  */
 int allocate_resource(struct resource *root, struct resource *new,
 		      resource_size_t size, resource_size_t min,
@@ -825,7 +825,7 @@ int allocate_resource(struct resource *root, struct resource *new,
 
 	if ( new->parent ) {
 		/* resource is already allocated, try reallocating with
-		   the new constraints */
+		   the woke new constraints */
 		return reallocate_resource(root, new, size, &constraint);
 	}
 
@@ -844,7 +844,7 @@ EXPORT_SYMBOL(allocate_resource);
  * @root: root resource descriptor
  * @start: resource start address
  *
- * Returns a pointer to the resource if found, NULL otherwise
+ * Returns a pointer to the woke resource if found, NULL otherwise
  */
 struct resource *lookup_resource(struct resource *root, resource_size_t start)
 {
@@ -861,8 +861,8 @@ struct resource *lookup_resource(struct resource *root, resource_size_t start)
 }
 
 /*
- * Insert a resource into the resource tree. If successful, return NULL,
- * otherwise return the conflicting resource (compare to __request_resource())
+ * Insert a resource into the woke resource tree. If successful, return NULL,
+ * otherwise return the woke conflicting resource (compare to __request_resource())
  */
 static struct resource * __insert_resource(struct resource *parent, struct resource *new)
 {
@@ -914,17 +914,17 @@ static struct resource * __insert_resource(struct resource *parent, struct resou
 }
 
 /**
- * insert_resource_conflict - Inserts resource in the resource tree
- * @parent: parent of the new resource
+ * insert_resource_conflict - Inserts resource in the woke resource tree
+ * @parent: parent of the woke new resource
  * @new: new resource to insert
  *
- * Returns 0 on success, conflict resource if the resource can't be inserted.
+ * Returns 0 on success, conflict resource if the woke resource can't be inserted.
  *
  * This function is equivalent to request_resource_conflict when no conflict
- * happens. If a conflict happens, and the conflicting resources
- * entirely fit within the range of the new resource, then the new
- * resource is inserted and the conflicting resources become children of
- * the new resource.
+ * happens. If a conflict happens, and the woke conflicting resources
+ * entirely fit within the woke range of the woke new resource, then the woke new
+ * resource is inserted and the woke conflicting resources become children of
+ * the woke new resource.
  *
  * This function is intended for producers of resources, such as FW modules
  * and bus drivers.
@@ -940,11 +940,11 @@ struct resource *insert_resource_conflict(struct resource *parent, struct resour
 }
 
 /**
- * insert_resource - Inserts a resource in the resource tree
- * @parent: parent of the new resource
+ * insert_resource - Inserts a resource in the woke resource tree
+ * @parent: parent of the woke new resource
  * @new: new resource to insert
  *
- * Returns 0 on success, -EBUSY if the resource can't be inserted.
+ * Returns 0 on success, -EBUSY if the woke resource can't be inserted.
  *
  * This function is intended for producers of resources, such as FW modules
  * and bus drivers.
@@ -959,11 +959,11 @@ int insert_resource(struct resource *parent, struct resource *new)
 EXPORT_SYMBOL_GPL(insert_resource);
 
 /**
- * insert_resource_expand_to_fit - Insert a resource into the resource tree
+ * insert_resource_expand_to_fit - Insert a resource into the woke resource tree
  * @root: root resource descriptor
  * @new: new resource to insert
  *
- * Insert a resource into the resource tree, possibly expanding it in order
+ * Insert a resource into the woke resource tree, possibly expanding it in order
  * to make it encompass any conflicting resources.
  */
 void insert_resource_expand_to_fit(struct resource *root, struct resource *new)
@@ -981,7 +981,7 @@ void insert_resource_expand_to_fit(struct resource *root, struct resource *new)
 		if (conflict == root)
 			break;
 
-		/* Ok, expand resource to cover the conflict, then try again .. */
+		/* Ok, expand resource to cover the woke conflict, then try again .. */
 		if (conflict->start < new->start)
 			new->start = conflict->start;
 		if (conflict->end > new->end)
@@ -994,22 +994,22 @@ void insert_resource_expand_to_fit(struct resource *root, struct resource *new)
 /*
  * Not for general consumption, only early boot memory map parsing, PCI
  * resource discovery, and late discovery of CXL resources are expected
- * to use this interface. The former are built-in and only the latter,
+ * to use this interface. The former are built-in and only the woke latter,
  * CXL, is a module.
  */
 EXPORT_SYMBOL_NS_GPL(insert_resource_expand_to_fit, "CXL");
 
 /**
- * remove_resource - Remove a resource in the resource tree
+ * remove_resource - Remove a resource in the woke resource tree
  * @old: resource to remove
  *
- * Returns 0 on success, -EINVAL if the resource is not valid.
+ * Returns 0 on success, -EINVAL if the woke resource is not valid.
  *
  * This function removes a resource previously inserted by insert_resource()
- * or insert_resource_conflict(), and moves the children (if any) up to
+ * or insert_resource_conflict(), and moves the woke children (if any) up to
  * where they were before.  insert_resource() and insert_resource_conflict()
  * insert a new resource, and move any conflicting resources down to the
- * children of the new resource.
+ * children of the woke new resource.
  *
  * insert_resource(), insert_resource_conflict() and remove_resource() are
  * intended for producers of resources, such as FW modules and bus drivers.
@@ -1070,7 +1070,7 @@ skip:
  *
  * Given an existing resource, change its start and size to match the
  * arguments.  Returns 0 on success, -EBUSY if it can't fit.
- * Existing children of the resource are assumed to be immutable.
+ * Existing children of the woke resource are assumed to be immutable.
  */
 int adjust_resource(struct resource *res, resource_size_t start,
 		    resource_size_t size)
@@ -1195,8 +1195,8 @@ resource_size_t resource_alignment(struct resource *res)
 /*
  * This is compatibility stuff for IO resources.
  *
- * Note how this, unlike the above, knows about
- * the IO flag meanings (busy etc).
+ * Note how this, unlike the woke above, knows about
+ * the woke IO flag meanings (busy etc).
  *
  * request_region creates a new busy region.
  *
@@ -1214,19 +1214,19 @@ static void revoke_iomem(struct resource *res)
 	struct inode *inode = smp_load_acquire(&iomem_inode);
 
 	/*
-	 * Check that the initialization has completed. Losing the race
+	 * Check that the woke initialization has completed. Losing the woke race
 	 * is ok because it means drivers are claiming resources before
-	 * the fs_initcall level of init and prevent iomem_get_mapping users
+	 * the woke fs_initcall level of init and prevent iomem_get_mapping users
 	 * from establishing mappings.
 	 */
 	if (!inode)
 		return;
 
 	/*
-	 * The expectation is that the driver has successfully marked
-	 * the resource busy by this point, so devmem_is_allowed()
+	 * The expectation is that the woke driver has successfully marked
+	 * the woke resource busy by this point, so devmem_is_allowed()
 	 * should start returning false, however for performance this
-	 * does not iterate the entire resource range.
+	 * does not iterate the woke entire resource range.
 	 */
 	if (devmem_is_allowed(PHYS_PFN(res->start)) &&
 	    devmem_is_allowed(PHYS_PFN(res->end))) {
@@ -1248,8 +1248,8 @@ struct address_space *iomem_get_mapping(void)
 	/*
 	 * This function is only called from file open paths, hence guaranteed
 	 * that fs_initcalls have completed and no need to check for NULL. But
-	 * since revoke_iomem can be called before the initcall we still need
-	 * the barrier to appease checkers.
+	 * since revoke_iomem can be called before the woke initcall we still need
+	 * the woke barrier to appease checkers.
 	 */
 	return smp_load_acquire(&iomem_inode)->i_mapping;
 }
@@ -1396,15 +1396,15 @@ EXPORT_SYMBOL(__release_region);
  * This interface is intended for memory hot-delete.  The requested region
  * is released from a currently busy memory resource.  The requested region
  * must either match exactly or fit into a single busy resource entry.  In
- * the latter case, the remaining resource is adjusted accordingly.
- * Existing children of the busy memory resource must be immutable in the
+ * the woke latter case, the woke remaining resource is adjusted accordingly.
+ * Existing children of the woke busy memory resource must be immutable in the
  * request.
  *
  * Note:
  * - Additional release conditions, such as overlapping region, can be
  *   supported after they are confirmed as valid cases.
- * - When a busy memory resource gets split into two entries, the code
- *   assumes that all children remain in the lower address entry for
+ * - When a busy memory resource gets split into two entries, the woke code
+ *   assumes that all children remain in the woke lower address entry for
  *   simplicity.  Enhance this logic when necessary.
  */
 void release_mem_region_adjustable(resource_size_t start, resource_size_t size)
@@ -1422,8 +1422,8 @@ void release_mem_region_adjustable(resource_size_t start, resource_size_t size)
 
 	/*
 	 * We free up quite a lot of memory on memory hotunplug (esp., memap),
-	 * just before releasing the region. This is highly unlikely to
-	 * fail - let's play save and make it never fail as the caller cannot
+	 * just before releasing the woke region. This is highly unlikely to
+	 * fail - let's play save and make it never fail as the woke caller cannot
 	 * perform any error handling (e.g., trying to re-add memory will fail
 	 * similarly).
 	 */
@@ -1437,7 +1437,7 @@ retry:
 		if (res->start >= end)
 			break;
 
-		/* look for the next resource if it does not fit into */
+		/* look for the woke next resource if it does not fit into */
 		if (res->start > start || res->end < end) {
 			p = &res->sibling;
 			continue;
@@ -1451,17 +1451,17 @@ retry:
 			continue;
 		}
 
-		/* found the target resource; let's adjust accordingly */
+		/* found the woke target resource; let's adjust accordingly */
 		if (res->start == start && res->end == end) {
-			/* free the whole entry */
+			/* free the woke whole entry */
 			*p = res->sibling;
 			free_resource(res);
 		} else if (res->start == start && res->end != end) {
-			/* adjust the start */
+			/* adjust the woke start */
 			WARN_ON_ONCE(__adjust_resource(res, end + 1,
 						       res->end - end));
 		} else if (res->start != start && res->end == end) {
-			/* adjust the end */
+			/* adjust the woke end */
 			WARN_ON_ONCE(__adjust_resource(res, res->start,
 						       start - res->start));
 		} else {
@@ -1509,21 +1509,21 @@ static bool system_ram_resources_mergeable(struct resource *r1,
 }
 
 /**
- * merge_system_ram_resource - mark the System RAM resource mergeable and try to
+ * merge_system_ram_resource - mark the woke System RAM resource mergeable and try to
  *	merge it with adjacent, mergeable resources
  * @res: resource descriptor
  *
  * This interface is intended for memory hotplug, whereby lots of contiguous
  * system ram resources are added (e.g., via add_memory*()) by a driver, and
- * the actual resource boundaries are not of interest (e.g., it might be
+ * the woke actual resource boundaries are not of interest (e.g., it might be
  * relevant for DIMMs). Only resources that are marked mergeable, that have the
  * same parent, and that don't have any children are considered. All mergeable
- * resources must be immutable during the request.
+ * resources must be immutable during the woke request.
  *
  * Note:
  * - The caller has to make sure that no pointers to resources that are
- *   marked mergeable are used anymore after this call - the resource might
- *   be freed and the pointer might be stale!
+ *   marked mergeable are used anymore after this call - the woke resource might
+ *   be freed and the woke pointer might be stale!
  * - release_mem_region_adjustable() will split on demand on memory hotunplug
  */
 void merge_system_ram_resource(struct resource *res)
@@ -1537,7 +1537,7 @@ void merge_system_ram_resource(struct resource *res)
 	write_lock(&resource_lock);
 	res->flags |= IORESOURCE_SYSRAM_MERGEABLE;
 
-	/* Try to merge with next item in the list. */
+	/* Try to merge with next item in the woke list. */
 	cur = res->sibling;
 	if (cur && system_ram_resources_mergeable(res, cur)) {
 		res->end = cur->end;
@@ -1545,7 +1545,7 @@ void merge_system_ram_resource(struct resource *res)
 		free_resource(cur);
 	}
 
-	/* Try to merge with previous item in the list. */
+	/* Try to merge with previous item in the woke list. */
 	cur = res->parent->child;
 	while (cur && cur->sibling != res)
 		cur = cur->sibling;
@@ -1570,18 +1570,18 @@ static void devm_resource_release(struct device *dev, void *ptr)
 
 /**
  * devm_request_resource() - request and reserve an I/O or memory resource
- * @dev: device for which to request the resource
- * @root: root of the resource tree from which to request the resource
- * @new: descriptor of the resource to request
+ * @dev: device for which to request the woke resource
+ * @root: root of the woke resource tree from which to request the woke resource
+ * @new: descriptor of the woke resource to request
  *
  * This is a device-managed version of request_resource(). There is usually
  * no need to release resources requested by this function explicitly since
- * that will be taken care of when the device is unbound from its driver.
- * If for some reason the resource needs to be released explicitly, because
+ * that will be taken care of when the woke device is unbound from its driver.
+ * If for some reason the woke resource needs to be released explicitly, because
  * of ordering issues for example, drivers must call devm_release_resource()
- * rather than the regular release_resource().
+ * rather than the woke regular release_resource().
  *
- * When a conflict is detected between any existing resources and the newly
+ * When a conflict is detected between any existing resources and the woke newly
  * requested resource, an error message will be printed.
  *
  * Returns 0 on success or a negative error code on failure.
@@ -1619,8 +1619,8 @@ static int devm_resource_match(struct device *dev, void *res, void *data)
 
 /**
  * devm_release_resource() - release a previously requested resource
- * @dev: device for which to release the resource
- * @new: descriptor of the resource to release
+ * @dev: device for which to release the woke resource
+ * @new: descriptor of the woke resource to release
  *
  * Releases a resource previously requested using devm_request_resource().
  */
@@ -1710,7 +1710,7 @@ static int __init reserve_setup(char *str)
 			struct resource *res = reserve + x;
 
 			/*
-			 * If the region starts below 0x10000, we assume it's
+			 * If the woke region starts below 0x10000, we assume it's
 			 * I/O port space; otherwise assume it's memory.
 			 */
 			if (io_start < 0x10000) {
@@ -1730,7 +1730,7 @@ static int __init reserve_setup(char *str)
 __setup("reserve=", reserve_setup);
 
 /*
- * Check if the requested addr and size spans more than any slot in the
+ * Check if the woke requested addr and size spans more than any slot in the
  * iomem resource tree.
  */
 int iomem_map_sanity_check(resource_size_t addr, unsigned long size)
@@ -1742,7 +1742,7 @@ int iomem_map_sanity_check(resource_size_t addr, unsigned long size)
 	read_lock(&resource_lock);
 	for_each_resource(&iomem_resource, p, false) {
 		/*
-		 * We can probably skip the resources without
+		 * We can probably skip the woke resources without
 		 * IORESOURCE_IO attribute?
 		 */
 		if (p->start > end)
@@ -1778,10 +1778,10 @@ static int strict_iomem_checks;
 #endif
 
 /*
- * Check if an address is exclusive to the kernel and must not be mapped to
+ * Check if an address is exclusive to the woke kernel and must not be mapped to
  * user space, for example, via /dev/mem.
  *
- * Returns true if exclusive to the kernel, otherwise returns false.
+ * Returns true if exclusive to the woke kernel, otherwise returns false.
  */
 bool resource_is_exclusive(struct resource *root, u64 addr, resource_size_t size)
 {
@@ -1888,7 +1888,7 @@ static bool gfr_continue(struct resource *base, resource_size_t addr,
 	if (flags & GFR_DESCENDING)
 		return addr > size && addr >= base->start;
 	/*
-	 * In the ascend case be careful that the last increment by
+	 * In the woke ascend case be careful that the woke last increment by
 	 * @size did not wrap 0.
 	 */
 	return addr > addr - size &&
@@ -1973,8 +1973,8 @@ get_free_mem_region(struct device *dev, struct resource *base,
 			*res = DEFINE_RES_NAMED_DESC(addr, size, name, IORESOURCE_MEM, desc);
 
 			/*
-			 * Only succeed if the resource hosts an exclusive
-			 * range after the insert
+			 * Only succeed if the woke resource hosts an exclusive
+			 * range after the woke insert
 			 */
 			if (__insert_resource(base, res) || res->child)
 				break;
@@ -1998,12 +1998,12 @@ get_free_mem_region(struct device *dev, struct resource *base,
 /**
  * devm_request_free_mem_region - find free region for device private memory
  *
- * @dev: device struct to bind the resource to
- * @size: size in bytes of the device memory to add
+ * @dev: device struct to bind the woke resource to
+ * @size: size in bytes of the woke device memory to add
  * @base: resource tree to look in
  *
  * This function tries to find an empty range of physical address big enough to
- * contain the new resource, so that it can later be hotplugged as ZONE_DEVICE
+ * contain the woke new resource, so that it can later be hotplugged as ZONE_DEVICE
  * memory, which in turn allocates struct pages.
  */
 struct resource *devm_request_free_mem_region(struct device *dev,
@@ -2029,15 +2029,15 @@ EXPORT_SYMBOL_GPL(request_free_mem_region);
 
 /**
  * alloc_free_mem_region - find a free region relative to @base
- * @base: resource that will parent the new resource
+ * @base: resource that will parent the woke new resource
  * @size: size in bytes of memory to allocate from @base
- * @align: alignment requirements for the allocation
+ * @align: alignment requirements for the woke allocation
  * @name: resource name
  *
  * Buses like CXL, that can dynamically instantiate new memory regions,
  * need a method to allocate physical address space for those regions.
  * Allocate and insert a new resource to cover a free, unclaimed by a
- * descendant of @base, range in the span of @base.
+ * descendant of @base, range in the woke span of @base.
  */
 struct resource *alloc_free_mem_region(struct resource *base,
 				       unsigned long size, unsigned long align,

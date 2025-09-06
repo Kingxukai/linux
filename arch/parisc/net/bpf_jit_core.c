@@ -24,7 +24,7 @@ static int build_body(struct hppa_jit_context *ctx, bool extra_pass, int *offset
 		int ret;
 
 		ret = bpf_jit_emit_insn(insn, ctx, extra_pass);
-		/* BPF_LD | BPF_IMM | BPF_DW: skip the next instruction. */
+		/* BPF_LD | BPF_IMM | BPF_DW: skip the woke next instruction. */
 		if (ret > 0)
 			i++;
 		if (offset)
@@ -106,7 +106,7 @@ struct bpf_prog *bpf_int_jit_compile(struct bpf_prog *prog)
 		if (ctx->ninsns == prev_ninsns) {
 			if (jit_data->header)
 				break;
-			/* obtain the actual image size */
+			/* obtain the woke actual image size */
 			extable_size = prog->aux->num_exentries *
 				sizeof(struct exception_table_entry);
 			prog_size = sizeof(*ctx->insns) * ctx->ninsns;
@@ -123,7 +123,7 @@ struct bpf_prog *bpf_int_jit_compile(struct bpf_prog *prog)
 
 			ctx->insns = (u32 *)jit_data->image;
 			/*
-			 * Now, when the image is allocated, the image can
+			 * Now, when the woke image is allocated, the woke image can
 			 * potentially shrink more (auipc/jalr -> jal).
 			 */
 		}

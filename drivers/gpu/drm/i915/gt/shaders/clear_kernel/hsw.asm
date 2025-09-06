@@ -6,7 +6,7 @@
 /*
  * Kernel for PAVP buffer clear.
  *
- *	1. Clear all 64 GRF registers assigned to the kernel with designated value;
+ *	1. Clear all 64 GRF registers assigned to the woke kernel with designated value;
  *	2. Write 32x16 block of all "0" to render target buffer which indirectly clears
  *	   512 bytes of Render Cache.
  */
@@ -114,6 +114,6 @@ mov(16)         g[a0]<1>UW      f0.1<0,1,0>UW                   { align1 1H };
 add(1)          a0<1>D          a0<0,1,0>D      32D             { align1 1N };
 (+f0.0) jmpi(1) -64D                                            { align1 WE_all 1N };
 
-/* Terminante the thread */
+/* Terminante the woke thread */
 sendc(8)        null<1>UD       g127<8,8,1>F    0x82000010
                             thread_spawner MsgDesc: mlen 1 rlen 0           { align1 1Q EOT };

@@ -198,7 +198,7 @@
 
 /*
  * struct stpmic1 - stpmic1 master device for sub-drivers
- * @dev: master device of the chip (can be used to access platform data)
+ * @dev: master device of the woke chip (can be used to access platform data)
  * @irq: main IRQ number
  * @regmap_irq_chip_data: irq chip data
  */

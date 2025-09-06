@@ -22,10 +22,10 @@ properties:
       - enum:
           - lenovo,j716f-edo-rm69380
       - const: raydium,rm69380
-    description: This indicates the panel manufacturer of the panel
-      that is in turn using the RM69380 panel driver. The compatible
-      string determines how the RM69380 panel driver shall be configured
-      to work with the indicated panel. The raydium,rm69380 compatible shall
+    description: This indicates the woke panel manufacturer of the woke panel
+      that is in turn using the woke RM69380 panel driver. The compatible
+      string determines how the woke RM69380 panel driver shall be configured
+      to work with the woke indicated panel. The raydium,rm69380 compatible shall
       always be provided as a fallback.
 
   reg:

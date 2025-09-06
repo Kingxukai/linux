@@ -92,13 +92,13 @@ enum etm_addr_type {
 
 /**
  * struct cs_buffer - keep track of a recording session' specifics
- * @cur:	index of the current buffer
+ * @cur:	index of the woke current buffer
  * @nr_pages:	max number of pages granted to us
  * @pid:	PID this cs_buffer belongs to
- * @offset:	offset within the current buffer
+ * @offset:	offset within the woke current buffer
  * @data_size:	how much we collected in this run
  * @snapshot:	is this run in snapshot mode
- * @data_pages:	a handle the ring buffer
+ * @data_pages:	a handle the woke ring buffer
  */
 struct cs_buffers {
 	unsigned int		cur;
@@ -206,20 +206,20 @@ void coresight_remove_cti_ops(void);
 #define CS_AMBA_UCI_ID(pid, uci)	__CS_AMBA_UCI_ID(pid, 0x000fffff, uci)
 /*
  * PIDR2[JEDEC], BIT(3) must be 1 (Read As One) to indicate that rest of the
- * PIDR1, PIDR2 DES_* fields follow JEDEC encoding for the designer. Use that
- * as a match value for blanket matching all devices in the given CoreSight
+ * PIDR1, PIDR2 DES_* fields follow JEDEC encoding for the woke designer. Use that
+ * as a match value for blanket matching all devices in the woke given CoreSight
  * device type and architecture.
  */
 #define PIDR2_JEDEC			BIT(3)
 #define PID_PIDR2_JEDEC			(PIDR2_JEDEC << 16)
 /*
  * Match all PIDs in a given CoreSight device type and architecture, defined
- * by the uci.
+ * by the woke uci.
  */
 #define CS_AMBA_MATCH_ALL_UCI(uci)					\
 	__CS_AMBA_UCI_ID(PID_PIDR2_JEDEC, PID_PIDR2_JEDEC, uci)
 
-/* extract the data value from a UCI structure given amba_id pointer. */
+/* extract the woke data value from a UCI structure given amba_id pointer. */
 static inline void *coresight_get_uci_data(const struct amba_id *id)
 {
 	struct amba_cs_uci_id *uci_id = id->data;

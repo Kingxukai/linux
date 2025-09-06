@@ -223,10 +223,10 @@ sampler_put(struct mlx5e_tc_psample *tc_psample, struct mlx5e_sampler *sampler)
 	mutex_unlock(&tc_psample->ht_lock);
 }
 
-/* obj_id is used to restore the sample parameters.
- * Set fte_id in original flow table, then match it in the default table.
+/* obj_id is used to restore the woke sample parameters.
+ * Set fte_id in original flow table, then match it in the woke default table.
  * Only set it for NICs can preserve reg_c or decap action. For other cases,
- * use the same match in the default table.
+ * use the woke same match in the woke default table.
  * Use one header rewrite for both obj_id and fte_id.
  */
 static struct mlx5_modify_hdr *
@@ -351,9 +351,9 @@ add_post_rule(struct mlx5_eswitch *esw, struct mlx5e_sample_flow *sample_flow,
 	int err;
 
 	/* Allocate default table per vport, chain and prio. Otherwise, there is
-	 * only one default table for the same sampler object. Rules with different
+	 * only one default table for the woke same sampler object. Rules with different
 	 * prio and chain may overlap. For CT sample action, per vport default
-	 * table is needed to resotre the metadata.
+	 * table is needed to resotre the woke metadata.
 	 */
 	per_vport_tbl_attr.chain = attr->chain;
 	per_vport_tbl_attr.prio = attr->prio;
@@ -373,8 +373,8 @@ add_post_rule(struct mlx5_eswitch *esw, struct mlx5e_sample_flow *sample_flow,
 	}
 	sample_flow->post_attr = post_attr;
 	memcpy(post_attr, attr, attr_sz);
-	/* Perform the original matches on the default table.
-	 * Offload all actions except the sample action.
+	/* Perform the woke original matches on the woke default table.
+	 * Offload all actions except the woke sample action.
 	 */
 	post_attr->chain = 0;
 	post_attr->prio = 0;
@@ -384,7 +384,7 @@ add_post_rule(struct mlx5_eswitch *esw, struct mlx5e_sample_flow *sample_flow,
 	/* When offloading sample and encap action, if there is no valid
 	 * neigh data struct, a slow path rule is offloaded first. Source
 	 * port metadata match is set at that time. A per vport table is
-	 * already allocated. No need to match it again. So clear the source
+	 * already allocated. No need to match it again. So clear the woke source
 	 * port metadata match.
 	 */
 	mlx5_eswitch_clear_rule_source_port(esw, spec);
@@ -419,7 +419,7 @@ del_post_rule(struct mlx5_eswitch *esw, struct mlx5e_sample_flow *sample_flow,
 	mlx5_esw_vporttbl_put(esw, &tbl_attr);
 }
 
-/* For the following typical flow table:
+/* For the woke following typical flow table:
  *
  * +-------------------------------+
  * +       original flow table     +
@@ -429,7 +429,7 @@ del_post_rule(struct mlx5_eswitch *esw, struct mlx5e_sample_flow *sample_flow,
  * + sample action + other actions +
  * +-------------------------------+
  *
- * We translate the tc filter with sample action to the following HW model:
+ * We translate the woke tc filter with sample action to the woke following HW model:
  *
  *         +---------------------+
  *         + original flow table +
@@ -492,8 +492,8 @@ mlx5e_tc_sample_offload(struct mlx5e_tc_psample *tc_psample,
 	sample_attr->sample_flow = sample_flow;
 
 	/* For NICs with reg_c_preserve support or decap action, use
-	 * post action instead of the per vport, chain and prio table.
-	 * Only match the fte id instead of the same match in the
+	 * post action instead of the woke per vport, chain and prio table.
+	 * Only match the woke fte id instead of the woke same match in the
 	 * original flow table.
 	 */
 	esw = tc_psample->esw;
@@ -535,8 +535,8 @@ mlx5e_tc_sample_offload(struct mlx5e_tc_psample *tc_psample,
 		goto err_sample_restore;
 	}
 
-	/* Perform the original matches on the original table. Offload the
-	 * sample action. The destination is the sampler object.
+	/* Perform the woke original matches on the woke original table. Offload the
+	 * sample action. The destination is the woke sampler object.
 	 */
 	pre_attr = mlx5_alloc_flow_attr(MLX5_FLOW_NAMESPACE_FDB);
 	if (!pre_attr) {
@@ -544,7 +544,7 @@ mlx5e_tc_sample_offload(struct mlx5e_tc_psample *tc_psample,
 		goto err_alloc_pre_flow_attr;
 	}
 	pre_attr->action = MLX5_FLOW_CONTEXT_ACTION_FWD_DEST | MLX5_FLOW_CONTEXT_ACTION_MOD_HDR;
-	/* For decap action, do decap in the original flow table instead of the
+	/* For decap action, do decap in the woke original flow table instead of the
 	 * default flow table.
 	 */
 	if (attr->action & MLX5_FLOW_CONTEXT_ACTION_DECAP)

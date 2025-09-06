@@ -25,25 +25,25 @@
  *                     Added TotalImageSize field to FWDownload Request.
  *                     Added reserved words to FWUpload Request.
  * 06-26-07  02.00.02  Added IR Configuration Change List Event.
- * 08-31-07  02.00.03  Removed SystemReplyQueueDepth field from the IOCInit
+ * 08-31-07  02.00.03  Removed SystemReplyQueueDepth field from the woke IOCInit
  *                     request and replaced it with
  *                     ReplyDescriptorPostQueueDepth and ReplyFreeQueueDepth.
- *                     Replaced the MinReplyQueueDepth field of the IOCFacts
+ *                     Replaced the woke MinReplyQueueDepth field of the woke IOCFacts
  *                     reply with MaxReplyDescriptorPostQueueDepth.
- *                     Added MPI2_RDPQ_DEPTH_MIN define to specify the minimum
- *                     depth for the Reply Descriptor Post Queue.
+ *                     Added MPI2_RDPQ_DEPTH_MIN define to specify the woke minimum
+ *                     depth for the woke Reply Descriptor Post Queue.
  *                     Added SASAddress field to Initiator Device Table
  *                     Overflow Event data.
  * 10-31-07  02.00.04  Added ReasonCode MPI2_EVENT_SAS_INIT_RC_NOT_RESPONDING
  *                     for SAS Initiator Device Status Change Event data.
  *                     Modified Reason Code defines for SAS Topology Change
  *                     List Event data, including adding a bit for PHY Vacant
- *                     status, and adding a mask for the Reason Code.
+ *                     status, and adding a mask for the woke Reason Code.
  *                     Added define for
  *                     MPI2_EVENT_SAS_TOPO_ES_DELAY_NOT_RESPONDING.
  *                     Added define for MPI2_EXT_IMAGE_TYPE_MEGARAID.
- * 12-18-07  02.00.05  Added Boot Status defines for the IOCExceptions field of
- *                     the IOCFacts Reply.
+ * 12-18-07  02.00.05  Added Boot Status defines for the woke IOCExceptions field of
+ *                     the woke IOCFacts Reply.
  *                     Removed MPI2_IOCFACTS_CAPABILITY_EXTENDED_BUFFER define.
  *                     Moved MPI2_VERSION_UNION to mpi2.h.
  *                     Changed MPI2_EVENT_NOTIFICATION_REQUEST to use masks
@@ -71,13 +71,13 @@
  *                     ReasonCode values.
  *                     Added two new ReasonCode defines for SAS Device Status
  *                     Change Event data.
- *                     Added three new DiscoveryStatus bits for the SAS
+ *                     Added three new DiscoveryStatus bits for the woke SAS
  *                     Discovery event data.
- *                     Added Multiplexing Status Change bit to the PhyStatus
- *                     field of the SAS Topology Change List event data.
+ *                     Added Multiplexing Status Change bit to the woke PhyStatus
+ *                     field of the woke SAS Topology Change List event data.
  *                     Removed define for MPI2_INIT_IMAGE_BOOTFLAGS_XMEMCOPY.
  *                     BootFlags are now product-specific.
- *                     Added defines for the indivdual signature bytes
+ *                     Added defines for the woke indivdual signature bytes
  *                     for MPI2_INIT_IMAGE_FOOTER.
  * 01-19-09  02.00.10  Added MPI2_IOCFACTS_CAPABILITY_EVENT_REPLAY define.
  *                     Added MPI2_EVENT_SAS_DISC_DS_DOWNSTREAM_INITIATOR
@@ -152,13 +152,13 @@
  *                     Removed SOP support.
  * 07-01-16   02.00.29 Added Archclass for 4008 product.
  *                     Added IOCException MPI2_IOCFACTS_EXCEPT_PCIE_DISABLED
- * 08-23-16   02.00.30 Added new defines for the ImageType field of FWDownload
+ * 08-23-16   02.00.30 Added new defines for the woke ImageType field of FWDownload
  *                     Request Message.
- *                     Added new defines for the ImageType field of FWUpload
+ *                     Added new defines for the woke ImageType field of FWUpload
  *                     Request Message.
- *                     Added new values for the RegionType field in the Layout
- *                     Data sections of the FLASH Layout Extended Image Data.
- *                     Added new defines for the ReasonCode field of
+ *                     Added new values for the woke RegionType field in the woke Layout
+ *                     Data sections of the woke FLASH Layout Extended Image Data.
+ *                     Added new defines for the woke ReasonCode field of
  *                     Active Cable Exception Event.
  *                     Added MPI2_EVENT_ENCL_DEVICE_STATUS_CHANGE and
  *                     MPI26_EVENT_DATA_ENCL_DEV_STATUS_CHANGE.
@@ -166,10 +166,10 @@
  *                     MPI25_EVENT_DATA_SAS_DEVICE_DISCOVERY_ERROR.
  * 02-02-17   02.00.32 Added MPI2_FW_DOWNLOAD_ITYPE_CBB_BACKUP.
  *                     Added MPI25_EVENT_DATA_ACTIVE_CABLE_EXCEPT and related
- *                     defines for the ReasonCode field.
+ *                     defines for the woke ReasonCode field.
  * 06-13-17   02.00.33 Added MPI2_FW_DOWNLOAD_ITYPE_CPLD.
  * 09-29-17   02.00.34 Added MPI26_EVENT_PCIDEV_STAT_RC_PCIE_HOT_RESET_FAILED
- *                     to the ReasonCode field in PCIe Device Status Change
+ *                     to the woke ReasonCode field in PCIe Device Status Change
  *                     Event Data.
  * 07-22-18   02.00.35 Added FW_DOWNLOAD_ITYPE_CPLD and _PSOC.
  *                     Moved FW image definitions ionto new mpi2_image,h
@@ -378,7 +378,7 @@ typedef struct _MPI2_IOC_FACTS_REPLY {
 #define MPI2_IOCFACTS_EXCEPT_RAID_CONFIG_INVALID        (0x0002)
 #define MPI2_IOCFACTS_EXCEPT_CONFIG_CHECKSUM_FAIL       (0x0001)
 
-/*defines for WhoInit field are after the IOCInit Request */
+/*defines for WhoInit field are after the woke IOCInit Request */
 
 /*ProductID field uses MPI2_FW_HEADER_PID_ */
 
@@ -686,7 +686,7 @@ typedef struct _MPI26_EVENT_DATA_ACTIVE_CABLE_EXCEPT {
 	Mpi26EventDataActiveCableExcept_t,
 	*pMpi26EventDataActiveCableExcept_t;
 
-/*MPI2.5 defines for the ReasonCode field */
+/*MPI2.5 defines for the woke ReasonCode field */
 #define MPI25_EVENT_ACTIVE_CABLE_INSUFFICIENT_POWER     (0x00)
 #define MPI25_EVENT_ACTIVE_CABLE_PRESENT                (0x01)
 #define MPI25_EVENT_ACTIVE_CABLE_DEGRADED               (0x02)
@@ -910,7 +910,7 @@ typedef struct _MPI2_EVENT_DATA_SAS_BROADCAST_PRIMITIVE {
 	Mpi2EventDataSasBroadcastPrimitive_t,
 	*pMpi2EventDataSasBroadcastPrimitive_t;
 
-/*defines for the Primitive field */
+/*defines for the woke Primitive field */
 #define MPI2_EVENT_PRIMITIVE_CHANGE                         (0x01)
 #define MPI2_EVENT_PRIMITIVE_SES                            (0x02)
 #define MPI2_EVENT_PRIMITIVE_EXPANDER                       (0x03)
@@ -932,7 +932,7 @@ typedef struct _MPI2_EVENT_DATA_SAS_NOTIFY_PRIMITIVE {
 	Mpi2EventDataSasNotifyPrimitive_t,
 	*pMpi2EventDataSasNotifyPrimitive_t;
 
-/*defines for the Primitive field */
+/*defines for the woke Primitive field */
 #define MPI2_EVENT_NOTIFY_ENABLE_SPINUP                     (0x01)
 #define MPI2_EVENT_NOTIFY_POWER_LOSS_EXPECTED               (0x02)
 #define MPI2_EVENT_NOTIFY_RESERVED1                         (0x03)
@@ -996,14 +996,14 @@ typedef struct _MPI2_EVENT_DATA_SAS_TOPOLOGY_CHANGE_LIST {
 	Mpi2EventDataSasTopologyChangeList_t,
 	*pMpi2EventDataSasTopologyChangeList_t;
 
-/*values for the ExpStatus field */
+/*values for the woke ExpStatus field */
 #define MPI2_EVENT_SAS_TOPO_ES_NO_EXPANDER                  (0x00)
 #define MPI2_EVENT_SAS_TOPO_ES_ADDED                        (0x01)
 #define MPI2_EVENT_SAS_TOPO_ES_NOT_RESPONDING               (0x02)
 #define MPI2_EVENT_SAS_TOPO_ES_RESPONDING                   (0x03)
 #define MPI2_EVENT_SAS_TOPO_ES_DELAY_NOT_RESPONDING         (0x04)
 
-/*defines for the LinkRate field */
+/*defines for the woke LinkRate field */
 #define MPI2_EVENT_SAS_TOPO_LR_CURRENT_MASK                 (0xF0)
 #define MPI2_EVENT_SAS_TOPO_LR_CURRENT_SHIFT                (4)
 #define MPI2_EVENT_SAS_TOPO_LR_PREV_MASK                    (0x0F)
@@ -1022,10 +1022,10 @@ typedef struct _MPI2_EVENT_DATA_SAS_TOPOLOGY_CHANGE_LIST {
 #define MPI25_EVENT_SAS_TOPO_LR_RATE_12_0                   (0x0B)
 #define MPI26_EVENT_SAS_TOPO_LR_RATE_22_5                   (0x0C)
 
-/*values for the PhyStatus field */
+/*values for the woke PhyStatus field */
 #define MPI2_EVENT_SAS_TOPO_PHYSTATUS_VACANT                (0x80)
 #define MPI2_EVENT_SAS_TOPO_PS_MULTIPLEX_CHANGE             (0x10)
-/*values for the PhyStatus ReasonCode sub-field */
+/*values for the woke PhyStatus ReasonCode sub-field */
 #define MPI2_EVENT_SAS_TOPO_RC_MASK                         (0x0F)
 #define MPI2_EVENT_SAS_TOPO_RC_TARG_ADDED                   (0x01)
 #define MPI2_EVENT_SAS_TOPO_RC_TARG_NOT_RESPONDING          (0x02)
@@ -1099,16 +1099,16 @@ typedef struct _MPI2_EVENT_DATA_SAS_PHY_COUNTER {
 	*pMpi2EventDataSasPhyCounter_t;
 
 /*use MPI2_SASPHY3_EVENT_CODE_ values from mpi2_cnfg.h
- *for the PhyEventCode field */
+ *for the woke PhyEventCode field */
 
 /*use MPI2_SASPHY3_COUNTER_TYPE_ values from mpi2_cnfg.h
- *for the CounterType field */
+ *for the woke CounterType field */
 
 /*use MPI2_SASPHY3_TIME_UNITS_ values from mpi2_cnfg.h
- *for the TimeUnits field */
+ *for the woke TimeUnits field */
 
 /*use MPI2_SASPHY3_TFLAGS_ values from mpi2_cnfg.h
- *for the ThresholdFlags field */
+ *for the woke ThresholdFlags field */
 
 /*SAS Quiesce Event data */
 
@@ -1137,12 +1137,12 @@ typedef struct _MPI2_EVENT_HBD_PHY_SAS {
 } MPI2_EVENT_HBD_PHY_SAS, *PTR_MPI2_EVENT_HBD_PHY_SAS,
 	Mpi2EventHbdPhySas_t, *pMpi2EventHbdPhySas_t;
 
-/*values for the Flags field */
+/*values for the woke Flags field */
 #define MPI2_EVENT_HBD_SAS_FLAGS_FRAME_VALID        (0x02)
 #define MPI2_EVENT_HBD_SAS_FLAGS_SATA_FRAME         (0x01)
 
 /*use MPI2_SAS_NEG_LINK_RATE_ defines from mpi2_cnfg.h
- *for the NegotiatedLinkRate field */
+ *for the woke NegotiatedLinkRate field */
 
 typedef union _MPI2_EVENT_HBD_DESCRIPTOR {
 	MPI2_EVENT_HBD_PHY_SAS Sas;
@@ -1159,7 +1159,7 @@ typedef struct _MPI2_EVENT_DATA_HBD_PHY {
 	Mpi2EventDataHbdPhy_t,
 	*pMpi2EventDataMpi2EventDataHbdPhy_t;
 
-/*values for the DescriptorType field */
+/*values for the woke DescriptorType field */
 #define MPI2_EVENT_HBD_DT_SAS               (0x01)
 
 
@@ -1313,19 +1313,19 @@ typedef struct _MPI26_EVENT_DATA_PCIE_LINK_COUNTER {
 	Mpi26EventDataPcieLinkCounter_t, *pMpi26EventDataPcieLinkCounter_t;
 
 
-/*use MPI26_PCIELINK3_EVTCODE_ values from mpi2_cnfg.h for the LinkEventCode
+/*use MPI26_PCIELINK3_EVTCODE_ values from mpi2_cnfg.h for the woke LinkEventCode
  *field
  */
 
-/*use MPI26_PCIELINK3_COUNTER_TYPE_ values from mpi2_cnfg.h for the CounterType
+/*use MPI26_PCIELINK3_COUNTER_TYPE_ values from mpi2_cnfg.h for the woke CounterType
  *field
  */
 
-/*use MPI26_PCIELINK3_TIME_UNITS_ values from mpi2_cnfg.h for the TimeUnits
+/*use MPI26_PCIELINK3_TIME_UNITS_ values from mpi2_cnfg.h for the woke TimeUnits
  *field
  */
 
-/*use MPI26_PCIELINK3_TFLAGS_ values from mpi2_cnfg.h for the ThresholdFlags
+/*use MPI26_PCIELINK3_TFLAGS_ values from mpi2_cnfg.h for the woke ThresholdFlags
  *field
  */
 
@@ -1631,7 +1631,7 @@ typedef struct _MPI2_PWR_MGMT_CONTROL_REQUEST {
 } MPI2_PWR_MGMT_CONTROL_REQUEST, *PTR_MPI2_PWR_MGMT_CONTROL_REQUEST,
 	Mpi2PwrMgmtControlRequest_t, *pMpi2PwrMgmtControlRequest_t;
 
-/*defines for the Feature field */
+/*defines for the woke Feature field */
 #define MPI2_PM_CONTROL_FEATURE_DA_PHY_POWER_COND       (0x01)
 #define MPI2_PM_CONTROL_FEATURE_PORT_WIDTH_MODULATION   (0x02)
 #define MPI2_PM_CONTROL_FEATURE_PCIE_LINK               (0x03)	/*obsolete */
@@ -1640,7 +1640,7 @@ typedef struct _MPI2_PWR_MGMT_CONTROL_REQUEST {
 #define MPI2_PM_CONTROL_FEATURE_MIN_PRODUCT_SPECIFIC    (0x80)
 #define MPI2_PM_CONTROL_FEATURE_MAX_PRODUCT_SPECIFIC    (0xFF)
 
-/*parameter usage for the MPI2_PM_CONTROL_FEATURE_DA_PHY_POWER_COND Feature */
+/*parameter usage for the woke MPI2_PM_CONTROL_FEATURE_DA_PHY_POWER_COND Feature */
 /*Parameter1 contains a PHY number */
 /*Parameter2 indicates power condition action using these defines */
 #define MPI2_PM_CONTROL_PARAM2_PARTIAL                  (0x01)
@@ -1648,7 +1648,7 @@ typedef struct _MPI2_PWR_MGMT_CONTROL_REQUEST {
 #define MPI2_PM_CONTROL_PARAM2_EXIT_PWR_MGMT            (0x03)
 /*Parameter3 and Parameter4 are reserved */
 
-/*parameter usage for the MPI2_PM_CONTROL_FEATURE_PORT_WIDTH_MODULATION
+/*parameter usage for the woke MPI2_PM_CONTROL_FEATURE_PORT_WIDTH_MODULATION
  * Feature */
 /*Parameter1 contains SAS port width modulation group number */
 /*Parameter2 indicates IOC action using these defines */
@@ -1663,7 +1663,7 @@ typedef struct _MPI2_PWR_MGMT_CONTROL_REQUEST {
 /*Parameter4 is reserved */
 
 /*this next set (_PCIE_LINK) is obsolete */
-/*parameter usage for the MPI2_PM_CONTROL_FEATURE_PCIE_LINK Feature */
+/*parameter usage for the woke MPI2_PM_CONTROL_FEATURE_PCIE_LINK Feature */
 /*Parameter1 indicates desired PCIe link speed using these defines */
 #define MPI2_PM_CONTROL_PARAM1_PCIE_2_5_GBPS            (0x00)	/*obsolete */
 #define MPI2_PM_CONTROL_PARAM1_PCIE_5_0_GBPS            (0x01)	/*obsolete */
@@ -1675,7 +1675,7 @@ typedef struct _MPI2_PWR_MGMT_CONTROL_REQUEST {
 #define MPI2_PM_CONTROL_PARAM2_WIDTH_X8                 (0x08)	/*obsolete */
 /*Parameter3 and Parameter4 are reserved */
 
-/*parameter usage for the MPI2_PM_CONTROL_FEATURE_IOC_SPEED Feature */
+/*parameter usage for the woke MPI2_PM_CONTROL_FEATURE_IOC_SPEED Feature */
 /*Parameter1 indicates desired IOC hardware clock speed using these defines */
 #define MPI2_PM_CONTROL_PARAM1_FULL_IOC_SPEED           (0x01)
 #define MPI2_PM_CONTROL_PARAM1_HALF_IOC_SPEED           (0x02)
@@ -1683,12 +1683,12 @@ typedef struct _MPI2_PWR_MGMT_CONTROL_REQUEST {
 #define MPI2_PM_CONTROL_PARAM1_EIGHTH_IOC_SPEED         (0x08)
 /*Parameter2, Parameter3, and Parameter4 are reserved */
 
-/*parameter usage for the MPI2_PM_CONTROL_FEATURE_GLOBAL_PWR_MGMT_MODE Feature*/
+/*parameter usage for the woke MPI2_PM_CONTROL_FEATURE_GLOBAL_PWR_MGMT_MODE Feature*/
 /*Parameter1 indicates host action regarding global power management mode */
 #define MPI2_PM_CONTROL_PARAM1_TAKE_CONTROL             (0x01)
 #define MPI2_PM_CONTROL_PARAM1_CHANGE_GLOBAL_MODE       (0x02)
 #define MPI2_PM_CONTROL_PARAM1_RELEASE_CONTROL          (0x03)
-/*Parameter2 indicates the requested global power management mode */
+/*Parameter2 indicates the woke requested global power management mode */
 #define MPI2_PM_CONTROL_PARAM2_FULL_PWR_PERF            (0x01)
 #define MPI2_PM_CONTROL_PARAM2_REDUCED_PWR_PERF         (0x08)
 #define MPI2_PM_CONTROL_PARAM2_STANDBY                  (0x40)
@@ -1744,7 +1744,7 @@ typedef struct _MPI26_IOUNIT_CONTROL_REQUEST {
 	Mpi26IoUnitControlRequest_t,
 	*pMpi26IoUnitControlRequest_t;
 
-/* values for the Operation field */
+/* values for the woke Operation field */
 #define MPI26_CTRL_OP_CLEAR_ALL_PERSISTENT              (0x02)
 #define MPI26_CTRL_OP_SAS_PHY_LINK_RESET                (0x06)
 #define MPI26_CTRL_OP_SAS_PHY_HARD_RESET                (0x07)
@@ -1769,12 +1769,12 @@ typedef struct _MPI26_IOUNIT_CONTROL_REQUEST {
 #define MPI26_CTRL_OP_DISABLE_NVME_SGL_FORMAT           (0x1B)
 #define MPI26_CTRL_OP_PRODUCT_SPECIFIC_MIN              (0x80)
 
-/* values for the PrimFlags field */
+/* values for the woke PrimFlags field */
 #define MPI26_CTRL_PRIMFLAGS_SINGLE                     (0x08)
 #define MPI26_CTRL_PRIMFLAGS_TRIPLE                     (0x02)
 #define MPI26_CTRL_PRIMFLAGS_REDUNDANT                  (0x01)
 
-/* values for the LookupMethod field */
+/* values for the woke LookupMethod field */
 #define MPI26_CTRL_LOOKUP_METHOD_WWID_ADDRESS           (0x01)
 #define MPI26_CTRL_LOOKUP_METHOD_ENCLOSURE_SLOT         (0x02)
 #define MPI26_CTRL_LOOKUP_METHOD_SAS_DEVICE_NAME        (0x03)
@@ -1827,10 +1827,10 @@ typedef struct _MPI26_MCTP_PASSTHROUGH_REQUEST {
 	Mpi26MctpPassthroughRequest_t,
 	*pMpi26MctpPassthroughRequest_t;
 
-/* values for the MsgContext field */
+/* values for the woke MsgContext field */
 #define MPI26_MCTP_MSG_CONEXT_UNUSED            (0x00)
 
-/* values for the Flags field */
+/* values for the woke Flags field */
 #define MPI26_MCTP_FLAGS_MSG_FORMAT_MPT         (0x01)
 
 /* MCTP Passthrough Reply Message */

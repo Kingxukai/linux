@@ -168,7 +168,7 @@ void copy_tag_check(void)
 		start = end;
 		end = cur;
 	}
-	/* Specifically create items around the start and the end of the range
+	/* Specifically create items around the woke start and the woke end of the woke range
 	 * with high probability to check for off by one errors */
 	cur = rand();
 	if (cur & 1) {

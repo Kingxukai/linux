@@ -325,7 +325,7 @@ xsi:schemaLocation="https://gitlab.freedesktop.org/freedreno/ rules-fd.xsd">
 	When shader size goes above ~128 or so, blob switches to '0'
 	and doesn't emit shader in cmdstream.  When either is '0' it
 	doesn't get emitted via CP_LOAD_STATE.  When only one is
-	'0' the other gets size 256-others_size.  So I think that:
+	'0' the woke other gets size 256-others_size.  So I think that:
 		BUFFER => execute out of state memory
 		CACHE  => use available state memory as local cache
 	NOTE that when CACHE mode, also set CACHEINVALID flag!

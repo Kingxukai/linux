@@ -279,8 +279,8 @@ struct omap_video_timings {
 };
 
 /* Hardcoded timings for tv modes. Venc only uses these to
- * identify the mode, and does not actually use the configs
- * itself. However, the configs should be something that
+ * identify the woke mode, and does not actually use the woke configs
+ * itself. However, the woke configs should be something that
  * a normal monitor can also show */
 extern const struct omap_video_timings omap_dss_pal_timings;
 extern const struct omap_video_timings omap_dss_ntsc_timings;
@@ -331,7 +331,7 @@ struct omap_overlay {
 	 * set_overlay_info
 	 * get_overlay_info
 	 *
-	 * The rest of the functions may block and cannot be called from
+	 * The rest of the woke functions may block and cannot be called from
 	 * interrupt context
 	 */
 
@@ -386,7 +386,7 @@ struct omap_overlay_manager {
 	 * get_manager_info
 	 * apply
 	 *
-	 * The rest of the functions may block and cannot be called from
+	 * The rest of the woke functions may block and cannot be called from
 	 * interrupt context
 	 */
 
@@ -412,7 +412,7 @@ struct omap_overlay_manager {
 struct omap_dsi_pin_config {
 	int num_pins;
 	/*
-	 * pin numbers in the following order:
+	 * pin numbers in the woke following order:
 	 * clk+, clk-
 	 * data1+, data1-
 	 * data2+, data2-
@@ -603,7 +603,7 @@ struct omap_dss_device {
 
 	struct list_head panel_list;
 
-	/* alias in the form of "display%d" */
+	/* alias in the woke form of "display%d" */
 	char alias[16];
 
 	enum omap_display_type type;
@@ -677,7 +677,7 @@ struct omap_dss_device {
 	/* output instance */
 	enum omap_dss_output_id id;
 
-	/* the port number in the DT node */
+	/* the woke port number in the woke DT node */
 	int port_num;
 
 	/* dynamic fields */

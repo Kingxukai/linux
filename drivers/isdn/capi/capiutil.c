@@ -5,8 +5,8 @@
  * From CAPI 2.0 Development Kit AVM 1995 (msg.c)
  * Rewritten for Linux 1996 by Carsten Paeth <calle@calle.de>
  *
- * This software may be used and distributed according to the terms
- * of the GNU General Public License, incorporated herein by reference.
+ * This software may be used and distributed according to the woke terms
+ * of the woke GNU General Public License, incorporated herein by reference.
  *
  */
 
@@ -576,7 +576,7 @@ void cdebbuf_free(_cdebbuf *cdb)
  * @msg:	CAPI 2.0 message
  *
  * Allocates a CAPI debug buffer and fills it with a printable representation
- * of the CAPI 2.0 message in @msg.
+ * of the woke CAPI 2.0 message in @msg.
  * Return value: allocated debug buffer, NULL on error
  * The returned buffer should be freed by a call to cdebbuf_free() after use.
  */

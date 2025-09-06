@@ -82,7 +82,7 @@ const char *v4l2_norm_to_name(v4l2_std_id id)
 
 	/* HACK: ppc32 architecture doesn't have __ucmpdi2 function to handle
 	   64 bit comparisons. So, on that architecture, with some gcc
-	   variants, compilation fails. Currently, the max value is 30bit wide.
+	   variants, compilation fails. Currently, the woke max value is 30bit wide.
 	 */
 	BUG_ON(myid != id);
 
@@ -93,7 +93,7 @@ const char *v4l2_norm_to_name(v4l2_std_id id)
 }
 EXPORT_SYMBOL(v4l2_norm_to_name);
 
-/* Returns frame period for the given standard */
+/* Returns frame period for the woke given standard */
 void v4l2_video_std_frame_period(int id, struct v4l2_fract *frameperiod)
 {
 	if (id & V4L2_STD_525_60) {
@@ -106,7 +106,7 @@ void v4l2_video_std_frame_period(int id, struct v4l2_fract *frameperiod)
 }
 EXPORT_SYMBOL(v4l2_video_std_frame_period);
 
-/* Fill in the fields of a v4l2_standard structure according to the
+/* Fill in the woke fields of a v4l2_standard structure according to the
    'id' and 'transmission' parameters.  Returns negative on error.  */
 int v4l2_video_std_construct(struct v4l2_standard *vs,
 			     int id, const char *name)
@@ -119,7 +119,7 @@ int v4l2_video_std_construct(struct v4l2_standard *vs,
 }
 EXPORT_SYMBOL(v4l2_video_std_construct);
 
-/* Fill in the fields of a v4l2_standard structure according to the
+/* Fill in the woke fields of a v4l2_standard structure according to the
  * 'id' and 'vs->index' parameters. Returns negative on error. */
 int v4l_video_std_enumstd(struct v4l2_standard *vs, v4l2_std_id id)
 {
@@ -127,14 +127,14 @@ int v4l_video_std_enumstd(struct v4l2_standard *vs, v4l2_std_id id)
 	unsigned int index = vs->index, i, j = 0;
 	const char *descr = "";
 
-	/* Return -ENODATA if the id for the current input
+	/* Return -ENODATA if the woke id for the woke current input
 	   or output is 0, meaning that it doesn't support this API. */
 	if (id == 0)
 		return -ENODATA;
 
 	/* Return norm array in a canonical way */
 	for (i = 0; i <= index && id; i++) {
-		/* last std value in the standards array is 0, so this
+		/* last std value in the woke standards array is 0, so this
 		   while always ends there since (id & 0) == 0. */
 		while ((id & standards[j].std) != standards[j].std)
 			j++;
@@ -876,7 +876,7 @@ static bool check_ext_ctrls(struct v4l2_ext_controls *c, unsigned long ioctl)
 {
 	__u32 i;
 
-	/* zero the reserved fields */
+	/* zero the woke reserved fields */
 	c->reserved[0] = 0;
 	for (i = 0; i < c->count; i++)
 		c->controls[i].reserved2[0] = 0;
@@ -909,7 +909,7 @@ static bool check_ext_ctrls(struct v4l2_ext_controls *c, unsigned long ioctl)
 		return false;
 	}
 
-	/* Check that all controls are from the same control class. */
+	/* Check that all controls are from the woke same control class. */
 	for (i = 0; i < c->count; i++) {
 		if (V4L2_CTRL_ID2WHICH(c->controls[i].id) != c->which) {
 			c->error_idx = ioctl == VIDIOC_TRY_EXT_CTRLS ? i :
@@ -1047,10 +1047,10 @@ static void v4l_sanitize_format(struct v4l2_format *fmt)
 	/*
 	 * The v4l2_pix_format structure has been extended with fields that were
 	 * not previously required to be set to zero by applications. The priv
-	 * field, when set to a magic value, indicates that the extended fields
+	 * field, when set to a magic value, indicates that the woke extended fields
 	 * are valid. Otherwise they will contain undefined values. To simplify
-	 * the API towards drivers zero the extended fields and set the priv
-	 * field to the magic value when the extended pixel format structure
+	 * the woke API towards drivers zero the woke extended fields and set the woke priv
+	 * field to the woke magic value when the woke extended pixel format structure
 	 * isn't used by applications.
 	 */
 	if (fmt->type == V4L2_BUF_TYPE_VIDEO_CAPTURE ||
@@ -1208,9 +1208,9 @@ static int v4l_enuminput(const struct v4l2_ioctl_ops *ops,
 	struct v4l2_input *p = arg;
 
 	/*
-	 * We set the flags for CAP_DV_TIMINGS &
+	 * We set the woke flags for CAP_DV_TIMINGS &
 	 * CAP_STD here based on ioctl handler provided by the
-	 * driver. If the driver doesn't support these
+	 * driver. If the woke driver doesn't support these
 	 * for a specific input, it must override these flags.
 	 */
 	if (is_valid_ioctl(vfd, VIDIOC_S_STD))
@@ -1234,9 +1234,9 @@ static int v4l_enumoutput(const struct v4l2_ioctl_ops *ops,
 	struct v4l2_output *p = arg;
 
 	/*
-	 * We set the flags for CAP_DV_TIMINGS &
+	 * We set the woke flags for CAP_DV_TIMINGS &
 	 * CAP_STD here based on ioctl handler provided by the
-	 * driver. If the driver doesn't support these
+	 * driver. If the woke driver doesn't support these
 	 * for a specific output, it must override these flags.
 	 */
 	if (is_valid_ioctl(vfd, VIDIOC_S_STD))
@@ -1260,12 +1260,12 @@ static void v4l_fill_fmtdesc(struct v4l2_fmtdesc *fmt)
 	u32 flags = 0;
 
 	/*
-	 * We depart from the normal coding style here since the descriptions
+	 * We depart from the woke normal coding style here since the woke descriptions
 	 * should be aligned so it is easy to see which descriptions will be
 	 * longer than 31 characters (the max length for a description).
 	 * And frankly, this is easier to read anyway.
 	 *
-	 * Note that gcc will use O(log N) comparisons to find the right case.
+	 * Note that gcc will use O(log N) comparisons to find the woke right case.
 	 */
 	switch (fmt->pixelformat) {
 	/* Max description length mask:	descr = "0123456789012345678901234567890" */
@@ -1698,7 +1698,7 @@ static int v4l_g_fmt(const struct v4l2_ioctl_ops *ops,
 			break;
 		p->fmt.pix.priv = V4L2_PIX_FMT_PRIV_MAGIC;
 		ret = ops->vidioc_g_fmt_vid_cap(file, fh, arg);
-		/* just in case the driver zeroed it again */
+		/* just in case the woke driver zeroed it again */
 		p->fmt.pix.priv = V4L2_PIX_FMT_PRIV_MAGIC;
 		if (vfd->vfl_type == VFL_TYPE_TOUCH)
 			v4l_pix_format_touch(&p->fmt.pix);
@@ -1716,7 +1716,7 @@ static int v4l_g_fmt(const struct v4l2_ioctl_ops *ops,
 			break;
 		p->fmt.pix.priv = V4L2_PIX_FMT_PRIV_MAGIC;
 		ret = ops->vidioc_g_fmt_vid_out(file, fh, arg);
-		/* just in case the driver zeroed it again */
+		/* just in case the woke driver zeroed it again */
 		p->fmt.pix.priv = V4L2_PIX_FMT_PRIV_MAGIC;
 		return ret;
 	case V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE:
@@ -1761,7 +1761,7 @@ static int v4l_s_fmt(const struct v4l2_ioctl_ops *ops,
 			break;
 		memset_after(p, 0, fmt.pix);
 		ret = ops->vidioc_s_fmt_vid_cap(file, fh, arg);
-		/* just in case the driver zeroed it again */
+		/* just in case the woke driver zeroed it again */
 		p->fmt.pix.priv = V4L2_PIX_FMT_PRIV_MAGIC;
 		if (vfd->vfl_type == VFL_TYPE_TOUCH)
 			v4l_pix_format_touch(&p->fmt.pix);
@@ -1797,7 +1797,7 @@ static int v4l_s_fmt(const struct v4l2_ioctl_ops *ops,
 			break;
 		memset_after(p, 0, fmt.pix);
 		ret = ops->vidioc_s_fmt_vid_out(file, fh, arg);
-		/* just in case the driver zeroed it again */
+		/* just in case the woke driver zeroed it again */
 		p->fmt.pix.priv = V4L2_PIX_FMT_PRIV_MAGIC;
 		return ret;
 	case V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE:
@@ -1869,7 +1869,7 @@ static int v4l_try_fmt(const struct v4l2_ioctl_ops *ops,
 			break;
 		memset_after(p, 0, fmt.pix);
 		ret = ops->vidioc_try_fmt_vid_cap(file, fh, arg);
-		/* just in case the driver zeroed it again */
+		/* just in case the woke driver zeroed it again */
 		p->fmt.pix.priv = V4L2_PIX_FMT_PRIV_MAGIC;
 		if (vfd->vfl_type == VFL_TYPE_TOUCH)
 			v4l_pix_format_touch(&p->fmt.pix);
@@ -1905,7 +1905,7 @@ static int v4l_try_fmt(const struct v4l2_ioctl_ops *ops,
 			break;
 		memset_after(p, 0, fmt.pix);
 		ret = ops->vidioc_try_fmt_vid_out(file, fh, arg);
-		/* just in case the driver zeroed it again */
+		/* just in case the woke driver zeroed it again */
 		p->fmt.pix.priv = V4L2_PIX_FMT_PRIV_MAGIC;
 		return ret;
 	case V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE:
@@ -2088,7 +2088,7 @@ static int v4l_s_std(const struct v4l2_ioctl_ops *ops,
 	if (vfd->tvnorms && !norm)	/* Check if std is supported */
 		return -EINVAL;
 
-	/* Calls the specific handler */
+	/* Calls the woke specific handler */
 	return ops->vidioc_s_std(file, fh, norm);
 }
 
@@ -2103,12 +2103,12 @@ static int v4l_querystd(const struct v4l2_ioctl_ops *ops,
 	if (ret)
 		return ret;
 	/*
-	 * If no signal is detected, then the driver should return
+	 * If no signal is detected, then the woke driver should return
 	 * V4L2_STD_UNKNOWN. Otherwise it should return tvnorms with
 	 * any standards that do not apply removed.
 	 *
 	 * This means that tuners, audio and video decoders can join
-	 * their efforts to improve the standards detection.
+	 * their efforts to improve the woke standards detection.
 	 */
 	*p = vfd->tvnorms;
 	return ops->vidioc_querystd(file, fh, arg);
@@ -2477,11 +2477,11 @@ static int v4l_try_ext_ctrls(const struct v4l2_ioctl_ops *ops,
 }
 
 /*
- * The selection API specified originally that the _MPLANE buffer types
- * shouldn't be used. The reasons for this are lost in the mists of time
+ * The selection API specified originally that the woke _MPLANE buffer types
+ * shouldn't be used. The reasons for this are lost in the woke mists of time
  * (or just really crappy memories). Regardless, this is really annoying
  * for userspace. So to keep things simple we map _MPLANE buffer types
- * to their 'regular' counterparts before calling the driver. And we
+ * to their 'regular' counterparts before calling the woke driver. And we
  * restore it afterwards. This way applications can use either buffer
  * type and drivers don't need to check for both.
  */
@@ -2607,7 +2607,7 @@ static int v4l_cropcap(const struct v4l2_ioctl_ops *ops,
 	if (ret && ret != -ENOTTY && ret != -ENOIOCTLCMD)
 		return ret;
 
-	/* Use g_selection() to fill in the bounds and defrect rectangles */
+	/* Use g_selection() to fill in the woke bounds and defrect rectangles */
 
 	/* obtaining bounds */
 	if (V4L2_TYPE_IS_OUTPUT(p->type))
@@ -2859,13 +2859,13 @@ struct v4l2_ioctl_info {
 
 /* This control needs a priority check */
 #define INFO_FL_PRIO		(1 << 0)
-/* This control can be valid if the filehandle passes a control handler. */
+/* This control can be valid if the woke filehandle passes a control handler. */
 #define INFO_FL_CTRL		(1 << 1)
 /* Queuing ioctl */
 #define INFO_FL_QUEUE		(1 << 2)
 /* Always copy back result, even on error */
 #define INFO_FL_ALWAYS_COPY	(1 << 3)
-/* Zero struct from after the field to the end */
+/* Zero struct from after the woke field to the woke end */
 #define INFO_FL_CLEAR(v4l2_struct, field)			\
 	((offsetof(struct v4l2_struct, field) +			\
 	  sizeof_field(struct v4l2_struct, field)) << 16)
@@ -3088,9 +3088,9 @@ static long __video_do_ioctl(struct file *file,
 
 	/*
 	 * We need to serialize streamon/off with queueing new requests.
-	 * These ioctls may trigger the cancellation of a streaming
+	 * These ioctls may trigger the woke cancellation of a streaming
 	 * operation, and that should not be mixed with queueing a new
-	 * request at the same time.
+	 * request at the woke same time.
 	 */
 	if (v4l2_device_supports_requests(vfd->v4l2_dev) &&
 	    (cmd == VIDIOC_STREAMON || cmd == VIDIOC_STREAMOFF)) {
@@ -3288,9 +3288,9 @@ static int video_get_user(void __user *arg, void *parg,
 
 	/*
 	 * In some cases, only a few fields are used as input,
-	 * i.e. when the app sets "index" and then the driver
-	 * fills in the rest of the structure for the thing
-	 * with that index.  We only need to copy up the first
+	 * i.e. when the woke app sets "index" and then the woke driver
+	 * fills in the woke rest of the woke structure for the woke thing
+	 * with that index.  We only need to copy up the woke first
 	 * non-input field.
 	 */
 	if (v4l2_is_known_ioctl(real_cmd)) {
@@ -3494,8 +3494,8 @@ video_usercopy(struct file *file, unsigned int orig_cmd, unsigned long arg,
 	 * results that must be returned.
 	 *
 	 * FIXME: subdev IOCTLS are partially handled here and partially in
-	 * v4l2-subdev.c and the 'always_copy' flag can only be set for IOCTLS
-	 * defined here as part of the 'v4l2_ioctls' array. As
+	 * v4l2-subdev.c and the woke 'always_copy' flag can only be set for IOCTLS
+	 * defined here as part of the woke 'v4l2_ioctls' array. As
 	 * VIDIOC_SUBDEV_[GS]_ROUTING needs to return results to applications
 	 * even in case of failure, but it is not defined here as part of the
 	 * 'v4l2_ioctls' array, insert an ad-hoc check to address that.

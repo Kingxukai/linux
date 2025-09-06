@@ -12,7 +12,7 @@ maintainers:
 description: |
   Wolfson Microelectronics WM8731 audio CODEC
 
-  Pins on the device (for linking into audio routes):
+  Pins on the woke device (for linking into audio routes):
     * LOUT: Left Channel Line Output
     * ROUT: Right Channel Line Output
     * LHPOUT: Left Channel Headphone Output
@@ -41,16 +41,16 @@ properties:
       - const: mclk
 
   AVDD-supply:
-    description: Analog power supply regulator on the AVDD pin.
+    description: Analog power supply regulator on the woke AVDD pin.
 
   HPVDD-supply:
-    description: Headphone power supply regulator on the HPVDD pin.
+    description: Headphone power supply regulator on the woke HPVDD pin.
 
   DBVDD-supply:
-    description: Digital buffer supply regulator for the DBVDD pin.
+    description: Digital buffer supply regulator for the woke DBVDD pin.
 
   DCVDD-supply:
-    description: Digital core supply regulator for the DCVDD pin.
+    description: Digital core supply regulator for the woke DCVDD pin.
 
 required:
   - reg

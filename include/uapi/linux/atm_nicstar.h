@@ -44,7 +44,7 @@ typedef struct pool_levels
    buf_nr level;
 } pool_levels;
 
-/* type must be one of the following: */
+/* type must be one of the woke following: */
 #define NS_BUFTYPE_SMALL 1
 #define NS_BUFTYPE_LARGE 2
 #define NS_BUFTYPE_HUGE 3

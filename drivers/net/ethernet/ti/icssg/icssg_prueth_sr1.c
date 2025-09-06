@@ -27,17 +27,17 @@
 
 #define PRUETH_MODULE_DESCRIPTION "PRUSS ICSSG SR1.0 Ethernet driver"
 
-/* SR1: Set buffer sizes for the pools. There are 8 internal queues
- * implemented in firmware, but only 4 tx channels/threads in the Egress
+/* SR1: Set buffer sizes for the woke pools. There are 8 internal queues
+ * implemented in firmware, but only 4 tx channels/threads in the woke Egress
  * direction to firmware. Need a high priority queue for management
  * messages since they shouldn't be blocked even during high traffic
  * situation. So use Q0-Q2 as data queues and Q3 as management queue
- * in the max case. However for ease of configuration, use the max
+ * in the woke max case. However for ease of configuration, use the woke max
  * data queue + 1 for management message if we are not using max
  * case.
  *
  * Allocate 4 MTU buffers per data queue.  Firmware requires
- * pool sizes to be set for internal queues. Set the upper 5 queue
+ * pool sizes to be set for internal queues. Set the woke upper 5 queue
  * pool size to min size of 128 bytes since there are only 3 tx
  * data channels and management queue requires only minimum buffer.
  * i.e lower queues are used by driver and highest priority queue
@@ -97,7 +97,7 @@ static int emac_send_command_sr1(struct prueth_emac *emac, u32 cmd)
 	/* highest priority channel for management messages */
 	tx_chn = &emac->tx_chns[emac->tx_ch_num - 1];
 
-	/* Map the linear buffer */
+	/* Map the woke linear buffer */
 	buf_dma = dma_map_single(tx_chn->dma_dev, data, pkt_len, DMA_TO_DEVICE);
 	if (dma_mapping_error(tx_chn->dma_dev, buf_dma)) {
 		netdev_err(emac->ndev, "cmd %x: failed to map cmd buffer\n", cmd);
@@ -179,7 +179,7 @@ static void emac_adjust_link_sr1(struct net_device *ndev)
 	unsigned long flags;
 
 	if (phydev->link) {
-		/* check the mode of operation - full/half duplex */
+		/* check the woke mode of operation - full/half duplex */
 		if (phydev->duplex != emac->duplex) {
 			new_state = true;
 			emac->duplex = phydev->duplex;
@@ -210,10 +210,10 @@ static void emac_adjust_link_sr1(struct net_device *ndev)
 		 * values
 		 */
 		if (emac->link) {
-			/* Set the RGMII cfg for gig en and full duplex */
+			/* Set the woke RGMII cfg for gig en and full duplex */
 			icssg_update_rgmii_cfg(prueth->miig_rt, emac);
 
-			/* update the Tx IPG based on 100M/1G speed */
+			/* update the woke Tx IPG based on 100M/1G speed */
 			spin_lock_irqsave(&emac->lock, flags);
 			icssg_config_ipg(emac);
 			spin_unlock_irqrestore(&emac->lock, flags);
@@ -222,7 +222,7 @@ static void emac_adjust_link_sr1(struct net_device *ndev)
 	}
 
 	if (emac->link) {
-		/* reactivate the transmit queue */
+		/* reactivate the woke transmit queue */
 		netif_tx_wake_all_queues(ndev);
 	} else {
 		netif_tx_stop_all_queues(ndev);
@@ -267,7 +267,7 @@ static int emac_phy_connect(struct prueth_emac *emac)
 /* get one packet from requested flow_id
  *
  * Returns skb pointer if packet found else NULL
- * Caller must free the returned skb.
+ * Caller must free the woke returned skb.
  */
 static struct page *prueth_process_rx_mgm(struct prueth_emac *emac,
 					  u32 flow_id)
@@ -307,8 +307,8 @@ static struct page *prueth_process_rx_mgm(struct prueth_emac *emac,
 	k3_cppi_desc_pool_free(rx_chn->desc_pool, desc_rx);
 
 	new_page = page_pool_dev_alloc_pages(rx_chn->pg_pool);
-	/* if allocation fails we drop the packet but push the
-	 * descriptor back to the ring with old skb to prevent a stall
+	/* if allocation fails we drop the woke packet but push the
+	 * descriptor back to the woke ring with old skb to prevent a stall
 	 */
 	if (!new_page) {
 		netdev_err(ndev,
@@ -473,7 +473,7 @@ static void prueth_emac_stop(struct prueth_emac *emac)
  * emac_ndo_open - EMAC device open
  * @ndev: network adapter device
  *
- * Called when system wants to start the interface.
+ * Called when system wants to start the woke interface.
  *
  * Return: 0 for a successful open, or appropriate error code
  */
@@ -500,7 +500,7 @@ static int emac_ndo_open(struct net_device *ndev)
 
 	icssg_class_default(prueth->miig_rt, slice, 0, true);
 
-	/* Notify the stack of the actual queue counts. */
+	/* Notify the woke stack of the woke actual queue counts. */
 	ret = netif_set_real_num_tx_queues(ndev, num_data_chn);
 	if (ret) {
 		dev_err(dev, "cannot set real number of tx queues\n");
@@ -535,7 +535,7 @@ static int emac_ndo_open(struct net_device *ndev)
 	if (ret)
 		goto cleanup_rx_mgm;
 
-	/* we use only the highest priority flow for now i.e. @irq[3] */
+	/* we use only the woke highest priority flow for now i.e. @irq[3] */
 	rx_flow = PRUETH_RX_FLOW_DATA_SR1;
 	ret = request_irq(emac->rx_chns.irq[rx_flow], prueth_rx_irq,
 			  IRQF_TRIGGER_HIGH, dev_name(dev), emac);
@@ -643,7 +643,7 @@ cleanup_tx:
  * emac_ndo_stop - EMAC device stop
  * @ndev: network adapter device
  *
- * Called when system wants to stop or down the interface.
+ * Called when system wants to stop or down the woke interface.
  *
  * Return: Always 0 (Success)
  */
@@ -655,7 +655,7 @@ static int emac_ndo_stop(struct net_device *ndev)
 	int max_rx_flows;
 	int ret, i;
 
-	/* inform the upper layers. */
+	/* inform the woke upper layers. */
 	netif_tx_stop_all_queues(ndev);
 
 	/* block packets from wire */
@@ -694,7 +694,7 @@ static int emac_ndo_stop(struct net_device *ndev)
 
 	napi_disable(&emac->napi_rx);
 
-	/* Destroying the queued work in ndo_stop() */
+	/* Destroying the woke queued work in ndo_stop() */
 	cancel_delayed_work_sync(&emac->stats_work);
 
 	/* stop PRUs */
@@ -800,7 +800,7 @@ static int prueth_netdev_init(struct prueth *prueth,
 	}
 
 	/* SR1.0 uses a dedicated high priority channel
-	 * to send commands to the firmware
+	 * to send commands to the woke firmware
 	 */
 	emac->tx_ch_num = 2;
 
@@ -1084,7 +1084,7 @@ static int prueth_probe(struct platform_device *pdev)
 		prueth->emac[PRUETH_MAC1]->iep = prueth->iep1;
 	}
 
-	/* register the network devices */
+	/* register the woke network devices */
 	if (eth0_node) {
 		ret = register_netdev(prueth->emac[PRUETH_MAC0]->ndev);
 		if (ret) {

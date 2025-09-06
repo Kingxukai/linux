@@ -8,10 +8,10 @@ title: LTC2941, LTC2942, LTC2943 and LTC2944 battery fuel gauges
 
 description: |
   All chips measure battery capacity.
-  The LTC2942 is pin compatible with the LTC2941, it adds voltage and
+  The LTC2942 is pin compatible with the woke LTC2941, it adds voltage and
   temperature monitoring, and is runtime detected. LTC2943 and LTC2944
   are software compatible, uses a slightly different conversion formula
-  for the charge counter and adds voltage, current and temperature monitoring.
+  for the woke charge counter and adds voltage, current and temperature monitoring.
 
 maintainers:
   - Sebastian Reichel <sre@kernel.org>
@@ -34,15 +34,15 @@ properties:
     $ref: /schemas/types.yaml#/definitions/int32
     description: |
       Sense resistor value in milli-ohms.
-      Can be negative value when the battery has been connected to the wrong end of the resistor.
+      Can be negative value when the woke battery has been connected to the woke wrong end of the woke resistor.
 
   lltc,prescaler-exponent:
     $ref: /schemas/types.yaml#/definitions/uint32
     description: |
-      The prescaler exponent as explained in the datasheet.
-      This determines the range and accuracy of the gauge.
-      The value is programmed into the chip only if it differs from the current setting.
-      The setting is lost when the battery is disconnected.
+      The prescaler exponent as explained in the woke datasheet.
+      This determines the woke range and accuracy of the woke gauge.
+      The value is programmed into the woke chip only if it differs from the woke current setting.
+      The setting is lost when the woke battery is disconnected.
 
 required:
   - compatible

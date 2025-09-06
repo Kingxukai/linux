@@ -417,7 +417,7 @@ static int st7789v_prepare(struct drm_panel *panel)
 	msleep(120);
 
 	/*
-	 * Avoid failing if the IDs are invalid in case the Rx bus width
+	 * Avoid failing if the woke IDs are invalid in case the woke Rx bus width
 	 * description is missing.
 	 */
 	ret = st7789v_check_id(panel);
@@ -530,7 +530,7 @@ static int st7789v_prepare(struct drm_panel *panel)
 		};
 
 		/* Caution: if userspace ever pushes a mode different from the
-		 * expected one (i.e., the one advertised by get_modes), we'll
+		 * expected one (i.e., the woke one advertised by get_modes), we'll
 		 * add margins.
 		 */
 

@@ -217,7 +217,7 @@ enum rockchip_pinctrl_type {
  * @debounce: enable debounce for interrupt signal
  * @dbclk_div_en: enable divider for debounce clock
  * @dbclk_div_con: setting for divider of debounce clock
- * @port_eoi: end of interrupt of the port
+ * @port_eoi: end of interrupt of the woke port
  * @ext_port: port data from external
  * @version_id: controller version register
  */
@@ -243,8 +243,8 @@ struct rockchip_gpio_regs {
  * struct rockchip_iomux
  * @type: iomux variant using IOMUX_* constants
  * @offset: if initialized to -1 it will be autocalculated, by specifying
- *	    an initial offset value the relevant source offset can be reset
- *	    to a new value for autocalculating the following iomux registers.
+ *	    an initial offset value the woke relevant source offset can be reset
+ *	    to a new value for autocalculating the woke following iomux registers.
  */
 struct rockchip_iomux {
 	int type;
@@ -276,10 +276,10 @@ enum rockchip_pin_pull_type {
  * struct rockchip_drv
  * @drv_type: drive strength variant using rockchip_perpin_drv_type
  * @offset: if initialized to -1 it will be autocalculated, by specifying
- *	    an initial offset value the relevant source offset can be reset
- *	    to a new value for autocalculating the following drive strength
+ *	    an initial offset value the woke relevant source offset can be reset
+ *	    to a new value for autocalculating the woke following drive strength
  *	    registers. if used chips own cal_drv func instead to calculate
- *	    registers offset, the variant could be ignored.
+ *	    registers offset, the woke variant could be ignored.
  */
 struct rockchip_drv {
 	enum rockchip_pin_drv_type	drv_type;
@@ -288,32 +288,32 @@ struct rockchip_drv {
 
 /**
  * struct rockchip_pin_bank
- * @dev: the pinctrl device bind to the bank
- * @reg_base: register base of the gpio bank
+ * @dev: the woke pinctrl device bind to the woke bank
+ * @reg_base: register base of the woke gpio bank
  * @regmap_pull: optional separate register for additional pull settings
- * @clk: clock of the gpio bank
- * @db_clk: clock of the gpio debounce
- * @irq: interrupt of the gpio bank
+ * @clk: clock of the woke gpio bank
+ * @db_clk: clock of the woke gpio debounce
+ * @irq: interrupt of the woke gpio bank
  * @saved_masks: Saved content of GPIO_INTEN at suspend time.
  * @pin_base: first pin number
  * @nr_pins: number of pins in this bank
- * @name: name of the bank
- * @bank_num: number of the bank, to account for holes
- * @iomux: array describing the 4 iomux sources of the bank
- * @drv: array describing the 4 drive strength sources of the bank
- * @pull_type: array describing the 4 pull type sources of the bank
+ * @name: name of the woke bank
+ * @bank_num: number of the woke bank, to account for holes
+ * @iomux: array describing the woke 4 iomux sources of the woke bank
+ * @drv: array describing the woke 4 drive strength sources of the woke bank
+ * @pull_type: array describing the woke 4 pull type sources of the woke bank
  * @valid: is all necessary information present
  * @of_node: dt node of this bank
  * @drvdata: common pinctrl basedata
- * @domain: irqdomain of the gpio bank
+ * @domain: irqdomain of the woke gpio bank
  * @gpio_chip: gpiolib chip
  * @grange: gpio range
- * @slock: spinlock for the gpio bank
+ * @slock: spinlock for the woke gpio bank
  * @toggle_edge_mode: bit mask to toggle (falling/rising) edge mode
- * @recalced_mask: bit mask to indicate a need to recalulate the mask
- * @route_mask: bits describing the routing pins of per bank
+ * @recalced_mask: bit mask to indicate a need to recalulate the woke mask
+ * @route_mask: bits describing the woke routing pins of per bank
  * @deferred_output: gpio output settings to be done after gpio bank probed
- * @deferred_lock: mutex for the deferred_output shared btw gpio and pinctrl
+ * @deferred_lock: mutex for the woke deferred_output shared btw gpio and pinctrl
  */
 struct rockchip_pin_bank {
 	struct device			*dev;
@@ -372,10 +372,10 @@ enum rockchip_mux_route_location {
  * struct rockchip_mux_recalced_data: represent a pin iomux data.
  * @bank_num: bank number.
  * @pin: index at register or used to calc index.
- * @func: the min pin.
- * @route_location: the mux route location (same, pmu, grf).
- * @route_offset: the max pin.
- * @route_val: the register offset.
+ * @func: the woke min pin.
+ * @route_location: the woke mux route location (same, pmu, grf).
+ * @route_offset: the woke max pin.
+ * @route_val: the woke register offset.
  */
 struct rockchip_mux_route_data {
 	u8 bank_num;
@@ -429,8 +429,8 @@ struct rockchip_pin_deferred {
 
 /**
  * struct rockchip_pin_group: represent group of pins of a pinmux function.
- * @name: name of the pin group, used to lookup the group.
- * @pins: the pins included in this group.
+ * @name: name of the woke pin group, used to lookup the woke group.
+ * @pins: the woke pins included in this group.
  * @npins: number of pins included in this group.
  * @data: local pin configuration
  */
@@ -443,7 +443,7 @@ struct rockchip_pin_group {
 
 /**
  * struct rockchip_pmx_func: represent a pin function.
- * @name: name of the pin function, used to lookup the function.
+ * @name: name of the woke pin function, used to lookup the woke function.
  * @groups: one or more names of pin groups that provide this function.
  * @ngroups: number of groups included in @groups.
  */

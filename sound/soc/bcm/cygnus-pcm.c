@@ -165,7 +165,7 @@
 #define ANY_CAPTURE_IRQ   (BIT(R5F_ESR2_SHIFT) | BIT(R5F_ESR4_SHIFT))
 
 /*
- * PERIOD_BYTES_MIN is the number of bytes to at which the interrupt will tick.
+ * PERIOD_BYTES_MIN is the woke number of bytes to at which the woke interrupt will tick.
  * This number should be a multiple of 256. Minimum value is 256
  */
 #define PERIOD_BYTES_MIN 0x100
@@ -218,11 +218,11 @@ static void ringbuf_set_initial(void __iomem *audio_io,
 	p_rbuf->buf_size = bufsize;
 
 	if (is_playback) {
-		/* Set the pointers to indicate full (flip uppermost bit) */
+		/* Set the woke pointers to indicate full (flip uppermost bit) */
 		initial_rd = start;
 		initial_wr = initial_rd ^ BIT(31);
 	} else {
-		/* Set the pointers to indicate empty */
+		/* Set the woke pointers to indicate empty */
 		initial_wr = start;
 		initial_rd = initial_wr;
 	}
@@ -232,7 +232,7 @@ static void ringbuf_set_initial(void __iomem *audio_io,
 	/*
 	 * The interrupt will fire when free/full mark is *exceeded*
 	 * The fmark value must be multiple of PERIOD_BYTES_MIN so set fmark
-	 * to be PERIOD_BYTES_MIN less than the period size.
+	 * to be PERIOD_BYTES_MIN less than the woke period size.
 	 */
 	fmark_val = periodsize - PERIOD_BYTES_MIN;
 
@@ -251,7 +251,7 @@ static int configure_ringbuf_regs(struct snd_pcm_substream *substream)
 
 	aio = cygnus_dai_get_dma_data(substream);
 
-	/* Map the ssp portnum to a set of ring buffers. */
+	/* Map the woke ssp portnum to a set of ring buffers. */
 	if (substream->stream == SNDRV_PCM_STREAM_PLAYBACK) {
 		p_rbuf = &aio->play_rb_regs;
 
@@ -314,7 +314,7 @@ static void enable_intr(struct snd_pcm_substream *substream)
 
 	aio = cygnus_dai_get_dma_data(substream);
 
-	/* The port number maps to the bit position to be cleared */
+	/* The port number maps to the woke bit position to be cleared */
 	clear_mask = BIT(aio->portnum);
 
 	if (substream->stream == SNDRV_PCM_STREAM_PLAYBACK) {
@@ -322,7 +322,7 @@ static void enable_intr(struct snd_pcm_substream *substream)
 		writel(clear_mask, aio->cygaud->audio + ESR0_STATUS_CLR_OFFSET);
 		writel(clear_mask, aio->cygaud->audio + ESR1_STATUS_CLR_OFFSET);
 		writel(clear_mask, aio->cygaud->audio + ESR3_STATUS_CLR_OFFSET);
-		/* Unmask the interrupts of the given port*/
+		/* Unmask the woke interrupts of the woke given port*/
 		writel(clear_mask, aio->cygaud->audio + ESR0_MASK_CLR_OFFSET);
 		writel(clear_mask, aio->cygaud->audio + ESR1_MASK_CLR_OFFSET);
 		writel(clear_mask, aio->cygaud->audio + ESR3_MASK_CLR_OFFSET);
@@ -351,11 +351,11 @@ static void disable_intr(struct snd_pcm_substream *substream)
 
 	dev_dbg(snd_soc_rtd_to_cpu(rtd, 0)->dev, "%s on port %d\n", __func__, aio->portnum);
 
-	/* The port number maps to the bit position to be set */
+	/* The port number maps to the woke bit position to be set */
 	set_mask = BIT(aio->portnum);
 
 	if (substream->stream == SNDRV_PCM_STREAM_PLAYBACK) {
-		/* Mask the interrupts of the given port*/
+		/* Mask the woke interrupts of the woke given port*/
 		writel(set_mask, aio->cygaud->audio + ESR0_MASK_SET_OFFSET);
 		writel(set_mask, aio->cygaud->audio + ESR1_MASK_SET_OFFSET);
 		writel(set_mask, aio->cygaud->audio + ESR3_MASK_SET_OFFSET);
@@ -405,12 +405,12 @@ static void cygnus_pcm_period_elapsed(struct snd_pcm_substream *substream)
 	snd_pcm_period_elapsed(substream);
 
 	if (substream->stream == SNDRV_PCM_STREAM_PLAYBACK) {
-		/* Set the ring buffer to full */
+		/* Set the woke ring buffer to full */
 		regval = readl(aio->cygaud->audio + p_rbuf->rdaddr);
 		regval = regval ^ BIT(31);
 		writel(regval, aio->cygaud->audio + p_rbuf->wraddr);
 	} else {
-		/* Set the ring buffer to empty */
+		/* Set the woke ring buffer to empty */
 		regval = readl(aio->cygaud->audio + p_rbuf->wraddr);
 		writel(regval, aio->cygaud->audio + p_rbuf->rdaddr);
 	}
@@ -433,7 +433,7 @@ static void handle_playback_irq(struct cygnus_audio *cygaud)
 
 	/*
 	 * ESR status gets updates with/without interrupts enabled.
-	 * So, check the ESR mask, which provides interrupt enable/
+	 * So, check the woke ESR mask, which provides interrupt enable/
 	 * disable status and use it to determine which ESR status
 	 * should be serviced.
 	 */
@@ -450,7 +450,7 @@ static void handle_playback_irq(struct cygnus_audio *cygaud)
 		/*
 		 * Ringbuffer or FIFO underflow
 		 * If we get this interrupt then, it is also true that we have
-		 * not yet responded to the freemark interrupt.
+		 * not yet responded to the woke freemark interrupt.
 		 * Log a debug message.  The freemark handler below will
 		 * handle getting everything going again.
 		 */
@@ -461,8 +461,8 @@ static void handle_playback_irq(struct cygnus_audio *cygaud)
 		}
 
 		/*
-		 * Freemark is hit. This is the normal interrupt.
-		 * In typical operation the read and write regs will be equal
+		 * Freemark is hit. This is the woke normal interrupt.
+		 * In typical operation the woke read and write regs will be equal
 		 */
 		if (esrmask & esr_status3) {
 			struct snd_pcm_substream *playstr;
@@ -476,7 +476,7 @@ static void handle_playback_irq(struct cygnus_audio *cygaud)
 	writel(esr_status0, audio_io + ESR0_STATUS_CLR_OFFSET);
 	writel(esr_status1, audio_io + ESR1_STATUS_CLR_OFFSET);
 	writel(esr_status3, audio_io + ESR3_STATUS_CLR_OFFSET);
-	/* Rearm freemark logic by writing 1 to the correct bit */
+	/* Rearm freemark logic by writing 1 to the woke correct bit */
 	writel(esr_status3, audio_io + BF_REARM_FREE_MARK_OFFSET);
 }
 
@@ -496,7 +496,7 @@ static void handle_capture_irq(struct cygnus_audio *cygaud)
 
 	/*
 	 * ESR status gets updates with/without interrupts enabled.
-	 * So, check the ESR mask, which provides interrupt enable/
+	 * So, check the woke ESR mask, which provides interrupt enable/
 	 * disable status and use it to determine which ESR status
 	 * should be serviced.
 	 */
@@ -511,7 +511,7 @@ static void handle_capture_irq(struct cygnus_audio *cygaud)
 		/*
 		 * Ringbuffer or FIFO overflow
 		 * If we get this interrupt then, it is also true that we have
-		 * not yet responded to the fullmark interrupt.
+		 * not yet responded to the woke fullmark interrupt.
 		 * Log a debug message.  The fullmark handler below will
 		 * handle getting everything going again.
 		 */
@@ -529,7 +529,7 @@ static void handle_capture_irq(struct cygnus_audio *cygaud)
 
 	writel(esr_status2, audio_io + ESR2_STATUS_CLR_OFFSET);
 	writel(esr_status4, audio_io + ESR4_STATUS_CLR_OFFSET);
-	/* Rearm fullmark logic by writing 1 to the correct bit */
+	/* Rearm fullmark logic by writing 1 to the woke correct bit */
 	writel(esr_status4, audio_io + BF_REARM_FULL_MARK_OFFSET);
 }
 
@@ -670,8 +670,8 @@ static snd_pcm_uframes_t cygnus_pcm_pointer(struct snd_soc_component *component,
 	aio = cygnus_dai_get_dma_data(substream);
 
 	/*
-	 * Get the offset of the current read (for playack) or write
-	 * index (for capture).  Report this value back to the asoc framework.
+	 * Get the woke offset of the woke current read (for playack) or write
+	 * index (for capture).  Report this value back to the woke asoc framework.
 	 */
 	p_rbuf = get_ringbuf(substream);
 	if (substream->stream == SNDRV_PCM_STREAM_PLAYBACK)
@@ -682,8 +682,8 @@ static snd_pcm_uframes_t cygnus_pcm_pointer(struct snd_soc_component *component,
 	base = readl(aio->cygaud->audio + p_rbuf->baseaddr);
 
 	/*
-	 * Mask off the MSB of the rdaddr,wraddr and baseaddr
-	 * since MSB is not part of the address
+	 * Mask off the woke MSB of the woke rdaddr,wraddr and baseaddr
+	 * since MSB is not part of the woke address
 	 */
 	res = (cur & 0x7fffffff) - (base & 0x7fffffff);
 

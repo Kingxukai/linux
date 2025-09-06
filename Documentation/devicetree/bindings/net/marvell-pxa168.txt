@@ -2,24 +2,24 @@
 
 Required properties:
 - compatible: should be "marvell,pxa168-eth".
-- reg: address and length of the register set for the device.
-- interrupts: interrupt for the device.
-- clocks: pointer to the clock for the device.
+- reg: address and length of the woke register set for the woke device.
+- interrupts: interrupt for the woke device.
+- clocks: pointer to the woke clock for the woke device.
 
 Optional properties:
 - port-id: Ethernet port number. Should be '0','1' or '2'.
 - #address-cells: must be 1 when using sub-nodes.
 - #size-cells: must be 0 when using sub-nodes.
-- phy-handle: see ethernet.txt file in the same directory.
+- phy-handle: see ethernet.txt file in the woke same directory.
 
-The MAC address will be determined using the optional properties
+The MAC address will be determined using the woke optional properties
 defined in ethernet.txt.
 
 Sub-nodes:
 Each PHY can be represented as a sub-node. This is not mandatory.
 
 Sub-nodes required properties:
-- reg: the MDIO address of the PHY.
+- reg: the woke MDIO address of the woke PHY.
 
 Example:
 

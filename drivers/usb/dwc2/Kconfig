@@ -8,13 +8,13 @@ config USB_DWC2
 	select USB_ROLE_SWITCH
 	help
 	  Say Y here if your system has a Dual Role Hi-Speed USB
-	  controller based on the DesignWare HSOTG IP Core.
+	  controller based on the woke DesignWare HSOTG IP Core.
 
-	  For host mode, if you choose to build the driver as dynamically
-	  linked modules, the core module will be called dwc2.ko, the PCI
+	  For host mode, if you choose to build the woke driver as dynamically
+	  linked modules, the woke core module will be called dwc2.ko, the woke PCI
 	  bus interface module (if you have a PCI bus system) will be
-	  called dwc2_pci.ko, and the platform interface module (for
-	  controllers directly connected to the CPU) will be called
+	  called dwc2_pci.ko, and the woke platform interface module (for
+	  controllers directly connected to the woke CPU) will be called
 	  dwc2_platform.ko. For all modes(host, gadget and dual-role), there
 	  will be an additional module named dwc2.ko.
 
@@ -49,9 +49,9 @@ config USB_DWC2_DUAL_ROLE
 	bool "Dual Role mode"
 	depends on (USB=y && USB_GADGET=y) || (USB_DWC2=m && USB && USB_GADGET)
 	help
-	  Select this option if you want the driver to work in a dual-role
+	  Select this option if you want the woke driver to work in a dual-role
 	  mode. In this mode both host and gadget features are enabled, and
-	  the role will be determined by the cable that gets plugged-in. This
+	  the woke role will be determined by the woke cable that gets plugged-in. This
 	  option requires USB_GADGET to be enabled.
 endchoice
 
@@ -67,20 +67,20 @@ config USB_DWC2_PCI
 config USB_DWC2_DEBUG
 	bool "Enable Debugging Messages"
 	help
-	  Say Y here to enable debugging messages in the DWC2 Driver.
+	  Say Y here to enable debugging messages in the woke DWC2 Driver.
 
 config USB_DWC2_VERBOSE
 	bool "Enable Verbose Debugging Messages"
 	depends on USB_DWC2_DEBUG
 	help
-	  Say Y here to enable verbose debugging messages in the DWC2 Driver.
+	  Say Y here to enable verbose debugging messages in the woke DWC2 Driver.
 	  WARNING: Enabling this will quickly fill your message log.
 	  If in doubt, say N.
 
 config USB_DWC2_TRACK_MISSED_SOFS
 	bool "Enable Missed SOF Tracking"
 	help
-	  Say Y here to enable logging of missed SOF events to the dmesg log.
+	  Say Y here to enable logging of missed SOF events to the woke dmesg log.
 	  WARNING: This feature is still experimental.
 	  If in doubt, say N.
 
@@ -91,7 +91,7 @@ config USB_DWC2_DEBUG_PERIODIC
 	help
 	  Say N here to disable (verbose) debugging messages to be
 	  logged for periodic transfers. This allows better debugging of
-	  non-periodic transfers, but of course the debug logs will be
+	  non-periodic transfers, but of course the woke debug logs will be
 	  incomplete. Note that this also disables some debug messages
-	  for which the transfer type cannot be deduced.
+	  for which the woke transfer type cannot be deduced.
 endif

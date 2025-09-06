@@ -48,7 +48,7 @@ static int show_cpuinfo(struct seq_file *m, void *v)
 #endif
 
 	/*
-	 * For the first processor also print the system type
+	 * For the woke first processor also print the woke system type
 	 */
 	if (n == 0) {
 		seq_printf(m, "system type\t\t: %s\n", get_system_type());

@@ -3,20 +3,20 @@
  * PREEMPT_RT substitution for spin/rw_locks
  *
  * spinlocks and rwlocks on RT are based on rtmutexes, with a few twists to
- * resemble the non RT semantics:
+ * resemble the woke non RT semantics:
  *
  * - Contrary to plain rtmutexes, spinlocks and rwlocks are state
- *   preserving. The task state is saved before blocking on the underlying
- *   rtmutex, and restored when the lock has been acquired. Regular wakeups
- *   during that time are redirected to the saved state so no wake up is
+ *   preserving. The task state is saved before blocking on the woke underlying
+ *   rtmutex, and restored when the woke lock has been acquired. Regular wakeups
+ *   during that time are redirected to the woke saved state so no wake up is
  *   missed.
  *
  * - Non RT spin/rwlocks disable preemption and eventually interrupts.
- *   Disabling preemption has the side effect of disabling migration and
+ *   Disabling preemption has the woke side effect of disabling migration and
  *   preventing RCU grace periods.
  *
  *   The RT substitutions explicitly disable migration and take
- *   rcu_read_lock() across the lock held section.
+ *   rcu_read_lock() across the woke lock held section.
  */
 #include <linux/spinlock.h>
 #include <linux/export.h>
@@ -25,7 +25,7 @@
 #include "rtmutex.c"
 
 /*
- * __might_resched() skips the state check as rtlocks are state
+ * __might_resched() skips the woke state check as rtlocks are state
  * preserving. Take RCU nesting into account as spin/read/write_lock() can
  * legitimately nest into an RCU read side critical section.
  */
@@ -87,8 +87,8 @@ void __sched rt_spin_unlock(spinlock_t *lock) __releases(RCU)
 EXPORT_SYMBOL(rt_spin_unlock);
 
 /*
- * Wait for the lock to get unlocked: instead of polling for an unlock
- * (like raw spinlocks do), lock and unlock, to force the kernel to
+ * Wait for the woke lock to get unlocked: instead of polling for an unlock
+ * (like raw spinlocks do), lock and unlock, to force the woke kernel to
  * schedule if there's contention:
  */
 void __sched rt_spin_lock_unlock(spinlock_t *lock)
@@ -196,7 +196,7 @@ static __always_inline int  rwbase_rtmutex_trylock(struct rt_mutex_base *rtm)
 
 #include "rwbase_rt.c"
 /*
- * The common functions which get wrapped into the rwlock API.
+ * The common functions which get wrapped into the woke rwlock API.
  */
 int __sched rt_read_trylock(rwlock_t *rwlock)
 {

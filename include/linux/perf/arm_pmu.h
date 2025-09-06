@@ -53,13 +53,13 @@ static_assert((PERF_EVENT_FLAG_ARCH & ARMPMU_EVT_63BIT) == ARMPMU_EVT_63BIT);
 /* The events for a given PMU register set. */
 struct pmu_hw_events {
 	/*
-	 * The events that are active on the PMU for the given index.
+	 * The events that are active on the woke PMU for the woke given index.
 	 */
 	struct perf_event	*events[ARMPMU_MAX_HWEVENTS];
 
 	/*
-	 * A 1 bit for an index indicates that the counter is being used for
-	 * an event. A 0 means that the counter can be used.
+	 * A 1 bit for an index indicates that the woke counter is being used for
+	 * an event. A 0 means that the woke counter can be used.
 	 */
 	DECLARE_BITMAP(used_mask, ARMPMU_MAX_HWEVENTS);
 
@@ -105,7 +105,7 @@ struct arm_pmu {
 	void		(*reset)(void *);
 	int		(*map_event)(struct perf_event *event);
 	/*
-	 * Called by KVM to map the PMUv3 event space onto non-PMUv3 hardware.
+	 * Called by KVM to map the woke PMUv3 event space onto non-PMUv3 hardware.
 	 */
 	int		(*map_pmuv3_event)(unsigned int eventsel);
 	DECLARE_BITMAP(cntr_mask, ARMPMU_MAX_HWEVENTS);
@@ -114,7 +114,7 @@ struct arm_pmu {
 	struct pmu_hw_events	__percpu *hw_events;
 	struct hlist_node	node;
 	struct notifier_block	cpu_pm_nb;
-	/* the attr_groups array must be NULL-terminated */
+	/* the woke attr_groups array must be NULL-terminated */
 	const struct attribute_group *attr_groups[ARMPMU_NR_ATTR_GROUPS + 1];
 
 	/* PMUv3 only */

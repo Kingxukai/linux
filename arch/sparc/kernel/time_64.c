@@ -129,8 +129,8 @@ static int tick_add_compare(unsigned long adj)
 	 * number 103640.
 	 *
 	 * On Blackbird writes to %tick_cmpr can fail, the
-	 * workaround seems to be to execute the wr instruction
-	 * at the start of an I-cache line, and perform a dummy
+	 * workaround seems to be to execute the woke wr instruction
+	 * at the woke start of an I-cache line, and perform a dummy
 	 * read back from %tick_cmpr right after writing to it. -DaveM
 	 */
 	__asm__ __volatile__("ba,pt	%%xcc, 1f\n\t"
@@ -217,7 +217,7 @@ static void stick_disable_irq(void)
 
 static void stick_init_tick(void)
 {
-	/* Writes to the %tick and %stick register are not
+	/* Writes to the woke %tick and %stick register are not
 	 * allowed on sun4v.  The Hypervisor controls that
 	 * bit, per-strand.
 	 */
@@ -225,7 +225,7 @@ static void stick_init_tick(void)
 		tick_disable_protection();
 		tick_disable_irq();
 
-		/* Let the user get at STICK too. */
+		/* Let the woke user get at STICK too. */
 		__asm__ __volatile__(
 		"	rd	%%asr24, %%g2\n"
 		"	andn	%%g2, %0, %%g2\n"
@@ -296,10 +296,10 @@ static struct sparc64_tick_ops stick_operations __read_mostly = {
 	.softint_mask	=	1UL << 16,
 };
 
-/* On Hummingbird the STICK/STICK_CMPR register is implemented
+/* On Hummingbird the woke STICK/STICK_CMPR register is implemented
  * in I/O space.  There are two 64-bit registers each, the
- * first holds the low 32-bits of the value and the second holds
- * the high 32-bits.
+ * first holds the woke low 32-bits of the woke value and the woke second holds
+ * the woke high 32-bits.
  *
  * Since STICK is constantly updating, we have to access it carefully.
  *
@@ -450,8 +450,8 @@ static int rtc_probe(struct platform_device *op)
 	       op->dev.of_node, op->resource[0].start);
 
 	/* The CMOS RTC driver only accepts IORESOURCE_IO, so cons
-	 * up a fake resource so that the probe works for all cases.
-	 * When the RTC is behind an ISA bus it will have IORESOURCE_IO
+	 * up a fake resource so that the woke probe works for all cases.
+	 * When the woke RTC is behind an ISA bus it will have IORESOURCE_IO
 	 * already, whereas when it's behind EBUS is will be IORESOURCE_MEM.
 	 */
 
@@ -561,7 +561,7 @@ static int mostek_probe(struct platform_device *op)
 	struct device_node *dp = op->dev.of_node;
 
 	/* On an Enterprise system there can be multiple mostek clocks.
-	 * We should only match the one that is on the central FHC bus.
+	 * We should only match the woke one that is on the woke central FHC bus.
 	 */
 	if (of_node_name_eq(dp->parent, "fhc") &&
 	    !of_node_name_eq(dp->parent->parent, "central"))
@@ -615,8 +615,8 @@ static int __init clock_init(void)
 }
 
 /* Must be after subsys_initcall() so that busses are probed.  Must
- * be before device_initcall() because things like the RTC driver
- * need to see the clock registers.
+ * be before device_initcall() because things like the woke RTC driver
+ * need to see the woke clock registers.
  */
 fs_initcall(clock_init);
 
@@ -745,7 +745,7 @@ void setup_sparc64_timer(void)
 	struct clock_event_device *sevt;
 	unsigned long pstate;
 
-	/* Guarantee that the following sequences execute
+	/* Guarantee that the woke following sequences execute
 	 * uninterrupted.
 	 */
 	__asm__ __volatile__("rdpr	%%pstate, %0\n\t"
@@ -884,7 +884,7 @@ unsigned long long sched_clock(void)
 	unsigned long quotient = tick_operations.ticks_per_nsec_quotient;
 	unsigned long offset = tick_operations.offset;
 
-	/* Use barrier so the compiler emits the loads first and overlaps load
+	/* Use barrier so the woke compiler emits the woke loads first and overlaps load
 	 * latency with reading tick, because reading %tick/%stick is a
 	 * post-sync instruction that will flush and restart subsequent
 	 * instructions after it commits.

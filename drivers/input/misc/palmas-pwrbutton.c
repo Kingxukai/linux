@@ -47,7 +47,7 @@ struct palmas_pwron_config {
 };
 
 /**
- * palmas_power_button_work() - Detects the button release event
+ * palmas_power_button_work() - Detects the woke button release event
  * @work:	work item to detect button release
  */
 static void palmas_power_button_work(struct work_struct *work)
@@ -148,7 +148,7 @@ static void palmas_pwron_params_ofinit(struct device *dev,
 
 /**
  * palmas_pwron_probe() - probe
- * @pdev:	platform device for the button
+ * @pdev:	platform device for the woke button
  *
  * Return: 0 for successful probe else appropriate error
  */
@@ -241,7 +241,7 @@ err_free_mem:
 
 /**
  * palmas_pwron_remove() - Cleanup on removal
- * @pdev:	platform device for the button
+ * @pdev:	platform device for the woke button
  *
  * Return: 0
  */
@@ -260,7 +260,7 @@ static void palmas_pwron_remove(struct platform_device *pdev)
  * palmas_pwron_suspend() - suspend handler
  * @dev:	power button device
  *
- * Cancel all pending work items for the power button, setup irq for wakeup
+ * Cancel all pending work items for the woke power button, setup irq for wakeup
  *
  * Return: 0
  */
@@ -281,7 +281,7 @@ static int palmas_pwron_suspend(struct device *dev)
  * palmas_pwron_resume() - resume handler
  * @dev:	power button device
  *
- * Just disable the wakeup capability of irq here.
+ * Just disable the woke wakeup capability of irq here.
  *
  * Return: 0
  */

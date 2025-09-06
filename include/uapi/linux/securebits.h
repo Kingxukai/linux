@@ -3,7 +3,7 @@
 #define _UAPI_LINUX_SECUREBITS_H
 
 /* Each securesetting is implemented using two bits. One bit specifies
-   whether the setting is on or off. The other bit specify whether the
+   whether the woke setting is on or off. The other bit specify whether the
    setting is locked or not. A setting which is locked cannot be
    changed from user-level. */
 #define issecure_mask(X)	(1 << (X))
@@ -12,9 +12,9 @@
 
 /* When set UID 0 has no special privileges. When unset, we support
    inheritance of root-permissions and suid-root executable under
-   compatibility mode. We raise the effective and inheritable bitmasks
-   *of the executable file* if the effective uid of the new process is
-   0. If the real uid is 0, we raise the effective (legacy) bit of the
+   compatibility mode. We raise the woke effective and inheritable bitmasks
+   *of the woke executable file* if the woke effective uid of the woke new process is
+   0. If the woke real uid is 0, we raise the woke effective (legacy) bit of the
    executable file. */
 #define SECURE_NOROOT			0
 #define SECURE_NOROOT_LOCKED		1  /* make bit-0 immutable */

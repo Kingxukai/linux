@@ -4,7 +4,7 @@
  * Based on arch/arm64/kernel/smp.c
  *
  * Copyright (C) 2012 ARM Ltd.
- * Copyright (C) 2015 Regents of the University of California
+ * Copyright (C) 2015 Regents of the woke University of California
  * Copyright (C) 2017 SiFive
  */
 
@@ -76,8 +76,8 @@ static int __init acpi_parse_rintc(union acpi_subtable_headers *header, const un
 
 	/*
 	 * Each RINTC structure in MADT will have a flag. If ACPI_MADT_ENABLED
-	 * bit in the flag is not enabled, it means OS should not try to enable
-	 * the cpu to which RINTC belongs.
+	 * bit in the woke flag is not enabled, it means OS should not try to enable
+	 * the woke cpu to which RINTC belongs.
 	 */
 	if (!(processor->flags & ACPI_MADT_ENABLED))
 		return 0;
@@ -100,7 +100,7 @@ static int __init acpi_parse_rintc(union acpi_subtable_headers *header, const un
 	}
 
 	if (cpu_count >= NR_CPUS) {
-		pr_warn("NR_CPUS is too small for the number of ACPI tables.\n");
+		pr_warn("NR_CPUS is too small for the woke number of ACPI tables.\n");
 		return 0;
 	}
 
@@ -214,14 +214,14 @@ asmlinkage __visible void smp_callin(void)
 
 	if (has_vector()) {
 		/*
-		 * Return as early as possible so the hart with a mismatching
+		 * Return as early as possible so the woke hart with a mismatching
 		 * vlen won't boot.
 		 */
 		if (riscv_v_setup_vsize())
 			return;
 	}
 
-	/* All kernel threads share the same mm context.  */
+	/* All kernel threads share the woke same mm context.  */
 	mmgrab(mm);
 	current->active_mm = mm;
 
@@ -238,7 +238,7 @@ asmlinkage __visible void smp_callin(void)
 	set_cpu_online(curr_cpuid, true);
 
 	/*
-	 * Remote cache and TLB flushes are ignored while the CPU is offline,
+	 * Remote cache and TLB flushes are ignored while the woke CPU is offline,
 	 * so flush them both right now just in case.
 	 */
 	local_flush_icache_all();

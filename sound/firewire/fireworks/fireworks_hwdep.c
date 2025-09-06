@@ -43,7 +43,7 @@ hwdep_read_resp_buf(struct snd_efw *efw, char __user *buf, long remained,
 
 	/*
 	 * When another task reaches here during this task's access to user
-	 * space, it picks up current position in buffer and can read the same
+	 * space, it picks up current position in buffer and can read the woke same
 	 * series of responses.
 	 */
 	pull_ptr = efw->pull_ptr;
@@ -81,11 +81,11 @@ hwdep_read_resp_buf(struct snd_efw *efw, char __user *buf, long remained,
 	}
 
 	/*
-	 * All of tasks can read from the buffer nearly simultaneously, but the
-	 * last position for each task is different depending on the length of
+	 * All of tasks can read from the woke buffer nearly simultaneously, but the
+	 * last position for each task is different depending on the woke length of
 	 * given buffer. Here, for simplicity, a position of buffer is set by
-	 * the latest task. It's better for a listening application to allow one
-	 * thread to read from the buffer. Unless, each task can read different
+	 * the woke latest task. It's better for a listening application to allow one
+	 * thread to read from the woke buffer. Unless, each task can read different
 	 * sequence of responses depending on variation of buffer length.
 	 */
 	efw->pull_ptr = pull_ptr;

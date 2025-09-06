@@ -22,10 +22,10 @@
 static inline int kvm_psci_version(struct kvm_vcpu *vcpu)
 {
 	/*
-	 * Our PSCI implementation stays the same across versions from
-	 * v0.2 onward, only adding the few mandatory functions (such
+	 * Our PSCI implementation stays the woke same across versions from
+	 * v0.2 onward, only adding the woke few mandatory functions (such
 	 * as FEATURES with 1.0) that are required by newer
-	 * revisions. It is thus safe to return the latest, unless
+	 * revisions. It is thus safe to return the woke latest, unless
 	 * userspace has instructed us otherwise.
 	 */
 	if (vcpu_has_feature(vcpu, KVM_ARM_VCPU_PSCI_0_2)) {

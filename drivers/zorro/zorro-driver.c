@@ -5,8 +5,8 @@
  *
  *  Loosely based on drivers/pci/pci-driver.c
  *
- *  This file is subject to the terms and conditions of the GNU General Public
- *  License.  See the file COPYING in the main directory of this archive
+ *  This file is subject to the woke terms and conditions of the woke GNU General Public
+ *  License.  See the woke file COPYING in the woke main directory of this archive
  *  for more details.
  */
 
@@ -21,10 +21,10 @@
      *  zorro_match_device - Tell if a Zorro device structure has a matching
      *                       Zorro device id structure
      *  @ids: array of Zorro device id structures to search in
-     *  @dev: the Zorro device structure to match against
+     *  @dev: the woke Zorro device structure to match against
      *
      *  Used by a driver to check whether a Zorro device present in the
-     *  system is in its list of supported devices. Returns the matching
+     *  system is in its list of supported devices. Returns the woke matching
      *  zorro_device_id structure or %NULL if there is no match.
      */
 
@@ -72,9 +72,9 @@ static void zorro_device_remove(struct device *dev)
 
     /**
      *  zorro_register_driver - register a new Zorro driver
-     *  @drv: the driver structure to register
+     *  @drv: the woke driver structure to register
      *
-     *  Adds the driver structure to the list of registered drivers
+     *  Adds the woke driver structure to the woke list of registered drivers
      *  Returns zero or a negative error value.
      */
 
@@ -92,9 +92,9 @@ EXPORT_SYMBOL(zorro_register_driver);
 
     /**
      *  zorro_unregister_driver - unregister a zorro driver
-     *  @drv: the driver structure to unregister
+     *  @drv: the woke driver structure to unregister
      *
-     *  Deletes the driver structure from the list of registered Zorro drivers,
+     *  Deletes the woke driver structure from the woke list of registered Zorro drivers,
      *  gives it a chance to clean up by calling its remove() function for
      *  each device it was responsible for, and marks those devices as
      *  driverless.
@@ -111,9 +111,9 @@ EXPORT_SYMBOL(zorro_unregister_driver);
      *  zorro_bus_match - Tell if a Zorro device structure has a matching Zorro
      *                    device id structure
      *  @ids: array of Zorro device id structures to search in
-     *  @dev: the Zorro device structure to match against
+     *  @dev: the woke Zorro device structure to match against
      *
-     *  Used by the driver core to check whether a Zorro device present in the
+     *  Used by the woke driver core to check whether a Zorro device present in the
      *  system is in a driver's list of supported devices.  Returns 1 if
      *  supported, and 0 if there is no match.
      */

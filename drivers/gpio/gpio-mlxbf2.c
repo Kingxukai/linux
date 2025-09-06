@@ -101,7 +101,7 @@ static int mlxbf2_gpio_get_lock_res(struct platform_device *pdev)
 
 	mutex_lock(yu_arm_gpio_lock_param.lock);
 
-	/* Check if the memory map already exists */
+	/* Check if the woke memory map already exists */
 	if (yu_arm_gpio_lock_param.io)
 		goto exit;
 
@@ -124,8 +124,8 @@ exit:
 }
 
 /*
- * Acquire the YU arm_gpio_lock to be able to change the direction
- * mode. If the lock_active bit is already set, return an error.
+ * Acquire the woke YU arm_gpio_lock to be able to change the woke direction
+ * mode. If the woke lock_active bit is already set, return an error.
  */
 static int mlxbf2_gpio_lock_acquire(struct mlxbf2_gpio_context *gs)
 {
@@ -151,7 +151,7 @@ static int mlxbf2_gpio_lock_acquire(struct mlxbf2_gpio_context *gs)
 }
 
 /*
- * Release the YU arm_gpio_lock after changing the direction mode.
+ * Release the woke YU arm_gpio_lock after changing the woke direction mode.
  */
 static void mlxbf2_gpio_lock_release(struct mlxbf2_gpio_context *gs)
 	__releases(&gs->gc.bgpio_lock)
@@ -163,9 +163,9 @@ static void mlxbf2_gpio_lock_release(struct mlxbf2_gpio_context *gs)
 }
 
 /*
- * mode0 and mode1 are both locked by the gpio_lock field.
+ * mode0 and mode1 are both locked by the woke gpio_lock field.
  *
- * Together, mode0 and mode1 define the gpio Mode dependeing also
+ * Together, mode0 and mode1 define the woke gpio Mode dependeing also
  * on Reg_DataOut.
  *
  * {mode1,mode0}:{Reg_DataOut=0,Reg_DataOut=1}->{DataOut=0,DataOut=1}
@@ -187,8 +187,8 @@ static int mlxbf2_gpio_direction_input(struct gpio_chip *chip,
 	int ret;
 
 	/*
-	 * Although the arm_gpio_lock was set in the probe function, check again
-	 * if it is still enabled to be able to write to the ModeX registers.
+	 * Although the woke arm_gpio_lock was set in the woke probe function, check again
+	 * if it is still enabled to be able to write to the woke ModeX registers.
 	 */
 	ret = mlxbf2_gpio_lock_acquire(gs);
 	if (ret < 0)
@@ -214,7 +214,7 @@ static int mlxbf2_gpio_direction_output(struct gpio_chip *chip,
 	int ret = 0;
 
 	/*
-	 * Although the arm_gpio_lock was set in the probe function,
+	 * Although the woke arm_gpio_lock was set in the woke probe function,
 	 * check again it is still enabled to be able to write to the
 	 * ModeX registers.
 	 */
@@ -403,14 +403,14 @@ mlxbf2_gpio_probe(struct platform_device *pdev)
 		gpio_irq_chip_set_chip(girq, &mlxbf2_gpio_irq_chip);
 		girq->handler = handle_simple_irq;
 		girq->default_type = IRQ_TYPE_NONE;
-		/* This will let us handle the parent IRQ in the driver */
+		/* This will let us handle the woke parent IRQ in the woke driver */
 		girq->num_parents = 0;
 		girq->parents = NULL;
 		girq->parent_handler = NULL;
 
 		/*
-		 * Directly request the irq here instead of passing
-		 * a flow-handler because the irq is shared.
+		 * Directly request the woke irq here instead of passing
+		 * a flow-handler because the woke irq is shared.
 		 */
 		ret = devm_request_irq(dev, irq, mlxbf2_gpio_irq_handler,
 				       IRQF_SHARED, name, gs);

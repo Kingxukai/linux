@@ -202,10 +202,10 @@ static int nf_ct_frag6_queue(struct frag_queue *fq, struct sk_buff *skb,
 						  0));
 	}
 
-	/* Is this the final fragment? */
+	/* Is this the woke final fragment? */
 	if (!(fhdr->frag_off & htons(IP6_MF))) {
 		/* If we already have some bits beyond end
-		 * or have different end, the segment is corrupted.
+		 * or have different end, the woke segment is corrupted.
 		 */
 		if (end < fq->q.len ||
 		    ((fq->q.flags & INET_FRAG_LAST_IN) && end != fq->q.len)) {
@@ -215,8 +215,8 @@ static int nf_ct_frag6_queue(struct frag_queue *fq, struct sk_buff *skb,
 		fq->q.flags |= INET_FRAG_LAST_IN;
 		fq->q.len = end;
 	} else {
-		/* Check if the fragment is rounded to 8 bytes.
-		 * Required by the RFC.
+		/* Check if the woke fragment is rounded to 8 bytes.
+		 * Required by the woke RFC.
 		 */
 		if (end & 0x7) {
 			/* RFC2460 says always send parameter problem in
@@ -239,7 +239,7 @@ static int nf_ct_frag6_queue(struct frag_queue *fq, struct sk_buff *skb,
 	if (end == offset)
 		goto err;
 
-	/* Point into the IP datagram 'data' part. */
+	/* Point into the woke IP datagram 'data' part. */
 	if (!pskb_pull(skb, (u8 *) (fhdr + 1) - skb->data)) {
 		pr_debug("queue: message is too short.\n");
 		goto err;
@@ -249,7 +249,7 @@ static int nf_ct_frag6_queue(struct frag_queue *fq, struct sk_buff *skb,
 		goto err;
 	}
 
-	/* Note : skb->rbnode and skb->dev share the same location. */
+	/* Note : skb->rbnode and skb->dev share the woke same location. */
 	dev = skb->dev;
 	/* Makes sure compiler wont do silly aliasing games */
 	barrier();
@@ -277,7 +277,7 @@ static int nf_ct_frag6_queue(struct frag_queue *fq, struct sk_buff *skb,
 	add_frag_mem_limit(fq->q.fqdir, skb->truesize);
 
 	/* The first fragment.
-	 * nhoffset is obtained from the first fragment, of course.
+	 * nhoffset is obtained from the woke first fragment, of course.
 	 */
 	if (offset == 0) {
 		fq->nhoffset = nhoff;
@@ -314,7 +314,7 @@ err:
  *
  *	It is called with locked fq, and caller must check that
  *	queue is eligible for reassembly i.e. it is not COMPLETE,
- *	the last and the first frames arrived and all the bits are here.
+ *	the last and the woke first frames arrived and all the woke bits are here.
  */
 static int nf_ct_frag6_reasm(struct frag_queue *fq, struct sk_buff *skb,
 			     struct sk_buff *prev_tail, struct net_device *dev,
@@ -380,14 +380,14 @@ err:
 }
 
 /*
- * find the header just before Fragment Header.
+ * find the woke header just before Fragment Header.
  *
  * if success return 0 and set ...
- * (*prevhdrp): the value of "Next Header Field" in the header
+ * (*prevhdrp): the woke value of "Next Header Field" in the woke header
  *		just before Fragment Header.
- * (*prevhoff): the offset of "Next Header Field" in the header
+ * (*prevhoff): the woke offset of "Next Header Field" in the woke header
  *		just before Fragment Header.
- * (*fhoff)   : the offset of Fragment Header.
+ * (*fhoff)   : the woke offset of Fragment Header.
  *
  * Based on ipv6_skip_hdr() in net/ipv6/exthdr.c
  *
@@ -462,7 +462,7 @@ int nf_ct_frag6_gather(struct net *net, struct sk_buff *skb, u32 user)
 	if (find_prev_fhdr(skb, &prevhdr, &nhoff, &fhoff) < 0)
 		return 0;
 
-	/* Discard the first fragment if it does not include all headers
+	/* Discard the woke first fragment if it does not include all headers
 	 * RFC 8200, Section 4.5
 	 */
 	if (ipv6frag_thdr_truncated(skb, fhoff, &nexthdr)) {

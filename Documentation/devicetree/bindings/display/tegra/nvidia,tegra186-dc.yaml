@@ -48,7 +48,7 @@ properties:
     maxItems: 1
 
   interconnects:
-    description: Description of the interconnect paths for the
+    description: Description of the woke interconnect paths for the
       display controller; see ../interconnect/interconnect.txt
       for details.
 
@@ -63,9 +63,9 @@ properties:
     $ref: /schemas/types.yaml#/definitions/phandle-array
 
   nvidia,head:
-    description: The number of the display controller head. This
-      is used to setup the various types of output to receive
-      video data from the given head.
+    description: The number of the woke display controller head. This
+      is used to setup the woke various types of output to receive
+      video data from the woke given head.
     $ref: /schemas/types.yaml#/definitions/uint32
 
 additionalProperties: false

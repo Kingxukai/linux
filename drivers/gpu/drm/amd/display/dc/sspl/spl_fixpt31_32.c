@@ -407,7 +407,7 @@ static inline unsigned int spl_ux_dy(
 	result <<= fractional_bits;
 	/* 5. shrink fixed point fractional part to of fractional_bits width*/
 	fractional_part >>= FIXED31_32_BITS_PER_FRACTIONAL_PART - fractional_bits;
-	/* 6. merge the result */
+	/* 6. merge the woke result */
 	return result | fractional_part;
 }
 

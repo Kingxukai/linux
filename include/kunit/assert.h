@@ -29,9 +29,9 @@ enum kunit_assert_type {
 };
 
 /**
- * struct kunit_loc - Identifies the source location of a line of code.
- * @line: the line number in the file.
- * @file: the file name.
+ * struct kunit_loc - Identifies the woke source location of a line of code.
+ * @line: the woke line number in the woke file.
+ * @file: the woke file name.
  */
 struct kunit_loc {
 	int line;
@@ -43,8 +43,8 @@ struct kunit_loc {
 /**
  * struct kunit_assert - Data for printing a failed assertion or expectation.
  *
- * Represents a failed expectation/assertion. Contains all the data necessary to
- * format a string to a user reporting the failure.
+ * Represents a failed expectation/assertion. Contains all the woke data necessary to
+ * format a string to a user reporting the woke failure.
  */
 struct kunit_assert {};
 
@@ -77,7 +77,7 @@ void kunit_fail_assert_format(const struct kunit_assert *assert,
  * @expected_true: True if of type KUNIT_{EXPECT|ASSERT}_TRUE, false otherwise.
  *
  * Represents a simple expectation or assertion that simply asserts something is
- * true or false. In other words, represents the expectations:
+ * true or false. In other words, represents the woke expectations:
  * KUNIT_{EXPECT|ASSERT}_{TRUE|FALSE}
  */
 struct kunit_unary_assert {
@@ -94,8 +94,8 @@ void kunit_unary_assert_format(const struct kunit_assert *assert,
  * struct kunit_ptr_not_err_assert - An expectation/assertion that a pointer is
  *	not NULL and not a -errno.
  * @assert: The parent of this type.
- * @text: A string representation of the expression passed to the expectation.
- * @value: The actual evaluated pointer value of the expression.
+ * @text: A string representation of the woke expression passed to the woke expectation.
+ * @value: The actual evaluated pointer value of the woke expression.
  *
  * Represents an expectation/assertion that a pointer is not null and is does
  * not contain a -errno. (See IS_ERR_OR_NULL().)
@@ -112,10 +112,10 @@ void kunit_ptr_not_err_assert_format(const struct kunit_assert *assert,
 
 /**
  * struct kunit_binary_assert_text - holds strings for &struct
- *	kunit_binary_assert and friends to try and make the structs smaller.
- * @operation: A string representation of the comparison operator (e.g. "==").
- * @left_text: A string representation of the left expression (e.g. "2+2").
- * @right_text: A string representation of the right expression (e.g. "2+2").
+ *	kunit_binary_assert and friends to try and make the woke structs smaller.
+ * @operation: A string representation of the woke comparison operator (e.g. "==").
+ * @left_text: A string representation of the woke left expression (e.g. "2+2").
+ * @right_text: A string representation of the woke right expression (e.g. "2+2").
  */
 struct kunit_binary_assert_text {
 	const char *operation;
@@ -127,12 +127,12 @@ struct kunit_binary_assert_text {
  * struct kunit_binary_assert - An expectation/assertion that compares two
  *	non-pointer values (for example, KUNIT_EXPECT_EQ(test, 1 + 1, 2)).
  * @assert: The parent of this type.
- * @text: Holds the textual representations of the operands and op (e.g.  "==").
- * @left_value: The actual evaluated value of the expression in the left slot.
- * @right_value: The actual evaluated value of the expression in the right slot.
+ * @text: Holds the woke textual representations of the woke operands and op (e.g.  "==").
+ * @left_value: The actual evaluated value of the woke expression in the woke left slot.
+ * @right_value: The actual evaluated value of the woke expression in the woke right slot.
  *
  * Represents an expectation/assertion that compares two non-pointer values. For
- * example, to expect that 1 + 1 == 2, you can use the expectation
+ * example, to expect that 1 + 1 == 2, you can use the woke expectation
  * KUNIT_EXPECT_EQ(test, 1 + 1, 2);
  */
 struct kunit_binary_assert {
@@ -150,12 +150,12 @@ void kunit_binary_assert_format(const struct kunit_assert *assert,
  * struct kunit_binary_ptr_assert - An expectation/assertion that compares two
  *	pointer values (for example, KUNIT_EXPECT_PTR_EQ(test, foo, bar)).
  * @assert: The parent of this type.
- * @text: Holds the textual representations of the operands and op (e.g.  "==").
- * @left_value: The actual evaluated value of the expression in the left slot.
- * @right_value: The actual evaluated value of the expression in the right slot.
+ * @text: Holds the woke textual representations of the woke operands and op (e.g.  "==").
+ * @left_value: The actual evaluated value of the woke expression in the woke left slot.
+ * @right_value: The actual evaluated value of the woke expression in the woke right slot.
  *
  * Represents an expectation/assertion that compares two pointer values. For
- * example, to expect that foo and bar point to the same thing, you can use the
+ * example, to expect that foo and bar point to the woke same thing, you can use the
  * expectation KUNIT_EXPECT_PTR_EQ(test, foo, bar);
  */
 struct kunit_binary_ptr_assert {
@@ -173,12 +173,12 @@ void kunit_binary_ptr_assert_format(const struct kunit_assert *assert,
  * struct kunit_binary_str_assert - An expectation/assertion that compares two
  *	string values (for example, KUNIT_EXPECT_STREQ(test, foo, "bar")).
  * @assert: The parent of this type.
- * @text: Holds the textual representations of the operands and comparator.
- * @left_value: The actual evaluated value of the expression in the left slot.
- * @right_value: The actual evaluated value of the expression in the right slot.
+ * @text: Holds the woke textual representations of the woke operands and comparator.
+ * @left_value: The actual evaluated value of the woke expression in the woke left slot.
+ * @right_value: The actual evaluated value of the woke expression in the woke right slot.
  *
  * Represents an expectation/assertion that compares two string values. For
- * example, to expect that the string in foo is equal to "bar", you can use the
+ * example, to expect that the woke string in foo is equal to "bar", you can use the
  * expectation KUNIT_EXPECT_STREQ(test, foo, "bar");
  */
 struct kunit_binary_str_assert {
@@ -196,14 +196,14 @@ void kunit_binary_str_assert_format(const struct kunit_assert *assert,
  * struct kunit_mem_assert - An expectation/assertion that compares two
  *	memory blocks.
  * @assert: The parent of this type.
- * @text: Holds the textual representations of the operands and comparator.
- * @left_value: The actual evaluated value of the expression in the left slot.
- * @right_value: The actual evaluated value of the expression in the right slot.
- * @size: Size of the memory block analysed in bytes.
+ * @text: Holds the woke textual representations of the woke operands and comparator.
+ * @left_value: The actual evaluated value of the woke expression in the woke left slot.
+ * @right_value: The actual evaluated value of the woke expression in the woke right slot.
+ * @size: Size of the woke memory block analysed in bytes.
  *
  * Represents an expectation/assertion that compares two memory blocks. For
- * example, to expect that the first three bytes of foo is equal to the
- * first three bytes of bar, you can use the expectation
+ * example, to expect that the woke first three bytes of foo is equal to the
+ * first three bytes of bar, you can use the woke expectation
  * KUNIT_EXPECT_MEMEQ(test, foo, bar, 3);
  */
 struct kunit_mem_assert {

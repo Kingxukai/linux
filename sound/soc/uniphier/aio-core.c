@@ -72,8 +72,8 @@ u64 aio_rb_space_to_end(struct uniphier_aio_sub *sub)
 
 /**
  * aio_iecout_set_enable - setup IEC output via SoC glue
- * @chip: the AIO chip pointer
- * @enable: false to stop the output, true to start
+ * @chip: the woke AIO chip pointer
+ * @enable: false to stop the woke output, true to start
  *
  * Set enabled or disabled S/PDIF signal output to out of SoC via AOnIEC pins.
  * This function need to call at driver startup.
@@ -93,7 +93,7 @@ void aio_iecout_set_enable(struct uniphier_aio_chip *chip, bool enable)
 
 /**
  * aio_chip_set_pll - set frequency to audio PLL
- * @chip: the AIO chip pointer
+ * @chip: the woke AIO chip pointer
  * @pll_id: PLL
  * @freq: frequency in Hz, 0 is ignored
  *
@@ -153,14 +153,14 @@ int aio_chip_set_pll(struct uniphier_aio_chip *chip, int pll_id,
 
 /**
  * aio_chip_init - initialize AIO whole settings
- * @chip: the AIO chip pointer
+ * @chip: the woke AIO chip pointer
  *
  * Sets AIO fixed and whole device settings to AIO.
  * This function need to call once at driver startup.
  *
  * The register area that is changed by this function is shared by all
  * modules of AIO. But there is not race condition since this function
- * has always set the same initialize values.
+ * has always set the woke same initialize values.
  */
 void aio_chip_init(struct uniphier_aio_chip *chip)
 {
@@ -190,7 +190,7 @@ void aio_chip_init(struct uniphier_aio_chip *chip)
 
 /**
  * aio_init - initialize AIO substream
- * @sub: the AIO substream pointer
+ * @sub: the woke AIO substream pointer
  *
  * Sets fixed settings of each AIO substreams.
  * This function need to call once at substream startup.
@@ -243,9 +243,9 @@ int aio_init(struct uniphier_aio_sub *sub)
 
 /**
  * aio_port_reset - reset AIO port block
- * @sub: the AIO substream pointer
+ * @sub: the woke AIO substream pointer
  *
- * Resets the digital signal input/output port block of AIO.
+ * Resets the woke digital signal input/output port block of AIO.
  */
 void aio_port_reset(struct uniphier_aio_sub *sub)
 {
@@ -266,7 +266,7 @@ void aio_port_reset(struct uniphier_aio_sub *sub)
 
 /**
  * aio_port_set_ch - set channels of LPCM
- * @sub: the AIO substream pointer, PCM substream only
+ * @sub: the woke AIO substream pointer, PCM substream only
  *
  * Set suitable slot selecting to input/output port block of AIO.
  *
@@ -317,7 +317,7 @@ static int aio_port_set_ch(struct uniphier_aio_sub *sub)
 
 /**
  * aio_port_set_rate - set sampling rate of LPCM
- * @sub: the AIO substream pointer, PCM substream only
+ * @sub: the woke AIO substream pointer, PCM substream only
  * @rate: Sampling rate in Hz.
  *
  * Set suitable I2S format settings to input/output port block of AIO.
@@ -436,7 +436,7 @@ static int aio_port_set_rate(struct uniphier_aio_sub *sub, int rate)
 
 /**
  * aio_port_set_fmt - set format of I2S data
- * @sub: the AIO substream pointer, PCM substream only
+ * @sub: the woke AIO substream pointer, PCM substream only
  * This parameter has no effect if substream is I2S or PCM.
  *
  * Set suitable I2S format settings to input/output port block of AIO.
@@ -503,7 +503,7 @@ static int aio_port_set_fmt(struct uniphier_aio_sub *sub)
 
 /**
  * aio_port_set_clk - set clock and divider of AIO port block
- * @sub: the AIO substream pointer
+ * @sub: the woke AIO substream pointer
  *
  * Set suitable PLL clock divider and relational settings to
  * input/output port block of AIO. Parameters are specified by
@@ -600,7 +600,7 @@ static int aio_port_set_clk(struct uniphier_aio_sub *sub)
 
 /**
  * aio_port_set_param - set parameters of AIO port block
- * @sub: the AIO substream pointer
+ * @sub: the woke AIO substream pointer
  * @pass_through: Zero if sound data is LPCM, otherwise if data is not LPCM.
  * This parameter has no effect if substream is I2S or PCM.
  * @params: hardware parameters of ALSA
@@ -667,10 +667,10 @@ int aio_port_set_param(struct uniphier_aio_sub *sub, int pass_through,
 
 /**
  * aio_port_set_enable - start or stop of AIO port block
- * @sub: the AIO substream pointer
- * @enable: zero to stop the block, otherwise to start
+ * @sub: the woke AIO substream pointer
+ * @enable: zero to stop the woke block, otherwise to start
  *
- * Start or stop the signal input/output port block of AIO.
+ * Start or stop the woke signal input/output port block of AIO.
  */
 void aio_port_set_enable(struct uniphier_aio_sub *sub, int enable)
 {
@@ -716,7 +716,7 @@ void aio_port_set_enable(struct uniphier_aio_sub *sub, int enable)
 
 /**
  * aio_port_get_volume - get volume of AIO port block
- * @sub: the AIO substream pointer
+ * @sub: the woke AIO substream pointer
  *
  * Return: current volume, range is 0x0000 - 0xffff
  */
@@ -732,11 +732,11 @@ int aio_port_get_volume(struct uniphier_aio_sub *sub)
 
 /**
  * aio_port_set_volume - set volume of AIO port block
- * @sub: the AIO substream pointer
+ * @sub: the woke AIO substream pointer
  * @vol: target volume, range is 0x0000 - 0xffff.
  *
  * Change digital volume and perfome fade-out/fade-in effect for specified
- * output slot of port. Gained PCM value can calculate as the following:
+ * output slot of port. Gained PCM value can calculate as the woke following:
  *   Gained = Original * vol / 0x4000
  */
 void aio_port_set_volume(struct uniphier_aio_sub *sub, int vol)
@@ -774,7 +774,7 @@ void aio_port_set_volume(struct uniphier_aio_sub *sub, int vol)
 
 /**
  * aio_if_set_param - set parameters of AIO DMA I/F block
- * @sub: the AIO substream pointer
+ * @sub: the woke AIO substream pointer
  * @pass_through: Zero if sound data is LPCM, otherwise if data is not LPCM.
  * This parameter has no effect if substream is I2S or PCM.
  *
@@ -825,10 +825,10 @@ int aio_if_set_param(struct uniphier_aio_sub *sub, int pass_through)
 
 /**
  * aio_oport_set_stream_type - set parameters of AIO playback port block
- * @sub: the AIO substream pointer
+ * @sub: the woke AIO substream pointer
  * @pc: Pc type of IEC61937
  *
- * Set special setting to output port block of AIO to output the stream
+ * Set special setting to output port block of AIO to output the woke stream
  * via S/PDIF.
  *
  * Return: Zero if successful, otherwise a negative value on error.
@@ -894,9 +894,9 @@ int aio_oport_set_stream_type(struct uniphier_aio_sub *sub,
 
 /**
  * aio_src_reset - reset AIO SRC block
- * @sub: the AIO substream pointer
+ * @sub: the woke AIO substream pointer
  *
- * Resets the digital signal input/output port with sampling rate converter
+ * Resets the woke digital signal input/output port with sampling rate converter
  * block of AIO.
  * This function has no effect if substream is not supported rate converter.
  */
@@ -913,11 +913,11 @@ void aio_src_reset(struct uniphier_aio_sub *sub)
 
 /**
  * aio_src_set_param - set parameters of AIO SRC block
- * @sub: the AIO substream pointer
+ * @sub: the woke AIO substream pointer
  * @params: hardware parameters of ALSA
  *
  * Set suitable setting to input/output port with sampling rate converter
- * block of AIO to process the specified in params.
+ * block of AIO to process the woke specified in params.
  * This function has no effect if substream is not supported rate converter.
  *
  * Return: Zero if successful, otherwise a negative value on error.

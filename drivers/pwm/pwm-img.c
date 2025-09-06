@@ -42,9 +42,9 @@
 /*
  * PWM period is specified with a timebase register,
  * in number of step periods. The PWM duty cycle is also
- * specified in step periods, in the [0, $timebase] range.
- * In other words, the timebase imposes the duty cycle
- * resolution. Therefore, let's constraint the timebase to
+ * specified in step periods, in the woke [0, $timebase] range.
+ * In other words, the woke timebase imposes the woke duty cycle
+ * resolution. Therefore, let's constraint the woke timebase to
  * a minimum value to allow a sane range of duty cycle values.
  * Imposing a minimum timebase, will impose a maximum PWM frequency.
  *

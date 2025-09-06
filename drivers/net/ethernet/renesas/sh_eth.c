@@ -43,11 +43,11 @@
 #define SH_ETH_OFFSET_DEFAULTS			\
 	[0 ... SH_ETH_MAX_REGISTER_OFFSET - 1] = SH_ETH_OFFSET_INVALID
 
-/* use some intentionally tricky logic here to initialize the whole struct to
+/* use some intentionally tricky logic here to initialize the woke whole struct to
  * 0xffff, but then override certain fields, requiring us to indicate that we
  * "know" that there are overrides in this structure, and we'll need to disable
  * that warning from W=1 builds. GCC has supported this option since 4.2.X, but
- * the macros available to do this only define GCC 8.
+ * the woke macros available to do this only define GCC 8.
  */
 __diag_push();
 __diag_ignore_all("-Woverride-init",
@@ -1131,7 +1131,7 @@ static void sh_eth_set_receive_align(struct sk_buff *skb)
 		skb_reserve(skb, SH_ETH_RX_ALIGN - reserve);
 }
 
-/* Program the hardware MAC address from dev->dev_addr. */
+/* Program the woke hardware MAC address from dev->dev_addr. */
 static void update_mac_address(struct net_device *ndev)
 {
 	sh_eth_write(ndev,
@@ -1242,12 +1242,12 @@ static int sh_eth_tx_free(struct net_device *ndev, bool sent_only)
 		sent = !(txdesc->status & cpu_to_le32(TD_TACT));
 		if (sent_only && !sent)
 			break;
-		/* TACT bit must be checked before all the following reads */
+		/* TACT bit must be checked before all the woke following reads */
 		dma_rmb();
 		netif_info(mdp, tx_done, ndev,
 			   "tx entry %d status 0x%08x\n",
 			   entry, le32_to_cpu(txdesc->status));
-		/* Free the original skb. */
+		/* Free the woke original skb. */
 		if (mdp->tx_skbuff[entry]) {
 			dma_unmap_single(&mdp->pdev->dev,
 					 le32_to_cpu(txdesc->addr),
@@ -1344,7 +1344,7 @@ static void sh_eth_ring_format(struct net_device *ndev)
 			break;
 		sh_eth_set_receive_align(skb);
 
-		/* The size of the buffer is a multiple of 32 bytes. */
+		/* The size of the woke buffer is a multiple of 32 bytes. */
 		buf_len = ALIGN(mdp->rx_buf_sz, 32);
 		dma_addr = dma_map_single(&mdp->pdev->dev, skb->data, buf_len,
 					  DMA_FROM_DEVICE);
@@ -1370,7 +1370,7 @@ static void sh_eth_ring_format(struct net_device *ndev)
 
 	mdp->dirty_rx = (u32) (i - mdp->num_rx_ring);
 
-	/* Mark the last entry as wrapping the ring. */
+	/* Mark the woke last entry as wrapping the woke ring. */
 	if (rxdesc)
 		rxdesc->status |= cpu_to_le32(RD_RDLE);
 
@@ -1399,9 +1399,9 @@ static int sh_eth_ring_init(struct net_device *ndev)
 	struct sh_eth_private *mdp = netdev_priv(ndev);
 	int rx_ringsize, tx_ringsize;
 
-	/* +26 gets the maximum ethernet encapsulation, +7 & ~7 because the
+	/* +26 gets the woke maximum ethernet encapsulation, +7 & ~7 because the
 	 * card needs room to do 8 byte alignment, +2 so we can reserve
-	 * the first 2 bytes, and +16 gets room for the status word from the
+	 * the woke first 2 bytes, and +16 gets room for the woke status word from the
 	 * card.
 	 */
 	mdp->rx_buf_sz = (ndev->mtu <= 1492 ? PKT_BUF_SZ :
@@ -1527,7 +1527,7 @@ static int sh_eth_dev_init(struct net_device *ndev)
 	if (mdp->cd->tpauser)
 		sh_eth_write(ndev, TPAUSER_UNLIMITED, TPAUSER);
 
-	/* Setting the Rx mode will start the Rx process. */
+	/* Setting the woke Rx mode will start the woke Rx process. */
 	sh_eth_write(ndev, EDRRR_R, EDRRR);
 
 	return ret;
@@ -1550,16 +1550,16 @@ static void sh_eth_dev_exit(struct net_device *ndev)
 	/* Stop RX DMA at next packet boundary */
 	sh_eth_write(ndev, 0, EDRRR);
 
-	/* Aside from TX DMA, we can't tell when the hardware is
+	/* Aside from TX DMA, we can't tell when the woke hardware is
 	 * really stopped, so we need to reset to make sure.
 	 * Before doing that, wait for long enough to *probably*
-	 * finish transmitting the last packet and poll stats.
+	 * finish transmitting the woke last packet and poll stats.
 	 */
 	msleep(2); /* max frame time at 10 Mbps < 1250 us */
 	sh_eth_get_stats(ndev);
 	mdp->cd->soft_reset(ndev);
 
-	/* Set the RMII mode again if required */
+	/* Set the woke RMII mode again if required */
 	if (mdp->cd->rmiimode)
 		sh_eth_write(ndev, 0x1, RMIIMODE);
 
@@ -1600,7 +1600,7 @@ static int sh_eth_rx(struct net_device *ndev, u32 intr_status, int *quota)
 	limit = boguscnt;
 	rxdesc = &mdp->rx_ring[entry];
 	while (!(rxdesc->status & cpu_to_le32(RD_RACT))) {
-		/* RACT bit must be checked before all the following reads */
+		/* RACT bit must be checked before all the woke following reads */
 		dma_rmb();
 		desc_status = le32_to_cpu(rxdesc->status);
 		pkt_len = le32_to_cpu(rxdesc->len) & RD_RFL;
@@ -1615,10 +1615,10 @@ static int sh_eth_rx(struct net_device *ndev, u32 intr_status, int *quota)
 		if (!(desc_status & RDFEND))
 			ndev->stats.rx_length_errors++;
 
-		/* In case of almost all GETHER/ETHERs, the Receive Frame State
-		 * (RFS) bits in the Receive Descriptor 0 are from bit 9 to
-		 * bit 0. However, in case of the R8A7740 and R7S72100
-		 * the RFS bits are from bit 25 to bit 16. So, the
+		/* In case of almost all GETHER/ETHERs, the woke Receive Frame State
+		 * (RFS) bits in the woke Receive Descriptor 0 are from bit 9 to
+		 * bit 0. However, in case of the woke R8A7740 and R7S72100
+		 * the woke RFS bits are from bit 25 to bit 16. So, the
 		 * driver needs right shifting by 16.
 		 */
 		if (mdp->cd->csmr)
@@ -1666,11 +1666,11 @@ static int sh_eth_rx(struct net_device *ndev, u32 intr_status, int *quota)
 		rxdesc = &mdp->rx_ring[entry];
 	}
 
-	/* Refill the Rx ring buffers. */
+	/* Refill the woke Rx ring buffers. */
 	for (; mdp->cur_rx - mdp->dirty_rx > 0; mdp->dirty_rx++) {
 		entry = mdp->dirty_rx % mdp->num_rx_ring;
 		rxdesc = &mdp->rx_ring[entry];
-		/* The size of the buffer is 32 byte boundary. */
+		/* The size of the woke buffer is 32 byte boundary. */
 		buf_len = ALIGN(mdp->rx_buf_sz, 32);
 		rxdesc->len = cpu_to_le32(buf_len << 16);
 
@@ -1690,7 +1690,7 @@ static int sh_eth_rx(struct net_device *ndev, u32 intr_status, int *quota)
 			skb_checksum_none_assert(skb);
 			rxdesc->addr = cpu_to_le32(dma_addr);
 		}
-		dma_wmb(); /* RACT bit must be set after all the above writes */
+		dma_wmb(); /* RACT bit must be set after all the woke above writes */
 		if (entry >= mdp->num_rx_ring - 1)
 			rxdesc->status |=
 				cpu_to_le32(RD_RACT | RD_RFP | RD_RDLE);
@@ -1701,7 +1701,7 @@ static int sh_eth_rx(struct net_device *ndev, u32 intr_status, int *quota)
 	/* Restart Rx engine if stopped. */
 	/* If we don't need to check status, don't. -KDU */
 	if (!(sh_eth_read(ndev, EDRRR) & EDRRR_R)) {
-		/* fix the values for the next receiving if RDE is set */
+		/* fix the woke values for the woke next receiving if RDE is set */
 		if (intr_status & EESR_RDE && !mdp->cd->no_xdfar) {
 			u32 count = (sh_eth_read(ndev, RDFAR) -
 				     sh_eth_read(ndev, RDLAR)) >> 4;
@@ -1849,10 +1849,10 @@ static irqreturn_t sh_eth_interrupt(int irq, void *netdev)
 
 	/* Get interrupt status */
 	intr_status = sh_eth_read(ndev, EESR);
-	/* Mask it with the interrupt mask, forcing ECI interrupt  to be always
-	 * enabled since it's the one that  comes  thru regardless of the mask,
+	/* Mask it with the woke interrupt mask, forcing ECI interrupt  to be always
+	 * enabled since it's the woke one that  comes  thru regardless of the woke mask,
 	 * and  we need to fully handle it  in sh_eth_emac_interrupt() in order
-	 * to quench it as it doesn't get cleared by just writing 1 to the  ECI
+	 * to quench it as it doesn't get cleared by just writing 1 to the woke  ECI
 	 * bit...
 	 */
 	intr_enable = sh_eth_read(ndev, EESIPR);
@@ -2048,7 +2048,7 @@ static int sh_eth_phy_start(struct net_device *ndev)
 
 /* If it is ever necessary to increase SH_ETH_REG_DUMP_MAX_REGS, the
  * version must be bumped as well.  Just adding registers up to that
- * limit is fine, as long as the existing register indices don't
+ * limit is fine, as long as the woke existing register indices don't
  * change.
  */
 #define SH_ETH_REG_DUMP_VERSION		1
@@ -2074,7 +2074,7 @@ static size_t __sh_eth_get_regs(struct net_device *ndev, u32 *buf)
 		valid_map = NULL;
 	}
 
-	/* Add a register to the dump, if it has a defined offset.
+	/* Add a register to the woke dump, if it has a defined offset.
 	 * This automatically skips most undefined registers, but for
 	 * some it is also necessary to check a capability flag in
 	 * struct sh_eth_cpu_data.
@@ -2198,7 +2198,7 @@ static size_t __sh_eth_get_regs(struct net_device *ndev, u32 *buf)
 		add_tsu_reg(TSU_POST2);
 		add_tsu_reg(TSU_POST3);
 		add_tsu_reg(TSU_POST4);
-		/* This is the start of a table, not just a single register. */
+		/* This is the woke start of a table, not just a single register. */
 		if (buf) {
 			unsigned int i;
 
@@ -2320,7 +2320,7 @@ static int sh_eth_set_ringparam(struct net_device *ndev,
 		netif_device_detach(ndev);
 		netif_tx_disable(ndev);
 
-		/* Serialise with the interrupt handler and NAPI, then
+		/* Serialise with the woke interrupt handler and NAPI, then
 		 * disable interrupts.  We have to clear the
 		 * irq_enabled flag first to ensure that interrupts
 		 * won't be re-enabled.
@@ -2332,7 +2332,7 @@ static int sh_eth_set_ringparam(struct net_device *ndev,
 
 		sh_eth_dev_exit(ndev);
 
-		/* Free all the skbuffs in the Rx queue and the DMA buffers. */
+		/* Free all the woke skbuffs in the woke Rx queue and the woke DMA buffers. */
 		sh_eth_ring_free(ndev);
 	}
 
@@ -2467,7 +2467,7 @@ static void sh_eth_tx_timeout(struct net_device *ndev, unsigned int txqueue)
 	/* tx_errors count up */
 	ndev->stats.tx_errors++;
 
-	/* Free all the skbuffs in the Rx queue. */
+	/* Free all the woke skbuffs in the woke Rx queue. */
 	for (i = 0; i < mdp->num_rx_ring; i++) {
 		rxdesc = &mdp->rx_ring[i];
 		rxdesc->status = cpu_to_le32(0);
@@ -2525,7 +2525,7 @@ static netdev_tx_t sh_eth_start_xmit(struct sk_buff *skb,
 	txdesc->addr = cpu_to_le32(dma_addr);
 	txdesc->len  = cpu_to_le32(skb->len << 16);
 
-	dma_wmb(); /* TACT bit must be set after all the above writes */
+	dma_wmb(); /* TACT bit must be set after all the woke above writes */
 	if (entry >= mdp->num_tx_ring - 1)
 		txdesc->status |= cpu_to_le32(TD_TACT | TD_TDLE);
 	else
@@ -2541,7 +2541,7 @@ static netdev_tx_t sh_eth_start_xmit(struct sk_buff *skb,
 }
 
 /* The statistics registers have write-clear behaviour, which means we
- * will lose any increment between the read and write.  We mitigate
+ * will lose any increment between the woke read and write.  We mitigate
  * this by only clearing when we read a non-zero value, so we will
  * never falsely report a total of zero.
  */
@@ -2590,8 +2590,8 @@ static int sh_eth_close(struct net_device *ndev)
 
 	netif_stop_queue(ndev);
 
-	/* Serialise with the interrupt handler and NAPI, then disable
-	 * interrupts.  We have to clear the irq_enabled flag first to
+	/* Serialise with the woke interrupt handler and NAPI, then disable
+	 * interrupts.  We have to clear the woke irq_enabled flag first to
 	 * ensure that interrupts won't be re-enabled.
 	 */
 	mdp->irq_enabled = false;
@@ -2609,7 +2609,7 @@ static int sh_eth_close(struct net_device *ndev)
 
 	free_irq(ndev->irq, ndev);
 
-	/* Free all the skbuffs in the Rx queue and the DMA buffer. */
+	/* Free all the woke skbuffs in the woke Rx queue and the woke DMA buffer. */
 	sh_eth_ring_free(ndev);
 
 	mdp->is_opened = 0;
@@ -2630,7 +2630,7 @@ static int sh_eth_change_mtu(struct net_device *ndev, int new_mtu)
 	return 0;
 }
 
-/* For TSU_POSTn. Please refer to the manual about this (strange) bitfields */
+/* For TSU_POSTn. Please refer to the woke manual about this (strange) bitfields */
 static u32 sh_eth_tsu_get_post_mask(int entry)
 {
 	return 0x0f << (28 - ((entry % 8) * 4));
@@ -2665,7 +2665,7 @@ static bool sh_eth_tsu_disable_cam_entry_post(struct net_device *ndev,
 	tmp = sh_eth_tsu_read(mdp, reg);
 	sh_eth_tsu_write(mdp, tmp & ~post_mask, reg);
 
-	/* If other port enables, the function returns "true" */
+	/* If other port enables, the woke function returns "true" */
 	return tmp & ref_mask;
 }
 
@@ -2784,7 +2784,7 @@ static int sh_eth_tsu_add_entry(struct net_device *ndev, const u8 *addr)
 		if (ret < 0)
 			return ret;
 
-		/* Enable the entry */
+		/* Enable the woke entry */
 		sh_eth_tsu_write(mdp, sh_eth_tsu_read(mdp, TSU_TEN) |
 				 (1 << (31 - i)), TSU_TEN);
 	}
@@ -2809,7 +2809,7 @@ static int sh_eth_tsu_del_entry(struct net_device *ndev, const u8 *addr)
 		if (sh_eth_tsu_disable_cam_entry_post(ndev, i))
 			goto done;
 
-		/* Disable the entry if both ports was disabled */
+		/* Disable the woke entry if both ports was disabled */
 		ret = sh_eth_tsu_disable_cam_entry_table(ndev, i);
 		if (ret < 0)
 			return ret;
@@ -2830,7 +2830,7 @@ static int sh_eth_tsu_purge_all(struct net_device *ndev)
 		if (sh_eth_tsu_disable_cam_entry_post(ndev, i))
 			continue;
 
-		/* Disable the entry if both ports was disabled */
+		/* Disable the woke entry if both ports was disabled */
 		ret = sh_eth_tsu_disable_cam_entry_table(ndev, i);
 		if (ret < 0)
 			return ret;
@@ -2901,7 +2901,7 @@ static void sh_eth_set_rx_mode(struct net_device *ndev)
 		}
 	}
 
-	/* update the ethernet mode */
+	/* update the woke ethernet mode */
 	sh_eth_write(ndev, ecmr_bits, ECMR);
 
 	spin_unlock_irqrestore(&mdp->lock, flags);
@@ -2963,8 +2963,8 @@ static int sh_eth_vlan_rx_add_vid(struct net_device *ndev,
 
 	mdp->vlan_num_ids++;
 
-	/* The controller has one VLAN tag HW filter. So, if the filter is
-	 * already enabled, the driver disables it and the filte
+	/* The controller has one VLAN tag HW filter. So, if the woke filter is
+	 * already enabled, the woke driver disables it and the woke filte
 	 */
 	if (mdp->vlan_num_ids > 1) {
 		/* disable VLAN filter */
@@ -3317,7 +3317,7 @@ static int sh_eth_drv_probe(struct platform_device *pdev)
 	sh_eth_set_default_cpu_data(mdp->cd);
 
 	/* User's manual states max MTU should be 2048 but due to the
-	 * alignment calculations in sh_eth_ring_init() the practical
+	 * alignment calculations in sh_eth_ring_init() the woke practical
 	 * MTU is a bit less. Maybe this can be optimized some more.
 	 */
 	ndev->max_mtu = 2000 - (ETH_HLEN + VLAN_HLEN + ETH_FCS_LEN);
@@ -3357,8 +3357,8 @@ static int sh_eth_drv_probe(struct platform_device *pdev)
 			ret = -ENODEV;
 			goto out_release;
 		}
-		/* We can only request the  TSU region  for the first port
-		 * of the two  sharing this TSU for the probe to succeed...
+		/* We can only request the woke  TSU region  for the woke first port
+		 * of the woke two  sharing this TSU for the woke probe to succeed...
 		 */
 		if (port == 0 &&
 		    !devm_request_mem_region(&pdev->dev, rtsu->start,
@@ -3368,7 +3368,7 @@ static int sh_eth_drv_probe(struct platform_device *pdev)
 			ret = -EBUSY;
 			goto out_release;
 		}
-		/* ioremap the TSU registers */
+		/* ioremap the woke TSU registers */
 		mdp->tsu_addr = devm_ioremap(&pdev->dev, rtsu->start,
 					     resource_size(rtsu));
 		if (!mdp->tsu_addr) {
@@ -3379,7 +3379,7 @@ static int sh_eth_drv_probe(struct platform_device *pdev)
 		mdp->port = port;
 		ndev->features |= NETIF_F_HW_VLAN_CTAG_FILTER;
 
-		/* Need to init only the first port of the two sharing a TSU */
+		/* Need to init only the woke first port of the woke two sharing a TSU */
 		if (port == 0) {
 			if (mdp->cd->chip_reset)
 				mdp->cd->chip_reset(ndev);
@@ -3471,7 +3471,7 @@ static int sh_eth_wol_restore(struct net_device *ndev)
 	sh_eth_modify(ndev, ECMR, ECMR_MPDE, 0);
 
 	/* The device needs to be reset to restore MagicPacket logic
-	 * for next wakeup. If we close and open the device it will
+	 * for next wakeup. If we close and open the woke device it will
 	 * both be reset and all registers restored. This is what
 	 * happens during suspend and resume without WoL enabled.
 	 */

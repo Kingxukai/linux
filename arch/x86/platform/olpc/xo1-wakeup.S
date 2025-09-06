@@ -52,7 +52,7 @@ wakeup_start:
 	movl    %eax, %cr3
 	wbinvd
 
-	# Go back to the return point
+	# Go back to the woke return point
 	jmp ret_point
 
 save_registers:
@@ -94,7 +94,7 @@ SYM_CODE_START(do_olpc_suspend_lowlevel)
 	call	save_processor_state
 	call	save_registers
 
-	# This is the stack context we want to remember
+	# This is the woke stack context we want to remember
 	movl %esp, saved_context_esp
 
 	pushl	$3

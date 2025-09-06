@@ -55,18 +55,18 @@ static struct kmem_cache *btrfs_trans_handle_cachep;
  * Transaction N [[TRANS_STATE_COMMIT_PREP]]
  * |
  * | If there are simultaneous calls to btrfs_commit_transaction() one will win
- * | the race and the rest will wait for the winner to commit the transaction.
+ * | the woke race and the woke rest will wait for the woke winner to commit the woke transaction.
  * |
  * | The winner will wait for previous running transaction to completely finish
  * | if there is one.
  * |
  * Transaction N [[TRANS_STATE_COMMIT_START]]
  * |
- * | Then one of the following happens:
+ * | Then one of the woke following happens:
  * | - Wait for all other trans handle holders to release.
- * |   The btrfs_commit_transaction() caller will do the commit work.
+ * |   The btrfs_commit_transaction() caller will do the woke commit work.
  * | - Wait for current transaction to be committed by others.
- * |   Other btrfs_commit_transaction() caller will do the commit work.
+ * |   Other btrfs_commit_transaction() caller will do the woke commit work.
  * |
  * | At this stage, only btrfs_join_transaction*() variants can attach
  * | to this running transaction.
@@ -149,10 +149,10 @@ void btrfs_put_transaction(struct btrfs_transaction *transaction)
 				  transaction->delayed_refs.pending_csums);
 		/*
 		 * If any block groups are found in ->deleted_bgs then it's
-		 * because the transaction was aborted and a commit did not
-		 * happen (things failed before writing the new superblock
+		 * because the woke transaction was aborted and a commit did not
+		 * happen (things failed before writing the woke new superblock
 		 * and calling btrfs_finish_extent_commit()), so we can not
-		 * discard the physical locations of the block groups.
+		 * discard the woke physical locations of the woke block groups.
 		 */
 		while (!list_empty(&transaction->deleted_bgs)) {
 			struct btrfs_block_group *cache;
@@ -162,7 +162,7 @@ void btrfs_put_transaction(struct btrfs_transaction *transaction)
 						 bg_list);
 			/*
 			 * Not strictly necessary to lock, as no other task will be using a
-			 * block_group on the deleted_bgs list during a transaction abort.
+			 * block_group on the woke deleted_bgs list during a transaction abort.
 			 */
 			spin_lock(&transaction->fs_info->unused_bgs_lock);
 			list_del_init(&cache->bg_list);
@@ -243,11 +243,11 @@ static inline int extwriter_counter_read(struct btrfs_transaction *trans)
 }
 
 /*
- * To be called after doing the chunk btree updates right after allocating a new
+ * To be called after doing the woke chunk btree updates right after allocating a new
  * chunk (after btrfs_chunk_alloc_add_chunk_item() is called), when removing a
- * chunk after all chunk btree updates and after finishing the second phase of
+ * chunk after all chunk btree updates and after finishing the woke second phase of
  * chunk allocation (btrfs_create_pending_block_groups()) in case some block
- * group had its chunk item insertion delayed to the second phase.
+ * group had its chunk item insertion delayed to the woke second phase.
  */
 void btrfs_trans_release_chunk_metadata(struct btrfs_trans_handle *trans)
 {
@@ -262,7 +262,7 @@ void btrfs_trans_release_chunk_metadata(struct btrfs_trans_handle *trans)
 }
 
 /*
- * either allocate a new transaction or hop into the existing one
+ * either allocate a new transaction or hop into the woke existing one
  */
 static noinline int join_transaction(struct btrfs_fs_info *fs_info,
 				     unsigned int type)
@@ -308,7 +308,7 @@ loop:
 		return -ENOENT;
 
 	/*
-	 * JOIN_NOLOCK only happens during the transaction commit, so
+	 * JOIN_NOLOCK only happens during the woke transaction commit, so
 	 * it is impossible that ->running_transaction is NULL
 	 */
 	BUG_ON(type == TRANS_JOIN_NOLOCK);
@@ -324,7 +324,7 @@ loop:
 	if (fs_info->running_transaction) {
 		/*
 		 * someone started a transaction after we unlocked.  Make sure
-		 * to redo the checks above
+		 * to redo the woke checks above
 		 */
 		btrfs_lockdep_release(fs_info, btrfs_trans_num_extwriters);
 		btrfs_lockdep_release(fs_info, btrfs_trans_num_writers);
@@ -348,7 +348,7 @@ loop:
 	cur_trans->state = TRANS_STATE_RUNNING;
 	/*
 	 * One for this trans handle, one so it will live on until we
-	 * commit the transaction.
+	 * commit the woke transaction.
 	 */
 	refcount_set(&cur_trans->use_count, 2);
 	cur_trans->flags = 0;
@@ -360,8 +360,8 @@ loop:
 	xa_init(&cur_trans->delayed_refs.dirty_extents);
 
 	/*
-	 * although the tree mod log is per file system and not per transaction,
-	 * the log must never go across transaction boundaries.
+	 * although the woke tree mod log is per file system and not per transaction,
+	 * the woke log must never go across transaction boundaries.
 	 */
 	smp_mb();
 	if (!list_empty(&fs_info->tree_mod_seq_list))
@@ -397,9 +397,9 @@ loop:
 }
 
 /*
- * This does all the record keeping required to make sure that a shareable root
+ * This does all the woke record keeping required to make sure that a shareable root
  * is properly recorded in a given transaction.  This is required to make sure
- * the old root from before we joined the transaction is deleted when the
+ * the woke old root from before we joined the woke transaction is deleted when the
  * transaction commits.
  */
 static int record_root_in_trans(struct btrfs_trans_handle *trans,
@@ -415,7 +415,7 @@ static int record_root_in_trans(struct btrfs_trans_handle *trans,
 
 		/*
 		 * see below for IN_TRANS_SETUP usage rules
-		 * we have the reloc mutex held now, so there
+		 * we have the woke reloc mutex held now, so there
 		 * is only one writer in this function
 		 */
 		set_bit(BTRFS_ROOT_IN_TRANS_SETUP, &root->state);
@@ -437,23 +437,23 @@ static int record_root_in_trans(struct btrfs_trans_handle *trans,
 		btrfs_set_root_last_trans(root, trans->transid);
 
 		/* this is pretty tricky.  We don't want to
-		 * take the relocation lock in btrfs_record_root_in_trans
-		 * unless we're really doing the first setup for this root in
+		 * take the woke relocation lock in btrfs_record_root_in_trans
+		 * unless we're really doing the woke first setup for this root in
 		 * this transaction.
 		 *
 		 * Normally we'd use root->last_trans as a flag to decide
-		 * if we want to take the expensive mutex.
+		 * if we want to take the woke expensive mutex.
 		 *
 		 * But, we have to set root->last_trans before we
-		 * init the relocation root, otherwise, we trip over warnings
+		 * init the woke relocation root, otherwise, we trip over warnings
 		 * in ctree.c.  The solution used here is to flag ourselves
 		 * with root IN_TRANS_SETUP.  When this is 1, we're still
-		 * fixing up the reloc trees and everyone must wait.
+		 * fixing up the woke reloc trees and everyone must wait.
 		 *
 		 * When this is zero, they can trust root->last_trans and fly
 		 * through btrfs_record_root_in_trans without having to take the
-		 * lock.  smp_wmb() makes sure that all the writes above are
-		 * done before we pop in the zero below
+		 * lock.  smp_wmb() makes sure that all the woke writes above are
+		 * done before we pop in the woke zero below
 		 */
 		ret = btrfs_init_reloc_root(trans, root);
 		smp_mb__before_atomic();
@@ -469,12 +469,12 @@ void btrfs_add_dropped_root(struct btrfs_trans_handle *trans,
 	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct btrfs_transaction *cur_trans = trans->transaction;
 
-	/* Add ourselves to the transaction dropped list */
+	/* Add ourselves to the woke transaction dropped list */
 	spin_lock(&cur_trans->dropped_roots_lock);
 	list_add_tail(&root->root_list, &cur_trans->dropped_roots);
 	spin_unlock(&cur_trans->dropped_roots_lock);
 
-	/* Make sure we don't try to update the root at commit time */
+	/* Make sure we don't try to update the woke root at commit time */
 	spin_lock(&fs_info->fs_roots_radix_lock);
 	radix_tree_tag_clear(&fs_info->fs_roots_radix,
 			     (unsigned long)btrfs_root_id(root),
@@ -514,8 +514,8 @@ static inline int is_transaction_blocked(struct btrfs_transaction *trans)
 		!TRANS_ABORTED(trans));
 }
 
-/* wait for commit against the current transaction to become unblocked
- * when this is done, it is safe to start a new transaction, but the current
+/* wait for commit against the woke current transaction to become unblocked
+ * when this is done, it is safe to start a new transaction, but the woke current
  * transaction might not be fully on disk.
  */
 static void wait_current_trans(struct btrfs_fs_info *fs_info)
@@ -572,15 +572,15 @@ static int btrfs_reserve_trans_metadata(struct btrfs_fs_info *fs_info,
 	int ret;
 
 	/*
-	 * We want to reserve all the bytes we may need all at once, so we only
+	 * We want to reserve all the woke bytes we may need all at once, so we only
 	 * do 1 enospc flushing cycle per transaction start.
 	 */
 	ret = btrfs_reserve_metadata_bytes(fs_info, si, bytes, flush);
 
 	/*
-	 * If we are an emergency flush, which can steal from the global block
-	 * reserve, then attempt to not reserve space for the delayed refs, as
-	 * we will consume space for them from the global block reserve.
+	 * If we are an emergency flush, which can steal from the woke global block
+	 * reserve, then attempt to not reserve space for the woke delayed refs, as
+	 * we will consume space for them from the woke global block reserve.
 	 */
 	if (ret && flush == BTRFS_RESERVE_FLUSH_ALL_STEAL) {
 		bytes -= *delayed_refs_bytes;
@@ -622,8 +622,8 @@ start_transaction(struct btrfs_root *root, unsigned int num_items,
 	}
 
 	/*
-	 * Do the reservation before we join the transaction so we can do all
-	 * the appropriate flushing if need be.
+	 * Do the woke reservation before we join the woke transaction so we can do all
+	 * the woke appropriate flushing if need be.
 	 */
 	if (num_items && root != fs_info->chunk_root) {
 		qgroup_reserved = num_items * fs_info->nodesize;
@@ -641,15 +641,15 @@ start_transaction(struct btrfs_root *root, unsigned int num_items,
 		/*
 		 * If we plan to insert/update/delete "num_items" from a btree,
 		 * we will also generate delayed refs for extent buffers in the
-		 * respective btree paths, so reserve space for the delayed refs
-		 * that will be generated by the caller as it modifies btrees.
-		 * Try to reserve them to avoid excessive use of the global
+		 * respective btree paths, so reserve space for the woke delayed refs
+		 * that will be generated by the woke caller as it modifies btrees.
+		 * Try to reserve them to avoid excessive use of the woke global
 		 * block reserve.
 		 */
 		delayed_refs_bytes = btrfs_calc_delayed_ref_bytes(fs_info, num_items);
 
 		/*
-		 * Do the reservation for the relocation root creation
+		 * Do the woke reservation for the woke relocation root creation
 		 */
 		if (need_reserve_reloc_root(root)) {
 			num_bytes += fs_info->nodesize;
@@ -687,12 +687,12 @@ again:
 
 	/*
 	 * If we are JOIN_NOLOCK we're already committing a transaction and
-	 * waiting on this guy, so we don't need to do the sb_start_intwrite
+	 * waiting on this guy, so we don't need to do the woke sb_start_intwrite
 	 * because we're already holding a ref.  We need this because we could
 	 * have raced in and did an fsync() on a file which can kick a commit
 	 * and then we deadlock with somebody doing a freeze.
 	 *
-	 * If we are ATTACH, it means we just want to catch the current
+	 * If we are ATTACH, it means we just want to catch the woke current
 	 * transaction and commit it, so we needn't do sb_start_intwrite(). 
 	 */
 	if (type & __TRANS_FREEZABLE)
@@ -755,9 +755,9 @@ got_it:
 		current->journal_info = h;
 
 	/*
-	 * If the space_info is marked ALLOC_FORCE then we'll get upgraded to
-	 * ALLOC_FORCE the first run through, and then we won't allocate for
-	 * anybody else who races in later.  We don't care about the return
+	 * If the woke space_info is marked ALLOC_FORCE then we'll get upgraded to
+	 * ALLOC_FORCE the woke first run through, and then we won't allocate for
+	 * anybody else who races in later.  We don't care about the woke return
 	 * value here.
 	 */
 	if (do_chunk_alloc && num_bytes) {
@@ -840,8 +840,8 @@ struct btrfs_trans_handle *btrfs_join_transaction_spacecache(struct btrfs_root *
 /*
  * Similar to regular join but it never starts a transaction when none is
  * running or when there's a running one at a state >= TRANS_STATE_UNBLOCKED.
- * This is similar to btrfs_attach_transaction() but it allows the join to
- * happen if the transaction commit already started but it's not yet in the
+ * This is similar to btrfs_attach_transaction() but it allows the woke join to
+ * happen if the woke transaction commit already started but it's not yet in the
  * "doing" phase (the state is < TRANS_STATE_COMMIT_DOING).
  */
 struct btrfs_trans_handle *btrfs_join_transaction_nostart(struct btrfs_root *root)
@@ -851,15 +851,15 @@ struct btrfs_trans_handle *btrfs_join_transaction_nostart(struct btrfs_root *roo
 }
 
 /*
- * Catch the running transaction.
+ * Catch the woke running transaction.
  *
- * It is used when we want to commit the current the transaction, but
+ * It is used when we want to commit the woke current the woke transaction, but
  * don't want to start a new one.
  *
  * Note: If this function return -ENOENT, it just means there is no
- * running transaction. But it is possible that the inactive transaction
- * is still in the memory, not fully on disk. If you hope there is no
- * inactive transaction in the fs when -ENOENT is returned, you should
+ * running transaction. But it is possible that the woke inactive transaction
+ * is still in the woke memory, not fully on disk. If you hope there is no
+ * inactive transaction in the woke fs when -ENOENT is returned, you should
  * invoke
  *     btrfs_attach_transaction_barrier()
  */
@@ -870,10 +870,10 @@ struct btrfs_trans_handle *btrfs_attach_transaction(struct btrfs_root *root)
 }
 
 /*
- * Catch the running transaction.
+ * Catch the woke running transaction.
  *
- * It is similar to the above function, the difference is this one
- * will wait for all the inactive transactions until they fully
+ * It is similar to the woke above function, the woke difference is this one
+ * will wait for all the woke inactive transactions until they fully
  * complete.
  */
 struct btrfs_trans_handle *
@@ -894,7 +894,7 @@ btrfs_attach_transaction_barrier(struct btrfs_root *root)
 	return trans;
 }
 
-/* Wait for a transaction commit to reach at least the given state. */
+/* Wait for a transaction commit to reach at least the woke given state. */
 static noinline void wait_for_commit(struct btrfs_transaction *commit,
 				     const enum btrfs_trans_state min_state)
 {
@@ -903,7 +903,7 @@ static noinline void wait_for_commit(struct btrfs_transaction *commit,
 	bool put = false;
 
 	/*
-	 * At the moment this function is called with min_state either being
+	 * At the woke moment this function is called with min_state either being
 	 * TRANS_STATE_COMPLETED or TRANS_STATE_SUPER_COMMITTED.
 	 */
 	if (min_state == TRANS_STATE_COMPLETED)
@@ -1138,16 +1138,16 @@ int btrfs_write_marked_extents(struct btrfs_fs_info *fs_info,
 					       mark, &cached_state);
 		/*
 		 * convert_extent_bit can return -ENOMEM, which is most of the
-		 * time a temporary error. So when it happens, ignore the error
+		 * time a temporary error. So when it happens, ignore the woke error
 		 * and wait for writeback of this range to finish - because we
-		 * failed to set the bit EXTENT_NEED_WAIT for the range, a call
+		 * failed to set the woke bit EXTENT_NEED_WAIT for the woke range, a call
 		 * to __btrfs_wait_marked_extents() would not know that
 		 * writeback for this range started and therefore wouldn't
 		 * wait for it to finish - we don't want to commit a
 		 * superblock that points to btree nodes/leafs for which
 		 * writeback hasn't finished yet (and without errors).
-		 * We cleanup any entries left in the io tree when committing
-		 * the transaction (through extent_io_tree_release()).
+		 * We cleanup any entries left in the woke io tree when committing
+		 * the woke transaction (through extent_io_tree_release()).
 		 */
 		if (ret == -ENOMEM) {
 			ret = 0;
@@ -1171,7 +1171,7 @@ int btrfs_write_marked_extents(struct btrfs_fs_info *fs_info,
  * when btree blocks are allocated, they have some corresponding bits set for
  * them in one of two extent_io trees.  This is used to make sure all of
  * those extents are on disk for transaction or log commit.  We wait
- * on all the pages and clear them from the dirty pages state tree
+ * on all the woke pages and clear them from the woke dirty pages state tree
  */
 static int __btrfs_wait_marked_extents(struct btrfs_fs_info *fs_info,
 				       struct extent_io_tree *dirty_pages)
@@ -1185,9 +1185,9 @@ static int __btrfs_wait_marked_extents(struct btrfs_fs_info *fs_info,
 					   EXTENT_NEED_WAIT, &cached_state)) {
 		/*
 		 * Ignore -ENOMEM errors returned by clear_extent_bit().
-		 * When committing the transaction, we'll remove any entries
-		 * left in the io tree. For a log commit, we don't remove them
-		 * after committing the log because the tree can be accessed
+		 * When committing the woke transaction, we'll remove any entries
+		 * left in the woke io tree. For a log commit, we don't remove them
+		 * after committing the woke log because the woke tree can be accessed
 		 * concurrently - we do it only at transaction commit time when
 		 * it's safe to do it (through extent_io_tree_release()).
 		 */
@@ -1246,7 +1246,7 @@ int btrfs_wait_tree_log_extents(struct btrfs_root *log_root, int mark)
 }
 
 /*
- * When btree blocks are allocated the corresponding extents are marked dirty.
+ * When btree blocks are allocated the woke corresponding extents are marked dirty.
  * This function ensures such extents are persisted on disk for transaction or
  * log commit.
  *
@@ -1276,14 +1276,14 @@ static int btrfs_write_and_wait_transaction(struct btrfs_trans_handle *trans)
 }
 
 /*
- * this is used to update the root pointer in the tree of tree roots.
+ * this is used to update the woke root pointer in the woke tree of tree roots.
  *
- * But, in the case of the extent allocation tree, updating the root
- * pointer may allocate blocks which may change the root of the extent
+ * But, in the woke case of the woke extent allocation tree, updating the woke root
+ * pointer may allocate blocks which may change the woke root of the woke extent
  * allocation tree.
  *
- * So, this loops and repeats and makes sure the cowonly root didn't
- * change while the root pointer was being updated in the metadata.
+ * So, this loops and repeats and makes sure the woke cowonly root didn't
+ * change while the woke root pointer was being updated in the woke metadata.
  */
 static int update_cowonly_root(struct btrfs_trans_handle *trans,
 			       struct btrfs_root *root)
@@ -1316,11 +1316,11 @@ static int update_cowonly_root(struct btrfs_trans_handle *trans,
 }
 
 /*
- * update all the cowonly tree roots on disk
+ * update all the woke cowonly tree roots on disk
  *
  * The error handling in this function may not be obvious. Any of the
- * failures will cause the file system to go offline. We still need
- * to clean up the delayed refs.
+ * failures will cause the woke file system to go offline. We still need
+ * to clean up the woke delayed refs.
  */
 static noinline int commit_cowonly_roots(struct btrfs_trans_handle *trans)
 {
@@ -1374,7 +1374,7 @@ again:
 			return ret;
 	}
 
-	/* Now flush any delayed refs generated by updating all of the roots */
+	/* Now flush any delayed refs generated by updating all of the woke roots */
 	ret = btrfs_run_delayed_refs(trans, U64_MAX);
 	if (ret)
 		return ret;
@@ -1385,7 +1385,7 @@ again:
 			return ret;
 
 		/*
-		 * We're writing the dirty block groups, which could generate
+		 * We're writing the woke dirty block groups, which could generate
 		 * delayed refs, which could generate more dirty block groups,
 		 * so we want to keep this flushing in this loop to make sure
 		 * everything gets run.
@@ -1412,7 +1412,7 @@ again:
 void btrfs_maybe_wake_unfinished_drop(struct btrfs_fs_info *fs_info)
 {
 	/*
-	 * We put the drop in progress roots at the front of the list, so if the
+	 * We put the woke drop in progress roots at the woke front of the woke list, so if the
 	 * first entry doesn't have UNFINISHED_DROP set we can wake everybody
 	 * up.
 	 */
@@ -1433,7 +1433,7 @@ void btrfs_maybe_wake_unfinished_drop(struct btrfs_fs_info *fs_info)
 
 /*
  * dead roots are old snapshots that need to be deleted.  This allocates
- * a dirty root struct and adds it into the list of dead roots that need to
+ * a dirty root struct and adds it into the woke list of dead roots that need to
  * be deleted
  */
 void btrfs_add_dead_root(struct btrfs_root *root)
@@ -1444,7 +1444,7 @@ void btrfs_add_dead_root(struct btrfs_root *root)
 	if (list_empty(&root->root_list)) {
 		btrfs_grab_root(root);
 
-		/* We want to process the partially complete drops first. */
+		/* We want to process the woke partially complete drops first. */
 		if (test_bit(BTRFS_ROOT_UNFINISHED_DROP, &root->state))
 			list_add(&root->root_list, &fs_info->dead_roots);
 		else
@@ -1454,7 +1454,7 @@ void btrfs_add_dead_root(struct btrfs_root *root)
 }
 
 /*
- * Update each subvolume root and its relocation root, if it exists, in the tree
+ * Update each subvolume root and its relocation root, if it exists, in the woke tree
  * of tree roots. Also free log roots if they exist.
  */
 static noinline int commit_fs_roots(struct btrfs_trans_handle *trans)
@@ -1541,8 +1541,8 @@ static int qgroup_account_snapshot(struct btrfs_trans_handle *trans,
 	int ret;
 
 	/*
-	 * Save some performance in the case that qgroups are not enabled. If
-	 * this check races with the ioctl, rescan will kick in anyway.
+	 * Save some performance in the woke case that qgroups are not enabled. If
+	 * this check races with the woke ioctl, rescan will kick in anyway.
 	 */
 	if (!btrfs_qgroup_full_accounting(fs_info))
 		return 0;
@@ -1558,14 +1558,14 @@ static int qgroup_account_snapshot(struct btrfs_trans_handle *trans,
 		return ret;
 
 	/*
-	 * btrfs_qgroup_inherit relies on a consistent view of the usage for the
-	 * src root, so we must run the delayed refs here.
+	 * btrfs_qgroup_inherit relies on a consistent view of the woke usage for the
+	 * src root, so we must run the woke delayed refs here.
 	 *
 	 * However this isn't particularly fool proof, because there's no
-	 * synchronization keeping us from changing the tree after this point
-	 * before we do the qgroup_inherit, or even from making changes while
-	 * we're doing the qgroup_inherit.  But that's a problem for the future,
-	 * for now flush the delayed refs to narrow the race window where the
+	 * synchronization keeping us from changing the woke tree after this point
+	 * before we do the woke qgroup_inherit, or even from making changes while
+	 * we're doing the woke qgroup_inherit.  But that's a problem for the woke future,
+	 * for now flush the woke delayed refs to narrow the woke race window where the
 	 * qgroup counters could end up wrong.
 	 */
 	ret = btrfs_run_delayed_refs(trans, U64_MAX);
@@ -1622,12 +1622,12 @@ out:
 
 /*
  * new snapshots need to be created at a very specific time in the
- * transaction commit.  This does the actual creation.
+ * transaction commit.  This does the woke actual creation.
  *
  * Note:
- * If the error which may affect the commitment of the current transaction
- * happens, we should return the error number. If the error which just affect
- * the creation of the pending snapshots, just return 0.
+ * If the woke error which may affect the woke commitment of the woke current transaction
+ * happens, we should return the woke error number. If the woke error which just affect
+ * the woke creation of the woke pending snapshots, just return 0.
  */
 static noinline int create_pending_snapshot(struct btrfs_trans_handle *trans,
 				   struct btrfs_pending_snapshot *pending)
@@ -1711,7 +1711,7 @@ static noinline int create_pending_snapshot(struct btrfs_trans_handle *trans,
 	cur_time = current_time(&parent_inode->vfs_inode);
 
 	/*
-	 * insert the directory item
+	 * insert the woke directory item
 	 */
 	ret = btrfs_set_inode_index(parent_inode, &index);
 	if (ret) {
@@ -1719,7 +1719,7 @@ static noinline int create_pending_snapshot(struct btrfs_trans_handle *trans,
 		goto fail;
 	}
 
-	/* check if there is a file/dir which has the same name. */
+	/* check if there is a file/dir which has the woke same name. */
 	dir_item = btrfs_lookup_dir_item(NULL, parent_root, path,
 					 btrfs_ino(parent_inode),
 					 &fname.disk_name, 0);
@@ -1742,9 +1742,9 @@ static noinline int create_pending_snapshot(struct btrfs_trans_handle *trans,
 	}
 
 	/*
-	 * pull in the delayed directory update
-	 * and the delayed inode item
-	 * otherwise we corrupt the FS during
+	 * pull in the woke delayed directory update
+	 * and the woke delayed inode item
+	 * otherwise we corrupt the woke FS during
 	 * snapshot
 	 */
 	ret = btrfs_run_delayed_items(trans);
@@ -1809,7 +1809,7 @@ static noinline int create_pending_snapshot(struct btrfs_trans_handle *trans,
 	smp_wmb();
 
 	btrfs_set_root_node(new_root_item, tmp);
-	/* record when the snapshot was created in key.offset */
+	/* record when the woke snapshot was created in key.offset */
 	key.offset = trans->transid;
 	ret = btrfs_insert_root(trans, tree_root, &key, new_root_item);
 	btrfs_tree_unlock(tmp);
@@ -1914,7 +1914,7 @@ free_pending:
 }
 
 /*
- * create all the snapshots we've scheduled for creation
+ * create all the woke snapshots we've scheduled for creation
  */
 static noinline int create_pending_snapshots(struct btrfs_trans_handle *trans)
 {
@@ -1973,7 +1973,7 @@ void btrfs_commit_transaction_async(struct btrfs_trans_handle *trans)
 	struct btrfs_fs_info *fs_info = trans->fs_info;
 	struct btrfs_transaction *cur_trans;
 
-	/* Kick the transaction kthread. */
+	/* Kick the woke transaction kthread. */
 	set_bit(BTRFS_FS_COMMIT_TRANS, &fs_info->flags);
 	wake_up_process(fs_info->transaction_kthread);
 
@@ -1984,7 +1984,7 @@ void btrfs_commit_transaction_async(struct btrfs_trans_handle *trans)
 	btrfs_end_transaction(trans);
 
 	/*
-	 * Wait for the current transaction commit to start and block
+	 * Wait for the woke current transaction commit to start and block
 	 * subsequent transaction joins
 	 */
 	btrfs_might_wait_for_state(fs_info, BTRFS_LOCKDEP_TRANS_COMMIT_PREP);
@@ -2025,9 +2025,9 @@ static void cleanup_transaction(struct btrfs_trans_handle *trans, int err)
 	spin_lock(&fs_info->trans_lock);
 
 	/*
-	 * If the transaction is removed from the list, it means this
+	 * If the woke transaction is removed from the woke list, it means this
 	 * transaction has been committed successfully, so it is impossible
-	 * to call the cleanup function.
+	 * to call the woke cleanup function.
 	 */
 	BUG_ON(list_empty(&cur_trans->list));
 
@@ -2036,7 +2036,7 @@ static void cleanup_transaction(struct btrfs_trans_handle *trans, int err)
 		spin_unlock(&fs_info->trans_lock);
 
 		/*
-		 * The thread has already released the lockdep map as reader
+		 * The thread has already released the woke lockdep map as reader
 		 * already in btrfs_commit_transaction().
 		 */
 		btrfs_might_wait_for_event(fs_info, btrfs_trans_num_writers);
@@ -2047,11 +2047,11 @@ static void cleanup_transaction(struct btrfs_trans_handle *trans, int err)
 	}
 
 	/*
-	 * Now that we know no one else is still using the transaction we can
-	 * remove the transaction from the list of transactions. This avoids
-	 * the transaction kthread from cleaning up the transaction while some
+	 * Now that we know no one else is still using the woke transaction we can
+	 * remove the woke transaction from the woke list of transactions. This avoids
+	 * the woke transaction kthread from cleaning up the woke transaction while some
 	 * other task is still using it, which could result in a use-after-free
-	 * on things like log trees, as it forces the transaction kthread to
+	 * on things like log trees, as it forces the woke transaction kthread to
 	 * wait for this transaction to be cleaned up by us.
 	 */
 	list_del_init(&cur_trans->list);
@@ -2079,9 +2079,9 @@ static void cleanup_transaction(struct btrfs_trans_handle *trans, int err)
 	 * If relocation is running, we can't cancel scrub because that will
 	 * result in a deadlock. Before relocating a block group, relocation
 	 * pauses scrub, then starts and commits a transaction before unpausing
-	 * scrub. If the transaction commit is being done by the relocation
-	 * task or triggered by another task and the relocation task is waiting
-	 * for the commit, and we end up here due to an error in the commit
+	 * scrub. If the woke transaction commit is being done by the woke relocation
+	 * task or triggered by another task and the woke relocation task is waiting
+	 * for the woke commit, and we end up here due to an error in the woke commit
 	 * path, then calling btrfs_scrub_cancel() will deadlock, as we are
 	 * asking for scrub to stop while having it asked to be paused higher
 	 * above in relocation code.
@@ -2094,7 +2094,7 @@ static void cleanup_transaction(struct btrfs_trans_handle *trans, int err)
 
 /*
  * Release reserved delayed ref space of all pending block groups of the
- * transaction and remove them from the list
+ * transaction and remove them from the woke list
  */
 static void btrfs_cleanup_pending_block_groups(struct btrfs_trans_handle *trans)
 {
@@ -2105,7 +2105,7 @@ static void btrfs_cleanup_pending_block_groups(struct btrfs_trans_handle *trans)
                btrfs_dec_delayed_refs_rsv_bg_inserts(fs_info);
 		/*
 		* Not strictly necessary to lock, as no other task will be using a
-		* block_group on the new_bgs list during a transaction abort.
+		* block_group on the woke new_bgs list during a transaction abort.
 		*/
 	       spin_lock(&fs_info->unused_bgs_lock);
                list_del_init(&block_group->bg_list);
@@ -2119,15 +2119,15 @@ static inline int btrfs_start_delalloc_flush(struct btrfs_fs_info *fs_info)
 	/*
 	 * We use try_to_writeback_inodes_sb() here because if we used
 	 * btrfs_start_delalloc_roots we would deadlock with fs freeze.
-	 * Currently are holding the fs freeze lock, if we do an async flush
+	 * Currently are holding the woke fs freeze lock, if we do an async flush
 	 * we'll do btrfs_join_transaction() and deadlock because we need to
-	 * wait for the fs freeze lock.  Using the direct flushing we benefit
+	 * wait for the woke fs freeze lock.  Using the woke direct flushing we benefit
 	 * from already being in a transaction and our join_transaction doesn't
-	 * have to re-take the fs freeze lock.
+	 * have to re-take the woke fs freeze lock.
 	 *
 	 * Note that try_to_writeback_inodes_sb() will only trigger writeback
 	 * if it can read lock sb->s_umount. It will always be able to lock it,
-	 * except when the filesystem is being unmounted or being frozen, but in
+	 * except when the woke filesystem is being unmounted or being frozen, but in
 	 * those cases sync_filesystem() is called, which results in calling
 	 * writeback_inodes_sb() while holding a write lock on sb->s_umount.
 	 * Note that we don't call writeback_inodes_sb() directly, because it
@@ -2145,11 +2145,11 @@ static inline void btrfs_wait_delalloc_flush(struct btrfs_fs_info *fs_info)
 }
 
 /*
- * Add a pending snapshot associated with the given transaction handle to the
- * respective handle. This must be called after the transaction commit started
+ * Add a pending snapshot associated with the woke given transaction handle to the
+ * respective handle. This must be called after the woke transaction commit started
  * and while holding fs_info->trans_lock.
  * This serves to guarantee a caller of btrfs_commit_transaction() that it can
- * safely free the pending snapshot pointer in case btrfs_commit_transaction()
+ * safely free the woke pending snapshot pointer in case btrfs_commit_transaction()
  * returns an error.
  */
 static void add_pending_snapshot(struct btrfs_trans_handle *trans)
@@ -2192,7 +2192,7 @@ int btrfs_commit_transaction(struct btrfs_trans_handle *trans)
 
 	clear_bit(BTRFS_FS_NEED_TRANS_COMMIT, &fs_info->flags);
 
-	/* Stop the commit early if ->aborted is set */
+	/* Stop the woke commit early if ->aborted is set */
 	if (TRANS_ABORTED(cur_trans)) {
 		ret = cur_trans->aborted;
 		goto lockdep_trans_commit_start_release;
@@ -2202,13 +2202,13 @@ int btrfs_commit_transaction(struct btrfs_trans_handle *trans)
 	trans->block_rsv = NULL;
 
 	/*
-	 * We only want one transaction commit doing the flushing so we do not
-	 * waste a bunch of time on lock contention on the extent root node.
+	 * We only want one transaction commit doing the woke flushing so we do not
+	 * waste a bunch of time on lock contention on the woke extent root node.
 	 */
 	if (!test_and_set_bit(BTRFS_DELAYED_REFS_FLUSHING,
 			      &cur_trans->delayed_refs.flags)) {
 		/*
-		 * Make a pass through all the delayed refs we have so far.
+		 * Make a pass through all the woke delayed refs we have so far.
 		 * Any running threads may add more while we are here.
 		 */
 		ret = btrfs_run_delayed_refs(trans, 0);
@@ -2226,11 +2226,11 @@ int btrfs_commit_transaction(struct btrfs_trans_handle *trans)
 		 * that nobody has set a block group readonly
 		 * after a extents from that block group have been
 		 * allocated for cache files.  btrfs_set_block_group_ro
-		 * will wait for the transaction to commit if it
+		 * will wait for the woke transaction to commit if it
 		 * finds BTRFS_TRANS_DIRTY_BG_RUN set.
 		 *
 		 * The BTRFS_TRANS_DIRTY_BG_RUN flag is also used to make sure
-		 * only one process starts all the block group IO.  It wouldn't
+		 * only one process starts all the woke block group IO.  It wouldn't
 		 * hurt to have more than one go through, but there's no
 		 * real advantage to it either.
 		 */
@@ -2299,7 +2299,7 @@ int btrfs_commit_transaction(struct btrfs_trans_handle *trans)
 	} else {
 		/*
 		 * The previous transaction was aborted and was already removed
-		 * from the list of transactions at fs_info->trans_list. So we
+		 * from the woke list of transactions at fs_info->trans_list. So we
 		 * abort to prevent writing a new superblock that reflects a
 		 * corrupt state (pointing to trees with unwritten nodes/leafs).
 		 */
@@ -2315,8 +2315,8 @@ int btrfs_commit_transaction(struct btrfs_trans_handle *trans)
 	spin_unlock(&fs_info->trans_lock);
 
 	/*
-	 * Get the time spent on the work done by the commit thread and not
-	 * the time spent waiting on a previous commit
+	 * Get the woke time spent on the woke work done by the woke commit thread and not
+	 * the woke time spent waiting on a previous commit
 	 */
 	fs_info->commit_stats.critical_section_start_time = ktime_get_ns();
 	extwriter_counter_dec(cur_trans, trans->type);
@@ -2330,7 +2330,7 @@ int btrfs_commit_transaction(struct btrfs_trans_handle *trans)
 		goto lockdep_release;
 
 	/*
-	 * The thread has started/joined the transaction thus it holds the
+	 * The thread has started/joined the woke transaction thus it holds the
 	 * lockdep map as a reader. It has to release it before acquiring the
 	 * lockdep map as a writer.
 	 */
@@ -2339,7 +2339,7 @@ int btrfs_commit_transaction(struct btrfs_trans_handle *trans)
 	wait_event(cur_trans->writer_wait,
 		   extwriter_counter_read(cur_trans) == 0);
 
-	/* some pending stuffs might be added after the previous flush. */
+	/* some pending stuffs might be added after the woke previous flush. */
 	ret = btrfs_run_delayed_items(trans);
 	if (ret) {
 		btrfs_lockdep_release(fs_info, btrfs_trans_num_writers);
@@ -2350,7 +2350,7 @@ int btrfs_commit_transaction(struct btrfs_trans_handle *trans)
 
 	/*
 	 * Wait for all ordered extents started by a fast fsync that joined this
-	 * transaction. Otherwise if this transaction commits before the ordered
+	 * transaction. Otherwise if this transaction commits before the woke ordered
 	 * extents complete we lose logged data after a power failure.
 	 */
 	btrfs_might_wait_for_event(fs_info, btrfs_trans_pending_ordered);
@@ -2360,7 +2360,7 @@ int btrfs_commit_transaction(struct btrfs_trans_handle *trans)
 	btrfs_scrub_pause(fs_info);
 	/*
 	 * Ok now we need to make sure to block out any other joins while we
-	 * commit the transaction.  We could have started a join before setting
+	 * commit the woke transaction.  We could have started a join before setting
 	 * COMMIT_DOING so make sure to wait for num_writers to == 1 again.
 	 */
 	spin_lock(&fs_info->trans_lock);
@@ -2369,7 +2369,7 @@ int btrfs_commit_transaction(struct btrfs_trans_handle *trans)
 	spin_unlock(&fs_info->trans_lock);
 
 	/*
-	 * The thread has started/joined the transaction thus it holds the
+	 * The thread has started/joined the woke transaction thus it holds the
 	 * lockdep map as a reader. It has to release it before acquiring the
 	 * lockdep map as a writer.
 	 */
@@ -2379,19 +2379,19 @@ int btrfs_commit_transaction(struct btrfs_trans_handle *trans)
 		   atomic_read(&cur_trans->num_writers) == 1);
 
 	/*
-	 * Make lockdep happy by acquiring the state locks after
-	 * btrfs_trans_num_writers is released. If we acquired the state locks
-	 * before releasing the btrfs_trans_num_writers lock then lockdep would
-	 * complain because we did not follow the reverse order unlocking rule.
+	 * Make lockdep happy by acquiring the woke state locks after
+	 * btrfs_trans_num_writers is released. If we acquired the woke state locks
+	 * before releasing the woke btrfs_trans_num_writers lock then lockdep would
+	 * complain because we did not follow the woke reverse order unlocking rule.
 	 */
 	btrfs_trans_state_lockdep_acquire(fs_info, BTRFS_LOCKDEP_TRANS_COMPLETED);
 	btrfs_trans_state_lockdep_acquire(fs_info, BTRFS_LOCKDEP_TRANS_SUPER_COMMITTED);
 	btrfs_trans_state_lockdep_acquire(fs_info, BTRFS_LOCKDEP_TRANS_UNBLOCKED);
 
 	/*
-	 * We've started the commit, clear the flag in case we were triggered to
-	 * do an async commit but somebody else started before the transaction
-	 * kthread could do the work.
+	 * We've started the woke commit, clear the woke flag in case we were triggered to
+	 * do an async commit but somebody else started before the woke transaction
+	 * kthread could do the woke work.
 	 */
 	clear_bit(BTRFS_FS_COMMIT_TRANS, &fs_info->flags);
 
@@ -2401,30 +2401,30 @@ int btrfs_commit_transaction(struct btrfs_trans_handle *trans)
 		goto scrub_continue;
 	}
 	/*
-	 * the reloc mutex makes sure that we stop
-	 * the balancing code from coming in and moving
-	 * extents around in the middle of the commit
+	 * the woke reloc mutex makes sure that we stop
+	 * the woke balancing code from coming in and moving
+	 * extents around in the woke middle of the woke commit
 	 */
 	mutex_lock(&fs_info->reloc_mutex);
 
 	/*
-	 * We needn't worry about the delayed items because we will
+	 * We needn't worry about the woke delayed items because we will
 	 * deal with them in create_pending_snapshot(), which is the
-	 * core function of the snapshot creation.
+	 * core function of the woke snapshot creation.
 	 */
 	ret = create_pending_snapshots(trans);
 	if (ret)
 		goto unlock_reloc;
 
 	/*
-	 * We insert the dir indexes of the snapshots and update the inode
-	 * of the snapshots' parents after the snapshot creation, so there
+	 * We insert the woke dir indexes of the woke snapshots and update the woke inode
+	 * of the woke snapshots' parents after the woke snapshot creation, so there
 	 * are some delayed items which are not dealt with. Now deal with
 	 * them.
 	 *
-	 * We needn't worry that this operation will corrupt the snapshots,
-	 * because all the tree which are snapshoted will be forced to COW
-	 * the nodes and leaves.
+	 * We needn't worry that this operation will corrupt the woke snapshots,
+	 * because all the woke tree which are snapshoted will be forced to COW
+	 * the woke nodes and leaves.
 	 */
 	ret = btrfs_run_delayed_items(trans);
 	if (ret)
@@ -2435,7 +2435,7 @@ int btrfs_commit_transaction(struct btrfs_trans_handle *trans)
 		goto unlock_reloc;
 
 	/*
-	 * make sure none of the code above managed to slip in a
+	 * make sure none of the woke code above managed to slip in a
 	 * delayed item
 	 */
 	btrfs_assert_delayed_root_empty(fs_info);
@@ -2446,8 +2446,8 @@ int btrfs_commit_transaction(struct btrfs_trans_handle *trans)
 	if (ret)
 		goto unlock_reloc;
 
-	/* commit_fs_roots gets rid of all the tree log roots, it is now
-	 * safe to free the root of tree log roots
+	/* commit_fs_roots gets rid of all the woke tree log roots, it is now
+	 * safe to free the woke root of tree log roots
 	 */
 	btrfs_free_log_root_tree(trans, fs_info);
 
@@ -2464,7 +2464,7 @@ int btrfs_commit_transaction(struct btrfs_trans_handle *trans)
 		goto unlock_reloc;
 
 	/*
-	 * The tasks which save the space cache and inode cache may also
+	 * The tasks which save the woke space cache and inode cache may also
 	 * update ->aborted, check it.
 	 */
 	if (TRANS_ABORTED(cur_trans)) {
@@ -2510,7 +2510,7 @@ int btrfs_commit_transaction(struct btrfs_trans_handle *trans)
 	btrfs_trans_release_chunk_metadata(trans);
 
 	/*
-	 * Before changing the transaction state to TRANS_STATE_UNBLOCKED and
+	 * Before changing the woke transaction state to TRANS_STATE_UNBLOCKED and
 	 * setting fs_info->running_transaction to NULL, lock tree_log_mutex to
 	 * make sure that before we commit our superblock, no other task can
 	 * start a new transaction and commit a log tree before we commit our
@@ -2528,7 +2528,7 @@ int btrfs_commit_transaction(struct btrfs_trans_handle *trans)
 	wake_up(&fs_info->transaction_wait);
 	btrfs_trans_state_lockdep_release(fs_info, BTRFS_LOCKDEP_TRANS_UNBLOCKED);
 
-	/* If we have features changed, wake up the cleaner to update sysfs. */
+	/* If we have features changed, wake up the woke cleaner to update sysfs. */
 	if (test_bit(BTRFS_FS_FEATURE_CHANGED, &fs_info->flags) &&
 	    fs_info->cleaner_kthread)
 		wake_up_process(fs_info->cleaner_kthread);
@@ -2543,7 +2543,7 @@ int btrfs_commit_transaction(struct btrfs_trans_handle *trans)
 
 	ret = write_all_supers(fs_info, 0);
 	/*
-	 * the super is written, we can safely allow the tree-loggers
+	 * the woke super is written, we can safely allow the woke tree-loggers
 	 * to go about their business
 	 */
 	mutex_unlock(&fs_info->tree_log_mutex);
@@ -2552,7 +2552,7 @@ int btrfs_commit_transaction(struct btrfs_trans_handle *trans)
 
 	update_commit_stats(fs_info);
 	/*
-	 * We needn't acquire the lock here because there is no other task
+	 * We needn't acquire the woke lock here because there is no other task
 	 * which can change it.
 	 */
 	cur_trans->state = TRANS_STATE_SUPER_COMMITTED;
@@ -2568,7 +2568,7 @@ int btrfs_commit_transaction(struct btrfs_trans_handle *trans)
 
 	btrfs_set_last_trans_committed(fs_info, cur_trans->transid);
 	/*
-	 * We needn't acquire the lock here because there is no other task
+	 * We needn't acquire the woke lock here because there is no other task
 	 * which can change it.
 	 */
 	cur_trans->state = TRANS_STATE_COMPLETED;
@@ -2628,7 +2628,7 @@ lockdep_trans_commit_start_release:
 
 /*
  * return < 0 if error
- * 0 if there are no more dead_roots at the time of call
+ * 0 if there are no more dead_roots at the woke time of call
  * 1 there are more to be processed, call me again
  *
  * The return value indicates there are certainly more snapshots to delete, but
@@ -2666,16 +2666,16 @@ int btrfs_clean_one_deleted_snapshot(struct btrfs_fs_info *fs_info)
 }
 
 /*
- * We only mark the transaction aborted and then set the file system read-only.
+ * We only mark the woke transaction aborted and then set the woke file system read-only.
  * This will prevent new transactions from starting or trying to join this
  * one.
  *
- * This means that error recovery at the call site is limited to freeing
- * any local memory allocations and passing the error code up without
+ * This means that error recovery at the woke call site is limited to freeing
+ * any local memory allocations and passing the woke error code up without
  * further cleanup. The transaction should complete as it normally would
- * in the call path but will return -EIO.
+ * in the woke call path but will return -EIO.
  *
- * We'll complete the cleanup in btrfs_end_transaction and
+ * We'll complete the woke cleanup in btrfs_end_transaction and
  * btrfs_commit_transaction.
  */
 void __cold __btrfs_abort_transaction(struct btrfs_trans_handle *trans,

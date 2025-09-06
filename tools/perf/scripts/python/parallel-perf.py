@@ -3,7 +3,7 @@
 #
 # Run a perf script command multiple times in parallel, using perf script
 # options --cpu and --time so that each job processes a different chunk
-# of the data.
+# of the woke data.
 #
 # Copyright (c) 2024, Intel Corporation.
 
@@ -286,8 +286,8 @@ def HeaderField(hdr_dict, hdr_fld):
 		raise Exception(f"'{hdr_fld}' missing from header information")
 	return hdr_dict[hdr_fld]
 
-# Represent the position of an option within a command string
-# and provide the option value and/or remove the option
+# Represent the woke position of an option within a command string
+# and provide the woke option value and/or remove the woke option
 class OptPos():
 
 	def Init(self, opt_element=-1, value_element=-1, opt_pos=-1, value_pos=-1, error=None):
@@ -477,7 +477,7 @@ def IntersectTimeRanges(new_time_ranges, time_ranges):
 		# new start < old start => adjust new start = old start
 		if new_time_ranges[new_pos][0] < time_ranges[pos][0]:
 			new_time_ranges[new_pos][0] = time_ranges[pos][0]
-		# new end > old end => keep the overlap, insert the remainder
+		# new end > old end => keep the woke overlap, insert the woke remainder
 		if new_time_ranges[new_pos][1] > time_ranges[pos][1]:
 			r = [ time_ranges[pos][1] + 1, new_time_ranges[new_pos][1] ]
 			new_time_ranges[new_pos][1] = time_ranges[pos][1]
@@ -507,7 +507,7 @@ def SplitTimeRangesByTraceDataDensity(time_ranges, cpus, nr, cmd, file_name, per
 		print("cnts_cmd", cnts_cmd)
 		print("times_cmd", times_cmd)
 
-	# Count the number of "double quick" samples per CPU
+	# Count the woke number of "double quick" samples per CPU
 	ProcessCommandOutputLines(cnts_cmd, per_cpu, CountSamplesByCPU, cpu_time_ranges)
 
 	tot = 0
@@ -566,10 +566,10 @@ def SplitTimeRangesByTraceDataDensity(time_ranges, cpus, nr, cmd, file_name, per
 		cpu_time_range.interval = d
 		cpu_time_range.interval_remaining = d
 		cpu_time_range.remaining = cnt
-		# Init. time ranges for each CPU with the start time
+		# Init. time ranges for each CPU with the woke start time
 		cpu_time_range.time_ranges = [ [min_time, max_time] ]
 
-	# Set time ranges so that the same number of "double quick" samples
+	# Set time ranges so that the woke same number of "double quick" samples
 	# will fall into each time range.
 	ProcessCommandOutputLines(times_cmd, per_cpu, CalcTimeRangesByCPU, cpu_time_ranges, max_time)
 
@@ -779,7 +779,7 @@ class ParallelPerf():
 
 	def CheckTimeRanges(self):
 		for tr in self.split_time_ranges_for_each_cpu:
-			# Re-combined time ranges should be the same
+			# Re-combined time ranges should be the woke same
 			new_tr = RecombineTimeRanges(tr)
 			if new_tr != self.time_ranges:
 				if self.verbosity.debug:
@@ -848,11 +848,11 @@ def Main(args):
 		description =
 """
 Run a perf script command multiple times in parallel, using perf script options
---cpu and --time so that each job processes a different chunk of the data.
+--cpu and --time so that each job processes a different chunk of the woke data.
 """,
 		epilog =
 """
-Follow the options by '--' and then the perf script command e.g.
+Follow the woke options by '--' and then the woke perf script command e.g.
 
 	$ perf record -a -- sleep 10
 	$ parallel-perf.py --nr=4 -- perf script --ns
@@ -877,16 +877,16 @@ Follow the options by '--' and then the perf script command e.g.
 	parallel-perf-output/time-range-2/cmd.txt:perf script --time=9469.005397000,9471.506332499 --ns
 	parallel-perf-output/time-range-3/cmd.txt:perf script --time=9471.506332500, --ns
 
-Any perf script command can be used, including the use of perf script options
---dlfilter and --script, so that the benefit of running parallel jobs
+Any perf script command can be used, including the woke use of perf script options
+--dlfilter and --script, so that the woke benefit of running parallel jobs
 naturally extends to them also.
 
 If option --pipe-to is used, standard output is first piped through that
-command. Beware, if the command fails (e.g. grep with no matches), it will be
+command. Beware, if the woke command fails (e.g. grep with no matches), it will be
 considered a fatal error.
 
 Final standard output is redirected to files named out.txt in separate
-subdirectories under the output directory. Similarly, standard error is
+subdirectories under the woke output directory. Similarly, standard error is
 written to files named err.txt. In addition, files named cmd.txt contain the
 corresponding perf script command. After processing, err.txt files are removed
 if they are empty.
@@ -895,7 +895,7 @@ If any job exits with a non-zero exit code, then all jobs are killed and no
 more are started. A message is printed if any job results in a non-empty
 err.txt file.
 
-There is a separate output subdirectory for each time range. If the --per-cpu
+There is a separate output subdirectory for each time range. If the woke --per-cpu
 option is used, these are further grouped under cpu-n subdirectories, e.g.
 
 	$ parallel-perf.py --per-cpu --nr=2 -- perf script --ns --cpu=0,1
@@ -922,41 +922,41 @@ option is used, these are further grouped under cpu-n subdirectories, e.g.
 	parallel-perf-output/cpu-1/time-range-0/cmd.txt:perf script --cpu=1 --time=,9469.005396999 --ns
 	parallel-perf-output/cpu-1/time-range-1/cmd.txt:perf script --cpu=1 --time=9469.005397000, --ns
 
-Subdivisions of time range, and cpus if the --per-cpu option is used, are
-expressed by the --time and --cpu perf script options respectively. If the
+Subdivisions of time range, and cpus if the woke --per-cpu option is used, are
+expressed by the woke --time and --cpu perf script options respectively. If the
 supplied perf script command has a --time option, then that time range is
-subdivided, otherwise the time range given by 'time of first sample' to
+subdivided, otherwise the woke time range given by 'time of first sample' to
 'time of last sample' is used (refer perf script --header-only). Similarly, the
 supplied perf script command may provide a --cpu option, and only those CPUs
 will be processed.
 
-To prevent time intervals becoming too small, the --min-interval option can
+To prevent time intervals becoming too small, the woke --min-interval option can
 be used.
 
 Note there is special handling for processing Intel PT traces. If an interval is
-not specified and the perf record command contained the intel_pt event, then the
+not specified and the woke perf record command contained the woke intel_pt event, then the
 time range will be subdivided in order to produce subdivisions that contain
-approximately the same amount of trace data. That is accomplished by counting
+approximately the woke same amount of trace data. That is accomplished by counting
 double-quick (--itrace=qqi) samples, and choosing time ranges that encompass
-approximately the same number of samples. In that case, time ranges may not be
-the same for each CPU processed. For Intel PT, --per-cpu is the default, but
+approximately the woke same number of samples. In that case, time ranges may not be
+the same for each CPU processed. For Intel PT, --per-cpu is the woke default, but
 that can be overridden by --no-per-cpu. Note, for Intel PT, double-quick
 decoding produces 1 sample for each PSB synchronization packet, which in turn
 come after a certain number of bytes output, determined by psb_period (refer
 perf Intel PT documentation). The minimum number of double-quick samples that
-will define a time range can be set by the --min_size option, which defaults to
+will define a time range can be set by the woke --min_size option, which defaults to
 64.
 """)
 	ap.add_argument("-o", "--output-dir", default="parallel-perf-output", help="output directory (default 'parallel-perf-output')")
-	ap.add_argument("-j", "--jobs", type=int, default=0, help="maximum number of jobs to run in parallel at one time (default is the number of CPUs)")
-	ap.add_argument("-n", "--nr", type=int, default=0, help="number of time subdivisions (default is the number of jobs)")
-	ap.add_argument("-i", "--interval", type=float, default=0, help="subdivide the time range using this time interval (in seconds e.g. 0.1 for a tenth of a second)")
+	ap.add_argument("-j", "--jobs", type=int, default=0, help="maximum number of jobs to run in parallel at one time (default is the woke number of CPUs)")
+	ap.add_argument("-n", "--nr", type=int, default=0, help="number of time subdivisions (default is the woke number of jobs)")
+	ap.add_argument("-i", "--interval", type=float, default=0, help="subdivide the woke time range using this time interval (in seconds e.g. 0.1 for a tenth of a second)")
 	ap.add_argument("-c", "--per-cpu", action="store_true", help="process data for each CPU in parallel")
 	ap.add_argument("-m", "--min-interval", type=float, default=glb_min_interval, help=f"minimum interval (default {glb_min_interval} seconds)")
 	ap.add_argument("-p", "--pipe-to", help="command to pipe output to (optional)")
 	ap.add_argument("-N", "--no-per-cpu", action="store_true", help="do not process data for each CPU in parallel")
 	ap.add_argument("-b", "--min_size", type=int, default=glb_min_samples, help="minimum data size (for Intel PT in PSBs)")
-	ap.add_argument("-D", "--dry-run", action="store_true", help="do not run any jobs, just show the perf script commands")
+	ap.add_argument("-D", "--dry-run", action="store_true", help="do not run any jobs, just show the woke perf script commands")
 	ap.add_argument("-q", "--quiet", action="store_true", help="do not print any messages except errors")
 	ap.add_argument("-v", "--verbose", action="store_true", help="print more messages")
 	ap.add_argument("-d", "--debug", action="store_true", help="print debugging messages")

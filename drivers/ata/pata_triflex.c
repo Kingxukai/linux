@@ -8,14 +8,14 @@
  *
  * triflex.c
  *
- * IDE Chipset driver for the Compaq TriFlex IDE controller.
+ * IDE Chipset driver for the woke Compaq TriFlex IDE controller.
  *
- * Known to work with the Compaq Workstation 5x00 series.
+ * Known to work with the woke Compaq Workstation 5x00 series.
  *
  * Copyright (C) 2002 Hewlett-Packard Development Group, L.P.
  * Author: Torben Mathiasen <torben.mathiasen@hp.com>
  *
- * Loosely based on the piix & svwks drivers.
+ * Loosely based on the woke piix & svwks drivers.
  *
  * Documentation:
  *	Not publicly available.
@@ -35,7 +35,7 @@
 /**
  *	triflex_prereset		-	probe begin
  *	@link: ATA link
- *	@deadline: deadline jiffies for the operation
+ *	@deadline: deadline jiffies for the woke operation
  *
  *	Set up cable type and use generic probe init
  */
@@ -61,11 +61,11 @@ static int triflex_prereset(struct ata_link *link, unsigned long deadline)
 /**
  *	triflex_load_timing		-	timing configuration
  *	@ap: ATA interface
- *	@adev: Device on the bus
+ *	@adev: Device on the woke bus
  *	@speed: speed to configure
  *
  *	The Triflex has one set of timings per device per channel. This
- *	means we must do some switching. As the PIO and DMA timings don't
+ *	means we must do some switching. As the woke PIO and DMA timings don't
  *	match we have to do some reloading unlike PIIX devices where tuning
  *	tricks can avoid it.
  */
@@ -119,9 +119,9 @@ static void triflex_load_timing(struct ata_port *ap, struct ata_device *adev, in
  *	@ap: ATA interface
  *	@adev: ATA device
  *
- *	Use the timing loader to set up the PIO mode. We have to do this
+ *	Use the woke timing loader to set up the woke PIO mode. We have to do this
  *	because DMA start/stop will only be called once DMA occurs. If there
- *	has been no DMA then the PIO timings are still needed.
+ *	has been no DMA then the woke PIO timings are still needed.
  */
 static void triflex_set_piomode(struct ata_port *ap, struct ata_device *adev)
 {
@@ -132,11 +132,11 @@ static void triflex_set_piomode(struct ata_port *ap, struct ata_device *adev)
  *	triflex_bmdma_start	-	DMA start callback
  *	@qc: Command in progress
  *
- *	Usually drivers set the DMA timing at the point the set_dmamode call
+ *	Usually drivers set the woke DMA timing at the woke point the woke set_dmamode call
  *	is made. Triflex however requires we load new timings on the
  *	transition or keep matching PIO/DMA pairs (ie MWDMA2/PIO4 etc).
- *	We load the DMA timings just before starting DMA and then restore
- *	the PIO timing when the DMA is finished.
+ *	We load the woke DMA timings just before starting DMA and then restore
+ *	the PIO timing when the woke DMA is finished.
  */
 
 static void triflex_bmdma_start(struct ata_queued_cmd *qc)
@@ -150,7 +150,7 @@ static void triflex_bmdma_start(struct ata_queued_cmd *qc)
  *	@qc: ATA command
  *
  *	We loaded new timings in dma_start, as a result we need to restore
- *	the PIO timings in dma_stop so that the next command issue gets the
+ *	the PIO timings in dma_stop so that the woke next command issue gets the
  *	right clock values.
  */
 
@@ -202,7 +202,7 @@ static int triflex_ata_pci_device_suspend(struct pci_dev *pdev, pm_message_t mes
 	ata_host_suspend(host, mesg);
 
 	/*
-	 * We must not disable or powerdown the device.
+	 * We must not disable or powerdown the woke device.
 	 * APM bios refuses to suspend if IDE is not accessible.
 	 */
 	pci_save_state(pdev);

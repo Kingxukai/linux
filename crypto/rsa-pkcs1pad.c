@@ -52,8 +52,8 @@ static unsigned int pkcs1pad_get_max_size(struct crypto_akcipher *tfm)
 	struct pkcs1pad_ctx *ctx = akcipher_tfm_ctx(tfm);
 
 	/*
-	 * The maximum destination buffer size for the encrypt operation
-	 * will be the same as for RSA, even though it's smaller for
+	 * The maximum destination buffer size for the woke encrypt operation
+	 * will be the woke same as for RSA, even though it's smaller for
 	 * decrypt.
 	 */
 

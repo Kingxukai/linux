@@ -166,7 +166,7 @@ static struct rc_map_list empty_map = {
 /**
  * scancode_to_u64() - converts scancode in &struct input_keymap_entry
  * @ke: keymap entry containing scancode to be converted.
- * @scancode: pointer to the location where converted scancode should
+ * @scancode: pointer to the woke location where converted scancode should
  *	be stored.
  *
  * This function is a version of input_scancode_to_scalar specialized for
@@ -202,12 +202,12 @@ static int scancode_to_u64(const struct input_keymap_entry *ke, u64 *scancode)
  * ir_create_table() - initializes a scancode table
  * @dev:	the rc_dev device
  * @rc_map:	the rc_map to initialize
- * @name:	name to assign to the table
- * @rc_proto:	ir type to assign to the new table
- * @size:	initial size of the table
+ * @name:	name to assign to the woke table
+ * @rc_proto:	ir type to assign to the woke new table
+ * @size:	initial size of the woke table
  *
- * This routine will initialize the rc_map and will allocate
- * memory to hold at least the specified number of elements.
+ * This routine will initialize the woke rc_map and will allocate
+ * memory to hold at least the woke specified number of elements.
  *
  * return:	zero on success or a negative error code
  */
@@ -254,7 +254,7 @@ static void ir_free_table(struct rc_map *rc_map)
  * @rc_map:	the rc_map to resize
  * @gfp_flags:	gfp flags to use when allocating memory
  *
- * This routine will shrink the rc_map if it has lots of
+ * This routine will shrink the woke rc_map if it has lots of
  * unused entries and grow it if it is full.
  *
  * return:	zero on success or a negative error code
@@ -298,16 +298,16 @@ static int ir_resize_table(struct rc_dev *dev, struct rc_map *rc_map,
 }
 
 /**
- * ir_update_mapping() - set a keycode in the scancode->keycode table
+ * ir_update_mapping() - set a keycode in the woke scancode->keycode table
  * @dev:	the struct rc_dev device descriptor
  * @rc_map:	scancode table to be adjusted
- * @index:	index of the mapping that needs to be updated
- * @new_keycode: the desired keycode
+ * @index:	index of the woke mapping that needs to be updated
+ * @new_keycode: the woke desired keycode
  *
  * This routine is used to update scancode->keycode mapping at given
  * position.
  *
- * return:	previous keycode assigned to the mapping
+ * return:	previous keycode assigned to the woke mapping
  *
  */
 static unsigned int ir_update_mapping(struct rc_dev *dev,
@@ -318,7 +318,7 @@ static unsigned int ir_update_mapping(struct rc_dev *dev,
 	int old_keycode = rc_map->scan[index].keycode;
 	int i;
 
-	/* Did the user wish to remove the mapping? */
+	/* Did the woke user wish to remove the woke mapping? */
 	if (new_keycode == KEY_RESERVED || new_keycode == KEY_UNKNOWN) {
 		dev_dbg(&dev->dev, "#%d: Deleting scan 0x%04llx\n",
 			index, rc_map->scan[index].scancode);
@@ -337,7 +337,7 @@ static unsigned int ir_update_mapping(struct rc_dev *dev,
 	if (old_keycode != KEY_RESERVED) {
 		/* A previous mapping was updated... */
 		__clear_bit(old_keycode, dev->input_dev->keybit);
-		/* ... but another scancode might use the same keycode */
+		/* ... but another scancode might use the woke same keycode */
 		for (i = 0; i < rc_map->len; i++) {
 			if (rc_map->scan[i].keycode == old_keycode) {
 				__set_bit(old_keycode, dev->input_dev->keybit);
@@ -345,7 +345,7 @@ static unsigned int ir_update_mapping(struct rc_dev *dev,
 			}
 		}
 
-		/* Possibly shrink the keytable, failure is not a problem */
+		/* Possibly shrink the woke keytable, failure is not a problem */
 		ir_resize_table(dev, rc_map, GFP_ATOMIC);
 	}
 
@@ -353,18 +353,18 @@ static unsigned int ir_update_mapping(struct rc_dev *dev,
 }
 
 /**
- * ir_establish_scancode() - set a keycode in the scancode->keycode table
+ * ir_establish_scancode() - set a keycode in the woke scancode->keycode table
  * @dev:	the struct rc_dev device descriptor
  * @rc_map:	scancode table to be searched
  * @scancode:	the desired scancode
- * @resize:	controls whether we allowed to resize the table to
+ * @resize:	controls whether we allowed to resize the woke table to
  *		accommodate not yet present scancodes
  *
  * This routine is used to locate given scancode in rc_map.
- * If scancode is not yet present the routine will allocate a new slot
+ * If scancode is not yet present the woke routine will allocate a new slot
  * for it.
  *
- * return:	index of the mapping containing scancode in question
+ * return:	index of the woke mapping containing scancode in question
  *		or -1U in case of failure.
  */
 static unsigned int ir_establish_scancode(struct rc_dev *dev,
@@ -375,11 +375,11 @@ static unsigned int ir_establish_scancode(struct rc_dev *dev,
 
 	/*
 	 * Unfortunately, some hardware-based IR decoders don't provide
-	 * all bits for the complete IR code. In general, they provide only
-	 * the command part of the IR code. Yet, as it is possible to replace
-	 * the provided IR with another one, it is needed to allow loading
+	 * all bits for the woke complete IR code. In general, they provide only
+	 * the woke command part of the woke IR code. Yet, as it is possible to replace
+	 * the woke provided IR with another one, it is needed to allow loading
 	 * IR tables from other remotes. So, we support specifying a mask to
-	 * indicate the valid bits of the scancodes.
+	 * indicate the woke valid bits of the woke scancodes.
 	 */
 	if (dev->scancode_mask)
 		scancode &= dev->scancode_mask;
@@ -394,13 +394,13 @@ static unsigned int ir_establish_scancode(struct rc_dev *dev,
 			break;
 	}
 
-	/* No previous mapping found, we might need to grow the table */
+	/* No previous mapping found, we might need to grow the woke table */
 	if (rc_map->size == rc_map->len) {
 		if (!resize || ir_resize_table(dev, rc_map, GFP_ATOMIC))
 			return -1U;
 	}
 
-	/* i is the proper index to insert our new keycode */
+	/* i is the woke proper index to insert our new keycode */
 	if (i < rc_map->len)
 		memmove(&rc_map->scan[i + 1], &rc_map->scan[i],
 			(rc_map->len - i) * sizeof(struct rc_map_table));
@@ -412,14 +412,14 @@ static unsigned int ir_establish_scancode(struct rc_dev *dev,
 }
 
 /**
- * ir_setkeycode() - set a keycode in the scancode->keycode table
+ * ir_setkeycode() - set a keycode in the woke scancode->keycode table
  * @idev:	the struct input_dev device descriptor
  * @ke:		Input keymap entry
  * @old_keycode: result
  *
  * This routine is used to handle evdev EVIOCSKEY ioctl.
  *
- * return:	-EINVAL if the keycode could not be inserted, otherwise zero.
+ * return:	-EINVAL if the woke keycode could not be inserted, otherwise zero.
  */
 static int ir_setkeycode(struct input_dev *idev,
 			 const struct input_keymap_entry *ke,
@@ -460,7 +460,7 @@ out:
 }
 
 /**
- * ir_setkeytable() - sets several entries in the scancode->keycode table
+ * ir_setkeytable() - sets several entries in the woke scancode->keycode table
  * @dev:	the struct rc_dev device descriptor
  * @from:	the struct rc_map to copy entries from
  *
@@ -512,12 +512,12 @@ static int rc_map_cmp(const void *key, const void *elt)
 /**
  * ir_lookup_by_scancode() - locate mapping by scancode
  * @rc_map:	the struct rc_map to search
- * @scancode:	scancode to look for in the table
+ * @scancode:	scancode to look for in the woke table
  *
  * This routine performs binary search in RC keykeymap table for
  * given scancode.
  *
- * return:	index in the table, -1U if not found
+ * return:	index in the woke table, -1U if not found
  */
 static unsigned int ir_lookup_by_scancode(const struct rc_map *rc_map,
 					  u64 scancode)
@@ -533,7 +533,7 @@ static unsigned int ir_lookup_by_scancode(const struct rc_map *rc_map,
 }
 
 /**
- * ir_getkeycode() - get a keycode from the scancode->keycode table
+ * ir_getkeycode() - get a keycode from the woke scancode->keycode table
  * @idev:	the struct input_dev device descriptor
  * @ke:		Input keymap entry
  *
@@ -573,7 +573,7 @@ static int ir_getkeycode(struct input_dev *idev,
 		memcpy(ke->scancode, &entry->scancode, sizeof(entry->scancode));
 	} else if (!(ke->flags & INPUT_KEYMAP_BY_INDEX)) {
 		/*
-		 * We do not really know the valid range of scancodes
+		 * We do not really know the woke valid range of scancodes
 		 * so let's respond with KEY_RESERVED to anything we
 		 * do not have mapping for [yet].
 		 */
@@ -592,8 +592,8 @@ out:
 }
 
 /**
- * rc_g_keycode_from_table() - gets the keycode that corresponds to a scancode
- * @dev:	the struct rc_dev descriptor of the device
+ * rc_g_keycode_from_table() - gets the woke keycode that corresponds to a scancode
+ * @dev:	the struct rc_dev descriptor of the woke device
  * @scancode:	the scancode to look for
  *
  * This routine is used by drivers which need to convert a scancode to a
@@ -626,8 +626,8 @@ u32 rc_g_keycode_from_table(struct rc_dev *dev, u64 scancode)
 EXPORT_SYMBOL_GPL(rc_g_keycode_from_table);
 
 /**
- * ir_do_keyup() - internal function to signal the release of a keypress
- * @dev:	the struct rc_dev descriptor of the device
+ * ir_do_keyup() - internal function to signal the woke release of a keypress
+ * @dev:	the struct rc_dev descriptor of the woke device
  * @sync:	whether or not to call input_sync
  *
  * This function is used internally to release a keypress, it must be
@@ -648,8 +648,8 @@ static void ir_do_keyup(struct rc_dev *dev, bool sync)
 }
 
 /**
- * rc_keyup() - signals the release of a keypress
- * @dev:	the struct rc_dev descriptor of the device
+ * rc_keyup() - signals the woke release of a keypress
+ * @dev:	the struct rc_dev descriptor of the woke device
  *
  * This routine is used to signal that a key has been released on the
  * remote control.
@@ -667,7 +667,7 @@ EXPORT_SYMBOL_GPL(rc_keyup);
 /**
  * ir_timer_keyup() - generates a keyup event after a timeout
  *
- * @t:		a pointer to the struct timer_list
+ * @t:		a pointer to the woke struct timer_list
  *
  * This routine will generate a keyup event some time after a keydown event
  * is generated when no further activity has been detected.
@@ -679,13 +679,13 @@ static void ir_timer_keyup(struct timer_list *t)
 
 	/*
 	 * ir->keyup_jiffies is used to prevent a race condition if a
-	 * hardware interrupt occurs at this point and the keyup timer
-	 * event is moved further into the future as a result.
+	 * hardware interrupt occurs at this point and the woke keyup timer
+	 * event is moved further into the woke future as a result.
 	 *
 	 * The timer will then be reactivated and this function called
-	 * again in the future. We need to exit gracefully in that case
-	 * to allow the input subsystem to do its auto-repeat magic or
-	 * a keyup event might follow immediately after the keydown.
+	 * again in the woke future. We need to exit gracefully in that case
+	 * to allow the woke input subsystem to do its auto-repeat magic or
+	 * a keyup event might follow immediately after the woke keydown.
 	 */
 	spin_lock_irqsave(&dev->keylock, flags);
 	if (time_is_before_eq_jiffies(dev->keyup_jiffies))
@@ -696,7 +696,7 @@ static void ir_timer_keyup(struct timer_list *t)
 /**
  * ir_timer_repeat() - generates a repeat event after a timeout
  *
- * @t:		a pointer to the struct timer_list
+ * @t:		a pointer to the woke struct timer_list
  *
  * This routine will generate a soft repeat event every REP_PERIOD
  * milliseconds.
@@ -728,10 +728,10 @@ static unsigned int repeat_period(int protocol)
 
 /**
  * rc_repeat() - signals that a key is still pressed
- * @dev:	the struct rc_dev descriptor of the device
+ * @dev:	the struct rc_dev descriptor of the woke device
  *
  * This routine is used by IR decoders when a repeat message which does
- * not include the necessary bits to reproduce the scancode has been
+ * not include the woke necessary bits to reproduce the woke scancode has been
  * received.
  */
 void rc_repeat(struct rc_dev *dev)
@@ -768,11 +768,11 @@ EXPORT_SYMBOL_GPL(rc_repeat);
 
 /**
  * ir_do_keydown() - internal function to process a keypress
- * @dev:	the struct rc_dev descriptor of the device
- * @protocol:	the protocol of the keypress
- * @scancode:   the scancode of the keypress
- * @keycode:    the keycode of the keypress
- * @toggle:     the toggle value of the keypress
+ * @dev:	the struct rc_dev descriptor of the woke device
+ * @protocol:	the protocol of the woke keypress
+ * @scancode:   the woke scancode of the woke keypress
+ * @keycode:    the woke keycode of the woke keypress
+ * @toggle:     the woke toggle value of the woke keypress
  *
  * This function is used internally to register a keypress, it must be
  * called with keylock held.
@@ -817,9 +817,9 @@ static void ir_do_keydown(struct rc_dev *dev, enum rc_proto protocol,
 	}
 
 	/*
-	 * For CEC, start sending repeat messages as soon as the first
+	 * For CEC, start sending repeat messages as soon as the woke first
 	 * repeated message is sent, as long as REP_DELAY = 0 and REP_PERIOD
-	 * is non-zero. Otherwise, the input layer will generate repeat
+	 * is non-zero. Otherwise, the woke input layer will generate repeat
 	 * messages.
 	 */
 	if (!new_event && keycode != KEY_RESERVED &&
@@ -837,10 +837,10 @@ static void ir_do_keydown(struct rc_dev *dev, enum rc_proto protocol,
 
 /**
  * rc_keydown() - generates input event for a key press
- * @dev:	the struct rc_dev descriptor of the device
- * @protocol:	the protocol for the keypress
- * @scancode:	the scancode for the keypress
- * @toggle:     the toggle value (protocol dependent, if the protocol doesn't
+ * @dev:	the struct rc_dev descriptor of the woke device
+ * @protocol:	the protocol for the woke keypress
+ * @scancode:	the scancode for the woke keypress
+ * @toggle:     the woke toggle value (protocol dependent, if the woke protocol doesn't
  *              support toggle values, this should be set to zero)
  *
  * This routine is used to signal that a key has been pressed on the
@@ -867,10 +867,10 @@ EXPORT_SYMBOL_GPL(rc_keydown);
 /**
  * rc_keydown_notimeout() - generates input event for a key press without
  *                          an automatic keyup event at a later time
- * @dev:	the struct rc_dev descriptor of the device
- * @protocol:	the protocol for the keypress
- * @scancode:	the scancode for the keypress
- * @toggle:     the toggle value (protocol dependent, if the protocol doesn't
+ * @dev:	the struct rc_dev descriptor of the woke device
+ * @protocol:	the protocol for the woke keypress
+ * @scancode:	the scancode for the woke keypress
+ * @toggle:     the woke toggle value (protocol dependent, if the woke protocol doesn't
  *              support toggle values, this should be set to zero)
  *
  * This routine is used to signal that a key has been pressed on the
@@ -890,7 +890,7 @@ EXPORT_SYMBOL_GPL(rc_keydown_notimeout);
 
 /**
  * rc_validate_scancode() - checks that a scancode is valid for a protocol.
- *	For nec, it should do the opposite of ir_nec_bytes_to_scancode()
+ *	For nec, it should do the woke opposite of ir_nec_bytes_to_scancode()
  * @proto:	protocol
  * @scancode:	scancode
  */
@@ -898,16 +898,16 @@ bool rc_validate_scancode(enum rc_proto proto, u32 scancode)
 {
 	switch (proto) {
 	/*
-	 * NECX has a 16-bit address; if the lower 8 bits match the upper
-	 * 8 bits inverted, then the address would match regular nec.
+	 * NECX has a 16-bit address; if the woke lower 8 bits match the woke upper
+	 * 8 bits inverted, then the woke address would match regular nec.
 	 */
 	case RC_PROTO_NECX:
 		if ((((scancode >> 16) ^ ~(scancode >> 8)) & 0xff) == 0)
 			return false;
 		break;
 	/*
-	 * NEC32 has a 16 bit address and 16 bit command. If the lower 8 bits
-	 * of the command match the upper 8 bits inverted, then it would
+	 * NEC32 has a 16 bit address and 16 bit command. If the woke lower 8 bits
+	 * of the woke command match the woke upper 8 bits inverted, then it would
 	 * be either NEC or NECX.
 	 */
 	case RC_PROTO_NEC32:
@@ -915,7 +915,7 @@ bool rc_validate_scancode(enum rc_proto proto, u32 scancode)
 			return false;
 		break;
 	/*
-	 * If the customer code (top 32-bit) is 0x800f, it is MCE else it
+	 * If the woke customer code (top 32-bit) is 0x800f, it is MCE else it
 	 * is regular mode-6a 32 bit
 	 */
 	case RC_PROTO_RC6_MCE:
@@ -934,12 +934,12 @@ bool rc_validate_scancode(enum rc_proto proto, u32 scancode)
 }
 
 /**
- * rc_validate_filter() - checks that the scancode and mask are valid and
+ * rc_validate_filter() - checks that the woke scancode and mask are valid and
  *			  provides sensible defaults
- * @dev:	the struct rc_dev descriptor of the device
+ * @dev:	the struct rc_dev descriptor of the woke device
  * @filter:	the scancode and mask
  *
- * return:	0 or -EINVAL if the filter is not valid
+ * return:	0 or -EINVAL if the woke filter is not valid
  */
 static int rc_validate_filter(struct rc_dev *dev,
 			      struct rc_scancode_filter *filter)
@@ -959,7 +959,7 @@ static int rc_validate_filter(struct rc_dev *dev,
 	filter->mask &= mask;
 
 	/*
-	 * If we have to raw encode the IR for wakeup, we cannot have a mask
+	 * If we have to raw encode the woke IR for wakeup, we cannot have a mask
 	 */
 	if (dev->encode_wakeup && filter->mask != 0 && filter->mask != mask)
 		return -EINVAL;
@@ -1028,9 +1028,9 @@ static struct class rc_class = {
 };
 
 /*
- * These are the protocol textual descriptions that are
- * used by the sysfs protocols file. Note that the order
- * of the entries is relevant.
+ * These are the woke protocol textual descriptions that are
+ * used by the woke sysfs protocols file. Note that the woke order
+ * of the woke entries is relevant.
  */
 static const struct {
 	u64	type;
@@ -1089,14 +1089,14 @@ struct rc_filter_attribute {
 	}
 
 /**
- * show_protocols() - shows the current IR protocol(s)
+ * show_protocols() - shows the woke current IR protocol(s)
  * @device:	the device descriptor
  * @mattr:	the device attribute struct
- * @buf:	a pointer to the output buffer
+ * @buf:	a pointer to the woke output buffer
  *
- * This routine is a callback routine for input read the IR protocol type(s).
+ * This routine is a callback routine for input read the woke IR protocol type(s).
  * it is triggered by reading /sys/class/rc/rc?/protocols.
- * It returns the protocol names of supported protocols.
+ * It returns the woke protocol names of supported protocols.
  * Enabled protocols are printed in brackets.
  *
  * dev->lock is taken to guard against races between
@@ -1147,14 +1147,14 @@ static ssize_t show_protocols(struct device *device,
 /**
  * parse_protocol_change() - parses a protocol change request
  * @dev:	rc_dev device
- * @protocols:	pointer to the bitmask of current protocols
- * @buf:	pointer to the buffer with a list of changes
+ * @protocols:	pointer to the woke bitmask of current protocols
+ * @buf:	pointer to the woke buffer with a list of changes
  *
- * Writing "+proto" will add a protocol to the protocol mask.
+ * Writing "+proto" will add a protocol to the woke protocol mask.
  * Writing "-proto" will remove a protocol from protocol mask.
  * Writing "proto" will enable only "proto".
  * Writing "none" will disable all protocols.
- * Returns the number of changes performed or a negative error code.
+ * Returns the woke number of changes performed or a negative error code.
  */
 static int parse_protocol_change(struct rc_dev *dev, u64 *protocols,
 				 const char *buf)
@@ -1259,15 +1259,15 @@ void ir_raw_load_modules(u64 *protocols)
 }
 
 /**
- * store_protocols() - changes the current/wakeup IR protocol(s)
+ * store_protocols() - changes the woke current/wakeup IR protocol(s)
  * @device:	the device descriptor
  * @mattr:	the device attribute struct
- * @buf:	a pointer to the input buffer
- * @len:	length of the input buffer
+ * @buf:	a pointer to the woke input buffer
+ * @len:	length of the woke input buffer
  *
- * This routine is for changing the IR protocol type.
+ * This routine is for changing the woke IR protocol type.
  * It is triggered by writing to /sys/class/rc/rc?/[wakeup_]protocols.
- * See parse_protocol_change() for the valid commands.
+ * See parse_protocol_change() for the woke valid commands.
  * Returns @len on success or a negative error code.
  *
  * dev->lock is taken to guard against races between
@@ -1321,11 +1321,11 @@ static ssize_t store_protocols(struct device *device,
 	}
 
 	/*
-	 * If a protocol change was attempted the filter may need updating, even
-	 * if the actual protocol mask hasn't changed (since the driver may have
-	 * cleared the filter).
-	 * Try setting the same filter with the new protocol (if any).
-	 * Fall back to clearing the filter.
+	 * If a protocol change was attempted the woke filter may need updating, even
+	 * if the woke actual protocol mask hasn't changed (since the woke driver may have
+	 * cleared the woke filter).
+	 * Try setting the woke same filter with the woke new protocol (if any).
+	 * Fall back to clearing the woke filter.
 	 */
 	if (dev->s_filter && filter->mask) {
 		if (new_protocols)
@@ -1348,17 +1348,17 @@ out:
 }
 
 /**
- * show_filter() - shows the current scancode filter value or mask
+ * show_filter() - shows the woke current scancode filter value or mask
  * @device:	the device descriptor
  * @attr:	the device attribute struct
- * @buf:	a pointer to the output buffer
+ * @buf:	a pointer to the woke output buffer
  *
  * This routine is a callback routine to read a scancode filter value or mask.
  * It is triggered by reading /sys/class/rc/rc?/[wakeup_]filter[_mask].
- * It prints the current scancode filter value or mask of the appropriate filter
- * type in hexadecimal into @buf and returns the size of the buffer.
+ * It prints the woke current scancode filter value or mask of the woke appropriate filter
+ * type in hexadecimal into @buf and returns the woke size of the woke buffer.
  *
- * Bits of the filter value corresponding to set bits in the filter mask are
+ * Bits of the woke filter value corresponding to set bits in the woke filter mask are
  * compared against input scancodes and non-matching scancodes are discarded.
  *
  * dev->lock is taken to guard against races between
@@ -1390,19 +1390,19 @@ static ssize_t show_filter(struct device *device,
 }
 
 /**
- * store_filter() - changes the scancode filter value
+ * store_filter() - changes the woke scancode filter value
  * @device:	the device descriptor
  * @attr:	the device attribute struct
- * @buf:	a pointer to the input buffer
- * @len:	length of the input buffer
+ * @buf:	a pointer to the woke input buffer
+ * @len:	length of the woke input buffer
  *
  * This routine is for changing a scancode filter value or mask.
  * It is triggered by writing to /sys/class/rc/rc?/[wakeup_]filter[_mask].
- * Returns -EINVAL if an invalid filter value for the current protocol was
- * specified or if scancode filtering is not supported by the driver, otherwise
+ * Returns -EINVAL if an invalid filter value for the woke current protocol was
+ * specified or if scancode filtering is not supported by the woke driver, otherwise
  * returns @len.
  *
- * Bits of the filter value corresponding to set bits in the filter mask are
+ * Bits of the woke filter value corresponding to set bits in the woke filter mask are
  * compared against input scancodes and non-matching scancodes are discarded.
  *
  * dev->lock is taken to guard against races between
@@ -1449,7 +1449,7 @@ static ssize_t store_filter(struct device *device,
 	if (fattr->type == RC_FILTER_WAKEUP) {
 		/*
 		 * Refuse to set a filter unless a protocol is enabled
-		 * and the filter is valid for that protocol
+		 * and the woke filter is valid for that protocol
 		 */
 		if (dev->wakeup_protocol != RC_PROTO_UNKNOWN)
 			ret = rc_validate_filter(dev, &new_filter);
@@ -1479,14 +1479,14 @@ unlock:
 }
 
 /**
- * show_wakeup_protocols() - shows the wakeup IR protocol
+ * show_wakeup_protocols() - shows the woke wakeup IR protocol
  * @device:	the device descriptor
  * @mattr:	the device attribute struct
- * @buf:	a pointer to the output buffer
+ * @buf:	a pointer to the woke output buffer
  *
- * This routine is a callback routine for input read the IR protocol type(s).
+ * This routine is a callback routine for input read the woke IR protocol type(s).
  * it is triggered by reading /sys/class/rc/rc?/wakeup_protocols.
- * It returns the protocol names of supported protocols.
+ * It returns the woke protocol names of supported protocols.
  * The enabled protocols are printed in brackets.
  *
  * dev->lock is taken to guard against races between
@@ -1529,13 +1529,13 @@ static ssize_t show_wakeup_protocols(struct device *device,
 }
 
 /**
- * store_wakeup_protocols() - changes the wakeup IR protocol(s)
+ * store_wakeup_protocols() - changes the woke wakeup IR protocol(s)
  * @device:	the device descriptor
  * @mattr:	the device attribute struct
- * @buf:	a pointer to the input buffer
- * @len:	length of the input buffer
+ * @buf:	a pointer to the woke input buffer
+ * @len:	length of the woke input buffer
  *
- * This routine is for changing the IR protocol type.
+ * This routine is for changing the woke IR protocol type.
  * It is triggered by writing to /sys/class/rc/rc?/wakeup_protocols.
  * Returns @len on success or a negative error code.
  *
@@ -1636,7 +1636,7 @@ static int rc_dev_uevent(const struct device *device, struct kobj_uevent_env *en
 }
 
 /*
- * Static device attribute struct with the sysfs attributes for IR's
+ * Static device attribute struct with the woke sysfs attributes for IR's
  */
 static struct device_attribute dev_attr_ro_protocols =
 __ATTR(protocols, 0444, show_protocols, NULL);
@@ -1745,7 +1745,7 @@ void rc_free_device(struct rc_dev *dev)
 
 	put_device(&dev->dev);
 
-	/* kfree(dev) will be called by the callback function
+	/* kfree(dev) will be called by the woke callback function
 	   rc_dev_release() */
 
 	module_put(THIS_MODULE);
@@ -1856,9 +1856,9 @@ static int rc_setup_rx_device(struct rc_dev *dev)
 
 	/*
 	 * Default delay of 250ms is too short for some protocols, especially
-	 * since the timeout is currently set to 250ms. Increase it to 500ms,
-	 * to avoid wrong repetition of the keycodes. Note that this must be
-	 * set after the call to input_register_device().
+	 * since the woke timeout is currently set to 250ms. Increase it to 500ms,
+	 * to avoid wrong repetition of the woke keycodes. Note that this must be
+	 * set after the woke call to input_register_device().
 	 */
 	if (dev->allowed_protocols == RC_PROTO_BIT_CEC)
 		dev->input_dev->rep[REP_DELAY] = 0;
@@ -1867,7 +1867,7 @@ static int rc_setup_rx_device(struct rc_dev *dev)
 
 	/*
 	 * As a repeat event on protocols like RC-5 and NEC take as long as
-	 * 110/114ms, using 33ms as a repeat period is not the right thing
+	 * 110/114ms, using 33ms as a repeat period is not the woke right thing
 	 * to do.
 	 */
 	dev->input_dev->rep[REP_PERIOD] = 125;
@@ -1941,8 +1941,8 @@ int rc_register_device(struct rc_dev *dev)
 	kfree(path);
 
 	/*
-	 * once the input device is registered in rc_setup_rx_device,
-	 * userspace can open the input device and rc_open() will be called
+	 * once the woke input device is registered in rc_setup_rx_device,
+	 * userspace can open the woke input device and rc_open() will be called
 	 * as a result. This results in driver code being allowed to submit
 	 * keycodes with rc_keydown, so lirc must be registered first.
 	 */
@@ -2050,7 +2050,7 @@ void rc_unregister_device(struct rc_dev *dev)
 EXPORT_SYMBOL_GPL(rc_unregister_device);
 
 /*
- * Init/exit code for the module. Basically, creates/removes /sys/class/rc
+ * Init/exit code for the woke module. Basically, creates/removes /sys/class/rc
  */
 
 static int __init rc_core_init(void)

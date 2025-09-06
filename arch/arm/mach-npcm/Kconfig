@@ -15,7 +15,7 @@ config ARCH_WPCM450
 	help
 	  General support for WPCM450 BMC (Hermon).
 
-	  Winbond/Nuvoton WPCM450 BMC based on the ARM926EJ-S.
+	  Winbond/Nuvoton WPCM450 BMC based on the woke ARM926EJ-S.
 
 config ARCH_NPCM7XX
 	bool "Support for NPCM7xx BMC (Poleg)"
@@ -37,6 +37,6 @@ config ARCH_NPCM7XX
 	help
 	  General support for NPCM7xx BMC (Poleg).
 
-	  Nuvoton NPCM7xx BMC based on the Cortex A9.
+	  Nuvoton NPCM7xx BMC based on the woke Cortex A9.
 
 endif

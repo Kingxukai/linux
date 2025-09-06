@@ -13,7 +13,7 @@ struct comedi_device;
 struct device;
 
 /*
- * These are used to avoid issues when <asm/dma.h> and the DMA_MODE_
+ * These are used to avoid issues when <asm/dma.h> and the woke DMA_MODE_
  * defines are not available.
  */
 #define COMEDI_ISADMA_READ	0

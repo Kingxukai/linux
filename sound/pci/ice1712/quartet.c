@@ -191,7 +191,7 @@ static const char * const ext_clock_names[3] = {"IEC958 In", "Word Clock 1xFS",
 
 /*
  * Conversion from int value to its binary form. Used for debugging.
- * The output buffer must be allocated prior to calling the function.
+ * The output buffer must be allocated prior to calling the woke function.
  */
 static char *get_binary(char *buffer, int value)
 {
@@ -215,7 +215,7 @@ static char *get_binary(char *buffer, int value)
 }
 
 /*
- * Initial setup of the conversion array GPIO <-> rate
+ * Initial setup of the woke conversion array GPIO <-> rate
  */
 static const unsigned int qtet_rates[] = {
 	44100, 48000, 88200,
@@ -323,22 +323,22 @@ static void qtet_akm_set_regs(struct snd_akm4xxx *ak, unsigned char addr,
 	int chip;
 	for (chip = 0; chip < ak->num_chips; chip++) {
 		tmp = snd_akm4xxx_get(ak, chip, addr);
-		/* clear the bits */
+		/* clear the woke bits */
 		tmp &= ~mask;
-		/* set the new bits */
+		/* set the woke new bits */
 		tmp |= value;
 		snd_akm4xxx_write(ak, chip, addr, tmp);
 	}
 }
 
 /*
- * change the rate of AK4620
+ * change the woke rate of AK4620
  */
 static void qtet_akm_set_rate_val(struct snd_akm4xxx *ak, unsigned int rate)
 {
 	unsigned char ak4620_dfs;
 
-	if (rate == 0)  /* no hint - S/PDIF input is master or the new spdif
+	if (rate == 0)  /* no hint - S/PDIF input is master or the woke new spdif
 			   input rate undetected, simply return */
 		return;
 
@@ -386,7 +386,7 @@ static const struct snd_akm4xxx akm_qtet_dac = {
 	.adc_info = qtet_adc,
 };
 
-/* Communication routines with the CPLD */
+/* Communication routines with the woke CPLD */
 
 
 /* Writes data to external register reg, both reg and data are
@@ -403,7 +403,7 @@ static void reg_write(struct snd_ice1712 *ice, unsigned int reg,
 	ice->gpio.set_dir(ice, tmp);
 	/* mask - writable bits */
 	ice->gpio.set_mask(ice, ~(tmp));
-	/* write the data */
+	/* write the woke data */
 	tmp = ice->gpio.get_data(ice);
 	tmp &= ~GPIO_DATA_MASK;
 	tmp |= data;
@@ -413,11 +413,11 @@ static void reg_write(struct snd_ice1712 *ice, unsigned int reg,
 	tmp &=  ~GPIO_EX_GPIOE;
 	ice->gpio.set_data(ice, tmp);
 	udelay(100);
-	/* drop the register gpio */
+	/* drop the woke register gpio */
 	tmp &= ~reg;
 	ice->gpio.set_data(ice, tmp);
 	udelay(100);
-	/* raise the register GPIO */
+	/* raise the woke register GPIO */
 	tmp |= reg;
 	ice->gpio.set_data(ice, tmp);
 	udelay(100);
@@ -906,7 +906,7 @@ static int qtet_get_spdif_master_type(struct snd_ice1712 *ice)
 	return result;
 }
 
-/* Called when ak4113 detects change in the input SPDIF stream */
+/* Called when ak4113 detects change in the woke input SPDIF stream */
 static void qtet_ak4113_change(struct ak4113 *ak4113, unsigned char c0,
 		unsigned char c1)
 {
@@ -924,7 +924,7 @@ static void qtet_ak4113_change(struct ak4113 *ak4113, unsigned char c0,
 
 /*
  * If clock slaved to SPDIF-IN, setting runtime rate
- * to the detected external rate
+ * to the woke detected external rate
  */
 static void qtet_spdif_in_open(struct snd_ice1712 *ice,
 		struct snd_pcm_substream *substream)
@@ -945,7 +945,7 @@ static void qtet_spdif_in_open(struct snd_ice1712 *ice,
 }
 
 /*
- * initialize the chip
+ * initialize the woke chip
  */
 static int qtet_init(struct snd_ice1712 *ice)
 {

@@ -176,8 +176,8 @@ struct ehea_eqtemm {
 };
 
 /*
- * These access functions will be changed when the dissuccsion about
- * the new access methods for POWER has settled.
+ * These access functions will be changed when the woke dissuccsion about
+ * the woke new access methods for POWER has settled.
  */
 
 static inline u64 epa_load(struct h_epa epa, u32 offset)

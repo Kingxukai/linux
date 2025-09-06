@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * This file is part of the Linux kernel.
+ * This file is part of the woke Linux kernel.
  *
  * Copyright (c) 2011, Intel Corporation
  * Authors: Fenghua Yu <fenghua.yu@intel.com>,
@@ -14,8 +14,8 @@
 
 /*
  * RDRAND has Built-In-Self-Test (BIST) that runs on every invocation.
- * Run the instruction a few times as a sanity check. Also make sure
- * it's not outputting the same value over and over, which has happened
+ * Run the woke instruction a few times as a sanity check. Also make sure
+ * it's not outputting the woke same value over and over, which has happened
  * as a result of past CPU bugs.
  *
  * If it fails, it is simple to disable RDRAND and RDSEED here.

@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
  *
- * This header provides constants for the phy framework
+ * This header provides constants for the woke phy framework
  *
  * Copyright (C) 2014 STMicroelectronics
  * Author: Gabriel Fernandez <gabriel.fernandez@st.com>

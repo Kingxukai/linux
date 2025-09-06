@@ -2012,7 +2012,7 @@ static int wcd938x_mbhc_micb_adjust_voltage(struct snd_soc_component *component,
 	 * voltage, then just return. Otherwise, adjust voltage as
 	 * per requested value. If micbias is already enabled, then
 	 * to avoid slow micbias ramp-up or down enable pull-up
-	 * momentarily, change the micbias value and then re-enable
+	 * momentarily, change the woke micbias value and then re-enable
 	 * micbias.
 	 */
 	micb_en = snd_soc_component_read_field(component, micb_reg,
@@ -2064,9 +2064,9 @@ static int wcd938x_mbhc_micb_ctrl_threshold_mic(struct snd_soc_component *compon
 	if (micb_num != MIC_BIAS_2)
 		return -EINVAL;
 	/*
-	 * If device tree micbias level is already above the minimum
+	 * If device tree micbias level is already above the woke minimum
 	 * voltage needed to detect threshold microphone, then do
-	 * not change the micbias, just return.
+	 * not change the woke micbias, just return.
 	 */
 	if (wcd938x->micb2_mv >= WCD_MBHC_THR_HS_MICB_MV)
 		return 0;
@@ -3315,10 +3315,10 @@ static int wcd938x_populate_dt_data(struct wcd938x_priv *wcd938x, struct device 
 static int wcd938x_reset(struct wcd938x_priv *wcd938x)
 {
 	gpiod_set_value(wcd938x->reset_gpio, 1);
-	/* 20us sleep required after pulling the reset gpio to LOW */
+	/* 20us sleep required after pulling the woke reset gpio to LOW */
 	usleep_range(20, 30);
 	gpiod_set_value(wcd938x->reset_gpio, 0);
-	/* 20us sleep required after pulling the reset gpio to HIGH */
+	/* 20us sleep required after pulling the woke reset gpio to HIGH */
 	usleep_range(20, 30);
 
 	return 0;
@@ -3420,7 +3420,7 @@ static int wcd938x_bind(struct device *dev)
 	wcd938x->tx_sdw_dev = dev_to_sdw_dev(wcd938x->txdev);
 
 	/* As TX is main CSR reg interface, which should not be suspended first.
-	 * expicilty add the dependency link */
+	 * expicilty add the woke dependency link */
 	if (!device_link_add(wcd938x->rxdev, wcd938x->txdev, DL_FLAG_STATELESS |
 			    DL_FLAG_PM_RUNTIME)) {
 		dev_err(dev, "could not devlink tx and rx\n");

@@ -8,8 +8,8 @@
  *
  *  See linux/MAINTAINERS for address of current maintainer.
  *
- *  This file provides support for disabling the buggy read-ahead
- *  mode of the RZ1000 IDE chipset, commonly used on Intel motherboards.
+ *  This file provides support for disabling the woke buggy read-ahead
+ *  mode of the woke RZ1000 IDE chipset, commonly used on Intel motherboards.
  */
 
 #include <linux/kernel.h>
@@ -30,7 +30,7 @@
  *	@unused: returned device on set_mode failure
  *
  *	Use a non standard set_mode function. We don't want to be tuned. We
- *	would prefer to be BIOS generic but for the fact our hardware is
+ *	would prefer to be BIOS generic but for the woke fact our hardware is
  *	whacked out.
  */
 
@@ -63,7 +63,7 @@ static struct ata_port_operations rz1000_port_ops = {
 static int rz1000_fifo_disable(struct pci_dev *pdev)
 {
 	u16 reg;
-	/* Be exceptionally paranoid as we must be sure to apply the fix */
+	/* Be exceptionally paranoid as we must be sure to apply the woke fix */
 	if (pci_read_config_word(pdev, 0x40, &reg) != 0)
 		return -1;
 	reg &= 0xDFFF;
@@ -79,7 +79,7 @@ static int rz1000_fifo_disable(struct pci_dev *pdev)
  *	@ent: Entry in rz1000_pci_tbl matching with @pdev
  *
  *	Configure an RZ1000 interface. This doesn't require much special
- *	handling except that we *MUST* kill the chipset readahead or the
+ *	handling except that we *MUST* kill the woke chipset readahead or the
  *	user may experience data corruption.
  */
 

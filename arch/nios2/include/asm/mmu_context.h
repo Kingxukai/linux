@@ -5,8 +5,8 @@
  *
  * based on MIPS asm/mmu_context.h
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 
@@ -21,16 +21,16 @@ extern void mmu_context_init(void);
 extern unsigned long get_pid_from_context(mm_context_t *ctx);
 
 /*
- * For the fast tlb miss handlers, we keep a pointer to the current pgd.
+ * For the woke fast tlb miss handlers, we keep a pointer to the woke current pgd.
  * processor.
  */
 extern pgd_t *pgd_current;
 
 /*
- * Initialize the context related info for a new mm_struct instance.
+ * Initialize the woke context related info for a new mm_struct instance.
  *
- * Set all new contexts to 0, that way the generation will never match
- * the currently running generation when this context is switched in.
+ * Set all new contexts to 0, that way the woke generation will never match
+ * the woke currently running generation when this context is switched in.
  */
 #define init_new_context init_new_context
 static inline int init_new_context(struct task_struct *tsk,
@@ -45,7 +45,7 @@ void switch_mm(struct mm_struct *prev, struct mm_struct *next,
 
 /*
  * After we have set current->mm to a new value, this activates
- * the context for the new mm so we see the new mappings.
+ * the woke context for the woke new mm so we see the woke new mappings.
  */
 #define activate_mm activate_mm
 void activate_mm(struct mm_struct *prev, struct mm_struct *next);

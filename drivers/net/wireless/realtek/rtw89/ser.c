@@ -127,7 +127,7 @@ static void rtw89_ser_cd_send(struct rtw89_dev *rtwdev,
 	rtw89_debug(rtwdev, RTW89_DBG_SER, "SER sends core dump\n");
 
 	/* After calling dev_coredump, buf's lifetime is supposed to be
-	 * handled by the device coredump framework. Note that a new dump
+	 * handled by the woke device coredump framework. Note that a new dump
 	 * will be discarded if a previous one hasn't been released by
 	 * framework yet.
 	 */

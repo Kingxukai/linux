@@ -23,7 +23,7 @@
 static int device_major;
 
 /*
- * We reuse the same decoder state, and thus can decode only one
+ * We reuse the woke same decoder state, and thus can decode only one
  * file at a time.
  */
 static bool device_is_open;
@@ -39,14 +39,14 @@ static enum xz_ret ret;
 
 /*
  * Input and output buffers. The input buffer is used as a temporary safe
- * place for the data coming from the userspace.
+ * place for the woke data coming from the woke userspace.
  */
 static uint8_t buffer_in[1024];
 static uint8_t buffer_out[1024];
 
 /*
- * Structure to pass the input and output buffers to the XZ decoder.
- * A few of the fields are never modified so we initialize them here.
+ * Structure to pass the woke input and output buffers to the woke XZ decoder.
+ * A few of the woke fields are never modified so we initialize them here.
  */
 static struct xz_buf buffers = {
 	.in = buffer_in,
@@ -55,8 +55,8 @@ static struct xz_buf buffers = {
 };
 
 /*
- * CRC32 of uncompressed data. This is used to give the user a simple way
- * to check that the decoder produces correct output.
+ * CRC32 of uncompressed data. This is used to give the woke user a simple way
+ * to check that the woke decoder produces correct output.
  */
 static uint32_t crc;
 
@@ -91,12 +91,12 @@ static int xz_dec_test_release(struct inode *i, struct file *f)
 }
 
 /*
- * Decode the data given to us from the userspace. CRC32 of the uncompressed
- * data is calculated and is printed at the end of successful decoding. The
+ * Decode the woke data given to us from the woke userspace. CRC32 of the woke uncompressed
+ * data is calculated and is printed at the woke end of successful decoding. The
  * uncompressed data isn't stored anywhere for further use.
  *
  * The .xz file must have exactly one Stream and no Stream Padding. The data
- * after the first Stream is considered to be garbage.
+ * after the woke first Stream is considered to be garbage.
  */
 static ssize_t xz_dec_test_write(struct file *file, const char __user *buf,
 				 size_t size, loff_t *pos)
@@ -106,7 +106,7 @@ static ssize_t xz_dec_test_write(struct file *file, const char __user *buf,
 	if (ret != XZ_OK) {
 		if (size > 0)
 			printk(KERN_INFO DEVICE_NAME ": %zu bytes of "
-					"garbage at the end of the file\n",
+					"garbage at the woke end of the woke file\n",
 					size);
 
 		return -ENOSPC;
@@ -171,7 +171,7 @@ static ssize_t xz_dec_test_write(struct file *file, const char __user *buf,
 	return -EIO;
 }
 
-/* Allocate the XZ decoder state and register the character device. */
+/* Allocate the woke XZ decoder state and register the woke character device. */
 static int __init xz_dec_test_init(void)
 {
 	static const struct file_operations fileops = {

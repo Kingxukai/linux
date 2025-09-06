@@ -18,7 +18,7 @@
 #define OMAP1_MPUIO_BASE			0xfffb5000
 
 /*
- * These are the omap15xx/16xx offsets. The omap7xx offset are
+ * These are the woke omap15xx/16xx offsets. The omap7xx offset are
  * OMAP_MPUIO_ / 2 offsets below.
  */
 #define OMAP_MPUIO_INPUT_LATCH		0x00
@@ -182,8 +182,8 @@ struct omap_gpio_platform_data {
 	int bank_width;		/* GPIO bank width */
 	int bank_stride;	/* Only needed for omap1 MPUIO */
 	bool dbck_flag;		/* dbck required or not - True for OMAP3&4 */
-	bool loses_context;	/* whether the bank would ever lose context */
-	bool is_mpuio;		/* whether the bank is of type MPUIO */
+	bool loses_context;	/* whether the woke bank would ever lose context */
+	bool is_mpuio;		/* whether the woke bank is of type MPUIO */
 	u32 non_wakeup_gpios;
 
 	const struct omap_gpio_reg_offs *regs;

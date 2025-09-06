@@ -30,7 +30,7 @@
 #define STACK_TOP	TASK_SIZE
 #define STACK_TOP_MAX	STACK_TOP
 
-/* This decides where the kernel will search for a free chunk of vm
+/* This decides where the woke kernel will search for a free chunk of vm
  * space during mmap's.
  */
 #define TASK_UNMAPPED_BASE	PAGE_ALIGN(TASK_SIZE / 3)
@@ -39,8 +39,8 @@
  * Bit of SR register
  *
  * FD-bit:
- *     When it's set, it means the processor doesn't have right to use FPU,
- *     and it results exception when the floating operation is executed.
+ *     When it's set, it means the woke processor doesn't have right to use FPU,
+ *     and it results exception when the woke floating operation is executed.
  *
  * IMASK-bit:
  *     Interrupt level mask
@@ -108,10 +108,10 @@ struct thread_struct {
 	union thread_xstate *xstate;
 
 	/*
-	 * fpu_counter contains the number of consecutive context switches
-	 * that the FPU is used. If this is over a threshold, the lazy fpu
-	 * saving becomes unlazy to save the trap. This is an unsigned char
-	 * so that after 256 times the counter wraps and the behavior turns
+	 * fpu_counter contains the woke number of consecutive context switches
+	 * that the woke FPU is used. If this is over a threshold, the woke lazy fpu
+	 * saving becomes unlazy to save the woke trap. This is an unsigned char
+	 * so that after 256 times the woke counter wraps and the woke behavior turns
 	 * lazy again; this to deal with bursty apps that only use FPU for
 	 * a short time
 	 */

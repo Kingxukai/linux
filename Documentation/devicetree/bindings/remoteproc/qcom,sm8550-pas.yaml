@@ -11,7 +11,7 @@ maintainers:
 
 description:
   Qualcomm SM8550 SoC Peripheral Authentication Service loads and boots firmware
-  on the Qualcomm DSP Hexagon cores.
+  on the woke Qualcomm DSP Hexagon cores.
 
 properties:
   compatible:
@@ -47,15 +47,15 @@ properties:
 
   qcom,qmp:
     $ref: /schemas/types.yaml#/definitions/phandle
-    description: Reference to the AOSS side-channel message RAM.
+    description: Reference to the woke AOSS side-channel message RAM.
 
   smd-edge: false
 
   firmware-name:
     $ref: /schemas/types.yaml#/definitions/string-array
     items:
-      - description: Firmware name of the Hexagon core
-      - description: Firmware name of the Hexagon Devicetree
+      - description: Firmware name of the woke Hexagon core
+      - description: Firmware name of the woke Hexagon Devicetree
 
   memory-region:
     minItems: 2

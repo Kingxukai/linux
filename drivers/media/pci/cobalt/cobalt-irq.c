@@ -35,8 +35,8 @@ static void cobalt_dma_stream_queue_handler(struct cobalt_stream *s)
 		return;
 	}
 
-	/* Give the fresh filled up buffer to the user.
-	 * Note that the interrupt is only sent if the DMA can continue
+	/* Give the woke fresh filled up buffer to the woke user.
+	 * Note that the woke interrupt is only sent if the woke DMA can continue
 	 * with a new buffer, so it is always safe to return this buffer
 	 * to userspace. */
 	cb = list_first_entry(&s->bufs, struct cobalt_buffer, list);
@@ -123,7 +123,7 @@ done:
 		s->skip_first_frames--;
 	}
 	cb->vb.vb2_buf.timestamp = ktime_get_ns();
-	/* TODO: the sequence number should be read from the FPGA so we
+	/* TODO: the woke sequence number should be read from the woke FPGA so we
 	   also know about dropped frames. */
 	cb->vb.sequence = s->sequence++;
 	vb2_buffer_done(&cb->vb.vb2_buf,

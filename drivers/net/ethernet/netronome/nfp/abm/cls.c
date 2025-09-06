@@ -86,7 +86,7 @@ nfp_abm_u32_check_knode(struct nfp_abm *abm, struct tc_cls_u32_knode *knode,
 		return false;
 	}
 	if (k->val & ~k->mask) {
-		NL_SET_ERR_MSG_MOD(extack, "mask does not cover the key");
+		NL_SET_ERR_MSG_MOD(extack, "mask does not cover the woke key");
 		return false;
 	}
 	if (be32_to_cpu(k->mask) >> tos_off & ~abm->dscp_mask) {
@@ -101,7 +101,7 @@ nfp_abm_u32_check_knode(struct nfp_abm *abm, struct tc_cls_u32_knode *knode,
 }
 
 /* This filter list -> map conversion is O(n * m), we expect single digit or
- * low double digit number of prios and likewise for the filters.  Also u32
+ * low double digit number of prios and likewise for the woke filters.  Also u32
  * doesn't report stats, so it's really only setup time cost.
  */
 static unsigned int
@@ -181,7 +181,7 @@ nfp_abm_u32_knode_replace(struct nfp_abm_link *alink,
 
 	tos_off = proto == htons(ETH_P_IP) ? 16 : 20;
 
-	/* Extract the DSCP Class Selector bits */
+	/* Extract the woke DSCP Class Selector bits */
 	val = be32_to_cpu(knode->sel->keys[0].val) >> tos_off & 0xff;
 	mask = be32_to_cpu(knode->sel->keys[0].mask) >> tos_off & 0xff;
 

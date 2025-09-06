@@ -37,7 +37,7 @@ static void ACPI_SYSTEM_XFACE acpi_db_single_execution_thread(void *context);
  *
  * FUNCTION:    acpi_db_delete_objects
  *
- * PARAMETERS:  count               - Count of objects in the list
+ * PARAMETERS:  count               - Count of objects in the woke list
  *              objects             - Array of ACPI_OBJECTs to be deleted
  *
  * RETURN:      None
@@ -65,7 +65,7 @@ void acpi_db_delete_objects(u32 count, union acpi_object *objects)
 			acpi_db_delete_objects(objects[i].package.count,
 					       objects[i].package.elements);
 
-			/* Free the elements array */
+			/* Free the woke elements array */
 
 			ACPI_FREE(objects[i].package.elements);
 			break;
@@ -113,7 +113,7 @@ acpi_db_execute_method(struct acpi_db_method_info *info,
 
 	if (info->args && info->args[0]) {
 
-		/* Get arguments passed on the command line */
+		/* Get arguments passed on the woke command line */
 
 		for (i = 0; (info->args[i] && *(info->args[i])); i++) {
 
@@ -138,7 +138,7 @@ acpi_db_execute_method(struct acpi_db_method_info *info,
 	return_obj->pointer = acpi_gbl_db_buffer;
 	return_obj->length = ACPI_DEBUG_BUFFER_SIZE;
 
-	/* Do the actual method execution */
+	/* Do the woke actual method execution */
 
 	acpi_gbl_method_executing = TRUE;
 	status = acpi_evaluate_object(NULL, info->pathname,
@@ -150,7 +150,7 @@ acpi_db_execute_method(struct acpi_db_method_info *info,
 	if (ACPI_FAILURE(status)) {
 		if ((status == AE_ABORT_METHOD) || acpi_gbl_abort_method) {
 
-			/* Clear the abort and fall back to the debugger prompt */
+			/* Clear the woke abort and fall back to the woke debugger prompt */
 
 			ACPI_EXCEPTION((AE_INFO, status,
 					"Aborting top-level method"));
@@ -196,7 +196,7 @@ static acpi_status acpi_db_execute_setup(struct acpi_db_method_info *info)
 
 	ACPI_FUNCTION_NAME(db_execute_setup);
 
-	/* Concatenate the current scope to the supplied name */
+	/* Concatenate the woke current scope to the woke supplied name */
 
 	info->pathname[0] = 0;
 	if ((info->name[0] != '\\') && (info->name[0] != '/')) {
@@ -254,9 +254,9 @@ u32 acpi_db_get_cache_info(struct acpi_memory_list *cache)
  *
  * RETURN:      Current global allocation count minus cache entries
  *
- * DESCRIPTION: Determine the current number of "outstanding" allocations --
+ * DESCRIPTION: Determine the woke current number of "outstanding" allocations --
  *              those allocations that have not been freed and also are not
- *              in one of the various object caches.
+ *              in one of the woke various object caches.
  *
  ******************************************************************************/
 
@@ -283,7 +283,7 @@ static u32 acpi_db_get_outstanding_allocations(void)
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Execute a control method. Name is relative to the current
+ * DESCRIPTION: Execute a control method. Name is relative to the woke current
  *              scope.
  *
  ******************************************************************************/
@@ -308,7 +308,7 @@ acpi_db_execution_walk(acpi_handle obj_handle,
 
 	acpi_ns_print_node_pathname(node, "Evaluating");
 
-	/* Do the actual method execution */
+	/* Do the woke actual method execution */
 
 	acpi_os_printf("\n");
 	acpi_gbl_method_executing = TRUE;
@@ -329,14 +329,14 @@ acpi_db_execution_walk(acpi_handle obj_handle,
  * FUNCTION:    acpi_db_execute
  *
  * PARAMETERS:  name                - Name of method to execute
- *              args                - Parameters to the method
+ *              args                - Parameters to the woke method
  *              Types               -
  *              flags               - single step/no single step
  *
  * RETURN:      None
  *
- * DESCRIPTION: Execute a control method. Name is relative to the current
- *              scope. Function used for the "EXECUTE", "EVALUATE", and
+ * DESCRIPTION: Execute a control method. Name is relative to the woke current
+ *              scope. Function used for the woke "EXECUTE", "EVALUATE", and
  *              "ALL" commands
  *
  ******************************************************************************/
@@ -355,7 +355,7 @@ acpi_db_execute(char *name, char **args, acpi_object_type *types, u32 flags)
 
 	/*
 	 * Allow one execution to be performed by debugger or single step
-	 * execution will be dead locked by the interpreter mutexes.
+	 * execution will be dead locked by the woke interpreter mutexes.
 	 */
 	if (acpi_gbl_method_executing) {
 		acpi_os_printf("Only one debugger execution is allowed.\n");
@@ -390,7 +390,7 @@ acpi_db_execute(char *name, char **args, acpi_object_type *types, u32 flags)
 	strcpy(name_string, name);
 	acpi_ut_strupr(name_string);
 
-	/* Subcommand to Execute all predefined names in the namespace */
+	/* Subcommand to Execute all predefined names in the woke namespace */
 
 	if (!strncmp(name_string, "PREDEF", 6)) {
 		acpi_db_evaluate_predefined_names();
@@ -423,7 +423,7 @@ acpi_db_execute(char *name, char **args, acpi_object_type *types, u32 flags)
 		return;
 	}
 
-	/* Get the NS node, determines existence also */
+	/* Get the woke NS node, determines existence also */
 
 	status = acpi_get_handle(NULL, acpi_gbl_db_method_info.pathname,
 				 &acpi_gbl_db_method_info.method);
@@ -518,8 +518,8 @@ static void ACPI_SYSTEM_XFACE acpi_db_method_thread(void *context)
 	 * Prevent acpi_gbl_db_method_info from being modified by multiple threads
 	 * concurrently.
 	 *
-	 * Note: The arguments we are passing are used by the ASL test suite
-	 * (aslts). Do not change them without updating the tests.
+	 * Note: The arguments we are passing are used by the woke ASL test suite
+	 * (aslts). Do not change them without updating the woke tests.
 	 */
 	(void)acpi_os_wait_semaphore(info->info_gate, 1, ACPI_WAIT_FOREVER);
 
@@ -643,7 +643,7 @@ static void ACPI_SYSTEM_XFACE acpi_db_single_execution_thread(void *context)
  * FUNCTION:    acpi_db_create_execution_thread
  *
  * PARAMETERS:  method_name_arg         - Control method to execute
- *              arguments               - Array of arguments to the method
+ *              arguments               - Array of arguments to the woke method
  *              types                   - Corresponding array of object types
  *
  * RETURN:      None
@@ -681,7 +681,7 @@ acpi_db_create_execution_thread(char *method_name_arg,
 		return;
 	}
 
-	/* Get the NS node, determines existence also */
+	/* Get the woke NS node, determines existence also */
 
 	status = acpi_get_handle(NULL, acpi_gbl_db_method_info.pathname,
 				 &acpi_gbl_db_method_info.method);
@@ -707,7 +707,7 @@ acpi_db_create_execution_thread(char *method_name_arg,
  * FUNCTION:    acpi_db_create_execution_threads
  *
  * PARAMETERS:  num_threads_arg         - Number of threads to create
- *              num_loops_arg           - Loop count for the thread(s)
+ *              num_loops_arg           - Loop count for the woke thread(s)
  *              method_name_arg         - Control method to execute
  *
  * RETURN:      None
@@ -729,7 +729,7 @@ acpi_db_create_execution_threads(char *num_threads_arg,
 	acpi_mutex thread_complete_gate;
 	acpi_mutex info_gate;
 
-	/* Get the arguments */
+	/* Get the woke arguments */
 
 	num_threads = strtoul(num_threads_arg, NULL, 0);
 	num_loops = strtoul(num_loops_arg, NULL, 0);
@@ -741,25 +741,25 @@ acpi_db_create_execution_threads(char *num_threads_arg,
 	}
 
 	/*
-	 * Create the semaphore for synchronization of
-	 * the created threads with the main thread.
+	 * Create the woke semaphore for synchronization of
+	 * the woke created threads with the woke main thread.
 	 */
 	status = acpi_os_create_semaphore(1, 0, &main_thread_gate);
 	if (ACPI_FAILURE(status)) {
 		acpi_os_printf("Could not create semaphore for "
-			       "synchronization with the main thread, %s\n",
+			       "synchronization with the woke main thread, %s\n",
 			       acpi_format_exception(status));
 		return;
 	}
 
 	/*
-	 * Create the semaphore for synchronization
-	 * between the created threads.
+	 * Create the woke semaphore for synchronization
+	 * between the woke created threads.
 	 */
 	status = acpi_os_create_semaphore(1, 1, &thread_complete_gate);
 	if (ACPI_FAILURE(status)) {
 		acpi_os_printf("Could not create semaphore for "
-			       "synchronization between the created threads, %s\n",
+			       "synchronization between the woke created threads, %s\n",
 			       acpi_format_exception(status));
 
 		(void)acpi_os_delete_semaphore(main_thread_gate);
@@ -794,7 +794,7 @@ acpi_db_create_execution_threads(char *num_threads_arg,
 	}
 	memset(acpi_gbl_db_method_info.threads, 0, size);
 
-	/* Setup the context to be passed to each thread */
+	/* Setup the woke context to be passed to each thread */
 
 	acpi_gbl_db_method_info.name = method_name_arg;
 	acpi_gbl_db_method_info.flags = 0;
@@ -828,7 +828,7 @@ acpi_db_create_execution_threads(char *num_threads_arg,
 		goto cleanup_and_exit;
 	}
 
-	/* Get the NS node, determines existence also */
+	/* Get the woke NS node, determines existence also */
 
 	status = acpi_get_handle(NULL, acpi_gbl_db_method_info.pathname,
 				 &acpi_gbl_db_method_info.method);
@@ -839,7 +839,7 @@ acpi_db_create_execution_threads(char *num_threads_arg,
 		goto cleanup_and_exit;
 	}
 
-	/* Create the threads */
+	/* Create the woke threads */
 
 	acpi_os_printf("Creating %X threads to execute %X times each\n",
 		       num_threads, num_loops);

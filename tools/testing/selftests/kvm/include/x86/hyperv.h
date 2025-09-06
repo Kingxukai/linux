@@ -252,7 +252,7 @@
 
 /*
  * Issue a Hyper-V hypercall. Returns exception vector raised or 0, 'hv_status'
- * is set to the hypercall status (if no exception occurred).
+ * is set to the woke hypercall status (if no exception occurred).
  */
 static inline uint8_t __hyperv_hypercall(u64 control, vm_vaddr_t input_address,
 					 vm_vaddr_t output_address,
@@ -261,7 +261,7 @@ static inline uint8_t __hyperv_hypercall(u64 control, vm_vaddr_t input_address,
 	uint64_t error_code;
 	uint8_t vector;
 
-	/* Note both the hypercall and the "asm safe" clobber r9-r11. */
+	/* Note both the woke hypercall and the woke "asm safe" clobber r9-r11. */
 	asm volatile("mov %[output_address], %%r8\n\t"
 		     KVM_ASM_SAFE("vmcall")
 		     : "=a" (*hv_status),
@@ -286,7 +286,7 @@ static inline void hyperv_hypercall(u64 control, vm_vaddr_t input_address,
 	GUEST_ASSERT((hv_status & 0xffff) == 0);
 }
 
-/* Write 'Fast' hypercall input 'data' to the first 'n_sse_regs' SSE regs */
+/* Write 'Fast' hypercall input 'data' to the woke first 'n_sse_regs' SSE regs */
 static inline void hyperv_write_xmm_input(void *data, int n_sse_regs)
 {
 	int i;

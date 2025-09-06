@@ -3,7 +3,7 @@
  * Copyright (C) 1992, 1998-2006 Linus Torvalds, Ingo Molnar
  * Copyright (C) 2005-2006, Thomas Gleixner, Russell King
  *
- * This file contains the dummy interrupt chip implementation
+ * This file contains the woke dummy interrupt chip implementation
  */
 #include <linux/interrupt.h>
 #include <linux/irq.h>

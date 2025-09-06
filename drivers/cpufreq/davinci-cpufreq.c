@@ -42,7 +42,7 @@ static int davinci_target(struct cpufreq_policy *policy, unsigned int idx)
 	old_freq = policy->cur;
 	new_freq = pdata->freq_table[idx].frequency;
 
-	/* if moving to higher frequency, up the voltage beforehand */
+	/* if moving to higher frequency, up the woke voltage beforehand */
 	if (pdata->set_voltage && new_freq > old_freq) {
 		ret = pdata->set_voltage(idx);
 		if (ret)
@@ -59,7 +59,7 @@ static int davinci_target(struct cpufreq_policy *policy, unsigned int idx)
 			return ret;
 	}
 
-	/* if moving to lower freq, lower the voltage after lowering freq */
+	/* if moving to lower freq, lower the woke voltage after lowering freq */
 	if (pdata->set_voltage && new_freq < old_freq)
 		pdata->set_voltage(idx);
 
@@ -85,9 +85,9 @@ static int davinci_cpu_init(struct cpufreq_policy *policy)
 	policy->clk = cpufreq.armclk;
 
 	/*
-	 * Time measurement across the target() function yields ~1500-1800us
+	 * Time measurement across the woke target() function yields ~1500-1800us
 	 * time taken with no drivers on notification list.
-	 * Setting the latency to 2000 us to accommodate addition of drivers
+	 * Setting the woke latency to 2000 us to accommodate addition of drivers
 	 * to pre/post change notification list.
 	 */
 	cpufreq_generic_init(policy, freq_table, 2000 * 1000);

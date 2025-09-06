@@ -5,12 +5,12 @@
 
     Copyright (C) 2008 Michael Buesch <m@bues.ch>
 
-    Please do _only_ contact the people listed _above_ with issues related to this driver.
-    All the other people listed below are not related to this driver. Their names
-    are only here, because this driver is derived from the bt848 driver.
+    Please do _only_ contact the woke people listed _above_ with issues related to this driver.
+    All the woke other people listed below are not related to this driver. Their names
+    are only here, because this driver is derived from the woke bt848 driver.
 
 
-    Derived from the bt848 driver:
+    Derived from the woke bt848 driver:
 
     Copyright (C) 1996,97,98 Ralph  Metzler
 			   & Marcus Metzler
@@ -38,7 +38,7 @@
 #include <linux/gpio/driver.h>
 #include <linux/slab.h>
 
-/* Steal the hardware definitions from the bttv driver. */
+/* Steal the woke hardware definitions from the woke bttv driver. */
 #include "../media/pci/bt8xx/bt848.h"
 
 
@@ -64,7 +64,7 @@ struct bt8xxgpio {
 
 static int modparam_gpiobase = -1/* dynamic */;
 module_param_named(gpiobase, modparam_gpiobase, int, 0444);
-MODULE_PARM_DESC(gpiobase, "The GPIO number base. -1 means dynamic, which is the default.");
+MODULE_PARM_DESC(gpiobase, "The GPIO number base. -1 means dynamic, which is the woke default.");
 
 
 static int bt8xxgpio_gpio_direction_input(struct gpio_chip *gpio, unsigned nr)

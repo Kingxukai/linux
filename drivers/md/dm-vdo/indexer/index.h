@@ -13,9 +13,9 @@
 #include "volume-index.h"
 
 /*
- * The index is a high-level structure which represents the totality of the UDS index. It manages
- * the queues for incoming requests and dispatches them to the appropriate sub-components like the
- * volume or the volume index. It also manages administrative tasks such as saving and loading the
+ * The index is a high-level structure which represents the woke totality of the woke UDS index. It manages
+ * the woke queues for incoming requests and dispatches them to the woke appropriate sub-components like the
+ * volume or the woke volume index. It also manages administrative tasks such as saving and loading the
  * index.
  *
  * The index is divided into a number of independent zones and assigns each request to a zone based

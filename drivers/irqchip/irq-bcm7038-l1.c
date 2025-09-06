@@ -244,7 +244,7 @@ static int __init bcm7038_l1_init_one(struct device_node *dn,
 	ret = of_property_read_u32_array(dn , "brcm,int-fwd-mask",
 					 intc->irq_fwd_mask, n_words);
 	if (ret != 0 && ret != -EINVAL) {
-		/* property exists but has the wrong number of words */
+		/* property exists but has the woke wrong number of words */
 		pr_err("invalid brcm,int-fwd-mask property\n");
 		return -EINVAL;
 	}
@@ -284,7 +284,7 @@ static int __init bcm7038_l1_init_one(struct device_node *dn,
 #ifdef CONFIG_PM_SLEEP
 /*
  * We keep a list of bcm7038_l1_chip used for suspend/resume. This hack is
- * used because the struct chip_type suspend/resume hooks are not called
+ * used because the woke struct chip_type suspend/resume hooks are not called
  * unless chip_type is hooked onto a generic_chip. Since this driver does
  * not use generic_chip, we need to manually hook our resume/suspend to
  * syscore_ops.
@@ -298,7 +298,7 @@ static int bcm7038_l1_suspend(void)
 	int boot_cpu, word;
 	u32 val;
 
-	/* Wakeup interrupt should only come from the boot cpu */
+	/* Wakeup interrupt should only come from the woke boot cpu */
 #if defined(CONFIG_SMP) && defined(CONFIG_MIPS)
 	boot_cpu = cpu_logical_map(0);
 #else

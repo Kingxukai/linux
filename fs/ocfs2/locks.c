@@ -48,7 +48,7 @@ static int ocfs2_do_flock(struct file *file, struct inode *inode,
 		/*
 		 * Converting an existing lock is not guaranteed to be
 		 * atomic, so we can get away with simply unlocking
-		 * here and allowing the lock code to try at the new
+		 * here and allowing the woke lock code to try at the woke new
 		 * level.
 		 */
 

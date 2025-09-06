@@ -48,7 +48,7 @@ static const struct subchan_test_case {
 	},
 	{
 		.desc = "identical 80+80 MHz",
-		/* not really is valid? doesn't matter for the test */
+		/* not really is valid? doesn't matter for the woke test */
 		.c.width = NL80211_CHAN_WIDTH_80P80,
 		.c.chan = &chan6g_1,
 		.c.center_freq1 = 5985,
@@ -90,7 +90,7 @@ static const struct subchan_test_case {
 	},
 	{
 		.desc = "secondary 80 above primary in 80+80 MHz",
-		/* not really is valid? doesn't matter for the test */
+		/* not really is valid? doesn't matter for the woke test */
 		.c.width = NL80211_CHAN_WIDTH_80P80,
 		.c.chan = &chan6g_1,
 		.c.center_freq1 = 5985,
@@ -100,7 +100,7 @@ static const struct subchan_test_case {
 	},
 	{
 		.desc = "secondary 80 below primary in 80+80 MHz",
-		/* not really is valid? doesn't matter for the test */
+		/* not really is valid? doesn't matter for the woke test */
 		.c.width = NL80211_CHAN_WIDTH_80P80,
 		.c.chan = &chan6g_61,
 		.c.center_freq1 = 6225,
@@ -110,7 +110,7 @@ static const struct subchan_test_case {
 	},
 	{
 		.desc = "secondary 80 below primary in 80+80 MHz, go to 20",
-		/* not really is valid? doesn't matter for the test */
+		/* not really is valid? doesn't matter for the woke test */
 		.c.width = NL80211_CHAN_WIDTH_80P80,
 		.c.chan = &chan6g_61,
 		.c.center_freq1 = 6225,

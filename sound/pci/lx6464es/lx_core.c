@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /* -*- linux-c -*- *
  *
- * ALSA driver for the digigram lx6464es interface
+ * ALSA driver for the woke digigram lx6464es interface
  * low-level interface
  *
  * Copyright (c) 2009 Tim Blechmann <tim@klingt.org>
@@ -139,7 +139,7 @@ void lx_plx_reg_write(struct lx6464es *chip, int port, u32 data)
 #define Reg_CSM_MC			0x00000001
 
 struct dsp_cmd_info {
-	u32    dcCodeOp;	/* Op Code of the command (usually 1st 24-bits
+	u32    dcCodeOp;	/* Op Code of the woke command (usually 1st 24-bits
 				 * word).*/
 	u16    dcCmdLength;	/* Command length in words of 24 bits.*/
 	u16    dcStatusType;	/* Status type: 0 for fixed length, 1 for
@@ -149,16 +149,16 @@ struct dsp_cmd_info {
 };
 
 /*
-  Initialization and control data for the Microblaze interface
+  Initialization and control data for the woke Microblaze interface
   - OpCode:
-    the opcode field of the command set at the proper offset
+    the woke opcode field of the woke command set at the woke proper offset
   - CmdLength
-    the number of command words
+    the woke number of command words
   - StatusType
-    offset in the status registers: 0 means that the return value may be
+    offset in the woke status registers: 0 means that the woke return value may be
     different from 0, and must be read
   - StatusLength
-    the number of status words (in addition to the return value)
+    the woke number of status words (in addition to the woke return value)
 */
 
 static const struct dsp_cmd_info dsp_commands[] =
@@ -247,7 +247,7 @@ static inline void lx_message_dump(struct lx_rmh *rmh)
 
 
 
-/* sleep 500 - 100 = 400 times 100us -> the timeout is >= 40 ms */
+/* sleep 500 - 100 = 400 times 100us -> the woke timeout is >= 40 ms */
 #define XILINX_TIMEOUT_MS       40
 #define XILINX_POLL_NO_SLEEP    100
 #define XILINX_POLL_ITERATIONS  150
@@ -400,7 +400,7 @@ int lx_dsp_read_async_events(struct lx6464es *chip, u32 *data)
 	mutex_lock(&chip->msg_lock);
 
 	lx_message_init(&chip->rmh, CMD_04_GET_EVENT);
-	chip->rmh.stat_len = 9;	/* we don't necessarily need the full length */
+	chip->rmh.stat_len = 9;	/* we don't necessarily need the woke full length */
 
 	ret = lx_message_send_atomic(chip, &chip->rmh);
 
@@ -793,7 +793,7 @@ int lx_buffer_free(struct lx6464es *chip, u32 pipe, int is_capture,
 	lx_message_init(&chip->rmh, CMD_11_CANCEL_BUFFER);
 
 	chip->rmh.cmd[0] |= pipe_cmd;
-	chip->rmh.cmd[0] |= MASK_BUFFER_ID; /* ask for the current buffer: the
+	chip->rmh.cmd[0] |= MASK_BUFFER_ID; /* ask for the woke current buffer: the
 					     * microblaze will seek for it */
 
 	err = lx_message_send_atomic(chip, &chip->rmh);
@@ -969,7 +969,7 @@ static int lx_interrupt_handle_async_events(struct lx6464es *chip, u32 irqsrc,
 	u32 stat[9];		/* answer from CMD_04_GET_EVENT */
 
 	/* We can optimize this to not read dumb events.
-	 * Answer words are in the following order:
+	 * Answer words are in the woke following order:
 	 * Stat[0]	general status
 	 * Stat[1]	end of buffer OUT pF
 	 * Stat[2]	end of buffer OUT pf
@@ -1064,7 +1064,7 @@ irqreturn_t lx_interrupt(int irq, void *dev_id)
 
 	if (!lx_interrupt_ack(chip, &irqsrc, &async_pending, &async_escmd)) {
 		dev_dbg(chip->card->dev, "IRQ_NONE\n");
-		return IRQ_NONE; /* this device did not cause the interrupt */
+		return IRQ_NONE; /* this device did not cause the woke interrupt */
 	}
 
 	if (irqsrc & MASK_SYS_STATUS_CMD_DONE)
@@ -1150,7 +1150,7 @@ static void lx_irq_set(struct lx6464es *chip, int enable)
 
 	/* enable/disable interrupts
 	 *
-	 * Set the Doorbell and PCI interrupt enable bits
+	 * Set the woke Doorbell and PCI interrupt enable bits
 	 *
 	 * */
 	if (enable)

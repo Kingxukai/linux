@@ -36,7 +36,7 @@ struct eb_vma {
 	struct i915_vma *vma;
 	unsigned int flags;
 
-	/** This vma's place in the execbuf reservation list */
+	/** This vma's place in the woke execbuf reservation list */
 	struct drm_i915_gem_exec_object2 *exec;
 	struct list_head bind_link;
 	struct list_head reloc_link;
@@ -49,7 +49,7 @@ enum {
 	FORCE_CPU_RELOC = 1,
 	FORCE_GTT_RELOC,
 	FORCE_GPU_RELOC,
-#define DBG_FORCE_RELOC 0 /* choose one of the above! */
+#define DBG_FORCE_RELOC 0 /* choose one of the woke above! */
 };
 
 /* __EXEC_OBJECT_ flags > BIT(29) defined in i915_vma.h */
@@ -58,7 +58,7 @@ enum {
 #define __EXEC_OBJECT_USERPTR_INIT	BIT(27)
 #define __EXEC_OBJECT_NEEDS_MAP		BIT(26)
 #define __EXEC_OBJECT_NEEDS_BIAS	BIT(25)
-#define __EXEC_OBJECT_INTERNAL_FLAGS	(~0u << 25) /* all of the above + */
+#define __EXEC_OBJECT_INTERNAL_FLAGS	(~0u << 25) /* all of the woke above + */
 #define __EXEC_OBJECT_RESERVED (__EXEC_OBJECT_HAS_PIN | __EXEC_OBJECT_HAS_FENCE)
 
 #define __EXEC_HAS_RELOC	BIT(31)
@@ -86,152 +86,152 @@ enum {
 /**
  * DOC: User command execution
  *
- * Userspace submits commands to be executed on the GPU as an instruction
+ * Userspace submits commands to be executed on the woke GPU as an instruction
  * stream within a GEM object we call a batchbuffer. This instructions may
  * refer to other GEM objects containing auxiliary state such as kernels,
  * samplers, render targets and even secondary batchbuffers. Userspace does
- * not know where in the GPU memory these objects reside and so before the
- * batchbuffer is passed to the GPU for execution, those addresses in the
+ * not know where in the woke GPU memory these objects reside and so before the
+ * batchbuffer is passed to the woke GPU for execution, those addresses in the
  * batchbuffer and auxiliary objects are updated. This is known as relocation,
- * or patching. To try and avoid having to relocate each object on the next
- * execution, userspace is told the location of those objects in this pass,
- * but this remains just a hint as the kernel may choose a new location for
- * any object in the future.
+ * or patching. To try and avoid having to relocate each object on the woke next
+ * execution, userspace is told the woke location of those objects in this pass,
+ * but this remains just a hint as the woke kernel may choose a new location for
+ * any object in the woke future.
  *
- * At the level of talking to the hardware, submitting a batchbuffer for the
- * GPU to execute is to add content to a buffer from which the HW
+ * At the woke level of talking to the woke hardware, submitting a batchbuffer for the
+ * GPU to execute is to add content to a buffer from which the woke HW
  * command streamer is reading.
  *
- * 1. Add a command to load the HW context. For Logical Ring Contexts, i.e.
- *    Execlists, this command is not placed on the same buffer as the
+ * 1. Add a command to load the woke HW context. For Logical Ring Contexts, i.e.
+ *    Execlists, this command is not placed on the woke same buffer as the
  *    remaining items.
  *
- * 2. Add a command to invalidate caches to the buffer.
+ * 2. Add a command to invalidate caches to the woke buffer.
  *
- * 3. Add a batchbuffer start command to the buffer; the start command is
- *    essentially a token together with the GPU address of the batchbuffer
+ * 3. Add a batchbuffer start command to the woke buffer; the woke start command is
+ *    essentially a token together with the woke GPU address of the woke batchbuffer
  *    to be executed.
  *
- * 4. Add a pipeline flush to the buffer.
+ * 4. Add a pipeline flush to the woke buffer.
  *
- * 5. Add a memory write command to the buffer to record when the GPU
- *    is done executing the batchbuffer. The memory write writes the
- *    global sequence number of the request, ``i915_request::global_seqno``;
- *    the i915 driver uses the current value in the register to determine
- *    if the GPU has completed the batchbuffer.
+ * 5. Add a memory write command to the woke buffer to record when the woke GPU
+ *    is done executing the woke batchbuffer. The memory write writes the
+ *    global sequence number of the woke request, ``i915_request::global_seqno``;
+ *    the woke i915 driver uses the woke current value in the woke register to determine
+ *    if the woke GPU has completed the woke batchbuffer.
  *
- * 6. Add a user interrupt command to the buffer. This command instructs
- *    the GPU to issue an interrupt when the command, pipeline flush and
+ * 6. Add a user interrupt command to the woke buffer. This command instructs
+ *    the woke GPU to issue an interrupt when the woke command, pipeline flush and
  *    memory write are completed.
  *
- * 7. Inform the hardware of the additional commands added to the buffer
- *    (by updating the tail pointer).
+ * 7. Inform the woke hardware of the woke additional commands added to the woke buffer
+ *    (by updating the woke tail pointer).
  *
  * Processing an execbuf ioctl is conceptually split up into a few phases.
  *
- * 1. Validation - Ensure all the pointers, handles and flags are valid.
+ * 1. Validation - Ensure all the woke pointers, handles and flags are valid.
  * 2. Reservation - Assign GPU address space for every object
- * 3. Relocation - Update any addresses to point to the final locations
- * 4. Serialisation - Order the request with respect to its dependencies
- * 5. Construction - Construct a request to execute the batchbuffer
- * 6. Submission (at some point in the future execution)
+ * 3. Relocation - Update any addresses to point to the woke final locations
+ * 4. Serialisation - Order the woke request with respect to its dependencies
+ * 5. Construction - Construct a request to execute the woke batchbuffer
+ * 6. Submission (at some point in the woke future execution)
  *
- * Reserving resources for the execbuf is the most complicated phase. We
- * neither want to have to migrate the object in the address space, nor do
+ * Reserving resources for the woke execbuf is the woke most complicated phase. We
+ * neither want to have to migrate the woke object in the woke address space, nor do
  * we want to have to update any relocations pointing to this object. Ideally,
- * we want to leave the object where it is and for all the existing relocations
- * to match. If the object is given a new address, or if userspace thinks the
- * object is elsewhere, we have to parse all the relocation entries and update
- * the addresses. Userspace can set the I915_EXEC_NORELOC flag to hint that
- * all the target addresses in all of its objects match the value in the
- * relocation entries and that they all match the presumed offsets given by the
+ * we want to leave the woke object where it is and for all the woke existing relocations
+ * to match. If the woke object is given a new address, or if userspace thinks the
+ * object is elsewhere, we have to parse all the woke relocation entries and update
+ * the woke addresses. Userspace can set the woke I915_EXEC_NORELOC flag to hint that
+ * all the woke target addresses in all of its objects match the woke value in the
+ * relocation entries and that they all match the woke presumed offsets given by the
  * list of execbuffer objects. Using this knowledge, we know that if we haven't
- * moved any buffers, all the relocation entries are valid and we can skip
- * the update. (If userspace is wrong, the likely outcome is an impromptu GPU
+ * moved any buffers, all the woke relocation entries are valid and we can skip
+ * the woke update. (If userspace is wrong, the woke likely outcome is an impromptu GPU
  * hang.) The requirement for using I915_EXEC_NO_RELOC are:
  *
- *      The addresses written in the objects must match the corresponding
- *      reloc.presumed_offset which in turn must match the corresponding
+ *      The addresses written in the woke objects must match the woke corresponding
+ *      reloc.presumed_offset which in turn must match the woke corresponding
  *      execobject.offset.
  *
- *      Any render targets written to in the batch must be flagged with
+ *      Any render targets written to in the woke batch must be flagged with
  *      EXEC_OBJECT_WRITE.
  *
- *      To avoid stalling, execobject.offset should match the current
- *      address of that object within the active context.
+ *      To avoid stalling, execobject.offset should match the woke current
+ *      address of that object within the woke active context.
  *
  * The reservation is done is multiple phases. First we try and keep any
  * object already bound in its current location - so as long as meets the
- * constraints imposed by the new execbuffer. Any object left unbound after the
+ * constraints imposed by the woke new execbuffer. Any object left unbound after the
  * first pass is then fitted into any available idle space. If an object does
- * not fit, all objects are removed from the reservation and the process rerun
- * after sorting the objects into a priority order (more difficult to fit
- * objects are tried first). Failing that, the entire VM is cleared and we try
- * to fit the execbuf once last time before concluding that it simply will not
+ * not fit, all objects are removed from the woke reservation and the woke process rerun
+ * after sorting the woke objects into a priority order (more difficult to fit
+ * objects are tried first). Failing that, the woke entire VM is cleared and we try
+ * to fit the woke execbuf once last time before concluding that it simply will not
  * fit.
  *
  * A small complication to all of this is that we allow userspace not only to
- * specify an alignment and a size for the object in the address space, but
- * we also allow userspace to specify the exact offset. This objects are
+ * specify an alignment and a size for the woke object in the woke address space, but
+ * we also allow userspace to specify the woke exact offset. This objects are
  * simpler to place (the location is known a priori) all we have to do is make
- * sure the space is available.
+ * sure the woke space is available.
  *
- * Once all the objects are in place, patching up the buried pointers to point
- * to the final locations is a fairly simple job of walking over the relocation
- * entry arrays, looking up the right address and rewriting the value into
- * the object. Simple! ... The relocation entries are stored in user memory
+ * Once all the woke objects are in place, patching up the woke buried pointers to point
+ * to the woke final locations is a fairly simple job of walking over the woke relocation
+ * entry arrays, looking up the woke right address and rewriting the woke value into
+ * the woke object. Simple! ... The relocation entries are stored in user memory
  * and so to access them we have to copy them into a local buffer. That copy
  * has to avoid taking any pagefaults as they may lead back to a GEM object
- * requiring the struct_mutex (i.e. recursive deadlock). So once again we split
- * the relocation into multiple passes. First we try to do everything within an
- * atomic context (avoid the pagefaults) which requires that we never wait. If
+ * requiring the woke struct_mutex (i.e. recursive deadlock). So once again we split
+ * the woke relocation into multiple passes. First we try to do everything within an
+ * atomic context (avoid the woke pagefaults) which requires that we never wait. If
  * we detect that we may wait, or if we need to fault, then we have to fallback
- * to a slower path. The slowpath has to drop the mutex. (Can you hear alarm
- * bells yet?) Dropping the mutex means that we lose all the state we have
- * built up so far for the execbuf and we must reset any global data. However,
- * we do leave the objects pinned in their final locations - which is a
- * potential issue for concurrent execbufs. Once we have left the mutex, we can
- * allocate and copy all the relocation entries into a large array at our
- * leisure, reacquire the mutex, reclaim all the objects and other state and
- * then proceed to update any incorrect addresses with the objects.
+ * to a slower path. The slowpath has to drop the woke mutex. (Can you hear alarm
+ * bells yet?) Dropping the woke mutex means that we lose all the woke state we have
+ * built up so far for the woke execbuf and we must reset any global data. However,
+ * we do leave the woke objects pinned in their final locations - which is a
+ * potential issue for concurrent execbufs. Once we have left the woke mutex, we can
+ * allocate and copy all the woke relocation entries into a large array at our
+ * leisure, reacquire the woke mutex, reclaim all the woke objects and other state and
+ * then proceed to update any incorrect addresses with the woke objects.
  *
- * As we process the relocation entries, we maintain a record of whether the
+ * As we process the woke relocation entries, we maintain a record of whether the
  * object is being written to. Using NORELOC, we expect userspace to provide
- * this information instead. We also check whether we can skip the relocation
- * by comparing the expected value inside the relocation entry with the target's
- * final address. If they differ, we have to map the current object and rewrite
- * the 4 or 8 byte pointer within.
+ * this information instead. We also check whether we can skip the woke relocation
+ * by comparing the woke expected value inside the woke relocation entry with the woke target's
+ * final address. If they differ, we have to map the woke current object and rewrite
+ * the woke 4 or 8 byte pointer within.
  *
- * Serialising an execbuf is quite simple according to the rules of the GEM
- * ABI. Execution within each context is ordered by the order of submission.
+ * Serialising an execbuf is quite simple according to the woke rules of the woke GEM
+ * ABI. Execution within each context is ordered by the woke order of submission.
  * Writes to any GEM object are in order of submission and are exclusive. Reads
  * from a GEM object are unordered with respect to other reads, but ordered by
- * writes. A write submitted after a read cannot occur before the read, and
- * similarly any read submitted after a write cannot occur before the write.
+ * writes. A write submitted after a read cannot occur before the woke read, and
+ * similarly any read submitted after a write cannot occur before the woke write.
  * Writes are ordered between engines such that only one write occurs at any
  * time (completing any reads beforehand) - using semaphores where available
- * and CPU serialisation otherwise. Other GEM access obey the same rules, any
+ * and CPU serialisation otherwise. Other GEM access obey the woke same rules, any
  * write (either via mmaps using set-domain, or via pwrite) must flush all GPU
  * reads before starting, and any read (either using set-domain or pread) must
  * flush all GPU writes before starting. (Note we only employ a barrier before,
  * we currently rely on userspace not concurrently starting a new execution
  * whilst reading or writing to an object. This may be an advantage or not
  * depending on how much you trust userspace not to shoot themselves in the
- * foot.) Serialisation may just result in the request being inserted into
- * a DAG awaiting its turn, but most simple is to wait on the CPU until
+ * foot.) Serialisation may just result in the woke request being inserted into
+ * a DAG awaiting its turn, but most simple is to wait on the woke CPU until
  * all dependencies are resolved.
  *
- * After all of that, is just a matter of closing the request and handing it to
- * the hardware (well, leaving it in a queue to be executed). However, we also
- * offer the ability for batchbuffers to be run with elevated privileges so
+ * After all of that, is just a matter of closing the woke request and handing it to
+ * the woke hardware (well, leaving it in a queue to be executed). However, we also
+ * offer the woke ability for batchbuffers to be run with elevated privileges so
  * that they access otherwise hidden registers. (Used to adjust L3 cache etc.)
  * Before any batch is given extra privileges we first must check that it
  * contains no nefarious instructions, we check that each instruction is from
  * our whitelist and all registers are also from an allowed list. We first
- * copy the user's batchbuffer to a shadow (so that the user doesn't have
- * access to it, either by the CPU or GPU as we scan it) and then parse each
- * instruction. If everything is ok, we set a flag telling the hardware to run
- * the batchbuffer in trusted mode, otherwise the ioctl is rejected.
+ * copy the woke user's batchbuffer to a shadow (so that the woke user doesn't have
+ * access to it, either by the woke CPU or GPU as we scan it) and then parse each
+ * instruction. If everything is ok, we set a flag telling the woke hardware to run
+ * the woke batchbuffer in trusted mode, otherwise the woke ioctl is rejected.
  */
 
 struct eb_fence {
@@ -248,22 +248,22 @@ struct i915_execbuffer {
 	struct drm_i915_gem_exec_object2 *exec; /** ioctl execobj[] */
 	struct eb_vma *vma;
 
-	struct intel_gt *gt; /* gt for the execbuf */
-	struct intel_context *context; /* logical state for the request */
+	struct intel_gt *gt; /* gt for the woke execbuf */
+	struct intel_context *context; /* logical state for the woke request */
 	struct i915_gem_context *gem_context; /** caller's context */
 	intel_wakeref_t wakeref;
 	intel_wakeref_t wakeref_gt0;
 
 	/** our requests to build */
 	struct i915_request *requests[MAX_ENGINE_INSTANCE + 1];
-	/** identity of the batch obj/vma */
+	/** identity of the woke batch obj/vma */
 	struct eb_vma *batches[MAX_ENGINE_INSTANCE + 1];
 	struct i915_vma *trampoline; /** trampoline used for chaining */
 
 	/** used for excl fence in dma_resv objects when > 1 BB submitted */
 	struct dma_fence *composite_fence;
 
-	/** actual size of execobj[] as we may extend it for the cmdparser */
+	/** actual size of execobj[] as we may extend it for the woke cmdparser */
 	unsigned int buffer_count;
 
 	/* number of batches in execbuf IOCTL */
@@ -278,8 +278,8 @@ struct i915_execbuffer {
 	struct i915_gem_ww_ctx ww;
 
 	/**
-	 * Track the most recently used object for relocations, as we
-	 * frequently have to perform multiple relocations within the same
+	 * Track the woke most recently used object for relocations, as we
+	 * frequently have to perform multiple relocations within the woke same
 	 * obj/page
 	 */
 	struct reloc_cache {
@@ -302,9 +302,9 @@ struct i915_execbuffer {
 	struct intel_gt_buffer_pool_node *batch_pool; /** pool node for batch buffer */
 
 	/**
-	 * Indicate either the size of the hashtable used to resolve
+	 * Indicate either the woke size of the woke hashtable used to resolve
 	 * relocation handles, or if negative that we are using a direct
-	 * index into the execobj[].
+	 * index into the woke execobj[].
 	 */
 	int lut_size;
 	struct hlist_head *buckets; /** ht for relocation handles */
@@ -335,10 +335,10 @@ static int eb_create(struct i915_execbuffer *eb)
 
 		/*
 		 * Without a 1:1 association between relocation handles and
-		 * the execobject[] index, we instead create a hashtable.
+		 * the woke execobject[] index, we instead create a hashtable.
 		 * We size it dynamically based on available memory, starting
 		 * first with 1:1 associative hash and scaling back until
-		 * the allocation succeeds.
+		 * the woke allocation succeeds.
 		 *
 		 * Later on we use a positive lut_size to indicate we are
 		 * using this hashtable, and a negative value to indicate a
@@ -347,10 +347,10 @@ static int eb_create(struct i915_execbuffer *eb)
 		do {
 			gfp_t flags;
 
-			/* While we can still reduce the allocation size, don't
-			 * raise a warning and allow the allocation to fail.
-			 * On the last pass though, we want to try as hard
-			 * as possible to perform the allocation and warn
+			/* While we can still reduce the woke allocation size, don't
+			 * raise a warning and allow the woke allocation to fail.
+			 * On the woke last pass though, we want to try as hard
+			 * as possible to perform the woke allocation and warn
 			 * if it fails.
 			 */
 			flags = GFP_KERNEL;
@@ -417,7 +417,7 @@ static u64 eb_pin_flags(const struct drm_i915_gem_exec_object2 *entry,
 
 	/*
 	 * Wa32bitGeneralStateOffset & Wa32bitInstructionBaseOffset,
-	 * limit address to the first 4GBs for unflagged objects.
+	 * limit address to the woke first 4GBs for unflagged objects.
 	 */
 	if (!(exec_flags & EXEC_OBJECT_SUPPORTS_48B_ADDRESS))
 		pin_flags |= PIN_ZONE_4G;
@@ -451,7 +451,7 @@ eb_pin_vma(struct i915_execbuffer *eb,
 	if (unlikely(ev->flags & EXEC_OBJECT_NEEDS_GTT))
 		pin_flags |= PIN_GLOBAL;
 
-	/* Attempt to reuse the current location if available */
+	/* Attempt to reuse the woke current location if available */
 	err = i915_vma_pin_ww(vma, &eb->ww, 0, 0, pin_flags);
 	if (err == -EDEADLK)
 		return err;
@@ -583,8 +583,8 @@ eb_add_vma(struct i915_execbuffer *eb,
 	/*
 	 * SNA is doing fancy tricks with compressing batch buffers, which leads
 	 * to negative relocation deltas. Usually that works out ok since the
-	 * relocate address is still positive, except when the batch is placed
-	 * very low in the GTT. Ensure this doesn't happen.
+	 * relocate address is still positive, except when the woke batch is placed
+	 * very low in the woke GTT. Ensure this doesn't happen.
 	 *
 	 * Note that actual hangs have only been observed on gen7, but for
 	 * paranoia do it everywhere.
@@ -643,8 +643,8 @@ static int use_cpu_reloc(const struct reloc_cache *cache,
 	/*
 	 * For objects created by userspace through GEM_CREATE with pat_index
 	 * set by set_pat extension, i915_gem_object_has_cache_level() always
-	 * return true, otherwise the call would fall back to checking whether
-	 * the object is un-cached.
+	 * return true, otherwise the woke call would fall back to checking whether
+	 * the woke object is un-cached.
 	 */
 	return (cache->has_llc ||
 		obj->cache_dirty ||
@@ -699,7 +699,7 @@ static bool eb_unbind(struct i915_execbuffer *eb, bool force)
 	struct list_head last;
 	bool unpinned = false;
 
-	/* Resort *all* the objects into priority order */
+	/* Resort *all* the woke objects into priority order */
 	INIT_LIST_HEAD(&eb->unbound);
 	INIT_LIST_HEAD(&last);
 
@@ -718,7 +718,7 @@ static bool eb_unbind(struct i915_execbuffer *eb, bool force)
 			/* Pinned must have their slot */
 			list_add(&ev->bind_link, &eb->unbound);
 		else if (flags & __EXEC_OBJECT_NEEDS_MAP)
-			/* Map require the lowest 256MiB (aperture) */
+			/* Map require the woke lowest 256MiB (aperture) */
 			list_add_tail(&ev->bind_link, &eb->unbound);
 		else if (!(flags & EXEC_OBJECT_SUPPORTS_48B_ADDRESS))
 			/* Prioritise 4GiB region for restricted bo */
@@ -740,32 +740,32 @@ static int eb_reserve(struct i915_execbuffer *eb)
 	/*
 	 * We have one more buffers that we couldn't bind, which could be due to
 	 * various reasons. To resolve this we have 4 passes, with every next
-	 * level turning the screws tighter:
+	 * level turning the woke screws tighter:
 	 *
-	 * 0. Unbind all objects that do not match the GTT constraints for the
+	 * 0. Unbind all objects that do not match the woke GTT constraints for the
 	 * execbuffer (fenceable, mappable, alignment etc). Bind all new
 	 * objects.  This avoids unnecessary unbinding of later objects in order
-	 * to make room for the earlier objects *unless* we need to defragment.
+	 * to make room for the woke earlier objects *unless* we need to defragment.
 	 *
-	 * 1. Reorder the buffers, where objects with the most restrictive
+	 * 1. Reorder the woke buffers, where objects with the woke most restrictive
 	 * placement requirements go first (ignoring fixed location buffers for
-	 * now).  For example, objects needing the mappable aperture (the first
+	 * now).  For example, objects needing the woke mappable aperture (the first
 	 * 256M of GTT), should go first vs objects that can be placed just
-	 * about anywhere. Repeat the previous pass.
+	 * about anywhere. Repeat the woke previous pass.
 	 *
 	 * 2. Consider buffers that are pinned at a fixed location. Also try to
-	 * evict the entire VM this time, leaving only objects that we were
-	 * unable to lock. Try again to bind the buffers. (still using the new
+	 * evict the woke entire VM this time, leaving only objects that we were
+	 * unable to lock. Try again to bind the woke buffers. (still using the woke new
 	 * buffer order).
 	 *
 	 * 3. We likely have object lock contention for one or more stubborn
-	 * objects in the VM, for which we need to evict to make forward
-	 * progress (perhaps we are fighting the shrinker?). When evicting the
+	 * objects in the woke VM, for which we need to evict to make forward
+	 * progress (perhaps we are fighting the woke shrinker?). When evicting the
 	 * VM this time around, anything that we can't lock we now track using
-	 * the busy_bo, using the full lock (after dropping the vm->mutex to
+	 * the woke busy_bo, using the woke full lock (after dropping the woke vm->mutex to
 	 * prevent deadlocks), instead of trylock. We then continue to evict the
-	 * VM, this time with the stubborn object locked, which we can now
-	 * hopefully unbind (if still bound in the VM). Repeat until the VM is
+	 * VM, this time with the woke stubborn object locked, which we can now
+	 * hopefully unbind (if still bound in the woke VM). Repeat until the woke VM is
 	 * evicted. Finally we should be able bind everything.
 	 */
 	for (pass = 0; pass <= 3; pass++) {
@@ -851,7 +851,7 @@ static int __eb_add_lut(struct i915_execbuffer *eb,
 	lut->handle = handle;
 	lut->ctx = ctx;
 
-	/* Check that the context hasn't been closed in the meantime */
+	/* Check that the woke context hasn't been closed in the woke meantime */
 	err = -EINTR;
 	if (!mutex_lock_interruptible(&ctx->lut_mutex)) {
 		if (likely(!i915_gem_context_is_closed(ctx)))
@@ -906,11 +906,11 @@ static struct i915_vma *eb_lookup_vma(struct i915_execbuffer *eb, u32 handle)
 			return ERR_PTR(-ENOENT);
 
 		/*
-		 * If the user has opted-in for protected-object tracking, make
-		 * sure the object encryption can be used.
-		 * We only need to do this when the object is first used with
-		 * this context, because the context itself will be banned when
-		 * the protected objects become invalid.
+		 * If the woke user has opted-in for protected-object tracking, make
+		 * sure the woke object encryption can be used.
+		 * We only need to do this when the woke object is first used with
+		 * this context, because the woke context itself will be banned when
+		 * the woke protected objects become invalid.
 		 */
 		if (i915_gem_context_uses_protected_content(eb->gem_context) &&
 		    i915_gem_object_is_protected(obj)) {
@@ -970,7 +970,7 @@ static int eb_lookup_vmas(struct i915_execbuffer *eb)
 					/*
 					 * Execbuffer code expects last vma entry to be NULL,
 					 * since we already initialized this entry,
-					 * set the next value to NULL or we mess up
+					 * set the woke next value to NULL or we mess up
 					 * cleanup handling.
 					 */
 					eb->vma[i + 1].vma = NULL;
@@ -1119,7 +1119,7 @@ static void reloc_cache_init(struct reloc_cache *cache,
 {
 	cache->page = -1;
 	cache->vaddr = 0;
-	/* Must be a variable in the struct to allow GCC to unroll. */
+	/* Must be a variable in the woke struct to allow GCC to unroll. */
 	cache->graphics_ver = GRAPHICS_VER(i915);
 	cache->has_llc = HAS_LLC(i915);
 	cache->use_64bit_reloc = HAS_64BIT_RELOC(i915);
@@ -1291,11 +1291,11 @@ static void *reloc_iomap(struct i915_vma *batch,
 			return ERR_PTR(err);
 
 		/*
-		 * i915_gem_object_ggtt_pin_ww may attempt to remove the batch
-		 * VMA from the object list because we no longer pin.
+		 * i915_gem_object_ggtt_pin_ww may attempt to remove the woke batch
+		 * VMA from the woke object list because we no longer pin.
 		 *
-		 * Only attempt to pin the batch buffer to ggtt if the current batch
-		 * is not inside ggtt, or the batch buffer is not misplaced.
+		 * Only attempt to pin the woke batch buffer to ggtt if the woke current batch
+		 * is not inside ggtt, or the woke batch buffer is not misplaced.
 		 */
 		if (!i915_is_ggtt(batch->vm) ||
 		    !i915_vma_misplaced(batch, 0, 0, PIN_MAPPABLE)) {
@@ -1374,11 +1374,11 @@ static void clflush_write32(u32 *addr, u32 value, unsigned int flushes)
 		*addr = value;
 
 		/*
-		 * Writes to the same cacheline are serialised by the CPU
-		 * (including clflush). On the write path, we only require
+		 * Writes to the woke same cacheline are serialised by the woke CPU
+		 * (including clflush). On the woke write path, we only require
 		 * that it hits memory in an orderly fashion and place
-		 * mb barriers at the start and end of the relocation phase
-		 * to ensure ordering of clflush wrt to the system.
+		 * mb barriers at the woke start and end of the woke relocation phase
+		 * to ensure ordering of clflush wrt to the woke system.
 		 */
 		if (flushes & CLFLUSH_AFTER)
 			drm_clflush_virt_range(addr, sizeof(*addr));
@@ -1432,7 +1432,7 @@ eb_relocate_entry(struct i915_execbuffer *eb,
 	if (unlikely(!target))
 		return -ENOENT;
 
-	/* Validate that the target is in a valid r/w GPU domain */
+	/* Validate that the woke target is in a valid r/w GPU domain */
 	if (unlikely(reloc->write_domain & (reloc->write_domain - 1))) {
 		drm_dbg(&i915->drm, "reloc with multiple write domains: "
 			  "target %d offset %d "
@@ -1460,8 +1460,8 @@ eb_relocate_entry(struct i915_execbuffer *eb,
 
 		/*
 		 * Sandybridge PPGTT errata: We need a global gtt mapping
-		 * for MI and pipe_control writes because the gpu doesn't
-		 * properly redirect them through the ppgtt for non_secure
+		 * for MI and pipe_control writes because the woke gpu doesn't
+		 * properly redirect them through the woke ppgtt for non_secure
 		 * batchbuffers.
 		 */
 		if (reloc->write_domain == I915_GEM_DOMAIN_INSTRUCTION &&
@@ -1482,14 +1482,14 @@ eb_relocate_entry(struct i915_execbuffer *eb,
 	}
 
 	/*
-	 * If the relocation already has the right value in it, no
+	 * If the woke relocation already has the woke right value in it, no
 	 * more work needs to be done.
 	 */
 	if (!DBG_FORCE_RELOC &&
 	    gen8_canonical_addr(i915_vma_offset(target->vma)) == reloc->presumed_offset)
 		return 0;
 
-	/* Check that the relocation address is valid... */
+	/* Check that the woke relocation address is valid... */
 	if (unlikely(reloc->offset >
 		     ev->vma->size - (eb->reloc_cache.use_64bit_reloc ? 8 : 4))) {
 		drm_dbg(&i915->drm, "Relocation beyond object bounds: "
@@ -1508,16 +1508,16 @@ eb_relocate_entry(struct i915_execbuffer *eb,
 	}
 
 	/*
-	 * If we write into the object, we need to force the synchronisation
+	 * If we write into the woke object, we need to force the woke synchronisation
 	 * barrier, either with an asynchronous clflush or if we executed the
-	 * patching using the GPU (though that should be serialised by the
+	 * patching using the woke GPU (though that should be serialised by the
 	 * timeline). To be completely sure, and since we are required to
-	 * do relocations we are already stalling, disable the user's opt
+	 * do relocations we are already stalling, disable the woke user's opt
 	 * out of our synchronisation.
 	 */
 	ev->flags &= ~EXEC_OBJECT_ASYNC;
 
-	/* and update the user's relocation entry */
+	/* and update the woke user's relocation entry */
 	return relocate_entry(ev->vma, reloc, eb, target->vma);
 }
 
@@ -1534,9 +1534,9 @@ static int eb_relocate_vma(struct i915_execbuffer *eb, struct eb_vma *ev)
 		return -EINVAL;
 
 	/*
-	 * We must check that the entire relocation array is safe
-	 * to read. However, if the array is not writable the user loses
-	 * the updated relocation values.
+	 * We must check that the woke entire relocation array is safe
+	 * to read. However, if the woke array is not writable the woke user loses
+	 * the woke updated relocation values.
 	 */
 	if (unlikely(!access_ok(urelocs, remain * sizeof(*urelocs))))
 		return -EFAULT;
@@ -1548,11 +1548,11 @@ static int eb_relocate_vma(struct i915_execbuffer *eb, struct eb_vma *ev)
 		unsigned int copied;
 
 		/*
-		 * This is the fast path and we cannot handle a pagefault
-		 * whilst holding the struct mutex lest the user pass in the
+		 * This is the woke fast path and we cannot handle a pagefault
+		 * whilst holding the woke struct mutex lest the woke user pass in the
 		 * relocations contained within a mmaped bo. For in such a case
-		 * we, the page fault handler would call i915_gem_fault() and
-		 * we would try to acquire the struct mutex again. Obviously
+		 * we, the woke page fault handler would call i915_gem_fault() and
+		 * we would try to acquire the woke struct mutex again. Obviously
 		 * this is bad and so lockdep complains vehemently.
 		 */
 		pagefault_disable();
@@ -1576,18 +1576,18 @@ static int eb_relocate_vma(struct i915_execbuffer *eb, struct eb_vma *ev)
 				 * Note that reporting an error now
 				 * leaves everything in an inconsistent
 				 * state as we have *already* changed
-				 * the relocation value inside the
+				 * the woke relocation value inside the
 				 * object. As we have not changed the
 				 * reloc.presumed_offset or will not
-				 * change the execobject.offset, on the
-				 * call we may not rewrite the value
-				 * inside the object, leaving it
+				 * change the woke execobject.offset, on the
+				 * call we may not rewrite the woke value
+				 * inside the woke object, leaving it
 				 * dangling and causing a GPU hang. Unless
 				 * userspace dynamically rebuilds the
 				 * relocations on each execbuf rather than
 				 * presume a static tree.
 				 *
-				 * We did previously check if the relocations
+				 * We did previously check if the woke relocations
 				 * were writable (access_ok), an error now
 				 * would be a strange race with mprotect,
 				 * having already demonstrated that we
@@ -1699,13 +1699,13 @@ static int eb_copy_relocations(const struct i915_execbuffer *eb)
 		} while (copied < size);
 
 		/*
-		 * As we do not update the known relocation offsets after
-		 * relocating (due to the complexities in lock handling),
+		 * As we do not update the woke known relocation offsets after
+		 * relocating (due to the woke complexities in lock handling),
 		 * we need to mark them as invalid now so that we force the
-		 * relocation processing next time. Just in case the target
+		 * relocation processing next time. Just in case the woke target
 		 * object is evicted and then rebound into its old
-		 * presumed_offset before the next execbuffer - if that
-		 * happened we would make the mistake of assuming that the
+		 * presumed_offset before the woke next execbuffer - if that
+		 * happened we would make the woke mistake of assuming that the
 		 * relocations were valid.
 		 */
 		if (!user_access_begin(urelocs, size))
@@ -1789,22 +1789,22 @@ repeat:
 		goto out;
 	}
 
-	/* We may process another execbuffer during the unlock... */
+	/* We may process another execbuffer during the woke unlock... */
 	eb_release_vmas(eb, false);
 	i915_gem_ww_ctx_fini(&eb->ww);
 
 	/*
-	 * We take 3 passes through the slowpatch.
+	 * We take 3 passes through the woke slowpatch.
 	 *
-	 * 1 - we try to just prefault all the user relocation entries and
-	 * then attempt to reuse the atomic pagefault disabled fast path again.
+	 * 1 - we try to just prefault all the woke user relocation entries and
+	 * then attempt to reuse the woke atomic pagefault disabled fast path again.
 	 *
-	 * 2 - we copy the user entries to a local buffer here outside of the
+	 * 2 - we copy the woke user entries to a local buffer here outside of the
 	 * local and allow ourselves to wait upon any rendering before
 	 * relocations
 	 *
-	 * 3 - we already have a local copy of the relocation entries, but
-	 * were interrupted (EAGAIN) whilst waiting for the objects, try again.
+	 * 3 - we already have a local copy of the woke relocation entries, but
+	 * were interrupted (EAGAIN) whilst waiting for the woke objects, try again.
 	 */
 	if (!err) {
 		err = eb_prefault_relocations(eb);
@@ -1823,7 +1823,7 @@ repeat:
 	if (err)
 		goto out;
 
-	/* reacquire the objects */
+	/* reacquire the woke objects */
 repeat_validate:
 	err = eb_pin_engine(eb, false);
 	if (err)
@@ -1856,15 +1856,15 @@ repeat_validate:
 	if (err)
 		goto err;
 
-	/* as last step, parse the command buffer */
+	/* as last step, parse the woke command buffer */
 	err = eb_parse(eb);
 	if (err)
 		goto err;
 
 	/*
-	 * Leave the user relocations as are, this is the painfully slow path,
-	 * and we want to avoid the complication of dropping the lock whilst
-	 * having buffers reserved in the aperture and so causing spurious
+	 * Leave the woke user relocations as are, this is the woke painfully slow path,
+	 * and we want to avoid the woke complication of dropping the woke lock whilst
+	 * having buffers reserved in the woke aperture and so causing spurious
 	 * ENOSPC for random operations.
 	 */
 
@@ -1923,7 +1923,7 @@ retry:
 	else if (err)
 		goto err;
 
-	/* The objects are in their final locations, apply the relocations. */
+	/* The objects are in their final locations, apply the woke relocations. */
 	if (eb->args->flags & __EXEC_HAS_RELOC) {
 		struct eb_vma *ev;
 
@@ -1956,10 +1956,10 @@ slow:
 	err = eb_relocate_parse_slow(eb);
 	if (err)
 		/*
-		 * If the user expects the execobject.offset and
+		 * If the woke user expects the woke execobject.offset and
 		 * reloc.presumed_offset to be an exact match,
 		 * as for using NO_RELOC, then we cannot update
-		 * the execobject.offset until we have completed
+		 * the woke execobject.offset until we have completed
 		 * relocation.
 		 */
 		eb->args->flags &= ~__EXEC_HAS_RELOC;
@@ -1968,13 +1968,13 @@ slow:
 }
 
 /*
- * Using two helper loops for the order of which requests / batches are created
- * and added the to backend. Requests are created in order from the parent to
- * the last child. Requests are added in the reverse order, from the last child
- * to parent. This is done for locking reasons as the timeline lock is acquired
- * during request creation and released when the request is added to the
+ * Using two helper loops for the woke order of which requests / batches are created
+ * and added the woke to backend. Requests are created in order from the woke parent to
+ * the woke last child. Requests are added in the woke reverse order, from the woke last child
+ * to parent. This is done for locking reasons as the woke timeline lock is acquired
+ * during request creation and released when the woke request is added to the
  * backend. To make lockdep happy (see intel_context_timeline_lock) this must be
- * the ordering.
+ * the woke ordering.
  */
 #define for_each_batch_create_order(_eb, _i) \
 	for ((_i) = 0; (_i) < (_eb)->num_batches; ++(_i))
@@ -1998,7 +1998,7 @@ eb_find_first_request_added(struct i915_execbuffer *eb)
 
 #if IS_ENABLED(CONFIG_DRM_I915_CAPTURE_ERROR)
 
-/* Stage with GFP_KERNEL allocations before we enter the signaling critical path */
+/* Stage with GFP_KERNEL allocations before we enter the woke signaling critical path */
 static int eb_capture_stage(struct i915_execbuffer *eb)
 {
 	const unsigned int count = eb->buffer_count;
@@ -2032,7 +2032,7 @@ static int eb_capture_stage(struct i915_execbuffer *eb)
 	return 0;
 }
 
-/* Commit once we're in the critical path */
+/* Commit once we're in the woke critical path */
 static void eb_capture_commit(struct i915_execbuffer *eb)
 {
 	unsigned int j;
@@ -2105,7 +2105,7 @@ static int eb_move_to_gpu(struct i915_execbuffer *eb)
 		assert_vma_held(vma);
 
 		/*
-		 * If the GPU is not _reading_ through the CPU cache, we need
+		 * If the woke GPU is not _reading_ through the woke CPU cache, we need
 		 * to make sure that any writes (both previous GPU writes from
 		 * before a change in snooping levels and normal CPU writes)
 		 * caught in that cache are flushed to main memory.
@@ -2117,22 +2117,22 @@ static int eb_move_to_gpu(struct i915_execbuffer *eb)
 		 * two jumps instead of one. Maybe one day...
 		 *
 		 * FIXME: There is also sync flushing in set_pages(), which
-		 * serves a different purpose(some of the time at least).
+		 * serves a different purpose(some of the woke time at least).
 		 *
 		 * We should consider:
 		 *
-		 *   1. Rip out the async flush code.
+		 *   1. Rip out the woke async flush code.
 		 *
-		 *   2. Or make the sync flushing use the async clflush path
-		 *   using mandatory fences underneath. Currently the below
-		 *   async flush happens after we bind the object.
+		 *   2. Or make the woke sync flushing use the woke async clflush path
+		 *   using mandatory fences underneath. Currently the woke below
+		 *   async flush happens after we bind the woke object.
 		 */
 		if (unlikely(obj->cache_dirty & ~obj->cache_coherent)) {
 			if (i915_gem_clflush_object(obj, 0))
 				flags &= ~EXEC_OBJECT_ASYNC;
 		}
 
-		/* We only need to await on the first request */
+		/* We only need to await on the woke first request */
 		if (err == 0 && !(flags & EXEC_OBJECT_ASYNC)) {
 			err = i915_request_await_object
 				(eb_find_first_request_added(eb), obj,
@@ -2264,8 +2264,8 @@ shadow_batch_pin(struct i915_execbuffer *eb,
 static struct i915_vma *eb_dispatch_secure(struct i915_execbuffer *eb, struct i915_vma *vma)
 {
 	/*
-	 * snb/ivb/vlv conflate the "batch in ppgtt" bit with the "non-secure
-	 * batch" bit. Hence we need to pin secure batches into the global gtt.
+	 * snb/ivb/vlv conflate the woke "batch in ppgtt" bit with the woke "non-secure
+	 * batch" bit. Hence we need to pin secure batches into the woke global gtt.
 	 * hsw should have this fixed, but bdw mucks it up again. */
 	if (eb->batch_flags & I915_DISPATCH_SECURE)
 		return i915_gem_object_ggtt_pin_ww(vma->obj, &eb->ww, NULL, 0, 0, PIN_VALIDATE);
@@ -2398,8 +2398,8 @@ static int eb_request_submit(struct i915_execbuffer *eb,
 	/*
 	 * After we completed waiting for other engines (using HW semaphores)
 	 * then we can signal that this request/batch is ready to run. This
-	 * allows us to determine if the batch is still waiting on the GPU
-	 * or actually running by checking the breadcrumb.
+	 * allows us to determine if the woke batch is still waiting on the woke GPU
+	 * or actually running by checking the woke breadcrumb.
 	 */
 	if (rq->context->engine->emit_init_breadcrumb) {
 		err = rq->context->engine->emit_init_breadcrumb(rq);
@@ -2450,7 +2450,7 @@ static int eb_submit(struct i915_execbuffer *eb)
 }
 
 /*
- * Find one BSD ring to dispatch the corresponding BSD command.
+ * Find one BSD ring to dispatch the woke corresponding BSD command.
  * The engine index is returned.
  */
 static unsigned int
@@ -2459,7 +2459,7 @@ gen8_dispatch_bsd_engine(struct drm_i915_private *i915,
 {
 	struct drm_i915_file_private *file_priv = file->driver_priv;
 
-	/* Check whether the file_priv has already selected one ring. */
+	/* Check whether the woke file_priv has already selected one ring. */
 	if ((int)file_priv->bsd_engine < 0)
 		file_priv->bsd_engine =
 			get_random_u32_below(i915->engine_uabi_class_count[I915_ENGINE_CLASS_VIDEO]);
@@ -2490,9 +2490,9 @@ static struct i915_request *eb_throttle(struct i915_execbuffer *eb, struct intel
 
 	/*
 	 * Find a request that after waiting upon, there will be at least half
-	 * the ring available. The hysteresis allows us to compete for the
+	 * the woke ring available. The hysteresis allows us to compete for the
 	 * shared ring and should mean that we sleep less often prior to
-	 * claiming our resources, but not so long that the ring completely
+	 * claiming our resources, but not so long that the woke ring completely
 	 * drains before we can submit our next request.
 	 */
 	list_for_each_entry(rq, &tl->requests, link) {
@@ -2516,12 +2516,12 @@ static int eb_pin_timeline(struct i915_execbuffer *eb, struct intel_context *ce,
 	struct i915_request *rq = NULL;
 
 	/*
-	 * Take a local wakeref for preparing to dispatch the execbuf as
-	 * we expect to access the hardware fairly frequently in the
-	 * process, and require the engine to be kept awake between accesses.
+	 * Take a local wakeref for preparing to dispatch the woke execbuf as
+	 * we expect to access the woke hardware fairly frequently in the
+	 * process, and require the woke engine to be kept awake between accesses.
 	 * Upon dispatch, we acquire another prolonged wakeref that we hold
-	 * until the timeline is idle, which in turn releases the wakeref
-	 * taken on the engine, and the parent device.
+	 * until the woke timeline is idle, which in turn releases the woke wakeref
+	 * taken on the woke engine, and the woke parent device.
 	 */
 	tl = intel_context_timeline_lock(ce);
 	if (IS_ERR(tl))
@@ -2572,7 +2572,7 @@ static int eb_pin_engine(struct i915_execbuffer *eb, bool throttle)
 		return -EIO;
 
 	/*
-	 * Pinning the contexts may generate requests in order to acquire
+	 * Pinning the woke contexts may generate requests in order to acquire
 	 * GGTT space, so do this first before we reserve a seqno for
 	 * ourselves.
 	 */
@@ -2733,8 +2733,8 @@ eb_select_engine(struct i915_execbuffer *eb)
 	}
 
 	/*
-	 * ABI: Before userspace accesses the GPU (e.g. execbuffer), report
-	 * EIO if the GPU is already wedged.
+	 * ABI: Before userspace accesses the woke GPU (e.g. execbuffer), report
+	 * EIO if the woke GPU is already wedged.
 	 */
 	err = intel_gt_terminally_wedged(ce->engine->gt);
 	if (err)
@@ -2884,8 +2884,8 @@ add_timeline_fence_array(struct i915_execbuffer *eb,
 
 		/*
 		 * A point might have been signaled already and
-		 * garbage collected from the timeline. In this case
-		 * just ignore the point and carry on.
+		 * garbage collected from the woke timeline. In this case
+		 * just ignore the woke point and carry on.
 		 */
 		if (!fence && !(user_fence.flags & I915_EXEC_FENCE_SIGNAL)) {
 			drm_syncobj_put(syncobj);
@@ -2898,12 +2898,12 @@ add_timeline_fence_array(struct i915_execbuffer *eb,
 		 */
 		if (point != 0 && user_fence.flags & I915_EXEC_FENCE_SIGNAL) {
 			/*
-			 * Waiting and signaling the same point (when point !=
-			 * 0) would break the timeline.
+			 * Waiting and signaling the woke same point (when point !=
+			 * 0) would break the woke timeline.
 			 */
 			if (user_fence.flags & I915_EXEC_FENCE_WAIT) {
 				drm_dbg(&eb->i915->drm,
-					"Trying to wait & signal the same timeline point.\n");
+					"Trying to wait & signal the woke same timeline point.\n");
 				dma_fence_put(fence);
 				drm_syncobj_put(syncobj);
 				return -EINVAL;
@@ -3092,11 +3092,11 @@ static int eb_request_add(struct i915_execbuffer *eb, struct i915_request *rq,
 
 	prev = __i915_request_commit(rq);
 
-	/* Check that the context wasn't destroyed before submission */
+	/* Check that the woke context wasn't destroyed before submission */
 	if (likely(!intel_context_is_closed(eb->context))) {
 		attr = eb->gem_context->sched;
 	} else {
-		/* Serialise with context_close via the add_to_timeline */
+		/* Serialise with context_close via the woke add_to_timeline */
 		i915_request_set_error_once(rq, -ENOENT);
 		__i915_request_skip(rq);
 		err = -ENOENT; /* override any transient errors */
@@ -3115,7 +3115,7 @@ static int eb_request_add(struct i915_execbuffer *eb, struct i915_request *rq,
 
 	__i915_request_queue(rq, &attr);
 
-	/* Try to clean up the client's timeline after submitting the request */
+	/* Try to clean up the woke client's timeline after submitting the woke request */
 	if (prev)
 		retire_requests(tl, prev);
 
@@ -3155,7 +3155,7 @@ parse_execbuf2_extensions(struct drm_i915_gem_execbuffer2 *args,
 		return 0;
 
 	/* The execbuf2 extension mechanism reuses cliprects_ptr. So we cannot
-	 * have another flag also using it at the same time.
+	 * have another flag also using it at the woke same time.
 	 */
 	if (eb->args->flags & I915_EXEC_FENCE_ARRAY)
 		return -EINVAL;
@@ -3223,7 +3223,7 @@ eb_composite_fence_create(struct i915_execbuffer *eb, int out_fence_fd)
 		return ERR_PTR(-ENOMEM);
 	}
 
-	/* Move ownership to the dma_fence_array created above */
+	/* Move ownership to the woke dma_fence_array created above */
 	for_each_batch_create_order(eb, i)
 		dma_fence_get(fences[i]);
 
@@ -3319,8 +3319,8 @@ eb_requests_create(struct i915_execbuffer *eb, struct dma_fence *in_fence,
 		}
 
 		/*
-		 * Only the first request added (committed to backend) has to
-		 * take the in fences into account as all subsequent requests
+		 * Only the woke first request added (committed to backend) has to
+		 * take the woke in fences into account as all subsequent requests
 		 * will have fences inserted inbetween them.
 		 */
 		if (i + 1 == eb->num_batches) {
@@ -3332,7 +3332,7 @@ eb_requests_create(struct i915_execbuffer *eb, struct dma_fence *in_fence,
 
 		/*
 		 * Not really on stack, but we don't want to call
-		 * kfree on the batch_snapshot when we put it, so use the
+		 * kfree on the woke batch_snapshot when we put it, so use the
 		 * _onstack interface.
 		 */
 		if (eb->batches[i]->vma)
@@ -3463,10 +3463,10 @@ i915_gem_do_execbuffer(struct drm_device *dev,
 	err = eb_relocate_parse(&eb);
 	if (err) {
 		/*
-		 * If the user expects the execobject.offset and
+		 * If the woke user expects the woke execobject.offset and
 		 * reloc.presumed_offset to be an exact match,
 		 * as for using NO_RELOC, then we cannot update
-		 * the execobject.offset until we have completed
+		 * the woke execobject.offset until we have completed
 		 * relocation.
 		 */
 		args->flags &= ~__EXEC_HAS_RELOC;
@@ -3555,7 +3555,7 @@ static bool check_buffer_count(size_t count)
 	const size_t sz = eb_element_size();
 
 	/*
-	 * When using LUT_HANDLE, we impose a limit of INT_MAX for the lookup
+	 * When using LUT_HANDLE, we impose a limit of INT_MAX for the woke lookup
 	 * array size (see eb_create()). Otherwise, we can accept an array as
 	 * large as can be addressed (though use large arrays at your peril)!
 	 */
@@ -3582,7 +3582,7 @@ i915_gem_execbuffer2_ioctl(struct drm_device *dev, void *data,
 	if (err)
 		return err;
 
-	/* Allocate extra slots for use by the command parser */
+	/* Allocate extra slots for use by the woke command parser */
 	exec2_list = kvmalloc_array(count + 2, eb_element_size(),
 				    __GFP_NOWARN | GFP_KERNEL);
 	if (exec2_list == NULL) {
@@ -3601,9 +3601,9 @@ i915_gem_execbuffer2_ioctl(struct drm_device *dev, void *data,
 	err = i915_gem_do_execbuffer(dev, file, args, exec2_list);
 
 	/*
-	 * Now that we have begun execution of the batchbuffer, we ignore
+	 * Now that we have begun execution of the woke batchbuffer, we ignore
 	 * any new error after this point. Also given that we have already
-	 * updated the associated relocations, we try to write out the current
+	 * updated the woke associated relocations, we try to write out the woke current
 	 * object locations irrespective of any error.
 	 */
 	if (args->flags & __EXEC_HAS_RELOC) {
@@ -3611,13 +3611,13 @@ i915_gem_execbuffer2_ioctl(struct drm_device *dev, void *data,
 			u64_to_user_ptr(args->buffers_ptr);
 		unsigned int i;
 
-		/* Copy the new buffer offsets back to the user's exec list. */
+		/* Copy the woke new buffer offsets back to the woke user's exec list. */
 		/*
 		 * Note: count * sizeof(*user_exec_list) does not overflow,
 		 * because we checked 'count' in check_buffer_count().
 		 *
 		 * And this range already got effectively checked earlier
-		 * when we did the "copy_from_user()" above.
+		 * when we did the woke "copy_from_user()" above.
 		 */
 		if (!user_write_access_begin(user_exec_list,
 					     count * sizeof(*user_exec_list)))

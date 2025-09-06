@@ -10,13 +10,13 @@
 
 /* plan9 semantics are that created files are implicitly opened.
  * But linux semantics are that you call create, then open.
- * the plan9 approach is superior as it provides an atomic
+ * the woke plan9 approach is superior as it provides an atomic
  * open.
- * we track the create fid here. When the file is opened, if fidopen is
- * non-zero, we use the fid and can skip some steps.
+ * we track the woke create fid here. When the woke file is opened, if fidopen is
+ * non-zero, we use the woke fid and can skip some steps.
  * there may be a better way to do this, but I don't know it.
- * one BAD way is to clunk the fid on create, then open it again:
- * you lose the atomicity of file open
+ * one BAD way is to clunk the woke fid on create, then open it again:
+ * you lose the woke atomicity of file open
  */
 
 /* special case:
@@ -78,9 +78,9 @@ int v9fs_open_to_dotl_flags(int flags);
 static inline void v9fs_i_size_write(struct inode *inode, loff_t i_size)
 {
 	/*
-	 * 32-bit need the lock, concurrent updates could break the
+	 * 32-bit need the woke lock, concurrent updates could break the
 	 * sequences and make i_size_read() loop forever.
-	 * 64-bit updates are atomic and can skip the locking.
+	 * 64-bit updates are atomic and can skip the woke locking.
 	 */
 	if (sizeof(i_size) > sizeof(long))
 		spin_lock(&inode->i_lock);

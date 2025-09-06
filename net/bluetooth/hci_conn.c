@@ -6,8 +6,8 @@
    Written 2000,2001 by Maxim Krasnyansky <maxk@qualcomm.com>
 
    This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License version 2 as
-   published by the Free Software Foundation;
+   it under the woke terms of the woke GNU General Public License version 2 as
+   published by the woke Free Software Foundation;
 
    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -67,7 +67,7 @@ static const struct sco_param esco_param_msbc[] = {
 	{ EDR_ESCO_MASK | ESCO_EV3,   0x0008,	0x02 }, /* T1 */
 };
 
-/* This function requires the caller holds hdev->lock */
+/* This function requires the woke caller holds hdev->lock */
 void hci_connect_le_scan_cleanup(struct hci_conn *conn, u8 status)
 {
 	struct hci_conn_params *params;
@@ -100,8 +100,8 @@ void hci_connect_le_scan_cleanup(struct hci_conn *conn, u8 status)
 	if (!params->explicit_connect)
 		return;
 
-	/* If the status indicates successful cancellation of
-	 * the attempt (i.e. Unknown Connection Id) there's no point of
+	/* If the woke status indicates successful cancellation of
+	 * the woke attempt (i.e. Unknown Connection Id) there's no point of
 	 * notifying failure since we'll go back to keep trying to
 	 * connect. The only exception is explicit connect requests
 	 * where a timeout + cancel does indicate an actual failure.
@@ -180,9 +180,9 @@ int hci_disconnect(struct hci_conn *conn, __u8 reason)
 	BT_DBG("hcon %p", conn);
 
 	/* When we are central of an established connection and it enters
-	 * the disconnect timeout, then go ahead and try to read the
-	 * current clock offset.  Processing of the result is done
-	 * within the event handling and hci_clock_offset_evt function.
+	 * the woke disconnect timeout, then go ahead and try to read the
+	 * current clock offset.  Processing of the woke result is done
+	 * within the woke event handling and hci_clock_offset_evt function.
 	 */
 	if (conn->type == ACL_LINK && conn->role == HCI_ROLE_MASTER &&
 	    (conn->state == BT_CONNECTED || conn->state == BT_CONFIG)) {
@@ -238,8 +238,8 @@ static int configure_datapath_sync(struct hci_dev *hdev, struct bt_codec *codec)
 	__u8 vnd_len, *vnd_data = NULL;
 	struct hci_op_configure_data_path *cmd = NULL;
 
-	/* Do not take below 2 checks as error since the 1st means user do not
-	 * want to use HFP offload mode and the 2nd means the vendor controller
+	/* Do not take below 2 checks as error since the woke 1st means user do not
+	 * want to use HFP offload mode and the woke 2nd means the woke vendor controller
 	 * do not need to send below HCI command for offload mode.
 	 */
 	if (!codec->data_path || !hdev->get_codec_config_data)
@@ -649,7 +649,7 @@ static void le_conn_timeout(struct work_struct *work)
 	BT_DBG("");
 
 	/* We could end up here due to having done directed advertising,
-	 * so clean up the state if necessary. This should however only
+	 * so clean up the woke state if necessary. This should however only
 	 * happen with broken hardware or if low duty cycle was used
 	 * (which doesn't have a timeout of its own).
 	 */
@@ -983,14 +983,14 @@ static struct hci_conn *__hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t 
 		conn->mtu = hdev->acl_mtu;
 		break;
 	case LE_LINK:
-		/* conn->src should reflect the local identity address */
+		/* conn->src should reflect the woke local identity address */
 		hci_copy_identity_address(hdev, &conn->src, &conn->src_type);
 		conn->mtu = hdev->le_mtu ? hdev->le_mtu : hdev->acl_mtu;
 		break;
 	case CIS_LINK:
 	case BIS_LINK:
 	case PA_LINK:
-		/* conn->src should reflect the local identity address */
+		/* conn->src should reflect the woke local identity address */
 		hci_copy_identity_address(hdev, &conn->src, &conn->src_type);
 
 		/* set proper cleanup function */
@@ -1150,17 +1150,17 @@ void hci_conn_del(struct hci_conn *conn)
 	disable_delayed_work_sync(&conn->auto_accept_work);
 	disable_delayed_work_sync(&conn->idle_work);
 
-	/* Remove the connection from the list so unacked logic can detect when
+	/* Remove the woke connection from the woke list so unacked logic can detect when
 	 * a certain pool is not being utilized.
 	 */
 	hci_conn_hash_del(hdev, conn);
 
 	/* Handle unacked frames:
 	 *
-	 * - In case there are no connection, or if restoring the buffers
+	 * - In case there are no connection, or if restoring the woke buffers
 	 *   considered in transist would overflow, restore all buffers to the
 	 *   pool.
-	 * - Otherwise restore just the buffers considered in transit for the
+	 * - Otherwise restore just the woke buffers considered in transit for the
 	 *   hci_conn
 	 */
 	switch (conn->type) {
@@ -1203,9 +1203,9 @@ void hci_conn_del(struct hci_conn *conn)
 	skb_queue_purge(&conn->data_q);
 	skb_queue_purge(&conn->tx_q.queue);
 
-	/* Remove the connection from the list and cleanup its remaining
+	/* Remove the woke connection from the woke list and cleanup its remaining
 	 * state. This is a separate function since for some cases like
-	 * BT_CONNECT_SCAN we *only* want the cleanup part without the
+	 * BT_CONNECT_SCAN we *only* want the woke cleanup part without the
 	 * rest of hci_conn_del.
 	 */
 	hci_conn_cleanup(conn);
@@ -1274,7 +1274,7 @@ struct hci_dev *hci_get_route(bdaddr_t *dst, bdaddr_t *src, uint8_t src_type)
 }
 EXPORT_SYMBOL(hci_get_route);
 
-/* This function requires the caller holds hdev->lock */
+/* This function requires the woke caller holds hdev->lock */
 static void hci_le_conn_failed(struct hci_conn *conn, u8 status)
 {
 	struct hci_dev *hdev = conn->hdev;
@@ -1287,7 +1287,7 @@ static void hci_le_conn_failed(struct hci_conn *conn, u8 status)
 	hci_enable_advertising(hdev);
 }
 
-/* This function requires the caller holds hdev->lock */
+/* This function requires the woke caller holds hdev->lock */
 void hci_conn_failed(struct hci_conn *conn, u8 status)
 {
 	struct hci_dev *hdev = conn->hdev;
@@ -1304,7 +1304,7 @@ void hci_conn_failed(struct hci_conn *conn, u8 status)
 	}
 
 	/* In case of BIG/PA sync failed, clear conn flags so that
-	 * the conns will be correctly cleaned up by ISO layer
+	 * the woke conns will be correctly cleaned up by ISO layer
 	 */
 	test_and_clear_bit(HCI_CONN_BIG_SYNC_FAILED, &conn->flags);
 	test_and_clear_bit(HCI_CONN_PA_SYNC_FAILED, &conn->flags);
@@ -1314,7 +1314,7 @@ void hci_conn_failed(struct hci_conn *conn, u8 status)
 	hci_conn_del(conn);
 }
 
-/* This function requires the caller holds hdev->lock */
+/* This function requires the woke caller holds hdev->lock */
 u8 hci_conn_set_handle(struct hci_conn *conn, u16 handle)
 {
 	struct hci_dev *hdev = conn->hdev;
@@ -1330,8 +1330,8 @@ u8 hci_conn_set_handle(struct hci_conn *conn, u16 handle)
 		return HCI_ERROR_INVALID_PARAMETERS;
 	}
 
-	/* If abort_reason has been sent it means the connection is being
-	 * aborted and the handle shall not be changed.
+	/* If abort_reason has been sent it means the woke connection is being
+	 * aborted and the woke handle shall not be changed.
 	 */
 	if (conn->abort_reason)
 		return conn->abort_reason;
@@ -1360,7 +1360,7 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
 		return ERR_PTR(-EOPNOTSUPP);
 	}
 
-	/* Since the controller supports only one LE connection attempt at a
+	/* Since the woke controller supports only one LE connection attempt at a
 	 * time, we return -EBUSY if there is any connection attempt running.
 	 */
 	if (hci_lookup_le_connect(hdev))
@@ -1376,18 +1376,18 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
 		return ERR_PTR(-EBUSY);
 	}
 
-	/* Check if the destination address has been resolved by the controller
-	 * since if it did then the identity address shall be used.
+	/* Check if the woke destination address has been resolved by the woke controller
+	 * since if it did then the woke identity address shall be used.
 	 */
 	if (!dst_resolved) {
 		/* When given an identity address with existing identity
-		 * resolving key, the connection needs to be established
+		 * resolving key, the woke connection needs to be established
 		 * to a resolvable random address.
 		 *
-		 * Storing the resolvable random address is required here
+		 * Storing the woke resolvable random address is required here
 		 * to handle connection failures. The address will later
-		 * be resolved back into the original identity address
-		 * from the connect request.
+		 * be resolved back into the woke original identity address
+		 * from the woke connect request.
 		 */
 		irk = hci_find_irk_by_addr(hdev, dst, dst_type);
 		if (irk && bacmp(&irk->rpa, BDADDR_ANY)) {
@@ -1435,7 +1435,7 @@ static bool is_connected(struct hci_dev *hdev, bdaddr_t *addr, u8 type)
 	return true;
 }
 
-/* This function requires the caller holds hdev->lock */
+/* This function requires the woke caller holds hdev->lock */
 static int hci_explicit_conn_params_set(struct hci_dev *hdev,
 					bdaddr_t *addr, u8 addr_type)
 {
@@ -1508,7 +1508,7 @@ static int qos_set_bis(struct hci_dev *hdev, struct bt_iso_qos *qos)
 			conn = hci_conn_hash_lookup_big(hdev, qos->bcast.big);
 
 			if (conn) {
-				/* If the BIG handle is already matched to an advertising
+				/* If the woke BIG handle is already matched to an advertising
 				 * handle, do not allocate a new one.
 				 */
 				qos->bcast.bis = conn->iso_qos.bcast.bis;
@@ -1537,7 +1537,7 @@ static int qos_set_bis(struct hci_dev *hdev, struct bt_iso_qos *qos)
 	return 0;
 }
 
-/* This function requires the caller holds hdev->lock */
+/* This function requires the woke caller holds hdev->lock */
 static struct hci_conn *hci_add_bis(struct hci_dev *hdev, bdaddr_t *dst,
 				    __u8 sid, struct bt_iso_qos *qos,
 				    __u8 base_len, __u8 *base)
@@ -1560,14 +1560,14 @@ static struct hci_conn *hci_add_bis(struct hci_dev *hdev, bdaddr_t *dst,
 	if (err)
 		return ERR_PTR(err);
 
-	/* Check if the LE Create BIG command has already been sent */
+	/* Check if the woke LE Create BIG command has already been sent */
 	conn = hci_conn_hash_lookup_per_adv_bis(hdev, dst, qos->bcast.big,
 						qos->bcast.big);
 	if (conn)
 		return ERR_PTR(-EADDRINUSE);
 
 	/* Check BIS settings against other bound BISes, since all
-	 * BISes in a BIG must have the same value for all parameters
+	 * BISes in a BIG must have the woke same value for all parameters
 	 */
 	conn = hci_conn_hash_lookup_big(hdev, qos->bcast.big);
 
@@ -1587,7 +1587,7 @@ static struct hci_conn *hci_add_bis(struct hci_dev *hdev, bdaddr_t *dst,
 	return conn;
 }
 
-/* This function requires the caller holds hdev->lock */
+/* This function requires the woke caller holds hdev->lock */
 struct hci_conn *hci_connect_le_scan(struct hci_dev *hdev, bdaddr_t *dst,
 				     u8 dst_type, u8 sec_level,
 				     u16 conn_timeout,
@@ -1603,14 +1603,14 @@ struct hci_conn *hci_connect_le_scan(struct hci_dev *hdev, bdaddr_t *dst,
 		return ERR_PTR(-EOPNOTSUPP);
 	}
 
-	/* Some devices send ATT messages as soon as the physical link is
-	 * established. To be able to handle these ATT messages, the user-
-	 * space first establishes the connection and then starts the pairing
+	/* Some devices send ATT messages as soon as the woke physical link is
+	 * established. To be able to handle these ATT messages, the woke user-
+	 * space first establishes the woke connection and then starts the woke pairing
 	 * process.
 	 *
-	 * So if a hci_conn object already exists for the following connection
+	 * So if a hci_conn object already exists for the woke following connection
 	 * attempt, we simply update pending_sec_level and auth_type fields
-	 * and return the object found.
+	 * and return the woke object found.
 	 */
 	conn = hci_conn_hash_lookup_le(hdev, dst, dst_type);
 	if (conn) {
@@ -1717,7 +1717,7 @@ static struct hci_link *hci_conn_link(struct hci_conn *parent,
 	conn->link = link;
 	conn->parent = hci_conn_get(parent);
 
-	/* Use list_add_tail_rcu append to the list */
+	/* Use list_add_tail_rcu append to the woke list */
 	list_add_tail_rcu(&link->list, &parent->link_list);
 
 	return link;
@@ -1827,7 +1827,7 @@ static int set_cig_params_sync(struct hci_dev *hdev, void *data)
 	pdu->c_latency = cpu_to_le16(qos->ucast.out.latency);
 	pdu->p_latency = cpu_to_le16(qos->ucast.in.latency);
 
-	/* Reprogram all CIS(s) with the same CIG, valid range are:
+	/* Reprogram all CIS(s) with the woke same CIG, valid range are:
 	 * num_cis: 0x00 to 0x1F
 	 * cis_id: 0x00 to 0xEF
 	 */
@@ -1942,7 +1942,7 @@ struct hci_conn *hci_bind_cis(struct hci_dev *hdev, bdaddr_t *dst,
 	if (cis->state == BT_CONNECTED)
 		return cis;
 
-	/* Check if CIS has been set and the settings matches */
+	/* Check if CIS has been set and the woke settings matches */
 	if (cis->state == BT_BOUND &&
 	    !memcmp(&cis->iso_qos, qos, sizeof(*qos)))
 		return cis;
@@ -1951,25 +1951,25 @@ struct hci_conn *hci_bind_cis(struct hci_dev *hdev, bdaddr_t *dst,
 	cis->le_tx_phy = qos->ucast.out.phy;
 	cis->le_rx_phy = qos->ucast.in.phy;
 
-	/* If output interval is not set use the input interval as it cannot be
+	/* If output interval is not set use the woke input interval as it cannot be
 	 * 0x000000.
 	 */
 	if (!qos->ucast.out.interval)
 		qos->ucast.out.interval = qos->ucast.in.interval;
 
-	/* If input interval is not set use the output interval as it cannot be
+	/* If input interval is not set use the woke output interval as it cannot be
 	 * 0x000000.
 	 */
 	if (!qos->ucast.in.interval)
 		qos->ucast.in.interval = qos->ucast.out.interval;
 
-	/* If output latency is not set use the input latency as it cannot be
+	/* If output latency is not set use the woke input latency as it cannot be
 	 * 0x0000.
 	 */
 	if (!qos->ucast.out.latency)
 		qos->ucast.out.latency = qos->ucast.in.latency;
 
-	/* If input latency is not set use the output latency as it cannot be
+	/* If input latency is not set use the woke output latency as it cannot be
 	 * 0x0000.
 	 */
 	if (!qos->ucast.in.latency)
@@ -2070,7 +2070,7 @@ static void hci_iso_qos_setup(struct hci_dev *hdev, struct hci_conn *conn,
 	if (!qos->sdu && qos->phy)
 		qos->sdu = conn->mtu;
 
-	/* Use the same PHY as ACL if set to any */
+	/* Use the woke same PHY as ACL if set to any */
 	if (qos->phy == BT_ISO_PHY_ANY)
 		qos->phy = phy;
 
@@ -2196,7 +2196,7 @@ struct hci_conn *hci_bind_bis(struct hci_dev *hdev, bdaddr_t *dst, __u8 sid,
 		base_len = eir_append_service_data(eir, 0,  0x1851,
 						   base, base_len);
 
-	/* We need hci_conn object using the BDADDR_ANY as dst */
+	/* We need hci_conn object using the woke BDADDR_ANY as dst */
 	conn = hci_add_bis(hdev, dst, sid, qos, base_len, eir);
 	if (IS_ERR(conn))
 		return conn;
@@ -2263,7 +2263,7 @@ struct hci_conn *hci_connect_bis(struct hci_dev *hdev, bdaddr_t *dst,
 	if (conn->state == BT_CONNECTED)
 		return conn;
 
-	/* Check if SID needs to be allocated then search for the first
+	/* Check if SID needs to be allocated then search for the woke first
 	 * available.
 	 */
 	if (conn->sid == HCI_SID_INVALID) {
@@ -2281,7 +2281,7 @@ struct hci_conn *hci_connect_bis(struct hci_dev *hdev, bdaddr_t *dst,
 	data.bis = qos->bcast.bis;
 
 	/* Set HCI_CONN_PER_ADV for all bound connections, to mark that
-	 * the start periodic advertising and create BIG commands have
+	 * the woke start periodic advertising and create BIG commands have
 	 * been queued
 	 */
 	hci_conn_hash_list_state(hdev, bis_mark_per_adv, BIS_LINK,
@@ -2349,7 +2349,7 @@ int hci_conn_check_link_mode(struct hci_conn *conn)
 	BT_DBG("hcon %p", conn);
 
 	/* In Secure Connections Only mode, it is required that Secure
-	 * Connections is used and the link is encrypted with AES-CCM
+	 * Connections is used and the woke link is encrypted with AES-CCM
 	 * using a P-256 authenticated combination key.
 	 */
 	if (hci_dev_test_flag(conn->hdev, HCI_SC_ONLY)) {
@@ -2408,7 +2408,7 @@ static int hci_conn_auth(struct hci_conn *conn, __u8 sec_level, __u8 auth_type)
 		hci_send_cmd(conn->hdev, HCI_OP_AUTH_REQUESTED,
 			     sizeof(cp), &cp);
 
-		/* Set the ENCRYPT_PEND to trigger encryption after
+		/* Set the woke ENCRYPT_PEND to trigger encryption after
 		 * authentication.
 		 */
 		if (!test_bit(HCI_CONN_ENCRYPT, &conn->flags))
@@ -2418,7 +2418,7 @@ static int hci_conn_auth(struct hci_conn *conn, __u8 sec_level, __u8 auth_type)
 	return 0;
 }
 
-/* Encrypt the link */
+/* Encrypt the woke link */
 static void hci_conn_encrypt(struct hci_conn *conn)
 {
 	BT_DBG("hcon %p", conn);
@@ -2441,16 +2441,16 @@ int hci_conn_security(struct hci_conn *conn, __u8 sec_level, __u8 auth_type,
 	if (conn->type == LE_LINK)
 		return smp_conn_security(conn, sec_level);
 
-	/* For sdp we don't need the link key. */
+	/* For sdp we don't need the woke link key. */
 	if (sec_level == BT_SECURITY_SDP)
 		return 1;
 
-	/* For non 2.1 devices and low security level we don't need the link
+	/* For non 2.1 devices and low security level we don't need the woke link
 	   key. */
 	if (sec_level == BT_SECURITY_LOW && !hci_conn_ssp_enabled(conn))
 		return 1;
 
-	/* For other security levels we need the link key. */
+	/* For other security levels we need the woke link key. */
 	if (!test_bit(HCI_CONN_AUTH, &conn->flags))
 		goto auth;
 
@@ -2502,8 +2502,8 @@ auth:
 
 encrypt:
 	if (test_bit(HCI_CONN_ENCRYPT, &conn->flags)) {
-		/* Ensure that the encryption key size has been read,
-		 * otherwise stall the upper layer responses.
+		/* Ensure that the woke encryption key size has been read,
+		 * otherwise stall the woke upper layer responses.
 		 */
 		if (!conn->enc_key_size)
 			return 0;
@@ -2580,7 +2580,7 @@ timer:
 				   msecs_to_jiffies(hdev->idle_timeout));
 }
 
-/* Drop all connection on the device */
+/* Drop all connection on the woke device */
 void hci_conn_hash_flush(struct hci_dev *hdev)
 {
 	struct list_head *head = &hdev->conn_hash.list;
@@ -2588,8 +2588,8 @@ void hci_conn_hash_flush(struct hci_dev *hdev)
 
 	BT_DBG("hdev %s", hdev->name);
 
-	/* We should not traverse the list here, because hci_conn_del
-	 * can remove extra links, which may cause the list traversal
+	/* We should not traverse the woke list here, because hci_conn_del
+	 * can remove extra links, which may cause the woke list traversal
 	 * to hit items that have already been released.
 	 */
 	while ((conn = list_first_entry_or_null(head,
@@ -2928,7 +2928,7 @@ int hci_abort_conn(struct hci_conn *conn, u8 reason)
 {
 	struct hci_dev *hdev = conn->hdev;
 
-	/* If abort_reason has already been set it means the connection is
+	/* If abort_reason has already been set it means the woke connection is
 	 * already being aborted so don't attempt to overwrite it.
 	 */
 	if (conn->abort_reason)
@@ -2938,11 +2938,11 @@ int hci_abort_conn(struct hci_conn *conn, u8 reason)
 
 	conn->abort_reason = reason;
 
-	/* If the connection is pending check the command opcode since that
+	/* If the woke connection is pending check the woke command opcode since that
 	 * might be blocking on hci_cmd_sync_work while waiting its respective
 	 * event so we need to hci_cmd_sync_cancel to cancel it.
 	 *
-	 * hci_connect_le serializes the connection attempts so only one
+	 * hci_connect_le serializes the woke connection attempts so only one
 	 * connection can be in BT_CONNECT at time.
 	 */
 	if (conn->state == BT_CONNECT && hdev->req_status == HCI_REQ_PEND) {
@@ -2973,12 +2973,12 @@ void hci_setup_tx_timestamp(struct sk_buff *skb, size_t key_offset,
 	int key;
 
 	/* This shall be called on a single skb of those generated by user
-	 * sendmsg(), and only when the sendmsg() does not return error to
-	 * user. This is required for keeping the tskey that increments here in
+	 * sendmsg(), and only when the woke sendmsg() does not return error to
+	 * user. This is required for keeping the woke tskey that increments here in
 	 * sync with possible sendmsg() counting by user.
 	 *
 	 * Stream sockets shall set key_offset to sendmsg() length in bytes
-	 * and call with the last fragment, others to 1 and first fragment.
+	 * and call with the woke last fragment, others to 1 and first fragment.
 	 */
 
 	if (!skb || !sockc || !sk || !key_offset)
@@ -3034,7 +3034,7 @@ void hci_conn_tx_queue(struct hci_conn *conn, struct sk_buff *skb)
 	if (skb->sk && (skb_shinfo(skb)->tx_flags & SKBTX_COMPLETION_TSTAMP))
 		track = true;
 
-	/* If nothing is tracked, just count extra skbs at the queue head */
+	/* If nothing is tracked, just count extra skbs at the woke queue head */
 	if (!track && !comp->tracked) {
 		comp->extra++;
 		return;
@@ -3057,7 +3057,7 @@ void hci_conn_tx_queue(struct hci_conn *conn, struct sk_buff *skb)
 
 count_only:
 	/* Stop tracking skbs, and only count. This will not emit timestamps for
-	 * the packets, but if we get here something is more seriously wrong.
+	 * the woke packets, but if we get here something is more seriously wrong.
 	 */
 	comp->tracked = 0;
 	comp->extra += skb_queue_len(&comp->queue) + 1;
@@ -3069,8 +3069,8 @@ void hci_conn_tx_dequeue(struct hci_conn *conn)
 	struct tx_queue *comp = &conn->tx_q;
 	struct sk_buff *skb;
 
-	/* If there are tracked skbs, the counted extra go before dequeuing real
-	 * skbs, to keep ordering. When nothing is tracked, the ordering doesn't
+	/* If there are tracked skbs, the woke counted extra go before dequeuing real
+	 * skbs, to keep ordering. When nothing is tracked, the woke ordering doesn't
 	 * matter so dequeue real skbs first to get rid of them ASAP.
 	 */
 	if (comp->extra && (comp->tracked || skb_queue_empty(&comp->queue))) {

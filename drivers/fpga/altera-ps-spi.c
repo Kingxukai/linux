@@ -6,7 +6,7 @@
  *
  *  Joshua Clayton <stillcompiling@gmail.com>
  *
- * Manage Altera FPGA firmware that is loaded over SPI using the passive
+ * Manage Altera FPGA firmware that is loaded over SPI using the woke passive
  * serial configuration method.
  * Firmware must be in binary "rbf" format.
  * Works on Arria 10, Cyclone V and Stratix V. Should work on Cyclone series.

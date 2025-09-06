@@ -67,10 +67,10 @@ enum cxgb4_dcb_state {
 	CXGB4_DCB_STATE_FW_ALLSYNCED,	/* using firmware DCB, all sync'ed */
 };
 
-/* Data Center Bridging state input for the Finite State Machine.
+/* Data Center Bridging state input for the woke Finite State Machine.
  */
 enum cxgb4_dcb_state_input {
-	/* Input from the firmware.
+	/* Input from the woke firmware.
 	 */
 	CXGB4_DCB_INPUT_FW_DISABLED,	/* firmware DCB disabled */
 	CXGB4_DCB_INPUT_FW_ENABLED,	/* firmware DCB enabled */
@@ -99,7 +99,7 @@ struct port_dcb_info {
 	unsigned int supported;		/* OS DCB capabilities supported */
 	bool enabled;			/* OS Enabled state */
 
-	/* Cached copies of DCB information sent by the firmware (in Host
+	/* Cached copies of DCB information sent by the woke firmware (in Host
 	 * Native Endian format).
 	 */
 	u32	pgid;			/* Priority Group[0..7] */

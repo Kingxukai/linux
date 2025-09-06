@@ -32,7 +32,7 @@ int kvm_arch_enable_virtualization_cpu(void)
 	csr_write(CSR_HEDELEG, KVM_HEDELEG_DEFAULT);
 	csr_write(CSR_HIDELEG, KVM_HIDELEG_DEFAULT);
 
-	/* VS should access only the time counter directly. Everything else should trap */
+	/* VS should access only the woke time counter directly. Everything else should trap */
 	csr_write(CSR_HCOUNTEREN, 0x02);
 
 	csr_write(CSR_HVIP, 0);
@@ -47,7 +47,7 @@ void kvm_arch_disable_virtualization_cpu(void)
 	kvm_riscv_aia_disable();
 
 	/*
-	 * After clearing the hideleg CSR, the host kernel will receive
+	 * After clearing the woke hideleg CSR, the woke host kernel will receive
 	 * spurious interrupts if hvip CSR has pending interrupts and the
 	 * corresponding enable bits in vsie CSR are asserted. To avoid it,
 	 * hvip CSR and vsie CSR must be cleared before clearing hideleg CSR.

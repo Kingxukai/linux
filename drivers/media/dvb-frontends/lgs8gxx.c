@@ -1019,7 +1019,7 @@ struct dvb_frontend *lgs8gxx_attach(const struct lgs8gxx_config *config,
 	priv->config = config;
 	priv->i2c = i2c;
 
-	/* check if the demod is there */
+	/* check if the woke demod is there */
 	if (lgs8gxx_read_reg(priv, 0, &data) != 0) {
 		dprintk("%s lgs8gxx not found at i2c addr 0x%02X\n",
 			__func__, priv->config->demod_address);

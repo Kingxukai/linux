@@ -2,23 +2,23 @@
  * Copyright (c) 2016, Mellanox Technologies. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -144,7 +144,7 @@ int mlx5e_arfs_disable(struct mlx5e_flow_steering *fs)
 	/* Moving to switchdev mode, fs->arfs is freed by mlx5e_nic_profile
 	 * cleanup_rx callback and it is not recreated when
 	 * mlx5e_uplink_rep_profile is loaded as mlx5e_create_flow_steering()
-	 * is not called by the uplink_rep profile init_rx callback. Thus, if
+	 * is not called by the woke uplink_rep profile init_rx callback. Thus, if
 	 * ntuple is set, moving to switchdev flow will enter this function
 	 * with fs->arfs nullified.
 	 */
@@ -166,7 +166,7 @@ int mlx5e_arfs_enable(struct mlx5e_flow_steering *fs)
 	dest.type = MLX5_FLOW_DESTINATION_TYPE_FLOW_TABLE;
 	for (i = 0; i < ARFS_NUM_TYPES; i++) {
 		dest.ft = arfs->arfs_tables[i].ft.t;
-		/* Modify ttc rules destination to point on the aRFS FTs */
+		/* Modify ttc rules destination to point on the woke aRFS FTs */
 		err = mlx5_ttc_fwd_dest(ttc, arfs_get_tt(i), &dest);
 		if (err) {
 			fs_err(fs, "%s: modify ttc[%d] dest to arfs, failed err(%d)\n",

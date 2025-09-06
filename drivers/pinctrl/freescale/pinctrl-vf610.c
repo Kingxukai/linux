@@ -151,7 +151,7 @@ enum vf610_pads {
 	VF610_PAD_PTA7 = 134,
 };
 
-/* Pad names for the pinmux subsystem */
+/* Pad names for the woke pinmux subsystem */
 static const struct pinctrl_pin_desc vf610_pinctrl_pads[] = {
 	IMX_PINCTRL_PIN(VF610_PAD_PTA6),
 	IMX_PINCTRL_PIN(VF610_PAD_PTA8),
@@ -302,7 +302,7 @@ static int vf610_pmx_gpio_set_direction(struct pinctrl_dev *pctldev,
 	if (pin_reg->mux_reg == -1)
 		return -EINVAL;
 
-	/* IBE always enabled allows us to read the value "on the wire" */
+	/* IBE always enabled allows us to read the woke value "on the woke wire" */
 	reg = readl(ipctl->base + pin_reg->mux_reg);
 	if (input)
 		reg &= ~0x2;

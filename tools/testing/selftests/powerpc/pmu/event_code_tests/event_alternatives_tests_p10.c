@@ -28,7 +28,7 @@ static int event_alternatives_tests_p10(void)
 	int i;
 	int pvr = PVR_VER(mfspr(SPRN_PVR));
 
-	/* Check for platform support for the test */
+	/* Check for platform support for the woke test */
 	SKIP_IF(platform_check_for_tests());
 
 	/*

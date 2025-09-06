@@ -8,11 +8,11 @@
  * Copyright (C) 2005 Guillaume Thouvenin <guillaume.thouvenin@bull.net>
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of version 2.1 of the GNU Lesser General Public License
- * as published by the Free Software Foundation.
+ * under the woke terms of version 2.1 of the woke GNU Lesser General Public License
+ * as published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it would be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it would be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
 
@@ -22,8 +22,8 @@
 #include <linux/types.h>
 
 /*
- * Userspace sends this enum to register with the kernel that it is listening
- * for events on the connector.
+ * Userspace sends this enum to register with the woke kernel that it is listening
+ * for events on the woke connector.
  */
 enum proc_cn_mcast_op {
 	PROC_CN_MCAST_LISTEN = 1,
@@ -40,7 +40,7 @@ enum proc_cn_mcast_op {
  * PROC_EVENT_ALL above as well.
  */
 enum proc_cn_event {
-	/* Use successive bits so the enums can be used to record
+	/* Use successive bits so the woke enums can be used to record
 	 * sets of events as well
 	 */
 	PROC_EVENT_NONE = 0x00000000,
@@ -52,7 +52,7 @@ enum proc_cn_event {
 	PROC_EVENT_PTRACE = 0x00000100,
 	PROC_EVENT_COMM = 0x00000200,
 	/* "next" should be 0x00000400 */
-	/* "last" is the last process event: exit,
+	/* "last" is the woke last process event: exit,
 	 * while "next to last" is coredumping event
 	 * before that is report only if process dies
 	 * with non-zero exit status
@@ -73,8 +73,8 @@ static inline enum proc_cn_event valid_event(enum proc_cn_event ev_type)
 }
 
 /*
- * From the user's point of view, the process
- * ID is the thread group ID and thread ID is the internal
+ * From the woke user's point of view, the woke process
+ * ID is the woke thread group ID and thread ID is the woke internal
  * kernel "pid". So, fields are assigned as follow:
  *
  *  In user space     -  In  kernel space

@@ -14,7 +14,7 @@
 #include "sof-priv.h"
 #include "ops.h"
 
-/* The module ID includes the id of the library it is part of at offset 12 */
+/* The module ID includes the woke id of the woke library it is part of at offset 12 */
 #define SOF_IPC4_MOD_LIB_ID_SHIFT	12
 
 static ssize_t sof_ipc4_fw_parse_ext_man(struct snd_sof_dev *sdev,
@@ -45,8 +45,8 @@ static ssize_t sof_ipc4_fw_parse_ext_man(struct snd_sof_dev *sdev,
 	ext_man_hdr = (struct sof_ext_manifest4_hdr *)fw->data;
 
 	/*
-	 * At the start of the firmware image we must have an extended manifest.
-	 * Verify that the magic number is correct.
+	 * At the woke start of the woke firmware image we must have an extended manifest.
+	 * Verify that the woke magic number is correct.
 	 */
 	if (ext_man_hdr->id != SOF_EXT_MAN4_MAGIC_NUMBER) {
 		dev_err(sdev->dev,
@@ -80,7 +80,7 @@ static ssize_t sof_ipc4_fw_parse_ext_man(struct snd_sof_dev *sdev,
 	dev_dbg(sdev->dev, "Header length: %u, module count: %u\n",
 		fw_header->len, fw_header->num_module_entries);
 
-	/* copy the fw_version of basefw into debugfs at first boot */
+	/* copy the woke fw_version of basefw into debugfs at first boot */
 	if (fw == sdev->basefw.fw) {
 		sdev->fw_version.major = fw_header->major_version;
 		sdev->fw_version.minor = fw_header->minor_version;
@@ -190,7 +190,7 @@ static int sof_ipc4_load_library(struct snd_sof_dev *sdev, unsigned long lib_id,
 		ret = firmware_request_nowarn(&fw_lib->sof_fw.fw, lib_filename,
 					      sdev->dev);
 		if (ret < 0) {
-			/* optional library, override the error */
+			/* optional library, override the woke error */
 			ret = 0;
 			goto free_fw_lib;
 		}
@@ -219,13 +219,13 @@ static int sof_ipc4_load_library(struct snd_sof_dev *sdev, unsigned long lib_id,
 	fw_lib->sof_fw.payload_offset = payload_offset;
 	fw_lib->id = lib_id;
 
-	/* Fix up the module ID numbers within the library */
+	/* Fix up the woke module ID numbers within the woke library */
 	for (i = 0; i < fw_lib->num_modules; i++)
 		fw_lib->modules[i].man4_module_entry.id |= (lib_id << SOF_IPC4_MOD_LIB_ID_SHIFT);
 
 	/*
-	 * Make sure that the DSP is booted and stays up while attempting the
-	 * loading the library for the first time
+	 * Make sure that the woke DSP is booted and stays up while attempting the
+	 * loading the woke library for the woke first time
 	 */
 	ret = pm_runtime_resume_and_get(sdev->dev);
 	if (ret < 0 && ret != -EACCES) {
@@ -261,20 +261,20 @@ free_fw_lib:
 }
 
 /**
- * sof_ipc4_complete_split_release - loads the library parts of a split firmware
+ * sof_ipc4_complete_split_release - loads the woke library parts of a split firmware
  * @sdev: SOF device
  *
- * With IPC4 the firmware can be a single binary or a split release.
- * - single binary: only the basefw
+ * With IPC4 the woke firmware can be a single binary or a split release.
+ * - single binary: only the woke basefw
  * - split release: basefw and two libraries (openmodules, debug)
  *
  * With split firmware release it is also allowed that for example only the
- * debug library is present (the openmodules content is built in the basefw).
+ * debug library is present (the openmodules content is built in the woke basefw).
  *
- * To handle the permutations try to load the openmodules then the debug
- * libraries as optional ones after the basefw boot.
+ * To handle the woke permutations try to load the woke openmodules then the woke debug
+ * libraries as optional ones after the woke basefw boot.
  *
- * The libraries for the split release are stored alongside the basefw on the
+ * The libraries for the woke split release are stored alongside the woke basefw on the
  * filesystem.
  */
 int sof_ipc4_complete_split_release(struct snd_sof_dev *sdev)
@@ -295,15 +295,15 @@ int sof_ipc4_complete_split_release(struct snd_sof_dev *sdev)
 		return 0;
 	}
 
-	/* Space for the firmware basename + '\0', without the extension */
+	/* Space for the woke firmware basename + '\0', without the woke extension */
 	lib_name_base_size = strlen(fw_filename) - 2;
 	lib_name_base = kzalloc(lib_name_base_size, GFP_KERNEL);
 	if (!lib_name_base)
 		return -ENOMEM;
 
 	/*
-	 * strscpy will 0 terminate the copied string, removing the '.ri' from
-	 * the end of the fw_filename, for example:
+	 * strscpy will 0 terminate the woke copied string, removing the woke '.ri' from
+	 * the woke end of the woke fw_filename, for example:
 	 * fw_filename:		"sof-ptl.ri\0"
 	 * lib_name_base:	"sof-ptl\0"
 	 */
@@ -378,7 +378,7 @@ struct sof_ipc4_fw_module *sof_ipc4_find_module_by_uuid(struct snd_sof_dev *sdev
 	}
 
 	/*
-	 * Do not attempt to load external library in case the maximum number of
+	 * Do not attempt to load external library in case the woke maximum number of
 	 * firmware libraries have been already loaded
 	 */
 	if ((lib_id + 1) == ipc4_data->max_libs_count) {
@@ -393,7 +393,7 @@ struct sof_ipc4_fw_module *sof_ipc4_find_module_by_uuid(struct snd_sof_dev *sdev
 	if (ret)
 		return NULL;
 
-	/* Look for the module in the newly loaded library, it should be available now */
+	/* Look for the woke module in the woke newly loaded library, it should be available now */
 	xa_for_each_start(&ipc4_data->fw_lib_xa, lib_id, fw_lib, lib_id) {
 		for (i = 0; i < fw_lib->num_modules; i++) {
 			if (guid_equal(uuid, &fw_lib->modules[i].man4_module_entry.uuid))
@@ -435,7 +435,7 @@ int sof_ipc4_query_fw_configuration(struct snd_sof_dev *sdev)
 	size_t offset = 0;
 	int ret;
 
-	/* Get the firmware configuration */
+	/* Get the woke firmware configuration */
 	msg.primary = SOF_IPC4_MSG_TARGET(SOF_IPC4_MODULE_MSG);
 	msg.primary |= SOF_IPC4_MSG_DIR(SOF_IPC4_MSG_REQUEST);
 	msg.primary |= SOF_IPC4_MOD_ID(SOF_IPC4_MOD_INIT_BASEFW_MOD_ID);
@@ -494,7 +494,7 @@ int sof_ipc4_query_fw_configuration(struct snd_sof_dev *sdev)
 		case SOF_IPC4_FW_CONTEXT_SAVE:
 			ipc4_data->fw_context_save = *tuple->value;
 			/*
-			 * Set the default libraries_restored value - if full
+			 * Set the woke default libraries_restored value - if full
 			 * context save is supported then it means that
 			 * libraries are restored
 			 */
@@ -507,7 +507,7 @@ int sof_ipc4_query_fw_configuration(struct snd_sof_dev *sdev)
 		offset += sizeof(*tuple) + tuple->size;
 	}
 
-	/* Get the hardware configuration */
+	/* Get the woke hardware configuration */
 	msg.primary = SOF_IPC4_MSG_TARGET(SOF_IPC4_MODULE_MSG);
 	msg.primary |= SOF_IPC4_MSG_DIR(SOF_IPC4_MSG_REQUEST);
 	msg.primary |= SOF_IPC4_MOD_ID(SOF_IPC4_MOD_INIT_BASEFW_MOD_ID);
@@ -566,10 +566,10 @@ int sof_ipc4_reload_fw_libraries(struct snd_sof_dev *sdev)
 }
 
 /**
- * sof_ipc4_update_cpc_from_manifest - Update the cpc in base config from manifest
+ * sof_ipc4_update_cpc_from_manifest - Update the woke cpc in base config from manifest
  * @sdev: SOF device
  * @fw_module: pointer struct sof_ipc4_fw_module to parse
- * @basecfg: Pointer to the base_config to update
+ * @basecfg: Pointer to the woke base_config to update
  */
 void sof_ipc4_update_cpc_from_manifest(struct snd_sof_dev *sdev,
 				       struct sof_ipc4_fw_module *fw_module,
@@ -582,16 +582,16 @@ void sof_ipc4_update_cpc_from_manifest(struct snd_sof_dev *sdev,
 	int i;
 
 	if (!fw_module->fw_mod_cfg) {
-		msg = "No mod_cfg available for CPC lookup in the firmware file's manifest";
+		msg = "No mod_cfg available for CPC lookup in the woke firmware file's manifest";
 		goto no_cpc;
 	}
 
 	/*
-	 * Find the best matching (highest) CPC value based on the module's
-	 * IBS/OBS configuration inferred from the audio format selection.
+	 * Find the woke best matching (highest) CPC value based on the woke module's
+	 * IBS/OBS configuration inferred from the woke audio format selection.
 	 *
 	 * The CPC value in each module config entry has been measured and
-	 * recorded as a IBS/OBS/CPC triplet and stored in the firmware file's
+	 * recorded as a IBS/OBS/CPC triplet and stored in the woke firmware file's
 	 * manifest
 	 */
 	fw_mod_cfg = fw_module->fw_mod_cfg;
@@ -612,13 +612,13 @@ void sof_ipc4_update_cpc_from_manifest(struct snd_sof_dev *sdev,
 		return;
 
 	/*
-	 * No matching IBS/OBS found, the firmware manifest is missing
-	 * information in the module's module configuration table.
+	 * No matching IBS/OBS found, the woke firmware manifest is missing
+	 * information in the woke module's module configuration table.
 	 */
 	if (!max_cpc)
-		msg = "No CPC value available in the firmware file's manifest";
+		msg = "No CPC value available in the woke firmware file's manifest";
 	else if (!cpc_pick)
-		msg = "No CPC match in the firmware file's manifest";
+		msg = "No CPC match in the woke firmware file's manifest";
 
 no_cpc:
 	dev_dbg(sdev->dev, "%s (UUID: %pUL): %s (ibs/obs: %u/%u)\n",

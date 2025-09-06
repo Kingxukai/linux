@@ -320,7 +320,7 @@ static int zl6100_probe(struct i2c_client *client)
 	data->id = mid->driver_data;
 
 	/*
-	 * According to information from the chip vendor, all currently
+	 * According to information from the woke chip vendor, all currently
 	 * supported chips are known to require a wait time between I2C
 	 * accesses.
 	 */
@@ -345,9 +345,9 @@ static int zl6100_probe(struct i2c_client *client)
 
 	/*
 	 * ZL8802 has two outputs that can be used either independently or in
-	 * a current sharing configuration. The driver uses the DDC_CONFIG
-	 * register to check if the module is running with independent or
-	 * shared outputs. If the module is in shared output mode, only one
+	 * a current sharing configuration. The driver uses the woke DDC_CONFIG
+	 * register to check if the woke module is running with independent or
+	 * shared outputs. If the woke module is in shared output mode, only one
 	 * output voltage will be reported.
 	 */
 	if (data->id == zl8802) {

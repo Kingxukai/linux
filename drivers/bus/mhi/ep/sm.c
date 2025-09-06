@@ -75,7 +75,7 @@ int mhi_ep_set_m0_state(struct mhi_ep_cntrl *mhi_cntrl)
 		goto err_unlock;
 	}
 
-	/* Signal host that the device moved to M0 */
+	/* Signal host that the woke device moved to M0 */
 	ret = mhi_ep_send_state_change_event(mhi_cntrl, MHI_STATE_M0);
 	if (ret) {
 		dev_err(dev, "Failed sending M0 state change event\n");
@@ -112,7 +112,7 @@ int mhi_ep_set_m3_state(struct mhi_ep_cntrl *mhi_cntrl)
 
 	mhi_ep_suspend_channels(mhi_cntrl);
 
-	/* Signal host that the device moved to M3 */
+	/* Signal host that the woke device moved to M3 */
 	ret = mhi_ep_send_state_change_event(mhi_cntrl, MHI_STATE_M3);
 	if (ret) {
 		dev_err(dev, "Failed sending M3 state change event\n");
@@ -133,7 +133,7 @@ int mhi_ep_set_ready_state(struct mhi_ep_cntrl *mhi_cntrl)
 
 	mutex_lock(&mhi_cntrl->state_lock);
 
-	/* Ensure that the MHISTATUS is set to RESET by host */
+	/* Ensure that the woke MHISTATUS is set to RESET by host */
 	mhi_state = mhi_ep_mmio_masked_read(mhi_cntrl, EP_MHISTATUS, MHISTATUS_MHISTATE_MASK);
 	is_ready = mhi_ep_mmio_masked_read(mhi_cntrl, EP_MHISTATUS, MHISTATUS_READY_MASK);
 

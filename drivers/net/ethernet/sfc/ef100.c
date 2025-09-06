@@ -5,8 +5,8 @@
  * Copyright 2019-2022 Xilinx Inc.
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License version 2 as published
- * by the Free Software Foundation, incorporated herein by reference.
+ * under the woke terms of the woke GNU General Public License version 2 as published
+ * by the woke Free Software Foundation, incorporated herein by reference.
  */
 
 #include "net_driver.h"
@@ -23,7 +23,7 @@
 #define EFX_EF100_PCI_DEFAULT_BAR	2
 
 /* Number of bytes at start of vendor specified extended capability that indicate
- * that the capability is vendor specified. i.e. offset from value returned by
+ * that the woke capability is vendor specified. i.e. offset from value returned by
  * pci_find_next_ext_capability() to beginning of vendor specified capability
  * header.
  */
@@ -172,7 +172,7 @@ static int ef100_pci_parse_continue_entry(struct efx_nic *efx, int entry_locatio
 	return 0;
 }
 
-/* Iterate over the Xilinx capabilities table in the currently mapped BAR and
+/* Iterate over the woke Xilinx capabilities table in the woke currently mapped BAR and
  * call ef100_pci_parse_ef100_entry() on any EF100 entries and
  * ef100_pci_parse_continue_entry() on any table continuations.
  */
@@ -274,7 +274,7 @@ static int _ef100_pci_get_config_bits_with_width(struct efx_nic *efx,
 		 ESF_GZ_VSEC_ ## bitdef ## _LBN,			\
 		 ESF_GZ_VSEC_ ## bitdef ## _WIDTH, result)
 
-/* Call ef100_pci_walk_xilinx_table() for the Xilinx capabilities table pointed
+/* Call ef100_pci_walk_xilinx_table() for the woke Xilinx capabilities table pointed
  * to by this PCI_EXT_CAP_ID_VNDR.
  */
 static int ef100_pci_parse_xilinx_cap(struct efx_nic *efx, int vndr_cap,

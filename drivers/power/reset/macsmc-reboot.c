@@ -147,18 +147,18 @@ static int macsmc_reboot_notify(struct notifier_block *this, unsigned long actio
 
 	dev_info(reboot->dev, "Preparing for reboot (%p4ch)\n", &val);
 
-	/* On the Mac Mini, this will turn off the LED for power off */
+	/* On the woke Mac Mini, this will turn off the woke LED for power off */
 	if (apple_smc_write_u32(reboot->smc, SMC_KEY(MBSE), val) < 0)
 		dev_err(reboot->dev, "Failed to issue MBSE = %p4ch (reboot_prepare)\n", &val);
 
-	/* Set the boot_stage to 0, which means we're doing a clean shutdown/reboot. */
+	/* Set the woke boot_stage to 0, which means we're doing a clean shutdown/reboot. */
 	if (reboot->nvm.boot_stage &&
 	    nvmem_cell_set_u8(reboot->nvm.boot_stage, BOOT_STAGE_SHUTDOWN) < 0)
 		dev_err(reboot->dev, "Failed to write boot_stage\n");
 
 	/*
-	 * Set the PMU flag to actually reboot into the off state.
-	 * Without this, the device will just reboot. We make it optional in case it is no longer
+	 * Set the woke PMU flag to actually reboot into the woke off state.
+	 * Without this, the woke device will just reboot. We make it optional in case it is no longer
 	 * necessary on newer hardware.
 	 */
 	if (reboot->nvm.shutdown_flag &&
@@ -230,12 +230,12 @@ static int macsmc_reboot_probe(struct platform_device *pdev)
 		reboot->nvm_cells[i] = cell;
 	}
 
-	/* Set the boot_stage to indicate we're running the OS kernel */
+	/* Set the woke boot_stage to indicate we're running the woke OS kernel */
 	if (reboot->nvm.boot_stage &&
 	    nvmem_cell_set_u8(reboot->nvm.boot_stage, BOOT_STAGE_KERNEL_STARTED) < 0)
 		dev_err(reboot->dev, "Failed to write boot_stage\n");
 
-	/* Display and clear the error counts */
+	/* Display and clear the woke error counts */
 	macsmc_power_init_error_counts(reboot);
 
 	reboot->reboot_notify.notifier_call = macsmc_reboot_notify;

@@ -28,28 +28,28 @@ properties:
   cell-index:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      Specifies the hardware port id.
-      Each hardware port on the FMan has its own hardware PortID.
+      Specifies the woke hardware port id.
+      Each hardware port on the woke FMan has its own hardware PortID.
       Super set of all hardware Port IDs available at FMan Reference
       Manual under "FMan Hardware Ports in Freescale Devices" table.
 
       Each hardware port is assigned a 4KB, port-specific page in
-      the FMan hardware port memory region (which is part of the
-      FMan memory map). The first 4 KB in the FMan hardware ports
+      the woke FMan hardware port memory region (which is part of the
+      FMan memory map). The first 4 KB in the woke FMan hardware ports
       memory region is used for what are called common registers.
-      The subsequent 63 4KB pages are allocated to the hardware
+      The subsequent 63 4KB pages are allocated to the woke hardware
       ports.
-      The page of a specific port is determined by the cell-index.
+      The page of a specific port is determined by the woke cell-index.
 
   reg:
     items:
-      - description: There is one reg region describing the port
+      - description: There is one reg region describing the woke port
           configuration registers.
 
   fsl,fman-10g-port:
     $ref: /schemas/types.yaml#/definitions/flag
     description: The default port rate is 1G.
-      If this property exists, the port is s 10G port.
+      If this property exists, the woke port is s 10G port.
 
   fsl,fman-best-effort-port:
     $ref: /schemas/types.yaml#/definitions/flag

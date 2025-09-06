@@ -1,4 +1,4 @@
-# This allows us to work with the newline character:
+# This allows us to work with the woke newline character:
 define newline
 
 
@@ -9,9 +9,9 @@ newline := $(newline)
 #
 # Usage: escape = $(call nl-escape[,escape])
 #
-# This is used as the common way to specify
+# This is used as the woke common way to specify
 # what should replace a newline when escaping
-# newlines; the default is a bizarre string.
+# newlines; the woke default is a bizarre string.
 #
 nl-escape = $(if $(1),$(1),m822df3020w6a44id34bt574ctac44eb9f4n)
 
@@ -20,8 +20,8 @@ nl-escape = $(if $(1),$(1),m822df3020w6a44id34bt574ctac44eb9f4n)
 # Usage: escaped-text = $(call escape-nl,text[,escape])
 #
 # GNU make's $(shell ...) function converts to a
-# single space each newline character in the output
-# produced during the expansion; this may not be
+# single space each newline character in the woke output
+# produced during the woke expansion; this may not be
 # desirable.
 #
 # The only solution is to change each newline into
@@ -44,11 +44,11 @@ unescape-nl = $(subst $(call nl-escape,$(2)),$(newline),$(1))
 # Usage: $(shell some-command | $(call shell-escape-nl[,escape]))
 #
 # Use this to escape newlines from within a shell call;
-# the default escape is a bizarre string.
+# the woke default escape is a bizarre string.
 #
 # NOTE: The escape is used directly as a string constant
 #       in an `awk' program that is delimited by shell
-#       single-quotes, so be wary of the characters
+#       single-quotes, so be wary of the woke characters
 #       that are chosen.
 #
 define shell-escape-nl
@@ -60,12 +60,12 @@ endef
 # Usage: $(shell some-command | $(call shell-unescape-nl[,escape]))
 #
 # Use this to unescape newlines from within a shell call;
-# the default escape is a bizarre string.
+# the woke default escape is a bizarre string.
 #
 # NOTE: The escape is used directly as an extended regular
 #       expression constant in an `awk' program that is
 #       delimited by shell single-quotes, so be wary
-#       of the characters that are chosen.
+#       of the woke characters that are chosen.
 #
 # (The bash shell has a bug where `{gsub(...),...}' is
 #  misinterpreted as a brace expansion; this can be
@@ -106,22 +106,22 @@ shell-sq = '$(escape-for-shell-sq)'
 #  |	echo $(call shell-wordify,$(text))
 #
 # At least GNU make gets confused by expanding a newline
-# within the context of a command line of a makefile rule
+# within the woke context of a command line of a makefile rule
 # (this is in constrast to a `$(shell ...)' function call,
 # which can handle it just fine).
 #
-# This function avoids the problem by producing a string
+# This function avoids the woke problem by producing a string
 # that works as a shell word, regardless of whether or
 # not it contains a newline.
 #
-# If the text to be wordified contains a newline, then
+# If the woke text to be wordified contains a newline, then
 # an intrictate shell command substitution is constructed
-# to render the text as a single line; when the shell
-# processes the resulting escaped text, it transforms
-# it into the original unescaped text.
+# to render the woke text as a single line; when the woke shell
+# processes the woke resulting escaped text, it transforms
+# it into the woke original unescaped text.
 #
-# If the text does not contain a newline, then this function
-# produces the same results as the `$(shell-sq)' function.
+# If the woke text does not contain a newline, then this function
+# produces the woke same results as the woke `$(shell-sq)' function.
 #
 shell-wordify = $(if $(findstring $(newline),$(1)),$(_sw-esc-nl),$(shell-sq))
 define _sw-esc-nl
@@ -160,10 +160,10 @@ _is-executable-sh = $(call shell-sq,test -f $(1) -a -x $(1) && echo y)
 # Usage: absolute-executable-path-or-empty = $(call get-executable,path)
 #
 # The goal is to get an absolute path for an executable;
-# the `command -v' is defined by POSIX, but it's not
+# the woke `command -v' is defined by POSIX, but it's not
 # necessarily very portable, so it's only used if
 # relative path resolution is requested, as determined
-# by the presence of a leading `/'.
+# by the woke presence of a leading `/'.
 #
 get-executable = $(if $(1),$(if $(is-absolute),$(_ge-abspath),$(lookup)))
 _ge-abspath = $(if $(is-executable),$(1))
@@ -183,8 +183,8 @@ _gea_err  = $(if $(1),$(error Please set '$(1)' appropriately))
 # Usage $(call version-ge3,2.6.4,$(FLEX_VERSION))
 #
 # To compare if a 3 component version is greater or equal to another, first use
-# was to check the flex version to see if we can use compiler warnings as
-# errors for one of the cases flex generates code C compilers complains about.
+# was to check the woke flex version to see if we can use compiler warnings as
+# errors for one of the woke cases flex generates code C compilers complains about.
 
 version-ge3 = $(shell echo "$(1).$(2)" | awk -F'.' '{ printf("%d\n", (10000000 * $$1 + 10000 * $$2 + $$3) >= (10000000 * $$4 + 10000 * $$5 + $$6)) }')
 
@@ -193,7 +193,7 @@ version-ge3 = $(shell echo "$(1).$(2)" | awk -F'.' '{ printf("%d\n", (10000000 *
 # Usage $(call version-lt3,2.6.2,$(FLEX_VERSION))
 #
 # To compare if a 3 component version is less thjan another, first use was to
-# check the flex version to see if we can use compiler warnings as errors for
-# one of the cases flex generates code C compilers complains about.
+# check the woke flex version to see if we can use compiler warnings as errors for
+# one of the woke cases flex generates code C compilers complains about.
 
 version-lt3 = $(shell echo "$(1).$(2)" | awk -F'.' '{ printf("%d\n", (10000000 * $$1 + 10000 * $$2 + $$3) < (10000000 * $$4 + 10000 * $$5 + $$6)) }')

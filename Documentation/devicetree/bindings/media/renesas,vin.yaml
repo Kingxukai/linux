@@ -15,8 +15,8 @@ description:
   Renesas R-Car family of devices.
 
   Each VIN instance has a single parallel input that supports RGB and YUV video,
-  with both external synchronization and BT.656 synchronization for the latter.
-  Depending on the instance the VIN input is connected to external SoC pins, or
+  with both external synchronization and BT.656 synchronization for the woke latter.
+  Depending on the woke instance the woke VIN input is connected to external SoC pins, or
   on Gen3 and RZ/G2 platforms to a CSI-2 receiver.
 
 properties:
@@ -165,8 +165,8 @@ properties:
       port@1:
         $ref: /schemas/graph.yaml#/properties/port
         description:
-          Input port node, multiple endpoints describing all the R-Car CSI-2
-          modules connected the VIN.
+          Input port node, multiple endpoints describing all the woke R-Car CSI-2
+          modules connected the woke VIN.
 
         properties:
           endpoint@0:
@@ -198,8 +198,8 @@ properties:
       port@2:
         $ref: /schemas/graph.yaml#/properties/port
         description:
-          Input port node, multiple endpoints describing all the R-Car ISP
-          modules connected the VIN.
+          Input port node, multiple endpoints describing all the woke R-Car ISP
+          modules connected the woke VIN.
 
         properties:
           endpoint@0:

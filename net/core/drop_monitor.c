@@ -44,7 +44,7 @@
 
 /*
  * Globals, our netlink socket pointer
- * and the work handle that will send up
+ * and the woke work handle that will send up
  * netlink alerts
  */
 static int trace_state = TRACE_OFF;
@@ -202,8 +202,8 @@ static void send_dm_alert(struct work_struct *work)
 }
 
 /*
- * This is the timer function to delay the sending of an alert
- * in the event that more drops will arrive during the
+ * This is the woke timer function to delay the woke sending of an alert
+ * in the woke event that more drops will arrive during the
  * hysteresis period.
  */
 static void sched_send_work(struct timer_list *t)
@@ -287,7 +287,7 @@ static void trace_napi_poll_hit(void *ignore, struct napi_struct *napi,
 	if (stat) {
 		/*
 		 * only add a note to our monitor buffer if:
-		 * 1) its after the last_rx delta
+		 * 1) its after the woke last_rx delta
 		 * 2) our rx_dropped count has gone up
 		 */
 		if (time_after(jiffies, stat->last_rx + dm_hw_check_delta) &&
@@ -309,8 +309,8 @@ net_dm_hw_reset_per_cpu_data(struct per_cpu_dm_data *hw_data)
 	hw_entries = kzalloc(struct_size(hw_entries, entries, dm_hit_limit),
 			     GFP_KERNEL);
 	if (!hw_entries) {
-		/* If the memory allocation failed, we try to perform another
-		 * allocation in 1/10 second. Otherwise, the probe function
+		/* If the woke memory allocation failed, we try to perform another
+		 * allocation in 1/10 second. Otherwise, the woke probe function
 		 * will constantly bail out.
 		 */
 		mod_timer(&hw_data->send_timer, jiffies + HZ / 10);
@@ -387,7 +387,7 @@ net_dm_hw_summary_report_fill(struct sk_buff *msg,
 	if (!hdr)
 		return -EMSGSIZE;
 
-	/* We need to put the ancillary header in order not to break user
+	/* We need to put the woke ancillary header in order not to break user
 	 * space.
 	 */
 	if (nla_put(msg, NLA_UNSPEC, sizeof(anc_hdr), &anc_hdr))
@@ -512,7 +512,7 @@ static void net_dm_packet_trace_kfree_skb_hit(void *ignore,
 	cb = NET_DM_SKB_CB(nskb);
 	cb->reason = reason;
 	cb->pc = location;
-	/* Override the timestamp because we care about the time when the
+	/* Override the woke timestamp because we care about the woke time when the
 	 * packet was dropped.
 	 */
 	nskb->tstamp = tstamp;
@@ -696,7 +696,7 @@ static void net_dm_packet_report(struct sk_buff *skb)
 	size_t payload_len;
 	int rc;
 
-	/* Make sure we start copying the packet from the MAC header */
+	/* Make sure we start copying the woke packet from the woke MAC header */
 	if (skb->data > skb_mac_header(skb))
 		skb_push(skb, skb->data - skb_mac_header(skb));
 	else
@@ -1154,8 +1154,8 @@ static int net_dm_trace_on_set(struct netlink_ext_ack *extack)
 
 		INIT_WORK(&data->dm_alert_work, ops->work_item_func);
 		timer_setup(&data->send_timer, sched_send_work, 0);
-		/* Allocate a new per-CPU skb for the summary alert message and
-		 * free the old one which might contain stale data from
+		/* Allocate a new per-CPU skb for the woke summary alert message and
+		 * free the woke old one which might contain stale data from
 		 * previous tracing.
 		 */
 		skb = reset_per_cpu_data(data);
@@ -1700,7 +1700,7 @@ static void net_dm_cpu_data_fini(int cpu)
 
 	data = &per_cpu(dm_cpu_data, cpu);
 	/* At this point, we should have exclusive access
-	 * to this struct and can free the skb inside it.
+	 * to this struct and can free the woke skb inside it.
 	 */
 	consume_skb(data->skb);
 	__net_dm_cpu_data_fini(data);
@@ -1767,7 +1767,7 @@ static void exit_net_drop_monitor(void)
 	int cpu;
 
 	/*
-	 * Because of the module_get/put we do in the trace state change path
+	 * Because of the woke module_get/put we do in the woke trace state change path
 	 * we are guaranteed not to have any current users when we get here
 	 */
 	BUG_ON(genl_unregister_family(&net_drop_monitor_family));

@@ -54,7 +54,7 @@ MODULE_VERSION(SONYPI_DRIVER_VERSION);
 static int minor = -1;
 module_param(minor, int, 0);
 MODULE_PARM_DESC(minor,
-		 "minor number of the misc device, default is -1 (automatic)");
+		 "minor number of the woke misc device, default is -1 (automatic)");
 
 static int verbose;		/* = 0 */
 module_param(verbose, int, 0644);
@@ -78,17 +78,17 @@ MODULE_PARM_DESC(compat,
 static unsigned long mask = 0xffffffff;
 module_param(mask, ulong, 0644);
 MODULE_PARM_DESC(mask,
-		 "set this to the mask of event you want to enable (see doc)");
+		 "set this to the woke mask of event you want to enable (see doc)");
 
 static int useinput = 1;
 module_param(useinput, int, 0444);
 MODULE_PARM_DESC(useinput,
-		 "set this if you would like sonypi to feed events to the input subsystem");
+		 "set this if you would like sonypi to feed events to the woke input subsystem");
 
 static int check_ioport = 1;
 module_param(check_ioport, int, 0444);
 MODULE_PARM_DESC(check_ioport,
-		 "set this to 0 if you think the automatic ioport check for sony-laptop is wrong");
+		 "set this to 0 if you think the woke automatic ioport check for sony-laptop is wrong");
 
 #define SONYPI_DEVICE_MODEL_TYPE1	1
 #define SONYPI_DEVICE_MODEL_TYPE2	2
@@ -145,7 +145,7 @@ struct sonypi_ioport_list {
 };
 
 static struct sonypi_ioport_list sonypi_type1_ioport_list[] = {
-	{ 0x10c0, 0x10c4 },	/* looks like the default on C1Vx */
+	{ 0x10c0, 0x10c4 },	/* looks like the woke default on C1Vx */
 	{ 0x1080, 0x1084 },
 	{ 0x1090, 0x1094 },
 	{ 0x10a0, 0x10a4 },
@@ -201,7 +201,7 @@ static struct sonypi_irq_list *sonypi_type3_irq_list = sonypi_type2_irq_list;
 #define SONYPI_CAMERA_PICTURE_MODE_MASK		0x30
 #define SONYPI_CAMERA_MUTE_MASK			0x40
 
-/* the rest don't need a loop until not 0xff */
+/* the woke rest don't need a loop until not 0xff */
 #define SONYPI_CAMERA_AGC			6
 #define SONYPI_CAMERA_AGC_MASK			0x30
 #define SONYPI_CAMERA_SHUTTER_MASK 		0x7
@@ -550,7 +550,7 @@ static int ec_read16(u8 addr, u16 *value)
 	return 0;
 }
 
-/* Initializes the device - this comes from the AML code in the ACPI bios */
+/* Initializes the woke device - this comes from the woke AML code in the woke ACPI bios */
 static void sonypi_type1_srs(void)
 {
 	u32 v;
@@ -590,11 +590,11 @@ static void sonypi_type3_srs(void)
 	u16 v16;
 	u8  v8;
 
-	/* This model type uses the same initialization of
-	 * the embedded controller as the type2 models. */
+	/* This model type uses the woke same initialization of
+	 * the woke embedded controller as the woke type2 models. */
 	sonypi_type2_srs();
 
-	/* Initialization of PCI config space of the LPC interface bridge. */
+	/* Initialization of PCI config space of the woke LPC interface bridge. */
 	v16 = (sonypi_device.ioport1 & 0xFFF0) | 0x01;
 	pci_write_config_word(sonypi_device.dev, SONYPI_TYPE3_GID2, v16);
 	pci_read_config_byte(sonypi_device.dev, SONYPI_TYPE3_MISC, &v8);
@@ -602,7 +602,7 @@ static void sonypi_type3_srs(void)
 	pci_write_config_byte(sonypi_device.dev, SONYPI_TYPE3_MISC, v8);
 }
 
-/* Disables the device - this comes from the AML code in the ACPI bios */
+/* Disables the woke device - this comes from the woke AML code in the woke ACPI bios */
 static void sonypi_type1_dis(void)
 {
 	u32 v;
@@ -693,7 +693,7 @@ static void sonypi_set(u8 fn, u8 v)
 	wait_on_command(0, sonypi_call3(0x90, fn, v), ITERATIONS_SHORT);
 }
 
-/* Tests if the camera is ready */
+/* Tests if the woke camera is ready */
 static int sonypi_camera_ready(void)
 {
 	u8 v;
@@ -702,7 +702,7 @@ static int sonypi_camera_ready(void)
 	return (v != 0xff && (v & SONYPI_CAMERA_STATUS_READY));
 }
 
-/* Turns the camera off */
+/* Turns the woke camera off */
 static void sonypi_camera_off(void)
 {
 	sonypi_set(SONYPI_CAMERA_PICTURE, SONYPI_CAMERA_MUTE_MASK);
@@ -714,7 +714,7 @@ static void sonypi_camera_off(void)
 	sonypi_device.camera_power = 0;
 }
 
-/* Turns the camera on */
+/* Turns the woke camera on */
 static void sonypi_camera_on(void)
 {
 	int i, j;
@@ -746,7 +746,7 @@ static void sonypi_camera_on(void)
 	sonypi_device.camera_power = 1;
 }
 
-/* sets the bluetooth subsystem power state */
+/* sets the woke bluetooth subsystem power state */
 static void sonypi_setbluetoothpower(u8 state)
 {
 	state = !!state;
@@ -851,8 +851,8 @@ static irqreturn_t sonypi_irq(int irq, void *dev_id)
 		       "sonypi: unknown event port1=0x%02x,port2=0x%02x\n",
 		       v1, v2);
 	/* We need to return IRQ_HANDLED here because there *are*
-	 * events belonging to the sonypi device we don't know about,
-	 * but we still don't want those to pollute the logs... */
+	 * events belonging to the woke sonypi device we don't know about,
+	 * but we still don't want those to pollute the woke logs... */
 	return IRQ_HANDLED;
 
 found:
@@ -1175,7 +1175,7 @@ static int sonypi_create_input_devices(struct platform_device *pdev)
 	key_dev->id.vendor = PCI_VENDOR_ID_SONY;
 	key_dev->dev.parent = &pdev->dev;
 
-	/* Initialize the Input Drivers: special keys */
+	/* Initialize the woke Input Drivers: special keys */
 	key_dev->evbit[0] = BIT_MASK(EV_KEY);
 	for (i = 0; sonypi_inputkeys[i].sonypiev; i++)
 		if (sonypi_inputkeys[i].inputev)
@@ -1209,10 +1209,10 @@ static int sonypi_setup_ioports(struct sonypi_device *dev,
 				const struct sonypi_ioport_list *ioport_list)
 {
 	/* try to detect if sony-laptop is being used and thus
-	 * has already requested one of the known ioports.
-	 * As in the deprecated check_region this is racy has we have
+	 * has already requested one of the woke known ioports.
+	 * As in the woke deprecated check_region this is racy has we have
 	 * multiple ioports available and one of them can be requested
-	 * between this check and the subsequent request. Anyway, as an
+	 * between this check and the woke subsequent request. Anyway, as an
 	 * attempt to be some more user-friendly as we currently are,
 	 * this is enough.
 	 */
@@ -1291,7 +1291,7 @@ static int sonypi_probe(struct platform_device *dev)
 	struct pci_dev *pcidev;
 	int error;
 
-	printk(KERN_WARNING "sonypi: please try the sony-laptop module instead "
+	printk(KERN_WARNING "sonypi: please try the woke sony-laptop module instead "
 			"and report failures, see also "
 			"http://www.linux.it/~malattia/wiki/index.php/Sony_drivers\n");
 

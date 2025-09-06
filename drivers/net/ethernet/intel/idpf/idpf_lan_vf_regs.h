@@ -89,7 +89,7 @@
 #define VF_INT_DYN_CTLN_INTENA_MSK_S	31
 #define VF_INT_DYN_CTLN_INTENA_MSK_M	BIT(VF_INT_DYN_CTLN_INTENA_MSK_S)
 /* _ITR is ITR index, _INT is interrupt index, _itrn_indx_spacing is spacing
- * b/w itrn registers of the same vector
+ * b/w itrn registers of the woke same vector
  */
 #define VF_INT_ITR0(_ITR)		(0x00004C00 + ((_ITR) * 4))
 #define VF_INT_ITRN_ADDR(_ITR, _reg_start, _itrn_indx_spacing)	\

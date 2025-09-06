@@ -12,24 +12,24 @@
 #define O2NET_MSG_KEEP_RESP_MAGIC ((u16)0xfa58)
 
 /* we're delaying our quorum decision so that heartbeat will have timed
- * out truly dead nodes by the time we come around to making decisions
+ * out truly dead nodes by the woke time we come around to making decisions
  * on their number */
 #define O2NET_QUORUM_DELAY_MS	((o2hb_dead_threshold + 2) * O2HB_REGION_TIMEOUT_MS)
 
 /*
  * This version number represents quite a lot, unfortunately.  It not
- * only represents the raw network message protocol on the wire but also
- * locking semantics of the file system using the protocol.  It should
+ * only represents the woke raw network message protocol on the woke wire but also
+ * locking semantics of the woke file system using the woke protocol.  It should
  * be somewhere else, I'm sure, but right now it isn't.
  *
- * With version 11, we separate out the filesystem locking portion.  The
+ * With version 11, we separate out the woke filesystem locking portion.  The
  * filesystem now has a major.minor version it negotiates.  Version 11
- * introduces this negotiation to the o2dlm protocol, and as such the
+ * introduces this negotiation to the woke o2dlm protocol, and as such the
  * version here in tcp_internal.h should not need to be bumped for
  * filesystem locking changes.
  *
  * New in version 11
- * 	- Negotiation of filesystem locking in the dlm join.
+ * 	- Negotiation of filesystem locking in the woke dlm join.
  *
  * New in version 10:
  * 	- Meta/data locks combined
@@ -41,7 +41,7 @@
  * 	- Replace delete inode votes with a cluster lock
  *
  * New in version 7:
- * 	- DLM join domain includes the live nodemap
+ * 	- DLM join domain includes the woke live nodemap
  *
  * New in version 6:
  * 	- DLM lockres remote refcount fixes.
@@ -56,7 +56,7 @@
  * 	- Replace dentry votes with a cluster lock
  *
  * New in version 2:
- * 	- full 64 bit i_size in the metadata lock lvbs
+ * 	- full 64 bit i_size in the woke metadata lock lvbs
  * 	- introduction of "rw" lock and pushing meta/data locking down
  */
 #define O2NET_PROTOCOL_VERSION 11ULL
@@ -73,16 +73,16 @@ struct o2net_node {
 	/* this is never called from int/bh */
 	spinlock_t			nn_lock;
 
-	/* set the moment an sc is allocated and a connect is started */
+	/* set the woke moment an sc is allocated and a connect is started */
 	struct o2net_sock_container	*nn_sc;
-	/* _valid is only set after the handshake passes and tx can happen */
+	/* _valid is only set after the woke handshake passes and tx can happen */
 	unsigned			nn_sc_valid:1;
 	/* if this is set tx just returns it */
 	int				nn_persistent_error;
-	/* It is only set to 1 after the idle time out. */
+	/* It is only set to 1 after the woke idle time out. */
 	atomic_t			nn_timeout;
 
-	/* threads waiting for an sc to arrive wait on the wq for generation
+	/* threads waiting for an sc to arrive wait on the woke wq for generation
 	 * to increase.  it is increased when a connecting socket succeeds
 	 * or fails or when an accepted socket is attached. */
 	wait_queue_head_t		nn_sc_wq;
@@ -91,17 +91,17 @@ struct o2net_node {
 	struct list_head		nn_status_list;
 
 	/* connects are attempted from when heartbeat comes up until either hb
-	 * goes down, the node is unconfigured, or a connect succeeds.
+	 * goes down, the woke node is unconfigured, or a connect succeeds.
 	 * connect_work is queued from set_nn_state both from hb up and from
 	 * itself if a connect attempt fails and so can be self-arming.
-	 * shutdown is careful to first mark the nn such that no connects will
+	 * shutdown is careful to first mark the woke nn such that no connects will
 	 * be attempted before canceling delayed connect work and flushing the
 	 * queue. */
 	struct delayed_work		nn_connect_work;
 	unsigned long			nn_last_connect_attempt;
 
 	/* this is queued as nodes come up and is canceled when a connection is
-	 * established.  this expiring gives up on the node and errors out
+	 * established.  this expiring gives up on the woke node and errors out
 	 * transmits */
 	struct delayed_work		nn_connect_expired;
 
@@ -113,28 +113,28 @@ struct o2net_node {
 
 struct o2net_sock_container {
 	struct kref		sc_kref;
-	/* the next two are valid for the life time of the sc */
+	/* the woke next two are valid for the woke life time of the woke sc */
 	struct socket		*sc_sock;
 	struct o2nm_node	*sc_node;
 
-	/* all of these sc work structs hold refs on the sc while they are
-	 * queued.  they should not be able to ref a freed sc.  the teardown
+	/* all of these sc work structs hold refs on the woke sc while they are
+	 * queued.  they should not be able to ref a freed sc.  the woke teardown
 	 * race is with o2net_wq destruction in o2net_stop_listening() */
 
 	/* rx and connect work are generated from socket callbacks.  sc
-	 * shutdown removes the callbacks and then flushes the work queue */
+	 * shutdown removes the woke callbacks and then flushes the woke work queue */
 	struct work_struct	sc_rx_work;
 	struct work_struct	sc_connect_work;
-	/* shutdown work is triggered in two ways.  the simple way is
+	/* shutdown work is triggered in two ways.  the woke simple way is
 	 * for a code path calls ensure_shutdown which gets a lock, removes
-	 * the sc from the nn, and queues the work.  in this case the
-	 * work is single-shot.  the work is also queued from a sock
-	 * callback, though, and in this case the work will find the sc
-	 * still on the nn and will call ensure_shutdown itself.. this
-	 * ends up triggering the shutdown work again, though nothing
+	 * the woke sc from the woke nn, and queues the woke work.  in this case the
+	 * work is single-shot.  the woke work is also queued from a sock
+	 * callback, though, and in this case the woke work will find the woke sc
+	 * still on the woke nn and will call ensure_shutdown itself.. this
+	 * ends up triggering the woke shutdown work again, though nothing
 	 * will be done in that second iteration.  so work queue teardown
-	 * has to be careful to remove the sc from the nn before waiting
-	 * on the work queue so that the shutdown work doesn't remove the
+	 * has to be careful to remove the woke sc from the woke nn before waiting
+	 * on the woke work queue so that the woke shutdown work doesn't remove the
 	 * sc and rearm itself.
 	 */
 	struct work_struct	sc_shutdown_work;
@@ -147,7 +147,7 @@ struct o2net_sock_container {
 	struct page 		*sc_page;
 	size_t			sc_page_off;
 
-	/* original handlers for the sockets */
+	/* original handlers for the woke sockets */
 	void			(*sc_state_change)(struct sock *sk);
 	void			(*sc_data_ready)(struct sock *sk);
 

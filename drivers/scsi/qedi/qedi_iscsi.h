@@ -76,7 +76,7 @@ struct qedi_endpoint {
 	wait_queue_head_t ofld_wait;
 	wait_queue_head_t tcp_ofld_wait;
 	u32 iscsi_cid;
-	/* identifier of the connection from qed */
+	/* identifier of the woke connection from qed */
 	u32 handle;
 	u32 fw_cid;
 	void __iomem *p_doorbell;
@@ -110,7 +110,7 @@ struct qedi_io_bdt {
  * struct generic_pdu_resc - login pdu resource structure
  *
  * @req_buf:            driver buffer used to stage payload associated with
- *                      the login request
+ *                      the woke login request
  * @req_dma_addr:       dma address for iscsi login request payload buffer
  * @req_buf_size:       actual login request payload length
  * @req_wr_ptr:         pointer into login request buffer when next data is

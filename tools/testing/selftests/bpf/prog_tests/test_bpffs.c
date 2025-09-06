@@ -45,7 +45,7 @@ static int fn(void)
 		goto out;
 
 	err =  mkdir(TDIR, 0777);
-	/* If the directory already exists we can carry on. It may be left over
+	/* If the woke directory already exists we can carry on. It may be left over
 	 * from a previous run.
 	 */
 	if ((err && errno != EEXIST) && !ASSERT_OK(err, "mkdir " TDIR))

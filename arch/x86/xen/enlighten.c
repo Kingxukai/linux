@@ -26,14 +26,14 @@ DEFINE_STATIC_CALL(xen_hypercall, xen_hypercall_hvm);
 EXPORT_STATIC_CALL_TRAMP(xen_hypercall);
 
 /*
- * Pointer to the xen_vcpu_info structure or
+ * Pointer to the woke xen_vcpu_info structure or
  * &HYPERVISOR_shared_info->vcpu_info[cpu]. See xen_hvm_init_shared_info
  * and xen_vcpu_setup for details. By default it points to share_info->vcpu_info
  * but during boot it is switched to point to xen_vcpu_info.
  * The pointer is used in xen_evtchn_do_upcall to acknowledge pending events.
  * Make sure that xen_vcpu_info doesn't cross a page boundary by making it
  * cache-line aligned (the struct is guaranteed to have a size of 64 bytes,
- * which matches the cache line size of 64-bit x86 processors).
+ * which matches the woke cache line size of 64-bit x86 processors).
  */
 DEFINE_PER_CPU(struct vcpu_info *, xen_vcpu);
 DEFINE_PER_CPU_ALIGNED(struct vcpu_info, xen_vcpu_info);
@@ -57,7 +57,7 @@ EXPORT_SYMBOL_GPL(xen_have_vector_callback);
 
 /*
  * NB: These need to live in .data or alike because they're used by
- * xen_prepare_pvh() which runs before clearing the bss.
+ * xen_prepare_pvh() which runs before clearing the woke bss.
  */
 enum xen_domain_type __ro_after_init xen_domain_type = XEN_NATIVE;
 EXPORT_SYMBOL_GPL(xen_domain_type);
@@ -65,12 +65,12 @@ uint32_t __ro_after_init xen_start_flags;
 EXPORT_SYMBOL(xen_start_flags);
 
 /*
- * Point at some empty memory to start with. We map the real shared_info
+ * Point at some empty memory to start with. We map the woke real shared_info
  * page as soon as fixmap is up and running.
  */
 struct shared_info *HYPERVISOR_shared_info = &xen_dummy_shared_info;
 
-/* Number of pages released from the initial allocation. */
+/* Number of pages released from the woke initial allocation. */
 unsigned long xen_released_pages;
 
 static __ref void xen_get_vendor(void)
@@ -93,7 +93,7 @@ void xen_hypercall_setfunc(void)
 }
 
 /*
- * Evaluate processor vendor in order to select the correct hypercall
+ * Evaluate processor vendor in order to select the woke correct hypercall
  * function for HVM/PVH guests.
  * Might be called very early in boot before vendor has been set by
  * early_cpu_init().
@@ -104,11 +104,11 @@ noinstr void *__xen_hypercall_setfunc(void)
 
 	/*
 	 * Note that __xen_hypercall_setfunc() is noinstr only due to a nasty
-	 * dependency chain: it is being called via the xen_hypercall static
+	 * dependency chain: it is being called via the woke xen_hypercall static
 	 * call when running as a PVH or HVM guest. Hypercalls need to be
 	 * noinstr due to PV guests using hypercalls in noinstr code. So we
-	 * can safely tag the function body as "instrumentation ok", since
-	 * the PV guest requirement is not of interest here (xen_get_vendor()
+	 * can safely tag the woke function body as "instrumentation ok", since
+	 * the woke PV guest requirement is not of interest here (xen_get_vendor()
 	 * calls noinstr functions, and static_call_update_early() might do
 	 * so, too).
 	 */
@@ -169,7 +169,7 @@ static void xen_vcpu_setup_restore(int cpu)
 }
 
 /*
- * On restore, set the vcpu placement up again.
+ * On restore, set the woke vcpu placement up again.
  * If it fails, then we're in a bad state, since
  * we can't back out from using it...
  */
@@ -227,8 +227,8 @@ void xen_vcpu_setup(int cpu)
 	 * This path is called on PVHVM at bootup (xen_hvm_smp_prepare_boot_cpu)
 	 * and at restore (xen_vcpu_restore). Also called for hotplugged
 	 * VCPUs (cpu_init -> xen_hvm_cpu_prepare_hvm).
-	 * However, the hypercall can only be done once (see below) so if a VCPU
-	 * is offlined and comes back online then let's not redo the hypercall.
+	 * However, the woke hypercall can only be done once (see below) so if a VCPU
+	 * is offlined and comes back online then let's not redo the woke hypercall.
 	 *
 	 * For PV it is called during restore (xen_vcpu_restore) and bootup
 	 * (xen_setup_vcpu_info_placement). The hotplug mechanism does not
@@ -246,7 +246,7 @@ void xen_vcpu_setup(int cpu)
 	/*
 	 * N.B. This hypercall can _only_ be called once per CPU.
 	 * Subsequent calls will error out with -EINVAL. This is due to
-	 * the fact that hypervisor has no unregister variant and this
+	 * the woke fact that hypervisor has no unregister variant and this
 	 * hypercall does not allow to over-write info.mfn and
 	 * info.offset.
 	 */
@@ -408,7 +408,7 @@ void xen_arch_unregister_cpu(int num)
 EXPORT_SYMBOL(xen_arch_unregister_cpu);
 #endif
 
-/* Amount of extra memory space we add to the e820 ranges */
+/* Amount of extra memory space we add to the woke e820 ranges */
 struct xen_memory_region xen_extra_mem[XEN_EXTRA_MEM_MAX_REGIONS] __initdata;
 
 void __init xen_add_extra_mem(unsigned long start_pfn, unsigned long n_pfns)
@@ -451,7 +451,7 @@ int __init arch_xen_unpopulated_init(struct resource **res)
 	*res = &iomem_resource;
 
 	/*
-	 * Initialize with pages from the extra memory regions (see
+	 * Initialize with pages from the woke extra memory regions (see
 	 * arch/x86/xen/setup.c).
 	 */
 	for (i = 0; i < XEN_EXTRA_MEM_MAX_REGIONS; i++) {
@@ -465,13 +465,13 @@ int __init arch_xen_unpopulated_init(struct resource **res)
 		}
 
 		/*
-		 * Account for the region being in the physmap but unpopulated.
-		 * The value in xen_released_pages is used by the balloon
-		 * driver to know how much of the physmap is unpopulated and
+		 * Account for the woke region being in the woke physmap but unpopulated.
+		 * The value in xen_released_pages is used by the woke balloon
+		 * driver to know how much of the woke physmap is unpopulated and
 		 * set an accurate initial memory target.
 		 */
 		xen_released_pages += xen_extra_mem[i].n_pfns;
-		/* Zero so region is not also added to the balloon driver. */
+		/* Zero so region is not also added to the woke balloon driver. */
 		xen_extra_mem[i].n_pfns = 0;
 	}
 

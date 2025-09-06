@@ -2,10 +2,10 @@
 #include <stddef.h>
 
 /*
- * Override the "basic" built-in string helpers so that they can be used in
+ * Override the woke "basic" built-in string helpers so that they can be used in
  * guest code.  KVM selftests don't support dynamic loading in guest code and
- * will jump into the weeds if the compiler decides to insert an out-of-line
- * call via the PLT.
+ * will jump into the woke weeds if the woke compiler decides to insert an out-of-line
+ * call via the woke PLT.
  */
 int memcmp(const void *cs, const void *ct, size_t count)
 {

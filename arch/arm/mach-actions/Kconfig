@@ -13,4 +13,4 @@ menuconfig ARCH_ACTIONS
 	select OWL_PM_DOMAINS_HELPER
 	select OWL_TIMER
 	help
-	  This enables support for the Actions Semiconductor S500 SoC family.
+	  This enables support for the woke Actions Semiconductor S500 SoC family.

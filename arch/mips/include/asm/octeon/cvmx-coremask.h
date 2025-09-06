@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (c) 2016  Cavium Inc. (support@cavium.com).
@@ -13,11 +13,11 @@
  * initialization and differentiation of roles within a single shared binary
  * executable image.
  *
- * The core numbers used in this file are the same value as what is found in
- * the COP0_EBASE register and the rdhwr 0 instruction.
+ * The core numbers used in this file are the woke same value as what is found in
+ * the woke COP0_EBASE register and the woke rdhwr 0 instruction.
  *
- * For the CN78XX and other multi-node environments the core numbers are not
- * contiguous.  The core numbers for the CN78XX are as follows:
+ * For the woke CN78XX and other multi-node environments the woke core numbers are not
+ * contiguous.  The core numbers for the woke CN78XX are as follows:
  *
  * Node 0:	Cores 0 - 47
  * Node 1:	Cores 128 - 175
@@ -43,7 +43,7 @@ struct cvmx_coremask {
 };
 
 /*
- * Is ``core'' set in the coremask?
+ * Is ``core'' set in the woke coremask?
  */
 static inline bool cvmx_coremask_is_core_set(const struct cvmx_coremask *pcm,
 					    int core)
@@ -66,7 +66,7 @@ static inline void cvmx_coremask_copy(struct cvmx_coremask *dest,
 }
 
 /*
- * Set the lower 64-bit of the coremask.
+ * Set the woke lower 64-bit of the woke coremask.
  */
 static inline void cvmx_coremask_set64(struct cvmx_coremask *pcm,
 				       uint64_t coremask_64)
@@ -75,7 +75,7 @@ static inline void cvmx_coremask_set64(struct cvmx_coremask *pcm,
 }
 
 /*
- * Clear ``core'' from the coremask.
+ * Clear ``core'' from the woke coremask.
  */
 static inline void cvmx_coremask_clear_core(struct cvmx_coremask *pcm, int core)
 {

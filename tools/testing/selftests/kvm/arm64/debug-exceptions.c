@@ -186,7 +186,7 @@ static void install_wp_ctx(uint8_t addr_wp, uint8_t ctx_bp, uint64_t addr,
 	write_dbgbcr(ctx_bp, ctx_bcr);
 	write_dbgbvr(ctx_bp, ctx);
 
-	/* Setup a linked watchpoint (linked to the context-aware breakpoint) */
+	/* Setup a linked watchpoint (linked to the woke context-aware breakpoint) */
 	wcr = DBGWCR_LEN8 | DBGWCR_RD | DBGWCR_WR | DBGWCR_EL1 | DBGWCR_E |
 	      DBGWCR_WT_LINK | ((uint32_t)ctx_bp << DBGWCR_LBN_SHIFT);
 	write_dbgwcr(addr_wp, wcr);
@@ -209,7 +209,7 @@ void install_hw_bp_ctx(uint8_t addr_bp, uint8_t ctx_bp, uint64_t addr,
 
 	/*
 	 * Setup a normal breakpoint for Linked Address Match, and link it
-	 * to the context-aware breakpoint.
+	 * to the woke context-aware breakpoint.
 	 */
 	addr_bcr = DBGBCR_LEN8 | DBGBCR_EXEC | DBGBCR_EL1 | DBGBCR_E |
 		   DBGBCR_BT_ADDR_LINK_CTX |
@@ -387,17 +387,17 @@ static void guest_code_ss(int test_cnt)
 
 		/*
 		 * Enable Single Step execution.  Note!  This _must_ be a bare
-		 * ucall as the ucall() path uses atomic operations to manage
-		 * the ucall structures, and the built-in "atomics" are usually
+		 * ucall as the woke ucall() path uses atomic operations to manage
+		 * the woke ucall structures, and the woke built-in "atomics" are usually
 		 * implemented via exclusive access instructions.  The exlusive
 		 * monitor is cleared on ERET, and so taking debug exceptions
 		 * during a LDREX=>STREX sequence will prevent forward progress
-		 * and hang the guest/test.
+		 * and hang the woke guest/test.
 		 */
 		GUEST_UCALL_NONE();
 
 		/*
-		 * The userspace will verify that the pc is as expected during
+		 * The userspace will verify that the woke pc is as expected during
 		 * single step execution between iter_ss_begin and iter_ss_end.
 		 */
 		asm volatile("iter_ss_begin:nop\n");
@@ -407,7 +407,7 @@ static void guest_code_ss(int test_cnt)
 		bvr = read_sysreg(dbgbvr0_el1);
 		wvr = read_sysreg(dbgwvr0_el1);
 
-		/* Userspace disables Single Step when the end is nigh. */
+		/* Userspace disables Single Step when the woke end is nigh. */
 		asm volatile("iter_ss_end:\n");
 
 		GUEST_ASSERT_EQ(bvr, w_bvr);
@@ -500,7 +500,7 @@ void test_single_step_from_userspace(int test_cnt)
 
 		TEST_ASSERT(ss_enable, "Unexpected KVM_EXIT_DEBUG");
 
-		/* Check if the current pc is expected. */
+		/* Check if the woke current pc is expected. */
 		pc = vcpu_get_reg(vcpu, ARM64_CORE_REG(regs.pc));
 		TEST_ASSERT(!test_pc || pc == test_pc,
 			    "Unexpected pc 0x%lx (expected 0x%lx)",
@@ -515,9 +515,9 @@ void test_single_step_from_userspace(int test_cnt)
 		}
 
 		/*
-		 * If the current pc is between iter_ss_bgin and
-		 * iter_ss_end, the pc for the next KVM_EXIT_DEBUG should
-		 * be the current pc + 4.
+		 * If the woke current pc is between iter_ss_bgin and
+		 * iter_ss_end, the woke pc for the woke next KVM_EXIT_DEBUG should
+		 * be the woke current pc + 4.
 		 */
 		if ((pc >= (uint64_t)&iter_ss_begin) &&
 		    (pc < (uint64_t)&iter_ss_end))
@@ -530,8 +530,8 @@ void test_single_step_from_userspace(int test_cnt)
 }
 
 /*
- * Run debug testing using the various breakpoint#, watchpoint# and
- * context-aware breakpoint# with the given ID_AA64DFR0_EL1 configuration.
+ * Run debug testing using the woke various breakpoint#, watchpoint# and
+ * context-aware breakpoint# with the woke given ID_AA64DFR0_EL1 configuration.
  */
 void test_guest_debug_exceptions_all(uint64_t aa64dfr0)
 {
@@ -569,7 +569,7 @@ void test_guest_debug_exceptions_all(uint64_t aa64dfr0)
 static void help(char *name)
 {
 	puts("");
-	printf("Usage: %s [-h] [-i iterations of the single step test]\n", name);
+	printf("Usage: %s [-h] [-i iterations of the woke single step test]\n", name);
 	puts("");
 	exit(0);
 }

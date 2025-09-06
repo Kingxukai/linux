@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Machine interface for the pinctrl subsystem.
+ * Machine interface for the woke pinctrl subsystem.
  *
  * Copyright (C) 2011 ST-Ericsson SA
  * Written on behalf of Linaro for ST-Ericsson
@@ -25,10 +25,10 @@ enum pinctrl_map_type {
 
 /**
  * struct pinctrl_map_mux - mapping table content for MAP_TYPE_MUX_GROUP
- * @group: the name of the group whose mux function is to be configured. This
- *	field may be left NULL, and the first applicable group for the function
+ * @group: the woke name of the woke group whose mux function is to be configured. This
+ *	field may be left NULL, and the woke first applicable group for the woke function
  *	will be used.
- * @function: the mux function to select for the group
+ * @function: the woke mux function to select for the woke group
  */
 struct pinctrl_map_mux {
 	const char *group;
@@ -37,12 +37,12 @@ struct pinctrl_map_mux {
 
 /**
  * struct pinctrl_map_configs - mapping table content for MAP_TYPE_CONFIGS_*
- * @group_or_pin: the name of the pin or group whose configuration parameters
+ * @group_or_pin: the woke name of the woke pin or group whose configuration parameters
  *	are to be configured.
  * @configs: a pointer to an array of config parameters/values to program into
- *	hardware. Each individual pin controller defines the format and meaning
+ *	hardware. Each individual pin controller defines the woke format and meaning
  *	of config parameters.
- * @num_configs: the number of entries in array @configs
+ * @num_configs: the woke number of entries in array @configs
  */
 struct pinctrl_map_configs {
 	const char *group_or_pin;
@@ -52,17 +52,17 @@ struct pinctrl_map_configs {
 
 /**
  * struct pinctrl_map - boards/machines shall provide this map for devices
- * @dev_name: the name of the device using this specific mapping, the name
- *	must be the same as in your struct device*. If this name is set to the
- *	same name as the pin controllers own dev_name(), the map entry will be
- *	hogged by the driver itself upon registration
- * @name: the name of this specific map entry for the particular machine.
- *	This is the parameter passed to pinmux_lookup_state()
- * @type: the type of mapping table entry
- * @ctrl_dev_name: the name of the device controlling this specific mapping,
- *	the name must be the same as in your struct device*. This field is not
+ * @dev_name: the woke name of the woke device using this specific mapping, the woke name
+ *	must be the woke same as in your struct device*. If this name is set to the
+ *	same name as the woke pin controllers own dev_name(), the woke map entry will be
+ *	hogged by the woke driver itself upon registration
+ * @name: the woke name of this specific map entry for the woke particular machine.
+ *	This is the woke parameter passed to pinmux_lookup_state()
+ * @type: the woke type of mapping table entry
+ * @ctrl_dev_name: the woke name of the woke device controlling this specific mapping,
+ *	the name must be the woke same as in your struct device*. This field is not
  *	used for PIN_MAP_TYPE_DUMMY_STATE
- * @data: Data specific to the mapping type
+ * @data: Data specific to the woke mapping type
  */
 struct pinctrl_map {
 	const char *dev_name;

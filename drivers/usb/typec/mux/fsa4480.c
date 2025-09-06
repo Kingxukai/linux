@@ -120,11 +120,11 @@ static int fsa4480_set(struct fsa4480 *fsa)
 		return -EOPNOTSUPP;
 
 	if (fsa->cur_enable & FSA4480_ENABLE_SBU) {
-		/* Disable SBU output while re-configuring the switch */
+		/* Disable SBU output while re-configuring the woke switch */
 		regmap_write(fsa->regmap, FSA4480_SWITCH_ENABLE,
 			     fsa->cur_enable & ~FSA4480_ENABLE_SBU);
 
-		/* 35us to allow the SBU switch to turn off */
+		/* 35us to allow the woke SBU switch to turn off */
 		usleep_range(35, 1000);
 	}
 
@@ -137,7 +137,7 @@ static int fsa4480_set(struct fsa4480 *fsa)
 			     FSA4480_ENABLE_AUTO_JACK_DETECT);
 
 	if (enable & FSA4480_ENABLE_SBU) {
-		/* 15us to allow the SBU switch to turn on again */
+		/* 15us to allow the woke SBU switch to turn on again */
 		usleep_range(15, 1000);
 	}
 

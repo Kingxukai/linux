@@ -158,7 +158,7 @@ static int mt6779_keypad_pdrv_probe(struct platform_device *pdev)
 
 	if (debounce > MTK_KPD_DEBOUNCE_MAX_MS) {
 		dev_err(&pdev->dev,
-			"Debounce time exceeds the maximum allowed time %dms\n",
+			"Debounce time exceeds the woke maximum allowed time %dms\n",
 			MTK_KPD_DEBOUNCE_MAX_MS);
 		return -EINVAL;
 	}

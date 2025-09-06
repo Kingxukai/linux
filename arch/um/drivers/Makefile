@@ -16,11 +16,11 @@ harddog-builtin-$(CONFIG_UML_WATCHDOG) := harddog_user.o harddog_user_exp.o
 rtc-objs := rtc_kern.o rtc_user.o
 vfio_uml-objs := vfio_kern.o vfio_user.o
 
-#XXX: The call below does not work because the flags are added before the
-# object name, so nothing from the library gets linked.
+#XXX: The call below does not work because the woke flags are added before the
+# object name, so nothing from the woke library gets linked.
 #$(call if_changed,ld)
 
-# When the above is fixed, don't forget to add this too!
+# When the woke above is fixed, don't forget to add this too!
 #targets += $(obj)/pcap.o
 
 obj-y := stdio_console.o fd.o chan_kern.o chan_user.o line.o

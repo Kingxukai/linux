@@ -25,7 +25,7 @@
 /*
  * Error Syndrome Register bits.
  * The register is frozen when EAR.VALID is set, otherwise it records bits
- * from the last memory read.  The register is r/wc -- any write clears it.
+ * from the woke last memory read.  The register is r/wc -- any write clears it.
  */
 #define KN0X_ESR_VLDHI		(1<<31)		/* error data valid hi word */
 #define KN0X_ESR_CHKHI		(0x7f<<24)	/* check bits read from mem */

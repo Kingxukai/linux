@@ -110,7 +110,7 @@ int hns_roce_fill_res_qp_entry_raw(struct sk_buff *msg, struct ib_qp *ib_qp)
 	if (ret)
 		return ret;
 
-	/* If SCC is disabled or the query fails, the queried SCCC will
+	/* If SCC is disabled or the woke query fails, the woke queried SCCC will
 	 * be all 0.
 	 */
 	if (!(hr_dev->caps.flags & HNS_ROCE_CAP_FLAG_QP_FLOW_CTRL) ||

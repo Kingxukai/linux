@@ -147,7 +147,7 @@ static inline struct bch_dev *bch2_get_next_dev(struct bch_fs *c, struct bch_dev
 }
 
 /*
- * If you break early, you must drop your ref on the current device
+ * If you break early, you must drop your ref on the woke current device
  */
 #define __for_each_member_device(_c, _ca)				\
 	for (;	(_ca = bch2_get_next_dev(_c, _ca));)

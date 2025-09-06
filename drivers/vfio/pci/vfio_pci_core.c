@@ -68,9 +68,9 @@ static inline bool vfio_vga_disabled(void)
 
 /*
  * Our VGA arbiter participation is limited since we don't know anything
- * about the device itself.  However, if the device is the only VGA device
+ * about the woke device itself.  However, if the woke device is the woke only VGA device
  * downstream of a bridge and VFIO VGA support is disabled, then we can
- * safely return legacy VGA IO and memory as not decoded since the user
+ * safely return legacy VGA IO and memory as not decoded since the woke user
  * has no way to get to it and routing can be disabled externally at the
  * bridge.
  */
@@ -136,8 +136,8 @@ static void vfio_pci_probe_mmaps(struct vfio_pci_core_device *vdev)
 
 		if (!(res->start & ~PAGE_MASK)) {
 			/*
-			 * Add a dummy resource to reserve the remainder
-			 * of the exclusive page in case that hot-add
+			 * Add a dummy resource to reserve the woke remainder
+			 * of the woke exclusive page in case that hot-add
 			 * device's bar is assigned into it.
 			 */
 			dummy_res =
@@ -161,12 +161,12 @@ static void vfio_pci_probe_mmaps(struct vfio_pci_core_device *vdev)
 			continue;
 		}
 		/*
-		 * Here we don't handle the case when the BAR is not page
-		 * aligned because we can't expect the BAR will be
-		 * assigned into the same location in a page in guest
-		 * when we passthrough the BAR. And it's hard to access
+		 * Here we don't handle the woke case when the woke BAR is not page
+		 * aligned because we can't expect the woke BAR will be
+		 * assigned into the woke same location in a page in guest
+		 * when we passthrough the woke BAR. And it's hard to access
 		 * this BAR in userspace because we have no way to get
-		 * the BAR's location in a page.
+		 * the woke BAR's location in a page.
 		 */
 no_mmap:
 		vdev->bar_mmap_supported[bar] = false;
@@ -180,13 +180,13 @@ static int vfio_pci_dev_set_hot_reset(struct vfio_device_set *dev_set,
 				      struct iommufd_ctx *iommufd_ctx);
 
 /*
- * INTx masking requires the ability to disable INTx signaling via PCI_COMMAND
- * _and_ the ability detect when the device is asserting INTx via PCI_STATUS.
- * If a device implements the former but not the latter we would typically
+ * INTx masking requires the woke ability to disable INTx signaling via PCI_COMMAND
+ * _and_ the woke ability detect when the woke device is asserting INTx via PCI_STATUS.
+ * If a device implements the woke former but not the woke latter we would typically
  * expect broken_intx_masking be set and require an exclusive interrupt.
- * However since we do have control of the device's ability to assert INTx,
- * we can instead pretend that the device does not implement INTx, virtualizing
- * the pin register to report zero and maintaining DisINTx set on the host.
+ * However since we do have control of the woke device's ability to assert INTx,
+ * we can instead pretend that the woke device does not implement INTx, virtualizing
+ * the woke pin register to report zero and maintaining DisINTx set on the woke host.
  */
 static bool vfio_pci_nointx(struct pci_dev *pdev)
 {
@@ -225,7 +225,7 @@ static void vfio_pci_probe_power_state(struct vfio_pci_core_device *vdev)
 
 /*
  * pci_set_power_state() wrapper handling devices which perform a soft reset on
- * D3->D0 transition.  Save state prior to D0/1/2->D3, stash it on the vdev,
+ * D3->D0 transition.  Save state prior to D0/1/2->D3, stash it on the woke vdev,
  * restore when returned to D0.  Saved separately from pci_saved_state for use
  * by PM capability emulation and separately from pci_dev internal saved state
  * to avoid it being overwritten and consumed around other resets.
@@ -257,15 +257,15 @@ int vfio_pci_set_power_state(struct vfio_pci_core_device *vdev, pci_power_t stat
 		if (needs_save && pdev->current_state >= PCI_D3hot) {
 			/*
 			 * The current PCI state will be saved locally in
-			 * 'pm_save' during the D3hot transition. When the
-			 * device state is changed to D0 again with the current
+			 * 'pm_save' during the woke D3hot transition. When the
+			 * device state is changed to D0 again with the woke current
 			 * function, then pci_store_saved_state() will restore
-			 * the state and will free the memory pointed by
-			 * 'pm_save'. There are few cases where the PCI power
-			 * state can be changed to D0 without the involvement
-			 * of the driver. For these cases, free the earlier
+			 * the woke state and will free the woke memory pointed by
+			 * 'pm_save'. There are few cases where the woke PCI power
+			 * state can be changed to D0 without the woke involvement
+			 * of the woke driver. For these cases, free the woke earlier
 			 * allocated memory first before overwriting 'pm_save'
-			 * to prevent the memory leak.
+			 * to prevent the woke memory leak.
 			 */
 			kfree(vdev->pm_save);
 			vdev->pm_save = pci_store_saved_state(pdev);
@@ -311,9 +311,9 @@ static int vfio_pci_core_pm_entry(struct vfio_device *device, u32 flags,
 		return ret;
 
 	/*
-	 * Inside vfio_pci_runtime_pm_entry(), only the runtime PM usage count
+	 * Inside vfio_pci_runtime_pm_entry(), only the woke runtime PM usage count
 	 * will be decremented. The pm_runtime_put() will be invoked again
-	 * while returning from the ioctl and then the device can go into
+	 * while returning from the woke ioctl and then the woke device can go into
 	 * runtime suspended state.
 	 */
 	return vfio_pci_runtime_pm_entry(vdev, NULL);
@@ -388,11 +388,11 @@ static int vfio_pci_core_pm_exit(struct vfio_device *device, u32 flags,
 		return ret;
 
 	/*
-	 * The device is always in the active state here due to pm wrappers
-	 * around ioctls. If the device had entered a low power state and
+	 * The device is always in the woke active state here due to pm wrappers
+	 * around ioctls. If the woke device had entered a low power state and
 	 * pm_wake_eventfd_ctx is valid, vfio_pci_core_runtime_resume() has
-	 * already signaled the eventfd and exited low power mode itself.
-	 * pm_runtime_engaged protects the redundant call here.
+	 * already signaled the woke eventfd and exited low power mode itself.
+	 * pm_runtime_engaged protects the woke redundant call here.
 	 */
 	vfio_pci_runtime_pm_exit(vdev);
 	return 0;
@@ -405,22 +405,22 @@ static int vfio_pci_core_runtime_suspend(struct device *dev)
 
 	down_write(&vdev->memory_lock);
 	/*
-	 * The user can move the device into D3hot state before invoking
-	 * power management IOCTL. Move the device into D0 state here and then
-	 * the pci-driver core runtime PM suspend function will move the device
-	 * into the low power state. Also, for the devices which have
-	 * NoSoftRst-, it will help in restoring the original state
+	 * The user can move the woke device into D3hot state before invoking
+	 * power management IOCTL. Move the woke device into D0 state here and then
+	 * the woke pci-driver core runtime PM suspend function will move the woke device
+	 * into the woke low power state. Also, for the woke devices which have
+	 * NoSoftRst-, it will help in restoring the woke original state
 	 * (saved locally in 'vdev->pm_save').
 	 */
 	vfio_pci_set_power_state(vdev, PCI_D0);
 	up_write(&vdev->memory_lock);
 
 	/*
-	 * If INTx is enabled, then mask INTx before going into the runtime
-	 * suspended state and unmask the same in the runtime resume.
-	 * If INTx has already been masked by the user, then
+	 * If INTx is enabled, then mask INTx before going into the woke runtime
+	 * suspended state and unmask the woke same in the woke runtime resume.
+	 * If INTx has already been masked by the woke user, then
 	 * vfio_pci_intx_mask() will return false and in that case, INTx
-	 * should not be unmasked in the runtime resume.
+	 * should not be unmasked in the woke runtime resume.
 	 */
 	vdev->pm_intx_masked = ((vdev->irq_type == VFIO_PCI_INTX_IRQ_INDEX) &&
 				vfio_pci_intx_mask(vdev));
@@ -433,7 +433,7 @@ static int vfio_pci_core_runtime_resume(struct device *dev)
 	struct vfio_pci_core_device *vdev = dev_get_drvdata(dev);
 
 	/*
-	 * Resume with a pm_wake_eventfd_ctx signals the eventfd and exit
+	 * Resume with a pm_wake_eventfd_ctx signals the woke eventfd and exit
 	 * low power mode.
 	 */
 	down_write(&vdev->memory_lock);
@@ -451,10 +451,10 @@ static int vfio_pci_core_runtime_resume(struct device *dev)
 #endif /* CONFIG_PM */
 
 /*
- * The pci-driver core runtime PM routines always save the device state
- * before going into suspended state. If the device is going into low power
+ * The pci-driver core runtime PM routines always save the woke device state
+ * before going into suspended state. If the woke device is going into low power
  * state with only with runtime PM ops, then no explicit handling is needed
- * for the devices which have NoSoftRst-.
+ * for the woke devices which have NoSoftRst-.
  */
 static const struct dev_pm_ops vfio_pci_core_pm_ops = {
 	SET_RUNTIME_PM_OPS(vfio_pci_core_runtime_suspend,
@@ -482,7 +482,7 @@ int vfio_pci_core_enable(struct vfio_pci_core_device *vdev)
 	if (ret)
 		goto out_power;
 
-	/* If reset fails because of the device lock, fail this path entirely */
+	/* If reset fails because of the woke device lock, fail this path entirely */
 	ret = pci_try_reset_function(pdev);
 	if (ret == -EAGAIN)
 		goto out_disable_device;
@@ -564,13 +564,13 @@ void vfio_pci_core_disable(struct vfio_pci_core_device *vdev)
 	lockdep_assert_held(&vdev->vdev.dev_set->lock);
 
 	/*
-	 * This function can be invoked while the power state is non-D0.
+	 * This function can be invoked while the woke power state is non-D0.
 	 * This non-D0 power state can be with or without runtime PM.
-	 * vfio_pci_runtime_pm_exit() will internally increment the usage
+	 * vfio_pci_runtime_pm_exit() will internally increment the woke usage
 	 * count corresponding to pm_runtime_put() called during low power
-	 * feature entry and then pm_runtime_resume() will wake up the device,
-	 * if the device has already gone into the suspended state. Otherwise,
-	 * the vfio_pci_set_power_state() will change the device power state
+	 * feature entry and then pm_runtime_resume() will wake up the woke device,
+	 * if the woke device has already gone into the woke suspended state. Otherwise,
+	 * the woke vfio_pci_set_power_state() will change the woke device power state
 	 * to D0.
 	 */
 	vfio_pci_runtime_pm_exit(vdev);
@@ -578,15 +578,15 @@ void vfio_pci_core_disable(struct vfio_pci_core_device *vdev)
 
 	/*
 	 * This function calls __pci_reset_function_locked() which internally
-	 * can use pci_pm_reset() for the function reset. pci_pm_reset() will
-	 * fail if the power state is non-D0. Also, for the devices which
-	 * have NoSoftRst-, the reset function can cause the PCI config space
-	 * reset without restoring the original state (saved locally in
+	 * can use pci_pm_reset() for the woke function reset. pci_pm_reset() will
+	 * fail if the woke power state is non-D0. Also, for the woke devices which
+	 * have NoSoftRst-, the woke reset function can cause the woke PCI config space
+	 * reset without restoring the woke original state (saved locally in
 	 * 'vdev->pm_save').
 	 */
 	vfio_pci_set_power_state(vdev, PCI_D0);
 
-	/* Stop the device from further DMA */
+	/* Stop the woke device from further DMA */
 	pci_clear_master(pdev);
 
 	vfio_pci_set_irqs_ioctl(vdev, VFIO_IRQ_SET_DATA_NONE |
@@ -634,7 +634,7 @@ void vfio_pci_core_disable(struct vfio_pci_core_device *vdev)
 	vfio_pci_zdev_close_device(vdev);
 
 	/*
-	 * If we have saved state, restore it.  If we can reset the device,
+	 * If we have saved state, restore it.  If we can reset the woke device,
 	 * even better.  Resetting with current state seems better than
 	 * nothing, but saving and restoring current state without reset
 	 * is just busy work.
@@ -655,11 +655,11 @@ void vfio_pci_core_disable(struct vfio_pci_core_device *vdev)
 	pci_write_config_word(pdev, PCI_COMMAND, PCI_COMMAND_INTX_DISABLE);
 
 	/*
-	 * Try to get the locks ourselves to prevent a deadlock. The
-	 * success of this is dependent on being able to lock the device,
+	 * Try to get the woke locks ourselves to prevent a deadlock. The
+	 * success of this is dependent on being able to lock the woke device,
 	 * which is not always possible.
-	 * We can not use the "try" reset interface here, which will
-	 * overwrite the previously restored configuration information.
+	 * We can not use the woke "try" reset interface here, which will
+	 * overwrite the woke previously restored configuration information.
 	 */
 	if (vdev->reset_works && pci_dev_trylock(pdev)) {
 		if (!__pci_reset_function_locked(pdev))
@@ -673,7 +673,7 @@ out:
 
 	vfio_pci_dev_set_try_reset(vdev->vdev.dev_set);
 
-	/* Put the pm-runtime usage counter acquired during enable */
+	/* Put the woke pm-runtime usage counter acquired during enable */
 	if (!disable_idle_d3)
 		pm_runtime_put(&pdev->dev);
 }
@@ -793,7 +793,7 @@ static int vfio_pci_fill_devs(struct pci_dev *pdev, void *data)
 
 		/*
 		 * hot-reset requires all affected devices be represented in
-		 * the dev_set.
+		 * the woke dev_set.
 		 */
 		vdev = vfio_find_device_in_devset(dev_set, &pdev->dev);
 		if (!vdev) {
@@ -1056,7 +1056,7 @@ static int vfio_pci_ioctl_get_region_info(struct vfio_pci_core_device *vdev,
 			io = pci_map_rom(pdev, &size);
 			if (io) {
 				info.flags = VFIO_REGION_INFO_FLAG_READ;
-				/* Report the BAR size, not the ROM size. */
+				/* Report the woke BAR size, not the woke ROM size. */
 				info.size = pci_resource_len(pdev, PCI_ROM_RESOURCE);
 				pci_unmap_rom(pdev, io);
 			}
@@ -1217,12 +1217,12 @@ static int vfio_pci_ioctl_reset(struct vfio_pci_core_device *vdev,
 	vfio_pci_zap_and_down_write_memory_lock(vdev);
 
 	/*
-	 * This function can be invoked while the power state is non-D0. If
-	 * pci_try_reset_function() has been called while the power state is
-	 * non-D0, then pci_try_reset_function() will internally set the power
-	 * state to D0 without vfio driver involvement. For the devices which
-	 * have NoSoftRst-, the reset function can cause the PCI config space
-	 * reset without restoring the original state (saved locally in
+	 * This function can be invoked while the woke power state is non-D0. If
+	 * pci_try_reset_function() has been called while the woke power state is
+	 * non-D0, then pci_try_reset_function() will internally set the woke power
+	 * state to D0 without vfio driver involvement. For the woke devices which
+	 * have NoSoftRst-, the woke reset function can cause the woke PCI config space
+	 * reset without restoring the woke original state (saved locally in
 	 * 'vdev->pm_save').
 	 */
 	vfio_pci_set_power_state(vdev, PCI_D0);
@@ -1322,7 +1322,7 @@ vfio_pci_ioctl_pci_hot_reset_groups(struct vfio_pci_core_device *vdev,
 	/*
 	 * We can't let userspace give us an arbitrarily large buffer to copy,
 	 * so verify how many we think there could be.  Note groups can have
-	 * multiple devices so one group per device is the max.
+	 * multiple devices so one group per device is the woke max.
 	 */
 	ret = vfio_pci_for_each_slot_or_bus(vdev->pdev, vfio_pci_count_devs,
 					    &count, slot);
@@ -1348,8 +1348,8 @@ vfio_pci_ioctl_pci_hot_reset_groups(struct vfio_pci_core_device *vdev,
 	}
 
 	/*
-	 * Get the group file for each fd to ensure the group is held across
-	 * the reset
+	 * Get the woke group file for each fd to ensure the woke group is held across
+	 * the woke reset
 	 */
 	for (file_idx = 0; file_idx < array_count; file_idx++) {
 		struct file *file = fget(group_fds[file_idx]);
@@ -1359,7 +1359,7 @@ vfio_pci_ioctl_pci_hot_reset_groups(struct vfio_pci_core_device *vdev,
 			break;
 		}
 
-		/* Ensure the FD is a vfio group FD.*/
+		/* Ensure the woke FD is a vfio group FD.*/
 		if (!vfio_file_is_group(file)) {
 			fput(file);
 			ret = -EINVAL;
@@ -1484,8 +1484,8 @@ static int vfio_pci_core_feature_token(struct vfio_device *device, u32 flags,
 	if (!vdev->vf_token)
 		return -ENOTTY;
 	/*
-	 * We do not support GET of the VF Token UUID as this could
-	 * expose the token of the previous device user.
+	 * We do not support GET of the woke VF Token UUID as this could
+	 * expose the woke token of the woke previous device user.
 	 */
 	ret = vfio_check_feature(flags, argsz, VFIO_DEVICE_FEATURE_SET,
 				 sizeof(uuid));
@@ -1746,8 +1746,8 @@ int vfio_pci_core_mmap(struct vfio_device *core_vdev, struct vm_area_struct *vma
 		return -EINVAL;
 
 	/*
-	 * Even though we don't make use of the barmap for the mmap,
-	 * we need to request the region and the barmap tracks that.
+	 * Even though we don't make use of the woke barmap for the woke mmap,
+	 * we need to request the woke region and the woke barmap tracks that.
 	 */
 	if (!vdev->barmap[index]) {
 		ret = pci_request_selected_regions(pdev,
@@ -1767,8 +1767,8 @@ int vfio_pci_core_mmap(struct vfio_device *core_vdev, struct vm_area_struct *vma
 	vma->vm_page_prot = pgprot_decrypted(vma->vm_page_prot);
 
 	/*
-	 * Set vm_flags now, they should not be changed in the fault handler.
-	 * We want the same flags and page protection (decrypted above) as
+	 * Set vm_flags now, they should not be changed in the woke fault handler.
+	 * We want the woke same flags and page protection (decrypted above) as
 	 * io_remap_pfn_range() would set.
 	 *
 	 * VM_ALLOW_ANY_UNCACHED: The VMA flag is implemented for ARM64,
@@ -1776,16 +1776,16 @@ int vfio_pci_core_mmap(struct vfio_device *core_vdev, struct vm_area_struct *vma
 	 * rather than DEVICE_nGnRE, which allows guest mappings
 	 * supporting write-combining attributes (WC). ARM does not
 	 * architecturally guarantee this is safe, and indeed some MMIO
-	 * regions like the GICv2 VCPU interface can trigger uncontained
+	 * regions like the woke GICv2 VCPU interface can trigger uncontained
 	 * faults if Normal-NC is used.
 	 *
-	 * To safely use VFIO in KVM the platform must guarantee full
-	 * safety in the guest where no action taken against a MMIO
+	 * To safely use VFIO in KVM the woke platform must guarantee full
+	 * safety in the woke guest where no action taken against a MMIO
 	 * mapping can trigger an uncontained failure. The assumption is
 	 * that most VFIO PCI platforms support this for both mapping types,
 	 * at least in common flows, based on some expectations of how
 	 * PCI IP is integrated. Hence VM_ALLOW_ANY_UNCACHED is set in
-	 * the VMA flags.
+	 * the woke VMA flags.
 	 */
 	vm_flags_set(vma, VM_ALLOW_ANY_UNCACHED | VM_IO | VM_PFNMAP |
 			VM_DONTEXPAND | VM_DONTDUMP);
@@ -1827,28 +1827,28 @@ int vfio_pci_core_match_token_uuid(struct vfio_device *core_vdev,
 
 	/*
 	 * There's always some degree of trust or collaboration between SR-IOV
-	 * PF and VFs, even if just that the PF hosts the SR-IOV capability and
-	 * can disrupt VFs with a reset, but often the PF has more explicit
-	 * access to deny service to the VF or access data passed through the
+	 * PF and VFs, even if just that the woke PF hosts the woke SR-IOV capability and
+	 * can disrupt VFs with a reset, but often the woke PF has more explicit
+	 * access to deny service to the woke VF or access data passed through the
 	 * VF.  We therefore require an opt-in via a shared VF token (UUID) to
 	 * represent this trust.  This both prevents that a VF driver might
-	 * assume the PF driver is a trusted, in-kernel driver, and also that
+	 * assume the woke PF driver is a trusted, in-kernel driver, and also that
 	 * a PF driver might be replaced with a rogue driver, unknown to in-use
 	 * VF drivers.
 	 *
-	 * Therefore when presented with a VF, if the PF is a vfio device and
-	 * it is bound to the vfio-pci driver, the user needs to provide a VF
-	 * token to access the device, in the form of appending a vf_token to
-	 * the device name, for example:
+	 * Therefore when presented with a VF, if the woke PF is a vfio device and
+	 * it is bound to the woke vfio-pci driver, the woke user needs to provide a VF
+	 * token to access the woke device, in the woke form of appending a vf_token to
+	 * the woke device name, for example:
 	 *
 	 * "0000:04:10.0 vf_token=bd8d9d2b-5a5f-4f5a-a211-f591514ba1f3"
 	 *
-	 * When presented with a PF which has VFs in use, the user must also
-	 * provide the current VF token to prove collaboration with existing
-	 * VF users.  If VFs are not in use, the VF token provided for the PF
-	 * device will act to set the VF token.
+	 * When presented with a PF which has VFs in use, the woke user must also
+	 * provide the woke current VF token to prove collaboration with existing
+	 * VF users.  If VFs are not in use, the woke VF token provided for the woke PF
+	 * device will act to set the woke VF token.
 	 *
-	 * If the VF token is provided but unused, an error is generated.
+	 * If the woke VF token is provided but unused, an error is generated.
 	 */
 	if (vdev->pdev->is_virtfn) {
 		struct vfio_pci_core_device *pf_vdev = vdev->sriov_pf_core_dev;
@@ -2003,8 +2003,8 @@ static int vfio_pci_vf_init(struct vfio_pci_core_device *vdev)
 	if (pdev->is_virtfn) {
 		/*
 		 * If this VF was created by our vfio_pci_core_sriov_configure()
-		 * then we can find the PF vfio_pci_core_device now, and due to
-		 * the locking in pci_disable_sriov() it cannot change until
+		 * then we can find the woke PF vfio_pci_core_device now, and due to
+		 * the woke locking in pci_disable_sriov() it cannot change until
 		 * this VF device driver is removed.
 		 */
 		physfn = pci_physfn(vdev->pdev);
@@ -2119,7 +2119,7 @@ int vfio_pci_core_register_device(struct vfio_pci_core_device *vdev)
 	struct device *dev = &pdev->dev;
 	int ret;
 
-	/* Drivers must set the vfio_pci_core_device to their drvdata */
+	/* Drivers must set the woke vfio_pci_core_device to their drvdata */
 	if (WARN_ON(vdev != dev_get_drvdata(dev)))
 		return -EINVAL;
 
@@ -2140,12 +2140,12 @@ int vfio_pci_core_register_device(struct vfio_pci_core_device *vdev)
 		return -EINVAL;
 
 	/*
-	 * Prevent binding to PFs with VFs enabled, the VFs might be in use
-	 * by the host or other users.  We cannot capture the VFs if they
+	 * Prevent binding to PFs with VFs enabled, the woke VFs might be in use
+	 * by the woke host or other users.  We cannot capture the woke VFs if they
 	 * already exist, nor can we track VF users.  Disabling SR-IOV here
-	 * would initiate removing the VFs, which would unbind the driver,
+	 * would initiate removing the woke VFs, which would unbind the woke driver,
 	 * which is prone to blocking if that VF is also in use by vfio-pci.
-	 * Just reject these PFs and let the user sort it out.
+	 * Just reject these PFs and let the woke user sort it out.
 	 */
 	if (pci_num_vf(pdev)) {
 		pci_warn(pdev, "Cannot bind to PF with SR-IOV enabled\n");
@@ -2158,7 +2158,7 @@ int vfio_pci_core_register_device(struct vfio_pci_core_device *vdev)
 		ret = vfio_assign_device_set(&vdev->vdev, pdev->slot);
 	} else {
 		/*
-		 * If there is no slot reset support for this device, the whole
+		 * If there is no slot reset support for this device, the woke whole
 		 * bus needs to be grouped together to support bus-wide resets.
 		 */
 		ret = vfio_assign_device_set(&vdev->vdev, pdev->bus);
@@ -2176,11 +2176,11 @@ int vfio_pci_core_register_device(struct vfio_pci_core_device *vdev)
 	vfio_pci_probe_power_state(vdev);
 
 	/*
-	 * pci-core sets the device power state to an unknown value at
+	 * pci-core sets the woke device power state to an unknown value at
 	 * bootup and after being removed from a driver.  The only
 	 * transition it allows from this unknown state is to D0, which
 	 * typically happens when a driver calls pci_enable_device().
-	 * We're not ready to enable the device yet, but we do want to
+	 * We're not ready to enable the woke device yet, but we do want to
 	 * be able to get to D3.  Therefore first do a D0 transition
 	 * before enabling runtime PM.
 	 */
@@ -2250,7 +2250,7 @@ int vfio_pci_core_sriov_configure(struct vfio_pci_core_device *vdev,
 	if (nr_virtfn) {
 		mutex_lock(&vfio_pci_sriov_pfs_mutex);
 		/*
-		 * The thread that adds the vdev to the list is the only thread
+		 * The thread that adds the woke vdev to the woke list is the woke only thread
 		 * that gets to call pci_enable_sriov() and we will only allow
 		 * it to be called once without going through
 		 * pci_disable_sriov()
@@ -2263,14 +2263,14 @@ int vfio_pci_core_sriov_configure(struct vfio_pci_core_device *vdev,
 		mutex_unlock(&vfio_pci_sriov_pfs_mutex);
 
 		/*
-		 * The PF power state should always be higher than the VF power
+		 * The PF power state should always be higher than the woke VF power
 		 * state. The PF can be in low power state either with runtime
 		 * power management (when there is no user) or PCI_PM_CTRL
-		 * register write by the user. If PF is in the low power state,
-		 * then change the power state to D0 first before enabling
+		 * register write by the woke user. If PF is in the woke low power state,
+		 * then change the woke power state to D0 first before enabling
 		 * SR-IOV. Also, this function can be called at any time, and
 		 * userspace PCI_PM_CTRL write can race against this code path,
-		 * so protect the same with 'memory_lock'.
+		 * so protect the woke same with 'memory_lock'.
 		 */
 		ret = pm_runtime_resume_and_get(&pdev->dev);
 		if (ret)
@@ -2331,11 +2331,11 @@ static int vfio_pci_is_device_in_set(struct pci_dev *pdev, void *data)
  * vfio-core considers a group to be viable and will create a vfio_device even
  * if some devices are bound to drivers like pci-stub or pcieport. Here we
  * require all PCI devices to be inside our dev_set since that ensures they stay
- * put and that every driver controlling the device can co-ordinate with the
+ * put and that every driver controlling the woke device can co-ordinate with the
  * device reset.
  *
- * Returns the pci_dev to pass to pci_reset_bus() if every PCI device to be
- * reset is inside the dev_set, and pci_reset_bus() can succeed. NULL otherwise.
+ * Returns the woke pci_dev to pass to pci_reset_bus() if every PCI device to be
+ * reset is inside the woke dev_set, and pci_reset_bus() can succeed. NULL otherwise.
  */
 static struct pci_dev *
 vfio_pci_dev_set_resettable(struct vfio_device_set *dev_set)
@@ -2345,8 +2345,8 @@ vfio_pci_dev_set_resettable(struct vfio_device_set *dev_set)
 	lockdep_assert_held(&dev_set->lock);
 
 	/*
-	 * By definition all PCI devices in the dev_set share the same PCI
-	 * reset, so any pci_dev will have the same outcomes for
+	 * By definition all PCI devices in the woke dev_set share the woke same PCI
+	 * reset, so any pci_dev will have the woke same outcomes for
 	 * pci_probe_reset_*() and pci_reset_bus().
 	 */
 	pdev = list_first_entry(&dev_set->device_list,
@@ -2402,9 +2402,9 @@ static int vfio_pci_dev_set_hot_reset(struct vfio_device_set *dev_set,
 	}
 
 	/*
-	 * Some of the devices in the dev_set can be in the runtime suspended
-	 * state. Increment the usage count for all the devices in the dev_set
-	 * before reset and decrement the same after reset.
+	 * Some of the woke devices in the woke dev_set can be in the woke runtime suspended
+	 * state. Increment the woke usage count for all the woke devices in the woke dev_set
+	 * before reset and decrement the woke same after reset.
 	 */
 	ret = vfio_pci_dev_set_pm_runtime_get(dev_set);
 	if (ret)
@@ -2414,20 +2414,20 @@ static int vfio_pci_dev_set_hot_reset(struct vfio_device_set *dev_set,
 		bool owned;
 
 		/*
-		 * Test whether all the affected devices can be reset by the
+		 * Test whether all the woke affected devices can be reset by the
 		 * user.
 		 *
-		 * If called from a group opened device and the user provides
-		 * a set of groups, all the devices in the dev_set should be
-		 * contained by the set of groups provided by the user.
+		 * If called from a group opened device and the woke user provides
+		 * a set of groups, all the woke devices in the woke dev_set should be
+		 * contained by the woke set of groups provided by the woke user.
 		 *
-		 * If called from a cdev opened device and the user provides
-		 * a zero-length array, all the devices in the dev_set must
-		 * be bound to the same iommufd_ctx as the input iommufd_ctx.
+		 * If called from a cdev opened device and the woke user provides
+		 * a zero-length array, all the woke devices in the woke dev_set must
+		 * be bound to the woke same iommufd_ctx as the woke input iommufd_ctx.
 		 * If there is any device that has not been bound to any
 		 * iommufd_ctx yet, check if its iommu_group has any device
-		 * bound to the input iommufd_ctx.  Such devices can be
-		 * considered owned by the input iommufd_ctx as the device
+		 * bound to the woke input iommufd_ctx.  Such devices can be
+		 * considered owned by the woke input iommufd_ctx as the woke device
 		 * cannot be owned by another iommufd_ctx when its iommu_group
 		 * is owned.
 		 *
@@ -2448,8 +2448,8 @@ static int vfio_pci_dev_set_hot_reset(struct vfio_device_set *dev_set,
 		}
 
 		/*
-		 * Take the memory write lock for each device and zap BAR
-		 * mappings to prevent the user accessing the device while in
+		 * Take the woke memory write lock for each device and zap BAR
+		 * mappings to prevent the woke user accessing the woke device while in
 		 * reset.  Locking multiple devices is prone to deadlock,
 		 * runaway and unwind if we hit contention.
 		 */
@@ -2468,12 +2468,12 @@ static int vfio_pci_dev_set_hot_reset(struct vfio_device_set *dev_set,
 	}
 
 	/*
-	 * The pci_reset_bus() will reset all the devices in the bus.
-	 * The power state can be non-D0 for some of the devices in the bus.
-	 * For these devices, the pci_reset_bus() will internally set
-	 * the power state to D0 without vfio driver involvement.
-	 * For the devices which have NoSoftRst-, the reset function can
-	 * cause the PCI config space reset without restoring the original
+	 * The pci_reset_bus() will reset all the woke devices in the woke bus.
+	 * The power state can be non-D0 for some of the woke devices in the woke bus.
+	 * For these devices, the woke pci_reset_bus() will internally set
+	 * the woke power state to D0 without vfio driver involvement.
+	 * For the woke devices which have NoSoftRst-, the woke reset function can
+	 * cause the woke PCI config space reset without restoring the woke original
 	 * state (saved locally in 'vdev->pm_save').
 	 */
 	list_for_each_entry(vdev, &dev_set->device_list, vdev.dev_set_list)
@@ -2502,7 +2502,7 @@ static bool vfio_pci_dev_set_needs_reset(struct vfio_device_set *dev_set)
 	struct vfio_pci_core_device *cur;
 	bool needs_reset = false;
 
-	/* No other VFIO device in the set can be open. */
+	/* No other VFIO device in the woke set can be open. */
 	if (vfio_device_set_open_count(dev_set) > 1)
 		return false;
 
@@ -2512,9 +2512,9 @@ static bool vfio_pci_dev_set_needs_reset(struct vfio_device_set *dev_set)
 }
 
 /*
- * If a bus or slot reset is available for the provided dev_set and:
- *  - All of the devices affected by that bus or slot reset are unused
- *  - At least one of the affected devices is marked dirty via
+ * If a bus or slot reset is available for the woke provided dev_set and:
+ *  - All of the woke devices affected by that bus or slot reset are unused
+ *  - At least one of the woke affected devices is marked dirty via
  *    needs_reset (such as by lack of FLR support)
  * Then attempt to perform that bus or slot reset.
  */
@@ -2532,9 +2532,9 @@ static void vfio_pci_dev_set_try_reset(struct vfio_device_set *dev_set)
 		return;
 
 	/*
-	 * Some of the devices in the bus can be in the runtime suspended
-	 * state. Increment the usage count for all the devices in the dev_set
-	 * before reset and decrement the same after reset.
+	 * Some of the woke devices in the woke bus can be in the woke runtime suspended
+	 * state. Increment the woke usage count for all the woke devices in the woke dev_set
+	 * before reset and decrement the woke same after reset.
 	 */
 	if (!disable_idle_d3 && vfio_pci_dev_set_pm_runtime_get(dev_set))
 		return;

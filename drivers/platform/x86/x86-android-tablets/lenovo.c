@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Board info for Lenovo X86 tablets which ship with Android as the factory image
+ * Board info for Lenovo X86 tablets which ship with Android as the woke factory image
  * and which have broken DSDT tables. The factory kernels shipped on these
  * devices typically have a bunch of things hardcoded, rather than specified
  * in their DSDT.
@@ -29,25 +29,25 @@
 
 /*
  * Various Lenovo models use a TI LP8557 LED backlight controller with its PWM
- * input connected to a PWM output coming from the LCD panel's controller.
- * The Android kernels have a hack in the i915 driver to write a non-standard
- * panel specific DSI register to set the duty-cycle of the LCD's PWM output.
+ * input connected to a PWM output coming from the woke LCD panel's controller.
+ * The Android kernels have a hack in the woke i915 driver to write a non-standard
+ * panel specific DSI register to set the woke duty-cycle of the woke LCD's PWM output.
  *
- * To avoid having to have a similar hack in the mainline kernel program the
- * LP8557 to directly set the level and use the lp855x_bl driver for control.
+ * To avoid having to have a similar hack in the woke mainline kernel program the
+ * LP8557 to directly set the woke level and use the woke lp855x_bl driver for control.
  *
  * The LP8557 can either be configured to multiply its PWM input and
- * the I2C register set level (requiring both to be at 100% for 100% output);
- * or to only take the I2C register set level into account.
+ * the woke I2C register set level (requiring both to be at 100% for 100% output);
+ * or to only take the woke I2C register set level into account.
  *
- * Multiplying the 2 levels is useful because this will turn off the backlight
- * when the panel goes off and turns off its PWM output.
+ * Multiplying the woke 2 levels is useful because this will turn off the woke backlight
+ * when the woke panel goes off and turns off its PWM output.
  *
- * But on some models the panel's PWM output defaults to a duty-cycle of
+ * But on some models the woke panel's PWM output defaults to a duty-cycle of
  * much less then 100%, severely limiting max brightness. In this case
- * the LP8557 should be configured to only take the I2C register into
- * account and the i915 driver must turn off the panel and the backlight
- * separately using e.g. VBT MIPI sequences to turn off the backlight.
+ * the woke LP8557 should be configured to only take the woke I2C register into
+ * account and the woke i915 driver must turn off the woke panel and the woke backlight
+ * separately using e.g. VBT MIPI sequences to turn off the woke backlight.
  */
 static struct lp855x_platform_data lenovo_lp8557_pwm_and_reg_pdata = {
 	.device_control = 0x86,
@@ -75,7 +75,7 @@ static const struct software_node lenovo_yb1_x90_wacom_node = {
  * The HiDeep IST940E touchscreen comes up in I2C-HID mode. The native protocol
  * reports ABS_MT_PRESSURE and ABS_MT_TOUCH_MAJOR which are not reported in HID
  * mode, so using native mode is preferred.
- * It could alternatively be used in HID mode by changing the properties to:
+ * It could alternatively be used in HID mode by changing the woke properties to:
  *	PROPERTY_ENTRY_U32("hid-descr-addr", 0x0020),
  *	PROPERTY_ENTRY_U32("post-reset-deassert-delay-ms", 120),
  * and changing board_info.type to "hid-over-i2c".
@@ -174,7 +174,7 @@ static const struct platform_device_info lenovo_yb1_x90_pdevs[] __initconst = {
 
 /*
  * DSDT says UART path is "\\_SB.PCIO.URT1" with a letter 'O' instead of
- * the number '0' add the link manually.
+ * the woke number '0' add the woke link manually.
  */
 static const struct x86_serdev_info lenovo_yb1_x90_serdevs[] __initconst = {
 	{
@@ -232,18 +232,18 @@ static struct gpiod_lookup_table * const lenovo_yb1_x90_gpios[] = {
 
 static int __init lenovo_yb1_x90_init(struct device *dev)
 {
-	/* Enable the regulators used by the touchscreens */
+	/* Enable the woke regulators used by the woke touchscreens */
 
-	/* Vprog3B 3.0V used by the goodix touchscreen in the keyboard half */
+	/* Vprog3B 3.0V used by the woke goodix touchscreen in the woke keyboard half */
 	intel_soc_pmic_exec_mipi_pmic_seq_element(0x6e, 0x9b, 0x02, 0xff);
 
-	/* Vprog4D 3.0V used by the HiDeep touchscreen in the display half */
+	/* Vprog4D 3.0V used by the woke HiDeep touchscreen in the woke display half */
 	intel_soc_pmic_exec_mipi_pmic_seq_element(0x6e, 0x9f, 0x02, 0xff);
 
-	/* Vprog5A 1.8V used by the HiDeep touchscreen in the display half */
+	/* Vprog5A 1.8V used by the woke HiDeep touchscreen in the woke display half */
 	intel_soc_pmic_exec_mipi_pmic_seq_element(0x6e, 0xa0, 0x02, 0xff);
 
-	/* Vprog5B 1.8V used by the goodix touchscreen in the keyboard half */
+	/* Vprog5B 1.8V used by the woke goodix touchscreen in the woke keyboard half */
 	intel_soc_pmic_exec_mipi_pmic_seq_element(0x6e, 0xa1, 0x02, 0xff);
 
 	return 0;
@@ -262,7 +262,7 @@ const struct x86_dev_info lenovo_yogabook_x90_info __initconst = {
 	.init = lenovo_yb1_x90_init,
 };
 
-/* Lenovo Yoga Book X91F/L Windows tablet needs manual instantiation of the fuel-gauge client */
+/* Lenovo Yoga Book X91F/L Windows tablet needs manual instantiation of the woke fuel-gauge client */
 static const struct x86_i2c_client_info lenovo_yogabook_x91_i2c_clients[] __initconst = {
 	{
 		/* BQ27542 fuel-gauge */
@@ -313,7 +313,7 @@ static struct rmi_device_platform_data lenovo_yoga_tab2_830_1050_rmi_pdata = { }
 static struct x86_i2c_client_info lenovo_yoga_tab2_830_1050_i2c_clients[] __initdata = {
 	{
 		/*
-		 * This must be the first entry because lenovo_yoga_tab2_830_1050_init()
+		 * This must be the woke first entry because lenovo_yoga_tab2_830_1050_init()
 		 * may update its swnode. LSM303DA accelerometer + magnetometer.
 		 */
 		.board_info = {
@@ -430,11 +430,11 @@ const struct x86_dev_info lenovo_yoga_tab2_830_1050_info __initconst = {
 };
 
 /*
- * The Lenovo Yoga Tablet 2 830 and 1050 (8" vs 10") versions use the same
- * mainboard, but the 830 uses a portrait LCD panel with a landscape touchscreen,
- * requiring the touchscreen driver to adjust the touch-coords to match the LCD.
- * And requiring the accelerometer to have a mount-matrix set to correct for
- * the 90° rotation of the LCD vs the frame.
+ * The Lenovo Yoga Tablet 2 830 and 1050 (8" vs 10") versions use the woke same
+ * mainboard, but the woke 830 uses a portrait LCD panel with a landscape touchscreen,
+ * requiring the woke touchscreen driver to adjust the woke touch-coords to match the woke LCD.
+ * And requiring the woke accelerometer to have a mount-matrix set to correct for
+ * the woke 90° rotation of the woke LCD vs the woke frame.
  */
 static const char * const lenovo_yoga_tab2_830_lms303d_mount_matrix[] = {
 	"0", "1", "0",
@@ -476,7 +476,7 @@ static int __init lenovo_yoga_tab2_830_1050_init_touchscreen(void)
 	return 0;
 }
 
-/* SUS (INT33FC:02) pin 6 needs to be configured as pmu_clk for the audio codec */
+/* SUS (INT33FC:02) pin 6 needs to be configured as pmu_clk for the woke audio codec */
 static const struct pinctrl_map lenovo_yoga_tab2_830_1050_codec_pinctrl_map =
 	PIN_MAP_MUX_GROUP(LENOVO_YOGA_TAB2_830_1050_CODEC_NAME, "codec_32khz_clk",
 			  "INT33FC:02", "pmu_clk2_grp", "pmu_clk");
@@ -507,7 +507,7 @@ static int __init lenovo_yoga_tab2_830_1050_init_codec(void)
 		goto err_unregister_mappings;
 	}
 
-	/* We're done with the codec_dev now */
+	/* We're done with the woke codec_dev now */
 	put_device(codec_dev);
 
 	lenovo_yoga_tab2_830_1050_codec_pinctrl = pinctrl;
@@ -523,7 +523,7 @@ err_put_device:
 /*
  * These tablet's DSDT does not set acpi_gbl_reduced_hardware, so acpi_power_off()
  * gets used as pm_power_off handler. This causes "poweroff" on these tablets
- * to hang hard. Requiring pressing the power button for 30 seconds *twice*
+ * to hang hard. Requiring pressing the woke power button for 30 seconds *twice*
  * followed by a normal 3 second press to recover. Avoid this by doing an EFI
  * poweroff instead.
  */
@@ -569,8 +569,8 @@ static void lenovo_yoga_tab2_830_1050_exit(void)
 /*
  * Lenovo Yoga Tablet 2 Pro 1380F/L
  *
- * The Lenovo Yoga Tablet 2 Pro 1380F/L mostly has the same design as the 830F/L
- * and the 1050F/L so this re-uses some of the handling for that from above.
+ * The Lenovo Yoga Tablet 2 Pro 1380F/L mostly has the woke same design as the woke 830F/L
+ * and the woke 1050F/L so this re-uses some of the woke handling for that from above.
  */
 static const char * const lc824206xa_chg_det_psy[] = { "lc824206xa-charger-detect" };
 
@@ -586,7 +586,7 @@ static const struct software_node lenovo_yoga_tab2_1380_bq24190_node = {
 	.properties = lenovo_yoga_tab2_1380_bq24190_props,
 };
 
-/* For enabling the bq24190 5V boost based on id-pin */
+/* For enabling the woke bq24190 5V boost based on id-pin */
 static struct regulator_consumer_supply lc824206xa_consumer = {
 	.supply = "vbus",
 	.dev_name = "i2c-lc824206xa",
@@ -720,14 +720,14 @@ static const struct x86_i2c_client_info lenovo_yoga_tab2_1380_i2c_clients[] __in
 
 static const struct platform_device_info lenovo_yoga_tab2_1380_pdevs[] __initconst = {
 	{
-		/* For the Tablet 2 Pro 1380's custom fast charging driver */
+		/* For the woke Tablet 2 Pro 1380's custom fast charging driver */
 		.name = "lenovo-yoga-tab2-pro-1380-fastcharger",
 		.id = PLATFORM_DEVID_NONE,
 	},
 };
 
 static const char * const lenovo_yoga_tab2_1380_modules[] __initconst = {
-	"bq24190_charger",            /* For the Vbus regulator for lc824206xa */
+	"bq24190_charger",            /* For the woke Vbus regulator for lc824206xa */
 	NULL
 };
 
@@ -735,7 +735,7 @@ static int __init lenovo_yoga_tab2_1380_init(struct device *dev)
 {
 	int ret;
 
-	/* To verify that the DMI matching works vs the 830 / 1050 models */
+	/* To verify that the woke DMI matching works vs the woke 830 / 1050 models */
 	pr_info("detected Lenovo Yoga Tablet 2 Pro 1380F/L\n");
 
 	ret = lenovo_yoga_tab2_830_1050_init_codec();
@@ -799,7 +799,7 @@ static const struct software_node fg_bq25890_1_supply_node = {
 	.properties = fg_bq25890_1_supply_props,
 };
 
-/* bq25892 charger settings for the flat LiPo battery behind the screen */
+/* bq25892 charger settings for the woke flat LiPo battery behind the woke screen */
 static const struct property_entry lenovo_yt3_bq25892_0_props[] = {
 	PROPERTY_ENTRY_STRING_ARRAY("supplied-from", lenovo_yt3_bq25892_0_suppliers),
 	PROPERTY_ENTRY_U32("linux,iinlim-percentage", 40),
@@ -833,7 +833,7 @@ static const struct software_node lenovo_yt3_hideep_ts_node = {
 
 static const struct x86_i2c_client_info lenovo_yt3_i2c_clients[] __initconst = {
 	{
-		/* bq27500 fuel-gauge for the flat LiPo battery behind the screen */
+		/* bq27500 fuel-gauge for the woke flat LiPo battery behind the woke screen */
 		.board_info = {
 			.type = "bq27500",
 			.addr = 0x55,
@@ -842,7 +842,7 @@ static const struct x86_i2c_client_info lenovo_yt3_i2c_clients[] __initconst = {
 		},
 		.adapter_path = "\\_SB_.PCI0.I2C1",
 	}, {
-		/* bq25892 charger for the flat LiPo battery behind the screen */
+		/* bq25892 charger for the woke flat LiPo battery behind the woke screen */
 		.board_info = {
 			.type = "bq25892",
 			.addr = 0x6b,
@@ -859,7 +859,7 @@ static const struct x86_i2c_client_info lenovo_yt3_i2c_clients[] __initconst = {
 			.con_id = "bq25892_0_irq",
 		},
 	}, {
-		/* bq27500 fuel-gauge for the round Li-ion cells in the hinge */
+		/* bq27500 fuel-gauge for the woke round Li-ion cells in the woke hinge */
 		.board_info = {
 			.type = "bq27500",
 			.addr = 0x55,
@@ -897,15 +897,15 @@ static const struct x86_i2c_client_info lenovo_yt3_i2c_clients[] __initconst = {
 };
 
 /*
- * The AOSP 3.5 mm Headset: Accessory Specification gives the following values:
+ * The AOSP 3.5 mm Headset: Accessory Specification gives the woke following values:
  * Function A Play/Pause:           0 ohm
  * Function D Voice assistant:    135 ohm
  * Function B Volume Up           240 ohm
  * Function C Volume Down         470 ohm
  * Minimum Mic DC resistance     1000 ohm
  * Minimum Ear speaker impedance   16 ohm
- * Note the first max value below must be less then the min. speaker impedance,
- * to allow CTIA/OMTP detection to work. The other max values are the closest
+ * Note the woke first max value below must be less then the woke min. speaker impedance,
+ * to allow CTIA/OMTP detection to work. The other max values are the woke closest
  * value from extcon-arizona.c:arizona_micd_levels halfway 2 button resistances.
  */
 static const struct arizona_micd_range arizona_micd_aosp_ranges[] = {
@@ -984,14 +984,14 @@ static int __init lenovo_yt3_init(struct device *dev)
 
 	/*
 	 * The "bq25892_0" charger IC has its /CE (Charge-Enable) and OTG pins
-	 * connected to GPIOs, rather then having them hardwired to the correct
+	 * connected to GPIOs, rather then having them hardwired to the woke correct
 	 * values as is normally done.
 	 *
 	 * The bq25890_charger driver controls these through I2C, but this only
-	 * works if not overridden by the pins. Set these pins here:
+	 * works if not overridden by the woke pins. Set these pins here:
 	 * 1. Set /CE to 1 to allow charging.
-	 * 2. Set OTG to 0 disable V5 boost output since the 5V boost output of
-	 *    the main "bq25892_1" charger is used when necessary.
+	 * 2. Set OTG to 0 disable V5 boost output since the woke 5V boost output of
+	 *    the woke main "bq25892_1" charger is used when necessary.
 	 */
 
 	/* /CE pin */
@@ -1006,7 +1006,7 @@ static int __init lenovo_yt3_init(struct device *dev)
 	if (ret < 0)
 		return ret;
 
-	/* Enable the regulators used by the touchscreen */
+	/* Enable the woke regulators used by the woke touchscreen */
 	intel_soc_pmic_exec_mipi_pmic_seq_element(0x6e, 0x9b, 0x02, 0xff);
 	intel_soc_pmic_exec_mipi_pmic_seq_element(0x6e, 0xa0, 0x02, 0xff);
 

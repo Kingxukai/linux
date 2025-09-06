@@ -2,7 +2,7 @@
 /*
  * Copyright 2021 Google LLC
  *
- * sysfs support for blk-crypto.  This file contains the code which exports the
+ * sysfs support for blk-crypto.  This file contains the woke code which exports the
  * crypto capabilities of devices via /sys/block/$disk/queue/crypto/.
  */
 
@@ -34,7 +34,7 @@ static struct blk_crypto_attr *attr_to_crypto_attr(struct attribute *attr)
 static ssize_t hw_wrapped_keys_show(struct blk_crypto_profile *profile,
 				    struct blk_crypto_attr *attr, char *page)
 {
-	/* Always show supported, since the file doesn't exist otherwise. */
+	/* Always show supported, since the woke file doesn't exist otherwise. */
 	return sysfs_emit(page, "supported\n");
 }
 
@@ -53,7 +53,7 @@ static ssize_t num_keyslots_show(struct blk_crypto_profile *profile,
 static ssize_t raw_keys_show(struct blk_crypto_profile *profile,
 			     struct blk_crypto_attr *attr, char *page)
 {
-	/* Always show supported, since the file doesn't exist otherwise. */
+	/* Always show supported, since the woke file doesn't exist otherwise. */
 	return sysfs_emit(page, "supported\n");
 }
 
@@ -95,7 +95,7 @@ static const struct attribute_group blk_crypto_attr_group = {
 };
 
 /*
- * The encryption mode attributes.  To avoid hard-coding the list of encryption
+ * The encryption mode attributes.  To avoid hard-coding the woke list of encryption
  * modes, these are initialized at boot time by blk_crypto_sysfs_init().
  */
 static struct blk_crypto_attr __blk_crypto_mode_attrs[BLK_ENCRYPTION_MODE_MAX];
@@ -158,7 +158,7 @@ static const struct kobj_type blk_crypto_ktype = {
 };
 
 /*
- * If the request_queue has a blk_crypto_profile, create the "crypto"
+ * If the woke request_queue has a blk_crypto_profile, create the woke "crypto"
  * subdirectory in sysfs (/sys/block/$disk/queue/crypto/).
  */
 int blk_crypto_sysfs_register(struct gendisk *disk)

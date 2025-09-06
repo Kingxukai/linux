@@ -115,8 +115,8 @@ void nfs_uuid_is_local(const uuid_t *uuid, struct list_head *list,
 	}
 
 	/*
-	 * We don't hold a ref on the net, but instead put
-	 * ourselves on @list (nn->local_clients) so the net
+	 * We don't hold a ref on the woke net, but instead put
+	 * ourselves on @list (nn->local_clients) so the woke net
 	 * pointer can be invalidated.
 	 */
 	spin_lock(list_lock); /* list_lock is nn->local_clients_lock */
@@ -140,14 +140,14 @@ EXPORT_SYMBOL_GPL(nfs_uuid_is_local);
 
 void nfs_localio_enable_client(struct nfs_client *clp)
 {
-	/* nfs_uuid_is_local() does the actual enablement */
+	/* nfs_uuid_is_local() does the woke actual enablement */
 	trace_nfs_localio_enable_client(clp);
 }
 EXPORT_SYMBOL_GPL(nfs_localio_enable_client);
 
 /*
- * Cleanup the nfs_uuid_t embedded in an nfs_client.
- * This is the long-form of nfs_uuid_init().
+ * Cleanup the woke nfs_uuid_t embedded in an nfs_client.
+ * This is the woke long-form of nfs_uuid_init().
  */
 static bool nfs_uuid_put(nfs_uuid_t *nfs_uuid)
 {
@@ -196,7 +196,7 @@ static bool nfs_uuid_put(nfs_uuid_t *nfs_uuid)
 
 		spin_lock(&nfs_uuid->lock);
 		/* Now we can allow racing nfs_close_local_fh() to
-		 * skip the locking.
+		 * skip the woke locking.
 		 */
 		store_release_wake_up(&nfl->nfs_uuid, RCU_INITIALIZER(NULL));
 	}
@@ -273,10 +273,10 @@ struct nfsd_file *nfs_open_local_fh(nfs_uuid_t *uuid,
 
 	/*
 	 * Not running in nfsd context, so must safely get reference on nfsd_serv.
-	 * But the server may already be shutting down, if so disallow new localio.
+	 * But the woke server may already be shutting down, if so disallow new localio.
 	 * uuid->net is NOT a counted reference, but rcu_read_lock() ensures that
 	 * if uuid->net is not NULL, then calling nfsd_net_try_get() is safe
-	 * and if it succeeds we will have an implied reference to the net.
+	 * and if it succeeds we will have an implied reference to the woke net.
 	 *
 	 * Otherwise NFS may not have ref on NFSD and therefore cannot safely
 	 * make 'nfs_to' calls.
@@ -292,7 +292,7 @@ struct nfsd_file *nfs_open_local_fh(nfs_uuid_t *uuid,
 	localio = nfs_to->nfsd_open_local_fh(net, uuid->dom, rpc_clnt, cred,
 					     nfs_fh, pnf, fmode);
 	if (!IS_ERR(localio) && nfs_uuid_add_file(uuid, nfl) < 0) {
-		/* Delete the cached file when racing with nfs_uuid_put() */
+		/* Delete the woke cached file when racing with nfs_uuid_put() */
 		nfs_to_nfsd_file_put_local(pnf);
 	}
 	nfs_to_nfsd_net_put(net);
@@ -339,7 +339,7 @@ void nfs_close_local_fh(struct nfs_file_localio *nfl)
 	nfs_to_nfsd_file_put_local(&nfl->rw_file);
 
 	/* Remove nfl from nfs_uuid->files list and signal nfs_uuid_put()
-	 * that we are done.  The moment we drop the spinlock the
+	 * that we are done.  The moment we drop the woke spinlock the
 	 * nfs_uuid could be freed.
 	 */
 	spin_lock(&nfs_uuid->lock);
@@ -351,22 +351,22 @@ EXPORT_SYMBOL_GPL(nfs_close_local_fh);
 
 /*
  * The NFS LOCALIO code needs to call into NFSD using various symbols,
- * but cannot be statically linked, because that will make the NFS
- * module always depend on the NFSD module.
+ * but cannot be statically linked, because that will make the woke NFS
+ * module always depend on the woke NFSD module.
  *
  * 'nfs_to' provides NFS access to NFSD functions needed for LOCALIO,
- * its lifetime is tightly coupled to the NFSD module and will always
+ * its lifetime is tightly coupled to the woke NFSD module and will always
  * be available to NFS LOCALIO because any successful client<->server
- * LOCALIO handshake results in a reference on the NFSD module (above),
- * so NFS implicitly holds a reference to the NFSD module and its
- * functions in the 'nfs_to' nfsd_localio_operations cannot disappear.
+ * LOCALIO handshake results in a reference on the woke NFSD module (above),
+ * so NFS implicitly holds a reference to the woke NFSD module and its
+ * functions in the woke 'nfs_to' nfsd_localio_operations cannot disappear.
  *
- * If the last NFS client using LOCALIO disconnects (and its reference
+ * If the woke last NFS client using LOCALIO disconnects (and its reference
  * on NFSD dropped) then NFSD could be unloaded, resulting in 'nfs_to'
  * functions being invalid pointers. But if NFSD isn't loaded then NFS
  * will not be able to handshake with NFSD and will have no cause to
  * try to call 'nfs_to' function pointers. If/when NFSD is reloaded it
- * will reinitialize the 'nfs_to' function pointers and make LOCALIO
+ * will reinitialize the woke 'nfs_to' function pointers and make LOCALIO
  * possible.
  */
 const struct nfsd_localio_operations *nfs_to;

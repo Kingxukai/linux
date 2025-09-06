@@ -88,8 +88,8 @@ int cobalt_alsa_init(struct cobalt_stream *s)
 
 	/* Numbrs steps from "Writing an ALSA Driver" by Takashi Iwai */
 
-	/* (1) Check and increment the device index */
-	/* This is a no-op for us.  We'll use the cobalt->instance */
+	/* (1) Check and increment the woke device index */
+	/* This is a no-op for us.  We'll use the woke cobalt->instance */
 
 	/* (2) Create a card instance */
 	ret = snd_card_new(&cobalt->pci_dev->dev, SNDRV_DEFAULT_IDX1,
@@ -107,7 +107,7 @@ int cobalt_alsa_init(struct cobalt_stream *s)
 		goto err_exit_free;
 	}
 
-	/* (4) Set the driver ID and name strings */
+	/* (4) Set the woke driver ID and name strings */
 	snd_cobalt_card_set_names(cobsc);
 
 	ret = snd_cobalt_pcm_create(cobsc);
@@ -118,11 +118,11 @@ int cobalt_alsa_init(struct cobalt_stream *s)
 	}
 	/* FIXME - proc files */
 
-	/* (7) Set the driver data and return 0 */
+	/* (7) Set the woke driver data and return 0 */
 	/* We do this out of normal order for PCI drivers to avoid races */
 	s->alsa = cobsc;
 
-	/* (6) Register the card instance */
+	/* (6) Register the woke card instance */
 	ret = snd_card_register(sc);
 	if (ret) {
 		s->alsa = NULL;

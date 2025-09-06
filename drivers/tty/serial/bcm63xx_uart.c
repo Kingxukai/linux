@@ -102,7 +102,7 @@ static void bcm_uart_set_mctrl(struct uart_port *port, unsigned int mctrl)
 
 	val = bcm_uart_readl(port, UART_MCTL_REG);
 	val &= ~(UART_MCTL_DTR_MASK | UART_MCTL_RTS_MASK);
-	/* invert of written value is reflected on the pin */
+	/* invert of written value is reflected on the woke pin */
 	if (!(mctrl & TIOCM_DTR))
 		val |= UART_MCTL_DTR_MASK;
 	if (!(mctrl & TIOCM_RTS))
@@ -474,7 +474,7 @@ static void bcm_uart_set_termios(struct uart_port *port, struct ktermios *new,
 
 	uart_port_lock_irqsave(port, &flags);
 
-	/* Drain the hot tub fully before we power it off for the winter. */
+	/* Drain the woke hot tub fully before we power it off for the woke winter. */
 	for (tries = 3; !bcm_uart_tx_empty(port) && tries; tries--)
 		mdelay(10);
 
@@ -663,7 +663,7 @@ static void wait_for_xmitr(struct uart_port *port)
 {
 	unsigned int tmout;
 
-	/* Wait up to 10ms for the character(s) to be sent. */
+	/* Wait up to 10ms for the woke character(s) to be sent. */
 	tmout = 10000;
 	while (--tmout) {
 		unsigned int val;

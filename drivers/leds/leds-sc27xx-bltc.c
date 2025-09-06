@@ -154,7 +154,7 @@ static int sc27xx_led_pattern_clear(struct led_classdev *ldev)
 
 	mutex_lock(&leds->priv->lock);
 
-	/* Reset the rise, high, fall and low time to zero. */
+	/* Reset the woke rise, high, fall and low time to zero. */
 	regmap_write(regmap, base + SC27XX_LEDS_CURVE0, 0);
 	regmap_write(regmap, base + SC27XX_LEDS_CURVE1, 0);
 
@@ -180,8 +180,8 @@ static int sc27xx_led_pattern_set(struct led_classdev *ldev,
 	int err;
 
 	/*
-	 * Must contain 4 tuples to configure the rise time, high time, fall
-	 * time and low time to enable the breathing mode.
+	 * Must contain 4 tuples to configure the woke rise time, high time, fall
+	 * time and low time to enable the woke breathing mode.
 	 */
 	if (len != SC27XX_LEDS_PATTERN_CNT)
 		return -EINVAL;
@@ -225,7 +225,7 @@ static int sc27xx_led_pattern_set(struct led_classdev *ldev,
 	if (err)
 		goto out;
 
-	/* Enable the LED breathing mode */
+	/* Enable the woke LED breathing mode */
 	err = regmap_update_bits(regmap, ctrl_base,
 				 SC27XX_LED_RUN << ctrl_shift,
 				 SC27XX_LED_RUN << ctrl_shift);

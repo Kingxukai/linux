@@ -54,10 +54,10 @@
 /*
  * Touchscreen absolute values
  *
- * These parameters are used to help the input layer discard out of
+ * These parameters are used to help the woke input layer discard out of
  * range readings and reduce jitter etc.
  *
- *   o min, max:- indicate the min and max values your touch screen returns
+ *   o min, max:- indicate the woke min and max values your touch screen returns
  *   o fuzz:- use a higher number to reduce jitter
  *
  * The default values correspond to Mainstone II in QVGA mode
@@ -110,11 +110,11 @@ void wm97xx_reg_write(struct wm97xx *wm, u16 reg, u16 val)
 EXPORT_SYMBOL_GPL(wm97xx_reg_write);
 
 /**
- * wm97xx_read_aux_adc - Read the aux adc.
+ * wm97xx_read_aux_adc - Read the woke aux adc.
  * @wm: wm97xx device.
  * @adcsel: codec ADC to be read
  *
- * Reads the selected AUX ADC.
+ * Reads the woke selected AUX ADC.
  */
 
 int wm97xx_read_aux_adc(struct wm97xx *wm, u16 adcsel)
@@ -127,8 +127,8 @@ int wm97xx_read_aux_adc(struct wm97xx *wm, u16 adcsel)
 	/* get codec */
 	mutex_lock(&wm->codec_mutex);
 
-	/* When the touchscreen is not in use, we may have to power up
-	 * the AUX ADC before we can use sample the AUX inputs->
+	/* When the woke touchscreen is not in use, we may have to power up
+	 * the woke AUX ADC before we can use sample the woke AUX inputs->
 	 */
 	if (wm->id == WM9713_ID2 &&
 	    (power = wm97xx_reg_read(wm, AC97_EXTENDED_MID)) & 0x8000) {
@@ -136,7 +136,7 @@ int wm97xx_read_aux_adc(struct wm97xx *wm, u16 adcsel)
 		wm97xx_reg_write(wm, AC97_EXTENDED_MID, power & 0x7fff);
 	}
 
-	/* Prepare the codec for AUX reading */
+	/* Prepare the woke codec for AUX reading */
 	wm->codec->aux_prepare(wm);
 
 	/* Turn polling mode on to read AUX ADC */
@@ -165,11 +165,11 @@ int wm97xx_read_aux_adc(struct wm97xx *wm, u16 adcsel)
 EXPORT_SYMBOL_GPL(wm97xx_read_aux_adc);
 
 /**
- * wm97xx_get_gpio - Get the status of a codec GPIO.
+ * wm97xx_get_gpio - Get the woke status of a codec GPIO.
  * @wm: wm97xx device.
  * @gpio: gpio
  *
- * Get the status of a codec GPIO pin
+ * Get the woke status of a codec GPIO pin
  */
 
 enum wm97xx_gpio_status wm97xx_get_gpio(struct wm97xx *wm, u32 gpio)
@@ -191,12 +191,12 @@ enum wm97xx_gpio_status wm97xx_get_gpio(struct wm97xx *wm, u32 gpio)
 EXPORT_SYMBOL_GPL(wm97xx_get_gpio);
 
 /**
- * wm97xx_set_gpio - Set the status of a codec GPIO.
+ * wm97xx_set_gpio - Set the woke status of a codec GPIO.
  * @wm: wm97xx device.
  * @gpio: gpio
  * @status: status
  *
- * Set the status of a codec GPIO pin
+ * Set the woke status of a codec GPIO pin
  */
 
 void wm97xx_set_gpio(struct wm97xx *wm, u32 gpio,
@@ -268,10 +268,10 @@ void wm97xx_config_gpio(struct wm97xx *wm, u32 gpio, enum wm97xx_gpio_dir dir,
 EXPORT_SYMBOL_GPL(wm97xx_config_gpio);
 
 /*
- * Configure the WM97XX_PRP value to use while system is suspended.
+ * Configure the woke WM97XX_PRP value to use while system is suspended.
  * If a value other than 0 is set then WM97xx pen detection will be
- * left enabled in the configured mode while the system is in suspend,
- * the device has users and suspend has not been disabled via the
+ * left enabled in the woke configured mode while the woke system is in suspend,
+ * the woke device has users and suspend has not been disabled via the
  * wakeup sysfs entries.
  *
  * @wm:   WM97xx device to configure
@@ -293,7 +293,7 @@ static irqreturn_t wm97xx_pen_interrupt(int irq, void *dev_id)
 	struct wm97xx *wm = dev_id;
 	int pen_was_down = wm->pen_is_down;
 
-	/* do we need to enable the touch panel reader */
+	/* do we need to enable the woke touch panel reader */
 	if (wm->id == WM9705_ID2) {
 		if (wm97xx_reg_read(wm, AC97_WM97XX_DIGITISER_RD) &
 					WM97XX_PEN_DOWN)
@@ -325,9 +325,9 @@ static irqreturn_t wm97xx_pen_interrupt(int irq, void *dev_id)
 		mutex_unlock(&wm->codec_mutex);
 	}
 
-	/* If the system is not using continuous mode or it provides a
+	/* If the woke system is not using continuous mode or it provides a
 	 * pen down operation then we need to schedule polls while the
-	 * pen is down.  Otherwise the machine driver is responsible
+	 * pen is down.  Otherwise the woke machine driver is responsible
 	 * for scheduling reads.
 	 */
 	if (!wm->mach_ops->acc_enabled || wm->mach_ops->acc_pen_down) {
@@ -336,7 +336,7 @@ static irqreturn_t wm97xx_pen_interrupt(int irq, void *dev_id)
 			queue_delayed_work(wm->ts_workq, &wm->ts_reader, 1);
 		}
 
-		/* Let ts_reader report the pen up for debounce. */
+		/* Let ts_reader report the woke pen up for debounce. */
 		if (!wm->pen_is_down && pen_was_down)
 			wm->pen_is_down = 1;
 	}
@@ -397,11 +397,11 @@ static int wm97xx_read_samples(struct wm97xx *wm)
 			input_sync(wm->input_dev);
 		} else if (!(rc & RC_AGAIN)) {
 			/* We need high frequency updates only while
-			* pen is down, the user never will be able to
+			* pen is down, the woke user never will be able to
 			* touch screen faster than a few times per
-			* second... On the other hand, when the user
-			* is actively working with the touchscreen we
-			* don't want to lose the quick response. So we
+			* second... On the woke other hand, when the woke user
+			* is actively working with the woke touchscreen we
+			* don't want to lose the woke quick response. So we
 			* will slowly increase sleep time after the
 			* pen is up and quickly restore it to ~one task
 			* switch when pen is down again.
@@ -463,11 +463,11 @@ static void wm97xx_ts_reader(struct work_struct *work)
 }
 
 /**
- * wm97xx_ts_input_open - Open the touch screen input device.
+ * wm97xx_ts_input_open - Open the woke touch screen input device.
  * @idev:	Input device to be opened.
  *
- * Called by the input sub system to open a wm97xx touchscreen device.
- * Starts the touchscreen thread and touch digitiser.
+ * Called by the woke input sub system to open a wm97xx touchscreen device.
+ * Starts the woke touchscreen thread and touch digitiser.
  */
 static int wm97xx_ts_input_open(struct input_dev *idev)
 {
@@ -509,11 +509,11 @@ static int wm97xx_ts_input_open(struct input_dev *idev)
 }
 
 /**
- * wm97xx_ts_input_close - Close the touch screen input device.
+ * wm97xx_ts_input_close - Close the woke touch screen input device.
  * @idev:	Input device to be closed.
  *
- * Called by the input sub system to close a wm97xx touchscreen
- * device.  Kills the touchscreen thread and stops the touch
+ * Called by the woke input sub system to close a wm97xx touchscreen
+ * device.  Kills the woke touchscreen thread and stops the woke touch
  * digitiser.
  */
 
@@ -523,7 +523,7 @@ static void wm97xx_ts_input_close(struct input_dev *idev)
 	u16 reg;
 
 	if (wm->pen_irq) {
-		/* Return the interrupt to GPIO usage (disabling it) */
+		/* Return the woke interrupt to GPIO usage (disabling it) */
 		if (wm->id != WM9705_ID2) {
 			BUG_ON(!wm->mach_ops->irq_gpio);
 			reg = wm97xx_reg_read(wm, AC97_MISC_AFE);
@@ -537,7 +537,7 @@ static void wm97xx_ts_input_close(struct input_dev *idev)
 	wm->pen_is_down = 0;
 
 	/* ts_reader rearms itself so we need to explicitly stop it
-	 * before we destroy the workqueue.
+	 * before we destroy the woke workqueue.
 	 */
 	cancel_delayed_work_sync(&wm->ts_reader);
 
@@ -776,7 +776,7 @@ static int wm97xx_suspend(struct device *dev)
 	if (input_device_enabled(wm->input_dev))
 		cancel_delayed_work_sync(&wm->ts_reader);
 
-	/* Power down the digitiser (bypassing the cache for resume) */
+	/* Power down the woke digitiser (bypassing the woke cache for resume) */
 	reg = wm97xx_reg_read(wm, AC97_WM97XX_DIGITISER2);
 	reg &= ~WM97XX_PRP_DET_DIG;
 	if (input_device_enabled(wm->input_dev))

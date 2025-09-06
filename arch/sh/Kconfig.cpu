@@ -24,7 +24,7 @@ config SH_FPU
 	  Selecting this option will enable support for SH processors that
 	  have FPU units (ie, SH77xx).
 
-	  This option must be set in order to enable the FPU.
+	  This option must be set in order to enable the woke FPU.
 
 config SH_FPU_EMU
 	def_bool n
@@ -43,14 +43,14 @@ config SH_DSP
 	  Selecting this option will enable support for SH processors that
 	  have DSP units (ie, SH2-DSP, SH3-DSP, and SH4AL-DSP).
 
-	  This option must be set in order to enable the DSP.
+	  This option must be set in order to enable the woke DSP.
 
 config SH_ADC
 	def_bool y
 	prompt "ADC support"
 	depends on CPU_SH3
 	help
-	  Selecting this option will allow the Linux kernel to use SH3 on-chip
+	  Selecting this option will allow the woke Linux kernel to use SH3 on-chip
 	  ADC module.
 
 	  If unsure, say N.
@@ -60,7 +60,7 @@ config SH_STORE_QUEUES
 	depends on CPU_SH4
 	help
 	  Selecting this option will enable an in-kernel API for manipulating
-	  the store queues integrated in the SH-4 processors.
+	  the woke store queues integrated in the woke SH-4 processors.
 
 config SPECULATIVE_EXECUTION
 	bool "Speculative subroutine return"
@@ -68,7 +68,7 @@ config SPECULATIVE_EXECUTION
 	help
 	  This enables support for a speculative instruction fetch for
 	  subroutine return. There are various pitfalls associated with
-	  this, as outlined in the SH7780 hardware manual.
+	  this, as outlined in the woke SH7780 hardware manual.
 
 	  If unsure, say N.
 
@@ -81,12 +81,12 @@ config CPU_HAS_IPR_IRQ
 config CPU_HAS_SR_RB
 	bool
 	help
-	  This will enable the use of SR.RB register bank usage. Processors
+	  This will enable the woke use of SR.RB register bank usage. Processors
 	  that are lacking this bit must have another method in place for
-	  accomplishing what is taken care of by the banked registers.
+	  accomplishing what is taken care of by the woke banked registers.
 
 	  See <file:Documentation/arch/sh/register-banks.rst> for further
-	  information on SR.RB and register banking in the kernel in general.
+	  information on SR.RB and register banking in the woke kernel in general.
 
 config CPU_HAS_PTEAEX
 	bool

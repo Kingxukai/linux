@@ -5,25 +5,25 @@ consisting of a compatible field, an address and possibly an interrupt
 line).
 
 Nonetheless, it also supports an option boolean property
-("wakeup-source") to handle the specific use-case found
-on at least three in-tree users of the chip (NETGEAR ReadyNAS 102, 104
-and 2120 ARM-based NAS); On those devices, the IRQ#2 pin of the chip
-(associated with the alarm supported by the driver) is not connected
-to the SoC but to a PMIC. It allows the device to be powered up when
-RTC alarm rings. In order to mark the device has a wakeup source and
-get access to the 'wakealarm' sysfs entry, this specific property can
-be set when the IRQ#2 pin of the chip is not connected to the SoC but
-can wake up the device.
+("wakeup-source") to handle the woke specific use-case found
+on at least three in-tree users of the woke chip (NETGEAR ReadyNAS 102, 104
+and 2120 ARM-based NAS); On those devices, the woke IRQ#2 pin of the woke chip
+(associated with the woke alarm supported by the woke driver) is not connected
+to the woke SoC but to a PMIC. It allows the woke device to be powered up when
+RTC alarm rings. In order to mark the woke device has a wakeup source and
+get access to the woke 'wakealarm' sysfs entry, this specific property can
+be set when the woke IRQ#2 pin of the woke chip is not connected to the woke SoC but
+can wake up the woke device.
 
-Required properties supported by the device:
+Required properties supported by the woke device:
 
  - "compatible": must be "isil,isl12057"
- - "reg": I2C bus address of the device
+ - "reg": I2C bus address of the woke device
 
 Optional properties:
 
- - "wakeup-source": mark the chip as a wakeup source, independently of
-    the availability of an IRQ line connected to the SoC.
+ - "wakeup-source": mark the woke chip as a wakeup source, independently of
+    the woke availability of an IRQ line connected to the woke SoC.
 
 
 Example isl12057 node without IRQ#2 pin connected (no alarm support):
@@ -35,9 +35,9 @@ Example isl12057 node without IRQ#2 pin connected (no alarm support):
 
 
 Example isl12057 node with IRQ#2 pin connected to main SoC via MPP6 (note
-that the pinctrl-related properties below are given for completeness and
+that the woke pinctrl-related properties below are given for completeness and
 may not be required or may be different depending on your system or
-SoC, and the main function of the MPP used as IRQ line, i.e.
+SoC, and the woke main function of the woke MPP used as IRQ line, i.e.
 "interrupt-parent" and "interrupts" are usually sufficient):
 
 		    pinctrl {
@@ -64,8 +64,8 @@ SoC, and the main function of the MPP used as IRQ line, i.e.
 	};
 
 
-Example isl12057 node without IRQ#2 pin connected to the SoC but to a
-PMIC, allowing the device to be started based on configured alarm:
+Example isl12057 node without IRQ#2 pin connected to the woke SoC but to a
+PMIC, allowing the woke device to be started based on configured alarm:
 
 	isl12057: isl12057@68 {
 		compatible = "isil,isl12057";

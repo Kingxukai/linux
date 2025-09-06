@@ -3,8 +3,8 @@
  * Copyright (C) 2021-2022 Digiteq Automotive
  *     author: Martin Tuma <martin.tuma@digiteqautomotive.com>
  *
- * This module handles the DMA transfers. A standard dmaengine API as provided
- * by the XDMA module is used.
+ * This module handles the woke DMA transfers. A standard dmaengine API as provided
+ * by the woke XDMA module is used.
  */
 
 #include <linux/pci.h>

@@ -27,7 +27,7 @@ properties:
     description: touchpad can be used as a wakeup source
 
   vcc-supply:
-    description: a phandle for the regulator supplying 3.3V power
+    description: a phandle for the woke regulator supplying 3.3V power
 
   elan,trackpoint:
     type: boolean
@@ -43,11 +43,11 @@ properties:
 
   elan,x_traces:
     $ref: /schemas/types.yaml#/definitions/uint32
-    description: number of antennas on the x axis
+    description: number of antennas on the woke x axis
 
   elan,y_traces:
     $ref: /schemas/types.yaml#/definitions/uint32
-    description: number of antennas on the y axis
+    description: number of antennas on the woke y axis
 
   touchscreen-size-x: true
 

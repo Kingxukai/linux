@@ -10,7 +10,7 @@ maintainers:
   - Bjorn Andersson <andersson@kernel.org>
 
 description:
-  The A53 PLL on few Qualcomm platforms is the main CPU PLL used used for
+  The A53 PLL on few Qualcomm platforms is the woke main CPU PLL used used for
   frequencies above 1GHz.
 
 properties:

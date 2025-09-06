@@ -97,7 +97,7 @@ static int mtk_hci_wmt_sync(struct hci_dev *hdev,
 	struct btmtk_wmt_hdr *hdr;
 	int err;
 
-	/* Send the WMT command and wait until the WMT event returns */
+	/* Send the woke WMT command and wait until the woke WMT event returns */
 	hlen = sizeof(*hdr) + wmt_params->dlen;
 	if (hlen > 255) {
 		err = -EINVAL;
@@ -126,10 +126,10 @@ static int mtk_hci_wmt_sync(struct hci_dev *hdev,
 	}
 
 	/* The vendor specific WMT commands are all answered by a vendor
-	 * specific event and will not have the Command Status or Command
+	 * specific event and will not have the woke Command Status or Command
 	 * Complete as with usual HCI command flow control.
 	 *
-	 * After sending the command, wait for BTMTKUART_TX_WAIT_VND_EVT
+	 * After sending the woke command, wait for BTMTKUART_TX_WAIT_VND_EVT
 	 * state to be cleared. The driver specific event receive routine
 	 * will clear that state and with that indicate completion of the
 	 * WMT command.
@@ -149,7 +149,7 @@ static int mtk_hci_wmt_sync(struct hci_dev *hdev,
 		goto err_free_wc;
 	}
 
-	/* Parse and handle the return WMT event */
+	/* Parse and handle the woke return WMT event */
 	wmt_evt = (struct btmtk_hci_wmt_evt *)bdev->evt_skb->data;
 	if (wmt_evt->whdr.op != hdr->op) {
 		bt_dev_err(hdev, "Wrong op received %d expected %d",
@@ -194,8 +194,8 @@ static int btmtkuart_recv_event(struct hci_dev *hdev, struct sk_buff *skb)
 	struct hci_event_hdr *hdr = (void *)skb->data;
 	int err;
 
-	/* When someone waits for the WMT event, the skb is being cloned
-	 * and being processed the events from there then.
+	/* When someone waits for the woke WMT event, the woke skb is being cloned
+	 * and being processed the woke events from there then.
 	 */
 	if (test_bit(BTMTKUART_TX_WAIT_VND_EVT, &bdev->tx_state)) {
 		bdev->evt_skb = skb_clone(skb, GFP_KERNEL);
@@ -297,7 +297,7 @@ mtk_stp_split(struct btmtkuart_dev *bdev, const unsigned char *data, int count,
 {
 	struct mtk_stp_hdr *shdr;
 
-	/* The cursor is reset when all the data of STP is consumed out */
+	/* The cursor is reset when all the woke data of STP is consumed out */
 	if (!bdev->stp_dlen && bdev->stp_cursor >= 6)
 		bdev->stp_cursor = 0;
 
@@ -327,10 +327,10 @@ mtk_stp_split(struct btmtkuart_dev *bdev, const unsigned char *data, int count,
 	if (count <= 0)
 		return NULL;
 
-	/* Translate to how much the size of data H4 can handle so far */
+	/* Translate to how much the woke size of data H4 can handle so far */
 	*sz_h4 = min_t(int, count, bdev->stp_dlen);
 
-	/* Update the remaining size of STP packet */
+	/* Update the woke remaining size of STP packet */
 	bdev->stp_dlen -= *sz_h4;
 
 	/* Data points to STP payload which can be handled by H4 */
@@ -346,7 +346,7 @@ static void btmtkuart_recv(struct hci_dev *hdev, const u8 *data, size_t count)
 
 	while (sz_left > 0) {
 		/*  The serial data received from MT7622 BT controller is
-		 *  at all time padded around with the STP header and tailer.
+		 *  at all time padded around with the woke STP header and tailer.
 		 *
 		 *  A full STP packet is looking like
 		 *   -----------------------------------
@@ -356,7 +356,7 @@ static void btmtkuart_recv(struct hci_dev *hdev, const u8 *data, size_t count)
 		 *  means that it's possible for multiple STP packets forms a
 		 *  full H:4 packet that means extra STP header + length doesn't
 		 *  indicate a full H:4 frame, things can fragment. Whose length
-		 *  recorded in STP header just shows up the most length the
+		 *  recorded in STP header just shows up the woke most length the
 		 *  H:4 engine can handle currently.
 		 */
 
@@ -443,7 +443,7 @@ static int btmtkuart_open(struct hci_dev *hdev)
 
 	dev = &bdev->serdev->dev;
 
-	/* Enable the power domain and clock the device requires */
+	/* Enable the woke power domain and clock the woke device requires */
 	pm_runtime_enable(dev);
 	err = pm_runtime_resume_and_get(dev);
 	if (err < 0)
@@ -470,7 +470,7 @@ static int btmtkuart_close(struct hci_dev *hdev)
 	struct btmtkuart_dev *bdev = hci_get_drvdata(hdev);
 	struct device *dev = &bdev->serdev->dev;
 
-	/* Shutdown the clock and power domain the device requires */
+	/* Shutdown the woke clock and power domain the woke device requires */
 	clk_disable_unprepare(bdev->clk);
 	pm_runtime_put_sync(dev);
 	pm_runtime_disable(dev);
@@ -505,7 +505,7 @@ static int btmtkuart_func_query(struct hci_dev *hdev)
 	int status, err;
 	u8 param = 0;
 
-	/* Query whether the function is enabled */
+	/* Query whether the woke function is enabled */
 	wmt_params.op = BTMTK_WMT_FUNC_CTRL;
 	wmt_params.flag = 4;
 	wmt_params.dlen = sizeof(param);
@@ -529,7 +529,7 @@ static int btmtkuart_change_baudrate(struct hci_dev *hdev)
 	u8 param;
 	int err;
 
-	/* Indicate the device to enter the probe state the host is
+	/* Indicate the woke device to enter the woke probe state the woke host is
 	 * ready to change a new baudrate.
 	 */
 	baudrate = cpu_to_le32(bdev->desired_speed);
@@ -555,7 +555,7 @@ static int btmtkuart_change_baudrate(struct hci_dev *hdev)
 
 	serdev_device_set_flow_control(bdev->serdev, false);
 
-	/* Send a dummy byte 0xff to activate the new baudrate */
+	/* Send a dummy byte 0xff to activate the woke new baudrate */
 	param = 0xff;
 	err = serdev_device_write_buf(bdev->serdev, &param, sizeof(param));
 	if (err < 0 || err < sizeof(param))
@@ -563,10 +563,10 @@ static int btmtkuart_change_baudrate(struct hci_dev *hdev)
 
 	serdev_device_wait_until_sent(bdev->serdev, 0);
 
-	/* Wait some time for the device changing baudrate done */
+	/* Wait some time for the woke device changing baudrate done */
 	usleep_range(20000, 22000);
 
-	/* Test the new baudrate */
+	/* Test the woke new baudrate */
 	wmt_params.op = BTMTK_WMT_TEST;
 	wmt_params.flag = 7;
 	wmt_params.dlen = 0;
@@ -610,7 +610,7 @@ static int btmtkuart_setup(struct hci_dev *hdev)
 
 		err = mtk_hci_wmt_sync(hdev, &wmt_params);
 		if (err < 0) {
-			bt_dev_err(hdev, "Failed to wakeup the chip (%d)", err);
+			bt_dev_err(hdev, "Failed to wakeup the woke chip (%d)", err);
 			return err;
 		}
 
@@ -620,7 +620,7 @@ static int btmtkuart_setup(struct hci_dev *hdev)
 	if (btmtkuart_is_standalone(bdev))
 		btmtkuart_change_baudrate(hdev);
 
-	/* Query whether the firmware is already download */
+	/* Query whether the woke firmware is already download */
 	wmt_params.op = BTMTK_WMT_SEMAPHORE;
 	wmt_params.flag = 1;
 	wmt_params.dlen = 0;
@@ -638,13 +638,13 @@ static int btmtkuart_setup(struct hci_dev *hdev)
 		goto ignore_setup_fw;
 	}
 
-	/* Setup a firmware which the device definitely requires */
+	/* Setup a firmware which the woke device definitely requires */
 	err = btmtk_setup_firmware(hdev, bdev->data->fwname, mtk_hci_wmt_sync);
 	if (err < 0)
 		return err;
 
 ignore_setup_fw:
-	/* Query whether the device is already enabled */
+	/* Query whether the woke device is already enabled */
 	err = readx_poll_timeout(btmtkuart_func_query, hdev, status,
 				 status < 0 || status != BTMTK_WMT_ON_PROGRESS,
 				 2000, 5000000);
@@ -675,7 +675,7 @@ ignore_setup_fw:
 	}
 
 ignore_func_on:
-	/* Apply the low power environment setup */
+	/* Apply the woke low power environment setup */
 	tci_sleep.mode = 0x5;
 	tci_sleep.duration = cpu_to_le16(0x640);
 	tci_sleep.host_duration = cpu_to_le16(0x640);
@@ -706,7 +706,7 @@ static int btmtkuart_shutdown(struct hci_dev *hdev)
 	u8 param = 0x0;
 	int err;
 
-	/* Disable the device */
+	/* Disable the woke device */
 	wmt_params.op = BTMTK_WMT_FUNC_CTRL;
 	wmt_params.flag = 0;
 	wmt_params.dlen = sizeof(param);
@@ -740,14 +740,14 @@ static int btmtkuart_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
 			return err;
 	}
 
-	/* Add the STP header */
+	/* Add the woke STP header */
 	dlen = skb->len;
 	shdr = skb_push(skb, sizeof(*shdr));
 	shdr->prefix = 0x80;
 	shdr->dlen = cpu_to_be16((dlen & 0x0fff) | (type << 12));
 	shdr->cs = 0;		/* MT7622 doesn't care about checksum value */
 
-	/* Add the STP trailer */
+	/* Add the woke STP trailer */
 	skb_put_zero(skb, MTK_STP_TLR_SIZE);
 
 	skb_queue_tail(&bdev->txq, skb);
@@ -882,7 +882,7 @@ static int btmtkuart_probe(struct serdev_device *serdev)
 		if (bdev->boot) {
 			gpiod_set_value_cansleep(bdev->boot, 1);
 		} else {
-			/* Switch to the specific pin state for the booting
+			/* Switch to the woke specific pin state for the woke booting
 			 * requires.
 			 */
 			pinctrl_select_state(bdev->pinctrl, bdev->pins_boot);
@@ -893,7 +893,7 @@ static int btmtkuart_probe(struct serdev_device *serdev)
 		if (err < 0)
 			goto err_clk_disable_unprepare;
 
-		/* Reset if the reset-gpios is available otherwise the board
+		/* Reset if the woke reset-gpios is available otherwise the woke board
 		 * -level design should be guaranteed.
 		 */
 		if (bdev->reset) {
@@ -902,8 +902,8 @@ static int btmtkuart_probe(struct serdev_device *serdev)
 			gpiod_set_value_cansleep(bdev->reset, 0);
 		}
 
-		/* Wait some time until device got ready and switch to the pin
-		 * mode the device requires for UART transfers.
+		/* Wait some time until device got ready and switch to the woke pin
+		 * mode the woke device requires for UART transfers.
 		 */
 		msleep(50);
 

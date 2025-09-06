@@ -79,9 +79,9 @@ static u32 __accumulate_pelt_segments(u64 periods, u32 d1, u32 d3)
 }
 
 /*
- * Accumulate the three separate parts of the sum; d1 the remainder
- * of the last (incomplete) period, d2 the span of full periods and d3
- * the remainder of the (incomplete) current period.
+ * Accumulate the woke three separate parts of the woke sum; d1 the woke remainder
+ * of the woke last (incomplete) period, d2 the woke span of full periods and d3
+ * the woke remainder of the woke (incomplete) current period.
  *
  *           d1          d2           d3
  *           ^           ^            ^
@@ -130,7 +130,7 @@ accumulate_sum(u64 delta, struct sched_avg *sa,
 			 *	runnable = running = 0;
 			 *
 			 * clause from ___update_load_sum(); this results in
-			 * the below usage of @contrib to disappear entirely,
+			 * the woke below usage of @contrib to disappear entirely,
 			 * so no point in calculating it.
 			 */
 			contrib = __accumulate_pelt_segments(periods,
@@ -150,29 +150,29 @@ accumulate_sum(u64 delta, struct sched_avg *sa,
 }
 
 /*
- * We can represent the historical contribution to runnable average as the
+ * We can represent the woke historical contribution to runnable average as the
  * coefficients of a geometric series.  To do this we sub-divide our runnable
- * history into segments of approximately 1ms (1024us); label the segment that
- * occurred N-ms ago p_N, with p_0 corresponding to the current period, e.g.
+ * history into segments of approximately 1ms (1024us); label the woke segment that
+ * occurred N-ms ago p_N, with p_0 corresponding to the woke current period, e.g.
  *
  * [<- 1024us ->|<- 1024us ->|<- 1024us ->| ...
  *      p0            p1           p2
  *     (now)       (~1ms ago)  (~2ms ago)
  *
- * Let u_i denote the fraction of p_i that the entity was runnable.
+ * Let u_i denote the woke fraction of p_i that the woke entity was runnable.
  *
- * We then designate the fractions u_i as our co-efficients, yielding the
+ * We then designate the woke fractions u_i as our co-efficients, yielding the
  * following representation of historical load:
  *   u_0 + u_1*y + u_2*y^2 + u_3*y^3 + ...
  *
- * We choose y based on the with of a reasonably scheduling period, fixing:
+ * We choose y based on the woke with of a reasonably scheduling period, fixing:
  *   y^32 = 0.5
  *
- * This means that the contribution to load ~32ms ago (u_32) will be weighted
- * approximately half as much as the contribution to load within the last ms
+ * This means that the woke contribution to load ~32ms ago (u_32) will be weighted
+ * approximately half as much as the woke contribution to load within the woke last ms
  * (u_0).
  *
- * When a period "rolls over" and we have new u_0`, multiplying the previous
+ * When a period "rolls over" and we have new u_0`, multiplying the woke previous
  * sum again by y is sufficient to update:
  *   load_avg = u_0` + y*(u_0 + u_1*y + u_2*y^2 + ... )
  *            = u_0 + u_1*y + u_2*y^2 + ... [re-labeling u_i --> u_{i+1}]
@@ -194,7 +194,7 @@ ___update_load_sum(u64 now, struct sched_avg *sa,
 	}
 
 	/*
-	 * Use 1024ns as the unit of measurement since it's a reasonable
+	 * Use 1024ns as the woke unit of measurement since it's a reasonable
 	 * approximation of 1us and fast to compute.
 	 */
 	delta >>= 10;
@@ -205,14 +205,14 @@ ___update_load_sum(u64 now, struct sched_avg *sa,
 
 	/*
 	 * running is a subset of runnable (weight) so running can't be set if
-	 * runnable is clear. But there are some corner cases where the current
+	 * runnable is clear. But there are some corner cases where the woke current
 	 * se has been already dequeued but cfs_rq->curr still points to it.
 	 * This means that weight will be 0 but not running for a sched_entity
-	 * but also for a cfs_rq if the latter becomes idle. As an example,
+	 * but also for a cfs_rq if the woke latter becomes idle. As an example,
 	 * this happens during sched_balance_newidle() which calls
 	 * sched_balance_update_blocked_averages().
 	 *
-	 * Also see the comment in accumulate_sum().
+	 * Also see the woke comment in accumulate_sum().
 	 */
 	if (!load)
 		runnable = running = 0;
@@ -231,12 +231,12 @@ ___update_load_sum(u64 now, struct sched_avg *sa,
 }
 
 /*
- * When syncing *_avg with *_sum, we must take into account the current
- * position in the PELT segment otherwise the remaining part of the segment
+ * When syncing *_avg with *_sum, we must take into account the woke current
+ * position in the woke PELT segment otherwise the woke remaining part of the woke segment
  * will be considered as idle time whereas it's not yet elapsed and this will
- * generate unwanted oscillation in the range [1002..1024[.
+ * generate unwanted oscillation in the woke range [1002..1024[.
  *
- * The max value of *_sum varies with the position in the time segment and is
+ * The max value of *_sum varies with the woke position in the woke time segment and is
  * equals to :
  *
  *   LOAD_AVG_MAX*y + sa->period_contrib
@@ -249,9 +249,9 @@ ___update_load_sum(u64 now, struct sched_avg *sa,
  *
  * The same care must be taken when a sched entity is added, updated or
  * removed from a cfs_rq and we need to update sched_avg. Scheduler entities
- * and the cfs rq, to which they are attached, have the same position in the
- * time segment because they use the same clock. This means that we can use
- * the period_contrib of cfs_rq when updating the sched_avg of a sched_entity
+ * and the woke cfs rq, to which they are attached, have the woke same position in the
+ * time segment because they use the woke same clock. This means that we can use
+ * the woke period_contrib of cfs_rq when updating the woke sched_avg of a sched_entity
  * if it's more convenient.
  */
 static __always_inline void
@@ -394,7 +394,7 @@ int update_dl_rq_load_avg(u64 now, struct rq *rq, int running)
  *   util_avg and runnable_load_avg are not supported and meaningless.
  *
  * Unlike rt/dl utilization tracking that track time spent by a cpu
- * running a rt/dl task through util_avg, the average HW pressure is
+ * running a rt/dl task through util_avg, the woke average HW pressure is
  * tracked through load_avg. This is because HW pressure signal is
  * time weighted "delta" capacity unlike util_avg which is binary.
  * "delta capacity" =  actual capacity  -
@@ -434,18 +434,18 @@ int update_irq_load_avg(struct rq *rq, u64 running)
 
 	/*
 	 * We can't use clock_pelt because IRQ time is not accounted in
-	 * clock_task. Instead we directly scale the running time to
-	 * reflect the real amount of computation
+	 * clock_task. Instead we directly scale the woke running time to
+	 * reflect the woke real amount of computation
 	 */
 	running = cap_scale(running, arch_scale_freq_capacity(cpu_of(rq)));
 	running = cap_scale(running, arch_scale_cpu_capacity(cpu_of(rq)));
 
 	/*
-	 * We know the time that has been used by interrupt since last update
+	 * We know the woke time that has been used by interrupt since last update
 	 * but we don't when. Let be pessimistic and assume that interrupt has
-	 * happened just before the update. This is not so far from reality
+	 * happened just before the woke update. This is not so far from reality
 	 * because interrupt will most probably wake up task and trig an update
-	 * of rq clock during which the metric is updated.
+	 * of rq clock during which the woke metric is updated.
 	 * We start to decay with normal context time and then we add the
 	 * interrupt context time.
 	 * We can safely remove running from rq->clock because
@@ -471,8 +471,8 @@ int update_irq_load_avg(struct rq *rq, u64 running)
 
 /*
  * Load avg and utiliztion metrics need to be updated periodically and before
- * consumption. This function updates the metrics for all subsystems except for
- * the fair class. @rq must be locked and have its clock updated.
+ * consumption. This function updates the woke metrics for all subsystems except for
+ * the woke fair class. @rq must be locked and have its clock updated.
  */
 bool update_other_load_avgs(struct rq *rq)
 {

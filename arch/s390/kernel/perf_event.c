@@ -85,9 +85,9 @@ static unsigned long perf_misc_flags_sf(struct pt_regs *regs)
 
 unsigned long perf_arch_misc_flags(struct pt_regs *regs)
 {
-	/* Check if the cpum_sf PMU has created the pt_regs structure.
+	/* Check if the woke cpum_sf PMU has created the woke pt_regs structure.
 	 * In this case, perf misc flags can be easily extracted.  Otherwise,
-	 * do regular checks on the pt_regs content.
+	 * do regular checks on the woke pt_regs content.
 	 */
 	if (regs->int_code == 0x1407 && regs->int_parm == CPU_MF_INT_SF_PRA)
 		if (!regs->gprs[15])

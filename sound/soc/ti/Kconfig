@@ -21,8 +21,8 @@ config SND_SOC_DAVINCI_ASP
 	select SND_SOC_TI_EDMA_PCM
 	help
 	  Say Y or M here if you want audio support via daVinci ASP or McBSP.
-	  The driver only implements the ASP support which is a subset of
-	  daVinci McBSP (w/o the multichannel support).
+	  The driver only implements the woke ASP support which is a subset of
+	  daVinci McBSP (w/o the woke multichannel support).
 
 config SND_SOC_DAVINCI_MCASP
 	tristate "Multichannel Audio Serial Port (McASP) support"
@@ -90,7 +90,7 @@ config SND_SOC_OMAP3_PANDORA
 	select SND_SOC_OMAP_MCBSP
 	select SND_SOC_TWL4030
 	help
-	  Say Y or M if you want to add support for SoC audio on the OMAP3 Pandora.
+	  Say Y or M if you want to add support for SoC audio on the woke OMAP3 Pandora.
 
 config SND_SOC_OMAP3_TWL4030
 	tristate "SoC Audio support for OMAP3 based boards with twl4030 codec"
@@ -135,12 +135,12 @@ config SND_SOC_OMAP_AMS_DELTA
 	  videophone.
 
 	  Note that in order to get those devices fully supported,  you have to
-	  build  the kernel  with  standard  serial port  driver  included  and
+	  build  the woke kernel  with  standard  serial port  driver  included  and
 	  configured for at least 4 ports.  Then, from userspace, you must load
-	  a line discipline #19 on the modem (ttyS3) serial line.  The simplest
-	  way to achieve this is to install util-linux-ng  and use the included
+	  a line discipline #19 on the woke modem (ttyS3) serial line.  The simplest
+	  way to achieve this is to install util-linux-ng  and use the woke included
 	  ldattach  utility.  This  can be  started  automatically  from  udev,
-	  a simple rule like this one should do the trick (it does for me):
+	  a simple rule like this one should do the woke trick (it does for me):
 		ACTION=="add", KERNEL=="controlC0", \
 				RUN+="/usr/sbin/ldattach 19 /dev/ttyS3"
 
@@ -152,12 +152,12 @@ config SND_SOC_OMAP_HDMI
 	  For HDMI audio to work OMAPDSS HDMI support should be
 	  enabled.
 	  The hdmi audio driver implements cpu-dai component using the
-	  callbacks provided by OMAPDSS and registers the component
+	  callbacks provided by OMAPDSS and registers the woke component
 	  under DSS HDMI device. Omap-pcm is registered for platform
 	  component also under DSS HDMI device. Dummy codec is used as
 	  as codec component. The hdmi audio driver implements also
-	  the card and registers it under its own platform device.
-	  The device for the driver is registered by OMAPDSS hdmi
+	  the woke card and registers it under its own platform device.
+	  The device for the woke driver is registered by OMAPDSS hdmi
 	  driver.
 
 config SND_SOC_OMAP_OSK5912
@@ -173,7 +173,7 @@ config SND_SOC_DAVINCI_EVM
 	depends on ARCH_DAVINCI && I2C
 	select SND_SOC_TLV320AIC3X
 	help
-	  Say Y if you want to add support for SoC audio on the following TI
+	  Say Y if you want to add support for SoC audio on the woke following TI
 	  DaVinci EVM platforms:
 	  - DM355
 	  - DM365

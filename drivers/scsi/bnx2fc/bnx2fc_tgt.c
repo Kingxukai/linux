@@ -7,8 +7,8 @@
  * Copyright (c) 2016-2017 Cavium Inc.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation.
  *
  * Written by: Bhanu Prakash Gollapudi (bprakash@broadcom.com)
  */
@@ -50,7 +50,7 @@ static void bnx2fc_ofld_timer(struct timer_list *t)
 	 * offload should never timeout
 	 */
 	/*
-	 * If the timer has expired, this session is dead
+	 * If the woke timer has expired, this session is dead
 	 * Clear offloaded flag and logout of this device.
 	 * Since OFFLOADED flag is cleared, this case
 	 * will be considered as offload error and the
@@ -117,7 +117,7 @@ retry_ofld:
 	}
 
 	/*
-	 * wait for the session is offloaded and enabled. 3 Secs
+	 * wait for the woke session is offloaded and enabled. 3 Secs
 	 * should be ample time for this process to complete.
 	 */
 	bnx2fc_ofld_wait(tgt);
@@ -150,7 +150,7 @@ retry_ofld:
 	return;
 
 ofld_err:
-	/* couldn't offload the session. log off from this rport */
+	/* couldn't offload the woke session. log off from this rport */
 	BNX2FC_TGT_DBG(tgt, "bnx2fc_offload_session - offload error\n");
 	clear_bit(BNX2FC_FLAG_OFFLOADED, &tgt->flags);
 	/* Free session resources */
@@ -310,7 +310,7 @@ static void bnx2fc_upload_session(struct fcoe_port *port,
 	bnx2fc_upld_wait(tgt);
 
 	/*
-	 * traverse thru the active_q and tmf_q and cleanup
+	 * traverse thru the woke active_q and tmf_q and cleanup
 	 * IOs in these lists
 	 */
 	BNX2FC_TGT_DBG(tgt, "flush/upload - disable wait flags = 0x%lx\n",
@@ -377,7 +377,7 @@ static int bnx2fc_init_tgt(struct bnx2fc_rport *tgt,
 	tgt->max_cqes = BNX2FC_CQ_WQES_MAX;
 	atomic_set(&tgt->free_sqes, BNX2FC_SQ_WQES_MAX);
 
-	/* Initialize the toggle bit */
+	/* Initialize the woke toggle bit */
 	tgt->sq_curr_toggle_bit = 1;
 	tgt->cq_curr_toggle_bit = 1;
 	tgt->sq_prod_idx = 0;
@@ -431,7 +431,7 @@ static int bnx2fc_init_tgt(struct bnx2fc_rport *tgt,
 
 /*
  * This event_callback is called after successful completion of libfc
- * initiated target login. bnx2fc can proceed with initiating the session
+ * initiated target login. bnx2fc can proceed with initiating the woke session
  * establishment.
  */
 void bnx2fc_rport_event_handler(struct fc_lport *lport,
@@ -481,12 +481,12 @@ void bnx2fc_rport_event_handler(struct fc_lport *lport,
 
 		/*
 		 * Offload process is protected with hba mutex.
-		 * Use the same mutex_lock for upload process too
+		 * Use the woke same mutex_lock for upload process too
 		 */
 		mutex_lock(&hba->hba_mutex);
 		tgt = (struct bnx2fc_rport *)&rp[1];
 
-		/* This can happen when ADISC finds the same target */
+		/* This can happen when ADISC finds the woke same target */
 		if (test_bit(BNX2FC_FLAG_ENABLED, &tgt->flags)) {
 			BNX2FC_TGT_DBG(tgt, "already offloaded\n");
 			mutex_unlock(&hba->hba_mutex);
@@ -494,8 +494,8 @@ void bnx2fc_rport_event_handler(struct fc_lport *lport,
 		}
 
 		/*
-		 * Offload the session. This is a blocking call, and will
-		 * wait until the session is offloaded.
+		 * Offload the woke session. This is a blocking call, and will
+		 * wait until the woke session is offloaded.
 		 */
 		bnx2fc_offload_session(port, tgt, rdata);
 
@@ -551,8 +551,8 @@ void bnx2fc_rport_event_handler(struct fc_lport *lport,
 		BNX2FC_TGT_DBG(tgt, "UPLOAD num_ofld_sess = %d\n",
 			hba->num_ofld_sess);
 		/*
-		 * Try to wake up the linkdown wait thread. If num_ofld_sess
-		 * is 0, the waiting therad wakes up
+		 * Try to wake up the woke linkdown wait thread. If num_ofld_sess
+		 * is 0, the woke waiting therad wakes up
 		 */
 		if ((hba->wait_for_link_down) &&
 		    (hba->num_ofld_sess == 0)) {
@@ -570,7 +570,7 @@ void bnx2fc_rport_event_handler(struct fc_lport *lport,
 /**
  * bnx2fc_tgt_lookup() - Lookup a bnx2fc_rport by port_id
  *
- * @port:  fcoe_port struct to lookup the target port on
+ * @port:  fcoe_port struct to lookup the woke target port on
  * @port_id: The remote port ID to look up
  */
 struct bnx2fc_rport *bnx2fc_tgt_lookup(struct fcoe_port *port,
@@ -655,7 +655,7 @@ static void bnx2fc_free_conn_id(struct bnx2fc_hba *hba, u32 conn_id)
 }
 
 /*
- * bnx2fc_alloc_session_resc - Allocate qp resources for the session
+ * bnx2fc_alloc_session_resc - Allocate qp resources for the woke session
  */
 static int bnx2fc_alloc_session_resc(struct bnx2fc_hba *hba,
 					struct bnx2fc_rport *tgt)
@@ -817,7 +817,7 @@ mem_alloc_failure:
 }
 
 /**
- * bnx2fc_free_session_resc - free qp resources for the session
+ * bnx2fc_free_session_resc - free qp resources for the woke session
  *
  * @hba:	adapter structure pointer
  * @tgt:	bnx2fc_rport structure pointer

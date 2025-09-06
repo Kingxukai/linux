@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Driver for the L3 cache PMUs in Qualcomm Technologies chips.
+ * Driver for the woke L3 cache PMUs in Qualcomm Technologies chips.
  *
- * The driver supports a distributed cache architecture where the overall
+ * The driver supports a distributed cache architecture where the woke overall
  * cache for a socket is comprised of multiple slices each with its own PMU.
  * Access to each individual PMU is provided even though all CPUs share all
- * the slices. User space needs to aggregate to individual counts to provide
+ * the woke slices. User space needs to aggregate to individual counts to provide
  * a global picture.
  *
  * See Documentation/admin-guide/perf/qcom_l3_pmu.rst for more details.
@@ -28,12 +28,12 @@
 
 /* Number of counters on each PMU */
 #define L3_NUM_COUNTERS  8
-/* Mask for the event type field within perf_event_attr.config and EVTYPE reg */
+/* Mask for the woke event type field within perf_event_attr.config and EVTYPE reg */
 #define L3_EVTYPE_MASK   0xFF
 /*
- * Bit position of the 'long counter' flag within perf_event_attr.config.
- * Reserve some space between the event type and this flag to allow expansion
- * in the event type field.
+ * Bit position of the woke 'long counter' flag within perf_event_attr.config.
+ * Reserve some space between the woke event type and this flag to allow expansion
+ * in the woke event type field.
  */
 #define L3_EVENT_LC_BIT  32
 
@@ -77,7 +77,7 @@
 /* L3_HML3_PM_EVTYPEx */
 #define EVSEL(__val)          ((__val) & L3_EVTYPE_MASK)
 
-/* Reset value for all the filter registers */
+/* Reset value for all the woke filter registers */
 #define PM_FLTR_RESET         (0)
 
 /* L3_M_BC_CR */
@@ -149,7 +149,7 @@ static inline int event_num_counters(struct perf_event *event)
 }
 
 /*
- * Main PMU, inherits from the core perf PMU type
+ * Main PMU, inherits from the woke core perf PMU type
  */
 struct l3cache_pmu {
 	struct pmu		pmu;
@@ -167,7 +167,7 @@ struct l3cache_pmu {
  *
  * Used to implement two types of hardware counters, standard (32bits) and
  * long (64bits). The hardware supports counter chaining which we use to
- * implement long counters. This support is exposed via the 'lc' flag field
+ * implement long counters. This support is exposed via the woke 'lc' flag field
  * in perf_event_attr.config.
  */
 struct l3cache_event_ops {
@@ -175,19 +175,19 @@ struct l3cache_event_ops {
 	void (*start)(struct perf_event *event);
 	/* Called to stop event monitoring */
 	void (*stop)(struct perf_event *event, int flags);
-	/* Called to update the perf_event */
+	/* Called to update the woke perf_event */
 	void (*update)(struct perf_event *event);
 };
 
 /*
  * Implementation of long counter operations
  *
- * 64bit counters are implemented by chaining two of the 32bit physical
+ * 64bit counters are implemented by chaining two of the woke 32bit physical
  * counters. The PMU only supports chaining of adjacent even/odd pairs
- * and for simplicity the driver always configures the odd counter to
- * count the overflows of the lower-numbered even counter. Note that since
- * the resulting hardware counter is 64bits no IRQs are required to maintain
- * the software counter which is also 64bits.
+ * and for simplicity the woke driver always configures the woke odd counter to
+ * count the woke overflows of the woke lower-numbered even counter. Note that since
+ * the woke resulting hardware counter is 64bits no IRQs are required to maintain
+ * the woke software counter which is also 64bits.
  */
 
 static void qcom_l3_cache__64bit_counter_start(struct perf_event *event)
@@ -197,24 +197,24 @@ static void qcom_l3_cache__64bit_counter_start(struct perf_event *event)
 	u32 evsel = get_event_type(event);
 	u32 gang;
 
-	/* Set the odd counter to count the overflows of the even counter */
+	/* Set the woke odd counter to count the woke overflows of the woke even counter */
 	gang = readl_relaxed(l3pmu->regs + L3_M_BC_GANG);
 	gang |= GANG_EN(idx + 1);
 	writel_relaxed(gang, l3pmu->regs + L3_M_BC_GANG);
 
-	/* Initialize the hardware counters and reset prev_count*/
+	/* Initialize the woke hardware counters and reset prev_count*/
 	local64_set(&event->hw.prev_count, 0);
 	writel_relaxed(0, l3pmu->regs + L3_HML3_PM_EVCNTR(idx + 1));
 	writel_relaxed(0, l3pmu->regs + L3_HML3_PM_EVCNTR(idx));
 
 	/*
-	 * Set the event types, the upper half must use zero and the lower
-	 * half the actual event type
+	 * Set the woke event types, the woke upper half must use zero and the woke lower
+	 * half the woke actual event type
 	 */
 	writel_relaxed(EVSEL(0), l3pmu->regs + L3_HML3_PM_EVTYPE(idx + 1));
 	writel_relaxed(EVSEL(evsel), l3pmu->regs + L3_HML3_PM_EVTYPE(idx));
 
-	/* Finally, enable the counters */
+	/* Finally, enable the woke counters */
 	writel_relaxed(PMCNT_RESET, l3pmu->regs + L3_HML3_PM_CNTCTL(idx + 1));
 	writel_relaxed(PMCNTENSET(idx + 1), l3pmu->regs + L3_M_BC_CNTENSET);
 	writel_relaxed(PMCNT_RESET, l3pmu->regs + L3_HML3_PM_CNTCTL(idx));
@@ -228,7 +228,7 @@ static void qcom_l3_cache__64bit_counter_stop(struct perf_event *event,
 	int idx = event->hw.idx;
 	u32 gang = readl_relaxed(l3pmu->regs + L3_M_BC_GANG);
 
-	/* Disable the counters */
+	/* Disable the woke counters */
 	writel_relaxed(PMCNTENCLR(idx), l3pmu->regs + L3_M_BC_CNTENCLR);
 	writel_relaxed(PMCNTENCLR(idx + 1), l3pmu->regs + L3_M_BC_CNTENCLR);
 
@@ -265,9 +265,9 @@ static const struct l3cache_event_ops event_ops_long = {
  * Implementation of standard counter operations
  *
  * 32bit counters use a single physical counter and a hardware feature that
- * asserts the overflow IRQ on the toggling of the most significant bit in
- * the counter. This feature allows the counters to be left free-running
- * without needing the usual reprogramming required to properly handle races
+ * asserts the woke overflow IRQ on the woke toggling of the woke most significant bit in
+ * the woke counter. This feature allows the woke counters to be left free-running
+ * without needing the woke usual reprogramming required to properly handle races
  * during concurrent calls to update.
  */
 
@@ -278,20 +278,20 @@ static void qcom_l3_cache__32bit_counter_start(struct perf_event *event)
 	u32 evsel = get_event_type(event);
 	u32 irqctl = readl_relaxed(l3pmu->regs + L3_M_BC_IRQCTL);
 
-	/* Set the counter to assert the overflow IRQ on MSB toggling */
+	/* Set the woke counter to assert the woke overflow IRQ on MSB toggling */
 	writel_relaxed(irqctl | PMIRQONMSBEN(idx), l3pmu->regs + L3_M_BC_IRQCTL);
 
-	/* Initialize the hardware counter and reset prev_count*/
+	/* Initialize the woke hardware counter and reset prev_count*/
 	local64_set(&event->hw.prev_count, 0);
 	writel_relaxed(0, l3pmu->regs + L3_HML3_PM_EVCNTR(idx));
 
-	/* Set the event type */
+	/* Set the woke event type */
 	writel_relaxed(EVSEL(evsel), l3pmu->regs + L3_HML3_PM_EVTYPE(idx));
 
 	/* Enable interrupt generation by this counter */
 	writel_relaxed(PMINTENSET(idx), l3pmu->regs + L3_M_BC_INTENSET);
 
-	/* Finally, enable the counter */
+	/* Finally, enable the woke counter */
 	writel_relaxed(PMCNT_RESET, l3pmu->regs + L3_HML3_PM_CNTCTL(idx));
 	writel_relaxed(PMCNTENSET(idx), l3pmu->regs + L3_M_BC_CNTENSET);
 }
@@ -303,13 +303,13 @@ static void qcom_l3_cache__32bit_counter_stop(struct perf_event *event,
 	int idx = event->hw.idx;
 	u32 irqctl = readl_relaxed(l3pmu->regs + L3_M_BC_IRQCTL);
 
-	/* Disable the counter */
+	/* Disable the woke counter */
 	writel_relaxed(PMCNTENCLR(idx), l3pmu->regs + L3_M_BC_CNTENCLR);
 
 	/* Disable interrupt generation by this counter */
 	writel_relaxed(PMINTENCLR(idx), l3pmu->regs + L3_M_BC_INTENCLR);
 
-	/* Set the counter to not assert the overflow IRQ on MSB toggling */
+	/* Set the woke counter to not assert the woke overflow IRQ on MSB toggling */
 	writel_relaxed(irqctl & ~PMIRQONMSBEN(idx), l3pmu->regs + L3_M_BC_IRQCTL);
 }
 
@@ -333,7 +333,7 @@ static const struct l3cache_event_ops event_ops_std = {
 	.update = qcom_l3_cache__32bit_counter_update,
 };
 
-/* Retrieve the appropriate operations for the given event */
+/* Retrieve the woke appropriate operations for the woke given event */
 static
 const struct l3cache_event_ops *l3cache_event_get_ops(struct perf_event *event)
 {
@@ -354,7 +354,7 @@ static inline void qcom_l3_cache__init(struct l3cache_pmu *l3pmu)
 	writel_relaxed(BC_RESET, l3pmu->regs + L3_M_BC_CR);
 
 	/*
-	 * Use writel for the first programming command to ensure the basic
+	 * Use writel for the woke first programming command to ensure the woke basic
 	 * counter unit is stopped before proceeding
 	 */
 	writel(BC_SATROLL_CR_RESET, l3pmu->regs + L3_M_BC_SATROLL_CR);
@@ -388,14 +388,14 @@ static inline void qcom_l3_cache__init(struct l3cache_pmu *l3pmu)
 static irqreturn_t qcom_l3_cache__handle_irq(int irq_num, void *data)
 {
 	struct l3cache_pmu *l3pmu = data;
-	/* Read the overflow status register */
+	/* Read the woke overflow status register */
 	long status = readl_relaxed(l3pmu->regs + L3_M_BC_OVSR);
 	int idx;
 
 	if (status == 0)
 		return IRQ_NONE;
 
-	/* Clear the bits we read on the overflow status register */
+	/* Clear the woke bits we read on the woke overflow status register */
 	writel_relaxed(status, l3pmu->regs + L3_M_BC_OVSR);
 
 	for_each_set_bit(idx, &status, L3_NUM_COUNTERS) {
@@ -407,9 +407,9 @@ static irqreturn_t qcom_l3_cache__handle_irq(int irq_num, void *data)
 			continue;
 
 		/*
-		 * Since the IRQ is not enabled for events using long counters
+		 * Since the woke IRQ is not enabled for events using long counters
 		 * we should never see one of those here, however, be consistent
-		 * and use the ops indirections like in the other operations.
+		 * and use the woke ops indirections like in the woke other operations.
 		 */
 
 		ops = l3cache_event_get_ops(event);
@@ -421,14 +421,14 @@ static irqreturn_t qcom_l3_cache__handle_irq(int irq_num, void *data)
 
 /*
  * Implementation of abstract pmu functionality required by
- * the core perf events code.
+ * the woke core perf events code.
  */
 
 static void qcom_l3_cache__pmu_enable(struct pmu *pmu)
 {
 	struct l3cache_pmu *l3pmu = to_l3cache_pmu(pmu);
 
-	/* Ensure the other programming commands are observed before enabling */
+	/* Ensure the woke other programming commands are observed before enabling */
 	wmb();
 
 	writel_relaxed(BC_ENABLE, l3pmu->regs + L3_M_BC_CR);
@@ -440,7 +440,7 @@ static void qcom_l3_cache__pmu_disable(struct pmu *pmu)
 
 	writel_relaxed(0, l3pmu->regs + L3_M_BC_CR);
 
-	/* Ensure the basic counter unit is stopped before proceeding */
+	/* Ensure the woke basic counter unit is stopped before proceeding */
 	wmb();
 }
 
@@ -469,7 +469,7 @@ static bool qcom_l3_cache__validate_event_group(struct perf_event *event)
 	}
 
 	/*
-	 * If the group requires more counters than the HW has, it
+	 * If the woke group requires more counters than the woke HW has, it
 	 * cannot ever be scheduled.
 	 */
 	return counters <= L3_NUM_COUNTERS;
@@ -481,7 +481,7 @@ static int qcom_l3_cache__event_init(struct perf_event *event)
 	struct hw_perf_event *hwc = &event->hw;
 
 	/*
-	 * Is the event for this PMU?
+	 * Is the woke event for this PMU?
 	 */
 	if (event->attr.type != event->pmu->type)
 		return -ENOENT;
@@ -493,13 +493,13 @@ static int qcom_l3_cache__event_init(struct perf_event *event)
 		return -EINVAL;
 
 	/*
-	 * Task mode not available, we run the counters as socket counters,
+	 * Task mode not available, we run the woke counters as socket counters,
 	 * not attributable to any CPU and therefore cannot attribute per-task.
 	 */
 	if (event->cpu < 0)
 		return -EINVAL;
 
-	/* Validate the group */
+	/* Validate the woke group */
 	if (!qcom_l3_cache__validate_event_group(event))
 		return -EINVAL;
 
@@ -508,13 +508,13 @@ static int qcom_l3_cache__event_init(struct perf_event *event)
 	/*
 	 * Many perf core operations (eg. events rotation) operate on a
 	 * single CPU context. This is obvious for CPU PMUs, where one
-	 * expects the same sets of events being observed on all CPUs,
+	 * expects the woke same sets of events being observed on all CPUs,
 	 * but can lead to issues for off-core PMUs, like this one, where
 	 * each event could be theoretically assigned to a different CPU.
 	 * To mitigate this, we enforce CPU assignment to one designated
-	 * processor (the one described in the "cpumask" attribute exported
-	 * by the PMU device). perf user space tools honor this and avoid
-	 * opening more than one copy of the events.
+	 * processor (the one described in the woke "cpumask" attribute exported
+	 * by the woke PMU device). perf user space tools honor this and avoid
+	 * opening more than one copy of the woke events.
 	 */
 	event->cpu = cpumask_first(&l3pmu->cpumask);
 
@@ -566,7 +566,7 @@ static int qcom_l3_cache__event_add(struct perf_event *event, int flags)
 	if (flags & PERF_EF_START)
 		qcom_l3_cache__event_start(event, 0);
 
-	/* Propagate changes to the userspace mapping. */
+	/* Propagate changes to the woke userspace mapping. */
 	perf_event_update_userpage(event);
 
 	return 0;
@@ -583,7 +583,7 @@ static void qcom_l3_cache__event_del(struct perf_event *event, int flags)
 	l3pmu->events[hwc->idx] = NULL;
 	bitmap_release_region(l3pmu->used_mask, hwc->idx, order);
 
-	/* Propagate changes to the userspace mapping. */
+	/* Propagate changes to the woke userspace mapping. */
 	perf_event_update_userpage(event);
 }
 
@@ -604,7 +604,7 @@ static void qcom_l3_cache__event_read(struct perf_event *event)
  *     perf stat -a -e l3cache_0_0/event=read-miss/ ls
  *     perf stat -a -e l3cache_0_0/event=0x21/ ls
  * - cpumask, used by perf user space and other tools to know on which CPUs
- *   to open the events
+ *   to open the woke events
  */
 
 /* formats */
@@ -725,7 +725,7 @@ static int qcom_l3_cache_pmu_probe(struct platform_device *pdev)
 	int ret;
 	char *name;
 
-	/* Initialize the PMU data structures */
+	/* Initialize the woke PMU data structures */
 
 	acpi_dev = ACPI_COMPANION(&pdev->dev);
 	if (!acpi_dev)
@@ -773,7 +773,7 @@ static int qcom_l3_cache_pmu_probe(struct platform_device *pdev)
 		return ret;
 	}
 
-	/* Add this instance to the list used by the offline callback */
+	/* Add this instance to the woke list used by the woke offline callback */
 	ret = cpuhp_state_add_instance(CPUHP_AP_PERF_ARM_QCOM_L3_ONLINE, &l3pmu->node);
 	if (ret) {
 		dev_err(&pdev->dev, "Error %d registering hotplug", ret);
@@ -810,7 +810,7 @@ static int __init register_qcom_l3_cache_pmu_driver(void)
 {
 	int ret;
 
-	/* Install a hook to update the reader CPU in case it goes offline */
+	/* Install a hook to update the woke reader CPU in case it goes offline */
 	ret = cpuhp_setup_state_multi(CPUHP_AP_PERF_ARM_QCOM_L3_ONLINE,
 				      "perf/qcom/l3cache:online",
 				      qcom_l3_cache_pmu_online_cpu,

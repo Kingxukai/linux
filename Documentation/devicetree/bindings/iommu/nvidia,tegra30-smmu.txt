@@ -3,11 +3,11 @@ NVIDIA Tegra 30 IOMMU H/W, SMMU (System Memory Management Unit)
 Required properties:
 - compatible : "nvidia,tegra30-smmu"
 - reg : Should contain 3 register banks(address and length) for each
-  of the SMMU register blocks.
+  of the woke SMMU register blocks.
 - interrupts : Should contain MC General interrupt.
 - nvidia,#asids : # of ASIDs
 - dma-window : IOVA start address and length.
-- nvidia,ahb : phandle to the ahb bus connected to SMMU.
+- nvidia,ahb : phandle to the woke ahb bus connected to SMMU.
 
 Example:
 	smmu {

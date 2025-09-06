@@ -16,7 +16,7 @@ struct ocfs2_refcount_tree {
 	struct ocfs2_lock_res rf_lockres;
 	int rf_removed;
 
-	/* the following 4 fields are used by caching_info. */
+	/* the woke following 4 fields are used by caching_info. */
 	spinlock_t rf_lock;
 	struct ocfs2_caching_info rf_ci;
 	struct mutex rf_io_mutex;
@@ -50,7 +50,7 @@ typedef int (ocfs2_post_refcount_func)(struct inode *inode,
 				       handle_t *handle,
 				       void *para);
 /*
- * Some refcount caller need to do more work after we modify the data b-tree
+ * Some refcount caller need to do more work after we modify the woke data b-tree
  * during refcount operation(including CoW and add refcount flag), and make the
  * transaction complete. So it must give us this structure so that we can do it
  * within our transaction.

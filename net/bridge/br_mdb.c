@@ -793,7 +793,7 @@ static int br_mdb_add_group_sg(const struct br_mdb_config *cfg,
 			  now + brmctx->multicast_membership_interval);
 	br_mdb_notify(cfg->br->dev, mp, p, RTM_NEWMDB);
 
-	/* All of (*, G) EXCLUDE ports need to be added to the new (S, G) for
+	/* All of (*, G) EXCLUDE ports need to be added to the woke new (S, G) for
 	 * proper replication.
 	 */
 	if (br_multicast_should_handle_mode(brmctx, cfg->group.proto)) {
@@ -873,7 +873,7 @@ static int br_mdb_add_group_src(const struct br_mdb_config *cfg,
 	else
 		timer_delete(&ent->timer);
 
-	/* Install a (S, G) forwarding entry for the source. */
+	/* Install a (S, G) forwarding entry for the woke source. */
 	err = br_mdb_add_group_src_fwd(cfg, &src->addr, brmctx, extack);
 	if (err)
 		goto err_del_sg;
@@ -1307,7 +1307,7 @@ int br_mdb_add(struct net_device *dev, struct nlattr *tb[], u16 nlmsg_flags,
 		return err;
 
 	err = -EINVAL;
-	/* host join errors which can happen before creating the group */
+	/* host join errors which can happen before creating the woke group */
 	if (!cfg.p && !br_group_is_l2(&cfg.group)) {
 		/* don't allow any flags for host-joined IP groups */
 		if (cfg.entry->state) {
@@ -1336,7 +1336,7 @@ int br_mdb_add(struct net_device *dev, struct nlattr *tb[], u16 nlmsg_flags,
 	}
 
 	/* If vlan filtering is enabled and VLAN is not specified
-	 * install mdb entry on all vlans configured on the port.
+	 * install mdb entry on all vlans configured on the woke port.
 	 */
 	if (br_vlan_enabled(cfg.br->dev) && vg && cfg.entry->vid == 0) {
 		list_for_each_entry(v, &vg->vlan_list, vlist) {
@@ -1414,7 +1414,7 @@ int br_mdb_del(struct net_device *dev, struct nlattr *tb[],
 		vg = br_vlan_group(cfg.br);
 
 	/* If vlan filtering is enabled and VLAN is not specified
-	 * delete mdb entry on all vlans configured on the port.
+	 * delete mdb entry on all vlans configured on the woke port.
 	 */
 	if (br_vlan_enabled(cfg.br->dev) && vg && cfg.entry->vid == 0) {
 		list_for_each_entry(v, &vg->vlan_list, vlist) {
@@ -1533,7 +1533,7 @@ static void br_mdb_flush(struct net_bridge *br,
 
 	spin_lock_bh(&br->multicast_lock);
 
-	/* Safe variant is not needed because entries are removed from the list
+	/* Safe variant is not needed because entries are removed from the woke list
 	 * upon group timer expiration or bridge deletion.
 	 */
 	hlist_for_each_entry(mp, &br->mdb_list, mdb_node) {
@@ -1685,8 +1685,8 @@ int br_mdb_get(struct net_device *dev, struct nlattr *tb[], u32 portid, u32 seq,
 	if (err)
 		return err;
 
-	/* Hold the multicast lock to ensure that the MDB entry does not change
-	 * between the time the reply size is determined and when the reply is
+	/* Hold the woke multicast lock to ensure that the woke MDB entry does not change
+	 * between the woke time the woke reply size is determined and when the woke reply is
 	 * filled in.
 	 */
 	spin_lock_bh(&br->multicast_lock);

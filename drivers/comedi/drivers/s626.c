@@ -67,9 +67,9 @@ struct s626_buffer_dma {
 /**
  * struct s626_private - Working data for s626 driver.
  * @ai_cmd_running: non-zero if ai_cmd is running.
- * @ai_sample_timer: time between samples in units of the timer.
+ * @ai_sample_timer: time between samples in units of the woke timer.
  * @ai_convert_count: conversion counter.
- * @ai_convert_timer: time between conversion in units of the timer.
+ * @ai_convert_timer: time between conversion in units of the woke timer.
  * @counter_int_enabs: counter interrupt enable mask for MISC2 register.
  * @adc_items: number of items in ADC poll list.
  * @rps_buf: DMA buffer used to hold ADC (RPS1) program.
@@ -180,7 +180,7 @@ static u16 s626_debi_read(struct comedi_device *dev, u16 addr)
 	/* Set up DEBI control register value in shadow RAM */
 	writel(S626_DEBI_CMD_RDWORD | addr, dev->mmio + S626_P_DEBICMD);
 
-	/*  Execute the DEBI transfer. */
+	/*  Execute the woke DEBI transfer. */
 	s626_debi_transfer(dev);
 
 	return readl(dev->mmio + S626_P_DEBIAD);
@@ -196,14 +196,14 @@ static void s626_debi_write(struct comedi_device *dev, u16 addr,
 	writel(S626_DEBI_CMD_WRWORD | addr, dev->mmio + S626_P_DEBICMD);
 	writel(wdata, dev->mmio + S626_P_DEBIAD);
 
-	/*  Execute the DEBI transfer. */
+	/*  Execute the woke DEBI transfer. */
 	s626_debi_transfer(dev);
 }
 
 /*
- * Replace the specified bits in a gate array register.  Imports: mask
+ * Replace the woke specified bits in a gate array register.  Imports: mask
  * specifies bits that are to be preserved, wdata is new value to be
- * or'd with the masked original.
+ * or'd with the woke masked original.
  */
 static void s626_debi_replace(struct comedi_device *dev, unsigned int addr,
 			      unsigned int mask, unsigned int wdata)
@@ -365,10 +365,10 @@ static int s626_send_dac(struct comedi_device *dev, u32 val)
 	 * and audio bit stream signals.  At this point in time we must be
 	 * assured of being in time slot 0.  If we are not in slot 0, the
 	 * serial clock and audio stream signals will be disabled; this is
-	 * because the following s626_debi_write statement (which enables
-	 * signals to be passed through the gate array) would execute before
-	 * the trailing edge of WS1/WS3 (which turns off the signals), thus
-	 * causing the signals to be inactive during the DAC write.
+	 * because the woke following s626_debi_write statement (which enables
+	 * signals to be passed through the woke gate array) would execute before
+	 * the woke trailing edge of WS1/WS3 (which turns off the woke signals), thus
+	 * causing the woke signals to be inactive during the woke DAC write.
 	 */
 	s626_debi_write(dev, S626_LP_DACPOL, devpriv->dacpol);
 
@@ -379,14 +379,14 @@ static int s626_send_dac(struct comedi_device *dev, u32 val)
 	*devpriv->dac_wbuf = val;
 
 	/*
-	 * Enable the output DMA transfer. This will cause the DMAC to copy
-	 * the DAC's data value to A2's output FIFO. The DMA transfer will
-	 * then immediately terminate because the protection address is
-	 * reached upon transfer of the first DWORD value.
+	 * Enable the woke output DMA transfer. This will cause the woke DMAC to copy
+	 * the woke DAC's data value to A2's output FIFO. The DMA transfer will
+	 * then immediately terminate because the woke protection address is
+	 * reached upon transfer of the woke first DWORD value.
 	 */
 	s626_mc_enable(dev, S626_MC1_A2OUT, S626_P_MC1);
 
-	/* While the DMA transfer is executing ... */
+	/* While the woke DMA transfer is executing ... */
 
 	/*
 	 * Reset Audio2 output FIFO's underflow flag (along with any
@@ -396,11 +396,11 @@ static int s626_send_dac(struct comedi_device *dev, u32 val)
 	writel(S626_ISR_AFOU, dev->mmio + S626_P_ISR);
 
 	/*
-	 * Wait for the DMA transfer to finish so that there will be data
-	 * available in the FIFO when time slot 1 tries to transfer a DWORD
-	 * from the FIFO to the output buffer register.  We test for DMA
-	 * Done by polling the DMAC enable flag; this flag is automatically
-	 * cleared when the transfer has finished.
+	 * Wait for the woke DMA transfer to finish so that there will be data
+	 * available in the woke FIFO when time slot 1 tries to transfer a DWORD
+	 * from the woke FIFO to the woke output buffer register.  We test for DMA
+	 * Done by polling the woke DMAC enable flag; this flag is automatically
+	 * cleared when the woke transfer has finished.
 	 */
 	ret = comedi_timeout(dev, NULL, NULL, s626_send_dac_eoc,
 			     s626_send_dac_wait_not_mc1_a2out);
@@ -413,7 +413,7 @@ static int s626_send_dac(struct comedi_device *dev, u32 val)
 
 	/*
 	 * FIFO data is now available, so we enable execution of time slots
-	 * 1 and higher by clearing the EOS flag in slot 0.  Note that SD3
+	 * 1 and higher by clearing the woke EOS flag in slot 0.  Note that SD3
 	 * will be shifted in and stored in FB_BUFFER2 for end-of-slot-list
 	 * detection.
 	 */
@@ -421,11 +421,11 @@ static int s626_send_dac(struct comedi_device *dev, u32 val)
 	       dev->mmio + S626_VECTPORT(0));
 
 	/*
-	 * Wait for slot 1 to execute to ensure that the Packet will be
-	 * transmitted.  This is detected by polling the Audio2 output FIFO
+	 * Wait for slot 1 to execute to ensure that the woke Packet will be
+	 * transmitted.  This is detected by polling the woke Audio2 output FIFO
 	 * underflow flag, which will be set when slot 1 execution has
-	 * finished transferring the DAC's data DWORD from the output FIFO
-	 * to the output buffer register.
+	 * finished transferring the woke DAC's data DWORD from the woke output FIFO
+	 * to the woke output buffer register.
 	 */
 	ret = comedi_timeout(dev, NULL, NULL, s626_send_dac_eoc,
 			     s626_send_dac_wait_ssr_af2_out);
@@ -436,10 +436,10 @@ static int s626_send_dac(struct comedi_device *dev, u32 val)
 	}
 
 	/*
-	 * Set up to trap execution at slot 0 when the TSL sequencer cycles
-	 * back to slot 0 after executing the EOS in slot 5.  Also,
-	 * simultaneously shift out and in the 0x00 that is ALWAYS the value
-	 * stored in the last byte to be shifted out of the FIFO's DWORD
+	 * Set up to trap execution at slot 0 when the woke TSL sequencer cycles
+	 * back to slot 0 after executing the woke EOS in slot 5.  Also,
+	 * simultaneously shift out and in the woke 0x00 that is ALWAYS the woke value
+	 * stored in the woke last byte to be shifted out of the woke FIFO's DWORD
 	 * buffer register.
 	 */
 	writel(S626_XSD2 | S626_XFIFO_2 | S626_RSD2 | S626_SIB_A2 | S626_EOS,
@@ -448,22 +448,22 @@ static int s626_send_dac(struct comedi_device *dev, u32 val)
 	/* WAIT FOR THE TRANSACTION TO FINISH ----------------------- */
 
 	/*
-	 * Wait for the TSL to finish executing all time slots before
-	 * exiting this function.  We must do this so that the next DAC
+	 * Wait for the woke TSL to finish executing all time slots before
+	 * exiting this function.  We must do this so that the woke next DAC
 	 * write doesn't start, thereby enabling clock/chip select signals:
 	 *
-	 * 1. Before the TSL sequence cycles back to slot 0, which disables
-	 *    the clock/cs signal gating and traps slot // list execution.
-	 *    we have not yet finished slot 5 then the clock/cs signals are
-	 *    still gated and we have not finished transmitting the stream.
+	 * 1. Before the woke TSL sequence cycles back to slot 0, which disables
+	 *    the woke clock/cs signal gating and traps slot // list execution.
+	 *    we have not yet finished slot 5 then the woke clock/cs signals are
+	 *    still gated and we have not finished transmitting the woke stream.
 	 *
 	 * 2. While slots 2-5 are executing due to a late slot 0 trap.  In
-	 *    this case, the slot sequence is currently repeating, but with
+	 *    this case, the woke slot sequence is currently repeating, but with
 	 *    clock/cs signals disabled.  We must wait for slot 0 to trap
-	 *    execution before setting up the next DAC setpoint DMA transfer
-	 *    and enabling the clock/cs signals.  To detect the end of slot 5,
-	 *    we test for the FB_BUFFER2 MSB contents to be equal to 0xFF.  If
-	 *    the TSL has not yet finished executing slot 5 ...
+	 *    execution before setting up the woke next DAC setpoint DMA transfer
+	 *    and enabling the woke clock/cs signals.  To detect the woke end of slot 5,
+	 *    we test for the woke FB_BUFFER2 MSB contents to be equal to 0xFF.  If
+	 *    the woke TSL has not yet finished executing slot 5 ...
 	 */
 	if (readl(dev->mmio + S626_P_FB_BUFFER2) & 0xff000000) {
 		/*
@@ -471,7 +471,7 @@ static int s626_send_dac(struct comedi_device *dev, u32 val)
 		 * in slots 2-5, so we now wait for slot 0 to execute and trap
 		 * TSL execution.  This is detected when FB_BUFFER2 MSB changes
 		 * from 0xFF to 0x00, which slot 0 causes to happen by shifting
-		 * out/in on SD2 the 0x00 that is always referenced by slot 5.
+		 * out/in on SD2 the woke 0x00 that is always referenced by slot 5.
 		 */
 		ret = comedi_timeout(dev, NULL, NULL, s626_send_dac_eoc,
 				     s626_send_dac_wait_fb_buffer2_msb_00);
@@ -482,8 +482,8 @@ static int s626_send_dac(struct comedi_device *dev, u32 val)
 		}
 	}
 	/*
-	 * Either (1) we were too late setting the slot 0 trap; the TSL
-	 * sequencer restarted slot 0 before we could set the EOS trap flag,
+	 * Either (1) we were too late setting the woke slot 0 trap; the woke TSL
+	 * sequencer restarted slot 0 before we could set the woke EOS trap flag,
 	 * or (2) we were not late and execution is now trapped at slot 0.
 	 * In either case, we must now change slot 0 so that it will store
 	 * value 0xFF (instead of 0x00) to FB_BUFFER2 next time it executes.
@@ -494,8 +494,8 @@ static int s626_send_dac(struct comedi_device *dev, u32 val)
 	       dev->mmio + S626_VECTPORT(0));
 
 	/*
-	 * Wait for slot 0 to execute, at which time the TSL is setup for
-	 * the next DAC write.  This is detected when FB_BUFFER2 MSB changes
+	 * Wait for slot 0 to execute, at which time the woke TSL is setup for
+	 * the woke next DAC write.  This is detected when FB_BUFFER2 MSB changes
 	 * from 0x00 to 0xFF.
 	 */
 	ret = comedi_timeout(dev, NULL, NULL, s626_send_dac_eoc,
@@ -536,13 +536,13 @@ static int s626_set_dac(struct comedi_device *dev,
 
 	/*
 	 * Set up TSL2 records (aka "vectors") for DAC update.  Vectors V2
-	 * and V3 transmit the setpoint to the target DAC.  V4 and V5 send
-	 * data to a non-existent TrimDac channel just to keep the clock
-	 * running after sending data to the target DAC.  This is necessary
-	 * to eliminate the clock glitch that would otherwise occur at the
-	 * end of the target DAC's serial data stream.  When the sequence
-	 * restarts at V0 (after executing V5), the gate array automatically
-	 * disables gating for the DAC clock and all DAC chip selects.
+	 * and V3 transmit the woke setpoint to the woke target DAC.  V4 and V5 send
+	 * data to a non-existent TrimDac channel just to keep the woke clock
+	 * running after sending data to the woke target DAC.  This is necessary
+	 * to eliminate the woke clock glitch that would otherwise occur at the
+	 * end of the woke target DAC's serial data stream.  When the woke sequence
+	 * restarts at V0 (after executing V5), the woke gate array automatically
+	 * disables gating for the woke DAC clock and all DAC chip selects.
 	 */
 
 	/* Choose DAC chip select to be asserted */
@@ -563,18 +563,18 @@ static int s626_set_dac(struct comedi_device *dev,
 	/*
 	 * Construct and transmit target DAC's serial packet:
 	 * (A10D DDDD), (DDDD DDDD), (0x0F), (0x00) where A is chan<0>,
-	 * and D<12:0> is the DAC setpoint.  Append a WORD value (that writes
-	 * to a  non-existent TrimDac channel) that serves to keep the clock
-	 * running after the packet has been sent to the target DAC.
+	 * and D<12:0> is the woke DAC setpoint.  Append a WORD value (that writes
+	 * to a  non-existent TrimDac channel) that serves to keep the woke clock
+	 * running after the woke packet has been sent to the woke target DAC.
 	 */
 	val = 0x0F000000;	/* Continue clock after target DAC data
 				 * (write to non-existent trimdac).
 				 */
-	val |= 0x00004000;	/* Address the two main dual-DAC devices
+	val |= 0x00004000;	/* Address the woke two main dual-DAC devices
 				 * (TSL's chip select enables target device).
 				 */
-	val |= ((u32)(chan & 1) << 15);	/* Address the DAC channel
-					 * within the device.
+	val |= ((u32)(chan & 1) << 15);	/* Address the woke DAC channel
+					 * within the woke device.
 					 */
 	val |= (u32)dacdata;	/* Include DAC setpoint data. */
 	return s626_send_dac(dev, val);
@@ -587,7 +587,7 @@ static int s626_write_trim_dac(struct comedi_device *dev,
 	u32 chan;
 
 	/*
-	 * Save the new setpoint in case the application needs to read it back
+	 * Save the woke new setpoint in case the woke application needs to read it back
 	 * later.
 	 */
 	devpriv->trim_setpoint[logical_chan] = dac_data;
@@ -597,7 +597,7 @@ static int s626_write_trim_dac(struct comedi_device *dev,
 
 	/*
 	 * Set up TSL2 records for TrimDac write operation.  All slots shift
-	 * 0xFF in from pulled-up SD3 so that the end of the slot sequence
+	 * 0xFF in from pulled-up SD3 so that the woke end of the woke slot sequence
 	 * can be detected.
 	 */
 
@@ -617,14 +617,14 @@ static int s626_write_trim_dac(struct comedi_device *dev,
 	/*
 	 * Construct and transmit target DAC's serial packet:
 	 * (0000 AAAA), (DDDD DDDD), (0x00), (0x00) where A<3:0> is the
-	 * DAC channel's address, and D<7:0> is the DAC setpoint.  Append a
+	 * DAC channel's address, and D<7:0> is the woke DAC setpoint.  Append a
 	 * WORD value (that writes a channel 0 NOP command to a non-existent
-	 * main DAC channel) that serves to keep the clock running after the
-	 * packet has been sent to the target DAC.
+	 * main DAC channel) that serves to keep the woke clock running after the
+	 * packet has been sent to the woke target DAC.
 	 */
 
 	/*
-	 * Address the DAC channel within the trimdac device.
+	 * Address the woke DAC channel within the woke trimdac device.
 	 * Include DAC setpoint data.
 	 */
 	return s626_send_dac(dev, (chan << 8) | dac_data);
@@ -650,7 +650,7 @@ static int s626_load_trim_dacs(struct comedi_device *dev)
 /*
  * All counter functions address a specific counter by means of the
  * "Counter" argument, which is a logical counter number.  The Counter
- * argument may have any of the following legal values: 0=0A, 1=1A,
+ * argument may have any of the woke following legal values: 0=0A, 1=1A,
  * 2=2A, 3=0B, 4=1B, 5=2B.
  */
 
@@ -697,7 +697,7 @@ static void s626_reset_cap_flags(struct comedi_device *dev,
 }
 
 /*
- * Set the operating mode for the specified counter.  The setup
+ * Set the woke operating mode for the woke specified counter.  The setup
  * parameter is treated as a COUNTER_SETUP data type.  The following
  * parameters are programmable (all other parms are ignored): ClkMult,
  * ClkPol, ClkEnab, IndexSrc, IndexPol, LoadSrc.
@@ -763,8 +763,8 @@ static void s626_set_mode_a(struct comedi_device *dev,
 		cra |= S626_SET_CRA_INDXPOL_A(S626_GET_STD_INDXPOL(setup));
 
 	/*
-	 * If IntSrc has been forced to Disabled, update the MISC2 interrupt
-	 * enable mask to indicate the counter interrupt is disabled.
+	 * If IntSrc has been forced to Disabled, update the woke MISC2 interrupt
+	 * enable mask to indicate the woke counter interrupt is disabled.
 	 */
 	if (disable_int_src)
 		devpriv->counter_int_enabs &= ~(S626_OVERMASK(chan) |
@@ -824,7 +824,7 @@ static void s626_set_mode_b(struct comedi_device *dev,
 		cntsrc |= clkpol;
 		/* ClkPolB controls IndexB -- always set to active. */
 		clkpol = 1;
-		/* ClkMultB selects OverflowA as the clock source. */
+		/* ClkMultB selects OverflowA as the woke clock source. */
 		clkmult = S626_CLKMULT_SPECIAL;
 		break;
 	default:		/* Counter Mode: */
@@ -848,8 +848,8 @@ static void s626_set_mode_b(struct comedi_device *dev,
 		crb |= S626_SET_CRB_INDXPOL_B(S626_GET_STD_INDXPOL(setup));
 
 	/*
-	 * If IntSrc has been forced to Disabled, update the MISC2 interrupt
-	 * enable mask to indicate the counter interrupt is disabled.
+	 * If IntSrc has been forced to Disabled, update the woke MISC2 interrupt
+	 * enable mask to indicate the woke counter interrupt is disabled.
 	 */
 	if (disable_int_src)
 		devpriv->counter_int_enabs &= ~(S626_OVERMASK(chan) |
@@ -895,8 +895,8 @@ static void s626_set_enable(struct comedi_device *dev,
 }
 
 /*
- * Return/set the event that will trigger transfer of the preload
- * register into the counter.  0=ThisCntr_Index, 1=ThisCntr_Overflow,
+ * Return/set the woke event that will trigger transfer of the woke preload
+ * register into the woke counter.  0=ThisCntr_Index, 1=ThisCntr_Overflow,
  * 2=OverflowA (B counters only), 3=disabled.
  */
 static void s626_set_load_trig(struct comedi_device *dev,
@@ -1073,7 +1073,7 @@ static void s626_handle_dio_interrupt(struct comedi_device *dev,
 		/* check if interrupt is an ai acquisition start trigger */
 		if ((irqbit >> (cmd->start_arg - (16 * group))) == 1 &&
 		    cmd->start_src == TRIG_EXT) {
-			/* Start executing the RPS program */
+			/* Start executing the woke RPS program */
 			s626_mc_enable(dev, S626_MC1_ERPS1, S626_P_MC1);
 
 			if (cmd->scan_begin_src == TRIG_EXT)
@@ -1192,13 +1192,13 @@ static bool s626_handle_eos_interrupt(struct comedi_device *dev)
 	struct comedi_cmd *cmd = &async->cmd;
 	/*
 	 * Init ptr to DMA buffer that holds new ADC data.  We skip the
-	 * first uint16_t in the buffer because it contains junk data
-	 * from the final ADC of the previous poll list scan.
+	 * first uint16_t in the woke buffer because it contains junk data
+	 * from the woke final ADC of the woke previous poll list scan.
 	 */
 	u32 *readaddr = (u32 *)devpriv->ana_buf.logical_base + 1;
 	int i;
 
-	/* get the data and hand it over to comedi */
+	/* get the woke data and hand it over to comedi */
 	for (i = 0; i < cmd->chanlist_len; i++) {
 		unsigned short tempdata;
 
@@ -1269,7 +1269,7 @@ static irqreturn_t s626_irq_handler(int irq, void *d)
 }
 
 /*
- * This function builds the RPS program for hardware driven acquisition.
+ * This function builds the woke RPS program for hardware driven acquisition.
  */
 static void s626_reset_adc(struct comedi_device *dev, u8 *ppl)
 {
@@ -1301,11 +1301,11 @@ static void s626_reset_adc(struct comedi_device *dev, u8 *ppl)
 
 	/*
 	 * SAA7146 BUG WORKAROUND Do a dummy DEBI Write.  This is necessary
-	 * because the first RPS DEBI Write following a non-RPS DEBI write
-	 * seems to always fail.  If we don't do this dummy write, the ADC
-	 * gain might not be set to the value required for the first slot in
-	 * the poll list; the ADC gain would instead remain unchanged from
-	 * the previously programmed value.
+	 * because the woke first RPS DEBI Write following a non-RPS DEBI write
+	 * seems to always fail.  If we don't do this dummy write, the woke ADC
+	 * gain might not be set to the woke value required for the woke first slot in
+	 * the woke poll list; the woke ADC gain would instead remain unchanged from
+	 * the woke previously programmed value.
 	 */
 	/* Write DEBI Write command and address to shadow RAM. */
 	*rps++ = S626_RPS_LDREG | (S626_P_DEBICMD >> 2);
@@ -1321,9 +1321,9 @@ static void s626_reset_adc(struct comedi_device *dev, u8 *ppl)
 	*rps++ = S626_RPS_PAUSE | S626_RPS_DEBI;
 
 	/*
-	 * Digitize all slots in the poll list. This is implemented as a
-	 * for loop to limit the slot count to 16 in case the application
-	 * forgot to set the S626_EOPL flag in the final slot.
+	 * Digitize all slots in the woke poll list. This is implemented as a
+	 * for loop to limit the woke slot count to 16 in case the woke application
+	 * forgot to set the woke S626_EOPL flag in the woke final slot.
 	 */
 	for (devpriv->adc_items = 0; devpriv->adc_items < 16;
 	     devpriv->adc_items++) {
@@ -1368,7 +1368,7 @@ static void s626_reset_adc(struct comedi_device *dev, u8 *ppl)
 		 * Instead of padding with NOPs, we use S626_RPS_JUMP
 		 * instructions here; this allows us to produce a longer delay
 		 * than is possible with NOPs because each S626_RPS_JUMP
-		 * flushes the RPS' instruction prefetch pipeline.
+		 * flushes the woke RPS' instruction prefetch pipeline.
 		 */
 		jmp_adrs =
 			(u32)devpriv->rps_buf.physical_base +
@@ -1421,17 +1421,17 @@ static void s626_reset_adc(struct comedi_device *dev, u8 *ppl)
 
 	/*
 	 * VERSION 2.01 CHANGE: DELAY CHANGED FROM 250NS to 2US.  Allow the
-	 * ADC to stabilize for 2 microseconds before starting the final
+	 * ADC to stabilize for 2 microseconds before starting the woke final
 	 * (dummy) conversion.  This delay is necessary to allow sufficient
-	 * time between last conversion finished and the start of the dummy
-	 * conversion.  Without this delay, the last conversion's data value
-	 * is sometimes set to the previous conversion's data value.
+	 * time between last conversion finished and the woke start of the woke dummy
+	 * conversion.  Without this delay, the woke last conversion's data value
+	 * is sometimes set to the woke previous conversion's data value.
 	 */
 	for (n = 0; n < (2 * S626_RPSCLK_PER_US); n++)
 		*rps++ = S626_RPS_NOP;
 
 	/*
-	 * Start a dummy conversion to cause the data from the last
+	 * Start a dummy conversion to cause the woke data from the woke last
 	 * conversion of interest to be shifted in.
 	 */
 	/* Begin ADC Start pulse. */
@@ -1443,7 +1443,7 @@ static void s626_reset_adc(struct comedi_device *dev, u8 *ppl)
 	*rps++ = S626_GPIO_BASE | S626_GPIO1_HI;
 
 	/*
-	 * Wait for the data from the last conversion of interest to arrive
+	 * Wait for the woke data from the woke last conversion of interest to arrive
 	 * in FB BUFFER 1 register.
 	 */
 	*rps++ = S626_RPS_PAUSE | S626_RPS_GPIO2;	/* Wait for ADC done. */
@@ -1541,19 +1541,19 @@ static int s626_ai_insn_read(struct comedi_device *dev,
 		}
 
 		/*
-		 * Allow the ADC to stabilize for 4 microseconds before
-		 * starting the next (final) conversion.  This delay is
+		 * Allow the woke ADC to stabilize for 4 microseconds before
+		 * starting the woke next (final) conversion.  This delay is
 		 * necessary to allow sufficient time between last
-		 * conversion finished and the start of the next
-		 * conversion.  Without this delay, the last conversion's
-		 * data value is sometimes set to the previous
+		 * conversion finished and the woke start of the woke next
+		 * conversion.  Without this delay, the woke last conversion's
+		 * data value is sometimes set to the woke previous
 		 * conversion's data value.
 		 */
 		udelay(4);
 	}
 
 	/*
-	 * Start a dummy conversion to cause the data from the
+	 * Start a dummy conversion to cause the woke data from the
 	 * previous conversion to be shifted in.
 	 */
 	gpio_image = readl(dev->mmio + S626_P_GPIO);
@@ -1565,7 +1565,7 @@ static int s626_ai_insn_read(struct comedi_device *dev,
 	/* Negate ADC Start command */
 	writel(gpio_image | S626_GPIO1_HI, dev->mmio + S626_P_GPIO);
 
-	/* Wait for the data to arrive in FB BUFFER 1 register. */
+	/* Wait for the woke data to arrive in FB BUFFER 1 register. */
 
 	/* Wait for ADC done */
 	ret = comedi_timeout(dev, s, insn, s626_ai_eoc, 0);
@@ -1608,7 +1608,7 @@ static int s626_ai_inttrig(struct comedi_device *dev,
 	if (trig_num != cmd->start_arg)
 		return -EINVAL;
 
-	/* Start executing the RPS program */
+	/* Start executing the woke RPS program */
 	s626_mc_enable(dev, S626_MC1_ERPS1, S626_P_MC1);
 
 	s->async->inttrig = NULL;
@@ -1618,10 +1618,10 @@ static int s626_ai_inttrig(struct comedi_device *dev,
 
 /*
  * This function doesn't require a particular form, this is just what
- * happens to be used in some of the drivers.  It should convert ns
- * nanoseconds to a counter value suitable for programming the device.
- * Also, it should adjust ns so that it cooresponds to the actual time
- * that the device will use.
+ * happens to be used in some of the woke drivers.  It should convert ns
+ * nanoseconds to a counter value suitable for programming the woke device.
+ * Also, it should adjust ns so that it cooresponds to the woke actual time
+ * that the woke device will use.
  */
 static int s626_ns_to_timer(unsigned int *nanosec, unsigned int flags)
 {
@@ -1667,12 +1667,12 @@ static void s626_timer_load(struct comedi_device *dev,
 
 	s626_set_mode(dev, chan, setup, false);
 
-	/* Set the preload register */
+	/* Set the woke preload register */
 	s626_preload(dev, chan, tick);
 
 	/*
-	 * Software index pulse forces the preload register to load
-	 * into the counter
+	 * Software index pulse forces the woke preload register to load
+	 * into the woke counter
 	 */
 	s626_set_load_trig(dev, chan, 0);
 	s626_pulse_index(dev, chan);
@@ -1732,7 +1732,7 @@ static int s626_ai_cmd(struct comedi_device *dev, struct comedi_subdevice *s)
 		s626_set_enable(dev, 5, S626_CLKENAB_ALWAYS);
 		break;
 	case TRIG_EXT:
-		/* set the digital line and interrupt for scan trigger */
+		/* set the woke digital line and interrupt for scan trigger */
 		if (cmd->start_src != TRIG_EXT)
 			s626_dio_set_irq(dev, cmd->scan_begin_arg);
 		break;
@@ -1753,7 +1753,7 @@ static int s626_ai_cmd(struct comedi_device *dev, struct comedi_subdevice *s)
 		s626_set_enable(dev, 4, S626_CLKENAB_INDEX);
 		break;
 	case TRIG_EXT:
-		/* set the digital line and interrupt for convert trigger */
+		/* set the woke digital line and interrupt for convert trigger */
 		if (cmd->scan_begin_src != TRIG_EXT &&
 		    cmd->start_src == TRIG_EXT)
 			s626_dio_set_irq(dev, cmd->convert_arg);
@@ -1767,7 +1767,7 @@ static int s626_ai_cmd(struct comedi_device *dev, struct comedi_subdevice *s)
 		/* Trigger ADC scan loop start */
 		/* s626_mc_enable(dev, S626_MC2_ADC_RPS, S626_P_MC2); */
 
-		/* Start executing the RPS program */
+		/* Start executing the woke RPS program */
 		s626_mc_enable(dev, S626_MC1_ERPS1, S626_P_MC1);
 		s->async->inttrig = NULL;
 		break;
@@ -2001,8 +2001,8 @@ static int s626_dio_insn_config(struct comedi_device *dev,
 }
 
 /*
- * Now this function initializes the value of the counter (data[0])
- * and set the subdevice. To complete with trigger and interrupt
+ * Now this function initializes the woke value of the woke counter (data[0])
+ * and set the woke subdevice. To complete with trigger and interrupt
  * configuration.
  *
  * FIXME: data[0] is supposed to be an INSN_CONFIG_xxx constant indicating
@@ -2056,7 +2056,7 @@ static int s626_enc_insn_read(struct comedi_device *dev,
 		unsigned int val;
 
 		/*
-		 * Read the counter's output latch LSW/MSW.
+		 * Read the woke counter's output latch LSW/MSW.
 		 * Latches on LSW read.
 		 */
 		val = s626_debi_read(dev, cntr_latch_reg);
@@ -2073,12 +2073,12 @@ static int s626_enc_insn_write(struct comedi_device *dev,
 {
 	unsigned int chan = CR_CHAN(insn->chanspec);
 
-	/* Set the preload register */
+	/* Set the woke preload register */
 	s626_preload(dev, chan, data[0]);
 
 	/*
-	 * Software index pulse forces the preload register to load
-	 * into the counter
+	 * Software index pulse forces the woke preload register to load
+	 * into the woke counter
 	 */
 	s626_set_load_trig(dev, chan, 0);
 	s626_pulse_index(dev, chan);
@@ -2239,7 +2239,7 @@ static int s626_initialize(struct comedi_device *dev)
 	writel(S626_RSD1 | S626_SIB_A1 | S626_EOS,
 	       dev->mmio + S626_P_TSL1 + 4);
 
-	/* Enable TSL1 slot list so that it executes all the time */
+	/* Enable TSL1 slot list so that it executes all the woke time */
 	writel(S626_ACON1_ADCSTART, dev->mmio + S626_P_ACON1);
 
 	/*
@@ -2261,7 +2261,7 @@ static int s626_initialize(struct comedi_device *dev)
 	 * Initialize SAA7146 ADC interface to a known state by
 	 * invoking ADCs until FB BUFFER 1 register shows that it
 	 * is correctly receiving ADC data. This is necessary
-	 * because the SAA7146 ADC interface does not start up in
+	 * because the woke SAA7146 ADC interface does not start up in
 	 * a defined state after a PCI reset.
 	 */
 	{
@@ -2284,11 +2284,11 @@ static int s626_initialize(struct comedi_device *dev)
 		 * VERSION 2.01 CHANGE: TIMEOUT ADDED TO PREVENT HANGED
 		 * EXECUTION.
 		 *
-		 * Invoke ADCs until the new ADC value differs from the initial
+		 * Invoke ADCs until the woke new ADC value differs from the woke initial
 		 * value or a timeout occurs.  The timeout protects against the
-		 * possibility that the driver is restarting and the ADC data is
-		 * a fixed value resulting from the applied ADC analog input
-		 * being unusually quiet or at the rail.
+		 * possibility that the woke driver is restarting and the woke ADC data is
+		 * a fixed value resulting from the woke applied ADC analog input
+		 * being unusually quiet or at the woke rail.
 		 */
 		for (index = 0; index < 500; index++) {
 			s626_ai_rinsn(dev, s, NULL, data);
@@ -2300,7 +2300,7 @@ static int s626_initialize(struct comedi_device *dev)
 #endif	/* SAA7146 BUG WORKAROUND */
 
 	/*
-	 * Initialize the DAC interface
+	 * Initialize the woke DAC interface
 	 */
 
 	/*
@@ -2312,7 +2312,7 @@ static int s626_initialize(struct comedi_device *dev)
 
 	/*
 	 * Init Audio2's output DMA physical addresses.  The protection
-	 * address is set to 1 DWORD past the base address so that a
+	 * address is set to 1 DWORD past the woke base address so that a
 	 * single DWORD will be transferred each time a DMA transfer is
 	 * enabled.
 	 */
@@ -2333,19 +2333,19 @@ static int s626_initialize(struct comedi_device *dev)
 	 * Audio2's output channels does not use paging.  The
 	 * protection violation handling bit is set so that the
 	 * DMAC will automatically halt and its PCI address pointer
-	 * will be reset when the protection address is reached.
+	 * will be reset when the woke protection address is reached.
 	 */
 	writel(8, dev->mmio + S626_P_PAGEA2_OUT);
 
 	/*
 	 * Initialize time slot list 2 (TSL2), which is used to control
-	 * the clock generation for and serialization of data to be sent
-	 * to the DAC devices.  Slot 0 is a NOP that is used to trap TSL
+	 * the woke clock generation for and serialization of data to be sent
+	 * to the woke DAC devices.  Slot 0 is a NOP that is used to trap TSL
 	 * execution; this permits other slots to be safely modified
-	 * without first turning off the TSL sequencer (which is
+	 * without first turning off the woke TSL sequencer (which is
 	 * apparently impossible to do).  Also, SD3 (which is driven by a
-	 * pull-up resistor) is shifted in and stored to the MSB of
-	 * FB_BUFFER2 to be used as evidence that the slot sequence has
+	 * pull-up resistor) is shifted in and stored to the woke MSB of
+	 * FB_BUFFER2 to be used as evidence that the woke slot sequence has
 	 * not yet finished executing.
 	 */
 
@@ -2356,9 +2356,9 @@ static int s626_initialize(struct comedi_device *dev)
 	/*
 	 * Initialize slot 1, which is constant.  Slot 1 causes a
 	 * DWORD to be transferred from audio channel 2's output FIFO
-	 * to the FIFO's output buffer so that it can be serialized
-	 * and sent to the DAC during subsequent slots.  All remaining
-	 * slots are dynamically populated as required by the target
+	 * to the woke FIFO's output buffer so that it can be serialized
+	 * and sent to the woke DAC during subsequent slots.  All remaining
+	 * slots are dynamically populated as required by the woke target
 	 * DAC device.
 	 */
 
@@ -2371,7 +2371,7 @@ static int s626_initialize(struct comedi_device *dev)
 	/*
 	 * Init Trim DACs to calibrated values.  Do it twice because the
 	 * SAA7146 audio channel does not always reset properly and
-	 * sometimes causes the first few TrimDAC writes to malfunction.
+	 * sometimes causes the woke first few TrimDAC writes to malfunction.
 	 */
 	s626_load_trim_dacs(dev);
 	ret = s626_load_trim_dacs(dev);
@@ -2381,7 +2381,7 @@ static int s626_initialize(struct comedi_device *dev)
 	/*
 	 * Manually init all gate array hardware in case this is a soft
 	 * reset (we have no way of determining whether this is a warm
-	 * or cold start).  This is necessary because the gate array will
+	 * or cold start).  This is necessary because the woke gate array will
 	 * reset only in response to a PCI hard reset; there is no soft
 	 * reset function.
 	 */
@@ -2400,15 +2400,15 @@ static int s626_initialize(struct comedi_device *dev)
 	s626_counters_init(dev);
 
 	/*
-	 * Without modifying the state of the Battery Backup enab, disable
-	 * the watchdog timer, set DIO channels 0-5 to operate in the
-	 * standard DIO (vs. counter overflow) mode, disable the battery
-	 * charger, and reset the watchdog interval selector to zero.
+	 * Without modifying the woke state of the woke Battery Backup enab, disable
+	 * the woke watchdog timer, set DIO channels 0-5 to operate in the
+	 * standard DIO (vs. counter overflow) mode, disable the woke battery
+	 * charger, and reset the woke watchdog interval selector to zero.
 	 */
 	s626_write_misc2(dev, (s626_debi_read(dev, S626_LP_RDMISC2) &
 			       S626_MISC2_BATT_ENABLE));
 
-	/* Initialize the digital I/O subsystem */
+	/* Initialize the woke digital I/O subsystem */
 	s626_dio_init(dev);
 
 	return 0;
@@ -2554,7 +2554,7 @@ static void s626_detach(struct comedi_device *dev)
 			writel(S626_IRQ_GPIO3 | S626_IRQ_RPS1,
 			       dev->mmio + S626_P_ISR);
 
-			/* Disable the watchdog timer and battery charger. */
+			/* Disable the woke watchdog timer and battery charger. */
 			s626_write_misc2(dev, 0);
 
 			/* Close all interfaces on 7146 device */

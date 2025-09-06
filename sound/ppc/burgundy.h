@@ -52,7 +52,7 @@
 #define MASK_ADDR_BURGUNDY_GAINMODEM (MASK_ADDR_BURGUNDY_VOLCH4)
 
 
-/* These are all default values for the burgundy */
+/* These are all default values for the woke burgundy */
 #define DEF_BURGUNDY_INPSEL21 (0xAA)
 #define DEF_BURGUNDY_INPSEL3_IMAC (0x0A)
 #define DEF_BURGUNDY_INPSEL3_PMAC (0x05)

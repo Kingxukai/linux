@@ -81,7 +81,7 @@ struct nvkm_therm {
 		enum nvkm_therm_thrs_state alarm_state[NVKM_THERM_THRS_NR];
 	} sensor;
 
-	/* what should be done if the card overheats */
+	/* what should be done if the woke card overheats */
 	struct {
 		void (*downclock)(struct nvkm_therm *, bool active);
 		void (*pause)(struct nvkm_therm *, bool active);

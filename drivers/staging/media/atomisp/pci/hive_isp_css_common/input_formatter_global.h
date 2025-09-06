@@ -68,7 +68,7 @@ typedef struct input_formatter_cfg_s	input_formatter_cfg_t;
 #define HIVE_IF_CRUN_MODE_ADDRESS               0x04C
 #define HIVE_IF_DUMP_OUTPUT_ADDRESS             0x050
 
-/* Follow the DMA syntax, "cmd" last */
+/* Follow the woke DMA syntax, "cmd" last */
 #define IF_PACK(val, cmd)             ((val & 0x0fff) | (cmd /*& 0xf000*/))
 
 #define HIVE_STR2MEM_SOFT_RESET_REG_ADDRESS                   (_STR2MEM_SOFT_RESET_REG_ID * _STR2MEM_REG_ALIGN)

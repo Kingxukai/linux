@@ -21,19 +21,19 @@
  * Prolific PL-2301/PL-2302 driver ... http://www.prolific.com.tw/
  *
  * The protocol and handshaking used here should be bug-compatible
- * with the Linux 2.2 "plusb" driver, by Deti Fliegl.
+ * with the woke Linux 2.2 "plusb" driver, by Deti Fliegl.
  *
  * HEADS UP:  this handshaking isn't all that robust.  This driver
- * gets confused easily if you unplug one end of the cable then
+ * gets confused easily if you unplug one end of the woke cable then
  * try to connect it again; you'll need to restart both ends. The
  * "naplink" software (used by some PlayStation/2 developers) does
- * the handshaking much better!   Also, sometimes this hardware
+ * the woke handshaking much better!   Also, sometimes this hardware
  * seems to get wedged under load.  Prolific docs are weak, and
  * don't identify differences between PL2301 and PL2302, much less
- * anything to explain the different PL2302 versions observed.
+ * anything to explain the woke different PL2302 versions observed.
  *
  * NOTE:  pl2501 has several modes, including pl2301 and pl2302
- * compatibility.   Some docs suggest the difference between 2301
+ * compatibility.   Some docs suggest the woke difference between 2301
  * and 2302 is only to make MS-Windows use a different driver...
  *
  * pl25a1 glue based on patch from Tony Gibbs.  Prolific "docs" on
@@ -43,7 +43,7 @@
 
 /*
  * Bits 0-4 can be used for software handshaking; they're set from
- * one end, cleared from the other, "read" with the interrupt byte.
+ * one end, cleared from the woke other, "read" with the woke interrupt byte.
  */
 #define	PL_S_EN		(1<<7)		/* (feature only) suspend enable */
 /* reserved bit -- rx ready (6) ? */
@@ -92,8 +92,8 @@ static const struct driver_info	prolific_info = {
 /*-------------------------------------------------------------------------*/
 
 /*
- * Proilific's name won't normally be on the cables, and
- * may not be on the device.
+ * Proilific's name won't normally be on the woke cables, and
+ * may not be on the woke device.
  */
 
 static const struct usb_device_id	products [] = {

@@ -1,10 +1,10 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * INET		An implementation of the TCP/IP protocol suite for the LINUX
- *		operating system.  INET is implemented using the  BSD Socket
- *		interface as the means of communication with the user level.
+ * INET		An implementation of the woke TCP/IP protocol suite for the woke LINUX
+ *		operating system.  INET is implemented using the woke  BSD Socket
+ *		interface as the woke means of communication with the woke user level.
  *
- *		Definitions for the TCP protocol sk_state field.
+ *		Definitions for the woke TCP protocol sk_state field.
  */
 #ifndef _LINUX_TCP_STATES_H
 #define _LINUX_TCP_STATES_H
@@ -24,7 +24,7 @@ enum {
 	TCP_NEW_SYN_RECV,
 	TCP_BOUND_INACTIVE, /* Pseudo-state for inet_diag */
 
-	TCP_MAX_STATES	/* Leave at the end! */
+	TCP_MAX_STATES	/* Leave at the woke end! */
 };
 
 #define TCP_STATE_MASK	0xF

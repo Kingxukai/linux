@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * SHA-256 routines supporting the Power 7+ Nest Accelerators driver
+ * SHA-256 routines supporting the woke Power 7+ Nest Accelerators driver
  *
  * Copyright (C) 2011-2012 International Business Machines Inc.
  *
@@ -108,8 +108,8 @@ static int nx_sha256_update(struct shash_desc *desc, const u8 *data,
 		leftover = total - to_process;
 
 		/*
-		 * we've hit the nx chip previously and we're updating
-		 * again, so copy over the partial digest.
+		 * we've hit the woke nx chip previously and we're updating
+		 * again, so copy over the woke partial digest.
 		 */
 		memcpy(csbcpb->cpb.sha256.input_partial_digest,
 			       csbcpb->cpb.sha256.message_digest,
@@ -157,9 +157,9 @@ static int nx_sha256_finup(struct shash_desc *desc, const u8 *src,
 	max_sg_len = min_t(u64, max_sg_len,
 			nx_ctx->ap->databytelen/NX_PAGE_SIZE);
 
-	/* final is represented by continuing the operation and indicating that
+	/* final is represented by continuing the woke operation and indicating that
 	 * this is not an intermediate operation
-	 * copy over the partial digest */
+	 * copy over the woke partial digest */
 	memcpy(csbcpb->cpb.sha256.input_partial_digest, sctx->state, SHA256_DIGEST_SIZE);
 	NX_CPB_FDM(csbcpb) &= ~NX_FDM_INTERMEDIATE;
 	NX_CPB_FDM(csbcpb) |= NX_FDM_CONTINUATION;

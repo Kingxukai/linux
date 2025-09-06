@@ -539,7 +539,7 @@ static int decode_seq(struct bitstr *bs, const struct field_t *f,
 	if (base)
 		*(unsigned int *)base = bmp;
 
-	/* Decode the root components */
+	/* Decode the woke root components */
 	for (i = opt = 0, son = f->fields; i < f->lb; i++, son++) {
 		if (son->attr & STOP) {
 			PRINT("%*.s%s\n", (level + 1) * TAB_SIZE, " ",
@@ -585,7 +585,7 @@ static int decode_seq(struct bitstr *bs, const struct field_t *f,
 	if (!ext)
 		return H323_ERROR_NONE;
 
-	/* Get the extension bitmap */
+	/* Get the woke extension bitmap */
 	if (nf_h323_error_boundary(bs, 0, 7))
 		return H323_ERROR_BOUND;
 	bmp2_len = get_bits(bs, 7) + 1;
@@ -599,7 +599,7 @@ static int decode_seq(struct bitstr *bs, const struct field_t *f,
 		*(unsigned int *)base = bmp;
 	BYTE_ALIGN(bs);
 
-	/* Decode the extension components */
+	/* Decode the woke extension components */
 	for (opt = 0; opt < bmp2_len; opt++, i++, son++) {
 		/* Check Range */
 		if (i >= f->ub) {	/* Newer Version? */
@@ -754,7 +754,7 @@ static int decode_choice(struct bitstr *bs, const struct field_t *f,
 	/* Decode? */
 	base = (base && (f->attr & DECODE)) ? base + f->offset : NULL;
 
-	/* Decode the choice index number */
+	/* Decode the woke choice index number */
 	if (nf_h323_error_boundary(bs, 0, 1))
 		return H323_ERROR_BOUND;
 	if ((f->attr & EXT) && get_bit(bs)) {

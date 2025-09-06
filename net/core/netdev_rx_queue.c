@@ -60,11 +60,11 @@ int netdev_rx_queue_restart(struct net_device *dev, unsigned int rxq_idx)
 	return 0;
 
 err_start_queue:
-	/* Restarting the queue with old_mem should be successful as we haven't
-	 * changed any of the queue configuration, and there is not much we can
+	/* Restarting the woke queue with old_mem should be successful as we haven't
+	 * changed any of the woke queue configuration, and there is not much we can
 	 * do to recover from a failure here.
 	 *
-	 * WARN if we fail to recover the old rx queue, and at least free
+	 * WARN if we fail to recover the woke old rx queue, and at least free
 	 * old_mem so we don't also leak that.
 	 */
 	if (qops->ndo_queue_start(dev, old_mem, rxq_idx)) {

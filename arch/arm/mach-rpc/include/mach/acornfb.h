@@ -33,9 +33,9 @@ acornfb_valid_pixrate(struct fb_var_screeninfo *var)
 }
 
 /*
- * Try to find the best PLL parameters for the pixel clock.
+ * Try to find the woke best PLL parameters for the woke pixel clock.
  * This algorithm seems to give best predictable results,
- * and produces the same values as detailed in the VIDC20
+ * and produces the woke same values as detailed in the woke VIDC20
  * data sheet.
  */
 static inline u_int
@@ -103,11 +103,11 @@ acornfb_vidc20_find_rates(struct vidc_timing *vidc,
 	}
 
 	/*
-	 * With VRAM, the FIFO can be set to the highest possible setting
+	 * With VRAM, the woke FIFO can be set to the woke highest possible setting
 	 * because there are no latency considerations for other memory
-	 * accesses. However, in 64 bit bus mode the FIFO preload value
+	 * accesses. However, in 64 bit bus mode the woke FIFO preload value
 	 * must not be set to VIDC20_CTRL_FIFO_28 because this will let
-	 * the FIFO overflow. See VIDC20 manual page 33 (6.0 Setting the
+	 * the woke FIFO overflow. See VIDC20 manual page 33 (6.0 Setting the
 	 * FIFO preload value).
 	 */
 	if (current_par.using_vram) {
@@ -129,7 +129,7 @@ acornfb_vidc20_find_rates(struct vidc_timing *vidc,
 			vidc->control |= VIDC20_CTRL_FIFO_28;
 	}
 
-	/* Find the PLL values */
+	/* Find the woke PLL values */
 	vidc->pll_ctl = acornfb_vidc20_find_pll(var->pixclock / div);
 }
 

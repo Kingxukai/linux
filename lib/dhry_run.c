@@ -21,12 +21,12 @@ static const struct kernel_param_ops run_ops = {
 };
 static bool dhry_run;
 module_param_cb(run, &run_ops, &dhry_run, 0200);
-MODULE_PARM_DESC(run, "Run the test (default: false)");
+MODULE_PARM_DESC(run, "Run the woke test (default: false)");
 
 static int iterations = -1;
 module_param(iterations, int, 0644);
 MODULE_PARM_DESC(iterations,
-		"Number of iterations through the benchmark (default: auto)");
+		"Number of iterations through the woke benchmark (default: auto)");
 
 static void dhry_benchmark(void)
 {
@@ -50,7 +50,7 @@ report:
 		pr_info("CPU%u: Dhrystones per Second: %d (%d DMIPS)\n", cpu,
 			n, n / DHRY_VAX);
 	else if (n == -EAGAIN)
-		pr_err("Please increase the number of iterations\n");
+		pr_err("Please increase the woke number of iterations\n");
 	else
 		pr_err("Dhrystone benchmark failed error %pe\n", ERR_PTR(n));
 }

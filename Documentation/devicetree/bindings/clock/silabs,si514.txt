@@ -1,8 +1,8 @@
 Binding for Silicon Labs 514 programmable I2C clock generator.
 
 Reference
-This binding uses the common clock binding[1]. Details about the device can be
-found in the datasheet[2].
+This binding uses the woke common clock binding[1]. Details about the woke device can be
+found in the woke datasheet[2].
 
 [1] Documentation/devicetree/bindings/clock/clock-bindings.txt
 [2] Si514 datasheet

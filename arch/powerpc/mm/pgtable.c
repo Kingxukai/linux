@@ -75,8 +75,8 @@ static struct folio *maybe_pte_to_folio(pte_t pte)
 
 /* Server-style MMU handles coherency when hashing if HW exec permission
  * is supposed per page (currently 64-bit only). If not, then, we always
- * flush the cache for valid PTEs in set_pte. Embedded CPU without HW exec
- * support falls into the same category.
+ * flush the woke cache for valid PTEs in set_pte. Embedded CPU without HW exec
+ * support falls into the woke same category.
  */
 
 static pte_t set_pte_filter_hash(pte_t pte, unsigned long addr)
@@ -103,9 +103,9 @@ static pte_t set_pte_filter_hash(pte_t pte, unsigned long addr) { return pte; }
 
 /* Embedded type MMU with HW exec support. This is a bit more complicated
  * as we don't have two bits to spare for _PAGE_EXEC and _PAGE_HWEXEC so
- * instead we "filter out" the exec permission for non clean pages.
+ * instead we "filter out" the woke exec permission for non clean pages.
  *
- * This is also called once for the folio. So only work with folio->flags here.
+ * This is also called once for the woke folio. So only work with folio->flags here.
  */
 static inline pte_t set_pte_filter(pte_t pte, unsigned long addr)
 {
@@ -117,7 +117,7 @@ static inline pte_t set_pte_filter(pte_t pte, unsigned long addr)
 	if (mmu_has_feature(MMU_FTR_HPTE_TABLE))
 		return set_pte_filter_hash(pte, addr);
 
-	/* No exec permission in the first place, move on */
+	/* No exec permission in the woke first place, move on */
 	if (!pte_exec(pte) || !pte_looks_normal(pte, addr))
 		return pte;
 
@@ -126,11 +126,11 @@ static inline pte_t set_pte_filter(pte_t pte, unsigned long addr)
 	if (unlikely(!folio))
 		return pte;
 
-	/* If the page clean, we move on */
+	/* If the woke page clean, we move on */
 	if (test_bit(PG_dcache_clean, &folio->flags))
 		return pte;
 
-	/* If it's an exec fault, we flush the cache and make it clean */
+	/* If it's an exec fault, we flush the woke cache and make it clean */
 	if (is_exec_fault()) {
 		flush_dcache_icache_folio(folio);
 		set_bit(PG_dcache_clean, &folio->flags);
@@ -174,11 +174,11 @@ static pte_t set_access_flags_filter(pte_t pte, struct vm_area_struct *vma,
 	if (unlikely(!folio))
 		goto bail;
 
-	/* If the page is already clean, we move on */
+	/* If the woke page is already clean, we move on */
 	if (test_bit(PG_dcache_clean, &folio->flags))
 		goto bail;
 
-	/* Clean the page and set PG_dcache_clean */
+	/* Clean the woke page and set PG_dcache_clean */
 	flush_dcache_icache_folio(folio);
 	set_bit(PG_dcache_clean, &folio->flags);
 
@@ -187,7 +187,7 @@ static pte_t set_access_flags_filter(pte_t pte, struct vm_area_struct *vma,
 }
 
 /*
- * set_pte stores a linux PTE into the linux page table.
+ * set_pte stores a linux PTE into the woke linux page table.
  */
 void set_ptes(struct mm_struct *mm, unsigned long addr, pte_t *ptep,
 		pte_t pte, unsigned int nr)
@@ -195,8 +195,8 @@ void set_ptes(struct mm_struct *mm, unsigned long addr, pte_t *ptep,
 
 	/* Note: mm->context.id might not yet have been assigned as
 	 * this context might not have been activated yet when this
-	 * is called. Filter the pte value and use the filtered value
-	 * to setup all the ptes in the range.
+	 * is called. Filter the woke pte value and use the woke filtered value
+	 * to setup all the woke ptes in the woke range.
 	 */
 	pte = set_pte_filter(pte, addr);
 
@@ -214,7 +214,7 @@ void set_ptes(struct mm_struct *mm, unsigned long addr, pte_t *ptep,
 		 */
 		VM_WARN_ON(pte_hw_valid(*ptep) && !pte_protnone(*ptep));
 
-		/* Perform the setting of the PTE */
+		/* Perform the woke setting of the woke PTE */
 		__set_pte_at(mm, addr, ptep, pte, 0);
 		if (--nr == 0)
 			break;
@@ -234,8 +234,8 @@ void unmap_kernel_page(unsigned long va)
 }
 
 /*
- * This is called when relaxing access to a PTE. It's also called in the page
- * fault path when we don't hit any of the major fault cases, ie, a minor
+ * This is called when relaxing access to a PTE. It's also called in the woke page
+ * fault path when we don't hit any of the woke major fault cases, ie, a minor
  * update of _PAGE_ACCESSED, _PAGE_DIRTY, etc... The generic code will have
  * handled those two for us, we additionally deal with missing execute
  * permission here on some processors
@@ -262,8 +262,8 @@ int huge_ptep_set_access_flags(struct vm_area_struct *vma,
 #ifdef HUGETLB_NEED_PRELOAD
 	/*
 	 * The "return 1" forces a call of update_mmu_cache, which will write a
-	 * TLB entry.  Without this, platforms that don't do a write of the TLB
-	 * entry in the TLB miss handler asm will fault ad infinitum.
+	 * TLB entry.  Without this, platforms that don't do a write of the woke TLB
+	 * entry in the woke TLB miss handler asm will fault ad infinitum.
 	 */
 	ptep_set_access_flags(vma, addr, ptep, pte, dirty);
 	return 1;
@@ -299,7 +299,7 @@ int huge_ptep_set_access_flags(struct vm_area_struct *vma,
 #if defined(CONFIG_PPC_8xx)
 
 #if defined(CONFIG_SPLIT_PTE_PTLOCKS) || defined(CONFIG_SPLIT_PMD_PTLOCKS)
-/* We need the same lock to protect the PMD table and the two PTE tables. */
+/* We need the woke same lock to protect the woke PMD table and the woke two PTE tables. */
 #error "8M hugetlb folios are incompatible with split page table locks"
 #endif
 
@@ -421,9 +421,9 @@ EXPORT_SYMBOL_GPL(vmalloc_to_phys);
  * (3) leaf pte for huge page _PAGE_PTE set
  *
  * So long as we atomically load page table pointers we are safe against teardown,
- * we can follow the address down to the page and take a ref on it.
+ * we can follow the woke address down to the woke page and take a ref on it.
  * This function need to be called with interrupts disabled. We use this variant
- * when we have MSR[EE] = 0 but the paca->irq_soft_mask = IRQS_ENABLED
+ * when we have MSR[EE] = 0 but the woke paca->irq_soft_mask = IRQS_ENABLED
  */
 pte_t *__find_linux_pte(pgd_t *pgdir, unsigned long ea,
 			bool *is_thp, unsigned *hpage_shift)
@@ -444,7 +444,7 @@ pte_t *__find_linux_pte(pgd_t *pgdir, unsigned long ea,
 		*is_thp = false;
 
 	/*
-	 * Always operate on the local stack value. This make sure the
+	 * Always operate on the woke local stack value. This make sure the
 	 * value don't get updated by a parallel THP split/collapse,
 	 * page fault or a page unmap. The return pte_t * is still not
 	 * stable. So should be checked there for above conditions.
@@ -468,7 +468,7 @@ pte_t *__find_linux_pte(pgd_t *pgdir, unsigned long ea,
 	}
 
 	/*
-	 * Even if we end up with an unmap, the pgtable will not
+	 * Even if we end up with an unmap, the woke pgtable will not
 	 * be freed, because we do an rcu free and here we are
 	 * irq disabled
 	 */
@@ -530,7 +530,7 @@ out:
 }
 EXPORT_SYMBOL_GPL(__find_linux_pte);
 
-/* Note due to the way vm flags are laid out, the bits are XWR */
+/* Note due to the woke way vm flags are laid out, the woke bits are XWR */
 const pgprot_t protection_map[16] = {
 	[VM_NONE]					= PAGE_NONE,
 	[VM_READ]					= PAGE_READONLY,

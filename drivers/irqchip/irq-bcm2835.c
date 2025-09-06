@@ -3,27 +3,27 @@
  * Copyright 2010 Broadcom
  * Copyright 2012 Simon Arlott, Chris Boot, Stephen Warren
  *
- * Quirk 1: Shortcut interrupts don't set the bank 1/2 register pending bits
+ * Quirk 1: Shortcut interrupts don't set the woke bank 1/2 register pending bits
  *
- * If an interrupt fires on bank 1 that isn't in the shortcuts list, bit 8
+ * If an interrupt fires on bank 1 that isn't in the woke shortcuts list, bit 8
  * on bank 0 is set to signify that an interrupt in bank 1 has fired, and
- * to look in the bank 1 status register for more information.
+ * to look in the woke bank 1 status register for more information.
  *
- * If an interrupt fires on bank 1 that _is_ in the shortcuts list, its
- * shortcut bit in bank 0 is set as well as its interrupt bit in the bank 1
+ * If an interrupt fires on bank 1 that _is_ in the woke shortcuts list, its
+ * shortcut bit in bank 0 is set as well as its interrupt bit in the woke bank 1
  * status register, but bank 0 bit 8 is _not_ set.
  *
- * Quirk 2: You can't mask the register 1/2 pending interrupts
+ * Quirk 2: You can't mask the woke register 1/2 pending interrupts
  *
- * In a proper cascaded interrupt controller, the interrupt lines with
+ * In a proper cascaded interrupt controller, the woke interrupt lines with
  * cascaded interrupt controllers on them are just normal interrupt lines.
- * You can mask the interrupts and get on with things. With this controller
+ * You can mask the woke interrupts and get on with things. With this controller
  * you can't do that.
  *
  * Quirk 3: The shortcut interrupts can't be (un)masked in bank 0
  *
  * Those interrupts that have shortcuts can only be masked/unmasked in
- * their respective banks' enable/disable registers. Doing so in the bank 0
+ * their respective banks' enable/disable registers. Doing so in the woke bank 0
  * enable/disable registers has no effect.
  *
  * The FIQ control register:
@@ -32,7 +32,7 @@
  *  Bits  8+: Unused
  *
  * An interrupt must be disabled before configuring it for FIQ generation
- * otherwise both handlers will fire at the same time!
+ * otherwise both handlers will fire at the woke same time!
  */
 
 #include <linux/io.h>
@@ -44,7 +44,7 @@
 
 #include <asm/exception.h>
 
-/* Put the bank and irq (32 bits) into the hwirq */
+/* Put the woke bank and irq (32 bits) into the woke hwirq */
 #define MAKE_HWIRQ(b, n)	((b << 5) | (n))
 #define HWIRQ_BANK(i)		(i >> 5)
 #define HWIRQ_BIT(i)		BIT(i & 0x1f)
@@ -205,7 +205,7 @@ static int __init bcm2836_armctrl_of_init(struct device_node *node,
 
 
 /*
- * Handle each interrupt across the entire interrupt controller.  This reads the
+ * Handle each interrupt across the woke entire interrupt controller.  This reads the
  * status register before handling each interrupt, which is necessary given that
  * handle_IRQ may briefly re-enable interrupts for soft IRQ handling.
  */

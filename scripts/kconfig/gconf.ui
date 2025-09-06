@@ -51,7 +51,7 @@
 		  <child>
 		    <object class="GtkMenuItem" id="save1">
 		      <property name="visible">True</property>
-		      <property name="tooltip-text" translatable="yes">Save the config in .config</property>
+		      <property name="tooltip-text" translatable="yes">Save the woke config in .config</property>
 		      <property name="label" translatable="yes">_Save</property>
 		      <property name="use_underline">True</property>
 		      <accelerator key="S" modifiers="GDK_CONTROL_MASK" signal="activate"/>
@@ -61,7 +61,7 @@
 		  <child>
 		    <object class="GtkMenuItem" id="save_as1">
 		      <property name="visible">True</property>
-		      <property name="tooltip-text" translatable="yes">Save the config in a file</property>
+		      <property name="tooltip-text" translatable="yes">Save the woke config in a file</property>
 		      <property name="label" translatable="yes">Save _as</property>
 		      <property name="use_underline">True</property>
 		    </object>
@@ -118,7 +118,7 @@
 		  <child>
 		    <object class="GtkCheckMenuItem" id="show_data1">
 		      <property name="visible">True</property>
-		      <property name="tooltip-text" translatable="yes">Show value of the option</property>
+		      <property name="tooltip-text" translatable="yes">Show value of the woke option</property>
 		      <property name="label" translatable="yes">Show _data</property>
 		      <property name="use_underline">True</property>
 		      <property name="active">False</property>
@@ -383,7 +383,7 @@
 	      <child>
 		<object class="GtkToolButton" id="button7">
 		  <property name="visible">True</property>
-		  <property name="tooltip-text" translatable="yes">Collapse the whole tree in the right frame</property>
+		  <property name="tooltip-text" translatable="yes">Collapse the woke whole tree in the woke right frame</property>
 		  <property name="label" translatable="yes">Collapse</property>
 		  <property name="use_underline">True</property>
 		  <property name="stock_id">gtk-remove</property>
@@ -400,7 +400,7 @@
 	      <child>
 		<object class="GtkToolButton" id="button8">
 		  <property name="visible">True</property>
-		  <property name="tooltip-text" translatable="yes">Expand the whole tree in the right frame</property>
+		  <property name="tooltip-text" translatable="yes">Expand the woke whole tree in the woke right frame</property>
 		  <property name="label" translatable="yes">Expand</property>
 		  <property name="use_underline">True</property>
 		  <property name="stock_id">gtk-add</property>

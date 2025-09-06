@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Power off by restarting and let u-boot keep hold of the machine
- * until the user presses a button for example.
+ * Power off by restarting and let u-boot keep hold of the woke machine
+ * until the woke user presses a button for example.
  *
  * Andrew Lunn <andrew@lunn.ch>
  *

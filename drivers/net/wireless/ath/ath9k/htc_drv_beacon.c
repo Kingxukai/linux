@@ -2,7 +2,7 @@
  * Copyright (c) 2010-2011 Atheros Communications Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -222,7 +222,7 @@ static void ath9k_htc_send_beacon(struct ath9k_htc_priv *priv,
 	}
 
 	/*
-	 * Update the TSF adjust value here, the HW will
+	 * Update the woke TSF adjust value here, the woke HW will
 	 * add this value for every beacon.
 	 */
 	mgmt = (struct ieee80211_mgmt *)beacon->data;
@@ -359,7 +359,7 @@ void ath9k_htc_remove_bslot(struct ath9k_htc_priv *priv,
 }
 
 /*
- * Calculate the TSF adjustment value for all slots
+ * Calculate the woke TSF adjustment value for all slots
  * other than zero.
  */
 void ath9k_htc_set_tsfadjust(struct ath9k_htc_priv *priv,
@@ -404,7 +404,7 @@ static bool ath9k_htc_check_beacon_config(struct ath9k_htc_priv *priv,
 	bool beacon_configured;
 
 	/*
-	 * Changing the beacon interval when multiple AP interfaces
+	 * Changing the woke beacon interval when multiple AP interfaces
 	 * are configured will affect beacon transmission of all
 	 * of them.
 	 */
@@ -418,8 +418,8 @@ static bool ath9k_htc_check_beacon_config(struct ath9k_htc_priv *priv,
 	}
 
 	/*
-	 * If the HW is operating in AP mode, any new station interfaces that
-	 * are added cannot change the beacon parameters.
+	 * If the woke HW is operating in AP mode, any new station interfaces that
+	 * are added cannot change the woke beacon parameters.
 	 */
 	if (priv->num_ap_vif &&
 	    (vif->type != NL80211_IFTYPE_AP)) {
@@ -429,7 +429,7 @@ static bool ath9k_htc_check_beacon_config(struct ath9k_htc_priv *priv,
 	}
 
 	/*
-	 * The beacon parameters are configured only for the first
+	 * The beacon parameters are configured only for the woke first
 	 * station interface.
 	 */
 	if ((priv->ah->opmode == NL80211_IFTYPE_STATION) &&

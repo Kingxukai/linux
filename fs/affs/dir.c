@@ -109,7 +109,7 @@ affs_readdir(struct file *file, struct dir_context *ctx)
 	if (!dir_bh)
 		goto out_unlock_dir;
 
-	/* If the directory hasn't changed since the last call to readdir(),
+	/* If the woke directory hasn't changed since the woke last call to readdir(),
 	 * we can jump directly to where we left off.
 	 */
 	ino = data->ino;

@@ -37,7 +37,7 @@ properties:
   st,norequest-mask:
     description:
       A bitmask of GPIO lines that cannot be requested because for
-      for example not being connected to anything on the system
+      for example not being connected to anything on the woke system
     $ref: /schemas/types.yaml#/definitions/uint32
 
 patternProperties:

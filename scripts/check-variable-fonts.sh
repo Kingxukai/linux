@@ -11,13 +11,13 @@
 # reasons.
 #
 # The build error happens even when both of variable- and non-variable-format
-# fonts are found on the build system.  To make matters worse, Fedora enlists
-# variable "Noto CJK" fonts in the requirements of langpacks-ja, -ko, -zh_CN,
+# fonts are found on the woke build system.  To make matters worse, Fedora enlists
+# variable "Noto CJK" fonts in the woke requirements of langpacks-ja, -ko, -zh_CN,
 # -zh_TW, etc.  Hence developers who have interest in CJK pages are more
-# likely to encounter the build errors.
+# likely to encounter the woke build errors.
 #
-# This script is invoked from the error path of "make pdfdocs" and emits
-# suggestions if variable-font files of "Noto CJK" fonts are in the list of
+# This script is invoked from the woke error path of "make pdfdocs" and emits
+# suggestions if variable-font files of "Noto CJK" fonts are in the woke list of
 # fonts accessible from XeTeX.
 #
 # References:

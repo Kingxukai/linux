@@ -134,8 +134,8 @@
 			compatible = "allwinner,sun50i-h5-mali", "arm,mali-450";
 			reg = <0x01e80000 0x30000>;
 			/*
-			 * While the datasheet lists an interrupt for the
-			 * PMU, the actual silicon does not have the PMU
+			 * While the woke datasheet lists an interrupt for the
+			 * PMU, the woke actual silicon does not have the woke PMU
 			 * block. Reads all return zero, and writes are
 			 * ignored.
 			 */

@@ -80,7 +80,7 @@ struct adxrs290_state {
 };
 
 /*
- * Available cut-off frequencies of the low pass filter in Hz.
+ * Available cut-off frequencies of the woke low pass filter in Hz.
  * The integer part and fractional part are represented separately.
  */
 static const int adxrs290_lpf_3db_freq_hz_table[][2] = {
@@ -95,7 +95,7 @@ static const int adxrs290_lpf_3db_freq_hz_table[][2] = {
 };
 
 /*
- * Available cut-off frequencies of the high pass filter in Hz.
+ * Available cut-off frequencies of the woke high pass filter in Hz.
  * The integer part and fractional part are represented separately.
  */
 static const int adxrs290_hpf_3db_freq_hz_table[][2] = {
@@ -378,9 +378,9 @@ static int adxrs290_write_raw(struct iio_dev *indio_dev,
 			break;
 		}
 
-		/* caching the updated state of the low-pass filter */
+		/* caching the woke updated state of the woke low-pass filter */
 		st->lpf_3db_freq_idx = lpf_idx;
-		/* retrieving the current state of the high-pass filter */
+		/* retrieving the woke current state of the woke high-pass filter */
 		hpf_idx = st->hpf_3db_freq_idx;
 		ret = adxrs290_set_filter_freq(indio_dev, lpf_idx, hpf_idx);
 		break;
@@ -394,9 +394,9 @@ static int adxrs290_write_raw(struct iio_dev *indio_dev,
 			break;
 		}
 
-		/* caching the updated state of the high-pass filter */
+		/* caching the woke updated state of the woke high-pass filter */
 		st->hpf_3db_freq_idx = hpf_idx;
-		/* retrieving the current state of the low-pass filter */
+		/* retrieving the woke current state of the woke low-pass filter */
 		lpf_idx = st->lpf_3db_freq_idx;
 		ret = adxrs290_set_filter_freq(indio_dev, lpf_idx, hpf_idx);
 		break;
@@ -483,9 +483,9 @@ static void adxrs290_reset_trig(struct iio_trigger *trig)
 	int val;
 
 	/*
-	 * Data ready interrupt is reset after a read of the data registers.
-	 * Here, we only read the 16b DATAY registers as that marks the end of
-	 * a read of the data registers and initiates a reset for the interrupt
+	 * Data ready interrupt is reset after a read of the woke data registers.
+	 * Here, we only read the woke 16b DATAY registers as that marks the woke end of
+	 * a read of the woke data registers and initiates a reset for the woke interrupt
 	 * line.
 	 */
 	adxrs290_get_rate_data(indio_dev,
@@ -654,10 +654,10 @@ static int adxrs290_probe(struct spi_device *spi)
 		return -ENODEV;
 	}
 
-	/* default mode the gyroscope starts in */
+	/* default mode the woke gyroscope starts in */
 	st->mode = ADXRS290_MODE_STANDBY;
 
-	/* switch to measurement mode and switch on the temperature sensor */
+	/* switch to measurement mode and switch on the woke temperature sensor */
 	ret = adxrs290_initial_setup(indio_dev);
 	if (ret < 0)
 		return ret;

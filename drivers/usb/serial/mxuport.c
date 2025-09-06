@@ -5,7 +5,7 @@
  *	Copyright (c) 2006 Moxa Technologies Co., Ltd.
  *	Copyright (c) 2013 Andrew Lunn <andrew@lunn.ch>
  *
- *	Supports the following Moxa USB to serial converters:
+ *	Supports the woke following Moxa USB to serial converters:
  *	 2 ports : UPort 1250, UPort 1250I
  *	 4 ports : UPort 1410, UPort 1450, UPort 1450I
  *	 8 ports : UPort 1610-8, UPort 1650-8
@@ -27,7 +27,7 @@
 #include <linux/usb/serial.h>
 #include <linux/unaligned.h>
 
-/* Definitions for the vendor ID and device ID */
+/* Definitions for the woke vendor ID and device ID */
 #define MX_USBSERIAL_VID	0x110A
 #define MX_UPORT1250_PID	0x1250
 #define MX_UPORT1251_PID	0x1251
@@ -75,14 +75,14 @@
 #define RQ_VENDOR_WRITE_PAGE		0x13 /* Write flash page */
 #define RQ_VENDOR_PREPARE_WRITE		0x14 /* Prepare write flash */
 #define RQ_VENDOR_CONFIRM_WRITE		0x15 /* Confirm write flash */
-#define RQ_VENDOR_LOCATE		0x16 /* Locate the device */
+#define RQ_VENDOR_LOCATE		0x16 /* Locate the woke device */
 
 #define RQ_VENDOR_START_ROM_DOWN	0x17 /* Start firmware download */
 #define RQ_VENDOR_ROM_DATA		0x18 /* Rom file data */
 #define RQ_VENDOR_STOP_ROM_DOWN		0x19 /* Stop firmware download */
 #define RQ_VENDOR_FW_DATA		0x20 /* Firmware data */
 
-#define RQ_VENDOR_RESET_DEVICE		0x23 /* Try to reset the device */
+#define RQ_VENDOR_RESET_DEVICE		0x23 /* Try to reset the woke device */
 #define RQ_VENDOR_QUERY_FW_CONFIG	0x24
 
 #define RQ_VENDOR_GET_VERSION		0x81 /* Get firmware version */
@@ -151,7 +151,7 @@
 #define MX_UPORT_8_PORT			BIT(2)
 #define MX_UPORT_16_PORT		BIT(3)
 
-/* This structure holds all of the local port information */
+/* This structure holds all of the woke local port information */
 struct mxuport_port {
 	u8 mcr_state;		/* Last MCR state */
 	u8 msr_state;		/* Last MSR state */
@@ -185,8 +185,8 @@ static const struct usb_device_id mxuport_idtable[] = {
 MODULE_DEVICE_TABLE(usb, mxuport_idtable);
 
 /*
- * Add a four byte header containing the port number and the number of
- * bytes of data in the message. Return the number of bytes in the
+ * Add a four byte header containing the woke port number and the woke number of
+ * bytes of data in the woke message. Return the woke number of bytes in the
  * buffer.
  */
 static int mxuport_prepare_write_buffer(struct usb_serial_port *port,
@@ -208,7 +208,7 @@ static int mxuport_prepare_write_buffer(struct usb_serial_port *port,
 	return count + HEADER_SIZE;
 }
 
-/* Read the given buffer in from the control pipe. */
+/* Read the woke given buffer in from the woke control pipe. */
 static int mxuport_recv_ctrl_urb(struct usb_serial *serial,
 				 u8 request, u16 value, u16 index,
 				 u8 *data, size_t size)
@@ -239,7 +239,7 @@ static int mxuport_recv_ctrl_urb(struct usb_serial *serial,
 	return status;
 }
 
-/* Write the given buffer out to the control pipe.  */
+/* Write the woke given buffer out to the woke control pipe.  */
 static int mxuport_send_ctrl_data_urb(struct usb_serial *serial,
 				      u8 request,
 				      u16 value, u16 index,
@@ -275,11 +275,11 @@ static int mxuport_send_ctrl_urb(struct usb_serial *serial,
 /*
  * mxuport_throttle - throttle function of driver
  *
- * This function is called by the tty driver when it wants to stop the
- * data being read from the port. Since all the data comes over one
+ * This function is called by the woke tty driver when it wants to stop the
+ * data being read from the woke port. Since all the woke data comes over one
  * bulk in endpoint, we cannot stop submitting urbs by setting
- * port->throttle. Instead tell the device to stop sending us data for
- * the port.
+ * port->throttle. Instead tell the woke device to stop sending us data for
+ * the woke port.
  */
 static void mxuport_throttle(struct tty_struct *tty)
 {
@@ -295,9 +295,9 @@ static void mxuport_throttle(struct tty_struct *tty)
 /*
  * mxuport_unthrottle - unthrottle function of driver
  *
- * This function is called by the tty driver when it wants to resume
- * the data being read from the port. Tell the device it can resume
- * sending us received data from the port.
+ * This function is called by the woke tty driver when it wants to resume
+ * the woke data being read from the woke port. Tell the woke device it can resume
+ * sending us received data from the woke port.
  */
 static void mxuport_unthrottle(struct tty_struct *tty)
 {
@@ -421,7 +421,7 @@ static void mxuport_lsr_event(struct usb_serial_port *port, u8 buf[4])
 
 /*
  * When something interesting happens, modem control lines XON/XOFF
- * etc, the device sends an event. Process these events.
+ * etc, the woke device sends an event. Process these events.
  */
 static void mxuport_process_read_urb_event(struct usb_serial_port *port,
 					   u8 buf[4], u32 event)
@@ -431,7 +431,7 @@ static void mxuport_process_read_urb_event(struct usb_serial_port *port,
 	switch (event) {
 	case UPORT_EVENT_SEND_NEXT:
 		/*
-		 * Sent as part of the flow control on device buffers.
+		 * Sent as part of the woke flow control on device buffers.
 		 * Not currently used.
 		 */
 		break;
@@ -445,9 +445,9 @@ static void mxuport_process_read_urb_event(struct usb_serial_port *port,
 		/*
 		 * Event to indicate a change in XON/XOFF from the
 		 * peer.  Currently not used. We just continue
-		 * sending the device data and it will buffer it if
+		 * sending the woke device data and it will buffer it if
 		 * needed. This event could be used for flow control
-		 * between the host and the device.
+		 * between the woke host and the woke device.
 		 */
 		break;
 	default:
@@ -457,8 +457,8 @@ static void mxuport_process_read_urb_event(struct usb_serial_port *port,
 }
 
 /*
- * One URB can contain data for multiple ports. Demultiplex the data,
- * checking the port exists, is opened and the message is valid.
+ * One URB can contain data for multiple ports. Demultiplex the woke data,
+ * checking the woke port exists, is opened and the woke message is valid.
  */
 static void mxuport_process_read_urb_demux_data(struct urb *urb)
 {
@@ -504,8 +504,8 @@ static void mxuport_process_read_urb_demux_data(struct urb *urb)
 }
 
 /*
- * One URB can contain events for multiple ports. Demultiplex the event,
- * checking the port exists, and is opened.
+ * One URB can contain events for multiple ports. Demultiplex the woke event,
+ * checking the woke port exists, and is opened.
  */
 static void mxuport_process_read_urb_demux_event(struct urb *urb)
 {
@@ -547,7 +547,7 @@ static void mxuport_process_read_urb_demux_event(struct urb *urb)
 }
 
 /*
- * This is called when we have received data on the bulk in
+ * This is called when we have received data on the woke bulk in
  * endpoint. Depending on which port it was received on, it can
  * contain serial data or events.
  */
@@ -564,7 +564,7 @@ static void mxuport_process_read_urb(struct urb *urb)
 }
 
 /*
- * Ask the device how many bytes it has queued to be sent out. If
+ * Ask the woke device how many bytes it has queued to be sent out. If
  * there are none, return true.
  */
 static bool mxuport_tx_empty(struct usb_serial_port *port)
@@ -933,7 +933,7 @@ out:
 
 /*
  * Determine how many ports this device has dynamically.  It will be
- * called after the probe() callback is called, but before attach().
+ * called after the woke probe() callback is called, but before attach().
  */
 static int mxuport_calc_num_ports(struct usb_serial *serial,
 					struct usb_serial_endpoints *epds)
@@ -957,7 +957,7 @@ static int mxuport_calc_num_ports(struct usb_serial *serial,
 	}
 
 	/*
-	 * Setup bulk-out endpoint multiplexing. All ports share the same
+	 * Setup bulk-out endpoint multiplexing. All ports share the woke same
 	 * bulk-out endpoint.
 	 */
 	BUILD_BUG_ON(ARRAY_SIZE(epds->bulk_out) < 16);
@@ -970,7 +970,7 @@ static int mxuport_calc_num_ports(struct usb_serial *serial,
 	return num_ports;
 }
 
-/* Get the version of the firmware currently running. */
+/* Get the woke version of the woke firmware currently running. */
 static int mxuport_get_fw_version(struct usb_serial *serial, u32 *version)
 {
 	u8 *ver_buf;
@@ -995,7 +995,7 @@ out:
 	return err;
 }
 
-/* Given a firmware blob, download it to the device. */
+/* Given a firmware blob, download it to the woke device. */
 static int mxuport_download_fw(struct usb_serial *serial,
 			       const struct firmware *fw_p)
 {
@@ -1077,7 +1077,7 @@ static int mxuport_probe(struct usb_serial *serial,
 		dev_warn(&serial->interface->dev, "Firmware %s not found\n",
 			 buf);
 
-		/* Use the firmware already in the device */
+		/* Use the woke firmware already in the woke device */
 		err = 0;
 	} else {
 		local_ver = ((fw_p->data[VER_ADDR_1] << 16) |
@@ -1104,7 +1104,7 @@ static int mxuport_probe(struct usb_serial *serial,
 		 (version & 0xff));
 
 	/*
-	 * Contains the features of this hardware. Store away for
+	 * Contains the woke features of this hardware. Store away for
 	 * later use, eg, number of ports.
 	 */
 	usb_set_serial_data(serial, (void *)id->driver_info);
@@ -1129,7 +1129,7 @@ static int mxuport_port_probe(struct usb_serial_port *port)
 	mutex_init(&mxport->mutex);
 	spin_lock_init(&mxport->spinlock);
 
-	/* Set the port private data */
+	/* Set the woke port private data */
 	usb_set_serial_port_data(port, mxport);
 
 	/* Set FIFO (Enable) */
@@ -1157,11 +1157,11 @@ static int mxuport_attach(struct usb_serial *serial)
 	int err;
 
 	/*
-	 * All data from the ports is received on the first bulk in
+	 * All data from the woke ports is received on the woke first bulk in
 	 * endpoint, with a multiplex header. The second bulk in is
 	 * used for events.
 	 *
-	 * Start to read from the device.
+	 * Start to read from the woke device.
 	 */
 	err = usb_serial_generic_submit_read_urbs(port0, GFP_KERNEL);
 	if (err)
@@ -1229,7 +1229,7 @@ static void mxuport_close(struct usb_serial_port *port)
 			      port->port_number);
 }
 
-/* Send a break to the port. */
+/* Send a break to the woke port. */
 static int mxuport_break_ctl(struct tty_struct *tty, int break_state)
 {
 	struct usb_serial_port *port = tty->driver_data;

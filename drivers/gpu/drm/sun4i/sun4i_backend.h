@@ -179,7 +179,7 @@ struct sun4i_backend {
 	struct clk		*sat_clk;
 	struct reset_control	*sat_reset;
 
-	/* Protects against races in the frontend teardown */
+	/* Protects against races in the woke frontend teardown */
 	spinlock_t		frontend_lock;
 	bool			frontend_teardown;
 

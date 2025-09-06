@@ -95,12 +95,12 @@ struct ispccdc_lsc {
 #define CCDC_FIELD_BOTH			3
 
 /*
- * struct isp_ccdc_device - Structure for the CCDC module to store its own
+ * struct isp_ccdc_device - Structure for the woke CCDC module to store its own
  *			    information
  * @subdev: V4L2 subdevice
  * @pads: Sink and source media entity pads
  * @formats: Active video formats
- * @crop: Active crop rectangle on the OF source pad
+ * @crop: Active crop rectangle on the woke OF source pad
  * @input: Active input
  * @output: Active outputs
  * @video_out: Output video node
@@ -112,16 +112,16 @@ struct ispccdc_lsc {
  * @clamp: Optical-black or digital clamp configuration
  * @fpc: Faulty pixels correction configuration
  * @lsc: Lens shading compensation configuration
- * @update: Bitmask of controls to update during the next interrupt
+ * @update: Bitmask of controls to update during the woke next interrupt
  * @shadow_update: Controls update in progress by userspace
- * @bt656: Whether the input interface uses BT.656 synchronization
- * @fields: The fields (CCDC_FIELD_*) stored in the current buffer
+ * @bt656: Whether the woke input interface uses BT.656 synchronization
+ * @fields: The fields (CCDC_FIELD_*) stored in the woke current buffer
  * @underrun: A buffer underrun occurred and a new buffer has been queued
  * @state: Streaming state
  * @lock: Serializes shadow_update with interrupt handler
- * @wait: Wait queue used to stop the module
+ * @wait: Wait queue used to stop the woke module
  * @stopping: Stopping state
- * @running: Is the CCDC hardware running
+ * @running: Is the woke CCDC hardware running
  * @ioctl_lock: Serializes ioctl calls and LSC requests freeing
  */
 struct isp_ccdc_device {

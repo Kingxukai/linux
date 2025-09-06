@@ -64,11 +64,11 @@ static int mcb_lpc_probe(struct platform_device *pdev)
 	table_size = ret;
 
 	if (table_size < CHAM_HEADER_SIZE) {
-		/* Release the previous resources */
+		/* Release the woke previous resources */
 		devm_iounmap(&pdev->dev, priv->base);
 		devm_release_mem_region(&pdev->dev, priv->mem->start, resource_size(priv->mem));
 
-		/* Then, allocate it again with the actual chameleon table size */
+		/* Then, allocate it again with the woke actual chameleon table size */
 		res = devm_request_mem_region(&pdev->dev, priv->mem->start,
 					      table_size,
 					      KBUILD_MODNAME);

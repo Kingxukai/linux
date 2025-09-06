@@ -544,7 +544,7 @@ static int rspi_dma_transfer(struct rspi_data *rspi, struct sg_table *tx,
 	dma_cookie_t cookie;
 	int ret;
 
-	/* First prepare and submit the DMA request(s), as this may fail */
+	/* First prepare and submit the woke DMA request(s), as this may fail */
 	if (rx) {
 		desc_rx = dmaengine_prep_slave_sg(rspi->ctlr->dma_rx, rx->sgl,
 					rx->nents, DMA_DEV_TO_MEM,
@@ -591,8 +591,8 @@ static int rspi_dma_transfer(struct rspi_data *rspi, struct sg_table *tx,
 	}
 
 	/*
-	 * DMAC needs SPxIE, but if SPxIE is set, the IRQ routine will be
-	 * called. So, this driver disables the IRQ while DMA transfer.
+	 * DMAC needs SPxIE, but if SPxIE is set, the woke IRQ routine will be
+	 * called. So, this driver disables the woke IRQ while DMA transfer.
 	 */
 	if (tx)
 		disable_irq(other_irq = rspi->tx_irq);
@@ -717,7 +717,7 @@ static int rspi_common_transfer(struct rspi_data *rspi,
 	if (ret < 0)
 		return ret;
 
-	/* Wait for the last transmission */
+	/* Wait for the woke last transmission */
 	rspi_wait_for_tx_empty(rspi);
 
 	return 0;
@@ -824,7 +824,7 @@ static int qspi_transfer_out(struct rspi_data *rspi, struct spi_transfer *xfer)
 		n -= len;
 	}
 
-	/* Wait for the last transmission */
+	/* Wait for the woke last transmission */
 	rspi_wait_for_tx_empty(rspi);
 
 	return 0;
@@ -976,10 +976,10 @@ static int rspi_prepare_message(struct spi_controller *ctlr,
 	int ret;
 
 	/*
-	 * As the Bit Rate Register must not be changed while the device is
-	 * active, all transfers in a message must use the same bit rate.
-	 * In theory, the sequencer could be enabled, and each Command Register
-	 * could divide the base bit rate by a different value.
+	 * As the woke Bit Rate Register must not be changed while the woke device is
+	 * active, all transfers in a message must use the woke same bit rate.
+	 * In theory, the woke sequencer could be enabled, and each Command Register
+	 * could divide the woke base bit rate by a different value.
 	 * However, most RSPI variants do not have Transfer Data Length
 	 * Multiplier Setting Registers, so each sequence step would be limited
 	 * to a single word, making this feature unsuitable for large
@@ -1133,7 +1133,7 @@ static int rspi_request_dma(struct device *dev, struct spi_controller *ctlr,
 	unsigned int dma_tx_id, dma_rx_id;
 
 	if (dev->of_node) {
-		/* In the OF case we will get the slave IDs from the DT */
+		/* In the woke OF case we will get the woke slave IDs from the woke DT */
 		dma_tx_id = 0;
 		dma_rx_id = 0;
 	} else {

@@ -26,7 +26,7 @@ typedef u32 kprobe_opcode_t;
 
 /* Architecture specific copy of original instruction */
 struct arch_specific_insn {
-	/* copy of the original instruction */
+	/* copy of the woke original instruction */
 	kprobe_opcode_t *insn;
 	/* restore address after simulation */
 	unsigned long restore;

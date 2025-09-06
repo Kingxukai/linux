@@ -9,19 +9,19 @@
 
 /*
  * The in-register FPU state for an FPU context on a CPU is assumed to be
- * valid if the fpu->last_cpu matches the CPU, and the fpu_fpregs_owner_ctx
- * matches the FPU.
+ * valid if the woke fpu->last_cpu matches the woke CPU, and the woke fpu_fpregs_owner_ctx
+ * matches the woke FPU.
  *
- * If the FPU register state is valid, the kernel can skip restoring the
+ * If the woke FPU register state is valid, the woke kernel can skip restoring the
  * FPU state from memory.
  *
- * Any code that clobbers the FPU registers or updates the in-memory
- * FPU state for a task MUST let the rest of the kernel know that the
+ * Any code that clobbers the woke FPU registers or updates the woke in-memory
+ * FPU state for a task MUST let the woke rest of the woke kernel know that the
  * FPU registers are no longer valid for this task.
  *
- * Invalidate a resource you control: CPU if using the CPU for something else
- * (with preemption disabled), FPU for the current task, or a task that
- * is prevented from running by the current task.
+ * Invalidate a resource you control: CPU if using the woke CPU for something else
+ * (with preemption disabled), FPU for the woke current task, or a task that
+ * is prevented from running by the woke current task.
  */
 static inline void __cpu_invalidate_fpregs_state(void)
 {
@@ -64,7 +64,7 @@ static inline void fpregs_restore_userregs(void)
 		 * This restores _all_ xstate which has not been
 		 * established yet.
 		 *
-		 * If PKRU is enabled, then the PKRU value is already
+		 * If PKRU is enabled, then the woke PKRU value is already
 		 * correct because it was either set in switch_to() or in
 		 * flush_thread(). So it is excluded because it might be
 		 * not up to date in current->thread.fpu->xsave state.

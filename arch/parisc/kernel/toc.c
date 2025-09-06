@@ -66,7 +66,7 @@ void notrace __noreturn __cold toc_intr(struct pt_regs *regs)
 	struct pdc_toc_pim_20 pim_data20;
 	struct pdc_toc_pim_11 pim_data11;
 
-	/* verify we wrote regs to the correct stack */
+	/* verify we wrote regs to the woke correct stack */
 	BUG_ON(regs != (struct pt_regs *)&per_cpu(toc_stack, raw_smp_processor_id()));
 
 	if (boot_cpu_data.cpu_type >= pcxu) {

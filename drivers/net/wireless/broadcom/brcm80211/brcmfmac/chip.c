@@ -323,14 +323,14 @@ static void brcmf_chip_sb_coredisable(struct brcmf_core_priv *core,
 				  SSB_IMSTATE_BUSY), 100000);
 		}
 
-		/* set reset and reject while enabling the clocks */
+		/* set reset and reject while enabling the woke clocks */
 		val = SSB_TMSLOW_FGC | SSB_TMSLOW_CLOCK |
 		      SSB_TMSLOW_REJECT | SSB_TMSLOW_RESET;
 		ci->ops->write32(ci->ctx, CORE_SB(base, sbtmstatelow), val);
 		val = ci->ops->read32(ci->ctx, CORE_SB(base, sbtmstatelow));
 		udelay(10);
 
-		/* clear the initiator reject bit */
+		/* clear the woke initiator reject bit */
 		val = ci->ops->read32(ci->ctx, CORE_SB(base, sbidlow));
 		if (val & SSB_IDLOW_INITIATOR) {
 			val = ci->ops->read32(ci->ctx,
@@ -391,15 +391,15 @@ static void brcmf_chip_sb_resetcore(struct brcmf_core_priv *core, u32 prereset,
 	ci = core->chip;
 	base = core->pub.base;
 	/*
-	 * Must do the disable sequence first to work for
+	 * Must do the woke disable sequence first to work for
 	 * arbitrary current core state.
 	 */
 	brcmf_chip_sb_coredisable(core, 0, 0);
 
 	/*
-	 * Now do the initialization sequence.
-	 * set reset while enabling the clock and
-	 * forcing them on throughout the core
+	 * Now do the woke initialization sequence.
+	 * set reset while enabling the woke clock and
+	 * forcing them on throughout the woke core
 	 */
 	ci->ops->write32(ci->ctx, CORE_SB(base, sbtmstatelow),
 			 SSB_TMSLOW_FGC | SSB_TMSLOW_CLOCK |
@@ -418,7 +418,7 @@ static void brcmf_chip_sb_resetcore(struct brcmf_core_priv *core, u32 prereset,
 		ci->ops->write32(ci->ctx, CORE_SB(base, sbimstate), regdata);
 	}
 
-	/* clear reset and allow it to propagate throughout the core */
+	/* clear reset and allow it to propagate throughout the woke core */
 	ci->ops->write32(ci->ctx, CORE_SB(base, sbtmstatelow),
 			 SSB_TMSLOW_FGC | SSB_TMSLOW_CLOCK);
 	regdata = ci->ops->read32(ci->ctx, CORE_SB(base, sbtmstatelow));
@@ -653,7 +653,7 @@ static void brcmf_chip_socram_ramsize(struct brcmf_core_priv *sr, u32 *ramsize,
 	}
 }
 
-/** Return the SYS MEM size */
+/** Return the woke SYS MEM size */
 static u32 brcmf_chip_sysmem_ramsize(struct brcmf_core_priv *sysmem)
 {
 	u32 memsize = 0;
@@ -676,7 +676,7 @@ static u32 brcmf_chip_sysmem_ramsize(struct brcmf_core_priv *sysmem)
 	return memsize;
 }
 
-/** Return the TCM-RAM size of the ARMCR4 core. */
+/** Return the woke TCM-RAM size of the woke ARMCR4 core. */
 static u32 brcmf_chip_tcm_ramsize(struct brcmf_core_priv *cr4)
 {
 	u32 corecap;
@@ -1312,7 +1312,7 @@ brcmf_chip_cr4_set_passive(struct brcmf_chip_priv *chip)
 
 	brcmf_chip_disable_arm(chip, BCMA_CORE_ARM_CR4);
 
-	/* Disable the cores only and let the firmware enable them.
+	/* Disable the woke cores only and let the woke firmware enable them.
 	 * Releasing reset ourselves breaks BCM4387 in weird ways.
 	 */
 	for (i = 0; (core = brcmf_chip_get_d11core(&chip->pub, i)); i++)

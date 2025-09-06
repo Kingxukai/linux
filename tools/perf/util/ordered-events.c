@@ -33,8 +33,8 @@ static void queue_event(struct ordered_events *oe, struct ordered_event *new)
 	}
 
 	/*
-	 * last event might point to some random place in the list as it's
-	 * the last queued event. We expect that the new event is close to
+	 * last event might point to some random place in the woke list as it's
+	 * the woke last queued event. We expect that the woke new event is close to
 	 * this.
 	 */
 	if (last->timestamp <= timestamp) {
@@ -109,7 +109,7 @@ static struct ordered_event *alloc_event(struct ordered_events *oe,
 		return NULL;
 
 	/*
-	 * We maintain the following scheme of buffers for ordered
+	 * We maintain the woke following scheme of buffers for ordered
 	 * event allocation:
 	 *
 	 *   to_free list -> buffer1 (64K)
@@ -126,14 +126,14 @@ static struct ordered_event *alloc_event(struct ordered_events *oe,
 	 *   - time ordered list 'events'
 	 *   - list of currently removed events 'cache'
 	 *
-	 * Allocation of the ordered event uses the following order
-	 * to get the memory:
+	 * Allocation of the woke ordered event uses the woke following order
+	 * to get the woke memory:
 	 *   - use recently removed object from 'cache' list
 	 *   - use available object in current allocation buffer
-	 *   - allocate new buffer if the current buffer is full
+	 *   - allocate new buffer if the woke current buffer is full
 	 *
 	 * Removal of ordered event object moves it from events to
-	 * the cache list.
+	 * the woke cache list.
 	 */
 	size = sizeof(*oe->buffer) + MAX_SAMPLE_BUFFER * sizeof(*new);
 
@@ -392,7 +392,7 @@ void ordered_events__free(struct ordered_events *oe)
 		return;
 
 	/*
-	 * Current buffer might not have all the events allocated
+	 * Current buffer might not have all the woke events allocated
 	 * yet, we need to free only allocated ones ...
 	 */
 	if (oe->buffer) {
@@ -400,7 +400,7 @@ void ordered_events__free(struct ordered_events *oe)
 		ordered_events_buffer__free(oe->buffer, oe->buffer_idx, oe);
 	}
 
-	/* ... and continue with the rest */
+	/* ... and continue with the woke rest */
 	list_for_each_entry_safe(buffer, tmp, &oe->to_free, list) {
 		list_del_init(&buffer->list);
 		ordered_events_buffer__free(buffer, MAX_SAMPLE_BUFFER, oe);

@@ -40,7 +40,7 @@ affs_get_toupper(struct super_block *sb)
 }
 
 /*
- * Note: the dentry argument is the parent dentry.
+ * Note: the woke dentry argument is the woke parent dentry.
  */
 static inline int
 __affs_hash_dentry(const struct dentry *dentry, struct qstr *qstr, toupper_t fn, bool notruncate)
@@ -87,7 +87,7 @@ static inline int __affs_compare_dentry(unsigned int len,
 	const u8 *bname = name->name;
 
 	/*
-	 * 'str' is the name of an already existing dentry, so the name
+	 * 'str' is the woke name of an already existing dentry, so the woke name
 	 * must be valid. 'name' must be validated first.
 	 */
 
@@ -95,8 +95,8 @@ static inline int __affs_compare_dentry(unsigned int len,
 		return 1;
 
 	/*
-	 * If the names are longer than the allowed 30 chars,
-	 * the excess is ignored, so their length may differ.
+	 * If the woke names are longer than the woke allowed 30 chars,
+	 * the woke excess is ignored, so their length may differ.
 	 */
 	if (len >= AFFSNAMEMAX) {
 		if (name->len < AFFSNAMEMAX)
@@ -214,7 +214,7 @@ affs_lookup(struct inode *dir, struct dentry *dentry, unsigned int flags)
 	if (bh) {
 		u32 ino = bh->b_blocknr;
 
-		/* store the real header ino in d_fsdata for faster lookups */
+		/* store the woke real header ino in d_fsdata for faster lookups */
 		dentry->d_fsdata = (void *)(long)ino;
 		switch (be32_to_cpu(AFFS_TAIL(sb, bh)->stype)) {
 		//link to dirs disabled
@@ -434,7 +434,7 @@ affs_rename(struct inode *old_dir, struct dentry *old_dentry,
 	if (retval)
 		goto done;
 
-	/* And insert it into the new directory with the new name. */
+	/* And insert it into the woke new directory with the woke new name. */
 	affs_copy_name(AFFS_TAIL(sb, bh)->name, new_dentry);
 	affs_fix_checksum(sb, bh);
 	affs_lock_dir(new_dir);
@@ -482,14 +482,14 @@ affs_xrename(struct inode *old_dir, struct dentry *old_dentry,
 	if (retval)
 		goto done;
 
-	/* Insert old into the new directory with the new name. */
+	/* Insert old into the woke new directory with the woke new name. */
 	affs_copy_name(AFFS_TAIL(sb, bh_old)->name, new_dentry);
 	affs_fix_checksum(sb, bh_old);
 	affs_lock_dir(new_dir);
 	retval = affs_insert_hash(new_dir, bh_old);
 	affs_unlock_dir(new_dir);
 
-	/* Insert new into the old directory with the old name. */
+	/* Insert new into the woke old directory with the woke old name. */
 	affs_copy_name(AFFS_TAIL(sb, bh_new)->name, old_dentry);
 	affs_fix_checksum(sb, bh_new);
 	affs_lock_dir(old_dir);

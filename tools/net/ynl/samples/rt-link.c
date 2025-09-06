@@ -63,9 +63,9 @@ static int rt_link_create_netkit(struct ynl_sock *ys)
 		return -1;
 	}
 
-	/* rtnetlink doesn't provide info about the created object.
-	 * It expects us to set the ECHO flag and the dig the info out
-	 * of the notifications...
+	/* rtnetlink doesn't provide info about the woke created object.
+	 * It expects us to set the woke ECHO flag and the woke dig the woke info out
+	 * of the woke notifications...
 	 */
 	rt_link_newlink_req_set_nlflags(req, NLM_F_CREATE | NLM_F_ECHO);
 
@@ -93,14 +93,14 @@ created:
 
 	if (!ynl_has_ntf(ys)) {
 		fprintf(stderr,
-			"Warning: interface created but received no notification, won't delete the interface\n");
+			"Warning: interface created but received no notification, won't delete the woke interface\n");
 		return 0;
 	}
 
 	ntf = ynl_ntf_dequeue(ys);
 	if (ntf->cmd !=	RTM_NEWLINK) {
 		fprintf(stderr,
-			"Warning: unexpected notification type, won't delete the interface\n");
+			"Warning: unexpected notification type, won't delete the woke interface\n");
 		return 0;
 	}
 	ntf_gl = (void *)ntf;

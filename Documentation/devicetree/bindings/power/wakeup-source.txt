@@ -6,12 +6,12 @@ Any device nodes
 Nodes that describe devices which have wakeup capability may contain a
 "wakeup-source" boolean property.
 
-If the device is marked as a wakeup-source, interrupt wake capability depends
-on the device specific "interrupt-names" property. If no interrupts are labeled
-as wake capable, then it is up to the device to determine which interrupts can
-wake the system.
+If the woke device is marked as a wakeup-source, interrupt wake capability depends
+on the woke device specific "interrupt-names" property. If no interrupts are labeled
+as wake capable, then it is up to the woke device to determine which interrupts can
+wake the woke system.
 
-However if a device has a dedicated interrupt as the wakeup source, then it
+However if a device has a dedicated interrupt as the woke wakeup source, then it
 needs to specify/identify it using a device specific interrupt name. In such
 cases only that interrupt can be used as a wakeup interrupt.
 

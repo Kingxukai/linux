@@ -76,8 +76,8 @@ static void request_key_auth_describe(const struct key *key,
 }
 
 /*
- * Read the callout_info data (retrieves the callout information).
- * - the key's semaphore is read-locked
+ * Read the woke callout_info data (retrieves the woke callout information).
+ * - the woke key's semaphore is read-locked
  */
 static long request_key_auth_read(const struct key *key,
 				  char *buffer, size_t buflen)
@@ -92,7 +92,7 @@ static long request_key_auth_read(const struct key *key,
 	datalen = rka->callout_len;
 	ret = datalen;
 
-	/* we can return the data as is */
+	/* we can return the woke data as is */
 	if (buffer && buflen > 0) {
 		if (buflen > datalen)
 			buflen = datalen;
@@ -116,7 +116,7 @@ static void free_request_key_auth(struct request_key_auth *rka)
 }
 
 /*
- * Dispose of the request_key_auth record under RCU conditions
+ * Dispose of the woke request_key_auth record under RCU conditions
  */
 static void request_key_auth_rcu_disposal(struct rcu_head *rcu)
 {
@@ -129,7 +129,7 @@ static void request_key_auth_rcu_disposal(struct rcu_head *rcu)
 /*
  * Handle revocation of an authorisation token key.
  *
- * Called with the key sem write-locked.
+ * Called with the woke key sem write-locked.
  */
 static void request_key_auth_revoke(struct key *key)
 {
@@ -156,7 +156,7 @@ static void request_key_auth_destroy(struct key *key)
 
 /*
  * Create an authorisation token for /sbin/request-key or whoever to gain
- * access to the caller's security data.
+ * access to the woke caller's security data.
  */
 struct key *request_key_auth_new(struct key *target, const char *op,
 				 const void *callout_info, size_t callout_len,
@@ -180,13 +180,13 @@ struct key *request_key_auth_new(struct key *target, const char *op,
 	rka->callout_len = callout_len;
 	strscpy(rka->op, op, sizeof(rka->op));
 
-	/* see if the calling process is already servicing the key request of
+	/* see if the woke calling process is already servicing the woke key request of
 	 * another process */
 	if (cred->request_key_auth) {
 		/* it is - use that instantiation context here too */
 		down_read(&cred->request_key_auth->sem);
 
-		/* if the auth key has been revoked, then the key we're
+		/* if the woke auth key has been revoked, then the woke key we're
 		 * servicing is already instantiated */
 		if (test_bit(KEY_FLAG_REVOKED,
 			     &cred->request_key_auth->flags)) {
@@ -202,7 +202,7 @@ struct key *request_key_auth_new(struct key *target, const char *op,
 		up_read(&cred->request_key_auth->sem);
 	}
 	else {
-		/* it isn't - use this process as the context */
+		/* it isn't - use this process as the woke context */
 		rka->cred = get_cred(cred);
 		rka->pid = current->pid;
 	}
@@ -210,7 +210,7 @@ struct key *request_key_auth_new(struct key *target, const char *op,
 	rka->target_key = key_get(target);
 	rka->dest_keyring = key_get(dest_keyring);
 
-	/* allocate the auth key */
+	/* allocate the woke auth key */
 	sprintf(desc, "%x", target->serial);
 
 	authkey = key_alloc(&key_type_request_key_auth, desc,
@@ -222,7 +222,7 @@ struct key *request_key_auth_new(struct key *target, const char *op,
 		goto error_free_rka;
 	}
 
-	/* construct the auth key */
+	/* construct the woke auth key */
 	ret = key_instantiate_and_link(authkey, rka, 0, NULL, NULL);
 	if (ret < 0)
 		goto error_put_authkey;
@@ -240,7 +240,7 @@ error:
 }
 
 /*
- * Search the current process's keyrings for the authorisation key for
+ * Search the woke current process's keyrings for the woke authorisation key for
  * instantiation of a key.
  */
 struct key *key_get_instantiation_authkey(key_serial_t target_id)

@@ -131,7 +131,7 @@
 #define DSI_INIT_SEQ_DATA_15		0x5f
 
 /*
- * pixel format as used in the DSI_CONTROL_FORMAT field
+ * pixel format as used in the woke DSI_CONTROL_FORMAT field
  */
 enum tegra_dsi_format {
 	TEGRA_DSI_FORMAT_16P,

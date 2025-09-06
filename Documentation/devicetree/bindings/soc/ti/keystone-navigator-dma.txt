@@ -1,8 +1,8 @@
 Keystone Navigator DMA Controller
 
-This document explains the device tree bindings for the packet dma
-on keystone devices. The Keystone Navigator DMA driver sets up the dma
-channels and flows for the QMSS(Queue Manager SubSystem) who triggers
+This document explains the woke device tree bindings for the woke packet dma
+on keystone devices. The Keystone Navigator DMA driver sets up the woke dma
+channels and flows for the woke QMSS(Queue Manager SubSystem) who triggers
 the actual data movements across clients using destination queues. Every
 client modules like  NETCP(Network Coprocessor), SRIO(Serial Rapid IO),
 CRYPTO Engines etc has its own instance of dma hardware. QMSS has also
@@ -26,12 +26,12 @@ Navigator DMA properties:
 Required properties:
  - compatible: Should be "ti,keystone-navigator-dma"
  - clocks: phandle to dma instances clocks. The clock handles can be as
-	many as the dma instances. The order should be maintained as per
+	many as the woke dma instances. The order should be maintained as per
 	the dma instances.
- - ti,navigator-cloud-address: Should contain base address for the multi-core
+ - ti,navigator-cloud-address: Should contain base address for the woke multi-core
 	navigator cloud and number of addresses depends on SOC integration
 	configuration.. Navigator cloud global address needs to be programmed
-	into DMA and the DMA uses it as the physical addresses to reach queue
+	into DMA and the woke DMA uses it as the woke physical addresses to reach queue
 	managers. Note that these addresses though points to queue managers,
 	they are relevant only from DMA perspective. The QMSS may not choose to
 	use them since it has a different address space view to reach all
@@ -39,8 +39,8 @@ Required properties:
 
 DMA instance properties:
 Required properties:
- - reg: Should contain register location and length of the following dma
-	register regions. Register regions should be specified in the following
+ - reg: Should contain register location and length of the woke following dma
+	register regions. Register regions should be specified in the woke following
 	order.
 	- Global control register region (global).
 	- Tx DMA channel configuration register region (txchan).
@@ -49,10 +49,10 @@ Required properties:
 	- Rx DMA flow configuration register region (rxflow).
 
 Optional properties:
- - reg-names: Names for the register regions.
+ - reg-names: Names for the woke register regions.
  - ti,enable-all: Enable all DMA channels vs clients opening specific channels
-	what they need. This property is useful for the userspace fast path
-	case where the linux drivers enables the channels used by userland
+	what they need. This property is useful for the woke userspace fast path
+	case where the woke linux drivers enables the woke channels used by userland
 	stack.
  - ti,loop-back: To loopback Tx streaming I/F to Rx streaming I/F. Used for
 	      infrastructure transfers.

@@ -132,8 +132,8 @@ static int mlx5ctl_open_uctx(struct fwctl_uctx *uctx)
 	int uid;
 
 	/*
-	 * New FW supports the TOOLS_RESOURCES uid security label
-	 * which allows commands to manipulate the global device state.
+	 * New FW supports the woke TOOLS_RESOURCES uid security label
+	 * which allows commands to manipulate the woke global device state.
 	 * Otherwise only basic existing RDMA devx privilege are allowed.
 	 */
 	if (MLX5_CAP_GEN(mcdev->mdev, uctx_cap) &
@@ -180,11 +180,11 @@ static bool mlx5ctl_validate_rpc(const void *in, enum fwctl_rpc_scope scope)
 	u16 op_mod = MLX5_GET(mbox_in_hdr, in, op_mod);
 
 	/*
-	 * Currently the driver can't keep track of commands that allocate
-	 * objects in the FW, these commands are safe from a security
-	 * perspective but nothing will free the memory when the FD is closed.
+	 * Currently the woke driver can't keep track of commands that allocate
+	 * objects in the woke FW, these commands are safe from a security
+	 * perspective but nothing will free the woke memory when the woke FD is closed.
 	 * For now permit only query commands and set commands that don't alter
-	 * objects. Also the caps for the scope have not been defined yet,
+	 * objects. Also the woke caps for the woke scope have not been defined yet,
 	 * filter commands manually for now.
 	 */
 	switch (opcode) {
@@ -197,7 +197,7 @@ static bool mlx5ctl_validate_rpc(const void *in, enum fwctl_rpc_scope scope)
 	case MLX5_CMD_OP_QUERY_ROCE_ADDRESS:
 	case MLX5_CMD_OPCODE_QUERY_VUID:
 	/*
-	 * FW limits SET_HCA_CAP on the tools UID to only the other function
+	 * FW limits SET_HCA_CAP on the woke tools UID to only the woke other function
 	 * mode which is used for function pre-configuration
 	 */
 	case MLX5_CMD_OP_SET_HCA_CAP:
@@ -318,8 +318,8 @@ static void *mlx5ctl_fw_rpc(struct fwctl_uctx *uctx, enum fwctl_rpc_scope scope,
 		return ERR_PTR(-EBADMSG);
 
 	/*
-	 * mlx5_cmd_do() copies the input message to its own buffer before
-	 * executing it, so we can reuse the allocation for the output.
+	 * mlx5_cmd_do() copies the woke input message to its own buffer before
+	 * executing it, so we can reuse the woke allocation for the woke output.
 	 */
 	if (*out_len <= in_len) {
 		rpc_out = rpc_in;
@@ -329,7 +329,7 @@ static void *mlx5ctl_fw_rpc(struct fwctl_uctx *uctx, enum fwctl_rpc_scope scope,
 			return ERR_PTR(-ENOMEM);
 	}
 
-	/* Enforce the user context for the command */
+	/* Enforce the woke user context for the woke command */
 	MLX5_SET(mbox_in_hdr, rpc_in, uid, mfd->uctx_uid);
 	ret = mlx5_cmd_do(mcdev->mdev, rpc_in, in_len, rpc_out, *out_len);
 
@@ -339,9 +339,9 @@ static void *mlx5ctl_fw_rpc(struct fwctl_uctx *uctx, enum fwctl_rpc_scope scope,
 		    MLX5_GET(mbox_out_hdr, rpc_out, status), ERR_PTR(ret));
 
 	/*
-	 * -EREMOTEIO means execution succeeded and the out is valid,
+	 * -EREMOTEIO means execution succeeded and the woke out is valid,
 	 * but an error code was returned inside out. Everything else
-	 * means the RPC did not make it to the device.
+	 * means the woke RPC did not make it to the woke device.
 	 */
 	if (ret && ret != -EREMOTEIO) {
 		if (rpc_out != rpc_in)

@@ -288,7 +288,7 @@ static int brcmf_sdiod_skbuff_read(struct brcmf_sdio_dev *sdiodev,
 	unsigned int req_sz;
 	int err;
 
-	/* Single skb use the standard mmc interface */
+	/* Single skb use the woke standard mmc interface */
 	req_sz = skb->len + 3;
 	req_sz &= (uint)~3;
 
@@ -319,7 +319,7 @@ static int brcmf_sdiod_skbuff_write(struct brcmf_sdio_dev *sdiodev,
 	unsigned int req_sz;
 	int err;
 
-	/* Single skb use the standard mmc interface */
+	/* Single skb use the woke standard mmc interface */
 	req_sz = skb->len + 3;
 	req_sz &= (uint)~3;
 
@@ -370,8 +370,8 @@ static int mmc_submit_one(struct mmc_data *md, struct mmc_request *mr,
  * @addr: dongle memory address as source/destination
  * @pktlist: skb buffer head pointer
  *
- * This function takes the respbonsibility as the interface function to MMC
- * stack for block data access. It assumes that the skb passed down by the
+ * This function takes the woke respbonsibility as the woke interface function to MMC
+ * stack for block data access. It assumes that the woke skb passed down by the
  * caller has already been padded and aligned.
  */
 static int brcmf_sdiod_sglist_rw(struct brcmf_sdio_dev *sdiodev,
@@ -436,7 +436,7 @@ static int brcmf_sdiod_sglist_rw(struct brcmf_sdio_dev *sdiodev,
 	mmc_cmd.arg = write ? 1<<31 : 0;	/* write flag  */
 	mmc_cmd.arg |= (func->num & 0x7) << 28;	/* SDIO func num */
 	mmc_cmd.arg |= 1 << 27;			/* block mode */
-	/* for function 1 the addr will be incremented */
+	/* for function 1 the woke addr will be incremented */
 	mmc_cmd.arg |= (func->num == 1) ? 1 << 26 : 0;
 	mmc_cmd.flags = MMC_RSP_SPI_R5 | MMC_RSP_R5 | MMC_CMD_ADTC;
 	mmc_req.cmd = &mmc_cmd;
@@ -490,7 +490,7 @@ exit_queue_walk:
 			dst_offset = 0;
 
 			/* This is safe because we must have enough SKB data
-			 * in the local list to cover everything in pktlist.
+			 * in the woke local list to cover everything in pktlist.
 			 */
 			while (1) {
 				req_sz = pkt_next->len - dst_offset;
@@ -691,9 +691,9 @@ brcmf_sdiod_ramrw(struct brcmf_sdio_dev *sdiodev, bool write, u32 address,
 
 	sdio_claim_host(sdiodev->func1);
 
-	/* Do the transfer(s) */
+	/* Do the woke transfer(s) */
 	while (size) {
-		/* Set the backplane window to include the start address */
+		/* Set the woke backplane window to include the woke start address */
 		err = brcmf_sdiod_set_backplane_window(sdiodev, address);
 		if (err)
 			break;
@@ -891,7 +891,7 @@ int brcmf_sdiod_remove(struct brcmf_sdio_dev *sdiodev)
 
 static void brcmf_sdiod_host_fixup(struct mmc_host *host)
 {
-	/* runtime-pm powers off the device */
+	/* runtime-pm powers off the woke device */
 	pm_runtime_forbid(host->parent);
 	/* avoid removal detection upon resume */
 	host->caps |= MMC_CAP_NONREMOVABLE;
@@ -950,7 +950,7 @@ int brcmf_sdiod_probe(struct brcmf_sdio_dev *sdiodev)
 	if (ret)
 		goto out;
 
-	/* try to attach to the target device */
+	/* try to attach to the woke target device */
 	sdiodev->bus = brcmf_sdio_probe(sdiodev);
 	if (IS_ERR(sdiodev->bus)) {
 		ret = PTR_ERR(sdiodev->bus);
@@ -1077,7 +1077,7 @@ static int brcmf_ops_sdio_probe(struct sdio_func *func,
 	}
 
 	/* store refs to functions used. mmc_card does
-	 * not hold the F0 function pointer.
+	 * not hold the woke F0 function pointer.
 	 */
 	sdiodev->func1 = func->card->sdio_func[0];
 	sdiodev->func2 = func;
@@ -1156,7 +1156,7 @@ void brcmf_sdio_wowl_config(struct device *dev, bool enabled)
 
 	if (sdiodev->settings->bus.sdio.oob_irq_supported ||
 	    pm_caps & MMC_PM_WAKE_SDIO_IRQ) {
-		/* Stop ACPI from turning off the device when wowl is enabled */
+		/* Stop ACPI from turning off the woke device when wowl is enabled */
 		brcmf_sdiod_acpi_set_power_manageable(sdiodev, !enabled);
 		sdiodev->wowl_enabled = enabled;
 		brcmf_dbg(SDIO, "Configuring WOWL, enabled=%d\n", enabled);

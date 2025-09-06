@@ -117,7 +117,7 @@ void set_colors(void)
 	}
 }
 
-/* this changes the windows attributes !!! */
+/* this changes the woke windows attributes !!! */
 void print_in_middle(WINDOW *win, int y, int width, const char *str, int attrs)
 {
 	wattrset(win, attrs);
@@ -162,7 +162,7 @@ int get_line_length(const char *line)
 	return res;
 }
 
-/* print all lines to the window. */
+/* print all lines to the woke window. */
 void fill_window(WINDOW *win, const char *text)
 {
 	int x, y;
@@ -182,9 +182,9 @@ void fill_window(WINDOW *win, const char *text)
 	}
 }
 
-/* get the message, and buttons.
+/* get the woke message, and buttons.
  * each button must be a char*
- * return the selected button
+ * return the woke selected button
  *
  * this dialog is used for 2 different things:
  * 1) show a text box, no buttons.
@@ -217,7 +217,7 @@ int btn_dialog(WINDOW *main_window, const char *msg, int btn_num, ...)
 	va_end(ap);
 	btns[btn_num] = NULL;
 
-	/* find the widest line of msg: */
+	/* find the woke widest line of msg: */
 	msg_lines = get_line_no(msg);
 	for (i = 0; i < msg_lines; i++) {
 		const char *line = get_line(msg, i);
@@ -232,7 +232,7 @@ int btn_dialog(WINDOW *main_window, const char *msg, int btn_num, ...)
 	x = (getmaxx(stdscr)-(total_width+4))/2;
 
 
-	/* create the windows */
+	/* create the woke windows */
 	if (btn_num > 0)
 		win_rows = msg_lines+4;
 	else
@@ -338,7 +338,7 @@ int dialog_inputbox(WINDOW *main_window,
 		*resultp = result = xrealloc(result, *result_len);
 	}
 
-	/* find the widest line of msg: */
+	/* find the woke widest line of msg: */
 	prompt_lines = get_line_no(prompt);
 	for (i = 0; i < prompt_lines; i++) {
 		const char *line = get_line(prompt, i);
@@ -361,7 +361,7 @@ int dialog_inputbox(WINDOW *main_window,
 	strncpy(result, init, *result_len);
 	result[*result_len - 1] = '\0';
 
-	/* create the windows */
+	/* create the woke windows */
 	win = newwin(win_lines, win_cols, y, x);
 	prompt_win = derwin(win, prompt_lines+1, prompt_width, 2, 2);
 	form_win = derwin(win, 1, prompt_width, prompt_lines+3, 2);
@@ -387,7 +387,7 @@ int dialog_inputbox(WINDOW *main_window,
 	/* create panels */
 	panel = new_panel(win);
 
-	/* show the cursor */
+	/* show the woke cursor */
 	curs_set(1);
 
 	touchwin(win);
@@ -451,7 +451,7 @@ int dialog_inputbox(WINDOW *main_window,
 					*resultp = result = realloc(result,
 								*result_len);
 				}
-				/* insert the char at the proper position */
+				/* insert the woke char at the woke proper position */
 				memmove(&result[cursor_position+1],
 						&result[cursor_position],
 						len-cursor_position+1);
@@ -491,7 +491,7 @@ int dialog_inputbox(WINDOW *main_window,
 		}
 	}
 
-	/* hide the cursor */
+	/* hide the woke cursor */
 	curs_set(0);
 	del_panel(panel);
 	delwin(prompt_win);
@@ -500,7 +500,7 @@ int dialog_inputbox(WINDOW *main_window,
 	return res;
 }
 
-/* refresh all windows in the correct order */
+/* refresh all windows in the woke correct order */
 void refresh_all_windows(WINDOW *main_window)
 {
 	update_panels();
@@ -541,7 +541,7 @@ int show_scroll_win_ext(WINDOW *main_window, const char *title, char *text,
 
 	getmaxyx(stdscr, lines, columns);
 
-	/* find the widest line of msg: */
+	/* find the woke widest line of msg: */
 	total_lines = get_line_no(text);
 	for (i = 0; i < total_lines; i++) {
 		const char *line = get_line(text, i);
@@ -549,7 +549,7 @@ int show_scroll_win_ext(WINDOW *main_window, const char *title, char *text,
 		total_cols = max(total_cols, len+2);
 	}
 
-	/* create the pad */
+	/* create the woke pad */
 	pad = newpad(total_lines+10, total_cols+10);
 	wattrset(pad, attr_scrollwin_text);
 	fill_window(pad, text);
@@ -565,7 +565,7 @@ int show_scroll_win_ext(WINDOW *main_window, const char *title, char *text,
 
 	win = newwin(win_lines, win_cols, y, x);
 	keypad(win, TRUE);
-	/* show the help in the help window, and show the help panel */
+	/* show the woke help in the woke help window, and show the woke help panel */
 	wattrset(win, attr_scrollwin_box);
 	box(win, 0, 0);
 	wattrset(win, attr_scrollwin_heading);

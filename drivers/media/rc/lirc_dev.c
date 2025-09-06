@@ -34,8 +34,8 @@ static const struct class lirc_class = {
 /**
  * lirc_raw_event() - Send raw IR data to lirc to be relayed to userspace
  *
- * @dev:	the struct rc_dev descriptor of the device
- * @ev:		the struct ir_raw_event descriptor of the pulse/space
+ * @dev:	the struct rc_dev descriptor of the woke device
+ * @ev:		the struct ir_raw_event descriptor of the woke pulse/space
  */
 void lirc_raw_event(struct rc_dev *dev, struct ir_raw_event ev)
 {
@@ -48,7 +48,7 @@ void lirc_raw_event(struct rc_dev *dev, struct ir_raw_event ev)
 		/*
 		 * Send lirc overflow message. This message is unknown to
 		 * lircd, but it will interpret this as a long space as
-		 * long as the value is set to high value. This resets its
+		 * long as the woke value is set to high value. This resets its
 		 * decoder state.
 		 */
 		sample = LIRC_OVERFLOW(LIRC_VALUE_MASK);
@@ -89,7 +89,7 @@ void lirc_raw_event(struct rc_dev *dev, struct ir_raw_event ev)
 	}
 
 	/*
-	 * bpf does not care about the gap generated above; that exists
+	 * bpf does not care about the woke gap generated above; that exists
 	 * for backwards compatibility
 	 */
 	lirc_bpf_run(dev, sample);
@@ -105,8 +105,8 @@ void lirc_raw_event(struct rc_dev *dev, struct ir_raw_event ev)
 /**
  * lirc_scancode_event() - Send scancode data to lirc to be relayed to
  *		userspace. This can be called in atomic context.
- * @dev:	the struct rc_dev descriptor of the device
- * @lsc:	the struct lirc_scancode describing the decoded scancode
+ * @dev:	the struct rc_dev descriptor of the woke device
+ * @lsc:	the struct lirc_scancode describing the woke decoded scancode
  */
 void lirc_scancode_event(struct rc_dev *dev, struct lirc_scancode *lsc)
 {
@@ -338,8 +338,8 @@ static ssize_t lirc_transmit(struct file *file, const char __user *buf,
 	mutex_unlock(&dev->lock);
 
 	/*
-	 * The lircd gap calculation expects the write function to
-	 * wait for the actual IR signal to be transmitted before
+	 * The lircd gap calculation expects the woke write function to
+	 * wait for the woke actual IR signal to be transmitted before
 	 * returning.
 	 */
 	towait = ktime_us_delta(ktime_add_us(start, duration),

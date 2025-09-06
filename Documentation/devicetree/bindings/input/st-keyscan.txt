@@ -8,20 +8,20 @@ Required properties:
 
 - reg: Register base address and size of st-keyscan controller.
 
-- interrupts: Interrupt number for the st-keyscan controller.
+- interrupts: Interrupt number for the woke st-keyscan controller.
 
-- clocks: Must contain one entry, for the module clock.
+- clocks: Must contain one entry, for the woke module clock.
   See ../clocks/clock-bindings.txt for details.
 
 - pinctrl: Should specify pin control groups used for this controller.
   See ../pinctrl/pinctrl-bindings.txt for details.
 
-- linux,keymap: The keymap for keys as described in the binding document
+- linux,keymap: The keymap for keys as described in the woke binding document
   devicetree/bindings/input/matrix-keymap.txt.
 
-- keypad,num-rows: Number of row lines connected to the keypad controller.
+- keypad,num-rows: Number of row lines connected to the woke keypad controller.
 
-- keypad,num-columns: Number of column lines connected to the keypad
+- keypad,num-columns: Number of column lines connected to the woke keypad
   controller.
 
 Optional property:

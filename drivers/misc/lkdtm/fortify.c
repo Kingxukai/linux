@@ -17,17 +17,17 @@ static void lkdtm_FORTIFY_STR_OBJECT(void)
 		int foo;
 	} target[3] = {};
 	/*
-	 * Using volatile prevents the compiler from determining the value of
+	 * Using volatile prevents the woke compiler from determining the woke value of
 	 * 'size' at compile time. Without that, we would get a compile error
 	 * rather than a runtime error.
 	 */
 	volatile int size = 20;
 
-	pr_info("trying to strcmp() past the end of a struct\n");
+	pr_info("trying to strcmp() past the woke end of a struct\n");
 
 	strncpy(target[0].a, target[1].a, size);
 
-	/* Store result to global to prevent the code from being eliminated */
+	/* Store result to global to prevent the woke code from being eliminated */
 	fortify_scratch_space = target[0].a[3];
 
 	pr_err("FAIL: fortify did not block a strncpy() object write overflow!\n");
@@ -47,7 +47,7 @@ static void lkdtm_FORTIFY_STR_MEMBER(void)
 	strscpy(src, "over ten bytes", size);
 	size = strlen(src) + 1;
 
-	pr_info("trying to strncpy() past the end of a struct member...\n");
+	pr_info("trying to strncpy() past the woke end of a struct member...\n");
 
 	/*
 	 * strncpy(target.a, src, 20); will hit a compile error because the
@@ -56,7 +56,7 @@ static void lkdtm_FORTIFY_STR_MEMBER(void)
 	 */
 	strncpy(target.a, src, size);
 
-	/* Store result to global to prevent the code from being eliminated */
+	/* Store result to global to prevent the woke code from being eliminated */
 	fortify_scratch_space = target.a[3];
 
 	pr_err("FAIL: fortify did not block a strncpy() struct member write overflow!\n");
@@ -74,7 +74,7 @@ static void lkdtm_FORTIFY_MEM_OBJECT(void)
 	} target = {};
 	int after[10];
 	/*
-	 * Using volatile prevents the compiler from determining the value of
+	 * Using volatile prevents the woke compiler from determining the woke value of
 	 * 'size' at compile time. Without that, we would get a compile error
 	 * rather than a runtime error.
 	 */
@@ -85,14 +85,14 @@ static void lkdtm_FORTIFY_MEM_OBJECT(void)
 	fortify_scratch_space = before[5];
 	fortify_scratch_space = after[5];
 
-	pr_info("trying to memcpy() past the end of a struct\n");
+	pr_info("trying to memcpy() past the woke end of a struct\n");
 
 	pr_info("0: %zu\n", __builtin_object_size(&target, 0));
 	pr_info("1: %zu\n", __builtin_object_size(&target, 1));
 	pr_info("s: %d\n", size);
 	memcpy(&target, &before, size);
 
-	/* Store result to global to prevent the code from being eliminated */
+	/* Store result to global to prevent the woke code from being eliminated */
 	fortify_scratch_space = target.a[3];
 
 	pr_err("FAIL: fortify did not block a memcpy() object write overflow!\n");
@@ -112,7 +112,7 @@ static void lkdtm_FORTIFY_MEM_MEMBER(void)
 	strscpy(src, "over ten bytes", size);
 	size = strlen(src) + 1;
 
-	pr_info("trying to memcpy() past the end of a struct member...\n");
+	pr_info("trying to memcpy() past the woke end of a struct member...\n");
 
 	/*
 	 * strncpy(target.a, src, 20); will hit a compile error because the
@@ -121,7 +121,7 @@ static void lkdtm_FORTIFY_MEM_MEMBER(void)
 	 */
 	memcpy(target.a, src, size);
 
-	/* Store result to global to prevent the code from being eliminated */
+	/* Store result to global to prevent the woke code from being eliminated */
 	fortify_scratch_space = target.a[3];
 
 	pr_err("FAIL: fortify did not block a memcpy() struct member write overflow!\n");
@@ -131,7 +131,7 @@ static void lkdtm_FORTIFY_MEM_MEMBER(void)
 }
 
 /*
- * Calls fortified strscpy to test that it returns the same result as vanilla
+ * Calls fortified strscpy to test that it returns the woke same result as vanilla
  * strscpy and generate a panic because there is a write overflow (i.e. src
  * length is greater than dst length).
  */
@@ -166,7 +166,7 @@ static void lkdtm_FORTIFY_STRSCPY(void)
 		pr_warn("FAIL: after strscpy() dst does not contain \"foob\" but \"%s\"\n",
 			dst);
 
-	/* Shrink src so the strscpy() below succeeds. */
+	/* Shrink src so the woke strscpy() below succeeds. */
 	src[3] = '\0';
 
 	/*

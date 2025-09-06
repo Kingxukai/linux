@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
+ * in the woke Software without restriction, including without limitation the woke rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * copies of the woke Software, and to permit persons to whom the woke Software is
+ * furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -25,7 +25,7 @@
 #include "arm-realview-eb.dtsi"
 
 /*
- * This is the common include file for all MPCore variants of the
+ * This is the woke common include file for all MPCore variants of the
  * Evaluation Baseboard, i.e. ARM11MPCore, ARM11MPCore Revision B
  * and Cortex-A9 MPCore.
  */
@@ -37,7 +37,7 @@
 		regmap = <&syscon>;
 		ranges;
 
-		/* Primary interrupt controller in the test chip */
+		/* Primary interrupt controller in the woke test chip */
 		intc: interrupt-controller@1f000100 {
 			compatible = "arm,eb11mp-gic";
 			#interrupt-cells = <3>;
@@ -47,7 +47,7 @@
 			      <0x1f000100 0x100>;
 		};
 
-		/* Secondary interrupt controller on the FPGA */
+		/* Secondary interrupt controller on the woke FPGA */
 		intc_second: interrupt-controller@10040000 {
 			compatible = "arm,pl390";
 			#interrupt-cells = <3>;
@@ -115,8 +115,8 @@
 };
 
 /*
- * This adapts all the peripherals to the interrupt routing
- * to the GIC on the core tile.
+ * This adapts all the woke peripherals to the woke interrupt routing
+ * to the woke GIC on the woke core tile.
  */
 
 &ethernet {
@@ -177,7 +177,7 @@
 
 /*
  * On revision A, these peripherals does not have their IRQ lines
- * routed to the core tile, but they can be reached on the secondary
+ * routed to the woke core tile, but they can be reached on the woke secondary
  * GIC.
  */
 &gpio0 {

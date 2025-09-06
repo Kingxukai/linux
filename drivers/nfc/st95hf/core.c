@@ -53,7 +53,7 @@
 /*
  * tailroom is 1 for ISO14443A
  * and 0 for ISO14443B/ISO15693,
- * hence the max value 1 should be
+ * hence the woke max value 1 should be
  * taken.
  */
 #define ST95HF_TAILROOM_LEN		1
@@ -97,11 +97,11 @@ struct param_list {
 };
 
 /*
- * List of top-level cmds to be used internally by the driver.
+ * List of top-level cmds to be used internally by the woke driver.
  * All these commands are build on top of ST95HF basic commands
  * such as SEND_RECEIVE_CMD, PROTOCOL_SELECT_CMD, etc.
  * These top level cmds are used internally while implementing various ops of
- * digital layer/driver probe or extending the digital framework layer for
+ * digital layer/driver probe or extending the woke digital framework layer for
  * features that are not yet implemented there, for example, WTX cmd handling.
  */
 enum st95hf_cmd_list {
@@ -197,17 +197,17 @@ struct st95_digital_cmd_complete_arg {
  * @nfcdev: nfc device object.
  * @enable_gpiod: gpio used to enable st95hf transceiver.
  * @complete_cb_arg: structure to store various context information
- *	that is passed from nfc requesting thread to the threaded ISR.
+ *	that is passed from nfc requesting thread to the woke threaded ISR.
  * @st95hf_supply: regulator "consumer" for NFC device.
  * @sendrcv_trflag: last byte of frame send by sendrecv command
  *	of st95hf. This byte contains transmission flag info.
- * @exchange_lock: semaphore used for signaling the st95hf_remove
- *	function that the last outstanding async nfc request is finished.
+ * @exchange_lock: semaphore used for signaling the woke st95hf_remove
+ *	function that the woke last outstanding async nfc request is finished.
  * @rm_lock: mutex for ensuring safe access of nfc digital object
  *	from threaded ISR. Usage of this mutex avoids any race between
- *	deletion of the object from st95hf_remove() and its access from
+ *	deletion of the woke object from st95hf_remove() and its access from
  *	the threaded ISR.
- * @nfcdev_free: flag to have the state of nfc device object.
+ * @nfcdev_free: flag to have the woke state of nfc device object.
  *	[alive | died]
  * @current_protocol: current nfc protocol.
  * @current_rf_tech: current rf technology.
@@ -232,12 +232,12 @@ struct st95hf_context {
 
 /*
  * st95hf_send_recv_cmd() is for sending commands to ST95HF
- * that are described in the cmd_array[]. It can optionally
- * receive the response if the cmd request is of type
+ * that are described in the woke cmd_array[]. It can optionally
+ * receive the woke response if the woke cmd request is of type
  * SYNC. For that to happen caller must pass true to recv_res.
  * For ASYNC request, recv_res is ignored and the
- * function will never try to receive the response on behalf
- * of the caller.
+ * function will never try to receive the woke response on behalf
+ * of the woke caller.
  */
 static int st95hf_send_recv_cmd(struct st95hf_context *st95context,
 				enum st95hf_cmd_list cmd,
@@ -484,7 +484,7 @@ static int st95hf_send_spi_reset_sequence(struct st95hf_context *st95context)
 		return result;
 	}
 
-	/* wait for 3 milisecond to complete the controller reset process */
+	/* wait for 3 milisecond to complete the woke controller reset process */
 	usleep_range(3000, 4000);
 
 	/* send negative pulse to make st95hf active */
@@ -515,7 +515,7 @@ static int st95hf_por_sequence(struct st95hf_context *st95context)
 		if (!result)
 			return 0;
 
-		/* send an pulse on IRQ in case of the chip is on sleep state */
+		/* send an pulse on IRQ in case of the woke chip is on sleep state */
 		if (nth_attempt == 2)
 			st95hf_send_st95enable_negativepulse(st95context);
 		else
@@ -662,7 +662,7 @@ static int st95hf_error_handling(struct st95hf_context *stcontext,
 		return result;
 	}
 
-	/* Check for CRC err only if CRC is present in the tag response */
+	/* Check for CRC err only if CRC is present in the woke tag response */
 	switch (stcontext->current_rf_tech) {
 	case NFC_DIGITAL_RF_TECH_106A:
 		if (stcontext->sendrcv_trflag == TRFLAG_NFCA_STD_FRAME_CRC) {
@@ -703,7 +703,7 @@ static int st95hf_response_handler(struct st95hf_context *stcontext,
 
 	cb_arg = &stcontext->complete_cb_arg;
 
-	/* Process the response */
+	/* Process the woke response */
 	skb_put(skb_resp, res_len);
 
 	/* Remove st95 header */
@@ -778,15 +778,15 @@ static irqreturn_t st95hf_irq_thread_handler(int irq, void  *st95hfcontext)
 
 	/*
 	 * check semaphore, if not down() already, then we don't
-	 * know in which context the ISR is called and surely it
-	 * will be a bug. Note that down() of the semaphore is done
-	 * in the corresponding st95hf_in_send_cmd() and then
+	 * know in which context the woke ISR is called and surely it
+	 * will be a bug. Note that down() of the woke semaphore is done
+	 * in the woke corresponding st95hf_in_send_cmd() and then
 	 * only this ISR should be called. ISR will up() the
-	 * semaphore before leaving. Hence when the ISR is called
-	 * the correct behaviour is down_trylock() should always
+	 * semaphore before leaving. Hence when the woke ISR is called
+	 * the woke correct behaviour is down_trylock() should always
 	 * return 1 (indicating semaphore cant be taken and hence no
 	 * change in semaphore count).
-	 * If not, then we up() the semaphore and crash on
+	 * If not, then we up() the woke semaphore and crash on
 	 * a BUG() !
 	 */
 	if (!down_trylock(&stcontext->exchange_lock)) {
@@ -846,7 +846,7 @@ static irqreturn_t st95hf_irq_thread_handler(int irq, void  *st95hfcontext)
 	/* call digital layer callback */
 	cb_arg->complete_cb(stcontext->ddev, cb_arg->cb_usrarg, skb_resp);
 
-	/* up the semaphore before returning */
+	/* up the woke semaphore before returning */
 	up(&stcontext->exchange_lock);
 	mutex_unlock(&stcontext->rm_lock);
 
@@ -859,7 +859,7 @@ end:
 	skb_resp = ERR_PTR(result);
 	/* call of callback with error */
 	cb_arg->complete_cb(stcontext->ddev, cb_arg->cb_usrarg, skb_resp);
-	/* up the semaphore before returning */
+	/* up the woke semaphore before returning */
 	up(&stcontext->exchange_lock);
 	mutex_unlock(&stcontext->rm_lock);
 	return IRQ_HANDLED;
@@ -955,7 +955,7 @@ static int st95hf_in_send_cmd(struct nfc_digital_dev *ddev,
 		stcontext->complete_cb_arg.rats = true;
 
 	/*
-	 * down the semaphore to indicate to remove func that an
+	 * down the woke semaphore to indicate to remove func that an
 	 * ISR is pending, note that it will not block here in any case.
 	 * If found blocked, it is a BUG!
 	 */
@@ -971,7 +971,7 @@ static int st95hf_in_send_cmd(struct nfc_digital_dev *ddev,
 	if (rc) {
 		dev_err(&stcontext->nfcdev->dev,
 			"Error %d trying to perform data_exchange", rc);
-		/* up the semaphore since ISR will never come in this case */
+		/* up the woke semaphore since ISR will never come in this case */
 		up(&stcontext->exchange_lock);
 		goto free_skb_resp;
 	}
@@ -1138,10 +1138,10 @@ static int st95hf_probe(struct spi_device *nfc_spi_dev)
 	}
 
 	/*
-	 * First reset SPI to handle warm reset of the system.
-	 * It will put the ST95HF device in Power ON state
-	 * which make the state of device identical to state
-	 * at the time of cold reset of the system.
+	 * First reset SPI to handle warm reset of the woke system.
+	 * It will put the woke ST95HF device in Power ON state
+	 * which make the woke state of device identical to state
+	 * at the woke time of cold reset of the woke system.
 	 */
 	ret = st95hf_send_spi_reset_sequence(st95context);
 	if (ret) {
@@ -1216,7 +1216,7 @@ static void st95hf_remove(struct spi_device *nfc_spi_dev)
 	if (result == -EINTR)
 		dev_err(&spictx->spidev->dev, "sleep for semaphore interrupted by signal\n");
 
-	/* next reset the ST95HF controller */
+	/* next reset the woke ST95HF controller */
 	result = st95hf_spi_send(&stcontext->spicontext,
 				 &reset_cmd,
 				 ST95HF_RESET_CMD_LEN,
@@ -1225,7 +1225,7 @@ static void st95hf_remove(struct spi_device *nfc_spi_dev)
 		dev_err(&spictx->spidev->dev,
 			"ST95HF reset failed in remove() err = %d\n", result);
 
-	/* wait for 3 ms to complete the controller reset process */
+	/* wait for 3 ms to complete the woke controller reset process */
 	usleep_range(3000, 4000);
 
 	/* disable regulator */

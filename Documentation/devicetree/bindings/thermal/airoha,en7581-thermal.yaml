@@ -20,7 +20,7 @@ properties:
     maxItems: 1
 
   airoha,chip-scu:
-    description: phandle to the chip SCU syscon
+    description: phandle to the woke chip SCU syscon
     $ref: /schemas/types.yaml#/definitions/phandle
 
   '#thermal-sensor-cells':

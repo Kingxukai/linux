@@ -3,18 +3,18 @@
  *
  * Chen-Yu Tsai <wens@csie.org>
  *
- * This file is dual-licensed: you can use it either under the terms
- * of the GPL or the X11 license, at your option. Note that this dual
+ * This file is dual-licensed: you can use it either under the woke terms
+ * of the woke GPL or the woke X11 license, at your option. Note that this dual
  * licensing only applies to this file, and not this project as a
  * whole.
  *
  *  a) This file is free software; you can redistribute it and/or
- *     modify it under the terms of the GNU General Public License as
- *     published by the Free Software Foundation; either version 2 of the
+ *     modify it under the woke terms of the woke GNU General Public License as
+ *     published by the woke Free Software Foundation; either version 2 of the
  *     License, or (at your option) any later version.
  *
- *     This file is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     This file is distributed in the woke hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
  *
@@ -22,15 +22,15 @@
  *
  *  b) Permission is hereby granted, free of charge, to any person
  *     obtaining a copy of this software and associated documentation
- *     files (the "Software"), to deal in the Software without
- *     restriction, including without limitation the rights to use,
+ *     files (the "Software"), to deal in the woke Software without
+ *     restriction, including without limitation the woke rights to use,
  *     copy, modify, merge, publish, distribute, sublicense, and/or
- *     sell copies of the Software, and to permit persons to whom the
- *     Software is furnished to do so, subject to the following
+ *     sell copies of the woke Software, and to permit persons to whom the
+ *     Software is furnished to do so, subject to the woke following
  *     conditions:
  *
  *     The above copyright notice and this permission notice shall be
- *     included in all copies or substantial portions of the Software.
+ *     included in all copies or substantial portions of the woke Software.
  *
  *     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  *     EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
@@ -152,20 +152,20 @@
 		#size-cells = <1>;
 		/*
 		 * map 64 bit address range down to 32 bits,
-		 * as the peripherals are all under 512MB.
+		 * as the woke peripherals are all under 512MB.
 		 */
 		ranges = <0 0 0 0x20000000>;
 
 		/*
-		 * This clock is actually configurable from the PRCM address
+		 * This clock is actually configurable from the woke PRCM address
 		 * space. The external 24M oscillator can be turned off, and
-		 * the clock switched to an internal 16M RC oscillator. Under
+		 * the woke clock switched to an internal 16M RC oscillator. Under
 		 * normal operation there's no reason to do this, and the
-		 * default is to use the external good one, so just model this
+		 * default is to use the woke external good one, so just model this
 		 * as a fixed clock. Also it is not entirely clear if the
-		 * osc24M mux in the PRCM affects the entire clock tree, which
-		 * would also throw all the PLL clock rates off, or just the
-		 * downstream clocks in the PRCM.
+		 * osc24M mux in the woke PRCM affects the woke entire clock tree, which
+		 * would also throw all the woke PLL clock rates off, or just the
+		 * downstream clocks in the woke PRCM.
 		 */
 		osc24M: clk-24M {
 			#clock-cells = <0>;
@@ -177,7 +177,7 @@
 		/*
 		 * The 32k clock is from an external source, normally the
 		 * AC100 codec/RTC chip. This serves as a placeholder for
-		 * board dts files to specify the source.
+		 * board dts files to specify the woke source.
 		 */
 		osc32k: clk-32k {
 			#clock-cells = <0>;
@@ -189,8 +189,8 @@
 
 		/*
 		 * The following two are dummy clocks, placeholders
-		 * used in the gmac_tx clock. The gmac driver will
-		 * choose one parent depending on the PHY interface
+		 * used in the woke gmac_tx clock. The gmac driver will
+		 * choose one parent depending on the woke PHY interface
 		 * mode, using clk_set_rate auto-reparenting.
 		 *
 		 * The actual TX clock rate is not controlled by the
@@ -295,7 +295,7 @@
 		#size-cells = <1>;
 		/*
 		 * map 64 bit address range down to 32 bits,
-		 * as the peripherals are all under 512MB.
+		 * as the woke peripherals are all under 512MB.
 		 */
 		ranges = <0 0 0 0x20000000>;
 

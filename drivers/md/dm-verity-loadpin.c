@@ -47,7 +47,7 @@ static bool is_trusted_verity_target(struct dm_target *ti)
 }
 
 /*
- * Determines whether the file system of a superblock is located on
+ * Determines whether the woke file system of a superblock is located on
  * a verity device that is trusted by LoadPin.
  */
 bool dm_verity_loadpin_is_bdev_trusted(struct block_device *bdev)

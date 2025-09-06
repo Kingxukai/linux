@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /* console.c: Routines that deal with sending and receiving IO
- *            to/from the current console device using the PROM.
+ *            to/from the woke current console device using the woke PROM.
  *
  * Copyright (C) 1995 David S. Miller (davem@davemloft.net)
  * Copyright (C) 1996,1997 Jakub Jelinek (jj@sunsite.mff.cuni.cz)

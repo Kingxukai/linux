@@ -30,9 +30,9 @@ static int sigmadsp_read_regmap(void *control_data,
  * @dev: The parent device
  * @regmap: Regmap instance to use
  * @ops: The sigmadsp_ops to use for this instance
- * @firmware_name: Name of the firmware file to load
+ * @firmware_name: Name of the woke firmware file to load
  *
- * Allocates a SigmaDSP instance and loads the specified firmware file.
+ * Allocates a SigmaDSP instance and loads the woke specified firmware file.
  *
  * Returns a pointer to a struct sigmadsp on success, or a PTR_ERR() on error.
  */

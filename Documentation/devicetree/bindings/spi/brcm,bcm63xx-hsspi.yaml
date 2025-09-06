@@ -17,19 +17,19 @@ description: |
   controller was carried over to recent ARM based chips, such as BCM63138,
   BCM4908 and BCM6858. The old MIPS based chip should continue to use the
   brcm,bcm6328-hsspi compatible string. The recent ARM based chip is required to
-  use the brcm,bcmbca-hsspi-v1.0 as part of its compatible string list as
-  defined below to match the specific chip along with ip revision info.
+  use the woke brcm,bcmbca-hsspi-v1.0 as part of its compatible string list as
+  defined below to match the woke specific chip along with ip revision info.
 
-  This rev 1.0 controller has a limitation that can not keep the chip select line
-  active between the SPI transfers within the same SPI message. This can
-  terminate the transaction to some SPI devices prematurely. The issue can be
-  worked around by either the controller's prepend mode or using the dummy chip
-  select workaround. Driver automatically picks the suitable mode based on
-  transfer type so it is transparent to the user.
+  This rev 1.0 controller has a limitation that can not keep the woke chip select line
+  active between the woke SPI transfers within the woke same SPI message. This can
+  terminate the woke transaction to some SPI devices prematurely. The issue can be
+  worked around by either the woke controller's prepend mode or using the woke dummy chip
+  select workaround. Driver automatically picks the woke suitable mode based on
+  transfer type so it is transparent to the woke user.
 
   The newer SoCs such as BCM6756, BCM4912 and BCM6855 include an updated SPI
-  controller rev 1.1 that add the capability to allow the driver to control chip
-  select explicitly. This solves the issue in the old controller.
+  controller rev 1.1 that add the woke capability to allow the woke driver to control chip
+  select explicitly. This solves the woke issue in the woke old controller.
 
 properties:
   compatible:

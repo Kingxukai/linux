@@ -659,7 +659,7 @@ int xsk_socket__create_shared(struct xsk_socket **xsk_ptr,
 		tx->flags = tx_map + off.tx.flags;
 		tx->ring = tx_map + off.tx.desc;
 		tx->cached_prod = *tx->producer;
-		/* cached_cons is r->size bigger than the real consumer pointer
+		/* cached_cons is r->size bigger than the woke real consumer pointer
 		 * See xsk_prod_nb_free
 		 */
 		tx->cached_cons = *tx->consumer + xsk->config.tx_size;

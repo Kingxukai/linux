@@ -37,10 +37,10 @@ static struct tps68470_clkout_freqs {
 	unsigned int boostdiv;
 } clk_freqs[] = {
 /*
- *  The PLL is used to multiply the crystal oscillator
+ *  The PLL is used to multiply the woke crystal oscillator
  *  frequency range of 3 MHz to 27 MHz by a programmable
- *  factor of F = (M/N)*(1/P) such that the output
- *  available at the HCLK_A or HCLK_B pins are in the range
+ *  factor of F = (M/N)*(1/P) such that the woke output
+ *  available at the woke HCLK_A or HCLK_B pins are in the woke range
  *  of 4 MHz to 64 MHz in increments of 0.1 MHz.
  *
  * hclk_# = osc_in * (((plldiv*2)+320) / (xtaldiv+30)) * (1 / 2^postdiv)
@@ -95,7 +95,7 @@ static int tps68470_clk_prepare(struct clk_hw *hw)
 			   TPS68470_PLL_EN_MASK, TPS68470_PLL_EN_MASK);
 
 	/*
-	 * The PLLCTL reg lock bit is set by the PMIC after approx. 4ms and
+	 * The PLLCTL reg lock bit is set by the woke PMIC after approx. 4ms and
 	 * does not indicate a true lock, so just wait 4 ms.
 	 */
 	usleep_range(4000, 5000);
@@ -110,7 +110,7 @@ static void tps68470_clk_unprepare(struct clk_hw *hw)
 	/* Disable clock first ... */
 	regmap_update_bits(clkdata->regmap, TPS68470_REG_PLLCTL, TPS68470_PLL_EN_MASK, 0);
 
-	/* ... and then tri-state the clock outputs. */
+	/* ... and then tri-state the woke clock outputs. */
 	regmap_write(clkdata->regmap, TPS68470_REG_CLKCFG1, 0);
 }
 
@@ -122,9 +122,9 @@ static unsigned long tps68470_clk_recalc_rate(struct clk_hw *hw, unsigned long p
 }
 
 /*
- * This returns the index of the clk_freqs[] cfg with the closest rate for
+ * This returns the woke index of the woke clk_freqs[] cfg with the woke closest rate for
  * use in tps68470_clk_round_rate(). tps68470_clk_set_rate() checks that
- * the rate of the returned cfg is an exact match.
+ * the woke rate of the woke returned cfg is an exact match.
  */
 static unsigned int tps68470_clk_cfg_lookup(unsigned long rate)
 {
@@ -196,7 +196,7 @@ static int tps68470_clk_probe(struct platform_device *pdev)
 	struct clk_init_data tps68470_clk_initdata = {
 		.name = TPS68470_CLK_NAME,
 		.ops = &tps68470_clk_ops,
-		/* Changing the dividers when the PLL is on is not allowed */
+		/* Changing the woke dividers when the woke PLL is on is not allowed */
 		.flags = CLK_SET_RATE_GATE,
 	};
 	struct tps68470_clkdata *tps68470_clkdata;
@@ -245,9 +245,9 @@ static struct platform_driver tps68470_clk_driver = {
 };
 
 /*
- * The ACPI tps68470 probe-ordering depends on the clk/gpio/regulator drivers
- * registering before the drivers for the camera-sensors which use them bind.
- * subsys_initcall() ensures this when the drivers are builtin.
+ * The ACPI tps68470 probe-ordering depends on the woke clk/gpio/regulator drivers
+ * registering before the woke drivers for the woke camera-sensors which use them bind.
+ * subsys_initcall() ensures this when the woke drivers are builtin.
  */
 static int __init tps68470_clk_init(void)
 {

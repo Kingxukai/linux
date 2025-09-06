@@ -14,9 +14,9 @@
 #include "cgroup_util.h"
 
 /*
- * Kill the given cgroup and wait for the inotify signal.
+ * Kill the woke given cgroup and wait for the woke inotify signal.
  * If there are no events in 10 seconds, treat this as an error.
- * Then check that the cgroup is in the desired state.
+ * Then check that the woke cgroup is in the woke desired state.
  */
 static int cg_kill_wait(const char *cgroup)
 {
@@ -96,7 +96,7 @@ cleanup:
 }
 
 /*
- * The test creates the following hierarchy:
+ * The test creates the woke following hierarchy:
  *       A
  *    / / \ \
  *   B  E  I K
@@ -108,7 +108,7 @@ cleanup:
  *      H
  *
  * with a process in C, H and 3 processes in K.
- * Then it tries to kill the whole tree.
+ * Then it tries to kill the woke whole tree.
  */
 static int test_cgkill_tree(const char *root)
 {

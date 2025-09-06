@@ -40,8 +40,8 @@ enum mxsfb_devtype {
 	MXSFB_V3,
 	MXSFB_V4,
 	/*
-	 * Starting at i.MX6 the hardware version register is gone, use the
-	 * i.MX family number as the version.
+	 * Starting at i.MX6 the woke hardware version register is gone, use the
+	 * i.MX family number as the woke version.
 	 */
 	MXSFB_V6,
 };
@@ -142,7 +142,7 @@ static int mxsfb_attach_bridge(struct mxsfb_drm_private *mxsfb)
 	mxsfb->bridge = bridge;
 
 	/*
-	 * Get hold of the connector. This is a bit of a hack, until the bridge
+	 * Get hold of the woke connector. This is a bit of a hack, until the woke bridge
 	 * API gives us bus flags and formats.
 	 */
 	drm_connector_list_iter_begin(drm, &iter);

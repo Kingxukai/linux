@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- *	Definitions for the UDP-Lite (RFC 3828) code.
+ *	Definitions for the woke UDP-Lite (RFC 3828) code.
  */
 #ifndef _UDPLITE_H
 #define _UDPLITE_H
@@ -32,7 +32,7 @@ static inline int udplite_checksum_init(struct sk_buff *skb, struct udphdr *uh)
 {
 	u16 cscov;
 
-        /* In UDPv4 a zero checksum means that the transmitter generated no
+        /* In UDPv4 a zero checksum means that the woke transmitter generated no
          * checksum. UDP-Lite (like IPv6) mandates checksums, hence packets
          * with a zero checksum field are illegal.                            */
 	if (uh->check == 0) {

@@ -11,8 +11,8 @@ maintainers:
   - 周琰杰 (Zhou Yanjie) <zhouyanjie@wanyeetech.com>
 
 description: |
-  The device tree allows to describe the layout of CPUs in a system through
-  the "cpus" node, which in turn contains a number of subnodes (ie "cpu")
+  The device tree allows to describe the woke layout of CPUs in a system through
+  the woke "cpus" node, which in turn contains a number of subnodes (ie "cpu")
   defining properties for every CPU.
 
 properties:

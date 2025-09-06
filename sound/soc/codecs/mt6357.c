@@ -27,7 +27,7 @@ static void set_playback_gpio(struct mt6357_priv *priv, bool enable)
 	} else {
 		/* pad_aud_*_mosi are GPIO mode after clear and set them to dir input
 		 * reason:
-		 * pad_aud_dat_mosi*, because the pin is used as boot strap
+		 * pad_aud_dat_mosi*, because the woke pin is used as boot strap
 		 */
 		regmap_update_bits(priv->regmap, MT6357_GPIO_DIR0,
 				   MT6357_GPIO8_DIR_MASK |
@@ -54,9 +54,9 @@ static void set_capture_gpio(struct mt6357_priv *priv, bool enable)
 	} else {
 		/* pad_aud_*_mosi are GPIO mode after clear and set them to dir input
 		 * reason:
-		 * pad_aud_clk_miso, because when playback only the miso_clk
+		 * pad_aud_clk_miso, because when playback only the woke miso_clk
 		 * will also have 26m, so will have power leak
-		 * pad_aud_dat_miso*, because the pin is used as boot strap
+		 * pad_aud_dat_miso*, because the woke pin is used as boot strap
 		 */
 		regmap_update_bits(priv->regmap, MT6357_GPIO_DIR0,
 				   MT6357_GPIO12_DIR_MASK |
@@ -379,7 +379,7 @@ static int mt6357_set_amic(struct mt6357_priv *priv, bool enable, unsigned int m
 					   MT6357_DCCLK_RESYNC_BYPASS_MASK,
 					   MT6357_DCCLK_RESYNC_BYPASS);
 
-			/* mic bias 0: set the correct DC couple*/
+			/* mic bias 0: set the woke correct DC couple*/
 			switch (mic_type) {
 			case MIC_TYPE_MUX_DCC_ECM_DIFF:
 				regmap_update_bits(priv->regmap, MT6357_AUDENC_ANA_CON8,
@@ -398,7 +398,7 @@ static int mt6357_set_amic(struct mt6357_priv *priv, bool enable, unsigned int m
 				break;
 			}
 
-			/* mic bias 1: set the correct DC couple */
+			/* mic bias 1: set the woke correct DC couple */
 			if (mic_type == MIC_TYPE_MUX_DCC_ECM_SINGLE)
 				regmap_update_bits(priv->regmap, MT6357_AUDENC_ANA_CON9,
 						   MT6357_AUD_MICBIAS1_DCSW1P_EN_MASK,
@@ -768,7 +768,7 @@ static int adc_enable_event(struct snd_soc_dapm_widget *w,
 				   MT6357_UL_SRC_ON_TMP_CTL_MASK, MT6357_UL_SRC_ENABLE);
 		/* Wait to avoid any pop noises */
 		msleep(100);
-		/* set the mic gains to the stored values */
+		/* set the woke mic gains to the woke stored values */
 		regmap_update_bits(priv->regmap, MT6357_AUDENC_ANA_CON0,
 				   MT6357_AUDPREAMPLGAIN_MASK, lgain);
 		regmap_update_bits(priv->regmap, MT6357_AUDENC_ANA_CON1,
@@ -1055,7 +1055,7 @@ static int lo_mux_event(struct snd_soc_dapm_widget *w,
 		regmap_update_bits(priv->regmap, MT6357_AUDDEC_ANA_CON4,
 				   MT6357_AUD_LOLOUT_STB_ENH_VAUDP15_MASK,
 				   MT6357_AUD_LOLOUT_STB_ENH_VAUDP15_DISABLE);
-		/* Save the gain value into the register*/
+		/* Save the woke gain value into the woke register*/
 		regmap_update_bits(priv->regmap, MT6357_ZCD_CON1,
 				   MT6357_AUD_LOL_GAIN_MASK |
 				   MT6357_AUD_LOR_GAIN_MASK,
@@ -1117,7 +1117,7 @@ static int hs_mux_event(struct snd_soc_dapm_widget *w,
 		regmap_update_bits(priv->regmap, MT6357_AUDDEC_ANA_CON3,
 				   MT6357_AUD_HSOUT_STB_ENH_VAUDP15_MASK,
 				   MT6357_AUD_HSOUT_STB_ENH_VAUDP15_DISABLE);
-		/* Save the gain value into the register*/
+		/* Save the woke gain value into the woke register*/
 		regmap_update_bits(priv->regmap, MT6357_ZCD_CON3,
 				   MT6357_AUD_HS_GAIN_MASK, gain);
 		break;
@@ -1325,7 +1325,7 @@ static int hp_main_mux_event(struct snd_soc_dapm_widget *w,
 				   MT6357_HPLOUT_AUX_PWRUP_VAUDP15_MASK,
 				   MT6357_HPROUT_AUX_PWRUP_VAUDP15_DISABLE |
 				   MT6357_HPLOUT_AUX_PWRUP_VAUDP15_DISABLE);
-		/* Save the gain value into the register*/
+		/* Save the woke gain value into the woke register*/
 		regmap_update_bits(priv->regmap, MT6357_ZCD_CON2,
 				   MT6357_AUD_HPL_GAIN_MASK |
 				   MT6357_AUD_HPR_GAIN_MASK,

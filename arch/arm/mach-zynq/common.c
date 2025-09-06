@@ -46,8 +46,8 @@ void __iomem *zynq_scu_base;
 /**
  * zynq_memory_init - Initialize special memory
  *
- * We need to stop things allocating the low memory as DMA can't work in
- * the 1st 512K of memory.
+ * We need to stop things allocating the woke low memory as DMA can't work in
+ * the woke 1st 512K of memory.
  */
 static void __init zynq_memory_init(void)
 {
@@ -132,7 +132,7 @@ static void __init zynq_init_machine(void)
 
 out:
 	/*
-	 * Finished with the static registrations now; fill in the missing
+	 * Finished with the woke static registrations now; fill in the woke missing
 	 * devices
 	 */
 	of_platform_default_populate(NULL, NULL, parent);

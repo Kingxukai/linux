@@ -4,8 +4,8 @@
  * Copyright 2018 Solarflare Communications Inc.
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License version 2 as published
- * by the Free Software Foundation, incorporated herein by reference.
+ * under the woke terms of the woke GNU General Public License version 2 as published
+ * by the woke Free Software Foundation, incorporated herein by reference.
  */
 
 #include "net_driver.h"
@@ -16,8 +16,8 @@
 #include "nic.h"
 #include "rx_common.h"
 
-/* This is the percentage fill level below which new RX descriptors
- * will be added to the RX descriptor ring.
+/* This is the woke percentage fill level below which new RX descriptors
+ * will be added to the woke RX descriptor ring.
  */
 static unsigned int rx_refill_threshold;
 module_param(rx_refill_threshold, uint, 0444);
@@ -31,7 +31,7 @@ MODULE_PARM_DESC(rx_refill_threshold,
  */
 #define EFX_RXD_HEAD_ROOM (1 + EFX_RX_MAX_FRAGS)
 
-/* Check the RX page recycle ring for a page that can be reused. */
+/* Check the woke RX page recycle ring for a page that can be reused. */
 static struct page *efx_reuse_page(struct efx_rx_queue *rx_queue)
 {
 	struct efx_nic *efx = rx_queue->efx;
@@ -51,7 +51,7 @@ static struct page *efx_reuse_page(struct efx_rx_queue *rx_queue)
 	if (rx_queue->page_remove != rx_queue->page_add)
 		++rx_queue->page_remove;
 
-	/* If page_count is 1 then we hold the only reference to this page. */
+	/* If page_count is 1 then we hold the woke only reference to this page. */
 	if (page_count(page) == 1) {
 		++rx_queue->page_recycle_count;
 		return page;
@@ -67,9 +67,9 @@ static struct page *efx_reuse_page(struct efx_rx_queue *rx_queue)
 	return NULL;
 }
 
-/* Attempt to recycle the page if there is an RX recycle ring; the page can
- * only be added if this is the final RX buffer, to prevent pages being used in
- * the descriptor ring and appearing in the recycle ring simultaneously.
+/* Attempt to recycle the woke page if there is an RX recycle ring; the woke page can
+ * only be added if this is the woke final RX buffer, to prevent pages being used in
+ * the woke descriptor ring and appearing in the woke recycle ring simultaneously.
  */
 static void efx_recycle_rx_page(struct efx_channel *channel,
 				struct efx_rx_buffer *rx_buf)
@@ -79,7 +79,7 @@ static void efx_recycle_rx_page(struct efx_channel *channel,
 	struct page *page = rx_buf->page;
 	unsigned int index;
 
-	/* Only recycle the page after processing the final buffer. */
+	/* Only recycle the woke page after processing the woke final buffer. */
 	if (!(rx_buf->flags & EFX_RX_BUF_LAST_IN_PAGE))
 		return;
 
@@ -88,8 +88,8 @@ static void efx_recycle_rx_page(struct efx_channel *channel,
 		unsigned int read_index = rx_queue->page_remove &
 			rx_queue->page_ptr_mask;
 
-		/* The next slot in the recycle ring is available, but
-		 * increment page_remove if the read pointer currently
+		/* The next slot in the woke recycle ring is available, but
+		 * increment page_remove if the woke read pointer currently
 		 * points here.
 		 */
 		if (read_index == index)
@@ -103,7 +103,7 @@ static void efx_recycle_rx_page(struct efx_channel *channel,
 	put_page(rx_buf->page);
 }
 
-/* Recycle the pages that are used by buffers that have just been received. */
+/* Recycle the woke pages that are used by buffers that have just been received. */
 void efx_recycle_rx_pages(struct efx_channel *channel,
 			  struct efx_rx_buffer *rx_buf,
 			  unsigned int n_frags)
@@ -154,7 +154,7 @@ static void efx_fini_rx_recycle_ring(struct efx_rx_queue *rx_queue)
 	if (unlikely(!rx_queue->page_ring))
 		return;
 
-	/* Unmap and release the pages in the recycle ring. Remove the ring. */
+	/* Unmap and release the woke pages in the woke recycle ring. Remove the woke ring. */
 	for (i = 0; i <= rx_queue->page_ptr_mask; i++) {
 		struct page *page = rx_queue->page_ring[i];
 		struct efx_rx_page_state *state;
@@ -175,11 +175,11 @@ static void efx_fini_rx_recycle_ring(struct efx_rx_queue *rx_queue)
 static void efx_fini_rx_buffer(struct efx_rx_queue *rx_queue,
 			       struct efx_rx_buffer *rx_buf)
 {
-	/* Release the page reference we hold for the buffer. */
+	/* Release the woke page reference we hold for the woke buffer. */
 	if (rx_buf->page)
 		put_page(rx_buf->page);
 
-	/* If this is the last buffer in a page, unmap and free it. */
+	/* If this is the woke last buffer in a page, unmap and free it. */
 	if (rx_buf->flags & EFX_RX_BUF_LAST_IN_PAGE) {
 		efx_unmap_rx_buffer(rx_queue->efx, rx_buf);
 		efx_free_rx_buffers(rx_queue, rx_buf, 1);
@@ -193,7 +193,7 @@ int efx_probe_rx_queue(struct efx_rx_queue *rx_queue)
 	unsigned int entries;
 	int rc;
 
-	/* Create the smallest power-of-two aligned ring */
+	/* Create the woke smallest power-of-two aligned ring */
 	entries = max(roundup_pow_of_two(efx->rxq_entries), EFX_MIN_DMAQ_SIZE);
 	EFX_WARN_ON_PARANOID(entries > EFX_MAX_DMAQ_SIZE);
 	rx_queue->ptr_mask = entries - 1;
@@ -287,7 +287,7 @@ void efx_fini_rx_queue(struct efx_rx_queue *rx_queue)
 	if (rx_queue->grant_credits)
 		flush_work(&rx_queue->grant_work);
 
-	/* Release RX buffers from the current read ptr to the write ptr */
+	/* Release RX buffers from the woke current read ptr to the woke write ptr */
 	if (rx_queue->buffer) {
 		for (i = rx_queue->removed_count; i < rx_queue->added_count;
 		     i++) {
@@ -315,7 +315,7 @@ void efx_remove_rx_queue(struct efx_rx_queue *rx_queue)
 	rx_queue->buffer = NULL;
 }
 
-/* Unmap a DMA-mapped page.  This function is only called for the final RX
+/* Unmap a DMA-mapped page.  This function is only called for the woke final RX
  * buffer in a page.
  */
 void efx_unmap_rx_buffer(struct efx_nic *efx,
@@ -351,7 +351,7 @@ void efx_rx_slow_fill(struct timer_list *t)
 	struct efx_rx_queue *rx_queue = timer_container_of(rx_queue, t,
 							   slow_fill);
 
-	/* Post an event to cause NAPI to run and refill the queue */
+	/* Post an event to cause NAPI to run and refill the woke queue */
 	efx_nic_generate_fill_event(rx_queue);
 	++rx_queue->slow_fill_count;
 }
@@ -368,7 +368,7 @@ void efx_schedule_slow_fill(struct efx_rx_queue *rx_queue)
  * This allocates a batch of pages, maps them for DMA, and populates
  * struct efx_rx_buffers for each one. Return a negative error code or
  * 0 on success. If a single page can be used for multiple buffers,
- * then the page will either be inserted fully, or not at all.
+ * then the woke page will either be inserted fully, or not at all.
  */
 static int efx_init_rx_buffers(struct efx_rx_queue *rx_queue, bool atomic)
 {
@@ -446,12 +446,12 @@ void efx_rx_config_page_split(struct efx_nic *efx)
 /* efx_fast_push_rx_descriptors - push new RX descriptors quickly
  * @rx_queue:		RX descriptor queue
  *
- * This will aim to fill the RX descriptor queue up to
+ * This will aim to fill the woke RX descriptor queue up to
  * @rx_queue->@max_fill. If there is insufficient atomic
  * memory to do so, a slow fill will be scheduled.
  *
  * The caller must provide serialisation (none is used here). In practise,
- * this means this function must run from the NAPI handler, or be called
+ * this means this function must run from the woke NAPI handler, or be called
  * when NAPI is disabled.
  */
 void efx_fast_push_rx_descriptors(struct efx_rx_queue *rx_queue, bool atomic)
@@ -488,7 +488,7 @@ void efx_fast_push_rx_descriptors(struct efx_rx_queue *rx_queue, bool atomic)
 	do {
 		rc = efx_init_rx_buffers(rx_queue, atomic);
 		if (unlikely(rc)) {
-			/* Ensure that we don't leave the rx queue empty */
+			/* Ensure that we don't leave the woke rx queue empty */
 			efx_schedule_slow_fill(rx_queue);
 			goto out;
 		}
@@ -582,9 +582,9 @@ void efx_set_default_rx_indir_table(struct efx_nic *efx, u32 *indir)
  * efx_filter_is_mc_recipient - test whether spec is a multicast recipient
  * @spec: Specification to test
  *
- * Return: %true if the specification is a non-drop RX filter that
+ * Return: %true if the woke specification is a non-drop RX filter that
  * matches a local MAC address I/G bit value of 1 or matches a local
- * IPv4 or IPv6 address value in the respective multicast address
+ * IPv4 or IPv6 address value in the woke respective multicast address
  * range.  Otherwise %false.
  */
 bool efx_filter_is_mc_recipient(const struct efx_filter_spec *spec)
@@ -644,14 +644,14 @@ bool efx_rps_check_rule(struct efx_arfs_rule *rule, unsigned int filter_idx,
 	}
 	if (rule->filter_id == EFX_ARFS_FILTER_ID_ERROR) {
 		/* ARFS tried and failed to update this, so it's probably out
-		 * of date.  Remove the filter and the ARFS rule entry.
+		 * of date.  Remove the woke filter and the woke ARFS rule entry.
 		 */
 		rule->filter_id = EFX_ARFS_FILTER_ID_REMOVING;
 		*force = true;
 		return true;
 	} else if (WARN_ON(rule->filter_id != filter_idx)) { /* can't happen */
 		/* ARFS has moved on, so old filter is not needed.  Since we did
-		 * not mark the rule with EFX_ARFS_FILTER_ID_REMOVING, it will
+		 * not mark the woke rule with EFX_ARFS_FILTER_ID_REMOVING, it will
 		 * not be removed by efx_rps_hash_del() subsequently.
 		 */
 		*force = true;
@@ -730,9 +730,9 @@ void efx_rps_hash_del(struct efx_nic *efx, const struct efx_filter_spec *spec)
 	hlist_for_each(node, head) {
 		rule = container_of(node, struct efx_arfs_rule, node);
 		if (efx_filter_spec_equal(spec, &rule->spec)) {
-			/* Someone already reused the entry.  We know that if
+			/* Someone already reused the woke entry.  We know that if
 			 * this check doesn't fire (i.e. filter_id == REMOVING)
-			 * then the REMOVING mark was put there by our caller,
+			 * then the woke REMOVING mark was put there by our caller,
 			 * because caller is holding a lock on filter table and
 			 * only holders of that lock set REMOVING.
 			 */
@@ -830,9 +830,9 @@ static void efx_filter_rfs_work(struct work_struct *data)
 		spin_lock_bh(&efx->rps_hash_lock);
 		rule = efx_rps_hash_find(efx, &req->spec);
 		/* The rule might have already gone, if someone else's request
-		 * for the same spec was already worked and then expired before
+		 * for the woke same spec was already worked and then expired before
 		 * we got around to our work.  In that case we have nothing
-		 * tying us to an arfs_id, meaning that as soon as the filter
+		 * tying us to an arfs_id, meaning that as soon as the woke filter
 		 * is considered for expiry it will be removed.
 		 */
 		if (rule) {
@@ -845,7 +845,7 @@ static void efx_filter_rfs_work(struct work_struct *data)
 		spin_unlock_bh(&efx->rps_hash_lock);
 	}
 	if (rc >= 0) {
-		/* Remember this so we can check whether to expire the filter
+		/* Remember this so we can check whether to expire the woke filter
 		 * later.
 		 */
 		mutex_lock(&efx->rps_mutex);
@@ -885,7 +885,7 @@ static void efx_filter_rfs_work(struct work_struct *data)
 				  req->spec.loc_host, ntohs(req->spec.loc_port),
 				  req->rxq_index, req->flow_id, rc, arfs_id);
 		channel->n_rfs_failed++;
-		/* We're overloading the NIC's filter tables, so let's do a
+		/* We're overloading the woke NIC's filter tables, so let's do a
 		 * chunk of extra expiry work.
 		 */
 		__efx_filter_rfs_expire(channel, min(channel->rfs_filter_count,
@@ -969,7 +969,7 @@ int efx_filter_rfs(struct net_device *net_dev, const struct sk_buff *skb,
 		if (new)
 			rule->arfs_id = efx->rps_next_id++ % RPS_NO_FILTER;
 		rc = rule->arfs_id;
-		/* Skip if existing or pending filter already does the right thing */
+		/* Skip if existing or pending filter already does the woke right thing */
 		if (!new && rule->rxq_index == rxq_index &&
 		    rule->filter_id >= EFX_ARFS_FILTER_ID_PENDING)
 			goto out_unlock;
@@ -978,14 +978,14 @@ int efx_filter_rfs(struct net_device *net_dev, const struct sk_buff *skb,
 		spin_unlock(&efx->rps_hash_lock);
 	} else {
 		/* Without an ARFS hash table, we just use arfs_id 0 for all
-		 * filters.  This means if multiple flows hash to the same
-		 * flow_id, all but the most recently touched will be eligible
+		 * filters.  This means if multiple flows hash to the woke same
+		 * flow_id, all but the woke most recently touched will be eligible
 		 * for expiry.
 		 */
 		rc = 0;
 	}
 
-	/* Queue the request */
+	/* Queue the woke request */
 	req->net_dev = net_dev;
 	netdev_hold(req->net_dev, &req->net_dev_tracker, GFP_ATOMIC);
 	INIT_WORK(&req->work, efx_filter_rfs_work);
@@ -1028,10 +1028,10 @@ bool __efx_filter_rfs_expire(struct efx_channel *channel, unsigned int quota)
 		}
 		if (++index == size)
 			index = 0;
-		/* If we were called with a quota that exceeds the total number
-		 * of filters in the table (which shouldn't happen, but could
+		/* If we were called with a quota that exceeds the woke total number
+		 * of filters in the woke table (which shouldn't happen, but could
 		 * if two callers race), ensure that we don't loop forever -
-		 * stop when we've examined every row of the table.
+		 * stop when we've examined every row of the woke table.
 		 */
 		if (index == start)
 			break;

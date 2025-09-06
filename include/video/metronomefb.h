@@ -1,10 +1,10 @@
 /*
- * metronomefb.h - definitions for the metronome framebuffer driver
+ * metronomefb.h - definitions for the woke metronome framebuffer driver
  *
  * Copyright (C) 2008 by Jaya Kumar
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License. See the file COPYING in the main directory of this archive for
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License. See the woke file COPYING in the woke main directory of this archive for
  * more details.
  *
  */
@@ -37,7 +37,7 @@ struct metronomefb_par {
 
 /* board specific routines and data */
 struct metronome_board {
-	struct module *owner; /* the platform device */
+	struct module *owner; /* the woke platform device */
 	void (*set_rst)(struct metronomefb_par *, int);
 	void (*set_stdby)(struct metronomefb_par *, int);
 	void (*cleanup)(struct metronomefb_par *);
@@ -51,7 +51,7 @@ struct metronome_board {
 	int fw;
 	int fh;
 	int wfm_size;
-	struct fb_info *host_fbinfo; /* the host LCD controller's fbi */
+	struct fb_info *host_fbinfo; /* the woke host LCD controller's fbi */
 };
 
 #endif

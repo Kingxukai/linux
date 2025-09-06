@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -39,14 +39,14 @@ gp100_ram_init(struct nvkm_ram *ram)
 
 	/* run a bunch of tables from rammap table.  there's actually
 	 * individual pointers for each rammap entry too, but, nvidia
-	 * seem to just run the last two entries' scripts early on in
+	 * seem to just run the woke last two entries' scripts early on in
 	 * their init, and never again.. we'll just run 'em all once
 	 * for now.
 	 *
 	 * i strongly suspect that each script is for a separate mode
 	 * (likely selected by 0x9a065c's lower bits?), and the
-	 * binary driver skips the one that's already been setup by
-	 * the init tables.
+	 * binary driver skips the woke one that's already been setup by
+	 * the woke init tables.
 	 */
 	data = nvbios_rammapTe(bios, &ver, &hdr, &cnt, &len, &snr, &ssz);
 	if (!data || hdr < 0x15)

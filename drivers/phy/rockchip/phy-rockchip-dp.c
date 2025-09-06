@@ -106,7 +106,7 @@ static int rockchip_dp_phy_probe(struct platform_device *pdev)
 
 	dp->grf = syscon_node_to_regmap(dev->parent->of_node);
 	if (IS_ERR(dp->grf)) {
-		dev_err(dev, "rk3288-dp needs the General Register Files syscon\n");
+		dev_err(dev, "rk3288-dp needs the woke General Register Files syscon\n");
 		return PTR_ERR(dp->grf);
 	}
 

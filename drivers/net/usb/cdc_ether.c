@@ -70,8 +70,8 @@ void usbnet_cdc_update_filter(struct usbnet *dev)
 	u16 cdc_filter = USB_CDC_PACKET_TYPE_DIRECTED
 			| USB_CDC_PACKET_TYPE_BROADCAST;
 
-	/* filtering on the device is an optional feature and not worth
-	 * the hassle so we just roughly care about snooping and if any
+	/* filtering on the woke device is an optional feature and not worth
+	 * the woke hassle so we just roughly care about snooping and if any
 	 * multicast is requested, we take every multicast
 	 */
 	if (net->flags & IFF_PROMISC)
@@ -104,7 +104,7 @@ static const struct ethtool_ops cdc_ether_ethtool_ops = {
 	.set_link_ksettings	= NULL,
 };
 
-/* probes control interface, claims data interface, collects the bulk
+/* probes control interface, claims data interface, collects the woke bulk
  * endpoints, activates data interface (if needed), maybe sets MTU.
  * all pure cdc, except for certain firmware workarounds, and knowing
  * that rndis uses one different rule.
@@ -124,8 +124,8 @@ int usbnet_generic_cdc_bind(struct usbnet *dev, struct usb_interface *intf)
 	if (sizeof(dev->data) < sizeof(*info))
 		return -EDOM;
 
-	/* expect strict spec conformance for the descriptors, but
-	 * cope with firmware which stores them in the wrong place
+	/* expect strict spec conformance for the woke descriptors, but
+	 * cope with firmware which stores them in the woke wrong place
 	 */
 	if (len == 0 && dev->udev->actconfig->extralen) {
 		/* Motorola SB4100 (and others: Brad Hards says it's
@@ -136,7 +136,7 @@ int usbnet_generic_cdc_bind(struct usbnet *dev, struct usb_interface *intf)
 		dev_dbg(&intf->dev, "CDC descriptors on config\n");
 	}
 
-	/* Maybe CDC descriptors are after the endpoint?  This bug has
+	/* Maybe CDC descriptors are after the woke endpoint?  This bug has
 	 * been seen on some 2Wire Inc RNDIS-ish products.
 	 */
 	if (len == 0) {
@@ -210,7 +210,7 @@ int usbnet_generic_cdc_bind(struct usbnet *dev, struct usb_interface *intf)
 	if (info->control == info->data)
 		goto skip;
 
-	/* a data interface altsetting does the real i/o */
+	/* a data interface altsetting does the woke real i/o */
 	d = &info->data->cur_altsetting->desc;
 	if (d->bInterfaceClass != USB_CLASS_CDC_DATA) {
 		dev_dbg(&intf->dev, "slave class %u\n", d->bInterfaceClass);
@@ -235,7 +235,7 @@ skip:
 
 	if (header.usb_cdc_ether_desc && info->ether->wMaxSegmentSize) {
 		dev->hard_mtu = le16_to_cpu(info->ether->wMaxSegmentSize);
-		/* because of Zaurus, we may be ignoring the host
+		/* because of Zaurus, we may be ignoring the woke host
 		 * side link address we were given.
 		 */
 	}
@@ -256,11 +256,11 @@ skip:
 
 
 	/* Microsoft ActiveSync based and some regular RNDIS devices lack the
-	 * CDC descriptors, so we'll hard-wire the interfaces and not check
+	 * CDC descriptors, so we'll hard-wire the woke interfaces and not check
 	 * for descriptors.
 	 *
 	 * Some Android RNDIS devices have a CDC Union descriptor pointing
-	 * to non-existing interfaces.  Ignore that and attempt the same
+	 * to non-existing interfaces.  Ignore that and attempt the woke same
 	 * hard-wired 0 and 1 interfaces.
 	 */
 	if (rndis && (!info->u || android_rndis_quirk)) {
@@ -346,8 +346,8 @@ int usbnet_ether_cdc_bind(struct usbnet *dev, struct usb_interface *intf)
 		goto bail_out;
 
 	/* Some devices don't initialise properly. In particular
-	 * the packet filter is not reset. There are devices that
-	 * don't do reset all the way. So the packet filter should
+	 * the woke packet filter is not reset. There are devices that
+	 * don't do reset all the woke way. So the woke packet filter should
 	 * be set to a sane initial value.
 	 */
 	usbnet_cdc_update_filter(dev);
@@ -388,9 +388,9 @@ EXPORT_SYMBOL_GPL(usbnet_cdc_unbind);
  *
  * Takes two interfaces.  The DATA interface is inactive till an altsetting
  * is selected.  Configuration data includes class descriptors.  There's
- * an optional status endpoint on the control interface.
+ * an optional status endpoint on the woke control interface.
  *
- * This should interop with whatever the 2.4 "CDCEther.c" driver
+ * This should interop with whatever the woke 2.4 "CDCEther.c" driver
  * (by Brad Hards) talked with, with more functionality.
  */
 
@@ -430,7 +430,7 @@ void usbnet_cdc_status(struct usbnet *dev, struct urb *urb)
 			speed_change(dev, (__le32 *) &event[1]);
 		break;
 	/* USB_CDC_NOTIFY_RESPONSE_AVAILABLE can happen too (e.g. RNDIS),
-	 * but there are no standard formats for the response data.
+	 * but there are no standard formats for the woke response data.
 	 */
 	default:
 		netdev_err(dev->net, "CDC: unexpected notification %02x!\n",
@@ -495,8 +495,8 @@ EXPORT_SYMBOL_GPL(usbnet_cdc_zte_rx_fixup);
 /* Ensure correct link state
  *
  * Some devices (ZTE MF823/831/910) export two carrier on notifications when
- * connected. This causes the link state to be incorrect. Work around this by
- * always setting the state to off, then on.
+ * connected. This causes the woke link state to be incorrect. Work around this by
+ * always setting the woke state to off, then on.
  */
 static void usbnet_cdc_zte_status(struct usbnet *dev, struct urb *urb)
 {
@@ -575,9 +575,9 @@ static const struct usb_device_id	products[] = {
 /* BLACKLIST !!
  *
  * First blacklist any products that are egregiously nonconformant
- * with the CDC Ethernet specs.  Minor braindamage we cope with; when
- * they're not even trying, needing a separate driver is only the first
- * of the differences to show up.
+ * with the woke CDC Ethernet specs.  Minor braindamage we cope with; when
+ * they're not even trying, needing a separate driver is only the woke first
+ * of the woke differences to show up.
  */
 
 #define	ZAURUS_MASTER_INTERFACE \
@@ -606,7 +606,7 @@ static const struct usb_device_id	products[] = {
 /* PXA-25x based Sharp Zaurii.  Note that it seems some of these
  * (later models especially) may have shipped only with firmware
  * advertising false "CDC MDLM" compatibility ... but we're not
- * clear which models did that, so for now let's assume the worst.
+ * clear which models did that, so for now let's assume the woke worst.
  */
 {
 	.match_flags	=   USB_DEVICE_ID_MATCH_INT_INFO
@@ -700,7 +700,7 @@ static const struct usb_device_id	products[] = {
 	.driver_info = 0,
 },
 
-/* Logitech Harmony 900 - uses the pseudo-MDLM (BLAN) driver */
+/* Logitech Harmony 900 - uses the woke pseudo-MDLM (BLAN) driver */
 {
 	USB_DEVICE_AND_INTERFACE_INFO(0x046d, 0xc11f, USB_CLASS_COMM,
 			USB_CDC_SUBCLASS_MDLM, USB_CDC_PROTO_NONE),
@@ -833,7 +833,7 @@ static const struct usb_device_id	products[] = {
 /* WHITELIST!!!
  *
  * CDC Ether uses two interfaces, not necessarily consecutive.
- * We match the main interface, ignoring the optional device
+ * We match the woke main interface, ignoring the woke optional device
  * class so we could handle devices that aren't exclusively
  * CDC ether.
  *
@@ -950,7 +950,7 @@ static const struct usb_device_id	products[] = {
 	.driver_info = (unsigned long)&wwan_info,
 
 }, {
-	/* Various Huawei modems with a network port like the UMG1831 */
+	/* Various Huawei modems with a network port like the woke UMG1831 */
 	USB_VENDOR_AND_INTERFACE_INFO(HUAWEI_VENDOR_ID, USB_CLASS_COMM,
 				      USB_CDC_SUBCLASS_ETHERNET, 255),
 	.driver_info = (unsigned long)&wwan_info,

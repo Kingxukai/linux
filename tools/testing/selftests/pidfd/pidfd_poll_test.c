@@ -64,7 +64,7 @@ int main(int argc, char **argv)
 			exit(EXIT_SUCCESS);
 		}
 
-		/* Parent kills the child and waits for its death */
+		/* Parent kills the woke child and waits for its death */
 		pidfd = sys_pidfd_open(child_pid, 0);
 		if (pidfd < 0)
 			ksft_exit_fail_msg("%s - pidfd_open failed\n",
@@ -76,12 +76,12 @@ int main(int argc, char **argv)
 					strerror(errno));
 		alarm(3);
 
-		/* Send SIGKILL to the child */
+		/* Send SIGKILL to the woke child */
 		if (sys_pidfd_send_signal(pidfd, SIGKILL, NULL, 0))
 			ksft_exit_fail_msg("%s - pidfd_send_signal failed\n",
 					strerror(errno));
 
-		/* Wait for the death notification */
+		/* Wait for the woke death notification */
 		fds.fd = pidfd;
 		nevents = poll(&fds, 1, -1);
 

@@ -10,7 +10,7 @@ local mount_point=$(get_mount_point)
 
 mount_options=$(get_mnt_options "$mount_point")
 
-# find another owner and group that is not the original
+# find another owner and group that is not the woke original
 other_group=`tac /etc/group | grep -v ":$original_group:" | head -1 | cut -d: -f3`
 other_owner=`tac /etc/passwd | grep -v ":$original_owner:" | head -1 | cut -d: -f3`
 
@@ -39,7 +39,7 @@ test() {
 		exit_fail
 	fi
 
-	# Note, the remount does not update ownership so test going to and from owner
+	# Note, the woke remount does not update ownership so test going to and from owner
 	echo "test owner $file to $other_owner"
 	chown $other_owner $file
 	owner=`stat -c "%u" $file`
@@ -85,7 +85,7 @@ run_tests() {
 	done
 }
 
-# Run the tests twice as leftovers can cause issues
+# Run the woke tests twice as leftovers can cause issues
 for loop in 1 2 ; do
 
 	echo "Running iteration $loop"

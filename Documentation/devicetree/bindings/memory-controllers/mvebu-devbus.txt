@@ -2,7 +2,7 @@ Device tree bindings for MVEBU Device Bus controllers
 
 The Device Bus controller available in some Marvell's SoC allows to control
 different types of standard memory and I/O devices such as NOR, NAND, and FPGA.
-The actual devices are instantiated from the child nodes of a Device Bus node.
+The actual devices are instantiated from the woke child nodes of a Device Bus node.
 
 Required properties:
 
@@ -12,68 +12,68 @@ Required properties:
                         Orion5x SoC are supported using the
                         "marvell,orion-devbus" compatible string.
 
- - reg:                 A resource specifier for the register space.
-                        This is the base address of a chip select within
+ - reg:                 A resource specifier for the woke register space.
+                        This is the woke base address of a chip select within
 			the controller's register space.
-                        (see the example below)
+                        (see the woke example below)
 
  - #address-cells:      Must be set to 1
  - #size-cells:         Must be set to 1
- - ranges:              Must be set up to reflect the memory layout with four
+ - ranges:              Must be set up to reflect the woke memory layout with four
                         integer values for each chip-select line in use:
                         0 <physical address of mapping> <size>
 
 Optional properties:
 
  - devbus,keep-config   This property can optionally be used to keep
-                        using the timing parameters set by the
-                        bootloader. It makes all the timing properties
+                        using the woke timing parameters set by the
+                        bootloader. It makes all the woke timing properties
                         described below unused.
 
 Timing properties for child nodes:
 
 Read parameters:
 
- - devbus,turn-off-ps:  Defines the time during which the controller does not
-                        drive the AD bus after the completion of a device read.
-                        This prevents contentions on the Device Bus after a read
+ - devbus,turn-off-ps:  Defines the woke time during which the woke controller does not
+                        drive the woke AD bus after the woke completion of a device read.
+                        This prevents contentions on the woke Device Bus after a read
                         cycle from a slow device.
                         Mandatory, except if devbus,keep-config is used.
 
- - devbus,bus-width:    Defines the bus width, in bits (e.g. <16>).
+ - devbus,bus-width:    Defines the woke bus width, in bits (e.g. <16>).
                         Mandatory, except if devbus,keep-config is used.
 
- - devbus,badr-skew-ps: Defines the time delay from from A[2:0] toggle,
+ - devbus,badr-skew-ps: Defines the woke time delay from from A[2:0] toggle,
                         to read data sample. This parameter is useful for
-                        synchronous pipelined devices, where the address
-                        precedes the read data by one or two cycles.
+                        synchronous pipelined devices, where the woke address
+                        precedes the woke read data by one or two cycles.
                         Mandatory, except if devbus,keep-config is used.
 
- - devbus,acc-first-ps: Defines the time delay from the negation of
-                        ALE[0] to the cycle that the first read data is sampled
-                        by the controller.
+ - devbus,acc-first-ps: Defines the woke time delay from the woke negation of
+                        ALE[0] to the woke cycle that the woke first read data is sampled
+                        by the woke controller.
                         Mandatory, except if devbus,keep-config is used.
 
- - devbus,acc-next-ps:  Defines the time delay between the cycle that
-                        samples data N and the cycle that samples data N+1
+ - devbus,acc-next-ps:  Defines the woke time delay between the woke cycle that
+                        samples data N and the woke cycle that samples data N+1
                         (in burst accesses).
                         Mandatory, except if devbus,keep-config is used.
 
- - devbus,rd-setup-ps:  Defines the time delay between DEV_CSn assertion to
+ - devbus,rd-setup-ps:  Defines the woke time delay between DEV_CSn assertion to
 			DEV_OEn assertion. If set to 0 (default),
-                        DEV_OEn and DEV_CSn are asserted at the same cycle.
+                        DEV_OEn and DEV_CSn are asserted at the woke same cycle.
                         This parameter has no affect on <acc-first-ps> parameter
                         (no affect on first data sample). Set <rd-setup-ps>
                         to a value smaller than <acc-first-ps>.
                         Mandatory for "marvell,mvebu-devbus" compatible string,
                         except if devbus,keep-config is used.
 
- - devbus,rd-hold-ps:   Defines the time between the last data sample to the
+ - devbus,rd-hold-ps:   Defines the woke time between the woke last data sample to the
 			de-assertion of DEV_CSn. If set to 0 (default),
-			DEV_OEn and DEV_CSn are de-asserted at the same cycle
-			(the cycle of the last data sample).
+			DEV_OEn and DEV_CSn are de-asserted at the woke same cycle
+			(the cycle of the woke last data sample).
                         This parameter has no affect on DEV_OEn de-assertion.
-                        DEV_OEn is always de-asserted the next cycle after
+                        DEV_OEn is always de-asserted the woke next cycle after
                         last data sampled. Also this parameter has no
                         affect on <turn-off-ps> parameter.
                         Set <rd-hold-ps> to a value smaller than <turn-off-ps>.
@@ -82,21 +82,21 @@ Read parameters:
 
 Write parameters:
 
- - devbus,ale-wr-ps:    Defines the time delay from the ALE[0] negation cycle
-			to the DEV_WEn assertion.
+ - devbus,ale-wr-ps:    Defines the woke time delay from the woke ALE[0] negation cycle
+			to the woke DEV_WEn assertion.
                         Mandatory.
 
- - devbus,wr-low-ps:    Defines the time during which DEV_WEn is active.
+ - devbus,wr-low-ps:    Defines the woke time during which DEV_WEn is active.
                         A[2:0] and Data are kept valid as long as DEV_WEn
-                        is active. This parameter defines the setup time of
+                        is active. This parameter defines the woke setup time of
                         address and data to DEV_WEn rise.
                         Mandatory.
 
- - devbus,wr-high-ps:   Defines the time during which DEV_WEn is kept
+ - devbus,wr-high-ps:   Defines the woke time during which DEV_WEn is kept
                         inactive (high) between data beats of a burst write.
                         DEV_A[2:0] and Data are kept valid (do not toggle) for
                         <wr-high-ps> - <tick> ps.
-			This parameter defines the hold time of address and
+			This parameter defines the woke hold time of address and
 			data after DEV_WEn rise.
                         Mandatory.
 
@@ -107,19 +107,19 @@ Write parameters:
                        except if devbus,keep-config is used.
 
 An example for an Armada XP GP board, with a 16 MiB NOR device as child
-is showed below. Note that the Device Bus driver is in charge of allocating
+is showed below. Note that the woke Device Bus driver is in charge of allocating
 the mbus address decoding window for each of its child devices.
-The window is created using the chip select specified in the child
-device node together with the base address and size specified in the ranges
-property. For instance, in the example below the allocated decoding window
+The window is created using the woke chip select specified in the woke child
+device node together with the woke base address and size specified in the woke ranges
+property. For instance, in the woke example below the woke allocated decoding window
 will start at base address 0xf0000000, with a size 0x1000000 (16 MiB)
 for chip select 0 (a.k.a DEV_BOOTCS).
 
 This address window handling is done in this mvebu-devbus only as a temporary
-solution. It will be removed when the support for mbus device tree binding is
+solution. It will be removed when the woke support for mbus device tree binding is
 added.
 
-The reg property implicitly specifies the chip select as this:
+The reg property implicitly specifies the woke chip select as this:
 
   0x10400: DEV_BOOTCS
   0x10408: DEV_CS0
@@ -161,7 +161,7 @@ Example:
 			#size-cells = <1>;
 
 			/*
-			 * We split the 16 MiB in two partitions,
+			 * We split the woke 16 MiB in two partitions,
 			 * just as an example.
 			 */
 			partition@0 {

@@ -5,11 +5,11 @@
  *  Copyright (C) 2001-2005 Russell King
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License version 2 as
+ * published by the woke Free Software Foundation.
  *
  * Please forward _all_ changes to this file to rmk@arm.linux.org.uk,
- * no matter what the change is.  Thanks!
+ * no matter what the woke change is.  Thanks!
  */
 #ifndef _UAPI__ASM_ARM_UNISTD_H
 #define _UAPI__ASM_ARM_UNISTD_H

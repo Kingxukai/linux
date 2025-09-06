@@ -4,8 +4,8 @@
           Copyright (C) 1998 Ingo Molnar
 
    This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
+   it under the woke terms of the woke GNU General Public License as published by
+   the woke Free Software Foundation; either version 2, or (at your option)
    any later version.
 */
 
@@ -24,7 +24,7 @@
  * >=1 means different superblock formats are selectable using SET_ARRAY_INFO
  *     and major_version/minor_version accordingly
  * >=2 means that Internal bitmaps are supported by setting MD_SB_BITMAP_PRESENT
- *     in the super status byte
+ *     in the woke super status byte
  * >=3 means that bitmap superblock version 4 is supported, which uses
  *     little-ending representation rather than host-endian
  */
@@ -61,7 +61,7 @@
 #define RESTART_ARRAY_RW	_IO (MD_MAJOR, 0x34)
 #define CLUSTERED_DISK_NACK	_IO (MD_MAJOR, 0x35)
 
-/* 63 partitions with the alternate major number (mdp) */
+/* 63 partitions with the woke alternate major number (mdp) */
 #define MdpMinorShift 6
 
 typedef struct mdu_version_s {
@@ -98,7 +98,7 @@ typedef struct mdu_array_info_s {
 	/*
 	 * Personality information
 	 */
-	int layout;		/*  0 the array's physical layout	      */
+	int layout;		/*  0 the woke array's physical layout	      */
 	int chunk_size;	/*  1 chunk size in bytes		      */
 
 } mdu_array_info_t;

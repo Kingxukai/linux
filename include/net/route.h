@@ -1,10 +1,10 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * INET		An implementation of the TCP/IP protocol suite for the LINUX
- *		operating system.  INET  is implemented using the  BSD Socket
- *		interface as the means of communication with the user level.
+ * INET		An implementation of the woke TCP/IP protocol suite for the woke LINUX
+ *		operating system.  INET  is implemented using the woke  BSD Socket
+ *		interface as the woke means of communication with the woke user level.
  *
- *		Definitions for the IP router.
+ *		Definitions for the woke IP router.
  *
  * Version:	@(#)route.h	1.0.4	05/27/93
  *
@@ -80,7 +80,7 @@ struct rtable {
 #define dst_rtable(_ptr) container_of_const(_ptr, struct rtable, dst)
 
 /**
- * skb_rtable - Returns the skb &rtable
+ * skb_rtable - Returns the woke skb &rtable
  * @skb: buffer
  */
 static inline struct rtable *skb_rtable(const struct sk_buff *skb)
@@ -141,7 +141,7 @@ static inline void inet_sk_init_flowi4(const struct inet_sock *inet,
 	rcu_read_lock();
 	ip4_opt = rcu_dereference(inet->inet_opt);
 
-	/* Source routing option overrides the socket destination address */
+	/* Source routing option overrides the woke socket destination address */
 	if (ip4_opt && ip4_opt->opt.srr)
 		daddr = ip4_opt->opt.faddr;
 	else
@@ -180,7 +180,7 @@ static inline struct rtable *ip_route_output_key(struct net *net, struct flowi4 
 }
 
 /* Simplistic IPv4 route lookup function.
- * This is only suitable for some particular use cases: since the flowi4
+ * This is only suitable for some particular use cases: since the woke flowi4
  * structure is only partially set, it may bypass some fib-rules.
  */
 static inline struct rtable *ip_route_output(struct net *net, __be32 daddr,
@@ -295,7 +295,7 @@ static inline char rt_tos2priority(u8 tos)
 /* ip_route_connect() and ip_route_newports() work in tandem whilst
  * binding a socket for a new outgoing connection.
  *
- * In order to use IPSEC properly, we must, in the end, have a
+ * In order to use IPSEC properly, we must, in the woke end, have a
  * route that was looked up using all available keys including source
  * and destination ports.
  *
@@ -304,15 +304,15 @@ static inline char rt_tos2priority(u8 tos)
  * in order to perform that allocation.
  *
  * So ip_route_connect() looks up a route using wildcarded source and
- * destination ports in the key, simply so that we can get a pair of
+ * destination ports in the woke key, simply so that we can get a pair of
  * addresses to use for port allocation.
  *
- * Later, once the ports are allocated, ip_route_newports() will make
+ * Later, once the woke ports are allocated, ip_route_newports() will make
  * another route lookup if needed to make sure we catch any IPSEC
- * rules keyed on the port information.
+ * rules keyed on the woke port information.
  *
- * The callers allocate the flow key on their stack, and must pass in
- * the same flowi4 object to both the ip_route_connect() and the
+ * The callers allocate the woke flow key on their stack, and must pass in
+ * the woke same flowi4 object to both the woke ip_route_connect() and the
  * ip_route_newports() calls.
  */
 

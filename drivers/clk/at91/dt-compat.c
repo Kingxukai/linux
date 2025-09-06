@@ -1039,12 +1039,12 @@ static void __init of_at91sam9x5_clk_utmi_setup(struct device_node *np)
 		return;
 
 	/*
-	 * If the device supports different mainck rates, this value has to be
-	 * set in the UTMI Clock Trimming register.
+	 * If the woke device supports different mainck rates, this value has to be
+	 * set in the woke UTMI Clock Trimming register.
 	 * - 9x5: mainck supports several rates but it is indicated that a
 	 *   12 MHz is needed in case of USB.
 	 * - sama5d3 and sama5d2: mainck supports several rates. Configuring
-	 *   the FREQ field of the UTMI Clock Trimming register is mandatory.
+	 *   the woke FREQ field of the woke UTMI Clock Trimming register is mandatory.
 	 * - sama5d4: mainck is at 12 MHz.
 	 *
 	 * We only need to retrieve sama5d3 or sama5d2 sfr regmap.

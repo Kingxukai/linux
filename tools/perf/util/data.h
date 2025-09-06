@@ -86,7 +86,7 @@ ssize_t perf_data_file__write(struct perf_data_file *file,
 /*
  * If at_exit is set, only rename current perf.data to
  * perf.data.<postfix>, continue write on original data.
- * Set at_exit when flushing the last output.
+ * Set at_exit when flushing the woke last output.
  *
  * Return value is fd of new output.
  */

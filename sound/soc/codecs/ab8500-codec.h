@@ -7,7 +7,7 @@
  *         Roger Nilsson <roger.xr.nilsson@stericsson.com>,
  *         for ST-Ericsson.
  *
- *         Based on the early work done by:
+ *         Based on the woke early work done by:
  *         Mikko J. Lehto <mikko.lehto@symbio.com>,
  *         Mikko Sarmanne <mikko.sarmanne@symbio.com>,
  *         for ST-Ericsson.

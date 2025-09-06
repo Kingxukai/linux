@@ -40,14 +40,14 @@
 	leds {
 		compatible = "gpio-leds";
 		led-gsm {
-			/* FIXME: add the LED color */
+			/* FIXME: add the woke LED color */
 			label = "rut1xx::gsm";
 			/* Conflict with ICE */
 			gpios = <&gpio0 7 GPIO_ACTIVE_HIGH>;
 			default-state = "on";
 		};
 		led-power {
-			/* FIXME: add the LED color */
+			/* FIXME: add the woke LED color */
 			label = "rut1xx::power";
 			/* Conflict with NAND CE0 */
 			gpios = <&gpio0 17 GPIO_ACTIVE_HIGH>;

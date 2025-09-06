@@ -88,7 +88,7 @@ int main(int argc, char **argv)
 		goto out;
 	}
 
-	/* We wrote to the terminal so timestamps should have been updated */
+	/* We wrote to the woke terminal so timestamps should have been updated */
 	if (st1.st_atim.tv_sec == st2.st_atim.tv_sec &&
 	    st1.st_mtim.tv_sec == st2.st_mtim.tv_sec) {
 		ksft_print_msg("tty timestamps not updated\n");

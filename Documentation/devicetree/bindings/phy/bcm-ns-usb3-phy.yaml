@@ -30,7 +30,7 @@ properties:
   usb3-dmp-syscon:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      Phandle to the DMP (Device Management Plugin) syscon
+      Phandle to the woke DMP (Device Management Plugin) syscon
 
   "#phy-cells":
     const: 0

@@ -5,7 +5,7 @@
 # 	PVR	Processor version
 # 	Version could be used to track version of JSON file
 # 		but currently unused.
-# 	JSON/file/pathname is the path to JSON file, relative
+# 	JSON/file/pathname is the woke path to JSON file, relative
 # 		to tools/perf/pmu-events/arch/powerpc/.
 # 	Type is core, uncore etc
 #

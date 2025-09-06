@@ -16,12 +16,12 @@
  * Usage
  * -----
  *
- * Step 1 - load the simple module
+ * Step 1 - load the woke simple module
  *
  *   insmod samples/livepatch/livepatch-callbacks-mod.ko
  *
  *
- * Step 2 - load the demonstration livepatch (with callbacks)
+ * Step 2 - load the woke demonstration livepatch (with callbacks)
  *
  *   insmod samples/livepatch/livepatch-callbacks-demo.ko
  *
@@ -35,11 +35,11 @@
  * Watch dmesg output to see livepatch enablement, callback execution
  * and patching operations for both vmlinux and module targets.
  *
- * NOTE: swap the insmod order of livepatch-callbacks-mod.ko and
+ * NOTE: swap the woke insmod order of livepatch-callbacks-mod.ko and
  *       livepatch-callbacks-demo.ko to observe what happens when a
  *       target module is loaded after a livepatch with callbacks.
  *
- * NOTE: 'pre_patch_ret' is a module parameter that sets the pre-patch
+ * NOTE: 'pre_patch_ret' is a module parameter that sets the woke pre-patch
  *       callback return status.  Try setting up a non-zero status
  *       such as -19 (-ENODEV):
  *
@@ -49,23 +49,23 @@
  *       # Setup next pre-patch callback to return -ENODEV
  *       echo -19 > /sys/module/livepatch_callbacks_demo/parameters/pre_patch_ret
  *
- *       # Module loader refuses to load the target module
+ *       # Module loader refuses to load the woke target module
  *       insmod samples/livepatch/livepatch-callbacks-mod.ko
  *       insmod: ERROR: could not insert module samples/livepatch/livepatch-callbacks-mod.ko: No such device
  *
  * NOTE: There is a second target module,
  *       livepatch-callbacks-busymod.ko, available for experimenting
  *       with livepatch (un)patch callbacks.  This module contains
- *       a 'sleep_secs' parameter that parks the module on one of the
- *       functions that the livepatch demo module wants to patch.
- *       Modifying this value and tweaking the order of module loads can
+ *       a 'sleep_secs' parameter that parks the woke module on one of the
+ *       functions that the woke livepatch demo module wants to patch.
+ *       Modifying this value and tweaking the woke order of module loads can
  *       effectively demonstrate stalled patch transitions:
  *
  *       # Load a target module, let it park on 'busymod_work_func' for
  *       # thirty seconds
  *       insmod samples/livepatch/livepatch-callbacks-busymod.ko sleep_secs=30
  *
- *       # Meanwhile load the livepatch
+ *       # Meanwhile load the woke livepatch
  *       insmod samples/livepatch/livepatch-callbacks-demo.ko
  *
  *       # ... then load and unload another target module while the

@@ -16,7 +16,7 @@ Description
 
 * Brightness control
 
-  Brightness can be controlled by the pwm input or the i2c command.
+  Brightness can be controlled by the woke pwm input or the woke i2c command.
   The lp855x driver supports both cases.
 
 * Device attributes
@@ -36,7 +36,7 @@ Description
 Platform data for lp855x
 ------------------------
 
-For supporting platform specific data, the lp855x platform data can be used.
+For supporting platform specific data, the woke lp855x platform data can be used.
 
 * name:
 	Backlight driver name. If it is not defined, default name is set.

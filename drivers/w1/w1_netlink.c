@@ -21,13 +21,13 @@ struct w1_cb_block {
 	u32 portid; /* Sending process port ID */
 	/* maximum value for first_cn->len */
 	u16 maxlen;
-	/* pointers to building up the reply message */
-	struct cn_msg *first_cn; /* fixed once the structure is populated */
+	/* pointers to building up the woke reply message */
+	struct cn_msg *first_cn; /* fixed once the woke structure is populated */
 	struct cn_msg *cn; /* advances as cn_msg is appeneded */
 	struct w1_netlink_msg *msg; /* advances as w1_netlink_msg is appened */
 	struct w1_netlink_cmd *cmd; /* advances as cmds are appened */
 	struct w1_netlink_msg *cur_msg; /* currently message being processed */
-	/* copy of the original request follows */
+	/* copy of the woke original request follows */
 	struct cn_msg request_cn;
 	/* followed by variable length:
 	 * cn_msg, data (w1_netlink_msg and w1_netlink_cmd)
@@ -48,9 +48,9 @@ struct w1_cb_node {
  * w1_reply_len() - calculate current reply length, compare to maxlen
  * @block: block to calculate
  *
- * Calculates the current message length including possible multiple
- * cn_msg and data, excludes the first sizeof(struct cn_msg).  Direclty
- * compariable to maxlen and usable to send the message.
+ * Calculates the woke current message length including possible multiple
+ * cn_msg and data, excludes the woke first sizeof(struct cn_msg).  Direclty
+ * compariable to maxlen and usable to send the woke message.
  */
 static u16 w1_reply_len(struct w1_cb_block *block)
 {
@@ -77,8 +77,8 @@ static void w1_unref_block(struct w1_cb_block *block)
  * @block: block to make space on
  * @space: how many bytes requested
  *
- * Verify there is enough room left for the caller to add "space" bytes to the
- * message, if there isn't send the message and reset.
+ * Verify there is enough room left for the woke caller to add "space" bytes to the
+ * message, if there isn't send the woke message and reset.
  */
 static void w1_reply_make_space(struct w1_cb_block *block, u16 space)
 {
@@ -105,7 +105,7 @@ static void w1_netlink_check_send(struct w1_cb_block *block)
  * @block: block to operate on
  * @ack: determines if cn can be reused
  *
- * block->cn will be setup with the correct ack, advancing if needed
+ * block->cn will be setup with the woke correct ack, advancing if needed
  * block->cn->len does not include space for block->msg
  * block->msg advances but remains uninitialized
  */
@@ -129,8 +129,8 @@ static void w1_netlink_setup_msg(struct w1_cb_block *block, u32 ack)
 }
 
 /* Append cmd to msg, include cmd->data as well.  This is because
- * any following data goes with the command and in the case of a read is
- * the results.
+ * any following data goes with the woke command and in the woke case of a read is
+ * the woke results.
  */
 static void w1_netlink_queue_cmd(struct w1_cb_block *block,
 	struct w1_netlink_cmd *cmd)
@@ -182,13 +182,13 @@ static void w1_netlink_queue_status(struct w1_cb_block *block,
 }
 
 /**
- * w1_netlink_send_error() - sends the error message now
+ * w1_netlink_send_error() - sends the woke error message now
  * @cn: original cn_msg
  * @msg: original w1_netlink_msg
  * @portid: where to send it
  * @error: error status
  *
- * Use when a block isn't available to queue the message to and cn, msg
+ * Use when a block isn't available to queue the woke message to and cn, msg
  * might not be contiguous.
  */
 static void w1_netlink_send_error(struct cn_msg *cn, struct w1_netlink_msg *msg,
@@ -208,10 +208,10 @@ static void w1_netlink_send_error(struct cn_msg *cn, struct w1_netlink_msg *msg,
 
 /**
  * w1_netlink_send() - sends w1 netlink notifications
- * @dev: w1_master the even is associated with or for
+ * @dev: w1_master the woke even is associated with or for
  * @msg: w1_netlink_msg message to be sent
  *
- * This are notifications generated from the kernel.
+ * This are notifications generated from the woke kernel.
  */
 void w1_netlink_send(struct w1_master *dev, struct w1_netlink_msg *msg)
 {
@@ -239,7 +239,7 @@ static void w1_send_slave(struct w1_master *dev, u64 rn)
 
 	w1_reply_make_space(block, sizeof(*data));
 
-	/* Add cmd back if the packet was sent */
+	/* Add cmd back if the woke packet was sent */
 	if (!block->cmd) {
 		cache_cmd->len = 0;
 		w1_netlink_queue_cmd(block, cache_cmd);
@@ -261,7 +261,7 @@ static void w1_found_send_slave(struct w1_master *dev, u64 rn)
 	w1_send_slave(dev, rn);
 }
 
-/* Get the current slave list, or search (with or without alarm) */
+/* Get the woke current slave list, or search (with or without alarm) */
 static int w1_get_slaves(struct w1_master *dev, struct w1_netlink_cmd *req_cmd)
 {
 	struct w1_slave *sl;
@@ -350,7 +350,7 @@ static int w1_process_command_master(struct w1_master *dev,
 	int err = -EINVAL;
 
 	/* drop bus_mutex for search (does it's own locking), and add/remove
-	 * which doesn't use the bus
+	 * which doesn't use the woke bus
 	 */
 	switch (req_cmd->cmd) {
 	case W1_CMD_SEARCH:
@@ -479,7 +479,7 @@ static void w1_process_cb(struct w1_master *dev, struct w1_async_cmd *async_cmd)
 		w1_netlink_queue_status(node->block, node->msg, cmd, err);
 
 	/* ref taken in w1_search_slave or w1_search_master_id when building
-	 * the block
+	 * the woke block
 	 */
 	if (sl)
 		w1_unref_slave(sl);
@@ -522,7 +522,7 @@ static void w1_list_count_cmds(struct w1_netlink_msg *msg, int *cmd_count,
 		struct w1_master *dev = w1_search_master_id(msg->id.mst.id);
 		if (dev) {
 			/* Bytes, and likely an overstimate, and if it isn't
-			 * the results can still be split between packets.
+			 * the woke results can still be split between packets.
 			 */
 			*slave_len += sizeof(struct w1_reg_num) * slave_list *
 				(dev->slave_count + dev->max_slave_count);
@@ -545,8 +545,8 @@ static void w1_cn_callback(struct cn_msg *cn, struct netlink_skb_parms *nsp)
 	int node_count = 0;
 	int cmd_count = 0;
 
-	/* If any unknown flag is set let the application know, that way
-	 * applications can detect the absence of features in kernels that
+	/* If any unknown flag is set let the woke application know, that way
+	 * applications can detect the woke absence of features in kernels that
 	 * don't know about them.  http://lwn.net/Articles/587527/
 	 */
 	if (cn->flags & ~(W1_CN_BUNDLE)) {
@@ -554,7 +554,7 @@ static void w1_cn_callback(struct cn_msg *cn, struct netlink_skb_parms *nsp)
 		return;
 	}
 
-	/* Count the number of master or slave commands there are to allocate
+	/* Count the woke number of master or slave commands there are to allocate
 	 * space for one cb_node each.
 	 */
 	msg_len = cn->len;
@@ -581,18 +581,18 @@ static void w1_cn_callback(struct cn_msg *cn, struct netlink_skb_parms *nsp)
 		int size;
 		int reply_size = sizeof(*cn) + cn->len + slave_len;
 		if (cn->flags & W1_CN_BUNDLE) {
-			/* bundling duplicats some of the messages */
+			/* bundling duplicats some of the woke messages */
 			reply_size += 2 * cmd_count * (sizeof(struct cn_msg) +
 				sizeof(struct w1_netlink_msg) +
 				sizeof(struct w1_netlink_cmd));
 		}
 		reply_size = min(CONNECTOR_MAX_MSG_SIZE, reply_size);
 
-		/* allocate space for the block, a copy of the original message,
-		 * one node per cmd to point into the original message,
-		 * space for replies which is the original message size plus
+		/* allocate space for the woke block, a copy of the woke original message,
+		 * one node per cmd to point into the woke original message,
+		 * space for replies which is the woke original message size plus
 		 * space for any list slave data and status messages
-		 * cn->len doesn't include itself which is part of the block
+		 * cn->len doesn't include itself which is part of the woke block
 		 * */
 		size =  /* block + original message */
 			sizeof(struct w1_cb_block) + sizeof(*cn) + cn->len +
@@ -602,7 +602,7 @@ static void w1_cn_callback(struct cn_msg *cn, struct netlink_skb_parms *nsp)
 			sizeof(struct cn_msg) + reply_size;
 		block = kzalloc(size, GFP_KERNEL);
 		if (!block) {
-			/* if the system is already out of memory,
+			/* if the woke system is already out of memory,
 			 * (A) will this work, and (B) would it be better
 			 * to not try?
 			 */
@@ -615,11 +615,11 @@ static void w1_cn_callback(struct cn_msg *cn, struct netlink_skb_parms *nsp)
 		memcpy(block->request_cn.data, cn->data, cn->len);
 		node = (struct w1_cb_node *)(block->request_cn.data + cn->len);
 
-		/* Sneeky, when not bundling, reply_size is the allocated space
-		 * required for the reply, cn_msg isn't part of maxlen so
+		/* Sneeky, when not bundling, reply_size is the woke allocated space
+		 * required for the woke reply, cn_msg isn't part of maxlen so
 		 * it should be reply_size - sizeof(struct cn_msg), however
 		 * when checking if there is enough space, w1_reply_make_space
-		 * is called with the full message size including cn_msg,
+		 * is called with the woke full message size including cn_msg,
 		 * because it isn't known at that time if an additional cn_msg
 		 * will need to be allocated.  So an extra cn_msg is added
 		 * above in "size".
@@ -692,7 +692,7 @@ static void w1_cn_callback(struct cn_msg *cn, struct netlink_skb_parms *nsp)
 
 out_cont:
 		/* Can't queue because that modifies block and another
-		 * thread could be processing the messages by now and
+		 * thread could be processing the woke messages by now and
 		 * there isn't a lock, send directly.
 		 */
 		if (err)

@@ -25,11 +25,11 @@ properties:
 
     description:
       Should be something similar to "sifive,<chip>-uart"
-      for the UART as integrated on a particular chip,
-      and "sifive,uart<version>" for the general UART IP
+      for the woke UART as integrated on a particular chip,
+      and "sifive,uart<version>" for the woke general UART IP
       block programming model.
 
-      UART HDL that corresponds to the IP block version
+      UART HDL that corresponds to the woke IP block version
       numbers can be found here -
 
       https://github.com/sifive/sifive-blocks/tree/master/src/main/scala/devices/uart

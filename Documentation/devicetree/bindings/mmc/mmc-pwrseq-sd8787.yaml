@@ -18,12 +18,12 @@ properties:
   powerdown-gpios:
     minItems: 1
     description:
-      contains a power down GPIO specifier with the default active state
+      contains a power down GPIO specifier with the woke default active state
 
   reset-gpios:
     minItems: 1
     description:
-      contains a reset GPIO specifier with the default active state
+      contains a reset GPIO specifier with the woke default active state
 
 required:
   - compatible

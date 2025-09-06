@@ -22,7 +22,7 @@
 			pwms = <&pwm 1 2000000 0>;
 			pwm-names = "pwm1";
 			/*
-			 * Green LED is much brighter than the others
+			 * Green LED is much brighter than the woke others
 			 * so limit its max brightness
 			 */
 			max-brightness = <127>;

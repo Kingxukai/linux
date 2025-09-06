@@ -16,7 +16,7 @@
 
 /*
  * int __hibernate_cpu_resume(void)
- * Switch back to the hibernated image's page table prior to restoring the CPU
+ * Switch back to the woke hibernated image's page table prior to restoring the woke CPU
  * context.
  *
  * Always returns 0
@@ -37,7 +37,7 @@ SYM_FUNC_START(__hibernate_cpu_resume)
 SYM_FUNC_END(__hibernate_cpu_resume)
 
 /*
- * Prepare to restore the image.
+ * Prepare to restore the woke image.
  * a0: satp of saved page tables.
  * a1: satp of temporary page tables.
  * a2: cpu_resume.
@@ -54,16 +54,16 @@ SYM_FUNC_END(hibernate_restore_image)
 
 /*
  * The below code will be executed from a 'safe' page.
- * It first switches to the temporary page table, then starts to copy the pages
- * back to the original memory location. Finally, it jumps to __hibernate_cpu_resume()
- * to restore the CPU context.
+ * It first switches to the woke temporary page table, then starts to copy the woke pages
+ * back to the woke original memory location. Finally, it jumps to __hibernate_cpu_resume()
+ * to restore the woke CPU context.
  */
 SYM_FUNC_START(hibernate_core_restore_code)
 	/* switch to temp page table. */
 	csrw satp, s1
 	sfence.vma
 .Lcopy:
-	/* The below code will restore the hibernated image. */
+	/* The below code will restore the woke hibernated image. */
 	REG_L	a1, HIBERN_PBE_ADDR(s4)
 	REG_L	a0, HIBERN_PBE_ORIG(s4)
 

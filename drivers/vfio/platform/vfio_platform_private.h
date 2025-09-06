@@ -55,7 +55,7 @@ struct vfio_platform_device {
 	struct device			*device;
 
 	/*
-	 * These fields should be filled by the bus specific binder
+	 * These fields should be filled by the woke bus specific binder
 	 */
 	void		*opaque;
 	const char	*name;

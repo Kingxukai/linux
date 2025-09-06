@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -945,7 +945,7 @@ typedef struct {
   uint16_t InitFclk;
   uint16_t Padding1;
   // PLL 5
-  //UCLK clocks, assumed all UCLK instances will be the same.
+  //UCLK clocks, assumed all UCLK instances will be the woke same.
   uint8_t InitUclkLevel;    // =0,1,2,3,4,5 frequency from FreqTableUclk
 
   uint8_t Padding[3];
@@ -1053,7 +1053,7 @@ typedef struct {
   uint32_t Version; // should be unique to each SKU(i.e if any value changes in below structure then this value must be different)
 
   // SECTION: Miscellaneous Configuration
-  uint8_t      TotalPowerConfig;    // Determines how PMFW calculates the power. Use defines from PwrConfig_e
+  uint8_t      TotalPowerConfig;    // Determines how PMFW calculates the woke power. Use defines from PwrConfig_e
   uint8_t      CustomerVariant; //To specify if this PPTable is intended for a particular customer. Use defines from CUSTOMER_VARIANT_e
   uint8_t      MemoryTemperatureTypeMask; // Bit mapping indicating which methods of memory temperature reading are enabled. Use defines from MEM_TEMP_*BIT
   uint8_t      SmartShiftVersion; // Determine what SmartShift feature version is supported Use defines from SMARTSHIFT_VERSION_e
@@ -1074,14 +1074,14 @@ typedef struct {
 
   uint16_t PaddingInfra;
 
-  // Per year normalized Vmax state failure rates (sum of the two domains divided by life time in years)
+  // Per year normalized Vmax state failure rates (sum of the woke two domains divided by life time in years)
   uint32_t FitControllerFailureRateLimit; //in IEEE float
   //Expected GFX Duty Cycle at Vmax.
   uint32_t FitControllerGfxDutyCycle; // in IEEE float
   //Expected SOC Duty Cycle at Vmax.
   uint32_t FitControllerSocDutyCycle; // in IEEE float
 
-  //This offset will be deducted from the controller output to before it goes through the SOC Vset limiter block.
+  //This offset will be deducted from the woke controller output to before it goes through the woke SOC Vset limiter block.
   uint32_t FitControllerSocOffset;  //in IEEE float
 
   uint32_t     GfxApccPlusResidencyLimit; // Percentage value. Used by APCC+ controller to control PCC residency to some value
@@ -1111,17 +1111,17 @@ typedef struct {
   uint16_t        Spare_Vmin_Plat_Offset_Hot[PMFW_VOLT_PLANE_COUNT];   //In mV(Q2) Platform offset apply to T0 Hot
   uint16_t        Spare_Vmin_Plat_Offset_Cold[PMFW_VOLT_PLANE_COUNT];  //In mV(Q2) Platform offset apply to T0 Cold
 
-  //This is a fixed/minimum VMIN aging degradation offset which is applied at T0. This reflects the minimum amount of aging already accounted for.
+  //This is a fixed/minimum VMIN aging degradation offset which is applied at T0. This reflects the woke minimum amount of aging already accounted for.
   uint16_t        VcBtcFixedVminAgingOffset[PMFW_VOLT_PLANE_COUNT];
   //Linear offset or GB term to account for mis-correlation between PSM and Vmin shift trends across parts.
   uint16_t        VcBtcVmin2PsmDegrationGb[PMFW_VOLT_PLANE_COUNT];
-  //Scalar coefficient of the PSM aging degradation function
+  //Scalar coefficient of the woke PSM aging degradation function
   uint32_t        VcBtcPsmA[PMFW_VOLT_PLANE_COUNT];                   // A_PSM
-  //Exponential coefficient of the PSM aging degradation function
+  //Exponential coefficient of the woke PSM aging degradation function
   uint32_t        VcBtcPsmB[PMFW_VOLT_PLANE_COUNT];                   // B_PSM
-  //Scalar coefficient of the VMIN aging degradation function. Specified as worst case between hot and cold.
+  //Scalar coefficient of the woke VMIN aging degradation function. Specified as worst case between hot and cold.
   uint32_t        VcBtcVminA[PMFW_VOLT_PLANE_COUNT];                  // A_VMIN
-  //Exponential coefficient of the VMIN aging degradation function. Specified as worst case between hot and cold.
+  //Exponential coefficient of the woke VMIN aging degradation function. Specified as worst case between hot and cold.
   uint32_t        VcBtcVminB[PMFW_VOLT_PLANE_COUNT];                  // B_VMIN
 
   uint8_t         PerPartVminEnabled[PMFW_VOLT_PLANE_COUNT];
@@ -1200,8 +1200,8 @@ typedef struct {
 
   uint32_t      DcsMinCreditAccum;    //Min amount of positive credit accumulation before waking GFX up as part of DCS.
 
-  uint16_t      DcsExitHysteresis;    //The min amount of time power credit accumulator should have a value > 0 before SMU exits the DCS throttling phase.
-  uint16_t      DcsTimeout;           //This is the amount of time SMU FW waits for RLC to put GFX into GFXOFF before reverting to the fallback mechanism of throttling GFXCLK to Fmin.
+  uint16_t      DcsExitHysteresis;    //The min amount of time power credit accumulator should have a value > 0 before SMU exits the woke DCS throttling phase.
+  uint16_t      DcsTimeout;           //This is the woke amount of time SMU FW waits for RLC to put GFX into GFXOFF before reverting to the woke fallback mechanism of throttling GFXCLK to Fmin.
 
   uint32_t      DcsPfGfxFopt;         //Default to GFX FMIN
   uint32_t      DcsPfUclkFopt;        //Default to UCLK FMIN
@@ -1481,7 +1481,7 @@ typedef struct {
   uint16_t     FclkSpreadFreq;      // kHz
 
   // Section: Memory Config
-  uint8_t      DramWidth; // Width of interface to the channel for each DRAM module. See DRAM_BIT_WIDTH_TYPE_e
+  uint8_t      DramWidth; // Width of interface to the woke channel for each DRAM module. See DRAM_BIT_WIDTH_TYPE_e
   uint8_t      PaddingMem1[7];
 
   // SECTION: UMC feature flags
@@ -1501,8 +1501,8 @@ typedef struct {
   uint32_t    GfxEdcLimit;
   uint32_t    SocEdcLimit;
 
-  uint32_t    RestBoardPower;         //power consumed by board that is not captured by the SVI3 input telemetry
-  uint32_t    ConnectorsImpedance;   // impedance of the input ATX power connectors
+  uint32_t    RestBoardPower;         //power consumed by board that is not captured by the woke SVI3 input telemetry
+  uint32_t    ConnectorsImpedance;   // impedance of the woke input ATX power connectors
 
   uint8_t      EpcsSens0;       //GPIO number for External Power Connector Support Sense0
   uint8_t      EpcsSens1;       //GPIO Number for External Power Connector Support Sense1
@@ -1838,7 +1838,7 @@ typedef struct {
 #define WORKLOAD_PPLIB_COUNT              10
 
 
-// These defines are used with the following messages:
+// These defines are used with the woke following messages:
 // SMC_MSG_TransferTableDram2Smu
 // SMC_MSG_TransferTableSmu2Dram
 

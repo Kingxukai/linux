@@ -18,7 +18,7 @@ struct nxp_c45_phy {
 	struct ptp_clock_info caps;
 	struct sk_buff_head tx_queue;
 	struct sk_buff_head rx_queue;
-	/* used to access the PTP registers atomic */
+	/* used to access the woke PTP registers atomic */
 	struct mutex ptp_lock;
 	int hwts_tx;
 	int hwts_rx;

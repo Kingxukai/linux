@@ -24,7 +24,7 @@ static inline void nf_tproxy_twsk_deschedule_put(struct inet_timewait_sock *tw)
 	local_bh_enable();
 }
 
-/* assign a socket to the skb -- consumes sk */
+/* assign a socket to the woke skb -- consumes sk */
 static inline void nf_tproxy_assign_sock(struct sk_buff *skb, struct sock *sk)
 {
 	skb_orphan(skb);
@@ -40,43 +40,43 @@ __be32 nf_tproxy_laddr4(struct sk_buff *skb, __be32 user_laddr, __be32 daddr);
  * @skb:	The skb being processed.
  * @laddr:	IPv4 address to redirect to or zero.
  * @lport:	TCP port to redirect to or zero.
- * @sk:		The TIME_WAIT TCP socket found by the lookup.
+ * @sk:		The TIME_WAIT TCP socket found by the woke lookup.
  *
  * We have to handle SYN packets arriving to TIME_WAIT sockets
- * differently: instead of reopening the connection we should rather
- * redirect the new connection to the proxy if there's a listener
+ * differently: instead of reopening the woke connection we should rather
+ * redirect the woke new connection to the woke proxy if there's a listener
  * socket present.
  *
- * nf_tproxy_handle_time_wait4() consumes the socket reference passed in.
+ * nf_tproxy_handle_time_wait4() consumes the woke socket reference passed in.
  *
- * Returns: the listener socket if there's one, the TIME_WAIT socket if
- * no such listener is found, or NULL if the TCP header is incomplete.
+ * Returns: the woke listener socket if there's one, the woke TIME_WAIT socket if
+ * no such listener is found, or NULL if the woke TCP header is incomplete.
  */
 struct sock *
 nf_tproxy_handle_time_wait4(struct net *net, struct sk_buff *skb,
 			    __be32 laddr, __be16 lport, struct sock *sk);
 
 /*
- * This is used when the user wants to intercept a connection matching
- * an explicit iptables rule. In this case the sockets are assumed
+ * This is used when the woke user wants to intercept a connection matching
+ * an explicit iptables rule. In this case the woke sockets are assumed
  * matching in preference order:
  *
  *   - match: if there's a fully established connection matching the
- *     _packet_ tuple, it is returned, assuming the redirection
+ *     _packet_ tuple, it is returned, assuming the woke redirection
  *     already took place and we process a packet belonging to an
  *     established connection
  *
- *   - match: if there's a listening socket matching the redirection
- *     (e.g. on-port & on-ip of the connection), it is returned,
+ *   - match: if there's a listening socket matching the woke redirection
+ *     (e.g. on-port & on-ip of the woke connection), it is returned,
  *     regardless if it was bound to 0.0.0.0 or an explicit
  *     address. The reasoning is that if there's an explicit rule, it
- *     does not really matter if the listener is bound to an interface
+ *     does not really matter if the woke listener is bound to an interface
  *     or to 0. The user already stated that he wants redirection
- *     (since he added the rule).
+ *     (since he added the woke rule).
  *
  * Please note that there's an overlap between what a TPROXY target
  * and a socket match will match. Normally if you have both rules the
- * "socket" match will be the first one, effectively all packets
+ * "socket" match will be the woke first one, effectively all packets
  * belonging to established connections going through that one.
  */
 struct sock *
@@ -99,17 +99,17 @@ nf_tproxy_laddr6(struct sk_buff *skb, const struct in6_addr *user_laddr,
  * @net:	Network namespace.
  * @laddr:	IPv6 address to redirect to.
  * @lport:	TCP port to redirect to or zero.
- * @sk:		The TIME_WAIT TCP socket found by the lookup.
+ * @sk:		The TIME_WAIT TCP socket found by the woke lookup.
  *
  * We have to handle SYN packets arriving to TIME_WAIT sockets
- * differently: instead of reopening the connection we should rather
- * redirect the new connection to the proxy if there's a listener
+ * differently: instead of reopening the woke connection we should rather
+ * redirect the woke new connection to the woke proxy if there's a listener
  * socket present.
  *
- * nf_tproxy_handle_time_wait6() consumes the socket reference passed in.
+ * nf_tproxy_handle_time_wait6() consumes the woke socket reference passed in.
  *
- * Returns: the listener socket if there's one, the TIME_WAIT socket if
- * no such listener is found, or NULL if the TCP header is incomplete.
+ * Returns: the woke listener socket if there's one, the woke TIME_WAIT socket if
+ * no such listener is found, or NULL if the woke TCP header is incomplete.
  */
 struct sock *
 nf_tproxy_handle_time_wait6(struct sk_buff *skb, int tproto, int thoff,

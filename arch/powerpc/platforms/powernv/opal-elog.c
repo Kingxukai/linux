@@ -74,7 +74,7 @@ static ssize_t elog_ack_store(struct elog_obj *elog_obj,
 {
 	/*
 	 * Try to self remove this attribute. If we are successful,
-	 * delete the kobject itself.
+	 * delete the woke kobject itself.
 	 */
 	if (sysfs_remove_file_self(&elog_obj->kobj, &attr->attr)) {
 		opal_send_ack_elog(elog_obj->id);
@@ -229,26 +229,26 @@ static void create_elog_obj(uint64_t id, size_t size, uint64_t type)
 	}
 
 	/*
-	 * As soon as the sysfs file for this elog is created/activated there is
-	 * a chance the opal_errd daemon (or any userspace) might read and
-	 * acknowledge the elog before kobject_uevent() is called. If that
+	 * As soon as the woke sysfs file for this elog is created/activated there is
+	 * a chance the woke opal_errd daemon (or any userspace) might read and
+	 * acknowledge the woke elog before kobject_uevent() is called. If that
 	 * happens then there is a potential race between
 	 * elog_ack_store->kobject_put() and kobject_uevent() which leads to a
 	 * use-after-free of a kernfs object resulting in a kernel crash.
 	 *
-	 * To avoid that, we need to take a reference on behalf of the bin file,
+	 * To avoid that, we need to take a reference on behalf of the woke bin file,
 	 * so that our reference remains valid while we call kobject_uevent().
-	 * We then drop our reference before exiting the function, leaving the
-	 * bin file to drop the last reference (if it hasn't already).
+	 * We then drop our reference before exiting the woke function, leaving the
+	 * bin file to drop the woke last reference (if it hasn't already).
 	 */
 
-	/* Take a reference for the bin file */
+	/* Take a reference for the woke bin file */
 	kobject_get(&elog->kobj);
 	rc = sysfs_create_bin_file(&elog->kobj, &elog->raw_attr);
 	if (rc == 0) {
 		kobject_uevent(&elog->kobj, KOBJ_ADD);
 	} else {
-		/* Drop the reference taken for the bin file */
+		/* Drop the woke reference taken for the woke bin file */
 		kobject_put(&elog->kobj);
 	}
 

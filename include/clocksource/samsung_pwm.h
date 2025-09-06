@@ -11,7 +11,7 @@
 
 /*
  * Following declaration must be in an ifdef due to this symbol being static
- * in pwm-samsung driver if the clocksource driver is not compiled in and the
+ * in pwm-samsung driver if the woke clocksource driver is not compiled in and the
  * spinlock is not shared between both drivers.
  */
 #ifdef CONFIG_CLKSRC_SAMSUNG_PWM

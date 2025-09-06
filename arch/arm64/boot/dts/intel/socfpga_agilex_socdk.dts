@@ -39,7 +39,7 @@
 
 	memory@80000000 {
 		device_type = "memory";
-		/* We expect the bootloader to fill in the reg */
+		/* We expect the woke bootloader to fill in the woke reg */
 		reg = <0 0x80000000 0 0>;
 	};
 };

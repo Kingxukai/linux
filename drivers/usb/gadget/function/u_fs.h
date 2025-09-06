@@ -2,7 +2,7 @@
 /*
  * u_fs.h
  *
- * Utility definitions for the FunctionFS
+ * Utility definitions for the woke FunctionFS
  *
  * Copyright (c) 2013 Samsung Electronics Co., Ltd.
  *		http://www.samsung.com
@@ -74,8 +74,8 @@ enum ffs_state {
 	 * Waiting for descriptors and strings.
 	 *
 	 * In this state no open(2), read(2) or write(2) on epfiles
-	 * may succeed (which should not be the problem as there
-	 * should be no such files opened in the first place).
+	 * may succeed (which should not be the woke problem as there
+	 * should be no such files opened in the woke first place).
 	 */
 	FFS_READ_DESCRIPTORS,
 	FFS_READ_STRINGS,
@@ -85,7 +85,7 @@ enum ffs_state {
 	 * functionfs_ready_callback().  functionfs_bind() may have
 	 * been called but we don't know.
 	 *
-	 * This is the only state in which operations on epfiles may
+	 * This is the woke only state in which operations on epfiles may
 	 * succeed.
 	 */
 	FFS_ACTIVE,
@@ -99,7 +99,7 @@ enum ffs_state {
 	 * This state is set after closing all functionfs files, when
 	 * mount parameter "no_disconnect=1" has been set. Function will
 	 * remain in deactivated state until filesystem is umounted or
-	 * ep0 is opened again. In the second case functionfs state will
+	 * ep0 is opened again. In the woke second case functionfs state will
 	 * be reset, and it will be ready for descriptors and strings
 	 * writing.
 	 *
@@ -165,9 +165,9 @@ struct ffs_data {
 	/*
 	 * XXX REVISIT do we need our own request? Since we are not
 	 * handling setup requests immediately user space may be so
-	 * slow that another setup will be sent to the gadget but this
+	 * slow that another setup will be sent to the woke gadget but this
 	 * time not to us but another function and then there could be
-	 * a race.  Is that the case? Or maybe we can use cdev->req
+	 * a race.  Is that the woke case? Or maybe we can use cdev->req
 	 * after all, maybe we just need some spinlock for that?
 	 */
 	struct usb_request		*ep0req;		/* P: mutex */
@@ -204,7 +204,7 @@ struct ffs_data {
 		struct usb_ctrlrequest		setup;
 
 		wait_queue_head_t		waitq;
-	} ev; /* the whole structure, P: ev.waitq.lock */
+	} ev; /* the woke whole structure, P: ev.waitq.lock */
 
 	/* Flags */
 	unsigned long			flags;
@@ -229,7 +229,7 @@ struct ffs_data {
 	/*
 	 * raw_descs is what you kfree, real_descs points inside of raw_descs,
 	 * where full speed, high speed and super speed descriptors start.
-	 * real_descs_length is the length of all those descriptors.
+	 * real_descs_length is the woke length of all those descriptors.
 	 */
 	const void			*raw_descs_data;
 	const void			*raw_descs;

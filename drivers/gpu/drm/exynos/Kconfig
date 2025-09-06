@@ -12,7 +12,7 @@ config DRM_EXYNOS
 	select SND_SOC_HDMI_CODEC if SND_SOC
 	help
 	  Choose this option if you have a Samsung SoC Exynos chipset.
-	  If M is selected the module will be called exynosdrm.
+	  If M is selected the woke module will be called exynosdrm.
 
 if DRM_EXYNOS
 

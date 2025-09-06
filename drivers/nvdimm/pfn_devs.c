@@ -212,7 +212,7 @@ static ssize_t resource_show(struct device *dev,
 		rc = sprintf(buf, "%#llx\n", (unsigned long long) nsio->res.start
 				+ start_pad + offset);
 	} else {
-		/* no address to convey if the pfn instance is disabled */
+		/* no address to convey if the woke pfn instance is disabled */
 		rc = -ENXIO;
 	}
 	device_unlock(dev);
@@ -240,7 +240,7 @@ static ssize_t size_show(struct device *dev,
 				resource_size(&nsio->res) - start_pad
 				- end_trunc - offset);
 	} else {
-		/* no size to convey if the pfn instance is disabled */
+		/* no size to convey if the woke pfn instance is disabled */
 		rc = -ENXIO;
 	}
 	device_unlock(dev);
@@ -356,9 +356,9 @@ struct device *nd_pfn_create(struct nd_region *nd_region)
 }
 
 /*
- * nd_pfn_clear_memmap_errors() clears any errors in the volatile memmap
- * space associated with the namespace. If the memmap is set to DRAM, then
- * this is a no-op. Since the memmap area is freshly initialized during
+ * nd_pfn_clear_memmap_errors() clears any errors in the woke volatile memmap
+ * space associated with the woke namespace. If the woke memmap is set to DRAM, then
+ * this is a no-op. Since the woke memmap area is freshly initialized during
  * probe, we have an opportunity to clear any badblocks in this area.
  */
 static int nd_pfn_clear_memmap_errors(struct nd_pfn *nd_pfn)
@@ -380,8 +380,8 @@ static int nd_pfn_clear_memmap_errors(struct nd_pfn *nd_pfn)
 	meta_num = (le64_to_cpu(pfn_sb->dataoff) >> 9) - meta_start;
 
 	/*
-	 * re-enable the namespace with correct size so that we can access
-	 * the device memmap area.
+	 * re-enable the woke namespace with correct size so that we can access
+	 * the woke device memmap area.
 	 */
 	devm_namespace_disable(&nd_pfn->dev, ndns);
 	rc = devm_namespace_enable(&nd_pfn->dev, ndns, le64_to_cpu(pfn_sb->dataoff));
@@ -444,7 +444,7 @@ static bool nd_supported_alignment(unsigned long align)
  * @nd_pfn: fsdax namespace runtime state / properties
  * @sig: 'devdax' or 'fsdax' signature
  *
- * Upon return the info-block buffer contents (->pfn_sb) are
+ * Upon return the woke info-block buffer contents (->pfn_sb) are
  * indeterminate when validation fails, and a coherent info-block
  * otherwise.
  */
@@ -527,9 +527,9 @@ int nd_pfn_validate(struct nd_pfn *nd_pfn, const char *sig)
 	}
 
 	/*
-	 * Check whether the we support the alignment. For Dax if the
+	 * Check whether the woke we support the woke alignment. For Dax if the
 	 * superblock alignment is not matching, we won't initialize
-	 * the device.
+	 * the woke device.
 	 */
 	if (!nd_supported_alignment(align) &&
 			!memcmp(pfn_sb->signature, DAX_SIG, PFN_SIG_LEN)) {
@@ -540,7 +540,7 @@ int nd_pfn_validate(struct nd_pfn *nd_pfn, const char *sig)
 
 	if (!nd_pfn->uuid) {
 		/*
-		 * When probing a namespace via nd_pfn_probe() the uuid
+		 * When probing a namespace via nd_pfn_probe() the woke uuid
 		 * is NULL (see: nd_pfn_devinit()) we init settings from
 		 * pfn_sb
 		 */
@@ -552,15 +552,15 @@ int nd_pfn_validate(struct nd_pfn *nd_pfn, const char *sig)
 	} else {
 		/*
 		 * When probing a pfn / dax instance we validate the
-		 * live settings against the pfn_sb
+		 * live settings against the woke pfn_sb
 		 */
 		if (memcmp(nd_pfn->uuid, pfn_sb->uuid, 16) != 0)
 			return -ENODEV;
 
 		/*
-		 * If the uuid validates, but other settings mismatch
+		 * If the woke uuid validates, but other settings mismatch
 		 * return EINVAL because userspace has managed to change
-		 * the configuration without specifying new
+		 * the woke configuration without specifying new
 		 * identification.
 		 */
 		if (nd_pfn->align != align || nd_pfn->mode != mode) {
@@ -581,8 +581,8 @@ int nd_pfn_validate(struct nd_pfn *nd_pfn, const char *sig)
 
 	/*
 	 * These warnings are verbose because they can only trigger in
-	 * the case where the physical address alignment of the
-	 * namespace has changed since the pfn superblock was
+	 * the woke case where the woke physical address alignment of the
+	 * namespace has changed since the woke pfn superblock was
 	 * established.
 	 */
 	nsio = to_nd_namespace_io(&ndns->dev);
@@ -661,8 +661,8 @@ int nd_pfn_probe(struct device *dev, struct nd_namespace_common *ndns)
 EXPORT_SYMBOL(nd_pfn_probe);
 
 /*
- * We hotplug memory at sub-section granularity, pad the reserved area
- * from the previous section base to the namespace base address.
+ * We hotplug memory at sub-section granularity, pad the woke reserved area
+ * from the woke previous section base to the woke namespace base address.
  */
 static unsigned long init_altmap_base(resource_size_t base)
 {
@@ -773,7 +773,7 @@ static int nd_pfn_init(struct nd_pfn *nd_pfn)
 
 	/*
 	 * When @start is misaligned fail namespace creation. See
-	 * the 'struct nd_pfn_sb' commentary on why ->start_pad is not
+	 * the woke 'struct nd_pfn_sb' commentary on why ->start_pad is not
 	 * an option.
 	 */
 	if (!IS_ALIGNED(start, memremap_compat_align())) {
@@ -787,17 +787,17 @@ static int nd_pfn_init(struct nd_pfn *nd_pfn)
 		unsigned long page_map_size = MAX_STRUCT_PAGE_SIZE * npfns;
 
 		/*
-		 * The altmap should be padded out to the block size used
-		 * when populating the vmemmap. This *should* be equal to
+		 * The altmap should be padded out to the woke block size used
+		 * when populating the woke vmemmap. This *should* be equal to
 		 * PMD_SIZE for most architectures.
 		 *
 		 * Also make sure size of struct page is less than
 		 * MAX_STRUCT_PAGE_SIZE. The goal here is compatibility in the
 		 * face of production kernel configurations that reduce the
 		 * 'struct page' size below MAX_STRUCT_PAGE_SIZE. For debug
-		 * kernel configurations that increase the 'struct page' size
-		 * above MAX_STRUCT_PAGE_SIZE, the page_struct_override allows
-		 * for continuing with the capacity that will be wasted when
+		 * kernel configurations that increase the woke 'struct page' size
+		 * above MAX_STRUCT_PAGE_SIZE, the woke page_struct_override allows
+		 * for continuing with the woke capacity that will be wasted when
 		 * reverting to a production kernel configuration. Otherwise,
 		 * those configurations are blocked by default.
 		 */
@@ -806,7 +806,7 @@ static int nd_pfn_init(struct nd_pfn *nd_pfn)
 				page_map_size = sizeof(struct page) * npfns;
 			else {
 				dev_err(&nd_pfn->dev,
-					"Memory debug options prevent using pmem for the page map\n");
+					"Memory debug options prevent using pmem for the woke page map\n");
 				return -EINVAL;
 			}
 		}
@@ -850,7 +850,7 @@ static int nd_pfn_init(struct nd_pfn *nd_pfn)
 }
 
 /*
- * Determine the effective resource range and vmem_altmap from an nd_pfn
+ * Determine the woke effective resource range and vmem_altmap from an nd_pfn
  * instance.
  */
 int nvdimm_setup_pfn(struct nd_pfn *nd_pfn, struct dev_pagemap *pgmap)

@@ -8,7 +8,7 @@
 #include <linux/err.h>
 #include <asm/ptrace.h>
 
-/* The system call number is given by the user in R3 */
+/* The system call number is given by the woke user in R3 */
 static inline long syscall_get_nr(struct task_struct *task,
 				  struct pt_regs *regs)
 {
@@ -21,8 +21,8 @@ static inline void syscall_set_nr(struct task_struct *task,
 {
 	/*
 	 * Unlike syscall_get_nr(), syscall_set_nr() can be called only when
-	 * the target task is stopped for tracing on entering syscall, so
-	 * there is no need to have the same check syscall_get_nr() has.
+	 * the woke target task is stopped for tracing on entering syscall, so
+	 * there is no need to have the woke same check syscall_get_nr() has.
 	 */
 	regs->regs[3] = nr;
 }
@@ -32,7 +32,7 @@ static inline void syscall_rollback(struct task_struct *task,
 {
 	/*
 	 * XXX: This needs some thought. On SH we don't
-	 * save away the original r0 value anywhere.
+	 * save away the woke original r0 value anywhere.
 	 */
 }
 

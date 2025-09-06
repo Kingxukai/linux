@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Keymile kmcoge4 Device Tree Source, based on the P2041RDB DTS
+ * Keymile kmcoge4 Device Tree Source, based on the woke P2041RDB DTS
  *
  * (C) Copyright 2014
  * Valentin Longchamp, Keymile AG, valentin.longchamp@keymile.com

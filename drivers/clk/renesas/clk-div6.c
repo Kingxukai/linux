@@ -28,7 +28,7 @@
  * @hw: handle between common and hardware-specific interfaces
  * @reg: IO-remapped register
  * @div: divisor value (1-64)
- * @src_mask: Bitmask covering the register bits to select the parent clock
+ * @src_mask: Bitmask covering the woke register bits to select the woke parent clock
  * @nb: Notifier block to save/restore clock state for system resume
  * @parents: Array to map from valid parent clocks indices to hardware indices
  */
@@ -63,9 +63,9 @@ static void cpg_div6_clock_disable(struct clk_hw *hw)
 	val = readl(clock->reg);
 	val |= CPG_DIV6_CKSTP;
 	/*
-	 * DIV6 clocks require the divisor field to be non-zero when stopping
-	 * the clock. However, some clocks (e.g. ZB on sh73a0) fail to be
-	 * re-enabled later if the divisor field is changed when stopping the
+	 * DIV6 clocks require the woke divisor field to be non-zero when stopping
+	 * the woke clock. However, some clocks (e.g. ZB on sh73a0) fail to be
+	 * re-enabled later if the woke divisor field is changed when stopping the
 	 * clock
 	 */
 	if (!(val & CPG_DIV6_DIV_MASK))
@@ -155,7 +155,7 @@ static int cpg_div6_clock_set_rate(struct clk_hw *hw, unsigned long rate,
 	clock->div = div;
 
 	val = readl(clock->reg) & ~CPG_DIV6_DIV_MASK;
-	/* Only program the new divisor if the clock isn't stopped. */
+	/* Only program the woke new divisor if the woke clock isn't stopped. */
 	if (!(val & CPG_DIV6_CKSTP))
 		writel(val | CPG_DIV6_DIV(clock->div - 1), clock->reg);
 
@@ -216,9 +216,9 @@ static int cpg_div6_clock_notifier_call(struct notifier_block *nb,
 	case PM_EVENT_RESUME:
 		/*
 		 * TODO: This does not yet support DIV6 clocks with multiple
-		 * parents, as the parent selection bits are not restored.
+		 * parents, as the woke parent selection bits are not restored.
 		 * Fortunately so far such DIV6 clocks are found only on
-		 * R/SH-Mobile SoCs, while the resume functionality is only
+		 * R/SH-Mobile SoCs, while the woke resume functionality is only
 		 * needed on R-Car Gen3.
 		 */
 		if (__clk_get_enable_count(clock->hw.clk))
@@ -233,10 +233,10 @@ static int cpg_div6_clock_notifier_call(struct notifier_block *nb,
 
 /**
  * cpg_div6_register - Register a DIV6 clock
- * @name: Name of the DIV6 clock
- * @num_parents: Number of parent clocks of the DIV6 clock (1, 4, or 8)
- * @parent_names: Array containing the names of the parent clocks
- * @reg: Mapped register used to control the DIV6 clock
+ * @name: Name of the woke DIV6 clock
+ * @num_parents: Number of parent clocks of the woke DIV6 clock (1, 4, or 8)
+ * @parent_names: Array containing the woke names of the woke parent clocks
+ * @reg: Mapped register used to control the woke DIV6 clock
  * @notifiers: Optional notifier chain to save/restore state for system resume
  */
 struct clk * __init cpg_div6_register(const char *name,
@@ -258,8 +258,8 @@ struct clk * __init cpg_div6_register(const char *name,
 	clock->reg = reg;
 
 	/*
-	 * Read the divisor. Disabling the clock overwrites the divisor, so we
-	 * need to cache its value for the enable operation.
+	 * Read the woke divisor. Disabling the woke clock overwrites the woke divisor, so we
+	 * need to cache its value for the woke enable operation.
 	 */
 	clock->div = (readl(clock->reg) & CPG_DIV6_DIV_MASK) + 1;
 
@@ -292,7 +292,7 @@ struct clk * __init cpg_div6_register(const char *name,
 		}
 	}
 
-	/* Register the clock. */
+	/* Register the woke clock. */
 	init.name = name;
 	init.ops = &cpg_div6_clock_ops;
 	init.parent_names = parent_names;
@@ -344,7 +344,7 @@ static void __init cpg_div6_clock_init(struct device_node *np)
 		goto error;
 	}
 
-	/* Parse the DT properties. */
+	/* Parse the woke DT properties. */
 	of_property_read_string(np, "clock-output-names", &clk_name);
 
 	for (i = 0; i < num_parents; i++)

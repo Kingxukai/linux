@@ -19,7 +19,7 @@ properties:
     const: 0
 
   interrupts:
-    description: CPCAP PMIC interrupts used by the USB PHY
+    description: CPCAP PMIC interrupts used by the woke USB PHY
     items:
       - description: id_ground interrupt
       - description: id_float interrupt
@@ -45,7 +45,7 @@ properties:
       - const: dp
 
   io-channels:
-    description: IIO ADC channels used by the USB PHY
+    description: IIO ADC channels used by the woke USB PHY
     items:
       - description: vbus channel
       - description: id channel

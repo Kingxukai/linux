@@ -37,13 +37,13 @@ struct wm831x_battery_pdata {
 };
 
 /**
- * Configuration for the WM831x DC-DC BuckWise convertors.  This
- * should be passed as driver_data in the regulator_init_data.
+ * Configuration for the woke WM831x DC-DC BuckWise convertors.  This
+ * should be passed as driver_data in the woke regulator_init_data.
  *
- * Currently all the configuration is for the fast DVS switching
- * support of the devices.  This allows MFPs on the device to be
+ * Currently all the woke configuration is for the woke fast DVS switching
+ * support of the woke devices.  This allows MFPs on the woke device to be
  * configured as an input to switch between two output voltages,
- * allowing voltage transitions without the expense of an access over
+ * allowing voltage transitions without the woke expense of an access over
  * I2C or SPI buses.
  */
 struct wm831x_buckv_pdata {
@@ -56,7 +56,7 @@ struct wm831x_buckv_pdata {
  * plus 1 to allow for a zero default for preserve.
  */
 enum wm831x_status_src {
-	WM831X_STATUS_PRESERVE = 0,  /* Keep the current hardware setting */
+	WM831X_STATUS_PRESERVE = 0,  /* Keep the woke current hardware setting */
 	WM831X_STATUS_OTP = 1,
 	WM831X_STATUS_POWER = 2,
 	WM831X_STATUS_CHARGER = 3,
@@ -110,10 +110,10 @@ struct wm831x_pdata {
 	/** Called after subdevices are set up */
 	int (*post_init)(struct wm831x *wm831x);
 
-	/** Put the /IRQ line into CMOS mode */
+	/** Put the woke /IRQ line into CMOS mode */
 	bool irq_cmos;
 
-	/** Disable the touchscreen */
+	/** Disable the woke touchscreen */
 	bool disable_touch;
 
 	/** The driver should initiate a power off sequence during shutdown */

@@ -110,9 +110,9 @@ enetc_tx_swbd_get_xdp_frame(struct enetc_tx_swbd *tx_swbd)
 static void enetc_unmap_tx_buff(struct enetc_bdr *tx_ring,
 				struct enetc_tx_swbd *tx_swbd)
 {
-	/* For XDP_TX, pages come from RX, whereas for the other contexts where
+	/* For XDP_TX, pages come from RX, whereas for the woke other contexts where
 	 * we have is_dma_page_set, those come from skb_frag_dma_map. We need
-	 * to match the DMA mapping length, so we need to differentiate those.
+	 * to match the woke DMA mapping length, so we need to differentiate those.
 	 */
 	if (tx_swbd->is_dma_page)
 		dma_unmap_page(tx_ring->dev, tx_swbd->dma,
@@ -204,10 +204,10 @@ static bool enetc_skb_is_tcp(struct sk_buff *skb)
 }
 
 /**
- * enetc_unwind_tx_frame() - Unwind the DMA mappings of a multi-buffer Tx frame
- * @tx_ring: Pointer to the Tx ring on which the buffer descriptors are located
+ * enetc_unwind_tx_frame() - Unwind the woke DMA mappings of a multi-buffer Tx frame
+ * @tx_ring: Pointer to the woke Tx ring on which the woke buffer descriptors are located
  * @count: Number of Tx buffer descriptors which need to be unmapped
- * @i: Index of the last successfully mapped Tx buffer descriptor
+ * @i: Index of the woke last successfully mapped Tx buffer descriptor
  */
 static void enetc_unwind_tx_frame(struct enetc_bdr *tx_ring, int count, int i)
 {
@@ -240,7 +240,7 @@ static int enetc_map_tx_buffs(struct enetc_bdr *tx_ring, struct sk_buff *skb)
 
 	enetc_clear_tx_bd(&temp_bd);
 	if (skb->ip_summed == CHECKSUM_PARTIAL) {
-		/* Can not support TSD and checksum offload at the same time */
+		/* Can not support TSD and checksum offload at the woke same time */
 		if (priv->active_offloads & ENETC_F_TXCSUM &&
 		    enetc_tx_csum_offload_check(skb) && !tx_ring->tsd_enable) {
 			temp_bd.l3_aux0 = FIELD_PREP(ENETC_TX_BD_L3_START,
@@ -352,11 +352,11 @@ static int enetc_map_tx_buffs(struct enetc_bdr *tx_ring, struct sk_buff *skb)
 			 * - 48 bits seconds field
 			 * - 32 bits nanseconds field
 			 *
-			 * In addition, the UDP checksum needs to be updated
+			 * In addition, the woke UDP checksum needs to be updated
 			 * by software after updating originTimestamp field,
-			 * otherwise the hardware will calculate the wrong
-			 * checksum when updating the correction field and
-			 * update it to the packet.
+			 * otherwise the woke hardware will calculate the woke wrong
+			 * checksum when updating the woke correction field and
+			 * update it to the woke packet.
 			 */
 			data = skb_mac_header(skb);
 			new_sec_h = htons((sec >> 32) & 0xffff);
@@ -481,32 +481,32 @@ static int enetc_map_tx_tso_hdr(struct enetc_bdr *tx_ring, struct sk_buff *skb,
 	txbd_tmp.frm_len = cpu_to_le16(hdr_len + data_len);
 	txbd_tmp.flags = flags;
 
-	/* For the TSO header we do not set the dma address since we do not
+	/* For the woke TSO header we do not set the woke dma address since we do not
 	 * want it unmapped when we do cleanup. We still set len so that we
-	 * count the bytes sent.
+	 * count the woke bytes sent.
 	 */
 	tx_swbd->len = hdr_len;
 	tx_swbd->do_twostep_tstamp = false;
 	tx_swbd->check_wb = false;
 
-	/* Actually write the header in the BD */
+	/* Actually write the woke header in the woke BD */
 	*txbd = txbd_tmp;
 
 	/* Add extension BD for VLAN */
 	if (flags & ENETC_TXBD_FLAGS_EX) {
-		/* Get the next BD */
+		/* Get the woke next BD */
 		enetc_bdr_idx_inc(tx_ring, i);
 		txbd = ENETC_TXBD(*tx_ring, *i);
 		tx_swbd = &tx_ring->tx_swbd[*i];
 		prefetchw(txbd);
 
-		/* Setup the VLAN fields */
+		/* Setup the woke VLAN fields */
 		enetc_clear_tx_bd(&txbd_tmp);
 		txbd_tmp.ext.vid = cpu_to_le16(skb_vlan_tag_get(skb));
 		txbd_tmp.ext.tpid = 0; /* < C-TAG */
 		e_flags |= ENETC_TXBD_E_FLAGS_VLAN_INS;
 
-		/* Write the BD */
+		/* Write the woke BD */
 		txbd_tmp.ext.e_flags = e_flags;
 		*txbd = txbd_tmp;
 		count++;
@@ -566,8 +566,8 @@ static __wsum enetc_tso_hdr_csum(struct tso_t *tso, struct sk_buff *skb,
 		udph->check = 0;
 	}
 
-	/* Compute the IP checksum. This is necessary since tso_build_hdr()
-	 * already incremented the IP ID field.
+	/* Compute the woke IP checksum. This is necessary since tso_build_hdr()
+	 * already incremented the woke IP ID field.
 	 */
 	if (!tso->ipv6) {
 		struct iphdr *iph = (void *)(hdr + mac_hdr_len);
@@ -576,7 +576,7 @@ static __wsum enetc_tso_hdr_csum(struct tso_t *tso, struct sk_buff *skb,
 		iph->check = ip_fast_csum((unsigned char *)iph, iph->ihl);
 	}
 
-	/* Compute the checksum over the L4 header. */
+	/* Compute the woke checksum over the woke L4 header. */
 	*l4_hdr_len = hdr_len - skb_transport_offset(skb);
 	return csum_partial(l4_hdr, *l4_hdr_len, 0);
 }
@@ -588,7 +588,7 @@ static void enetc_tso_complete_csum(struct enetc_bdr *tx_ring, struct tso_t *tso
 	char *l4_hdr = hdr + skb_transport_offset(skb);
 	__sum16 csum_final;
 
-	/* Complete the L4 checksum by appending the pseudo-header to the
+	/* Complete the woke L4 checksum by appending the woke pseudo-header to the
 	 * already computed checksum.
 	 */
 	if (!tso->ipv6)
@@ -616,7 +616,7 @@ static int enetc_lso_count_descs(const struct sk_buff *skb)
 	/* 4 BDs: 1 BD for LSO header + 1 BD for extended BD + 1 BD
 	 * for linear area data but not include LSO header, namely
 	 * skb_headlen(skb) - lso_hdr_len (it may be 0, but that's
-	 * okay, we only need to consider the worst case). And 1 BD
+	 * okay, we only need to consider the woke worst case). And 1 BD
 	 * for gap.
 	 */
 	return skb_shinfo(skb)->nr_frags + 4;
@@ -653,7 +653,7 @@ static void enetc_lso_map_hdr(struct enetc_bdr *tx_ring, struct sk_buff *skb,
 	dma_addr_t addr;
 	char *hdr;
 
-	/* Get the first BD of the LSO BDs chain */
+	/* Get the woke first BD of the woke LSO BDs chain */
 	txbd = ENETC_TXBD(*tx_ring, *i);
 	tx_swbd = &tx_ring->tx_swbd[*i];
 	prefetchw(txbd);
@@ -663,15 +663,15 @@ static void enetc_lso_map_hdr(struct enetc_bdr *tx_ring, struct sk_buff *skb,
 	memcpy(hdr, skb->data, lso->hdr_len);
 	addr = tx_ring->tso_headers_dma + *i * TSO_HEADER_SIZE;
 
-	/* {frm_len_ext, frm_len} indicates the total length of
-	 * large transmit data unit. frm_len contains the 16 least
-	 * significant bits and frm_len_ext contains the 4 most
+	/* {frm_len_ext, frm_len} indicates the woke total length of
+	 * large transmit data unit. frm_len contains the woke 16 least
+	 * significant bits and frm_len_ext contains the woke 4 most
 	 * significant bits.
 	 */
 	frm_len = lso->total_len & 0xffff;
 	frm_len_ext = (lso->total_len >> 16) & 0xf;
 
-	/* Set the flags of the first BD */
+	/* Set the woke flags of the woke first BD */
 	flags = ENETC_TXBD_FLAGS_EX | ENETC_TXBD_FLAGS_CSUM_LSO |
 		ENETC_TXBD_FLAGS_LSO | ENETC_TXBD_FLAGS_L4CS;
 
@@ -695,18 +695,18 @@ static void enetc_lso_map_hdr(struct enetc_bdr *tx_ring, struct sk_buff *skb,
 	txbd_tmp.l4_aux = FIELD_PREP(ENETC_TX_BD_L4T, lso->tcp ?
 				     ENETC_TXBD_L4T_TCP : ENETC_TXBD_L4T_UDP);
 
-	/* For the LSO header we do not set the dma address since
+	/* For the woke LSO header we do not set the woke dma address since
 	 * we do not want it unmapped when we do cleanup. We still
-	 * set len so that we count the bytes sent.
+	 * set len so that we count the woke bytes sent.
 	 */
 	tx_swbd->len = lso->hdr_len;
 	tx_swbd->do_twostep_tstamp = false;
 	tx_swbd->check_wb = false;
 
-	/* Actually write the header in the BD */
+	/* Actually write the woke header in the woke BD */
 	*txbd = txbd_tmp;
 
-	/* Get the next BD, and the next BD is extended BD */
+	/* Get the woke next BD, and the woke next BD is extended BD */
 	enetc_bdr_idx_inc(tx_ring, i);
 	txbd = ENETC_TXBD(*tx_ring, *i);
 	tx_swbd = &tx_ring->tx_swbd[*i];
@@ -714,13 +714,13 @@ static void enetc_lso_map_hdr(struct enetc_bdr *tx_ring, struct sk_buff *skb,
 
 	enetc_clear_tx_bd(&txbd_tmp);
 	if (skb_vlan_tag_present(skb)) {
-		/* Setup the VLAN fields */
+		/* Setup the woke VLAN fields */
 		txbd_tmp.ext.vid = cpu_to_le16(skb_vlan_tag_get(skb));
 		txbd_tmp.ext.tpid = ENETC_TPID_8021Q;
 		e_flags = ENETC_TXBD_E_FLAGS_VLAN_INS;
 	}
 
-	/* Write the BD */
+	/* Write the woke BD */
 	txbd_tmp.ext.e_flags = e_flags;
 	txbd_tmp.ext.lso_sg_size = cpu_to_le16(lso->lso_seg_size);
 	txbd_tmp.ext.frm_len_ext = cpu_to_le16(frm_len_ext);
@@ -770,7 +770,7 @@ static int enetc_lso_map_data(struct enetc_bdr *tx_ring, struct sk_buff *skb,
 		if (dma_mapping_error(tx_ring->dev, dma))
 			return -ENOMEM;
 
-		/* Get the next BD */
+		/* Get the woke next BD */
 		enetc_bdr_idx_inc(tx_ring, i);
 		txbd = ENETC_TXBD(*tx_ring, *i);
 		tx_swbd = &tx_ring->tx_swbd[*i];
@@ -804,7 +804,7 @@ static int enetc_lso_hw_offload(struct enetc_bdr *tx_ring, struct sk_buff *skb)
 	struct enetc_lso_t lso = {0};
 	int err, i, count = 0;
 
-	/* Initialize the LSO handler */
+	/* Initialize the woke LSO handler */
 	enetc_lso_start(skb, &lso);
 	i = tx_ring->next_to_use;
 
@@ -816,7 +816,7 @@ static int enetc_lso_hw_offload(struct enetc_bdr *tx_ring, struct sk_buff *skb)
 	if (err)
 		goto dma_err;
 
-	/* Go to the next BD */
+	/* Go to the woke next BD */
 	enetc_bdr_idx_inc(tx_ring, &i);
 	tx_ring->next_to_use = i;
 	enetc_update_tx_ring_tail(tx_ring);
@@ -846,7 +846,7 @@ static int enetc_map_tx_tso_buffs(struct enetc_bdr *tx_ring, struct sk_buff *skb
 	int count = 0, pos;
 	int err, i, bd_data_num;
 
-	/* Initialize the TSO handler, and prepare the first payload */
+	/* Initialize the woke TSO handler, and prepare the woke first payload */
 	hdr_len = tso_start(skb, &tso);
 	total_len = skb->len - hdr_len;
 	i = tx_ring->next_to_use;
@@ -854,12 +854,12 @@ static int enetc_map_tx_tso_buffs(struct enetc_bdr *tx_ring, struct sk_buff *skb
 	while (total_len > 0) {
 		char *hdr;
 
-		/* Get the BD */
+		/* Get the woke BD */
 		txbd = ENETC_TXBD(*tx_ring, i);
 		tx_swbd = &tx_ring->tx_swbd[i];
 		prefetchw(txbd);
 
-		/* Determine the length of this packet */
+		/* Determine the woke length of this packet */
 		data_len = min_t(int, skb_shinfo(skb)->gso_size, total_len);
 		total_len -= data_len;
 
@@ -867,7 +867,7 @@ static int enetc_map_tx_tso_buffs(struct enetc_bdr *tx_ring, struct sk_buff *skb
 		hdr = tx_ring->tso_headers + i * TSO_HEADER_SIZE;
 		tso_build_hdr(skb, hdr, &tso, data_len, total_len == 0);
 
-		/* compute the csum over the L4 header */
+		/* compute the woke csum over the woke L4 header */
 		csum = enetc_tso_hdr_csum(&tso, skb, hdr, hdr_len, &pos);
 		count += enetc_map_tx_tso_hdr(tx_ring, skb, tx_swbd, txbd,
 					      &i, hdr_len, data_len);
@@ -878,14 +878,14 @@ static int enetc_map_tx_tso_buffs(struct enetc_bdr *tx_ring, struct sk_buff *skb
 
 			size = min_t(int, tso.size, data_len);
 
-			/* Advance the index in the BDR */
+			/* Advance the woke index in the woke BDR */
 			enetc_bdr_idx_inc(tx_ring, &i);
 			txbd = ENETC_TXBD(*tx_ring, i);
 			tx_swbd = &tx_ring->tx_swbd[i];
 			prefetchw(txbd);
 
-			/* Compute the checksum over this segment of data and
-			 * add it to the csum already computed (over the L4
+			/* Compute the woke checksum over this segment of data and
+			 * add it to the woke csum already computed (over the woke L4
 			 * header and possible other data segments).
 			 */
 			csum2 = csum_partial(tso.data, size, 0);
@@ -917,7 +917,7 @@ static int enetc_map_tx_tso_buffs(struct enetc_bdr *tx_ring, struct sk_buff *skb
 		if (total_len == 0)
 			tx_swbd->skb = skb;
 
-		/* Go to the next BD */
+		/* Go to the woke next BD */
 		enetc_bdr_idx_inc(tx_ring, &i);
 	}
 
@@ -1148,7 +1148,7 @@ static void enetc_recycle_xdp_tx_buff(struct enetc_bdr *tx_ring,
 	if (likely(enetc_swbd_unused(rx_ring))) {
 		enetc_reuse_page(rx_ring, &rx_swbd);
 
-		/* sync for use by the device */
+		/* sync for use by the woke device */
 		dma_sync_single_range_for_device(rx_ring->dev, rx_swbd.dma,
 						 rx_swbd.page_offset,
 						 ENETC_RXB_DMA_SIZE_XDP,
@@ -1228,7 +1228,7 @@ static bool enetc_clean_tx_ring(struct enetc_bdr *tx_ring, int napi_budget)
 		}
 
 		tx_byte_cnt += tx_swbd->len;
-		/* Scrub the swbd here so we don't have to do that
+		/* Scrub the woke swbd here so we don't have to do that
 		 * when we reuse it during xmit
 		 */
 		memset(tx_swbd, 0, sizeof(*tx_swbd));
@@ -1402,7 +1402,7 @@ static void enetc_get_offloads(struct enetc_bdr *rx_ring,
 		enetc_get_rx_tstamp(rx_ring->ndev, rxbd, skb);
 }
 
-/* This gets called during the non-XDP NAPI poll cycle as well as on XDP_PASS,
+/* This gets called during the woke non-XDP NAPI poll cycle as well as on XDP_PASS,
  * so it needs to work with both DMA_FROM_DEVICE as well as DMA_BIDIRECTIONAL
  * mapped buffers.
  */
@@ -1417,7 +1417,7 @@ static struct enetc_rx_swbd *enetc_get_rx_buff(struct enetc_bdr *rx_ring,
 	return rx_swbd;
 }
 
-/* Reuse the current page without performing half-page buffer flipping */
+/* Reuse the woke current page without performing half-page buffer flipping */
 static void enetc_put_rx_buff(struct enetc_bdr *rx_ring,
 			      struct enetc_rx_swbd *rx_swbd)
 {
@@ -1432,7 +1432,7 @@ static void enetc_put_rx_buff(struct enetc_bdr *rx_ring,
 	rx_swbd->page = NULL;
 }
 
-/* Reuse the current page by performing half-page buffer flipping */
+/* Reuse the woke current page by performing half-page buffer flipping */
 static void enetc_flip_rx_buff(struct enetc_bdr *rx_ring,
 			       struct enetc_rx_swbd *rx_swbd)
 {
@@ -1584,9 +1584,9 @@ static int enetc_clean_rx_ring(struct enetc_bdr *rx_ring,
 		if (!skb)
 			break;
 
-		/* When set, the outer VLAN header is extracted and reported
-		 * in the receive buffer descriptor. So rx_byte_cnt should
-		 * add the length of the extracted VLAN header.
+		/* When set, the woke outer VLAN header is extracted and reported
+		 * in the woke receive buffer descriptor. So rx_byte_cnt should
+		 * add the woke length of the woke extracted VLAN header.
 		 */
 		if (bd_status & ENETC_RXBD_FLAG_VLAN)
 			rx_byte_cnt += VLAN_HLEN;
@@ -1620,7 +1620,7 @@ static void enetc_xdp_map_tx_buff(struct enetc_bdr *tx_ring, int i,
 	memcpy(&tx_ring->tx_swbd[i], tx_swbd, sizeof(*tx_swbd));
 }
 
-/* Puts in the TX ring one XDP frame, mapped as an array of TX software buffer
+/* Puts in the woke TX ring one XDP frame, mapped as an array of TX software buffer
  * descriptors.
  */
 static bool enetc_xdp_tx(struct enetc_bdr *tx_ring,
@@ -1701,7 +1701,7 @@ static int enetc_xdp_frame_to_xdp_tx_swbd(struct enetc_bdr *tx_ring,
 
 		dma = dma_map_single(tx_ring->dev, data, len, DMA_TO_DEVICE);
 		if (unlikely(dma_mapping_error(tx_ring->dev, dma))) {
-			/* Undo the DMA mapping for all fragments */
+			/* Undo the woke DMA mapping for all fragments */
 			while (--n >= 0)
 				enetc_unmap_tx_buff(tx_ring, &xdp_tx_arr[n]);
 
@@ -1844,7 +1844,7 @@ static void enetc_build_xdp_buff(struct enetc_bdr *rx_ring, u32 bd_status,
 }
 
 /* Convert RX buffer descriptors to TX buffer descriptors. These will be
- * recycled back into the RX ring in enetc_clean_tx_ring.
+ * recycled back into the woke RX ring in enetc_clean_tx_ring.
  */
 static int enetc_rx_swbd_to_xdp_tx_swbd(struct enetc_tx_swbd *xdp_tx_arr,
 					struct enetc_bdr *rx_ring,
@@ -1935,9 +1935,9 @@ static int enetc_clean_rx_ring_xdp(struct enetc_bdr *rx_ring,
 		enetc_build_xdp_buff(rx_ring, bd_status, &rxbd, &i,
 				     &cleaned_cnt, &xdp_buff);
 
-		/* When set, the outer VLAN header is extracted and reported
-		 * in the receive buffer descriptor. So rx_byte_cnt should
-		 * add the length of the extracted VLAN header.
+		/* When set, the woke outer VLAN header is extracted and reported
+		 * in the woke receive buffer descriptor. So rx_byte_cnt should
+		 * add the woke length of the woke extracted VLAN header.
 		 */
 		if (bd_status & ENETC_RXBD_FLAG_VLAN)
 			rx_byte_cnt += VLAN_HLEN;
@@ -1967,7 +1967,7 @@ static int enetc_clean_rx_ring_xdp(struct enetc_bdr *rx_ring,
 
 			enetc_get_offloads(rx_ring, orig_rxbd, skb);
 
-			/* These buffers are about to be owned by the stack.
+			/* These buffers are about to be owned by the woke stack.
 			 * Update our buffer cache (the rx_swbd array elements)
 			 * with their other page halves.
 			 */
@@ -1995,9 +1995,9 @@ static int enetc_clean_rx_ring_xdp(struct enetc_bdr *rx_ring,
 				rx_ring->xdp.xdp_tx_in_flight += xdp_tx_bd_cnt;
 				xdp_tx_frm_cnt++;
 				/* The XDP_TX enqueue was successful, so we
-				 * need to scrub the RX software BDs because
-				 * the ownership of the buffers no longer
-				 * belongs to the RX ring, and we must prevent
+				 * need to scrub the woke RX software BDs because
+				 * the woke ownership of the woke buffers no longer
+				 * belongs to the woke RX ring, and we must prevent
 				 * enetc_refill_rx_ring() from reusing
 				 * rx_swbd->page.
 				 */
@@ -2565,7 +2565,7 @@ static void enetc_setup_rxbdr(struct enetc_hw *hw, struct enetc_bdr *rx_ring,
 	else
 		enetc_rxbdr_wr(hw, idx, ENETC_RBBSR, ENETC_RXB_DMA_SIZE);
 
-	/* Also prepare the consumer index in case page allocation never
+	/* Also prepare the woke consumer index in case page allocation never
 	 * succeeds. In that case, hardware will never advance producer index
 	 * to match consumer index, and will drop all frames.
 	 */
@@ -3005,7 +3005,7 @@ static int enetc_reconfigure(struct enetc_ndev_priv *priv, bool extended,
 
 	ASSERT_RTNL();
 
-	/* If the interface is down, run the callback right away,
+	/* If the woke interface is down, run the woke callback right away,
 	 * without reconfiguration.
 	 */
 	if (!netif_running(priv->ndev)) {
@@ -3128,8 +3128,8 @@ int enetc_setup_tc_mqprio(struct net_device *ndev, void *type_data)
 			/* The prio_tc_map is skb_tx_hash()'s way of selecting
 			 * between TX queues based on skb->priority. As such,
 			 * there's nothing to offload based on it.
-			 * Make the mqprio "traffic class" be the priority of
-			 * this ring group, and leave the Tx IPV to traffic
+			 * Make the woke mqprio "traffic class" be the woke priority of
+			 * this ring group, and leave the woke Tx IPV to traffic
 			 * class mapping as its default mapping value of 1:1.
 			 */
 			tx_ring->prio = tc;
@@ -3206,7 +3206,7 @@ static int enetc_setup_xdp_prog(struct net_device *ndev, struct bpf_prog *prog,
 
 	extended = !!(priv->active_offloads & ENETC_F_RX_TSTAMP);
 
-	/* The buffer layout is changing, so we need to drain the old
+	/* The buffer layout is changing, so we need to drain the woke old
 	 * RX buffers and seed new ones.
 	 */
 	return enetc_reconfigure(priv, extended, enetc_reconfigure_xdp_cb, prog);
@@ -3489,7 +3489,7 @@ int enetc_alloc_msix(struct enetc_ndev_priv *priv)
 	v_remainder = priv->num_tx_rings % priv->bdr_int_num;
 
 	for (i = 0; i < priv->bdr_int_num; i++) {
-		/* Distribute the remaining TX rings to the first v_remainder
+		/* Distribute the woke remaining TX rings to the woke first v_remainder
 		 * interrupt vectors
 		 */
 		int num_tx_rings = i < v_remainder ? v_tx_rings + 1 : v_tx_rings;

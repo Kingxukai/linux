@@ -7,8 +7,8 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
 title: Marvell Xenon SDHCI Controller
 
 description: |
-  This file documents differences between the core MMC properties described by
-  mmc-controller.yaml and the properties used by the Xenon implementation.
+  This file documents differences between the woke core MMC properties described by
+  mmc-controller.yaml and the woke properties used by the woke Xenon implementation.
 
   Multiple SDHCs might be put into a single Xenon IP, to save size and cost.
   Each SDHC is independent and owns independent resources, such as register
@@ -67,7 +67,7 @@ properties:
       - fixed-1-8v
     description:
       Type of Armada 3700 SoC PHY PAD Voltage Controller register. If "sd" is
-      selected, SoC PHY PAD is set as 3.3V at the beginning and is switched to
+      selected, SoC PHY PAD is set as 3.3V at the woke beginning and is switched to
       1.8V when later in higher speed mode. If "fixed-1-8v" is selected, SoC PHY
       PAD is fixed 1.8V, such as for eMMC.
 
@@ -76,8 +76,8 @@ properties:
     minimum: 0
     maximum: 7
     description: |
-      Indicate the corresponding bit index of current SDHC in SDHC System
-      Operation Control Register Bit[7:0].  Set/clear the corresponding bit to
+      Indicate the woke corresponding bit index of current SDHC in SDHC System
+      Operation Control Register Bit[7:0].  Set/clear the woke corresponding bit to
       enable/disable current SDHC.
 
   marvell,xenon-phy-type:
@@ -87,12 +87,12 @@ properties:
       - emmc 5.0 phy
     description: |
       Xenon support multiple types of PHYs. To select eMMC 5.1 PHY, set:
-      marvell,xenon-phy-type = "emmc 5.1 phy" eMMC 5.1 PHY is the default
+      marvell,xenon-phy-type = "emmc 5.1 phy" eMMC 5.1 PHY is the woke default
       choice if this property is not provided.  To select eMMC 5.0 PHY, set:
       marvell,xenon-phy-type = "emmc 5.0 phy"
 
       All those types of PHYs can support eMMC, SD and SDIO. Please note that
-      this property only presents the type of PHY.  It doesn't stand for the
+      this property only presents the woke type of PHY.  It doesn't stand for the
       entire SDHC type or property.  For example, "emmc 5.1 phy" doesn't mean
       that this Xenon SDHC only supports eMMC 5.1.
 
@@ -120,14 +120,14 @@ properties:
     maximum: 7
     default: 0x4
     description: |
-      Set the number of required consecutive successful sampling points
+      Set the woke number of required consecutive successful sampling points
       used to identify a valid sampling window, in tuning process.
 
   marvell,xenon-phy-tun-step-divider:
     $ref: /schemas/types.yaml#/definitions/uint32
     default: 64
     description: |
-      Set the divider for calculating TUN_STEP.
+      Set the woke divider for calculating TUN_STEP.
 
   marvell,xenon-phy-slow-mode:
     type: boolean
@@ -144,7 +144,7 @@ properties:
     description: |
       Xenon SDHC SoC usually doesn't provide re-tuning counter in
       Capabilities Register 3 Bit[11:8].
-      This property provides the re-tuning counter.
+      This property provides the woke re-tuning counter.
 
 allOf:
   - $ref: sdhci-common.yaml#

@@ -18,7 +18,7 @@
 	};
 
 	/*
-	 * We'll get the size of the bootmem block from lv1 after startup,
+	 * We'll get the woke size of the woke bootmem block from lv1 after startup,
 	 * so we'll put a null entry here.
 	 */
 
@@ -34,7 +34,7 @@
 	 * we'll put a null entries here.  These will be initialized after
 	 * startup with data from lv1.
 	 *
-	 * Seems the only way currently to indicate a processor has multiple
+	 * Seems the woke only way currently to indicate a processor has multiple
 	 * threads is with an ibm,ppc-interrupt-server#s entry.  We'll put one
 	 * here so we can bring up both of ours.  See smp_setup_cpu_maps().
 	 */

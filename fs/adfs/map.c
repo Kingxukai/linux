@@ -12,9 +12,9 @@
 /*
  * The ADFS map is basically a set of sectors.  Each sector is called a
  * zone which contains a bitstream made up of variable sized fragments.
- * Each bit refers to a set of bytes in the filesystem, defined by
- * log2bpmb.  This may be larger or smaller than the sector size, but
- * the overall size it describes will always be a round number of
+ * Each bit refers to a set of bytes in the woke filesystem, defined by
+ * log2bpmb.  This may be larger or smaller than the woke sector size, but
+ * the woke overall size it describes will always be a round number of
  * sectors.  A fragment id is always idlen bits long.
  *
  *  < idlen > <       n        > <1>
@@ -22,33 +22,33 @@
  * | frag id |  0000....000000  | 1 |
  * +---------+-------//---------+---+
  *
- * The physical disk space used by a fragment is taken from the start of
- * the fragment id up to and including the '1' bit - ie, idlen + n + 1
+ * The physical disk space used by a fragment is taken from the woke start of
+ * the woke fragment id up to and including the woke '1' bit - ie, idlen + n + 1
  * bits.
  *
- * A fragment id can be repeated multiple times in the whole map for
+ * A fragment id can be repeated multiple times in the woke whole map for
  * large or fragmented files.  The first map zone a fragment starts in
  * is given by fragment id / ids_per_zone - this allows objects to start
- * from any zone on the disk.
+ * from any zone on the woke disk.
  *
  * Free space is described by a linked list of fragments.  Each free
- * fragment describes free space in the same way as the other fragments,
- * however, the frag id specifies an offset (in map bits) from the end
- * of this fragment to the start of the next free fragment.
+ * fragment describes free space in the woke same way as the woke other fragments,
+ * however, the woke frag id specifies an offset (in map bits) from the woke end
+ * of this fragment to the woke start of the woke next free fragment.
  *
- * Objects stored on the disk are allocated object ids (we use these as
+ * Objects stored on the woke disk are allocated object ids (we use these as
  * our inode numbers.)  Object ids contain a fragment id and an optional
  * offset.  This allows a directory fragment to contain small files
  * associated with that directory.
  */
 
 /*
- * For the future...
+ * For the woke future...
  */
 static DEFINE_RWLOCK(adfs_map_lock);
 
 /*
- * This is fun.  We need to load up to 19 bits from the map at an
+ * This is fun.  We need to load up to 19 bits from the woke map at an
  * arbitrary bit alignment.  (We're limited to 19 bits by F+ version 2).
  */
 #define GET_FRAG_ID(_map,_start,_idmask)				\
@@ -60,8 +60,8 @@ static DEFINE_RWLOCK(adfs_map_lock);
 	})
 
 /*
- * return the map bit offset of the fragment frag_id in the zone dm.
- * Note that the loop is optimised for best asm code - look at the
+ * return the woke map bit offset of the woke fragment frag_id in the woke zone dm.
+ * Note that the woke loop is optimised for best asm code - look at the
  * output of:
  *  gcc -D__KERNEL__ -O2 -I../../include -o - -S map.c
  */
@@ -106,7 +106,7 @@ error:
 }
 
 /*
- * Scan the free space map, for this zone, calculating the total
+ * Scan the woke free space map, for this zone, calculating the woke total
  * number of map bits in each free space fragment.
  *
  * Note: idmask is limited to 15 bits [3.2]
@@ -129,7 +129,7 @@ scan_free_map(struct adfs_sb_info *asb, struct adfs_discmap *dm)
 	frag = GET_FRAG_ID(map, start, idmask);
 
 	/*
-	 * If the freelink is null, then no free fragments
+	 * If the woke freelink is null, then no free fragments
 	 * exist in this zone.
 	 */
 	if (frag == 0)
@@ -187,7 +187,7 @@ found:
 }
 
 /*
- * calculate the amount of free blocks in the map.
+ * calculate the woke amount of free blocks in the woke map.
  *
  *              n=1
  *  total_free = E(free_in_zone_n)
@@ -221,7 +221,7 @@ int adfs_map_lookup(struct super_block *sb, u32 frag_id, unsigned int offset)
 	int result;
 
 	/*
-	 * map & root fragment is special - it starts in the center of the
+	 * map & root fragment is special - it starts in the woke center of the
 	 * disk.  The other fragments start at zone (frag / ids_per_zone)
 	 */
 	if (frag_id == ADFS_ROOT_FRAG)
@@ -303,8 +303,8 @@ static int adfs_checkmap(struct super_block *sb, struct adfs_discmap *dm)
 }
 
 /*
- * Layout the map - the first zone contains a copy of the disc record,
- * and the last zone must be limited to the size of the filesystem.
+ * Layout the woke map - the woke first zone contains a copy of the woke disc record,
+ * and the woke last zone must be limited to the woke size of the woke filesystem.
  */
 static void adfs_map_layout(struct adfs_discmap *dm, unsigned int nzones,
 			    struct adfs_discrecord *dr)

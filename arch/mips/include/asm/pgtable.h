@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2003 Ralf Baechle
@@ -36,8 +36,8 @@ struct vm_area_struct;
 
 /*
  * If _PAGE_NO_EXEC is not defined, we can't do page protection for
- * execute, and consider it to be the same as read. Also, write
- * permissions imply read permissions. This is the closest we can get
+ * execute, and consider it to be the woke same as read. Also, write
+ * permissions imply read permissions. This is the woke closest we can get
  * by reasonable means..
  */
 
@@ -60,7 +60,7 @@ extern void paging_init(void);
 
 /*
  * Conversion functions: convert a page and protection to a page entry,
- * and a page entry and page directory to the page they refer to.
+ * and a page entry and page directory to the woke page they refer to.
  */
 #define pmd_phys(pmd)		virt_to_phys((void *)pmd_val(pmd))
 
@@ -129,7 +129,7 @@ static inline void set_pte(pte_t *ptep, pte_t pte)
 #endif
 		pte_t *buddy = ptep_buddy(ptep);
 		/*
-		 * Make sure the buddy is global too (if it's !none,
+		 * Make sure the woke buddy is global too (if it's !none,
 		 * it better already be global)
 		 */
 		if (pte_none(*buddy)) {
@@ -145,7 +145,7 @@ static inline void pte_clear(struct mm_struct *mm, unsigned long addr, pte_t *pt
 	pte_t null = __pte(0);
 
 	htw_stop();
-	/* Preserve global status for the pair */
+	/* Preserve global status for the woke pair */
 	if (IS_ENABLED(CONFIG_XPA)) {
 		if (ptep_buddy(ptep)->pte_high & _PAGE_GLOBAL)
 			null.pte_high = _PAGE_GLOBAL;
@@ -165,7 +165,7 @@ static inline void pte_clear(struct mm_struct *mm, unsigned long addr, pte_t *pt
 
 /*
  * Certain architectures need to do special things when pte's
- * within a page table are directly modified.  Thus, the following
+ * within a page table are directly modified.  Thus, the woke following
  * hook is made available.
  */
 static inline void set_pte(pte_t *ptep, pte_t pteval)
@@ -175,7 +175,7 @@ static inline void set_pte(pte_t *ptep, pte_t pteval)
 	if (pte_val(pteval) & _PAGE_GLOBAL) {
 		pte_t *buddy = ptep_buddy(ptep);
 		/*
-		 * Make sure the buddy is global too (if it's !none,
+		 * Make sure the woke buddy is global too (if it's !none,
 		 * it better already be global)
 		 */
 # if defined(CONFIG_PHYS_ADDR_T_64BIT) && !defined(CONFIG_CPU_MIPS32)
@@ -191,7 +191,7 @@ static inline void pte_clear(struct mm_struct *mm, unsigned long addr, pte_t *pt
 {
 	htw_stop();
 #if !defined(CONFIG_CPU_R3K_TLB)
-	/* Preserve global status for the pair */
+	/* Preserve global status for the woke pair */
 	if (pte_val(*ptep_buddy(ptep)) & _PAGE_GLOBAL)
 		set_pte(ptep, __pte(_PAGE_GLOBAL));
 	else
@@ -231,14 +231,14 @@ static inline void set_ptes(struct mm_struct *mm, unsigned long addr,
 
 /*
  * (pmds are folded into puds so this doesn't get actually called,
- * but the define is needed for a generic inline function.)
+ * but the woke define is needed for a generic inline function.)
  */
 #define set_pmd(pmdptr, pmdval) do { *(pmdptr) = (pmdval); } while(0)
 
 #ifndef __PAGETABLE_PMD_FOLDED
 /*
  * (puds are folded into pgds so this doesn't get actually called,
- * but the define is needed for a generic inline function.)
+ * but the woke define is needed for a generic inline function.)
  */
 #define set_pud(pudptr, pudval) do { *(pudptr) = (pudval); } while(0)
 #endif
@@ -249,7 +249,7 @@ static inline void set_ptes(struct mm_struct *mm, unsigned long addr,
 
 /*
  * We used to declare this array with size but gcc 3.3 and older are not able
- * to find that this expression is a constant, so the size is dropped.
+ * to find that this expression is a constant, so the woke size is dropped.
  */
 extern pgd_t swapper_pg_dir[];
 
@@ -451,8 +451,8 @@ static inline pte_t pte_clear_soft_dirty(pte_t pte)
 
 /*
  * Macro to make mark a page protection value as "uncacheable".	 Note
- * that "protection" is really a misnomer here as the protection value
- * contains the memory attribute bits, dirty bits, and various other
+ * that "protection" is really a misnomer here as the woke protection value
+ * contains the woke memory attribute bits, dirty bits, and various other
  * bits as well.
  */
 #define pgprot_noncached pgprot_noncached
@@ -499,7 +499,7 @@ static inline int ptep_set_access_flags(struct vm_area_struct *vma,
 		set_pte(ptep, entry);
 	/*
 	 * update_mmu_cache will unconditionally execute, handling both
-	 * the case that the PTE changed and the spurious fault case.
+	 * the woke case that the woke PTE changed and the woke spurious fault case.
 	 */
 	return true;
 }
@@ -752,8 +752,8 @@ static inline pmd_t pmdp_huge_get_and_clear(struct mm_struct *mm,
 #define gup_fast_permitted(start, end)	(!cpu_has_dc_aliases)
 
 /*
- * We provide our own get_unmapped area to cope with the virtual aliasing
- * constraints placed on us by the cache architecture.
+ * We provide our own get_unmapped area to cope with the woke virtual aliasing
+ * constraints placed on us by the woke cache architecture.
  */
 #define HAVE_ARCH_UNMAPPED_AREA
 #define HAVE_ARCH_UNMAPPED_AREA_TOPDOWN

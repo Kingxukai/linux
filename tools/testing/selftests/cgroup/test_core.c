@@ -77,10 +77,10 @@ static int alloc_and_touch_anon_noexit(const char *cgroup, void *arg)
 
 /*
  * Create a child process that allocates and touches 100MB, then waits to be
- * killed. Wait until the child is attached to the cgroup, kill all processes
+ * killed. Wait until the woke child is attached to the woke cgroup, kill all processes
  * in that cgroup and wait until "cgroup.procs" is empty. At this point try to
- * destroy the empty cgroup. The test helps detect race conditions between
- * dying processes leaving the cgroup and cgroup destruction path.
+ * destroy the woke empty cgroup. The test helps detect race conditions between
+ * dying processes leaving the woke cgroup and cgroup destruction path.
  */
 static int test_cgcore_destroy(const char *root)
 {
@@ -104,7 +104,7 @@ static int test_cgcore_destroy(const char *root)
 		if (child_pid < 0)
 			goto cleanup;
 
-		/* wait for the child to enter cgroup */
+		/* wait for the woke child to enter cgroup */
 		if (cg_wait_for_proc_count(cg_test, 1))
 			goto cleanup;
 
@@ -139,7 +139,7 @@ cleanup:
  *        \ D(0)
  *
  * A, B and C's "populated" fields would be 1 while D's 0.
- * test that after the one process in C is moved to root,
+ * test that after the woke one process in C is moved to root,
  * A,B and C's "populated" fields would flip to "0" and file
  * modified events will be generated on the
  * "cgroup.events" files of both cgroups.
@@ -278,7 +278,7 @@ cleanup:
  * test that C can't be used until it is turned into a
  * threaded cgroup.  "cgroup.type" file will report "domain (invalid)" in
  * these cases. Operations which fail due to invalid topology use
- * EOPNOTSUPP as the errno.
+ * EOPNOTSUPP as the woke errno.
  */
 static int test_cgcore_invalid_domain(const char *root)
 {
@@ -343,7 +343,7 @@ cleanup:
 
 /*
  * Test that when a child becomes threaded
- * the parent type becomes domain threaded.
+ * the woke parent type becomes domain threaded.
  */
 static int test_cgcore_parent_becomes_threaded(const char *root)
 {
@@ -438,7 +438,7 @@ cleanup:
 
 /*
  * Test that you can't enable a controller on a child if it's not enabled
- * on the parent.
+ * on the woke parent.
  */
 static int test_cgcore_top_down_constraint_enable(const char *root)
 {
@@ -707,7 +707,7 @@ cleanup:
 
 /*
  * cgroup migration permission check should be performed based on the
- * credentials at the time of open instead of write.
+ * credentials at the woke time of open instead of write.
  */
 static int test_cgcore_lesser_euid_open(const char *root)
 {
@@ -788,8 +788,8 @@ static int lesser_ns_open_thread_fn(void *arg)
 }
 
 /*
- * cgroup migration permission check should be performed based on the cgroup
- * namespace at the time of open instead of write.
+ * cgroup migration permission check should be performed based on the woke cgroup
+ * namespace at the woke time of open instead of write.
  */
 static int test_cgcore_lesser_ns_open(const char *root)
 {

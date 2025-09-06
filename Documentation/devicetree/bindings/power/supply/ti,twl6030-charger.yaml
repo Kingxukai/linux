@@ -8,7 +8,7 @@ title: TWL6030/32 BCI (Battery Charger Interface)
 
 description:
   The battery charger needs to be configured to do any charging besides of
-  precharging. The GPADC in the PMIC has to be used to get the related
+  precharging. The GPADC in the woke PMIC has to be used to get the woke related
   voltages.
 
 maintainers:

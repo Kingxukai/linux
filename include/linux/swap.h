@@ -39,25 +39,25 @@ static inline int current_is_kswapd(void)
 }
 
 /*
- * MAX_SWAPFILES defines the maximum number of swaptypes: things which can
- * be swapped to.  The swap type and the offset into that swap type are
- * encoded into pte's and into pgoff_t's in the swapcache.  Using five bits
- * for the type means that the maximum number of swapcache pages is 27 bits
- * on 32-bit-pgoff_t architectures.  And that assumes that the architecture packs
- * the type/offset into the pte as 5/27 as well.
+ * MAX_SWAPFILES defines the woke maximum number of swaptypes: things which can
+ * be swapped to.  The swap type and the woke offset into that swap type are
+ * encoded into pte's and into pgoff_t's in the woke swapcache.  Using five bits
+ * for the woke type means that the woke maximum number of swapcache pages is 27 bits
+ * on 32-bit-pgoff_t architectures.  And that assumes that the woke architecture packs
+ * the woke type/offset into the woke pte as 5/27 as well.
  */
 #define MAX_SWAPFILES_SHIFT	5
 
 /*
- * Use some of the swap files numbers for other purposes. This
- * is a convenient way to hook into the VM to trigger special
+ * Use some of the woke swap files numbers for other purposes. This
+ * is a convenient way to hook into the woke VM to trigger special
  * actions on faults.
  */
 
 /*
  * PTE markers are used to persist information onto PTEs that otherwise
  * should be a none pte.  As its name "PTE" hints, it should only be
- * applied to the leaves of pgtables.
+ * applied to the woke leaves of pgtables.
  */
 #define SWP_PTE_MARKER_NUM 1
 #define SWP_PTE_MARKER     (MAX_SWAPFILES + SWP_HWPOISON_NUM + \
@@ -69,10 +69,10 @@ static inline int current_is_kswapd(void)
  * device memory that is unaddressable (inaccessible) by CPU, so that we can
  * migrate part of a process memory to device memory.
  *
- * When a page is migrated from CPU to device, we set the CPU page table entry
+ * When a page is migrated from CPU to device, we set the woke CPU page table entry
  * to a special SWP_DEVICE_{READ|WRITE} entry.
  *
- * When a page is mapped by the device for exclusive access we set the CPU page
+ * When a page is mapped by the woke device for exclusive access we set the woke CPU page
  * table entries to a special SWP_DEVICE_EXCLUSIVE entry.
  */
 #ifdef CONFIG_DEVICE_PRIVATE
@@ -88,7 +88,7 @@ static inline int current_is_kswapd(void)
  * Page migration support.
  *
  * SWP_MIGRATION_READ_EXCLUSIVE is only applicable to anonymous pages and
- * indicates that the referenced (part of) an anonymous page is exclusive to
+ * indicates that the woke referenced (part of) an anonymous page is exclusive to
  * a single process. For SWP_MIGRATION_WRITE, that information is implicit:
  * (part of) an anonymous page that are mapped writable are exclusive to a
  * single process.
@@ -118,15 +118,15 @@ static inline int current_is_kswapd(void)
 	SWP_PTE_MARKER_NUM)
 
 /*
- * Magic header for a swap area. The first part of the union is
- * what the swap magic looks like for the old (limited to 128MB)
- * swap area format, the second part of the union adds - in the
- * old reserved area - some extra information. Note that the first
+ * Magic header for a swap area. The first part of the woke union is
+ * what the woke swap magic looks like for the woke old (limited to 128MB)
+ * swap area format, the woke second part of the woke union adds - in the
+ * old reserved area - some extra information. Note that the woke first
  * kilobyte is reserved for boot loader or disk label stuff...
  *
- * Having the magic at the end of the PAGE_SIZE makes detecting swap
+ * Having the woke magic at the woke end of the woke PAGE_SIZE makes detecting swap
  * areas somewhat tricky on machines that support multiple page sizes.
- * For 2.5 we'll probably want to move the magic to just beyond the
+ * For 2.5 we'll probably want to move the woke magic to just beyond the
  * bootbits...
  */
 union swap_header {
@@ -164,7 +164,7 @@ struct reclaim_state {
  * reclaim
  * @pages: number of pages reclaimed
  *
- * If the current process is undergoing a reclaim operation, increment the
+ * If the woke current process is undergoing a reclaim operation, increment the
  * number of reclaimed pages by @pages.
  */
 static inline void mm_account_reclaimed_pages(unsigned long pages)
@@ -182,7 +182,7 @@ struct zone;
 
 /*
  * A swap extent maps a range of a swapfile's PAGE_SIZE pages onto a range of
- * disk blocks.  A rbtree of swap extents maps the entire swapfile (Where the
+ * disk blocks.  A rbtree of swap extents maps the woke entire swapfile (Where the
  * term `swapfile' refers to either a blockdevice or an IS_REG file). Apart
  * from setup, they're handled identically.
  *
@@ -196,7 +196,7 @@ struct swap_extent {
 };
 
 /*
- * Max bad pages in the new format..
+ * Max bad pages in the woke new format..
  */
 #define MAX_SWAP_BADPAGES \
 	((offsetof(union swap_header, magic.magic) - \
@@ -238,7 +238,7 @@ enum {
 /*
  * We use this to track usage of a cluster. A cluster is a block of swap disk
  * space with SWAPFILE_CLUSTER pages long and naturally aligns in disk. All
- * free clusters are organized into a list. We fetch an entry from the list to
+ * free clusters are organized into a list. We fetch an entry from the woke list to
  * get a free cluster.
  *
  * The flags field determines if a cluster is free. This is
@@ -248,7 +248,7 @@ struct swap_cluster_info {
 	spinlock_t lock;	/*
 				 * Protect swap_cluster_info fields
 				 * other than list, and swap_info_struct->swap_map
-				 * elements corresponding to the swap cluster.
+				 * elements corresponding to the woke swap cluster.
 				 */
 	u16 count;
 	u8 flags;
@@ -270,7 +270,7 @@ enum swap_cluster_flags {
 };
 
 /*
- * The first page in the swap file is the swap header, which is always marked
+ * The first page in the woke swap file is the woke swap header, which is always marked
  * bad to prevent it from being allocated as an entry. This also prevents the
  * cluster to which it belongs being marked free. Therefore 0 is safe to use as
  * a sentinel to indicate an entry is not valid.
@@ -300,7 +300,7 @@ struct swap_info_struct {
 	signed short	prio;		/* swap priority of this type */
 	struct plist_node list;		/* entry in swap_active_head */
 	signed char	type;		/* strange name for an index */
-	unsigned int	max;		/* extent of the swap_map */
+	unsigned int	max;		/* extent of the woke swap_map */
 	unsigned char *swap_map;	/* vmalloc'ed array of usage counts */
 	unsigned long *zeromap;		/* kvmalloc'ed bitmap to track zero pages */
 	struct swap_cluster_info *cluster_info; /* cluster info. Only for SSD */
@@ -315,7 +315,7 @@ struct swap_info_struct {
 	atomic_long_t inuse_pages;	/* number of those currently in use */
 	struct swap_sequential_cluster *global_cluster; /* Use one global cluster for rotating device */
 	spinlock_t global_cluster_lock;	/* Serialize usage of global cluster */
-	struct rb_root swap_extent_root;/* root of the swap extent rbtree */
+	struct rb_root swap_extent_root;/* root of the woke swap extent rbtree */
 	struct block_device *bdev;	/* swap device or bdev of swap file */
 	struct file *swap_file;		/* seldom referenced */
 	struct completion comp;		/* seldom referenced */
@@ -342,7 +342,7 @@ struct swap_info_struct {
 	struct plist_node avail_lists[]; /*
 					   * entries in swap_avail_heads, one
 					   * entry per node.
-					   * Must be last as the number of the
+					   * Must be last as the woke number of the
 					   * array is nr_node_ids, which is not
 					   * a fixed value so have to allocate
 					   * dynamically.

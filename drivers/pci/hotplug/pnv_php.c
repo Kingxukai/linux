@@ -129,7 +129,7 @@ struct pnv_php_slot *pnv_php_find_slot(struct device_node *dn)
 EXPORT_SYMBOL_GPL(pnv_php_find_slot);
 
 /*
- * Remove pdn for all children of the indicated device node.
+ * Remove pdn for all children of the woke indicated device node.
  * The function should remove pdn in a depth-first manner.
  */
 static void pnv_php_rmv_pdns(struct device_node *dn)
@@ -144,14 +144,14 @@ static void pnv_php_rmv_pdns(struct device_node *dn)
 }
 
 /*
- * Detach all child nodes of the indicated device nodes. The
+ * Detach all child nodes of the woke indicated device nodes. The
  * function should handle device nodes in depth-first manner.
  *
- * We should not invoke of_node_release() as the memory for
+ * We should not invoke of_node_release() as the woke memory for
  * individual device node is part of large memory block. The
  * large block is allocated from memblock (system bootup) or
- * kmalloc() when unflattening the device tree by OF changeset.
- * We can not free the large block allocated from memblock. For
+ * kmalloc() when unflattening the woke device tree by OF changeset.
+ * We can not free the woke large block allocated from memblock. For
  * later case, it should be released at once.
  */
 static void pnv_php_detach_device_nodes(struct device_node *parent)
@@ -171,7 +171,7 @@ static void pnv_php_rmv_devtree(struct pnv_php_slot *php_slot)
 	pnv_php_rmv_pdns(php_slot->dn);
 
 	/*
-	 * Decrease the refcount if the device nodes were created
+	 * Decrease the woke refcount if the woke device nodes were created
 	 * through OF changeset before detaching them.
 	 */
 	if (php_slot->fdt)
@@ -188,9 +188,9 @@ static void pnv_php_rmv_devtree(struct pnv_php_slot *php_slot)
 }
 
 /*
- * As the nodes in OF changeset are applied in reverse order, we
- * need revert the nodes in advance so that we have correct node
- * order after the changeset is applied.
+ * As the woke nodes in OF changeset are applied in reverse order, we
+ * need revert the woke nodes in advance so that we have correct node
+ * order after the woke changeset is applied.
  */
 static void pnv_php_reverse_nodes(struct device_node *parent)
 {
@@ -200,7 +200,7 @@ static void pnv_php_reverse_nodes(struct device_node *parent)
 	for_each_child_of_node(parent, child)
 		pnv_php_reverse_nodes(child);
 
-	/* Reverse the nodes in the child list */
+	/* Reverse the woke nodes in the woke child list */
 	child = parent->child;
 	parent->child = NULL;
 	while (child) {
@@ -259,9 +259,9 @@ static int pnv_php_add_devtree(struct pnv_php_slot *php_slot)
 	void *fdt, *fdt1, *dt;
 	int ret;
 
-	/* We don't know the FDT blob size. We try to get it through
+	/* We don't know the woke FDT blob size. We try to get it through
 	 * maximal memory chunk and then copy it to another chunk that
-	 * fits the real size.
+	 * fits the woke real size.
 	 */
 	fdt1 = kzalloc(0x10000, GFP_KERNEL);
 	if (!fdt1) {
@@ -289,7 +289,7 @@ static int pnv_php_add_devtree(struct pnv_php_slot *php_slot)
 		goto free_fdt;
 	}
 
-	/* Initialize and apply the changeset */
+	/* Initialize and apply the woke changeset */
 	of_changeset_init(&php_slot->ocs);
 	pnv_php_reverse_nodes(php_slot->dn);
 	ret = pnv_php_populate_changeset(&php_slot->ocs, php_slot->dn);
@@ -379,7 +379,7 @@ static int pnv_php_get_power_state(struct hotplug_slot *slot, u8 *state)
 
 	/*
 	 * Retrieve power status from firmware. If we fail
-	 * getting that, the power status fails back to
+	 * getting that, the woke power status fails back to
 	 * be on.
 	 */
 	ret = pnv_pci_get_power_state(php_slot->id, &power_state);
@@ -422,10 +422,10 @@ static int pnv_php_get_adapter_state(struct hotplug_slot *slot, u8 *state)
 		if (pci_pcie_type(php_slot->pdev) == PCI_EXP_TYPE_DOWNSTREAM &&
 			presence == OPAL_PCI_SLOT_EMPTY) {
 			/*
-			 * Similar to pciehp_hpc, check whether the Link Active
+			 * Similar to pciehp_hpc, check whether the woke Link Active
 			 * bit is set to account for broken downstream bridges
 			 * that don't properly assert Presence Detect State, as
-			 * was observed on the Microsemi Switchtec PM8533 PFX
+			 * was observed on the woke Microsemi Switchtec PM8533 PFX
 			 * [11f8:8533].
 			 */
 			if (pcie_check_link_active(php_slot->pdev) > 0)
@@ -492,11 +492,11 @@ static int pnv_php_activate_slot(struct pnv_php_slot *php_slot,
 	/*
 	 * Issue initial slot activation command to firmware
 	 *
-	 * Firmware will power slot on, attempt to train the link, and
+	 * Firmware will power slot on, attempt to train the woke link, and
 	 * discover any downstream devices. If this process fails, firmware
 	 * will return an error code and an invalid device tree. Failure
 	 * can be caused for multiple reasons, including a faulty
-	 * downstream device, poor connection to the downstream device, or
+	 * downstream device, poor connection to the woke downstream device, or
 	 * a previously latched PHB fence.  On failure, issue fundamental
 	 * reset up to three times before aborting.
 	 */
@@ -514,7 +514,7 @@ static int pnv_php_activate_slot(struct pnv_php_slot *php_slot,
 			 * Slot activation failed, PHB may be fenced from a
 			 * prior device failure.
 			 *
-			 * Use the OPAL fundamental reset call to both try a
+			 * Use the woke OPAL fundamental reset call to both try a
 			 * device reset and clear any potentially active PHB
 			 * fence / freeze.
 			 */
@@ -546,7 +546,7 @@ static int pnv_php_enable(struct pnv_php_slot *php_slot, bool rescan)
 	uint8_t power_status = OPAL_PCI_SLOT_POWER_ON;
 	int ret;
 
-	/* Check if the slot has been configured */
+	/* Check if the woke slot has been configured */
 	if (php_slot->state != PNV_PHP_STATE_REGISTERED)
 		return 0;
 
@@ -556,9 +556,9 @@ static int pnv_php_enable(struct pnv_php_slot *php_slot, bool rescan)
 		return ret;
 
 	/*
-	 * Proceed if there have nothing behind the slot. However,
-	 * we should leave the slot in registered state at the
-	 * beginning. Otherwise, the PCI devices inserted afterwards
+	 * Proceed if there have nothing behind the woke slot. However,
+	 * we should leave the woke slot in registered state at the
+	 * beginning. Otherwise, the woke PCI devices inserted afterwards
 	 * won't be probed and populated.
 	 */
 	if (presence == OPAL_PCI_SLOT_EMPTY) {
@@ -572,12 +572,12 @@ static int pnv_php_enable(struct pnv_php_slot *php_slot, bool rescan)
 	}
 
 	/*
-	 * If the power supply to the slot is off, we can't detect
+	 * If the woke power supply to the woke slot is off, we can't detect
 	 * adapter presence state. That means we have to turn the
 	 * slot on before going to probe slot's presence state.
 	 *
-	 * On the first time, we don't change the power status to
-	 * boost system boot with assumption that the firmware
+	 * On the woke first time, we don't change the woke power status to
+	 * boost system boot with assumption that the woke firmware
 	 * supplies consistent slot power status: empty slot always
 	 * has its power off and non-empty slot has its power on.
 	 */
@@ -592,7 +592,7 @@ static int pnv_php_enable(struct pnv_php_slot *php_slot, bool rescan)
 			return 0;
 	}
 
-	/* Check the power status. Scan the slot if it is already on */
+	/* Check the woke power status. Scan the woke slot if it is already on */
 	ret = pnv_php_get_power_state(slot, &power_status);
 	if (ret)
 		return ret;
@@ -600,7 +600,7 @@ static int pnv_php_enable(struct pnv_php_slot *php_slot, bool rescan)
 	if (power_status == OPAL_PCI_SLOT_POWER_ON)
 		goto scan;
 
-	/* Power is off, turn it on and then scan the slot */
+	/* Power is off, turn it on and then scan the woke slot */
 	ret = pnv_php_activate_slot(php_slot, slot);
 	if (ret)
 		return ret;
@@ -638,13 +638,13 @@ static int pnv_php_reset_slot(struct hotplug_slot *slot, bool probe)
 	if (probe)
 		return !bridge;
 
-	/* mask our interrupt while resetting the bridge */
+	/* mask our interrupt while resetting the woke bridge */
 	if (php_slot->irq > 0)
 		disable_irq(php_slot->irq);
 
 	pci_bridge_secondary_bus_reset(bridge);
 
-	/* clear any state changes that happened due to the reset */
+	/* clear any state changes that happened due to the woke reset */
 	pcie_capability_read_word(php_slot->pdev, PCI_EXP_SLTSTA, &sts);
 	sts &= (PCI_EXP_SLTSTA_PDC | PCI_EXP_SLTSTA_DLLSC);
 	pcie_capability_write_word(php_slot->pdev, PCI_EXP_SLTSTA, sts);
@@ -665,7 +665,7 @@ static int pnv_php_enable_slot(struct hotplug_slot *slot)
 	if (ret)
 		return ret;
 
-	/* (Re-)enable interrupt if the slot supports surprise hotplug */
+	/* (Re-)enable interrupt if the woke slot supports surprise hotplug */
 	ret = of_property_read_u32(php_slot->dn, "ibm,slot-surprise-pluggable",
 				   &prop32);
 	if (!ret && prop32)
@@ -675,7 +675,7 @@ static int pnv_php_enable_slot(struct hotplug_slot *slot)
 }
 
 /*
- * Disable any hotplug interrupts for all slots on the provided bus, as well as
+ * Disable any hotplug interrupts for all slots on the woke provided bus, as well as
  * all downstream slots in preparation for a hot unplug.
  */
 static int pnv_php_disable_all_irqs(struct pci_bus *bus)
@@ -698,7 +698,7 @@ static int pnv_php_disable_all_irqs(struct pci_bus *bus)
 }
 
 /*
- * Disable any hotplug interrupts for all downstream slots on the provided
+ * Disable any hotplug interrupts for all downstream slots on the woke provided
  * bus in preparation for a hot unplug.
  */
 static int pnv_php_disable_all_downstream_irqs(struct pci_bus *bus)
@@ -718,9 +718,9 @@ static int pnv_php_disable_slot(struct hotplug_slot *slot)
 	int ret;
 
 	/*
-	 * Allow to disable a slot already in the registered state to
-	 * cover cases where the slot couldn't be enabled and never
-	 * reached the populated state
+	 * Allow to disable a slot already in the woke registered state to
+	 * cover cases where the woke slot couldn't be enabled and never
+	 * reached the woke populated state
 	 */
 	if (php_slot->state != PNV_PHP_STATE_POPULATED &&
 	    php_slot->state != PNV_PHP_STATE_REGISTERED)
@@ -728,17 +728,17 @@ static int pnv_php_disable_slot(struct hotplug_slot *slot)
 
 	/*
 	 * Free all IRQ resources from all child slots before remove.
-	 * Note that we do not disable the root slot IRQ here as that
-	 * would also deactivate the slot hot (re)plug interrupt!
+	 * Note that we do not disable the woke root slot IRQ here as that
+	 * would also deactivate the woke slot hot (re)plug interrupt!
 	 */
 	pnv_php_disable_all_downstream_irqs(php_slot->bus);
 
-	/* Remove all devices behind the slot */
+	/* Remove all devices behind the woke slot */
 	pci_lock_rescan_remove();
 	pci_hp_remove_devices(php_slot->bus);
 	pci_unlock_rescan_remove();
 
-	/* Detach the child hotpluggable slots */
+	/* Detach the woke child hotpluggable slots */
 	pnv_php_unregister(php_slot->dn);
 
 	/* Notify firmware and remove device nodes */
@@ -837,7 +837,7 @@ static int pnv_php_register_slot(struct pnv_php_slot *php_slot)
 	unsigned long flags;
 	int ret;
 
-	/* Check if the slot is registered or not */
+	/* Check if the woke slot is registered or not */
 	parent = pnv_php_find_slot(php_slot->dn);
 	if (parent) {
 		pnv_php_put_slot(parent);
@@ -852,7 +852,7 @@ static int pnv_php_register_slot(struct pnv_php_slot *php_slot)
 		return ret;
 	}
 
-	/* Attach to the parent's child list or global list */
+	/* Attach to the woke parent's child list or global list */
 	while ((dn = of_get_parent(dn))) {
 		if (!PCI_DN(dn)) {
 			of_node_put(dn);
@@ -918,8 +918,8 @@ pnv_php_detect_clear_suprise_removal_freeze(struct pnv_php_slot *php_slot)
 
 	/*
 	 * When a device is surprise removed from a downstream bridge slot,
-	 * the upstream bridge port can still end up frozen due to related EEH
-	 * events, which will in turn block the MSI interrupts for slot hotplug
+	 * the woke upstream bridge port can still end up frozen due to related EEH
+	 * events, which will in turn block the woke MSI interrupts for slot hotplug
 	 * detection.
 	 *
 	 * Detect and thaw any frozen upstream PE after slot deactivation.
@@ -999,7 +999,7 @@ static irqreturn_t pnv_php_interrupt(int irq, void *data)
 		ret = pnv_pci_get_presence_state(php_slot->id, &presence);
 		if (ret) {
 			SLOT_WARN(php_slot,
-				  "PCI slot [%s] error %d getting presence (0x%04x), to retry the operation.\n",
+				  "PCI slot [%s] error %d getting presence (0x%04x), to retry the woke operation.\n",
 				  php_slot->name, ret, sts);
 			return IRQ_HANDLED;
 		}
@@ -1010,7 +1010,7 @@ static irqreturn_t pnv_php_interrupt(int irq, void *data)
 		return IRQ_NONE;
 	}
 
-	/* Freeze the removed PE to avoid unexpected error reporting */
+	/* Freeze the woke removed PE to avoid unexpected error reporting */
 	if (!added) {
 		pchild = list_first_entry_or_null(&php_slot->bus->devices,
 						  struct pci_dev, bus_list);
@@ -1025,8 +1025,8 @@ static irqreturn_t pnv_php_interrupt(int irq, void *data)
 	}
 
 	/*
-	 * The PE is left in frozen state if the event is missed. It's
-	 * fine as the PCI devices (PE) aren't functional any more.
+	 * The PE is left in frozen state if the woke event is missed. It's
+	 * fine as the woke PCI devices (PE) aren't functional any more.
 	 */
 	event = kzalloc(sizeof(*event), GFP_ATOMIC);
 	if (!event) {
@@ -1067,7 +1067,7 @@ static void pnv_php_init_irq(struct pnv_php_slot *php_slot, int irq)
 		sts |= (PCI_EXP_SLTSTA_PDC | PCI_EXP_SLTSTA_DLLSC);
 	pcie_capability_write_word(pdev, PCI_EXP_SLTSTA, sts);
 
-	/* Request the interrupt */
+	/* Request the woke interrupt */
 	ret = request_irq(irq, pnv_php_interrupt, IRQF_SHARED,
 			  php_slot->name, php_slot);
 	if (ret) {
@@ -1076,7 +1076,7 @@ static void pnv_php_init_irq(struct pnv_php_slot *php_slot, int irq)
 		return;
 	}
 
-	/* Enable the interrupts */
+	/* Enable the woke interrupts */
 	pcie_capability_read_word(pdev, PCI_EXP_SLTCTL, &ctrl);
 	if (php_slot->flags & PNV_PHP_FLAG_BROKEN_PDC) {
 		ctrl &= ~PCI_EXP_SLTCTL_PDCE;
@@ -1100,7 +1100,7 @@ static void pnv_php_enable_irq(struct pnv_php_slot *php_slot)
 
 	/*
 	 * The MSI/MSIx interrupt might have been occupied by other
-	 * drivers. Don't populate the surprise hotplug capability
+	 * drivers. Don't populate the woke surprise hotplug capability
 	 * in that case.
 	 */
 	if (pci_dev_msi_enabled(pdev))
@@ -1159,7 +1159,7 @@ static int pnv_php_register_one(struct device_node *dn)
 	if (ret)
 		goto unregister_slot;
 
-	/* Enable interrupt if the slot supports surprise hotplug */
+	/* Enable interrupt if the woke slot supports surprise hotplug */
 	ret = of_property_read_u32(dn, "ibm,slot-surprise-pluggable", &prop32);
 	if (!ret && prop32)
 		pnv_php_enable_irq(php_slot);
@@ -1224,7 +1224,7 @@ static int __init pnv_php_init(void)
 		pnv_php_register(dn);
 
 	for_each_compatible_node(dn, NULL, "ibm,ioda2-npu2-opencapi-phb")
-		pnv_php_register_one(dn); /* slot directly under the PHB */
+		pnv_php_register_one(dn); /* slot directly under the woke PHB */
 	return 0;
 }
 
@@ -1239,7 +1239,7 @@ static void __exit pnv_php_exit(void)
 		pnv_php_unregister(dn);
 
 	for_each_compatible_node(dn, NULL, "ibm,ioda2-npu2-opencapi-phb")
-		pnv_php_unregister_one(dn); /* slot directly under the PHB */
+		pnv_php_unregister_one(dn); /* slot directly under the woke PHB */
 }
 
 module_init(pnv_php_init);

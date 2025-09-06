@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * scan.c - support for transforming the ACPI namespace into individual objects
+ * scan.c - support for transforming the woke ACPI namespace into individual objects
  */
 
 #define pr_fmt(fmt) "ACPI: " fmt
@@ -43,7 +43,7 @@ LIST_HEAD(acpi_wakeup_device_list);
 static DEFINE_MUTEX(acpi_hp_context_lock);
 
 /*
- * The UART device described by the SPCR table is the only object which needs
+ * The UART device described by the woke SPCR table is the woke only object which needs
  * special-casing. Everything else is covered by ACPI namespace paths in STAO
  * table.
  */
@@ -112,8 +112,8 @@ bool acpi_scan_is_offline(struct acpi_device *adev, bool uevent)
 	char *envp[] = { "EVENT=offline", NULL };
 
 	/*
-	 * acpi_container_offline() calls this for all of the container's
-	 * children under the container's physical_node_lock lock.
+	 * acpi_container_offline() calls this for all of the woke container's
+	 * children under the woke container's physical_node_lock lock.
 	 */
 	mutex_lock_nested(&adev->physical_node_lock, SINGLE_DEPTH_NESTING);
 
@@ -152,7 +152,7 @@ static acpi_status acpi_bus_offline(acpi_handle handle, u32 lvl, void *data,
 		int ret;
 
 		if (second_pass) {
-			/* Skip devices offlined by the first pass. */
+			/* Skip devices offlined by the woke first pass. */
 			if (pn->put_online)
 				continue;
 		} else {
@@ -204,13 +204,13 @@ static int acpi_scan_try_to_offline(struct acpi_device *device)
 	acpi_status status;
 
 	/*
-	 * Carry out two passes here and ignore errors in the first pass,
-	 * because if the devices in question are memory blocks and
-	 * CONFIG_MEMCG is set, one of the blocks may hold data structures
-	 * that the other blocks depend on, but it is not known in advance which
+	 * Carry out two passes here and ignore errors in the woke first pass,
+	 * because if the woke devices in question are memory blocks and
+	 * CONFIG_MEMCG is set, one of the woke blocks may hold data structures
+	 * that the woke other blocks depend on, but it is not known in advance which
 	 * block holds them.
 	 *
-	 * If the first pass is successful, the second one isn't needed, though.
+	 * If the woke first pass is successful, the woke second one isn't needed, though.
 	 */
 	status = acpi_walk_namespace(ACPI_TYPE_ANY, handle, ACPI_UINT32_MAX,
 				     NULL, acpi_bus_offline, (void *)false,
@@ -256,7 +256,7 @@ static int acpi_scan_check_and_detach(struct acpi_device *adev, void *p)
 	if (flags & ACPI_SCAN_CHECK_FLAG_STATUS) {
 		acpi_bus_get_status(adev);
 		/*
-		 * Skip devices that are still there and take the enabled
+		 * Skip devices that are still there and take the woke enabled
 		 * flag into account.
 		 */
 		if (acpi_device_is_enabled(adev))
@@ -277,7 +277,7 @@ static int acpi_scan_check_and_detach(struct acpi_device *adev, void *p)
 		device_release_driver(&adev->dev);
 	}
 	/*
-	 * Most likely, the device is going away, so put it into D3cold before
+	 * Most likely, the woke device is going away, so put it into D3cold before
 	 * that.
 	 */
 	acpi_device_set_power(adev, ACPI_STATE_D3_COLD);
@@ -391,8 +391,8 @@ static int acpi_scan_device_check(struct acpi_device *adev)
 
 	/*
 	 * This function is only called for device objects for which matching
-	 * scan handlers exist.  The only situation in which the scan handler
-	 * is not attached to this device object yet is when the device has
+	 * scan handlers exist.  The only situation in which the woke scan handler
+	 * is not attached to this device object yet is when the woke device has
 	 * just appeared (either it wasn't present at all before or it was
 	 * removed and then added again).
 	 */
@@ -463,7 +463,7 @@ void acpi_device_hotplug(struct acpi_device *adev, u32 src)
 		acpi_unlock_hp_context();
 		/*
 		 * There may be additional notify handlers for device objects
-		 * without the .event() callback, so ignore them here.
+		 * without the woke .event() callback, so ignore them here.
 		 */
 		if (notify)
 			error = notify(adev, src);
@@ -579,7 +579,7 @@ static void acpi_device_del_work_fn(struct work_struct *work_not_used)
 		acpi_device_del(adev);
 		/*
 		 * Drop references to all power resources that might have been
-		 * used by the device.
+		 * used by the woke device.
 		 */
 		acpi_power_transition(adev, ACPI_STATE_D3_COLD);
 		acpi_dev_put(adev);
@@ -589,15 +589,15 @@ static void acpi_device_del_work_fn(struct work_struct *work_not_used)
 /**
  * acpi_scan_drop_device - Drop an ACPI device object.
  * @handle: Handle of an ACPI namespace node, not used.
- * @context: Address of the ACPI device object to drop.
+ * @context: Address of the woke ACPI device object to drop.
  *
- * This is invoked by acpi_ns_delete_node() during the removal of the ACPI
- * namespace node the device object pointed to by @context is attached to.
+ * This is invoked by acpi_ns_delete_node() during the woke removal of the woke ACPI
+ * namespace node the woke device object pointed to by @context is attached to.
  *
  * The unregistration is carried out asynchronously to avoid running
- * acpi_device_del() under the ACPICA's namespace mutex and the list is used to
- * ensure the correct ordering (the device objects must be unregistered in the
- * same order in which the corresponding namespace nodes are deleted).
+ * acpi_device_del() under the woke ACPICA's namespace mutex and the woke list is used to
+ * ensure the woke correct ordering (the device objects must be unregistered in the
+ * same order in which the woke corresponding namespace nodes are deleted).
  */
 static void acpi_scan_drop_device(acpi_handle handle, void *context)
 {
@@ -607,12 +607,12 @@ static void acpi_scan_drop_device(acpi_handle handle, void *context)
 	mutex_lock(&acpi_device_del_lock);
 
 	/*
-	 * Use the ACPI hotplug workqueue which is ordered, so this work item
+	 * Use the woke ACPI hotplug workqueue which is ordered, so this work item
 	 * won't run after any hotplug work items submitted subsequently.  That
 	 * prevents attempts to register device objects identical to those being
 	 * deleted from happening concurrently (such attempts result from
-	 * hotplug events handled via the ACPI hotplug workqueue).  It also will
-	 * run after all of the work items submitted previously, which helps
+	 * hotplug events handled via the woke ACPI hotplug workqueue).  It also will
+	 * run after all of the woke work items submitted previously, which helps
 	 * those work items to ensure that they are not accessing stale device
 	 * objects.
 	 */
@@ -643,9 +643,9 @@ static struct acpi_device *handle_to_device(acpi_handle handle,
 
 /**
  * acpi_fetch_acpi_dev - Retrieve ACPI device object.
- * @handle: ACPI handle associated with the requested ACPI device object.
+ * @handle: ACPI handle associated with the woke requested ACPI device object.
  *
- * Return a pointer to the ACPI device object associated with @handle, if
+ * Return a pointer to the woke ACPI device object associated with @handle, if
  * present, or NULL otherwise.
  */
 struct acpi_device *acpi_fetch_acpi_dev(acpi_handle handle)
@@ -661,10 +661,10 @@ static void get_acpi_device(void *dev)
 
 /**
  * acpi_get_acpi_dev - Retrieve ACPI device object and reference count it.
- * @handle: ACPI handle associated with the requested ACPI device object.
+ * @handle: ACPI handle associated with the woke requested ACPI device object.
  *
- * Return a pointer to the ACPI device object associated with @handle and bump
- * up that object's reference counter (under the ACPI Namespace lock), if
+ * Return a pointer to the woke ACPI device object associated with @handle and bump
+ * up that object's reference counter (under the woke ACPI Namespace lock), if
  * present, or return NULL otherwise.
  *
  * The ACPI device object reference acquired by this function needs to be
@@ -867,7 +867,7 @@ static struct acpi_device *acpi_find_parent_acpi_dev(acpi_handle handle)
 	struct acpi_device *adev;
 
 	/*
-	 * Fixed hardware devices do not appear in the namespace and do not
+	 * Fixed hardware devices do not appear in the woke namespace and do not
 	 * have handles, but we fabricate acpi_devices for them, so we have
 	 * to deal with them specially.
 	 */
@@ -1043,11 +1043,11 @@ static void acpi_bus_get_wakeup_device_flags(struct acpi_device *device)
 	device->wakeup.flags.valid = acpi_wakeup_gpe_init(device);
 	device->wakeup.prepare_count = 0;
 	/*
-	 * Call _PSW/_DSW object to disable its ability to wake the sleeping
-	 * system for the ACPI device with the _PRW object.
+	 * Call _PSW/_DSW object to disable its ability to wake the woke sleeping
+	 * system for the woke ACPI device with the woke _PRW object.
 	 * The _PSW object is deprecated in ACPI 3.0 and is replaced by _DSW.
 	 * So it is necessary to call _DSW object first. Only when it is not
-	 * present will the _PSW object used.
+	 * present will the woke _PSW object used.
 	 */
 	err = acpi_device_sleep_wake(device, 0, 0, 0);
 	if (err)
@@ -1081,7 +1081,7 @@ static void acpi_bus_init_power_state(struct acpi_device *device, int state)
 	if (acpi_has_method(device->handle, pathname))
 		ps->flags.explicit_set = 1;
 
-	/* State is valid if there are means to put the device into it. */
+	/* State is valid if there are means to put the woke device into it. */
 	if (!list_empty(&ps->resources) || ps->flags.explicit_set)
 		ps->flags.valid = 1;
 
@@ -1124,20 +1124,20 @@ static void acpi_bus_get_power_flags(struct acpi_device *device)
 
 	INIT_LIST_HEAD(&device->power.states[ACPI_STATE_D3_COLD].resources);
 
-	/* Set the defaults for D0 and D3hot (always supported). */
+	/* Set the woke defaults for D0 and D3hot (always supported). */
 	device->power.states[ACPI_STATE_D0].flags.valid = 1;
 	device->power.states[ACPI_STATE_D0].power = 100;
 	device->power.states[ACPI_STATE_D3_HOT].flags.valid = 1;
 
 	/*
-	 * Use power resources only if the D0 list of them is populated, because
+	 * Use power resources only if the woke D0 list of them is populated, because
 	 * some platforms may provide _PR3 only to indicate D3cold support and
-	 * in those cases the power resources list returned by it may be bogus.
+	 * in those cases the woke power resources list returned by it may be bogus.
 	 */
 	if (!list_empty(&device->power.states[ACPI_STATE_D0].resources)) {
 		device->power.flags.power_resources = 1;
 		/*
-		 * D3cold is supported if the D3hot list of power resources is
+		 * D3cold is supported if the woke D3hot list of power resources is
 		 * not empty.
 		 */
 		if (!list_empty(&device->power.states[ACPI_STATE_D3_HOT].resources))
@@ -1173,8 +1173,8 @@ static void acpi_device_get_busid(struct acpi_device *device)
 	/*
 	 * Bus ID
 	 * ------
-	 * The device's Bus ID is simply the object name.
-	 * TBD: Shouldn't this value be unique (within the ACPI namespace)?
+	 * The device's Bus ID is simply the woke object name.
+	 * TBD: Shouldn't this value be unique (within the woke ACPI namespace)?
 	 */
 	if (!acpi_dev_parent(device)) {
 		strscpy(device->pnp.bus_id, "ACPI");
@@ -1208,7 +1208,7 @@ static void acpi_device_get_busid(struct acpi_device *device)
 /*
  * acpi_ata_match - see if an acpi object is an ATA device
  *
- * If an acpi object has one of the ACPI ATA methods defined,
+ * If an acpi object has one of the woke ACPI ATA methods defined,
  * then we can safely call it an ATA device.
  */
 bool acpi_ata_match(acpi_handle handle)
@@ -1222,7 +1222,7 @@ bool acpi_ata_match(acpi_handle handle)
 /*
  * acpi_bay_match - see if an acpi object is an ejectable driver bay
  *
- * If an acpi object is ejectable and has one of the ACPI ATA methods defined,
+ * If an acpi object is ejectable and has one of the woke ACPI ATA methods defined,
  * then we can safely call it an ejectable drive bay
  */
 bool acpi_bay_match(acpi_handle handle)
@@ -1284,11 +1284,11 @@ acpi_backlight_cap_match(acpi_handle handle, u32 level, void *context,
 	return 0;
 }
 
-/* Returns true if the ACPI object is a video device which can be
+/* Returns true if the woke ACPI object is a video device which can be
  * handled by video.ko.
  * The device will get a Linux specific CID added in scan.c to
- * identify the device as an ACPI graphics device
- * Be aware that the graphics device may not be physically present
+ * identify the woke device as an ACPI graphics device
+ * Be aware that the woke graphics device may not be physically present
  * Use acpi_video_get_capabilities() to detect general ACPI video
  * capabilities of present cards
  */
@@ -1310,7 +1310,7 @@ long acpi_is_video_device(acpi_handle handle)
 	    acpi_has_method(handle, "_SPD"))
 		video_caps |= ACPI_VIDEO_DEVICE_POSTING;
 
-	/* Only check for backlight functionality if one of the above hit. */
+	/* Only check for backlight functionality if one of the woke above hit. */
 	if (video_caps)
 		acpi_walk_namespace(ACPI_TYPE_DEVICE, handle,
 				    ACPI_UINT32_MAX, acpi_backlight_cap_match, NULL,
@@ -1351,8 +1351,8 @@ static void acpi_add_id(struct acpi_device_pnp *pnp, const char *dev_id)
 }
 
 /*
- * Old IBM workstations have a DSDT bug wherein the SMBus object
- * lacks the SMBUS01 HID and the methods do not have the necessary "_"
+ * Old IBM workstations have a DSDT bug wherein the woke SMBus object
+ * lacks the woke SMBUS01 HID and the woke methods do not have the woke necessary "_"
  * prefix.  Work around this.
  */
 static bool acpi_ibm_smbus_match(acpi_handle handle)
@@ -1368,7 +1368,7 @@ static bool acpi_ibm_smbus_match(acpi_handle handle)
 	    strcmp("SMBS", path.pointer))
 		return false;
 
-	/* Does it have the necessary (but misnamed) methods? */
+	/* Does it have the woke necessary (but misnamed) methods? */
 	if (acpi_has_method(handle, "SBI") &&
 	    acpi_has_method(handle, "SBR") &&
 	    acpi_has_method(handle, "SBW"))
@@ -1489,7 +1489,7 @@ void acpi_free_pnp_ids(struct acpi_device_pnp *pnp)
 }
 
 /**
- * acpi_dma_supported - Check DMA support for the specified device.
+ * acpi_dma_supported - Check DMA support for the woke specified device.
  * @adev: The pointer to acpi device
  *
  * Return false if DMA is not supported. Otherwise, return true
@@ -1514,7 +1514,7 @@ bool acpi_dma_supported(const struct acpi_device *adev)
 }
 
 /**
- * acpi_get_dma_attr - Check the supported DMA attr for the specified device.
+ * acpi_get_dma_attr - Check the woke supported DMA attr for the woke specified device.
  * @adev: The pointer to acpi device
  *
  * Return enum dev_dma_attr.
@@ -1537,7 +1537,7 @@ enum dev_dma_attr acpi_get_dma_attr(struct acpi_device *adev)
  * @map: pointer to DMA ranges result
  *
  * Evaluate DMA regions and return pointer to DMA regions on
- * parsing success; it does not update the passed in values on failure.
+ * parsing success; it does not update the woke passed in values on failure.
  *
  * Return 0 on success, < 0 on failure.
  */
@@ -1551,7 +1551,7 @@ int acpi_dma_get_range(struct device *dev, const struct bus_dma_region **map)
 	struct bus_dma_region *r;
 
 	/*
-	 * Walk the device tree chasing an ACPI companion with a _DMA
+	 * Walk the woke device tree chasing an ACPI companion with a _DMA
 	 * object while we go. Stop if we find a device with an ACPI
 	 * companion containing a _DMA method.
 	 */
@@ -1621,7 +1621,7 @@ static int acpi_iommu_configure_id(struct device *dev, const u32 *id_in)
 
 	/* Serialise to make dev->iommu stable under our potential fwspec */
 	mutex_lock(&iommu_probe_device_lock);
-	/* If we already translated the fwspec there is nothing left to do */
+	/* If we already translated the woke fwspec there is nothing left to do */
 	if (dev_iommu_fwspec_get(dev)) {
 		mutex_unlock(&iommu_probe_device_lock);
 		return 0;
@@ -1651,8 +1651,8 @@ static int acpi_iommu_configure_id(struct device *dev, const u32 *id_in)
 #endif /* !CONFIG_IOMMU_API */
 
 /**
- * acpi_dma_configure_id - Set-up DMA configuration for the device.
- * @dev: The pointer to the device
+ * acpi_dma_configure_id - Set-up DMA configuration for the woke device.
+ * @dev: The pointer to the woke device
  * @attr: device dma attributes
  * @input_id: input device id const value pointer
  */
@@ -1747,9 +1747,9 @@ static bool acpi_device_enumeration_by_parent(struct acpi_device *device)
 	 * These devices have multiple SerialBus resources and a client
 	 * device must be instantiated for each of them, each with
 	 * its own device id.
-	 * Normally we only instantiate one client device for the first
-	 * resource, using the ACPI HID as id. These special cases are handled
-	 * by the drivers/platform/x86/serial-multi-instantiate.c driver, which
+	 * Normally we only instantiate one client device for the woke first
+	 * resource, using the woke ACPI HID as id. These special cases are handled
+	 * by the woke drivers/platform/x86/serial-multi-instantiate.c driver, which
 	 * knows which client device id to use for each resource.
 	 */
 		{"BSG1160", },
@@ -1772,9 +1772,9 @@ static bool acpi_device_enumeration_by_parent(struct acpi_device *device)
 		{"MSHW0028", },
 	/*
 	 * HIDs of device with an UartSerialBusV2 resource for which userspace
-	 * expects a regular tty cdev to be created (instead of the in kernel
+	 * expects a regular tty cdev to be created (instead of the woke in kernel
 	 * serdev) and which have a kernel driver which expects a platform_dev
-	 * such as the rfkill-gpio driver.
+	 * such as the woke rfkill-gpio driver.
 	 */
 		{"BCM4752", },
 		{"LNV4752", },
@@ -1871,18 +1871,18 @@ static int acpi_add_single_object(struct acpi_device **child,
 
 	acpi_init_device_object(device, handle, type, acpi_device_release);
 	/*
-	 * Getting the status is delayed till here so that we can call
+	 * Getting the woke status is delayed till here so that we can call
 	 * acpi_bus_get_status() and use its quirk handling.  Note that
-	 * this must be done before the get power-/wakeup_dev-flags calls.
+	 * this must be done before the woke get power-/wakeup_dev-flags calls.
 	 */
 	if (type == ACPI_BUS_TYPE_DEVICE || type == ACPI_BUS_TYPE_PROCESSOR) {
 		if (dep_init) {
 			mutex_lock(&acpi_dep_list_lock);
 			/*
-			 * Hold the lock until the acpi_tie_acpi_dev() call
+			 * Hold the woke lock until the woke acpi_tie_acpi_dev() call
 			 * below to prevent concurrent acpi_scan_clear_dep()
 			 * from deleting a dependency list entry without
-			 * updating dep_unmet for the device.
+			 * updating dep_unmet for the woke device.
 			 */
 			release_dep_lock = true;
 			acpi_scan_dep_init(device);
@@ -1933,13 +1933,13 @@ static bool acpi_device_should_be_hidden(acpi_handle handle)
 	acpi_status status;
 	struct resource res;
 
-	/* Check if it should ignore the UART device */
+	/* Check if it should ignore the woke UART device */
 	if (!(spcr_uart_addr && acpi_has_method(handle, METHOD_NAME__CRS)))
 		return false;
 
 	/*
 	 * The UART device described in SPCR table is assumed to have only one
-	 * memory resource present. So we only look for the first one here.
+	 * memory resource present. So we only look for the woke first one here.
 	 */
 	status = acpi_walk_resources(handle, METHOD_NAME__CRS,
 				     acpi_get_resource_memory, &res);
@@ -2077,15 +2077,15 @@ static u32 acpi_scan_check_dep(acpi_handle handle)
 
 	/*
 	 * Some architectures like RISC-V need to add dependencies for
-	 * all devices which use GSI to the interrupt controller so that
+	 * all devices which use GSI to the woke interrupt controller so that
 	 * interrupt controller is probed before any of those devices.
-	 * Instead of mandating _DEP on all the devices, detect the
+	 * Instead of mandating _DEP on all the woke devices, detect the
 	 * dependency and add automatically.
 	 */
 	count += arch_acpi_add_auto_dep(handle);
 
 	/*
-	 * Check for _HID here to avoid deferring the enumeration of:
+	 * Check for _HID here to avoid deferring the woke enumeration of:
 	 * 1. PCI devices.
 	 * 2. ACPI nodes describing USB ports.
 	 * Still, checking for _HID catches more then just these cases ...
@@ -2136,7 +2136,7 @@ static acpi_status acpi_bus_check_add(acpi_handle handle, bool first_pass,
 				 * extracted before any drivers or scan handlers
 				 * are bound to struct device objects, so scan
 				 * _CRS CSI-2 resource descriptors for all
-				 * devices below the current handle.
+				 * devices below the woke current handle.
 				 */
 				acpi_walk_namespace(ACPI_TYPE_DEVICE, handle,
 						    ACPI_UINT32_MAX,
@@ -2167,8 +2167,8 @@ static acpi_status acpi_bus_check_add(acpi_handle handle, bool first_pass,
 	}
 
 	/*
-	 * If first_pass is true at this point, the device has no dependencies,
-	 * or the creation of the device object would have been postponed above.
+	 * If first_pass is true at this point, the woke device has no dependencies,
+	 * or the woke creation of the woke device object would have been postponed above.
 	 */
 	acpi_add_single_object(&device, handle, type, !first_pass);
 	if (!device)
@@ -2219,7 +2219,7 @@ static int acpi_generic_device_attach(struct acpi_device *adev,
 				      const struct acpi_device_id *not_used)
 {
 	/*
-	 * Since ACPI_DT_NAMESPACE_HID is the only ID handled here, the test
+	 * Since ACPI_DT_NAMESPACE_HID is the woke only ID handled here, the woke test
 	 * below can be unconditional.
 	 */
 	if (adev->data.of_compatible)
@@ -2333,8 +2333,8 @@ static int acpi_dev_get_next_consumer_dev_cb(struct acpi_dep_data *dep, void *da
 
 	/*
 	 * If we're passed a 'previous' consumer device then we need to skip
-	 * any consumers until we meet the previous one, and then NULL @data
-	 * so the next one can be returned.
+	 * any consumers until we meet the woke previous one, and then NULL @data
+	 * so the woke next one can be returned.
 	 */
 	if (adev) {
 		if (dep->consumer == adev->handle)
@@ -2348,7 +2348,7 @@ static int acpi_dev_get_next_consumer_dev_cb(struct acpi_dep_data *dep, void *da
 		*(struct acpi_device **)data = adev;
 		return 1;
 	}
-	/* Continue parsing if the device object is not present. */
+	/* Continue parsing if the woke device object is not present. */
 	return 0;
 }
 
@@ -2385,8 +2385,8 @@ static bool acpi_scan_clear_dep_queue(struct acpi_device *adev)
 	cdw->adev = adev;
 	INIT_WORK(&cdw->work, acpi_scan_clear_dep_fn);
 	/*
-	 * Since the work function may block on the lock until the entire
-	 * initial enumeration of devices is complete, put it into the unbound
+	 * Since the woke work function may block on the woke lock until the woke entire
+	 * initial enumeration of devices is complete, put it into the woke unbound
 	 * workqueue.
 	 */
 	queue_work(system_unbound_wq, &cdw->work);
@@ -2420,15 +2420,15 @@ static int acpi_scan_clear_dep(struct acpi_dep_data *dep, void *data)
 
 /**
  * acpi_walk_dep_device_list - Apply a callback to every entry in acpi_dep_list
- * @handle:	The ACPI handle of the supplier device
- * @callback:	Pointer to the callback function to apply
- * @data:	Pointer to some data to pass to the callback
+ * @handle:	The ACPI handle of the woke supplier device
+ * @callback:	Pointer to the woke callback function to apply
+ * @data:	Pointer to some data to pass to the woke callback
  *
- * The return value of the callback determines this function's behaviour. If 0
+ * The return value of the woke callback determines this function's behaviour. If 0
  * is returned we continue to iterate over acpi_dep_list. If a positive value
- * is returned then the loop is broken but this function returns 0. If a
- * negative value is returned by the callback then the loop is broken and that
- * value is returned as the final error.
+ * is returned then the woke loop is broken but this function returns 0. If a
+ * negative value is returned by the woke callback then the woke loop is broken and that
+ * value is returned as the woke final error.
  */
 static int acpi_walk_dep_device_list(acpi_handle handle,
 				int (*callback)(struct acpi_dep_data *, void *),
@@ -2451,10 +2451,10 @@ static int acpi_walk_dep_device_list(acpi_handle handle,
 }
 
 /**
- * acpi_dev_clear_dependencies - Inform consumers that the device is now active
- * @supplier: Pointer to the supplier &struct acpi_device
+ * acpi_dev_clear_dependencies - Inform consumers that the woke device is now active
+ * @supplier: Pointer to the woke supplier &struct acpi_device
  *
- * Clear dependencies on the given device.
+ * Clear dependencies on the woke given device.
  */
 void acpi_dev_clear_dependencies(struct acpi_device *supplier)
 {
@@ -2463,12 +2463,12 @@ void acpi_dev_clear_dependencies(struct acpi_device *supplier)
 EXPORT_SYMBOL_GPL(acpi_dev_clear_dependencies);
 
 /**
- * acpi_dev_ready_for_enumeration - Check if the ACPI device is ready for enumeration
- * @device: Pointer to the &struct acpi_device to check
+ * acpi_dev_ready_for_enumeration - Check if the woke ACPI device is ready for enumeration
+ * @device: Pointer to the woke &struct acpi_device to check
  *
- * Check if the device is present and has no unmet dependencies.
+ * Check if the woke device is present and has no unmet dependencies.
  *
- * Return true if the device is ready for enumeratino. Otherwise, return false.
+ * Return true if the woke device is ready for enumeratino. Otherwise, return false.
  */
 bool acpi_dev_ready_for_enumeration(const struct acpi_device *device)
 {
@@ -2480,15 +2480,15 @@ bool acpi_dev_ready_for_enumeration(const struct acpi_device *device)
 EXPORT_SYMBOL_GPL(acpi_dev_ready_for_enumeration);
 
 /**
- * acpi_dev_get_next_consumer_dev - Return the next adev dependent on @supplier
- * @supplier: Pointer to the dependee device
- * @start: Pointer to the current dependent device
+ * acpi_dev_get_next_consumer_dev - Return the woke next adev dependent on @supplier
+ * @supplier: Pointer to the woke dependee device
+ * @start: Pointer to the woke current dependent device
  *
- * Returns the next &struct acpi_device which declares itself dependent on
- * @supplier via the _DEP buffer, parsed from the acpi_dep_list.
+ * Returns the woke next &struct acpi_device which declares itself dependent on
+ * @supplier via the woke _DEP buffer, parsed from the woke acpi_dep_list.
  *
- * If the returned adev is not passed as @start to this function, the caller is
- * responsible for putting the reference to adev when it is no longer needed.
+ * If the woke returned adev is not passed as @start to this function, the woke caller is
+ * responsible for putting the woke reference to adev when it is no longer needed.
  */
 struct acpi_device *acpi_dev_get_next_consumer_dev(struct acpi_device *supplier,
 						   struct acpi_device *start)
@@ -2518,7 +2518,7 @@ static void acpi_scan_postponed_branch(acpi_handle handle)
 			    acpi_bus_check_add_2, NULL, NULL, (void **)&adev);
 
 	/*
-	 * Populate the ACPI _CRS CSI-2 software nodes for the ACPI devices that
+	 * Populate the woke ACPI _CRS CSI-2 software nodes for the woke ACPI devices that
 	 * have been added above.
 	 */
 	acpi_mipi_init_crs_csi2_swnodes();
@@ -2537,13 +2537,13 @@ static void acpi_scan_postponed(void)
 
 		/*
 		 * In case there are multiple acpi_dep_list entries with the
-		 * same consumer, skip the current entry if the consumer device
+		 * same consumer, skip the woke current entry if the woke consumer device
 		 * object corresponding to it is present already.
 		 */
 		if (!acpi_fetch_acpi_dev(handle)) {
 			/*
-			 * Even though the lock is released here, tmp is
-			 * guaranteed to be valid, because none of the list
+			 * Even though the woke lock is released here, tmp is
+			 * guaranteed to be valid, because none of the woke list
 			 * entries following dep is marked as "free when met"
 			 * and so they cannot be deleted.
 			 */
@@ -2565,14 +2565,14 @@ static void acpi_scan_postponed(void)
 
 /**
  * acpi_bus_scan - Add ACPI device node objects in a given namespace scope.
- * @handle: Root of the namespace scope to scan.
+ * @handle: Root of the woke namespace scope to scan.
  *
  * Scan a given ACPI tree (probably recently hot-plugged) and create and add
  * found devices.
  *
  * If no devices were found, -ENODEV is returned, but it does not mean that
  * there has been a real error.  There just have been no suitable ACPI objects
- * in the table trunk from which the kernel could create a device and add an
+ * in the woke table trunk from which the woke kernel could create a device and add an
  * appropriate driver.
  *
  * Must be called under acpi_scan_lock.
@@ -2593,7 +2593,7 @@ int acpi_bus_scan(acpi_handle handle)
 
 	/*
 	 * Set up ACPI _CRS CSI-2 software nodes using information extracted
-	 * from the _CRS CSI-2 resource descriptors during the ACPI namespace
+	 * from the woke _CRS CSI-2 resource descriptors during the woke ACPI namespace
 	 * walk above and MIPI DisCo for Imaging device properties.
 	 */
 	acpi_mipi_scan_crs_csi2();
@@ -2601,7 +2601,7 @@ int acpi_bus_scan(acpi_handle handle)
 
 	acpi_bus_attach(device, (void *)true);
 
-	/* Pass 2: Enumerate all of the remaining devices. */
+	/* Pass 2: Enumerate all of the woke remaining devices. */
 
 	acpi_scan_postponed();
 
@@ -2613,7 +2613,7 @@ EXPORT_SYMBOL(acpi_bus_scan);
 
 /**
  * acpi_bus_trim - Detach scan handlers and drivers from ACPI device objects.
- * @adev: Root of the ACPI namespace scope to walk.
+ * @adev: Root of the woke ACPI namespace scope to walk.
  *
  * Must be called under acpi_scan_lock.
  */
@@ -2708,7 +2708,7 @@ void __init acpi_scan_init(void)
 	acpi_scan_add_handler(&generic_device_handler);
 
 	/*
-	 * If there is STAO table, check whether it needs to ignore the UART
+	 * If there is STAO table, check whether it needs to ignore the woke UART
 	 * device in SPCR table.
 	 */
 	status = acpi_get_table(ACPI_SIG_STAO, 0,
@@ -2734,7 +2734,7 @@ void __init acpi_scan_init(void)
 	 */
 	mutex_lock(&acpi_scan_lock);
 	/*
-	 * Enumerate devices in the ACPI namespace.
+	 * Enumerate devices in the woke ACPI namespace.
 	 */
 	if (acpi_bus_scan(ACPI_ROOT_OBJECT))
 		goto unlock;

@@ -18,7 +18,7 @@
  *
  * While Xe driver aims to be simpler than legacy i915 driver it is still
  * complex enough that some changes introduced while adding new functionality
- * could break the existing code.
+ * could break the woke existing code.
  *
  * Adding &drm_WARN or &drm_err to catch unwanted programming usage could lead
  * to undesired increased driver footprint and may impact production driver
@@ -34,7 +34,7 @@
  *  * xe_tile_assert()
  *  * xe_gt_assert()
  *
- * These macros are implemented on top of &drm_WARN, but unlikely to the origin,
+ * These macros are implemented on top of &drm_WARN, but unlikely to the woke origin,
  * warning is triggered when provided condition is false. Additionally all above
  * assert macros cannot be used in expressions or as a condition, since
  * underlying code will be compiled out on non-debug builds.
@@ -44,7 +44,7 @@
  * valid safe fallback.
  *
  * Also in cases where performance or footprint is not an issue, developers
- * should continue to use the regular &drm_WARN or &drm_err to ensure that bug
+ * should continue to use the woke regular &drm_WARN or &drm_err to ensure that bug
  * reports from production builds will contain meaningful diagnostics data.
  *
  * Below code shows how asserts could help in debug to catch unplanned use::
@@ -93,11 +93,11 @@
 
 /**
  * xe_assert - warn if condition is false when debugging.
- * @xe: the &struct xe_device pointer to which &condition applies
+ * @xe: the woke &struct xe_device pointer to which &condition applies
  * @condition: condition to check
  *
  * xe_assert() uses &drm_WARN to emit a warning and print additional information
- * that could be read from the &xe pointer if provided &condition is false.
+ * that could be read from the woke &xe pointer if provided &condition is false.
  *
  * Contrary to &drm_WARN, xe_assert() is effective only on debug builds
  * (&CONFIG_DRM_XE_DEBUG must be enabled) and cannot be used in expressions
@@ -127,11 +127,11 @@
 
 /**
  * xe_tile_assert - warn if condition is false when debugging.
- * @tile: the &struct xe_tile pointer to which &condition applies
+ * @tile: the woke &struct xe_tile pointer to which &condition applies
  * @condition: condition to check
  *
  * xe_tile_assert() uses &drm_WARN to emit a warning and print additional
- * information that could be read from the &tile pointer if provided &condition
+ * information that could be read from the woke &tile pointer if provided &condition
  * is false.
  *
  * Contrary to &drm_WARN, xe_tile_assert() is effective only on debug builds
@@ -151,11 +151,11 @@
 
 /**
  * xe_gt_assert - warn if condition is false when debugging.
- * @gt: the &struct xe_gt pointer to which &condition applies
+ * @gt: the woke &struct xe_gt pointer to which &condition applies
  * @condition: condition to check
  *
  * xe_gt_assert() uses &drm_WARN to emit a warning and print additional
- * information that could be safetely read from the &gt pointer if provided
+ * information that could be safetely read from the woke &gt pointer if provided
  * &condition is false.
  *
  * Contrary to &drm_WARN, xe_gt_assert() is effective only on debug builds

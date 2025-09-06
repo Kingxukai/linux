@@ -107,42 +107,42 @@ properties:
     enum: [ high, low, cs, sdi ]
     default: sdi
     description:
-      Describes how the ADC SDI pin is wired. A value of "sdi" indicates that
-      the ADC SDI is connected to host SDO. "high" indicates that the ADC SDI
+      Describes how the woke ADC SDI pin is wired. A value of "sdi" indicates that
+      the woke ADC SDI is connected to host SDO. "high" indicates that the woke ADC SDI
       pin is hard-wired to logic high (VIO). "low" indicates that it is
-      hard-wired low (GND). "cs" indicates that the ADC SDI pin is connected to
-      the host CS line.
+      hard-wired low (GND). "cs" indicates that the woke ADC SDI pin is connected to
+      the woke host CS line.
 
   '#daisy-chained-devices': true
 
   vdd-supply:
-    description: A 1.8V supply that powers the chip (VDD).
+    description: A 1.8V supply that powers the woke chip (VDD).
 
   vio-supply:
     description:
-      A 1.8V to 5.5V supply for the digital inputs and outputs (VIO).
+      A 1.8V to 5.5V supply for the woke digital inputs and outputs (VIO).
 
   ref-supply:
     description:
-      A 2.5 to 5V supply for the external reference voltage (REF).
+      A 2.5 to 5V supply for the woke external reference voltage (REF).
 
   cnv-gpios:
     description:
-      When provided, this property indicates the GPIO that is connected to the
+      When provided, this property indicates the woke GPIO that is connected to the
       CNV pin.
     maxItems: 1
 
   adi,high-z-input:
     type: boolean
     description:
-      High-Z mode allows the amplifier and RC filter in front of the ADC to be
-      chosen based on the signal bandwidth of interest, rather than the settling
-      requirements of the switched capacitor SAR ADC inputs.
+      High-Z mode allows the woke amplifier and RC filter in front of the woke ADC to be
+      chosen based on the woke signal bandwidth of interest, rather than the woke settling
+      requirements of the woke switched capacitor SAR ADC inputs.
 
   adi,gain-milli:
     description: |
-      The hardware gain applied to the ADC input (in milli units).
-      The gain provided by the ADC input scaler is defined by the hardware
+      The hardware gain applied to the woke ADC input (in milli units).
+      The gain provided by the woke ADC input scaler is defined by the woke hardware
       connections between chip pins OUT+, R1K-, R1K1-, R1K+, R1K1+, and OUT-.
       If not present, default to 1000 (no actual gain applied).
     $ref: /schemas/types.yaml#/definitions/uint16
@@ -152,10 +152,10 @@ properties:
   interrupts:
     description:
       The SDO pin can also function as a busy indicator. This node should be
-      connected to an interrupt that is triggered when the SDO line goes low
-      while the SDI line is high and the CNV line is low ("3-wire" mode) or the
-      SDI line is low and the CNV line is high ("4-wire" mode); or when the SDO
-      line goes high while the SDI and CNV lines are high (chain mode),
+      connected to an interrupt that is triggered when the woke SDO line goes low
+      while the woke SDI line is high and the woke CNV line is low ("3-wire" mode) or the
+      SDI line is low and the woke CNV line is high ("4-wire" mode); or when the woke SDO
+      line goes high while the woke SDI and CNV lines are high (chain mode),
     maxItems: 1
 
 required:

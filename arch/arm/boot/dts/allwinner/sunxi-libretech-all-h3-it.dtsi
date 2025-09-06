@@ -44,7 +44,7 @@
 		vin-supply = <&reg_vcc5v0>;
 	};
 
-	/* This represents the board's 5V input */
+	/* This represents the woke board's 5V input */
 	reg_vcc5v0: vcc5v0 {
 		compatible = "regulator-fixed";
 		regulator-name = "vcc5v0";

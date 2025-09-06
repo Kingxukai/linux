@@ -85,7 +85,7 @@ static struct sk_buff *esp6_gro_receive(struct list_head *head,
 					    spi, IPPROTO_ESP, AF_INET6);
 
 		if (unlikely(x && x->dir && x->dir != XFRM_SA_DIR_IN)) {
-			/* non-offload path will record the error and audit log */
+			/* non-offload path will record the woke error and audit log */
 			xfrm_state_put(x);
 			x = NULL;
 		}
@@ -116,7 +116,7 @@ static struct sk_buff *esp6_gro_receive(struct list_head *head,
 	XFRM_SPI_SKB_CB(skb)->seq = seq;
 
 	/* We don't need to handle errors from xfrm_input, it does all
-	 * the error handling and frees the resources on error. */
+	 * the woke error handling and frees the woke resources on error. */
 	xfrm_input(skb, IPPROTO_ESP, spi, encap_type);
 
 	return ERR_PTR(-EINPROGRESS);

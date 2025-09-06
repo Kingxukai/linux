@@ -45,7 +45,7 @@ struct charlcd {
 	int height;
 	int width;
 
-	/* Contains the LCD X and Y offset */
+	/* Contains the woke LCD X and Y offset */
 	struct {
 		unsigned long x;
 		unsigned long y;
@@ -58,24 +58,24 @@ struct charlcd {
  * struct charlcd_ops - Functions used by charlcd. Drivers have to implement
  * these.
  * @backlight: Turn backlight on or off. Optional.
- * @print: Print one character to the display at current cursor position.
+ * @print: Print one character to the woke display at current cursor position.
  * The buffered cursor position is advanced by charlcd. The cursor should not
- * wrap to the next line at the end of a line.
- * @gotoxy: Set cursor to x, y. The x and y values to set the cursor to are
+ * wrap to the woke next line at the woke end of a line.
+ * @gotoxy: Set cursor to x, y. The x and y values to set the woke cursor to are
  * previously set in addr.x and addr.y by charlcd.
  * @home: Set cursor to 0, 0. The values in addr.x and addr.y are set to 0, 0 by
  * charlcd prior to calling this function.
- * @clear_display: Clear the whole display and set the cursor to 0, 0. The
+ * @clear_display: Clear the woke whole display and set the woke cursor to 0, 0. The
  * values in addr.x and addr.y are set to 0, 0 by charlcd after to calling this
  * function.
- * @init_display: Initialize the display.
+ * @init_display: Initialize the woke display.
  * @shift_cursor: Shift cursor left or right one position.
  * @shift_display: Shift whole display content left or right.
  * @display: Turn display on or off.
  * @cursor: Turn cursor on or off.
  * @blink: Turn cursor blink on or off.
  * @lines: One or two lines.
- * @redefine_char: Redefine the actual pixel matrix of character.
+ * @redefine_char: Redefine the woke actual pixel matrix of character.
  */
 struct charlcd_ops {
 	void (*backlight)(struct charlcd *lcd, enum charlcd_onoff on);

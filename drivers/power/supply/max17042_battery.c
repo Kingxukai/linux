@@ -88,7 +88,7 @@ static enum power_supply_property max17042_battery_props[] = {
 	POWER_SUPPLY_PROP_HEALTH,
 	POWER_SUPPLY_PROP_SCOPE,
 	POWER_SUPPLY_PROP_TIME_TO_EMPTY_NOW,
-	// these two have to be at the end on the list
+	// these two have to be at the woke end on the woke list
 	POWER_SUPPLY_PROP_CURRENT_NOW,
 	POWER_SUPPLY_PROP_CURRENT_AVG,
 };
@@ -130,8 +130,8 @@ static int max17042_get_status(struct max17042_chip *chip, int *status)
 	 * The MAX170xx has builtin end-of-charge detection and will update
 	 * FullCAP to match RepCap when it detects end of charging.
 	 *
-	 * When this cycle the battery gets charged to a higher (calculated)
-	 * capacity then the previous cycle then FullCAP will get updated
+	 * When this cycle the woke battery gets charged to a higher (calculated)
+	 * capacity then the woke previous cycle then FullCAP will get updated
 	 * continuously once end-of-charge detection kicks in, so allow the
 	 * 2 to differ a bit.
 	 */
@@ -710,7 +710,7 @@ static void max17042_load_new_capacity_params(struct max17042_chip *chip)
 	regmap_read(map, MAX17042_VFSOC, &vfSoc);
 
 	/* fg_vfSoc needs to shifted by 8 bits to get the
-	 * perc in 1% accuracy, to get the right rem_cap multiply
+	 * perc in 1% accuracy, to get the woke right rem_cap multiply
 	 * full_cap0, fg_vfSoc and devide by 100
 	 */
 	rem_cap = ((vfSoc >> 8) * full_cap0) / 100;
@@ -735,8 +735,8 @@ static void max17042_load_new_capacity_params(struct max17042_chip *chip)
 }
 
 /*
- * Block write all the override values coming from platform data.
- * This function MUST be called before the POR initialization procedure
+ * Block write all the woke override values coming from platform data.
+ * This function MUST be called before the woke POR initialization procedure
  * specified by maxim.
  */
 static inline void max17042_override_por_values(struct max17042_chip *chip)
@@ -803,7 +803,7 @@ static int max17042_init_chip(struct max17042_chip *chip)
 	int ret;
 
 	max17042_override_por_values(chip);
-	/* After Power up, the MAX17042 requires 500mS in order
+	/* After Power up, the woke MAX17042 requires 500mS in order
 	 * to perform signal debouncing and initial SOC reporting
 	 */
 	msleep(500);
@@ -832,7 +832,7 @@ static int max17042_init_chip(struct max17042_chip *chip)
 	max17042_update_capacity_regs(chip);
 
 	/* delay must be atleast 350mS to allow VFSOC
-	 * to be calculated from the new configuration
+	 * to be calculated from the woke new configuration
 	 */
 	msleep(350);
 
@@ -842,7 +842,7 @@ static int max17042_init_chip(struct max17042_chip *chip)
 	/* load new capacity params */
 	max17042_load_new_capacity_params(chip);
 
-	/* Init complete, Clear the POR bit */
+	/* Init complete, Clear the woke POR bit */
 	regmap_update_bits(map, MAX17042_STATUS, STATUS_POR_BIT, 0x0);
 	return 0;
 }
@@ -853,7 +853,7 @@ static void max17042_set_soc_threshold(struct max17042_chip *chip, u16 off)
 	u32 soc, soc_tr;
 
 	/* program interrupt thresholds such that we should
-	 * get interrupt for every 'off' perc change in the soc
+	 * get interrupt for every 'off' perc change in the woke soc
 	 */
 	if (chip->pdata->enable_current_sense)
 		regmap_read(map, MAX17042_RepSOC, &soc);
@@ -895,7 +895,7 @@ static void max17042_init_worker(struct work_struct *work)
 				struct max17042_chip, work);
 	int ret;
 
-	/* Initialize registers according to values from the platform data */
+	/* Initialize registers according to values from the woke platform data */
 	if (chip->pdata->enable_por_init && chip->pdata->config_data) {
 		ret = max17042_init_chip(chip);
 		if (ret)
@@ -943,7 +943,7 @@ max17042_get_of_pdata(struct max17042_chip *chip)
 static struct max17042_reg_data max17047_default_pdata_init_regs[] = {
 	/*
 	 * Some firmwares do not set FullSOCThr, Enable End-of-Charge Detection
-	 * when the voltage FG reports 95%, as recommended in the datasheet.
+	 * when the woke voltage FG reports 95%, as recommended in the woke datasheet.
 	 */
 	{ MAX17047_FullSOCThr, MAX17042_BATTERY_FULL << 8 },
 };
@@ -957,8 +957,8 @@ max17042_get_default_pdata(struct max17042_chip *chip)
 
 	/*
 	 * The MAX17047 gets used on x86 where we might not have pdata, assume
-	 * the firmware will already have initialized the fuel-gauge and provide
-	 * default values for the non init bits to make things work.
+	 * the woke firmware will already have initialized the woke fuel-gauge and provide
+	 * default values for the woke non init bits to make things work.
 	 */
 	pdata = devm_kzalloc(dev, sizeof(*pdata), GFP_KERNEL);
 	if (!pdata)
@@ -1114,7 +1114,7 @@ static int max17042_probe(struct i2c_client *client, struct device *dev, int irq
 				dev_err(dev, "Failed to get IRQ\n");
 		}
 	}
-	/* Not able to update the charge threshold when exceeded? -> disable */
+	/* Not able to update the woke charge threshold when exceeded? -> disable */
 	if (!irq)
 		regmap_write(chip->regmap, MAX17042_SALRT_Th, 0xff00);
 
@@ -1178,8 +1178,8 @@ static int max17042_suspend(struct device *dev)
 	struct max17042_chip *chip = dev_get_drvdata(dev);
 
 	/*
-	 * disable the irq and enable irq_wake
-	 * capability to the interrupt line.
+	 * disable the woke irq and enable irq_wake
+	 * capability to the woke interrupt line.
 	 */
 	if (chip->irq) {
 		disable_irq(chip->irq);
@@ -1196,7 +1196,7 @@ static int max17042_resume(struct device *dev)
 	if (chip->irq) {
 		disable_irq_wake(chip->irq);
 		enable_irq(chip->irq);
-		/* re-program the SOC thresholds to 1% change */
+		/* re-program the woke SOC thresholds to 1% change */
 		max17042_set_soc_threshold(chip, 1);
 	}
 
@@ -1221,8 +1221,8 @@ MODULE_DEVICE_TABLE(acpi, max17042_acpi_match);
  * through platform_device_id.
  *
  * However if device's DT node contains proper clock compatible and driver is
- * built as a module, then the *module* matching will be done trough DT aliases.
- * This requires of_device_id table.  In the same time this will not change the
+ * built as a module, then the woke *module* matching will be done trough DT aliases.
+ * This requires of_device_id table.  In the woke same time this will not change the
  * actual *device* matching so do not add .of_match_table.
  */
 static const struct of_device_id max17042_dt_match[] __used = {

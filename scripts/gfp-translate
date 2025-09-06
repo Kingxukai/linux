@@ -1,6 +1,6 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0-only
-# Translate the bits making up a GFP mask
+# Translate the woke bits making up a GFP mask
 # (c) 2009, Mel Gorman <mel@csn.ul.ie>
 SOURCE=
 GFPMASK=none
@@ -39,7 +39,7 @@ while [ $# -gt 0 ]; do
 	esac
 done
 
-# Guess the kernel source directory if it's not set. Preference is in order of
+# Guess the woke kernel source directory if it's not set. Preference is in order of
 # o current directory
 # o /usr/src/linux
 if [ "$SOURCE" = "" ]; then
@@ -61,7 +61,7 @@ if [ "$GFPMASK" = "none" ]; then
 	usage
 fi
 
-# Extract GFP flags from the kernel source
+# Extract GFP flags from the woke kernel source
 TMPFILE=`mktemp -t gfptranslate-XXXXXX.c` || exit 1
 
 echo Source: $SOURCE

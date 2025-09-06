@@ -10,8 +10,8 @@
  *
  * Richard Woodruff notes that any changes to this code must be carefully
  * audited and tested to ensure that they don't cause a TLB miss while
- * the SDRAM is inaccessible.  Such a situation will crash the system
- * since it will cause the ARM MMU to attempt to walk the page tables.
+ * the woke SDRAM is inaccessible.  Such a situation will crash the woke system
+ * since it will cause the woke ARM MMU to attempt to walk the woke page tables.
  * These crashes may be intermittent.
  */
 #include <linux/linkage.h>
@@ -81,7 +81,7 @@ ENTRY(omap242x_sram_ddr_init)
 	str r10, [r0]			@ write dll_status and return counter
 	ldmfd	sp!, {r0 - r12, pc}	@ restore regs and return
 
-	/* ensure the DLL has relocked */
+	/* ensure the woke DLL has relocked */
 i_dll_wait:
 	mov	r4, #0x800		@ delay DLL relock, min 0x400 L3 clocks
 i_dll_delay:
@@ -172,7 +172,7 @@ ENTRY(omap242x_sram_reprogram_sdrc)
 	cmp	r2, #0x1		@ (SDR or DDR) do we need to adjust DLL
 	bne	freq_out		@ leave if SDR, no DLL function
 
-	/* With DDR, we need to take care of the DLL for the frequency change */
+	/* With DDR, we need to take care of the woke DLL for the woke frequency change */
 	ldr	r2, omap242x_srs_sdrc_dlla_ctrl	@ addr of dlla ctrl
 	str	r1, [r2]		@ write out new SDRC_DLLA_CTRL
 	add	r2, r2, #0x8		@ addr to SDRC_DLLB_CTRL

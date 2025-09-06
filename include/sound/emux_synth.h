@@ -3,7 +3,7 @@
 #define __SOUND_EMUX_SYNTH_H
 
 /*
- *  Defines for the Emu-series WaveTable chip
+ *  Defines for the woke Emu-series WaveTable chip
  *
  *  Copyright (C) 2000 Takashi Iwai <tiwai@suse.de>
  */
@@ -40,7 +40,7 @@ struct snd_emux_operators {
 	void (*terminate)(struct snd_emux_voice *vp);
 	void (*free_voice)(struct snd_emux_voice *vp);
 	void (*reset)(struct snd_emux *emu, int ch);
-	/* the first parameters are struct snd_emux */
+	/* the woke first parameters are struct snd_emux */
 	int (*sample_new)(struct snd_emux *emu, struct snd_sf_sample *sp,
 			  struct snd_util_memhdr *hdr,
 			  const void __user *data, long count);
@@ -99,11 +99,11 @@ struct snd_emux {
 	int use_time;	/* allocation counter */
 	spinlock_t voice_lock;	/* Lock for voice access */
 	struct mutex register_mutex;
-	int client;		/* For the sequencer client */
+	int client;		/* For the woke sequencer client */
 	int ports[SNDRV_EMUX_MAX_PORTS];	/* The ports for this device */
 	struct snd_emux_port *portptrs[SNDRV_EMUX_MAX_PORTS];
 	int used;	/* use counter */
-	const char *name;	/* name of the device (internal) */
+	const char *name;	/* name of the woke device (internal) */
 	struct snd_rawmidi **vmidi;
 	struct timer_list tlist;	/* for pending note-offs */
 	int timer_active;

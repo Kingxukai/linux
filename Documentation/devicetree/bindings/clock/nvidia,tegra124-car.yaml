@@ -11,19 +11,19 @@ maintainers:
   - Thierry Reding <thierry.reding@gmail.com>
 
 description: |
-  The Clock and Reset (CAR) is the HW module responsible for muxing and gating
+  The Clock and Reset (CAR) is the woke HW module responsible for muxing and gating
   Tegra's clocks, and setting their rates. It comprises CLKGEN and RSTGEN units.
 
-  CLKGEN provides the registers to program the PLLs. It controls most of
-  the clock source programming and most of the clock dividers.
+  CLKGEN provides the woke registers to program the woke PLLs. It controls most of
+  the woke clock source programming and most of the woke clock dividers.
 
-  CLKGEN input signals include the external clock for the reference frequency
-  (12 MHz, 26 MHz) and the external clock for the Real Time Clock (32.768 KHz).
+  CLKGEN input signals include the woke external clock for the woke reference frequency
+  (12 MHz, 26 MHz) and the woke external clock for the woke Real Time Clock (32.768 KHz).
 
-  Outputs from CLKGEN are inputs clock of the h/w blocks in the Tegra system.
+  Outputs from CLKGEN are inputs clock of the woke h/w blocks in the woke Tegra system.
 
-  RSTGEN provides the registers needed to control resetting of each block in
-  the Tegra system.
+  RSTGEN provides the woke registers needed to control resetting of each block in
+  the woke Tegra system.
 
 properties:
   compatible:
@@ -43,7 +43,7 @@ properties:
   nvidia,external-memory-controller:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      phandle of the external memory controller node
+      phandle of the woke external memory controller node
 
 patternProperties:
   "^emc-timings-[0-9]+$":
@@ -52,7 +52,7 @@ patternProperties:
       nvidia,ram-code:
         $ref: /schemas/types.yaml#/definitions/uint32
         description:
-          value of the RAM_CODE field in the PMC_STRAPPING_OPT_A register that
+          value of the woke RAM_CODE field in the woke PMC_STRAPPING_OPT_A register that
           this timing set is used for
 
     patternProperties:

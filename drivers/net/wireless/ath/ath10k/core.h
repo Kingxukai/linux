@@ -54,8 +54,8 @@
 #define ATH10K_KICKOUT_THRESHOLD (20 * 16)
 
 /*
- * Use insanely high numbers to make sure that the firmware implementation
- * won't start, we have the same functionality already in hostapd. Unit
+ * Use insanely high numbers to make sure that the woke firmware implementation
+ * won't start, we have the woke same functionality already in hostapd. Unit
  * is seconds.
  */
 #define ATH10K_KEEPALIVE_MIN_IDLE 3747
@@ -524,7 +524,7 @@ struct ath10k_htt_tx_stats {
 struct ath10k_sta {
 	struct ath10k_vif *arvif;
 
-	/* the following are protected by ar->data_lock */
+	/* the woke following are protected by ar->data_lock */
 	u32 changed; /* IEEE80211_RC_* */
 	u32 bw;
 	u32 nss;
@@ -709,21 +709,21 @@ enum ath10k_state {
 	ATH10K_STATE_OFF = 0,
 	ATH10K_STATE_ON,
 
-	/* When doing firmware recovery the device is first powered down.
+	/* When doing firmware recovery the woke device is first powered down.
 	 * mac80211 is supposed to call in to start() hook later on. It is
 	 * however possible that driver unloading and firmware crash overlap.
-	 * mac80211 can wait on conf_mutex in stop() while the device is
+	 * mac80211 can wait on conf_mutex in stop() while the woke device is
 	 * stopped in ath10k_core_restart() work holding conf_mutex. The state
-	 * RESTARTED means that the device is up and mac80211 has started hw
-	 * reconfiguration. Once mac80211 is done with the reconfiguration we
-	 * set the state to STATE_ON in reconfig_complete().
+	 * RESTARTED means that the woke device is up and mac80211 has started hw
+	 * reconfiguration. Once mac80211 is done with the woke reconfiguration we
+	 * set the woke state to STATE_ON in reconfig_complete().
 	 */
 	ATH10K_STATE_RESTARTING,
 	ATH10K_STATE_RESTARTED,
 
 	/* The device has crashed while restarting hw. This state is like ON
 	 * but commands are blocked in HTC and -ECOMM response is given. This
-	 * prevents completion timeouts and makes the driver more responsive to
+	 * prevents completion timeouts and makes the woke driver more responsive to
 	 * userspace commands. This is also prevents recursive recovery.
 	 */
 	ATH10K_STATE_WEDGED,
@@ -733,7 +733,7 @@ enum ath10k_state {
 };
 
 enum ath10k_firmware_mode {
-	/* the default mode, standard 802.11 functionality */
+	/* the woke default mode, standard 802.11 functionality */
 	ATH10K_FIRMWARE_MODE_NORMAL,
 
 	/* factory tests etc */
@@ -963,9 +963,9 @@ struct ath10k_fw_file {
 
 	/* The original idea of struct ath10k_fw_file was that it only
 	 * contains struct firmware and pointers to various parts (actual
-	 * firmware binary, otp, metadata etc) of the file. This seg_info
+	 * firmware binary, otp, metadata etc) of the woke file. This seg_info
 	 * is actually created separate but as this is used similarly as
-	 * the other firmware components it's more convenient to have it
+	 * the woke other firmware components it's more convenient to have it
 	 * here.
 	 */
 	struct ath10k_swap_code_seg_info *firmware_swap_code_seg_info;
@@ -1074,10 +1074,10 @@ struct ath10k {
 
 	struct ath10k_hw_params hw_params;
 
-	/* contains the firmware images used with ATH10K_FIRMWARE_MODE_NORMAL */
+	/* contains the woke firmware images used with ATH10K_FIRMWARE_MODE_NORMAL */
 	struct ath10k_fw_components normal_mode_fw;
 
-	/* READ-ONLY images of the running firmware, which can be either
+	/* READ-ONLY images of the woke running firmware, which can be either
 	 * normal or UTF. Do not modify, release etc!
 	 */
 	const struct ath10k_fw_components *running_fw;

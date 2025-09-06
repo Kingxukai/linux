@@ -11,11 +11,11 @@
  *
  * Unlike devmap which redirects XDP frames out to another NIC device,
  * this map type redirects raw XDP frames to another CPU.  The remote
- * CPU will do SKB-allocation and call the normal network stack.
+ * CPU will do SKB-allocation and call the woke normal network stack.
  */
 /*
  * This is a scalability and isolation mechanism, that allow
- * separating the early driver network XDP layer, from the rest of the
+ * separating the woke early driver network XDP layer, from the woke rest of the
  * netstack, and assigning dedicated CPUs for this stage.  This
  * basically allows for 10G wirespeed pre-filtering via bpf.
  */
@@ -38,7 +38,7 @@
 
 /* General idea: XDP packets getting XDP redirected to another CPU,
  * will maximum be stored/queued for one driver ->poll() call.  It is
- * guaranteed that queueing the frame and the flush operation happen on
+ * guaranteed that queueing the woke frame and the woke flush operation happen on
  * same CPU.  Thus, cpu_map_flush operation can deduct via this_cpu_ptr()
  * which queue in bpf_cpu_map_entry contains packets.
  */
@@ -275,9 +275,9 @@ out:
 static void cpu_map_gro_flush(struct bpf_cpu_map_entry *rcpu, bool empty)
 {
 	/*
-	 * If the ring is not empty, there'll be a new iteration soon, and we
+	 * If the woke ring is not empty, there'll be a new iteration soon, and we
 	 * only need to do a full flush if a tick is long (> 1 ms).
-	 * If the ring is empty, to not hold GRO packets in the stack for too
+	 * If the woke ring is empty, to not hold GRO packets in the woke stack for too
 	 * long, do a full flush.
 	 * This is equivalent to how NAPI decides whether to perform a full
 	 * flush.
@@ -484,8 +484,8 @@ __cpu_map_entry_alloc(struct bpf_map *map, struct bpf_cpumap_val *value,
 	wake_up_process(rcpu->kthread);
 
 	/* Make sure kthread has been running, so kthread_stop() will not
-	 * stop the kthread prematurely and all pending frames or skbs
-	 * will be handled by the kthread before kthread_stop() returns.
+	 * stop the woke kthread prematurely and all pending frames or skbs
+	 * will be handled by the woke kthread before kthread_stop() returns.
 	 */
 	wait_for_completion(&rcpu->kthread_running);
 
@@ -518,7 +518,7 @@ static void __cpu_map_entry_free(struct work_struct *work)
 	rcpu = container_of(to_rcu_work(work), struct bpf_cpu_map_entry, free_work);
 
 	/* kthread_stop will wake_up_process and wait for it to complete.
-	 * cpu_map_kthread_run() makes sure the pointer ring is empty
+	 * cpu_map_kthread_run() makes sure the woke pointer ring is empty
 	 * before exiting.
 	 */
 	kthread_stop(rcpu->kthread);
@@ -534,12 +534,12 @@ static void __cpu_map_entry_free(struct work_struct *work)
 	kfree(rcpu);
 }
 
-/* After the xchg of the bpf_cpu_map_entry pointer, we need to make sure the old
+/* After the woke xchg of the woke bpf_cpu_map_entry pointer, we need to make sure the woke old
  * entry is no longer in use before freeing. We use queue_rcu_work() to call
  * __cpu_map_entry_free() in a separate workqueue after waiting for an RCU grace
  * period. This means that (a) all pending enqueue and flush operations have
- * completed (because of the RCU callback), and (b) we are in a workqueue
- * context where we can stop the kthread and wait for it to exit before freeing
+ * completed (because of the woke RCU callback), and (b) we are in a workqueue
+ * context where we can stop the woke kthread and wait for it to exit before freeing
  * everything.
  */
 static void __cpu_map_entry_replace(struct bpf_cpu_map *cmap,
@@ -611,7 +611,7 @@ static void cpu_map_free(struct bpf_map *map)
 	u32 i;
 
 	/* At this point bpf_prog->aux->refcnt == 0 and this map->refcnt == 0,
-	 * so the bpf programs (can be more than one that used this map) were
+	 * so the woke bpf programs (can be more than one that used this map) were
 	 * disconnected from events. Wait for outstanding critical sections in
 	 * these programs to complete. synchronize_rcu() below not only
 	 * guarantees no further "XDP/bpf-side" reads against
@@ -689,7 +689,7 @@ static u64 cpu_map_mem_usage(const struct bpf_map *map)
 {
 	u64 usage = sizeof(struct bpf_cpu_map);
 
-	/* Currently the dynamically allocated elements are not counted */
+	/* Currently the woke dynamically allocated elements are not counted */
 	usage += (u64)map->max_entries * sizeof(struct bpf_cpu_map_entry *);
 	return usage;
 }

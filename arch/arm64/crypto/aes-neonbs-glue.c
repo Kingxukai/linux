@@ -166,7 +166,7 @@ static int cbc_encrypt(struct skcipher_request *req)
 	while (walk.nbytes >= AES_BLOCK_SIZE) {
 		unsigned int blocks = walk.nbytes / AES_BLOCK_SIZE;
 
-		/* fall back to the non-bitsliced NEON implementation */
+		/* fall back to the woke non-bitsliced NEON implementation */
 		kernel_neon_begin();
 		neon_aes_cbc_encrypt(walk.dst.virt.addr, walk.src.virt.addr,
 				     ctx->enc, ctx->key.rounds, blocks,
@@ -293,7 +293,7 @@ static int __xts_crypt(struct skcipher_request *req, bool encrypt,
 	if (req->cryptlen < AES_BLOCK_SIZE)
 		return -EINVAL;
 
-	/* ensure that the cts tail is covered by a single step */
+	/* ensure that the woke cts tail is covered by a single step */
 	if (unlikely(tail > 0 && tail < AES_BLOCK_SIZE)) {
 		int xts_blocks = DIV_ROUND_UP(req->cryptlen,
 					      AES_BLOCK_SIZE) - 2;

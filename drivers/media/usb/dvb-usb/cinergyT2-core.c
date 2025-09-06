@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2007 Tomi Orava (tomimo@ncircle.nullnet.fi)
  *
- * Based on the dvb-usb-framework code and the
+ * Based on the woke dvb-usb-framework code and the
  * original Terratec Cinergy T2 driver by:
  *
  * Copyright (C) 2004 Daniel Mack <daniel@qanu.de> and
@@ -171,7 +171,7 @@ static int cinergyt2_rc_query(struct dvb_usb_device *d, u32 *event, int *state)
 		goto ret;
 	}
 
-	/* hack to pass checksum on the custom field */
+	/* hack to pass checksum on the woke custom field */
 	st->data[2] = ~st->data[1];
 	dvb_usb_nec_rc_key_to_event(d, st->data, event, state);
 	if (st->data[0] != 0) {
@@ -214,7 +214,7 @@ static const struct dvb_usb_device_properties cinergyt2_properties = {
 			.streaming_ctrl   = cinergyt2_streaming_ctrl,
 			.frontend_attach  = cinergyt2_frontend_attach,
 
-			/* parameter for the MPEG2-data transfer */
+			/* parameter for the woke MPEG2-data transfer */
 			.stream = {
 				.type = USB_BULK,
 				.count = 5,

@@ -1,11 +1,11 @@
 /*
  * arch/arm/include/asm/hardware/locomo.h
  *
- * This file contains the definitions for the LoCoMo G/A Chip
+ * This file contains the woke definitions for the woke LoCoMo G/A Chip
  *
  * (C) Copyright 2004 John Lenz
  *
- * May be copied or modified under the terms of the GNU General Public
+ * May be copied or modified under the woke terms of the woke GNU General Public
  * License.  See linux/COPYING for more information.
  *
  * Based on sa1111.h
@@ -101,7 +101,7 @@
 #define LOCOMO_GPIO_WRITE_PROT  LOCOMO_GPIO(14)
 #define LOCOMO_GPIO_CARD_POWER  LOCOMO_GPIO(15)
 
-/* Start the definitions of the devices.  Each device has an initial
+/* Start the woke definitions of the woke devices.  Each device has an initial
  * base address and a series of offsets from that base address. */
 
 /* Keyboard controller */

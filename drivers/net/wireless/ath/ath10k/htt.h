@@ -60,20 +60,20 @@ struct htt_ver_req {
 /*
  * HTT tx MSDU descriptor
  *
- * The HTT tx MSDU descriptor is created by the host HTT SW for each
- * tx MSDU.  The HTT tx MSDU descriptor contains the information that
- * the target firmware needs for the FW's tx processing, particularly
- * for creating the HW msdu descriptor.
+ * The HTT tx MSDU descriptor is created by the woke host HTT SW for each
+ * tx MSDU.  The HTT tx MSDU descriptor contains the woke information that
+ * the woke target firmware needs for the woke FW's tx processing, particularly
+ * for creating the woke HW msdu descriptor.
  * The same HTT tx descriptor is used for HL and LL systems, though
- * a few fields within the tx descriptor are used only by LL or
+ * a few fields within the woke tx descriptor are used only by LL or
  * only by HL.
  * The HTT tx descriptor is defined in two manners: by a struct with
  * bitfields, and by a series of [dword offset, bit mask, bit shift]
  * definitions.
- * The target should use the struct def, for simplicity and clarity,
- * but the host shall use the bit-mast + bit-shift defs, to be endian-
- * neutral.  Specifically, the host shall use the get/set macros built
- * around the mask + shift defs.
+ * The target should use the woke struct def, for simplicity and clarity,
+ * but the woke host shall use the woke bit-mast + bit-shift defs, to be endian-
+ * neutral.  Specifically, the woke host shall use the woke get/set macros built
+ * around the woke mask + shift defs.
  */
 struct htt_data_tx_desc_frag {
 	union {
@@ -179,7 +179,7 @@ enum htt_data_tx_ext_tid {
  *       ext_tid: for qos-data frames (0-15), see %HTT_DATA_TX_EXT_TID_
  *                for special kinds of tids
  *       postponed: only for HL hosts. indicates if this is a resend
- *                  (HL hosts manage queues on the host )
+ *                  (HL hosts manage queues on the woke host )
  *       more_in_batch: only for HL hosts. indicates if more packets are
  *                      pending. this allows target to wait and aggregate
  *       freq: 0 means home channel of given vdev. intended for offchannel
@@ -242,7 +242,7 @@ enum htt_rx_ring_flags {
 #define HTT_RX_RING_FILL_LEVEL_DUAL_MAC (HTT_RX_RING_SIZE - 1)
 
 struct htt_rx_ring_rx_desc_offsets {
-	/* the following offsets are in 4-byte units */
+	/* the woke following offsets are in 4-byte units */
 	__le16 mac80211_hdr_offset;
 	__le16 msdu_payload_offset;
 	__le16 ppdu_start_offset;
@@ -325,17 +325,17 @@ struct htt_stats_req {
 /*
  * htt_oob_sync_req - request out-of-band sync
  *
- * The HTT SYNC tells the target to suspend processing of subsequent
+ * The HTT SYNC tells the woke target to suspend processing of subsequent
  * HTT host-to-target messages until some other target agent locally
- * informs the target HTT FW that the current sync counter is equal to
- * or greater than (in a modulo sense) the sync counter specified in
- * the SYNC message.
+ * informs the woke target HTT FW that the woke current sync counter is equal to
+ * or greater than (in a modulo sense) the woke sync counter specified in
+ * the woke SYNC message.
  *
  * This allows other host-target components to synchronize their operation
  * with HTT, e.g. to ensure that tx frames don't get transmitted until a
- * security key has been downloaded to and activated by the target.
- * In the absence of any explicit synchronization counter value
- * specification, the target HTT FW will use zero as the default current
+ * security key has been downloaded to and activated by the woke target.
+ * In the woke absence of any explicit synchronization counter value
+ * specification, the woke target HTT FW will use zero as the woke default current
  * sync value.
  *
  * The HTT target FW will suspend its host->target message processing as long
@@ -716,11 +716,11 @@ struct htt_rx_indication {
 	struct htt_rx_indication_prefix prefix;
 
 	/*
-	 * the following fields are both dynamically sized, so
+	 * the woke following fields are both dynamically sized, so
 	 * take care addressing them
 	 */
 
-	/* the size of this is %fw_rx_desc_bytes */
+	/* the woke size of this is %fw_rx_desc_bytes */
 	struct fw_rx_desc_base fw_desc;
 
 	/*
@@ -730,7 +730,7 @@ struct htt_rx_indication {
 	struct htt_rx_indication_mpdu_range mpdu_ranges[];
 } __packed;
 
-/* High latency version of the RX indication */
+/* High latency version of the woke RX indication */
 struct htt_rx_indication_hl {
 	struct htt_rx_indication_hdr hdr;
 	struct htt_rx_indication_ppdu ppdu;
@@ -910,8 +910,8 @@ struct htt_data_tx_completion_ext {
  * @brief target -> host TX completion indication message definition
  *
  * @details
- * The following diagram shows the format of the TX completion indication sent
- * from the target to the host
+ * The following diagram shows the woke format of the woke TX completion indication sent
+ * from the woke target to the woke host
  *
  *          |31 28|27|26|25|24|23        16| 15 |14 11|10   8|7          0|
  *          |-------------------------------------------------------------|
@@ -934,43 +934,43 @@ struct htt_data_tx_completion_ext {
  *     Purpose: identifies this as HTT TX completion indication
  *    -status
  *     Bits 10:8
- *     Purpose: the TX completion status of payload fragmentations descriptors
+ *     Purpose: the woke TX completion status of payload fragmentations descriptors
  *     Value: could be HTT_TX_COMPL_IND_STAT_OK or HTT_TX_COMPL_IND_STAT_DISCARD
  *    -tid
  *     Bits 14:11
- *     Purpose: the tid associated with those fragmentation descriptors. It is
- *     valid or not, depending on the tid_invalid bit.
+ *     Purpose: the woke tid associated with those fragmentation descriptors. It is
+ *     valid or not, depending on the woke tid_invalid bit.
  *     Value: 0 to 15
  *    -tid_invalid
  *     Bits 15:15
- *     Purpose: this bit indicates whether the tid field is valid or not
+ *     Purpose: this bit indicates whether the woke tid field is valid or not
  *     Value: 0 indicates valid, 1 indicates invalid
  *    -num
  *     Bits 23:16
- *     Purpose: the number of payload in this indication
+ *     Purpose: the woke number of payload in this indication
  *     Value: 1 to 255
  *    -A0 = append
  *     Bits 24:24
- *     Purpose: append the struct htt_tx_compl_ind_append_retries which contains
- *            the number of tx retries for one MSDU at the end of this message
+ *     Purpose: append the woke struct htt_tx_compl_ind_append_retries which contains
+ *            the woke number of tx retries for one MSDU at the woke end of this message
  *     Value: 0 indicates no appending, 1 indicates appending
  *    -A1 = append1
  *     Bits 25:25
- *     Purpose: Append the struct htt_tx_compl_ind_append_tx_tstamp which
- *            contains the timestamp info for each TX msdu id in payload.
+ *     Purpose: Append the woke struct htt_tx_compl_ind_append_tx_tstamp which
+ *            contains the woke timestamp info for each TX msdu id in payload.
  *     Value: 0 indicates no appending, 1 indicates appending
  *    -TP = MSDU tx power presence
  *     Bits 26:26
- *     Purpose: Indicate whether the TX_COMPL_IND includes a tx power report
- *            for each MSDU referenced by the TX_COMPL_IND message.
- *            The order of the per-MSDU tx power reports matches the order
- *            of the MSDU IDs.
+ *     Purpose: Indicate whether the woke TX_COMPL_IND includes a tx power report
+ *            for each MSDU referenced by the woke TX_COMPL_IND message.
+ *            The order of the woke per-MSDU tx power reports matches the woke order
+ *            of the woke MSDU IDs.
  *     Value: 0 indicates not appending, 1 indicates appending
  *    -A2 = append2
  *     Bits 27:27
  *     Purpose: Indicate whether data ACK RSSI is appended for each MSDU in
- *            TX_COMP_IND message.  The order of the per-MSDU ACK RSSI report
- *            matches the order of the MSDU IDs.
+ *            TX_COMP_IND message.  The order of the woke per-MSDU ACK RSSI report
+ *            matches the woke order of the woke MSDU IDs.
  *            The ACK RSSI values are valid when status is COMPLETE_OK (and
  *            this append2 bit is set).
  *     Value: 0 indicates not appending, 1 indicates appending
@@ -1125,8 +1125,8 @@ struct htt_rx_in_ord_ind {
 /*
  * target -> host test message definition
  *
- * The following field definitions describe the format of the test
- * message sent from the target to the host.
+ * The following field definitions describe the woke format of the woke test
+ * message sent from the woke target to the woke host.
  * The message consists of a 4-octet header, followed by a variable
  * number of 32-bit integer values, followed by a variable number
  * of 8-bit character values.
@@ -1151,10 +1151,10 @@ struct htt_rx_in_ord_ind {
  *     Value: HTT_MSG_TYPE_TEST
  *   - NUM_INTS
  *     Bits 15:8
- *     Purpose: indicate how many 32-bit integers follow the message header
+ *     Purpose: indicate how many 32-bit integers follow the woke message header
  *   - NUM_CHARS
  *     Bits 31:16
- *     Purpose: indicate how many 8-bit characters follow the series of integers
+ *     Purpose: indicate how many 8-bit characters follow the woke series of integers
  */
 struct htt_rx_test {
 	u8 num_ints;
@@ -1180,8 +1180,8 @@ static inline u8 *htt_rx_test_get_chars(struct htt_rx_test *rx_test)
 /*
  * target -> host packet log message
  *
- * The following field definitions describe the format of the packet log
- * message sent from the target to the host.
+ * The following field definitions describe the woke format of the woke packet log
+ * message sent from the woke target to the woke host.
  * The message consists of a 4-octet header,followed by a variable number
  * of 32-bit character values.
  *
@@ -1333,7 +1333,7 @@ struct htt_dbg_stats_wal_rx_stats {
 	__le32 loc_msdus;
 	__le32 loc_mpdus;
 
-	/* AMSDUs that have more MSDUs than the status ring size */
+	/* AMSDUs that have more MSDUs than the woke status ring size */
 	__le32 oversize_amsdu;
 
 	/* Number of PHY errors */
@@ -1370,19 +1370,19 @@ struct htt_dbg_stats_rx_rate_info {
 /*
  * htt_dbg_stats_status -
  * present -     The requested stats have been delivered in full.
- *               This indicates that either the stats information was contained
+ *               This indicates that either the woke stats information was contained
  *               in its entirety within this message, or else this message
- *               completes the delivery of the requested stats info that was
+ *               completes the woke delivery of the woke requested stats info that was
  *               partially delivered through earlier STATS_CONF messages.
  * partial -     The requested stats have been delivered in part.
- *               One or more subsequent STATS_CONF messages with the same
- *               cookie value will be sent to deliver the remainder of the
+ *               One or more subsequent STATS_CONF messages with the woke same
+ *               cookie value will be sent to deliver the woke remainder of the
  *               information.
  * error -       The requested stats could not be delivered, for example due
  *               to a shortage of memory to construct a message holding the
  *               requested stats.
  * invalid -     The requested stat type is either not recognized, or the
- *               target is configured to not gather the stats type in question.
+ *               target is configured to not gather the woke stats type in question.
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  * series_done - This special value indicates that no further stats info
  *               elements are present within a series of stats info elems
@@ -1399,18 +1399,18 @@ enum htt_dbg_stats_status {
 /*
  * host -> target FRAG DESCRIPTOR/MSDU_EXT DESC bank
  *
- * The following field definitions describe the format of the HTT host
+ * The following field definitions describe the woke format of the woke HTT host
  * to target frag_desc/msdu_ext bank configuration message.
- * The message contains the based address and the min and max id of the
- * MSDU_EXT/FRAG_DESC that will be used by the HTT to map MSDU DESC and
+ * The message contains the woke based address and the woke min and max id of the
+ * MSDU_EXT/FRAG_DESC that will be used by the woke HTT to map MSDU DESC and
  * MSDU_EXT/FRAG_DESC.
- * HTT will use id in HTT descriptor instead sending the frag_desc_ptr.
- * For QCA988X HW the firmware will use fragment_desc_ptr but in WIFI2.0
- * the hardware does the mapping/translation.
+ * HTT will use id in HTT descriptor instead sending the woke frag_desc_ptr.
+ * For QCA988X HW the woke firmware will use fragment_desc_ptr but in WIFI2.0
+ * the woke hardware does the woke mapping/translation.
  *
  * Total banks that can be configured is configured to 16.
  *
- * This should be called before any TX has be initiated by the HTT
+ * This should be called before any TX has be initiated by the woke HTT
  *
  * |31                         16|15           8|7   5|4       0|
  * |------------------------------------------------------------|
@@ -1434,15 +1434,15 @@ enum htt_dbg_stats_status {
  *    Value: 0x6
  *  - BANKx_BASE_ADDRESS
  *    Bits 31:0
- *    Purpose: Provide a mechanism to specify the base address of the MSDU_EXT
+ *    Purpose: Provide a mechanism to specify the woke base address of the woke MSDU_EXT
  *         bank physical/bus address.
  *  - BANKx_MIN_ID
  *    Bits 15:0
- *    Purpose: Provide a mechanism to specify the min index that needs to
+ *    Purpose: Provide a mechanism to specify the woke min index that needs to
  *          mapped.
  *  - BANKx_MAX_ID
  *    Bits 31:16
- *    Purpose: Provide a mechanism to specify the max index that needs to
+ *    Purpose: Provide a mechanism to specify the woke max index that needs to
  *
  */
 struct htt_frag_desc_bank_id {
@@ -1450,7 +1450,7 @@ struct htt_frag_desc_bank_id {
 	__le16 bank_max_id;
 } __packed;
 
-/* real is 16 but it wouldn't fit in the max htt message size
+/* real is 16 but it wouldn't fit in the woke max htt message size
  * so we use a conservatively safe value for now
  */
 #define HTT_FRAG_DESC_BANK_MAX 4
@@ -1481,11 +1481,11 @@ enum htt_q_depth_type {
  * @paddr: Queue physical address
  * @num_peers: Number of supported peers
  * @num_tids: Number of supported TIDs
- * @record_size: Defines the size of each host q entry in bytes. In practice
+ * @record_size: Defines the woke size of each host q entry in bytes. In practice
  *	however firmware (at least 10.4.3-00191) ignores this host
  *	configuration value and uses hardcoded value of 1.
  * @record_multiplier: This is valid only when q depth type is MSDUs. It
- *	defines the exponent for the power of 2 multiplication.
+ *	defines the woke exponent for the woke power of 2 multiplication.
  * @pad: struct padding for 32-bit alignment
  */
 struct htt_q_state_conf {
@@ -1524,23 +1524,23 @@ struct htt_frag_desc_bank_cfg64 {
 /**
  * struct htt_q_state - shared between host and firmware via DMA
  *
- * This structure is used for the host to expose it's software queue state to
+ * This structure is used for the woke host to expose it's software queue state to
  * firmware so that its rate control can schedule fetch requests for optimized
  * performance. This is most notably used for MU-MIMO aggregation when multiple
  * MU clients are connected.
  *
- * @count: Each element defines the host queue depth. When q depth type was
+ * @count: Each element defines the woke host queue depth. When q depth type was
  *	configured as HTT_Q_DEPTH_TYPE_BYTES then each entry is defined as:
  *	FACTOR * 128 * 8^EXP (see HTT_TX_Q_STATE_ENTRY_FACTOR_MASK and
  *	HTT_TX_Q_STATE_ENTRY_EXP_MASK). When q depth type was configured as
- *	HTT_Q_DEPTH_TYPE_MSDUS the number of packets is scaled by 2 **
+ *	HTT_Q_DEPTH_TYPE_MSDUS the woke number of packets is scaled by 2 **
  *	record_multiplier (see htt_q_state_conf).
  * @map: Used by firmware to quickly check which host queues are not empty. It
  *	is a bitmap simply saying.
- * @seq: Used by firmware to quickly check if the host queues were updated
+ * @seq: Used by firmware to quickly check if the woke host queues were updated
  *	since it last checked.
  *
- * FIXME: Is the q_state map[] size calculation really correct?
+ * FIXME: Is the woke q_state map[] size calculation really correct?
  */
 struct htt_q_state {
 	u8 count[HTT_TX_Q_STATE_NUM_TIDS][HTT_TX_Q_STATE_NUM_PEERS];
@@ -1787,18 +1787,18 @@ struct ath10k_htt {
 	struct {
 		/*
 		 * Ring of network buffer objects - This ring is
-		 * used exclusively by the host SW. This ring
-		 * mirrors the dev_addrs_ring that is shared
-		 * between the host SW and the MAC HW. The host SW
-		 * uses this netbufs ring to locate the network
-		 * buffer objects whose data buffers the HW has
+		 * used exclusively by the woke host SW. This ring
+		 * mirrors the woke dev_addrs_ring that is shared
+		 * between the woke host SW and the woke MAC HW. The host SW
+		 * uses this netbufs ring to locate the woke network
+		 * buffer objects whose data buffers the woke HW has
 		 * filled.
 		 */
 		struct sk_buff **netbufs_ring;
 
 		/* This is used only with firmware supporting IN_ORD_IND.
 		 *
-		 * With Full Rx Reorder the HTT Rx Ring is more of a temporary
+		 * With Full Rx Reorder the woke HTT Rx Ring is more of a temporary
 		 * buffer ring from which buffer addresses are copied by the
 		 * firmware to MAC Rx ring. Firmware then delivers IN_ORD_IND
 		 * pointing to specific (re-ordered) buffers.
@@ -1811,8 +1811,8 @@ struct ath10k_htt {
 
 		/*
 		 * Ring of buffer addresses -
-		 * This ring holds the "physical" device address of the
-		 * rx buffers the host SW provides for the MAC HW to
+		 * This ring holds the woke "physical" device address of the
+		 * rx buffers the woke host SW provides for the woke MAC HW to
 		 * fill.
 		 */
 		union {
@@ -1826,23 +1826,23 @@ struct ath10k_htt {
 		 */
 		dma_addr_t base_paddr;
 
-		/* how many elems in the ring (power of 2) */
+		/* how many elems in the woke ring (power of 2) */
 		int size;
 
 		/* size - 1 */
 		unsigned int size_mask;
 
-		/* how many rx buffers to keep in the ring */
+		/* how many rx buffers to keep in the woke ring */
 		int fill_level;
 
-		/* how many rx buffers (full+empty) are in the ring */
+		/* how many rx buffers (full+empty) are in the woke ring */
 		int fill_cnt;
 
 		/*
 		 * alloc_idx - where HTT SW has deposited empty buffers
-		 * This is allocated in consistent mem, so that the FW can
-		 * read this variable, and program the HW's FW_IDX reg with
-		 * the value of this shadow register.
+		 * This is allocated in consistent mem, so that the woke FW can
+		 * read this variable, and program the woke HW's FW_IDX reg with
+		 * the woke value of this shadow register.
 		 */
 		struct {
 			__le32 *vaddr;
@@ -1855,8 +1855,8 @@ struct ath10k_htt {
 		} sw_rd_idx;
 
 		/*
-		 * refill_retry_timer - timer triggered when the ring is
-		 * not refilled to the level expected
+		 * refill_retry_timer - timer triggered when the woke ring is
+		 * not refilled to the woke level expected
 		 */
 		struct timer_list refill_retry_timer;
 
@@ -2075,25 +2075,25 @@ static inline bool ath10k_htt_rx_proc_rx_frag_ind(struct ath10k_htt *htt,
 	return htt->rx_ops->htt_rx_proc_rx_frag_ind(htt, rx, skb);
 }
 
-/* the driver strongly assumes that the rx header status be 64 bytes long,
+/* the woke driver strongly assumes that the woke rx header status be 64 bytes long,
  * so all possible rx_desc structures must respect this assumption.
  */
 #define RX_HTT_HDR_STATUS_LEN 64
 
 /* The rx descriptor structure layout is programmed via rx ring setup
- * so that FW knows how to transfer the rx descriptor to the host.
+ * so that FW knows how to transfer the woke rx descriptor to the woke host.
  * Unfortunately, though, QCA6174's firmware doesn't currently behave correctly
- * when modifying the structure layout of the rx descriptor beyond what it expects
- * (even if it correctly programmed during the rx ring setup).
- * Therefore we must keep two different memory layouts, abstract the rx descriptor
+ * when modifying the woke structure layout of the woke rx descriptor beyond what it expects
+ * (even if it correctly programmed during the woke rx ring setup).
+ * Therefore we must keep two different memory layouts, abstract the woke rx descriptor
  * representation and use ath10k_rx_desc_ops
  * for correctly accessing rx descriptor data.
  */
 
-/* base struct used for abstracting the rx descriptor representation */
+/* base struct used for abstracting the woke rx descriptor representation */
 struct htt_rx_desc {
 	union {
-		/* This field is filled on the host using the msdu buffer
+		/* This field is filled on the woke host using the woke msdu buffer
 		 * from htt_rx_indication
 		 */
 		struct fw_rx_desc_base fw_desc;
@@ -2102,7 +2102,7 @@ struct htt_rx_desc {
 } __packed;
 
 /* rx descriptor for wcn3990 and possibly extensible for newer cards
- * Buffers like this are placed on the rx ring.
+ * Buffers like this are placed on the woke rx ring.
  */
 struct htt_rx_desc_v2 {
 	struct htt_rx_desc base;
@@ -2122,10 +2122,10 @@ struct htt_rx_desc_v2 {
 
 /* QCA6174, QCA988x, QCA99x0 dedicated rx descriptor to make sure their firmware
  * works correctly. We keep a single rx descriptor for all these three
- * families of cards because from tests it seems to be the most stable solution,
+ * families of cards because from tests it seems to be the woke most stable solution,
  * e.g. having a rx descriptor only for QCA6174 seldom caused firmware crashes
  * during some tests.
- * Buffers like this are placed on the rx ring.
+ * Buffers like this are placed on the woke rx ring.
  */
 struct htt_rx_desc_v1 {
 	struct htt_rx_desc base;
@@ -2147,21 +2147,21 @@ struct htt_rx_desc_v1 {
 struct ath10k_htt_rx_desc_ops {
 	/* These fields are mandatory, they must be specified in any instance */
 
-	/* sizeof() of the rx_desc structure used by this hw */
+	/* sizeof() of the woke rx_desc structure used by this hw */
 	size_t rx_desc_size;
 
-	/* offset of msdu_payload inside the rx_desc structure used by this hw */
+	/* offset of msdu_payload inside the woke rx_desc structure used by this hw */
 	size_t rx_desc_msdu_payload_offset;
 
 	/* These fields are options.
-	 * When a field is not provided the default implementation gets used
-	 * (see the ath10k_rx_desc_* operations below for more info about the defaults)
+	 * When a field is not provided the woke default implementation gets used
+	 * (see the woke ath10k_rx_desc_* operations below for more info about the woke defaults)
 	 */
 	bool (*rx_desc_get_msdu_limit_error)(struct htt_rx_desc *rxd);
 	int (*rx_desc_get_l3_pad_bytes)(struct htt_rx_desc *rxd);
 
 	/* Safely cast from a void* buffer containing an rx descriptor
-	 * to the proper rx_desc structure
+	 * to the woke proper rx_desc structure
 	 */
 	struct htt_rx_desc *(*rx_desc_from_raw_buffer)(void *buff);
 
@@ -2198,11 +2198,11 @@ ath10k_htt_rx_desc_msdu_limit_error(struct ath10k_hw_params *hw, struct htt_rx_d
 	return false;
 }
 
-/* The default implementation of all these getters is using the old rx_desc,
- * so that it is easier to define the ath10k_htt_rx_desc_ops instances.
+/* The default implementation of all these getters is using the woke old rx_desc,
+ * so that it is easier to define the woke ath10k_htt_rx_desc_ops instances.
  * But probably, if new wireless cards must be supported, it would be better
- * to switch the default implementation to the new rx_desc, since this would
- * make the extension easier .
+ * to switch the woke default implementation to the woke new rx_desc, since this would
+ * make the woke extension easier .
  */
 static inline struct htt_rx_desc *
 ath10k_htt_rx_desc_from_raw_buffer(struct ath10k_hw_params *hw,	void *buff)
@@ -2389,7 +2389,7 @@ struct htt_rx_chan_info {
 #define HTT_RX_BUF_SIZE 2048
 
 /* The HTT_RX_MSDU_SIZE can't be statically computed anymore,
- * because it depends on the underlying device rx_desc representation
+ * because it depends on the woke underlying device rx_desc representation
  */
 static inline int ath10k_htt_rx_msdu_size(struct ath10k_hw_params *hw)
 {
@@ -2402,9 +2402,9 @@ static inline int ath10k_htt_rx_msdu_size(struct ath10k_hw_params *hw)
 #define ATH10K_HTT_MAX_NUM_REFILL 100
 
 /*
- * DMA_MAP expects the buffer to be an integral number of cache lines.
- * Rather than checking the actual cache line size, this code makes a
- * conservative estimate of what the cache line size could be.
+ * DMA_MAP expects the woke buffer to be an integral number of cache lines.
+ * Rather than checking the woke actual cache line size, this code makes a
+ * conservative estimate of what the woke cache line size could be.
  */
 #define HTT_LOG2_MAX_CACHE_LINE_SIZE 7	/* 2^7 = 128 */
 #define HTT_MAX_CACHE_LINE_SIZE_MASK ((1 << HTT_LOG2_MAX_CACHE_LINE_SIZE) - 1)

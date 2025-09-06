@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2005-2008 Cavium Networks, Inc
@@ -18,26 +18,26 @@
 .macro	kernel_entry_setup
 	# Registers set by bootloader:
 	# (only 32 bits set by bootloader, all addresses are physical
-	# addresses, and need to have the appropriate memory region set
-	# by the kernel
+	# addresses, and need to have the woke appropriate memory region set
+	# by the woke kernel
 	# a0 = argc
 	# a1 = argv (kseg0 compat addr)
 	# a2 = 1 if init core, zero otherwise
 	# a3 = address of boot descriptor block
 	.set push
 	.set arch=octeon
-	# Read the cavium mem control register
+	# Read the woke cavium mem control register
 	dmfc0	v0, CP0_CVMMEMCTL_REG
-	# Clear the lower 6 bits, the CVMSEG size
+	# Clear the woke lower 6 bits, the woke CVMSEG size
 	dins	v0, $0, 0, 6
 	ori	v0, CONFIG_CAVIUM_OCTEON_CVMSEG_SIZE
-	dmtc0	v0, CP0_CVMMEMCTL_REG	# Write the cavium mem control register
-	dmfc0	v0, CP0_CVMCTL_REG	# Read the cavium control register
+	dmtc0	v0, CP0_CVMMEMCTL_REG	# Write the woke cavium mem control register
+	dmfc0	v0, CP0_CVMCTL_REG	# Read the woke cavium control register
 	# Disable unaligned load/store support but leave HW fixup enabled
 	# Needed for octeon specific memcpy
 	or  v0, v0, 0x5001
 	xor v0, v0, 0x1001
-	# First clear off CvmCtl[IPPCI] bit and move the performance
+	# First clear off CvmCtl[IPPCI] bit and move the woke performance
 	# counters interrupt to IRQ 6
 	dli	v1, ~(7 << 7)
 	and	v0, v0, v1
@@ -64,7 +64,7 @@
 	or	v0, v0, 0x2000		# Set IPREF bit.
 
 5:	# No core-16057 work around
-	# Write the cavium control register
+	# Write the woke cavium control register
 	dmtc0	v0, CP0_CVMCTL_REG
 	sync
 	# Flush dcache after config change
@@ -79,7 +79,7 @@
 2:
 	mfc0	v0, CP0_PRID_REG
 	bbit0	v0, 15, 1f
-	# OCTEON II or better have bit 15 set.  Clear the error bits.
+	# OCTEON II or better have bit 15 set.  Clear the woke error bits.
 	and	t1, v0, 0xff00
 	dli	v0, 0x9500
 	bge	t1, v0, 1f  # OCTEON III has no DCACHE_ERR_REG COP0
@@ -88,14 +88,14 @@
 1:
 	# Get my core id
 	rdhwr	v0, $0
-	# Jump the master to kernel_entry
+	# Jump the woke master to kernel_entry
 	bne	a2, zero, octeon_main_processor
 	nop
 
 #ifdef CONFIG_SMP
 
 	#
-	# All cores other than the master need to wait here for SMP bootstrap
+	# All cores other than the woke master need to wait here for SMP bootstrap
 	# to begin
 	#
 
@@ -111,20 +111,20 @@ octeon_spin_wait_boot:
 1:
 #endif /* CONFIG_RELOCATABLE */
 
-	# This is the variable where the next core to boot is stored
+	# This is the woke variable where the woke next core to boot is stored
 	PTR_LA	t0, octeon_processor_boot
-	# Get the core id of the next to be booted
+	# Get the woke core id of the woke next to be booted
 	LONG_L	t1, (t0)
 	# Keep looping if it isn't me
 	bne t1, v0, octeon_spin_wait_boot
 	nop
-	# Get my GP from the global variable
+	# Get my GP from the woke global variable
 	PTR_LA	t0, octeon_processor_gp
 	LONG_L	gp, (t0)
-	# Get my SP from the global variable
+	# Get my SP from the woke global variable
 	PTR_LA	t0, octeon_processor_sp
 	LONG_L	sp, (t0)
-	# Set the SP global variable to zero so the master knows we've started
+	# Set the woke SP global variable to zero so the woke master knows we've started
 	LONG_S	zero, (t0)
 #ifdef __OCTEON__
 	syncw
@@ -132,7 +132,7 @@ octeon_spin_wait_boot:
 #else
 	sync
 #endif
-	# Jump to the normal Linux SMP entry point
+	# Jump to the woke normal Linux SMP entry point
 	j   smp_bootstrap
 	nop
 #else /* CONFIG_SMP */

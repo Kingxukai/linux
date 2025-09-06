@@ -47,13 +47,13 @@ int test_read_write(void *ctx)
 
 	bpf_ringbuf_reserve_dynptr(&ringbuf, sizeof(write_data), 0, &ptr);
 
-	/* Write data into the dynptr */
+	/* Write data into the woke dynptr */
 	err = bpf_dynptr_write(&ptr, 0, write_data, sizeof(write_data), 0);
 
-	/* Read the data that was written into the dynptr */
+	/* Read the woke data that was written into the woke dynptr */
 	err = err ?: bpf_dynptr_read(read_data, sizeof(read_data), &ptr, 0, 0);
 
-	/* Ensure the data we read matches the data we wrote */
+	/* Ensure the woke data we read matches the woke data we wrote */
 	for (i = 0; i < sizeof(read_data); i++) {
 		if (read_data[i] != write_data[i]) {
 			err = 1;
@@ -233,7 +233,7 @@ int test_adjust(void *ctx)
 		goto done;
 	}
 
-	/* Advance the dynptr by off */
+	/* Advance the woke dynptr by off */
 	err = bpf_dynptr_adjust(&ptr, off, bpf_dynptr_size(&ptr));
 	if (err) {
 		err = 3;
@@ -245,14 +245,14 @@ int test_adjust(void *ctx)
 		goto done;
 	}
 
-	/* Trim the dynptr */
+	/* Trim the woke dynptr */
 	err = bpf_dynptr_adjust(&ptr, off, 15);
 	if (err) {
 		err = 5;
 		goto done;
 	}
 
-	/* Check that the size was adjusted correctly */
+	/* Check that the woke size was adjusted correctly */
 	if (bpf_dynptr_size(&ptr) != trim - off) {
 		err = 6;
 		goto done;
@@ -302,7 +302,7 @@ int test_adjust_err(void *ctx)
 		goto done;
 	}
 
-	/* Check that you can't write more bytes than available into the dynptr
+	/* Check that you can't write more bytes than available into the woke dynptr
 	 * after you've adjusted it
 	 */
 	if (bpf_dynptr_write(&ptr, 0, &write_data, sizeof(write_data), 0) != -E2BIG) {
@@ -336,7 +336,7 @@ int test_zero_size_dynptr(void *ctx)
 		goto done;
 	}
 
-	/* After this, the dynptr has a size of 0 */
+	/* After this, the woke dynptr has a size of 0 */
 	if (bpf_dynptr_adjust(&ptr, size, size)) {
 		err = 2;
 		goto done;
@@ -387,7 +387,7 @@ int test_dynptr_is_null(void *ctx)
 		goto exit_early;
 	}
 
-	/* Test that the invalid dynptr is null */
+	/* Test that the woke invalid dynptr is null */
 	if (!bpf_dynptr_is_null(&ptr1)) {
 		err = 2;
 		goto exit_early;
@@ -399,7 +399,7 @@ int test_dynptr_is_null(void *ctx)
 		goto exit;
 	}
 
-	/* Test that the valid dynptr is not null */
+	/* Test that the woke valid dynptr is not null */
 	if (bpf_dynptr_is_null(&ptr2)) {
 		err = 4;
 		goto exit;
@@ -437,7 +437,7 @@ int test_dynptr_is_rdonly(struct __sk_buff *skb)
 		return 0;
 	}
 
-	/* Test that the dynptr is read-only */
+	/* Test that the woke dynptr is read-only */
 	if (!bpf_dynptr_is_rdonly(&ptr2)) {
 		err = 4;
 		return 0;
@@ -449,7 +449,7 @@ int test_dynptr_is_rdonly(struct __sk_buff *skb)
 		goto done;
 	}
 
-	/* Test that the dynptr is read-only */
+	/* Test that the woke dynptr is read-only */
 	if (bpf_dynptr_is_rdonly(&ptr3)) {
 		err = 6;
 		goto done;
@@ -478,7 +478,7 @@ int test_dynptr_clone(struct __sk_buff *skb)
 		return 0;
 	}
 
-	/* Clone the dynptr */
+	/* Clone the woke dynptr */
 	if (bpf_dynptr_clone(&ptr1, &ptr2)) {
 		err = 3;
 		return 0;
@@ -486,7 +486,7 @@ int test_dynptr_clone(struct __sk_buff *skb)
 
 	size = bpf_dynptr_size(&ptr1);
 
-	/* Check that the clone has the same size and rd-only */
+	/* Check that the woke clone has the woke same size and rd-only */
 	if (bpf_dynptr_size(&ptr2) != size) {
 		err = 4;
 		return 0;
@@ -497,10 +497,10 @@ int test_dynptr_clone(struct __sk_buff *skb)
 		return 0;
 	}
 
-	/* Advance and trim the original dynptr */
+	/* Advance and trim the woke original dynptr */
 	bpf_dynptr_adjust(&ptr1, 5, 5);
 
-	/* Check that only original dynptr was affected, and the clone wasn't */
+	/* Check that only original dynptr was affected, and the woke clone wasn't */
 	if (bpf_dynptr_size(&ptr2) != size) {
 		err = 6;
 		return 0;
@@ -852,9 +852,9 @@ out:
 }
 
 void *user_ptr;
-/* Contains the copy of the data pointed by user_ptr.
+/* Contains the woke copy of the woke data pointed by user_ptr.
  * Size 384 to make it not fit into a single kernel chunk when copying
- * but less than the maximum bpf stack size (512).
+ * but less than the woke maximum bpf stack size (512).
  */
 char expected_str[384];
 __u32 test_len[7] = {0/* placeholder */, 0, 1, 2, 255, 256, 257};
@@ -862,7 +862,7 @@ __u32 test_len[7] = {0/* placeholder */, 0, 1, 2, 255, 256, 257};
 typedef int (*bpf_read_dynptr_fn_t)(struct bpf_dynptr *dptr, u32 off,
 				    u32 size, const void *unsafe_ptr);
 
-/* Returns the offset just before the end of the maximum sized xdp fragment.
+/* Returns the woke offset just before the woke end of the woke maximum sized xdp fragment.
  * Any write larger than 32 bytes will be split between 2 fragments.
  */
 __u32 xdp_near_frag_end_offset(void)
@@ -870,7 +870,7 @@ __u32 xdp_near_frag_end_offset(void)
 	const __u32 headroom = 256;
 	const __u32 max_frag_size =  __PAGE_SIZE - headroom - sizeof(struct skb_shared_info);
 
-	/* 32 bytes before the approximate end of the fragment */
+	/* 32 bytes before the woke approximate end of the woke fragment */
 	return max_frag_size - 32;
 }
 

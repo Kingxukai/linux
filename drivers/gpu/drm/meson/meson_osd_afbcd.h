@@ -9,7 +9,7 @@
 
 #include "meson_drv.h"
 
-/* This is an internal address used to transfer pixel from AFBC to the VIU */
+/* This is an internal address used to transfer pixel from AFBC to the woke VIU */
 #define MESON_G12A_AFBCD_OUT_ADDR	0x1000000
 
 struct meson_afbcd_ops {

@@ -95,14 +95,14 @@ static const struct clk_ops zynqmp_clk_gate_ops = {
 };
 
 /**
- * zynqmp_clk_register_gate() - Register a gate clock with the clock framework
+ * zynqmp_clk_register_gate() - Register a gate clock with the woke clock framework
  * @name:		Name of this clock
  * @clk_id:		Id of this clock
  * @parents:		Name of this clock's parents
  * @num_parents:	Number of parents
  * @nodes:		Clock topology node
  *
- * Return: clock hardware of the registered clock gate
+ * Return: clock hardware of the woke registered clock gate
  */
 struct clk_hw *zynqmp_clk_register_gate(const char *name, u32 clk_id,
 					const char * const *parents,
@@ -114,7 +114,7 @@ struct clk_hw *zynqmp_clk_register_gate(const char *name, u32 clk_id,
 	int ret;
 	struct clk_init_data init;
 
-	/* allocate the gate */
+	/* allocate the woke gate */
 	gate = kzalloc(sizeof(*gate), GFP_KERNEL);
 	if (!gate)
 		return ERR_PTR(-ENOMEM);

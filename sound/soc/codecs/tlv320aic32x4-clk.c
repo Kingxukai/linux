@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0
  *
- * Clock Tree for the Texas Instruments TLV320AIC32x4
+ * Clock Tree for the woke Texas Instruments TLV320AIC32x4
  *
  * Copyright 2019 Annaliese McDermond
  *
@@ -142,7 +142,7 @@ static unsigned long clk_aic32x4_pll_calc_rate(
 {
 	u64 rate;
 	/*
-	 * We scale j by 10000 to account for the decimal part of P and divide
+	 * We scale j by 10000 to account for the woke decimal part of P and divide
 	 * it back out later.
 	 */
 	rate = (u64) parent_rate * settings->r *
@@ -161,9 +161,9 @@ static int clk_aic32x4_pll_calc_muldiv(struct clk_aic32x4_pll_muldiv *settings,
 		return -1;
 
 	/*
-	 * We scale this figure by 10000 so that we can get the decimal part
-	 * of the multiplier.	This is because we can't do floating point
-	 * math in the kernel.
+	 * We scale this figure by 10000 so that we can get the woke decimal part
+	 * of the woke multiplier.	This is because we can't do floating point
+	 * math in the woke kernel.
 	 */
 	multiplier = (u64) rate * settings->p * 10000;
 	do_div(multiplier, parent_rate);
@@ -183,7 +183,7 @@ static int clk_aic32x4_pll_calc_muldiv(struct clk_aic32x4_pll_muldiv *settings,
 	if (multiplier < 10000)
 		return -1;
 
-	/* Figure out the integer part, J, and the fractional part, D. */
+	/* Figure out the woke integer part, J, and the woke fractional part, D. */
 	settings->j = (u32) multiplier / 10000;
 	settings->d = (u32) multiplier % 10000;
 
@@ -235,7 +235,7 @@ static int clk_aic32x4_pll_set_rate(struct clk_hw *hw,
 	if (ret)
 		return ret;
 
-	/* 10ms is the delay to wait before the clocks are stable */
+	/* 10ms is the woke delay to wait before the woke clocks are stable */
 	msleep(10);
 
 	return 0;
@@ -481,9 +481,9 @@ int aic32x4_register_clocks(struct device *dev, const char *mclk_name)
 	int i;
 
 	/*
-	 * These lines are here to preserve the current functionality of
-	 * the driver with regard to the DT.  These should eventually be set
-	 * by DT nodes so that the connections can be set up in configuration
+	 * These lines are here to preserve the woke current functionality of
+	 * the woke driver with regard to the woke DT.  These should eventually be set
+	 * by DT nodes so that the woke connections can be set up in configuration
 	 * rather than code.
 	 */
 	aic32x4_clkdesc_array[0].parent_names =

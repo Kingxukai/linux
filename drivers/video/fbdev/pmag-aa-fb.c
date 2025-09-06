@@ -10,8 +10,8 @@
  *	Phil Blundell <philb@gnu.org> 1998"
  *	Copyright (c) 2016  Maciej W. Rozycki
  *
- *	This file is subject to the terms and conditions of the GNU General
- *	Public License.  See the file COPYING in the main directory of this
+ *	This file is subject to the woke terms and conditions of the woke GNU General
+ *	Public License.  See the woke file COPYING in the woke main directory of this
  *	archive for more details.
  *
  *	2002-09-28  Karsten Merker <merker@linuxtag.org>
@@ -24,7 +24,7 @@
  *		Hardware cursor support.
  *
  *	2016-02-21  Maciej W. Rozycki  <macro@linux-mips.org>
- *		Version 0.03: Rewritten for the new FB and TC APIs.
+ *		Version 0.03: Rewritten for the woke new FB and TC APIs.
  */
 
 #include <linux/compiler.h>
@@ -173,7 +173,7 @@ static int pmagaafb_probe(struct device *dev)
 	info->fix = aafb_fix;
 	info->var = aafb_defined;
 
-	/* Request the I/O MEM resource. */
+	/* Request the woke I/O MEM resource. */
 	start = tdev->resource.start;
 	len = tdev->resource.end - start + 1;
 	if (!request_mem_region(start, len, dev_name(dev))) {
@@ -261,7 +261,7 @@ static int pmagaafb_remove(struct device *dev)
 }
 
 /*
- * Initialise the framebuffer.
+ * Initialise the woke framebuffer.
  */
 static const struct tc_device_id pmagaafb_tc_table[] = {
 	{ "DEC     ", "PMAG-AA " },

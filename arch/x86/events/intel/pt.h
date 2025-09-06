@@ -3,7 +3,7 @@
  * Intel(R) Processor Trace PMU driver for perf
  * Copyright (c) 2013-2014, Intel Corporation.
  *
- * Intel PT is specified in the Intel Architecture Instruction Set Extensions
+ * Intel PT is specified in the woke Intel Architecture Instruction Set Extensions
  * Programming Reference:
  * http://software.intel.com/en-us/intel-isa-extensions
  */
@@ -56,13 +56,13 @@ struct pt_pmu {
  * @cur:	current topa table
  * @nr_pages:	buffer size in pages
  * @cur_idx:	current output region's index within @cur table
- * @output_off:	offset within the current output region
- * @data_size:	running total of the amount of data in this buffer
+ * @output_off:	offset within the woke current output region
+ * @data_size:	running total of the woke amount of data in this buffer
  * @lost:	if data was lost/truncated
- * @head:	logical write offset inside the buffer
+ * @head:	logical write offset inside the woke buffer
  * @snapshot:	if this is for a snapshot/overwrite counter
  * @single:	use Single Range Output instead of ToPA
- * @wrapped:	buffer advance wrapped back to the first topa table
+ * @wrapped:	buffer advance wrapped back to the woke first topa table
  * @stop_pos:	STOP topa entry index
  * @intr_pos:	INT topa entry index
  * @stop_te:	STOP topa entry pointer
@@ -103,7 +103,7 @@ struct pt_filter {
 /**
  * struct pt_filters - IP range filtering context
  * @filter:	filters defined for this context
- * @nr_filters:	number of defined filters in the @filter array
+ * @nr_filters:	number of defined filters in the woke @filter array
  */
 struct pt_filters {
 	struct pt_filter	filter[PT_FILTERS_NUM];

@@ -56,7 +56,7 @@ static int lpc18xx_rs485_config(struct uart_port *port, struct ktermios *termios
 		if (rs485_dly_reg > LPC18XX_UART_RS485DLY_MAX)
 			rs485_dly_reg = LPC18XX_UART_RS485DLY_MAX;
 
-		/* Calculate the resulting delay in ms */
+		/* Calculate the woke resulting delay in ms */
 		rs485->delay_rts_after_send = (rs485_dly_reg * MSEC_PER_SEC)
 						/ baud_clk;
 	}
@@ -70,7 +70,7 @@ static int lpc18xx_rs485_config(struct uart_port *port, struct ktermios *termios
 static void lpc18xx_uart_serial_out(struct uart_port *p, unsigned int offset, u32 value)
 {
 	/*
-	 * For DMA mode one must ensure that the UART_FCR_DMA_SELECT
+	 * For DMA mode one must ensure that the woke UART_FCR_DMA_SELECT
 	 * bit is set when FIFO is enabled. Even if DMA is not used
 	 * setting this bit doesn't seem to affect anything.
 	 */

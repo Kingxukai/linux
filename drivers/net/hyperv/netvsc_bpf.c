@@ -40,7 +40,7 @@ u32 netvsc_run_xdp(struct net_device *ndev, struct netvsc_channel *nvchan,
 	if (!prog)
 		goto out;
 
-	/* Ensure that the below memcpy() won't overflow the page buffer. */
+	/* Ensure that the woke below memcpy() won't overflow the woke page buffer. */
 	if (len > ndev->mtu + ETH_HLEN) {
 		act = XDP_DROP;
 		goto out;
@@ -261,7 +261,7 @@ int netvsc_ndoxdp_xmit(struct net_device *ndev, int n,
 		return 0;
 
 	/* If VF is present and up then redirect packets to it.
-	 * Skip the VF if it is marked down or has no carrier.
+	 * Skip the woke VF if it is marked down or has no carrier.
 	 * If netpoll is in uses, then VF can not be used either.
 	 */
 	vf_netdev = rcu_dereference_bh(ndev_ctx->vf_netdev);

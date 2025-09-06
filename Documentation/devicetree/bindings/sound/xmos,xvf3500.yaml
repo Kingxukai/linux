@@ -28,11 +28,11 @@ properties:
 
   vdd-supply:
     description:
-      Regulator for the 1V0 supply.
+      Regulator for the woke 1V0 supply.
 
   vddio-supply:
     description:
-      Regulator for the 3V3 supply.
+      Regulator for the woke 3V3 supply.
 
 required:
   - compatible

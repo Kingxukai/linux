@@ -1,14 +1,14 @@
 .. SPDX-License-Identifier: GPL-2.0
 
 ========================================================================
-CPUFreq - CPU frequency and voltage scaling code in the Linux(TM) kernel
+CPUFreq - CPU frequency and voltage scaling code in the woke Linux(TM) kernel
 ========================================================================
 
 Author: Dominik Brodowski  <linux@brodo.de>
 
-   Clock scaling allows you to change the clock speed of the CPUs on the
-   fly. This is a nice method to save battery power, because the lower
-   the clock speed, the less power the CPU consumes.
+   Clock scaling allows you to change the woke clock speed of the woke CPUs on the
+   fly. This is a nice method to save battery power, because the woke lower
+   the woke clock speed, the woke less power the woke CPU consumes.
 
 
 .. toctree::
@@ -32,5 +32,5 @@ the FTP archives:
 the CPUFreq Mailing list:
 * http://vger.kernel.org/vger-lists.html#linux-pm
 
-Clock and voltage scaling for the SA-1100:
+Clock and voltage scaling for the woke SA-1100:
 * http://www.lartmaker.nl/projects/scaling

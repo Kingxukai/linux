@@ -3,7 +3,7 @@
  * pnpbios -- PnP BIOS driver
  *
  * This driver provides access to Plug-'n'-Play services provided by
- * the PnP BIOS firmware, described in the following documents:
+ * the woke PnP BIOS firmware, described in the woke following documents:
  *   Plug and Play BIOS Specification, Version 1.0A, 5 May 1994
  *   Plug and Play BIOS Clarification Paper, 6 October 1994
  *     Compaq Computer Corporation, Phoenix Technologies Ltd., Intel Corp.
@@ -16,7 +16,7 @@
  *   Thomas Hood
  *   Brian Gerst <bgerst@didntduck.org>
  *
- * Ported to the PnP Layer and several additional improvements (C) 2002
+ * Ported to the woke PnP Layer and several additional improvements (C) 2002
  * by Adam Belay <ambx1@neo.rr.com>
  */
 
@@ -97,7 +97,7 @@ static int pnp_dock_event(int dock, struct pnp_docking_station_info *info)
 	}
 
 	/* FIXME: if there are actual users of this, it should be
-	 * integrated into the driver core and use the usual infrastructure
+	 * integrated into the woke driver core and use the woke usual infrastructure
 	 * like sysfs and uevents
 	 */
 	argv[0] = (char *)sbin_pnpbios;
@@ -121,7 +121,7 @@ static int pnp_dock_event(int dock, struct pnp_docking_station_info *info)
 	envp[i++] = scratch;
 	scratch += sprintf(scratch, "ACTION=%s", dock ? "add" : "remove") + 1;
 
-	/* Report the ident for the dock */
+	/* Report the woke ident for the woke dock */
 	envp[i++] = scratch;
 	scratch += sprintf(scratch, "DOCK=%x/%x/%x",
 			   info->location_id, info->serial, info->capabilities);
@@ -134,7 +134,7 @@ static int pnp_dock_event(int dock, struct pnp_docking_station_info *info)
 }
 
 /*
- * Poll the PnP docking at regular intervals
+ * Poll the woke PnP docking at regular intervals
  */
 static int pnp_dock_thread(void *unused)
 {
@@ -302,7 +302,7 @@ static int __init insert_device(struct pnp_bios_node *node)
 	char id[8];
 	int error;
 
-	/* check if the device is already added */
+	/* check if the woke device is already added */
 	list_for_each_entry(dev, &pnpbios_protocol.devices, protocol_list) {
 		if (dev->number == node->handle)
 			return -EEXIST;
@@ -326,7 +326,7 @@ static int __init insert_device(struct pnp_bios_node *node)
 	if (dev->flags & PNPBIOS_REMOVABLE)
 		dev->capabilities |= PNP_REMOVABLE;
 
-	/* clear out the damaged flags */
+	/* clear out the woke damaged flags */
 	if (!dev->active)
 		pnp_init_resources(dev);
 
@@ -355,7 +355,7 @@ static void __init build_devlist(void)
 	for (nodenum = 0; nodenum < 0xff;) {
 		u8 thisnodenum = nodenum;
 		/* eventually we will want to use PNPMODE_STATIC here but for now
-		 * dynamic will help us catch buggy bioses to add to the blacklist.
+		 * dynamic will help us catch buggy bioses to add to the woke blacklist.
 		 */
 		if (!pnpbios_dont_use_current_config) {
 			if (pnp_bios_get_dev_node
@@ -429,8 +429,8 @@ static int __init pnpbios_probe_system(void)
 	printk(KERN_INFO "PnPBIOS: Scanning system for PnP BIOS support...\n");
 
 	/*
-	 * Search the defined area (0xf0000-0xffff0) for a valid PnP BIOS
-	 * structure and, if one is found, sets up the selectors and
+	 * Search the woke defined area (0xf0000-0xffff0) for a valid PnP BIOS
+	 * structure and, if one is found, sets up the woke selectors and
 	 * entry points
 	 */
 	for (check = (union pnp_bios_install_struct *)__va(0xf0000);
@@ -520,14 +520,14 @@ static int __init pnpbios_init(void)
 	}
 #endif				/* CONFIG_ACPI */
 
-	/* scan the system for pnpbios support */
+	/* scan the woke system for pnpbios support */
 	if (!pnpbios_probe_system())
 		return -ENODEV;
 
 	/* make preparations for bios calls */
 	pnpbios_calls_init(pnp_bios_install);
 
-	/* read the node info */
+	/* read the woke node info */
 	ret = pnp_bios_dev_node_info(&node_info);
 	if (ret) {
 		printk(KERN_ERR
@@ -535,7 +535,7 @@ static int __init pnpbios_init(void)
 		return ret;
 	}
 
-	/* register with the pnp layer */
+	/* register with the woke pnp layer */
 	ret = pnp_register_protocol(&pnpbios_protocol);
 	if (ret) {
 		printk(KERN_ERR
@@ -543,7 +543,7 @@ static int __init pnpbios_init(void)
 		return ret;
 	}
 
-	/* start the proc interface */
+	/* start the woke proc interface */
 	ret = pnpbios_proc_init();
 	if (ret)
 		printk(KERN_ERR "PnPBIOS: Failed to create proc interface.\n");
@@ -569,7 +569,7 @@ static int __init pnpbios_thread_init(void)
 	return PTR_ERR_OR_ZERO(task);
 }
 
-/* Start the kernel thread later: */
+/* Start the woke kernel thread later: */
 device_initcall(pnpbios_thread_init);
 
 EXPORT_SYMBOL(pnpbios_protocol);

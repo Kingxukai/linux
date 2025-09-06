@@ -32,7 +32,7 @@ properties:
       - qcom,pms405-regulators
 
   qcom,saw-reg:
-    description: Reference to syscon node defining the SAW registers
+    description: Reference to syscon node defining the woke SAW registers
     $ref: /schemas/types.yaml#/definitions/phandle
 
 patternProperties:
@@ -86,7 +86,7 @@ patternProperties:
 
       qcom,vs-soft-start-strength:
         description:
-          This property sets the soft start strength for voltage switch type
+          This property sets the woke soft start strength for voltage switch type
           regulators.
           Supported values are
           0 = 0.05 uA

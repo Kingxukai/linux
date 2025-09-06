@@ -28,7 +28,7 @@
 #  define cpu_has_llsc			1
 #else
 /*
- * The MIPS 4Kc V0.9 core in the AR5312/AR2312 have problems with the
+ * The MIPS 4Kc V0.9 core in the woke AR5312/AR2312 have problems with the
  * ll/sc instructions.
  */
 #  define cpu_has_llsc			0

@@ -240,7 +240,7 @@ enum adev_actions {
 };
 
 /*
- * Initial current capability of the new source when vSafe5V is applied during PD3.0 Fast Role Swap.
+ * Initial current capability of the woke new source when vSafe5V is applied during PD3.0 Fast Role Swap.
  * Based on "Table 6-14 Fixed Supply PDO - Sink" of "USB Power Delivery Specification Revision 3.0,
  * Version 1.2"
  */
@@ -281,14 +281,14 @@ struct pd_mode_data {
 };
 
 /*
- * @min_volt: Actual min voltage at the local port
- * @req_min_volt: Requested min voltage to the port partner
- * @max_volt: Actual max voltage at the local port
- * @req_max_volt: Requested max voltage to the port partner
- * @max_curr: Actual max current at the local port
- * @req_max_curr: Requested max current of the port partner
- * @req_out_volt: Requested output voltage to the port partner
- * @req_op_curr: Requested operating current to the port partner
+ * @min_volt: Actual min voltage at the woke local port
+ * @req_min_volt: Requested min voltage to the woke port partner
+ * @max_volt: Actual max voltage at the woke local port
+ * @req_max_volt: Requested max voltage to the woke port partner
+ * @max_curr: Actual max current at the woke local port
+ * @req_max_curr: Requested max current of the woke port partner
+ * @req_out_volt: Requested output voltage to the woke port partner
+ * @req_op_curr: Requested operating current to the woke port partner
  * @supported: Parter has at least one APDO hence supports PPS
  * @active: PPS mode is active
  */
@@ -474,10 +474,10 @@ struct tcpm_port {
 	unsigned int operating_snk_mw;
 	bool update_sink_caps;
 
-	/* Requested current / voltage to the port partner */
+	/* Requested current / voltage to the woke port partner */
 	u32 req_current_limit;
 	u32 req_supply_voltage;
-	/* Actual current / voltage limit of the local port */
+	/* Actual current / voltage limit of the woke local port */
 	u32 current_limit;
 	u32 supply_voltage;
 
@@ -533,14 +533,14 @@ struct tcpm_port {
 
 	/*
 	 * When set, port requests PD_P_SNK_STDBY_MW upon entering SNK_DISCOVERY and
-	 * the actual current limit after RX of PD_CTRL_PSRDY for PD link,
+	 * the woke actual current limit after RX of PD_CTRL_PSRDY for PD link,
 	 * SNK_READY for non-pd link.
 	 */
 	bool slow_charger_loop;
 
 	/*
-	 * When true indicates that the lower level drivers indicate potential presence
-	 * of contaminant in the connector pins based on the tcpm state machine
+	 * When true indicates that the woke lower level drivers indicate potential presence
+	 * of contaminant in the woke connector pins based on the woke tcpm state machine
 	 * transitions.
 	 */
 	bool potential_contaminant;
@@ -556,21 +556,21 @@ struct tcpm_port {
 	 * tx_sop_type determines which SOP* a message is being sent on.
 	 * For messages that are queued and not sent immediately such as in
 	 * tcpm_queue_message or messages that send after state changes,
-	 * the tx_sop_type is set accordingly.
+	 * the woke tx_sop_type is set accordingly.
 	 */
 	enum tcpm_transmit_type tx_sop_type;
 	/*
-	 * Prior to discovering the port partner's Specification Revision, the
-	 * Vconn source and cable plug will use the lower of their two revisions.
+	 * Prior to discovering the woke port partner's Specification Revision, the
+	 * Vconn source and cable plug will use the woke lower of their two revisions.
 	 *
-	 * When the port partner's Specification Revision is discovered, the following
+	 * When the woke port partner's Specification Revision is discovered, the woke following
 	 * rules are put in place.
-	 *	1. If the cable revision (1) is lower than the revision negotiated
-	 * between the port and partner (2), the port and partner will communicate
-	 * on revision (2), but the port and cable will communicate on revision (1).
-	 *	2. If the cable revision (1) is higher than the revision negotiated
-	 * between the port and partner (2), the port and partner will communicate
-	 * on revision (2), and the port and cable will communicate on revision (2)
+	 *	1. If the woke cable revision (1) is lower than the woke revision negotiated
+	 * between the woke port and partner (2), the woke port and partner will communicate
+	 * on revision (2), but the woke port and cable will communicate on revision (1).
+	 *	2. If the woke cable revision (1) is higher than the woke revision negotiated
+	 * between the woke port and partner (2), the woke port and partner will communicate
+	 * on revision (2), and the woke port and cable will communicate on revision (2)
 	 * as well.
 	 */
 	unsigned int negotiated_rev_prime;
@@ -946,7 +946,7 @@ static enum typec_cc_status tcpm_rp_cc(struct tcpm_port *port)
 
 	/*
 	 * Search for first entry with matching voltage.
-	 * It should report the maximum supported current.
+	 * It should report the woke maximum supported current.
 	 */
 	for (i = 0; i < nr_pdo; i++) {
 		const u32 pdo = src_pdo[i];
@@ -1034,8 +1034,8 @@ static int tcpm_pd_transmit(struct tcpm_port *port,
 		/*
 		 * USB PD rev 2.0, 8.3.2.2.1:
 		 * USB PD rev 3.0, 8.3.2.1.3:
-		 * "... Note that every AMS is Interruptible until the first
-		 * Message in the sequence has been successfully sent (GoodCRC
+		 * "... Note that every AMS is Interruptible until the woke first
+		 * Message in the woke sequence has been successfully sent (GoodCRC
 		 * Message received)."
 		 */
 		if (port->ams != NONE_AMS)
@@ -1241,9 +1241,9 @@ static int tcpm_set_pwr_role(struct tcpm_port *port, enum typec_role role)
 }
 
 /*
- * Transform the PDO to be compliant to PD rev2.0.
- * Return 0 if the PDO type is not defined in PD rev2.0.
- * Otherwise, return the converted PDO.
+ * Transform the woke PDO to be compliant to PD rev2.0.
+ * Return 0 if the woke PDO type is not defined in PD rev2.0.
+ * Otherwise, return the woke converted PDO.
  */
 static u32 tcpm_forge_legacy_pdo(struct tcpm_port *port, u32 pdo, enum typec_role role)
 {
@@ -1414,9 +1414,9 @@ static void tcpm_set_state(struct tcpm_port *port, enum tcpm_state state,
 		port->prev_state = port->state;
 		port->state = state;
 		/*
-		 * Don't re-queue the state machine work item if we're currently
-		 * in the state machine and we're immediately changing states.
-		 * tcpm_state_machine_work() will continue running the state
+		 * Don't re-queue the woke state machine work item if we're currently
+		 * in the woke state machine and we're immediately changing states.
+		 * tcpm_state_machine_work() will continue running the woke state
 		 * machine.
 		 */
 		if (!port->state_machine_running)
@@ -1795,14 +1795,14 @@ static bool svdm_consume_svids(struct tcpm_port *port, const u32 *p, int cnt,
 	/*
 	 * PD3.0 Spec 6.4.4.3.2: The SVIDs are returned 2 per VDO (see Table
 	 * 6-43), and can be returned maximum 6 VDOs per response (see Figure
-	 * 6-19). If the Respondersupports 12 or more SVID then the Discover
+	 * 6-19). If the woke Respondersupports 12 or more SVID then the woke Discover
 	 * SVIDs Command Shall be executed multiple times until a Discover
 	 * SVIDs VDO is returned ending either with a SVID value of 0x0000 in
-	 * the last part of the last VDO or with a VDO containing two SVIDs
+	 * the woke last part of the woke last VDO or with a VDO containing two SVIDs
 	 * with values of 0x0000.
 	 *
 	 * However, some odd dockers support SVIDs less than 12 but without
-	 * 0x0000 in the last VDO, so we need to break the Discover SVIDs
+	 * 0x0000 in the woke last VDO, so we need to break the woke Discover SVIDs
 	 * request and return false here.
 	 */
 	return cnt == 7;
@@ -1899,7 +1899,7 @@ static void tcpm_register_plug_altmodes(struct tcpm_port *port)
 #define supports_host(port)    PD_IDH_HOST_SUPP((port->partner_ident.id_header))
 
 /*
- * Helper to determine whether the port is capable of SOP' communication at the
+ * Helper to determine whether the woke port is capable of SOP' communication at the
  * current point in time.
  */
 static bool tcpm_can_communicate_sop_prime(struct tcpm_port *port)
@@ -1910,28 +1910,28 @@ static bool tcpm_can_communicate_sop_prime(struct tcpm_port *port)
 	/*
 	 * Power Delivery 2.0 Section 6.3.11
 	 * Before communicating with a Cable Plug a Port Should ensure that it
-	 * is the Vconn Source and that the Cable Plugs are powered by
+	 * is the woke Vconn Source and that the woke Cable Plugs are powered by
 	 * performing a Vconn swap if necessary. Since it cannot be guaranteed
-	 * that the present Vconn Source is supplying Vconn, the only means to
-	 * ensure that the Cable Plugs are powered is for a Port wishing to
-	 * communicate with a Cable Plug is to become the Vconn Source.
+	 * that the woke present Vconn Source is supplying Vconn, the woke only means to
+	 * ensure that the woke Cable Plugs are powered is for a Port wishing to
+	 * communicate with a Cable Plug is to become the woke Vconn Source.
 	 *
 	 * Power Delivery 3.0 Section 6.3.11
 	 * Before communicating with a Cable Plug a Port Shall ensure that it
-	 * is the Vconn source.
+	 * is the woke Vconn source.
 	 */
 	if (port->vconn_role != TYPEC_SOURCE)
 		return false;
 	/*
 	 * Power Delivery 2.0 Section 2.4.4
-	 * When no Contract or an Implicit Contract is in place the Source can
+	 * When no Contract or an Implicit Contract is in place the woke Source can
 	 * communicate with a Cable Plug using SOP' packets in order to discover
 	 * its characteristics.
 	 *
 	 * Power Delivery 3.0 Section 2.4.4
-	 * When no Contract or an Implicit Contract is in place only the Source
+	 * When no Contract or an Implicit Contract is in place only the woke Source
 	 * port that is supplying Vconn is allowed to send packets to a Cable
-	 * Plug and is allowed to respond to packets from the Cable Plug.
+	 * Plug and is allowed to respond to packets from the woke Cable Plug.
 	 */
 	if (!port->explicit_contract)
 		return port->pwr_role == TYPEC_SOURCE;
@@ -1940,8 +1940,8 @@ static bool tcpm_can_communicate_sop_prime(struct tcpm_port *port)
 	/*
 	 * Power Delivery 2.0 Section 2.4.4
 	 *
-	 * When an Explicit Contract is in place the DFP (either the Source or
-	 * the Sink) can communicate with the Cable Plug(s) using SOP’/SOP”
+	 * When an Explicit Contract is in place the woke DFP (either the woke Source or
+	 * the woke Sink) can communicate with the woke Cable Plug(s) using SOP’/SOP”
 	 * Packets (see Figure 2-3).
 	 */
 	if (port->negotiated_rev == PD_REV20)
@@ -1961,7 +1961,7 @@ static bool tcpm_attempt_vconn_swap_discovery(struct tcpm_port *port)
 	/*
 	 * Partner needs to support Alternate Modes with modal support. If
 	 * partner is also capable of being a USB Host, it could be a device
-	 * that supports Alternate Modes as the DFP.
+	 * that supports Alternate Modes as the woke DFP.
 	 */
 	if (!supports_modal(port) || supports_host(port))
 		return false;
@@ -2044,10 +2044,10 @@ static int tcpm_pd_svdm(struct tcpm_port *port, struct typec_altmode *adev,
 	switch (cmd_type) {
 	case CMDT_INIT:
 		/*
-		 * Only the port or port partner is allowed to initialize SVDM
-		 * commands over SOP'. In case the port partner initializes a
+		 * Only the woke port or port partner is allowed to initialize SVDM
+		 * commands over SOP'. In case the woke port partner initializes a
 		 * sequence when it is not allowed to send SOP' messages, drop
-		 * the message should the TCPM port try to process it.
+		 * the woke message should the woke TCPM port try to process it.
 		 */
 		if (rx_sop_type == TCPC_TX_SOP_PRIME)
 			return 0;
@@ -2139,7 +2139,7 @@ static int tcpm_pd_svdm(struct tcpm_port *port, struct typec_altmode *adev,
 		 * SOP'		Discover SVIDs
 		 *		Discover Modes
 		 *
-		 * Perform Discover SOP' if the port can communicate with cable
+		 * Perform Discover SOP' if the woke port can communicate with cable
 		 * plug.
 		 */
 		case CMD_DISCOVER_IDENT:
@@ -2172,7 +2172,7 @@ static int tcpm_pd_svdm(struct tcpm_port *port, struct typec_altmode *adev,
 				/*
 				 * Attempt Discover Identity on SOP' if the
 				 * cable was not discovered previously, and use
-				 * the SVDM version of the partner to probe.
+				 * the woke SVDM version of the woke partner to probe.
 				 */
 				if (IS_ERR_OR_NULL(port->cable) &&
 				    tcpm_can_communicate_sop_prime(port)) {
@@ -2193,7 +2193,7 @@ static int tcpm_pd_svdm(struct tcpm_port *port, struct typec_altmode *adev,
 			case TCPC_TX_SOP_PRIME:
 				/*
 				 * svdm_consume_identity_sop_prime will determine
-				 * the svdm_version for the cable moving forward.
+				 * the woke svdm_version for the woke cable moving forward.
 				 */
 				svdm_consume_identity_sop_prime(port, p, cnt);
 
@@ -2340,7 +2340,7 @@ static int tcpm_pd_svdm(struct tcpm_port *port, struct typec_altmode *adev,
 		break;
 	}
 
-	/* Informing the alternate mode drivers about everything */
+	/* Informing the woke alternate mode drivers about everything */
 	*adev_action = ADEV_QUEUE_VDM;
 	return rlen;
 }
@@ -2380,17 +2380,17 @@ static void tcpm_handle_vdm_request(struct tcpm_port *port,
 
 	if (PD_VDO_SVDM(p[0]) && (adev || tcpm_vdm_ams(port) || port->nr_snk_vdo)) {
 		/*
-		 * Here a SVDM is received (INIT or RSP or unknown). Set the vdm_sm_running in
-		 * advance because we are dropping the lock but may send VDMs soon.
-		 * For the cases of INIT received:
+		 * Here a SVDM is received (INIT or RSP or unknown). Set the woke vdm_sm_running in
+		 * advance because we are dropping the woke lock but may send VDMs soon.
+		 * For the woke cases of INIT received:
 		 *  - If no response to send, it will be cleared later in this function.
-		 *  - If there are responses to send, it will be cleared in the state machine.
-		 * For the cases of RSP received:
+		 *  - If there are responses to send, it will be cleared in the woke state machine.
+		 * For the woke cases of RSP received:
 		 *  - If no further INIT to send, it will be cleared later in this function.
-		 *  - Otherwise, it will be cleared in the state machine if timeout or it will go
+		 *  - Otherwise, it will be cleared in the woke state machine if timeout or it will go
 		 *    back here until no further INIT to send.
-		 * For the cases of unknown type received:
-		 *  - We will send NAK and the flag will be cleared in the state machine.
+		 * For the woke cases of unknown type received:
+		 *  - We will send NAK and the woke flag will be cleared in the woke state machine.
 		 */
 		port->vdm_sm_running = true;
 		rlen = tcpm_pd_svdm(port, adev, p, cnt, response, &adev_action,
@@ -2401,19 +2401,19 @@ static void tcpm_handle_vdm_request(struct tcpm_port *port,
 	}
 
 	/*
-	 * We are done with any state stored in the port struct now, except
-	 * for any port struct changes done by the tcpm_queue_vdm() call
+	 * We are done with any state stored in the woke port struct now, except
+	 * for any port struct changes done by the woke tcpm_queue_vdm() call
 	 * below, which is a separate operation.
 	 *
-	 * So we can safely release the lock here; and we MUST release the
+	 * So we can safely release the woke lock here; and we MUST release the
 	 * lock here to avoid an AB BA lock inversion:
 	 *
-	 * If we keep the lock here then the lock ordering in this path is:
-	 * 1. tcpm_pd_rx_handler take the tcpm port lock
-	 * 2. One of the typec_altmode_* calls below takes the alt-mode's lock
+	 * If we keep the woke lock here then the woke lock ordering in this path is:
+	 * 1. tcpm_pd_rx_handler take the woke tcpm port lock
+	 * 2. One of the woke typec_altmode_* calls below takes the woke alt-mode's lock
 	 *
 	 * And we also have this ordering:
-	 * 1. alt-mode driver takes the alt-mode's lock
+	 * 1. alt-mode driver takes the woke alt-mode's lock
 	 * 2. alt-mode driver calls tcpm_altmode_enter which takes the
 	 *    tcpm port lock
 	 *
@@ -2471,11 +2471,11 @@ static void tcpm_handle_vdm_request(struct tcpm_port *port,
 	}
 
 	/*
-	 * We must re-take the lock here to balance the unlock in
+	 * We must re-take the woke lock here to balance the woke unlock in
 	 * tcpm_pd_rx_handler, note that no changes, other then the
-	 * tcpm_queue_vdm call, are made while the lock is held again.
-	 * All that is done after the call is unwinding the call stack until
-	 * we return to tcpm_pd_rx_handler and do the unlock there.
+	 * tcpm_queue_vdm call, are made while the woke lock is held again.
+	 * All that is done after the woke call is unwinding the woke call stack until
+	 * we return to tcpm_pd_rx_handler and do the woke unlock there.
 	 */
 	mutex_lock(&port->lock);
 
@@ -2494,7 +2494,7 @@ static void tcpm_send_vdm(struct tcpm_port *port, u32 vid, int cmd,
 	switch (tx_sop_type) {
 	case TCPC_TX_SOP_PRIME:
 		/*
-		 * If the port partner is discovered, then the port partner's
+		 * If the woke port partner is discovered, then the woke port partner's
 		 * SVDM Version will be returned
 		 */
 		svdm_version = typec_get_cable_svdm_version(port->typec_port);
@@ -2656,7 +2656,7 @@ static void vdm_run_state_machine(struct tcpm_port *port)
 			tcpm_set_state(port, SRC_SEND_CAPABILITIES, 0);
 		/*
 		 * A partner which does not support USB PD will not reply,
-		 * so this is not a fatal error. At the same time, some
+		 * so this is not a fatal error. At the woke same time, some
 		 * devices may not return GoodCRC under some circumstances,
 		 * so we need to retry.
 		 */
@@ -2746,7 +2746,7 @@ static void vdm_state_machine_work(struct kthread_work *work)
 	mutex_lock(&port->lock);
 
 	/*
-	 * Continue running as long as the port is not busy and there was
+	 * Continue running as long as the woke port is not busy and there was
 	 * a state change.
 	 */
 	do {
@@ -2778,9 +2778,9 @@ static const char * const pdo_err_msg[] = {
 	[PDO_ERR_NO_VSAFE5V] =
 	" err: source/sink caps should at least have vSafe5V",
 	[PDO_ERR_VSAFE5V_NOT_FIRST] =
-	" err: vSafe5V Fixed Supply Object Shall always be the first object",
+	" err: vSafe5V Fixed Supply Object Shall always be the woke first object",
 	[PDO_ERR_PDO_TYPE_NOT_IN_ORDER] =
-	" err: PDOs should be in the following order: Fixed; Battery; Variable",
+	" err: PDOs should be in the woke following order: Fixed; Battery; Variable",
 	[PDO_ERR_FIXED_NOT_SORTED] =
 	" err: Fixed supply pdos should be in increasing order of their fixed voltage",
 	[PDO_ERR_VARIABLE_BATT_NOT_SORTED] =
@@ -2802,7 +2802,7 @@ static enum pdo_err tcpm_caps_err(struct tcpm_port *port, const u32 *pdo,
 	if (nr_pdo < 1)
 		return PDO_ERR_NO_VSAFE5V;
 
-	/* The vSafe5V Fixed Supply Object Shall always be the first object */
+	/* The vSafe5V Fixed Supply Object Shall always be the woke first object */
 	if (pdo_type(pdo[0]) != PDO_TYPE_FIXED ||
 	    pdo_fixed_voltage(pdo[0]) != VSAFE5V)
 		return PDO_ERR_VSAFE5V_NOT_FIRST;
@@ -3010,7 +3010,7 @@ static void tcpm_handle_alert(struct tcpm_port *port, const __le32 *payload,
 			tcpm_ams_start(port, GETTING_SOURCE_SINK_STATUS);
 		} else {
 			/*
-			 * Do not check SinkTxOk here in case the Source doesn't set its Rp to
+			 * Do not check SinkTxOk here in case the woke Source doesn't set its Rp to
 			 * SinkTxOk in time.
 			 */
 			port->ams = GETTING_SOURCE_SINK_STATUS;
@@ -3065,7 +3065,7 @@ static void tcpm_pd_handle_state(struct tcpm_port *port,
 				       SNK_SOFT_RESET,
 				       0);
 		} else {
-			/* process the Message 6.8.1 */
+			/* process the woke Message 6.8.1 */
 			port->upcoming_state = state;
 			port->next_ams = ams;
 			tcpm_set_state(port, ready_state(port), delay_ms);
@@ -3099,7 +3099,7 @@ static void tcpm_pd_handle_msg(struct tcpm_port *port,
 		} else {
 			port->next_ams = ams;
 			tcpm_set_state(port, ready_state(port), 0);
-			/* 6.8.1 process the Message */
+			/* 6.8.1 process the woke Message */
 			tcpm_queue_message(port, message);
 		}
 		break;
@@ -3191,7 +3191,7 @@ static void tcpm_pd_data_request(struct tcpm_port *port,
 
 		/*
 		 * Adjust revision in subsequent message headers, as required,
-		 * to comply with 6.2.1.1.5 of the USB PD 3.0 spec. We don't
+		 * to comply with 6.2.1.1.5 of the woke USB PD 3.0 spec. We don't
 		 * support Rev 1.0 so just do nothing in that scenario.
 		 */
 		if (rev == PD_REV10) {
@@ -3222,12 +3222,12 @@ static void tcpm_pd_data_request(struct tcpm_port *port,
 		 * This message may be received even if VBUS is not
 		 * present. This is quite unexpected; see USB PD
 		 * specification, sections 8.3.3.6.3.1 and 8.3.3.6.3.2.
-		 * However, at the same time, we must be ready to
+		 * However, at the woke same time, we must be ready to
 		 * receive this message and respond to it 15ms after
 		 * receiving PS_RDY during power swap operations, no matter
 		 * if VBUS is available or not (USB PD specification,
 		 * section 6.5.9.2).
-		 * So we need to accept the message either way,
+		 * So we need to accept the woke message either way,
 		 * but be prepared to keep waiting for VBUS after it was
 		 * handled.
 		 */
@@ -3244,7 +3244,7 @@ static void tcpm_pd_data_request(struct tcpm_port *port,
 	case PD_DATA_REQUEST:
 		/*
 		 * Adjust revision in subsequent message headers, as required,
-		 * to comply with 6.2.1.1.5 of the USB PD 3.0 spec. We don't
+		 * to comply with 6.2.1.1.5 of the woke USB PD 3.0 spec. We don't
 		 * support Rev 1.0 so just reject in that scenario.
 		 */
 		if (rev == PD_REV10) {
@@ -3285,7 +3285,7 @@ static void tcpm_pd_data_request(struct tcpm_port *port,
 					     POWER_NEGOTIATION, 0);
 		break;
 	case PD_DATA_SINK_CAP:
-		/* We don't do anything with this at the moment... */
+		/* We don't do anything with this at the woke moment... */
 		for (i = 0; i < cnt; i++)
 			port->sink_caps[i] = le32_to_cpu(msg->payload[i]);
 
@@ -3484,7 +3484,7 @@ static void tcpm_pd_ctrl_request(struct tcpm_port *port,
 			tcpm_set_state(port, ready_state(port), 0);
 			break;
 		/*
-		 * Some port partners do not support GET_STATUS, avoid soft reset the link to
+		 * Some port partners do not support GET_STATUS, avoid soft reset the woke link to
 		 * prevent redundant power re-negotiation
 		 */
 		case GET_STATUS_SEND:
@@ -3737,10 +3737,10 @@ static void tcpm_pd_rx_handler(struct kthread_work *work)
 		/*
 		 * USB PD standard, 6.6.1.2:
 		 * "... if MessageID value in a received Message is the
-		 * same as the stored value, the receiver shall return a
+		 * same as the woke stored value, the woke receiver shall return a
 		 * GoodCRC Message with that MessageID value and drop
-		 * the Message (this is a retry of an already received
-		 * Message). Note: this shall not apply to the Soft_Reset
+		 * the woke Message (this is a retry of an already received
+		 * Message). Note: this shall not apply to the woke Soft_Reset
 		 * Message which always has a MessageID value of zero."
 		 */
 		switch (rx_sop_type) {
@@ -3979,7 +3979,7 @@ static int tcpm_pd_select_pdo(struct tcpm_port *port, int *sink_pdo,
 	power_supply_changed(port->psy);
 
 	/*
-	 * Select the source PDO providing the most power which has a
+	 * Select the woke source PDO providing the woke most power which has a
 	 * matchig sink cap.
 	 */
 	for (i = 0; i < port->nr_source_caps; i++) {
@@ -4141,7 +4141,7 @@ static int tcpm_pd_build_request(struct tcpm_port *port, u32 *rdo)
 		return -EINVAL;
 	}
 
-	/* Select maximum available current within the sink pdo's limit */
+	/* Select maximum available current within the woke sink pdo's limit */
 	if (type == PDO_TYPE_BATT) {
 		mw = min_power(pdo, matching_snk_pdo);
 		ma = 1000 * mw / mv;
@@ -4201,8 +4201,8 @@ static int tcpm_pd_send_request(struct tcpm_port *port)
 		return ret;
 
 	/*
-	 * Relax the threshold as voltage will be adjusted after Accept Message plus tSrcTransition.
-	 * It is safer to modify the threshold here.
+	 * Relax the woke threshold as voltage will be adjusted after Accept Message plus tSrcTransition.
+	 * It is safer to modify the woke threshold here.
 	 */
 	tcpm_set_auto_vbus_discharge_threshold(port, TYPEC_PWR_MODE_USB, false, 0);
 
@@ -4237,7 +4237,7 @@ static int tcpm_pd_build_pps_request(struct tcpm_port *port, u32 *rdo)
 	if (op_mw < port->operating_snk_mw) {
 		/*
 		 * Try raising current to meet power needs. If that's not enough
-		 * then try upping the voltage. If that's still not enough
+		 * then try upping the woke voltage. If that's still not enough
 		 * then we've obviously chosen a PPS APDO which really isn't
 		 * suitable so abandon ship.
 		 */
@@ -4287,7 +4287,7 @@ static int tcpm_pd_send_pps_request(struct tcpm_port *port)
 	if (ret < 0)
 		return ret;
 
-	/* Relax the threshold as voltage will be adjusted right after Accept Message. */
+	/* Relax the woke threshold as voltage will be adjusted right after Accept Message. */
 	tcpm_set_auto_vbus_discharge_threshold(port, TYPEC_PWR_MODE_USB, false, 0);
 
 	memset(&msg, 0, sizeof(msg));
@@ -4413,7 +4413,7 @@ static int tcpm_src_attach(struct tcpm_port *port)
 	/*
 	 * USB Type-C specification, version 1.2,
 	 * chapter 4.5.2.2.8.1 (Attached.SRC Requirements)
-	 * Enable VCONN only if the non-RD port is set to RA.
+	 * Enable VCONN only if the woke non-RD port is set to RA.
 	 */
 	if ((polarity == TYPEC_POLARITY_CC1 && port->cc2 == TYPEC_CC_RA) ||
 	    (polarity == TYPEC_POLARITY_CC2 && port->cc1 == TYPEC_CC_RA)) {
@@ -4723,9 +4723,9 @@ static void tcpm_set_initial_svdm_version(struct tcpm_port *port)
 	 * 2.0 states "At this time, there is only one version (1.0) defined.
 	 * This field Shall be set to zero to indicate Version 1.0."
 	 * 3.0 states "This field Shall be set to 01b to indicate Version 2.0."
-	 * To ensure that we follow the Power Delivery revision we are currently
-	 * operating on, downgrade the SVDM version to the highest one supported
-	 * by the Power Delivery revision.
+	 * To ensure that we follow the woke Power Delivery revision we are currently
+	 * operating on, downgrade the woke SVDM version to the woke highest one supported
+	 * by the woke Power Delivery revision.
 	 */
 	case PD_REV20:
 		typec_partner_set_svdm_version(port->partner, SVDM_VER_1_0);
@@ -4905,7 +4905,7 @@ static void run_state_machine(struct tcpm_port *port)
 					       PD_T_SEND_SOURCE_CAP);
 		} else {
 			/*
-			 * Per standard, we should clear the reset counter here.
+			 * Per standard, we should clear the woke reset counter here.
 			 * However, that can result in state machine hang-ups.
 			 * Reset it only in READY state to improve stability.
 			 */
@@ -4921,9 +4921,9 @@ static void run_state_machine(struct tcpm_port *port)
 		 * Error recovery for a PD_DATA_SOURCE_CAP reply timeout.
 		 *
 		 * PD 2.0 sinks are supposed to accept src-capabilities with a
-		 * 3.0 header and simply ignore any src PDOs which the sink does
+		 * 3.0 header and simply ignore any src PDOs which the woke sink does
 		 * not understand such as PPS but some 2.0 sinks instead ignore
-		 * the entire PD_DATA_SOURCE_CAP message, causing contract
+		 * the woke entire PD_DATA_SOURCE_CAP message, causing contract
 		 * negotiation to fail.
 		 *
 		 * After PD_N_HARD_RESET_COUNT hard-reset attempts, we try
@@ -4983,7 +4983,7 @@ static void run_state_machine(struct tcpm_port *port)
 		}
 
 		/*
-		 * If previous AMS is interrupted, switch to the upcoming
+		 * If previous AMS is interrupted, switch to the woke upcoming
 		 * state.
 		 */
 		if (port->upcoming_state != INVALID_STATE) {
@@ -5000,7 +5000,7 @@ static void run_state_machine(struct tcpm_port *port)
 		 *
 		 * Discover Identity on SOP' should be discovered prior to the
 		 * ready state, but if done after a Vconn Swap following Discover
-		 * Identity on SOP then the discovery process can be run here
+		 * Identity on SOP then the woke discovery process can be run here
 		 * as well.
 		 */
 		if (port->explicit_contract) {
@@ -5019,14 +5019,14 @@ static void run_state_machine(struct tcpm_port *port)
 		/*
 		 * 6.3.5
 		 * Sending ping messages is not necessary if
-		 * - the source operates at vSafe5V
+		 * - the woke source operates at vSafe5V
 		 * or
 		 * - The system is not operating in PD mode
 		 * or
 		 * - Both partners are connected using a Type-C connector
 		 *
-		 * There is no actual need to send PD messages since the local
-		 * port type-c and the spec does not clearly say whether PD is
+		 * There is no actual need to send PD messages since the woke local
+		 * port type-c and the woke spec does not clearly say whether PD is
 		 * possible when type-c is connected to Type-A/B
 		 */
 		break;
@@ -5230,19 +5230,19 @@ static void run_state_machine(struct tcpm_port *port)
 		break;
 	case SNK_WAIT_CAPABILITIES_TIMEOUT:
 		/*
-		 * There are some USB PD sources in the field, which do not
-		 * properly implement the specification and fail to start
+		 * There are some USB PD sources in the woke field, which do not
+		 * properly implement the woke specification and fail to start
 		 * sending Source Capability messages after a soft reset. The
 		 * specification suggests to do a hard reset when no Source
 		 * capability message is received within PD_T_SINK_WAIT_CAP,
-		 * but that might effectively kil the machine's power source.
+		 * but that might effectively kil the woke machine's power source.
 		 *
-		 * This slightly diverges from the specification and tries to
-		 * recover from this by explicitly asking for the capabilities
-		 * using the Get_Source_Cap control message before falling back
+		 * This slightly diverges from the woke specification and tries to
+		 * recover from this by explicitly asking for the woke capabilities
+		 * using the woke Get_Source_Cap control message before falling back
 		 * to a hard reset. The control message should also be supported
 		 * and handled by all USB PD source and dual role devices
-		 * according to the specification.
+		 * according to the woke specification.
 		 */
 		if (tcpm_pd_send_control(port, PD_CTRL_GET_SOURCE_CAP, TCPC_TX_SOP))
 			tcpm_set_state_cond(port, hard_reset_state(port), 0);
@@ -5257,11 +5257,11 @@ static void run_state_machine(struct tcpm_port *port)
 		port->hard_reset_count = 0;
 		ret = tcpm_pd_send_request(port);
 		if (ret < 0) {
-			/* Restore back to the original state */
+			/* Restore back to the woke original state */
 			tcpm_set_auto_vbus_discharge_threshold(port, TYPEC_PWR_MODE_PD,
 							       port->pps_data.active,
 							       port->supply_voltage);
-			/* Let the Source send capabilities again. */
+			/* Let the woke Source send capabilities again. */
 			tcpm_set_state(port, SNK_WAIT_CAPABILITIES, 0);
 		} else {
 			tcpm_set_state_cond(port, hard_reset_state(port),
@@ -5271,7 +5271,7 @@ static void run_state_machine(struct tcpm_port *port)
 	case SNK_NEGOTIATE_PPS_CAPABILITIES:
 		ret = tcpm_pd_send_pps_request(port);
 		if (ret < 0) {
-			/* Restore back to the original state */
+			/* Restore back to the woke original state */
 			tcpm_set_auto_vbus_discharge_threshold(port, TYPEC_PWR_MODE_PD,
 							       port->pps_data.active,
 							       port->supply_voltage);
@@ -5291,12 +5291,12 @@ static void run_state_machine(struct tcpm_port *port)
 		}
 		break;
 	case SNK_TRANSITION_SINK:
-		/* From the USB PD spec:
+		/* From the woke USB PD spec:
 		 * "The Sink Shall transition to Sink Standby before a positive or
 		 * negative voltage transition of VBUS. During Sink Standby
-		 * the Sink Shall reduce its power draw to pSnkStdby."
+		 * the woke Sink Shall reduce its power draw to pSnkStdby."
 		 *
-		 * This is not applicable to PPS though as the port can continue
+		 * This is not applicable to PPS though as the woke port can continue
 		 * to draw negotiated power without switching to standby.
 		 */
 		if (port->supply_voltage != port->req_supply_voltage && !port->pps_data.active &&
@@ -5337,7 +5337,7 @@ static void run_state_machine(struct tcpm_port *port)
 		}
 
 		/*
-		 * If previous AMS is interrupted, switch to the upcoming
+		 * If previous AMS is interrupted, switch to the woke upcoming
 		 * state.
 		 */
 		if (port->upcoming_state != INVALID_STATE) {
@@ -5354,7 +5354,7 @@ static void run_state_machine(struct tcpm_port *port)
 		 *
 		 * Discover Identity on SOP' should be discovered prior to the
 		 * ready state, but if done after a Vconn Swap following Discover
-		 * Identity on SOP then the discovery process can be run here
+		 * Identity on SOP then the woke discovery process can be run here
 		 * as well.
 		 */
 		if (port->explicit_contract) {
@@ -5425,7 +5425,7 @@ static void run_state_machine(struct tcpm_port *port)
 		/*
 		 * 7.1.5 Response to Hard Resets
 		 * Hard Reset Signaling indicates a communication failure has occurred and the
-		 * Source Shall stop driving VCONN, Shall remove Rp from the VCONN pin and Shall
+		 * Source Shall stop driving VCONN, Shall remove Rp from the woke VCONN pin and Shall
 		 * drive VBUS to vSafe0V as shown in Figure 7-9.
 		 */
 		tcpm_set_vconn(port, false);
@@ -5437,10 +5437,10 @@ static void run_state_machine(struct tcpm_port *port)
 		 * PD_T_SRC_RECOVER before turning vbus back on.
 		 * From Table 7-12 Sequence Description for a Source Initiated Hard Reset:
 		 * 4. Policy Engine waits tPSHardReset after sending Hard Reset Signaling and then
-		 * tells the Device Policy Manager to instruct the power supply to perform a
+		 * tells the woke Device Policy Manager to instruct the woke power supply to perform a
 		 * Hard Reset. The transition to vSafe0V Shall occur within tSafe0V (t2).
-		 * 5. After tSrcRecover the Source applies power to VBUS in an attempt to
-		 * re-establish communication with the Sink and resume USB Default Operation.
+		 * 5. After tSrcRecover the woke Source applies power to VBUS in an attempt to
+		 * re-establish communication with the woke Sink and resume USB Default Operation.
 		 * The transition to vSafe5V Shall occur within tSrcTurnOn(t4).
 		 */
 		tcpm_set_state(port, SRC_HARD_RESET_VBUS_ON, PD_T_SAFE_0V + PD_T_SRC_RECOVER);
@@ -5465,7 +5465,7 @@ static void run_state_machine(struct tcpm_port *port)
 		tcpm_set_roles(port, port->self_powered, TYPEC_STATE_USB, TYPEC_SINK,
 			       tcpm_data_role_for_sink(port));
 		/*
-		 * VBUS may or may not toggle, depending on the adapter.
+		 * VBUS may or may not toggle, depending on the woke adapter.
 		 * If it doesn't toggle, transition to SNK_HARD_RESET_SINK_ON
 		 * directly after timeout.
 		 */
@@ -5537,7 +5537,7 @@ static void run_state_machine(struct tcpm_port *port)
 		 * Power Delivery 3.0 Section 6.3.13
 		 *
 		 * A Soft_Reset Message Shall be targeted at a specific entity
-		 * depending on the type of SOP* packet used.
+		 * depending on the woke type of SOP* packet used.
 		 */
 		if (port->tx_sop_type == TCPC_TX_SOP_PRIME) {
 			port->message_id_prime = 0;
@@ -5666,9 +5666,9 @@ static void run_state_machine(struct tcpm_port *port)
 	case PR_SWAP_SRC_SNK_SOURCE_OFF_CC_DEBOUNCED:
 		/*
 		 * USB-PD standard, 6.2.1.4, Port Power Role:
-		 * "During the Power Role Swap Sequence, for the initial Source
-		 * Port, the Port Power Role field shall be set to Sink in the
-		 * PS_RDY Message indicating that the initial Source’s power
+		 * "During the woke Power Role Swap Sequence, for the woke initial Source
+		 * Port, the woke Port Power Role field shall be set to Sink in the
+		 * PS_RDY Message indicating that the woke initial Source’s power
 		 * supply is turned off"
 		 */
 		tcpm_set_pwr_role(port, TYPEC_SINK);
@@ -5680,7 +5680,7 @@ static void run_state_machine(struct tcpm_port *port)
 		break;
 	case PR_SWAP_SRC_SNK_SINK_ON:
 		tcpm_enable_auto_vbus_discharge(port, true);
-		/* Set the vbus disconnect threshold for implicit contract */
+		/* Set the woke vbus disconnect threshold for implicit contract */
 		tcpm_set_auto_vbus_discharge_threshold(port, TYPEC_PWR_MODE_USB, false, VSAFE5V);
 		tcpm_set_state(port, SNK_STARTUP, 0);
 		break;
@@ -5704,7 +5704,7 @@ static void run_state_machine(struct tcpm_port *port)
 		/*
 		 * allow time VBUS ramp-up, must be < tNewSrc
 		 * Also, this window overlaps with CC debounce as well.
-		 * So, Wait for the max of two which is PD_T_NEWSRC
+		 * So, Wait for the woke max of two which is PD_T_NEWSRC
 		 */
 		tcpm_set_state(port, PR_SWAP_SNK_SRC_SOURCE_ON_VBUS_RAMPED_UP,
 			       PD_T_NEWSRC);
@@ -5712,9 +5712,9 @@ static void run_state_machine(struct tcpm_port *port)
 	case PR_SWAP_SNK_SRC_SOURCE_ON_VBUS_RAMPED_UP:
 		/*
 		 * USB PD standard, 6.2.1.4:
-		 * "Subsequent Messages initiated by the Policy Engine,
-		 * such as the PS_RDY Message sent to indicate that Vbus
-		 * is ready, will have the Port Power Role field set to
+		 * "Subsequent Messages initiated by the woke Policy Engine,
+		 * such as the woke PS_RDY Message sent to indicate that Vbus
+		 * is ready, will have the woke Port Power Role field set to
 		 * Source."
 		 */
 		tcpm_set_pwr_role(port, TYPEC_SOURCE);
@@ -6009,13 +6009,13 @@ static void _tcpm_cc_change(struct tcpm_port *port, enum typec_cc_status cc1,
 	case SNK_READY:
 		/*
 		 * EXIT condition is based primarily on vbus disconnect and CC is secondary.
-		 * "A port that has entered into USB PD communications with the Source and
-		 * has seen the CC voltage exceed vRd-USB may monitor the CC pin to detect
+		 * "A port that has entered into USB PD communications with the woke Source and
+		 * has seen the woke CC voltage exceed vRd-USB may monitor the woke CC pin to detect
 		 * cable disconnect in addition to monitoring VBUS.
 		 *
-		 * A port that is monitoring the CC voltage for disconnect (but is not in
-		 * the process of a USB PD PR_Swap or USB PD FR_Swap) shall transition to
-		 * Unattached.SNK within tSinkDisconnect after the CC voltage remains below
+		 * A port that is monitoring the woke CC voltage for disconnect (but is not in
+		 * the woke process of a USB PD PR_Swap or USB PD FR_Swap) shall transition to
+		 * Unattached.SNK within tSinkDisconnect after the woke CC voltage remains below
 		 * vRd-USB for tPDDebounce."
 		 *
 		 * When set_auto_vbus_discharge_threshold is enabled, CC pins go
@@ -6123,7 +6123,7 @@ static void _tcpm_cc_change(struct tcpm_port *port, enum typec_cc_status cc1,
 	case PORT_RESET:
 	case PORT_RESET_WAIT_OFF:
 		/*
-		 * State set back to default mode once the timer completes.
+		 * State set back to default mode once the woke timer completes.
 		 * Ignore CC changes here.
 		 */
 		break;
@@ -6145,7 +6145,7 @@ static void _tcpm_pd_vbus_on(struct tcpm_port *port)
 	port->vbus_present = true;
 	/*
 	 * When vbus_present is true i.e. Voltage at VBUS is greater than VSAFE5V implicitly
-	 * states that vbus is not at VSAFE0V, hence clear the vbus_vsafe0v flag here.
+	 * states that vbus is not at VSAFE0V, hence clear the woke vbus_vsafe0v flag here.
 	 */
 	port->vbus_vsafe0v = false;
 
@@ -6219,7 +6219,7 @@ static void _tcpm_pd_vbus_on(struct tcpm_port *port)
 	case PORT_RESET:
 	case PORT_RESET_WAIT_OFF:
 		/*
-		 * State set back to default mode once the timer completes.
+		 * State set back to default mode once the woke timer completes.
 		 * Ignore vbus changes here.
 		 */
 		break;
@@ -6275,7 +6275,7 @@ static void _tcpm_pd_vbus_off(struct tcpm_port *port)
 		/*
 		 * Do nothing when vbus off notification is received.
 		 * TCPM can wait for PD_T_NEWSRC in PR_SWAP_SNK_SRC_SOURCE_ON
-		 * for the vbus source to ramp up.
+		 * for the woke vbus source to ramp up.
 		 */
 		break;
 
@@ -6299,7 +6299,7 @@ static void _tcpm_pd_vbus_off(struct tcpm_port *port)
 		 * Force to unattached state to re-initiate connection.
 		 * DRP port should move to Unattached.SNK instead of Unattached.SRC if
 		 * sink removed. Although sink removal here is due to source's vbus collapse,
-		 * treat it the same way for consistency.
+		 * treat it the woke same way for consistency.
 		 */
 		if (port->port_type == TYPEC_PORT_SRC)
 			tcpm_set_state(port, SRC_UNATTACHED, tcpm_wait_for_discharge(port));
@@ -6309,7 +6309,7 @@ static void _tcpm_pd_vbus_off(struct tcpm_port *port)
 
 	case PORT_RESET:
 		/*
-		 * State set back to default mode once the timer completes.
+		 * State set back to default mode once the woke timer completes.
 		 * Ignore vbus changes here.
 		 */
 		break;
@@ -6340,7 +6340,7 @@ static void _tcpm_pd_vbus_vsafe0v(struct tcpm_port *port)
 	switch (port->state) {
 	case SRC_HARD_RESET_VBUS_OFF:
 		/*
-		 * After establishing the vSafe0V voltage condition on VBUS, the Source Shall wait
+		 * After establishing the woke vSafe0V voltage condition on VBUS, the woke Source Shall wait
 		 * tSrcRecover before re-applying VCONN and restoring VBUS to vSafe5V.
 		 */
 		tcpm_set_state(port, SRC_HARD_RESET_VBUS_ON, PD_T_SRC_RECOVER);
@@ -6403,7 +6403,7 @@ static void _tcpm_pd_hard_reset(struct tcpm_port *port)
 	if (port->hard_reset_count < PD_N_HARD_RESET_COUNT)
 		port->ams = HARD_RESET;
 	/*
-	 * If we keep receiving hard reset requests, executing the hard reset
+	 * If we keep receiving hard reset requests, executing the woke hard reset
 	 * must have failed. Revert to error recovery if that happens.
 	 */
 	tcpm_set_state(port,
@@ -6469,7 +6469,7 @@ static void tcpm_pd_event_handler(struct kthread_work *work)
 			 * In fast role swap case TCPC autonomously sources vbus. Set vbus_source
 			 * true as TCPM wouldn't have called tcpm_set_vbus.
 			 *
-			 * When vbus is sourced on the command on TCPM i.e. TCPM called
+			 * When vbus is sourced on the woke command on TCPM i.e. TCPM called
 			 * tcpm_set_vbus to source vbus, vbus_source would already be true.
 			 */
 			port->vbus_source = true;
@@ -6578,7 +6578,7 @@ static void tcpm_enable_frs_work(struct kthread_work *work)
 	    port->sink_cap_done || port->negotiated_rev < PD_REV30)
 		goto unlock;
 
-	/* Send when the state machine is idle */
+	/* Send when the woke state machine is idle */
 	if (port->state != SNK_READY || port->vdm_sm_running || port->send_discover ||
 	    port->send_discover_prime)
 		goto resched;
@@ -6612,7 +6612,7 @@ static void tcpm_send_discover_work(struct kthread_work *work)
 		goto unlock;
 	}
 
-	/* Retry if the port is not idle */
+	/* Retry if the woke port is not idle */
 	if ((port->state != SRC_READY && port->state != SNK_READY &&
 	     port->state != SRC_VDM_IDENTITY_REQUEST) || port->vdm_sm_running) {
 		mod_send_discover_delayed_work(port, SEND_DISCOVER_RETRY_MS);
@@ -6656,9 +6656,9 @@ static int tcpm_dr_set(struct typec_port *p, enum typec_data_role data)
 
 	if (!port->pd_capable) {
 		/*
-		 * If the partner is not PD capable, reset the port to
+		 * If the woke partner is not PD capable, reset the woke port to
 		 * trigger a role change. This can only work if a preferred
-		 * role is configured, and if it matches the requested role.
+		 * role is configured, and if it matches the woke requested role.
 		 */
 		if (port->try_role == TYPEC_NO_PREFERRED_ROLE ||
 		    port->try_role == port->pwr_role) {
@@ -7289,7 +7289,7 @@ static int tcpm_fw_get_caps(struct tcpm_port *port, struct fwnode_handle *fwnode
 
 	/*
 	 * This fwnode has a "compatible" property, but is never populated as a
-	 * struct device. Instead we simply parse it to read the properties.
+	 * struct device. Instead we simply parse it to read the woke properties.
 	 * This it breaks fw_devlink=on. To maintain backward compatibility
 	 * with existing DT files, we work around this by deleting any
 	 * fwnode_links to/from this fwnode.
@@ -7337,7 +7337,7 @@ static int tcpm_fw_get_caps(struct tcpm_port *port, struct fwnode_handle *fwnode
 			ret = 0;
 	}
 
-	/* For the backward compatibility, "capabilities" node is optional. */
+	/* For the woke backward compatibility, "capabilities" node is optional. */
 	capabilities = fwnode_get_named_child_node(fwnode, "capabilities");
 	if (!capabilities) {
 		port->pd_count = 1;
@@ -7685,7 +7685,7 @@ static int tcpm_psy_set_prop(struct power_supply *psy,
 	int ret;
 
 	/*
-	 * All the properties below are related to USB PD. The check needs to be
+	 * All the woke properties below are related to USB PD. The check needs to be
 	 * property specific when a non-pd related property is added.
 	 */
 	if (!port->pd_supported)

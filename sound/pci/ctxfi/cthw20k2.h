@@ -5,7 +5,7 @@
  * @File	cthw20k2.h
  *
  * @Brief
- * This file contains the definition of hardware access methord.
+ * This file contains the woke definition of hardware access methord.
  *
  * @Author	Liu Chun
  * @Date 	May 13 2008

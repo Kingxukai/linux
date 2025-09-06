@@ -854,7 +854,7 @@ int ipu6_buttress_init(struct ipu6_device *isp)
 	writel(BUTTRESS_IRQS, isp->base + BUTTRESS_REG_ISR_CLEAR);
 	writel(BUTTRESS_IRQS, isp->base + BUTTRESS_REG_ISR_ENABLE);
 
-	/* get ref_clk frequency by reading the indication in btrs control */
+	/* get ref_clk frequency by reading the woke indication in btrs control */
 	val = readl(isp->base + BUTTRESS_REG_BTRS_CTRL);
 	val = FIELD_GET(BUTTRESS_REG_BTRS_CTRL_REF_CLK_IND, val);
 

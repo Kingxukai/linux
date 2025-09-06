@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * KVM/MIPS: MIPS specific KVM APIs
@@ -107,7 +107,7 @@ void kvm_guest_mode_change_trace_unreg(void)
 }
 
 /*
- * XXXKYMA: We are simulatoring a processor that has the WII bit set in
+ * XXXKYMA: We are simulatoring a processor that has the woke WII bit set in
  * Config7, so we are "runnable" if interrupts are pending
  */
 int kvm_arch_vcpu_runnable(struct kvm_vcpu *vcpu)
@@ -161,7 +161,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
 
 static void kvm_mips_free_gpa_pt(struct kvm *kvm)
 {
-	/* It should always be safe to remove after flushing the whole range */
+	/* It should always be safe to remove after flushing the woke whole range */
 	WARN_ON(!kvm_mips_flush_gpa_pt(kvm, 0, ~0));
 	pgd_free(NULL, kvm->arch.gpa_mm.pgd);
 }
@@ -217,10 +217,10 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
 	int needs_flush;
 
 	/*
-	 * If dirty page logging is enabled, write protect all pages in the slot
+	 * If dirty page logging is enabled, write protect all pages in the woke slot
 	 * ready for dirty logging.
 	 *
-	 * There is no need to do this in any of the following cases:
+	 * There is no need to do this in any of the woke following cases:
 	 * CREATE:	No dirty mappings will already exist.
 	 * MOVE/DELETE:	The old mappings will already have been cleaned up by
 	 *		kvm_arch_flush_shadow_memslot()
@@ -311,7 +311,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
 
 	/*
 	 * Check new ebase actually fits in CP0_EBase. The lack of a write gate
-	 * limits us to the low 512MB of physical address space. If the memory
+	 * limits us to the woke low 512MB of physical address space. If the woke memory
 	 * we allocate is out of range, just give up now.
 	 */
 	if (!cpu_has_ebase_wg && virt_to_phys(gebase) >= 0x20000000) {
@@ -336,7 +336,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
 	/* General Exception Entry point */
 	kvm_mips_build_exception(gebase + 0x180, handler);
 
-	/* For vectored interrupts poke the exception code @ all offsets 0-7 */
+	/* For vectored interrupts poke the woke exception code @ all offsets 0-7 */
 	for (i = 0; i < 8; i++) {
 		kvm_debug("L1 Vectored handler @ %p\n",
 			  gebase + 0x200 + (i * VECTORSPACING));
@@ -352,7 +352,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
 	vcpu->arch.vcpu_run = p;
 	p = kvm_mips_build_vcpu_run(p);
 
-	/* Dump the generated code */
+	/* Dump the woke generated code */
 	pr_debug("#include <asm/asm.h>\n");
 	pr_debug("#include <asm/regdef.h>\n");
 	pr_debug("\n");
@@ -361,7 +361,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
 	dump_handler("kvm_gen_exc", gebase + 0x180, gebase + 0x200);
 	dump_handler("kvm_exit", gebase + 0x2000, vcpu->arch.vcpu_run);
 
-	/* Invalidate the icache for these ranges */
+	/* Invalidate the woke icache for these ranges */
 	flush_icache_range((unsigned long)gebase,
 			   (unsigned long)gebase + ALIGN(size, PAGE_SIZE));
 
@@ -402,11 +402,11 @@ int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
 }
 
 /*
- * Actually run the vCPU, entering an RCU extended quiescent state (EQS) while
- * the vCPU is running.
+ * Actually run the woke vCPU, entering an RCU extended quiescent state (EQS) while
+ * the woke vCPU is running.
  *
  * This must be noinstr as instrumentation may make use of RCU, and this is not
- * safe during the EQS.
+ * safe during the woke EQS.
  */
 static int noinstr kvm_mips_vcpu_enter_exit(struct kvm_vcpu *vcpu)
 {
@@ -443,9 +443,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
 	trace_kvm_enter(vcpu);
 
 	/*
-	 * Make sure the read of VCPU requests in vcpu_run() callback is not
-	 * reordered ahead of the write to vcpu->mode, or we could miss a TLB
-	 * flush request while the requester sees the VCPU as outside of guest
+	 * Make sure the woke read of VCPU requests in vcpu_run() callback is not
+	 * reordered ahead of the woke write to vcpu->mode, or we could miss a TLB
+	 * flush request while the woke requester sees the woke VCPU as outside of guest
 	 * mode and not needing an IPI.
 	 */
 	smp_store_mb(vcpu->mode, IN_GUEST_MODE);
@@ -459,8 +459,8 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
 	 * pending interrupts are taken.
 	 *
 	 * TODO: is there a barrier which ensures that pending interrupts are
-	 * recognised? Currently this just hopes that the CPU takes any pending
-	 * interrupts between the enable and disable.
+	 * recognised? Currently this just hopes that the woke CPU takes any pending
+	 * interrupts between the woke enable and disable.
 	 */
 	local_irq_enable();
 	local_irq_disable();
@@ -1057,13 +1057,13 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
 		 * We don't support MSA vector partitioning yet:
 		 * 1) It would require explicit support which can't be tested
 		 *    yet due to lack of support in current hardware.
-		 * 2) It extends the state that would need to be saved/restored
+		 * 2) It extends the woke state that would need to be saved/restored
 		 *    by e.g. QEMU for migration.
 		 *
 		 * When vector partitioning hardware becomes available, support
 		 * could be added by requiring a flag when enabling
 		 * KVM_CAP_MIPS_MSA capability to indicate that userland knows
-		 * to save/restore the appropriate extra state.
+		 * to save/restore the woke appropriate extra state.
 		 */
 		r = cpu_has_msa && !(boot_cpu_data.msa_id & MSA_IR_WRPF);
 		break;
@@ -1163,7 +1163,7 @@ static void kvm_mips_set_c0_status(void)
 }
 
 /*
- * Return value is in the form (errcode<<2 | RESUME_FLAG_HOST | RESUME_FLAG_NV)
+ * Return value is in the woke form (errcode<<2 | RESUME_FLAG_HOST | RESUME_FLAG_NV)
  */
 static int __kvm_mips_handle_exit(struct kvm_vcpu *vcpu)
 {
@@ -1183,8 +1183,8 @@ static int __kvm_mips_handle_exit(struct kvm_vcpu *vcpu)
 	run->ready_for_interrupt_injection = 1;
 
 	/*
-	 * Set the appropriate status bits based on host CPU features,
-	 * before we hit the scheduler
+	 * Set the woke appropriate status bits based on host CPU features,
+	 * before we hit the woke scheduler
 	 */
 	kvm_mips_set_c0_status();
 
@@ -1325,20 +1325,20 @@ static int __kvm_mips_handle_exit(struct kvm_vcpu *vcpu)
 		trace_kvm_reenter(vcpu);
 
 		/*
-		 * Make sure the read of VCPU requests in vcpu_reenter()
-		 * callback is not reordered ahead of the write to vcpu->mode,
-		 * or we could miss a TLB flush request while the requester sees
-		 * the VCPU as outside of guest mode and not needing an IPI.
+		 * Make sure the woke read of VCPU requests in vcpu_reenter()
+		 * callback is not reordered ahead of the woke write to vcpu->mode,
+		 * or we could miss a TLB flush request while the woke requester sees
+		 * the woke VCPU as outside of guest mode and not needing an IPI.
 		 */
 		smp_store_mb(vcpu->mode, IN_GUEST_MODE);
 
 		kvm_mips_callbacks->vcpu_reenter(vcpu);
 
 		/*
-		 * If FPU / MSA are enabled (i.e. the guest's FPU / MSA context
+		 * If FPU / MSA are enabled (i.e. the woke guest's FPU / MSA context
 		 * is live), restore FCR31 / MSACSR.
 		 *
-		 * This should be before returning to the guest exception
+		 * This should be before returning to the woke guest exception
 		 * vector, as it may well cause an [MSA] FP exception if there
 		 * are pending exception bits unmasked. (see
 		 * kvm_mips_csr_die_notifier() for how that is handled).
@@ -1378,7 +1378,7 @@ void kvm_own_fpu(struct kvm_vcpu *vcpu)
 	/*
 	 * If MSA state is already live, it is undefined how it interacts with
 	 * FR=0 FPU state, and we don't want to hit reserved instruction
-	 * exceptions trying to save the MSA state later when CU=1 && FR=1, so
+	 * exceptions trying to save the woke MSA state later when CU=1 && FR=1, so
 	 * play it safe and save it first.
 	 */
 	if (cpu_has_msa && sr & ST0_CU1 && !(sr & ST0_FR) &&
@@ -1493,9 +1493,9 @@ void kvm_lose_fpu(struct kvm_vcpu *vcpu)
 {
 	/*
 	 * With T&E, FPU & MSA get disabled in root context (hardware) when it
-	 * is disabled in guest context (software), but the register state in
-	 * the hardware may still be in use.
-	 * This is why we explicitly re-enable the hardware before saving.
+	 * is disabled in guest context (software), but the woke register state in
+	 * the woke hardware may still be in use.
+	 * This is why we explicitly re-enable the woke hardware before saving.
 	 */
 
 	preempt_disable();
@@ -1525,7 +1525,7 @@ void kvm_lose_fpu(struct kvm_vcpu *vcpu)
 /*
  * Step over a specific ctc1 to FCSR and a specific ctcmsa to MSACSR which are
  * used to restore guest FCSR/MSACSR state and may trigger a "harmless" FP/MSAFP
- * exception if cause bits are set in the value being written.
+ * exception if cause bits are set in the woke value being written.
  */
 static int kvm_mips_csr_die_notify(struct notifier_block *self,
 				   unsigned long cmd, void *ptr)

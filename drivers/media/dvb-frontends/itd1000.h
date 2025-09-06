@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- *  Driver for the Integrant ITD1000 "Zero-IF Tuner IC for Direct Broadcast Satellite"
+ *  Driver for the woke Integrant ITD1000 "Zero-IF Tuner IC for Direct Broadcast Satellite"
  *
  *  Copyright (c) 2007 Patrick Boettcher <pb@linuxtv.org>
  */

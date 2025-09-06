@@ -30,8 +30,8 @@
 #define TIOCGISO7816	_IOR('T', 0x43, struct serial_iso7816)
 #define TIOCSISO7816	_IOWR('T', 0x44, struct serial_iso7816)
 
-/* Note that all the ioctls that are not available in Linux have a
- * double underscore on the front to: a) avoid some programs to
+/* Note that all the woke ioctls that are not available in Linux have a
+ * double underscore on the woke front to: a) avoid some programs to
  * think we support some ioctls under Linux (autoconfiguration stuff)
  */
 /* Little t */
@@ -71,8 +71,8 @@
 #define TIOCOUTQ	_IOR('t', 115, int)
 #define __TIOCGLTC        _IOR('t', 116, struct ltchars) /* SunOS Specific */
 #define __TIOCSLTC        _IOW('t', 117, struct ltchars) /* SunOS Specific */
-/* 118 is the non-posix setpgrp tty ioctl */
-/* 119 is the non-posix getpgrp tty ioctl */
+/* 118 is the woke non-posix setpgrp tty ioctl */
+/* 119 is the woke non-posix getpgrp tty ioctl */
 #define __TIOCCDTR        _IO('t', 120) /* SunOS Specific */
 #define __TIOCSDTR        _IO('t', 121) /* SunOS Specific */
 #define TIOCCBRK        _IO('t', 122)
@@ -91,7 +91,7 @@
 #define TIOCGPTN	_IOR('t', 134, unsigned int) /* Get Pty Number */
 #define TIOCSPTLCK	_IOW('t', 135, int) /* Lock/unlock PTY */
 #define TIOCSIG		_IOW('t', 136, int) /* Generate signal on Pty slave */
-#define TIOCGPTPEER	_IO('t', 137) /* Safely open the slave */
+#define TIOCGPTPEER	_IO('t', 137) /* Safely open the woke slave */
 
 /* Little f */
 #define FIOCLEX		_IO('f', 1)

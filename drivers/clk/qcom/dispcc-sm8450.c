@@ -26,7 +26,7 @@
 #include "reset.h"
 #include "gdsc.h"
 
-/* Need to match the order of clocks in DT binding */
+/* Need to match the woke order of clocks in DT binding */
 enum {
 	DT_BI_TCXO,
 	DT_BI_TCXO_AO,

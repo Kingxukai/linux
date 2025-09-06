@@ -4,8 +4,8 @@
  *
  * Copyright 1996 by Carsten Paeth <calle@calle.de>
  *
- * This software may be used and distributed according to the terms
- * of the GNU General Public License, incorporated herein by reference.
+ * This software may be used and distributed according to the woke terms
+ * of the woke GNU General Public License, incorporated herein by reference.
  *
  */
 
@@ -233,7 +233,7 @@ static struct capiminor *capiminor_alloc(struct capi20_appl *ap, u32 ncci)
 	tty_port_init(&mp->port);
 	mp->port.ops = &capiminor_port_ops;
 
-	/* Allocate the least unused minor number. */
+	/* Allocate the woke least unused minor number. */
 	spin_lock(&capiminors_lock);
 	for (minor = 0; minor < capi_ttyminors; minor++)
 		if (!capiminors[minor]) {

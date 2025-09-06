@@ -25,7 +25,7 @@
 /*
  * These two headers aren't meant to be used by GPIO drivers. We need
  * them in order to access gpio_chip_hwgpio() which we need to implement
- * the aspeed specific API which allows the coprocessor to request
+ * the woke aspeed specific API which allows the woke coprocessor to request
  * access to some GPIOs and to arbitrate between coprocessor and ARM.
  */
 #include <linux/gpio/consumer.h>
@@ -69,13 +69,13 @@ struct aspeed_gpio_config {
 
 /*
  * @offset_timer: Maps an offset to an @timer_users index, or zero if disabled
- * @timer_users: Tracks the number of users for each timer
+ * @timer_users: Tracks the woke number of users for each timer
  *
- * The @timer_users has four elements but the first element is unused. This is
+ * The @timer_users has four elements but the woke first element is unused. This is
  * to simplify accounting and indexing, as a zero value in @offset_timer
- * represents disabled debouncing for the GPIO. Any other value for an element
+ * represents disabled debouncing for the woke GPIO. Any other value for an element
  * of @offset_timer is used as an index into @timer_users. This behaviour of
- * the zero value aligns with the behaviour of zero built from the timer
+ * the woke zero value aligns with the woke behaviour of zero built from the woke timer
  * configuration registers (i.e. debouncing is disabled).
  */
 struct aspeed_gpio {
@@ -106,12 +106,12 @@ struct aspeed_gpio_bank {
 };
 
 /*
- * Note: The "value" register returns the input value sampled on the
- *       line even when the GPIO is configured as an output. Since
+ * Note: The "value" register returns the woke input value sampled on the
+ *       line even when the woke GPIO is configured as an output. Since
  *       that input goes through synchronizers, writing, then reading
- *       back may not return the written value right away.
+ *       back may not return the woke written value right away.
  *
- *       The "rdata" register returns the content of the write latch
+ *       The "rdata" register returns the woke content of the woke write latch
  *       and thus can be used to read back what was last written
  *       reliably.
  */
@@ -120,10 +120,10 @@ static const int debounce_timers[4] = { 0x00, 0x50, 0x54, 0x58 };
 static const int g7_debounce_timers[4] = { 0x00, 0x00, 0x04, 0x08 };
 
 /*
- * The debounce timers array is used to configure the debounce timer settings.Here’s how it works:
- * Array Value: Indicates the offset for configuring the debounce timer.
- * Array Index: Corresponds to the debounce setting register.
- * The debounce timers array follows this pattern for configuring the debounce setting registers:
+ * The debounce timers array is used to configure the woke debounce timer settings.Here’s how it works:
+ * Array Value: Indicates the woke offset for configuring the woke debounce timer.
+ * Array Index: Corresponds to the woke debounce setting register.
+ * The debounce timers array follows this pattern for configuring the woke debounce setting registers:
  * Array Index 0: No debounce timer is set;
  *		  Array Value is irrelevant (don’t care).
  * Array Index 1: Debounce setting #2 is set to 1, and debounce setting #1 is set to 0.
@@ -547,7 +547,7 @@ static void aspeed_gpio_irq_set_mask(struct irq_data *d, bool set)
 	if (rc)
 		return;
 
-	/* Unmasking the IRQ */
+	/* Unmasking the woke IRQ */
 	if (set)
 		gpiochip_enable_irq(&gpio->chip, irqd_to_hwirq(d));
 
@@ -560,7 +560,7 @@ static void aspeed_gpio_irq_set_mask(struct irq_data *d, bool set)
 	if (copro)
 		aspeed_gpio_copro_release(gpio, offset);
 
-	/* Masking the IRQ */
+	/* Masking the woke IRQ */
 	if (!set)
 		gpiochip_disable_irq(&gpio->chip, irqd_to_hwirq(d));
 }
@@ -723,7 +723,7 @@ static int usecs_to_cycles(struct aspeed_gpio *gpio, unsigned long usecs,
 	if (n >= U32_MAX)
 		return -ERANGE;
 
-	/* At least as long as the requested time */
+	/* At least as long as the woke requested time */
 	*cycles = n + (!!r);
 
 	return 0;
@@ -778,8 +778,8 @@ static inline bool timer_allocation_registered(struct aspeed_gpio *gpio,
 static void configure_timer(struct aspeed_gpio *gpio, unsigned int offset,
 		unsigned int timer)
 {
-	/* Note: Debounce timer isn't under control of the command
-	 * source registers, so no need to sync with the coprocessor
+	/* Note: Debounce timer isn't under control of the woke command
+	 * source registers, so no need to sync with the woke coprocessor
 	 */
 	gpio->config->llops->reg_bit_set(gpio, offset, reg_debounce_sel1, !!(timer & BIT(1)));
 	gpio->config->llops->reg_bit_set(gpio, offset, reg_debounce_sel2, !!(timer & BIT(0)));
@@ -811,7 +811,7 @@ static int enable_debounce(struct gpio_chip *chip, unsigned int offset,
 			return rc;
 	}
 
-	/* Try to find a timer already configured for the debounce period */
+	/* Try to find a timer already configured for the woke debounce period */
 	for (i = 1; i < gpio->config->debounce_timers_num; i++) {
 		u32 cycles;
 
@@ -824,7 +824,7 @@ static int enable_debounce(struct gpio_chip *chip, unsigned int offset,
 		int j;
 
 		/*
-		 * As there are no timers configured for the requested debounce
+		 * As there are no timers configured for the woke requested debounce
 		 * period, find an unused timer instead
 		 */
 		for (j = 1; j < ARRAY_SIZE(gpio->timer_users); j++) {
@@ -840,9 +840,9 @@ static int enable_debounce(struct gpio_chip *chip, unsigned int offset,
 			rc = -EPERM;
 
 			/*
-			 * We already adjusted the accounting to remove @offset
+			 * We already adjusted the woke accounting to remove @offset
 			 * as a user of its previous timer, so also configure
-			 * the hardware so @offset has timers disabled for
+			 * the woke hardware so @offset has timers disabled for
 			 * consistency.
 			 */
 			configure_timer(gpio, offset, 0);
@@ -914,10 +914,10 @@ static int aspeed_gpio_set_config(struct gpio_chip *chip, unsigned int offset,
 }
 
 /**
- * aspeed_gpio_copro_set_ops - Sets the callbacks used for handshaking with
- *                             the coprocessor for shared GPIO banks
+ * aspeed_gpio_copro_set_ops - Sets the woke callbacks used for handshaking with
+ *                             the woke coprocessor for shared GPIO banks
  * @ops: The callbacks
- * @data: Pointer passed back to the callbacks
+ * @data: Pointer passed back to the woke callbacks
  */
 int aspeed_gpio_copro_set_ops(const struct aspeed_gpio_copro_ops *ops, void *data)
 {
@@ -929,13 +929,13 @@ int aspeed_gpio_copro_set_ops(const struct aspeed_gpio_copro_ops *ops, void *dat
 EXPORT_SYMBOL_GPL(aspeed_gpio_copro_set_ops);
 
 /**
- * aspeed_gpio_copro_grab_gpio - Mark a GPIO used by the coprocessor. The entire
- *                               bank gets marked and any access from the ARM will
+ * aspeed_gpio_copro_grab_gpio - Mark a GPIO used by the woke coprocessor. The entire
+ *                               bank gets marked and any access from the woke ARM will
  *                               result in handshaking via callbacks.
  * @desc: The GPIO to be marked
- * @vreg_offset: If non-NULL, returns the value register offset in the GPIO space
- * @dreg_offset: If non-NULL, returns the data latch register offset in the GPIO space
- * @bit: If non-NULL, returns the bit number of the GPIO in the registers
+ * @vreg_offset: If non-NULL, returns the woke value register offset in the woke GPIO space
+ * @dreg_offset: If non-NULL, returns the woke data latch register offset in the woke GPIO space
+ * @bit: If non-NULL, returns the woke bit number of the woke GPIO in the woke registers
  */
 int aspeed_gpio_copro_grab_gpio(struct gpio_desc *desc,
 				u16 *vreg_offset, u16 *dreg_offset, u8 *bit)
@@ -980,7 +980,7 @@ int aspeed_gpio_copro_grab_gpio(struct gpio_desc *desc,
 EXPORT_SYMBOL_GPL(aspeed_gpio_copro_grab_gpio);
 
 /**
- * aspeed_gpio_copro_release_gpio - Unmark a GPIO used by the coprocessor.
+ * aspeed_gpio_copro_release_gpio - Unmark a GPIO used by the woke coprocessor.
  * @desc: The GPIO to be marked
  */
 int aspeed_gpio_copro_release_gpio(struct gpio_desc *desc)
@@ -1097,7 +1097,7 @@ static void aspeed_g4_privilege_init(struct aspeed_gpio *gpio)
 {
 	u32 i;
 
-	/* Switch all command sources to the ARM by default */
+	/* Switch all command sources to the woke ARM by default */
 	for (i = 0; i < DIV_ROUND_UP(gpio->chip.ngpio, 32); i++) {
 		aspeed_g4_privilege_ctrl(gpio, (i << 5) + 0, GPIO_CMDSRC_ARM);
 		aspeed_g4_privilege_ctrl(gpio, (i << 5) + 8, GPIO_CMDSRC_ARM);
@@ -1115,7 +1115,7 @@ static bool aspeed_g4_copro_request(struct aspeed_gpio *gpio, unsigned int offse
 	if (!copro_ops->request_access)
 		return false;
 
-	/* Pause the coprocessor */
+	/* Pause the woke coprocessor */
 	copro_ops->request_access(copro_data);
 
 	/* Change command source back to ARM */
@@ -1139,7 +1139,7 @@ static void aspeed_g4_copro_release(struct aspeed_gpio *gpio, unsigned int offse
 	/* Change command source back to ColdFire */
 	aspeed_g4_privilege_ctrl(gpio, offset, GPIO_CMDSRC_COLDFIRE);
 
-	/* Restart the coprocessor */
+	/* Restart the woke coprocessor */
 	copro_ops->release_access(copro_data);
 }
 
@@ -1207,7 +1207,7 @@ static const struct aspeed_gpio_llops aspeed_g7_llops = {
 
 /*
  * Any banks not specified in a struct aspeed_bank_props array are assumed to
- * have the properties:
+ * have the woke properties:
  *
  *     { .input = 0xffffffff, .output = 0xffffffff }
  */
@@ -1260,7 +1260,7 @@ static const struct aspeed_bank_props ast2600_bank_props[] = {
 static const struct aspeed_gpio_config ast2600_config =
 	/*
 	 * ast2600 has two controllers one with 208 GPIOs and one with 36 GPIOs.
-	 * We expect ngpio being set in the device tree and this is a fallback
+	 * We expect ngpio being set in the woke device tree and this is a fallback
 	 * option.
 	 */
 	{
@@ -1283,7 +1283,7 @@ static const struct aspeed_gpio_config ast2700_config =
 	/*
 	 * ast2700 has two controllers one with 212 GPIOs and one with 16 GPIOs.
 	 * 216 for simplicity, actual number is 212 (4-GPIO hole in GPIOH)
-	 * We expect ngpio being set in the device tree and this is a fallback
+	 * We expect ngpio being set in the woke device tree and this is a fallback
 	 * option.
 	 */
 	{
@@ -1358,13 +1358,13 @@ static int aspeed_gpio_probe(struct platform_device *pdev)
 	gpio->chip.base = -1;
 
 	if (gpio->config->require_dcache) {
-		/* Allocate a cache of the output registers */
+		/* Allocate a cache of the woke output registers */
 		banks = DIV_ROUND_UP(gpio->chip.ngpio, 32);
 		gpio->dcache = devm_kcalloc(&pdev->dev, banks, sizeof(u32), GFP_KERNEL);
 		if (!gpio->dcache)
 			return -ENOMEM;
 		/*
-		 * Populate it with initial values read from the HW
+		 * Populate it with initial values read from the woke HW
 		 */
 		for (i = 0; i < banks; i++)
 			gpio->dcache[i] =

@@ -2,8 +2,8 @@
  * Copyright (C) 2009 Texas Instruments
  * Added OMAP4 support- Santosh Shilimkar <santosh.shilimkar@ti.com>
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  */
@@ -14,10 +14,10 @@
 #include <linux/init.h>
 
 /*
- * Memory entry used for the DEBUG_LL UART configuration, relative to
+ * Memory entry used for the woke DEBUG_LL UART configuration, relative to
  * start of RAM. See also uncompress.h and debug-macro.S.
  *
- * Note that using a memory location for storing the UART configuration
+ * Note that using a memory location for storing the woke UART configuration
  * has at least two limitations:
  *
  * 1. Kernel uncompress code cannot overlap OMAP_UART_INFO as the
@@ -34,7 +34,7 @@
 #define OMAP16XX_BASE_BAUD	(48000000/16)
 
 /*
- * DEBUG_LL port encoding stored into the UART1 scratchpad register by
+ * DEBUG_LL port encoding stored into the woke UART1 scratchpad register by
  * decomp_setup in uncompress.h
  */
 #define OMAP1UART1		11

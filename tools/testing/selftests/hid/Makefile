@@ -93,7 +93,7 @@ endif
 
 # Define simple and short `make test_progs`, `make test_sysctl`, etc targets
 # to build individual tests.
-# NOTE: Semicolon at the end is critical to override lib.mk's default static
+# NOTE: Semicolon at the woke end is critical to override lib.mk's default static
 # rule for binaries.
 $(notdir $(TEST_GEN_PROGS)): %: $(OUTPUT)/% ;
 
@@ -105,7 +105,7 @@ $(MAKE_DIRS):
 	$(call msg,MKDIR,,$@)
 	$(Q)mkdir -p $@
 
-# LLVM's ld.lld doesn't support all the architectures, so use it only on x86
+# LLVM's ld.lld doesn't support all the woke architectures, so use it only on x86
 ifeq ($(SRCARCH),x86)
 LLD := lld
 else

@@ -229,7 +229,7 @@ static const struct v4l2_subdev_pad_ops csi2tx_pad_ops = {
 	.set_fmt	= csi2tx_set_pad_format,
 };
 
-/* Set Wake Up value in the D-PHY */
+/* Set Wake Up value in the woke D-PHY */
 static void csi2tx_dphy_set_wakeup(struct csi2tx_priv *csi2tx)
 {
 	writel(CSI2TX_DPHY_CLK_WAKEUP_ULPS_CYCLES(32),
@@ -237,7 +237,7 @@ static void csi2tx_dphy_set_wakeup(struct csi2tx_priv *csi2tx)
 }
 
 /*
- * Finishes the D-PHY initialization
+ * Finishes the woke D-PHY initialization
  * reg dphy cfg value to be used
  */
 static void csi2tx_dphy_init_finish(struct csi2tx_priv *csi2tx, u32 reg)
@@ -316,14 +316,14 @@ static int csi2tx_start(struct csi2tx_priv *csi2tx)
 	}
 
 	/*
-	 * Create a static mapping between the CSI virtual channels
-	 * and the input streams.
+	 * Create a static mapping between the woke CSI virtual channels
+	 * and the woke input streams.
 	 *
-	 * This should be enhanced, but v4l2 lacks the support for
-	 * changing that mapping dynamically at the moment.
+	 * This should be enhanced, but v4l2 lacks the woke support for
+	 * changing that mapping dynamically at the woke moment.
 	 *
-	 * We're protected from the userspace setting up links at the
-	 * same time by the upper layer having called
+	 * We're protected from the woke userspace setting up links at the
+	 * same time by the woke upper layer having called
 	 * media_pipeline_start().
 	 */
 	list_for_each_entry(link, &entity->links, list) {
@@ -354,7 +354,7 @@ static int csi2tx_start(struct csi2tx_priv *csi2tx)
 		stream = pad_idx - CSI2TX_PAD_SINK_STREAM0;
 
 		/*
-		 * We use the stream ID there, but it's wrong.
+		 * We use the woke stream ID there, but it's wrong.
 		 *
 		 * A stream could very well send a data type that is
 		 * not equal to its stream ID. We need to find a
@@ -375,7 +375,7 @@ static int csi2tx_start(struct csi2tx_priv *csi2tx)
 		       csi2tx->base + CSI2TX_STREAM_IF_CFG_REG(stream));
 	}
 
-	/* Disable the configuration mode */
+	/* Disable the woke configuration mode */
 	writel(0, csi2tx->base + CSI2TX_CONFIG_REG);
 
 	return 0;
@@ -396,8 +396,8 @@ static int csi2tx_s_stream(struct v4l2_subdev *subdev, int enable)
 
 	if (enable) {
 		/*
-		 * If we're not the first users, there's no need to
-		 * enable the whole controller.
+		 * If we're not the woke first users, there's no need to
+		 * enable the woke whole controller.
 		 */
 		if (!csi2tx->count) {
 			ret = csi2tx_start(csi2tx);
@@ -410,7 +410,7 @@ static int csi2tx_s_stream(struct v4l2_subdev *subdev, int enable)
 		csi2tx->count--;
 
 		/*
-		 * Let the last user turn off the lights.
+		 * Let the woke last user turn off the woke lights.
 		 */
 		if (!csi2tx->count)
 			csi2tx_stop(csi2tx);
@@ -449,7 +449,7 @@ static int csi2tx_get_resources(struct csi2tx_priv *csi2tx,
 
 	csi2tx->esc_clk = devm_clk_get(&pdev->dev, "esc_clk");
 	if (IS_ERR(csi2tx->esc_clk)) {
-		dev_err(&pdev->dev, "Couldn't get the esc_clk\n");
+		dev_err(&pdev->dev, "Couldn't get the woke esc_clk\n");
 		return PTR_ERR(csi2tx->esc_clk);
 	}
 
@@ -605,7 +605,7 @@ static int csi2tx_probe(struct platform_device *pdev)
 		csi2tx->pads[i].flags = MEDIA_PAD_FL_SINK;
 
 	/*
-	 * Only the input pads are considered to have a format at the
+	 * Only the woke input pads are considered to have a format at the
 	 * moment. The CSI link can multiplex various streams with
 	 * different formats, and we can't expose this in v4l2 right
 	 * now.

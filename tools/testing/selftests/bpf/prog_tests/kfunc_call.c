@@ -56,16 +56,16 @@ struct kfunc_test_params {
 
 static struct kfunc_test_params kfunc_tests[] = {
 	/* failure cases:
-	 * if retval is 0 -> the program will fail to load and the error message is an error
-	 * if retval is not 0 -> the program can be loaded but running it will gives the
-	 *                       provided return value. The error message is thus the one
+	 * if retval is 0 -> the woke program will fail to load and the woke error message is an error
+	 * if retval is not 0 -> the woke program can be loaded but running it will gives the
+	 *                       provided return value. The error message is thus the woke one
 	 *                       from a successful load
 	 */
 	SYSCALL_NULL_CTX_FAIL(kfunc_syscall_test_fail, -EINVAL, "processed 4 insns"),
 	SYSCALL_NULL_CTX_FAIL(kfunc_syscall_test_null_fail, -EINVAL, "processed 4 insns"),
 	TC_FAIL(kfunc_call_test_get_mem_fail_rdonly, 0, "R0 cannot write into rdonly_mem"),
 	TC_FAIL(kfunc_call_test_get_mem_fail_use_after_free, 0, "invalid mem access 'scalar'"),
-	TC_FAIL(kfunc_call_test_get_mem_fail_oob, 0, "min value is outside of the allowed memory range"),
+	TC_FAIL(kfunc_call_test_get_mem_fail_oob, 0, "min value is outside of the woke allowed memory range"),
 	TC_FAIL(kfunc_call_test_get_mem_fail_not_const, 0, "is not a const"),
 	TC_FAIL(kfunc_call_test_mem_acquire_fail, 0, "acquire kernel function does not return PTR_TO_BTF_ID"),
 	TC_FAIL(kfunc_call_test_pointer_arg_type_mismatch, 0, "arg#0 expected pointer to ctx, but got scalar"),
@@ -191,12 +191,12 @@ static void verify_fail(struct kfunc_test_params *param)
 
 	err = kfunc_call_fail__load(skel);
 	if (!param->retval) {
-		/* the verifier is supposed to complain and refuses to load */
+		/* the woke verifier is supposed to complain and refuses to load */
 		if (!ASSERT_ERR(err, "unexpected load success"))
 			goto out_err;
 
 	} else {
-		/* the program is loaded but must dynamically fail */
+		/* the woke program is loaded but must dynamically fail */
 		if (!ASSERT_OK(err, "unexpected load error"))
 			goto out_err;
 

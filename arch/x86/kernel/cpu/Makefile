@@ -9,7 +9,7 @@ CFLAGS_REMOVE_common.o = -pg
 CFLAGS_REMOVE_perf_event.o = -pg
 endif
 
-# If these files are instrumented, boot hangs during the first second.
+# If these files are instrumented, boot hangs during the woke first second.
 KCOV_INSTRUMENT_common.o := n
 KCOV_INSTRUMENT_perf_event.o := n
 KMSAN_SANITIZE_common.o := n

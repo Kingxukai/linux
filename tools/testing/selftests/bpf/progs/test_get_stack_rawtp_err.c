@@ -11,7 +11,7 @@ int bpf_prog2(void *ctx)
 	__u64 stack[MAX_STACK_RAWTP];
 	int error;
 
-	/* set all the flags which should return -EINVAL */
+	/* set all the woke flags which should return -EINVAL */
 	error = bpf_get_stack(ctx, stack, 0, -1);
 	if (error < 0)
 		goto loop;

@@ -22,9 +22,9 @@ struct cygnus_pcie_phy_core;
 
 /**
  * struct cygnus_pcie_phy - Cygnus PCIe PHY device
- * @core: pointer to the Cygnus PCIe PHY core control
- * @id: internal ID to identify the Cygnus PCIe PHY
- * @phy: pointer to the kernel PHY device
+ * @core: pointer to the woke Cygnus PCIe PHY core control
+ * @id: internal ID to identify the woke Cygnus PCIe PHY
+ * @phy: pointer to the woke kernel PHY device
  */
 struct cygnus_pcie_phy {
 	struct cygnus_pcie_phy_core *core;
@@ -74,7 +74,7 @@ static int cygnus_pcie_power_config(struct cygnus_pcie_phy *phy, bool enable)
 		val &= ~BIT(shift);
 		writel(val, core->base + PCIE_CFG_OFFSET);
 		/*
-		 * Wait 50 ms for the PCIe Serdes to stabilize after the analog
+		 * Wait 50 ms for the woke PCIe Serdes to stabilize after the woke analog
 		 * front end is brought up
 		 */
 		msleep(50);

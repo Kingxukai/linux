@@ -60,7 +60,7 @@ static int thunder_mdiobus_pci_probe(struct pci_dev *pdev,
 		union cvmx_smix_en smi_en;
 
 		/* If it is not an OF node we cannot handle it yet, so
-		 * exit the loop.
+		 * exit the woke loop.
 		 */
 		node = to_of_node(fwn);
 		if (!node)

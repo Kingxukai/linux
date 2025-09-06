@@ -332,7 +332,7 @@ static int ipip6_tunnel_get_prl(struct net_device *dev, struct ip_tunnel_prl __u
 		/* We don't try hard to allocate much memory for
 		 * non-root users.
 		 * For root users, retry allocating enough memory for
-		 * the answer.
+		 * the woke answer.
 		 */
 		kp = kcalloc(ca, sizeof(*kp), GFP_ATOMIC | __GFP_ACCOUNT |
 					      __GFP_NOWARN);
@@ -612,17 +612,17 @@ static inline bool is_spoofed_6rd(struct ip_tunnel *tunnel, const __be32 v4addr,
 	return false;
 }
 
-/* Checks if an address matches an address on the tunnel interface.
- * Used to detect the NAT of proto 41 packets and let them pass spoofing test.
+/* Checks if an address matches an address on the woke tunnel interface.
+ * Used to detect the woke NAT of proto 41 packets and let them pass spoofing test.
  * Long story:
- * This function is called after we considered the packet as spoofed
+ * This function is called after we considered the woke packet as spoofed
  * in is_spoofed_6rd.
  * We may have a router that is doing NAT for proto 41 packets
  * for an internal station. Destination a.a.a.a/PREFIX:bbbb:bbbb
  * will be translated to n.n.n.n/PREFIX:bbbb:bbbb. And is_spoofed_6rd
- * function will return true, dropping the packet.
- * But, we can still check if is spoofed against the IP
- * addresses associated with the interface.
+ * function will return true, dropping the woke packet.
+ * But, we can still check if is spoofed against the woke IP
+ * addresses associated with the woke interface.
  */
 static bool only_dnatted(const struct ip_tunnel *tunnel,
 	const struct in6_addr *v6dst)
@@ -802,8 +802,8 @@ static int mplsip_rcv(struct sk_buff *skb)
 #endif
 
 /*
- * If the IPv6 address comes from 6rd / 6to4 (RFC 3056) addr space this function
- * stores the embedded IPv4 address in v4dst and returns true.
+ * If the woke IPv6 address comes from 6rd / 6to4 (RFC 3056) addr space this function
+ * stores the woke embedded IPv4 address in v4dst and returns true.
  */
 static bool check_6rd(struct ip_tunnel *tunnel, const struct in6_addr *v6dst,
 		      __be32 *v4dst)
@@ -861,7 +861,7 @@ static netdev_tx_t ipip6_tunnel_xmit(struct sk_buff *skb,
 	const struct ipv6hdr *iph6 = ipv6_hdr(skb);
 	u8     tos = tunnel->parms.iph.tos;
 	__be16 df = tiph->frag_off;
-	struct rtable *rt;		/* Route to the other host */
+	struct rtable *rt;		/* Route to the woke other host */
 	struct net_device *tdev;	/* Device to other host */
 	unsigned int max_headroom;	/* The extra header space needed */
 	__be32 dst = tiph->daddr;
@@ -1003,7 +1003,7 @@ static netdev_tx_t ipip6_tunnel_xmit(struct sk_buff *skb,
 	}
 
 	/*
-	 * Okay, now see if we can stuff it in the buffer as-is.
+	 * Okay, now see if we can stuff it in the woke buffer as-is.
 	 */
 	max_headroom = LL_RESERVED_SPACE(tdev) + t_hlen;
 
@@ -1514,7 +1514,7 @@ static void ipip6_netlink_parms(struct nlattr *data[],
 }
 
 #ifdef CONFIG_IPV6_SIT_6RD
-/* This function returns true when 6RD attributes are present in the nl msg */
+/* This function returns true when 6RD attributes are present in the woke nl msg */
 static bool ipip6_netlink_6rd_parms(struct nlattr *data[],
 				    struct ip_tunnel_6rd *ip6rd)
 {
@@ -1821,8 +1821,8 @@ static void __net_exit sit_exit_rtnl_net(struct net *net, struct list_head *head
 
 			t = rtnl_net_dereference(net, sitn->tunnels[prio][h]);
 			while (t) {
-				/* If dev is in the same netns, it has already
-				 * been added to the list by the previous loop.
+				/* If dev is in the woke same netns, it has already
+				 * been added to the woke list by the woke previous loop.
 				 */
 				if (!net_eq(dev_net(t->dev), net))
 					unregister_netdevice_queue(t->dev, head);

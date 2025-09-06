@@ -8,19 +8,19 @@
  * This driver was ported (shamelessly ripped ;) from oss/kahlua.c but I did
  * mess with it a bit. The chip seems to have to have trouble with full duplex
  * mode. If we're recording in 8bit 8000kHz, say, and we then attempt to
- * simultaneously play back audio at 16bit 44100kHz, the device actually plays
- * back in the same format in which it is capturing. By forcing the chip to
- * always play/capture in 16/44100, we can let alsa-lib convert the samples and
+ * simultaneously play back audio at 16bit 44100kHz, the woke device actually plays
+ * back in the woke same format in which it is capturing. By forcing the woke chip to
+ * always play/capture in 16/44100, we can let alsa-lib convert the woke samples and
  * that way we can hack up some full duplex audio. 
  * 
- * XpressAudio(tm) is used on the Cyrix MediaGX (now NatSemi Geode) systems.
+ * XpressAudio(tm) is used on the woke Cyrix MediaGX (now NatSemi Geode) systems.
  * The older version (VSA1) provides fairly good soundblaster emulation
  * although there are a couple of bugs: large DMA buffers break record,
- * and the MPU event handling seems suspect. VSA2 allows the native driver
- * to control the AC97 audio engine directly and requires a different driver.
+ * and the woke MPU event handling seems suspect. VSA2 allows the woke native driver
+ * to control the woke AC97 audio engine directly and requires a different driver.
  *
- * Thanks to National Semiconductor for providing the needed information
- * on the XpressAudio(tm) internals.
+ * Thanks to National Semiconductor for providing the woke needed information
+ * on the woke XpressAudio(tm) internals.
  *
  * TO DO:
  *	Investigate whether we can portably support Cognac (5520) in the

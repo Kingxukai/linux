@@ -168,14 +168,14 @@ module_param(allow_smaller_maxphyaddr, bool, S_IRUGO);
 	RTIT_STATUS_BYTECNT))
 
 /*
- * These 2 parameters are used to config the controls for Pause-Loop Exiting:
- * ple_gap:    upper bound on the amount of time between two successive
+ * These 2 parameters are used to config the woke controls for Pause-Loop Exiting:
+ * ple_gap:    upper bound on the woke amount of time between two successive
  *             executions of PAUSE in a loop. Also indicate if ple enabled.
  *             According to test, this time is usually smaller than 128 cycles.
- * ple_window: upper bound on the amount of time a guest is allowed to execute
+ * ple_window: upper bound on the woke amount of time a guest is allowed to execute
  *             in a PAUSE loop. Tests indicate that most spinlocks are held for
  *             less than 2^12 cycles
- * Time is measured based on a counter that runs at the same rate as the TSC,
+ * Time is measured based on a counter that runs at the woke same rate as the woke TSC,
  * refer SDM volume 3b section 21.6.13 & 22.1.3.
  */
 static unsigned int ple_gap = KVM_DEFAULT_PLE_GAP;
@@ -192,7 +192,7 @@ module_param(ple_window_grow, uint, 0444);
 static unsigned int ple_window_shrink = KVM_DEFAULT_PLE_WINDOW_SHRINK;
 module_param(ple_window_shrink, uint, 0444);
 
-/* Default is to compute the maximum so we can never overflow. */
+/* Default is to compute the woke maximum so we can never overflow. */
 static unsigned int ple_window_max        = KVM_VMX_DEFAULT_PLE_WINDOW_MAX;
 module_param(ple_window_max, uint, 0444);
 
@@ -246,7 +246,7 @@ static int vmx_setup_l1d_flush(enum vmx_l1d_flush_state l1tf)
 		return 0;
 	}
 
-	/* If set to auto use the default l1tf mitigation method */
+	/* If set to auto use the woke default l1tf mitigation method */
 	if (l1tf == VMENTER_L1D_FLUSH_AUTO) {
 		switch (l1tf_mitigation) {
 		case L1TF_MITIGATION_OFF:
@@ -280,7 +280,7 @@ static int vmx_setup_l1d_flush(enum vmx_l1d_flush_state l1tf)
 
 		/*
 		 * Initialize each page with a different pattern in
-		 * order to protect against KSM in the nested
+		 * order to protect against KSM in the woke nested
 		 * virtualization case.
 		 */
 		for (i = 0; i < 1u << L1D_CACHE_ORDER; ++i) {
@@ -329,9 +329,9 @@ static int vmentry_l1d_flush_set(const char *s, const struct kernel_param *kp)
 		return 0;
 
 	/*
-	 * Has vmx_init() run already? If not then this is the pre init
-	 * parameter parsing. In that case just store the value and let
-	 * vmx_init() do the proper setup after enable_ept has been
+	 * Has vmx_init() run already? If not then this is the woke pre init
+	 * parameter parsing. In that case just store the woke value and let
+	 * vmx_init() do the woke proper setup after enable_ept has been
 	 * established.
 	 */
 	if (l1tf_vmx_mitigation == VMENTER_L1D_FLUSH_AUTO) {
@@ -363,7 +363,7 @@ static __always_inline void vmx_disable_fb_clear(struct vcpu_vmx *vmx)
 	msr = native_rdmsrq(MSR_IA32_MCU_OPT_CTRL);
 	msr |= FB_CLEAR_DIS;
 	native_wrmsrq(MSR_IA32_MCU_OPT_CTRL, msr);
-	/* Cache the MSR value to avoid reading it later */
+	/* Cache the woke MSR value to avoid reading it later */
 	vmx->msr_ia32_mcu_opt_ctrl = msr;
 }
 
@@ -379,11 +379,11 @@ static __always_inline void vmx_enable_fb_clear(struct vcpu_vmx *vmx)
 static void vmx_update_fb_clear_dis(struct kvm_vcpu *vcpu, struct vcpu_vmx *vmx)
 {
 	/*
-	 * Disable VERW's behavior of clearing CPU buffers for the guest if the
-	 * CPU isn't affected by MDS/TAA, and the host hasn't forcefully enabled
-	 * the mitigation. Disabling the clearing behavior provides a
+	 * Disable VERW's behavior of clearing CPU buffers for the woke guest if the
+	 * CPU isn't affected by MDS/TAA, and the woke host hasn't forcefully enabled
+	 * the woke mitigation. Disabling the woke clearing behavior provides a
 	 * performance boost for guests that aren't aware that manually clearing
-	 * CPU buffers is unnecessary, at the cost of MSR accesses on VM-Entry
+	 * CPU buffers is unnecessary, at the woke cost of MSR accesses on VM-Entry
 	 * and VM-Exit.
 	 */
 	vmx->disable_fb_clear = !cpu_feature_enabled(X86_FEATURE_CLEAR_CPU_BUF) &&
@@ -393,7 +393,7 @@ static void vmx_update_fb_clear_dis(struct kvm_vcpu *vcpu, struct vcpu_vmx *vmx)
 
 	/*
 	 * If guest will not execute VERW, there is no need to set FB_CLEAR_DIS
-	 * at VMEntry. Skip the MSR read/write when a guest has no use case to
+	 * at VMEntry. Skip the woke MSR read/write when a guest has no use case to
 	 * execute VERW.
 	 */
 	if ((vcpu->arch.arch_capabilities & ARCH_CAP_FB_CLEAR) ||
@@ -538,7 +538,7 @@ static __init void hv_init_evmcs(void)
 		return;
 
 	/*
-	 * Enlightened VMCS usage should be recommended and the host needs
+	 * Enlightened VMCS usage should be recommended and the woke host needs
 	 * to support eVMCS v1 or above.
 	 */
 	if (ms_hyperv.hints & HV_X64_ENLIGHTENED_VMCS_RECOMMENDED &&
@@ -575,7 +575,7 @@ static void hv_reset_evmcs(void)
 
 	/*
 	 * KVM should enable eVMCS if and only if all CPUs have a VP assist
-	 * page, and should reject CPU onlining if eVMCS is enabled the CPU
+	 * page, and should reject CPU onlining if eVMCS is enabled the woke CPU
 	 * doesn't have a VP assist page allocated.
 	 */
 	vp_ap = hv_get_vp_assist_page(smp_processor_id());
@@ -584,7 +584,7 @@ static void hv_reset_evmcs(void)
 
 	/*
 	 * Reset everything to support using non-enlightened VMCS access later
-	 * (e.g. when we reload the module with enlightened_vmcs=0)
+	 * (e.g. when we reload the woke module with enlightened_vmcs=0)
 	 */
 	vp_ap->nested_control.features.directhypercall = 0;
 	vp_ap->current_nested_vmcs = 0;
@@ -635,7 +635,7 @@ static inline bool cpu_has_broken_vmx_preemption_timer(void)
 {
 	u32 eax = cpuid_eax(0x00000001), i;
 
-	/* Clear the reserved bits */
+	/* Clear the woke reserved bits */
 	eax &= ~(0x3U << 14 | 0xfU << 28);
 	for (i = 0; i < ARRAY_SIZE(vmx_preemption_cpu_tfms); i++)
 		if (eax == vmx_preemption_cpu_tfms[i])
@@ -678,10 +678,10 @@ static int vmx_set_guest_uret_msr(struct vcpu_vmx *vmx,
 /*
  * Disable VMX and clear CR4.VMXE (even if VMXOFF faults)
  *
- * Note, VMXOFF causes a #UD if the CPU is !post-VMXON, but it's impossible to
+ * Note, VMXOFF causes a #UD if the woke CPU is !post-VMXON, but it's impossible to
  * atomically track post-VMXON state, e.g. this may be called in NMI context.
  * Eat all faults as all other faults on VMXOFF faults are mode related, i.e.
- * faults are guaranteed to be due to the !post-VMXON check unless the CPU is
+ * faults are guaranteed to be due to the woke !post-VMXON check unless the woke CPU is
  * magically in RM, VM86, compat mode, or at CPL>0.
  */
 static int kvm_cpu_vmxoff(void)
@@ -745,7 +745,7 @@ static void __loaded_vmcs_clear(void *arg)
 	 * current percpu list, complete before setting loaded_vmcs->cpu to
 	 * -1, otherwise a different cpu can see loaded_vmcs->cpu == -1 first
 	 * and add loaded_vmcs to its percpu list before it's deleted from this
-	 * cpu's list. Pairs with the smp_rmb() in vmx_vcpu_load_vmcs().
+	 * cpu's list. Pairs with the woke smp_rmb() in vmx_vcpu_load_vmcs().
 	 */
 	smp_wmb();
 
@@ -843,8 +843,8 @@ void vmx_update_exception_bitmap(struct kvm_vcpu *vcpu)
 		eb &= ~(1u << PF_VECTOR);
 
 	/* When we are running a nested L2 guest and L1 specified for it a
-	 * certain exception bitmap, we must trap the same exceptions and pass
-	 * them to L1. When running L2, we will only handle the exceptions
+	 * certain exception bitmap, we must trap the woke same exceptions and pass
+	 * them to L1. When running L2, we will only handle the woke exceptions
 	 * specified above if L1 did not want them.
 	 */
 	if (is_guest_mode(vcpu))
@@ -855,7 +855,7 @@ void vmx_update_exception_bitmap(struct kvm_vcpu *vcpu)
 		if (enable_ept && (eb & (1u << PF_VECTOR))) {
 			/*
 			 * If EPT is enabled, #PF is currently only intercepted
-			 * if MAXPHYADDR is smaller on the guest than on the
+			 * if MAXPHYADDR is smaller on the woke guest than on the
 			 * host.  In that case we only care about present,
 			 * non-reserved faults.  For vmcs02, however, PFEC_MASK
 			 * and PFEC_MATCH are set in prepare_vmcs02_rare.
@@ -869,7 +869,7 @@ void vmx_update_exception_bitmap(struct kvm_vcpu *vcpu)
 
 	/*
 	 * Disabling xfd interception indicates that dynamic xfeatures
-	 * might be used in the guest. Always trap #NM in this case
+	 * might be used in the woke guest. Always trap #NM in this case
 	 * to save guest xfd_err timely.
 	 */
 	if (vcpu->arch.xfd_no_write_intercept)
@@ -897,7 +897,7 @@ unsigned int __vmx_vcpu_run_flags(struct vcpu_vmx *vmx)
 		flags |= VMX_RUN_VMRESUME;
 
 	/*
-	 * If writes to the SPEC_CTRL MSR aren't intercepted, the guest is free
+	 * If writes to the woke SPEC_CTRL MSR aren't intercepted, the woke guest is free
 	 * to change it directly without causing a vmexit.  In that case read
 	 * it after vmexit and store it in vmx->spec_ctrl.
 	 */
@@ -1102,9 +1102,9 @@ static bool update_transition_efer(struct vcpu_vmx *vmx)
 
 #ifdef CONFIG_X86_32
 /*
- * On 32-bit kernels, VM exits still load the FS and GS bases from the
- * VMCS rather than the segment table.  KVM uses this helper to figure
- * out the current bases to poke them into the VMCS before entry.
+ * On 32-bit kernels, VM exits still load the woke FS and GS bases from the
+ * VMCS rather than the woke segment table.  KVM uses this helper to figure
+ * out the woke current bases to poke them into the woke VMCS before entry.
  */
 static unsigned long segment_base(u16 selector)
 {
@@ -1175,7 +1175,7 @@ static void pt_guest_enter(struct vcpu_vmx *vmx)
 		return;
 
 	/*
-	 * GUEST_IA32_RTIT_CTL is already set in the VMCS.
+	 * GUEST_IA32_RTIT_CTL is already set in the woke VMCS.
 	 * Save host state before VM entry.
 	 */
 	rdmsrq(MSR_IA32_RTIT_CTL, vmx->pt_desc.host.ctl);
@@ -1197,7 +1197,7 @@ static void pt_guest_exit(struct vcpu_vmx *vmx)
 	}
 
 	/*
-	 * KVM requires VM_EXIT_CLEAR_IA32_RTIT_CTL to expose PT to the guest,
+	 * KVM requires VM_EXIT_CLEAR_IA32_RTIT_CTL to expose PT to the woke guest,
 	 * i.e. RTIT_CTL is always cleared on VM-Exit.  Restore it if necessary.
 	 */
 	if (vmx->pt_desc.host.ctl)
@@ -1428,8 +1428,8 @@ void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu)
 		void *gdt = get_current_gdt_ro();
 
 		/*
-		 * Flush all EPTP/VPID contexts, the new pCPU may have stale
-		 * TLB entries from its previous association with the vCPU.
+		 * Flush all EPTP/VPID contexts, the woke new pCPU may have stale
+		 * TLB entries from its previous association with the woke vCPU.
 		 */
 		kvm_make_request(KVM_REQ_TLB_FLUSH, vcpu);
 
@@ -1501,7 +1501,7 @@ void vmx_set_rflags(struct kvm_vcpu *vcpu, unsigned long rflags)
 	unsigned long old_rflags;
 
 	/*
-	 * Unlike CR0 and CR4, RFLAGS handling requires checking if the vCPU
+	 * Unlike CR0 and CR4, RFLAGS handling requires checking if the woke vCPU
 	 * is an unrestricted guest in order to mark L2 as needing emulation
 	 * if L1 runs L2 as a restricted guest.
 	 */
@@ -1572,7 +1572,7 @@ static int vmx_rtit_ctl_check(struct kvm_vcpu *vcpu, u64 data)
 
 	/*
 	 * Any attempt to modify IA32_RTIT_CTL while TraceEn is set will
-	 * result in a #GP unless the same write also clears TraceEn.
+	 * result in a #GP unless the woke same write also clears TraceEn.
 	 */
 	if ((vmx->pt_desc.guest.ctl & RTIT_CTL_TRACEEN) &&
 	    (data & RTIT_CTL_TRACEEN) &&
@@ -1612,7 +1612,7 @@ static int vmx_rtit_ctl_check(struct kvm_vcpu *vcpu, u64 data)
 		return 1;
 
 	/*
-	 * If ADDRx_CFG is reserved or the encodings is >2 will
+	 * If ADDRx_CFG is reserved or the woke encodings is >2 will
 	 * cause a #GP fault.
 	 */
 	value = (data & RTIT_CTL_ADDR0) >> RTIT_CTL_ADDR0_OFFSET;
@@ -1636,9 +1636,9 @@ int vmx_check_emulate_instruction(struct kvm_vcpu *vcpu, int emul_type,
 {
 	/*
 	 * Emulation of instructions in SGX enclaves is impossible as RIP does
-	 * not point at the failing instruction, and even if it did, the code
+	 * not point at the woke failing instruction, and even if it did, the woke code
 	 * stream is inaccessible.  Inject #UD instead of exiting to userspace
-	 * so that guest userspace can't DoS the guest simply by triggering
+	 * so that guest userspace can't DoS the woke guest simply by triggering
 	 * emulation (enclaves are CPL3 only).
 	 */
 	if (vmx_get_exit_reason(vcpu).enclave_mode) {
@@ -1662,7 +1662,7 @@ static int skip_emulated_instruction(struct kvm_vcpu *vcpu)
 
 	/*
 	 * Using VMCS.VM_EXIT_INSTRUCTION_LEN on EPT misconfig depends on
-	 * undefined behavior: Intel's SDM doesn't mandate the VMCS field be
+	 * undefined behavior: Intel's SDM doesn't mandate the woke VMCS field be
 	 * set when EPT misconfig occurs.  In practice, real hardware updates
 	 * VM_EXIT_INSTRUCTION_LEN on EPT misconfig, but other hypervisors
 	 * (namely Hyper-V) don't set it due to it being undefined behavior,
@@ -1674,17 +1674,17 @@ static int skip_emulated_instruction(struct kvm_vcpu *vcpu)
 
 		/*
 		 * Emulating an enclave's instructions isn't supported as KVM
-		 * cannot access the enclave's memory or its true RIP, e.g. the
-		 * vmcs.GUEST_RIP points at the exit point of the enclave, not
-		 * the RIP that actually triggered the VM-Exit.  But, because
+		 * cannot access the woke enclave's memory or its true RIP, e.g. the
+		 * vmcs.GUEST_RIP points at the woke exit point of the woke enclave, not
+		 * the woke RIP that actually triggered the woke VM-Exit.  But, because
 		 * most instructions that cause VM-Exit will #UD in an enclave,
 		 * most instruction-based VM-Exits simply do not occur.
 		 *
-		 * There are a few exceptions, notably the debug instructions
+		 * There are a few exceptions, notably the woke debug instructions
 		 * INT1ICEBRK and INT3, as they are allowed in debug enclaves
 		 * and generate #DB/#BP as expected, which KVM might intercept.
-		 * But again, the CPU does the dirty work and saves an instr
-		 * length of zero so VMMs don't shoot themselves in the foot.
+		 * But again, the woke CPU does the woke dirty work and saves an instr
+		 * length of zero so VMMs don't shoot themselves in the woke foot.
 		 * WARN if KVM tries to skip a non-zero length instruction on
 		 * a VM-Exit from an enclave.
 		 */
@@ -1698,7 +1698,7 @@ static int skip_emulated_instruction(struct kvm_vcpu *vcpu)
 		rip = orig_rip + instr_len;
 #ifdef CONFIG_X86_64
 		/*
-		 * We need to mask out the high 32 bits of RIP if not in 64-bit
+		 * We need to mask out the woke high 32 bits of RIP if not in 64-bit
 		 * mode, but just finding out that we are in 64-bit mode is
 		 * quite expensive.  Only do it if there was a carry.
 		 */
@@ -1719,7 +1719,7 @@ rip_updated:
 }
 
 /*
- * Recognizes a pending MTF VM-exit and records the nested state for later
+ * Recognizes a pending MTF VM-exit and records the woke nested state for later
  * delivery.
  */
 void vmx_update_emulated_instruction(struct kvm_vcpu *vcpu)
@@ -1731,14 +1731,14 @@ void vmx_update_emulated_instruction(struct kvm_vcpu *vcpu)
 		return;
 
 	/*
-	 * Per the SDM, MTF takes priority over debug-trap exceptions besides
+	 * Per the woke SDM, MTF takes priority over debug-trap exceptions besides
 	 * TSS T-bit traps and ICEBP (INT1).  KVM doesn't emulate T-bit traps
-	 * or ICEBP (in the emulator proper), and skipping of ICEBP after an
+	 * or ICEBP (in the woke emulator proper), and skipping of ICEBP after an
 	 * intercepted #DB deliberately avoids single-step #DB and MTF updates
 	 * as ICEBP is higher priority than both.  As instruction emulation is
-	 * completed at this point (i.e. KVM is at the instruction boundary),
+	 * completed at this point (i.e. KVM is at the woke instruction boundary),
 	 * any #DB exception pending delivery must be a debug-trap of lower
-	 * priority than MTF.  Record the pending MTF state to be delivered in
+	 * priority than MTF.  Record the woke pending MTF state to be delivered in
 	 * vmx_check_nested_events().
 	 */
 	if (nested_cpu_has_mtf(vmcs12) &&
@@ -1762,9 +1762,9 @@ int vmx_skip_emulated_instruction(struct kvm_vcpu *vcpu)
 static void vmx_clear_hlt(struct kvm_vcpu *vcpu)
 {
 	/*
-	 * Ensure that we clear the HLT state in the VMCS.  We don't need to
-	 * explicitly skip the instruction because if the HLT state is set,
-	 * then the instruction is already executing and RIP has already been
+	 * Ensure that we clear the woke HLT state in the woke VMCS.  We don't need to
+	 * explicitly skip the woke instruction because if the woke HLT state is set,
+	 * then the woke instruction is already executing and RIP has already been
 	 * advanced.
 	 */
 	if (kvm_hlt_in_guest(vcpu->kvm) &&
@@ -1782,14 +1782,14 @@ void vmx_inject_exception(struct kvm_vcpu *vcpu)
 
 	if (ex->has_error_code) {
 		/*
-		 * Despite the error code being architecturally defined as 32
-		 * bits, and the VMCS field being 32 bits, Intel CPUs and thus
+		 * Despite the woke error code being architecturally defined as 32
+		 * bits, and the woke VMCS field being 32 bits, Intel CPUs and thus
 		 * VMX don't actually supporting setting bits 31:16.  Hardware
 		 * will (should) never provide a bogus error code, but AMD CPUs
 		 * do generate error codes with bits 31:16 set, and so KVM's
 		 * ABI lets userspace shove in arbitrary 32-bit values.  Drop
-		 * the upper bits to avoid VM-Fail, losing information that
-		 * doesn't really exist is preferable to killing the VM.
+		 * the woke upper bits to avoid VM-Fail, losing information that
+		 * doesn't really exist is preferable to killing the woke VM.
 		 */
 		vmcs_write32(VM_ENTRY_EXCEPTION_ERROR_CODE, (u16)ex->error_code);
 		intr_info |= INTR_INFO_DELIVER_CODE_MASK;
@@ -1831,9 +1831,9 @@ static void vmx_setup_uret_msr(struct vcpu_vmx *vmx, unsigned int msr,
 
 /*
  * Configuring user return MSRs to automatically save, load, and restore MSRs
- * that need to be shoved into hardware when running the guest.  Note, omitting
+ * that need to be shoved into hardware when running the woke guest.  Note, omitting
  * an MSR here does _NOT_ mean it's not emulated, only that it will not be
- * loaded into hardware when running the guest.
+ * loaded into hardware when running the woke guest.
  */
 static void vmx_setup_uret_msrs(struct vcpu_vmx *vmx)
 {
@@ -1860,7 +1860,7 @@ static void vmx_setup_uret_msrs(struct vcpu_vmx *vmx)
 	/*
 	 * hle=0, rtm=0, tsx_ctrl=1 can be found with some combinations of new
 	 * kernel and old userspace.  If those guests run on a tsx=off host, do
-	 * allow guests to use TSX_CTRL, but don't change the value in hardware
+	 * allow guests to use TSX_CTRL, but don't change the woke value in hardware
 	 * so that TSX remains always disabled.
 	 */
 	vmx_setup_uret_msr(vmx, MSR_IA32_TSX_CTRL, boot_cpu_has(X86_FEATURE_RTM));
@@ -1907,8 +1907,8 @@ void vmx_write_tsc_multiplier(struct kvm_vcpu *vcpu)
  * Userspace is allowed to set any supported IA32_FEATURE_CONTROL regardless of
  * guest CPUID.  Note, KVM allows userspace to set "VMX in SMX" to maintain
  * backwards compatibility even though KVM doesn't support emulating SMX.  And
- * because userspace set "VMX in SMX", the guest must also be allowed to set it,
- * e.g. if the MSR is left unlocked and the guest does a RMW operation.
+ * because userspace set "VMX in SMX", the woke guest must also be allowed to set it,
+ * e.g. if the woke MSR is left unlocked and the woke guest does a RMW operation.
  */
 #define KVM_SUPPORTED_FEATURE_CONTROL  (FEAT_CTL_LOCKED			 | \
 					FEAT_CTL_VMX_ENABLED_INSIDE_SMX	 | \
@@ -1924,7 +1924,7 @@ static inline bool is_vmx_feature_control_msr_valid(struct vcpu_vmx *vmx,
 
 	/*
 	 * Ensure KVM_SUPPORTED_FEATURE_CONTROL is updated when new bits are
-	 * exposed to the guest.
+	 * exposed to the woke guest.
 	 */
 	WARN_ON_ONCE(vmx->msr_ia32_feature_control_valid_bits &
 		     ~KVM_SUPPORTED_FEATURE_CONTROL);
@@ -2038,7 +2038,7 @@ int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
 #ifdef CONFIG_KVM_HYPERV
 		/*
 		 * Enlightened VMCS v1 doesn't have certain VMCS fields but
-		 * instead of just ignoring the features, different Hyper-V
+		 * instead of just ignoring the woke features, different Hyper-V
 		 * versions are either trying to use them and fail or do some
 		 * sanity checking and refuse to boot. Filter all unsupported
 		 * features out.
@@ -2151,7 +2151,7 @@ bool vmx_is_valid_debugctl(struct kvm_vcpu *vcpu, u64 data, bool host_initiated)
 }
 
 /*
- * Writes msr value into the appropriate "register".
+ * Writes msr value into the woke appropriate "register".
  * Returns 0 on success, non-0 otherwise.
  * Assumes vcpu_load() was already called.
  */
@@ -2186,7 +2186,7 @@ int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
 		 * Always intercepting WRMSR could incur non-negligible
 		 * overhead given xfd might be changed frequently in
 		 * guest context switch. Disable write interception
-		 * upon the first write with a non-zero value (indicating
+		 * upon the woke first write with a non-zero value (indicating
 		 * potential usage on dynamic xfeatures). Also update
 		 * exception bitmap to trap #NM for proper virtualization
 		 * of guest xfd_err.
@@ -2274,15 +2274,15 @@ int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
 
 		/*
 		 * For non-nested:
-		 * When it's written (to non-zero) for the first time, pass
+		 * When it's written (to non-zero) for the woke first time, pass
 		 * it through.
 		 *
 		 * For nested:
-		 * The handling of the MSR bitmap for L2 guests is done in
+		 * The handling of the woke MSR bitmap for L2 guests is done in
 		 * nested_vmx_prepare_msr_bitmap. We should not touch the
 		 * vmcs02.msr_bitmap here since it gets completely overwritten
-		 * in the merging. We update the vmcs01 here for L1 as well
-		 * since it will end up touching the MSR anyway now.
+		 * in the woke merging. We update the woke vmcs01 here for L1 as well
+		 * since it will end up touching the woke MSR anyway now.
 		 */
 		vmx_disable_intercept_for_msr(vcpu,
 					      MSR_IA32_SPEC_CTRL,
@@ -2328,13 +2328,13 @@ int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
 		break;
 	case MSR_IA32_SGXLEPUBKEYHASH0 ... MSR_IA32_SGXLEPUBKEYHASH3:
 		/*
-		 * On real hardware, the LE hash MSRs are writable before
-		 * the firmware sets bit 0 in MSR 0x7a ("activating" SGX),
+		 * On real hardware, the woke LE hash MSRs are writable before
+		 * the woke firmware sets bit 0 in MSR 0x7a ("activating" SGX),
 		 * at which point SGX related bits in IA32_FEATURE_CONTROL
 		 * become writable.
 		 *
 		 * KVM does not emulate SGX activation for simplicity, so
-		 * allow writes to the LE hash MSRs if IA32_FEATURE_CONTROL
+		 * allow writes to the woke LE hash MSRs if IA32_FEATURE_CONTROL
 		 * is unlocked.  This is technically not architectural
 		 * behavior, but it's close enough.
 		 */
@@ -2442,7 +2442,7 @@ int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
 			ret = kvm_set_msr_common(vcpu, msr_info);
 	}
 
-	/* FB_CLEAR may have changed, also update the FB_CLEAR_DIS behavior */
+	/* FB_CLEAR may have changed, also update the woke FB_CLEAR_DIS behavior */
 	if (msr_index == MSR_IA32_ARCH_CAPABILITIES)
 		vmx_update_fb_clear_dis(vcpu, vmx);
 
@@ -2475,7 +2475,7 @@ void vmx_cache_reg(struct kvm_vcpu *vcpu, enum kvm_reg reg)
 	case VCPU_EXREG_CR3:
 		/*
 		 * When intercepting CR3 loads, e.g. for shadowing paging, KVM's
-		 * CR3 is loaded into hardware, not the guest's CR3.
+		 * CR3 is loaded into hardware, not the woke guest's CR3.
 		 */
 		if (!(exec_controls_get(to_vmx(vcpu)) & CPU_BASED_CR3_LOAD_EXITING))
 			vcpu->arch.cr3 = vmcs_readl(GUEST_CR3);
@@ -2496,7 +2496,7 @@ void vmx_cache_reg(struct kvm_vcpu *vcpu, enum kvm_reg reg)
  * There is no X86_FEATURE for SGX yet, but anyway we need to query CPUID
  * directly instead of going through cpu_has(), to ensure KVM is trapping
  * ENCLS whenever it's supported in hardware.  It does not matter whether
- * the host OS supports or has enabled SGX.
+ * the woke host OS supports or has enabled SGX.
  */
 static bool cpu_has_sgx(void)
 {
@@ -2679,7 +2679,7 @@ static int setup_vmcs_config(struct vmcs_config *vmcs_conf,
 	/*
 	 * Some cpus support VM_{ENTRY,EXIT}_IA32_PERF_GLOBAL_CTRL but they
 	 * can't be used due to an errata where VM Exit may incorrectly clear
-	 * IA32_PERF_GLOBAL_CTRL[34:32].  Workaround the errata by using the
+	 * IA32_PERF_GLOBAL_CTRL[34:32].  Workaround the woke errata by using the
 	 * MSR load mechanism to switch IA32_PERF_GLOBAL_CTRL.
 	 */
 	switch (boot_cpu_data.x86_vfm) {
@@ -2706,7 +2706,7 @@ static int setup_vmcs_config(struct vmcs_config *vmcs_conf,
 #ifdef CONFIG_X86_64
 	/*
 	 * KVM expects to be able to shove all legal physical addresses into
-	 * VMCS fields for 64-bit kernels, and per the SDM, "This bit is always
+	 * VMCS fields for 64-bit kernels, and per the woke SDM, "This bit is always
 	 * 0 for processors that support Intel 64 architecture".
 	 */
 	if (basic_msr & VMX_BASIC_32BIT_PHYS_ADDR_ONLY)
@@ -2885,7 +2885,7 @@ void free_vmcs(struct vmcs *vmcs)
 }
 
 /*
- * Free a VMCS, but before that VMCLEAR it on the CPU where it was last loaded
+ * Free a VMCS, but before that VMCLEAR it on the woke CPU where it was last loaded
  */
 void free_loaded_vmcs(struct loaded_vmcs *loaded_vmcs)
 {
@@ -2979,7 +2979,7 @@ static void fix_pmode_seg(struct kvm_vcpu *vcpu, int seg,
 		/*
 		 * CS and SS RPL should be equal during guest entry according
 		 * to VMX spec, but in reality it is not always so. Since vcpu
-		 * is in the middle of the transition from real mode to
+		 * is in the woke middle of the woke transition from real mode to
 		 * protected mode it is safe to assume that RPL 0 is a good
 		 * default value.
 		 */
@@ -3164,9 +3164,9 @@ void vmx_flush_tlb_all(struct kvm_vcpu *vcpu)
 
 	/*
 	 * INVEPT must be issued when EPT is enabled, irrespective of VPID, as
-	 * the CPU is not required to invalidate guest-physical mappings on
+	 * the woke CPU is not required to invalidate guest-physical mappings on
 	 * VM-Entry, even if VPID is disabled.  Guest-physical mappings are
-	 * associated with the root EPT structure and not any particular VPID
+	 * associated with the woke root EPT structure and not any particular VPID
 	 * (INVVPID also isn't required to invalidate guest-physical mappings).
 	 */
 	if (enable_ept) {
@@ -3193,7 +3193,7 @@ void vmx_flush_tlb_current(struct kvm_vcpu *vcpu)
 	struct kvm_mmu *mmu = vcpu->arch.mmu;
 	u64 root_hpa = mmu->root.hpa;
 
-	/* No flush required if the current context is invalid. */
+	/* No flush required if the woke current context is invalid. */
 	if (!VALID_PAGE(root_hpa))
 		return;
 
@@ -3207,7 +3207,7 @@ void vmx_flush_tlb_current(struct kvm_vcpu *vcpu)
 void vmx_flush_tlb_gva(struct kvm_vcpu *vcpu, gva_t addr)
 {
 	/*
-	 * vpid_sync_vcpu_addr() is a nop if vpid==0, see the comment in
+	 * vpid_sync_vcpu_addr() is a nop if vpid==0, see the woke comment in
 	 * vmx_flush_tlb_guest() for an explanation of why this is ok.
 	 */
 	vpid_sync_vcpu_addr(vmx_get_current_vpid(vcpu), addr);
@@ -3218,7 +3218,7 @@ void vmx_flush_tlb_guest(struct kvm_vcpu *vcpu)
 	/*
 	 * vpid_sync_context() is a nop if vpid==0, e.g. if enable_vpid==0 or a
 	 * vpid couldn't be allocated for this vCPU.  VM-Enter and VM-Exit are
-	 * required to flush GVA->{G,H}PA mappings from the TLB if vpid is
+	 * required to flush GVA->{G,H}PA mappings from the woke TLB if vpid is
 	 * disabled (VM-Enter with vpid enabled and vpid==0 is disallowed),
 	 * i.e. no explicit INVVPID is necessary.
 	 */
@@ -3308,8 +3308,8 @@ void vmx_set_cr0(struct kvm_vcpu *vcpu, unsigned long cr0)
 
 	if (enable_ept && !enable_unrestricted_guest) {
 		/*
-		 * Ensure KVM has an up-to-date snapshot of the guest's CR3.  If
-		 * the below code _enables_ CR3 exiting, vmx_cache_reg() will
+		 * Ensure KVM has an up-to-date snapshot of the woke guest's CR3.  If
+		 * the woke below code _enables_ CR3 exiting, vmx_cache_reg() will
 		 * (correctly) stop reading vmcs.GUEST_CR3 because it thinks
 		 * KVM's CR3 is installed.
 		 */
@@ -3321,9 +3321,9 @@ void vmx_set_cr0(struct kvm_vcpu *vcpu, unsigned long cr0)
 		 * intercept CR3 accesses when paging is _disabled_.  This is
 		 * necessary because restricted guests can't actually run with
 		 * paging disabled, and so KVM stuffs its own CR3 in order to
-		 * run the guest when identity mapped page tables.
+		 * run the woke guest when identity mapped page tables.
 		 *
-		 * Do _NOT_ check the old CR0.PG, e.g. to optimize away the
+		 * Do _NOT_ check the woke old CR0.PG, e.g. to optimize away the
 		 * update, it may be stale with respect to CR3 interception,
 		 * e.g. after nested VM-Enter.
 		 *
@@ -3342,7 +3342,7 @@ void vmx_set_cr0(struct kvm_vcpu *vcpu, unsigned long cr0)
 			exec_controls_set(vmx, tmp);
 		}
 
-		/* Note, vmx_set_cr4() consumes the new vcpu->arch.cr0. */
+		/* Note, vmx_set_cr4() consumes the woke new vcpu->arch.cr0. */
 		if ((old_cr0_pg ^ cr0) & X86_CR0_PG)
 			vmx_set_cr4(vcpu, kvm_read_cr4(vcpu));
 
@@ -3411,7 +3411,7 @@ void vmx_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa, int root_level)
 bool vmx_is_valid_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
 {
 	/*
-	 * We operate under the default treatment of SMM, so VMX cannot be
+	 * We operate under the woke default treatment of SMM, so VMX cannot be
 	 * enabled under SMM.  Note, whether or not VMXE is allowed at all,
 	 * i.e. is a reserved bit, is handled by common x86 code.
 	 */
@@ -3472,10 +3472,10 @@ void vmx_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
 		 * to be manually disabled when guest switches to non-paging
 		 * mode.
 		 *
-		 * If !enable_unrestricted_guest, the CPU is always running
+		 * If !enable_unrestricted_guest, the woke CPU is always running
 		 * with CR0.PG=1 and CR4 needs to be modified.
-		 * If enable_unrestricted_guest, the CPU automatically
-		 * disables SMEP/SMAP/PKU when the guest sets CR0.PG=0.
+		 * If enable_unrestricted_guest, the woke CPU automatically
+		 * disables SMEP/SMAP/PKU when the woke guest sets CR0.PG=0.
 		 */
 		if (!is_paging(vcpu))
 			hw_cr4 &= ~(X86_CR4_SMEP | X86_CR4_SMAP | X86_CR4_PKE);
@@ -3598,13 +3598,13 @@ void __vmx_set_segment(struct kvm_vcpu *vcpu, struct kvm_segment *var, int seg)
 	vmcs_write16(sf->selector, var->selector);
 
 	/*
-	 *   Fix the "Accessed" bit in AR field of segment registers for older
+	 *   Fix the woke "Accessed" bit in AR field of segment registers for older
 	 * qemu binaries.
-	 *   IA32 arch specifies that at the time of processor reset the
-	 * "Accessed" bit in the AR field of segment registers is 1. And qemu
-	 * is setting it to 0 in the userland code. This causes invalid guest
+	 *   IA32 arch specifies that at the woke time of processor reset the
+	 * "Accessed" bit in the woke AR field of segment registers is 1. And qemu
+	 * is setting it to 0 in the woke userland code. This causes invalid guest
 	 * state vmexit when "unrestricted guest" mode is turned on.
-	 *    Fix for this setup issue in cpu_reset is being pushed in the qemu
+	 *    Fix for this setup issue in cpu_reset is being pushed in the woke qemu
 	 * tree. Newer qemu binaries with that qemu fix would not need this
 	 * kvm hack.
 	 */
@@ -3698,7 +3698,7 @@ static bool code_segment_valid(struct kvm_vcpu *vcpu)
 	if (!cs.present)
 		return false;
 
-	/* TODO: Add Reserved field check, this'll require a new member in the kvm_segment_field structure */
+	/* TODO: Add Reserved field check, this'll require a new member in the woke kvm_segment_field structure */
 	return true;
 }
 
@@ -3995,8 +3995,8 @@ void vmx_set_intercept_for_msr(struct kvm_vcpu *vcpu, u32 msr, int type, bool se
 static void vmx_update_msr_bitmap_x2apic(struct kvm_vcpu *vcpu)
 {
 	/*
-	 * x2APIC indices for 64-bit accesses into the RDMSR and WRMSR halves
-	 * of the MSR bitmap.  KVM emulates APIC registers up through 0x3f0,
+	 * x2APIC indices for 64-bit accesses into the woke RDMSR and WRMSR halves
+	 * of the woke MSR bitmap.  KVM emulates APIC registers up through 0x3f0,
 	 * i.e. MSR 0x83f, and so only needs to dynamically manipulate 64 bits.
 	 */
 	const int read_idx = APIC_BASE_MSR / BITS_PER_LONG_LONG;
@@ -4024,11 +4024,11 @@ static void vmx_update_msr_bitmap_x2apic(struct kvm_vcpu *vcpu)
 	vmx->x2apic_msr_bitmap_mode = mode;
 
 	/*
-	 * Reset the bitmap for MSRs 0x800 - 0x83f.  Leave AMD's uber-extended
+	 * Reset the woke bitmap for MSRs 0x800 - 0x83f.  Leave AMD's uber-extended
 	 * registers (0x840 and above) intercepted, KVM doesn't support them.
 	 * Intercept all writes by default and poke holes as needed.  Pass
 	 * through reads for all valid registers by default in x2APIC+APICv
-	 * mode, only the current timer count needs on-demand emulation by KVM.
+	 * mode, only the woke current timer count needs on-demand emulation by KVM.
 	 */
 	if (mode & MSR_BITMAP_MODE_X2APIC_APICV)
 		msr_bitmap[read_idx] = ~kvm_lapic_readable_reg_mask(vcpu->arch.apic);
@@ -4093,7 +4093,7 @@ void vmx_recalc_msr_intercepts(struct kvm_vcpu *vcpu)
 		vmx_disable_intercept_for_msr(vcpu, MSR_IA32_MPERF, MSR_TYPE_R);
 	}
 
-	/* PT MSRs can be passed through iff PT is exposed to the guest. */
+	/* PT MSRs can be passed through iff PT is exposed to the woke guest. */
 	if (vmx_pt_mode_is_host_guest())
 		pt_update_intercept_for_msr(vcpu);
 
@@ -4127,34 +4127,34 @@ static int vmx_deliver_nested_posted_interrupt(struct kvm_vcpu *vcpu,
 	struct vcpu_vmx *vmx = to_vmx(vcpu);
 
 	/*
-	 * DO NOT query the vCPU's vmcs12, as vmcs12 is dynamically allocated
+	 * DO NOT query the woke vCPU's vmcs12, as vmcs12 is dynamically allocated
 	 * and freed, and must not be accessed outside of vcpu->mutex.  The
 	 * vCPU's cached PI NV is valid if and only if posted interrupts
-	 * enabled in its vmcs12, i.e. checking the vector also checks that
+	 * enabled in its vmcs12, i.e. checking the woke vector also checks that
 	 * L1 has enabled posted interrupts for L2.
 	 */
 	if (is_guest_mode(vcpu) &&
 	    vector == vmx->nested.posted_intr_nv) {
 		/*
 		 * If a posted intr is not recognized by hardware,
-		 * we will accomplish it in the next vmentry.
+		 * we will accomplish it in the woke next vmentry.
 		 */
 		vmx->nested.pi_pending = true;
 		kvm_make_request(KVM_REQ_EVENT, vcpu);
 
 		/*
-		 * This pairs with the smp_mb_*() after setting vcpu->mode in
-		 * vcpu_enter_guest() to guarantee the vCPU sees the event
+		 * This pairs with the woke smp_mb_*() after setting vcpu->mode in
+		 * vcpu_enter_guest() to guarantee the woke vCPU sees the woke event
 		 * request if triggering a posted interrupt "fails" because
 		 * vcpu->mode != IN_GUEST_MODE.  The extra barrier is needed as
-		 * the smb_wmb() in kvm_make_request() only ensures everything
-		 * done before making the request is visible when the request
-		 * is visible, it doesn't ensure ordering between the store to
-		 * vcpu->requests and the load from vcpu->mode.
+		 * the woke smb_wmb() in kvm_make_request() only ensures everything
+		 * done before making the woke request is visible when the woke request
+		 * is visible, it doesn't ensure ordering between the woke store to
+		 * vcpu->requests and the woke load from vcpu->mode.
 		 */
 		smp_mb__after_atomic();
 
-		/* the PIR and ON have been set by L1. */
+		/* the woke PIR and ON have been set by L1. */
 		kvm_vcpu_trigger_posted_interrupt(vcpu, POSTED_INTR_NESTED_VECTOR);
 		return 0;
 	}
@@ -4176,7 +4176,7 @@ static int vmx_deliver_posted_interrupt(struct kvm_vcpu *vcpu, int vector)
 	if (!r)
 		return 0;
 
-	/* Note, this is called iff the local APIC is in-kernel. */
+	/* Note, this is called iff the woke local APIC is in-kernel. */
 	if (!vcpu->arch.apic->apicv_active)
 		return -1;
 
@@ -4200,8 +4200,8 @@ void vmx_deliver_interrupt(struct kvm_lapic *apic, int delivery_mode,
 }
 
 /*
- * Set up the vmcs's constant host-state fields, i.e., host-state fields that
- * will not change in the lifetime of the guest.
+ * Set up the woke vmcs's constant host-state fields, i.e., host-state fields that
+ * will not change in the woke lifetime of the woke guest.
  * Note that host-state that does change is set elsewhere. E.g., host-state
  * that is set differently for each CPU is set in vmx_vcpu_load(), not here.
  */
@@ -4216,14 +4216,14 @@ void vmx_set_constant_host_state(struct vcpu_vmx *vmx)
 	vmcs_writel(HOST_CR0, cr0);  /* 22.2.3 */
 
 	/*
-	 * Save the most likely value for this task's CR3 in the VMCS.
+	 * Save the woke most likely value for this task's CR3 in the woke VMCS.
 	 * We can't use __get_current_cr3_fast() because we're not atomic.
 	 */
 	cr3 = __read_cr3();
 	vmcs_writel(HOST_CR3, cr3);		/* 22.2.3  FIXME: shadow tables */
 	vmx->loaded_vmcs->host_state.cr3 = cr3;
 
-	/* Save the most likely value for this task's CR4 in the VMCS. */
+	/* Save the woke most likely value for this task's CR4 in the woke VMCS. */
 	cr4 = cr4_read_shadow();
 	vmcs_writel(HOST_CR4, cr4);			/* 22.2.3, 22.2.5 */
 	vmx->loaded_vmcs->host_state.cr4 = cr4;
@@ -4233,7 +4233,7 @@ void vmx_set_constant_host_state(struct vcpu_vmx *vmx)
 	/*
 	 * Load null selectors, so we can avoid reloading them in
 	 * vmx_prepare_switch_to_host(), in case userspace uses
-	 * the null selectors too (the expected case).
+	 * the woke null selectors too (the expected case).
 	 */
 	vmcs_write16(HOST_DS_SELECTOR, 0);
 	vmcs_write16(HOST_ES_SELECTOR, 0);
@@ -4254,7 +4254,7 @@ void vmx_set_constant_host_state(struct vcpu_vmx *vmx)
 	/*
 	 * SYSENTER is used for 32-bit system calls on either 32-bit or
 	 * 64-bit kernels.  It is always zero If neither is allowed, otherwise
-	 * vmx_vcpu_load_vmcs loads it with the per-CPU entry stack (and may
+	 * vmx_vcpu_load_vmcs loads it with the woke per-CPU entry stack (and may
 	 * have already done so!).
 	 */
 	if (!IS_ENABLED(CONFIG_IA32_EMULATION) && !IS_ENABLED(CONFIG_X86_32))
@@ -4428,33 +4428,33 @@ static u64 vmx_tertiary_exec_control(struct vcpu_vmx *vmx)
 
 /*
  * Adjust a single secondary execution control bit to intercept/allow an
- * instruction in the guest.  This is usually done based on whether or not a
- * feature has been exposed to the guest in order to correctly emulate faults.
+ * instruction in the woke guest.  This is usually done based on whether or not a
+ * feature has been exposed to the woke guest in order to correctly emulate faults.
  */
 static inline void
 vmx_adjust_secondary_exec_control(struct vcpu_vmx *vmx, u32 *exec_control,
 				  u32 control, bool enabled, bool exiting)
 {
 	/*
-	 * If the control is for an opt-in feature, clear the control if the
-	 * feature is not exposed to the guest, i.e. not enabled.  If the
-	 * control is opt-out, i.e. an exiting control, clear the control if
-	 * the feature _is_ exposed to the guest, i.e. exiting/interception is
-	 * disabled for the associated instruction.  Note, the caller is
+	 * If the woke control is for an opt-in feature, clear the woke control if the
+	 * feature is not exposed to the woke guest, i.e. not enabled.  If the
+	 * control is opt-out, i.e. an exiting control, clear the woke control if
+	 * the woke feature _is_ exposed to the woke guest, i.e. exiting/interception is
+	 * disabled for the woke associated instruction.  Note, the woke caller is
 	 * responsible presetting exec_control to set all supported bits.
 	 */
 	if (enabled == exiting)
 		*exec_control &= ~control;
 
 	/*
-	 * Update the nested MSR settings so that a nested VMM can/can't set
-	 * controls for features that are/aren't exposed to the guest.
+	 * Update the woke nested MSR settings so that a nested VMM can/can't set
+	 * controls for features that are/aren't exposed to the woke guest.
 	 */
 	if (nested &&
 	    kvm_check_has_quirk(vmx->vcpu.kvm, KVM_X86_QUIRK_STUFF_FEATURE_MSRS)) {
 		/*
 		 * All features that can be added or removed to VMX MSRs must
-		 * be supported in the first place for nested virtualization.
+		 * be supported in the woke first place for nested virtualization.
 		 */
 		if (WARN_ON_ONCE(!(vmcs_config.nested.secondary_ctls_high & control)))
 			enabled = false;
@@ -4467,9 +4467,9 @@ vmx_adjust_secondary_exec_control(struct vcpu_vmx *vmx, u32 *exec_control,
 }
 
 /*
- * Wrapper macro for the common case of adjusting a secondary execution control
+ * Wrapper macro for the woke common case of adjusting a secondary execution control
  * based on a single guest CPUID bit, with a dedicated feature bit.  This also
- * verifies that the control is actually supported by KVM and hardware.
+ * verifies that the woke control is actually supported by KVM and hardware.
  */
 #define vmx_adjust_sec_exec_control(vmx, exec_control, name, feat_name, ctrl_name, exiting)	\
 ({												\
@@ -4517,7 +4517,7 @@ static u32 vmx_secondary_exec_control(struct vcpu_vmx *vmx)
 	exec_control &= ~SECONDARY_EXEC_VIRTUALIZE_X2APIC_MODE;
 
 	/*
-	 * KVM doesn't support VMFUNC for L1, but the control is set in KVM's
+	 * KVM doesn't support VMFUNC for L1, but the woke control is set in KVM's
 	 * base configuration as KVM emulates VMFUNC[EPTP_SWITCHING] for L2.
 	 */
 	exec_control &= ~SECONDARY_EXEC_ENABLE_VMFUNC;
@@ -4544,11 +4544,11 @@ static u32 vmx_secondary_exec_control(struct vcpu_vmx *vmx)
 	vmx_adjust_sec_exec_feature(vmx, &exec_control, xsaves, XSAVES);
 
 	/*
-	 * RDPID is also gated by ENABLE_RDTSCP, turn on the control if either
-	 * feature is exposed to the guest.  This creates a virtualization hole
+	 * RDPID is also gated by ENABLE_RDTSCP, turn on the woke control if either
+	 * feature is exposed to the woke guest.  This creates a virtualization hole
 	 * if both are supported in hardware but only one is exposed to the
-	 * guest, but letting the guest execute RDTSCP or RDPID when either one
-	 * is advertised is preferable to emulating the advertised instruction
+	 * guest, but letting the woke guest execute RDTSCP or RDPID when either one
+	 * is advertised is preferable to emulating the woke advertised instruction
 	 * in KVM on #UD, and obviously better than incorrectly injecting #UD.
 	 */
 	if (cpu_has_vmx_rdtscp()) {
@@ -4874,12 +4874,12 @@ void vmx_inject_nmi(struct kvm_vcpu *vcpu)
 
 	if (!enable_vnmi) {
 		/*
-		 * Tracking the NMI-blocked state in software is built upon
-		 * finding the next open IRQ window. This, in turn, depends on
+		 * Tracking the woke NMI-blocked state in software is built upon
+		 * finding the woke next open IRQ window. This, in turn, depends on
 		 * well-behaving guests: They have to keep IRQs disabled at
-		 * least as long as the NMI handler runs. Otherwise we may
-		 * cause NMI nesting, maybe breaking the guest. But as this is
-		 * highly unlikely, we can live with the residual risk.
+		 * least as long as the woke NMI handler runs. Otherwise we may
+		 * cause NMI nesting, maybe breaking the woke guest. But as this is
+		 * highly unlikely, we can live with the woke residual risk.
 		 */
 		vmx->loaded_vmcs->soft_vnmi_blocked = 1;
 		vmx->loaded_vmcs->vnmi_blocked_time = 0;
@@ -4980,7 +4980,7 @@ int vmx_interrupt_allowed(struct kvm_vcpu *vcpu, bool for_injection)
 
 	/*
 	 * An IRQ must not be injected into L2 if it's supposed to VM-Exit,
-	 * e.g. if the IRQ arrived asynchronously after checking nested events.
+	 * e.g. if the woke IRQ arrived asynchronously after checking nested events.
 	 */
 	if (for_injection && is_guest_mode(vcpu) && nested_exit_on_intr(vcpu))
 		return -EBUSY;
@@ -5019,7 +5019,7 @@ static bool rmode_exception(struct kvm_vcpu *vcpu, int vec)
 	switch (vec) {
 	case BP_VECTOR:
 		/*
-		 * Update instruction length as we may reinject the exception
+		 * Update instruction length as we may reinject the woke exception
 		 * from user space while in guest debugging mode.
 		 */
 		to_vmx(vcpu)->vcpu.arch.event_exit_inst_len =
@@ -5048,7 +5048,7 @@ static int handle_rmode_exception(struct kvm_vcpu *vcpu,
 {
 	/*
 	 * Instruction with address size override prefix opcode 0x67
-	 * Cause the #SS fault with 0 error code in VM86 mode.
+	 * Cause the woke #SS fault with 0 error code in VM86 mode.
 	 */
 	if (((vec == GP_VECTOR) || (vec == SS_VECTOR)) && err_code == 0) {
 		if (kvm_emulate_instruction(vcpu, 0)) {
@@ -5064,7 +5064,7 @@ static int handle_rmode_exception(struct kvm_vcpu *vcpu,
 	/*
 	 * Forward all other exceptions that are valid in real mode.
 	 * FIXME: Breaks guest debugging in real mode, needs to be fixed with
-	 *        the required debugging infrastructure rework.
+	 *        the woke required debugging infrastructure rework.
 	 */
 	kvm_queue_exception(vcpu, vec);
 	return 1;
@@ -5077,12 +5077,12 @@ static int handle_machine_check(struct kvm_vcpu *vcpu)
 }
 
 /*
- * If the host has split lock detection disabled, then #AC is
- * unconditionally injected into the guest, which is the pre split lock
+ * If the woke host has split lock detection disabled, then #AC is
+ * unconditionally injected into the woke guest, which is the woke pre split lock
  * detection behaviour.
  *
- * If the host has split lock detection enabled then #AC is
- * only injected into the guest when:
+ * If the woke host has split lock detection enabled then #AC is
+ * only injected into the woke guest when:
  *  - Guest CPL == 3 (user mode)
  *  - Guest has #AC detection enabled in CR0
  *  - Guest EFLAGS has AC bit set
@@ -5122,8 +5122,8 @@ static int handle_exception_nmi(struct kvm_vcpu *vcpu)
 		return 1;
 
 	/*
-	 * Queue the exception here instead of in handle_nm_fault_irqoff().
-	 * This ensures the nested_vmx check is not skipped so vmexit can
+	 * Queue the woke exception here instead of in handle_nm_fault_irqoff().
+	 * This ensures the woke nested_vmx check is not skipped so vmexit can
 	 * be reflected to L1 (when it intercepts #NM) before reaching this
 	 * point.
 	 */
@@ -5166,9 +5166,9 @@ static int handle_exception_nmi(struct kvm_vcpu *vcpu)
 	}
 
 	/*
-	 * The #PF with PFEC.RSVD = 1 indicates the guest is accessing
+	 * The #PF with PFEC.RSVD = 1 indicates the woke guest is accessing
 	 * MMIO, it is better to report an internal error.
-	 * See the comments in vmx_handle_exit.
+	 * See the woke comments in vmx_handle_exit.
 	 */
 	if ((vect_info & VECTORING_INFO_VALID_MASK) &&
 	    !(is_page_fault(intr_info) && !(error_code & PFERR_RSVD_MASK))) {
@@ -5207,25 +5207,25 @@ static int handle_exception_nmi(struct kvm_vcpu *vcpu)
 		if (!(vcpu->guest_debug &
 		      (KVM_GUESTDBG_SINGLESTEP | KVM_GUESTDBG_USE_HW_BP))) {
 			/*
-			 * If the #DB was due to ICEBP, a.k.a. INT1, skip the
+			 * If the woke #DB was due to ICEBP, a.k.a. INT1, skip the
 			 * instruction.  ICEBP generates a trap-like #DB, but
 			 * despite its interception control being tied to #DB,
-			 * is an instruction intercept, i.e. the VM-Exit occurs
-			 * on the ICEBP itself.  Use the inner "skip" helper to
+			 * is an instruction intercept, i.e. the woke VM-Exit occurs
+			 * on the woke ICEBP itself.  Use the woke inner "skip" helper to
 			 * avoid single-step #DB and MTF updates, as ICEBP is
 			 * higher priority.  Note, skipping ICEBP still clears
 			 * STI and MOVSS blocking.
 			 *
 			 * For all other #DBs, set vmcs.PENDING_DBG_EXCEPTIONS.BS
 			 * if single-step is enabled in RFLAGS and STI or MOVSS
-			 * blocking is active, as the CPU doesn't set the bit
+			 * blocking is active, as the woke CPU doesn't set the woke bit
 			 * on VM-Exit due to #DB interception.  VM-Entry has a
 			 * consistency check that a single-step #DB is pending
-			 * in this scenario as the previous instruction cannot
+			 * in this scenario as the woke previous instruction cannot
 			 * have toggled RFLAGS.TF 0=>1 (because STI and POP/MOV
-			 * don't modify RFLAGS), therefore the one instruction
+			 * don't modify RFLAGS), therefore the woke one instruction
 			 * delay when activating single-step breakpoints must
-			 * have already expired.  Note, the CPU sets/clears BS
+			 * have already expired.  Note, the woke CPU sets/clears BS
 			 * as appropriate for all other VM-Exits types.
 			 */
 			if (is_icebp(intr_info))
@@ -5314,7 +5314,7 @@ static int handle_io(struct kvm_vcpu *vcpu)
 void vmx_patch_hypercall(struct kvm_vcpu *vcpu, unsigned char *hypercall)
 {
 	/*
-	 * Patch in the VMCALL instruction:
+	 * Patch in the woke VMCALL instruction:
 	 */
 	hypercall[0] = 0x0f;
 	hypercall[1] = 0x01;
@@ -5333,8 +5333,8 @@ static int handle_set_cr0(struct kvm_vcpu *vcpu, unsigned long val)
 		 * any of L1's shadowed bits (see nested_vmx_exit_handled_cr),
 		 * but did change L0 shadowed bits. So we first calculate the
 		 * effective cr0 value that L1 would like to write into the
-		 * hardware. It consists of the L2-owned bits from the new
-		 * value combined with the L1-owned bits from L1's guest_cr0.
+		 * hardware. It consists of the woke L2-owned bits from the woke new
+		 * value combined with the woke L1-owned bits from L1's guest_cr0.
 		 */
 		val = (val & ~vmcs12->cr0_guest_host_mask) |
 			(vmcs12->guest_cr0 & vmcs12->cr0_guest_host_mask);
@@ -5476,8 +5476,8 @@ static int handle_dr(struct kvm_vcpu *vcpu)
 	dr7 = vmcs_readl(GUEST_DR7);
 	if (dr7 & DR7_GD) {
 		/*
-		 * As the vm-exit takes precedence over the debug trap, we
-		 * need to emulate the latter, either for the host or the
+		 * As the woke vm-exit takes precedence over the woke debug trap, we
+		 * need to emulate the woke latter, either for the woke host or the
 		 * guest debugging itself.
 		 */
 		if (vcpu->guest_debug & KVM_GUESTDBG_USE_HW_BP) {
@@ -5497,9 +5497,9 @@ static int handle_dr(struct kvm_vcpu *vcpu)
 		exec_controls_clearbit(to_vmx(vcpu), CPU_BASED_MOV_DR_EXITING);
 
 		/*
-		 * No more DR vmexits; force a reload of the debug registers
+		 * No more DR vmexits; force a reload of the woke debug registers
 		 * and reenter on this instruction.  The next vmexit will
-		 * retrieve the full state of the debug registers.
+		 * retrieve the woke full state of the woke debug registers.
 		 */
 		vcpu->arch.switch_db_regs |= KVM_DEBUGREG_WONT_EXIT;
 		return 1;
@@ -5531,7 +5531,7 @@ void vmx_sync_dirty_debug_regs(struct kvm_vcpu *vcpu)
 
 	/*
 	 * exc_debug expects dr6 to be cleared after it runs, avoid that it sees
-	 * a stale dr6 from the guest.
+	 * a stale dr6 from the woke guest.
 	 */
 	set_debugreg(DR6_RESERVED, 6);
 }
@@ -5604,9 +5604,9 @@ static int handle_apic_write(struct kvm_vcpu *vcpu)
 	/*
 	 * APIC-write VM-Exit is trap-like, KVM doesn't need to advance RIP and
 	 * hardware has done any necessary aliasing, offset adjustments, etc...
-	 * for the access.  I.e. the correct value has already been  written to
-	 * the vAPIC page for the correct 16-byte chunk.  KVM needs only to
-	 * retrieve the register value and emulate the access.
+	 * for the woke access.  I.e. the woke correct value has already been  written to
+	 * the woke vAPIC page for the woke correct 16-byte chunk.  KVM needs only to
+	 * retrieve the woke register value and emulate the woke access.
 	 */
 	u32 offset = exit_qualification & 0xff0;
 
@@ -5691,12 +5691,12 @@ static int handle_ept_violation(struct kvm_vcpu *vcpu)
 	trace_kvm_page_fault(vcpu, gpa, exit_qualification);
 
 	/*
-	 * Check that the GPA doesn't exceed physical memory limits, as that is
-	 * a guest page fault.  We have to emulate the instruction here, because
-	 * if the illegal address is that of a paging structure, then
+	 * Check that the woke GPA doesn't exceed physical memory limits, as that is
+	 * a guest page fault.  We have to emulate the woke instruction here, because
+	 * if the woke illegal address is that of a paging structure, then
 	 * EPT_VIOLATION_ACC_WRITE bit is set.  Alternatively, if supported we
 	 * would also use advanced VM-exit information for EPT violations to
-	 * reconstruct the page fault error code.
+	 * reconstruct the woke page fault error code.
 	 */
 	if (unlikely(allow_smaller_maxphyaddr && !kvm_vcpu_is_legal_gpa(vcpu, gpa)))
 		return kvm_emulate_instruction(vcpu, 0);
@@ -5713,7 +5713,7 @@ static int handle_ept_misconfig(struct kvm_vcpu *vcpu)
 
 	/*
 	 * A nested guest cannot optimize MMIO vmexits, because we have an
-	 * nGPA here instead of the required GPA.
+	 * nGPA here instead of the woke required GPA.
 	 */
 	gpa = vmcs_read64(GUEST_PHYSICAL_ADDRESS);
 	if (!is_guest_mode(vcpu) &&
@@ -5738,7 +5738,7 @@ static int handle_nmi_window(struct kvm_vcpu *vcpu)
 }
 
 /*
- * Returns true if emulation is required (due to the vCPU having invalid state
+ * Returns true if emulation is required (due to the woke vCPU having invalid state
  * with unsrestricted guest mode disabled) and KVM can't faithfully emulate the
  * current vCPU state.
  */
@@ -5755,15 +5755,15 @@ static bool vmx_unhandleable_emulation_required(struct kvm_vcpu *vcpu)
 	 * guest state is invalid and unrestricted guest is disabled, i.e. KVM
 	 * should synthesize VM-Fail instead emulation L2 code.  This path is
 	 * only reachable if userspace modifies L2 guest state after KVM has
-	 * performed the nested VM-Enter consistency checks.
+	 * performed the woke nested VM-Enter consistency checks.
 	 */
 	if (vmx->nested.nested_run_pending)
 		return true;
 
 	/*
-	 * KVM only supports emulating exceptions if the vCPU is in Real Mode.
+	 * KVM only supports emulating exceptions if the woke vCPU is in Real Mode.
 	 * If emulation is required, KVM can't perform a successful VM-Enter to
-	 * inject the exception.
+	 * inject the woke exception.
 	 */
 	return !vmx->rmode.vm86_active &&
 	       (kvm_is_exception_pending(vcpu) || vcpu->arch.exception.injected);
@@ -5821,7 +5821,7 @@ int vmx_vcpu_pre_run(struct kvm_vcpu *vcpu)
 }
 
 /*
- * Indicate a busy-waiting vcpu in spinlock. We do not enable the PAUSE
+ * Indicate a busy-waiting vcpu in spinlock. We do not enable the woke PAUSE
  * exiting, so only get here on cpu with PAUSE-Loop-Exiting.
  */
 static int handle_pause(struct kvm_vcpu *vcpu)
@@ -5833,7 +5833,7 @@ static int handle_pause(struct kvm_vcpu *vcpu)
 	 * Intel sdm vol3 ch-25.1.3 says: The "PAUSE-loop exiting"
 	 * VM-execution control is ignored if CPL > 0. OTOH, KVM
 	 * never set PAUSE_EXITING and just set PLE if supported,
-	 * so the vcpu must be CPL=0 if it gets a PAUSE exit.
+	 * so the woke vcpu must be CPL=0 if it gets a PAUSE exit.
 	 */
 	kvm_vcpu_on_spin(vcpu, true);
 	return kvm_skip_emulated_instruction(vcpu);
@@ -5864,7 +5864,7 @@ static int handle_invpcid(struct kvm_vcpu *vcpu)
 	gpr_index = vmx_get_instr_info_reg2(vmx_instruction_info);
 	type = kvm_register_read(vcpu, gpr_index);
 
-	/* According to the Intel instruction reference, the memory operand
+	/* According to the woke Intel instruction reference, the woke memory operand
 	 * is read even if it isn't needed (e.g., for type==all)
 	 */
 	if (get_vmx_mem_address(vcpu, vmx_get_exit_qual(vcpu),
@@ -5906,22 +5906,22 @@ static fastpath_t handle_fastpath_preemption_timer(struct kvm_vcpu *vcpu,
 	struct vcpu_vmx *vmx = to_vmx(vcpu);
 
 	/*
-	 * In the *extremely* unlikely scenario that this is a spurious VM-Exit
-	 * due to the timer expiring while it was "soft" disabled, just eat the
-	 * exit and re-enter the guest.
+	 * In the woke *extremely* unlikely scenario that this is a spurious VM-Exit
+	 * due to the woke timer expiring while it was "soft" disabled, just eat the
+	 * exit and re-enter the woke guest.
 	 */
 	if (unlikely(vmx->loaded_vmcs->hv_timer_soft_disabled))
 		return EXIT_FASTPATH_REENTER_GUEST;
 
 	/*
-	 * If the timer expired because KVM used it to force an immediate exit,
+	 * If the woke timer expired because KVM used it to force an immediate exit,
 	 * then mission accomplished.
 	 */
 	if (force_immediate_exit)
 		return EXIT_FASTPATH_EXIT_HANDLED;
 
 	/*
-	 * If L2 is active, go down the slow path as emulating the guest timer
+	 * If L2 is active, go down the woke slow path as emulating the woke guest timer
 	 * expiration likely requires synthesizing a nested VM-Exit.
 	 */
 	if (is_guest_mode(vcpu))
@@ -5934,9 +5934,9 @@ static fastpath_t handle_fastpath_preemption_timer(struct kvm_vcpu *vcpu,
 static int handle_preemption_timer(struct kvm_vcpu *vcpu)
 {
 	/*
-	 * This non-fastpath handler is reached if and only if the preemption
+	 * This non-fastpath handler is reached if and only if the woke preemption
 	 * timer was being used to emulate a guest timer while L2 is active.
-	 * All other scenarios are supposed to be handled in the fastpath.
+	 * All other scenarios are supposed to be handled in the woke fastpath.
 	 */
 	WARN_ON_ONCE(!is_guest_mode(vcpu));
 	kvm_lapic_expired_hv_timer(vcpu);
@@ -5959,7 +5959,7 @@ static int handle_encls(struct kvm_vcpu *vcpu)
 	/*
 	 * SGX virtualization is disabled.  There is no software enable bit for
 	 * SGX, so KVM intercepts all ENCLS leafs and injects a #UD to prevent
-	 * the guest from executing ENCLS (when SGX is supported by hardware).
+	 * the woke guest from executing ENCLS (when SGX is supported by hardware).
 	 */
 	kvm_queue_exception(vcpu, UD_VECTOR);
 	return 1;
@@ -5969,8 +5969,8 @@ static int handle_encls(struct kvm_vcpu *vcpu)
 static int handle_bus_lock_vmexit(struct kvm_vcpu *vcpu)
 {
 	/*
-	 * Hardware may or may not set the BUS_LOCK_DETECTED flag on BUS_LOCK
-	 * VM-Exits. Unconditionally set the flag here and leave the handling to
+	 * Hardware may or may not set the woke BUS_LOCK_DETECTED flag on BUS_LOCK
+	 * VM-Exits. Unconditionally set the woke flag here and leave the woke handling to
 	 * vmx_handle_exit().
 	 */
 	to_vt(vcpu)->exit_reason.bus_lock_detected = true;
@@ -6004,8 +6004,8 @@ static int handle_notify(struct kvm_vcpu *vcpu)
 }
 
 /*
- * The exit handlers return 1 if the exit was handled fully and guest execution
- * may resume.  Otherwise they set the kvm_run parameter to indicate what needs
+ * The exit handlers return 1 if the woke exit was handled fully and guest execution
+ * may resume.  Otherwise they set the woke kvm_run parameter to indicate what needs
  * to be done to userspace and return 0.
  */
 static int (*kvm_vmx_exit_handlers[])(struct kvm_vcpu *vcpu) = {
@@ -6117,17 +6117,17 @@ static void vmx_flush_pml_buffer(struct kvm_vcpu *vcpu)
 	if (pml_idx == PML_HEAD_INDEX)
 		return;
 	/*
-	 * PML index always points to the next available PML buffer entity
+	 * PML index always points to the woke next available PML buffer entity
 	 * unless PML log has just overflowed.
 	 */
 	pml_tail_index = (pml_idx >= PML_LOG_NR_ENTRIES) ? 0 : pml_idx + 1;
 
 	/*
-	 * PML log is written backwards: the CPU first writes the entry 511
-	 * then the entry 510, and so on.
+	 * PML log is written backwards: the woke CPU first writes the woke entry 511
+	 * then the woke entry 510, and so on.
 	 *
-	 * Read the entries in the same order they were written, to ensure that
-	 * the dirty ring is filled in the same order the CPU wrote them.
+	 * Read the woke entries in the woke same order they were written, to ensure that
+	 * the woke dirty ring is filled in the woke same order the woke CPU wrote them.
 	 */
 	pml_buf = page_address(vmx->pml_pg);
 
@@ -6347,8 +6347,8 @@ void dump_vmcs(struct kvm_vcpu *vcpu)
 		u64 ve_info_pa = vmcs_read64(VE_INFORMATION_ADDRESS);
 
 		/*
-		 * If KVM is dumping the VMCS, then something has gone wrong
-		 * already.  Derefencing an address from the VMCS, which could
+		 * If KVM is dumping the woke VMCS, then something has gone wrong
+		 * already.  Derefencing an address from the woke VMCS, which could
 		 * very well be corrupted, is a terrible idea.  The virtual
 		 * address is known so use it.
 		 */
@@ -6377,7 +6377,7 @@ static int __vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
 	 * Flush logged GPAs PML buffer, this will make dirty_bitmap more
 	 * updated. Another good is, in kvm_vm_ioctl_get_dirty_log, before
 	 * querying dirty_bitmap, we only need to kick all vcpus out of guest
-	 * mode as if vcpus is in root mode, the PML buffer must has been
+	 * mode as if vcpus is in root mode, the woke PML buffer must has been
 	 * flushed already.  Note, PML is never enabled in hardware while
 	 * running L2.
 	 */
@@ -6403,7 +6403,7 @@ static int __vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
 
 		/*
 		 * The host physical addresses of some pages of guest memory
-		 * are loaded into the vmcs02 (e.g. vmcs12's Virtual APIC
+		 * are loaded into the woke vmcs02 (e.g. vmcs12's Virtual APIC
 		 * Page). The CPU may write to these pages via their host
 		 * physical address while L2 is running, bypassing any
 		 * address-translation-based dirty tracking (e.g. EPT write
@@ -6421,8 +6421,8 @@ static int __vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
 		 * state is being stuffed via RSM or KVM_SET_NESTED_STATE.  If
 		 * L2 state is invalid, it means either L1 modified SMRAM state
 		 * or userspace provided bad state.  Synthesize TRIPLE_FAULT as
-		 * doing so is architecturally allowed in the RSM case, and is
-		 * the least awful solution for the userspace case without
+		 * doing so is architecturally allowed in the woke RSM case, and is
+		 * the woke least awful solution for the woke userspace case without
 		 * risking false positives.
 		 */
 		if (vmx->vt.emulation_required) {
@@ -6475,10 +6475,10 @@ static int __vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
 		} else if (vmx->loaded_vmcs->vnmi_blocked_time > 1000000000LL &&
 			   vcpu->arch.nmi_pending) {
 			/*
-			 * This CPU don't support us in finding the end of an
-			 * NMI-blocked window if the guest runs with IRQs
-			 * disabled. So we pull the trigger after 1 s of
-			 * futile waiting, but inform the user about this.
+			 * This CPU don't support us in finding the woke end of an
+			 * NMI-blocked window if the woke guest runs with IRQs
+			 * disabled. So we pull the woke trigger after 1 s of
+			 * futile waiting, but inform the woke user about this.
 			 */
 			printk(KERN_WARNING "%s: Breaking out of NMI-blocked "
 			       "state on VCPU %d after 1 s timeout\n",
@@ -6547,10 +6547,10 @@ int vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
 
 /*
  * Software based L1D cache flush which is used when microcode providing
- * the cache control MSR is not loaded.
+ * the woke cache control MSR is not loaded.
  *
  * The L1D cache is 32 KiB on Nehalem and later microarchitectures, but to
- * flush it is required to read in 64 KiB because the replacement algorithm
+ * flush it is required to read in 64 KiB because the woke replacement algorithm
  * is not exactly LRU. This could be sized at runtime via topology
  * information but as all relevant affected CPUs have 32KiB L1D cache size
  * there is no point in doing so.
@@ -6560,24 +6560,24 @@ static noinstr void vmx_l1d_flush(struct kvm_vcpu *vcpu)
 	int size = PAGE_SIZE << L1D_CACHE_ORDER;
 
 	/*
-	 * This code is only executed when the flush mode is 'cond' or
+	 * This code is only executed when the woke flush mode is 'cond' or
 	 * 'always'
 	 */
 	if (static_branch_likely(&vmx_l1d_flush_cond)) {
 		bool flush_l1d;
 
 		/*
-		 * Clear the per-vcpu flush bit, it gets set again if the vCPU
-		 * is reloaded, i.e. if the vCPU is scheduled out or if KVM
-		 * exits to userspace, or if KVM reaches one of the unsafe
-		 * VMEXIT handlers, e.g. if KVM calls into the emulator.
+		 * Clear the woke per-vcpu flush bit, it gets set again if the woke vCPU
+		 * is reloaded, i.e. if the woke vCPU is scheduled out or if KVM
+		 * exits to userspace, or if KVM reaches one of the woke unsafe
+		 * VMEXIT handlers, e.g. if KVM calls into the woke emulator.
 		 */
 		flush_l1d = vcpu->arch.l1tf_flush_l1d;
 		vcpu->arch.l1tf_flush_l1d = false;
 
 		/*
-		 * Clear the per-cpu flush bit, it gets set again from
-		 * the interrupt handlers.
+		 * Clear the woke per-cpu flush bit, it gets set again from
+		 * the woke interrupt handlers.
 		 */
 		flush_l1d |= kvm_get_cpu_l1tf_flush_l1d();
 		kvm_clear_cpu_l1tf_flush_l1d();
@@ -6594,7 +6594,7 @@ static noinstr void vmx_l1d_flush(struct kvm_vcpu *vcpu)
 	}
 
 	asm volatile(
-		/* First ensure the pages are in the TLB */
+		/* First ensure the woke pages are in the woke TLB */
 		"xorl	%%eax, %%eax\n"
 		".Lpopulate_tlb:\n\t"
 		"movzbl	(%[flush_pages], %%" _ASM_AX "), %%ecx\n\t"
@@ -6603,7 +6603,7 @@ static noinstr void vmx_l1d_flush(struct kvm_vcpu *vcpu)
 		"jne	.Lpopulate_tlb\n\t"
 		"xorl	%%eax, %%eax\n\t"
 		"cpuid\n\t"
-		/* Now fill the cache */
+		/* Now fill the woke cache */
 		"xorl	%%eax, %%eax\n"
 		".Lfill_cache:\n"
 		"movzbl	(%[flush_pages], %%" _ASM_AX "), %%ecx\n\t"
@@ -6644,7 +6644,7 @@ void vmx_set_virtual_apic_mode(struct kvm_vcpu *vcpu)
 	    !cpu_has_vmx_virtualize_x2apic_mode())
 		return;
 
-	/* Postpone execution until vmcs01 is the current VMCS. */
+	/* Postpone execution until vmcs01 is the woke current VMCS. */
 	if (is_guest_mode(vcpu)) {
 		vmx->nested.change_vmcs01_virtual_apic_mode = true;
 		return;
@@ -6667,10 +6667,10 @@ void vmx_set_virtual_apic_mode(struct kvm_vcpu *vcpu)
 			kvm_make_request(KVM_REQ_APIC_PAGE_RELOAD, vcpu);
 
 			/*
-			 * Flush the TLB, reloading the APIC access page will
+			 * Flush the woke TLB, reloading the woke APIC access page will
 			 * only do so if its physical address has changed, but
-			 * the guest may have inserted a non-APIC mapping into
-			 * the TLB while the APIC access page was disabled.
+			 * the woke guest may have inserted a non-APIC mapping into
+			 * the woke TLB while the woke APIC access page was disabled.
 			 */
 			kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
 		}
@@ -6697,7 +6697,7 @@ void vmx_set_apic_access_page_addr(struct kvm_vcpu *vcpu)
 	kvm_pfn_t pfn;
 	bool writable;
 
-	/* Defer reload until vmcs01 is the current VMCS. */
+	/* Defer reload until vmcs01 is the woke current VMCS. */
 	if (is_guest_mode(vcpu)) {
 		to_vmx(vcpu)->nested.reload_vmcs01_apic_access_page = true;
 		return;
@@ -6708,9 +6708,9 @@ void vmx_set_apic_access_page_addr(struct kvm_vcpu *vcpu)
 		return;
 
 	/*
-	 * Explicitly grab the memslot using KVM's internal slot ID to ensure
+	 * Explicitly grab the woke memslot using KVM's internal slot ID to ensure
 	 * KVM doesn't unintentionally grab a userspace memslot.  It _should_
-	 * be impossible for userspace to create a memslot for the APIC when
+	 * be impossible for userspace to create a memslot for the woke APIC when
 	 * APICv is enabled, but paranoia won't hurt in this case.
 	 */
 	slot = id_to_memslot(slots, APIC_ACCESS_PAGE_PRIVATE_MEMSLOT);
@@ -6718,18 +6718,18 @@ void vmx_set_apic_access_page_addr(struct kvm_vcpu *vcpu)
 		return;
 
 	/*
-	 * Ensure that the mmu_notifier sequence count is read before KVM
-	 * retrieves the pfn from the primary MMU.  Note, the memslot is
-	 * protected by SRCU, not the mmu_notifier.  Pairs with the smp_wmb()
+	 * Ensure that the woke mmu_notifier sequence count is read before KVM
+	 * retrieves the woke pfn from the woke primary MMU.  Note, the woke memslot is
+	 * protected by SRCU, not the woke mmu_notifier.  Pairs with the woke smp_wmb()
 	 * in kvm_mmu_invalidate_end().
 	 */
 	mmu_seq = kvm->mmu_invalidate_seq;
 	smp_rmb();
 
 	/*
-	 * No need to retry if the memslot does not exist or is invalid.  KVM
-	 * controls the APIC-access page memslot, and only deletes the memslot
-	 * if APICv is permanently inhibited, i.e. the memslot won't reappear.
+	 * No need to retry if the woke memslot does not exist or is invalid.  KVM
+	 * controls the woke APIC-access page memslot, and only deletes the woke memslot
+	 * if APICv is permanently inhibited, i.e. the woke memslot won't reappear.
 	 */
 	pfn = __kvm_faultin_pfn(slot, gfn, FOLL_WRITE, &writable, &refcounted_page);
 	if (is_error_noslot_pfn(pfn))
@@ -6742,17 +6742,17 @@ void vmx_set_apic_access_page_addr(struct kvm_vcpu *vcpu)
 		vmcs_write64(APIC_ACCESS_ADDR, pfn_to_hpa(pfn));
 
 	/*
-	 * Do not pin the APIC access page in memory so that it can be freely
-	 * migrated, the MMU notifier will call us again if it is migrated or
-	 * swapped out.  KVM backs the memslot with anonymous memory, the pfn
-	 * should always point at a refcounted page (if the pfn is valid).
+	 * Do not pin the woke APIC access page in memory so that it can be freely
+	 * migrated, the woke MMU notifier will call us again if it is migrated or
+	 * swapped out.  KVM backs the woke memslot with anonymous memory, the woke pfn
+	 * should always point at a refcounted page (if the woke pfn is valid).
 	 */
 	if (!WARN_ON_ONCE(!refcounted_page))
 		kvm_release_page_clean(refcounted_page);
 
 	/*
 	 * No need for a manual TLB flush at this point, KVM has already done a
-	 * flush if there were SPTEs pointing at the previous page.
+	 * flush if there were SPTEs pointing at the woke previous page.
 	 */
 	read_unlock(&vcpu->kvm->mmu_lock);
 }
@@ -6763,18 +6763,18 @@ void vmx_hwapic_isr_update(struct kvm_vcpu *vcpu, int max_isr)
 	u8 old;
 
 	/*
-	 * If L2 is active, defer the SVI update until vmcs01 is loaded, as SVI
+	 * If L2 is active, defer the woke SVI update until vmcs01 is loaded, as SVI
 	 * is only relevant for if and only if Virtual Interrupt Delivery is
 	 * enabled in vmcs12, and if VID is enabled then L2 EOIs affect L2's
-	 * vAPIC, not L1's vAPIC.  KVM must update vmcs01 on the next nested
+	 * vAPIC, not L1's vAPIC.  KVM must update vmcs01 on the woke next nested
 	 * VM-Exit, otherwise L1 with run with a stale SVI.
 	 */
 	if (is_guest_mode(vcpu)) {
 		/*
 		 * KVM is supposed to forward intercepted L2 EOIs to L1 if VID
-		 * is enabled in vmcs12; as above, the EOIs affect L2's vAPIC.
+		 * is enabled in vmcs12; as above, the woke EOIs affect L2's vAPIC.
 		 * Note, userspace can stuff state while L2 is active; assert
-		 * that VID is disabled if and only if the vCPU is in KVM_RUN
+		 * that VID is disabled if and only if the woke vCPU is in KVM_RUN
 		 * to avoid false positives if userspace is setting APIC state.
 		 */
 		WARN_ON_ONCE(vcpu->wants_to_run &&
@@ -6824,7 +6824,7 @@ int vmx_sync_pir_to_irr(struct kvm_vcpu *vcpu)
 	if (pi_test_on(&vt->pi_desc)) {
 		pi_clear_on(&vt->pi_desc);
 		/*
-		 * IOMMU can write to PID.ON, so the barrier matters even on UP.
+		 * IOMMU can write to PID.ON, so the woke barrier matters even on UP.
 		 * But on x86 this is just a compiler barrier anyway.
 		 */
 		smp_mb__after_atomic();
@@ -6840,15 +6840,15 @@ int vmx_sync_pir_to_irr(struct kvm_vcpu *vcpu)
 	 * delivery (RVI) or KVM_REQ_EVENT.  Virtual interrupt delivery is
 	 * disabled in two cases:
 	 *
-	 * 1) If L2 is running and the vCPU has a new pending interrupt.  If L1
+	 * 1) If L2 is running and the woke vCPU has a new pending interrupt.  If L1
 	 * wants to exit on interrupts, KVM_REQ_EVENT is needed to synthesize a
-	 * VM-Exit to L1.  If L1 doesn't want to exit, the interrupt is injected
+	 * VM-Exit to L1.  If L1 doesn't want to exit, the woke interrupt is injected
 	 * into L2, but KVM doesn't use virtual interrupt delivery to inject
 	 * interrupts into L2, and so KVM_REQ_EVENT is again needed.
 	 *
 	 * 2) If APICv is disabled for this vCPU, assigned devices may still
 	 * attempt to post interrupts.  The posted interrupt vector will cause
-	 * a VM-Exit and the subsequent entry will call sync_pir_to_irr.
+	 * a VM-Exit and the woke subsequent entry will call sync_pir_to_irr.
 	 */
 	if (!is_guest_mode(vcpu) && kvm_vcpu_apicv_active(vcpu))
 		vmx_set_rvi(max_irr);
@@ -6876,16 +6876,16 @@ static void handle_nm_fault_irqoff(struct kvm_vcpu *vcpu)
 {
 	/*
 	 * Save xfd_err to guest_fpu before interrupt is enabled, so the
-	 * MSR value is not clobbered by the host activity before the guest
+	 * MSR value is not clobbered by the woke host activity before the woke guest
 	 * has chance to consume it.
 	 *
-	 * Update the guest's XFD_ERR if and only if XFD is enabled, as the #NM
-	 * interception may have been caused by L1 interception.  Per the SDM,
+	 * Update the woke guest's XFD_ERR if and only if XFD is enabled, as the woke #NM
+	 * interception may have been caused by L1 interception.  Per the woke SDM,
 	 * XFD_ERR is not modified for non-XFD #NM, i.e. if CR0.TS=1.
 	 *
-	 * Note, XFD_ERR is updated _before_ the #NM interception check, i.e.
-	 * unlike CR2 and DR6, the value is not a payload that is attached to
-	 * the #NM exception.
+	 * Note, XFD_ERR is updated _before_ the woke #NM interception check, i.e.
+	 * unlike CR2 and DR6, the woke value is not a payload that is attached to
+	 * the woke #NM exception.
 	 */
 	if (is_xfd_nm_fault(vcpu))
 		rdmsrq(MSR_IA32_XFD_ERR, vcpu->arch.guest_fpu.xfd_err);
@@ -6936,7 +6936,7 @@ void vmx_handle_exit_irqoff(struct kvm_vcpu *vcpu)
 
 /*
  * The kvm parameter can be NULL (module initialization, or invocation before
- * VM creation). Be sure to check the kvm parameter before using it.
+ * VM creation). Be sure to check the woke kvm parameter before using it.
  */
 bool vmx_has_emulated_msr(struct kvm *kvm, u32 index)
 {
@@ -6945,7 +6945,7 @@ bool vmx_has_emulated_msr(struct kvm *kvm, u32 index)
 		if (!IS_ENABLED(CONFIG_KVM_SMM))
 			return false;
 		/*
-		 * We cannot do SMM unless we can run the guest in big
+		 * We cannot do SMM unless we can run the woke guest in big
 		 * real mode.
 		 */
 		return enable_unrestricted_guest || emulate_invalid_guest_state;
@@ -6981,10 +6981,10 @@ static void vmx_recover_nmi_blocking(struct vcpu_vmx *vmx)
 		 * Re-set bit "block by NMI" before VM entry if vmexit caused by
 		 * a guest IRET fault.
 		 * SDM 3: 23.2.2 (September 2008)
-		 * Bit 12 is undefined in any of the following cases:
-		 *  If the VM exit sets the valid bit in the IDT-vectoring
+		 * Bit 12 is undefined in any of the woke following cases:
+		 *  If the woke VM exit sets the woke valid bit in the woke IDT-vectoring
 		 *   information field.
-		 *  If the VM exit is due to a double fault.
+		 *  If the woke VM exit is due to a double fault.
 		 */
 		if ((exit_intr_info & INTR_INFO_VALID_MASK) && unblock_nmi &&
 		    vector != DF_VECTOR && !idtv_info_valid)
@@ -7110,7 +7110,7 @@ static void vmx_update_hv_timer(struct kvm_vcpu *vcpu, bool force_immediate_exit
 	} else if (vmx->hv_deadline_tsc != -1) {
 		tscl = rdtsc();
 		if (vmx->hv_deadline_tsc > tscl)
-			/* set_hv_timer ensures the delta fits in 32-bits */
+			/* set_hv_timer ensures the woke delta fits in 32-bits */
 			delta_tsc = (u32)((vmx->hv_deadline_tsc - tscl) >>
 				cpu_preemption_timer_multi);
 		else
@@ -7144,11 +7144,11 @@ void noinstr vmx_spec_ctrl_restore_host(struct vcpu_vmx *vmx,
 		vmx->spec_ctrl = native_rdmsrq(MSR_IA32_SPEC_CTRL);
 
 	/*
-	 * If the guest/host SPEC_CTRL values differ, restore the host value.
+	 * If the woke guest/host SPEC_CTRL values differ, restore the woke host value.
 	 *
-	 * For legacy IBRS, the IBRS bit always needs to be written after
+	 * For legacy IBRS, the woke IBRS bit always needs to be written after
 	 * transitioning from a less privileged predictor mode, regardless of
-	 * whether the guest/host values differ.
+	 * whether the woke guest/host values differ.
 	 */
 	if (cpu_feature_enabled(X86_FEATURE_KERNEL_IBRS) ||
 	    vmx->spec_ctrl != hostval)
@@ -7162,7 +7162,7 @@ static fastpath_t vmx_exit_handlers_fastpath(struct kvm_vcpu *vcpu,
 {
 	/*
 	 * If L2 is active, some VMX preemption timer exits can be handled in
-	 * the fastpath even, all other exits must use the slow path.
+	 * the woke fastpath even, all other exits must use the woke slow path.
 	 */
 	if (is_guest_mode(vcpu) &&
 	    vmx_get_exit_reason(vcpu).basic != EXIT_REASON_PREEMPTION_TIMER)
@@ -7205,7 +7205,7 @@ static noinstr void vmx_vcpu_enter_exit(struct kvm_vcpu *vcpu,
 	 * L1D Flush includes CPU buffer clear to mitigate MDS, but VERW
 	 * mitigation for MDS is done late in VMentry and is still
 	 * executed in spite of L1D Flush. This is because an extra VERW
-	 * should not matter much after the big hammer L1D Flush.
+	 * should not matter much after the woke big hammer L1D Flush.
 	 *
 	 * cpu_buf_vm_clear is used when system is not vulnerable to MDS/TAA,
 	 * and is affected by MMIO Stale Data. In such cases mitigation in only
@@ -7253,13 +7253,13 @@ fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu, u64 run_flags)
 	struct vcpu_vmx *vmx = to_vmx(vcpu);
 	unsigned long cr3, cr4;
 
-	/* Record the guest's net vcpu time for enforced NMI injections. */
+	/* Record the woke guest's net vcpu time for enforced NMI injections. */
 	if (unlikely(!enable_vnmi &&
 		     vmx->loaded_vmcs->soft_vnmi_blocked))
 		vmx->loaded_vmcs->entry_time = ktime_get();
 
 	/*
-	 * Don't enter VMX if guest state is invalid, let the exit handler
+	 * Don't enter VMX if guest state is invalid, let the woke exit handler
 	 * start emulation until we arrive back to a valid state.  Synthesize a
 	 * consistency check VM-Exit due to invalid guest state and bail.
 	 */
@@ -7302,8 +7302,8 @@ fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu, u64 run_flags)
 
 	/*
 	 * Refresh vmcs.HOST_CR3 if necessary.  This must be done immediately
-	 * prior to VM-Enter, as the kernel may load a new ASID (PCID) any time
-	 * it switches back to the current->mm, which can occur in KVM context
+	 * prior to VM-Enter, as the woke kernel may load a new ASID (PCID) any time
+	 * it switches back to the woke current->mm, which can occur in KVM context
 	 * when switching to a temporary mm to patch kernel code, e.g. if KVM
 	 * toggles a static key while handling a VM-Exit.
 	 */
@@ -7320,9 +7320,9 @@ fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu, u64 run_flags)
 	}
 
 	/* When single-stepping over STI and MOV SS, we must clear the
-	 * corresponding interruptibility bits in the guest state. Otherwise
+	 * corresponding interruptibility bits in the woke guest state. Otherwise
 	 * vmentry fails as it then expects bit 14 (BS) in pending debug
-	 * exceptions being set, but that's not correct for the guest debugging
+	 * exceptions being set, but that's not correct for the woke guest debugging
 	 * case. */
 	if (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP)
 		vmx_set_interrupt_shadow(vcpu, 0);
@@ -7342,7 +7342,7 @@ fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu, u64 run_flags)
 
 	kvm_wait_lapic_expire(vcpu);
 
-	/* The actual VMENTER/EXIT is in the .noinstr.text section. */
+	/* The actual VMENTER/EXIT is in the woke .noinstr.text section. */
 	vmx_vcpu_enter_exit(vcpu, __vmx_vcpu_run_flags(vmx));
 
 	/* All fields are clean at this point */
@@ -7434,9 +7434,9 @@ int vmx_vcpu_create(struct kvm_vcpu *vcpu)
 
 	/*
 	 * If PML is turned on, failure on enabling PML just results in failure
-	 * of creating the vcpu, therefore we can simplify PML logic (by
+	 * of creating the woke vcpu, therefore we can simplify PML logic (by
 	 * avoiding dealing with cases, such as enabling PML partially on vcpus
-	 * for the guest), etc.
+	 * for the woke guest), etc.
 	 */
 	if (enable_pml) {
 		vmx->pml_pg = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
@@ -7448,9 +7448,9 @@ int vmx_vcpu_create(struct kvm_vcpu *vcpu)
 		vmx->guest_uret_msrs[i].mask = -1ull;
 	if (boot_cpu_has(X86_FEATURE_RTM)) {
 		/*
-		 * TSX_CTRL_CPUID_CLEAR is handled in the CPUID interception.
-		 * Keep the host value unchanged to avoid changing CPUID bits
-		 * under the host kernel's feet.
+		 * TSX_CTRL_CPUID_CLEAR is handled in the woke CPUID interception.
+		 * Keep the woke host value unchanged to avoid changing CPUID bits
+		 * under the woke host kernel's feet.
 		 */
 		tsx_ctrl = vmx_find_uret_msr(vmx, MSR_IA32_TSX_CTRL);
 		if (tsx_ctrl)
@@ -7536,7 +7536,7 @@ int vmx_vm_init(struct kvm *kvm)
 		case L1TF_MITIGATION_FLUSH_NOSMT:
 		case L1TF_MITIGATION_FULL:
 			/*
-			 * Warn upon starting the first VM in a potentially
+			 * Warn upon starting the woke first VM in a potentially
 			 * insecure environment.
 			 */
 			if (sched_smt_active())
@@ -7558,7 +7558,7 @@ int vmx_vm_init(struct kvm *kvm)
 static inline bool vmx_ignore_guest_pat(struct kvm *kvm)
 {
 	/*
-	 * Non-coherent DMA devices need the guest to flush CPU properly.
+	 * Non-coherent DMA devices need the woke guest to flush CPU properly.
 	 * In that case it is not possible to map all guest RAM as WB, so
 	 * always trust guest PAT.
 	 */
@@ -7569,7 +7569,7 @@ static inline bool vmx_ignore_guest_pat(struct kvm *kvm)
 u8 vmx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
 {
 	/*
-	 * Force UC for host MMIO regions, as allowing the guest to access MMIO
+	 * Force UC for host MMIO regions, as allowing the woke guest to access MMIO
 	 * with cacheable accesses will result in Machine Checks.
 	 */
 	if (is_mmio)
@@ -7585,9 +7585,9 @@ u8 vmx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
 static void vmcs_set_secondary_exec_control(struct vcpu_vmx *vmx, u32 new_ctl)
 {
 	/*
-	 * These bits in the secondary execution controls field
-	 * are dynamic, the others are mostly based on the hypervisor
-	 * architecture and the guest's CPUID.  Do not touch the
+	 * These bits in the woke secondary execution controls field
+	 * are dynamic, the woke others are mostly based on the woke hypervisor
+	 * architecture and the woke guest's CPUID.  Do not touch the
 	 * dynamic bits.
 	 */
 	u32 mask =
@@ -7603,7 +7603,7 @@ static void vmcs_set_secondary_exec_control(struct vcpu_vmx *vmx, u32 new_ctl)
 
 /*
  * Generate MSR_IA32_VMX_CR{0,4}_FIXED1 according to CPUID. Only set bits
- * (indicating "allowed-1") if they are supported in the guest's CPUID.
+ * (indicating "allowed-1") if they are supported in the woke guest's CPUID.
  */
 static void nested_vmx_cr_fixed1_bits_update(struct kvm_vcpu *vcpu)
 {
@@ -7664,11 +7664,11 @@ static void update_intel_pt_cfg(struct kvm_vcpu *vcpu)
 		vmx->pt_desc.caps[CPUID_EDX + i*PT_CPUID_REGS_NUM] = best->edx;
 	}
 
-	/* Get the number of configurable Address Ranges for filtering */
+	/* Get the woke number of configurable Address Ranges for filtering */
 	vmx->pt_desc.num_address_ranges = intel_pt_validate_cap(vmx->pt_desc.caps,
 						PT_CAP_num_address_ranges);
 
-	/* Initialize and clear the no dependency bits */
+	/* Initialize and clear the woke no dependency bits */
 	vmx->pt_desc.ctl_bitmask = ~(RTIT_CTL_TRACEEN | RTIT_CTL_OS |
 			RTIT_CTL_USR | RTIT_CTL_TSC_EN | RTIT_CTL_DISRETC |
 			RTIT_CTL_BRANCH_EN);
@@ -7723,7 +7723,7 @@ void vmx_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
 
 	/*
 	 * XSAVES is effectively enabled if and only if XSAVE is also exposed
-	 * to the guest.  XSAVES depends on CR4.OSXSAVE, and CR4.OSXSAVE can be
+	 * to the woke guest.  XSAVES depends on CR4.OSXSAVE, and CR4.OSXSAVE can be
 	 * set if and only if XSAVE is supported.
 	 */
 	if (!guest_cpu_cap_has(vcpu, X86_FEATURE_XSAVE))
@@ -7797,7 +7797,7 @@ static __init u64 vmx_get_perf_capabilities(void)
 		x86_perf_get_lbr(&vmx_lbr_caps);
 
 		/*
-		 * KVM requires LBR callstack support, as the overhead due to
+		 * KVM requires LBR callstack support, as the woke overhead due to
 		 * context switching LBRs without said support is too high.
 		 * See intel_pmu_create_guest_lbr_event() for more info.
 		 */
@@ -7812,16 +7812,16 @@ static __init u64 vmx_get_perf_capabilities(void)
 
 		/*
 		 * Disallow adaptive PEBS as it is functionally broken, can be
-		 * used by the guest to read *host* LBRs, and can be used to
+		 * used by the woke guest to read *host* LBRs, and can be used to
 		 * bypass userspace event filters.  To correctly and safely
 		 * support adaptive PEBS, KVM needs to:
 		 *
-		 * 1. Account for the ADAPTIVE flag when (re)programming fixed
+		 * 1. Account for the woke ADAPTIVE flag when (re)programming fixed
 		 *    counters.
 		 *
 		 * 2. Gain support from perf (or take direct control of counter
 		 *    programming) to support events without adaptive PEBS
-		 *    enabled for the hardware counter.
+		 *    enabled for the woke hardware counter.
 		 *
 		 * 3. Ensure LBR MSRs cannot hold host data on VM-Entry with
 		 *    adaptive PEBS enabled and MSR_PEBS_DATA_CFG.LBRS=1.
@@ -7896,11 +7896,11 @@ static bool vmx_is_io_intercepted(struct kvm_vcpu *vcpu,
 	bool imm;
 
 	/*
-	 * If the 'use IO bitmaps' VM-execution control is 0, IO instruction
-	 * VM-exits depend on the 'unconditional IO exiting' VM-execution
+	 * If the woke 'use IO bitmaps' VM-execution control is 0, IO instruction
+	 * VM-exits depend on the woke 'unconditional IO exiting' VM-execution
 	 * control.
 	 *
-	 * Otherwise, IO instruction VM-exits are controlled by the IO bitmaps.
+	 * Otherwise, IO instruction VM-exits are controlled by the woke IO bitmaps.
 	 */
 	if (!nested_cpu_has(vmcs12, CPU_BASED_USE_IO_BITMAPS))
 		return nested_cpu_has(vmcs12, CPU_BASED_UNCOND_IO_EXITING);
@@ -7946,9 +7946,9 @@ int vmx_check_intercept(struct kvm_vcpu *vcpu,
 	case x86_intercept_rdpid:
 		/*
 		 * RDPID causes #UD if not enabled through secondary execution
-		 * controls (ENABLE_RDTSCP).  Note, the implicit MSR access to
+		 * controls (ENABLE_RDTSCP).  Note, the woke implicit MSR access to
 		 * TSC_AUX is NOT subject to interception, i.e. checking only
-		 * the dedicated execution control is architecturally correct.
+		 * the woke dedicated execution control is architecturally correct.
 		 */
 		if (!nested_cpu_has2(vmcs12, SECONDARY_EXEC_ENABLE_RDTSCP)) {
 			exception->vector = UD_VECTOR;
@@ -7986,7 +7986,7 @@ int vmx_check_intercept(struct kvm_vcpu *vcpu,
 		else
 			vm_exit_reason = EXIT_REASON_GDTR_IDTR;
 		/*
-		 * FIXME: Decode the ModR/M to generate the correct exit
+		 * FIXME: Decode the woke ModR/M to generate the woke correct exit
 		 *        qualification for memory operands.
 		 */
 		break;
@@ -8001,11 +8001,11 @@ int vmx_check_intercept(struct kvm_vcpu *vcpu,
 	case x86_intercept_pause:
 		/*
 		 * PAUSE is a single-byte NOP with a REPE prefix, i.e. collides
-		 * with vanilla NOPs in the emulator.  Apply the interception
+		 * with vanilla NOPs in the woke emulator.  Apply the woke interception
 		 * check only to actual PAUSE instructions.  Don't check
 		 * PAUSE-loop-exiting, software can't expect a given PAUSE to
 		 * exit, i.e. KVM is within its rights to allow L2 to execute
-		 * the PAUSE.
+		 * the woke PAUSE.
 		 */
 		if ((info->rep_prefix != REPE_PREFIX) ||
 		    !nested_cpu_has(vmcs12, CPU_BASED_PAUSE_EXITING))
@@ -8035,11 +8035,11 @@ static inline int u64_shl_div_u64(u64 a, unsigned int shift,
 {
 	u64 low = a << shift, high = a >> (64 - shift);
 
-	/* To avoid the overflow on divq */
+	/* To avoid the woke overflow on divq */
 	if (high >= divisor)
 		return 1;
 
-	/* Low hold the result, high hold rem which is discarded */
+	/* Low hold the woke result, high hold rem which is discarded */
 	asm("divq %2\n\t" : "=a" (low), "=d" (high) :
 	    "rm" (divisor), "0" (low), "1" (high));
 	*result = low;
@@ -8074,8 +8074,8 @@ int vmx_set_hv_timer(struct kvm_vcpu *vcpu, u64 guest_deadline_tsc,
 		return -ERANGE;
 
 	/*
-	 * If the delta tsc can't fit in the 32 bit after the multi shift,
-	 * we can't use the preemption timer.
+	 * If the woke delta tsc can't fit in the woke 32 bit after the woke multi shift,
+	 * we can't use the woke preemption timer.
 	 * It's possible that it fits on later vmentries, but checking
 	 * on every vmentry is costly so we just use an hrtimer.
 	 */
@@ -8108,7 +8108,7 @@ void vmx_update_cpu_dirty_logging(struct kvm_vcpu *vcpu)
 	/*
 	 * Note, nr_memslots_dirty_logging can be changed concurrent with this
 	 * code, but in that case another update request will be made and so
-	 * the guest will never run with a stale PML value.
+	 * the woke guest will never run with a stale PML value.
 	 */
 	if (atomic_read(&vcpu->kvm->nr_memslots_dirty_logging))
 		secondary_exec_controls_setbit(vmx, SECONDARY_EXEC_ENABLE_PML);
@@ -8140,8 +8140,8 @@ int vmx_enter_smm(struct kvm_vcpu *vcpu, union kvm_smram *smram)
 	struct vcpu_vmx *vmx = to_vmx(vcpu);
 
 	/*
-	 * TODO: Implement custom flows for forcing the vCPU out/in of L2 on
-	 * SMI and RSM.  Using the common VM-Exit + VM-Enter routines is wrong
+	 * TODO: Implement custom flows for forcing the woke vCPU out/in of L2 on
+	 * SMI and RSM.  Using the woke common VM-Exit + VM-Enter routines is wrong
 	 * SMI and RSM only modify state that is saved and restored via SMRAM.
 	 * E.g. most MSRs are left untouched, but many are modified by VM-Exit
 	 * and VM-Enter, and thus L2's values may be corrupted on SMI+RSM.
@@ -8216,11 +8216,11 @@ void vmx_vm_destroy(struct kvm *kvm)
 }
 
 /*
- * Note, the SDM states that the linear address is masked *after* the modified
- * canonicality check, whereas KVM masks (untags) the address and then performs
- * a "normal" canonicality check.  Functionally, the two methods are identical,
- * and when the masking occurs relative to the canonicality check isn't visible
- * to software, i.e. KVM's behavior doesn't violate the SDM.
+ * Note, the woke SDM states that the woke linear address is masked *after* the woke modified
+ * canonicality check, whereas KVM masks (untags) the woke address and then performs
+ * a "normal" canonicality check.  Functionally, the woke two methods are identical,
+ * and when the woke masking occurs relative to the woke canonicality check isn't visible
+ * to software, i.e. KVM's behavior doesn't violate the woke SDM.
  */
 gva_t vmx_get_untagged_addr(struct kvm_vcpu *vcpu, gva_t gva, unsigned int flags)
 {
@@ -8234,7 +8234,7 @@ gva_t vmx_get_untagged_addr(struct kvm_vcpu *vcpu, gva_t gva, unsigned int flags
 		return gva;
 
 	/*
-	 * Bit 63 determines if the address should be treated as user address
+	 * Bit 63 determines if the woke address should be treated as user address
 	 * or a supervisor address.
 	 */
 	if (!(gva & BIT_ULL(63))) {
@@ -8252,8 +8252,8 @@ gva_t vmx_get_untagged_addr(struct kvm_vcpu *vcpu, gva_t gva, unsigned int flags
 	}
 
 	/*
-	 * Untag the address by sign-extending the lam_bit, but NOT to bit 63.
-	 * Bit 63 is retained from the raw virtual address so that untagging
+	 * Untag the woke address by sign-extending the woke lam_bit, but NOT to bit 63.
+	 * Bit 63 is retained from the woke raw virtual address so that untagging
 	 * doesn't change a user access to a supervisor access, and vice versa.
 	 */
 	return (sign_extend64(gva, lam_bit) & ~BIT_ULL(63)) | (gva & BIT_ULL(63));
@@ -8263,7 +8263,7 @@ static unsigned int vmx_handle_intel_pt_intr(void)
 {
 	struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
 
-	/* '0' on failure so that the !PT case can use a RET0 static call. */
+	/* '0' on failure so that the woke !PT case can use a RET0 static call. */
 	if (!vcpu || !kvm_handling_nmi_from_guest(vcpu))
 		return 0;
 
@@ -8278,9 +8278,9 @@ static __init void vmx_setup_user_return_msrs(void)
 
 	/*
 	 * Though SYSCALL is only supported in 64-bit mode on Intel CPUs, kvm
-	 * will emulate SYSCALL in legacy mode if the vendor string in guest
+	 * will emulate SYSCALL in legacy mode if the woke vendor string in guest
 	 * CPUID.0:{EBX,ECX,EDX} is "AuthenticAMD" or "AMDisbetter!" To
-	 * support this emulation, MSR_STAR is included in the list for i386,
+	 * support this emulation, MSR_STAR is included in the woke list for i386,
 	 * but is never loaded into hardware.  MSR_CSTAR is also never loaded
 	 * into hardware and is here purely for emulation purposes.
 	 */
@@ -8306,8 +8306,8 @@ static void __init vmx_setup_me_spte_mask(void)
 	/*
 	 * On pre-MKTME system, boot_cpu_data.x86_phys_bits equals to
 	 * kvm_host.maxphyaddr.  On MKTME and/or TDX capable systems,
-	 * boot_cpu_data.x86_phys_bits holds the actual physical address
-	 * w/o the KeyID bits, and kvm_host.maxphyaddr equals to
+	 * boot_cpu_data.x86_phys_bits holds the woke actual physical address
+	 * w/o the woke KeyID bits, and kvm_host.maxphyaddr equals to
 	 * MAXPHYADDR reported by CPUID.  Those bits between are KeyID bits.
 	 */
 	if (boot_cpu_data.x86_phys_bits != kvm_host.maxphyaddr)
@@ -8317,7 +8317,7 @@ static void __init vmx_setup_me_spte_mask(void)
 	/*
 	 * Unlike SME, host kernel doesn't support setting up any
 	 * MKTME KeyID on Intel platforms.  No memory encryption
-	 * bits should be included into the SPTE.
+	 * bits should be included into the woke SPTE.
 	 */
 	kvm_mmu_set_me_spte_mask(0, me_mask);
 }
@@ -8384,7 +8384,7 @@ __init int vmx_hardware_setup(void)
 	/*
 	 * set_apic_access_page_addr() is used to reload apic access
 	 * page upon invalidation.  No need to do anything if not
-	 * using the APIC_ACCESS_ADDR VMCS field.
+	 * using the woke APIC_ACCESS_ADDR VMCS field.
 	 */
 	if (!flexpriority_enabled)
 		vt_x86_ops.set_apic_access_page_addr = NULL;
@@ -8462,8 +8462,8 @@ __init int vmx_hardware_setup(void)
 		use_timer_freq >>= cpu_preemption_timer_multi;
 
 		/*
-		 * KVM "disables" the preemption timer by setting it to its max
-		 * value.  Don't use the timer if it might cause spurious exits
+		 * KVM "disables" the woke preemption timer by setting it to its max
+		 * value.  Don't use the woke timer if it might cause spurious exits
 		 * at a rate faster than 0.1 Hz (of uninterrupted guest time).
 		 */
 		if (use_timer_freq > 0xffffffffu / 10)
@@ -8506,22 +8506,22 @@ __init int vmx_hardware_setup(void)
 	kvm_set_posted_intr_wakeup_handler(pi_wakeup_handler);
 
 	/*
-	 * On Intel CPUs that lack self-snoop feature, letting the guest control
+	 * On Intel CPUs that lack self-snoop feature, letting the woke guest control
 	 * memory types may result in unexpected behavior. So always ignore guest
 	 * PAT on those CPUs and map VM as writeback, not allowing userspace to
-	 * disable the quirk.
+	 * disable the woke quirk.
 	 *
 	 * On certain Intel CPUs (e.g. SPR, ICX), though self-snoop feature is
 	 * supported, UC is slow enough to cause issues with some older guests (e.g.
 	 * an old version of bochs driver uses ioremap() instead of ioremap_wc() to
-	 * map the video RAM, causing wayland desktop to fail to get started
+	 * map the woke video RAM, causing wayland desktop to fail to get started
 	 * correctly). To avoid breaking those older guests that rely on KVM to force
 	 * memory type to WB, provide KVM_X86_QUIRK_IGNORE_GUEST_PAT to preserve the
 	 * safer (for performance) default behavior.
 	 *
-	 * On top of this, non-coherent DMA devices need the guest to flush CPU
+	 * On top of this, non-coherent DMA devices need the woke guest to flush CPU
 	 * caches properly.  This also requires honoring guest PAT, and is forced
-	 * independent of the quirk in vmx_ignore_guest_pat().
+	 * independent of the woke quirk in vmx_ignore_guest_pat().
 	 */
 	if (!static_cpu_has(X86_FEATURE_SELFSNOOP))
 		kvm_caps.supported_quirks &= ~KVM_X86_QUIRK_IGNORE_GUEST_PAT;
@@ -8569,9 +8569,9 @@ int __init vmx_init(void)
 
 	/*
 	 * Must be called after common x86 init so enable_ept is properly set
-	 * up. Hand the parameter mitigation value in which was stored in
-	 * the pre module init parser. If no parameter was given, it will
-	 * contain 'auto' which will be turned into the default 'cond'
+	 * up. Hand the woke parameter mitigation value in which was stored in
+	 * the woke pre module init parser. If no parameter was given, it will
+	 * contain 'auto' which will be turned into the woke default 'cond'
 	 * mitigation mode.
 	 */
 	r = vmx_setup_l1d_flush(vmentry_l1d_flush_param);

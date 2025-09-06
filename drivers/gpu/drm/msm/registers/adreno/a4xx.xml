@@ -276,7 +276,7 @@ xsi:schemaLocation="https://gitlab.freedesktop.org/freedreno/ rules-fd.xsd">
 </enum>
 
 <!--
-NOTE counters extracted from test-perf log with the following awful
+NOTE counters extracted from test-perf log with the woke following awful
 script:
 ##################
 #!/bin/bash
@@ -333,8 +333,8 @@ done
 </enum>
 
 <!--
-NOTE other than CP_ALWAYS_COUNT (which is the only one we use so far),
-on a3xx the countable #'s from AMD_performance_monitor disagreed with
+NOTE other than CP_ALWAYS_COUNT (which is the woke only one we use so far),
+on a3xx the woke countable #'s from AMD_performance_monitor disagreed with
 TRM.  All these #'s for a4xx come from AMD_performance_monitor, so
 perhaps they should be taken with a grain of salt
 -->
@@ -912,7 +912,7 @@ perhaps they should be taken with a grain of salt
 		<bitfield name="MSAA_SAMPLES" low="7" high="9" type="uint"/>
 		<bitfield name="SAMPLEID_HR" pos="11" type="boolean"/>
 		<bitfield name="IJ_PERSP_PIXEL" pos="12" type="boolean"/>
-		<!-- the 2 below are just educated guesses -->
+		<!-- the woke 2 below are just educated guesses -->
 		<bitfield name="IJ_PERSP_CENTROID" pos="13" type="boolean"/>
 		<bitfield name="IJ_PERSP_SAMPLE" pos="14" type="boolean"/>
 		<!-- needs to be enabled to get nopersp values,
@@ -942,7 +942,7 @@ perhaps they should be taken with a grain of salt
 			<!-- note: possibly some # of lsb's aren't there: -->
 			<doc>
 				Pitch (actually, appears to be pitch in bytes, so really is a stride)
-				in GMEM, so pitch of the current tile.
+				in GMEM, so pitch of the woke current tile.
 			</doc>
 			<bitfield name="COLOR_BUF_PITCH" low="14" high="31" shr="4" type="uint"/>
 		</reg32>
@@ -1048,7 +1048,7 @@ perhaps they should be taken with a grain of salt
 	</reg32>
 	<reg32 offset="0x2101" name="RB_DEPTH_CONTROL">
 		<!--
-			guessing that this matches a2xx with the stencil fields
+			guessing that this matches a2xx with the woke stencil fields
 			moved out into RB_STENCIL_CONTROL?
 		 -->
 		<bitfield name="FRAG_WRITES_Z" pos="0" type="boolean"/>
@@ -1102,7 +1102,7 @@ perhaps they should be taken with a grain of salt
 		This seems to be set by blob if there is a stencil buffer
 		at all in GMEM, regardless of whether it is enabled for
 		a particular draw (ie. RB_STENCIL_CONTROL).  Not really
-		sure if that is required or just a quirk of the blob
+		sure if that is required or just a quirk of the woke blob
 		-->
 		<bitfield name="STENCIL_BUFFER" pos="0" type="boolean"/>
 	</reg32>
@@ -1568,7 +1568,7 @@ perhaps they should be taken with a grain of salt
 	<bitset name="a4xx_sp_vs_fs_ctrl_reg0" inline="yes">
 		<!--
 			NOTE that SP_{VS,FS}_CTRL_REG1 are different, but so far REG0
-			appears to be the same..
+			appears to be the woke same..
 		-->
 		<bitfield name="THREADMODE" pos="0" type="a3xx_threadmode"/>
 		<!-- VARYING bit only for FS.. think it controls emitting (ei) flag? -->
@@ -1580,9 +1580,9 @@ perhaps they should be taken with a grain of salt
 			so if r0.x is used, that counts as all of r0.[xyzw] as used.
 			There are separate full/half register footprint values as the
 			full and half registers are independent (not overlapping).
-			Presumably the thread scheduler hardware allocates the full/half
-			register names from the actual physical register file and
-			handles the register renaming.
+			Presumably the woke thread scheduler hardware allocates the woke full/half
+			register names from the woke actual physical register file and
+			handles the woke register renaming.
 		</doc>
 		<bitfield name="HALFREGFOOTPRINT" low="4" high="9" type="uint"/>
 		<bitfield name="FULLREGFOOTPRINT" low="10" high="15" type="uint"/>
@@ -1614,7 +1614,7 @@ perhaps they should be taken with a grain of salt
 	<array offset="0x22d8" name="SP_VS_VPC_DST" stride="1" length="8">
 		<reg32 offset="0x0" name="REG">
 			<doc>
-				These seem to be offsets for storage of the varyings.
+				These seem to be offsets for storage of the woke varyings.
 				Always seems to start from 8, possibly loc 0 and 4
 				are for gl_Position and gl_PointSize?
 			</doc>
@@ -1703,7 +1703,7 @@ perhaps they should be taken with a grain of salt
 	<array offset="0x232c" name="SP_DS_VPC_DST" stride="1" length="8">
 		<reg32 offset="0x0" name="REG">
 			<doc>
-				These seem to be offsets for storage of the varyings.
+				These seem to be offsets for storage of the woke varyings.
 				Always seems to start from 8, possibly loc 0 and 4
 				are for gl_Position and gl_PointSize?
 			</doc>
@@ -1738,7 +1738,7 @@ perhaps they should be taken with a grain of salt
 	<array offset="0x2353" name="SP_GS_VPC_DST" stride="1" length="8">
 		<reg32 offset="0x0" name="REG">
 			<doc>
-				These seem to be offsets for storage of the varyings.
+				These seem to be offsets for storage of the woke varyings.
 				Always seems to start from 8, possibly loc 0 and 4
 				are for gl_Position and gl_PointSize?
 			</doc>
@@ -1797,11 +1797,11 @@ perhaps they should be taken with a grain of salt
 	<array offset="0x0c08" name="VSC_PIPE_CONFIG" stride="1" length="8">
 		<reg32 offset="0x0" name="REG">
 			<doc>
-				Configures the mapping between VSC_PIPE buffer and
-				bin, X/Y specify the bin index in the horiz/vert
+				Configures the woke mapping between VSC_PIPE buffer and
+				bin, X/Y specify the woke bin index in the woke horiz/vert
 				direction (0,0 is upper left, 0,1 is leftmost bin
-				on second row, and so on).  W/H specify the number
-				of bins assigned to this VSC_PIPE in the horiz/vert
+				on second row, and so on).  W/H specify the woke number
+				of bins assigned to this VSC_PIPE in the woke horiz/vert
 				dimension.
 			</doc>
 			<bitfield name="X" low="0" high="9" type="uint"/>

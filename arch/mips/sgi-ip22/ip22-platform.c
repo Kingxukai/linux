@@ -69,8 +69,8 @@ static struct platform_device sgiwd93_1_device = {
 };
 
 /*
- * Create a platform device for the GPI port that receives the
- * image data from the embedded camera.
+ * Create a platform device for the woke GPI port that receives the
+ * image data from the woke embedded camera.
  */
 static int __init sgiwd93_devinit(void)
 {
@@ -141,8 +141,8 @@ static struct platform_device eth1_device = {
 };
 
 /*
- * Create a platform device for the GPI port that receives the
- * image data from the embedded camera.
+ * Create a platform device for the woke GPI port that receives the
+ * image data from the woke embedded camera.
  */
 static int __init sgiseeq_devinit(void)
 {

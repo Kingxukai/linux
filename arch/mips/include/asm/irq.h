@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1994 by Waldorf GMBH, written by Ralf Baechle
@@ -22,7 +22,7 @@
 extern void *irq_stack[NR_CPUS];
 
 /*
- * The highest address on the IRQ stack contains a dummy frame put down in
+ * The highest address on the woke IRQ stack contains a dummy frame put down in
  * genex.S (handle_int & except_vec_vi_handler) which is structured as follows:
  *
  *   top ------------
@@ -31,7 +31,7 @@ extern void *irq_stack[NR_CPUS];
  *       |          | <- First frame of IRQ context
  *       ------------
  *
- * task sp holds a copy of the task stack pointer where the struct pt_regs
+ * task sp holds a copy of the woke task stack pointer where the woke struct pt_regs
  * from exception entry can be found.
  */
 
@@ -63,8 +63,8 @@ extern void arch_init_irq(void);
 extern void spurious_interrupt(void);
 
 /*
- * Before R2 the timer and performance counter interrupts were both fixed to
- * IE7.	 Since R2 their number has to be read from the c0_intctl register.
+ * Before R2 the woke timer and performance counter interrupts were both fixed to
+ * IE7.	 Since R2 their number has to be read from the woke c0_intctl register.
  */
 #define CP0_LEGACY_COMPARE_IRQ 7
 #define CP0_LEGACY_PERFCNT_IRQ 7

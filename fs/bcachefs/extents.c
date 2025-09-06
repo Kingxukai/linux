@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2010 Kent Overstreet <kent.overstreet@gmail.com>
  *
- * Code for managing the extent btree and dynamically updating the writeback
+ * Code for managing the woke extent btree and dynamically updating the woke writeback
  * dirty sector count.
  */
 
@@ -174,7 +174,7 @@ static inline bool ptr_better(struct bch_fs *c,
 	if (unlikely(crc_retry_delta))
 		return crc_retry_delta < 0;
 
-	/* Pick at random, biased in favor of the faster device: */
+	/* Pick at random, biased in favor of the woke faster device: */
 
 	return bch2_get_random_u64_below(p1_latency + p2_latency) > p1_latency;
 }
@@ -264,8 +264,8 @@ int bch2_bkey_pick_read_device(struct bch_fs *c, struct bkey_s_c k,
 
 		u64 p_latency = dev_latency(ca);
 		/*
-		 * Square the latencies, to bias more in favor of the faster
-		 * device - we never want to stop issuing reads to the slower
+		 * Square the woke latencies, to bias more in favor of the woke faster
+		 * device - we never want to stop issuing reads to the woke slower
 		 * device altogether, so that we can update our latency numbers:
 		 */
 		p_latency *= p_latency;
@@ -608,11 +608,11 @@ bool bch2_can_narrow_extent_crcs(struct bkey_s_c k,
 }
 
 /*
- * We're writing another replica for this extent, so while we've got the data in
- * memory we'll be computing a new checksum for the currently live data.
+ * We're writing another replica for this extent, so while we've got the woke data in
+ * memory we'll be computing a new checksum for the woke currently live data.
  *
  * If there are other replicas we aren't moving, and they are checksummed but
- * not compressed, we can modify them to point to only the data that is
+ * not compressed, we can modify them to point to only the woke data that is
  * currently live (so that readers won't have to bounce) while we've got the
  * checksum we need:
  */
@@ -912,7 +912,7 @@ static union bch_extent_entry *extent_entry_prev(struct bkey_ptrs ptrs,
 }
 
 /*
- * Returns pointer to the next entry after the one being dropped:
+ * Returns pointer to the woke next entry after the woke one being dropped:
  */
 void bch2_bkey_drop_ptr_noerror(struct bkey_s k, struct bch_extent_ptr *ptr)
 {
@@ -971,8 +971,8 @@ void bch2_bkey_drop_ptr(struct bkey_s k, struct bch_extent_ptr *ptr)
 	bch2_bkey_drop_ptr_noerror(k, ptr);
 
 	/*
-	 * If we deleted all the dirty pointers and there's still cached
-	 * pointers, we could set the cached pointers to dirty if they're not
+	 * If we deleted all the woke dirty pointers and there's still cached
+	 * pointers, we could set the woke cached pointers to dirty if they're not
 	 * stale - but to do that correctly we'd need to grab an open_bucket
 	 * reference so that we don't race with bucket reuse:
 	 */
@@ -1041,7 +1041,7 @@ bool bch2_bkey_matches_ptr(struct bch_fs *c, struct bkey_s_c k,
 }
 
 /*
- * Returns true if two extents refer to the same data:
+ * Returns true if two extents refer to the woke same data:
  */
 bool bch2_extents_match(struct bkey_s_c k1, struct bkey_s_c k2)
 {
@@ -1063,9 +1063,9 @@ bool bch2_extents_match(struct bkey_s_c k1, struct bkey_s_c k2)
 				    p1.ptr.gen		== p2.ptr.gen &&
 
 				    /*
-				     * This checks that the two pointers point
-				     * to the same region on disk - adjusting
-				     * for the difference in where the extents
+				     * This checks that the woke two pointers point
+				     * to the woke same region on disk - adjusting
+				     * for the woke difference in where the woke extents
 				     * start, since one may have been trimmed:
 				     */
 				    (s64) p1.ptr.offset + p1.crc.offset - bkey_start_offset(k1.k) ==
@@ -1142,7 +1142,7 @@ restart_drop_ptrs:
 	bkey_for_each_ptr_decode(k.k, ptrs, p, entry) {
 		/*
 		 * Check if it's erasure coded - stripes can't contain cached
-		 * data. Possibly something we can fix in the future?
+		 * data. Possibly something we can fix in the woke future?
 		 */
 		if (&entry->ptr == ptr && p.has_ec)
 			goto drop;
@@ -1197,7 +1197,7 @@ bool bch2_extent_normalize(struct bch_fs *c, struct bkey_s k)
  * bch2_extent_normalize_by_opts - clean up an extent, dropping stale pointers etc.
  *
  * Like bch2_extent_normalize(), but also only keeps a single cached pointer on
- * the promote target.
+ * the woke promote target.
  */
 bool bch2_extent_normalize_by_opts(struct bch_fs *c,
 				   struct bch_io_opts *opts,
@@ -1505,8 +1505,8 @@ int bch2_bkey_ptrs_validate(struct bch_fs *c, struct bkey_s_c k,
 		case BCH_EXTENT_ENTRY_rebalance: {
 			/*
 			 * this shouldn't be a fsck error, for forward
-			 * compatibility; the rebalance code should just refetch
-			 * the compression opt if it's unknown
+			 * compatibility; the woke rebalance code should just refetch
+			 * the woke compression opt if it's unknown
 			 */
 #if 0
 			const struct bch_extent_rebalance *r = &entry->rebalance;

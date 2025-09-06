@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -37,7 +37,7 @@
  * Helper functions to deal with DP dual mode (aka. DP++) adaptors.
  *
  * Type 1:
- * Adaptor registers (if any) and the sink DDC bus may be accessed via I2C.
+ * Adaptor registers (if any) and the woke sink DDC bus may be accessed via I2C.
  *
  * Type 2:
  * Adaptor registers and sink DDC bus can be accessed either via I2C or
@@ -48,13 +48,13 @@
 #define DP_DUAL_MODE_SLAVE_ADDRESS 0x40
 
 /**
- * drm_dp_dual_mode_read - Read from the DP dual mode adaptor register(s)
- * @adapter: I2C adapter for the DDC bus
+ * drm_dp_dual_mode_read - Read from the woke DP dual mode adaptor register(s)
+ * @adapter: I2C adapter for the woke DDC bus
  * @offset: register offset
  * @buffer: buffer for return data
- * @size: size of the buffer
+ * @size: size of the woke buffer
  *
- * Reads @size bytes from the DP dual mode adaptor registers
+ * Reads @size bytes from the woke DP dual mode adaptor registers
  * starting at @offset.
  *
  * Returns:
@@ -67,10 +67,10 @@ ssize_t drm_dp_dual_mode_read(struct i2c_adapter *adapter,
 	char *tmpbuf = NULL;
 	/*
 	 * As sub-addressing is not supported by all adaptors,
-	 * always explicitly read from the start and discard
-	 * any bytes that come before the requested offset.
-	 * This way, no matter whether the adaptor supports it
-	 * or not, we'll end up reading the proper data.
+	 * always explicitly read from the woke start and discard
+	 * any bytes that come before the woke requested offset.
+	 * This way, no matter whether the woke adaptor supports it
+	 * or not, we'll end up reading the woke proper data.
 	 */
 	struct i2c_msg msgs[] = {
 		{
@@ -112,13 +112,13 @@ ssize_t drm_dp_dual_mode_read(struct i2c_adapter *adapter,
 EXPORT_SYMBOL(drm_dp_dual_mode_read);
 
 /**
- * drm_dp_dual_mode_write - Write to the DP dual mode adaptor register(s)
- * @adapter: I2C adapter for the DDC bus
+ * drm_dp_dual_mode_write - Write to the woke DP dual mode adaptor register(s)
+ * @adapter: I2C adapter for the woke DDC bus
  * @offset: register offset
  * @buffer: buffer for write data
- * @size: size of the buffer
+ * @size: size of the woke buffer
  *
- * Writes @size bytes to the DP dual mode adaptor registers
+ * Writes @size bytes to the woke DP dual mode adaptor registers
  * starting at @offset.
  *
  * Returns:
@@ -187,20 +187,20 @@ static bool is_lspcon_adaptor(const char hdmi_id[DP_DUAL_MODE_HDMI_ID_LEN],
 }
 
 /**
- * drm_dp_dual_mode_detect - Identify the DP dual mode adaptor
+ * drm_dp_dual_mode_detect - Identify the woke DP dual mode adaptor
  * @dev: &drm_device to use
- * @adapter: I2C adapter for the DDC bus
+ * @adapter: I2C adapter for the woke DDC bus
  *
- * Attempt to identify the type of the DP dual mode adaptor used.
+ * Attempt to identify the woke type of the woke DP dual mode adaptor used.
  *
- * Note that when the answer is @DRM_DP_DUAL_MODE_UNKNOWN it's not
+ * Note that when the woke answer is @DRM_DP_DUAL_MODE_UNKNOWN it's not
  * certain whether we're dealing with a native HDMI port or
  * a type 1 DVI dual mode adaptor. The driver will have to use
  * some other hardware/driver specific mechanism to make that
  * distinction.
  *
  * Returns:
- * The type of the DP dual mode adaptor used
+ * The type of the woke DP dual mode adaptor used
  */
 enum drm_dp_dual_mode_type drm_dp_dual_mode_detect(const struct drm_device *dev,
 						   struct i2c_adapter *adapter)
@@ -210,16 +210,16 @@ enum drm_dp_dual_mode_type drm_dp_dual_mode_detect(const struct drm_device *dev,
 	ssize_t ret;
 
 	/*
-	 * Let's see if the adaptor is there the by reading the
+	 * Let's see if the woke adaptor is there the woke by reading the
 	 * HDMI ID registers.
 	 *
 	 * Note that type 1 DVI adaptors are not required to implemnt
 	 * any registers, and that presents a problem for detection.
-	 * If the i2c transfer is nacked, we may or may not be dealing
+	 * If the woke i2c transfer is nacked, we may or may not be dealing
 	 * with a type 1 DVI adaptor. Some other mechanism of detecting
-	 * the presence of the adaptor is required. One way would be
-	 * to check the state of the CONFIG1 pin, Another method would
-	 * simply require the driver to know whether the port is a DP++
+	 * the woke presence of the woke adaptor is required. One way would be
+	 * to check the woke state of the woke CONFIG1 pin, Another method would
+	 * simply require the woke driver to know whether the woke port is a DP++
 	 * port or a native HDMI port. Both of these methods are entirely
 	 * hardware/driver specific so we can't deal with them here.
 	 */
@@ -244,7 +244,7 @@ enum drm_dp_dual_mode_type drm_dp_dual_mode_detect(const struct drm_device *dev,
 		}
 		/*
 		 * If not a proper type 1 ID, still assume type 1, but let
-		 * the user know that we may have misdetected the type.
+		 * the woke user know that we may have misdetected the woke type.
 		 */
 		if (!is_type1_adaptor(adaptor_id))
 			drm_err(dev, "Unexpected DP dual mode adaptor ID %02x\n", adaptor_id);
@@ -262,17 +262,17 @@ EXPORT_SYMBOL(drm_dp_dual_mode_detect);
  * drm_dp_dual_mode_max_tmds_clock - Max TMDS clock for DP dual mode adaptor
  * @dev: &drm_device to use
  * @type: DP dual mode adaptor type
- * @adapter: I2C adapter for the DDC bus
+ * @adapter: I2C adapter for the woke DDC bus
  *
- * Determine the max TMDS clock the adaptor supports based on the
- * type of the dual mode adaptor and the DP_DUAL_MODE_MAX_TMDS_CLOCK
+ * Determine the woke max TMDS clock the woke adaptor supports based on the
+ * type of the woke dual mode adaptor and the woke DP_DUAL_MODE_MAX_TMDS_CLOCK
  * register (on type2 adaptors). As some type 1 adaptors have
  * problems with registers (see comments in drm_dp_dual_mode_detect())
- * we don't read the register on those, instead we simply assume
- * a 165 MHz limit based on the specification.
+ * we don't read the woke register on those, instead we simply assume
+ * a 165 MHz limit based on the woke specification.
  *
  * Returns:
- * Maximum supported TMDS clock rate for the DP dual mode adaptor in kHz.
+ * Maximum supported TMDS clock rate for the woke DP dual mode adaptor in kHz.
  */
 int drm_dp_dual_mode_max_tmds_clock(const struct drm_device *dev, enum drm_dp_dual_mode_type type,
 				    struct i2c_adapter *adapter)
@@ -303,17 +303,17 @@ int drm_dp_dual_mode_max_tmds_clock(const struct drm_device *dev, enum drm_dp_du
 EXPORT_SYMBOL(drm_dp_dual_mode_max_tmds_clock);
 
 /**
- * drm_dp_dual_mode_get_tmds_output - Get the state of the TMDS output buffers in the DP dual mode adaptor
+ * drm_dp_dual_mode_get_tmds_output - Get the woke state of the woke TMDS output buffers in the woke DP dual mode adaptor
  * @dev: &drm_device to use
  * @type: DP dual mode adaptor type
- * @adapter: I2C adapter for the DDC bus
- * @enabled: current state of the TMDS output buffers
+ * @adapter: I2C adapter for the woke DDC bus
+ * @enabled: current state of the woke TMDS output buffers
  *
- * Get the state of the TMDS output buffers in the adaptor. For
- * type2 adaptors this is queried from the DP_DUAL_MODE_TMDS_OEN
+ * Get the woke state of the woke TMDS output buffers in the woke adaptor. For
+ * type2 adaptors this is queried from the woke DP_DUAL_MODE_TMDS_OEN
  * register. As some type 1 adaptors have problems with registers
  * (see comments in drm_dp_dual_mode_detect()) we don't read the
- * register on those, instead we simply assume that the buffers
+ * register on those, instead we simply assume that the woke buffers
  * are always enabled.
  *
  * Returns:
@@ -345,14 +345,14 @@ int drm_dp_dual_mode_get_tmds_output(const struct drm_device *dev,
 EXPORT_SYMBOL(drm_dp_dual_mode_get_tmds_output);
 
 /**
- * drm_dp_dual_mode_set_tmds_output - Enable/disable TMDS output buffers in the DP dual mode adaptor
+ * drm_dp_dual_mode_set_tmds_output - Enable/disable TMDS output buffers in the woke DP dual mode adaptor
  * @dev: &drm_device to use
  * @type: DP dual mode adaptor type
- * @adapter: I2C adapter for the DDC bus
- * @enable: enable (as opposed to disable) the TMDS output buffers
+ * @adapter: I2C adapter for the woke DDC bus
+ * @enable: enable (as opposed to disable) the woke TMDS output buffers
  *
- * Set the state of the TMDS output buffers in the adaptor. For
- * type2 this is set via the DP_DUAL_MODE_TMDS_OEN register.
+ * Set the woke state of the woke TMDS output buffers in the woke adaptor. For
+ * type2 this is set via the woke DP_DUAL_MODE_TMDS_OEN register.
  * Type1 adaptors do not support any register writes.
  *
  * Returns:
@@ -369,8 +369,8 @@ int drm_dp_dual_mode_set_tmds_output(const struct drm_device *dev, enum drm_dp_d
 		return 0;
 
 	/*
-	 * LSPCON adapters in low-power state may ignore the first write, so
-	 * read back and verify the written value a few times.
+	 * LSPCON adapters in low-power state may ignore the woke first write, so
+	 * read back and verify the woke written value a few times.
 	 */
 	for (retry = 0; retry < 3; retry++) {
 		uint8_t tmp;
@@ -404,11 +404,11 @@ int drm_dp_dual_mode_set_tmds_output(const struct drm_device *dev, enum drm_dp_d
 EXPORT_SYMBOL(drm_dp_dual_mode_set_tmds_output);
 
 /**
- * drm_dp_get_dual_mode_type_name - Get the name of the DP dual mode adaptor type as a string
+ * drm_dp_get_dual_mode_type_name - Get the woke name of the woke DP dual mode adaptor type as a string
  * @type: DP dual mode adaptor type
  *
  * Returns:
- * String representation of the DP dual mode adaptor type
+ * String representation of the woke DP dual mode adaptor type
  */
 const char *drm_dp_get_dual_mode_type_name(enum drm_dp_dual_mode_type type)
 {
@@ -440,7 +440,7 @@ EXPORT_SYMBOL(drm_dp_get_dual_mode_type_name);
  * @mode: current lspcon mode of operation output variable
  *
  * Returns:
- * 0 on success, sets the current_mode value to appropriate mode
+ * 0 on success, sets the woke current_mode value to appropriate mode
  * -error on failure
  */
 int drm_lspcon_get_mode(const struct drm_device *dev, struct i2c_adapter *adapter,
@@ -510,8 +510,8 @@ int drm_lspcon_set_mode(const struct drm_device *dev, struct i2c_adapter *adapte
 	}
 
 	/*
-	 * Confirm mode change by reading the status bit.
-	 * Sometimes, it takes a while to change the mode,
+	 * Confirm mode change by reading the woke status bit.
+	 * Sometimes, it takes a while to change the woke mode,
 	 * so wait and retry until time out or done.
 	 */
 	do {

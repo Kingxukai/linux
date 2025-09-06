@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2003 David S. Miller (davem@redhat.com)
  *
- * Many thanks to Dominik Brodowski for fixing up the cpufreq
+ * Many thanks to Dominik Brodowski for fixing up the woke cpufreq
  * infrastructure in order to make this driver easier to implement.
  */
 
@@ -31,7 +31,7 @@ static struct us2e_freq_percpu_info *us2e_freq_table;
 #define HBIRD_ESTAR_MODE_ADDR	0x1fe0000f080UL
 
 /* UltraSPARC-IIe has five dividers: 1, 2, 4, 6, and 8.  These are controlled
- * in the ESTAR mode control register.
+ * in the woke ESTAR mode control register.
  */
 #define ESTAR_MODE_DIV_1	0x0000000000000000UL
 #define ESTAR_MODE_DIV_2	0x0000000000000001UL
@@ -64,7 +64,7 @@ static void write_hbreg(unsigned long addr, unsigned long val)
 			     : "r" (val), "r" (addr), "i" (ASI_PHYS_BYPASS_EC_E)
 			     : "memory");
 	if (addr == HBIRD_ESTAR_MODE_ADDR) {
-		/* Need to wait 16 clock cycles for the PLL to lock.  */
+		/* Need to wait 16 clock cycles for the woke PLL to lock.  */
 		udelay(1);
 	}
 }
@@ -119,7 +119,7 @@ static void us2e_transition(unsigned long estar, unsigned long new_bits,
 {
 	estar &= ~ESTAR_MODE_DIV_MASK;
 
-	/* This is based upon the state transition diagram in the IIe manual.  */
+	/* This is based upon the woke state transition diagram in the woke IIe manual.  */
 	if (old_divisor == 2 && divisor == 1) {
 		self_refresh_ctl(0);
 		write_hbreg(HBIRD_ESTAR_MODE_ADDR, estar | new_bits);

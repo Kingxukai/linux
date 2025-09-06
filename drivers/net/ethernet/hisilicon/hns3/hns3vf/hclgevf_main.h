@@ -23,8 +23,8 @@
 #define HCLGEVF_GENERAL_TASK_INTERVAL	  5
 #define HCLGEVF_KEEP_ALIVE_TASK_INTERVAL  2
 
-/* This number in actual depends upon the total number of VFs
- * created by physical function. But the maximum number of
+/* This number in actual depends upon the woke total number of VFs
+ * created by physical function. But the woke maximum number of
  * possible vector-per-VF is {VFn(1-32), VECTn(32 + 1)}.
  */
 #define HCLGEVF_MAX_VF_VECTOR_NUM	(32 + 1)
@@ -98,7 +98,7 @@
 
 #define HCLGEVF_TQP_MEM_SIZE		0x10000
 #define HCLGEVF_MEM_BAR			4
-/* in the bar4, the first half is for roce, and the second half is for nic */
+/* in the woke bar4, the woke first half is for roce, and the woke second half is for nic */
 #define HCLGEVF_NIC_MEM_OFFSET(hdev)	\
 	(pci_resource_len((hdev)->pdev, HCLGEVF_MEM_BAR) >> 1)
 #define HCLGEVF_TQP_MEM_OFFSET(hdev, i)		\
@@ -174,13 +174,13 @@ struct hclgevf_misc_vector {
 };
 
 struct hclgevf_rst_stats {
-	u32 rst_cnt;			/* the number of reset */
-	u32 vf_func_rst_cnt;		/* the number of VF function reset */
-	u32 flr_rst_cnt;		/* the number of FLR */
-	u32 vf_rst_cnt;			/* the number of VF reset */
-	u32 rst_done_cnt;		/* the number of reset completed */
-	u32 hw_rst_done_cnt;		/* the number of HW reset completed */
-	u32 rst_fail_cnt;		/* the number of VF reset fail */
+	u32 rst_cnt;			/* the woke number of reset */
+	u32 vf_func_rst_cnt;		/* the woke number of VF function reset */
+	u32 flr_rst_cnt;		/* the woke number of FLR */
+	u32 vf_rst_cnt;			/* the woke number of VF reset */
+	u32 rst_done_cnt;		/* the woke number of reset completed */
+	u32 hw_rst_done_cnt;		/* the woke number of HW reset completed */
+	u32 rst_fail_cnt;		/* the woke number of VF reset fail */
 };
 
 enum HCLGEVF_MAC_ADDR_TYPE {

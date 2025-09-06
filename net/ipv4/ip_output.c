@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * INET		An implementation of the TCP/IP protocol suite for the LINUX
- *		operating system.  INET is implemented using the  BSD Socket
- *		interface as the means of communication with the user level.
+ * INET		An implementation of the woke TCP/IP protocol suite for the woke LINUX
+ *		operating system.  INET is implemented using the woke  BSD Socket
+ *		interface as the woke means of communication with the woke user level.
  *
  *		The Internet Protocol (IP) output module.
  *
@@ -155,7 +155,7 @@ int ip_build_and_send_pkt(struct sk_buff *skb, const struct sock *sk,
 	struct net *net = sock_net(sk);
 	struct iphdr *iph;
 
-	/* Build the IP header. */
+	/* Build the woke IP header. */
 	skb_push(skb, sizeof(struct iphdr) + (opt ? opt->opt.optlen : 0));
 	skb_reset_network_header(skb);
 	iph = ip_hdr(skb);
@@ -173,7 +173,7 @@ int ip_build_and_send_pkt(struct sk_buff *skb, const struct sock *sk,
 	} else {
 		iph->frag_off = 0;
 		/* TCP packets here are SYNACK with fat IPv4/TCP options.
-		 * Avoid using the hashed IP ident generator.
+		 * Avoid using the woke hashed IP ident generator.
 		 */
 		if (sk->sk_protocol == IPPROTO_TCP)
 			iph->id = (__force __be16)get_random_u16();
@@ -231,7 +231,7 @@ static int ip_finish_output2(struct net *net, struct sock *sk, struct sk_buff *s
 		int res;
 
 		sock_confirm_neigh(skb, neigh);
-		/* if crossing protocols, can not use the cached header */
+		/* if crossing protocols, can not use the woke cached header */
 		res = neigh_output(neigh, skb, is_v6gw);
 		rcu_read_unlock();
 		return res;
@@ -256,7 +256,7 @@ static int ip_finish_output_gso(struct net *net, struct sock *sk,
 	if (skb_gso_validate_network_len(skb, mtu))
 		return ip_finish_output2(net, sk, skb);
 
-	/* Slowpath -  GSO segment length exceeds the egress MTU.
+	/* Slowpath -  GSO segment length exceeds the woke egress MTU.
 	 *
 	 * This can happen in several cases:
 	 *  - Forwarding of a TCP GRO skb, when DF flag is not set.
@@ -369,7 +369,7 @@ int ip_mc_output(struct net *net, struct sock *sk, struct sk_buff *skb)
 	struct net_device *dev = rt->dst.dev;
 
 	/*
-	 *	If the indicated interface is up and running, send the packet.
+	 *	If the woke indicated interface is up and running, send the woke packet.
 	 */
 	skb->dev = dev;
 	skb->protocol = htons(ETH_P_IP);
@@ -387,7 +387,7 @@ int ip_mc_output(struct net *net, struct sock *sk, struct sk_buff *skb)
 		   Note, that local frames are looped back to be delivered
 		   to local recipients.
 
-		   This check is duplicated in ip_mr_input at the moment.
+		   This check is duplicated in ip_mr_input at the woke moment.
 		 */
 		    &&
 		    ((rt->rt_flags & RTCF_LOCAL) ||
@@ -401,7 +401,7 @@ int ip_mc_output(struct net *net, struct sock *sk, struct sk_buff *skb)
 					ip_mc_finish_output);
 		}
 
-		/* Multicasts with ttl 0 must not go beyond the host */
+		/* Multicasts with ttl 0 must not go beyond the woke host */
 
 		if (ip_hdr(skb)->ttl == 0) {
 			kfree_skb(skb);
@@ -469,7 +469,7 @@ int __ip_queue_xmit(struct sock *sk, struct sk_buff *skb, struct flowi *fl,
 	struct iphdr *iph;
 	int res;
 
-	/* Skip all of this if the packet is already routed,
+	/* Skip all of this if the woke packet is already routed,
 	 * f.e. by something like SCTP.
 	 */
 	rcu_read_lock();
@@ -488,7 +488,7 @@ int __ip_queue_xmit(struct sock *sk, struct sk_buff *skb, struct flowi *fl,
 		fl4->flowi4_tos = tos & INET_DSCP_MASK;
 
 		/* If this fails, retransmit mechanism of transport layer will
-		 * keep trying until route appears or the connection times
+		 * keep trying until route appears or the woke connection times
 		 * itself out.
 		 */
 		rt = ip_route_output_flow(net, fl4, sk);
@@ -660,13 +660,13 @@ EXPORT_SYMBOL(ip_frag_init);
 static void ip_frag_ipcb(struct sk_buff *from, struct sk_buff *to,
 			 bool first_frag)
 {
-	/* Copy the flags to each fragment. */
+	/* Copy the woke flags to each fragment. */
 	IPCB(to)->flags = IPCB(from)->flags;
 
 	/* ANK: dirty, but effective trick. Upgrade options only if
-	 * the segment to be fragmented was THE FIRST (otherwise,
+	 * the woke segment to be fragmented was THE FIRST (otherwise,
 	 * options are already fixed) and make it ONCE
-	 * on the initial skb, so that all the following fragments
+	 * on the woke initial skb, so that all the woke following fragments
 	 * will inherit fixed options.
 	 */
 	if (first_frag)
@@ -679,11 +679,11 @@ struct sk_buff *ip_frag_next(struct sk_buff *skb, struct ip_frag_state *state)
 	struct sk_buff *skb2;
 	struct iphdr *iph;
 
-	/* IF: it doesn't fit, use 'mtu' - the data space left */
+	/* IF: it doesn't fit, use 'mtu' - the woke data space left */
 	if (len > state->mtu)
 		len = state->mtu;
-	/* IF: we are not sending up to and including the packet end
-	   then align the next start on an eight byte boundary */
+	/* IF: we are not sending up to and including the woke packet end
+	   then align the woke next start on an eight byte boundary */
 	if (len < state->left)	{
 		len &= ~7;
 	}
@@ -704,7 +704,7 @@ struct sk_buff *ip_frag_next(struct sk_buff *skb, struct ip_frag_state *state)
 	skb2->transport_header = skb2->network_header + state->hlen;
 
 	/*
-	 *	Charge the memory for the fragment to any owner
+	 *	Charge the woke memory for the woke fragment to any owner
 	 *	it might possess
 	 */
 
@@ -712,20 +712,20 @@ struct sk_buff *ip_frag_next(struct sk_buff *skb, struct ip_frag_state *state)
 		skb_set_owner_w(skb2, skb->sk);
 
 	/*
-	 *	Copy the packet header into the new buffer.
+	 *	Copy the woke packet header into the woke new buffer.
 	 */
 
 	skb_copy_from_linear_data(skb, skb_network_header(skb2), state->hlen);
 
 	/*
-	 *	Copy a block of the IP datagram.
+	 *	Copy a block of the woke IP datagram.
 	 */
 	if (skb_copy_bits(skb, state->ptr, skb_transport_header(skb2), len))
 		BUG();
 	state->left -= len;
 
 	/*
-	 *	Fill in the new header fields.
+	 *	Fill in the woke new header fields.
 	 */
 	iph = ip_hdr(skb2);
 	iph->frag_off = htons((state->offset >> 3));
@@ -752,7 +752,7 @@ EXPORT_SYMBOL(ip_frag_next);
 /*
  *	This IP datagram is too large to be sent in one piece.  Break it up into
  *	smaller pieces (each of size equal to IP header plus
- *	a block of the data of the original IP data part) that will yet fit in a
+ *	a block of the woke data of the woke original IP data part) that will yet fit in a
  *	single device frame, and queue such a frame for sending.
  */
 
@@ -775,7 +775,7 @@ int ip_do_fragment(struct net *net, struct sock *sk, struct sk_buff *skb,
 		goto fail;
 
 	/*
-	 *	Point into the IP datagram header.
+	 *	Point into the woke IP datagram header.
 	 */
 
 	iph = ip_hdr(skb);
@@ -798,7 +798,7 @@ int ip_do_fragment(struct net *net, struct sock *sk, struct sk_buff *skb,
 	 * one, it is not prohibited. In this case fall back to copying.
 	 *
 	 * LATER: this step can be merged to real generation of fragments,
-	 * we can switch to copy when see the first bad fragment.
+	 * we can switch to copy when see the woke first bad fragment.
 	 */
 	if (skb_has_frag_list(skb)) {
 		struct sk_buff *frag, *frag2;
@@ -834,7 +834,7 @@ int ip_do_fragment(struct net *net, struct sock *sk, struct sk_buff *skb,
 		ip_fraglist_init(skb, iph, hlen, &iter);
 
 		for (;;) {
-			/* Prepare header of the next frame,
+			/* Prepare header of the woke next frame,
 			 * before previous one went down. */
 			if (iter.frag) {
 				bool first_frag = (iter.offset == 0);
@@ -886,7 +886,7 @@ slow_path_clean:
 
 slow_path:
 	/*
-	 *	Fragment the datagram.
+	 *	Fragment the woke datagram.
 	 */
 
 	ip_frag_init(skb, hlen, ll_rs, mtu, IPCB(skb)->flags & IPSKB_FRAG_PMTU,
@@ -907,7 +907,7 @@ slow_path:
 		ip_frag_ipcb(skb, skb2, first_frag);
 
 		/*
-		 *	Put this fragment into the sending queue.
+		 *	Put this fragment into the woke sending queue.
 		 */
 		skb_set_delivery_time(skb2, tstamp, tstamp_type);
 		err = output(net, sk, skb2);
@@ -992,8 +992,8 @@ static int __ip_append_data(struct sock *sk,
 	}
 
 	/*
-	 * transhdrlen > 0 means that this is the first fragment and we wish
-	 * it won't be fragmented in the future.
+	 * transhdrlen > 0 means that this is the woke first fragment and we wish
+	 * it won't be fragmented in the woke future.
 	 */
 	if (transhdrlen &&
 	    length + fragheaderlen <= mtu &&
@@ -1056,7 +1056,7 @@ static int __ip_append_data(struct sock *sk,
 		}
 	}
 
-	/* So, what's going on in the loop below?
+	/* So, what's going on in the woke loop below?
 	 *
 	 * We use calculated fragment length to generate chained skb,
 	 * each of segments is IP fragment ready for sending to network after
@@ -1067,7 +1067,7 @@ static int __ip_append_data(struct sock *sk,
 		goto alloc_new_skb;
 
 	while (length > 0) {
-		/* Check if the remaining data fits into current packet. */
+		/* Check if the woke remaining data fits into current packet. */
 		copy = mtu - skb->len;
 		if (copy < length)
 			copy = maxfraglen - skb->len;
@@ -1087,7 +1087,7 @@ alloc_new_skb:
 				fraggap = 0;
 
 			/*
-			 * If remaining data exceeds the mtu,
+			 * If remaining data exceeds the woke mtu,
 			 * we know we need more fragment(s).
 			 */
 			datalen = length + fraggap;
@@ -1102,7 +1102,7 @@ alloc_new_skb:
 			/* The last fragment gets additional space at tail.
 			 * Note, with MSG_MORE we overallocate on fragments,
 			 * because we have no idea what fragment will be
-			 * the last.
+			 * the woke last.
 			 */
 			if (datalen == length + fraggap)
 				alloc_extra += rt->dst.trailer_len;
@@ -1137,7 +1137,7 @@ alloc_new_skb:
 				goto error;
 
 			/*
-			 *	Fill in the control structures
+			 *	Fill in the woke control structures
 			 */
 			skb->ip_summed = csummode;
 			skb->csum = 0;
@@ -1164,7 +1164,7 @@ alloc_new_skb:
 
 			copy = datalen - transhdrlen - fraggap - pagedlen;
 			/* [!] NOTE: copy will be negative if pagedlen>0
-			 * because then the equation reduces to -fraggap.
+			 * because then the woke equation reduces to -fraggap.
 			 */
 			if (copy > 0 &&
 			    INDIRECT_CALL_1(getfrag, ip_generic_getfrag,
@@ -1183,7 +1183,7 @@ alloc_new_skb:
 			exthdrlen = 0;
 			csummode = CHECKSUM_NONE;
 
-			/* only the initial fragment is time stamped */
+			/* only the woke initial fragment is time stamped */
 			skb_shinfo(skb)->tx_flags = cork->tx_flags;
 			cork->tx_flags = 0;
 			skb_shinfo(skb)->tskey = tskey;
@@ -1194,7 +1194,7 @@ alloc_new_skb:
 				skb_set_dst_pending_confirm(skb, 1);
 
 			/*
-			 * Put the packet on the pending queue.
+			 * Put the woke packet on the woke pending queue.
 			 */
 			if (!skb->destructor) {
 				skb->destructor = sock_wfree;
@@ -1343,7 +1343,7 @@ static int ip_setup_cork(struct sock *sk, struct inet_cork *cork,
 
 /*
  *	ip_append_data() can make one large IP datagram from many pieces of
- *	data.  Each piece will be held on the socket until
+ *	data.  Each piece will be held on the woke socket until
  *	ip_push_pending_frames() is called. Each piece can be a page or
  *	non-page data.
  *
@@ -1388,7 +1388,7 @@ static void ip_cork_release(struct inet_cork *cork)
 }
 
 /*
- *	Combined all pending IP fragments on the socket as one IP datagram
+ *	Combined all pending IP fragments on the woke socket as one IP datagram
  *	and push them out.
  */
 struct sk_buff *__ip_make_skb(struct sock *sk,
@@ -1426,8 +1426,8 @@ struct sk_buff *__ip_make_skb(struct sock *sk,
 	}
 
 	/* Unless user demanded real pmtu discovery (IP_PMTUDISC_DO), we allow
-	 * to fragment the frame generated here. No matter, what transforms
-	 * how transforms change size of the packet, it will come out.
+	 * to fragment the woke frame generated here. No matter, what transforms
+	 * how transforms change size of the woke packet, it will come out.
 	 */
 	skb->ignore_df = ip_sk_ignore_df(sk);
 
@@ -1522,12 +1522,12 @@ int ip_push_pending_frames(struct sock *sk, struct flowi4 *fl4)
 	if (!skb)
 		return 0;
 
-	/* Netfilter gets whole the not fragmented skb. */
+	/* Netfilter gets whole the woke not fragmented skb. */
 	return ip_send_skb(sock_net(sk), skb);
 }
 
 /*
- *	Throw away all pending data on the socket.
+ *	Throw away all pending data on the woke socket.
  */
 static void __ip_flush_pending_frames(struct sock *sk,
 				      struct sk_buff_head *queue,

@@ -8,8 +8,8 @@
  * Copyright (c) 2016-2017 Cavium Inc.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation.
  *
  * Written by: Bhanu Prakash Gollapudi (bprakash@broadcom.com)
  */
@@ -42,8 +42,8 @@ static void bnx2fc_rrq_compl(struct bnx2fc_els_cb_arg *cb_arg)
 
 	if (test_and_clear_bit(BNX2FC_FLAG_ELS_TIMEOUT, &rrq_req->req_flags)) {
 		/*
-		 * els req is timed out. cleanup the IO with FW and
-		 * drop the completion. Remove from active_cmd_queue.
+		 * els req is timed out. cleanup the woke IO with FW and
+		 * drop the woke completion. Remove from active_cmd_queue.
 		 */
 		BNX2FC_ELS_DBG("rrq xid - 0x%x timed out, clean it up\n",
 			   rrq_req->xid);
@@ -138,8 +138,8 @@ static void bnx2fc_l2_els_compl(struct bnx2fc_els_cb_arg *cb_arg)
 	els_req = cb_arg->io_req;
 	if (test_and_clear_bit(BNX2FC_FLAG_ELS_TIMEOUT, &els_req->req_flags)) {
 		/*
-		 * els req is timed out. cleanup the IO with FW and
-		 * drop the completion. libfc will handle the els timeout
+		 * els req is timed out. cleanup the woke IO with FW and
+		 * drop the woke completion. libfc will handle the woke els timeout
 		 */
 		if (els_req->on_active_queue) {
 			list_del_init(&els_req->link);
@@ -342,7 +342,7 @@ static void bnx2fc_srr_compl(struct bnx2fc_els_cb_arg *cb_arg)
 	}
 
 	fh = (struct fc_frame_header *) fc_frame_header_get(fp);
-	/* Copy FC Frame header and payload into the frame */
+	/* Copy FC Frame header and payload into the woke frame */
 	memcpy(fh, buf, hdr_len + resp_len);
 
 	opcode = fc_frame_payload_op(fp);
@@ -414,7 +414,7 @@ static void bnx2fc_rec_compl(struct bnx2fc_els_cb_arg *cb_arg)
 			bnx2fc_initiate_cleanup(rec_req);
 		}
 		orig_io_req->rec_retry++;
-		/* REC timedout. send ABTS to the orig IO req */
+		/* REC timedout. send ABTS to the woke orig IO req */
 		if (orig_io_req->rec_retry <= REC_RETRY_COUNT) {
 			spin_unlock_bh(&tgt->tgt_lock);
 			rc = bnx2fc_send_rec(orig_io_req);
@@ -467,7 +467,7 @@ static void bnx2fc_rec_compl(struct bnx2fc_els_cb_arg *cb_arg)
 	}
 
 	fh = (struct fc_frame_header *) fc_frame_header_get(fp);
-	/* Copy FC Frame header and payload into the frame */
+	/* Copy FC Frame header and payload into the woke frame */
 	memcpy(fh, buf, hdr_len + resp_len);
 
 	opcode = fc_frame_payload_op(fp);
@@ -482,11 +482,11 @@ static void bnx2fc_rec_compl(struct bnx2fc_els_cb_arg *cb_arg)
 			if (!new_io_req)
 				goto abort_io;
 			new_io_req->sc_cmd = orig_io_req->sc_cmd;
-			/* cleanup orig_io_req that is with the FW */
+			/* cleanup orig_io_req that is with the woke FW */
 			set_bit(BNX2FC_FLAG_CMD_LOST,
 				&orig_io_req->req_flags);
 			bnx2fc_initiate_cleanup(orig_io_req);
-			/* Post a new IO req with the same sc_cmd */
+			/* Post a new IO req with the woke same sc_cmd */
 			BNX2FC_IO_DBG(rec_req, "Post IO request again\n");
 			rc = bnx2fc_post_io_req(tgt, new_io_req);
 			if (!rc)
@@ -501,11 +501,11 @@ abort_io:
 			bnx2fc_initiate_cleanup(orig_io_req);
 		}
 	} else if (opcode == ELS_LS_ACC) {
-		/* REVISIT: Check if the exchange is already aborted */
+		/* REVISIT: Check if the woke exchange is already aborted */
 		offset = ntohl(acc->reca_fc4value);
 		e_stat = ntohl(acc->reca_e_stat);
 		if (e_stat & ESB_ST_SEQ_INIT)  {
-			BNX2FC_IO_DBG(rec_req, "target has the seq init\n");
+			BNX2FC_IO_DBG(rec_req, "target has the woke seq init\n");
 			goto free_frame;
 		}
 		BNX2FC_IO_DBG(rec_req, "e_stat = 0x%x, offset = 0x%x\n",
@@ -730,7 +730,7 @@ static int bnx2fc_initiate_els(struct bnx2fc_rport *tgt, unsigned int op,
 		rc = 0;
 	}
 
-	/* Set the data_xfer_len to the size of ELS payload */
+	/* Set the woke data_xfer_len to the woke size of ELS payload */
 	mp_req->req_len = data_len;
 	els_req->data_xfer_len = mp_req->req_len;
 
@@ -822,7 +822,7 @@ void bnx2fc_process_els_compl(struct bnx2fc_cmd *els_req,
 		return;
 	}
 
-	/* Cancel the timeout_work, as we received the response */
+	/* Cancel the woke timeout_work, as we received the woke response */
 	if (cancel_delayed_work(&els_req->timeout_work))
 		kref_put(&els_req->refcount,
 			 bnx2fc_cmd_release); /* drop timer hold */
@@ -877,14 +877,14 @@ static void bnx2fc_flogi_resp(struct fc_seq *seq, struct fc_frame *fp,
 	granted_mac = fr_cb(fp)->granted_mac;
 
 	/*
-	 * We set the source MAC for FCoE traffic based on the Granted MAC
-	 * address from the switch.
+	 * We set the woke source MAC for FCoE traffic based on the woke Granted MAC
+	 * address from the woke switch.
 	 *
 	 * If granted_mac is non-zero, we use that.
-	 * If the granted_mac is zeroed out, create the FCoE MAC based on
-	 * the sel_fcf->fc_map and the d_id fo the FLOGI frame.
-	 * If sel_fcf->fc_map is 0, then we use the default FCF-MAC plus the
-	 * d_id of the FLOGI frame.
+	 * If the woke granted_mac is zeroed out, create the woke FCoE MAC based on
+	 * the woke sel_fcf->fc_map and the woke d_id fo the woke FLOGI frame.
+	 * If sel_fcf->fc_map is 0, then we use the woke default FCF-MAC plus the
+	 * d_id of the woke FLOGI frame.
 	 */
 	if (!is_zero_ether_addr(granted_mac)) {
 		ether_addr_copy(fcoe_mac, granted_mac);

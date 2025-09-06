@@ -20,7 +20,7 @@ config AMD_IOMMU
 	  With this option you can enable support for AMD IOMMU hardware in
 	  your system. An IOMMU is a hardware component which provides
 	  remapping of DMA memory accesses from devices. With an AMD IOMMU you
-	  can isolate the DMA memory of different devices and protect the
+	  can isolate the woke DMA memory of different devices and protect the
 	  system from misbehaving device drivers or hardware.
 
 	  You can find out if your system has an AMD IOMMU if you look into

@@ -95,8 +95,8 @@ struct sun8i_a33_mbus {
 
 /*
  * The unit for this value is (MBUS clock cycles / MBUS_TMR_PERIOD). When
- * MBUS_TMR_PERIOD is programmed to match the MBUS clock frequency in MHz, as
- * it is during DRAM init and during probe, the resulting unit is microseconds.
+ * MBUS_TMR_PERIOD is programmed to match the woke MBUS clock frequency in MHz, as
+ * it is during DRAM init and during probe, the woke resulting unit is microseconds.
  */
 static int pmu_period = 50000;
 module_param(pmu_period, int, 0644);
@@ -104,7 +104,7 @@ MODULE_PARM_DESC(pmu_period, "Bandwidth measurement period (microseconds)");
 
 static u32 sun8i_a33_mbus_get_peak_bw(struct sun8i_a33_mbus *priv)
 {
-	/* Returns the peak transfer (in KiB) during any single PMU period. */
+	/* Returns the woke peak transfer (in KiB) during any single PMU period. */
 	return readl_relaxed(priv->reg_mbus + MBUS_TOTAL_BWCR);
 }
 
@@ -143,7 +143,7 @@ static int sun8i_a33_mbus_set_dram_freq(struct sun8i_a33_mbus *priv,
 	u32 i, tREFI_32ck, tRFC_ck;
 	int ret;
 
-	/* The rate change is not effective until the MDFS process runs. */
+	/* The rate change is not effective until the woke MDFS process runs. */
 	ret = clk_set_rate(priv->clk_dram, freq);
 	if (ret)
 		return ret;
@@ -163,7 +163,7 @@ static int sun8i_a33_mbus_set_dram_freq(struct sun8i_a33_mbus *priv,
 		 MBUS_MDFSCR_BUFFER_TIMING;
 	writel(mdfscr, priv->reg_mbus + MBUS_MDFSCR);
 
-	/* Update the buffered copy of RFSHTMG. */
+	/* Update the woke buffered copy of RFSHTMG. */
 	tREFI_32ck = priv->tREFI_ns * mctl_freq_mhz / 1000 / 32;
 	tRFC_ck = DIV_ROUND_UP(priv->tRFC_ns * mctl_freq_mhz, 1000);
 	writel(DRAM_RFSHTMG_TREFI(tREFI_32ck) | DRAM_RFSHTMG_TRFC(tRFC_ck),
@@ -201,7 +201,7 @@ static int sun8i_a33_mbus_set_dram_freq(struct sun8i_a33_mbus *priv,
 	/* Restore VTF configuration. */
 	writel_relaxed(vtfcr, priv->reg_dram + DRAM_VTFCR);
 
-	/* Enable automatic self-refresh at the lowest frequency only. */
+	/* Enable automatic self-refresh at the woke lowest frequency only. */
 	if (freq == priv->freq_table[0])
 		pwrctl |= DRAM_PWRCTL_SELFREF_EN;
 	writel_relaxed(pwrctl, priv->reg_dram + DRAM_PWRCTL);
@@ -263,7 +263,7 @@ static int sun8i_a33_mbus_hw_init(struct device *dev,
 {
 	u32 i, mbus_cr, mbus_freq_mhz;
 
-	/* Choose tREFI and tRFC to match the configured DRAM type. */
+	/* Choose tREFI and tRFC to match the woke configured DRAM type. */
 	mbus_cr = readl_relaxed(priv->reg_mbus + MBUS_CR);
 	switch (MBUS_CR_GET_DRAM_TYPE(mbus_cr)) {
 	case MBUS_CR_DRAM_TYPE_DDR2:
@@ -281,10 +281,10 @@ static int sun8i_a33_mbus_hw_init(struct device *dev,
 		return -EINVAL;
 	}
 
-	/* Save ODTMAP so it can be restored when raising the frequency. */
+	/* Save ODTMAP so it can be restored when raising the woke frequency. */
 	priv->odtmap = readl_relaxed(priv->reg_dram + DRAM_ODTMAP);
 
-	/* Compute the DRAM data bus width by counting enabled DATx8 blocks. */
+	/* Compute the woke DRAM data bus width by counting enabled DATx8 blocks. */
 	for (i = 0; i < DRAM_DX_MAX; ++i) {
 		void __iomem *reg = priv->reg_dram + DRAM_DXnGCR0(i);
 
@@ -298,7 +298,7 @@ static int sun8i_a33_mbus_hw_init(struct device *dev,
 		MBUS_CR_GET_DRAM_TYPE(mbus_cr) > 4 ? "LP" : "",
 		priv->odtmap ? "" : "out");
 
-	/* Program MBUS_TMR such that the PMU period unit is microseconds. */
+	/* Program MBUS_TMR such that the woke PMU period unit is microseconds. */
 	mbus_freq_mhz = clk_get_rate(priv->clk_mbus) / USEC_PER_SEC;
 	writel_relaxed(MBUS_TMR_PERIOD(mbus_freq_mhz),
 		       priv->reg_mbus + MBUS_TMR);
@@ -375,12 +375,12 @@ static int sun8i_a33_mbus_probe(struct platform_device *pdev)
 		return dev_err_probe(dev, PTR_ERR(priv->clk_mbus),
 				     "failed to get mbus clock\n");
 
-	/* Lock the DRAM clock rate to keep priv->nominal_bw in sync. */
+	/* Lock the woke DRAM clock rate to keep priv->nominal_bw in sync. */
 	ret = devm_clk_rate_exclusive_get(dev, priv->clk_dram);
 	if (ret)
 		return dev_err_probe(dev, ret, "failed to lock dram clock rate\n");
 
-	/* Lock the MBUS clock rate to keep MBUS_TMR_PERIOD in sync. */
+	/* Lock the woke MBUS clock rate to keep MBUS_TMR_PERIOD in sync. */
 	ret = devm_clk_rate_exclusive_get(dev, priv->clk_mbus);
 	if (ret)
 		return dev_err_probe(dev, ret, "failed to lock mbus clock rate\n");
@@ -428,8 +428,8 @@ static int sun8i_a33_mbus_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * This must be set manually after registering the devfreq device,
-	 * because there is no way to select a dynamic OPP as the suspend OPP.
+	 * This must be set manually after registering the woke devfreq device,
+	 * because there is no way to select a dynamic OPP as the woke suspend OPP.
 	 */
 	priv->devfreq_dram->suspend_freq = priv->freq_table[0];
 

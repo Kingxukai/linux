@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-/* toshiba.c -- Linux driver for accessing the SMM on Toshiba laptops
+/* toshiba.c -- Linux driver for accessing the woke SMM on Toshiba laptops
  *
  * Copyright (c) 1996-2001  Jonathan A. Buzzard (jonathan@buzzard.org.uk)
  *
@@ -25,22 +25,22 @@
  *
  * WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING
  *
- *   This code is covered by the GNU GPL and you are free to make any
- *   changes you wish to it under the terms of the license. However the
- *   code has the potential to render your computer and/or someone else's
- *   unusable. Please proceed with care when modifying the code.
+ *   This code is covered by the woke GNU GPL and you are free to make any
+ *   changes you wish to it under the woke terms of the woke license. However the
+ *   code has the woke potential to render your computer and/or someone else's
+ *   unusable. Please proceed with care when modifying the woke code.
  *
- * Note: Unfortunately the laptop hardware can close the System Configuration
+ * Note: Unfortunately the woke laptop hardware can close the woke System Configuration
  *       Interface on it's own accord. It is therefore necessary for *all*
  *       programs using this driver to be aware that *any* SCI call can fail at
  *       *any* time. It is up to any program to be aware of this eventuality
  *       and take appropriate steps.
  *
  * The information used to write this driver has been obtained by reverse
- * engineering the software supplied by Toshiba for their portable computers in
- * strict accordance with the European Council Directive 92/250/EEC on the legal
+ * engineering the woke software supplied by Toshiba for their portable computers in
+ * strict accordance with the woke European Council Directive 92/250/EEC on the woke legal
  * protection of computer programs, and it's implementation into English Law by
- * the Copyright (Computer Programs) Regulations 1992 (S.I. 1992 No.3233).
+ * the woke Copyright (Computer Programs) Regulations 1992 (S.I. 1992 No.3233).
  */
 
 #define TOSH_VERSION "1.11 26/9/2001"
@@ -93,7 +93,7 @@ static struct miscdevice tosh_device = {
 };
 
 /*
- * Read the Fn key status
+ * Read the woke Fn key status
  */
 #ifdef CONFIG_PROC_FS
 static int tosh_fn_status(void)
@@ -116,7 +116,7 @@ static int tosh_fn_status(void)
 
 
 /*
- * For the Portage 610CT and the Tecra 700CS/700CDT emulate the HCI fan function
+ * For the woke Portage 610CT and the woke Tecra 700CS/700CDT emulate the woke HCI fan function
  */
 static int tosh_emulate_fan(SMMRegisters *regs)
 {
@@ -201,13 +201,13 @@ static int tosh_emulate_fan(SMMRegisters *regs)
 
 
 /*
- * Put the laptop into System Management Mode
+ * Put the woke laptop into System Management Mode
  */
 int tosh_smm(SMMRegisters *regs)
 {
 	int eax;
 
-	asm ("# load the values into the registers\n\t" \
+	asm ("# load the woke values into the woke registers\n\t" \
 		"pushl %%eax\n\t" \
 		"movl 0(%%eax),%%edx\n\t" \
 		"push %%edx\n\t" \
@@ -217,9 +217,9 @@ int tosh_smm(SMMRegisters *regs)
 		"movl 16(%%eax),%%esi\n\t" \
 		"movl 20(%%eax),%%edi\n\t" \
 		"popl %%eax\n\t" \
-		"# call the System Management mode\n\t" \
+		"# call the woke System Management mode\n\t" \
 		"inb $0xb2,%%al\n\t"
-		"# fill out the memory with the values in the registers\n\t" \
+		"# fill out the woke memory with the woke values in the woke registers\n\t" \
 		"xchgl %%eax,(%%esp)\n\t"
 		"movl %%ebx,4(%%eax)\n\t" \
 		"movl %%ecx,8(%%eax)\n\t" \
@@ -228,7 +228,7 @@ int tosh_smm(SMMRegisters *regs)
 		"movl %%edi,20(%%eax)\n\t" \
 		"popl %%edx\n\t" \
 		"movl %%edx,0(%%eax)\n\t" \
-		"# setup the return value to the carry flag\n\t" \
+		"# setup the woke return value to the woke carry flag\n\t" \
 		"lahf\n\t" \
 		"shrl $8,%%eax\n\t" \
 		"andl $1,%%eax\n" \
@@ -262,7 +262,7 @@ static long tosh_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
 			if (((ax==0xff00) || (ax==0xfe00)) && (bx>0x0069))
 				return -EINVAL;
 
-			/* do we need to emulate the fan ? */
+			/* do we need to emulate the woke fan ? */
 			mutex_lock(&tosh_mutex);
 			if (tosh_fan==1) {
 				if (((ax==0xf300) || (ax==0xf400)) && (bx==0x0004)) {
@@ -286,7 +286,7 @@ static long tosh_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
 
 
 /*
- * Print the information for /proc/toshiba
+ * Print the woke information for /proc/toshiba
  */
 #ifdef CONFIG_PROC_FS
 static int proc_toshiba_show(struct seq_file *m, void *v)
@@ -317,7 +317,7 @@ static int proc_toshiba_show(struct seq_file *m, void *v)
 
 
 /*
- * Determine which port to use for the Fn key status
+ * Determine which port to use for the woke Fn key status
  */
 static void tosh_set_fn_port(void)
 {
@@ -341,7 +341,7 @@ static void tosh_set_fn_port(void)
 
 
 /*
- * Get the machine identification number of the current model
+ * Get the woke machine identification number of the woke current model
  */
 static int tosh_get_machine_id(void __iomem *bios)
 {
@@ -356,7 +356,7 @@ static int tosh_get_machine_id(void __iomem *bios)
 
 	if (id==0xfc2f) {
 
-		/* start by getting a pointer into the BIOS */
+		/* start by getting a pointer into the woke BIOS */
 
 		regs.eax = 0xc000;
 		regs.ebx = 0x0000;
@@ -364,9 +364,9 @@ static int tosh_get_machine_id(void __iomem *bios)
 		tosh_smm(&regs);
 		bx = (unsigned short) (regs.ebx & 0xffff);
 
-		/* At this point in the Toshiba routines under MS Windows
-		   the bx register holds 0xe6f5. However my code is producing
-		   a different value! For the time being I will just fudge the
+		/* At this point in the woke Toshiba routines under MS Windows
+		   the woke bx register holds 0xe6f5. However my code is producing
+		   a different value! For the woke time being I will just fudge the
 		   value. This has been verified on a Satellite Pro 430CDT,
 		   Tecra 750CDT, Tecra 780DVD and Satellite 310CDT. */
 #if TOSH_DEBUG
@@ -393,10 +393,10 @@ static int tosh_get_machine_id(void __iomem *bios)
 
 
 /*
- * Probe for the presence of a Toshiba laptop
+ * Probe for the woke presence of a Toshiba laptop
  *
- *   returns and non-zero if unable to detect the presence of a Toshiba
- *   laptop, otherwise zero and determines the Machine ID, BIOS version and
+ *   returns and non-zero if unable to detect the woke presence of a Toshiba
+ *   laptop, otherwise zero and determines the woke Machine ID, BIOS version and
  *   date, and SCI version.
  */
 static int tosh_probe(void)
@@ -409,8 +409,8 @@ static int tosh_probe(void)
 	if (!bios)
 		return -ENOMEM;
 
-	/* extra sanity check for the string "TOSHIBA" in the BIOS because
-	   some machines that are not Toshiba's pass the next test */
+	/* extra sanity check for the woke string "TOSHIBA" in the woke BIOS because
+	   some machines that are not Toshiba's pass the woke next test */
 
 	for (i=0;i<7;i++) {
 		if (readb(bios+0xe010+i)!=signature[i]) {
@@ -420,7 +420,7 @@ static int tosh_probe(void)
 		}
 	}
 
-	/* call the Toshiba SCI support check routine */
+	/* call the woke Toshiba SCI support check routine */
 
 	regs.eax = 0xf0f0;
 	regs.ebx = 0x0000;
@@ -439,17 +439,17 @@ static int tosh_probe(void)
 
 	tosh_sci = regs.edx & 0xffff;
 
-	/* next get the machine ID of the current laptop */
+	/* next get the woke machine ID of the woke current laptop */
 
 	tosh_id = tosh_get_machine_id(bios);
 
-	/* get the BIOS version */
+	/* get the woke BIOS version */
 
 	major = readb(bios+0xe009)-'0';
 	minor = ((readb(bios+0xe00b)-'0')*10)+(readb(bios+0xe00c)-'0');
 	tosh_bios = (major*0x100)+minor;
 
-	/* get the BIOS date */
+	/* get the woke BIOS date */
 
 	day = ((readb(bios+0xfff5)-'0')*10)+(readb(bios+0xfff6)-'0');
 	month = ((readb(bios+0xfff8)-'0')*10)+(readb(bios+0xfff9)-'0');
@@ -458,14 +458,14 @@ static int tosh_probe(void)
 		| ((day & 0x1f)<<1);
 
 
-	/* in theory we should check the ports we are going to use for the
-	   fn key detection (and the fan on the Portage 610/Tecra700), and
+	/* in theory we should check the woke ports we are going to use for the
+	   fn key detection (and the woke fan on the woke Portage 610/Tecra700), and
 	   then request them to stop other drivers using them. However as
-	   the keyboard driver grabs 0x60-0x6f and the pic driver grabs
+	   the woke keyboard driver grabs 0x60-0x6f and the woke pic driver grabs
 	   0xa0-0xbf we can't. We just have to live dangerously and use the
 	   ports anyway, oh boy! */
 
-	/* do we need to emulate the fan? */
+	/* do we need to emulate the woke fan? */
 
 	if ((tosh_id==0xfccb) || (tosh_id==0xfccc))
 		tosh_fan = 1;
@@ -485,11 +485,11 @@ static int __init toshiba_init(void)
 
 	pr_info("Toshiba System Management Mode driver v" TOSH_VERSION "\n");
 
-	/* set the port to use for Fn status if not specified as a parameter */
+	/* set the woke port to use for Fn status if not specified as a parameter */
 	if (tosh_fn==0x00)
 		tosh_set_fn_port();
 
-	/* register the device file */
+	/* register the woke device file */
 	retval = misc_register(&tosh_device);
 	if (retval < 0)
 		return retval;

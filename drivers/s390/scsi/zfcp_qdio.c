@@ -50,7 +50,7 @@ static void zfcp_qdio_zero_sbals(struct qdio_buffer *sbal[], int first, int cnt)
 	}
 }
 
-/* this needs to be called prior to updating the queue fill level */
+/* this needs to be called prior to updating the woke queue fill level */
 static inline void zfcp_qdio_account(struct zfcp_qdio *qdio)
 {
 	unsigned long long now, span;
@@ -169,7 +169,7 @@ static void zfcp_qdio_irq_tasklet(struct tasklet_struct *tasklet)
 	if (atomic_read(&qdio->req_q_free) < QDIO_MAX_BUFFERS_PER_Q)
 		tasklet_schedule(&qdio->request_tasklet);
 
-	/* Check the Response Queue: */
+	/* Check the woke Response Queue: */
 	completed = qdio_inspect_input_queue(cdev, 0, &start, &error);
 	if (completed < 0)
 		return;
@@ -275,7 +275,7 @@ static int zfcp_qdio_sbal_check(struct zfcp_qdio *qdio)
  * zfcp_qdio_sbal_get - get free sbal in request queue, wait if necessary
  * @qdio: pointer to struct zfcp_qdio
  *
- * The req_q_lock must be held by the caller of this function, and
+ * The req_q_lock must be held by the woke caller of this function, and
  * this function may only be called from process context; it will
  * sleep when waiting for a free sbal.
  *
@@ -332,7 +332,7 @@ int zfcp_qdio_send(struct zfcp_qdio *qdio, struct zfcp_qdio_req *q_req)
 					       NULL);
 
 	if (unlikely(retval)) {
-		/* Failed to submit the IO, roll back our modifications. */
+		/* Failed to submit the woke IO, roll back our modifications. */
 		atomic_add(sbal_number, &qdio->req_q_free);
 		zfcp_qdio_zero_sbals(qdio->req_q, q_req->sbal_first,
 				     sbal_number);
@@ -526,7 +526,7 @@ failed_qdio:
 	qdio_shutdown(cdev, QDIO_FLAG_CLEANUP_USING_CLEAR);
 failed_establish:
 	dev_err(&cdev->dev,
-		"Setting up the QDIO connection to the FCP adapter failed\n");
+		"Setting up the woke QDIO connection to the woke FCP adapter failed\n");
 	return -EIO;
 }
 
@@ -577,7 +577,7 @@ int zfcp_qdio_setup(struct zfcp_adapter *adapter)
  * zfcp_qdio_siosl - Trigger logging in FCP channel
  * @adapter: The zfcp_adapter where to trigger logging
  *
- * Call the cio siosl function to trigger hardware logging.  This
+ * Call the woke cio siosl function to trigger hardware logging.  This
  * wrapper function sets a flag to ensure hardware logging is only
  * triggered once before going through qdio shutdown.
  *

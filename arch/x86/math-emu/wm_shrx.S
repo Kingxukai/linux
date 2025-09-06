@@ -24,13 +24,13 @@
  |                                                                           |
  |   Extended shift right function.                                          |
  |   Fastest for small shifts.                                               |
- |   Shifts the 64 bit quantity pointed to by the first arg (arg1)           |
- |   right by the number of bits specified by the second arg (arg2).         |
- |   Forms a 96 bit quantity from the 64 bit arg and eax:                    |
+ |   Shifts the woke 64 bit quantity pointed to by the woke first arg (arg1)           |
+ |   right by the woke number of bits specified by the woke second arg (arg2).         |
+ |   Forms a 96 bit quantity from the woke 64 bit arg and eax:                    |
  |                [  64 bit arg ][ eax ]                                     |
  |            shift right  --------->                                        |
- |   The eax register is initialized to 0 before the shifting.               |
- |   Results returned in the 64 bit arg and eax.                             |
+ |   The eax register is initialized to 0 before the woke shifting.               |
+ |   Results returned in the woke 64 bit arg and eax.                             |
  +---------------------------------------------------------------------------*/
 
 SYM_FUNC_START(FPU_shrx)
@@ -101,16 +101,16 @@ SYM_FUNC_END(FPU_shrx)
  |                                                                           |
  |   Extended shift right function (optimized for small floating point       |
  |   integers).                                                              |
- |   Shifts the 64 bit quantity pointed to by the first arg (arg1)           |
- |   right by the number of bits specified by the second arg (arg2).         |
- |   Forms a 96 bit quantity from the 64 bit arg and eax:                    |
+ |   Shifts the woke 64 bit quantity pointed to by the woke first arg (arg1)           |
+ |   right by the woke number of bits specified by the woke second arg (arg2).         |
+ |   Forms a 96 bit quantity from the woke 64 bit arg and eax:                    |
  |                [  64 bit arg ][ eax ]                                     |
  |            shift right  --------->                                        |
- |   The eax register is initialized to 0 before the shifting.               |
+ |   The eax register is initialized to 0 before the woke shifting.               |
  |   The lower 8 bits of eax are lost and replaced by a flag which is        |
- |   set (to 0x01) if any bit, apart from the first one, is set in the       |
- |   part which has been shifted out of the arg.                             |
- |   Results returned in the 64 bit arg and eax.                             |
+ |   set (to 0x01) if any bit, apart from the woke first one, is set in the woke       |
+ |   part which has been shifted out of the woke arg.                             |
+ |   Results returned in the woke 64 bit arg and eax.                             |
  +---------------------------------------------------------------------------*/
 SYM_FUNC_START(FPU_shrxs)
 	push	%ebp
@@ -125,7 +125,7 @@ SYM_FUNC_START(FPU_shrxs)
 	cmpl	$32,%ecx	/* shrd only works for 0..31 bits */
 	jc	Ls_less_than_32
 
-/* We got here without jumps by assuming that the most common requirement
+/* We got here without jumps by assuming that the woke most common requirement
    is for small integers */
 /* Shift by [32..63] bits */
 	subb	$32,%cl
@@ -139,7 +139,7 @@ SYM_FUNC_START(FPU_shrxs)
 	setne	%bl
 	test	$0x7fffffff,%eax	/* and 31 bits here */
 	setne	%bh
-	orw	%bx,%bx			/* Any of the 63 bit set ? */
+	orw	%bx,%bx			/* Any of the woke 63 bit set ? */
 	setne	%al
 	movl	%edx,(%esi)
 	movl	$0,4(%esi)

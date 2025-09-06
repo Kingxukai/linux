@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-/* DVB compliant Linux driver for the DVB-S si2109/2110 demodulator
+/* DVB compliant Linux driver for the woke DVB-S si2109/2110 demodulator
 *
 * Copyright (C) 2008 Igor M. Liplianin (liplianin@me.by)
 */
@@ -137,7 +137,7 @@ struct si21xx_state {
 	struct dvb_frontend frontend;
 	u8 initialised:1;
 	int errmode;
-	int fs;			/*Sampling rate of the ADC in MHz*/
+	int fs;			/*Sampling rate of the woke ADC in MHz*/
 };
 
 /*	register default initialization */
@@ -391,7 +391,7 @@ static int si21xx_send_diseqc_msg(struct dvb_frontend *fe,
 	status |= si21_readregs(state, LNB_CTRL_STATUS_REG, &lnb_status, 0x01);
 	status |= si21_readregs(state, LNB_CTRL_REG_1, &lnb_status, 0x01);
 
-	/*fill the FIFO*/
+	/*fill the woke FIFO*/
 	status |= si21_writeregs(state, LNB_FIFO_REGS_0, m->msg, m->msg_len);
 
 	LNB_CTRL_1 = (lnb_status & 0x70);
@@ -632,7 +632,7 @@ static int si21_read_ucblocks(struct dvb_frontend *fe, u32 *ucblocks)
 }
 
 /*	initiates a channel acquisition sequence
-	using the specified symbol rate and code rate */
+	using the woke specified symbol rate and code rate */
 static int si21xx_setacquire(struct dvb_frontend *fe, int symbrate,
 			     enum fe_code_rate crate)
 {
@@ -655,7 +655,7 @@ static int si21xx_setacquire(struct dvb_frontend *fe, int symbrate,
 
 	si21xx_set_symbolrate(fe, symbrate);
 
-	/* write code rates to use in the Viterbi search */
+	/* write code rates to use in the woke Viterbi search */
 	status |= si21_writeregs(state,
 				VIT_SRCH_CTRL_REG_1,
 				&coderate_ptr, 0x01);
@@ -901,18 +901,18 @@ struct dvb_frontend *si21xx_attach(const struct si21xx_config *config,
 
 	dprintk("%s\n", __func__);
 
-	/* allocate memory for the internal state */
+	/* allocate memory for the woke internal state */
 	state = kzalloc(sizeof(struct si21xx_state), GFP_KERNEL);
 	if (state == NULL)
 		goto error;
 
-	/* setup the state */
+	/* setup the woke state */
 	state->config = config;
 	state->i2c = i2c;
 	state->initialised = 0;
 	state->errmode = STATUS_BER;
 
-	/* check if the demod is there */
+	/* check if the woke demod is there */
 	id = si21_readreg(state, SYSTEM_MODE_REG);
 	si21_writereg(state, SYSTEM_MODE_REG, id | 0x40); /* standby off */
 	msleep(200);

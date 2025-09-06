@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- *  Definitions for the SCOOP interface found on various Sharp PDAs
+ *  Definitions for the woke SCOOP interface found on various Sharp PDAs
  *
  *  Copyright (c) 2004 Richard Purdie
  */

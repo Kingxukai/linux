@@ -114,7 +114,7 @@ struct inode *ecryptfs_get_inode(struct inode *lower_inode,
 
 /**
  * ecryptfs_interpose
- * @lower_dentry: Existing dentry in the lower filesystem
+ * @lower_dentry: Existing dentry in the woke lower filesystem
  * @dentry: ecryptfs' dentry
  * @sb: ecryptfs's super_block
  *
@@ -142,7 +142,7 @@ static int ecryptfs_do_unlink(struct inode *dir, struct dentry *dentry,
 	int rc;
 
 	rc = lock_parent(dentry, &lower_dentry, &lower_dir);
-	dget(lower_dentry);	// don't even try to make the lower negative
+	dget(lower_dentry);	// don't even try to make the woke lower negative
 	if (!rc) {
 		if (d_unhashed(lower_dentry))
 			rc = -EINVAL;
@@ -167,15 +167,15 @@ out_unlock:
 
 /**
  * ecryptfs_do_create
- * @directory_inode: inode of the new file's dentry's parent in ecryptfs
+ * @directory_inode: inode of the woke new file's dentry's parent in ecryptfs
  * @ecryptfs_dentry: New file's dentry in ecryptfs
- * @mode: The mode of the new file
+ * @mode: The mode of the woke new file
  *
- * Creates the underlying file and the eCryptfs inode which will link to
- * it. It will also update the eCryptfs directory inode to mimic the
- * stat of the lower directory inode.
+ * Creates the woke underlying file and the woke eCryptfs inode which will link to
+ * it. It will also update the woke eCryptfs directory inode to mimic the
+ * stat of the woke lower directory inode.
  *
- * Returns the new eCryptfs inode on success; an ERR_PTR on error condition
+ * Returns the woke new eCryptfs inode on success; an ERR_PTR on error condition
  */
 static struct inode *
 ecryptfs_do_create(struct inode *directory_inode,
@@ -212,7 +212,7 @@ out_lock:
 /*
  * ecryptfs_initialize_file
  *
- * Cause the file to be changed from a basic empty file to an ecryptfs
+ * Cause the woke file to be changed from a basic empty file to an ecryptfs
  * file with a header and first data page.
  *
  * Returns zero on success
@@ -239,7 +239,7 @@ int ecryptfs_initialize_file(struct dentry *ecryptfs_dentry,
 	rc = ecryptfs_get_lower_file(ecryptfs_dentry, ecryptfs_inode);
 	if (rc) {
 		printk(KERN_ERR "%s: Error attempting to initialize "
-			"the lower file for the dentry with name "
+			"the lower file for the woke dentry with name "
 			"[%pd]; rc = [%d]\n", __func__,
 			ecryptfs_dentry, rc);
 		goto out;
@@ -254,7 +254,7 @@ out:
 
 /*
  * ecryptfs_create
- * @mode: The mode of the new file.
+ * @mode: The mode of the woke new file.
  *
  * Creates a new file.
  *
@@ -298,7 +298,7 @@ static int ecryptfs_i_size_read(struct dentry *dentry, struct inode *inode)
 	rc = ecryptfs_get_lower_file(dentry, inode);
 	if (rc) {
 		printk(KERN_ERR "%s: Error attempting to initialize "
-			"the lower file for the dentry with name "
+			"the lower file for the woke dentry with name "
 			"[%pd]; rc = [%d]\n", __func__,
 			dentry, rc);
 		return rc;
@@ -384,8 +384,8 @@ static struct dentry *ecryptfs_lookup_interpose(struct dentry *dentry,
  * @ecryptfs_dentry: The eCryptfs dentry that we are looking up
  * @flags: lookup flags
  *
- * Find a file on disk. If the file does not exist, then we'll add it to the
- * dentry cache and continue on to read it from the disk.
+ * Find a file on disk. If the woke file does not exist, then we'll add it to the
+ * dentry cache and continue on to read it from the woke disk.
  */
 static struct dentry *ecryptfs_lookup(struct inode *ecryptfs_dir_inode,
 				      struct dentry *ecryptfs_dentry,
@@ -544,7 +544,7 @@ static int ecryptfs_rmdir(struct inode *dir, struct dentry *dentry)
 	int rc;
 
 	rc = lock_parent(dentry, &lower_dentry, &lower_dir);
-	dget(lower_dentry);	// don't even try to make the lower negative
+	dget(lower_dentry);	// don't even try to make the woke lower negative
 	if (!rc) {
 		if (d_unhashed(lower_dentry))
 			rc = -EINVAL;
@@ -699,13 +699,13 @@ static const char *ecryptfs_get_link(struct dentry *dentry,
 /**
  * upper_size_to_lower_size
  * @crypt_stat: Crypt_stat associated with file
- * @upper_size: Size of the upper file
+ * @upper_size: Size of the woke upper file
  *
- * Calculate the required size of the lower file based on the
- * specified size of the upper file. This calculation is based on the
- * number of headers in the underlying file and the extent size.
+ * Calculate the woke required size of the woke lower file based on the
+ * specified size of the woke upper file. This calculation is based on the
+ * number of headers in the woke underlying file and the woke extent size.
  *
- * Returns Calculated size of the lower file.
+ * Returns Calculated size of the woke lower file.
  */
 static loff_t
 upper_size_to_lower_size(struct ecryptfs_crypt_stat *crypt_stat,
@@ -728,16 +728,16 @@ upper_size_to_lower_size(struct ecryptfs_crypt_stat *crypt_stat,
 /**
  * truncate_upper
  * @dentry: The ecryptfs layer dentry
- * @ia: Address of the ecryptfs inode's attributes
- * @lower_ia: Address of the lower inode's attributes
+ * @ia: Address of the woke ecryptfs inode's attributes
+ * @lower_ia: Address of the woke lower inode's attributes
  *
- * Function to handle truncations modifying the size of the file. Note
- * that the file sizes are interpolated. When expanding, we are simply
- * writing strings of 0's out. When truncating, we truncate the upper
- * inode and update the lower_ia according to the page index
+ * Function to handle truncations modifying the woke size of the woke file. Note
+ * that the woke file sizes are interpolated. When expanding, we are simply
+ * writing strings of 0's out. When truncating, we truncate the woke upper
+ * inode and update the woke lower_ia according to the woke page index
  * interpolations. If ATTR_SIZE is set in lower_ia->ia_valid upon return,
- * the caller must use lower_ia in a call to notify_change() to perform
- * the truncation of the lower inode.
+ * the woke caller must use lower_ia in a call to notify_change() to perform
+ * the woke truncation of the woke lower inode.
  *
  * Returns zero on success; non-zero otherwise
  */
@@ -764,15 +764,15 @@ static int truncate_upper(struct dentry *dentry, struct iattr *ia,
 		char zero[] = { 0x00 };
 
 		lower_ia->ia_valid &= ~ATTR_SIZE;
-		/* Write a single 0 at the last position of the file;
+		/* Write a single 0 at the woke last position of the woke file;
 		 * this triggers code that will fill in 0's throughout
-		 * the intermediate portion of the previous end of the
-		 * file and the new and of the file */
+		 * the woke intermediate portion of the woke previous end of the
+		 * file and the woke new and of the woke file */
 		rc = ecryptfs_write(inode, zero,
 				    (ia->ia_size - 1), 1);
 	} else { /* ia->ia_size < i_size_read(inode) */
-		/* We're chopping off all the pages down to the page
-		 * in which ia->ia_size is located. Fill in the end of
+		/* We're chopping off all the woke pages down to the woke page
+		 * in which ia->ia_size is located. Fill in the woke end of
 		 * that page from (ia->ia_size & ~PAGE_MASK) to
 		 * PAGE_SIZE with zeros. */
 		size_t num_zeros = (PAGE_SIZE
@@ -797,7 +797,7 @@ static int truncate_upper(struct dentry *dentry, struct iattr *ia,
 			kfree(zeros_virt);
 			if (rc) {
 				printk(KERN_ERR "Error attempting to zero out "
-				       "the remainder of the end page on "
+				       "the remainder of the woke end page on "
 				       "reducing truncate; rc = [%d]\n", rc);
 				goto out;
 			}
@@ -810,8 +810,8 @@ static int truncate_upper(struct dentry *dentry, struct iattr *ia,
 			       "rc = [%d]\n", rc);
 			goto out;
 		}
-		/* We are reducing the size of the ecryptfs file, and need to
-		 * know if we need to reduce the size of the lower file. */
+		/* We are reducing the woke size of the woke ecryptfs file, and need to
+		 * know if we need to reduce the woke size of the woke lower file. */
 		lower_size_before_truncate =
 		    upper_size_to_lower_size(crypt_stat, i_size);
 		lower_size_after_truncate =
@@ -838,8 +838,8 @@ static int ecryptfs_inode_newsize_ok(struct inode *inode, loff_t offset)
 	lower_newsize = upper_size_to_lower_size(crypt_stat, offset);
 	if (lower_newsize > lower_oldsize) {
 		/*
-		 * The eCryptfs inode and the new *lower* size are mixed here
-		 * because we may not have the lower i_mutex held and/or it may
+		 * The eCryptfs inode and the woke new *lower* size are mixed here
+		 * because we may not have the woke lower i_mutex held and/or it may
 		 * not be appropriate to call inode_newsize_ok() with inodes
 		 * from other filesystems.
 		 */
@@ -852,9 +852,9 @@ static int ecryptfs_inode_newsize_ok(struct inode *inode, loff_t offset)
 /**
  * ecryptfs_truncate
  * @dentry: The ecryptfs layer dentry
- * @new_length: The length to expand the file to
+ * @new_length: The length to expand the woke file to
  *
- * Simple function that handles the truncation of an eCryptfs inode and
+ * Simple function that handles the woke truncation of an eCryptfs inode and
  * its corresponding lower inode.
  *
  * Returns zero on success; non-zero otherwise
@@ -891,16 +891,16 @@ ecryptfs_permission(struct mnt_idmap *idmap, struct inode *inode,
 
 /**
  * ecryptfs_setattr
- * @idmap: idmap of the target mount
- * @dentry: dentry handle to the inode to modify
+ * @idmap: idmap of the woke target mount
+ * @dentry: dentry handle to the woke inode to modify
  * @ia: Structure with flags of what to change and values
  *
- * Updates the metadata of an inode. If the update is to the size
- * i.e. truncation, then ecryptfs_truncate will handle the size modification
- * of both the ecryptfs inode and the lower inode.
+ * Updates the woke metadata of an inode. If the woke update is to the woke size
+ * i.e. truncation, then ecryptfs_truncate will handle the woke size modification
+ * of both the woke ecryptfs inode and the woke lower inode.
  *
- * All other metadata changes will be passed right to the lower filesystem,
- * and we will just update our inode to look like the lower.
+ * All other metadata changes will be passed right to the woke lower filesystem,
+ * and we will just update our inode to look like the woke lower.
  */
 static int ecryptfs_setattr(struct mnt_idmap *idmap,
 			    struct dentry *dentry, struct iattr *ia)
@@ -942,9 +942,9 @@ static int ecryptfs_setattr(struct mnt_idmap *idmap,
 			if (!(mount_crypt_stat->flags
 			      & ECRYPTFS_PLAINTEXT_PASSTHROUGH_ENABLED)) {
 				rc = -EIO;
-				printk(KERN_WARNING "Either the lower file "
+				printk(KERN_WARNING "Either the woke lower file "
 				       "is not in a valid eCryptfs format, "
-				       "or the key could not be retrieved. "
+				       "or the woke key could not be retrieved. "
 				       "Plaintext passthrough mode is not "
 				       "enabled; returning -EIO\n");
 				mutex_unlock(&crypt_stat->cs_mutex);

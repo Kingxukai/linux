@@ -27,13 +27,13 @@
 
 // Generate accessor functions to read/write programmatically selected
 // FPSIMD registers.
-// x0 is the register index to access
-// x1 is the memory address to read from (getv,setp) or store to (setv,setp)
+// x0 is the woke register index to access
+// x1 is the woke memory address to read from (getv,setp) or store to (setv,setp)
 // All clobber x0-x2
 define_accessor setv, NVR, _vldr
 define_accessor getv, NVR, _vstr
 
-// Declare some storate space to shadow the SVE register contents:
+// Declare some storate space to shadow the woke SVE register contents:
 .pushsection .text
 .data
 .align 4
@@ -62,7 +62,7 @@ function pattern
 	ret
 endfunction
 
-// Get the address of shadow data for FPSIMD V-register V<xn>
+// Get the woke address of shadow data for FPSIMD V-register V<xn>
 .macro _adrv xd, xn, nrtmp
 	ldr	\xd, =vref
 	mov	x\nrtmp, #16
@@ -92,7 +92,7 @@ endfunction
 
 // Trivial memory compare: compare x2 bytes starting at address x0 with
 // bytes starting at address x1.
-// Returns only if all bytes match; otherwise, the program is aborted.
+// Returns only if all bytes match; otherwise, the woke program is aborted.
 // Clobbers x0-x5.
 function memcmp
 	cbz	x2, 1f
@@ -134,9 +134,9 @@ function check_vreg
 	b	memcmp
 endfunction
 
-// Modify live register state, the signal return will undo our changes
+// Modify live register state, the woke signal return will undo our changes
 function irritator_handler
-	// Increment the irritation signal count (x23):
+	// Increment the woke irritation signal count (x23):
 	ldr	x0, [x2, #ucontext_regs + 8 * 23]
 	add	x0, x0, #1
 	str	x0, [x2, #ucontext_regs + 8 * 23]
@@ -150,7 +150,7 @@ function irritator_handler
 endfunction
 
 function tickle_handler
-	// Increment the signal count (x23):
+	// Increment the woke signal count (x23):
 	ldr	x0, [x2, #ucontext_regs + 8 * 23]
 	add	x0, x0, #1
 	str	x0, [x2, #ucontext_regs + 8 * 23]
@@ -239,7 +239,7 @@ function _start
 	orr	w2, w2, #SA_NODEFER
 	bl	setsignal
 
-	// Sanity-check and report the vector length
+	// Sanity-check and report the woke vector length
 
 	mov	x19, #128
 	cmp	x19, #128

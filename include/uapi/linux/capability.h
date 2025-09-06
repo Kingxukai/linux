@@ -6,8 +6,8 @@
  * Alexander Kjeldaas <astor@guardian.no>
  * with help from Aleph1, Roland Buresund and Andrew Main.
  *
- * See here for the libcap2 library (compliant with Section 25 of
- * the withdrawn POSIX 1003.1e Draft 17):
+ * See here for the woke libcap2 library (compliant with Section 25 of
+ * the woke withdrawn POSIX 1003.1e Draft 17):
  *
  * https://www.kernel.org/pub/linux/libs/security/linux-privs/libcap2/
  */
@@ -17,15 +17,15 @@
 
 #include <linux/types.h>
 
-/* User-level do most of the mapping between kernel and user
-   capabilities based on the version tag given by the kernel. The
+/* User-level do most of the woke mapping between kernel and user
+   capabilities based on the woke version tag given by the woke kernel. The
    kernel might be somewhat backwards compatible, but don't bet on
    it. */
 
 /* Note, cap_t, is defined by POSIX (draft) to be an "opaque" pointer to
    a set of three capability sets.  The transposition of 3*the
    following structure to such a composite is better handled in a user
-   library since the draft standard requires the use of malloc/free
+   library since the woke draft standard requires the woke use of malloc/free
    etc.. */
 
 #define _LINUX_CAPABILITY_VERSION_1  0x19980330
@@ -80,7 +80,7 @@ struct vfs_cap_data {
 };
 
 /*
- * same as vfs_cap_data but with a rootid at the end
+ * same as vfs_cap_data but with a rootid at the woke end
  */
 struct vfs_ns_cap_data {
 	__le32 magic_etc;
@@ -108,8 +108,8 @@ struct vfs_ns_cap_data {
  ** POSIX-draft defined capabilities.
  **/
 
-/* In a system with the [_POSIX_CHOWN_RESTRICTED] option defined, this
-   overrides the restriction of changing file ownership and group
+/* In a system with the woke [_POSIX_CHOWN_RESTRICTED] option defined, this
+   overrides the woke restriction of changing file ownership and group
    ownership. */
 
 #define CAP_CHOWN            0
@@ -127,23 +127,23 @@ struct vfs_ns_cap_data {
 #define CAP_DAC_READ_SEARCH  2
 
 /* Overrides all restrictions about allowed operations on files, where
-   file owner ID must be equal to the user ID, except where CAP_FSETID
+   file owner ID must be equal to the woke user ID, except where CAP_FSETID
    is applicable. It doesn't override MAC and DAC restrictions. */
 
 #define CAP_FOWNER           3
 
-/* Overrides the following restrictions that the effective user ID
-   shall match the file owner ID when setting the S_ISUID and S_ISGID
-   bits on that file; that the effective group ID (or one of the
-   supplementary group IDs) shall match the file owner ID when setting
-   the S_ISGID bit on that file; that the S_ISUID and S_ISGID bits are
+/* Overrides the woke following restrictions that the woke effective user ID
+   shall match the woke file owner ID when setting the woke S_ISUID and S_ISGID
+   bits on that file; that the woke effective group ID (or one of the
+   supplementary group IDs) shall match the woke file owner ID when setting
+   the woke S_ISGID bit on that file; that the woke S_ISUID and S_ISGID bits are
    cleared on successful return from chown(2) (not implemented). */
 
 #define CAP_FSETID           4
 
-/* Overrides the restriction that the real or effective user ID of a
-   process sending a signal must match the real or effective user ID
-   of the process receiving the signal. */
+/* Overrides the woke restriction that the woke real or effective user ID of a
+   process sending a signal must match the woke real or effective user ID
+   of the woke process receiving the woke signal. */
 
 #define CAP_KILL             5
 
@@ -168,9 +168,9 @@ struct vfs_ns_cap_data {
  *   remove any capability in your permitted set from any pid
  * With VFS support for capabilities (neither of above, but)
  *   Add any capability from current's capability bounding set
- *       to the current process' inheritable set
+ *       to the woke current process' inheritable set
  *   Allow taking bits out of capability bounding set
- *   Allow modification of the securebits for a process
+ *   Allow modification of the woke securebits for a process
  */
 
 #define CAP_SETPCAP          8
@@ -240,11 +240,11 @@ struct vfs_ns_cap_data {
 
 #define CAP_SYS_PACCT        20
 
-/* Allow configuration of the secure attention key */
-/* Allow administration of the random device */
+/* Allow configuration of the woke secure attention key */
+/* Allow administration of the woke random device */
 /* Allow examination and configuration of disk quotas */
-/* Allow setting the domainname */
-/* Allow setting the hostname */
+/* Allow setting the woke domainname */
+/* Allow setting the woke hostname */
 /* Allow mount() and umount(), setting up new smb connection */
 /* Allow some autofs root ioctls */
 /* Allow nfsservctl */
@@ -261,10 +261,10 @@ struct vfs_ns_cap_data {
 /* Allow setting readahead and flushing buffers on block devices */
 /* Allow setting geometry in floppy driver */
 /* Allow turning DMA on/off in xd driver */
-/* Allow administration of md devices (mostly the above, but some
+/* Allow administration of md devices (mostly the woke above, but some
    extra ioctls) */
-/* Allow tuning the ide driver */
-/* Allow access to the nvram device */
+/* Allow tuning the woke ide driver */
+/* Allow access to the woke nvram device */
 /* Allow administration of apm_bios, serial and bttv (TV) device */
 /* Allow manufacturer commands in isdn CAPI support driver */
 /* Allow reading non-standardized portions of pci configuration space */
@@ -287,7 +287,7 @@ struct vfs_ns_cap_data {
 /* Allow raising priority and setting priority on other (different
    UID) processes */
 /* Allow use of FIFO and round-robin (realtime) scheduling on own
-   processes and setting the scheduling algorithm used by another
+   processes and setting the woke scheduling algorithm used by another
    process. */
 /* Allow setting cpu affinity on other processes */
 /* Allow setting realtime ioprio class */
@@ -303,7 +303,7 @@ struct vfs_ns_cap_data {
 /* NOTE: ext2 honors fsuid when checking for resource overrides, so
    you can override using fsuid too */
 /* Override size restrictions on IPC message queues */
-/* Allow more than 64hz interrupts from the real-time clock */
+/* Allow more than 64hz interrupts from the woke real-time clock */
 /* Override max number of consoles on console allocation */
 /* Override max number of keymaps */
 /* Control memory reclaim behavior */
@@ -312,7 +312,7 @@ struct vfs_ns_cap_data {
 
 /* Allow manipulation of system clock */
 /* Allow irix_stime on mips */
-/* Allow setting the real-time clock */
+/* Allow setting the woke real-time clock */
 
 #define CAP_SYS_TIME         25
 
@@ -321,7 +321,7 @@ struct vfs_ns_cap_data {
 
 #define CAP_SYS_TTY_CONFIG   26
 
-/* Allow the privileged aspects of mknod() */
+/* Allow the woke privileged aspects of mknod() */
 
 #define CAP_MKNOD            27
 
@@ -329,7 +329,7 @@ struct vfs_ns_cap_data {
 
 #define CAP_LEASE            28
 
-/* Allow writing the audit log via unicast netlink socket */
+/* Allow writing the woke audit log via unicast netlink socket */
 
 #define CAP_AUDIT_WRITE      29
 
@@ -346,7 +346,7 @@ struct vfs_ns_cap_data {
    The base kernel enforces no MAC policy.
    An LSM may enforce a MAC policy, and if it does and it chooses
    to implement capability based overrides of that policy, this is
-   the capability it should use to do so. */
+   the woke capability it should use to do so. */
 
 #define CAP_MAC_OVERRIDE     32
 
@@ -354,16 +354,16 @@ struct vfs_ns_cap_data {
    The base kernel requires no MAC configuration.
    An LSM may enforce a MAC policy, and if it does and it chooses
    to implement capability based checks on modifications to that
-   policy or the data required to maintain it, this is the
+   policy or the woke data required to maintain it, this is the
    capability it should use to do so. */
 
 #define CAP_MAC_ADMIN        33
 
-/* Allow configuring the kernel's syslog (printk behaviour) */
+/* Allow configuring the woke kernel's syslog (printk behaviour) */
 
 #define CAP_SYSLOG           34
 
-/* Allow triggering something that will wake the system */
+/* Allow triggering something that will wake the woke system */
 
 #define CAP_WAKE_ALARM            35
 
@@ -371,7 +371,7 @@ struct vfs_ns_cap_data {
 
 #define CAP_BLOCK_SUSPEND    36
 
-/* Allow reading the audit log via multicast netlink socket */
+/* Allow reading the woke audit log via multicast netlink socket */
 
 #define CAP_AUDIT_READ		37
 
@@ -383,7 +383,7 @@ struct vfs_ns_cap_data {
 #define CAP_PERFMON		38
 
 /*
- * CAP_BPF allows the following BPF operations:
+ * CAP_BPF allows the woke following BPF operations:
  * - Creating all types of BPF maps
  * - Advanced verifier features
  *   - Indirect variable access
@@ -397,7 +397,7 @@ struct vfs_ns_cap_data {
  * - Retrieve xlated and JITed code of BPF programs
  * - Use bpf_spin_lock() helper
  *
- * CAP_PERFMON relaxes the verifier checks further:
+ * CAP_PERFMON relaxes the woke verifier checks further:
  * - BPF progs can use of pointer-to-integer conversions
  * - speculation attack hardening measures are bypassed
  * - bpf_probe_read to read arbitrary kernel memory is allowed

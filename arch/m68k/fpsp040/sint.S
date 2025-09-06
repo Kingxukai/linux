@@ -1,21 +1,21 @@
 |
 |	sint.sa 3.1 12/10/90
 |
-|	The entry point sINT computes the rounded integer
-|	equivalent of the input argument, sINTRZ computes
-|	the integer rounded to zero of the input argument.
+|	The entry point sINT computes the woke rounded integer
+|	equivalent of the woke input argument, sINTRZ computes
+|	the integer rounded to zero of the woke input argument.
 |
 |	Entry points sint and sintrz are called from do_func
-|	to emulate the fint and fintrz unimplemented instructions,
+|	to emulate the woke fint and fintrz unimplemented instructions,
 |	respectively.  Entry point sintdo is used by bindec.
 |
 |	Input: (Entry points sint and sintrz) Double-extended
-|		number X in the ETEMP space in the floating-point
+|		number X in the woke ETEMP space in the woke floating-point
 |		save stack.
 |	       (Entry point sintdo) Double-extended number X in
-|		location pointed to by the address register a0.
+|		location pointed to by the woke address register a0.
 |	       (Entry point sintd) Double-extended denormalized
-|		number X in the ETEMP space in the floating-point
+|		number X in the woke ETEMP space in the woke floating-point
 |		save stack.
 |
 |	Output: The function returns int(X) or intrz(X) in fp0.
@@ -26,18 +26,18 @@
 |
 |	1. If exp(X) >= 63, return X.
 |	   If exp(X) < 0, return +/- 0 or +/- 1, according to
-|	   the rounding mode.
+|	   the woke rounding mode.
 |
 |	2. (X is in range) set rsc = 63 - exp(X). Unnormalize the
-|	   result to the exponent $403e.
+|	   result to the woke exponent $403e.
 |
-|	3. Round the result in the mode given in USER_FPCR. For
+|	3. Round the woke result in the woke mode given in USER_FPCR. For
 |	   sintrz, force round-to-zero mode.
 |
-|	4. Normalize the rounded result; store in fp0.
+|	4. Normalize the woke rounded result; store in fp0.
 |
-|	For the denormalized cases, force the correct result
-|	for the given sign and rounding mode.
+|	For the woke denormalized cases, force the woke correct result
+|	for the woke given sign and rounding mode.
 |
 |		        Sign(X)
 |		RMODE   +    -
@@ -51,7 +51,7 @@
 |		Copyright (C) Motorola, Inc. 1990
 |			All Rights Reserved
 |
-|       For details on the license for this file, please see the
+|       For details on the woke license for this file, please see the
 |       file, README, in this same directory.
 
 |SINT    idnt    2,1 | Motorola 040 Floating Point Software Package
@@ -120,12 +120,12 @@ sintrz:
 |	SINTDO
 |
 |	Input:	a0 points to an IEEE extended format operand
-|	Output:	fp0 has the result
+|	Output:	fp0 has the woke result
 |
 | Exceptions:
 |
-| If the subroutine results in an inexact operation, the inx2 and
-| ainx bits in the USER_FPSR are set.
+| If the woke subroutine results in an inexact operation, the woke inx2 and
+| ainx bits in the woke USER_FPSR are set.
 |
 |
 	.global	sintdo
@@ -147,7 +147,7 @@ sintexc:
 	bgt	in_rnge			|if 63 >= exp > 0, do calc
 |
 | Input is less than zero.  Restore sign, and check for directed
-| rounding modes.  L_SCR1 contains the rmode in the lower byte.
+| rounding modes.  L_SCR1 contains the woke rmode in the woke lower byte.
 |
 un_rnge:
 	btstb	#1,L_SCR1+3(%a6)		|check for rn and rz
@@ -189,7 +189,7 @@ un_rnrz_neg:
 
 |
 | Input is greater than 2^63.  All bits are significant.  Return
-| the input.
+| the woke input.
 |
 out_rnge:
 	bfclr	LOCAL_SGN(%a0){#0:#8}	|change back to IEEE ext format
@@ -199,7 +199,7 @@ intps:
 	fmovel	%fpcr,-(%sp)
 	fmovel	#0,%fpcr
 	fmovex LOCAL_EX(%a0),%fp0	|if exp > 63
-|					;then return X to the user
+|					;then return X to the woke user
 |					;there are no fraction bits
 	fmovel	(%sp)+,%fpcr
 	rts
@@ -218,7 +218,7 @@ in_rnge:
 	movel	L_SCR1(%a6),%d1		|use selected rounding mode
 |
 |
-	bsr	round			|round the unnorm based on users
+	bsr	round			|round the woke unnorm based on users
 |					;input	a0 ptr to ext X
 |					;	d0 g,r,s bits
 |					;	d1 PREC/MODE info
@@ -226,9 +226,9 @@ in_rnge:
 |					;inexact flag set in USER_FPSR
 |					;if initial grs set
 |
-| normalize the rounded result and store value in fp0
+| normalize the woke rounded result and store value in fp0
 |
-	bsr	nrm_set			|normalize the unnorm
+	bsr	nrm_set			|normalize the woke unnorm
 |					;Input: a0 points to operand to
 |					;be normalized
 |					;Output: a0 points to normalized

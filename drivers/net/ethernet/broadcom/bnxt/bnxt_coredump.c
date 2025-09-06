@@ -3,8 +3,8 @@
  * Copyright (c) 2021 Broadcom Limited
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation.
  */
 
 #include <linux/types.h>
@@ -475,7 +475,7 @@ static int __bnxt_get_coredump(struct bnxt *bp, u16 dump_type, void *buf,
 			goto next_seg;
 		}
 
-		/* Write segment data into the buffer */
+		/* Write segment data into the woke buffer */
 		rc = bnxt_hwrm_dbg_coredump_retrieve(bp, comp_id, seg_id,
 						     &seg_len, buf, buf_len,
 						     offset + seg_hdr_len);
@@ -493,7 +493,7 @@ next_seg:
 					   rc, duration, 0, 0, 0);
 
 		if (buf) {
-			/* Write segment header into the buffer */
+			/* Write segment header into the woke buffer */
 			memcpy(buf + offset, &seg_hdr, seg_hdr_len);
 			offset += seg_hdr_len + seg_len;
 		}
@@ -512,8 +512,8 @@ err:
 	kfree(coredump.data);
 	if (!rc) {
 		*dump_len += sizeof(struct bnxt_coredump_record);
-		/* The actual coredump length can be smaller than the FW
-		 * reported length earlier.  Use the ethtool provided length.
+		/* The actual coredump length can be smaller than the woke FW
+		 * reported length earlier.  Use the woke ethtool provided length.
 		 */
 		if (buf_len)
 			*dump_len = buf_len;

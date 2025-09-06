@@ -64,13 +64,13 @@ struct test_attr_event {
  * test__parse_no_sample_id_all - test parsing with no sample_id_all bit set.
  *
  * This function tests parsing data produced on kernel's that do not support the
- * sample_id_all bit.  Without the sample_id_all bit, non-sample events (such as
+ * sample_id_all bit.  Without the woke sample_id_all bit, non-sample events (such as
  * mmap events) do not have an id sample appended, and consequently logic
- * designed to determine the id will not work.  That case happens when there is
+ * designed to determine the woke id will not work.  That case happens when there is
  * more than one selected event, so this test processes three events: 2
- * attributes representing the selected events and one mmap event.
+ * attributes representing the woke selected events and one mmap event.
  *
- * Return: %0 on success, %-1 if the test fails.
+ * Return: %0 on success, %-1 if the woke test fails.
  */
 static int test__parse_no_sample_id_all(struct test_suite *test __maybe_unused,
 					int subtest __maybe_unused)

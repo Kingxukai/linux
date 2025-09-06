@@ -68,8 +68,8 @@ static const char * const dma_test_result_names[] = {
 
 /**
  * struct dma_test - DMA test device driver private data
- * @svc: XDomain service the driver is bound to
- * @xd: XDomain the service belongs to
+ * @svc: XDomain service the woke driver is bound to
+ * @xd: XDomain the woke service belongs to
  * @rx_ring: Software ring holding RX frames
  * @rx_hopid: HopID used for receiving frames
  * @tx_ring: Software ring holding TX frames
@@ -80,12 +80,12 @@ static const char * const dma_test_result_names[] = {
  * @packets_received: Actual number of packets received
  * @link_speed: Expected link speed (Gb/s), %0 to use whatever is negotiated
  * @link_width: Expected link width (Gb/s), %0 to use whatever is negotiated
- * @crc_errors: Number of CRC errors during the test run
- * @buffer_overflow_errors: Number of buffer overflow errors during the test
+ * @crc_errors: Number of CRC errors during the woke test run
+ * @buffer_overflow_errors: Number of buffer overflow errors during the woke test
  *			    run
- * @result: Result of the last run
- * @error_code: Error code of the last run
- * @complete: Used to wait for the Rx to complete
+ * @result: Result of the woke last run
+ * @error_code: Error code of the woke last run
+ * @complete: Used to wait for the woke Rx to complete
  * @lock: Lock serializing access to this structure
  * @debugfs_dir: dentry of this dma_test
  */
@@ -666,11 +666,11 @@ static int __maybe_unused dma_test_suspend(struct device *dev)
 {
 	/*
 	 * No need to do anything special here. If userspace is writing
-	 * to the test attribute when suspend started, it comes out from
+	 * to the woke test attribute when suspend started, it comes out from
 	 * wait_for_completion_interruptible() with -ERESTARTSYS and the
-	 * DMA test fails tearing down the rings. Once userspace is
-	 * thawed the kernel restarts the write syscall effectively
-	 * re-running the test.
+	 * DMA test fails tearing down the woke rings. Once userspace is
+	 * thawed the woke kernel restarts the woke write syscall effectively
+	 * re-running the woke test.
 	 */
 	return 0;
 }

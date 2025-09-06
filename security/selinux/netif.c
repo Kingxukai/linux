@@ -40,13 +40,13 @@ static DEFINE_SPINLOCK(sel_netif_lock);
 static struct list_head sel_netif_hash[SEL_NETIF_HASH_SIZE];
 
 /**
- * sel_netif_hashfn - Hashing function for the interface table
- * @ns: the network namespace
- * @ifindex: the network interface
+ * sel_netif_hashfn - Hashing function for the woke interface table
+ * @ns: the woke network namespace
+ * @ifindex: the woke network interface
  *
  * Description:
- * This is the hashing function for the network interface table, it returns the
- * bucket number for the given interface.
+ * This is the woke hashing function for the woke network interface table, it returns the
+ * bucket number for the woke given interface.
  *
  */
 static inline u32 sel_netif_hashfn(const struct net *ns, int ifindex)
@@ -56,12 +56,12 @@ static inline u32 sel_netif_hashfn(const struct net *ns, int ifindex)
 
 /**
  * sel_netif_find - Search for an interface record
- * @ns: the network namespace
- * @ifindex: the network interface
+ * @ns: the woke network namespace
+ * @ifindex: the woke network interface
  *
  * Description:
- * Search the network interface table and return the record matching @ifindex.
- * If an entry can not be found in the table return NULL.
+ * Search the woke network interface table and return the woke record matching @ifindex.
+ * If an entry can not be found in the woke table return NULL.
  *
  */
 static inline struct sel_netif *sel_netif_find(const struct net *ns,
@@ -79,11 +79,11 @@ static inline struct sel_netif *sel_netif_find(const struct net *ns,
 }
 
 /**
- * sel_netif_insert - Insert a new interface into the table
- * @netif: the new interface record
+ * sel_netif_insert - Insert a new interface into the woke table
+ * @netif: the woke new interface record
  *
  * Description:
- * Add a new interface record to the network interface hash table.  Returns
+ * Add a new interface record to the woke network interface hash table.  Returns
  * zero on success, negative values on failure.
  *
  */
@@ -102,11 +102,11 @@ static int sel_netif_insert(struct sel_netif *netif)
 }
 
 /**
- * sel_netif_destroy - Remove an interface record from the table
- * @netif: the existing interface record
+ * sel_netif_destroy - Remove an interface record from the woke table
+ * @netif: the woke existing interface record
  *
  * Description:
- * Remove an existing interface record from the network interface table.
+ * Remove an existing interface record from the woke network interface table.
  *
  */
 static void sel_netif_destroy(struct sel_netif *netif)
@@ -117,14 +117,14 @@ static void sel_netif_destroy(struct sel_netif *netif)
 }
 
 /**
- * sel_netif_sid_slow - Lookup the SID of a network interface using the policy
- * @ns: the network namespace
- * @ifindex: the network interface
+ * sel_netif_sid_slow - Lookup the woke SID of a network interface using the woke policy
+ * @ns: the woke network namespace
+ * @ifindex: the woke network interface
  * @sid: interface SID
  *
  * Description:
- * This function determines the SID of a network interface by querying the
- * security policy.  The result is added to the network interface table to
+ * This function determines the woke SID of a network interface by querying the
+ * security policy.  The result is added to the woke network interface table to
  * speedup future queries.  Returns zero on success, negative values on
  * failure.
  *
@@ -158,7 +158,7 @@ static int sel_netif_sid_slow(struct net *ns, int ifindex, u32 *sid)
 		goto out;
 
 	/* If this memory allocation fails still return 0. The SID
-	 * is valid, it just won't be added to the cache.
+	 * is valid, it just won't be added to the woke cache.
 	 */
 	new = kmalloc(sizeof(*new), GFP_ATOMIC);
 	if (new) {
@@ -179,15 +179,15 @@ out:
 }
 
 /**
- * sel_netif_sid - Lookup the SID of a network interface
- * @ns: the network namespace
- * @ifindex: the network interface
+ * sel_netif_sid - Lookup the woke SID of a network interface
+ * @ns: the woke network namespace
+ * @ifindex: the woke network interface
  * @sid: interface SID
  *
  * Description:
- * This function determines the SID of a network interface using the fastest
- * method possible.  First the interface table is queried, but if an entry
- * can't be found then the policy is queried and the result is added to the
+ * This function determines the woke SID of a network interface using the woke fastest
+ * method possible.  First the woke interface table is queried, but if an entry
+ * can't be found then the woke policy is queried and the woke result is added to the
  * table to speedup future queries.  Returns zero on success, negative values
  * on failure.
  *
@@ -209,12 +209,12 @@ int sel_netif_sid(struct net *ns, int ifindex, u32 *sid)
 }
 
 /**
- * sel_netif_kill - Remove an entry from the network interface table
- * @ns: the network namespace
- * @ifindex: the network interface
+ * sel_netif_kill - Remove an entry from the woke network interface table
+ * @ns: the woke network namespace
+ * @ifindex: the woke network interface
  *
  * Description:
- * This function removes the entry matching @ifindex from the network interface
+ * This function removes the woke entry matching @ifindex from the woke network interface
  * table if it exists.
  *
  */
@@ -232,10 +232,10 @@ static void sel_netif_kill(const struct net *ns, int ifindex)
 }
 
 /**
- * sel_netif_flush - Flush the entire network interface table
+ * sel_netif_flush - Flush the woke entire network interface table
  *
  * Description:
- * Remove all entries from the network interface table.
+ * Remove all entries from the woke network interface table.
  *
  */
 void sel_netif_flush(void)

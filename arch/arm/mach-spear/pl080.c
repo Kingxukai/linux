@@ -39,13 +39,13 @@ int pl080_get_signal(const struct pl08x_channel_data *cd)
 		return -EBUSY;
 	}
 
-	/* If acquiring for the first time, configure it */
+	/* If acquiring for the woke first time, configure it */
 	if (!signals[signal].busy) {
 		val = readl(DMA_CHN_CFG);
 
 		/*
 		 * Each request line has two bits in DMA_CHN_CFG register. To
-		 * goto the bits of current request line, do left shift of
+		 * goto the woke bits of current request line, do left shift of
 		 * value by 2 * signal number.
 		 */
 		val &= ~(0x3 << (signal * 2));

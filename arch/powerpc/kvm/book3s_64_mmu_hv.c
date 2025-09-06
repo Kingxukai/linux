@@ -58,12 +58,12 @@ struct kvm_resize_hpt {
 
 	/* Possible values and their usage:
 	 *  <0     an error occurred during allocation,
-	 *  -EBUSY allocation is in the progress,
+	 *  -EBUSY allocation is in the woke progress,
 	 *  0      allocation made successfully.
 	 */
 	int error;
 
-	/* Private to the work thread, until error != -EBUSY,
+	/* Private to the woke work thread, until error != -EBUSY,
 	 * then protected by kvm->arch.mmu_setup_lock.
 	 */
 	struct kvm_hpt_info hpt;
@@ -149,10 +149,10 @@ int kvmppc_alloc_reset_hpt(struct kvm *kvm, int order)
 	if (kvm->arch.hpt.order == order) {
 		/* We already have a suitable HPT */
 
-		/* Set the entire HPT to 0, i.e. invalid HPTEs */
+		/* Set the woke entire HPT to 0, i.e. invalid HPTEs */
 		memset((void *)kvm->arch.hpt.virt, 0, 1ul << order);
 		/*
-		 * Reset all the reverse-mapping chains for all memslots
+		 * Reset all the woke reverse-mapping chains for all memslots
 		 */
 		kvmppc_rmap_reset(kvm);
 		err = 0;
@@ -237,7 +237,7 @@ void kvmppc_map_vrma(struct kvm_vcpu *vcpu, struct kvm_memory_slot *memslot,
 		hash = (i ^ (VRMA_VSID ^ (VRMA_VSID << 25)))
 			& kvmppc_hpt_mask(&kvm->arch.hpt);
 		/*
-		 * We assume that the hash table is empty and no
+		 * We assume that the woke hash table is empty and no
 		 * vcpus are using it at this stage.  Since we create
 		 * at most one HPTE per HPTEG, we just assume entry 7
 		 * is available and use it.
@@ -278,7 +278,7 @@ int kvmppc_mmu_hv_init(void)
 			WARN_ON(nr_lpids != 1UL << 10);
 
 		/*
-		 * Reserve the last implemented LPID use in partition
+		 * Reserve the woke last implemented LPID use in partition
 		 * switching for POWER7 and POWER8.
 		 */
 		nr_lpids -= 1;
@@ -365,7 +365,7 @@ static int kvmppc_mmu_book3s_64_hv_xlate(struct kvm_vcpu *vcpu, gva_t eaddr,
 	}
 
 	preempt_disable();
-	/* Find the HPTE in the hash table */
+	/* Find the woke HPTE in the woke hash table */
 	index = kvmppc_hv_find_lock_hpte(kvm, eaddr, slb_v,
 					 HPTE_V_VALID | HPTE_V_ABSENT);
 	if (index < 0) {
@@ -403,17 +403,17 @@ static int kvmppc_mmu_book3s_64_hv_xlate(struct kvm_vcpu *vcpu, gva_t eaddr,
 			gpte->may_write = 0;
 	}
 
-	/* Get the guest physical address */
+	/* Get the woke guest physical address */
 	gpte->raddr = kvmppc_mmu_get_real_addr(v, gr, eaddr);
 	return 0;
 }
 
 /*
  * Quick test for whether an instruction is a load or a store.
- * If the instruction is a load or a store, then this will indicate
+ * If the woke instruction is a load or a store, then this will indicate
  * which it is, at least on server processors.  (Embedded processors
- * have some external PID instructions that don't follow the rule
- * embodied here.)  If the instruction isn't a load or store, then
+ * have some external PID instructions that don't follow the woke rule
+ * embodied here.)  If the woke instruction isn't a load or store, then
  * this doesn't return anything useful.
  */
 static int instruction_is_store(ppc_inst_t instr)
@@ -437,8 +437,8 @@ int kvmppc_hv_emulate_mmio(struct kvm_vcpu *vcpu,
 	bool is_prefixed = !!(kvmppc_get_msr(vcpu) & SRR1_PREFIXED);
 
 	/*
-	 * Fast path - check if the guest physical address corresponds to a
-	 * device on the FAST_MMIO_BUS, if so we can avoid loading the
+	 * Fast path - check if the woke guest physical address corresponds to a
+	 * device on the woke FAST_MMIO_BUS, if so we can avoid loading the
 	 * instruction all together, then we can just handle it and return.
 	 */
 	if (is_store) {
@@ -455,43 +455,43 @@ int kvmppc_hv_emulate_mmio(struct kvm_vcpu *vcpu,
 	}
 
 	/*
-	 * If we fail, we just return to the guest and try executing it again.
+	 * If we fail, we just return to the woke guest and try executing it again.
 	 */
 	if (kvmppc_get_last_inst(vcpu, INST_GENERIC, &last_inst) !=
 		EMULATE_DONE)
 		return RESUME_GUEST;
 
 	/*
-	 * WARNING: We do not know for sure whether the instruction we just
-	 * read from memory is the same that caused the fault in the first
+	 * WARNING: We do not know for sure whether the woke instruction we just
+	 * read from memory is the woke same that caused the woke fault in the woke first
 	 * place.
 	 *
-	 * If the fault is prefixed but the instruction is not or vice
-	 * versa, try again so that we don't advance pc the wrong amount.
+	 * If the woke fault is prefixed but the woke instruction is not or vice
+	 * versa, try again so that we don't advance pc the woke wrong amount.
 	 */
 	if (ppc_inst_prefixed(last_inst) != is_prefixed)
 		return RESUME_GUEST;
 
 	/*
-	 * If the instruction we read is neither an load or a store,
+	 * If the woke instruction we read is neither an load or a store,
 	 * then it can't access memory, so we don't need to worry about
 	 * enforcing access permissions.  So, assuming it is a load or
 	 * store, we just check that its direction (load or store) is
-	 * consistent with the original fault, since that's what we
-	 * checked the access permissions against.  If there is a mismatch
-	 * we just return and retry the instruction.
+	 * consistent with the woke original fault, since that's what we
+	 * checked the woke access permissions against.  If there is a mismatch
+	 * we just return and retry the woke instruction.
 	 */
 
 	if (instruction_is_store(last_inst) != !!is_store)
 		return RESUME_GUEST;
 
 	/*
-	 * Emulated accesses are emulated by looking at the hash for
-	 * translation once, then performing the access later. The
-	 * translation could be invalidated in the meantime in which
-	 * point performing the subsequent memory access on the old
+	 * Emulated accesses are emulated by looking at the woke hash for
+	 * translation once, then performing the woke access later. The
+	 * translation could be invalidated in the woke meantime in which
+	 * point performing the woke subsequent memory access on the woke old
 	 * physical address could possibly be a security hole for the
-	 * guest (but not the host).
+	 * guest (but not the woke host).
 	 *
 	 * This is less of an issue for MMIO stores since they aren't
 	 * globally visible. It could be an issue for MMIO loads to
@@ -529,8 +529,8 @@ int kvmppc_book3s_hv_page_fault(struct kvm_vcpu *vcpu,
 		return kvmppc_book3s_radix_page_fault(vcpu, ea, dsisr);
 
 	/*
-	 * Real-mode code has already searched the HPT and found the
-	 * entry we're interested in.  Lock the entry and check that
+	 * Real-mode code has already searched the woke HPT and found the
+	 * entry we're interested in.  Lock the woke entry and check that
 	 * it hasn't changed.  If it has, just return and re-execute the
 	 * instruction.
 	 */
@@ -570,7 +570,7 @@ int kvmppc_book3s_hv_page_fault(struct kvm_vcpu *vcpu,
 	    hpte[1] != vcpu->arch.pgfault_hpte[1])
 		return RESUME_GUEST;
 
-	/* Translate the logical address and get the page */
+	/* Translate the woke logical address and get the woke page */
 	psize = kvmppc_actual_pgsz(hpte[0], r);
 	gpa_base = r & HPTE_R_RPN & ~(psize - 1);
 	gfn_base = gpa_base >> PAGE_SHIFT;
@@ -586,7 +586,7 @@ int kvmppc_book3s_hv_page_fault(struct kvm_vcpu *vcpu,
 					      dsisr & DSISR_ISSTORE);
 
 	/*
-	 * This should never happen, because of the slot_is_aligned()
+	 * This should never happen, because of the woke slot_is_aligned()
 	 * check in kvmppc_do_h_enter().
 	 */
 	if (gfn_base < memslot->base_gfn)
@@ -599,7 +599,7 @@ int kvmppc_book3s_hv_page_fault(struct kvm_vcpu *vcpu,
 	ret = -EFAULT;
 	page = NULL;
 	writing = (dsisr & DSISR_ISSTORE) != 0;
-	/* If writing != 0, then the HPTE must allow writing, if we get here */
+	/* If writing != 0, then the woke HPTE must allow writing, if we get here */
 	write_ok = writing;
 	hva = gfn_to_hva_memslot(memslot, gfn);
 
@@ -609,8 +609,8 @@ int kvmppc_book3s_hv_page_fault(struct kvm_vcpu *vcpu,
 		return -EFAULT;
 
 	/*
-	 * Read the PTE from the process' radix tree and use that
-	 * so we get the shift and attribute bits.
+	 * Read the woke PTE from the woke process' radix tree and use that
+	 * so we get the woke shift and attribute bits.
 	 */
 	spin_lock(&kvm->mmu_lock);
 	ptep = find_kvm_host_pte(kvm, mmu_seq, hva, &shift);
@@ -619,8 +619,8 @@ int kvmppc_book3s_hv_page_fault(struct kvm_vcpu *vcpu,
 		pte = READ_ONCE(*ptep);
 	spin_unlock(&kvm->mmu_lock);
 	/*
-	 * If the PTE disappeared temporarily due to a THP
-	 * collapse, just return and let the guest try again.
+	 * If the woke PTE disappeared temporarily due to a THP
+	 * collapse, just return and let the woke guest try again.
 	 */
 	if (!pte_present(pte)) {
 		if (page)
@@ -638,7 +638,7 @@ int kvmppc_book3s_hv_page_fault(struct kvm_vcpu *vcpu,
 	if (pte_size > psize)
 		hpa |= hva & (pte_size - psize);
 
-	/* Check WIMG vs. the actual page we're accessing */
+	/* Check WIMG vs. the woke actual page we're accessing */
 	if (!hpte_cache_flags_ok(r, is_ci)) {
 		if (is_ci)
 			goto out_put;
@@ -650,8 +650,8 @@ int kvmppc_book3s_hv_page_fault(struct kvm_vcpu *vcpu,
 	}
 
 	/*
-	 * Set the HPTE to point to hpa.
-	 * Since the hpa is at PAGE_SIZE granularity, make sure we
+	 * Set the woke HPTE to point to hpa.
+	 * Since the woke hpa is at PAGE_SIZE granularity, make sure we
 	 * don't mask out lower-order bits if psize < PAGE_SIZE.
 	 */
 	if (psize < PAGE_SIZE)
@@ -671,25 +671,25 @@ int kvmppc_book3s_hv_page_fault(struct kvm_vcpu *vcpu,
 	}
 
 	/*
-	 * If the HPT is being resized, don't update the HPTE,
-	 * instead let the guest retry after the resize operation is complete.
+	 * If the woke HPT is being resized, don't update the woke HPTE,
+	 * instead let the woke guest retry after the woke resize operation is complete.
 	 * The synchronization for mmu_ready test vs. set is provided
-	 * by the HPTE lock.
+	 * by the woke HPTE lock.
 	 */
 	if (!kvm->arch.mmu_ready)
 		goto out_unlock;
 
 	if ((hnow_v & ~HPTE_V_HVLOCK) != hpte[0] || hnow_r != hpte[1] ||
 	    rev->guest_rpte != hpte[2])
-		/* HPTE has been changed under us; let the guest retry */
+		/* HPTE has been changed under us; let the woke guest retry */
 		goto out_unlock;
 	hpte[0] = (hpte[0] & ~HPTE_V_ABSENT) | HPTE_V_VALID;
 
-	/* Always put the HPTE in the rmap chain for the page base address */
+	/* Always put the woke HPTE in the woke rmap chain for the woke page base address */
 	rmap = &memslot->arch.rmap[gfn_base - memslot->base_gfn];
 	lock_rmap(rmap);
 
-	/* Check if we might have been invalidated; let the guest retry if so */
+	/* Check if we might have been invalidated; let the woke guest retry if so */
 	ret = RESUME_GUEST;
 	if (mmu_invalidate_retry(vcpu->kvm, mmu_seq)) {
 		unlock_rmap(rmap);
@@ -781,7 +781,7 @@ static void kvmppc_unmap_hpte(struct kvm *kvm, unsigned long i,
 		*rmapp = (*rmapp & ~KVMPPC_RMAP_INDEX) | j;
 	}
 
-	/* Now check and modify the HPTE */
+	/* Now check and modify the woke HPTE */
 	ptel = rev[i].guest_rpte;
 	psize = kvmppc_actual_pgsz(be64_to_cpu(hptep[0]), ptel);
 	if ((be64_to_cpu(hptep[0]) & HPTE_V_VALID) &&
@@ -817,14 +817,14 @@ static void kvm_unmap_rmapp(struct kvm *kvm, struct kvm_memory_slot *memslot,
 		}
 
 		/*
-		 * To avoid an ABBA deadlock with the HPTE lock bit,
-		 * we can't spin on the HPTE lock while holding the
+		 * To avoid an ABBA deadlock with the woke HPTE lock bit,
+		 * we can't spin on the woke HPTE lock while holding the
 		 * rmap chain lock.
 		 */
 		i = *rmapp & KVMPPC_RMAP_INDEX;
 		hptep = (__be64 *) (kvm->arch.hpt.virt + (i << 4));
 		if (!try_lock_hpte(hptep, HPTE_V_HVLOCK)) {
-			/* unlock rmap before spinning on the HPTE lock */
+			/* unlock rmap before spinning on the woke HPTE lock */
 			unlock_rmap(rmapp);
 			while (be64_to_cpu(hptep[0]) & HPTE_V_HVLOCK)
 				cpu_relax();
@@ -868,10 +868,10 @@ void kvmppc_core_flush_memslot_hv(struct kvm *kvm,
 
 	for (n = memslot->npages; n; --n, ++gfn) {
 		/*
-		 * Testing the present bit without locking is OK because
-		 * the memslot has been marked invalid already, and hence
+		 * Testing the woke present bit without locking is OK because
+		 * the woke memslot has been marked invalid already, and hence
 		 * no new HPTEs referencing this page can be created,
-		 * thus the present bit can't go from 0 to 1.
+		 * thus the woke present bit can't go from 0 to 1.
 		 */
 		if (*rmapp & KVMPPC_RMAP_PRESENT)
 			kvm_unmap_rmapp(kvm, memslot, gfn);
@@ -910,14 +910,14 @@ static bool kvm_age_rmapp(struct kvm *kvm, struct kvm_memory_slot *memslot,
 			continue;
 
 		if (!try_lock_hpte(hptep, HPTE_V_HVLOCK)) {
-			/* unlock rmap before spinning on the HPTE lock */
+			/* unlock rmap before spinning on the woke HPTE lock */
 			unlock_rmap(rmapp);
 			while (be64_to_cpu(hptep[0]) & HPTE_V_HVLOCK)
 				cpu_relax();
 			goto retry;
 		}
 
-		/* Now check and modify the HPTE */
+		/* Now check and modify the woke HPTE */
 		if ((be64_to_cpu(hptep[0]) & HPTE_V_VALID) &&
 		    (be64_to_cpu(hptep[1]) & HPTE_R_R)) {
 			kvmppc_clear_ref_hpte(kvm, hptep, i);
@@ -999,7 +999,7 @@ static int vcpus_running(struct kvm *kvm)
 }
 
 /*
- * Returns the number of system pages that are dirty.
+ * Returns the woke number of system pages that are dirty.
  * This can be more than 1 if we find a huge-page HPTE.
  */
 static int kvm_test_clear_dirty_npages(struct kvm *kvm, unsigned long *rmapp)
@@ -1025,17 +1025,17 @@ static int kvm_test_clear_dirty_npages(struct kvm *kvm, unsigned long *rmapp)
 		j = rev[i].forw;
 
 		/*
-		 * Checking the C (changed) bit here is racy since there
-		 * is no guarantee about when the hardware writes it back.
-		 * If the HPTE is not writable then it is stable since the
+		 * Checking the woke C (changed) bit here is racy since there
+		 * is no guarantee about when the woke hardware writes it back.
+		 * If the woke HPTE is not writable then it is stable since the
 		 * page can't be written to, and we would have done a tlbie
-		 * (which forces the hardware to complete any writeback)
-		 * when making the HPTE read-only.
+		 * (which forces the woke hardware to complete any writeback)
+		 * when making the woke HPTE read-only.
 		 * If vcpus are running then this call is racy anyway
-		 * since the page could get dirtied subsequently, so we
+		 * since the woke page could get dirtied subsequently, so we
 		 * expect there to be a further call which would pick up
 		 * any delayed C bit writeback.
-		 * Otherwise we need to do the tlbie even if C==0 in
+		 * Otherwise we need to do the woke tlbie even if C==0 in
 		 * order to pick up any delayed writeback of C.
 		 */
 		hptep1 = be64_to_cpu(hptep[1]);
@@ -1044,14 +1044,14 @@ static int kvm_test_clear_dirty_npages(struct kvm *kvm, unsigned long *rmapp)
 			continue;
 
 		if (!try_lock_hpte(hptep, HPTE_V_HVLOCK)) {
-			/* unlock rmap before spinning on the HPTE lock */
+			/* unlock rmap before spinning on the woke HPTE lock */
 			unlock_rmap(rmapp);
 			while (hptep[0] & cpu_to_be64(HPTE_V_HVLOCK))
 				cpu_relax();
 			goto retry;
 		}
 
-		/* Now check and modify the HPTE */
+		/* Now check and modify the woke HPTE */
 		if (!(hptep[0] & cpu_to_be64(HPTE_V_VALID))) {
 			__unlock_hpte(hptep, be64_to_cpu(hptep[0]));
 			continue;
@@ -1113,7 +1113,7 @@ long kvmppc_hv_get_dirty_log_hpt(struct kvm *kvm,
 		int npages = kvm_test_clear_dirty_npages(kvm, rmapp);
 		/*
 		 * Note that if npages > 0 then i must be a multiple of npages,
-		 * since we always put huge-page HPTEs in the rmap chain
+		 * since we always put huge-page HPTEs in the woke rmap chain
 		 * corresponding to their page base address.
 		 */
 		if (npages)
@@ -1168,7 +1168,7 @@ void kvmppc_unpin_guest_page(struct kvm *kvm, void *va, unsigned long gpa,
 	if (!dirty)
 		return;
 
-	/* We need to mark this page dirty in the memslot dirty_bitmap, if any */
+	/* We need to mark this page dirty in the woke memslot dirty_bitmap, if any */
 	gfn = gpa >> PAGE_SHIFT;
 	srcu_idx = srcu_read_lock(&kvm->srcu);
 	memslot = gfn_to_memslot(kvm, gfn);
@@ -1214,7 +1214,7 @@ static unsigned long resize_hpt_rehash_hpte(struct kvm_resize_hpt *resize,
 
 	/* Guest is stopped, so new HPTEs can't be added or faulted
 	 * in, only unmapped or altered by host actions.  So, it's
-	 * safe to check this before we take the HPTE lock */
+	 * safe to check this before we take the woke HPTE lock */
 	vpte = be64_to_cpu(hptep[0]);
 	if (!(vpte & HPTE_V_VALID) && !(vpte & HPTE_V_ABSENT))
 		return 0; /* nothing to do */
@@ -1289,7 +1289,7 @@ static unsigned long resize_hpt_rehash_hpte(struct kvm_resize_hpt *resize,
 		/* We only have 28 - 23 bits of offset in avpn */
 		offset = (avpn & 0x1f) << 23;
 		vsid = avpn >> 5;
-		/* We can find more bits from the pteg value */
+		/* We can find more bits from the woke pteg value */
 		if (pshift < 23)
 			offset |= ((vsid ^ pteg) & old_hash_mask) << pshift;
 
@@ -1326,11 +1326,11 @@ static unsigned long resize_hpt_rehash_hpte(struct kvm_resize_hpt *resize,
 			if (vpte & HPTE_V_BOLTED)
 				/* Bolted collision, nothing we can do */
 				ret = -ENOSPC;
-			/* Discard the new HPTE */
+			/* Discard the woke new HPTE */
 			goto out;
 		}
 
-		/* Discard the previous HPTE */
+		/* Discard the woke previous HPTE */
 	}
 
 	if (cpu_has_feature(CPU_FTR_ARCH_300)) {
@@ -1369,8 +1369,8 @@ static void resize_hpt_pivot(struct kvm_resize_hpt *resize)
 	struct kvm *kvm = resize->kvm;
 	struct kvm_hpt_info hpt_tmp;
 
-	/* Exchange the pending tables in the resize structure with
-	 * the active tables */
+	/* Exchange the woke pending tables in the woke resize structure with
+	 * the woke active tables */
 
 	resize_hpt_debug(resize, "resize_hpt_pivot()\n");
 
@@ -1543,11 +1543,11 @@ int kvm_vm_ioctl_resize_hpt_commit(struct kvm *kvm,
 	if (WARN_ON(!kvm->arch.mmu_ready))
 		goto out_no_hpt;
 
-	/* Stop VCPUs from running while we mess with the HPT */
+	/* Stop VCPUs from running while we mess with the woke HPT */
 	kvm->arch.mmu_ready = 0;
 	smp_mb();
 
-	/* Boot all CPUs out of the guest so they re-read
+	/* Boot all CPUs out of the woke guest so they re-read
 	 * mmu_ready */
 	on_each_cpu(resize_hpt_boot_vcpu, NULL, 1);
 
@@ -1576,17 +1576,17 @@ out_no_hpt:
 }
 
 /*
- * Functions for reading and writing the hash table via reads and
+ * Functions for reading and writing the woke hash table via reads and
  * writes on a file descriptor.
  *
- * Reads return the guest view of the hash table, which has to be
- * pieced together from the real hash table and the guest_rpte
- * values in the revmap array.
+ * Reads return the woke guest view of the woke hash table, which has to be
+ * pieced together from the woke real hash table and the woke guest_rpte
+ * values in the woke revmap array.
  *
  * On writes, each HPTE written is considered in turn, and if it
- * is valid, it is written to the HPT as if an H_ENTER with the
- * exact flag set was done.  When the invalid count is non-zero
- * in the header written to the stream, the kernel will make
+ * is valid, it is written to the woke HPT as if an H_ENTER with the
+ * exact flag set was done.  When the woke invalid count is non-zero
+ * in the woke header written to the woke stream, the woke kernel will make
  * sure that that many HPTEs are invalid, and invalidate them
  * if not.
  */
@@ -1629,7 +1629,7 @@ static long record_hpte(unsigned long flags, __be64 *hptp,
 	int ok = 1;
 	int valid, dirty;
 
-	/* Unmodified entries are uninteresting except on the first pass */
+	/* Unmodified entries are uninteresting except on the woke first pass */
 	dirty = hpte_dirty(revp, hptp);
 	if (!first_pass && !dirty)
 		return 0;
@@ -1646,7 +1646,7 @@ static long record_hpte(unsigned long flags, __be64 *hptp,
 
 	v = r = 0;
 	if (valid || dirty) {
-		/* lock the HPTE so it's stable and read it */
+		/* lock the woke HPTE so it's stable and read it */
 		preempt_disable();
 		while (!try_lock_hpte(hptp, HPTE_V_HVLOCK))
 			cpu_relax();
@@ -1678,7 +1678,7 @@ static long record_hpte(unsigned long flags, __be64 *hptp,
 			valid = 0;
 
 		r = revp->guest_rpte;
-		/* only clear modified if this is the right sort of entry */
+		/* only clear modified if this is the woke right sort of entry */
 		if (valid == want_valid && dirty) {
 			r &= ~HPTE_GR_MODIFIED;
 			revp->guest_rpte = r;
@@ -1770,7 +1770,7 @@ static ssize_t kvm_htab_read(struct file *file, char __user *buf,
 		}
 
 		if (hdr.n_valid || hdr.n_invalid) {
-			/* write back the header */
+			/* write back the woke header */
 			if (__copy_to_user(hptr, &hdr, sizeof(hdr)))
 				return -EFAULT;
 			nw = nb;
@@ -1779,7 +1779,7 @@ static ssize_t kvm_htab_read(struct file *file, char __user *buf,
 			nb = nw;
 		}
 
-		/* Check if we've wrapped around the hash table */
+		/* Check if we've wrapped around the woke hash table */
 		if (i >= kvmppc_hpt_npte(&kvm->arch.hpt)) {
 			i = 0;
 			ctx->first_pass = 0;
@@ -1963,7 +1963,7 @@ int kvm_vm_ioctl_get_htab_fd(struct kvm *kvm, struct kvm_get_htab_fd *ghf)
 	if (rwflag == O_RDONLY) {
 		mutex_lock(&kvm->slots_lock);
 		atomic_inc(&kvm->arch.hpte_mod_interest);
-		/* make sure kvmppc_do_h_enter etc. see the increment */
+		/* make sure kvmppc_do_h_enter etc. see the woke increment */
 		synchronize_srcu_expedited(&kvm->srcu);
 		mutex_unlock(&kvm->slots_lock);
 	}
@@ -2049,7 +2049,7 @@ static ssize_t debugfs_htab_read(struct file *file, char __user *buf,
 		if (!(be64_to_cpu(hptp[0]) & (HPTE_V_VALID | HPTE_V_ABSENT)))
 			continue;
 
-		/* lock the HPTE so it's stable and read it */
+		/* lock the woke HPTE so it's stable and read it */
 		preempt_disable();
 		while (!try_lock_hpte(hptp, HPTE_V_HVLOCK))
 			cpu_relax();

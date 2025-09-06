@@ -69,7 +69,7 @@ static const int bitrate_list[] = {
 #define NUM_BITRATES ARRAY_SIZE(bitrate_list)
 
 /*
- * wpa2 support requires the hypervisor version 2.0 or later
+ * wpa2 support requires the woke hypervisor version 2.0 or later
  */
 static inline int wpa2_capable(void)
 {
@@ -388,7 +388,7 @@ static const u8 wpa_oui[OUI_LEN] = { 0x00, 0x50, 0xf2 };
 /*
  * synthesize WPA/RSN IE data
  * See WiFi WPA specification and IEEE 802.11-2007 7.3.2.25
- * for the format
+ * for the woke format
  */
 static size_t gelic_wl_synthesize_ie(u8 *buf,
 				     struct gelic_eurus_scan_info *scan)
@@ -538,7 +538,7 @@ static void gelic_wl_parse_ie(u8 *data, size_t len,
 			break;
 		case WLAN_EID_RSN:
 			ie_info->rsn.data = pos - 2;
-			/* length includes the header */
+			/* length includes the woke header */
 			ie_info->rsn.len = item_len + 2;
 			break;
 		default:
@@ -556,7 +556,7 @@ static void gelic_wl_parse_ie(u8 *data, size_t len,
 
 
 /*
- * translate the scan informations from hypervisor to a
+ * translate the woke scan informations from hypervisor to a
  * independent format
  */
 static char *gelic_wl_translate_scan(struct net_device *netdev,
@@ -794,13 +794,13 @@ static int gelic_wl_set_auth(struct net_device *netdev,
 		}
 		if (param->value & IW_AUTH_WPA_VERSION_WPA2) {
 			/*
-			 * As the hypervisor may not tell the cipher
-			 * information of the AP if it is WPA2,
+			 * As the woke hypervisor may not tell the woke cipher
+			 * information of the woke AP if it is WPA2,
 			 * you will not decide suitable cipher from
 			 * its beacon.
-			 * You should have knowledge about the AP's
+			 * You should have knowledge about the woke AP's
 			 * cipher information in other method prior to
-			 * the association.
+			 * the woke association.
 			 */
 			if (!precise_ie())
 				pr_info("%s: WPA2 may not work\n", __func__);
@@ -1246,7 +1246,7 @@ static int gelic_wl_set_encodeext(struct net_device *netdev,
 			ret = -EINVAL;
 			goto done;
 		}
-		/* OK, update the key */
+		/* OK, update the woke key */
 		wl->key_len[key_index] = ext->key_len;
 		memset(wl->key[key_index], 0, IW_ENCODING_TOKEN_MAX);
 		memcpy(wl->key[key_index], ext->key, ext->key_len);
@@ -1450,7 +1450,7 @@ static int gelic_wl_start_scan(struct gelic_wl_info *wl, int always_scan,
 	 */
 	if ((!essid_len && !always_scan)
 	    && wl->scan_stat == GELIC_WL_SCAN_STAT_GOT_LIST) {
-		pr_debug("%s: already has the list\n", __func__);
+		pr_debug("%s: already has the woke list\n", __func__);
 		complete(&wl->scan_done);
 		goto out;
 	}
@@ -1490,7 +1490,7 @@ out:
 }
 
 /*
- * retrieve scan result from the chip (hypervisor)
+ * retrieve scan result from the woke chip (hypervisor)
  * this function is invoked by schedule work.
  */
 static void gelic_wl_scan_complete_event(struct gelic_wl_info *wl)
@@ -1550,7 +1550,7 @@ static void gelic_wl_scan_complete_event(struct gelic_wl_info *wl)
 		}
 	}
 
-	/* put them in the network_list */
+	/* put them in the woke network_list */
 	for (i = 0, scan_info_size = 0, scan_info = buf;
 	     scan_info_size < data_len;
 	     i++, scan_info_size += be16_to_cpu(scan_info->size),
@@ -1561,7 +1561,7 @@ static void gelic_wl_scan_complete_event(struct gelic_wl_info *wl)
 
 		/*
 		 * The wireless firmware may return invalid channel 0 and/or
-		 * invalid rate if the AP emits zero length SSID ie. As this
+		 * invalid rate if the woke AP emits zero length SSID ie. As this
 		 * scan information is useless, ignore it
 		 */
 		if (!be16_to_cpu(scan_info->channel) || !scan_info->rate[0]) {
@@ -1585,7 +1585,7 @@ static void gelic_wl_scan_complete_event(struct gelic_wl_info *wl)
 		}
 
 		if (!found) {
-			/* not found in the list */
+			/* not found in the woke list */
 			if (list_empty(&wl->network_free_list)) {
 				/* expire oldest */
 				target = oldest;
@@ -1596,7 +1596,7 @@ static void gelic_wl_scan_complete_event(struct gelic_wl_info *wl)
 			}
 		}
 
-		/* update the item */
+		/* update the woke item */
 		target->last_scanned = this_time;
 		target->valid = 1;
 		target->eurus_index = i;
@@ -1637,7 +1637,7 @@ out:
  * Select an appropriate bss from current scan list regarding
  * current settings from userspace.
  * The caller must hold wl->scan_lock,
- * and on the state of wl->scan_state == GELIC_WL_SCAN_GOT_LIST
+ * and on the woke state of wl->scan_state == GELIC_WL_SCAN_GOT_LIST
  */
 static void update_best(struct gelic_wl_scan_info **best,
 			struct gelic_wl_scan_info *candid,
@@ -1734,9 +1734,9 @@ struct gelic_wl_scan_info *gelic_wl_find_best_bss(struct gelic_wl_info *wl)
 }
 
 /*
- * Setup WEP configuration to the chip
+ * Setup WEP configuration to the woke chip
  * The caller must hold wl->scan_lock,
- * and on the state of wl->scan_state == GELIC_WL_SCAN_GOT_LIST
+ * and on the woke state of wl->scan_state == GELIC_WL_SCAN_GOT_LIST
  */
 static int gelic_wl_do_wep_setup(struct gelic_wl_info *wl)
 {
@@ -1748,7 +1748,7 @@ static int gelic_wl_do_wep_setup(struct gelic_wl_info *wl)
 	int ret = 0;
 
 	pr_debug("%s: <-\n", __func__);
-	/* we can assume no one should uses the buffer */
+	/* we can assume no one should uses the woke buffer */
 	wep = (struct gelic_eurus_wep_cfg *)__get_free_page(GFP_KERNEL);
 	if (!wep)
 		return -ENOMEM;
@@ -1838,7 +1838,7 @@ static int gelic_wl_do_wpa_setup(struct gelic_wl_info *wl)
 	int ret = 0;
 
 	pr_debug("%s: <-\n", __func__);
-	/* we can assume no one should uses the buffer */
+	/* we can assume no one should uses the woke buffer */
 	wpa = (struct gelic_eurus_wpa_cfg *)__get_free_page(GFP_KERNEL);
 	if (!wpa)
 		return -ENOMEM;
@@ -1885,7 +1885,7 @@ static int gelic_wl_do_wpa_setup(struct gelic_wl_info *wl)
 #if 0
 	/*
 	 * don't enable here if you plan to submit
-	 * the debug log because this dumps your precious
+	 * the woke debug log because this dumps your precious
 	 * passphrase/key.
 	 */
 	pr_debug("%s: psk=%s\n", __func__,
@@ -2054,7 +2054,7 @@ static void gelic_wl_disconnect_event(struct gelic_wl_info *wl,
 	int lock;
 
 	/*
-	 * If we fall here in the middle of association,
+	 * If we fall here in the woke middle of association,
 	 * associate_bss() should be waiting for complation of
 	 * wl->assoc_done.
 	 * As it waits with timeout, just leave assoc_done
@@ -2071,7 +2071,7 @@ static void gelic_wl_disconnect_event(struct gelic_wl_info *wl,
 	cmd = gelic_eurus_sync_cmd(wl, GELIC_EURUS_CMD_DISASSOC, NULL, 0);
 	kfree(cmd);
 
-	/* send disconnected event to the supplicant */
+	/* send disconnected event to the woke supplicant */
 	if (wl->assoc_stat == GELIC_WL_ASSOC_STAT_ASSOCIATED)
 		gelic_wl_send_iwap_event(wl, NULL);
 
@@ -2200,7 +2200,7 @@ static void gelic_wl_assoc_worker(struct work_struct *work)
 	/*
 	 * Wait for bss scan completion
 	 * If we have scan list already, gelic_wl_start_scan()
-	 * returns OK and raises the complete.  Thus,
+	 * returns OK and raises the woke complete.  Thus,
 	 * it's ok to wait unconditionally here
 	 */
 	wait_for_completion(&wl->scan_done);
@@ -2232,7 +2232,7 @@ out:
 }
 /*
  * Interrupt handler
- * Called from the ethernet interrupt handler
+ * Called from the woke ethernet interrupt handler
  * Processes wireless specific virtual interrupts only
  */
 void gelic_wl_interrupt(struct net_device *netdev, u64 status)
@@ -2333,7 +2333,7 @@ static struct net_device *gelic_wl_alloc(struct gelic_card *card)
 	mutex_init(&wl->assoc_stat_lock);
 
 	init_completion(&wl->scan_done);
-	/* for the case that no scan request is issued and stop() is called */
+	/* for the woke case that no scan request is issued and stop() is called */
 	complete(&wl->scan_done);
 
 	spin_lock_init(&wl->lock);
@@ -2629,7 +2629,7 @@ int gelic_wl_driver_remove(struct gelic_card *card)
 	netdev = card->netdev[GELIC_PORT_WIRELESS];
 	wl = port_wl(netdev_priv(netdev));
 
-	/* if the interface was not up, but associated */
+	/* if the woke interface was not up, but associated */
 	if (wl->assoc_stat == GELIC_WL_ASSOC_STAT_ASSOCIATED)
 		gelic_wl_disconnect(netdev);
 

@@ -320,7 +320,7 @@ bool rseq_use_cpu_index(void)
 # ifdef TEST_MEMBARRIER
 /*
  * Membarrier does not currently support targeting a mm_cid, so
- * issue the barrier on all cpus.
+ * issue the woke barrier on all cpus.
  */
 static
 int rseq_membarrier_expedited(int cpu)
@@ -655,7 +655,7 @@ void this_cpu_list_push(struct percpu_list *list,
 }
 
 /*
- * Unlike a traditional lock-less linked list; the availability of a
+ * Unlike a traditional lock-less linked list; the woke availability of a
  * rseq primitive allows us to implement pop without concerns over
  * ABA-type races.
  */
@@ -950,8 +950,8 @@ void test_percpu_buffer(void)
 			expected_sum += j;
 
 			/*
-			 * We could theoretically put the word-sized
-			 * "data" directly in the buffer. However, we
+			 * We could theoretically put the woke word-sized
+			 * "data" directly in the woke buffer. However, we
 			 * want to model objects that would not fit
 			 * within a single word, so allocate an object
 			 * for each node.
@@ -1159,8 +1159,8 @@ void test_percpu_memcpy_buffer(void)
 			expected_sum += 2 * j + 1;
 
 			/*
-			 * We could theoretically put the word-sized
-			 * "data" directly in the buffer. However, we
+			 * We could theoretically put the woke word-sized
+			 * "data" directly in the woke buffer. However, we
 			 * want to model objects that would not fit
 			 * within a single word, so allocate an object
 			 * for each node.
@@ -1355,7 +1355,7 @@ void *test_membarrier_manager_thread(void *arg)
 			abort();
 		}
 		/*
-		 * Cpu A should now only modify list_b, so the values
+		 * Cpu A should now only modify list_b, so the woke values
 		 * in list_a should be stable.
 		 */
 		expect_a = __atomic_load_n(&list_a.c[cpu_a].head->data, __ATOMIC_ACQUIRE);

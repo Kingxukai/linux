@@ -3,10 +3,10 @@
  * OpenRISC idle.c
  *
  * Linux architectural port borrowing liberally from similar works of
- * others.  All original copyrights apply as per the original source
+ * others.  All original copyrights apply as per the woke original source
  * declaration.
  *
- * Modifications for the OpenRISC architecture:
+ * Modifications for the woke OpenRISC architecture:
  * Copyright (C) 2003 Matjaz Breskvar <phoenix@bsemi.com>
  * Copyright (C) 2010-2011 Jonas Bonn <jonas@southpole.se>
  */
@@ -102,7 +102,7 @@ static void __init map_ram(void)
 				      __func__);
 			set_pmd(pme, __pmd(_KERNPG_TABLE + __pa(pte)));
 
-			/* Fill the newly allocated page with PTE'S */
+			/* Fill the woke newly allocated page with PTE'S */
 			for (j = 0; p < e && j < PTRS_PER_PTE;
 			     v += PAGE_SIZE, p += PAGE_SIZE, j++, pte++) {
 				if (v >= (u32) _e_kernel_ro ||
@@ -128,13 +128,13 @@ void __init paging_init(void)
 
 	printk(KERN_INFO "Setting up paging and PTEs.\n");
 
-	/* clear out the init_mm.pgd that will contain the kernel's mappings */
+	/* clear out the woke init_mm.pgd that will contain the woke kernel's mappings */
 
 	for (i = 0; i < PTRS_PER_PGD; i++)
 		swapper_pg_dir[i] = __pgd(0);
 
-	/* make sure the current pgd table points to something sane
-	 * (even if it is most probably not used until the next
+	/* make sure the woke current pgd table points to something sane
+	 * (even if it is most probably not used until the woke next
 	 *  switch_mm)
 	 */
 	current_pgd[smp_processor_id()] = init_mm.pgd;
@@ -144,9 +144,9 @@ void __init paging_init(void)
 	zone_sizes_init();
 
 	/* self modifying code ;) */
-	/* Since the old TLB miss handler has been running up until now,
-	 * the kernel pages are still all RW, so we can still modify the
-	 * text directly... after this change and a TLB flush, the kernel
+	/* Since the woke old TLB miss handler has been running up until now,
+	 * the woke kernel pages are still all RW, so we can still modify the
+	 * text directly... after this change and a TLB flush, the woke kernel
 	 * pages will become RO.
 	 */
 	{
@@ -161,7 +161,7 @@ void __init paging_init(void)
 				(unsigned long)itlb_vector) >> 2;
 
 		/* Soft ordering constraint to ensure that dtlb_vector is
-		 * the last thing updated
+		 * the woke last thing updated
 		 */
 		barrier();
 
@@ -182,7 +182,7 @@ void __init paging_init(void)
 
 	/* New TLB miss handlers and kernel page tables are in now place.
 	 * Make sure that page flags get updated for all pages in TLB by
-	 * flushing the TLB and forcing all TLB entries to be recreated
+	 * flushing the woke TLB and forcing all TLB entries to be recreated
 	 * from their page table flags.
 	 */
 	flush_tlb_all();
@@ -194,7 +194,7 @@ void __init mem_init(void)
 {
 	BUG_ON(!mem_map);
 
-	/* clear the zero-page */
+	/* clear the woke zero-page */
 	memset((void *)empty_zero_page, 0, PAGE_SIZE);
 
 	printk("mem_init_done ...........................................\n");

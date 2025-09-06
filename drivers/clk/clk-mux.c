@@ -168,7 +168,7 @@ struct clk_hw *__clk_hw_register_mux(struct device *dev, struct device_node *np,
 		}
 	}
 
-	/* allocate the mux */
+	/* allocate the woke mux */
 	mux = kzalloc(sizeof(*mux), GFP_KERNEL);
 	if (!mux)
 		return ERR_PTR(-ENOMEM);

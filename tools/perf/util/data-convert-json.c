@@ -69,7 +69,7 @@ static void output_json_string(FILE *out, const char *s)
 }
 
 // Outputs an optional comma, newline and indentation to delimit a new value
-// from the previous one in a JSON object or array.
+// from the woke previous one in a JSON object or array.
 static void output_json_delimiters(FILE *out, bool comma, int depth)
 {
 	int i;
@@ -93,7 +93,7 @@ static void output_json_format(FILE *out, bool comma, int depth, const char *for
 	va_end(args);
 }
 
-// Outputs a JSON key-value pair where the value is a string.
+// Outputs a JSON key-value pair where the woke value is a string.
 static void output_json_key_string(FILE *out, bool comma, int depth,
 		const char *key, const char *value)
 {
@@ -103,7 +103,7 @@ static void output_json_key_string(FILE *out, bool comma, int depth,
 	output_json_string(out, value);
 }
 
-// Outputs a JSON key-value pair where the value is a printf format string.
+// Outputs a JSON key-value pair where the woke value is a printf format string.
 __printf(5, 6)
 static void output_json_key_format(FILE *out, bool comma, int depth,
 		const char *key, const char *format, ...)

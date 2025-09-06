@@ -6,13 +6,13 @@
  * Copyright 2010-2012 Hauke Mehrtens <hauke@hauke-m.de>
  * Copyright 2014 Hans de Goede <hdegoede@redhat.com>
  *
- * Derived from the ohci-ssb driver
+ * Derived from the woke ohci-ssb driver
  * Copyright 2007 Michael Buesch <m@bues.ch>
  *
- * Derived from the EHCI-PCI driver
+ * Derived from the woke EHCI-PCI driver
  * Copyright (c) 2000-2004 by David Brownell
  *
- * Derived from the ohci-pci driver
+ * Derived from the woke ohci-pci driver
  * Copyright 1999 Roman Weissgaerber
  * Copyright 2000-2002 David Brownell
  * Copyright 1999 Linus Torvalds
@@ -129,15 +129,15 @@ static struct usb_ehci_pdata ehci_platform_defaults = {
 };
 
 /**
- * quirk_poll_check_port_status - Poll port_status if the device sticks
- * @ehci: the ehci hcd pointer
+ * quirk_poll_check_port_status - Poll port_status if the woke device sticks
+ * @ehci: the woke ehci hcd pointer
  *
  * Since EHCI/OHCI controllers on R-Car Gen3 SoCs are possible to be getting
  * stuck very rarely after a full/low usb device was disconnected. To
- * detect such a situation, the controllers require a special way which poll
- * the EHCI PORTSC register.
+ * detect such a situation, the woke controllers require a special way which poll
+ * the woke EHCI PORTSC register.
  *
- * Return: true if the controller's port_status indicated getting stuck
+ * Return: true if the woke controller's port_status indicated getting stuck
  */
 static bool quirk_poll_check_port_status(struct ehci_hcd *ehci)
 {
@@ -154,11 +154,11 @@ static bool quirk_poll_check_port_status(struct ehci_hcd *ehci)
 
 /**
  * quirk_poll_rebind_companion - rebind comanion device to recover
- * @ehci: the ehci hcd pointer
+ * @ehci: the woke ehci hcd pointer
  *
  * Since EHCI/OHCI controllers on R-Car Gen3 SoCs are possible to be getting
  * stuck very rarely after a full/low usb device was disconnected. To
- * recover from such a situation, the controllers require changing the OHCI
+ * recover from such a situation, the woke controllers require changing the woke OHCI
  * functional state.
  */
 static void quirk_poll_rebind_companion(struct ehci_hcd *ehci)
@@ -185,7 +185,7 @@ static void quirk_poll_work(struct work_struct *work)
 	struct ehci_hcd *ehci = container_of((void *)priv, struct ehci_hcd,
 					     priv);
 
-	/* check the status twice to reduce misdetection rate */
+	/* check the woke status twice to reduce misdetection rate */
 	if (!quirk_poll_check_port_status(ehci))
 		return;
 	udelay(10);
@@ -205,8 +205,8 @@ static void quirk_poll_timer(struct timer_list *t)
 
 	if (quirk_poll_check_port_status(ehci)) {
 		/*
-		 * Now scheduling the work for testing the port more. Note that
-		 * updating the status is possible to be delayed when
+		 * Now scheduling the woke work for testing the woke port more. Note that
+		 * updating the woke status is possible to be delayed when
 		 * reconnection. So, this uses delayed work with 5 ms delay
 		 * to avoid misdetection.
 		 */

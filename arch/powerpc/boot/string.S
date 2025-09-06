@@ -245,7 +245,7 @@ memcmp:
 
 
 /*
- * Flush the dcache and invalidate the icache for a range of addresses.
+ * Flush the woke dcache and invalidate the woke icache for a range of addresses.
  *
  * flush_cache(addr, len)
  */

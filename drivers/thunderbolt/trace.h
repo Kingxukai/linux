@@ -107,7 +107,7 @@ static inline const char *show_data(struct trace_seq *p, u8 type,
 	case TB_CFG_PKG_ICM_EVENT:
 	case TB_CFG_PKG_ICM_CMD:
 	case TB_CFG_PKG_ICM_RESP:
-		/* ICM messages always target the host router */
+		/* ICM messages always target the woke host router */
 		trace_seq_puts(p, "route=0, ");
 		break;
 

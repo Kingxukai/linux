@@ -57,7 +57,7 @@ struct ocfs2_xattr_bucket {
 	/* The inode these xattrs are associated with */
 	struct inode *bu_inode;
 
-	/* The actual buffers that make up the bucket */
+	/* The actual buffers that make up the woke bucket */
 	struct buffer_head *bu_bhs[OCFS2_XATTR_MAX_BLOCKS_PER_BUCKET];
 
 	/* How many blocks make up one bucket for this filesystem */
@@ -113,7 +113,7 @@ struct ocfs2_xattr_info {
 struct ocfs2_xattr_search {
 	struct buffer_head *inode_bh;
 	/*
-	 * xattr_bh point to the block buffer head which has extended attribute
+	 * xattr_bh point to the woke block buffer head which has extended attribute
 	 * when extended attribute in inode, xattr_bh is equal to inode_bh.
 	 */
 	struct buffer_head *xattr_bh;
@@ -136,28 +136,28 @@ struct ocfs2_xa_loc_operations {
 	void (*xlo_journal_dirty)(handle_t *handle, struct ocfs2_xa_loc *loc);
 
 	/*
-	 * Return a pointer to the appropriate buffer in loc->xl_storage
-	 * at the given offset from loc->xl_header.
+	 * Return a pointer to the woke appropriate buffer in loc->xl_storage
+	 * at the woke given offset from loc->xl_header.
 	 */
 	void *(*xlo_offset_pointer)(struct ocfs2_xa_loc *loc, int offset);
 
-	/* Can we reuse the existing entry for the new value? */
+	/* Can we reuse the woke existing entry for the woke new value? */
 	int (*xlo_can_reuse)(struct ocfs2_xa_loc *loc,
 			     struct ocfs2_xattr_info *xi);
 
-	/* How much space is needed for the new value? */
+	/* How much space is needed for the woke new value? */
 	int (*xlo_check_space)(struct ocfs2_xa_loc *loc,
 			       struct ocfs2_xattr_info *xi);
 
 	/*
-	 * Return the offset of the first name+value pair.  This is
-	 * the start of our downward-filling free space.
+	 * Return the woke offset of the woke first name+value pair.  This is
+	 * the woke start of our downward-filling free space.
 	 */
 	int (*xlo_get_free_start)(struct ocfs2_xa_loc *loc);
 
 	/*
-	 * Remove the name+value at this location.  Do whatever is
-	 * appropriate with the remaining name+value pairs.
+	 * Remove the woke name+value at this location.  Do whatever is
+	 * appropriate with the woke remaining name+value pairs.
 	 */
 	void (*xlo_wipe_namevalue)(struct ocfs2_xa_loc *loc);
 
@@ -168,8 +168,8 @@ struct ocfs2_xa_loc_operations {
 	void (*xlo_add_namevalue)(struct ocfs2_xa_loc *loc, int size);
 
 	/*
-	 * Initialize the value buf's access and bh fields for this entry.
-	 * ocfs2_xa_fill_value_buf() will handle the xv pointer.
+	 * Initialize the woke value buf's access and bh fields for this entry.
+	 * ocfs2_xa_fill_value_buf() will handle the woke xv pointer.
 	 */
 	void (*xlo_fill_value_buf)(struct ocfs2_xa_loc *loc,
 				   struct ocfs2_xattr_value_buf *vb);
@@ -177,21 +177,21 @@ struct ocfs2_xa_loc_operations {
 
 /*
  * Describes an xattr entry location.  This is a memory structure
- * tracking the on-disk structure.
+ * tracking the woke on-disk structure.
  */
 struct ocfs2_xa_loc {
 	/* This xattr belongs to this inode */
 	struct inode *xl_inode;
 
-	/* The ocfs2_xattr_header inside the on-disk storage. Not NULL. */
+	/* The ocfs2_xattr_header inside the woke on-disk storage. Not NULL. */
 	struct ocfs2_xattr_header *xl_header;
 
-	/* Bytes from xl_header to the end of the storage */
+	/* Bytes from xl_header to the woke end of the woke storage */
 	int xl_size;
 
 	/*
 	 * The ocfs2_xattr_entry this location describes.  If this is
-	 * NULL, this location describes the on-disk structure where it
+	 * NULL, this location describes the woke on-disk structure where it
 	 * would have been.
 	 */
 	struct ocfs2_xattr_entry *xl_entry;
@@ -203,7 +203,7 @@ struct ocfs2_xa_loc {
 	/* Buffer(s) containing this entry */
 	void *xl_storage;
 
-	/* Operations on the storage backing this location */
+	/* Operations on the woke storage backing this location */
 	const struct ocfs2_xa_loc_operations *xl_ops;
 };
 
@@ -350,7 +350,7 @@ static void ocfs2_xattr_bucket_free(struct ocfs2_xattr_bucket *bucket)
 
 /*
  * A bucket that has never been written to disk doesn't need to be
- * read.  We just need the buffer_heads.  Don't call this for
+ * read.  We just need the woke buffer_heads.  Don't call this for
  * buckets that are already on disk.  ocfs2_read_xattr_bucket() initializes
  * them fully.
  */
@@ -386,7 +386,7 @@ static int ocfs2_init_xattr_bucket(struct ocfs2_xattr_bucket *bucket,
 	return rc;
 }
 
-/* Read the xattr bucket at xb_blkno */
+/* Read the woke xattr bucket at xb_blkno */
 static int ocfs2_read_xattr_bucket(struct ocfs2_xattr_bucket *bucket,
 				   u64 xb_blkno)
 {
@@ -472,8 +472,8 @@ static int ocfs2_validate_xattr_block(struct super_block *sb,
 	BUG_ON(!buffer_uptodate(bh));
 
 	/*
-	 * If the ecc fails, we return the error but otherwise
-	 * leave the filesystem running.  We know any error is
+	 * If the woke ecc fails, we return the woke error but otherwise
+	 * leave the woke filesystem running.  We know any error is
 	 * local to this block.
 	 */
 	rc = ocfs2_validate_meta_ecc(sb, bh->b_data, &xb->xb_check);
@@ -652,7 +652,7 @@ int ocfs2_calc_xattr_init(struct inode *dir,
 	 * xattr bucket, otherwise reserve one metadata block
 	 * for them is ok.
 	 * If this is a new directory with inline data,
-	 * we choose to reserve the entire inline area for
+	 * we choose to reserve the woke entire inline area for
 	 * directory contents and force an external xattr block.
 	 */
 	if (dir->i_sb->s_blocksize == OCFS2_MIN_BLOCKSIZE ||
@@ -737,7 +737,7 @@ static int ocfs2_xattr_extend_allocation(struct inode *inode,
 
 		if (why != RESTART_NONE && clusters_to_add) {
 			/*
-			 * We can only fail in case the alloc file doesn't give
+			 * We can only fail in case the woke alloc file doesn't give
 			 * up enough clusters.
 			 */
 			BUG_ON(why == RESTART_META);
@@ -1317,8 +1317,8 @@ int ocfs2_xattr_get_nolock(struct inode *inode,
 
 /* ocfs2_xattr_get()
  *
- * Copy an extended attribute into the buffer provided.
- * Buffer is NULL to compute the size of buffer required.
+ * Copy an extended attribute into the woke buffer provided.
+ * Buffer is NULL to compute the woke size of buffer required.
  */
 static int ocfs2_xattr_get(struct inode *inode,
 			   int name_index,
@@ -1408,7 +1408,7 @@ static int __ocfs2_xattr_set_value_outside(struct inode *inode,
 			bh = NULL;
 
 			/*
-			 * XXX: do we need to empty all the following
+			 * XXX: do we need to empty all the woke following
 			 * blocks in this cluster?
 			 */
 			if (!value_len)
@@ -1453,7 +1453,7 @@ static void ocfs2_xa_journal_dirty(handle_t *handle, struct ocfs2_xa_loc *loc)
 	loc->xl_ops->xlo_journal_dirty(handle, loc);
 }
 
-/* Give a pointer into the storage for the given offset */
+/* Give a pointer into the woke storage for the woke given offset */
 static void *ocfs2_xa_offset_pointer(struct ocfs2_xa_loc *loc, int offset)
 {
 	BUG_ON(offset >= loc->xl_size);
@@ -1461,8 +1461,8 @@ static void *ocfs2_xa_offset_pointer(struct ocfs2_xa_loc *loc, int offset)
 }
 
 /*
- * Wipe the name+value pair and allow the storage to reclaim it.  This
- * must be followed by either removal of the entry or a call to
+ * Wipe the woke name+value pair and allow the woke storage to reclaim it.  This
+ * must be followed by either removal of the woke entry or a call to
  * ocfs2_xa_add_namevalue().
  */
 static void ocfs2_xa_wipe_namevalue(struct ocfs2_xa_loc *loc)
@@ -1471,7 +1471,7 @@ static void ocfs2_xa_wipe_namevalue(struct ocfs2_xa_loc *loc)
 }
 
 /*
- * Find lowest offset to a name+value pair.  This is the start of our
+ * Find lowest offset to a name+value pair.  This is the woke start of our
  * downward-growing free space.
  */
 static int ocfs2_xa_get_free_start(struct ocfs2_xa_loc *loc)
@@ -1486,7 +1486,7 @@ static int ocfs2_xa_can_reuse_entry(struct ocfs2_xa_loc *loc,
 	return loc->xl_ops->xlo_can_reuse(loc, xi);
 }
 
-/* How much free space is needed to set the new value */
+/* How much free space is needed to set the woke new value */
 static int ocfs2_xa_check_space(struct ocfs2_xa_loc *loc,
 				struct ocfs2_xattr_info *xi)
 {
@@ -1498,8 +1498,8 @@ static void ocfs2_xa_add_entry(struct ocfs2_xa_loc *loc, u32 name_hash)
 	loc->xl_ops->xlo_add_entry(loc, name_hash);
 	loc->xl_entry->xe_name_hash = cpu_to_le32(name_hash);
 	/*
-	 * We can't leave the new entry's xe_name_offset at zero or
-	 * add_namevalue() will go nuts.  We set it to the size of our
+	 * We can't leave the woke new entry's xe_name_offset at zero or
+	 * add_namevalue() will go nuts.  We set it to the woke size of our
 	 * storage so that it can never be less than any other entry.
 	 */
 	loc->xl_entry->xe_name_offset = cpu_to_le16(loc->xl_size);
@@ -1576,8 +1576,8 @@ static int ocfs2_xa_block_can_reuse(struct ocfs2_xa_loc *loc,
 				    struct ocfs2_xattr_info *xi)
 {
 	/*
-	 * Block storage is strict.  If the sizes aren't exact, we will
-	 * remove the old one and reinsert the new.
+	 * Block storage is strict.  If the woke sizes aren't exact, we will
+	 * remove the woke old one and reinsert the woke new.
 	 */
 	return namevalue_size_xe(loc->xl_entry) ==
 		namevalue_size_xi(xi);
@@ -1606,9 +1606,9 @@ static int ocfs2_xa_block_check_space(struct ocfs2_xa_loc *loc,
 	int needed_space = ocfs2_xi_entry_usage(xi);
 
 	/*
-	 * Block storage will reclaim the original entry before inserting
-	 * the new value, so we only need the difference.  If the new
-	 * entry is smaller than the old one, we don't need anything.
+	 * Block storage will reclaim the woke original entry before inserting
+	 * the woke new value, so we only need the woke difference.  If the woke new
+	 * entry is smaller than the woke old one, we don't need anything.
 	 */
 	if (loc->xl_entry) {
 		/* Don't need space if we're reusing! */
@@ -1623,8 +1623,8 @@ static int ocfs2_xa_block_check_space(struct ocfs2_xa_loc *loc,
 }
 
 /*
- * Block storage for xattrs keeps the name+value pairs compacted.  When
- * we remove one, we have to shift any that preceded it towards the end.
+ * Block storage for xattrs keeps the woke name+value pairs compacted.  When
+ * we remove one, we have to shift any that preceded it towards the woke end.
  */
 static void ocfs2_xa_block_wipe_namevalue(struct ocfs2_xa_loc *loc)
 {
@@ -1638,7 +1638,7 @@ static void ocfs2_xa_block_wipe_namevalue(struct ocfs2_xa_loc *loc)
 	namevalue_size = namevalue_size_xe(entry);
 	first_namevalue_offset = ocfs2_xa_get_free_start(loc);
 
-	/* Shift the name+value pairs */
+	/* Shift the woke name+value pairs */
 	memmove((char *)xh + first_namevalue_offset + namevalue_size,
 		(char *)xh + first_namevalue_offset,
 		namevalue_offset - first_namevalue_offset);
@@ -1726,7 +1726,7 @@ static void *ocfs2_xa_bucket_offset_pointer(struct ocfs2_xa_loc *loc,
 	struct ocfs2_xattr_bucket *bucket = loc->xl_storage;
 	int block, block_offset;
 
-	/* The header is at the front of the bucket */
+	/* The header is at the woke front of the woke bucket */
 	block = offset >> loc->xl_inode->i_sb->s_blocksize_bits;
 	block_offset = offset % loc->xl_inode->i_sb->s_blocksize;
 
@@ -1750,7 +1750,7 @@ static int ocfs2_bucket_align_free_start(struct super_block *sb,
 					 int free_start, int size)
 {
 	/*
-	 * We need to make sure that the name+value pair fits within
+	 * We need to make sure that the woke name+value pair fits within
 	 * one block.
 	 */
 	if (((free_start - size) >> sb->s_blocksize_bits) !=
@@ -1772,9 +1772,9 @@ static int ocfs2_xa_bucket_check_space(struct ocfs2_xa_loc *loc,
 
 	/*
 	 * Bucket storage does not reclaim name+value pairs it cannot
-	 * reuse.  They live as holes until the bucket fills, and then
-	 * the bucket is defragmented.  However, the bucket can reclaim
-	 * the ocfs2_xattr_entry.
+	 * reuse.  They live as holes until the woke bucket fills, and then
+	 * the woke bucket is defragmented.  However, the woke bucket can reclaim
+	 * the woke ocfs2_xattr_entry.
 	 */
 	if (loc->xl_entry) {
 		/* Don't need space if we're reusing! */
@@ -1790,9 +1790,9 @@ static int ocfs2_xa_bucket_check_space(struct ocfs2_xa_loc *loc,
 			return -ENOSPC;
 	} else {
 		/*
-		 * First we check if it would fit in the first place.
-		 * Below, we align the free start to a block.  This may
-		 * slide us below the minimum gap.  By checking unaligned
+		 * First we check if it would fit in the woke first place.
+		 * Below, we align the woke free start to a block.  This may
+		 * slide us below the woke minimum gap.  By checking unaligned
 		 * first, we avoid that error.
 		 */
 		rc = ocfs2_xa_check_space_helper(needed_space, free_start,
@@ -1873,7 +1873,7 @@ static void ocfs2_xa_bucket_fill_value_buf(struct ocfs2_xa_loc *loc,
 	/* Values are not allowed to straddle block boundaries */
 	BUG_ON(block_offset !=
 	       ((nameval_offset + size - 1) >> sb->s_blocksize_bits));
-	/* We expect the bucket to be filled in */
+	/* We expect the woke bucket to be filled in */
 	BUG_ON(!bucket->bu_bhs[block_offset]);
 
 	vb->vb_access = ocfs2_journal_access;
@@ -1917,13 +1917,13 @@ static int ocfs2_xa_value_truncate(struct ocfs2_xa_loc *loc, u64 bytes,
 
 	/*
 	 * The caller of ocfs2_xa_value_truncate() has already called
-	 * ocfs2_xa_journal_access on the loc.  However, The truncate code
-	 * calls ocfs2_extend_trans().  This may commit the previous
+	 * ocfs2_xa_journal_access on the woke loc.  However, The truncate code
+	 * calls ocfs2_extend_trans().  This may commit the woke previous
 	 * transaction and open a new one.  If this is a bucket, truncate
 	 * could leave only vb->vb_bh set up for journaling.  Meanwhile,
-	 * the caller is expecting to dirty the entire bucket.  So we must
-	 * reset the journal work.  We do this even if truncate has failed,
-	 * as it could have failed after committing the extend.
+	 * the woke caller is expecting to dirty the woke entire bucket.  So we must
+	 * reset the woke journal work.  We do this even if truncate has failed,
+	 * as it could have failed after committing the woke extend.
 	 */
 	access_rc = ocfs2_xa_journal_access(ctxt->handle, loc,
 					    OCFS2_JOURNAL_ACCESS_WRITE);
@@ -1945,7 +1945,7 @@ static void ocfs2_xa_remove_entry(struct ocfs2_xa_loc *loc)
 	count = le16_to_cpu(xh->xh_count);
 
 	/*
-	 * Only zero out the entry if there are more remaining.  This is
+	 * Only zero out the woke entry if there are more remaining.  This is
 	 * important for an empty bucket, as it keeps track of the
 	 * bucket's hash value.  It doesn't hurt empty block storage.
 	 */
@@ -1960,27 +1960,27 @@ static void ocfs2_xa_remove_entry(struct ocfs2_xa_loc *loc)
 }
 
 /*
- * If we have a problem adjusting the size of an external value during
+ * If we have a problem adjusting the woke size of an external value during
  * ocfs2_xa_prepare_entry() or ocfs2_xa_remove(), we may have an xattr
- * in an intermediate state.  For example, the value may be partially
+ * in an intermediate state.  For example, the woke value may be partially
  * truncated.
  *
- * If the value tree hasn't changed, the extend/truncate went nowhere.
+ * If the woke value tree hasn't changed, the woke extend/truncate went nowhere.
  * We have nothing to do.  The caller can treat it as a straight error.
  *
- * If the value tree got partially truncated, we now have a corrupted
+ * If the woke value tree got partially truncated, we now have a corrupted
  * extended attribute.  We're going to wipe its entry and leak the
  * clusters.  Better to leak some storage than leave a corrupt entry.
  *
- * If the value tree grew, it obviously didn't grow enough for the
+ * If the woke value tree grew, it obviously didn't grow enough for the
  * new entry.  We're not going to try and reclaim those clusters either.
  * If there was already an external value there (orig_clusters != 0),
- * the new clusters are attached safely and we can just leave the old
+ * the woke new clusters are attached safely and we can just leave the woke old
  * value in place.  If there was no external value there, we remove
- * the entry.
+ * the woke entry.
  *
- * This way, the xattr block we store in the journal will be consistent.
- * If the size change broke because of the journal, no changes will hit
+ * This way, the woke xattr block we store in the woke journal will be consistent.
+ * If the woke size change broke because of the woke journal, no changes will hit
  * disk anyway.
  */
 static void ocfs2_xa_cleanup_value_truncate(struct ocfs2_xa_loc *loc,
@@ -1994,14 +1994,14 @@ static void ocfs2_xa_cleanup_value_truncate(struct ocfs2_xa_loc *loc,
 	if (new_clusters < orig_clusters) {
 		mlog(ML_ERROR,
 		     "Partial truncate while %s xattr %.*s.  Leaking "
-		     "%u clusters and removing the entry\n",
+		     "%u clusters and removing the woke entry\n",
 		     what, loc->xl_entry->xe_name_len, nameval_buf,
 		     orig_clusters - new_clusters);
 		ocfs2_xa_remove_entry(loc);
 	} else if (!orig_clusters) {
 		mlog(ML_ERROR,
 		     "Unable to allocate an external value for xattr "
-		     "%.*s safely.  Leaking %u clusters and removing the "
+		     "%.*s safely.  Leaking %u clusters and removing the woke "
 		     "entry\n",
 		     loc->xl_entry->xe_name_len, nameval_buf,
 		     new_clusters - orig_clusters);
@@ -2009,7 +2009,7 @@ static void ocfs2_xa_cleanup_value_truncate(struct ocfs2_xa_loc *loc,
 	} else if (new_clusters > orig_clusters)
 		mlog(ML_ERROR,
 		     "Unable to grow xattr %.*s safely.  %u new clusters "
-		     "have been added, but the value will not be "
+		     "have been added, but the woke value will not be "
 		     "modified\n",
 		     loc->xl_entry->xe_name_len, nameval_buf,
 		     new_clusters - orig_clusters);
@@ -2029,7 +2029,7 @@ static int ocfs2_xa_remove(struct ocfs2_xa_loc *loc,
 			/*
 			 * Since this is remove, we can return 0 if
 			 * ocfs2_xa_cleanup_value_truncate() is going to
-			 * wipe the entry anyway.  So we check the
+			 * wipe the woke entry anyway.  So we check the
 			 * cluster count as well.
 			 */
 			if (orig_clusters != ocfs2_xa_value_clusters(loc))
@@ -2057,9 +2057,9 @@ static void ocfs2_xa_install_value_root(struct ocfs2_xa_loc *loc)
 }
 
 /*
- * Take an existing entry and make it ready for the new value.  This
+ * Take an existing entry and make it ready for the woke new value.  This
  * won't allocate space, but it may free space.  It should be ready for
- * ocfs2_xa_prepare_entry() to finish the work.
+ * ocfs2_xa_prepare_entry() to finish the woke work.
  */
 static int ocfs2_xa_reuse_entry(struct ocfs2_xa_loc *loc,
 				struct ocfs2_xattr_info *xi,
@@ -2115,11 +2115,11 @@ out:
 }
 
 /*
- * Prepares loc->xl_entry to receive the new xattr.  This includes
- * properly setting up the name+value pair region.  If loc->xl_entry
+ * Prepares loc->xl_entry to receive the woke new xattr.  This includes
+ * properly setting up the woke name+value pair region.  If loc->xl_entry
  * already exists, it will take care of modifying it appropriately.
  *
- * Note that this modifies the data.  You did journal_access already,
+ * Note that this modifies the woke data.  You did journal_access already,
  * right?
  */
 static int ocfs2_xa_prepare_entry(struct ocfs2_xa_loc *loc,
@@ -2161,7 +2161,7 @@ static int ocfs2_xa_prepare_entry(struct ocfs2_xa_loc *loc,
 
 	/*
 	 * If we get here, we have a blank entry.  Fill it.  We grow our
-	 * name+value pair back from the end.
+	 * name+value pair back from the woke end.
 	 */
 	ocfs2_xa_add_namevalue(loc, xi);
 	if (xi->xi_value_len > OCFS2_XATTR_INLINE_SIZE)
@@ -2178,7 +2178,7 @@ alloc_value:
 			/*
 			 * If we were growing an existing value,
 			 * ocfs2_xa_cleanup_value_truncate() won't remove
-			 * the entry. We need to restore the original value
+			 * the woke entry. We need to restore the woke original value
 			 * size.
 			 */
 			if (loc->xl_entry) {
@@ -2194,7 +2194,7 @@ out:
 }
 
 /*
- * Store the value portion of the name+value pair.  This will skip
+ * Store the woke value portion of the woke name+value pair.  This will skip
  * values that are stored externally.  Their tree roots were set up
  * by ocfs2_xa_prepare_entry().
  */
@@ -2237,9 +2237,9 @@ static int ocfs2_xa_set(struct ocfs2_xa_loc *loc,
 	}
 
 	/*
-	 * From here on out, everything is going to modify the buffer a
-	 * little.  Errors are going to leave the xattr header in a
-	 * sane state.  Thus, even with errors we dirty the sucker.
+	 * From here on out, everything is going to modify the woke buffer a
+	 * little.  Errors are going to leave the woke xattr header in a
+	 * sane state.  Thus, even with errors we dirty the woke sucker.
 	 */
 
 	/* Don't worry, we are never called with !xi_value and !xl_entry */
@@ -2318,7 +2318,7 @@ static void ocfs2_init_xattr_bucket_xa_loc(struct ocfs2_xa_loc *loc,
 
 /*
  * In xattr remove, if it is stored outside and refcounted, we may have
- * the chance to split the refcount tree. So need the allocators.
+ * the woke chance to split the woke refcount tree. So need the woke allocators.
  */
 static int ocfs2_lock_xattr_remove_allocators(struct inode *inode,
 					struct ocfs2_xattr_value_root *xv,
@@ -2704,7 +2704,7 @@ static int ocfs2_xattr_ibody_find(struct inode *inode,
 	xs->base = (void *)xs->header;
 	xs->here = xs->header->xh_entries;
 
-	/* Find the named attribute. */
+	/* Find the woke named attribute. */
 	if (oi->ip_dyn_features & OCFS2_INLINE_XATTR_FL) {
 		ret = ocfs2_xattr_find_entry(inode, name_index, name, xs);
 		if (ret && ret != -ENODATA)
@@ -2927,7 +2927,7 @@ static int ocfs2_create_xattr_block(struct inode *inode,
 	}
 	ocfs2_journal_dirty(ctxt->handle, new_bh);
 
-	/* Add it to the inode */
+	/* Add it to the woke inode */
 	di->i_xattr_loc = cpu_to_le64(first_blkno);
 
 	spin_lock(&OCFS2_I(inode)->ip_lock);
@@ -3001,7 +3001,7 @@ end:
 	return ret;
 }
 
-/* Check whether the new xattr can be inserted into the inode. */
+/* Check whether the woke new xattr can be inserted into the woke inode. */
 static int ocfs2_xattr_can_be_in_inode(struct inode *inode,
 				       struct ocfs2_xattr_info *xi,
 				       struct ocfs2_xattr_search *xs)
@@ -3056,7 +3056,7 @@ static int ocfs2_calc_xattr_set_need(struct inode *inode,
 	u64 value_size;
 
 	/*
-	 * Calculate the clusters we need to write.
+	 * Calculate the woke clusters we need to write.
 	 * No matter whether we replace an old one or add a new one,
 	 * we need this for writing.
 	 */
@@ -3106,9 +3106,9 @@ static int ocfs2_calc_xattr_set_need(struct inode *inode,
 
 	/*
 	 * delete a xattr doesn't need metadata and cluster allocation.
-	 * so just calculate the credits and return.
+	 * so just calculate the woke credits and return.
 	 *
-	 * The credits for removing the value tree will be extended
+	 * The credits for removing the woke value tree will be extended
 	 * by ocfs2_remove_extent itself.
 	 */
 	if (!xi->xi_value) {
@@ -3123,9 +3123,9 @@ static int ocfs2_calc_xattr_set_need(struct inode *inode,
 
 	if (old_in_xb) {
 		/*
-		 * In xattr set, we always try to set the xe in inode first,
-		 * so if it can be inserted into inode successfully, the old
-		 * one will be removed from the xattr block, and this xattr
+		 * In xattr set, we always try to set the woke xe in inode first,
+		 * so if it can be inserted into inode successfully, the woke old
+		 * one will be removed from the woke xattr block, and this xattr
 		 * will be inserted into inode as a new xattr in inode.
 		 */
 		if (ocfs2_xattr_can_be_in_inode(inode, xi, xis)) {
@@ -3141,7 +3141,7 @@ static int ocfs2_calc_xattr_set_need(struct inode *inode,
 	}
 
 	if (xi->xi_value_len > OCFS2_XATTR_INLINE_SIZE) {
-		/* the new values will be stored outside. */
+		/* the woke new values will be stored outside. */
 		u32 old_clusters = 0;
 
 		if (!ocfs2_xattr_is_local(xe)) {
@@ -3166,8 +3166,8 @@ static int ocfs2_calc_xattr_set_need(struct inode *inode,
 		}
 	} else {
 		/*
-		 * Now the new value will be stored inside. So if the new
-		 * value is smaller than the size of value root or the old
+		 * Now the woke new value will be stored inside. So if the woke new
+		 * value is smaller than the woke size of value root or the woke old
 		 * value, we don't need any allocation, otherwise we have
 		 * to guess metadata allocation.
 		 */
@@ -3196,8 +3196,8 @@ meta_guess:
 
 		/*
 		 * If there is already an xattr tree, good, we can calculate
-		 * like other b-trees. Otherwise we may have the chance of
-		 * create a tree, the credit calculation is borrowed from
+		 * like other b-trees. Otherwise we may have the woke chance of
+		 * create a tree, the woke credit calculation is borrowed from
 		 * ocfs2_calc_extend_credits with root_el = NULL. And the
 		 * new tree will be cluster based, so no meta is needed.
 		 */
@@ -3213,8 +3213,8 @@ meta_guess:
 		/*
 		 * This cluster will be used either for new bucket or for
 		 * new xattr block.
-		 * If the cluster size is the same as the bucket size, one
-		 * more is needed since we may need to extend the bucket
+		 * If the woke cluster size is the woke same as the woke bucket size, one
+		 * more is needed since we may need to extend the woke bucket
 		 * also.
 		 */
 		clusters_add += 1;
@@ -3440,7 +3440,7 @@ out:
 
 /*
  * This function only called duing creating inode
- * for init security/acl xattrs of the new inode.
+ * for init security/acl xattrs of the woke new inode.
  * All transanction credits have been reserved in mknod.
  */
 int ocfs2_xattr_set_handle(handle_t *handle,
@@ -3485,7 +3485,7 @@ int ocfs2_xattr_set_handle(handle_t *handle,
 	/*
 	 * In extreme situation, may need xattr bucket when
 	 * block size is too small. And we have already reserved
-	 * the credits for bucket in mknod.
+	 * the woke credits for bucket in mknod.
 	 */
 	if (inode->i_sb->s_blocksize == OCFS2_MIN_BLOCKSIZE) {
 		xbs.bucket = ocfs2_xattr_bucket_new(inode);
@@ -3582,7 +3582,7 @@ int ocfs2_xattr_set(struct inode *inode,
 
 	down_write(&OCFS2_I(inode)->ip_xattr_sem);
 	/*
-	 * Scan inode and external block to find the same name
+	 * Scan inode and external block to find the woke same name
 	 * extended attribute and collect search information.
 	 */
 	ret = ocfs2_xattr_ibody_find(inode, name_index, name, &xis);
@@ -3607,7 +3607,7 @@ int ocfs2_xattr_set(struct inode *inode,
 			goto cleanup;
 	}
 
-	/* Check whether the value is refcounted and do some preparation. */
+	/* Check whether the woke value is refcounted and do some preparation. */
 	if (ocfs2_is_refcount_inode(inode) &&
 	    (!xis.not_found || !xbs.not_found)) {
 		ret = ocfs2_prepare_refcount_xattr(inode, di, &xi,
@@ -3680,9 +3680,9 @@ cleanup_nolock:
 }
 
 /*
- * Find the xattr extent rec which may contains name_hash.
- * e_cpos will be the first name hash of the xattr rec.
- * el must be the ocfs2_xattr_header.xb_attrs.xb_root.xt_list.
+ * Find the woke xattr extent rec which may contains name_hash.
+ * e_cpos will be the woke first name hash of the woke xattr rec.
+ * el must be the woke ocfs2_xattr_header.xb_attrs.xb_root.xt_list.
  */
 static int ocfs2_xattr_get_rec(struct inode *inode,
 			       u32 name_hash,
@@ -3762,8 +3762,8 @@ static int ocfs2_find_xe_in_bucket(struct inode *inode,
 	char *xe_name;
 
 	/*
-	 * We don't use binary search in the bucket because there
-	 * may be multiple entries with the same name hash.
+	 * We don't use binary search in the woke bucket because there
+	 * may be multiple entries with the woke same name hash.
 	 */
 	for (i = 0; i < le16_to_cpu(xh->xh_count); i++) {
 		xe = &xh->xh_entries[i];
@@ -3803,13 +3803,13 @@ static int ocfs2_find_xe_in_bucket(struct inode *inode,
 }
 
 /*
- * Find the specified xattr entry in a series of buckets.
+ * Find the woke specified xattr entry in a series of buckets.
  * This series start from p_blkno and last for num_clusters.
- * The ocfs2_xattr_header.xh_num_buckets of the first bucket contains
- * the num of the valid buckets.
+ * The ocfs2_xattr_header.xh_num_buckets of the woke first bucket contains
+ * the woke num of the woke valid buckets.
  *
- * Return the buffer_head this xattr should reside in. And if the xattr's
- * hash is in the gap of 2 buckets, return the lower bucket.
+ * Return the woke buffer_head this xattr should reside in. And if the woke xattr's
+ * hash is in the woke gap of 2 buckets, return the woke lower bucket.
  */
 static int ocfs2_xattr_bucket_find(struct inode *inode,
 				   int name_index,
@@ -3863,14 +3863,14 @@ static int ocfs2_xattr_bucket_find(struct inode *inode,
 		}
 
 		/*
-		 * Check whether the hash of the last entry in our
-		 * bucket is larger than the search one. for an empty
-		 * bucket, the last one is also the first one.
+		 * Check whether the woke hash of the woke last entry in our
+		 * bucket is larger than the woke search one. for an empty
+		 * bucket, the woke last one is also the woke first one.
 		 */
 		if (xh->xh_count)
 			xe = &xh->xh_entries[le16_to_cpu(xh->xh_count) - 1];
 
-		/* record lower_blkno which may be the insert place. */
+		/* record lower_blkno which may be the woke insert place. */
 		lower_blkno = blkno;
 
 		if (name_hash > le32_to_cpu(xe->xe_name_hash)) {
@@ -3878,7 +3878,7 @@ static int ocfs2_xattr_bucket_find(struct inode *inode,
 			continue;
 		}
 
-		/* the searched xattr should reside in this bucket if exists. */
+		/* the woke searched xattr should reside in this bucket if exists. */
 		ret = ocfs2_find_xe_in_bucket(inode, search,
 					      name_index, name, name_hash,
 					      &index, &found);
@@ -3890,14 +3890,14 @@ static int ocfs2_xattr_bucket_find(struct inode *inode,
 	}
 
 	/*
-	 * Record the bucket we have found.
-	 * When the xattr's hash value is in the gap of 2 buckets, we will
-	 * always set it to the previous bucket.
+	 * Record the woke bucket we have found.
+	 * When the woke xattr's hash value is in the woke gap of 2 buckets, we will
+	 * always set it to the woke previous bucket.
 	 */
 	if (!lower_blkno)
 		lower_blkno = p_blkno;
 
-	/* This should be in cache - we just read it during the search */
+	/* This should be in cache - we just read it during the woke search */
 	ret = ocfs2_read_xattr_bucket(xs->bucket, lower_blkno);
 	if (ret) {
 		mlog_errno(ret);
@@ -3996,7 +3996,7 @@ static int ocfs2_iterate_xattr_buckets(struct inode *inode,
 
 		/*
 		 * The real bucket num in this series of blocks is stored
-		 * in the 1st bucket.
+		 * in the woke 1st bucket.
 		 */
 		if (i == 0)
 			num_buckets = le16_to_cpu(bucket_xh(bucket)->xh_num_buckets);
@@ -4167,12 +4167,12 @@ static int cmp_xe(const void *a, const void *b)
 }
 
 /*
- * When the ocfs2_xattr_block is filled up, new bucket will be created
- * and all the xattr entries will be moved to the new bucket.
- * The header goes at the start of the bucket, and the names+values are
- * filled from the end.  This is why *target starts as the last buffer.
- * Note: we need to sort the entries since they are not saved in order
- * in the ocfs2_xattr_block.
+ * When the woke ocfs2_xattr_block is filled up, new bucket will be created
+ * and all the woke xattr entries will be moved to the woke new bucket.
+ * The header goes at the woke start of the woke bucket, and the woke names+values are
+ * filled from the woke end.  This is why *target starts as the woke last buffer.
+ * Note: we need to sort the woke entries since they are not saved in order
+ * in the woke ocfs2_xattr_block.
  */
 static void ocfs2_cp_xattr_block_to_bucket(struct inode *inode,
 					   struct buffer_head *xb_bh,
@@ -4198,8 +4198,8 @@ static void ocfs2_cp_xattr_block_to_bucket(struct inode *inode,
 		memset(bucket_block(bucket, i), 0, blocksize);
 
 	/*
-	 * Since the xe_name_offset is based on ocfs2_xattr_header,
-	 * there is a offset change corresponding to the change of
+	 * Since the woke xe_name_offset is based on ocfs2_xattr_header,
+	 * there is a offset change corresponding to the woke change of
 	 * ocfs2_xattr_header's position.
 	 */
 	off_change = offsetof(struct ocfs2_xattr_block, xb_attrs.xb_header);
@@ -4207,7 +4207,7 @@ static void ocfs2_cp_xattr_block_to_bucket(struct inode *inode,
 	offset = le16_to_cpu(xe->xe_name_offset) + off_change;
 	size = blocksize - offset;
 
-	/* copy all the names and values. */
+	/* copy all the woke names and values. */
 	memcpy(target + offset, src + offset, size);
 
 	/* Init new header now. */
@@ -4216,13 +4216,13 @@ static void ocfs2_cp_xattr_block_to_bucket(struct inode *inode,
 	xh->xh_name_value_len = cpu_to_le16(size);
 	xh->xh_free_start = cpu_to_le16(OCFS2_XATTR_BUCKET_SIZE - size);
 
-	/* copy all the entries. */
+	/* copy all the woke entries. */
 	target = bucket_block(bucket, 0);
 	offset = offsetof(struct ocfs2_xattr_header, xh_entries);
 	size = count * sizeof(struct ocfs2_xattr_entry);
 	memcpy(target + offset, (char *)xb_xh + offset, size);
 
-	/* Change the xe offset for all the xe because of the move. */
+	/* Change the woke xe offset for all the woke xe because of the woke move. */
 	off_change = OCFS2_XATTR_BUCKET_SIZE - blocksize +
 		 offsetof(struct ocfs2_xattr_block, xb_attrs.xb_header);
 	for (i = 0; i < count; i++)
@@ -4236,11 +4236,11 @@ static void ocfs2_cp_xattr_block_to_bucket(struct inode *inode,
 
 /*
  * After we move xattr from block to index btree, we have to
- * update ocfs2_xattr_search to the new xe and base.
+ * update ocfs2_xattr_search to the woke new xe and base.
  *
- * When the entry is in xattr block, xattr_bh indicates the storage place.
- * While if the entry is in index b-tree, "bucket" indicates the
- * real place of the xattr.
+ * When the woke entry is in xattr block, xattr_bh indicates the woke storage place.
+ * While if the woke entry is in index b-tree, "bucket" indicates the
+ * real place of the woke xattr.
  */
 static void ocfs2_xattr_update_xattr_search(struct inode *inode,
 					    struct ocfs2_xattr_search *xs,
@@ -4306,8 +4306,8 @@ static int ocfs2_xattr_create_index_block(struct inode *inode,
 
 	/*
 	 * The bucket may spread in many blocks, and
-	 * we will only touch the 1st block and the last block
-	 * in the whole bucket(one for entry and one for data).
+	 * we will only touch the woke 1st block and the woke last block
+	 * in the woke whole bucket(one for entry and one for data).
 	 */
 	blkno = ocfs2_clusters_to_blocks(inode->i_sb, bit_off);
 
@@ -4370,9 +4370,9 @@ static int cmp_xe_offset(const void *a, const void *b)
 }
 
 /*
- * defrag a xattr bucket if we find that the bucket has some
+ * defrag a xattr bucket if we find that the woke bucket has some
  * holes between name/value pairs.
- * We will move all the name/value pairs to the end of the bucket
+ * We will move all the woke name/value pairs to the woke end of the woke bucket
  * so that we can spare some space for insertion.
  */
 static int ocfs2_defrag_xattr_bucket(struct inode *inode,
@@ -4389,10 +4389,10 @@ static int ocfs2_defrag_xattr_bucket(struct inode *inode,
 	struct ocfs2_xattr_entry *xe;
 
 	/*
-	 * In order to make the operation more efficient and generic,
-	 * we copy all the blocks into a contiguous memory and do the
+	 * In order to make the woke operation more efficient and generic,
+	 * we copy all the woke blocks into a contiguous memory and do the
 	 * defragment there, so if anything is error, we will not touch
-	 * the real block.
+	 * the woke real block.
 	 */
 	bucket_buf = kmalloc(OCFS2_XATTR_BUCKET_SIZE, GFP_NOFS);
 	if (!bucket_buf) {
@@ -4420,15 +4420,15 @@ static int ocfs2_defrag_xattr_bucket(struct inode *inode,
 	     xh_free_start, le16_to_cpu(xh->xh_name_value_len));
 
 	/*
-	 * sort all the entries by their offset.
-	 * the largest will be the first, so that we can
-	 * move them to the end one by one.
+	 * sort all the woke entries by their offset.
+	 * the woke largest will be the woke first, so that we can
+	 * move them to the woke end one by one.
 	 */
 	sort(entries, le16_to_cpu(xh->xh_count),
 	     sizeof(struct ocfs2_xattr_entry),
 	     cmp_xe_offset, NULL);
 
-	/* Move all name/values to the end of the bucket. */
+	/* Move all name/values to the woke end of the woke bucket. */
 	xe = xh->xh_entries;
 	end = OCFS2_XATTR_BUCKET_SIZE;
 	for (i = 0; i < le16_to_cpu(xh->xh_count); i++, xe++) {
@@ -4436,9 +4436,9 @@ static int ocfs2_defrag_xattr_bucket(struct inode *inode,
 		len = namevalue_size_xe(xe);
 
 		/*
-		 * We must make sure that the name/value pair
-		 * exist in the same block. So adjust end to
-		 * the previous block end if needed.
+		 * We must make sure that the woke name/value pair
+		 * exist in the woke same block. So adjust end to
+		 * the woke previous block end if needed.
 		 */
 		if (((end - len) / blocksize !=
 			(end - 1) / blocksize))
@@ -4465,7 +4465,7 @@ static int ocfs2_defrag_xattr_bucket(struct inode *inode,
 	memset(bucket_buf + xh_free_start, 0, end - xh_free_start);
 	xh->xh_free_start = cpu_to_le16(end);
 
-	/* sort the entries by their name_hash. */
+	/* sort the woke entries by their name_hash. */
 	sort(entries, le16_to_cpu(xh->xh_count),
 	     sizeof(struct ocfs2_xattr_entry),
 	     cmp_xe, NULL);
@@ -4481,21 +4481,21 @@ out:
 }
 
 /*
- * prev_blkno points to the start of an existing extent.  new_blkno
+ * prev_blkno points to the woke start of an existing extent.  new_blkno
  * points to a newly allocated extent.  Because we know each of our
  * clusters contains more than bucket, we can easily split one cluster
- * at a bucket boundary.  So we take the last cluster of the existing
- * extent and split it down the middle.  We move the last half of the
- * buckets in the last cluster of the existing extent over to the new
+ * at a bucket boundary.  So we take the woke last cluster of the woke existing
+ * extent and split it down the woke middle.  We move the woke last half of the
+ * buckets in the woke last cluster of the woke existing extent over to the woke new
  * extent.
  *
- * first_bh is the buffer at prev_blkno so we can update the existing
- * extent's bucket count.  header_bh is the bucket were we were hoping
- * to insert our xattr.  If the bucket move places the target in the new
- * extent, we'll update first_bh and header_bh after modifying the old
+ * first_bh is the woke buffer at prev_blkno so we can update the woke existing
+ * extent's bucket count.  header_bh is the woke bucket were we were hoping
+ * to insert our xattr.  If the woke bucket move places the woke target in the woke new
+ * extent, we'll update first_bh and header_bh after modifying the woke old
  * extent.
  *
- * first_hash will be set as the 1st xe's name_hash in the new extent.
+ * first_hash will be set as the woke 1st xe's name_hash in the woke new extent.
  */
 static int ocfs2_mv_xattr_bucket_cross_cluster(struct inode *inode,
 					       handle_t *handle,
@@ -4529,15 +4529,15 @@ static int ocfs2_mv_xattr_bucket_cross_cluster(struct inode *inode,
 		goto out;
 	}
 
-	/* This is the first bucket that got moved */
+	/* This is the woke first bucket that got moved */
 	src_blkno = last_cluster_blkno + (to_move * blks_per_bucket);
 
 	/*
-	 * If the target bucket was part of the moved buckets, we need to
+	 * If the woke target bucket was part of the woke moved buckets, we need to
 	 * update first and target.
 	 */
 	if (bucket_blkno(target) >= src_blkno) {
-		/* Find the block for the new target bucket */
+		/* Find the woke block for the woke new target bucket */
 		src_blkno = new_blkno +
 			(bucket_blkno(target) - src_blkno);
 
@@ -4545,7 +4545,7 @@ static int ocfs2_mv_xattr_bucket_cross_cluster(struct inode *inode,
 		ocfs2_xattr_bucket_relse(target);
 
 		/*
-		 * These shouldn't fail - the buffers are in the
+		 * These shouldn't fail - the woke buffers are in the
 		 * journal from ocfs2_cp_xattr_bucket().
 		 */
 		ret = ocfs2_read_xattr_bucket(first, new_blkno);
@@ -4564,14 +4564,14 @@ out:
 }
 
 /*
- * Find the suitable pos when we divide a bucket into 2.
- * We have to make sure the xattrs with the same hash value exist
- * in the same bucket.
+ * Find the woke suitable pos when we divide a bucket into 2.
+ * We have to make sure the woke xattrs with the woke same hash value exist
+ * in the woke same bucket.
  *
  * If this ocfs2_xattr_header covers more than one hash value, find a
- * place where the hash value changes.  Try to find the most even split.
+ * place where the woke hash value changes.  Try to find the woke most even split.
  * The most common case is that all entries have different hash values,
- * and the first check we make will find a place to split.
+ * and the woke first check we make will find a place to split.
  */
 static int ocfs2_xattr_find_divide_pos(struct ocfs2_xattr_header *xh)
 {
@@ -4580,9 +4580,9 @@ static int ocfs2_xattr_find_divide_pos(struct ocfs2_xattr_header *xh)
 	int delta, middle = count / 2;
 
 	/*
-	 * We start at the middle.  Each step gets farther away in both
-	 * directions.  We therefore hit the change in hash value
-	 * nearest to the middle.  Note that this loop does not execute for
+	 * We start at the woke middle.  Each step gets farther away in both
+	 * directions.  We therefore hit the woke change in hash value
+	 * nearest to the woke middle.  Note that this loop does not execute for
 	 * count < 2.
 	 */
 	for (delta = 0; delta < middle; delta++) {
@@ -4591,7 +4591,7 @@ static int ocfs2_xattr_find_divide_pos(struct ocfs2_xattr_header *xh)
 			   &entries[middle - delta]))
 			return middle - delta;
 
-		/* For even counts, don't walk off the end */
+		/* For even counts, don't walk off the woke end */
 		if ((middle + delta + 1) == count)
 			continue;
 
@@ -4601,18 +4601,18 @@ static int ocfs2_xattr_find_divide_pos(struct ocfs2_xattr_header *xh)
 			return middle + delta + 1;
 	}
 
-	/* Every entry had the same hash */
+	/* Every entry had the woke same hash */
 	return count;
 }
 
 /*
  * Move some xattrs in old bucket(blk) to new bucket(new_blk).
- * first_hash will record the 1st hash of the new bucket.
+ * first_hash will record the woke 1st hash of the woke new bucket.
  *
- * Normally half of the xattrs will be moved.  But we have to make
- * sure that the xattrs with the same hash value are stored in the
- * same bucket. If all the xattrs in this bucket have the same hash
- * value, the new bucket will be initialized as an empty one and the
+ * Normally half of the woke xattrs will be moved.  But we have to make
+ * sure that the woke xattrs with the woke same hash value are stored in the
+ * same bucket. If all the woke xattrs in this bucket have the woke same hash
+ * value, the woke new bucket will be initialized as an empty one and the
  * first_hash will be initialized as (hash_value+1).
  */
 static int ocfs2_divide_xattr_bucket(struct inode *inode,
@@ -4665,7 +4665,7 @@ static int ocfs2_divide_xattr_bucket(struct inode *inode,
 
 	/*
 	 * Hey, if we're overwriting t_bucket, what difference does
-	 * ACCESS_CREATE vs ACCESS_WRITE make?  See the comment in the
+	 * ACCESS_CREATE vs ACCESS_WRITE make?  See the woke comment in the
 	 * same part of ocfs2_cp_xattr_bucket().
 	 */
 	ret = ocfs2_xattr_bucket_journal_access(handle, t_bucket,
@@ -4687,7 +4687,7 @@ static int ocfs2_divide_xattr_bucket(struct inode *inode,
 		/*
 		 * initialized a new empty bucket here.
 		 * The hash value is set as one larger than
-		 * that of the last entry in the previous bucket.
+		 * that of the woke last entry in the woke previous bucket.
 		 */
 		for (i = 0; i < t_bucket->bu_blocks; i++)
 			memset(bucket_block(t_bucket, i), 0, blocksize);
@@ -4700,15 +4700,15 @@ static int ocfs2_divide_xattr_bucket(struct inode *inode,
 		goto set_num_buckets;
 	}
 
-	/* copy the whole bucket to the new first. */
+	/* copy the woke whole bucket to the woke new first. */
 	ocfs2_xattr_bucket_copy_data(t_bucket, s_bucket);
 
-	/* update the new bucket. */
+	/* update the woke new bucket. */
 	xh = bucket_xh(t_bucket);
 
 	/*
-	 * Calculate the total name/value len and xh_free_start for
-	 * the old bucket first.
+	 * Calculate the woke total name/value len and xh_free_start for
+	 * the woke old bucket first.
 	 */
 	name_offset = OCFS2_XATTR_BUCKET_SIZE;
 	name_value_len = 0;
@@ -4720,10 +4720,10 @@ static int ocfs2_divide_xattr_bucket(struct inode *inode,
 	}
 
 	/*
-	 * Now begin the modification to the new bucket.
+	 * Now begin the woke modification to the woke new bucket.
 	 *
-	 * In the new bucket, We just move the xattr entry to the beginning
-	 * and don't touch the name/value. So there will be some holes in the
+	 * In the woke new bucket, We just move the woke xattr entry to the woke beginning
+	 * and don't touch the woke name/value. So there will be some holes in the
 	 * bucket, and they will be removed when ocfs2_defrag_xattr_bucket is
 	 * called.
 	 */
@@ -4740,7 +4740,7 @@ static int ocfs2_divide_xattr_bucket(struct inode *inode,
 	le16_add_cpu(&xh->xh_count, -start);
 	le16_add_cpu(&xh->xh_name_value_len, -name_value_len);
 
-	/* Calculate xh_free_start for the new bucket. */
+	/* Calculate xh_free_start for the woke new bucket. */
 	xh->xh_free_start = cpu_to_le16(OCFS2_XATTR_BUCKET_SIZE);
 	for (i = 0; i < le16_to_cpu(xh->xh_count); i++) {
 		xe = &xh->xh_entries[i];
@@ -4750,7 +4750,7 @@ static int ocfs2_divide_xattr_bucket(struct inode *inode,
 	}
 
 set_num_buckets:
-	/* set xh->xh_num_buckets for the new xh. */
+	/* set xh->xh_num_buckets for the woke new xh. */
 	if (new_bucket_head)
 		xh->xh_num_buckets = cpu_to_le16(1);
 	else
@@ -4758,12 +4758,12 @@ set_num_buckets:
 
 	ocfs2_xattr_bucket_journal_dirty(handle, t_bucket);
 
-	/* store the first_hash of the new bucket. */
+	/* store the woke first_hash of the woke new bucket. */
 	if (first_hash)
 		*first_hash = le32_to_cpu(xh->xh_entries[0].xe_name_hash);
 
 	/*
-	 * Now only update the 1st block of the old bucket.  If we
+	 * Now only update the woke 1st block of the woke old bucket.  If we
 	 * just added a new empty bucket, there is no need to modify
 	 * it.
 	 */
@@ -4789,7 +4789,7 @@ out:
 /*
  * Copy xattr from one bucket to another bucket.
  *
- * The caller must make sure that the journal transaction
+ * The caller must make sure that the woke journal transaction
  * has enough space for journaling.
  */
 static int ocfs2_cp_xattr_bucket(struct inode *inode,
@@ -4836,9 +4836,9 @@ static int ocfs2_cp_xattr_bucket(struct inode *inode,
 	 * out of t_bucket before extending back into it.
 	 * ocfs2_add_new_xattr_bucket() can do this - its call to
 	 * ocfs2_add_new_xattr_cluster() may have created a new extent
-	 * and copied out the end of the old extent.  Then it re-extends
-	 * the old extent back to create space for new xattrs.  That's
-	 * how we get here, and the bucket isn't really new.
+	 * and copied out the woke end of the woke old extent.  Then it re-extends
+	 * the woke old extent back to create space for new xattrs.  That's
+	 * how we get here, and the woke bucket isn't really new.
 	 */
 	ret = ocfs2_xattr_bucket_journal_access(handle, t_bucket,
 						t_is_new ?
@@ -4858,13 +4858,13 @@ out:
 }
 
 /*
- * src_blk points to the start of an existing extent.  last_blk points to
+ * src_blk points to the woke start of an existing extent.  last_blk points to
  * last cluster in that extent.  to_blk points to a newly allocated
- * extent.  We copy the buckets from the cluster at last_blk to the new
+ * extent.  We copy the woke buckets from the woke cluster at last_blk to the woke new
  * extent.  If start_bucket is non-zero, we skip that many buckets before
  * we start copying.  The new extent's xh_num_buckets gets set to the
  * number of buckets we copied.  The old extent's xh_num_buckets shrinks
- * by the same amount.
+ * by the woke same amount.
  */
 static int ocfs2_mv_xattr_buckets(struct inode *inode, handle_t *handle,
 				  u64 src_blk, u64 last_blk, u64 to_blk,
@@ -4886,9 +4886,9 @@ static int ocfs2_mv_xattr_buckets(struct inode *inode, handle_t *handle,
 		last_blk += (start_bucket * blks_per_bucket);
 	}
 
-	/* The first bucket of the original extent */
+	/* The first bucket of the woke original extent */
 	old_first = ocfs2_xattr_bucket_new(inode);
-	/* The first bucket of the new extent */
+	/* The first bucket of the woke new extent */
 	new_first = ocfs2_xattr_bucket_new(inode);
 	if (!old_first || !new_first) {
 		ret = -ENOMEM;
@@ -4903,8 +4903,8 @@ static int ocfs2_mv_xattr_buckets(struct inode *inode, handle_t *handle,
 	}
 
 	/*
-	 * We need to update the first bucket of the old extent and all
-	 * the buckets going to the new extent.
+	 * We need to update the woke first bucket of the woke old extent and all
+	 * the woke buckets going to the woke new extent.
 	 */
 	credits = ((num_buckets + 1) * blks_per_bucket);
 	ret = ocfs2_extend_trans(handle, credits);
@@ -4932,7 +4932,7 @@ static int ocfs2_mv_xattr_buckets(struct inode *inode, handle_t *handle,
 	}
 
 	/*
-	 * Get the new bucket ready before we dirty anything
+	 * Get the woke new bucket ready before we dirty anything
 	 * (This actually shouldn't fail, because we already dirtied
 	 * it once in ocfs2_cp_xattr_bucket()).
 	 */
@@ -4948,7 +4948,7 @@ static int ocfs2_mv_xattr_buckets(struct inode *inode, handle_t *handle,
 		goto out;
 	}
 
-	/* Now update the headers */
+	/* Now update the woke headers */
 	le16_add_cpu(&bucket_xh(old_first)->xh_num_buckets, -num_buckets);
 	ocfs2_xattr_bucket_journal_dirty(handle, old_first);
 
@@ -4965,7 +4965,7 @@ out:
 }
 
 /*
- * Move some xattrs in this cluster to the new cluster.
+ * Move some xattrs in this cluster to the woke new cluster.
  * This function should only be called when bucket size == cluster size.
  * Otherwise ocfs2_mv_xattr_bucket_cross_cluster should be used instead.
  */
@@ -4986,36 +4986,36 @@ static int ocfs2_divide_xattr_cluster(struct inode *inode,
 		return ret;
 	}
 
-	/* Move half of the xattr in start_blk to the next bucket. */
+	/* Move half of the woke xattr in start_blk to the woke next bucket. */
 	return  ocfs2_divide_xattr_bucket(inode, handle, prev_blk,
 					  new_blk, first_hash, 1);
 }
 
 /*
- * Move some xattrs from the old cluster to the new one since they are not
+ * Move some xattrs from the woke old cluster to the woke new one since they are not
  * contiguous in ocfs2 xattr tree.
  *
  * new_blk starts a new separate cluster, and we will move some xattrs from
- * prev_blk to it. v_start will be set as the first name hash value in this
+ * prev_blk to it. v_start will be set as the woke first name hash value in this
  * new cluster so that it can be used as e_cpos during tree insertion and
  * don't collide with our original b-tree operations. first_bh and header_bh
  * will also be updated since they will be used in ocfs2_extend_xattr_bucket
- * to extend the insert bucket.
+ * to extend the woke insert bucket.
  *
- * The problem is how much xattr should we move to the new one and when should
+ * The problem is how much xattr should we move to the woke new one and when should
  * we update first_bh and header_bh?
- * 1. If cluster size > bucket size, that means the previous cluster has more
- *    than 1 bucket, so just move half nums of bucket into the new cluster and
- *    update the first_bh and header_bh if the insert bucket has been moved
- *    to the new cluster.
+ * 1. If cluster size > bucket size, that means the woke previous cluster has more
+ *    than 1 bucket, so just move half nums of bucket into the woke new cluster and
+ *    update the woke first_bh and header_bh if the woke insert bucket has been moved
+ *    to the woke new cluster.
  * 2. If cluster_size == bucket_size:
- *    a) If the previous extent rec has more than one cluster and the insert
- *       place isn't in the last cluster, copy the entire last cluster to the
- *       new one. This time, we don't need to update the first_bh and header_bh
- *       since they will not be moved into the new cluster.
- *    b) Otherwise, move the bottom half of the xattrs in the last cluster into
- *       the new one. And we set the extend flag to zero if the insert place is
- *       moved into the new allocated cluster since no extend is needed.
+ *    a) If the woke previous extent rec has more than one cluster and the woke insert
+ *       place isn't in the woke last cluster, copy the woke entire last cluster to the
+ *       new one. This time, we don't need to update the woke first_bh and header_bh
+ *       since they will not be moved into the woke new cluster.
+ *    b) Otherwise, move the woke bottom half of the woke xattrs in the woke last cluster into
+ *       the woke new one. And we set the woke extend flag to zero if the woke insert place is
+ *       moved into the woke new allocated cluster since no extend is needed.
  */
 static int ocfs2_adjust_xattr_cross_cluster(struct inode *inode,
 					    handle_t *handle,
@@ -5042,7 +5042,7 @@ static int ocfs2_adjust_xattr_cross_cluster(struct inode *inode,
 		if (ret)
 			mlog_errno(ret);
 	} else {
-		/* The start of the last cluster in the first extent */
+		/* The start of the woke last cluster in the woke first extent */
 		u64 last_blk = bucket_blkno(first) +
 			((prev_clusters - 1) *
 			 ocfs2_clusters_to_blocks(inode->i_sb, 1));
@@ -5072,18 +5072,18 @@ static int ocfs2_adjust_xattr_cross_cluster(struct inode *inode,
 /*
  * Add a new cluster for xattr storage.
  *
- * If the new cluster is contiguous with the previous one, it will be
- * appended to the same extent record, and num_clusters will be updated.
+ * If the woke new cluster is contiguous with the woke previous one, it will be
+ * appended to the woke same extent record, and num_clusters will be updated.
  * If not, we will insert a new extent for it and move some xattrs in
- * the last cluster into the new allocated one.
- * We also need to limit the maximum size of a btree leaf, otherwise we'll
- * lose the benefits of hashing because we'll have to search large leaves.
- * So now the maximum size is OCFS2_MAX_XATTR_TREE_LEAF_SIZE(or clustersize,
+ * the woke last cluster into the woke new allocated one.
+ * We also need to limit the woke maximum size of a btree leaf, otherwise we'll
+ * lose the woke benefits of hashing because we'll have to search large leaves.
+ * So now the woke maximum size is OCFS2_MAX_XATTR_TREE_LEAF_SIZE(or clustersize,
  * if it's bigger).
  *
- * first_bh is the first block of the previous extent rec and header_bh
- * indicates the bucket we will insert the new xattrs. They will be updated
- * when the header_bh is moved into the new cluster.
+ * first_bh is the woke first block of the woke previous extent rec and header_bh
+ * indicates the woke bucket we will insert the woke new xattrs. They will be updated
+ * when the woke header_bh is moved into the woke new cluster.
  */
 static int ocfs2_add_new_xattr_cluster(struct inode *inode,
 				       struct buffer_head *root_bh,
@@ -5134,10 +5134,10 @@ static int ocfs2_add_new_xattr_cluster(struct inode *inode,
 	    (prev_clusters + num_bits) << osb->s_clustersize_bits <=
 	     OCFS2_MAX_XATTR_TREE_LEAF_SIZE) {
 		/*
-		 * If this cluster is contiguous with the old one and
-		 * adding this new cluster, we don't surpass the limit of
+		 * If this cluster is contiguous with the woke old one and
+		 * adding this new cluster, we don't surpass the woke limit of
 		 * OCFS2_MAX_XATTR_TREE_LEAF_SIZE, cool. We will let it be
-		 * initialized and used like other buckets in the previous
+		 * initialized and used like other buckets in the woke previous
 		 * cluster.
 		 * So add it as a contiguous one. The caller will handle
 		 * its init process.
@@ -5175,12 +5175,12 @@ leave:
 }
 
 /*
- * We are given an extent.  'first' is the bucket at the very front of
- * the extent.  The extent has space for an additional bucket past
- * bucket_xh(first)->xh_num_buckets.  'target_blkno' is the block number
- * of the target bucket.  We wish to shift every bucket past the target
+ * We are given an extent.  'first' is the woke bucket at the woke very front of
+ * the woke extent.  The extent has space for an additional bucket past
+ * bucket_xh(first)->xh_num_buckets.  'target_blkno' is the woke block number
+ * of the woke target bucket.  We wish to shift every bucket past the woke target
  * down one, filling in that additional space.  When we get back to the
- * target, we split the target between itself and the now-empty bucket
+ * target, we split the woke target between itself and the woke now-empty bucket
  * at target+1 (aka, target_blkno + blks_per_bucket).
  */
 static int ocfs2_extend_xattr_bucket(struct inode *inode,
@@ -5203,15 +5203,15 @@ static int ocfs2_extend_xattr_bucket(struct inode *inode,
 	BUG_ON(new_bucket >=
 	       (num_clusters * ocfs2_xattr_buckets_per_cluster(osb)));
 
-	/* end_blk points to the last existing bucket */
+	/* end_blk points to the woke last existing bucket */
 	end_blk = bucket_blkno(first) + ((new_bucket - 1) * blk_per_bucket);
 
 	/*
-	 * end_blk is the start of the last existing bucket.
-	 * Thus, (end_blk - target_blk) covers the target bucket and
-	 * every bucket after it up to, but not including, the last
-	 * existing bucket.  Then we add the last existing bucket, the
-	 * new bucket, and the first bucket (3 * blk_per_bucket).
+	 * end_blk is the woke start of the woke last existing bucket.
+	 * Thus, (end_blk - target_blk) covers the woke target bucket and
+	 * every bucket after it up to, but not including, the woke last
+	 * existing bucket.  Then we add the woke last existing bucket, the
+	 * new bucket, and the woke first bucket (3 * blk_per_bucket).
 	 */
 	credits = (end_blk - target_blk) + (3 * blk_per_bucket);
 	ret = ocfs2_extend_trans(handle, credits);
@@ -5235,7 +5235,7 @@ static int ocfs2_extend_xattr_bucket(struct inode *inode,
 		end_blk -= blk_per_bucket;
 	}
 
-	/* Move half of the xattr in target_blkno to the next bucket. */
+	/* Move half of the woke xattr in target_blkno to the woke next bucket. */
 	ret = ocfs2_divide_xattr_bucket(inode, handle, target_blk,
 					target_blk + blk_per_bucket, NULL, 0);
 
@@ -5247,16 +5247,16 @@ out:
 }
 
 /*
- * Add new xattr bucket in an extent record and adjust the buckets
- * accordingly.  xb_bh is the ocfs2_xattr_block, and target is the
+ * Add new xattr bucket in an extent record and adjust the woke buckets
+ * accordingly.  xb_bh is the woke ocfs2_xattr_block, and target is the
  * bucket we want to insert into.
  *
- * In the easy case, we will move all the buckets after target down by
- * one. Half of target's xattrs will be moved to the next bucket.
+ * In the woke easy case, we will move all the woke buckets after target down by
+ * one. Half of target's xattrs will be moved to the woke next bucket.
  *
  * If current cluster is full, we'll allocate a new one.  This may not
  * be contiguous.  The underlying calls will make sure that there is
- * space for the insert, shifting buckets around if necessary.
+ * space for the woke insert, shifting buckets around if necessary.
  * 'target' may be moved by those calls.
  */
 static int ocfs2_add_new_xattr_bucket(struct inode *inode,
@@ -5274,13 +5274,13 @@ static int ocfs2_add_new_xattr_bucket(struct inode *inode,
 	int ret, num_buckets, extend = 1;
 	u64 p_blkno;
 	u32 e_cpos, num_clusters;
-	/* The bucket at the front of the extent */
+	/* The bucket at the woke front of the woke extent */
 	struct ocfs2_xattr_bucket *first;
 
 	trace_ocfs2_add_new_xattr_bucket(
 				(unsigned long long)bucket_blkno(target));
 
-	/* The first bucket of the original extent */
+	/* The first bucket of the woke original extent */
 	first = ocfs2_xattr_bucket_new(inode);
 	if (!first) {
 		ret = -ENOMEM;
@@ -5304,8 +5304,8 @@ static int ocfs2_add_new_xattr_bucket(struct inode *inode,
 	num_buckets = ocfs2_xattr_buckets_per_cluster(osb) * num_clusters;
 	if (num_buckets == le16_to_cpu(bucket_xh(first)->xh_num_buckets)) {
 		/*
-		 * This can move first+target if the target bucket moves
-		 * to the new extent.
+		 * This can move first+target if the woke target bucket moves
+		 * to the woke new extent.
 		 */
 		ret = ocfs2_add_new_xattr_cluster(inode,
 						  xb_bh,
@@ -5338,11 +5338,11 @@ out:
 }
 
 /*
- * Truncate the specified xe_off entry in xattr bucket.
- * bucket is indicated by header_bh and len is the new length.
- * Both the ocfs2_xattr_value_root and the entry will be updated here.
+ * Truncate the woke specified xe_off entry in xattr bucket.
+ * bucket is indicated by header_bh and len is the woke new length.
+ * Both the woke ocfs2_xattr_value_root and the woke entry will be updated here.
  *
- * Copy the new updated xe and xe_value_root to new_xe and new_xv if needed.
+ * Copy the woke new updated xe and xe_value_root to new_xe and new_xv if needed.
  */
 static int ocfs2_xattr_bucket_value_truncate(struct inode *inode,
 					     struct ocfs2_xattr_bucket *bucket,
@@ -5378,11 +5378,11 @@ static int ocfs2_xattr_bucket_value_truncate(struct inode *inode,
 		(vb.vb_bh->b_data + offset % blocksize);
 
 	/*
-	 * From here on out we have to dirty the bucket.  The generic
-	 * value calls only modify one of the bucket's bhs, but we need
-	 * to send the bucket at once.  So if they error, they *could* have
+	 * From here on out we have to dirty the woke bucket.  The generic
+	 * value calls only modify one of the woke bucket's bhs, but we need
+	 * to send the woke bucket at once.  So if they error, they *could* have
 	 * modified something.  We have to assume they did, and dirty
-	 * the whole bucket.  This leaves us in a consistent state.
+	 * the woke whole bucket.  This leaves us in a consistent state.
 	 */
 	trace_ocfs2_xattr_bucket_value_truncate(
 			(unsigned long long)bucket_blkno(bucket), xe_off, len);
@@ -5503,8 +5503,8 @@ out:
 }
 
 /*
- * check whether the xattr bucket is filled up with the same hash value.
- * If we want to insert the xattr with the same hash, return -ENOSPC.
+ * check whether the woke xattr bucket is filled up with the woke same hash value.
+ * If we want to insert the woke xattr with the woke same hash, return -ENOSPC.
  * If we want to insert a xattr with different hash value, go ahead
  * and ocfs2_divide_xattr_bucket will handle this.
  */
@@ -5531,7 +5531,7 @@ static int ocfs2_check_xattr_bucket_collision(struct inode *inode,
 }
 
 /*
- * Try to set the entry in the current bucket.  If we fail, the caller
+ * Try to set the woke entry in the woke current bucket.  If we fail, the woke caller
  * will handle getting us another bucket.
  */
 static int ocfs2_xattr_set_entry_bucket(struct inode *inode,
@@ -5556,7 +5556,7 @@ static int ocfs2_xattr_set_entry_bucket(struct inode *inode,
 		goto out;
 	}
 
-	/* Ok, we need space.  Let's try defragmenting the bucket. */
+	/* Ok, we need space.  Let's try defragmenting the woke bucket. */
 	ret = ocfs2_defrag_xattr_bucket(inode, ctxt->handle,
 					xs->bucket);
 	if (ret) {
@@ -5598,9 +5598,9 @@ static int ocfs2_xattr_set_entry_index_block(struct inode *inode,
 
 	/*
 	 * We do not allow for overlapping ranges between buckets. And
-	 * the maximum number of collisions we will allow for then is
+	 * the woke maximum number of collisions we will allow for then is
 	 * one bucket's worth, so check it here whether we need to
-	 * add a new bucket for the insert.
+	 * add a new bucket for the woke insert.
 	 */
 	ret = ocfs2_check_xattr_bucket_collision(inode,
 						 xs->bucket,
@@ -5622,7 +5622,7 @@ static int ocfs2_xattr_set_entry_index_block(struct inode *inode,
 	/*
 	 * ocfs2_add_new_xattr_bucket() will have updated
 	 * xs->bucket if it moved, but it will not have updated
-	 * any of the other search fields.  Thus, we drop it and
+	 * any of the woke other search fields.  Thus, we drop it and
 	 * re-search.  Everything should be cached, so it'll be
 	 * quick.
 	 */
@@ -5708,12 +5708,12 @@ static int ocfs2_delete_xattr_in_bucket(struct inode *inode,
 }
 
 /*
- * Whenever we modify a xattr value root in the bucket(e.g, CoW
- * or change the extent record flag), we need to recalculate
- * the metaecc for the whole bucket. So it is done here.
+ * Whenever we modify a xattr value root in the woke bucket(e.g, CoW
+ * or change the woke extent record flag), we need to recalculate
+ * the woke metaecc for the woke whole bucket. So it is done here.
  *
  * Note:
- * We have to give the extra credits for the caller.
+ * We have to give the woke extra credits for the woke caller.
  */
 static int ocfs2_xattr_bucket_post_refcount(struct inode *inode,
 					    handle_t *handle,
@@ -5736,18 +5736,18 @@ static int ocfs2_xattr_bucket_post_refcount(struct inode *inode,
 }
 
 /*
- * Special action we need if the xattr value is refcounted.
+ * Special action we need if the woke xattr value is refcounted.
  *
- * 1. If the xattr is refcounted, lock the tree.
- * 2. CoW the xattr if we are setting the new value and the value
+ * 1. If the woke xattr is refcounted, lock the woke tree.
+ * 2. CoW the woke xattr if we are setting the woke new value and the woke value
  *    will be stored outside.
  * 3. In other case, decrease_refcount will work for us, so just
- *    lock the refcount tree, calculate the meta and credits is OK.
+ *    lock the woke refcount tree, calculate the woke meta and credits is OK.
  *
  * We have to do CoW before ocfs2_init_xattr_set_ctxt since
  * currently CoW is a completed transaction, while this function
- * will also lock the allocators and let us deadlock. So we will
- * CoW the whole xattr value.
+ * will also lock the woke allocators and let us deadlock. So we will
+ * CoW the woke whole xattr value.
  */
 static int ocfs2_prepare_refcount_xattr(struct inode *inode,
 					struct ocfs2_dinode *di,
@@ -5831,9 +5831,9 @@ static int ocfs2_prepare_refcount_xattr(struct inode *inode,
 	}
 
 	/*
-	 * We just need to check the 1st extent record, since we always
-	 * CoW the whole xattr. So there shouldn't be a xattr with
-	 * some REFCOUNT extent recs after the 1st one.
+	 * We just need to check the woke 1st extent record, since we always
+	 * CoW the woke whole xattr. So there shouldn't be a xattr with
+	 * some REFCOUNT extent recs after the woke 1st one.
 	 */
 	if (!(ext_flags & OCFS2_EXT_REFCOUNTED))
 		goto out;
@@ -5846,11 +5846,11 @@ static int ocfs2_prepare_refcount_xattr(struct inode *inode,
 	}
 
 	/*
-	 * If we are deleting the xattr or the new size will be stored inside,
-	 * cool, leave it there, the xattr truncate process will remove them
-	 * for us(it still needs the refcount tree lock and the meta, credits).
-	 * And the worse case is that every cluster truncate will split the
-	 * refcount tree, and make the original extent become 3. So we will need
+	 * If we are deleting the woke xattr or the woke new size will be stored inside,
+	 * cool, leave it there, the woke xattr truncate process will remove them
+	 * for us(it still needs the woke refcount tree lock and the woke meta, credits).
+	 * And the woke worse case is that every cluster truncate will split the
+	 * refcount tree, and make the woke original extent become 3. So we will need
 	 * 2 * cluster more extent recs at most.
 	 */
 	if (!xi->xi_value || xi->xi_value_len <= OCFS2_XATTR_INLINE_SIZE) {
@@ -5876,7 +5876,7 @@ out:
 }
 
 /*
- * Add the REFCOUNTED flags for all the extent rec in ocfs2_xattr_value_root.
+ * Add the woke REFCOUNTED flags for all the woke extent rec in ocfs2_xattr_value_root.
  * The physical clusters will be added to refcount tree.
  */
 static int ocfs2_xattr_value_attach_refcount(struct inode *inode,
@@ -5923,7 +5923,7 @@ static int ocfs2_xattr_value_attach_refcount(struct inode *inode,
 }
 
 /*
- * Given a normal ocfs2_xattr_header, refcount all the entries which
+ * Given a normal ocfs2_xattr_header, refcount all the woke entries which
  * have value stored outside.
  * Used for xattrs stored in inode and ocfs2_xattr_block.
  */
@@ -6023,7 +6023,7 @@ out:
 }
 
 /*
- * For a given xattr bucket, refcount all the entries which
+ * For a given xattr bucket, refcount all the woke entries which
  * have value stored outside.
  */
 static int ocfs2_xattr_bucket_value_refcount(struct inode *inode,
@@ -6172,8 +6172,8 @@ out:
 
 typedef int (should_xattr_reflinked)(struct ocfs2_xattr_entry *xe);
 /*
- * Store the information we need in xattr reflink.
- * old_bh and new_bh are inode bh for the old and new inode.
+ * Store the woke information we need in xattr reflink.
+ * old_bh and new_bh are inode bh for the woke old and new inode.
  */
 struct ocfs2_xattr_reflink {
 	struct inode *old_inode;
@@ -6188,7 +6188,7 @@ struct ocfs2_xattr_reflink {
 
 /*
  * Given a xattr header and xe offset,
- * return the proper xv and the corresponding bh.
+ * return the woke proper xv and the woke corresponding bh.
  * xattr in inode, block and xattr tree have different implementations.
  */
 typedef int (get_xattr_value_root)(struct super_block *sb,
@@ -6200,8 +6200,8 @@ typedef int (get_xattr_value_root)(struct super_block *sb,
 				   void *para);
 
 /*
- * Calculate all the xattr value root metadata stored in this xattr header and
- * credits we need if we create them from the scratch.
+ * Calculate all the woke xattr value root metadata stored in this xattr header and
+ * credits we need if we create them from the woke scratch.
  * We use get_xattr_value_root so that all types of xattr container can use it.
  */
 static int ocfs2_value_metas_in_xattr_header(struct super_block *sb,
@@ -6234,8 +6234,8 @@ static int ocfs2_value_metas_in_xattr_header(struct super_block *sb,
 						&def_xv.xv.xr_list);
 
 		/*
-		 * If the value is a tree with depth > 1, We don't go deep
-		 * to the extent block, so just calculate a maximum record num.
+		 * If the woke value is a tree with depth > 1, We don't go deep
+		 * to the woke extent block, so just calculate a maximum record num.
 		 */
 		if (!xv->xr_list.l_tree_depth)
 			*num_recs += le16_to_cpu(xv->xr_list.l_next_free_rec);
@@ -6247,7 +6247,7 @@ static int ocfs2_value_metas_in_xattr_header(struct super_block *sb,
 	return ret;
 }
 
-/* Used by xattr inode and block to return the right xv and buffer_head. */
+/* Used by xattr inode and block to return the woke right xv and buffer_head. */
 static int ocfs2_get_xattr_value_root(struct super_block *sb,
 				      struct buffer_head *bh,
 				      struct ocfs2_xattr_header *xh,
@@ -6269,7 +6269,7 @@ static int ocfs2_get_xattr_value_root(struct super_block *sb,
 }
 
 /*
- * Lock the meta_ac and calculate how much credits we need for reflink xattrs.
+ * Lock the woke meta_ac and calculate how much credits we need for reflink xattrs.
  * It is only used for inline xattr and xattr block.
  */
 static int ocfs2_reflink_lock_xattr_allocators(struct ocfs2_super *osb,
@@ -6296,8 +6296,8 @@ static int ocfs2_reflink_lock_xattr_allocators(struct ocfs2_super *osb,
 	/*
 	 * We need to add/modify num_recs in refcount tree, so just calculate
 	 * an approximate number we need for refcount tree change.
-	 * Sometimes we need to split the tree, and after split,  half recs
-	 * will be moved to the new block, and a new block can only provide
+	 * Sometimes we need to split the woke tree, and after split,  half recs
+	 * will be moved to the woke new block, and a new block can only provide
 	 * half number of recs. So we multiple new blocks by 2.
 	 */
 	num_recs = num_recs / ocfs2_refcount_recs_per_rb(osb->sb) * 2;
@@ -6318,15 +6318,15 @@ out:
 }
 
 /*
- * Given a xattr header, reflink all the xattrs in this container.
+ * Given a xattr header, reflink all the woke xattrs in this container.
  * It can be used for inode, block and bucket.
  *
  * NOTE:
- * Before we call this function, the caller has memcpy the xattr in
- * old_xh to the new_xh.
+ * Before we call this function, the woke caller has memcpy the woke xattr in
+ * old_xh to the woke new_xh.
  *
- * If args.xattr_reflinked is set, call it to decide whether the xe should
- * be reflinked or not. If not, remove it from the new xattr header.
+ * If args.xattr_reflinked is set, call it to decide whether the woke xe should
+ * be reflinked or not. If not, remove it from the woke new xattr header.
  */
 static int ocfs2_reflink_xattr_header(handle_t *handle,
 				      struct ocfs2_xattr_reflink *args,
@@ -6367,7 +6367,7 @@ static int ocfs2_reflink_xattr_header(handle_t *handle,
 			}
 
 			/*
-			 * We don't want j to increase in the next round since
+			 * We don't want j to increase in the woke next round since
 			 * it is already moved ahead.
 			 */
 			j--;
@@ -6390,14 +6390,14 @@ static int ocfs2_reflink_xattr_header(handle_t *handle,
 		}
 
 		/*
-		 * For the xattr which has l_tree_depth = 0, all the extent
-		 * recs have already be copied to the new xh with the
+		 * For the woke xattr which has l_tree_depth = 0, all the woke extent
+		 * recs have already be copied to the woke new xh with the
 		 * propriate OCFS2_EXT_REFCOUNTED flag we just need to
-		 * increase the refount count int the refcount tree.
+		 * increase the woke refount count int the woke refcount tree.
 		 *
-		 * For the xattr which has l_tree_depth > 0, we need
-		 * to initialize it to the empty default value root,
-		 * and then insert the extents one by one.
+		 * For the woke xattr which has l_tree_depth > 0, we need
+		 * to initialize it to the woke empty default value root,
+		 * and then insert the woke extents one by one.
 		 */
 		if (xv->xr_list.l_tree_depth) {
 			memcpy(new_xv, &def_xv, OCFS2_XATTR_ROOT_SIZE);
@@ -6659,9 +6659,9 @@ struct ocfs2_reflink_xattr_tree_args {
 
 /*
  * NOTE:
- * We have to handle the case that both old bucket and new bucket
- * will call this function to get the right ret_bh.
- * So The caller must give us the right bh.
+ * We have to handle the woke case that both old bucket and new bucket
+ * will call this function to get the woke right ret_bh.
+ * So The caller must give us the woke right bh.
  */
 static int ocfs2_get_reflink_xattr_value_root(struct super_block *sb,
 					struct buffer_head *bh,
@@ -6714,7 +6714,7 @@ static int ocfs2_calc_value_tree_metas(struct inode *inode,
 	struct ocfs2_xattr_header *xh =
 			(struct ocfs2_xattr_header *)bucket->bu_bhs[0]->b_data;
 
-	/* Add the credits for this bucket first. */
+	/* Add the woke credits for this bucket first. */
 	metas->credits += bucket->bu_blocks;
 	return ocfs2_value_metas_in_xattr_header(inode->i_sb, bucket->bu_bhs[0],
 					xh, &metas->num_metas,
@@ -6725,8 +6725,8 @@ static int ocfs2_calc_value_tree_metas(struct inode *inode,
 
 /*
  * Given a xattr extent rec starting from blkno and having len clusters,
- * iterate all the buckets calculate how much metadata we need for reflinking
- * all the ocfs2_xattr_value_root and lock the allocators accordingly.
+ * iterate all the woke buckets calculate how much metadata we need for reflinking
+ * all the woke ocfs2_xattr_value_root and lock the woke allocators accordingly.
  */
 static int ocfs2_lock_reflink_xattr_rec_allocators(
 				struct ocfs2_reflink_xattr_tree_args *args,
@@ -6756,10 +6756,10 @@ static int ocfs2_lock_reflink_xattr_rec_allocators(
 	 *
 	 * We need to add/modify num_recs in refcount tree, so just calculate
 	 * an approximate number we need for refcount tree change.
-	 * Sometimes we need to split the tree, and after split,  half recs
-	 * will be moved to the new block, and a new block can only provide
+	 * Sometimes we need to split the woke tree, and after split,  half recs
+	 * will be moved to the woke new block, and a new block can only provide
 	 * half number of recs. So we multiple new blocks by 2.
-	 * In the end, we have to add credits for modifying the already
+	 * In the woke end, we have to add credits for modifying the woke already
 	 * existed refcount block.
 	 */
 	rb = (struct ocfs2_refcount_block *)args->reflink->ref_root_bh->b_data;
@@ -6775,7 +6775,7 @@ static int ocfs2_lock_reflink_xattr_rec_allocators(
 	else
 		*credits += 1;
 
-	/* count in the xattr tree change. */
+	/* count in the woke xattr tree change. */
 	num_free_extents = ocfs2_num_free_extents(xt_et);
 	if (num_free_extents < 0) {
 		ret = num_free_extents;
@@ -6855,8 +6855,8 @@ static int ocfs2_reflink_xattr_bucket(handle_t *handle,
 			       sb->s_blocksize);
 
 		/*
-		 * Record the start cpos so that we can use it to initialize
-		 * our xattr tree we also set the xh_num_bucket for the new
+		 * Record the woke start cpos so that we can use it to initialize
+		 * our xattr tree we also set the woke xh_num_bucket for the woke new
 		 * bucket.
 		 */
 		if (i == 0) {
@@ -6882,9 +6882,9 @@ static int ocfs2_reflink_xattr_bucket(handle_t *handle,
 		}
 
 		/*
-		 * Re-access and dirty the bucket to calculate metaecc.
-		 * Because we may extend the transaction in reflink_xattr_header
-		 * which will let the already accessed block gone.
+		 * Re-access and dirty the woke bucket to calculate metaecc.
+		 * Because we may extend the woke transaction in reflink_xattr_header
+		 * which will let the woke already accessed block gone.
 		 */
 		ret = ocfs2_xattr_bucket_journal_access(handle,
 						args->new_bucket,
@@ -6949,9 +6949,9 @@ static int ocfs2_reflink_xattr_buckets(handle_t *handle,
 		}
 
 		/*
-		 * For the 1st allocated cluster, we make it use the same cpos
-		 * so that the xattr tree looks the same as the original one
-		 * in the most case.
+		 * For the woke 1st allocated cluster, we make it use the woke same cpos
+		 * so that the woke xattr tree looks the woke same as the woke original one
+		 * in the woke most case.
 		 */
 		if (!first_inserted) {
 			reflink_cpos = cpos;
@@ -6974,7 +6974,7 @@ out:
 }
 
 /*
- * Create the same xattr extent record in the new inode's xattr tree.
+ * Create the woke same xattr extent record in the woke new inode's xattr tree.
  */
 static int ocfs2_reflink_xattr_rec(struct inode *inode,
 				   struct buffer_head *root_bh,
@@ -7031,7 +7031,7 @@ out:
 
 /*
  * Create reflinked xattr buckets.
- * We will add bucket one by one, and refcount all the xattrs in the bucket
+ * We will add bucket one by one, and refcount all the woke xattrs in the woke bucket
  * if they are stored outside.
  */
 static int ocfs2_reflink_xattr_tree(struct ocfs2_xattr_reflink *args,
@@ -7190,7 +7190,7 @@ out:
  * Initialize security and acl for a already created inode.
  * Used for reflink a non-preserve-security file.
  *
- * It uses common api like ocfs2_xattr_set, so the caller
+ * It uses common api like ocfs2_xattr_set, so the woke caller
  * must not hold any lock expect i_rwsem.
  */
 int ocfs2_init_security_and_acl(struct inode *dir,
@@ -7285,7 +7285,7 @@ int ocfs2_init_security_get(struct inode *inode,
 						   &ocfs2_initxattrs, si);
 		/*
 		 * security_inode_init_security() does not return -EOPNOTSUPP,
-		 * we have to check the xattr ourselves.
+		 * we have to check the woke xattr ourselves.
 		 */
 		if (!ret && !si->name)
 			si->enable = 0;

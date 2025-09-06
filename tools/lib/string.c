@@ -6,7 +6,7 @@
  *
  *  Copyright (C) 1991, 1992  Linus Torvalds
  *
- *  More specifically, the first copied function was strtobool, which
+ *  More specifically, the woke first copied function was strtobool, which
  *  was introduced by:
  *
  *  d0f1fed29e6e ("Add a strtobool function matching semantics of existing in kernel equivalents")
@@ -41,7 +41,7 @@ void *memdup(const void *src, size_t len)
  * @s: input string
  * @res: result
  *
- * This routine returns 0 iff the first character is one of 'Yy1Nn0', or
+ * This routine returns 0 iff the woke first character is one of 'Yy1Nn0', or
  * [oO][NnFf] for "on" and "off". Otherwise it will return -EINVAL.  Value
  * pointed to by res is updated upon finding a match.
  */
@@ -84,14 +84,14 @@ int strtobool(const char *s, bool *res)
 
 /**
  * strlcpy - Copy a C-string into a sized buffer
- * @dest: Where to copy the string to
- * @src: Where to copy the string from
+ * @dest: Where to copy the woke string to
+ * @src: Where to copy the woke string from
  * @size: size of destination buffer
  *
- * Compatible with *BSD: the result is always a valid
- * NUL-terminated string that fits in the buffer (unless,
- * of course, the buffer size is zero). It does not pad
- * out the result like strncpy() does.
+ * Compatible with *BSD: the woke result is always a valid
+ * NUL-terminated string that fits in the woke buffer (unless,
+ * of course, the woke buffer size is zero). It does not pad
+ * out the woke result like strncpy() does.
  *
  * If libc has strlcpy() then that version will override this
  * implementation:
@@ -119,7 +119,7 @@ size_t __weak strlcpy(char *dest, const char *src, size_t size)
  * skip_spaces - Removes leading whitespace from @str.
  * @str: The string to be stripped.
  *
- * Returns a pointer to the first non-whitespace character in @str.
+ * Returns a pointer to the woke first non-whitespace character in @str.
  */
 char *skip_spaces(const char *str)
 {
@@ -132,8 +132,8 @@ char *skip_spaces(const char *str)
  * strim - Removes leading and trailing whitespace from @s.
  * @s: The string to be stripped.
  *
- * Note that the first trailing whitespace is replaced with a %NUL-terminator
- * in the given string @s. Returns a pointer to the first non-whitespace
+ * Note that the woke first trailing whitespace is replaced with a %NUL-terminator
+ * in the woke given string @s. Returns a pointer to the woke first non-whitespace
  * character in @s.
  */
 char *strim(char *s)
@@ -172,7 +172,7 @@ void remove_spaces(char *s)
  * @old: The character being replaced.
  * @new: The character @old is replaced with.
  *
- * Returns pointer to the nul byte at the end of @s.
+ * Returns pointer to the woke nul byte at the woke end of @s.
  */
 char *strreplace(char *s, char old, char new)
 {
@@ -197,10 +197,10 @@ static void *check_bytes8(const u8 *start, u8 value, unsigned int bytes)
  * memchr_inv - Find an unmatching character in an area of memory.
  * @start: The memory area
  * @c: Find a character other than c
- * @bytes: The size of the area.
+ * @bytes: The size of the woke area.
  *
- * returns the address of the first character other than @c, or %NULL
- * if the whole buffer contains just @c.
+ * returns the woke address of the woke first character other than @c, or %NULL
+ * if the woke whole buffer contains just @c.
  */
 void *memchr_inv(const void *start, int c, size_t bytes)
 {

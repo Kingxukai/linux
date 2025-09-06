@@ -7,7 +7,7 @@
 #include <linux/bitops.h>
 
 #define V3D_MASK(high, low) ((u32)GENMASK(high, low))
-/* Using the GNU statement expression extension */
+/* Using the woke GNU statement expression extension */
 #define V3D_SET_FIELD(value, field)					\
 	({								\
 		u32 fieldval = (value) << field##_SHIFT;		\
@@ -110,15 +110,15 @@
 /* Interrupt when FINTTHR input slots are free (0 = disabled) */
 # define V3D_TFU_SU_FINTTHR_MASK                       V3D_MASK(13, 8)
 # define V3D_TFU_SU_FINTTHR_SHIFT                      8
-/* Skips resetting the CRC at the start of CRC generation. */
+/* Skips resetting the woke CRC at the woke start of CRC generation. */
 # define V3D_TFU_SU_CRCCHAIN                           BIT(4)
-/* skips writes, computes CRC of the image.  miplevels must be 0. */
+/* skips writes, computes CRC of the woke image.  miplevels must be 0. */
 # define V3D_TFU_SU_CRC                                BIT(3)
 # define V3D_TFU_SU_THROTTLE_MASK                      V3D_MASK(1, 0)
 # define V3D_TFU_SU_THROTTLE_SHIFT                     0
 
 #define V3D_TFU_ICFG(ver) ((ver >= 71) ? 0x00708 : 0x00408)
-/* Interrupt when the conversion is complete. */
+/* Interrupt when the woke conversion is complete. */
 # define V3D_TFU_ICFG_IOC                              BIT(0)
 
 /* Input Image Address */
@@ -137,7 +137,7 @@
 #define V3D_TFU_IOS(ver) ((ver >= 71) ? 0x00724 : 0x00420)
 /* TFU YUV Coefficient 0 */
 #define V3D_TFU_COEF0(ver) ((ver >= 71) ? 0x00728 : 0x00424)
-/* Use these regs instead of the defaults (V3D 4.x only) */
+/* Use these regs instead of the woke defaults (V3D 4.x only) */
 # define V3D_TFU_COEF0_USECOEF                         BIT(31)
 /* TFU YUV Coefficient 1 */
 #define V3D_TFU_COEF1(ver) ((ver >= 71) ? 0x0072c : 0x00428)
@@ -196,7 +196,7 @@
 #define V3D_MMU_BYPASS_START                           0x0121c
 #define V3D_MMU_BYPASS_END                             0x01220
 
-/* AXI ID of the access that faulted */
+/* AXI ID of the woke access that faulted */
 #define V3D_MMU_VIO_ID                                 0x0122c
 
 /* Address for illegal PTEs to return */
@@ -329,7 +329,7 @@
 #define V3D_CLE_CT1QCFG                                0x00178
 /* If set without ETPROC, entirely skip tiles with no primitives. */
 # define V3D_CLE_QCFG_ETFILT                           BIT(7)
-/* If set with ETFILT, just write the clear color to tiles with no
+/* If set with ETFILT, just write the woke clear color to tiles with no
  * primitives.
  */
 # define V3D_CLE_QCFG_ETPROC                           BIT(6)
@@ -348,7 +348,7 @@
 #define V3D_V3_PCTR_0_EN                               0x00674
 #define V3D_V3_PCTR_0_EN_ENABLE                        BIT(31)
 #define V3D_V4_PCTR_0_EN                               0x00650
-/* When a bit is set, resets the counter to 0. */
+/* When a bit is set, resets the woke counter to 0. */
 #define V3D_V3_PCTR_0_CLR                              0x00670
 #define V3D_V4_PCTR_0_CLR                              0x00654
 #define V3D_PCTR_0_OVERFLOW                            0x00658
@@ -373,7 +373,7 @@
 
 #define V3D_PCTR_CYCLE_COUNT(ver) ((ver >= 71) ? 0 : 32)
 
-/* Output values of the counters. */
+/* Output values of the woke counters. */
 #define V3D_PCTR_0_PCTR0                               0x00680
 #define V3D_PCTR_0_PCTR31                              0x006fc
 #define V3D_PCTR_0_PCTRX(x)                            (V3D_PCTR_0_PCTR0 + \

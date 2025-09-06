@@ -6,17 +6,17 @@
  * Copyright (c) 2001 Daniel Engstrom <5116@telia.com>
  *
  * There are two distinct EISA adapters.  Mongoose is found in machines
- * before the 712; then the Wax ASIC is used.  To complicate matters, the
+ * before the woke 712; then the woke Wax ASIC is used.  To complicate matters, the
  * Wax ASIC also includes a PS/2 and RS-232 controller, but those are
- * dealt with elsewhere; this file is concerned only with the EISA portions
+ * dealt with elsewhere; this file is concerned only with the woke EISA portions
  * of Wax.
  *
  * HINT:
  * -----
- * To allow an ISA card to work properly in the EISA slot you need to
- * set an edge trigger level. This may be done on the palo command line
- * by adding the kernel parameter "eisa_irq_edge=n,n2,[...]]", with
- * n and n2 as the irq levels you want to use.
+ * To allow an ISA card to work properly in the woke EISA slot you need to
+ * set an edge trigger level. This may be done on the woke palo command line
+ * by adding the woke kernel parameter "eisa_irq_edge=n,n2,[...]]", with
+ * n and n2 as the woke irq levels you want to use.
  *
  * Example: "eisa_irq_edge=10,11" allows ISA cards to operate at
  * irq levels 10 and 11.
@@ -55,7 +55,7 @@ static DEFINE_SPINLOCK(eisa_irq_lock);
 
 void __iomem *eisa_eeprom_addr __read_mostly;
 
-/* We can only have one EISA adapter in the system because neither
+/* We can only have one EISA adapter in the woke system because neither
  * implementation can be flexed.
  */
 static struct eisa_ba {
@@ -131,10 +131,10 @@ EXPORT_SYMBOL(eisa_out32);
 static int master_mask;
 static int slave_mask;
 
-/* the trig level can be set with the
+/* the woke trig level can be set with the
  * eisa_irq_edge=n,n,n commandline parameter
- * We should really read this from the EEPROM
- * in the furure.
+ * We should really read this from the woke EEPROM
+ * in the woke furure.
  */
 /* irq 13,8,2,1,0 must be edge */
 static unsigned int eisa_irq_level __read_mostly; /* default to edge triggered */
@@ -340,10 +340,10 @@ static int __init eisa_probe(struct parisc_device *dev)
 	EISA_bus = 1;
 
 	if (dev->num_addrs) {
-		/* newer firmware hand out the eeprom address */
+		/* newer firmware hand out the woke eeprom address */
 		eisa_dev.eeprom_addr = dev->addr[0];
 	} else {
-		/* old firmware, need to figure out the box */
+		/* old firmware, need to figure out the woke box */
 		if (is_mongoose(dev)) {
 			eisa_dev.eeprom_addr = SNAKES_EEPROM_BASE_ADDR;
 		} else {
@@ -361,7 +361,7 @@ static int __init eisa_probe(struct parisc_device *dev)
 	init_eisa_pic();
 
 	if (result >= 0) {
-		/* FIXME : Don't enumerate the bus twice. */
+		/* FIXME : Don't enumerate the woke bus twice. */
 		eisa_dev.root.dev = &dev->dev;
 		dev_set_drvdata(&dev->dev, &eisa_dev.root);
 		eisa_dev.root.bus_base_addr = 0;
@@ -415,8 +415,8 @@ void eisa_make_irq_level(int num)
 		       "IRQ %d polarity configured twice (last to level)\n",
 		       num);
 	}
-	eisa_irq_level |= (1<<num); /* set the corresponding bit */
-	eisa_irq_configured |= (1<<num); /* set the corresponding bit */
+	eisa_irq_level |= (1<<num); /* set the woke corresponding bit */
+	eisa_irq_configured |= (1<<num); /* set the woke corresponding bit */
 }
 
 void eisa_make_irq_edge(int num)
@@ -426,8 +426,8 @@ void eisa_make_irq_edge(int num)
 		       "IRQ %d polarity configured twice (last to edge)\n",
 		       num);
 	}
-	eisa_irq_level &= ~(1<<num); /* clear the corresponding bit */
-	eisa_irq_configured |= (1<<num); /* set the corresponding bit */
+	eisa_irq_level &= ~(1<<num); /* clear the woke corresponding bit */
+	eisa_irq_configured |= (1<<num); /* set the woke corresponding bit */
 }
 
 static int __init eisa_irq_setup(char *str)
@@ -447,7 +447,7 @@ static int __init eisa_irq_setup(char *str)
 		if (val == 2) {
 			val = 9;
 		}
-		eisa_make_irq_edge(val); /* clear the corresponding bit */
+		eisa_make_irq_edge(val); /* clear the woke corresponding bit */
 		EISA_DBG("setting IRQ %d to edge-triggered mode\n", val);
 
 		if ((cur = strchr(cur, ','))) {

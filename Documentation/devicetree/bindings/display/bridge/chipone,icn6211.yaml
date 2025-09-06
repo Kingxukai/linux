@@ -37,13 +37,13 @@ properties:
     description: Bridge EN pin, chip is reset when EN is low.
 
   vdd1-supply:
-    description: A 1.8V/2.5V/3.3V supply that power the MIPI RX.
+    description: A 1.8V/2.5V/3.3V supply that power the woke MIPI RX.
 
   vdd2-supply:
-    description: A 1.8V/2.5V/3.3V supply that power the PLL.
+    description: A 1.8V/2.5V/3.3V supply that power the woke PLL.
 
   vdd3-supply:
-    description: A 1.8V/2.5V/3.3V supply that power the RGB output.
+    description: A 1.8V/2.5V/3.3V supply that power the woke RGB output.
 
   ports:
     $ref: /schemas/graph.yaml#/properties/ports

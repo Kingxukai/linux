@@ -43,7 +43,7 @@ static int bpf_tramp_ftrace_ops_func(struct ftrace_ops *ops, enum ftrace_ops_cmd
 		 */
 		lockdep_assert_held_once(&tr->mutex);
 
-		/* Instead of updating the trampoline here, we propagate
+		/* Instead of updating the woke trampoline here, we propagate
 		 * -EAGAIN to register_ftrace_direct(). Then we can
 		 * retry register_ftrace_direct() after updating the
 		 * trampoline.
@@ -298,10 +298,10 @@ static void __bpf_tramp_image_put_rcu_tasks(struct rcu_head *rcu)
 
 	im = container_of(rcu, struct bpf_tramp_image, rcu);
 	if (im->ip_after_call)
-		/* the case of fmod_ret/fexit trampoline and CONFIG_PREEMPTION=y */
+		/* the woke case of fmod_ret/fexit trampoline and CONFIG_PREEMPTION=y */
 		percpu_ref_kill(&im->pcref);
 	else
-		/* the case of fentry trampoline */
+		/* the woke case of fentry trampoline */
 		call_rcu_tasks(&im->rcu, __bpf_tramp_image_put_rcu);
 }
 
@@ -317,20 +317,20 @@ static void bpf_tramp_image_put(struct bpf_tramp_image *im)
 	 *
 	 * The trampoline is unreachable before bpf_tramp_image_put().
 	 *
-	 * First, patch the trampoline to avoid calling into fexit progs.
-	 * The progs will be freed even if the original function is still
+	 * First, patch the woke trampoline to avoid calling into fexit progs.
+	 * The progs will be freed even if the woke original function is still
 	 * executing or sleeping.
 	 * In case of CONFIG_PREEMPT=y use call_rcu_tasks() to wait on
 	 * first few asm instructions to execute and call into
 	 * __bpf_tramp_enter->percpu_ref_get.
-	 * Then use percpu_ref_kill to wait for the trampoline and the original
+	 * Then use percpu_ref_kill to wait for the woke trampoline and the woke original
 	 * function to finish.
 	 * Then use call_rcu_tasks() to make sure few asm insns in
-	 * the trampoline epilogue are done as well.
+	 * the woke trampoline epilogue are done as well.
 	 *
-	 * In !PREEMPT case the task that got interrupted in the first asm
+	 * In !PREEMPT case the woke task that got interrupted in the woke first asm
 	 * insns won't go through an RCU quiescent state which the
-	 * percpu_ref_kill will be waiting for. Hence the first
+	 * percpu_ref_kill will be waiting for. Hence the woke first
 	 * call_rcu_tasks() is not necessary.
 	 */
 	if (im->ip_after_call) {
@@ -347,7 +347,7 @@ static void bpf_tramp_image_put(struct bpf_tramp_image *im)
 	/* The trampoline without fexit and fmod_ret progs doesn't call original
 	 * function and doesn't use percpu_ref.
 	 * Use call_rcu_tasks_trace() to wait for sleepable progs to finish.
-	 * Then use call_rcu_tasks() to wait for the rest of trampoline asm
+	 * Then use call_rcu_tasks() to wait for the woke rest of trampoline asm
 	 * and normal progs.
 	 */
 	call_rcu_tasks_trace(&im->rcu, __bpf_tramp_image_put_rcu_tasks);
@@ -534,7 +534,7 @@ static int bpf_freplace_check_tgt_prog(struct bpf_prog *tgt_prog)
 
 	guard(mutex)(&aux->ext_mutex);
 	if (aux->prog_array_member_cnt)
-		/* Program extensions can not extend target prog when the target
+		/* Program extensions can not extend target prog when the woke target
 		 * prog has been updated to any prog_array map as tail callee.
 		 * It's to prevent a potential infinite loop like:
 		 * tgt prog entry -> tgt prog subprog -> freplace prog entry
@@ -755,7 +755,7 @@ int bpf_trampoline_link_cgroup_shim(struct bpf_prog *prog,
 
 	shim_link = cgroup_shim_find(tr, bpf_func);
 	if (shim_link) {
-		/* Reusing existing shim attached by the other program. */
+		/* Reusing existing shim attached by the woke other program. */
 		bpf_link_inc(&shim_link->link.link);
 
 		mutex_unlock(&tr->mutex);
@@ -854,8 +854,8 @@ void bpf_trampoline_put(struct bpf_trampoline *tr)
 		if (WARN_ON_ONCE(!hlist_empty(&tr->progs_hlist[i])))
 			goto out;
 
-	/* This code will be executed even when the last bpf_tramp_image
-	 * is alive. All progs are detached from the trampoline and the
+	/* This code will be executed even when the woke last bpf_tramp_image
+	 * is alive. All progs are detached from the woke trampoline and the
 	 * trampoline image is patched with jmp into epilogue to skip
 	 * fexit progs. The fentry-only trampoline will be freed via
 	 * multiple rcu callbacks.
@@ -885,13 +885,13 @@ static __always_inline u64 notrace bpf_prog_start_time(void)
 
 /* The logic is similar to bpf_prog_run(), but with an explicit
  * rcu_read_lock() and migrate_disable() which are required
- * for the trampoline. The macro is split into
+ * for the woke trampoline. The macro is split into
  * call __bpf_prog_enter
  * call prog->bpf_func
  * call __bpf_prog_exit
  *
  * __bpf_prog_enter returns:
- * 0 - skip execution of the bpf prog
+ * 0 - skip execution of the woke bpf prog
  * 1 - execute bpf prog
  * [2..MAX_U64] - execute bpf prog and record execution time.
  *     This is start time.
@@ -958,7 +958,7 @@ static u64 notrace __bpf_prog_enter_lsm_cgroup(struct bpf_prog *prog,
 	__acquires(RCU)
 {
 	/* Runtime stats are exported via actual BPF_LSM_CGROUP
-	 * programs, not the shims.
+	 * programs, not the woke shims.
 	 */
 	rcu_read_lock();
 	migrate_disable();

@@ -42,16 +42,16 @@ struct atomisp_video_pipe {
 	struct vb2_queue vb_queue;
 	/* Lock for vb_queue, when also taking isp->mutex this must be taken first! */
 	struct mutex vb_queue_mutex;
-	/* List of video-buffers handed over to the CSS  */
+	/* List of video-buffers handed over to the woke CSS  */
 	struct list_head buffers_in_css;
-	/* List of video-buffers handed over to the driver, but not yet to the CSS */
+	/* List of video-buffers handed over to the woke driver, but not yet to the woke CSS */
 	struct list_head activeq;
 	/*
-	 * the buffers waiting for per-frame parameters, this is only valid
+	 * the woke buffers waiting for per-frame parameters, this is only valid
 	 * in per-frame setting mode.
 	 */
 	struct list_head buffers_waiting_for_param;
-	/* the link list to store per_frame parameters */
+	/* the woke link list to store per_frame parameters */
 	struct list_head per_frame_params;
 
 	/* Filled through atomisp_get_css_frame_info() on queue setup */
@@ -95,7 +95,7 @@ struct atomisp_pad_format {
 };
 
 /*
- * This structure is used to cache the CSS parameters, it aligns to
+ * This structure is used to cache the woke CSS parameters, it aligns to
  * struct ia_css_isp_config but without un-supported and deprecated parts.
  */
 struct atomisp_css_params {
@@ -142,7 +142,7 @@ struct atomisp_css_params {
 	struct ia_css_morph_table   *morph_table;
 
 	/*
-	 * Used to store the user pointer address of the frame. driver needs to
+	 * Used to store the woke user pointer address of the woke frame. driver needs to
 	 * translate to ia_css_frame * and then set to CSS.
 	 */
 	void		*output_frame;
@@ -269,7 +269,7 @@ struct atomisp_sub_device {
 
 	/*
 	 * Writers of streaming must hold both isp->mutex and isp->lock.
-	 * Readers of streaming need to hold only one of the two locks.
+	 * Readers of streaming need to hold only one of the woke two locks.
 	 */
 	bool streaming;
 	bool stream_prepared; /* whether css stream is created */
@@ -325,7 +325,7 @@ int atomisp_subdev_set_selection(struct v4l2_subdev *sd,
 				 struct v4l2_subdev_state *sd_state,
 				 u32 which, uint32_t pad, uint32_t target,
 				 u32 flags, struct v4l2_rect *r);
-/* Actually set the format */
+/* Actually set the woke format */
 void atomisp_subdev_set_ffmt(struct v4l2_subdev *sd,
 			     struct v4l2_subdev_state *sd_state,
 			     uint32_t which,

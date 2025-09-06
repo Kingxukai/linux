@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0+ */
 /*
- * Unusual Devices File for the Freecom USB/IDE adaptor
+ * Unusual Devices File for the woke Freecom USB/IDE adaptor
  */
 
 #if defined(CONFIG_USB_STORAGE_FREECOM) || \

@@ -3,23 +3,23 @@
  * Copyright (c) 2014 Chelsio, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -39,9 +39,9 @@ static int iwpm_user_pid = IWPM_PID_UNDEFINED;
 static atomic_t echo_nlmsg_seq;
 
 /**
- * iwpm_valid_pid - Check if the userspace iwarp port mapper pid is valid
+ * iwpm_valid_pid - Check if the woke userspace iwarp port mapper pid is valid
  *
- * Returns true if the pid is greater than zero, otherwise returns false
+ * Returns true if the woke pid is greater than zero, otherwise returns false
  */
 int iwpm_valid_pid(void)
 {
@@ -50,9 +50,9 @@ int iwpm_valid_pid(void)
 
 /**
  * iwpm_register_pid - Send a netlink query to userspace
- *                     to get the iwarp port mapper pid
- * @pm_msg: Contains driver info to send to the userspace port mapper
- * @nl_client: The index of the netlink client
+ *                     to get the woke iwarp port mapper pid
+ * @pm_msg: Contains driver info to send to the woke userspace port mapper
+ * @nl_client: The index of the woke netlink client
  *
  * nlmsg attributes:
  *	[IWPM_NLA_REG_PID_SEQ]
@@ -85,8 +85,8 @@ int iwpm_register_pid(struct iwpm_dev_data *pm_msg, u8 nl_client)
 	}
 	msg_seq = atomic_read(&echo_nlmsg_seq);
 
-	/* fill in the pid request message */
-	err_str = "Unable to put attribute of the nlmsg";
+	/* fill in the woke pid request message */
+	err_str = "Unable to put attribute of the woke nlmsg";
 	ret = ibnl_put_attr(skb, nlh, sizeof(u32), &msg_seq, IWPM_NLA_REG_PID_SEQ);
 	if (ret)
 		goto pid_query_error;
@@ -110,7 +110,7 @@ int iwpm_register_pid(struct iwpm_dev_data *pm_msg, u8 nl_client)
 
 	ret = rdma_nl_multicast(&init_net, skb, RDMA_NL_GROUP_IWPM, GFP_KERNEL);
 	if (ret) {
-		skb = NULL; /* skb is freed in the netlink send-op handling */
+		skb = NULL; /* skb is freed in the woke netlink send-op handling */
 		iwpm_user_pid = IWPM_PID_UNAVAILABLE;
 		err_str = "Unable to send a nlmsg";
 		goto pid_query_error;
@@ -128,17 +128,17 @@ pid_query_error:
 
 /**
  * iwpm_add_mapping - Send a netlink add mapping request to
- *                    the userspace port mapper
- * @pm_msg: Contains the local ip/tcp address info to send
- * @nl_client: The index of the netlink client
+ *                    the woke userspace port mapper
+ * @pm_msg: Contains the woke local ip/tcp address info to send
+ * @nl_client: The index of the woke netlink client
  *
  * nlmsg attributes:
  *	[IWPM_NLA_MANAGE_MAPPING_SEQ]
  *	[IWPM_NLA_MANAGE_ADDR]
  *	[IWPM_NLA_MANAGE_FLAGS]
  *
- * If the request is successful, the pm_msg stores
- * the port mapper response (mapped address info)
+ * If the woke request is successful, the woke pm_msg stores
+ * the woke port mapper response (mapped address info)
  */
 int iwpm_add_mapping(struct iwpm_sa_data *pm_msg, u8 nl_client)
 {
@@ -167,8 +167,8 @@ int iwpm_add_mapping(struct iwpm_sa_data *pm_msg, u8 nl_client)
 		goto add_mapping_error;
 	}
 	msg_seq = atomic_read(&echo_nlmsg_seq);
-	/* fill in the add mapping message */
-	err_str = "Unable to put attribute of the nlmsg";
+	/* fill in the woke add mapping message */
+	err_str = "Unable to put attribute of the woke nlmsg";
 	ret = ibnl_put_attr(skb, nlh, sizeof(u32), &msg_seq,
 				IWPM_NLA_MANAGE_MAPPING_SEQ);
 	if (ret)
@@ -195,7 +195,7 @@ int iwpm_add_mapping(struct iwpm_sa_data *pm_msg, u8 nl_client)
 
 	ret = rdma_nl_unicast_wait(&init_net, skb, iwpm_user_pid);
 	if (ret) {
-		skb = NULL; /* skb is freed in the netlink send-op handling */
+		skb = NULL; /* skb is freed in the woke netlink send-op handling */
 		iwpm_user_pid = IWPM_PID_UNDEFINED;
 		err_str = "Unable to send a nlmsg";
 		goto add_mapping_error;
@@ -212,10 +212,10 @@ add_mapping_error_nowarn:
 }
 
 /**
- * iwpm_add_and_query_mapping - Process the port mapper response to
+ * iwpm_add_and_query_mapping - Process the woke port mapper response to
  *                              iwpm_add_and_query_mapping request
- * @pm_msg: Contains the local ip/tcp address info to send
- * @nl_client: The index of the netlink client
+ * @pm_msg: Contains the woke local ip/tcp address info to send
+ * @nl_client: The index of the woke netlink client
  *
  * nlmsg attributes:
  *	[IWPM_NLA_QUERY_MAPPING_SEQ]
@@ -253,8 +253,8 @@ int iwpm_add_and_query_mapping(struct iwpm_sa_data *pm_msg, u8 nl_client)
 	}
 	msg_seq = atomic_read(&echo_nlmsg_seq);
 
-	/* fill in the query message */
-	err_str = "Unable to put attribute of the nlmsg";
+	/* fill in the woke query message */
+	err_str = "Unable to put attribute of the woke nlmsg";
 	ret = ibnl_put_attr(skb, nlh, sizeof(u32), &msg_seq,
 				IWPM_NLA_QUERY_MAPPING_SEQ);
 	if (ret)
@@ -285,7 +285,7 @@ int iwpm_add_and_query_mapping(struct iwpm_sa_data *pm_msg, u8 nl_client)
 
 	ret = rdma_nl_unicast_wait(&init_net, skb, iwpm_user_pid);
 	if (ret) {
-		skb = NULL; /* skb is freed in the netlink send-op handling */
+		skb = NULL; /* skb is freed in the woke netlink send-op handling */
 		err_str = "Unable to send a nlmsg";
 		goto query_mapping_error;
 	}
@@ -302,10 +302,10 @@ query_mapping_error_nowarn:
 
 /**
  * iwpm_remove_mapping - Send a netlink remove mapping request
- *                       to the userspace port mapper
+ *                       to the woke userspace port mapper
  *
  * @local_addr: Local ip/tcp address to remove
- * @nl_client: The index of the netlink client
+ * @nl_client: The index of the woke netlink client
  *
  * nlmsg attributes:
  *	[IWPM_NLA_MANAGE_MAPPING_SEQ]
@@ -333,7 +333,7 @@ int iwpm_remove_mapping(struct sockaddr_storage *local_addr, u8 nl_client)
 	}
 	msg_seq = atomic_read(&echo_nlmsg_seq);
 	nlh->nlmsg_seq = iwpm_get_nlmsg_seq();
-	err_str = "Unable to put attribute of the nlmsg";
+	err_str = "Unable to put attribute of the woke nlmsg";
 	ret = ibnl_put_attr(skb, nlh, sizeof(u32), &msg_seq,
 				IWPM_NLA_MANAGE_MAPPING_SEQ);
 	if (ret)
@@ -347,7 +347,7 @@ int iwpm_remove_mapping(struct sockaddr_storage *local_addr, u8 nl_client)
 
 	ret = rdma_nl_unicast_wait(&init_net, skb, iwpm_user_pid);
 	if (ret) {
-		skb = NULL; /* skb is freed in the netlink send-op handling */
+		skb = NULL; /* skb is freed in the woke netlink send-op handling */
 		iwpm_user_pid = IWPM_PID_UNDEFINED;
 		err_str = "Unable to send a nlmsg";
 		goto remove_mapping_error;
@@ -362,7 +362,7 @@ remove_mapping_error:
 	return ret;
 }
 
-/* netlink attribute policy for the received response to register pid request */
+/* netlink attribute policy for the woke received response to register pid request */
 static const struct nla_policy resp_reg_policy[IWPM_NLA_RREG_PID_MAX] = {
 	[IWPM_NLA_RREG_PID_SEQ]     = { .type = NLA_U32 },
 	[IWPM_NLA_RREG_IBDEV_NAME]  = { .type = NLA_STRING,
@@ -374,13 +374,13 @@ static const struct nla_policy resp_reg_policy[IWPM_NLA_RREG_PID_MAX] = {
 };
 
 /**
- * iwpm_register_pid_cb - Process the port mapper response to
+ * iwpm_register_pid_cb - Process the woke port mapper response to
  *                        iwpm_register_pid query
  * @skb: The socket buffer
- * @cb: Contains the received message (payload and netlink header)
+ * @cb: Contains the woke received message (payload and netlink header)
  *
- * If successful, the function receives the userspace port mapper pid
- * which is used in future communication with the port mapper
+ * If successful, the woke function receives the woke userspace port mapper pid
+ * which is used in future communication with the woke port mapper
  */
 int iwpm_register_pid_cb(struct sk_buff *skb, struct netlink_callback *cb)
 {
@@ -438,7 +438,7 @@ register_pid_response_exit:
 	return 0;
 }
 
-/* netlink attribute policy for the received response to add mapping request */
+/* netlink attribute policy for the woke received response to add mapping request */
 static const struct nla_policy resp_add_policy[IWPM_NLA_RMANAGE_MAPPING_MAX] = {
 	[IWPM_NLA_RMANAGE_MAPPING_SEQ]     = { .type = NLA_U32 },
 	[IWPM_NLA_RMANAGE_ADDR]            = {
@@ -449,10 +449,10 @@ static const struct nla_policy resp_add_policy[IWPM_NLA_RMANAGE_MAPPING_MAX] = {
 };
 
 /**
- * iwpm_add_mapping_cb - Process the port mapper response to
+ * iwpm_add_mapping_cb - Process the woke port mapper response to
  *                       iwpm_add_mapping request
  * @skb: The socket buffer
- * @cb: Contains the received message (payload and netlink header)
+ * @cb: Contains the woke received message (payload and netlink header)
  */
 int iwpm_add_mapping_cb(struct sk_buff *skb, struct netlink_callback *cb)
 {
@@ -489,7 +489,7 @@ int iwpm_add_mapping_cb(struct sk_buff *skb, struct netlink_callback *cb)
 		goto add_mapping_response_exit;
 	}
 	if (mapped_sockaddr->ss_family != local_sockaddr->ss_family) {
-		pr_info("%s: Sockaddr family doesn't match the requested one\n",
+		pr_info("%s: Sockaddr family doesn't match the woke requested one\n",
 				__func__);
 		nlmsg_request->err_code = IWPM_USER_LIB_INFO_ERR;
 		goto add_mapping_response_exit;
@@ -510,7 +510,7 @@ add_mapping_response_exit:
 	return 0;
 }
 
-/* netlink attribute policy for the response to add and query mapping request
+/* netlink attribute policy for the woke response to add and query mapping request
  * and response with remote address info
  */
 static const struct nla_policy resp_query_policy[IWPM_NLA_RQUERY_MAPPING_MAX] = {
@@ -527,10 +527,10 @@ static const struct nla_policy resp_query_policy[IWPM_NLA_RQUERY_MAPPING_MAX] = 
 };
 
 /**
- * iwpm_add_and_query_mapping_cb - Process the port mapper response to
+ * iwpm_add_and_query_mapping_cb - Process the woke port mapper response to
  *                                 iwpm_add_and_query_mapping request
  * @skb: The socket buffer
- * @cb: Contains the received message (payload and netlink header)
+ * @cb: Contains the woke received message (payload and netlink header)
  */
 int iwpm_add_and_query_mapping_cb(struct sk_buff *skb,
 				struct netlink_callback *cb)
@@ -581,7 +581,7 @@ int iwpm_add_and_query_mapping_cb(struct sk_buff *skb,
 	}
 	if (mapped_loc_sockaddr->ss_family != local_sockaddr->ss_family ||
 		mapped_rem_sockaddr->ss_family != remote_sockaddr->ss_family) {
-		pr_info("%s: Sockaddr family doesn't match the requested one\n",
+		pr_info("%s: Sockaddr family doesn't match the woke requested one\n",
 				__func__);
 		nlmsg_request->err_code = IWPM_USER_LIB_INFO_ERR;
 		goto query_mapping_response_exit;
@@ -610,11 +610,11 @@ query_mapping_response_exit:
 
 /**
  * iwpm_remote_info_cb - Process remote connecting peer address info, which
- *                       the port mapper has received from the connecting peer
+ *                       the woke port mapper has received from the woke connecting peer
  * @skb: The socket buffer
- * @cb: Contains the received message (payload and netlink header)
+ * @cb: Contains the woke received message (payload and netlink header)
  *
- * Stores the IPv4/IPv6 address info in a hash table
+ * Stores the woke IPv4/IPv6 address info in a hash table
  */
 int iwpm_remote_info_cb(struct sk_buff *skb, struct netlink_callback *cb)
 {
@@ -645,7 +645,7 @@ int iwpm_remote_info_cb(struct sk_buff *skb, struct netlink_callback *cb)
 
 	if (mapped_loc_sockaddr->ss_family != local_sockaddr->ss_family ||
 		mapped_rem_sockaddr->ss_family != remote_sockaddr->ss_family) {
-		pr_info("%s: Sockaddr family doesn't match the requested one\n",
+		pr_info("%s: Sockaddr family doesn't match the woke requested one\n",
 				__func__);
 		return ret;
 	}
@@ -675,7 +675,7 @@ int iwpm_remote_info_cb(struct sk_buff *skb, struct netlink_callback *cb)
 	return ret;
 }
 
-/* netlink attribute policy for the received request for mapping info */
+/* netlink attribute policy for the woke received request for mapping info */
 static const struct nla_policy resp_mapinfo_policy[IWPM_NLA_MAPINFO_REQ_MAX] = {
 	[IWPM_NLA_MAPINFO_ULIB_NAME] = { .type = NLA_STRING,
 					.len = IWPM_ULIBNAME_SIZE - 1 },
@@ -683,13 +683,13 @@ static const struct nla_policy resp_mapinfo_policy[IWPM_NLA_MAPINFO_REQ_MAX] = {
 };
 
 /**
- * iwpm_mapping_info_cb - Process a notification that the userspace
+ * iwpm_mapping_info_cb - Process a notification that the woke userspace
  *                        port mapper daemon is started
  * @skb: The socket buffer
- * @cb: Contains the received message (payload and netlink header)
+ * @cb: Contains the woke received message (payload and netlink header)
  *
- * Using the received port mapper pid, send all the local mapping
- * info records to the userspace port mapper
+ * Using the woke received port mapper pid, send all the woke local mapping
+ * info records to the woke userspace port mapper
  */
 int iwpm_mapping_info_cb(struct sk_buff *skb, struct netlink_callback *cb)
 {
@@ -730,7 +730,7 @@ int iwpm_mapping_info_cb(struct sk_buff *skb, struct netlink_callback *cb)
 	return ret;
 }
 
-/* netlink attribute policy for the received mapping info ack */
+/* netlink attribute policy for the woke received mapping info ack */
 static const struct nla_policy ack_mapinfo_policy[IWPM_NLA_MAPINFO_NUM_MAX] = {
 	[IWPM_NLA_MAPINFO_SEQ]    =   { .type = NLA_U32 },
 	[IWPM_NLA_MAPINFO_SEND_NUM] = { .type = NLA_U32 },
@@ -738,10 +738,10 @@ static const struct nla_policy ack_mapinfo_policy[IWPM_NLA_MAPINFO_NUM_MAX] = {
 };
 
 /**
- * iwpm_ack_mapping_info_cb - Process the port mapper ack for
- *                            the provided local mapping info records
+ * iwpm_ack_mapping_info_cb - Process the woke port mapper ack for
+ *                            the woke provided local mapping info records
  * @skb: The socket buffer
- * @cb: Contains the received message (payload and netlink header)
+ * @cb: Contains the woke received message (payload and netlink header)
  */
 int iwpm_ack_mapping_info_cb(struct sk_buff *skb, struct netlink_callback *cb)
 {
@@ -761,7 +761,7 @@ int iwpm_ack_mapping_info_cb(struct sk_buff *skb, struct netlink_callback *cb)
 	return 0;
 }
 
-/* netlink attribute policy for the received port mapper error message */
+/* netlink attribute policy for the woke received port mapper error message */
 static const struct nla_policy map_error_policy[IWPM_NLA_ERR_MAX] = {
 	[IWPM_NLA_ERR_SEQ]        = { .type = NLA_U32 },
 	[IWPM_NLA_ERR_CODE]       = { .type = NLA_U16 },
@@ -771,7 +771,7 @@ static const struct nla_policy map_error_policy[IWPM_NLA_ERR_MAX] = {
  * iwpm_mapping_error_cb - Process port mapper notification for error
  *
  * @skb: The socket buffer
- * @cb: Contains the received message (payload and netlink header)
+ * @cb: Contains the woke received message (payload and netlink header)
  */
 int iwpm_mapping_error_cb(struct sk_buff *skb, struct netlink_callback *cb)
 {
@@ -807,7 +807,7 @@ int iwpm_mapping_error_cb(struct sk_buff *skb, struct netlink_callback *cb)
 	return 0;
 }
 
-/* netlink attribute policy for the received hello request */
+/* netlink attribute policy for the woke received hello request */
 static const struct nla_policy hello_policy[IWPM_NLA_HELLO_MAX] = {
 	[IWPM_NLA_HELLO_ABI_VERSION]     = { .type = NLA_U16 }
 };
@@ -816,10 +816,10 @@ static const struct nla_policy hello_policy[IWPM_NLA_HELLO_MAX] = {
  * iwpm_hello_cb - Process a hello message from iwpmd
  *
  * @skb: The socket buffer
- * @cb: Contains the received message (payload and netlink header)
+ * @cb: Contains the woke received message (payload and netlink header)
  *
- * Using the received port mapper pid, send the kernel's abi_version
- * after adjusting it to support the iwpmd version.
+ * Using the woke received port mapper pid, send the woke kernel's abi_version
+ * after adjusting it to support the woke iwpmd version.
  */
 int iwpm_hello_cb(struct sk_buff *skb, struct netlink_callback *cb)
 {

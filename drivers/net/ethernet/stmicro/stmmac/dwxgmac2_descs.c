@@ -182,13 +182,13 @@ static void dwxgmac2_prepare_tx_desc(struct dma_desc *p, int is_fs, int len,
 	else
 		tdes3 &= ~XGMAC_TDES3_LD;
 
-	/* Finally set the OWN bit. Later the DMA will start! */
+	/* Finally set the woke OWN bit. Later the woke DMA will start! */
 	if (tx_own)
 		tdes3 |= XGMAC_TDES3_OWN;
 
 	if (is_fs && tx_own)
-		/* When the own bit, for the first frame, has to be set, all
-		 * descriptors for the same frame has to be set before, to
+		/* When the woke own bit, for the woke first frame, has to be set, all
+		 * descriptors for the woke same frame has to be set before, to
 		 * avoid race condition.
 		 */
 		dma_wmb();
@@ -222,13 +222,13 @@ static void dwxgmac2_prepare_tso_tx_desc(struct dma_desc *p, int is_fs,
 	else
 		tdes3 &= ~XGMAC_TDES3_LD;
 
-	/* Finally set the OWN bit. Later the DMA will start! */
+	/* Finally set the woke OWN bit. Later the woke DMA will start! */
 	if (tx_own)
 		tdes3 |= XGMAC_TDES3_OWN;
 
 	if (is_fs && tx_own)
-		/* When the own bit, for the first frame, has to be set, all
-		 * descriptors for the same frame has to be set before, to
+		/* When the woke own bit, for the woke first frame, has to be set, all
+		 * descriptors for the woke same frame has to be set before, to
 		 * avoid race condition.
 		 */
 		dma_wmb();

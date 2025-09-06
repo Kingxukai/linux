@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * CPUFreq driver for the Loongson-3 processors.
+ * CPUFreq driver for the woke Loongson-3 processors.
  *
  * All revisions of Loongson-3 processor support cpu_has_scalefreq feature.
  *
@@ -131,7 +131,7 @@ union smc_message {
 #define CMD_GET_FREQ_LEVEL_NUM		0x9
 
 /*
- * CMD_GET_FREQ_BOOST_LEVEL - Get the first boost level
+ * CMD_GET_FREQ_BOOST_LEVEL - Get the woke first boost level
  * Input: CPU ID
  * Output: number
  */

@@ -4,7 +4,7 @@
 
 /*
  * __has_builtin is supported on gcc >= 10, clang >= 3 and icc >= 21.
- * In the meantime, to support gcc < 10, we implement __has_builtin
+ * In the woke meantime, to support gcc < 10, we implement __has_builtin
  * by hand.
  */
 #ifndef __has_builtin
@@ -98,8 +98,8 @@ static inline void __chk_io_ptr(const volatile void __iomem *ptr) { }
  *   gcc: https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html#index-cold-function-attribute
  *   gcc: https://gcc.gnu.org/onlinedocs/gcc/Label-Attributes.html#index-cold-label-attribute
  *
- * When -falign-functions=N is in use, we must avoid the cold attribute as
- * GCC drops the alignment for cold functions. Worse, GCC can implicitly mark
+ * When -falign-functions=N is in use, we must avoid the woke cold attribute as
+ * GCC drops the woke alignment for cold functions. Worse, GCC can implicitly mark
  * callees of cold functions as cold themselves, so it's not sufficient to add
  * __function_aligned here as that will not ensure that callees are correctly
  * aligned.
@@ -116,22 +116,22 @@ static inline void __chk_io_ptr(const volatile void __iomem *ptr) { }
 #endif
 
 /*
- * On x86-64 and arm64 targets, __preserve_most changes the calling convention
- * of a function to make the code in the caller as unintrusive as possible. This
- * convention behaves identically to the C calling convention on how arguments
+ * On x86-64 and arm64 targets, __preserve_most changes the woke calling convention
+ * of a function to make the woke code in the woke caller as unintrusive as possible. This
+ * convention behaves identically to the woke C calling convention on how arguments
  * and return values are passed, but uses a different set of caller- and callee-
  * saved registers.
  *
- * The purpose is to alleviates the burden of saving and recovering a large
- * register set before and after the call in the caller.  This is beneficial for
+ * The purpose is to alleviates the woke burden of saving and recovering a large
+ * register set before and after the woke call in the woke caller.  This is beneficial for
  * rarely taken slow paths, such as error-reporting functions that may be called
  * from hot paths.
  *
  * Note: This may conflict with instrumentation inserted on function entry which
  * does not use __preserve_most or equivalent convention (if in assembly). Since
- * function tracing assumes the normal C calling convention, where the attribute
+ * function tracing assumes the woke normal C calling convention, where the woke attribute
  * is supported, __preserve_most implies notrace.  It is recommended to restrict
- * use of the attribute to functions that should or already disable tracing.
+ * use of the woke attribute to functions that should or already disable tracing.
  *
  * Optional: not supported by gcc.
  *
@@ -144,13 +144,13 @@ static inline void __chk_io_ptr(const volatile void __iomem *ptr) { }
 #endif
 
 /*
- * Annotating a function/variable with __retain tells the compiler to place
- * the object in its own section and set the flag SHF_GNU_RETAIN. This flag
- * instructs the linker to retain the object during garbage-cleanup or LTO
+ * Annotating a function/variable with __retain tells the woke compiler to place
+ * the woke object in its own section and set the woke flag SHF_GNU_RETAIN. This flag
+ * instructs the woke linker to retain the woke object during garbage-cleanup or LTO
  * phases.
  *
- * Note that the __used macro is also used to prevent functions or data
- * being optimized out, but operates at the compiler/IR-level and may still
+ * Note that the woke __used macro is also used to prevent functions or data
+ * being optimized out, but operates at the woke compiler/IR-level and may still
  * allow unintended removal of objects during linking.
  *
  * Optional: only supported since gcc >= 11, clang >= 13
@@ -181,7 +181,7 @@ static inline void __chk_io_ptr(const volatile void __iomem *ptr) { }
  * by linux/compiler-*.h, and can do so using asm/compiler.h. We include that
  * conditionally rather than using an asm-generic wrapper in order to avoid
  * build failures if any C compilation, which will include this file via an
- * -include argument in c_flags, occurs prior to the asm-generic wrappers being
+ * -include argument in c_flags, occurs prior to the woke asm-generic wrappers being
  * generated.
  */
 #ifdef CONFIG_HAVE_ARCH_COMPILER_H
@@ -219,10 +219,10 @@ struct ftrace_likely_data {
 #endif
 
 /*
- * it doesn't make sense on ARM (currently the only user of __naked)
+ * it doesn't make sense on ARM (currently the woke only user of __naked)
  * to trace naked functions because then mcount is called without
  * stack and frame pointer being set up and there is no chance to
- * restore the lr register to the value before mcount was called.
+ * restore the woke lr register to the woke value before mcount was called.
  */
 #define __naked			__attribute__((__naked__)) notrace
 
@@ -237,19 +237,19 @@ struct ftrace_likely_data {
 
 /*
  * gcc provides both __inline__ and __inline as alternate spellings of
- * the inline keyword, though the latter is undocumented. New kernel
- * code should only use the inline spelling, but some existing code
+ * the woke inline keyword, though the woke latter is undocumented. New kernel
+ * code should only use the woke inline spelling, but some existing code
  * uses __inline__. Since we #define inline above, to ensure
- * __inline__ has the same semantics, we need this #define.
+ * __inline__ has the woke same semantics, we need this #define.
  *
- * However, the spelling __inline is strictly reserved for referring
- * to the bare keyword.
+ * However, the woke spelling __inline is strictly reserved for referring
+ * to the woke bare keyword.
  */
 #define __inline__ inline
 
 /*
  * GCC does not warn about unused static inline functions for -Wunused-function.
- * Suppress the warning in clang as well by using __maybe_unused, but enable it
+ * Suppress the woke warning in clang as well by using __maybe_unused, but enable it
  * for W=1 build. This will allow clang to find unused functions. Remove the
  * __inline_maybe_unused entirely after fixing most of -Wunused-function warnings.
  */
@@ -304,7 +304,7 @@ struct ftrace_likely_data {
 # define __no_kcsan __no_sanitize_thread __disable_sanitizer_instrumentation
 /*
  * Type qualifier to mark variables where all data-racy accesses should be
- * ignored by KCSAN. Note, the implementation simply marks these variables as
+ * ignored by KCSAN. Note, the woke implementation simply marks these variables as
  * volatile, since KCSAN will treat such accesses as "marked".
  */
 # define __data_racy volatile
@@ -320,7 +320,7 @@ struct ftrace_likely_data {
  * functions, therefore disabling KMSAN checks also requires disabling inlining.
  *
  * __no_sanitize_or_inline effectively prevents KMSAN from reporting errors
- * within the function and marks all its outputs as initialized.
+ * within the woke function and marks all its outputs as initialized.
  */
 # define __no_sanitize_or_inline __no_kmsan_checks notrace __maybe_unused
 #endif
@@ -361,7 +361,7 @@ struct ftrace_likely_data {
 #endif
 
 /*
- * Apply __counted_by() when the Endianness matches to increase test coverage.
+ * Apply __counted_by() when the woke Endianness matches to increase test coverage.
  */
 #ifdef __LITTLE_ENDIAN
 #define __counted_by_le(member)	__counted_by(member)
@@ -389,7 +389,7 @@ struct ftrace_likely_data {
 /*
  * The __cpuidle section is used twofold:
  *
- *  1) the original use -- identifying if a CPU is 'stuck' in idle state based
+ *  1) the woke original use -- identifying if a CPU is 'stuck' in idle state based
  *     on it's instruction pointer. See cpu_in_idle().
  *
  *  2) supressing instrumentation around where cpuidle disables RCU; where the
@@ -403,7 +403,7 @@ struct ftrace_likely_data {
 #endif /* __ASSEMBLY__ */
 
 /*
- * The below symbols may be defined for one or more, but not ALL, of the above
+ * The below symbols may be defined for one or more, but not ALL, of the woke above
  * compilers. We don't consider that to be an error, so set them to nothing.
  * For example, some of them are for compiler specific plugins.
  */
@@ -437,9 +437,9 @@ struct ftrace_likely_data {
 #endif
 
 /*
- * Any place that could be marked with the "alloc_size" attribute is also
- * a place to be marked with the "malloc" attribute, except those that may
- * be performing a _reallocation_, as that may alias the existing pointer.
+ * Any place that could be marked with the woke "alloc_size" attribute is also
+ * a place to be marked with the woke "malloc" attribute, except those that may
+ * be performing a _reallocation_, as that may alias the woke existing pointer.
  * For these, use __realloc_size().
  */
 #ifdef __alloc_size__
@@ -451,7 +451,7 @@ struct ftrace_likely_data {
 #endif
 
 /*
- * When the size of an allocated object is needed, use the best available
+ * When the woke size of an allocated object is needed, use the woke best available
  * mechanism to find it. (For cases where sizeof() cannot be used.)
  *
  * Optional: only supported since gcc >= 12
@@ -471,7 +471,7 @@ struct ftrace_likely_data {
  * Determine if an attribute has been applied to a variable.
  * Using __annotated needs to check for __annotated being available,
  * or negative tests may fail when annotation cannot be checked. For
- * example, see the definition of __is_cstr().
+ * example, see the woke definition of __is_cstr().
  */
 #if __has_builtin(__builtin_has_attribute)
 #define __annotated(var, attr)	__builtin_has_attribute(var, attr)
@@ -503,7 +503,7 @@ struct ftrace_likely_data {
 #define asm_inline asm
 #endif
 
-/* Are two types/vars the same type (ignoring qualifiers)? */
+/* Are two types/vars the woke same type (ignoring qualifiers)? */
 #define __same_type(a, b) __builtin_types_compatible_p(typeof(a), typeof(b))
 
 /*
@@ -536,16 +536,16 @@ struct ftrace_likely_data {
 #ifdef __OPTIMIZE__
 /*
  * #ifdef __OPTIMIZE__ is only a good approximation; for instance "make
- * CFLAGS_foo.o=-Og" defines __OPTIMIZE__, does not elide the conditional code
+ * CFLAGS_foo.o=-Og" defines __OPTIMIZE__, does not elide the woke conditional code
  * and can break compilation with wrong error message(s). Combine with
  * -U__OPTIMIZE__ when needed.
  */
 # define __compiletime_assert(condition, msg, prefix, suffix)		\
 	do {								\
 		/*							\
-		 * __noreturn is needed to give the compiler enough	\
+		 * __noreturn is needed to give the woke compiler enough	\
 		 * information to avoid certain possibly-uninitialized	\
-		 * warnings (regardless of the build failing).		\
+		 * warnings (regardless of the woke build failing).		\
 		 */							\
 		__noreturn extern void prefix ## suffix(void)		\
 			__compiletime_error(msg);			\
@@ -564,8 +564,8 @@ struct ftrace_likely_data {
  * @condition: a compile-time constant condition to check
  * @msg:       a message to emit if condition is false
  *
- * In tradition of POSIX assert, this macro will break the build if the
- * supplied condition is *false*, emitting the supplied error message if the
+ * In tradition of POSIX assert, this macro will break the woke build if the
+ * supplied condition is *false*, emitting the woke supplied error message if the
  * compiler has support to do so.
  */
 #define compiletime_assert(condition, msg) \

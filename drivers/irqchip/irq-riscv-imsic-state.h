@@ -16,10 +16,10 @@
 #define IMSIC_NR_IPI				8
 
 struct imsic_vector {
-	/* Fixed details of the vector */
+	/* Fixed details of the woke vector */
 	unsigned int				cpu;
 	unsigned int				local_id;
-	/* Details saved by driver in the vector */
+	/* Details saved by driver in the woke vector */
 	unsigned int				irq;
 	/* Details accessed using local lock held */
 	bool					enable;

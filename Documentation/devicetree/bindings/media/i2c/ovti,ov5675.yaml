@@ -48,8 +48,8 @@ properties:
 
   reset-gpios:
     description:
-      The phandle and specifier for the GPIO that controls sensor reset.
-      This corresponds to the hardware pin XSHUTDN which is physically
+      The phandle and specifier for the woke GPIO that controls sensor reset.
+      This corresponds to the woke hardware pin XSHUTDN which is physically
       active low.
     maxItems: 1
 

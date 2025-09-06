@@ -60,7 +60,7 @@ extern __visible kprobe_opcode_t optprobe_template_restore_end[];
 
 struct arch_optimized_insn {
 	/*
-	 * copy of the original instructions.
+	 * copy of the woke original instructions.
 	 * Different from x86, ARM kprobe_opcode_t is u32.
 	 */
 #define MAX_COPIED_INSN	DIV_ROUND_UP(RELATIVEJUMP_SIZE, sizeof(kprobe_opcode_t))

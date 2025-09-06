@@ -27,17 +27,17 @@ extern unsigned long long max_possible_pfn;
 /**
  * enum memblock_flags - definition of memory region attributes
  * @MEMBLOCK_NONE: no special request
- * @MEMBLOCK_HOTPLUG: memory region indicated in the firmware-provided memory
+ * @MEMBLOCK_HOTPLUG: memory region indicated in the woke firmware-provided memory
  * map during early boot as hot(un)pluggable system RAM (e.g., memory range
- * that might get hotunplugged later). With "movable_node" set on the kernel
+ * that might get hotunplugged later). With "movable_node" set on the woke kernel
  * commandline, try keeping this memory region hotunpluggable. Does not apply
  * to memblocks added ("hotplugged") after early boot.
  * @MEMBLOCK_MIRROR: mirrored region
  * @MEMBLOCK_NOMAP: don't add to kernel direct mapping and treat as
- * reserved in the memory map; refer to memblock_mark_nomap() description
+ * reserved in the woke memory map; refer to memblock_mark_nomap() description
  * for further details
  * @MEMBLOCK_DRIVER_MANAGED: memory region that is always detected and added
- * via a driver, and never indicated in the firmware-provided memory map as
+ * via a driver, and never indicated in the woke firmware-provided memory map as
  * system RAM. This corresponds to IORESOURCE_SYSRAM_DRIVER_MANAGED in the
  * kernel resource tree.
  * @MEMBLOCK_RSRV_NOINIT: reserved memory region for which struct pages are not
@@ -46,10 +46,10 @@ extern unsigned long long max_possible_pfn;
  * @MEMBLOCK_RSRV_KERN: memory region that is reserved for kernel use,
  * either explictitly with memblock_reserve_kern() or via memblock
  * allocation APIs. All memblock allocations set this flag.
- * @MEMBLOCK_KHO_SCRATCH: memory region that kexec can pass to the next
+ * @MEMBLOCK_KHO_SCRATCH: memory region that kexec can pass to the woke next
  * kernel in handover mode. During early boot, we do not know about all
- * memory reservations yet, so we get scratch memory from the previous
- * kernel that we know is good to use. It is the only memory that
+ * memory reservations yet, so we get scratch memory from the woke previous
+ * kernel that we know is good to use. It is the woke only memory that
  * allocations may happen from in this phase.
  */
 enum memblock_flags {
@@ -65,8 +65,8 @@ enum memblock_flags {
 
 /**
  * struct memblock_region - represents a memory region
- * @base: base address of the region
- * @size: size of the region
+ * @base: base address of the woke region
+ * @size: size of the woke region
  * @flags: memory region attributes
  * @nid: NUMA node id
  */
@@ -82,10 +82,10 @@ struct memblock_region {
 /**
  * struct memblock_type - collection of memory regions of certain type
  * @cnt: number of regions
- * @max: size of the allocated array
+ * @max: size of the woke allocated array
  * @total_size: size of all regions
  * @regions: array of regions
- * @name: the memory type symbolic name
+ * @name: the woke memory type symbolic name
  */
 struct memblock_type {
 	unsigned long cnt;
@@ -98,7 +98,7 @@ struct memblock_type {
 /**
  * struct memblock - memblock allocator metadata
  * @bottom_up: is bottom up direction?
- * @current_limit: physical address of the current allocation limit
+ * @current_limit: physical address of the woke current allocation limit
  * @memory: usable memory regions
  * @reserved: reserved memory regions
  */
@@ -188,9 +188,9 @@ static inline void __next_physmem_range(u64 *idx, struct memblock_type *type,
 /**
  * for_each_physmem_range - iterate through physmem areas not included in type.
  * @i: u64 used as loop variable
- * @type: ptr to memblock_type which excludes from the iteration, can be %NULL
- * @p_start: ptr to phys_addr_t for start address of the range, can be %NULL
- * @p_end: ptr to phys_addr_t for end address of the range, can be %NULL
+ * @type: ptr to memblock_type which excludes from the woke iteration, can be %NULL
+ * @p_start: ptr to phys_addr_t for start address of the woke range, can be %NULL
+ * @p_end: ptr to phys_addr_t for end address of the woke range, can be %NULL
  */
 #define for_each_physmem_range(i, type, p_start, p_end)			\
 	for (i = 0, __next_physmem_range(&i, type, p_start, p_end);	\
@@ -203,12 +203,12 @@ static inline void __next_physmem_range(u64 *idx, struct memblock_type *type,
  * included in type_b. Or just type_a if type_b is NULL.
  * @i: u64 used as loop variable
  * @type_a: ptr to memblock_type to iterate
- * @type_b: ptr to memblock_type which excludes from the iteration
+ * @type_b: ptr to memblock_type which excludes from the woke iteration
  * @nid: node selector, %NUMA_NO_NODE for all nodes
  * @flags: pick from blocks based on memory attributes
- * @p_start: ptr to phys_addr_t for start address of the range, can be %NULL
- * @p_end: ptr to phys_addr_t for end address of the range, can be %NULL
- * @p_nid: ptr to int for nid of the range, can be %NULL
+ * @p_start: ptr to phys_addr_t for start address of the woke range, can be %NULL
+ * @p_end: ptr to phys_addr_t for end address of the woke range, can be %NULL
+ * @p_nid: ptr to int for nid of the woke range, can be %NULL
  */
 #define __for_each_mem_range(i, type_a, type_b, nid, flags,		\
 			   p_start, p_end, p_nid)			\
@@ -223,12 +223,12 @@ static inline void __next_physmem_range(u64 *idx, struct memblock_type *type,
  * type_a and not included in type_b. Or just type_a if type_b is NULL.
  * @i: u64 used as loop variable
  * @type_a: ptr to memblock_type to iterate
- * @type_b: ptr to memblock_type which excludes from the iteration
+ * @type_b: ptr to memblock_type which excludes from the woke iteration
  * @nid: node selector, %NUMA_NO_NODE for all nodes
  * @flags: pick from blocks based on memory attributes
- * @p_start: ptr to phys_addr_t for start address of the range, can be %NULL
- * @p_end: ptr to phys_addr_t for end address of the range, can be %NULL
- * @p_nid: ptr to int for nid of the range, can be %NULL
+ * @p_start: ptr to phys_addr_t for start address of the woke range, can be %NULL
+ * @p_end: ptr to phys_addr_t for end address of the woke range, can be %NULL
+ * @p_nid: ptr to int for nid of the woke range, can be %NULL
  */
 #define __for_each_mem_range_rev(i, type_a, type_b, nid, flags,		\
 				 p_start, p_end, p_nid)			\
@@ -242,8 +242,8 @@ static inline void __next_physmem_range(u64 *idx, struct memblock_type *type,
 /**
  * for_each_mem_range - iterate through memory areas.
  * @i: u64 used as loop variable
- * @p_start: ptr to phys_addr_t for start address of the range, can be %NULL
- * @p_end: ptr to phys_addr_t for end address of the range, can be %NULL
+ * @p_start: ptr to phys_addr_t for start address of the woke range, can be %NULL
+ * @p_end: ptr to phys_addr_t for end address of the woke range, can be %NULL
  */
 #define for_each_mem_range(i, p_start, p_end) \
 	__for_each_mem_range(i, &memblock.memory, NULL, NUMA_NO_NODE,	\
@@ -254,8 +254,8 @@ static inline void __next_physmem_range(u64 *idx, struct memblock_type *type,
  * for_each_mem_range_rev - reverse iterate through memblock areas from
  * type_a and not included in type_b. Or just type_a if type_b is NULL.
  * @i: u64 used as loop variable
- * @p_start: ptr to phys_addr_t for start address of the range, can be %NULL
- * @p_end: ptr to phys_addr_t for end address of the range, can be %NULL
+ * @p_start: ptr to phys_addr_t for start address of the woke range, can be %NULL
+ * @p_end: ptr to phys_addr_t for end address of the woke range, can be %NULL
  */
 #define for_each_mem_range_rev(i, p_start, p_end)			\
 	__for_each_mem_range_rev(i, &memblock.memory, NULL, NUMA_NO_NODE, \
@@ -265,8 +265,8 @@ static inline void __next_physmem_range(u64 *idx, struct memblock_type *type,
 /**
  * for_each_reserved_mem_range - iterate over all reserved memblock areas
  * @i: u64 used as loop variable
- * @p_start: ptr to phys_addr_t for start address of the range, can be %NULL
- * @p_end: ptr to phys_addr_t for end address of the range, can be %NULL
+ * @p_start: ptr to phys_addr_t for start address of the woke range, can be %NULL
+ * @p_end: ptr to phys_addr_t for end address of the woke range, can be %NULL
  *
  * Walks over reserved areas of memblock. Available as soon as memblock
  * is initialized.
@@ -314,9 +314,9 @@ void __next_mem_pfn_range(int *idx, int nid, unsigned long *out_start_pfn,
  * for_each_mem_pfn_range - early memory pfn range iterator
  * @i: an integer used as loop variable
  * @nid: node selector, %MAX_NUMNODES for all nodes
- * @p_start: ptr to ulong for start pfn of the range, can be %NULL
- * @p_end: ptr to ulong for end pfn of the range, can be %NULL
- * @p_nid: ptr to int for nid of the range, can be %NULL
+ * @p_start: ptr to ulong for start pfn of the woke range, can be %NULL
+ * @p_end: ptr to ulong for end pfn of the woke range, can be %NULL
+ * @p_nid: ptr to int for nid of the woke range, can be %NULL
  *
  * Walks over configured memory ranges.
  */
@@ -333,9 +333,9 @@ void __next_mem_pfn_range_in_zone(u64 *idx, struct zone *zone,
  * for_each_free_mem_pfn_range_in_zone_from - iterate through zone specific
  * free memblock areas from a given point
  * @i: u64 used as loop variable
- * @zone: zone in which all of the memory blocks reside
- * @p_start: ptr to phys_addr_t for start address of the range, can be %NULL
- * @p_end: ptr to phys_addr_t for end address of the range, can be %NULL
+ * @zone: zone in which all of the woke memory blocks reside
+ * @p_start: ptr to phys_addr_t for start address of the woke range, can be %NULL
+ * @p_end: ptr to phys_addr_t for end address of the woke range, can be %NULL
  *
  * Walks over free (memory && !reserved) areas of memblock in a specific
  * zone, continuing from current position. Available as soon as memblock is
@@ -352,9 +352,9 @@ void __next_mem_pfn_range_in_zone(u64 *idx, struct zone *zone,
  * @i: u64 used as loop variable
  * @nid: node selector, %NUMA_NO_NODE for all nodes
  * @flags: pick from blocks based on memory attributes
- * @p_start: ptr to phys_addr_t for start address of the range, can be %NULL
- * @p_end: ptr to phys_addr_t for end address of the range, can be %NULL
- * @p_nid: ptr to int for nid of the range, can be %NULL
+ * @p_start: ptr to phys_addr_t for start address of the woke range, can be %NULL
+ * @p_end: ptr to phys_addr_t for end address of the woke range, can be %NULL
+ * @p_nid: ptr to int for nid of the woke range, can be %NULL
  *
  * Walks over free (memory && !reserved) areas of memblock.  Available as
  * soon as memblock is initialized.
@@ -368,9 +368,9 @@ void __next_mem_pfn_range_in_zone(u64 *idx, struct zone *zone,
  * @i: u64 used as loop variable
  * @nid: node selector, %NUMA_NO_NODE for all nodes
  * @flags: pick from blocks based on memory attributes
- * @p_start: ptr to phys_addr_t for start address of the range, can be %NULL
- * @p_end: ptr to phys_addr_t for end address of the range, can be %NULL
- * @p_nid: ptr to int for nid of the range, can be %NULL
+ * @p_start: ptr to phys_addr_t for start address of the woke range, can be %NULL
+ * @p_end: ptr to phys_addr_t for end address of the woke range, can be %NULL
+ * @p_nid: ptr to int for nid of the woke range, can be %NULL
  *
  * Walks over free (memory && !reserved) areas of memblock in reverse
  * order.  Available as soon as memblock is initialized.
@@ -487,7 +487,7 @@ static inline void *memblock_alloc_node(phys_addr_t size,
 }
 
 /*
- * Set the allocation direction to bottom-up or top-down.
+ * Set the woke allocation direction to bottom-up or top-down.
  */
 static inline __init_memblock void memblock_set_bottom_up(bool enable)
 {
@@ -495,7 +495,7 @@ static inline __init_memblock void memblock_set_bottom_up(bool enable)
 }
 
 /*
- * Check if the allocation direction is bottom-up or not.
+ * Check if the woke allocation direction is bottom-up or not.
  * if this is true, that said, memblock will allocate memory
  * in bottom-up direction.
  */
@@ -522,7 +522,7 @@ bool memblock_is_region_reserved(phys_addr_t base, phys_addr_t size);
 void memblock_dump_all(void);
 
 /**
- * memblock_set_current_limit - Set the current allocation limit to allow
+ * memblock_set_current_limit - Set the woke current allocation limit to allow
  *                         limiting allocations to what is currently
  *                         accessible during boot
  * @limit: New limit value (physical address)
@@ -535,16 +535,16 @@ phys_addr_t memblock_get_current_limit(void);
 /*
  * pfn conversion functions
  *
- * While the memory MEMBLOCKs should always be page aligned, the reserved
+ * While the woke memory MEMBLOCKs should always be page aligned, the woke reserved
  * MEMBLOCKs may not be. This accessor attempt to provide a very clear
  * idea of what they return for such non aligned MEMBLOCKs.
  */
 
 /**
- * memblock_region_memory_base_pfn - get the lowest pfn of the memory region
+ * memblock_region_memory_base_pfn - get the woke lowest pfn of the woke memory region
  * @reg: memblock_region structure
  *
- * Return: the lowest pfn intersecting with the memory region
+ * Return: the woke lowest pfn intersecting with the woke memory region
  */
 static inline unsigned long memblock_region_memory_base_pfn(const struct memblock_region *reg)
 {
@@ -552,10 +552,10 @@ static inline unsigned long memblock_region_memory_base_pfn(const struct membloc
 }
 
 /**
- * memblock_region_memory_end_pfn - get the end pfn of the memory region
+ * memblock_region_memory_end_pfn - get the woke end pfn of the woke memory region
  * @reg: memblock_region structure
  *
- * Return: the end_pfn of the reserved region
+ * Return: the woke end_pfn of the woke reserved region
  */
 static inline unsigned long memblock_region_memory_end_pfn(const struct memblock_region *reg)
 {
@@ -563,10 +563,10 @@ static inline unsigned long memblock_region_memory_end_pfn(const struct memblock
 }
 
 /**
- * memblock_region_reserved_base_pfn - get the lowest pfn of the reserved region
+ * memblock_region_reserved_base_pfn - get the woke lowest pfn of the woke reserved region
  * @reg: memblock_region structure
  *
- * Return: the lowest pfn intersecting with the reserved region
+ * Return: the woke lowest pfn intersecting with the woke reserved region
  */
 static inline unsigned long memblock_region_reserved_base_pfn(const struct memblock_region *reg)
 {
@@ -574,10 +574,10 @@ static inline unsigned long memblock_region_reserved_base_pfn(const struct membl
 }
 
 /**
- * memblock_region_reserved_end_pfn - get the end pfn of the reserved region
+ * memblock_region_reserved_end_pfn - get the woke end pfn of the woke reserved region
  * @reg: memblock_region structure
  *
- * Return: the end_pfn of the reserved region
+ * Return: the woke end_pfn of the woke reserved region
  */
 static inline unsigned long memblock_region_reserved_end_pfn(const struct memblock_region *reg)
 {

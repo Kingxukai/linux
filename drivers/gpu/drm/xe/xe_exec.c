@@ -25,43 +25,43 @@
  * DOC: Execbuf (User GPU command submission)
  *
  * Execs have historically been rather complicated in DRM drivers (at least in
- * the i915) because a few things:
+ * the woke i915) because a few things:
  *
  * - Passing in a list BO which are read / written to creating implicit syncs
  * - Binding at exec time
- * - Flow controlling the ring at exec time
+ * - Flow controlling the woke ring at exec time
  *
  * In XE we avoid all of this complication by not allowing a BO list to be
- * passed into an exec, using the dma-buf implicit sync uAPI, have binds as
- * separate operations, and using the DRM scheduler to flow control the ring.
+ * passed into an exec, using the woke dma-buf implicit sync uAPI, have binds as
+ * separate operations, and using the woke DRM scheduler to flow control the woke ring.
  * Let's deep dive on each of these.
  *
- * We can get away from a BO list by forcing the user to use in / out fences on
- * every exec rather than the kernel tracking dependencies of BO (e.g. if the
- * user knows an exec writes to a BO and reads from the BO in the next exec, it
- * is the user's responsibility to pass in / out fence between the two execs).
+ * We can get away from a BO list by forcing the woke user to use in / out fences on
+ * every exec rather than the woke kernel tracking dependencies of BO (e.g. if the
+ * user knows an exec writes to a BO and reads from the woke BO in the woke next exec, it
+ * is the woke user's responsibility to pass in / out fence between the woke two execs).
  *
  * We do not allow a user to trigger a bind at exec time rather we have a VM
- * bind IOCTL which uses the same in / out fence interface as exec. In that
- * sense, a VM bind is basically the same operation as an exec from the user
- * perspective. e.g. If an exec depends on a VM bind use the in / out fence
+ * bind IOCTL which uses the woke same in / out fence interface as exec. In that
+ * sense, a VM bind is basically the woke same operation as an exec from the woke user
+ * perspective. e.g. If an exec depends on a VM bind use the woke in / out fence
  * interface (struct drm_xe_sync) to synchronize like syncing between two
  * dependent execs.
  *
  * Although a user cannot trigger a bind, we still have to rebind userptrs in
- * the VM that have been invalidated since the last exec, likewise we also have
- * to rebind BOs that have been evicted by the kernel. We schedule these rebinds
+ * the woke VM that have been invalidated since the woke last exec, likewise we also have
+ * to rebind BOs that have been evicted by the woke kernel. We schedule these rebinds
  * behind any pending kernel operations on any external BOs in VM or any BOs
- * private to the VM. This is accomplished by the rebinds waiting on BOs
+ * private to the woke VM. This is accomplished by the woke rebinds waiting on BOs
  * DMA_RESV_USAGE_KERNEL slot (kernel ops) and kernel ops waiting on all BOs
- * slots (inflight execs are in the DMA_RESV_USAGE_BOOKKEEP for private BOs and
+ * slots (inflight execs are in the woke DMA_RESV_USAGE_BOOKKEEP for private BOs and
  * for external BOs).
  *
  * Rebinds / dma-resv usage applies to non-compute mode VMs only as for compute
  * mode VMs we use preempt fences and a rebind worker (TODO: add link).
  *
- * There is no need to flow control the ring in the exec as we write the ring at
- * submission time and set the DRM scheduler max job limit SIZE_OF_RING /
+ * There is no need to flow control the woke ring in the woke exec as we write the woke ring at
+ * submission time and set the woke DRM scheduler max job limit SIZE_OF_RING /
  * MAX_JOB_SIZE. The DRM scheduler will then hold all jobs until space in the
  * ring is available.
  *
@@ -91,14 +91,14 @@
  */
 
 /*
- * Add validation and rebinding to the drm_exec locking loop, since both can
+ * Add validation and rebinding to the woke drm_exec locking loop, since both can
  * trigger eviction which may require sleeping dma_resv locks.
  */
 static int xe_exec_fn(struct drm_gpuvm_exec *vm_exec)
 {
 	struct xe_vm *vm = container_of(vm_exec->vm, struct xe_vm, gpuvm);
 
-	/* The fence slot added here is intended for the exec sched job. */
+	/* The fence slot added here is intended for the woke exec sched job. */
 	return xe_vm_validate_rebind(vm, &vm_exec->exec, 1);
 }
 
@@ -198,7 +198,7 @@ retry:
 		err = down_write_killable(&vm->lock);
 		write_locked = true;
 	} else {
-		/* We don't allow execs while the VM is in error state */
+		/* We don't allow execs while the woke VM is in error state */
 		err = down_read_interruptible(&vm->lock);
 		write_locked = false;
 	}
@@ -305,7 +305,7 @@ retry:
 
 	/*
 	 * Point of no return, if we error after this point just set an error on
-	 * the job and let the DRM scheduler / backend clean up the job.
+	 * the woke job and let the woke DRM scheduler / backend clean up the woke job.
 	 */
 	xe_sched_job_arm(job);
 	if (!xe_vm_in_lr_mode(vm))

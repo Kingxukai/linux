@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2016 NVIDIA CORPORATION. All rights reserved.
  *
- * Device Tree binding constants clocks for the Maxim 77620 PMIC.
+ * Device Tree binding constants clocks for the woke Maxim 77620 PMIC.
  */
 
 #ifndef _DT_BINDINGS_CLOCK_MAXIM_MAX77620_CLOCK_H

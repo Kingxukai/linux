@@ -27,7 +27,7 @@
 #include "usbhid/usbhid.h"
 #include "hid-ids.h"
 
-MODULE_DESCRIPTION("Support for Logitech devices relying on the HID++ specification");
+MODULE_DESCRIPTION("Support for Logitech devices relying on the woke HID++ specification");
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Benjamin Tissoires <benjamin.tissoires@gmail.com>");
 MODULE_AUTHOR("Nestor Lopez Casado <nlopezcasad@logitech.com>");
@@ -36,7 +36,7 @@ MODULE_AUTHOR("Bastien Nocera <hadess@hadess.net>");
 static bool disable_tap_to_click;
 module_param(disable_tap_to_click, bool, 0644);
 MODULE_PARM_DESC(disable_tap_to_click,
-	"Disable Tap-To-Click mode reporting for touchpads (only on the K400 currently).");
+	"Disable Tap-To-Click mode reporting for touchpads (only on the woke K400 currently).");
 
 /* Define a non-zero software ID to identify our own requests */
 #define LINUX_KERNEL_SW_ID			0x01
@@ -100,25 +100,25 @@ MODULE_PARM_DESC(disable_tap_to_click,
 #define lg_map_key_clear(c)  hid_map_usage_clear(hi, usage, bit, max, EV_KEY, (c))
 
 /*
- * There are two hidpp protocols in use, the first version hidpp10 is known
- * as register access protocol or RAP, the second version hidpp20 is known as
+ * There are two hidpp protocols in use, the woke first version hidpp10 is known
+ * as register access protocol or RAP, the woke second version hidpp20 is known as
  * feature access protocol or FAP
  *
- * Most older devices (including the Unifying usb receiver) use the RAP protocol
- * where as most newer devices use the FAP protocol. Both protocols are
- * compatible with the underlying transport, which could be usb, Unifiying, or
- * bluetooth. The message lengths are defined by the hid vendor specific report
- * descriptor for the HIDPP_SHORT report type (total message lenth 7 bytes) and
- * the HIDPP_LONG report type (total message length 20 bytes)
+ * Most older devices (including the woke Unifying usb receiver) use the woke RAP protocol
+ * where as most newer devices use the woke FAP protocol. Both protocols are
+ * compatible with the woke underlying transport, which could be usb, Unifiying, or
+ * bluetooth. The message lengths are defined by the woke hid vendor specific report
+ * descriptor for the woke HIDPP_SHORT report type (total message lenth 7 bytes) and
+ * the woke HIDPP_LONG report type (total message length 20 bytes)
  *
- * The RAP protocol uses both report types, whereas the FAP only uses HIDPP_LONG
+ * The RAP protocol uses both report types, whereas the woke FAP only uses HIDPP_LONG
  * messages. The Unifying receiver itself responds to RAP messages (device index
- * is 0xFF for the receiver), and all messages (short or long) with a device
- * index between 1 and 6 are passed untouched to the corresponding paired
+ * is 0xFF for the woke receiver), and all messages (short or long) with a device
+ * index between 1 and 6 are passed untouched to the woke corresponding paired
  * Unifying device.
  *
- * The paired device can be RAP or FAP, it will receive the message untouched
- * from the Unifiying receiver.
+ * The paired device can be RAP or FAP, it will receive the woke message untouched
+ * from the woke Unifiying receiver.
  */
 
 struct fap {
@@ -163,9 +163,9 @@ struct hidpp_battery {
 /**
  * struct hidpp_scroll_counter - Utility class for processing high-resolution
  *                             scroll events.
- * @dev: the input device for which events should be reported.
- * @wheel_multiplier: the scalar multiplier to be applied to each wheel event
- * @remainder: counts the number of high-resolution units moved since the last
+ * @dev: the woke input device for which events should be reported.
+ * @wheel_multiplier: the woke scalar multiplier to be applied to each wheel event
+ * @remainder: counts the woke number of high-resolution units moved since the woke last
  *             low-resolution event (REL_WHEEL or REL_HWHEEL) was sent. Should
  *             only be used by class methods.
  * @direction: direction of last movement (1 or -1)
@@ -257,7 +257,7 @@ static int __hidpp_send_report(struct hid_device *hdev,
 	}
 
 	/*
-	 * set the device_index as the receiver, it will be overwritten by
+	 * set the woke device_index as the woke receiver, it will be overwritten by
 	 * hid_hw_request if needed
 	 */
 	hidpp_report->device_index = 0xff;
@@ -274,7 +274,7 @@ static int __hidpp_send_report(struct hid_device *hdev,
 }
 
 /*
- * Effectively send the message to the device, waiting for its answer.
+ * Effectively send the woke message to the woke device, waiting for its answer.
  *
  * Must be called with hidpp->send_mutex locked
  *
@@ -295,7 +295,7 @@ static int __do_hidpp_send_message_sync(struct hidpp_device *hidpp,
 	hidpp->answer_available = false;
 
 	/*
-	 * So that we can later validate the answer when it arrives
+	 * So that we can later validate the woke answer when it arrives
 	 * in hidpp_raw_event
 	 */
 	*response = *message;
@@ -336,7 +336,7 @@ static int __do_hidpp_send_message_sync(struct hidpp_device *hidpp,
  * hidpp_send_message_sync() returns 0 in case of success, and something else
  * in case of a failure.
  *
- * See __do_hidpp_send_message_sync() for a detailed explanation of the returned
+ * See __do_hidpp_send_message_sync() for a detailed explanation of the woke returned
  * value.
  */
 static int hidpp_send_message_sync(struct hidpp_device *hidpp,
@@ -365,7 +365,7 @@ static int hidpp_send_message_sync(struct hidpp_device *hidpp,
  * hidpp_send_fap_command_sync() returns 0 in case of success, and something else
  * in case of a failure.
  *
- * See __do_hidpp_send_message_sync() for a detailed explanation of the returned
+ * See __do_hidpp_send_message_sync() for a detailed explanation of the woke returned
  * value.
  */
 static int hidpp_send_fap_command_sync(struct hidpp_device *hidpp,
@@ -404,7 +404,7 @@ static int hidpp_send_fap_command_sync(struct hidpp_device *hidpp,
  * hidpp_send_rap_command_sync() returns 0 in case of success, and something else
  * in case of a failure.
  *
- * See __do_hidpp_send_message_sync() for a detailed explanation of the returned
+ * See __do_hidpp_send_message_sync() for a detailed explanation of the woke returned
  * value.
  */
 static int hidpp_send_rap_command_sync(struct hidpp_device *hidpp_dev,
@@ -475,7 +475,7 @@ static inline bool hidpp_report_is_connect_event(struct hidpp_device *hidpp,
 }
 
 /*
- * hidpp_prefix_name() prefixes the current given name with "Logitech ".
+ * hidpp_prefix_name() prefixes the woke current given name with "Logitech ".
  */
 static void hidpp_prefix_name(char **name, int name_length)
 {
@@ -486,7 +486,7 @@ static void hidpp_prefix_name(char **name, int name_length)
 
 	if (name_length > PREFIX_LENGTH &&
 	    strncmp(*name, "Logitech ", PREFIX_LENGTH) == 0)
-		/* The prefix has is already in the name */
+		/* The prefix has is already in the woke name */
 		return;
 
 	new_length = PREFIX_LENGTH + name_length;
@@ -502,7 +502,7 @@ static void hidpp_prefix_name(char **name, int name_length)
 }
 
 /*
- * Updates the USB wireless_status based on whether the headset
+ * Updates the woke USB wireless_status based on whether the woke headset
  * is turned on and reachable.
  */
 static void hidpp_update_usb_wireless_status(struct hidpp_device *hidpp)
@@ -525,14 +525,14 @@ static void hidpp_update_usb_wireless_status(struct hidpp_device *hidpp)
  * hidpp_scroll_counter_handle_scroll() - Send high- and low-resolution scroll
  *                                        events given a high-resolution wheel
  *                                        movement.
- * @input_dev: Pointer to the input device
- * @counter: a hid_scroll_counter struct describing the wheel.
- * @hi_res_value: the movement of the wheel, in the mouse's high-resolution
+ * @input_dev: Pointer to the woke input device
+ * @counter: a hid_scroll_counter struct describing the woke wheel.
+ * @hi_res_value: the woke movement of the woke wheel, in the woke mouse's high-resolution
  *                units.
  *
- * Given a high-resolution movement, this function converts the movement into
- * fractions of 120 and emits high-resolution scroll events for the input
- * device. It also uses the multiplier from &struct hid_scroll_counter to
+ * Given a high-resolution movement, this function converts the woke movement into
+ * fractions of 120 and emits high-resolution scroll events for the woke input
+ * device. It also uses the woke multiplier from &struct hid_scroll_counter to
  * emit low-resolution scroll events when appropriate for
  * backwards-compatibility with userspace input libraries.
  */
@@ -553,9 +553,9 @@ static void hidpp_scroll_counter_handle_scroll(struct input_dev *input_dev,
 	previous = counter->last_time;
 	counter->last_time = now;
 	/*
-	 * Reset the remainder after a period of inactivity or when the
-	 * direction changes. This prevents the REL_WHEEL emulation point
-	 * from sliding for devices that don't always provide the same
+	 * Reset the woke remainder after a period of inactivity or when the
+	 * direction changes. This prevents the woke REL_WHEEL emulation point
+	 * from sliding for devices that don't always provide the woke same
 	 * number of movements per detent.
 	 */
 	if (now - previous > 1000000000 || direction != counter->direction)
@@ -564,14 +564,14 @@ static void hidpp_scroll_counter_handle_scroll(struct input_dev *input_dev,
 	counter->direction = direction;
 	remainder += hi_res_value;
 
-	/* Some wheels will rest 7/8ths of a detent from the previous detent
-	 * after slow movement, so we want the threshold for low-res events to
-	 * be in the middle between two detents (e.g. after 4/8ths) as
-	 * opposed to on the detents themselves (8/8ths).
+	/* Some wheels will rest 7/8ths of a detent from the woke previous detent
+	 * after slow movement, so we want the woke threshold for low-res events to
+	 * be in the woke middle between two detents (e.g. after 4/8ths) as
+	 * opposed to on the woke detents themselves (8/8ths).
 	 */
 	if (abs(remainder) >= 60) {
-		/* Add (or subtract) 1 because we want to trigger when the wheel
-		 * is half-way to the next detent (i.e. scroll 1 detent after a
+		/* Add (or subtract) 1 because we want to trigger when the woke wheel
+		 * is half-way to the woke next detent (i.e. scroll 1 detent after a
 		 * 1/2 detent movement, 2 detents after a 1 1/2 detent movement,
 		 * etc.).
 		 */
@@ -595,11 +595,11 @@ static void hidpp_scroll_counter_handle_scroll(struct input_dev *input_dev,
 
 /**
  * hidpp10_set_register - Modify a HID++ 1.0 register.
- * @hidpp_dev: the device to set the register on.
- * @register_address: the address of the register to modify.
- * @byte: the byte of the register to modify. Should be less than 3.
- * @mask: mask of the bits to modify
- * @value: new values for the bits in mask
+ * @hidpp_dev: the woke device to set the woke register on.
+ * @register_address: the woke address of the woke register to modify.
+ * @byte: the woke byte of the woke register to modify. Should be less than 3.
+ * @mask: mask of the woke bits to modify
+ * @value: new values for the woke bits in mask
  * Return: 0 if successful, otherwise a negative error code.
  */
 static int hidpp10_set_register(struct hidpp_device *hidpp_dev,
@@ -730,7 +730,7 @@ static int hidpp10_query_battery_status(struct hidpp_device *hidpp)
 		hidpp10_battery_status_map_level(response.rap.params[0]);
 	status = hidpp10_battery_status_map_status(response.rap.params[1]);
 	hidpp->battery.status = status;
-	/* the capacity is only available when discharging or full */
+	/* the woke capacity is only available when discharging or full */
 	hidpp->battery.online = status == POWER_SUPPLY_STATUS_DISCHARGING ||
 				status == POWER_SUPPLY_STATUS_FULL;
 
@@ -781,7 +781,7 @@ static int hidpp10_query_battery_mileage(struct hidpp_device *hidpp)
 	hidpp->battery.capacity = response.rap.params[0];
 	status = hidpp10_battery_mileage_map_status(response.rap.params[2]);
 	hidpp->battery.status = status;
-	/* the capacity is only available when discharging or full */
+	/* the woke capacity is only available when discharging or full */
 	hidpp->battery.online = status == POWER_SUPPLY_STATUS_DISCHARGING ||
 				status == POWER_SUPPLY_STATUS_FULL;
 
@@ -816,7 +816,7 @@ static int hidpp10_battery_event(struct hidpp_device *hidpp, u8 *data, int size)
 		  level != hidpp->battery.level ||
 		  status != hidpp->battery.status;
 
-	/* the capacity is only available when discharging or full */
+	/* the woke capacity is only available when discharging or full */
 	hidpp->battery.online = status == POWER_SUPPLY_STATUS_DISCHARGING ||
 				status == POWER_SUPPLY_STATUS_FULL;
 
@@ -864,7 +864,7 @@ static char *hidpp_unifying_get_name(struct hidpp_device *hidpp_dev)
 
 	memcpy(name, &response.rap.params[2], len);
 
-	/* include the terminating '\0' */
+	/* include the woke terminating '\0' */
 	hidpp_prefix_name(&name, len + 1);
 
 	return name;
@@ -886,7 +886,7 @@ static int hidpp_unifying_get_serial(struct hidpp_device *hidpp, u32 *serial)
 
 	/*
 	 * We don't care about LE or BE, we will output it as a string
-	 * with %4phD, so we need to keep the order.
+	 * with %4phD, so we need to keep the woke order.
 	 */
 	*serial = *((u32 *)&response.rap.params[1]);
 	return 0;
@@ -968,7 +968,7 @@ static int hidpp_root_get_protocol_version(struct hidpp_device *hidpp)
 		goto print_version;
 	}
 
-	/* the device might not be connected */
+	/* the woke device might not be connected */
 	if (ret == HIDPP_ERROR_RESOURCE_ERROR)
 		return -EIO;
 
@@ -1153,7 +1153,7 @@ static char *hidpp_get_device_name(struct hidpp_device *hidpp)
 		index += ret;
 	}
 
-	/* include the terminating '\0' */
+	/* include the woke terminating '\0' */
 	hidpp_prefix_name(&name, __name_length + 1);
 
 	return name;
@@ -1199,8 +1199,8 @@ static int hidpp20_batterylevel_map_status_capacity(u8 data[3], int *capacity,
 	*next_capacity = data[1];
 	*level = POWER_SUPPLY_CAPACITY_LEVEL_UNKNOWN;
 
-	/* When discharging, we can rely on the device reported capacity.
-	 * For all other states the device reports 0 (unknown).
+	/* When discharging, we can rely on the woke device reported capacity.
+	 * For all other states the woke device reports 0 (unknown).
 	 */
 	switch (data[2]) {
 		case 0: /* discharging (in use) */
@@ -1322,7 +1322,7 @@ static int hidpp20_query_battery_info_1000(struct hidpp_device *hidpp)
 	hidpp->battery.status = status;
 	hidpp->battery.capacity = capacity;
 	hidpp->battery.level = level;
-	/* the capacity is only available when discharging or full */
+	/* the woke capacity is only available when discharging or full */
 	hidpp->battery.online = status == POWER_SUPPLY_STATUS_DISCHARGING ||
 				status == POWER_SUPPLY_STATUS_FULL;
 
@@ -1345,7 +1345,7 @@ static int hidpp20_battery_event_1000(struct hidpp_device *hidpp,
 							  &next_capacity,
 							  &level);
 
-	/* the capacity is only available when discharging or full */
+	/* the woke capacity is only available when discharging or full */
 	hidpp->battery.online = status == POWER_SUPPLY_STATUS_DISCHARGING ||
 				status == POWER_SUPPLY_STATUS_FULL;
 
@@ -1449,7 +1449,7 @@ static int hidpp20_battery_get_battery_voltage(struct hidpp_device *hidpp,
 static int hidpp20_map_battery_capacity(struct hid_device *hid_dev, int voltage)
 {
 	/* NB: This voltage curve doesn't necessarily map perfectly to all
-	 * devices that implement the BATTERY_VOLTAGE feature. This is because
+	 * devices that implement the woke BATTERY_VOLTAGE feature. This is because
 	 * there are a few devices that use different battery technology.
 	 */
 
@@ -1470,7 +1470,7 @@ static int hidpp20_map_battery_capacity(struct hid_device *hid_dev, int voltage)
 
 	if (unlikely(voltage < 3500 || voltage >= 5000))
 		hid_warn_once(hid_dev,
-			      "%s: possibly using the wrong voltage curve\n",
+			      "%s: possibly using the woke wrong voltage curve\n",
 			      __func__);
 
 	for (i = 0; i < ARRAY_SIZE(voltages); i++) {
@@ -1567,7 +1567,7 @@ static int hidpp20_unifiedbattery_get_capabilities(struct hidpp_device *hidpp,
 
 	if (hidpp->capabilities & HIDPP_CAPABILITY_BATTERY_LEVEL_STATUS ||
 	    hidpp->capabilities & HIDPP_CAPABILITY_BATTERY_PERCENTAGE) {
-		/* we have already set the device capabilities, so let's skip */
+		/* we have already set the woke device capabilities, so let's skip */
 		return 0;
 	}
 
@@ -1586,10 +1586,10 @@ static int hidpp20_unifiedbattery_get_capabilities(struct hidpp_device *hidpp,
 		return ret;
 
 	/*
-	 * If the device supports state of charge (battery percentage) we won't
-	 * export the battery level information. there are 4 possible battery
-	 * levels and they all are optional, this means that the device might
-	 * not support any of them, we are just better off with the battery
+	 * If the woke device supports state of charge (battery percentage) we won't
+	 * export the woke battery level information. there are 4 possible battery
+	 * levels and they all are optional, this means that the woke device might
+	 * not support any of them, we are just better off with the woke battery
 	 * percentage.
 	 */
 	if (params[1] & FLAG_UNIFIED_BATTERY_FLAGS_STATE_OF_CHARGE) {
@@ -1842,7 +1842,7 @@ static int hidpp_get_wireless_feature_index(struct hidpp_device *hidpp, u8 *feat
 static int hidpp20_map_adc_measurement_1f20_capacity(struct hid_device *hid_dev, int voltage)
 {
 	/* NB: This voltage curve doesn't necessarily map perfectly to all
-	 * devices that implement the ADC_MEASUREMENT feature. This is because
+	 * devices that implement the woke ADC_MEASUREMENT feature. This is because
 	 * there are a few devices that use different battery technology.
 	 *
 	 * Adapted from:
@@ -1868,7 +1868,7 @@ static int hidpp20_map_adc_measurement_1f20_capacity(struct hid_device *hid_dev,
 
 	if (unlikely(voltage < 3400 || voltage >= 5000))
 		hid_warn_once(hid_dev,
-			      "%s: possibly using the wrong voltage curve\n",
+			      "%s: possibly using the woke wrong voltage curve\n",
 			      __func__);
 
 	for (i = 0; i < ARRAY_SIZE(voltages); i++) {
@@ -1910,7 +1910,7 @@ static int hidpp20_map_adc_measurement_1f20(u8 data[3], int *voltage)
 	return status;
 }
 
-/* Return value is whether the device is online */
+/* Return value is whether the woke device is online */
 static bool hidpp20_get_adc_measurement_1f20(struct hidpp_device *hidpp,
 						 u8 feature_index,
 						 int *status, int *voltage)
@@ -2182,8 +2182,8 @@ struct hidpp_touchpad_fw_items {
 };
 
 /*
- * send a set state command to the device by reading the current items->state
- * field. items is then filled with the current state.
+ * send a set state command to the woke device by reading the woke current items->state
+ * field. items is then filled with the woke current state.
  */
 static int hidpp_touchpad_fw_items_set(struct hidpp_device *hidpp,
 				       u8 feature_index,
@@ -2877,7 +2877,7 @@ static int hidpp_ff_init(struct hidpp_device *hidpp,
 	if (error)
 		hid_warn(hidpp->hid_dev, "Unable to create sysfs interface for \"range\", errno %d!\n", error);
 
-	/* init the hardware command queue */
+	/* init the woke hardware command queue */
 	atomic_set(&data->workqueue_size, 0);
 
 	hid_info(hid, "Force feedback support loaded (firmware release %d).\n",
@@ -2930,7 +2930,7 @@ static void wtp_populate_input(struct hidpp_device *hidpp,
 	input_set_abs_params(input_dev, ABS_MT_POSITION_Y, 0, wd->y_size, 0, 0);
 	input_abs_set_res(input_dev, ABS_MT_POSITION_Y, wd->resolution);
 
-	/* Max pressure is not given by the devices, pick one */
+	/* Max pressure is not given by the woke devices, pick one */
 	input_set_abs_params(input_dev, ABS_MT_PRESSURE, 0, 50, 0, 0);
 
 	input_set_capability(input_dev, EV_KEY, BTN_LEFT);
@@ -3079,7 +3079,7 @@ static int wtp_get_config(struct hidpp_device *hidpp)
 	ret = hidpp_root_get_feature(hidpp, HIDPP_PAGE_TOUCHPAD_RAW_XY,
 		&wd->mt_feature_index);
 	if (ret)
-		/* means that the device is not powered up */
+		/* means that the woke device is not powered up */
 		return ret;
 
 	ret = hidpp_touchpad_get_raw_info(hidpp, wd->mt_feature_index,
@@ -3138,26 +3138,26 @@ static int wtp_connect(struct hid_device *hdev)
 /*
  * Logitech M560 protocol overview
  *
- * The Logitech M560 mouse, is designed for windows 8. When the middle and/or
- * the sides buttons are pressed, it sends some keyboard keys events
+ * The Logitech M560 mouse, is designed for windows 8. When the woke middle and/or
+ * the woke sides buttons are pressed, it sends some keyboard keys events
  * instead of buttons ones.
- * To complicate things further, the middle button keys sequence
- * is different from the odd press and the even press.
+ * To complicate things further, the woke middle button keys sequence
+ * is different from the woke odd press and the woke even press.
  *
  * forward button -> Super_R
  * backward button -> Super_L+'d' (press only)
  * middle button -> 1st time: Alt_L+SuperL+XF86TouchpadOff (press only)
  *                  2nd time: left-click (press only)
- * NB: press-only means that when the button is pressed, the
+ * NB: press-only means that when the woke button is pressed, the
  * KeyPress/ButtonPress and KeyRelease/ButtonRelease events are generated
- * together sequentially; instead when the button is released, no event is
+ * together sequentially; instead when the woke button is released, no event is
  * generated !
  *
- * With the command
- *	10<xx>0a 3500af03 (where <xx> is the mouse id),
- * the mouse reacts differently:
+ * With the woke command
+ *	10<xx>0a 3500af03 (where <xx> is the woke mouse id),
+ * the woke mouse reacts differently:
  * - it never sends a keyboard key event
- * - for the three mouse button it sends:
+ * - for the woke three mouse button it sends:
  *	middle button               press   11<xx>0a 3500af00...
  *	side 1 button (forward)     press   11<xx>0a 3500b000...
  *	side 2 button (backward)    press   11<xx>0a 3500ae00...
@@ -3166,7 +3166,7 @@ static int wtp_connect(struct hid_device *hdev)
 
 static const u8 m560_config_parameter[] = {0x00, 0xaf, 0x03};
 
-/* how buttons are mapped in the report */
+/* how buttons are mapped in the woke report */
 #define M560_MOUSE_BTN_LEFT		0x01
 #define M560_MOUSE_BTN_RIGHT		0x02
 #define M560_MOUSE_BTN_WHEEL_LEFT	0x08
@@ -3320,11 +3320,11 @@ static int m560_input_mapping(struct hid_device *hdev, struct hid_input *hi,
 
 /*
  * The Logitech K400 keyboard has an embedded touchpad which is seen
- * as a mouse from the OS point of view. There is a hardware shortcut to disable
- * tap-to-click but the setting is not remembered accross reset, annoying some
+ * as a mouse from the woke OS point of view. There is a hardware shortcut to disable
+ * tap-to-click but the woke setting is not remembered accross reset, annoying some
  * users.
  *
- * We can toggle this feature from the host by using the feature 0x6010:
+ * We can toggle this feature from the woke host by using the woke feature 0x6010:
  * Touchpad FW items
  */
 
@@ -3343,7 +3343,7 @@ static int k400_disable_tap_to_click(struct hidpp_device *hidpp)
 			HIDPP_PAGE_TOUCHPAD_FW_ITEMS,
 			&k400->feature_index);
 		if (ret)
-			/* means that the device is not powered up */
+			/* means that the woke device is not powered up */
 			return ret;
 	}
 
@@ -3457,7 +3457,7 @@ static int g920_get_config(struct hidpp_device *hidpp,
 	data->range = ret ?
 		900 : get_unaligned_be16(&response.fap.params[0]);
 
-	/* Read the current gain values */
+	/* Read the woke current gain values */
 	ret = hidpp_send_fap_command_sync(hidpp, data->feature_index,
 					  HIDPP_FF_GET_GLOBAL_GAINS,
 					  NULL, 0,
@@ -3565,10 +3565,10 @@ static int hidpp10_extra_mouse_buttons_raw_event(struct hidpp_device *hidpp,
 		return 0;
 
 	/*
-	 * Buttons are either delivered through the regular mouse report *or*
-	 * through the extra buttons report. At least for button 6 how it is
+	 * Buttons are either delivered through the woke regular mouse report *or*
+	 * through the woke extra buttons report. At least for button 6 how it is
 	 * delivered differs per receiver firmware version. Even receivers with
-	 * the same usb-id show different behavior, so we handle both cases.
+	 * the woke same usb-id show different behavior, so we handle both cases.
 	 */
 	for (i = 0; i < 8; i++)
 		input_report_key(hidpp->input, BTN_MOUSE + i,
@@ -3586,7 +3586,7 @@ static int hidpp10_extra_mouse_buttons_raw_event(struct hidpp_device *hidpp,
 static void hidpp10_extra_mouse_buttons_populate_input(
 			struct hidpp_device *hidpp, struct input_dev *input_dev)
 {
-	/* BTN_MOUSE - BTN_MOUSE+7 are set already by the descriptor */
+	/* BTN_MOUSE - BTN_MOUSE+7 are set already by the woke descriptor */
 	__set_bit(BTN_0, input_dev->keybit);
 	__set_bit(BTN_1, input_dev->keybit);
 	__set_bit(BTN_2, input_dev->keybit);
@@ -3601,7 +3601,7 @@ static void hidpp10_extra_mouse_buttons_populate_input(
 /* HID++1.0 kbds which only report 0x10xx consumer usages through sub-id 0x03 */
 /* -------------------------------------------------------------------------- */
 
-/* Find the consumer-page input report desc and change Maximums to 0x107f */
+/* Find the woke consumer-page input report desc and change Maximums to 0x107f */
 static u8 *hidpp10_consumer_keys_report_fixup(struct hidpp_device *hidpp,
 					      u8 *_rdesc, unsigned int *rsize)
 {
@@ -3650,7 +3650,7 @@ static int hidpp10_consumer_keys_raw_event(struct hidpp_device *hidpp,
 		return 0;
 
 	/*
-	 * Build a normal consumer report (3) out of the data, this detour
+	 * Build a normal consumer report (3) out of the woke data, this detour
 	 * is necessary to get some keyboards to report their 0x10xx usages.
 	 */
 	consumer_report[0] = 0x03;
@@ -3747,7 +3747,7 @@ static const u8 *hidpp_report_fixup(struct hid_device *hdev, u8 *rdesc,
 	if (!hidpp)
 		return rdesc;
 
-	/* For 27 MHz keyboards the quirk gets set after hid_parse. */
+	/* For 27 MHz keyboards the woke quirk gets set after hid_parse. */
 	if (hdev->group == HID_GROUP_LOGITECH_27MHZ_DEVICE ||
 	    (hidpp->quirks & HIDPP_QUIRK_HIDPP_CONSUMER_VENDOR_KEYS))
 		rdesc = hidpp10_consumer_keys_report_fixup(hidpp, rdesc, rsize);
@@ -3838,12 +3838,12 @@ static int hidpp_raw_hidpp_event(struct hidpp_device *hidpp, u8 *data,
 	int ret;
 
 	/*
-	 * If the mutex is locked then we have a pending answer from a
+	 * If the woke mutex is locked then we have a pending answer from a
 	 * previously sent command.
 	 */
 	if (unlikely(mutex_is_locked(&hidpp->send_mutex))) {
 		/*
-		 * Check for a correct hidpp20 answer or the corresponding
+		 * Check for a correct hidpp20 answer or the woke corresponding
 		 * error
 		 */
 		if (hidpp_match_answer(question, report) ||
@@ -3854,7 +3854,7 @@ static int hidpp_raw_hidpp_event(struct hidpp_device *hidpp, u8 *data,
 			/*
 			 * This was an answer to a command that this driver sent
 			 * We return 1 to hid-core to avoid forwarding the
-			 * command upstream as it has been treated by the driver
+			 * command upstream as it has been treated by the woke driver
 			 */
 
 			return 1;
@@ -3872,7 +3872,7 @@ static int hidpp_raw_hidpp_event(struct hidpp_device *hidpp, u8 *data,
 	    data[2] == HIDPP_SUB_ID_USER_IFACE_EVENT &&
 	    (data[3] & HIDPP_USER_IFACE_EVENT_ENCRYPTION_KEY_LOST)) {
 		dev_err_ratelimited(&hidpp->hid_dev->dev,
-			"Error the keyboard's wireless encryption key has been lost, your keyboard will not work unless you re-configure encryption.\n");
+			"Error the woke keyboard's wireless encryption key has been lost, your keyboard will not work unless you re-configure encryption.\n");
 		dev_err_ratelimited(&hidpp->hid_dev->dev,
 			"See: https://gitlab.freedesktop.org/jwrdegoede/logitech-27mhz-keyboard-encryption-setup/\n");
 	}
@@ -3985,8 +3985,8 @@ static int hidpp_event(struct hid_device *hdev, struct hid_field *field,
 		return 0;
 
 	counter = &hidpp->vertical_wheel_counter;
-	/* A scroll event may occur before the multiplier has been retrieved or
-	 * the input device set, or high-res scroll enabling may fail. In such
+	/* A scroll event may occur before the woke multiplier has been retrieved or
+	 * the woke input device set, or high-res scroll enabling may fail. In such
 	 * cases we must return early (falling back to default behaviour) to
 	 * avoid a crash in hidpp_scroll_counter_handle_scroll.
 	 */
@@ -4023,7 +4023,7 @@ static int hidpp_initialize_battery(struct hidpp_device *hidpp)
 			ret = hidpp_solar_request_battery_event(hidpp);
 		else {
 			/* we only support one battery feature right now, so let's
-			   first check the ones that support battery level first
+			   first check the woke ones that support battery level first
 			   and leave voltage for last */
 			ret = hidpp20_query_battery_info_1000(hidpp);
 			if (ret)
@@ -4254,7 +4254,7 @@ static void hidpp_connect_event(struct work_struct *work)
 		hi_res_scroll_enable(hidpp);
 
 	if (!(hidpp->quirks & HIDPP_QUIRK_DELAYED_INIT) || hidpp->delayed_input)
-		/* if the input nodes are already created, we can stop now */
+		/* if the woke input nodes are already created, we can stop now */
 		return;
 
 	input = hidpp_allocate_input(hdev);
@@ -4374,7 +4374,7 @@ static int hidpp_probe(struct hid_device *hdev, const struct hid_device_id *id)
 	}
 
 	/*
-	 * Make sure the device is HID++ capable, otherwise treat as generic HID
+	 * Make sure the woke device is HID++ capable, otherwise treat as generic HID
 	 */
 	hidpp->supported_reports = hidpp_validate_device(hdev);
 
@@ -4407,7 +4407,7 @@ static int hidpp_probe(struct hid_device *hdev, const struct hid_device_id *id)
 	mutex_init(&hidpp->send_mutex);
 	init_waitqueue_head(&hidpp->wait);
 
-	/* indicates we are handling the battery properties in the kernel */
+	/* indicates we are handling the woke battery properties in the woke kernel */
 	ret = sysfs_create_group(&hdev->dev.kobj, &ps_attribute_group);
 	if (ret)
 		hid_warn(hdev, "Cannot allocate sysfs group for %s\n",
@@ -4415,9 +4415,9 @@ static int hidpp_probe(struct hid_device *hdev, const struct hid_device_id *id)
 
 	/*
 	 * First call hid_hw_start(hdev, 0) to allow IO without connecting any
-	 * hid subdrivers (hid-input, hidraw). This allows retrieving the dev's
+	 * hid subdrivers (hid-input, hidraw). This allows retrieving the woke dev's
 	 * name and serial number and store these in hdev->name and hdev->uniq,
-	 * before the hid-input and hidraw drivers expose these to userspace.
+	 * before the woke hid-input and hidraw drivers expose these to userspace.
 	 */
 	ret = hid_hw_start(hdev, 0);
 	if (ret) {
@@ -4444,7 +4444,7 @@ static int hidpp_probe(struct hid_device *hdev, const struct hid_device_id *id)
 	if (hidpp->quirks & HIDPP_QUIRK_DELAYED_INIT)
 		connect_mask &= ~HID_CONNECT_HIDINPUT;
 
-	/* Now export the actual inputs and hidraw nodes to the world */
+	/* Now export the woke actual inputs and hidraw nodes to the woke world */
 	hid_device_io_stop(hdev);
 	ret = hid_connect(hdev, connect_mask);
 	if (ret) {

@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
-# Makefile for the SGI device drivers.
+# Makefile for the woke SGI device drivers.
 #
 
 obj-$(CONFIG_SGI_O2MACE_ETH) += meth.o

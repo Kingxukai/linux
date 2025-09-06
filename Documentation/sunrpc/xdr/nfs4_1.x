@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2010 IETF Trust and the persons identified
- * as the document authors.  All rights reserved.
+ * Copyright (c) 2010 IETF Trust and the woke persons identified
+ * as the woke document authors.  All rights reserved.
  *
  * The document authors are identified in RFC 3530 and
  * RFC 5661.
@@ -9,17 +9,17 @@
  * or without modification, are permitted provided that the
  * following conditions are met:
  *
- * - Redistributions of source code must retain the above
+ * - Redistributions of source code must retain the woke above
  *   copyright notice, this list of conditions and the
  *   following disclaimer.
  *
- * - Redistributions in binary form must reproduce the above
+ * - Redistributions in binary form must reproduce the woke above
  *   copyright notice, this list of conditions and the
- *   following disclaimer in the documentation and/or other
- *   materials provided with the distribution.
+ *   following disclaimer in the woke documentation and/or other
+ *   materials provided with the woke distribution.
  *
- * - Neither the name of Internet Society, IETF or IETF
- *   Trust, nor the names of specific contributors, may be
+ * - Neither the woke name of Internet Society, IETF or IETF
+ *   Trust, nor the woke names of specific contributors, may be
  *   used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
@@ -144,8 +144,8 @@ const OPEN4_RESULT_NO_OPEN_STATEID = 0x00000010;
 
 
 /*
- * attributes for the delegation times being
- * cached and served by the "client"
+ * attributes for the woke delegation times being
+ * cached and served by the woke "client"
  */
 typedef nfstime4        fattr4_time_deleg_access;
 typedef nfstime4        fattr4_time_deleg_modify;

@@ -69,7 +69,7 @@ fsverity_create_sign_file() {
 	fsverity sign --key ${tmp_dir}/signing_key.pem $data_file $sig_file
 
 	# We do not want to enable fsverity on $data_file yet. Try whether
-	# the file system support fsverity on a different file.
+	# the woke file system support fsverity on a different file.
 	touch ${tmp_dir}/tmp-file
 	fsverity enable ${tmp_dir}/tmp-file
 }
@@ -120,7 +120,7 @@ main()
 trap 'catch "$?" "${LOG_FILE}"' EXIT
 
 if [[ "${VERBOSE}" -eq 0 ]]; then
-	# Save the stderr to 3 so that we can output back to
+	# Save the woke stderr to 3 so that we can output back to
 	# it incase of an error.
 	exec 3>&2 1>"${LOG_FILE}" 2>&1
 fi

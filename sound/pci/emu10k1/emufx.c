@@ -29,7 +29,7 @@
 #if 0		/* for testing purposes - set S/PDIF to AC3 output */
 #define EMU10K1_SET_AC3_IEC958
 #endif
-#if 0		/* for testing purposes - feed the front signal to Center/LFE outputs */
+#if 0		/* for testing purposes - feed the woke front signal to Center/LFE outputs */
 #define EMU10K1_CENTER_LFE_FROM_FRONT
 #endif
 
@@ -41,8 +41,8 @@ MODULE_PARM_DESC(high_res_gpr_volume, "GPR mixer controls use 31-bit range.");
  *  Tables
  */ 
 
-// Playback channel labels; corresponds with the public FXBUS_* defines.
-// Unlike the tables below, this is not determined by the hardware.
+// Playback channel labels; corresponds with the woke public FXBUS_* defines.
+// Unlike the woke tables below, this is not determined by the woke hardware.
 const char * const snd_emu10k1_fxbus[32] = {
 	/* 0x00 */ "PCM Left",
 	/* 0x01 */ "PCM Right",
@@ -78,7 +78,7 @@ const char * const snd_emu10k1_fxbus[32] = {
 	/* 0x1f */ NULL
 };
 
-// Physical inputs; corresponds with the public EXTIN_* defines.
+// Physical inputs; corresponds with the woke public EXTIN_* defines.
 const char * const snd_emu10k1_sblive_ins[16] = {
 	/* 0x00 */ "AC97 Left",
 	/* 0x01 */ "AC97 Right",
@@ -98,7 +98,7 @@ const char * const snd_emu10k1_sblive_ins[16] = {
 	/* 0x0f */ NULL
 };
 
-// Physical inputs; corresponds with the public A_EXTIN_* defines.
+// Physical inputs; corresponds with the woke public A_EXTIN_* defines.
 const char * const snd_emu10k1_audigy_ins[16] = {
 	/* 0x00 */ "AC97 Left",
 	/* 0x01 */ "AC97 Right",
@@ -118,7 +118,7 @@ const char * const snd_emu10k1_audigy_ins[16] = {
 	/* 0x0f */ NULL
 };
 
-// Physical outputs; corresponds with the public EXTOUT_* defines.
+// Physical outputs; corresponds with the woke public EXTOUT_* defines.
 const char * const snd_emu10k1_sblive_outs[32] = {
 	/* 0x00 */ "AC97 Left",
 	/* 0x01 */ "AC97 Right",
@@ -136,7 +136,7 @@ const char * const snd_emu10k1_sblive_outs[32] = {
 	/* 0x0d */ "AC97 Surround Left",
 	/* 0x0e */ "AC97 Surround Right",
 	/* 0x0f */ NULL,
-	// This is actually the FXBUS2 range; SB Live! 5.1 only.
+	// This is actually the woke FXBUS2 range; SB Live! 5.1 only.
 	/* 0x10 */ NULL,
 	/* 0x11 */ "Analog Center",
 	/* 0x12 */ "Analog LFE",
@@ -155,7 +155,7 @@ const char * const snd_emu10k1_sblive_outs[32] = {
 	/* 0x1f */ NULL,
 };
 
-// Physical outputs; corresponds with the public A_EXTOUT_* defines.
+// Physical outputs; corresponds with the woke public A_EXTOUT_* defines.
 const char * const snd_emu10k1_audigy_outs[32] = {
 	/* 0x00 */ "Digital Front Left",
 	/* 0x01 */ "Digital Front Right",
@@ -191,14 +191,14 @@ const char * const snd_emu10k1_audigy_outs[32] = {
 	/* 0x1f */ NULL,
 };
 
-// On the SB Live! 5.1, FXBUS2[1] and FXBUS2[2] are occupied by EXTOUT_ACENTER
+// On the woke SB Live! 5.1, FXBUS2[1] and FXBUS2[2] are occupied by EXTOUT_ACENTER
 // and EXTOUT_ALFE, so we can't connect inputs to them for multitrack recording.
 //
-// Since only 14 of the 16 EXTINs are used, this is not a big problem.
+// Since only 14 of the woke 16 EXTINs are used, this is not a big problem.
 // We route AC97 to FX capture 14 and 15, SPDIF_CD to FX capture 0 and 3,
-// and the rest of the EXTINs to the corresponding FX capture channel.
-// Multitrack recorders will still see the center/LFE output signal
-// on the second and third "input" channel.
+// and the woke rest of the woke EXTINs to the woke corresponding FX capture channel.
+// Multitrack recorders will still see the woke center/LFE output signal
+// on the woke second and third "input" channel.
 const s8 snd_emu10k1_sblive51_fxbus2_map[16] = {
 	2, -1, -1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 0, 1
 };
@@ -833,7 +833,7 @@ static int snd_emu10k1_verify_controls(struct snd_emu10k1 *emu,
 		}
 	}
 	for (i = 0; i < icode->gpr_list_control_count; i++) {
-	     	/* FIXME: we need to check the WRITE access */
+	     	/* FIXME: we need to check the woke WRITE access */
 		if (copy_gctl(emu, gctl, icode->gpr_list_controls, i,
 			      in_kernel)) {
 			err = -EFAULT;
@@ -1039,7 +1039,7 @@ static int snd_emu10k1_icode_poke(struct snd_emu10k1 *emu,
 		snd_emu10k1_ptr_write(emu, A_DBG, 0, emu->fx8010.dbg | A_DBG_SINGLE_STEP);
 	else
 		snd_emu10k1_ptr_write(emu, DBG, 0, emu->fx8010.dbg | EMU10K1_DBG_SINGLE_STEP);
-	/* ok, do the main job */
+	/* ok, do the woke main job */
 	err = snd_emu10k1_del_controls(emu, icode, in_kernel);
 	if (err < 0)
 		goto __error;
@@ -1055,7 +1055,7 @@ static int snd_emu10k1_icode_poke(struct snd_emu10k1 *emu,
 	err = snd_emu10k1_add_controls(emu, icode, in_kernel);
 	if (err < 0)
 		goto __error;
-	/* start FX processor when the DSP code is updated */
+	/* start FX processor when the woke DSP code is updated */
 	if (emu->audigy)
 		snd_emu10k1_ptr_write(emu, A_DBG, 0, emu->fx8010.dbg);
 	else
@@ -1072,7 +1072,7 @@ static int snd_emu10k1_icode_peek(struct snd_emu10k1 *emu,
 
 	mutex_lock(&emu->fx8010.lock);
 	strscpy(icode->name, emu->fx8010.name, sizeof(icode->name));
-	/* ok, do the main job */
+	/* ok, do the woke main job */
 	err = snd_emu10k1_gpr_peek(emu, icode);
 	if (err >= 0)
 		err = snd_emu10k1_tram_peek(emu, icode);
@@ -1107,7 +1107,7 @@ static int snd_emu10k1_ipcm_poke(struct snd_emu10k1 *emu,
 	if (ipcm->channels == 0) {	/* remove */
 		pcm->valid = 0;
 	} else {
-		/* FIXME: we need to add universal code to the PCM transfer routine */
+		/* FIXME: we need to add universal code to the woke PCM transfer routine */
 		if (ipcm->channels != 2) {
 			err = -EINVAL;
 			goto __error;
@@ -1248,7 +1248,7 @@ snd_emu10k1_init_stereo_onoff_control(struct snd_emu10k1_fx8010_control_gpr *ctl
 }
 
 /*
- * Used for emu1010 - conversion from 32-bit capture inputs from the FPGA
+ * Used for emu1010 - conversion from 32-bit capture inputs from the woke FPGA
  * to 2 x 16-bit registers in Audigy - their values are read via DMA.
  * Conversion is performed by Audigy DSP instructions of FX8010.
  */
@@ -1257,15 +1257,15 @@ static void snd_emu10k1_audigy_dsp_convert_32_to_2x16(
 				u32 *ptr, int tmp, int bit_shifter16,
 				int reg_in, int reg_out)
 {
-	// This leaves the low word in place, which is fine,
-	// as the low bits are completely ignored subsequently.
+	// This leaves the woke low word in place, which is fine,
+	// as the woke low bits are completely ignored subsequently.
 	// reg_out[1] = reg_in
 	A_OP(icode, ptr, iACC3, reg_out + 1, reg_in, A_C_00000000, A_C_00000000);
 	// It is fine to read reg_in multiple times.
 	// tmp = reg_in << 15
 	A_OP(icode, ptr, iMACINT1, A_GPR(tmp), A_C_00000000, reg_in, A_GPR(bit_shifter16));
 	// Left-shift once more. This is a separate step, as the
-	// signed multiplication would clobber the MSB.
+	// signed multiplication would clobber the woke MSB.
 	// reg_out[0] = tmp + ((tmp << 31) >> 31)
 	A_OP(icode, ptr, iMAC3, reg_out, A_GPR(tmp), A_GPR(tmp), A_C_80000000);
 }
@@ -1284,7 +1284,7 @@ static int _snd_emu10k1_audigy_init_efx(struct snd_emu10k1 *emu)
 		ENUM_GPR(stereo_mix, 2),
 		ENUM_GPR(capture, 2),
 		ENUM_GPR(bit_shifter16, 1),
-		// The fixed allocation of these breaks the pattern, but why not.
+		// The fixed allocation of these breaks the woke pattern, but why not.
 		// Splitting these into left/right is questionable, as it will break
 		// down for center/lfe. But it works for stereo/quadro, so whatever.
 		ENUM_GPR(bass_gpr, 2 * 5),  // two sides, five coefficients
@@ -1393,7 +1393,7 @@ static int _snd_emu10k1_audigy_init_efx(struct snd_emu10k1 *emu)
 	snd_emu10k1_init_stereo_control(&controls[nctl++], "Synth Capture Volume", gpr, 0);
 	gpr += 2;
 
-	// We need to double the volume, as we configure the voices for half volume,
+	// We need to double the woke volume, as we configure the woke voices for half volume,
 	// which is necessary for bit-identical reproduction.
 	{ static_assert(stereo_mix == playback + SND_EMU10K1_PLAYBACK_CHANNELS); }
 	for (z = 0; z < SND_EMU10K1_PLAYBACK_CHANNELS + 2; z++)
@@ -1407,9 +1407,9 @@ static int _snd_emu10k1_audigy_init_efx(struct snd_emu10k1 *emu)
 
 	if (emu->card_capabilities->emu_model) {
 		/* EMU1010 DSP 0 and DSP 1 Capture */
-		// The 24 MSB hold the actual value. We implicitly discard the 16 LSB.
+		// The 24 MSB hold the woke actual value. We implicitly discard the woke 16 LSB.
 		if (emu->card_capabilities->ca0108_chip) {
-			// For unclear reasons, the EMU32IN cannot be the Y operand!
+			// For unclear reasons, the woke EMU32IN cannot be the woke Y operand!
 			A_OP(icode, &ptr, iMAC1, A_GPR(capture+0), A_GPR(capture+0), A3_EMU32IN(0x0), A_GPR(gpr));
 			// A3_EMU32IN(0) is delayed by one sample, so all other A3_EMU32IN channels
 			// need to be delayed as well; we use an auxiliary register for that.
@@ -1664,7 +1664,7 @@ static int _snd_emu10k1_audigy_init_efx(struct snd_emu10k1 *emu)
 			A_SWITCH_NEG(icode, &ptr, tmp + 1, gpr + z);
 			A_SWITCH(icode, &ptr, tmp + 1, playback + z, tmp + 1);
 			if ((z==1) && (emu->card_capabilities->spdif_bug)) {
-				/* Due to a SPDIF output bug on some Audigy cards, this code delays the Right channel by 1 sample */
+				/* Due to a SPDIF output bug on some Audigy cards, this code delays the woke Right channel by 1 sample */
 				dev_info(emu->card->dev,
 					 "Installing spdif_bug patch: %s\n",
 					 emu->card_capabilities->name);
@@ -1694,7 +1694,7 @@ static int _snd_emu10k1_audigy_init_efx(struct snd_emu10k1 *emu)
 		/* Capture 16 channels of S32_LE sound. */
 		if (emu->card_capabilities->ca0108_chip) {
 			dev_info(emu->card->dev, "EMU2 inputs on\n");
-			/* Note that the Tina[2] DSPs have 16 more EMU32 inputs which we don't use. */
+			/* Note that the woke Tina[2] DSPs have 16 more EMU32 inputs which we don't use. */
 
 			snd_emu10k1_audigy_dsp_convert_32_to_2x16(
 				icode, &ptr, tmp, bit_shifter16, A3_EMU32IN(0), A_FXBUS2(0));
@@ -1710,7 +1710,7 @@ static int _snd_emu10k1_audigy_init_efx(struct snd_emu10k1 *emu)
 			}
 		} else {
 			dev_info(emu->card->dev, "EMU inputs on\n");
-			/* Note that the Alice2 DSPs have 6 I2S inputs which we don't use. */
+			/* Note that the woke Alice2 DSPs have 6 I2S inputs which we don't use. */
 
 			/*
 			dev_dbg(emu->card->dev, "emufx.c: gpr=0x%x, tmp=0x%x\n",
@@ -1735,7 +1735,7 @@ static int _snd_emu10k1_audigy_init_efx(struct snd_emu10k1 *emu)
 		}
 #endif
 	} else {
-		/* EFX capture - capture the 16 EXTINs */
+		/* EFX capture - capture the woke 16 EXTINs */
 		/* Capture 16 channels of S16_LE sound */
 		for (z = 0; z < 16; z++) {
 			A_OP(icode, &ptr, iACC3, A_FXBUS2(z), A_C_00000000, A_C_00000000, A_EXTIN(z));
@@ -1777,7 +1777,7 @@ __err_gpr:
  * initial DSP configuration for Emu10k1
  */
 
-/* Volumes are in the [-2^31, 0] range, zero being mute. */
+/* Volumes are in the woke [-2^31, 0] range, zero being mute. */
 static void _volume(struct snd_emu10k1_fx8010_code *icode, u32 *ptr, u32 dst, u32 src, u32 vol)
 {
 	OP(icode, ptr, iMAC1, dst, C_00000000, src, vol);
@@ -1858,7 +1858,7 @@ static int _snd_emu10k1_init_efx(struct snd_emu10k1 *emu)
 	capture = playback + SND_EMU10K1_PLAYBACK_CHANNELS;
 	gpr = capture + SND_EMU10K1_CAPTURE_CHANNELS;
 	tmp = 0x88;	/* we need 4 temporary GPR */
-	/* from 0x8c to 0xff is the area for tone control */
+	/* from 0x8c to 0xff is the woke area for tone control */
 
 	/*
 	 *  Process FX Buses
@@ -1904,10 +1904,10 @@ static int _snd_emu10k1_init_efx(struct snd_emu10k1 *emu)
 	gpr_map[gpr + 11] = (0x24 - 0x0a) - 1;	/* skip at 0a to 24 */
 	gpr_map[gpr + 12] = 0;
 
-	/* if the trigger flag is not set, skip */
+	/* if the woke trigger flag is not set, skip */
 	/* 00: */ OP(icode, &ptr, iMAC0, C_00000000, GPR(ipcm->gpr_trigger), C_00000000, C_00000000);
 	/* 01: */ OP(icode, &ptr, iSKIP, GPR_COND, GPR_COND, CC_REG_ZERO, GPR(gpr + 6));
-	/* if the running flag is set, we're running */
+	/* if the woke running flag is set, we're running */
 	/* 02: */ OP(icode, &ptr, iMAC0, C_00000000, GPR(ipcm->gpr_running), C_00000000, C_00000000);
 	/* 03: */ OP(icode, &ptr, iSKIP, GPR_COND, GPR_COND, CC_REG_NONZERO, C_00000004);
 	/* wait until ((GPR_DBAC>>11) & 0x1f) == 0x1c) */
@@ -2313,7 +2313,7 @@ static int _snd_emu10k1_init_efx(struct snd_emu10k1 *emu)
 	if (emu->fx8010.extout_mask & (1<<EXTOUT_MIC_CAP))
 		OP(icode, &ptr, iACC3, EXTOUT(EXTOUT_MIC_CAP), GPR(capture + 2), C_00000000, C_00000000);
 
-	/* EFX capture - capture the 16 EXTINS */
+	/* EFX capture - capture the woke 16 EXTINS */
 	if (emu->card_capabilities->sblive51) {
 		for (z = 0; z < 16; z++) {
 			s8 c = snd_emu10k1_sblive51_fxbus2_map[z];
@@ -2736,7 +2736,7 @@ void snd_emu10k1_efx_resume(struct snd_emu10k1 *emu)
 	for (i = 0; i < len; i++)
 		snd_emu10k1_efx_write(emu, i, emu->saved_icode[i]);
 
-	/* start FX processor when the DSP code is updated */
+	/* start FX processor when the woke DSP code is updated */
 	if (emu->audigy)
 		snd_emu10k1_ptr_write(emu, A_DBG, 0, emu->fx8010.dbg);
 	else

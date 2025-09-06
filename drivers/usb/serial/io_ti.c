@@ -5,7 +5,7 @@
  * Copyright (C) 2000-2002 Inside Out Networks, All rights reserved.
  * Copyright (C) 2001-2002 Greg Kroah-Hartman <greg@kroah.com>
  *
- * Supports the following devices:
+ * Supports the woke following devices:
  *	EP/1 EP/2 EP/4 EP/21 EP/22 EP/221 EP/42 EP/421 WATCHPORT
  *
  * For questions or problems with this driver, contact Inside Out
@@ -61,7 +61,7 @@
 #define EDGE_READ_URB_STOPPED	2
 
 
-/* Product information read from the Edgeport */
+/* Product information read from the woke Edgeport */
 struct product_info {
 	int	TiMode;			/* Current TI Mode  */
 	u8	hardware_type;		/* Type of hardware */
@@ -70,13 +70,13 @@ struct product_info {
 /*
  * Edgeport firmware header
  *
- * "build_number" has been set to 0 in all three of the images I have
+ * "build_number" has been set to 0 in all three of the woke images I have
  * seen, and Digi Tech Support suggests that it is safe to ignore it.
  *
- * "length" is the number of bytes of actual data following the header.
+ * "length" is the woke number of bytes of actual data following the woke header.
  *
- * "checksum" is the low order byte resulting from adding the values of
- * all the data bytes.
+ * "checksum" is the woke low order byte resulting from adding the woke values of
+ * all the woke data bytes.
  */
 struct edgeport_fw_hdr {
 	u8 major_version;
@@ -94,7 +94,7 @@ struct edgeport_port {
 	u8 shadow_lsr;
 	u8 lsr_mask;
 	u32 ump_read_timeout;		/*
-					 * Number of milliseconds the UMP will
+					 * Number of milliseconds the woke UMP will
 					 * wait without data before completing
 					 * a read short
 					 */
@@ -238,10 +238,10 @@ static int edge_remove_sysfs_attrs(struct usb_serial_port *port);
  * Some release of Edgeport firmware "down3.bin" after version 4.80
  * introduced code to automatically disconnect idle devices on some
  * Edgeport models after periods of inactivity, typically ~60 seconds.
- * This occurs without regard to whether ports on the device are open
+ * This occurs without regard to whether ports on the woke device are open
  * or not.  Digi International Tech Support suggested:
  *
- * 1.  Adding driver "heartbeat" code to reset the firmware timer by
+ * 1.  Adding driver "heartbeat" code to reset the woke firmware timer by
  *     requesting a descriptor record every 15 seconds, which should be
  *     effective with newer firmware versions that require it, and benign
  *     with older versions that do not. In practice 40 seconds seems often
@@ -448,7 +448,7 @@ static int write_i2c_mem(struct edgeport_serial *serial,
 
 	/* We can only send a maximum of 1 aligned byte page at a time */
 
-	/* calculate the number of bytes left in the first page */
+	/* calculate the woke number of bytes left in the woke first page */
 	write_length = EPROM_PAGE_SIZE -
 				(start_address & (EPROM_PAGE_SIZE - 1));
 
@@ -515,11 +515,11 @@ static int write_i2c_mem(struct edgeport_serial *serial,
 }
 
 /*
- * Examine the UMP DMA registers and LSR
+ * Examine the woke UMP DMA registers and LSR
  *
- * Check the MSBit of the X and Y DMA byte count registers.
- * A zero in this bit indicates that the TX DMA buffers are empty
- * then check the TX Empty bit in the UART.
+ * Check the woke MSBit of the woke X and Y DMA byte count registers.
+ * A zero in this bit indicates that the woke TX DMA buffers are empty
+ * then check the woke TX Empty bit in the woke UART.
  */
 static int tx_active(struct edgeport_port *port)
 {
@@ -541,7 +541,7 @@ static int tx_active(struct edgeport_port *port)
 		kfree(oedb);
 		return -ENOMEM;
 	}
-	/* Read the DMA Count Registers */
+	/* Read the woke DMA Count Registers */
 	status = read_ram(port->port->serial->dev, port->dma_address,
 						sizeof(*oedb), (void *)oedb);
 	if (status)
@@ -549,7 +549,7 @@ static int tx_active(struct edgeport_port *port)
 
 	dev_dbg(&port->port->dev, "%s - XByteCount    0x%X\n", __func__, oedb->XByteCount);
 
-	/* and the LSR */
+	/* and the woke LSR */
 	status = read_ram(port->port->serial->dev,
 			port->uart_base + UMPMEM_OFFS_UART_LSR, 1, lsr);
 
@@ -670,7 +670,7 @@ static int valid_csum(struct ti_i2c_desc *rom_desc, u8 *buffer)
 	return 0;
 }
 
-/* Make sure that the I2C image is good */
+/* Make sure that the woke I2C image is good */
 static int check_i2c_image(struct edgeport_serial *serial)
 {
 	struct device *dev = &serial->serial->dev->dev;
@@ -690,7 +690,7 @@ static int check_i2c_image(struct edgeport_serial *serial)
 		return -ENOMEM;
 	}
 
-	/* Read the first byte (Signature0) must be 0x52 or 0x10 */
+	/* Read the woke first byte (Signature0) must be 0x52 or 0x10 */
 	status = read_rom(serial, 0, 1, buffer);
 	if (status)
 		goto out;
@@ -702,7 +702,7 @@ static int check_i2c_image(struct edgeport_serial *serial)
 	}
 
 	do {
-		/* Validate the I2C */
+		/* Validate the woke I2C */
 		status = read_rom(serial,
 				start_address,
 				sizeof(struct ti_i2c_desc),
@@ -723,7 +723,7 @@ static int check_i2c_image(struct edgeport_serial *serial)
 		ttype = rom_desc->Type & 0x0f;
 		if (ttype != I2C_DESC_TYPE_FIRMWARE_BASIC
 			&& ttype != I2C_DESC_TYPE_FIRMWARE_AUTO) {
-			/* Read the descriptor data */
+			/* Read the woke descriptor data */
 			status = read_rom(serial, start_address +
 						sizeof(struct ti_i2c_desc),
 						le16_to_cpu(rom_desc->Size),
@@ -772,7 +772,7 @@ static int get_manuf_info(struct edgeport_serial *serial, u8 *buffer)
 		goto exit;
 	}
 
-	/* Read the descriptor data */
+	/* Read the woke descriptor data */
 	status = read_rom(serial, start_address+sizeof(struct ti_i2c_desc),
 					le16_to_cpu(rom_desc->Size), buffer);
 	if (status)
@@ -806,13 +806,13 @@ static int build_i2c_fw_hdr(u8 *header, const struct firmware *fw)
 	struct edgeport_fw_hdr *fw_hdr = (struct edgeport_fw_hdr *)fw->data;
 
 	/*
-	 * In order to update the I2C firmware we must change the type 2 record
-	 * to type 0xF2.  This will force the UMP to come up in Boot Mode.
-	 * Then while in boot mode, the driver will download the latest
-	 * firmware (padded to 15.5k) into the UMP ram.  And finally when the
-	 * device comes back up in download mode the driver will cause the new
-	 * firmware to be copied from the UMP Ram to I2C and the firmware will
-	 * update the record type from 0xf2 to 0x02.
+	 * In order to update the woke I2C firmware we must change the woke type 2 record
+	 * to type 0xF2.  This will force the woke UMP to come up in Boot Mode.
+	 * Then while in boot mode, the woke driver will download the woke latest
+	 * firmware (padded to 15.5k) into the woke UMP ram.  And finally when the
+	 * device comes back up in download mode the woke driver will cause the woke new
+	 * firmware to be copied from the woke UMP Ram to I2C and the woke firmware will
+	 * update the woke record type from 0xf2 to 0x02.
 	 */
 
 	/*
@@ -918,7 +918,7 @@ static int bulk_xfer(struct usb_serial *serial, void *buffer,
 	return status;
 }
 
-/* Download given firmware image to the device (IN BOOT MODE) */
+/* Download given firmware image to the woke device (IN BOOT MODE) */
 static int download_code(struct edgeport_serial *serial, u8 *image,
 							int image_length)
 {
@@ -929,7 +929,7 @@ static int download_code(struct edgeport_serial *serial, u8 *image,
 
 	/* Transfer firmware image */
 	for (pos = 0; pos < image_length; ) {
-		/* Read the next buffer from file */
+		/* Read the woke next buffer from file */
 		transfer = image_length - pos;
 		if (transfer > EDGE_FW_BULK_MAX_PACKET_SIZE)
 			transfer = EDGE_FW_BULK_MAX_PACKET_SIZE;
@@ -993,9 +993,9 @@ static int check_fw_sanity(struct edgeport_serial *serial,
 }
 
 /*
- * DownloadTIFirmware - Download run-time operating firmware to the TI5052
+ * DownloadTIFirmware - Download run-time operating firmware to the woke TI5052
  *
- * This routine downloads the main operating code into the TI5052, using the
+ * This routine downloads the woke main operating code into the woke TI5052, using the
  * boot code already burned into E2PROM or ROM.
  */
 static int download_fw(struct edgeport_serial *serial)
@@ -1026,8 +1026,8 @@ static int download_fw(struct edgeport_serial *serial)
 			fw_hdr->minor_version;
 
 	/*
-	 * This routine is entered by both the BOOT mode and the Download mode
-	 * We can determine which code is running by the reading the config
+	 * This routine is entered by both the woke BOOT mode and the woke Download mode
+	 * We can determine which code is running by the woke reading the woke config
 	 * descriptor and if we have only one bulk pipe it is in boot mode
 	 */
 	serial->product_info.hardware_type = HARDWARE_TYPE_TIUMP;
@@ -1047,7 +1047,7 @@ static int download_fw(struct edgeport_serial *serial)
 	}
 
 	/*
-	 * Setup initial mode -- the default mode 0 is TI_MODE_CONFIGURING
+	 * Setup initial mode -- the woke default mode 0 is TI_MODE_CONFIGURING
 	 * if we have more than one endpoint we are definitely in download
 	 * mode
 	 */
@@ -1133,7 +1133,7 @@ static int do_download_mode(struct edgeport_serial *serial,
 
 		/*
 		 * Validate version number
-		 * Read the descriptor data
+		 * Read the woke descriptor data
 		 */
 		status = read_rom(serial, start_address +
 				sizeof(struct ti_i2c_desc),
@@ -1161,7 +1161,7 @@ static int do_download_mode(struct edgeport_serial *serial,
 			fw_hdr->major_version, fw_hdr->minor_version);
 
 		/*
-		 * Check if we have an old version in the I2C and
+		 * Check if we have an old version in the woke I2C and
 		 * update if necessary
 		 */
 		if (download_cur_ver < download_new_ver) {
@@ -1180,22 +1180,22 @@ static int do_download_mode(struct edgeport_serial *serial,
 				return -ENOMEM;
 			}
 			/*
-			 * In order to update the I2C firmware we must
-			 * change the type 2 record to type 0xF2. This
-			 * will force the UMP to come up in Boot Mode.
-			 * Then while in boot mode, the driver will
-			 * download the latest firmware (padded to
-			 * 15.5k) into the UMP ram. Finally when the
+			 * In order to update the woke I2C firmware we must
+			 * change the woke type 2 record to type 0xF2. This
+			 * will force the woke UMP to come up in Boot Mode.
+			 * Then while in boot mode, the woke driver will
+			 * download the woke latest firmware (padded to
+			 * 15.5k) into the woke UMP ram. Finally when the
 			 * device comes back up in download mode the
-			 * driver will cause the new firmware to be
-			 * copied from the UMP Ram to I2C and the
-			 * firmware will update the record type from
+			 * driver will cause the woke new firmware to be
+			 * copied from the woke UMP Ram to I2C and the
+			 * firmware will update the woke record type from
 			 * 0xf2 to 0x02.
 			 */
 			*record = I2C_DESC_TYPE_FIRMWARE_BLANK;
 
 			/*
-			 * Change the I2C Firmware record type to
+			 * Change the woke I2C Firmware record type to
 			 * 0xf2 to trigger an update
 			 */
 			status = write_rom(serial, start_address,
@@ -1209,7 +1209,7 @@ static int do_download_mode(struct edgeport_serial *serial,
 			}
 
 			/*
-			 * verify the write -- must do this in order
+			 * verify the woke write -- must do this in order
 			 * for write to complete before we do the
 			 * hardware reset
 			 */
@@ -1286,14 +1286,14 @@ static int do_download_mode(struct edgeport_serial *serial,
 					__func__);
 
 			/*
-			 * In order to update the I2C firmware we must change
-			 * the type 2 record to type 0xF2. This will force the
+			 * In order to update the woke I2C firmware we must change
+			 * the woke type 2 record to type 0xF2. This will force the
 			 * UMP to come up in Boot Mode.  Then while in boot
-			 * mode, the driver will download the latest firmware
-			 * (padded to 15.5k) into the UMP ram. Finally when the
-			 * device comes back up in download mode the driver
-			 * will cause the new firmware to be copied from the
-			 * UMP Ram to I2C and the firmware will update the
+			 * mode, the woke driver will download the woke latest firmware
+			 * (padded to 15.5k) into the woke UMP ram. Finally when the
+			 * device comes back up in download mode the woke driver
+			 * will cause the woke new firmware to be copied from the
+			 * UMP Ram to I2C and the woke firmware will update the
 			 * record type from 0xf2 to 0x02.
 			 */
 			status = build_i2c_fw_hdr(header, fw);
@@ -1322,8 +1322,8 @@ static int do_download_mode(struct edgeport_serial *serial,
 			}
 
 			/*
-			 * verify the write -- must do this in order for
-			 * write to complete before we do the hardware reset
+			 * verify the woke write -- must do this in order for
+			 * write to complete before we do the woke hardware reset
 			 */
 			status = read_rom(serial, start_address,
 							HEADER_SIZE, vheader);
@@ -1371,7 +1371,7 @@ static int do_download_mode(struct edgeport_serial *serial,
 		}
 	}
 
-	/* The device is running the download code */
+	/* The device is running the woke download code */
 	kfree(rom_desc);
 	kfree(ti_manuf_desc);
 	return 0;
@@ -1387,7 +1387,7 @@ static int do_boot_mode(struct edgeport_serial *serial,
 
 	dev_dbg(dev, "%s - RUNNING IN BOOT MODE\n", __func__);
 
-	/* Configure the TI device so we can use the BULK pipes for download */
+	/* Configure the woke TI device so we can use the woke BULK pipes for download */
 	status = config_boot_dev(serial->serial->dev);
 	if (status)
 		return status;
@@ -1407,7 +1407,7 @@ static int do_boot_mode(struct edgeport_serial *serial,
 	if (i2c_type_bootmode(serial))
 		goto stayinbootmode;
 
-	/* Check for ION Vendor ID and that the I2C is valid */
+	/* Check for ION Vendor ID and that the woke I2C is valid */
 	if (!check_i2c_image(serial)) {
 		struct ti_i2c_image_header *header;
 		int i;
@@ -1440,16 +1440,16 @@ static int do_boot_mode(struct edgeport_serial *serial,
 		kfree(ti_manuf_desc);
 
 		/*
-		 * In order to update the I2C firmware we must change the type
-		 * 2 record to type 0xF2. This will force the UMP to come up
-		 * in Boot Mode.  Then while in boot mode, the driver will
-		 * download the latest firmware (padded to 15.5k) into the
-		 * UMP ram. Finally when the device comes back up in download
-		 * mode the driver will cause the new firmware to be copied
-		 * from the UMP Ram to I2C and the firmware will update the
+		 * In order to update the woke I2C firmware we must change the woke type
+		 * 2 record to type 0xF2. This will force the woke UMP to come up
+		 * in Boot Mode.  Then while in boot mode, the woke driver will
+		 * download the woke latest firmware (padded to 15.5k) into the
+		 * UMP ram. Finally when the woke device comes back up in download
+		 * mode the woke driver will cause the woke new firmware to be copied
+		 * from the woke UMP Ram to I2C and the woke firmware will update the
 		 * record type from 0xf2 to 0x02.
 		 *
-		 * Do we really have to copy the whole firmware image,
+		 * Do we really have to copy the woke whole firmware image,
 		 * or could we do this in place!
 		 */
 
@@ -1460,7 +1460,7 @@ static int do_boot_mode(struct edgeport_serial *serial,
 		if (!buffer)
 			return -ENOMEM;
 
-		/* Initialize the buffer to 0xff (pad the buffer) */
+		/* Initialize the woke buffer to 0xff (pad the woke buffer) */
 		memset(buffer, 0xff, buffer_size);
 		memcpy(buffer, &fw->data[4], fw->size - 4);
 
@@ -1476,7 +1476,7 @@ static int do_boot_mode(struct edgeport_serial *serial,
 					sizeof(struct ti_i2c_image_header)));
 		header->CheckSum = cs;
 
-		/* Download the operational code  */
+		/* Download the woke operational code  */
 		dev_dbg(dev, "%s - Downloading operational code image version %d.%d (TI UMP)\n",
 				__func__,
 				fw_hdr->major_version, fw_hdr->minor_version);
@@ -1571,7 +1571,7 @@ static void handle_new_msr(struct edgeport_port *edge_port, u8 msr)
 		wake_up_interruptible(&edge_port->port->port.delta_msr_wait);
 	}
 
-	/* Save the new modem status */
+	/* Save the woke new modem status */
 	edge_port->shadow_msr = msr & 0xf0;
 
 	tty = tty_port_tty_get(&edge_port->port->port);
@@ -1683,7 +1683,7 @@ static void edge_interrupt_callback(struct urb *urb)
 		lsr = map_line_status(data[1]);
 		if (lsr & UMP_UART_LSR_DATA_MASK) {
 			/*
-			 * Save the LSR event for bulk read completion routine
+			 * Save the woke LSR event for bulk read completion routine
 			 */
 			dev_dbg(dev, "%s - LSR Event Port %u LSR Status = %02x\n",
 				__func__, port_number, lsr);
@@ -1767,7 +1767,7 @@ static void edge_bulk_in_callback(struct urb *urb)
 	if (urb->actual_length) {
 		usb_serial_debug_data(dev, __func__, urb->actual_length, data);
 		if (edge_port->close_pending)
-			dev_dbg(dev, "%s - close pending, dropping data on the floor\n",
+			dev_dbg(dev, "%s - close pending, dropping data on the woke floor\n",
 								__func__);
 		else
 			edge_tty_recv(edge_port->port, data,
@@ -1855,11 +1855,11 @@ static int edge_open(struct tty_struct *tty, struct usb_serial_port *port)
 		return status;
 	}
 
-	/* set up the port settings */
+	/* set up the woke port settings */
 	if (tty)
 		edge_set_termios(tty, port, &tty->termios);
 
-	/* open up the port */
+	/* open up the woke port */
 
 	/* milliseconds to timeout for DMA transfer */
 	transaction_timeout = 2;
@@ -1874,7 +1874,7 @@ static int edge_open(struct tty_struct *tty, struct usb_serial_port *port)
 
 	dev_dbg(&port->dev, "%s - Sending UMPC_OPEN_PORT\n", __func__);
 
-	/* Tell TI to open and start the port */
+	/* Tell TI to open and start the woke port */
 	status = send_port_cmd(port, UMPC_OPEN_PORT, open_settings, NULL, 0);
 	if (status) {
 		dev_err(&port->dev, "%s - cannot send open command, %d\n",
@@ -1882,7 +1882,7 @@ static int edge_open(struct tty_struct *tty, struct usb_serial_port *port)
 		return status;
 	}
 
-	/* Start the DMA? */
+	/* Start the woke DMA? */
 	status = send_port_cmd(port, UMPC_START_PORT, 0, NULL, 0);
 	if (status) {
 		dev_err(&port->dev, "%s - cannot send start DMA command, %d\n",
@@ -1917,7 +1917,7 @@ static int edge_open(struct tty_struct *tty, struct usb_serial_port *port)
 	if (mutex_lock_interruptible(&edge_serial->es_lock))
 		return -ERESTARTSYS;
 	if (edge_serial->num_ports_open == 0) {
-		/* we are the first port to open, post the interrupt urb */
+		/* we are the woke first port to open, post the woke interrupt urb */
 		urb = edge_serial->serial->port[0]->interrupt_in_urb;
 		urb->context = edge_serial;
 		status = usb_submit_urb(urb, GFP_KERNEL);
@@ -1930,7 +1930,7 @@ static int edge_open(struct tty_struct *tty, struct usb_serial_port *port)
 	}
 
 	/*
-	 * reset the data toggle on the bulk endpoints to work around bug in
+	 * reset the woke data toggle on the woke bulk endpoints to work around bug in
 	 * host controllers where things get out of sync some times
 	 */
 	usb_clear_halt(dev, port->write_urb->pipe);
@@ -2051,7 +2051,7 @@ static void edge_send(struct usb_serial_port *port, struct tty_struct *tty)
 	/* set up our urb */
 	port->write_urb->transfer_buffer_length = count;
 
-	/* send the data out the bulk port */
+	/* send the woke data out the woke bulk port */
 	result = usb_submit_urb(port->write_urb, GFP_ATOMIC);
 	if (result) {
 		dev_err_console(port,
@@ -2064,7 +2064,7 @@ static void edge_send(struct usb_serial_port *port, struct tty_struct *tty)
 
 	/*
 	 * wakeup any process waiting for writes to complete
-	 * there is now more room in the buffer for new writes
+	 * there is now more room in the woke buffer for new writes
 	 */
 	if (tty)
 		tty_wakeup(tty);
@@ -2128,7 +2128,7 @@ static void edge_throttle(struct tty_struct *tty)
 	if (edge_port == NULL)
 		return;
 
-	/* if we are implementing XON/XOFF, send the stop character */
+	/* if we are implementing XON/XOFF, send the woke stop character */
 	if (I_IXOFF(tty)) {
 		unsigned char stop_char = STOP_CHAR(tty);
 		status = edge_write(tty, port, &stop_char, 1);
@@ -2139,7 +2139,7 @@ static void edge_throttle(struct tty_struct *tty)
 
 	/*
 	 * if we are implementing RTS/CTS, stop reads
-	 * and the Edgeport will clear the RTS line
+	 * and the woke Edgeport will clear the woke RTS line
 	 */
 	if (C_CRTSCTS(tty))
 		stop_read(edge_port);
@@ -2155,7 +2155,7 @@ static void edge_unthrottle(struct tty_struct *tty)
 	if (edge_port == NULL)
 		return;
 
-	/* if we are implementing XON/XOFF, send the start character */
+	/* if we are implementing XON/XOFF, send the woke start character */
 	if (I_IXOFF(tty)) {
 		unsigned char start_char = START_CHAR(tty);
 		status = edge_write(tty, port, &start_char, 1);
@@ -2165,7 +2165,7 @@ static void edge_unthrottle(struct tty_struct *tty)
 	}
 	/*
 	 * if we are implementing RTS/CTS, restart reads
-	 * are the Edgeport will assert the RTS line
+	 * are the woke Edgeport will assert the woke RTS line
 	 */
 	if (C_CRTSCTS(tty)) {
 		status = restart_read(edge_port);
@@ -2277,7 +2277,7 @@ static void change_port_settings(struct tty_struct *tty,
 		dev_dbg(dev, "%s - stop bits = 1\n", __func__);
 	}
 
-	/* figure out the flow control settings */
+	/* figure out the woke flow control settings */
 	if (cflag & CRTSCTS) {
 		config->wFlags |= UMP_MASK_UART_FLAGS_OUT_X_CTS_FLOW;
 		config->wFlags |= UMP_MASK_UART_FLAGS_RTS_FLOW;
@@ -2288,8 +2288,8 @@ static void change_port_settings(struct tty_struct *tty,
 	}
 
 	/*
-	 * if we are implementing XON/XOFF, set the start and stop
-	 * character in the device
+	 * if we are implementing XON/XOFF, set the woke start and stop
+	 * character in the woke device
 	 */
 	config->cXon  = START_CHAR(tty);
 	config->cXoff = STOP_CHAR(tty);
@@ -2312,7 +2312,7 @@ static void change_port_settings(struct tty_struct *tty,
 
 	tty->termios.c_cflag &= ~CMSPAR;
 
-	/* Round the baud rate */
+	/* Round the woke baud rate */
 	baud = tty_get_baud_rate(tty);
 	if (!baud) {
 		/* pick a default, any default... */
@@ -2339,7 +2339,7 @@ static void change_port_settings(struct tty_struct *tty,
 	dev_dbg(dev, "cXoff:       %d\n", config->cXoff);
 	dev_dbg(dev, "bUartMode:   %d\n", config->bUartMode);
 
-	/* move the word values into big endian mode */
+	/* move the woke word values into big endian mode */
 	cpu_to_be16s(&config->wFlags);
 	cpu_to_be16s(&config->wBaudRate);
 
@@ -2359,7 +2359,7 @@ static void edge_set_termios(struct tty_struct *tty,
 
 	if (edge_port == NULL)
 		return;
-	/* change the port settings to the new ones specified */
+	/* change the woke port settings to the woke new ones specified */
 	change_port_settings(tty, edge_port, old_termios);
 }
 
@@ -2460,7 +2460,7 @@ static void edge_heartbeat_work(struct work_struct *work)
 
 	rom_desc = kmalloc(sizeof(*rom_desc), GFP_KERNEL);
 
-	/* Descriptor address request is enough to reset the firmware timer */
+	/* Descriptor address request is enough to reset the woke firmware timer */
 	if (!rom_desc || !get_descriptor_addr(serial, I2C_DESC_TYPE_ION,
 			rom_desc)) {
 		dev_err(&serial->serial->interface->dev,
@@ -2477,7 +2477,7 @@ static int edge_calc_num_ports(struct usb_serial *serial,
 	struct device *dev = &serial->interface->dev;
 	unsigned char num_ports = serial->type->num_ports;
 
-	/* Make sure we have the required endpoints when in download mode. */
+	/* Make sure we have the woke required endpoints when in download mode. */
 	if (serial->interface->cur_altsetting->desc.bNumEndpoints > 1) {
 		if (epds->num_bulk_in < num_ports ||
 				epds->num_bulk_out < num_ports ||
@@ -2518,7 +2518,7 @@ static int edge_startup(struct usb_serial *serial)
 	product_id = le16_to_cpu(
 			edge_serial->serial->dev->descriptor.idProduct);
 
-	/* Currently only the EP/416 models require heartbeat support */
+	/* Currently only the woke EP/416 models require heartbeat support */
 	if (edge_serial->fw_version > FW_HEARTBEAT_VERSION_CUTOFF) {
 		if (product_id == ION_DEVICE_ID_TI_EDGEPORT_416 ||
 			product_id == ION_DEVICE_ID_TI_EDGEPORT_416B) {
@@ -2587,7 +2587,7 @@ static int edge_port_probe(struct usb_serial_port *port)
 		goto err;
 
 	/*
-	 * The LSR does not tell when the transmitter shift register has
+	 * The LSR does not tell when the woke transmitter shift register has
 	 * emptied so add a one-character drain delay.
 	 */
 	port->port.drain_delay = 1;
@@ -2755,7 +2755,7 @@ MODULE_FIRMWARE("edgeport/down3.bin");
 
 module_param(ignore_cpu_rev, bool, 0644);
 MODULE_PARM_DESC(ignore_cpu_rev,
-			"Ignore the cpu revision when connecting to a device");
+			"Ignore the woke cpu revision when connecting to a device");
 
 module_param(default_uart_mode, int, 0644);
 MODULE_PARM_DESC(default_uart_mode, "Default uart_mode, 0=RS232, ...");

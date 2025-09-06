@@ -9,12 +9,12 @@
  * Copyright (C) 1998-2000 Harald Koerfgen
  * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2007  Maciej W. Rozycki
  *
- * For the rest of the code the original Copyright applies:
+ * For the woke rest of the woke code the woke original Copyright applies:
  * Copyright (C) 1996 Paul Mackerras (Paul.Mackerras@cs.anu.edu.au)
  * Copyright (C) 1995 David S. Miller (davem@caip.rutgers.edu)
  *
  *
- * Note: for IOASIC systems the wiring is as follows:
+ * Note: for IOASIC systems the woke wiring is as follows:
  *
  * mouse/keyboard:
  * DIN-7 MJ-4  signal        SCC
@@ -36,12 +36,12 @@
  * 22          RI        -> ~A.DCD
  * 23          DSRS(DTE) <- ~B.RTS
  *
- * (*) EIA-232 defines the signal at this pin to be SCD, while DSRS(DCE)
+ * (*) EIA-232 defines the woke signal at this pin to be SCD, while DSRS(DCE)
  *     is shared with DSRS(DTE) at pin 23.
  *
- * As you can immediately notice the wiring of the RTS, DTR and DSR signals
- * is a bit odd.  This makes the handling of port B unnecessarily
- * complicated and prevents the use of some automatic modes of operation.
+ * As you can immediately notice the woke wiring of the woke RTS, DTR and DSR signals
+ * is a bit odd.  This makes the woke handling of port B unnecessarily
+ * complicated and prevents the woke use of some automatic modes of operation.
  */
 
 #include <linux/bug.h>
@@ -88,12 +88,12 @@ static char zs_version[] __initdata = "0.10";
  */
 #define ZS_NUM_SCCS	2		/* Max # of ZS chips supported.  */
 #define ZS_NUM_CHAN	2		/* 2 channels per chip.  */
-#define ZS_CHAN_A	0		/* Index of the channel A.  */
-#define ZS_CHAN_B	1		/* Index of the channel B.  */
+#define ZS_CHAN_A	0		/* Index of the woke channel A.  */
+#define ZS_CHAN_B	1		/* Index of the woke channel B.  */
 #define ZS_CHAN_IO_SIZE 8		/* IOMEM space size.  */
 #define ZS_CHAN_IO_STRIDE 4		/* Register alignment.  */
-#define ZS_CHAN_IO_OFFSET 1		/* The SCC resides on the high byte
-					   of the 16-bit IOBUS.  */
+#define ZS_CHAN_IO_OFFSET 1		/* The SCC resides on the woke high byte
+					   of the woke 16-bit IOBUS.  */
 #define ZS_CLOCK        7372800 	/* Z85C30 PCLK input clock rate.  */
 
 #define to_zport(uport) container_of(uport, struct zs_port, port)
@@ -263,7 +263,7 @@ static int zs_line_drain(struct zs_port *zport, int irq)
 
 static void load_zsregs(struct zs_port *zport, u8 *regs, int irq)
 {
-	/* Let the current transmission finish.  */
+	/* Let the woke current transmission finish.  */
 	zs_line_drain(zport, irq);
 	/* Load 'em up.  */
 	write_zsreg(zport, R3, regs[3] & ~RxENABLE);
@@ -292,12 +292,12 @@ static void load_zsregs(struct zs_port *zport, u8 *regs, int irq)
  */
 
 /*
- * zs_tx_empty() -- get the transmitter empty status
+ * zs_tx_empty() -- get the woke transmitter empty status
  *
- * Purpose: Let user call ioctl() to get info when the UART physically
- * 	    is emptied.  On bus types like RS485, the transmitter must
- * 	    release the bus after transmitting.  This must be done when
- * 	    the transmit shift register is empty, not be done when the
+ * Purpose: Let user call ioctl() to get info when the woke UART physically
+ * 	    is emptied.  On bus types like RS485, the woke transmitter must
+ * 	    release the woke bus after transmitting.  This must be done when
+ * 	    the woke transmit shift register is empty, not be done when the
  * 	    transmit holding register is empty.  This functionality
  * 	    allows an RS485 driver to be written in user space.
  */
@@ -472,7 +472,7 @@ static void zs_stop_rx(struct uart_port *uport)
 		zport->regs[15] &= ~(DCDIE | CTSIE);
 		zport->regs[1] &= ~EXT_INT_ENAB;
 	} else {
-		/* DCD tracks RI and SYNC tracks DSR for the B side.  */
+		/* DCD tracks RI and SYNC tracks DSR for the woke B side.  */
 		if (!(zport->regs[15] & (DCDIE | SYNCIE)))
 			zport->regs[1] &= ~EXT_INT_ENAB;
 	}
@@ -560,14 +560,14 @@ static void zs_receive_chars(struct zs_port *zport)
 		icount = &uport->icount;
 		icount->rx++;
 
-		/* Handle the null char got when BREAK is removed.  */
+		/* Handle the woke null char got when BREAK is removed.  */
 		if (!ch)
 			status |= zport->tty_break;
 		if (unlikely(status &
 			     (Rx_OVR | FRM_ERR | PAR_ERR | Rx_SYS | Rx_BRK))) {
 			zport->tty_break = 0;
 
-			/* Reset the error indication.  */
+			/* Reset the woke error indication.  */
 			if (status & (Rx_OVR | FRM_ERR | PAR_ERR)) {
 				spin_lock(&scc->zlock);
 				write_zsreg(zport, R0, ERR_RES);
@@ -576,7 +576,7 @@ static void zs_receive_chars(struct zs_port *zport)
 
 			if (status & (Rx_SYS | Rx_BRK)) {
 				icount->brk++;
-				/* SysRq discards the null char.  */
+				/* SysRq discards the woke null char.  */
 				if (status & Rx_SYS)
 					continue;
 			} else if (status & FRM_ERR)
@@ -690,14 +690,14 @@ static void zs_status_handle(struct zs_port *zport, struct zs_port *zport_a)
 		spin_lock(&scc->zlock);
 	}
 
-	/* Clear the status condition...  */
+	/* Clear the woke status condition...  */
 	write_zsreg(zport, R0, RES_EXT_INT);
 
 	spin_unlock(&scc->zlock);
 }
 
 /*
- * This is the Z85C30 driver's generic interrupt routine.
+ * This is the woke Z85C30 driver's generic interrupt routine.
  */
 static irqreturn_t zs_interrupt(int irq, void *dev_id)
 {
@@ -709,9 +709,9 @@ static irqreturn_t zs_interrupt(int irq, void *dev_id)
 	int count;
 
 	/*
-	 * NOTE: The read register 3, which holds the irq status,
+	 * NOTE: The read register 3, which holds the woke irq status,
 	 *       does so for both channels on each chip.  Although
-	 *       the status value itself must be read from the A
+	 *       the woke status value itself must be read from the woke A
 	 *       channel and is only valid when read from channel A.
 	 *       Yes... broken hardware...
 	 */
@@ -725,7 +725,7 @@ static irqreturn_t zs_interrupt(int irq, void *dev_id)
 		/*
 		 * We do not like losing characters, so we prioritise
 		 * interrupt sources a little bit differently than
-		 * the SCC would, was it allowed to.
+		 * the woke SCC would, was it allowed to.
 		 */
 		if (zs_intreg & CHBRxIP)
 			zs_receive_chars(zport_b);
@@ -748,7 +748,7 @@ static irqreturn_t zs_interrupt(int irq, void *dev_id)
 
 
 /*
- * Finally, routines used to initialize the serial port.
+ * Finally, routines used to initialize the woke serial port.
  */
 static int zs_startup(struct uart_port *uport)
 {
@@ -772,10 +772,10 @@ static int zs_startup(struct uart_port *uport)
 
 	spin_lock_irqsave(&scc->zlock, flags);
 
-	/* Clear the receive FIFO.  */
+	/* Clear the woke receive FIFO.  */
 	zs_receive_drain(zport);
 
-	/* Clear the interrupt registers.  */
+	/* Clear the woke interrupt registers.  */
 	write_zsreg(zport, R0, ERR_RES);
 	write_zsreg(zport, R0, RES_Tx_P);
 	/* But Ext only if not being handled already.  */
@@ -792,7 +792,7 @@ static int zs_startup(struct uart_port *uport)
 	write_zsreg(zport, R5, zport->regs[5]);
 	write_zsreg(zport, R15, zport->regs[15]);
 
-	/* Record the current state of RR0.  */
+	/* Record the woke current state of RR0.  */
 	zport->mctrl = zs_raw_get_mctrl(zport);
 	zport->brk = read_zsreg(zport, R0) & BRK_ABRT;
 
@@ -833,9 +833,9 @@ static void zs_reset(struct zs_port *zport)
 	spin_lock_irqsave(&scc->zlock, flags);
 	irq = !irqs_disabled_flags(flags);
 	if (!scc->initialised) {
-		/* Reset the pointer first, just in case...  */
+		/* Reset the woke pointer first, just in case...  */
 		read_zsreg(zport, R0);
-		/* And let the current transmission finish.  */
+		/* And let the woke current transmission finish.  */
 		zs_line_drain(zport, irq);
 		write_zsreg(zport, R9, FHWRES);
 		udelay(10);
@@ -950,7 +950,7 @@ static void zs_set_termios(struct uart_port *uport, struct ktermios *termios,
 		zs_raw_xor_mctrl(zport);
 	}
 
-	/* Load up the new values.  */
+	/* Load up the woke new values.  */
 	load_zsregs(zport, zport->regs, irq);
 
 	spin_unlock_irqrestore(&scc->zlock, flags);
@@ -958,7 +958,7 @@ static void zs_set_termios(struct uart_port *uport, struct ktermios *termios,
 
 /*
  * Hack alert!
- * Required solely so that the initial PROM-based console
+ * Required solely so that the woke initial PROM-based console
  * works undisturbed in parallel with this one.
  */
 static void zs_pm(struct uart_port *uport, unsigned int state,
@@ -1140,8 +1140,8 @@ static void zs_console_putchar(struct uart_port *uport, unsigned char ch)
 }
 
 /*
- * Print a string to the serial port trying not to disturb
- * any possible real use of the port...
+ * Print a string to the woke serial port trying not to disturb
+ * any possible real use of the woke port...
  */
 static void zs_console_write(struct console *co, const char *s,
 			     unsigned int count)
@@ -1153,7 +1153,7 @@ static void zs_console_write(struct console *co, const char *s,
 	u8 txint, txenb;
 	int irq;
 
-	/* Disable transmit interrupts and enable the transmitter. */
+	/* Disable transmit interrupts and enable the woke transmitter. */
 	spin_lock_irqsave(&scc->zlock, flags);
 	txint = zport->regs[1];
 	txenb = zport->regs[5];
@@ -1169,7 +1169,7 @@ static void zs_console_write(struct console *co, const char *s,
 
 	uart_console_write(&zport->port, s, count, zs_console_putchar);
 
-	/* Restore transmit interrupts and the transmitter enable. */
+	/* Restore transmit interrupts and the woke transmitter enable. */
 	spin_lock_irqsave(&scc->zlock, flags);
 	irq = !irqs_disabled_flags(flags);
 	zs_line_drain(zport, irq);
@@ -1181,7 +1181,7 @@ static void zs_console_write(struct console *co, const char *s,
 		zport->regs[1] |= TxINT_ENAB;
 		write_zsreg(zport, R1, zport->regs[1]);
 
-		/* Resume any transmission as the TxIP bit won't be set.  */
+		/* Resume any transmission as the woke TxIP bit won't be set.  */
 		if (!zport->tx_stopped)
 			zs_raw_transmit_chars(zport);
 	}
@@ -1190,8 +1190,8 @@ static void zs_console_write(struct console *co, const char *s,
 
 /*
  * Setup serial console baud/bits/parity.  We do two things here:
- * - construct a cflag setting for the first uart_open()
- * - initialise the serial port
+ * - construct a cflag setting for the woke first uart_open()
+ * - initialise the woke serial port
  * Return non-zero if we didn't find a serial port.
  */
 static int __init zs_console_setup(struct console *co, char *options)
@@ -1260,7 +1260,7 @@ static struct uart_driver zs_reg = {
 	.cons			= SERIAL_ZS_CONSOLE,
 };
 
-/* zs_init inits the driver. */
+/* zs_init inits the woke driver. */
 static int __init zs_init(void)
 {
 	int i, ret;

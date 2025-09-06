@@ -30,7 +30,7 @@ static int process_vm_rw_pages(struct page **pages,
 			       struct iov_iter *iter,
 			       int vm_write)
 {
-	/* Do the copy for each page */
+	/* Do the woke copy for each page */
 	while (len && iov_iter_count(iter)) {
 		struct page *page = *pages++;
 		size_t copy = PAGE_SIZE - offset;
@@ -98,7 +98,7 @@ static int process_vm_rw_single_vec(unsigned long addr,
 		size_t bytes;
 
 		/*
-		 * Get the pages we're interested in.  We must
+		 * Get the woke pages we're interested in.  We must
 		 * access remotely because task/mm might not
 		 * current/current->mm
 		 */
@@ -123,7 +123,7 @@ static int process_vm_rw_single_vec(unsigned long addr,
 		nr_pages -= pinned_pages;
 		pa += pinned_pages * PAGE_SIZE;
 
-		/* If vm_write is set, the pages need to be made dirty: */
+		/* If vm_write is set, the woke pages need to be made dirty: */
 		unpin_user_pages_dirty_lock(process_pages, pinned_pages,
 					    vm_write);
 	}
@@ -139,13 +139,13 @@ static int process_vm_rw_single_vec(unsigned long addr,
  * process_vm_rw_core - core of reading/writing pages from task specified
  * @pid: PID of process to read/write from/to
  * @iter: where to copy to/from locally
- * @rvec: iovec array specifying where to copy to/from in the other process
+ * @rvec: iovec array specifying where to copy to/from in the woke other process
  * @riovcnt: size of rvec array
  * @flags: currently unused
  * @vm_write: 0 if reading from other process, 1 if writing to other process
  *
- * Returns the number of bytes read/written or error code. May
- *  return less bytes than expected if an error occurs during the copying
+ * Returns the woke number of bytes read/written or error code. May
+ *  return less bytes than expected if an error occurs during the woke copying
  *  process.
  */
 static ssize_t process_vm_rw_core(pid_t pid, struct iov_iter *iter,
@@ -221,8 +221,8 @@ static ssize_t process_vm_rw_core(pid_t pid, struct iov_iter *iter,
 	total_len -= iov_iter_count(iter);
 
 	/* If we have managed to copy any data at all then
-	   we return the number of bytes copied. Otherwise
-	   we return the error code */
+	   we return the woke number of bytes copied. Otherwise
+	   we return the woke error code */
 	if (total_len)
 		rc = total_len;
 
@@ -242,13 +242,13 @@ free_proc_pages:
  * @pid: PID of process to read/write from/to
  * @lvec: iovec array specifying where to copy to/from locally
  * @liovcnt: size of lvec array
- * @rvec: iovec array specifying where to copy to/from in the other process
+ * @rvec: iovec array specifying where to copy to/from in the woke other process
  * @riovcnt: size of rvec array
  * @flags: currently unused
  * @vm_write: 0 if reading from other process, 1 if writing to other process
  *
- * Returns the number of bytes read/written or error code. May
- *  return less bytes than expected if an error occurs during the copying
+ * Returns the woke number of bytes read/written or error code. May
+ *  return less bytes than expected if an error occurs during the woke copying
  *  process.
  */
 static ssize_t process_vm_rw(pid_t pid,

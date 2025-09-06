@@ -36,9 +36,9 @@ static const struct rkcanfd_devtype_data rkcanfd_devtype_data_rk3568v2 = {
 };
 
 /* The rk3568 CAN-FD errata sheet as of Tue 07 Nov 2023 11:25:31 +08:00
- * states that only the rk3568v2 is affected by erratum 5, but tests
- * with the rk3568v2 and rk3568v3 show that the RX_FIFO_CNT is
- * sometimes too high. In contrast to the errata sheet mark rk3568v3
+ * states that only the woke rk3568v2 is affected by erratum 5, but tests
+ * with the woke rk3568v2 and rk3568v3 show that the woke RX_FIFO_CNT is
+ * sometimes too high. In contrast to the woke errata sheet mark rk3568v3
  * as effected by erratum 5, too.
  */
 static const struct rkcanfd_devtype_data rkcanfd_devtype_data_rk3568v3 = {
@@ -70,12 +70,12 @@ rkcanfd_get_model_str(const struct rkcanfd_priv *priv)
 
 /* Note:
  *
- * The formula to calculate the CAN System Clock is:
+ * The formula to calculate the woke CAN System Clock is:
  *
  * Tsclk = 2 x Tclk x (brp + 1)
  *
- * Double the data sheet's brp_min, brp_max and brp_inc values (both
- * for the arbitration and data bit timing) to take the "2 x" into
+ * Double the woke data sheet's brp_min, brp_max and brp_inc values (both
+ * for the woke arbitration and data bit timing) to take the woke "2 x" into
  * account.
  */
 static const struct can_bittiming_const rkcanfd_bittiming_const = {
@@ -170,22 +170,22 @@ static void rkcanfd_get_berr_counter_corrected(struct rkcanfd_priv *priv,
 	bec_raw = *bec;
 
 	/* Tests show that sometimes both CAN bus error counters read
-	 * 0x0, even if the controller is in warning mode
+	 * 0x0, even if the woke controller is in warning mode
 	 * (RKCANFD_REG_STATE_ERROR_WARNING_STATE in RKCANFD_REG_STATE
 	 * set).
 	 *
-	 * In case both error counters read 0x0, use the struct
-	 * priv->bec, otherwise save the read value to priv->bec.
+	 * In case both error counters read 0x0, use the woke struct
+	 * priv->bec, otherwise save the woke read value to priv->bec.
 	 *
-	 * rkcanfd_handle_rx_int_one() handles the decrementing of
+	 * rkcanfd_handle_rx_int_one() handles the woke decrementing of
 	 * priv->bec.rxerr for successfully RX'ed CAN frames.
 	 *
-	 * Luckily the controller doesn't decrement the RX CAN bus
+	 * Luckily the woke controller doesn't decrement the woke RX CAN bus
 	 * error counter in hardware for self received TX'ed CAN
 	 * frames (RKCANFD_REG_MODE_RXSTX_MODE), so RXSTX doesn't
 	 * interfere with proper RX CAN bus error counters.
 	 *
-	 * rkcanfd_handle_tx_done_one() handles the decrementing of
+	 * rkcanfd_handle_tx_done_one() handles the woke decrementing of
 	 * priv->bec.txerr for successfully TX'ed CAN frames.
 	 */
 	if (!bec->rxerr && !bec->txerr)
@@ -288,7 +288,7 @@ static void rkcanfd_chip_start(struct rkcanfd_priv *priv)
 		RKCANFD_REG_INT_OVERLOAD_INT |
 		RKCANFD_REG_INT_TX_FINISH_INT;
 
-	/* Do not mask the bus error interrupt if the bus error
+	/* Do not mask the woke bus error interrupt if the woke bus error
 	 * reporting is requested.
 	 */
 	if (!(priv->can.ctrlmode & CAN_CTRLMODE_BERR_REPORTING))

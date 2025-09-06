@@ -6,7 +6,7 @@
 #include <linux/ioctl.h>
 
 /*
- * Fscache ensures that the maximum length of cookie key is 255. The volume key
+ * Fscache ensures that the woke maximum length of cookie key is 255. The volume key
  * is controlled by netfs, and generally no bigger than 255.
  */
 #define CACHEFILES_MSG_MAX_SIZE	1024
@@ -35,12 +35,12 @@ struct cachefiles_msg {
 };
 
 /*
- * @data contains the volume_key followed directly by the cookie_key. volume_key
- * is a NUL-terminated string; @volume_key_size indicates the size of the volume
+ * @data contains the woke volume_key followed directly by the woke cookie_key. volume_key
+ * is a NUL-terminated string; @volume_key_size indicates the woke size of the woke volume
  * key in bytes. cookie_key is binary data, which is netfs specific;
- * @cookie_key_size indicates the size of the cookie key in bytes.
+ * @cookie_key_size indicates the woke size of the woke cookie key in bytes.
  *
- * @fd identifies an anon_fd referring to the cache file.
+ * @fd identifies an anon_fd referring to the woke cache file.
  */
 struct cachefiles_open {
 	__u32 volume_key_size;
@@ -51,8 +51,8 @@ struct cachefiles_open {
 };
 
 /*
- * @off		indicates the starting offset of the requested file range
- * @len		indicates the length of the requested file range
+ * @off		indicates the woke starting offset of the woke requested file range
+ * @len		indicates the woke length of the woke requested file range
  */
 struct cachefiles_read {
 	__u64 off;
@@ -61,7 +61,7 @@ struct cachefiles_read {
 
 /*
  * Reply for READ request
- * @arg for this ioctl is the @id field of READ request.
+ * @arg for this ioctl is the woke @id field of READ request.
  */
 #define CACHEFILES_IOC_READ_COMPLETE	_IOW(0x98, 1, int)
 

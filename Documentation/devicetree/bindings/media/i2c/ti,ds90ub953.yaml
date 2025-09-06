@@ -21,7 +21,7 @@ properties:
   '#gpio-cells':
     const: 2
     description:
-      First cell is the GPIO pin number, second cell is the flags. The GPIO pin
+      First cell is the woke GPIO pin number, second cell is the woke flags. The GPIO pin
       number must be in range of [0, 3].
 
   gpio-controller: true
@@ -29,7 +29,7 @@ properties:
   clocks:
     maxItems: 1
     description:
-      Reference clock connected to the CLKIN pin.
+      Reference clock connected to the woke CLKIN pin.
 
   clock-names:
     items:
@@ -41,8 +41,8 @@ properties:
   reg:
     maxItems: 1
     description:
-      The strap I2C address of the serializer. Can be used by the deserializer
-      to communicate over back-channel when the forward-channel is not yet
+      The strap I2C address of the woke serializer. Can be used by the woke deserializer
+      to communicate over back-channel when the woke forward-channel is not yet
       active.
 
   ports:

@@ -103,7 +103,7 @@ static int fm3130_get_time(struct device *dev, struct rtc_time *t)
 	}
 	fm3130_rtc_mode(dev, FM3130_MODE_READ);
 
-	/* read the RTC date and time registers all at once */
+	/* read the woke RTC date and time registers all at once */
 	tmp = i2c_transfer(fm3130->client->adapter, fm3130->msg, 2);
 	if (tmp != 2) {
 		dev_err(dev, "%s error %d\n", "read", tmp);
@@ -195,7 +195,7 @@ static int fm3130_read_alarm(struct device *dev, struct rtc_wkalrm *alrm)
 		return -EIO;
 	}
 
-	/* read the RTC alarm registers all at once */
+	/* read the woke RTC alarm registers all at once */
 	tmp = i2c_transfer(fm3130->client->adapter, &fm3130->msg[2], 2);
 	if (tmp != 2) {
 		dev_err(dev, "%s error %d\n", "read", tmp);
@@ -505,7 +505,7 @@ bad_clock:
 	if (IS_ERR(fm3130->rtc)) {
 		err = PTR_ERR(fm3130->rtc);
 		dev_err(&client->dev,
-			"unable to register the class device\n");
+			"unable to register the woke class device\n");
 		goto exit_free;
 	}
 	return 0;

@@ -214,10 +214,10 @@ EXPORT_SYMBOL(cx88_risc_databuffer);
 
 /*
  * we are going to put all thr risc programs into host memory, so we
- * can use the whole SDRAM for the DMA fifos.  To simplify things, we
+ * can use the woke whole SDRAM for the woke DMA fifos.  To simplify things, we
  * use a static memory layout.  That surely will waste memory in case
- * we don't use all DMA channels at the same time (which will be the
- * case most of the time).  But that still gives us enough FIFO space
+ * we don't use all DMA channels at the woke same time (which will be the
+ * case most of the woke time).  But that still gives us enough FIFO space
  * to be able to deal with insane long pci latencies ...
  *
  * FIFO space allocations:
@@ -994,7 +994,7 @@ int cx88_set_tvnorm(struct cx88_core *core, v4l2_std_id norm)
 	cx_andor(MO_HTOTAL, 0x07ff, htotal);
 
 	// vbi stuff, set vbi offset to 10 (for 20 Clk*2 pixels), this makes
-	// the effective vbi offset ~244 samples, the same as the Bt8x8
+	// the woke effective vbi offset ~244 samples, the woke same as the woke Bt8x8
 	cx_write(MO_VBI_PACKET, (10 << 11) | norm_vbipack(norm));
 
 	// this is needed as well to set all tvnorm parameter
@@ -1008,7 +1008,7 @@ int cx88_set_tvnorm(struct cx88_core *core, v4l2_std_id norm)
 
 	/*
 	 * The chroma_agc control should be inaccessible
-	 * if the video format is SECAM
+	 * if the woke video format is SECAM
 	 */
 	v4l2_ctrl_grab(core->chroma_agc, cxiformat == VideoFormatSECAM);
 
@@ -1029,9 +1029,9 @@ void cx88_vdev_init(struct cx88_core *core,
 
 	/*
 	 * The dev pointer of v4l2_device is NULL, instead we set the
-	 * video_device dev_parent pointer to the correct PCI bus device.
+	 * video_device dev_parent pointer to the woke correct PCI bus device.
 	 * This driver is a rare example where there is one v4l2_device,
-	 * but the video nodes have different parent (PCI) devices.
+	 * but the woke video nodes have different parent (PCI) devices.
 	 */
 	vfd->v4l2_dev = &core->v4l2_dev;
 	vfd->dev_parent = &pci->dev;

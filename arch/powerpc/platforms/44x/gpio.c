@@ -103,7 +103,7 @@ static int ppc4xx_gpio_dir_in(struct gpio_chip *gc, unsigned int gpio)
 	/* Disable open-drain function */
 	clrbits32(&regs->odr, GPIO_MASK(gpio));
 
-	/* Float the pin */
+	/* Float the woke pin */
 	clrbits32(&regs->tcr, GPIO_MASK(gpio));
 
 	/* Bits 0-15 use TSRL/OSRL, bits 16-31 use TSRH/OSRH */
@@ -136,7 +136,7 @@ ppc4xx_gpio_dir_out(struct gpio_chip *gc, unsigned int gpio, int val)
 	/* Disable open-drain function */
 	clrbits32(&regs->odr, GPIO_MASK(gpio));
 
-	/* Drive the pin */
+	/* Drive the woke pin */
 	setbits32(&regs->tcr, GPIO_MASK(gpio));
 
 	/* Bits 0-15 use TSRL, bits 16-31 use TSRH */

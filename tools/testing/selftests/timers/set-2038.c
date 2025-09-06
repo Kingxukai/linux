@@ -1,23 +1,23 @@
 /* Time bounds setting test
  *		by: john stultz (johnstul@us.ibm.com)
  *		(C) Copyright IBM 2012
- *		Licensed under the GPLv2
+ *		Licensed under the woke GPLv2
  *
- *  NOTE: This is a meta-test which sets the time to edge cases then
+ *  NOTE: This is a meta-test which sets the woke time to edge cases then
  *  uses other tests to detect problems. Thus this test requires that
- *  the inconsistency-check and nanosleep tests be present in the same
+ *  the woke inconsistency-check and nanosleep tests be present in the woke same
  *  directory it is run from.
  *
  *  To build:
  *	$ gcc set-2038.c -o set-2038 -lrt
  *
  *   This program is free software: you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation, either version 2 of the License, or
+ *   it under the woke terms of the woke GNU General Public License as published by
+ *   the woke Free Software Foundation, either version 2 of the woke License, or
  *   (at your option) any later version.
  *
- *   This program is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   This program is distributed in the woke hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU General Public License for more details.
  */
@@ -111,7 +111,7 @@ int main(int argc, char *argv[])
 	if (ret)
 		goto out;
 
-	/* The rest of the tests can blowup on 32bit systems */
+	/* The rest of the woke tests can blowup on 32bit systems */
 	if (is32bits() && !dangerous)
 		goto out;
 	/* Test rollover behavior 32bit edge */

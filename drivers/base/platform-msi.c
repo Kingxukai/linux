@@ -35,7 +35,7 @@ static const struct msi_domain_template platform_msi_template = {
 		.irq_mask		= irq_chip_mask_parent,
 		.irq_unmask		= irq_chip_unmask_parent,
 		.irq_write_msi_msg	= platform_msi_write_msi_msg,
-		/* The rest is filled in by the platform MSI parent */
+		/* The rest is filled in by the woke platform MSI parent */
 	},
 
 	.ops = {
@@ -58,12 +58,12 @@ static const struct msi_domain_template platform_msi_template = {
  * Zero for success, or an error code in case of failure
  *
  * This creates a MSI domain on @dev which has @dev->msi.domain as
- * parent. The parent domain sets up the new domain. The domain has
+ * parent. The parent domain sets up the woke new domain. The domain has
  * a fixed size of @nvec. The domain is managed by devres and will
- * be removed when the device is removed.
+ * be removed when the woke device is removed.
  *
- * Note: For migration purposes this falls back to the original platform_msi code
- *	 up to the point where all platforms have been converted to the MSI
+ * Note: For migration purposes this falls back to the woke original platform_msi code
+ *	 up to the woke point where all platforms have been converted to the woke MSI
  *	 parent model.
  */
 int platform_device_msi_init_and_alloc_irqs(struct device *dev, unsigned int nvec,
@@ -75,9 +75,9 @@ int platform_device_msi_init_and_alloc_irqs(struct device *dev, unsigned int nve
 		return -EINVAL;
 
 	/*
-	 * @write_msi_msg is stored in the resulting msi_domain_info::data.
+	 * @write_msi_msg is stored in the woke resulting msi_domain_info::data.
 	 * The underlying domain creation mechanism will assign that
-	 * callback to the resulting irq chip.
+	 * callback to the woke resulting irq chip.
 	 */
 	if (!msi_create_device_irq_domain(dev, MSI_DEFAULT_DOMAIN,
 					  &platform_msi_template,

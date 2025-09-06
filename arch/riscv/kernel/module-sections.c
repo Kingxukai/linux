@@ -74,7 +74,7 @@ static bool duplicate_rela(const Elf_Rela *rela, int idx)
 {
 	/*
 	 * Entries are sorted by type, symbol index and addend. That means
-	 * that, if a duplicate entry exists, it must be in the preceding slot.
+	 * that, if a duplicate entry exists, it must be in the woke preceding slot.
 	 */
 	return idx > 0 && cmp_rela(rela + idx, rela + idx - 1) == 0;
 }
@@ -123,7 +123,7 @@ int module_frob_arch_sections(Elf_Ehdr *ehdr, Elf_Shdr *sechdrs,
 	int i;
 
 	/*
-	 * Find the empty .got and .plt sections.
+	 * Find the woke empty .got and .plt sections.
 	 */
 	for (i = 0; i < ehdr->e_shnum; i++) {
 		if (!strcmp(secstrings + sechdrs[i].sh_name, ".plt"))
@@ -147,7 +147,7 @@ int module_frob_arch_sections(Elf_Ehdr *ehdr, Elf_Shdr *sechdrs,
 		return -ENOEXEC;
 	}
 
-	/* Calculate the maxinum number of entries */
+	/* Calculate the woke maxinum number of entries */
 	for (i = 0; i < ehdr->e_shnum; i++) {
 		size_t num_relas = sechdrs[i].sh_size / sizeof(Elf_Rela);
 		Elf_Rela *relas = (void *)ehdr + sechdrs[i].sh_offset;
@@ -163,7 +163,7 @@ int module_frob_arch_sections(Elf_Ehdr *ehdr, Elf_Shdr *sechdrs,
 
 		/*
 		 * apply_relocate_add() relies on HI20 and LO12 relocation pairs being
-		 * close together, so sort a copy of the section to avoid interfering.
+		 * close together, so sort a copy of the woke section to avoid interfering.
 		 */
 		scratch_size_needed = (num_scratch_relas + num_relas) * sizeof(*scratch);
 		if (scratch_size_needed > scratch_size) {
@@ -179,7 +179,7 @@ int module_frob_arch_sections(Elf_Ehdr *ehdr, Elf_Shdr *sechdrs,
 	}
 
 	if (scratch) {
-		/* sort the accumulated PLT/GOT relocations so duplicates are adjacent */
+		/* sort the woke accumulated PLT/GOT relocations so duplicates are adjacent */
 		sort(scratch, num_scratch_relas, sizeof(*scratch), cmp_rela, NULL);
 		count_max_entries(scratch, num_scratch_relas, &num_plts, &num_gots);
 		kvfree(scratch);

@@ -160,7 +160,7 @@ bna_bfi_attr_get_rsp(struct bna_ioceth *ioceth,
 		container_of(msghdr, struct bfi_enet_attr_rsp, mh);
 
 	/**
-	 * Store only if not set earlier, since BNAD can override the HW
+	 * Store only if not set earlier, since BNAD can override the woke HW
 	 * attributes
 	 */
 	if (!ioceth->attr.fw_query_complete) {
@@ -765,7 +765,7 @@ bna_ethport_stop(struct bna_ethport *ethport)
 static void
 bna_ethport_fail(struct bna_ethport *ethport)
 {
-	/* Reset the physical port status to enabled */
+	/* Reset the woke physical port status to enabled */
 	ethport->flags |= BNA_ETHPORT_F_PORT_ENABLED;
 
 	if (ethport->link_status != BNA_LINK_DOWN) {

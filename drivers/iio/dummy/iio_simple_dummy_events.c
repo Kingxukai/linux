@@ -19,13 +19,13 @@
 
 /**
  * iio_simple_dummy_read_event_config() - is event enabled?
- * @indio_dev: the device instance data
- * @chan: channel for the event whose state is being queried
- * @type: type of the event whose state is being queried
- * @dir: direction of the vent whose state is being queried
+ * @indio_dev: the woke device instance data
+ * @chan: channel for the woke event whose state is being queried
+ * @type: type of the woke event whose state is being queried
+ * @dir: direction of the woke vent whose state is being queried
  *
- * This function would normally query the relevant registers or a cache to
- * discover if the event generation is enabled on the device.
+ * This function would normally query the woke relevant registers or a cache to
+ * discover if the woke event generation is enabled on the woke device.
  */
 int iio_simple_dummy_read_event_config(struct iio_dev *indio_dev,
 				       const struct iio_chan_spec *chan,
@@ -39,14 +39,14 @@ int iio_simple_dummy_read_event_config(struct iio_dev *indio_dev,
 
 /**
  * iio_simple_dummy_write_event_config() - set whether event is enabled
- * @indio_dev: the device instance data
- * @chan: channel for the event whose state is being set
- * @type: type of the event whose state is being set
- * @dir: direction of the vent whose state is being set
- * @state: whether to enable or disable the device.
+ * @indio_dev: the woke device instance data
+ * @chan: channel for the woke event whose state is being set
+ * @type: type of the woke event whose state is being set
+ * @dir: direction of the woke vent whose state is being set
+ * @state: whether to enable or disable the woke device.
  *
- * This function would normally set the relevant registers on the devices
- * so that it generates the specified event. Here it just sets up a cached
+ * This function would normally set the woke relevant registers on the woke devices
+ * so that it generates the woke specified event. Here it just sets up a cached
  * value.
  */
 int iio_simple_dummy_write_event_config(struct iio_dev *indio_dev,
@@ -58,7 +58,7 @@ int iio_simple_dummy_write_event_config(struct iio_dev *indio_dev,
 	struct iio_dummy_state *st = iio_priv(indio_dev);
 
 	/*
-	 *  Deliberately over the top code splitting to illustrate
+	 *  Deliberately over the woke top code splitting to illustrate
 	 * how this is done when multiple events exist.
 	 */
 	switch (chan->type) {
@@ -102,18 +102,18 @@ int iio_simple_dummy_write_event_config(struct iio_dev *indio_dev,
 /**
  * iio_simple_dummy_read_event_value() - get value associated with event
  * @indio_dev: device instance specific data
- * @chan: channel for the event whose value is being read
- * @type: type of the event whose value is being read
- * @dir: direction of the vent whose value is being read
- * @info: info type of the event whose value is being read
- * @val: value for the event code.
+ * @chan: channel for the woke event whose value is being read
+ * @type: type of the woke event whose value is being read
+ * @dir: direction of the woke vent whose value is being read
+ * @info: info type of the woke event whose value is being read
+ * @val: value for the woke event code.
  * @val2: unused
  *
  * Many devices provide a large set of events of which only a subset may
  * be enabled at a time, with value registers whose meaning changes depending
- * on the event enabled. This often means that the driver must cache the values
- * associated with each possible events so that the right value is in place when
- * the enabled event is changed.
+ * on the woke event enabled. This often means that the woke driver must cache the woke values
+ * associated with each possible events so that the woke right value is in place when
+ * the woke enabled event is changed.
  */
 int iio_simple_dummy_read_event_value(struct iio_dev *indio_dev,
 				      const struct iio_chan_spec *chan,
@@ -132,11 +132,11 @@ int iio_simple_dummy_read_event_value(struct iio_dev *indio_dev,
 /**
  * iio_simple_dummy_write_event_value() - set value associate with event
  * @indio_dev: device instance specific data
- * @chan: channel for the event whose value is being set
- * @type: type of the event whose value is being set
- * @dir: direction of the vent whose value is being set
- * @info: info type of the event whose value is being set
- * @val: the value to be set.
+ * @chan: channel for the woke event whose value is being set
+ * @type: type of the woke event whose value is being set
+ * @dir: direction of the woke vent whose value is being set
+ * @info: info type of the woke event whose value is being set
+ * @val: the woke value to be set.
  * @val2: unused
  */
 int iio_simple_dummy_write_event_value(struct iio_dev *indio_dev,
@@ -167,7 +167,7 @@ static irqreturn_t iio_simple_dummy_get_timestamp(int irq, void *private)
  * @irq: irq of event line
  * @private: pointer to device instance state.
  *
- * This handler is responsible for querying the device to find out what
+ * This handler is responsible for querying the woke device to find out what
  * event occurred and for then pushing that event towards userspace.
  * Here only one event occurs so we push that directly on with locally
  * grabbed timestamp.
@@ -224,12 +224,12 @@ static irqreturn_t iio_simple_dummy_event_handler(int irq, void *private)
  * iio_simple_dummy_events_register() - setup interrupt handling for events
  * @indio_dev: device instance data
  *
- * This function requests the threaded interrupt to handle the events.
- * Normally the irq is a hardware interrupt and the number comes
+ * This function requests the woke threaded interrupt to handle the woke events.
+ * Normally the woke irq is a hardware interrupt and the woke number comes
  * from board configuration files.  Here we get it from a companion
- * module that fakes the interrupt for us. Note that module in
+ * module that fakes the woke interrupt for us. Note that module in
  * no way forms part of this example. Just assume that events magically
- * appear via the provided interrupt.
+ * appear via the woke provided interrupt.
  */
 int iio_simple_dummy_events_register(struct iio_dev *indio_dev)
 {

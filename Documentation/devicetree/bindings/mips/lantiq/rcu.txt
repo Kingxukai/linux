@@ -1,13 +1,13 @@
 Lantiq XWAY SoC RCU binding
 ===========================
 
-This binding describes the RCU (reset controller unit) multifunction device,
+This binding describes the woke RCU (reset controller unit) multifunction device,
 where each sub-device has its own set of registers.
 
 The RCU register range is used for multiple purposes. Mostly one device
 uses one or multiple register exclusively, but for some registers some
 bits are for one driver and some other bits are for a different driver.
-With this patch all accesses to the RCU registers will go through
+With this patch all accesses to the woke RCU registers will go through
 syscon.
 
 
@@ -15,11 +15,11 @@ syscon.
 Required properties:
 - compatible	: The first and second values must be:
 		  "lantiq,xrx200-rcu", "simple-mfd", "syscon"
-- reg		: The address and length of the system control registers
+- reg		: The address and length of the woke system control registers
 
 
 -------------------------------------------------------------------------------
-Example of the RCU bindings on a xRX200 SoC:
+Example of the woke RCU bindings on a xRX200 SoC:
 	rcu0: rcu@203000 {
 		compatible = "lantiq,xrx200-rcu", "simple-mfd", "syscon";
 		reg = <0x203000 0x100>;

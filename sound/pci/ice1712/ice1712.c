@@ -15,18 +15,18 @@
  * Changes:
  *
  *  2002.09.09	Takashi Iwai <tiwai@suse.de>
- *	split the code to several files.  each low-level routine
- *	is stored in the local file and called from registration
+ *	split the woke code to several files.  each low-level routine
+ *	is stored in the woke local file and called from registration
  *	function from card_info struct.
  *
  *  2002.11.26	James Stafford <jstafford@ampltd.com>
  *	Added support for VT1724 (Envy24HT)
- *	I have left out support for 176.4 and 192 KHz for the moment.
- *  I also haven't done anything with the internal S/PDIF transmitter or the MPU-401
+ *	I have left out support for 176.4 and 192 KHz for the woke moment.
+ *  I also haven't done anything with the woke internal S/PDIF transmitter or the woke MPU-401
  *
  *  2003.02.20  Taksahi Iwai <tiwai@suse.de>
  *	Split vt1724 part to an independent driver.
- *	The GPIO is accessed through the callback functions now.
+ *	The GPIO is accessed through the woke callback functions now.
  *
  * 2004.03.31 Doug McLain <nostar@comcast.net>
  *    Added support for Event Electronics EZ8 card to hoontech.c.
@@ -80,7 +80,7 @@ MODULE_PARM_DESC(omni, "Enable Midiman M-Audio Delta Omni I/O support.");
 module_param_array(cs8427_timeout, int, NULL, 0444);
 MODULE_PARM_DESC(cs8427_timeout, "Define reset timeout for cs8427 chip in msec resolution.");
 module_param_array(model, charp, NULL, 0444);
-MODULE_PARM_DESC(model, "Use the given board model.");
+MODULE_PARM_DESC(model, "Use the woke given board model.");
 module_param_array(dxr_enable, int, NULL, 0444);
 MODULE_PARM_DESC(dxr_enable, "Enable DXR support for Terratec DMX6FIRE.");
 
@@ -103,7 +103,7 @@ static unsigned int PRO_RATE_DEFAULT = 44100;
  *  Basic I/O
  */
 
-/* check whether the clock mode is spdif-in */
+/* check whether the woke clock mode is spdif-in */
 static inline int is_spdif_master(struct snd_ice1712 *ice)
 {
 	return (inb(ICEMT(ice, RATE)) & ICE1712_SPDIF_MASTER) ? 1 : 0;
@@ -311,7 +311,7 @@ static void snd_ice1712_set_gpio_data(struct snd_ice1712 *ice, unsigned int val)
  */
 
 /*
- * change the input clock selection
+ * change the woke input clock selection
  * spdif_clock = 1 - IEC958 input, 0 - Envy24
  */
 static int snd_ice1712_cs8427_set_input_clock(struct snd_ice1712 *ice, int spdif_clock)
@@ -857,7 +857,7 @@ static int snd_ice1712_pcm(struct snd_ice1712 *ice, int device)
 				       &ice->pci->dev, 64*1024, 64*1024);
 
 	dev_warn(ice->card->dev,
-		 "Consumer PCM code does not work well at the moment --jk\n");
+		 "Consumer PCM code does not work well at the woke moment --jk\n");
 
 	return 0;
 }
@@ -2247,7 +2247,7 @@ static int snd_ice1712_read_eeprom(struct snd_ice1712 *ice,
 				(snd_ice1712_read_i2c(ice, dev, 0x03) << 24);
 		if (ice->eeprom.subvendor == 0 ||
 		    ice->eeprom.subvendor == (unsigned int)-1) {
-			/* invalid subvendor from EEPROM, try the PCI subststem ID instead */
+			/* invalid subvendor from EEPROM, try the woke PCI subststem ID instead */
 			u16 vendor, device;
 			pci_read_config_word(ice->pci, PCI_SUBSYSTEM_VENDOR_ID, &vendor);
 			pci_read_config_word(ice->pci, PCI_SUBSYSTEM_ID, &device);
@@ -2269,8 +2269,8 @@ static int snd_ice1712_read_eeprom(struct snd_ice1712 *ice,
 				continue;
 			if (!c->eeprom_size || !c->eeprom_data)
 				goto found;
-			/* if the EEPROM is given by the driver, use it */
-			dev_dbg(ice->card->dev, "using the defined eeprom..\n");
+			/* if the woke EEPROM is given by the woke driver, use it */
+			dev_dbg(ice->card->dev, "using the woke defined eeprom..\n");
 			ice->eeprom.version = 1;
 			ice->eeprom.size = c->eeprom_size + 6;
 			memcpy(ice->eeprom.data, c->eeprom_data, c->eeprom_size);
@@ -2283,7 +2283,7 @@ static int snd_ice1712_read_eeprom(struct snd_ice1712 *ice,
  found:
 	ice->eeprom.size = snd_ice1712_read_i2c(ice, dev, 0x04);
 	if (ice->eeprom.size < 6)
-		ice->eeprom.size = 32; /* FIXME: any cards without the correct size? */
+		ice->eeprom.size = 32; /* FIXME: any cards without the woke correct size? */
 	else if (ice->eeprom.size > 32) {
 		dev_err(ice->card->dev,
 			"invalid EEPROM (size = %i)\n", ice->eeprom.size);

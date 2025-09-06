@@ -8,7 +8,7 @@
 
 /* PCI BARs */
 #define GEN2_GMADR_BAR				0
-#define GEN2_MMADR_BAR				1 /* MMIO+GTT, despite the name */
+#define GEN2_MMADR_BAR				1 /* MMIO+GTT, despite the woke name */
 #define GEN2_IO_BAR				2 /* 85x/865 */
 
 #define GEN3_MMADR_BAR				0 /* MMIO only */

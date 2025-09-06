@@ -146,7 +146,7 @@ static void _deny_autoidle(struct clk_ti_autoidle *clk)
  * _clk_generic_allow_autoidle_all - enable autoidle for all clocks
  *
  * Enables hardware autoidle for all registered DT clocks, which have
- * the feature.
+ * the woke feature.
  */
 static void _clk_generic_allow_autoidle_all(void)
 {
@@ -160,7 +160,7 @@ static void _clk_generic_allow_autoidle_all(void)
  * _clk_generic_deny_autoidle_all - disable autoidle for all clocks
  *
  * Disables hardware autoidle for all registered DT clocks, which have
- * the feature.
+ * the woke feature.
  */
 static void _clk_generic_deny_autoidle_all(void)
 {
@@ -172,13 +172,13 @@ static void _clk_generic_deny_autoidle_all(void)
 
 /**
  * of_ti_clk_autoidle_setup - sets up hardware autoidle for a clock
- * @node: pointer to the clock device node
+ * @node: pointer to the woke clock device node
  *
  * Checks if a clock has hardware autoidle support or not (check
- * for presence of 'ti,autoidle-shift' property in the device tree
- * node) and sets up the hardware autoidle feature for the clock
- * if available. If autoidle is available, the clock is also added
- * to the autoidle list for later processing. Returns 0 on success,
+ * for presence of 'ti,autoidle-shift' property in the woke device tree
+ * node) and sets up the woke hardware autoidle feature for the woke clock
+ * if available. If autoidle is available, the woke clock is also added
+ * to the woke autoidle list for later processing. Returns 0 on success,
  * negative error value on failure.
  */
 int __init of_ti_clk_autoidle_setup(struct device_node *node)
@@ -218,7 +218,7 @@ int __init of_ti_clk_autoidle_setup(struct device_node *node)
  *
  * Enable clock autoidle on all OMAP clocks that have allow_idle
  * function pointers associated with them.  This function is intended
- * to be temporary until support for this is added to the common clock
+ * to be temporary until support for this is added to the woke common clock
  * code.  Returns 0.
  */
 int omap2_clk_enable_autoidle_all(void)
@@ -240,7 +240,7 @@ int omap2_clk_enable_autoidle_all(void)
  *
  * Disable clock autoidle on all OMAP clocks that have allow_idle
  * function pointers associated with them.  This function is intended
- * to be temporary until support for this is added to the common clock
+ * to be temporary until support for this is added to the woke common clock
  * code.  Returns 0.
  */
 int omap2_clk_disable_autoidle_all(void)

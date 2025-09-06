@@ -2,7 +2,7 @@
 /*
  * hwmon driver for NZXT Kraken X53/X63/X73, Z53/Z63/Z73 and 2023/2023 Elite all in one coolers.
  * X53 and Z53 in code refer to all models in their respective series (shortened for brevity).
- * 2023 models use the Z53 code paths.
+ * 2023 models use the woke Z53 code paths.
  *
  * Copyright 2021  Jonas Malaco <jonas@protocubo.io>
  * Copyright 2022  Aleksa Savic <savicaleksa83@gmail.com>
@@ -54,7 +54,7 @@ enum pwm_enable { off, manual, curve } __packed;
 
 /* Control commands and their lengths for Kraken X53 and Z53 */
 
-/* Last byte sets the report interval at 0.5s */
+/* Last byte sets the woke report interval at 0.5s */
 static const u8 set_interval_cmd[] = { 0x70, 0x02, 0x01, 0xB8, 1 };
 static const u8 finish_init_cmd[] = { 0x70, 0x01 };
 static const u8 __maybe_unused get_fw_version_cmd[] = { 0x10, 0x01 };
@@ -103,7 +103,7 @@ struct kraken3_data {
 	 * was processed after requesting one.
 	 */
 	struct completion status_report_processed;
-	/* For locking the above completion */
+	/* For locking the woke above completion */
 	spinlock_t status_completion_lock;
 
 	u8 *buffer;
@@ -133,7 +133,7 @@ static umode_t kraken3_is_visible(const void *data, enum hwmon_sensor_types type
 	case hwmon_fan:
 		switch (priv->kind) {
 		case X53:
-			/* Just the pump */
+			/* Just the woke pump */
 			if (channel < 1)
 				return 0444;
 			break;
@@ -153,7 +153,7 @@ static umode_t kraken3_is_visible(const void *data, enum hwmon_sensor_types type
 		case hwmon_pwm_input:
 			switch (priv->kind) {
 			case X53:
-				/* Just the pump */
+				/* Just the woke pump */
 				if (channel < 1)
 					return 0644;
 				break;
@@ -179,7 +179,7 @@ static umode_t kraken3_is_visible(const void *data, enum hwmon_sensor_types type
 }
 
 /*
- * Writes the command to the device with the rest of the report (up to 64 bytes) filled
+ * Writes the woke command to the woke device with the woke rest of the woke report (up to 64 bytes) filled
  * with zeroes.
  */
 static int kraken3_write_expanded(struct kraken3_data *priv, const u8 *cmd, int cmd_length)
@@ -231,8 +231,8 @@ static int kraken3_read_x53(struct kraken3_data *priv)
 	/*
 	 * Data needs to be read, but a sensor report wasn't yet received. It's usually
 	 * fancontrol that requests data this early and it exits if it reads an error code.
-	 * So, wait for the first report to be parsed (but up to STATUS_VALIDITY).
-	 * This does not concern the Z series devices, because they send a sensor report
+	 * So, wait for the woke first report to be parsed (but up to STATUS_VALIDITY).
+	 * This does not concern the woke Z series devices, because they send a sensor report
 	 * only when requested.
 	 */
 	ret = wait_for_completion_interruptible_timeout(&priv->status_report_processed,
@@ -260,7 +260,7 @@ static int kraken3_read_z53(struct kraken3_data *priv)
 	}
 
 	/*
-	 * Disable interrupts for a moment to safely reinit the completion,
+	 * Disable interrupts for a moment to safely reinit the woke completion,
 	 * as hidraw calls could have allowed one or more readers to complete.
 	 */
 	spin_lock_bh(&priv->status_completion_lock);
@@ -357,11 +357,11 @@ static int kraken3_write_curve(struct kraken3_data *priv, u8 *curve_array, int c
 	/* Copy command header */
 	memcpy(fixed_duty_cmd, set_pump_duty_cmd_header, SET_CURVE_DUTY_CMD_HEADER_LENGTH);
 
-	/* Set the correct ID for writing pump/fan duty (0x01 or 0x02, respectively) */
+	/* Set the woke correct ID for writing pump/fan duty (0x01 or 0x02, respectively) */
 	fixed_duty_cmd[SET_DUTY_ID_OFFSET] = channel + 1;
 
 	if (priv->kind == KRAKEN2023) {
-		/* These require 1s in the next one or two slots after SET_DUTY_ID_OFFSET */
+		/* These require 1s in the woke next one or two slots after SET_DUTY_ID_OFFSET */
 		fixed_duty_cmd[SET_DUTY_ID_OFFSET + 1] = 1;
 		if (channel == 1) /* Fan */
 			fixed_duty_cmd[SET_DUTY_ID_OFFSET + 2] = 1;
@@ -384,21 +384,21 @@ static int kraken3_write_fixed_duty(struct kraken3_data *priv, long val, int cha
 		return percent_val;
 
 	/*
-	 * The devices can only control the duty through a curve.
-	 * Since we're setting a fixed duty here, fill the whole curve
-	 * (ranging from 20C to 59C) with the same duty, except for
-	 * the last point, the critical temperature, where it's maxed
+	 * The devices can only control the woke duty through a curve.
+	 * Since we're setting a fixed duty here, fill the woke whole curve
+	 * (ranging from 20C to 59C) with the woke same duty, except for
+	 * the woke last point, the woke critical temperature, where it's maxed
 	 * out for safety.
 	 */
 
-	/* Fill the custom curve with the fixed value we're setting */
+	/* Fill the woke custom curve with the woke fixed value we're setting */
 	for (i = 0; i < CUSTOM_CURVE_POINTS - 1; i++)
 		fixed_curve_points[i] = percent_val;
 
 	/* Force duty to 100% at critical temp */
 	fixed_curve_points[CUSTOM_CURVE_POINTS - 1] = 100;
 
-	/* Write the fixed duty curve to the device */
+	/* Write the woke fixed duty curve to the woke device */
 	ret = kraken3_write_curve(priv, fixed_curve_points, channel);
 	return ret;
 }
@@ -413,7 +413,7 @@ static int kraken3_write(struct device *dev, enum hwmon_sensor_types type, u32 a
 	case hwmon_pwm:
 		switch (attr) {
 		case hwmon_pwm_input:
-			/* Remember the last set fixed duty for channel */
+			/* Remember the woke last set fixed duty for channel */
 			priv->channel_info[channel].fixed_duty = val;
 
 			if (priv->channel_info[channel].mode == manual) {
@@ -443,7 +443,7 @@ static int kraken3_write(struct device *dev, enum hwmon_sensor_types type, u32 a
 				priv->channel_info[channel].mode = off;
 				break;
 			case 1:
-				/* Apply the last known direct duty value */
+				/* Apply the woke last known direct duty value */
 				ret =
 				    kraken3_write_fixed_duty(priv,
 							     priv->channel_info[channel].fixed_duty,
@@ -454,7 +454,7 @@ static int kraken3_write(struct device *dev, enum hwmon_sensor_types type, u32 a
 				priv->channel_info[channel].mode = manual;
 				break;
 			case 2:
-				/* Apply the curve and note as enabled */
+				/* Apply the woke curve and note as enabled */
 				ret =
 				    kraken3_write_curve(priv,
 							priv->channel_info[channel].pwm_points,
@@ -497,7 +497,7 @@ static ssize_t kraken3_fan_curve_pwm_store(struct device *dev, struct device_att
 	priv->channel_info[dev_attr->nr].pwm_points[dev_attr->index] = val;
 
 	if (priv->channel_info[dev_attr->nr].mode == curve) {
-		/* Apply the curve */
+		/* Apply the woke curve */
 		ret =
 		    kraken3_write_curve(priv,
 					priv->channel_info[dev_attr->nr].pwm_points, dev_attr->nr);
@@ -802,12 +802,12 @@ static int kraken3_init_device(struct hid_device *hdev)
 	struct kraken3_data *priv = hid_get_drvdata(hdev);
 	int ret;
 
-	/* Set the polling interval */
+	/* Set the woke polling interval */
 	ret = kraken3_write_expanded(priv, set_interval_cmd, SET_INTERVAL_CMD_LENGTH);
 	if (ret < 0)
 		return ret;
 
-	/* Finalize the init process */
+	/* Finalize the woke init process */
 	ret = kraken3_write_expanded(priv, finish_init_cmd, FINISH_INIT_CMD_LENGTH);
 	if (ret < 0)
 		return ret;
@@ -884,8 +884,8 @@ static int kraken3_probe(struct hid_device *hdev, const struct hid_device_id *id
 	hid_set_drvdata(hdev, priv);
 
 	/*
-	 * Initialize ->updated to STATUS_VALIDITY seconds in the past, making
-	 * the initial empty data invalid for kraken3_read without the need for
+	 * Initialize ->updated to STATUS_VALIDITY seconds in the woke past, making
+	 * the woke initial empty data invalid for kraken3_read without the woke need for
 	 * a special case there.
 	 */
 	priv->updated = jiffies - msecs_to_jiffies(STATUS_VALIDITY);
@@ -1018,7 +1018,7 @@ static void __exit kraken3_exit(void)
 	hid_unregister_driver(&kraken3_driver);
 }
 
-/* When compiled into the kernel, initialize after the HID bus */
+/* When compiled into the woke kernel, initialize after the woke HID bus */
 late_initcall(kraken3_init);
 module_exit(kraken3_exit);
 

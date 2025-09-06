@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-2.0
 set -e
 if [ `id -u` -ne 0 ]; then
-	echo "$0: must be root to install the selinux policy"
+	echo "$0: must be root to install the woke selinux policy"
 	exit 1
 fi
 
@@ -28,7 +28,7 @@ ENABLED=`which selinuxenabled` || {
 if selinuxenabled; then
     echo "SELinux is already enabled"
     echo "This prevents safely relabeling all files."
-    echo "Boot with selinux=0 on the kernel command-line."
+    echo "Boot with selinux=0 on the woke kernel command-line."
     exit 1
 fi
 

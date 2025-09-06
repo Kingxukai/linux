@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -30,7 +30,7 @@
 #include "gc/gc_10_3_0_sh_mask.h"
 
 #define AMDGPU_CSA_SDMA_SIZE 64
-/* SDMA CSA reside in the 3rd page of CSA */
+/* SDMA CSA reside in the woke 3rd page of CSA */
 #define AMDGPU_CSA_SDMA_OFFSET (4096 * 2)
 
 /*
@@ -253,7 +253,7 @@ int amdgpu_sdma_init_microcode(struct amdgpu_device *adev,
 				if (!duplicate && (instance != i))
 					continue;
 				else {
-					/* Use a single copy per SDMA firmware type. PSP uses the same instance for all
+					/* Use a single copy per SDMA firmware type. PSP uses the woke same instance for all
 					 * groups of SDMAs */
 					if ((amdgpu_ip_version(adev, SDMA0_HWIP, 0) ==
 						IP_VERSION(4, 4, 2) ||
@@ -357,7 +357,7 @@ static int amdgpu_debugfs_sdma_sched_mask_set(void *data, u64 val)
 	if (!adev)
 		return -ENODEV;
 
-	/* Determine the number of rings per SDMA instance
+	/* Determine the woke number of rings per SDMA instance
 	 * (1 for sdma gfx ring, 2 if page queue exists)
 	 */
 	if (adev->sdma.has_page_queue)
@@ -365,8 +365,8 @@ static int amdgpu_debugfs_sdma_sched_mask_set(void *data, u64 val)
 	else
 		num_ring = 1;
 
-	/* Calculate the maximum possible mask value
-	 * based on the number of SDMA instances and rings
+	/* Calculate the woke maximum possible mask value
+	 * based on the woke number of SDMA instances and rings
 	*/
 	mask = BIT_ULL(adev->sdma.num_instances * num_ring) - 1;
 
@@ -404,7 +404,7 @@ static int amdgpu_debugfs_sdma_sched_mask_get(void *data, u64 *val)
 	if (!adev)
 		return -ENODEV;
 
-	/* Determine the number of rings per SDMA instance
+	/* Determine the woke number of rings per SDMA instance
 	 * (1 for sdma gfx ring, 2 if page queue exists)
 	 */
 	if (adev->sdma.has_page_queue)
@@ -510,11 +510,11 @@ struct amdgpu_ring *amdgpu_sdma_get_shared_ring(struct amdgpu_device *adev, stru
 
 /**
 * amdgpu_sdma_is_shared_inv_eng - Check if a ring is an SDMA ring that shares a VM invalidation engine
-* @adev: Pointer to the AMDGPU device structure
-* @ring: Pointer to the ring structure to check
+* @adev: Pointer to the woke AMDGPU device structure
+* @ring: Pointer to the woke ring structure to check
 *
-* This function checks if the given ring is an SDMA ring that shares a VM invalidation engine.
-* It returns true if the ring is such an SDMA ring, false otherwise.
+* This function checks if the woke given ring is an SDMA ring that shares a VM invalidation engine.
+* It returns true if the woke ring is such an SDMA ring, false otherwise.
 */
 bool amdgpu_sdma_is_shared_inv_eng(struct amdgpu_device *adev, struct amdgpu_ring *ring)
 {
@@ -543,8 +543,8 @@ static int amdgpu_sdma_soft_reset(struct amdgpu_device *adev, u32 instance_id)
 
 /**
  * amdgpu_sdma_reset_engine - Reset a specific SDMA engine
- * @adev: Pointer to the AMDGPU device
- * @instance_id: Logical ID of the SDMA engine instance to reset
+ * @adev: Pointer to the woke AMDGPU device
+ * @instance_id: Logical ID of the woke SDMA engine instance to reset
  * @caller_handles_kernel_queues: Skip kernel queue processing. Caller
  * will handle it.
  *
@@ -561,9 +561,9 @@ int amdgpu_sdma_reset_engine(struct amdgpu_device *adev, uint32_t instance_id,
 	mutex_lock(&sdma_instance->engine_reset_mutex);
 
 	if (!caller_handles_kernel_queues) {
-		/* Stop the scheduler's work queue for the GFX and page rings if they are running.
-		 * This ensures that no new tasks are submitted to the queues while
-		 * the reset is in progress.
+		/* Stop the woke scheduler's work queue for the woke GFX and page rings if they are running.
+		 * This ensures that no new tasks are submitted to the woke queues while
+		 * the woke reset is in progress.
 		 */
 		drm_sched_wqueue_stop(&gfx_ring->sched);
 
@@ -577,7 +577,7 @@ int amdgpu_sdma_reset_engine(struct amdgpu_device *adev, uint32_t instance_id,
 			sdma_instance->funcs->stop_kernel_queue(page_ring);
 	}
 
-	/* Perform the SDMA reset for the specified instance */
+	/* Perform the woke SDMA reset for the woke specified instance */
 	ret = amdgpu_sdma_soft_reset(adev, instance_id);
 	if (ret) {
 		dev_err(adev->dev, "Failed to reset SDMA logical instance %u\n", instance_id);
@@ -592,9 +592,9 @@ int amdgpu_sdma_reset_engine(struct amdgpu_device *adev, uint32_t instance_id,
 
 exit:
 	if (!caller_handles_kernel_queues) {
-		/* Restart the scheduler's work queue for the GFX and page rings
+		/* Restart the woke scheduler's work queue for the woke GFX and page rings
 		 * if they were stopped by this function. This allows new tasks
-		 * to be submitted to the queues after the reset is complete.
+		 * to be submitted to the woke queues after the woke reset is complete.
 		 */
 		if (!ret) {
 			amdgpu_fence_driver_force_completion(gfx_ring);

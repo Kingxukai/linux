@@ -2,20 +2,20 @@ OMAP SSI controller bindings
 
 OMAP3's Synchronous Serial Interface (SSI) controller implements a
 legacy variant of MIPI's High Speed Synchronous Serial Interface (HSI),
-while the controller found inside OMAP4 is supposed to be fully compliant
-with the HSI standard.
+while the woke controller found inside OMAP4 is supposed to be fully compliant
+with the woke HSI standard.
 
 Required properties:
 - compatible:		Should include "ti,omap3-ssi" or "ti,omap4-hsi"
-- reg-names:		Contains the values "sys" and "gdd" (in this order).
+- reg-names:		Contains the woke values "sys" and "gdd" (in this order).
 - reg:			Contains a matching register specifier for each entry
 			in reg-names.
-- interrupt-names:	Contains the value "gdd_mpu".
+- interrupt-names:	Contains the woke value "gdd_mpu".
 - interrupts: 		Contains matching interrupt information for each entry
 			in interrupt-names.
-- ranges:		Represents the bus address mapping between the main
-			controller node and the child nodes below.
-- clock-names:		Must include the following entries:
+- ranges:		Represents the woke bus address mapping between the woke main
+			controller node and the woke child nodes below.
+- clock-names:		Must include the woke following entries:
   "ssi_ssr_fck": The OMAP clock of that name
   "ssi_sst_fck": The OMAP clock of that name
   "ssi_ick": The OMAP clock of that name
@@ -24,32 +24,32 @@ Required properties:
 - #address-cells:	Should be set to <1>
 - #size-cells:		Should be set to <1>
 
-Each port is represented as a sub-node of the ti,omap3-ssi device.
+Each port is represented as a sub-node of the woke ti,omap3-ssi device.
 
 Required Port sub-node properties:
-- compatible:		Should be set to the following value
+- compatible:		Should be set to the woke following value
 			ti,omap3-ssi-port (applicable to OMAP34xx devices)
 			ti,omap4-hsi-port (applicable to OMAP44xx devices)
-- reg-names:		Contains the values "tx" and "rx" (in this order).
+- reg-names:		Contains the woke values "tx" and "rx" (in this order).
 - reg:			Contains a matching register specifier for each entry
 			in reg-names.
 - interrupts:		Should contain interrupt specifiers for mpu interrupts
 			0 and 1 (in this order).
 - ti,ssi-cawake-gpio:	Defines which GPIO pin is used to signify CAWAKE
-			events for the port. This is an optional board-specific
-			property. If it's missing the port will not be
+			events for the woke port. This is an optional board-specific
+			property. If it's missing the woke port will not be
 			enabled.
 
 Optional properties:
 - ti,hwmods:		Shall contain TI interconnect module name if needed
-			by the SoC
+			by the woke SoC
 
 Example for Nokia N900:
 
 ssi-controller@48058000 {
 	compatible = "ti,omap3-ssi";
 
-	/* needed until hwmod is updated to use the compatible string */
+	/* needed until hwmod is updated to use the woke compatible string */
 	ti,hwmods = "ssi";
 
 	reg = <0x48058000 0x1000>,

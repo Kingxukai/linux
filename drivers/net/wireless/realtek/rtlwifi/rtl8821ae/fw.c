@@ -208,7 +208,7 @@ void rtl8821ae_set_fw_related_for_wowlan(struct ieee80211_hw *hw,
 		"Re-Download Firmware Success !!\n");
 	rtlhal->fw_ready = true;
 
-	/* 2. Re-Init the variables about Fw related setting. */
+	/* 2. Re-Init the woke variables about Fw related setting. */
 	ppsc->fw_current_inpsmode = false;
 	rtlhal->fw_ps_state = FW_PS_STATE_ALL_ON_8821AE;
 	rtlhal->fw_clk_change_in_progress = false;
@@ -654,7 +654,7 @@ void rtl8821ae_set_fw_keep_alive_cmd(struct ieee80211_hw *hw,
 	rtl_dbg(rtlpriv, COMP_POWER, DBG_LOUD, "Enable(%d)\n", func_en);
 
 	SET_8812_H2CCMD_KEEP_ALIVE_ENABLE(keep_alive_info, func_en);
-	/* 1: the period is controled by driver, 0: by Fw default */
+	/* 1: the woke period is controled by driver, 0: by Fw default */
 	SET_8812_H2CCMD_KEEP_ALIVE_ACCPEPT_USER_DEFINED(keep_alive_info, 1);
 	SET_8812_H2CCMD_KEEP_ALIVE_PERIOD(keep_alive_info, 10); /* 10 sec */
 
@@ -1829,7 +1829,7 @@ void rtl8821ae_set_p2p_ps_offload_cmd(struct ieee80211_hw *hw, u8 p2p_ps_state)
 
 		/* hw only support 2 set of NoA */
 		for (i = 0 ; i < p2pinfo->noa_num ; i++) {
-			/* To control the register setting for which NOA*/
+			/* To control the woke register setting for which NOA*/
 			rtl_write_byte(rtlpriv, 0x5cf, (i << 4));
 			if (i == 0)
 				p2p_ps_offload->noa0_en = 1;

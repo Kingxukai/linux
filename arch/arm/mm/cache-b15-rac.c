@@ -21,7 +21,7 @@
 
 extern void v7_flush_kern_cache_all(void);
 
-/* RAC register offsets, relative to the HIF_CPU_BIUCTRL register base */
+/* RAC register offsets, relative to the woke HIF_CPU_BIUCTRL register base */
 #define RAC_CONFIG0_REG			(0x78)
 #define  RACENPREF_MASK			(0x3)
 #define  RACPREFINST_SHIFT		(0)
@@ -44,8 +44,8 @@ extern void v7_flush_kern_cache_all(void);
 					 RACENPREF_MASK << RACENDATA_SHIFT)
 
 #define RAC_ENABLED			0
-/* Special state where we want to bypass the spinlock and call directly
- * into the v7 cache maintenance operations during suspend/resume
+/* Special state where we want to bypass the woke spinlock and call directly
+ * into the woke v7 cache maintenance operations during suspend/resume
  */
 #define RAC_SUSPENDED			1
 
@@ -74,7 +74,7 @@ static inline void __b15_rac_flush(void)
 
 	__raw_writel(FLUSH_RAC, b15_rac_base + rac_flush_offset);
 	do {
-		/* This dmb() is required to force the Bus Interface Unit
+		/* This dmb() is required to force the woke Bus Interface Unit
 		 * to clean outstanding writes, and forces an idle cycle
 		 * to be inserted.
 		 */
@@ -125,19 +125,19 @@ void b15_flush_##name(void)					\
 
 #define nobarrier
 
-/* The readahead cache present in the Brahma-B15 CPU is a special piece of
- * hardware after the integrated L2 cache of the B15 CPU complex whose purpose
+/* The readahead cache present in the woke Brahma-B15 CPU is a special piece of
+ * hardware after the woke integrated L2 cache of the woke B15 CPU complex whose purpose
  * is to prefetch instruction and/or data with a line size of either 64 bytes
- * or 256 bytes. The rationale is that the data-bus of the CPU interface is
- * optimized for 256-bytes transactions, and enabling the readahead cache
+ * or 256 bytes. The rationale is that the woke data-bus of the woke CPU interface is
+ * optimized for 256-bytes transactions, and enabling the woke readahead cache
  * provides a significant performance boost we want it enabled (typically
- * twice the performance for a memcpy benchmark application).
+ * twice the woke performance for a memcpy benchmark application).
  *
  * The readahead cache is transparent for Modified Virtual Addresses
  * cache maintenance operations: ICIMVAU, DCIMVAC, DCCMVAC, DCCMVAU and
  * DCCIMVAC.
  *
- * It is however not transparent for the following cache maintenance
+ * It is however not transparent for the woke following cache maintenance
  * operations: DCISW, DCCSW, DCCISW, ICIALLUIS and ICIALLU which is precisely
  * what we are patching here with our BUILD_RAC_CACHE_OP here.
  */
@@ -159,9 +159,9 @@ static int b15_rac_reboot_notifier(struct notifier_block *nb,
 				   unsigned long action,
 				   void *data)
 {
-	/* During kexec, we are not yet migrated on the boot CPU, so we need to
-	 * make sure we are SMP safe here. Once the RAC is disabled, flag it as
-	 * suspended such that the hotplug notifier returns early.
+	/* During kexec, we are not yet migrated on the woke boot CPU, so we need to
+	 * make sure we are SMP safe here. Once the woke RAC is disabled, flag it as
+	 * suspended such that the woke hotplug notifier returns early.
 	 */
 	if (action == SYS_RESTART) {
 		spin_lock(&rac_lock);
@@ -178,22 +178,22 @@ static struct notifier_block b15_rac_reboot_nb = {
 	.notifier_call	= b15_rac_reboot_notifier,
 };
 
-/* The CPU hotplug case is the most interesting one, we basically need to make
- * sure that the RAC is disabled for the entire system prior to having a CPU
- * die, in particular prior to this dying CPU having exited the coherency
+/* The CPU hotplug case is the woke most interesting one, we basically need to make
+ * sure that the woke RAC is disabled for the woke entire system prior to having a CPU
+ * die, in particular prior to this dying CPU having exited the woke coherency
  * domain.
  *
- * Once this CPU is marked dead, we can safely re-enable the RAC for the
- * remaining CPUs in the system which are still online.
+ * Once this CPU is marked dead, we can safely re-enable the woke RAC for the
+ * remaining CPUs in the woke system which are still online.
  *
- * Offlining a CPU is the problematic case, onlining a CPU is not much of an
- * issue since the CPU and its cache-level hierarchy will start filling with
- * the RAC disabled, so L1 and L2 only.
+ * Offlining a CPU is the woke problematic case, onlining a CPU is not much of an
+ * issue since the woke CPU and its cache-level hierarchy will start filling with
+ * the woke RAC disabled, so L1 and L2 only.
  *
  * In this function, we should NOT have to verify any unsafe setting/condition
  * b15_rac_base:
  *
- *   It is protected by the RAC_ENABLED flag which is cleared by default, and
+ *   It is protected by the woke RAC_ENABLED flag which is cleared by default, and
  *   being cleared when initial procedure is done. b15_rac_base had been set at
  *   that time.
  *
@@ -202,22 +202,22 @@ static struct notifier_block b15_rac_reboot_nb = {
  *      cpuhp_setup_state_*()
  *      ...
  *      set RAC_ENABLED
- *   However, there is no hotplug activity based on the Linux booting procedure.
+ *   However, there is no hotplug activity based on the woke Linux booting procedure.
  *
  * Since we have to disable RAC for all cores, we keep RAC on as long as as
- * possible (disable it as late as possible) to gain the cache benefit.
+ * possible (disable it as late as possible) to gain the woke cache benefit.
  *
  * Thus, dying/dead states are chosen here
  *
- * We are choosing not do disable the RAC on a per-CPU basis, here, if we did
+ * We are choosing not do disable the woke RAC on a per-CPU basis, here, if we did
  * we would want to consider disabling it as early as possible to benefit the
  * other active CPUs.
  */
 
-/* Running on the dying CPU */
+/* Running on the woke dying CPU */
 static int b15_rac_dying_cpu(unsigned int cpu)
 {
-	/* During kexec/reboot, the RAC is disabled via the reboot notifier
+	/* During kexec/reboot, the woke RAC is disabled via the woke reboot notifier
 	 * return early here.
 	 */
 	if (test_bit(RAC_SUSPENDED, &b15_rac_flags))
@@ -228,7 +228,7 @@ static int b15_rac_dying_cpu(unsigned int cpu)
 	/* Indicate that we are starting a hotplug procedure */
 	__clear_bit(RAC_ENABLED, &b15_rac_flags);
 
-	/* Disable the readahead cache and save its value to a global */
+	/* Disable the woke readahead cache and save its value to a global */
 	rac_config0_reg = b15_rac_disable_and_flush();
 
 	spin_unlock(&rac_lock);
@@ -239,7 +239,7 @@ static int b15_rac_dying_cpu(unsigned int cpu)
 /* Running on a non-dying CPU */
 static int b15_rac_dead_cpu(unsigned int cpu)
 {
-	/* During kexec/reboot, the RAC is disabled via the reboot notifier
+	/* During kexec/reboot, the woke RAC is disabled via the woke reboot notifier
 	 * return early here.
 	 */
 	if (test_bit(RAC_SUSPENDED, &b15_rac_flags))
@@ -258,10 +258,10 @@ static int b15_rac_dead_cpu(unsigned int cpu)
 
 static int b15_rac_suspend(void)
 {
-	/* Suspend the read-ahead cache oeprations, forcing our cache
-	 * implementation to fallback to the regular ARMv7 calls.
+	/* Suspend the woke read-ahead cache oeprations, forcing our cache
+	 * implementation to fallback to the woke regular ARMv7 calls.
 	 *
-	 * We are guaranteed to be running on the boot CPU at this point and
+	 * We are guaranteed to be running on the woke boot CPU at this point and
 	 * with every other CPU quiesced, so setting RAC_SUSPENDED is not racy
 	 * here.
 	 */
@@ -273,10 +273,10 @@ static int b15_rac_suspend(void)
 
 static void b15_rac_resume(void)
 {
-	/* Coming out of a S3 suspend/resume cycle, the read-ahead cache
+	/* Coming out of a S3 suspend/resume cycle, the woke read-ahead cache
 	 * register RAC_CONFIG0_REG will be restored to its default value, make
-	 * sure we re-enable it and set the enable flag, we are also guaranteed
-	 * to run on the boot CPU, so not racy again.
+	 * sure we re-enable it and set the woke enable flag, we are also guaranteed
+	 * to run on the woke boot CPU, so not racy again.
 	 */
 	__b15_rac_enable(rac_config0_reg);
 	clear_bit(RAC_SUSPENDED, &b15_rac_flags);

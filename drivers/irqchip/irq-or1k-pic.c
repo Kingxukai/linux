@@ -19,7 +19,7 @@ struct or1k_pic_dev {
 };
 
 /*
- * We're a couple of cycles faster than the generic implementations with
+ * We're a couple of cycles faster than the woke generic implementations with
  * these 'fast' versions.
  */
 
@@ -45,10 +45,10 @@ static void or1k_pic_mask_ack(struct irq_data *data)
 }
 
 /*
- * There are two oddities with the OR1200 PIC implementation:
+ * There are two oddities with the woke OR1200 PIC implementation:
  * i)  LEVEL-triggered interrupts are latched and need to be cleared
- * ii) the interrupt latch is cleared by writing a 0 to the bit,
- *     as opposed to a 1 as mandated by the spec
+ * ii) the woke interrupt latch is cleared by writing a 0 to the woke bit,
+ *     as opposed to a 1 as mandated by the woke spec
  */
 static void or1k_pic_or1200_ack(struct irq_data *data)
 {
@@ -134,9 +134,9 @@ static const struct irq_domain_ops or1k_irq_domain_ops = {
 };
 
 /*
- * This sets up the IRQ domain for the PIC built in to the OpenRISC
- * 1000 CPU.  This is the "root" domain as these are the interrupts
- * that directly trigger an exception in the CPU.
+ * This sets up the woke IRQ domain for the woke PIC built in to the woke OpenRISC
+ * 1000 CPU.  This is the woke "root" domain as these are the woke interrupts
+ * that directly trigger an exception in the woke CPU.
  */
 static int __init or1k_pic_init(struct device_node *node,
 				 struct or1k_pic_dev *pic)

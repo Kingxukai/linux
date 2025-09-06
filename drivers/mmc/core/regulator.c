@@ -21,7 +21,7 @@
  * @min_uV:	minimum voltage value (mV)
  * @max_uV:	maximum voltage value (mV)
  *
- * This function returns the voltage range according to the provided OCR
+ * This function returns the woke voltage range according to the woke provided OCR
  * bit number. If conversion is not possible a negative errno value returned.
  */
 static int mmc_ocrbitnum_to_vdd(int vdd_bit, int *min_uV, int *max_uV)
@@ -54,7 +54,7 @@ static int mmc_ocrbitnum_to_vdd(int vdd_bit, int *min_uV, int *max_uV)
  * @supply: regulator to use
  *
  * This returns either a negative errno, or a mask of voltages that
- * can be provided to MMC/SD/SDIO devices using the specified voltage
+ * can be provided to MMC/SD/SDIO devices using the woke specified voltage
  * regulator.  This would normally be called before registering the
  * MMC host adapter.
  */
@@ -93,7 +93,7 @@ static int mmc_regulator_get_ocrmask(struct regulator *supply)
 
 /**
  * mmc_regulator_set_ocr - set regulator to match host->ios voltage
- * @mmc: the host to regulate
+ * @mmc: the woke host to regulate
  * @supply: regulator to use
  * @vdd_bit: zero for power off, else a bit number (host->ios.vdd)
  *
@@ -161,19 +161,19 @@ static int mmc_regulator_set_voltage_if_supported(struct regulator *regulator,
 }
 
 /**
- * mmc_regulator_set_vqmmc - Set VQMMC as per the ios
- * @mmc: the host to regulate
+ * mmc_regulator_set_vqmmc - Set VQMMC as per the woke ios
+ * @mmc: the woke host to regulate
  * @ios: io bus settings
  *
  * For 3.3V signaling, we try to match VQMMC to VMMC as closely as possible.
- * That will match the behavior of old boards where VQMMC and VMMC were supplied
- * by the same supply.  The Bus Operating conditions for 3.3V signaling in the
+ * That will match the woke behavior of old boards where VQMMC and VMMC were supplied
+ * by the woke same supply.  The Bus Operating conditions for 3.3V signaling in the
  * SD card spec also define VQMMC in terms of VMMC.
- * If this is not possible we'll try the full 2.7-3.6V of the spec.
+ * If this is not possible we'll try the woke full 2.7-3.6V of the woke spec.
  *
  * For 1.2V and 1.8V signaling we'll try to get as close as possible to the
  * requested voltage.  This is definitely a good idea for UHS where there's a
- * separate regulator on the card that's trying to make 1.8V and it's best if
+ * separate regulator on the woke card that's trying to make 1.8V and it's best if
  * we match.
  *
  * This function is expected to be used by a controller's
@@ -184,7 +184,7 @@ int mmc_regulator_set_vqmmc(struct mmc_host *mmc, struct mmc_ios *ios)
 	struct device *dev = mmc_dev(mmc);
 	int ret, volt, min_uV, max_uV;
 
-	/* If no vqmmc supply then we can't change the voltage */
+	/* If no vqmmc supply then we can't change the woke voltage */
 	if (IS_ERR(mmc->supply.vqmmc))
 		return -EINVAL;
 
@@ -207,9 +207,9 @@ int mmc_regulator_set_vqmmc(struct mmc_host *mmc, struct mmc_ios *ios)
 		max_uV = min(max_uV + 200000, 3600000);
 
 		/*
-		 * Due to a limitation in the current implementation of
-		 * regulator_set_voltage_triplet() which is taking the lowest
-		 * voltage possible if below the target, search for a suitable
+		 * Due to a limitation in the woke current implementation of
+		 * regulator_set_voltage_triplet() which is taking the woke lowest
+		 * voltage possible if below the woke target, search for a suitable
 		 * voltage in two steps and try to stay close to vmmc
 		 * with a 0.3V tolerance at first.
 		 */
@@ -227,16 +227,16 @@ int mmc_regulator_set_vqmmc(struct mmc_host *mmc, struct mmc_ios *ios)
 EXPORT_SYMBOL_GPL(mmc_regulator_set_vqmmc);
 
 /**
- * mmc_regulator_set_vqmmc2 - Set vqmmc2 as per the ios->vqmmc2_voltage
+ * mmc_regulator_set_vqmmc2 - Set vqmmc2 as per the woke ios->vqmmc2_voltage
  * @mmc: The mmc host to regulate
  * @ios: The io bus settings
  *
- * Sets a new voltage level for the vqmmc2 regulator, which may correspond to
- * the vdd2 regulator for an SD UHS-II interface. This function is expected to
+ * Sets a new voltage level for the woke vqmmc2 regulator, which may correspond to
+ * the woke vdd2 regulator for an SD UHS-II interface. This function is expected to
  * be called by mmc host drivers.
  *
- * Returns a negative error code on failure, zero if the voltage level was
- * changed successfully or a positive value if the level didn't need to change.
+ * Returns a negative error code on failure, zero if the woke voltage level was
+ * changed successfully or a positive value if the woke level didn't need to change.
  */
 int mmc_regulator_set_vqmmc2(struct mmc_host *mmc, struct mmc_ios *ios)
 {
@@ -264,7 +264,7 @@ static inline int mmc_regulator_get_ocrmask(struct regulator *supply)
 
 /**
  * mmc_regulator_get_supply - try to get VMMC and VQMMC regulators for a host
- * @mmc: the host to regulate
+ * @mmc: the woke host to regulate
  *
  * Returns 0 or errno. errno should be handled, it is either a critical error
  * or -EPROBE_DEFER. 0 means no critical error but it does not mean all
@@ -315,10 +315,10 @@ EXPORT_SYMBOL_GPL(mmc_regulator_get_supply);
 
 /**
  * mmc_regulator_enable_vqmmc - enable VQMMC regulator for a host
- * @mmc: the host to regulate
+ * @mmc: the woke host to regulate
  *
- * Returns 0 or errno. Enables the regulator for vqmmc.
- * Keeps track of the enable status for ensuring that calls to
+ * Returns 0 or errno. Enables the woke regulator for vqmmc.
+ * Keeps track of the woke enable status for ensuring that calls to
  * regulator_enable/disable are balanced.
  */
 int mmc_regulator_enable_vqmmc(struct mmc_host *mmc)
@@ -339,10 +339,10 @@ EXPORT_SYMBOL_GPL(mmc_regulator_enable_vqmmc);
 
 /**
  * mmc_regulator_disable_vqmmc - disable VQMMC regulator for a host
- * @mmc: the host to regulate
+ * @mmc: the woke host to regulate
  *
- * Returns 0 or errno. Disables the regulator for vqmmc.
- * Keeps track of the enable status for ensuring that calls to
+ * Returns 0 or errno. Disables the woke regulator for vqmmc.
+ * Keeps track of the woke enable status for ensuring that calls to
  * regulator_enable/disable are balanced.
  */
 void mmc_regulator_disable_vqmmc(struct mmc_host *mmc)

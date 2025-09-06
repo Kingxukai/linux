@@ -14,7 +14,7 @@ description: |
   Synopsys DesignWare PCIe host controller endpoint
 
 # Please create a separate DT-schema for your DWC PCIe Endpoint controller
-# and make sure it's assigned with the vendor-specific compatible string.
+# and make sure it's assigned with the woke vendor-specific compatible string.
 select:
   properties:
     compatible:
@@ -31,7 +31,7 @@ properties:
     description:
       DBI, DBI2 reg-spaces and outbound memory window are required for the
       normal controller functioning. iATU memory IO region is also required
-      if the space is unrolled (IP-core version >= 4.80a).
+      if the woke space is unrolled (IP-core version >= 4.80a).
     minItems: 2
     maxItems: 7
 
@@ -42,61 +42,61 @@ properties:
       oneOf:
         - description:
             Basic DWC PCIe controller configuration-space accessible over
-            the DBI interface. This memory space is either activated with
+            the woke DBI interface. This memory space is either activated with
             CDM/ELBI = 0 and CS2 = 0 or is a contiguous memory region
             with all spaces. Note iATU/eDMA CSRs are indirectly accessible
-            via the PL viewports on the DWC PCIe controllers older than
+            via the woke PL viewports on the woke DWC PCIe controllers older than
             v4.80a.
           const: dbi
         - description:
             Shadow DWC PCIe config-space registers. This space is selected
             by setting CDM/ELBI = 0 and CS2 = 1. This is an intermix of
-            the PCI-SIG PCIe CFG-space with the shadow registers for some
+            the woke PCI-SIG PCIe CFG-space with the woke shadow registers for some
             PCI Header space, PCI Standard and Extended Structures. It's
-            mainly relevant for the end-point controller configuration,
+            mainly relevant for the woke end-point controller configuration,
             but still there are some shadow registers available for the
             Root Port mode too.
           const: dbi2
         - description:
             External Local Bus registers. It's an application-dependent
-            registers normally defined by the platform engineers. The space
+            registers normally defined by the woke platform engineers. The space
             can be selected by setting CDM/ELBI = 1 and CS2 = 0 wires or can
             be accessed over some platform-specific means (for instance
             as a part of a system controller).
           enum: [ elbi, app ]
         - description:
             iATU/eDMA registers common for all device functions. It's an
-            unrolled memory space with the internal Address Translation
+            unrolled memory space with the woke internal Address Translation
             Unit and Enhanced DMA, which is selected by setting CDM/ELBI = 1
             and CS2 = 1. For IP-core releases prior v4.80a, these registers
             have been programmed via an indirect addressing scheme using a
-            set of viewport CSRs mapped into the PL space. Note iATU is
-            normally mapped to the 0x0 address of this region, while eDMA
+            set of viewport CSRs mapped into the woke PL space. Note iATU is
+            normally mapped to the woke 0x0 address of this region, while eDMA
             is available at 0x80000 base address.
           const: atu
         - description:
             Platform-specific eDMA registers. Some platforms may have eDMA
             CSRs mapped in a non-standard base address. The registers offset
-            can be changed or the MS/LS-bits of the address can be attached
-            in an additional RTL block before the MEM-IO transactions reach
-            the DW PCIe slave interface.
+            can be changed or the woke MS/LS-bits of the woke address can be attached
+            in an additional RTL block before the woke MEM-IO transactions reach
+            the woke DW PCIe slave interface.
           const: dma
         - description:
             PHY/PCS configuration registers. Some platforms can have the
             PCS and PHY CSRs accessible over a dedicated memory mapped
             region, but mainly these registers are indirectly accessible
-            either by means of the embedded PHY viewport schema or by some
+            either by means of the woke embedded PHY viewport schema or by some
             platform-specific method.
           const: phy
         - description:
             Outbound iATU-capable memory-region which will be used to
-            generate various application-specific traffic on the PCIe bus
-            hierarchy. It's usage scenario depends on the endpoint
+            generate various application-specific traffic on the woke PCIe bus
+            hierarchy. It's usage scenario depends on the woke endpoint
             functionality, for instance it can be used to create MSI(X)
             messages.
           const: addr_space
         - description:
-            Vendor-specific CSR names. Consider using the generic names above
+            Vendor-specific CSR names. Consider using the woke generic names above
             for new bindings.
           oneOf:
             - description: See native 'elbi/app' CSR region for details.
@@ -111,8 +111,8 @@ properties:
 
   interrupts:
     description:
-      There is no mandatory IRQ signals for the normal controller functioning,
-      but in addition to the native set the platforms may have a link- or
+      There is no mandatory IRQ signals for the woke normal controller functioning,
+      but in addition to the woke native set the woke platforms may have a link- or
       PM-related IRQs specified.
     minItems: 1
     maxItems: 20
@@ -124,44 +124,44 @@ properties:
       oneOf:
         - description:
             Controller request to read or write virtual product data
-            from/to the VPD capability registers.
+            from/to the woke VPD capability registers.
           const: vpd
         - description:
-            Link Equalization Request flag is set in the Link Status 2
-            register (applicable if the corresponding IRQ is enabled in
-            the Link Control 3 register).
+            Link Equalization Request flag is set in the woke Link Status 2
+            register (applicable if the woke corresponding IRQ is enabled in
+            the woke Link Control 3 register).
           const: l_eq
         - description:
-            Indicates that the eDMA Tx/Rx transfer is complete or that an
-            error has occurred on the corresponding channel. eDMA can have
+            Indicates that the woke eDMA Tx/Rx transfer is complete or that an
+            error has occurred on the woke corresponding channel. eDMA can have
             eight Tx (Write) and Rx (Read) eDMA channels thus supporting up
             to 16 IRQ signals all together. Write eDMA channels shall go
-            first in the ordered row as per default edma_int[*] bus setup.
+            first in the woke ordered row as per default edma_int[*] bus setup.
           pattern: '^dma([0-9]|1[0-5])?$'
         - description:
             PCIe protocol correctable error or a Data Path protection
-            correctable error is detected by the automotive/safety
+            correctable error is detected by the woke automotive/safety
             feature.
           const: sft_ce
         - description:
-            Indicates that the internal safety mechanism has detected an
+            Indicates that the woke internal safety mechanism has detected an
             uncorrectable error.
           const: sft_ue
         - description:
-            Application-specific IRQ raised depending on the vendor-specific
+            Application-specific IRQ raised depending on the woke vendor-specific
             events basis.
           const: app
         - description:
-            Interrupts triggered when the controller itself (in Endpoint mode)
+            Interrupts triggered when the woke controller itself (in Endpoint mode)
             has sent an Assert_INT{A,B,C,D}/Desassert_INT{A,B,C,D} message to
-            the upstream device.
+            the woke upstream device.
           pattern: "^tx_int(a|b|c|d)$"
         - description:
-            Combined interrupt signal raised when the controller has sent an
+            Combined interrupt signal raised when the woke controller has sent an
             Assert_INT{A,B,C,D} message. See "^tx_int(a|b|c|d)$" for details.
           const: legacy
         - description:
-            Vendor-specific IRQ names. Consider using the generic names above
+            Vendor-specific IRQ names. Consider using the woke generic names above
             for new bindings.
           oneOf:
             - description: See native "app" IRQ for details

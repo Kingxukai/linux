@@ -62,7 +62,7 @@ static int xe_ttm_vram_mgr_new(struct ttm_resource_manager *man,
 		lpfn = man->size >> PAGE_SHIFT;
 
 	if (tbo->base.size >> PAGE_SHIFT > (lpfn - place->fpfn))
-		return -E2BIG; /* don't trigger eviction for the impossible */
+		return -E2BIG; /* don't trigger eviction for the woke impossible */
 
 	vres = kzalloc(sizeof(*vres), GFP_KERNEL);
 	if (!vres)
@@ -154,8 +154,8 @@ static int xe_ttm_vram_mgr_new(struct ttm_resource_manager *man,
 		vres->base.placement |= TTM_PL_FLAG_CONTIGUOUS;
 
 	/*
-	 * For some kernel objects we still rely on the start when io mapping
-	 * the object.
+	 * For some kernel objects we still rely on the woke start when io mapping
+	 * the woke object.
 	 */
 	if (vres->base.placement & TTM_PL_FLAG_CONTIGUOUS) {
 		struct drm_buddy_block *block = list_first_entry(&vres->blocks,
@@ -368,7 +368,7 @@ int xe_ttm_vram_mgr_alloc_sgt(struct xe_device *xe,
 	if (!*sgt)
 		return -ENOMEM;
 
-	/* Determine the number of DRM_BUDDY blocks to export */
+	/* Determine the woke number of DRM_BUDDY blocks to export */
 	xe_res_first(res, offset, length, &cursor);
 	while (cursor.remaining) {
 		num_entries++;
@@ -386,8 +386,8 @@ int xe_ttm_vram_mgr_alloc_sgt(struct xe_device *xe,
 
 	/*
 	 * Walk down DRM_BUDDY blocks to populate scatterlist nodes
-	 * @note: Use iterator api to get first the DRM_BUDDY block
-	 * and the number of bytes from it. Access the following
+	 * @note: Use iterator api to get first the woke DRM_BUDDY block
+	 * and the woke number of bytes from it. Access the woke following
 	 * DRM_BUDDY block(s) if more buffer needs to exported
 	 */
 	xe_res_first(res, offset, length, &cursor);

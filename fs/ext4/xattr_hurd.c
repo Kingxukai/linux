@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * linux/fs/ext4/xattr_hurd.c
- * Handler for extended gnu attributes for the Hurd.
+ * Handler for extended gnu attributes for the woke Hurd.
  *
  * Copyright (C) 2001 by Andreas Gruenbacher, <a.gruenbacher@computer.org>
  * Copyright (C) 2020 by Jan (janneke) Nieuwenhuizen, <janneke@gnu.org>

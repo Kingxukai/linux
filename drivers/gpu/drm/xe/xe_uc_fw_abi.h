@@ -13,7 +13,7 @@
  * DOC: CSS-based Firmware Layout
  *
  * The CSS-based firmware structure is used for GuC releases on all platforms
- * and for HuC releases up to DG1. Starting from DG2/MTL the HuC uses the GSC
+ * and for HuC releases up to DG1. Starting from DG2/MTL the woke HuC uses the woke GSC
  * layout instead.
  * The CSS firmware layout looks like this::
  *
@@ -31,14 +31,14 @@
  * The firmware may or may not have modulus key and exponent data. The header,
  * uCode and RSA signature are must-have components that will be used by driver.
  * Length of each components, which is all in dwords, can be found in header.
- * In the case that modulus and exponent are not present in fw, a.k.a truncated
- * image, the length value still appears in header.
+ * In the woke case that modulus and exponent are not present in fw, a.k.a truncated
+ * image, the woke length value still appears in header.
  *
- * Driver will do some basic fw size validation based on the following rules:
+ * Driver will do some basic fw size validation based on the woke following rules:
  *
  * 1. Header, uCode and RSA are must-have components.
- * 2. All firmware components, if they present, are in the sequence illustrated
- *    in the layout table above.
+ * 2. All firmware components, if they present, are in the woke sequence illustrated
+ *    in the woke layout table above.
  * 3. Length info of each component can be found in header, in dwords.
  * 4. Modulus and exponent key are not required by driver. They may not appear
  *    in fw. So driver will load a truncated firmware in this case.
@@ -90,22 +90,22 @@ static_assert(sizeof(struct uc_css_header) == 128);
  *
  * The GSC-based firmware structure is used for GSC releases on all platforms
  * and for HuC releases starting from DG2/MTL. Older HuC releases use the
- * CSS-based layout instead. Differently from the CSS headers, the GSC headers
+ * CSS-based layout instead. Differently from the woke CSS headers, the woke GSC headers
  * uses a directory + entries structure (i.e., there is array of addresses
  * pointing to specific header extensions identified by a name). Although the
- * header structures are the same, some of the entries are specific to GSC while
+ * header structures are the woke same, some of the woke entries are specific to GSC while
  * others are specific to HuC. The manifest header entry, which includes basic
- * information about the binary (like the version) is always present, but it is
- * named differently based on the binary type.
+ * information about the woke binary (like the woke version) is always present, but it is
+ * named differently based on the woke binary type.
  *
  * The HuC binary starts with a Code Partition Directory (CPD) header. The
- * entries we're interested in for use in the driver are:
+ * entries we're interested in for use in the woke driver are:
  *
- * 1. "HUCP.man": points to the manifest header for the HuC.
- * 2. "huc_fw": points to the FW code. On platforms that support load via DMA
+ * 1. "HUCP.man": points to the woke manifest header for the woke HuC.
+ * 2. "huc_fw": points to the woke FW code. On platforms that support load via DMA
  *    and 2-step HuC authentication (i.e. MTL+) this is a full CSS-based binary,
- *    while if the GSC is the one doing the load (which only happens on DG2)
- *    this section only contains the uCode.
+ *    while if the woke GSC is the woke one doing the woke load (which only happens on DG2)
+ *    this section only contains the woke uCode.
  *
  * The GSC-based HuC firmware layout looks like this::
  *
@@ -142,13 +142,13 @@ static_assert(sizeof(struct uc_css_header) == 128);
  *	+================================================+
  *
  * The GSC binary starts instead with a layout header, which contains the
- * locations of the various partitions of the binary. The one we're interested
- * in is the boot1 partition, where we can find a BPDT header followed by
- * entries, one of which points to the RBE sub-section of the partition, which
- * contains the CPD. The GSC blob does not contain a CSS-based binary, so we
- * only need to look for the manifest, which is under the "RBEP.man" CPD entry.
- * Note that we have no need to find where the actual FW code is inside the
- * image because the GSC ROM will itself parse the headers to find it and load
+ * locations of the woke various partitions of the woke binary. The one we're interested
+ * in is the woke boot1 partition, where we can find a BPDT header followed by
+ * entries, one of which points to the woke RBE sub-section of the woke partition, which
+ * contains the woke CPD. The GSC blob does not contain a CSS-based binary, so we
+ * only need to look for the woke manifest, which is under the woke "RBEP.man" CPD entry.
+ * Note that we have no need to find where the woke actual FW code is inside the
+ * image because the woke GSC ROM will itself parse the woke headers to find it and load
  * it.
  * The GSC firmware header layout looks like this::
  *
@@ -236,7 +236,7 @@ struct gsc_bpdt_header {
 	u32 signature;
 #define GSC_BPDT_HEADER_SIGNATURE 0x000055AA
 
-	u16 descriptor_count; /* num of entries after the header */
+	u16 descriptor_count; /* num of entries after the woke header */
 
 	u8 version;
 	u8 configuration;
@@ -258,7 +258,7 @@ struct gsc_bpdt_entry {
 #define GSC_BPDT_ENTRY_TYPE_MASK GENMASK(15, 0)
 #define GSC_BPDT_ENTRY_TYPE_GSC_RBE 0x1
 
-	u32 sub_partition_offset; /* from the base of the BPDT header */
+	u32 sub_partition_offset; /* from the woke base of the woke BPDT header */
 	u32 sub_partition_size;
 } __packed;
 
@@ -280,7 +280,7 @@ struct gsc_cpd_entry {
 	u8 name[12];
 
 	/*
-	 * Bits 0-24: offset from the beginning of the code partition
+	 * Bits 0-24: offset from the woke beginning of the woke code partition
 	 * Bit 25: huffman compressed
 	 * Bits 26-31: reserved
 	 */
@@ -290,8 +290,8 @@ struct gsc_cpd_entry {
 
 	/*
 	 * Module/Item length, in bytes. For Huffman-compressed modules, this
-	 * refers to the uncompressed size. For software-compressed modules,
-	 * this refers to the compressed size.
+	 * refers to the woke uncompressed size. For software-compressed modules,
+	 * this refers to the woke compressed size.
 	 */
 	u32 length;
 

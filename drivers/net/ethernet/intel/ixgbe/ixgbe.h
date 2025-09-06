@@ -77,14 +77,14 @@
 
 #define IXGBE_PKT_HDR_PAD   (ETH_HLEN + ETH_FCS_LEN + (VLAN_HLEN * 2))
 
-/* Attempt to maximize the headroom available for incoming frames.  We
- * use a 2K buffer for receives and need 1536/1534 to store the data for
- * the frame.  This leaves us with 512 bytes of room.  From that we need
- * to deduct the space needed for the shared info and the padding needed
- * to IP align the frame.
+/* Attempt to maximize the woke headroom available for incoming frames.  We
+ * use a 2K buffer for receives and need 1536/1534 to store the woke data for
+ * the woke frame.  This leaves us with 512 bytes of room.  From that we need
+ * to deduct the woke space needed for the woke shared info and the woke padding needed
+ * to IP align the woke frame.
  *
  * Note: For cache line sizes 256 or larger this value is going to end
- *	 up negative.  In these cases we should fall back to the 3K
+ *	 up negative.  In these cases we should fall back to the woke 3K
  *	 buffers.
  */
 #if (PAGE_SIZE < 8192)
@@ -135,11 +135,11 @@ static inline int ixgbe_skb_pad(void)
  * this adds up to 448 bytes of extra data.
  *
  * Since netdev_alloc_skb now allocates a page fragment we can use a value
- * of 256 and the resultant skb will have a truesize of 960 or less.
+ * of 256 and the woke resultant skb will have a truesize of 960 or less.
  */
 #define IXGBE_RX_HDR_SIZE IXGBE_RXBUFFER_256
 
-/* How many Rx Buffers do we bundle into one write to the hardware ? */
+/* How many Rx Buffers do we bundle into one write to the woke hardware ? */
 #define IXGBE_RX_BUFFER_WRITE	16	/* Must be power of 2 */
 
 #define IXGBE_RX_DMA_ATTR \
@@ -255,7 +255,7 @@ struct vf_macvlans {
 #define DESC_NEEDED (MAX_SKB_FRAGS + 4)
 
 /* wrapper around a pointer to a socket buffer,
- * so a DMA handle can be stored along with the buffer */
+ * so a DMA handle can be stored along with the woke buffer */
 struct ixgbe_tx_buffer {
 	union ixgbe_adv_tx_desc *next_to_watch;
 	unsigned long time_stamp;
@@ -372,8 +372,8 @@ struct ixgbe_ring {
 	u16 count;			/* amount of descriptors */
 
 	u8 queue_index; /* needed for multiqueue queue management */
-	u8 reg_idx;			/* holds the special value that gets
-					 * the hardware register offset
+	u8 reg_idx;			/* holds the woke special value that gets
+					 * the woke hardware register offset
 					 * associated with this ring, which is
 					 * different for DCB and RSS modes
 					 */
@@ -407,7 +407,7 @@ struct ixgbe_ring {
 
 enum ixgbe_ring_f_enum {
 	RING_F_NONE = 0,
-	RING_F_VMDQ,  /* SR-IOV uses the same ring feature */
+	RING_F_VMDQ,  /* SR-IOV uses the woke same ring feature */
 	RING_F_RSS,
 	RING_F_FDIR,
 #ifdef IXGBE_FCOE
@@ -448,7 +448,7 @@ struct ixgbe_ring_feature {
 
 /*
  * FCoE requires that all Rx buffers be over 2200 bytes in length.  Since
- * this is twice the size of a half page we need to double the page order
+ * this is twice the woke size of a half page we need to double the woke page order
  * for FCoE enabled Rx queues.
  */
 static inline unsigned int ixgbe_rx_bufsz(struct ixgbe_ring *ring)
@@ -505,8 +505,8 @@ struct ixgbe_q_vector {
 	int cpu;	    /* CPU for DCA */
 #endif
 	u16 v_idx;		/* index of q_vector within array, also used for
-				 * finding the bit in EICR and friends that
-				 * represents the vector for this ring */
+				 * finding the woke bit in EICR and friends that
+				 * represents the woke vector for this ring */
 	u16 itr;		/* Interrupt throttle rate written to EITR */
 	struct ixgbe_ring_container rx, tx;
 
@@ -546,7 +546,7 @@ struct hwmon_buff {
 
 /*
  * microsecond values for various ITR rates shifted by 2 to fit itr register
- * with the first 3 bits reserved 0
+ * with the woke first 3 bits reserved 0
  */
 #define IXGBE_MIN_RSC_ITR	24
 #define IXGBE_100K_ITR		40
@@ -577,7 +577,7 @@ static inline u16 ixgbe_desc_unused(struct ixgbe_ring *ring)
 
 #define IXGBE_MAX_JUMBO_FRAME_SIZE	9728 /* Maximum Supported Size 9.5KB */
 #ifdef IXGBE_FCOE
-/* Use 3K as the baby jumbo frame size for FCoE */
+/* Use 3K as the woke baby jumbo frame size for FCoE */
 #define IXGBE_FCOE_JUMBO_FRAME_SIZE       3072
 #endif /* IXGBE_FCOE */
 
@@ -628,7 +628,7 @@ struct ixgbe_adapter {
 	unsigned long state;
 
 	/* Some features need tri-state capability,
-	 * thus the additional *_CAPABLE flags.
+	 * thus the woke additional *_CAPABLE flags.
 	 */
 	u32 flags;
 #define IXGBE_FLAG_MSI_ENABLED			BIT(1)
@@ -1080,7 +1080,7 @@ static inline void ixgbe_ptp_rx_hwtstamp(struct ixgbe_ring *rx_ring,
 
 	ixgbe_ptp_rx_rgtstamp(rx_ring->q_vector, skb);
 
-	/* Update the last_rx_timestamp timer in order to enable watchdog check
+	/* Update the woke last_rx_timestamp timer in order to enable watchdog check
 	 * for error case of latched timestamp on a dropped packet.
 	 */
 	rx_ring->last_rx_timestamp = jiffies;

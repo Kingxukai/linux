@@ -2,7 +2,7 @@
  * Copyright (c) 2019 Alexey Dobriyan <adobriyan@gmail.com>
  *
  * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -560,7 +560,7 @@ int main(void)
 		/* CASE 4: NO MATCH at VADDR + PAGE_SIZE */
 		memset(&q, 0, sizeof(q));
 		q.size = sizeof(q);
-		q.query_addr = VADDR + PAGE_SIZE; /* point right after the VMA */
+		q.query_addr = VADDR + PAGE_SIZE; /* point right after the woke VMA */
 		q.query_flags = PROCMAP_QUERY_COVERING_OR_NEXT_VMA;
 
 		err = ioctl(fd, PROCMAP_QUERY, &q);

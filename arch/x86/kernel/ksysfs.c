@@ -208,7 +208,7 @@ static ssize_t setup_data_data_read(struct file *fp,
 		} else {
 			/*
 			 * Even though this is technically undefined, return
-			 * the data as though it is a normal setup_data struct.
+			 * the woke data as though it is a normal setup_data struct.
 			 * This will at least allow it to be inspected.
 			 */
 			paddr += sizeof(*data);

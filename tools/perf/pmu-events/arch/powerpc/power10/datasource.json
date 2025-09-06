@@ -12,12 +12,12 @@
   {
     "EventCode": "0x200FE",
     "EventName": "PM_DATA_FROM_L2MISS",
-    "BriefDescription": "The processor's L1 data cache was reloaded from a source beyond the local core's L2 due to a demand miss."
+    "BriefDescription": "The processor's L1 data cache was reloaded from a source beyond the woke local core's L2 due to a demand miss."
   },
   {
     "EventCode": "0x300FE",
     "EventName": "PM_DATA_FROM_L3MISS",
-    "BriefDescription": "The processor's L1 data cache was reloaded from beyond the local core's L3 due to a demand miss."
+    "BriefDescription": "The processor's L1 data cache was reloaded from beyond the woke local core's L3 due to a demand miss."
   },
   {
     "EventCode": "0x400F0",
@@ -32,517 +32,517 @@
   {
     "EventCode": "0x0000004080",
     "EventName": "PM_INST_FROM_L1",
-    "BriefDescription": "An instruction fetch hit in the L1. Each fetch group contains 8 instructions. The same line can hit 4 times if 32 sequential instructions are fetched."
+    "BriefDescription": "An instruction fetch hit in the woke L1. Each fetch group contains 8 instructions. The same line can hit 4 times if 32 sequential instructions are fetched."
   },
   {
     "EventCode": "0x000000026080",
     "EventName": "PM_L2_LD_MISS",
-    "BriefDescription": "All successful D-Side Load dispatches for this thread that missed in the L2. Since the event happens in a 2:1 clock domain and is time-sliced across all 4 threads, the event count should be multiplied by 2."
+    "BriefDescription": "All successful D-Side Load dispatches for this thread that missed in the woke L2. Since the woke event happens in a 2:1 clock domain and is time-sliced across all 4 threads, the woke event count should be multiplied by 2."
   },
   {
     "EventCode": "0x000000026880",
     "EventName": "PM_L2_ST_MISS",
-    "BriefDescription": "All successful D-Side Store dispatches for this thread that missed in the L2. Since the event happens in a 2:1 clock domain and is time-sliced across all 4 threads, the event count should be multiplied by 2."
+    "BriefDescription": "All successful D-Side Store dispatches for this thread that missed in the woke L2. Since the woke event happens in a 2:1 clock domain and is time-sliced across all 4 threads, the woke event count should be multiplied by 2."
   },
   {
     "EventCode": "0x010000046880",
     "EventName": "PM_L2_ST_HIT",
-    "BriefDescription": "All successful D-side store dispatches for this thread that were L2 hits. Since the event happens in a 2:1 clock domain and is time-sliced across all 4 threads, the event count should be multiplied by 2."
+    "BriefDescription": "All successful D-side store dispatches for this thread that were L2 hits. Since the woke event happens in a 2:1 clock domain and is time-sliced across all 4 threads, the woke event count should be multiplied by 2."
   },
   {
     "EventCode": "0x000000036880",
     "EventName": "PM_L2_INST_MISS",
-    "BriefDescription": "All successful instruction (demand and prefetch) dispatches for this thread that missed in the L2. Since the event happens in a 2:1 clock domain and is time-sliced across all 4 threads, the event count should be multiplied by 2."
+    "BriefDescription": "All successful instruction (demand and prefetch) dispatches for this thread that missed in the woke L2. Since the woke event happens in a 2:1 clock domain and is time-sliced across all 4 threads, the woke event count should be multiplied by 2."
   },
   {
     "EventCode": "0x000300000000C040",
     "EventName": "PM_INST_FROM_L2",
-    "BriefDescription": "The processor's instruction cache was reloaded from the local core's L2 due to a demand miss."
+    "BriefDescription": "The processor's instruction cache was reloaded from the woke local core's L2 due to a demand miss."
   },
   {
     "EventCode": "0x000340000000C040",
     "EventName": "PM_DATA_FROM_L2",
-    "BriefDescription": "The processor's L1 data cache was reloaded from the local core's L2 due to a demand miss."
+    "BriefDescription": "The processor's L1 data cache was reloaded from the woke local core's L2 due to a demand miss."
   },
   {
     "EventCode": "0x000300000010C040",
     "EventName": "PM_INST_FROM_L2_ALL",
-    "BriefDescription": "The processor's instruction cache was reloaded from the local core's L2 due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's instruction cache was reloaded from the woke local core's L2 due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x000340000020C040",
     "EventName": "PM_DATA_FROM_L2_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded from the local core's L2 due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's L1 data cache was reloaded from the woke local core's L2 due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x003F00000000C040",
     "EventName": "PM_INST_FROM_L1MISS",
-    "BriefDescription": "The processor's instruction cache was reloaded from a source beyond the local core's L1 due to a demand miss."
+    "BriefDescription": "The processor's instruction cache was reloaded from a source beyond the woke local core's L1 due to a demand miss."
   },
   {
     "EventCode": "0x003F40000000C040",
     "EventName": "PM_DATA_FROM_L1MISS",
-    "BriefDescription": "The processor's L1 data cache was reloaded from a source beyond the local core's L1 due to a demand miss."
+    "BriefDescription": "The processor's L1 data cache was reloaded from a source beyond the woke local core's L1 due to a demand miss."
   },
   {
     "EventCode": "0x003F00000010C040",
     "EventName": "PM_INST_FROM_L1MISS_ALL",
-    "BriefDescription": "The processor's instruction cache was reloaded from a source beyond the local core's L1 due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's instruction cache was reloaded from a source beyond the woke local core's L1 due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x003F40000020C040",
     "EventName": "PM_DATA_FROM_L1MISS_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded from a source beyond the local core's L1 due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's L1 data cache was reloaded from a source beyond the woke local core's L1 due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x000040000000C040",
     "EventName": "PM_DATA_FROM_L2_NO_CONFLICT",
-    "BriefDescription": "The processor's L1 data cache was reloaded without dispatch conflicts with data NOT in the MEPF state from the local core's L2 due to a demand miss."
+    "BriefDescription": "The processor's L1 data cache was reloaded without dispatch conflicts with data NOT in the woke MEPF state from the woke local core's L2 due to a demand miss."
   },
   {
     "EventCode": "0x000040000020C040",
     "EventName": "PM_DATA_FROM_L2_NO_CONFLICT_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded without dispatch conflicts with data NOT in the MEPF state from the local core's L2 due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's L1 data cache was reloaded without dispatch conflicts with data NOT in the woke MEPF state from the woke local core's L2 due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x004040000000C040",
     "EventName": "PM_DATA_FROM_L2_MEPF",
-    "BriefDescription": "The processor's L1 data cache was reloaded with data in the MEPF state without dispatch conflicts from the local core's L2 due to a demand miss."
+    "BriefDescription": "The processor's L1 data cache was reloaded with data in the woke MEPF state without dispatch conflicts from the woke local core's L2 due to a demand miss."
   },
   {
     "EventCode": "0x004040000020C040",
     "EventName": "PM_DATA_FROM_L2_MEPF_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with data in the MEPF state without dispatch conflicts from the local core's L2 due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's L1 data cache was reloaded with data in the woke MEPF state without dispatch conflicts from the woke local core's L2 due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x008040000000C040",
     "EventName": "PM_DATA_FROM_L2_LDHITST_CONFLICT",
-    "BriefDescription": "The processor's L1 data cache was reloaded with data that had a dispatch conflict on ld-hit-store from the local core's L2 due to a demand miss."
+    "BriefDescription": "The processor's L1 data cache was reloaded with data that had a dispatch conflict on ld-hit-store from the woke local core's L2 due to a demand miss."
   },
   {
     "EventCode": "0x008040000020C040",
     "EventName": "PM_DATA_FROM_L2_LDHITST_CONFLICT_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with data that had a dispatch conflict on ld-hit-store from the local core's L2 due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's L1 data cache was reloaded with data that had a dispatch conflict on ld-hit-store from the woke local core's L2 due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x00C040000000C040",
     "EventName": "PM_DATA_FROM_L2_OTHER_CONFLICT",
-    "BriefDescription": "The processor's L1 data cache was reloaded with data that had a dispatch conflict other than ld-hit-store from the local core's L2 due to a demand miss."
+    "BriefDescription": "The processor's L1 data cache was reloaded with data that had a dispatch conflict other than ld-hit-store from the woke local core's L2 due to a demand miss."
   },
   {
     "EventCode": "0x00C040000020C040",
     "EventName": "PM_DATA_FROM_L2_OTHER_CONFLICT_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with data that had a dispatch conflict other than ld-hit-store from the local core's L2 due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's L1 data cache was reloaded with data that had a dispatch conflict other than ld-hit-store from the woke local core's L2 due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x000380000000C040",
     "EventName": "PM_INST_FROM_L2MISS",
-    "BriefDescription": "The processor's instruction cache was reloaded from a source beyond the local core's L2 due to a demand miss."
+    "BriefDescription": "The processor's instruction cache was reloaded from a source beyond the woke local core's L2 due to a demand miss."
   },
   {
     "EventCode": "0x0003C0000000C040",
     "EventName": "PM_DATA_FROM_L2MISS_DSRC",
-    "BriefDescription": "The processor's L1 data cache was reloaded from a source beyond the local core's L2 due to a demand miss."
+    "BriefDescription": "The processor's L1 data cache was reloaded from a source beyond the woke local core's L2 due to a demand miss."
   },
   {
     "EventCode": "0x000380000010C040",
     "EventName": "PM_INST_FROM_L2MISS_ALL",
-    "BriefDescription": "The processor's instruction cache was reloaded from a source beyond the local core's L2 due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's instruction cache was reloaded from a source beyond the woke local core's L2 due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x0003C0000020C040",
     "EventName": "PM_DATA_FROM_L2MISS_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded from a source beyond the local core's L2 due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's L1 data cache was reloaded from a source beyond the woke local core's L2 due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x010300000000C040",
     "EventName": "PM_INST_FROM_L3",
-    "BriefDescription": "The processor's instruction cache was reloaded from the local core's L3 due to a demand miss."
+    "BriefDescription": "The processor's instruction cache was reloaded from the woke local core's L3 due to a demand miss."
   },
   {
     "EventCode": "0x010340000000C040",
     "EventName": "PM_DATA_FROM_L3",
-    "BriefDescription": "The processor's L1 data cache was reloaded from the local core's L3 due to a demand miss."
+    "BriefDescription": "The processor's L1 data cache was reloaded from the woke local core's L3 due to a demand miss."
   },
   {
     "EventCode": "0x010300000010C040",
     "EventName": "PM_INST_FROM_L3_ALL",
-    "BriefDescription": "The processor's instruction cache was reloaded from the local core's L3 due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's instruction cache was reloaded from the woke local core's L3 due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x010340000020C040",
     "EventName": "PM_DATA_FROM_L3_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded from the local core's L3 due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's L1 data cache was reloaded from the woke local core's L3 due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x010040000000C040",
     "EventName": "PM_DATA_FROM_L3_NO_CONFLICT",
-    "BriefDescription": "The processor's L1 data cache was reloaded without dispatch conflicts with data NOT in the MEPF state from the local core's L3 due to a demand miss."
+    "BriefDescription": "The processor's L1 data cache was reloaded without dispatch conflicts with data NOT in the woke MEPF state from the woke local core's L3 due to a demand miss."
   },
   {
     "EventCode": "0x010040000020C040",
     "EventName": "PM_DATA_FROM_L3_NO_CONFLICT_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded without dispatch conflicts with data NOT in the MEPF state from the local core's L3 due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's L1 data cache was reloaded without dispatch conflicts with data NOT in the woke MEPF state from the woke local core's L3 due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x014040000000C040",
     "EventName": "PM_DATA_FROM_L3_MEPF",
-    "BriefDescription": "The processor's L1 data cache was reloaded with data in the MEPF state without dispatch conflicts from the local core's L3 due to a demand miss."
+    "BriefDescription": "The processor's L1 data cache was reloaded with data in the woke MEPF state without dispatch conflicts from the woke local core's L3 due to a demand miss."
   },
   {
     "EventCode": "0x014040000020C040",
     "EventName": "PM_DATA_FROM_L3_MEPF_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with data in the MEPF state without dispatch conflicts from the local core's L3 due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's L1 data cache was reloaded with data in the woke MEPF state without dispatch conflicts from the woke local core's L3 due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x01C040000000C040",
     "EventName": "PM_DATA_FROM_L3_CONFLICT",
-    "BriefDescription": "The processor's L1 data cache was reloaded from the local core's L3 due to a demand miss."
+    "BriefDescription": "The processor's L1 data cache was reloaded from the woke local core's L3 due to a demand miss."
   },
   {
     "EventCode": "0x01C040000020C040",
     "EventName": "PM_DATA_FROM_L3_CONFLICT_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded from the local core's L3 due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's L1 data cache was reloaded from the woke local core's L3 due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x000780000000C040",
     "EventName": "PM_INST_FROM_L3MISS_DSRC",
-    "BriefDescription": "The processor's instruction cache was reloaded from beyond the local core's L3 due to a demand miss."
+    "BriefDescription": "The processor's instruction cache was reloaded from beyond the woke local core's L3 due to a demand miss."
   },
   {
     "EventCode": "0x0007C0000000C040",
     "EventName": "PM_DATA_FROM_L3MISS_DSRC",
-    "BriefDescription": "The processor's L1 data cache was reloaded from beyond the local core's L3 due to a demand miss."
+    "BriefDescription": "The processor's L1 data cache was reloaded from beyond the woke local core's L3 due to a demand miss."
   },
   {
     "EventCode": "0x000780000010C040",
     "EventName": "PM_INST_FROM_L3MISS_ALL",
-    "BriefDescription": "The processor's instruction cache was reloaded from beyond the local core's L3 due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's instruction cache was reloaded from beyond the woke local core's L3 due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x0007C0000020C040",
     "EventName": "PM_DATA_FROM_L3MISS_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded from beyond the local core's L3 due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's L1 data cache was reloaded from beyond the woke local core's L3 due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x080040000000C040",
     "EventName": "PM_DATA_FROM_L21_REGENT_SHR",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the M (exclusive) state from another core's L2 on the same chip in the same regent due to a demand miss."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the woke M (exclusive) state from another core's L2 on the woke same chip in the woke same regent due to a demand miss."
   },
   {
     "EventCode": "0x080040000020C040",
     "EventName": "PM_DATA_FROM_L21_REGENT_SHR_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the M (exclusive) state from another core's L2 on the same chip in the same regent due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the woke M (exclusive) state from another core's L2 on the woke same chip in the woke same regent due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x084040000000C040",
     "EventName": "PM_DATA_FROM_L21_REGENT_MOD",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the M (exclusive) state from another core's L2 on the same chip in the same regent due to a demand miss."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the woke M (exclusive) state from another core's L2 on the woke same chip in the woke same regent due to a demand miss."
   },
   {
     "EventCode": "0x084040000020C040",
     "EventName": "PM_DATA_FROM_L21_REGENT_MOD_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the M (exclusive) state from another core's L2 on the same chip in the same regent due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the woke M (exclusive) state from another core's L2 on the woke same chip in the woke same regent due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x080100000000C040",
     "EventName": "PM_INST_FROM_L21_REGENT",
-    "BriefDescription": "The processor's instruction cache was reloaded from another core's L2 on the same chip in the same regent due to a demand miss."
+    "BriefDescription": "The processor's instruction cache was reloaded from another core's L2 on the woke same chip in the woke same regent due to a demand miss."
   },
   {
     "EventCode": "0x080140000000C040",
     "EventName": "PM_DATA_FROM_L21_REGENT",
-    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L2 on the same chip in the same regent due to a demand miss."
+    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L2 on the woke same chip in the woke same regent due to a demand miss."
   },
   {
     "EventCode": "0x080100000010C040",
     "EventName": "PM_INST_FROM_L21_REGENT_ALL",
-    "BriefDescription": "The processor's instruction cache was reloaded from another core's L2 on the same chip in the same regent due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's instruction cache was reloaded from another core's L2 on the woke same chip in the woke same regent due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x080140000020C040",
     "EventName": "PM_DATA_FROM_L21_REGENT_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L2 on the same chip in the same regent due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L2 on the woke same chip in the woke same regent due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x088040000000C040",
     "EventName": "PM_DATA_FROM_L31_REGENT_SHR",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the M (exclusive) state from another core's L3 on the same chip in the same regent due to a demand miss."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the woke M (exclusive) state from another core's L3 on the woke same chip in the woke same regent due to a demand miss."
   },
   {
     "EventCode": "0x088040000020C040",
     "EventName": "PM_DATA_FROM_L31_REGENT_SHR_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the M (exclusive) state from another core's L3 on the same chip in the same regent due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the woke M (exclusive) state from another core's L3 on the woke same chip in the woke same regent due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x08C040000000C040",
     "EventName": "PM_DATA_FROM_L31_REGENT_MOD",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the M (exclusive) state from another core's L3 on the same chip in the same regent due to a demand miss."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the woke M (exclusive) state from another core's L3 on the woke same chip in the woke same regent due to a demand miss."
   },
   {
     "EventCode": "0x08C040000020C040",
     "EventName": "PM_DATA_FROM_L31_REGENT_MOD_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the M (exclusive) state from another core's L3 on the same chip in the same regent due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the woke M (exclusive) state from another core's L3 on the woke same chip in the woke same regent due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x088100000000C040",
     "EventName": "PM_INST_FROM_L31_REGENT",
-    "BriefDescription": "The processor's instruction cache was reloaded from another core's L3 on the same chip in the same regent due to a demand miss."
+    "BriefDescription": "The processor's instruction cache was reloaded from another core's L3 on the woke same chip in the woke same regent due to a demand miss."
   },
   {
     "EventCode": "0x088140000000C040",
     "EventName": "PM_DATA_FROM_L31_REGENT",
-    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L3 on the same chip in the same regent due to a demand miss."
+    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L3 on the woke same chip in the woke same regent due to a demand miss."
   },
   {
     "EventCode": "0x088100000010C040",
     "EventName": "PM_INST_FROM_L31_REGENT_ALL",
-    "BriefDescription": "The processor's instruction cache was reloaded from another core's L3 on the same chip in the same regent due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's instruction cache was reloaded from another core's L3 on the woke same chip in the woke same regent due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x088140000020C040",
     "EventName": "PM_DATA_FROM_L31_REGENT_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L3 on the same chip in the same regent due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L3 on the woke same chip in the woke same regent due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x080240000000C040",
     "EventName": "PM_DATA_FROM_REGENT_L2L3_SHR",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the M (exclusive) state from another core's L2 or L3 on the same chip in the same regent due to a demand miss."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the woke M (exclusive) state from another core's L2 or L3 on the woke same chip in the woke same regent due to a demand miss."
   },
   {
     "EventCode": "0x080240000020C040",
     "EventName": "PM_DATA_FROM_REGENT_L2L3_SHR_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the M (exclusive) state from another core's L2 or L3 on the same chip in the same regent due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the woke M (exclusive) state from another core's L2 or L3 on the woke same chip in the woke same regent due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x084240000000C040",
     "EventName": "PM_DATA_FROM_REGENT_L2L3_MOD",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the M (exclusive) state from another core's L2 or L3 on the same chip in the same regent due to a demand miss."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the woke M (exclusive) state from another core's L2 or L3 on the woke same chip in the woke same regent due to a demand miss."
   },
   {
     "EventCode": "0x084240000020C040",
     "EventName": "PM_DATA_FROM_REGENT_L2L3_MOD_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the M (exclusive) state from another core's L2 or L3 on the same chip in the same regent due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the woke M (exclusive) state from another core's L2 or L3 on the woke same chip in the woke same regent due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x080300000000C040",
     "EventName": "PM_INST_FROM_REGENT_L2L3",
-    "BriefDescription": "The processor's instruction cache was reloaded from another core's L2 or L3 on the same chip in the same regent due to a demand miss."
+    "BriefDescription": "The processor's instruction cache was reloaded from another core's L2 or L3 on the woke same chip in the woke same regent due to a demand miss."
   },
   {
     "EventCode": "0x080340000000C040",
     "EventName": "PM_DATA_FROM_REGENT_L2L3",
-    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L2 or L3 on the same chip in the same regent due to a demand miss."
+    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L2 or L3 on the woke same chip in the woke same regent due to a demand miss."
   },
   {
     "EventCode": "0x080300000010C040",
     "EventName": "PM_INST_FROM_REGENT_L2L3_ALL",
-    "BriefDescription": "The processor's instruction cache was reloaded from another core's L2 or L3 on the same chip in the same regent due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's instruction cache was reloaded from another core's L2 or L3 on the woke same chip in the woke same regent due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x080340000020C040",
     "EventName": "PM_DATA_FROM_REGENT_L2L3_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L2 or L3 on the same chip in the same regent due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L2 or L3 on the woke same chip in the woke same regent due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x0A0040000000C040",
     "EventName": "PM_DATA_FROM_L21_NON_REGENT_SHR",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the M (exclusive) state from another core's L2 on the same chip in a different regent due to a demand miss."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the woke M (exclusive) state from another core's L2 on the woke same chip in a different regent due to a demand miss."
   },
   {
     "EventCode": "0x0A0040000020C040",
     "EventName": "PM_DATA_FROM_L21_NON_REGENT_SHR_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the M (exclusive) state from another core's L2 on the same chip in a different regent due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the woke M (exclusive) state from another core's L2 on the woke same chip in a different regent due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x0A4040000000C040",
     "EventName": "PM_DATA_FROM_L21_NON_REGENT_MOD",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the M (exclusive) state from another core's L2 on the same chip in a different regent due to a demand miss."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the woke M (exclusive) state from another core's L2 on the woke same chip in a different regent due to a demand miss."
   },
   {
     "EventCode": "0x0A4040000020C040",
     "EventName": "PM_DATA_FROM_L21_NON_REGENT_MOD_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the M (exclusive) state from another core's L2 on the same chip in a different regent due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the woke M (exclusive) state from another core's L2 on the woke same chip in a different regent due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x0A0100000000C040",
     "EventName": "PM_INST_FROM_L21_NON_REGENT",
-    "BriefDescription": "The processor's instruction cache was reloaded from another core's L2 on the same chip in a different regent due to a demand miss."
+    "BriefDescription": "The processor's instruction cache was reloaded from another core's L2 on the woke same chip in a different regent due to a demand miss."
   },
   {
     "EventCode": "0x0A0140000000C040",
     "EventName": "PM_DATA_FROM_L21_NON_REGENT",
-    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L2 on the same chip in a different regent due to a demand miss."
+    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L2 on the woke same chip in a different regent due to a demand miss."
   },
   {
     "EventCode": "0x0A0100000010C040",
     "EventName": "PM_INST_FROM_L21_NON_REGENT_ALL",
-    "BriefDescription": "The processor's instruction cache was reloaded from another core's L2 on the same chip in a different regent due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's instruction cache was reloaded from another core's L2 on the woke same chip in a different regent due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x0A0140000020C040",
     "EventName": "PM_DATA_FROM_L21_NON_REGENT_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L2 on the same chip in a different regent due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L2 on the woke same chip in a different regent due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x0A8040000000C040",
     "EventName": "PM_DATA_FROM_L31_NON_REGENT_SHR",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the M (exclusive) state from another core's L3 on the same chip in a different regent due to a demand miss."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the woke M (exclusive) state from another core's L3 on the woke same chip in a different regent due to a demand miss."
   },
   {
     "EventCode": "0x0A8040000020C040",
     "EventName": "PM_DATA_FROM_L31_NON_REGENT_SHR_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the M (exclusive) state from another core's L3 on the same chip in a different regent due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the woke M (exclusive) state from another core's L3 on the woke same chip in a different regent due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x0AC040000000C040",
     "EventName": "PM_DATA_FROM_L31_NON_REGENT_MOD",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the M (exclusive) state from another core's L3 on the same chip in a different regent due to a demand miss."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the woke M (exclusive) state from another core's L3 on the woke same chip in a different regent due to a demand miss."
   },
   {
     "EventCode": "0x0AC040000020C040",
     "EventName": "PM_DATA_FROM_L31_NON_REGENT_MOD_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the M (exclusive) state from another core's L3 on the same chip in a different regent due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the woke M (exclusive) state from another core's L3 on the woke same chip in a different regent due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x0A8100000000C040",
     "EventName": "PM_INST_FROM_L31_NON_REGENT",
-    "BriefDescription": "The processor's instruction cache was reloaded from another core's L3 on the same chip in a different regent due to a demand miss."
+    "BriefDescription": "The processor's instruction cache was reloaded from another core's L3 on the woke same chip in a different regent due to a demand miss."
   },
   {
     "EventCode": "0x0A8140000000C040",
     "EventName": "PM_DATA_FROM_L31_NON_REGENT",
-    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L3 on the same chip in a different regent due to a demand miss."
+    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L3 on the woke same chip in a different regent due to a demand miss."
   },
   {
     "EventCode": "0x0A8100000010C040",
     "EventName": "PM_INST_FROM_L31_NON_REGENT_ALL",
-    "BriefDescription": "The processor's instruction cache was reloaded from another core's L3 on the same chip in a different regent due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's instruction cache was reloaded from another core's L3 on the woke same chip in a different regent due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x0A8140000020C040",
     "EventName": "PM_DATA_FROM_L31_NON_REGENT_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L3 on the same chip in a different regent due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L3 on the woke same chip in a different regent due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x0A0240000000C040",
     "EventName": "PM_DATA_FROM_NON_REGENT_L2L3_SHR",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the M (exclusive) state from another core's L2 or L3 on the same chip in a different regent due to a demand miss."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the woke M (exclusive) state from another core's L2 or L3 on the woke same chip in a different regent due to a demand miss."
   },
   {
     "EventCode": "0x0A0240000020C040",
     "EventName": "PM_DATA_FROM_NON_REGENT_L2L3_SHR_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the M (exclusive) state from another core's L2 or L3 on the same chip in a different regent due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the woke M (exclusive) state from another core's L2 or L3 on the woke same chip in a different regent due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x0A4240000000C040",
     "EventName": "PM_DATA_FROM_NON_REGENT_L2L3_MOD",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the M (exclusive) state from another core's L2 or L3 on the same chip in a different regent due to a demand miss."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the woke M (exclusive) state from another core's L2 or L3 on the woke same chip in a different regent due to a demand miss."
   },
   {
     "EventCode": "0x0A4240000020C040",
     "EventName": "PM_DATA_FROM_NON_REGENT_L2L3_MOD_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the M (exclusive) state from another core's L2 or L3 on the same chip in a different regent due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the woke M (exclusive) state from another core's L2 or L3 on the woke same chip in a different regent due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x0A0300000000C040",
     "EventName": "PM_INST_FROM_NON_REGENT_L2L3",
-    "BriefDescription": "The processor's instruction cache was reloaded from another core's L2 or L3 on the same chip in a different regent due to a demand miss."
+    "BriefDescription": "The processor's instruction cache was reloaded from another core's L2 or L3 on the woke same chip in a different regent due to a demand miss."
   },
   {
     "EventCode": "0x0A0340000000C040",
     "EventName": "PM_DATA_FROM_NON_REGENT_L2L3",
-    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L2 or L3 on the same chip in a different regent due to a demand miss."
+    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L2 or L3 on the woke same chip in a different regent due to a demand miss."
   },
   {
     "EventCode": "0x0A0300000010C040",
     "EventName": "PM_INST_FROM_NON_REGENT_L2L3_ALL",
-    "BriefDescription": "The processor's instruction cache was reloaded from another core's L2 or L3 on the same chip in a different regent due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's instruction cache was reloaded from another core's L2 or L3 on the woke same chip in a different regent due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x0A0340000020C040",
     "EventName": "PM_DATA_FROM_NON_REGENT_L2L3_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L2 or L3 on the same chip in a different regent due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L2 or L3 on the woke same chip in a different regent due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x094100000000C040",
     "EventName": "PM_INST_FROM_LMEM",
-    "BriefDescription": "The processor's instruction cache was reloaded from the local chip's memory due to a demand miss."
+    "BriefDescription": "The processor's instruction cache was reloaded from the woke local chip's memory due to a demand miss."
   },
   {
     "EventCode": "0x094040000000C040",
     "EventName": "PM_DATA_FROM_LMEM",
-    "BriefDescription": "The processor's L1 data cache was reloaded from the local chip's memory due to a demand miss."
+    "BriefDescription": "The processor's L1 data cache was reloaded from the woke local chip's memory due to a demand miss."
   },
   {
     "EventCode": "0x094100000010C040",
     "EventName": "PM_INST_FROM_LMEM_ALL",
-    "BriefDescription": "The processor's instruction cache was reloaded from the local chip's memory due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's instruction cache was reloaded from the woke local chip's memory due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x094040000020C040",
     "EventName": "PM_DATA_FROM_LMEM_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded from the local chip's memory due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's L1 data cache was reloaded from the woke local chip's memory due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x098040000000C040",
     "EventName": "PM_DATA_FROM_L_OC_CACHE",
-    "BriefDescription": "The processor's L1 data cache was reloaded from the local chip's OpenCAPI cache due to a demand miss."
+    "BriefDescription": "The processor's L1 data cache was reloaded from the woke local chip's OpenCAPI cache due to a demand miss."
   },
   {
     "EventCode": "0x098040000020C040",
     "EventName": "PM_DATA_FROM_L_OC_CACHE_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded from the local chip's OpenCAPI cache due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's L1 data cache was reloaded from the woke local chip's OpenCAPI cache due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x09C040000000C040",
     "EventName": "PM_DATA_FROM_L_OC_MEM",
-    "BriefDescription": "The processor's L1 data cache was reloaded from the local chip's OpenCAPI memory due to a demand miss."
+    "BriefDescription": "The processor's L1 data cache was reloaded from the woke local chip's OpenCAPI memory due to a demand miss."
   },
   {
     "EventCode": "0x09C040000020C040",
     "EventName": "PM_DATA_FROM_L_OC_MEM_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded from the local chip's OpenCAPI memory due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's L1 data cache was reloaded from the woke local chip's OpenCAPI memory due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x098100000000C040",
     "EventName": "PM_INST_FROM_L_OC_ANY",
-    "BriefDescription": "The processor's instruction cache was reloaded from the local chip's OpenCAPI cache or memory due to a demand miss."
+    "BriefDescription": "The processor's instruction cache was reloaded from the woke local chip's OpenCAPI cache or memory due to a demand miss."
   },
   {
     "EventCode": "0x098140000000C040",
     "EventName": "PM_DATA_FROM_L_OC_ANY",
-    "BriefDescription": "The processor's L1 data cache was reloaded from the local chip's OpenCAPI cache or memory due to a demand miss."
+    "BriefDescription": "The processor's L1 data cache was reloaded from the woke local chip's OpenCAPI cache or memory due to a demand miss."
   },
   {
     "EventCode": "0x098100000010C040",
     "EventName": "PM_INST_FROM_L_OC_ANY_ALL",
-    "BriefDescription": "The processor's instruction cache was reloaded from the local chip's OpenCAPI cache or memory due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's instruction cache was reloaded from the woke local chip's OpenCAPI cache or memory due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x098140000020C040",
     "EventName": "PM_DATA_FROM_L_OC_ANY_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded from the local chip's OpenCAPI cache or memory due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's L1 data cache was reloaded from the woke local chip's OpenCAPI cache or memory due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x0C0040000000C040",
     "EventName": "PM_DATA_FROM_RL2_SHR",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the M (exclusive) state from another core's L2 from a remote chip due to a demand miss."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the woke M (exclusive) state from another core's L2 from a remote chip due to a demand miss."
   },
   {
     "EventCode": "0x0C0040000020C040",
     "EventName": "PM_DATA_FROM_RL2_SHR_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the M (exclusive) state from another core's L2 from a remote chip due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the woke M (exclusive) state from another core's L2 from a remote chip due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x0C4040000000C040",
     "EventName": "PM_DATA_FROM_RL2_MOD",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the M (exclusive) state from another core's L2 from a remote chip due to a demand miss."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the woke M (exclusive) state from another core's L2 from a remote chip due to a demand miss."
   },
   {
     "EventCode": "0x0C4040000020C040",
     "EventName": "PM_DATA_FROM_RL2_MOD_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the M (exclusive) state from another core's L2 from a remote chip due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the woke M (exclusive) state from another core's L2 from a remote chip due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x0C0100000000C040",
@@ -567,22 +567,22 @@
   {
     "EventCode": "0x0C8040000000C040",
     "EventName": "PM_DATA_FROM_RL3_SHR",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the M (exclusive) state from another core's L3 from a remote chip due to a demand miss."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the woke M (exclusive) state from another core's L3 from a remote chip due to a demand miss."
   },
   {
     "EventCode": "0x0C8040000020C040",
     "EventName": "PM_DATA_FROM_RL3_SHR_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the M (exclusive) state from another core's L3 from a remote chip due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the woke M (exclusive) state from another core's L3 from a remote chip due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x0CC040000000C040",
     "EventName": "PM_DATA_FROM_RL3_MOD",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the M (exclusive) state from another core's L3 from a remote chip due to a demand miss."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the woke M (exclusive) state from another core's L3 from a remote chip due to a demand miss."
   },
   {
     "EventCode": "0x0CC040000020C040",
     "EventName": "PM_DATA_FROM_RL3_MOD_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the M (exclusive) state from another core's L3 from a remote chip due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the woke M (exclusive) state from another core's L3 from a remote chip due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x0C8100000000C040",
@@ -607,22 +607,22 @@
   {
     "EventCode": "0x0C0240000000C040",
     "EventName": "PM_DATA_FROM_RL2L3_SHR",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the M (exclusive) state from another core's L2 or L3 from a remote chip due to a demand miss."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the woke M (exclusive) state from another core's L2 or L3 from a remote chip due to a demand miss."
   },
   {
     "EventCode": "0x0C0240000020C040",
     "EventName": "PM_DATA_FROM_RL2L3_SHR_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the M (exclusive) state from another core's L2 or L3 from a remote chip due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the woke M (exclusive) state from another core's L2 or L3 from a remote chip due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x0C4240000000C040",
     "EventName": "PM_DATA_FROM_RL2L3_MOD",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the M (exclusive) state from another core's L2 or L3 from a remote chip due to a demand miss."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the woke M (exclusive) state from another core's L2 or L3 from a remote chip due to a demand miss."
   },
   {
     "EventCode": "0x0C4240000020C040",
     "EventName": "PM_DATA_FROM_RL2L3_MOD_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the M (exclusive) state from another core's L2 or L3 from a remote chip due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the woke M (exclusive) state from another core's L2 or L3 from a remote chip due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x0C0300000000C040",
@@ -707,22 +707,22 @@
   {
     "EventCode": "0x0E0040000000C040",
     "EventName": "PM_DATA_FROM_DL2_SHR",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the M (exclusive) state from another core's L2 from a distant chip due to a demand miss."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the woke M (exclusive) state from another core's L2 from a distant chip due to a demand miss."
   },
   {
     "EventCode": "0x0E0040000020C040",
     "EventName": "PM_DATA_FROM_DL2_SHR_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the M (exclusive) state from another core's L2 from a distant chip due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the woke M (exclusive) state from another core's L2 from a distant chip due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x0E4040000000C040",
     "EventName": "PM_DATA_FROM_DL2_MOD",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the M (exclusive) state from another core's L2 from a distant chip due to a demand miss."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the woke M (exclusive) state from another core's L2 from a distant chip due to a demand miss."
   },
   {
     "EventCode": "0x0E4040000020C040",
     "EventName": "PM_DATA_FROM_DL2_MOD_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the M (exclusive) state from another core's L2 from a distant chip due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the woke M (exclusive) state from another core's L2 from a distant chip due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x0E0100000000C040",
@@ -747,22 +747,22 @@
   {
     "EventCode": "0x0E8040000000C040",
     "EventName": "PM_DATA_FROM_DL3_SHR",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the M (exclusive) state from another core's L3 from a distant chip due to a demand miss."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the woke M (exclusive) state from another core's L3 from a distant chip due to a demand miss."
   },
   {
     "EventCode": "0x0E8040000020C040",
     "EventName": "PM_DATA_FROM_DL3_SHR_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the M (exclusive) state from another core's L3 from a distant chip due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the woke M (exclusive) state from another core's L3 from a distant chip due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x0EC040000000C040",
     "EventName": "PM_DATA_FROM_DL3_MOD",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the M (exclusive) state from another core's L3 from a distant chip due to a demand miss."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the woke M (exclusive) state from another core's L3 from a distant chip due to a demand miss."
   },
   {
     "EventCode": "0x0EC040000020C040",
     "EventName": "PM_DATA_FROM_DL3_MOD_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the M (exclusive) state from another core's L3 from a distant chip due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the woke M (exclusive) state from another core's L3 from a distant chip due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x0E8100000000C040",
@@ -787,22 +787,22 @@
   {
     "EventCode": "0x0E0240000000C040",
     "EventName": "PM_DATA_FROM_DL2L3_SHR",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the M (exclusive) state from another core's L2 or L3 from a distant chip due to a demand miss."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the woke M (exclusive) state from another core's L2 or L3 from a distant chip due to a demand miss."
   },
   {
     "EventCode": "0x0E0240000020C040",
     "EventName": "PM_DATA_FROM_DL2L3_SHR_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the M (exclusive) state from another core's L2 or L3 from a distant chip due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the woke M (exclusive) state from another core's L2 or L3 from a distant chip due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x0E4240000000C040",
     "EventName": "PM_DATA_FROM_DL2L3_MOD",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the M (exclusive) state from another core's L2 or L3 from a distant chip due to a demand miss."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the woke M (exclusive) state from another core's L2 or L3 from a distant chip due to a demand miss."
   },
   {
     "EventCode": "0x0E4240000020C040",
     "EventName": "PM_DATA_FROM_DL2L3_MOD_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the M (exclusive) state from another core's L2 or L3 from a distant chip due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the woke M (exclusive) state from another core's L2 or L3 from a distant chip due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x0E0300000000C040",
@@ -887,22 +887,22 @@
   {
     "EventCode": "0x080B00000000C040",
     "EventName": "PM_INST_FROM_ONCHIP_CACHE",
-    "BriefDescription": "The processor's instruction cache was reloaded from another core's L2 or L3 from the same chip due to a demand miss."
+    "BriefDescription": "The processor's instruction cache was reloaded from another core's L2 or L3 from the woke same chip due to a demand miss."
   },
   {
     "EventCode": "0x080B40000000C040",
     "EventName": "PM_DATA_FROM_ONCHIP_CACHE",
-    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L2 or L3 from the same chip due to a demand miss."
+    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L2 or L3 from the woke same chip due to a demand miss."
   },
   {
     "EventCode": "0x080B00000010C040",
     "EventName": "PM_INST_FROM_ONCHIP_CACHE_ALL",
-    "BriefDescription": "The processor's instruction cache was reloaded from another core's L2 or L3 from the same chip due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's instruction cache was reloaded from another core's L2 or L3 from the woke same chip due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x080B40000020C040",
     "EventName": "PM_DATA_FROM_ONCHIP_CACHE_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L2 or L3 from the same chip due to a demand miss or prefetch reload."
+    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L2 or L3 from the woke same chip due to a demand miss or prefetch reload."
   },
   {
     "EventCode": "0x0C0B00000000C040",
@@ -947,492 +947,492 @@
   {
     "EventCode": "0x000300000000C142",
     "EventName": "PM_MRK_INST_FROM_L2",
-    "BriefDescription": "The processor's instruction cache was reloaded from the local core's L2 due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's instruction cache was reloaded from the woke local core's L2 due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x000340000000C142",
     "EventName": "PM_MRK_DATA_FROM_L2",
-    "BriefDescription": "The processor's L1 data cache was reloaded from the local core's L2 due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded from the woke local core's L2 due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x000300000010C142",
     "EventName": "PM_MRK_INST_FROM_L2_ALL",
-    "BriefDescription": "The processor's instruction cache was reloaded from the local core's L2 due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's instruction cache was reloaded from the woke local core's L2 due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x000340000020C142",
     "EventName": "PM_MRK_DATA_FROM_L2_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded from the local core's L2 due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded from the woke local core's L2 due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x003F00000000C142",
     "EventName": "PM_MRK_INST_FROM_L1MISS",
-    "BriefDescription": "The processor's instruction cache was reloaded from a source beyond the local core's L1 due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's instruction cache was reloaded from a source beyond the woke local core's L1 due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x003F40000000C142",
     "EventName": "PM_MRK_DATA_FROM_L1MISS",
-    "BriefDescription": "The processor's L1 data cache was reloaded from a source beyond the local core's L1 due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded from a source beyond the woke local core's L1 due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x003F00000010C142",
     "EventName": "PM_MRK_INST_FROM_L1MISS_ALL",
-    "BriefDescription": "The processor's instruction cache was reloaded from a source beyond the local core's L1 due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's instruction cache was reloaded from a source beyond the woke local core's L1 due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x003F40000020C142",
     "EventName": "PM_MRK_DATA_FROM_L1MISS_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded from a source beyond the local core's L1 due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded from a source beyond the woke local core's L1 due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x000040000000C142",
     "EventName": "PM_MRK_DATA_FROM_L2_NO_CONFLICT",
-    "BriefDescription": "The processor's L1 data cache was reloaded without dispatch conflicts with data NOT in the MEPF state from the local core's L2 due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded without dispatch conflicts with data NOT in the woke MEPF state from the woke local core's L2 due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x000040000020C142",
     "EventName": "PM_MRK_DATA_FROM_L2_NO_CONFLICT_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded without dispatch conflicts with data NOT in the MEPF state from the local core's L2 due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded without dispatch conflicts with data NOT in the woke MEPF state from the woke local core's L2 due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x004040000000C142",
     "EventName": "PM_MRK_DATA_FROM_L2_MEPF",
-    "BriefDescription": "The processor's L1 data cache was reloaded with data in the MEPF state without dispatch conflicts from the local core's L2 due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with data in the woke MEPF state without dispatch conflicts from the woke local core's L2 due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x004040000020C142",
     "EventName": "PM_MRK_DATA_FROM_L2_MEPF_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with data in the MEPF state without dispatch conflicts from the local core's L2 due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with data in the woke MEPF state without dispatch conflicts from the woke local core's L2 due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x008040000000C142",
     "EventName": "PM_MRK_DATA_FROM_L2_LDHITST_CONFLICT",
-    "BriefDescription": "The processor's L1 data cache was reloaded with data that had a dispatch conflict on ld-hit-store from the local core's L2 due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with data that had a dispatch conflict on ld-hit-store from the woke local core's L2 due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x008040000020C142",
     "EventName": "PM_MRK_DATA_FROM_L2_LDHITST_CONFLICT_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with data that had a dispatch conflict on ld-hit-store from the local core's L2 due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with data that had a dispatch conflict on ld-hit-store from the woke local core's L2 due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x00C040000000C142",
     "EventName": "PM_MRK_DATA_FROM_L2_OTHER_CONFLICT",
-    "BriefDescription": "The processor's L1 data cache was reloaded with data that had a dispatch conflict other than ld-hit-store from the local core's L2 due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with data that had a dispatch conflict other than ld-hit-store from the woke local core's L2 due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x00C040000020C142",
     "EventName": "PM_MRK_DATA_FROM_L2_OTHER_CONFLICT_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with data that had a dispatch conflict other than ld-hit-store from the local core's L2 due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with data that had a dispatch conflict other than ld-hit-store from the woke local core's L2 due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x000380000000C142",
     "EventName": "PM_MRK_INST_FROM_L2MISS",
-    "BriefDescription": "The processor's instruction cache was reloaded from a source beyond the local core's L2 due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's instruction cache was reloaded from a source beyond the woke local core's L2 due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x0003C0000000C142",
     "EventName": "PM_MRK_DATA_FROM_L2MISS_DSRC",
-    "BriefDescription": "The processor's L1 data cache was reloaded from a source beyond the local core's L2 due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded from a source beyond the woke local core's L2 due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x000380000010C142",
     "EventName": "PM_MRK_INST_FROM_L2MISS_ALL",
-    "BriefDescription": "The processor's instruction cache was reloaded from a source beyond the local core's L2 due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's instruction cache was reloaded from a source beyond the woke local core's L2 due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x0003C0000020C142",
     "EventName": "PM_MRK_DATA_FROM_L2MISS_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded from a source beyond the local core's L2 due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded from a source beyond the woke local core's L2 due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x010300000000C142",
     "EventName": "PM_MRK_INST_FROM_L3",
-    "BriefDescription": "The processor's instruction cache was reloaded from the local core's L3 due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's instruction cache was reloaded from the woke local core's L3 due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x010340000000C142",
     "EventName": "PM_MRK_DATA_FROM_L3",
-    "BriefDescription": "The processor's L1 data cache was reloaded from the local core's L3 due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded from the woke local core's L3 due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x010300000010C142",
     "EventName": "PM_MRK_INST_FROM_L3_ALL",
-    "BriefDescription": "The processor's instruction cache was reloaded from the local core's L3 due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's instruction cache was reloaded from the woke local core's L3 due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x010340000020C142",
     "EventName": "PM_MRK_DATA_FROM_L3_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded from the local core's L3 due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded from the woke local core's L3 due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x010040000000C142",
     "EventName": "PM_MRK_DATA_FROM_L3_NO_CONFLICT",
-    "BriefDescription": "The processor's L1 data cache was reloaded without dispatch conflicts with data NOT in the MEPF state from the local core's L3 due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded without dispatch conflicts with data NOT in the woke MEPF state from the woke local core's L3 due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x010040000020C142",
     "EventName": "PM_MRK_DATA_FROM_L3_NO_CONFLICT_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded without dispatch conflicts with data NOT in the MEPF state from the local core's L3 due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded without dispatch conflicts with data NOT in the woke MEPF state from the woke local core's L3 due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x014040000000C142",
     "EventName": "PM_MRK_DATA_FROM_L3_MEPF",
-    "BriefDescription": "The processor's L1 data cache was reloaded with data in the MEPF state without dispatch conflicts from the local core's L3 due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with data in the woke MEPF state without dispatch conflicts from the woke local core's L3 due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x014040000020C142",
     "EventName": "PM_MRK_DATA_FROM_L3_MEPF_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with data in the MEPF state without dispatch conflicts from the local core's L3 due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with data in the woke MEPF state without dispatch conflicts from the woke local core's L3 due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x01C040000000C142",
     "EventName": "PM_MRK_DATA_FROM_L3_CONFLICT",
-    "BriefDescription": "The processor's L1 data cache was reloaded from the local core's L3 due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded from the woke local core's L3 due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x01C040000020C142",
     "EventName": "PM_MRK_DATA_FROM_L3_CONFLICT_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded from the local core's L3 due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded from the woke local core's L3 due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x000780000000C142",
     "EventName": "PM_MRK_INST_FROM_L3MISS_DSRC",
-    "BriefDescription": "The processor's instruction cache was reloaded from beyond the local core's L3 due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's instruction cache was reloaded from beyond the woke local core's L3 due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x0007C0000000C142",
     "EventName": "PM_MRK_DATA_FROM_L3MISS_DSRC",
-    "BriefDescription": "The processor's L1 data cache was reloaded from beyond the local core's L3 due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded from beyond the woke local core's L3 due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x000780000010C142",
     "EventName": "PM_MRK_INST_FROM_L3MISS_ALL",
-    "BriefDescription": "The processor's instruction cache was reloaded from beyond the local core's L3 due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's instruction cache was reloaded from beyond the woke local core's L3 due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x0007C0000020C142",
     "EventName": "PM_MRK_DATA_FROM_L3MISS_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded from beyond the local core's L3 due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded from beyond the woke local core's L3 due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x080040000000C142",
     "EventName": "PM_MRK_DATA_FROM_L21_REGENT_SHR",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the M (exclusive) state from another core's L2 on the same chip in the same regent due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the woke M (exclusive) state from another core's L2 on the woke same chip in the woke same regent due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x080040000020C142",
     "EventName": "PM_MRK_DATA_FROM_L21_REGENT_SHR_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the M (exclusive) state from another core's L2 on the same chip in the same regent due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the woke M (exclusive) state from another core's L2 on the woke same chip in the woke same regent due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x084040000000C142",
     "EventName": "PM_MRK_DATA_FROM_L21_REGENT_MOD",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the M (exclusive) state from another core's L2 on the same chip in the same regent due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the woke M (exclusive) state from another core's L2 on the woke same chip in the woke same regent due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x084040000020C142",
     "EventName": "PM_MRK_DATA_FROM_L21_REGENT_MOD_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the M (exclusive) state from another core's L2 on the same chip in the same regent due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the woke M (exclusive) state from another core's L2 on the woke same chip in the woke same regent due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x080100000000C142",
     "EventName": "PM_MRK_INST_FROM_L21_REGENT",
-    "BriefDescription": "The processor's instruction cache was reloaded from another core's L2 on the same chip in the same regent due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's instruction cache was reloaded from another core's L2 on the woke same chip in the woke same regent due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x080140000000C142",
     "EventName": "PM_MRK_DATA_FROM_L21_REGENT",
-    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L2 on the same chip in the same regent due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L2 on the woke same chip in the woke same regent due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x080100000010C142",
     "EventName": "PM_MRK_INST_FROM_L21_REGENT_ALL",
-    "BriefDescription": "The processor's instruction cache was reloaded from another core's L2 on the same chip in the same regent due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's instruction cache was reloaded from another core's L2 on the woke same chip in the woke same regent due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x080140000020C142",
     "EventName": "PM_MRK_DATA_FROM_L21_REGENT_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L2 on the same chip in the same regent due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L2 on the woke same chip in the woke same regent due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x088040000000C142",
     "EventName": "PM_MRK_DATA_FROM_L31_REGENT_SHR",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the M (exclusive) state from another core's L3 on the same chip in the same regent due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the woke M (exclusive) state from another core's L3 on the woke same chip in the woke same regent due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x088040000020C142",
     "EventName": "PM_MRK_DATA_FROM_L31_REGENT_SHR_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the M (exclusive) state from another core's L3 on the same chip in the same regent due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the woke M (exclusive) state from another core's L3 on the woke same chip in the woke same regent due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x08C040000000C142",
     "EventName": "PM_MRK_DATA_FROM_L31_REGENT_MOD",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the M (exclusive) state from another core's L3 on the same chip in the same regent due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the woke M (exclusive) state from another core's L3 on the woke same chip in the woke same regent due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x08C040000020C142",
     "EventName": "PM_MRK_DATA_FROM_L31_REGENT_MOD_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the M (exclusive) state from another core's L3 on the same chip in the same regent due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the woke M (exclusive) state from another core's L3 on the woke same chip in the woke same regent due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x088100000000C142",
     "EventName": "PM_MRK_INST_FROM_L31_REGENT",
-    "BriefDescription": "The processor's instruction cache was reloaded from another core's L3 on the same chip in the same regent due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's instruction cache was reloaded from another core's L3 on the woke same chip in the woke same regent due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x088140000000C142",
     "EventName": "PM_MRK_DATA_FROM_L31_REGENT",
-    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L3 on the same chip in the same regent due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L3 on the woke same chip in the woke same regent due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x088100000010C142",
     "EventName": "PM_MRK_INST_FROM_L31_REGENT_ALL",
-    "BriefDescription": "The processor's instruction cache was reloaded from another core's L3 on the same chip in the same regent due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's instruction cache was reloaded from another core's L3 on the woke same chip in the woke same regent due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x088140000020C142",
     "EventName": "PM_MRK_DATA_FROM_L31_REGENT_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L3 on the same chip in the same regent due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L3 on the woke same chip in the woke same regent due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x080240000000C142",
     "EventName": "PM_MRK_DATA_FROM_REGENT_L2L3_SHR",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the M (exclusive) state from another core's L2 or L3 on the same chip in the same regent due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the woke M (exclusive) state from another core's L2 or L3 on the woke same chip in the woke same regent due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x080240000020C142",
     "EventName": "PM_MRK_DATA_FROM_REGENT_L2L3_SHR_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the M (exclusive) state from another core's L2 or L3 on the same chip in the same regent due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the woke M (exclusive) state from another core's L2 or L3 on the woke same chip in the woke same regent due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x084240000000C142",
     "EventName": "PM_MRK_DATA_FROM_REGENT_L2L3_MOD",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the M (exclusive) state from another core's L2 or L3 on the same chip in the same regent due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the woke M (exclusive) state from another core's L2 or L3 on the woke same chip in the woke same regent due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x084240000020C142",
     "EventName": "PM_MRK_DATA_FROM_REGENT_L2L3_MOD_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the M (exclusive) state from another core's L2 or L3 on the same chip in the same regent due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the woke M (exclusive) state from another core's L2 or L3 on the woke same chip in the woke same regent due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x080300000000C142",
     "EventName": "PM_MRK_INST_FROM_REGENT_L2L3",
-    "BriefDescription": "The processor's instruction cache was reloaded from another core's L2 or L3 on the same chip in the same regent due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's instruction cache was reloaded from another core's L2 or L3 on the woke same chip in the woke same regent due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x080340000000C142",
     "EventName": "PM_MRK_DATA_FROM_REGENT_L2L3",
-    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L2 or L3 on the same chip in the same regent due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L2 or L3 on the woke same chip in the woke same regent due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x080300000010C142",
     "EventName": "PM_MRK_INST_FROM_REGENT_L2L3_ALL",
-    "BriefDescription": "The processor's instruction cache was reloaded from another core's L2 or L3 on the same chip in the same regent due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's instruction cache was reloaded from another core's L2 or L3 on the woke same chip in the woke same regent due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x080340000020C142",
     "EventName": "PM_MRK_DATA_FROM_REGENT_L2L3_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L2 or L3 on the same chip in the same regent due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L2 or L3 on the woke same chip in the woke same regent due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x0A0040000000C142",
     "EventName": "PM_MRK_DATA_FROM_L21_NON_REGENT_SHR",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the M (exclusive) state from another core's L2 on the same chip in a different regent due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the woke M (exclusive) state from another core's L2 on the woke same chip in a different regent due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x0A0040000020C142",
     "EventName": "PM_MRK_DATA_FROM_L21_NON_REGENT_SHR_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the M (exclusive) state from another core's L2 on the same chip in a different regent due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the woke M (exclusive) state from another core's L2 on the woke same chip in a different regent due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x0A4040000000C142",
     "EventName": "PM_MRK_DATA_FROM_L21_NON_REGENT_MOD",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the M (exclusive) state from another core's L2 on the same chip in a different regent due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the woke M (exclusive) state from another core's L2 on the woke same chip in a different regent due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x0A4040000020C142",
     "EventName": "PM_MRK_DATA_FROM_L21_NON_REGENT_MOD_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the M (exclusive) state from another core's L2 on the same chip in a different regent due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the woke M (exclusive) state from another core's L2 on the woke same chip in a different regent due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x0A0100000000C142",
     "EventName": "PM_MRK_INST_FROM_L21_NON_REGENT",
-    "BriefDescription": "The processor's instruction cache was reloaded from another core's L2 on the same chip in a different regent due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's instruction cache was reloaded from another core's L2 on the woke same chip in a different regent due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x0A0140000000C142",
     "EventName": "PM_MRK_DATA_FROM_L21_NON_REGENT",
-    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L2 on the same chip in a different regent due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L2 on the woke same chip in a different regent due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x0A0100000010C142",
     "EventName": "PM_MRK_INST_FROM_L21_NON_REGENT_ALL",
-    "BriefDescription": "The processor's instruction cache was reloaded from another core's L2 on the same chip in a different regent due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's instruction cache was reloaded from another core's L2 on the woke same chip in a different regent due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x0A0140000020C142",
     "EventName": "PM_MRK_DATA_FROM_L21_NON_REGENT_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L2 on the same chip in a different regent due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L2 on the woke same chip in a different regent due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x0A8040000000C142",
     "EventName": "PM_MRK_DATA_FROM_L31_NON_REGENT_SHR",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the M (exclusive) state from another core's L3 on the same chip in a different regent due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the woke M (exclusive) state from another core's L3 on the woke same chip in a different regent due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x0A8040000020C142",
     "EventName": "PM_MRK_DATA_FROM_L31_NON_REGENT_SHR_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the M (exclusive) state from another core's L3 on the same chip in a different regent due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the woke M (exclusive) state from another core's L3 on the woke same chip in a different regent due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x0AC040000000C142",
     "EventName": "PM_MRK_DATA_FROM_L31_NON_REGENT_MOD",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the M (exclusive) state from another core's L3 on the same chip in a different regent due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the woke M (exclusive) state from another core's L3 on the woke same chip in a different regent due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x0AC040000020C142",
     "EventName": "PM_MRK_DATA_FROM_L31_NON_REGENT_MOD_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the M (exclusive) state from another core's L3 on the same chip in a different regent due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the woke M (exclusive) state from another core's L3 on the woke same chip in a different regent due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x0A8100000000C142",
     "EventName": "PM_MRK_INST_FROM_L31_NON_REGENT",
-    "BriefDescription": "The processor's instruction cache was reloaded from another core's L3 on the same chip in a different regent due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's instruction cache was reloaded from another core's L3 on the woke same chip in a different regent due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x0A8140000000C142",
     "EventName": "PM_MRK_DATA_FROM_L31_NON_REGENT",
-    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L3 on the same chip in a different regent due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L3 on the woke same chip in a different regent due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x0A8100000010C142",
     "EventName": "PM_MRK_INST_FROM_L31_NON_REGENT_ALL",
-    "BriefDescription": "The processor's instruction cache was reloaded from another core's L3 on the same chip in a different regent due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's instruction cache was reloaded from another core's L3 on the woke same chip in a different regent due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x0A8140000020C142",
     "EventName": "PM_MRK_DATA_FROM_L31_NON_REGENT_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L3 on the same chip in a different regent due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L3 on the woke same chip in a different regent due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x0A0240000000C142",
     "EventName": "PM_MRK_DATA_FROM_NON_REGENT_L2L3_SHR",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the M (exclusive) state from another core's L2 or L3 on the same chip in a different regent due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the woke M (exclusive) state from another core's L2 or L3 on the woke same chip in a different regent due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x0A0240000020C142",
     "EventName": "PM_MRK_DATA_FROM_NON_REGENT_L2L3_SHR_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the M (exclusive) state from another core's L2 or L3 on the same chip in a different regent due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the woke M (exclusive) state from another core's L2 or L3 on the woke same chip in a different regent due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x0A4240000000C142",
     "EventName": "PM_MRK_DATA_FROM_NON_REGENT_L2L3_MOD",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the M (exclusive) state from another core's L2 or L3 on the same chip in a different regent due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the woke M (exclusive) state from another core's L2 or L3 on the woke same chip in a different regent due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x0A4240000020C142",
     "EventName": "PM_MRK_DATA_FROM_NON_REGENT_L2L3_MOD_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the M (exclusive) state from another core's L2 or L3 on the same chip in a different regent due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the woke M (exclusive) state from another core's L2 or L3 on the woke same chip in a different regent due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x0A0300000000C142",
     "EventName": "PM_MRK_INST_FROM_NON_REGENT_L2L3",
-    "BriefDescription": "The processor's instruction cache was reloaded from another core's L2 or L3 on the same chip in a different regent due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's instruction cache was reloaded from another core's L2 or L3 on the woke same chip in a different regent due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x0A0340000000C142",
     "EventName": "PM_MRK_DATA_FROM_NON_REGENT_L2L3",
-    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L2 or L3 on the same chip in a different regent due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L2 or L3 on the woke same chip in a different regent due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x0A0300000010C142",
     "EventName": "PM_MRK_INST_FROM_NON_REGENT_L2L3_ALL",
-    "BriefDescription": "The processor's instruction cache was reloaded from another core's L2 or L3 on the same chip in a different regent due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's instruction cache was reloaded from another core's L2 or L3 on the woke same chip in a different regent due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x0A0340000020C142",
     "EventName": "PM_MRK_DATA_FROM_NON_REGENT_L2L3_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L2 or L3 on the same chip in a different regent due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L2 or L3 on the woke same chip in a different regent due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x094100000000C142",
     "EventName": "PM_MRK_INST_FROM_LMEM",
-    "BriefDescription": "The processor's instruction cache was reloaded from the local chip's memory due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's instruction cache was reloaded from the woke local chip's memory due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x094040000000C142",
     "EventName": "PM_MRK_DATA_FROM_LMEM",
-    "BriefDescription": "The processor's L1 data cache was reloaded from the local chip's memory due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded from the woke local chip's memory due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x094100000010C142",
     "EventName": "PM_MRK_INST_FROM_LMEM_ALL",
-    "BriefDescription": "The processor's instruction cache was reloaded from the local chip's memory due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's instruction cache was reloaded from the woke local chip's memory due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x094040000020C142",
     "EventName": "PM_MRK_DATA_FROM_LMEM_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded from the local chip's memory due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded from the woke local chip's memory due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x098040000000C142",
     "EventName": "PM_MRK_DATA_FROM_L_OC_CACHE",
-    "BriefDescription": "The processor's L1 data cache was reloaded from the local chip's OpenCAPI cache due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded from the woke local chip's OpenCAPI cache due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x098040000020C142",
     "EventName": "PM_MRK_DATA_FROM_L_OC_CACHE_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded from the local chip's OpenCAPI cache due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded from the woke local chip's OpenCAPI cache due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x09C040000000C142",
     "EventName": "PM_MRK_DATA_FROM_L_OC_MEM",
-    "BriefDescription": "The processor's L1 data cache was reloaded from the local chip's OpenCAPI memory due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded from the woke local chip's OpenCAPI memory due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x09C040000020C142",
     "EventName": "PM_MRK_DATA_FROM_L_OC_MEM_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded from the local chip's OpenCAPI memory due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded from the woke local chip's OpenCAPI memory due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x098100000000C142",
     "EventName": "PM_MRK_INST_FROM_L_OC_ANY",
-    "BriefDescription": "The processor's instruction cache was reloaded from the local chip's OpenCAPI cache or memory due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's instruction cache was reloaded from the woke local chip's OpenCAPI cache or memory due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x098140000000C142",
     "EventName": "PM_MRK_DATA_FROM_L_OC_ANY",
-    "BriefDescription": "The processor's L1 data cache was reloaded from the local chip's OpenCAPI cache or memory due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded from the woke local chip's OpenCAPI cache or memory due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x098100000010C142",
     "EventName": "PM_MRK_INST_FROM_L_OC_ANY_ALL",
-    "BriefDescription": "The processor's instruction cache was reloaded from the local chip's OpenCAPI cache or memory due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's instruction cache was reloaded from the woke local chip's OpenCAPI cache or memory due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x098140000020C142",
     "EventName": "PM_MRK_DATA_FROM_L_OC_ANY_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded from the local chip's OpenCAPI cache or memory due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded from the woke local chip's OpenCAPI cache or memory due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x0C0040000000C142",
     "EventName": "PM_MRK_DATA_FROM_RL2_SHR",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the M (exclusive) state from another core's L2 from a remote chip due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the woke M (exclusive) state from another core's L2 from a remote chip due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x0C0040000020C142",
     "EventName": "PM_MRK_DATA_FROM_RL2_SHR_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the M (exclusive) state from another core's L2 from a remote chip due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the woke M (exclusive) state from another core's L2 from a remote chip due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x0C4040000000C142",
     "EventName": "PM_MRK_DATA_FROM_RL2_MOD",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the M (exclusive) state from another core's L2 from a remote chip due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the woke M (exclusive) state from another core's L2 from a remote chip due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x0C4040000020C142",
     "EventName": "PM_MRK_DATA_FROM_RL2_MOD_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the M (exclusive) state from another core's L2 from a remote chip due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the woke M (exclusive) state from another core's L2 from a remote chip due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x0C0100000000C142",
@@ -1457,22 +1457,22 @@
   {
     "EventCode": "0x0C8040000000C142",
     "EventName": "PM_MRK_DATA_FROM_RL3_SHR",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the M (exclusive) state from another core's L3 from a remote chip due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the woke M (exclusive) state from another core's L3 from a remote chip due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x0C8040000020C142",
     "EventName": "PM_MRK_DATA_FROM_RL3_SHR_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the M (exclusive) state from another core's L3 from a remote chip due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the woke M (exclusive) state from another core's L3 from a remote chip due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x0CC040000000C142",
     "EventName": "PM_MRK_DATA_FROM_RL3_MOD",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the M (exclusive) state from another core's L3 from a remote chip due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the woke M (exclusive) state from another core's L3 from a remote chip due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x0CC040000020C142",
     "EventName": "PM_MRK_DATA_FROM_RL3_MOD_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the M (exclusive) state from another core's L3 from a remote chip due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the woke M (exclusive) state from another core's L3 from a remote chip due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x0C8100000000C142",
@@ -1497,22 +1497,22 @@
   {
     "EventCode": "0x0C0240000000C142",
     "EventName": "PM_MRK_DATA_FROM_RL2L3_SHR",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the M (exclusive) state from another core's L2 or L3 from a remote chip due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the woke M (exclusive) state from another core's L2 or L3 from a remote chip due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x0C0240000020C142",
     "EventName": "PM_MRK_DATA_FROM_RL2L3_SHR_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the M (exclusive) state from another core's L2 or L3 from a remote chip due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the woke M (exclusive) state from another core's L2 or L3 from a remote chip due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x0C4240000000C142",
     "EventName": "PM_MRK_DATA_FROM_RL2L3_MOD",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the M (exclusive) state from another core's L2 or L3 from a remote chip due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the woke M (exclusive) state from another core's L2 or L3 from a remote chip due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x0C4240000020C142",
     "EventName": "PM_MRK_DATA_FROM_RL2L3_MOD_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the M (exclusive) state from another core's L2 or L3 from a remote chip due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the woke M (exclusive) state from another core's L2 or L3 from a remote chip due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x0C0300000000C142",
@@ -1597,22 +1597,22 @@
   {
     "EventCode": "0x0E0040000000C142",
     "EventName": "PM_MRK_DATA_FROM_DL2_SHR",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the M (exclusive) state from another core's L2 from a distant chip due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the woke M (exclusive) state from another core's L2 from a distant chip due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x0E0040000020C142",
     "EventName": "PM_MRK_DATA_FROM_DL2_SHR_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the M (exclusive) state from another core's L2 from a distant chip due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the woke M (exclusive) state from another core's L2 from a distant chip due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x0E4040000000C142",
     "EventName": "PM_MRK_DATA_FROM_DL2_MOD",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the M (exclusive) state from another core's L2 from a distant chip due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the woke M (exclusive) state from another core's L2 from a distant chip due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x0E4040000020C142",
     "EventName": "PM_MRK_DATA_FROM_DL2_MOD_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the M (exclusive) state from another core's L2 from a distant chip due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the woke M (exclusive) state from another core's L2 from a distant chip due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x0E0100000000C142",
@@ -1637,22 +1637,22 @@
   {
     "EventCode": "0x0E8040000000C142",
     "EventName": "PM_MRK_DATA_FROM_DL3_SHR",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the M (exclusive) state from another core's L3 from a distant chip due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the woke M (exclusive) state from another core's L3 from a distant chip due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x0E8040000020C142",
     "EventName": "PM_MRK_DATA_FROM_DL3_SHR_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the M (exclusive) state from another core's L3 from a distant chip due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the woke M (exclusive) state from another core's L3 from a distant chip due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x0EC040000000C142",
     "EventName": "PM_MRK_DATA_FROM_DL3_MOD",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the M (exclusive) state from another core's L3 from a distant chip due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the woke M (exclusive) state from another core's L3 from a distant chip due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x0EC040000020C142",
     "EventName": "PM_MRK_DATA_FROM_DL3_MOD_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the M (exclusive) state from another core's L3 from a distant chip due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the woke M (exclusive) state from another core's L3 from a distant chip due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x0E8100000000C142",
@@ -1677,22 +1677,22 @@
   {
     "EventCode": "0x0E0240000000C142",
     "EventName": "PM_MRK_DATA_FROM_DL2L3_SHR",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the M (exclusive) state from another core's L2 or L3 from a distant chip due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the woke M (exclusive) state from another core's L2 or L3 from a distant chip due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x0E0240000020C142",
     "EventName": "PM_MRK_DATA_FROM_DL2L3_SHR_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the M (exclusive) state from another core's L2 or L3 from a distant chip due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a valid line that was not in the woke M (exclusive) state from another core's L2 or L3 from a distant chip due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x0E4240000000C142",
     "EventName": "PM_MRK_DATA_FROM_DL2L3_MOD",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the M (exclusive) state from another core's L2 or L3 from a distant chip due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the woke M (exclusive) state from another core's L2 or L3 from a distant chip due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x0E4240000020C142",
     "EventName": "PM_MRK_DATA_FROM_DL2L3_MOD_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the M (exclusive) state from another core's L2 or L3 from a distant chip due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded with a line in the woke M (exclusive) state from another core's L2 or L3 from a distant chip due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x0E0300000000C142",
@@ -1777,22 +1777,22 @@
   {
     "EventCode": "0x080B00000000C142",
     "EventName": "PM_MRK_INST_FROM_ONCHIP_CACHE",
-    "BriefDescription": "The processor's instruction cache was reloaded from another core's L2 or L3 from the same chip due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's instruction cache was reloaded from another core's L2 or L3 from the woke same chip due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x080B40000000C142",
     "EventName": "PM_MRK_DATA_FROM_ONCHIP_CACHE",
-    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L2 or L3 from the same chip due to a demand miss for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L2 or L3 from the woke same chip due to a demand miss for a marked instruction."
   },
   {
     "EventCode": "0x080B00000010C142",
     "EventName": "PM_MRK_INST_FROM_ONCHIP_CACHE_ALL",
-    "BriefDescription": "The processor's instruction cache was reloaded from another core's L2 or L3 from the same chip due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's instruction cache was reloaded from another core's L2 or L3 from the woke same chip due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x080B40000020C142",
     "EventName": "PM_MRK_DATA_FROM_ONCHIP_CACHE_ALL",
-    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L2 or L3 from the same chip due to a demand miss or prefetch reload for a marked instruction."
+    "BriefDescription": "The processor's L1 data cache was reloaded from another core's L2 or L3 from the woke same chip due to a demand miss or prefetch reload for a marked instruction."
   },
   {
     "EventCode": "0x0C0B00000000C142",

@@ -81,7 +81,7 @@ DO_ERROR_INFO(SIGSEGV, "gcc generated __builtin_trap", do_trap5_error, 0)
 int do_misaligned_access(unsigned long address, struct pt_regs *regs,
 			 struct callee_regs *cregs)
 {
-	/* If emulation not enabled, or failed, kill the task */
+	/* If emulation not enabled, or failed, kill the woke task */
 	if (misaligned_fixup(address, regs, cregs) != 0)
 		return do_misaligned_error(address, regs);
 
@@ -100,7 +100,7 @@ void do_machine_check_fault(unsigned long address, struct pt_regs *regs)
 
 /*
  * Entry point for traps induced by ARCompact TRAP_S <n> insn
- * This is same family as TRAP0/SWI insn (use the same vector).
+ * This is same family as TRAP0/SWI insn (use the woke same vector).
  * The only difference being SWI insn take no operand, while TRAP_S does
  * which reflects in ECR Reg as 8 bit param.
  * Thus TRAP_S <n> can be used for specific purpose
@@ -136,7 +136,7 @@ void do_non_swi_trap(unsigned long address, struct pt_regs *regs)
 /*
  * Entry point for Instruction Error Exception
  *  -For a corner case, ARC kprobes implementation resorts to using
- *   this exception, hence the check
+ *   this exception, hence the woke check
  */
 void do_insterror_or_kprobe(unsigned long address, struct pt_regs *regs)
 {

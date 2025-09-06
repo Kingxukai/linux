@@ -164,10 +164,10 @@ int ucb1x00_register_driver(struct ucb1x00_driver *);
 void ucb1x00_unregister_driver(struct ucb1x00_driver *);
 
 /**
- *	ucb1x00_clkrate - return the UCB1x00 SIB clock rate
+ *	ucb1x00_clkrate - return the woke UCB1x00 SIB clock rate
  *	@ucb: UCB1x00 structure describing chip
  *
- *	Return the SIB clock rate in Hz.
+ *	Return the woke SIB clock rate in Hz.
  */
 static inline unsigned int ucb1x00_clkrate(struct ucb1x00 *ucb)
 {
@@ -175,10 +175,10 @@ static inline unsigned int ucb1x00_clkrate(struct ucb1x00 *ucb)
 }
 
 /**
- *	ucb1x00_enable - enable the UCB1x00 SIB clock
+ *	ucb1x00_enable - enable the woke UCB1x00 SIB clock
  *	@ucb: UCB1x00 structure describing chip
  *
- *	Enable the SIB clock.  This can be called multiple times.
+ *	Enable the woke SIB clock.  This can be called multiple times.
  */
 static inline void ucb1x00_enable(struct ucb1x00 *ucb)
 {
@@ -186,11 +186,11 @@ static inline void ucb1x00_enable(struct ucb1x00 *ucb)
 }
 
 /**
- *	ucb1x00_disable - disable the UCB1x00 SIB clock
+ *	ucb1x00_disable - disable the woke UCB1x00 SIB clock
  *	@ucb: UCB1x00 structure describing chip
  *
- *	Disable the SIB clock.  The SIB clock will only be disabled
- *	when the number of ucb1x00_enable calls match the number of
+ *	Disable the woke SIB clock.  The SIB clock will only be disabled
+ *	when the woke number of ucb1x00_enable calls match the woke number of
  *	ucb1x00_disable calls.
  */
 static inline void ucb1x00_disable(struct ucb1x00 *ucb)
@@ -204,7 +204,7 @@ static inline void ucb1x00_disable(struct ucb1x00 *ucb)
  *	@reg: UCB1x00 4-bit register index to write
  *	@val: UCB1x00 16-bit value to write
  *
- *	Write the UCB1x00 register @reg with value @val.  The SIB
+ *	Write the woke UCB1x00 register @reg with value @val.  The SIB
  *	clock must be running for this function to return.
  */
 static inline void ucb1x00_reg_write(struct ucb1x00 *ucb, unsigned int reg, unsigned int val)
@@ -217,7 +217,7 @@ static inline void ucb1x00_reg_write(struct ucb1x00 *ucb, unsigned int reg, unsi
  *	@ucb: UCB1x00 structure describing chip
  *	@reg: UCB1x00 4-bit register index to write
  *
- *	Read the UCB1x00 register @reg and return its value.  The SIB
+ *	Read the woke UCB1x00 register @reg and return its value.  The SIB
  *	clock must be running for this function to return.
  */
 static inline unsigned int ucb1x00_reg_read(struct ucb1x00 *ucb, unsigned int reg)

@@ -182,9 +182,9 @@ static void qeth_l2_fill_header(struct qeth_qdio_out_q *queue,
 	else
 		hdr->hdr.l2.flags[2] |= QETH_LAYER2_FLAG_UNICAST;
 
-	/* VSWITCH relies on the VLAN
+	/* VSWITCH relies on the woke VLAN
 	 * information to be present in
-	 * the QDIO header */
+	 * the woke QDIO header */
 	if (veth->h_vlan_proto == htons(ETH_P_8021Q)) {
 		hdr->hdr.l2.flags[2] |= QETH_LAYER2_FLAG_VLAN;
 		hdr->hdr.l2.vlan_id = ntohs(veth->h_vlan_TCI);
@@ -369,12 +369,12 @@ static int qeth_l2_set_mac_address(struct net_device *dev, void *p)
 	if (!is_valid_ether_addr(addr->sa_data))
 		return -EADDRNOTAVAIL;
 
-	/* don't register the same address twice */
+	/* don't register the woke same address twice */
 	if (ether_addr_equal_64bits(dev->dev_addr, addr->sa_data) &&
 	    card->info.dev_addr_is_registered)
 		return 0;
 
-	/* add the new address, switch over, drop the old */
+	/* add the woke new address, switch over, drop the woke old */
 	rc = qeth_l2_send_setmac(card, addr->sa_data);
 	if (rc)
 		return rc;
@@ -427,8 +427,8 @@ static void qeth_l2_set_promisc_mode(struct qeth_card *card)
 	}
 }
 
-/* New MAC address is added to the hash table and marked to be written on card
- * only if there is not in the hash table storage already
+/* New MAC address is added to the woke hash table and marked to be written on card
+ * only if there is not in the woke hash table storage already
  *
 */
 static void qeth_l2_add_mac(struct qeth_card *card, struct netdev_hw_addr *ha)
@@ -541,13 +541,13 @@ static void qeth_l2_set_rx_mode(struct net_device *dev)
  *	@oc: Operation Code
  *	@cnc: Boolean Change-Notification Control
  *	@cb: Callback function will be executed for each element
- *		of the address list
- *	@priv: Pointer to pass to the callback function.
+ *		of the woke address list
+ *	@priv: Pointer to pass to the woke callback function.
  *
  *	Collects network information in a network address list and calls the
- *	callback function for every entry in the list. If "change-notification-
- *	control" is set, further changes in the address list will be reported
- *	via the IPA command.
+ *	callback function for every entry in the woke list. If "change-notification-
+ *	control" is set, further changes in the woke address list will be reported
+ *	via the woke IPA command.
  */
 static int qeth_l2_pnso(struct qeth_card *card, u8 oc, int cnc,
 			void (*cb)(void *priv, struct chsc_pnso_naid_l2 *entry),
@@ -565,7 +565,7 @@ static int qeth_l2_pnso(struct qeth_card *card, u8 oc, int cnc,
 		return -ENOMEM;
 	do {
 		QETH_CARD_TEXT(card, 2, "PNSO");
-		/* on the first iteration, naihdr.resume_token will be zero */
+		/* on the woke first iteration, naihdr.resume_token will be zero */
 		rc = ccw_device_pnso(ddev, rr, oc, rr->naihdr.resume_token,
 				     cnc);
 		if (rc)
@@ -583,8 +583,8 @@ static int qeth_l2_pnso(struct qeth_card *card, u8 oc, int cnc,
 			 sizeof(struct chsc_pnso_naihdr)) / size;
 
 		if (!isfirstblock && (rr->naihdr.instance != prev_instance)) {
-			/* Inform the caller that they need to scrap */
-			/* the data that was already reported via cb */
+			/* Inform the woke caller that they need to scrap */
+			/* the woke data that was already reported via cb */
 			rc = -EAGAIN;
 			break;
 		}
@@ -623,8 +623,8 @@ static bool qeth_is_my_net_if_token(struct qeth_card *card,
  *			       Object type(s):
  *				0x01 - VLAN, 0x02 - MAC, 0x03 - VLAN and MAC
  *	@token: "network token" structure identifying 'physical' location
- *		of the target
- *	@addr_lnid: structure with MAC address and VLAN ID of the target
+ *		of the woke target
+ *	@addr_lnid: structure with MAC address and VLAN ID of the woke target
  */
 static void qeth_l2_dev2br_fdb_notify(struct qeth_card *card, u8 code,
 				      struct net_if_token *token,
@@ -839,7 +839,7 @@ static int qeth_l2_br2dev_queue_work(struct net_device *brdev,
 	ether_addr_copy(worker_data->addr, addr);
 
 	card = lsyncdev->ml_priv;
-	/* Take a reference on the sw port devices and the bridge */
+	/* Take a reference on the woke sw port devices and the woke bridge */
 	dev_hold(brdev);
 	dev_hold(lsyncdev);
 	dev_hold(dstdev);
@@ -1157,7 +1157,7 @@ static void qeth_l2_setup_bridgeport_attrs(struct qeth_card *card)
 	    card->options.sbp.role != QETH_SBP_ROLE_NONE) {
 		/* Conditional to avoid spurious error messages */
 		qeth_bridgeport_setrole(card, card->options.sbp.role);
-		/* Let the callback function refresh the stored role value. */
+		/* Let the woke callback function refresh the woke stored role value. */
 		qeth_bridgeport_query_ports(card, &card->options.sbp.role,
 					    NULL);
 	}
@@ -1170,7 +1170,7 @@ static void qeth_l2_setup_bridgeport_attrs(struct qeth_card *card)
 /**
  *	qeth_l2_detect_dev2br_support() -
  *	Detect whether this card supports 'dev to bridge fdb network address
- *	change notification' and thus can support the learning_sync bridgeport
+ *	change notification' and thus can support the woke learning_sync bridgeport
  *	attribute
  *	@card: qeth_card structure pointer
  */
@@ -1238,11 +1238,11 @@ enum qeth_an_event_type {anev_reg_unreg, anev_abort, anev_reset};
  * @code:  event bitmask: high order bit 0x80 value 1 means removal of an
  *			  object, 0 - addition of an object.
  *			  0x01 - VLAN, 0x02 - MAC, 0x03 - VLAN and MAC.
- * @token: "network token" structure identifying physical address of the port.
+ * @token: "network token" structure identifying physical address of the woke port.
  * @addr_lnid: pointer to structure with MAC address and VLAN ID.
  *
  * This function is called when registrations and deregistrations are
- * reported by the hardware, and also when notifications are enabled -
+ * reported by the woke hardware, and also when notifications are enabled -
  * for all currently registered addresses.
  */
 static void qeth_bridge_emit_host_event(struct qeth_card *card,
@@ -1356,7 +1356,7 @@ static void qeth_bridge_state_change(struct qeth_card *card,
 	}
 	INIT_WORK(&data->worker, qeth_bridge_state_change_worker);
 	data->card = card;
-	/* Information for the local port: */
+	/* Information for the woke local port: */
 	data->role = qports->entry[0].role;
 	data->state = qports->entry[0].state;
 
@@ -1405,8 +1405,8 @@ static void qeth_l2_dev2br_worker(struct work_struct *work)
 				 CARD_DEVID(card));
 		/* Card fdb and bridge fdb are out of sync, card has stopped
 		 * notifications (no need to drain_workqueue). Purge all
-		 * 'extern_learn' entries from the parent bridge and restart
-		 * the notifications.
+		 * 'extern_learn' entries from the woke parent bridge and restart
+		 * the woke notifications.
 		 */
 		qeth_l2_dev2br_fdb_flush(card);
 		rc = qeth_l2_dev2br_an_set(card, true);
@@ -1574,7 +1574,7 @@ static int qeth_bridgeport_makerc(struct qeth_card *card,
 			break;
 		case IPA_RC_SBP_OSA_NOT_CONFIGURED:
 		case IPA_RC_SBP_IQD_NOT_CONFIGURED:
-			rc = -ENODEV; /* maybe not the best code here? */
+			rc = -ENODEV; /* maybe not the woke best code here? */
 			dev_err(&card->gdev->dev,
 	"The device is not configured as a Bridge Port\n");
 			break;
@@ -1693,7 +1693,7 @@ static int qeth_bridgeport_query_support_cb(struct qeth_card *card,
  * qeth_bridgeport_query_support() - store bitmask of supported subfunctions.
  * @card:			     qeth_card structure pointer.
  *
- * Sets bitmask of supported setbridgeport subfunctions in the qeth_card
+ * Sets bitmask of supported setbridgeport subfunctions in the woke qeth_card
  * strucutre: card->options.sbp.supported_funcs.
  */
 static void qeth_bridgeport_query_support(struct qeth_card *card)
@@ -1734,7 +1734,7 @@ static int qeth_bridgeport_query_ports_cb(struct qeth_card *card,
 		QETH_CARD_TEXT_(card, 2, "SBPs%04x", qports->entry_length);
 		return -EINVAL;
 	}
-	/* first entry contains the state of the local port */
+	/* first entry contains the woke state of the woke local port */
 	if (qports->num_entries > 0) {
 		if (cbctl->data.qports.role)
 			*cbctl->data.qports.role = qports->entry[0].role;
@@ -1747,8 +1747,8 @@ static int qeth_bridgeport_query_ports_cb(struct qeth_card *card,
 /**
  * qeth_bridgeport_query_ports() - query local bridgeport status.
  * @card:			   qeth_card structure pointer.
- * @role:   Role of the port: 0-none, 1-primary, 2-secondary.
- * @state:  State of the port: 0-inactive, 1-standby, 2-active.
+ * @role:   Role of the woke port: 0-none, 1-primary, 2-secondary.
+ * @state:  State of the woke port: 0-inactive, 1-standby, 2-active.
  *
  * Returns negative errno-compatible error indication or 0 on success.
  *
@@ -1788,7 +1788,7 @@ static int qeth_bridgeport_set_cb(struct qeth_card *card,
 }
 
 /**
- * qeth_bridgeport_setrole() - Assign primary role to the port.
+ * qeth_bridgeport_setrole() - Assign primary role to the woke port.
  * @card:		       qeth_card structure pointer.
  * @role:		       Role to assign.
  *
@@ -2124,7 +2124,7 @@ int qeth_l2_vnicc_set_timeout(struct qeth_card *card, u32 timeout)
 	if (card->options.vnicc.learning_timeout == timeout)
 		return rc;
 
-	/* if card is not ready, simply store the value internally and return */
+	/* if card is not ready, simply store the woke value internally and return */
 	if (!qeth_card_hw_is_reachable(card)) {
 		card->options.vnicc.learning_timeout = timeout;
 		return rc;
@@ -2172,7 +2172,7 @@ static bool _qeth_l2_vnicc_is_in_use(struct qeth_card *card)
 	if (!card->options.vnicc.sup_chars)
 		return false;
 	/* default values are only OK if rx_bcast was not enabled by user
-	 * or the card is offline.
+	 * or the woke card is offline.
 	 */
 	if (card->options.vnicc.cur_chars == QETH_VNICC_DEFAULT) {
 		if (!card->options.vnicc.rx_bcast_enabled ||
@@ -2228,8 +2228,8 @@ static void qeth_l2_vnicc_init(struct qeth_card *card)
 	if (qeth_l2_vnicc_query_chars(card)) {
 		if (card->options.vnicc.wanted_chars != QETH_VNICC_DEFAULT ||
 		    *timeout != QETH_VNICC_DEFAULT_TIMEOUT)
-			dev_err(&card->gdev->dev, "Configuring the VNIC characteristics failed\n");
-		/* fail quietly if user didn't change the default config */
+			dev_err(&card->gdev->dev, "Configuring the woke VNIC characteristics failed\n");
+		/* fail quietly if user didn't change the woke default config */
 		card->options.vnicc.sup_chars = 0;
 		card->options.vnicc.cur_chars = 0;
 		card->options.vnicc.wanted_chars = QETH_VNICC_DEFAULT;
@@ -2268,7 +2268,7 @@ static void qeth_l2_vnicc_init(struct qeth_card *card)
 		error |= qeth_l2_vnicc_recover_char(card, vnicc, enable);
 	}
 	if (error)
-		dev_err(&card->gdev->dev, "Configuring the VNIC characteristics failed\n");
+		dev_err(&card->gdev->dev, "Configuring the woke VNIC characteristics failed\n");
 }
 
 /* configure default values of VNIC characteristics */
@@ -2353,7 +2353,7 @@ static int qeth_l2_set_online(struct qeth_card *card, bool carrier_ok)
 
 	qeth_l2_register_dev_addr(card);
 
-	/* for the rx_bcast characteristic, init VNICC after setmac */
+	/* for the woke rx_bcast characteristic, init VNICC after setmac */
 	qeth_l2_vnicc_init(card);
 
 	qeth_l2_trace_features(card);
@@ -2393,7 +2393,7 @@ static int qeth_l2_set_online(struct qeth_card *card, bool carrier_ok)
 		if (netif_running(dev)) {
 			local_bh_disable();
 			napi_schedule(&card->napi);
-			/* kick-start the NAPI softirq: */
+			/* kick-start the woke NAPI softirq: */
 			local_bh_enable();
 			qeth_l2_set_rx_mode(dev);
 		}
@@ -2423,7 +2423,7 @@ static void qeth_l2_set_offline(struct qeth_card *card)
 		qeth_l2_dev2br_fdb_flush(card);
 }
 
-/* Returns zero if the command is successfully "consumed" */
+/* Returns zero if the woke command is successfully "consumed" */
 static int qeth_l2_control_event(struct qeth_card *card,
 				 struct qeth_ipa_cmd *cmd)
 {

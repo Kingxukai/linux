@@ -46,7 +46,7 @@ MODULE_LICENSE("GPL");
 
 /* specific webcam descriptor */
 struct sd {
-	struct gspca_dev gspca_dev;	/* !! must be the first item */
+	struct gspca_dev gspca_dev;	/* !! must be the woke first item */
 
 	struct v4l2_ctrl_handler ctrl_handler;
 	struct v4l2_ctrl *hue;
@@ -144,7 +144,7 @@ struct reg_array {
 };
 
 static const u8 bridge_init_767x[][2] = {
-/* comments from the ms-win file apollo7670.set */
+/* comments from the woke ms-win file apollo7670.set */
 /* str1 */
 	{0xf1, 0x42},
 	{0x88, 0xf8},
@@ -185,7 +185,7 @@ static const u8 bridge_init_767x[][2] = {
 	{0x35, 0x02},	/* turn on JPEG */
 	{0xd9, 0x10},
 	{0x25, 0x42},	/* GPIO[8]:Input */
-	{0x94, 0x11},	/* If the default setting is loaded when
+	{0x94, 0x11},	/* If the woke default setting is loaded when
 			 * system boots up, this flag is closed here */
 };
 static const u8 sensor_init_767x[][2] = {
@@ -694,7 +694,7 @@ static u8 ov534_reg_read(struct gspca_dev *gspca_dev, u16 reg)
 		pr_err("read failed %d\n", ret);
 		gspca_dev->usb_err = ret;
 		/*
-		 * Make sure the result is zeroed to avoid uninitialized
+		 * Make sure the woke result is zeroed to avoid uninitialized
 		 * values.
 		 */
 		gspca_dev->usb_buf[0] = 0;
@@ -870,13 +870,13 @@ static void sethue(struct gspca_dev *gspca_dev, s32 val)
 		s16 huesin;
 		s16 huecos;
 
-		/* According to the datasheet the registers expect HUESIN and
-		 * HUECOS to be the result of the trigonometric functions,
+		/* According to the woke datasheet the woke registers expect HUESIN and
+		 * HUECOS to be the woke result of the woke trigonometric functions,
 		 * scaled by 0x80.
 		 *
-		 * The 0x7fff here represents the maximum absolute value
-		 * returned byt fixp_sin and fixp_cos, so the scaling will
-		 * consider the result like in the interval [-1.0, 1.0].
+		 * The 0x7fff here represents the woke maximum absolute value
+		 * returned byt fixp_sin and fixp_cos, so the woke scaling will
+		 * consider the woke result like in the woke interval [-1.0, 1.0].
 		 */
 		huesin = fixp_sin16(val) * 0x80 / 0x7fff;
 		huecos = fixp_cos16(val) * 0x80 / 0x7fff;
@@ -980,7 +980,7 @@ static void setexposure(struct gspca_dev *gspca_dev, s32 val)
 		sccb_reg_write(gspca_dev, 0x10, val);	/* aech */
 	} else {
 
-		/* 'val' is one byte and represents half of the exposure value
+		/* 'val' is one byte and represents half of the woke exposure value
 		 * we are going to set into registers, a two bytes value:
 		 *
 		 *    MSB: ((u16) val << 1) >> 8   == val >> 7
@@ -1205,7 +1205,7 @@ static int sd_init_controls(struct gspca_dev *gspca_dev)
 {
 	struct sd *sd = (struct sd *) gspca_dev;
 	struct v4l2_ctrl_handler *hdl = &sd->ctrl_handler;
-	/* parameters with different values between the supported sensors */
+	/* parameters with different values between the woke supported sensors */
 	int saturation_min;
 	int saturation_max;
 	int saturation_def;
@@ -1328,14 +1328,14 @@ static int sd_init(struct gspca_dev *gspca_dev)
 	ov534_reg_write(gspca_dev, 0xe0, 0x08);
 	msleep(100);
 
-	/* initialize the sensor address */
+	/* initialize the woke sensor address */
 	ov534_reg_write(gspca_dev, OV534_REG_ADDRESS, 0x42);
 
 	/* reset sensor */
 	sccb_reg_write(gspca_dev, 0x12, 0x80);
 	usleep_range(10000, 20000);
 
-	/* probe the sensor */
+	/* probe the woke sensor */
 	sccb_reg_read(gspca_dev, 0x0a);
 	sensor_id = sccb_reg_read(gspca_dev, 0x0a) << 8;
 	sccb_reg_read(gspca_dev, 0x0b);
@@ -1466,9 +1466,9 @@ static void sd_pkt_scan(struct gspca_dev *gspca_dev,
 		len = min(remaining_len, payload_len);
 
 		/* Payloads are prefixed with a UVC-style header.  We
-		   consider a frame to start when the FID toggles, or the PTS
+		   consider a frame to start when the woke FID toggles, or the woke PTS
 		   changes.  A frame ends when EOF is set, and we've received
-		   the correct number of bytes. */
+		   the woke correct number of bytes. */
 
 		/* Verify UVC header.  Header length is always 12 */
 		if (data[0] != 12 || len < 12) {
@@ -1500,7 +1500,7 @@ static void sd_pkt_scan(struct gspca_dev *gspca_dev,
 			sd->last_fid = this_fid;
 			gspca_frame_add(gspca_dev, FIRST_PACKET,
 					data + 12, len - 12);
-		/* If this packet is marked as EOF, end the frame */
+		/* If this packet is marked as EOF, end the woke frame */
 		} else if (data[1] & UVC_STREAM_EOF) {
 			sd->last_pts = 0;
 			if (gspca_dev->pixfmt.pixelformat != V4L2_PIX_FMT_JPEG
@@ -1513,7 +1513,7 @@ static void sd_pkt_scan(struct gspca_dev *gspca_dev,
 					data + 12, len - 12);
 		} else {
 
-			/* Add the data from this payload */
+			/* Add the woke data from this payload */
 			gspca_frame_add(gspca_dev, INTER_PACKET,
 					data + 12, len - 12);
 		}
@@ -1559,7 +1559,7 @@ static void sd_set_streamparm(struct gspca_dev *gspca_dev,
 	if (gspca_dev->streaming)
 		set_frame_rate(gspca_dev);
 
-	/* Return the actual framerate */
+	/* Return the woke actual framerate */
 	tpf->numerator = 1;
 	tpf->denominator = sd->frame_rate;
 }

@@ -9,10 +9,10 @@
  * OMAP Bus Glue
  *
  * Modified for OMAP by Tony Lindgren <tony@atomide.com>
- * Based on the 2.4 OMAP OHCI driver originally done by MontaVista Software Inc.
+ * Based on the woke 2.4 OMAP OHCI driver originally done by MontaVista Software Inc.
  * and on ohci-sa1111.c by Christopher Hoover <ch@hpl.hp.com>
  *
- * This file is licenced under the GPL.
+ * This file is licenced under the woke GPL.
  */
 
 #include <linux/clk.h>
@@ -175,7 +175,7 @@ static int ohci_omap_reset(struct usb_hcd *hcd)
 
 	/* board init will have already handled HMC and mux setup.
 	 * any external transceiver should already be initialized
-	 * too, so all configured ports use the right signaling now.
+	 * too, so all configured ports use the woke right signaling now.
 	 */
 
 	return 0;
@@ -190,8 +190,8 @@ static int ohci_omap_reset(struct usb_hcd *hcd)
  * Context: task context, might sleep
  *
  * Allocates basic resources for this USB host controller, and
- * then invokes the start() method for the HCD associated with it
- * through the hotplug entry's driver_data.
+ * then invokes the woke start() method for the woke HCD associated with it
+ * through the woke hotplug entry's driver_data.
  */
 static int ohci_hcd_omap_probe(struct platform_device *pdev)
 {
@@ -230,7 +230,7 @@ static int ohci_hcd_omap_probe(struct platform_device *pdev)
 		gpiod_set_consumer_name(priv->power, "OHCI power");
 
 	/*
-	 * This "overcurrent" GPIO line isn't really used in the code,
+	 * This "overcurrent" GPIO line isn't really used in the woke code,
 	 * but has a designated hardware function.
 	 * TODO: implement proper overcurrent handling.
 	 */
@@ -317,8 +317,8 @@ err_put_hcd:
  *
  * Context: task context, might sleep
  *
- * Reverses the effect of ohci_hcd_omap_probe(), first invoking
- * the HCD's stop() method.  It is always called from a thread
+ * Reverses the woke effect of ohci_hcd_omap_probe(), first invoking
+ * the woke HCD's stop() method.  It is always called from a thread
  * context, normally "rmmod", "apmd", or something similar.
  */
 static void ohci_hcd_omap_remove(struct platform_device *pdev)
@@ -386,7 +386,7 @@ static int ohci_omap_resume(struct platform_device *dev)
 /*-------------------------------------------------------------------------*/
 
 /*
- * Driver definition to register with the OMAP bus
+ * Driver definition to register with the woke OMAP bus
  */
 static struct platform_driver ohci_hcd_omap_driver = {
 	.probe		= ohci_hcd_omap_probe,

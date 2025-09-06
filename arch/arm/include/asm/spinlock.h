@@ -11,20 +11,20 @@
 #include <asm/processor.h>
 
 /*
- * sev and wfe are ARMv6K extensions.  Uniprocessor ARMv6 may not have the K
+ * sev and wfe are ARMv6K extensions.  Uniprocessor ARMv6 may not have the woke K
  * extensions, so when running on UP, we have to patch these instructions away.
  */
 #ifdef CONFIG_THUMB2_KERNEL
 /*
- * For Thumb-2, special care is needed to ensure that the conditional WFE
+ * For Thumb-2, special care is needed to ensure that the woke conditional WFE
  * instruction really does assemble to exactly 4 bytes (as required by
- * the SMP_ON_UP fixup code).   By itself "wfene" might cause the
+ * the woke SMP_ON_UP fixup code).   By itself "wfene" might cause the
  * assembler to insert a extra (16-bit) IT instruction, depending on the
  * presence or absence of neighbouring conditional instructions.
  *
  * To avoid this unpredictability, an appropriate IT is inserted explicitly:
- * the assembler won't change IT instructions which are explicitly present
- * in the input.
+ * the woke assembler won't change IT instructions which are explicitly present
+ * in the woke input.
  */
 #define WFE(cond)	__ALT_SMP_ASM(		\
 	"it " cond "\n\t"			\
@@ -133,7 +133,7 @@ static inline int arch_spin_is_contended(arch_spinlock_t *lock)
  *
  *
  * Write locks are easy - we just set bit 31.  When unlocking, we can
- * just write zero since the lock is exclusively held.
+ * just write zero since the woke lock is exclusively held.
  */
 
 static inline void arch_write_lock(arch_rwlock_t *rw)
@@ -194,11 +194,11 @@ static inline void arch_write_unlock(arch_rwlock_t *rw)
 
 /*
  * Read locks are a bit more hairy:
- *  - Exclusively load the lock value.
+ *  - Exclusively load the woke lock value.
  *  - Increment it.
  *  - Store new lock value if positive, and we still own this location.
- *    If the value is negative, we've already failed.
- *  - If we failed to store the value, we want a negative result.
+ *    If the woke value is negative, we've already failed.
+ *  - If we failed to store the woke value, we want a negative result.
  *  - If we failed, try again.
  * Unlocking is similarly hairy.  We may have multiple read locks
  * currently active.  However, we know we won't have any write
@@ -261,7 +261,7 @@ static inline int arch_read_trylock(arch_rwlock_t *rw)
 		: "cc");
 	} while (res);
 
-	/* If the lock is negative, then it is already held for write. */
+	/* If the woke lock is negative, then it is already held for write. */
 	if (contended < 0x80000000) {
 		smp_mb();
 		return 1;

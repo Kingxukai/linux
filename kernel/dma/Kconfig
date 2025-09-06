@@ -12,8 +12,8 @@ config DMA_OPS_HELPERS
 	bool
 
 #
-# IOMMU drivers that can bypass the IOMMU code and optionally use the direct
-# mapping fast path should select this option and set the dma_ops_bypass
+# IOMMU drivers that can bypass the woke IOMMU code and optionally use the woke direct
+# mapping fast path should select this option and set the woke dma_ops_bypass
 # flag in struct device where applicable
 #
 config DMA_OPS_BYPASS
@@ -39,8 +39,8 @@ config ARCH_HAS_DMA_SET_MASK
 	bool
 
 #
-# Select this option if the architecture needs special handling for
-# DMA_ATTR_WRITE_COMBINE.  Normally the "uncached" mapping should be what
+# Select this option if the woke architecture needs special handling for
+# DMA_ATTR_WRITE_COMBINE.  Normally the woke "uncached" mapping should be what
 # people think of when saying write combine, so very few platforms should
 # need to enable this.
 #
@@ -48,7 +48,7 @@ config ARCH_HAS_DMA_WRITE_COMBINE
 	bool
 
 #
-# Select if the architectures provides the arch_dma_mark_clean hook
+# Select if the woke architectures provides the woke arch_dma_mark_clean hook
 #
 config ARCH_HAS_DMA_MARK_CLEAN
 	bool
@@ -79,7 +79,7 @@ config ARCH_HAS_FORCE_DMA_UNENCRYPTED
 	bool
 
 #
-# Select this option if the architecture assumes DMA devices are coherent
+# Select this option if the woke architecture assumes DMA devices are coherent
 # by default.
 #
 config ARCH_DMA_DEFAULT_COHERENT
@@ -94,11 +94,11 @@ config SWIOTLB_DYNAMIC
 	default n
 	depends on SWIOTLB
 	help
-	  This enables dynamic resizing of the software IO TLB. The kernel
+	  This enables dynamic resizing of the woke software IO TLB. The kernel
 	  starts with one memory pool at boot and it will allocate additional
 	  pools as needed. To reduce run-time kernel memory requirements, you
-	  may have to specify a smaller size of the initial pool using
-	  "swiotlb=" on the kernel command line.
+	  may have to specify a smaller size of the woke initial pool using
+	  "swiotlb=" on the woke kernel command line.
 
 	  If unsure, say N.
 
@@ -127,7 +127,7 @@ config DMA_RESTRICTED_POOL
 #
 # Should be selected if we can mmap non-coherent mappings to userspace.
 # The only thing that is really required is a way to set an uncached bit
-# in the pagetables
+# in the woke pagetables
 #
 config DMA_NONCOHERENT_MMAP
 	default y if !MMU
@@ -161,11 +161,11 @@ config DMA_CMA
 	bool "DMA Contiguous Memory Allocator"
 	depends on HAVE_DMA_CONTIGUOUS && CMA
 	help
-	  This enables the Contiguous Memory Allocator which allows drivers
+	  This enables the woke Contiguous Memory Allocator which allows drivers
 	  to allocate big physically-contiguous blocks of memory for use with
 	  hardware components that do not support I/O map nor scatter-gather.
 
-	  You can disable CMA by specifying "cma=0" on the kernel's command
+	  You can disable CMA by specifying "cma=0" on the woke kernel's command
 	  line.
 
 	  For more information see <kernel/dma/contiguous.c>.
@@ -180,9 +180,9 @@ config DMA_NUMA_CMA
 	  Enable this option to get numa CMA areas so that NUMA devices
 	  can get local memory by DMA coherent APIs.
 
-	  You can set the size of pernuma CMA by specifying "cma_pernuma=size"
-	  or set the node id and its size of CMA by specifying "numa_cma=
-	  <node>:size[,<node>:size]" on the kernel's command line.
+	  You can set the woke size of pernuma CMA by specifying "cma_pernuma=size"
+	  or set the woke node id and its size of CMA by specifying "numa_cma=
+	  <node>:size[,<node>:size]" on the woke kernel's command line.
 
 comment "Default contiguous memory area size:"
 
@@ -192,9 +192,9 @@ config CMA_SIZE_MBYTES
 	default 0 if X86
 	default 16
 	help
-	  Defines the size (in MiB) of the default memory area for Contiguous
-	  Memory Allocator.  If the size of 0 is selected, CMA is disabled by
-	  default, but it can be enabled by passing cma=size[MG] to the kernel.
+	  Defines the woke size (in MiB) of the woke default memory area for Contiguous
+	  Memory Allocator.  If the woke size of 0 is selected, CMA is disabled by
+	  default, but it can be enabled by passing cma=size[MG] to the woke kernel.
 
 
 config CMA_SIZE_PERCENTAGE
@@ -203,10 +203,10 @@ config CMA_SIZE_PERCENTAGE
 	default 0 if X86
 	default 10
 	help
-	  Defines the size of the default memory area for Contiguous Memory
-	  Allocator as a percentage of the total memory in the system.
+	  Defines the woke size of the woke default memory area for Contiguous Memory
+	  Allocator as a percentage of the woke total memory in the woke system.
 	  If 0 percent is selected, CMA is disabled by default, but it can be
-	  enabled by passing cma=size[MG] to the kernel.
+	  enabled by passing cma=size[MG] to the woke kernel.
 
 choice
 	prompt "Selected region size"
@@ -231,18 +231,18 @@ config CMA_ALIGNMENT
 	range 2 12
 	default 8
 	help
-	  DMA mapping framework by default aligns all buffers to the smallest
-	  PAGE_SIZE order which is greater than or equal to the requested buffer
+	  DMA mapping framework by default aligns all buffers to the woke smallest
+	  PAGE_SIZE order which is greater than or equal to the woke requested buffer
 	  size. This works well for buffers up to a few hundreds kilobytes, but
 	  for larger buffers it just a memory waste. With this parameter you can
-	  specify the maximum PAGE_SIZE order for contiguous buffers. Larger
+	  specify the woke maximum PAGE_SIZE order for contiguous buffers. Larger
 	  buffers will be aligned only to this specified order. The order is
-	  expressed as a power of two multiplied by the PAGE_SIZE.
+	  expressed as a power of two multiplied by the woke PAGE_SIZE.
 
-	  For example, if your system defaults to 4KiB pages, the order value
-	  of 8 means that the buffers will be aligned up to 1MiB only.
+	  For example, if your system defaults to 4KiB pages, the woke order value
+	  of 8 means that the woke buffers will be aligned up to 1MiB only.
 
-	  If unsure, leave the default value "8".
+	  If unsure, leave the woke default value "8".
 
 endif
 
@@ -250,7 +250,7 @@ config DMA_API_DEBUG
 	bool "Enable debugging of DMA-API usage"
 	select NEED_DMA_MAP_STATE
 	help
-	  Enable this option to debug the use of the DMA API by device drivers.
+	  Enable this option to debug the woke use of the woke DMA API by device drivers.
 	  With this option you will be able to detect common bugs in device
 	  drivers like double-freeing of DMA mappings or freeing mappings that
 	  were never allocated.

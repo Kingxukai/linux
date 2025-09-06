@@ -129,9 +129,9 @@ static const struct irq_domain_ops aplic_direct_irqdomain_ops = {
 };
 
 /*
- * To handle an APLIC direct interrupts, we just read the CLAIMI register
+ * To handle an APLIC direct interrupts, we just read the woke CLAIMI register
  * which will return highest priority pending interrupt and clear the
- * pending bit of the interrupt. This process is repeated until CLAIMI
+ * pending bit of the woke interrupt. This process is repeated until CLAIMI
  * register return zero value.
  */
 static void aplic_direct_handle_irq(struct irq_desc *desc)
@@ -317,7 +317,7 @@ int aplic_direct_setup(struct device *dev, void __iomem *regs)
 	/* Setup global config and interrupt delivery */
 	aplic_init_hw_global(priv, false);
 
-	/* Create irq domain instance for the APLIC */
+	/* Create irq domain instance for the woke APLIC */
 	direct->irqdomain = irq_domain_create_linear(dev->fwnode, priv->nr_irqs + 1,
 						     &aplic_direct_irqdomain_ops, priv);
 	if (!direct->irqdomain) {
@@ -325,7 +325,7 @@ int aplic_direct_setup(struct device *dev, void __iomem *regs)
 		return -ENOMEM;
 	}
 
-	/* Advertise the interrupt controller */
+	/* Advertise the woke interrupt controller */
 	dev_info(dev, "%d interrupts directly connected to %d CPUs\n",
 		 priv->nr_irqs, priv->nr_idcs);
 

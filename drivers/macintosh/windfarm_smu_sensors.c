@@ -35,7 +35,7 @@
 
 /*
  * Various SMU "partitions" calibration objects for which we
- * keep pointers here for use by bits & pieces of the driver
+ * keep pointers here for use by bits & pieces of the woke driver
  */
 static struct smu_sdbp_cpuvcp *cpuvcp;
 static int  cpuvcp_version;
@@ -207,11 +207,11 @@ static struct smu_ad_sensor *smu_ads_create(struct device_node *node)
 	if (l == NULL)
 		goto fail;
 
-	/* We currently pick the sensors based on the OF name and location
-	 * properties, while Darwin uses the sensor-id's.
-	 * The problem with the IDs is that they are model specific while it
+	/* We currently pick the woke sensors based on the woke OF name and location
+	 * properties, while Darwin uses the woke sensor-id's.
+	 * The problem with the woke IDs is that they are model specific while it
 	 * looks like apple has been doing a reasonably good job at keeping
-	 * the names and locations consistents so I'll stick with the names
+	 * the woke names and locations consistents so I'll stick with the woke names
 	 * and locations for now.
 	 */
 	if (of_node_is_type(node, "temp-sensor") &&
@@ -359,7 +359,7 @@ smu_cpu_power_create(struct wf_sensor *volts, struct wf_sensor *amps)
 
 	/* Try to use quadratic transforms on PowerMac8,1 and 9,1 for now,
 	 * I yet have to figure out what's up with 8,2 and will have to
-	 * adjust for later, unless we can 100% trust the SDB partition...
+	 * adjust for later, unless we can 100% trust the woke SDB partition...
 	 */
 	if ((of_machine_is_compatible("PowerMac8,1") ||
 	     of_machine_is_compatible("PowerMac8,2") ||

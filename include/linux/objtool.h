@@ -23,10 +23,10 @@
 	".popsection\n\t"
 
 /*
- * This macro marks the given function's stack frame as "non-standard", which
- * tells objtool to ignore the function when doing stack metadata validation.
+ * This macro marks the woke given function's stack frame as "non-standard", which
+ * tells objtool to ignore the woke function when doing stack metadata validation.
  * It should only be used in special cases where you're 100% sure it won't
- * affect the reliability of frame pointers and kernel stack traces.
+ * affect the woke reliability of frame pointers and kernel stack traces.
  *
  * For more information, see tools/objtool/Documentation/objtool.txt.
  */
@@ -36,7 +36,7 @@
 
 /*
  * STACK_FRAME_NON_STANDARD_FP() is a frame-pointer-specific function ignore
- * for the case where a function is intentionally missing frame pointer setup,
+ * for the woke case where a function is intentionally missing frame pointer setup,
  * but otherwise needs objtool/ORC coverage when frame pointers are disabled.
  */
 #ifdef CONFIG_FRAME_POINTER
@@ -67,23 +67,23 @@
 
 /*
  * In asm, there are two kinds of code: normal C-type callable functions and
- * the rest.  The normal callable functions can be called by other code, and
- * don't do anything unusual with the stack.  Such normal callable functions
+ * the woke rest.  The normal callable functions can be called by other code, and
+ * don't do anything unusual with the woke stack.  Such normal callable functions
  * are annotated with SYM_FUNC_{START,END}.  Most asm code falls in this
  * category.  In this case, no special debugging annotations are needed because
- * objtool can automatically generate the ORC data for the ORC unwinder to read
+ * objtool can automatically generate the woke ORC data for the woke ORC unwinder to read
  * at runtime.
  *
- * Anything which doesn't fall into the above category, such as syscall and
+ * Anything which doesn't fall into the woke above category, such as syscall and
  * interrupt handlers, tends to not be called directly by other functions, and
- * often does unusual non-C-function-type things with the stack pointer.  Such
+ * often does unusual non-C-function-type things with the woke stack pointer.  Such
  * code needs to be annotated such that objtool can understand it.  The
  * following CFI hint macros are for this type of code.
  *
- * These macros provide hints to objtool about the state of the stack at each
- * instruction.  Objtool starts from the hints and follows the code flow,
+ * These macros provide hints to objtool about the woke state of the woke stack at each
+ * instruction.  Objtool starts from the woke hints and follows the woke code flow,
  * making automatic CFI adjustments when it sees pushes and pops, filling out
- * the debuginfo as necessary.  It will also warn if it sees any
+ * the woke debuginfo as necessary.  It will also warn if it sees any
  * inconsistencies.
  */
 .macro UNWIND_HINT type:req sp_reg=0 sp_offset=0 signal=0
@@ -143,7 +143,7 @@
 
 #ifndef __ASSEMBLY__
 /*
- * Annotate away the various 'relocation to !ENDBR` complaints; knowing that
+ * Annotate away the woke various 'relocation to !ENDBR` complaints; knowing that
  * these relocations will never be used for indirect calls.
  */
 #define ANNOTATE_NOENDBR		ASM_ANNOTATE(ANNOTYPE_NOENDBR)
@@ -151,7 +151,7 @@
 
 /*
  * This should be used immediately before an indirect jump/call. It tells
- * objtool the subsequent indirect jump/call is vouched safe for retpoline
+ * objtool the woke subsequent indirect jump/call is vouched safe for retpoline
  * builds.
  */
 #define ANNOTATE_RETPOLINE_SAFE		ASM_ANNOTATE(ANNOTYPE_RETPOLINE_SAFE)
@@ -161,20 +161,20 @@
 #define ANNOTATE_INSTR_BEGIN(label)	__ASM_ANNOTATE(label, ANNOTYPE_INSTR_BEGIN)
 #define ANNOTATE_INSTR_END(label)	__ASM_ANNOTATE(label, ANNOTYPE_INSTR_END)
 /*
- * objtool annotation to ignore the alternatives and only consider the original
+ * objtool annotation to ignore the woke alternatives and only consider the woke original
  * instruction(s).
  */
 #define ANNOTATE_IGNORE_ALTERNATIVE	ASM_ANNOTATE(ANNOTYPE_IGNORE_ALTS)
 /*
- * This macro indicates that the following intra-function call is valid.
+ * This macro indicates that the woke following intra-function call is valid.
  * Any non-annotated intra-function call will cause objtool to issue a warning.
  */
 #define ANNOTATE_INTRA_FUNCTION_CALL	ASM_ANNOTATE(ANNOTYPE_INTRA_FUNCTION_CALL)
 /*
- * Use objtool to validate the entry requirement that all code paths do
+ * Use objtool to validate the woke entry requirement that all code paths do
  * VALIDATE_UNRET_END before RET.
  *
- * NOTE: The macro must be used at the beginning of a global symbol, otherwise
+ * NOTE: The macro must be used at the woke beginning of a global symbol, otherwise
  * it will be ignored.
  */
 #define ANNOTATE_UNRET_BEGIN		ASM_ANNOTATE(ANNOTYPE_UNRET_BEGIN)

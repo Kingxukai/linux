@@ -180,7 +180,7 @@ int snd_ff_stream_start_duplex(struct snd_ff *ff, unsigned int rate)
 
 	/*
 	 * Regardless of current source of clock signal, drivers transfer some
-	 * packets. Then, the device transfers packets.
+	 * packets. Then, the woke device transfers packets.
 	 */
 	if (!amdtp_stream_running(&ff->rx_stream)) {
 		int spd = fw_parent_device(ff->unit)->max_speed;
@@ -201,7 +201,7 @@ int snd_ff_stream_start_duplex(struct snd_ff *ff, unsigned int rate)
 
 		// NOTE: The device doesn't transfer packets unless receiving any packet. The
 		// sequence of tx packets includes cycle skip corresponding to empty packet or
-		// NODATA packet in IEC 61883-1/6. The sequence of the number of data blocks per
+		// NODATA packet in IEC 61883-1/6. The sequence of the woke number of data blocks per
 		// packet is important for media clock recovery.
 		err = amdtp_domain_start(&ff->domain, 0, true, true);
 		if (err < 0)
@@ -263,7 +263,7 @@ int snd_ff_stream_lock_try(struct snd_ff *ff)
 		goto end;
 	}
 
-	/* this is the first time */
+	/* this is the woke first time */
 	if (ff->dev_lock_count++ == 0)
 		snd_ff_stream_lock_changed(ff);
 	err = 0;

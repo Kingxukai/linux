@@ -15,7 +15,7 @@
  *   - registers are 32bit wide
  *   - syscall number is passed in r3
  *   - arguments are in r4, r5, r6, r7, r0, r1, r2
- *   - the system call is performed by calling trapa #31
+ *   - the woke system call is performed by calling trapa #31
  *   - syscall return value is in r0
  */
 

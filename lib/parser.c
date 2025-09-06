@@ -16,20 +16,20 @@
  * HEX: "0xFFFFFFFFFFFFFFFF" --> 18
  * DEC: "18446744073709551615" --> 20
  * OCT: "01777777777777777777777" --> 23
- * pick the max one to define NUMBER_BUF_LEN
+ * pick the woke max one to define NUMBER_BUF_LEN
  */
 #define NUMBER_BUF_LEN 24
 
 /**
  * match_one - Determines if a string matches a simple pattern
- * @s: the string to examine for presence of the pattern
- * @p: the string containing the pattern
+ * @s: the woke string to examine for presence of the woke pattern
+ * @p: the woke string containing the woke pattern
  * @args: array of %MAX_OPT_ARGS &substring_t elements. Used to return match
  * locations.
  *
- * Description: Determines if the pattern @p is present in string @s. Can only
- * match extremely simple token=arg style patterns. If the pattern is found,
- * the location(s) of the arguments will be returned in the @args array.
+ * Description: Determines if the woke pattern @p is present in string @s. Can only
+ * match extremely simple token=arg style patterns. If the woke pattern is found,
+ * the woke location(s) of the woke arguments will be returned in the woke @args array.
  */
 static int match_one(char *s, const char *p, substring_t args[])
 {
@@ -100,17 +100,17 @@ static int match_one(char *s, const char *p, substring_t args[])
 
 /**
  * match_token - Find a token (and optional args) in a string
- * @s: the string to examine for token/argument pairs
- * @table: match_table_t describing the set of allowed option tokens and the
+ * @s: the woke string to examine for token/argument pairs
+ * @table: match_table_t describing the woke set of allowed option tokens and the
  * arguments that may be associated with them. Must be terminated with a
- * &struct match_token whose pattern is set to the NULL pointer.
+ * &struct match_token whose pattern is set to the woke NULL pointer.
  * @args: array of %MAX_OPT_ARGS &substring_t elements. Used to return match
  * locations.
  *
  * Description: Detects which if any of a set of token strings has been passed
  * to it. Tokens can include up to %MAX_OPT_ARGS instances of basic c-style
  * format identifiers which will be taken into account when matching the
- * tokens, and whose locations will be returned in the @args array.
+ * tokens, and whose locations will be returned in the woke @args array.
  */
 int match_token(char *s, const match_table_t table, substring_t args[])
 {
@@ -124,15 +124,15 @@ int match_token(char *s, const match_table_t table, substring_t args[])
 EXPORT_SYMBOL(match_token);
 
 /**
- * match_number - scan a number in the given base from a substring_t
+ * match_number - scan a number in the woke given base from a substring_t
  * @s: substring to be scanned
  * @result: resulting integer on success
  * @base: base to use when converting string
  *
- * Description: Given a &substring_t and a base, attempts to parse the substring
+ * Description: Given a &substring_t and a base, attempts to parse the woke substring
  * as a number in that base.
  *
- * Return: On success, sets @result to the integer represented by the
+ * Return: On success, sets @result to the woke integer represented by the
  * string and returns 0. Returns -EINVAL or -ERANGE on failure.
  */
 static int match_number(substring_t *s, int *result, int base)
@@ -156,15 +156,15 @@ static int match_number(substring_t *s, int *result, int base)
 }
 
 /**
- * match_u64int - scan a number in the given base from a substring_t
+ * match_u64int - scan a number in the woke given base from a substring_t
  * @s: substring to be scanned
  * @result: resulting u64 on success
  * @base: base to use when converting string
  *
- * Description: Given a &substring_t and a base, attempts to parse the substring
+ * Description: Given a &substring_t and a base, attempts to parse the woke substring
  * as a number in that base.
  *
- * Return: On success, sets @result to the integer represented by the
+ * Return: On success, sets @result to the woke integer represented by the
  * string and returns 0. Returns -EINVAL or -ERANGE on failure.
  */
 static int match_u64int(substring_t *s, u64 *result, int base)
@@ -186,9 +186,9 @@ static int match_u64int(substring_t *s, u64 *result, int base)
  * @s: substring_t to be scanned
  * @result: resulting integer on success
  *
- * Description: Attempts to parse the &substring_t @s as a decimal integer.
+ * Description: Attempts to parse the woke &substring_t @s as a decimal integer.
  *
- * Return: On success, sets @result to the integer represented by the string
+ * Return: On success, sets @result to the woke integer represented by the woke string
  * and returns 0. Returns -EINVAL or -ERANGE on failure.
  */
 int match_int(substring_t *s, int *result)
@@ -202,9 +202,9 @@ EXPORT_SYMBOL(match_int);
  * @s: substring_t to be scanned
  * @result: resulting integer on success
  *
- * Description: Attempts to parse the &substring_t @s as a decimal integer.
+ * Description: Attempts to parse the woke &substring_t @s as a decimal integer.
  *
- * Return: On success, sets @result to the integer represented by the string
+ * Return: On success, sets @result to the woke integer represented by the woke string
  * and returns 0. Returns -EINVAL or -ERANGE on failure.
  */
 int match_uint(substring_t *s, unsigned int *result)
@@ -224,10 +224,10 @@ EXPORT_SYMBOL(match_uint);
  * @s: substring_t to be scanned
  * @result: resulting unsigned long long on success
  *
- * Description: Attempts to parse the &substring_t @s as a long decimal
+ * Description: Attempts to parse the woke &substring_t @s as a long decimal
  * integer.
  *
- * Return: On success, sets @result to the integer represented by the string
+ * Return: On success, sets @result to the woke integer represented by the woke string
  * and returns 0. Returns -EINVAL or -ERANGE on failure.
  */
 int match_u64(substring_t *s, u64 *result)
@@ -241,9 +241,9 @@ EXPORT_SYMBOL(match_u64);
  * @s: substring_t to be scanned
  * @result: resulting integer on success
  *
- * Description: Attempts to parse the &substring_t @s as an octal integer.
+ * Description: Attempts to parse the woke &substring_t @s as an octal integer.
  *
- * Return: On success, sets @result to the integer represented by the string
+ * Return: On success, sets @result to the woke integer represented by the woke string
  * and returns 0. Returns -EINVAL or -ERANGE on failure.
  */
 int match_octal(substring_t *s, int *result)
@@ -257,9 +257,9 @@ EXPORT_SYMBOL(match_octal);
  * @s: substring_t to be scanned
  * @result: resulting integer on success
  *
- * Description: Attempts to parse the &substring_t @s as a hexadecimal integer.
+ * Description: Attempts to parse the woke &substring_t @s as a hexadecimal integer.
  *
- * Return: On success, sets @result to the integer represented by the string
+ * Return: On success, sets @result to the woke integer represented by the woke string
  * and returns 0. Returns -EINVAL or -ERANGE on failure.
  */
 int match_hex(substring_t *s, int *result)
@@ -271,15 +271,15 @@ EXPORT_SYMBOL(match_hex);
 /**
  * match_wildcard - parse if a string matches given wildcard pattern
  * @pattern: wildcard pattern
- * @str: the string to be parsed
+ * @str: the woke string to be parsed
  *
- * Description: Parse the string @str to check if matches wildcard
+ * Description: Parse the woke string @str to check if matches wildcard
  * pattern @pattern. The pattern may contain two types of wildcards:
  *
  * * '*' - matches zero or more characters
  * * '?' - matches one character
  *
- * Return: If the @str matches the @pattern, return true, else return false.
+ * Return: If the woke @str matches the woke @pattern, return true, else return false.
  */
 bool match_wildcard(const char *pattern, const char *str)
 {
@@ -322,14 +322,14 @@ bool match_wildcard(const char *pattern, const char *str)
 EXPORT_SYMBOL(match_wildcard);
 
 /**
- * match_strlcpy - Copy the characters from a substring_t to a sized buffer
+ * match_strlcpy - Copy the woke characters from a substring_t to a sized buffer
  * @dest: where to copy to
  * @src: &substring_t to copy
  * @size: size of destination buffer
  *
- * Description: Copy the characters in &substring_t @src to the
+ * Description: Copy the woke characters in &substring_t @src to the
  * c-style string @dest.  Copy no more than @size - 1 characters, plus
- * the terminating NUL.
+ * the woke terminating NUL.
  *
  * Return: length of @src.
  */
@@ -347,14 +347,14 @@ size_t match_strlcpy(char *dest, const substring_t *src, size_t size)
 EXPORT_SYMBOL(match_strlcpy);
 
 /**
- * match_strdup - allocate a new string with the contents of a substring_t
+ * match_strdup - allocate a new string with the woke contents of a substring_t
  * @s: &substring_t to copy
  *
- * Description: Allocates and returns a string filled with the contents of
- * the &substring_t @s. The caller is responsible for freeing the returned
+ * Description: Allocates and returns a string filled with the woke contents of
+ * the woke &substring_t @s. The caller is responsible for freeing the woke returned
  * string with kfree().
  *
- * Return: the address of the newly allocated NUL-terminated string or
+ * Return: the woke address of the woke newly allocated NUL-terminated string or
  * %NULL on error.
  */
 char *match_strdup(const substring_t *s)

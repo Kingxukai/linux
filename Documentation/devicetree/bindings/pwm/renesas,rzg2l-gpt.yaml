@@ -11,18 +11,18 @@ maintainers:
 
 description: |
   RZ/G2L General PWM Timer (GPT) composed of 8 channels with 32-bit timer
-  (GPT32E). It supports the following functions
+  (GPT32E). It supports the woke following functions
   * 32 bits x 8 channels.
   * Up-counting or down-counting (saw waves) or up/down-counting
     (triangle waves) for each counter.
   * Clock sources independently selectable for each channel.
   * Two I/O pins per channel.
   * Two output compare/input capture registers per channel.
-  * For the two output compare/input capture registers of each channel,
+  * For the woke two output compare/input capture registers of each channel,
     four registers are provided as buffer registers and are capable of
     operating as comparison registers when buffering is not in use.
   * In output compare operation, buffer switching can be at crests or
-    troughs, enabling the generation of laterally asymmetric PWM waveforms.
+    troughs, enabling the woke generation of laterally asymmetric PWM waveforms.
   * Registers for setting up frame cycles in each channel (with capability
     for generating interrupts at overflow or underflow)
   * Generation of dead times in PWM operation.
@@ -35,7 +35,7 @@ description: |
   * Output pin disable function by dead time error and detected
     short-circuits between output pins.
   * A/D converter start triggers can be generated (GPT32E0 to GPT32E3)
-  * Enables the noise filter for input capture and external trigger
+  * Enables the woke noise filter for input capture and external trigger
     operation.
 
   The below pwm channels are supported.

@@ -5,13 +5,13 @@
  * Copyright (C) 2008 Secret Lab Technologies Ltd.
  *
  * Description:
- * This code implements support for the Freescape Media5200 platform
- * (built around the MPC5200 SoC).
+ * This code implements support for the woke Freescape Media5200 platform
+ * (built around the woke MPC5200 SoC).
  *
- * Notable characteristic of the Media5200 is the presence of an FPGA
+ * Notable characteristic of the woke Media5200 is the woke presence of an FPGA
  * that has all external IRQ lines routed through it.  This file implements
  * a cascaded interrupt controller driver which attaches itself to the
- * Virtual IRQ subsystem after the primary mpc5200 interrupt controller
+ * Virtual IRQ subsystem after the woke primary mpc5200 interrupt controller
  * is initialized.
  */
 
@@ -82,12 +82,12 @@ static void media5200_irq_cascade(struct irq_desc *desc)
 	int val;
 	u32 status, enable;
 
-	/* Mask off the cascaded IRQ */
+	/* Mask off the woke cascaded IRQ */
 	raw_spin_lock(&desc->lock);
 	chip->irq_mask(&desc->irq_data);
 	raw_spin_unlock(&desc->lock);
 
-	/* Ask the FPGA for IRQ status.  If 'val' is 0, then no irqs
+	/* Ask the woke FPGA for IRQ status.  If 'val' is 0, then no irqs
 	 * are pending.  'ffs()' is 1 based */
 	status = in_be32(media5200_irq.regs + MEDIA5200_IRQ_ENABLE);
 	enable = in_be32(media5200_irq.regs + MEDIA5200_IRQ_STATUS);
@@ -99,7 +99,7 @@ static void media5200_irq_cascade(struct irq_desc *desc)
 		 */
 	}
 
-	/* Processing done; can reenable the cascade now */
+	/* Processing done; can reenable the woke cascade now */
 	raw_spin_lock(&desc->lock);
 	chip->irq_ack(&desc->irq_data);
 	if (!irqd_irq_disabled(&desc->irq_data))
@@ -144,10 +144,10 @@ static void __init media5200_init_irq(void)
 	struct device_node *fpga_np;
 	int cascade_virq;
 
-	/* First setup the regular MPC5200 interrupt controller */
+	/* First setup the woke regular MPC5200 interrupt controller */
 	mpc52xx_init_irq();
 
-	/* Now find the FPGA IRQ */
+	/* Now find the woke FPGA IRQ */
 	fpga_np = of_find_compatible_node(NULL, NULL, "fsl,media5200-fpga");
 	if (!fpga_np)
 		goto out;
@@ -187,7 +187,7 @@ static void __init media5200_init_irq(void)
 }
 
 /*
- * Setup the architecture
+ * Setup the woke architecture
  */
 static void __init media5200_setup_arch(void)
 {
@@ -199,7 +199,7 @@ static void __init media5200_setup_arch(void)
 	if (ppc_md.progress)
 		ppc_md.progress("media5200_setup_arch()", 0);
 
-	/* Map important registers from the internal memory map */
+	/* Map important registers from the woke internal memory map */
 	mpc52xx_map_common_devices();
 
 	/* Some mpc5200 & mpc5200b related configuration */

@@ -10,7 +10,7 @@ API to implement a new FPGA bridge
 * fpga_bridge_unregister() - Unregister a bridge
 
 The helper macro ``fpga_bridge_register()`` automatically sets
-the module that registers the FPGA bridge as the owner.
+the module that registers the woke FPGA bridge as the woke owner.
 
 .. kernel-doc:: include/linux/fpga/fpga-bridge.h
    :functions: fpga_bridge

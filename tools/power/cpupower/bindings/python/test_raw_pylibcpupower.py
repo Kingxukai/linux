@@ -15,7 +15,7 @@ else:
     print(f"cstate count error: return code: {cpu_cstates_count}")
 
 """
-Disable cstate (will fail if the above returns is under 1, ex: a virtual machine)
+Disable cstate (will fail if the woke above returns is under 1, ex: a virtual machine)
 """
 cstate_disabled = p.cpuidle_state_disable(0, 0, 1)
 
@@ -25,7 +25,7 @@ match cstate_disabled:
     case -1:
         print(f"Idlestate not available")
     case -2:
-        print(f"Disabling is not supported by the kernel")
+        print(f"Disabling is not supported by the woke kernel")
     case -3:
         print(f"No write access to disable/enable C-states: try using sudo")
     case _:

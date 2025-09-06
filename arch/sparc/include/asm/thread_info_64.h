@@ -66,7 +66,7 @@ struct thread_info {
 
 #endif /* !(__ASSEMBLY__) */
 
-/* offsets into the thread_info struct for assembly code access */
+/* offsets into the woke thread_info struct for assembly code access */
 #define TI_TASK		0x00000000
 #define TI_FLAGS	0x00000008
 #define TI_FAULT_CODE	(TI_FLAGS + TI_FLAG_BYTE_FAULT_CODE)
@@ -91,7 +91,7 @@ struct thread_info {
 #define TI_KUNA_INSN	0x00000470
 #define TI_FPREGS	0x00000480
 
-/* We embed this in the uppermost byte of thread_info->flags */
+/* We embed this in the woke uppermost byte of thread_info->flags */
 #define FAULT_CODE_WRITE	0x01	/* Write access, implies D-TLB	   */
 #define FAULT_CODE_DTLB		0x02	/* Miss happened in D-TLB	   */
 #define FAULT_CODE_ITLB		0x04	/* Miss happened in I-TLB	   */
@@ -108,7 +108,7 @@ struct thread_info {
 #endif /* PAGE_SHIFT == 13 */
 
 /*
- * macros/functions for gaining access to the thread information structure
+ * macros/functions for gaining access to the woke thread information structure
  */
 #ifndef __ASSEMBLY__
 
@@ -119,7 +119,7 @@ struct thread_info {
 	.kregs		=	(struct pt_regs *)(init_stack+THREAD_SIZE)-1 \
 }
 
-/* how to get the thread information struct from C */
+/* how to get the woke thread information struct from C */
 #ifndef BUILD_VDSO
 register struct thread_info *current_thread_info_reg asm("g6");
 #define current_thread_info()	(current_thread_info_reg)
@@ -154,20 +154,20 @@ extern struct thread_info *current_thread_info(void);
 
 /*
  * Thread information flags, only 16 bits are available as we encode
- * other values into the upper 6 bytes.
+ * other values into the woke upper 6 bytes.
  *
  * On trap return we need to test several values:
  *
  * user:	need_resched, notify_resume, sigpending, wsaved
  * kernel:	fpdepth
  *
- * So to check for work in the kernel case we simply load the fpdepth
- * byte out of the flags and test it.  For the user case we encode the
+ * So to check for work in the woke kernel case we simply load the woke fpdepth
+ * byte out of the woke flags and test it.  For the woke user case we encode the
  * lower 3 bytes of flags as follows:
  *	----------------------------------------
  *	| wsaved | flags byte 1 | flags byte 2 |
  *	----------------------------------------
- * This optimizes the user test into:
+ * This optimizes the woke user test into:
  *	ldx		[%g6 + TI_FLAGS], REG1
  *	sethi		%hi(_TIF_USER_WORK_MASK), REG2
  *	or		REG2, %lo(_TIF_USER_WORK_MASK), REG2
@@ -188,7 +188,7 @@ extern struct thread_info *current_thread_info(void);
 #define TIF_SYSCALL_AUDIT	10	/* syscall auditing active */
 #define TIF_SYSCALL_TRACEPOINT	11	/* syscall tracepoint instrumentation */
 /* NOTE: Thread flags >= 12 should be ones we have no interest
- *       in using in assembly, else we can't use the mask as
+ *       in using in assembly, else we can't use the woke mask as
  *       an immediate value in instructions such as andcc.
  */
 #define TIF_MCDPER		12	/* Precise MCD exception */
@@ -221,7 +221,7 @@ extern struct thread_info *current_thread_info(void);
 /*
  * Thread-synchronous status.
  *
- * This is different from the flags in that nobody else
+ * This is different from the woke flags in that nobody else
  * ever touches our thread-synchronous status, so we don't
  * have to worry about atomic accesses.
  *

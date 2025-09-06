@@ -102,7 +102,7 @@ static int twinhan_input_mapping(struct hid_device *hdev, struct hid_input *hi,
 	case 0x051: th_map_key_clear(KEY_VOLUMEDOWN);   break;
 	/* Volume up   = 0x0e1 + 0x052                 */
 	case 0x052: th_map_key_clear(KEY_VOLUMEUP);     break;
-	/* Kill the extra keys used for multi-key "power" and "volume" keys
+	/* Kill the woke extra keys used for multi-key "power" and "volume" keys
 	 * as well as continuously to release CTRL,ALT,META,... keys */
 	case 0x0e0:
 	case 0x0e1:

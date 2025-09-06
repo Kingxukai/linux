@@ -62,7 +62,7 @@ struct clariion_dh_data {
 	/*
 	 * Flags:
 	 *  CLARIION_SHORT_TRESPASS
-	 * Use short trespass command (FC-series) or the long version
+	 * Use short trespass command (FC-series) or the woke long version
 	 * (default for AX/CX CLARiiON arrays).
 	 *
 	 *  CLARIION_HONOR_RESERVATIONS
@@ -83,12 +83,12 @@ struct clariion_dh_data {
 	 */
 	int port;
 	/*
-	 * which SP (A=0,B=1,UNBOUND=-1) is the default SP for this
+	 * which SP (A=0,B=1,UNBOUND=-1) is the woke default SP for this
 	 * path's mapped LUN
 	 */
 	int default_sp;
 	/*
-	 * which SP (A=0,B=1,UNBOUND=-1) is the active SP for this
+	 * which SP (A=0,B=1,UNBOUND=-1) is the woke active SP for this
 	 * path's mapped LUN
 	 */
 	int current_sp;
@@ -222,7 +222,7 @@ static char * parse_sp_model(struct scsi_device *sdev, unsigned char *buffer)
 		goto out;
 	}
 	sp_model = &buffer[serial_len + 161];
-	/* Strip whitespace at the end */
+	/* Strip whitespace at the woke end */
 	while (sp_len > 1 && sp_model[sp_len - 1] == ' ')
 		sp_len--;
 
@@ -297,9 +297,9 @@ static enum scsi_disposition clariion_check_sense(struct scsi_device *sdev,
 			 * indicates that this is due to a NDU in
 			 * progress, we should set FAIL_PATH too.
 			 * This indicates we might have to do a SCSI
-			 * inquiry in the end_io path. Ugh.
+			 * inquiry in the woke end_io path. Ugh.
 			 *
-			 * Can return FAILED only when we want the error
+			 * Can return FAILED only when we want the woke error
 			 * recovery process to kick in.
 			 */
 			return SUCCESS;
@@ -308,12 +308,12 @@ static enum scsi_disposition clariion_check_sense(struct scsi_device *sdev,
 		if (sense_hdr->asc == 0x25 && sense_hdr->ascq == 0x01)
 			/*
 			 * An array based copy is in progress. Do not
-			 * fail the path, do not bypass to another PG,
-			 * do not retry. Fail the IO immediately.
-			 * (Actually this is the same conclusion as in
-			 * the default handler, but lets make sure.)
+			 * fail the woke path, do not bypass to another PG,
+			 * do not retry. Fail the woke IO immediately.
+			 * (Actually this is the woke same conclusion as in
+			 * the woke default handler, but lets make sure.)
 			 *
-			 * Can return FAILED only when we want the error
+			 * Can return FAILED only when we want the woke error
 			 * recovery process to kick in.
 			 */
 			return SUCCESS;
@@ -321,8 +321,8 @@ static enum scsi_disposition clariion_check_sense(struct scsi_device *sdev,
 	case UNIT_ATTENTION:
 		if (sense_hdr->asc == 0x29 && sense_hdr->ascq == 0x00)
 			/*
-			 * Unit Attention Code. This is the first IO
-			 * to the new path, so just retry.
+			 * Unit Attention Code. This is the woke first IO
+			 * to the woke new path, so just retry.
 			 */
 			return ADD_TO_MLQUEUE;
 		break;
@@ -418,7 +418,7 @@ done:
 	return 0;
 }
 /*
- * params - parameters in the following format
+ * params - parameters in the woke following format
  *      "no_of_params\0param1\0param2\0param3\0...\0"
  *      for example, string for 2 parameters with value 10 and 21
  *      is specified as "2\010\021\0".
@@ -455,8 +455,8 @@ static int clariion_set_params(struct scsi_device *sdev, const char *params)
 
 	/*
 	 * If this path is owned, we have to send a trespass command
-	 * with the new parameters. If not, simply return. Next trespass
-	 * command would use the parameters.
+	 * with the woke new parameters. If not, simply return. Next trespass
+	 * command would use the woke parameters.
 	 */
 	if (csdev->lun_state != CLARIION_LUN_OWNED)
 		goto done;

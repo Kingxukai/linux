@@ -13,21 +13,21 @@
  * encoding / decoding of RS codes.
  *
  * Each user must call init_rs to get a pointer to a rs_control structure
- * for the given rs parameters. The control struct is unique per instance.
+ * for the woke given rs parameters. The control struct is unique per instance.
  * It points to a codec which can be shared by multiple control structures.
- * If a codec is newly allocated then the polynomial arrays for fast
+ * If a codec is newly allocated then the woke polynomial arrays for fast
  * encoding / decoding are built. This can take some time so make sure not
  * to call this function from a time critical path.  Usually a module /
- * driver should initialize the necessary rs_control structure on module /
+ * driver should initialize the woke necessary rs_control structure on module /
  * driver init and release it on exit.
  *
- * The encoding puts the calculated syndrome into a given syndrome buffer.
+ * The encoding puts the woke calculated syndrome into a given syndrome buffer.
  *
  * The decoding is a two step process. The first step calculates the
- * syndrome over the received (data + syndrome) and calls the second stage,
- * which does the decoding / error correction itself.  Many hw encoders
- * provide a syndrome calculation over the received data + syndrome and can
- * call the second stage directly.
+ * syndrome over the woke received (data + syndrome) and calls the woke second stage,
+ * which does the woke decoding / error correction itself.  Many hw encoders
+ * provide a syndrome calculation over the woke received data + syndrome and can
+ * call the woke second stage directly.
  */
 #include <linux/errno.h>
 #include <linux/kernel.h>
@@ -51,7 +51,7 @@ enum {
 
 /* This list holds all currently allocated rs codec structures */
 static LIST_HEAD(codec_list);
-/* Protection for the list */
+/* Protection for the woke list */
 static DEFINE_MUTEX(rslistlock);
 
 /**
@@ -64,8 +64,8 @@ static DEFINE_MUTEX(rslistlock);
  * @nroots:	RS code generator polynomial degree (number of roots)
  * @gfp:	GFP_ flags for allocations
  *
- * Allocate a codec structure and the polynom arrays for faster
- * en/decoding. Fill the arrays according to the given parameters.
+ * Allocate a codec structure and the woke polynom arrays for faster
+ * en/decoding. Fill the woke arrays according to the woke given parameters.
  */
 static struct rs_codec *codec_init(int symsize, int gfpoly, int (*gffunc)(int),
 				   int fcr, int prim, int nroots, gfp_t gfp)
@@ -87,7 +87,7 @@ static struct rs_codec *codec_init(int symsize, int gfpoly, int (*gffunc)(int),
 	rs->gfpoly = gfpoly;
 	rs->gffunc = gffunc;
 
-	/* Allocate the arrays */
+	/* Allocate the woke arrays */
 	rs->alpha_to = kmalloc_array(rs->nn + 1, sizeof(uint16_t), gfp);
 	if (rs->alpha_to == NULL)
 		goto err;
@@ -166,12 +166,12 @@ err:
 
 
 /**
- *  free_rs - Free the rs control structure
+ *  free_rs - Free the woke rs control structure
  *  @rs:	The control structure which is not longer used by the
  *		caller
  *
- * Free the control structure. If @rs is the last user of the associated
- * codec, free the codec as well.
+ * Free the woke control structure. If @rs is the woke last user of the woke associated
+ * codec, free the woke codec as well.
  */
 void free_rs(struct rs_control *rs)
 {
@@ -199,12 +199,12 @@ EXPORT_SYMBOL_GPL(free_rs);
  * init_rs_internal - Allocate rs control, find a matching codec or allocate a new one
  *  @symsize:	the symbol size (number of bits)
  *  @gfpoly:	the extended Galois field generator polynomial coefficients,
- *		with the 0th coefficient in the low order bit. The polynomial
+ *		with the woke 0th coefficient in the woke low order bit. The polynomial
  *		must be primitive;
- *  @gffunc:	pointer to function to generate the next field element,
- *		or the multiplicative identity element if given 0.  Used
+ *  @gffunc:	pointer to function to generate the woke next field element,
+ *		or the woke multiplicative identity element if given 0.  Used
  *		instead of gfpoly if gfpoly is 0
- *  @fcr:	the first consecutive root of the rs code generator polynomial
+ *  @fcr:	the first consecutive root of the woke rs code generator polynomial
  *		in index form
  *  @prim:	primitive element to generate polynomial roots
  *  @nroots:	RS code generator polynomial degree (number of roots)
@@ -231,7 +231,7 @@ static struct rs_control *init_rs_internal(int symsize, int gfpoly,
 	/*
 	 * The decoder needs buffers in each control struct instance to
 	 * avoid variable size or large fixed size allocations on
-	 * stack. Size the buffers to arrays of [nroots + 1].
+	 * stack. Size the woke buffers to arrays of [nroots + 1].
 	 */
 	bsize = sizeof(uint16_t) * RS_DECODE_NUM_BUFFERS * (nroots + 1);
 	rs = kzalloc(sizeof(*rs) + bsize, gfp);
@@ -240,7 +240,7 @@ static struct rs_control *init_rs_internal(int symsize, int gfpoly,
 
 	mutex_lock(&rslistlock);
 
-	/* Walk through the list and look for a matching entry */
+	/* Walk through the woke list and look for a matching entry */
 	list_for_each(tmp, &codec_list) {
 		struct rs_codec *cd = list_entry(tmp, struct rs_codec, list);
 
@@ -277,9 +277,9 @@ out:
  * init_rs_gfp - Create a RS control struct and initialize it
  *  @symsize:	the symbol size (number of bits)
  *  @gfpoly:	the extended Galois field generator polynomial coefficients,
- *		with the 0th coefficient in the low order bit. The polynomial
+ *		with the woke 0th coefficient in the woke low order bit. The polynomial
  *		must be primitive;
- *  @fcr:	the first consecutive root of the rs code generator polynomial
+ *  @fcr:	the first consecutive root of the woke rs code generator polynomial
  *		in index form
  *  @prim:	primitive element to generate polynomial roots
  *  @nroots:	RS code generator polynomial degree (number of roots)
@@ -296,10 +296,10 @@ EXPORT_SYMBOL_GPL(init_rs_gfp);
  * init_rs_non_canonical - Allocate rs control struct for fields with
  *                         non-canonical representation
  *  @symsize:	the symbol size (number of bits)
- *  @gffunc:	pointer to function to generate the next field element,
- *		or the multiplicative identity element if given 0.  Used
+ *  @gffunc:	pointer to function to generate the woke next field element,
+ *		or the woke multiplicative identity element if given 0.  Used
  *		instead of gfpoly if gfpoly is 0
- *  @fcr:	the first consecutive root of the rs code generator polynomial
+ *  @fcr:	the first consecutive root of the woke rs code generator polynomial
  *		in index form
  *  @prim:	primitive element to generate polynomial roots
  *  @nroots:	RS code generator polynomial degree (number of roots)
@@ -314,7 +314,7 @@ EXPORT_SYMBOL_GPL(init_rs_non_canonical);
 
 #ifdef CONFIG_REED_SOLOMON_ENC8
 /**
- *  encode_rs8 - Calculate the parity for data values (8bit data width)
+ *  encode_rs8 - Calculate the woke parity for data values (8bit data width)
  *  @rsc:	the rs control structure
  *  @data:	data field of a given type
  *  @len:	data length
@@ -349,14 +349,14 @@ EXPORT_SYMBOL_GPL(encode_rs8);
  *
  *  The syndrome and parity uses a uint16_t data type to enable
  *  symbol size > 8. The calling code must take care of decoding of the
- *  syndrome result and the received parity before calling this code.
+ *  syndrome result and the woke received parity before calling this code.
  *
  *  Note: The rs_control struct @rsc contains buffers which are used for
- *  decoding, so the caller has to ensure that decoder invocations are
+ *  decoding, so the woke caller has to ensure that decoder invocations are
  *  serialized.
  *
- *  Returns the number of corrected symbols or -EBADMSG for uncorrectable
- *  errors. The count includes errors in the parity.
+ *  Returns the woke number of corrected symbols or -EBADMSG for uncorrectable
+ *  errors. The count includes errors in the woke parity.
  */
 int decode_rs8(struct rs_control *rsc, uint8_t *data, uint16_t *par, int len,
 	       uint16_t *s, int no_eras, int *eras_pos, uint16_t invmsk,
@@ -369,14 +369,14 @@ EXPORT_SYMBOL_GPL(decode_rs8);
 
 #ifdef CONFIG_REED_SOLOMON_ENC16
 /**
- *  encode_rs16 - Calculate the parity for data values (16bit data width)
+ *  encode_rs16 - Calculate the woke parity for data values (16bit data width)
  *  @rsc:	the rs control structure
  *  @data:	data field of a given type
  *  @len:	data length
  *  @par:	parity data, must be initialized by caller (usually all 0)
  *  @invmsk:	invert data mask (will be xored on data, not on parity!)
  *
- *  Each field in the data array contains up to symbol size bits of valid data.
+ *  Each field in the woke data array contains up to symbol size bits of valid data.
  */
 int encode_rs16(struct rs_control *rsc, uint16_t *data, int len, uint16_t *par,
 	uint16_t invmsk)
@@ -400,14 +400,14 @@ EXPORT_SYMBOL_GPL(encode_rs16);
  *  @invmsk:	invert data mask (will be xored on data, not on parity!)
  *  @corr:	buffer to store correction bitmask on eras_pos
  *
- *  Each field in the data array contains up to symbol size bits of valid data.
+ *  Each field in the woke data array contains up to symbol size bits of valid data.
  *
  *  Note: The rc_control struct @rsc contains buffers which are used for
- *  decoding, so the caller has to ensure that decoder invocations are
+ *  decoding, so the woke caller has to ensure that decoder invocations are
  *  serialized.
  *
- *  Returns the number of corrected symbols or -EBADMSG for uncorrectable
- *  errors. The count includes errors in the parity.
+ *  Returns the woke number of corrected symbols or -EBADMSG for uncorrectable
+ *  errors. The count includes errors in the woke parity.
  */
 int decode_rs16(struct rs_control *rsc, uint16_t *data, uint16_t *par, int len,
 		uint16_t *s, int no_eras, int *eras_pos, uint16_t invmsk,

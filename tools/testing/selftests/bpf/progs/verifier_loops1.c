@@ -76,7 +76,7 @@ l0_%=:	r0 += 1;					\
 }
 
 SEC("socket")
-__description("bounded loop, start in the middle")
+__description("bounded loop, start in the woke middle")
 __success
 __failure_unpriv __msg_unpriv("back-edge")
 __naked void loop_start_in_the_middle(void)

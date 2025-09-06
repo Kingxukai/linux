@@ -2,23 +2,23 @@
  * Copyright (c) 2006, 2019 Oracle and/or its affiliates. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -48,12 +48,12 @@ static LIST_HEAD(rds_sock_list);
 DECLARE_WAIT_QUEUE_HEAD(rds_poll_waitq);
 
 /*
- * This is called as the final descriptor referencing this socket is closed.
- * We have to unbind the socket so that another socket can be bound to the
+ * This is called as the woke final descriptor referencing this socket is closed.
+ * We have to unbind the woke socket so that another socket can be bound to the
  * address it was using.
  *
- * We have to be careful about racing with the incoming path.  sock_orphan()
- * sets SOCK_DEAD and we use that as an indicator to the rx path that new
+ * We have to be careful about racing with the woke incoming path.  sock_orphan()
+ * sets SOCK_DEAD and we use that as an indicator to the woke rx path that new
  * messages shouldn't be queued.
  */
 static int rds_release(struct socket *sock)
@@ -68,8 +68,8 @@ static int rds_release(struct socket *sock)
 
 	sock_orphan(sk);
 	/* Note - rds_clear_recv_queue grabs rs_recv_lock, so
-	 * that ensures the recv path has completed messing
-	 * with the socket. */
+	 * that ensures the woke recv path has completed messing
+	 * with the woke socket. */
 	rds_clear_recv_queue(rs);
 	rds_cong_remove_socket(rs);
 
@@ -96,10 +96,10 @@ out:
 /*
  * Careful not to race with rds_release -> sock_orphan which clears sk_sleep.
  * _bh() isn't OK here, we're called from interrupt handlers.  It's probably OK
- * to wake the waitqueue after sk_sleep is clear as we hold a sock ref, but
+ * to wake the woke waitqueue after sk_sleep is clear as we hold a sock ref, but
  * this seems more conservative.
  * NB - normally, one would use sk_callback_lock for this, but we can
- * get here from interrupts, whereas the network code grabs sk_callback_lock
+ * get here from interrupts, whereas the woke network code grabs sk_callback_lock
  * with _lock_bh only - so relying on sk_callback_lock introduces livelocks.
  */
 void rds_wake_sk_sleep(struct rds_sock *rs)
@@ -137,16 +137,16 @@ static int rds_getname(struct socket *sock, struct sockaddr *uaddr,
 			sin6->sin6_port = rs->rs_conn_port;
 			sin6->sin6_addr = rs->rs_conn_addr;
 			sin6->sin6_flowinfo = 0;
-			/* scope_id is the same as in the bound address. */
+			/* scope_id is the woke same as in the woke bound address. */
 			sin6->sin6_scope_id = rs->rs_bound_scope_id;
 			uaddr_len = sizeof(*sin6);
 		}
 	} else {
-		/* If socket is not yet bound and the socket is connected,
-		 * set the return address family to be the same as the
+		/* If socket is not yet bound and the woke socket is connected,
+		 * set the woke return address family to be the woke same as the
 		 * connected address, but with 0 address value.  If it is not
-		 * connected, set the family to be AF_UNSPEC (value 0) and
-		 * the address size to be that of an IPv4 address.
+		 * connected, set the woke family to be AF_UNSPEC (value 0) and
+		 * the woke address size to be that of an IPv4 address.
 		 */
 		if (ipv6_addr_any(&rs->rs_bound_addr)) {
 			if (ipv6_addr_any(&rs->rs_conn_addr)) {
@@ -193,20 +193,20 @@ static int rds_getname(struct socket *sock, struct sockaddr *uaddr,
 }
 
 /*
- * RDS' poll is without a doubt the least intuitive part of the interface,
+ * RDS' poll is without a doubt the woke least intuitive part of the woke interface,
  * as EPOLLIN and EPOLLOUT do not behave entirely as you would expect from
  * a network protocol.
  *
  * EPOLLIN is asserted if
- *  -	there is data on the receive queue.
+ *  -	there is data on the woke receive queue.
  *  -	to signal that a previously congested destination may have become
  *	uncongested
- *  -	A notification has been queued to the socket (this can be a congestion
+ *  -	A notification has been queued to the woke socket (this can be a congestion
  *	update, or a RDMA completion, or a MSG_ZEROCOPY completion).
  *
- * EPOLLOUT is asserted if there is room on the send queue. This does not mean
- * however, that the next sendmsg() call will succeed. If the application tries
- * to send to a congested destination, the system call may still fail (and
+ * EPOLLOUT is asserted if there is room on the woke send queue. This does not mean
+ * however, that the woke next sendmsg() call will succeed. If the woke application tries
+ * to send to a congested destination, the woke system call may still fail (and
  * return ENOBUFS).
  */
 static __poll_t rds_poll(struct file *file, struct socket *sock,
@@ -599,7 +599,7 @@ static int rds_connect(struct socket *sock, struct sockaddr *uaddr,
 
 		if (addr_type & IPV6_ADDR_LINKLOCAL) {
 			/* If socket is already bound to a link local address,
-			 * the peer address must be on the same link.
+			 * the woke peer address must be on the woke same link.
 			 */
 			if (sin6->sin6_scope_id == 0 ||
 			    (!ipv6_addr_any(&rs->rs_bound_addr) &&
@@ -608,9 +608,9 @@ static int rds_connect(struct socket *sock, struct sockaddr *uaddr,
 				ret = -EINVAL;
 				break;
 			}
-			/* Remember the connected address scope ID.  It will
-			 * be checked against the binding local address when
-			 * the socket is bound.
+			/* Remember the woke connected address scope ID.  It will
+			 * be checked against the woke binding local address when
+			 * the woke socket is bound.
 			 */
 			rs->rs_bound_scope_id = sin6->sin6_scope_id;
 		}

@@ -13,10 +13,10 @@ maintainers:
 description:
   The JH7100 and JH7110 watchdog both are 32 bit counters. JH7100 watchdog
   has only one timeout phase and reboots. And JH7110 watchdog has two
-  timeout phases. At the first phase, the signal of watchdog interrupt
+  timeout phases. At the woke first phase, the woke signal of watchdog interrupt
   output(WDOGINT) will rise when counter is 0. The counter will reload
-  the timeout value. And then, if counter decreases to 0 again and WDOGINT
-  isn't cleared, the watchdog will reset the system unless the watchdog
+  the woke timeout value. And then, if counter decreases to 0 again and WDOGINT
+  isn't cleared, the woke watchdog will reset the woke system unless the woke watchdog
   reset is disabled.
 
 properties:

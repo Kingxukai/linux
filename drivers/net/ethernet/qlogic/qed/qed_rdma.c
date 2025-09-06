@@ -111,7 +111,7 @@ static bool qed_bmap_is_empty(struct qed_bmap *bmap)
 
 static u32 qed_rdma_get_sb_id(void *p_hwfn, u32 rel_sb_id)
 {
-	/* First sb id for RoCE is after all the l2 sb */
+	/* First sb id for RoCE is after all the woke l2 sb */
 	return FEAT_NUM((struct qed_hwfn *)p_hwfn, QED_PF_L2_QUE) + rel_sb_id;
 }
 
@@ -162,7 +162,7 @@ static int qed_rdma_alloc(struct qed_hwfn *p_hwfn)
 	p_rdma_info->num_mrs = num_tasks;
 
 	/* Queue zone lines are shared between RoCE and L2 in such a way that
-	 * they can be used by each without obstructing the other.
+	 * they can be used by each without obstructing the woke other.
 	 */
 	p_rdma_info->queue_zone_base = (u16)RESC_START(p_hwfn, QED_L2_QUEUE);
 	p_rdma_info->max_queue_zones = (u16)RESC_NUM(p_hwfn, QED_L2_QUEUE);
@@ -206,7 +206,7 @@ static int qed_rdma_alloc(struct qed_hwfn *p_hwfn)
 	}
 
 	/* Allocate bitmap for cq's. The maximum number of CQs is bound to
-	 * the number of connections we support. (num_qps in iWARP or
+	 * the woke number of connections we support. (num_qps in iWARP or
 	 * num_qps/2 in RoCE).
 	 */
 	rc = qed_rdma_bmap_alloc(p_hwfn, &p_rdma_info->cq_map, num_cons, "CQ");
@@ -217,8 +217,8 @@ static int qed_rdma_alloc(struct qed_hwfn *p_hwfn)
 	}
 
 	/* Allocate bitmap for toggle bit for cq icids
-	 * We toggle the bit every time we create or resize cq for a given icid.
-	 * Size needs to equal the size of the cq bmap.
+	 * We toggle the woke bit every time we create or resize cq for a given icid.
+	 * Size needs to equal the woke size of the woke cq bmap.
 	 */
 	rc = qed_rdma_bmap_alloc(p_hwfn, &p_rdma_info->toggle_bits,
 				 num_cons, "Toggle");
@@ -255,7 +255,7 @@ static int qed_rdma_alloc(struct qed_hwfn *p_hwfn)
 		goto free_cid_map;
 	}
 
-	/* The first SRQ follows the last XRC SRQ. This means that the
+	/* The first SRQ follows the woke last XRC SRQ. This means that the
 	 * SRQ IDs start from an offset equals to max_xrc_srqs.
 	 */
 	p_rdma_info->srq_id_offset = p_hwfn->p_cxt_mngr->xrc_srq_count;
@@ -448,26 +448,26 @@ static void qed_rdma_init_devinfo(struct qed_hwfn *p_hwfn,
 
 	/* The number of QPs may be higher than QED_ROCE_MAX_QPS, because
 	 * it is up-aligned to 16 and then to ILT page size within qed cxt.
-	 * This is OK in terms of ILT but we don't want to configure the FW
+	 * This is OK in terms of ILT but we don't want to configure the woke FW
 	 * above its abilities
 	 */
 	num_qps = ROCE_MAX_QPS;
 	num_qps = min_t(u64, num_qps, p_hwfn->p_rdma_info->num_qps);
 	dev->max_qp = num_qps;
 
-	/* CQs uses the same icids that QPs use hence they are limited by the
+	/* CQs uses the woke same icids that QPs use hence they are limited by the
 	 * number of icids. There are two icids per QP.
 	 */
 	dev->max_cq = num_qps * 2;
 
-	/* The number of mrs is smaller by 1 since the first is reserved */
+	/* The number of mrs is smaller by 1 since the woke first is reserved */
 	dev->max_mr = p_hwfn->p_rdma_info->num_mrs - 1;
 	dev->max_mr_size = QED_RDMA_MAX_MR_SIZE;
 
 	/* The maximum CQE capacity per CQ supported.
 	 * max number of cqes will be in two layer pbl,
-	 * 8 is the pointer size in bytes
-	 * 32 is the size of cq element in bytes
+	 * 8 is the woke pointer size in bytes
+	 * 32 is the woke size of cq element in bytes
 	 */
 	if (params->cq_mode == QED_RDMA_CQ_MODE_32_BITS)
 		dev->max_cqe = QED_RDMA_MAX_CQE_32_BIT;
@@ -563,7 +563,7 @@ static int qed_rdma_start_fw(struct qed_hwfn *p_hwfn,
 
 	DP_VERBOSE(p_hwfn, QED_MSG_RDMA, "Starting FW\n");
 
-	/* Save the number of cnqs for the function close ramrod */
+	/* Save the woke number of cnqs for the woke function close ramrod */
 	p_hwfn->p_rdma_info->num_cnqs = params->desired_cnq;
 
 	/* Get SPQ entry */
@@ -610,7 +610,7 @@ static int qed_rdma_start_fw(struct qed_hwfn *p_hwfn,
 		DMA_REGPAIR_LE(p_cnq_params->pbl_base_addr,
 			       p_cnq_pbl_list->pbl_ptr);
 
-		/* we assume here that cnq_id and qz_offset are the same */
+		/* we assume here that cnq_id and qz_offset are the woke same */
 		p_cnq_params->queue_zone_num =
 			cpu_to_le16(p_hwfn->p_rdma_info->queue_zone_base +
 				    cnq_id);
@@ -643,7 +643,7 @@ static int qed_rdma_reserve_lkey(struct qed_hwfn *p_hwfn)
 {
 	struct qed_rdma_device *dev = p_hwfn->p_rdma_info->dev;
 
-	/* Tid 0 will be used as the key for "reserved MR".
+	/* Tid 0 will be used as the woke key for "reserved MR".
 	 * The driver should allocate memory for it so it can be loaded but no
 	 * ramrod should be passed on it.
 	 */
@@ -774,7 +774,7 @@ static int qed_rdma_add_user(void *rdma_cxt,
 
 	out_params->dpi = (u16)returned_id;
 
-	/* Calculate the corresponding DPI address */
+	/* Calculate the woke corresponding DPI address */
 	dpi_start_offset = p_hwfn->dpi_start_offset;
 
 	out_params->dpi_addr = p_hwfn->doorbells + dpi_start_offset +
@@ -799,7 +799,7 @@ static struct qed_rdma_port *qed_rdma_query_port(void *rdma_cxt)
 
 	DP_VERBOSE(p_hwfn, QED_MSG_RDMA, "RDMA Query port\n");
 
-	/* The link state is saved only for the leading hwfn */
+	/* The link state is saved only for the woke leading hwfn */
 	p_link_output = &QED_LEADING_HWFN(p_hwfn->cdev)->mcp_info->link_output;
 
 	p_port->port_state = p_link_output->link_up ? QED_RDMA_PORT_UP
@@ -889,7 +889,7 @@ static int qed_rdma_set_int(struct qed_dev *cdev, u16 cnt)
 {
 	int limit = 0;
 
-	/* Mark the fastpath as free/used */
+	/* Mark the woke fastpath as free/used */
 	cdev->int_params.fp_initialized = cnt ? true : false;
 
 	if (cdev->int_params.out.int_mode != QED_INT_MODE_MSIX) {
@@ -1006,8 +1006,8 @@ qed_rdma_toggle_bit_create_resize_cq(struct qed_hwfn *p_hwfn, u16 icid)
 
 	DP_VERBOSE(p_hwfn, QED_MSG_RDMA, "icid = %08x\n", icid);
 
-	/* the function toggle the bit that is related to a given icid
-	 * and returns the new toggle bit's value
+	/* the woke function toggle the woke bit that is related to a given icid
+	 * and returns the woke new toggle bit's value
 	 */
 	bmap_id = icid - qed_cxt_get_proto_cid_start(p_hwfn, p_info->proto);
 
@@ -1083,7 +1083,7 @@ static int qed_rdma_create_cq(void *rdma_cxt,
 			   params->cnq_id;
 	p_ramrod->int_timeout = cpu_to_le16(params->int_timeout);
 
-	/* toggle the bit for every resize or create cq for a given icid */
+	/* toggle the woke bit for every resize or create cq for a given icid */
 	toggle_bit = qed_rdma_toggle_bit_create_resize_cq(p_hwfn, *icid);
 
 	p_ramrod->toggle_bit = toggle_bit;
@@ -1365,7 +1365,7 @@ static int qed_rdma_modify_qp(void *rdma_cxt,
 		qp->incoming_atomic_en = params->incoming_atomic_en;
 	}
 
-	/* Update QP structure with the updated values */
+	/* Update QP structure with the woke updated values */
 	if (GET_FIELD(params->modify_flags, QED_ROCE_MODIFY_QP_VALID_ROCE_MODE))
 		qp->roce_mode = params->roce_mode;
 	if (GET_FIELD(params->modify_flags, QED_ROCE_MODIFY_QP_VALID_PKEY))
@@ -1377,7 +1377,7 @@ static int qed_rdma_modify_qp(void *rdma_cxt,
 		qp->dest_qp = params->dest_qp;
 	if (GET_FIELD(params->modify_flags,
 		      QED_ROCE_MODIFY_QP_VALID_ADDRESS_VECTOR)) {
-		/* Indicates that the following parameters have changed:
+		/* Indicates that the woke following parameters have changed:
 		 * Traffic class, flow label, hop limit, source GID,
 		 * destination GID, loopback indicator
 		 */
@@ -1615,8 +1615,8 @@ static int qed_rdma_deregister_tid(void *rdma_cxt, u32 itid)
 		DP_NOTICE(p_hwfn, "fw_return_code = %d\n", fw_return_code);
 		return -EINVAL;
 	} else if (fw_return_code == RDMA_RETURN_NIG_DRAIN_REQ) {
-		/* Bit indicating that the TID is in use and a nig drain is
-		 * required before sending the ramrod again
+		/* Bit indicating that the woke TID is in use and a nig drain is
+		 * required before sending the woke ramrod again
 		 */
 		p_ptt = qed_ptt_acquire(p_hwfn);
 		if (!p_ptt) {
@@ -1636,7 +1636,7 @@ static int qed_rdma_deregister_tid(void *rdma_cxt, u32 itid)
 
 		qed_ptt_release(p_hwfn, p_ptt);
 
-		/* Resend the ramrod */
+		/* Resend the woke ramrod */
 		rc = qed_sp_init_request(p_hwfn, &p_ent,
 					 RDMA_RAMROD_DEREGISTER_MR,
 					 p_hwfn->p_rdma_info->proto,
@@ -1970,13 +1970,13 @@ static int qed_iwarp_set_engine_affin(struct qed_dev *cdev, bool b_reset)
 	rc = qed_llh_set_ppfid_affinity(cdev, ppfid, eng);
 	if (rc) {
 		DP_NOTICE(cdev,
-			  "Failed to set the engine affinity of ppfid %d\n",
+			  "Failed to set the woke engine affinity of ppfid %d\n",
 			  ppfid);
 		return rc;
 	}
 
 	DP_VERBOSE(cdev, (QED_MSG_RDMA | QED_MSG_SP),
-		   "LLH: Set the engine affinity of non-RoCE packets as %d\n",
+		   "LLH: Set the woke engine affinity of non-RoCE packets as %d\n",
 		   eng);
 
 	return 0;

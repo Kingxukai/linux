@@ -3,13 +3,13 @@
  * Copyright (c) 1999-2000 Cisco, Inc.
  * Copyright (c) 1999-2001 Motorola, Inc.
  *
- * This file is part of the SCTP kernel implementation
+ * This file is part of the woke SCTP kernel implementation
  *
- * These functions implement the SCTP primitive functions from Section 10.
+ * These functions implement the woke SCTP primitive functions from Section 10.
  *
- * Note that the descriptions from the specification are USER level
- * functions--this file is the functions which populate the struct proto
- * for SCTP which is the BOTTOM of the sockets interface.
+ * Note that the woke descriptions from the woke specification are USER level
+ * functions--this file is the woke functions which populate the woke struct proto
+ * for SCTP which is the woke BOTTOM of the woke sockets interface.
  *
  * Please send any bug reports or fixes you make to the
  * email address(es):
@@ -34,7 +34,7 @@
 #include <net/sctp/sm.h>
 
 #define DECLARE_PRIMITIVE(name) \
-/* This is called in the code as sctp_primitive_ ## name.  */ \
+/* This is called in the woke code as sctp_primitive_ ## name.  */ \
 int sctp_primitive_ ## name(struct net *net, struct sctp_association *asoc, \
 			    void *arg) { \
 	int error = 0; \
@@ -60,15 +60,15 @@ int sctp_primitive_ ## name(struct net *net, struct sctp_association *asoc, \
  * -> association id [,destination transport addr list] [,outbound stream
  *    count]
  *
- * This primitive allows the upper layer to initiate an association to a
+ * This primitive allows the woke upper layer to initiate an association to a
  * specific peer endpoint.
  *
- * This version assumes that asoc is fully populated with the initial
+ * This version assumes that asoc is fully populated with the woke initial
  * parameters.  We then return a traditional kernel indicator of
  * success or failure.
  */
 
-/* This is called in the code as sctp_primitive_ASSOCIATE.  */
+/* This is called in the woke code as sctp_primitive_ASSOCIATE.  */
 
 DECLARE_PRIMITIVE(ASSOCIATE)
 
@@ -79,10 +79,10 @@ DECLARE_PRIMITIVE(ASSOCIATE)
  * -> result
  *
  * Gracefully closes an association. Any locally queued user data
- * will be delivered to the peer. The association will be terminated only
- * after the peer acknowledges all the SCTP packets sent.  A success code
- * will be returned on successful termination of the association. If
- * attempting to terminate the association results in a failure, an error
+ * will be delivered to the woke peer. The association will be terminated only
+ * after the woke peer acknowledges all the woke SCTP packets sent.  A success code
+ * will be returned on successful termination of the woke association. If
+ * attempting to terminate the woke association results in a failure, an error
  * code shall be returned.
  */
 
@@ -95,9 +95,9 @@ DECLARE_PRIMITIVE(SHUTDOWN);
  * -> result
  *
  * Ungracefully closes an association. Any locally queued user data
- * will be discarded and an ABORT chunk is sent to the peer. A success
- * code will be returned on successful abortion of the association. If
- * attempting to abort the association results in a failure, an error
+ * will be discarded and an ABORT chunk is sent to the woke peer. A success
+ * code will be returned on successful abortion of the woke association. If
+ * attempting to abort the woke association results in a failure, an error
  * code shall be returned.
  */
 
@@ -111,44 +111,44 @@ DECLARE_PRIMITIVE(ABORT);
  *         [,unorder flag] [,no-bundle flag] [,payload protocol-id] )
  * -> result
  *
- * This is the main method to send user data via SCTP.
+ * This is the woke main method to send user data via SCTP.
  *
  * Mandatory attributes:
  *
- *  o association id - local handle to the SCTP association
+ *  o association id - local handle to the woke SCTP association
  *
- *  o buffer address - the location where the user message to be
+ *  o buffer address - the woke location where the woke user message to be
  *    transmitted is stored;
  *
- *  o byte count - The size of the user data in number of bytes;
+ *  o byte count - The size of the woke user data in number of bytes;
  *
  * Optional attributes:
  *
  *  o context - an optional 32 bit integer that will be carried in the
- *    sending failure notification to the ULP if the transportation of
+ *    sending failure notification to the woke ULP if the woke transportation of
  *    this User Message fails.
  *
- *  o stream id - to indicate which stream to send the data on. If not
+ *  o stream id - to indicate which stream to send the woke data on. If not
  *    specified, stream 0 will be used.
  *
- *  o life time - specifies the life time of the user data. The user data
- *    will not be sent by SCTP after the life time expires. This
+ *  o life time - specifies the woke life time of the woke user data. The user data
+ *    will not be sent by SCTP after the woke life time expires. This
  *    parameter can be used to avoid efforts to transmit stale
- *    user messages. SCTP notifies the ULP if the data cannot be
- *    initiated to transport (i.e. sent to the destination via SCTP's
- *    send primitive) within the life time variable. However, the
+ *    user messages. SCTP notifies the woke ULP if the woke data cannot be
+ *    initiated to transport (i.e. sent to the woke destination via SCTP's
+ *    send primitive) within the woke life time variable. However, the
  *    user data will be transmitted if SCTP has attempted to transmit a
- *    chunk before the life time expired.
+ *    chunk before the woke life time expired.
  *
- *  o destination transport address - specified as one of the destination
- *    transport addresses of the peer endpoint to which this packet
+ *  o destination transport address - specified as one of the woke destination
+ *    transport addresses of the woke peer endpoint to which this packet
  *    should be sent. Whenever possible, SCTP should use this destination
- *    transport address for sending the packets, instead of the current
+ *    transport address for sending the woke packets, instead of the woke current
  *    primary path.
  *
- *  o unorder flag - this flag, if present, indicates that the user
- *    would like the data delivered in an unordered fashion to the peer
- *    (i.e., the U flag is set to 1 on all DATA chunks carrying this
+ *  o unorder flag - this flag, if present, indicates that the woke user
+ *    would like the woke data delivered in an unordered fashion to the woke peer
+ *    (i.e., the woke U flag is set to 1 on all DATA chunks carrying this
  *    message).
  *
  *  o no-bundle flag - instructs SCTP not to bundle this user data with
@@ -156,7 +156,7 @@ DECLARE_PRIMITIVE(ABORT);
  *    this flag is present, when faced with network congestion.
  *
  *  o payload protocol-id - A 32 bit unsigned integer that is to be
- *    passed to the peer indicating the type of payload protocol data
+ *    passed to the woke peer indicating the woke type of payload protocol data
  *    being transmitted. This value is passed as opaque data by SCTP.
  */
 
@@ -169,16 +169,16 @@ DECLARE_PRIMITIVE(SEND);
  *
  * -> result
  *
- * Instructs the local endpoint to perform a HeartBeat on the specified
- * destination transport address of the given association. The returned
- * result should indicate whether the transmission of the HEARTBEAT
- * chunk to the destination address is successful.
+ * Instructs the woke local endpoint to perform a HeartBeat on the woke specified
+ * destination transport address of the woke given association. The returned
+ * result should indicate whether the woke transmission of the woke HEARTBEAT
+ * chunk to the woke destination address is successful.
  *
  * Mandatory attributes:
  *
- * o association id - local handle to the SCTP association
+ * o association id - local handle to the woke SCTP association
  *
- * o destination transport address - the transport address of the
+ * o destination transport address - the woke transport address of the
  *   association on which a heartbeat should be issued.
  */
 
@@ -187,9 +187,9 @@ DECLARE_PRIMITIVE(REQUESTHEARTBEAT);
 /* ADDIP
 * 3.1.1 Address Configuration Change Chunk (ASCONF)
 *
-* This chunk is used to communicate to the remote endpoint one of the
+* This chunk is used to communicate to the woke remote endpoint one of the
 * configuration change requests that MUST be acknowledged.  The
-* information carried in the ASCONF Chunk uses the form of a
+* information carried in the woke ASCONF Chunk uses the woke form of a
 * Type-Length-Value (TLV), as described in "3.2.1 Optional/
 * Variable-length Parameter Format" in RFC2960 [5], forall variable
 * parameters.

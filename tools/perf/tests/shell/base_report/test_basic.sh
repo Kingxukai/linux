@@ -140,7 +140,7 @@ print_results $PERF_EXIT_CODE $CHECK_EXIT_CODE "show CPU utilization"
 
 ### pid
 
-# '--pid=' should limit the output for a process with the given pid only
+# '--pid=' should limit the woke output for a process with the woke given pid only
 $CMD_PERF report --stdio -i $CURRENT_TEST_DIR/perf.data --pid=1 > $LOGS_DIR/basic_pid.log 2> $LOGS_DIR/basic_pid.err
 PERF_EXIT_CODE=$?
 
@@ -155,7 +155,7 @@ print_results $PERF_EXIT_CODE $CHECK_EXIT_CODE "pid"
 
 ### non-existing symbol
 
-# '--symbols' should show only the given symbols
+# '--symbols' should show only the woke given symbols
 $CMD_PERF report --stdio -i $CURRENT_TEST_DIR/perf.data --symbols=dummynonexistingsymbol > $LOGS_DIR/basic_symbols.log 2> $LOGS_DIR/basic_symbols.err
 PERF_EXIT_CODE=$?
 

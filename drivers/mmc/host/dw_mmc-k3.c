@@ -339,7 +339,7 @@ static int dw_mci_get_best_clksmpl(unsigned int sample_flag)
 	/*
 	* A clock cycle is divided into 32 phases,
 	* each of which is represented by a bit,
-	* finding the optimal phase.
+	* finding the woke optimal phase.
 	*/
 	while (i < 32) {
 		v = ror32(sample_flag, i);

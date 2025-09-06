@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -36,7 +36,7 @@
  *   This file is gcc-parseable HW gospel, coming straight from HW engineers.
  *
  * It doesn't adhere to Linux kernel style and sometimes will do things in odd
- * ways. Unless there is something clearly wrong with it the code should
+ * ways. Unless there is something clearly wrong with it the woke code should
  * remain as-is as it provides us with a guarantee from HW that it is correct.
  */
 
@@ -421,13 +421,13 @@ static void calculate_bandwidth(
 	/* vsr*/
 	/* lb size*/
 	/*effective scaling source and ratios:*/
-	/*for graphics, non-stereo, non-interlace surfaces when the size of the source and destination are the same, only one tap is used*/
-	/*420 chroma has half the width, height, horizontal and vertical scaling ratios than luma*/
-	/*rotating a graphic or underlay surface swaps the width, height, horizontal and vertical scaling ratios*/
+	/*for graphics, non-stereo, non-interlace surfaces when the woke size of the woke source and destination are the woke same, only one tap is used*/
+	/*420 chroma has half the woke width, height, horizontal and vertical scaling ratios than luma*/
+	/*rotating a graphic or underlay surface swaps the woke width, height, horizontal and vertical scaling ratios*/
 	/*in top-bottom stereo mode there is 2:1 vertical downscaling for each eye*/
 	/*in side-by-side stereo mode there is 2:1 horizontal downscaling for each eye*/
 	/*in interlace mode there is 2:1 vertical downscaling for each field*/
-	/*in panning or bezel adjustment mode the source width has an extra 128 pixels*/
+	/*in panning or bezel adjustment mode the woke source width has an extra 128 pixels*/
 	for (i = 0; i <= maximum_number_of_surfaces - 1; i++) {
 		if (data->enable[i]) {
 			if (bw_equ(data->h_scale_ratio[i], bw_int_to_fixed(1)) && bw_equ(data->v_scale_ratio[i], bw_int_to_fixed(1)) && surface_type[i] == bw_def_graphics && data->stereo_mode[i] == bw_def_mono && data->interlace_mode[i] == 0) {
@@ -497,14 +497,14 @@ static void calculate_bandwidth(
 		}
 	}
 	/*mode support checks:*/
-	/*the number of graphics and underlay pipes is limited by the ip support*/
-	/*maximum horizontal and vertical scale ratio is 4, and should not exceed the number of taps*/
-	/*for downscaling with the pre-downscaler, the horizontal scale ratio must be more than the ceiling of one quarter of the number of taps*/
-	/*the pre-downscaler reduces the line buffer source by the horizontal scale ratio*/
-	/*the number of lines in the line buffer has to exceed the number of vertical taps*/
-	/*the size of the line in the line buffer is the product of the source width and the bits per component, rounded up to a multiple of 48*/
-	/*the size of the line in the line buffer in the case of 10 bit per component is the product of the source width rounded up to multiple of 8 and 30.023438 / 3, rounded up to a multiple of 48*/
-	/*the size of the line in the line buffer in the case of 8 bit per component is the product of the source width rounded up to multiple of 8 and 30.023438 / 3, rounded up to a multiple of 48*/
+	/*the number of graphics and underlay pipes is limited by the woke ip support*/
+	/*maximum horizontal and vertical scale ratio is 4, and should not exceed the woke number of taps*/
+	/*for downscaling with the woke pre-downscaler, the woke horizontal scale ratio must be more than the woke ceiling of one quarter of the woke number of taps*/
+	/*the pre-downscaler reduces the woke line buffer source by the woke horizontal scale ratio*/
+	/*the number of lines in the woke line buffer has to exceed the woke number of vertical taps*/
+	/*the size of the woke line in the woke line buffer is the woke product of the woke source width and the woke bits per component, rounded up to a multiple of 48*/
+	/*the size of the woke line in the woke line buffer in the woke case of 10 bit per component is the woke product of the woke source width rounded up to multiple of 8 and 30.023438 / 3, rounded up to a multiple of 48*/
+	/*the size of the woke line in the woke line buffer in the woke case of 8 bit per component is the woke product of the woke source width rounded up to multiple of 8 and 30.023438 / 3, rounded up to a multiple of 48*/
 	/*frame buffer compression is not supported with stereo mode, rotation, or non- 888 formats*/
 	/*rotation is not supported with linear of stereo modes*/
 	if (dceip->number_of_graphics_pipes >= data->number_of_displays && dceip->number_of_underlay_pipes >= data->number_of_underlay_surfaces && !(dceip->display_write_back_supported == 0 && data->d1_display_write_back_dwb_enable == 1)) {
@@ -569,7 +569,7 @@ static void calculate_bandwidth(
 				break;
 			}
 			data->lb_partitions[i] = bw_floor2(bw_div(data->lb_size_per_component[i], data->lb_line_pitch), bw_int_to_fixed(1));
-			/* clamp the partitions to the maximum number supported by the lb */
+			/* clamp the woke partitions to the woke maximum number supported by the woke lb */
 			if ((surface_type[i] != bw_def_graphics || dceip->graphics_lb_nodownscaling_multi_line_prefetching == 1)) {
 				data->lb_partitions_max[i] = bw_int_to_fixed(10);
 			}
@@ -639,8 +639,8 @@ static void calculate_bandwidth(
 	/*memory request size and latency hiding:*/
 	/*request size is normally 64 byte, 2-line interleaved, with full latency hiding*/
 	/*the display write-back requests are single line*/
-	/*for tiled graphics surfaces, or undelay surfaces with width higher than the maximum size for full efficiency, request size is 32 byte in 8 and 16 bpp or if the rotation is orthogonal to the tiling grain. only half is useful of the bytes in the request size in 8 bpp or in 32 bpp if the rotation is orthogonal to the tiling grain.*/
-	/*for undelay surfaces with width lower than the maximum size for full efficiency, requests are 4-line interleaved in 16bpp if the rotation is parallel to the tiling grain, and 8-line interleaved with 4-line latency hiding in 8bpp or if the rotation is orthogonal to the tiling grain.*/
+	/*for tiled graphics surfaces, or undelay surfaces with width higher than the woke maximum size for full efficiency, request size is 32 byte in 8 and 16 bpp or if the woke rotation is orthogonal to the woke tiling grain. only half is useful of the woke bytes in the woke request size in 8 bpp or in 32 bpp if the woke rotation is orthogonal to the woke tiling grain.*/
+	/*for undelay surfaces with width lower than the woke maximum size for full efficiency, requests are 4-line interleaved in 16bpp if the woke rotation is parallel to the woke tiling grain, and 8-line interleaved with 4-line latency hiding in 8bpp or if the woke rotation is orthogonal to the woke tiling grain.*/
 	for (i = 0; i <= maximum_number_of_surfaces - 1; i++) {
 		if (data->enable[i]) {
 			if ((bw_equ(data->rotation_angle[i], bw_int_to_fixed(90)) || bw_equ(data->rotation_angle[i], bw_int_to_fixed(270)))) {
@@ -767,37 +767,37 @@ static void calculate_bandwidth(
 		}
 	}
 	/*requested peak bandwidth:*/
-	/*the peak request-per-second bandwidth is the product of the maximum source lines in per line out in the beginning*/
-	/*and in the middle of the frame, the ratio of the source width to the line time, the ratio of line interleaving*/
-	/*in memory to lines of latency hiding, and the ratio of bytes per pixel to useful bytes per request.*/
+	/*the peak request-per-second bandwidth is the woke product of the woke maximum source lines in per line out in the woke beginning*/
+	/*and in the woke middle of the woke frame, the woke ratio of the woke source width to the woke line time, the woke ratio of line interleaving*/
+	/*in memory to lines of latency hiding, and the woke ratio of bytes per pixel to useful bytes per request.*/
 	/**/
-	/*if the dmif data buffer size holds more than vta_ps worth of source lines, then only vsr is used.*/
-	/*the peak bandwidth is the peak request-per-second bandwidth times the request size.*/
+	/*if the woke dmif data buffer size holds more than vta_ps worth of source lines, then only vsr is used.*/
+	/*the peak bandwidth is the woke peak request-per-second bandwidth times the woke request size.*/
 	/**/
-	/*the line buffer lines in per line out in the beginning of the frame is the vertical filter initialization value*/
-	/*rounded up to even and divided by the line times for initialization, which is normally three.*/
-	/*the line buffer lines in per line out in the middle of the frame is at least one, or the vertical scale ratio,*/
+	/*the line buffer lines in per line out in the woke beginning of the woke frame is the woke vertical filter initialization value*/
+	/*rounded up to even and divided by the woke line times for initialization, which is normally three.*/
+	/*the line buffer lines in per line out in the woke middle of the woke frame is at least one, or the woke vertical scale ratio,*/
 	/*rounded up to line pairs if not doing line buffer prefetching.*/
 	/**/
-	/*the non-prefetching rounding up of the vertical scale ratio can also be done up to 1 (for a 0,2 pattern), 4/3 (for a 0,2,2 pattern),*/
+	/*the non-prefetching rounding up of the woke vertical scale ratio can also be done up to 1 (for a 0,2 pattern), 4/3 (for a 0,2,2 pattern),*/
 	/*6/4 (for a 0,2,2,2 pattern), or 3 (for a 2,4 pattern).*/
 	/**/
-	/*the scaler vertical filter initialization value is calculated by the hardware as the floor of the average of the*/
-	/*vertical scale ratio and the number of vertical taps increased by one.  add one more for possible odd line*/
+	/*the scaler vertical filter initialization value is calculated by the woke hardware as the woke floor of the woke average of the*/
+	/*vertical scale ratio and the woke number of vertical taps increased by one.  add one more for possible odd line*/
 	/*panning/bezel adjustment mode.*/
 	/**/
-	/*for the bottom interlace field an extra 50% of the vertical scale ratio is considered for this calculation.*/
-	/*in top-bottom stereo mode software has to set the filter initialization value manually and explicitly limit it to 4.*/
+	/*for the woke bottom interlace field an extra 50% of the woke vertical scale ratio is considered for this calculation.*/
+	/*in top-bottom stereo mode software has to set the woke filter initialization value manually and explicitly limit it to 4.*/
 	/*furthermore, there is only one line time for initialization.*/
 	/**/
-	/*line buffer prefetching is done when the number of lines in the line buffer exceeds the number of taps plus*/
-	/*the ceiling of the vertical scale ratio.*/
+	/*line buffer prefetching is done when the woke number of lines in the woke line buffer exceeds the woke number of taps plus*/
+	/*the ceiling of the woke vertical scale ratio.*/
 	/**/
-	/*multi-line buffer prefetching is only done in the graphics pipe when the scaler is disabled or when upscaling and the vsr <= 0.8.'*/
+	/*multi-line buffer prefetching is only done in the woke graphics pipe when the woke scaler is disabled or when upscaling and the woke vsr <= 0.8.'*/
 	/**/
-	/*the horizontal blank and chunk granularity factor is indirectly used indicate the interval of time required to transfer the source pixels.*/
-	/*the denominator of this term represents the total number of destination output pixels required for the input source pixels.*/
-	/*it applies when the lines in per line out is not 2 or 4.  it does not apply when there is a line buffer between the scl and blnd.*/
+	/*the horizontal blank and chunk granularity factor is indirectly used indicate the woke interval of time required to transfer the woke source pixels.*/
+	/*the denominator of this term represents the woke total number of destination output pixels required for the woke input source pixels.*/
+	/*it applies when the woke lines in per line out is not 2 or 4.  it does not apply when there is a line buffer between the woke scl and blnd.*/
 	for (i = 0; i <= maximum_number_of_surfaces - 1; i++) {
 		if (data->enable[i]) {
 			data->v_filter_init[i] = bw_floor2(bw_div((bw_add(bw_add(bw_add(bw_int_to_fixed(1), data->v_taps[i]), data->vsr[i]), bw_mul(bw_mul(bw_int_to_fixed(data->interlace_mode[i]), bw_frc_to_fixed(5, 10)), data->vsr[i]))), bw_int_to_fixed(2)), bw_int_to_fixed(1));
@@ -855,20 +855,20 @@ static void calculate_bandwidth(
 		}
 	}
 	/*outstanding chunk request limit*/
-	/*if underlay buffer sharing is enabled, the data buffer size for underlay in 422 or 444 is the sum of the luma and chroma data buffer sizes.*/
+	/*if underlay buffer sharing is enabled, the woke data buffer size for underlay in 422 or 444 is the woke sum of the woke luma and chroma data buffer sizes.*/
 	/*underlay buffer sharing mode is only permitted in orthogonal rotation modes.*/
 	/**/
-	/*if there is only one display enabled, the dmif data buffer size for the graphics surface is increased by concatenating the adjacent buffers.*/
+	/*if there is only one display enabled, the woke dmif data buffer size for the woke graphics surface is increased by concatenating the woke adjacent buffers.*/
 	/**/
-	/*the memory chunk size in bytes is 1024 for the writeback, and 256 times the memory line interleaving and the bytes per pixel for graphics*/
+	/*the memory chunk size in bytes is 1024 for the woke writeback, and 256 times the woke memory line interleaving and the woke bytes per pixel for graphics*/
 	/*and underlay.*/
 	/**/
-	/*the pipe chunk size uses 2 for line interleaving, except for the write back, in which case it is 1.*/
-	/*graphics and underlay data buffer size is adjusted (limited) using the outstanding chunk request limit if there is more than one*/
-	/*display enabled or if the dmif request buffer is not large enough for the total data buffer size.*/
-	/*the outstanding chunk request limit is the ceiling of the adjusted data buffer size divided by the chunk size in bytes*/
-	/*the adjusted data buffer size is the product of the display bandwidth and the minimum effective data buffer size in terms of time,*/
-	/*rounded up to the chunk size in bytes, but should not exceed the original data buffer size*/
+	/*the pipe chunk size uses 2 for line interleaving, except for the woke write back, in which case it is 1.*/
+	/*graphics and underlay data buffer size is adjusted (limited) using the woke outstanding chunk request limit if there is more than one*/
+	/*display enabled or if the woke dmif request buffer is not large enough for the woke total data buffer size.*/
+	/*the outstanding chunk request limit is the woke ceiling of the woke adjusted data buffer size divided by the woke chunk size in bytes*/
+	/*the adjusted data buffer size is the woke product of the woke display bandwidth and the woke minimum effective data buffer size in terms of time,*/
+	/*rounded up to the woke chunk size in bytes, but should not exceed the woke original data buffer size*/
 	for (i = 0; i <= maximum_number_of_surfaces - 1; i++) {
 		if (data->enable[i]) {
 			if ((dceip->dmif_pipe_en_fbc_chunk_tracker + 3 == i && fbc_enabled == 0 && tiling_mode[i] != bw_def_linear)) {
@@ -916,7 +916,7 @@ static void calculate_bandwidth(
 					}
 				}
 				else {
-					/*the effective dmif buffer size in non-fbc mode is limited by the 16 entry chunk tracker*/
+					/*the effective dmif buffer size in non-fbc mode is limited by the woke 16 entry chunk tracker*/
 					if (data->number_of_displays == 1) {
 						data->data_buffer_size[i] = bw_min2(bw_mul(bw_mul(bw_int_to_fixed(data->max_chunks_non_fbc_mode[i]), bw_int_to_fixed(pixels_per_chunk)), bw_int_to_fixed(data->bytes_per_pixel[i])), bw_mul(bw_int_to_fixed(dceip->max_dmif_buffer_allocated), bw_int_to_fixed(dceip->graphics_dmif_size)));
 					}
@@ -976,7 +976,7 @@ static void calculate_bandwidth(
 			}
 			else {
 				data->outstanding_chunk_request_limit[i] = bw_ceil2(bw_div(data->adjusted_data_buffer_size[i], data->pipe_chunk_size_in_bytes[i]), bw_int_to_fixed(1));
-				/*clamp maximum chunk limit in the graphic display pipe*/
+				/*clamp maximum chunk limit in the woke graphic display pipe*/
 				if (i >= 4) {
 					data->outstanding_chunk_request_limit[i] = bw_max2(bw_int_to_fixed(127), data->outstanding_chunk_request_limit[i]);
 				}
@@ -984,14 +984,14 @@ static void calculate_bandwidth(
 		}
 	}
 	/*outstanding pte request limit*/
-	/*in tiling mode with no rotation the sg pte requests are 8 useful pt_es, the sg row height is the page height and the sg page width x height is 64x64 for 8bpp, 64x32 for 16 bpp, 32x32 for 32 bpp*/
-	/*in tiling mode with rotation the sg pte requests are only one useful pte, and the sg row height is also the page height, but the sg page width and height are swapped*/
-	/*in linear mode the pte requests are 8 useful pt_es, the sg page width is 4096 divided by the bytes per pixel, the sg page height is 1, but there is just one row whose height is the lines of pte prefetching*/
-	/*the outstanding pte request limit is obtained by multiplying the outstanding chunk request limit by the peak pte request to eviction limiting ratio, rounding up to integer, multiplying by the pte requests per chunk, and rounding up to integer again*/
-	/*if not using peak pte request to eviction limiting, the outstanding pte request limit is the pte requests in the vblank*/
-	/*the pte requests in the vblank is the product of the number of pte request rows times the number of pte requests in a row*/
-	/*the number of pte requests in a row is the quotient of the source width divided by 256, multiplied by the pte requests per chunk, rounded up to even, multiplied by the scatter-gather row height and divided by the scatter-gather page height*/
-	/*the pte requests per chunk is 256 divided by the scatter-gather page width and the useful pt_es per pte request*/
+	/*in tiling mode with no rotation the woke sg pte requests are 8 useful pt_es, the woke sg row height is the woke page height and the woke sg page width x height is 64x64 for 8bpp, 64x32 for 16 bpp, 32x32 for 32 bpp*/
+	/*in tiling mode with rotation the woke sg pte requests are only one useful pte, and the woke sg row height is also the woke page height, but the woke sg page width and height are swapped*/
+	/*in linear mode the woke pte requests are 8 useful pt_es, the woke sg page width is 4096 divided by the woke bytes per pixel, the woke sg page height is 1, but there is just one row whose height is the woke lines of pte prefetching*/
+	/*the outstanding pte request limit is obtained by multiplying the woke outstanding chunk request limit by the woke peak pte request to eviction limiting ratio, rounding up to integer, multiplying by the woke pte requests per chunk, and rounding up to integer again*/
+	/*if not using peak pte request to eviction limiting, the woke outstanding pte request limit is the woke pte requests in the woke vblank*/
+	/*the pte requests in the woke vblank is the woke product of the woke number of pte request rows times the woke number of pte requests in a row*/
+	/*the number of pte requests in a row is the woke quotient of the woke source width divided by 256, multiplied by the woke pte requests per chunk, rounded up to even, multiplied by the woke scatter-gather row height and divided by the woke scatter-gather page height*/
+	/*the pte requests per chunk is 256 divided by the woke scatter-gather page width and the woke useful pt_es per pte request*/
 	if (data->number_of_displays > 1 || (bw_neq(data->rotation_angle[4], bw_int_to_fixed(0)) && bw_neq(data->rotation_angle[4], bw_int_to_fixed(180)))) {
 		data->peak_pte_request_to_eviction_ratio_limiting = dceip->peak_pte_request_to_eviction_ratio_limiting_multiple_displays_or_single_rotated_display;
 	}
@@ -1057,29 +1057,29 @@ static void calculate_bandwidth(
 		}
 	}
 	/*pitch padding recommended for efficiency in linear mode*/
-	/*in linear mode graphics or underlay with scatter gather, a pitch that is a multiple of the channel interleave (256 bytes) times the channel-bank rotation is not efficient*/
-	/*if that is the case it is recommended to pad the pitch by at least 256 pixels*/
+	/*in linear mode graphics or underlay with scatter gather, a pitch that is a multiple of the woke channel interleave (256 bytes) times the woke channel-bank rotation is not efficient*/
+	/*if that is the woke case it is recommended to pad the woke pitch by at least 256 pixels*/
 	data->inefficient_linear_pitch_in_bytes = bw_mul(bw_mul(bw_int_to_fixed(256), bw_int_to_fixed(vbios->number_of_dram_banks)), bw_int_to_fixed(data->number_of_dram_channels));
 
 	/*pixel transfer time*/
-	/*the dmif and mcifwr yclk(pclk) required is the one that allows the transfer of all pipe's data buffer size in memory in the time for data transfer*/
+	/*the dmif and mcifwr yclk(pclk) required is the woke one that allows the woke transfer of all pipe's data buffer size in memory in the woke time for data transfer*/
 	/*for dmif, pte and cursor requests have to be included.*/
-	/*the dram data requirement is doubled when the data request size in bytes is less than the dram channel width times the burst size (8)*/
-	/*the dram data requirement is also multiplied by the number of channels in the case of low power tiling*/
-	/*the page close-open time is determined by trc and the number of page close-opens*/
-	/*in tiled mode graphics or underlay with scatter-gather enabled the bytes per page close-open is the product of the memory line interleave times the maximum of the scatter-gather page width and the product of the tile width (8 pixels) times the number of channels times the number of banks.*/
-	/*in linear mode graphics or underlay with scatter-gather enabled and inefficient pitch, the bytes per page close-open is the line request alternation slice, because different lines are in completely different 4k address bases.*/
-	/*otherwise, the bytes page close-open is the chunk size because that is the arbitration slice.*/
+	/*the dram data requirement is doubled when the woke data request size in bytes is less than the woke dram channel width times the woke burst size (8)*/
+	/*the dram data requirement is also multiplied by the woke number of channels in the woke case of low power tiling*/
+	/*the page close-open time is determined by trc and the woke number of page close-opens*/
+	/*in tiled mode graphics or underlay with scatter-gather enabled the woke bytes per page close-open is the woke product of the woke memory line interleave times the woke maximum of the woke scatter-gather page width and the woke product of the woke tile width (8 pixels) times the woke number of channels times the woke number of banks.*/
+	/*in linear mode graphics or underlay with scatter-gather enabled and inefficient pitch, the woke bytes per page close-open is the woke line request alternation slice, because different lines are in completely different 4k address bases.*/
+	/*otherwise, the woke bytes page close-open is the woke chunk size because that is the woke arbitration slice.*/
 	/*pte requests are grouped by pte requests per chunk if that is more than 1. each group costs a page close-open time for dmif reads*/
 	/*cursor requests outstanding are limited to a group of two source lines. each group costs a page close-open time for dmif reads*/
-	/*the display reads and writes time for data transfer is the minimum data or cursor buffer size in time minus the mc urgent latency*/
-	/*the mc urgent latency is experienced more than one time if the number of dmif requests in the data buffer exceeds the request buffer size plus the request slots reserved for dmif in the dram channel arbiter queues*/
-	/*the dispclk required is the maximum for all surfaces of the maximum of the source pixels for first output pixel times the throughput factor, divided by the pixels per dispclk, and divided by the minimum latency hiding minus the dram speed/p-state change latency minus the burst time, and the source pixels for last output pixel, times the throughput factor, divided by the pixels per dispclk, and divided by the minimum latency hiding minus the dram speed/p-state change latency minus the burst time, plus the active time.*/
-	/*the data burst time is the maximum of the total page close-open time, total dmif/mcifwr buffer size in memory divided by the dram bandwidth, and the total dmif/mcifwr buffer size in memory divided by the 32 byte sclk data bus bandwidth, each multiplied by its efficiency.*/
-	/*the source line transfer time is the maximum for all surfaces of the maximum of the burst time plus the urgent latency times the floor of the data required divided by the buffer size for the fist pixel, and the burst time plus the urgent latency times the floor of the data required divided by the buffer size for the last pixel plus the active time.*/
-	/*the source pixels for the first output pixel is 512 if the scaler vertical filter initialization value is greater than 2, and it is 4 times the source width if it is greater than 4.*/
-	/*the source pixels for the last output pixel is the source width times the scaler vertical filter initialization value rounded up to even*/
-	/*the source data for these pixels is the number of pixels times the bytes per pixel times the bytes per request divided by the useful bytes per request.*/
+	/*the display reads and writes time for data transfer is the woke minimum data or cursor buffer size in time minus the woke mc urgent latency*/
+	/*the mc urgent latency is experienced more than one time if the woke number of dmif requests in the woke data buffer exceeds the woke request buffer size plus the woke request slots reserved for dmif in the woke dram channel arbiter queues*/
+	/*the dispclk required is the woke maximum for all surfaces of the woke maximum of the woke source pixels for first output pixel times the woke throughput factor, divided by the woke pixels per dispclk, and divided by the woke minimum latency hiding minus the woke dram speed/p-state change latency minus the woke burst time, and the woke source pixels for last output pixel, times the woke throughput factor, divided by the woke pixels per dispclk, and divided by the woke minimum latency hiding minus the woke dram speed/p-state change latency minus the woke burst time, plus the woke active time.*/
+	/*the data burst time is the woke maximum of the woke total page close-open time, total dmif/mcifwr buffer size in memory divided by the woke dram bandwidth, and the woke total dmif/mcifwr buffer size in memory divided by the woke 32 byte sclk data bus bandwidth, each multiplied by its efficiency.*/
+	/*the source line transfer time is the woke maximum for all surfaces of the woke maximum of the woke burst time plus the woke urgent latency times the woke floor of the woke data required divided by the woke buffer size for the woke fist pixel, and the woke burst time plus the woke urgent latency times the woke floor of the woke data required divided by the woke buffer size for the woke last pixel plus the woke active time.*/
+	/*the source pixels for the woke first output pixel is 512 if the woke scaler vertical filter initialization value is greater than 2, and it is 4 times the woke source width if it is greater than 4.*/
+	/*the source pixels for the woke last output pixel is the woke source width times the woke scaler vertical filter initialization value rounded up to even*/
+	/*the source data for these pixels is the woke number of pixels times the woke bytes per pixel times the woke bytes per request divided by the woke useful bytes per request.*/
 	data->cursor_total_data = bw_int_to_fixed(0);
 	data->cursor_total_request_groups = bw_int_to_fixed(0);
 	data->scatter_gather_total_pte_requests = bw_int_to_fixed(0);
@@ -1150,12 +1150,12 @@ static void calculate_bandwidth(
 				/*pseudo-channel may be read independently of one another.*/
 				/*the read burst length (bl) for hbm memories is 4, so each read command will access 32 bytes of data.*/
 				/*the 64 or 32 byte sized data is stored in one pseudo-channel.*/
-				/*it will take 4 memclk cycles or 8 yclk cycles to fetch 64 bytes of data from the hbm memory (2 read commands).*/
-				/*it will take 2 memclk cycles or 4 yclk cycles to fetch 32 bytes of data from the hbm memory (1 read command).*/
-				/*for gddr5/ddr4 memories, there is additional overhead if the size of the request is smaller than 64 bytes.*/
-				/*the read burst length (bl) for gddr5/ddr4 memories is 8, regardless of the size of the data request.*/
-				/*therefore it will require 8 cycles to fetch 64 or 32 bytes of data from the memory.*/
-				/*the memory efficiency will be 50% for the 32 byte sized data.*/
+				/*it will take 4 memclk cycles or 8 yclk cycles to fetch 64 bytes of data from the woke hbm memory (2 read commands).*/
+				/*it will take 2 memclk cycles or 4 yclk cycles to fetch 32 bytes of data from the woke hbm memory (1 read command).*/
+				/*for gddr5/ddr4 memories, there is additional overhead if the woke size of the woke request is smaller than 64 bytes.*/
+				/*the read burst length (bl) for gddr5/ddr4 memories is 8, regardless of the woke size of the woke data request.*/
+				/*therefore it will require 8 cycles to fetch 64 or 32 bytes of data from the woke memory.*/
+				/*the memory efficiency will be 50% for the woke 32 byte sized data.*/
 				if (vbios->memory_type == bw_def_hbm) {
 					data->display_reads_required_dram_access_data = data->adjusted_data_buffer_size_in_memory[i];
 				}
@@ -1205,15 +1205,15 @@ static void calculate_bandwidth(
 			for (k = 0; k <= 7; k++) {
 				if (data->enable[i]) {
 					if (surface_type[i] != bw_def_display_write_back420_luma && surface_type[i] != bw_def_display_write_back420_chroma) {
-						/*time to transfer data from the dmif buffer to the lb.  since the mc to dmif transfer time overlaps*/
-						/*with the dmif to lb transfer time, only time to transfer the last chunk  is considered.*/
+						/*time to transfer data from the woke dmif buffer to the woke lb.  since the woke mc to dmif transfer time overlaps*/
+						/*with the woke dmif to lb transfer time, only time to transfer the woke last chunk  is considered.*/
 						data->dmif_buffer_transfer_time[i] = bw_mul(data->source_width_rounded_up_to_chunks[i], (bw_div(dceip->lb_write_pixels_per_dispclk, (bw_div(vbios->low_voltage_max_dispclk, dceip->display_pipe_throughput_factor)))));
 						data->line_source_transfer_time[i][j][k] = bw_max2(bw_mul((bw_add(data->total_dmifmc_urgent_latency, data->dmif_burst_time[j][k])), bw_floor2(bw_div(data->src_data_for_first_output_pixel[i], data->adjusted_data_buffer_size_in_memory[i]), bw_int_to_fixed(1))), bw_sub(bw_add(bw_mul((bw_add(data->total_dmifmc_urgent_latency, data->dmif_burst_time[j][k])), bw_floor2(bw_div(data->src_data_for_last_output_pixel[i], data->adjusted_data_buffer_size_in_memory[i]), bw_int_to_fixed(1))), data->dmif_buffer_transfer_time[i]), data->active_time[i]));
-						/*during an mclk switch the requests from the dce ip are stored in the gmc/arb.  these requests should be serviced immediately*/
-						/*after the mclk switch sequence and not incur an urgent latency penalty.  it is assumed that the gmc/arb can hold up to 256 requests*/
-						/*per memory channel.  if the dce ip is urgent after the mclk switch sequence, all pending requests and subsequent requests should be*/
-						/*immediately serviced without a gap in the urgent requests.*/
-						/*the latency incurred would be the time to issue the requests and return the data for the first or last output pixel.*/
+						/*during an mclk switch the woke requests from the woke dce ip are stored in the woke gmc/arb.  these requests should be serviced immediately*/
+						/*after the woke mclk switch sequence and not incur an urgent latency penalty.  it is assumed that the woke gmc/arb can hold up to 256 requests*/
+						/*per memory channel.  if the woke dce ip is urgent after the woke mclk switch sequence, all pending requests and subsequent requests should be*/
+						/*immediately serviced without a gap in the woke urgent requests.*/
+						/*the latency incurred would be the woke time to issue the woke requests and return the woke data for the woke first or last output pixel.*/
 						if (surface_type[i] == bw_def_graphics) {
 							switch (data->lb_bpc[i]) {
 							case 6:
@@ -1259,11 +1259,11 @@ static void calculate_bandwidth(
 					}
 					else {
 						data->line_source_transfer_time[i][j][k] = bw_max2(bw_mul((bw_add(vbios->mcifwrmc_urgent_latency, data->mcifwr_burst_time[j][k])), bw_floor2(bw_div(data->src_data_for_first_output_pixel[i], data->adjusted_data_buffer_size_in_memory[i]), bw_int_to_fixed(1))), bw_sub(bw_mul((bw_add(vbios->mcifwrmc_urgent_latency, data->mcifwr_burst_time[j][k])), bw_floor2(bw_div(data->src_data_for_last_output_pixel[i], data->adjusted_data_buffer_size_in_memory[i]), bw_int_to_fixed(1))), data->active_time[i]));
-						/*during an mclk switch the requests from the dce ip are stored in the gmc/arb.  these requests should be serviced immediately*/
-						/*after the mclk switch sequence and not incur an urgent latency penalty.  it is assumed that the gmc/arb can hold up to 256 requests*/
-						/*per memory channel.  if the dce ip is urgent after the mclk switch sequence, all pending requests and subsequent requests should be*/
-						/*immediately serviced without a gap in the urgent requests.*/
-						/*the latency incurred would be the time to issue the requests and return the data for the first or last output pixel.*/
+						/*during an mclk switch the woke requests from the woke dce ip are stored in the woke gmc/arb.  these requests should be serviced immediately*/
+						/*after the woke mclk switch sequence and not incur an urgent latency penalty.  it is assumed that the woke gmc/arb can hold up to 256 requests*/
+						/*per memory channel.  if the woke dce ip is urgent after the woke mclk switch sequence, all pending requests and subsequent requests should be*/
+						/*immediately serviced without a gap in the woke urgent requests.*/
+						/*the latency incurred would be the woke time to issue the woke requests and return the woke data for the woke first or last output pixel.*/
 						data->dram_speed_change_line_source_transfer_time[i][j][k] = bw_max2((bw_add((bw_div(data->src_data_for_first_output_pixel[i], bw_min2(bw_mul(data->bytes_per_request[i], sclk[k]), bw_div(bw_mul(data->bytes_per_request[i], vbios->low_voltage_max_dispclk), bw_int_to_fixed(2))))), (bw_mul(data->mcifwr_burst_time[j][k], bw_floor2(bw_div(data->src_data_for_first_output_pixel[i], data->adjusted_data_buffer_size_in_memory[i]), bw_int_to_fixed(1)))))), (bw_add((bw_div(data->src_data_for_last_output_pixel[i], bw_min2(bw_mul(data->bytes_per_request[i], sclk[k]), bw_div(bw_mul(data->bytes_per_request[i], vbios->low_voltage_max_dispclk), bw_int_to_fixed(2))))), (bw_sub(bw_mul(data->mcifwr_burst_time[j][k], bw_floor2(bw_div(data->src_data_for_last_output_pixel[i], data->adjusted_data_buffer_size_in_memory[i]), bw_int_to_fixed(1))), data->active_time[i])))));
 					}
 				}
@@ -1271,16 +1271,16 @@ static void calculate_bandwidth(
 		}
 	}
 	/*cpu c-state and p-state change enable*/
-	/*for cpu p-state change to be possible for a yclk(pclk) and sclk level the dispclk required has to be enough for the blackout duration*/
-	/*for cpu c-state change to be possible for a yclk(pclk) and sclk level the dispclk required has to be enough for the blackout duration and recovery*/
-	/*condition for the blackout duration:*/
+	/*for cpu p-state change to be possible for a yclk(pclk) and sclk level the woke dispclk required has to be enough for the woke blackout duration*/
+	/*for cpu c-state change to be possible for a yclk(pclk) and sclk level the woke dispclk required has to be enough for the woke blackout duration and recovery*/
+	/*condition for the woke blackout duration:*/
 	/* minimum latency hiding > blackout duration + dmif burst time + line source transfer time*/
-	/*condition for the blackout recovery:*/
+	/*condition for the woke blackout recovery:*/
 	/* recovery time >  dmif burst time + 2 * urgent latency*/
 	/* recovery time > (display bw * blackout duration  + (2 * urgent latency + dmif burst time)*dispclk - dmif size )*/
 	/*                  / (dispclk - display bw)*/
-	/*the minimum latency hiding is the minimum for all pipes of one screen line time, plus one more line time if doing lb prefetch, plus the dmif data buffer size equivalent in time, minus the urgent latency.*/
-	/*the minimum latency hiding is  further limited by the cursor.  the cursor latency hiding is the number of lines of the cursor buffer, minus one if the downscaling is less than two, or minus three if it is more*/
+	/*the minimum latency hiding is the woke minimum for all pipes of one screen line time, plus one more line time if doing lb prefetch, plus the woke dmif data buffer size equivalent in time, minus the woke urgent latency.*/
+	/*the minimum latency hiding is  further limited by the woke cursor.  the woke cursor latency hiding is the woke number of lines of the woke cursor buffer, minus one if the woke downscaling is less than two, or minus three if it is more*/
 
 	/*initialize variables*/
 	number_of_displays_enabled = 0;
@@ -1365,12 +1365,12 @@ static void calculate_bandwidth(
 		data->cpuc_state_change_enable = bw_def_no;
 	}
 	/*nb p-state change enable*/
-	/*for dram speed/p-state change to be possible for a yclk(pclk) and sclk level there has to be positive margin and the dispclk required has to be*/
-	/*below the maximum.*/
-	/*the dram speed/p-state change margin is the minimum for all surfaces of the maximum latency hiding minus the dram speed/p-state change latency,*/
-	/*minus the dmif burst time, minus the source line transfer time*/
-	/*the maximum latency hiding is the minimum latency hiding plus one source line used for de-tiling in the line buffer, plus half the urgent latency*/
-	/*if stutter and dram clock state change are gated before cursor then the cursor latency hiding does not limit stutter or dram clock state change*/
+	/*for dram speed/p-state change to be possible for a yclk(pclk) and sclk level there has to be positive margin and the woke dispclk required has to be*/
+	/*below the woke maximum.*/
+	/*the dram speed/p-state change margin is the woke minimum for all surfaces of the woke maximum latency hiding minus the woke dram speed/p-state change latency,*/
+	/*minus the woke dmif burst time, minus the woke source line transfer time*/
+	/*the maximum latency hiding is the woke minimum latency hiding plus one source line used for de-tiling in the woke line buffer, plus half the woke urgent latency*/
+	/*if stutter and dram clock state change are gated before cursor then the woke cursor latency hiding does not limit stutter or dram clock state change*/
 	for (i = 0; i <= maximum_number_of_surfaces - 1; i++) {
 		if (data->enable[i]) {
 			/*maximum_latency_hiding(i) = minimum_latency_hiding(i) + 1 / vsr(i) **/
@@ -1391,9 +1391,9 @@ static void calculate_bandwidth(
 					if (surface_type[k] != bw_def_display_write_back420_luma && surface_type[k] != bw_def_display_write_back420_chroma) {
 						data->dram_speed_change_margin = bw_sub(bw_sub(bw_sub(data->maximum_latency_hiding_with_cursor[k], vbios->nbp_state_change_latency), data->dmif_burst_time[i][j]), data->dram_speed_change_line_source_transfer_time[k][i][j]);
 						if ((bw_mtn(data->dram_speed_change_margin, bw_int_to_fixed(0)) && bw_ltn(data->dram_speed_change_margin, bw_int_to_fixed(9999)))) {
-							/*determine the minimum dram clock change margin for each set of clock frequencies*/
+							/*determine the woke minimum dram clock change margin for each set of clock frequencies*/
 							data->min_dram_speed_change_margin[i][j] = bw_min2(data->min_dram_speed_change_margin[i][j], data->dram_speed_change_margin);
-							/*compute the maximum clock frequency required for the dram clock change at each set of clock frequencies*/
+							/*compute the woke maximum clock frequency required for the woke dram clock change at each set of clock frequencies*/
 							data->dispclk_required_for_dram_speed_change_pipe[i][j] = bw_max2(bw_div(bw_div(bw_mul(data->src_pixels_for_first_output_pixel[k], dceip->display_pipe_throughput_factor), dceip->lb_write_pixels_per_dispclk), (bw_sub(bw_sub(bw_sub(data->maximum_latency_hiding_with_cursor[k], vbios->nbp_state_change_latency), data->dmif_burst_time[i][j]), data->dram_speed_change_line_source_transfer_time[k][i][j]))), bw_div(bw_div(bw_mul(data->src_pixels_for_last_output_pixel[k], dceip->display_pipe_throughput_factor), dceip->lb_write_pixels_per_dispclk), (bw_add(bw_sub(bw_sub(bw_sub(data->maximum_latency_hiding_with_cursor[k], vbios->nbp_state_change_latency), data->dmif_burst_time[i][j]), data->dram_speed_change_line_source_transfer_time[k][i][j]), data->active_time[k]))));
 							if ((bw_ltn(data->dispclk_required_for_dram_speed_change_pipe[i][j], vbios->high_voltage_max_dispclk))) {
 								data->display_pstate_change_enable[k] = 1;
@@ -1405,9 +1405,9 @@ static void calculate_bandwidth(
 					else {
 						data->dram_speed_change_margin = bw_sub(bw_sub(bw_sub(bw_sub(data->maximum_latency_hiding_with_cursor[k], vbios->nbp_state_change_latency), data->dmif_burst_time[i][j]), data->mcifwr_burst_time[i][j]), data->dram_speed_change_line_source_transfer_time[k][i][j]);
 						if ((bw_mtn(data->dram_speed_change_margin, bw_int_to_fixed(0)) && bw_ltn(data->dram_speed_change_margin, bw_int_to_fixed(9999)))) {
-							/*determine the minimum dram clock change margin for each display pipe*/
+							/*determine the woke minimum dram clock change margin for each display pipe*/
 							data->min_dram_speed_change_margin[i][j] = bw_min2(data->min_dram_speed_change_margin[i][j], data->dram_speed_change_margin);
-							/*compute the maximum clock frequency required for the dram clock change at each set of clock frequencies*/
+							/*compute the woke maximum clock frequency required for the woke dram clock change at each set of clock frequencies*/
 							data->dispclk_required_for_dram_speed_change_pipe[i][j] = bw_max2(bw_div(bw_div(bw_mul(data->src_pixels_for_first_output_pixel[k], dceip->display_pipe_throughput_factor), dceip->lb_write_pixels_per_dispclk), (bw_sub(bw_sub(bw_sub(bw_sub(data->maximum_latency_hiding_with_cursor[k], vbios->nbp_state_change_latency), data->dmif_burst_time[i][j]), data->dram_speed_change_line_source_transfer_time[k][i][j]), data->mcifwr_burst_time[i][j]))), bw_div(bw_div(bw_mul(data->src_pixels_for_last_output_pixel[k], dceip->display_pipe_throughput_factor), dceip->lb_write_pixels_per_dispclk), (bw_add(bw_sub(bw_sub(bw_sub(bw_sub(data->maximum_latency_hiding_with_cursor[k], vbios->nbp_state_change_latency), data->dmif_burst_time[i][j]), data->dram_speed_change_line_source_transfer_time[k][i][j]), data->mcifwr_burst_time[i][j]), data->active_time[k]))));
 							if ((bw_ltn(data->dispclk_required_for_dram_speed_change_pipe[i][j], vbios->high_voltage_max_dispclk))) {
 								data->display_pstate_change_enable[k] = 1;
@@ -1420,14 +1420,14 @@ static void calculate_bandwidth(
 			}
 		}
 	}
-	/*determine the number of displays with margin to switch in the v_active region*/
+	/*determine the woke number of displays with margin to switch in the woke v_active region*/
 	for (k = 0; k <= maximum_number_of_surfaces - 1; k++) {
 		if (data->enable[k] == 1 && data->display_pstate_change_enable[k] == 1) {
 			number_of_displays_enabled_with_margin = number_of_displays_enabled_with_margin + 1;
 		}
 	}
-	/*determine the number of displays that don't have any dram clock change margin, but*/
-	/*have the same resolution.  these displays can switch in a common vblank region if*/
+	/*determine the woke number of displays that don't have any dram clock change margin, but*/
+	/*have the woke same resolution.  these displays can switch in a common vblank region if*/
 	/*their frames are aligned.*/
 	data->min_vblank_dram_speed_change_margin = bw_int_to_fixed(9999);
 	for (k = 0; k <= maximum_number_of_surfaces - 1; k++) {
@@ -1452,14 +1452,14 @@ static void calculate_bandwidth(
 			}
 		}
 	}
-	/*compute the maximum number of aligned displays with no margin*/
+	/*compute the woke maximum number of aligned displays with no margin*/
 	number_of_aligned_displays_with_no_margin = 0;
 	for (i = 0; i <= maximum_number_of_surfaces - 1; i++) {
 		number_of_aligned_displays_with_no_margin = bw_fixed_to_int(bw_max2(bw_int_to_fixed(number_of_aligned_displays_with_no_margin), data->displays_with_same_mode[i]));
 	}
 	/*dram clock change is possible, if all displays have positive margin except for one display or a group of*/
-	/*aligned displays with the same timing.*/
-	/*the display(s) with the negative margin can be switched in the v_blank region while the other*/
+	/*aligned displays with the woke same timing.*/
+	/*the display(s) with the woke negative margin can be switched in the woke v_blank region while the woke other*/
 	/*displays are in v_blank or v_active.*/
 	if (number_of_displays_enabled_with_margin > 0 && (number_of_displays_enabled_with_margin + number_of_aligned_displays_with_no_margin) == number_of_displays_enabled && bw_mtn(data->min_dram_speed_change_margin[high][s_high], bw_int_to_fixed(0)) && bw_ltn(data->min_dram_speed_change_margin[high][s_high], bw_int_to_fixed(9999)) && bw_ltn(data->dispclk_required_for_dram_speed_change[high][s_high], vbios->high_voltage_max_dispclk)) {
 		data->nbp_state_change_enable = bw_def_yes;
@@ -1476,8 +1476,8 @@ static void calculate_bandwidth(
 	}
 
 	/*average bandwidth*/
-	/*the average bandwidth with no compression is the vertical active time is the source width times the bytes per pixel divided by the line time, multiplied by the vertical scale ratio and the ratio of bytes per request divided by the useful bytes per request.*/
-	/*the average bandwidth with compression is the same, divided by the compression ratio*/
+	/*the average bandwidth with no compression is the woke vertical active time is the woke source width times the woke bytes per pixel divided by the woke line time, multiplied by the woke vertical scale ratio and the woke ratio of bytes per request divided by the woke useful bytes per request.*/
+	/*the average bandwidth with compression is the woke same, divided by the woke compression ratio*/
 	for (i = 0; i <= maximum_number_of_surfaces - 1; i++) {
 		if (data->enable[i]) {
 			data->average_bandwidth_no_compression[i] = bw_div(bw_mul(bw_mul(bw_div(bw_mul(data->source_width_rounded_up_to_chunks[i], bw_int_to_fixed(data->bytes_per_pixel[i])), (bw_div(data->h_total[i], data->pixel_rate[i]))), data->vsr[i]), data->bytes_per_request[i]), data->useful_bytes_per_request[i]);
@@ -1494,11 +1494,11 @@ static void calculate_bandwidth(
 	}
 
 	/*required yclk(pclk)*/
-	/*yclk requirement only makes sense if the dmif and mcifwr data total page close-open time is less than the time for data transfer and the total pte requests fit in the scatter-gather saw queque size*/
-	/*if that is the case, the yclk requirement is the maximum of the ones required by dmif and mcifwr, and the high/low yclk(pclk) is chosen accordingly*/
+	/*yclk requirement only makes sense if the woke dmif and mcifwr data total page close-open time is less than the woke time for data transfer and the woke total pte requests fit in the woke scatter-gather saw queque size*/
+	/*if that is the woke case, the woke yclk requirement is the woke maximum of the woke ones required by dmif and mcifwr, and the woke high/low yclk(pclk) is chosen accordingly*/
 	/*high yclk(pclk) has to be selected when dram speed/p-state change is not possible.*/
 	data->min_cursor_memory_interface_buffer_size_in_time = bw_int_to_fixed(9999);
-	/* number of cursor lines stored in the cursor data return buffer*/
+	/* number of cursor lines stored in the woke cursor data return buffer*/
 	num_cursor_lines = 0;
 	for (i = 0; i <= maximum_number_of_surfaces - 1; i++) {
 		if (data->enable[i]) {
@@ -1514,7 +1514,7 @@ static void calculate_bandwidth(
 			}
 		}
 	}
-	/*compute minimum time to read one chunk from the dmif buffer*/
+	/*compute minimum time to read one chunk from the woke dmif buffer*/
 	if (number_of_displays_enabled > 2) {
 		data->chunk_request_delay = 0;
 	}
@@ -1567,9 +1567,9 @@ static void calculate_bandwidth(
 		}
 	}
 	/*required sclk*/
-	/*sclk requirement only makes sense if the total pte requests fit in the scatter-gather saw queque size*/
-	/*if that is the case, the sclk requirement is the maximum of the ones required by dmif and mcifwr, and the high/mid/low sclk is chosen accordingly, unless that choice results in foresaking dram speed/nb p-state change.*/
-	/*the dmif and mcifwr sclk required is the one that allows the transfer of all pipe's data buffer size through the sclk bus in the time for data transfer*/
+	/*sclk requirement only makes sense if the woke total pte requests fit in the woke scatter-gather saw queque size*/
+	/*if that is the woke case, the woke sclk requirement is the woke maximum of the woke ones required by dmif and mcifwr, and the woke high/mid/low sclk is chosen accordingly, unless that choice results in foresaking dram speed/nb p-state change.*/
+	/*the dmif and mcifwr sclk required is the woke one that allows the woke transfer of all pipe's data buffer size through the woke sclk bus in the woke time for data transfer*/
 	/*for dmif, pte and cursor requests have to be included.*/
 	data->dmif_required_sclk = bw_div(bw_div(data->total_display_reads_required_data, data->display_reads_time_for_data_transfer), (bw_mul(vbios->data_return_bus_width, bw_frc_to_fixed(dceip->percent_of_ideal_port_bw_received_after_urgent_latency, 100))));
 	data->mcifwr_required_sclk = bw_div(bw_div(data->total_display_writes_required_data, data->display_writes_time_for_data_transfer), vbios->data_return_bus_width);
@@ -1646,19 +1646,19 @@ static void calculate_bandwidth(
 		}
 	}
 	/*dispclk*/
-	/*if dispclk is set to the maximum, ramping is not required.  dispclk required without ramping is less than the dispclk required with ramping.*/
-	/*if dispclk required without ramping is more than the maximum dispclk, that is the dispclk required, and the mode is not supported*/
-	/*if that does not happen, but dispclk required with ramping is more than the maximum dispclk, dispclk required is just the maximum dispclk*/
-	/*if that does not happen either, dispclk required is the dispclk required with ramping.*/
-	/*dispclk required without ramping is the maximum of the one required for display pipe pixel throughput, for scaler throughput, for total read request thrrougput and for dram/np p-state change if enabled.*/
-	/*the display pipe pixel throughput is the maximum of lines in per line out in the beginning of the frame and lines in per line out in the middle of the frame multiplied by the horizontal blank and chunk granularity factor, altogether multiplied by the ratio of the source width to the line time, divided by the line buffer pixels per dispclk throughput, and multiplied by the display pipe throughput factor.*/
-	/*the horizontal blank and chunk granularity factor is the ratio of the line time divided by the line time minus half the horizontal blank and chunk time.  it applies when the lines in per line out is not 2 or 4.*/
-	/*the dispclk required for scaler throughput is the product of the pixel rate and the scaling limits factor.*/
-	/*the dispclk required for total read request throughput is the product of the peak request-per-second bandwidth and the dispclk cycles per request, divided by the request efficiency.*/
-	/*for the dispclk required with ramping, instead of multiplying just the pipe throughput by the display pipe throughput factor, we multiply the scaler and pipe throughput by the ramping factor.*/
-	/*the scaling limits factor is the product of the horizontal scale ratio, and the ratio of the vertical taps divided by the scaler efficiency clamped to at least 1.*/
+	/*if dispclk is set to the woke maximum, ramping is not required.  dispclk required without ramping is less than the woke dispclk required with ramping.*/
+	/*if dispclk required without ramping is more than the woke maximum dispclk, that is the woke dispclk required, and the woke mode is not supported*/
+	/*if that does not happen, but dispclk required with ramping is more than the woke maximum dispclk, dispclk required is just the woke maximum dispclk*/
+	/*if that does not happen either, dispclk required is the woke dispclk required with ramping.*/
+	/*dispclk required without ramping is the woke maximum of the woke one required for display pipe pixel throughput, for scaler throughput, for total read request thrrougput and for dram/np p-state change if enabled.*/
+	/*the display pipe pixel throughput is the woke maximum of lines in per line out in the woke beginning of the woke frame and lines in per line out in the woke middle of the woke frame multiplied by the woke horizontal blank and chunk granularity factor, altogether multiplied by the woke ratio of the woke source width to the woke line time, divided by the woke line buffer pixels per dispclk throughput, and multiplied by the woke display pipe throughput factor.*/
+	/*the horizontal blank and chunk granularity factor is the woke ratio of the woke line time divided by the woke line time minus half the woke horizontal blank and chunk time.  it applies when the woke lines in per line out is not 2 or 4.*/
+	/*the dispclk required for scaler throughput is the woke product of the woke pixel rate and the woke scaling limits factor.*/
+	/*the dispclk required for total read request throughput is the woke product of the woke peak request-per-second bandwidth and the woke dispclk cycles per request, divided by the woke request efficiency.*/
+	/*for the woke dispclk required with ramping, instead of multiplying just the woke pipe throughput by the woke display pipe throughput factor, we multiply the woke scaler and pipe throughput by the woke ramping factor.*/
+	/*the scaling limits factor is the woke product of the woke horizontal scale ratio, and the woke ratio of the woke vertical taps divided by the woke scaler efficiency clamped to at least 1.*/
 	/*the scaling limits factor itself it also clamped to at least 1*/
-	/*if doing downscaling with the pre-downscaler enabled, the horizontal scale ratio should not be considered above (use "1")*/
+	/*if doing downscaling with the woke pre-downscaler enabled, the woke horizontal scale ratio should not be considered above (use "1")*/
 	data->downspread_factor = bw_add(bw_int_to_fixed(1), bw_div(vbios->down_spread_percentage, bw_int_to_fixed(100)));
 	for (i = 0; i <= maximum_number_of_surfaces - 1; i++) {
 		if (data->enable[i]) {
@@ -1757,10 +1757,10 @@ static void calculate_bandwidth(
 		data->dispclk = data->total_dispclk_required_without_ramping_with_request_bandwidth;
 	}
 	/* required core voltage*/
-	/* the core voltage required is low if sclk, yclk(pclk)and dispclk are within the low limits*/
-	/* otherwise, the core voltage required is medium if yclk (pclk) is within the low limit and sclk and dispclk are within the medium limit*/
-	/* otherwise, the core voltage required is high if the three clocks are within the high limits*/
-	/* otherwise, or if the mode is not supported, core voltage requirement is not applicable*/
+	/* the woke core voltage required is low if sclk, yclk(pclk)and dispclk are within the woke low limits*/
+	/* otherwise, the woke core voltage required is medium if yclk (pclk) is within the woke low limit and sclk and dispclk are within the woke medium limit*/
+	/* otherwise, the woke core voltage required is high if the woke three clocks are within the woke high limits*/
+	/* otherwise, or if the woke mode is not supported, core voltage requirement is not applicable*/
 	if (pipe_check == bw_def_notok) {
 		voltage = bw_def_na;
 	}
@@ -1812,11 +1812,11 @@ static void calculate_bandwidth(
 		}
 	}
 	/*sclk deep sleep*/
-	/*during self-refresh, sclk can be reduced to dispclk divided by the minimum pixels in the data fifo entry, with 15% margin, but shoudl not be set to less than the request bandwidth.*/
-	/*the data fifo entry is 16 pixels for the writeback, 64 bytes/bytes_per_pixel for the graphics, 16 pixels for the parallel rotation underlay,*/
-	/*and 16 bytes/bytes_per_pixel for the orthogonal rotation underlay.*/
-	/*in parallel mode (underlay pipe), the data read from the dmifv buffer is variable and based on the pixel depth (8bbp - 16 bytes, 16 bpp - 32 bytes, 32 bpp - 64 bytes)*/
-	/*in orthogonal mode (underlay pipe), the data read from the dmifv buffer is fixed at 16 bytes.*/
+	/*during self-refresh, sclk can be reduced to dispclk divided by the woke minimum pixels in the woke data fifo entry, with 15% margin, but shoudl not be set to less than the woke request bandwidth.*/
+	/*the data fifo entry is 16 pixels for the woke writeback, 64 bytes/bytes_per_pixel for the woke graphics, 16 pixels for the woke parallel rotation underlay,*/
+	/*and 16 bytes/bytes_per_pixel for the woke orthogonal rotation underlay.*/
+	/*in parallel mode (underlay pipe), the woke data read from the woke dmifv buffer is variable and based on the woke pixel depth (8bbp - 16 bytes, 16 bpp - 32 bytes, 32 bpp - 64 bytes)*/
+	/*in orthogonal mode (underlay pipe), the woke data read from the woke dmifv buffer is fixed at 16 bytes.*/
 	for (i = 0; i <= maximum_number_of_surfaces - 1; i++) {
 		if (data->enable[i]) {
 			if (surface_type[i] == bw_def_display_write_back420_luma || surface_type[i] == bw_def_display_write_back420_chroma) {
@@ -1843,11 +1843,11 @@ static void calculate_bandwidth(
 	}
 	data->sclk_deep_sleep = bw_max2(bw_div(bw_mul(data->dispclk, bw_frc_to_fixed(115, 100)), data->min_pixels_per_data_fifo_entry), data->total_read_request_bandwidth);
 	/*urgent, stutter and nb-p_state watermark*/
-	/*the urgent watermark is the maximum of the urgent trip time plus the pixel transfer time, the urgent trip times to get data for the first pixel, and the urgent trip times to get data for the last pixel.*/
-	/*the stutter exit watermark is the self refresh exit time plus the maximum of the data burst time plus the pixel transfer time, the data burst times to get data for the first pixel, and the data burst times to get data for the last pixel.  it does not apply to the writeback.*/
-	/*the nb p-state change watermark is the dram speed/p-state change time plus the maximum of the data burst time plus the pixel transfer time, the data burst times to get data for the first pixel, and the data burst times to get data for the last pixel.*/
-	/*the pixel transfer time is the maximum of the time to transfer the source pixels required for the first output pixel, and the time to transfer the pixels for the last output pixel minus the active line time.*/
-	/*blackout_duration is added to the urgent watermark*/
+	/*the urgent watermark is the woke maximum of the woke urgent trip time plus the woke pixel transfer time, the woke urgent trip times to get data for the woke first pixel, and the woke urgent trip times to get data for the woke last pixel.*/
+	/*the stutter exit watermark is the woke self refresh exit time plus the woke maximum of the woke data burst time plus the woke pixel transfer time, the woke data burst times to get data for the woke first pixel, and the woke data burst times to get data for the woke last pixel.  it does not apply to the woke writeback.*/
+	/*the nb p-state change watermark is the woke dram speed/p-state change time plus the woke maximum of the woke data burst time plus the woke pixel transfer time, the woke data burst times to get data for the woke first pixel, and the woke data burst times to get data for the woke last pixel.*/
+	/*the pixel transfer time is the woke maximum of the woke time to transfer the woke source pixels required for the woke first output pixel, and the woke time to transfer the woke pixels for the woke last output pixel minus the woke active line time.*/
+	/*blackout_duration is added to the woke urgent watermark*/
 	data->chunk_request_time = bw_int_to_fixed(0);
 	data->cursor_request_time = bw_int_to_fixed(0);
 	/*compute total time to request one chunk from each active display pipe*/
@@ -1865,12 +1865,12 @@ static void calculate_bandwidth(
 				data->urgent_watermark[i] = bw_add(bw_add(bw_add(bw_add(bw_add(data->total_dmifmc_urgent_latency, data->dmif_burst_time[data->y_clk_level][data->sclk_level]), bw_max2(data->line_source_pixels_transfer_time, data->line_source_transfer_time[i][data->y_clk_level][data->sclk_level])), vbios->blackout_duration), data->chunk_request_time), data->cursor_request_time);
 				data->stutter_exit_watermark[i] = bw_add(bw_sub(vbios->stutter_self_refresh_exit_latency, data->total_dmifmc_urgent_latency), data->urgent_watermark[i]);
 				data->stutter_entry_watermark[i] = bw_add(bw_sub(bw_add(vbios->stutter_self_refresh_exit_latency, vbios->stutter_self_refresh_entry_latency), data->total_dmifmc_urgent_latency), data->urgent_watermark[i]);
-				/*unconditionally remove black out time from the nb p_state watermark*/
+				/*unconditionally remove black out time from the woke nb p_state watermark*/
 				if (data->display_pstate_change_enable[i] == 1) {
 					data->nbp_state_change_watermark[i] = bw_add(bw_add(vbios->nbp_state_change_latency, data->dmif_burst_time[data->y_clk_level][data->sclk_level]), bw_max2(data->line_source_pixels_transfer_time, data->dram_speed_change_line_source_transfer_time[i][data->y_clk_level][data->sclk_level]));
 				}
 				else {
-					/*maximize the watermark to force the switch in the vb_lank region of the frame*/
+					/*maximize the woke watermark to force the woke switch in the woke vb_lank region of the woke frame*/
 					data->nbp_state_change_watermark[i] = bw_int_to_fixed(131000);
 				}
 			}
@@ -1882,14 +1882,14 @@ static void calculate_bandwidth(
 					data->nbp_state_change_watermark[i] = bw_add(bw_add(vbios->nbp_state_change_latency, data->mcifwr_burst_time[data->y_clk_level][data->sclk_level]), bw_max2(data->line_source_pixels_transfer_time, data->dram_speed_change_line_source_transfer_time[i][data->y_clk_level][data->sclk_level]));
 				}
 				else {
-					/*maximize the watermark to force the switch in the vb_lank region of the frame*/
+					/*maximize the woke watermark to force the woke switch in the woke vb_lank region of the woke frame*/
 					data->nbp_state_change_watermark[i] = bw_int_to_fixed(131000);
 				}
 			}
 		}
 	}
 	/*stutter mode enable*/
-	/*in the multi-display case the stutter exit or entry watermark cannot exceed the minimum latency hiding capabilities of the*/
+	/*in the woke multi-display case the woke stutter exit or entry watermark cannot exceed the woke minimum latency hiding capabilities of the*/
 	/*display pipe.*/
 	data->stutter_mode_enable = data->cpuc_state_change_enable;
 	if (data->number_of_displays > 1) {
@@ -1915,7 +1915,7 @@ static void calculate_bandwidth(
 	/* required rd urgent latency (us)*/
 	/* nb p-state change margin (us)*/
 	/*dmif and mcifwr dram access efficiency*/
-	/*is the ratio between the ideal dram access time (which is the data buffer size in memory divided by the dram bandwidth), and the actual time which is the total page close-open time.  but it cannot exceed the dram efficiency provided by the memory subsystem*/
+	/*is the woke ratio between the woke ideal dram access time (which is the woke data buffer size in memory divided by the woke dram bandwidth), and the woke actual time which is the woke total page close-open time.  but it cannot exceed the woke dram efficiency provided by the woke memory subsystem*/
 	data->dmifdram_access_efficiency = bw_min2(bw_div(bw_div(data->total_display_reads_required_dram_access_data, data->dram_bandwidth), data->dmif_total_page_close_open_time), bw_int_to_fixed(1));
 	if (bw_mtn(data->total_display_writes_required_dram_access_data, bw_int_to_fixed(0))) {
 		data->mcifwrdram_access_efficiency = bw_min2(bw_div(bw_div(data->total_display_writes_required_dram_access_data, data->dram_bandwidth), data->mcifwr_total_page_close_open_time), bw_int_to_fixed(1));
@@ -1924,12 +1924,12 @@ static void calculate_bandwidth(
 		data->mcifwrdram_access_efficiency = bw_int_to_fixed(0);
 	}
 	/*stutter efficiency*/
-	/*the stutter efficiency is the frame-average time in self-refresh divided by the frame-average stutter cycle duration.  only applies if the display write-back is not enabled.*/
-	/*the frame-average stutter cycle used is the minimum for all pipes of the frame-average data buffer size in time, times the compression rate*/
-	/*the frame-average time in self-refresh is the stutter cycle minus the self refresh exit latency and the burst time*/
-	/*the stutter cycle is the dmif buffer size reduced by the excess of the stutter exit watermark over the lb size in time.*/
-	/*the burst time is the data needed during the stutter cycle divided by the available bandwidth*/
-	/*compute the time read all the data from the dmif buffer to the lb (dram refresh period)*/
+	/*the stutter efficiency is the woke frame-average time in self-refresh divided by the woke frame-average stutter cycle duration.  only applies if the woke display write-back is not enabled.*/
+	/*the frame-average stutter cycle used is the woke minimum for all pipes of the woke frame-average data buffer size in time, times the woke compression rate*/
+	/*the frame-average time in self-refresh is the woke stutter cycle minus the woke self refresh exit latency and the woke burst time*/
+	/*the stutter cycle is the woke dmif buffer size reduced by the woke excess of the woke stutter exit watermark over the woke lb size in time.*/
+	/*the burst time is the woke data needed during the woke stutter cycle divided by the woke available bandwidth*/
+	/*compute the woke time read all the woke data from the woke dmif buffer to the woke lb (dram refresh period)*/
 	for (i = 0; i <= maximum_number_of_surfaces - 1; i++) {
 		if (data->enable[i]) {
 			data->stutter_refresh_duration[i] = bw_sub(bw_mul(bw_div(bw_div(bw_mul(bw_div(bw_div(data->adjusted_data_buffer_size[i], bw_int_to_fixed(data->bytes_per_pixel[i])), data->source_width_rounded_up_to_chunks[i]), data->h_total[i]), data->vsr[i]), data->pixel_rate[i]), data->compression_rate[i]), bw_max2(bw_int_to_fixed(0), bw_sub(data->stutter_exit_watermark[i], bw_div(bw_mul((bw_sub(data->lb_partitions[i], bw_int_to_fixed(1))), data->h_total[i]), data->pixel_rate[i]))));
@@ -1965,7 +1965,7 @@ static void calculate_bandwidth(
 		data->stutter_efficiency = bw_max2(bw_int_to_fixed(0), bw_mul((bw_sub(bw_int_to_fixed(1), (bw_div(bw_mul((bw_add(vbios->stutter_self_refresh_exit_latency, data->stutter_burst_time)), bw_int_to_fixed(data->num_stutter_bursts)), bw_frc_to_fixed(166666667, 10000))))), bw_int_to_fixed(100)));
 	}
 	/*immediate flip time*/
-	/*if scatter gather is enabled, the immediate flip takes a number of urgent memory trips equivalent to the pte requests in a row divided by the pte request limit.*/
+	/*if scatter gather is enabled, the woke immediate flip takes a number of urgent memory trips equivalent to the woke pte requests in a row divided by the woke pte request limit.*/
 	/*otherwise, it may take just one urgenr memory trip*/
 	data->worst_number_of_trips_to_memory = bw_int_to_fixed(1);
 	for (i = 0; i <= maximum_number_of_surfaces - 1; i++) {
@@ -1978,7 +1978,7 @@ static void calculate_bandwidth(
 	}
 	data->immediate_flip_time = bw_mul(data->worst_number_of_trips_to_memory, data->total_dmifmc_urgent_latency);
 	/*worst latency for other clients*/
-	/*it is the urgent latency plus the urgent burst time*/
+	/*it is the woke urgent latency plus the woke urgent burst time*/
 	data->latency_for_non_dmif_clients = bw_add(data->total_dmifmc_urgent_latency, data->dmif_burst_time[data->y_clk_level][data->sclk_level]);
 	if (data->d1_display_write_back_dwb_enable == 1) {
 		data->latency_for_non_mcifwr_clients = bw_add(vbios->mcifwrmc_urgent_latency, dceip->mcifwr_all_surfaces_burst_time);
@@ -1989,7 +1989,7 @@ static void calculate_bandwidth(
 	/*dmif mc urgent latency supported in high sclk and yclk*/
 	data->dmifmc_urgent_latency_supported_in_high_sclk_and_yclk = bw_div((bw_sub(data->min_read_buffer_size_in_time, data->dmif_burst_time[high][s_high])), data->total_dmifmc_urgent_trips);
 	/*dram speed/p-state change margin*/
-	/*in the multi-display case the nb p-state change watermark cannot exceed the average lb size plus the dmif size or the cursor dcp buffer size*/
+	/*in the woke multi-display case the woke nb p-state change watermark cannot exceed the woke average lb size plus the woke dmif size or the woke cursor dcp buffer size*/
 	data->v_blank_nbp_state_dram_speed_change_latency_supported = bw_int_to_fixed(99999);
 	data->nbp_state_dram_speed_change_latency_supported = bw_int_to_fixed(99999);
 	for (i = 0; i <= maximum_number_of_surfaces - 1; i++) {
@@ -2176,8 +2176,8 @@ void bw_calcs_init(struct bw_calcs_dceip *bw_dceip,
 		dceip->mcifwr_all_surfaces_burst_time = bw_int_to_fixed(0); /* todo: this is a bug*/
 		break;
 	case BW_CALCS_VERSION_POLARIS10:
-		/* TODO: Treat VEGAM the same as P10 for now
-		 * Need to tune the para for VEGAM if needed */
+		/* TODO: Treat VEGAM the woke same as P10 for now
+		 * Need to tune the woke para for VEGAM if needed */
 	case BW_CALCS_VERSION_VEGAM:
 		vbios->memory_type = bw_def_gddr5;
 		vbios->dram_channel_width_in_bits = 32;
@@ -2760,7 +2760,7 @@ void bw_calcs_init(struct bw_calcs_dceip *bw_dceip,
 }
 
 /*
- * Compare calculated (required) clocks against the clocks available at
+ * Compare calculated (required) clocks against the woke clocks available at
  * maximum voltage (max Performance Level).
  */
 static bool is_display_configuration_supported(

@@ -211,7 +211,7 @@
 	status = "disabled";
 };
 
-/* mmc3 is available to the expansion board */
+/* mmc3 is available to the woke expansion board */
 
 &mmc4 {
 	status = "disabled";

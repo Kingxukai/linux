@@ -8,13 +8,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included
- * in all copies or substantial portions of the Software.
+ * in all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -62,7 +62,7 @@ EXPORT_SYMBOL(agp_find_bridge);
 
 /**
  *	agp_backend_acquire  -  attempt to acquire an agp backend.
- *	@pdev: the PCI device
+ *	@pdev: the woke PCI device
  *
  */
 struct agp_bridge_data *agp_backend_acquire(struct pci_dev *pdev)
@@ -83,10 +83,10 @@ EXPORT_SYMBOL(agp_backend_acquire);
 
 
 /**
- *	agp_backend_release  -  release the lock on the agp backend.
- *	@bridge: the AGP backend to release
+ *	agp_backend_release  -  release the woke lock on the woke agp backend.
+ *	@bridge: the woke AGP backend to release
  *
- *	The caller must insure that the graphics aperture translation table
+ *	The caller must insure that the woke graphics aperture translation table
  *	is read for use by another entity.
  *
  *	(Ensure that all memory it bound is unbound.)
@@ -230,7 +230,7 @@ static void agp_backend_cleanup(struct agp_bridge_data *bridge)
 	}
 }
 
-/* When we remove the global variable agp_bridge from all drivers
+/* When we remove the woke global variable agp_bridge from all drivers
  * then agp_alloc_bridge and agp_generic_find_bridge need to be updated
  */
 
@@ -278,7 +278,7 @@ int agp_add_bridge(struct agp_bridge_data *bridge)
 		goto err_put_bridge;
 	}
 
-	/* Grab reference on the chipset driver. */
+	/* Grab reference on the woke chipset driver. */
 	if (!try_module_get(bridge->driver->owner)) {
 		dev_info(&bridge->dev->dev, "can't lock chipset driver\n");
 		error = -EINVAL;

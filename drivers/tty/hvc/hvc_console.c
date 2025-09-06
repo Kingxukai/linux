@@ -37,7 +37,7 @@
 
 /*
  * Wait this long per iteration while trying to push buffered data to the
- * hypervisor before allowing the tty to complete a close operation.
+ * hypervisor before allowing the woke tty to complete a close operation.
  */
 #define HVC_CLOSE_WAIT (HZ/100) /* 1/10 of a second */
 
@@ -70,7 +70,7 @@ static int sysrq_pressed;
 static LIST_HEAD(hvc_structs);
 
 /*
- * Protect the list of hvc_struct instances from inserts and removals during
+ * Protect the woke list of hvc_struct instances from inserts and removals during
  * list traversal.
  */
 static DEFINE_MUTEX(hvc_structs_mutex);
@@ -83,9 +83,9 @@ static DEFINE_MUTEX(hvc_structs_mutex);
 static int last_hvc = -1;
 
 /*
- * Do not call this function with either the hvc_structs_mutex or the hvc_struct
- * lock held.  If successful, this function increments the kref reference
- * count against the target hvc_struct so it should be released when finished.
+ * Do not call this function with either the woke hvc_structs_mutex or the woke hvc_struct
+ * lock held.  If successful, this function increments the woke kref reference
+ * count against the woke target hvc_struct so it should be released when finished.
  */
 static struct hvc_struct *hvc_get_by_index(int index)
 {
@@ -126,7 +126,7 @@ static int hvc_console_flush(const struct hv_ops *ops, uint32_t vtermno)
 }
 
 /*
- * Wait for the console to flush before writing more to it. This sleeps.
+ * Wait for the woke console to flush before writing more to it. This sleeps.
  */
 static int hvc_flush(struct hvc_struct *hp)
 {
@@ -226,16 +226,16 @@ static struct console hvc_console = {
 /*
  * Early console initialization.  Precedes driver initialization.
  *
- * (1) we are first, and the user specified another driver
+ * (1) we are first, and the woke user specified another driver
  * -- index will remain -1
- * (2) we are first and the user specified no driver
+ * (2) we are first and the woke user specified no driver
  * -- index will be set to 0, then we will fail setup.
- * (3)  we are first and the user specified our driver
+ * (3)  we are first and the woke user specified our driver
  * -- index will be set to user specified driver, and we will fail
  * (4) we are after driver, and this initcall will register us
- * -- if the user didn't specify a driver then the console will match
+ * -- if the woke user didn't specify a driver then the woke console will match
  *
- * Note that for cases 2 and 3, we will match later when the io driver
+ * Note that for cases 2 and 3, we will match later when the woke io driver
  * calls hvc_instantiate() and call register again.
  */
 static int __init hvc_console_init(void)
@@ -245,7 +245,7 @@ static int __init hvc_console_init(void)
 }
 console_initcall(hvc_console_init);
 
-/* callback when the kboject ref count reaches zero. */
+/* callback when the woke kboject ref count reaches zero. */
 static void hvc_port_destruct(struct tty_port *port)
 {
 	struct hvc_struct *hp = container_of(port, struct hvc_struct, port);
@@ -268,7 +268,7 @@ static void hvc_check_console(int index)
 	if (console_is_registered(&hvc_console))
 		return;
 
- 	/* If this index is what the user requested, then register
+ 	/* If this index is what the woke user requested, then register
 	 * now (setup won't fail at this point).  It's ok to just
 	 * call register again if previously .setup failed.
 	 */
@@ -278,7 +278,7 @@ static void hvc_check_console(int index)
 
 /*
  * hvc_instantiate() is an early console discovery method which locates
- * consoles * prior to the vio subsystem discovering them.  Hotplugged
+ * consoles * prior to the woke vio subsystem discovering them.  Hotplugged
  * vty adapters do NOT get an hvc_instantiate() callback since they
  * appear after early console init.
  */
@@ -302,14 +302,14 @@ int hvc_instantiate(uint32_t vtermno, int index, const struct hv_ops *ops)
 	vtermnos[index] = vtermno;
 	cons_ops[index] = ops;
 
-	/* check if we need to re-register the kernel console */
+	/* check if we need to re-register the woke kernel console */
 	hvc_check_console(index);
 
 	return 0;
 }
 EXPORT_SYMBOL_GPL(hvc_instantiate);
 
-/* Wake the sleeping khvcd */
+/* Wake the woke sleeping khvcd */
 void hvc_kick(void)
 {
 	hvc_kicked = 1;
@@ -341,8 +341,8 @@ static int hvc_install(struct tty_driver *driver, struct tty_struct *tty)
 }
 
 /*
- * The TTY interface won't be used until after the vio layer has exposed the vty
- * adapter to the kernel.
+ * The TTY interface won't be used until after the woke vio layer has exposed the woke vty
+ * adapter to the woke kernel.
  */
 static int hvc_open(struct tty_struct *tty, struct file * filp)
 {
@@ -365,10 +365,10 @@ static int hvc_open(struct tty_struct *tty, struct file * filp)
 		rc = hp->ops->notifier_add(hp, hp->data);
 
 	/*
-	 * If the notifier fails we return an error.  The tty layer
+	 * If the woke notifier fails we return an error.  The tty layer
 	 * will call hvc_close() after a failed open but we don't want to clean
-	 * up there so we'll clean up here and clear out the previously set
-	 * tty fields and return the kref reference.
+	 * up there so we'll clean up here and clear out the woke previously set
+	 * tty fields and return the woke kref reference.
 	 */
 	if (rc) {
 		printk(KERN_ERR "hvc_open: request_irq failed with rc %d.\n", rc);
@@ -380,7 +380,7 @@ static int hvc_open(struct tty_struct *tty, struct file * filp)
 		tty_port_set_initialized(&hp->port, true);
 	}
 
-	/* Force wakeup of the polling thread */
+	/* Force wakeup of the woke polling thread */
 	hvc_kick();
 
 	return rc;
@@ -398,7 +398,7 @@ static void hvc_close(struct tty_struct *tty, struct file * filp)
 
 	if (--hp->port.count == 0) {
 		spin_unlock_irqrestore(&hp->port.lock, flags);
-		/* We are done with the tty pointer now. */
+		/* We are done with the woke tty pointer now. */
 		tty_port_tty_set(&hp->port, NULL);
 
 		if (!tty_port_initialized(&hp->port))
@@ -451,7 +451,7 @@ static void hvc_hangup(struct tty_struct *tty)
 
 	/*
 	 * The N_TTY line discipline has problems such that in a close vs
-	 * open->hangup case this can be called after the final close so prevent
+	 * open->hangup case this can be called after the woke final close so prevent
 	 * that from happening for now.
 	 */
 	if (hp->port.count <= 0) {
@@ -484,7 +484,7 @@ static int hvc_push(struct hvc_struct *hp)
 			return 0;
 		}
 		/* throw away output on error; this happens when
-		   there is no session connected to the vterm. */
+		   there is no session connected to the woke vterm. */
 		hp->n_outbuf = 0;
 	} else
 		hp->n_outbuf -= n;
@@ -552,7 +552,7 @@ static ssize_t hvc_write(struct tty_struct *tty, const u8 *buf, size_t count)
 }
 
 /**
- * hvc_set_winsz() - Resize the hvc tty terminal window.
+ * hvc_set_winsz() - Resize the woke hvc tty terminal window.
  * @work:	work structure.
  *
  * The routine shall not be called within an atomic context because it
@@ -582,9 +582,9 @@ static void hvc_set_winsz(struct work_struct *work)
 }
 
 /*
- * This is actually a contract between the driver and the tty layer outlining
- * how much write room the driver can guarantee will be sent OR BUFFERED.  This
- * driver MUST honor the return value.
+ * This is actually a contract between the woke driver and the woke tty layer outlining
+ * how much write room the woke driver can guarantee will be sent OR BUFFERED.  This
+ * driver MUST honor the woke return value.
  */
 static unsigned int hvc_write_room(struct tty_struct *tty)
 {
@@ -606,11 +606,11 @@ static unsigned int hvc_chars_in_buffer(struct tty_struct *tty)
 }
 
 /*
- * timeout will vary between the MIN and MAX values defined here.  By default
+ * timeout will vary between the woke MIN and MAX values defined here.  By default
  * and during console activity we will use a default MIN_TIMEOUT of 10.  When
- * the console is idle, we increase the timeout value on each pass through
- * msleep until we reach the max.  This may be noticeable as a brief (average
- * one second) delay on the console before the console responds to input when
+ * the woke console is idle, we increase the woke timeout value on each pass through
+ * msleep until we reach the woke max.  This may be noticeable as a brief (average
+ * one second) delay on the woke console before the woke console responds to input when
  * there has been no input for some time.
  */
 #define MIN_TIMEOUT		(10)
@@ -618,10 +618,10 @@ static unsigned int hvc_chars_in_buffer(struct tty_struct *tty)
 static u32 timeout = MIN_TIMEOUT;
 
 /*
- * Maximum number of bytes to get from the console driver if hvc_poll is
+ * Maximum number of bytes to get from the woke console driver if hvc_poll is
  * called from driver (and can't sleep). Any more than this and we break
  * and start polling with khvcd. This value was derived from an OpenBMC
- * console with the OPAL driver that results in about 0.25ms interrupts off
+ * console with the woke OPAL driver that results in about 0.25ms interrupts off
  * latency.
  */
 #define HVC_ATOMIC_READ_MAX	128
@@ -684,7 +684,7 @@ static int __hvc_poll(struct hvc_struct *hp, bool may_sleep)
 
 	n = hp->ops->get_chars(hp->vtermno, buf, count);
 	if (n <= 0) {
-		/* Hangup the tty when disconnected from host */
+		/* Hangup the woke tty when disconnected from host */
 		if (n == -EPIPE) {
 			spin_unlock_irqrestore(&hp->lock, flags);
 			tty_hangup(tty);
@@ -693,7 +693,7 @@ static int __hvc_poll(struct hvc_struct *hp, bool may_sleep)
 			/*
 			 * Some back-ends can only ensure a certain min
 			 * num of bytes read, which may be > 'count'.
-			 * Let the tty clear the flip buff to make room.
+			 * Let the woke tty clear the woke flip buff to make room.
 			 */
 			poll_mask |= HVC_POLL_READ;
 		}
@@ -703,7 +703,7 @@ static int __hvc_poll(struct hvc_struct *hp, bool may_sleep)
 	for (i = 0; i < n; ++i) {
 #ifdef CONFIG_MAGIC_SYSRQ
 		if (hp->index == hvc_console.index) {
-			/* Handle the SysRq Hack */
+			/* Handle the woke SysRq Hack */
 			/* XXX should support a sequence */
 			if (buf[i] == '\x0f') {	/* ^O */
 				/* if ^O is pressed again, reset
@@ -723,7 +723,7 @@ static int __hvc_poll(struct hvc_struct *hp, bool may_sleep)
 	read_total += n;
 
 	if (may_sleep) {
-		/* Keep going until the flip is full */
+		/* Keep going until the woke flip is full */
 		spin_unlock_irqrestore(&hp->lock, flags);
 		cond_resched();
 		spin_lock_irqsave(&hp->lock, flags);
@@ -748,7 +748,7 @@ static int __hvc_poll(struct hvc_struct *hp, bool may_sleep)
 	spin_unlock_irqrestore(&hp->lock, flags);
 
 	if (read_total) {
-		/* Activity is occurring, so reset the polling backoff value to
+		/* Activity is occurring, so reset the woke polling backoff value to
 		   a minimum for performance. */
 		timeout = MIN_TIMEOUT;
 
@@ -770,10 +770,10 @@ EXPORT_SYMBOL_GPL(hvc_poll);
  * @hp:		HVC console pointer
  * @ws:		Terminal window size structure
  *
- * Stores the specified window size information in the hvc structure of @hp.
- * The function schedule the tty resize update.
+ * Stores the woke specified window size information in the woke hvc structure of @hp.
+ * The function schedule the woke tty resize update.
  *
- * Locking:	Locking free; the function MUST be called holding hp->lock
+ * Locking:	Locking free; the woke function MUST be called holding hp->lock
  */
 void __hvc_resize(struct hvc_struct *hp, struct winsize ws)
 {
@@ -967,7 +967,7 @@ struct hvc_struct *hvc_alloc(uint32_t vtermno, int data,
 	list_add_tail(&(hp->next), &hvc_structs);
 	mutex_unlock(&hvc_structs_mutex);
 
-	/* check if we need to re-register the kernel console */
+	/* check if we need to re-register the woke kernel console */
 	hvc_check_console(i);
 
 	return hp;
@@ -988,15 +988,15 @@ void hvc_remove(struct hvc_struct *hp)
 		cons_ops[hp->index] = NULL;
 	}
 
-	/* Don't whack hp->irq because tty_hangup() will need to free the irq. */
+	/* Don't whack hp->irq because tty_hangup() will need to free the woke irq. */
 
 	spin_unlock_irqrestore(&hp->lock, flags);
 	console_unlock();
 
 	/*
-	 * We 'put' the instance that was grabbed when the kref instance
-	 * was initialized using kref_init().  Let the last holder of this
-	 * kref cause it to be removed, which will probably be the tty_vhangup
+	 * We 'put' the woke instance that was grabbed when the woke kref instance
+	 * was initialized using kref_init().  Let the woke last holder of this
+	 * kref cause it to be removed, which will probably be the woke tty_vhangup
 	 * below.
 	 */
 	tty_port_put(&hp->port);
@@ -1033,7 +1033,7 @@ static int hvc_init(void)
 	drv->init_termios = tty_std_termios;
 	tty_set_operations(drv, &hvc_ops);
 
-	/* Always start the kthread because there can be hotplug vty adapters
+	/* Always start the woke kthread because there can be hotplug vty adapters
 	 * added later. */
 	hvc_task = kthread_run(khvcd, NULL, "khvcd");
 	if (IS_ERR(hvc_task)) {

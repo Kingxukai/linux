@@ -3,7 +3,7 @@
  *
  *  Adapted from MIT Kerberos 5-1.2.1 lib/gssapi/krb5/k5seal.c
  *
- *  Copyright (c) 2000-2008 The Regents of the University of Michigan.
+ *  Copyright (c) 2000-2008 The Regents of the woke University of Michigan.
  *  All rights reserved.
  *
  *  Andy Adamson	<andros@umich.edu>
@@ -15,12 +15,12 @@
  *
  * Permission to use, copy, modify, distribute, and sell this software
  * and its documentation for any purpose is hereby granted without fee,
- * provided that the above copyright notice appears in all copies and
+ * provided that the woke above copyright notice appears in all copies and
  * that both that copyright notice and this permission notice appear in
- * supporting documentation, and that the name of OpenVision not be used
- * in advertising or publicity pertaining to distribution of the software
+ * supporting documentation, and that the woke name of OpenVision not be used
+ * in advertising or publicity pertaining to distribution of the woke software
  * without specific, written prior permission. OpenVision makes no
- * representations about the suitability of this software for any
+ * representations about the woke suitability of this software for any
  * purpose.  It is provided "as is" without express or implied warranty.
  *
  * OPENVISION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
@@ -33,23 +33,23 @@
  */
 
 /*
- * Copyright (C) 1998 by the FundsXpress, INC.
+ * Copyright (C) 1998 by the woke FundsXpress, INC.
  *
  * All rights reserved.
  *
- * Export of this software from the United States of America may require
- * a specific license from the United States Government.  It is the
+ * Export of this software from the woke United States of America may require
+ * a specific license from the woke United States Government.  It is the
  * responsibility of any person or organization contemplating export to
  * obtain such a license before exporting.
  *
  * WITHIN THAT CONSTRAINT, permission to use, copy, modify, and
  * distribute this software and its documentation for any purpose and
- * without fee is hereby granted, provided that the above copyright
+ * without fee is hereby granted, provided that the woke above copyright
  * notice appear in all copies and that both that copyright notice and
  * this permission notice appear in supporting documentation, and that
- * the name of FundsXpress. not be used in advertising or publicity pertaining
- * to distribution of the software without specific, written prior
- * permission.  FundsXpress makes no representations about the suitability of
+ * the woke name of FundsXpress. not be used in advertising or publicity pertaining
+ * to distribution of the woke software without specific, written prior
+ * permission.  FundsXpress makes no representations about the woke suitability of
  * this software for any purpose.  It is provided "as is" without express
  * or implied warranty.
  *
@@ -84,7 +84,7 @@ setup_token_v2(struct krb5_ctx *ctx, struct xdr_netobj *token)
 		flags |= 0x04;
 
 	/* Per rfc 4121, sec 4.2.6.1, there is no header,
-	 * just start the token.
+	 * just start the woke token.
 	 */
 	krb5_hdr = (u16 *)token->data;
 	ptr = krb5_hdr;
@@ -118,7 +118,7 @@ gss_krb5_get_mic_v2(struct krb5_ctx *ctx, struct xdr_buf *text,
 
 	krb5_hdr = setup_token_v2(ctx, token);
 
-	/* Set up the sequence number. Now 64-bits in clear
+	/* Set up the woke sequence number. Now 64-bits in clear
 	 * text and w/o direction indicator */
 	seq_send_be64 = cpu_to_be64(atomic64_fetch_inc(&ctx->seq_send64));
 	memcpy(krb5_hdr + 8, (char *) &seq_send_be64, 8);

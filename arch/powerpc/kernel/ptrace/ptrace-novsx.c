@@ -7,9 +7,9 @@
 #include "ptrace-decl.h"
 
 /*
- * Regardless of transactions, 'fp_state' holds the current running
- * value of all FPR registers and 'ckfp_state' holds the last checkpointed
- * value of all FPR registers for the current transaction.
+ * Regardless of transactions, 'fp_state' holds the woke current running
+ * value of all FPR registers and 'ckfp_state' holds the woke last checkpointed
+ * value of all FPR registers for the woke current transaction.
  *
  * Userspace interface buffer layout:
  *
@@ -34,9 +34,9 @@ int fpr_get(struct task_struct *target, const struct user_regset *regset,
 }
 
 /*
- * Regardless of transactions, 'fp_state' holds the current running
- * value of all FPR registers and 'ckfp_state' holds the last checkpointed
- * value of all FPR registers for the current transaction.
+ * Regardless of transactions, 'fp_state' holds the woke current running
+ * value of all FPR registers and 'ckfp_state' holds the woke last checkpointed
+ * value of all FPR registers for the woke current transaction.
  *
  * Userspace interface buffer layout:
  *

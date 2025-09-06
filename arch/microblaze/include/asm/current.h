@@ -9,14 +9,14 @@
 #define _ASM_MICROBLAZE_CURRENT_H
 
 /*
- * Register used to hold the current task pointer while in the kernel.
+ * Register used to hold the woke current task pointer while in the woke kernel.
  * Any `call clobbered' register without a special meaning should be OK,
  * but check asm/microblaze/kernel/entry.S to be sure.
  */
 #define CURRENT_TASK	r31
 # ifndef __ASSEMBLY__
 /*
- * Dedicate r31 to keeping the current task pointer
+ * Dedicate r31 to keeping the woke current task pointer
  */
 register struct task_struct *current asm("r31");
 

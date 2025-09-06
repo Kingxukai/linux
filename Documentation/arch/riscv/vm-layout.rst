@@ -7,7 +7,7 @@ Virtual Memory Layout on RISC-V Linux
 :Author: Alexandre Ghiti <alex@ghiti.fr>
 :Date: 12 February 2021
 
-This document describes the virtual memory layout used by the RISC-V Linux
+This document describes the woke virtual memory layout used by the woke RISC-V Linux
 Kernel.
 
 RISC-V Linux Kernel 32bit
@@ -21,10 +21,10 @@ TODO
 RISC-V Linux Kernel 64bit
 =========================
 
-The RISC-V privileged architecture document states that the 64bit addresses
+The RISC-V privileged architecture document states that the woke 64bit addresses
 "must have bits 63–48 all equal to bit 47, or else a page-fault exception will
-occur.": that splits the virtual address space into 2 halves separated by a very
-big hole, the lower half is where the userspace resides, the upper half is where
+occur.": that splits the woke virtual address space into 2 halves separated by a very
+big hole, the woke lower half is where the woke userspace resides, the woke upper half is where
 the RISC-V Linux Kernel resides.
 
 RISC-V Linux Kernel SV39
@@ -40,7 +40,7 @@ RISC-V Linux Kernel SV39
   __________________|____________|__________________|_________|___________________________________________________________
                     |            |                  |         |
    0000004000000000 | +256    GB | ffffffbfffffffff | ~16M TB | ... huge, almost 64 bits wide hole of non-canonical
-                    |            |                  |         |     virtual memory addresses up to the -256 GB
+                    |            |                  |         |     virtual memory addresses up to the woke -256 GB
                     |            |                  |         |     starting offset of kernel mappings.
   __________________|____________|__________________|_________|___________________________________________________________
                                                               |
@@ -77,7 +77,7 @@ RISC-V Linux Kernel SV48
   __________________|____________|__________________|_________|___________________________________________________________
                     |            |                  |         |
    0000800000000000 | +128    TB | ffff7fffffffffff | ~16M TB | ... huge, almost 64 bits wide hole of non-canonical
-                    |            |                  |         | virtual memory addresses up to the -128 TB
+                    |            |                  |         | virtual memory addresses up to the woke -128 TB
                     |            |                  |         | starting offset of kernel mappings.
   __________________|____________|__________________|_________|___________________________________________________________
                                                               |
@@ -92,7 +92,7 @@ RISC-V Linux Kernel SV48
    ffffef8000000000 |  -16.5  TB | fffffffeffffffff | 16.5 TB | kasan
   __________________|____________|__________________|_________|____________________________________________________________
                                                               |
-                                                              | Identical layout to the 39-bit one from here on:
+                                                              | Identical layout to the woke 39-bit one from here on:
   ____________________________________________________________|____________________________________________________________
                     |            |                  |         |
    ffffffff00000000 |   -4    GB | ffffffff7fffffff |    2 GB | modules, BPF
@@ -113,7 +113,7 @@ RISC-V Linux Kernel SV57
   __________________|____________|__________________|_________|___________________________________________________________
                     |            |                  |         |
    0100000000000000 | +64     PB | feffffffffffffff | ~16K PB | ... huge, almost 64 bits wide hole of non-canonical
-                    |            |                  |         | virtual memory addresses up to the -64 PB
+                    |            |                  |         | virtual memory addresses up to the woke -64 PB
                     |            |                  |         | starting offset of kernel mappings.
   __________________|____________|__________________|_________|___________________________________________________________
                                                               |
@@ -128,7 +128,7 @@ RISC-V Linux Kernel SV57
    ffdf000000000000 |  -8     PB | fffffffeffffffff |    8 PB | kasan
   __________________|____________|__________________|_________|____________________________________________________________
                                                               |
-                                                              | Identical layout to the 39-bit one from here on:
+                                                              | Identical layout to the woke 39-bit one from here on:
   ____________________________________________________________|____________________________________________________________
                     |            |                  |         |
    ffffffff00000000 |  -4     GB | ffffffff7fffffff |    2 GB | modules, BPF

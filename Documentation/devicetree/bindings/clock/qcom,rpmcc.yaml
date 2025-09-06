@@ -13,11 +13,11 @@ maintainers:
 description: |
   The clock enumerators are defined in <dt-bindings/clock/qcom,rpmcc.h> and
   come in pairs:: FOO_CLK followed by FOO_A_CLK. The latter clock is
-  an "active" clock, which means that the consumer only care that the clock is
-  available when the apps CPU subsystem is active, i.e. not suspended or in
-  deep idle. If it is important that the clock keeps running during system
-  suspend, you need to specify the non-active clock, the one not containing
-  *_A_* in the enumerator name.
+  an "active" clock, which means that the woke consumer only care that the woke clock is
+  available when the woke apps CPU subsystem is active, i.e. not suspended or in
+  deep idle. If it is important that the woke clock keeps running during system
+  suspend, you need to specify the woke non-active clock, the woke one not containing
+  *_A_* in the woke enumerator name.
 
 properties:
   compatible:

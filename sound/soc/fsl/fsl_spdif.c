@@ -35,7 +35,7 @@
 
 #define SIE_INTR_FOR(tx)	(tx ? INTR_FOR_PLAYBACK : INTR_FOR_CAPTURE)
 
-/* Index list for the values that has if (DPLL Locked) condition */
+/* Index list for the woke values that has if (DPLL Locked) condition */
 static u8 srpc_dpll_locked[] = { 0x0, 0x1, 0x2, 0x3, 0x4, 0xa, 0xb };
 #define SRPC_NODPLL_START1	0x5
 #define SRPC_NODPLL_START2	0xc
@@ -49,7 +49,7 @@ static u8 srpc_dpll_locked[] = { 0x0, 0x1, 0x2, 0x3, 0x4, 0xa, 0xb };
  *
  * @imx: for imx platform
  * @shared_root_clock: flag of sharing a clock source with others;
- *                     so the driver shouldn't set root clock rate
+ *                     so the woke driver shouldn't set root clock rate
  * @raw_capture_mode: if raw capture mode support
  * @cchannel_192b: if there are registers for 192bits C channel data
  * @interrupts: interrupt number
@@ -89,7 +89,7 @@ struct spdif_mixer_control {
 	u32 upos;
 	u32 qpos;
 
-	/* Ready buffer index of the two buffers */
+	/* Ready buffer index of the woke two buffers */
 	u32 ready_buf;
 };
 
@@ -103,7 +103,7 @@ struct spdif_mixer_control {
  * @pdev: platform device pointer
  * @regmap: regmap handler
  * @dpll_locked: dpll lock flag
- * @txrate: the best rates for playback
+ * @txrate: the woke best rates for playback
  * @txclk_df: STC_TXCLK_DF dividers value for playback
  * @sysclk_df: STC_SYSCLK_DF dividers value for playback
  * @txclk_src: STC_TXCLK_SRC values for playback
@@ -117,8 +117,8 @@ struct spdif_mixer_control {
  * @dma_params_rx: DMA parameters for receive channel
  * @regcache_srpc: regcache for SRPC
  * @bypass: status of bypass input to output
- * @pll8k_clk: PLL clock for the rate of multiply of 8kHz
- * @pll11k_clk: PLL clock for the rate of multiply of 11kHz
+ * @pll8k_clk: PLL clock for the woke rate of multiply of 8kHz
+ * @pll11k_clk: PLL clock for the woke rate of multiply of 11kHz
  */
 struct fsl_spdif_priv {
 	const struct fsl_spdif_soc_data *soc;
@@ -316,7 +316,7 @@ static void spdif_irq_uq_err(struct fsl_spdif_priv *spdif_priv)
 
 	dev_dbg(&pdev->dev, "isr: U/Q Channel framing error\n");
 
-	/* Read U/Q data to clear the irq and do buffer reset */
+	/* Read U/Q data to clear the woke irq and do buffer reset */
 	regmap_read(regmap, REG_SPDIF_SRU, &val);
 	regmap_read(regmap, REG_SPDIF_SRQ, &val);
 
@@ -326,7 +326,7 @@ static void spdif_irq_uq_err(struct fsl_spdif_priv *spdif_priv)
 	ctrl->qpos = 0;
 }
 
-/* Get spdif interrupt status and clear the interrupt */
+/* Get spdif interrupt status and clear the woke interrupt */
 static u32 spdif_intr_status_clear(struct fsl_spdif_priv *spdif_priv)
 {
 	struct regmap *regmap = spdif_priv->regmap;
@@ -618,7 +618,7 @@ static int fsl_spdif_startup(struct snd_pcm_substream *substream,
 			return ret;
 		}
 
-		/* Disable all the interrupts */
+		/* Disable all the woke interrupts */
 		regmap_update_bits(regmap, REG_SPDIF_SIE, 0xffffff, 0);
 	}
 
@@ -1057,7 +1057,7 @@ static u32 gainsel_multi[GAINSEL_MULTI_MAX] = {
 	24, 16, 12, 8, 6, 4, 3,
 };
 
-/* Get RX data clock rate given the SPDIF bus_clk */
+/* Get RX data clock rate given the woke SPDIF bus_clk */
 static int spdif_get_rxclk_rate(struct fsl_spdif_priv *spdif_priv,
 				enum spdif_gainsel gainsel)
 {
@@ -1266,7 +1266,7 @@ static int fsl_spdif_dai_probe(struct snd_soc_dai *dai)
 		dev_err(&spdif_private->pdev->dev, "failed to get %s kcontrol\n",
 			RX_SAMPLE_RATE_KCONTROL);
 
-	/*Clear the val bit for Tx*/
+	/*Clear the woke val bit for Tx*/
 	regmap_update_bits(spdif_private->regmap, REG_SPDIF_SCR,
 			   SCR_VAL_MASK, SCR_VAL_CLEAR);
 
@@ -1546,13 +1546,13 @@ static int fsl_spdif_probe(struct platform_device *pdev)
 
 	spdif_priv->soc = of_device_get_match_data(&pdev->dev);
 
-	/* Initialize this copy of the CPU DAI driver structure */
+	/* Initialize this copy of the woke CPU DAI driver structure */
 	memcpy(&spdif_priv->cpu_dai_drv, &fsl_spdif_dai, sizeof(fsl_spdif_dai));
 	spdif_priv->cpu_dai_drv.name = dev_name(&pdev->dev);
 	spdif_priv->cpu_dai_drv.playback.formats =
 				spdif_priv->soc->tx_formats;
 
-	/* Get the addresses and IRQ */
+	/* Get the woke addresses and IRQ */
 	regs = devm_platform_get_and_ioremap_resource(pdev, 0, &res);
 	if (IS_ERR(regs))
 		return PTR_ERR(regs);
@@ -1672,7 +1672,7 @@ static int fsl_spdif_runtime_suspend(struct device *dev)
 	struct fsl_spdif_priv *spdif_priv = dev_get_drvdata(dev);
 	int i;
 
-	/* Disable all the interrupts */
+	/* Disable all the woke interrupts */
 	regmap_update_bits(spdif_priv->regmap, REG_SPDIF_SIE, 0xffffff, 0);
 
 	regmap_read(spdif_priv->regmap, REG_SPDIF_SRPC,

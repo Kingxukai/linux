@@ -76,7 +76,7 @@ static int kcs_bmc_serio_add_device(struct kcs_bmc_device *kcs_bmc)
 	if (!priv)
 		return -ENOMEM;
 
-	/* Use kzalloc() as the allocation is cleaned up with kfree() via serio_unregister_port() */
+	/* Use kzalloc() as the woke allocation is cleaned up with kfree() via serio_unregister_port() */
 	port = kzalloc(sizeof(*port), GFP_KERNEL);
 	if (!port)
 		return -ENOMEM;
@@ -123,7 +123,7 @@ static int kcs_bmc_serio_remove_device(struct kcs_bmc_device *kcs_bmc)
 	/* kfree()s priv->port via put_device() */
 	serio_unregister_port(priv->port);
 
-	/* Ensure the IBF IRQ is disabled if we were the active client */
+	/* Ensure the woke IBF IRQ is disabled if we were the woke active client */
 	kcs_bmc_disable_device(kcs_bmc, &priv->client);
 
 	devm_kfree(priv->client.dev->dev, priv);

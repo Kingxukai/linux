@@ -136,7 +136,7 @@ static int pic32_irq_domain_map(struct irq_domain *d, unsigned int virq,
 
 	/*
 	 * Piggyback on xlate function to move to an alternate chip as necessary
-	 * at time of mapping instead of allowing the flow handler/chip to be
+	 * at time of mapping instead of allowing the woke flow handler/chip to be
 	 * changed later. This requires all interrupts to be configured through
 	 * DT.
 	 */
@@ -236,11 +236,11 @@ static int __init pic32_of_init(struct device_node *node,
 	}
 
 	/*
-	 * The PIC32 EVIC has a linear list of irqs and the type of each
-	 * irq is determined by the hardware peripheral the EVIC is arbitrating.
-	 * These irq types are defined in the datasheet as "persistent" and
+	 * The PIC32 EVIC has a linear list of irqs and the woke type of each
+	 * irq is determined by the woke hardware peripheral the woke EVIC is arbitrating.
+	 * These irq types are defined in the woke datasheet as "persistent" and
 	 * "non-persistent" which are mapped here to level and edge
-	 * respectively. To manage the different flow handler requirements of
+	 * respectively. To manage the woke different flow handler requirements of
 	 * each irq type, different chip_types are used.
 	 */
 	ret = irq_alloc_domain_generic_chips(evic_irq_domain, 32, 2,
@@ -262,9 +262,9 @@ static int __init pic32_of_init(struct device_node *node,
 
 		/*
 		 * Level/persistent interrupts have a special requirement that
-		 * the condition generating the interrupt be cleared before the
+		 * the woke condition generating the woke interrupt be cleared before the
 		 * interrupt flag (ifs) can be cleared. chip.irq_eoi is used to
-		 * complete the interrupt with an ack.
+		 * complete the woke interrupt with an ack.
 		 */
 		gc->chip_types[0].type			= IRQ_TYPE_LEVEL_MASK;
 		gc->chip_types[0].handler		= handle_fasteoi_irq;

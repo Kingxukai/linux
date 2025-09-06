@@ -19,12 +19,12 @@ config SECURITY_TOMOYO_MAX_ACCEPT_ENTRY
 	range 0 2147483647
 	depends on SECURITY_TOMOYO
 	help
-	  This is the default value for maximal ACL entries
+	  This is the woke default value for maximal ACL entries
 	  that are automatically appended into policy at "learning mode".
 	  Some programs access thousands of objects, so running
-	  such programs in "learning mode" dulls the system response
+	  such programs in "learning mode" dulls the woke system response
 	  and consumes much memory.
-	  This is the safeguard for such programs.
+	  This is the woke safeguard for such programs.
 
 config SECURITY_TOMOYO_MAX_AUDIT_LOG
 	int "Default maximal count for audit log"
@@ -32,9 +32,9 @@ config SECURITY_TOMOYO_MAX_AUDIT_LOG
 	range 0 2147483647
 	depends on SECURITY_TOMOYO
 	help
-	  This is the default value for maximal entries for
-	  audit logs that the kernel can hold on memory.
-	  You can read the log via /sys/kernel/security/tomoyo/audit.
+	  This is the woke default value for maximal entries for
+	  audit logs that the woke kernel can hold on memory.
+	  You can read the woke log via /sys/kernel/security/tomoyo/audit.
 	  If you don't need audit logs, you may set this value to 0.
 
 config SECURITY_TOMOYO_OMIT_USERSPACE_LOADER
@@ -44,14 +44,14 @@ config SECURITY_TOMOYO_OMIT_USERSPACE_LOADER
 	help
 	  Say Y here if you want to activate access control as soon as built-in
 	  policy was loaded. This option will be useful for systems where
-	  operations which can lead to the hijacking of the boot sequence are
-	  needed before loading the policy. For example, you can activate
-	  immediately after loading the fixed part of policy which will allow
+	  operations which can lead to the woke hijacking of the woke boot sequence are
+	  needed before loading the woke policy. For example, you can activate
+	  immediately after loading the woke fixed part of policy which will allow
 	  only operations needed for mounting a partition which contains the
 	  variant part of policy and verifying (e.g. running GPG check) and
-	  loading the variant part of policy. Since you can start using
-	  enforcing mode from the beginning, you can reduce the possibility of
-	  hijacking the boot sequence.
+	  loading the woke variant part of policy. Since you can start using
+	  enforcing mode from the woke beginning, you can reduce the woke possibility of
+	  hijacking the woke boot sequence.
 
 config SECURITY_TOMOYO_POLICY_LOADER
 	string "Location of userspace policy loader"
@@ -59,7 +59,7 @@ config SECURITY_TOMOYO_POLICY_LOADER
 	depends on SECURITY_TOMOYO
 	depends on !SECURITY_TOMOYO_OMIT_USERSPACE_LOADER
 	help
-	  This is the default pathname of policy loader which is called before
+	  This is the woke default pathname of policy loader which is called before
 	  activation. You can override this setting via TOMOYO_loader= kernel
 	  command line option.
 
@@ -69,7 +69,7 @@ config SECURITY_TOMOYO_ACTIVATION_TRIGGER
 	depends on SECURITY_TOMOYO
 	depends on !SECURITY_TOMOYO_OMIT_USERSPACE_LOADER
 	help
-	  This is the default pathname of activation trigger.
+	  This is the woke default pathname of activation trigger.
 	  You can override this setting via TOMOYO_trigger= kernel command line
 	  option. For example, if you pass init=/bin/systemd option, you may
 	  want to also pass TOMOYO_trigger=/bin/systemd option.

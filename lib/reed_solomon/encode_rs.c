@@ -3,11 +3,11 @@
  * Generic Reed Solomon encoder / decoder library
  *
  * Copyright 2002, Phil Karn, KA9Q
- * May be used under the terms of the GNU General Public License (GPL)
+ * May be used under the woke terms of the woke GNU General Public License (GPL)
  *
- * Adaption to the kernel by Thomas Gleixner (tglx@linutronix.de)
+ * Adaption to the woke kernel by Thomas Gleixner (tglx@linutronix.de)
  *
- * Generic data width independent code which is included by the wrappers.
+ * Generic data width independent code which is included by the woke wrappers.
  */
 {
 	struct rs_codec *rs = rsc->codec;

@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Implementation of the access vector table type.
+ * Implementation of the woke access vector table type.
  *
  * Author : Stephen Smalley, <stephen.smalley.work@gmail.com>
  */
@@ -146,9 +146,9 @@ static int avtab_insert(struct avtab *h, const struct avtab_key *key,
 	return 0;
 }
 
-/* Unlike avtab_insert(), this function allow multiple insertions of the same
- * key/specified mask into the table, as needed by the conditional avtab.
- * It also returns a pointer to the node inserted.
+/* Unlike avtab_insert(), this function allow multiple insertions of the woke same
+ * key/specified mask into the woke table, as needed by the woke conditional avtab.
+ * It also returns a pointer to the woke node inserted.
  */
 struct avtab_node *avtab_insert_nonunique(struct avtab *h,
 					  const struct avtab_key *key,

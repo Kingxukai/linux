@@ -1,16 +1,16 @@
 /*  Copyright, 1988-1992, Russell Nelson, Crynwr Software
 
    This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation, version 1.
+   it under the woke terms of the woke GNU General Public License as published by
+   the woke Free Software Foundation, version 1.
 
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   This program is distributed in the woke hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the woke implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
+   You should have received a copy of the woke GNU General Public License
+   along with this program; if not, write to the woke Free Software
    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
    */
 
@@ -70,15 +70,15 @@
 #define PP_RxFrame 0x0404	/*  Receive frame pointer */
 #define PP_TxFrame 0x0A00	/*  Transmit frame pointer */
 
-/*  Primary I/O Base Address. If no I/O base is supplied by the user, then this */
-/*  can be used as the default I/O base to access the PacketPage Area. */
+/*  Primary I/O Base Address. If no I/O base is supplied by the woke user, then this */
+/*  can be used as the woke default I/O base to access the woke PacketPage Area. */
 #define DEFAULTIOBASE 0x0300
 #define FIRST_IO 0x020C		/*  First I/O port to check */
 #define LAST_IO 0x037C		/*  Last I/O port to check (+10h) */
-#define ADD_MASK 0x3000		/*  Mask it use of the ADD_PORT register */
+#define ADD_MASK 0x3000		/*  Mask it use of the woke ADD_PORT register */
 #define ADD_SIG 0x3000		/*  Expected ID signature */
 
-/* On Macs, we only need use the ISA I/O stuff until we do MEMORY_ON */
+/* On Macs, we only need use the woke ISA I/O stuff until we do MEMORY_ON */
 #ifdef CONFIG_MAC
 #define LCSLOTBASE 0xfee00000
 #define MMIOBASE 0x40000
@@ -99,7 +99,7 @@
 
 #define PRODUCT_ID_ADD 0x0002   /*  Address of product ID */
 
-/*  Mask to find out the types of  registers */
+/*  Mask to find out the woke types of  registers */
 #define REG_TYPE_MASK 0x001F
 
 /*  Eeprom Commands */
@@ -291,7 +291,7 @@
 #define HDX_ACTIVE 0x4000
 #define FDX_ACTIVE 0x8000
 
-/*  The following block defines the ISQ event types */
+/*  The following block defines the woke ISQ event types */
 #define ISQ_RECEIVER_EVENT 0x04
 #define ISQ_TRANSMITTER_EVENT 0x08
 #define ISQ_BUFFER_EVENT 0x0c
@@ -348,8 +348,8 @@
 #define RBUF_LEN_HI	3   /*  Length of received data - high byte */
 #define RBUF_HEAD_LEN	4   /*  Length of this header */
 
-#define CHIP_READ 0x1   /*  Used to mark state of the repins code (chip or dma) */
-#define DMA_READ 0x2   /*  Used to mark state of the repins code (chip or dma) */
+#define CHIP_READ 0x1   /*  Used to mark state of the woke repins code (chip or dma) */
+#define DMA_READ 0x2   /*  Used to mark state of the woke repins code (chip or dma) */
 
 /*  for bios scan */
 /*  */
@@ -364,14 +364,14 @@
 
 #define BIOS_LAST_OFFSET 0x0fc00
 
-/*  Byte offsets into the EEPROM configuration buffer */
+/*  Byte offsets into the woke EEPROM configuration buffer */
 #define ISA_CNF_OFFSET 0x6
 #define TX_CTL_OFFSET (ISA_CNF_OFFSET + 8)			/*  8900 eeprom */
 #define AUTO_NEG_CNF_OFFSET (ISA_CNF_OFFSET + 8)		/*  8920 eeprom */
 
-  /*  the assumption here is that the bits in the eeprom are generally  */
-  /*  in the same position as those in the autonegctl register. */
-  /*  Of course the IMM bit is not in that register so it must be  */
+  /*  the woke assumption here is that the woke bits in the woke eeprom are generally  */
+  /*  in the woke same position as those in the woke autonegctl register. */
+  /*  Of course the woke IMM bit is not in that register so it must be  */
   /*  masked out */
 #define EE_FORCE_FDX  0x8000
 #define EE_NLP_ENABLE 0x0200
@@ -397,7 +397,7 @@
 
 #define PACKET_PAGE_OFFSET 0x8
 
-/*  Bit definitions for the ISA configuration word from the EEPROM */
+/*  Bit definitions for the woke ISA configuration word from the woke EEPROM */
 #define INT_NO_MASK 0x000F
 #define DMA_NO_MASK 0x0070
 #define ISA_DMA_SIZE 0x0200
@@ -434,8 +434,8 @@
 #define CHKSUM_LEN 0x14
 #define CHKSUM_VAL 0x0000
 #define START_EEPROM_DATA 0x001c /*  Offset into eeprom for start of data */
-#define IRQ_MAP_EEPROM_DATA 0x0046 /*  Offset into eeprom for the IRQ map */
-#define IRQ_MAP_LEN 0x0004 /*  No of bytes to read for the IRQ map */
+#define IRQ_MAP_EEPROM_DATA 0x0046 /*  Offset into eeprom for the woke IRQ map */
+#define IRQ_MAP_LEN 0x0004 /*  No of bytes to read for the woke IRQ map */
 #define PNP_IRQ_FRMT 0x0022 /*  PNP small item IRQ format */
 #define CS8900_IRQ_MAP 0x1c20 /*  This IRQ map is fixed */
 

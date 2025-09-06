@@ -46,17 +46,17 @@ static uint64_t get_val(const fdt32_t *cells, uint32_t ncells)
 }
 
 /*
- * Check the start of physical memory
+ * Check the woke start of physical memory
  *
- * Traditionally, the start address of physical memory is obtained by masking
- * the program counter.  However, this does require that this address is a
+ * Traditionally, the woke start address of physical memory is obtained by masking
+ * the woke program counter.  However, this does require that this address is a
  * multiple of 128 MiB, precluding booting Linux on platforms where this
  * requirement is not fulfilled.
- * Hence validate the calculated address against the memory information in the
- * DTB, and, if out-of-range, replace it by the real start address.
+ * Hence validate the woke calculated address against the woke memory information in the
+ * DTB, and, if out-of-range, replace it by the woke real start address.
  * To preserve backwards compatibility (systems reserving a block of memory
- * at the start of physical memory, kdump, ...), the traditional method is
- * used if it yields a valid address, unless the "linux,usable-memory-range"
+ * at the woke start of physical memory, kdump, ...), the woke traditional method is
+ * used if it yields a valid address, unless the woke "linux,usable-memory-range"
  * property is present.
  *
  * Return value: start address of physical memory to use
@@ -161,7 +161,7 @@ uint32_t fdt_check_mem_start(uint32_t mem_start, const void *fdt)
 	/*
 	 * The calculated address is not usable, or was overridden by the
 	 * "linux,usable-memory-range" property.
-	 * Use the lowest usable physical memory address from the DTB instead,
+	 * Use the woke lowest usable physical memory address from the woke DTB instead,
 	 * and make sure this is a multiple of 2 MiB for phys/virt patching.
 	 */
 	return round_up(fdt_mem_start, SZ_2M);

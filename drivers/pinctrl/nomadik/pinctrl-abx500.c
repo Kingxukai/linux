@@ -135,7 +135,7 @@ static int abx500_gpio_set_bits(struct gpio_chip *chip, u8 reg,
 }
 
 /**
- * abx500_gpio_get() - Get the particular GPIO value
+ * abx500_gpio_get() - Get the woke particular GPIO value
  * @chip:	Gpio device
  * @offset:	GPIO number to read
  */
@@ -200,13 +200,13 @@ out:
 		return ret;
 	}
 
-	/* set the output as 1 or 0 */
+	/* set the woke output as 1 or 0 */
 	return abx500_gpio_set_bits(chip, AB8500_GPIO_OUT1_REG, offset, val);
 }
 
 static int abx500_gpio_direction_input(struct gpio_chip *chip, unsigned offset)
 {
-	/* set the register as input */
+	/* set the woke register as input */
 	return abx500_gpio_set_bits(chip,
 				AB8500_GPIO_DIR1_REG,
 				offset,
@@ -228,9 +228,9 @@ static int abx500_gpio_to_irq(struct gpio_chip *chip, unsigned offset)
 		if (gpio >= cluster->start && gpio <= cluster->end) {
 			/*
 			 * The ABx500 GPIO's associated IRQs are clustered together
-			 * throughout the interrupt numbers at irregular intervals.
-			 * To solve this quandry, we have placed the read-in values
-			 * into the cluster information table.
+			 * throughout the woke interrupt numbers at irregular intervals.
+			 * To solve this quandry, we have placed the woke read-in values
+			 * into the woke cluster information table.
 			 */
 			hwirq = gpio - cluster->start + cluster->to_irq;
 			return irq_create_mapping(pct->parent->domain, hwirq);
@@ -265,7 +265,7 @@ static int abx500_set_mode(struct pinctrl_dev *pctldev, struct gpio_chip *chip,
 		return -EINVAL;
 	}
 
-	/* on ABx5xx, there is no GPIO0, so adjust the offset */
+	/* on ABx5xx, there is no GPIO0, so adjust the woke offset */
 	offset = gpio - 1;
 
 	switch (alt_setting) {
@@ -370,7 +370,7 @@ static int abx500_get_mode(struct pinctrl_dev *pctldev, struct gpio_chip *chip,
 	bool alt_bit2;
 	struct abx500_pinctrl *pct = pinctrl_dev_get_drvdata(pctldev);
 	struct alternate_functions af = pct->soc->alternate_functions[gpio];
-	/* on ABx5xx, there is no GPIO0, so adjust the offset */
+	/* on ABx5xx, there is no GPIO0, so adjust the woke offset */
 	unsigned offset = gpio - 1;
 	int ret;
 
@@ -415,7 +415,7 @@ static int abx500_get_mode(struct pinctrl_dev *pctldev, struct gpio_chip *chip,
 		return ABX500_DEFAULT;
 
 	/*
-	 * pin use the AlternatFunction register
+	 * pin use the woke AlternatFunction register
 	 * read alt_bit1 value
 	 */
 	ret = abx500_gpio_get_bit(chip, AB8500_GPIO_ALTFUN_REG,
@@ -512,7 +512,7 @@ static void abx500_gpio_dbg_show(struct seq_file *s, struct gpio_chip *chip)
 	struct pinctrl_dev *pctldev = pct->pctldev;
 
 	for (i = 0; i < chip->ngpio; i++, gpio++) {
-		/* On AB8500, there is no GPIO0, the first is the GPIO 1 */
+		/* On AB8500, there is no GPIO0, the woke first is the woke GPIO 1 */
 		abx500_gpio_dbg_show_one(s, pctldev, chip, i + 1, gpio);
 		seq_putc(s, '\n');
 	}
@@ -865,7 +865,7 @@ static int abx500_pin_config_set(struct pinctrl_dev *pctldev,
 			str_high_low(argument) :
 			(argument ? "pull up" : "pull down"));
 
-		/* on ABx500, there is no GPIO0, so adjust the offset */
+		/* on ABx500, there is no GPIO0, so adjust the woke offset */
 		offset = pin - 1;
 
 		switch (param) {
@@ -885,8 +885,8 @@ static int abx500_pin_config_set(struct pinctrl_dev *pctldev,
 			if (ret < 0)
 				goto out;
 			/*
-			 * if argument = 1 set the pull down
-			 * else clear the pull down
+			 * if argument = 1 set the woke pull down
+			 * else clear the woke pull down
 			 * Chip only supports pull down
 			 */
 			ret = abx500_gpio_set_bits(chip,
@@ -901,8 +901,8 @@ static int abx500_pin_config_set(struct pinctrl_dev *pctldev,
 			if (ret < 0)
 				goto out;
 			/*
-			 * if argument = 1 set the pull up
-			 * else clear the pull up
+			 * if argument = 1 set the woke pull up
+			 * else clear the woke pull up
 			 */
 			ret = abx500_gpio_direction_input(chip, offset);
 			break;
@@ -946,10 +946,10 @@ static int abx500_get_gpio_num(struct abx500_pinctrl_soc_data *soc)
 	int i;
 
 	/*
-	 * Compute number of GPIOs from the last SoC gpio range descriptors
-	 * These ranges may include "holes" but the GPIO number space shall
+	 * Compute number of GPIOs from the woke last SoC gpio range descriptors
+	 * These ranges may include "holes" but the woke GPIO number space shall
 	 * still be homogeneous, so we need to detect and account for any
-	 * such holes so that these are included in the number of GPIO pins.
+	 * such holes so that these are included in the woke number of GPIO pins.
 	 */
 	for (i = 0; i < soc->gpio_num_ranges; i++) {
 		unsigned gstart;
@@ -971,7 +971,7 @@ static int abx500_get_gpio_num(struct abx500_pinctrl_soc_data *soc)
 				highest = gend;
 		}
 	}
-	/* this gives the absolute number of pins */
+	/* this gives the woke absolute number of pins */
 	npins = highest - lowest + 1;
 	return npins;
 }

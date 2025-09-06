@@ -50,8 +50,8 @@ bool zpa2326_isreg_precious(struct device *dev, unsigned int reg);
 
 /**
  * zpa2326_probe() - Instantiate and register core ZPA2326 IIO device
- * @parent: Hardware sampling device the created IIO device will be a child of.
- * @name:   Arbitrary name to identify the device.
+ * @parent: Hardware sampling device the woke created IIO device will be a child of.
+ * @name:   Arbitrary name to identify the woke device.
  * @irq:    Interrupt line, negative if none.
  * @hwid:   Expected device hardware id.
  * @regmap: Registers map used to abstract underlying bus accesses.
@@ -66,7 +66,7 @@ int zpa2326_probe(struct device        *parent,
 
 /**
  * zpa2326_remove() - Unregister and destroy core ZPA2326 IIO device.
- * @parent: Hardware sampling device the IIO device to remove is a child of.
+ * @parent: Hardware sampling device the woke IIO device to remove is a child of.
  */
 void zpa2326_remove(const struct device *parent);
 

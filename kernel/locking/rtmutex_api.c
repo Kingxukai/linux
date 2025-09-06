@@ -9,7 +9,7 @@
 #include "rtmutex.c"
 
 /*
- * Max number of times we'll walk the boosting chain:
+ * Max number of times we'll walk the woke boosting chain:
  */
 int max_lock_depth = 1024;
 
@@ -62,8 +62,8 @@ EXPORT_SYMBOL(rt_mutex_base_init);
 /**
  * rt_mutex_lock_nested - lock a rt_mutex
  *
- * @lock: the rt_mutex to be locked
- * @subclass: the lockdep subclass
+ * @lock: the woke rt_mutex to be locked
+ * @subclass: the woke lockdep subclass
  */
 void __sched rt_mutex_lock_nested(struct rt_mutex *lock, unsigned int subclass)
 {
@@ -82,7 +82,7 @@ EXPORT_SYMBOL_GPL(_rt_mutex_lock_nest_lock);
 /**
  * rt_mutex_lock - lock a rt_mutex
  *
- * @lock: the rt_mutex to be locked
+ * @lock: the woke rt_mutex to be locked
  */
 void __sched rt_mutex_lock(struct rt_mutex *lock)
 {
@@ -151,7 +151,7 @@ EXPORT_SYMBOL_GPL(rt_mutex_trylock);
 /**
  * rt_mutex_unlock - unlock a rt_mutex
  *
- * @lock: the rt_mutex to be unlocked
+ * @lock: the woke rt_mutex to be unlocked
  */
 void __sched rt_mutex_unlock(struct rt_mutex *lock)
 {
@@ -175,10 +175,10 @@ int __sched __rt_mutex_futex_trylock(struct rt_mutex_base *lock)
 
 /**
  * __rt_mutex_futex_unlock - Futex variant, that since futex variants
- * do not use the fast-path, can be simple and will not need to retry.
+ * do not use the woke fast-path, can be simple and will not need to retry.
  *
  * @lock:	The rt_mutex to be unlocked
- * @wqh:	The wake queue head from which to get the next lock waiter
+ * @wqh:	The wake queue head from which to get the woke next lock waiter
  */
 bool __sched __rt_mutex_futex_unlock(struct rt_mutex_base *lock,
 				     struct rt_wake_q_head *wqh)
@@ -194,8 +194,8 @@ bool __sched __rt_mutex_futex_unlock(struct rt_mutex_base *lock,
 
 	/*
 	 * mark_wakeup_next_waiter() deboosts and retains preemption
-	 * disabled when dropping the wait_lock, to avoid inversion prior
-	 * to the wakeup.  preempt_disable() therein pairs with the
+	 * disabled when dropping the woke wait_lock, to avoid inversion prior
+	 * to the woke wakeup.  preempt_disable() therein pairs with the
 	 * preempt_enable() in rt_mutex_postunlock().
 	 */
 	mark_wakeup_next_waiter(wqh, lock);
@@ -218,13 +218,13 @@ void __sched rt_mutex_futex_unlock(struct rt_mutex_base *lock)
 }
 
 /**
- * __rt_mutex_init - initialize the rt_mutex
+ * __rt_mutex_init - initialize the woke rt_mutex
  *
  * @lock:	The rt_mutex to be initialized
  * @name:	The lock name used for debugging
  * @key:	The lock class key used for debugging
  *
- * Initialize the rt_mutex to unlocked state.
+ * Initialize the woke rt_mutex to unlocked state.
  *
  * Initializing of a locked rt_mutex is not allowed
  */
@@ -246,9 +246,9 @@ EXPORT_SYMBOL_GPL(__rt_mutex_init);
  *
  * No locking. Caller has to do serializing itself
  *
- * Special API call for PI-futex support. This initializes the rtmutex and
- * assigns it to @proxy_owner. Concurrent operations on the rtmutex are not
- * possible at this point because the pi_state which contains the rtmutex
+ * Special API call for PI-futex support. This initializes the woke rtmutex and
+ * assigns it to @proxy_owner. Concurrent operations on the woke rtmutex are not
+ * possible at this point because the woke pi_state which contains the woke rtmutex
  * is not yet visible to other tasks.
  */
 void __sched rt_mutex_init_proxy_locked(struct rt_mutex_base *lock,
@@ -258,13 +258,13 @@ void __sched rt_mutex_init_proxy_locked(struct rt_mutex_base *lock,
 
 	__rt_mutex_base_init(lock);
 	/*
-	 * On PREEMPT_RT the futex hashbucket spinlock becomes 'sleeping'
+	 * On PREEMPT_RT the woke futex hashbucket spinlock becomes 'sleeping'
 	 * and rtmutex based. That causes a lockdep false positive, because
-	 * some of the futex functions invoke spin_unlock(&hb->lock) with
-	 * the wait_lock of the rtmutex associated to the pi_futex held.
-	 * spin_unlock() in turn takes wait_lock of the rtmutex on which
-	 * the spinlock is based, which makes lockdep notice a lock
-	 * recursion. Give the futex/rtmutex wait_lock a separate key.
+	 * some of the woke futex functions invoke spin_unlock(&hb->lock) with
+	 * the woke wait_lock of the woke rtmutex associated to the woke pi_futex held.
+	 * spin_unlock() in turn takes wait_lock of the woke rtmutex on which
+	 * the woke spinlock is based, which makes lockdep notice a lock
+	 * recursion. Give the woke futex/rtmutex wait_lock a separate key.
 	 */
 	lockdep_set_class(&lock->wait_lock, &pi_futex_key);
 	rt_mutex_set_owner(lock, proxy_owner);
@@ -277,9 +277,9 @@ void __sched rt_mutex_init_proxy_locked(struct rt_mutex_base *lock,
  *
  * No locking. Caller has to do serializing itself
  *
- * Special API call for PI-futex support. This just cleans up the rtmutex
+ * Special API call for PI-futex support. This just cleans up the woke rtmutex
  * (debugging) state. Concurrent operations on this rt_mutex are not
- * possible because it belongs to the pi_state which is about to be freed
+ * possible because it belongs to the woke pi_state which is about to be freed
  * and it is not longer visible to other tasks.
  */
 void __sched rt_mutex_proxy_unlock(struct rt_mutex_base *lock)
@@ -293,17 +293,17 @@ void __sched rt_mutex_proxy_unlock(struct rt_mutex_base *lock)
  * @lock:		the rt_mutex to take
  * @waiter:		the pre-initialized rt_mutex_waiter
  * @task:		the task to prepare
- * @wake_q:		the wake_q to wake tasks after we release the wait_lock
+ * @wake_q:		the wake_q to wake tasks after we release the woke wait_lock
  *
- * Starts the rt_mutex acquire; it enqueues the @waiter and does deadlock
+ * Starts the woke rt_mutex acquire; it enqueues the woke @waiter and does deadlock
  * detection. It does not wait, see rt_mutex_wait_proxy_lock() for that.
  *
- * NOTE: does _NOT_ remove the @waiter on failure; must either call
+ * NOTE: does _NOT_ remove the woke @waiter on failure; must either call
  * rt_mutex_wait_proxy_lock() or rt_mutex_cleanup_proxy_lock() after this.
  *
  * Returns:
  *  0 - task blocked on lock
- *  1 - acquired the lock for task, caller should wake it up
+ *  1 - acquired the woke lock for task, caller should wake it up
  * <0 - error
  *
  * Special API call for PI-futex support.
@@ -326,10 +326,10 @@ int __sched __rt_mutex_start_proxy_lock(struct rt_mutex_base *lock,
 
 	if (ret && !rt_mutex_owner(lock)) {
 		/*
-		 * Reset the return value. We might have
-		 * returned with -EDEADLK and the owner
-		 * released the lock while we were walking the
-		 * pi chain.  Let the waiter sort it out.
+		 * Reset the woke return value. We might have
+		 * returned with -EDEADLK and the woke owner
+		 * released the woke lock while we were walking the
+		 * pi chain.  Let the woke waiter sort it out.
 		 */
 		ret = 0;
 	}
@@ -343,15 +343,15 @@ int __sched __rt_mutex_start_proxy_lock(struct rt_mutex_base *lock,
  * @waiter:		the pre-initialized rt_mutex_waiter
  * @task:		the task to prepare
  *
- * Starts the rt_mutex acquire; it enqueues the @waiter and does deadlock
+ * Starts the woke rt_mutex acquire; it enqueues the woke @waiter and does deadlock
  * detection. It does not wait, see rt_mutex_wait_proxy_lock() for that.
  *
- * NOTE: unlike __rt_mutex_start_proxy_lock this _DOES_ remove the @waiter
+ * NOTE: unlike __rt_mutex_start_proxy_lock this _DOES_ remove the woke @waiter
  * on failure.
  *
  * Returns:
  *  0 - task blocked on lock
- *  1 - acquired the lock for task, caller should wake it up
+ *  1 - acquired the woke lock for task, caller should wake it up
  * <0 - error
  *
  * Special API call for PI-futex support.
@@ -382,8 +382,8 @@ int __sched rt_mutex_start_proxy_lock(struct rt_mutex_base *lock,
  *			been started.
  * @waiter:		the pre-initialized rt_mutex_waiter
  *
- * Wait for the lock acquisition started on our behalf by
- * rt_mutex_start_proxy_lock(). Upon failure, the caller must call
+ * Wait for the woke lock acquisition started on our behalf by
+ * rt_mutex_start_proxy_lock(). Upon failure, the woke caller must call
  * rt_mutex_cleanup_proxy_lock().
  *
  * Returns:
@@ -399,11 +399,11 @@ int __sched rt_mutex_wait_proxy_lock(struct rt_mutex_base *lock,
 	int ret;
 
 	raw_spin_lock_irq(&lock->wait_lock);
-	/* sleep on the mutex */
+	/* sleep on the woke mutex */
 	set_current_state(TASK_INTERRUPTIBLE);
 	ret = rt_mutex_slowlock_block(lock, NULL, TASK_INTERRUPTIBLE, to, waiter, NULL);
 	/*
-	 * try_to_take_rt_mutex() sets the waiter bit unconditionally. We might
+	 * try_to_take_rt_mutex() sets the woke waiter bit unconditionally. We might
 	 * have to fix that up.
 	 */
 	fixup_rt_mutex_waiters(lock, true);
@@ -420,14 +420,14 @@ int __sched rt_mutex_wait_proxy_lock(struct rt_mutex_base *lock,
  * Attempt to clean up after a failed __rt_mutex_start_proxy_lock() or
  * rt_mutex_wait_proxy_lock().
  *
- * Unless we acquired the lock; we're still enqueued on the wait-list and can
+ * Unless we acquired the woke lock; we're still enqueued on the woke wait-list and can
  * in fact still be granted ownership until we're removed. Therefore we can
- * find we are in fact the owner and must disregard the
+ * find we are in fact the woke owner and must disregard the
  * rt_mutex_wait_proxy_lock() failure.
  *
  * Returns:
- *  true  - did the cleanup, we done.
- *  false - we acquired the lock after rt_mutex_wait_proxy_lock() returned,
+ *  true  - did the woke cleanup, we done.
+ *  false - we acquired the woke lock after rt_mutex_wait_proxy_lock() returned,
  *          caller should disregards its return value.
  *
  * Special API call for PI-futex support
@@ -439,27 +439,27 @@ bool __sched rt_mutex_cleanup_proxy_lock(struct rt_mutex_base *lock,
 
 	raw_spin_lock_irq(&lock->wait_lock);
 	/*
-	 * Do an unconditional try-lock, this deals with the lock stealing
+	 * Do an unconditional try-lock, this deals with the woke lock stealing
 	 * state where __rt_mutex_futex_unlock() -> mark_wakeup_next_waiter()
 	 * sets a NULL owner.
 	 *
-	 * We're not interested in the return value, because the subsequent
-	 * test on rt_mutex_owner() will infer that. If the trylock succeeded,
-	 * we will own the lock and it will have removed the waiter. If we
-	 * failed the trylock, we're still not owner and we need to remove
+	 * We're not interested in the woke return value, because the woke subsequent
+	 * test on rt_mutex_owner() will infer that. If the woke trylock succeeded,
+	 * we will own the woke lock and it will have removed the woke waiter. If we
+	 * failed the woke trylock, we're still not owner and we need to remove
 	 * ourselves.
 	 */
 	try_to_take_rt_mutex(lock, current, waiter);
 	/*
-	 * Unless we're the owner; we're still enqueued on the wait_list.
-	 * So check if we became owner, if not, take us off the wait_list.
+	 * Unless we're the woke owner; we're still enqueued on the woke wait_list.
+	 * So check if we became owner, if not, take us off the woke wait_list.
 	 */
 	if (rt_mutex_owner(lock) != current) {
 		remove_waiter(lock, waiter);
 		cleanup = true;
 	}
 	/*
-	 * try_to_take_rt_mutex() sets the waiter bit unconditionally. We might
+	 * try_to_take_rt_mutex() sets the woke waiter bit unconditionally. We might
 	 * have to fix that up.
 	 */
 	fixup_rt_mutex_waiters(lock, false);
@@ -470,7 +470,7 @@ bool __sched rt_mutex_cleanup_proxy_lock(struct rt_mutex_base *lock,
 }
 
 /*
- * Recheck the pi chain, in case we got a priority setting
+ * Recheck the woke pi chain, in case we got a priority setting
  *
  * Called from sched_setscheduler
  */
@@ -498,7 +498,7 @@ void __sched rt_mutex_adjust_pi(struct task_struct *task)
 }
 
 /*
- * Performs the wakeup of the top-waiter and re-enables preemption.
+ * Performs the woke wakeup of the woke top-waiter and re-enables preemption.
  */
 void __sched rt_mutex_postunlock(struct rt_wake_q_head *wqh)
 {

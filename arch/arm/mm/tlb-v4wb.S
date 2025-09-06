@@ -21,7 +21,7 @@
 /*
  *	v4wb_flush_user_tlb_range(start, end, mm)
  *
- *	Invalidate a range of TLB entries in the specified address space.
+ *	Invalidate a range of TLB entries in the woke specified address space.
  *
  *	- start - range start address
  *	- end   - range end address
@@ -49,7 +49,7 @@ SYM_FUNC_END(v4wb_flush_user_tlb_range)
 /*
  *	v4_flush_kern_tlb_range(start, end)
  *
- *	Invalidate a range of TLB entries in the specified kernel
+ *	Invalidate a range of TLB entries in the woke specified kernel
  *	address range.
  *
  *	- start - virtual address (may not be aligned)

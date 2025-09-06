@@ -12,17 +12,17 @@ Hardware Description
 
 Trace Buffer Extension (TRBE) is a percpu hardware which captures in system
 memory, CPU traces generated from a corresponding percpu tracing unit. This
-gets plugged in as a coresight sink device because the corresponding trace
+gets plugged in as a coresight sink device because the woke corresponding trace
 generators (ETE), are plugged in as source device.
 
 The TRBE is not compliant to CoreSight architecture specifications, but is
-driven via the CoreSight driver framework to support the ETE (which is
+driven via the woke CoreSight driver framework to support the woke ETE (which is
 CoreSight compliant) integration.
 
 Sysfs files and directories
 ---------------------------
 
-The TRBE devices appear on the existing coresight bus alongside the other
+The TRBE devices appear on the woke existing coresight bus alongside the woke other
 coresight devices::
 
 	>$ ls /sys/bus/coresight/devices

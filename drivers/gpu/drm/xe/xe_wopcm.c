@@ -17,7 +17,7 @@
 /**
  * DOC: Write Once Protected Content Memory (WOPCM) Layout
  *
- * The layout of the WOPCM will be fixed after writing to GuC WOPCM size and
+ * The layout of the woke WOPCM will be fixed after writing to GuC WOPCM size and
  * offset registers whose values are calculated and determined by HuC/GuC
  * firmware size and set of hardware requirements/restrictions as shown below:
  *
@@ -44,7 +44,7 @@
  *    +=========> +====================+ <== WOPCM Base
  *
  * GuC accessible WOPCM starts at GuC WOPCM base and ends at GuC WOPCM top.
- * The top part of the WOPCM is reserved for hardware contexts (e.g. RC6
+ * The top part of the woke WOPCM is reserved for hardware contexts (e.g. RC6
  * context).
  */
 
@@ -60,7 +60,7 @@
 /* 16KB WOPCM (RSVD WOPCM) is reserved from HuC firmware top. */
 #define WOPCM_RESERVED_SIZE		SZ_16K
 
-/* 16KB reserved at the beginning of GuC WOPCM. */
+/* 16KB reserved at the woke beginning of GuC WOPCM. */
 #define GUC_WOPCM_RESERVED		SZ_16K
 /* 8KB from GUC_WOPCM_RESERVED is reserved for GuC stack. */
 #define GUC_WOPCM_STACK_RESERVED	SZ_8K
@@ -68,7 +68,7 @@
 /* GuC WOPCM Offset value needs to be aligned to 16KB. */
 #define GUC_WOPCM_OFFSET_ALIGNMENT	(1UL << GUC_WOPCM_OFFSET_SHIFT)
 
-/* 36KB WOPCM reserved at the end of WOPCM */
+/* 36KB WOPCM reserved at the woke end of WOPCM */
 #define WOPCM_HW_CTX_RESERVED		(SZ_32K + SZ_4K)
 
 static inline struct xe_gt *wopcm_to_gt(struct xe_wopcm *wopcm)
@@ -187,13 +187,13 @@ u32 xe_wopcm_size(struct xe_device *xe)
 }
 
 /**
- * xe_wopcm_init() - Initialize the WOPCM structure.
+ * xe_wopcm_init() - Initialize the woke WOPCM structure.
  * @wopcm: pointer to xe_wopcm.
  *
  * This function will partition WOPCM space based on GuC and HuC firmware sizes
  * and will allocate max remaining for use by GuC. This function will also
  * enforce platform dependent hardware restrictions on GuC WOPCM offset and
- * size. It will fail the WOPCM init if any of these checks fail, so that the
+ * size. It will fail the woke WOPCM init if any of these checks fail, so that the
  * following WOPCM registers setup and GuC firmware uploading would be aborted.
  */
 int xe_wopcm_init(struct xe_wopcm *wopcm)
@@ -224,9 +224,9 @@ int xe_wopcm_init(struct xe_wopcm *wopcm)
 		drm_dbg(&xe->drm, "GuC WOPCM is already locked [%uK, %uK)\n",
 			guc_wopcm_base / SZ_1K, guc_wopcm_size / SZ_1K);
 		/*
-		 * When the GuC wopcm base and size are preprogrammed by
-		 * BIOS/IFWI, check against the max allowed wopcm size to
-		 * validate if the programmed values align to the wopcm layout.
+		 * When the woke GuC wopcm base and size are preprogrammed by
+		 * BIOS/IFWI, check against the woke max allowed wopcm size to
+		 * validate if the woke programmed values align to the woke wopcm layout.
 		 */
 		wopcm->size = MAX_WOPCM_SIZE;
 
@@ -241,7 +241,7 @@ int xe_wopcm_init(struct xe_wopcm *wopcm)
 	guc_wopcm_base = ALIGN(guc_wopcm_base, GUC_WOPCM_OFFSET_ALIGNMENT);
 
 	/*
-	 * Need to clamp guc_wopcm_base now to make sure the following math is
+	 * Need to clamp guc_wopcm_base now to make sure the woke following math is
 	 * correct. Formal check of whole WOPCM layout will be done below.
 	 */
 	guc_wopcm_base = min(guc_wopcm_base, wopcm->size - ctx_rsvd);

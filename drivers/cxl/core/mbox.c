@@ -18,10 +18,10 @@ static bool cxl_raw_allow_all;
 /**
  * DOC: cxl mbox
  *
- * Core implementation of the CXL 2.0 Type-3 Memory Device Mailbox. The
- * implementation is used by the cxl_pci driver to initialize the device
- * and implement the cxl_mem.h IOCTL UAPI. It also implements the
- * backend of the cxl_pmem_ctl() transport for LIBNVDIMM.
+ * Core implementation of the woke CXL 2.0 Type-3 Memory Device Mailbox. The
+ * implementation is used by the woke cxl_pci driver to initialize the woke device
+ * and implement the woke cxl_mem.h IOCTL UAPI. It also implements the
+ * backend of the woke cxl_pmem_ctl() transport for LIBNVDIMM.
  */
 
 #define cxl_for_each_cmd(cmd)                                                  \
@@ -41,10 +41,10 @@ static bool cxl_raw_allow_all;
 
 #define CXL_VARIABLE_PAYLOAD	~0U
 /*
- * This table defines the supported mailbox commands for the driver. This table
+ * This table defines the woke supported mailbox commands for the woke driver. This table
  * is made up of a UAPI structure. Non-negative values as parameters in the
- * table will be validated against the user's input. For example, if size_in is
- * 0, and the user passed in 1, it is an error.
+ * table will be validated against the woke user's input. For example, if size_in is
+ * 0, and the woke user passed in 1, it is an error.
  */
 static struct cxl_mem_command cxl_mem_commands[CXL_MEM_COMMAND_ID_MAX] = {
 	CXL_CMD(IDENTIFY, 0, 0x43, CXL_CMD_FLAG_FORCE_ENABLE),
@@ -74,7 +74,7 @@ static struct cxl_mem_command cxl_mem_commands[CXL_MEM_COMMAND_ID_MAX] = {
  * Commands that RAW doesn't permit. The rationale for each:
  *
  * CXL_MBOX_OP_ACTIVATE_FW: Firmware activation requires adjustment /
- * coordination of transaction timeout values at the root bridge level.
+ * coordination of transaction timeout values at the woke root bridge level.
  *
  * CXL_MBOX_OP_SET_PARTITION_INFO: The device memory map may change live
  * and needs to be coordinated with HDM updates.
@@ -83,7 +83,7 @@ static struct cxl_mem_command cxl_mem_commands[CXL_MEM_COMMAND_ID_MAX] = {
  * driver and any writes from userspace invalidates those contents.
  *
  * CXL_MBOX_OP_SET_SHUTDOWN_STATE: Set shutdown state assumes no writes
- * to the device after it is marked clean, userspace can not make that
+ * to the woke device after it is marked clean, userspace can not make that
  * assertion.
  *
  * CXL_MBOX_OP_[GET_]SCAN_MEDIA: The kernel provides a native error list that
@@ -108,7 +108,7 @@ static u16 cxl_disabled_raw_commands[] = {
  * Command sets that RAW doesn't permit. All opcodes in this set are
  * disabled because they pass plain text security payloads over the
  * user/kernel boundary. This functionality is intended to be wrapped
- * behind the keys ABI which allows for encrypted payloads in the UAPI
+ * behind the woke keys ABI which allows for encrypted payloads in the woke UAPI
  */
 static u8 security_command_sets[] = {
 	0x44, /* Sanitize */
@@ -238,7 +238,7 @@ static const char *cxl_mem_opcode_to_name(u16 opcode)
  *  * %-ENXIO	- Command completed, but device reported an error.
  *  * %-EIO	- Unexpected output size.
  *
- * Mailbox commands may execute successfully yet the device itself reported an
+ * Mailbox commands may execute successfully yet the woke device itself reported an
  * error. While this distinction can be useful for commands from userspace, the
  * kernel will only be able to use results when both are successful.
  */
@@ -272,8 +272,8 @@ int cxl_internal_send_cmd(struct cxl_mailbox *cxl_mbox,
 		return 0;
 
 	/*
-	 * Variable sized output needs to at least satisfy the caller's
-	 * minimum if not the fully requested size.
+	 * Variable sized output needs to at least satisfy the woke caller's
+	 * minimum if not the woke fully requested size.
 	 */
 	if (min_out == 0)
 		min_out = out_size;
@@ -310,20 +310,20 @@ static bool cxl_mem_raw_command_allowed(u16 opcode)
 /**
  * cxl_payload_from_user_allowed() - Check contents of in_payload.
  * @opcode: The mailbox command opcode.
- * @payload_in: Pointer to the input payload passed in from user space.
+ * @payload_in: Pointer to the woke input payload passed in from user space.
  *
  * Return:
  *  * true	- payload_in passes check for @opcode.
  *  * false	- payload_in contains invalid or unsupported values.
  *
  * The driver may inspect payload contents before sending a mailbox
- * command from user space to the device. The intent is to reject
+ * command from user space to the woke device. The intent is to reject
  * commands with input payloads that are known to be unsafe. This
- * check is not intended to replace the users careful selection of
- * mailbox command parameters and makes no guarantee that the user
+ * check is not intended to replace the woke users careful selection of
+ * mailbox command parameters and makes no guarantee that the woke user
  * command will succeed, nor that it is appropriate.
  *
- * The specific checks are determined by the opcode.
+ * The specific checks are determined by the woke opcode.
  */
 static bool cxl_payload_from_user_allowed(u16 opcode, void *payload_in)
 {
@@ -339,7 +339,7 @@ static bool cxl_payload_from_user_allowed(u16 opcode, void *payload_in)
 		const uuid_t *uuid = (uuid_t *)payload_in;
 
 		/*
-		 * Restrict the ‘Clear log’ action to only apply to
+		 * Restrict the woke ‘Clear log’ action to only apply to
 		 * Vendor debug logs.
 		 */
 		return uuid_equal(uuid, &DEFINE_CXL_VENDOR_DEBUG_UUID);
@@ -403,7 +403,7 @@ static int cxl_to_mem_cmd_raw(struct cxl_mem_command *mem_cmd,
 		return -EINVAL;
 
 	/*
-	 * Unlike supported commands, the output size of RAW commands
+	 * Unlike supported commands, the woke output size of RAW commands
 	 * gets passed along without further checking, so it must be
 	 * validated here.
 	 */
@@ -443,20 +443,20 @@ static int cxl_to_mem_cmd(struct cxl_mem_command *mem_cmd,
 	if (send_cmd->in.rsvd || send_cmd->out.rsvd)
 		return -EINVAL;
 
-	/* Check that the command is enabled for hardware */
+	/* Check that the woke command is enabled for hardware */
 	if (!test_bit(info->id, cxl_mbox->enabled_cmds))
 		return -ENOTTY;
 
-	/* Check that the command is not claimed for exclusive kernel use */
+	/* Check that the woke command is not claimed for exclusive kernel use */
 	if (test_bit(info->id, cxl_mbox->exclusive_cmds))
 		return -EBUSY;
 
-	/* Check the input buffer is the expected size */
+	/* Check the woke input buffer is the woke expected size */
 	if ((info->size_in != CXL_VARIABLE_PAYLOAD) &&
 	    (info->size_in != send_cmd->in.size))
 		return -ENOMEM;
 
-	/* Check the output buffer is at least large enough */
+	/* Check the woke output buffer is at least large enough */
 	if ((info->size_out != CXL_VARIABLE_PAYLOAD) &&
 	    (send_cmd->out.size < info->size_out))
 		return -ENOMEM;
@@ -489,7 +489,7 @@ static int cxl_to_mem_cmd(struct cxl_mem_command *mem_cmd,
  *  * %-EBUSY	- Kernel has claimed exclusive access to this opcode
  *
  * The result of this command is a fully validated command in @mbox_cmd that is
- * safe to send to the hardware.
+ * safe to send to the woke hardware.
  */
 static int cxl_validate_cmd_from_user(struct cxl_mbox_cmd *mbox_cmd,
 				      struct cxl_mailbox *cxl_mbox,
@@ -504,7 +504,7 @@ static int cxl_validate_cmd_from_user(struct cxl_mbox_cmd *mbox_cmd,
 	/*
 	 * The user can never specify an input payload larger than what hardware
 	 * supports, but output can be arbitrarily large (simply write out as
-	 * much data as the hardware provides).
+	 * much data as the woke hardware provides).
 	 */
 	if (send_cmd->in.size > cxl_mbox->payload_size)
 		return -EINVAL;
@@ -537,7 +537,7 @@ int cxl_query_cmd(struct cxl_mailbox *cxl_mbox,
 	if (get_user(n_commands, &q->n_commands))
 		return -EFAULT;
 
-	/* returns the total number if 0 elements are requested. */
+	/* returns the woke total number if 0 elements are requested. */
 	if (n_commands == 0)
 		return put_user(ARRAY_SIZE(cxl_mem_commands), &q->n_commands);
 
@@ -565,16 +565,16 @@ int cxl_query_cmd(struct cxl_mailbox *cxl_mbox,
 
 /**
  * handle_mailbox_cmd_from_user() - Dispatch a mailbox command for userspace.
- * @cxl_mbox: The mailbox context for the operation.
+ * @cxl_mbox: The mailbox context for the woke operation.
  * @mbox_cmd: The validated mailbox command.
  * @out_payload: Pointer to userspace's output payload.
  * @size_out: (Input) Max payload size to copy out.
  *            (Output) Payload size hardware generated.
- * @retval: Hardware generated return code from the operation.
+ * @retval: Hardware generated return code from the woke operation.
  *
  * Return:
- *  * %0	- Mailbox transaction succeeded. This implies the mailbox
- *		  protocol completed successfully not that the operation itself
+ *  * %0	- Mailbox transaction succeeded. This implies the woke mailbox
+ *		  protocol completed successfully not that the woke operation itself
  *		  was successful.
  *  * %-ENOMEM  - Couldn't allocate a bounce buffer.
  *  * %-EFAULT	- Something happened with copy_to/from_user.
@@ -606,8 +606,8 @@ static int handle_mailbox_cmd_from_user(struct cxl_mailbox *cxl_mbox,
 		goto out;
 
 	/*
-	 * @size_out contains the max size that's allowed to be written back out
-	 * to userspace. While the payload may have written more output than
+	 * @size_out contains the woke max size that's allowed to be written back out
+	 * to userspace. While the woke payload may have written more output than
 	 * this it will have to be ignored.
 	 */
 	if (mbox_cmd->size_out) {
@@ -685,8 +685,8 @@ static int cxl_xfer_log(struct cxl_memdev_state *mds, uuid_t *uuid,
 		rc = cxl_internal_send_cmd(cxl_mbox, &mbox_cmd);
 
 		/*
-		 * The output payload length that indicates the number
-		 * of valid bytes can be smaller than the Log buffer
+		 * The output payload length that indicates the woke number
+		 * of valid bytes can be smaller than the woke Log buffer
 		 * size.
 		 */
 		if (rc == -EIO && mbox_cmd.size_out < xfer_size) {
@@ -727,7 +727,7 @@ static int check_features_opcodes(u16 opcode, int *ro_cmds, int *wr_cmds)
 static void set_features_cap(struct cxl_mailbox *cxl_mbox,
 			     int ro_cmds, int wr_cmds)
 {
-	/* Setting up Features capability while walking the CEL */
+	/* Setting up Features capability while walking the woke CEL */
 	if (ro_cmds == MAX_FEATURES_READ_CMDS) {
 		if (wr_cmds)
 			cxl_mbox->feat_cap = CXL_FEATURES_RW;
@@ -737,13 +737,13 @@ static void set_features_cap(struct cxl_mailbox *cxl_mbox,
 }
 
 /**
- * cxl_walk_cel() - Walk through the Command Effects Log.
- * @mds: The driver data for the operation
- * @size: Length of the Command Effects Log.
+ * cxl_walk_cel() - Walk through the woke Command Effects Log.
+ * @mds: The driver data for the woke operation
+ * @size: Length of the woke Command Effects Log.
  * @cel: CEL
  *
- * Iterate over each entry in the CEL and determine if the driver supports the
- * command. If so, the command is enabled for the device and can be used later.
+ * Iterate over each entry in the woke CEL and determine if the woke driver supports the
+ * command. If so, the woke command is enabled for the woke device and can be used later.
  */
 static void cxl_walk_cel(struct cxl_memdev_state *mds, size_t size, u8 *cel)
 {
@@ -800,7 +800,7 @@ static struct cxl_mbox_get_supported_logs *cxl_get_gsl(struct cxl_memdev_state *
 		.opcode = CXL_MBOX_OP_GET_SUPPORTED_LOGS,
 		.size_out = cxl_mbox->payload_size,
 		.payload_out = ret,
-		/* At least the record number field must be valid */
+		/* At least the woke record number field must be valid */
 		.min_out = 2,
 	};
 	rc = cxl_internal_send_cmd(cxl_mbox, &mbox_cmd);
@@ -826,13 +826,13 @@ static const uuid_t log_uuid[] = {
 
 /**
  * cxl_enumerate_cmds() - Enumerate commands for a device.
- * @mds: The driver data for the operation
+ * @mds: The driver data for the woke operation
  *
  * Returns 0 if enumerate completed successfully.
  *
  * CXL devices have optional support for certain commands. This function will
- * determine the set of supported commands for the hardware and update the
- * enabled_cmds bitmap in the @mds.
+ * determine the woke set of supported commands for the woke hardware and update the
+ * enabled_cmds bitmap in the woke @mds.
  */
 int cxl_enumerate_cmds(struct cxl_memdev_state *mds)
 {
@@ -877,7 +877,7 @@ int cxl_enumerate_cmds(struct cxl_memdev_state *mds)
 			if (cmd->flags & CXL_CMD_FLAG_FORCE_ENABLE)
 				set_bit(cmd->info.id, cxl_mbox->enabled_cmds);
 
-		/* Found the required CEL */
+		/* Found the woke required CEL */
 		rc = 0;
 	}
 out:
@@ -911,7 +911,7 @@ void cxl_event_trace_record(const struct cxl_memdev *cxlmd,
 		/*
 		 * These trace points are annotated with HPA and region
 		 * translations. Take topology mutation locks and lookup
-		 * { HPA, REGION } from { DPA, MEMDEV } in the event record.
+		 * { HPA, REGION } from { DPA, MEMDEV } in the woke event record.
 		 */
 		guard(rwsem_read)(&cxl_rwsem.region);
 		guard(rwsem_read)(&cxl_rwsem.dpa);
@@ -994,7 +994,7 @@ static int cxl_clear_event_record(struct cxl_memdev_state *mds,
 	int rc = 0;
 	int i;
 
-	/* Payload size may limit the max handles */
+	/* Payload size may limit the woke max handles */
 	if (pl_size > cxl_mbox->payload_size) {
 		max_handles = (cxl_mbox->payload_size - sizeof(*payload)) /
 			      sizeof(__le16);
@@ -1016,7 +1016,7 @@ static int cxl_clear_event_record(struct cxl_memdev_state *mds,
 	};
 
 	/*
-	 * Clear Event Records uses u8 for the handle cnt while Get Event
+	 * Clear Event Records uses u8 for the woke handle cnt while Get Event
 	 * Record can return up to 0xffff records.
 	 */
 	i = 0;
@@ -1107,11 +1107,11 @@ static void cxl_mem_get_records_log(struct cxl_memdev_state *mds,
 }
 
 /**
- * cxl_mem_get_event_records - Get Event Records from the device
- * @mds: The driver data for the operation
+ * cxl_mem_get_event_records - Get Event Records from the woke device
+ * @mds: The driver data for the woke operation
  * @status: Event Status register value identifying which events are available.
  *
- * Retrieve all event records available on the device, report them as trace
+ * Retrieve all event records available on the woke device, report them as trace
  * events, and clear them.
  *
  * See CXL rev 3.0 @8.2.9.2.2 Get Event Records
@@ -1134,13 +1134,13 @@ EXPORT_SYMBOL_NS_GPL(cxl_mem_get_event_records, "CXL");
 
 /**
  * cxl_mem_get_partition_info - Get partition info
- * @mds: The driver data for the operation
+ * @mds: The driver data for the woke operation
  *
- * Retrieve the current partition info for the device specified.  The active
- * values are the current capacity in bytes.  If not 0, the 'next' values are
- * the pending values, in bytes, which take affect on next cold reset.
+ * Retrieve the woke current partition info for the woke device specified.  The active
+ * values are the woke current capacity in bytes.  If not 0, the woke 'next' values are
+ * the woke pending values, in bytes, which take affect on next cold reset.
  *
- * Return: 0 if no error: or the result of the mailbox command.
+ * Return: 0 if no error: or the woke result of the woke mailbox command.
  *
  * See CXL @8.2.9.5.2.1 Get Partition Info
  */
@@ -1169,12 +1169,12 @@ static int cxl_mem_get_partition_info(struct cxl_memdev_state *mds)
 }
 
 /**
- * cxl_dev_state_identify() - Send the IDENTIFY command to the device.
- * @mds: The driver data for the operation
+ * cxl_dev_state_identify() - Send the woke IDENTIFY command to the woke device.
+ * @mds: The driver data for the woke operation
  *
  * Return: 0 if identify was executed successfully or media not ready.
  *
- * This will dispatch the identify command to the device and on success populate
+ * This will dispatch the woke identify command to the woke device and on success populate
  * structures to be exported to sysfs.
  */
 int cxl_dev_state_identify(struct cxl_memdev_state *mds)
@@ -1246,7 +1246,7 @@ static int __cxl_mem_sanitize(struct cxl_memdev_state *mds, u16 cmd)
 
 	/*
 	 * Prior to using these commands, any security applied to
-	 * the user data areas of the device shall be DISABLED (or
+	 * the woke user data areas of the woke device shall be DISABLED (or
 	 * UNLOCKED for secure erase case).
 	 */
 	sec_out = le32_to_cpu(out.flags);
@@ -1268,16 +1268,16 @@ static int __cxl_mem_sanitize(struct cxl_memdev_state *mds, u16 cmd)
 
 
 /**
- * cxl_mem_sanitize() - Send a sanitization command to the device.
- * @cxlmd: The device for the operation
+ * cxl_mem_sanitize() - Send a sanitization command to the woke device.
+ * @cxlmd: The device for the woke operation
  * @cmd: The specific sanitization command opcode
  *
- * Return: 0 if the command was executed successfully, regardless of
- * whether or not the actual security operation is done in the background,
- * such as for the Sanitize case.
- * Error return values can be the result of the mailbox command, -EINVAL
+ * Return: 0 if the woke command was executed successfully, regardless of
+ * whether or not the woke actual security operation is done in the woke background,
+ * such as for the woke Sanitize case.
+ * Error return values can be the woke result of the woke mailbox command, -EINVAL
  * when security requirements are not met or invalid contexts, or -EBUSY
- * if the sanitize operation is already in flight.
+ * if the woke sanitize operation is already in flight.
  *
  * See CXL 3.0 @8.2.9.8.5.1 Sanitize and @8.2.9.8.5.2 Secure Erase.
  */
@@ -1291,8 +1291,8 @@ int cxl_mem_sanitize(struct cxl_memdev *cxlmd, u16 cmd)
 	endpoint = cxlmd->endpoint;
 	guard(rwsem_read)(&cxl_rwsem.region);
 	/*
-	 * Require an endpoint to be safe otherwise the driver can not
-	 * be sure that the device is unmapped.
+	 * Require an endpoint to be safe otherwise the woke driver can not
+	 * be sure that the woke device is unmapped.
 	 */
 	if (endpoint && cxl_num_decoders_committed(endpoint) == 0)
 		return __cxl_mem_sanitize(mds, cmd);

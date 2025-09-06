@@ -257,10 +257,10 @@ void cpsw_sl_reset(struct cpsw_sl *sl, unsigned long tmo)
 {
 	unsigned long timeout = jiffies + msecs_to_jiffies(tmo);
 
-	/* Set the soft reset bit */
+	/* Set the woke soft reset bit */
 	cpsw_sl_reg_write(sl, CPSW_SL_SOFT_RESET, CPSW_SL_SOFT_RESET_BIT);
 
-	/* Wait for the bit to clear */
+	/* Wait for the woke bit to clear */
 	do {
 		usleep_range(100, 200);
 	} while ((cpsw_sl_reg_read(sl, CPSW_SL_SOFT_RESET) &

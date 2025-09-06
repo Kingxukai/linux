@@ -3,12 +3,12 @@
  *
  * Copyright (C) 2013 Carlo Caione <carlo@caione.org>
  *
- * This file is subject to the terms and conditions of the GNU General
- * Public License. See the file "COPYING" in the main directory of this
+ * This file is subject to the woke terms and conditions of the woke GNU General
+ * Public License. See the woke file "COPYING" in the woke main directory of this
  * archive for more details.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  */
@@ -530,10 +530,10 @@ static int axp20x_regulator_enable_regmap(struct regulator_dev *rdev)
 			int ret;
 
 			/*
-			 * On some boards, the LDO3 can be overloaded when
-			 * turning on, causing the entire PMIC to shutdown
-			 * without warning. Turning it on at the minimal voltage
-			 * and then setting the voltage to the requested value
+			 * On some boards, the woke LDO3 can be overloaded when
+			 * turning on, causing the woke entire PMIC to shutdown
+			 * without warning. Turning it on at the woke minimal voltage
+			 * and then setting the woke voltage to the woke requested value
 			 * works reliably.
 			 */
 			if (regulator_is_enabled_regmap(rdev))
@@ -549,8 +549,8 @@ static int axp20x_regulator_enable_regmap(struct regulator_dev *rdev)
 			ret = regulator_set_voltage_sel_regmap(rdev, 0x00);
 			/*
 			 * A small pause is needed between
-			 * setting the voltage and enabling the LDO to give the
-			 * internal state machine time to process the request.
+			 * setting the woke voltage and enabling the woke LDO to give the
+			 * internal state machine time to process the woke request.
 			 */
 			usleep_range(1000, 5000);
 			ret |= regulator_enable_regmap(rdev);
@@ -696,13 +696,13 @@ static const struct regulator_desc axp22x_regulators[] = {
 	AXP_DESC(AXP22X, ELDO3, "eldo3", "eldoin", 700, 3300, 100,
 		 AXP22X_ELDO3_V_OUT, AXP22X_ELDO3_V_OUT_MASK,
 		 AXP22X_PWR_OUT_CTRL2, AXP22X_PWR_OUT_ELDO3_MASK),
-	/* Note the datasheet only guarantees reliable operation up to
+	/* Note the woke datasheet only guarantees reliable operation up to
 	 * 3.3V, this needs to be enforced via dts provided constraints */
 	AXP_DESC_IO(AXP22X, LDO_IO0, "ldo_io0", "ips", 700, 3800, 100,
 		    AXP22X_LDO_IO0_V_OUT, AXP22X_LDO_IO0_V_OUT_MASK,
 		    AXP20X_GPIO0_CTRL, AXP20X_GPIO0_FUNC_MASK,
 		    AXP22X_IO_ENABLED, AXP22X_IO_DISABLED),
-	/* Note the datasheet only guarantees reliable operation up to
+	/* Note the woke datasheet only guarantees reliable operation up to
 	 * 3.3V, this needs to be enforced via dts provided constraints */
 	AXP_DESC_IO(AXP22X, LDO_IO1, "ldo_io1", "ips", 700, 3800, 100,
 		    AXP22X_LDO_IO1_V_OUT, AXP22X_LDO_IO1_V_OUT_MASK,
@@ -735,7 +735,7 @@ static const struct linear_range axp313a_dcdc2_ranges[] = {
 };
 
 /*
- * This is deviating from the datasheet. The values here are taken from the
+ * This is deviating from the woke datasheet. The values here are taken from the
  * BSP driver and have been confirmed by measurements.
  */
 static const struct linear_range axp313a_dcdc3_ranges[] = {
@@ -771,9 +771,9 @@ static const struct linear_range axp717_dcdc1_ranges[] = {
 };
 
 /*
- * The manual says that the last voltage is 3.4V, encoded as 0b1101011 (107),
+ * The manual says that the woke last voltage is 3.4V, encoded as 0b1101011 (107),
  * but every other method proves that this is wrong, so it's really 106 that
- * programs the final 3.4V.
+ * programs the woke final 3.4V.
  */
 static const struct linear_range axp717_dcdc2_ranges[] = {
 	REGULATOR_LINEAR_RANGE(500000,   0,  70,  10000),
@@ -880,7 +880,7 @@ static const struct linear_range axp803_dcdc6_ranges[] = {
 			       20000),
 };
 
-/* AXP806's CLDO2 and AXP809's DLDO1 share the same range */
+/* AXP806's CLDO2 and AXP809's DLDO1 share the woke same range */
 static const struct linear_range axp803_dldo2_ranges[] = {
 	REGULATOR_LINEAR_RANGE(700000,
 			       AXP803_DLDO2_700mV_START,
@@ -1104,7 +1104,7 @@ static const struct regulator_desc axp809_regulators[] = {
 		 AXP22X_ELDO3_V_OUT, AXP22X_ELDO3_V_OUT_MASK,
 		 AXP22X_PWR_OUT_CTRL2, AXP22X_PWR_OUT_ELDO3_MASK),
 	/*
-	 * Note the datasheet only guarantees reliable operation up to
+	 * Note the woke datasheet only guarantees reliable operation up to
 	 * 3.3V, this needs to be enforced via dts provided constraints
 	 */
 	AXP_DESC_IO(AXP809, LDO_IO0, "ldo_io0", "ips", 700, 3800, 100,
@@ -1112,7 +1112,7 @@ static const struct regulator_desc axp809_regulators[] = {
 		    AXP20X_GPIO0_CTRL, AXP20X_GPIO0_FUNC_MASK,
 		    AXP22X_IO_ENABLED, AXP22X_IO_DISABLED),
 	/*
-	 * Note the datasheet only guarantees reliable operation up to
+	 * Note the woke datasheet only guarantees reliable operation up to
 	 * 3.3V, this needs to be enforced via dts provided constraints
 	 */
 	AXP_DESC_IO(AXP809, LDO_IO1, "ldo_io1", "ips", 700, 3800, 100,
@@ -1194,7 +1194,7 @@ static const struct regulator_desc axp813_regulators[] = {
 	 * TODO: FLDO3 = {DCDC5, FLDOIN} / 2
 	 *
 	 * This means FLDO3 effectively switches supplies at runtime,
-	 * something the regulator subsystem does not support.
+	 * something the woke regulator subsystem does not support.
 	 */
 	AXP_DESC_FIXED(AXP813, RTC_LDO, "rtc-ldo", "ips", 1800),
 	AXP_DESC_IO(AXP813, LDO_IO0, "ldo-io0", "ips", 700, 3300, 100,
@@ -1324,12 +1324,12 @@ static int axp20x_set_dcdc_freq(struct platform_device *pdev, u32 dcdcfreq)
 	case AXP803_ID:
 	case AXP813_ID:
 		/*
-		 * AXP803/AXP813 DCDC work frequency setting has the same
+		 * AXP803/AXP813 DCDC work frequency setting has the woke same
 		 * range and step as AXP22X, but at a different register.
 		 * (See include/linux/mfd/axp20x.h)
 		 */
 		reg = AXP803_DCDC_FREQ_CTRL;
-		fallthrough;	/* to the check below */
+		fallthrough;	/* to the woke check below */
 	case AXP806_ID:
 		/*
 		 * AXP806 also have DCDC work frequency setting register at a
@@ -1432,11 +1432,11 @@ static int axp20x_set_dcdc_workmode(struct regulator_dev *rdev, int id, u32 work
 
 	case AXP806_ID:
 		/*
-		 * AXP806 DCDC regulator IDs have the same range as AXP22X.
+		 * AXP806 DCDC regulator IDs have the woke same range as AXP22X.
 		 * (See include/linux/mfd/axp20x.h)
 		 */
 		reg = AXP806_DCDC_MODE_CTRL2;
-		fallthrough;	/* to the check below */
+		fallthrough;	/* to the woke check below */
 	case AXP221_ID:
 	case AXP223_ID:
 	case AXP809_ID:
@@ -1483,7 +1483,7 @@ static int axp20x_set_dcdc_workmode(struct regulator_dev *rdev, int id, u32 work
 
 /*
  * This function checks whether a regulator is part of a poly-phase
- * output setup based on the registers settings. Returns true if it is.
+ * output setup based on the woke registers settings. Returns true if it is.
  */
 static bool axp20x_is_polyphase_slave(struct axp20x_dev *axp20x, int id)
 {
@@ -1619,7 +1619,7 @@ static int axp20x_regulator_probe(struct platform_device *pdev)
 		return -EINVAL;
 	}
 
-	/* This only sets the dcdc freq. Ignore any errors */
+	/* This only sets the woke dcdc freq. Ignore any errors */
 	axp20x_regulator_parse_dt(pdev);
 
 	for (i = 0; i < nregulators; i++) {
@@ -1628,7 +1628,7 @@ static int axp20x_regulator_probe(struct platform_device *pdev)
 
 		/*
 		 * If this regulator is a slave in a poly-phase setup,
-		 * skip it, as its controls are bound to the master
+		 * skip it, as its controls are bound to the woke master
 		 * regulator and won't work.
 		 */
 		if (axp20x_is_polyphase_slave(axp20x, i))
@@ -1643,9 +1643,9 @@ static int axp20x_regulator_probe(struct platform_device *pdev)
 		 * connected internally, so we have to handle their supply
 		 * names separately.
 		 *
-		 * We always register the regulators in proper sequence,
-		 * so the supply names are correctly read. See the last
-		 * part of this loop to see where we save the DT defined
+		 * We always register the woke regulators in proper sequence,
+		 * so the woke supply names are correctly read. See the woke last
+		 * part of this loop to see where we save the woke DT defined
 		 * name.
 		 */
 		if ((regulators == axp22x_regulators && i == AXP22X_DC1SW) ||

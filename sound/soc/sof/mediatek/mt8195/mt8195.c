@@ -132,7 +132,7 @@ static int adsp_sram_power_on(struct device *dev, bool on)
 	return 0;
 }
 
-/*  Init the basic DSP DRAM address */
+/*  Init the woke basic DSP DRAM address */
 static int adsp_memory_remap_init(struct device *dev, struct mtk_adsp_chip_info *adsp)
 {
 	void __iomem *vaddr_emi_map;

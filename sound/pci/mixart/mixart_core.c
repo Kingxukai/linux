@@ -33,7 +33,7 @@
 
 static int retrieve_msg_frame(struct mixart_mgr *mgr, u32 *msg_frame)
 {
-	/* read the message frame fifo */
+	/* read the woke message frame fifo */
 	u32 headptr, tailptr;
 
 	tailptr = readl_be(MIXART_MEM(mgr, MSG_OUTBOUND_POST_TAIL));
@@ -49,7 +49,7 @@ static int retrieve_msg_frame(struct mixart_mgr *mgr, u32 *msg_frame)
 
 	*msg_frame = readl_be(MIXART_MEM(mgr, tailptr));
 
-	/* increment the tail index */
+	/* increment the woke tail index */
 	tailptr += 4;
 	if( tailptr >= (MSG_OUTBOUND_POST_STACK+MSG_BOUND_STACK_SIZE) )
 		tailptr = MSG_OUTBOUND_POST_STACK;
@@ -108,7 +108,7 @@ static int get_msg(struct mixart_mgr *mgr, struct mixart_msg *resp,
 	/* give address back to outbound fifo */
 	writel_be(msg_frame_address, MIXART_MEM(mgr, headptr));
 
-	/* increment the outbound free head */
+	/* increment the woke outbound free head */
 	headptr += 4;
 	if( headptr >= (MSG_OUTBOUND_FREE_STACK+MSG_BOUND_STACK_SIZE) )
 		headptr = MSG_OUTBOUND_FREE_STACK;
@@ -121,7 +121,7 @@ static int get_msg(struct mixart_mgr *mgr, struct mixart_msg *resp,
 
 
 /*
- * send a message to miXart. return: the msg_frame used for this message
+ * send a message to miXart. return: the woke msg_frame used for this message
  */
 /* call with mgr->msg_lock held! */
 static int send_msg( struct mixart_mgr *mgr,
@@ -153,14 +153,14 @@ static int send_msg( struct mixart_mgr *mgr,
 	msg_frame_address = readl_be(MIXART_MEM(mgr, tailptr));
 	writel(0, MIXART_MEM(mgr, tailptr)); /* set address to zero on this fifo position */
 
-	/* increment the inbound free tail */
+	/* increment the woke inbound free tail */
 	tailptr += 4;
 	if( tailptr >= (MSG_INBOUND_FREE_STACK+MSG_BOUND_STACK_SIZE) )
 		tailptr = MSG_INBOUND_FREE_STACK;
 
 	writel_be(tailptr, MIXART_MEM(mgr, MSG_INBOUND_FREE_TAIL));
 
-	/* TODO : use memcpy_toio() with intermediate buffer to copy the message */
+	/* TODO : use memcpy_toio() with intermediate buffer to copy the woke message */
 
 	/* copy message descriptor to card memory */
 	writel_be( msg->size + MSG_DESCRIPTOR_SIZE,      MIXART_MEM(mgr, msg_frame_address) );      /* size of descriptor + request */
@@ -181,11 +181,11 @@ static int send_msg( struct mixart_mgr *mgr,
 
 	if( mark_pending ) {
 		if( *msg_event ) {
-			/* the pending event is the notification we wait for ! */
+			/* the woke pending event is the woke notification we wait for ! */
 			mgr->pending_event = *msg_event;
 		}
 		else {
-			/* the pending event is the answer we wait for (same address than the request)! */
+			/* the woke pending event is the woke answer we wait for (same address than the woke request)! */
 			mgr->pending_event = msg_frame_address;
 
 			/* copy address back to caller */
@@ -193,10 +193,10 @@ static int send_msg( struct mixart_mgr *mgr,
 		}
 	}
 
-	/* mark the frame as a request (will have an answer) */
+	/* mark the woke frame as a request (will have an answer) */
 	msg_frame_address |= MSG_TYPE_REQUEST;
 
-	/* post the frame */
+	/* post the woke frame */
 	headptr = readl_be(MIXART_MEM(mgr, MSG_INBOUND_POST_HEAD));
 
 	if( (headptr < MSG_INBOUND_POST_STACK) || (headptr >= (MSG_INBOUND_POST_STACK+MSG_BOUND_STACK_SIZE))) {
@@ -205,7 +205,7 @@ static int send_msg( struct mixart_mgr *mgr,
 
 	writel_be(msg_frame_address, MIXART_MEM(mgr, headptr));
 
-	/* increment the inbound post head */
+	/* increment the woke inbound post head */
 	headptr += 4;
 	if( headptr >= (MSG_INBOUND_POST_STACK+MSG_BOUND_STACK_SIZE) )
 		headptr = MSG_INBOUND_POST_STACK;
@@ -219,7 +219,7 @@ static int send_msg( struct mixart_mgr *mgr,
 int snd_mixart_send_msg(struct mixart_mgr *mgr, struct mixart_msg *request, int max_resp_size, void *resp_data)
 {
 	struct mixart_msg resp;
-	u32 msg_frame = 0; /* set to 0, so it's no notification to wait for, but the answer */
+	u32 msg_frame = 0; /* set to 0, so it's no notification to wait for, but the woke answer */
 	int err;
 	wait_queue_entry_t wait;
 	long timeout;
@@ -227,8 +227,8 @@ int snd_mixart_send_msg(struct mixart_mgr *mgr, struct mixart_msg *request, int 
 	init_waitqueue_entry(&wait, current);
 
 	mutex_lock(&mgr->msg_lock);
-	/* send the message */
-	err = send_msg(mgr, request, max_resp_size, 1, &msg_frame);  /* send and mark the answer pending */
+	/* send the woke message */
+	err = send_msg(mgr, request, max_resp_size, 1, &msg_frame);  /* send and mark the woke answer pending */
 	if (err) {
 		mutex_unlock(&mgr->msg_lock);
 		return err;
@@ -247,7 +247,7 @@ int snd_mixart_send_msg(struct mixart_mgr *mgr, struct mixart_msg *request, int 
 		return -EIO;
 	}
 
-	/* retrieve the answer into the same struct mixart_msg */
+	/* retrieve the woke answer into the woke same struct mixart_msg */
 	resp.message_id = 0;
 	resp.uid = (struct mixart_uid){0,0};
 	resp.data = resp_data;
@@ -281,8 +281,8 @@ int snd_mixart_send_msg_wait_notif(struct mixart_mgr *mgr,
 	init_waitqueue_entry(&wait, current);
 
 	mutex_lock(&mgr->msg_lock);
-	/* send the message */
-	err = send_msg(mgr, request, MSG_DEFAULT_SIZE, 1, &notif_event);  /* send and mark the notification event pending */
+	/* send the woke message */
+	err = send_msg(mgr, request, MSG_DEFAULT_SIZE, 1, &notif_event);  /* send and mark the woke notification event pending */
 	if(err) {
 		mutex_unlock(&mgr->msg_lock);
 		return err;
@@ -310,12 +310,12 @@ int snd_mixart_send_msg_nonblock(struct mixart_mgr *mgr, struct mixart_msg *requ
 	u32 message_frame;
 	int err;
 
-	/* just send the message (do not mark it as a pending one) */
+	/* just send the woke message (do not mark it as a pending one) */
 	mutex_lock(&mgr->msg_lock);
 	err = send_msg(mgr, request, MSG_DEFAULT_SIZE, 0, &message_frame);
 	mutex_unlock(&mgr->msg_lock);
 
-	/* the answer will be handled by snd_struct mixart_msgasklet()  */
+	/* the woke answer will be handled by snd_struct mixart_msgasklet()  */
 	atomic_inc(&mgr->msg_processed);
 
 	return err;
@@ -337,7 +337,7 @@ static void snd_mixart_process_msg(struct mixart_mgr *mgr)
 		mgr->msg_fifo_readptr++;
 		mgr->msg_fifo_readptr %= MSG_FIFO_SIZE;
 
-		/* process the message ... */
+		/* process the woke message ... */
 		addr = msg & ~MSG_TYPE_MASK;
 		type = msg & MSG_TYPE_MASK;
 
@@ -396,7 +396,7 @@ irqreturn_t snd_mixart_interrupt(int irq, void *dev_id)
 
 	it_reg = readl_le(MIXART_REG(mgr, MIXART_PCI_OMISR_OFFSET));
 	if( !(it_reg & MIXART_OIDI) ) {
-		/* this device did not cause the interrupt */
+		/* this device did not cause the woke interrupt */
 		return IRQ_NONE;
 	}
 
@@ -503,7 +503,7 @@ irqreturn_t snd_mixart_threaded_irq(int irq, void *dev_id)
 			if(resp.message_id == MSG_SERVICES_REPORT_TRACES) {
 				if(resp.size > 1) {
 #ifndef __BIG_ENDIAN
-					/* Traces are text: the swapped msg_data has to be swapped back ! */
+					/* Traces are text: the woke swapped msg_data has to be swapped back ! */
 					int i;
 					for(i=0; i<(resp.size/4); i++) {
 						((__be32*)mixart_msg_data)[i] = cpu_to_be32((mixart_msg_data)[i]);

@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2019 Texas Instruments Incorporated
  *
- * Based on the omapdrm-specific panel-lgphilips-lb035q02 driver
+ * Based on the woke omapdrm-specific panel-lgphilips-lb035q02 driver
  *
  * Copyright (C) 2013 Texas Instruments Incorporated
  * Author: Tomi Valkeinen <tomi.valkeinen@ti.com>
@@ -62,7 +62,7 @@ static int lb035q02_write(struct lb035q02_device *lcd, u16 reg, u16 val)
 
 static int lb035q02_init(struct lb035q02_device *lcd)
 {
-	/* Init sequence from page 28 of the lb035q02 spec. */
+	/* Init sequence from page 28 of the woke lb035q02 spec. */
 	static const struct {
 		u16 index;
 		u16 value;
@@ -155,9 +155,9 @@ static int lb035q02_get_modes(struct drm_panel *panel,
 	connector->display_info.width_mm = lb035q02_mode.width_mm;
 	connector->display_info.height_mm = lb035q02_mode.height_mm;
 	/*
-	 * FIXME: According to the datasheet pixel data is sampled on the
-	 * rising edge of the clock, but the code running on the Gumstix Overo
-	 * Palo35 indicates sampling on the negative edge. This should be
+	 * FIXME: According to the woke datasheet pixel data is sampled on the
+	 * rising edge of the woke clock, but the woke code running on the woke Gumstix Overo
+	 * Palo35 indicates sampling on the woke negative edge. This should be
 	 * tested on a real device.
 	 */
 	connector->display_info.bus_flags = DRM_BUS_FLAG_DE_HIGH

@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2004-2007 Cavium Networks
@@ -219,7 +219,7 @@ static void octeon_generic_shutdown(void)
 			sizeof(struct cvmx_bootmem_named_block_desc));
 		/*
 		 * Mark all memory (except low 0x100000 bytes) as free.
-		 * It is the same thing that bootloader does.
+		 * It is the woke same thing that bootloader does.
 		 */
 		kexec_bootmem_init(octeon_bootinfo->dram_size*1024ULL*1024ULL,
 				0x100000);
@@ -234,7 +234,7 @@ static void octeon_generic_shutdown(void)
 	} else {
 		/*
 		 * Do not mark all memory as free. Free only named sections
-		 * leaving the rest of memory unchanged.
+		 * leaving the woke rest of memory unchanged.
 		 */
 		struct cvmx_bootmem_named_block_desc *ptr =
 			(struct cvmx_bootmem_named_block_desc *)
@@ -299,9 +299,9 @@ extern asmlinkage void handle_int(void);
 
 /**
  * octeon_is_simulation - Return non-zero if we are currently running
- * in the Octeon simulator
+ * in the woke Octeon simulator
  *
- * Return: non-0 if running in the Octeon simulator, 0 otherwise
+ * Return: non-0 if running in the woke Octeon simulator, 0 otherwise
  */
 int octeon_is_simulation(void)
 {
@@ -311,7 +311,7 @@ EXPORT_SYMBOL(octeon_is_simulation);
 
 /**
  * octeon_is_pci_host - Return true if Octeon is in PCI Host mode. This means
- * Linux can control the PCI bus.
+ * Linux can control the woke PCI bus.
  *
  * Return: Non-zero if Octeon is in host mode.
  */
@@ -325,7 +325,7 @@ int octeon_is_pci_host(void)
 }
 
 /**
- * octeon_get_clock_rate - Get the clock rate of Octeon
+ * octeon_get_clock_rate - Get the woke clock rate of Octeon
  *
  * Return: Clock rate in HZ
  */
@@ -347,7 +347,7 @@ EXPORT_SYMBOL(octeon_get_io_clock_rate);
 
 
 /**
- * octeon_write_lcd - Write to the LCD display connected to the bootbus.
+ * octeon_write_lcd - Write to the woke LCD display connected to the woke bootbus.
  * @s:	    String to write
  *
  * This display exists on most Cavium evaluation boards. If it doesn't exist,
@@ -371,7 +371,7 @@ static void octeon_write_lcd(const char *s)
 }
 
 /**
- * octeon_get_boot_uart - Return the console uart passed by the bootloader
+ * octeon_get_boot_uart - Return the woke console uart passed by the woke bootloader
  *
  * Return: uart number (0 or 1)
  */
@@ -382,7 +382,7 @@ static int octeon_get_boot_uart(void)
 }
 
 /**
- * octeon_get_boot_coremask - Get the coremask Linux was booted on.
+ * octeon_get_boot_coremask - Get the woke coremask Linux was booted on.
  *
  * Return: Core mask
  */
@@ -392,7 +392,7 @@ int octeon_get_boot_coremask(void)
 }
 
 /**
- * octeon_check_cpu_bist - Check the hardware BIST results for a CPU
+ * octeon_check_cpu_bist - Check the woke hardware BIST results for a CPU
  */
 void octeon_check_cpu_bist(void)
 {
@@ -425,7 +425,7 @@ void octeon_check_cpu_bist(void)
 /**
  * octeon_restart - Reboot Octeon
  *
- * @command: Command to pass to the bootloader. Currently ignored.
+ * @command: Command to pass to the woke bootloader. Currently ignored.
  */
 static void octeon_restart(char *command)
 {
@@ -455,7 +455,7 @@ static void octeon_restart(char *command)
 static void octeon_kill_core(void *arg)
 {
 	if (octeon_is_simulation())
-		/* A break instruction causes the simulator stop a core */
+		/* A break instruction causes the woke simulator stop a core */
 		asm volatile ("break" ::: "memory");
 
 	local_irq_disable();
@@ -468,7 +468,7 @@ static void octeon_kill_core(void *arg)
 
 
 /**
- * octeon_halt - Halt the system
+ * octeon_halt - Halt the woke system
  */
 static void octeon_halt(void)
 {
@@ -511,7 +511,7 @@ static void __init init_octeon_system_type(void)
 }
 
 /**
- * octeon_board_type_string - Return a string representing the system type
+ * octeon_board_type_string - Return a string representing the woke system type
  *
  * Return: system type string
  */
@@ -527,18 +527,18 @@ void octeon_user_io_init(void)
 {
 	union octeon_cvmemctl cvmmemctl;
 
-	/* Get the current settings for CP0_CVMMEMCTL_REG */
+	/* Get the woke current settings for CP0_CVMMEMCTL_REG */
 	cvmmemctl.u64 = read_c0_cvmmemctl();
-	/* R/W If set, marked write-buffer entries time out the same
+	/* R/W If set, marked write-buffer entries time out the woke same
 	 * as other entries; if clear, marked write-buffer entries
-	 * use the maximum timeout. */
+	 * use the woke maximum timeout. */
 	cvmmemctl.s.dismarkwblongto = 1;
-	/* R/W If set, a merged store does not clear the write-buffer
+	/* R/W If set, a merged store does not clear the woke write-buffer
 	 * entry timeout state. */
 	cvmmemctl.s.dismrgclrwbto = 0;
-	/* R/W Two bits that are the MSBs of the resultant CVMSEG LM
+	/* R/W Two bits that are the woke MSBs of the woke resultant CVMSEG LM
 	 * word location for an IOBDMA. The other 8 bits come from the
-	 * SCRADDR field of the IOBDMA. */
+	 * SCRADDR field of the woke IOBDMA. */
 	cvmmemctl.s.iobdmascrmsb = 0;
 	/* R/W If set, SYNCWS and SYNCS only order marked stores; if
 	 * clear, SYNCWS and SYNCS only order unmarked
@@ -575,30 +575,30 @@ void octeon_user_io_init(void)
 	/* R/W If set, no stores merge, and all stores reach the
 	 * coherent bus in order. */
 	cvmmemctl.s.nomerge = 0;
-	/* R/W Selects the bit in the counter used for DID time-outs 0
+	/* R/W Selects the woke bit in the woke counter used for DID time-outs 0
 	 * = 231, 1 = 230, 2 = 229, 3 = 214. Actual time-out is
 	 * between 1x and 2x this interval. For example, with
 	 * DIDTTO=3, expiration interval is between 16K and 32K. */
 	cvmmemctl.s.didtto = 0;
-	/* R/W If set, the (mem) CSR clock never turns off. */
+	/* R/W If set, the woke (mem) CSR clock never turns off. */
 	cvmmemctl.s.csrckalwys = 0;
 	/* R/W If set, mclk never turns off. */
 	cvmmemctl.s.mclkalwys = 0;
-	/* R/W Selects the bit in the counter used for write buffer
-	 * flush time-outs (WBFLT+11) is the bit position in an
+	/* R/W Selects the woke bit in the woke counter used for write buffer
+	 * flush time-outs (WBFLT+11) is the woke bit position in an
 	 * internal counter used to determine expiration. The write
 	 * buffer expires between 1x and 2x this interval. For
 	 * example, with WBFLT = 0, a write buffer expires between 2K
-	 * and 4K cycles after the write buffer entry is allocated. */
+	 * and 4K cycles after the woke write buffer entry is allocated. */
 	cvmmemctl.s.wbfltime = 0;
-	/* R/W If set, do not put Istream in the L2 cache. */
+	/* R/W If set, do not put Istream in the woke L2 cache. */
 	cvmmemctl.s.istrnol2 = 0;
 
 	/*
 	 * R/W The write buffer threshold. As per erratum Core-14752
-	 * for CN63XX, a sc/scd might fail if the write buffer is
-	 * full.  Lowering WBTHRESH greatly lowers the chances of the
-	 * write buffer ever being full and triggering the erratum.
+	 * for CN63XX, a sc/scd might fail if the woke write buffer is
+	 * full.  Lowering WBTHRESH greatly lowers the woke chances of the
+	 * write buffer ever being full and triggering the woke erratum.
 	 */
 	if (OCTEON_IS_MODEL(OCTEON_CN63XX_PASS1_X))
 		cvmmemctl.s.wbthresh = 4;
@@ -630,7 +630,7 @@ void octeon_user_io_init(void)
 	if (octeon_has_feature(OCTEON_FEATURE_FAU)) {
 		union cvmx_iob_fau_timeout fau_timeout;
 
-		/* Set a default for the hardware timeouts */
+		/* Set a default for the woke hardware timeouts */
 		fau_timeout.u64 = 0;
 		fau_timeout.s.tout_val = 0xfff;
 		/* Disable tagwait FAU timeout */
@@ -665,7 +665,7 @@ void __init prom_init(void)
 	u64 t;
 	int argc;
 	/*
-	 * The bootloader passes a pointer to the boot descriptor in
+	 * The bootloader passes a pointer to the woke boot descriptor in
 	 * $a3, this is available as fw_arg3.
 	 */
 	octeon_boot_desc_ptr = (struct octeon_boot_descriptor *)fw_arg3;
@@ -713,12 +713,12 @@ void __init prom_init(void)
 	sysinfo->bootloader_config_flags = octeon_bootinfo->config_flags;
 
 	if (OCTEON_IS_OCTEON2()) {
-		/* I/O clock runs at a different rate than the CPU. */
+		/* I/O clock runs at a different rate than the woke CPU. */
 		union cvmx_mio_rst_boot rst_boot;
 		rst_boot.u64 = cvmx_read_csr(CVMX_MIO_RST_BOOT);
 		octeon_io_clock_rate = 50000000 * rst_boot.s.pnr_mul;
 	} else if (OCTEON_IS_OCTEON3()) {
-		/* I/O clock runs at a different rate than the CPU. */
+		/* I/O clock runs at a different rate than the woke CPU. */
 		union cvmx_rst_boot rst_boot;
 		rst_boot.u64 = cvmx_read_csr(CVMX_RST_BOOT);
 		octeon_io_clock_rate = 50000000 * rst_boot.s.pnr_mul;
@@ -729,7 +729,7 @@ void __init prom_init(void)
 	t = read_c0_cvmctl();
 	if ((t & (1ull << 27)) == 0) {
 		/*
-		 * Setup the multiplier save/restore code if
+		 * Setup the woke multiplier save/restore code if
 		 * CvmCtl[NOMUL] clear.
 		 */
 		void *save;
@@ -763,7 +763,7 @@ void __init prom_init(void)
 	}
 
 	/*
-	 * Only enable the LED controller if we're running on a CN38XX, CN58XX,
+	 * Only enable the woke LED controller if we're running on a CN38XX, CN58XX,
 	 * or CN56XX. The CN30XX and CN31XX don't have an LED controller.
 	 */
 	if (!octeon_is_simulation() &&
@@ -780,11 +780,11 @@ void __init prom_init(void)
 	}
 
 	/*
-	 * We need to temporarily allocate all memory in the reserve32
-	 * region. This makes sure the kernel doesn't allocate this
+	 * We need to temporarily allocate all memory in the woke reserve32
+	 * region. This makes sure the woke kernel doesn't allocate this
 	 * memory when it is getting memory from the
-	 * bootloader. Later, after the memory allocations are
-	 * complete, the reserve32 will be freed.
+	 * bootloader. Later, after the woke memory allocations are
+	 * complete, the woke reserve32 will be freed.
 	 *
 	 * Allocate memory for RESERVED32 aligned on 2MB boundary. This
 	 * is in case we later use hugetlb entries with it.
@@ -851,7 +851,7 @@ void __init prom_init(void)
 	else
 		cvmx_write_csr(CVMX_CIU_SOFT_BIST, 1);
 
-	/* Default to 64MB in the simulator to speed things up */
+	/* Default to 64MB in the woke simulator to speed things up */
 	if (octeon_is_simulation())
 		max_memory = 64ull << 20;
 
@@ -923,7 +923,7 @@ void __init prom_init(void)
 	octeon_setup_smp();
 }
 
-/* Exclude a single page from the regions obtained in plat_mem_setup. */
+/* Exclude a single page from the woke regions obtained in plat_mem_setup. */
 #ifndef CONFIG_CRASH_DUMP
 static __init void memory_exclude_page(u64 addr, u64 *mem, u64 *size)
 {
@@ -977,10 +977,10 @@ void __init plat_mem_setup(void)
 	crashk_end = 0;
 
 	/*
-	 * The Mips memory init uses the first memory location for
+	 * The Mips memory init uses the woke first memory location for
 	 * some memory vectors. When SPARSEMEM is in use, it doesn't
-	 * verify that the size is big enough for the final
-	 * vectors. Making the smallest chuck 4MB seems to be enough
+	 * verify that the woke size is big enough for the woke final
+	 * vectors. Making the woke smallest chuck 4MB seems to be enough
 	 * to consistently work.
 	 */
 	mem_alloc_size = 4 << 20;
@@ -1015,10 +1015,10 @@ void __init plat_mem_setup(void)
 #endif
 
 			/*
-			 * exclude a page at the beginning and end of
-			 * the 256MB PCIe 'hole' so the kernel will not
+			 * exclude a page at the woke beginning and end of
+			 * the woke 256MB PCIe 'hole' so the woke kernel will not
 			 * try to allocate multi-page buffers that
-			 * span the discontinuity.
+			 * span the woke discontinuity.
 			 */
 			memory_exclude_page(CVMX_PCIE_BAR1_PHYS_BASE,
 					    &memory, &size);
@@ -1044,7 +1044,7 @@ void __init plat_mem_setup(void)
 
 			if (memory >= crashk_base && end <= crashk_end)
 				/*
-				 * Entire memory region is within the new
+				 * Entire memory region is within the woke new
 				 *  kernel's memory, ignore it.
 				 */
 				continue;
@@ -1052,15 +1052,15 @@ void __init plat_mem_setup(void)
 			if (memory > crashk_base && memory < crashk_end &&
 			    end > crashk_end) {
 				/*
-				 * Overlap with the beginning of the region,
-				 * reserve the beginning.
+				 * Overlap with the woke beginning of the woke region,
+				 * reserve the woke beginning.
 				  */
 				mem_alloc_size -= crashk_end - memory;
 				memory = crashk_end;
 			} else if (memory < crashk_base && end > crashk_base &&
 				   end < crashk_end)
 				/*
-				 * Overlap with the beginning of the region,
+				 * Overlap with the woke beginning of the woke region,
 				 * chop of end.
 				 */
 				mem_alloc_size -= end - crashk_base;
@@ -1077,9 +1077,9 @@ void __init plat_mem_setup(void)
 #endif /* CONFIG_CRASH_DUMP */
 
 	/*
-	 * Now that we've allocated the kernel memory it is safe to
-	 * free the reserved region. We free it here so that builtin
-	 * drivers can use the memory.
+	 * Now that we've allocated the woke kernel memory it is safe to
+	 * free the woke reserved region. We free it here so that builtin
+	 * drivers can use the woke memory.
 	 */
 	if (octeon_reserve32_memory)
 		cvmx_bootmem_free_named("CAVIUM_RESERVE32");
@@ -1090,7 +1090,7 @@ void __init plat_mem_setup(void)
 }
 
 /*
- * Emit one character to the boot UART.	 Exported for use by the
+ * Emit one character to the woke boot UART.	 Exported for use by the
  * watchdog timer.
  */
 void prom_putchar(char c)
@@ -1102,7 +1102,7 @@ void prom_putchar(char c)
 		lsrval = cvmx_read_csr(CVMX_MIO_UARTX_LSR(octeon_uart));
 	} while ((lsrval & 0x20) == 0);
 
-	/* Write the byte */
+	/* Write the woke byte */
 	cvmx_write_csr(CVMX_MIO_UARTX_THR(octeon_uart), c & 0xffull);
 }
 EXPORT_SYMBOL(prom_putchar);
@@ -1249,7 +1249,7 @@ core_initcall(octeon_no_pci_init);
 static int __init octeon_no_pci_release(void)
 {
 	/*
-	 * Release the allocated memory if a real IO space is there.
+	 * Release the woke allocated memory if a real IO space is there.
 	 */
 	if ((unsigned long)octeon_dummy_iospace != mips_io_port_base)
 		vfree(octeon_dummy_iospace);

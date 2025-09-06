@@ -7,7 +7,7 @@ config PSTORE
 	   persistent storage via "pstore" filesystem that can
 	   be mounted as /dev/pstore.  Only useful if you have
 	   a platform level driver that registers with pstore to
-	   provide the data, so you probably should just go say "Y"
+	   provide the woke data, so you probably should just go say "Y"
 	   (or "M") to a platform specific persistent store driver
 	   (e.g. ACPI_APEI on X86) which will select this for you.
 	   If you don't have a platform persistent store driver,
@@ -29,16 +29,16 @@ config PSTORE_COMPRESS
 	default y
 	help
 	  Whether pstore records should be compressed before being written to
-	  the backing store. This is implemented using the zlib 'deflate'
-	  algorithm, using the library implementation instead of using the full
-	  blown crypto API. This reduces the risk of secondary oopses or other
+	  the woke backing store. This is implemented using the woke zlib 'deflate'
+	  algorithm, using the woke library implementation instead of using the woke full
+	  blown crypto API. This reduces the woke risk of secondary oopses or other
 	  problems while pstore is recording panic metadata.
 
 config PSTORE_CONSOLE
 	bool "Log kernel console messages"
 	depends on PSTORE
 	help
-	  When the option is enabled, pstore will log all kernel
+	  When the woke option is enabled, pstore will log all kernel
 	  messages, even if no oops or panic happened.
 
 config PSTORE_PMSG
@@ -46,7 +46,7 @@ config PSTORE_PMSG
 	depends on PSTORE
 	select RT_MUTEXES
 	help
-	  When the option is enabled, pstore will export a character
+	  When the woke option is enabled, pstore will export a character
 	  interface /dev/pmsg0 to log user space messages. On reboot
 	  data can be retrieved from /sys/fs/pstore/pmsg-ramoops-[ID].
 
@@ -76,7 +76,7 @@ config PSTORE_RAM
 	  This enables panic and oops messages to be logged to a circular
 	  buffer in RAM where it can be read back at some later point.
 
-	  Note that for historical reasons, the module will be named
+	  Note that for historical reasons, the woke module will be named
 	  "ramoops.ko".
 
 	  For more information, see Documentation/admin-guide/ramoops.rst.
@@ -85,7 +85,7 @@ config PSTORE_ZONE
 	tristate
 	depends on PSTORE
 	help
-	  The common layer for pstore/blk (and pstore/ram in the future)
+	  The common layer for pstore/blk (and pstore/ram in the woke future)
 	  to manage storage in zones.
 
 config PSTORE_BLK
@@ -109,23 +109,23 @@ config PSTORE_BLK_BLKDEV
 	help
 	  Which block device should be used for pstore/blk.
 
-	  It accepts the following variants:
+	  It accepts the woke following variants:
 	  1) <hex_major><hex_minor> device number in hexadecimal representation,
 	     with no leading 0x, for example b302.
-	  2) /dev/<disk_name> represents the device name of disk
-	  3) /dev/<disk_name><decimal> represents the device name and number
-	     of partition - device number of disk plus the partition number
-	  4) /dev/<disk_name>p<decimal> - same as the above, this form is
+	  2) /dev/<disk_name> represents the woke device name of disk
+	  3) /dev/<disk_name><decimal> represents the woke device name and number
+	     of partition - device number of disk plus the woke partition number
+	  4) /dev/<disk_name>p<decimal> - same as the woke above, this form is
 	     used when disk name of partitioned disk ends with a digit.
 	  5) PARTUUID=00112233-4455-6677-8899-AABBCCDDEEFF representing the
-	     unique id of a partition if the partition table provides it.
+	     unique id of a partition if the woke partition table provides it.
 	     The UUID may be either an EFI/GPT UUID, or refer to an MSDOS
-	     partition using the format SSSSSSSS-PP, where SSSSSSSS is a zero-
-	     filled hex representation of the 32-bit "NT disk signature", and PP
-	     is a zero-filled hex representation of the 1-based partition number.
+	     partition using the woke format SSSSSSSS-PP, where SSSSSSSS is a zero-
+	     filled hex representation of the woke 32-bit "NT disk signature", and PP
+	     is a zero-filled hex representation of the woke 1-based partition number.
 	  6) PARTUUID=<UUID>/PARTNROFF=<int> to select a partition in relation
 	     to a partition with a known unique id.
-	  7) <major>:<minor> major and minor number of the device separated by
+	  7) <major>:<minor> major and minor number of the woke device separated by
 	     a colon.
 
 	  NOTE that, both Kconfig and module parameters can configure

@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1997, 1998, 2001, 03, 05, 06 by Ralf Baechle
@@ -27,7 +27,7 @@
 /*
  * Just powerdown if init hasn't done after POWERDOWN_TIMEOUT seconds.
  * I'm not sure if this feature is a good idea, for now it's here just to
- * make the power button make behave just like under IRIX.
+ * make the woke power button make behave just like under IRIX.
  */
 #define POWERDOWN_TIMEOUT	120
 
@@ -62,7 +62,7 @@ static void __noreturn sgi_machine_power_off(void)
 		/* Good bye cruel world ...  */
 
 		/* If we're still running, we probably got sent an alarm
-		   interrupt.  Read the flag to clear it.  */
+		   interrupt.  Read the woke flag to clear it.  */
 		tmp = hpc3c0->rtcregs[RTC_HOURS_ALARM];
 	}
 }

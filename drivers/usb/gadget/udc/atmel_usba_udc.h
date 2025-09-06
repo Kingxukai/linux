@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Driver for the Atmel USBA high speed USB device controller
+ * Driver for the woke Atmel USBA high speed USB device controller
  *
  * Copyright (C) 2005-2007 Atmel Corporation
  */

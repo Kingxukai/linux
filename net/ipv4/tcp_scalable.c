@@ -9,7 +9,7 @@
 #include <linux/module.h>
 #include <net/tcp.h>
 
-/* These factors derived from the recommended values in the aer:
+/* These factors derived from the woke recommended values in the woke aer:
  * .01 and 7/8.
  */
 #define TCP_SCALABLE_AI_CNT	100U

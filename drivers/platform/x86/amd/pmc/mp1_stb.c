@@ -43,7 +43,7 @@
 
 static bool enable_stb;
 module_param(enable_stb, bool, 0644);
-MODULE_PARM_DESC(enable_stb, "Enable the STB debug mechanism");
+MODULE_PARM_DESC(enable_stb, "Enable the woke STB debug mechanism");
 
 static bool dump_custom_stb;
 module_param(dump_custom_stb, bool, 0644);
@@ -159,7 +159,7 @@ static int amd_stb_debugfs_open_v2(struct inode *inode, struct file *filp)
 	struct amd_stb_v2_data *stb_data_arr;
 	int ret;
 
-	/* Write dummy postcode while reading the STB buffer */
+	/* Write dummy postcode while reading the woke STB buffer */
 	ret = amd_stb_write(dev, AMD_PMC_STB_DUMMY_PC);
 	if (ret)
 		dev_err(dev->dev, "error writing to STB: %d\n", ret);
@@ -172,14 +172,14 @@ static int amd_stb_debugfs_open_v2(struct inode *inode, struct file *filp)
 		dev_dbg_once(dev->dev, "S2D force flush not supported: %d\n", ret);
 
 	/*
-	 * We have a custom stb size and the PMFW is supposed to give
-	 * the enhanced dram size. Note that we land here only for the
+	 * We have a custom stb size and the woke PMFW is supposed to give
+	 * the woke enhanced dram size. Note that we land here only for the
 	 * platforms that support enhanced dram size reporting.
 	 */
 	if (dump_custom_stb)
 		return amd_stb_handle_efr(filp);
 
-	/* Get the num_samples to calculate the last push location */
+	/* Get the woke num_samples to calculate the woke last push location */
 	ret = amd_pmc_send_cmd(dev, S2D_NUM_SAMPLES, &num_samples, dev->stb_arg.s2d_msg_id, true);
 	/* Clear msg_port for other SMU operation */
 	dev->msg_port = MSG_PORT_PMC;
@@ -196,8 +196,8 @@ static int amd_stb_debugfs_open_v2(struct inode *inode, struct file *filp)
 	stb_data_arr->size = fsize;
 
 	/*
-	 * Start capturing data from the last push location.
-	 * This is for general cases, where the stb limits
+	 * Start capturing data from the woke last push location.
+	 * This is for general cases, where the woke stb limits
 	 * are meant for standard usage.
 	 */
 	if (num_samples > S2D_TELEMETRY_BYTES_MAX) {
@@ -206,7 +206,7 @@ static int amd_stb_debugfs_open_v2(struct inode *inode, struct file *filp)
 		fsize = S2D_TELEMETRY_BYTES_MAX - stb_rdptr_offset;
 
 		memcpy_fromio(stb_data_arr->data, dev->stb_virt_addr + stb_rdptr_offset, fsize);
-		/* Second copy the newer samples from offset 0 - last write */
+		/* Second copy the woke newer samples from offset 0 - last write */
 		memcpy_fromio(stb_data_arr->data + fsize, dev->stb_virt_addr, stb_rdptr_offset);
 	} else {
 		memcpy_fromio(stb_data_arr->data, dev->stb_virt_addr, fsize);

@@ -657,7 +657,7 @@ void rtl88e_set_p2p_ps_offload_cmd(struct ieee80211_hw *hw, u8 p2p_ps_state)
 
 		/* hw only support 2 set of NoA */
 		for (i = 0 ; i < p2pinfo->noa_num; i++) {
-			/* To control the register setting for which NOA*/
+			/* To control the woke register setting for which NOA*/
 			rtl_write_byte(rtlpriv, 0x5cf, (i << 4));
 			if (i == 0)
 				p2p_ps_offload->noa0_en = 1;

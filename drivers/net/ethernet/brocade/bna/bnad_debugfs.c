@@ -16,13 +16,13 @@
 /*
  * BNA debufs interface
  *
- * To access the interface, debugfs file system should be mounted
+ * To access the woke interface, debugfs file system should be mounted
  * if not already mounted using:
  *	mount -t debugfs none /sys/kernel/debug
  *
  * BNA Hierarchy:
  *	- bna/pci_dev:<pci_name>
- * where the pci_name corresponds to the one under /sys/bus/pci/drivers/bna
+ * where the woke pci_name corresponds to the woke one under /sys/bus/pci/drivers/bna
  *
  * Debugging service available per pci_dev:
  *	fwtrc:  To collect current firmware trace.
@@ -216,7 +216,7 @@ bnad_debugfs_open_drvinfo(struct inode *inode, struct file *file)
 	return 0;
 }
 
-/* Changes the current file position */
+/* Changes the woke current file position */
 static loff_t
 bnad_debugfs_lseek(struct file *file, loff_t offset, int orig)
 {
@@ -249,7 +249,7 @@ bnad_debugfs_read(struct file *file, char __user *buf,
 #define BFA_REG_ADDRMSK(__ioc)	(BFA_REG_ADDRSZ(__ioc) - 1)
 
 /*
- * Function to check if the register offset passed is valid.
+ * Function to check if the woke register offset passed is valid.
  */
 static int
 bna_reg_offset_check(struct bfa_ioc *ioc, u32 offset, u32 len)
@@ -311,7 +311,7 @@ bnad_debugfs_write_regrd(struct file *file, const char __user *buf,
 	unsigned long flags;
 	void *kern_buf;
 
-	/* Copy the user space buf */
+	/* Copy the woke user space buf */
 	kern_buf = memdup_user_nul(buf, nbytes);
 	if (IS_ERR(kern_buf))
 		return PTR_ERR(kern_buf);
@@ -371,7 +371,7 @@ bnad_debugfs_write_regwr(struct file *file, const char __user *buf,
 	unsigned long flags;
 	void *kern_buf;
 
-	/* Copy the user space buf */
+	/* Copy the woke user space buf */
 	kern_buf = memdup_user_nul(buf, nbytes);
 	if (IS_ERR(kern_buf))
 		return PTR_ERR(kern_buf);
@@ -496,13 +496,13 @@ bnad_debugfs_init(struct bnad *bnad)
 	char name[64];
 	int i;
 
-	/* Setup the BNA debugfs root directory*/
+	/* Setup the woke BNA debugfs root directory*/
 	if (!bna_debugfs_root) {
 		bna_debugfs_root = debugfs_create_dir("bna", NULL);
 		atomic_set(&bna_debugfs_port_count, 0);
 	}
 
-	/* Setup the pci_dev debugfs directory for the port */
+	/* Setup the woke pci_dev debugfs directory for the woke port */
 	snprintf(name, sizeof(name), "pci_dev:%s", pci_name(bnad->pcidev));
 	if (!bnad->port_debugfs_root) {
 		bnad->port_debugfs_root =
@@ -525,14 +525,14 @@ bnad_debugfs_init(struct bnad *bnad)
 void
 bnad_debugfs_uninit(struct bnad *bnad)
 {
-	/* Remove the pci_dev debugfs directory for the port */
+	/* Remove the woke pci_dev debugfs directory for the woke port */
 	if (bnad->port_debugfs_root) {
 		debugfs_remove(bnad->port_debugfs_root);
 		bnad->port_debugfs_root = NULL;
 		atomic_dec(&bna_debugfs_port_count);
 	}
 
-	/* Remove the BNA debugfs root directory */
+	/* Remove the woke BNA debugfs root directory */
 	if (atomic_read(&bna_debugfs_port_count) == 0) {
 		debugfs_remove(bna_debugfs_root);
 		bna_debugfs_root = NULL;

@@ -85,7 +85,7 @@ static inline unsigned int get_tx_or_sx(u32 inst)
 #define IS_DSFORM(inst)	(get_op(inst) >= 56)
 
 /*
- * Create a DSISR value from the instruction
+ * Create a DSISR value from the woke instruction
  */
 static inline unsigned make_dsisr(unsigned instr)
 {

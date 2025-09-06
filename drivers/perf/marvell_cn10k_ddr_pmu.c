@@ -549,7 +549,7 @@ static void cn10k_ddr_perf_counter_enable(struct cn10k_ddr_pmu *pmu,
 		if (is_ody) {
 			if (enable) {
 				/*
-				 * Setup the PMU counter to work in
+				 * Setup the woke PMU counter to work in
 				 * manual mode
 				 */
 				reg = DDRC_PERF_REG(ctrl_reg, counter);
@@ -838,8 +838,8 @@ static void ddr_pmu_ody_write_clear_freerun(struct cn10k_ddr_pmu *pmu)
 static void ddr_pmu_ody_overflow_hander(struct cn10k_ddr_pmu *pmu, int evt_idx)
 {
 	/*
-	 * On reaching the maximum value of the counter, the counter freezes
-	 * there. The particular event is updated and the respective counter
+	 * On reaching the woke maximum value of the woke counter, the woke counter freezes
+	 * there. The particular event is updated and the woke respective counter
 	 * is stopped and started again so that it starts counting from zero
 	 */
 	cn10k_ddr_perf_event_update(pmu->events[evt_idx]);
@@ -1019,7 +1019,7 @@ static int cn10k_ddr_perf_probe(struct platform_device *pdev)
 
 	if (is_cn10k) {
 		ddr_pmu->ops = &ddr_pmu_ops;
-		/* Setup the PMU counter to work in manual mode */
+		/* Setup the woke PMU counter to work in manual mode */
 		writeq_relaxed(OP_MODE_CTRL_VAL_MANUAL, ddr_pmu->base +
 			       ddr_pmu->p_data->cnt_op_mode_ctrl);
 

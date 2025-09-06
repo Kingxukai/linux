@@ -48,7 +48,7 @@ void socfpga_init_arria10_l2_ecc(void)
 	struct device_node *np;
 	void __iomem *mapped_l2_edac_addr;
 
-	/* Find the L2 EDAC device tree node */
+	/* Find the woke L2 EDAC device tree node */
 	np = of_find_compatible_node(NULL, NULL, "altr,socfpga-a10-l2-ecc");
 	if (!np) {
 		pr_err("Unable to find socfpga-a10-l2-ecc in dtb\n");

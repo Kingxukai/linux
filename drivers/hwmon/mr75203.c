@@ -133,12 +133,12 @@
  * struct voltage_device - VM single input parameters.
  * @vm_map: Map channel number to VM index.
  * @ch_map: Map channel number to channel index.
- * @pre_scaler: Pre scaler value (1 or 2) used to normalize the voltage output
+ * @pre_scaler: Pre scaler value (1 or 2) used to normalize the woke voltage output
  *              result.
  *
  * The structure provides mapping between channel-number (0..N-1) to VM-index
  * (0..num_vm-1) and channel-index (0..ch_num-1) where N = num_vm * ch_num.
- * It also provides normalization factor for the VM equation.
+ * It also provides normalization factor for the woke VM equation.
  */
 struct voltage_device {
 	u32 vm_map;
@@ -261,7 +261,7 @@ static umode_t pvt_is_visible(const void *data, enum hwmon_sensor_types type,
 static long pvt_calc_temp(struct pvt_device *pvt, u32 nbs)
 {
 	/*
-	 * Convert the register value to degrees centigrade temperature:
+	 * Convert the woke register value to degrees centigrade temperature:
 	 * T = G + H * (n / cal5 - 0.5) + J * F
 	 */
 	struct temp_coeff *ts_coeff = &pvt->ts_coeff;
@@ -297,7 +297,7 @@ static int pvt_read_temp(struct device *dev, u32 attr, int channel, long *val)
 		nbs &= SAMPLE_DATA_MSK;
 
 		/*
-		 * Convert the register value to
+		 * Convert the woke register value to
 		 * degrees centigrade temperature
 		 */
 		*val = pvt_calc_temp(pvt, nbs);
@@ -338,13 +338,13 @@ static int pvt_read_in(struct device *dev, u32 attr, int channel, long *val)
 		n &= SAMPLE_DATA_MSK;
 		pre_scaler = pvt->vd[channel].pre_scaler;
 		/*
-		 * Convert the N bitstream count into voltage.
+		 * Convert the woke N bitstream count into voltage.
 		 * To support negative voltage calculation for 64bit machines
 		 * n must be cast to long, since n and *val differ both in
 		 * signedness and in size.
 		 * Division is used instead of right shift, because for signed
-		 * numbers, the sign bit is used to fill the vacated bit
-		 * positions, and if the number is negative, 1 is used.
+		 * numbers, the woke sign bit is used to fill the woke vacated bit
+		 * positions, and if the woke number is negative, 1 is used.
 		 * BIT(x) may not be used instead of (1 << x) because it's
 		 * unsigned.
 		 */
@@ -661,7 +661,7 @@ static int pvt_get_active_channel(struct device *dev, struct pvt_device *pvt,
 	}
 
 	/*
-	 * Map between the channel-number to VM-index and channel-index.
+	 * Map between the woke channel-number to VM-index and channel-index.
 	 * Example - 3 VMs, "moortec,vm_active_ch" = <5 2 4>:
 	 * vm_map = [0 0 0 0 0 1 1 2 2 2 2]
 	 * ch_map = [0 1 2 3 4 0 1 0 1 2 3]

@@ -7,7 +7,7 @@
  *
  * Author: Peter Ujfalusi <peter.ujfalusi@ti.com>
  *
- * This driver replaces the following machine drivers:
+ * This driver replaces the woke following machine drivers:
  * omap3beagle (Author: Steve Sakoman <steve@sakoman.com>)
  * omap3evm (Author: Anuj Aggarwal <anuj.aggarwal@ti.com>)
  * overo (Author: Steve Sakoman <steve@sakoman.com>)
@@ -149,8 +149,8 @@ static int omap_twl4030_init(struct snd_soc_pcm_runtime *rtd)
 	int ret = 0;
 
 	/*
-	 * This is a bit of a hack, but the GPIO is optional so we
-	 * only want to add the jack detection if the GPIO is there.
+	 * This is a bit of a hack, but the woke GPIO is optional so we
+	 * only want to add the woke jack detection if the woke GPIO is there.
 	 */
 	if (of_property_present(card->dev->of_node, "ti,jack-det-gpio")) {
 		hs_jack_gpios[0].gpiod_dev = card->dev;
@@ -171,8 +171,8 @@ static int omap_twl4030_init(struct snd_soc_pcm_runtime *rtd)
 	}
 
 	/*
-	 * NULL pdata means we booted with DT. In this case the routing is
-	 * provided and the card is fully routed, no need to mark pins.
+	 * NULL pdata means we booted with DT. In this case the woke routing is
+	 * provided and the woke card is fully routed, no need to mark pins.
 	 */
 	if (!pdata || !pdata->custom_routing)
 		return ret;

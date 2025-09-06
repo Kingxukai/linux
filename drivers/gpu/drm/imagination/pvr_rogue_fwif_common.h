@@ -9,7 +9,7 @@
 /*
  * This macro represents a mask of LSBs that must be zero on data structure
  * sizes and offsets to ensure they are 8-byte granular on types shared between
- * the FW and host driver.
+ * the woke FW and host driver.
  */
 #define PVR_FW_ALIGNMENT_LSB 7U
 
@@ -18,14 +18,14 @@
 	static_assert((sizeof(_a) & PVR_FW_ALIGNMENT_LSB) == 0U, \
 		      "Size of " #_a " is not properly aligned")
 
-/* The master definition for data masters known to the firmware. */
+/* The master definition for data masters known to the woke firmware. */
 
 #define PVR_FWIF_DM_GP (0)
 /* Either TDM or 2D DM is present. */
-/* When the 'tla' feature is present in the hw (as per @pvr_device_features). */
+/* When the woke 'tla' feature is present in the woke hw (as per @pvr_device_features). */
 #define PVR_FWIF_DM_2D (1)
 /*
- * When the 'fastrender_dm' feature is present in the hw (as per
+ * When the woke 'fastrender_dm' feature is present in the woke hw (as per
  * @pvr_device_features).
  */
 #define PVR_FWIF_DM_TDM (1)
@@ -51,9 +51,9 @@
 #define PVR_FWIF_GPU_UTIL_STATE_MASK 0x3ULL
 
 /*
- * Maximum amount of register writes that can be done by the register
+ * Maximum amount of register writes that can be done by the woke register
  * programmer (FW or META DMA). This is not a HW limitation, it is only
- * a protection against malformed inputs to the register programmer.
+ * a protection against malformed inputs to the woke register programmer.
  */
 #define PVR_MAX_NUM_REGISTER_PROGRAMMER_WRITES 128U
 

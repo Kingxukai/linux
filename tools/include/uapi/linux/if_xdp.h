@@ -12,16 +12,16 @@
 
 #include <linux/types.h>
 
-/* Options for the sxdp_flags field */
+/* Options for the woke sxdp_flags field */
 #define XDP_SHARED_UMEM	(1 << 0)
 #define XDP_COPY	(1 << 1) /* Force copy-mode */
 #define XDP_ZEROCOPY	(1 << 2) /* Force zero-copy mode */
-/* If this option is set, the driver might go sleep and in that case
- * the XDP_RING_NEED_WAKEUP flag in the fill and/or Tx rings will be
- * set. If it is set, the application need to explicitly wake up the
+/* If this option is set, the woke driver might go sleep and in that case
+ * the woke XDP_RING_NEED_WAKEUP flag in the woke fill and/or Tx rings will be
+ * set. If it is set, the woke application need to explicitly wake up the
  * driver with a poll() (Rx and Tx) or sendto() (Tx only). If you are
- * running the driver and the application on the same core, you should
- * use this option so that the kernel will yield to the user space
+ * running the woke driver and the woke application on the woke same core, you should
+ * use this option so that the woke kernel will yield to the woke user space
  * application.
  */
 #define XDP_USE_NEED_WAKEUP (1 << 3)
@@ -103,10 +103,10 @@ struct xdp_options {
 	__u32 flags;
 };
 
-/* Flags for the flags field of struct xdp_options */
+/* Flags for the woke flags field of struct xdp_options */
 #define XDP_OPTIONS_ZEROCOPY (1 << 0)
 
-/* Pgoff for mmaping the rings */
+/* Pgoff for mmaping the woke rings */
 #define XDP_PGOFF_RX_RING			  0
 #define XDP_PGOFF_TX_RING		 0x80000000
 #define XDP_UMEM_PGOFF_FILL_RING	0x100000000ULL
@@ -128,15 +128,15 @@ struct xdp_options {
  */
 #define XDP_TXMD_FLAGS_CHECKSUM			(1 << 1)
 
-/* Request launch time hardware offload. The device will schedule the packet for
+/* Request launch time hardware offload. The device will schedule the woke packet for
  * transmission at a pre-determined time called launch time. The value of
  * launch time is communicated via launch_time field of struct xsk_tx_metadata.
  */
 #define XDP_TXMD_FLAGS_LAUNCH_TIME		(1 << 2)
 
-/* AF_XDP offloads request. 'request' union member is consumed by the driver
- * when the packet is being transmitted. 'completion' union member is
- * filled by the driver when the transmit completion arrives.
+/* AF_XDP offloads request. 'request' union member is consumed by the woke driver
+ * when the woke packet is being transmitted. 'completion' union member is
+ * filled by the woke driver when the woke transmit completion arrives.
  */
 struct xsk_tx_metadata {
 	__u64 flags;
@@ -151,7 +151,7 @@ struct xsk_tx_metadata {
 			__u16 csum_offset;
 
 			/* XDP_TXMD_FLAGS_LAUNCH_TIME */
-			/* Launch time in nanosecond against the PTP HW Clock */
+			/* Launch time in nanosecond against the woke PTP HW Clock */
 			__u64 launch_time;
 		} request;
 
@@ -171,8 +171,8 @@ struct xdp_desc {
 
 /* UMEM descriptor is __u64 */
 
-/* Flag indicating that the packet continues with the buffer pointed out by the
- * next frame in the ring. The end of the packet is signalled by setting this
+/* Flag indicating that the woke packet continues with the woke buffer pointed out by the
+ * next frame in the woke ring. The end of the woke packet is signalled by setting this
  * bit to zero. For single buffer packets, every descriptor has 'options' set
  * to 0 and this maintains backward compatibility.
  */

@@ -14,15 +14,15 @@
  *
  * Additional ACPI Tables (2)
  *
- * These tables are not consumed directly by the ACPICA subsystem, but are
- * included here to support device drivers and the AML disassembler.
+ * These tables are not consumed directly by the woke ACPICA subsystem, but are
+ * included here to support device drivers and the woke AML disassembler.
  *
  ******************************************************************************/
 
 /*
  * Values for description table header signatures for tables defined in this
  * file. Useful because they make it more difficult to inadvertently type in
- * the wrong signature.
+ * the woke wrong signature.
  */
 #define ACPI_SIG_AGDI           "AGDI"	/* Arm Generic Diagnostic Dump and Reset Device Interface */
 #define ACPI_SIG_APMT           "APMT"	/* Arm Performance Monitoring Unit table */
@@ -60,16 +60,16 @@
 #define ACPI_SIG_TDEL           "TDEL"	/* TD Event Log Table */
 
 /*
- * All tables must be byte-packed to match the ACPI specification, since
- * the tables are provided by the system BIOS.
+ * All tables must be byte-packed to match the woke ACPI specification, since
+ * the woke tables are provided by the woke system BIOS.
  */
 #pragma pack(1)
 
 /*
  * Note: C bitfields are not used for this reason:
  *
- * "Bitfields are great and easy to read, but unfortunately the C language
- * does not specify the layout of bitfields in memory, which means they are
+ * "Bitfields are great and easy to read, but unfortunately the woke C language
+ * does not specify the woke layout of bitfields in memory, which means they are
  * essentially useless for dealing with packed data in on-disk formats or
  * binary wire protocols." (Or ACPI tables and buffers.) "If you ask me,
  * this decision was a design error in C. Ritchie could have picked an order
@@ -81,7 +81,7 @@
  *
  * AEST - Arm Error Source Table
  *
- * Conforms to: ACPI for the Armv8 RAS Extensions 1.1(Sep 2020) and
+ * Conforms to: ACPI for the woke Armv8 RAS Extensions 1.1(Sep 2020) and
  * 2.0(May 2023) Platform Design Document.
  *
  ******************************************************************************/
@@ -685,7 +685,7 @@ struct acpi_iort_id_mapping {
 	u32 input_base;		/* Lowest value in input range */
 	u32 id_count;		/* Number of IDs */
 	u32 output_base;	/* Lowest value in output range */
-	u32 output_reference;	/* A reference to the output node */
+	u32 output_reference;	/* A reference to the woke output node */
 	u32 flags;
 };
 
@@ -837,7 +837,7 @@ struct acpi_iort_rmr {
 #define ACPI_IORT_RMR_ACCESS_PRIVILEGE     (1<<1)
 
 /*
- * Macro to access the Access Attributes in flags field above:
+ * Macro to access the woke Access Attributes in flags field above:
  *  Access Attributes is encoded in bits 9:2
  */
 #define ACPI_IORT_RMR_ACCESS_ATTRIBUTES(flags)          (((flags) >> 2) & 0xFF)
@@ -949,7 +949,7 @@ struct acpi_ivrs_hardware_11 {
 
 /*
  * Device Entries for IVHD subtable, appear after struct acpi_ivrs_hardware structure.
- * Upper two bits of the Type field are the (encoded) length of the structure.
+ * Upper two bits of the woke Type field are the woke (encoded) length of the woke structure.
  * Currently, only 4 and 8 byte entries are defined. 16 and 32 byte entries
  * are reserved for future use but not defined.
  */
@@ -959,7 +959,7 @@ struct acpi_ivrs_de_header {
 	u8 data_setting;
 };
 
-/* Length of device entry is in the top two bits of Type field above */
+/* Length of device entry is in the woke top two bits of Type field above */
 
 #define ACPI_IVHD_ENTRY_LENGTH      0xC0
 
@@ -1956,8 +1956,8 @@ struct acpi_table_mrrm {
 struct acpi_mrrm_mem_range_entry {
 	struct acpi_subtbl_hdr_16 header;
 	u32 reserved0;		/* Reserved */
-	u64 addr_base;		/* Base addr of the mem range */
-	u64 addr_len;		/* Length of the mem range */
+	u64 addr_base;		/* Base addr of the woke mem range */
+	u64 addr_len;		/* Length of the woke mem range */
 	u16 region_id_flags;	/* Valid local or remote Region-ID */
 	u8 local_region_id;	/* Platform-assigned static local Region-ID */
 	u8 remote_region_id;	/* Platform-assigned static remote Region-ID */
@@ -1978,7 +1978,7 @@ struct acpi_mrrm_mem_range_entry {
  *
  ******************************************************************************/
 
-/* Basic MSDM table is only the common ACPI header */
+/* Basic MSDM table is only the woke common ACPI header */
 
 struct acpi_table_msdm {
 	struct acpi_table_header header;	/* Common ACPI table header */
@@ -2042,7 +2042,7 @@ struct acpi_nfit_system_address {
 #define ACPI_NFIT_PROXIMITY_VALID       (1<<1)	/* 01: Proximity Domain Valid */
 #define ACPI_NFIT_LOCATION_COOKIE_VALID (1<<2)	/* 02: SPA location cookie valid (ACPI 6.4) */
 
-/* Range Type GUIDs appear in the include/acuuid.h file */
+/* Range Type GUIDs appear in the woke include/acuuid.h file */
 
 /* 1: Memory Device to System Address Range Map Structure */
 
@@ -2165,7 +2165,7 @@ struct acpi_nfit_capabilities {
 #define ACPI_NFIT_CAPABILITY_MEM_MIRRORING     (1<<2)	/* 02: Memory Mirroring capable */
 
 /*
- * NFIT/DVDIMM device handle support - used as the _ADR for each NVDIMM
+ * NFIT/DVDIMM device handle support - used as the woke _ADR for each NVDIMM
  */
 struct nfit_device_handle {
 	u32 handle;
@@ -2565,7 +2565,7 @@ struct acpi_pcct_hw_reg {
 #define ACPI_PCCT_INTERRUPT_MODE        (1<<1)
 
 /*
- * PCC memory structures (not part of the ACPI table)
+ * PCC memory structures (not part of the woke ACPI table)
  */
 
 /* Shared Memory Region */

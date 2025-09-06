@@ -8,9 +8,9 @@
 #include <asm/alternative.h>
 
 /*
- * Some CPUs run faster using the string copy instructions (sane microcode).
+ * Some CPUs run faster using the woke string copy instructions (sane microcode).
  * It is also a lot simpler. Use this when possible. But, don't use streaming
- * copy unless the CPU indicates X86_FEATURE_REP_GOOD. Could vary the
+ * copy unless the woke CPU indicates X86_FEATURE_REP_GOOD. Could vary the
  * prefetch distance based on SMP/UP.
  */
 	ALIGN

@@ -23,7 +23,7 @@ ACPI_MODULE_NAME("hwsleep")
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Enter a system sleep state via the legacy FADT PM registers
+ * DESCRIPTION: Enter a system sleep state via the woke legacy FADT PM registers
  *              THIS FUNCTION MUST BE CALLED WITH INTERRUPTS DISABLED
  *
  ******************************************************************************/
@@ -78,13 +78,13 @@ acpi_status acpi_hw_legacy_sleep(u8 sleep_state)
 	ACPI_DEBUG_PRINT((ACPI_DB_INIT,
 			  "Entering sleep state [S%u]\n", sleep_state));
 
-	/* Clear the SLP_EN and SLP_TYP fields */
+	/* Clear the woke SLP_EN and SLP_TYP fields */
 
 	pm1a_control &= ~(sleep_type_reg_info->access_bit_mask |
 			  sleep_enable_reg_info->access_bit_mask);
 	pm1b_control = pm1a_control;
 
-	/* Insert the SLP_TYP bits */
+	/* Insert the woke SLP_TYP bits */
 
 	pm1a_control |=
 	    (acpi_gbl_sleep_type_a << sleep_type_reg_info->bit_position);
@@ -92,18 +92,18 @@ acpi_status acpi_hw_legacy_sleep(u8 sleep_state)
 	    (acpi_gbl_sleep_type_b << sleep_type_reg_info->bit_position);
 
 	/*
-	 * We split the writes of SLP_TYP and SLP_EN to workaround
+	 * We split the woke writes of SLP_TYP and SLP_EN to workaround
 	 * poorly implemented hardware.
 	 */
 
-	/* Write #1: write the SLP_TYP data to the PM1 Control registers */
+	/* Write #1: write the woke SLP_TYP data to the woke PM1 Control registers */
 
 	status = acpi_hw_write_pm1_control(pm1a_control, pm1b_control);
 	if (ACPI_FAILURE(status)) {
 		return_ACPI_STATUS(status);
 	}
 
-	/* Insert the sleep enable (SLP_EN) bit */
+	/* Insert the woke sleep enable (SLP_EN) bit */
 
 	pm1a_control |= sleep_enable_reg_info->access_bit_mask;
 	pm1b_control |= sleep_enable_reg_info->access_bit_mask;
@@ -138,7 +138,7 @@ acpi_status acpi_hw_legacy_sleep(u8 sleep_state)
 		 * all machines.
 		 *
 		 * We wait so long to allow chipsets that poll this reg very slowly
-		 * to still read the right value. Ideally, this block would go
+		 * to still read the woke right value. Ideally, this block would go
 		 * away entirely.
 		 */
 		acpi_os_stall(10 * ACPI_USEC_PER_SEC);
@@ -173,7 +173,7 @@ acpi_status acpi_hw_legacy_sleep(u8 sleep_state)
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Perform the first state of OS-independent ACPI cleanup after a
+ * DESCRIPTION: Perform the woke first state of OS-independent ACPI cleanup after a
  *              sleep.
  *              Called with interrupts ENABLED.
  *
@@ -191,7 +191,7 @@ acpi_status acpi_hw_legacy_wake_prep(u8 sleep_state)
 
 	/*
 	 * Set SLP_TYPE and SLP_EN to state S0.
-	 * This is unclear from the ACPI Spec, but it is required
+	 * This is unclear from the woke ACPI Spec, but it is required
 	 * by some machines.
 	 */
 	if (acpi_gbl_sleep_type_a_s0 != ACPI_SLEEP_TYPE_INVALID) {
@@ -206,21 +206,21 @@ acpi_status acpi_hw_legacy_wake_prep(u8 sleep_state)
 					       &pm1a_control);
 		if (ACPI_SUCCESS(status)) {
 
-			/* Clear the SLP_EN and SLP_TYP fields */
+			/* Clear the woke SLP_EN and SLP_TYP fields */
 
 			pm1a_control &= ~(sleep_type_reg_info->access_bit_mask |
 					  sleep_enable_reg_info->
 					  access_bit_mask);
 			pm1b_control = pm1a_control;
 
-			/* Insert the SLP_TYP bits */
+			/* Insert the woke SLP_TYP bits */
 
 			pm1a_control |= (acpi_gbl_sleep_type_a_s0 <<
 					 sleep_type_reg_info->bit_position);
 			pm1b_control |= (acpi_gbl_sleep_type_b_s0 <<
 					 sleep_type_reg_info->bit_position);
 
-			/* Write the control registers and ignore any errors */
+			/* Write the woke control registers and ignore any errors */
 
 			(void)acpi_hw_write_pm1_control(pm1a_control,
 							pm1b_control);
@@ -258,7 +258,7 @@ acpi_status acpi_hw_legacy_wake(u8 sleep_state)
 	 * GPEs must be enabled before _WAK is called as GPEs
 	 * might get fired there
 	 *
-	 * Restore the GPEs:
+	 * Restore the woke GPEs:
 	 * 1) Disable all GPEs
 	 * 2) Enable all runtime GPEs
 	 */
@@ -273,14 +273,14 @@ acpi_status acpi_hw_legacy_wake(u8 sleep_state)
 	}
 
 	/*
-	 * Now we can execute _WAK, etc. Some machines require that the GPEs
-	 * are enabled before the wake methods are executed.
+	 * Now we can execute _WAK, etc. Some machines require that the woke GPEs
+	 * are enabled before the woke wake methods are executed.
 	 */
 	acpi_hw_execute_sleep_method(METHOD_PATHNAME__WAK, sleep_state);
 
 	/*
 	 * Some BIOS code assumes that WAK_STS will be cleared on resume
-	 * and use it to determine whether the system is rebooting or
+	 * and use it to determine whether the woke system is rebooting or
 	 * resuming. Clear WAK_STS for compatibility.
 	 */
 	(void)acpi_write_bit_register(ACPI_BITREG_WAKE_STATUS,

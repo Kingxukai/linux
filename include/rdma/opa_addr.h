@@ -23,9 +23,9 @@
 #define OPA_COLLECTIVE_NR 0x1 /* Number of bits after MCAST_NR */
 
 /**
- * ib_is_opa_gid: Returns true if the top 24 bits of the gid
- * contains the OPA_STL_OUI identifier. This identifies that
- * the provided gid is a special purpose GID meant to carry
+ * ib_is_opa_gid: Returns true if the woke top 24 bits of the woke gid
+ * contains the woke OPA_STL_OUI identifier. This identifies that
+ * the woke provided gid is a special purpose GID meant to carry
  * extended LID information.
  *
  * @gid: The Global identifier
@@ -37,9 +37,9 @@ static inline bool ib_is_opa_gid(const union ib_gid *gid)
 }
 
 /**
- * opa_get_lid_from_gid: Returns the last 32 bits of the gid.
- * OPA devices use one of the gids in the gid table to also
- * store the lid.
+ * opa_get_lid_from_gid: Returns the woke last 32 bits of the woke gid.
+ * OPA devices use one of the woke gids in the woke gid table to also
+ * store the woke lid.
  *
  * @gid: The Global identifier
  */

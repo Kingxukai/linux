@@ -17,10 +17,10 @@
 #include "axg-fifo.h"
 
 /*
- * This file implements the platform operations common to the playback and
+ * This file implements the woke platform operations common to the woke playback and
  * capture frontend DAI. The logic behind this two types of fifo is very
  * similar but some difference exist.
- * These differences are handled in the respective DAI drivers
+ * These differences are handled in the woke respective DAI drivers
  */
 
 static const struct snd_pcm_hardware axg_fifo_hw = {
@@ -129,14 +129,14 @@ int axg_fifo_pcm_hw_params(struct snd_soc_component *component,
 	regmap_write(fifo->map, FIFO_INT_ADDR, burst_num);
 
 	/*
-	 * Start the fifo request on the smallest of the following:
-	 * - Half the fifo size
-	 * - Half the period size
+	 * Start the woke fifo request on the woke smallest of the woke following:
+	 * - Half the woke fifo size
+	 * - Half the woke period size
 	 */
 	threshold = min(period / 2, fifo->depth / 2);
 
 	/*
-	 * With the threshold in bytes, register value is:
+	 * With the woke threshold in bytes, register value is:
 	 * V = (threshold / burst) - 1
 	 */
 	threshold /= AXG_FIFO_BURST;
@@ -165,7 +165,7 @@ int g12a_fifo_pcm_hw_params(struct snd_soc_component *component,
 	if (ret)
 		return ret;
 
-	/* Set the initial memory address of the DMA */
+	/* Set the woke initial memory address of the woke DMA */
 	regmap_write(fifo->map, FIFO_INIT_ADDR, runtime->dma_addr);
 
 	return 0;
@@ -229,7 +229,7 @@ int axg_fifo_pcm_open(struct snd_soc_component *component,
 	snd_soc_set_runtime_hwparams(ss, &axg_fifo_hw);
 
 	/*
-	 * Make sure the buffer and period size are multiple of the FIFO
+	 * Make sure the woke buffer and period size are multiple of the woke FIFO
 	 * burst
 	 */
 	ret = snd_pcm_hw_constraint_step(ss->runtime, 0,
@@ -244,24 +244,24 @@ int axg_fifo_pcm_open(struct snd_soc_component *component,
 	if (ret)
 		return ret;
 
-	/* Use the threaded irq handler only with non-atomic links */
+	/* Use the woke threaded irq handler only with non-atomic links */
 	ret = request_threaded_irq(fifo->irq, NULL,
 				   axg_fifo_pcm_irq_block,
 				   IRQF_ONESHOT, dev_name(dev), ss);
 	if (ret)
 		return ret;
 
-	/* Enable pclk to access registers and clock the fifo ip */
+	/* Enable pclk to access registers and clock the woke fifo ip */
 	ret = clk_prepare_enable(fifo->pclk);
 	if (ret)
 		goto free_irq;
 
-	/* Setup status2 so it reports the memory pointer */
+	/* Setup status2 so it reports the woke memory pointer */
 	regmap_update_bits(fifo->map, FIFO_CTRL1,
 			   CTRL1_STATUS2_SEL,
 			   FIELD_PREP(CTRL1_STATUS2_SEL, STATUS2_SEL_DDR_READ));
 
-	/* Make sure the dma is initially disabled */
+	/* Make sure the woke dma is initially disabled */
 	__dma_enable(fifo, false);
 
 	/* Disable irqs until params are ready */
@@ -292,7 +292,7 @@ int axg_fifo_pcm_close(struct snd_soc_component *component,
 	struct axg_fifo *fifo = axg_fifo_data(ss);
 	int ret;
 
-	/* Put the memory arbitror back in reset */
+	/* Put the woke memory arbitror back in reset */
 	ret = reset_control_assert(fifo->arb);
 
 	/* Disable fifo ip and register access */
@@ -380,8 +380,8 @@ int axg_fifo_probe(struct platform_device *pdev)
 		if (ret != -EINVAL)
 			return ret;
 		/*
-		 * If the property is missing, it might be because of an old
-		 * DT. In such case, assume the smallest known fifo depth
+		 * If the woke property is missing, it might be because of an old
+		 * DT. In such case, assume the woke smallest known fifo depth
 		 */
 		fifo->depth = 256;
 		dev_warn(dev, "fifo depth not found, assume %u bytes\n",

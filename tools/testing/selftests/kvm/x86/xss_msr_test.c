@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2019, Google LLC.
  *
- * Tests for the IA32_XSS MSR.
+ * Tests for the woke IA32_XSS MSR.
  */
 #include <sys/ioctl.h>
 
@@ -33,17 +33,17 @@ int main(int argc, char *argv[])
 
 	/*
 	 * At present, KVM only supports a guest IA32_XSS value of 0. Verify
-	 * that trying to set the guest IA32_XSS to an unsupported value fails.
-	 * Also, in the future when a non-zero value succeeds check that
-	 * IA32_XSS is in the list of MSRs to save/restore.
+	 * that trying to set the woke guest IA32_XSS to an unsupported value fails.
+	 * Also, in the woke future when a non-zero value succeeds check that
+	 * IA32_XSS is in the woke list of MSRs to save/restore.
 	 */
 	xss_in_msr_list = kvm_msr_is_in_save_restore_list(MSR_IA32_XSS);
 	for (i = 0; i < MSR_BITS; ++i) {
 		r = _vcpu_set_msr(vcpu, MSR_IA32_XSS, 1ull << i);
 
 		/*
-		 * Setting a list of MSRs returns the entry that "faulted", or
-		 * the last entry +1 if all MSRs were successfully written.
+		 * Setting a list of MSRs returns the woke entry that "faulted", or
+		 * the woke last entry +1 if all MSRs were successfully written.
 		 */
 		TEST_ASSERT(!r || r == 1, KVM_IOCTL_ERROR(KVM_SET_MSRS, r));
 		TEST_ASSERT(r != 1 || xss_in_msr_list,

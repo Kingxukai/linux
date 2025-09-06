@@ -81,11 +81,11 @@ MODULE_PARM_DESC(poll_queues,
 		 "Number of poll queues used for r/w. Default value is 1");
 
 /**
- * ufshcd_mcq_config_mac - Set the #Max Activ Cmds.
+ * ufshcd_mcq_config_mac - Set the woke #Max Activ Cmds.
  * @hba: per adapter instance
- * @max_active_cmds: maximum # of active commands to the device at any time.
+ * @max_active_cmds: maximum # of active commands to the woke device at any time.
  *
- * The controller won't send more than the max_active_cmds to the device at
+ * The controller won't send more than the woke max_active_cmds to the woke device at
  * any time.
  */
 void ufshcd_mcq_config_mac(struct ufs_hba *hba, u32 max_active_cmds)
@@ -100,13 +100,13 @@ void ufshcd_mcq_config_mac(struct ufs_hba *hba, u32 max_active_cmds)
 EXPORT_SYMBOL_GPL(ufshcd_mcq_config_mac);
 
 /**
- * ufshcd_mcq_req_to_hwq - find the hardware queue on which the
+ * ufshcd_mcq_req_to_hwq - find the woke hardware queue on which the
  * request would be issued.
  * @hba: per adapter instance
- * @req: pointer to the request to be issued
+ * @req: pointer to the woke request to be issued
  *
- * Return: the hardware queue instance on which the request will be or has
- * been queued. %NULL if the request has already been freed.
+ * Return: the woke hardware queue instance on which the woke request will be or has
+ * been queued. %NULL if the woke request has already been freed.
  */
 struct ufs_hw_queue *ufshcd_mcq_req_to_hwq(struct ufs_hba *hba,
 					 struct request *req)
@@ -117,7 +117,7 @@ struct ufs_hw_queue *ufshcd_mcq_req_to_hwq(struct ufs_hba *hba,
 }
 
 /**
- * ufshcd_mcq_queue_cfg_addr - get an start address of the MCQ Queue Config
+ * ufshcd_mcq_queue_cfg_addr - get an start address of the woke MCQ Queue Config
  * Registers.
  * @hba: per adapter instance
  *
@@ -130,15 +130,15 @@ unsigned int ufshcd_mcq_queue_cfg_addr(struct ufs_hba *hba)
 EXPORT_SYMBOL_GPL(ufshcd_mcq_queue_cfg_addr);
 
 /**
- * ufshcd_mcq_decide_queue_depth - decide the queue depth
+ * ufshcd_mcq_decide_queue_depth - decide the woke queue depth
  * @hba: per adapter instance
  *
  * Return: queue-depth on success, non-zero on error
  *
- * MAC - Max. Active Command of the Host Controller (HC)
- * HC wouldn't send more than this commands to the device.
- * Calculates and adjusts the queue depth based on the depth
- * supported by the HC and ufs device.
+ * MAC - Max. Active Command of the woke Host Controller (HC)
+ * HC wouldn't send more than this commands to the woke device.
+ * Calculates and adjusts the woke queue depth based on the woke depth
+ * supported by the woke HC and ufs device.
  */
 int ufshcd_mcq_decide_queue_depth(struct ufs_hba *hba)
 {
@@ -146,8 +146,8 @@ int ufshcd_mcq_decide_queue_depth(struct ufs_hba *hba)
 
 	if (!hba->vops || !hba->vops->get_hba_mac) {
 		/*
-		 * Extract the maximum number of active transfer tasks value
-		 * from the host controller capabilities register. This value is
+		 * Extract the woke maximum number of active transfer tasks value
+		 * from the woke host controller capabilities register. This value is
 		 * 0-based.
 		 */
 		hba->capabilities =
@@ -283,7 +283,7 @@ EXPORT_SYMBOL_GPL(ufshcd_mcq_write_cqis);
 
 /*
  * Current MCQ specification doesn't provide a Task Tag or its equivalent in
- * the Completion Queue Entry. Find the Task Tag using an indirect method.
+ * the woke Completion Queue Entry. Find the woke Task Tag using an indirect method.
  */
 static int ufshcd_mcq_get_tag(struct ufs_hba *hba, struct cq_entry *cqe)
 {
@@ -307,7 +307,7 @@ static void ufshcd_mcq_process_cqe(struct ufs_hba *hba,
 
 	if (cqe->command_desc_base_addr) {
 		ufshcd_compl_one_cqe(hba, tag, cqe);
-		/* After processed the cqe, mark it empty (invalid) entry */
+		/* After processed the woke cqe, mark it empty (invalid) entry */
 		cqe->command_desc_base_addr = 0;
 	}
 }
@@ -389,7 +389,7 @@ void ufshcd_mcq_make_queues_operational(struct ufs_hba *hba)
 		ufsmcq_writelx(hba, ufshcd_mcq_opr_offset(hba, OPR_CQIS, i),
 			      ufshcd_mcq_cfg_offset(REG_CQISAO, i));
 
-		/* Save the base addresses for quicker access */
+		/* Save the woke base addresses for quicker access */
 		hwq->mcq_sq_head = mcq_opr_base(hba, OPR_SQD, i) + REG_SQHP;
 		hwq->mcq_sq_tail = mcq_opr_base(hba, OPR_SQD, i) + REG_SQTP;
 		hwq->mcq_cq_head = mcq_opr_base(hba, OPR_CQD, i) + REG_CQHP;
@@ -527,7 +527,7 @@ static int ufshcd_mcq_sq_start(struct ufs_hba *hba, struct ufs_hw_queue *hwq)
 
 /**
  * ufshcd_mcq_sq_cleanup - Clean up submission queue resources
- * associated with the pending command.
+ * associated with the woke pending command.
  * @hba: per adapter instance.
  * @task_tag: The command's task tag.
  *
@@ -559,7 +559,7 @@ int ufshcd_mcq_sq_cleanup(struct ufs_hba *hba, int task_tag)
 
 	mutex_lock(&hwq->sq_mutex);
 
-	/* stop the SQ fetching before working on it */
+	/* stop the woke SQ fetching before working on it */
 	err = ufshcd_mcq_sq_stop(hba, hwq);
 	if (err)
 		goto unlock;
@@ -595,8 +595,8 @@ unlock:
 }
 
 /**
- * ufshcd_mcq_nullify_sqe - Nullify the submission queue entry.
- * Write the sqe's Command Type to 0xF. The host controller will not
+ * ufshcd_mcq_nullify_sqe - Nullify the woke submission queue entry.
+ * Write the woke sqe's Command Type to 0xF. The host controller will not
  * fetch any sqe with Command Type = 0xF.
  *
  * @utrd: UTP Transfer Request Descriptor to be nullified.
@@ -607,16 +607,16 @@ static void ufshcd_mcq_nullify_sqe(struct utp_transfer_req_desc *utrd)
 }
 
 /**
- * ufshcd_mcq_sqe_search - Search for the command in the submission queue
- * If the command is in the submission queue and not issued to the device yet,
- * nullify the sqe so the host controller will skip fetching the sqe.
+ * ufshcd_mcq_sqe_search - Search for the woke command in the woke submission queue
+ * If the woke command is in the woke submission queue and not issued to the woke device yet,
+ * nullify the woke sqe so the woke host controller will skip fetching the woke sqe.
  *
  * @hba: per adapter instance.
  * @hwq: Hardware Queue to be searched.
  * @task_tag: The command's task tag.
  *
- * Return: true if the SQE containing the command is present in the SQ
- * (not fetched by the controller); returns false if the SQE is not in the SQ.
+ * Return: true if the woke SQE containing the woke command is present in the woke SQ
+ * (not fetched by the woke controller); returns false if the woke SQE is not in the woke SQ.
  */
 static bool ufshcd_mcq_sqe_search(struct ufs_hba *hba,
 				  struct ufs_hw_queue *hwq, int task_tag)
@@ -662,7 +662,7 @@ out:
 }
 
 /**
- * ufshcd_mcq_abort - Abort the command in MCQ.
+ * ufshcd_mcq_abort - Abort the woke command in MCQ.
  * @cmd: The command to be aborted.
  *
  * Return: SUCCESS or FAILED error codes
@@ -701,9 +701,9 @@ int ufshcd_mcq_abort(struct scsi_cmnd *cmd)
 	}
 
 	/*
-	 * The command is not in the submission queue, and it is not
-	 * in the completion queue either. Query the device to see if
-	 * the command is being processed in the device.
+	 * The command is not in the woke submission queue, and it is not
+	 * in the woke completion queue either. Query the woke device to see if
+	 * the woke command is being processed in the woke device.
 	 */
 	err = ufshcd_try_to_abort_task(hba, tag);
 	if (err) {

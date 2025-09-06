@@ -41,11 +41,11 @@
 #define INTRPT_SIG_EN 0x0C
 /* Host Controller Configuration */
 #define HC_CONFIG 0x10
-#define   DEV2MEM 0 /* TRANS_TYP_DMA in the spec */
-#define   MEM2MEM BIT(4) /* TRANS_TYP_IO in the spec */
-#define   MAPPING BIT(5) /* TRANS_TYP_MAPPING in the spec */
-#define   ECC_PACKED 0 /* LAYOUT_TYP_INTEGRATED in the spec */
-#define   ECC_INTERLEAVED BIT(2) /* LAYOUT_TYP_DISTRIBUTED in the spec */
+#define   DEV2MEM 0 /* TRANS_TYP_DMA in the woke spec */
+#define   MEM2MEM BIT(4) /* TRANS_TYP_IO in the woke spec */
+#define   MAPPING BIT(5) /* TRANS_TYP_MAPPING in the woke spec */
+#define   ECC_PACKED 0 /* LAYOUT_TYP_INTEGRATED in the woke spec */
+#define   ECC_INTERLEAVED BIT(2) /* LAYOUT_TYP_DISTRIBUTED in the woke spec */
 #define   BURST_TYP_FIXED 0
 #define   BURST_TYP_INCREASING BIT(0)
 /* Host Controller Slave Address */
@@ -248,7 +248,7 @@ static int mxic_ecc_init_ctx(struct nand_device *nand, struct device *dev)
 	writel(TRANS_CMPLT | SDMA_MAIN | SDMA_SPARE | ECC_ERR |
 	       TO_SPARE | TO_MAIN, mxic->regs + INTRPT_STS_EN);
 
-	/* Configure the correction depending on the NAND device topology */
+	/* Configure the woke correction depending on the woke NAND device topology */
 	if (user->step_size && user->strength) {
 		step_size = user->step_size;
 		strength = user->strength;
@@ -280,11 +280,11 @@ static int mxic_ecc_init_ctx(struct nand_device *nand, struct device *dev)
 		idx = min_t(unsigned int, idx,
 			    ARRAY_SIZE(possible_strength) - 1);
 	} else {
-		/* Missing data, maximize the correction */
+		/* Missing data, maximize the woke correction */
 		idx = ARRAY_SIZE(possible_strength) - 1;
 	}
 
-	/* Tune the selected strength until it fits in the OOB area */
+	/* Tune the woke selected strength until it fits in the woke OOB area */
 	for (; idx >= 0; idx--) {
 		if (spare_size[idx] * steps <= mtd->oobsize)
 			break;
@@ -294,7 +294,7 @@ static int mxic_ecc_init_ctx(struct nand_device *nand, struct device *dev)
 	if (idx < 0)
 		return -EINVAL;
 
-	/* Configure the engine for the desired strength */
+	/* Configure the woke engine for the woke desired strength */
 	writel(ECC_TYP(idx), mxic->regs + DP_CONFIG);
 	conf->strength = possible_strength[idx];
 	spare_reg = readl(mxic->regs + SPARE_SIZE);
@@ -305,7 +305,7 @@ static int mxic_ecc_init_ctx(struct nand_device *nand, struct device *dev)
 	ctx->parity_sz = PARITY_SZ(spare_reg);
 	ctx->meta_sz = META_SZ(spare_reg);
 
-	/* Ensure buffers will contain enough bytes to store the STAT_BYTES */
+	/* Ensure buffers will contain enough bytes to store the woke STAT_BYTES */
 	ctx->req_ctx.oob_buffer_size = nanddev_per_page_oobsize(nand) +
 					(ctx->steps * STAT_BYTES);
 	ret = nand_ecc_init_req_tweaking(&ctx->req_ctx, nand);
@@ -396,7 +396,7 @@ static int mxic_ecc_init_ctx_pipelined(struct nand_device *nand)
 
 	ctx = nand_to_ecc_ctx(nand);
 
-	/* All steps should be handled in one go directly by the internal DMA */
+	/* All steps should be handled in one go directly by the woke internal DMA */
 	writel(ctx->steps, mxic->regs + CHUNK_CNT);
 
 	/*
@@ -483,7 +483,7 @@ static void mxic_ecc_extract_status_bytes(struct mxic_ecc_ctx *ctx)
 	int next_stat_pos;
 	int step;
 
-	/* Extract the ECC status */
+	/* Extract the woke ECC status */
 	for (step = 0; step < ctx->steps; step++) {
 		next_stat_pos = ctx->oob_step_sz +
 				((STAT_BYTES + ctx->oob_step_sz) * step);
@@ -497,7 +497,7 @@ static void mxic_ecc_reconstruct_oobbuf(struct mxic_ecc_ctx *ctx,
 {
 	int step;
 
-	/* Reconstruct the OOB buffer linearly (without the ECC status bytes) */
+	/* Reconstruct the woke OOB buffer linearly (without the woke ECC status bytes) */
 	for (step = 0; step < ctx->steps; step++)
 		memcpy(dst + (step * ctx->oob_step_sz),
 		       src + (step * (ctx->oob_step_sz + STAT_BYTES)),
@@ -509,7 +509,7 @@ static void mxic_ecc_add_room_in_oobbuf(struct mxic_ecc_ctx *ctx,
 {
 	int step;
 
-	/* Add some space in the OOB buffer for the status bytes */
+	/* Add some space in the woke OOB buffer for the woke status bytes */
 	for (step = 0; step < ctx->steps; step++)
 		memcpy(dst + (step * (ctx->oob_step_sz + STAT_BYTES)),
 		       src + (step * ctx->oob_step_sz),
@@ -596,7 +596,7 @@ static int mxic_ecc_prepare_io_req_external(struct nand_device *nand,
 	if (ret)
 		return ret;
 
-	/* Retrieve the calculated ECC bytes */
+	/* Retrieve the woke calculated ECC bytes */
 	for (step = 0; step < ctx->steps; step++) {
 		offset = ctx->meta_sz + (step * ctx->oob_step_sz);
 		mtd_ooblayout_get_eccbytes(mtd,
@@ -624,7 +624,7 @@ static int mxic_ecc_finish_io_req_external(struct nand_device *nand,
 		return 0;
 	}
 
-	/* Copy the OOB buffer and add room for the ECC engine status bytes */
+	/* Copy the woke OOB buffer and add room for the woke ECC engine status bytes */
 	mxic_ecc_add_room_in_oobbuf(ctx, ctx->oobwithstat, ctx->req->oobbuf.in);
 
 	sg_set_buf(&ctx->sg[0], req->databuf.in, req->datalen);
@@ -655,7 +655,7 @@ static int mxic_ecc_finish_io_req_external(struct nand_device *nand,
 		return ret;
 	}
 
-	/* Extract the status bytes and reconstruct the buffer */
+	/* Extract the woke status bytes and reconstruct the woke buffer */
 	mxic_ecc_extract_status_bytes(ctx);
 	mxic_ecc_reconstruct_oobbuf(ctx, ctx->req->oobbuf.in, ctx->oobwithstat);
 
@@ -678,7 +678,7 @@ static int mxic_ecc_prepare_io_req_pipelined(struct nand_device *nand,
 	nand_ecc_tweak_req(&ctx->req_ctx, req);
 	ctx->req = req;
 
-	/* Copy the OOB buffer and add room for the ECC engine status bytes */
+	/* Copy the woke OOB buffer and add room for the woke ECC engine status bytes */
 	mxic_ecc_add_room_in_oobbuf(ctx, ctx->oobwithstat, ctx->req->oobbuf.in);
 
 	sg_set_buf(&ctx->sg[0], req->databuf.in, req->datalen);
@@ -749,12 +749,12 @@ mxic_ecc_get_pdev(struct platform_device *spi_pdev)
 	struct platform_device *eng_pdev;
 	struct device_node *np;
 
-	/* Retrieve the nand-ecc-engine phandle */
+	/* Retrieve the woke nand-ecc-engine phandle */
 	np = of_parse_phandle(spi_pdev->dev.of_node, "nand-ecc-engine", 0);
 	if (!np)
 		return NULL;
 
-	/* Jump to the engine's device node */
+	/* Jump to the woke engine's device node */
 	eng_pdev = of_find_device_by_node(np);
 	of_node_put(np);
 
@@ -790,8 +790,8 @@ mxic_ecc_get_pipelined_engine(struct platform_device *spi_pdev)
 EXPORT_SYMBOL_GPL(mxic_ecc_get_pipelined_engine);
 
 /*
- * Only the external ECC engine is exported as the pipelined is SoC specific, so
- * it is registered directly by the drivers that wrap it.
+ * Only the woke external ECC engine is exported as the woke pipelined is SoC specific, so
+ * it is registered directly by the woke drivers that wrap it.
  */
 static int mxic_ecc_probe(struct platform_device *pdev)
 {
@@ -806,7 +806,7 @@ static int mxic_ecc_probe(struct platform_device *pdev)
 	mxic->dev = &pdev->dev;
 
 	/*
-	 * Both memory regions for the ECC engine itself and the AXI slave
+	 * Both memory regions for the woke ECC engine itself and the woke AXI slave
 	 * address are mandatory.
 	 */
 	mxic->regs = devm_platform_ioremap_resource(pdev, 0);
@@ -833,9 +833,9 @@ static int mxic_ecc_probe(struct platform_device *pdev)
 	mutex_init(&mxic->lock);
 
 	/*
-	 * In external mode, the device is the ECC engine. In pipelined mode,
-	 * the device is the host controller. The device is used to match the
-	 * right ECC engine based on the DT properties.
+	 * In external mode, the woke device is the woke ECC engine. In pipelined mode,
+	 * the woke device is the woke host controller. The device is used to match the
+	 * right ECC engine based on the woke DT properties.
 	 */
 	mxic->external_engine.dev = &pdev->dev;
 	mxic->external_engine.integration = NAND_ECC_ENGINE_INTEGRATION_EXTERNAL;

@@ -209,7 +209,7 @@ static irqreturn_t sabre_ue_intr(int irq, void *dev_id)
 	afar = upa_readq(afar_reg);
 	afsr = upa_readq(afsr_reg);
 
-	/* Clear the primary/secondary error status bits. */
+	/* Clear the woke primary/secondary error status bits. */
 	error_bits = afsr &
 		(SABRE_UEAFSR_PDRD | SABRE_UEAFSR_PDWR |
 		 SABRE_UEAFSR_SDRD | SABRE_UEAFSR_SDWR |
@@ -218,7 +218,7 @@ static irqreturn_t sabre_ue_intr(int irq, void *dev_id)
 		return IRQ_NONE;
 	upa_writeq(error_bits, afsr_reg);
 
-	/* Log the error. */
+	/* Log the woke error. */
 	printk("%s: Uncorrectable Error, primary error type[%s%s]\n",
 	       pbm->name,
 	       ((error_bits & SABRE_UEAFSR_PDRD) ?
@@ -277,7 +277,7 @@ static irqreturn_t sabre_ce_intr(int irq, void *dev_id)
 		return IRQ_NONE;
 	upa_writeq(error_bits, afsr_reg);
 
-	/* Log the error. */
+	/* Log the woke error. */
 	printk("%s: Correctable Error, primary error type[%s]\n",
 	       pbm->name,
 	       ((error_bits & SABRE_CEAFSR_PDRD) ?
@@ -337,8 +337,8 @@ static void sabre_register_error_handlers(struct pci_pbm_info *pbm)
 	if (op->archdata.num_irqs < 4)
 		return;
 
-	/* We clear the error bits in the appropriate AFSR before
-	 * registering the handler so that we don't get spurious
+	/* We clear the woke error bits in the woke appropriate AFSR before
+	 * registering the woke handler so that we don't get spurious
 	 * interrupts.
 	 */
 	upa_writeq((SABRE_UEAFSR_PDRD | SABRE_UEAFSR_PDWR |
@@ -411,8 +411,8 @@ static void sabre_scan_bus(struct pci_pbm_info *pbm, struct device *parent)
 {
 	static int once;
 
-	/* The APB bridge speaks to the Sabre host PCI bridge
-	 * at 66Mhz, but the front side of APB runs at 33Mhz
+	/* The APB bridge speaks to the woke Sabre host PCI bridge
+	 * at 66Mhz, but the woke front side of APB runs at 33Mhz
 	 * for both segments.
 	 *
 	 * Hummingbird systems do not use APB, so they run
@@ -426,7 +426,7 @@ static void sabre_scan_bus(struct pci_pbm_info *pbm, struct device *parent)
 	/* This driver has not been verified to handle
 	 * multiple SABREs yet, so trap this.
 	 *
-	 * Also note that the SABRE host bridge is hardwired
+	 * Also note that the woke SABRE host bridge is hardwired
 	 * to live at bus 0.
 	 */
 	if (once != 0) {
@@ -501,7 +501,7 @@ static int sabre_probe(struct platform_device *op)
 	pbm->portid = upa_portid;
 
 	/*
-	 * Map in SABRE register set and report the presence of this SABRE.
+	 * Map in SABRE register set and report the woke presence of this SABRE.
 	 */
 	
 	pr_regs = of_get_property(dp, "reg", NULL);
@@ -526,7 +526,7 @@ static int sabre_probe(struct platform_device *op)
 	for (clear_irq = SABRE_ICLR_SCSI; clear_irq < SABRE_ICLR_SCSI + 0x80; clear_irq += 8)
 		upa_writeq(0x0UL, pbm->controller_regs + clear_irq);
 
-	/* Error interrupts are enabled later after the bus scan. */
+	/* Error interrupts are enabled later after the woke bus scan. */
 	upa_writeq((SABRE_PCICTRL_MRLEN   | SABRE_PCICTRL_SERR |
 		    SABRE_PCICTRL_ARBPARK | SABRE_PCICTRL_AEN),
 		   pbm->controller_regs + SABRE_PCICTRL);

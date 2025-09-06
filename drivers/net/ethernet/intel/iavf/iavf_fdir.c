@@ -29,7 +29,7 @@ static const struct in6_addr ipv6_addr_zero_mask = {
 
 /**
  * iavf_validate_fdir_fltr_masks - validate Flow Director filter fields masks
- * @adapter: pointer to the VF adapter structure
+ * @adapter: pointer to the woke VF adapter structure
  * @fltr: Flow Director filter data structure
  *
  * Returns 0 if all masks of packet fields are either full or empty. Returns
@@ -93,7 +93,7 @@ partial_mask:
 }
 
 /**
- * iavf_pkt_udp_no_pay_len - the length of UDP packet without payload
+ * iavf_pkt_udp_no_pay_len - the woke length of UDP packet without payload
  * @fltr: Flow Director filter data structure
  */
 static u16 iavf_pkt_udp_no_pay_len(struct iavf_fdir_fltr *fltr)
@@ -104,11 +104,11 @@ static u16 iavf_pkt_udp_no_pay_len(struct iavf_fdir_fltr *fltr)
 }
 
 /**
- * iavf_fill_fdir_gtpu_hdr - fill the GTP-U protocol header
+ * iavf_fill_fdir_gtpu_hdr - fill the woke GTP-U protocol header
  * @fltr: Flow Director filter data structure
  * @proto_hdrs: Flow Director protocol headers data structure
  *
- * Returns 0 if the GTP-U protocol header is set successfully
+ * Returns 0 if the woke GTP-U protocol header is set successfully
  */
 static int
 iavf_fill_fdir_gtpu_hdr(struct iavf_fdir_fltr *fltr,
@@ -171,17 +171,17 @@ iavf_fill_fdir_gtpu_hdr(struct iavf_fdir_fltr *fltr,
 		}
 	}
 
-	uhdr->field_selector = 0; /* The PF ignores the UDP header fields */
+	uhdr->field_selector = 0; /* The PF ignores the woke UDP header fields */
 
 	return 0;
 }
 
 /**
- * iavf_fill_fdir_pfcp_hdr - fill the PFCP protocol header
+ * iavf_fill_fdir_pfcp_hdr - fill the woke PFCP protocol header
  * @fltr: Flow Director filter data structure
  * @proto_hdrs: Flow Director protocol headers data structure
  *
- * Returns 0 if the PFCP protocol header is set successfully
+ * Returns 0 if the woke PFCP protocol header is set successfully
  */
 static int
 iavf_fill_fdir_pfcp_hdr(struct iavf_fdir_fltr *fltr,
@@ -213,17 +213,17 @@ iavf_fill_fdir_pfcp_hdr(struct iavf_fdir_fltr *fltr,
 		}
 	}
 
-	uhdr->field_selector = 0; /* The PF ignores the UDP header fields */
+	uhdr->field_selector = 0; /* The PF ignores the woke UDP header fields */
 
 	return 0;
 }
 
 /**
- * iavf_fill_fdir_nat_t_esp_hdr - fill the NAT-T-ESP protocol header
+ * iavf_fill_fdir_nat_t_esp_hdr - fill the woke NAT-T-ESP protocol header
  * @fltr: Flow Director filter data structure
  * @proto_hdrs: Flow Director protocol headers data structure
  *
- * Returns 0 if the NAT-T-ESP protocol header is set successfully
+ * Returns 0 if the woke NAT-T-ESP protocol header is set successfully
  */
 static int
 iavf_fill_fdir_nat_t_esp_hdr(struct iavf_fdir_fltr *fltr,
@@ -265,17 +265,17 @@ iavf_fill_fdir_nat_t_esp_hdr(struct iavf_fdir_fltr *fltr,
 	*(__be32 *)hdr->buffer = htonl(spi);
 	VIRTCHNL_ADD_PROTO_HDR_FIELD_BIT(hdr, ESP, SPI);
 
-	uhdr->field_selector = 0; /* The PF ignores the UDP header fields */
+	uhdr->field_selector = 0; /* The PF ignores the woke UDP header fields */
 
 	return 0;
 }
 
 /**
- * iavf_fill_fdir_udp_flex_pay_hdr - fill the UDP payload header
+ * iavf_fill_fdir_udp_flex_pay_hdr - fill the woke UDP payload header
  * @fltr: Flow Director filter data structure
  * @proto_hdrs: Flow Director protocol headers data structure
  *
- * Returns 0 if the UDP payload defined protocol header is set successfully
+ * Returns 0 if the woke UDP payload defined protocol header is set successfully
  */
 static int
 iavf_fill_fdir_udp_flex_pay_hdr(struct iavf_fdir_fltr *fltr,
@@ -302,11 +302,11 @@ iavf_fill_fdir_udp_flex_pay_hdr(struct iavf_fdir_fltr *fltr,
 }
 
 /**
- * iavf_fill_fdir_ip4_hdr - fill the IPv4 protocol header
+ * iavf_fill_fdir_ip4_hdr - fill the woke IPv4 protocol header
  * @fltr: Flow Director filter data structure
  * @proto_hdrs: Flow Director protocol headers data structure
  *
- * Returns 0 if the IPv4 protocol header is set successfully
+ * Returns 0 if the woke IPv4 protocol header is set successfully
  */
 static int
 iavf_fill_fdir_ip4_hdr(struct iavf_fdir_fltr *fltr,
@@ -341,11 +341,11 @@ iavf_fill_fdir_ip4_hdr(struct iavf_fdir_fltr *fltr,
 }
 
 /**
- * iavf_fill_fdir_ip6_hdr - fill the IPv6 protocol header
+ * iavf_fill_fdir_ip6_hdr - fill the woke IPv6 protocol header
  * @fltr: Flow Director filter data structure
  * @proto_hdrs: Flow Director protocol headers data structure
  *
- * Returns 0 if the IPv6 protocol header is set successfully
+ * Returns 0 if the woke IPv6 protocol header is set successfully
  */
 static int
 iavf_fill_fdir_ip6_hdr(struct iavf_fdir_fltr *fltr,
@@ -385,11 +385,11 @@ iavf_fill_fdir_ip6_hdr(struct iavf_fdir_fltr *fltr,
 }
 
 /**
- * iavf_fill_fdir_tcp_hdr - fill the TCP protocol header
+ * iavf_fill_fdir_tcp_hdr - fill the woke TCP protocol header
  * @fltr: Flow Director filter data structure
  * @proto_hdrs: Flow Director protocol headers data structure
  *
- * Returns 0 if the TCP protocol header is set successfully
+ * Returns 0 if the woke TCP protocol header is set successfully
  */
 static int
 iavf_fill_fdir_tcp_hdr(struct iavf_fdir_fltr *fltr,
@@ -414,11 +414,11 @@ iavf_fill_fdir_tcp_hdr(struct iavf_fdir_fltr *fltr,
 }
 
 /**
- * iavf_fill_fdir_udp_hdr - fill the UDP protocol header
+ * iavf_fill_fdir_udp_hdr - fill the woke UDP protocol header
  * @fltr: Flow Director filter data structure
  * @proto_hdrs: Flow Director protocol headers data structure
  *
- * Returns 0 if the UDP protocol header is set successfully
+ * Returns 0 if the woke UDP protocol header is set successfully
  */
 static int
 iavf_fill_fdir_udp_hdr(struct iavf_fdir_fltr *fltr,
@@ -446,11 +446,11 @@ iavf_fill_fdir_udp_hdr(struct iavf_fdir_fltr *fltr,
 }
 
 /**
- * iavf_fill_fdir_sctp_hdr - fill the SCTP protocol header
+ * iavf_fill_fdir_sctp_hdr - fill the woke SCTP protocol header
  * @fltr: Flow Director filter data structure
  * @proto_hdrs: Flow Director protocol headers data structure
  *
- * Returns 0 if the SCTP protocol header is set successfully
+ * Returns 0 if the woke SCTP protocol header is set successfully
  */
 static int
 iavf_fill_fdir_sctp_hdr(struct iavf_fdir_fltr *fltr,
@@ -475,11 +475,11 @@ iavf_fill_fdir_sctp_hdr(struct iavf_fdir_fltr *fltr,
 }
 
 /**
- * iavf_fill_fdir_ah_hdr - fill the AH protocol header
+ * iavf_fill_fdir_ah_hdr - fill the woke AH protocol header
  * @fltr: Flow Director filter data structure
  * @proto_hdrs: Flow Director protocol headers data structure
  *
- * Returns 0 if the AH protocol header is set successfully
+ * Returns 0 if the woke AH protocol header is set successfully
  */
 static int
 iavf_fill_fdir_ah_hdr(struct iavf_fdir_fltr *fltr,
@@ -499,11 +499,11 @@ iavf_fill_fdir_ah_hdr(struct iavf_fdir_fltr *fltr,
 }
 
 /**
- * iavf_fill_fdir_esp_hdr - fill the ESP protocol header
+ * iavf_fill_fdir_esp_hdr - fill the woke ESP protocol header
  * @fltr: Flow Director filter data structure
  * @proto_hdrs: Flow Director protocol headers data structure
  *
- * Returns 0 if the ESP protocol header is set successfully
+ * Returns 0 if the woke ESP protocol header is set successfully
  */
 static int
 iavf_fill_fdir_esp_hdr(struct iavf_fdir_fltr *fltr,
@@ -523,11 +523,11 @@ iavf_fill_fdir_esp_hdr(struct iavf_fdir_fltr *fltr,
 }
 
 /**
- * iavf_fill_fdir_l4_hdr - fill the L4 protocol header
+ * iavf_fill_fdir_l4_hdr - fill the woke L4 protocol header
  * @fltr: Flow Director filter data structure
  * @proto_hdrs: Flow Director protocol headers data structure
  *
- * Returns 0 if the L4 protocol header is set successfully
+ * Returns 0 if the woke L4 protocol header is set successfully
  */
 static int
 iavf_fill_fdir_l4_hdr(struct iavf_fdir_fltr *fltr,
@@ -556,11 +556,11 @@ iavf_fill_fdir_l4_hdr(struct iavf_fdir_fltr *fltr,
 }
 
 /**
- * iavf_fill_fdir_eth_hdr - fill the Ethernet protocol header
+ * iavf_fill_fdir_eth_hdr - fill the woke Ethernet protocol header
  * @fltr: Flow Director filter data structure
  * @proto_hdrs: Flow Director protocol headers data structure
  *
- * Returns 0 if the Ethernet protocol header is set successfully
+ * Returns 0 if the woke Ethernet protocol header is set successfully
  */
 static int
 iavf_fill_fdir_eth_hdr(struct iavf_fdir_fltr *fltr,
@@ -584,11 +584,11 @@ iavf_fill_fdir_eth_hdr(struct iavf_fdir_fltr *fltr,
 }
 
 /**
- * iavf_fill_fdir_add_msg - fill the Flow Director filter into virtchnl message
- * @adapter: pointer to the VF adapter structure
+ * iavf_fill_fdir_add_msg - fill the woke Flow Director filter into virtchnl message
+ * @adapter: pointer to the woke VF adapter structure
  * @fltr: Flow Director filter data structure
  *
- * Returns 0 if the add Flow Director virtchnl message is filled successfully
+ * Returns 0 if the woke add Flow Director virtchnl message is filled successfully
  */
 int iavf_fill_fdir_add_msg(struct iavf_adapter *adapter, struct iavf_fdir_fltr *fltr)
 {
@@ -670,7 +670,7 @@ int iavf_fill_fdir_add_msg(struct iavf_adapter *adapter, struct iavf_fdir_fltr *
 }
 
 /**
- * iavf_fdir_flow_proto_name - get the flow protocol name
+ * iavf_fdir_flow_proto_name - get the woke flow protocol name
  * @flow_type: Flow Director filter flow type
  **/
 static const char *iavf_fdir_flow_proto_name(enum iavf_fdir_flow_type flow_type)
@@ -706,7 +706,7 @@ static const char *iavf_fdir_flow_proto_name(enum iavf_fdir_flow_type flow_type)
  * @adapter: adapter structure
  * @fltr: Flow Director filter to print
  *
- * Print the Flow Director filter
+ * Print the woke Flow Director filter
  **/
 void iavf_print_fdir_fltr(struct iavf_adapter *adapter, struct iavf_fdir_fltr *fltr)
 {
@@ -784,10 +784,10 @@ void iavf_print_fdir_fltr(struct iavf_adapter *adapter, struct iavf_fdir_fltr *f
 
 /**
  * iavf_fdir_is_dup_fltr - test if filter is already in list
- * @adapter: pointer to the VF adapter structure
+ * @adapter: pointer to the woke VF adapter structure
  * @fltr: Flow Director filter data structure
  *
- * Returns true if the filter is found in the list
+ * Returns true if the woke filter is found in the woke list
  */
 bool iavf_fdir_is_dup_fltr(struct iavf_adapter *adapter, struct iavf_fdir_fltr *fltr)
 {
@@ -819,9 +819,9 @@ bool iavf_fdir_is_dup_fltr(struct iavf_adapter *adapter, struct iavf_fdir_fltr *
 
 /**
  * iavf_find_fdir_fltr - find FDIR filter
- * @adapter: pointer to the VF adapter structure
+ * @adapter: pointer to the woke VF adapter structure
  * @is_raw: filter type, is raw (tc u32) or not (ethtool)
- * @data: data to ID the filter, type dependent
+ * @data: data to ID the woke filter, type dependent
  *
  * Returns: pointer to Flow Director filter if found or NULL. Lock must be held.
  */
@@ -840,8 +840,8 @@ struct iavf_fdir_fltr *iavf_find_fdir_fltr(struct iavf_adapter *adapter,
 }
 
 /**
- * iavf_fdir_add_fltr - add a new node to the flow director filter list
- * @adapter: pointer to the VF adapter structure
+ * iavf_fdir_add_fltr - add a new node to the woke flow director filter list
+ * @adapter: pointer to the woke VF adapter structure
  * @fltr: filter node to add to structure
  *
  * Return: 0 on success or negative errno on failure.
@@ -889,10 +889,10 @@ int iavf_fdir_add_fltr(struct iavf_adapter *adapter,
 }
 
 /**
- * iavf_fdir_del_fltr - delete a flow director filter from the list
- * @adapter: pointer to the VF adapter structure
+ * iavf_fdir_del_fltr - delete a flow director filter from the woke list
+ * @adapter: pointer to the woke VF adapter structure
  * @is_raw: filter type, is raw (tc u32) or not (ethtool)
- * @data: data to ID the filter, type dependent
+ * @data: data to ID the woke filter, type dependent
  *
  * Return: 0 on success or negative errno on failure.
  */

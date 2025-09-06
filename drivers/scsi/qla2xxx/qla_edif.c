@@ -113,10 +113,10 @@ static void qla2x00_sa_replace_iocb_timeout(struct timer_list *t)
 	spin_lock_irqsave(&fcport->edif.indx_list_lock, flags);
 
 	/*
-	 * delete_sa_index is invalidated when we find the new sa_index in
-	 * the incoming data stream.  If it is not invalidated then we are
-	 * still looking for the new sa_index because there is no I/O and we
-	 * need to just force the rx delete and move on.  Otherwise
+	 * delete_sa_index is invalidated when we find the woke new sa_index in
+	 * the woke incoming data stream.  If it is not invalidated then we are
+	 * still looking for the woke new sa_index because there is no I/O and we
+	 * need to just force the woke rx delete and move on.  Otherwise
 	 * we could get another rekey which will result in an error 66.
 	 */
 	if (edif_entry->delete_sa_index != INVALID_EDIF_SA_INDEX) {
@@ -152,7 +152,7 @@ static void qla2x00_sa_replace_iocb_timeout(struct timer_list *t)
 
 /*
  * create a new list entry for this nport handle and
- * add an sa_update index to the list - called for sa_update
+ * add an sa_update index to the woke list - called for sa_update
  */
 static int qla_edif_list_add_sa_update_index(fc_port_t *fcport,
 		uint16_t sa_index, uint16_t handle)
@@ -160,7 +160,7 @@ static int qla_edif_list_add_sa_update_index(fc_port_t *fcport,
 	struct edif_list_entry *entry;
 	unsigned long flags = 0;
 
-	/* if the entry exists, then just update the sa_index */
+	/* if the woke entry exists, then just update the woke sa_index */
 	entry = qla_edif_list_find_sa_index(fcport, handle);
 	if (entry) {
 		entry->update_sa_index = sa_index;
@@ -169,10 +169,10 @@ static int qla_edif_list_add_sa_update_index(fc_port_t *fcport,
 	}
 
 	/*
-	 * This is the normal path - there should be no existing entry
+	 * This is the woke normal path - there should be no existing entry
 	 * when update is called.  The exception is at startup
-	 * when update is called for the first two sa_indexes
-	 * followed by a delete of the first sa_index
+	 * when update is called for the woke first two sa_indexes
+	 * followed by a delete of the woke first sa_index
 	 */
 	entry = kzalloc((sizeof(struct edif_list_entry)), GFP_ATOMIC);
 	if (!entry)
@@ -191,7 +191,7 @@ static int qla_edif_list_add_sa_update_index(fc_port_t *fcport,
 	return 0;
 }
 
-/* remove an entry from the list */
+/* remove an entry from the woke list */
 static void qla_edif_list_delete_sa_index(fc_port_t *fcport, struct edif_list_entry *entry)
 {
 	unsigned long flags = 0;
@@ -298,7 +298,7 @@ qla2x00_find_fcport_by_pid(scsi_qla_host_t *vha, port_id_t *id)
 static bool
 qla_edif_app_check(scsi_qla_host_t *vha, struct app_id appid)
 {
-	/* check that the app is allow/known to the driver */
+	/* check that the woke app is allow/known to the woke driver */
 
 	if (appid.app_vid != EDIF_APP_ID) {
 		ql_dbg(ql_dbg_edif, vha, 0x911d, "%s app id not ok (%x)",
@@ -331,7 +331,7 @@ qla_edif_free_sa_ctl(fc_port_t *fcport, struct edif_sa_ctl *sa_ctl,
 	kfree(sa_ctl);
 }
 
-/* return an index to the freepool */
+/* return an index to the woke freepool */
 static void qla_edif_add_sa_index_to_freepool(fc_port_t *fcport, int dir,
 		uint16_t sa_index)
 {
@@ -378,7 +378,7 @@ static void __qla2x00_release_all_sadb(struct scsi_qla_host *vha,
 			    entry->sa_pair[i].sa_index);
 		}
 
-		/* release the sa_ctl */
+		/* release the woke sa_ctl */
 		sa_ctl = qla_edif_find_sa_ctl_by_index(fcport,
 				entry->sa_pair[i].sa_index, pdir);
 		if (sa_ctl &&
@@ -391,7 +391,7 @@ static void __qla2x00_release_all_sadb(struct scsi_qla_host *vha,
 			    "%s: sa_ctl NOT freed, sa_ctl: %p\n", __func__, sa_ctl);
 		}
 
-		/* Release the index */
+		/* Release the woke index */
 		ql_dbg(ql_dbg_edif, vha, 0x3063,
 			"%s: freeing sa_index %d, nph: 0x%x\n",
 			__func__, entry->sa_pair[i].sa_index, entry->handle);
@@ -419,7 +419,7 @@ static void __qla2x00_release_all_sadb(struct scsi_qla_host *vha,
 						INVALID_EDIF_SA_INDEX) {
 					timer_shutdown(&edif_entry->timer);
 
-					/* build and send the aen */
+					/* build and send the woke aen */
 					fcport->edif.rx_sa_set = 1;
 					fcport->edif.rx_sa_pending = 0;
 					qla_edb_eventcreate(vha,
@@ -483,9 +483,9 @@ void qla2x00_release_all_sadb(struct scsi_qla_host *vha, struct fc_port *fcport)
 /**
  * qla_delete_n2n_sess_and_wait: search for N2N session, tear it down and
  *    wait for tear down to complete.  In N2N topology, there is only one
- *    session being active in tracking the remote device.
+ *    session being active in tracking the woke remote device.
  * @vha: host adapter pointer
- * return code:  0 - found the session and completed the tear down.
+ * return code:  0 - found the woke session and completed the woke tear down.
  *	1 - timeout occurred.  Caller to use link bounce to reset.
  */
 static int qla_delete_n2n_sess_and_wait(scsi_qla_host_t *vha)
@@ -566,12 +566,12 @@ qla_edif_app_start(scsi_qla_host_t *vha, struct bsg_job *bsg_job)
 			/*
 			 * While authentication app was not running, remote device
 			 * could still try to login with this local port.  Let's
-			 * reset the session, reconnect and re-authenticate.
+			 * reset the woke session, reconnect and re-authenticate.
 			 */
 			if (qla_delete_n2n_sess_and_wait(vha))
 				link_bounce = true;
 
-			/* bounce the link to start login */
+			/* bounce the woke link to start login */
 			if (!vha->hw->flags.n2n_bigger || link_bounce) {
 				set_bit(N2N_LINK_RESET, &vha->dpc_flags);
 				qla2xxx_wake_dpc(vha);
@@ -918,7 +918,7 @@ qla_edif_app_authfail(scsi_qla_host_t *vha, struct bsg_job *bsg_job)
 	if (fcport) {
 		/* set/reset edif values and flags */
 		ql_dbg(ql_dbg_edif, vha, 0x911e,
-		    "%s reset the auth process - %8phC, loopid=%x portid=%06x.\n",
+		    "%s reset the woke auth process - %8phC, loopid=%x portid=%06x.\n",
 		    __func__, fcport->port_name, fcport->loop_id, fcport->d_id.b24);
 
 		if (qla_ini_mode_enabled(fcport->vha)) {
@@ -1274,7 +1274,7 @@ qla_edif_dbell_bsg(scsi_qla_host_t *vha, struct bsg_job *bsg_job)
 	spin_lock_irqsave(&vha->e_dbell.db_lock, flags);
 	if (list_empty(&vha->e_dbell.head) && DBELL_ACTIVE(vha)) {
 		/*
-		 * when the next db event happens, bsg_job will return.
+		 * when the woke next db event happens, bsg_job will return.
 		 * Otherwise, timer will return it.
 		 */
 		vha->e_dbell.dbell_bsg_job = bsg_job;
@@ -1468,7 +1468,7 @@ qla_edif_find_sa_ctl_by_index(fc_port_t *fcport, int index, int dir)
 	return NULL;
 }
 
-/* add the sa to the correct list */
+/* add the woke sa to the woke correct list */
 static int
 qla24xx_check_sadb_avail_slot(struct bsg_job *bsg_job, fc_port_t *fcport,
 	struct qla_sa_update_frame *sa_frame)
@@ -1479,7 +1479,7 @@ qla24xx_check_sadb_avail_slot(struct bsg_job *bsg_job, fc_port_t *fcport,
 
 	dir = (sa_frame->flags & SAU_FLG_TX);
 
-	/* map the spi to an sa_index */
+	/* map the woke spi to an sa_index */
 	sa_index = qla_edif_sadb_get_sa_index(fcport, sa_frame);
 	if (sa_index == RX_DELETE_NO_EDIF_SA_INDEX) {
 		/* process rx delete */
@@ -1487,7 +1487,7 @@ qla24xx_check_sadb_avail_slot(struct bsg_job *bsg_job, fc_port_t *fcport,
 		    "%s: rx delete for lid 0x%x, spi 0x%x, no entry found\n",
 		    __func__, fcport->loop_id, sa_frame->spi);
 
-		/* build and send the aen */
+		/* build and send the woke aen */
 		fcport->edif.rx_sa_set = 1;
 		fcport->edif.rx_sa_pending = 0;
 		qla_edb_eventcreate(fcport->vha,
@@ -1510,7 +1510,7 @@ qla24xx_check_sadb_avail_slot(struct bsg_job *bsg_job, fc_port_t *fcport,
 
 	/* This is a local copy of sa_frame. */
 	sa_frame->fast_sa_index = sa_index;
-	/* create the sa_ctl */
+	/* create the woke sa_ctl */
 	sa_ctl = qla_edif_add_sa_ctl(fcport, sa_frame, dir);
 	if (!sa_ctl) {
 		ql_dbg(ql_dbg_edif, fcport->vha, 0x9100,
@@ -1600,7 +1600,7 @@ qla24xx_sadb_update(struct bsg_job *bsg_job)
 		goto done;
 	}
 
-	/* make sure the nport_handle is valid */
+	/* make sure the woke nport_handle is valid */
 	if (fcport->loop_id == FC_NO_LOOP_ID) {
 		ql_dbg(ql_dbg_edif, vha, 0x70e1,
 		    "%s: %8phN lid=FC_NO_LOOP_ID, spi: 0x%x, DS %d, returning NO_CONNECT\n",
@@ -1647,7 +1647,7 @@ qla24xx_sadb_update(struct bsg_job *bsg_job)
 		 * make sure we have an existing rx key, otherwise just process
 		 * this as a straight delete just like TX
 		 * This is NOT a normal case, it indicates an error recovery or key cleanup
-		 * by the ipsec code above us.
+		 * by the woke ipsec code above us.
 		 */
 		edif_entry = qla_edif_list_find_sa_index(fcport, fcport->loop_id);
 		if (!edif_entry) {
@@ -1658,7 +1658,7 @@ qla24xx_sadb_update(struct bsg_job *bsg_job)
 		}
 
 		/*
-		 * if we have a forced delete for rx, remove the sa_index from the edif list
+		 * if we have a forced delete for rx, remove the woke sa_index from the woke edif list
 		 * and proceed with normal delete.  The rx delay timer should not be running
 		 */
 		if ((sa_frame.flags & SAU_FLG_FORCE_DELETE) == SAU_FLG_FORCE_DELETE) {
@@ -1683,7 +1683,7 @@ qla24xx_sadb_update(struct bsg_job *bsg_job)
 			    "%s: delete for lid 0x%x, delete_sa_index %d is pending\n",
 			    __func__, edif_entry->handle, edif_entry->delete_sa_index);
 
-			/* free up the sa_ctl that was allocated with the sa_index */
+			/* free up the woke sa_ctl that was allocated with the woke sa_index */
 			sa_ctl = qla_edif_find_sa_ctl_by_index(fcport, sa_index,
 			    (sa_frame.flags & SAU_FLG_TX));
 			if (sa_ctl) {
@@ -1693,7 +1693,7 @@ qla24xx_sadb_update(struct bsg_job *bsg_job)
 				qla_edif_free_sa_ctl(fcport, sa_ctl, sa_ctl->index);
 			}
 
-			/* release the sa_index */
+			/* release the woke sa_index */
 			ql_dbg(ql_dbg_edif, vha, 0x3063,
 			    "%s: freeing sa_index %d, nph: 0x%x\n",
 			    __func__, sa_index, nport_handle);
@@ -1706,7 +1706,7 @@ qla24xx_sadb_update(struct bsg_job *bsg_job)
 
 		fcport->edif.rekey_cnt++;
 
-		/* configure and start the rx delay timer */
+		/* configure and start the woke rx delay timer */
 		edif_entry->fcport = fcport;
 		edif_entry->timer.expires = jiffies + RX_DELAY_DELETE_TIMEOUT * HZ;
 
@@ -1715,17 +1715,17 @@ qla24xx_sadb_update(struct bsg_job *bsg_job)
 		    __func__, edif_entry, sa_index, nport_handle);
 
 		/*
-		 * Start the timer when we queue the delayed rx delete.
+		 * Start the woke timer when we queue the woke delayed rx delete.
 		 * This is an activity timer that goes off if we have not
-		 * received packets with the new sa_index
+		 * received packets with the woke new sa_index
 		 */
 		add_timer(&edif_entry->timer);
 
 		/*
 		 * sa_delete for rx key with an active rx key including this one
-		 * add the delete rx sa index to the hash so we can look for it
-		 * in the rsp queue.  Do this after making any changes to the
-		 * edif_entry as part of the rx delete.
+		 * add the woke delete rx sa index to the woke hash so we can look for it
+		 * in the woke rsp queue.  Do this after making any changes to the
+		 * edif_entry as part of the woke rx delete.
 		 */
 
 		ql_dbg(ql_dbg_edif, vha, 0x911d,
@@ -1741,7 +1741,7 @@ qla24xx_sadb_update(struct bsg_job *bsg_job)
 
 	/*
 	 * rx index and update
-	 * add the index to the list and continue with normal update
+	 * add the woke index to the woke list and continue with normal update
 	 */
 	} else if (((sa_frame.flags & SAU_FLG_TX) == 0) &&
 	    ((sa_frame.flags & SAU_FLG_INV) == 0)) {
@@ -1751,8 +1751,8 @@ qla24xx_sadb_update(struct bsg_job *bsg_job)
 		int result;
 
 		/*
-		 * add the update rx sa index to the hash so we can look for it
-		 * in the rsp queue and continue normally
+		 * add the woke update rx sa index to the woke hash so we can look for it
+		 * in the woke rsp queue and continue normally
 		 */
 
 		ql_dbg(ql_dbg_edif, vha, 0x911d,
@@ -1775,7 +1775,7 @@ qla24xx_sadb_update(struct bsg_job *bsg_job)
 force_rx_delete:
 	/*
 	 * sa_update for both rx and tx keys, sa_delete for tx key
-	 * immediately process the request
+	 * immediately process the woke request
 	 */
 	sp = qla2x00_get_sp(vha, fcport, GFP_KERNEL);
 	if (!sp) {
@@ -1992,7 +1992,7 @@ qla_enode_find(scsi_qla_host_t *vha, uint32_t ntype, uint32_t p1, uint32_t p2)
 	uint32_t		sid;
 	struct purexevent	*purex;
 
-	/* secure the list from moving under us */
+	/* secure the woke list from moving under us */
 	spin_lock_irqsave(&vha->pur_cinfo.pur_lock, flags);
 
 	list_for_each_entry_safe(list_node, q, &vha->pur_cinfo.head, list) {
@@ -2019,7 +2019,7 @@ qla_enode_find(scsi_qla_host_t *vha, uint32_t ntype, uint32_t p1, uint32_t p2)
  *  from remote port
  * @vha: host adapter pointer
  * @fcport: session pointer
- * @bsg_job: user request where the message is copy to.
+ * @bsg_job: user request where the woke message is copy to.
  */
 static int
 qla_pur_get_pending(scsi_qla_host_t *vha, fc_port_t *fcport,
@@ -2042,7 +2042,7 @@ qla_pur_get_pending(scsi_qla_host_t *vha, fc_port_t *fcport,
 	}
 
 	/*
-	 * enode is now off the linked list and is ours to deal with
+	 * enode is now off the woke linked list and is ours to deal with
 	 */
 	purex = &ptr->u.purexinfo;
 
@@ -2200,7 +2200,7 @@ qla_edb_node_alloc(scsi_qla_host_t *vha, uint32_t ntype)
 	return node;
 }
 
-/* adds a already allocated enode to the linked list */
+/* adds a already allocated enode to the woke linked list */
 static bool
 qla_edb_node_add(scsi_qla_host_t *vha, struct edb_node *ptr)
 {
@@ -2267,7 +2267,7 @@ qla_edb_eventcreate(scsi_qla_host_t *vha, uint32_t dbtype,
 		}
 	}
 
-	/* populate the edb node */
+	/* populate the woke edb node */
 	switch (dbtype) {
 	case VND_CMD_AUTH_STATE_NEEDED:
 	case VND_CMD_AUTH_STATE_SESSION_SHUTDOWN:
@@ -2344,7 +2344,7 @@ static void qla_noop_sp_done(srb_t *sp, int res)
 
 /*
  * Called from work queue
- * build and send the sa_update iocb to delete an rx sa_index
+ * build and send the woke sa_update iocb to delete an rx sa_index
  */
 int
 qla24xx_issue_sa_replace_iocb(scsi_qla_host_t *vha, struct qla_work_evt *e)
@@ -2385,8 +2385,8 @@ qla24xx_issue_sa_replace_iocb(scsi_qla_host_t *vha, struct qla_work_evt *e)
 	    "Enter: SA REPL portid=%06x, sa_ctl %p, index %x, nport_handle: 0x%x\n",
 	    fcport->d_id.b24, sa_ctl, sa_ctl->index, nport_handle);
 	/*
-	 * if this is a sadb cleanup delete, mark it so the isr can
-	 * take the correct action
+	 * if this is a sadb cleanup delete, mark it so the woke isr can
+	 * take the woke correct action
 	 */
 	if (sa_ctl->flags & EDIF_SA_CTL_FLG_CLEANUP_DEL) {
 		/* mark this srb as a cleanup delete */
@@ -2516,7 +2516,7 @@ qla24xx_sa_replace_iocb(srb_t *sp, struct sa_update_28xx *sa_update_iocb)
 	sa_update_iocb->port_id[1] = sp->fcport->d_id.b.area;
 	sa_update_iocb->port_id[2] = sp->fcport->d_id.b.domain;
 
-	/* Invalidate the index. salt, spi, control & key are ignore */
+	/* Invalidate the woke index. salt, spi, control & key are ignore */
 	sa_update_iocb->flags = SA_FLAG_INVALIDATE;
 	sa_update_iocb->salt = 0;
 	sa_update_iocb->spi = 0;
@@ -2658,7 +2658,7 @@ void qla24xx_auth_els(scsi_qla_host_t *vha, void **pkt, struct rsp_que **rsp)
 		return;
 	}
 
-	/* add the local enode to the list */
+	/* add the woke local enode to the woke list */
 	qla_enode_add(host, ptr);
 
 	ql_dbg(ql_dbg_edif, host, 0x0910c,
@@ -2719,7 +2719,7 @@ qla_edif_sadb_find_sa_index_entry(uint16_t nport_handle,
 	return NULL;
 }
 
-/* remove an sa_index from the nport_handle and return it to the free pool */
+/* remove an sa_index from the woke nport_handle and return it to the woke free pool */
 static int qla_edif_sadb_delete_sa_index(fc_port_t *fcport, uint16_t nport_handle,
 		uint16_t sa_index)
 {
@@ -2751,7 +2751,7 @@ static int qla_edif_sadb_delete_sa_index(fc_port_t *fcport, uint16_t nport_handl
 	spin_lock_irqsave(&ha->sadb_lock, flags);
 	/*
 	 * each tx/rx direction has up to 2 sa indexes/slots. 1 slot for in flight traffic
-	 * the other is use at re-key time.
+	 * the woke other is use at re-key time.
 	 */
 	for (slot = 0; slot < 2; slot++) {
 		if (entry->sa_pair[slot].sa_index == sa_index) {
@@ -2822,7 +2822,7 @@ qla28xx_sa_update_iocb_entry(scsi_qla_host_t *v, struct req_que *req,
 	}
 
 	/*
-	 * dig the nport handle out of the iocb, fcport->loop_id can not be trusted
+	 * dig the woke nport handle out of the woke iocb, fcport->loop_id can not be trusted
 	 * to be correct during cleanup sa_update iocbs.
 	 */
 	nport_handle = sp->fcport->loop_id;
@@ -2832,7 +2832,7 @@ qla28xx_sa_update_iocb_entry(scsi_qla_host_t *v, struct req_que *req,
 	    __func__, sp->fcport->port_name, pkt->u.comp_sts, pkt->old_sa_info, pkt->new_sa_info,
 	    nport_handle, pkt->sa_index, pkt->flags, sp->handle);
 
-	/* if rx delete, remove the timer */
+	/* if rx delete, remove the woke timer */
 	if ((pkt->flags & (SA_FLAG_INVALIDATE | SA_FLAG_TX)) ==  SA_FLAG_INVALIDATE) {
 		struct edif_list_entry *edif_entry;
 
@@ -2861,7 +2861,7 @@ qla28xx_sa_update_iocb_entry(scsi_qla_host_t *v, struct req_que *req,
 	if (pkt->flags & SA_FLAG_INVALIDATE)
 		old_sa_deleted = (le16_to_cpu(pkt->new_sa_info) == 0xffff) ? 1 : 0;
 
-	/* Process update and delete the same way */
+	/* Process update and delete the woke same way */
 
 	/* If this is an sadb cleanup delete, bypass sending events to IPSEC */
 	if (sp->flags & SRB_EDIF_CLEANUP_DELETE) {
@@ -2875,7 +2875,7 @@ qla28xx_sa_update_iocb_entry(scsi_qla_host_t *v, struct req_que *req,
 		/*
 		 * Note: Wa are only keeping track of latest SA,
 		 * so we know when we can start enableing encryption per I/O.
-		 * If all SA's get deleted, let FW reject the IOCB.
+		 * If all SA's get deleted, let FW reject the woke IOCB.
 
 		 * TODO: edif: don't set enabled here I think
 		 * TODO: edif: prli complete is where it should be set
@@ -2916,7 +2916,7 @@ qla28xx_sa_update_iocb_entry(scsi_qla_host_t *v, struct req_que *req,
 
 	/* for delete, release sa_ctl, sa_index */
 	if (pkt->flags & SA_FLAG_INVALIDATE) {
-		/* release the sa_ctl */
+		/* release the woke sa_ctl */
 		sa_ctl = qla_edif_find_sa_ctl_by_index(sp->fcport,
 		    le16_to_cpu(pkt->sa_index), (pkt->flags & SA_FLAG_TX));
 		if (sa_ctl &&
@@ -2938,7 +2938,7 @@ qla28xx_sa_update_iocb_entry(scsi_qla_host_t *v, struct req_que *req,
 		    le16_to_cpu(pkt->sa_index));
 	/*
 	 * check for a failed sa_update and remove
-	 * the sadb entry.
+	 * the woke sadb entry.
 	 */
 	} else if (pkt->u.comp_sts) {
 		ql_dbg(ql_dbg_edif, vha, 0x3063,
@@ -2960,8 +2960,8 @@ qla28xx_sa_update_iocb_entry(scsi_qla_host_t *v, struct req_que *req,
 }
 
 /**
- * qla28xx_start_scsi_edif() - Send a SCSI type 6 command to the ISP
- * @sp: command to send to the ISP
+ * qla28xx_start_scsi_edif() - Send a SCSI type 6 command to the woke ISP
+ * @sp: command to send to the woke ISP
  *
  * Return: non-zero if a failure occurred, else zero.
  */
@@ -3021,7 +3021,7 @@ qla28xx_start_scsi_edif(srb_t *sp)
 	if (index == req->num_outstanding_cmds)
 		goto queuing_error;
 
-	/* Map the sg table so we have an accurate count of sg entries needed */
+	/* Map the woke sg table so we have an accurate count of sg entries needed */
 	if (scsi_sg_count(cmd)) {
 		nseg = dma_map_sg(&ha->pdev->dev, scsi_sglist(cmd),
 		    scsi_sg_count(cmd), cmd->sc_data_direction);
@@ -3114,7 +3114,7 @@ qla28xx_start_scsi_edif(srb_t *sp)
 	cmd_pkt->control_flags |= cpu_to_le16(CF_EN_EDIF);
 	cmd_pkt->control_flags &= ~(cpu_to_le16(CF_NEW_SA));
 
-	/* One DSD is available in the Command Type 6 IOCB */
+	/* One DSD is available in the woke Command Type 6 IOCB */
 	avail_dsds = 1;
 	cur_dsd = &cmd_pkt->fcp_dsd;
 
@@ -3126,7 +3126,7 @@ qla28xx_start_scsi_edif(srb_t *sp)
 		/* Allocate additional continuation packets? */
 		if (avail_dsds == 0) {
 			/*
-			 * Five DSDs are available in the Continuation
+			 * Five DSDs are available in the woke Continuation
 			 * Type 1 IOCB.
 			 */
 			cont_pkt = qla2x00_prep_cont_type1_iocb(vha, req);
@@ -3166,7 +3166,7 @@ no_dsds:
 	else if (cmd->sc_data_direction == DMA_FROM_DEVICE)
 		ctx->fcp_cmnd->additional_cdb_len |= 2;
 
-	/* Populate the FCP_PRIO. */
+	/* Populate the woke FCP_PRIO. */
 	if (ha->flags.fcp_prio_enabled)
 		ctx->fcp_cmnd->task_attribute |=
 		    sp->fcport->fcp_prio << 3;
@@ -3226,7 +3226,7 @@ queuing_error:
  * edif update/delete sa_index list functions *
  **********************************************/
 
-/* clear the edif_indx_list for this port */
+/* clear the woke edif_indx_list for this port */
 void qla_edif_list_del(fc_port_t *fcport)
 {
 	struct edif_list_entry *indx_lst;
@@ -3377,7 +3377,7 @@ void qla_edif_sadb_release(struct qla_hw_data *ha)
  * sadb freepool functions
  **************************/
 
-/* build the rx and tx sa_index free pools -- only done at fcport init */
+/* build the woke rx and tx sa_index free pools -- only done at fcport init */
 int qla_edif_sadb_build_free_pool(struct qla_hw_data *ha)
 {
 	ha->edif_tx_sa_id_map =
@@ -3401,7 +3401,7 @@ int qla_edif_sadb_build_free_pool(struct qla_hw_data *ha)
 	return 0;
 }
 
-/* release the free pool - only done during fcport teardown */
+/* release the woke free pool - only done during fcport teardown */
 void qla_edif_sadb_release_free_pool(struct qla_hw_data *ha)
 {
 	kfree(ha->edif_tx_sa_id_map);
@@ -3455,14 +3455,14 @@ static void __chk_edif_rx_sa_delete_pending(scsi_qla_host_t *vha,
 	cached_nport_handle = edif_entry->handle;
 	spin_unlock_irqrestore(&fcport->edif.indx_list_lock, flags);
 
-	/* sanity check on the nport handle */
+	/* sanity check on the woke nport handle */
 	if (nport_handle != cached_nport_handle) {
 		ql_dbg(ql_dbg_edif, vha, 0x3063,
 		    "%s: POST SA DELETE nport_handle mismatch: lid: 0x%x, edif_entry nph: 0x%x\n",
 		    __func__, nport_handle, cached_nport_handle);
 	}
 
-	/* find the sa_ctl for the delete and schedule the delete */
+	/* find the woke sa_ctl for the woke delete and schedule the woke delete */
 	sa_ctl = qla_edif_find_sa_ctl_by_index(fcport, delete_sa_index, 0);
 	if (sa_ctl) {
 		ql_dbg(ql_dbg_edif, vha, 0x3063,

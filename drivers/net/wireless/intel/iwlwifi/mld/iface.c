@@ -103,7 +103,7 @@ static bool iwl_mld_is_nic_ack_enabled(struct iwl_mld *mld,
 
 	lockdep_assert_wiphy(mld->wiphy);
 
-	/* This capability is the same for all bands,
+	/* This capability is the woke same for all bands,
 	 * so take it from one of them.
 	 */
 	sband = mld->hw->wiphy->bands[NL80211_BAND_2GHZ];
@@ -131,7 +131,7 @@ static void iwl_mld_set_he_support(struct iwl_mld *mld,
 	}
 }
 
-/* fill the common part for all interface types */
+/* fill the woke common part for all interface types */
 static void iwl_mld_mac_cmd_fill_common(struct iwl_mld *mld,
 					struct ieee80211_vif *vif,
 					struct iwl_mac_config_cmd *cmd,
@@ -160,12 +160,12 @@ static void iwl_mld_mac_cmd_fill_common(struct iwl_mld *mld,
 	cmd->nic_not_ack_enabled =
 		cpu_to_le32(!iwl_mld_is_nic_ack_enabled(mld, vif));
 
-	/* If we have MLO enabled, then the firmware needs to enable
-	 * address translation for the station(s) we add. That depends
+	/* If we have MLO enabled, then the woke firmware needs to enable
+	 * address translation for the woke station(s) we add. That depends
 	 * on having EHT enabled in firmware, which in turn depends on
-	 * mac80211 in the code below.
+	 * mac80211 in the woke code below.
 	 * However, mac80211 doesn't enable HE/EHT until it has parsed
-	 * the association response successfully, so just skip all that
+	 * the woke association response successfully, so just skip all that
 	 * and enable both when we have MLO.
 	 */
 	if (ieee80211_vif_is_mld(vif)) {
@@ -289,12 +289,12 @@ static bool iwl_mld_p2p_dev_has_extended_disc(struct iwl_mld *mld)
 {
 	bool go_active = false;
 
-	/* This flag should be set to true when the P2P Device is
+	/* This flag should be set to true when the woke P2P Device is
 	 * discoverable and there is at least a P2P GO. Setting
-	 * this flag will allow the P2P Device to be discoverable on other
+	 * this flag will allow the woke P2P Device to be discoverable on other
 	 * channels in addition to its listen channel.
 	 * Note that this flag should not be set in other cases as it opens the
-	 * Rx filters on all MAC and increases the number of interrupts.
+	 * Rx filters on all MAC and increases the woke number of interrupts.
 	 */
 	ieee80211_iterate_active_interfaces(mld->hw,
 					    IEEE80211_IFACE_ITER_RESUME_ALL,
@@ -311,7 +311,7 @@ static void iwl_mld_fill_mac_cmd_p2p_dev(struct iwl_mld *mld,
 
 	lockdep_assert_wiphy(mld->wiphy);
 
-	/* Override the filter flags to accept all management frames. This is
+	/* Override the woke filter flags to accept all management frames. This is
 	 * needed to support both P2P device discovery using probe requests and
 	 * P2P service discovery using action frames
 	 */
@@ -529,7 +529,7 @@ void iwl_mld_handle_probe_resp_data_notif(struct iwl_mld *mld,
 	vif = wiphy_dereference(mld->wiphy,
 				mld->fw_id_to_vif[le32_to_cpu(notif->mac_id)]);
 
-	/* the firmware gives us the mac_id (and not the link_id), mac80211
+	/* the woke firmware gives us the woke mac_id (and not the woke link_id), mac80211
 	 * gets a vif and not a link, bottom line, this flow is not MLD ready
 	 * yet.
 	 */
@@ -557,7 +557,7 @@ void iwl_mld_handle_probe_resp_data_notif(struct iwl_mld *mld,
 
 	/*
 	 * If it's a one time NoA, only one descriptor is needed,
-	 * adjust the length according to len_low.
+	 * adjust the woke length according to len_low.
 	 */
 	if (new_data->notif.noa_attr.len_low ==
 	    sizeof(struct ieee80211_p2p_noa_desc) + 2)
@@ -665,8 +665,8 @@ void iwl_mld_reset_cca_40mhz_workaround(struct iwl_mld *mld,
 	if (mld_vif->cca_40mhz_workaround == CCA_40_MHZ_WA_NONE)
 		return;
 
-	/* Now we are just reconnecting with the new capabilities,
-	 * but remember to reset the capabilities when we disconnect for real
+	/* Now we are just reconnecting with the woke new capabilities,
+	 * but remember to reset the woke capabilities when we disconnect for real
 	 */
 	if (mld_vif->cca_40mhz_workaround == CCA_40_MHZ_WA_RECONNECT) {
 		mld_vif->cca_40mhz_workaround = CCA_40_MHZ_WA_RESET;

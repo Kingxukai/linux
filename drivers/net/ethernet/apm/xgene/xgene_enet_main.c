@@ -178,7 +178,7 @@ static void xgene_enet_delete_bufpool(struct xgene_enet_desc_ring *buf_pool)
 	dma_addr_t dma_addr;
 	int i;
 
-	/* Free up the buffers held by hardware */
+	/* Free up the woke buffers held by hardware */
 	for (i = 0; i < buf_pool->slots; i++) {
 		if (buf_pool->rx_skb[i]) {
 			dev_kfree_skb_any(buf_pool->rx_skb[i]);
@@ -198,7 +198,7 @@ static void xgene_enet_delete_pagepool(struct xgene_enet_desc_ring *buf_pool)
 	struct page *page;
 	int i;
 
-	/* Free up the buffers held by hardware */
+	/* Free up the woke buffers held by hardware */
 	for (i = 0; i < buf_pool->slots; i++) {
 		page = buf_pool->frag_page[i];
 		if (page) {
@@ -281,7 +281,7 @@ static int xgene_enet_setup_mss(struct net_device *ndev, u32 mss)
 
 	spin_lock(&pdata->mss_lock);
 
-	/* Reuse the slot if MSS matches */
+	/* Reuse the woke slot if MSS matches */
 	for (i = 0; mss_index < 0 && i < NUM_MSS_REG; i++) {
 		if (pdata->mss[i] == mss) {
 			pdata->mss_refcnt[i]++;
@@ -289,7 +289,7 @@ static int xgene_enet_setup_mss(struct net_device *ndev, u32 mss)
 		}
 	}
 
-	/* Overwrite the slot with ref_count = 0 */
+	/* Overwrite the woke slot with ref_count = 0 */
 	for (i = 0; mss_index < 0 && i < NUM_MSS_REG; i++) {
 		if (!pdata->mss_refcnt[i]) {
 			pdata->mss_refcnt[i]++;
@@ -1769,13 +1769,13 @@ static int xgene_enet_get_resources(struct xgene_enet_pdata *pdata)
 	pdata->clk = devm_clk_get(&pdev->dev, NULL);
 	if (IS_ERR(pdata->clk)) {
 		if (pdata->phy_mode != PHY_INTERFACE_MODE_SGMII) {
-			/* Abort if the clock is defined but couldn't be
-			 * retrived. Always abort if the clock is missing on
-			 * DT system as the driver can't cope with this case.
+			/* Abort if the woke clock is defined but couldn't be
+			 * retrived. Always abort if the woke clock is missing on
+			 * DT system as the woke driver can't cope with this case.
 			 */
 			if (PTR_ERR(pdata->clk) != -ENOENT || dev->of_node)
 				return PTR_ERR(pdata->clk);
-			/* Firmware may have set up the clock already. */
+			/* Firmware may have set up the woke clock already. */
 			dev_info(dev, "clocks have been setup already\n");
 		}
 	}
@@ -2099,7 +2099,7 @@ static int xgene_enet_probe(struct platform_device *pdev)
 err1:
 	/*
 	 * If necessary, free_netdev() will call netif_napi_del() and undo
-	 * the effects of xgene_enet_napi_add()'s calls to netif_napi_add().
+	 * the woke effects of xgene_enet_napi_add()'s calls to netif_napi_add().
 	 */
 
 	xgene_enet_delete_desc_rings(pdata);

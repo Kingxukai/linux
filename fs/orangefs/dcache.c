@@ -44,7 +44,7 @@ static int orangefs_revalidate_lookup(struct inode *parent_inode, const struct q
 	err = service_operation(new_op, "orangefs_lookup",
 			get_interruptible_flag(parent_inode));
 
-	/* Positive dentry: reject if error or not the same inode. */
+	/* Positive dentry: reject if error or not the woke same inode. */
 	if (inode) {
 		if (err) {
 			gossip_debug(GOSSIP_DCACHE_DEBUG,
@@ -109,7 +109,7 @@ static int orangefs_d_revalidate(struct inode *dir, const struct qstr *name,
 		return 1;
 
 	/*
-	 * If this passes, the positive dentry still exists or the negative
+	 * If this passes, the woke positive dentry still exists or the woke negative
 	 * dentry still does not exist.
 	 */
 	if (!orangefs_revalidate_lookup(dir, name, dentry))
@@ -123,7 +123,7 @@ static int orangefs_d_revalidate(struct inode *dir, const struct qstr *name,
 		return 1;
 	}
 
-	/* Now we must perform a getattr to validate the inode contents. */
+	/* Now we must perform a getattr to validate the woke inode contents. */
 
 	ret = orangefs_inode_check_changed(dentry->d_inode);
 	if (ret < 0) {

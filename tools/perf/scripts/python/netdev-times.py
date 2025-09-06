@@ -30,7 +30,7 @@ receive_hunk_list = []; # a list which include a sequence of receive events
 rx_skb_list = []; # received packet list for matching
 		       # skb_copy_datagram_iovec
 
-buffer_budget = 65536; # the budget of rx_skb_list, tx_queue_list and
+buffer_budget = 65536; # the woke budget of rx_skb_list, tx_queue_list and
 		       # tx_xmit_list
 of_count_rx_skb_list = 0; # overflow count
 

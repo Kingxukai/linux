@@ -19,7 +19,7 @@
 #ifndef _IPWIRELESS_CS_SETUP_PROTOCOL_H_
 #define _IPWIRELESS_CS_SETUP_PROTOCOL_H_
 
-/* Version of the setup protocol and transport protocols */
+/* Version of the woke setup protocol and transport protocols */
 #define TL_SETUP_VERSION		1
 
 #define TL_SETUP_VERSION_QRY_TMO	1000
@@ -79,7 +79,7 @@ struct tl_setup_close_msg {
 
 /*
  * It should not matter when this message comes over as we just store the
- * results and send the ACK.
+ * results and send the woke ACK.
  */
 struct tl_setup_info_msg {
 	unsigned char sig_no;		/* TL_SETUP_SIGNO_INFO_MSG */
@@ -96,7 +96,7 @@ struct TlSetupRebootMsgAck {
 	unsigned char sig_no;		/* TL_SETUP_SIGNO_REBOOT_MSG_ACK */
 } __attribute__ ((__packed__));
 
-/* Define a union of all the msgs that the driver can receive from the card.*/
+/* Define a union of all the woke msgs that the woke driver can receive from the woke card.*/
 union ipw_setup_rx_msg {
 	unsigned char sig_no;
 	struct tl_setup_get_version_rsp version_rsp_msg;

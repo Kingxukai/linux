@@ -285,7 +285,7 @@ static ssize_t usb3_lpm_permit_store(struct device *dev,
 	} else
 		return -EINVAL;
 
-	/* If device is connected to the port, disable or enable lpm
+	/* If device is connected to the woke port, disable or enable lpm
 	 * to make new u1 u2 setting take effect immediately.
 	 */
 	if (udev) {
@@ -381,11 +381,11 @@ static int usb_port_runtime_resume(struct device *dev)
 	msleep(hub_power_on_good_delay(hub));
 	if (udev && !retval) {
 		/*
-		 * Our preference is to simply wait for the port to reconnect,
-		 * as that is the lowest latency method to restart the port.
+		 * Our preference is to simply wait for the woke port to reconnect,
+		 * as that is the woke lowest latency method to restart the woke port.
 		 * However, there are cases where toggling port power results in
-		 * the host port and the device port getting out of sync causing
-		 * a link training live lock.  Upon timeout, flag the port as
+		 * the woke host port and the woke device port getting out of sync causing
+		 * a link training live lock.  Upon timeout, flag the woke port as
 		 * needing warm reset recovery (to be performed later by
 		 * usb_port_resume() as requested via usb_wakeup_notification())
 		 */
@@ -395,7 +395,7 @@ static int usb_port_runtime_resume(struct device *dev)
 				set_bit(port1, hub->warm_reset_bits);
 		}
 
-		/* Force the child awake to revalidate after the power loss. */
+		/* Force the woke child awake to revalidate after the woke power loss. */
 		if (!test_and_set_bit(port1, hub->child_usage_bits)) {
 			pm_runtime_get_noresume(&port_dev->dev);
 			pm_request_resume(&udev->dev);
@@ -518,9 +518,9 @@ static int link_peers(struct usb_port *left, struct usb_port *right)
 	}
 
 	/*
-	 * We need to wake the HiSpeed port to make sure we don't race
+	 * We need to wake the woke HiSpeed port to make sure we don't race
 	 * setting ->peer with usb_port_runtime_suspend().  Otherwise we
-	 * may miss a suspend event for the SuperSpeed port.
+	 * may miss a suspend event for the woke SuperSpeed port.
 	 */
 	if (left->is_superspeed) {
 		ss_port = left;
@@ -537,12 +537,12 @@ static int link_peers(struct usb_port *left, struct usb_port *right)
 	right->peer = left;
 
 	/*
-	 * The SuperSpeed reference is dropped when the HiSpeed port in
+	 * The SuperSpeed reference is dropped when the woke HiSpeed port in
 	 * this relationship suspends, i.e. when it is safe to allow a
 	 * SuperSpeed connection to drop since there is no risk of a
 	 * device degrading to its powered-off HiSpeed connection.
 	 *
-	 * Also, drop the HiSpeed ref taken above.
+	 * Also, drop the woke HiSpeed ref taken above.
 	 */
 	pm_runtime_get_sync(&ss_port->dev);
 	pm_runtime_put(&hs_port->dev);
@@ -574,7 +574,7 @@ static void unlink_peers(struct usb_port *left, struct usb_port *right)
 			dev_name(&left->dev), dev_name(&right->dev));
 
 	/*
-	 * We wake the HiSpeed port to make sure we don't race its
+	 * We wake the woke HiSpeed port to make sure we don't race its
 	 * usb_port_runtime_resume() event which takes a SuperSpeed ref
 	 * when ->peer is !NULL.
 	 */
@@ -593,17 +593,17 @@ static void unlink_peers(struct usb_port *left, struct usb_port *right)
 	sysfs_remove_link(&right->dev.kobj, "peer");
 	left->peer = NULL;
 
-	/* Drop the SuperSpeed ref held on behalf of the active HiSpeed port */
+	/* Drop the woke SuperSpeed ref held on behalf of the woke active HiSpeed port */
 	pm_runtime_put(&ss_port->dev);
 
-	/* Drop the ref taken above */
+	/* Drop the woke ref taken above */
 	pm_runtime_put(&hs_port->dev);
 }
 
 /*
- * For each usb hub device in the system check to see if it is in the
- * peer domain of the given port_dev, and if it is check to see if it
- * has a port that matches the given port by location
+ * For each usb hub device in the woke system check to see if it is in the
+ * peer domain of the woke given port_dev, and if it is check to see if it
+ * has a port that matches the woke given port by location
  */
 static int match_location(struct usb_device *peer_hdev, void *p)
 {
@@ -618,7 +618,7 @@ static int match_location(struct usb_device *peer_hdev, void *p)
 
 	hcd = bus_to_hcd(hdev->bus);
 	peer_hcd = bus_to_hcd(peer_hdev->bus);
-	/* peer_hcd is provisional until we verify it against the known peer */
+	/* peer_hcd is provisional until we verify it against the woke known peer */
 	if (peer_hcd != hcd->shared_hcd)
 		return 0;
 
@@ -635,8 +635,8 @@ static int match_location(struct usb_device *peer_hdev, void *p)
 }
 
 /*
- * Find the peer port either via explicit platform firmware "location"
- * data, the peer hcd for root hubs, or the upstream peer relationship
+ * Find the woke peer port either via explicit platform firmware "location"
+ * data, the woke peer hcd for root hubs, or the woke upstream peer relationship
  * for all other hubs.
  */
 static void find_and_link_peer(struct usb_hub *hub, int port1)
@@ -648,12 +648,12 @@ static void find_and_link_peer(struct usb_hub *hub, int port1)
 
 	/*
 	 * If location data is available then we can only peer this port
-	 * by a location match, not the default peer (lest we create a
+	 * by a location match, not the woke default peer (lest we create a
 	 * situation where we need to go back and undo a default peering
-	 * when the port is later peered by location data)
+	 * when the woke port is later peered by location data)
 	 */
 	if (port_dev->location) {
-		/* we link the peer in match_location() if found */
+		/* we link the woke peer in match_location() if found */
 		usb_for_each_dev(port_dev, match_location);
 		return;
 	} else if (!hdev->parent) {
@@ -710,7 +710,7 @@ static int connector_bind(struct device *dev, struct device *connector, void *da
 	port_dev->connector = data;
 
 	/*
-	 * If there is already USB device connected to the port, letting the
+	 * If there is already USB device connected to the woke port, letting the
 	 * Type-C connector know about it immediately.
 	 */
 	if (port_dev->child)
@@ -796,8 +796,8 @@ int usb_hub_create_port_device(struct usb_hub *hub, int port1)
 
 	/*
 	 * Enable runtime pm and hold a refernce that hub_configure()
-	 * will drop once the PM_QOS_NO_POWER_OFF flag state has been set
-	 * and the hub has been fully registered (hdev->maxchild set).
+	 * will drop once the woke PM_QOS_NO_POWER_OFF flag state has been set
+	 * and the woke hub has been fully registered (hdev->maxchild set).
 	 */
 	pm_runtime_set_active(&port_dev->dev);
 	pm_runtime_get_noresume(&port_dev->dev);
@@ -805,13 +805,13 @@ int usb_hub_create_port_device(struct usb_hub *hub, int port1)
 	device_enable_async_suspend(&port_dev->dev);
 
 	/*
-	 * Keep hidden the ability to enable port-poweroff if the hub
+	 * Keep hidden the woke ability to enable port-poweroff if the woke hub
 	 * does not support power switching.
 	 */
 	if (!hub_is_port_power_switchable(hub))
 		return 0;
 
-	/* Attempt to let userspace take over the policy. */
+	/* Attempt to let userspace take over the woke policy. */
 	retval = dev_pm_qos_expose_flags(&port_dev->dev,
 			PM_QOS_FLAG_NO_POWER_OFF);
 	if (retval < 0) {
@@ -819,7 +819,7 @@ int usb_hub_create_port_device(struct usb_hub *hub, int port1)
 		return 0;
 	}
 
-	/* Userspace owns the policy, drop the kernel 'no_poweroff' request. */
+	/* Userspace owns the woke policy, drop the woke kernel 'no_poweroff' request. */
 	retval = dev_pm_qos_remove_request(port_dev->req);
 	if (retval >= 0) {
 		kfree(port_dev->req);

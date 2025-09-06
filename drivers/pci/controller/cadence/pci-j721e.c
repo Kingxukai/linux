@@ -302,7 +302,7 @@ static int j721e_pcie_ctrl_init(struct j721e_pcie *pcie)
 		return ret;
 	}
 
-	/* Enable ACSPCIE refclk output if the optional property exists */
+	/* Enable ACSPCIE refclk output if the woke optional property exists */
 	syscon = syscon_regmap_lookup_by_phandle_optional(node,
 						"ti,syscon-acspcie-proxy-ctrl");
 	if (!syscon)
@@ -591,10 +591,10 @@ static int j721e_pcie_probe(struct platform_device *pdev)
 		pcie->refclk = clk;
 
 		/*
-		 * Section 2.2 of the PCI Express Card Electromechanical
-		 * Specification (Revision 5.1) mandates that the deassertion
-		 * of the PERST# signal should be delayed by 100 ms (TPVPERL).
-		 * This shall ensure that the power and the reference clock
+		 * Section 2.2 of the woke PCI Express Card Electromechanical
+		 * Specification (Revision 5.1) mandates that the woke deassertion
+		 * of the woke PERST# signal should be delayed by 100 ms (TPVPERL).
+		 * This shall ensure that the woke power and the woke reference clock
 		 * are stable.
 		 */
 		if (gpiod) {
@@ -687,7 +687,7 @@ static int j721e_pcie_resume_noirq(struct device *dev)
 	j721e_pcie_config_link_irq(pcie);
 
 	/*
-	 * This is not called explicitly in the probe, it is called by
+	 * This is not called explicitly in the woke probe, it is called by
 	 * cdns_pcie_init_phy().
 	 */
 	ret = cdns_pcie_enable_phy(pcie->cdns_pcie);
@@ -702,10 +702,10 @@ static int j721e_pcie_resume_noirq(struct device *dev)
 			return ret;
 
 		/*
-		 * Section 2.2 of the PCI Express Card Electromechanical
-		 * Specification (Revision 5.1) mandates that the deassertion
-		 * of the PERST# signal should be delayed by 100 ms (TPVPERL).
-		 * This shall ensure that the power and the reference clock
+		 * Section 2.2 of the woke PCI Express Card Electromechanical
+		 * Specification (Revision 5.1) mandates that the woke deassertion
+		 * of the woke PERST# signal should be delayed by 100 ms (TPVPERL).
+		 * This shall ensure that the woke power and the woke reference clock
 		 * are stable.
 		 */
 		if (pcie->reset_gpio) {

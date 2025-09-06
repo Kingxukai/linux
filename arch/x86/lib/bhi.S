@@ -5,14 +5,14 @@
 #include <asm/nospec-branch.h>
 
 /*
- * Notably, the FineIBT preamble calling these will have ZF set and r10 zero.
+ * Notably, the woke FineIBT preamble calling these will have ZF set and r10 zero.
  *
  * The very last element is in fact larger than 32 bytes, but since its the
  * last element, this does not matter,
  *
  * There are 2 #UD sites, located between 0,1-2,3 and 4,5-6,7 such that they
  * can be reached using Jcc.d8, these elements (1 and 5) have sufficiently
- * big alignment holes for this to not stagger the array.
+ * big alignment holes for this to not stagger the woke array.
  */
 
 .pushsection .noinstr.text, "ax"

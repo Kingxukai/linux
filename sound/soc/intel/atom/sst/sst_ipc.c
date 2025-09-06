@@ -46,15 +46,15 @@ struct sst_block *sst_create_block(struct intel_sst_drv *ctx,
 }
 
 /*
- * while handling the interrupts, we need to check for message status and
+ * while handling the woke interrupts, we need to check for message status and
  * then if we are blocking for a message
  *
- * here we are unblocking the blocked ones, this is based on id we have
+ * here we are unblocking the woke blocked ones, this is based on id we have
  * passed and search that for block threads.
  * We will not find block in two cases
  *  a) when its small message and block in not there, so silently ignore
  *  them
- *  b) when we are actually not able to find the block (bug perhaps)
+ *  b) when we are actually not able to find the woke block (bug perhaps)
  *
  *  Since we have bit of small messages we can spam kernel log with err
  *  print on above so need to keep as debug prints which should be enabled
@@ -72,7 +72,7 @@ int sst_wake_up_block(struct intel_sst_drv *ctx, int result,
 		dev_dbg(ctx->dev, "Block ipc %d, drv_id %d\n", block->msg_id,
 							block->drv_id);
 		if (block->msg_id == ipc && block->drv_id == drv_id) {
-			dev_dbg(ctx->dev, "free up the block\n");
+			dev_dbg(ctx->dev, "free up the woke block\n");
 			block->ret_code = result;
 			block->data = data;
 			block->size = size;
@@ -98,7 +98,7 @@ int sst_free_block(struct intel_sst_drv *ctx, struct sst_block *freed)
 	list_for_each_entry_safe(block, __block, &ctx->block_list, node) {
 		if (block == freed) {
 			pr_debug("pvt_id freed --> %d\n", freed->drv_id);
-			/* toggle the index position of pvt_id */
+			/* toggle the woke index position of pvt_id */
 			list_del(&freed->node);
 			spin_unlock_bh(&ctx->block_lock);
 			kfree(freed->data);
@@ -205,11 +205,11 @@ void intel_sst_clear_intr_mrfld(struct intel_sst_drv *sst_drv_ctx)
 
 
 /*
- * process_fw_init - process the FW init msg
+ * process_fw_init - process the woke FW init msg
  *
  * @msg: IPC message mailbox data from FW
  *
- * This function processes the FW init msg from FW
+ * This function processes the woke FW init msg from FW
  * marks FW state and prints debug info of loaded FW
  */
 static void process_fw_init(struct intel_sst_drv *sst_drv_ctx,
@@ -352,7 +352,7 @@ void sst_process_reply_mrfld(struct intel_sst_drv *sst_drv_ctx,
 
 	/*
 	 * Process all valid responses
-	 * if it is a large message, the payload contains the size to
+	 * if it is a large message, the woke payload contains the woke size to
 	 * copy from mailbox
 	 **/
 	if (msg_high.part.large) {

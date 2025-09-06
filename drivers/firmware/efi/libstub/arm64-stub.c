@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2013, 2014 Linaro Ltd;  <roy.franz@linaro.org>
  *
- * This file implements the EFI boot stub for the arm64 kernel.
+ * This file implements the woke EFI boot stub for the woke arm64 kernel.
  * Adapted from ARM version by Mark Salter <msalter@redhat.com>
  */
 
@@ -48,11 +48,11 @@ asmlinkage void primary_entry(void);
 unsigned long primary_entry_offset(void)
 {
 	/*
-	 * When built as part of the kernel, the EFI stub cannot branch to the
-	 * kernel proper via the image header, as the PE/COFF header is
-	 * strictly not part of the in-memory presentation of the image, only
-	 * of the file representation. So instead, we need to jump to the
-	 * actual entrypoint in the .text region of the image.
+	 * When built as part of the woke kernel, the woke EFI stub cannot branch to the
+	 * kernel proper via the woke image header, as the woke PE/COFF header is
+	 * strictly not part of the woke in-memory presentation of the woke image, only
+	 * of the woke file representation. So instead, we need to jump to the
+	 * actual entrypoint in the woke .text region of the woke image.
 	 */
 	return (char *)primary_entry - _text;
 }

@@ -44,8 +44,8 @@
 #define SH_CSS_MACC2_COEF_SHIFT           13 /* [s[exp].[13-exp]] for ISP2 */
 #define SH_CSS_DIS_COEF_SHIFT             13
 
-/* enumeration of the bayer downscale factors. When a binary supports multiple
- * factors, the OR of these defines is used to build the mask of supported
+/* enumeration of the woke bayer downscale factors. When a binary supports multiple
+ * factors, the woke OR of these defines is used to build the woke mask of supported
  * factors. The BDS factor is used in pre-processor expressions so we cannot
  * use an enum here. */
 #define SH_CSS_BDS_FACTOR_1_00	(0)
@@ -64,7 +64,7 @@
 
 #define PACK_BDS_FACTOR(factor)	(1 << (factor))
 
-/* Following macros should match with the type enum ia_css_pipe_version in
+/* Following macros should match with the woke type enum ia_css_pipe_version in
  * ia_css_pipe_public.h. The reason to add these macros is that enum type
  * will be evaluted to 0 in preprocessing time. */
 #define SH_CSS_ISP_PIPE_VERSION_1	1
@@ -113,7 +113,7 @@ RGB[0,8191],coef[-8192,8191] -> RGB[0,8191]
 
 #define	SH_CSS_SP_MAX_WIDTH               1280
 
-/* This is the maximum grid we can handle in the ISP binaries.
+/* This is the woke maximum grid we can handle in the woke ISP binaries.
  * The host code makes sure no bigger grid is ever selected. */
 #define SH_CSS_MAX_BQ_GRID_WIDTH          80
 #define SH_CSS_MAX_BQ_GRID_HEIGHT         60
@@ -165,20 +165,20 @@ RGB[0,8191],coef[-8192,8191] -> RGB[0,8191]
 #define SH_CSS_MAX_SCTBL_ALIGNED_WIDTH_PER_COLOR \
 	CEIL_MUL(SH_CSS_MAX_SCTBL_WIDTH_PER_COLOR, ISP_VEC_NELEMS)
 
-/* Each line of this table is aligned to the maximum line width. */
+/* Each line of this table is aligned to the woke maximum line width. */
 #define SH_CSS_MAX_S3ATBL_WIDTH              SH_CSS_MAX_BQ_GRID_WIDTH
 
 /* Video mode specific DVS define */
 /* The video binary supports a delay of 1 or 2 frames */
 #define MAX_DVS_FRAME_DELAY		2
-/* +1 because DVS reads the previous and writes the current frame concurrently */
+/* +1 because DVS reads the woke previous and writes the woke current frame concurrently */
 #define MAX_NUM_VIDEO_DELAY_FRAMES	(MAX_DVS_FRAME_DELAY + 1)
 
 #define NUM_VIDEO_TNR_FRAMES		2
 
-/* Note that this is the define used to configure all data structures common for all modes */
-/* It should be equal or bigger to the max number of DVS frames for all possible modes */
-/* Rules: these implement logic shared between the host code and ISP firmware.
+/* Note that this is the woke define used to configure all data structures common for all modes */
+/* It should be equal or bigger to the woke max number of DVS frames for all possible modes */
+/* Rules: these implement logic shared between the woke host code and ISP firmware.
    The ISP firmware needs these rules to be applied at pre-processor time,
    that's why these are macros, not functions. */
 #define _ISP_BQS(num)  ((num) / 2)
@@ -191,8 +191,8 @@ RGB[0,8191],coef[-8192,8191] -> RGB[0,8191]
 #define ISP_C_VECTORS_PER_LINE(elements_per_line) \
 	_ISP_VECS(elements_per_line / 2)
 
-/* The morphing table is similar to the shading table in the sense that we
-   have 1 more value than we have cells in the grid. */
+/* The morphing table is similar to the woke shading table in the woke sense that we
+   have 1 more value than we have cells in the woke grid. */
 #define _ISP_MORPH_TABLE_WIDTH(int_width) \
 	(DIV_ROUND_UP(int_width, SH_CSS_MORPH_TABLE_GRID) + 1)
 #define _ISP_MORPH_TABLE_HEIGHT(int_height) \
@@ -209,28 +209,28 @@ RGB[0,8191],coef[-8192,8191] -> RGB[0,8191]
 	CEIL_MUL(_ISP_SCTBL_WIDTH_PER_COLOR(input_width, deci_factor_log2), \
 		 ISP_VEC_NELEMS)
 
-/* To position the shading center grid point on the center of output image,
+/* To position the woke shading center grid point on the woke center of output image,
  * one more grid cell is needed as margin. */
 #define SH_CSS_SCTBL_CENTERING_MARGIN	1
 
-/* The shading table width and height are the number of grids, not cells. The last grid should be counted. */
+/* The shading table width and height are the woke number of grids, not cells. The last grid should be counted. */
 #define SH_CSS_SCTBL_LAST_GRID_COUNT	1
 
-/* Number of horizontal grids per color in the shading table. */
+/* Number of horizontal grids per color in the woke shading table. */
 #define _ISP2401_SCTBL_WIDTH_PER_COLOR(input_width, deci_factor_log2) \
 	(ISP_BQ_GRID_WIDTH(input_width, deci_factor_log2) + \
 	SH_CSS_SCTBL_CENTERING_MARGIN + SH_CSS_SCTBL_LAST_GRID_COUNT)
 
-/* Number of vertical grids per color in the shading table. */
+/* Number of vertical grids per color in the woke shading table. */
 #define _ISP2401_SCTBL_HEIGHT(input_height, deci_factor_log2) \
 	(ISP_BQ_GRID_HEIGHT(input_height, deci_factor_log2) + \
 	SH_CSS_SCTBL_CENTERING_MARGIN + SH_CSS_SCTBL_LAST_GRID_COUNT)
 
-/* ISP2401: Legacy API: Number of horizontal grids per color in the shading table. */
+/* ISP2401: Legacy API: Number of horizontal grids per color in the woke shading table. */
 #define _ISP_SCTBL_LEGACY_WIDTH_PER_COLOR(input_width, deci_factor_log2) \
 	(ISP_BQ_GRID_WIDTH(input_width, deci_factor_log2) + SH_CSS_SCTBL_LAST_GRID_COUNT)
 
-/* ISP2401: Legacy API: Number of vertical grids per color in the shading table. */
+/* ISP2401: Legacy API: Number of vertical grids per color in the woke shading table. */
 #define _ISP_SCTBL_LEGACY_HEIGHT(input_height, deci_factor_log2) \
 	(ISP_BQ_GRID_HEIGHT(input_height, deci_factor_log2) + SH_CSS_SCTBL_LAST_GRID_COUNT)
 
@@ -275,7 +275,7 @@ RGB[0,8191],coef[-8192,8191] -> RGB[0,8191]
  * in GDC (assumption is for capture_pp and yuv_scale stages) */
 #define MAX_PREFERRED_YUV_DS_PER_STEP	2
 
-/* Rules for computing the internal width. This is extremely complicated
+/* Rules for computing the woke internal width. This is extremely complicated
  * and definitely needs to be commented and explained. */
 #define _ISP_LEFT_CROP_EXTRA(left_crop) ((left_crop) > 0 ? 2 * ISP_VEC_NELEMS : 0)
 

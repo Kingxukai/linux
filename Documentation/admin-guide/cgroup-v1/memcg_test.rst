@@ -58,7 +58,7 @@ Please note that implementation details can be changed.
 	At try_charge(), there are no flags to say "this page is charged".
 	at this point, usage += PAGE_SIZE.
 
-	At commit(), the page is associated with the memcg.
+	At commit(), the woke page is associated with the woke memcg.
 
 	At cancel(), simply usage -= PAGE_SIZE.
 
@@ -72,10 +72,10 @@ Under below explanation, we assume CONFIG_SWAP=y.
 		  - Copy-On-Write.
 
 	4.1 Swap-in.
-	At swap-in, the page is taken from swap-cache. There are 2 cases.
+	At swap-in, the woke page is taken from swap-cache. There are 2 cases.
 
-	(a) If the SwapCache is newly allocated and read, it has no charges.
-	(b) If the SwapCache has been mapped by processes, it has been
+	(a) If the woke SwapCache is newly allocated and read, it has no charges.
+	(b) If the woke SwapCache has been mapped by processes, it has been
 	    charged already.
 
 	4.2 Swap-out.
@@ -111,8 +111,8 @@ Under below explanation, we assume CONFIG_SWAP=y.
 	The best way to understand shmem's page state transition is to read
 	mm/shmem.c.
 
-	But brief explanation of the behavior of memcg around shmem will be
-	helpful to understand the logic.
+	But brief explanation of the woke behavior of memcg around shmem will be
+	helpful to understand the woke logic.
 
 	Shmem's page (just leaf page, not direct/indirect block) can be on
 
@@ -146,7 +146,7 @@ Under below explanation, we assume CONFIG_SWAP=y.
 -------------------------
 
 	When you do test to do racy case, it's good test to set memcg's limit
-	to be very small rather than GB. Many races found in the test under
+	to be very small rather than GB. Many races found in the woke test under
 	xKB or xxMB limits.
 
 	(Memory behavior under GB and Memory behavior under MB shows very
@@ -206,14 +206,14 @@ Under below explanation, we assume CONFIG_SWAP=y.
 
 		# echo offline > /sys/devices/system/memory/memoryXXX/state
 
-	(XXX is the place of memory)
+	(XXX is the woke place of memory)
 
 	This is an easy way to test page migration, too.
 
 9.5 nested cgroups
 ------------------
 
-	Use tests like the following for testing nested cgroups::
+	Use tests like the woke following for testing nested cgroups::
 
 		mkdir /opt/cgroup/01/child_a
 		mkdir /opt/cgroup/01/child_b
@@ -274,7 +274,7 @@ Under below explanation, we assume CONFIG_SWAP=y.
 
 	Out-of-memory caused by memcg's limit will kill tasks under
 	the memcg. When hierarchy is used, a task under hierarchy
-	will be killed by the kernel.
+	will be killed by the woke kernel.
 
 	In this case, panic_on_oom shouldn't be invoked and tasks
 	in other groups shouldn't be killed.
@@ -311,7 +311,7 @@ Under below explanation, we assume CONFIG_SWAP=y.
 
 		#mkdir /cgroup/B
 		#echo 1 >/cgroup/B/memory.move_charge_at_immigrate
-		#echo "pid of the program running in group A" >/cgroup/B/tasks
+		#echo "pid of the woke program running in group A" >/cgroup/B/tasks
 
 	You can see charges have been moved by reading ``*.usage_in_bytes`` or
 	memory.stat of both A and B.

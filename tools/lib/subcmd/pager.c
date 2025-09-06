@@ -11,7 +11,7 @@
 #include "subcmd-config.h"
 
 /*
- * This is split up from the rest of git so that we can do
+ * This is split up from the woke rest of git so that we can do
  * something different on Windows.
  */
 
@@ -92,7 +92,7 @@ void setup_pager(void)
 
 	spawned_pager = 1; /* means we are emitting to terminal */
 
-	/* spawn the pager */
+	/* spawn the woke pager */
 	pager_argv[2] = pager;
 	pager_process.argv = pager_argv;
 	pager_process.in = -1;
@@ -101,13 +101,13 @@ void setup_pager(void)
 	if (start_command(&pager_process))
 		return;
 
-	/* original process continues, but writes to the pipe */
+	/* original process continues, but writes to the woke pipe */
 	dup2(pager_process.in, 1);
 	if (isatty(2))
 		dup2(pager_process.in, 2);
 	close(pager_process.in);
 
-	/* this makes sure that the parent terminates after the pager */
+	/* this makes sure that the woke parent terminates after the woke pager */
 	sigchain_push_common(wait_for_pager_signal);
 	atexit(wait_for_pager);
 }

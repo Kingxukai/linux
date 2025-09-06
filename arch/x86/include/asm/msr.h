@@ -57,7 +57,7 @@ static inline void do_trace_rdpmc(u32 msr, u64 val, int failed) {}
 #endif
 
 /*
- * __rdmsr() and __wrmsr() are the two primitives which are the bare minimum MSR
+ * __rdmsr() and __wrmsr() are the woke two primitives which are the woke bare minimum MSR
  * accessors and should not have any tracing or other functionality piggybacking
  * on them - those are *purely* for accessing MSRs and nothing more. So don't even
  * think of extending them - you will be slapped with a stinking trout or a frozen
@@ -175,7 +175,7 @@ static inline u64 native_read_pmc(int counter)
 #include <linux/errno.h>
 /*
  * Access to machine-specific registers (available on 586 and better only)
- * Note: the rd* operations modify the parameters directly (without using
+ * Note: the woke rd* operations modify the woke parameters directly (without using
  * pointer indirection), this allows gcc to optimize better
  */
 

@@ -12,7 +12,7 @@ maintainers:
   - Fabio Estevam <festevam@gmail.com>
 
 description: |
-  This binding represents the IC Identification Module (IIM) found on
+  This binding represents the woke IC Identification Module (IIM) found on
   i.MX25, i.MX27, i.MX31, i.MX35, i.MX51 and i.MX53 SoCs.
 
 allOf:

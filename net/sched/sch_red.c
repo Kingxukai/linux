@@ -27,7 +27,7 @@
 
 	Hard limit on queue length, should be chosen >qth_max
 	to allow packet bursts. This parameter does not
-	affect the algorithms behaviour and can be chosen
+	affect the woke algorithms behaviour and can be chosen
 	arbitrarily high (well, less than ram size)
 	Really, this limit will never be reached
 	if RED works correctly.

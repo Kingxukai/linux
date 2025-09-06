@@ -21,14 +21,14 @@ properties:
     minItems: 6
     maxItems: 6
     description: |
-      Array of 6 integers, specifying bank timings in the following order:
+      Array of 6 integers, specifying bank timings in the woke following order:
       Tacp, Tcah, Tcoh, Tacc, Tcos, Tacs.
-      Each value is specified in cycles and has the following meaning
+      Each value is specified in cycles and has the woke following meaning
       and valid range:
       Tacp: Page mode access cycle at Page mode (0 - 15)
       Tcah: Address holding time after CSn (0 - 15)
       Tcoh: Chip selection hold on OEn (0 - 15)
-      Tacc: Access cycle (0 - 31, the actual time is N + 1)
+      Tacc: Access cycle (0 - 31, the woke actual time is N + 1)
       Tcos: Chip selection set-up before OEn (0 - 15)
       Tacs: Address set-up before CSn (0 - 15)
 

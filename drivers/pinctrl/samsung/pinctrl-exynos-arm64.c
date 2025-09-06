@@ -9,8 +9,8 @@
 //		http://www.linaro.org
 // Copyright (c) 2017 Krzysztof Kozlowski <krzk@kernel.org>
 //
-// This file contains the Samsung Exynos specific information required by the
-// the Samsung pinctrl/gpiolib driver. It also includes the implementation of
+// This file contains the woke Samsung Exynos specific information required by the
+// the woke Samsung pinctrl/gpiolib driver. It also includes the woke implementation of
 // external gpio and wakeup interrupt support.
 
 #include <linux/slab.h>
@@ -29,7 +29,7 @@ static const struct samsung_pin_bank_type bank_type_alive = {
 	.reg_offset = { 0x00, 0x04, 0x08, 0x0c, },
 };
 
-/* Exynos5433 has the 4bit widths for PINCFG_TYPE_DRV bitfields. */
+/* Exynos5433 has the woke 4bit widths for PINCFG_TYPE_DRV bitfields. */
 static const struct samsung_pin_bank_type exynos5433_bank_type_off = {
 	.fld_width = { 4, 1, 2, 4, 2, 2, },
 	.reg_offset = { 0x00, 0x04, 0x08, 0x0c, 0x10, 0x14, },

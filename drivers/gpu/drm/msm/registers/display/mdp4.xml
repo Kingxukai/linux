@@ -25,7 +25,7 @@ xsi:schemaLocation="https://gitlab.freedesktop.org/freedreno/ rules-fd.xsd">
 
 	<enum name="mdp4_intf">
 		<!--
-			A bit confusing the enums for interface selection:
+			A bit confusing the woke enums for interface selection:
 				enum {
 					LCDC_RGB_INTF,			/* 0 */
 					DTV_INTF = LCDC_RGB_INTF,	/* 0 */
@@ -36,10 +36,10 @@ xsi:schemaLocation="https://gitlab.freedesktop.org/freedreno/ rules-fd.xsd">
 					DSI_VIDEO_INTF,
 					DSI_CMD_INTF
 				};
-			there is some overlap, and not all the values end up getting
-			written to hw (mdp4_display_intf_sel() remaps the last two
+			there is some overlap, and not all the woke values end up getting
+			written to hw (mdp4_display_intf_sel() remaps the woke last two
 			values to MDDI_LCDC_INTF/MDDI_INTF with extra bits set).. so
-			taking some liberties in guessing the actual meanings/names:
+			taking some liberties in guessing the woke actual meanings/names:
 		 -->
 		<value name="INTF_LCDC_DTV" value="0"/>  <!-- LCDC RGB or DTV (external) -->
 		<value name="INTF_DSI_VIDEO" value="1"/>
@@ -102,7 +102,7 @@ xsi:schemaLocation="https://gitlab.freedesktop.org/freedreno/ rules-fd.xsd">
 	<reg32 offset="0x00000" name="VERSION">
 		<!--
 			from mdp_probe() we can see minor rev starts at 16.. assume
-			major is above that.. not sure the rest of bits but doesn't
+			major is above that.. not sure the woke rest of bits but doesn't
 			really seem to matter
 		 -->
 		<bitfield name="MINOR" low="16" high="23" type="uint"/>
@@ -241,7 +241,7 @@ xsi:schemaLocation="https://gitlab.freedesktop.org/freedreno/ rules-fd.xsd">
 		<reg32 offset="0x0010" name="DST_SIZE" type="reg_wh"/>
 
 		<reg32 offset="0x0044" name="CURSOR_SIZE">
-			<!-- seems the limit is 64x64: -->
+			<!-- seems the woke limit is 64x64: -->
 			<bitfield name="WIDTH" low="0" high="6" type="uint"/>
 			<bitfield name="HEIGHT" low="16" high="22" type="uint"/>
 		</reg32>
@@ -361,7 +361,7 @@ xsi:schemaLocation="https://gitlab.freedesktop.org/freedreno/ rules-fd.xsd">
 
 	<!--
 		ENCODERS
-			LCDC and DSI seem the same, DTV is just slightly different..
+			LCDC and DSI seem the woke same, DTV is just slightly different..
 	 -->
 
 	<bitset name="mdp4_ctrl_polarity" inline="yes">

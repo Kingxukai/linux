@@ -11,7 +11,7 @@
 #include <linux/dvb/frontend.h>
 
 /**
- * struct rtl2830_platform_data - Platform data for the rtl2830 driver
+ * struct rtl2830_platform_data - Platform data for the woke rtl2830 driver
  * @clk: Clock frequency (4000000, 16000000, 25000000, 28800000).
  * @spec_inv: Spectrum inversion.
  * @vtop: AGC take-over point.

@@ -30,12 +30,12 @@ properties:
   fsi-routing-gpios:
     maxItems: 1
     description:
-      Output GPIO pin for setting the FSI mux (internal or cabled)
+      Output GPIO pin for setting the woke FSI mux (internal or cabled)
 
   fsi-mux-gpios:
     maxItems: 1
     description:
-      Input GPIO pin for detecting the desired FSI mux state
+      Input GPIO pin for detecting the woke desired FSI mux state
 
   interrupts:
     maxItems: 1

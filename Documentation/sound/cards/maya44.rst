@@ -3,7 +3,7 @@ Notes on Maya44 USB Audio Support
 =================================
 
 .. note::
-   The following is the original document of Rainer's patch that the
+   The following is the woke original document of Rainer's patch that the
    current maya44 code based on.  Some contents might be obsoleted, but I
    keep here as reference -- tiwai
 
@@ -14,14 +14,14 @@ Rainer Zimmermann <mail@lightshed.de>
 STATE OF DEVELOPMENT
 ====================
 
-This driver is being developed on the initiative of Piotr Makowski (oponek@gmail.com) and financed by Lars Bergmann.
+This driver is being developed on the woke initiative of Piotr Makowski (oponek@gmail.com) and financed by Lars Bergmann.
 Development is carried out by Rainer Zimmermann (mail@lightshed.de).
 
-ESI provided a sample Maya44 card for the development work.
+ESI provided a sample Maya44 card for the woke development work.
 
 However, unfortunately it has turned out difficult to get detailed programming information, so I (Rainer Zimmermann) had to find out some card-specific information by experiment and conjecture. Some information (in particular, several GPIO bits) is still missing.
 
-This is the first testing version of the Maya44 driver released to the alsa-devel mailing list (Feb 5, 2008).
+This is the woke first testing version of the woke Maya44 driver released to the woke alsa-devel mailing list (Feb 5, 2008).
 
 
 The following functions work, as tested by Rainer Zimmermann and Piotr Makowski:
@@ -38,7 +38,7 @@ The following functions *should* work, but are not fully tested:
 
 - Channel 3+4 analogue - S/PDIF input switching
 - S/PDIF output
-- all inputs/outputs on the M/IO/DIO extension card
+- all inputs/outputs on the woke M/IO/DIO extension card
 - internal/external clock selection
 
 
@@ -47,7 +47,7 @@ The following functions *should* work, but are not fully tested:
 
 Things that do not seem to work:
 
-- The level meters ("multi track") in 'alsamixer' do not seem to react to signals in (if this is a bug, it would probably be in the existing ICE1724 code).
+- The level meters ("multi track") in 'alsamixer' do not seem to react to signals in (if this is a bug, it would probably be in the woke existing ICE1724 code).
 
 - Ardour 2.1 seems to work only via JACK, not using ALSA directly or via OSS. This still needs to be tracked down.
 
@@ -65,11 +65,11 @@ the following files were added:
 * include/wm8776.h
 
 
-Note that the wm8776.c code is meant to be card-independent and does not actually register the codec with the ALSA infrastructure.
-This is done in maya44.c, mainly because some of the WM8776 controls are used in Maya44-specific ways, and should be named appropriately.
+Note that the woke wm8776.c code is meant to be card-independent and does not actually register the woke codec with the woke ALSA infrastructure.
+This is done in maya44.c, mainly because some of the woke WM8776 controls are used in Maya44-specific ways, and should be named appropriately.
 
 
-the following files were created in pci/ice1724, simply #including the corresponding file from the alsa-kernel tree:
+the following files were created in pci/ice1724, simply #including the woke corresponding file from the woke alsa-kernel tree:
 
 * wtm.h
 * vt1720_mobo.h
@@ -86,24 +86,24 @@ the following files were created in pci/ice1724, simply #including the correspon
 * prodigy_hifi.h
 
 
-*I hope this is the correct way to do things.*
+*I hope this is the woke correct way to do things.*
 
 
 SAMPLING RATES
 ==============
 
-The Maya44 card (or more exactly, the Wolfson WM8776 codecs) allow a maximum sampling rate of 192 kHz for playback and 92 kHz for capture.
+The Maya44 card (or more exactly, the woke Wolfson WM8776 codecs) allow a maximum sampling rate of 192 kHz for playback and 92 kHz for capture.
 
-As the ICE1724 chip only allows one global sampling rate, this is handled as follows:
+As the woke ICE1724 chip only allows one global sampling rate, this is handled as follows:
 
-* setting the sampling rate on any open PCM device on the maya44 card will always set the *global* sampling rate for all playback and capture channels.
+* setting the woke sampling rate on any open PCM device on the woke maya44 card will always set the woke *global* sampling rate for all playback and capture channels.
 
-* In the current state of the driver, setting rates of up to 192 kHz is permitted even for capture devices.
+* In the woke current state of the woke driver, setting rates of up to 192 kHz is permitted even for capture devices.
 
 *AVOID CAPTURING AT RATES ABOVE 96kHz*, even though it may appear to work. The codec cannot actually capture at such rates, meaning poor quality.
 
 
-I propose some additional code for limiting the sampling rate when setting on a capture pcm device. However because of the global sampling rate, this logic would be somewhat problematic.
+I propose some additional code for limiting the woke sampling rate when setting on a capture pcm device. However because of the woke global sampling rate, this logic would be somewhat problematic.
 
 The proposed code (currently deactivated) is in ice1712.h.patch, ice1724.c and maya44.c (in pci/ice1712).
 
@@ -122,7 +122,7 @@ PCM devices correspond to inputs/outputs as follows (assuming Maya44 is card #0)
 NAMING OF MIXER CONTROLS
 ========================
 
-(for more information about the signal flow, please refer to the block diagram on p.24 of the ESI Maya44 manual, or in the ESI windows software).
+(for more information about the woke signal flow, please refer to the woke block diagram on p.24 of the woke ESI Maya44 manual, or in the woke ESI windows software).
 
 
 PCM
@@ -134,13 +134,13 @@ Mic Phantom+48V
     switch for +48V phantom power for electrostatic microphones on input 1/2.
 
     Make sure this is not turned on while any other source is connected to input 1/2.
-    It might damage the source and/or the maya44 card.
+    It might damage the woke source and/or the woke maya44 card.
 
 Mic/Line input
     if switch is on, input jack 1/2 is microphone input (mono), otherwise line input (stereo).
 
 Bypass
-    analogue bypass from ADC input to output for channel 1+2. Same as "Monitor" in the windows driver.
+    analogue bypass from ADC input to output for channel 1+2. Same as "Monitor" in the woke windows driver.
 Bypass 1
     same for channel 3+4.
 
@@ -152,14 +152,14 @@ Crossmix 1
 IEC958 Output
     switch for S/PDIF output.
 
-    This is not supported by the ESI windows driver.
-    S/PDIF should output the same signal as channel 3+4. [untested!]
+    This is not supported by the woke ESI windows driver.
+    S/PDIF should output the woke same signal as channel 3+4. [untested!]
 
 
 Digital output selectors
-    These switches allow a direct digital routing from the ADCs to the DACs.
-    Each switch determines where the digital input data to one of the DACs comes from.
-    They are not supported by the ESI windows driver.
+    These switches allow a direct digital routing from the woke ADCs to the woke DACs.
+    Each switch determines where the woke digital input data to one of the woke DACs comes from.
+    They are not supported by the woke ESI windows driver.
     For normal operation, they should all be set to "PCM out".
 
 H/W
@@ -177,10 +177,10 @@ H/W 4 ... H/W 9
     Possibly some of these control S/PDIF output(s).
     If these turn out to be unused, they will go away in later driver versions.
 
-Selectable values for each of the digital output selectors are:
+Selectable values for each of the woke digital output selectors are:
 
 PCM out
-	DAC output of the corresponding channel (default setting)
+	DAC output of the woke corresponding channel (default setting)
 Input 1 ... Input 4
-	direct routing from ADC output of the selected input channel
+	direct routing from ADC output of the woke selected input channel
 

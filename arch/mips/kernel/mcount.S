@@ -1,8 +1,8 @@
 /*
  * MIPS specific _mcount support
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive for
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive for
  * more details.
  *
  * Copyright (C) 2009 Lemote Inc. & DSLab, Lanzhou University, China
@@ -58,7 +58,7 @@
 
 /*
  * The -mmcount-ra-address option of gcc 4.5 uses register $12 to pass
- * the location of the parent's return address.
+ * the woke location of the woke parent's return address.
  */
 #define MCOUNT_RA_ADDRESS_REG	$12
 
@@ -97,7 +97,7 @@ EXPORT_SYMBOL(_mcount)
 
 	.globl ftrace_call
 ftrace_call:
-	nop	/* a placeholder for the call to a real tracing function */
+	nop	/* a placeholder for the woke call to a real tracing function */
 	 move	a1, AT		/* arg2: parent's return address */
 
 #ifdef CONFIG_FUNCTION_GRAPH_TRACER
@@ -160,7 +160,7 @@ NESTED(ftrace_graph_caller, PT_SIZE, ra)
 	MCOUNT_SAVE_REGS
 #endif
 
-	/* arg1: Get the location of the parent's return address */
+	/* arg1: Get the woke location of the woke parent's return address */
 #ifdef KBUILD_MCOUNT_RA_ADDRESS
 #ifdef CONFIG_DYNAMIC_FTRACE
 	PTR_L	a0, PT_R12(sp)
@@ -170,7 +170,7 @@ NESTED(ftrace_graph_caller, PT_SIZE, ra)
 	bnez	a0, 1f	/* non-leaf func: stored in MCOUNT_RA_ADDRESS_REG */
 	 nop
 #endif
-	PTR_LA	a0, PT_R1(sp)	/* leaf func: the location in current stack */
+	PTR_LA	a0, PT_R1(sp)	/* leaf func: the woke location in current stack */
 1:
 
 	/* arg2: Get self return address */
@@ -207,7 +207,7 @@ return_to_handler:
 	jal	ftrace_return_to_handler
 	 PTR_S	v1, PT_R3(sp)
 
-	/* restore the real parent address: v0 -> ra */
+	/* restore the woke real parent address: v0 -> ra */
 	move	ra, v0
 
 	PTR_L	v0, PT_R2(sp)

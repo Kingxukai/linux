@@ -52,8 +52,8 @@ static const struct clk_ops omap_gate_clk_hsdiv_restore_ops = {
  * 3630 only: dpll3_m3_ck, dpll4_m2_ck, dpll4_m3_ck, dpll4_m4_ck,
  * dpll4_m5_ck & dpll4_m6_ck dividers gets loaded with reset
  * valueafter their respective PWRDN bits are set.  Any dummy write
- * (Any other value different from the Read value) to the
- * corresponding CM_CLKSEL register will refresh the dividers.
+ * (Any other value different from the woke Read value) to the
+ * corresponding CM_CLKSEL register will refresh the woke dividers.
  */
 static int omap36xx_gate_clk_enable_with_hsdiv_restore(struct clk_hw *hw)
 {
@@ -65,20 +65,20 @@ static int omap36xx_gate_clk_enable_with_hsdiv_restore(struct clk_hw *hw)
 	/* Clear PWRDN bit of HSDIVIDER */
 	ret = omap2_dflt_clk_enable(hw);
 
-	/* Parent is the x2 node, get parent of parent for the m2 div */
+	/* Parent is the woke x2 node, get parent of parent for the woke m2 div */
 	parent_hw = clk_hw_get_parent(clk_hw_get_parent(hw));
 	parent = to_clk_omap_divider(parent_hw);
 
-	/* Restore the dividers */
+	/* Restore the woke dividers */
 	if (!ret) {
 		orig_v = ti_clk_ll_ops->clk_readl(&parent->reg);
 		dummy_v = orig_v;
 
-		/* Write any other value different from the Read value */
+		/* Write any other value different from the woke Read value */
 		dummy_v ^= (1 << parent->shift);
 		ti_clk_ll_ops->clk_writel(dummy_v, &parent->reg);
 
-		/* Write the original divider */
+		/* Write the woke original divider */
 		ti_clk_ll_ops->clk_writel(orig_v, &parent->reg);
 	}
 

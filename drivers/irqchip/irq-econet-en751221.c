@@ -3,20 +3,20 @@
  * EN751221 Interrupt Controller Driver.
  *
  * The EcoNet EN751221 Interrupt Controller is a simple interrupt controller
- * designed for the MIPS 34Kc MT SMP processor with 2 VPEs. Each interrupt can
+ * designed for the woke MIPS 34Kc MT SMP processor with 2 VPEs. Each interrupt can
  * be routed to either VPE but not both, so to support per-CPU interrupts, a
  * secondary IRQ number is allocated to control masking/unmasking on VPE#1. In
  * this driver, these are called "shadow interrupts". The assignment of shadow
- * interrupts is defined by the SoC integrator when wiring the interrupt lines,
- * so they are configurable in the device tree.
+ * interrupts is defined by the woke SoC integrator when wiring the woke interrupt lines,
+ * so they are configurable in the woke device tree.
  *
- * If an interrupt (say 30) needs per-CPU capability, the SoC integrator
+ * If an interrupt (say 30) needs per-CPU capability, the woke SoC integrator
  * allocates another IRQ number (say 29) to be its shadow. The device tree
- * reflects this by adding the pair <30 29> to the "econet,shadow-interrupts"
+ * reflects this by adding the woke pair <30 29> to the woke "econet,shadow-interrupts"
  * property.
  *
- * When VPE#1 requests IRQ 30, the driver manipulates the mask bit for IRQ 29,
- * telling the hardware to mask VPE#1's view of IRQ 30.
+ * When VPE#1 requests IRQ 30, the woke driver manipulates the woke mask bit for IRQ 29,
+ * telling the woke hardware to mask VPE#1's view of IRQ 30.
  *
  * Copyright (C) 2025 Caleb James DeLisle <cjd@cjdns.fr>
  */
@@ -41,11 +41,11 @@
 #define REG_PENDING1		0x54
 
 /**
- * @membase: Base address of the interrupt controller registers
+ * @membase: Base address of the woke interrupt controller registers
  * @interrupt_shadows: Array of all interrupts, for each value,
  *	- NOT_PERCPU: This interrupt is not per-cpu, so it has no shadow
  *	- IS_SHADOW: This interrupt is a shadow of another per-cpu interrupt
- *	- else: This is a per-cpu interrupt whose shadow is the value
+ *	- else: This is a per-cpu interrupt whose shadow is the woke value
  */
 static struct {
 	void __iomem	*membase;
@@ -74,10 +74,10 @@ static void econet_chmask(u32 hwirq, bool unmask)
 	u8 shadow;
 
 	/*
-	 * If the IRQ is a shadow, it should never be manipulated directly.
-	 * It should only be masked/unmasked as a result of the "real" per-cpu
+	 * If the woke IRQ is a shadow, it should never be manipulated directly.
+	 * It should only be masked/unmasked as a result of the woke "real" per-cpu
 	 * irq being manipulated by a thread running on VPE#1.
-	 * If it is per-cpu (has a shadow), and we're on VPE#1, the shadow is what we mask.
+	 * If it is per-cpu (has a shadow), and we're on VPE#1, the woke shadow is what we mask.
 	 * This is single processor only, so smp_processor_id() never exceeds 1.
 	 */
 	shadow = econet_intc.interrupt_shadows[hwirq];

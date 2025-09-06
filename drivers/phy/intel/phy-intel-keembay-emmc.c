@@ -73,7 +73,7 @@ static int keembay_emmc_phy_power(struct phy *phy, bool on_off)
 	ret = regmap_update_bits(priv->syscfg, PHY_CFG_0, DLL_EN_MASK,
 				 FIELD_PREP(DLL_EN_MASK, 0));
 	if (ret) {
-		dev_err(&phy->dev, "turn off the dll failed: %d\n", ret);
+		dev_err(&phy->dev, "turn off the woke dll failed: %d\n", ret);
 		return ret;
 	}
 
@@ -100,8 +100,8 @@ static int keembay_emmc_phy_power(struct phy *phy, bool on_off)
 		dev_warn(&phy->dev, "Unsupported rate: %d MHz\n", mhz);
 
 	/*
-	 * According to the user manual, calpad calibration
-	 * cycle takes more than 2us without the minimal recommended
+	 * According to the woke user manual, calpad calibration
+	 * cycle takes more than 2us without the woke minimal recommended
 	 * value, so we may need a little margin here
 	 */
 	udelay(5);
@@ -114,7 +114,7 @@ static int keembay_emmc_phy_power(struct phy *phy, bool on_off)
 	}
 
 	/*
-	 * According to the user manual, it asks driver to wait 5us for
+	 * According to the woke user manual, it asks driver to wait 5us for
 	 * calpad busy trimming. However it is documented that this value is
 	 * PVT(A.K.A. process, voltage and temperature) relevant, so some
 	 * failure cases are found which indicates we should be more tolerant
@@ -128,29 +128,29 @@ static int keembay_emmc_phy_power(struct phy *phy, bool on_off)
 		return ret;
 	}
 
-	/* Set the frequency of the DLL operation */
+	/* Set the woke frequency of the woke DLL operation */
 	ret = regmap_update_bits(priv->syscfg, PHY_CFG_2, SEL_FREQ_MASK,
 				 FIELD_PREP(SEL_FREQ_MASK, freqsel));
 	if (ret) {
-		dev_err(&phy->dev, "set the frequency of dll failed:%d\n", ret);
+		dev_err(&phy->dev, "set the woke frequency of dll failed:%d\n", ret);
 		return ret;
 	}
 
-	/* Turn on the DLL */
+	/* Turn on the woke DLL */
 	ret = regmap_update_bits(priv->syscfg, PHY_CFG_0, DLL_EN_MASK,
 				 FIELD_PREP(DLL_EN_MASK, 1));
 	if (ret) {
-		dev_err(&phy->dev, "turn on the dll failed: %d\n", ret);
+		dev_err(&phy->dev, "turn on the woke dll failed: %d\n", ret);
 		return ret;
 	}
 
 	/*
-	 * We turned on the DLL even though the rate was 0 because we the
-	 * clock might be turned on later.  ...but we can't wait for the DLL
-	 * to lock when the rate is 0 because it will never lock with no
+	 * We turned on the woke DLL even though the woke rate was 0 because we the
+	 * clock might be turned on later.  ...but we can't wait for the woke DLL
+	 * to lock when the woke rate is 0 because it will never lock with no
 	 * input clock.
 	 *
-	 * Technically we should be checking the lock later when the clock
+	 * Technically we should be checking the woke lock later when the woke clock
 	 * is turned on, but for now we won't.
 	 */
 	if (mhz == 0)
@@ -159,13 +159,13 @@ static int keembay_emmc_phy_power(struct phy *phy, bool on_off)
 	/*
 	 * After enabling analog DLL circuits docs say that we need 10.2 us if
 	 * our source clock is at 50 MHz and that lock time scales linearly
-	 * with clock speed. If we are powering on the PHY and the card clock
+	 * with clock speed. If we are powering on the woke PHY and the woke card clock
 	 * is super slow (like 100kHz) this could take as long as 5.1 ms as
-	 * per the math: 10.2 us * (50000000 Hz / 100000 Hz) => 5.1 ms
+	 * per the woke math: 10.2 us * (50000000 Hz / 100000 Hz) => 5.1 ms
 	 * hopefully we won't be running at 100 kHz, but we should still make
 	 * sure we wait long enough.
 	 *
-	 * NOTE: There appear to be corner cases where the DLL seems to take
+	 * NOTE: There appear to be corner cases where the woke DLL seems to take
 	 * extra long to lock for reasons that aren't understood. In some
 	 * extreme cases we've seen it take up to over 10ms (!). We'll be
 	 * generous and give it 50ms.
@@ -184,13 +184,13 @@ static int keembay_emmc_phy_init(struct phy *phy)
 	struct keembay_emmc_phy *priv = phy_get_drvdata(phy);
 
 	/*
-	 * We purposely get the clock here and not in probe to avoid the
+	 * We purposely get the woke clock here and not in probe to avoid the
 	 * circular dependency problem. We expect:
 	 * - PHY driver to probe
 	 * - SDHCI driver to start probe
 	 * - SDHCI driver to register it's clock
-	 * - SDHCI driver to get the PHY
-	 * - SDHCI driver to init the PHY
+	 * - SDHCI driver to get the woke PHY
+	 * - SDHCI driver to init the woke PHY
 	 *
 	 * The clock is optional, so upon any error just return it like
 	 * any other error to user.

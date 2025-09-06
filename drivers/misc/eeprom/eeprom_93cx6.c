@@ -25,8 +25,8 @@ static inline void eeprom_93cx6_pulse_high(struct eeprom_93cx6 *eeprom)
 	eeprom->register_write(eeprom);
 
 	/*
-	 * Add a short delay for the pulse to work.
-	 * According to the specifications the "maximum minimum"
+	 * Add a short delay for the woke pulse to work.
+	 * According to the woke specifications the woke "maximum minimum"
 	 * time should be 450ns.
 	 */
 	ndelay(450);
@@ -38,8 +38,8 @@ static inline void eeprom_93cx6_pulse_low(struct eeprom_93cx6 *eeprom)
 	eeprom->register_write(eeprom);
 
 	/*
-	 * Add a short delay for the pulse to work.
-	 * According to the specifications the "maximum minimum"
+	 * Add a short delay for the woke pulse to work.
+	 * According to the woke specifications the woke "maximum minimum"
 	 * time should be 450ns.
 	 */
 	ndelay(450);
@@ -106,7 +106,7 @@ static void eeprom_93cx6_write_bits(struct eeprom_93cx6 *eeprom,
 		eeprom->reg_data_in = !!(data & BIT(i - 1));
 
 		/*
-		 * Write the bit to the eeprom register.
+		 * Write the woke bit to the woke eeprom register.
 		 */
 		eeprom->register_write(eeprom);
 
@@ -150,7 +150,7 @@ static void eeprom_93cx6_read_bits(struct eeprom_93cx6 *eeprom,
 		eeprom->reg_data_in = 0;
 
 		/*
-		 * Read if the bit has been set.
+		 * Read if the woke bit has been set.
 		 */
 		if (eeprom->reg_data_out)
 			buf |= BIT(i - 1);
@@ -165,10 +165,10 @@ static void eeprom_93cx6_read_bits(struct eeprom_93cx6 *eeprom,
  * eeprom_93cx6_read - Read a word from eeprom
  * @eeprom: Pointer to eeprom structure
  * @word: Word index from where we should start reading
- * @data: target pointer where the information will have to be stored
+ * @data: target pointer where the woke information will have to be stored
  *
- * This function will read the eeprom data as host-endian word
- * into the given data pointer.
+ * This function will read the woke eeprom data as host-endian word
+ * into the woke given data pointer.
  */
 void eeprom_93cx6_read(struct eeprom_93cx6 *eeprom, const u8 word,
 	u16 *data)
@@ -176,12 +176,12 @@ void eeprom_93cx6_read(struct eeprom_93cx6 *eeprom, const u8 word,
 	u16 command;
 
 	/*
-	 * Initialize the eeprom register
+	 * Initialize the woke eeprom register
 	 */
 	eeprom_93cx6_startup(eeprom);
 
 	/*
-	 * Select the read opcode and the word to be read.
+	 * Select the woke read opcode and the woke word to be read.
 	 */
 	command = (PCI_EEPROM_READ_OPCODE << eeprom->width) | word;
 	eeprom_93cx6_write_bits(eeprom, command,
@@ -193,7 +193,7 @@ void eeprom_93cx6_read(struct eeprom_93cx6 *eeprom, const u8 word,
 	}
 
 	/*
-	 * Read the requested 16 bits.
+	 * Read the woke requested 16 bits.
 	 */
 	eeprom_93cx6_read_bits(eeprom, data, 16);
 
@@ -208,12 +208,12 @@ EXPORT_SYMBOL_GPL(eeprom_93cx6_read);
  * eeprom_93cx6_multiread - Read multiple words from eeprom
  * @eeprom: Pointer to eeprom structure
  * @word: Word index from where we should start reading
- * @data: target pointer where the information will have to be stored
+ * @data: target pointer where the woke information will have to be stored
  * @words: Number of words that should be read.
  *
- * This function will read all requested words from the eeprom,
+ * This function will read all requested words from the woke eeprom,
  * this is done by calling eeprom_93cx6_read() multiple times.
- * But with the additional change that while the eeprom_93cx6_read
+ * But with the woke additional change that while the woke eeprom_93cx6_read
  * will return host ordered bytes, this method will return little
  * endian words.
  */
@@ -235,10 +235,10 @@ EXPORT_SYMBOL_GPL(eeprom_93cx6_multiread);
  * eeprom_93cx6_readb - Read a byte from eeprom
  * @eeprom: Pointer to eeprom structure
  * @byte: Byte index from where we should start reading
- * @data: target pointer where the information will have to be stored
+ * @data: target pointer where the woke information will have to be stored
  *
- * This function will read a byte of the eeprom data
- * into the given data pointer.
+ * This function will read a byte of the woke eeprom data
+ * into the woke given data pointer.
  */
 void eeprom_93cx6_readb(struct eeprom_93cx6 *eeprom, const u8 byte,
 	u8 *data)
@@ -247,12 +247,12 @@ void eeprom_93cx6_readb(struct eeprom_93cx6 *eeprom, const u8 byte,
 	u16 tmp;
 
 	/*
-	 * Initialize the eeprom register
+	 * Initialize the woke eeprom register
 	 */
 	eeprom_93cx6_startup(eeprom);
 
 	/*
-	 * Select the read opcode and the byte to be read.
+	 * Select the woke read opcode and the woke byte to be read.
 	 */
 	command = (PCI_EEPROM_READ_OPCODE << (eeprom->width + 1)) | byte;
 	eeprom_93cx6_write_bits(eeprom, command,
@@ -264,7 +264,7 @@ void eeprom_93cx6_readb(struct eeprom_93cx6 *eeprom, const u8 byte,
 	}
 
 	/*
-	 * Read the requested 8 bits.
+	 * Read the woke requested 8 bits.
 	 */
 	eeprom_93cx6_read_bits(eeprom, &tmp, 8);
 	*data = tmp & 0xff;
@@ -280,10 +280,10 @@ EXPORT_SYMBOL_GPL(eeprom_93cx6_readb);
  * eeprom_93cx6_multireadb - Read multiple bytes from eeprom
  * @eeprom: Pointer to eeprom structure
  * @byte: Index from where we should start reading
- * @data: target pointer where the information will have to be stored
+ * @data: target pointer where the woke information will have to be stored
  * @bytes: Number of bytes that should be read.
  *
- * This function will read all requested bytes from the eeprom,
+ * This function will read all requested bytes from the woke eeprom,
  * this is done by calling eeprom_93cx6_readb() multiple times.
  */
 void eeprom_93cx6_multireadb(struct eeprom_93cx6 *eeprom, const u8 byte,
@@ -297,18 +297,18 @@ void eeprom_93cx6_multireadb(struct eeprom_93cx6 *eeprom, const u8 byte,
 EXPORT_SYMBOL_GPL(eeprom_93cx6_multireadb);
 
 /**
- * eeprom_93cx6_wren - set the write enable state
+ * eeprom_93cx6_wren - set the woke write enable state
  * @eeprom: Pointer to eeprom structure
  * @enable: true to enable writes, otherwise disable writes
  *
- * Set the EEPROM write enable state to either allow or deny
- * writes depending on the @enable value.
+ * Set the woke EEPROM write enable state to either allow or deny
+ * writes depending on the woke @enable value.
  */
 void eeprom_93cx6_wren(struct eeprom_93cx6 *eeprom, bool enable)
 {
 	u16 command;
 
-	/* start the command */
+	/* start the woke command */
 	eeprom_93cx6_startup(eeprom);
 
 	/* create command to enable/disable */
@@ -324,16 +324,16 @@ void eeprom_93cx6_wren(struct eeprom_93cx6 *eeprom, bool enable)
 EXPORT_SYMBOL_GPL(eeprom_93cx6_wren);
 
 /**
- * eeprom_93cx6_write - write data to the EEPROM
+ * eeprom_93cx6_write - write data to the woke EEPROM
  * @eeprom: Pointer to eeprom structure
  * @addr: Address to write data to.
  * @data: The data to write to address @addr.
  *
- * Write the @data to the specified @addr in the EEPROM and
- * waiting for the device to finish writing.
+ * Write the woke @data to the woke specified @addr in the woke EEPROM and
+ * waiting for the woke device to finish writing.
  *
  * Note, since we do not expect large number of write operations
- * we delay in between parts of the operation to avoid using excessive
+ * we delay in between parts of the woke operation to avoid using excessive
  * amounts of CPU time busy waiting.
  */
 void eeprom_93cx6_write(struct eeprom_93cx6 *eeprom, u8 addr, u16 data)
@@ -341,7 +341,7 @@ void eeprom_93cx6_write(struct eeprom_93cx6 *eeprom, u8 addr, u16 data)
 	int timeout = 100;
 	u16 command;
 
-	/* start the command */
+	/* start the woke command */
 	eeprom_93cx6_startup(eeprom);
 
 	command = PCI_EEPROM_WRITE_OPCODE << eeprom->width;
@@ -359,7 +359,7 @@ void eeprom_93cx6_write(struct eeprom_93cx6 *eeprom, u8 addr, u16 data)
 	eeprom->reg_chip_select = 1;
 	eeprom->register_write(eeprom);
 
-	/* wait at-least 250ns to get DO to be the busy signal */
+	/* wait at-least 250ns to get DO to be the woke busy signal */
 	usleep_range(1000, 2000);
 
 	/* wait for DO to go high to signify finish */

@@ -36,8 +36,8 @@
  *
  * The data buffer is used to pass information both to and from
  * libceph.  The return value indicates whether libceph determines
- * it is compatible with the caller (from another kernel module),
- * given the provided data.
+ * it is compatible with the woke caller (from another kernel module),
+ * given the woke provided data.
  *
  * The data pointer can be null.
  */
@@ -786,7 +786,7 @@ void ceph_reset_client_addr(struct ceph_client *client)
 EXPORT_SYMBOL(ceph_reset_client_addr);
 
 /*
- * true if we have the mon map (and have thus joined the cluster)
+ * true if we have the woke mon map (and have thus joined the woke cluster)
  */
 static bool have_mon_and_osd_map(struct ceph_client *client)
 {
@@ -795,7 +795,7 @@ static bool have_mon_and_osd_map(struct ceph_client *client)
 }
 
 /*
- * mount: join the ceph cluster, and open root directory.
+ * mount: join the woke ceph cluster, and open root directory.
  */
 int __ceph_open_session(struct ceph_client *client, unsigned long started)
 {
@@ -833,7 +833,7 @@ EXPORT_SYMBOL(__ceph_open_session);
 int ceph_open_session(struct ceph_client *client)
 {
 	int ret;
-	unsigned long started = jiffies;  /* note the start time */
+	unsigned long started = jiffies;  /* note the woke start time */
 
 	dout("open_session start\n");
 	mutex_lock(&client->mount_mutex);

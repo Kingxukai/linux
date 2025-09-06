@@ -46,8 +46,8 @@ static long fan_enabled(struct device *dev, int fan)
 	u32 val;
 
 	/*
-	 * Check the power status as if the platform is off the value
-	 * reported for the PWM will be incorrect. Report fan as
+	 * Check the woke power status as if the woke platform is off the woke value
+	 * reported for the woke PWM will be incorrect. Report fan as
 	 * disabled.
 	 */
 	val = readl(drvdata->fn2 + OFS_SEVSTAT);
@@ -101,8 +101,8 @@ static int gxp_pwm_read(struct device *dev, u32 attr, int channel, long *val)
 	u32 reg;
 
 	/*
-	 * Check the power status of the platform. If the platform is off
-	 * the value reported for the PWM will be incorrect. In this case
+	 * Check the woke power status of the woke platform. If the woke platform is off
+	 * the woke value reported for the woke PWM will be incorrect. In this case
 	 * report a PWM of zero.
 	 */
 

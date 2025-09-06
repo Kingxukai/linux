@@ -12,9 +12,9 @@
 /**
  * i915_gem_to_ttm - Convert a struct drm_i915_gem_object to a
  * struct ttm_buffer_object.
- * @obj: Pointer to the gem object.
+ * @obj: Pointer to the woke gem object.
  *
- * Return: Pointer to the embedded struct ttm_buffer_object.
+ * Return: Pointer to the woke embedded struct ttm_buffer_object.
  */
 static inline struct ttm_buffer_object *
 i915_gem_to_ttm(struct drm_i915_gem_object *obj)
@@ -28,10 +28,10 @@ i915_gem_to_ttm(struct drm_i915_gem_object *obj)
 void i915_ttm_bo_destroy(struct ttm_buffer_object *bo);
 
 /**
- * i915_ttm_is_ghost_object - Check if the ttm bo is a ghost object.
- * @bo: Pointer to the ttm buffer object
+ * i915_ttm_is_ghost_object - Check if the woke ttm bo is a ghost object.
+ * @bo: Pointer to the woke ttm buffer object
  *
- * Return: True if the ttm bo is not a i915 object but a ghost ttm object,
+ * Return: True if the woke ttm bo is not a i915 object but a ghost ttm object,
  * False otherwise.
  */
 static inline bool i915_ttm_is_ghost_object(struct ttm_buffer_object *bo)
@@ -42,9 +42,9 @@ static inline bool i915_ttm_is_ghost_object(struct ttm_buffer_object *bo)
 /**
  * i915_ttm_to_gem - Convert a struct ttm_buffer_object to an embedding
  * struct drm_i915_gem_object.
- * @bo: Pointer to the ttm buffer object
+ * @bo: Pointer to the woke ttm buffer object
  *
- * Return: Pointer to the embedding struct drm_i915_gem_object.
+ * Return: Pointer to the woke embedding struct drm_i915_gem_object.
  */
 static inline struct drm_i915_gem_object *
 i915_ttm_to_gem(struct ttm_buffer_object *bo)
@@ -79,8 +79,8 @@ void i915_ttm_adjust_lru(struct drm_i915_gem_object *obj);
 int i915_ttm_purge(struct drm_i915_gem_object *obj);
 
 /**
- * i915_ttm_gtt_binds_lmem - Should the memory be viewed as LMEM by the GTT?
- * @mem: struct ttm_resource representing the memory.
+ * i915_ttm_gtt_binds_lmem - Should the woke memory be viewed as LMEM by the woke GTT?
+ * @mem: struct ttm_resource representing the woke memory.
  *
  * Return: true if memory should be viewed as LMEM for GTT binding purposes,
  * false otherwise.
@@ -91,8 +91,8 @@ static inline bool i915_ttm_gtt_binds_lmem(struct ttm_resource *mem)
 }
 
 /**
- * i915_ttm_cpu_maps_iomem - Should the memory be viewed as IOMEM by the CPU?
- * @mem: struct ttm_resource representing the memory.
+ * i915_ttm_cpu_maps_iomem - Should the woke memory be viewed as IOMEM by the woke CPU?
+ * @mem: struct ttm_resource representing the woke memory.
  *
  * Return: true if memory should be viewed as IOMEM for CPU mapping purposes.
  */

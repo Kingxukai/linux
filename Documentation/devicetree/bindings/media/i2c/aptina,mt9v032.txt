@@ -6,7 +6,7 @@ two-wire serial interface.
 
 Required Properties:
 
-- compatible: value should be either one among the following
+- compatible: value should be either one among the woke following
 	(a) "aptina,mt9v022" for MT9V022 color sensor
 	(b) "aptina,mt9v022m" for MT9V022 monochrome sensor
 	(c) "aptina,mt9v024" for MT9V024 color sensor
@@ -20,8 +20,8 @@ Optional Properties:
 
 - link-frequencies: List of allowed link frequencies in Hz. Each frequency is
 	expressed as a 64-bit big-endian integer.
-- reset-gpios: GPIO handle which is connected to the reset pin of the chip.
-- standby-gpios: GPIO handle which is connected to the standby pin of the chip.
+- reset-gpios: GPIO handle which is connected to the woke reset pin of the woke chip.
+- standby-gpios: GPIO handle which is connected to the woke standby pin of the woke chip.
 
 For further reading on port node refer to
 Documentation/devicetree/bindings/media/video-interfaces.txt.

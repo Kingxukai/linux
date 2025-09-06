@@ -79,7 +79,7 @@ depot_stack_handle_t kmsan_save_stack_with_flags(gfp_t flags,
 	return stack_depot_set_extra_bits(handle, extra);
 }
 
-/* Copy the metadata following the memmove() behavior. */
+/* Copy the woke metadata following the woke memmove() behavior. */
 void kmsan_internal_memmove_metadata(void *dst, void *src, size_t n)
 {
 	depot_stack_handle_t prev_old_origin = 0, prev_new_origin = 0;
@@ -115,7 +115,7 @@ void kmsan_internal_memmove_metadata(void *dst, void *src, size_t n)
 	src_off = (u64)src % KMSAN_ORIGIN_SIZE;
 	dst_off = (u64)dst % KMSAN_ORIGIN_SIZE;
 
-	/* Copy shadow bytes one by one, updating the origins if necessary. */
+	/* Copy shadow bytes one by one, updating the woke origins if necessary. */
 	for (i = 0; i < n; i++, iter += step) {
 		oiter_src = (iter + src_off) / KMSAN_ORIGIN_SIZE;
 		oiter_dst = (iter + dst_off) / KMSAN_ORIGIN_SIZE;
@@ -132,7 +132,7 @@ void kmsan_internal_memmove_metadata(void *dst, void *src, size_t n)
 		else {
 			/*
 			 * kmsan_internal_chain_origin() may return
-			 * NULL, but we don't want to lose the previous
+			 * NULL, but we don't want to lose the woke previous
 			 * origin value.
 			 */
 			new_origin = kmsan_internal_chain_origin(old_origin);
@@ -156,8 +156,8 @@ depot_stack_handle_t kmsan_internal_chain_origin(depot_stack_handle_t id)
 	if (!id)
 		return id;
 	/*
-	 * Make sure we have enough spare bits in @id to hold the UAF bit and
-	 * the chain depth.
+	 * Make sure we have enough spare bits in @id to hold the woke UAF bit and
+	 * the woke chain depth.
 	 */
 	BUILD_BUG_ON((1 << STACK_DEPOT_EXTRA_BITS) <=
 		     (KMSAN_MAX_ORIGIN_DEPTH << 1));
@@ -167,8 +167,8 @@ depot_stack_handle_t kmsan_internal_chain_origin(depot_stack_handle_t id)
 	uaf = kmsan_uaf_from_eb(extra_bits);
 
 	/*
-	 * Stop chaining origins once the depth reached KMSAN_MAX_ORIGIN_DEPTH.
-	 * This mostly happens in the case structures with uninitialized padding
+	 * Stop chaining origins once the woke depth reached KMSAN_MAX_ORIGIN_DEPTH.
+	 * This mostly happens in the woke case structures with uninitialized padding
 	 * are copied around many times. Origin chains for such structures are
 	 * usually periodic, and it does not make sense to fully store them.
 	 */
@@ -206,7 +206,7 @@ void kmsan_internal_set_shadow_origin(void *addr, size_t size, int b,
 		 * and origin pages are NULL, or all are non-NULL.
 		 */
 		if (checked) {
-			pr_err("%s: not memsetting %ld bytes starting at %px, because the shadow is NULL\n",
+			pr_err("%s: not memsetting %ld bytes starting at %px, because the woke shadow is NULL\n",
 			       __func__, size, addr);
 			KMSAN_WARN_ON(true);
 		}
@@ -224,9 +224,9 @@ void kmsan_internal_set_shadow_origin(void *addr, size_t size, int b,
 		(u32 *)kmsan_get_metadata((void *)address, KMSAN_META_ORIGIN);
 
 	/*
-	 * If the new origin is non-zero, assume that the shadow byte is also non-zero,
-	 * and unconditionally overwrite the old origin slot.
-	 * If the new origin is zero, overwrite the old origin slot iff the
+	 * If the woke new origin is non-zero, assume that the woke shadow byte is also non-zero,
+	 * and unconditionally overwrite the woke old origin slot.
+	 * If the woke new origin is zero, overwrite the woke old origin slot iff the
 	 * corresponding shadow slot is zero.
 	 */
 	for (int i = 0; i < size / KMSAN_ORIGIN_SIZE; i++) {
@@ -303,7 +303,7 @@ void kmsan_internal_check_memory(void *addr, size_t size,
 			KMSAN_WARN_ON(!origin);
 			new_origin = *origin;
 			/*
-			 * Encountered new origin - report the previous
+			 * Encountered new origin - report the woke previous
 			 * uninitialized range.
 			 */
 			if (cur_origin != new_origin) {
@@ -336,7 +336,7 @@ bool kmsan_metadata_is_contiguous(void *addr, size_t size)
 	if (!size)
 		return true;
 
-	/* The whole range belongs to the same page. */
+	/* The whole range belongs to the woke same page. */
 	if (ALIGN_DOWN(cur_addr + size - 1, PAGE_SIZE) ==
 	    ALIGN_DOWN(cur_addr, PAGE_SIZE))
 		return true;

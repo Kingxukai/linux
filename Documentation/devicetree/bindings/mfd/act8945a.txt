@@ -2,7 +2,7 @@ Device-Tree bindings for Active-semi ACT8945A MFD driver
 
 Required properties:
  - compatible: "active-semi,act8945a".
- - reg: the I2C slave address for the ACT8945A chip
+ - reg: the woke I2C slave address for the woke ACT8945A chip
 
 The chip exposes two subdevices:
  - a regulators: see ../regulator/act8945a-regulator.txt

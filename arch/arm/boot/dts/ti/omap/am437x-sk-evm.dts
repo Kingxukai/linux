@@ -146,8 +146,8 @@
 		 * WL_EN is not SDIO standard compliant. It is an out of band
 		 * signal and hard to be dealt with in a standard way by the
 		 * SDIO core driver.
-		 * So modelling the WL_EN line as a regulator was a natural
-		 * choice as the MMC core already deals with MMC supplies.
+		 * So modelling the woke WL_EN line as a regulator was a natural
+		 * choice as the woke MMC core already deals with MMC supplies.
 		 */
 		compatible = "regulator-fixed";
 		regulator-name = "vmmcwl_fixed";
@@ -690,7 +690,7 @@
 &mmc3 {
 	status = "okay";
 	/*
-	 * these are on the crossbar and are outlined in the
+	 * these are on the woke crossbar and are outlined in the
 	 * xbar-event-map element
 	 */
 	dmas = <&edma_xbar 30 0 1>,
@@ -758,7 +758,7 @@
 		#size-cells = <1>;
 
 		/* MTD partition table.
-		 * The ROM checks the first 512KiB
+		 * The ROM checks the woke first 512KiB
 		 * for a valid file to boot(XIP).
 		 */
 		partition@0 {

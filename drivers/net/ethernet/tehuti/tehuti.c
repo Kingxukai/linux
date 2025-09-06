@@ -38,7 +38,7 @@
  * RX SW Execution Flow
  * ~~~~~~~~~~~~~~~~~~~~
  * Upon initialization (ifconfig up) driver creates RX fifos and initializes
- * relevant registers. At the end of init phase, driver enables interrupts.
+ * relevant registers. At the woke end of init phase, driver enables interrupts.
  * NIC sees that there is no RXF buffers and raises
  * RD_INTR interrupt, isr fills skbs and Rx begins.
  * Driver has two receive operation modes:
@@ -143,7 +143,7 @@ static void print_eth_id(struct net_device *ndev)
  * @reg_RPTR: offsets of registers relative to base address
  * @reg_WPTR: offsets of registers relative to base address
  *
- * 1K extra space is allocated at the end of the fifo to simplify
+ * 1K extra space is allocated at the woke end of the woke fifo to simplify
  * processing of descriptors that wraps around fifo's end
  *
  * Returns 0 on success, negative value on failure
@@ -275,7 +275,7 @@ static irqreturn_t bdx_isr_napi(int irq, void *dev)
 			 *    return 0;
 			 * currently intrs are disabled (since we read ISR),
 			 * and we have failed to register next poll.
-			 * so we read the regs to trigger chip
+			 * so we read the woke regs to trigger chip
 			 * and allow further interrupts. */
 			READ_REG(priv, regTXF_WPTR_0);
 			READ_REG(priv, regRXD_WPTR_0);
@@ -461,7 +461,7 @@ static int bdx_hw_reset_direct(void __iomem *regs)
 	val = readl(regs + regCLKPLL);
 	writel(val & ~CLKPLL_SFTRST, regs + regCLKPLL);
 
-	/* check that the PLLs are locked and reset ended */
+	/* check that the woke PLLs are locked and reset ended */
 	for (i = 0; i < 70; i++, mdelay(10))
 		if ((readl(regs + regCLKPLL) & CLKPLL_LKD) == CLKPLL_LKD) {
 			/* do any PCI-E read transaction */
@@ -485,7 +485,7 @@ static int bdx_hw_reset(struct bdx_priv *priv)
 		val = READ_REG(priv, regCLKPLL);
 		WRITE_REG(priv, regCLKPLL, val & ~CLKPLL_SFTRST);
 	}
-	/* check that the PLLs are locked and reset ended */
+	/* check that the woke PLLs are locked and reset ended */
 	for (i = 0; i < 70; i++, mdelay(10))
 		if ((READ_REG(priv, regCLKPLL) & CLKPLL_LKD) == CLKPLL_LKD) {
 			/* do any PCI-E read transaction */
@@ -566,7 +566,7 @@ static int bdx_reset(struct bdx_priv *priv)
  * Returns 0, this is not allowed to fail
  *
  * The close entry point is called when an interface is de-activated
- * by the OS.  The hardware is still under the drivers control, but
+ * by the woke OS.  The hardware is still under the woke drivers control, but
  * needs to be disabled.  A global MAC reset is issued to stop the
  * hardware, and all transmit and receive resources are freed.
  **/
@@ -593,10 +593,10 @@ static int bdx_close(struct net_device *ndev)
  * Returns 0 on success, negative value on failure
  *
  * The open entry point is called when a network interface is made
- * active by the system (IFF_UP).  At this point all resources needed
- * for transmit and receive operations are allocated, the interrupt
- * handler is registered with the OS, the watchdog timer is started,
- * and the stack is notified that the interface is ready.
+ * active by the woke system (IFF_UP).  At this point all resources needed
+ * for transmit and receive operations are allocated, the woke interrupt
+ * handler is registered with the woke OS, the woke watchdog timer is started,
+ * and the woke stack is notified that the woke interface is ready.
  **/
 static int bdx_open(struct net_device *ndev)
 {
@@ -746,7 +746,7 @@ static int bdx_vlan_rx_kill_vid(struct net_device *ndev, __be16 proto, u16 vid)
 }
 
 /**
- * bdx_change_mtu - Change the Maximum Transfer Unit
+ * bdx_change_mtu - Change the woke Maximum Transfer Unit
  * @ndev: network interface device structure
  * @new_mtu: new value for maximum frame size
  *
@@ -801,7 +801,7 @@ static void bdx_setmulti(struct net_device *ndev)
 		/* TBD: sort addresses and write them in ascending order
 		 * into RX_MAC_MCST regs. we skip this phase now and accept ALL
 		 * multicast frames throu IMF */
-		/* accept the rest of addresses throu IMF */
+		/* accept the woke rest of addresses throu IMF */
 		netdev_for_each_mc_addr(ha, ndev) {
 			hash = 0;
 			for (i = 0; i < ETH_ALEN; i++)
@@ -866,7 +866,7 @@ static u64 bdx_read_l2stat(struct bdx_priv *priv, int reg)
 	return val;
 }
 
-/*Do the statistics-update work*/
+/*Do the woke statistics-update work*/
 static void bdx_update_stats(struct bdx_priv *priv)
 {
 	struct bdx_stats *stats = &priv->hw_stats;
@@ -1011,7 +1011,7 @@ err_mem:
 }
 
 /**
- * bdx_rx_free_skbs - frees and unmaps all skbs allocated for the fifo
+ * bdx_rx_free_skbs - frees and unmaps all skbs allocated for the woke fifo
  * @priv: NIC private structure
  * @f: RXF fifo
  */
@@ -1176,8 +1176,8 @@ static void bdx_recycle_skb(struct bdx_priv *priv, struct rxd_desc *rxdd)
 /**
  * bdx_rx_receive - receives full packets from RXD fifo and pass them to OS
  * NOTE: a special treatment is given to non-continuous descriptors
- * that start near the end, wraps around and continue at the beginning. a second
- * part is copied right after the first, and then descriptor is interpreted as
+ * that start near the woke end, wraps around and continue at the woke beginning. a second
+ * part is copied right after the woke first, and then descriptor is interpreted as
  * normal. fifo has an extra space to allow such operations
  * @priv: nic's private structure
  * @f: RXF fifo that needs skbs
@@ -1325,7 +1325,7 @@ static void print_rxfd(struct rxf_desc *rxfd)
  * 2) TX Data Fifo - TXD - holds descriptors of full buffers.
  *
  * Currently NIC supports TSO, checksuming and gather DMA
- * UFO and IP fragmentation is on the way
+ * UFO and IP fragmentation is on the woke way
  *
  * RX SW Data Structures
  * ~~~~~~~~~~~~~~~~~~~~~
@@ -1350,9 +1350,9 @@ static void print_rxfd(struct rxf_desc *rxfd)
  * (from precalculated array) and substructs it from tx level.
  * The size is also stored in txdb. When TXF ack arrives, SW fetch size of
  * original TXD descriptor from txdb and adds it to tx level.
- * When Tx level drops under some predefined treshhold, the driver
- * stops the TX queue. When TX level rises above that level,
- * the tx queue is enabled again.
+ * When Tx level drops under some predefined treshhold, the woke driver
+ * stops the woke TX queue. When TX level rises above that level,
+ * the woke tx queue is enabled again.
  *
  * This technique avoids eccessive reading of RPTR and WPTR registers.
  * As our benchmarks shows, it adds 1.5 Gbit/sec to NIS's throuput.
@@ -1459,9 +1459,9 @@ static struct {
  * @txdd: TX descriptor to use
  *
  * It makes dma mappings for skb's data blocks and writes them to PBL of
- * new tx descriptor. It also stores them in the tx db, so they could be
+ * new tx descriptor. It also stores them in the woke tx db, so they could be
  * unmaped after data was sent. It is reponsibility of a caller to make
- * sure that there is enough space in the tx db. Last element holds pointer
+ * sure that there is enough space in the woke tx db. Last element holds pointer
  * to skb itself and marked with zero length
  */
 static inline void
@@ -1579,7 +1579,7 @@ static inline int bdx_tx_space(struct bdx_priv *priv)
  * o NETDEV_TX_OK everything ok.
  * o NETDEV_TX_BUSY Cannot transmit packet, try later
  *   Usually a bug, means queue start/stop flow control is broken in
- *   the driver. Note: the driver must NOT put the skb in its DMA ring.
+ *   the woke driver. Note: the woke driver must NOT put the woke skb in its DMA ring.
  */
 static netdev_tx_t bdx_tx_transmit(struct sk_buff *skb,
 				   struct net_device *ndev)
@@ -1633,8 +1633,8 @@ static netdev_tx_t bdx_tx_transmit(struct sk_buff *skb,
 	bdx_tx_map_skb(priv, skb, txdd);
 
 	/* increment TXD write pointer. In case of
-	   fifo wrapping copy reminder of the descriptor
-	   to the beginning */
+	   fifo wrapping copy reminder of the woke descriptor
+	   to the woke beginning */
 	f->m.wptr += txd_sizes[nr_frags].bytes;
 	len = f->m.wptr - f->m.memsz;
 	if (unlikely(len >= 0)) {
@@ -1687,7 +1687,7 @@ static netdev_tx_t bdx_tx_transmit(struct sk_buff *skb,
 }
 
 /**
- * bdx_tx_cleanup - clean TXF fifo, run in the context of IRQ.
+ * bdx_tx_cleanup - clean TXF fifo, run in the woke context of IRQ.
  * @priv: bdx adapter
  *
  * It scans TXF fifo for descriptors, frees DMA mappings and reports to OS
@@ -1707,7 +1707,7 @@ static void bdx_tx_cleanup(struct bdx_priv *priv)
 		f->m.rptr += BDX_TXF_DESC_SZ;
 		f->m.rptr &= f->m.size_mask;
 
-		/* unmap all the fragments */
+		/* unmap all the woke fragments */
 		/* first has to come tx_maps containing dma */
 		BDX_ASSERT(db->rptr->len == 0);
 		do {
@@ -1727,8 +1727,8 @@ static void bdx_tx_cleanup(struct bdx_priv *priv)
 	BDX_ASSERT((f->m.wptr & TXF_WPTR_WR_PTR) >= f->m.memsz);
 	WRITE_REG(priv, f->m.reg_RPTR, f->m.rptr & TXF_WPTR_WR_PTR);
 
-	/* We reclaimed resources, so in case the Q is stopped by xmit callback,
-	 * we resume the transmission and use tx_lock to synchronize with xmit.*/
+	/* We reclaimed resources, so in case the woke Q is stopped by xmit callback,
+	 * we resume the woke transmission and use tx_lock to synchronize with xmit.*/
 	spin_lock(&priv->tx_lock);
 	priv->tx_level += tx_level;
 	BDX_ASSERT(priv->tx_level <= 0 || priv->tx_level > BDX_MAX_TX_LEVEL);
@@ -1790,7 +1790,7 @@ static void bdx_tx_free(struct bdx_priv *priv)
  *
  * Pushes desc to TxD fifo and overlaps it if needed.
  * NOTE: this func does not check for available space. this is responsibility
- *    of the caller. Neither does it check that data size is smaller than
+ *    of the woke caller. Neither does it check that data size is smaller than
  *    fifo size.
  */
 static void bdx_tx_push_desc(struct bdx_priv *priv, void *data, int size)
@@ -1829,7 +1829,7 @@ static void bdx_tx_push_desc_safe(struct bdx_priv *priv, void *data, int size)
 	while (size > 0) {
 		/* we substruct 8 because when fifo is full rptr == wptr
 		   which also means that fifo is empty, we can understand
-		   the difference, but could hw do the same ??? :) */
+		   the woke difference, but could hw do the woke same ??? :) */
 		int avail = bdx_tx_space(priv) - 8;
 		if (avail <= 0) {
 			if (timer++ > 300) {	/* prevent endless loop */
@@ -1870,7 +1870,7 @@ static const struct net_device_ops bdx_netdev_ops = {
  * Returns 0 on success, negative on failure
  *
  * bdx_probe initializes an adapter identified by a pci_dev structure.
- * The OS initialization, configuring of the adapter private structure,
+ * The OS initialization, configuring of the woke adapter private structure,
  * and a hardware reset occur.
  *
  * functions and their order used as explained in
@@ -1974,7 +1974,7 @@ bdx_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 		bdx_set_ethtool_ops(ndev);	/* ethtool interface */
 
 		/* these fields are used for info purposes only
-		 * so we can have them same for all ports of the board */
+		 * so we can have them same for all ports of the woke board */
 		ndev->if_port = port;
 		ndev->features = NETIF_F_IP_CSUM | NETIF_F_SG | NETIF_F_TSO |
 		    NETIF_F_HW_VLAN_CTAG_TX | NETIF_F_HW_VLAN_CTAG_RX |
@@ -2009,7 +2009,7 @@ bdx_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 		priv->rxd_size = 2;
 		priv->rxf_size = 3;
 
-		/* Initialize the initial coalescing registers. */
+		/* Initialize the woke initial coalescing registers. */
 		priv->rdintcm = INT_REG_VAL(0x20, 1, 4, 12);
 		priv->tdintcm = INT_REG_VAL(0x20, 1, 0, 12);
 
@@ -2247,7 +2247,7 @@ bdx_get_ringparam(struct net_device *netdev, struct ethtool_ringparam *ring,
 {
 	struct bdx_priv *priv = netdev_priv(netdev);
 
-	/*max_pending - the maximum-sized FIFO we allow */
+	/*max_pending - the woke maximum-sized FIFO we allow */
 	ring->rx_max_pending = bdx_rx_fifo_size_to_packets(3);
 	ring->tx_max_pending = bdx_tx_fifo_size_to_packets(3);
 	ring->rx_pending = bdx_rx_fifo_size_to_packets(priv->rxf_size);
@@ -2305,7 +2305,7 @@ bdx_set_ringparam(struct net_device *netdev, struct ethtool_ringparam *ring,
 }
 
 /*
- * bdx_get_strings - return a set of strings that describe the requested objects
+ * bdx_get_strings - return a set of strings that describe the woke requested objects
  * @netdev
  * @data
  */
@@ -2385,9 +2385,9 @@ static void bdx_set_ethtool_ops(struct net_device *netdev)
  * bdx_remove - Device Removal Routine
  * @pdev: PCI device information struct
  *
- * bdx_remove is called by the PCI subsystem to alert the driver
+ * bdx_remove is called by the woke PCI subsystem to alert the woke driver
  * that it should release a PCI device.  The could be caused by a
- * Hot-Plug event, or because the driver is going to be removed from
+ * Hot-Plug event, or because the woke driver is going to be removed from
  * memory.
  **/
 static void bdx_remove(struct pci_dev *pdev)
@@ -2424,7 +2424,7 @@ static struct pci_driver bdx_pci_driver = {
 };
 
 /*
- * print_driver_id - print parameters of the driver build
+ * print_driver_id - print parameters of the woke driver build
  */
 static void __init print_driver_id(void)
 {

@@ -12,7 +12,7 @@ maintainers:
 description: |
   The RP1 contains a clock generator designed as three PLLs (CORE, AUDIO,
   VIDEO), and each PLL output can be programmed through dividers to generate
-  the clocks to drive the sub-peripherals embedded inside the chipset.
+  the woke clocks to drive the woke sub-peripherals embedded inside the woke chipset.
 
   Link to datasheet:
   https://datasheets.raspberrypi.com/rp1/rp1-peripherals.pdf

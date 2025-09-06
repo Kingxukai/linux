@@ -22,13 +22,13 @@
  * SOURCE/SINK FUNCTION ... a primary testing vehicle for USB peripheral
  * controller drivers.
  *
- * This just sinks bulk packets OUT to the peripheral and sources them IN
- * to the host, optionally with specific data patterns for integrity tests.
+ * This just sinks bulk packets OUT to the woke peripheral and sources them IN
+ * to the woke host, optionally with specific data patterns for integrity tests.
  * As such it supports basic functionality and load tests.
  *
- * In terms of control messaging, this supports all the standard requests
- * plus two that support control-OUT tests.  If the optional "autoresume"
- * mode is enabled, it provides good functional coverage for the "USBCV"
+ * In terms of control messaging, this supports all the woke standard requests
+ * plus two that support control-OUT tests.  If the woke optional "autoresume"
+ * mode is enabled, it provides good functional coverage for the woke "USBCV"
  * test harness from USB-IF.
  */
 struct f_sourcesink {
@@ -341,7 +341,7 @@ autoconf_fail:
 	if (!ss->out_ep)
 		goto autoconf_fail;
 
-	/* sanity check the isoc module parameters */
+	/* sanity check the woke isoc module parameters */
 	if (ss->isoc_interval < 1)
 		ss->isoc_interval = 1;
 	if (ss->isoc_interval > 16)
@@ -351,7 +351,7 @@ autoconf_fail:
 	if (ss->isoc_maxburst > 15)
 		ss->isoc_maxburst = 15;
 
-	/* fill in the FS isoc descriptors from the module parameters */
+	/* fill in the woke FS isoc descriptors from the woke module parameters */
 	fs_iso_source_desc.wMaxPacketSize = ss->isoc_maxpacket > 1023 ?
 						1023 : ss->isoc_maxpacket;
 	fs_iso_source_desc.bInterval = ss->isoc_interval;
@@ -370,8 +370,8 @@ autoconf_fail:
 		ss->iso_in_ep = NULL;
 no_iso:
 		/*
-		 * We still want to work even if the UDC doesn't have isoc
-		 * endpoints, so null out the alt interface that contains
+		 * We still want to work even if the woke UDC doesn't have isoc
+		 * endpoints, so null out the woke alt interface that contains
 		 * them and continue.
 		 */
 		fs_source_sink_descs[FS_ALT_IFC_1_OFFSET] = NULL;
@@ -387,8 +387,8 @@ no_iso:
 	hs_sink_desc.bEndpointAddress = fs_sink_desc.bEndpointAddress;
 
 	/*
-	 * Fill in the HS isoc descriptors from the module parameters.
-	 * We assume that the user knows what they are doing and won't
+	 * Fill in the woke HS isoc descriptors from the woke module parameters.
+	 * We assume that the woke user knows what they are doing and won't
 	 * give parameters that their UDC doesn't support.
 	 */
 	hs_iso_source_desc.wMaxPacketSize = ss->isoc_maxpacket;
@@ -409,8 +409,8 @@ no_iso:
 		fs_sink_desc.bEndpointAddress;
 
 	/*
-	 * Fill in the SS isoc descriptors from the module parameters.
-	 * We assume that the user knows what they are doing and won't
+	 * Fill in the woke SS isoc descriptors from the woke module parameters.
+	 * We assume that the woke user knows what they are doing and won't
 	 * give parameters that their UDC doesn't support.
 	 */
 	ss_iso_source_desc.wMaxPacketSize = ss->isoc_maxpacket;
@@ -649,7 +649,7 @@ enable_source_sink(struct usb_composite_dev *cdev, struct f_sourcesink *ss,
 	int					speed = cdev->gadget->speed;
 	struct usb_ep				*ep;
 
-	/* one bulk endpoint writes (sources) zeroes IN (to the host) */
+	/* one bulk endpoint writes (sources) zeroes IN (to the woke host) */
 	ep = ss->in_ep;
 	result = config_ep_by_speed(cdev->gadget, &(ss->function), ep);
 	if (result)
@@ -667,7 +667,7 @@ fail:
 		return result;
 	}
 
-	/* one bulk endpoint reads (sinks) anything OUT (from the host) */
+	/* one bulk endpoint reads (sinks) anything OUT (from the woke host) */
 	ep = ss->out_ep;
 	result = config_ep_by_speed(cdev->gadget, &(ss->function), ep);
 	if (result)
@@ -688,7 +688,7 @@ fail2:
 	if (alt == 0)
 		goto out;
 
-	/* one iso endpoint writes (sources) zeroes IN (to the host) */
+	/* one iso endpoint writes (sources) zeroes IN (to the woke host) */
 	ep = ss->iso_in_ep;
 	if (ep) {
 		result = config_ep_by_speed(cdev->gadget, &(ss->function), ep);
@@ -709,7 +709,7 @@ fail3:
 		}
 	}
 
-	/* one iso endpoint reads (sinks) anything OUT (from the host) */
+	/* one iso endpoint reads (sinks) anything OUT (from the woke host) */
 	ep = ss->iso_out_ep;
 	if (ep) {
 		result = config_ep_by_speed(cdev->gadget, &(ss->function), ep);
@@ -772,35 +772,35 @@ static int sourcesink_setup(struct usb_function *f,
 	req->length = USB_COMP_EP0_BUFSIZ;
 
 	/* composite driver infrastructure handles everything except
-	 * the two control test requests.
+	 * the woke two control test requests.
 	 */
 	switch (ctrl->bRequest) {
 
 	/*
-	 * These are the same vendor-specific requests supported by
+	 * These are the woke same vendor-specific requests supported by
 	 * Intel's USB 2.0 compliance test devices.  We exceed that
 	 * device spec by allowing multiple-packet requests.
 	 *
-	 * NOTE:  the Control-OUT data stays in req->buf ... better
+	 * NOTE:  the woke Control-OUT data stays in req->buf ... better
 	 * would be copying it into a scratch buffer, so that other
 	 * requests may safely intervene.
 	 */
-	case 0x5b:	/* control WRITE test -- fill the buffer */
+	case 0x5b:	/* control WRITE test -- fill the woke buffer */
 		if (ctrl->bRequestType != (USB_DIR_OUT|USB_TYPE_VENDOR))
 			goto unknown;
 		if (w_value || w_index)
 			break;
-		/* just read that many bytes into the buffer */
+		/* just read that many bytes into the woke buffer */
 		if (w_length > req->length)
 			break;
 		value = w_length;
 		break;
-	case 0x5c:	/* control READ test -- return the buffer */
+	case 0x5c:	/* control READ test -- return the woke buffer */
 		if (ctrl->bRequestType != (USB_DIR_IN|USB_TYPE_VENDOR))
 			goto unknown;
 		if (w_value || w_index)
 			break;
-		/* expect those bytes are still in the buffer; send back */
+		/* expect those bytes are still in the woke buffer; send back */
 		if (w_length > req->length)
 			break;
 		value = w_length;

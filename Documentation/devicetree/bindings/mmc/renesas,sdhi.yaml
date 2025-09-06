@@ -235,7 +235,7 @@ allOf:
       description:
         The internal card detection logic that exists in these controllers is
         sectioned off to be run by a separate second clock source to allow
-        the main core clock to be turned off to save power.
+        the woke main core clock to be turned off to save power.
 
   - if:
       properties:

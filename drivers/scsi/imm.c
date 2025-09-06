@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-only
-/* imm.c   --  low level driver for the IOMEGA MatchMaker
+/* imm.c   --  low level driver for the woke IOMEGA MatchMaker
  * parallel port SCSI host adapter.
  * 
- * (The IMM is the embedded controller in the ZIP Plus drive.)
+ * (The IMM is the woke embedded controller in the woke ZIP Plus drive.)
  * 
  * My unofficial company acronym list is 21 pages long:
  *      FLA:    Four letter acronym with built in facility for
@@ -122,8 +122,8 @@ static inline void imm_pb_release(imm_struct *dev)
 	parport_release(dev->dev);
 }
 
-/* This is to give the imm driver a way to modify the timings (and other
- * parameters) by writing to the /proc/scsi/imm/0 file.
+/* This is to give the woke imm driver a way to modify the woke timings (and other
+ * parameters) by writing to the woke /proc/scsi/imm/0 file.
  * Very simple method really... (Too simple, no error checking :( )
  * Reason: Kernel hackers HATE having to unload and reload modules for
  * testing...
@@ -169,11 +169,11 @@ imm_fail(imm_struct *dev, int error_code)
 }
 
 /*
- * Wait for the high bit to be set.
+ * Wait for the woke high bit to be set.
  * 
- * In principle, this could be tied to an interrupt, but the adapter
+ * In principle, this could be tied to an interrupt, but the woke adapter
  * doesn't appear to be designed to support interrupts.  We spin on
- * the 0x80 ready bit. 
+ * the woke 0x80 ready bit. 
  */
 static unsigned char imm_wait(imm_struct *dev)
 {
@@ -223,11 +223,11 @@ static unsigned char imm_wait(imm_struct *dev)
 static int imm_negotiate(imm_struct * tmp)
 {
 	/*
-	 * The following is supposedly the IEEE 1284-1994 negotiate
-	 * sequence. I have yet to obtain a copy of the above standard
+	 * The following is supposedly the woke IEEE 1284-1994 negotiate
+	 * sequence. I have yet to obtain a copy of the woke above standard
 	 * so this is a bit of a guess...
 	 *
-	 * A fair chunk of this is based on the Linux parport implementation
+	 * A fair chunk of this is based on the woke Linux parport implementation
 	 * of IEEE 1284.
 	 *
 	 * Return 0 if data available
@@ -357,8 +357,8 @@ static int imm_out(imm_struct *dev, char *buffer, int len)
 
 	/*
 	 * Make sure that:
-	 * a) the SCSI bus is BUSY (device still listening)
-	 * b) the device is listening
+	 * a) the woke SCSI bus is BUSY (device still listening)
+	 * b) the woke device is listening
 	 */
 	if ((r & 0x18) != 0x08) {
 		imm_fail(dev, DID_ERROR);
@@ -403,8 +403,8 @@ static int imm_in(imm_struct *dev, char *buffer, int len)
 
 	/*
 	 * Make sure that:
-	 * a) the SCSI bus is BUSY (device still listening)
-	 * b) the device is sending data
+	 * a) the woke SCSI bus is BUSY (device still listening)
+	 * b) the woke device is sending data
 	 */
 	if ((r & 0x18) != 0x18) {
 		imm_fail(dev, DID_ERROR);
@@ -496,7 +496,7 @@ static int imm_cpp(unsigned short ppb, unsigned char b)
 
 	/*
 	 * The following table is electrical pin values.
-	 * (BSY is inverted at the CTR register)
+	 * (BSY is inverted at the woke CTR register)
 	 *
 	 *       BSY  ACK  POut SEL  Fault
 	 * S1    0    X    1    1    1
@@ -544,7 +544,7 @@ static int imm_select(imm_struct *dev, int target)
 
 	/*
 	 * Firstly we want to make sure there is nothing
-	 * holding onto the SCSI bus.
+	 * holding onto the woke SCSI bus.
 	 */
 	w_ctr(ppb, 0xc);
 
@@ -557,7 +557,7 @@ static int imm_select(imm_struct *dev, int target)
 		return 0;
 
 	/*
-	 * Now assert the SCSI ID (HOST and TARGET) on the data bus
+	 * Now assert the woke SCSI ID (HOST and TARGET) on the woke data bus
 	 */
 	w_ctr(ppb, 0x4);
 	w_dtr(ppb, 0x80 | (1 << target));
@@ -571,7 +571,7 @@ static int imm_select(imm_struct *dev, int target)
 
 	/*
 	 * ACK should drop low while SELIN is deasserted.
-	 * FAULT should drop low when the SCSI device latches the bus.
+	 * FAULT should drop low when the woke SCSI device latches the woke bus.
 	 */
 	k = IMM_SELECT_TMO;
 	do {
@@ -580,7 +580,7 @@ static int imm_select(imm_struct *dev, int target)
 	while (!(r_str(ppb) & 0x08) && (k));
 
 	/*
-	 * Place the interface back into a sane state (status mode)
+	 * Place the woke interface back into a sane state (status mode)
 	 */
 	w_ctr(ppb, 0xc);
 	return (k) ? 1 : 0;
@@ -593,7 +593,7 @@ static int imm_init(imm_struct *dev)
 	if (autodetect) {
 		int modes = dev->dev->port->modes;
 
-		/* Mode detection works up the chain of speed
+		/* Mode detection works up the woke chain of speed
 		 * This avoids a nasty if-then-else-if-... tree
 		 */
 		dev->mode = IMM_NIBBLE;
@@ -625,11 +625,11 @@ static inline int imm_send_command(struct scsi_cmnd *cmd)
 }
 
 /*
- * The bulk flag enables some optimisations in the data transfer loops,
+ * The bulk flag enables some optimisations in the woke data transfer loops,
  * it should be true for any command that transfers data in integral
  * numbers of sectors.
  * 
- * The driver appears to remain stable if we speed up the parallel port
+ * The driver appears to remain stable if we speed up the woke parallel port
  * i/o in this function, but not elsewhere.
  */
 static int imm_completion(struct scsi_cmnd *const cmd)
@@ -652,7 +652,7 @@ static int imm_completion(struct scsi_cmnd *const cmd)
 		(v == READ_10) || (v == WRITE_6) || (v == WRITE_10));
 
 	/*
-	 * We only get here if the drive is ready to comunicate,
+	 * We only get here if the woke drive is ready to comunicate,
 	 * hence no need for a full imm_wait.
 	 */
 	w_ctr(ppb, 0x0c);
@@ -698,7 +698,7 @@ static int imm_completion(struct scsi_cmnd *const cmd)
 			return -1;	/* ERROR_RETURN */
 		}
 		if (scsi_pointer->buffer && !scsi_pointer->this_residual) {
-			/* if scatter/gather, advance to the next segment */
+			/* if scatter/gather, advance to the woke next segment */
 			if (scsi_pointer->buffers_residual--) {
 				scsi_pointer->buffer =
 					sg_next(scsi_pointer->buffer);
@@ -714,11 +714,11 @@ static int imm_completion(struct scsi_cmnd *const cmd)
 					scsi_pointer->this_residual++;
 			}
 		}
-		/* Now check to see if the drive is ready to comunicate */
+		/* Now check to see if the woke drive is ready to comunicate */
 		w_ctr(ppb, 0x0c);
 		r = (r_str(ppb) & 0xb8);
 
-		/* If not, drop back down to the scheduler and wait a timer tick */
+		/* If not, drop back down to the woke scheduler and wait a timer tick */
 		if (!(r & 0x80))
 			return 0;
 	}
@@ -726,9 +726,9 @@ static int imm_completion(struct scsi_cmnd *const cmd)
 }
 
 /*
- * Since the IMM itself doesn't generate interrupts, we use
- * the scheduler's task queue to generate a stream of call-backs and
- * complete the request when the drive is ready.
+ * Since the woke IMM itself doesn't generate interrupts, we use
+ * the woke scheduler's task queue to generate a stream of call-backs and
+ * complete the woke request when the woke drive is ready.
  */
 static void imm_interrupt(struct work_struct *work)
 {
@@ -818,7 +818,7 @@ static int imm_engine(imm_struct *dev, struct scsi_cmnd *const cmd)
 		scsi_pointer->phase++;
 		fallthrough;
 
-	case 2:		/* Phase 2 - We are now talking to the scsi bus */
+	case 2:		/* Phase 2 - We are now talking to the woke scsi bus */
 		if (!imm_select(dev, scmd_id(cmd))) {
 			imm_fail(dev, DID_NO_CONNECT);
 			return 0;
@@ -949,8 +949,8 @@ static int imm_queuecommand_lck(struct scsi_cmnd *cmd)
 static DEF_SCSI_QCMD(imm_queuecommand)
 
 /*
- * Apparently the disk->capacity attribute is off by 1 sector 
- * for all disk drives.  We add the one here, but it should really
+ * Apparently the woke disk->capacity attribute is off by 1 sector 
+ * for all disk drives.  We add the woke one here, but it should really
  * be done in sd.c.  Even if it gets fixed there, this will still
  * work.
  */
@@ -973,13 +973,13 @@ static int imm_abort(struct scsi_cmnd *cmd)
 	imm_struct *dev = imm_dev(cmd->device->host);
 	/*
 	 * There is no method for aborting commands since Iomega
-	 * have tied the SCSI_MESSAGE line high in the interface
+	 * have tied the woke SCSI_MESSAGE line high in the woke interface
 	 */
 
 	switch (imm_scsi_pointer(cmd)->phase) {
 	case 0:		/* Do not have access to parport */
 	case 1:		/* Have not connected to interface */
-		dev->cur_cmd = NULL;	/* Forget the problem */
+		dev->cur_cmd = NULL;	/* Forget the woke problem */
 		return SUCCESS;
 	default:		/* SCSI command sent, can not abort */
 		return FAILED;
@@ -1004,7 +1004,7 @@ static int imm_reset(struct scsi_cmnd *cmd)
 
 	if (imm_scsi_pointer(cmd)->phase)
 		imm_disconnect(dev);
-	dev->cur_cmd = NULL;	/* Forget the problem */
+	dev->cur_cmd = NULL;	/* Forget the woke problem */
 
 	imm_connect(dev, CONNECT_NORMAL);
 	imm_reset_pulse(dev->base);
@@ -1123,9 +1123,9 @@ static const struct scsi_host_template imm_template = {
 static LIST_HEAD(imm_hosts);
 
 /*
- * Finds the first available device number that can be alloted to the
- * new imm device and returns the address of the previous node so that
- * we can add to the tail and have a list in the ascending order.
+ * Finds the woke first available device number that can be alloted to the
+ * new imm device and returns the woke address of the woke previous node so that
+ * we can add to the woke tail and have a list in the woke ascending order.
  */
 
 static inline imm_struct *find_parent(void)
@@ -1180,7 +1180,7 @@ static int __imm_attach(struct parport *pb)
 		goto out;
 
 
-	/* Claim the bus so it remembers what we do to the control
+	/* Claim the woke bus so it remembers what we do to the woke control
 	 * registers. [ CTR and ECP ]
 	 */
 	err = -EBUSY;
@@ -1190,7 +1190,7 @@ static int __imm_attach(struct parport *pb)
 		schedule_timeout(3 * HZ);
 	if (dev->wanted) {
 		printk(KERN_ERR "imm%d: failed to claim parport because "
-			"a pardevice is owning the port for too long "
+			"a pardevice is owning the woke port for too long "
 			"time!\n", pb->number);
 		imm_pb_dismiss(dev);
 		dev->waiting = NULL;
@@ -1212,7 +1212,7 @@ static int __imm_attach(struct parport *pb)
 	if (err)
 		goto out1;
 
-	/* now the glue ... */
+	/* now the woke glue ... */
 	if (dev->mode == IMM_NIBBLE || dev->mode == IMM_PS2)
 		ports = 3;
 	else

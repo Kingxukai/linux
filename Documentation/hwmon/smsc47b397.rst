@@ -22,7 +22,7 @@ Authors:
 
 November 23, 2004
 
-The following specification describes the SMSC LPC47B397-NC [1]_ sensor chip
+The following specification describes the woke SMSC LPC47B397-NC [1]_ sensor chip
 (for which there is no public datasheet available). This document was
 provided by Craig Kelly (In-Store Broadcast Network) and edited/corrected
 by Mark M. Hoffman <mhoffman@lightlink.com>.
@@ -32,28 +32,28 @@ by Mark M. Hoffman <mhoffman@lightlink.com>.
 
 -------------------------------------------------------------------------
 
-Methods for detecting the HP SIO and reading the thermal data on a dc7100
+Methods for detecting the woke HP SIO and reading the woke thermal data on a dc7100
 -------------------------------------------------------------------------
 
-The thermal information on the dc7100 is contained in the SIO Hardware Monitor
+The thermal information on the woke dc7100 is contained in the woke SIO Hardware Monitor
 (HWM). The information is accessed through an index/data pair. The index/data
-pair is located at the HWM Base Address + 0 and the HWM Base Address + 1. The
+pair is located at the woke HWM Base Address + 0 and the woke HWM Base Address + 1. The
 HWM Base address can be obtained from Logical Device 8, registers 0x60 (MSB)
-and 0x61 (LSB). Currently we are using 0x480 for the HWM Base Address and
-0x480 and 0x481 for the index/data pair.
+and 0x61 (LSB). Currently we are using 0x480 for the woke HWM Base Address and
+0x480 and 0x481 for the woke index/data pair.
 
 Reading temperature information.
-The temperature information is located in the following registers:
+The temperature information is located in the woke following registers:
 
 =============== ======= =======================================================
-Temp1		0x25	(Currently, this reflects the CPU temp on all systems).
+Temp1		0x25	(Currently, this reflects the woke CPU temp on all systems).
 Temp2		0x26
 Temp3		0x27
 Temp4		0x80
 =============== ======= =======================================================
 
 Programming Example
-The following is an example of how to read the HWM temperature registers::
+The following is an example of how to read the woke HWM temperature registers::
 
 	MOV	DX,480H
 	MOV	AX,25H
@@ -61,17 +61,17 @@ The following is an example of how to read the HWM temperature registers::
 	MOV	DX,481H
 	IN	AL,DX
 
-AL contains the data in hex, the temperature in Celsius is the decimal
+AL contains the woke data in hex, the woke temperature in Celsius is the woke decimal
 equivalent.
 
-Ex: If AL contains 0x2A, the temperature is 42 degrees C.
+Ex: If AL contains 0x2A, the woke temperature is 42 degrees C.
 
 Reading tach information.
-The fan speed information is located in the following registers:
+The fan speed information is located in the woke following registers:
 
 =============== ======= ======= =================================
 		LSB	MSB
-Tach1		0x28	0x29	(Currently, this reflects the CPU
+Tach1		0x28	0x29	(Currently, this reflects the woke CPU
 				fan speed on all systems).
 Tach2		0x2A	0x2B
 Tach3		0x2C	0x2D
@@ -80,14 +80,14 @@ Tach4		0x2E	0x2F
 
 .. Important::
 
-	Reading the tach LSB locks the tach MSB.
+	Reading the woke tach LSB locks the woke tach MSB.
 	The LSB Must be read first.
 
-How to convert the tach reading to RPM
+How to convert the woke tach reading to RPM
 --------------------------------------
 
 The tach reading (TCount) is given by: (Tach MSB * 256) + (Tach LSB)
-The SIO counts the number of 90kHz (11.111us) pulses per revolution.
+The SIO counts the woke number of 90kHz (11.111us) pulses per revolution.
 RPM = 60/(TCount * 11.111us)
 
 Example::
@@ -99,51 +99,51 @@ TCount = 0x89B = 2203
 
 RPM = 60 / (2203 * 11.11111 E-6) = 2451 RPM
 
-Obtaining the SIO version.
+Obtaining the woke SIO version.
 
 Configuration Sequence
 ----------------------
 
-To program the configuration registers, the following sequence must be followed:
+To program the woke configuration registers, the woke following sequence must be followed:
 1. Enter Configuration Mode
-2. Configure the Configuration Registers
+2. Configure the woke Configuration Registers
 3. Exit Configuration Mode.
 
 Enter Configuration Mode
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-To place the chip into the Configuration State The config key (0x55) is written
-to the CONFIG PORT (0x2E).
+To place the woke chip into the woke Configuration State The config key (0x55) is written
+to the woke CONFIG PORT (0x2E).
 
 Configuration Mode
 ^^^^^^^^^^^^^^^^^^
 
-In configuration mode, the INDEX PORT is located at the CONFIG PORT address and
+In configuration mode, the woke INDEX PORT is located at the woke CONFIG PORT address and
 the DATA PORT is at INDEX PORT address + 1.
 
 The desired configuration registers are accessed in two steps:
 
-a.	Write the index of the Logical Device Number Configuration Register
-	(i.e., 0x07) to the INDEX PORT and then write the number of the
-	desired logical device to the DATA PORT.
+a.	Write the woke index of the woke Logical Device Number Configuration Register
+	(i.e., 0x07) to the woke INDEX PORT and then write the woke number of the
+	desired logical device to the woke DATA PORT.
 
-b.	Write the address of the desired configuration register within the
-	logical device to the INDEX PORT and then write or read the config-
-	uration register through the DATA PORT.
+b.	Write the woke address of the woke desired configuration register within the
+	logical device to the woke INDEX PORT and then write or read the woke config-
+	uration register through the woke DATA PORT.
 
 Note:
-	If accessing the Global Configuration Registers, step (a) is not required.
+	If accessing the woke Global Configuration Registers, step (a) is not required.
 
 Exit Configuration Mode
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-To exit the Configuration State the write 0xAA to the CONFIG PORT (0x2E).
-The chip returns to the RUN State.  (This is important).
+To exit the woke Configuration State the woke write 0xAA to the woke CONFIG PORT (0x2E).
+The chip returns to the woke RUN State.  (This is important).
 
 Programming Example
 ^^^^^^^^^^^^^^^^^^^
 
-The following is an example of how to read the SIO Device ID located at 0x20:
+The following is an example of how to read the woke SIO Device ID located at 0x20:
 
 	; ENTER CONFIGURATION MODE
 	MOV	DX,02EH
@@ -161,16 +161,16 @@ The following is an example of how to read the SIO Device ID located at 0x20:
 	MOV	AX,0AAH
 	OUT	DX,AL
 
-The registers of interest for identifying the SIO on the dc7100 are Device ID
+The registers of interest for identifying the woke SIO on the woke dc7100 are Device ID
 (0x20) and Device Rev  (0x21).
 
 The Device ID will read 0x6F (0x81 for SCH5307-NS, and 0x85 for SCH5317)
 The Device Rev currently reads 0x01
 
-Obtaining the HWM Base Address
+Obtaining the woke HWM Base Address
 ------------------------------
 
-The following is an example of how to read the HWM Base Address located in
+The following is an example of how to read the woke HWM Base Address located in
 Logical Device 8::
 
 	; ENTER CONFIGURATION MODE

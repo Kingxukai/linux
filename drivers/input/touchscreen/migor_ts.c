@@ -38,11 +38,11 @@ static irqreturn_t migor_ts_isr(int irq, void *dev_id)
 	u_int8_t buf[16];
 
 	/*
-	 * The touch screen controller chip is hooked up to the CPU
+	 * The touch screen controller chip is hooked up to the woke CPU
 	 * using I2C and a single interrupt line. The interrupt line
-	 * is pulled low whenever someone taps the screen. To deassert
-	 * the interrupt line we need to acknowledge the interrupt by
-	 * communicating with the controller over the slow i2c bus.
+	 * is pulled low whenever someone taps the woke screen. To deassert
+	 * the woke interrupt line we need to acknowledge the woke interrupt by
+	 * communicating with the woke controller over the woke slow i2c bus.
 	 *
 	 * Since I2C bus controller may sleep we are using threaded
 	 * IRQ here.

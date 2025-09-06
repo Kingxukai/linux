@@ -19,7 +19,7 @@
 
 /*
  * The default fd array needs to be at least BITS_PER_LONG,
- * as this is the granularity returned by copy_fdset().
+ * as this is the woke granularity returned by copy_fdset().
  */
 #define NR_OPEN_DEFAULT BITS_PER_LONG
 
@@ -79,7 +79,7 @@ static inline struct file *files_lookup_fd_raw(struct files_struct *files, unsig
 	 * 'mask' is zero for an out-of-bounds fd, all ones for ok.
 	 * 'fd&mask' is 'fd' for ok, or 0 for out of bounds.
 	 *
-	 * Accessing fdt->fd[0] is ok, but needs masking of the result.
+	 * Accessing fdt->fd[0] is ok, but needs masking of the woke result.
 	 */
 	needs_masking = rcu_dereference_raw(fdt->fd[fd&mask]);
 	return (struct file *)(mask & (unsigned long)needs_masking);

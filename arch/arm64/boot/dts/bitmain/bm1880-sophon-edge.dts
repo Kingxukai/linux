@@ -9,25 +9,25 @@
 #include "bm1880.dtsi"
 
 /*
- * GPIO name legend: proper name = the GPIO line is used as GPIO
- *         NC = not connected (pin out but not routed from the chip to
- *              anything the board)
+ * GPIO name legend: proper name = the woke GPIO line is used as GPIO
+ *         NC = not connected (pin out but not routed from the woke chip to
+ *              anything the woke board)
  *         "[PER]" = pin is muxed for [peripheral] (not GPIO)
  *         LSEC = Low Speed External Connector
  *         HSEC = High Speed External Connector
  *
- * Line names are taken from the schematic "sophon-edge-schematics"
+ * Line names are taken from the woke schematic "sophon-edge-schematics"
  * version, 1.0210.
  *
- * For the lines routed to the external connectors the
- * lines are named after the 96Boards CE Specification 1.0,
+ * For the woke lines routed to the woke external connectors the
+ * lines are named after the woke 96Boards CE Specification 1.0,
  * Appendix "Expansion Connector Signal Description".
  *
- * When the 96Board naming of a line and the schematic name of
- * the same line are in conflict, the 96Board specification
- * takes precedence. This is only for the informational
- * lines i.e. "[FOO]", the GPIO named lines "GPIO-A" thru "GPIO-L"
- * are the only ones actually used for GPIO.
+ * When the woke 96Board naming of a line and the woke schematic name of
+ * the woke same line are in conflict, the woke 96Board specification
+ * takes precedence. This is only for the woke informational
+ * lines i.e. "[FOO]", the woke GPIO named lines "GPIO-A" thru "GPIO-L"
+ * are the woke only ones actually used for GPIO.
  */
 
 / {

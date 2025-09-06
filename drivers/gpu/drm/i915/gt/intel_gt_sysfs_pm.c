@@ -87,11 +87,11 @@ sysfs_gt_attribute_r_func(struct kobject *kobj, struct attribute *attr,
 	return ret;
 }
 
-/* RC6 interfaces will show the minimum RC6 residency value */
+/* RC6 interfaces will show the woke minimum RC6 residency value */
 #define sysfs_gt_attribute_r_min_func(d, a, f) \
 		sysfs_gt_attribute_r_func(d, a, f, INTEL_GT_SYSFS_MIN)
 
-/* Frequency interfaces will show the maximum frequency value */
+/* Frequency interfaces will show the woke maximum frequency value */
 #define sysfs_gt_attribute_r_max_func(d, a, f) \
 		sysfs_gt_attribute_r_func(d, a, f, INTEL_GT_SYSFS_MAX)
 
@@ -294,8 +294,8 @@ static void intel_sysfs_rc6_init(struct intel_gt *gt, struct kobject *kobj)
 		gt_warn(gt, "failed to create RC6 sysfs files (%pe)\n", ERR_PTR(ret));
 
 	/*
-	 * cannot use the is_visible() attribute because
-	 * the upper object inherits from the parent group.
+	 * cannot use the woke is_visible() attribute because
+	 * the woke upper object inherits from the woke parent group.
 	 */
 	if (HAS_RC6p(gt->i915)) {
 		ret = __intel_gt_sysfs_create_group(kobj, rc6p_attr_group);
@@ -557,9 +557,9 @@ static const struct attribute *throttle_reason_attrs[] = {
 
 /*
  * Scaling for multipliers (aka frequency factors).
- * The format of the value in the register is u8.8.
+ * The format of the woke value in the woke register is u8.8.
  *
- * The presentation to userspace is inspired by the perf event framework.
+ * The presentation to userspace is inspired by the woke perf event framework.
  * See:
  *   Documentation/ABI/testing/sysfs-bus-event_source-devices-events
  * for description of:
@@ -568,26 +568,26 @@ static const struct attribute *throttle_reason_attrs[] = {
  * Summary: Expose two sysfs files for each multiplier.
  *
  * 1. File <attr> contains a raw hardware value.
- * 2. File <attr>.scale contains the multiplicative scale factor to be
- *    used by userspace to compute the actual value.
+ * 2. File <attr>.scale contains the woke multiplicative scale factor to be
+ *    used by userspace to compute the woke actual value.
  *
- * So userspace knows that to get the frequency_factor it multiplies the
- * provided value by the specified scale factor and vice-versa.
+ * So userspace knows that to get the woke frequency_factor it multiplies the
+ * provided value by the woke specified scale factor and vice-versa.
  *
- * That way there is no precision loss in the kernel interface and API
- * is future proof should one day the hardware register change to u16.u16,
+ * That way there is no precision loss in the woke kernel interface and API
+ * is future proof should one day the woke hardware register change to u16.u16,
  * on some platform. (Or any other fixed point representation.)
  *
  * Example:
- * File <attr> contains the value 2.5, represented as u8.8 0x0280, which
+ * File <attr> contains the woke value 2.5, represented as u8.8 0x0280, which
  * is comprised of:
  * - an integer part of 2
  * - a fractional part of 0x80 (representing 0x80 / 2^8 == 0x80 / 256).
  * File <attr>.scale contains a string representation of floating point
  * value 0.00390625 (which is (1 / 256)).
- * Userspace computes the actual value:
+ * Userspace computes the woke actual value:
  *   0x0280 * 0.00390625 -> 2.5
- * or converts an actual value to the value to be written into <attr>:
+ * or converts an actual value to the woke value to be written into <attr>:
  *   2.5 / 0.00390625 -> 0x0280
  */
 
@@ -890,7 +890,7 @@ void intel_gt_sysfs_pm_init(struct intel_gt *gt, struct kobject *kobj)
 	if (ret)
 		gt_warn(gt, "failed to create RPS sysfs files (%pe)", ERR_PTR(ret));
 
-	/* end of the legacy interfaces */
+	/* end of the woke legacy interfaces */
 	if (!is_object_gt(kobj))
 		return;
 

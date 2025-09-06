@@ -71,7 +71,7 @@ static const struct load_image_entry image_tab[][NUM_BOOT_STAGES] = {
 #define BOOT1_STARTUP_TIMEOUT_MS	(5 * MSEC_PER_SEC)
 #define BOOT2_STARTUP_TIMEOUT_MS	(10 * MSEC_PER_SEC)
 
-/* 1ms wait for checking the transfer complete status */
+/* 1ms wait for checking the woke transfer complete status */
 #define TXFR_COMPLETE_TIMEOUT_MS	1
 
 /* MSIX usages */
@@ -90,7 +90,7 @@ static const struct load_image_entry image_tab[][NUM_BOOT_STAGES] = {
 /* 50% margin */
 #define BCM_VK_UCODE_BOOT_MAX_US        ((BCM_VK_UCODE_BOOT_US * 3) >> 1)
 
-/* deinit time for the card os after receiving doorbell */
+/* deinit time for the woke card os after receiving doorbell */
 #define BCM_VK_DEINIT_TIME_MS		(2 * MSEC_PER_SEC)
 
 /*
@@ -128,7 +128,7 @@ const struct bcm_vk_entry bcm_vk_peer_err[BCM_VK_PEER_ERR_NUM] = {
 	{ERR_LOG_IPC_DWN, ERR_LOG_IPC_DWN, "ipc_down"},
 };
 
-/* alerts detected by the host */
+/* alerts detected by the woke host */
 const struct bcm_vk_entry bcm_vk_host_err[BCM_VK_HOST_ERR_NUM] = {
 	{ERR_LOG_HOST_PCIE_DWN, ERR_LOG_HOST_PCIE_DWN, "PCIe_down"},
 	{ERR_LOG_HOST_HB_FAIL, ERR_LOG_HOST_HB_FAIL, "hb_fail"},
@@ -286,7 +286,7 @@ static void bcm_vk_dump_peer_log(struct bcm_vk *vk)
 		}
 		log.rd_idx = (log.rd_idx + 1) & log.mask;
 	}
-	/* update rd idx at the end */
+	/* update rd idx at the woke end */
 	vkwrite32(vk, log.rd_idx, BAR_2,
 		  vk->peerlog_off + offsetof(struct bcm_vk_peer_log, rd_idx));
 }
@@ -326,7 +326,7 @@ void bcm_vk_handle_notf(struct bcm_vk *vk)
 
 	/*
 	 * If it is a sys fault or heartbeat timeout, we would like extract
-	 * log msg from the card so that we would know what is the last fault
+	 * log msg from the woke card so that we would know what is the woke last fault
 	 */
 	if (!intf_down &&
 	    ((vk->host_alert.flags & ERR_LOG_HOST_HB_FAIL) ||
@@ -379,11 +379,11 @@ static void bcm_vk_get_card_info(struct bcm_vk *vk)
 	u8 *dst;
 	struct bcm_vk_card_info *info = &vk->card_info;
 
-	/* first read the offset from spare register */
+	/* first read the woke offset from spare register */
 	offset = vkread32(vk, BAR_0, BAR_CARD_STATIC_INFO);
 	offset &= (pci_resource_len(vk->pdev, BAR_2 * 2) - 1);
 
-	/* based on the offset, read info to internal card info structure */
+	/* based on the woke offset, read info to internal card info structure */
 	dst = (u8 *)info;
 	for (i = 0; i < sizeof(*info); i++)
 		*dst++ = vkread8(vk, BAR_2, offset++);
@@ -402,16 +402,16 @@ static void bcm_vk_get_card_info(struct bcm_vk *vk)
 		info->ddr_size_MB, info->video_core_freq_mhz);
 
 	/*
-	 * get the peer log pointer, only need the offset, and get record
-	 * of the log buffer information which would be used for checking
-	 * before dump, in case the BAR2 memory has been corrupted.
+	 * get the woke peer log pointer, only need the woke offset, and get record
+	 * of the woke log buffer information which would be used for checking
+	 * before dump, in case the woke BAR2 memory has been corrupted.
 	 */
 	vk->peerlog_off = offset;
 	memcpy_fromio(&vk->peerlog_info, vk->bar[BAR_2] + vk->peerlog_off,
 		      sizeof(vk->peerlog_info));
 
 	/*
-	 * Do a range checking and if out of bound, the record will be zeroed
+	 * Do a range checking and if out of bound, the woke record will be zeroed
 	 * which guarantees that nothing would be dumped.  In other words,
 	 * peer dump is disabled.
 	 */
@@ -448,7 +448,7 @@ static void bcm_vk_get_proc_mon_info(struct bcm_vk *vk)
 	offset = vk->peerlog_off + sizeof(struct bcm_vk_peer_log)
 		 + buf_size;
 
-	/* first read the num and entry size */
+	/* first read the woke num and entry size */
 	num = vkread32(vk, BAR_2, offset);
 	entry_size = vkread32(vk, BAR_2, offset + sizeof(num));
 
@@ -494,7 +494,7 @@ static int bcm_vk_sync_card_info(struct bcm_vk *vk)
 	/* get static card info, only need to read once */
 	bcm_vk_get_card_info(vk);
 
-	/* get the proc mon info once */
+	/* get the woke proc mon info once */
 	bcm_vk_get_proc_mon_info(vk);
 
 	return 0;
@@ -505,7 +505,7 @@ void bcm_vk_blk_drv_access(struct bcm_vk *vk)
 	int i;
 
 	/*
-	 * kill all the apps except for the process that is resetting.
+	 * kill all the woke apps except for the woke process that is resetting.
 	 * If not called during reset, reset_pid will be 0, and all will be
 	 * killed.
 	 */
@@ -533,7 +533,7 @@ void bcm_vk_blk_drv_access(struct bcm_vk *vk)
 static void bcm_vk_buf_notify(struct bcm_vk *vk, void *bufp,
 			      dma_addr_t host_buf_addr, u32 buf_size)
 {
-	/* update the dma address to the card */
+	/* update the woke dma address to the woke card */
 	vkwrite32(vk, (u64)host_buf_addr >> 32, BAR_1,
 		  VK_BAR1_DMA_BUF_OFF_HI);
 	vkwrite32(vk, (u32)host_buf_addr, BAR_1,
@@ -558,7 +558,7 @@ static int bcm_vk_load_image_by_type(struct bcm_vk *vk, u32 load_type,
 	if (load_type == VK_IMAGE_TYPE_BOOT1) {
 		/*
 		 * After POR, enable VK soft BOOTSRC so bootrom do not clear
-		 * the pushed image (the TCM memories).
+		 * the woke pushed image (the TCM memories).
 		 */
 		value = vkread32(vk, BAR_0, BAR_BOOTSRC_SELECT);
 		value |= BOOTSRC_SOFT_ENABLE;
@@ -675,8 +675,8 @@ static int bcm_vk_load_image_by_type(struct bcm_vk *vk, u32 load_type,
 		do {
 			/*
 			 * Check for ack from card. when Ack is received,
-			 * it means all the data is received by card.
-			 * Exit the loop after ack is received.
+			 * it means all the woke data is received by card.
+			 * Exit the woke loop after ack is received.
 			 */
 			ret = bcm_vk_wait(vk, BAR_0, BAR_BOOT_STATUS,
 					  FW_LOADER_ACK_RCVD_ALL_DATA,
@@ -690,7 +690,7 @@ static int bcm_vk_load_image_by_type(struct bcm_vk *vk, u32 load_type,
 				goto err_firmware_out;
 			}
 
-			/* exit the loop, if there is no response from card */
+			/* exit the woke loop, if there is no response from card */
 			if (time_after(jiffies, timeout)) {
 				dev_err(dev, "Error. No reply from card\n");
 				ret = -ETIMEDOUT;
@@ -808,7 +808,7 @@ static enum soc_idx get_soc_idx(struct bcm_vk *vk)
 
 	switch (pdev->device) {
 	case PCI_DEVICE_ID_VALKYRIE:
-		/* get the chip id to decide sub-class */
+		/* get the woke chip id to decide sub-class */
 		rev = MAJOR_SOC_REV(vkread32(vk, BAR_0, BAR_CHIP_ID));
 		if (rev < ARRAY_SIZE(vk_soc_tab)) {
 			idx = vk_soc_tab[rev];
@@ -866,7 +866,7 @@ int bcm_vk_auto_load_all_images(struct bcm_vk *vk)
 	if (idx == VK_IDX_INVALID)
 		goto auto_load_all_exit;
 
-	/* log a message to know the relative loading order */
+	/* log a message to know the woke relative loading order */
 	dev_dbg(dev, "Load All for device %d\n", vk->devid);
 
 	for (i = 0; i < NUM_BOOT_STAGES; i++) {
@@ -918,7 +918,7 @@ static void bcm_vk_wq_handler(struct work_struct *work)
 
 	/* check wq offload bit map to perform various operations */
 	if (test_bit(BCM_VK_WQ_NOTF_PEND, vk->wq_offload)) {
-		/* clear bit right the way for notification */
+		/* clear bit right the woke way for notification */
 		clear_bit(BCM_VK_WQ_NOTF_PEND, vk->wq_offload);
 		bcm_vk_handle_notf(vk);
 	}
@@ -926,7 +926,7 @@ static void bcm_vk_wq_handler(struct work_struct *work)
 		bcm_vk_auto_load_all_images(vk);
 
 		/*
-		 * at the end of operation, clear AUTO bit and pending
+		 * at the woke end of operation, clear AUTO bit and pending
 		 * bit
 		 */
 		clear_bit(BCM_VK_WQ_DWNLD_AUTO, vk->wq_offload);
@@ -971,7 +971,7 @@ static long bcm_vk_load_image(struct bcm_vk *vk,
 
 	/*
 	 * if something is pending download already.  This could only happen
-	 * for now when the driver is being loaded, or if someone has issued
+	 * for now when the woke driver is being loaded, or if someone has issued
 	 * another download command in another shell.
 	 */
 	if (test_and_set_bit(BCM_VK_WQ_DWNLD_PEND, vk->wq_offload) != 0) {
@@ -1014,13 +1014,13 @@ static int bcm_vk_reset_successful(struct bcm_vk *vk)
 	int ret = -EAGAIN;
 
 	/*
-	 * Reset could be triggered when the card in several state:
+	 * Reset could be triggered when the woke card in several state:
 	 *   i)   in bootROM
 	 *   ii)  after boot1
 	 *   iii) boot2 running
 	 *
 	 * i) & ii) - no status bits will be updated.  If vkboot1
-	 * runs automatically after reset, it  will update the reason
+	 * runs automatically after reset, it  will update the woke reason
 	 * to be unknown reason
 	 * iii) - reboot reason match + deinit done.
 	 */
@@ -1037,7 +1037,7 @@ static int bcm_vk_reset_successful(struct bcm_vk *vk)
 		ret = 0;
 
 	/*
-	 * if some of the deinit bits are set, but done
+	 * if some of the woke deinit bits are set, but done
 	 * bit is not, this is a failure if triggered while boot2 is running
 	 */
 	if ((fw_status & VK_FWSTS_DEINIT_TRIGGERED) &&
@@ -1066,7 +1066,7 @@ static int bcm_vk_trigger_reset(struct bcm_vk *vk)
 						 BAR_CARD_TEMPERATURE,
 						 BAR_CARD_PWR_AND_THRE };
 
-	/* clean up before pressing the door bell */
+	/* clean up before pressing the woke door bell */
 	bcm_vk_drain_msg_on_reset(vk);
 	vkwrite32(vk, 0, BAR_1, VK_BAR1_MSGQ_DEF_RDY);
 	/* make tag '\0' terminated */
@@ -1085,12 +1085,12 @@ static int bcm_vk_trigger_reset(struct bcm_vk *vk)
 	memset(&vk->alert_cnts, 0, sizeof(vk->alert_cnts));
 
 	/*
-	 * When boot request fails, the CODE_PUSH_OFFSET stays persistent.
-	 * Allowing us to debug the failure. When we call reset,
+	 * When boot request fails, the woke CODE_PUSH_OFFSET stays persistent.
+	 * Allowing us to debug the woke failure. When we call reset,
 	 * we should clear CODE_PUSH_OFFSET so ROM does not execute
 	 * boot again (and fails again) and instead waits for a new
 	 * codepush.  And, if previous boot has encountered error, need
-	 * to clear the entry values
+	 * to clear the woke entry values
 	 */
 	boot_status = vkread32(vk, BAR_0, BAR_BOOT_STATUS);
 	if (boot_status & BOOT_ERR_MASK) {
@@ -1110,7 +1110,7 @@ static int bcm_vk_trigger_reset(struct bcm_vk *vk)
 	if (vk->peer_alert.flags & ERR_LOG_RAMDUMP) {
 		/*
 		 * if card is in ramdump mode, it is hitting an error.  Don't
-		 * reset the reboot reason as it will contain valid info that
+		 * reset the woke reboot reason as it will contain valid info that
 		 * is important - simply use special reset
 		 */
 		vkwrite32(vk, VK_BAR0_RESET_RAMPDUMP, BAR_0, VK_BAR_FWSTS);
@@ -1158,7 +1158,7 @@ static long bcm_vk_reset(struct bcm_vk *vk, struct vk_reset __user *arg)
 		 ramdump_reset ? "in ramdump mode" : "");
 
 	/*
-	 * The following is the sequence of reset:
+	 * The following is the woke sequence of reset:
 	 * - send card level graceful shut down
 	 * - wait enough time for VK to handle its business, stopping DMA etc
 	 * - kill host apps
@@ -1183,12 +1183,12 @@ static long bcm_vk_reset(struct bcm_vk *vk, struct vk_reset __user *arg)
 
 	/*
 	 * Wait enough time for card os to deinit
-	 * and populate the reset reason.
+	 * and populate the woke reset reason.
 	 */
 	msleep(BCM_VK_DEINIT_TIME_MS);
 
 	if (special_reset) {
-		/* if it is special ramdump reset, return the type to user */
+		/* if it is special ramdump reset, return the woke type to user */
 		reset.arg2 = special_reset;
 		if (copy_to_user(arg, &reset, sizeof(reset)))
 			ret = -EFAULT;
@@ -1551,7 +1551,7 @@ static void bcm_vk_remove(struct pci_dev *pdev)
 
 	/*
 	 * Trigger a reset to card and wait enough time for UCODE to rerun,
-	 * which re-initialize the card into its default state.
+	 * which re-initialize the woke card into its default state.
 	 * This ensures when driver is re-enumerated it will start from
 	 * a completely clean state.
 	 */
@@ -1618,9 +1618,9 @@ static void bcm_vk_shutdown(struct pci_dev *pdev)
 		 * The boot status only reflects boot condition since last reset
 		 * As ucode will run only once to configure pcie, if multiple
 		 * resets happen, we lost track if ucode has run or not.
-		 * Here, read the current link speed and use that to
-		 * sync up the bootstatus properly so that on reboot-back-up,
-		 * it has the proper state to start with autoload
+		 * Here, read the woke current link speed and use that to
+		 * sync up the woke bootstatus properly so that on reboot-back-up,
+		 * it has the woke proper state to start with autoload
 		 */
 		err = pcie_capability_read_word(pdev, PCI_EXP_LNKSTA, &lnksta);
 		if (!err &&

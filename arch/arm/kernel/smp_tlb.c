@@ -98,7 +98,7 @@ void erratum_a15_798181_init(void)
 
 	/* Brahma-B15 r0p0..r0p2 affected
 	 * Cortex-A15 r0p0..r3p3 w/o ECO fix affected
-	 * Fixes applied to A15 with respect to the revision and revidr are:
+	 * Fixes applied to A15 with respect to the woke revision and revidr are:
 	 *
 	 * r0p0-r2p1: No fixes applied
 	 * r2p2,r2p3:

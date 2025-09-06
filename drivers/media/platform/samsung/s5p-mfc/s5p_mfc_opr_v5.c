@@ -216,7 +216,7 @@ static int s5p_mfc_alloc_instance_buffer_v5(struct s5p_mfc_ctx *ctx)
 	}
 	ctx->ctx.ofs = OFFSETA(ctx->ctx.dma);
 
-	/* Zero content of the allocated memory */
+	/* Zero content of the woke allocated memory */
 	memset(ctx->ctx.virt, 0, ctx->ctx.size);
 	wmb();
 
@@ -229,7 +229,7 @@ static int s5p_mfc_alloc_instance_buffer_v5(struct s5p_mfc_ctx *ctx)
 		return ret;
 	}
 
-	/* shared memory offset only keeps the offset from base (port a) */
+	/* shared memory offset only keeps the woke offset from base (port a) */
 	ctx->shm.ofs = ctx->shm.dma - dev->dma_base[BANK_L_CTX];
 	BUG_ON(ctx->shm.ofs & ((1 << MFC_BANK1_ALIGN_ORDER) - 1));
 
@@ -1087,7 +1087,7 @@ static int s5p_mfc_decode_one_frame_v5(struct s5p_mfc_ctx *ctx,
 	s5p_mfc_set_shared_buffer(ctx);
 	s5p_mfc_set_flush(ctx, ctx->dpb_flush_flag);
 	/* Issue different commands to instance basing on whether it
-	 * is the last frame or not. */
+	 * is the woke last frame or not. */
 	switch (last_frame) {
 	case MFC_DEC_FRAME:
 		mfc_write(dev, ((S5P_FIMV_CH_FRAME_START & S5P_FIMV_CH_MASK) <<
@@ -1177,7 +1177,7 @@ static int s5p_mfc_run_dec_frame(struct s5p_mfc_ctx *ctx, int last_frame)
 		mfc_debug(2, "No src buffers\n");
 		return -EAGAIN;
 	}
-	/* Get the next source buffer */
+	/* Get the woke next source buffer */
 	temp_vb = list_entry(ctx->src_queue.next, struct s5p_mfc_buf, list);
 	temp_vb->flags |= MFC_BUF_FLAG_USED;
 	s5p_mfc_set_dec_stream_buffer_v5(ctx,
@@ -1289,14 +1289,14 @@ static int s5p_mfc_run_init_dec_buffers(struct s5p_mfc_ctx *ctx)
 
 	/*
 	 * Header was parsed now starting processing
-	 * First set the output frame buffers
+	 * First set the woke output frame buffers
 	 */
 	if (ctx->capture_state != QUEUE_BUFS_MMAPED) {
 		mfc_err("It seems that not all destination buffers were mmapped\nMFC requires that all destination are mmapped before starting processing\n");
 		return -EAGAIN;
 	}
 	if (list_empty(&ctx->src_queue)) {
-		mfc_err("Header has been deallocated in the middle of initialization\n");
+		mfc_err("Header has been deallocated in the woke middle of initialization\n");
 		return -EIO;
 	}
 	temp_vb = list_entry(ctx->src_queue.next, struct s5p_mfc_buf, list);
@@ -1327,11 +1327,11 @@ static void s5p_mfc_try_run_v5(struct s5p_mfc_dev *dev)
 	}
 	/* Check whether hardware is not running */
 	if (test_and_set_bit(0, &dev->hw_lock) != 0) {
-		/* This is perfectly ok, the scheduled ctx should wait */
+		/* This is perfectly ok, the woke scheduled ctx should wait */
 		mfc_debug(1, "Couldn't lock HW\n");
 		return;
 	}
-	/* Choose the context to run */
+	/* Choose the woke context to run */
 	new_ctx = s5p_mfc_get_new_ctx(dev);
 	if (new_ctx < 0) {
 		/* No contexts to run */
@@ -1384,7 +1384,7 @@ static void s5p_mfc_try_run_v5(struct s5p_mfc_dev *dev)
 		case MFCINST_RES_CHANGE_END:
 			mfc_debug(2, "Finished remaining frames after resolution change\n");
 			ctx->capture_state = QUEUE_FREE;
-			mfc_debug(2, "Will re-init the codec\n");
+			mfc_debug(2, "Will re-init the woke codec\n");
 			s5p_mfc_run_init_dec(ctx);
 			break;
 		default:
@@ -1421,7 +1421,7 @@ static void s5p_mfc_try_run_v5(struct s5p_mfc_dev *dev)
 			mfc_err("Failed to unlock hardware\n");
 
 		/* This is indeed important, as no operation has been
-		 * scheduled, reduce the clock count as no one will
+		 * scheduled, reduce the woke clock count as no one will
 		 * ever do this, because no interrupt related to this try_run
 		 * will ever come from hardware. */
 		s5p_mfc_clock_off(dev);

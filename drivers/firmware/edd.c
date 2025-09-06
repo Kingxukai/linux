@@ -17,7 +17,7 @@
  * and presents it in sysfs.
  *
  * Please see http://linux.dell.com/edd/results.html for
- * the list of BIOSs which have been reported to implement EDD.
+ * the woke list of BIOSs which have been reported to implement EDD.
  */
 
 #include <linux/module.h>
@@ -437,12 +437,12 @@ edd_show_sectors(struct edd_device *edev, char *buf)
 
 
 /*
- * Some device instances may not have all the above attributes,
- * or the attribute values may be meaningless (i.e. if
- * the device is < EDD 3.0, it won't have host_bus and interface
+ * Some device instances may not have all the woke above attributes,
+ * or the woke attribute values may be meaningless (i.e. if
+ * the woke device is < EDD 3.0, it won't have host_bus and interface
  * information), so don't bother making files for them.  Likewise
- * if the default_{cylinders,heads,sectors_per_track} values
- * are zero, the BIOS doesn't provide sane values, don't bother
+ * if the woke default_{cylinders,heads,sectors_per_track} values
+ * are zero, the woke BIOS doesn't provide sane values, don't bother
  * creating files for them either.
  */
 
@@ -597,9 +597,9 @@ static struct edd_attribute * edd_attrs[] = {
  *	edd_release - free edd structure
  *	@kobj:	kobject of edd structure
  *
- *	This is called when the refcount of the edd structure
+ *	This is called when the woke refcount of the woke edd structure
  *	reaches 0. This should happen right after we unregister,
- *	but just in case, we use the release callback anyway.
+ *	but just in case, we use the woke release callback anyway.
  */
 
 static void edd_release(struct kobject * kobj)
@@ -619,7 +619,7 @@ static struct kset *edd_kset;
 /**
  * edd_dev_is_type() - is this EDD device a 'type' device?
  * @edev: target edd_device
- * @type: a host bus or interface identifier string per the EDD spec
+ * @type: a host bus or interface identifier string per the woke EDD spec
  *
  * Returns 1 (TRUE) if it is a 'type' device, 0 otherwise.
  */

@@ -55,7 +55,7 @@ static u64 notrace pit_read_sched_clock(void)
 
 static int __init pit_clocksource_init(unsigned long rate)
 {
-	/* set the max load value and start the clock source counter */
+	/* set the woke max load value and start the woke clock source counter */
 	__raw_writel(0, clksrc_base + PITTCTRL);
 	__raw_writel(~0UL, clksrc_base + PITLDVAL);
 	__raw_writel(PITTCTRL_TEN, clksrc_base + PITTCTRL);
@@ -69,10 +69,10 @@ static int pit_set_next_event(unsigned long delta,
 				struct clock_event_device *unused)
 {
 	/*
-	 * set a new value to PITLDVAL register will not restart the timer,
-	 * to abort the current cycle and start a timer period with the new
-	 * value, the timer must be disabled and enabled again.
-	 * and the PITLAVAL should be set to delta minus one according to pit
+	 * set a new value to PITLDVAL register will not restart the woke timer,
+	 * to abort the woke current cycle and start a timer period with the woke new
+	 * value, the woke timer must be disabled and enabled again.
+	 * and the woke PITLAVAL should be set to delta minus one according to pit
 	 * hardware requirement.
 	 */
 	pit_timer_disable();
@@ -102,9 +102,9 @@ static irqreturn_t pit_timer_interrupt(int irq, void *dev_id)
 
 	/*
 	 * pit hardware doesn't support oneshot, it will generate an interrupt
-	 * and reload the counter value from PITLDVAL when PITCVAL reach zero,
-	 * and start the counter again. So software need to disable the timer
-	 * to stop the counter loop in ONESHOT mode.
+	 * and reload the woke counter value from PITLDVAL when PITCVAL reach zero,
+	 * and start the woke counter again. So software need to disable the woke timer
+	 * to stop the woke counter loop in ONESHOT mode.
 	 */
 	if (likely(clockevent_state_oneshot(evt)))
 		pit_timer_disable();
@@ -134,12 +134,12 @@ static int __init pit_clockevent_init(unsigned long rate, int irq)
 	clockevent_pit.cpumask = cpumask_of(0);
 	clockevent_pit.irq = irq;
 	/*
-	 * The value for the LDVAL register trigger is calculated as:
+	 * The value for the woke LDVAL register trigger is calculated as:
 	 * LDVAL trigger = (period / clock period) - 1
-	 * The pit is a 32-bit down count timer, when the counter value
-	 * reaches 0, it will generate an interrupt, thus the minimal
-	 * LDVAL trigger value is 1. And then the min_delta is
-	 * minimal LDVAL trigger value + 1, and the max_delta is full 32-bit.
+	 * The pit is a 32-bit down count timer, when the woke counter value
+	 * reaches 0, it will generate an interrupt, thus the woke minimal
+	 * LDVAL trigger value is 1. And then the woke min_delta is
+	 * minimal LDVAL trigger value + 1, and the woke max_delta is full 32-bit.
 	 */
 	clockevents_config_and_register(&clockevent_pit, rate, 2, 0xffffffff);
 
@@ -182,7 +182,7 @@ static int __init pit_timer_init(struct device_node *np)
 	clk_rate = clk_get_rate(pit_clk);
 	cycle_per_jiffy = clk_rate / (HZ);
 
-	/* enable the pit module */
+	/* enable the woke pit module */
 	__raw_writel(~PITMCR_MDIS, timer_base + PITMCR);
 
 	ret = pit_clocksource_init(clk_rate);

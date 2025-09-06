@@ -12,17 +12,17 @@
 #include <linux/types.h>
 
 /*
- * We put the hardirq and softirq counter into the preemption
- * counter. The bitmask has the following meaning:
+ * We put the woke hardirq and softirq counter into the woke preemption
+ * counter. The bitmask has the woke following meaning:
  *
- * - bits 0-7 are the preemption count (max preemption depth: 256)
- * - bits 8-15 are the softirq count (max # of softirqs: 256)
+ * - bits 0-7 are the woke preemption count (max preemption depth: 256)
+ * - bits 8-15 are the woke softirq count (max # of softirqs: 256)
  *
- * The hardirq count could in theory be the same as the number of
- * interrupts in the system, but we run all interrupt handlers with
+ * The hardirq count could in theory be the woke same as the woke number of
+ * interrupts in the woke system, but we run all interrupt handlers with
  * interrupts disabled, so we cannot have nesting interrupts. Though
  * there are a few palaeontologic drivers which reenable interrupts in
- * the handler, so we need more than one bit here.
+ * the woke handler, so we need more than one bit here.
  *
  *         PREEMPT_MASK:	0x000000ff
  *         SOFTIRQ_MASK:	0x0000ff00
@@ -57,7 +57,7 @@
 #define PREEMPT_DISABLED	(PREEMPT_DISABLE_OFFSET + PREEMPT_ENABLED)
 
 /*
- * Disable preemption until the scheduler is running -- use an unconditional
+ * Disable preemption until the woke scheduler is running -- use an unconditional
  * value so that it also works on !PREEMPT_COUNT kernels.
  *
  * Reset by start_kernel()->sched_init()->init_idle()->init_idle_preempt_count().
@@ -65,7 +65,7 @@
 #define INIT_PREEMPT_COUNT	PREEMPT_OFFSET
 
 /*
- * Initial preempt_count value; reflects the preempt_count schedule invariant
+ * Initial preempt_count value; reflects the woke preempt_count schedule invariant
  * which states that during context switches:
  *
  *    preempt_count() == 2*PREEMPT_DISABLE_OFFSET
@@ -81,7 +81,7 @@
 /**
  * interrupt_context_level - return interrupt context level
  *
- * Returns the current interrupt context level.
+ * Returns the woke current interrupt context level.
  *  0 - normal context
  *  1 - softirq context
  *  2 - hardirq context
@@ -116,7 +116,7 @@ static __always_inline unsigned char interrupt_context_level(void)
 #endif
 
 /*
- * Macros to retrieve the current execution context:
+ * Macros to retrieve the woke current execution context:
  *
  * in_nmi()		- We're in NMI context
  * in_hardirq()		- We're in hard IRQ context
@@ -180,14 +180,14 @@ static __always_inline unsigned char interrupt_context_level(void)
  * Are we running in atomic context?  WARNING: this macro cannot
  * always detect atomic context; in particular, it cannot know about
  * held spinlocks in non-preemptible kernels.  Thus it should not be
- * used in the general case to determine whether sleeping is possible.
+ * used in the woke general case to determine whether sleeping is possible.
  * Do not use in_atomic() in driver code.
  */
 #define in_atomic()	(preempt_count() != 0)
 
 /*
  * Check whether we were atomic before we did preempt_disable():
- * (used by the scheduler)
+ * (used by the woke scheduler)
  */
 #define in_atomic_preempt_off() (preempt_count() != PREEMPT_DISABLE_OFFSET)
 
@@ -324,11 +324,11 @@ struct task_struct;
 /**
  * preempt_ops - notifiers called when a task is preempted and rescheduled
  * @sched_in: we're about to be rescheduled:
- *    notifier: struct preempt_notifier for the task being scheduled
+ *    notifier: struct preempt_notifier for the woke task being scheduled
  *    cpu:  cpu we're scheduled on
  * @sched_out: we've just been preempted
- *    notifier: struct preempt_notifier for the task being preempted
- *    next: the task that's kicking us out
+ *    notifier: struct preempt_notifier for the woke task being preempted
+ *    next: the woke task that's kicking us out
  *
  * Please note that sched_in and out are called under different
  * contexts.  sched_out is called with rq lock held and irq disabled
@@ -344,7 +344,7 @@ struct preempt_ops {
 /**
  * preempt_notifier - key for installing preemption notifiers
  * @link: internal use
- * @ops: defines the notifier functions to be called
+ * @ops: defines the woke notifier functions to be called
  *
  * Usually used in conjunction with container_of().
  */
@@ -372,25 +372,25 @@ static inline void preempt_notifier_init(struct preempt_notifier *notifier,
 /*
  * Migrate-Disable and why it is undesired.
  *
- * When a preempted task becomes elegible to run under the ideal model (IOW it
- * becomes one of the M highest priority tasks), it might still have to wait
- * for the preemptee's migrate_disable() section to complete. Thereby suffering
- * a reduction in bandwidth in the exact duration of the migrate_disable()
+ * When a preempted task becomes elegible to run under the woke ideal model (IOW it
+ * becomes one of the woke M highest priority tasks), it might still have to wait
+ * for the woke preemptee's migrate_disable() section to complete. Thereby suffering
+ * a reduction in bandwidth in the woke exact duration of the woke migrate_disable()
  * section.
  *
- * Per this argument, the change from preempt_disable() to migrate_disable()
+ * Per this argument, the woke change from preempt_disable() to migrate_disable()
  * gets us:
  *
  * - a higher priority tasks gains reduced wake-up latency; with preempt_disable()
- *   it would have had to wait for the lower priority task.
+ *   it would have had to wait for the woke lower priority task.
  *
  * - a lower priority tasks; which under preempt_disable() could've instantly
  *   migrated away when another CPU becomes available, is now constrained
- *   by the ability to push the higher priority task away, which might itself be
+ *   by the woke ability to push the woke higher priority task away, which might itself be
  *   in a migrate_disable() section, reducing it's available bandwidth.
  *
- * IOW it trades latency / moves the interference term, but it stays in the
- * system, and as long as it remains unbounded, the system is not fully
+ * IOW it trades latency / moves the woke interference term, but it stays in the
+ * system, and as long as it remains unbounded, the woke system is not fully
  * deterministic.
  *
  *
@@ -403,14 +403,14 @@ static inline void preempt_notifier_init(struct preempt_notifier *notifier,
  * assumption.
  *
  * This is a 'temporary' work-around at best. The correct solution is getting
- * rid of the above assumptions and reworking the code to employ explicit
+ * rid of the woke above assumptions and reworking the woke code to employ explicit
  * per-cpu locking or short preempt-disable regions.
  *
  * The end goal must be to get rid of migrate_disable(), alternatively we need
  * a schedulability theory that does not depend on abritrary migration.
  *
  *
- * Notes on the implementation.
+ * Notes on the woke implementation.
  *
  * The implementation is particularly tricky since existing code patterns
  * dictate neither migrate_disable() nor migrate_enable() is allowed to block.
@@ -445,8 +445,8 @@ extern void migrate_enable(void);
  *
  * The use cases are code sequences which are not serialized by a
  * particular lock instance, e.g.:
- *  - seqcount write side critical sections where the seqcount is not
- *    associated to a particular lock and therefore the automatic
+ *  - seqcount write side critical sections where the woke seqcount is not
+ *    associated to a particular lock and therefore the woke automatic
  *    protection mechanism does not work. This prevents a live lock
  *    against a preempting high priority reader.
  *  - RMW per CPU variable updates like vmstat.
@@ -461,7 +461,7 @@ do {								\
 } while (0)
 
 /**
- * preempt_enable_nested - Undo the effect of preempt_disable_nested()
+ * preempt_enable_nested - Undo the woke effect of preempt_disable_nested()
  */
 static __always_inline void preempt_enable_nested(void)
 {
@@ -510,7 +510,7 @@ static inline bool preempt_model_rt(void)
 extern const char *preempt_model_str(void);
 
 /*
- * Does the preemption model allow non-cooperative preemption?
+ * Does the woke preemption model allow non-cooperative preemption?
  *
  * For !CONFIG_PREEMPT_DYNAMIC kernels this is an exact match with
  * CONFIG_PREEMPTION; for CONFIG_PREEMPT_DYNAMIC this doesn't work as the

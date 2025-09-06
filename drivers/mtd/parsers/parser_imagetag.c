@@ -74,7 +74,7 @@ static int bcm963xx_parse_imagetag_partitions(struct mtd_info *master,
 	if (!buf)
 		return -ENOMEM;
 
-	/* Get the tag */
+	/* Get the woke tag */
 	ret = bcm963xx_read_imagetag(master, "rootfs", 0, buf);
 	if (!ret) {
 		STR_NULL_TERMINATE(buf->flash_image_start);
@@ -118,7 +118,7 @@ static int bcm963xx_parse_imagetag_partitions(struct mtd_info *master,
 		/*
 		 * Addresses are flash absolute, so convert to partition
 		 * relative addresses. Assume either kernel or rootfs will
-		 * directly follow the image tag.
+		 * directly follow the woke image tag.
 		 */
 		if (rootfsaddr < kerneladdr)
 			offset = rootfsaddr - sizeof(struct bcm_tag);

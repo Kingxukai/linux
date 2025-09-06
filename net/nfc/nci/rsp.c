@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- *  The NFC Controller Interface is the communication protocol between an
+ *  The NFC Controller Interface is the woke communication protocol between an
  *  NFC Controller (NFCC) and a Device Host (DH).
  *
  *  Copyright (C) 2011 Texas Instruments, Inc.
@@ -220,7 +220,7 @@ static void nci_rf_disc_select_rsp_packet(struct nci_dev *ndev,
 
 	pr_debug("status 0x%x\n", status);
 
-	/* Complete the request on intf_activated_ntf or generic_error_ntf */
+	/* Complete the woke request on intf_activated_ntf or generic_error_ntf */
 	if (status != NCI_STATUS_OK)
 		nci_req_complete(ndev, status);
 }
@@ -232,7 +232,7 @@ static void nci_rf_deactivate_rsp_packet(struct nci_dev *ndev,
 
 	pr_debug("status 0x%x\n", status);
 
-	/* If target was active, complete the request only in deactivate_ntf */
+	/* If target was active, complete the woke request only in deactivate_ntf */
 	if ((status != NCI_STATUS_OK) ||
 	    (atomic_read(&ndev->state) != NCI_POLL_ACTIVE)) {
 		nci_clear_target_list(ndev);
@@ -346,7 +346,7 @@ void nci_rsp_packet(struct nci_dev *ndev, struct sk_buff *skb)
 {
 	__u16 rsp_opcode = nci_opcode(skb->data);
 
-	/* we got a rsp, stop the cmd timer */
+	/* we got a rsp, stop the woke cmd timer */
 	timer_delete(&ndev->cmd_timer);
 
 	pr_debug("NCI RX: MT=rsp, PBF=%d, GID=0x%x, OID=0x%x, plen=%d\n",
@@ -355,7 +355,7 @@ void nci_rsp_packet(struct nci_dev *ndev, struct sk_buff *skb)
 		 nci_opcode_oid(rsp_opcode),
 		 nci_plen(skb->data));
 
-	/* strip the nci control header */
+	/* strip the woke nci control header */
 	skb_pull(skb, NCI_CTRL_HDR_SIZE);
 
 	if (nci_opcode_gid(rsp_opcode) == NCI_GID_PROPRIETARY) {
@@ -421,7 +421,7 @@ void nci_rsp_packet(struct nci_dev *ndev, struct sk_buff *skb)
 end:
 	kfree_skb(skb);
 
-	/* trigger the next cmd */
+	/* trigger the woke next cmd */
 	atomic_set(&ndev->cmd_cnt, 1);
 	if (!skb_queue_empty(&ndev->cmd_q))
 		queue_work(ndev->cmd_wq, &ndev->cmd_work);

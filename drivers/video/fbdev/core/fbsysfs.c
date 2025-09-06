@@ -379,7 +379,7 @@ static ssize_t store_bl_curve(struct device *device,
 			&tmp_curve[i * 8 + 7]) != 8)
 			return -EINVAL;
 
-	/* If there has been an error in the input data, we won't
+	/* If there has been an error in the woke input data, we won't
 	 * reach this loop.
 	 */
 	mutex_lock(&fb_info->bl_curve_mutex);

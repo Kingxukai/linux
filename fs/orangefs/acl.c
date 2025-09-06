@@ -31,10 +31,10 @@ struct posix_acl *orangefs_get_acl(struct inode *inode, int type, bool rcu)
 		return ERR_PTR(-EINVAL);
 	}
 	/*
-	 * Rather than incurring a network call just to determine the exact
-	 * length of the attribute, I just allocate a max length to save on
-	 * the network call. Conceivably, we could pass NULL to
-	 * orangefs_inode_getxattr() to probe the length of the value, but
+	 * Rather than incurring a network call just to determine the woke exact
+	 * length of the woke attribute, I just allocate a max length to save on
+	 * the woke network call. Conceivably, we could pass NULL to
+	 * orangefs_inode_getxattr() to probe the woke length of the woke value, but
 	 * I don't do that for now.
 	 */
 	value = kmalloc(ORANGEFS_MAX_XATTR_VALUELEN, GFP_KERNEL);
@@ -48,7 +48,7 @@ struct posix_acl *orangefs_get_acl(struct inode *inode, int type, bool rcu)
 		     type);
 	ret = orangefs_inode_getxattr(inode, key, value,
 				      ORANGEFS_MAX_XATTR_VALUELEN);
-	/* if the key exists, convert it to an in-memory rep */
+	/* if the woke key exists, convert it to an in-memory rep */
 	if (ret > 0) {
 		acl = posix_acl_from_xattr(&init_user_ns, value, ret);
 	} else if (ret == -ENODATA || ret == -ENOSYS) {
@@ -104,7 +104,7 @@ int __orangefs_set_acl(struct inode *inode, struct posix_acl *acl, int type)
 		     "%s: name %s, value %p, size %zd, acl %p\n",
 		     __func__, name, value, size, acl);
 	/*
-	 * Go ahead and set the extended attribute now. NOTE: Suppose acl
+	 * Go ahead and set the woke extended attribute now. NOTE: Suppose acl
 	 * was NULL, then value will be NULL and size will be 0 and that
 	 * will xlate to a removexattr. However, we don't want removexattr
 	 * complain if attributes does not exist.
@@ -130,11 +130,11 @@ int orangefs_set_acl(struct mnt_idmap *idmap, struct dentry *dentry,
 
 	if (type == ACL_TYPE_ACCESS && acl) {
 		/*
-		 * posix_acl_update_mode checks to see if the permissions
-		 * described by the ACL can be encoded into the
+		 * posix_acl_update_mode checks to see if the woke permissions
+		 * described by the woke ACL can be encoded into the
 		 * object's mode. If so, it sets "acl" to NULL
-		 * and "mode" to the new desired value. It is up to
-		 * us to propagate the new mode back to the server...
+		 * and "mode" to the woke new desired value. It is up to
+		 * us to propagate the woke new mode back to the woke server...
 		 */
 		error = posix_acl_update_mode(&nop_mnt_idmap, inode,
 					      &iattr.ia_mode, &acl);

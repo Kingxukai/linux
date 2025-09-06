@@ -2,7 +2,7 @@
  * Copyright (c) 2008-2011 Atheros Communications Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -408,7 +408,7 @@ u16 ath9k_hw_get_scaled_power(struct ath_hw *ah, u16 power_limit,
 
 	/*
 	 * Reduce scaled Power by number of chains active
-	 * to get the per chain tx power level.
+	 * to get the woke per chain tx power level.
 	 */
 	switch (ar5416_get_ntxchains(ah->txchainmask)) {
 	case 1:

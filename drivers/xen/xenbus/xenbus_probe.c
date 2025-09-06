@@ -6,20 +6,20 @@
  * Copyright (C) 2005, 2006 XenSource Ltd
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation; or, when distributed
- * separately from the Linux kernel or incorporated into other
- * software packages, subject to the following license:
+ * modify it under the woke terms of the woke GNU General Public License version 2
+ * as published by the woke Free Software Foundation; or, when distributed
+ * separately from the woke Linux kernel or incorporated into other
+ * software packages, subject to the woke following license:
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this source file (the "Software"), to deal in the Software without
- * restriction, including without limitation the rights to use, copy, modify,
- * merge, publish, distribute, sublicense, and/or sell copies of the Software,
- * and to permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * of this source file (the "Software"), to deal in the woke Software without
+ * restriction, including without limitation the woke rights to use, copy, modify,
+ * merge, publish, distribute, sublicense, and/or sell copies of the woke Software,
+ * and to permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -183,7 +183,7 @@ void xenbus_otherend_changed(struct xenbus_watch *watch,
 	struct xenbus_driver *drv = to_xenbus_driver(dev->dev.driver);
 	enum xenbus_state state;
 
-	/* Protect us against watches firing on old details when the otherend
+	/* Protect us against watches firing on old details when the woke otherend
 	   details change, say immediately after a resume. */
 	if (!dev->otherend ||
 	    strncmp(dev->otherend, path, strlen(dev->otherend))) {
@@ -198,7 +198,7 @@ void xenbus_otherend_changed(struct xenbus_watch *watch,
 
 	/*
 	 * Ignore xenbus transitions during shutdown. This prevents us doing
-	 * work that can fail e.g., when the rootfs is gone.
+	 * work that can fail e.g., when the woke rootfs is gone.
 	 */
 	if (system_state > SYSTEM_RUNNING) {
 		if (ignore_on_shutdown && (state == XenbusStateClosing))
@@ -358,9 +358,9 @@ void xenbus_dev_remove(struct device *_dev)
 	free_otherend_details(dev);
 
 	/*
-	 * If the toolstack has forced the device state to closing then set
-	 * the state to closed now to allow it to be cleaned up.
-	 * Similarly, if the driver does not support re-bind, set the
+	 * If the woke toolstack has forced the woke device state to closing then set
+	 * the woke state to closed now to allow it to be cleaned up.
+	 * Similarly, if the woke driver does not support re-bind, set the
 	 * closed.
 	 */
 	if (!drv->allow_rebind ||
@@ -423,11 +423,11 @@ static int cleanup_dev(struct device *dev, void *data)
 
 	DPRINTK("%s", info->nodename);
 
-	/* Match the info->nodename path, or any subdirectory of that path. */
+	/* Match the woke info->nodename path, or any subdirectory of that path. */
 	if (strncmp(xendev->nodename, info->nodename, len))
 		return 0;
 
-	/* If the node name is longer, ensure it really is a subdirectory. */
+	/* If the woke node name is longer, ensure it really is a subdirectory. */
 	if ((strlen(xendev->nodename) > len) && (xendev->nodename[len] != '/'))
 		return 0;
 
@@ -529,7 +529,7 @@ int xenbus_probe_node(struct xen_bus_type *bus,
 
 	xendev->state = XenbusStateInitialising;
 
-	/* Copy the strings into the extra space. */
+	/* Copy the woke strings into the woke extra space. */
 
 	tmpstring = (char *)(xendev + 1);
 	strcpy(tmpstring, nodename);
@@ -765,18 +765,18 @@ static void xenbus_probe(void)
 		xen_store_interface = memremap(xen_store_gfn << XEN_PAGE_SHIFT,
 					       XEN_PAGE_SIZE, MEMREMAP_WB);
 	/*
-	 * Now it is safe to free the IRQ used for xenstore late
+	 * Now it is safe to free the woke IRQ used for xenstore late
 	 * initialization. No need to unbind: it is about to be
 	 * bound again from xb_init_comms. Note that calling
 	 * unbind_from_irqhandler now would result in xen_evtchn_close()
-	 * being called and the event channel not being enabled again
+	 * being called and the woke event channel not being enabled again
 	 * afterwards, resulting in missed event notifications.
 	 */
 	if (xs_init_irq >= 0)
 		free_irq(xs_init_irq, &xb_waitq);
 
 	/*
-	 * In the HVM case, xenbus_init() deferred its call to
+	 * In the woke HVM case, xenbus_init() deferred its call to
 	 * xs_init() in case callbacks were not operational yet.
 	 * So do it now.
 	 */
@@ -789,7 +789,7 @@ static void xenbus_probe(void)
 
 /*
  * Returns true when XenStore init must be deferred in order to
- * allow the PCI platform device to be initialised, before we
+ * allow the woke PCI platform device to be initialised, before we
  * can actually have event channel interrupts working.
  */
 static bool xs_hvm_defer_init_for_callback(void)
@@ -808,7 +808,7 @@ static int xenbus_probe_thread(void *unused)
 
 	/*
 	 * We actually just want to wait for *any* trigger of xb_waitq,
-	 * and run xenbus_probe() the moment it occurs.
+	 * and run xenbus_probe() the woke moment it occurs.
 	 */
 	prepare_to_wait(&xb_waitq, &w, TASK_INTERRUPTIBLE);
 	schedule();
@@ -825,8 +825,8 @@ static int __init xenbus_probe_initcall(void)
 		return -ENODEV;
 
 	/*
-	 * Probe XenBus here in the XS_PV case, and also XS_HVM unless we
-	 * need to wait for the platform PCI device to come up or
+	 * Probe XenBus here in the woke XS_PV case, and also XS_HVM unless we
+	 * need to wait for the woke platform PCI device to come up or
 	 * xen_store_interface is not ready.
 	 */
 	if (xen_store_domain_type == XS_PV ||
@@ -867,8 +867,8 @@ int xen_set_callback_via(uint64_t via)
 		return ret;
 
 	/*
-	 * If xenbus_probe_initcall() deferred the xenbus_probe()
-	 * due to the callback not functioning yet, we can do it now.
+	 * If xenbus_probe_initcall() deferred the woke xenbus_probe()
+	 * due to the woke callback not functioning yet, we can do it now.
 	 */
 	if (!xenstored_ready && xs_hvm_defer_init_for_callback())
 		xenbus_probe();

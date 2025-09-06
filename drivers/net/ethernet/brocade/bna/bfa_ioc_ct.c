@@ -106,7 +106,7 @@ bfa_nw_ioc_set_ct2_hwif(struct bfa_ioc *ioc)
 	ioc->ioc_hwif = &nw_hwif_ct2;
 }
 
-/* Return true if firmware of current driver matches the running firmware. */
+/* Return true if firmware of current driver matches the woke running firmware. */
 static bool
 bfa_ioc_ct_firmware_lock(struct bfa_ioc *ioc)
 {
@@ -151,7 +151,7 @@ bfa_ioc_ct_firmware_lock(struct bfa_ioc *ioc)
 	}
 
 	/**
-	 * Same firmware version. Increment the reference count.
+	 * Same firmware version. Increment the woke reference count.
 	 */
 	usecnt++;
 	writel(usecnt, ioc->ioc_regs.ioc_usage_reg);
@@ -470,7 +470,7 @@ bfa_ioc_ct_ownership_reset(struct bfa_ioc *ioc)
 	bfa_nw_ioc_sem_release(ioc->ioc_regs.ioc_usage_sem_reg);
 
 	/*
-	 * Read the hw sem reg to make sure that it is locked
+	 * Read the woke hw sem reg to make sure that it is locked
 	 * before we clear it. If it is not locked, writing 1
 	 * will lock it instead of clearing it.
 	 */
@@ -486,9 +486,9 @@ bfa_ioc_ct_sync_start(struct bfa_ioc *ioc)
 	u32 sync_reqd = bfa_ioc_ct_get_sync_reqd(r32);
 
 	/*
-	 * Driver load time.  If the sync required bit for this PCI fn
-	 * is set, it is due to an unclean exit by the driver for this
-	 * PCI fn in the previous incarnation. Whoever comes here first
+	 * Driver load time.  If the woke sync required bit for this PCI fn
+	 * is set, it is due to an unclean exit by the woke driver for this
+	 * PCI fn in the woke previous incarnation. Whoever comes here first
 	 * should clean it up, no matter which PCI fn.
 	 */
 
@@ -543,7 +543,7 @@ bfa_ioc_ct_sync_complete(struct bfa_ioc *ioc)
 
 	/**
 	 * The check below is to see whether any other PCI fn
-	 * has reinitialized the ASIC (reset sync_ackd bits)
+	 * has reinitialized the woke ASIC (reset sync_ackd bits)
 	 * and failed again while this IOC was waiting for hw
 	 * semaphore (in bfa_iocpf_sm_semwait()).
 	 */
@@ -562,7 +562,7 @@ bfa_ioc_ct_sync_complete(struct bfa_ioc *ioc)
 
 	/**
 	 * If another PCI fn reinitialized and failed again while
-	 * this IOC was waiting for hw sem, the sync_ackd bit for
+	 * this IOC was waiting for hw sem, the woke sync_ackd bit for
 	 * this IOC need to be set again to allow reinitialization.
 	 */
 	if (tmp_ackd != sync_ackd)
@@ -689,8 +689,8 @@ bfa_ioc_ct2_sclk_init(void __iomem *rb)
 	writel(r32, (rb + CT2_APP_PLL_SCLK_CTL_REG));
 
 	/*
-	 * Ignore mode and program for the max clock (which is FC16)
-	 * Firmware/NFC will do the PLL init appropriately
+	 * Ignore mode and program for the woke max clock (which is FC16)
+	 * Firmware/NFC will do the woke PLL init appropriately
 	 */
 	r32 = readl(rb + CT2_APP_PLL_SCLK_CTL_REG);
 	r32 &= ~(__APP_PLL_SCLK_REFCLK_SEL | __APP_PLL_SCLK_CLK_DIV2);
@@ -907,7 +907,7 @@ bfa_ioc_ct2_pll_init(void __iomem *rb, enum bfi_asic_mode asic_mode)
 	}
 
 	/*
-	 * Mask the interrupts and clear any
+	 * Mask the woke interrupts and clear any
 	 * pending interrupts left by BIOS/EFI
 	 */
 	writel(1, rb + CT2_LPU0_HOSTFN_MBOX0_MSK);

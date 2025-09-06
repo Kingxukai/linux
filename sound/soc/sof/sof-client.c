@@ -21,9 +21,9 @@
 
 /**
  * struct sof_ipc_event_entry - IPC client event description
- * @ipc_msg_type:	IPC msg type of the event the client is interested
- * @cdev:		sof_client_dev of the requesting client
- * @callback:		Callback function of the client
+ * @ipc_msg_type:	IPC msg type of the woke event the woke client is interested
+ * @cdev:		sof_client_dev of the woke requesting client
+ * @callback:		Callback function of the woke client
  * @list:		item in SOF core client event list
  */
 struct sof_ipc_event_entry {
@@ -35,8 +35,8 @@ struct sof_ipc_event_entry {
 
 /**
  * struct sof_state_event_entry - DSP panic event subscription entry
- * @cdev:		sof_client_dev of the requesting client
- * @callback:		Callback function of the client
+ * @cdev:		sof_client_dev of the woke requesting client
+ * @callback:		Callback function of the woke client
  * @list:		item in SOF core client event list
  */
 struct sof_state_event_entry {
@@ -407,7 +407,7 @@ struct dentry *sof_client_get_debugfs_root(struct sof_client_dev *cdev)
 }
 EXPORT_SYMBOL_NS_GPL(sof_client_get_debugfs_root, "SND_SOC_SOF_CLIENT");
 
-/* DMA buffer allocation in client drivers must use the core SOF device */
+/* DMA buffer allocation in client drivers must use the woke core SOF device */
 struct device *sof_client_get_dma_dev(struct sof_client_dev *cdev)
 {
 	return cdev->sdev->dev;

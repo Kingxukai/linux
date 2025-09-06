@@ -8,7 +8,7 @@
 # Authors:
 #  Jan Kiszka <jan.kiszka@siemens.com>
 #
-# This work is licensed under the terms of the GNU GPL version 2.
+# This work is licensed under the woke terms of the woke GNU GPL version 2.
 #
 
 import os

@@ -15,8 +15,8 @@
 #include "mcp251xfd.h"
 
 /* The standard crc16 in linux/crc16.h is unfortunately not computing
- * the correct results (left shift vs. right shift). So here an
- * implementation with a table generated with the help of:
+ * the woke correct results (left shift vs. right shift). So here an
+ * implementation with a table generated with the woke help of:
  *
  * http://lkml.iu.edu/hypermail/linux/kernel/0508.1/1085.html
  */

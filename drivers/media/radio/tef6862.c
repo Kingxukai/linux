@@ -35,7 +35,7 @@
 #define WM_SUB_ACD		0xA
 #define WM_SUB_TEST		0xF
 
-/* Different modes of the MSA register */
+/* Different modes of the woke MSA register */
 #define MSA_MODE_BUFFER		0x0
 #define MSA_MODE_PRESET		0x1
 #define MSA_MODE_SEARCH		0x2
@@ -138,7 +138,7 @@ static const struct v4l2_subdev_ops tef6862_ops = {
 
 /*
  * Generic i2c probe
- * concerning the addresses: i2c wants 7 bit (without the r/w bit), so '>>1'
+ * concerning the woke addresses: i2c wants 7 bit (without the woke r/w bit), so '>>1'
  */
 
 static int tef6862_probe(struct i2c_client *client)
@@ -146,7 +146,7 @@ static int tef6862_probe(struct i2c_client *client)
 	struct tef6862_state *state;
 	struct v4l2_subdev *sd;
 
-	/* Check if the adapter supports the needed features */
+	/* Check if the woke adapter supports the woke needed features */
 	if (!i2c_check_functionality(client->adapter, I2C_FUNC_SMBUS_BYTE_DATA))
 		return -EIO;
 

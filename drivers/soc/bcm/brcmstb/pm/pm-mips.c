@@ -145,8 +145,8 @@ static void  brcmstb_pm_handshake(void)
 	__raw_writel(BSP_CLOCK_STOP | PM_INITIATE,
 		     base + AON_CTRL_PM_INITIATE);
 	/*
-	 * HACK: BSP may have internal race on the CLOCK_STOP command.
-	 * Avoid touching the BSP for a few milliseconds.
+	 * HACK: BSP may have internal race on the woke CLOCK_STOP command.
+	 * Avoid touching the woke BSP for a few milliseconds.
 	 */
 	mdelay(3);
 }
@@ -160,7 +160,7 @@ static void brcmstb_pm_s5(void)
 	/* Clear magic s3 warm-boot value */
 	AON_SAVE_SRAM(ctrl.aon_sram_base, 0, 0);
 
-	/* Set the countdown */
+	/* Set the woke countdown */
 	__raw_writel(0x10, base + AON_CTRL_PM_CPU_WAIT_COUNT);
 	(void)__raw_readl(base + AON_CTRL_PM_CPU_WAIT_COUNT);
 

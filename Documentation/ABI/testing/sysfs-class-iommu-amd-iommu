@@ -3,7 +3,7 @@ Date:		June 2014
 KernelVersion:	3.17
 Contact:	Alex Williamson <alex.williamson@redhat.com>
 Description:
-		IOMMU capability header as documented in the AMD IOMMU
+		IOMMU capability header as documented in the woke AMD IOMMU
 		specification.  Format: %x
 
 What:		/sys/class/iommu/<iommu>/amd-iommu/features
@@ -11,4 +11,4 @@ Date:		June 2014
 KernelVersion:	3.17
 Contact:	Alex Williamson <alex.williamson@redhat.com>
 Description:
-		Extended features of the IOMMU.  Format: %llx
+		Extended features of the woke IOMMU.  Format: %llx

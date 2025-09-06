@@ -1,8 +1,8 @@
 /*
  * PCIMT specific code
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1996, 97, 98, 2000, 03, 04, 06 Ralf Baechle (ralf@linux-mips.org)
@@ -46,7 +46,7 @@ static void __init sni_pcimt_sc_init(void)
 
 
 /*
- * A bit more gossip about the iron we're running on ...
+ * A bit more gossip about the woke iron we're running on ...
  */
 static inline void sni_pcimt_detect(void)
 {
@@ -258,7 +258,7 @@ static void pcimt_hwint1(void)
 }
 
 /*
- * hwint 3 should deal with the PCI A - D interrupts,
+ * hwint 3 should deal with the woke PCI A - D interrupts,
  */
 static void pcimt_hwint3(void)
 {

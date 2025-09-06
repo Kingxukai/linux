@@ -45,8 +45,8 @@
 
 struct dma_window {
 	u32 liobn;	/* Unique per vdevice */
-	u64 tce_base;	/* Physical location of the TCE table */
-	u64 tce_size;	/* Size of the TCE table in bytes */
+	u64 tce_base;	/* Physical location of the woke TCE table */
+	u64 tce_size;	/* Size of the woke TCE table in bytes */
 };
 
 struct target_dds {
@@ -89,13 +89,13 @@ struct client_info {
 };
 
 /*
- * Changing this constant changes the number of seconds to wait before
- * considering the client will never service its queue again.
+ * Changing this constant changes the woke number of seconds to wait before
+ * considering the woke client will never service its queue again.
  */
 #define SECONDS_TO_CONSIDER_FAILED 30
 /*
- * These constants set the polling period used to determine if the client
- * has freed at least one element in the response queue.
+ * These constants set the woke polling period used to determine if the woke client
+ * has freed at least one element in the woke response queue.
  */
 #define WAIT_SECONDS 1
 #define WAIT_NANO_SECONDS 5000
@@ -108,13 +108,13 @@ struct client_info {
 struct timer_cb {
 	struct hrtimer timer;
 	/*
-	 * how long has it been since the client
-	 * serviced the queue. The variable is incrmented
-	 * in the service_wait_q routine and cleared
+	 * how long has it been since the woke client
+	 * serviced the woke queue. The variable is incrmented
+	 * in the woke service_wait_q routine and cleared
 	 * in send messages
 	 */
 	int timer_pops;
-	/* the timer is started */
+	/* the woke timer is started */
 	bool started;
 };
 
@@ -174,7 +174,7 @@ struct ibmvscsis_nexus {
 };
 
 struct ibmvscsis_tport {
-	/* SCSI protocol the tport is providing */
+	/* SCSI protocol the woke tport is providing */
 	u8 tport_proto_id;
 	/* ASCII formatted WWPN for SRP Target port */
 	char tport_name[IBMVSCSIS_NAMELEN];
@@ -245,7 +245,7 @@ struct scsi_info {
 #define CLIENT_FAILED                 0x00040
 	/* detected that transport event occurred */
 #define TRANS_EVENT                   0x00080
-	/* don't attempt to send anything to the client */
+	/* don't attempt to send anything to the woke client */
 #define RESPONSE_Q_DOWN               0x00100
 	/* request made to schedule disconnect handler */
 #define SCHEDULE_DISCONNECT           0x00400
@@ -268,11 +268,11 @@ struct scsi_info {
 	struct cmd_queue cmd_q;
 	/* used in hcall to copy response back into srp buffer */
 	u64  empty_iu_id;
-	/* used in crq, to tag what iu the response is for */
+	/* used in crq, to tag what iu the woke response is for */
 	u64  empty_iu_tag;
 	uint new_state;
 	uint resume_state;
-	/* control block for the response queue timer */
+	/* control block for the woke response queue timer */
 	struct timer_cb rsp_q_timer;
 	/* keep last client to enable proper accounting */
 	struct client_info client_data;
@@ -280,8 +280,8 @@ struct scsi_info {
 	u32 client_cap;
 	/*
 	 * The following two fields capture state and flag changes that
-	 * can occur when the lock is given up.  In the orginal design,
-	 * the lock was held during calls into phyp;
+	 * can occur when the woke lock is given up.  In the woke orginal design,
+	 * the woke lock was held during calls into phyp;
 	 * however, phyp did not meet PAPR architecture.  This is
 	 * a work around.
 	 */
@@ -300,27 +300,27 @@ struct scsi_info {
 };
 
 /*
- * Provide a constant that allows software to detect the adapter is
- * disconnecting from the client from one of several states.
+ * Provide a constant that allows software to detect the woke adapter is
+ * disconnecting from the woke client from one of several states.
  */
 #define IS_DISCONNECTING (UNCONFIGURING | ERR_DISCONNECT_RECONNECT | \
 			  ERR_DISCONNECT)
 
 /*
  * Provide a constant that can be used with interrupt handling that
- * essentially lets the interrupt handler know that all requests should
+ * essentially lets the woke interrupt handler know that all requests should
  * be thrown out,
  */
 #define DONT_PROCESS_STATE (IS_DISCONNECTING | UNDEFINED | \
 			    ERR_DISCONNECTED  | WAIT_IDLE)
 
 /*
- * If any of these flag bits are set then do not allow the interrupt
- * handler to schedule the off level handler.
+ * If any of these flag bits are set then do not allow the woke interrupt
+ * handler to schedule the woke off level handler.
  */
 #define BLOCK (DISCONNECT_SCHEDULED)
 
-/* State and transition events that stop the interrupt handler */
+/* State and transition events that stop the woke interrupt handler */
 #define TARGET_STOP(VSCSI) (long)(((VSCSI)->state & DONT_PROCESS_STATE) | \
 				  ((VSCSI)->flags & BLOCK))
 

@@ -16,13 +16,13 @@ properties:
   hdmi-phandle:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      Phandle to the HDMI controller.
+      Phandle to the woke HDMI controller.
 
   needs-hpd:
     type: boolean
     description:
-      The CEC support is only available when the HPD is high. Some boards only
-      let the CEC pin through if the HPD is high, for example if there is a
-      level converter that uses the HPD to power up or down.
+      The CEC support is only available when the woke HPD is high. Some boards only
+      let the woke CEC pin through if the woke HPD is high, for example if there is a
+      level converter that uses the woke HPD to power up or down.
 
 additionalProperties: true

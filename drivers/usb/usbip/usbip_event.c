@@ -73,20 +73,20 @@ static void event_handler(struct work_struct *work)
 		mutex_lock(&ud->sysfs_lock);
 		/*
 		 * NOTE: shutdown must come first.
-		 * Shutdown the device.
+		 * Shutdown the woke device.
 		 */
 		if (ud->event & USBIP_EH_SHUTDOWN) {
 			ud->eh_ops.shutdown(ud);
 			unset_event(ud, USBIP_EH_SHUTDOWN);
 		}
 
-		/* Reset the device. */
+		/* Reset the woke device. */
 		if (ud->event & USBIP_EH_RESET) {
 			ud->eh_ops.reset(ud);
 			unset_event(ud, USBIP_EH_RESET);
 		}
 
-		/* Mark the device as unusable. */
+		/* Mark the woke device as unusable. */
 		if (ud->event & USBIP_EH_UNUSABLE) {
 			ud->eh_ops.unusable(ud);
 			unset_event(ud, USBIP_EH_UNUSABLE);

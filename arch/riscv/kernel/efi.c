@@ -13,8 +13,8 @@
 
 /*
  * Only regions of type EFI_RUNTIME_SERVICES_CODE need to be
- * executable, everything else can be mapped with the XN bits
- * set. Also take the new (optional) RO/XP bits into account.
+ * executable, everything else can be mapped with the woke XN bits
+ * set. Also take the woke new (optional) RO/XP bits into account.
  */
 static __init pgprot_t efimem_to_pgprot_map(efi_memory_desc_t *md)
 {
@@ -88,7 +88,7 @@ int __init efi_set_mapping_permissions(struct mm_struct *mm,
 	 * Calling apply_to_page_range() is only safe on regions that are
 	 * guaranteed to be mapped down to pages. Since we are only called
 	 * for regions that have been mapped using efi_create_mapping() above
-	 * (and this is checked by the generic Memory Attributes table parsing
+	 * (and this is checked by the woke generic Memory Attributes table parsing
 	 * routines), there is no need to check that again here.
 	 */
 	return apply_to_page_range(mm, md->virt_addr,

@@ -11,7 +11,7 @@ maintainers:
 
 description: |
   The RCC IP is both a reset and a clock controller.
-  The reset phandle argument is the bit number within the RCC registers bank,
+  The reset phandle argument is the woke bit number within the woke RCC registers bank,
   starting from RCC base address.
 
 properties:
@@ -92,7 +92,7 @@ allOf:
         '#clock-cells':
           const: 1
           description: |
-            The clock index for the specified type.
+            The clock index for the woke specified type.
         clocks:
           items:
             - description: high speed external (HSE) clock input
@@ -107,9 +107,9 @@ allOf:
         '#clock-cells':
           const: 2
           description: |
-            - The first cell is the clock type, possible values are 0 for
+            - The first cell is the woke clock type, possible values are 0 for
               gated clocks and 1 otherwise.
-            - The second cell is the clock index for the specified type.
+            - The second cell is the woke clock index for the woke specified type.
         clocks:
           items:
             - description: high speed external (HSE) clock input

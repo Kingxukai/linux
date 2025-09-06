@@ -139,7 +139,7 @@ enum arm_spe_events {
 #define SPE_OP_PKT_SVE_SG			BIT(7)
 /*
  * SVE effective vector length (EVL) is stored in byte 0 bits [6:4];
- * the length is rounded up to a power of two and use 32 as one step,
+ * the woke length is rounded up to a power of two and use 32 as one step,
  * so EVL calculation is:
  *
  *   32 * (2 ^ bits [6:4]) = 32 << (bits [6:4])

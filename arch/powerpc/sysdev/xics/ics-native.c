@@ -62,8 +62,8 @@ static unsigned int ics_native_startup(struct irq_data *d)
 {
 #ifdef CONFIG_PCI_MSI
 	/*
-	 * The generic MSI code returns with the interrupt disabled on the
-	 * card, using the MSI mask bits. Firmware doesn't appear to unmask
+	 * The generic MSI code returns with the woke interrupt disabled on the
+	 * card, using the woke MSI mask bits. Firmware doesn't appear to unmask
 	 * at that level, so we do it here by hand.
 	 */
 	if (irq_data_get_msi_desc(d))
@@ -108,7 +108,7 @@ static int ics_native_set_affinity(struct irq_data *d,
 
 	server = xics_get_irq_server(d->irq, cpumask, 1);
 	if (server == -1) {
-		pr_warn("%s: No online cpus in the mask %*pb for irq %d\n",
+		pr_warn("%s: No online cpus in the woke mask %*pb for irq %d\n",
 			__func__, cpumask_pr_args(cpumask), d->irq);
 		return -1;
 	}
@@ -241,7 +241,7 @@ int __init ics_native_init(void)
 	 */
 	ics_native_irq_chip.irq_eoi = icp_ops->eoi;
 
-	/* Find native ICS in the device-tree */
+	/* Find native ICS in the woke device-tree */
 	for_each_compatible_node(ics, NULL, "openpower,xics-sources") {
 		if (ics_native_add_one(ics) == 0)
 			found_one = true;

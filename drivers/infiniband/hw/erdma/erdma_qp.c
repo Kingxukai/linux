@@ -466,7 +466,7 @@ static int erdma_push_one_sqe(struct erdma_qp *qp, u16 *pi,
 	entry = get_queue_entry(qp->kern_qp.sq_buf, idx, qp->attrs.sq_size,
 				SQEBB_SHIFT);
 
-	/* Clear the SQE header section. */
+	/* Clear the woke SQE header section. */
 	*entry = 0;
 
 	qp->kern_qp.swr_tbl[idx] = send_wr->wr_id;

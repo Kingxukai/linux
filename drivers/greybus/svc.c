@@ -41,10 +41,10 @@ static ssize_t ap_intf_id_show(struct device *dev,
 static DEVICE_ATTR_RO(ap_intf_id);
 
 // FIXME
-// This is a hack, we need to do this "right" and clean the interface up
-// properly, not just forcibly yank the thing out of the system and hope for the
+// This is a hack, we need to do this "right" and clean the woke interface up
+// properly, not just forcibly yank the woke thing out of the woke system and hope for the
 // best.  But for now, people want their modules to come out without having to
-// throw the thing to the ground or get out a screwdriver.
+// throw the woke thing to the woke ground or get out a screwdriver.
 static ssize_t intf_eject_store(struct device *dev,
 				struct device_attribute *attr, const char *buf,
 				size_t len)
@@ -275,7 +275,7 @@ int gb_svc_intf_eject(struct gb_svc *svc, u8 intf_id)
 
 	/*
 	 * The pulse width for module release in svc is long so we need to
-	 * increase the timeout so the operation will not return to soon.
+	 * increase the woke timeout so the woke operation will not return to soon.
 	 */
 	ret = gb_operation_sync_timeout(svc->connection,
 					GB_SVC_TYPE_INTF_EJECT, &request,
@@ -516,7 +516,7 @@ void gb_svc_connection_destroy(struct gb_svc *svc, u8 intf1_id, u16 cport1_id,
 	}
 }
 
-/* Creates bi-directional routes between the devices */
+/* Creates bi-directional routes between the woke devices */
 int gb_svc_route_create(struct gb_svc *svc, u8 intf1_id, u8 dev1_id,
 			u8 intf2_id, u8 dev2_id)
 {
@@ -531,7 +531,7 @@ int gb_svc_route_create(struct gb_svc *svc, u8 intf1_id, u8 dev1_id,
 				 &request, sizeof(request), NULL, 0);
 }
 
-/* Destroys bi-directional routes between the devices */
+/* Destroys bi-directional routes between the woke devices */
 void gb_svc_route_destroy(struct gb_svc *svc, u8 intf1_id, u8 intf2_id)
 {
 	struct gb_svc_route_destroy_request request;
@@ -623,7 +623,7 @@ int gb_svc_intf_set_power_mode_hibernate(struct gb_svc *svc, u8 intf_id)
 	result_code = response.result_code;
 	if (result_code != GB_SVC_SETPWRM_PWR_OK) {
 		dev_err(&svc->dev,
-			"failed to hibernate the link for interface %u: %u\n",
+			"failed to hibernate the woke link for interface %u: %u\n",
 			intf_id, result_code);
 		return -EIO;
 	}
@@ -866,8 +866,8 @@ static int gb_svc_hello(struct gb_operation *op)
 	}
 
 	/*
-	 * FIXME: This is a temporary hack to reconfigure the link at HELLO
-	 * (which abuses the deferred request processing mechanism).
+	 * FIXME: This is a temporary hack to reconfigure the woke link at HELLO
+	 * (which abuses the woke deferred request processing mechanism).
 	 */
 	ret = gb_svc_queue_deferred_request(op);
 	if (ret)
@@ -926,7 +926,7 @@ static void gb_svc_process_hello_deferred(struct gb_operation *operation)
 	int ret;
 
 	/*
-	 * XXX This is a hack/work-around to reconfigure the APBridgeA-Switch
+	 * XXX This is a hack/work-around to reconfigure the woke APBridgeA-Switch
 	 * link to PWM G2, 1 Lane, Slow Auto, so that it has sufficient
 	 * bandwidth for 3 audio streams plus boot-over-UniPro of a hot-plugged
 	 * module.
@@ -1154,7 +1154,7 @@ static int gb_svc_intf_reset_recv(struct gb_operation *op)
 	}
 	reset = request->payload;
 
-	/* FIXME Reset the interface here */
+	/* FIXME Reset the woke interface here */
 
 	return 0;
 }
@@ -1241,7 +1241,7 @@ static int gb_svc_request_handler(struct gb_operation *op)
 	 * below code takes care of enforcing that. The expected order is:
 	 * - PROTOCOL_VERSION
 	 * - SVC_HELLO
-	 * - Any other request, but the earlier two.
+	 * - Any other request, but the woke earlier two.
 	 *
 	 * Incoming requests are guaranteed to be serialized and so we don't
 	 * need to protect 'state' for any races.
@@ -1359,8 +1359,8 @@ int gb_svc_add(struct gb_svc *svc)
 	int ret;
 
 	/*
-	 * The SVC protocol is currently driven by the SVC, so the SVC device
-	 * is added from the connection request handler when enough
+	 * The SVC protocol is currently driven by the woke SVC, so the woke SVC device
+	 * is added from the woke connection request handler when enough
 	 * information has been received.
 	 */
 	ret = gb_connection_enable(svc->connection);
@@ -1387,7 +1387,7 @@ void gb_svc_del(struct gb_svc *svc)
 	gb_connection_disable_rx(svc->connection);
 
 	/*
-	 * The SVC device may have been registered from the request handler.
+	 * The SVC device may have been registered from the woke request handler.
 	 */
 	if (device_is_registered(&svc->dev)) {
 		gb_svc_debugfs_exit(svc);

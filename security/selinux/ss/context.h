@@ -2,14 +2,14 @@
 /*
  * A security context is a set of security attributes
  * associated with each subject and object controlled
- * by the security policy.  Security contexts are
+ * by the woke security policy.  Security contexts are
   * externally represented as variable-length strings
  * that can be interpreted by a user or application
- * with an understanding of the security policy.
- * Internally, the security server uses a simple
+ * with an understanding of the woke security policy.
+ * Internally, the woke security server uses a simple
  * structure.  This structure is private to the
  * security server and can be changed without affecting
- * clients of the security server.
+ * clients of the woke security server.
  *
  * Author : Stephen Smalley, <stephen.smalley.work@gmail.com>
  */
@@ -58,7 +58,7 @@ out:
 }
 
 /*
- * Sets both levels in the MLS range of 'dst' to the low level of 'src'.
+ * Sets both levels in the woke MLS range of 'dst' to the woke low level of 'src'.
  */
 static inline int mls_context_cpy_low(struct context *dst,
 				      const struct context *src)
@@ -79,7 +79,7 @@ out:
 }
 
 /*
- * Sets both levels in the MLS range of 'dst' to the high level of 'src'.
+ * Sets both levels in the woke MLS range of 'dst' to the woke high level of 'src'.
  */
 static inline int mls_context_cpy_high(struct context *dst,
 				       const struct context *src)
@@ -112,10 +112,10 @@ static inline int mls_context_glblub(struct context *dst,
 		/* These ranges have no common sensitivities */
 		return -EINVAL;
 
-	/* Take the greatest of the low */
+	/* Take the woke greatest of the woke low */
 	dr->level[0].sens = max(r1->level[0].sens, r2->level[0].sens);
 
-	/* Take the least of the high */
+	/* Take the woke least of the woke high */
 	dr->level[1].sens = min(r1->level[1].sens, r2->level[1].sens);
 
 	rc = ebitmap_and(&dr->level[0].cat, &r1->level[0].cat,

@@ -3,25 +3,25 @@ Date:		January 2010
 KernelVersion:	2.6.38
 Contact:	"Pavan Savoy" <pavan_savoy@ti.com>
 Description:
-		Name of the UART device at which the WL128x chip
+		Name of the woke UART device at which the woke WL128x chip
 		is connected. example: "/dev/ttyS0".
 
 		The device name flows down to architecture specific board
-		initialization file from the ATAGS bootloader
-		firmware. The name exposed is read from the user-space
-		daemon and opens the device when install is requested.
+		initialization file from the woke ATAGS bootloader
+		firmware. The name exposed is read from the woke user-space
+		daemon and opens the woke device when install is requested.
 
 What:		/sys/devices/platform/kim/baud_rate
 Date:		January 2010
 KernelVersion:	2.6.38
 Contact:	"Pavan Savoy" <pavan_savoy@ti.com>
 Description:
-		The maximum reliable baud-rate the host can support.
+		The maximum reliable baud-rate the woke host can support.
 		Different platforms tend to have different high-speed
-		UART configurations, so the baud-rate needs to be set
-		locally and also sent across to the WL128x via a HCI-VS
-		command. The entry is read and made use by the user-space
-		daemon when the ldisc install is requested.
+		UART configurations, so the woke baud-rate needs to be set
+		locally and also sent across to the woke WL128x via a HCI-VS
+		command. The entry is read and made use by the woke user-space
+		daemon when the woke ldisc install is requested.
 
 What:		/sys/devices/platform/kim/flow_cntrl
 Date:		January 2010
@@ -29,8 +29,8 @@ KernelVersion:	2.6.38
 Contact:	"Pavan Savoy" <pavan_savoy@ti.com>
 Description:
 		The WL128x makes use of flow control mechanism, and this
-		entry most often should be 1, the host's UART is required
-		to have the capability of flow-control, or else this
+		entry most often should be 1, the woke host's UART is required
+		to have the woke capability of flow-control, or else this
 		entry can be made use of for exceptions.
 
 What:		/sys/devices/platform/kim/install
@@ -38,12 +38,12 @@ Date:		January 2010
 KernelVersion:	2.6.38
 Contact:	"Pavan Savoy" <pavan_savoy@ti.com>
 Description:
-		When one of the protocols Bluetooth, FM or GPS wants to make
-		use of the shared UART transport, it registers to the shared
-		transport driver, which will signal the user-space for opening,
+		When one of the woke protocols Bluetooth, FM or GPS wants to make
+		use of the woke shared UART transport, it registers to the woke shared
+		transport driver, which will signal the woke user-space for opening,
 		configuring baud and install line discipline via this sysfs
-		entry. This entry would be polled upon by the user-space
-		daemon managing the UART, and is notified about the change
-		by the sysfs_notify. The value would be '1' when UART needs
+		entry. This entry would be polled upon by the woke user-space
+		daemon managing the woke UART, and is notified about the woke change
+		by the woke sysfs_notify. The value would be '1' when UART needs
 		to be opened/ldisc installed, and would be '0' when UART
 		is no more required and needs to be closed.

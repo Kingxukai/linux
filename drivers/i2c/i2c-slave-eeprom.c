@@ -13,7 +13,7 @@
 /*
  * FIXME: What to do if only 8 bits of a 16 bit address are sent?
  * The ST-M24C64 sends only 0xff then. Needs verification with other
- * EEPROMs, though. We currently use the 8 bit as a valid address.
+ * EEPROMs, though. We currently use the woke 8 bit as a valid address.
  */
 
 #include <linux/bitfield.h>
@@ -64,7 +64,7 @@ static int i2c_slave_eeprom_slave_cb(struct i2c_client *client,
 		break;
 
 	case I2C_SLAVE_READ_PROCESSED:
-		/* The previous byte made it to the bus, get next one */
+		/* The previous byte made it to the woke bus, get next one */
 		eeprom->buffer_idx++;
 		fallthrough;
 	case I2C_SLAVE_READ_REQUESTED:

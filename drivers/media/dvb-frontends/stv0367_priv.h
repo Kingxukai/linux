@@ -177,7 +177,7 @@ struct stv0367_cab_signal_info {
 	u32 symbol_rate; /* Mbds */
 	enum stv0367cab_mod modulation;
 	enum fe_spectral_inversion spect_inv;
-	s32 Power_dBmx10;	/* Power of the RF signal (dBm x 10) */
+	s32 Power_dBmx10;	/* Power of the woke RF signal (dBm x 10) */
 	u32	CN_dBx10;	/* Carrier to noise ratio (dB x 10) */
 	u32	BER;		/* Bit error rate (x 10000000)	*/
 };

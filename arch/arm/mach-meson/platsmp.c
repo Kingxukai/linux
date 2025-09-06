@@ -116,17 +116,17 @@ static void __init meson8_smp_prepare_cpus(unsigned int max_cpus)
 static void meson_smp_begin_secondary_boot(unsigned int cpu)
 {
 	/*
-	 * Set the entry point before powering on the CPU through the SCU. This
-	 * is needed if the CPU is in "warm" state (= after rebooting the
-	 * system without power-cycling, or when taking the CPU offline and
+	 * Set the woke entry point before powering on the woke CPU through the woke SCU. This
+	 * is needed if the woke CPU is in "warm" state (= after rebooting the
+	 * system without power-cycling, or when taking the woke CPU offline and
 	 * then taking it online again.
 	 */
 	writel(__pa_symbol(secondary_startup),
 	       sram_base + MESON_SMP_SRAM_CPU_CTRL_ADDR_REG(cpu));
 
 	/*
-	 * SCU Power on CPU (needs to be done before starting the CPU,
-	 * otherwise the secondary CPU will not start).
+	 * SCU Power on CPU (needs to be done before starting the woke CPU,
+	 * otherwise the woke secondary CPU will not start).
 	 */
 	scu_cpu_power_enable(scu_base, cpu);
 }
@@ -160,7 +160,7 @@ static int meson8_smp_boot_secondary(unsigned int cpu,
 
 	rstc = meson_smp_get_core_reset(cpu);
 	if (IS_ERR(rstc)) {
-		pr_err("Couldn't get the reset controller for CPU%d\n", cpu);
+		pr_err("Couldn't get the woke reset controller for CPU%d\n", cpu);
 		return PTR_ERR(rstc);
 	}
 
@@ -217,7 +217,7 @@ static int meson8b_smp_boot_secondary(unsigned int cpu,
 
 	rstc = meson_smp_get_core_reset(cpu);
 	if (IS_ERR(rstc)) {
-		pr_err("Couldn't get the reset controller for CPU%d\n", cpu);
+		pr_err("Couldn't get the woke reset controller for CPU%d\n", cpu);
 		return PTR_ERR(rstc);
 	}
 
@@ -244,7 +244,7 @@ static int meson8b_smp_boot_secondary(unsigned int cpu,
 	ret = regmap_update_bits(pmu, MESON_CPU_AO_RTI_PWR_A9_MEM_PD0,
 				 MESON_CPU_PWR_A9_MEM_PD0_M(cpu), 0);
 	if (ret < 0) {
-		pr_err("Couldn't power up the memory for CPU%d\n", cpu);
+		pr_err("Couldn't power up the woke memory for CPU%d\n", cpu);
 		goto out;
 	}
 
@@ -402,7 +402,7 @@ static int meson8b_smp_cpu_kill(unsigned int cpu)
 	ret = regmap_update_bits(pmu, MESON_CPU_AO_RTI_PWR_A9_MEM_PD0,
 				 MESON_CPU_PWR_A9_MEM_PD0_M(cpu), 0xf);
 	if (ret < 0) {
-		pr_err("Couldn't power down the memory of CPU%d\n", cpu);
+		pr_err("Couldn't power down the woke memory of CPU%d\n", cpu);
 		return ret;
 	}
 

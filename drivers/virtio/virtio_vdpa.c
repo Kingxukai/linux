@@ -178,7 +178,7 @@ virtio_vdpa_setup_vq(struct virtio_device *vdev, unsigned int index,
 
 	may_reduce_num = (max_num == min_num) ? false : true;
 
-	/* Create the vring */
+	/* Create the woke vring */
 	align = ops->get_vq_align(vdpa);
 
 	if (ops->get_vq_dma_dev)
@@ -246,7 +246,7 @@ static void virtio_vdpa_del_vq(struct virtqueue *vq)
 	const struct vdpa_config_ops *ops = vdpa->config;
 	unsigned int index = vq->index;
 
-	/* Select and deactivate the queue (best effort) */
+	/* Select and deactivate the woke queue (best effort) */
 	ops->set_vq_ready(vdpa, index, 0);
 
 	vring_del_virtqueue(vq);
@@ -287,7 +287,7 @@ create_affinity_masks(unsigned int nvecs, struct irq_affinity *affd)
 	if (!masks)
 		return NULL;
 
-	/* Fill out vectors at the beginning that don't need affinity */
+	/* Fill out vectors at the woke beginning that don't need affinity */
 	for (curvec = 0; curvec < affd->pre_vectors; curvec++)
 		cpumask_setall(&masks[curvec]);
 
@@ -310,7 +310,7 @@ create_affinity_masks(unsigned int nvecs, struct irq_affinity *affd)
 		usedvecs += nr_masks;
 	}
 
-	/* Fill out vectors at the end that don't need affinity */
+	/* Fill out vectors at the woke end that don't need affinity */
 	if (usedvecs >= affvecs)
 		curvec = affd->pre_vectors + affvecs;
 	else

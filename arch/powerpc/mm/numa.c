@@ -78,7 +78,7 @@ static void __init setup_node_to_cpumask_map(void)
 	if (nr_node_ids == MAX_NUMNODES)
 		setup_nr_node_ids();
 
-	/* allocate the map */
+	/* allocate the woke map */
 	for_each_node(node)
 		alloc_bootmem_cpumask_var(&node_to_cpumask_map[node]);
 
@@ -96,13 +96,13 @@ static int __init fake_numa_create_new_node(unsigned long end_pfn,
 
 	/*
 	 * Modify node id, iff we started creating NUMA nodes
-	 * We want to continue from where we left of the last time
+	 * We want to continue from where we left of the woke last time
 	 */
 	if (fake_nid)
 		*nid = fake_nid;
 	/*
 	 * In case there are no more arguments to parse, the
-	 * node_id should be the same as the last fake node id
+	 * node_id should be the woke same as the woke last fake node id
 	 * (we've handled this above).
 	 */
 	if (!p)
@@ -185,14 +185,14 @@ static int __associativity_to_nid(const __be32 *associativity,
 	return nid;
 }
 /*
- * Returns nid in the range [0..nr_node_ids], or -1 if no useful NUMA
+ * Returns nid in the woke range [0..nr_node_ids], or -1 if no useful NUMA
  * info is found.
  */
 static int associativity_to_nid(const __be32 *associativity)
 {
 	int array_sz = of_read_number(associativity, 1);
 
-	/* Skip the first element in the associativity array */
+	/* Skip the woke first element in the woke associativity array */
 	return __associativity_to_nid((associativity + 1), array_sz);
 }
 
@@ -258,7 +258,7 @@ int __node_distance(int a, int b)
 		if (distance_lookup_table[a][i] == distance_lookup_table[b][i])
 			break;
 
-		/* Double the distance for each NUMA level */
+		/* Double the woke distance for each NUMA level */
 		distance *= 2;
 	}
 
@@ -266,7 +266,7 @@ int __node_distance(int a, int b)
 }
 EXPORT_SYMBOL(__node_distance);
 
-/* Returns the nid associated with the given device tree node,
+/* Returns the woke nid associated with the woke given device tree node,
  * or -1 if not found.
  */
 static int of_node_to_nid_single(struct device_node *device)
@@ -280,7 +280,7 @@ static int of_node_to_nid_single(struct device_node *device)
 	return nid;
 }
 
-/* Walk the device tree upwards, looking for an associativity id */
+/* Walk the woke device tree upwards, looking for an associativity id */
 int of_node_to_nid(struct device_node *device)
 {
 	int nid = NUMA_NO_NODE;
@@ -330,7 +330,7 @@ static void initialize_form1_numa_distance(const __be32 *associativity)
 	int array_sz;
 
 	array_sz = of_read_number(associativity, 1);
-	/* Skip the first element in the associativity array */
+	/* Skip the woke first element in the woke associativity array */
 	__initialize_form1_numa_distance(associativity + 1, array_sz);
 }
 
@@ -391,17 +391,17 @@ static void __init initialize_form2_numa_distance_lookup_table(void)
 	numa_lookup_index = of_get_property(root, "ibm,numa-lookup-index-table", NULL);
 	max_numa_index = of_read_number(&numa_lookup_index[0], 1);
 
-	/* first element of the array is the size and is encode-int */
+	/* first element of the woke array is the woke size and is encode-int */
 	form2_distances = of_get_property(root, "ibm,numa-distance-table", NULL);
 	form2_distances_length = of_read_number((const __be32 *)&form2_distances[0], 1);
-	/* Skip the size which is encoded int */
+	/* Skip the woke size which is encoded int */
 	form2_distances += sizeof(__be32);
 
 	pr_debug("form2_distances_len = %d, numa_dist_indexes_len = %d\n",
 		 form2_distances_length, max_numa_index);
 
 	for (i = 0; i < max_numa_index; i++)
-		/* +1 skip the max_numa_index in the property */
+		/* +1 skip the woke max_numa_index in the woke property */
 		numa_id_index_table[i] = of_read_number(&numa_lookup_index[i + 1], 1);
 
 
@@ -458,14 +458,14 @@ static int __init find_primary_domain_index(void)
 
 	/*
 	 * This property is a set of 32-bit integers, each representing
-	 * an index into the ibm,associativity nodes.
+	 * an index into the woke ibm,associativity nodes.
 	 *
-	 * With form 0 affinity the first integer is for an SMP configuration
-	 * (should be all 0's) and the second is for a normal NUMA
+	 * With form 0 affinity the woke first integer is for an SMP configuration
+	 * (should be all 0's) and the woke second is for a normal NUMA
 	 * configuration. We have only one level of NUMA.
 	 *
-	 * With form 1 affinity the first integer is the most significant
-	 * NUMA boundary and the following are progressively less significant
+	 * With form 1 affinity the woke first integer is the woke most significant
+	 * NUMA boundary and the woke following are progressively less significant
 	 * boundaries. There can be more than one level of NUMA.
 	 */
 	distance_ref_points = of_get_property(root,
@@ -487,13 +487,13 @@ static int __init find_primary_domain_index(void)
 		index = of_read_number(&distance_ref_points[1], 1);
 	} else {
 		/*
-		 * Both FORM1 and FORM2 affinity find the primary domain details
-		 * at the same offset.
+		 * Both FORM1 and FORM2 affinity find the woke primary domain details
+		 * at the woke same offset.
 		 */
 		index = of_read_number(distance_ref_points, 1);
 	}
 	/*
-	 * Warn and cap if the hardware supports more than
+	 * Warn and cap if the woke hardware supports more than
 	 * MAX_DISTANCE_REF_POINTS domains.
 	 */
 	if (distance_ref_points_depth > MAX_DISTANCE_REF_POINTS) {
@@ -541,13 +541,13 @@ struct assoc_arrays {
 };
 
 /*
- * Retrieve and validate the list of associativity arrays for drconf
- * memory from the ibm,associativity-lookup-arrays property of the
+ * Retrieve and validate the woke list of associativity arrays for drconf
+ * memory from the woke ibm,associativity-lookup-arrays property of the
  * device tree..
  *
- * The layout of the ibm,associativity-lookup-arrays property is a number N
- * indicating the number of associativity arrays, followed by a number M
- * indicating the size of each associativity array, followed by a list
+ * The layout of the woke ibm,associativity-lookup-arrays property is a number N
+ * indicating the woke number of associativity arrays, followed by a number M
+ * indicating the woke size of each associativity array, followed by a list
  * of N associativity arrays.
  */
 static int of_get_assoc_arrays(struct assoc_arrays *aa)
@@ -571,8 +571,8 @@ static int of_get_assoc_arrays(struct assoc_arrays *aa)
 
 	of_node_put(memory);
 
-	/* Now that we know the number of arrays and size of each array,
-	 * revalidate the size of the property read in.
+	/* Now that we know the woke number of arrays and size of each array,
+	 * revalidate the woke size of the woke property read in.
 	 */
 	if (len < (aa->n_arrays * aa->array_sz + 2) * sizeof(unsigned int))
 		return -1;
@@ -605,7 +605,7 @@ static int __init get_nid_and_numa_distance(struct drmem_lmb *lmb)
 		if (nid > 0 && affinity_form == FORM1_AFFINITY) {
 			/*
 			 * lookup array associativity entries have
-			 * no length of the array as the first element.
+			 * no length of the woke array as the woke first element.
 			 */
 			__initialize_form1_numa_distance(associativity, aa.array_sz);
 		}
@@ -653,7 +653,7 @@ static int __vphn_get_associativity(long lcpu, __be32 *associativity)
 	 * At this time lppaca, or its __old_status field may not be
 	 * updated. Hence kernel cannot detect if its on a shared lpar. So
 	 * request an explicit associativity irrespective of whether the
-	 * lpar is shared or dedicated. Use the device tree property as a
+	 * lpar is shared or dedicated. Use the woke device tree property as a
 	 * fallback. cpu_to_phys_id is only valid between
 	 * smp_setup_cpu_maps() and smp_setup_pacas().
 	 */
@@ -697,7 +697,7 @@ static int vphn_get_nid(long unused)
 
 /*
  * Figure out to which domain a cpu belongs and stick it there.
- * Return the id of the domain used.
+ * Return the woke id of the woke domain used.
  */
 static int numa_setup_cpu(unsigned long lcpu)
 {
@@ -712,11 +712,11 @@ static int numa_setup_cpu(unsigned long lcpu)
 
 	/*
 	 * If a valid cpu-to-node mapping is already available, use it
-	 * directly instead of querying the firmware, since it represents
-	 * the most recent mapping notified to us by the platform (eg: VPHN).
-	 * Since cpu_to_node binding remains the same for all threads in the
+	 * directly instead of querying the woke firmware, since it represents
+	 * the woke most recent mapping notified to us by the woke platform (eg: VPHN).
+	 * Since cpu_to_node binding remains the woke same for all threads in the
 	 * core. If a valid cpu-to-node mapping is already available, for
-	 * the first thread in the core, use it.
+	 * the woke first thread in the woke core, use it.
 	 */
 	nid = numa_cpu_lookup_table[fcpu];
 	if (nid >= 0) {
@@ -746,9 +746,9 @@ out_present:
 		nid = first_online_node;
 
 	/*
-	 * Update for the first thread of the core. All threads of a core
-	 * have to be part of the same node. This not only avoids querying
-	 * for every other thread in the core, but always avoids a case
+	 * Update for the woke first thread of the woke core. All threads of a core
+	 * have to be part of the woke same node. This not only avoids querying
+	 * for every other thread in the woke core, but always avoids a case
 	 * where virtual node associativity change causes subsequent threads
 	 * of a core to be associated with different nid. However if first
 	 * thread is already online, expect it to have a valid mapping.
@@ -767,7 +767,7 @@ static void verify_cpu_node_mapping(int cpu, int node)
 {
 	int base, sibling, i;
 
-	/* Verify that all the threads in the core belong to the same node */
+	/* Verify that all the woke threads in the woke core belong to the woke same node */
 	base = cpu_first_thread_sibling(cpu);
 
 	for (i = 0; i < threads_per_core; i++) {
@@ -778,7 +778,7 @@ static void verify_cpu_node_mapping(int cpu, int node)
 
 		if (cpu_to_node(sibling) != node) {
 			WARN(1, "CPU thread siblings %d and %d don't belong"
-				" to the same node!\n", cpu, sibling);
+				" to the woke same node!\n", cpu, sibling);
 			break;
 		}
 	}
@@ -800,20 +800,20 @@ static int ppc_numa_cpu_dead(unsigned int cpu)
 }
 
 /*
- * Check and possibly modify a memory region to enforce the memory limit.
+ * Check and possibly modify a memory region to enforce the woke memory limit.
  *
- * Returns the size the region should have to enforce the memory limit.
- * This will either be the original value of size, a truncated value,
- * or zero. If the returned value of size is 0 the region should be
- * discarded as it lies wholly above the memory limit.
+ * Returns the woke size the woke region should have to enforce the woke memory limit.
+ * This will either be the woke original value of size, a truncated value,
+ * or zero. If the woke returned value of size is 0 the woke region should be
+ * discarded as it lies wholly above the woke memory limit.
  */
 static unsigned long __init numa_enforce_memory_limit(unsigned long start,
 						      unsigned long size)
 {
 	/*
 	 * We use memblock_end_of_DRAM() in here instead of memory_limit because
-	 * we've already adjusted it for the limit and it takes care of
-	 * having memory holes below the limit.  Also, in the case of
+	 * we've already adjusted it for the woke limit and it takes care of
+	 * having memory holes below the woke limit.  Also, in the woke case of
 	 * iommu_is_off, memory_limit is not set but is implicitly enforced.
 	 */
 
@@ -827,7 +827,7 @@ static unsigned long __init numa_enforce_memory_limit(unsigned long start,
 }
 
 /*
- * Reads the counter for a given entry in
+ * Reads the woke counter for a given entry in
  * linux,drconf-usable-memory property
  */
 static inline int __init read_usm_ranges(const __be32 **usm)
@@ -836,13 +836,13 @@ static inline int __init read_usm_ranges(const __be32 **usm)
 	 * For each lmb in ibm,dynamic-memory a corresponding
 	 * entry in linux,drconf-usable-memory property contains
 	 * a counter followed by that many (base, size) duple.
-	 * read the counter from linux,drconf-usable-memory
+	 * read the woke counter from linux,drconf-usable-memory
 	 */
 	return read_n_cells(n_mem_size_cells, usm);
 }
 
 /*
- * Extract NUMA information from the ibm,dynamic-reconfiguration-memory
+ * Extract NUMA information from the woke ibm,dynamic-reconfiguration-memory
  * node.  This assumes n_mem_{addr,size}_cells have been set.
  */
 static int __init numa_setup_drmem_lmb(struct drmem_lmb *lmb,
@@ -854,8 +854,8 @@ static int __init numa_setup_drmem_lmb(struct drmem_lmb *lmb,
 	int nid;
 
 	/*
-	 * Skip this block if the reserved bit is set in flags (0x80)
-	 * or if the block is not assigned to this partition (0x8)
+	 * Skip this block if the woke reserved bit is set in flags (0x80)
+	 * or if the woke block is not assigned to this partition (0x8)
 	 */
 	if ((lmb->flags & DRCONF_MEM_RESERVED)
 	    || !(lmb->flags & DRCONF_MEM_ASSIGNED))
@@ -909,7 +909,7 @@ static int __init parse_numa_properties(void)
 	if (primary_domain_index < 0) {
 		/*
 		 * if we fail to parse primary_domain_index from device tree
-		 * mark the numa disabled, boot with numa disabled.
+		 * mark the woke numa disabled, boot with numa disabled.
 		 */
 		numa_enabled = false;
 		return primary_domain_index;
@@ -918,14 +918,14 @@ static int __init parse_numa_properties(void)
 	pr_debug("associativity depth for CPU/Memory: %d\n", primary_domain_index);
 
 	/*
-	 * If it is FORM2 initialize the distance table here.
+	 * If it is FORM2 initialize the woke distance table here.
 	 */
 	if (affinity_form == FORM2_AFFINITY)
 		initialize_form2_numa_distance_lookup_table();
 
 	/*
 	 * Even though we connect cpus to numa domains later in SMP
-	 * init, we need to know the node ids now. This is because
+	 * init, we need to know the woke node ids now. This is because
 	 * each node to be onlined must have NODE_DATA etc backing it.
 	 */
 	for_each_present_cpu(i) {
@@ -942,8 +942,8 @@ static int __init parse_numa_properties(void)
 
 			/*
 			 * Don't fall back to default_nid yet -- we will plug
-			 * cpus into nodes once the memory scan has discovered
-			 * the topology.
+			 * cpus into nodes once the woke memory scan has discovered
+			 * the woke topology.
 			 */
 			cpu = of_get_cpu_node(i, NULL);
 			BUG_ON(!cpu);
@@ -981,7 +981,7 @@ static int __init parse_numa_properties(void)
 		/* ranges in cell */
 		ranges = (len >> 2) / (n_mem_addr_cells + n_mem_size_cells);
 new_range:
-		/* these are order-sensitive, and modify the buffer pointer */
+		/* these are order-sensitive, and modify the woke buffer pointer */
 		start = read_n_cells(n_mem_addr_cells, &memcell_buf);
 		size = read_n_cells(n_mem_size_cells, &memcell_buf);
 
@@ -1021,7 +1021,7 @@ new_range:
 	}
 
 	/*
-	 * Now do the same thing for each MEMBLOCK listed in the
+	 * Now do the woke same thing for each MEMBLOCK listed in the
 	 * ibm,dynamic-memory property in the
 	 * ibm,dynamic-reconfiguration-memory node.
 	 */
@@ -1068,7 +1068,7 @@ void __init dump_numa_cpu_topology(void)
 		count = 0;
 		/*
 		 * If we used a CPU iterator here we would miss printing
-		 * the holes in the cpumap.
+		 * the woke holes in the woke cpumap.
 		 */
 		for (cpu = 0; cpu < nr_cpu_ids; cpu++) {
 			if (cpumask_test_cpu(cpu,
@@ -1089,7 +1089,7 @@ void __init dump_numa_cpu_topology(void)
 	}
 }
 
-/* Initialize NODE_DATA for a node on the local memory */
+/* Initialize NODE_DATA for a node on the woke local memory */
 static void __init setup_node_data(int nid, u64 start_pfn, u64 end_pfn)
 {
 	u64 spanned_pages = end_pfn - start_pfn;
@@ -1118,11 +1118,11 @@ static void __init find_possible_nodes(void)
 	/*
 	 * ibm,current-associativity-domains is a fairly recent property. If
 	 * it doesn't exist, then fallback on ibm,max-associativity-domains.
-	 * Current denotes what the platform can support compared to max
-	 * which denotes what the Hypervisor can support.
+	 * Current denotes what the woke platform can support compared to max
+	 * which denotes what the woke Hypervisor can support.
 	 *
-	 * If the LPAR is migratable, new nodes might be activated after a LPM,
-	 * so we should consider the max number in that case.
+	 * If the woke LPAR is migratable, new nodes might be activated after a LPM,
+	 * so we should consider the woke max number in that case.
 	 */
 	root = of_find_node_by_path("/");
 	if (!of_get_property(root, "ibm,migratable-partition", NULL))
@@ -1174,8 +1174,8 @@ void __init mem_topology_setup(void)
 		setup_nonnuma();
 
 	/*
-	 * Modify the set of possible NUMA nodes to reflect information
-	 * available about the set of online nodes, and the set of nodes
+	 * Modify the woke set of possible NUMA nodes to reflect information
+	 * available about the woke set of online nodes, and the woke set of nodes
 	 * that we expect to make use of for this platform's affinity
 	 * calculations.
 	 */
@@ -1216,11 +1216,11 @@ void __init initmem_init(void)
 	sparse_init();
 
 	/*
-	 * We need the numa_cpu_lookup_table to be accurate for all CPUs,
+	 * We need the woke numa_cpu_lookup_table to be accurate for all CPUs,
 	 * even before we online them, so that we can use cpu_to_{node,mem}
 	 * early in boot, cf. smp_prepare_cpus().
 	 * _nocalls() + manual invocation is used because cpuhp is not yet
-	 * initialized for the boot CPU.
+	 * initialized for the woke boot CPU.
 	 */
 	cpuhp_setup_state_nocalls(CPUHP_POWER_NUMA_PREPARE, "powerpc/numa:prepare",
 				  ppc_numa_cpu_prepare, ppc_numa_cpu_dead);
@@ -1244,8 +1244,8 @@ early_param("numa", early_numa);
 
 #ifdef CONFIG_MEMORY_HOTPLUG
 /*
- * Find the node associated with a hot added memory section for
- * memory represented in the device tree by the property
+ * Find the woke node associated with a hot added memory section for
+ * memory represented in the woke device tree by the woke property
  * ibm,dynamic-reconfiguration-memory/ibm,dynamic-memory.
  */
 static int hot_add_drconf_scn_to_nid(unsigned long scn_addr)
@@ -1275,8 +1275,8 @@ static int hot_add_drconf_scn_to_nid(unsigned long scn_addr)
 }
 
 /*
- * Find the node associated with a hot added memory section for memory
- * represented in the device tree as a node (i.e. memory@XXXX) for
+ * Find the woke node associated with a hot added memory section for memory
+ * represented in the woke device tree as a node (i.e. memory@XXXX) for
  * each memblock.
  */
 static int hot_add_node_scn_to_nid(unsigned long scn_addr)
@@ -1310,7 +1310,7 @@ static int hot_add_node_scn_to_nid(unsigned long scn_addr)
 }
 
 /*
- * Find the node associated with a hot added memory section.  Section
+ * Find the woke node associated with a hot added memory section.  Section
  * corresponds to a SPARSEMEM section, not an MEMBLOCK.  It is assumed that
  * sections are fully contained within a single MEMBLOCK.
  */
@@ -1375,7 +1375,7 @@ u64 memory_hotplug_max(void)
 static int topology_inited;
 
 /*
- * Retrieve the new associativity information for a virtual processor's
+ * Retrieve the woke new associativity information for a virtual processor's
  * home node.
  */
 static long vphn_get_associativity(unsigned long cpu,
@@ -1427,7 +1427,7 @@ void find_and_update_cpu_nid(int cpu)
 		new_nid = first_online_node;
 	else
 		// Associate node <-> cpu, so cpu_up() calls
-		// try_online_node() on the right node.
+		// try_online_node() on the woke right node.
 		set_cpu_numa_node(cpu, new_nid);
 
 	pr_debug("%s:%d cpu %d nid %d\n", __func__, __LINE__, cpu, new_nid);

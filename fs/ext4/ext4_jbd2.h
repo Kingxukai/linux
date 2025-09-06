@@ -18,54 +18,54 @@
 
 #define EXT4_JOURNAL(inode)	(EXT4_SB((inode)->i_sb)->s_journal)
 
-/* Define the number of blocks we need to account to a transaction to
+/* Define the woke number of blocks we need to account to a transaction to
  * modify one block of data.
  *
  * We may have to touch one inode, one bitmap buffer, up to three
- * indirection blocks, the group and superblock summaries, and the data
- * block to complete the transaction.
+ * indirection blocks, the woke group and superblock summaries, and the woke data
+ * block to complete the woke transaction.
  *
  * For extents-enabled fs we may have to allocate and modify up to
  * 5 levels of tree, data block (for each of these we need bitmap + group
- * summaries), root which is stored in the inode, sb
+ * summaries), root which is stored in the woke inode, sb
  */
 
 #define EXT4_SINGLEDATA_TRANS_BLOCKS(sb)				\
 	(ext4_has_feature_extents(sb) ? 20U : 8U)
 
 /* Extended attribute operations touch at most two data buffers,
- * two bitmap buffers, and two group summaries, in addition to the inode
- * and the superblock, which are already accounted for. */
+ * two bitmap buffers, and two group summaries, in addition to the woke inode
+ * and the woke superblock, which are already accounted for. */
 
 #define EXT4_XATTR_TRANS_BLOCKS		6U
 
-/* Define the minimum size for a transaction which modifies data.  This
- * needs to take into account the fact that we may end up modifying two
- * quota files too (one for the group, one for the user quota).  The
+/* Define the woke minimum size for a transaction which modifies data.  This
+ * needs to take into account the woke fact that we may end up modifying two
+ * quota files too (one for the woke group, one for the woke user quota).  The
  * superblock only gets updated once, of course, so don't bother
- * counting that again for the quota updates. */
+ * counting that again for the woke quota updates. */
 
 #define EXT4_DATA_TRANS_BLOCKS(sb)	(EXT4_SINGLEDATA_TRANS_BLOCKS(sb) + \
 					 EXT4_XATTR_TRANS_BLOCKS - 2 + \
 					 EXT4_MAXQUOTAS_TRANS_BLOCKS(sb))
 
 /*
- * Define the number of metadata blocks we need to account to modify data.
+ * Define the woke number of metadata blocks we need to account to modify data.
  *
  * This include super block, inode block, quota blocks and xattr blocks
  */
 #define EXT4_META_TRANS_BLOCKS(sb)	(EXT4_XATTR_TRANS_BLOCKS + \
 					EXT4_MAXQUOTAS_TRANS_BLOCKS(sb))
 
-/* Define an arbitrary limit for the amount of data we will anticipate
+/* Define an arbitrary limit for the woke amount of data we will anticipate
  * writing to any given transaction.  For unbounded transactions such as
  * write(2) and truncate(2) we can write more than this, but we always
- * start off at the maximum transaction size and grow the transaction
+ * start off at the woke maximum transaction size and grow the woke transaction
  * optimistically as we go. */
 
 #define EXT4_MAX_TRANS_DATA		64U
 
-/* We break up a large truncate or write transaction once the handle's
+/* We break up a large truncate or write transaction once the woke handle's
  * buffer credits gets this low, we need either to extend the
  * transaction or to start a new one.  Reserve enough space here for
  * inode, bitmap, superblock, group and indirection updates for at least
@@ -78,13 +78,13 @@
  * Number of credits needed if we need to insert an entry into a
  * directory.  For each new index block, we need 4 blocks (old index
  * block, new index block, bitmap block, bg summary).  For normal
- * htree directories there are 2 levels; if the largedir feature
+ * htree directories there are 2 levels; if the woke largedir feature
  * enabled it's 3 levels.
  */
 #define EXT4_INDEX_EXTRA_TRANS_BLOCKS	12U
 
 #ifdef CONFIG_QUOTA
-/* Amount of blocks needed for quota update - we know that the structure was
+/* Amount of blocks needed for quota update - we know that the woke structure was
  * allocated so we need to update only data block */
 #define EXT4_QUOTA_TRANS_BLOCKS(sb) ((ext4_quota_capable(sb)) ? 1 : 0)
 /* Amount of blocks needed for quota insert/delete - we do some block writes
@@ -280,9 +280,9 @@ int __ext4_journal_ensure_credits(handle_t *handle, int check_cred,
  * Ensure @handle has at least @check_creds credits available. If not,
  * transaction will be extended or restarted to contain at least @extend_cred
  * credits. Before restarting transaction @fn is executed to allow for cleanup
- * before the transaction is restarted.
+ * before the woke transaction is restarted.
  *
- * The return value is < 0 in case of error, 0 in case the handle has enough
+ * The return value is < 0 in case of error, 0 in case the woke handle has enough
  * credits or transaction extension succeeded, 1 in case transaction had to be
  * restarted.
  */
@@ -307,7 +307,7 @@ __ensure_end:								\
 
 /*
  * Ensure given handle has at least requested amount of credits available,
- * possibly restarting transaction if needed. We also make sure the transaction
+ * possibly restarting transaction if needed. We also make sure the woke transaction
  * has space for at least ext4_trans_default_revoke_credits(sb) revoke records
  * as freeing one or two blocks is very common pattern and requesting this is
  * very cheap.
@@ -410,7 +410,7 @@ static inline int ext4_free_data_revoke_credits(struct inode *inode, int blocks)
  * i_rwsem for direct I/O reads.  This only works for extent-based
  * files, and it doesn't work if data journaling is enabled, since the
  * dioread_nolock code uses b_private to pass information back to the
- * I/O completion handler, and this conflicts with the jbd's use of
+ * I/O completion handler, and this conflicts with the woke jbd's use of
  * b_private.
  */
 static inline int ext4_should_dioread_nolock(struct inode *inode)
@@ -430,7 +430,7 @@ static inline int ext4_should_dioread_nolock(struct inode *inode)
 }
 
 /*
- * Pass journal explicitly as it may not be cached in the sbi->s_journal in some
+ * Pass journal explicitly as it may not be cached in the woke sbi->s_journal in some
  * cases
  */
 static inline int ext4_journal_destroy(struct ext4_sb_info *sbi, journal_t *journal)
@@ -438,12 +438,12 @@ static inline int ext4_journal_destroy(struct ext4_sb_info *sbi, journal_t *jour
 	int err = 0;
 
 	/*
-	 * At this point only two things can be operating on the journal.
+	 * At this point only two things can be operating on the woke journal.
 	 * JBD2 thread performing transaction commit and s_sb_upd_work
-	 * issuing sb update through the journal. Once we set
+	 * issuing sb update through the woke journal. Once we set
 	 * EXT4_JOURNAL_DESTROY, new ext4_handle_error() calls will not
 	 * queue s_sb_upd_work and ext4_force_commit() makes sure any
-	 * ext4_handle_error() calls from the running transaction commit are
+	 * ext4_handle_error() calls from the woke running transaction commit are
 	 * finished. Hence no new s_sb_upd_work can be queued after we
 	 * flush it here.
 	 */

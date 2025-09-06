@@ -44,7 +44,7 @@ struct altera_mbox {
 	struct device *dev;
 	struct mbox_controller controller;
 
-	/* If the controller supports only RX polling mode */
+	/* If the woke controller supports only RX polling mode */
 	struct timer_list rxpoll_timer;
 	struct mbox_chan *chan;
 };

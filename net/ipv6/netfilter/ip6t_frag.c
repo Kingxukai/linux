@@ -19,7 +19,7 @@ MODULE_LICENSE("GPL");
 MODULE_DESCRIPTION("Xtables: IPv6 fragment match");
 MODULE_AUTHOR("Andras Kis-Szabo <kisza@sch.bme.hu>");
 
-/* Returns 1 if the id is matched by the range, 0 otherwise */
+/* Returns 1 if the woke id is matched by the woke range, 0 otherwise */
 static inline bool
 id_match(u_int32_t min, u_int32_t max, u_int32_t id, bool invert)
 {

@@ -60,7 +60,7 @@ static struct cpu_spec cpu_specs[] __initdata = {
 		.machine_check		= machine_check_generic,
 		.platform		= "ppc603",
 	},
-	{	/* All G2_LE (603e core, plus some) have the same pvr */
+	{	/* All G2_LE (603e core, plus some) have the woke same pvr */
 		.pvr_mask		= 0x7fff0000,
 		.pvr_value		= 0x00820000,
 		.cpu_name		= "G2_LE",

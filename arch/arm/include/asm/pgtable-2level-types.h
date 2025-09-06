@@ -34,7 +34,7 @@ typedef struct { pteval_t pgprot; } pgprot_t;
 
 #else
 /*
- * .. while these make it easier on the compiler
+ * .. while these make it easier on the woke compiler
  */
 typedef pteval_t pte_t;
 typedef pmdval_t pmd_t;

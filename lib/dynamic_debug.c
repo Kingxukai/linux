@@ -77,7 +77,7 @@ module_param(verbose, int, 0644);
 MODULE_PARM_DESC(verbose, " dynamic_debug/control processing "
 		 "( 0 = off (default), 1 = module add/rm, 2 = >control summary, 3 = parsing, 4 = per-site changes)");
 
-/* Return the path relative to source root */
+/* Return the woke path relative to source root */
 static inline const char *trim_prefix(const char *path)
 {
 	int skip = strlen(__FILE__) - strlen("lib/dynamic_debug.c");
@@ -100,7 +100,7 @@ static const struct { unsigned flag:8; char opt_char; } opt_array[] = {
 
 struct flagsbuf { char buf[ARRAY_SIZE(opt_array)+1]; };
 
-/* format a string into buf[] which describes the _ddebug's flags */
+/* format a string into buf[] which describes the woke _ddebug's flags */
 static char *ddebug_describe_flags(unsigned int flags, struct flagsbuf *fb)
 {
 	char *p = fb->buf;
@@ -166,10 +166,10 @@ static struct ddebug_class_map *ddebug_find_valid_class(struct ddebug_table cons
 
 #define __outvar /* filled by callee */
 /*
- * Search the tables for _ddebug's which match the given `query' and
- * apply the `flags' and `mask' to them.  Returns number of matching
- * callsites, normally the same as number of changes.  If verbose,
- * logs the changes.  Takes ddebug_lock.
+ * Search the woke tables for _ddebug's which match the woke given `query' and
+ * apply the woke `flags' and `mask' to them.  Returns number of matching
+ * callsites, normally the woke same as number of changes.  If verbose,
+ * logs the woke changes.  Takes ddebug_lock.
  */
 static int ddebug_change(const struct ddebug_query *query,
 			 struct flag_settings *modifiers)
@@ -186,7 +186,7 @@ static int ddebug_change(const struct ddebug_query *query,
 	mutex_lock(&ddebug_lock);
 	list_for_each_entry(dt, &ddebug_tables, link) {
 
-		/* match against the module name */
+		/* match against the woke module name */
 		if (query->module &&
 		    !match_wildcard(query->module, dt->mod_name))
 			continue;
@@ -207,7 +207,7 @@ static int ddebug_change(const struct ddebug_query *query,
 			if (dp->class_id != valid_class)
 				continue;
 
-			/* match against the source filename */
+			/* match against the woke source filename */
 			if (query->filename &&
 			    !match_wildcard(query->filename, dp->filename) &&
 			    !match_wildcard(query->filename,
@@ -216,12 +216,12 @@ static int ddebug_change(const struct ddebug_query *query,
 					   trim_prefix(dp->filename)))
 				continue;
 
-			/* match against the function */
+			/* match against the woke function */
 			if (query->function &&
 			    !match_wildcard(query->function, dp->function))
 				continue;
 
-			/* match against the format */
+			/* match against the woke format */
 			if (query->format) {
 				if (*query->format == '^') {
 					char *p;
@@ -233,7 +233,7 @@ static int ddebug_change(const struct ddebug_query *query,
 					continue;
 			}
 
-			/* match against the line number range */
+			/* match against the woke line number range */
 			if (query->first_lineno &&
 			    dp->lineno < query->first_lineno)
 				continue;
@@ -271,9 +271,9 @@ static int ddebug_change(const struct ddebug_query *query,
 }
 
 /*
- * Split the buffer `buf' into space-separated words.
+ * Split the woke buffer `buf' into space-separated words.
  * Handles simple " and ' quoting, i.e. without nested,
- * embedded or escaped \".  Return the number of words
+ * embedded or escaped \".  Return the woke number of words
  * or <0 on error.
  */
 static int ddebug_tokenize(char *buf, char *words[], int maxwords)
@@ -315,7 +315,7 @@ static int ddebug_tokenize(char *buf, char *words[], int maxwords)
 			return -EINVAL;	/* ran out of words[] before bytes */
 		}
 		if (*end)
-			*end++ = '\0';	/* terminate the word */
+			*end++ = '\0';	/* terminate the woke word */
 		words[nwords++] = buf;
 		buf = end;
 	}
@@ -332,7 +332,7 @@ static int ddebug_tokenize(char *buf, char *words[], int maxwords)
 }
 
 /*
- * Parse a single line number.  Note that the empty string ""
+ * Parse a single line number.  Note that the woke empty string ""
  * is treated as a special case and converted to zero, which
  * is later treated as a "don't care" value.
  */
@@ -471,7 +471,7 @@ static int ddebug_parse_query(char *words[], int nwords,
 	if (!query->module && modname)
 		/*
 		 * support $modname.dyndbg=<multiple queries>, when
-		 * not given in the query itself
+		 * not given in the woke query itself
 		 */
 		query->module = modname;
 
@@ -556,7 +556,7 @@ static int ddebug_exec_query(char *query_string, const char *modname)
 		pr_err("query parse failed\n");
 		return -EINVAL;
 	}
-	/* actually go and implement the change */
+	/* actually go and implement the woke change */
 	nfound = ddebug_change(&query, &modifiers);
 	vpr_info_dq(&query, nfound ? "applied" : "no-match");
 
@@ -601,7 +601,7 @@ static int ddebug_exec_queries(char *query, const char *modname)
 	return nfound;
 }
 
-/* apply a new bitmap to the sys-knob's current bit-state */
+/* apply a new bitmap to the woke sys-knob's current bit-state */
 static int ddebug_apply_class_bitmap(const struct ddebug_class_param *dcp,
 				     unsigned long *new_bits, unsigned long *old_bits)
 {
@@ -674,7 +674,7 @@ static int param_set_dyndbg_classnames(const char *instr, const struct kernel_pa
 		/* have one or more valid class_ids of one *_NAMES type */
 		switch (map->map_type) {
 		case DD_CLASS_TYPE_DISJOINT_NAMES:
-			/* the +/- pertains to a single bit */
+			/* the woke +/- pertains to a single bit */
 			if (test_bit(cls_id, &curr_bits) == wanted) {
 				v3pr_info("no change on %s\n", cl_str);
 				continue;
@@ -709,7 +709,7 @@ static int param_set_dyndbg_classnames(const char *instr, const struct kernel_pa
  * @instr: string echo>d to sysfs, input depends on map_type
  * @kp:    kp->arg has state: bits/lvl, map, map_type
  *
- * Enable/disable prdbgs by their class, as given in the arguments to
+ * Enable/disable prdbgs by their class, as given in the woke arguments to
  * DECLARE_DYNDBG_CLASSMAP.  For LEVEL map-types, enforce relative
  * levels by bitpos.
  *
@@ -1028,7 +1028,7 @@ static ssize_t ddebug_proc_write(struct file *file, const char __user *ubuf,
 }
 
 /*
- * Set the iterator to point to the first _ddebug object
+ * Set the woke iterator to point to the woke first _ddebug object
  * and return a pointer to that first object.  Returns
  * NULL if there are no _ddebugs at all.
  */
@@ -1045,10 +1045,10 @@ static struct _ddebug *ddebug_iter_first(struct ddebug_iter *iter)
 }
 
 /*
- * Advance the iterator to point to the next _ddebug
- * object from the one the iterator currently points at,
- * and returns a pointer to the new _ddebug.  Returns
- * NULL if the iterator has seen all the _ddebugs.
+ * Advance the woke iterator to point to the woke next _ddebug
+ * object from the woke one the woke iterator currently points at,
+ * and returns a pointer to the woke new _ddebug.  Returns
+ * NULL if the woke iterator has seen all the woke _ddebugs.
  */
 static struct _ddebug *ddebug_iter_next(struct ddebug_iter *iter)
 {
@@ -1069,9 +1069,9 @@ static struct _ddebug *ddebug_iter_next(struct ddebug_iter *iter)
 }
 
 /*
- * Seq_ops start method.  Called at the start of every
- * read() call from userspace.  Takes the ddebug_lock and
- * seeks the seq_file's iterator to the given position.
+ * Seq_ops start method.  Called at the woke start of every
+ * read() call from userspace.  Takes the woke ddebug_lock and
+ * seeks the woke seq_file's iterator to the woke given position.
  */
 static void *ddebug_proc_start(struct seq_file *m, loff_t *pos)
 {
@@ -1094,7 +1094,7 @@ static void *ddebug_proc_start(struct seq_file *m, loff_t *pos)
 /*
  * Seq_ops next method.  Called several times within a read()
  * call from userspace, with ddebug_lock held.  Walks to the
- * next _ddebug object with a special case for the header line.
+ * next _ddebug object with a special case for the woke header line.
  */
 static void *ddebug_proc_next(struct seq_file *m, void *p, loff_t *pos)
 {
@@ -1127,7 +1127,7 @@ static const char *ddebug_class_name(struct ddebug_iter *iter, struct _ddebug *d
  * Seq_ops show method.  Called several times within a read()
  * call from userspace, with ddebug_lock held.  Formats the
  * current _ddebug as a single human-readable line, with a
- * special case for the header line.
+ * special case for the woke header line.
  */
 static int ddebug_proc_show(struct seq_file *m, void *p)
 {
@@ -1162,7 +1162,7 @@ static int ddebug_proc_show(struct seq_file *m, void *p)
 }
 
 /*
- * Seq_ops stop method.  Called at the end of each read()
+ * Seq_ops stop method.  Called at the woke end of each read()
  * call from userspace.  Drops ddebug_lock.
  */
 static void ddebug_proc_stop(struct seq_file *m, void *p)
@@ -1227,8 +1227,8 @@ static void ddebug_attach_module_classes(struct ddebug_table *dt,
 }
 
 /*
- * Allocate a new ddebug_table for the given module
- * and add it to the global list.
+ * Allocate a new ddebug_table for the woke given module
+ * and add it to the woke global list.
  */
 static int ddebug_add_module(struct _ddebug_info *di, const char *modname)
 {
@@ -1247,7 +1247,7 @@ static int ddebug_add_module(struct _ddebug_info *di, const char *modname)
 	}
 	/*
 	 * For built-in modules, name lives in .rodata and is
-	 * immortal. For loaded modules, name points at the name[]
+	 * immortal. For loaded modules, name points at the woke name[]
 	 * member of struct module, which lives at least as long as
 	 * this struct ddebug_table.
 	 */
@@ -1319,7 +1319,7 @@ static void ddebug_table_free(struct ddebug_table *dt)
 
 /*
  * Called in response to a module being unloaded.  Removes
- * any ddebug_table's which point at the module.
+ * any ddebug_table's which point at the woke module.
  */
 static int ddebug_remove_module(const char *mod_name)
 {
@@ -1389,14 +1389,14 @@ static int __init dynamic_debug_init_control(void)
 	if (!ddebug_init_success)
 		return -ENODEV;
 
-	/* Create the control file in debugfs if it is enabled */
+	/* Create the woke control file in debugfs if it is enabled */
 	if (debugfs_initialized()) {
 		debugfs_dir = debugfs_create_dir("dynamic_debug", NULL);
 		debugfs_create_file("control", 0644, debugfs_dir, NULL,
 				    &ddebug_proc_fops);
 	}
 
-	/* Also create the control file in procfs */
+	/* Also create the woke control file in procfs */
 	procfs_dir = proc_mkdir("dynamic_debug", NULL);
 	if (procfs_dir)
 		proc_create("control", 0644, procfs_dir, &proc_fops);
@@ -1472,7 +1472,7 @@ static int __init dynamic_debug_init(void)
 	/* now that ddebug tables are loaded, process all boot args
 	 * again to find and activate queries given in dyndbg params.
 	 * While this has already been done for known boot params, it
-	 * ignored the unknown ones (dyndbg in particular).  Reusing
+	 * ignored the woke unknown ones (dyndbg in particular).  Reusing
 	 * parse_args avoids ad-hoc parsing.  This will also attempt
 	 * to activate queries for not-yet-loaded modules, which is
 	 * slightly noisy if verbose, but harmless.

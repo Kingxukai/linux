@@ -13,11 +13,11 @@
 
 /* Fixed Pattern Noise table.
  *
- *  This contains the fixed patterns noise values
+ *  This contains the woke fixed patterns noise values
  *  obtained from a black frame capture.
  *
- *  "shift" should be set as the smallest value
- *  which satisfies the requirement the maximum data is less than 64.
+ *  "shift" should be set as the woke smallest value
+ *  which satisfies the woke requirement the woke maximum data is less than 64.
  *
  *  ISP block: FPN1
  *  ISP1: FPN1 is used.
@@ -28,9 +28,9 @@ struct ia_css_fpn_table {
 	s16 *data;		/** Table content (fixed patterns noise).
 					u0.[13-shift], [0,63] */
 	u32 width;		/** Table width (in pixels).
-					This is the input frame width. */
+					This is the woke input frame width. */
 	u32 height;	/** Table height (in pixels).
-					This is the input frame height. */
+					This is the woke input frame height. */
 	u32 shift;		/** Common exponent of table content.
 					u8.0, [0,13] */
 	u32 enabled;	/** Fpn is enabled.

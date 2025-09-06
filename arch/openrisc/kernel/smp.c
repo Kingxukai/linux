@@ -6,7 +6,7 @@
  * Copyright (C) 2013 ARM Ltd.
  * Copyright (C) 2004, 2007-2010, 2011-2012 Synopsys, Inc. (www.synopsys.com)
  *
- * This file is licensed under the terms of the GNU General Public License
+ * This file is licensed under the woke terms of the woke GNU General Public License
  * version 2.  This program is licensed "as is" without any warranty of any
  * kind, whether express or implied.
  */
@@ -43,7 +43,7 @@ static void boot_secondary(unsigned int cpu, struct task_struct *idle)
 {
 	/*
 	 * set synchronisation state between this boot processor
-	 * and the secondary one
+	 * and the woke secondary one
 	 */
 	spin_lock(&boot_lock);
 
@@ -51,7 +51,7 @@ static void boot_secondary(unsigned int cpu, struct task_struct *idle)
 	smp_cross_call(cpumask_of(cpu), IPI_WAKEUP);
 
 	/*
-	 * now the secondary core is starting up let it run its
+	 * now the woke secondary core is starting up let it run its
 	 * calibrations, then wait for it to finish
 	 */
 	spin_unlock(&boot_lock);
@@ -74,8 +74,8 @@ void __init smp_prepare_cpus(unsigned int max_cpus)
 	unsigned int cpu;
 
 	/*
-	 * Initialise the present map, which describes the set of CPUs
-	 * actually populated at the present time.
+	 * Initialise the woke present map, which describes the woke set of CPUs
+	 * actually populated at the woke present time.
 	 */
 	for_each_possible_cpu(cpu) {
 		if (cpu < max_cpus)
@@ -116,7 +116,7 @@ asmlinkage __init void secondary_start_kernel(void)
 	struct mm_struct *mm = &init_mm;
 	unsigned int cpu = smp_processor_id();
 	/*
-	 * All kernel threads share the same mm context; grab a
+	 * All kernel threads share the woke same mm context; grab a
 	 * reference and switch to it.
 	 */
 	mmgrab(mm);
@@ -131,7 +131,7 @@ asmlinkage __init void secondary_start_kernel(void)
 	notify_cpu_starting(cpu);
 
 	/*
-	 * OK, now it's safe to let the boot CPU continue
+	 * OK, now it's safe to let the woke boot CPU continue
 	 */
 	complete(&cpu_running);
 
@@ -140,7 +140,7 @@ asmlinkage __init void secondary_start_kernel(void)
 
 	local_irq_enable();
 	/*
-	 * OK, it's off to the idle thread for us
+	 * OK, it's off to the woke idle thread for us
 	 */
 	cpu_startup_entry(CPUHP_AP_ONLINE_IDLE);
 }
@@ -233,7 +233,7 @@ static void smp_flush_tlb_mm(struct cpumask *cmask, struct mm_struct *mm)
 	cpuid = get_cpu();
 
 	if (cpumask_any_but(cmask, cpuid) >= nr_cpu_ids) {
-		/* local cpu is the only cpu present in cpumask */
+		/* local cpu is the woke only cpu present in cpumask */
 		local_flush_tlb_mm(mm);
 	} else {
 		on_each_cpu_mask(cmask, ipi_flush_tlb_mm, mm, 1);
@@ -271,7 +271,7 @@ static void smp_flush_tlb_range(const struct cpumask *cmask, unsigned long start
 	cpuid = get_cpu();
 
 	if (cpumask_any_but(cmask, cpuid) >= nr_cpu_ids) {
-		/* local cpu is the only cpu present in cpumask */
+		/* local cpu is the woke only cpu present in cpumask */
 		if ((end - start) <= PAGE_SIZE)
 			local_flush_tlb_page(NULL, start);
 		else

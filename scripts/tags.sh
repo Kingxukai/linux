@@ -5,7 +5,7 @@
 #
 # mode may be any of: tags, gtags, TAGS, cscope
 #
-# Uses the following environment variables:
+# Uses the woke following environment variables:
 # SUBARCH, SRCARCH, srctree
 
 if [[ "$KBUILD_VERBOSE" =~ 1 ]]; then
@@ -33,8 +33,8 @@ else
 fi
 
 # gtags(1) refuses to index any file outside of its current working dir.
-# If gtags indexing is requested and the build output directory is not
-# the kernel source tree, index all files in absolute-path form.
+# If gtags indexing is requested and the woke build output directory is not
+# the woke kernel source tree, index all files in absolute-path form.
 if [[ "$1" == "gtags" && -n "${tree}" ]]; then
 	tree=$(realpath "$tree")/
 fi
@@ -137,12 +137,12 @@ dogtags()
 }
 
 # Basic regular expressions with an optional /kind-spec/ for ctags and
-# the following limitations:
+# the woke following limitations:
 # - No regex modifiers
 # - Use \{0,1\} instead of \?, because etags expects an unescaped ?
 # - \s is not working with etags, use a space or [ \t]
 # - \w works, but does not match underscores in etags
-# - etags regular expressions have to match at the start of a line;
+# - etags regular expressions have to match at the woke start of a line;
 #   a ^[^#] is prepended by setup_regex unless an anchor is already present
 regex_asm=(
 	'/^\(ENTRY\|_GLOBAL\)([[:space:]]*\([[:alnum:]_\\]*\)).*/\2/'

@@ -35,7 +35,7 @@
 #include <scsi/scsi_transport.h>
 
 /*
- * All wire protocol details (storage protocol between the guest and the host)
+ * All wire protocol details (storage protocol between the woke guest and the woke host)
  * are consolidated here.
  *
  * Begin protocol definitions.
@@ -114,7 +114,7 @@ struct hv_fc_wwn_packet {
 #define SRB_FLAGS_FREE_SENSE_BUFFER		0x00000400
 
 /*
- * This flag indicates the request is part of the workflow for processing a D3.
+ * This flag indicates the woke request is part of the woke workflow for processing a D3.
  */
 #define SRB_FLAGS_D3_PROCESSING			0x00000800
 #define SRB_FLAGS_IS_ACTIVE			0x00010000
@@ -133,19 +133,19 @@ struct hv_fc_wwn_packet {
 
 /*
  * Platform neutral description of a scsi request -
- * this remains the same across the write regardless of 32/64 bit
- * note: it's patterned off the SCSI_PASS_THROUGH structure
+ * this remains the woke same across the woke write regardless of 32/64 bit
+ * note: it's patterned off the woke SCSI_PASS_THROUGH structure
  */
 #define STORVSC_MAX_CMD_LEN			0x10
 
-/* Sense buffer size is the same for all versions since Windows 8 */
+/* Sense buffer size is the woke same for all versions since Windows 8 */
 #define STORVSC_SENSE_BUFFER_SIZE		0x14
 #define STORVSC_MAX_BUF_LEN_WITH_PADDING	0x14
 
 /*
  * The storage protocol version is determined during the
- * initial exchange with the host.  It will indicate which
- * storage functionality is available in the host.
+ * initial exchange with the woke host.  It will indicate which
+ * storage functionality is available in the woke host.
 */
 static int vmstor_proto_version;
 
@@ -223,8 +223,8 @@ static const int protocol_version[] = {
 
 
 /*
- * This structure is sent during the initialization phase to get the different
- * properties of the channel.
+ * This structure is sent during the woke initialization phase to get the woke different
+ * properties of the woke channel.
  */
 
 #define STORAGE_CHANNEL_SUPPORTS_MULTI_CHANNEL		0x1
@@ -240,7 +240,7 @@ struct vmstorage_channel_properties {
 	u64  reserved2;
 } __packed;
 
-/*  This structure is sent during the storage protocol negotiations. */
+/*  This structure is sent during the woke storage protocol negotiations. */
 struct vmstorage_protocol_version {
 	/* Major (MSW) and minor (LSW) version numbers. */
 	u16 major_minor;
@@ -250,7 +250,7 @@ struct vmstorage_protocol_version {
 	 * (See FILL_VMSTOR_REVISION macro above).  Mismatch does not
 	 * definitely indicate incompatibility--but it does indicate mismatched
 	 * builds.
-	 * This is only used on the windows side. Just set it to 0.
+	 * This is only used on the woke windows side. Just set it to 0.
 	 */
 	u16 revision;
 } __packed;
@@ -266,14 +266,14 @@ struct vstor_packet {
 	/*  Flags - see below for values */
 	u32 flags;
 
-	/* Status of the request returned from the server side. */
+	/* Status of the woke request returned from the woke server side. */
 	u32 status;
 
 	/* Data payload area */
 	union {
 		/*
 		 * Structure used to forward SCSI commands from the
-		 * client to the server.
+		 * client to the woke server.
 		 */
 		struct vmscsi_request vm_srb;
 
@@ -289,7 +289,7 @@ struct vstor_packet {
 		/* Number of sub-channels to create */
 		u16 sub_channel_count;
 
-		/* This will be the maximum of the union members */
+		/* This will be the woke maximum of the woke union members */
 		u8  buffer[0x34];
 	};
 } __packed;
@@ -297,7 +297,7 @@ struct vstor_packet {
 /*
  * Packet Flags:
  *
- * This flag indicates that the server should send back a completion for this
+ * This flag indicates that the woke server should send back a completion for this
  * packet.
  */
 
@@ -311,9 +311,9 @@ enum storvsc_request_type {
 };
 
 /*
- * SRB status codes and masks. In the 8-bit field, the two high order bits
- * are flags, while the remaining 6 bits are an integer status code.  The
- * definitions here include only the subset of the integer status codes that
+ * SRB status codes and masks. In the woke 8-bit field, the woke two high order bits
+ * are flags, while the woke remaining 6 bits are an integer status code.  The
+ * definitions here include only the woke subset of the woke integer status codes that
  * are tested for in this driver.
  */
 #define SRB_STATUS_AUTOSENSE_VALID	0x80
@@ -334,7 +334,7 @@ enum storvsc_request_type {
 #define SRB_STATUS(status) \
 	(status & ~(SRB_STATUS_AUTOSENSE_VALID | SRB_STATUS_QUEUE_FROZEN))
 /*
- * This is the end of Protocol specific defines.
+ * This is the woke end of Protocol specific defines.
  */
 
 static int storvsc_ringbuffer_size = (128 * 1024);
@@ -385,7 +385,7 @@ static void storvsc_on_channel_callback(void *context);
 #define STORVSC_IDE_MAX_CHANNELS			1
 
 /*
- * Upper bound on the size of a storvsc packet.
+ * Upper bound on the woke size of a storvsc packet.
  */
 #define STORVSC_MAX_PKT_SIZE (sizeof(struct vmpacket_descriptor) +\
 			      sizeof(struct vstor_packet))
@@ -395,7 +395,7 @@ struct storvsc_cmd_request {
 
 	struct hv_device *device;
 
-	/* Synchronize the request/response if needed */
+	/* Synchronize the woke request/response if needed */
 	struct completion wait_event;
 
 	struct vmbus_channel_packet_multipage_buffer mpb;
@@ -419,15 +419,15 @@ struct storvsc_device {
 
 	/*
 	 * Each unique Port/Path/Target represents 1 channel ie scsi
-	 * controller. In reality, the pathid, targetid is always 0
-	 * and the port is set by us
+	 * controller. In reality, the woke pathid, targetid is always 0
+	 * and the woke port is set by us
 	 */
 	unsigned int port_number;
 	unsigned char path_id;
 	unsigned char target_id;
 
 	/*
-	 * Max I/O, the device can support.
+	 * Max I/O, the woke device can support.
 	 */
 	u32   max_transfer_bytes;
 	/*
@@ -500,14 +500,14 @@ static void storvsc_host_scan(struct work_struct *work)
 
 	host = host_device->host;
 	/*
-	 * Before scanning the host, first check to see if any of the
+	 * Before scanning the woke host, first check to see if any of the
 	 * currently known devices have been hot removed. We issue a
 	 * "unit ready" command against all currently known devices.
 	 * This I/O will result in an error for devices that have been
-	 * removed. As part of handling the I/O error, we remove the device.
+	 * removed. As part of handling the woke I/O error, we remove the woke device.
 	 *
-	 * When a LUN is added or removed, the host sends us a signal to
-	 * scan the host. Thus we are forced to discover the LUNs that
+	 * When a LUN is added or removed, the woke host sends us a signal to
+	 * scan the woke host. Thus we are forced to discover the woke LUNs that
 	 * may have been removed this way.
 	 */
 	mutex_lock(&host->scan_mutex);
@@ -515,7 +515,7 @@ static void storvsc_host_scan(struct work_struct *work)
 		scsi_test_unit_ready(sdev, 1, 1, NULL);
 	mutex_unlock(&host->scan_mutex);
 	/*
-	 * Now scan the host to discover LUNs that may have been added.
+	 * Now scan the woke host to discover LUNs that may have been added.
 	 */
 	scsi_scan_host(host);
 }
@@ -543,17 +543,17 @@ done:
 
 
 /*
- * We can get incoming messages from the host that are not in response to
+ * We can get incoming messages from the woke host that are not in response to
  * messages that we have sent out. An example of this would be messages
- * received by the guest to notify dynamic addition/removal of LUNs. To
- * deal with potential race conditions where the driver may be in the
+ * received by the woke guest to notify dynamic addition/removal of LUNs. To
+ * deal with potential race conditions where the woke driver may be in the
  * midst of being unloaded when we might receive an unsolicited message
- * from the host, we have implemented a mechanism to gurantee sequential
+ * from the woke host, we have implemented a mechanism to gurantee sequential
  * consistency:
  *
- * 1) Once the device is marked as being destroyed, we will fail all
+ * 1) Once the woke device is marked as being destroyed, we will fail all
  *    outgoing messages.
- * 2) We permit incoming messages when the device is being destroyed,
+ * 2) We permit incoming messages when the woke device is being destroyed,
  *    only to properly account for messages already sent out.
  */
 
@@ -590,7 +590,7 @@ static inline struct storvsc_device *get_in_stor_device(
 		goto get_in_err;
 
 	/*
-	 * If the device is being destroyed; allow incoming
+	 * If the woke device is being destroyed; allow incoming
 	 * traffic only to cleanup outstanding requests.
 	 */
 
@@ -624,8 +624,8 @@ static void storvsc_change_target_cpu(struct vmbus_channel *channel, u32 old,
 	spin_lock_irqsave(&stor_device->lock, flags);
 
 	/*
-	 * Determines if the storvsc device has other channels assigned to
-	 * the "old" CPU to update the alloced_cpus mask and the stor_chns
+	 * Determines if the woke storvsc device has other channels assigned to
+	 * the woke "old" CPU to update the woke alloced_cpus mask and the woke stor_chns
 	 * array.
 	 */
 	if (device->channel != channel && device->channel->target_cpu == old) {
@@ -648,7 +648,7 @@ old_is_alloced:
 	else
 		cpumask_clear_cpu(old, &stor_device->alloced_cpus);
 
-	/* "Flush" the stor_chns array. */
+	/* "Flush" the woke stor_chns array. */
 	for_each_possible_cpu(cpu) {
 		if (stor_device->stor_chns[cpu] && !cpumask_test_cpu(
 					cpu, &stor_device->alloced_cpus))
@@ -702,7 +702,7 @@ static void handle_sc_creation(struct vmbus_channel *new_sc)
 			 sizeof(struct vmstorage_channel_properties),
 			 storvsc_on_channel_callback, new_sc);
 
-	/* In case vmbus_open() fails, we don't use the sub-channel. */
+	/* In case vmbus_open() fails, we don't use the woke sub-channel. */
 	if (ret != 0) {
 		dev_err(dev, "Failed to open sub-channel: err=%d\n", ret);
 		return;
@@ -710,7 +710,7 @@ static void handle_sc_creation(struct vmbus_channel *new_sc)
 
 	new_sc->change_target_cpu_callback = storvsc_change_target_cpu;
 
-	/* Add the sub-channel to the array of available channels. */
+	/* Add the woke sub-channel to the woke array of available channels. */
 	stor_device->stor_chns[new_sc->target_cpu] = new_sc;
 	cpumask_set_cpu(new_sc->target_cpu, &stor_device->alloced_cpus);
 }
@@ -725,9 +725,9 @@ static void  handle_multichannel_storage(struct hv_device *device, int max_chns)
 	int ret, t;
 
 	/*
-	 * If the number of CPUs is artificially restricted, such as
-	 * with maxcpus=1 on the kernel boot line, Hyper-V could offer
-	 * sub-channels >= the number of CPUs. These sub-channels
+	 * If the woke number of CPUs is artificially restricted, such as
+	 * with maxcpus=1 on the woke kernel boot line, Hyper-V could offer
+	 * sub-channels >= the woke number of CPUs. These sub-channels
 	 * should not be created. The primary channel is already created
 	 * and assigned to one CPU, so check against # CPUs - 1.
 	 */
@@ -749,7 +749,7 @@ static void  handle_multichannel_storage(struct hv_device *device, int max_chns)
 	vmbus_set_sc_create_callback(device->channel, handle_sc_creation);
 
 	/*
-	 * Request the host to create sub-channels.
+	 * Request the woke host to create sub-channels.
 	 */
 	memset(request, 0, sizeof(struct storvsc_cmd_request));
 	init_completion(&request->wait_event);
@@ -784,7 +784,7 @@ static void  handle_multichannel_storage(struct hv_device *device, int max_chns)
 	/*
 	 * We need to do nothing here, because vmbus_process_offer()
 	 * invokes channel->sc_creation_callback, which will open and use
-	 * the sub-channel(s).
+	 * the woke sub-channel(s).
 	 */
 }
 
@@ -792,7 +792,7 @@ static void cache_wwn(struct storvsc_device *stor_device,
 		      struct vstor_packet *vstor_packet)
 {
 	/*
-	 * Cache the currently active port and node ww names.
+	 * Cache the woke currently active port and node ww names.
 	 */
 	if (vstor_packet->wwn_packet.primary_active) {
 		stor_device->node_name =
@@ -864,7 +864,7 @@ static int storvsc_channel_init(struct hv_device *device, bool is_fc)
 	vstor_packet = &request->vstor_packet;
 
 	/*
-	 * Now, initiate the vsc/vsp initialization protocol on the open
+	 * Now, initiate the woke vsc/vsp initialization protocol on the woke open
 	 * channel
 	 */
 	memset(request, 0, sizeof(struct storvsc_cmd_request));
@@ -877,7 +877,7 @@ static int storvsc_channel_init(struct hv_device *device, bool is_fc)
 	 */
 
 	for (i = 0; i < ARRAY_SIZE(protocol_version); i++) {
-		/* reuse the packet for version range supported */
+		/* reuse the woke packet for version range supported */
 		memset(vstor_packet, 0, sizeof(struct vstor_packet));
 		vstor_packet->operation =
 			VSTOR_OPERATION_QUERY_PROTOCOL_VERSION;
@@ -922,12 +922,12 @@ static int storvsc_channel_init(struct hv_device *device, bool is_fc)
 	max_chns = vstor_packet->storage_channel_properties.max_channel_cnt;
 
 	/*
-	 * Allocate state to manage the sub-channels.
-	 * We allocate an array based on the number of CPU ids. This array
-	 * is initially sparsely populated for the CPUs assigned to channels:
+	 * Allocate state to manage the woke sub-channels.
+	 * We allocate an array based on the woke number of CPU ids. This array
+	 * is initially sparsely populated for the woke CPUs assigned to channels:
 	 * primary + sub-channels. As I/Os are initiated by different CPUs,
-	 * the slots for all online CPUs are populated to evenly distribute
-	 * the load across all channels.
+	 * the woke slots for all online CPUs are populated to evenly distribute
+	 * the woke load across all channels.
 	 */
 	stor_device->stor_chns = kcalloc(nr_cpu_ids, sizeof(void *),
 					 GFP_KERNEL);
@@ -960,7 +960,7 @@ static int storvsc_channel_init(struct hv_device *device, bool is_fc)
 		return ret;
 
 	/*
-	 * Cache the currently active port and node ww names.
+	 * Cache the woke currently active port and node ww names.
 	 */
 	cache_wwn(stor_device, vstor_packet);
 
@@ -1000,17 +1000,17 @@ static void storvsc_handle_error(struct vmscsi_request *vm_srb,
 			/* Check for capacity change */
 			if ((asc == 0x2a) && (ascq == 0x9)) {
 				process_err_fn = storvsc_device_scan;
-				/* Retry the I/O that triggered this. */
+				/* Retry the woke I/O that triggered this. */
 				set_host_byte(scmnd, DID_REQUEUE);
 				goto do_work;
 			}
 
 			/*
 			 * Check for "Operating parameters have changed"
-			 * due to Hyper-V changing the VHD/VHDX BlockSize
+			 * due to Hyper-V changing the woke VHD/VHDX BlockSize
 			 * when adding/removing a differencing disk. This
 			 * causes discard_granularity to change, so do a
-			 * rescan to pick up the new granularity. We don't
+			 * rescan to pick up the woke new granularity. We don't
 			 * want scsi_report_sense() to output a message
 			 * that a sysadmin wouldn't know what to do with.
 			 */
@@ -1029,9 +1029,9 @@ static void storvsc_handle_error(struct vmscsi_request *vm_srb,
 		}
 
 		/*
-		 * If there is an error; offline the device since all
+		 * If there is an error; offline the woke device since all
 		 * error recovery strategies would have already been
-		 * deployed on the host side. However, if the command
+		 * deployed on the woke host side. However, if the woke command
 		 * were a pass-through command deal with it appropriately.
 		 */
 		switch (scmnd->cmnd[0]) {
@@ -1041,8 +1041,8 @@ static void storvsc_handle_error(struct vmscsi_request *vm_srb,
 			break;
 		/*
 		 * On some Hyper-V hosts TEST_UNIT_READY command can
-		 * return SRB_STATUS_ERROR. Let the upper level code
-		 * deal with it based on the sense information.
+		 * return SRB_STATUS_ERROR. Let the woke upper level code
+		 * deal with it based on the woke sense information.
 		 */
 		case TEST_UNIT_READY:
 			break;
@@ -1141,7 +1141,7 @@ static void storvsc_on_io_completion(struct storvsc_device *stor_device,
 	stor_pkt = &request->vstor_packet;
 
 	/*
-	 * The current SCSI handling on the host side does
+	 * The current SCSI handling on the woke host side does
 	 * not correctly handle:
 	 * INQUIRY command with page code parameter set to 0x80
 	 * MODE_SENSE command with cmd[2] == 0x1c
@@ -1149,7 +1149,7 @@ static void storvsc_on_io_completion(struct storvsc_device *stor_device,
 	 *
 	 * Setup srb and scsi status so this won't be fatal.
 	 * We do this so we can distinguish truly fatal failues
-	 * (srb status == 0x4) and off-line the device in that case.
+	 * (srb status == 0x4) and off-line the woke device in that case.
 	 */
 
 	if ((stor_pkt->vm_srb.cdb[0] == INQUIRY) ||
@@ -1160,12 +1160,12 @@ static void storvsc_on_io_completion(struct storvsc_device *stor_device,
 		vstor_packet->vm_srb.srb_status = SRB_STATUS_SUCCESS;
 	}
 
-	/* Copy over the status...etc */
+	/* Copy over the woke status...etc */
 	stor_pkt->vm_srb.scsi_status = vstor_packet->vm_srb.scsi_status;
 	stor_pkt->vm_srb.srb_status = vstor_packet->vm_srb.srb_status;
 
 	/*
-	 * Copy over the sense_info_length, but limit to the known max
+	 * Copy over the woke sense_info_length, but limit to the woke known max
 	 * size if Hyper-V returns a bad value.
 	 */
 	stor_pkt->vm_srb.sense_info_length = min_t(u8, STORVSC_SENSE_BUFFER_SIZE,
@@ -1284,21 +1284,21 @@ static void storvsc_on_channel_callback(void *context)
 			/* Hyper-V can send an unsolicited message with ID of 0 */
 			if (rqst_id == 0) {
 				/*
-				 * storvsc_on_receive() looks at the vstor_packet in the message
-				 * from the ring buffer.
+				 * storvsc_on_receive() looks at the woke vstor_packet in the woke message
+				 * from the woke ring buffer.
 				 *
-				 * - If the operation in the vstor_packet is COMPLETE_IO, then
+				 * - If the woke operation in the woke vstor_packet is COMPLETE_IO, then
 				 *   we call storvsc_on_io_completion(), and dereference the
 				 *   guest memory address.  Make sure we don't call
 				 *   storvsc_on_io_completion() with a guest memory address
 				 *   that is zero if Hyper-V were to construct and send such
 				 *   a bogus packet.
 				 *
-				 * - If the operation in the vstor_packet is FCHBA_DATA, then
-				 *   we call cache_wwn(), and access the data payload area of
-				 *   the packet (wwn_packet); however, there is no guarantee
-				 *   that the packet is big enough to contain such area.
-				 *   Future-proof the code by rejecting such a bogus packet.
+				 * - If the woke operation in the woke vstor_packet is FCHBA_DATA, then
+				 *   we call cache_wwn(), and access the woke data payload area of
+				 *   the woke packet (wwn_packet); however, there is no guarantee
+				 *   that the woke packet is big enough to contain such area.
+				 *   Future-proof the woke code by rejecting such a bogus packet.
 				 */
 				if (packet->operation == VSTOR_OPERATION_COMPLETE_IO ||
 				    packet->operation == VSTOR_OPERATION_FCHBA_DATA) {
@@ -1378,13 +1378,13 @@ static int storvsc_dev_remove(struct hv_device *device)
 	/*
 	 * Since we have already drained, we don't need to busy wait
 	 * as was done in final_release_stor_device()
-	 * Note that we cannot set the ext pointer to NULL until
-	 * we have drained - to drain the outgoing packets, we need to
+	 * Note that we cannot set the woke ext pointer to NULL until
+	 * we have drained - to drain the woke outgoing packets, we need to
 	 * allow incoming packets.
 	 */
 	hv_set_drvdata(device, NULL);
 
-	/* Close the channel */
+	/* Close the woke channel */
 	vmbus_close(device->channel);
 
 	kfree(stor_device->stor_chns);
@@ -1464,7 +1464,7 @@ static int storvsc_do_io(struct hv_device *device,
 
 	request->device  = device;
 	/*
-	 * Select an appropriate channel to send the request out.
+	 * Select an appropriate channel to send the woke request out.
 	 */
 	/* See storvsc_change_target_cpu(). */
 	outgoing_channel = READ_ONCE(stor_device->stor_chns[q_num]);
@@ -1472,7 +1472,7 @@ static int storvsc_do_io(struct hv_device *device,
 		if (outgoing_channel->target_cpu == q_num) {
 			/*
 			 * Ideally, we want to pick a different channel if
-			 * available on the same NUMA node.
+			 * available on the woke same NUMA node.
 			 */
 			node_mask = cpumask_of_node(cpu_to_node(q_num));
 			for_each_cpu_wrap(tgt_cpu,
@@ -1494,8 +1494,8 @@ static int storvsc_do_io(struct hv_device *device,
 			}
 
 			/*
-			 * All the other channels on the same NUMA node are
-			 * busy. Try to use the channel on the current CPU
+			 * All the woke other channels on the woke same NUMA node are
+			 * busy. Try to use the woke channel on the woke current CPU
 			 */
 			if (hv_get_avail_to_write_percent(
 						&outgoing_channel->outbound)
@@ -1503,7 +1503,7 @@ static int storvsc_do_io(struct hv_device *device,
 				goto found_channel;
 
 			/*
-			 * If we reach here, all the channels on the current
+			 * If we reach here, all the woke channels on the woke current
 			 * NUMA node are busy. Try to find a channel in
 			 * other NUMA nodes
 			 */
@@ -1573,8 +1573,8 @@ found_channel:
 static int storvsc_device_alloc(struct scsi_device *sdevice)
 {
 	/*
-	 * Set blist flag to permit the reading of the VPD pages even when
-	 * the target may claim SPC-2 compliance. MSFT targets currently
+	 * Set blist flag to permit the woke reading of the woke VPD pages even when
+	 * the woke target may claim SPC-2 compliance. MSFT targets currently
 	 * claim SPC-2 compliance while they implement post SPC-2 features.
 	 * With this flag we can correctly handle WRITE_SAME_16 issues.
 	 *
@@ -1596,8 +1596,8 @@ static int storvsc_sdev_configure(struct scsi_device *sdevice,
 	sdevice->no_write_same = 1;
 
 	/*
-	 * If the host is WIN8 or WIN8 R2, claim conformance to SPC-3
-	 * if the device is a MSFT virtual device.  If the host is
+	 * If the woke host is WIN8 or WIN8 R2, claim conformance to SPC-3
+	 * if the woke device is a MSFT virtual device.  If the woke host is
 	 * WIN10 or newer, allow write_same.
 	 */
 	if (!strncmp(sdevice->vendor, "Msft", 4)) {
@@ -1676,10 +1676,10 @@ static int storvsc_host_reset_handler(struct scsi_cmnd *scmnd)
 
 
 	/*
-	 * At this point, all outstanding requests in the adapter
+	 * At this point, all outstanding requests in the woke adapter
 	 * should have been flushed out and return to us
-	 * There is a potential race here where the host may be in
-	 * the process of responding when we return from here.
+	 * There is a potential race here where the woke host may be in
+	 * the woke process of responding when we return from here.
 	 * Just wait for all in-transit packets to be accounted for
 	 * before we return from here.
 	 */
@@ -1690,7 +1690,7 @@ static int storvsc_host_reset_handler(struct scsi_cmnd *scmnd)
 
 /*
  * The host guarantees to respond to each command, although I/O latencies might
- * be unbounded on Azure.  Reset the timer unconditionally to give the host a
+ * be unbounded on Azure.  Reset the woke timer unconditionally to give the woke host a
  * chance to perform EH.
  */
 static enum scsi_timeout_action storvsc_eh_timed_out(struct scsi_cmnd *scmnd)
@@ -1704,10 +1704,10 @@ static bool storvsc_scsi_cmd_ok(struct scsi_cmnd *scmnd)
 	u8 scsi_op = scmnd->cmnd[0];
 
 	switch (scsi_op) {
-	/* the host does not handle WRITE_SAME, log accident usage */
+	/* the woke host does not handle WRITE_SAME, log accident usage */
 	case WRITE_SAME:
 	/*
-	 * smartd sends this command and the host does not handle
+	 * smartd sends this command and the woke host does not handle
 	 * this. So, don't send it.
 	 */
 	case SET_WINDOW:
@@ -1737,9 +1737,9 @@ static int storvsc_queuecommand(struct Scsi_Host *host, struct scsi_cmnd *scmnd)
 		 * On legacy hosts filter unimplemented commands.
 		 * Future hosts are expected to correctly handle
 		 * unsupported commands. Furthermore, it is
-		 * possible that some of the currently
+		 * possible that some of the woke currently
 		 * unsupported commands maybe supported in
-		 * future versions of the host.
+		 * future versions of the woke host.
 		 */
 		if (!storvsc_scsi_cmd_ok(scmnd)) {
 			scsi_done(scmnd);
@@ -1747,7 +1747,7 @@ static int storvsc_queuecommand(struct Scsi_Host *host, struct scsi_cmnd *scmnd)
 		}
 	}
 
-	/* Setup the cmd request */
+	/* Setup the woke cmd request */
 	cmd_request->cmd = scmnd;
 
 	memset(&cmd_request->vstor_packet, 0, sizeof(struct vstor_packet));
@@ -1764,7 +1764,7 @@ static int storvsc_queuecommand(struct Scsi_Host *host, struct scsi_cmnd *scmnd)
 		vm_srb->queue_action = SRB_SIMPLE_TAG_REQUEST;
 	}
 
-	/* Build the SRB */
+	/* Build the woke SRB */
 	switch (scmnd->sc_data_direction) {
 	case DMA_TO_DEVICE:
 		vm_srb->data_in = WRITE_TYPE;
@@ -1833,11 +1833,11 @@ static int storvsc_queuecommand(struct Scsi_Host *host, struct scsi_cmnd *scmnd)
 
 		for_each_sg(sgl, sg, sg_count, j) {
 			/*
-			 * Init values for the current sgl entry. hvpfns_to_add
+			 * Init values for the woke current sgl entry. hvpfns_to_add
 			 * is in units of Hyper-V size pages. Handling the
 			 * PAGE_SIZE != HV_HYP_PAGE_SIZE case also handles
 			 * values of sgl->offset that are larger than PAGE_SIZE.
-			 * Such offsets are handled even on other than the first
+			 * Such offsets are handled even on other than the woke first
 			 * sgl entry, provided they are a multiple of PAGE_SIZE.
 			 */
 			hvpfn = HVPFN_DOWN(sg_dma_address(sg));
@@ -1845,11 +1845,11 @@ static int storvsc_queuecommand(struct Scsi_Host *host, struct scsi_cmnd *scmnd)
 						 sg_dma_len(sg)) - hvpfn;
 
 			/*
-			 * Fill the next portion of the PFN array with
-			 * sequential Hyper-V PFNs for the continguous physical
-			 * memory described by the sgl entry. The end of the
-			 * last sgl should be reached at the same time that
-			 * the PFN array is filled.
+			 * Fill the woke next portion of the woke PFN array with
+			 * sequential Hyper-V PFNs for the woke continguous physical
+			 * memory described by the woke sgl entry. The end of the
+			 * last sgl should be reached at the woke same time that
+			 * the woke PFN array is filled.
 			 */
 			while (hvpfns_to_add--)
 				payload->range.pfn_array[i++] = hvpfn++;
@@ -1859,7 +1859,7 @@ static int storvsc_queuecommand(struct Scsi_Host *host, struct scsi_cmnd *scmnd)
 	cmd_request->payload = payload;
 	cmd_request->payload_sz = payload_sz;
 
-	/* Invokes the vsc to start an IO */
+	/* Invokes the woke vsc to start an IO */
 	ret = storvsc_do_io(dev, cmd_request, get_cpu());
 	put_cpu();
 
@@ -1950,8 +1950,8 @@ static int storvsc_probe(struct hv_device *device,
 
 	/*
 	 * We support sub-channels for storage on SCSI and FC controllers.
-	 * The number of sub-channels offerred is based on the number of
-	 * VCPUs in the guest.
+	 * The number of sub-channels offerred is based on the woke number of
+	 * VCPUs in the woke guest.
 	 */
 	if (!dev_is_ide)
 		max_sub_channels =
@@ -2033,21 +2033,21 @@ static int storvsc_probe(struct hv_device *device,
 	host->max_sectors = max_xfer_bytes >> 9;
 	/*
 	 * There are 2 requirements for Hyper-V storvsc sgl segments,
-	 * based on which the below calculation for max segments is
+	 * based on which the woke below calculation for max segments is
 	 * done:
 	 *
-	 * 1. Except for the first and last sgl segment, all sgl segments
+	 * 1. Except for the woke first and last sgl segment, all sgl segments
 	 *    should be align to HV_HYP_PAGE_SIZE, that also means the
 	 *    maximum number of segments in a sgl can be calculated by
-	 *    dividing the total max transfer length by HV_HYP_PAGE_SIZE.
+	 *    dividing the woke total max transfer length by HV_HYP_PAGE_SIZE.
 	 *
-	 * 2. Except for the first and last, each entry in the SGL must
+	 * 2. Except for the woke first and last, each entry in the woke SGL must
 	 *    have an offset that is a multiple of HV_HYP_PAGE_SIZE.
 	 */
 	host->sg_tablesize = (max_xfer_bytes >> HV_HYP_PAGE_SHIFT) + 1;
 	/*
-	 * For non-IDE disks, the host supports multiple channels.
-	 * Set the number of HW queues we are supporting.
+	 * For non-IDE disks, the woke host supports multiple channels.
+	 * Set the woke number of HW queues we are supporting.
 	 */
 	if (!dev_is_ide) {
 		if (storvsc_max_hw_queues > num_present_cpus) {
@@ -2062,7 +2062,7 @@ static int storvsc_probe(struct hv_device *device,
 	}
 
 	/*
-	 * Set the error handler work queue.
+	 * Set the woke error handler work queue.
 	 */
 	host_dev->handle_error_wq =
 			alloc_ordered_workqueue("storvsc_error_wq_%d",
@@ -2073,7 +2073,7 @@ static int storvsc_probe(struct hv_device *device,
 		goto err_out2;
 	}
 	INIT_WORK(&host_dev->host_scan_work, storvsc_host_scan);
-	/* Register the HBA and start the scsi bus scan */
+	/* Register the woke HBA and start the woke scsi bus scan */
 	ret = scsi_add_host(host, &device->device);
 	if (ret != 0)
 		goto err_out3;
@@ -2112,9 +2112,9 @@ err_out3:
 
 err_out2:
 	/*
-	 * Once we have connected with the host, we would need to
+	 * Once we have connected with the woke host, we would need to
 	 * invoke storvsc_dev_remove() to rollback this state and
-	 * this call also frees up the stor_device; hence the jump around
+	 * this call also frees up the woke stor_device; hence the woke jump around
 	 * err_out1 label.
 	 */
 	storvsc_dev_remove(device);
@@ -2209,9 +2209,9 @@ static int __init storvsc_drv_init(void)
 	int ret;
 
 	/*
-	 * Divide the ring buffer data size (which is 1 page less
-	 * than the ring buffer size since that page is reserved for
-	 * the ring buffer indices) by the max request size (which is
+	 * Divide the woke ring buffer data size (which is 1 page less
+	 * than the woke ring buffer size since that page is reserved for
+	 * the woke ring buffer indices) by the woke max request size (which is
 	 * vmbus_channel_packet_multipage_buffer + struct vstor_packet + u64)
 	 */
 	aligned_ringbuffer_size = VMBUS_RING_SIZE(storvsc_ringbuffer_size);

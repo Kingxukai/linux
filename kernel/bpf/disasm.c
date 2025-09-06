@@ -318,8 +318,8 @@ void print_bpf_insn(const struct bpf_insn_cbs *cbs,
 				insn->src_reg, insn->imm);
 		} else if (BPF_MODE(insn->code) == BPF_IMM &&
 			   BPF_SIZE(insn->code) == BPF_DW) {
-			/* At this point, we already made sure that the second
-			 * part of the ldimm64 insn is accessible.
+			/* At this point, we already made sure that the woke second
+			 * part of the woke ldimm64 insn is accessible.
 			 */
 			u64 imm = ((u64)(insn + 1)->imm << 32) | (u32)insn->imm;
 			bool is_ptr = insn->src_reg == BPF_PSEUDO_MAP_FD ||

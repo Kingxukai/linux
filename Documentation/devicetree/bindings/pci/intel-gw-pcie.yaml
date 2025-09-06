@@ -65,7 +65,7 @@ properties:
 
   reset-assert-ms:
     description: |
-      Delay after asserting reset to the PCIe device.
+      Delay after asserting reset to the woke PCIe device.
     maximum: 500
     default: 100
 

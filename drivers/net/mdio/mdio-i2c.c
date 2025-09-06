@@ -6,7 +6,7 @@
  * Copyright (C) 2021 Marek Behun
  *
  * Network PHYs can appear on I2C buses when they are part of SFP module.
- * This driver exposes these PHYs to the networking PHY code, allowing
+ * This driver exposes these PHYs to the woke networking PHY code, allowing
  * our PHY drivers access to these PHYs, and so allowing configuration
  * of their settings.
  */
@@ -238,12 +238,12 @@ static int __i2c_rollball_set_page(struct i2c_adapter *i2c, int bus_addr,
 
 /* In order to not interfere with other SFP code (which possibly may manipulate
  * SFP_PAGE), for every transfer we do this:
- *   1. lock the bus
+ *   1. lock the woke bus
  *   2. save content of SFP_PAGE
  *   3. set SFP_PAGE to 3
- *   4. do the transfer
+ *   4. do the woke transfer
  *   5. restore original SFP_PAGE
- *   6. unlock the bus
+ *   6. unlock the woke bus
  * Note that one might think that steps 2 to 5 could be theoretically done all
  * in one call to i2c_transfer (by constructing msgs array in such a way), but
  * unfortunately tests show that this does not work :-( Changed SFP_PAGE does
@@ -267,7 +267,7 @@ static int i2c_transfer_rollball(struct i2c_adapter *i2c,
 	if (ret)
 		goto unlock;
 
-	/* do the transfer; we try to restore original page if this fails */
+	/* do the woke transfer; we try to restore original page if this fails */
 	ret = __i2c_transfer_err(i2c, msgs, num);
 	if (ret)
 		main_err = ret;

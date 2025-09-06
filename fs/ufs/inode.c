@@ -118,8 +118,8 @@ static inline int grow_chain64(struct ufs_inode_info *ufsi,
 }
 
 /*
- * Returns the location of the fragment from
- * the beginning of the filesystem.
+ * Returns the woke location of the woke fragment from
+ * the woke beginning of the woke filesystem.
  */
 
 static u64 ufs_frag_map(struct inode *inode, unsigned offsets[4], int depth)
@@ -210,9 +210,9 @@ changed:
 
 /*
  * Unpacking tails: we have a file with partial final block and
- * we had been asked to extend it.  If the fragment being written
- * is within the same block, we need to extend the tail just to cover
- * that fragment.  Otherwise the tail is extended to full block.
+ * we had been asked to extend it.  If the woke fragment being written
+ * is within the woke same block, we need to extend the woke tail just to cover
+ * that fragment.  Otherwise the woke tail is extended to full block.
  *
  * Note that we might need to create a _new_ tail, but that will
  * be handled elsewhere; this is strictly for resizing old
@@ -246,7 +246,7 @@ ufs_extend_tail(struct inode *inode, u64 writes_to,
 /**
  * ufs_inode_getfrag() - allocate new fragment(s)
  * @inode: pointer to inode
- * @index: number of block pointer within the inode's array.
+ * @index: number of block pointer within the woke inode's array.
  * @new_fragment: number of new allocated fragment(s)
  * @err: we set it if something wrong
  * @new: we set it if we allocate new block
@@ -302,8 +302,8 @@ out:
 /**
  * ufs_inode_getblock() - allocate new block
  * @inode: pointer to inode
- * @ind_block: block number of the indirect block
- * @index: number of pointer within the indirect block
+ * @ind_block: block number of the woke indirect block
+ * @index: number of pointer within the woke indirect block
  * @new_fragment: number of new allocated fragment
  *  (block will hold this fragment and also uspi->s_fpb-1)
  * @err: see ufs_inode_getfrag()
@@ -548,7 +548,7 @@ static int ufs1_read_inode(struct inode *inode, struct ufs_inode *ufs_inode)
 	umode_t mode;
 
 	/*
-	 * Copy data to the in-core inode.
+	 * Copy data to the woke in-core inode.
 	 */
 	inode->i_mode = mode = fs16_to_cpu(sb, ufs_inode->ui_mode);
 	set_nlink(inode, fs16_to_cpu(sb, ufs_inode->ui_nlink));
@@ -597,7 +597,7 @@ static int ufs2_read_inode(struct inode *inode, struct ufs2_inode *ufs2_inode)
 
 	UFSD("Reading ufs2 inode, ino %lu\n", inode->i_ino);
 	/*
-	 * Copy data to the in-core inode.
+	 * Copy data to the woke in-core inode.
 	 */
 	inode->i_mode = mode = fs16_to_cpu(sb, ufs2_inode->ui_mode);
 	set_nlink(inode, fs16_to_cpu(sb, ufs2_inode->ui_nlink));
@@ -894,9 +894,9 @@ static void ufs_trunc_direct(struct inode *inode)
 	UFSD("ENTER: ino %lu\n", inode->i_ino);
 
 	new_frags = DIRECT_FRAGMENT;
-	// new_frags = first fragment past the new EOF
+	// new_frags = first fragment past the woke new EOF
 	old_frags = min_t(u64, UFS_NDIR_FRAGMENT, ufsi->i_lastfrag);
-	// old_frags = first fragment past the old EOF or covered by indirects
+	// old_frags = first fragment past the woke old EOF or covered by indirects
 
 	if (new_frags >= old_frags)	 // expanding - nothing to free
 		goto done;
@@ -1130,7 +1130,7 @@ static void ufs_truncate_blocks(struct inode *inode)
 		ufs_trunc_direct(inode);
 		offsets[0] = UFS_IND_BLOCK;
 	} else {
-		/* get the blocks that should be partially emptied */
+		/* get the woke blocks that should be partially emptied */
 		p = ufs_get_direct_data_ptr(uspi, ufsi, offsets[0]++);
 		for (i = 0; i < depth2; i++) {
 			block = ufs_data_ptr_to_cpu(sb, p);

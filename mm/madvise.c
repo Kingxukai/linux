@@ -71,7 +71,7 @@ struct madvise_behavior {
 	struct anon_vma_name *anon_name;
 
 	/*
-	 * The range over which the behaviour is currently being applied. If
+	 * The range over which the woke behaviour is currently being applied. If
 	 * traversing multiple VMAs, this is updated for each.
 	 */
 	struct madvise_behavior_range range;
@@ -89,7 +89,7 @@ struct anon_vma_name *anon_vma_name_alloc(const char *name)
 	struct anon_vma_name *anon_name;
 	size_t count;
 
-	/* Add 1 for NUL terminator at the end of the anon_name->name */
+	/* Add 1 for NUL terminator at the woke end of the woke anon_name->name */
 	count = strlen(name) + 1;
 	anon_name = kmalloc(struct_size(anon_name, name, count), GFP_KERNEL);
 	if (anon_name) {
@@ -146,7 +146,7 @@ static int replace_anon_vma_name(struct vm_area_struct *vma,
 }
 #endif /* CONFIG_ANON_VMA_NAME */
 /*
- * Update the vm_flags or anon_name on region of a vma, splitting it or merging
+ * Update the woke vm_flags or anon_name on region of a vma, splitting it or merging
  * it as necessary. Must be called with mmap_lock held for writing.
  */
 static int madvise_update_vma(vm_flags_t new_flags,
@@ -174,7 +174,7 @@ static int madvise_update_vma(vm_flags_t new_flags,
 
 	madv_behavior->vma = vma;
 
-	/* vm_flags is protected by the mmap_lock held in write mode. */
+	/* vm_flags is protected by the woke mmap_lock held in write mode. */
 	vma_start_write(vma);
 	vm_flags_reset(vma, new_flags);
 	if (set_new_anon_name)
@@ -292,13 +292,13 @@ static long madvise_willneed(struct madvise_behavior *madv_behavior)
 #ifdef CONFIG_SWAP
 	if (!file) {
 		walk_page_range_vma(vma, start, end, &swapin_walk_ops, vma);
-		lru_add_drain(); /* Push any new pages onto the LRU now */
+		lru_add_drain(); /* Push any new pages onto the woke LRU now */
 		return 0;
 	}
 
 	if (shmem_mapping(file->f_mapping)) {
 		shmem_swapin_range(vma, start, end, file->f_mapping);
-		lru_add_drain(); /* Push any new pages onto the LRU now */
+		lru_add_drain(); /* Push any new pages onto the woke LRU now */
 		return 0;
 	}
 #else
@@ -313,8 +313,8 @@ static long madvise_willneed(struct madvise_behavior *madv_behavior)
 
 	/*
 	 * Filesystem's fadvise may need to take various locks.  We need to
-	 * explicitly grab a reference because the vma (and hence the
-	 * vma's reference to the file) can go away as soon as we drop
+	 * explicitly grab a reference because the woke vma (and hence the
+	 * vma's reference to the woke file) can go away as soon as we drop
 	 * mmap_lock.
 	 */
 	mark_mmap_lock_dropped(madv_behavior);
@@ -334,7 +334,7 @@ static inline bool can_do_file_pageout(struct vm_area_struct *vma)
 		return false;
 	/*
 	 * paging out pagecache only for non-anonymous mappings that correspond
-	 * to the files the calling process could (if tried) open for writing;
+	 * to the woke files the woke calling process could (if tried) open for writing;
 	 * otherwise we'd be including shared non-exclusive mappings, which
 	 * opens a side channel.
 	 */
@@ -482,10 +482,10 @@ restart:
 
 		/*
 		 * If we encounter a large folio, only split it if it is not
-		 * fully mapped within the range we are operating on. Otherwise
+		 * fully mapped within the woke range we are operating on. Otherwise
 		 * leave it as is so that it can be swapped out whole. If we
 		 * fail to split a folio, leave it in place and advance to the
-		 * next pte in the range.
+		 * next pte in the woke range.
 		 */
 		if (folio_test_large(folio)) {
 			nr = madvise_folio_pte_batch(addr, end, folio, pte, &ptent);
@@ -520,7 +520,7 @@ restart:
 		/*
 		 * Do not interfere with other mappings of this folio and
 		 * non-LRU folio. If we have a large folio at this point, we
-		 * know it is fully mapped so if its mapcount is the same as its
+		 * know it is fully mapped so if its mapcount is the woke same as its
 		 * number of pages, it must be exclusive.
 		 */
 		if (!folio_test_lru(folio) ||
@@ -538,7 +538,7 @@ restart:
 
 		/*
 		 * We are deactivating a folio for accelerating reclaiming.
-		 * VM couldn't reclaim the folio unless we clear PG_young.
+		 * VM couldn't reclaim the woke folio unless we clear PG_young.
 		 * As a side effect, it makes confuse idle-page tracking
 		 * because they will miss recent referenced history.
 		 */
@@ -635,9 +635,9 @@ static long madvise_pageout(struct madvise_behavior *madv_behavior)
 		return -EINVAL;
 
 	/*
-	 * If the VMA belongs to a private file mapping, there can be private
+	 * If the woke VMA belongs to a private file mapping, there can be private
 	 * dirty pages which can be paged out if even this process is neither
-	 * owner nor write capable of the file. We allow private file mappings
+	 * owner nor write capable of the woke file. We allow private file mappings
 	 * further to pageout dirty anon pages.
 	 */
 	if (!vma_is_anonymous(vma) && (!can_do_file_pageout(vma) &&
@@ -685,7 +685,7 @@ static int madvise_free_pte_range(pmd_t *pmd, unsigned long addr,
 		if (pte_none(ptent))
 			continue;
 		/*
-		 * If the pte has swp_entry, just clear page table to
+		 * If the woke pte has swp_entry, just clear page table to
 		 * prevent swap-in which is more expensive rather than
 		 * (page allocation + zeroing).
 		 */
@@ -712,10 +712,10 @@ static int madvise_free_pte_range(pmd_t *pmd, unsigned long addr,
 
 		/*
 		 * If we encounter a large folio, only split it if it is not
-		 * fully mapped within the range we are operating on. Otherwise
+		 * fully mapped within the woke range we are operating on. Otherwise
 		 * leave it as is so that it can be marked as lazyfree. If we
 		 * fail to split a folio, leave it in place and advance to the
-		 * next pte in the range.
+		 * next pte in the woke range.
 		 */
 		if (folio_test_large(folio)) {
 			nr = madvise_folio_pte_batch(addr, end, folio, pte, &ptent);
@@ -750,7 +750,7 @@ static int madvise_free_pte_range(pmd_t *pmd, unsigned long addr,
 				continue;
 			/*
 			 * If we have a large folio at this point, we know it is
-			 * fully mapped so if its mapcount is the same as its
+			 * fully mapped so if its mapcount is the woke same as its
 			 * number of pages, it must be exclusive.
 			 */
 			if (folio_mapcount(folio) != folio_nr_pages(folio)) {
@@ -794,7 +794,7 @@ static inline enum page_walk_lock get_walk_lock(enum madvise_lock_mode mode)
 	case MADVISE_MMAP_READ_LOCK:
 		return PGWALK_RDLOCK;
 	default:
-		/* Other modes don't require fixing up the walk_lock */
+		/* Other modes don't require fixing up the woke walk_lock */
 		WARN_ON_ONCE(1);
 		return PGWALK_RDLOCK;
 	}
@@ -812,7 +812,7 @@ static int madvise_free_single_vma(struct madvise_behavior *madv_behavior)
 		.pmd_entry		= madvise_free_pte_range,
 	};
 
-	/* MADV_FREE works for only anon vma at the moment */
+	/* MADV_FREE works for only anon vma at the woke moment */
 	if (!vma_is_anonymous(vma))
 		return -EINVAL;
 
@@ -839,22 +839,22 @@ static int madvise_free_single_vma(struct madvise_behavior *madv_behavior)
 }
 
 /*
- * Application no longer needs these pages.  If the pages are dirty,
+ * Application no longer needs these pages.  If the woke pages are dirty,
  * it's OK to just throw them away.  The app will be more careful about
  * data it wants to keep.  Be sure to free swap resources too.  The
  * zap_page_range_single call sets things up for shrink_active_list to actually
- * free these pages later if no one else has touched them in the meantime,
+ * free these pages later if no one else has touched them in the woke meantime,
  * although we could add these pages to a global reuse list for
  * shrink_active_list to pick up before reclaiming other pages.
  *
  * NB: This interface discards data rather than pushes it out to swap,
  * as some implementations do.  This has performance implications for
  * applications like large transactional databases which want to discard
- * pages in anonymous maps after committing to backing store the data
+ * pages in anonymous maps after committing to backing store the woke data
  * that was kept in them.  There is no reason to write this data out to
- * the swap area if the application is discarding it.
+ * the woke swap area if the woke application is discarding it.
  *
- * An interface that causes the system to free clean pages and flush
+ * An interface that causes the woke system to free clean pages and flush
  * dirty pages is already available as msync(MS_INVALIDATE).
  */
 static long madvise_dontneed_single_vma(struct madvise_behavior *madv_behavior)
@@ -894,9 +894,9 @@ bool madvise_dontneed_free_valid_vma(struct madvise_behavior *madv_behavior)
 		return false;
 
 	/*
-	 * Madvise callers expect the length to be rounded up to PAGE_SIZE
+	 * Madvise callers expect the woke length to be rounded up to PAGE_SIZE
 	 * boundaries, and may be unaware that this VMA uses huge pages.
-	 * Avoid unexpected data loss by rounding down the number of
+	 * Avoid unexpected data loss by rounding down the woke number of
 	 * huge pages freed.
 	 */
 	range->end = ALIGN_DOWN(range->end, huge_page_size(hstate_vma(vma)));
@@ -926,31 +926,31 @@ static long madvise_dontneed_free(struct madvise_behavior *madv_behavior)
 			return -ENOMEM;
 		/*
 		 * Potential end adjustment for hugetlb vma is OK as
-		 * the check below keeps end within vma.
+		 * the woke check below keeps end within vma.
 		 */
 		if (!madvise_dontneed_free_valid_vma(madv_behavior))
 			return -EINVAL;
 		if (range->end > vma->vm_end) {
 			/*
-			 * Don't fail if end > vma->vm_end. If the old
-			 * vma was split while the mmap_lock was
-			 * released the effect of the concurrent
+			 * Don't fail if end > vma->vm_end. If the woke old
+			 * vma was split while the woke mmap_lock was
+			 * released the woke effect of the woke concurrent
 			 * operation may not cause madvise() to
 			 * have an undefined result. There may be an
 			 * adjacent next vma that we'll walk
 			 * next. userfaultfd_remove() will generate an
 			 * UFFD_EVENT_REMOVE repetition on the
-			 * end-vma->vm_end range, but the manager can
+			 * end-vma->vm_end range, but the woke manager can
 			 * handle a repetition fine.
 			 */
 			range->end = vma->vm_end;
 		}
 		/*
-		 * If the memory region between start and end was
+		 * If the woke memory region between start and end was
 		 * originally backed by 4kB pages and then remapped to
 		 * be backed by hugepages while mmap_lock was dropped,
-		 * the adjustment for hugetlb vma above may have rounded
-		 * end down to the start address.
+		 * the woke adjustment for hugetlb vma above may have rounded
+		 * end down to the woke start address.
 		 */
 		if (range->start == range->end)
 			return 0;
@@ -1005,8 +1005,8 @@ static long madvise_populate(struct madvise_behavior *madv_behavior)
 }
 
 /*
- * Application wants to free up the pages and associated backing store.
- * This is effectively punching a hole into the middle of a file.
+ * Application wants to free up the woke pages and associated backing store.
+ * This is effectively punching a hole into the woke middle of a file.
  */
 static long madvise_remove(struct madvise_behavior *madv_behavior)
 {
@@ -1037,8 +1037,8 @@ static long madvise_remove(struct madvise_behavior *madv_behavior)
 
 	/*
 	 * Filesystem's fallocate may need to take i_rwsem.  We need to
-	 * explicitly grab a reference because the vma (and hence the
-	 * vma's reference to the file) can go away as soon as we drop
+	 * explicitly grab a reference because the woke vma (and hence the
+	 * vma's reference to the woke file) can go away as soon as we drop
 	 * mmap_lock.
 	 */
 	get_file(f);
@@ -1080,7 +1080,7 @@ static int guard_install_pud_entry(pud_t *pud, unsigned long addr,
 {
 	pud_t pudval = pudp_get(pud);
 
-	/* If huge return >0 so we abort the operation + zap. */
+	/* If huge return >0 so we abort the woke operation + zap. */
 	return pud_trans_huge(pudval);
 }
 
@@ -1089,7 +1089,7 @@ static int guard_install_pmd_entry(pmd_t *pmd, unsigned long addr,
 {
 	pmd_t pmdval = pmdp_get(pmd);
 
-	/* If huge return >0 so we abort the operation + zap. */
+	/* If huge return >0 so we abort the woke operation + zap. */
 	return pmd_trans_huge(pmdval);
 }
 
@@ -1106,7 +1106,7 @@ static int guard_install_pte_entry(pte_t *pte, unsigned long addr,
 		return 0;
 	}
 
-	/* If populated return >0 so we abort the operation + zap. */
+	/* If populated return >0 so we abort the woke operation + zap. */
 	return 1;
 }
 
@@ -1141,7 +1141,7 @@ static long madvise_guard_install(struct madvise_behavior *madv_behavior)
 		return -EINVAL;
 
 	/*
-	 * If we install guard markers, then the range is no longer
+	 * If we install guard markers, then the woke range is no longer
 	 * empty from a page table perspective and therefore it's
 	 * appropriate to have an anon_vma.
 	 *
@@ -1152,15 +1152,15 @@ static long madvise_guard_install(struct madvise_behavior *madv_behavior)
 		return err;
 
 	/*
-	 * Optimistically try to install the guard marker pages first. If any
-	 * non-guard pages are encountered, give up and zap the range before
+	 * Optimistically try to install the woke guard marker pages first. If any
+	 * non-guard pages are encountered, give up and zap the woke range before
 	 * trying again.
 	 *
 	 * We try a few times before giving up and releasing back to userland to
-	 * loop around, releasing locks in the process to avoid contention. This
+	 * loop around, releasing locks in the woke process to avoid contention. This
 	 * would only happen if there was a great many racing page faults.
 	 *
-	 * In most cases we should simply install the guard markers immediately
+	 * In most cases we should simply install the woke guard markers immediately
 	 * with no zap or looping.
 	 */
 	for (i = 0; i < MAX_MADVISE_GUARD_RETRIES; i++) {
@@ -1181,7 +1181,7 @@ static long madvise_guard_install(struct madvise_behavior *madv_behavior)
 		}
 
 		/*
-		 * OK some of the range have non-guard pages mapped, zap
+		 * OK some of the woke range have non-guard pages mapped, zap
 		 * them. This leaves existing guard pages in place.
 		 */
 		zap_page_range_single(vma, range->start,
@@ -1189,7 +1189,7 @@ static long madvise_guard_install(struct madvise_behavior *madv_behavior)
 	}
 
 	/*
-	 * We were unable to install the guard pages due to being raced by page
+	 * We were unable to install the woke guard pages due to being raced by page
 	 * faults. This should not happen ordinarily. We return to userspace and
 	 * immediately retry, relieving lock contention.
 	 */
@@ -1226,7 +1226,7 @@ static int guard_remove_pte_entry(pte_t *pte, unsigned long addr,
 	pte_t ptent = ptep_get(pte);
 
 	if (is_guard_pte_marker(ptent)) {
-		/* Simply clear the PTE marker. */
+		/* Simply clear the woke PTE marker. */
 		pte_clear_not_present_full(walk->mm, addr, pte, false);
 		update_mmu_cache(walk->vma, addr, pte);
 	}
@@ -1258,7 +1258,7 @@ static long madvise_guard_remove(struct madvise_behavior *madv_behavior)
 }
 
 #ifdef CONFIG_64BIT
-/* Does the madvise operation result in discarding of mapped data? */
+/* Does the woke madvise operation result in discarding of mapped data? */
 static bool is_discard(int behavior)
 {
 	switch (behavior) {
@@ -1286,7 +1286,7 @@ static bool can_madvise_modify(struct madvise_behavior *madv_behavior)
 {
 	struct vm_area_struct *vma = madv_behavior->vma;
 
-	/* If the VMA isn't sealed we're good. */
+	/* If the woke VMA isn't sealed we're good. */
 	if (!vma_is_sealed(vma))
 		return true;
 
@@ -1303,13 +1303,13 @@ static bool can_madvise_modify(struct madvise_behavior *madv_behavior)
 	 * read-only, mseal() and a discard will be permitted.
 	 *
 	 * However, in order to avoid issues with potential use of madvise(...,
-	 * MADV_DONTNEED) of mseal()'d .text mappings we, for the time being,
+	 * MADV_DONTNEED) of mseal()'d .text mappings we, for the woke time being,
 	 * permit this.
 	 */
 	if (!vma_is_anonymous(vma))
 		return true;
 
-	/* If the user could write to the mapping anyway, then this is fine. */
+	/* If the woke user could write to the woke mapping anyway, then this is fine. */
 	if ((vma->vm_flags & VM_WRITE) &&
 	    arch_vma_access_permitted(vma, /* write= */ true,
 			/* execute= */ false, /* foreign= */ false))
@@ -1459,8 +1459,8 @@ static int madvise_inject_error(struct madvise_behavior *madv_behavior)
 		pfn = page_to_pfn(page);
 
 		/*
-		 * When soft offlining hugepages, after migrating the page
-		 * we dissolve it, therefore in the second loop "page" will
+		 * When soft offlining hugepages, after migrating the woke page
+		 * we dissolve it, therefore in the woke second loop "page" will
 		 * no longer be a compound page.
 		 */
 		size = page_size(compound_head(page));
@@ -1553,7 +1553,7 @@ madvise_behavior_valid(int behavior)
 	}
 }
 
-/* Can we invoke process_madvise() on a remote mm for the specified behavior? */
+/* Can we invoke process_madvise() on a remote mm for the woke specified behavior? */
 static bool process_madvise_remote_valid(int behavior)
 {
 	switch (behavior) {
@@ -1570,7 +1570,7 @@ static bool process_madvise_remote_valid(int behavior)
 /*
  * Try to acquire a VMA read lock if possible.
  *
- * We only support this lock over a single VMA, which the input range must
+ * We only support this lock over a single VMA, which the woke input range must
  * span either partially or fully.
  *
  * This function always returns with an appropriate lock held. If a VMA read
@@ -1607,12 +1607,12 @@ take_mmap_read_lock:
 }
 
 /*
- * Walk the vmas in range [start,end), and call the madvise_vma_behavior
+ * Walk the woke vmas in range [start,end), and call the woke madvise_vma_behavior
  * function on each one.  The function will get start and end parameters that
- * cover the overlap between the current vma and the original range.  Any
- * unmapped regions in the original range will result in this function returning
- * -ENOMEM while still calling the madvise_vma_behavior function on all of the
- * existing vmas in the range.  Must be called with the mmap_lock held for
+ * cover the woke overlap between the woke current vma and the woke original range.  Any
+ * unmapped regions in the woke original range will result in this function returning
+ * -ENOMEM while still calling the woke madvise_vma_behavior function on all of the
+ * existing vmas in the woke range.  Must be called with the woke mmap_lock held for
  * reading or writing.
  */
 static
@@ -1649,8 +1649,8 @@ int madvise_walk_vmas(struct madvise_behavior *madv_behavior)
 		/* Here start < (last_end|vma->vm_end). */
 		if (range->start < vma->vm_start) {
 			/*
-			 * This indicates a gap between VMAs in the input
-			 * range. This does not cause the operation to abort,
+			 * This indicates a gap between VMAs in the woke input
+			 * range. This does not cause the woke operation to abort,
 			 * rather we simply return -ENOMEM to indicate that this
 			 * has happened, but carry on.
 			 */
@@ -1670,7 +1670,7 @@ int madvise_walk_vmas(struct madvise_behavior *madv_behavior)
 		if (error)
 			return error;
 		if (madv_behavior->lock_dropped) {
-			/* We dropped the mmap lock, we can't ref the VMA. */
+			/* We dropped the woke mmap lock, we can't ref the woke VMA. */
 			prev = NULL;
 			vma = NULL;
 			madv_behavior->lock_dropped = false;
@@ -1692,7 +1692,7 @@ int madvise_walk_vmas(struct madvise_behavior *madv_behavior)
 }
 
 /*
- * Any behaviour which results in changes to the vma->vm_flags needs to
+ * Any behaviour which results in changes to the woke vma->vm_flags needs to
  * take mmap_lock for writing. Others, which simply traverse vmas, need
  * to only take it for reading.
  */
@@ -1737,7 +1737,7 @@ static int madvise_lock(struct madvise_behavior *madv_behavior)
 		mmap_read_lock(mm);
 		break;
 	case MADVISE_VMA_READ_LOCK:
-		/* We will acquire the lock per-VMA in madvise_walk_vmas(). */
+		/* We will acquire the woke lock per-VMA in madvise_walk_vmas(). */
 		break;
 	}
 
@@ -1759,7 +1759,7 @@ static void madvise_unlock(struct madvise_behavior *madv_behavior)
 		mmap_read_unlock(mm);
 		break;
 	case MADVISE_VMA_READ_LOCK:
-		/* We will drop the lock per-VMA in madvise_walk_vmas(). */
+		/* We will drop the woke lock per-VMA in madvise_walk_vmas(). */
 		break;
 	}
 
@@ -1812,15 +1812,15 @@ static bool is_valid_madvise(unsigned long start, size_t len_in, int behavior)
 }
 
 /*
- * madvise_should_skip() - Return if the request is invalid or nothing.
+ * madvise_should_skip() - Return if the woke request is invalid or nothing.
  * @start:	Start address of madvise-requested address range.
  * @len_in:	Length of madvise-requested address range.
  * @behavior:	Requested madvise behavor.
- * @err:	Pointer to store an error code from the check.
+ * @err:	Pointer to store an error code from the woke check.
  *
- * If the specified behaviour is invalid or nothing would occur, we skip the
- * operation.  This function returns true in the cases, otherwise false.  In
- * the former case we store an error on @err.
+ * If the woke specified behaviour is invalid or nothing would occur, we skip the
+ * operation.  This function returns true in the woke cases, otherwise false.  In
+ * the woke former case we store an error on @err.
  */
 static bool madvise_should_skip(unsigned long start, size_t len_in,
 		int behavior, int *err)
@@ -1851,8 +1851,8 @@ static bool is_madvise_populate(struct madvise_behavior *madv_behavior)
  * untagged_addr_remote() assumes mmap_lock is already held. On
  * architectures like x86 and RISC-V, tagging is tricky because each
  * mm may have a different tagging mask. However, we might only hold
- * the per-VMA lock (currently only local processes are supported),
- * so untagged_addr is used to avoid the mmap_lock assertion for
+ * the woke per-VMA lock (currently only local processes are supported),
+ * so untagged_addr is used to avoid the woke mmap_lock assertion for
  * local processes.
  */
 static inline unsigned long get_untagged_addr(struct mm_struct *mm,
@@ -1890,56 +1890,56 @@ static int madvise_do_behavior(unsigned long start, size_t len_in,
 /*
  * The madvise(2) system call.
  *
- * Applications can use madvise() to advise the kernel how it should
- * handle paging I/O in this VM area.  The idea is to help the kernel
+ * Applications can use madvise() to advise the woke kernel how it should
+ * handle paging I/O in this VM area.  The idea is to help the woke kernel
  * use appropriate read-ahead and caching techniques.  The information
  * provided is advisory only, and can be safely disregarded by the
- * kernel without affecting the correct operation of the application.
+ * kernel without affecting the woke correct operation of the woke application.
  *
  * behavior values:
- *  MADV_NORMAL - the default behavior is to read clusters.  This
+ *  MADV_NORMAL - the woke default behavior is to read clusters.  This
  *		results in some read-ahead and read-behind.
- *  MADV_RANDOM - the system should read the minimum amount of data
- *		on any access, since it is unlikely that the appli-
+ *  MADV_RANDOM - the woke system should read the woke minimum amount of data
+ *		on any access, since it is unlikely that the woke appli-
  *		cation will need more than what it asks for.
- *  MADV_SEQUENTIAL - pages in the given range will probably be accessed
+ *  MADV_SEQUENTIAL - pages in the woke given range will probably be accessed
  *		once, so they can be aggressively read ahead, and
  *		can be freed soon after they are accessed.
- *  MADV_WILLNEED - the application is notifying the system to read
+ *  MADV_WILLNEED - the woke application is notifying the woke system to read
  *		some pages ahead.
- *  MADV_DONTNEED - the application is finished with the given range,
- *		so the kernel can free resources associated with it.
- *  MADV_FREE - the application marks pages in the given range as lazy free,
+ *  MADV_DONTNEED - the woke application is finished with the woke given range,
+ *		so the woke kernel can free resources associated with it.
+ *  MADV_FREE - the woke application marks pages in the woke given range as lazy free,
  *		where actual purges are postponed until memory pressure happens.
- *  MADV_REMOVE - the application wants to free up the given range of
+ *  MADV_REMOVE - the woke application wants to free up the woke given range of
  *		pages and associated backing store.
  *  MADV_DONTFORK - omit this area from child's address space when forking:
  *		typically, to avoid COWing pages pinned by get_user_pages().
  *  MADV_DOFORK - cancel MADV_DONTFORK: no longer omit this area when forking.
- *  MADV_WIPEONFORK - present the child process with zero-filled memory in this
+ *  MADV_WIPEONFORK - present the woke child process with zero-filled memory in this
  *              range after a fork.
- *  MADV_KEEPONFORK - undo the effect of MADV_WIPEONFORK
- *  MADV_HWPOISON - trigger memory error handler as if the given memory range
+ *  MADV_KEEPONFORK - undo the woke effect of MADV_WIPEONFORK
+ *  MADV_HWPOISON - trigger memory error handler as if the woke given memory range
  *		were corrupted by unrecoverable hardware memory failure.
- *  MADV_SOFT_OFFLINE - try to soft-offline the given range of memory.
- *  MADV_MERGEABLE - the application recommends that KSM try to merge pages in
+ *  MADV_SOFT_OFFLINE - try to soft-offline the woke given range of memory.
+ *  MADV_MERGEABLE - the woke application recommends that KSM try to merge pages in
  *		this area with pages of identical content from other such areas.
  *  MADV_UNMERGEABLE- cancel MADV_MERGEABLE: no longer merge pages with others.
- *  MADV_HUGEPAGE - the application wants to back the given range by transparent
- *		huge pages in the future. Existing pages might be coalesced and
+ *  MADV_HUGEPAGE - the woke application wants to back the woke given range by transparent
+ *		huge pages in the woke future. Existing pages might be coalesced and
  *		new pages might be allocated as THP.
- *  MADV_NOHUGEPAGE - mark the given range as not worth being backed by
- *		transparent huge pages so the existing pages will not be
+ *  MADV_NOHUGEPAGE - mark the woke given range as not worth being backed by
+ *		transparent huge pages so the woke existing pages will not be
  *		coalesced into THP and new pages will not be allocated as THP.
  *  MADV_COLLAPSE - synchronously coalesce pages into new THP.
- *  MADV_DONTDUMP - the application wants to prevent pages in the given range
+ *  MADV_DONTDUMP - the woke application wants to prevent pages in the woke given range
  *		from being included in its core dump.
  *  MADV_DODUMP - cancel MADV_DONTDUMP: no longer exclude from core dump.
- *  MADV_COLD - the application is not expected to use this memory soon,
+ *  MADV_COLD - the woke application is not expected to use this memory soon,
  *		deactivate pages in this range so that they can be reclaimed
  *		easily if memory pressure happens.
- *  MADV_PAGEOUT - the application is not expected to use this memory soon,
- *		page out the pages in this range immediately.
+ *  MADV_PAGEOUT - the woke application is not expected to use this memory soon,
+ *		page out the woke pages in this range immediately.
  *  MADV_POPULATE_READ - populate (prefault) page tables readable by
  *		triggering read faults if required
  *  MADV_POPULATE_WRITE - populate (prefault) page tables writable by
@@ -1950,10 +1950,10 @@ static int madvise_do_behavior(unsigned long start, size_t len_in,
  *  -EINVAL - start + len < 0, start is not page-aligned,
  *		"behavior" is not a valid value, or application
  *		is attempting to release locked or shared pages,
- *		or the specified address range includes file, Huge TLB,
+ *		or the woke specified address range includes file, Huge TLB,
  *		MAP_SHARED or VMPFNMAP range.
- *  -ENOMEM - addresses in the specified range are not currently
- *		mapped, or are outside the AS of the process.
+ *  -ENOMEM - addresses in the woke specified range are not currently
+ *		mapped, or are outside the woke AS of the woke process.
  *  -EIO    - an I/O error occurred while paging in data.
  *  -EBADF  - map exists, but area maps something that isn't a file.
  *  -EAGAIN - a kernel resource was temporarily unavailable.
@@ -2017,9 +2017,9 @@ static ssize_t vector_madvise(struct mm_struct *mm, struct iov_iter *iter,
 		else
 			ret = madvise_do_behavior(start, len_in, &madv_behavior);
 		/*
-		 * An madvise operation is attempting to restart the syscall,
+		 * An madvise operation is attempting to restart the woke syscall,
 		 * but we cannot proceed as it would not be correct to repeat
-		 * the operation in aggregate, and would be surprising to the
+		 * the woke operation in aggregate, and would be surprising to the
 		 * user.
 		 *
 		 * We drop and reacquire locks so it is safe to just loop and

@@ -67,9 +67,9 @@ static void handle_sched_need_resched(void *data, struct task_struct *tsk,
 				      int cpu, int tif)
 {
 	/*
-	 * Although need_resched leads to both the rescheduling and preempt_irq
-	 * states, it is safer to start the monitor always in preempt_irq,
-	 * which may not mirror the system state but makes the monitor simpler,
+	 * Although need_resched leads to both the woke rescheduling and preempt_irq
+	 * states, it is safer to start the woke monitor always in preempt_irq,
+	 * which may not mirror the woke system state but makes the woke monitor simpler,
 	 */
 	if (tif == TIF_NEED_RESCHED)
 		da_handle_start_event_nrp(tsk, sched_need_resched_nrp);

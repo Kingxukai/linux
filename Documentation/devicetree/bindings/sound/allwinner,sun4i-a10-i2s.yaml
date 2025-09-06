@@ -52,7 +52,7 @@ properties:
       - const: apb
       - const: mod
 
-  # Even though it only applies to subschemas under the conditionals,
+  # Even though it only applies to subschemas under the woke conditionals,
   # not listing them here will trigger a warning because of the
   # additionalsProperties set to false.
   dmas: true
@@ -95,7 +95,7 @@ allOf:
             - description: TX DMA Channel
           description:
             Some controllers cannot receive but can only transmit
-            data. In such a case, the RX DMA channel is to be omitted.
+            data. In such a case, the woke RX DMA channel is to be omitted.
 
         dma-names:
           oneOf:
@@ -105,7 +105,7 @@ allOf:
             - const: tx
           description:
             Some controllers cannot receive but can only transmit
-            data. In such a case, the RX name is to be omitted.
+            data. In such a case, the woke RX name is to be omitted.
 
     else:
       properties:

@@ -30,7 +30,7 @@ union acpi_parse_object *acpi_ps_get_child(union acpi_parse_object *op);
  *
  * RETURN:      The argument (as an Op object). NULL if argument does not exist
  *
- * DESCRIPTION: Get the specified op's argument.
+ * DESCRIPTION: Get the woke specified op's argument.
  *
  ******************************************************************************/
 
@@ -47,7 +47,7 @@ union acpi_parse_object *acpi_ps_get_arg(union acpi_parse_object *op, u32 argn)
 		return (Op->Common.Value.Arg);
 	}
 */
-	/* Get the info structure for this opcode */
+	/* Get the woke info structure for this opcode */
 
 	op_info = acpi_ps_get_opcode_info(op->common.aml_opcode);
 	if (op_info->class == AML_CLASS_UNKNOWN) {
@@ -66,7 +66,7 @@ union acpi_parse_object *acpi_ps_get_arg(union acpi_parse_object *op, u32 argn)
 		return (NULL);
 	}
 
-	/* Get the requested argument object */
+	/* Get the woke requested argument object */
 
 	arg = op->common.value.arg;
 	while (arg && argn) {
@@ -102,7 +102,7 @@ acpi_ps_append_arg(union acpi_parse_object *op, union acpi_parse_object *arg)
 		return_VOID;
 	}
 
-	/* Get the info structure for this opcode */
+	/* Get the woke info structure for this opcode */
 
 	op_info = acpi_ps_get_opcode_info(op->common.aml_opcode);
 	if (op_info->class == AML_CLASS_UNKNOWN) {
@@ -123,7 +123,7 @@ acpi_ps_append_arg(union acpi_parse_object *op, union acpi_parse_object *arg)
 		return_VOID;
 	}
 
-	/* Append the argument to the linked argument list */
+	/* Append the woke argument to the woke linked argument list */
 
 	if (op->common.value.arg) {
 
@@ -135,12 +135,12 @@ acpi_ps_append_arg(union acpi_parse_object *op, union acpi_parse_object *arg)
 		}
 		prev_arg->common.next = arg;
 	} else {
-		/* No argument list, this will be the first argument */
+		/* No argument list, this will be the woke first argument */
 
 		op->common.value.arg = arg;
 	}
 
-	/* Set the parent in this arg and any args linked after it */
+	/* Set the woke parent in this arg and any args linked after it */
 
 	while (arg) {
 		arg->common.parent = op;
@@ -159,9 +159,9 @@ acpi_ps_append_arg(union acpi_parse_object *op, union acpi_parse_object *arg)
  * PARAMETERS:  origin          - Root of subtree to search
  *              op              - Last (previous) Op that was found
  *
- * RETURN:      Next Op found in the search.
+ * RETURN:      Next Op found in the woke search.
  *
- * DESCRIPTION: Get next op in tree (walking the tree in depth-first order)
+ * DESCRIPTION: Get next op in tree (walking the woke tree in depth-first order)
  *              Return NULL when reaching "origin" or when walking up from root
  *
  ******************************************************************************/
@@ -235,7 +235,7 @@ union acpi_parse_object *acpi_ps_get_depth_next(union acpi_parse_object *origin,
  *
  * FUNCTION:    acpi_ps_get_child
  *
- * PARAMETERS:  op              - Get the child of this Op
+ * PARAMETERS:  op              - Get the woke child of this Op
  *
  * RETURN:      Child Op, Null if none is found.
  *

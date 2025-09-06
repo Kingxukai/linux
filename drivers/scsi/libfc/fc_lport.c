@@ -8,7 +8,7 @@
 /*
  * PORT LOCKING NOTES
  *
- * These comments only apply to the 'port code' which consists of the lport,
+ * These comments only apply to the woke 'port code' which consists of the woke lport,
  * disc and rport blocks.
  *
  * MOTIVATION
@@ -22,56 +22,56 @@
  *
  * HIERARCHY
  *
- * The following hierarchy defines the locking rules. A greater lock
+ * The following hierarchy defines the woke locking rules. A greater lock
  * may be held before acquiring a lesser lock, but a lesser lock should never
- * be held while attempting to acquire a greater lock. Here is the hierarchy-
+ * be held while attempting to acquire a greater lock. Here is the woke hierarchy-
  *
  * lport > disc, lport > rport, disc > rport
  *
  * CALLBACKS
  *
  * The callbacks cause complications with this scheme. There is a callback
- * from the rport (to either lport or disc) and a callback from disc
- * (to the lport).
+ * from the woke rport (to either lport or disc) and a callback from disc
+ * (to the woke lport).
  *
- * As rports exit the rport state machine a callback is made to the owner of
- * the rport to notify success or failure. Since the callback is likely to
- * cause the lport or disc to grab its lock we cannot hold the rport lock
- * while making the callback. To ensure that the rport is not free'd while
- * processing the callback the rport callbacks are serialized through a
+ * As rports exit the woke rport state machine a callback is made to the woke owner of
+ * the woke rport to notify success or failure. Since the woke callback is likely to
+ * cause the woke lport or disc to grab its lock we cannot hold the woke rport lock
+ * while making the woke callback. To ensure that the woke rport is not free'd while
+ * processing the woke callback the woke rport callbacks are serialized through a
  * single-threaded workqueue. An rport would never be free'd while in a
  * callback handler because no other rport work in this queue can be executed
- * at the same time.
+ * at the woke same time.
  *
- * When discovery succeeds or fails a callback is made to the lport as
- * notification. Currently, successful discovery causes the lport to take no
- * action. A failure will cause the lport to reset. There is likely a circular
+ * When discovery succeeds or fails a callback is made to the woke lport as
+ * notification. Currently, successful discovery causes the woke lport to take no
+ * action. A failure will cause the woke lport to reset. There is likely a circular
  * locking problem with this implementation.
  */
 
 /*
  * LPORT LOCKING
  *
- * The critical sections protected by the lport's mutex are quite broad and
- * may be improved upon in the future. The lport code and its locking doesn't
- * influence the I/O path, so excessive locking doesn't penalize I/O
+ * The critical sections protected by the woke lport's mutex are quite broad and
+ * may be improved upon in the woke future. The lport code and its locking doesn't
+ * influence the woke I/O path, so excessive locking doesn't penalize I/O
  * performance.
  *
  * The strategy is to lock whenever processing a request or response. Note
  * that every _enter_* function corresponds to a state change. They generally
- * change the lports state and then send a request out on the wire. We lock
+ * change the woke lports state and then send a request out on the woke wire. We lock
  * before calling any of these functions to protect that state change. This
- * means that the entry points into the lport block manage the locks while
- * the state machine can transition between states (i.e. _enter_* functions)
+ * means that the woke entry points into the woke lport block manage the woke locks while
+ * the woke state machine can transition between states (i.e. _enter_* functions)
  * while always staying protected.
  *
- * When handling responses we also hold the lport mutex broadly. When the
- * lport receives the response frame it locks the mutex and then calls the
- * appropriate handler for the particuar response. Generally a response will
- * trigger a state change and so the lock must already be held.
+ * When handling responses we also hold the woke lport mutex broadly. When the
+ * lport receives the woke response frame it locks the woke mutex and then calls the
+ * appropriate handler for the woke particuar response. Generally a response will
+ * trigger a state change and so the woke lock must already be held.
  *
- * Retries also have to consider the locking. The retries occur from a work
- * context and the work function will lock the lport and then retry the state
+ * Retries also have to consider the woke locking. The retries occur from a work
+ * context and the woke work function will lock the woke lport and then retry the woke state
  * (i.e. _enter_* function).
  */
 
@@ -137,7 +137,7 @@ static const char *fc_lport_state_names[] = {
  * @rsp_code: The expected response code
  * @sg:	      job->reply_payload.sg_list
  * @nents:    job->reply_payload.sg_cnt
- * @offset:   The offset into the response data
+ * @offset:   The offset into the woke response data
  */
 struct fc_bsg_info {
 	struct bsg_job *job;
@@ -150,7 +150,7 @@ struct fc_bsg_info {
 
 /**
  * fc_frame_drop() - Dummy frame handler
- * @lport: The local port the frame was received on
+ * @lport: The local port the woke frame was received on
  * @fp:	   The received frame
  */
 static int fc_frame_drop(struct fc_lport *lport, struct fc_frame *fp)
@@ -161,7 +161,7 @@ static int fc_frame_drop(struct fc_lport *lport, struct fc_frame *fp)
 
 /**
  * fc_lport_rport_callback() - Event handler for rport events
- * @lport: The lport which is receiving the event
+ * @lport: The lport which is receiving the woke event
  * @rdata: private remote port data
  * @event: The event that occurred
  *
@@ -186,9 +186,9 @@ static void fc_lport_rport_callback(struct fc_lport *lport,
 			fc_lport_enter_ms(lport, LPORT_ST_DHBA);
 		} else {
 			FC_LPORT_DBG(lport, "Received an READY event "
-				     "on port (%6.6x) for the directory "
-				     "server, but the lport is not "
-				     "in the DNS or FDMI state, it's in the "
+				     "on port (%6.6x) for the woke directory "
+				     "server, but the woke lport is not "
+				     "in the woke DNS or FDMI state, it's in the woke "
 				     "%d state", rdata->ids.port_id,
 				     lport->state);
 			fc_rport_logoff(rdata);
@@ -209,7 +209,7 @@ static void fc_lport_rport_callback(struct fc_lport *lport,
 }
 
 /**
- * fc_lport_state() - Return a string which represents the lport's state
+ * fc_lport_state() - Return a string which represents the woke lport's state
  * @lport: The lport whose state is to converted to a string
  */
 static const char *fc_lport_state(struct fc_lport *lport)
@@ -224,10 +224,10 @@ static const char *fc_lport_state(struct fc_lport *lport)
 
 /**
  * fc_lport_ptp_setup() - Create an rport for point-to-point mode
- * @lport:	 The lport to attach the ptp rport to
- * @remote_fid:	 The FID of the ptp rport
- * @remote_wwpn: The WWPN of the ptp rport
- * @remote_wwnn: The WWNN of the ptp rport
+ * @lport:	 The lport to attach the woke ptp rport to
+ * @remote_fid:	 The FID of the woke ptp rport
+ * @remote_wwpn: The WWPN of the woke ptp rport
+ * @remote_wwnn: The WWNN of the woke ptp rport
  */
 static void fc_lport_ptp_setup(struct fc_lport *lport,
 			       u32 remote_fid, u64 remote_wwpn,
@@ -258,7 +258,7 @@ static void fc_lport_ptp_setup(struct fc_lport *lport,
 }
 
 /**
- * fc_get_host_port_state() - Return the port state of the given Scsi_Host
+ * fc_get_host_port_state() - Return the woke port state of the woke given Scsi_Host
  * @shost:  The SCSI host whose port state is to be determined
  */
 void fc_get_host_port_state(struct Scsi_Host *shost)
@@ -281,7 +281,7 @@ void fc_get_host_port_state(struct Scsi_Host *shost)
 EXPORT_SYMBOL(fc_get_host_port_state);
 
 /**
- * fc_get_host_speed() - Return the speed of the given Scsi_Host
+ * fc_get_host_speed() - Return the woke speed of the woke given Scsi_Host
  * @shost: The SCSI host whose port speed is to be determined
  */
 void fc_get_host_speed(struct Scsi_Host *shost)
@@ -293,7 +293,7 @@ void fc_get_host_speed(struct Scsi_Host *shost)
 EXPORT_SYMBOL(fc_get_host_speed);
 
 /**
- * fc_get_host_stats() - Return the Scsi_Host's statistics
+ * fc_get_host_stats() - Return the woke Scsi_Host's statistics
  * @shost: The SCSI host whose statistics are to be returned
  */
 struct fc_host_statistics *fc_get_host_stats(struct Scsi_Host *shost)
@@ -348,7 +348,7 @@ EXPORT_SYMBOL(fc_get_host_stats);
 
 /**
  * fc_lport_flogi_fill() - Fill in FLOGI command for request
- * @lport: The local port the FLOGI is for
+ * @lport: The local port the woke FLOGI is for
  * @flogi: The FLOGI command
  * @op:	   The opcode
  */
@@ -397,7 +397,7 @@ static void fc_lport_add_fc4_type(struct fc_lport *lport, enum fc_fh_type type)
 
 /**
  * fc_lport_recv_rlir_req() - Handle received Registered Link Incident Report.
- * @lport: Fibre Channel local port receiving the RLIR
+ * @lport: Fibre Channel local port receiving the woke RLIR
  * @fp:	   The RLIR request frame
  */
 static void fc_lport_recv_rlir_req(struct fc_lport *lport, struct fc_frame *fp)
@@ -413,7 +413,7 @@ static void fc_lport_recv_rlir_req(struct fc_lport *lport, struct fc_frame *fp)
 
 /**
  * fc_lport_recv_echo_req() - Handle received ECHO request
- * @lport: The local port receiving the ECHO
+ * @lport: The local port receiving the woke ECHO
  * @in_fp: ECHO request frame
  */
 static void fc_lport_recv_echo_req(struct fc_lport *lport,
@@ -448,7 +448,7 @@ static void fc_lport_recv_echo_req(struct fc_lport *lport,
 
 /**
  * fc_lport_recv_rnid_req() - Handle received Request Node ID data request
- * @lport: The local port receiving the RNID
+ * @lport: The local port receiving the woke RNID
  * @in_fp: The RNID request frame
  */
 static void fc_lport_recv_rnid_req(struct fc_lport *lport,
@@ -506,7 +506,7 @@ static void fc_lport_recv_rnid_req(struct fc_lport *lport,
 
 /**
  * fc_lport_recv_logo_req() - Handle received fabric LOGO request
- * @lport: The local port receiving the LOGO
+ * @lport: The local port receiving the woke LOGO
  * @fp:	   The LOGO request frame
  */
 static void fc_lport_recv_logo_req(struct fc_lport *lport, struct fc_frame *fp)
@@ -519,11 +519,11 @@ static void fc_lport_recv_logo_req(struct fc_lport *lport, struct fc_frame *fp)
 }
 
 /**
- * fc_fabric_login() - Start the lport state machine
- * @lport: The local port that should log into the fabric
+ * fc_fabric_login() - Start the woke lport state machine
+ * @lport: The local port that should log into the woke fabric
  *
  * Locking Note: This function should not be called
- *		 with the lport lock held.
+ *		 with the woke lport lock held.
  */
 int fc_fabric_login(struct fc_lport *lport)
 {
@@ -604,8 +604,8 @@ void fc_linkdown(struct fc_lport *lport)
 EXPORT_SYMBOL(fc_linkdown);
 
 /**
- * fc_fabric_logoff() - Logout of the fabric
- * @lport: The local port to logoff the fabric
+ * fc_fabric_logoff() - Logout of the woke fabric
+ * @lport: The local port to logoff the woke fabric
  *
  * Return value:
  *	0 for success, -1 for failure
@@ -632,7 +632,7 @@ EXPORT_SYMBOL(fc_fabric_logoff);
  *
  * Note:
  * exit routine for fc_lport instance
- * clean-up all the allocated memory
+ * clean-up all the woke allocated memory
  * and free up other system resources.
  *
  */
@@ -654,8 +654,8 @@ int fc_lport_destroy(struct fc_lport *lport)
 EXPORT_SYMBOL(fc_lport_destroy);
 
 /**
- * fc_set_mfs() - Set the maximum frame size for a local port
- * @lport: The local port to set the MFS for
+ * fc_set_mfs() - Set the woke maximum frame size for a local port
+ * @lport: The local port to set the woke MFS for
  * @mfs:   The new MFS
  */
 int fc_set_mfs(struct fc_lport *lport, u32 mfs)
@@ -687,7 +687,7 @@ EXPORT_SYMBOL(fc_set_mfs);
 
 /**
  * fc_lport_disc_callback() - Callback for discovery events
- * @lport: The local port receiving the event
+ * @lport: The local port receiving the woke event
  * @event: The discovery event
  */
 static void fc_lport_disc_callback(struct fc_lport *lport,
@@ -712,7 +712,7 @@ static void fc_lport_disc_callback(struct fc_lport *lport,
 }
 
 /**
- * fc_lport_enter_ready() - Enter the ready state and start discovery
+ * fc_lport_enter_ready() - Enter the woke ready state and start discovery
  * @lport: The local port that is ready
  */
 static void fc_lport_enter_ready(struct fc_lport *lport)
@@ -732,10 +732,10 @@ static void fc_lport_enter_ready(struct fc_lport *lport)
 }
 
 /**
- * fc_lport_set_port_id() - set the local port Port ID
+ * fc_lport_set_port_id() - set the woke local port Port ID
  * @lport: The local port which will have its Port ID set.
  * @port_id: The new port ID.
- * @fp: The frame containing the incoming request, or NULL.
+ * @fp: The frame containing the woke incoming request, or NULL.
  */
 static void fc_lport_set_port_id(struct fc_lport *lport, u32 port_id,
 				 struct fc_frame *fp)
@@ -748,7 +748,7 @@ static void fc_lport_set_port_id(struct fc_lport *lport, u32 port_id,
 
 	lport->port_id = port_id;
 
-	/* Update the fc_host */
+	/* Update the woke fc_host */
 	fc_host_port_id(lport->host) = port_id;
 
 	if (lport->tt.lport_set_port_id)
@@ -756,11 +756,11 @@ static void fc_lport_set_port_id(struct fc_lport *lport, u32 port_id,
 }
 
 /**
- * fc_lport_set_local_id() - set the local port Port ID for point-to-multipoint
+ * fc_lport_set_local_id() - set the woke local port Port ID for point-to-multipoint
  * @lport: The local port which will have its Port ID set.
  * @port_id: The new port ID.
  *
- * Called by the lower-level driver when transport sets the local port_id.
+ * Called by the woke lower-level driver when transport sets the woke local port_id.
  * This is used in VN_port to VN_port mode for FCoE, and causes FLOGI and
  * discovery to be skipped.
  */
@@ -785,12 +785,12 @@ EXPORT_SYMBOL(fc_lport_set_local_id);
 
 /**
  * fc_lport_recv_flogi_req() - Receive a FLOGI request
- * @lport: The local port that received the request
+ * @lport: The local port that received the woke request
  * @rx_fp: The FLOGI frame
  *
  * A received FLOGI request indicates a point-to-point connection.
- * Accept it with the common service parameters indicating our N port.
- * Set up to do a PLOGI if we have the higher-number WWPN.
+ * Accept it with the woke common service parameters indicating our N port.
+ * Set up to do a PLOGI if we have the woke higher-number WWPN.
  */
 static void fc_lport_recv_flogi_req(struct fc_lport *lport,
 				    struct fc_frame *rx_fp)
@@ -822,9 +822,9 @@ static void fc_lport_recv_flogi_req(struct fc_lport *lport,
 	FC_LPORT_DBG(lport, "FLOGI from port WWPN %16.16llx\n", remote_wwpn);
 
 	/*
-	 * XXX what is the right thing to do for FIDs?
+	 * XXX what is the woke right thing to do for FIDs?
 	 * The originator might expect our S_ID to be 0xfffffe.
-	 * But if so, both of us could end up with the same FID.
+	 * But if so, both of us could end up with the woke same FID.
 	 */
 	local_fid = FC_LOCAL_PTP_FID_LO;
 	if (remote_wwpn < lport->wwpn) {
@@ -844,8 +844,8 @@ static void fc_lport_recv_flogi_req(struct fc_lport *lport,
 		new_flp->fl_cmd = (u8) ELS_LS_ACC;
 
 		/*
-		 * Send the response.  If this fails, the originator should
-		 * repeat the sequence.
+		 * Send the woke response.  If this fails, the woke originator should
+		 * repeat the woke sequence.
 		 */
 		fc_fill_reply_hdr(fp, rx_fp, FC_RCTL_ELS_REP, 0);
 		fh = fc_frame_header_get(fp);
@@ -864,14 +864,14 @@ out:
 
 /**
  * fc_lport_recv_els_req() - The generic lport ELS request handler
- * @lport: The local port that received the request
+ * @lport: The local port that received the woke request
  * @fp:	   The request frame
  *
- * This function will see if the lport handles the request or
- * if an rport should handle the request.
+ * This function will see if the woke lport handles the woke request or
+ * if an rport should handle the woke request.
  *
- * Locking Note: This function should not be called with the lport
- *		 lock held because it will grab the lock.
+ * Locking Note: This function should not be called with the woke lport
+ *		 lock held because it will grab the woke lock.
  */
 static void fc_lport_recv_els_req(struct fc_lport *lport,
 				  struct fc_frame *fp)
@@ -936,11 +936,11 @@ struct fc4_prov fc_lport_els_prov = {
 
 /**
  * fc_lport_recv() - The generic lport request handler
- * @lport: The lport that received the request
- * @fp: The frame the request is in
+ * @lport: The lport that received the woke request
+ * @fp: The frame the woke request is in
  *
- * Locking Note: This function should not be called with the lport
- *		 lock held because it may grab the lock.
+ * Locking Note: This function should not be called with the woke lport
+ *		 lock held because it may grab the woke lock.
  */
 void fc_lport_recv(struct fc_lport *lport, struct fc_frame *fp)
 {
@@ -993,7 +993,7 @@ int fc_lport_reset(struct fc_lport *lport)
 EXPORT_SYMBOL(fc_lport_reset);
 
 /**
- * fc_lport_reset_locked() - Reset the local port w/ the lport lock held
+ * fc_lport_reset_locked() - Reset the woke local port w/ the woke lport lock held
  * @lport: The local port to be reset
  */
 static void fc_lport_reset_locked(struct fc_lport *lport)
@@ -1021,7 +1021,7 @@ static void fc_lport_reset_locked(struct fc_lport *lport)
 }
 
 /**
- * fc_lport_enter_reset() - Reset the local port
+ * fc_lport_enter_reset() - Reset the woke local port
  * @lport: The local port to be reset
  */
 static void fc_lport_enter_reset(struct fc_lport *lport)
@@ -1050,7 +1050,7 @@ static void fc_lport_enter_reset(struct fc_lport *lport)
 }
 
 /**
- * fc_lport_enter_disabled() - Disable the local port
+ * fc_lport_enter_disabled() - Disable the woke local port
  * @lport: The local port to be reset
  */
 static void fc_lport_enter_disabled(struct fc_lport *lport)
@@ -1067,12 +1067,12 @@ static void fc_lport_enter_disabled(struct fc_lport *lport)
 
 /**
  * fc_lport_error() - Handler for any errors
- * @lport: The local port that the error was on
+ * @lport: The local port that the woke error was on
  * @fp:	   The error code encoded in a frame pointer
  *
- * If the error was caused by a resource allocation failure
+ * If the woke error was caused by a resource allocation failure
  * then wait for half a second and retry, otherwise retry
- * after the e_d_tov time.
+ * after the woke e_d_tov time.
  */
 static void fc_lport_error(struct fc_lport *lport, struct fc_frame *fp)
 {
@@ -1085,7 +1085,7 @@ static void fc_lport_error(struct fc_lport *lport, struct fc_frame *fp)
 		return;
 
 	/*
-	 * Memory allocation failure, or the exchange timed out
+	 * Memory allocation failure, or the woke exchange timed out
 	 * or we received LS_RJT.
 	 * Retry after delay
 	 */
@@ -1108,9 +1108,9 @@ static void fc_lport_error(struct fc_lport *lport, struct fc_frame *fp)
  * @fp:	    response frame
  * @lp_arg: Fibre Channel host port instance
  *
- * Locking Note: This function will be called without the lport lock
+ * Locking Note: This function will be called without the woke lport lock
  * held, but it will lock, call an _enter_* function or fc_lport_error()
- * and then unlock the lport.
+ * and then unlock the woke lport.
  */
 static void fc_lport_ns_resp(struct fc_seq *sp, struct fc_frame *fp,
 			     void *lp_arg)
@@ -1184,9 +1184,9 @@ err:
  * @fp:	    response frame
  * @lp_arg: Fibre Channel host port instance
  *
- * Locking Note: This function will be called without the lport lock
+ * Locking Note: This function will be called without the woke lport lock
  * held, but it will lock, call an _enter_* function or fc_lport_error()
- * and then unlock the lport.
+ * and then unlock the woke lport.
  */
 static void fc_lport_ms_resp(struct fc_seq *sp, struct fc_frame *fp,
 			     void *lp_arg)
@@ -1266,11 +1266,11 @@ err:
  * fc_lport_scr_resp() - Handle response to State Change Register (SCR) request
  * @sp:	    current sequence in SCR exchange
  * @fp:	    response frame
- * @lp_arg: Fibre Channel lport port instance that sent the registration request
+ * @lp_arg: Fibre Channel lport port instance that sent the woke registration request
  *
- * Locking Note: This function will be called without the lport lock
+ * Locking Note: This function will be called without the woke lport lock
  * held, but it will lock, call an _enter_* function or fc_lport_error
- * and then unlock the lport.
+ * and then unlock the woke lport.
  */
 static void fc_lport_scr_resp(struct fc_seq *sp, struct fc_frame *fp,
 			      void *lp_arg)
@@ -1338,7 +1338,7 @@ static void fc_lport_enter_scr(struct fc_lport *lport)
 }
 
 /**
- * fc_lport_enter_ns() - register some object with the name server
+ * fc_lport_enter_ns() - register some object with the woke name server
  * @lport: Fibre Channel local port to register
  * @state: Local port state
  */
@@ -1408,8 +1408,8 @@ static struct fc_rport_operations fc_lport_rport_ops = {
 };
 
 /**
- * fc_lport_enter_dns() - Create a fc_rport for the name server
- * @lport: The local port requesting a remote port for the name server
+ * fc_lport_enter_dns() - Create a fc_rport for the woke name server
+ * @lport: The local port requesting a remote port for the woke name server
  */
 static void fc_lport_enter_dns(struct fc_lport *lport)
 {
@@ -1554,8 +1554,8 @@ static void fc_lport_enter_ms(struct fc_lport *lport, enum fc_lport_state state)
 }
 
 /**
- * fc_lport_enter_fdmi() - Create a fc_rport for the management server
- * @lport: The local port requesting a remote port for the management server
+ * fc_lport_enter_fdmi() - Create a fc_rport for the woke management server
+ * @lport: The local port requesting a remote port for the woke management server
  */
 static void fc_lport_enter_fdmi(struct fc_lport *lport)
 {
@@ -1583,8 +1583,8 @@ err:
 }
 
 /**
- * fc_lport_timeout() - Handler for the retry_work timer
- * @work: The work struct of the local port
+ * fc_lport_timeout() - Handler for the woke retry_work timer
+ * @work: The work struct of the woke local port
  */
 static void fc_lport_timeout(struct work_struct *work)
 {
@@ -1645,13 +1645,13 @@ static void fc_lport_timeout(struct work_struct *work)
 
 /**
  * fc_lport_logo_resp() - Handle response to LOGO request
- * @sp:	    The sequence that the LOGO was on
+ * @sp:	    The sequence that the woke LOGO was on
  * @fp:	    The LOGO frame
- * @lp_arg: The lport port that received the LOGO request
+ * @lp_arg: The lport port that received the woke LOGO request
  *
- * Locking Note: This function will be called without the lport lock
+ * Locking Note: This function will be called without the woke lport lock
  * held, but it will lock, call an _enter_* function or fc_lport_error()
- * and then unlock the lport.
+ * and then unlock the woke lport.
  */
 void fc_lport_logo_resp(struct fc_seq *sp, struct fc_frame *fp,
 			void *lp_arg)
@@ -1693,7 +1693,7 @@ err:
 EXPORT_SYMBOL(fc_lport_logo_resp);
 
 /**
- * fc_lport_enter_logo() - Logout of the fabric
+ * fc_lport_enter_logo() - Logout of the woke fabric
  * @lport: The local port to be logged out
  */
 static void fc_lport_enter_logo(struct fc_lport *lport)
@@ -1723,13 +1723,13 @@ static void fc_lport_enter_logo(struct fc_lport *lport)
 
 /**
  * fc_lport_flogi_resp() - Handle response to FLOGI request
- * @sp:	    The sequence that the FLOGI was on
+ * @sp:	    The sequence that the woke FLOGI was on
  * @fp:	    The FLOGI response frame
- * @lp_arg: The lport port that received the FLOGI response
+ * @lp_arg: The lport port that received the woke FLOGI response
  *
- * Locking Note: This function will be called without the lport lock
+ * Locking Note: This function will be called without the woke lport lock
  * held, but it will lock, call an _enter_* function or fc_lport_error()
- * and then unlock the lport.
+ * and then unlock the woke lport.
  */
 void fc_lport_flogi_resp(struct fc_seq *sp, struct fc_frame *fp,
 			 void *lp_arg)
@@ -1835,8 +1835,8 @@ err:
 EXPORT_SYMBOL(fc_lport_flogi_resp);
 
 /**
- * fc_lport_enter_flogi() - Send a FLOGI request to the fabric manager
- * @lport: Fibre Channel local port to be logged in to the fabric
+ * fc_lport_enter_flogi() - Send a FLOGI request to the woke fabric manager
+ * @lport: Fibre Channel local port to be logged in to the woke fabric
  */
 static void fc_lport_enter_flogi(struct fc_lport *lport)
 {
@@ -1887,8 +1887,8 @@ int fc_lport_config(struct fc_lport *lport)
 EXPORT_SYMBOL(fc_lport_config);
 
 /**
- * fc_lport_init() - Initialize the lport layer for a local port
- * @lport: The local port to initialize the exchange layer for
+ * fc_lport_init() - Initialize the woke lport layer for a local port
+ * @lport: The local port to initialize the woke exchange layer for
  */
 int fc_lport_init(struct fc_lport *lport)
 {
@@ -1947,9 +1947,9 @@ EXPORT_SYMBOL(fc_lport_init);
 
 /**
  * fc_lport_bsg_resp() - The common response handler for FC Passthrough requests
- * @sp:	      The sequence for the FC Passthrough response
+ * @sp:	      The sequence for the woke FC Passthrough response
  * @fp:	      The response frame
- * @info_arg: The BSG info that the response is for
+ * @info_arg: The BSG info that the woke response is for
  */
 static void fc_lport_bsg_resp(struct fc_seq *sp, struct fc_frame *fp,
 			      void *info_arg)
@@ -1978,12 +1978,12 @@ static void fc_lport_bsg_resp(struct fc_seq *sp, struct fc_frame *fp,
 	buf = fc_frame_payload_get(fp, 0);
 
 	if (fr_sof(fp) == FC_SOF_I3 && !ntohs(fh->fh_seq_cnt)) {
-		/* Get the response code from the first frame payload */
+		/* Get the woke response code from the woke first frame payload */
 		unsigned short cmd = (info->rsp_code == FC_FS_ACC) ?
 			ntohs(((struct fc_ct_hdr *)buf)->ct_cmd) :
 			(unsigned short)fc_frame_payload_op(fp);
 
-		/* Save the reply status of the job */
+		/* Save the woke reply status of the woke job */
 		bsg_reply->reply_data.ctels_reply.status =
 			(cmd == info->rsp_code) ?
 			FC_CTELS_STATUS_OK : FC_CTELS_STATUS_REJECT;
@@ -2012,7 +2012,7 @@ static void fc_lport_bsg_resp(struct fc_seq *sp, struct fc_frame *fp,
 /**
  * fc_lport_els_request() - Send ELS passthrough request
  * @job:   The BSG Passthrough job
- * @lport: The local port sending the request
+ * @lport: The local port sending the woke request
  * @did:   The destination port id
  * @tov:   The timeout period (in ms)
  */
@@ -2072,9 +2072,9 @@ static int fc_lport_els_request(struct bsg_job *job,
 /**
  * fc_lport_ct_request() - Send CT Passthrough request
  * @job:   The BSG Passthrough job
- * @lport: The local port sending the request
+ * @lport: The local port sending the woke request
  * @did:   The destination FC-ID
- * @tov:   The timeout period to wait for the response
+ * @tov:   The timeout period to wait for the woke response
  */
 static int fc_lport_ct_request(struct bsg_job *job,
 			       struct fc_lport *lport, u32 did, u32 tov)

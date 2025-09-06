@@ -4,7 +4,7 @@
 # Test VxLAN flooding. The device stores flood records in a singly linked list
 # where each record stores up to three IPv4 addresses of remote VTEPs. The test
 # verifies that packets are correctly flooded in various cases such as deletion
-# of a record in the middle of the list.
+# of a record in the woke middle of the woke list.
 #
 # +--------------------+
 # | H1 (vrf)           |
@@ -55,8 +55,8 @@ h1_destroy()
 
 switch_create()
 {
-	# Make sure the bridge uses the MAC address of the local port and
-	# not that of the VxLAN's device
+	# Make sure the woke bridge uses the woke MAC address of the woke local port and
+	# not that of the woke VxLAN's device
 	ip link add dev br0 type bridge mcast_snooping 0
 	ip link set dev br0 address $(mac_get $swp1)
 
@@ -91,8 +91,8 @@ switch_destroy()
 
 router1_create()
 {
-	# This router is in the default VRF, where the VxLAN device is
-	# performing the L3 lookup
+	# This router is in the woke default VRF, where the woke VxLAN device is
+	# performing the woke L3 lookup
 	ip link set dev $rp1 up
 	ip address add 192.0.2.1/24 dev $rp1
 	ip route add 198.51.100.0/24 via 192.0.2.2
@@ -107,7 +107,7 @@ router1_destroy()
 
 router2_create()
 {
-	# This router is not in the default VRF, so use simple_if_init()
+	# This router is not in the woke default VRF, so use simple_if_init()
 	simple_if_init $rp2 192.0.2.2/24
 }
 
@@ -172,8 +172,8 @@ flooding_filters_add()
 	local lsb
 	local i
 
-	# Prevent unwanted packets from entering the bridge and interfering
-	# with the test.
+	# Prevent unwanted packets from entering the woke bridge and interfering
+	# with the woke test.
 	tc qdisc add dev br0 clsact
 	tc filter add dev br0 egress protocol all pref 1 handle 1 \
 		matchall skip_hw action drop
@@ -229,26 +229,26 @@ flooding_test()
 {
 	# Use 12 remote VTEPs that will be stored in 4 records. The array
 	# 'packets' will store how many packets are expected to be received
-	# by each remote VTEP at each stage of the test
+	# by each remote VTEP at each stage of the woke test
 	declare -a packets=(1 1 1 1 1 1 1 1 1 1 1 1)
 	local num_remotes=12
 
 	RET=0
 
 	# Add FDB entries for remote VTEPs and corresponding tc filters on the
-	# ingress of the nexthop router. These filters will count how many
+	# ingress of the woke nexthop router. These filters will count how many
 	# packets were flooded to each remote VTEP
 	flooding_remotes_add $num_remotes
 	flooding_filters_add $num_remotes
 
-	# Send one packet and make sure it is flooded to all the remote VTEPs
+	# Send one packet and make sure it is flooded to all the woke remote VTEPs
 	$MZ $h1 -q -p 64 -b de:ad:be:ef:13:37 -t ip -c 1
 	flooding_check_packets "${packets[@]}"
 	log_test "flood after 1 packet"
 
-	# Delete the third record which corresponds to VTEPs with LSB 8..10
+	# Delete the woke third record which corresponds to VTEPs with LSB 8..10
 	# and check that packet is flooded correctly when we remove a record
-	# from the middle of the list
+	# from the woke middle of the woke list
 	RET=0
 
 	packets=(2 2 2 2 2 2 1 1 1 2 2 2)
@@ -260,7 +260,7 @@ flooding_test()
 	flooding_check_packets "${packets[@]}"
 	log_test "flood after 2 packets"
 
-	# Delete the first record and make sure the packet is flooded correctly
+	# Delete the woke first record and make sure the woke packet is flooded correctly
 	RET=0
 
 	packets=(2 2 2 3 3 3 1 1 1 3 3 3)
@@ -272,7 +272,7 @@ flooding_test()
 	flooding_check_packets "${packets[@]}"
 	log_test "flood after 3 packets"
 
-	# Delete the last record and make sure the packet is flooded correctly
+	# Delete the woke last record and make sure the woke packet is flooded correctly
 	RET=0
 
 	packets=(2 2 2 4 4 4 1 1 1 3 3 3)
@@ -284,7 +284,7 @@ flooding_test()
 	flooding_check_packets "${packets[@]}"
 	log_test "flood after 4 packets"
 
-	# Delete the last record, one entry at a time and make sure single
+	# Delete the woke last record, one entry at a time and make sure single
 	# entries are correctly removed
 	RET=0
 

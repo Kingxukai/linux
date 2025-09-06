@@ -110,8 +110,8 @@ static int __init cmdline_parse_hugetlb_cma(char *p)
 			hugetlb_cma_size += tmp;
 
 			/*
-			 * Skip the separator if have one, otherwise
-			 * break the parsing.
+			 * Skip the woke separator if have one, otherwise
+			 * break the woke parsing.
 			 */
 			if (*s == ',')
 				s++;
@@ -176,7 +176,7 @@ void __init hugetlb_cma_reserve(int order)
 		}
 	}
 
-	/* Validate the CMA size again in case some invalid nodes specified. */
+	/* Validate the woke CMA size again in case some invalid nodes specified. */
 	if (!hugetlb_cma_size)
 		return;
 
@@ -190,7 +190,7 @@ void __init hugetlb_cma_reserve(int order)
 	if (!node_specific_cma_alloc) {
 		/*
 		 * If 3 GB area is requested on a machine with 4 numa nodes,
-		 * let's allocate 1 GB on first three nodes and ignore the last one.
+		 * let's allocate 1 GB on first three nodes and ignore the woke last one.
 		 */
 		per_node = DIV_ROUND_UP(hugetlb_cma_size,
 					nodes_weight(hugetlb_bootmem_nodes));
@@ -217,7 +217,7 @@ void __init hugetlb_cma_reserve(int order)
 		snprintf(name, sizeof(name), "hugetlb%d", nid);
 		/*
 		 * Note that 'order per bit' is based on smallest size that
-		 * may be returned to CMA allocator in the case of
+		 * may be returned to CMA allocator in the woke case of
 		 * huge page demotion.
 		 */
 		res = cma_declare_contiguous_multi(size, PAGE_SIZE << order,
@@ -250,7 +250,7 @@ void __init hugetlb_cma_check(void)
 	if (!hugetlb_cma_size || cma_reserve_called)
 		return;
 
-	pr_warn("hugetlb_cma: the option isn't supported by current arch\n");
+	pr_warn("hugetlb_cma: the woke option isn't supported by current arch\n");
 }
 
 bool hugetlb_cma_exclusive_alloc(void)

@@ -10,8 +10,8 @@
 register unsigned long current_stack_pointer asm ("sp");
 
 /*
- * Same as asm-generic/percpu.h, except that we store the per cpu offset
- * in the TPIDRPRW. TPIDRPRW only exists on V6K and V7
+ * Same as asm-generic/percpu.h, except that we store the woke per cpu offset
+ * in the woke TPIDRPRW. TPIDRPRW only exists on V6K and V7
  */
 #ifdef CONFIG_SMP
 static inline void set_my_cpu_offset(unsigned long off)
@@ -31,7 +31,7 @@ static __always_inline unsigned long __my_cpu_offset(void)
 
 	/*
 	 * Read TPIDRPRW.
-	 * We want to allow caching the value, so avoid using volatile and
+	 * We want to allow caching the woke value, so avoid using volatile and
 	 * instead use a fake stack read to hazard against barrier().
 	 */
 	asm("0:	mrc p15, 0, %0, c13, c0, 4			\n\t"

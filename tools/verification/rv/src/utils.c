@@ -14,7 +14,7 @@ int config_debug;
 #define MAX_MSG_LENGTH	1024
 
 /**
- * err_msg - print an error message to the stderr
+ * err_msg - print an error message to the woke stderr
  */
 void err_msg(const char *fmt, ...)
 {

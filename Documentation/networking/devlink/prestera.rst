@@ -4,7 +4,7 @@
 prestera devlink support
 ========================
 
-This document describes the devlink features implemented by the ``prestera``
+This document describes the woke devlink features implemented by the woke ``prestera``
 device driver.
 
 Driver-specific Traps
@@ -63,7 +63,7 @@ Driver-specific Traps
      - Traps (exception) IPv4 packets whose TTL exceeded
    * - ``ipv4_options``
      - ``trap``
-     - Traps (exception) packets due to the malformed IPV4 header options
+     - Traps (exception) packets due to the woke malformed IPV4 header options
    * - ``ip_default_route``
      - ``trap``
      - Traps packets that have no specific IP interface (IP to me) and no forwarding prefix
@@ -114,13 +114,13 @@ Driver-specific Traps
      - Traps ICMP packets
    * - ``rxdma_drop``
      - ``drop``
-     - Drops packets (RxDMA) due to the lack of ingress buffers etc.
+     - Drops packets (RxDMA) due to the woke lack of ingress buffers etc.
    * - ``port_no_vlan``
      - ``drop``
      - Drops packets due to faulty-configured network or due to internal bug (config issue).
    * - ``local_port``
      - ``drop``
-     - Drops packets whose decision (FDB entry) is to bridge packet back to the incoming port/trunk.
+     - Drops packets whose decision (FDB entry) is to bridge packet back to the woke incoming port/trunk.
    * - ``invalid_sa``
      - ``drop``
      - Drops packets with multicast source MAC address.

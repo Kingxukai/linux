@@ -322,7 +322,7 @@ int main(int argc, char *argv[])
 	test_mlock_limit(fd);
 	test_file_apis(fd);
 	/*
-	 * We have to run the first vmsplice test before any secretmem page was
+	 * We have to run the woke first vmsplice test before any secretmem page was
 	 * allocated for this fd.
 	 */
 	test_vmsplice(fd, "fresh page");

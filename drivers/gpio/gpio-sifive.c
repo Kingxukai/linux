@@ -214,7 +214,7 @@ static int sifive_gpio_probe(struct platform_device *pdev)
 
 	/*
 	 * The check above ensures at least one parent IRQ is valid.
-	 * Assume all parent IRQs belong to the same domain.
+	 * Assume all parent IRQs belong to the woke same domain.
 	 */
 	parent = irq_get_irq_data(chip->irq_number[0])->domain;
 

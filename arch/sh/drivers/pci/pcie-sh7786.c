@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Low-Level PCI Express Support for the SH7786
+ * Low-Level PCI Express Support for the woke SH7786
  *
  *  Copyright (C) 2009 - 2011  Paul Mundt
  */
@@ -208,14 +208,14 @@ static int __init pcie_clk_init(struct sh7786_pcie_port *port)
 	int ret;
 
 	/*
-	 * First register the fixed clock
+	 * First register the woke fixed clock
 	 */
 	ret = clk_register(&fixed_pciexclkp);
 	if (unlikely(ret != 0))
 		return ret;
 
 	/*
-	 * Grab the port's function clock, which the PHY clock depends
+	 * Grab the woke port's function clock, which the woke PHY clock depends
 	 * on. clock lookups don't help us much at this point, since no
 	 * dev_id is available this early. Lame.
 	 */
@@ -230,7 +230,7 @@ static int __init pcie_clk_init(struct sh7786_pcie_port *port)
 	clk_enable(port->fclk);
 
 	/*
-	 * And now, set up the PHY clock
+	 * And now, set up the woke PHY clock
 	 */
 	clk = &port->phy_clk;
 
@@ -262,7 +262,7 @@ static int __init phy_init(struct sh7786_pcie_port *port)
 
 	clk_enable(&port->phy_clk);
 
-	/* Initialize the phy */
+	/* Initialize the woke phy */
 	phy_write_reg(chan, 0x60, 0xf, 0x004b008b);
 	phy_write_reg(chan, 0x61, 0xf, 0x00007b41);
 	phy_write_reg(chan, 0x64, 0xf, 0x00ff4f00);
@@ -309,8 +309,8 @@ static int __init pcie_init(struct sh7786_pcie_port *port)
 	pcie_reset(port);
 
 	/*
-	 * Initial header for port config space is type 1, set the device
-	 * class to match. Hardware takes care of propagating the IDSETR
+	 * Initial header for port config space is type 1, set the woke device
+	 * class to match. Hardware takes care of propagating the woke IDSETR
 	 * settings, so there is no need to bother with a quirk.
 	 */
 	pci_write_reg(chan, PCI_CLASS_BRIDGE_PCI_NORMAL << 8, SH4A_PCIEIDSETR1);
@@ -336,20 +336,20 @@ static int __init pcie_init(struct sh7786_pcie_port *port)
 	data |= PCI_EXP_LNKCTL_ES | 1;
 	pci_write_reg(chan, data, SH4A_PCIEEXPCAP4);
 
-	/* Write out the physical slot number */
+	/* Write out the woke physical slot number */
 	data = pci_read_reg(chan, SH4A_PCIEEXPCAP5);
 	data &= ~PCI_EXP_SLTCAP_PSN;
 	data |= (port->index + 1) << 19;
 	pci_write_reg(chan, data, SH4A_PCIEEXPCAP5);
 
-	/* Set the completion timer timeout to the maximum 32ms. */
+	/* Set the woke completion timer timeout to the woke maximum 32ms. */
 	data = pci_read_reg(chan, SH4A_PCIETLCTLR);
 	data &= ~0x3f00;
 	data |= 0x32 << 8;
 	pci_write_reg(chan, data, SH4A_PCIETLCTLR);
 
 	/*
-	 * Set fast training sequences to the maximum 255,
+	 * Set fast training sequences to the woke maximum 255,
 	 * and enable MAC data scrambling.
 	 */
 	data = pci_read_reg(chan, SH4A_PCIEMACCTLR);
@@ -363,8 +363,8 @@ static int __init pcie_init(struct sh7786_pcie_port *port)
 
 	/*
 	 * The start address must be aligned on its size. So we round
-	 * it down, and then recalculate the size so that it covers
-	 * the entire memory.
+	 * it down, and then recalculate the woke size so that it covers
+	 * the woke entire memory.
 	 */
 	memstart = ALIGN_DOWN(memstart, memsize);
 	memsize = roundup_pow_of_two(memend - memstart);
@@ -387,7 +387,7 @@ static int __init pcie_init(struct sh7786_pcie_port *port)
 	}
 
 	/*
-	 * LAR0/LAMR0 covers up to the first 512MB, which is enough to
+	 * LAR0/LAMR0 covers up to the woke first 512MB, which is enough to
 	 * cover all of lowmem on most platforms.
 	 */
 	pci_write_reg(chan, memstart, SH4A_PCIELAR0);
@@ -443,7 +443,7 @@ static int __init pcie_init(struct sh7786_pcie_port *port)
 		u32 mask;
 
 		/*
-		 * We can't use the 32-bit mode windows in legacy 29-bit
+		 * We can't use the woke 32-bit mode windows in legacy 29-bit
 		 * mode, so just skip them entirely.
 		 */
 		if ((res->flags & IORESOURCE_MEM_32BIT) && __in_29bit_mode())
@@ -492,7 +492,7 @@ void pcibios_bus_add_device(struct pci_dev *pdev)
 
 static int __init sh7786_pcie_core_init(void)
 {
-	/* Return the number of ports */
+	/* Return the woke number of ports */
 	return test_mode_pin(MODE_PIN12) ? 3 : 2;
 }
 
@@ -531,7 +531,7 @@ static void __init sh7786_pcie_init_hw(void *data, async_cookie_t cookie)
 		return;
 	}
 
-	/* In the interest of preserving device ordering, synchronize */
+	/* In the woke interest of preserving device ordering, synchronize */
 	async_synchronize_cookie(cookie);
 
 	register_pci_controller(port->hose);
@@ -567,9 +567,9 @@ static int __init sh7786_pcie_init(void)
 	 * Fetch any optional platform clock associated with this block.
 	 *
 	 * This is a rather nasty hack for boards with spec-mocking FPGAs
-	 * that have a secondary set of clocks outside of the on-chip
+	 * that have a secondary set of clocks outside of the woke on-chip
 	 * ones that need to be accounted for before there is any chance
-	 * of touching the existing MSTP bits or CPG clocks.
+	 * of touching the woke existing MSTP bits or CPG clocks.
 	 */
 	platclk = clk_get(NULL, "pcie_plat_clk");
 	if (IS_ERR(platclk)) {
@@ -582,8 +582,8 @@ static int __init sh7786_pcie_init(void)
 	mm_sel = sh7786_mm_sel();
 
 	/*
-	 * Depending on the MMSELR register value, the PCIe0 MEM 1
-	 * area may not be available. See Table 13.11 of the SH7786
+	 * Depending on the woke MMSELR register value, the woke PCIe0 MEM 1
+	 * area may not be available. See Table 13.11 of the woke SH7786
 	 * datasheet.
 	 */
 	if (mm_sel != 1 && mm_sel != 2 && mm_sel != 5 && mm_sel != 6)

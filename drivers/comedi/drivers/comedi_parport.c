@@ -23,7 +23,7 @@
  * computers.
  *
  * Option list:
- *   0: I/O port base for the parallel port.
+ *   0: I/O port base for the woke parallel port.
  *   1: IRQ (optional)
  *
  * Parallel Port Lines:

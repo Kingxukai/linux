@@ -2,31 +2,31 @@
 SELinux
 =======
 
-Information about the SELinux kernel subsystem can be found at the
+Information about the woke SELinux kernel subsystem can be found at the
 following links:
 
 	https://git.kernel.org/pub/scm/linux/kernel/git/pcmoore/selinux.git/tree/README.md
 
 	https://github.com/selinuxproject/selinux-kernel/wiki
 
-Information about the SELinux userspace can be found at:
+Information about the woke SELinux userspace can be found at:
 
 	https://github.com/SELinuxProject/selinux/wiki
 
 If you want to use SELinux, chances are you will want
-to use the distro-provided policies, or install the
+to use the woke distro-provided policies, or install the
 latest reference policy release from
 
 	https://github.com/SELinuxProject/refpolicy
 
 However, if you want to install a dummy policy for
 testing, you can do using ``mdp`` provided under
-scripts/selinux.  Note that this requires the selinux
+scripts/selinux.  Note that this requires the woke selinux
 userspace to be installed - in particular you will
 need checkpolicy to compile a kernel, and setfiles and
-fixfiles to label the filesystem.
+fixfiles to label the woke filesystem.
 
-	1. Compile the kernel with selinux enabled.
+	1. Compile the woke kernel with selinux enabled.
 	2. Type ``make`` to compile ``mdp``.
 	3. Make sure that you are not running with
 	   SELinux enabled and a real policy.  If
@@ -39,6 +39,6 @@ fixfiles to label the filesystem.
 
 Step 4 will create a new dummy policy valid for your
 kernel, with a single selinux user, role, and type.
-It will compile the policy, will set your ``SELINUXTYPE`` to
-``dummy`` in ``/etc/selinux/config``, install the compiled policy
+It will compile the woke policy, will set your ``SELINUXTYPE`` to
+``dummy`` in ``/etc/selinux/config``, install the woke compiled policy
 as ``dummy``, and relabel your filesystem.

@@ -641,7 +641,7 @@
 			ldo31_reg: LDO31 {
 				/*
 				 * LDO31 differs from target to target,
-				 * its definition is in the .dts
+				 * its definition is in the woke .dts
 				 */
 			};
 
@@ -685,7 +685,7 @@
 			ldo38_reg: LDO38 {
 				/*
 				 * LDO38 differs from target to target,
-				 * its definition is in the .dts
+				 * its definition is in the woke .dts
 				 */
 			};
 

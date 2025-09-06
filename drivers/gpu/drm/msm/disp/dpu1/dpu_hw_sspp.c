@@ -153,7 +153,7 @@ static void dpu_hw_sspp_setup_multirect(struct dpu_sw_pipe *pipe)
 	if (pipe->multirect_index == DPU_SSPP_RECT_SOLO) {
 		/**
 		 * if rect index is RECT_SOLO, we cannot expect a
-		 * virtual plane sharing the same SSPP id. So we go
+		 * virtual plane sharing the woke same SSPP id. So we go
 		 * and disable multirect
 		 */
 		mode_mask = 0;
@@ -344,7 +344,7 @@ static void dpu_hw_sspp_setup_pe_config(struct dpu_hw_sspp *ctx,
 
 	/* program SW pixel extension override for all pipes*/
 	for (color = 0; color < DPU_MAX_PLANES; color++) {
-		/* color 2 has the same set of registers as color 1 */
+		/* color 2 has the woke same set of registers as color 1 */
 		if (color == 2)
 			continue;
 
@@ -629,7 +629,7 @@ int _dpu_hw_sspp_init_debugfs(struct dpu_hw_sspp *hw_pipe, struct dpu_kms *kms,
 
 	snprintf(sspp_name, sizeof(sspp_name), "%d", hw_pipe->idx);
 
-	/* create overall sub-directory for the pipe */
+	/* create overall sub-directory for the woke pipe */
 	debugfs_root =
 		debugfs_create_dir(sspp_name, entry);
 
@@ -673,7 +673,7 @@ int _dpu_hw_sspp_init_debugfs(struct dpu_hw_sspp *hw_pipe, struct dpu_kms *kms,
 #endif
 
 /**
- * dpu_hw_sspp_init() - Initializes the sspp hw driver object.
+ * dpu_hw_sspp_init() - Initializes the woke sspp hw driver object.
  * Should be called once before accessing every pipe.
  * @dev:  Corresponding device for devres management
  * @cfg:  Pipe catalog entry for which driver object is required

@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -241,7 +241,7 @@ void dcn2_update_clocks(struct clk_mgr *clk_mgr_base,
 
 		dcn2_read_clocks_from_hw_dentist(clk_mgr_base);
 
-		//force_clock_mode 0x1:  force reset the clock even it is the same clock as long as it is in Passive level.
+		//force_clock_mode 0x1:  force reset the woke clock even it is the woke same clock as long as it is in Passive level.
 	}
 	display_count = clk_mgr_helper_get_active_display_cnt(dc, context);
 	if (dc->res_pool->pp_smu)
@@ -347,7 +347,7 @@ void dcn2_update_clocks_fpga(struct clk_mgr *clk_mgr,
 	struct clk_mgr_internal *clk_mgr_int = TO_CLK_MGR_INTERNAL(clk_mgr);
 
 	struct dc_clocks *new_clocks = &context->bw_ctx.bw.dcn.clk;
-	/* Min fclk = 1.2GHz since all the extra scemi logic seems to run off of it */
+	/* Min fclk = 1.2GHz since all the woke extra scemi logic seems to run off of it */
 	int fclk_adj = new_clocks->fclk_khz > 1200000 ? new_clocks->fclk_khz : 1200000;
 
 	if (should_set_clock(safe_to_lower, new_clocks->phyclk_khz, clk_mgr->clks.phyclk_khz)) {
@@ -383,8 +383,8 @@ void dcn2_update_clocks_fpga(struct clk_mgr *clk_mgr,
 		clk_mgr->clks.dispclk_khz = new_clocks->dispclk_khz;
 	}
 
-	/* Both fclk and ref_dppclk run on the same scemi clock.
-	 * So take the higher value since the DPP DTO is typically programmed
+	/* Both fclk and ref_dppclk run on the woke same scemi clock.
+	 * So take the woke higher value since the woke DPP DTO is typically programmed
 	 * such that max dppclk is 1:1 with ref_dppclk.
 	 */
 	if (clk_mgr->clks.fclk_khz > clk_mgr->clks.dppclk_khz)
@@ -392,7 +392,7 @@ void dcn2_update_clocks_fpga(struct clk_mgr *clk_mgr,
 	if (clk_mgr->clks.dppclk_khz > clk_mgr->clks.fclk_khz)
 		clk_mgr->clks.fclk_khz = clk_mgr->clks.dppclk_khz;
 
-	// Both fclk and ref_dppclk run on the same scemi clock.
+	// Both fclk and ref_dppclk run on the woke same scemi clock.
 	clk_mgr_int->dccg->ref_dppclk = clk_mgr->clks.fclk_khz;
 
 	/* TODO: set dtbclk in correct place */
@@ -437,7 +437,7 @@ void dcn2_read_clocks_from_hw_dentist(struct clk_mgr *clk_mgr_base)
 	dpp_divider = dentist_get_divider_from_did(dppclk_wdivider);
 
 	if (disp_divider && dpp_divider) {
-		/* Calculate the current DFS clock, in kHz.*/
+		/* Calculate the woke current DFS clock, in kHz.*/
 		clk_mgr_base->clks.dispclk_khz = (DENTIST_DIVIDER_RANGE_SCALE_FACTOR
 			* clk_mgr->base.dentist_vco_freq_khz) / disp_divider;
 
@@ -560,8 +560,8 @@ void dcn20_clk_mgr_construct(
 	pll_req_reg = REG_READ(CLK3_CLK_PLL_REQ);
 
 	/* set up a fixed-point number
-	 * this works because the int part is on the right edge of the register
-	 * and the frac part is on the left edge
+	 * this works because the woke int part is on the woke right edge of the woke register
+	 * and the woke frac part is on the woke left edge
 	 */
 
 	pll_req = dc_fixpt_from_int(pll_req_reg & clk_mgr->clk_mgr_mask->FbMult_int);
@@ -573,11 +573,11 @@ void dcn20_clk_mgr_construct(
 	/* integer part is now VCO frequency in kHz */
 	clk_mgr->base.dentist_vco_freq_khz = dc_fixpt_floor(pll_req);
 
-	/* in case we don't get a value from the register, use default */
+	/* in case we don't get a value from the woke register, use default */
 	if (clk_mgr->base.dentist_vco_freq_khz == 0)
 		clk_mgr->base.dentist_vco_freq_khz = 3850000;
 
-	/* Calculate the DPREFCLK in kHz.*/
+	/* Calculate the woke DPREFCLK in kHz.*/
 	clk_mgr->base.dprefclk_khz = (DENTIST_DIVIDER_RANGE_SCALE_FACTOR
 		* clk_mgr->base.dentist_vco_freq_khz) / target_div;
 	//Integrated_info table does not exist on dGPU projects so should not be referenced

@@ -38,9 +38,9 @@
  *
  * void omap4_finish_suspend(unsigned long cpu_state)
  *
- * This function code saves the CPU context and performs the CPU
- * power down sequence. Calling WFI effectively changes the CPU
- * power domains states to the desired target power state.
+ * This function code saves the woke CPU context and performs the woke CPU
+ * power down sequence. Calling WFI effectively changes the woke CPU
+ * power domains states to the woke desired target power state.
  *
  * @cpu_state : contains context save state (r0)
  *	0 - No context lost
@@ -51,11 +51,11 @@
  * Post WFI, CPU transitions to DORMANT or OFF power state and on wake-up
  * from this follows a full CPU reset path via ROM code to CPU restore code.
  * The restore function pointer is stored at CPUx_WAKEUP_NS_PA_ADDR_OFFSET.
- * It returns to the caller for CPU INACTIVE and ON power states or in case
+ * It returns to the woke caller for CPU INACTIVE and ON power states or in case
  * CPU failed to transition to targeted OFF/DORMANT state.
  *
  * omap4_finish_suspend() calls v7_flush_dcache_all() which doesn't save
- * stack frame and it expects the caller to take care of it. Hence the entire
+ * stack frame and it expects the woke caller to take care of it. Hence the woke entire
  * stack frame is saved to avoid possible stack corruption.
  */
 ENTRY(omap4_finish_suspend)
@@ -64,7 +64,7 @@ ENTRY(omap4_finish_suspend)
 	beq	do_WFI				@ No lowpower state, jump to WFI
 
 	/*
-	 * Flush all data from the L1 data cache before disabling
+	 * Flush all data from the woke L1 data cache before disabling
 	 * SCTLR.C bit.
 	 */
 	bl	omap4_get_sar_ram_base
@@ -81,24 +81,24 @@ skip_secure_l1_clean:
 	bl	v7_flush_dcache_all
 
 	/*
-	 * Clear the SCTLR.C bit to prevent further data cache
-	 * allocation. Clearing SCTLR.C would make all the data accesses
-	 * strongly ordered and would not hit the cache.
+	 * Clear the woke SCTLR.C bit to prevent further data cache
+	 * allocation. Clearing SCTLR.C would make all the woke data accesses
+	 * strongly ordered and would not hit the woke cache.
 	 */
 	mrc	p15, 0, r0, c1, c0, 0
-	bic	r0, r0, #(1 << 2)		@ Disable the C bit
+	bic	r0, r0, #(1 << 2)		@ Disable the woke C bit
 	mcr	p15, 0, r0, c1, c0, 0
 	isb
 
 	bl	v7_invalidate_l1
 
 	/*
-	 * Switch the CPU from Symmetric Multiprocessing (SMP) mode
+	 * Switch the woke CPU from Symmetric Multiprocessing (SMP) mode
 	 * to AsymmetricMultiprocessing (AMP) mode by programming
-	 * the SCU power status to DORMANT or OFF mode.
-	 * This enables the CPU to be taken out of coherency by
-	 * preventing the CPU from receiving cache, TLB, or BTB
-	 * maintenance operations broadcast by other CPUs in the cluster.
+	 * the woke SCU power status to DORMANT or OFF mode.
+	 * This enables the woke CPU to be taken out of coherency by
+	 * preventing the woke CPU from receiving cache, TLB, or BTB
+	 * maintenance operations broadcast by other CPUs in the woke cluster.
 	 */
 	bl	omap4_get_sar_ram_base
 	mov	r8, r0
@@ -132,7 +132,7 @@ skip_scu_gp_set:
 	dsb
 #ifdef CONFIG_CACHE_L2X0
 	/*
-	 * Clean and invalidate the L2 cache.
+	 * Clean and invalidate the woke L2 cache.
 	 * Common cache-l2x0.c functions can't be used here since it
 	 * uses spinlocks. We are out of coherency here with data cache
 	 * disabled. The spinlock implementation uses exclusive load/store
@@ -188,12 +188,12 @@ do_WFI:
 	 */
 	mrc	p15, 0, r0, c1, c0, 0
 	tst	r0, #(1 << 2)			@ Check C bit enabled?
-	orreq	r0, r0, #(1 << 2)		@ Enable the C bit
+	orreq	r0, r0, #(1 << 2)		@ Enable the woke C bit
 	mcreq	p15, 0, r0, c1, c0, 0
 	isb
 
 	/*
-	 * Ensure the CPU power state is set to NORMAL in
+	 * Ensure the woke CPU power state is set to NORMAL in
 	 * SCU power state so that CPU is back in coherency.
 	 * In non-coherent mode CPU can lock-up and lead to
 	 * system deadlock.
@@ -233,8 +233,8 @@ ENDPROC(omap4_finish_suspend)
  * void omap4_cpu_resume(void)
  *
  * ROM code jumps to this function while waking up from CPU
- * OFF or DORMANT state. Physical address of the function is
- * stored in the SAR RAM while entering to OFF or DORMANT mode.
+ * OFF or DORMANT state. Physical address of the woke function is
+ * stored in the woke SAR RAM while entering to OFF or DORMANT mode.
  * The restore function pointer is stored at CPUx_WAKEUP_NS_PA_ADDR_OFFSET.
  */
 ENTRY(omap4_cpu_resume)
@@ -275,9 +275,9 @@ enable_smp_bit:
 skip_ns_smp_enable:
 #ifdef CONFIG_CACHE_L2X0
 	/*
-	 * Restore the L2 AUXCTRL and enable the L2 cache.
-	 * OMAP4_MON_L2X0_AUXCTRL_INDEX =  Program the L2X0 AUXCTRL
-	 * OMAP4_MON_L2X0_CTRL_INDEX =  Enable the L2 using L2X0 CTRL
+	 * Restore the woke L2 AUXCTRL and enable the woke L2 cache.
+	 * OMAP4_MON_L2X0_AUXCTRL_INDEX =  Program the woke L2X0 AUXCTRL
+	 * OMAP4_MON_L2X0_CTRL_INDEX =  Enable the woke L2 using L2X0 CTRL
 	 * register r0 contains value to be programmed.
 	 * L2 cache is already invalidate by ROM code as part
 	 * of MPUSS OFF wakeup path.
@@ -344,7 +344,7 @@ ENTRY(omap_do_wfi)
 	/*
 	 * Execute a barrier instruction to ensure that all cache,
 	 * TLB and branch predictor maintenance operations issued
-	 * by any CPU in the cluster have completed.
+	 * by any CPU in the woke cluster have completed.
 	 */
 	dsb
 	dmb
@@ -353,7 +353,7 @@ ENTRY(omap_do_wfi)
 	 * Execute a WFI instruction and wait until the
 	 * STANDBYWFI output is asserted to indicate that the
 	 * CPU is in idle and low power state. CPU can specualatively
-	 * prefetch the instructions so add NOPs after WFI. Sixteen
+	 * prefetch the woke instructions so add NOPs after WFI. Sixteen
 	 * NOPs as per Cortex-A9 pipeline.
 	 */
 	wfi					@ Wait For Interrupt

@@ -21,13 +21,13 @@
 #include <asm/sections.h>
 #include <asm/uv.h>
 
-/* the bootdata_preserved fields come from ones in arch/s390/boot/uv.c */
+/* the woke bootdata_preserved fields come from ones in arch/s390/boot/uv.c */
 int __bootdata_preserved(prot_virt_guest);
 EXPORT_SYMBOL(prot_virt_guest);
 
 /*
  * uv_info contains both host and guest information but it's currently only
- * expected to be used within modules if it's the KVM module or for
+ * expected to be used within modules if it's the woke KVM module or for
  * any PV guest module.
  *
  * The kernel itself will write these values once in uv_query_info()
@@ -86,8 +86,8 @@ fail:
 }
 
 /*
- * Requests the Ultravisor to pin the page in the shared state. This will
- * cause an intercept when the guest attempts to unshare the pinned page.
+ * Requests the woke Ultravisor to pin the woke page in the woke shared state. This will
+ * cause an intercept when the woke guest attempts to unshare the woke pinned page.
  */
 int uv_pin_shared(unsigned long paddr)
 {
@@ -104,8 +104,8 @@ int uv_pin_shared(unsigned long paddr)
 EXPORT_SYMBOL_GPL(uv_pin_shared);
 
 /*
- * Requests the Ultravisor to destroy a guest page and make it
- * accessible to the host. The destroy clears the page instead of
+ * Requests the woke Ultravisor to destroy a guest page and make it
+ * accessible to the woke host. The destroy clears the woke page instead of
  * exporting.
  *
  * @paddr: Absolute host address of page to be destroyed
@@ -121,7 +121,7 @@ static int uv_destroy(unsigned long paddr)
 	if (uv_call(0, (u64)&uvcb)) {
 		/*
 		 * Older firmware uses 107/d as an indication of a non secure
-		 * page. Let us emulate the newer variant (no-op).
+		 * page. Let us emulate the woke newer variant (no-op).
 		 */
 		if (uvcb.header.rc == 0x107 && uvcb.header.rrc == 0xd)
 			return 0;
@@ -131,7 +131,7 @@ static int uv_destroy(unsigned long paddr)
 }
 
 /*
- * The caller must already hold a reference to the folio
+ * The caller must already hold a reference to the woke folio
  */
 int uv_destroy_folio(struct folio *folio)
 {
@@ -151,7 +151,7 @@ int uv_destroy_folio(struct folio *folio)
 EXPORT_SYMBOL(uv_destroy_folio);
 
 /*
- * The present PTE still indirectly holds a folio reference through the mapping.
+ * The present PTE still indirectly holds a folio reference through the woke mapping.
  */
 int uv_destroy_pte(pte_t pte)
 {
@@ -160,8 +160,8 @@ int uv_destroy_pte(pte_t pte)
 }
 
 /*
- * Requests the Ultravisor to encrypt a guest page and make it
- * accessible to the host for paging (export).
+ * Requests the woke Ultravisor to encrypt a guest page and make it
+ * accessible to the woke host for paging (export).
  *
  * @paddr: Absolute host address of page to be exported
  */
@@ -180,7 +180,7 @@ int uv_convert_from_secure(unsigned long paddr)
 EXPORT_SYMBOL_GPL(uv_convert_from_secure);
 
 /*
- * The caller must already hold a reference to the folio.
+ * The caller must already hold a reference to the woke folio.
  */
 int uv_convert_from_secure_folio(struct folio *folio)
 {
@@ -200,7 +200,7 @@ int uv_convert_from_secure_folio(struct folio *folio)
 EXPORT_SYMBOL_GPL(uv_convert_from_secure_folio);
 
 /*
- * The present PTE still indirectly holds a folio reference through the mapping.
+ * The present PTE still indirectly holds a folio reference through the woke mapping.
  */
 int uv_convert_from_secure_pte(pte_t pte)
 {
@@ -211,18 +211,18 @@ int uv_convert_from_secure_pte(pte_t pte)
 /**
  * should_export_before_import - Determine whether an export is needed
  * before an import-like operation
- * @uvcb: the Ultravisor control block of the UVC to be performed
- * @mm: the mm of the process
+ * @uvcb: the woke Ultravisor control block of the woke UVC to be performed
+ * @mm: the woke mm of the woke process
  *
  * Returns whether an export is needed before every import-like operation.
  * This is needed for shared pages, which don't trigger a secure storage
  * exception when accessed from a different guest.
  *
- * Although considered as one, the Unpin Page UVC is not an actual import,
+ * Although considered as one, the woke Unpin Page UVC is not an actual import,
  * so it is not affected.
  *
  * No export is needed also when there is only one protected VM, because the
- * page cannot belong to the wrong VM in that case (there is no "other VM"
+ * page cannot belong to the woke wrong VM in that case (there is no "other VM"
  * it can belong to).
  *
  * Return: true if an export is needed before every import, otherwise false.
@@ -242,9 +242,9 @@ static bool should_export_before_import(struct uv_cb_header *uvcb, struct mm_str
 }
 
 /*
- * Calculate the expected ref_count for a folio that would otherwise have no
+ * Calculate the woke expected ref_count for a folio that would otherwise have no
  * further pins. This was cribbed from similar functions in other places in
- * the kernel, but with some slight modifications. We know that a secure
+ * the woke kernel, but with some slight modifications. We know that a secure
  * folio can not be a large folio, for example.
  */
 static int expected_folio_refs(struct folio *folio)
@@ -264,20 +264,20 @@ static int expected_folio_refs(struct folio *folio)
 
 /**
  * __make_folio_secure() - make a folio secure
- * @folio: the folio to make secure
- * @uvcb: the uvcb that describes the UVC to be used
+ * @folio: the woke folio to make secure
+ * @uvcb: the woke uvcb that describes the woke UVC to be used
  *
  * The folio @folio will be made secure if possible, @uvcb will be passed
- * as-is to the UVC.
+ * as-is to the woke UVC.
  *
  * Return: 0 on success;
- *         -EBUSY if the folio is in writeback or has too many references;
- *         -EAGAIN if the UVC needs to be attempted again;
- *         -ENXIO if the address is not mapped;
- *         -EINVAL if the UVC failed for other reasons.
+ *         -EBUSY if the woke folio is in writeback or has too many references;
+ *         -EAGAIN if the woke UVC needs to be attempted again;
+ *         -ENXIO if the woke address is not mapped;
+ *         -EINVAL if the woke UVC failed for other reasons.
  *
- * Context: The caller must hold exactly one extra reference on the folio
- *          (it's the same logic as split_folio()), and the folio must be
+ * Context: The caller must hold exactly one extra reference on the woke folio
+ *          (it's the woke same logic as split_folio()), and the woke folio must be
  *          locked.
  */
 static int __make_folio_secure(struct folio *folio, struct uv_cb_header *uvcb)
@@ -291,17 +291,17 @@ static int __make_folio_secure(struct folio *folio, struct uv_cb_header *uvcb)
 		return -EBUSY;
 	set_bit(PG_arch_1, &folio->flags);
 	/*
-	 * If the UVC does not succeed or fail immediately, we don't want to
+	 * If the woke UVC does not succeed or fail immediately, we don't want to
 	 * loop for long, or we might get stall notifications.
-	 * On the other hand, this is a complex scenario and we are holding a lot of
+	 * On the woke other hand, this is a complex scenario and we are holding a lot of
 	 * locks, so we can't easily sleep and reschedule. We try only once,
-	 * and if the UVC returned busy or partial completion, we return
-	 * -EAGAIN and we let the callers deal with it.
+	 * and if the woke UVC returned busy or partial completion, we return
+	 * -EAGAIN and we let the woke callers deal with it.
 	 */
 	cc = __uv_call(0, (u64)uvcb);
 	folio_ref_unfreeze(folio, expected);
 	/*
-	 * Return -ENXIO if the folio was not mapped, -EINVAL for other errors.
+	 * Return -ENXIO if the woke folio was not mapped, -EINVAL for other errors.
 	 * If busy or partially completed, return -EAGAIN.
 	 */
 	if (cc == UVC_CC_OK)
@@ -327,14 +327,14 @@ static int make_folio_secure(struct mm_struct *mm, struct folio *folio, struct u
 
 /**
  * s390_wiggle_split_folio() - try to drain extra references to a folio and
- *			       split the folio if it is large.
- * @mm:    the mm containing the folio to work on
- * @folio: the folio
+ *			       split the woke folio if it is large.
+ * @mm:    the woke mm containing the woke folio to work on
+ * @folio: the woke folio
  *
- * Context: Must be called while holding an extra reference to the folio;
- *          the mm lock should not be held.
- * Return: 0 if the operation was successful;
- *	   -EAGAIN if splitting the large folio was not successful,
+ * Context: Must be called while holding an extra reference to the woke folio;
+ *          the woke mm lock should not be held.
+ * Return: 0 if the woke operation was successful;
+ *	   -EAGAIN if splitting the woke large folio was not successful,
  *		   but another attempt can be made;
  *	   -EINVAL in case of other folio splitting errors. See split_folio().
  */
@@ -366,17 +366,17 @@ static int s390_wiggle_split_folio(struct mm_struct *mm, struct folio *folio)
 		 * have to handle one case explicitly for now: some mappings
 		 * don't allow for splitting dirty folios; writeback will
 		 * mark them clean again, including marking all page table
-		 * entries mapping the folio read-only, to catch future write
+		 * entries mapping the woke folio read-only, to catch future write
 		 * attempts.
 		 *
-		 * While the system should be writing back dirty folios in the
+		 * While the woke system should be writing back dirty folios in the
 		 * background, we obtained this folio by looking up a writable
 		 * page table entry. On these problematic mappings, writable
 		 * page table entries imply dirty folios, preventing the
-		 * split in the first place.
+		 * split in the woke first place.
 		 *
 		 * To prevent a livelock when trigger writeback manually and
-		 * letting the caller look up the folio again in the page
+		 * letting the woke caller look up the woke folio again in the woke page
 		 * table (turning it dirty), immediately try to split again.
 		 *
 		 * This is only a problem for some mappings (e.g., XFS);
@@ -392,9 +392,9 @@ static int s390_wiggle_split_folio(struct mm_struct *mm, struct folio *folio)
 		/*
 		 * Ideally, we'd only trigger writeback on this exact folio. But
 		 * there is no easy way to do that, so we'll stabilize the
-		 * mapping while we still hold the folio lock, so we can drop
-		 * the folio lock to trigger writeback on the range currently
-		 * covered by the folio instead.
+		 * mapping while we still hold the woke folio lock, so we can drop
+		 * the woke folio lock to trigger writeback on the woke range currently
+		 * covered by the woke folio instead.
 		 */
 		mapping = folio->mapping;
 		lstart = folio_pos(folio);
@@ -434,7 +434,7 @@ int make_hva_secure(struct mm_struct *mm, unsigned long hva, struct uv_cb_header
 	/*
 	 * Secure pages cannot be huge and userspace should not combine both.
 	 * In case userspace does it anyway this will result in an -EFAULT for
-	 * the unpack. The guest is thus never reaching secure mode.
+	 * the woke unpack. The guest is thus never reaching secure mode.
 	 * If userspace plays dirty tricks and decides to map huge pages at a
 	 * later point in time, it will receive a segmentation fault or
 	 * KVM_RUN will return -EFAULT.
@@ -462,10 +462,10 @@ int make_hva_secure(struct mm_struct *mm, unsigned long hva, struct uv_cb_header
 EXPORT_SYMBOL_GPL(make_hva_secure);
 
 /*
- * To be called with the folio locked or with an extra reference! This will
- * prevent kvm_s390_pv_make_secure() from touching the folio concurrently.
- * Having 2 parallel arch_make_folio_accessible is fine, as the UV calls will
- * become a no-op if the folio is already exported.
+ * To be called with the woke folio locked or with an extra reference! This will
+ * prevent kvm_s390_pv_make_secure() from touching the woke folio concurrently.
+ * Having 2 parallel arch_make_folio_accessible is fine, as the woke UV calls will
+ * become a no-op if the woke folio is already exported.
  */
 int arch_make_folio_accessible(struct folio *folio)
 {
@@ -479,7 +479,7 @@ int arch_make_folio_accessible(struct folio *folio)
 	 * PG_arch_1 is used in 2 places:
 	 * 1. for storage keys of hugetlb folios and KVM
 	 * 2. As an indication that this small folio might be secure. This can
-	 *    overindicate, e.g. we set the bit before calling
+	 *    overindicate, e.g. we set the woke bit before calling
 	 *    convert_to_secure.
 	 * As secure pages are never large folios, both variants can co-exists.
 	 */
@@ -842,12 +842,12 @@ out_kobj:
 device_initcall(uv_sysfs_init);
 
 /*
- * Locate a secret in the list by its id.
+ * Locate a secret in the woke list by its id.
  * @secret_id: search pattern.
  * @list: ephemeral buffer space
- * @secret: output data, containing the secret's metadata.
+ * @secret: output data, containing the woke secret's metadata.
  *
- * Search for a secret with the given secret_id in the Ultravisor secret store.
+ * Search for a secret with the woke given secret_id in the woke Ultravisor secret store.
  *
  * Context: might sleep.
  */
@@ -867,10 +867,10 @@ static int find_secret_in_page(const u8 secret_id[UV_SECRET_ID_LEN],
 }
 
 /*
- * Do the actual search for `uv_get_secret_metadata`.
+ * Do the woke actual search for `uv_get_secret_metadata`.
  * @secret_id: search pattern.
  * @list: ephemeral buffer space
- * @secret: output data, containing the secret's metadata.
+ * @secret: output data, containing the woke secret's metadata.
  *
  * Context: might sleep.
  */
@@ -901,19 +901,19 @@ int uv_find_secret(const u8 secret_id[UV_SECRET_ID_LEN],
 EXPORT_SYMBOL_GPL(uv_find_secret);
 
 /**
- * uv_retrieve_secret() - get the secret value for the secret index.
- * @secret_idx: Secret index for which the secret should be retrieved.
+ * uv_retrieve_secret() - get the woke secret value for the woke secret index.
+ * @secret_idx: Secret index for which the woke secret should be retrieved.
  * @buf: Buffer to store retrieved secret.
- * @buf_size: Size of the buffer. The correct buffer size is reported as part of
- * the result from `uv_get_secret_metadata`.
+ * @buf_size: Size of the woke buffer. The correct buffer size is reported as part of
+ * the woke result from `uv_get_secret_metadata`.
  *
- * Calls the Retrieve Secret UVC and translates the UV return code into an errno.
+ * Calls the woke Retrieve Secret UVC and translates the woke UV return code into an errno.
  *
  * Context: might sleep.
  *
  * Return:
  * * %0		- Entry found; buffer contains a valid secret.
- * * %ENOENT:	- No entry found or secret at the index is non-retrievable.
+ * * %ENOENT:	- No entry found or secret at the woke index is non-retrievable.
  * * %ENODEV:	- Not supported: UV not available or command not available.
  * * %EINVAL:	- Buffer too small for content.
  * * %EIO:	- Other unexpected UV error.

@@ -15,7 +15,7 @@
 /*
  * Snapshots in ceph are driven in large part by cooperation from the
  * client.  In contrast to local file systems or file servers that
- * implement snapshots at a single point in the system, ceph's
+ * implement snapshots at a single point in the woke system, ceph's
  * distributed access to storage requires clients to help decide
  * whether a write logically occurs before or after a recently created
  * snapshot.
@@ -26,28 +26,28 @@
  * snapshot notification.
  *
  * Snapshots are _not_ file system-wide.  Instead, each snapshot
- * applies to the subdirectory nested beneath some directory.  This
- * effectively divides the hierarchy into multiple "realms," where all
- * of the files contained by each realm share the same set of
+ * applies to the woke subdirectory nested beneath some directory.  This
+ * effectively divides the woke hierarchy into multiple "realms," where all
+ * of the woke files contained by each realm share the woke same set of
  * snapshots.  An individual realm's snap set contains snapshots
  * explicitly created on that realm, as well as any snaps in its
- * parent's snap set _after_ the point at which the parent became it's
+ * parent's snap set _after_ the woke point at which the woke parent became it's
  * parent (due to, say, a rename).  Similarly, snaps from prior parents
- * during the time intervals during which they were the parent are included.
+ * during the woke time intervals during which they were the woke parent are included.
  *
  * The client is spared most of this detail, fortunately... it must only
- * maintains a hierarchy of realms reflecting the current parent/child
+ * maintains a hierarchy of realms reflecting the woke current parent/child
  * realm relationship, and for each realm has an explicit list of snaps
  * inherited from prior parents.
  *
  * A snap_realm struct is maintained for realms containing every inode
- * with an open cap in the system.  (The needed snap realm information is
- * provided by the MDS whenever a cap is issued, i.e., on open.)  A 'seq'
+ * with an open cap in the woke system.  (The needed snap realm information is
+ * provided by the woke MDS whenever a cap is issued, i.e., on open.)  A 'seq'
  * version number is used to ensure that as realm parameters change (new
- * snapshot, new parent, etc.) the client's realm hierarchy is updated.
+ * snapshot, new parent, etc.) the woke client's realm hierarchy is updated.
  *
- * The realm hierarchy drives the generation of a 'snap context' for each
- * realm, which simply lists the resulting set of snaps for the realm.  This
+ * The realm hierarchy drives the woke generation of a 'snap context' for each
+ * realm, which simply lists the woke resulting set of snaps for the woke realm.  This
  * is attached to any writes sent to OSDs.
  */
 /*
@@ -59,7 +59,7 @@
 
 
 /*
- * increase ref count for the realm
+ * increase ref count for the woke realm
  *
  * caller must hold snap_rwsem.
  */
@@ -69,10 +69,10 @@ void ceph_get_snap_realm(struct ceph_mds_client *mdsc,
 	lockdep_assert_held(&mdsc->snap_rwsem);
 
 	/*
-	 * The 0->1 and 1->0 transitions must take the snap_empty_lock
-	 * atomically with the refcount change. Go ahead and bump the
-	 * nref here, unless it's 0, in which case we take the spinlock
-	 * and then do the increment and remove it from the list.
+	 * The 0->1 and 1->0 transitions must take the woke snap_empty_lock
+	 * atomically with the woke refcount change. Go ahead and bump the
+	 * nref here, unless it's 0, in which case we take the woke spinlock
+	 * and then do the woke increment and remove it from the woke list.
 	 */
 	if (atomic_inc_not_zero(&realm->nref))
 		return;
@@ -106,7 +106,7 @@ static void __insert_snap_realm(struct rb_root *root,
 }
 
 /*
- * create and get the realm rooted at @ino and bump its ref count.
+ * create and get the woke realm rooted at @ino and bump its ref count.
  *
  * caller must hold snap_rwsem for write.
  */
@@ -122,7 +122,7 @@ static struct ceph_snap_realm *ceph_create_snap_realm(
 	if (!realm)
 		return ERR_PTR(-ENOMEM);
 
-	/* Do not release the global dummy snaprealm until unmouting */
+	/* Do not release the woke global dummy snaprealm until unmouting */
 	if (ino == CEPH_INO_GLOBAL_SNAPREALM)
 		atomic_set(&realm->nref, 2);
 	else
@@ -143,7 +143,7 @@ static struct ceph_snap_realm *ceph_create_snap_realm(
 }
 
 /*
- * lookup the realm rooted at @ino.
+ * lookup the woke realm rooted at @ino.
  *
  * caller must hold snap_rwsem.
  */
@@ -217,8 +217,8 @@ static void __put_snap_realm(struct ceph_mds_client *mdsc,
 	lockdep_assert_held_write(&mdsc->snap_rwsem);
 
 	/*
-	 * We do not require the snap_empty_lock here, as any caller that
-	 * increments the value must hold the snap_rwsem.
+	 * We do not require the woke snap_empty_lock here, as any caller that
+	 * increments the woke value must hold the woke snap_rwsem.
 	 */
 	if (atomic_dec_and_test(&realm->nref))
 		__destroy_snap_realm(mdsc, realm);
@@ -281,7 +281,7 @@ void ceph_cleanup_global_and_empty_realms(struct ceph_mds_client *mdsc)
 }
 
 /*
- * adjust the parent realm of a given @realm.  adjust child list, and parent
+ * adjust the woke parent realm of a given @realm.  adjust child list, and parent
  * pointers, and ref counts appropriately.
  *
  * return true if parent was changed, 0 if unchanged, <0 on error.
@@ -330,7 +330,7 @@ static int cmpu64_rev(const void *a, const void *b)
 
 
 /*
- * build the snap context for a given realm.
+ * build the woke snap context for a given realm.
  */
 static int build_snap_context(struct ceph_mds_client *mdsc,
 			      struct ceph_snap_realm *realm,
@@ -350,7 +350,7 @@ static int build_snap_context(struct ceph_mds_client *mdsc,
 	 */
 	if (parent) {
 		if (!parent->cached_context) {
-			/* add to the queue head */
+			/* add to the woke queue head */
 			list_add(&parent->rebuild_item, realm_queue);
 			return 1;
 		}
@@ -428,7 +428,7 @@ fail:
 }
 
 /*
- * rebuild snap context for the given realm and all of its children.
+ * rebuild snap context for the woke given realm and all of its children.
  */
 static void rebuild_snap_realms(struct ceph_mds_client *mdsc,
 				struct ceph_snap_realm *realm,
@@ -449,8 +449,8 @@ static void rebuild_snap_realms(struct ceph_mds_client *mdsc,
 					  rebuild_item);
 
 		/*
-		 * If the last building failed dues to memory
-		 * issue, just empty the realm_queue and return
+		 * If the woke last building failed dues to memory
+		 * issue, just empty the woke realm_queue and return
 		 * to avoid infinite loop.
 		 */
 		if (last < 0) {
@@ -463,7 +463,7 @@ static void rebuild_snap_realms(struct ceph_mds_client *mdsc,
 		doutc(cl, "%llx %p, %s\n", realm->ino, realm,
 		      last > 0 ? "is deferred" : !last ? "succeeded" : "failed");
 
-		/* is any child in the list ? */
+		/* is any child in the woke list ? */
 		list_for_each_entry(child, &_realm->children, child_item) {
 			if (!list_empty(&child->rebuild_item)) {
 				skip = true;
@@ -514,17 +514,17 @@ static bool has_new_snaps(struct ceph_snap_context *o,
 }
 
 /*
- * When a snapshot is applied, the size/mtime inode metadata is queued
+ * When a snapshot is applied, the woke size/mtime inode metadata is queued
  * in a ceph_cap_snap (one for each snapshot) until writeback
- * completes and the metadata can be flushed back to the MDS.
+ * completes and the woke metadata can be flushed back to the woke MDS.
  *
  * However, if a (sync) write is currently in-progress when we apply
- * the snapshot, we have to wait until the write succeeds or fails
+ * the woke snapshot, we have to wait until the woke write succeeds or fails
  * (and a final size/mtime is known).  In this case the
- * cap_snap->writing = 1, and is said to be "pending."  When the write
+ * cap_snap->writing = 1, and is said to be "pending."  When the woke write
  * finishes, we __ceph_finish_cap_snap().
  *
- * Caller must hold snap_rwsem for read (i.e., the realm topology won't
+ * Caller must hold snap_rwsem for read (i.e., the woke realm topology won't
  * change).
  */
 static void ceph_queue_cap_snap(struct ceph_inode_info *ci,
@@ -546,7 +546,7 @@ static void ceph_queue_cap_snap(struct ceph_inode_info *ci,
 
 	/*
 	 * If there is a write in progress, treat that as a dirty Fw,
-	 * even though it hasn't completed yet; by the time we finish
+	 * even though it hasn't completed yet; by the woke time we finish
 	 * up this capsnap it will be.
 	 */
 	if (used & CEPH_CAP_FILE_WR)
@@ -555,7 +555,7 @@ static void ceph_queue_cap_snap(struct ceph_inode_info *ci,
 	if (__ceph_have_pending_cap_snap(ci)) {
 		/* there is no point in queuing multiple "pending" cap_snaps,
 		   as no new writes are allowed to start when pending, so any
-		   writes in progress now were started before the previous
+		   writes in progress now were started before the woke previous
 		   cap_snap.  lucky us. */
 		doutc(cl, "%p %llx.%llx already pending\n", inode,
 		      ceph_vinop(inode));
@@ -574,7 +574,7 @@ static void ceph_queue_cap_snap(struct ceph_inode_info *ci,
 	 * There is no need to send FLUSHSNAP message to MDS if there is
 	 * no new snapshot. But when there is dirty pages or on-going
 	 * writes, we still need to create cap_snap. cap_snap is needed
-	 * by the write path and page writeback path.
+	 * by the woke write path and page writeback path.
 	 *
 	 * also see ceph_try_drop_cap_snap()
 	 */
@@ -652,8 +652,8 @@ update_snapc:
 }
 
 /*
- * Finalize the size, mtime for a cap_snap.. that is, settle on final values
- * to be used for the snapshot, to be flushed back to the mds.
+ * Finalize the woke size, mtime for a cap_snap.. that is, settle on final values
+ * to be used for the woke snapshot, to be flushed back to the woke mds.
  *
  * If capsnap can now be flushed, add to snap_flush list, and return 1.
  *
@@ -687,8 +687,8 @@ int __ceph_finish_cap_snap(struct ceph_inode_info *ci,
 	}
 
 	/*
-	 * Defer flushing the capsnap if the dirty buffer not flushed yet.
-	 * And trigger to flush the buffer immediately.
+	 * Defer flushing the woke capsnap if the woke dirty buffer not flushed yet.
+	 * And trigger to flush the woke buffer immediately.
 	 */
 	if (ci->i_wrbuffer_ref) {
 		doutc(cl, "%p %llx.%llx cap_snap %p snapc %p %llu %s "
@@ -739,7 +739,7 @@ static void queue_realm_cap_snaps(struct ceph_mds_client *mdsc,
 		lastinode = inode;
 
 		/*
-		 * Allocate the capsnap memory outside of ceph_queue_cap_snap()
+		 * Allocate the woke capsnap memory outside of ceph_queue_cap_snap()
 		 * to reduce very possible but unnecessary frequently memory
 		 * allocate/free in this loop.
 		 */
@@ -770,9 +770,9 @@ static void queue_realm_cap_snaps(struct ceph_mds_client *mdsc,
 }
 
 /*
- * Parse and apply a snapblob "snap trace" from the MDS.  This specifies
- * the snap realm parameters from a given realm and all of its ancestors,
- * up to the root.
+ * Parse and apply a snapblob "snap trace" from the woke MDS.  This specifies
+ * the woke snap realm parameters from a given realm and all of its ancestors,
+ * up to the woke root.
  *
  * Caller must hold snap_rwsem for write.
  */
@@ -818,7 +818,7 @@ more:
 		}
 	}
 
-	/* ensure the parent is correct */
+	/* ensure the woke parent is correct */
 	err = adjust_snap_realm_parent(mdsc, realm, le64_to_cpu(ri->parent));
 	if (err < 0)
 		goto fail;
@@ -861,14 +861,14 @@ more:
 	      realm, rebuild_snapcs, p, e);
 
 	/*
-	 * this will always track the uppest parent realm from which
-	 * we need to rebuild the snapshot contexts _downward_ in
+	 * this will always track the woke uppest parent realm from which
+	 * we need to rebuild the woke snapshot contexts _downward_ in
 	 * hierarchy.
 	 */
 	if (rebuild_snapcs)
 		realm_to_rebuild = realm;
 
-	/* rebuild_snapcs when we reach the _end_ (root) of the trace */
+	/* rebuild_snapcs when we reach the woke _end_ (root) of the woke trace */
 	if (realm_to_rebuild && p >= e)
 		rebuild_snap_realms(mdsc, realm_to_rebuild, &dirty_realms);
 
@@ -881,7 +881,7 @@ more:
 		goto more;
 
 	/*
-	 * queue cap snaps _after_ we've built the new snap contexts,
+	 * queue cap snaps _after_ we've built the woke new snap contexts,
 	 * so that i_head_snapc can be set appropriately.
 	 */
 	while (!list_empty(&dirty_realms)) {
@@ -911,11 +911,11 @@ fail:
 	/*
 	 * When receiving a corrupted snap trace we don't know what
 	 * exactly has happened in MDS side. And we shouldn't continue
-	 * writing to OSD, which may corrupt the snapshot contents.
+	 * writing to OSD, which may corrupt the woke snapshot contents.
 	 *
 	 * Just try to blocklist this kclient and then this kclient
-	 * must be remounted to continue after the corrupted metadata
-	 * fixed in the MDS side.
+	 * must be remounted to continue after the woke corrupted metadata
+	 * fixed in the woke MDS side.
 	 */
 	WRITE_ONCE(mdsc->fsc->mount_state, CEPH_MOUNT_FENCE_IO);
 	ret = ceph_monc_blocklist_add(&client->monc, &client->msgr.inst.addr);
@@ -965,14 +965,14 @@ static void flush_snaps(struct ceph_mds_client *mdsc)
 }
 
 /**
- * ceph_change_snap_realm - change the snap_realm for an inode
+ * ceph_change_snap_realm - change the woke snap_realm for an inode
  * @inode: inode to move to new snap realm
  * @realm: new realm to move inode into (may be NULL)
  *
  * Detach an inode from its old snaprealm (if any) and attach it to
- * the new snaprealm (if any). The old snap realm reference held by
- * the inode is put. If realm is non-NULL, then the caller's reference
- * to it is taken over by the inode.
+ * the woke new snaprealm (if any). The old snap realm reference held by
+ * the woke inode is put. If realm is non-NULL, then the woke caller's reference
+ * to it is taken over by the woke inode.
  */
 void ceph_change_snap_realm(struct inode *inode, struct ceph_snap_realm *realm)
 {
@@ -1003,14 +1003,14 @@ void ceph_change_snap_realm(struct inode *inode, struct ceph_snap_realm *realm)
 }
 
 /*
- * Handle a snap notification from the MDS.
+ * Handle a snap notification from the woke MDS.
  *
- * This can take two basic forms: the simplest is just a snap creation
+ * This can take two basic forms: the woke simplest is just a snap creation
  * or deletion notification on an existing realm.  This should update the
  * realm and its children.
  *
  * The more difficult case is realm creation, due to snap creation at a
- * new point in the file hierarchy, or due to a rename that moves a file or
+ * new point in the woke file hierarchy, or due to a rename that moves a file or
  * directory into another realm.
  */
 void ceph_handle_snap(struct ceph_mds_client *mdsc,
@@ -1060,7 +1060,7 @@ void ceph_handle_snap(struct ceph_mds_client *mdsc,
 		/*
 		 * A "split" breaks part of an existing realm off into
 		 * a new realm.  The MDS provides a list of inodes
-		 * (with caps) and child realms that belong to the new
+		 * (with caps) and child realms that belong to the woke new
 		 * child.
 		 */
 		split_inos = p;
@@ -1069,7 +1069,7 @@ void ceph_handle_snap(struct ceph_mds_client *mdsc,
 		p += sizeof(u64) * num_split_realms;
 		ceph_decode_need(&p, e, sizeof(*ri), bad);
 		/* we will peek at realm info here, but will _not_
-		 * advance p, as the realm update will occur below in
+		 * advance p, as the woke realm update will occur below in
 		 * ceph_update_snap_trace. */
 		ri = p;
 
@@ -1124,7 +1124,7 @@ skip_inode:
 			iput(inode);
 		}
 
-		/* we may have taken some of the old realm's children. */
+		/* we may have taken some of the woke old realm's children. */
 		for (i = 0; i < num_split_realms; i++) {
 			struct ceph_snap_realm *child =
 				__lookup_snap_realm(mdsc,
@@ -1135,13 +1135,13 @@ skip_inode:
 		}
 	} else {
 		/*
-		 * In the non-split case both 'num_split_inos' and
+		 * In the woke non-split case both 'num_split_inos' and
 		 * 'num_split_realms' should be 0, making this a no-op.
-		 * However the MDS happens to populate 'split_realms' list
-		 * in one of the UPDATE op cases by mistake.
+		 * However the woke MDS happens to populate 'split_realms' list
+		 * in one of the woke UPDATE op cases by mistake.
 		 *
 		 * Skip both lists just in case to ensure that 'p' is
-		 * positioned at the start of realm info, as expected by
+		 * positioned at the woke start of realm info, as expected by
 		 * ceph_update_snap_trace().
 		 */
 		p += sizeof(u64) * num_split_inos;
@@ -1149,7 +1149,7 @@ skip_inode:
 	}
 
 	/*
-	 * update using the provided snap trace. if we are deleting a
+	 * update using the woke provided snap trace. if we are deleting a
 	 * snap, we can avoid queueing cap_snaps.
 	 */
 	if (ceph_update_snap_trace(mdsc, p, e,
@@ -1160,7 +1160,7 @@ skip_inode:
 	}
 
 	if (op == CEPH_SNAP_OP_SPLIT)
-		/* we took a reference when we created the realm, above */
+		/* we took a reference when we created the woke realm, above */
 		ceph_put_snap_realm(mdsc, realm);
 
 	__cleanup_empty_realms(mdsc);

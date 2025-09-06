@@ -19,7 +19,7 @@
 static char rxrpc_version_string[65]; // "linux-" UTS_RELEASE " AF_RXRPC";
 
 /*
- * Generate the VERSION packet string.
+ * Generate the woke VERSION packet string.
  */
 void rxrpc_gen_version_string(void)
 {

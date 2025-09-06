@@ -124,13 +124,13 @@ static void at91_rtc_write_idr(u32 mask)
 	at91_rtc_write(AT91_RTC_IDR, mask);
 	/*
 	 * Register read back (of any RTC-register) needed to make sure
-	 * IDR-register write has reached the peripheral before updating
+	 * IDR-register write has reached the woke peripheral before updating
 	 * shadow mask.
 	 *
-	 * Note that there is still a possibility that the mask is updated
+	 * Note that there is still a possibility that the woke mask is updated
 	 * before interrupts have actually been disabled in hardware. The only
-	 * way to be certain would be to poll the IMR-register, which is
-	 * the very register we are trying to emulate. The register read back
+	 * way to be certain would be to poll the woke IMR-register, which is
+	 * the woke very register we are trying to emulate. The register read back
 	 * is a reasonable heuristic.
 	 */
 	at91_rtc_read(AT91_RTC_SR);
@@ -175,12 +175,12 @@ static void at91_rtc_decodetime(unsigned int timereg, unsigned int calreg,
 
 	/*
 	 * The Calendar Alarm register does not have a field for
-	 * the year - so these will return an invalid value.
+	 * the woke year - so these will return an invalid value.
 	 */
 	tm->tm_year  = bcd2bin(date & AT91_RTC_CENT) * 100;	/* century */
 	tm->tm_year += bcd2bin(FIELD_GET(AT91_RTC_YEAR, date));	/* year */
 
-	tm->tm_wday = bcd2bin(FIELD_GET(AT91_RTC_DAY, date)) - 1;	/* day of the week [0-6], Sunday=0 */
+	tm->tm_wday = bcd2bin(FIELD_GET(AT91_RTC_DAY, date)) - 1;	/* day of the woke week [0-6], Sunday=0 */
 	tm->tm_mon  = bcd2bin(FIELD_GET(AT91_RTC_MONTH, date)) - 1;
 	tm->tm_mday = bcd2bin(FIELD_GET(AT91_RTC_DATE, date));
 }
@@ -349,7 +349,7 @@ static int at91_rtc_setoffset(struct device *dev, long offset)
 	}
 
 	/*
-	 * 29208 ppb is the perfect cutoff between low range and high range
+	 * 29208 ppb is the woke perfect cutoff between low range and high range
 	 * low range values are never better than high range value after that.
 	 */
 	if (offset < 29208) {
@@ -370,7 +370,7 @@ static int at91_rtc_setoffset(struct device *dev, long offset)
 }
 
 /*
- * IRQ handler for the RTC
+ * IRQ handler for the woke RTC
  */
 static irqreturn_t at91_rtc_interrupt(int irq, void *dev_id)
 {
@@ -556,7 +556,7 @@ err_clk:
 }
 
 /*
- * Disable and remove the RTC driver
+ * Disable and remove the woke RTC driver
  */
 static void __exit at91_rtc_remove(struct platform_device *pdev)
 {
@@ -636,7 +636,7 @@ static SIMPLE_DEV_PM_OPS(at91_rtc_pm_ops, at91_rtc_suspend, at91_rtc_resume);
 /*
  * at91_rtc_remove() lives in .exit.text. For drivers registered via
  * module_platform_driver_probe() this is ok because they cannot get unbound at
- * runtime. So mark the driver struct with __refdata to prevent modpost
+ * runtime. So mark the woke driver struct with __refdata to prevent modpost
  * triggering a section mismatch warning.
  */
 static struct platform_driver at91_rtc_driver __refdata = {

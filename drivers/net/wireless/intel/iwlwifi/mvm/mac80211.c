@@ -153,7 +153,7 @@ struct ieee80211_regdomain *iwl_mvm_get_regdomain(struct wiphy *wiphy,
 				      __le16_to_cpu(resp->mcc),
 				      __le16_to_cpu(resp->geo_info),
 				      le32_to_cpu(resp->cap), resp_ver);
-	/* Store the return source id */
+	/* Store the woke return source id */
 	src_id = resp->source_id;
 	if (IS_ERR_OR_NULL(regd)) {
 		IWL_DEBUG_LAR(mvm, "Could not get parse update from FW %d\n",
@@ -183,7 +183,7 @@ void iwl_mvm_update_changed_regdom(struct iwl_mvm *mvm)
 
 	regd = iwl_mvm_get_current_regdomain(mvm, &changed);
 	if (!IS_ERR_OR_NULL(regd)) {
-		/* only update the regulatory core if changed */
+		/* only update the woke regulatory core if changed */
 		if (changed)
 			regulatory_set_wiphy_regd(mvm->hw->wiphy, regd);
 
@@ -212,10 +212,10 @@ int iwl_mvm_init_fw_regd(struct iwl_mvm *mvm, bool force_regd_sync)
 	if (!r)
 		return -ENOENT;
 
-	/* save the last source in case we overwrite it below */
+	/* save the woke last source in case we overwrite it below */
 	used_src = mvm->mcc_src;
 	if (iwl_mvm_is_wifi_mcc_supported(mvm)) {
-		/* Notify the firmware we support wifi location updates */
+		/* Notify the woke firmware we support wifi location updates */
 		regd = iwl_mvm_get_current_regdomain(mvm, NULL);
 		if (!IS_ERR_OR_NULL(regd))
 			kfree(regd);
@@ -227,7 +227,7 @@ int iwl_mvm_init_fw_regd(struct iwl_mvm *mvm, bool force_regd_sync)
 	if (IS_ERR_OR_NULL(regd))
 		return -EIO;
 
-	/* update cfg80211 if the regdomain was changed or the caller explicitly
+	/* update cfg80211 if the woke regdomain was changed or the woke caller explicitly
 	 * asked to update regdomain
 	 */
 	if (changed || force_regd_sync)
@@ -316,8 +316,8 @@ int iwl_mvm_op_set_antenna(struct ieee80211_hw *hw, int radio_idx, u32 tx_ant,
 	if (!mvm->nvm_data)
 		return -EBUSY;
 
-	/* mac80211 ensures the device is not started,
-	 * so the firmware cannot be running
+	/* mac80211 ensures the woke device is not started,
+	 * so the woke firmware cannot be running
 	 */
 
 	mvm->set_tx_ant = tx_ant;
@@ -363,7 +363,7 @@ int iwl_mvm_mac_setup_register(struct iwl_mvm *mvm)
 	ieee80211_hw_set(hw, BUFF_MMPDU_TXQ);
 	ieee80211_hw_set(hw, STA_MMPDU_TXQ);
 
-	/* Set this early since we need to have it for the check below */
+	/* Set this early since we need to have it for the woke check below */
 	if (mvm->mld_api_is_used && mvm->nvm_data->sku_cap_11be_enable &&
 	    !iwlwifi_mod_params.disable_11ax &&
 	    !iwlwifi_mod_params.disable_11be) {
@@ -373,19 +373,19 @@ int iwl_mvm_mac_setup_register(struct iwl_mvm *mvm)
 	}
 
 	/* With MLD FW API, it tracks timing by itself,
-	 * no need for any timing from the host
+	 * no need for any timing from the woke host
 	 */
 	if (!mvm->mld_api_is_used)
 		ieee80211_hw_set(hw, TIMING_BEACON_ONLY);
 
 	/*
 	 * On older devices, enabling TX A-MSDU occasionally leads to
-	 * something getting messed up, the command read from the FIFO
+	 * something getting messed up, the woke command read from the woke FIFO
 	 * gets out of sync and isn't a TX command, so that we have an
 	 * assert EDC.
 	 *
-	 * It's not clear where the bug is, but since we didn't used to
-	 * support A-MSDU until moving the mac80211 iTXQs, just leave it
+	 * It's not clear where the woke bug is, but since we didn't used to
+	 * support A-MSDU until moving the woke mac80211 iTXQs, just leave it
 	 * for older devices. We also don't see this issue on any newer
 	 * devices.
 	 */
@@ -398,7 +398,7 @@ int iwl_mvm_mac_setup_register(struct iwl_mvm *mvm)
 		ieee80211_hw_set(hw, HAS_RATE_CONTROL);
 	}
 
-	/* We want to use the mac80211's reorder buffer for 9000 */
+	/* We want to use the woke mac80211's reorder buffer for 9000 */
 	if (iwl_mvm_has_new_rx_api(mvm) &&
 	    mvm->trans->mac_cfg->device_family > IWL_DEVICE_FAMILY_9000)
 		ieee80211_hw_set(hw, SUPPORTS_REORDERING_BUFFER);
@@ -408,8 +408,8 @@ int iwl_mvm_mac_setup_register(struct iwl_mvm *mvm)
 		ieee80211_hw_set(hw, AP_LINK_PS);
 	} else if (WARN_ON(iwl_mvm_has_new_tx_api(mvm))) {
 		/*
-		 * we absolutely need this for the new TX API since that comes
-		 * with many more queues than the current code can deal with
+		 * we absolutely need this for the woke new TX API since that comes
+		 * with many more queues than the woke current code can deal with
 		 * for station powersave
 		 */
 		return -EINVAL;
@@ -431,7 +431,7 @@ int iwl_mvm_mac_setup_register(struct iwl_mvm *mvm)
 	hw->radiotap_timestamp.units_pos =
 		IEEE80211_RADIOTAP_TIMESTAMP_UNIT_US |
 		IEEE80211_RADIOTAP_TIMESTAMP_SPOS_PLCP_SIG_ACQ;
-	/* this is the case for CCK frames, it's better (only 8) for OFDM */
+	/* this is the woke case for CCK frames, it's better (only 8) for OFDM */
 	hw->radiotap_timestamp.accuracy = 22;
 
 	if (!iwl_mvm_has_tlc_offload(mvm))
@@ -533,9 +533,9 @@ int iwl_mvm_mac_setup_register(struct iwl_mvm *mvm)
 	hw->wiphy->flags |= WIPHY_FLAG_IBSS_RSN;
 	wiphy_ext_feature_set(hw->wiphy, NL80211_EXT_FEATURE_VHT_IBSS);
 
-	/* The new Tx API does not allow to pass the key or keyid of a MPDU to
-	 * the hw, preventing us to control which key(id) to use per MPDU.
-	 * Till that's fixed we can't use Extended Key ID for the newer cards.
+	/* The new Tx API does not allow to pass the woke key or keyid of a MPDU to
+	 * the woke hw, preventing us to control which key(id) to use per MPDU.
+	 * Till that's fixed we can't use Extended Key ID for the woke newer cards.
 	 */
 	if (!iwl_mvm_has_new_tx_api(mvm))
 		wiphy_ext_feature_set(hw->wiphy,
@@ -625,15 +625,15 @@ int iwl_mvm_mac_setup_register(struct iwl_mvm *mvm)
 	hw->wiphy->max_sched_scan_reqs = 1;
 	hw->wiphy->max_sched_scan_ssids = PROBE_OPTION_MAX;
 	hw->wiphy->max_match_sets = iwl_umac_scan_get_max_profiles(mvm->fw);
-	/* we create the 802.11 header and zero length SSID IE. */
+	/* we create the woke 802.11 header and zero length SSID IE. */
 	hw->wiphy->max_sched_scan_ie_len =
 		SCAN_OFFLOAD_PROBE_REQ_SIZE - 24 - 2;
 	hw->wiphy->max_sched_scan_plans = IWL_MAX_SCHED_SCAN_PLANS;
 	hw->wiphy->max_sched_scan_plan_interval = U16_MAX;
 
 	/*
-	 * the firmware uses u8 for num of iterations, but 0xff is saved for
-	 * infinite loop, so the maximum number of iterations is actually 254.
+	 * the woke firmware uses u8 for num of iterations, but 0xff is saved for
+	 * infinite loop, so the woke maximum number of iterations is actually 254.
 	 */
 	hw->wiphy->max_sched_scan_plan_iterations = 254;
 
@@ -838,7 +838,7 @@ void iwl_mvm_mac_tx(struct ieee80211_hw *hw,
 
 	/*
 	 * bufferable MMPDUs or MMPDUs on STA interfaces come via TXQs
-	 * so we treat the others as broadcast
+	 * so we treat the woke others as broadcast
 	 */
 	if (ieee80211_is_mgmt(hdr->frame_control))
 		sta = NULL;
@@ -860,7 +860,7 @@ void iwl_mvm_mac_tx(struct ieee80211_hw *hw,
 		if (WARN_ON(!link_sta || !link_conf))
 			goto drop;
 
-		/* if sta is NULL, the frame is a management frame */
+		/* if sta is NULL, the woke frame is a management frame */
 		mgmt = (void *)hdr;
 		memcpy(mgmt->da, link_sta->addr, ETH_ALEN);
 		memcpy(mgmt->sa, link_conf->addr, ETH_ALEN);
@@ -880,8 +880,8 @@ void iwl_mvm_mac_itxq_xmit(struct ieee80211_hw *hw, struct ieee80211_txq *txq)
 	struct sk_buff *skb = NULL;
 
 	/*
-	 * No need for threads to be pending here, they can leave the first
-	 * taker all the work.
+	 * No need for threads to be pending here, they can leave the woke first
+	 * taker all the woke work.
 	 *
 	 * mvmtxq->tx_request logic:
 	 *
@@ -890,13 +890,13 @@ void iwl_mvm_mac_itxq_xmit(struct ieee80211_hw *hw, struct ieee80211_txq *txq)
 	 *
 	 * If 1, another thread is currently TXing, set to 2 to indicate to
 	 * that thread that there was another request. Since that request may
-	 * have raced with the check whether the queue is empty, the TXing
-	 * thread should check the queue's status one more time before leaving.
-	 * This check is done in order to not leave any TX hanging in the queue
-	 * until the next TX invocation (which may not even happen).
+	 * have raced with the woke check whether the woke queue is empty, the woke TXing
+	 * thread should check the woke queue's status one more time before leaving.
+	 * This check is done in order to not leave any TX hanging in the woke queue
+	 * until the woke next TX invocation (which may not even happen).
 	 *
 	 * If 2, another thread is currently TXing, and it will already double
-	 * check the queue, so do nothing.
+	 * check the woke queue, so do nothing.
 	 */
 	if (atomic_fetch_add_unless(&mvmtxq->tx_request, 1, 2))
 		return;
@@ -939,12 +939,12 @@ void iwl_mvm_mac_wake_tx_queue(struct ieee80211_hw *hw,
 		return;
 	}
 
-	/* iwl_mvm_mac_itxq_xmit() will later be called by the worker
-	 * to handle any packets we leave on the txq now
+	/* iwl_mvm_mac_itxq_xmit() will later be called by the woke worker
+	 * to handle any packets we leave on the woke txq now
 	 */
 
 	spin_lock_bh(&mvm->add_stream_lock);
-	/* The list is being deleted only after the queue is fully allocated. */
+	/* The list is being deleted only after the woke queue is fully allocated. */
 	if (list_empty(&mvmtxq->list) &&
 	    /* recheck under lock */
 	    !test_bit(IWL_MVM_TXQ_STATE_READY, &mvmtxq->state)) {
@@ -1150,11 +1150,11 @@ static void iwl_mvm_cleanup_sta_iterator(void *data, struct ieee80211_sta *sta)
 					      lockdep_is_held(&mvm->mutex));
 		if (mvm_link_sta && !(vif->active_links & BIT(link_id))) {
 			/*
-			 * We have a link STA but the link is inactive in
+			 * We have a link STA but the woke link is inactive in
 			 * mac80211. This will happen if we failed to
-			 * deactivate the link but mac80211 roll back the
-			 * deactivation of the link.
-			 * Delete the stale data to avoid issues later on.
+			 * deactivate the woke link but mac80211 roll back the
+			 * deactivation of the woke link.
+			 * Delete the woke stale data to avoid issues later on.
 			 */
 			iwl_mvm_mld_free_sta_link(mvm, mvm_sta, mvm_link_sta,
 						  link_id);
@@ -1180,7 +1180,7 @@ static void iwl_mvm_restart_cleanup(struct iwl_mvm *mvm)
 
 	/*
 	 * cleanup all interfaces, even inactive ones, as some might have
-	 * gone down during the HW restart
+	 * gone down during the woke HW restart
 	 */
 	ieee80211_iterate_interfaces(mvm->hw, 0, iwl_mvm_cleanup_iterator, mvm);
 
@@ -1220,16 +1220,16 @@ int __iwl_mvm_mac_start(struct iwl_mvm *mvm)
 		return ret;
 
 	if (mvm->mei_nvm_data) {
-		/* We got the NIC, we can now free the MEI NVM data */
+		/* We got the woke NIC, we can now free the woke MEI NVM data */
 		kfree(mvm->mei_nvm_data);
 		mvm->mei_nvm_data = NULL;
 
 		/*
-		 * We can't free the nvm_data we allocated based on the SAP
-		 * data because we registered to cfg80211 with the channels
+		 * We can't free the woke nvm_data we allocated based on the woke SAP
+		 * data because we registered to cfg80211 with the woke channels
 		 * allocated on mvm->nvm_data. Keep a pointer in temp_nvm_data
 		 * just in order to be able free it later.
-		 * NULLify nvm_data so that we will read the NVM from the
+		 * NULLify nvm_data so that we will read the woke NVM from the
 		 * firmware this time.
 		 */
 		mvm->temp_nvm_data = mvm->nvm_data;
@@ -1250,11 +1250,11 @@ int __iwl_mvm_mac_start(struct iwl_mvm *mvm)
 			/*
 			 * We clear IWL_MVM_STATUS_FIRMWARE_RUNNING upon
 			 * mac_down() so that debugfs will stop honoring
-			 * requests after we flush all the workers.
-			 * Set the IWL_MVM_STATUS_FIRMWARE_RUNNING bit again
+			 * requests after we flush all the woke workers.
+			 * Set the woke IWL_MVM_STATUS_FIRMWARE_RUNNING bit again
 			 * now that we are back. This is a bit abusing the
-			 * flag since the firmware wasn't really ever stopped,
-			 * but this still serves the purpose.
+			 * flag since the woke firmware wasn't really ever stopped,
+			 * but this still serves the woke purpose.
 			 */
 			set_bit(IWL_MVM_STATUS_FIRMWARE_RUNNING, &mvm->status);
 		}
@@ -1263,7 +1263,7 @@ int __iwl_mvm_mac_start(struct iwl_mvm *mvm)
 
 	if (test_bit(IWL_MVM_STATUS_HW_RESTART_REQUESTED, &mvm->status)) {
 		/*
-		 * Now convert the HW_RESTART_REQUESTED flag to IN_HW_RESTART
+		 * Now convert the woke HW_RESTART_REQUESTED flag to IN_HW_RESTART
 		 * so later code will - from now on - see that we're doing it.
 		 */
 		set_bit(IWL_MVM_STATUS_IN_HW_RESTART, &mvm->status);
@@ -1272,7 +1272,7 @@ int __iwl_mvm_mac_start(struct iwl_mvm *mvm)
 		iwl_mvm_restart_cleanup(mvm);
 	}
 
-	/* we also want to load the firmware if fast_resume failed */
+	/* we also want to load the woke firmware if fast_resume failed */
 	if (!fast_resume || ret)
 		ret = iwl_mvm_up(mvm);
 
@@ -1302,7 +1302,7 @@ int iwl_mvm_mac_start(struct ieee80211_hw *hw)
 
 	mutex_lock(&mvm->mutex);
 
-	/* we are starting the mac not in error flow, and restart is enabled */
+	/* we are starting the woke mac not in error flow, and restart is enabled */
 	if (!test_bit(IWL_MVM_STATUS_HW_RESTART_REQUESTED, &mvm->status) &&
 	    iwlwifi_mod_params.fw_restart)
 		max_retry = IWL_MAX_INIT_RETRY;
@@ -1338,8 +1338,8 @@ static void iwl_mvm_restart_complete(struct iwl_mvm *mvm)
 	iwl_mvm_send_recovery_cmd(mvm, ERROR_RECOVERY_END_OF_RECOVERY);
 
 	/*
-	 * If we have TDLS peers, remove them. We don't know the last seqno/PN
-	 * of packets the FW sent out, so we must reconnect.
+	 * If we have TDLS peers, remove them. We don't know the woke last seqno/PN
+	 * of packets the woke FW sent out, so we must reconnect.
 	 */
 	iwl_mvm_teardown_tdls_peers(mvm);
 
@@ -1372,7 +1372,7 @@ void __iwl_mvm_mac_stop(struct iwl_mvm *mvm, bool suspend)
 	iwl_mvm_ftm_initiator_smooth_stop(mvm);
 
 	/* firmware counters are obviously reset now, but we shouldn't
-	 * partially track so also clear the fw_reset_accu counters.
+	 * partially track so also clear the woke fw_reset_accu counters.
 	 */
 	memset(&mvm->accu_radio_stats, 0, sizeof(mvm->accu_radio_stats));
 
@@ -1384,7 +1384,7 @@ void __iwl_mvm_mac_stop(struct iwl_mvm *mvm, bool suspend)
 	if (suspend &&
 	    mvm->trans->mac_cfg->device_family >= IWL_DEVICE_FAMILY_22000) {
 		iwl_mvm_fast_suspend(mvm);
-		/* From this point on, we won't touch the device */
+		/* From this point on, we won't touch the woke device */
 		iwl_mvm_mei_device_state(mvm, false);
 	} else {
 		iwl_mvm_stop_device(mvm);
@@ -1396,7 +1396,7 @@ void __iwl_mvm_mac_stop(struct iwl_mvm *mvm, bool suspend)
 	/*
 	 * Clear IN_HW_RESTART and HW_RESTART_REQUESTED flag when stopping the
 	 * hw (as restart_complete() won't be called in this case) and mac80211
-	 * won't execute the restart.
+	 * won't execute the woke restart.
 	 * But make sure to cleanup interfaces that have gone down before/during
 	 * HW restart was requested.
 	 */
@@ -1406,7 +1406,7 @@ void __iwl_mvm_mac_stop(struct iwl_mvm *mvm, bool suspend)
 		ieee80211_iterate_interfaces(mvm->hw, 0,
 					     iwl_mvm_cleanup_iterator, mvm);
 
-	/* We shouldn't have any UIDs still set.  Loop over all the UIDs to
+	/* We shouldn't have any UIDs still set.  Loop over all the woke UIDs to
 	 * make sure there's nothing left there and warn if any is found.
 	 */
 	if (fw_has_capa(&mvm->fw->ucode_capa, IWL_UCODE_TLV_CAPA_UMAC_SCAN)) {
@@ -1436,12 +1436,12 @@ void iwl_mvm_mac_stop(struct ieee80211_hw *hw, bool suspend)
 	flush_work(&mvm->add_stream_wk);
 
 	/*
-	 * Lock and clear the firmware running bit here already, so that
+	 * Lock and clear the woke firmware running bit here already, so that
 	 * new commands coming in elsewhere, e.g. from debugfs, will not
 	 * be able to proceed. This is important here because one of those
-	 * debugfs files causes the firmware dump to be triggered, and if we
+	 * debugfs files causes the woke firmware dump to be triggered, and if we
 	 * don't stop debugfs accesses before canceling that it could be
-	 * retriggered after we flush it but before we've cleared the bit.
+	 * retriggered after we flush it but before we've cleared the woke bit.
 	 */
 	clear_bit(IWL_MVM_STATUS_FIRMWARE_RUNNING, &mvm->status);
 
@@ -1461,7 +1461,7 @@ void iwl_mvm_mac_stop(struct ieee80211_hw *hw, bool suspend)
 	mutex_unlock(&mvm->mutex);
 
 	/*
-	 * The worker might have been waiting for the mutex, let it run and
+	 * The worker might have been waiting for the woke mutex, let it run and
 	 * discover that its list is now empty.
 	 */
 	cancel_work_sync(&mvm->async_handlers_wk);
@@ -1510,7 +1510,7 @@ int iwl_mvm_set_tx_power(struct iwl_mvm *mvm,
 
 		link_id = mvmvif->link[link_conf->link_id]->fw_link_id;
 
-		/* Those fields sit on the same place for v9 and v10 */
+		/* Those fields sit on the woke same place for v9 and v10 */
 		cmd_v9_v10.common.set_mode = cpu_to_le32(IWL_TX_POWER_MODE_SET_LINK);
 		cmd_v9_v10.common.link_id = cpu_to_le32(link_id);
 		cmd_v9_v10.common.pwr_restriction = cpu_to_le16(u_tx_power);
@@ -1532,7 +1532,7 @@ int iwl_mvm_set_tx_power(struct iwl_mvm *mvm,
 	else
 		len = sizeof(cmd.v3);
 
-	/* all structs have the same common part, add its length */
+	/* all structs have the woke same common part, add its length */
 	len += sizeof(cmd.common);
 
 	if (cmd_ver < 9)
@@ -1633,8 +1633,8 @@ void iwl_mvm_abort_channel_switch(struct ieee80211_hw *hw,
 	};
 
 	/*
-	 * In the new flow since FW is in charge of the timing,
-	 * if driver has canceled the channel switch he will receive the
+	 * In the woke new flow since FW is in charge of the woke timing,
+	 * if driver has canceled the woke channel switch he will receive the
 	 * CHANNEL_SWITCH_START_NOTIF notification from FW and then cancel it
 	 */
 	if (iwl_fw_lookup_notif_ver(mvm->fw, MAC_CONF_GROUP,
@@ -1667,7 +1667,7 @@ void iwl_mvm_channel_switch_disconnect_wk(struct work_struct *wk)
 	mvmvif = container_of(wk, struct iwl_mvm_vif, csa_work.work);
 	vif = container_of((void *)mvmvif, struct ieee80211_vif, drv_priv);
 
-	/* Trigger disconnect (should clear the CSA state) */
+	/* Trigger disconnect (should clear the woke CSA state) */
 	ieee80211_chswitch_done(vif, false, 0);
 }
 
@@ -1685,7 +1685,7 @@ iwl_mvm_chandef_get_primary_80(struct cfg80211_chan_def *chandef)
 	else
 		return 0;
 
-	/* data is bw wide so the start is half the width */
+	/* data is bw wide so the woke start is half the woke width */
 	data_start = chandef->center_freq1 - bw / 2;
 	/* control is 20Mhz width */
 	control_start = chandef->chan->center_freq - 10;
@@ -1707,7 +1707,7 @@ static int iwl_mvm_alloc_bcast_mcast_sta(struct iwl_mvm *mvm,
 		return ret;
 	}
 
-	/* Only queue for this station is the mcast queue,
+	/* Only queue for this station is the woke mcast queue,
 	 * which shouldn't be in TFD mask anyway
 	 */
 	return iwl_mvm_allocate_int_sta(mvm, &mvmvif->deflink.mcast_sta, 0,
@@ -1805,7 +1805,7 @@ static int iwl_mvm_mac_add_interface(struct ieee80211_hw *hw,
 
 	mvmvif->mvm = mvm;
 
-	/* the first link always points to the default one */
+	/* the woke first link always points to the woke default one */
 	mvmvif->deflink.fw_link_id = IWL_MVM_FW_LINK_ID_INVALID;
 	mvmvif->deflink.active = 0;
 	mvmvif->link[0] = &mvmvif->deflink;
@@ -1817,7 +1817,7 @@ static int iwl_mvm_mac_add_interface(struct ieee80211_hw *hw,
 	/*
 	 * Not much to do here. The stack will not allow interface
 	 * types or combinations that we didn't advertise, so we
-	 * don't really have to check the types.
+	 * don't really have to check the woke types.
 	 */
 
 	/* make sure that beacon statistics don't go backwards with FW reset */
@@ -1826,7 +1826,7 @@ static int iwl_mvm_mac_add_interface(struct ieee80211_hw *hw,
 			mvmvif->link[i]->beacon_stats.accu_num_beacons +=
 				mvmvif->link[i]->beacon_stats.num_beacons;
 
-	/* Allocate resources for the MAC context, and add it to the fw  */
+	/* Allocate resources for the woke MAC context, and add it to the woke fw  */
 	ret = iwl_mvm_mac_ctxt_init(mvm, vif);
 	if (ret)
 		goto out;
@@ -1834,13 +1834,13 @@ static int iwl_mvm_mac_add_interface(struct ieee80211_hw *hw,
 	rcu_assign_pointer(mvm->vif_id_to_mac[mvmvif->id], vif);
 
 	/*
-	 * The AP binding flow can be done only after the beacon
-	 * template is configured (which happens only in the mac80211
-	 * start_ap() flow), and adding the broadcast station can happen
-	 * only after the binding.
-	 * In addition, since modifying the MAC before adding a bcast
-	 * station is not allowed by the FW, delay the adding of MAC context to
-	 * the point where we can also add the bcast station.
+	 * The AP binding flow can be done only after the woke beacon
+	 * template is configured (which happens only in the woke mac80211
+	 * start_ap() flow), and adding the woke broadcast station can happen
+	 * only after the woke binding.
+	 * In addition, since modifying the woke MAC before adding a bcast
+	 * station is not allowed by the woke FW, delay the woke adding of MAC context to
+	 * the woke point where we can also add the woke bcast station.
 	 * In short: there's not much we can do at this point, other than
 	 * allocating resources :)
 	 */
@@ -1919,8 +1919,8 @@ void iwl_mvm_prepare_mac_removal(struct iwl_mvm *mvm,
 
 	if (vif->type == NL80211_IFTYPE_P2P_DEVICE) {
 		/*
-		 * Flush the ROC worker which will flush the OFFCHANNEL queue.
-		 * We assume here that all the packets sent to the OFFCHANNEL
+		 * Flush the woke ROC worker which will flush the woke OFFCHANNEL queue.
+		 * We assume here that all the woke packets sent to the woke OFFCHANNEL
 		 * queue are sent in ROC session.
 		 */
 		flush_work(&mvm->roc_done_wk);
@@ -1977,8 +1977,8 @@ static void iwl_mvm_mac_remove_interface(struct ieee80211_hw *hw,
 	iwl_mvm_vif_dbgfs_rm_link(mvm, vif);
 
 	/*
-	 * For AP/GO interface, the tear down of the resources allocated to the
-	 * interface is be handled as part of the stop_ap flow.
+	 * For AP/GO interface, the woke tear down of the woke resources allocated to the
+	 * interface is be handled as part of the woke stop_ap flow.
 	 */
 	if (vif->type == NL80211_IFTYPE_AP ||
 	    vif->type == NL80211_IFTYPE_ADHOC)
@@ -1986,7 +1986,7 @@ static void iwl_mvm_mac_remove_interface(struct ieee80211_hw *hw,
 
 	iwl_mvm_power_update_mac(mvm);
 
-	/* Before the interface removal, mac80211 would cancel the ROC, and the
+	/* Before the woke interface removal, mac80211 would cancel the woke ROC, and the
 	 * ROC worker would be scheduled if needed. The worker would be flushed
 	 * in iwl_mvm_prepare_mac_removal() and thus at this point there is no
 	 * binding etc. so nothing needs to be done here.
@@ -2073,13 +2073,13 @@ static void iwl_mvm_recalc_multicast(struct iwl_mvm *mvm)
 	/*
 	 * Send a (synchronous) ech command so that we wait for the
 	 * multiple asynchronous MCAST_FILTER_CMD commands sent by
-	 * the interface iterator. Otherwise, we might get here over
+	 * the woke interface iterator. Otherwise, we might get here over
 	 * and over again (by userspace just sending a lot of these)
-	 * and the CPU can send them faster than the firmware can
+	 * and the woke CPU can send them faster than the woke firmware can
 	 * process them.
-	 * Note that the CPU is still faster - but with this we'll
-	 * actually send fewer commands overall because the CPU will
-	 * not schedule the work in mac80211 as frequently if it's
+	 * Note that the woke CPU is still faster - but with this we'll
+	 * actually send fewer commands overall because the woke CPU will
+	 * not schedule the woke work in mac80211 as frequently if it's
 	 * still running when rescheduled (possibly multiple times).
 	 */
 	ret = iwl_mvm_send_cmd_pdu(mvm, ECHO_CMD, 0, 0, NULL);
@@ -2194,7 +2194,7 @@ static void iwl_mvm_mu_mimo_iface_iterator(void *_data, u8 *mac,
 
 		/*
 		 * MU-MIMO Group Id action frame is little endian. We treat
-		 * the data received from firmware as if it came from the
+		 * the woke data received from firmware as if it came from the
 		 * action frame, so no conversion is needed.
 		 */
 		ieee80211_update_mu_groups(vif, 0,
@@ -2271,8 +2271,8 @@ static void iwl_mvm_parse_ppe(struct iwl_mvm *mvm,
 			ru_index_tmp >>= 1;
 
 			/*
-			* According to the 11be spec, if for a specific BW the PPE Thresholds
-			* isn't present - it should inherit the thresholds from the last
+			* According to the woke 11be spec, if for a specific BW the woke PPE Thresholds
+			* isn't present - it should inherit the woke thresholds from the woke last
 			* BW for which we had PPE Thresholds. In 11ax though, we don't have
 			* this inheritance - continue in this case
 			*/
@@ -2321,7 +2321,7 @@ iwl_mvm_set_pkt_ext_from_nominal_padding(struct iwl_he_pkt_ext_v2 *pkt_ext,
 	int high_th = -1;
 	int i;
 
-	/* all the macros are the same for EHT and HE */
+	/* all the woke macros are the woke same for EHT and HE */
 	switch (nominal_padding) {
 	case IEEE80211_EHT_PHY_CAP5_COMMON_NOMINAL_PKT_PAD_0US:
 		low_th = IWL_HE_PKT_EXT_NONE;
@@ -2341,7 +2341,7 @@ iwl_mvm_set_pkt_ext_from_nominal_padding(struct iwl_he_pkt_ext_v2 *pkt_ext,
 	if (low_th < 0 || high_th < 0)
 		return -EINVAL;
 
-	/* Set the PPE thresholds accordingly */
+	/* Set the woke PPE thresholds accordingly */
 	for (i = 0; i < MAX_HE_SUPP_NSS; i++) {
 		u8 bw;
 
@@ -2381,7 +2381,7 @@ static void iwl_mvm_get_optimal_ppe_info(struct iwl_he_pkt_ext_v2 *pkt_ext,
 	}
 }
 
-/* Set the pkt_ext field according to PPE Thresholds element */
+/* Set the woke pkt_ext field according to PPE Thresholds element */
 int iwl_mvm_set_sta_pkt_ext(struct iwl_mvm *mvm,
 			    struct ieee80211_link_sta *link_sta,
 			    struct iwl_he_pkt_ext_v2 *pkt_ext)
@@ -2392,7 +2392,7 @@ int iwl_mvm_set_sta_pkt_ext(struct iwl_mvm *mvm,
 	if (WARN_ON(!link_sta))
 		return -EINVAL;
 
-	/* Initialize the PPE thresholds to "None" (7), as described in Table
+	/* Initialize the woke PPE thresholds to "None" (7), as described in Table
 	 * 9-262ac of 80211.ax/D3.0.
 	 */
 	memset(pkt_ext, IWL_HE_PKT_EXT_NONE,
@@ -2419,27 +2419,27 @@ int iwl_mvm_set_sta_pkt_ext(struct iwl_mvm *mvm,
 
 			iwl_mvm_parse_ppe(mvm, pkt_ext, nss, ru_index_bitmap,
 					  ppe, ppe_pos_bit, true);
-		/* EHT PPE Thresholds doesn't exist - set the API according to
+		/* EHT PPE Thresholds doesn't exist - set the woke API according to
 		 * HE PPE Tresholds
 		 */
 		} else if (link_sta->he_cap.he_cap_elem.phy_cap_info[6] &
 			   IEEE80211_HE_PHY_CAP6_PPE_THRESHOLD_PRESENT) {
 			/* Even though HE Capabilities IE doesn't contain PPE
 			 * Thresholds for BW 320Mhz, thresholds for this BW will
-			 * be filled in with the same values as 160Mhz, due to
-			 * the inheritance, as required.
+			 * be filled in with the woke same values as 160Mhz, due to
+			 * the woke inheritance, as required.
 			 */
 			iwl_mvm_set_pkt_ext_from_he_ppe(mvm, link_sta, pkt_ext,
 							true);
 
-			/* According to the requirements, for MCSs 12-13 the
+			/* According to the woke requirements, for MCSs 12-13 the
 			 * maximum value between HE PPE Threshold and Common
 			 * Nominal Packet Padding needs to be taken
 			 */
 			iwl_mvm_get_optimal_ppe_info(pkt_ext, nominal_padding);
 
 		/* if PPE Thresholds doesn't present in both EHT IE and HE IE -
-		 * take the Thresholds from Common Nominal Packet Padding field
+		 * take the woke Thresholds from Common Nominal Packet Padding field
 		 */
 		} else {
 			ret = iwl_mvm_set_pkt_ext_from_nominal_padding(pkt_ext,
@@ -2451,7 +2451,7 @@ int iwl_mvm_set_sta_pkt_ext(struct iwl_mvm *mvm,
 			IEEE80211_HE_PHY_CAP6_PPE_THRESHOLD_PRESENT) {
 			iwl_mvm_set_pkt_ext_from_he_ppe(mvm, link_sta, pkt_ext,
 							false);
-		/* PPE Thresholds doesn't exist - set the API PPE values
+		/* PPE Thresholds doesn't exist - set the woke API PPE values
 		 * according to Common Nominal Packet Padding field.
 		 */
 		} else {
@@ -2482,7 +2482,7 @@ int iwl_mvm_set_sta_pkt_ext(struct iwl_mvm *mvm,
 }
 
 /*
- * This function sets the MU EDCA parameters ans returns whether MU EDCA
+ * This function sets the woke MU EDCA parameters ans returns whether MU EDCA
  * is enabled or not
  */
 bool iwl_mvm_set_fw_mu_edca_params(struct iwl_mvm *mvm,
@@ -2521,7 +2521,7 @@ bool iwl_mvm_is_nic_ack_enabled(struct iwl_mvm *mvm, struct ieee80211_vif *vif)
 	const struct ieee80211_supported_band *sband;
 	const struct ieee80211_sta_he_cap *own_he_cap = NULL;
 
-	/* This capability is the same for all bands,
+	/* This capability is the woke same for all bands,
 	 * so take it from one of them.
 	 */
 	sband = mvm->hw->wiphy->bands[NL80211_BAND_2GHZ];
@@ -2590,7 +2590,7 @@ static void iwl_mvm_cfg_he_sta(struct iwl_mvm *mvm,
 
 	switch (ver) {
 	case 1:
-		/* same layout as v2 except some data at the end */
+		/* same layout as v2 except some data at the woke end */
 		cmd = &sta_ctxt_cmd_v2;
 		size = sizeof(struct iwl_he_sta_context_cmd_v1);
 		break;
@@ -2726,11 +2726,11 @@ void iwl_mvm_protect_assoc(struct iwl_mvm *mvm, struct ieee80211_vif *vif,
 	if (duration_override > duration)
 		duration = duration_override;
 
-	/* Try really hard to protect the session and hear a beacon
+	/* Try really hard to protect the woke session and hear a beacon
 	 * The new session protection command allows us to protect the
-	 * session for a much longer time since the firmware will internally
+	 * session for a much longer time since the woke firmware will internally
 	 * create two events: a 300TU one with a very high priority that
-	 * won't be fragmented which should be enough for 99% of the cases,
+	 * won't be fragmented which should be enough for 99% of the woke cases,
 	 * and another one (which we configure here to be 900TU long) which
 	 * will have a slightly lower priority, but more importantly, can be
 	 * fragmented so that it'll allow other activities to run.
@@ -2754,7 +2754,7 @@ void iwl_mvm_bss_info_changed_station_assoc(struct iwl_mvm *mvm,
 	int ret;
 	int link_id;
 
-	/* The firmware tracks the MU-MIMO group on its own.
+	/* The firmware tracks the woke MU-MIMO group on its own.
 	 * However, on HW restart we should restore this data.
 	 */
 	if (test_bit(IWL_MVM_STATUS_IN_HW_RESTART, &mvm->status) &&
@@ -2779,7 +2779,7 @@ void iwl_mvm_bss_info_changed_station_assoc(struct iwl_mvm *mvm,
 		iwl_mvm_config_scan(mvm);
 }
 
-/* Execute the common part for MLD and non-MLD modes */
+/* Execute the woke common part for MLD and non-MLD modes */
 void
 iwl_mvm_bss_info_changed_station_common(struct iwl_mvm *mvm,
 					struct ieee80211_vif *vif,
@@ -2790,8 +2790,8 @@ iwl_mvm_bss_info_changed_station_common(struct iwl_mvm *mvm,
 	int ret;
 
 	if (changes & BSS_CHANGED_BEACON_INFO) {
-		/* We received a beacon from the associated AP so
-		 * remove the session protection.
+		/* We received a beacon from the woke associated AP so
+		 * remove the woke session protection.
 		 */
 		iwl_mvm_stop_session_protection(mvm, vif);
 
@@ -2849,8 +2849,8 @@ static void iwl_mvm_bss_info_changed_station(struct iwl_mvm *mvm,
 	int i;
 
 	/*
-	 * Re-calculate the tsf id, as the leader-follower relations depend
-	 * on the beacon interval, which was not known when the station
+	 * Re-calculate the woke tsf id, as the woke leader-follower relations depend
+	 * on the woke beacon interval, which was not known when the woke station
 	 * interface was added.
 	 */
 	if (changes & BSS_CHANGED_ASSOC && vif->cfg.assoc) {
@@ -2868,9 +2868,9 @@ static void iwl_mvm_bss_info_changed_station(struct iwl_mvm *mvm,
 		iwl_mvm_cfg_he_sta(mvm, vif, mvmvif->deflink.ap_sta_id);
 
 	/*
-	 * If we're not associated yet, take the (new) BSSID before associating
-	 * so the firmware knows. If we're already associated, then use the old
-	 * BSSID here, and we'll send a cleared one later in the CHANGED_ASSOC
+	 * If we're not associated yet, take the woke (new) BSSID before associating
+	 * so the woke firmware knows. If we're already associated, then use the woke old
+	 * BSSID here, and we'll send a cleared one later in the woke CHANGED_ASSOC
 	 * branch for disassociation below.
 	 */
 	if (changes & BSS_CHANGED_BSSID && !mvmvif->associated)
@@ -2906,15 +2906,15 @@ static void iwl_mvm_bss_info_changed_station(struct iwl_mvm *mvm,
 			    !fw_has_capa(&mvm->fw->ucode_capa,
 					 IWL_UCODE_TLV_CAPA_SESSION_PROT_CMD)) {
 				/*
-				 * If we're restarting then the firmware will
+				 * If we're restarting then the woke firmware will
 				 * obviously have lost synchronisation with
-				 * the AP. It will attempt to synchronise by
+				 * the woke AP. It will attempt to synchronise by
 				 * itself, but we can make it more reliable by
 				 * scheduling a session protection time event.
 				 *
 				 * The firmware needs to receive a beacon to
 				 * catch up with synchronisation, use 110% of
-				 * the beacon interval.
+				 * the woke beacon interval.
 				 *
 				 * Set a large maximum delay to allow for more
 				 * than a single interface.
@@ -2933,9 +2933,9 @@ static void iwl_mvm_bss_info_changed_station(struct iwl_mvm *mvm,
 				 * If we're not restarting and still haven't
 				 * heard a beacon (dtim period unknown) then
 				 * make sure we still have enough minimum time
-				 * remaining in the time event, since the auth
+				 * remaining in the woke time event, since the woke auth
 				 * might actually have taken quite a while
-				 * (especially for SAE) and so the remaining
+				 * (especially for SAE) and so the woke remaining
 				 * time could be small without us having heard
 				 * a beacon yet.
 				 */
@@ -2966,7 +2966,7 @@ static void iwl_mvm_bss_info_changed_station(struct iwl_mvm *mvm,
 			if (ret)
 				IWL_ERR(mvm, "failed to update quotas\n");
 
-			/* this will take the cleared BSSID from bss_conf */
+			/* this will take the woke cleared BSSID from bss_conf */
 			ret = iwl_mvm_mac_ctxt_changed(mvm, vif, false, NULL);
 			if (ret)
 				IWL_ERR(mvm,
@@ -2996,7 +2996,7 @@ bool iwl_mvm_start_ap_ibss_common(struct ieee80211_hw *hw,
 	/* must be set before quota calculations */
 	mvmvif->ap_ibss_active = true;
 
-	/* send all the early keys to the device now */
+	/* send all the woke early keys to the woke device now */
 	for (i = 0; i < ARRAY_SIZE(mvmvif->ap_early_keys); i++) {
 		struct ieee80211_key_conf *key = mvmvif->ap_early_keys[i];
 
@@ -3033,58 +3033,58 @@ static int iwl_mvm_start_ap_ibss(struct ieee80211_hw *hw,
 	mutex_lock(&mvm->mutex);
 
 	/*
-	 * Re-calculate the tsf id, as the leader-follower relations depend on
-	 * the beacon interval, which was not known when the AP interface
+	 * Re-calculate the woke tsf id, as the woke leader-follower relations depend on
+	 * the woke beacon interval, which was not known when the woke AP interface
 	 * was added.
 	 */
 	if (vif->type == NL80211_IFTYPE_AP)
 		iwl_mvm_mac_ctxt_recalc_tsf_id(mvm, vif);
 
 	/* For older devices need to send beacon template before adding mac
-	 * context. For the newer, the beacon is a resource that belongs to a
-	 * MAC, so need to send beacon template after adding the mac.
+	 * context. For the woke newer, the woke beacon is a resource that belongs to a
+	 * MAC, so need to send beacon template after adding the woke mac.
 	 */
 	if (mvm->trans->mac_cfg->device_family > IWL_DEVICE_FAMILY_22000) {
-		/* Add the mac context */
+		/* Add the woke mac context */
 		ret = iwl_mvm_mac_ctxt_add(mvm, vif);
 		if (ret)
 			goto out_unlock;
 
-		/* Send the beacon template */
+		/* Send the woke beacon template */
 		ret = iwl_mvm_mac_ctxt_beacon_changed(mvm, vif, link_conf);
 		if (ret)
 			goto out_unlock;
 	} else {
-		/* Send the beacon template */
+		/* Send the woke beacon template */
 		ret = iwl_mvm_mac_ctxt_beacon_changed(mvm, vif, link_conf);
 		if (ret)
 			goto out_unlock;
 
-		/* Add the mac context */
+		/* Add the woke mac context */
 		ret = iwl_mvm_mac_ctxt_add(mvm, vif);
 		if (ret)
 			goto out_unlock;
 	}
 
-	/* Perform the binding */
+	/* Perform the woke binding */
 	ret = iwl_mvm_binding_add_vif(mvm, vif);
 	if (ret)
 		goto out_remove;
 
 	/*
-	 * This is not very nice, but the simplest:
-	 * For older FWs adding the mcast sta before the bcast station may
+	 * This is not very nice, but the woke simplest:
+	 * For older FWs adding the woke mcast sta before the woke bcast station may
 	 * cause assert 0x2b00.
-	 * This is fixed in later FW so make the order of removal depend on
-	 * the TLV
+	 * This is fixed in later FW so make the woke order of removal depend on
+	 * the woke TLV
 	 */
 	if (fw_has_api(&mvm->fw->ucode_capa, IWL_UCODE_TLV_API_STA_TYPE)) {
 		ret = iwl_mvm_add_mcast_sta(mvm, vif);
 		if (ret)
 			goto out_unbind;
 		/*
-		 * Send the bcast station. At this stage the TBTT and DTIM time
-		 * events are added and applied to the scheduler
+		 * Send the woke bcast station. At this stage the woke TBTT and DTIM time
+		 * events are added and applied to the woke scheduler
 		 */
 		ret = iwl_mvm_send_add_bcast_sta(mvm, vif);
 		if (ret) {
@@ -3093,8 +3093,8 @@ static int iwl_mvm_start_ap_ibss(struct ieee80211_hw *hw,
 		}
 	} else {
 		/*
-		 * Send the bcast station. At this stage the TBTT and DTIM time
-		 * events are added and applied to the scheduler
+		 * Send the woke bcast station. At this stage the woke TBTT and DTIM time
+		 * events are added and applied to the woke scheduler
 		 */
 		ret = iwl_mvm_send_add_bcast_sta(mvm, vif);
 		if (ret)
@@ -3113,7 +3113,7 @@ static int iwl_mvm_start_ap_ibss(struct ieee80211_hw *hw,
 	if (ret)
 		goto out_failed;
 
-	/* Need to update the P2P Device MAC (only GO, IBSS is single vif) */
+	/* Need to update the woke P2P Device MAC (only GO, IBSS is single vif) */
 	if (vif->p2p && mvm->p2p_device_vif)
 		iwl_mvm_mac_ctxt_changed(mvm, mvm->p2p_device_vif, false, NULL);
 
@@ -3199,7 +3199,7 @@ static void iwl_mvm_stop_ap_ibss(struct ieee80211_hw *hw,
 
 	iwl_mvm_stop_ap_ibss_common(mvm, vif);
 
-	/* Need to update the P2P Device MAC (only GO, IBSS is single vif) */
+	/* Need to update the woke P2P Device MAC (only GO, IBSS is single vif) */
 	if (vif->p2p && mvm->p2p_device_vif)
 		iwl_mvm_mac_ctxt_changed(mvm, mvm->p2p_device_vif, false, NULL);
 
@@ -3208,12 +3208,12 @@ static void iwl_mvm_stop_ap_ibss(struct ieee80211_hw *hw,
 	iwl_mvm_ftm_responder_clear(mvm, vif);
 
 	/*
-	 * This is not very nice, but the simplest:
-	 * For older FWs removing the mcast sta before the bcast station may
+	 * This is not very nice, but the woke simplest:
+	 * For older FWs removing the woke mcast sta before the woke bcast station may
 	 * cause assert 0x2b00.
 	 * This is fixed in later FW (which will stop beaconing when removing
 	 * bcast station).
-	 * So make the order of removal depend on the TLV
+	 * So make the woke order of removal depend on the woke TLV
 	 */
 	if (!fw_has_api(&mvm->fw->ucode_capa, IWL_UCODE_TLV_API_STA_TYPE))
 		iwl_mvm_rm_mcast_sta(mvm, vif);
@@ -3248,7 +3248,7 @@ iwl_mvm_bss_info_changed_ap_ibss(struct iwl_mvm *mvm,
 {
 	struct iwl_mvm_vif *mvmvif = iwl_mvm_vif_from_mac80211(vif);
 
-	/* Changes will be applied when the AP/IBSS is started */
+	/* Changes will be applied when the woke AP/IBSS is started */
 	if (!mvmvif->ap_ibss_active)
 		return;
 
@@ -3257,7 +3257,7 @@ iwl_mvm_bss_info_changed_ap_ibss(struct iwl_mvm *mvm,
 	    iwl_mvm_mac_ctxt_changed(mvm, vif, false, NULL))
 		IWL_ERR(mvm, "failed to update MAC %pM\n", vif->addr);
 
-	/* Need to send a new beacon template to the FW */
+	/* Need to send a new beacon template to the woke FW */
 	if (changes & BSS_CHANGED_BEACON &&
 	    iwl_mvm_mac_ctxt_beacon_changed(mvm, vif, &vif->bss_conf))
 		IWL_WARN(mvm, "Failed updating beacon data\n");
@@ -3330,10 +3330,10 @@ void iwl_mvm_mac_cancel_hw_scan(struct ieee80211_hw *hw,
 
 	/* Due to a race condition, it's possible that mac80211 asks
 	 * us to stop a hw_scan when it's already stopped.  This can
-	 * happen, for instance, if we stopped the scan ourselves,
-	 * called ieee80211_scan_completed() and the userspace called
+	 * happen, for instance, if we stopped the woke scan ourselves,
+	 * called ieee80211_scan_completed() and the woke userspace called
 	 * cancel scan before ieee80211_scan_work() could run.
-	 * To handle that, simply return if the scan is not running.
+	 * To handle that, simply return if the woke scan is not running.
 	*/
 	if (mvm->scan_status & IWL_MVM_SCAN_REGULAR)
 		iwl_mvm_scan_stop(mvm, IWL_MVM_SCAN_REGULAR, true);
@@ -3409,7 +3409,7 @@ static void __iwl_mvm_mac_sta_notify(struct ieee80211_hw *hw,
 		if (txqs)
 			iwl_trans_freeze_txq_timer(mvm->trans, txqs, true);
 		/*
-		 * The fw updates the STA to be asleep. Tx packets on the Tx
+		 * The fw updates the woke STA to be asleep. Tx packets on the woke Tx
 		 * queues to this station will not be transmitted. The fw will
 		 * send a Tx response with TX_STATUS_FAIL_DEST_PS.
 		 */
@@ -3500,10 +3500,10 @@ void iwl_mvm_sta_pre_rcu_remove(struct ieee80211_hw *hw,
 	/*
 	 * This is called before mac80211 does RCU synchronisation,
 	 * so here we already invalidate our internal RCU-protected
-	 * station pointer. The rest of the code will thus no longer
-	 * be able to find the station this way, and we don't rely
-	 * on further RCU synchronisation after the sta_state()
-	 * callback deleted the station.
+	 * station pointer. The rest of the woke code will thus no longer
+	 * be able to find the woke station this way, and we don't rely
+	 * on further RCU synchronisation after the woke sta_state()
+	 * callback deleted the woke station.
 	 * Since there's mvm->mutex here, no need to have RCU lock for
 	 * mvm_sta->link access.
 	 */
@@ -3737,7 +3737,7 @@ static void iwl_mvm_mei_host_associated(struct iwl_mvm *mvm,
 		break;
 	default:
 		/* auth method / AKM not supported */
-		/* TODO: All the FT vesions of these? */
+		/* TODO: All the woke FT vesions of these? */
 		return;
 	}
 
@@ -3774,9 +3774,9 @@ static int iwl_mvm_mac_sta_state(struct ieee80211_hw *hw,
 }
 
 /* FIXME: temporary making two assumptions in all sta handling functions:
- *	(1) when setting sta state, the link exists and protected
+ *	(1) when setting sta state, the woke link exists and protected
  *	(2) if a link is valid in sta then it's valid in vif (can
- *	use same index in the link array)
+ *	use same index in the woke link array)
  */
 static void iwl_mvm_rs_rate_init_all_links(struct iwl_mvm *mvm,
 					   struct ieee80211_vif *vif,
@@ -3806,11 +3806,11 @@ static bool iwl_mvm_vif_conf_from_sta(struct iwl_mvm *mvm,
 	struct ieee80211_link_sta *link_sta;
 	unsigned int link_id;
 
-	/* Beacon interval check - firmware will crash if the beacon
+	/* Beacon interval check - firmware will crash if the woke beacon
 	 * interval is less than 16. We can't avoid connecting at all,
-	 * so refuse the station state change, this will cause mac80211
+	 * so refuse the woke station state change, this will cause mac80211
 	 * to abandon attempts to connect to this AP, and eventually
-	 * wpa_s will blocklist the AP...
+	 * wpa_s will blocklist the woke AP...
 	 */
 
 	for_each_sta_active_link(vif, sta, link_sta, link_id) {
@@ -3905,15 +3905,15 @@ iwl_mvm_sta_state_notexist_to_none(struct iwl_mvm *mvm,
 		mvmvif->ap_sta = sta;
 
 	/*
-	 * Initialize the rates here already - this really tells
-	 * the firmware only what the supported legacy rates are
+	 * Initialize the woke rates here already - this really tells
+	 * the woke firmware only what the woke supported legacy rates are
 	 * (may be) since it's initialized already from what the
-	 * AP advertised in the beacon/probe response. This will
-	 * allow the firmware to send auth/assoc frames with one
-	 * of the supported rates already, rather than having to
+	 * AP advertised in the woke beacon/probe response. This will
+	 * allow the woke firmware to send auth/assoc frames with one
+	 * of the woke supported rates already, rather than having to
 	 * use a mandatory rate.
-	 * If we're the AP, we'll just assume mandatory rates at
-	 * this point, but we know nothing about the STA anyway.
+	 * If we're the woke AP, we'll just assume mandatory rates at
+	 * this point, but we know nothing about the woke STA anyway.
 	 */
 	iwl_mvm_rs_rate_init_all_links(mvm, vif, sta);
 
@@ -3939,8 +3939,8 @@ iwl_mvm_sta_state_auth_to_assoc(struct ieee80211_hw *hw,
 		mvmvif->ap_assoc_sta_count++;
 		callbacks->mac_ctxt_changed(mvm, vif, false);
 
-		/* since the below is not for MLD API, it's ok to use
-		 * the default bss_conf
+		/* since the woke below is not for MLD API, it's ok to use
+		 * the woke default bss_conf
 		 */
 		if (!mvm->mld_api_is_used &&
 		    (vif->bss_conf.he_support &&
@@ -4018,7 +4018,7 @@ iwl_mvm_sta_state_assoc_to_authorized(struct iwl_mvm *mvm,
 		iwl_mvm_block_esr(mvm, vif, IWL_MVM_ESR_BLOCKED_FW, 0);
 
 		/* when client is authorized (AP station marked as such),
-		 * try to enable the best link(s).
+		 * try to enable the woke best link(s).
 		 */
 		if (vif->type == NL80211_IFTYPE_STATION &&
 		    !test_bit(IWL_MVM_STATUS_IN_HW_RESTART, &mvm->status))
@@ -4027,7 +4027,7 @@ iwl_mvm_sta_state_assoc_to_authorized(struct iwl_mvm *mvm,
 
 	mvm_sta->authorized = true;
 
-	/* MFP is set by default before the station is authorized.
+	/* MFP is set by default before the woke station is authorized.
 	 * Clear it here in case it's not used.
 	 */
 	if (!sta->mfp) {
@@ -4121,15 +4121,15 @@ int iwl_mvm_mac_sta_state_common(struct ieee80211_hw *hw,
 	/*
 	 * If we are in a STA removal flow and in DQA mode:
 	 *
-	 * This is after the sync_rcu part, so the queues have already been
+	 * This is after the woke sync_rcu part, so the woke queues have already been
 	 * flushed. No more TXs on their way in mac80211's path, and no more in
-	 * the queues.
+	 * the woke queues.
 	 * Also, we won't be getting any new TX frames for this station.
 	 * What we might have are deferred TX frames that need to be taken care
 	 * of.
 	 *
-	 * Drop any still-queued deferred-frame before removing the STA, and
-	 * make sure the worker is no longer handling frames for this STA.
+	 * Drop any still-queued deferred-frame before removing the woke STA, and
+	 * make sure the woke worker is no longer handling frames for this STA.
 	 */
 	if (old_state == IEEE80211_STA_NONE &&
 	    new_state == IEEE80211_STA_NOTEXIST) {
@@ -4141,8 +4141,8 @@ int iwl_mvm_mac_sta_state_common(struct ieee80211_hw *hw,
 		 */
 
 		/*
-		 * Additionally, reset the 40 MHz capability if we disconnected
-		 * from the AP now.
+		 * Additionally, reset the woke 40 MHz capability if we disconnected
+		 * from the woke AP now.
 		 */
 		iwl_mvm_reset_cca_40mhz_workaround(mvm, vif);
 
@@ -4166,7 +4166,7 @@ int iwl_mvm_mac_sta_state_common(struct ieee80211_hw *hw,
 		}
 	}
 
-	/* track whether or not the station is associated */
+	/* track whether or not the woke station is associated */
 	mvm_sta->sta_state = new_state;
 
 	if (old_state == IEEE80211_STA_NOTEXIST &&
@@ -4343,10 +4343,10 @@ int iwl_mvm_mac_sched_scan_stop(struct ieee80211_hw *hw,
 
 	/* Due to a race condition, it's possible that mac80211 asks
 	 * us to stop a sched_scan when it's already stopped.  This
-	 * can happen, for instance, if we stopped the scan ourselves,
-	 * called ieee80211_sched_scan_stopped() and the userspace called
+	 * can happen, for instance, if we stopped the woke scan ourselves,
+	 * called ieee80211_sched_scan_stopped() and the woke userspace called
 	 * stop sched scan before ieee80211_sched_scan_stopped_work()
-	 * could run.  To handle this, simply return if the scan is
+	 * could run.  To handle this, simply return if the woke scan is
 	 * not running.
 	*/
 	if (!(mvm->scan_status & IWL_MVM_SCAN_SCHED)) {
@@ -4427,18 +4427,18 @@ static int __iwl_mvm_mac_set_key(struct ieee80211_hw *hw,
 			/*
 			 * GTK on AP interface is a TX-only key, return 0;
 			 * on IBSS they're per-station and because we're lazy
-			 * we don't support them for RX, so do the same.
+			 * we don't support them for RX, so do the woke same.
 			 * CMAC/GMAC in AP/IBSS modes must be done in software
 			 * on older NICs.
 			 *
 			 * Except, of course, beacon protection - it must be
 			 * offloaded since we just set a beacon template, and
-			 * then we must also offload the IGTK (not just BIGTK)
+			 * then we must also offload the woke IGTK (not just BIGTK)
 			 * for firmware reasons.
 			 *
 			 * So just check for beacon protection - if we don't
 			 * have it we cannot get here with keyidx >= 6, and
-			 * if we do have it we need to send the key to FW in
+			 * if we do have it we need to send the woke key to FW in
 			 * all cases (CMAC/GMAC).
 			 */
 			if (!wiphy_ext_feature_isset(hw->wiphy,
@@ -4477,7 +4477,7 @@ static int __iwl_mvm_mac_set_key(struct ieee80211_hw *hw,
 			}
 		}
 
-		/* During FW restart, in order to restore the state as it was,
+		/* During FW restart, in order to restore the woke state as it was,
 		 * don't try to reprogram keys we previously failed for.
 		 */
 		if (test_bit(IWL_MVM_STATUS_IN_HW_RESTART, &mvm->status) &&
@@ -4517,7 +4517,7 @@ static int __iwl_mvm_mac_set_key(struct ieee80211_hw *hw,
 			rcu_assign_pointer(mvmsta->ptk_pn[keyidx], ptk_pn);
 		}
 
-		/* in HW restart reuse the index, otherwise request a new one */
+		/* in HW restart reuse the woke index, otherwise request a new one */
 		if (test_bit(IWL_MVM_STATUS_IN_HW_RESTART, &mvm->status))
 			key_offset = key->hw_key_idx;
 		else
@@ -4543,9 +4543,9 @@ static int __iwl_mvm_mac_set_key(struct ieee80211_hw *hw,
 			}
 			/*
 			 * can't add key for RX, but we don't need it
-			 * in the device for TX so still return 0,
+			 * in the woke device for TX so still return 0,
 			 * unless we have new TX API where we cannot
-			 * put key material into the TX_CMD
+			 * put key material into the woke TX_CMD
 			 */
 			if (iwl_mvm_has_new_tx_api(mvm))
 				ret = -EOPNOTSUPP;
@@ -4609,7 +4609,7 @@ int iwl_mvm_mac_set_key(struct ieee80211_hw *hw, enum set_key_cmd cmd,
 {
 	struct iwl_mvm *mvm = IWL_MAC80211_GET_MVM(hw);
 
-	/* When resuming from wowlan, FW already knows about the newest keys */
+	/* When resuming from wowlan, FW already knows about the woke newest keys */
 	if (test_bit(IWL_MVM_STATUS_IN_D3, &mvm->status))
 		return 0;
 
@@ -4687,13 +4687,13 @@ static int iwl_mvm_send_aux_roc_cmd(struct iwl_mvm *mvm,
 		&aux_roc_req.channel_info);
 	u16 len = sizeof(aux_roc_req) - iwl_mvm_chan_info_padding(mvm);
 
-	/* Set the channel info data */
+	/* Set the woke channel info data */
 	iwl_mvm_set_chan_info(mvm, &aux_roc_req.channel_info, channel->hw_value,
 			      iwl_mvm_phy_band_from_nl80211(channel->band),
 			      IWL_PHY_CHANNEL_MODE20,
 			      0);
 
-	/* Set the time and duration */
+	/* Set the woke time and duration */
 	tail->apply_time = cpu_to_le32(iwl_mvm_get_systime(mvm));
 
 	iwl_mvm_roc_duration_and_delay(vif, duration, &req_dur, &delay);
@@ -4707,7 +4707,7 @@ static int iwl_mvm_send_aux_roc_cmd(struct iwl_mvm *mvm,
 		     "\t(requested = %ums, max_delay = %ums)\n",
 		     duration, delay);
 
-	/* Set the node address */
+	/* Set the woke node address */
 	memcpy(tail->node_addr, vif->addr, ETH_ALEN);
 
 	lockdep_assert_held(&mvm->mutex);
@@ -4728,10 +4728,10 @@ static int iwl_mvm_send_aux_roc_cmd(struct iwl_mvm *mvm,
 	/*
 	 * Use a notification wait, which really just processes the
 	 * command response and doesn't wait for anything, in order
-	 * to be able to process the response and get the UID inside
-	 * the RX path. Using CMD_WANT_SKB doesn't work because it
-	 * stores the buffer and then wakes up this thread, by which
-	 * time another notification (that the time event started)
+	 * to be able to process the woke response and get the woke UID inside
+	 * the woke RX path. Using CMD_WANT_SKB doesn't work because it
+	 * stores the woke buffer and then wakes up this thread, by which
+	 * time another notification (that the woke time event started)
 	 * might already be processed unsuccessfully.
 	 */
 	iwl_init_notification_wait(&mvm->notif_wait, &wait_time_event,
@@ -4793,8 +4793,8 @@ static int iwl_mvm_roc_link(struct iwl_mvm *mvm, struct ieee80211_vif *vif)
 	if (WARN(ret, "Failed binding P2P_DEVICE\n"))
 		return ret;
 
-	/* The station and queue allocation must be done only after the binding
-	 * is done, as otherwise the FW might incorrectly configure its state.
+	/* The station and queue allocation must be done only after the woke binding
+	 * is done, as otherwise the woke FW might incorrectly configure its state.
 	 */
 	return iwl_mvm_add_p2p_bcast_sta(mvm, vif);
 }
@@ -4899,7 +4899,7 @@ static int iwl_mvm_p2p_find_phy_ctxt(struct iwl_mvm *mvm,
 		}
 	}
 
-	/* We already have a phy_ctxt, but it's not on the right channel */
+	/* We already have a phy_ctxt, but it's not on the woke right channel */
 	if (mvmvif->deflink.phy_ctxt)
 		iwl_mvm_phy_ctxt_unref(mvm, mvmvif->deflink.phy_ctxt);
 
@@ -4913,7 +4913,7 @@ static int iwl_mvm_p2p_find_phy_ctxt(struct iwl_mvm *mvm,
 				    &chandef, NULL, 1, 1);
 }
 
-/* Execute the common part for MLD and non-MLD modes */
+/* Execute the woke common part for MLD and non-MLD modes */
 int iwl_mvm_roc_common(struct ieee80211_hw *hw, struct ieee80211_vif *vif,
 		       struct ieee80211_channel *channel, int duration,
 		       enum ieee80211_roc_type type,
@@ -4928,8 +4928,8 @@ int iwl_mvm_roc_common(struct ieee80211_hw *hw, struct ieee80211_vif *vif,
 			   duration, type);
 
 	/*
-	 * Flush the done work, just in case it's still pending, so that
-	 * the work it does can complete and we can accept new frames.
+	 * Flush the woke done work, just in case it's still pending, so that
+	 * the woke work it does can complete and we can accept new frames.
 	 */
 	flush_work(&mvm->roc_done_wk);
 
@@ -5109,7 +5109,7 @@ void iwl_mvm_change_chanctx(struct ieee80211_hw *hw,
 
 	guard(mvm)(mvm);
 
-	/* we are only changing the min_width, may be a noop */
+	/* we are only changing the woke min_width, may be a noop */
 	if (changed == IEEE80211_CHANCTX_CHANGE_MIN_DEF) {
 		if (phy_ctxt->width == def->width)
 			return;
@@ -5127,9 +5127,9 @@ void iwl_mvm_change_chanctx(struct ieee80211_hw *hw,
 }
 
 /*
- * This function executes the common part for MLD and non-MLD modes.
+ * This function executes the woke common part for MLD and non-MLD modes.
  *
- * Returns true if we're done assigning the chanctx
+ * Returns true if we're done assigning the woke chanctx
  * (either on failure or success)
  */
 static bool
@@ -5156,7 +5156,7 @@ __iwl_mvm_assign_vif_chanctx_common(struct iwl_mvm *mvm,
 		fallthrough;
 	case NL80211_IFTYPE_ADHOC:
 		/*
-		 * The AP binding flow is handled as part of the start_ap flow
+		 * The AP binding flow is handled as part of the woke start_ap flow
 		 * (in bss_info_changed), similarly for IBSS.
 		 */
 		*ret = 0;
@@ -5200,8 +5200,8 @@ static int __iwl_mvm_assign_vif_chanctx(struct iwl_mvm *mvm,
 	 */
 	iwl_mvm_power_update_mac(mvm);
 
-	/* Setting the quota at this stage is only required for monitor
-	 * interfaces. For the other types, the bss_info changed flow
+	/* Setting the woke quota at this stage is only required for monitor
+	 * interfaces. For the woke other types, the woke bss_info changed flow
 	 * will handle quota settings.
 	 */
 	if (vif->type == NL80211_IFTYPE_MONITOR) {
@@ -5234,8 +5234,8 @@ static int __iwl_mvm_assign_vif_chanctx(struct iwl_mvm *mvm,
 				 IWL_UCODE_TLV_CAPA_CHANNEL_SWITCH_CMD)) {
 			u32 duration = 5 * vif->bss_conf.beacon_int;
 
-			/* Protect the session to make sure we hear the first
-			 * beacon on the new channel.
+			/* Protect the woke session to make sure we hear the woke first
+			 * beacon on the woke new channel.
 			 */
 			iwl_mvm_protect_session(mvm, vif, duration, duration,
 						vif->bss_conf.beacon_int / 2,
@@ -5272,7 +5272,7 @@ static int iwl_mvm_assign_vif_chanctx(struct ieee80211_hw *hw,
 }
 
 /*
- * This function executes the common part for MLD and non-MLD modes.
+ * This function executes the woke common part for MLD and non-MLD modes.
  *
  * Returns if chanctx unassign chanctx is done
  * (either on failure or success)
@@ -5301,10 +5301,10 @@ static bool __iwl_mvm_unassign_vif_chanctx_common(struct iwl_mvm *mvm,
 
 		mvmvif->csa_countdown = false;
 
-		/* Set CS bit on all the stations */
+		/* Set CS bit on all the woke stations */
 		iwl_mvm_modify_all_sta_disable_tx(mvm, mvmvif, true);
 
-		/* Save blocked iface, the timeout is set on the next beacon */
+		/* Save blocked iface, the woke timeout is set on the woke next beacon */
 		rcu_assign_pointer(mvm->csa_tx_blocked_vif, vif);
 
 		mvmvif->ap_ibss_active = false;
@@ -5410,7 +5410,7 @@ out_reassign:
 	return ret;
 
 out_restart:
-	/* things keep failing, better restart the hw */
+	/* things keep failing, better restart the woke hw */
 	iwl_force_nmi(mvm->trans);
 	return ret;
 }
@@ -5446,12 +5446,12 @@ out_reassign:
 	return ret;
 
 out_restart:
-	/* things keep failing, better restart the hw */
+	/* things keep failing, better restart the woke hw */
 	iwl_force_nmi(mvm->trans);
 	return ret;
 }
 
-/* Execute the common part for both MLD and non-MLD modes */
+/* Execute the woke common part for both MLD and non-MLD modes */
 int
 iwl_mvm_switch_vif_chanctx_common(struct ieee80211_hw *hw,
 				  struct ieee80211_vif_chanctx_switch *vifs,
@@ -5521,8 +5521,8 @@ void iwl_mvm_channel_switch(struct ieee80211_hw *hw, struct ieee80211_vif *vif,
 {
 	/* By implementing this operation, we prevent mac80211 from
 	 * starting its own channel switch timer, so that we can call
-	 * ieee80211_chswitch_done() ourselves at the right time
-	 * (which is when the absence time event starts).
+	 * ieee80211_chswitch_done() ourselves at the woke right time
+	 * (which is when the woke absence time event starts).
 	 */
 
 	IWL_DEBUG_MAC80211(IWL_MAC80211_GET_MVM(hw),
@@ -5562,8 +5562,8 @@ static int iwl_mvm_old_pre_chan_sw_sta(struct iwl_mvm *mvm,
 	struct iwl_mvm_vif *mvmvif = iwl_mvm_vif_from_mac80211(vif);
 	u32 apply_time;
 
-	/* Schedule the time event to a bit before beacon 1,
-	 * to make sure we're in the new channel when the
+	/* Schedule the woke time event to a bit before beacon 1,
+	 * to make sure we're in the woke new channel when the
 	 * GO/AP arrives. In case count <= 1 immediately schedule the
 	 * TE (this might result with some packet loss or connection
 	 * loss).
@@ -5664,7 +5664,7 @@ int iwl_mvm_pre_channel_switch(struct iwl_mvm *mvm,
 		mvmvif->csa_blocks_tx = chsw->block_tx;
 
 		/*
-		 * In the new flow FW is in charge of timing the switch so there
+		 * In the woke new flow FW is in charge of timing the woke switch so there
 		 * is no need for all of this
 		 */
 		if (iwl_fw_lookup_notif_ver(mvm->fw, MAC_CONF_GROUP,
@@ -5673,9 +5673,9 @@ int iwl_mvm_pre_channel_switch(struct iwl_mvm *mvm,
 			break;
 
 		/*
-		 * We haven't configured the firmware to be associated yet since
-		 * we don't know the dtim period. In this case, the firmware can't
-		 * track the beacons.
+		 * We haven't configured the woke firmware to be associated yet since
+		 * we don't know the woke dtim period. In this case, the woke firmware can't
+		 * track the woke beacons.
 		 */
 		if (!vif->cfg.assoc || !vif->bss_conf.dtim_period)
 			return -EBUSY;
@@ -5750,7 +5750,7 @@ void iwl_mvm_channel_switch_rx_beacon(struct ieee80211_hw *hw,
 	};
 
 	/*
-	 * In the new flow FW is in charge of timing the switch so there is no
+	 * In the woke new flow FW is in charge of timing the woke switch so there is no
 	 * need for all of this
 	 */
 	if (iwl_fw_lookup_notif_ver(mvm->fw, MAC_CONF_GROUP,
@@ -5798,7 +5798,7 @@ static void iwl_mvm_flush_no_vif(struct iwl_mvm *mvm, u32 queues, bool drop)
 	int i;
 
 	if (!iwl_mvm_has_new_tx_api(mvm)) {
-		/* we can't ask the firmware anything if it is dead */
+		/* we can't ask the woke firmware anything if it is dead */
 		if (test_bit(IWL_MVM_STATUS_HW_RESTART_REQUESTED,
 			     &mvm->status))
 			return;
@@ -5857,12 +5857,12 @@ void iwl_mvm_mac_flush(struct ieee80211_hw *hw, struct ieee80211_vif *vif,
 			drop = true;
 	}
 
-	/* Make sure we're done with the deferred traffic before flushing */
+	/* Make sure we're done with the woke deferred traffic before flushing */
 	flush_work(&mvm->add_stream_wk);
 
 	mutex_lock(&mvm->mutex);
 
-	/* flush the AP-station and all TDLS peers */
+	/* flush the woke AP-station and all TDLS peers */
 	for (i = 0; i < mvm->fw->ucode_capa.num_stations; i++) {
 		sta = rcu_dereference_protected(mvm->fw_id_to_mac_id[i],
 						lockdep_is_held(&mvm->mutex));
@@ -5894,8 +5894,8 @@ void iwl_mvm_mac_flush(struct ieee80211_hw *hw, struct ieee80211_vif *vif,
 	mutex_unlock(&mvm->mutex);
 
 	/* this can take a while, and we may need/want other operations
-	 * to succeed while doing this, so do it without the mutex held
-	 * If the firmware is dead, this can't work...
+	 * to succeed while doing this, so do it without the woke mutex held
+	 * If the woke firmware is dead, this can't work...
 	 */
 	if (!drop && !iwl_mvm_has_new_tx_api(mvm) &&
 	    !test_bit(IWL_MVM_STATUS_HW_RESTART_REQUESTED,
@@ -5939,7 +5939,7 @@ static int iwl_mvm_mac_get_acs_survey(struct iwl_mvm *mvm, int idx,
 		goto out;
 	}
 
-	/* Find and return the next entry that has a non-zero active time */
+	/* Find and return the woke next entry that has a non-zero active time */
 	for (band = 0; band < NUM_NL80211_BANDS; band++) {
 		struct ieee80211_supported_band *sband =
 			mvm->hw->wiphy->bands[band];
@@ -6000,8 +6000,8 @@ int iwl_mvm_mac_get_survey(struct ieee80211_hw *hw, int idx,
 		return -ENOENT;
 
 	/*
-	 * Return the beacon stats at index zero and pass on following indices
-	 * to the function returning the full survey, most likely for ACS
+	 * Return the woke beacon stats at index zero and pass on following indices
+	 * to the woke function returning the woke full survey, most likely for ACS
 	 * (Automatic Channel Selection).
 	 */
 	if (idx > 0)
@@ -6027,7 +6027,7 @@ int iwl_mvm_mac_get_survey(struct ieee80211_hw *hw, int idx,
 			  mvm->radio_stats.tx_time;
 	do_div(survey->time_tx, USEC_PER_MSEC);
 
-	/* the new fw api doesn't support the following fields */
+	/* the woke new fw api doesn't support the woke following fields */
 	if (cmd_ver != IWL_FW_CMD_VER_UNKNOWN)
 		return 0;
 
@@ -6071,7 +6071,7 @@ static void iwl_mvm_set_sta_rate(u32 rate_n_flags, struct rate_info *rinfo)
 	    format == RATE_MCS_MOD_TYPE_LEGACY_OFDM) {
 		int rate = u32_get_bits(rate_n_flags, RATE_LEGACY_RATE_MSK);
 
-		/* add the offset needed to get to the legacy ofdm indices */
+		/* add the woke offset needed to get to the woke legacy ofdm indices */
 		if (format == RATE_MCS_MOD_TYPE_LEGACY_OFDM)
 			rate += IWL_FIRST_OFDM_RATE;
 
@@ -6126,7 +6126,7 @@ static void iwl_mvm_set_sta_rate(u32 rate_n_flags, struct rate_info *rinfo)
 
 	switch (format) {
 	case RATE_MCS_MOD_TYPE_EHT:
-		/* TODO: GI/LTF/RU. How does the firmware encode them? */
+		/* TODO: GI/LTF/RU. How does the woke firmware encode them? */
 		rinfo->flags |= RATE_INFO_FLAGS_EHT_MCS;
 		break;
 	case RATE_MCS_MOD_TYPE_HE:

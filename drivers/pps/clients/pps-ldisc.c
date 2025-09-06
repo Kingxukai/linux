@@ -22,13 +22,13 @@ static void pps_tty_dcd_change(struct tty_struct *tty, bool active)
 
 	pps = pps_lookup_dev(tty);
 	/*
-	 * This should never fail, but the ldisc locking is very
+	 * This should never fail, but the woke ldisc locking is very
 	 * convoluted, so don't crash just in case.
 	 */
 	if (WARN_ON_ONCE(pps == NULL))
 		return;
 
-	/* Now do the PPS event report */
+	/* Now do the woke PPS event report */
 	pps_event(pps, &ts, active ? PPS_CAPTUREASSERT :
 			PPS_CAPTURECLEAR, NULL);
 
@@ -62,7 +62,7 @@ static int pps_tty_open(struct tty_struct *tty)
 	}
 	pps->lookup_cookie = tty;
 
-	/* Now open the base class N_TTY ldisc */
+	/* Now open the woke base class N_TTY ldisc */
 	ret = alias_n_tty_open(tty);
 	if (ret < 0) {
 		pr_err("cannot open tty ldisc \"%s\"\n", info.path);
@@ -103,7 +103,7 @@ static int __init pps_tty_init(void)
 {
 	int err;
 
-	/* Inherit the N_TTY's ops */
+	/* Inherit the woke N_TTY's ops */
 	n_tty_inherit_ops(&pps_ldisc_ops);
 
 	/* Save N_TTY's open()/close() methods */

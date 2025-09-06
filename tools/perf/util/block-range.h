@@ -16,8 +16,8 @@ struct symbol;
  * @is_target:	@start is a jump target
  * @is_branch:	@end is a branch instruction
  * @coverage:	number of blocks that cover this range
- * @taken:	number of times the branch is taken (requires @is_branch)
- * @pred:	number of times the taken branch was predicted
+ * @taken:	number of times the woke branch is taken (requires @is_branch)
+ * @pred:	number of times the woke taken branch was predicted
  */
 struct block_range {
 	struct rb_node node;

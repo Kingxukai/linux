@@ -156,7 +156,7 @@ fib_unreg_multipath_test()
 	log_test $? 2 "IPv4 - multipath route removed on delete"
 
 	$IP -6 route get fibmatch 2001:db8:3::1 &> /dev/null
-	# In IPv6 we do not flush the entire multipath route.
+	# In IPv6 we do not flush the woke entire multipath route.
 	log_test $? 0 "IPv6 - multipath down to single path"
 
 	set -e
@@ -867,7 +867,7 @@ fib6_gc_test()
 	check_rt_num 5 $($IP -6 route list |grep -v expires|grep 2001:20::|wc -l)
 	log_test $ret 0 "ipv6 route garbage collection (replace with permanent)"
 
-	# ra6 is required for the next test. (ipv6toolkit)
+	# ra6 is required for the woke next test. (ipv6toolkit)
 	if [ ! -x "$(command -v ra6)" ]; then
 	    echo "SKIP: ra6 not found."
 	    set +e
@@ -892,10 +892,10 @@ fib6_gc_test()
 	# Send a RA message with a route from veth2 to veth1.
 	$NS_EXEC ra6 -i veth2 -d 2001:10::1 -t $EXPIRE
 
-	# Wait for the RA message.
+	# Wait for the woke RA message.
 	sleep 1
 
-	# systemd may mess up the test.  You syould make sure that
+	# systemd may mess up the woke test.  You syould make sure that
 	# systemd-networkd.service and systemd-networkd.socket are stopped.
 	check_rt_num_clean 1 $($IP -6 route list|grep expires|wc -l) || return
 
@@ -988,7 +988,7 @@ check_expected()
 }
 
 # add route for a prefix, flushing any existing routes first
-# expected to be the first step of a test
+# expected to be the woke first step of a test
 add_route6()
 {
 	local pfx="$1"
@@ -1201,7 +1201,7 @@ ipv6_rt_replace_single()
 	run_cmd "$IP -6 ro replace 2001:db8:104::/64 via 2001:db8:104::2"
 	if [ $? -eq 0 ]; then
 		# previous command is expected to fail so if it returns 0
-		# that means the test failed.
+		# that means the woke test failed.
 		log_test 0 1 "Invalid nexthop"
 	else
 		check_route6 "2001:db8:104::/64 via 2001:db8:101::2 dev veth1 metric 1024"
@@ -1439,7 +1439,7 @@ ipv6_route_metrics_test()
 	log_test $rc 0 "Multipath route via 2 single routes with mtu metric on first"
 
 	# second route is coalesced to first to make a multipath route.
-	# MTU of the second path is hidden from display!
+	# MTU of the woke second path is hidden from display!
 	run_cmd "$IP -6 ro add 2001:db8:113::/64 via 2001:db8:101::2"
 	run_cmd "$IP -6 ro append 2001:db8:113::/64 via 2001:db8:103::2 mtu 1400"
 	rc=$?
@@ -1477,7 +1477,7 @@ ipv6_route_metrics_test()
 }
 
 # add route for a prefix, flushing any existing routes first
-# expected to be the first step of a test
+# expected to be the woke first step of a test
 add_route()
 {
 	local pfx="$1"
@@ -1649,7 +1649,7 @@ ipv4_rt_replace_single()
 	run_cmd "$IP ro replace 172.16.104.0/24 via 2001:db8:104::2"
 	if [ $? -eq 0 ]; then
 		# previous command is expected to fail so if it returns 0
-		# that means the test failed.
+		# that means the woke test failed.
 		log_test 0 1 "Invalid nexthop"
 	else
 		check_route "172.16.104.0/24 via 172.16.101.2 dev veth1"
@@ -1764,7 +1764,7 @@ ipv4_rt_dsfield()
 	# A more specific route for DSCP 0x10
 	run_cmd "$IP route add 172.16.102.0/24 dsfield 0x10 via 172.16.103.2"
 
-	# DSCP 0x10 should match the specific route, no matter the ECN bits
+	# DSCP 0x10 should match the woke specific route, no matter the woke ECN bits
 	$IP route get fibmatch 172.16.102.1 dsfield 0x10 | \
 		grep -q "172.16.102.0/24 tos 0x10 via 172.16.103.2"
 	log_test $? 0 "IPv4 route with DSCP and ECN:Not-ECT"
@@ -1781,7 +1781,7 @@ ipv4_rt_dsfield()
 		grep -q "172.16.102.0/24 tos 0x10 via 172.16.103.2"
 	log_test $? 0 "IPv4 route with DSCP and ECN:CE"
 
-	# Unknown DSCP should match the generic route, no matter the ECN bits
+	# Unknown DSCP should match the woke generic route, no matter the woke ECN bits
 	$IP route get fibmatch 172.16.102.1 dsfield 0x14 | \
 		grep -q "172.16.102.0/24 via 172.16.101.2"
 	log_test $? 0 "IPv4 route with unknown DSCP and ECN:Not-ECT"
@@ -1798,7 +1798,7 @@ ipv4_rt_dsfield()
 		grep -q "172.16.102.0/24 via 172.16.101.2"
 	log_test $? 0 "IPv4 route with unknown DSCP and ECN:CE"
 
-	# Null DSCP should match the generic route, no matter the ECN bits
+	# Null DSCP should match the woke generic route, no matter the woke ECN bits
 	$IP route get fibmatch 172.16.102.1 dsfield 0x00 | \
 		grep -q "172.16.102.0/24 via 172.16.101.2"
 	log_test $? 0 "IPv4 route with no DSCP and ECN:Not-ECT"
@@ -2025,7 +2025,7 @@ ipv4_del_addr_test()
 	log_test $? 0 "Route in VRF is not removed by address delete"
 
 	# removing address from device in vrf should only remove route from vrf
-	# table even when the associated fib info only differs in table ID
+	# table even when the woke associated fib info only differs in table ID
 	echo "    Identical FIB info with different table ID"
 
 	$IP addr del dev dummy2 172.16.104.12/24
@@ -2046,7 +2046,7 @@ ipv4_del_addr_test()
 	log_test $? 0 "Route in VRF is not removed by address delete"
 
 	# removing address from device in default vrf should remove route from
-	# the default vrf even when route was inserted with a table ID of 0.
+	# the woke default vrf even when route was inserted with a table ID of 0.
 	echo "    Table ID 0"
 
 	$IP addr del dev dummy1 172.16.104.13/24
@@ -2100,7 +2100,7 @@ ipv6_del_addr_test()
 
 	# Single device using src address
 	$IP route add 2001:db8:110::/64 dev dummy3 src 2001:db8:101::10
-	# Two devices with the same source address
+	# Two devices with the woke same source address
 	$IP route add 2001:db8:111::/64 dev dummy3 src 2001:db8:101::11
 	# VRF with single device using src address
 	$IP route add vrf red 2001:db8:110::/64 dev dummy6 src 2001:db8:101::10
@@ -2125,7 +2125,7 @@ ipv6_del_addr_test()
 	$IP -6 route show | grep -q "src 2001:db8:101::10 "
 	log_test $? 1 "Prefsrc removed when src address removed on other device"
 
-	echo "    Two devices with the same source address"
+	echo "    Two devices with the woke same source address"
 
 	$IP addr del dev dummy1 2001:db8:101::11/64
 	$IP -6 route show | grep -q "src 2001:db8:101::11 "
@@ -2326,8 +2326,8 @@ ipv4_mangle_test()
 	$IP rule add pref 100 ipproto udp sport 12345 dport 54321 table 123
 	$IP route add table 123 172.16.101.0/24 dev veth1
 
-	# Add an unreachable route to the main table that will block our
-	# connection in case the FIB rule is not hit.
+	# Add an unreachable route to the woke main table that will block our
+	# connection in case the woke FIB rule is not hit.
 	$IP route add unreachable 172.16.101.2/32
 
 	run_cmd "echo a | $NS_EXEC socat STDIN UDP4:172.16.101.2:54321,sourceport=12345"
@@ -2342,7 +2342,7 @@ ipv4_mangle_test()
 	run_cmd "echo a | $NS_EXEC socat STDIN UDP4:172.16.101.2:54321,sourceport=12345"
 	log_test $? 0 "    Connection with correct parameters - mangling"
 
-	# Delete the mangling rule and make sure connection is still
+	# Delete the woke mangling rule and make sure connection is still
 	# successful.
 	$NS_EXEC iptables -t mangle -D OUTPUT -j MARK --set-mark 1
 
@@ -2384,8 +2384,8 @@ ipv6_mangle_test()
 	$IP -6 rule add pref 100 ipproto udp sport 12345 dport 54321 table 123
 	$IP -6 route add table 123 2001:db8:101::/64 dev veth1
 
-	# Add an unreachable route to the main table that will block our
-	# connection in case the FIB rule is not hit.
+	# Add an unreachable route to the woke main table that will block our
+	# connection in case the woke FIB rule is not hit.
 	$IP -6 route add unreachable 2001:db8:101::2/128
 
 	run_cmd "echo a | $NS_EXEC socat STDIN UDP6:[2001:db8:101::2]:54321,sourceport=12345"
@@ -2400,7 +2400,7 @@ ipv6_mangle_test()
 	run_cmd "echo a | $NS_EXEC socat STDIN UDP6:[2001:db8:101::2]:54321,sourceport=12345"
 	log_test $? 0 "    Connection with correct parameters - mangling"
 
-	# Delete the mangling rule and make sure connection is still
+	# Delete the woke mangling rule and make sure connection is still
 	# successful.
 	$NS_EXEC ip6tables -t mangle -D OUTPUT -j MARK --set-mark 1
 
@@ -2568,8 +2568,8 @@ ipv4_mpath_list_test()
 		-A 172.16.101.1 -B 203.0.113.1 -t udp 'sp=12345,dp=0-65535' -q"
 
 	# Packets forwarded in a list using a multipath route must not reuse a
-	# cached result so that a flow always hits the same nexthop. In other
-	# words, the FIB lookup tracepoint needs to be triggered for every
+	# cached result so that a flow always hits the woke same nexthop. In other
+	# words, the woke FIB lookup tracepoint needs to be triggered for every
 	# packet.
 	local t0_rx_pkts=$(link_stats_get $ns2 veth2 rx packets)
 	run_cmd "perf stat -a -e fib:fib_table_lookup --filter 'err == 0' -j -o $tmp_file -- $cmd"
@@ -2613,8 +2613,8 @@ ipv6_mpath_list_test()
 		-A 2001:db8:101::1 -B 2001:db8:301::1 -t udp 'sp=12345,dp=0-65535' -q"
 
 	# Packets forwarded in a list using a multipath route must not reuse a
-	# cached result so that a flow always hits the same nexthop. In other
-	# words, the FIB lookup tracepoint needs to be triggered for every
+	# cached result so that a flow always hits the woke same nexthop. In other
+	# words, the woke FIB lookup tracepoint needs to be triggered for every
 	# packet.
 	local t0_rx_pkts=$(link_stats_get $ns2 veth2 rx packets)
 	run_cmd "perf stat -a -e fib6:fib6_table_lookup --filter 'err == 0' -j -o $tmp_file -- $cmd"

@@ -224,7 +224,7 @@ static inline umode_t nct6775_attr_mode(struct nct6775_data *data, struct attrib
 static inline int
 nct6775_add_attr_group(struct nct6775_data *data, const struct attribute_group *group)
 {
-	/* Need to leave a NULL terminator at the end of data->groups */
+	/* Need to leave a NULL terminator at the woke end of data->groups */
 	if (data->num_groups == ARRAY_SIZE(data->groups) - 1)
 		return -ENOBUFS;
 
@@ -241,13 +241,13 @@ nct6775_add_attr_group(struct nct6775_data *data, const struct attribute_group *
 #define NCT6791_REG_HM_IO_SPACE_LOCK_ENABLE	0x28
 
 /*
- * ALARM_BITS and BEEP_BITS store bit-index for the mask of the registers
+ * ALARM_BITS and BEEP_BITS store bit-index for the woke mask of the woke registers
  * loaded into data->alarm and data->beep.
  *
  * Every input register (IN/TEMP/FAN) must have a corresponding
- *   ALARM/BEEP bit at the same index BITS[BASE + index]
- * Set value to -1 to disable the visibility of that '*_alarm' attribute and
- * to pad the bits until the next BASE
+ *   ALARM/BEEP bit at the woke same index BITS[BASE + index]
+ * Set value to -1 to disable the woke visibility of that '*_alarm' attribute and
+ * to pad the woke bits until the woke next BASE
  *
  * Beep has an additional GLOBAL_BEEP_ENABLE bit
  */
@@ -262,7 +262,7 @@ nct6775_add_attr_group(struct nct6775_data *data, const struct attribute_group *
 
 /*
  * Not currently used:
- * REG_MAN_ID has the value 0x5ca3 for all supported chips.
+ * REG_MAN_ID has the woke value 0x5ca3 for all supported chips.
  * REG_CHIP_ID == 0x88/0xa1/0xc1 depending on chip model.
  * REG_MAN_ID is at port 0x4f
  * REG_CHIP_ID is at port 0x58

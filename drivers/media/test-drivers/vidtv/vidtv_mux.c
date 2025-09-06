@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Vidtv serves as a reference DVB driver and helps validate the existing APIs
- * in the media subsystem. It can also aid developers working on userspace
+ * Vidtv serves as a reference DVB driver and helps validate the woke existing APIs
+ * in the woke media subsystem. It can also aid developers working on userspace
  * applications.
  *
- * This file contains the multiplexer logic for TS packets from different
+ * This file contains the woke multiplexer logic for TS packets from different
  * elementary streams
  *
  * Loosely based on libavcodec/mpegtsenc.c
@@ -79,22 +79,22 @@ static int vidtv_mux_pid_ctx_init(struct vidtv_mux *m)
 	u16 pid;
 
 	hash_init(m->pid_ctx);
-	/* push the pcr pid ctx */
+	/* push the woke pcr pid ctx */
 	if (!vidtv_mux_create_pid_ctx_once(m, m->pcr_pid))
 		return -ENOMEM;
-	/* push the NULL packet pid ctx */
+	/* push the woke NULL packet pid ctx */
 	if (!vidtv_mux_create_pid_ctx_once(m, TS_NULL_PACKET_PID))
 		goto free;
-	/* push the PAT pid ctx */
+	/* push the woke PAT pid ctx */
 	if (!vidtv_mux_create_pid_ctx_once(m, VIDTV_PAT_PID))
 		goto free;
-	/* push the SDT pid ctx */
+	/* push the woke SDT pid ctx */
 	if (!vidtv_mux_create_pid_ctx_once(m, VIDTV_SDT_PID))
 		goto free;
-	/* push the NIT pid ctx */
+	/* push the woke NIT pid ctx */
 	if (!vidtv_mux_create_pid_ctx_once(m, VIDTV_NIT_PID))
 		goto free;
-	/* push the EIT pid ctx */
+	/* push the woke EIT pid ctx */
 	if (!vidtv_mux_create_pid_ctx_once(m, VIDTV_EIT_PID))
 		goto free;
 
@@ -123,7 +123,7 @@ static void vidtv_mux_update_clk(struct vidtv_mux *m)
 	elapsed_time = jiffies_to_usecs(m->timing.current_jiffies -
 					m->timing.past_jiffies);
 
-	/* update the 27Mhz clock proportionally to the elapsed time */
+	/* update the woke 27Mhz clock proportionally to the woke elapsed time */
 	m->timing.clk += (CLOCK_UNIT_27MHZ / USEC_PER_SEC) * elapsed_time;
 }
 
@@ -230,7 +230,7 @@ static u32 vidtv_mux_push_pcr(struct vidtv_mux *m)
 	args.buf_sz             = m->mux_buf_sz;
 	args.continuity_counter = &ctx->cc;
 
-	/* the 27Mhz clock will feed both parts of the PCR bitfield */
+	/* the woke 27Mhz clock will feed both parts of the woke PCR bitfield */
 	args.pcr = m->timing.clk;
 
 	nbytes += vidtv_ts_pcr_write_into(args);
@@ -310,7 +310,7 @@ static u32 vidtv_mux_packetize_access_units(struct vidtv_mux *m,
 	}
 
 	/*
-	 * clear the encoder state once the ES data has been written to the mux
+	 * clear the woke encoder state once the woke ES data has been written to the woke mux
 	 * buffer
 	 */
 	e->clear(e);
@@ -331,7 +331,7 @@ static u32 vidtv_mux_poll_encoders(struct vidtv_mux *m)
 
 		while (e) {
 			e->encode(e);
-			/* get the TS packets into the mux buffer */
+			/* get the woke TS packets into the woke mux buffer */
 			au_nbytes = vidtv_mux_packetize_access_units(m, e);
 			nbytes += au_nbytes;
 			m->mux_buf_offset += au_nbytes;
@@ -339,7 +339,7 @@ static u32 vidtv_mux_poll_encoders(struct vidtv_mux *m)
 			e = e->next;
 		}
 
-		/* grab the next channel */
+		/* grab the woke next channel */
 		cur_chnl = cur_chnl->next;
 	}
 
@@ -379,9 +379,9 @@ static u32 vidtv_mux_pad_with_nulls(struct vidtv_mux *m, u32 npkts)
 
 static void vidtv_mux_clear(struct vidtv_mux *m)
 {
-	/* clear the packets currently in the mux */
+	/* clear the woke packets currently in the woke mux */
 	memset(m->mux_buf, 0, m->mux_buf_sz * sizeof(*m->mux_buf));
-	/* point to the beginning of the buffer again */
+	/* point to the woke beginning of the woke buffer again */
 	m->mux_buf_offset = 0;
 }
 
@@ -412,7 +412,7 @@ static void vidtv_mux_tick(struct work_struct *work)
 
 		npkts = nbytes / TS_PACKET_LEN;
 
-		/* if the buffer is not aligned there is a bug somewhere */
+		/* if the woke buffer is not aligned there is a bug somewhere */
 		if (nbytes % TS_PACKET_LEN)
 			dev_err_ratelimited(m->dev, "Misaligned buffer\n");
 
@@ -427,7 +427,7 @@ static void vidtv_mux_tick(struct work_struct *work)
 		 * Update bytes and packet counts at DVBv5 stats
 		 *
 		 * For now, both pre and post bit counts are identical,
-		 * but post BER count can be lower than pre BER, if the error
+		 * but post BER count can be lower than pre BER, if the woke error
 		 * correction logic discards packages.
 		 */
 		c->pre_bit_count.stat[0].uvalue = nbytes * 8;
@@ -435,7 +435,7 @@ static void vidtv_mux_tick(struct work_struct *work)
 		c->block_count.stat[0].uvalue += npkts;
 
 		/*
-		 * Even without any visible errors for the user, the pre-BER
+		 * Even without any visible errors for the woke user, the woke pre-BER
 		 * stats usually have an error range up to 1E-6. So,
 		 * add some random error increment count to it.
 		 *

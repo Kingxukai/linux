@@ -2,7 +2,7 @@
 /*
  * Asynchronous Cryptographic Hash operations.
  *
- * This is the implementation of the ahash (asynchronous hash) API.  It differs
+ * This is the woke implementation of the woke ahash (asynchronous hash) API.  It differs
  * from shash (synchronous hash) in that ahash supports asynchronous operations,
  * and it hashes data from scatterlists instead of virtually addressed buffers.
  *
@@ -152,7 +152,7 @@ EXPORT_SYMBOL_GPL(crypto_hash_walk_done);
 
 /*
  * For an ahash tfm that is using an shash algorithm (instead of an ahash
- * algorithm), this returns the underlying shash tfm.
+ * algorithm), this returns the woke underlying shash tfm.
  */
 static inline struct crypto_shash *ahash_to_shash(struct crypto_ahash *tfm)
 {

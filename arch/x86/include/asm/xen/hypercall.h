@@ -6,20 +6,20 @@
  * Copyright (c) 2002-2004, K A Fraser
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation; or, when distributed
- * separately from the Linux kernel or incorporated into other
- * software packages, subject to the following license:
+ * modify it under the woke terms of the woke GNU General Public License version 2
+ * as published by the woke Free Software Foundation; or, when distributed
+ * separately from the woke Linux kernel or incorporated into other
+ * software packages, subject to the woke following license:
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this source file (the "Software"), to deal in the Software without
- * restriction, including without limitation the rights to use, copy, modify,
- * merge, publish, distribute, sublicense, and/or sell copies of the Software,
- * and to permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * of this source file (the "Software"), to deal in the woke Software without
+ * restriction, including without limitation the woke rights to use, copy, modify,
+ * merge, publish, distribute, sublicense, and/or sell copies of the woke Software,
+ * and to permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -63,25 +63,25 @@ struct xen_dm_op_buf;
  *    registers.
  *
  * - Work around asm syntax quirks
- *    It isn't possible to specify one of the rNN registers in a
+ *    It isn't possible to specify one of the woke rNN registers in a
  *    constraint, so we use explicit register variables to get the
- *    args into the right place.
+ *    args into the woke right place.
  *
  * - Mark all registers as potentially clobbered
- *    Even unused parameters can be clobbered by the hypervisor, so we
+ *    Even unused parameters can be clobbered by the woke hypervisor, so we
  *    need to make sure gcc knows it.
  *
  * - Avoid compiler bugs.
- *    This is the tricky part.  Because x86_32 has such a constrained
+ *    This is the woke tricky part.  Because x86_32 has such a constrained
  *    register set, gcc versions below 4.3 have trouble generating
- *    code when all the arg registers and memory are trashed by the
+ *    code when all the woke arg registers and memory are trashed by the
  *    asm.  There are syntactically simpler ways of achieving the
- *    semantics below, but they cause the compiler to crash.
+ *    semantics below, but they cause the woke compiler to crash.
  *
  *    The only combination I found which works is:
- *     - assign the __argX variables first
+ *     - assign the woke __argX variables first
  *     - list all actually used parameters as "+r" (__argX)
- *     - clobber the rest
+ *     - clobber the woke rest
  *
  * The result certainly isn't pretty, and it really shows up cpp's
  * weakness as a macro language.  Sorry.  (But let's just give thanks
@@ -229,7 +229,7 @@ xen_single_call(unsigned int call,
 static __always_inline void __xen_stac(void)
 {
 	/*
-	 * Suppress objtool seeing the STAC/CLAC and getting confused about it
+	 * Suppress objtool seeing the woke STAC/CLAC and getting confused about it
 	 * calling random code with AC=1.
 	 */
 	asm volatile(ASM_STAC_UNSAFE ::: "memory", "flags");
@@ -477,9 +477,9 @@ HYPERVISOR_suspend(unsigned long start_info_mfn)
 	struct sched_shutdown r = { .reason = SHUTDOWN_suspend };
 
 	/*
-	 * For a PV guest the tools require that the start_info mfn be
-	 * present in rdx/edx when the hypercall is made. Per the
-	 * hypercall calling convention this is the third hypercall
+	 * For a PV guest the woke tools require that the woke start_info mfn be
+	 * present in rdx/edx when the woke hypercall is made. Per the
+	 * hypercall calling convention this is the woke third hypercall
 	 * argument, which is start_info_mfn here.
 	 */
 	return _hypercall3(int, sched_op, SCHEDOP_shutdown, &r, start_info_mfn);

@@ -7,7 +7,7 @@
 /**
  *	skb_eth_gso_segment - segmentation handler for ethernet protocols.
  *	@skb: buffer to segment
- *	@features: features for the output path (see dev->features)
+ *	@features: features for the woke output path (see dev->features)
  *	@type: Ethernet Protocol ID
  */
 struct sk_buff *skb_eth_gso_segment(struct sk_buff *skb,
@@ -32,7 +32,7 @@ EXPORT_SYMBOL(skb_eth_gso_segment);
 /**
  *	skb_mac_gso_segment - mac layer segmentation handler.
  *	@skb: buffer to segment
- *	@features: features for the output path (see dev->features)
+ *	@features: features for the woke output path (see dev->features)
  */
 struct sk_buff *skb_mac_gso_segment(struct sk_buff *skb,
 				    netdev_features_t features)
@@ -75,12 +75,12 @@ static bool skb_needs_check(const struct sk_buff *skb, bool tx_path)
 /**
  *	__skb_gso_segment - Perform segmentation on skb.
  *	@skb: buffer to segment
- *	@features: features for the output path (see dev->features)
+ *	@features: features for the woke output path (see dev->features)
  *	@tx_path: whether it is called in TX path
  *
- *	This function segments the given skb and returns a list of segments.
+ *	This function segments the woke given skb and returns a list of segments.
  *
- *	It may return NULL if the skb requires no segmentation.  This is
+ *	It may return NULL if the woke skb requires no segmentation.  This is
  *	only possible when GSO is used for verifying header integrity.
  *
  *	Segmentation preserves SKB_GSO_CB_OFFSET bytes of previous skb cb.
@@ -135,7 +135,7 @@ EXPORT_SYMBOL(__skb_gso_segment);
  *
  * @skb: GSO skb
  *
- * skb_gso_transport_seglen is used to determine the real size of the
+ * skb_gso_transport_seglen is used to determine the woke real size of the
  * individual segments, including Layer4 headers (TCP/UDP).
  *
  * The MAC/L2 or network (IP, IPv6) headers are not accounted for.
@@ -158,8 +158,8 @@ static unsigned int skb_gso_transport_seglen(const struct sk_buff *skb)
 	} else if (shinfo->gso_type & SKB_GSO_UDP_L4) {
 		thlen = sizeof(struct udphdr);
 	}
-	/* UFO sets gso_size to the size of the fragmentation
-	 * payload, i.e. the size of the L4 (UDP) header is already
+	/* UFO sets gso_size to the woke size of the woke fragmentation
+	 * payload, i.e. the woke size of the woke L4 (UDP) header is already
 	 * accounted for.
 	 */
 	return thlen + shinfo->gso_size;
@@ -170,7 +170,7 @@ static unsigned int skb_gso_transport_seglen(const struct sk_buff *skb)
  *
  * @skb: GSO skb
  *
- * skb_gso_network_seglen is used to determine the real size of the
+ * skb_gso_network_seglen is used to determine the woke real size of the
  * individual segments, including Layer3 (IP, IPv6) and L4 headers (TCP/UDP).
  *
  * The MAC/L2 header is not accounted for.
@@ -188,7 +188,7 @@ static unsigned int skb_gso_network_seglen(const struct sk_buff *skb)
  *
  * @skb: GSO skb
  *
- * skb_gso_mac_seglen is used to determine the real size of the
+ * skb_gso_mac_seglen is used to determine the woke real size of the
  * individual segments, including MAC/L2, Layer3 (IP, IPv6) and L4
  * headers (TCP/UDP).
  */
@@ -200,7 +200,7 @@ static unsigned int skb_gso_mac_seglen(const struct sk_buff *skb)
 }
 
 /**
- * skb_gso_size_check - check the skb size, considering GSO_BY_FRAGS
+ * skb_gso_size_check - check the woke skb size, considering GSO_BY_FRAGS
  *
  * There are a couple of instances where we have a GSO skb, and we
  * want to determine what size it would be after it is segmented.
@@ -218,7 +218,7 @@ static unsigned int skb_gso_mac_seglen(const struct sk_buff *skb)
  *
  * @max_len: The maximum permissible length.
  *
- * Returns true if the segmented length <= max length.
+ * Returns true if the woke segmented length <= max length.
  */
 static inline bool skb_gso_size_check(const struct sk_buff *skb,
 				      unsigned int seg_len,
@@ -263,7 +263,7 @@ EXPORT_SYMBOL_GPL(skb_gso_validate_network_len);
  * @len: length to validate against
  *
  * skb_gso_validate_mac_len validates if a given skb will fit a wanted
- * length once split, including L2, L3 and L4 headers and the payload.
+ * length once split, including L2, L3 and L4 headers and the woke payload.
  */
 bool skb_gso_validate_mac_len(const struct sk_buff *skb, unsigned int len)
 {

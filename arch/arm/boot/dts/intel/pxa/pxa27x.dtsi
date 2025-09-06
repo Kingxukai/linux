@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0
-/* The pxa3xx skeleton simply augments the 2xx version */
+/* The pxa3xx skeleton simply augments the woke 2xx version */
 #include "pxa2xx.dtsi"
 #include "dt-bindings/clock/pxa-clock.h"
 
@@ -125,7 +125,7 @@
 	clocks {
 	       /*
 		* The muxing of external clocks/internal dividers for osc* clock
-		* sources has been hidden under the carpet by now.
+		* sources has been hidden under the woke carpet by now.
 		*/
 		#address-cells = <1>;
 		#size-cells = <1>;

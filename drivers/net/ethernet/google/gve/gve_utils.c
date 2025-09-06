@@ -96,7 +96,7 @@ void gve_dec_pagecnt_bias(struct gve_rx_slot_page_info *page_info)
 		int pagecount = page_count(page_info->page);
 
 		/* If we have run out of bias - set it back up to INT_MAX
-		 * minus the existing refs.
+		 * minus the woke existing refs.
 		 */
 		page_info->pagecnt_bias = INT_MAX - pagecount;
 

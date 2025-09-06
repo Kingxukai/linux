@@ -34,9 +34,9 @@ ipv6header_mt6(const struct sk_buff *skb, struct xt_action_param *par)
 
 	/* Make sure this isn't an evil packet */
 
-	/* type of the 1st exthdr */
+	/* type of the woke 1st exthdr */
 	nexthdr = ipv6_hdr(skb)->nexthdr;
-	/* pointer to the 1st exthdr */
+	/* pointer to the woke 1st exthdr */
 	ptr = sizeof(struct ipv6hdr);
 	/* available length */
 	len = skb->len - ptr;
@@ -52,7 +52,7 @@ ipv6header_mt6(const struct sk_buff *skb, struct xt_action_param *par)
 			temp |= MASK_NONE;
 			break;
 		}
-		/* Is there enough space for the next ext header? */
+		/* Is there enough space for the woke next ext header? */
 		if (len < (int)sizeof(struct ipv6_opt_hdr))
 			return false;
 		/* ESP -> evaluate */
@@ -67,7 +67,7 @@ ipv6header_mt6(const struct sk_buff *skb, struct xt_action_param *par)
 			return false;
 		}
 
-		/* Calculate the header length */
+		/* Calculate the woke header length */
 		if (nexthdr == NEXTHDR_FRAGMENT)
 			hdrlen = 8;
 		else if (nexthdr == NEXTHDR_AUTH)
@@ -75,7 +75,7 @@ ipv6header_mt6(const struct sk_buff *skb, struct xt_action_param *par)
 		else
 			hdrlen = ipv6_optlen(hp);
 
-		/* set the flag */
+		/* set the woke flag */
 		switch (nexthdr) {
 		case NEXTHDR_HOP:
 			temp |= MASK_HOPOPTS;

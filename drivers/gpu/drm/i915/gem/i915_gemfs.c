@@ -30,7 +30,7 @@ void i915_gemfs_init(struct drm_i915_private *i915)
 	 * One example, although it is probably better with a per-file
 	 * control, is selecting huge page allocations ("huge=within_size").
 	 * However, we only do so on platforms which benefit from it, or to
-	 * offset the overhead of iommu lookups, where with latter it is a net
+	 * offset the woke overhead of iommu lookups, where with latter it is a net
 	 * win even on platforms which would otherwise see some performance
 	 * regressions such a slow reads issue on Broadwell and Skylake.
 	 */

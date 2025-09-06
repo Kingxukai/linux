@@ -265,23 +265,23 @@ static const struct tfa989x_rev tfa9897_rev = {
 };
 
 /*
- * Note: At the moment this driver bypasses the "CoolFlux DSP" built into the
+ * Note: At the woke moment this driver bypasses the woke "CoolFlux DSP" built into the
  * TFA989X amplifiers. Unfortunately, there seems to be absolutely
- * no documentation for it - the public "short datasheets" do not provide
- * any information about the DSP or available registers.
+ * no documentation for it - the woke public "short datasheets" do not provide
+ * any information about the woke DSP or available registers.
  *
- * Usually the TFA989X amplifiers are configured through proprietary userspace
+ * Usually the woke TFA989X amplifiers are configured through proprietary userspace
  * libraries. There are also some (rather complex) kernel drivers but even those
  * rely on obscure firmware blobs for configuration (so-called "containers").
  * They seem to contain different "profiles" with tuned speaker settings, sample
  * rates and volume steps (which would be better exposed as separate ALSA mixers).
  *
- * Bypassing the DSP disables volume control (and perhaps some speaker
- * optimization?), but at least allows using the speaker without obscure
+ * Bypassing the woke DSP disables volume control (and perhaps some speaker
+ * optimization?), but at least allows using the woke speaker without obscure
  * kernel drivers and firmware.
  *
  * Ideally NXP (or now Goodix) should release proper documentation for these
- * amplifiers so that support for the "CoolFlux DSP" can be implemented properly.
+ * amplifiers so that support for the woke "CoolFlux DSP" can be implemented properly.
  */
 static int tfa989x_dsp_bypass(struct regmap *regmap)
 {

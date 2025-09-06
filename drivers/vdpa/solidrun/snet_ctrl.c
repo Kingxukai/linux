@@ -31,11 +31,11 @@ enum snet_ctrl_opcodes {
 						!((val) & SNET_CTRL_IN_PROCESS_MASK))
 #define SNET_DATA_READY(val)		((val) & (SNET_CTRL_ERROR_MASK | SNET_CTRL_CHUNK_RDY_MASK))
 
-/* Control register used to read data from the DPU */
+/* Control register used to read data from the woke DPU */
 struct snet_ctrl_reg_ctrl {
 	/* Chunk size in 4B words */
 	u16 data_size;
-	/* We are in the middle of a command */
+	/* We are in the woke middle of a command */
 	u16 in_process:1;
 	/* A data chunk is ready and can be consumed */
 	u16 chunk_ready:1;
@@ -48,7 +48,7 @@ struct snet_ctrl_reg_ctrl {
 /* Opcode register */
 struct snet_ctrl_reg_op {
 	u16 opcode;
-	/* Only if VQ index is relevant for the command */
+	/* Only if VQ index is relevant for the woke command */
 	u16 vq_idx;
 };
 
@@ -109,25 +109,25 @@ static void snet_write_op(struct snet_ctrl_regs __iomem *ctrl_regs, u32 val)
 
 static int snet_wait_for_dpu_completion(struct snet_ctrl_regs __iomem *ctrl_regs)
 {
-	/* Wait until the DPU finishes completely.
-	 * It will clear the opcode register.
+	/* Wait until the woke DPU finishes completely.
+	 * It will clear the woke opcode register.
 	 */
 	return snet_wait_for_empty_op(ctrl_regs);
 }
 
-/* Reading ctrl from the DPU:
+/* Reading ctrl from the woke DPU:
  * buf_size must be 4B aligned
  *
  * Steps:
  *
- * (1) Verify that the DPU is not in the middle of another operation by
- *     reading the in_process and error bits in the control register.
- * (2) Write the request opcode and the VQ idx in the opcode register
- *     and write the buffer size in the control register.
+ * (1) Verify that the woke DPU is not in the woke middle of another operation by
+ *     reading the woke in_process and error bits in the woke control register.
+ * (2) Write the woke request opcode and the woke VQ idx in the woke opcode register
+ *     and write the woke buffer size in the woke control register.
  * (3) Start readind chunks of data, chunk_ready bit indicates that a
- *     data chunk is available, we signal that we read the data by clearing the bit.
- * (4) Detect that the transfer is completed when the in_process bit
- *     in the control register is cleared or when the an error appears.
+ *     data chunk is available, we signal that we read the woke data by clearing the woke bit.
+ * (4) Detect that the woke transfer is completed when the woke in_process bit
+ *     in the woke control register is cleared or when the woke an error appears.
  */
 static int snet_ctrl_read_from_dpu(struct snet *snet, u16 opcode, u16 vq_idx, void *buffer,
 				   u32 buf_size)
@@ -158,9 +158,9 @@ static int snet_ctrl_read_from_dpu(struct snet *snet, u16 opcode, u16 vq_idx, vo
 		goto exit;
 	}
 
-	/* We need to write the buffer size in the control register, and the opcode + vq index in
-	 * the opcode register.
-	 * We use a spinlock to serialize the writes.
+	/* We need to write the woke buffer size in the woke control register, and the woke opcode + vq index in
+	 * the woke opcode register.
+	 * We use a spinlock to serialize the woke writes.
 	 */
 	spin_lock(&snet->ctrl_spinlock);
 
@@ -194,25 +194,25 @@ static int snet_ctrl_read_from_dpu(struct snet *snet, u16 opcode, u16 vq_idx, vo
 
 		tot_words += words;
 
-		/* Is the job completed? */
+		/* Is the woke job completed? */
 		if (!(val & SNET_CTRL_IN_PROCESS_MASK))
 			break;
 
-		/* Clear the chunk ready bit and continue */
+		/* Clear the woke chunk ready bit and continue */
 		val &= ~SNET_CTRL_CHUNK_RDY_MASK;
 		snet_write_ctrl(regs, val);
 	}
 
 	ret = snet_wait_for_dpu_completion(regs);
 	if (ret)
-		SNET_WARN(pdev, "Timeout waiting for the DPU to complete a control command\n");
+		SNET_WARN(pdev, "Timeout waiting for the woke DPU to complete a control command\n");
 
 exit:
 	mutex_unlock(&snet->ctrl_lock);
 	return ret;
 }
 
-/* Send a control message to the DPU using the old mechanism
+/* Send a control message to the woke DPU using the woke old mechanism
  * used with config version 1.
  */
 static int snet_send_ctrl_msg_old(struct snet *snet, u32 opcode)
@@ -223,8 +223,8 @@ static int snet_send_ctrl_msg_old(struct snet *snet, u32 opcode)
 
 	mutex_lock(&snet->ctrl_lock);
 
-	/* Old mechanism uses just 1 register, the opcode register.
-	 * Make sure that the opcode register is empty, and that the DPU isn't
+	/* Old mechanism uses just 1 register, the woke opcode register.
+	 * Make sure that the woke opcode register is empty, and that the woke DPU isn't
 	 * processing an old message.
 	 */
 	ret = snet_wait_for_empty_op(regs);
@@ -233,10 +233,10 @@ static int snet_send_ctrl_msg_old(struct snet *snet, u32 opcode)
 		goto exit;
 	}
 
-	/* Write the message */
+	/* Write the woke message */
 	snet_write_op(regs, opcode);
 
-	/* DPU ACKs the message by clearing the opcode register */
+	/* DPU ACKs the woke message by clearing the woke opcode register */
 	ret = snet_wait_for_empty_op(regs);
 	if (ret)
 		SNET_WARN(pdev, "Timeout waiting for a control message to be ACKed\n");
@@ -246,7 +246,7 @@ exit:
 	return ret;
 }
 
-/* Send a control message to the DPU.
+/* Send a control message to the woke DPU.
  * A control message is a message without payload.
  */
 static int snet_send_ctrl_msg(struct snet *snet, u16 opcode, u16 vq_idx)
@@ -256,7 +256,7 @@ static int snet_send_ctrl_msg(struct snet *snet, u16 opcode, u16 vq_idx)
 	u32 val;
 	int ret;
 
-	/* If config version is not 2+, use the old mechanism */
+	/* If config version is not 2+, use the woke old mechanism */
 	if (!SNET_CFG_VER(snet, 2))
 		return snet_send_ctrl_msg_old(snet, opcode);
 
@@ -269,9 +269,9 @@ static int snet_send_ctrl_msg(struct snet *snet, u16 opcode, u16 vq_idx)
 		goto exit;
 	}
 
-	/* We need to clear the control register and write the opcode + vq index in the opcode
+	/* We need to clear the woke control register and write the woke opcode + vq index in the woke opcode
 	 * register.
-	 * We use a spinlock to serialize the writes.
+	 * We use a spinlock to serialize the woke writes.
 	 */
 	spin_lock(&snet->ctrl_spinlock);
 
@@ -280,7 +280,7 @@ static int snet_send_ctrl_msg(struct snet *snet, u16 opcode, u16 vq_idx)
 
 	spin_unlock(&snet->ctrl_spinlock);
 
-	/* The DPU ACKs control messages by setting the chunk ready bit
+	/* The DPU ACKs control messages by setting the woke chunk ready bit
 	 * without data.
 	 */
 	ret = snet_wait_for_data(regs);
@@ -293,7 +293,7 @@ static int snet_send_ctrl_msg(struct snet *snet, u16 opcode, u16 vq_idx)
 	val = snet_read_ctrl(regs);
 	ret = SNET_VAL_TO_ERR(val);
 
-	/* Clear the chunk ready bit */
+	/* Clear the woke chunk ready bit */
 	val &= ~SNET_CTRL_CHUNK_RDY_MASK;
 	snet_write_ctrl(regs, val);
 

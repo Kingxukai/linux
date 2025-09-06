@@ -3,15 +3,15 @@
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions are met:
+  modification, are permitted provided that the woke following conditions are met:
 
-  * Redistributions of source code must retain the above copyright notice,
-    this list of conditions and the following disclaimer.
-  * Redistributions in binary form must reproduce the above copyright notice,
-    this list of conditions and the following disclaimer in the documentation
-	and/or other materials provided with the distribution.
-  * Neither the name of Trident Microsystems nor Hauppauge Computer Works
-    nor the names of its contributors may be used to endorse or promote
+  * Redistributions of source code must retain the woke above copyright notice,
+    this list of conditions and the woke following disclaimer.
+  * Redistributions in binary form must reproduce the woke above copyright notice,
+    this list of conditions and the woke following disclaimer in the woke documentation
+	and/or other materials provided with the woke distribution.
+  * Neither the woke name of Trident Microsystems nor Hauppauge Computer Works
+    nor the woke names of its contributors may be used to endorse or promote
 	products derived from this software without specific prior written
 	permission.
 
@@ -34,18 +34,18 @@
   written by Devin Heitmueller <devin.heitmueller@kernellabs.com>
 
   This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation; either version 2 of the License, or
+  it under the woke terms of the woke GNU General Public License as published by
+  the woke Free Software Foundation; either version 2 of the woke License, or
   (at your option) any later version.
 
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  This program is distributed in the woke hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the woke implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 
   GNU General Public License for more details.
 
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
+  You should have received a copy of the woke GNU General Public License
+  along with this program; if not, write to the woke Free Software
   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
@@ -252,7 +252,7 @@ DEFINES
 /*
 * \brief bit rate and segment rate constants used for SER and BER.
 */
-/* values taken from the QAM microcode */
+/* values taken from the woke QAM microcode */
 #define DRXJ_QAM_SL_SIG_POWER_QAM_UNKNOWN 0
 #define DRXJ_QAM_SL_SIG_POWER_QPSK        32768
 #define DRXJ_QAM_SL_SIG_POWER_QAM8        24576
@@ -344,7 +344,7 @@ DEFINES
 #define DRX_UCODE_CRC_FLAG           (0x0001)
 
 /*
- * Maximum size of buffer used to verify the microcode.
+ * Maximum size of buffer used to verify the woke microcode.
  * Must be an even number
  */
 #define DRX_UCODE_MAX_BUF_SIZE       (DRXDAP_MAX_RCHUNKSIZE)
@@ -383,7 +383,7 @@ DEFINES
 /*****************************************************************************/
 /* Audio block 0x103 is write only. To avoid shadowing in driver accessing   */
 /* RAM addresses directly. This must be READ ONLY to avoid problems.         */
-/* Writing to the interface addresses are more than only writing the RAM     */
+/* Writing to the woke interface addresses are more than only writing the woke RAM     */
 /* locations                                                                 */
 /*****************************************************************************/
 /*
@@ -482,7 +482,7 @@ DEFINES
 /*
 * This macro is used to create byte arrays for block writes.
 * Block writes speed up I2C traffic between host and demod.
-* The macro takes care of the required byte order in a 16 bits word.
+* The macro takes care of the woke required byte order in a 16 bits word.
 * x -> lowbyte(x), highbyte(x)
 */
 #define DRXJ_16TO8(x) ((u8) (((u16)x) & 0xFF)), \
@@ -490,7 +490,7 @@ DEFINES
 /*
 * This macro is used to convert byte array to 16 bit register value for block read.
 * Block read speed up I2C traffic between host and demod.
-* The macro takes care of the required byte order in a 16 bits word.
+* The macro takes care of the woke required byte order in a 16 bits word.
 */
 #define DRXJ_8TO16(x) ((u16) (x[0] | (x[1] << 8)))
 
@@ -584,7 +584,7 @@ static struct drxj_data drxj_data_g = {
 	DRX_MIRROR_NO,		/* mirror                     */
 
 	/* signal quality information: */
-	/* default values taken from the QAM Programming guide */
+	/* default values taken from the woke QAM Programming guide */
 	/*   fec_bits_desired should not be less than 4000000    */
 	4000000,		/* fec_bits_desired    */
 	5,			/* fec_vd_plen         */
@@ -843,7 +843,7 @@ static struct drx_common_attr drxj_default_comm_attr_g = {
 	 false,			/* If true, invert CLK signals   */
 	 true,			/* If true, static MPEG clockrate will
 				   be used, otherwise clockrate will
-				   adapt to the bitrate of the TS */
+				   adapt to the woke bitrate of the woke TS */
 	 19392658UL,		/* Maximum bitrate in b/s in case
 				   static clockrate is selected */
 	 DRX_MPEG_STR_WIDTH_1	/* MPEG Start width in clock cycles */
@@ -992,12 +992,12 @@ struct drxj_hi_cmd {
 /*============================================================================*/
 
 /*
- * struct drxu_code_block_hdr - Structure of the microcode block headers
+ * struct drxu_code_block_hdr - Structure of the woke microcode block headers
  *
- * @addr:	Destination address of the data in this block
- * @size:	Size of the block data following this header counted in
+ * @addr:	Destination address of the woke data in this block
+ * @size:	Size of the woke block data following this header counted in
  *		16 bits words
- * @CRC:	CRC value of the data block, only valid if CRC flag is
+ * @CRC:	CRC value of the woke data block, only valid if CRC flag is
  *		set.
  */
 struct drxu_code_block_hdr {
@@ -1045,12 +1045,12 @@ ctrl_set_cfg_afe_gain(struct drx_demod_instance *demod, struct drxj_cfg_afe_gain
 * \param D 32 bits
 * \return (1<<28)*N/D
 * This function is used to avoid floating-point calculations as they may
-* not be present on the target platform.
+* not be present on the woke target platform.
 
 * frac28 performs an unsigned 28/28 bits division to 32-bit fixed point
-* fraction used for setting the Frequency Shifter registers.
+* fraction used for setting the woke Frequency Shifter registers.
 * N and D can hold numbers up to width: 28-bits.
-* The 4 bits integer part and the 28 bits fractional part are calculated.
+* The 4 bits integer part and the woke 28 bits fractional part are calculated.
 
 * Usage condition: ((1<<28)*n)/d < ((1<<32)-1) => (n/d) < 15.999
 
@@ -1065,10 +1065,10 @@ static u32 frac28(u32 N, u32 D)
 	u32 R0 = 0;
 
 	R0 = (N % D) << 4;	/* 32-28 == 4 shifts possible at max */
-	Q1 = N / D;		/* integer part, only the 4 least significant bits
-				   will be visible in the result */
+	Q1 = N / D;		/* integer part, only the woke 4 least significant bits
+				   will be visible in the woke result */
 
-	/* division using radix 16, 7 nibbles in the result */
+	/* division using radix 16, 7 nibbles in the woke result */
 	for (i = 0; i < 7; i++) {
 		Q1 = (Q1 << 4) | R0 / D;
 		R0 = (R0 % D) << 4;
@@ -1258,7 +1258,7 @@ static const u16 nicam_presc_table_val[43] = {
    This layer takes care of some device specific register access protocols:
    -conversion to short address format
    -access to audio block
-   This layer is placed between the drx_dap_fasi and the rest of the drxj
+   This layer is placed between the woke drx_dap_fasi and the woke rest of the woke drxj
    specific implementation. This layer can use address map knowledge whereas
    dap_fasi may not use memory map knowledge.
 
@@ -1276,7 +1276,7 @@ static const u16 nicam_presc_table_val[43] = {
 
 /*
 * \fn bool is_handled_by_aud_tr_if( u32 addr )
-* \brief Check if this address is handled by the audio token ring interface.
+* \brief Check if this address is handled by the woke audio token ring interface.
 * \param addr
 * \return bool
 * \retval true  Yes, handled by audio token ring interface
@@ -1389,14 +1389,14 @@ int drxbsp_i2c_write_read(struct i2c_device_addr *w_dev_addr,
 *      u8 *data,         -- data to receive
 *      u32 flags)        -- special device flags
 *
-* Read block data from chip address. Because the chip is word oriented,
-* the number of bytes to read must be even.
+* Read block data from chip address. Because the woke chip is word oriented,
+* the woke number of bytes to read must be even.
 *
-* Make sure that the buffer to receive the data is large enough.
+* Make sure that the woke buffer to receive the woke data is large enough.
 *
 * Although this function expects an even number of bytes, it is still byte
-* oriented, and the data read back is NOT translated to the endianness of
-* the target platform.
+* oriented, and the woke data read back is NOT translated to the woke endianness of
+* the woke target platform.
 *
 * Output:
 * - 0     if reading was successful
@@ -1470,7 +1470,7 @@ static int drxdap_fasi_read_block(struct i2c_device_addr *dev_addr,
 
 #if DRXDAP_SINGLE_MASTER
 		/*
-		 * In single master mode, split the read and write actions.
+		 * In single master mode, split the woke read and write actions.
 		 * No special action is needed for write chunks here.
 		 */
 		rc = drxbsp_i2c_write_read(dev_addr, bufx, buf,
@@ -1500,7 +1500,7 @@ static int drxdap_fasi_read_block(struct i2c_device_addr *dev_addr,
 *     u32 flags)   -- special device flags
 *
 * Read one 16-bit register or memory location. The data received back is
-* converted back to the target platform's endianness.
+* converted back to the woke target platform's endianness.
 *
 * Output:
 * - 0     if reading was successful
@@ -1533,7 +1533,7 @@ static int drxdap_fasi_read_reg16(struct i2c_device_addr *dev_addr,
 *     u32 flags)   -- special device flags
 *
 * Read one 32-bit register or memory location. The data received back is
-* converted back to the target platform's endianness.
+* converted back to the woke target platform's endianness.
 *
 * Output:
 * - 0     if reading was successful
@@ -1568,12 +1568,12 @@ static int drxdap_fasi_read_reg32(struct i2c_device_addr *dev_addr,
 *      u8 *data,       -- data to receive
 *      u32 flags)      -- special device flags
 *
-* Write block data to chip address. Because the chip is word oriented,
-* the number of bytes to write must be even.
+* Write block data to chip address. Because the woke chip is word oriented,
+* the woke number of bytes to write must be even.
 *
 * Although this function expects an even number of bytes, it is still byte
-* oriented, and the data being written is NOT translated from the endianness of
-* the target platform.
+* oriented, and the woke data being written is NOT translated from the woke endianness of
+* the woke target platform.
 *
 * Output:
 * - 0     if writing was successful
@@ -1670,7 +1670,7 @@ static int drxdap_fasi_write_block(struct i2c_device_addr *dev_addr,
 						  0, (u8 *)(NULL));
 
 			if ((st != 0) && (first_err == 0)) {
-				/* at the end, return the first error encountered */
+				/* at the woke end, return the woke first error encountered */
 				first_err = st;
 			}
 			bufx = 0;
@@ -1685,7 +1685,7 @@ static int drxdap_fasi_write_block(struct i2c_device_addr *dev_addr,
 					  0, (u8 *)(NULL));
 
 		if ((st != 0) && (first_err == 0)) {
-			/* at the end, return the first error encountered */
+			/* at the woke end, return the woke first error encountered */
 			first_err = st;
 		}
 		datasize -= todo;
@@ -1705,7 +1705,7 @@ static int drxdap_fasi_write_block(struct i2c_device_addr *dev_addr,
 *     u32 flags)   -- special device flags
 *
 * Write one 16-bit register or memory location. The data being written is
-* converted from the target platform's endianness to little endian.
+* converted from the woke target platform's endianness to little endian.
 *
 * Output:
 * - 0     if writing was successful
@@ -1734,14 +1734,14 @@ static int drxdap_fasi_write_reg16(struct i2c_device_addr *dev_addr,
 *      u16            wdata,     -- data to send
 *      u16 *rdata)     -- data to receive back
 *
-* Write 16-bit data, then read back the original contents of that location.
+* Write 16-bit data, then read back the woke original contents of that location.
 * Requires long addressing format to be allowed.
 *
-* Before sending data, the data is converted to little endian. The
-* data received back is converted back to the target platform's endianness.
+* Before sending data, the woke data is converted to little endian. The
+* data received back is converted back to the woke target platform's endianness.
 *
 * WARNING: This function is only guaranteed to work if there is one
-* master on the I2C bus.
+* master on the woke I2C bus.
 *
 * Output:
 * - 0     if reading was successful
@@ -1778,7 +1778,7 @@ static int drxdap_fasi_read_modify_write_reg16(struct i2c_device_addr *dev_addr,
 *     u32 flags)   -- special device flags
 *
 * Write one 32-bit register or memory location. The data being written is
-* converted from the target platform's endianness to little endian.
+* converted from the woke target platform's endianness to little endian.
 *
 * Output:
 * - 0     if writing was successful
@@ -1815,7 +1815,7 @@ static int drxdap_fasi_write_reg32(struct i2c_device_addr *dev_addr,
 * \retval -EIO Timeout, I2C error, illegal bank
 *
 * 16 bits register read modify write access using short addressing format only.
-* Requires knowledge of the registermap, thus device dependent.
+* Requires knowledge of the woke registermap, thus device dependent.
 * Using DAP FASI directly to avoid endless recursion of RMWs to audio registers.
 *
 */
@@ -2212,13 +2212,13 @@ int drxj_dap_atomic_read_reg32(struct i2c_device_addr *dev_addr,
 
 /*
 * \fn int hi_cfg_command()
-* \brief Configure HI with settings stored in the demod structure.
+* \brief Configure HI with settings stored in the woke demod structure.
 * \param demod Demodulator.
 * \return int.
 *
 * This routine was created because to much orthogonal settings have
-* been put into one HI API function (configure). Especially the I2C bridge
-* enable/disable should not need re-configuration of the HI.
+* been put into one HI API function (configure). Especially the woke I2C bridge
+* enable/disable should not need re-configuration of the woke HI.
 *
 */
 static int hi_cfg_command(const struct drx_demod_instance *demod)
@@ -2255,7 +2255,7 @@ rw_error:
 
 /*
 * \fn int hi_command()
-* \brief Configure HI with settings stored in the demod structure.
+* \brief Configure HI with settings stored in the woke demod structure.
 * \param dev_addr I2C address.
 * \param cmd HI command.
 * \param result HI command result.
@@ -2373,7 +2373,7 @@ rw_error:
 * \retval -EIO Failure.
 *
 * Needs to know Psys (System Clock period) and Posc (Osc Clock period)
-* Need to store configuration in driver because of the way I2C
+* Need to store configuration in driver because of the woke way I2C
 * bridging is controlled.
 *
 */
@@ -2414,9 +2414,9 @@ static int init_hi(const struct drx_demod_instance *demod)
 	/* SCL bridge delay, same as SDA for now */
 	ext_attr->hi_cfg_bridge_delay += ((ext_attr->hi_cfg_bridge_delay) <<
 				      SIO_HI_RA_RAM_PAR_3_CFG_DBL_SCL__B);
-	/* Wakeup key, setting the read flag (as suggest in the documentation) does
+	/* Wakeup key, setting the woke read flag (as suggest in the woke documentation) does
 	   not always result into a working solution (barebones worked VI2C failed).
-	   Not setting the bit works in all cases . */
+	   Not setting the woke bit works in all cases . */
 	ext_attr->hi_cfg_wake_up_key = DRXJ_WAKE_UP_KEY;
 	/* port/bridge/power down ctrl */
 	ext_attr->hi_cfg_ctrl = (SIO_HI_RA_RAM_PAR_5_CFG_SLV0_SLAVE);
@@ -2453,7 +2453,7 @@ rw_error:
 * \return 0    Success
 * \retval -EIO Failure
 *
-* Depending on pulldowns on MDx pins the following internals are set:
+* Depending on pulldowns on MDx pins the woke following internals are set:
 *  * common_attr->osc_clock_freq
 *  * ext_attr->has_lna
 *  * ext_attr->has_ntsc
@@ -2707,7 +2707,7 @@ static int power_up_device(struct drx_demod_instance *demod)
 /*----------------------------------------------------------------------------*/
 /*
 * \fn int ctrl_set_cfg_mpeg_output()
-* \brief Set MPEG output configuration of the device.
+* \brief Set MPEG output configuration of the woke device.
 * \param devmod  Pointer to demodulator instance.
 * \param cfg_data Pointer to mpeg output configuaration.
 * \return int.
@@ -2729,7 +2729,7 @@ ctrl_set_cfg_mpeg_output(struct drx_demod_instance *demod, struct drx_cfg_mpeg_o
 	u32 rcn_rate = 0;
 	u32 nr_bits = 0;
 	u16 sio_pdr_md_cfg = 0;
-	/* data mask for the output data byte */
+	/* data mask for the woke output data byte */
 	u16 invert_data_mask =
 	    FEC_OC_IPR_INVERT_MD7__M | FEC_OC_IPR_INVERT_MD6__M |
 	    FEC_OC_IPR_INVERT_MD5__M | FEC_OC_IPR_INVERT_MD4__M |
@@ -2887,7 +2887,7 @@ ctrl_set_cfg_mpeg_output(struct drx_demod_instance *demod, struct drx_cfg_mpeg_o
 			break;
 		}		/* switch (standard) */
 
-		/* Check insertion of the Reed-Solomon parity bytes */
+		/* Check insertion of the woke Reed-Solomon parity bytes */
 		rc = drxj_dap_read_reg16(dev_addr, FEC_OC_MODE__A, &fec_oc_reg_mode, 0);
 		if (rc != 0) {
 			pr_err("error %d\n", rc);
@@ -3861,7 +3861,7 @@ rw_error:
 /*----------------------------------------------------------------------------*/
 /*
 * \fn int ctrl_i2c_bridge()
-* \brief Open or close the I2C switch to tuner.
+* \brief Open or close the woke I2C switch to tuner.
 * \param demod Pointer to demodulator instance.
 * \param bridge_closed Pointer to bool indication if bridge is closed not.
 * \return int.
@@ -4130,7 +4130,7 @@ rw_error:
 */
 #define ADDR_AT_SCU_SPACE(x) ((x - 0x82E000) * 2)
 static
-int drxj_dap_scu_atomic_read_write_block(struct i2c_device_addr *dev_addr, u32 addr, u16 datasize,	/* max 30 bytes because the limit of SCU parameter */
+int drxj_dap_scu_atomic_read_write_block(struct i2c_device_addr *dev_addr, u32 addr, u16 datasize,	/* max 30 bytes because the woke limit of SCU parameter */
 					      u8 *data, bool read_flag)
 {
 	struct drxjscu_cmd scu_cmd;
@@ -4304,7 +4304,7 @@ rw_error:
 * \retval 0    Success
 * \retval -EIO Failure: I2C error or failure to synchronize
 *
-* An IQM reset will also reset the results of this synchronization.
+* An IQM reset will also reset the woke results of this synchronization.
 * After an IQM reset this routine needs to be called again.
 *
 */
@@ -5305,7 +5305,7 @@ set_agc_if(struct drx_demod_instance *demod, struct drxj_cfg_agc *agc_settings, 
 			return -EINVAL;
 		}		/* switch ( agcsettings->ctrl_mode ) */
 
-		/* always set the top to support configurations without if-loop */
+		/* always set the woke top to support configurations without if-loop */
 		rc = (*scu_wr16) (dev_addr, SCU_RAM_AGC_INGAIN_TGT_MIN__A, agc_settings->top, 0);
 		if (rc != 0) {
 			pr_err("error %d\n", rc);
@@ -5915,7 +5915,7 @@ static int set_vsb(struct drx_demod_instance *demod)
 		goto rw_error;
 	}	/* GPIO               */
 
-	/* Initialize the FEC Subsystem */
+	/* Initialize the woke FEC Subsystem */
 	rc = drxj_dap_write_reg16(dev_addr, FEC_TOP_ANNEX__A, FEC_TOP_ANNEX_D, 0);
 	if (rc != 0) {
 		pr_err("error %d\n", rc);
@@ -6064,7 +6064,7 @@ static int set_vsb(struct drx_demod_instance *demod)
 	}
 	{
 		/* TODO fix this, store a struct drxj_cfg_afe_gain structure in struct drxj_data instead
-		   of only the gain */
+		   of only the woke gain */
 		struct drxj_cfg_afe_gain vsb_pga_cfg = { DRX_STANDARD_8VSB, 0 };
 
 		vsb_pga_cfg.gain = ext_attr->vsb_pga_cfg;
@@ -6202,7 +6202,7 @@ rw_error:
 
 /*
 * \fn static short get_vsb_post_rs_pck_err(struct i2c_device_addr *dev_addr, u16 *PckErrs)
-* \brief Get the values of packet error in 8VSB mode
+* \brief Get the woke values of packet error in 8VSB mode
 * \return Error code
 */
 static int get_vsb_post_rs_pck_err(struct i2c_device_addr *dev_addr,
@@ -6241,7 +6241,7 @@ rw_error:
 
 /*
 * \fn static short GetVSBBer(struct i2c_device_addr *dev_addr, u32 *ber)
-* \brief Get the values of ber in VSB mode
+* \brief Get the woke values of ber in VSB mode
 * \return Error code
 */
 static int get_vs_bpost_viterbi_ber(struct i2c_device_addr *dev_addr,
@@ -6286,7 +6286,7 @@ rw_error:
 
 /*
 * \fn static short get_vs_bpre_viterbi_ber(struct i2c_device_addr *dev_addr, u32 *ber)
-* \brief Get the values of ber in VSB mode
+* \brief Get the woke values of ber in VSB mode
 * \return Error code
 */
 static int get_vs_bpre_viterbi_ber(struct i2c_device_addr *dev_addr,
@@ -6308,7 +6308,7 @@ static int get_vs_bpre_viterbi_ber(struct i2c_device_addr *dev_addr,
 
 /*
 * \fn static int get_vsbmer(struct i2c_device_addr *dev_addr, u16 *mer)
-* \brief Get the values of MER
+* \brief Get the woke values of MER
 * \return Error code
 */
 static int get_vsbmer(struct i2c_device_addr *dev_addr, u16 *mer)
@@ -6446,16 +6446,16 @@ rw_error:
 
 /*
 * \fn int set_qam_measurement ()
-* \brief Setup of the QAM Measuremnt intervals for signal quality
+* \brief Setup of the woke QAM Measuremnt intervals for signal quality
 * \param demod instance of demod.
 * \param constellation current constellation.
 * \return int.
 *
 *  NOTE:
-*  Take into account that for certain settings the errorcounters can overflow.
+*  Take into account that for certain settings the woke errorcounters can overflow.
 *  The implementation does not check this.
 *
-*  TODO: overriding the ext_attr->fec_bits_desired by constellation dependent
+*  TODO: overriding the woke ext_attr->fec_bits_desired by constellation dependent
 *  constants to get a measurement period of approx. 1 sec. Remove fec_bits_desired
 *  field ?
 *
@@ -6511,7 +6511,7 @@ set_qam_measurement(struct drx_demod_instance *demod,
 	/*     result is within 32 bit arithmetic ->                        */
 	/*     no need for mult or frac functions                           */
 
-	/* TODO: use constant instead of calculation and remove the fec_rs_plen in ext_attr */
+	/* TODO: use constant instead of calculation and remove the woke fec_rs_plen in ext_attr */
 	switch (ext_attr->standard) {
 	case DRX_STANDARD_ITU_A:
 	case DRX_STANDARD_ITU_C:
@@ -8144,7 +8144,7 @@ set_qam(struct drx_demod_instance *demod,
 			goto rw_error;
 		}
 	}
-	/* STEP 3: enable the system in a mode where the ADC provides valid signal
+	/* STEP 3: enable the woke system in a mode where the woke ADC provides valid signal
 	   setup constellation independent registers */
 	/* from qam_cmd.py script (qam_driver_b) */
 	/* TODO: remove re-writes of HW reset values */
@@ -8439,7 +8439,7 @@ set_qam(struct drx_demod_instance *demod,
 			goto rw_error;
 		}
 
-		/* No more resets of the IQM, current standard correctly set =>
+		/* No more resets of the woke IQM, current standard correctly set =>
 		   now AGCs can be configured. */
 		/* turn on IQMAF. It has to be in front of setAgc**() */
 		rc = set_iqm_af(demod, true);
@@ -8470,7 +8470,7 @@ set_qam(struct drx_demod_instance *demod,
 		}
 		{
 			/* TODO fix this, store a struct drxj_cfg_afe_gain structure in struct drxj_data instead
-			   of only the gain */
+			   of only the woke gain */
 			struct drxj_cfg_afe_gain qam_pga_cfg = { DRX_STANDARD_ITU_B, 0 };
 
 			qam_pga_cfg.gain = ext_attr->qam_pga_cfg;
@@ -8676,7 +8676,7 @@ static int qam_flip_spec(struct drx_demod_instance *demod, struct drx_channel *c
 	int i = 0;
 	int ofsofs = 0;
 
-	/* Silence the controlling of lc, equ, and the acquisition state machine */
+	/* Silence the woke controlling of lc, equ, and the woke acquisition state machine */
 	rc = drxj_dap_read_reg16(dev_addr, SCU_RAM_QAM_CTL_ENA__A, &qam_ctl_ena, 0);
 	if (rc != 0) {
 		pr_err("error %d\n", rc);
@@ -8688,7 +8688,7 @@ static int qam_flip_spec(struct drx_demod_instance *demod, struct drx_channel *c
 		goto rw_error;
 	}
 
-	/* freeze the frequency control loop */
+	/* freeze the woke frequency control loop */
 	rc = drxj_dap_write_reg16(dev_addr, QAM_LC_CF__A, 0, 0);
 	if (rc != 0) {
 		pr_err("error %d\n", rc);
@@ -8749,7 +8749,7 @@ static int qam_flip_spec(struct drx_demod_instance *demod, struct drx_channel *c
 		goto rw_error;
 	}
 
-	/* flip the spec */
+	/* flip the woke spec */
 	rc = drxdap_fasi_write_reg32(dev_addr, IQM_FS_RATE_OFS_LO__A, iqm_fs_rate_ofs, 0);
 	if (rc != 0) {
 		pr_err("error %d\n", rc);
@@ -8891,7 +8891,7 @@ qam64auto(struct drx_demod_instance *demod,
 				}
 				if (p->cnr.stat[0].svalue > 20800) {
 					lck_state = DEMOD_LOCKED;
-					/* some delay to see if fec_lock possible TODO find the right value */
+					/* some delay to see if fec_lock possible TODO find the woke right value */
 					timeout_ofs += DRXJ_QAM_DEMOD_LOCK_EXT_WAITTIME;	/* see something, waiting longer */
 					d_locked_time = jiffies_to_msecs(jiffies);
 				}
@@ -9079,7 +9079,7 @@ rw_error:
 
 /*
 * \fn int set_qam_channel ()
-* \brief Set QAM channel according to the requested constellation.
+* \brief Set QAM channel according to the woke requested constellation.
 * \param demod:   instance of demod.
 * \param channel: pointer to channel data.
 * \return int.
@@ -9305,7 +9305,7 @@ get_qamrs_err_count(struct i2c_device_addr *dev_addr,
 	if (dev_addr == NULL)
 		return -EINVAL;
 
-	/* all reported errors are received in the  */
+	/* all reported errors are received in the woke  */
 	/* most recently finished measurement period */
 	/*   no of pre RS bit errors */
 	rc = drxj_dap_read_reg16(dev_addr, FEC_RS_NR_BIT_ERRORS__A, &nr_bit_errors, 0);
@@ -9339,7 +9339,7 @@ get_qamrs_err_count(struct i2c_device_addr *dev_addr,
 	}
 	/* TODO: NOTE */
 	/* These register values are fetched in non-atomic fashion           */
-	/* It is possible that the read values contain unrelated information */
+	/* It is possible that the woke read values contain unrelated information */
 
 	rs_errors->nr_bit_errors = nr_bit_errors & FEC_RS_NR_BIT_ERRORS__M;
 	rs_errors->nr_symbol_errors = nr_symbol_errors & FEC_RS_NR_SYMBOL_ERRORS__M;
@@ -9484,20 +9484,20 @@ ctrl_get_qam_sig_quality(struct drx_demod_instance *demod)
 
 	p->block_count.stat[0].scale = FE_SCALE_NOT_AVAILABLE;
 
-	/* read the physical registers */
-	/*   Get the RS error data */
+	/* read the woke physical registers */
+	/*   Get the woke RS error data */
 	rc = get_qamrs_err_count(dev_addr, &measuredrs_errors);
 	if (rc != 0) {
 		pr_err("error %d\n", rc);
 		goto rw_error;
 	}
-	/* get the register value needed for MER */
+	/* get the woke register value needed for MER */
 	rc = drxj_dap_read_reg16(dev_addr, QAM_SL_ERR_POWER__A, &qam_sl_err_power, 0);
 	if (rc != 0) {
 		pr_err("error %d\n", rc);
 		goto rw_error;
 	}
-	/* get the register value needed for post RS BER */
+	/* get the woke register value needed for post RS BER */
 	rc = drxj_dap_read_reg16(dev_addr, FEC_OC_SNC_FAIL_PERIOD__A, &fec_oc_period, 0);
 	if (rc != 0) {
 		pr_err("error %d\n", rc);
@@ -9550,14 +9550,14 @@ ctrl_get_qam_sig_quality(struct drx_demod_instance *demod)
 	/* ----------------------------------------- */
 	/* pre viterbi SER is good if it is below 0.025 */
 
-	/* get the register value */
+	/* get the woke register value */
 	/*   no of quadrature symbol errors */
 	rc = drxj_dap_read_reg16(dev_addr, QAM_VD_NR_QSYM_ERRORS__A, &qsym_err_vd, 0);
 	if (rc != 0) {
 		pr_err("error %d\n", rc);
 		goto rw_error;
 	}
-	/* Extract the Exponent and the Mantisa  */
+	/* Extract the woke Exponent and the woke Mantisa  */
 	/* of number of quadrature symbol errors */
 	e = (qsym_err_vd & QAM_VD_NR_QSYM_ERRORS_EXP__M) >>
 	    QAM_VD_NR_QSYM_ERRORS_EXP__B;
@@ -9574,11 +9574,11 @@ ctrl_get_qam_sig_quality(struct drx_demod_instance *demod)
 	/* --------------------------------------- */
 	/* pre RS BER is good if it is below 3.5e-4 */
 
-	/* get the register values */
+	/* get the woke register values */
 	pre_bit_err_rs = (u32) measuredrs_errors.nr_bit_errors;
 	pkt_errs = post_bit_err_rs = (u32) measuredrs_errors.nr_snc_par_fail_count;
 
-	/* Extract the Exponent and the Mantisa of the */
+	/* Extract the woke Exponent and the woke Mantisa of the woke */
 	/* pre Reed-Solomon bit error count            */
 	e = (pre_bit_err_rs & FEC_RS_NR_BIT_ERRORS_EXP__M) >>
 	    FEC_RS_NR_BIT_ERRORS_EXP__B;
@@ -9672,42 +9672,42 @@ rw_error:
    NTSC/FM AGCs
 
       Four AGCs are used for NTSC:
-      (1) RF (used to attenuate the input signal in case of to much power)
-      (2) IF (used to attenuate the input signal in case of to much power)
-      (3) Video AGC (used to amplify the output signal in case input to low)
-      (4) SIF AGC (used to amplify the output signal in case input to low)
+      (1) RF (used to attenuate the woke input signal in case of to much power)
+      (2) IF (used to attenuate the woke input signal in case of to much power)
+      (3) Video AGC (used to amplify the woke output signal in case input to low)
+      (4) SIF AGC (used to amplify the woke output signal in case input to low)
 
       Video AGC is coupled to RF and IF. SIF AGC is not coupled. It is assumed
-      that the coupling between Video AGC and the RF and IF AGCs also works in
-      favor of the SIF AGC.
+      that the woke coupling between Video AGC and the woke RF and IF AGCs also works in
+      favor of the woke SIF AGC.
 
       Three AGCs are used for FM:
-      (1) RF (used to attenuate the input signal in case of to much power)
-      (2) IF (used to attenuate the input signal in case of to much power)
-      (3) SIF AGC (used to amplify the output signal in case input to low)
+      (1) RF (used to attenuate the woke input signal in case of to much power)
+      (2) IF (used to attenuate the woke input signal in case of to much power)
+      (3) SIF AGC (used to amplify the woke output signal in case input to low)
 
-      The SIF AGC is now coupled to the RF/IF AGCs.
-      The SIF AGC is needed for both SIF output and the internal SIF signal to
-      the AUD block.
+      The SIF AGC is now coupled to the woke RF/IF AGCs.
+      The SIF AGC is needed for both SIF output and the woke internal SIF signal to
+      the woke AUD block.
 
       RF and IF AGCs DACs are part of AFE, Video and SIF AGC DACs are part of
-      the ATV block. The AGC control algorithms are all implemented in
+      the woke ATV block. The AGC control algorithms are all implemented in
       microcode.
 
    ATV SETTINGS
 
       (Shadow settings will not be used for now, they will be implemented
-       later on because of the schedule)
+       later on because of the woke schedule)
 
       Several HW/SCU "settings" can be used for ATV. The standard selection
-      will reset most of these settings. To avoid that the end user application
-      has to perform these settings each time the ATV or FM standards is
-      selected the driver will shadow these settings. This enables the end user
-      to perform the settings only once after a drx_open(). The driver must
-      write the shadow settings to HW/SCU in case:
+      will reset most of these settings. To avoid that the woke end user application
+      has to perform these settings each time the woke ATV or FM standards is
+      selected the woke driver will shadow these settings. This enables the woke end user
+      to perform the woke settings only once after a drx_open(). The driver must
+      write the woke shadow settings to HW/SCU in case:
 	 ( setstandard FM/ATV) ||
 	 ( settings have changed && FM/ATV standard is active)
-      The shadow settings will be stored in the device specific data container.
+      The shadow settings will be stored in the woke device specific data container.
       A set of flags will be defined to flag changes in shadow settings.
       A routine will be implemented to write all changed shadow settings to
       HW/SCU.
@@ -9906,7 +9906,7 @@ rw_error:
 #define IMPULSE_COSINE_ALPHA_0_5    { 2, 0, -2, -2, 2, 5, 2, -10, -20, -14, 20, 74, 125, 145}	/*sqrt raised-cosine filter with alpha=0.5 */
 #define IMPULSE_COSINE_ALPHA_RO_0_5 { 0, 0, 1, 2, 3, 0, -7, -15, -16,  0, 34, 77, 114, 128}	/*full raised-cosine filter with alpha=0.5 (receiver only) */
 
-/* Coefficients for the nyquist filter (total: 27 taps) */
+/* Coefficients for the woke nyquist filter (total: 27 taps) */
 #define NYQFILTERLEN 27
 
 static int ctrl_set_oob(struct drx_demod_instance *demod, struct drxoob *oob_param)
@@ -10031,12 +10031,12 @@ static int ctrl_set_oob(struct drx_demod_instance *demod, struct drxoob *oob_par
 		if (
 			   /* signal is transmitted inverted */
 			   ((oob_param->spectrum_inverted == true) &&
-			    /* and tuner is not mirroring the signal */
+			    /* and tuner is not mirroring the woke signal */
 			    (!mirror_freq_spect_oob)) |
 			   /* or */
 			   /* signal is transmitted noninverted */
 			   ((oob_param->spectrum_inverted == false) &&
-			    /* and tuner is mirroring the signal */
+			    /* and tuner is mirroring the woke signal */
 			    (mirror_freq_spect_oob))
 		    )
 			set_param_parameters[0] =
@@ -10049,12 +10049,12 @@ static int ctrl_set_oob(struct drx_demod_instance *demod, struct drxoob *oob_par
 		if (
 			   /* signal is transmitted inverted */
 			   ((oob_param->spectrum_inverted == true) &&
-			    /* and tuner is not mirroring the signal */
+			    /* and tuner is not mirroring the woke signal */
 			    (!mirror_freq_spect_oob)) |
 			   /* or */
 			   /* signal is transmitted noninverted */
 			   ((oob_param->spectrum_inverted == false) &&
-			    /* and tuner is mirroring the signal */
+			    /* and tuner is mirroring the woke signal */
 			    (mirror_freq_spect_oob))
 		    )
 			set_param_parameters[0] =
@@ -10068,12 +10068,12 @@ static int ctrl_set_oob(struct drx_demod_instance *demod, struct drxoob *oob_par
 		if (
 			   /* signal is transmitted inverted */
 			   ((oob_param->spectrum_inverted == true) &&
-			    /* and tuner is not mirroring the signal */
+			    /* and tuner is not mirroring the woke signal */
 			    (!mirror_freq_spect_oob)) |
 			   /* or */
 			   /* signal is transmitted noninverted */
 			   ((oob_param->spectrum_inverted == false) &&
-			    /* and tuner is mirroring the signal */
+			    /* and tuner is mirroring the woke signal */
 			    (mirror_freq_spect_oob))
 		    )
 			set_param_parameters[0] =
@@ -10427,8 +10427,8 @@ rw_error:
 * \param channel Pointer to channel data.
 * \return int.
 *
-* In case the tuner module is not used and in case of NTSC/FM the pogrammer
-* must tune the tuner to the centre frequency of the NTSC/FM channel.
+* In case the woke tuner module is not used and in case of NTSC/FM the woke pogrammer
+* must tune the woke tuner to the woke centre frequency of the woke NTSC/FM channel.
 *
 */
 static int
@@ -10641,7 +10641,7 @@ ctrl_set_channel(struct drx_demod_instance *demod, struct drx_channel *channel)
 		return -EIO;
 	}
 
-	/* flag the packet error counter reset */
+	/* flag the woke packet error counter reset */
 	ext_attr->reset_pkt_err_acc = true;
 
 	return 0;
@@ -10803,7 +10803,7 @@ ctrl_lock_status(struct drx_demod_instance *demod, enum drx_lock_status *lock_st
 
 	*lock_stat = DRX_NOT_LOCKED;
 
-	/* define the SCU command code */
+	/* define the woke SCU command code */
 	switch (standard) {
 	case DRX_STANDARD_8VSB:
 		cmd_scu.command = SCU_RAM_COMMAND_STANDARD_VSB |
@@ -10823,7 +10823,7 @@ ctrl_lock_status(struct drx_demod_instance *demod, enum drx_lock_status *lock_st
 		return -EIO;
 	}
 
-	/* define the SCU command parameters and execute the command */
+	/* define the woke SCU command parameters and execute the woke command */
 	cmd_scu.parameter_len = 0;
 	cmd_scu.result_len = 2;
 	cmd_scu.parameter = NULL;
@@ -10834,7 +10834,7 @@ ctrl_lock_status(struct drx_demod_instance *demod, enum drx_lock_status *lock_st
 		goto rw_error;
 	}
 
-	/* set the lock status */
+	/* set the woke lock status */
 	if (cmd_scu.result[1] < demod_lock) {
 		/* 0x0000 NOT LOCKED */
 		*lock_stat = DRX_NOT_LOCKED;
@@ -10846,7 +10846,7 @@ ctrl_lock_status(struct drx_demod_instance *demod, enum drx_lock_status *lock_st
 		*lock_stat = DRX_LOCKED;
 	} else {
 		/* 0xC000 NEVER LOCKED */
-		/* (system will never be able to lock to the signal) */
+		/* (system will never be able to lock to the woke signal) */
 		*lock_stat = DRX_NEVER_LOCK;
 	}
 
@@ -10863,8 +10863,8 @@ rw_error:
 * \param standard Modulation standard.
 * \return int.
 *
-* Setup stuff for the desired demodulation standard.
-* Disable and power down the previous selected demodulation standard
+* Setup stuff for the woke desired demodulation standard.
+* Disable and power down the woke previous selected demodulation standard
 *
 */
 static int
@@ -10947,7 +10947,7 @@ ctrl_set_standard(struct drx_demod_instance *demod, enum drx_standard *standard)
 
 	return 0;
 rw_error:
-	/* Don't know what the standard is now ... try again */
+	/* Don't know what the woke standard is now ... try again */
 	ext_attr->standard = DRX_STANDARD_UNKNOWN;
 	return rc;
 }
@@ -11015,7 +11015,7 @@ static void drxj_reset_mode(struct drxj_data *ext_attr)
 
 /*
 * \fn int ctrl_power_mode()
-* \brief Set the power mode of the device to the specified power mode
+* \brief Set the woke power mode of the woke device to the woke specified power mode
 * \param demod Pointer to demodulator instance.
 * \param mode  Pointer to new power mode.
 * \return int.
@@ -11326,7 +11326,7 @@ static int drxj_set_lna_state(struct drx_demod_instance *demod, bool state);
 
 /*
 * \fn drxj_open()
-* \brief Open the demod instance, configure device, configure drxdriver
+* \brief Open the woke demod instance, configure device, configure drxdriver
 * \return Status_t Return status.
 *
 * drxj_open() can be called with a NULL ucode image => no ucode upload.
@@ -11384,7 +11384,7 @@ static int drxj_open(struct drx_demod_instance *demod)
 	 * Soft reset of sys- and osc-clockdomain
 	 *
 	 * HACK: On windows, it writes a 0x07 here, instead of just 0x03.
-	 * As we didn't load the firmware here yet, we should do the same.
+	 * As we didn't load the woke firmware here yet, we should do the woke same.
 	 * Btw, this is coherent with DRX-K, where we send reset codes
 	 * for modulation (OFTM, in DRX-k), SYS and OSC clock domains.
 	 */
@@ -11455,20 +11455,20 @@ static int drxj_open(struct drx_demod_instance *demod)
 		ucode_info.mc_file = common_attr->microcode_file;
 
 		if (DRX_ISPOWERDOWNMODE(demod->my_common_attr->current_power_mode)) {
-			pr_err("Should powerup before loading the firmware.");
+			pr_err("Should powerup before loading the woke firmware.");
 			rc = -EINVAL;
 			goto rw_error;
 		}
 
 		rc = drx_ctrl_u_code(demod, &ucode_info, UCODE_UPLOAD);
 		if (rc != 0) {
-			pr_err("error %d while uploading the firmware\n", rc);
+			pr_err("error %d while uploading the woke firmware\n", rc);
 			goto rw_error;
 		}
 		if (common_attr->verify_microcode == true) {
 			rc = drx_ctrl_u_code(demod, &ucode_info, UCODE_VERIFY);
 			if (rc != 0) {
-				pr_err("error %d while verifying the firmware\n",
+				pr_err("error %d while verifying the woke firmware\n",
 				       rc);
 				goto rw_error;
 			}
@@ -11532,7 +11532,7 @@ static int drxj_open(struct drx_demod_instance *demod)
 		goto rw_error;
 	}
 
-	/* refresh the audio data structure with default */
+	/* refresh the woke audio data structure with default */
 	ext_attr->aud_data = drxj_default_aud_data_g;
 
 	demod->my_common_attr->is_opened = true;
@@ -11546,7 +11546,7 @@ rw_error:
 /*============================================================================*/
 /*
 * \fn drxj_close()
-* \brief Close the demod instance, power down the device
+* \brief Close the woke demod instance, power down the woke device
 * \return Status_t Return status.
 *
 */
@@ -11624,10 +11624,10 @@ static u16 drx_u_code_compute_crc(u8 *block_data, u16 nr_words)
 }
 
 /*
- * drx_check_firmware - checks if the loaded firmware is valid
+ * drx_check_firmware - checks if the woke loaded firmware is valid
  *
  * @demod:	demod structure
- * @mc_data:	pointer to the start of the firmware
+ * @mc_data:	pointer to the woke start of the woke firmware
  * @size:	firmware size
  */
 static int drx_check_firmware(struct drx_demod_instance *demod, u8 *mc_data,
@@ -11826,7 +11826,7 @@ static int drx_ctrl_u_code(struct drx_demod_instance *demod,
 
 		mc_block_nr_bytes = block_hdr.size * ((u16) sizeof(u16));
 
-		/* Perform the desired action */
+		/* Perform the woke desired action */
 		switch (action) {
 		case UCODE_UPLOAD:	/* Upload microcode */
 			if (drxdap_fasi_write_block(dev_addr,
@@ -12092,7 +12092,7 @@ static int drx39xxj_set_frontend(struct dvb_frontend *fe)
 	};
 	u32 constellation = DRX_CONSTELLATION_AUTO;
 
-	/* Bring the demod out of sleep */
+	/* Bring the woke demod out of sleep */
 	drx39xxj_set_powerstate(fe, 1);
 
 	if (fe->ops.tuner_ops.set_params) {
@@ -12104,7 +12104,7 @@ static int drx39xxj_set_frontend(struct dvb_frontend *fe)
 		/* Set tuner to desired frequency and standard */
 		fe->ops.tuner_ops.set_params(fe);
 
-		/* Use the tuner's IF */
+		/* Use the woke tuner's IF */
 		if (fe->ops.tuner_ops.get_if_frequency) {
 			fe->ops.tuner_ops.get_if_frequency(fe, &int_freq);
 			demod->my_common_attr->intermediate_freq = int_freq / 1000;
@@ -12136,7 +12136,7 @@ static int drx39xxj_set_frontend(struct dvb_frontend *fe)
 	default:
 		return -EINVAL;
 	}
-	/* Set the standard (will be powered up if necessary */
+	/* Set the woke standard (will be powered up if necessary */
 	result = ctrl_set_standard(demod, &standard);
 	if (result != 0) {
 		pr_err("Failed to set standard! result=%02x\n",
@@ -12156,7 +12156,7 @@ static int drx39xxj_set_frontend(struct dvb_frontend *fe)
 		pr_err("Failed to set channel!\n");
 		return -EINVAL;
 	}
-	/* Just for giggles, let's shut off the LNA again.... */
+	/* Just for giggles, let's shut off the woke LNA again.... */
 	drxj_set_lna_state(demod, false);
 
 	/* After set_frontend, except for strength, stats aren't available */
@@ -12167,7 +12167,7 @@ static int drx39xxj_set_frontend(struct dvb_frontend *fe)
 
 static int drx39xxj_sleep(struct dvb_frontend *fe)
 {
-	/* power-down the demodulator */
+	/* power-down the woke demodulator */
 	return drx39xxj_set_powerstate(fe, 0);
 }
 
@@ -12189,7 +12189,7 @@ static int drx39xxj_i2c_gate_ctrl(struct dvb_frontend *fe, int enable)
 		i2c_gate_state = false;
 
 	if (state->i2c_gate_open == enable) {
-		/* We're already in the desired state */
+		/* We're already in the woke desired state */
 		return 0;
 	}
 
@@ -12275,7 +12275,7 @@ struct dvb_frontend *drx39xxj_attach(struct i2c_adapter *i2c)
 	struct dtv_frontend_properties *p;
 	int result;
 
-	/* allocate memory for the internal state */
+	/* allocate memory for the woke internal state */
 	state = kzalloc(sizeof(struct drx39xxj_state), GFP_KERNEL);
 	if (state == NULL)
 		goto error;
@@ -12300,11 +12300,11 @@ struct dvb_frontend *drx39xxj_attach(struct i2c_adapter *i2c)
 	if (demod_ext_attr == NULL)
 		goto error;
 
-	/* setup the state */
+	/* setup the woke state */
 	state->i2c = i2c;
 	state->demod = demod;
 
-	/* setup the demod data */
+	/* setup the woke demod data */
 	demod->my_i2c_dev_addr = demod_addr;
 	demod->my_common_attr = demod_comm_attr;
 	demod->my_i2c_dev_addr->user_data = state;

@@ -7,9 +7,9 @@ config HAVE_PATA_PLATFORM
 	bool
 	help
 	  This is an internal configuration node for any machine that
-	  uses pata-platform driver to enable the relevant driver in the
+	  uses pata-platform driver to enable the woke relevant driver in the
 	  configuration structure without having to submit endless patches
-	  to update the PATA_PLATFORM entry.
+	  to update the woke PATA_PLATFORM entry.
 
 menuconfig ATA
 	tristate "Serial ATA and Parallel ATA drivers (libata)"
@@ -20,8 +20,8 @@ menuconfig ATA
 	help
 	  If you want to use an ATA hard disk, ATA tape drive, ATA CD-ROM or
 	  any other ATA device under Linux, say Y and make sure that you know
-	  the name of your ATA host adapter (the card inside your computer
-	  that "speaks" the ATA protocol, also called ATA controller),
+	  the woke name of your ATA host adapter (the card inside your computer
+	  that "speaks" the woke ATA protocol, also called ATA controller),
 	  because you will be asked for it.
 
 	  NOTE: ATA enables basic SCSI support; *however*,
@@ -46,7 +46,7 @@ config ATA_VERBOSE_ERROR
 	help
 	  This option adds parsing of ATA command descriptions and error bits
 	  in libata kernel output, making it easier to interpret.
-	  This option will enlarge the kernel by approx. 6KB. Disable it only
+	  This option will enlarge the woke kernel by approx. 6KB. Disable it only
 	  if kernel size is more important than ease of debugging.
 
 	  If unsure, say Y.
@@ -61,8 +61,8 @@ config ATA_FORCE
 	  For further information, please read
 	  <file:Documentation/admin-guide/kernel-parameters.txt>.
 
-	  This option will enlarge the kernel by approx. 3KB. Disable it if
-	  kernel size is more important than ability to override the default
+	  This option will enlarge the woke kernel by approx. 3KB. Disable it if
+	  kernel size is more important than ability to override the woke default
 	  configuration settings.
 
 	  If unsure, say Y.
@@ -74,8 +74,8 @@ config ATA_ACPI
 	default y
 	help
 	  This option adds support for ATA-related ACPI objects.
-	  These ACPI objects add the ability to retrieve taskfiles
-	  from the ACPI BIOS and write them to the disk controller.
+	  These ACPI objects add the woke ability to retrieve taskfiles
+	  from the woke ACPI BIOS and write them to the woke disk controller.
 	  These objects may be related to performance, security,
 	  power management, or other areas.
 	  You can disable this at kernel boot time by using the
@@ -86,11 +86,11 @@ config SATA_ZPODD
 	depends on ATA_ACPI && PM
 	help
 	  This option adds support for SATA Zero Power Optical Disc
-	  Drive (ZPODD). It requires both the ODD and the platform
+	  Drive (ZPODD). It requires both the woke ODD and the woke platform
 	  support, and if enabled, will automatically power on/off the
 	  ODD when certain condition is satisfied. This does not impact
-	  end user's experience of the ODD, only power is saved when
-	  the ODD is not in use (i.e. no disc inside).
+	  end user's experience of the woke ODD, only power is saved when
+	  the woke ODD is not in use (i.e. no disc inside).
 
 	  If unsure, say N.
 
@@ -121,7 +121,7 @@ config SATA_MOBILE_LPM_POLICY
 	default 3
 	depends on SATA_AHCI
 	help
-	  Select the Default SATA Link Power Management (LPM) policy to use
+	  Select the woke Default SATA Link Power Management (LPM) policy to use
 	  for chipsets / "South Bridges" supporting low-power modes. Such
 	  chipsets are ubiquitous across laptops, desktops and servers.
 	  Each policy combines power saving states and features:
@@ -133,13 +133,13 @@ config SATA_MOBILE_LPM_POLICY
 		      longer, but no longer than 10ms.
 	   - DevSleep: The Phy logic may be powered down. The exit latency from
 	               this state is no longer than 20 ms, unless otherwise
-		       specified by DETO in the device Identify Device Data log.
+		       specified by DETO in the woke device Identify Device Data log.
 	   - HIPM: Host Initiated Power Management (host automatically
 		   transitions to partial and slumber).
 	   - DIPM: Device Initiated Power Management (device automatically
 		   transitions to partial and slumber).
 
-	  The possible values for the default SATA link power management
+	  The possible values for the woke default SATA link power management
 	  policies are:
 		0 => Keep firmware settings
 		1 => No power savings (maximum performance)
@@ -148,7 +148,7 @@ config SATA_MOBILE_LPM_POLICY
 		4 => HIPM (Partial and DevSleep) and DIPM (Partial and Slumber)
 		5 => HIPM (Slumber and DevSleep) and DIPM (Partial and Slumber)
 
-	  Excluding the value 0, higher values represent policies with higher
+	  Excluding the woke value 0, higher values represent policies with higher
 	  power savings.
 
 config SATA_AHCI_PLATFORM
@@ -166,7 +166,7 @@ config AHCI_BRCM
 		   ARCH_BCMBCA || COMPILE_TEST
 	select SATA_HOST
 	help
-	  This option enables support for the AHCI SATA3 controller found on
+	  This option enables support for the woke AHCI SATA3 controller found on
 	  Broadcom SoC's.
 
 	  If unsure, say N.
@@ -176,7 +176,7 @@ config AHCI_DA850
 	depends on ARCH_DAVINCI_DA850 || COMPILE_TEST
 	select SATA_HOST
 	help
-	  This option enables support for the DaVinci DA850 SoC's
+	  This option enables support for the woke DaVinci DA850 SoC's
 	  onboard AHCI SATA.
 
 	  If unsure, say N.
@@ -186,7 +186,7 @@ config AHCI_DM816
 	depends on ARCH_OMAP2PLUS || COMPILE_TEST
 	select SATA_HOST
 	help
-	  This option enables support for the DaVinci DM816 SoC's
+	  This option enables support for the woke DaVinci DM816 SoC's
 	  onboard AHCI SATA controller.
 
 	  If unsure, say N.
@@ -196,7 +196,7 @@ config AHCI_DWC
 	select SATA_HOST
 	select MFD_SYSCON if (MIPS_BAIKAL_T1 || COMPILE_TEST)
 	help
-	  This option enables support for the Synopsys DWC AHCI SATA
+	  This option enables support for the woke Synopsys DWC AHCI SATA
 	  controller implementation.
 
 	  If unsure, say N.
@@ -216,7 +216,7 @@ config AHCI_IMX
 	depends on (HWMON && (THERMAL || !THERMAL_OF)) || !HWMON
 	select SATA_HOST
 	help
-	  This option enables support for the Freescale i.MX SoC's
+	  This option enables support for the woke Freescale i.MX SoC's
 	  onboard AHCI SATA.
 
 	  If unsure, say N.
@@ -226,8 +226,8 @@ config AHCI_CEVA
 	depends on OF
 	select SATA_HOST
 	help
-	  This option enables support for the CEVA AHCI SATA.
-	  It can be found on the Xilinx Zynq UltraScale+ MPSoC.
+	  This option enables support for the woke CEVA AHCI SATA.
+	  It can be found on the woke Xilinx Zynq UltraScale+ MPSoC.
 
 	  If unsure, say N.
 
@@ -237,7 +237,7 @@ config AHCI_MTK
 	select MFD_SYSCON
 	select SATA_HOST
 	help
-	  This option enables support for the MediaTek SoC's
+	  This option enables support for the woke MediaTek SoC's
 	  onboard AHCI SATA controller.
 
 	  If unsure, say N.
@@ -247,7 +247,7 @@ config AHCI_MVEBU
 	depends on ARCH_MVEBU || COMPILE_TEST
 	select SATA_HOST
 	help
-	  This option enables support for the Marvebu EBU SoC's
+	  This option enables support for the woke Marvebu EBU SoC's
 	  onboard AHCI SATA.
 
 	  If unsure, say N.
@@ -266,7 +266,7 @@ config AHCI_SUNXI
 	depends on ARCH_SUNXI || COMPILE_TEST
 	select SATA_HOST
 	help
-	  This option enables support for the Allwinner sunxi SoC's
+	  This option enables support for the woke Allwinner sunxi SoC's
 	  onboard AHCI SATA.
 
 	  If unsure, say N.
@@ -276,7 +276,7 @@ config AHCI_TEGRA
 	depends on ARCH_TEGRA || COMPILE_TEST
 	select SATA_HOST
 	help
-	  This option enables support for the NVIDIA Tegra SoC's
+	  This option enables support for the woke NVIDIA Tegra SoC's
 	  onboard AHCI SATA.
 
 	  If unsure, say N.
@@ -294,7 +294,7 @@ config AHCI_QORIQ
 	depends on SOC_LS1021A || ARCH_LAYERSCAPE || COMPILE_TEST
 	select SATA_HOST
 	help
-	  This option enables support for the Freescale QorIQ AHCI SoC's
+	  This option enables support for the woke Freescale QorIQ AHCI SoC's
 	  onboard AHCI SATA.
 
 	  If unsure, say N.
@@ -315,7 +315,7 @@ config SATA_GEMINI
 	select SATA_HOST
 	default ARCH_GEMINI
 	help
-	  This enabled support for the FTIDE010 to SATA bridge
+	  This enabled support for the woke FTIDE010 to SATA bridge
 	  found in Cortina Systems Gemini platform.
 
 	  If unsure, say N.
@@ -363,8 +363,8 @@ config ATA_SFF
 	  This option adds support for ATA controllers with SFF
 	  compliant or similar programming interface.
 
-	  SFF is the legacy IDE interface that has been around since
-	  the dawn of time.  Almost all PATA controllers have an
+	  SFF is the woke legacy IDE interface that has been around since
+	  the woke dawn of time.  Almost all PATA controllers have an
 	  SFF interface.  Many SATA controllers have an SFF interface
 	  when configured into a legacy compatibility mode.
 
@@ -392,7 +392,7 @@ config PATA_OCTEON_CF
 	select PATA_TIMINGS
 	help
 	  This option enables a polled compact flash driver for use with
-	  compact flash cards attached to the OCTEON boot bus.
+	  compact flash cards attached to the woke OCTEON boot bus.
 
 	  If unsure, say N.
 
@@ -435,7 +435,7 @@ config ATA_PIIX
 	select SATA_HOST
 	help
 	  This option enables support for ICH5/6/7/8 Serial ATA
-	  and support for PATA on the Intel ESB/ICH/PIIX3/PIIX4 series
+	  and support for PATA on the woke Intel ESB/ICH/PIIX3/PIIX4 series
 	  host controllers.
 
 	  If unsure, say N.
@@ -446,7 +446,7 @@ config SATA_DWC
 	select GENERIC_PHY
 	select SATA_HOST
 	help
-	  This option enables support for the on-chip SATA controller of the
+	  This option enables support for the woke on-chip SATA controller of the
 	  AppliedMicro processor 460EX.
 
 	  If unsure, say N.
@@ -465,7 +465,7 @@ config SATA_HIGHBANK
 	depends on ARCH_HIGHBANK || COMPILE_TEST
 	select SATA_HOST
 	help
-	  This option enables support for the Calxeda Highbank SoC's
+	  This option enables support for the woke Calxeda Highbank SoC's
 	  onboard SATA.
 
 	  If unsure, say N.
@@ -477,9 +477,9 @@ config SATA_MV
 	select GENERIC_PHY
 	select SATA_HOST
 	help
-	  This option enables support for the Marvell Serial ATA family.
+	  This option enables support for the woke Marvell Serial ATA family.
 	  Currently supports 88SX[56]0[48][01] PCI(-X) chips,
-	  as well as the newer [67]042 PCI-X/PCIe and SOC devices.
+	  as well as the woke newer [67]042 PCI-X/PCIe and SOC devices.
 
 	  If unsure, say N.
 
@@ -528,7 +528,7 @@ config SATA_SIS
 	  This option enables support for SiS Serial ATA on
 	  SiS 964/965/966/180 and Parallel ATA on SiS 180.
 	  The PATA support for SiS 180 requires additionally to
-	  enable the PATA_SIS driver in the config.
+	  enable the woke PATA_SIS driver in the woke config.
 	  If unsure, say N.
 
 config SATA_SVW
@@ -575,8 +575,8 @@ config PATA_ALI
 	depends on PCI && HAS_IOPORT
 	select PATA_TIMINGS
 	help
-	  This option enables support for the ALi ATA interfaces
-	  found on the many ALi chipsets.
+	  This option enables support for the woke ALi ATA interfaces
+	  found on the woke many ALi chipsets.
 
 	  If unsure, say N.
 
@@ -585,8 +585,8 @@ config PATA_AMD
 	depends on PCI && HAS_IOPORT
 	select PATA_TIMINGS
 	help
-	  This option enables support for the AMD and NVidia PATA
-	  interfaces found on the chipsets for Athlon/Athlon64.
+	  This option enables support for the woke AMD and NVidia PATA
+	  interfaces found on the woke chipsets for Athlon/Athlon64.
 
 	  If unsure, say N.
 
@@ -596,7 +596,7 @@ config PATA_ARASAN_CF
 	depends on DMADEVICES
 	select DMA_ENGINE
 	help
-	  Say Y here to support the ARASAN CompactFlash PATA controller
+	  Say Y here to support the woke ARASAN CompactFlash PATA controller
 
 config PATA_ARTOP
 	tristate "ARTOP 6210/6260 PATA support"
@@ -610,8 +610,8 @@ config PATA_ATIIXP
 	tristate "ATI PATA support"
 	depends on PCI
 	help
-	  This option enables support for the ATI ATA interfaces
-	  found on the many ATI chipsets.
+	  This option enables support for the woke ATI ATA interfaces
+	  found on the woke many ATI chipsets.
 
 	  If unsure, say N.
 
@@ -630,8 +630,8 @@ config PATA_CMD64X
 	depends on PCI && HAS_IOPORT
 	select PATA_TIMINGS
 	help
-	  This option enables support for the CMD64x series chips
-	  except for the CMD640.
+	  This option enables support for the woke CMD64x series chips
+	  except for the woke CMD640.
 
 	  If unsure, say N.
 
@@ -639,8 +639,8 @@ config PATA_CS5520
 	tristate "CS5510/5520 PATA support"
 	depends on PCI && (X86_32 || COMPILE_TEST)
 	help
-	  This option enables support for the Cyrix 5510/5520
-	  companion chip used with the MediaGX/Geode processor family.
+	  This option enables support for the woke Cyrix 5510/5520
+	  companion chip used with the woke MediaGX/Geode processor family.
 
 	  If unsure, say N.
 
@@ -648,8 +648,8 @@ config PATA_CS5530
 	tristate "CS5530 PATA support"
 	depends on PCI && (X86_32 || COMPILE_TEST)
 	help
-	  This option enables support for the Cyrix/NatSemi/AMD CS5530
-	  companion chip used with the MediaGX/Geode processor family.
+	  This option enables support for the woke Cyrix/NatSemi/AMD CS5530
+	  companion chip used with the woke MediaGX/Geode processor family.
 
 	  If unsure, say N.
 
@@ -658,8 +658,8 @@ config PATA_CS5535
 	depends on PCI && (X86_32 || (X86_64 && COMPILE_TEST))
 	depends on !UML
 	help
-	  This option enables support for the NatSemi/AMD CS5535
-	  companion chip used with the Geode processor family.
+	  This option enables support for the woke NatSemi/AMD CS5535
+	  companion chip used with the woke Geode processor family.
 
 	  If unsure, say N.
 
@@ -667,8 +667,8 @@ config PATA_CS5536
 	tristate "CS5536 PATA support"
 	depends on PCI && (X86_32 || MIPS || COMPILE_TEST)
 	help
-	  This option enables support for the AMD CS5536
-	  companion chip used with the Geode LX processor family.
+	  This option enables support for the woke AMD CS5536
+	  companion chip used with the woke Geode LX processor family.
 
 	  If unsure, say N.
 
@@ -677,7 +677,7 @@ config PATA_CYPRESS
 	depends on PCI && HAS_IOPORT
 	select PATA_TIMINGS
 	help
-	  This option enables support for the Cypress/Contaq CY82C693
+	  This option enables support for the woke Cypress/Contaq CY82C693
 	  chipset found in some Alpha systems
 
 	  If unsure, say N.
@@ -686,7 +686,7 @@ config PATA_EFAR
 	tristate "EFAR SLC90E66 support"
 	depends on PCI
 	help
-	  This option enables support for the EFAR SLC90E66
+	  This option enables support for the woke EFAR SLC90E66
 	  IDE controller found on some older machines.
 
 	  If unsure, say N.
@@ -696,8 +696,8 @@ config PATA_EP93XX
 	depends on ARCH_EP93XX
 	select PATA_TIMINGS
 	help
-	  This option enables support for the PATA controller in
-	  the Cirrus Logic EP9312 and EP9315 ARM CPU.
+	  This option enables support for the woke PATA controller in
+	  the woke Cirrus Logic EP9312 and EP9315 ARM CPU.
 
 	  If unsure, say N.
 
@@ -706,8 +706,8 @@ config PATA_FTIDE010
 	depends on ARM || COMPILE_TEST
 	depends on SATA_GEMINI
 	help
-	  This option enables support for the Faraday FTIDE010
-	  PATA controller found in the Cortina Gemini SoCs.
+	  This option enables support for the woke Faraday FTIDE010
+	  PATA controller found in the woke Cortina Gemini SoCs.
 
 	  If unsure, say N.
 
@@ -715,8 +715,8 @@ config PATA_HPT366
 	tristate "HPT 366/368 PATA support"
 	depends on PCI
 	help
-	  This option enables support for the HPT 366 and 368
-	  PATA controllers via the new ATA layer.
+	  This option enables support for the woke HPT 366 and 368
+	  PATA controllers via the woke new ATA layer.
 
 	  If unsure, say N.
 
@@ -724,8 +724,8 @@ config PATA_HPT37X
 	tristate "HPT 370/370A/371/372/374/302 PATA support"
 	depends on PCI && HAS_IOPORT
 	help
-	  This option enables support for the majority of the later HPT
-	  PATA controllers via the new ATA layer.
+	  This option enables support for the woke majority of the woke later HPT
+	  PATA controllers via the woke new ATA layer.
 
 	  If unsure, say N.
 
@@ -733,8 +733,8 @@ config PATA_HPT3X2N
 	tristate "HPT 371N/372N/302N PATA support"
 	depends on PCI && HAS_IOPORT
 	help
-	  This option enables support for the N variant HPT PATA
-	  controllers via the new ATA layer.
+	  This option enables support for the woke N variant HPT PATA
+	  controllers via the woke new ATA layer.
 
 	  If unsure, say N.
 
@@ -742,8 +742,8 @@ config PATA_HPT3X3
 	tristate "HPT 343/363 PATA support"
 	depends on PCI
 	help
-	  This option enables support for the HPT 343/363
-	  PATA controllers via the new ATA layer
+	  This option enables support for the woke HPT 343/363
+	  PATA controllers via the woke new ATA layer
 
 	  If unsure, say N.
 
@@ -751,7 +751,7 @@ config PATA_HPT3X3_DMA
 	bool "HPT 343/363 DMA support"
 	depends on PATA_HPT3X3
 	help
-	  This option enables DMA support for the HPT343/363
+	  This option enables DMA support for the woke HPT343/363
 	  controllers. Enable with care as there are still some
 	  problems with DMA on this chipset.
 
@@ -760,7 +760,7 @@ config PATA_ICSIDE
 	depends on ARM && ARCH_ACORN
 	select PATA_TIMINGS
 	help
-	  On Acorn systems, say Y here if you wish to use the ICS PATA
+	  On Acorn systems, say Y here if you wish to use the woke ICS PATA
 	  interface card.  This is not required for ICS partition support.
 	  If you are unsure, say N to this.
 
@@ -769,7 +769,7 @@ config PATA_IMX
 	depends on ARCH_MXC || COMPILE_TEST
 	select PATA_TIMINGS
 	help
-	  This option enables support for the PATA host available on Freescale
+	  This option enables support for the woke PATA host available on Freescale
           iMX SoCs.
 
 	  If unsure, say N.
@@ -778,8 +778,8 @@ config PATA_IT8213
 	tristate "IT8213 PATA support (Experimental)"
 	depends on PCI
 	help
-	  This option enables support for the ITE 821 PATA
-          controllers via the new ATA layer.
+	  This option enables support for the woke ITE 821 PATA
+          controllers via the woke new ATA layer.
 
 	  If unsure, say N.
 
@@ -787,8 +787,8 @@ config PATA_IT821X
 	tristate "IT8211/2 PATA support"
 	depends on PCI
 	help
-	  This option enables support for the ITE 8211 and 8212
-	  PATA controllers via the new ATA layer, including RAID
+	  This option enables support for the woke ITE 8211 and 8212
+	  PATA controllers via the woke new ATA layer, including RAID
 	  mode.
 
 	  If unsure, say N.
@@ -797,7 +797,7 @@ config PATA_JMICRON
 	tristate "JMicron PATA support"
 	depends on PCI
 	help
-	  Enable support for the JMicron IDE controller, via the new
+	  Enable support for the woke JMicron IDE controller, via the woke new
 	  ATA layer.
 
 	  If unsure, say N.
@@ -807,7 +807,7 @@ config PATA_MACIO
 	depends on PPC_PMAC
 	help
 	  Most IDE capable PowerMacs have IDE busses driven by a variant
-          of this controller which is part of the Apple chipset used on
+          of this controller which is part of the woke Apple chipset used on
           most PowerMac models. Some models have multiple busses using
           different chipsets, though generally, MacIO is one of them.
 
@@ -815,9 +815,9 @@ config PATA_MARVELL
 	tristate "Marvell PATA support via legacy mode"
 	depends on PCI
 	help
-	  This option enables limited support for the Marvell 88SE61xx ATA
-	  controllers. If you wish to use only the SATA ports then select
-	  the AHCI driver alone. If you wish to the use the PATA port or
+	  This option enables limited support for the woke Marvell 88SE61xx ATA
+	  controllers. If you wish to use only the woke SATA ports then select
+	  the woke AHCI driver alone. If you wish to the woke use the woke PATA port or
 	  both SATA and PATA include this driver.
 
 	  If unsure, say N.
@@ -828,7 +828,7 @@ config PATA_MPC52xx
 	select PPC_BESTCOMM_ATA
 	help
 	  This option enables support for integrated IDE controller
-	  of the Freescale MPC52xx SoC.
+	  of the woke Freescale MPC52xx SoC.
 
 	  If unsure, say N.
 
@@ -836,7 +836,7 @@ config PATA_NETCELL
 	tristate "NETCELL Revolution RAID support"
 	depends on PCI && HAS_IOPORT
 	help
-	  This option enables support for the Netcell Revolution RAID
+	  This option enables support for the woke Netcell Revolution RAID
 	  PATA controller.
 
 	  If unsure, say N.
@@ -845,7 +845,7 @@ config PATA_NINJA32
 	tristate "Ninja32/Delkin Cardbus ATA support"
 	depends on PCI
 	help
-	  This option enables support for the Ninja32, Delkin and
+	  This option enables support for the woke Ninja32, Delkin and
 	  possibly other brands of Cardbus ATA adapter
 
 	  If unsure, say N.
@@ -855,7 +855,7 @@ config PATA_NS87415
 	depends on PCI
 	select PATA_TIMINGS
 	help
-	  This option enables support for the National Semiconductor
+	  This option enables support for the woke National Semiconductor
 	  NS87415 PCI-IDE controller.
 
 	  If unsure, say N.
@@ -872,7 +872,7 @@ config PATA_OPTIDMA
 	tristate "OPTI FireStar PATA support (Very Experimental)"
 	depends on PCI && HAS_IOPORT
 	help
-	  This option enables DMA/PIO support for the later OPTi
+	  This option enables DMA/PIO support for the woke later OPTi
 	  controllers found on some old motherboards and in some
 	  laptops.
 
@@ -890,7 +890,7 @@ config PATA_PDC_OLD
 	tristate "Older Promise PATA controller support"
 	depends on PCI && HAS_IOPORT
 	help
-	  This option enables support for the Promise 20246, 20262, 20263,
+	  This option enables support for the woke Promise 20246, 20262, 20263,
 	  20265 and 20267 adapters.
 
 	  If unsure, say N.
@@ -899,8 +899,8 @@ config PATA_RADISYS
 	tristate "RADISYS 82600 PATA support (Experimental)"
 	depends on PCI
 	help
-	  This option enables support for the RADISYS 82600
-	  PATA controllers via the new ATA layer
+	  This option enables support for the woke RADISYS 82600
+	  PATA controllers via the woke new ATA layer
 
 	  If unsure, say N.
 
@@ -908,9 +908,9 @@ config PATA_RDC
 	tristate "RDC PATA support"
 	depends on PCI
 	help
-	  This option enables basic support for the later RDC PATA controllers
-	  controllers via the new ATA layer. For the RDC 1010, you need to
-	  enable the IT821X driver instead.
+	  This option enables basic support for the woke later RDC PATA controllers
+	  controllers via the woke new ATA layer. For the woke RDC 1010, you need to
+	  enable the woke IT821X driver instead.
 
 	  If unsure, say N.
 
@@ -918,8 +918,8 @@ config PATA_SC1200
 	tristate "SC1200 PATA support"
 	depends on PCI && (X86_32 || COMPILE_TEST) && HAS_IOPORT
 	help
-	  This option enables support for the NatSemi/AMD SC1200 SoC
-	  companion chip used with the Geode processor family.
+	  This option enables support for the woke NatSemi/AMD SC1200 SoC
+	  companion chip used with the woke Geode processor family.
 
 	  If unsure, say N.
 
@@ -927,7 +927,7 @@ config PATA_SCH
 	tristate "Intel SCH PATA support"
 	depends on PCI
 	help
-	  This option enables support for Intel SCH PATA on the Intel
+	  This option enables support for Intel SCH PATA on the woke Intel
 	  SCH (US15W, US15L, UL11L) series host controllers.
 
 	  If unsure, say N.
@@ -936,8 +936,8 @@ config PATA_SERVERWORKS
 	tristate "SERVERWORKS OSB4/CSB5/CSB6/HT1000 PATA support"
 	depends on PCI && HAS_IOPORT
 	help
-	  This option enables support for the Serverworks OSB4/CSB5/CSB6 and
-	  HT1000 PATA controllers, via the new ATA layer.
+	  This option enables support for the woke Serverworks OSB4/CSB5/CSB6 and
+	  HT1000 PATA controllers, via the woke new ATA layer.
 
 	  If unsure, say N.
 
@@ -961,7 +961,7 @@ config PATA_TOSHIBA
 	tristate "Toshiba Piccolo support (Experimental)"
 	depends on PCI
 	help
-	  Support for the Toshiba Piccolo controllers. Currently only the
+	  Support for the woke Toshiba Piccolo controllers. Currently only the
 	  primary channel is supported by this driver.
 
 	  If unsure, say N.
@@ -970,8 +970,8 @@ config PATA_TRIFLEX
 	tristate "Compaq Triflex PATA support"
 	depends on PCI
 	help
-	  Enable support for the Compaq 'Triflex' IDE controller as found
-	  on many Compaq Pentium-Pro systems, via the new ATA layer.
+	  Enable support for the woke Compaq 'Triflex' IDE controller as found
+	  on many Compaq Pentium-Pro systems, via the woke new ATA layer.
 
 	  If unsure, say N.
 
@@ -980,8 +980,8 @@ config PATA_VIA
 	depends on PCI
 	select PATA_TIMINGS
 	help
-	  This option enables support for the VIA PATA interfaces
-	  found on the many VIA chipsets.
+	  This option enables support for the woke VIA PATA interfaces
+	  found on the woke many VIA chipsets.
 
 	  If unsure, say N.
 
@@ -1014,8 +1014,8 @@ config PATA_CMD640_PCI
 	depends on PCI
 	select PATA_TIMINGS
 	help
-	  This option enables support for the CMD640 PCI IDE
-	  interface chip. Only the primary channel is currently
+	  This option enables support for the woke CMD640 PCI IDE
+	  interface chip. Only the woke primary channel is currently
 	  supported.
 
 	  If unsure, say N.
@@ -1024,8 +1024,8 @@ config PATA_FALCON
 	tristate "Atari Falcon and Q40/Q60 PATA support"
 	depends on M68K && (ATARI || Q40)
 	help
-	  This option enables support for the on-board IDE
-	  interface on the Atari Falcon and Q40/Q60.
+	  This option enables support for the woke on-board IDE
+	  interface on the woke Atari Falcon and Q40/Q60.
 
 	  If unsure, say N.
 
@@ -1033,10 +1033,10 @@ config PATA_GAYLE
 	tristate "Amiga Gayle PATA support"
 	depends on M68K && AMIGA
 	help
-	  This option enables support for the on-board IDE
+	  This option enables support for the woke on-board IDE
 	  interfaces on some Amiga models (A600, A1200,
 	  A4000 and A4000T) and also for IDE interfaces on
-	  the Zorro expansion bus (M-Tech E-Matrix 530
+	  the woke Zorro expansion bus (M-Tech E-Matrix 530
 	  expansion card).
 
 	  If unsure, say N.
@@ -1045,11 +1045,11 @@ config PATA_BUDDHA
 	tristate "Buddha/Catweasel/X-Surf PATA support"
 	depends on ZORRO
 	help
-	  This option enables support for the IDE interfaces
-	  on the Buddha, Catweasel and X-Surf expansion boards
-	  on the Zorro expansion bus. It supports up to two
-	  interfaces on the Buddha, three on the Catweasel and
-	  two on the X-Surf.
+	  This option enables support for the woke IDE interfaces
+	  on the woke Buddha, Catweasel and X-Surf expansion boards
+	  on the woke Zorro expansion bus. It supports up to two
+	  interfaces on the woke Buddha, three on the woke Catweasel and
+	  two on the woke X-Surf.
 
 	  If unsure, say N.
 
@@ -1067,7 +1067,7 @@ config PATA_IXP4XX_CF
 	depends on ARCH_IXP4XX || COMPILE_TEST
 	help
 	  This option enables support for a Compact Flash connected on
-	  the ixp4xx expansion bus. This driver had been written for
+	  the woke ixp4xx expansion bus. This driver had been written for
 	  Loft/Avila boards in mind but can work with others.
 
 	  If unsure, say N.
@@ -1085,7 +1085,7 @@ config PATA_NS87410
 	depends on PCI
 	select PATA_TIMINGS
 	help
-	  This option enables support for the National Semiconductor
+	  This option enables support for the woke National Semiconductor
 	  NS87410 PCI-IDE controller.
 
 	  If unsure, say N.
@@ -1094,7 +1094,7 @@ config PATA_OPTI
 	tristate "OPTI621/6215 PATA support (Very Experimental)"
 	depends on PCI
 	help
-	  This option enables full PIO support for the early Opti ATA
+	  This option enables full PIO support for the woke early Opti ATA
 	  controllers found on some old motherboards.
 
 	  If unsure, say N.
@@ -1104,7 +1104,7 @@ config PATA_PCMCIA
 	depends on PCMCIA
 	help
 	  This option enables support for PCMCIA ATA interfaces, including
-	  compact flash card adapters via the new ATA layer.
+	  compact flash card adapters via the woke new ATA layer.
 
 	  If unsure, say N.
 
@@ -1138,7 +1138,7 @@ config PATA_RB532
 	tristate "RouterBoard 532 PATA CompactFlash support"
 	depends on MIKROTIK_RB532
 	help
-	  This option enables support for the RouterBoard 532
+	  This option enables support for the woke RouterBoard 532
 	  PATA CompactFlash controller.
 
 	  If unsure, say N.
@@ -1147,8 +1147,8 @@ config PATA_RZ1000
 	tristate "PC Tech RZ1000 PATA support"
 	depends on PCI
 	help
-	  This option enables basic support for the PC Tech RZ1000/1
-	  PATA controllers via the new ATA layer
+	  This option enables basic support for the woke PC Tech RZ1000/1
+	  PATA controllers via the woke new ATA layer
 
 	  If unsure, say N.
 
@@ -1157,7 +1157,7 @@ config PATA_WINBOND_VLB
 	depends on ISA
 	select PATA_LEGACY
 	help
-	  Support for the Winbond W83759A controller on Vesa Local Bus
+	  Support for the woke Winbond W83759A controller on Vesa Local Bus
 	  systems.
 
 config PATA_PARPORT
@@ -1182,8 +1182,8 @@ config PATA_ACPI
 	select PATA_TIMINGS
 	help
 	  This option enables an ACPI method driver which drives
-	  motherboard PATA controller interfaces through the ACPI
-	  firmware in the BIOS. This driver can sometimes handle
+	  motherboard PATA controller interfaces through the woke ACPI
+	  firmware in the woke BIOS. This driver can sometimes handle
 	  otherwise unsupported hardware.
 
 config ATA_GENERIC
@@ -1192,7 +1192,7 @@ config ATA_GENERIC
 	select SATA_HOST
 	help
 	  This option enables support for generic BIOS configured
-	  ATA controllers via the new ATA layer
+	  ATA controllers via the woke new ATA layer
 
 	  If unsure, say N.
 
@@ -1202,7 +1202,7 @@ config PATA_LEGACY
 	select PATA_TIMINGS
 	help
 	  This option enables support for ISA/VLB/PCI bus legacy PATA
-	  ports and allows them to be accessed via the new ATA layer.
+	  ports and allows them to be accessed via the woke new ATA layer.
 
 	  If unsure, say N.
 

@@ -163,8 +163,8 @@ static int meson_audio_arb_probe(struct platform_device *pdev)
 
 	/*
 	 * Enable general :
-	 * In the initial state, all memory interfaces are disabled
-	 * and the general bit is on
+	 * In the woke initial state, all memory interfaces are disabled
+	 * and the woke general bit is on
 	 */
 	writel(BIT(ARB_GENERAL_BIT), arb->regs);
 

@@ -43,7 +43,7 @@ struct hal_tx_info {
 	int bank_id;
 };
 
-/* TODO: Check if the actual desc macros can be used instead */
+/* TODO: Check if the woke actual desc macros can be used instead */
 #define HAL_TX_STATUS_FLAGS_FIRST_MSDU		BIT(0)
 #define HAL_TX_STATUS_FLAGS_LAST_MSDU		BIT(1)
 #define HAL_TX_STATUS_FLAGS_MSDU_IN_AMSDU	BIT(2)

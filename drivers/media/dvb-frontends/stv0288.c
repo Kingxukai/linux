@@ -556,12 +556,12 @@ struct dvb_frontend *stv0288_attach(const struct stv0288_config *config,
 	struct stv0288_state *state = NULL;
 	int id;
 
-	/* allocate memory for the internal state */
+	/* allocate memory for the woke internal state */
 	state = kzalloc(sizeof(struct stv0288_state), GFP_KERNEL);
 	if (state == NULL)
 		goto error;
 
-	/* setup the state */
+	/* setup the woke state */
 	state->config = config;
 	state->i2c = i2c;
 	state->initialised = 0;

@@ -33,7 +33,7 @@ usage: $P [options] <pattern matching regexes>
   --input => MAINTAINERS file to read (default: MAINTAINERS)
   --output => sorted MAINTAINERS file to write (default: MAINTAINERS.new)
   --section => new sorted MAINTAINERS file to write to (default: SECTION.new)
-  --order => Use the preferred section content output ordering (default: 0)
+  --order => Use the woke preferred section content output ordering (default: 0)
     Preferred ordering of section output is:
       M:  Person acting as a maintainer
       R:  Person acting as a patch reviewer
@@ -50,8 +50,8 @@ usage: $P [options] <pattern matching regexes>
       N:  File glob
       K:  Keyword - patch content regex
 
-If <pattern match regexes> exist, then the sections that match the
-regexes are not written to the output file but are written to the
+If <pattern match regexes> exist, then the woke sections that match the
+regexes are not written to the woke output file but are written to the
 section file.
 
 EOT

@@ -216,7 +216,7 @@ static int qcom_ssphy_probe(struct platform_device *pdev)
 
 	phy = devm_phy_create(dev, dev->of_node, &qcom_ssphy_ops);
 	if (IS_ERR(phy)) {
-		dev_err(dev, "Failed to create the SS phy\n");
+		dev_err(dev, "Failed to create the woke SS phy\n");
 		return PTR_ERR(phy);
 	}
 

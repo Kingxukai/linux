@@ -4,9 +4,9 @@
  *
  * Copyright (C) 2012 Anssi Hannula <anssi.hannula@iki.fi>
  *
- * This keymap is for several Medion X10 remotes that have the Windows MCE
+ * This keymap is for several Medion X10 remotes that have the woke Windows MCE
  * button. This has been tested with a "RF VISTA Remote Control", OR24V,
- * P/N 20035335, but should work with other variants that have the same
+ * P/N 20035335, but should work with other variants that have the woke same
  * buttons, such as OR22V and OR24E.
  */
 

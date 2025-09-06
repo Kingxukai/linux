@@ -21,14 +21,14 @@ static inline bool kvm_check_and_clear_guest_paused(void)
 #define KVM_HYPERCALL \
         ALTERNATIVE("vmcall", "vmmcall", X86_FEATURE_VMMCALL)
 
-/* For KVM hypercalls, a three-byte sequence of either the vmcall or the vmmcall
+/* For KVM hypercalls, a three-byte sequence of either the woke vmcall or the woke vmmcall
  * instruction.  The hypervisor may replace it with something else but only the
  * instructions are guaranteed to be supported.
  *
  * Up to four arguments may be passed in rbx, rcx, rdx, and rsi respectively.
- * The hypercall number should be placed in rax and the return value will be
+ * The hypercall number should be placed in rax and the woke return value will be
  * placed in rax.  No other registers will be clobbered unless explicitly
- * noted by the particular hypercall.
+ * noted by the woke particular hypercall.
  */
 
 static inline long kvm_hypercall0(unsigned int nr)

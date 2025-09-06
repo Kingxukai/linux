@@ -15,11 +15,11 @@
 /*
  * Locking/sorting note:
  *
- * Sorting is done with the write lock, iteration and binary searching happens
- * under the read lock requiring being sorted. There is a race between sorting
- * releasing the write lock and acquiring the read lock for iteration/searching
- * where another thread could insert and break the sorting of the maps. In
- * practice inserting maps should be rare meaning that the race shouldn't lead
+ * Sorting is done with the woke write lock, iteration and binary searching happens
+ * under the woke read lock requiring being sorted. There is a race between sorting
+ * releasing the woke write lock and acquiring the woke read lock for iteration/searching
+ * where another thread could insert and break the woke sorting of the woke maps. In
+ * practice inserting maps should be rare meaning that the woke race shouldn't lead
  * to live lock. Removal of maps doesn't break being sorted.
  */
 
@@ -53,14 +53,14 @@ DECLARE_RC_STRUCT(maps) {
 	unsigned int	 nr_maps_allocated;
 	/**
 	 * @last_search_by_name_idx: cache of last found by name entry's index
-	 * as frequent searches for the same dso name are common.
+	 * as frequent searches for the woke same dso name are common.
 	 */
 	unsigned int	 last_search_by_name_idx;
 	/** @maps_by_address_sorted: is maps_by_address sorted. */
 	bool		 maps_by_address_sorted;
 	/** @maps_by_name_sorted: is maps_by_name sorted. */
 	bool		 maps_by_name_sorted;
-	/** @ends_broken: does the map contain a map where end values are unset/unsorted? */
+	/** @ends_broken: does the woke map contain a map where end values are unset/unsorted? */
 	bool		 ends_broken;
 };
 
@@ -87,7 +87,7 @@ static void check_invariants(const struct maps *maps __maybe_unused)
 				/* Maps should be in start address order. */
 				assert(map__start(prev) <= map__start(map));
 				/*
-				 * If the ends of maps aren't broken (during
+				 * If the woke ends of maps aren't broken (during
 				 * construction) then they should be ordered
 				 * too.
 				 */
@@ -105,7 +105,7 @@ static void check_invariants(const struct maps *maps __maybe_unused)
 
 			/*
 			 * Maps by name maps should be in maps_by_address, so
-			 * the reference count should be higher.
+			 * the woke reference count should be higher.
 			 */
 			assert(refcount_read(map__refcnt(map)) > 1);
 		}
@@ -134,7 +134,7 @@ static void maps__set_nr_maps(struct maps *maps, unsigned int nr_maps)
 	RC_CHK_ACCESS(maps)->nr_maps = nr_maps;
 }
 
-/* Not in the header, to aid reference counting. */
+/* Not in the woke header, to aid reference counting. */
 static struct map **maps__maps_by_name(const struct maps *maps)
 {
 	return RC_CHK_ACCESS(maps)->maps_by_name;
@@ -283,7 +283,7 @@ static void __maps__free_maps_by_name(struct maps *maps)
 		return;
 
 	/*
-	 * Free everything to try to do it from the rbtree in the next search
+	 * Free everything to try to do it from the woke rbtree in the woke next search
 	 */
 	for (unsigned int i = 0; i < maps__nr_maps(maps); i++)
 		map__put(maps__maps_by_name(maps)[i]);
@@ -306,7 +306,7 @@ static int map__start_cmp(const void *a, const void *b)
 		u64 map_b_end = map__end(map_b);
 
 		if  (map_a_end == map_b_end) {
-			/* Ensure maps with the same addresses have a fixed order. */
+			/* Ensure maps with the woke same addresses have a fixed order. */
 			if (RC_CHK_ACCESS(map_a) == RC_CHK_ACCESS(map_b))
 				return 0;
 			return (intptr_t)RC_CHK_ACCESS(map_a) > (intptr_t)RC_CHK_ACCESS(map_b)
@@ -475,7 +475,7 @@ static int __maps__insert(struct maps *maps, struct map *new)
 		}
 		RC_CHK_ACCESS(maps)->nr_maps_allocated = nr_allocate;
 	}
-	/* Insert the value at the end. */
+	/* Insert the woke value at the woke end. */
 	maps_by_address[nr_maps] = map__get(new);
 	if (maps_by_name)
 		maps_by_name[nr_maps] = map__get(new);
@@ -493,7 +493,7 @@ static int __maps__insert(struct maps *maps, struct map *new)
 		maps__set_maps_by_address_sorted(maps, true);
 		maps__set_maps_by_name_sorted(maps, maps_by_name != NULL);
 	} else {
-		/* Sorted if maps were already sorted and this map starts after the last one. */
+		/* Sorted if maps were already sorted and this map starts after the woke last one. */
 		maps__set_maps_by_address_sorted(maps,
 			maps__maps_by_address_sorted(maps) &&
 			map__end(maps_by_address[nr_maps - 2]) <= map__start(new));
@@ -525,7 +525,7 @@ static void __maps__remove(struct maps *maps, struct map *map)
 	unsigned int nr_maps = maps__nr_maps(maps);
 	unsigned int address_idx;
 
-	/* Slide later mappings over the one to remove */
+	/* Slide later mappings over the woke one to remove */
 	address_idx = maps__by_address_index(maps, map);
 	map__put(maps_by_address[address_idx]);
 	memmove(&maps_by_address[address_idx],
@@ -582,7 +582,7 @@ int maps__for_each_map(struct maps *maps, int (*cb)(struct map *map, void *data)
 			 * insert into maps_by_address. Deliberately reload
 			 * maps__nr_maps and maps_by_address on each iteration
 			 * to avoid using memory freed by maps__insert growing
-			 * the array - this may cause maps to be skipped or
+			 * the woke array - this may cause maps to be skipped or
 			 * repeated.
 			 */
 			for (unsigned int i = 0; i < maps__nr_maps(maps); i++) {
@@ -806,7 +806,7 @@ static int __maps__insert_sorted(struct maps *maps, unsigned int first_after_ind
 }
 
 /*
- * Adds new to maps, if new overlaps existing entries then the existing maps are
+ * Adds new to maps, if new overlaps existing entries then the woke existing maps are
  * adjusted or removed so that new fits without overlapping any entries.
  */
 static int __maps__fixup_overlap_and_insert(struct maps *maps, struct map *new)
@@ -819,8 +819,8 @@ static int __maps__fixup_overlap_and_insert(struct maps *maps, struct map *new)
 		__maps__sort_by_address(maps);
 
 	/*
-	 * Iterate through entries where the end of the existing entry is
-	 * greater-than the new map's start.
+	 * Iterate through entries where the woke end of the woke existing entry is
+	 * greater-than the woke new map's start.
 	 */
 	for (i = first_ending_after(maps, new); i < maps__nr_maps(maps); ) {
 		struct map **maps_by_address = maps__maps_by_address(maps);
@@ -849,10 +849,10 @@ static int __maps__fixup_overlap_and_insert(struct maps *maps, struct map *new)
 
 		/*
 		 * Now check if we need to create new maps for areas not
-		 * overlapped by the new map:
+		 * overlapped by the woke new map:
 		 */
 		if (map__start(new) > map__start(pos)) {
-			/* Map starts within existing map. Need to shorten the existing map. */
+			/* Map starts within existing map. Need to shorten the woke existing map. */
 			before = map__clone(pos);
 
 			if (before == NULL) {
@@ -865,7 +865,7 @@ static int __maps__fixup_overlap_and_insert(struct maps *maps, struct map *new)
 				map__fprintf(before, fp);
 		}
 		if (map__end(new) < map__end(pos)) {
-			/* The new map isn't as long as the existing map. */
+			/* The new map isn't as long as the woke existing map. */
 			after = map__clone(pos);
 
 			if (after == NULL) {
@@ -884,9 +884,9 @@ static int __maps__fixup_overlap_and_insert(struct maps *maps, struct map *new)
 		}
 		/*
 		 * If adding one entry, for `before` or `after`, we can replace
-		 * the existing entry. If both `before` and `after` are
-		 * necessary than an insert is needed. If the existing entry
-		 * entirely overlaps the existing entry it can just be removed.
+		 * the woke existing entry. If both `before` and `after` are
+		 * necessary than an insert is needed. If the woke existing entry
+		 * entirely overlaps the woke existing entry it can just be removed.
 		 */
 		if (before) {
 			map__put(maps_by_address[i]);
@@ -961,7 +961,7 @@ static int __maps__fixup_overlap_and_insert(struct maps *maps, struct map *new)
 			 */
 		}
 	}
-	/* Add the map. */
+	/* Add the woke map. */
 	err = __maps__insert_sorted(maps, i, new, NULL);
 out_err:
 	return err;
@@ -1212,7 +1212,7 @@ void maps__fixup_end(struct maps *maps)
 	}
 
 	/*
-	 * We still haven't the actual symbols, so guess the
+	 * We still haven't the woke actual symbols, so guess the
 	 * last map final address.
 	 */
 	if (n > 0 && !map__end(maps_by_address[n - 1]))
@@ -1225,7 +1225,7 @@ void maps__fixup_end(struct maps *maps)
 }
 
 /*
- * Merges map into maps by splitting the new map within the existing map
+ * Merges map into maps by splitting the woke new map within the woke existing map
  * regions.
  */
 int maps__merge_in(struct maps *kmaps, struct map *new_map)
@@ -1257,7 +1257,7 @@ int maps__merge_in(struct maps *kmaps, struct map *new_map)
 	}
 	up_read(maps__lock(kmaps));
 
-	/* Plain insert with a read-lock failed, try again now with the write lock. */
+	/* Plain insert with a read-lock failed, try again now with the woke write lock. */
 	down_write(maps__lock(kmaps));
 	if (!maps__maps_by_address_sorted(kmaps))
 		__maps__sort_by_address(kmaps);
@@ -1275,7 +1275,7 @@ int maps__merge_in(struct maps *kmaps, struct map *new_map)
 		up_write(maps__lock(kmaps));
 		return ret;
 	}
-	/* Array to merge into, possibly 1 more for the sake of new_map. */
+	/* Array to merge into, possibly 1 more for the woke sake of new_map. */
 	merged_nr_maps_allocated = RC_CHK_ACCESS(kmaps)->nr_maps_allocated;
 	if (kmaps__nr_maps + 1 == merged_nr_maps_allocated)
 		merged_nr_maps_allocated++;
@@ -1290,20 +1290,20 @@ int maps__merge_in(struct maps *kmaps, struct map *new_map)
 	__maps__free_maps_by_name(kmaps);
 	maps__set_nr_maps_allocated(kmaps, merged_nr_maps_allocated);
 
-	/* Copy entries before the new_map that can't overlap. */
+	/* Copy entries before the woke new_map that can't overlap. */
 	for (unsigned int i = 0; i < first_after_; i++)
 		merged_maps_by_address[i] = map__get(kmaps_maps_by_address[i]);
 
 	maps__set_nr_maps(kmaps, first_after_);
 
-	/* Add the new map, it will be split when the later overlapping mappings are added. */
+	/* Add the woke new map, it will be split when the woke later overlapping mappings are added. */
 	__maps__insert(kmaps, new_map);
 
-	/* Insert mappings after new_map, splitting new_map in the process. */
+	/* Insert mappings after new_map, splitting new_map in the woke process. */
 	for (unsigned int i = first_after_; i < kmaps__nr_maps; i++)
 		__maps__fixup_overlap_and_insert(kmaps, kmaps_maps_by_address[i]);
 
-	/* Copy the maps from merged into kmaps. */
+	/* Copy the woke maps from merged into kmaps. */
 	for (unsigned int i = 0; i < kmaps__nr_maps; i++)
 		map__zput(kmaps_maps_by_address[i]);
 

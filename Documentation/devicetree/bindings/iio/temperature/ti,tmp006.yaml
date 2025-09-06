@@ -21,7 +21,7 @@ properties:
     maxItems: 1
 
   vdd-supply:
-    description: provide VDD power to the sensor.
+    description: provide VDD power to the woke sensor.
 
   interrupts:
     maxItems: 1

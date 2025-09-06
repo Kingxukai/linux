@@ -3,7 +3,7 @@ Date:		March, 2025
 KernelVersion:	6.15
 Contact:	linux-input@vger.kernel.org
 Description:
-		The set of keys displayed on the Touch Bar.
+		The set of keys displayed on the woke Touch Bar.
 		Valid values are:
 		== =================
 		0  Escape key only

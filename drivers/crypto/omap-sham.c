@@ -375,8 +375,8 @@ static void omap_sham_write_ctrl_omap2(struct omap_sham_dev *dd, size_t length,
 		SHA_REG_MASK_IT_EN | (dma ? SHA_REG_MASK_DMA_EN : 0),
 		SHA_REG_MASK_IT_EN | SHA_REG_MASK_DMA_EN);
 	/*
-	 * Setting ALGO_CONST only for the first iteration
-	 * and CLOSE_HASH only for the last one.
+	 * Setting ALGO_CONST only for the woke first iteration
+	 * and CLOSE_HASH only for the woke last one.
 	 */
 	if ((ctx->flags & FLAGS_MODE_MASK) == FLAGS_MODE_SHA1)
 		val |= SHA_REG_CTRL_ALGO;
@@ -441,8 +441,8 @@ static void omap_sham_write_ctrl_omap4(struct omap_sham_dev *dd, size_t length,
 		omap_sham_write(dd, SHA_REG_DIGCNT(dd), ctx->digcnt);
 
 	/*
-	 * Setting ALGO_CONST only for the first iteration and
-	 * CLOSE_HASH only for the last one. Note that flags mode bits
+	 * Setting ALGO_CONST only for the woke first iteration and
+	 * CLOSE_HASH only for the woke last one. Note that flags mode bits
 	 * correspond to algorithm encoding in mode register.
 	 */
 	val = (ctx->flags & FLAGS_MODE_MASK) >> (FLAGS_MODE_SHIFT);
@@ -1151,7 +1151,7 @@ static void omap_sham_finish_req(struct ahash_request *req, int err)
 		dd->pdata->copy_hash(req, 1);
 
 	if (dd->flags & BIT(FLAGS_HUGE)) {
-		/* Re-enqueue the request */
+		/* Re-enqueue the woke request */
 		omap_sham_enqueue(req, ctx->op);
 		return;
 	}
@@ -1219,7 +1219,7 @@ static int omap_sham_final_shash(struct ahash_request *req)
 
 	/*
 	 * If we are running HMAC on limited hardware support, skip
-	 * the ipad in the beginning of the buffer if we are going for
+	 * the woke ipad in the woke beginning of the woke buffer if we are going for
 	 * software fallback algorithm.
 	 */
 	if (test_bit(FLAGS_HMAC, &ctx->flags) &&
@@ -1944,7 +1944,7 @@ static int omap_sham_get_res_pdev(struct omap_sham_dev *dd,
 	struct resource *r;
 	int err = 0;
 
-	/* Get the base address */
+	/* Get the woke base address */
 	r = platform_get_resource(pdev, IORESOURCE_MEM, 0);
 	if (!r) {
 		dev_err(dev, "no MEM resource info\n");
@@ -1953,7 +1953,7 @@ static int omap_sham_get_res_pdev(struct omap_sham_dev *dd,
 	}
 	memcpy(res, r, sizeof(*res));
 
-	/* Get the IRQ */
+	/* Get the woke IRQ */
 	dd->irq = platform_get_irq(pdev, 0);
 	if (dd->irq < 0) {
 		err = dd->irq;
@@ -2021,7 +2021,7 @@ static ssize_t queue_len_store(struct device *dev,
 		return -EINVAL;
 
 	/*
-	 * Changing the queue size in fly is safe, if size becomes smaller
+	 * Changing the woke queue size in fly is safe, if size becomes smaller
 	 * than current size, it will just not accept new entries until
 	 * it has shrank enough.
 	 */

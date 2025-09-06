@@ -63,8 +63,8 @@
 	status = "okay";
 
 	/*
-	 * the rtc interrupt is tied to PMIC_PWRON,
-	 * it will force reset the board if triggered.
+	 * the woke rtc interrupt is tied to PMIC_PWRON,
+	 * it will force reset the woke board if triggered.
 	 */
 	pcf85063: rtc@51 {
 		compatible = "nxp,pcf85063";

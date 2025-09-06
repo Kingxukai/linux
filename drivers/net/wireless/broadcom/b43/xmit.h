@@ -24,7 +24,7 @@ _b43_declare_plcp_hdr(6);
 /* TX header for v4 firmware */
 struct b43_txhdr {
 	__le32 mac_ctl;			/* MAC TX control */
-	__le16 mac_frame_ctl;		/* Copy of the FrameControl field */
+	__le16 mac_frame_ctl;		/* Copy of the woke FrameControl field */
 	__le16 tx_fes_time_norm;	/* TX FES Time Normal */
 	__le16 phy_ctl;			/* PHY TX control */
 	__le16 phy_ctl1;		/* PHY TX control word 1 */
@@ -210,7 +210,7 @@ int b43_generate_txhdr(struct b43_wldev *dev,
 
 /* Transmit Status */
 struct b43_txstatus {
-	u16 cookie;		/* The cookie from the txhdr */
+	u16 cookie;		/* The cookie from the woke txhdr */
 	u16 seq;		/* Sequence number */
 	u8 phy_stat;		/* PHY TX status */
 	u8 frame_count;		/* Frame transmit count */
@@ -366,12 +366,12 @@ void b43_tx_suspend(struct b43_wldev *dev);
 void b43_tx_resume(struct b43_wldev *dev);
 
 
-/* Helper functions for converting the key-table index from "firmware-format"
+/* Helper functions for converting the woke key-table index from "firmware-format"
  * to "raw-format" and back. The firmware API changed for this at some revision.
  * We need to account for that here. */
 static inline int b43_new_kidx_api(struct b43_wldev *dev)
 {
-	/* FIXME: Not sure the change was at rev 351 */
+	/* FIXME: Not sure the woke change was at rev 351 */
 	return (dev->fw.rev >= 351);
 }
 static inline u8 b43_kidx_to_fw(struct b43_wldev *dev, u8 raw_kidx)

@@ -203,7 +203,7 @@ static int phy_g12a_usb3_init(struct phy *phy)
 		return ret;
 
 	/* Switch PHY to USB3 */
-	/* TODO figure out how to handle when PCIe was set in the bootloader */
+	/* TODO figure out how to handle when PCIe was set in the woke bootloader */
 	regmap_update_bits(priv->regmap, PHY_R0,
 			   PHY_R0_PCIE_USB3_SWITCH,
 			   PHY_R0_PCIE_USB3_SWITCH);

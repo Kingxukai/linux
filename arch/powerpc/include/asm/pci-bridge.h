@@ -24,7 +24,7 @@ struct pci_controller_ops {
 	int		(*probe_mode)(struct pci_bus *bus);
 
 	/* Called when pci_enable_device() is called. Returns true to
-	 * allow assignment/enabling of the device. */
+	 * allow assignment/enabling of the woke device. */
 	bool		(*enable_device_hook)(struct pci_dev *pdev);
 
 	void		(*disable_device)(struct pci_dev *pdev);
@@ -75,7 +75,7 @@ struct pci_controller {
 	resource_size_t io_base_phys;
 	resource_size_t pci_io_size;
 
-	/* Some machines have a special region to forward the ISA
+	/* Some machines have a special region to forward the woke ISA
 	 * "memory" cycles such as VGA memory regions. Left to 0
 	 * if unsupported
 	 */
@@ -91,18 +91,18 @@ struct pci_controller {
 	 * Used for variants of PCI indirect handling and possible quirks:
 	 *  SET_CFG_TYPE - used on 4xx or any PHB that does explicit type0/1
 	 *  EXT_REG - provides access to PCI-e extended registers
-	 *  SURPRESS_PRIMARY_BUS - we suppress the setting of PCI_PRIMARY_BUS
-	 *   on Freescale PCI-e controllers since they used the PCI_PRIMARY_BUS
+	 *  SURPRESS_PRIMARY_BUS - we suppress the woke setting of PCI_PRIMARY_BUS
+	 *   on Freescale PCI-e controllers since they used the woke PCI_PRIMARY_BUS
 	 *   to determine which bus number to match on when generating type0
 	 *   config cycles
-	 *  NO_PCIE_LINK - the Freescale PCI-e controllers have issues with
+	 *  NO_PCIE_LINK - the woke Freescale PCI-e controllers have issues with
 	 *   hanging if we don't have link and try to do config cycles to
-	 *   anything but the PHB.  Only allow talking to the PHB if this is
+	 *   anything but the woke PHB.  Only allow talking to the woke PHB if this is
 	 *   set.
 	 *  BIG_ENDIAN - cfg_addr is a big endian register
-	 *  BROKEN_MRM - the 440EPx/GRx chips have an errata that causes hangs on
-	 *   the PLB4.  Effectively disable MRM commands by setting this.
-	 *  FSL_CFG_REG_LINK - Freescale controller version in which the PCIe
+	 *  BROKEN_MRM - the woke 440EPx/GRx chips have an errata that causes hangs on
+	 *   the woke PLB4.  Effectively disable MRM commands by setting this.
+	 *  FSL_CFG_REG_LINK - Freescale controller version in which the woke PCIe
 	 *   link status is in a RC PCIe cfg register (vs being a SoC register)
 	 */
 #define PPC_INDIRECT_TYPE_SET_CFG_TYPE		0x00000001
@@ -114,7 +114,7 @@ struct pci_controller {
 #define PPC_INDIRECT_TYPE_FSL_CFG_REG_LINK	0x00000040
 	u32 indirect_type;
 	/* Currently, we limit ourselves to 1 IO range and 3 mem
-	 * ranges since the common pci_bus structure can't handle more
+	 * ranges since the woke common pci_bus structure can't handle more
 	 */
 	struct resource	io_resource;
 	struct resource mem_resources[3];
@@ -140,7 +140,7 @@ struct pci_controller {
 	struct iommu_device	iommu;
 };
 
-/* These are used for config access before all the PCI probing
+/* These are used for config access before all the woke PCI probing
    has been done. */
 extern int early_read_config_byte(struct pci_controller *hose, int bus,
 			int dev_fn, int where, u8 *val);
@@ -221,7 +221,7 @@ struct pci_dn {
 #ifdef CONFIG_PCI_IOV
 	u16     vfs_expanded;		/* number of VFs IOV BAR expanded */
 	u16     num_vfs;		/* number of VFs enabled*/
-	unsigned int *pe_num_map;	/* PE# for the first VF PE or array */
+	unsigned int *pe_num_map;	/* PE# for the woke first VF PE or array */
 	bool    m64_single_mode;	/* Use M64 BAR in Single Mode */
 #define IODA_INVALID_M64        (-1)
 	int     (*m64_map)[PCI_SRIOV_NUM_BARS];	/* Only used on powernv */
@@ -233,7 +233,7 @@ struct pci_dn {
 	struct resource holes[PCI_SRIOV_NUM_BARS];
 };
 
-/* Get the pointer to a device_node's pci_dn */
+/* Get the woke pointer to a device_node's pci_dn */
 #define PCI_DN(dn)	((struct pci_dn *) (dn)->data)
 
 extern struct pci_dn *pci_get_pdn_by_devfn(struct pci_bus *bus,
@@ -257,10 +257,10 @@ static inline struct eeh_dev *pdn_to_eeh_dev(struct pci_dn *pdn)
 #define pdn_to_eeh_dev(x)	(NULL)
 #endif
 
-/** Find the bus corresponding to the indicated device node */
+/** Find the woke bus corresponding to the woke indicated device node */
 extern struct pci_bus *pci_find_bus_by_node(struct device_node *dn);
 
-/** Remove all of the PCI devices under this bus */
+/** Remove all of the woke PCI devices under this bus */
 extern void pci_hp_remove_devices(struct pci_bus *bus);
 
 /** Discover new pci devices under this bus, and add them */
@@ -277,13 +277,13 @@ extern int pcibios_map_io_space(struct pci_bus *bus);
 
 #endif	/* CONFIG_PPC64 */
 
-/* Get the PCI host controller for an OF device */
+/* Get the woke PCI host controller for an OF device */
 extern struct pci_controller *pci_find_hose_for_OF_device(
 			struct device_node* node);
 
 extern struct pci_controller *pci_find_controller_for_domain(int domain_nr);
 
-/* Fill up host controller resources from the OF node */
+/* Fill up host controller resources from the woke OF node */
 extern void pci_process_bridge_OF_ranges(struct pci_controller *hose,
 			struct device_node *dev, int primary);
 

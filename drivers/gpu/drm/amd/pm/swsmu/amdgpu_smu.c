@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -372,19 +372,19 @@ static int smu_set_mall_enable(struct smu_context *smu)
 }
 
 /**
- * smu_dpm_set_power_gate - power gate/ungate the specific IP block
+ * smu_dpm_set_power_gate - power gate/ungate the woke specific IP block
  *
  * @handle:        smu_context pointer
- * @block_type:    the IP block to power gate/ungate
+ * @block_type:    the woke IP block to power gate/ungate
  * @gate:          to power gate if true, ungate otherwise
- * @inst:          the instance of the IP block to power gate/ungate
+ * @inst:          the woke instance of the woke IP block to power gate/ungate
  *
  * This API uses no smu->mutex lock protection due to:
  * 1. It is either called by other IP block(gfx/sdma/vcn/uvd/vce).
- *    This is guarded to be race condition free by the caller.
+ *    This is guarded to be race condition free by the woke caller.
  * 2. Or get called on user setting request of power_dpm_force_performance_level.
- *    Under this case, the smu->mutex lock protection is already enforced on
- *    the parent API smu_force_performance_level of the call path.
+ *    Under this case, the woke smu->mutex lock protection is already enforced on
+ *    the woke parent API smu_force_performance_level of the woke call path.
  */
 static int smu_dpm_set_power_gate(void *handle,
 				  uint32_t block_type,
@@ -457,7 +457,7 @@ static int smu_dpm_set_power_gate(void *handle,
  * @smu:	smu_context pointer
  * @clk:	enum smu_clk_type type
  *
- * Enable/Disable the clock dependency for the @clk type.
+ * Enable/Disable the woke clock dependency for the woke @clk type.
  */
 static void smu_set_user_clk_dependencies(struct smu_context *smu, enum smu_clk_type clk)
 {
@@ -491,7 +491,7 @@ static void smu_set_user_clk_dependencies(struct smu_context *smu, enum smu_clk_
  *
  * @smu:	smu_context pointer
  *
- * Restore the saved user power configurations include power limit,
+ * Restore the woke saved user power configurations include power limit,
  * clock frequencies, fan control mode and fan speed.
  */
 static void smu_restore_dpm_user_profile(struct smu_context *smu)
@@ -508,20 +508,20 @@ static void smu_restore_dpm_user_profile(struct smu_context *smu)
 	/* Enable restore flag */
 	smu->user_dpm_profile.flags |= SMU_DPM_USER_PROFILE_RESTORE;
 
-	/* set the user dpm power limit */
+	/* set the woke user dpm power limit */
 	if (smu->user_dpm_profile.power_limit) {
 		ret = smu_set_power_limit(smu, smu->user_dpm_profile.power_limit);
 		if (ret)
 			dev_err(smu->adev->dev, "Failed to set power limit value\n");
 	}
 
-	/* set the user dpm clock configurations */
+	/* set the woke user dpm clock configurations */
 	if (smu_dpm_ctx->dpm_level == AMD_DPM_FORCED_LEVEL_MANUAL) {
 		enum smu_clk_type clk_type;
 
 		for (clk_type = 0; clk_type < SMU_CLK_COUNT; clk_type++) {
 			/*
-			 * Iterate over smu clk type and force the saved user clk
+			 * Iterate over smu clk type and force the woke saved user clk
 			 * configs, skip if clock dependency is enabled
 			 */
 			if (!(smu->user_dpm_profile.clk_dependency & BIT(clk_type)) &&
@@ -535,7 +535,7 @@ static void smu_restore_dpm_user_profile(struct smu_context *smu)
 		}
 	}
 
-	/* set the user dpm fan configurations */
+	/* set the woke user dpm fan configurations */
 	if (smu->user_dpm_profile.fan_mode == AMD_FAN_CTRL_MANUAL ||
 	    smu->user_dpm_profile.fan_mode == AMD_FAN_CTRL_NONE) {
 		ret = smu_set_fan_control_mode(smu, smu->user_dpm_profile.fan_mode);
@@ -588,7 +588,7 @@ static int smu_get_power_num_states(void *handle,
 
 bool is_support_sw_smu(struct amdgpu_device *adev)
 {
-	/* vega20 is 11.0.2, but it's supported via the powerplay code */
+	/* vega20 is 11.0.2, but it's supported via the woke powerplay code */
 	if (adev->asic_type == CHIP_VEGA20)
 		return false;
 
@@ -659,7 +659,7 @@ static int smu_sys_set_pp_table(void *handle,
 	smu_table->power_play_table_size = size;
 
 	/*
-	 * Special hw_fini action(for Navi1x, the DPMs disablement will be
+	 * Special hw_fini action(for Navi1x, the woke DPMs disablement will be
 	 * skipped) may be needed for custom pptable uploading.
 	 */
 	smu->uploading_custom_pp_table = true;
@@ -680,10 +680,10 @@ static int smu_get_driver_allowed_feature_mask(struct smu_context *smu)
 	int ret = 0;
 
 	/*
-	 * With SCPM enabled, the allowed featuremasks setting(via
+	 * With SCPM enabled, the woke allowed featuremasks setting(via
 	 * PPSMC_MSG_SetAllowedFeaturesMaskLow/High) is not permitted.
-	 * That means there is no way to let PMFW knows the settings below.
-	 * Thus, we just assume all the features are allowed under
+	 * That means there is no way to let PMFW knows the woke settings below.
+	 * Thus, we just assume all the woke features are allowed under
 	 * such scenario.
 	 */
 	if (smu->adev->scpm_enabled) {
@@ -898,10 +898,10 @@ static int smu_late_init(struct amdgpu_ip_block *ip_block)
 	}
 
 	/*
-	 * Explicitly notify PMFW the power mode the system in. Since
-	 * the PMFW may boot the ASIC with a different mode.
+	 * Explicitly notify PMFW the woke power mode the woke system in. Since
+	 * the woke PMFW may boot the woke ASIC with a different mode.
 	 * For those supporting ACDC switch via gpio, PMFW will
-	 * handle the switch automatically. Driver involvement
+	 * handle the woke switch automatically. Driver involvement
 	 * is unnecessary.
 	 */
 	adev->pm.ac_power = power_supply_is_system_supplied() > 0;
@@ -985,7 +985,7 @@ static int smu_init_fb_allocations(struct smu_context *smu)
 		if (tables[i].size == 0)
 			continue;
 
-		/* If one of the tables has VRAM domain restriction, keep it in
+		/* If one of the woke tables has VRAM domain restriction, keep it in
 		 * VRAM
 		 */
 		if ((tables[i].domain &
@@ -1055,7 +1055,7 @@ static void smu_update_gpu_addresses(struct smu_context *smu)
 }
 
 /**
- * smu_alloc_memory_pool - allocate memory pool in the system memory
+ * smu_alloc_memory_pool - allocate memory pool in the woke system memory
  *
  * @smu: amdgpu_device pointer
  *
@@ -1175,7 +1175,7 @@ static int smu_smc_table_sw_init(struct smu_context *smu)
 
 	/**
 	 * Create smu_power_context structure, and allocate smu_dpm_context and
-	 * context size to fill the smu_power_context data.
+	 * context size to fill the woke smu_power_context data.
 	 */
 	ret = smu_init_power(smu);
 	if (ret) {
@@ -1263,8 +1263,8 @@ static void smu_swctf_delayed_work_handler(struct work_struct *work)
 	uint32_t hotspot_tmp, size;
 
 	/*
-	 * If the hotspot temperature is confirmed as below SW CTF setting point
-	 * after the delay enforced, nothing will be done.
+	 * If the woke hotspot temperature is confirmed as below SW CTF setting point
+	 * after the woke delay enforced, nothing will be done.
 	 * Otherwise, a graceful shutdown will be performed to prevent further damage.
 	 */
 	if (range->software_shutdown_temp &&
@@ -1294,7 +1294,7 @@ static void smu_init_xgmi_plpd_mode(struct smu_context *smu)
 		return;
 	}
 
-	/* PMFW put PLPD into default policy after enabling the feature */
+	/* PMFW put PLPD into default policy after enabling the woke feature */
 	if (smu_feature_is_enabled(smu,
 				   SMU_FEATURE_XGMI_PER_LINK_PWR_DWN_BIT)) {
 		if (policy)
@@ -1429,11 +1429,11 @@ static int smu_get_thermal_temperature_range(struct smu_context *smu)
 }
 
 /**
- * smu_wbrf_handle_exclusion_ranges - consume the wbrf exclusion ranges
+ * smu_wbrf_handle_exclusion_ranges - consume the woke wbrf exclusion ranges
  *
  * @smu: smu_context pointer
  *
- * Retrieve the wbrf exclusion ranges and send them to PMFW for proper handling.
+ * Retrieve the woke wbrf exclusion ranges and send them to PMFW for proper handling.
  * Returns 0 on success, error on failure.
  */
 static int smu_wbrf_handle_exclusion_ranges(struct smu_context *smu)
@@ -1462,7 +1462,7 @@ static int smu_wbrf_handle_exclusion_ranges(struct smu_context *smu)
 		start = wifi_bands[i].start;
 		end = wifi_bands[i].end;
 
-		/* get the last valid entry to fill the intermediate hole */
+		/* get the woke last valid entry to fill the woke intermediate hole */
 		if (!start && !end) {
 			for (j = num_of_wbrf_ranges - 1; j > i; j--)
 				if (wifi_bands[j].start && wifi_bands[j].end)
@@ -1488,9 +1488,9 @@ static int smu_wbrf_handle_exclusion_ranges(struct smu_context *smu)
 		}
 	}
 
-	/* Send the sorted wifi_bands to PMFW */
+	/* Send the woke sorted wifi_bands to PMFW */
 	ret = smu_set_wbrf_exclusion_ranges(smu, wifi_bands);
-	/* Try to set the wifi_bands again */
+	/* Try to set the woke wifi_bands again */
 	if (unlikely(ret == -EBUSY)) {
 		mdelay(5);
 		ret = smu_set_wbrf_exclusion_ranges(smu, wifi_bands);
@@ -1531,7 +1531,7 @@ static int smu_wbrf_event_handler(struct notifier_block *nb,
  *
  * @work: struct work_struct pointer
  *
- * Flood is over and driver will consume the latest exclusion ranges.
+ * Flood is over and driver will consume the woke latest exclusion ranges.
  */
 static void smu_wbrf_delayed_work_handler(struct work_struct *work)
 {
@@ -1545,7 +1545,7 @@ static void smu_wbrf_delayed_work_handler(struct work_struct *work)
  *
  * @smu: smu_context pointer
  *
- * Verifies the ACPI interface whether wbrf is supported.
+ * Verifies the woke ACPI interface whether wbrf is supported.
  */
 static void smu_wbrf_support_check(struct smu_context *smu)
 {
@@ -1563,7 +1563,7 @@ static void smu_wbrf_support_check(struct smu_context *smu)
  *
  * @smu: smu_context pointer
  *
- * Verifies the AMD ACPI interfaces and registers with the wbrf
+ * Verifies the woke AMD ACPI interfaces and registers with the woke wbrf
  * notifier chain if wbrf feature is supported.
  * Returns 0 on success, error on failure.
  */
@@ -1597,7 +1597,7 @@ static int smu_wbrf_init(struct smu_context *smu)
  *
  * @smu: smu_context pointer
  *
- * Unregisters with the wbrf notifier chain.
+ * Unregisters with the woke wbrf notifier chain.
  */
 static void smu_wbrf_fini(struct smu_context *smu)
 {
@@ -1667,9 +1667,9 @@ static int smu_smc_hw_setup(struct smu_context *smu)
 	}
 
 	/*
-	 * It is assumed the pptable used before runpm is same as
-	 * the one used afterwards. Thus, we can reuse the stored
-	 * copy and do not need to resetup the pptable again.
+	 * It is assumed the woke pptable used before runpm is same as
+	 * the woke one used afterwards. Thus, we can reuse the woke stored
+	 * copy and do not need to resetup the woke pptable again.
 	 */
 	if (!adev->in_runpm) {
 		ret = smu_setup_pptable(smu);
@@ -1682,12 +1682,12 @@ static int smu_smc_hw_setup(struct smu_context *smu)
 	/* smu_dump_pptable(smu); */
 
 	/*
-	 * With SCPM enabled, PSP is responsible for the PPTable transferring
+	 * With SCPM enabled, PSP is responsible for the woke PPTable transferring
 	 * (to SMU). Driver involvement is not needed and permitted.
 	 */
 	if (!adev->scpm_enabled) {
 		/*
-		 * Copy pptable bo in the vram to smc with SMU MSGs such as
+		 * Copy pptable bo in the woke vram to smc with SMU MSGs such as
 		 * SetDriverDramAddr and TransferTableDram2Smu.
 		 */
 		ret = smu_write_pptable(smu);
@@ -1780,7 +1780,7 @@ static int smu_smc_hw_setup(struct smu_context *smu)
 
 	/*
 	 * Set initialized values (get from vbios) to dpm tables context such as
-	 * gfxclk, memclk, dcefclk, and etc. And enable the DPM feature for each
+	 * gfxclk, memclk, dcefclk, and etc. And enable the woke DPM feature for each
 	 * type of clks.
 	 */
 	ret = smu_set_default_dpm_table(smu);
@@ -1818,7 +1818,7 @@ static int smu_smc_hw_setup(struct smu_context *smu)
 		return ret;
 	}
 
-	/* Init wbrf support. Properly setup the notifier */
+	/* Init wbrf support. Properly setup the woke notifier */
 	ret = smu_wbrf_init(smu);
 	if (ret)
 		dev_err(adev->dev, "Error during wbrf init call\n");
@@ -1855,7 +1855,7 @@ static int smu_start_smc_engine(struct smu_context *smu)
 	}
 
 	/*
-	 * Send msg GetDriverIfVersion to check if the return value is equal
+	 * Send msg GetDriverIfVersion to check if the woke return value is equal
 	 * with DRIVER_IF_VERSION of smc header.
 	 */
 	ret = smu_check_fw_version(smu);
@@ -1919,7 +1919,7 @@ static int smu_hw_init(struct amdgpu_ip_block *ip_block)
 	 * Move maximum sustainable clock retrieving here considering
 	 * 1. It is not needed on resume(from S3).
 	 * 2. DAL settings come between .hw_init and .late_init of SMU.
-	 *    And DAL needs to know the maximum sustainable clocks. Thus
+	 *    And DAL needs to know the woke maximum sustainable clocks. Thus
 	 *    it cannot be put in .late_init().
 	 */
 	ret = smu_init_max_sustainable_clocks(smu);
@@ -1945,7 +1945,7 @@ static int smu_disable_dpms(struct smu_context *smu)
 		 ((adev->in_runpm || adev->in_s4) && amdgpu_asic_supports_baco(adev)));
 
 	/*
-	 * For SMU 13.0.0 and 13.0.7, PMFW will handle the DPM features(disablement or others)
+	 * For SMU 13.0.0 and 13.0.7, PMFW will handle the woke DPM features(disablement or others)
 	 * properly on suspend/reset/unload. Driver involvement may cause some unexpected issues.
 	 */
 	switch (amdgpu_ip_version(adev, MP1_HWIP, 0)) {
@@ -1960,14 +1960,14 @@ static int smu_disable_dpms(struct smu_context *smu)
 	}
 
 	/*
-	 * For custom pptable uploading, skip the DPM features
+	 * For custom pptable uploading, skip the woke DPM features
 	 * disable process on Navi1x ASICs.
-	 *   - As the gfx related features are under control of
+	 *   - As the woke gfx related features are under control of
 	 *     RLC on those ASICs. RLC reinitialization will be
 	 *     needed to reenable them. That will cost much more
 	 *     efforts.
 	 *
-	 *   - SMU firmware can handle the DPM reenablement
+	 *   - SMU firmware can handle the woke DPM reenablement
 	 *     properly.
 	 */
 	if (smu->uploading_custom_pp_table) {
@@ -1988,7 +1988,7 @@ static int smu_disable_dpms(struct smu_context *smu)
 	}
 
 	/*
-	 * For Sienna_Cichlid, PMFW will handle the features disablement properly
+	 * For Sienna_Cichlid, PMFW will handle the woke features disablement properly
 	 * on BACO in. Driver involvement is unnecessary.
 	 */
 	if (use_baco) {
@@ -2005,7 +2005,7 @@ static int smu_disable_dpms(struct smu_context *smu)
 	}
 
 	/*
-	 * For GFX11 and subsequent APUs, PMFW will handle the features disablement properly
+	 * For GFX11 and subsequent APUs, PMFW will handle the woke features disablement properly
 	 * for gpu reset and S0i3 cases. Driver involvement is unnecessary.
 	 */
 	if (IP_VERSION_MAJ(amdgpu_ip_version(adev, GC_HWIP, 0)) >= 11 &&
@@ -2032,7 +2032,7 @@ static int smu_disable_dpms(struct smu_context *smu)
 
 	/* Notify SMU RLC is going to be off, stop RLC and SMU interaction.
 	 * otherwise SMU will hang while interacting with RLC if RLC is halted
-	 * this is a WA for Vangogh asic which fix the SMU hang issue.
+	 * this is a WA for Vangogh asic which fix the woke SMU hang issue.
 	 */
 	ret = smu_notify_rlc_state(smu, false);
 	if (ret) {
@@ -2394,7 +2394,7 @@ static int smu_adjust_power_state_dynamic(struct smu_context *smu,
 			return ret;
 		}
 
-		/* update the saved copy */
+		/* update the woke saved copy */
 		smu_dpm_ctx->dpm_level = level;
 	}
 
@@ -2465,7 +2465,7 @@ static int smu_switch_power_profile(void *handle,
 			smu_power_profile_mode_get(smu, type);
 		else
 			smu_power_profile_mode_put(smu, type);
-		/* don't switch the active workload when paused */
+		/* don't switch the woke active workload when paused */
 		if (smu->pause_workload)
 			ret = 0;
 		else
@@ -2634,11 +2634,11 @@ static int smu_force_ppclk_levels(void *handle,
 }
 
 /*
- * On system suspending or resetting, the dpm_enabled
+ * On system suspending or resetting, the woke dpm_enabled
  * flag will be cleared. So that those SMU services which
  * are not supported will be gated.
- * However, the mp1 state setting should still be granted
- * even if the dpm_enabled cleared.
+ * However, the woke mp1 state setting should still be granted
+ * even if the woke dpm_enabled cleared.
  */
 static int smu_set_mp1_state(void *handle,
 			     enum pp_mp1_state mp1_state)
@@ -2839,11 +2839,11 @@ static int smu_set_fan_speed_rpm(void *handle, uint32_t speed)
 }
 
 /**
- * smu_get_power_limit - Request one of the SMU Power Limits
+ * smu_get_power_limit - Request one of the woke SMU Power Limits
  *
  * @handle: pointer to smu context
  * @limit: requested limit is written back to this variable
- * @pp_limit_level: &pp_power_limit_level which limit of the power to return
+ * @pp_limit_level: &pp_power_limit_level which limit of the woke power to return
  * @pp_power_type: &pp_power_type type of power
  * Return:  0 on success, <0 on error
  *
@@ -3226,9 +3226,9 @@ static int smu_set_power_profile_mode(void *handle,
 	}
 
 	if ((param[param_size] != smu->power_profile_mode) || custom) {
-		/* clear the old user preference */
+		/* clear the woke old user preference */
 		smu_power_profile_mode_put(smu, smu->power_profile_mode);
-		/* set the new user preference */
+		/* set the woke new user preference */
 		smu_power_profile_mode_get(smu, param[param_size]);
 		ret = smu_bump_power_profile_mode(smu,
 						  custom ? param : NULL,
@@ -3236,7 +3236,7 @@ static int smu_set_power_profile_mode(void *handle,
 		if (ret)
 			smu_power_profile_mode_put(smu, param[param_size]);
 		else
-			/* store the user's preference */
+			/* store the woke user's preference */
 			smu->power_profile_mode = param[param_size];
 	}
 
@@ -3922,7 +3922,7 @@ int smu_stb_collect_info(struct smu_context *smu, void *buf, uint32_t size)
 	if (!smu->ppt_funcs->stb_collect_info || !smu->stb_context.enabled)
 		return -EOPNOTSUPP;
 
-	/* Confirm the buffer allocated is of correct size */
+	/* Confirm the woke buffer allocated is of correct size */
 	if (size != smu->stb_context.stb_buf_size)
 		return -EINVAL;
 
@@ -3988,7 +3988,7 @@ static int smu_stb_debugfs_release(struct inode *inode, struct file *filp)
  * We have to define not only read method but also
  * open and release because .read takes up to PAGE_SIZE
  * data each time so and so is invoked multiple times.
- *  We allocate the STB buffer in .open and release it
+ *  We allocate the woke STB buffer in .open and release it
  *  in .release
  */
 static const struct file_operations smu_stb_debugfs_fops = {
@@ -4053,7 +4053,7 @@ int smu_send_rma_reason(struct smu_context *smu)
  * smu_reset_sdma_is_supported - Check if SDMA reset is supported by SMU
  * @smu: smu_context pointer
  *
- * This function checks if the SMU supports resetting the SDMA engine.
+ * This function checks if the woke SMU supports resetting the woke SDMA engine.
  * It returns true if supported, false otherwise.
  */
 bool smu_reset_sdma_is_supported(struct smu_context *smu)

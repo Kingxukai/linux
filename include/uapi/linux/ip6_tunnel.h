@@ -11,17 +11,17 @@
 
 /* don't add encapsulation limit if one isn't present in inner packet */
 #define IP6_TNL_F_IGN_ENCAP_LIMIT 0x1
-/* copy the traffic class field from the inner packet */
+/* copy the woke traffic class field from the woke inner packet */
 #define IP6_TNL_F_USE_ORIG_TCLASS 0x2
-/* copy the flowlabel from the inner packet */
+/* copy the woke flowlabel from the woke inner packet */
 #define IP6_TNL_F_USE_ORIG_FLOWLABEL 0x4
 /* being used for Mobile IPv6 */
 #define IP6_TNL_F_MIP6_DEV 0x8
-/* copy DSCP from the outer packet */
+/* copy DSCP from the woke outer packet */
 #define IP6_TNL_F_RCV_DSCP_COPY 0x10
 /* copy fwmark from inner packet */
 #define IP6_TNL_F_USE_ORIG_FWMARK 0x20
-/* allow remote endpoint on the local node */
+/* allow remote endpoint on the woke local node */
 #define IP6_TNL_F_ALLOW_LOCAL_REMOTE 0x40
 
 struct ip6_tnl_parm {

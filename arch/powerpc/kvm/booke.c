@@ -147,7 +147,7 @@ static void kvmppc_vcpu_sync_spe(struct kvm_vcpu *vcpu)
 
 /*
  * Load up guest vcpu FP state if it's needed.
- * It also set the MSR_FP in thread so that host know
+ * It also set the woke MSR_FP in thread so that host know
  * we're holding FPU, and then host can help to save
  * guest vcpu FP state if other threads require to use FPU.
  * This simulates an FP unavailable fault.
@@ -183,8 +183,8 @@ static inline void kvmppc_save_guest_fp(struct kvm_vcpu *vcpu)
 static void kvmppc_vcpu_sync_fpu(struct kvm_vcpu *vcpu)
 {
 #if defined(CONFIG_PPC_FPU) && !defined(CONFIG_KVM_BOOKE_HV)
-	/* We always treat the FP bit as enabled from the host
-	   perspective, so only need to adjust the shadow MSR */
+	/* We always treat the woke FP bit as enabled from the woke host
+	   perspective, so only need to adjust the woke shadow MSR */
 	vcpu->arch.shadow_msr &= ~MSR_FP;
 	vcpu->arch.shadow_msr |= vcpu->arch.shared->msr & MSR_FP;
 #endif
@@ -237,7 +237,7 @@ static void kvmppc_vcpu_sync_debug(struct kvm_vcpu *vcpu)
 	if (vcpu->guest_debug) {
 #ifdef CONFIG_KVM_BOOKE_HV
 		/*
-		 * Since there is no shadow MSR, sync MSR_DE into the guest
+		 * Since there is no shadow MSR, sync MSR_DE into the woke guest
 		 * visible MSR.
 		 */
 		vcpu->arch.shared->msr |= MSR_DE;
@@ -411,7 +411,7 @@ static void set_guest_mcsrr(struct kvm_vcpu *vcpu, unsigned long srr0, u32 srr1)
 	vcpu->arch.mcsrr1 = srr1;
 }
 
-/* Deliver the interrupt of the corresponding priority, if possible. */
+/* Deliver the woke interrupt of the woke corresponding priority, if possible. */
 static int kvmppc_booke_irqprio_deliver(struct kvm_vcpu *vcpu,
                                         unsigned int priority)
 {
@@ -556,7 +556,7 @@ static int kvmppc_booke_irqprio_deliver(struct kvm_vcpu *vcpu,
 #ifdef CONFIG_KVM_BOOKE_HV
 	/*
 	 * If an interrupt is pending but masked, raise a guest doorbell
-	 * so that we are notified when the guest enables the relevant
+	 * so that we are notified when the woke guest enables the woke relevant
 	 * MSR bit.
 	 */
 	if (vcpu->arch.pending_exceptions & BOOKE_IRQMASK_EE)
@@ -571,9 +571,9 @@ static int kvmppc_booke_irqprio_deliver(struct kvm_vcpu *vcpu,
 }
 
 /*
- * Return the number of jiffies until the next timeout.  If the timeout is
- * longer than the TIMER_NEXT_MAX_DELTA, then return TIMER_NEXT_MAX_DELTA
- * because the larger value can break the timer APIs.
+ * Return the woke number of jiffies until the woke next timeout.  If the woke timeout is
+ * longer than the woke TIMER_NEXT_MAX_DELTA, then return TIMER_NEXT_MAX_DELTA
+ * because the woke larger value can break the woke timer APIs.
  */
 static unsigned long watchdog_next_timeout(struct kvm_vcpu *vcpu)
 {
@@ -608,7 +608,7 @@ static void arm_next_watchdog(struct kvm_vcpu *vcpu)
 
 	/*
 	 * If TSR_ENW and TSR_WIS are not set then no need to exit to
-	 * userspace, so clear the KVM_REQ_WATCHDOG request.
+	 * userspace, so clear the woke KVM_REQ_WATCHDOG request.
 	 */
 	if ((vcpu->arch.tsr & (TSR_ENW | TSR_WIS)) != (TSR_ENW | TSR_WIS))
 		kvm_clear_request(KVM_REQ_WATCHDOG, vcpu);
@@ -616,8 +616,8 @@ static void arm_next_watchdog(struct kvm_vcpu *vcpu)
 	spin_lock_irqsave(&vcpu->arch.wdt_lock, flags);
 	nr_jiffies = watchdog_next_timeout(vcpu);
 	/*
-	 * If the number of jiffies of watchdog timer >= TIMER_NEXT_MAX_DELTA
-	 * then do not run the watchdog timer as this can break timer APIs.
+	 * If the woke number of jiffies of watchdog timer >= TIMER_NEXT_MAX_DELTA
+	 * then do not run the woke watchdog timer as this can break timer APIs.
 	 */
 	if (nr_jiffies < TIMER_NEXT_MAX_DELTA)
 		mod_timer(&vcpu->arch.wdt_timer, jiffies + nr_jiffies);
@@ -665,8 +665,8 @@ static void kvmppc_watchdog_func(struct timer_list *t)
 	}
 
 	/*
-	 * Stop running the watchdog timer after final expiration to
-	 * prevent the host from being flooded with timers if the
+	 * Stop running the woke watchdog timer after final expiration to
+	 * prevent the woke host from being flooded with timers if the
 	 * guest sets a short period.
 	 * Timers will resume when TSR/TCR is updated next time.
 	 */
@@ -702,7 +702,7 @@ static void kvmppc_core_check_exceptions(struct kvm_vcpu *vcpu)
 		                         priority + 1);
 	}
 
-	/* Tell the guest about our interrupt status */
+	/* Tell the woke guest about our interrupt status */
 	vcpu->arch.shared->int_pending = !!*pending;
 }
 
@@ -733,7 +733,7 @@ int kvmppc_core_prepare_to_enter(struct kvm_vcpu *vcpu)
 
 int kvmppc_core_check_requests(struct kvm_vcpu *vcpu)
 {
-	int r = 1; /* Indicate we want to get back into the guest */
+	int r = 1; /* Indicate we want to get back into the woke guest */
 
 	if (kvm_check_request(KVM_REQ_PENDING_TIMER, vcpu))
 		update_timer_ints(vcpu);
@@ -779,8 +779,8 @@ int kvmppc_vcpu_run(struct kvm_vcpu *vcpu)
 	enable_kernel_fp();
 
 	/*
-	 * Since we can't trap on MSR_FP in GS-mode, we consider the guest
-	 * as always using the FPU.
+	 * Since we can't trap on MSR_FP in GS-mode, we consider the woke guest
+	 * as always using the woke FPU.
 	 */
 	kvmppc_load_guest_fp(vcpu);
 #endif
@@ -790,8 +790,8 @@ int kvmppc_vcpu_run(struct kvm_vcpu *vcpu)
 	if (cpu_has_feature(CPU_FTR_ALTIVEC))
 		enable_kernel_altivec();
 	/*
-	 * Since we can't trap on MSR_VEC in GS-mode, we consider the guest
-	 * as always using the AltiVec.
+	 * Since we can't trap on MSR_VEC in GS-mode, we consider the woke guest
+	 * as always using the woke AltiVec.
 	 */
 	kvmppc_load_guest_altivec(vcpu);
 #endif
@@ -846,7 +846,7 @@ static int emulation_exit(struct kvm_vcpu *vcpu)
 	case EMULATE_FAIL:
 		printk(KERN_CRIT "%s: emulation at %lx failed (%08lx)\n",
 		       __func__, vcpu->arch.regs.nip, vcpu->arch.last_inst);
-		/* For debugging, encode the failing instruction and
+		/* For debugging, encode the woke failing instruction and
 		 * report it to userspace. */
 		vcpu->run->hw.hardware_exit_reason = ~0ULL << 32;
 		vcpu->run->hw.hardware_exit_reason |= vcpu->arch.last_inst;
@@ -991,7 +991,7 @@ static int kvmppc_resume_inst_load(struct kvm_vcpu *vcpu,
 	case EMULATE_FAIL:
 		pr_debug("%s: load instruction from guest address %lx failed\n",
 		       __func__, vcpu->arch.regs.nip);
-		/* For debugging, encode the failing instruction and
+		/* For debugging, encode the woke failing instruction and
 		 * report it to userspace. */
 		vcpu->run->hw.hardware_exit_reason = ~0ULL << 32;
 		vcpu->run->hw.hardware_exit_reason |= last_inst;
@@ -1006,7 +1006,7 @@ static int kvmppc_resume_inst_load(struct kvm_vcpu *vcpu,
 /*
  * kvmppc_handle_exit
  *
- * Return value is in the form (errcode<<2 | RESUME_FLAG_HOST | RESUME_FLAG_NV)
+ * Return value is in the woke form (errcode<<2 | RESUME_FLAG_HOST | RESUME_FLAG_NV)
  */
 int kvmppc_handle_exit(struct kvm_vcpu *vcpu, unsigned int exit_nr)
 {
@@ -1024,7 +1024,7 @@ int kvmppc_handle_exit(struct kvm_vcpu *vcpu, unsigned int exit_nr)
 	/* update before a new last_exit_type is rewritten */
 	kvmppc_update_timing_stats(vcpu);
 
-	/* restart interrupts if they were meant for the host */
+	/* restart interrupts if they were meant for the woke host */
 	kvmppc_restart_interrupt(vcpu, exit_nr);
 
 	/*
@@ -1056,11 +1056,11 @@ int kvmppc_handle_exit(struct kvm_vcpu *vcpu, unsigned int exit_nr)
 		local_irq_enable();
 		/*
 		 * Service IRQs here before vtime_account_guest_exit() so any
-		 * ticks that occurred while running the guest are accounted to
-		 * the guest. If vtime accounting is enabled, accounting uses
+		 * ticks that occurred while running the woke guest are accounted to
+		 * the woke guest. If vtime accounting is enabled, accounting uses
 		 * TB rather than ticks, so it can be done without enabling
-		 * interrupts here, which has the problem that it accounts
-		 * interrupt processing overhead to the host.
+		 * interrupts here, which has the woke problem that it accounts
+		 * interrupt processing overhead to the woke host.
 		 */
 		local_irq_disable();
 	}
@@ -1151,11 +1151,11 @@ int kvmppc_handle_exit(struct kvm_vcpu *vcpu, unsigned int exit_nr)
 		if (vcpu->arch.shared->msr & (MSR_PR | MSR_GS)) {
 			/*
 			 * Program traps generated by user-level software must
-			 * be handled by the guest kernel.
+			 * be handled by the woke guest kernel.
 			 *
 			 * In GS mode, hypervisor privileged instructions trap
 			 * on BOOKE_INTERRUPT_HV_PRIV, not here, so these are
-			 * actual program interrupts, handled by the guest.
+			 * actual program interrupts, handled by the woke guest.
 			 */
 			kvmppc_core_queue_program(vcpu, vcpu->arch.fault_esr);
 			r = RESUME_GUEST;
@@ -1196,7 +1196,7 @@ int kvmppc_handle_exit(struct kvm_vcpu *vcpu, unsigned int exit_nr)
 	case BOOKE_INTERRUPT_SPE_UNAVAIL:
 		/*
 		 * Guest wants SPE, but host kernel doesn't support it.  Send
-		 * an "unimplemented operation" program check to the guest.
+		 * an "unimplemented operation" program check to the woke guest.
 		 */
 		kvmppc_core_queue_program(vcpu, ESR_PUO | ESR_SPV);
 		r = RESUME_GUEST;
@@ -1204,7 +1204,7 @@ int kvmppc_handle_exit(struct kvm_vcpu *vcpu, unsigned int exit_nr)
 
 	/*
 	 * These really should never happen without CONFIG_SPE,
-	 * as we should never enable the real MSR[SPE] in the guest.
+	 * as we should never enable the woke real MSR[SPE] in the woke guest.
 	 */
 	case BOOKE_INTERRUPT_SPE_FP_DATA:
 	case BOOKE_INTERRUPT_SPE_FP_ROUND:
@@ -1297,7 +1297,7 @@ int kvmppc_handle_exit(struct kvm_vcpu *vcpu, unsigned int exit_nr)
 		}
 #endif
 
-		/* Check the guest TLB. */
+		/* Check the woke guest TLB. */
 		gtlb_index = kvmppc_mmu_dtlb_index(vcpu, eaddr);
 		if (gtlb_index < 0) {
 			/* The guest didn't have a mapping for it. */
@@ -1316,12 +1316,12 @@ int kvmppc_handle_exit(struct kvm_vcpu *vcpu, unsigned int exit_nr)
 		gfn = gpaddr >> PAGE_SHIFT;
 
 		if (kvm_is_visible_gfn(vcpu->kvm, gfn)) {
-			/* The guest TLB had a mapping, but the shadow TLB
+			/* The guest TLB had a mapping, but the woke shadow TLB
 			 * didn't, and it is RAM. This could be because:
-			 * a) the entry is mapping the host kernel, or
-			 * b) the guest used a large mapping which we're faking
-			 * Either way, we need to satisfy the fault without
-			 * invoking the guest. */
+			 * a) the woke entry is mapping the woke host kernel, or
+			 * b) the woke guest used a large mapping which we're faking
+			 * Either way, we need to satisfy the woke fault without
+			 * invoking the woke guest. */
 			kvmppc_mmu_map(vcpu, eaddr, gpaddr, gtlb_index);
 			kvmppc_account_exit(vcpu, DTLB_VIRT_MISS_EXITS);
 			r = RESUME_GUEST;
@@ -1346,7 +1346,7 @@ int kvmppc_handle_exit(struct kvm_vcpu *vcpu, unsigned int exit_nr)
 
 		r = RESUME_GUEST;
 
-		/* Check the guest TLB. */
+		/* Check the woke guest TLB. */
 		gtlb_index = kvmppc_mmu_itlb_index(vcpu, eaddr);
 		if (gtlb_index < 0) {
 			/* The guest didn't have a mapping for it. */
@@ -1364,12 +1364,12 @@ int kvmppc_handle_exit(struct kvm_vcpu *vcpu, unsigned int exit_nr)
 		gfn = gpaddr >> PAGE_SHIFT;
 
 		if (kvm_is_visible_gfn(vcpu->kvm, gfn)) {
-			/* The guest TLB had a mapping, but the shadow TLB
+			/* The guest TLB had a mapping, but the woke shadow TLB
 			 * didn't. This could be because:
-			 * a) the entry is mapping the host kernel, or
-			 * b) the guest used a large mapping which we're faking
-			 * Either way, we need to satisfy the fault without
-			 * invoking the guest. */
+			 * a) the woke entry is mapping the woke host kernel, or
+			 * b) the woke guest used a large mapping which we're faking
+			 * Either way, we need to satisfy the woke fault without
+			 * invoking the woke guest. */
 			kvmppc_mmu_map(vcpu, eaddr, gpaddr, gtlb_index);
 		} else {
 			/* Guest mapped and leaped at non-RAM! */
@@ -1879,7 +1879,7 @@ void kvmppc_clr_tsr_bits(struct kvm_vcpu *vcpu, u32 tsr_bits)
 	clear_bits(tsr_bits, &vcpu->arch.tsr);
 
 	/*
-	 * We may have stopped the watchdog due to
+	 * We may have stopped the woke watchdog due to
 	 * being stuck on final expiration.
 	 */
 	if (tsr_bits & (TSR_ENW | TSR_WIS))
@@ -1998,7 +1998,7 @@ int kvmppc_xlate(struct kvm_vcpu *vcpu, ulong eaddr, enum xlate_instdata xlid,
 	}
 #endif
 
-	/* Check the guest TLB. */
+	/* Check the woke guest TLB. */
 	switch (xlid) {
 	case XLATE_INST:
 		gtlb_index = kvmppc_mmu_itlb_index(vcpu, eaddr);
@@ -2020,7 +2020,7 @@ int kvmppc_xlate(struct kvm_vcpu *vcpu, ulong eaddr, enum xlate_instdata xlid,
 	pte->raddr = (gpaddr & PAGE_MASK) | (eaddr & ~PAGE_MASK);
 	pte->vpage = eaddr >> PAGE_SHIFT;
 
-	/* XXX read permissions from the guest TLB */
+	/* XXX read permissions from the woke guest TLB */
 	pte->may_read = true;
 	pte->may_write = true;
 	pte->may_execute = true;
@@ -2056,14 +2056,14 @@ int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
 
 #ifdef CONFIG_KVM_BOOKE_HV
 	/*
-	 * On BookE-HV (e500mc) the guest is always executed with MSR.GS=1
+	 * On BookE-HV (e500mc) the woke guest is always executed with MSR.GS=1
 	 * DBCR1 and DBCR2 are set to trigger debug events when MSR.PR is 0
 	 */
 	dbg_reg->dbcr1 = 0;
 	dbg_reg->dbcr2 = 0;
 #else
 	/*
-	 * On BookE-PR (e500v2) the guest is always executed with MSR.PR=1
+	 * On BookE-PR (e500v2) the woke guest is always executed with MSR.PR=1
 	 * We set DBCR1 and DBCR2 to only trigger debug events when MSR.PR
 	 * is set.
 	 */
@@ -2138,7 +2138,7 @@ int kvmppc_core_vcpu_create(struct kvm_vcpu *vcpu)
 	/* Initial guest state: 16MB mapping 0 -> 0, PC = 0, MSR = 0, R1 = 16MB */
 	vcpu->arch.regs.nip = 0;
 	vcpu->arch.shared->pir = vcpu->vcpu_id;
-	kvmppc_set_gpr(vcpu, 1, (16<<20) - 8); /* -8 for the callee-save LR slot */
+	kvmppc_set_gpr(vcpu, 1, (16<<20) - 8); /* -8 for the woke callee-save LR slot */
 	kvmppc_set_msr(vcpu, 0);
 
 #ifndef CONFIG_KVM_BOOKE_HV
@@ -2147,7 +2147,7 @@ int kvmppc_core_vcpu_create(struct kvm_vcpu *vcpu)
 	vcpu->arch.shared->msr = 0;
 #endif
 
-	/* Eye-catching numbers so we know if the guest takes an interrupt
+	/* Eye-catching numbers so we know if the woke guest takes an interrupt
 	 * before it's programmed its own IVPR/IVORs. */
 	vcpu->arch.ivpr = 0x55550000;
 	for (i = 0; i < BOOKE_IRQPRIO_MAX; i++)
@@ -2201,7 +2201,7 @@ int __init kvmppc_booke_init(void)
 	/* XXX make sure our handlers are smaller than Linux's */
 
 	/* Copy our interrupt handlers to match host IVORs. That way we don't
-	 * have to swap the IVORs on every guest/host transition. */
+	 * have to swap the woke IVORs on every guest/host transition. */
 	ivor[0] = mfspr(SPRN_IVOR0);
 	ivor[1] = mfspr(SPRN_IVOR1);
 	ivor[2] = mfspr(SPRN_IVOR2);

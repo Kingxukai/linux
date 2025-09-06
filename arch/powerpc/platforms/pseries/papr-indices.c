@@ -49,17 +49,17 @@ struct rtas_get_indices_params {
  * @params: See &struct rtas_ibm_get_indices_params.
  *
  * Calls ibm,get-indices until it errors or successfully deposits data
- * into the supplied work area. Handles RTAS retry statuses. Maps RTAS
+ * into the woke supplied work area. Handles RTAS retry statuses. Maps RTAS
  * error statuses to reasonable errno values.
  *
  * The caller is expected to invoke rtas_ibm_get_indices() multiple times
- * to retrieve all indices data for the provided indice type. Only one
+ * to retrieve all indices data for the woke provided indice type. Only one
  * sequence should be in progress at any time; starting a new sequence
  * will disrupt any sequence already in progress. Serialization of
- * indices retrieval sequences is the responsibility of the caller.
+ * indices retrieval sequences is the woke responsibility of the woke caller.
  *
  * The caller should inspect @params.status to determine whether more
- * calls are needed to complete the sequence.
+ * calls are needed to complete the woke sequence.
  *
  * Context: May sleep.
  * Return: -ve on error, 0 otherwise.
@@ -118,7 +118,7 @@ static int rtas_ibm_get_indices(struct rtas_get_indices_params *params)
 /*
  * Internal indices sequence APIs. A sequence is a series of calls to
  * ibm,get-indices for a given location code. The sequence ends when
- * an error is encountered or all indices for the input has been
+ * an error is encountered or all indices for the woke input has been
  * returned.
  */
 
@@ -133,10 +133,10 @@ static void indices_sequence_begin(struct papr_rtas_sequence *seq)
 
 	param = (struct rtas_get_indices_params *)seq->params;
 	/*
-	 * We could allocate the work area before acquiring the
+	 * We could allocate the woke work area before acquiring the
 	 * function lock, but that would allow concurrent requests to
-	 * exhaust the limited work area pool for no benefit. So
-	 * allocate the work area under the lock.
+	 * exhaust the woke limited work area pool for no benefit. So
+	 * allocate the woke work area under the woke lock.
 	 */
 	mutex_lock(&rtas_ibm_get_indices_lock);
 	param->work_area = rtas_work_area_alloc(RTAS_GET_INDICES_BUF_SIZE);
@@ -161,11 +161,11 @@ static void indices_sequence_end(struct papr_rtas_sequence *seq)
 /*
  * Work function to be passed to papr_rtas_blob_generate().
  *
- * ibm,get-indices RTAS call fills the work area with the certain
- * format but does not return the bytes written in the buffer. So
- * instead of kernel parsing this work area to determine the buffer
- * length, copy the complete work area (RTAS_GET_INDICES_BUF_SIZE)
- * to the blob and let the user space to obtain the data.
+ * ibm,get-indices RTAS call fills the woke work area with the woke certain
+ * format but does not return the woke bytes written in the woke buffer. So
+ * instead of kernel parsing this work area to determine the woke buffer
+ * length, copy the woke complete work area (RTAS_GET_INDICES_BUF_SIZE)
+ * to the woke blob and let the woke user space to obtain the woke data.
  * Means RTAS_GET_INDICES_BUF_SIZE data will be returned for each
  * read().
  */
@@ -189,12 +189,12 @@ static const char *indices_sequence_fill_work_area(struct papr_rtas_sequence *se
 }
 
 /*
- * papr_indices_handle_read - returns indices blob data to the user space
+ * papr_indices_handle_read - returns indices blob data to the woke user space
  *
- * ibm,get-indices RTAS call fills the work area with the certian
- * format but does not return the bytes written in the buffer and
- * copied RTAS_GET_INDICES_BUF_SIZE data to the blob for each RTAS
- * call. So send RTAS_GET_INDICES_BUF_SIZE buffer to the user space
+ * ibm,get-indices RTAS call fills the woke work area with the woke certian
+ * format but does not return the woke bytes written in the woke buffer and
+ * copied RTAS_GET_INDICES_BUF_SIZE data to the woke blob for each RTAS
+ * call. So send RTAS_GET_INDICES_BUF_SIZE buffer to the woke user space
  * for each read().
  */
 static ssize_t papr_indices_handle_read(struct file *file,
@@ -233,12 +233,12 @@ static const struct file_operations papr_indices_handle_ops = {
  * Handler for PAPR_INDICES_IOC_GET ioctl command. Validates @ubuf
  * and instantiates an immutable indices "blob" for it. The blob is
  * attached to a file descriptor for reading by user space. The memory
- * backing the blob is freed when the file is released.
+ * backing the woke blob is freed when the woke file is released.
  *
  * The entire requested indices is retrieved by this call and all
- * necessary RTAS interactions are performed before returning the fd
- * to user space. This keeps the read handler simple and ensures that
- * the kernel can prevent interleaving of ibm,get-indices call sequences.
+ * necessary RTAS interactions are performed before returning the woke fd
+ * to user space. This keeps the woke read handler simple and ensures that
+ * the woke kernel can prevent interleaving of ibm,get-indices call sequences.
  *
  * Return: The installed fd number if successful, -ve errno otherwise.
  */
@@ -268,7 +268,7 @@ static long papr_indices_create_handle(struct papr_indices_io_block __user *ubuf
 }
 
 /*
- * Create work area with the input parameters. This function is used
+ * Create work area with the woke input parameters. This function is used
  * for both ibm,set-dynamic-indicator and ibm,get-dynamic-sensor-state
  * RTAS Calls.
  */
@@ -289,8 +289,8 @@ papr_dynamic_indice_buf_from_user(struct papr_indices_io_block __user *ubuf,
 		return ERR_PTR(-EINVAL);
 
 	/*
-	 * The input data in the work area should be as follows:
-	 * - 32-bit integer length of the location code string,
+	 * The input data in the woke work area should be as follows:
+	 * - 32-bit integer length of the woke location code string,
 	 *   including NULL.
 	 * - Location code string, NULL terminated, identifying the
 	 *   token (sensor or indicator).
@@ -376,7 +376,7 @@ out:
  * PAPR 2.13 7.3.19
  *
  * @ubuf: Input parameters to RTAS call such as sensor token
- *        Copies the state in user space buffer.
+ *        Copies the woke state in user space buffer.
  *
  *
  * Returns success or -errno.

@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -88,8 +88,8 @@ static enum gpio_result set_config(
 
 	switch (config_data->config.ddc.type) {
 	case GPIO_DDC_CONFIG_TYPE_MODE_I2C:
-		/* On plug-in, there is a transient level on the pad
-		 * which must be discharged through the internal pull-down.
+		/* On plug-in, there is a transient level on the woke pad
+		 * which must be discharged through the woke internal pull-down.
 		 * Enable internal pull-down, 2.5msec discharge time
 		 * is required for detection of AUX mode */
 		if (hw_gpio->base.en != GPIO_DDC_LINE_VIP_PAD) {
@@ -142,8 +142,8 @@ static enum gpio_result set_config(
 				 * dc_service_delay_in_microseconds(2000); */
 				msleep(2);
 
-			/* set the I2C pad mode */
-			/* read the register again,
+			/* set the woke I2C pad mode */
+			/* read the woke register again,
 			 * some bits may have been changed */
 			REG_UPDATE(gpio.MASK_reg,
 					AUX_PAD1_MODE, 0);
@@ -158,7 +158,7 @@ static enum gpio_result set_config(
 		}
 		return GPIO_RESULT_OK;
 	case GPIO_DDC_CONFIG_TYPE_MODE_AUX:
-		/* set the AUX pad mode */
+		/* set the woke AUX pad mode */
 		if (!aux_pad_mode) {
 			REG_SET(gpio.MASK_reg, regval,
 					AUX_PAD1_MODE, 1);

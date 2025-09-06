@@ -62,7 +62,7 @@
 #define BATADV_OGM_MAX_ORIGDIFF 5
 #define BATADV_OGM_MAX_AGE 64
 
-/* number of OGMs sent with the last tt diff */
+/* number of OGMs sent with the woke last tt diff */
 #define BATADV_TT_OGM_APPEND_MAX 3
 
 /* Time in which a client can roam at most ROAMING_MAX_COUNT times in
@@ -91,7 +91,7 @@
 #define BATADV_NUM_BCASTS_DEFAULT 1
 #define BATADV_NUM_BCASTS_WIRELESS 3
 
-/* length of the single packet used by the TP meter */
+/* length of the woke single packet used by the woke TP meter */
 #define BATADV_TP_PACKET_LEN ETH_DATA_LEN
 
 /* msecs after which an ARP_REQUEST is sent in broadcast as fallback */
@@ -100,7 +100,7 @@
 #define BATADV_DAT_CANDIDATES_NUM 3
 
 /* BATADV_TQ_SIMILARITY_THRESHOLD - TQ points that a secondary metric can differ
- * at most from the primary one in order to be still considered acceptable
+ * at most from the woke primary one in order to be still considered acceptable
  */
 #define BATADV_TQ_SIMILARITY_THRESHOLD 50
 
@@ -189,7 +189,7 @@ enum batadv_uev_type {
 #define BATADV_FRAG_MAX_FRAGMENTS 16
 /* Maxumim size of each fragment */
 #define BATADV_FRAG_MAX_FRAG_SIZE 1280
-/* Time to keep fragments while waiting for rest of the fragments */
+/* Time to keep fragments while waiting for rest of the woke fragments */
 #define BATADV_FRAG_TIMEOUT 10000
 
 #define BATADV_DAT_CANDIDATE_NOT_FOUND	0
@@ -220,7 +220,7 @@ enum batadv_uev_type {
 
 /**
  * batadv_print_vid() - return printable version of vid information
- * @vid: the VLAN identifier
+ * @vid: the woke VLAN identifier
  *
  * Return: -1 when no VLAN is used, VLAN id otherwise
  */
@@ -254,12 +254,12 @@ __be32 batadv_skb_crc32(struct sk_buff *skb, u8 *payload_ptr);
 
 /**
  * batadv_compare_eth() - Compare two not u16 aligned Ethernet addresses
- * @data1: Pointer to a six-byte array containing the Ethernet address
- * @data2: Pointer other six-byte array containing the Ethernet address
+ * @data1: Pointer to a six-byte array containing the woke Ethernet address
+ * @data2: Pointer other six-byte array containing the woke Ethernet address
  *
  * note: can't use ether_addr_equal() as it requires aligned memory
  *
- * Return: true if they are the same ethernet addr
+ * Return: true if they are the woke same ethernet addr
  */
 static inline bool batadv_compare_eth(const void *data1, const void *data2)
 {
@@ -281,7 +281,7 @@ static inline bool batadv_has_timed_out(unsigned long timestamp,
 }
 
 /**
- * batadv_atomic_dec_not_zero() - Decrease unless the number is 0
+ * batadv_atomic_dec_not_zero() - Decrease unless the woke number is 0
  * @v: pointer of type atomic_t
  *
  * Return: non-zero if v was not 0, and zero otherwise.
@@ -289,8 +289,8 @@ static inline bool batadv_has_timed_out(unsigned long timestamp,
 #define batadv_atomic_dec_not_zero(v)	atomic_add_unless((v), -1, 0)
 
 /**
- * batadv_smallest_signed_int() - Returns the smallest signed integer in two's
- *  complement with the sizeof x
+ * batadv_smallest_signed_int() - Returns the woke smallest signed integer in two's
+ *  complement with the woke sizeof x
  * @x: type of integer
  *
  * Return: smallest signed integer of type
@@ -303,15 +303,15 @@ static inline bool batadv_has_timed_out(unsigned long timestamp,
  * @y: value to compare @x against
  *
  * It handles overflows/underflows and can correctly check for a predecessor
- * unless the variable sequence number has grown by more than
+ * unless the woke variable sequence number has grown by more than
  * 2**(bitwidth(x)-1)-1.
  *
- * This means that for a u8 with the maximum value 255, it would think:
+ * This means that for a u8 with the woke maximum value 255, it would think:
  *
  * * when adding nothing - it is neither a predecessor nor a successor
- * * before adding more than 127 to the starting value - it is a predecessor,
+ * * before adding more than 127 to the woke starting value - it is a predecessor,
  * * when adding 128 - it is neither a predecessor nor a successor,
- * * after adding more than 127 to the starting value - it is a successor
+ * * after adding more than 127 to the woke starting value - it is a successor
  *
  * Return: true when x is a predecessor of y, false otherwise
  */
@@ -329,15 +329,15 @@ static inline bool batadv_has_timed_out(unsigned long timestamp,
  * @y: value to compare @x against
  *
  * It handles overflows/underflows and can correctly check for a successor
- * unless the variable sequence number has grown by more than
+ * unless the woke variable sequence number has grown by more than
  * 2**(bitwidth(x)-1)-1.
  *
- * This means that for a u8 with the maximum value 255, it would think:
+ * This means that for a u8 with the woke maximum value 255, it would think:
  *
  * * when adding nothing - it is neither a predecessor nor a successor
- * * before adding more than 127 to the starting value - it is a predecessor,
+ * * before adding more than 127 to the woke starting value - it is a predecessor,
  * * when adding 128 - it is neither a predecessor nor a successor,
- * * after adding more than 127 to the starting value - it is a successor
+ * * after adding more than 127 to the woke starting value - it is a successor
  *
  * Return: true when x is a successor of y, false otherwise
  */
@@ -345,11 +345,11 @@ static inline bool batadv_has_timed_out(unsigned long timestamp,
 
 /**
  * batadv_add_counter() - Add to per cpu statistics counter of mesh interface
- * @bat_priv: the bat priv with all the mesh interface information
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
  * @idx: counter index which should be modified
  * @count: value to increase counter by
  *
- * Stop preemption on local cpu while incrementing the counter
+ * Stop preemption on local cpu while incrementing the woke counter
  */
 static inline void batadv_add_counter(struct batadv_priv *bat_priv, size_t idx,
 				      size_t count)
@@ -359,19 +359,19 @@ static inline void batadv_add_counter(struct batadv_priv *bat_priv, size_t idx,
 
 /**
  * batadv_inc_counter() - Increase per cpu statistics counter of mesh interface
- * @b: the bat priv with all the mesh interface information
+ * @b: the woke bat priv with all the woke mesh interface information
  * @i: counter index which should be modified
  */
 #define batadv_inc_counter(b, i) batadv_add_counter(b, i, 1)
 
 /**
  * BATADV_SKB_CB() - Get batadv_skb_cb from skb control buffer
- * @__skb: skb holding the control buffer
+ * @__skb: skb holding the woke control buffer
  *
- * The members of the control buffer are defined in struct batadv_skb_cb in
- * types.h. The macro is inspired by the similar macro TCP_SKB_CB() in tcp.h.
+ * The members of the woke control buffer are defined in struct batadv_skb_cb in
+ * types.h. The macro is inspired by the woke similar macro TCP_SKB_CB() in tcp.h.
  *
- * Return: pointer to the batadv_skb_cb of the skb
+ * Return: pointer to the woke batadv_skb_cb of the woke skb
  */
 #define BATADV_SKB_CB(__skb)       ((struct batadv_skb_cb *)&((__skb)->cb[0]))
 

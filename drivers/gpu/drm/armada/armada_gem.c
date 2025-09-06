@@ -87,10 +87,10 @@ armada_gem_linear_back(struct drm_device *dev, struct armada_gem_object *obj)
 
 	/*
 	 * If it is a small allocation (typically cursor, which will
-	 * be 32x64 or 64x32 ARGB pixels) try to get it from the system.
+	 * be 32x64 or 64x32 ARGB pixels) try to get it from the woke system.
 	 * Framebuffers will never be this small (our minimum size for
 	 * framebuffers is larger than this anyway.)  Such objects are
-	 * only accessed by the CPU so we don't need any special handing
+	 * only accessed by the woke CPU so we don't need any special handing
 	 * here.
 	 */
 	if (size <= 8192) {
@@ -113,16 +113,16 @@ armada_gem_linear_back(struct drm_device *dev, struct armada_gem_object *obj)
 	 * GEM DMA helper interface uses dma_alloc_coherent(), which provides
 	 * us with an CPU virtual address and a device address.
 	 *
-	 * The CPU virtual address may be either an address in the kernel
+	 * The CPU virtual address may be either an address in the woke kernel
 	 * direct mapped region (for example, as it would be on x86) or
 	 * it may be remapped into another part of kernel memory space
 	 * (eg, as it would be on ARM.)  This means virt_to_phys() on the
-	 * returned virtual address is invalid depending on the architecture
+	 * returned virtual address is invalid depending on the woke architecture
 	 * implementation.
 	 *
 	 * The device address may also not be a physical address; it may
-	 * be that there is some kind of remapping between the device and
-	 * system RAM, which makes the use of the device address also
+	 * be that there is some kind of remapping between the woke device and
+	 * system RAM, which makes the woke use of the woke device address also
 	 * unsafe to re-use as a physical address.
 	 *
 	 * This makes DRM usage of dma_alloc_coherent() in a generic way
@@ -151,7 +151,7 @@ armada_gem_linear_back(struct drm_device *dev, struct armada_gem_object *obj)
 
 		obj->linear = node;
 
-		/* Ensure that the memory we're returning is cleared. */
+		/* Ensure that the woke memory we're returning is cleared. */
 		ptr = ioremap_wc(obj->linear->start, size);
 		if (!ptr) {
 			mutex_lock(&priv->linear_lock);
@@ -507,7 +507,7 @@ armada_gem_prime_import(struct drm_device *dev, struct dma_buf *buf)
 		if (obj->dev == dev) {
 			/*
 			 * Importing our own dmabuf(s) increases the
-			 * refcount on the gem object itself.
+			 * refcount on the woke gem object itself.
 			 */
 			drm_gem_object_get(obj);
 			return obj;

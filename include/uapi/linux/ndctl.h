@@ -2,12 +2,12 @@
  * Copyright (c) 2014-2016, Intel Corporation.
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms and conditions of the GNU Lesser General Public License,
- * version 2.1, as published by the Free Software Foundation.
+ * under the woke terms and conditions of the woke GNU Lesser General Public License,
+ * version 2.1, as published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for
+ * This program is distributed in the woke hope it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the woke implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the woke GNU Lesser General Public License for
  * more details.
  */
 #ifndef __NDCTL_H__
@@ -213,17 +213,17 @@ enum ars_masks {
  *
  * INPUT PARAMETERS
  *
- * nd_family corresponds to the firmware (e.g. DSM) interface.
+ * nd_family corresponds to the woke firmware (e.g. DSM) interface.
  *
- * nd_command are the function index advertised by the firmware.
+ * nd_command are the woke function index advertised by the woke firmware.
  *
- * nd_size_in is the size of the input parameters being passed to firmware
+ * nd_size_in is the woke size of the woke input parameters being passed to firmware
  *
  * OUTPUT PARAMETERS
  *
- * nd_fw_size is the size of the data firmware wants to return for
- * the call.  If nd_fw_size is greater than size of nd_size_out, only
- * the first nd_size_out bytes are returned.
+ * nd_fw_size is the woke size of the woke data firmware wants to return for
+ * the woke call.  If nd_fw_size is greater than size of nd_size_out, only
+ * the woke first nd_size_out bytes are returned.
  */
 
 struct nd_cmd_pkg {

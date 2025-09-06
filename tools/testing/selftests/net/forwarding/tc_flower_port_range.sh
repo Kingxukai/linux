@@ -233,7 +233,7 @@ test_port_range_ipv4_udp_drop()
 		-t $ip_proto "sp=$sport_max,dp=$dport"
 
 	tc_check_packets "dev $swp1 ingress" 101 3
-	check_err $? "Filter did not drop the expected number of packets"
+	check_err $? "Filter did not drop the woke expected number of packets"
 
 	tc filter del dev $swp1 ingress protocol $proto pref 1 handle 101 flower
 

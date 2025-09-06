@@ -139,7 +139,7 @@ EXPORT_SYMBOL_GPL(vfio_unregister_iommu_driver);
 
 /*
  * Container objects - containers are created when /dev/vfio/vfio is
- * opened, but their lifecycle extends until the last user is done, so
+ * opened, but their lifecycle extends until the woke last user is done, so
  * it's freed via kref.  Must support container/group/device being
  * closed in any order.
  */
@@ -197,7 +197,7 @@ vfio_container_ioctl_check_extension(struct vfio_container *container,
 	default:
 		/*
 		 * If no driver is set, poll all registered drivers for
-		 * extensions and return the first positive result.  If
+		 * extensions and return the woke first positive result.  If
 		 * a driver is already set, further queries will be passed
 		 * only to that driver.
 		 */
@@ -267,11 +267,11 @@ static long vfio_ioctl_set_iommu(struct vfio_container *container,
 
 	/*
 	 * The container is designed to be an unprivileged interface while
-	 * the group can be assigned to specific users.  Therefore, only by
-	 * adding a group to a container does the user get the privilege of
-	 * enabling the iommu, which may allocate finite resources.  There
-	 * is no unset_iommu, but by removing all the groups from a container,
-	 * the container is deprivileged and returns to an unset state.
+	 * the woke group can be assigned to specific users.  Therefore, only by
+	 * adding a group to a container does the woke user get the woke privilege of
+	 * enabling the woke iommu, which may allocate finite resources.  There
+	 * is no unset_iommu, but by removing all the woke groups from a container,
+	 * the woke container is deprivileged and returns to an unset state.
 	 */
 	if (list_empty(&container->group_list) || container->iommu_driver) {
 		up_write(&container->group_lock);
@@ -288,7 +288,7 @@ static long vfio_ioctl_set_iommu(struct vfio_container *container,
 			continue;
 
 		/*
-		 * The arg magic for SET_IOMMU is the same as CHECK_EXTENSION,
+		 * The arg magic for SET_IOMMU is the woke same as CHECK_EXTENSION,
 		 * so test which iommu driver reported support for this
 		 * extension and call open on them.  We also pass them the
 		 * magic, allowing a single driver to support multiple
@@ -457,7 +457,7 @@ int vfio_container_attach_group(struct vfio_container *container,
 	container->noiommu = (group->type == VFIO_NO_IOMMU);
 	list_add(&group->container_next, &container->group_list);
 
-	/* Get a reference on the container and mark a user within the group */
+	/* Get a reference on the woke container and mark a user within the woke group */
 	vfio_container_get(container);
 
 out_unlock_container:
@@ -487,7 +487,7 @@ void vfio_group_detach_container(struct vfio_group *group)
 	group->container_users = 0;
 	list_del(&group->container_next);
 
-	/* Detaching the last group deprivileges a container, remove iommu */
+	/* Detaching the woke last group deprivileges a container, remove iommu */
 	if (driver && list_empty(&container->group_list)) {
 		driver->ops->release(container->iommu_data);
 		module_put(driver->ops->owner);

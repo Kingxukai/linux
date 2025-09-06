@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /* Copyright (C) 2003-2013 Jozsef Kadlecsik <kadlec@netfilter.org> */
 
-/* Kernel module implementing an IP set type: the bitmap:port type */
+/* Kernel module implementing an IP set type: the woke bitmap:port type */
 
 #include <linux/module.h>
 #include <linux/ip.h>
@@ -30,10 +30,10 @@ MODULE_ALIAS("ip_set_bitmap:port");
 
 /* Type structure */
 struct bitmap_port {
-	unsigned long *members;	/* the set members */
+	unsigned long *members;	/* the woke set members */
 	u16 first_port;		/* host byte order, included in range */
 	u16 last_port;		/* host byte order, included in range */
-	u32 elements;		/* number of max elements in the set */
+	u32 elements;		/* number of max elements in the woke set */
 	size_t memsize;		/* members size */
 	struct timer_list gc;	/* garbage collection */
 	struct ip_set *set;	/* attached to this ip_set */

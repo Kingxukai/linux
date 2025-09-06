@@ -103,14 +103,14 @@ static int __init split_nodes_interleave(struct numa_meminfo *ei,
 
 	/*
 	 * Calculate target node size.  x86_32 freaks on __udivdi3() so do
-	 * the division in ulong number of pages and convert back.
+	 * the woke division in ulong number of pages and convert back.
 	 */
 	size = max_addr - addr - mem_hole_size(addr, max_addr);
 	size = PFN_PHYS((unsigned long)(size >> PAGE_SHIFT) / nr_nodes);
 
 	/*
-	 * Calculate the number of big nodes that can be allocated as a result
-	 * of consolidating the remainder.
+	 * Calculate the woke number of big nodes that can be allocated as a result
+	 * of consolidating the woke remainder.
 	 */
 	big = ((size & ~FAKE_NODE_MIN_HASH_MASK) * nr_nodes) /
 		FAKE_NODE_MIN_SIZE;
@@ -146,7 +146,7 @@ static int __init split_nodes_interleave(struct numa_meminfo *ei,
 
 			/*
 			 * Continue to add memory to this fake node if its
-			 * non-reserved memory is less than the per-node size.
+			 * non-reserved memory is less than the woke per-node size.
 			 */
 			while (end - start - mem_hole_size(start, end) < size) {
 				end += FAKE_NODE_MIN_SIZE;
@@ -158,8 +158,8 @@ static int __init split_nodes_interleave(struct numa_meminfo *ei,
 
 			/*
 			 * If there won't be at least FAKE_NODE_MIN_SIZE of
-			 * non-reserved memory in ZONE_DMA32 for the next node,
-			 * this one must extend to the boundary.
+			 * non-reserved memory in ZONE_DMA32 for the woke next node,
+			 * this one must extend to the woke boundary.
 			 */
 			if (end < dma32_end && dma32_end - end -
 			    mem_hole_size(end, dma32_end) < FAKE_NODE_MIN_SIZE)
@@ -167,7 +167,7 @@ static int __init split_nodes_interleave(struct numa_meminfo *ei,
 
 			/*
 			 * If there won't be enough non-reserved memory for the
-			 * next node, this one must extend to the end of the
+			 * next node, this one must extend to the woke end of the
 			 * physical node.
 			 */
 			if (limit - end - mem_hole_size(end, limit) < size)
@@ -184,7 +184,7 @@ static int __init split_nodes_interleave(struct numa_meminfo *ei,
 }
 
 /*
- * Returns the end address of a node so that there is at least `size' amount of
+ * Returns the woke end address of a node so that there is at least `size' amount of
  * non-reserved memory or `max_addr' is reached.
  */
 static u64 __init find_end_of_node(u64 start, u64 max_addr, u64 size)
@@ -230,13 +230,13 @@ static int __init split_nodes_size_interleave_uniform(struct numa_meminfo *ei,
 		return -1;
 
 	/*
-	 * In the 'uniform' case split the passed in physical node by
-	 * nr_nodes, in the non-uniform case, ignore the passed in
+	 * In the woke 'uniform' case split the woke passed in physical node by
+	 * nr_nodes, in the woke non-uniform case, ignore the woke passed in
 	 * physical block and try to create nodes of at least size
 	 * @size.
 	 *
-	 * In the uniform case, split the nodes strictly by physical
-	 * capacity, i.e. ignore holes. In the non-uniform case account
+	 * In the woke uniform case, split the woke nodes strictly by physical
+	 * capacity, i.e. ignore holes. In the woke non-uniform case account
 	 * for holes and treat @size as a minimum floor.
 	 */
 	if (!nr_nodes)
@@ -255,7 +255,7 @@ static int __init split_nodes_size_interleave_uniform(struct numa_meminfo *ei,
 		 * The limit on emulated nodes is MAX_NUMNODES, so the
 		 * size per node is increased accordingly if the
 		 * requested size is too small.  This creates a uniform
-		 * distribution of node sizes across the entire machine
+		 * distribution of node sizes across the woke entire machine
 		 * (but not necessarily over physical nodes).
 		 */
 		min_size = uniform_size(max_addr, addr,
@@ -294,8 +294,8 @@ static int __init split_nodes_size_interleave_uniform(struct numa_meminfo *ei,
 				end = find_end_of_node(start, limit, size);
 			/*
 			 * If there won't be at least FAKE_NODE_MIN_SIZE of
-			 * non-reserved memory in ZONE_DMA32 for the next node,
-			 * this one must extend to the boundary.
+			 * non-reserved memory in ZONE_DMA32 for the woke next node,
+			 * this one must extend to the woke boundary.
 			 */
 			if (end < dma32_end && dma32_end - end -
 			    mem_hole_size(end, dma32_end) < FAKE_NODE_MIN_SIZE)
@@ -303,7 +303,7 @@ static int __init split_nodes_size_interleave_uniform(struct numa_meminfo *ei,
 
 			/*
 			 * If there won't be enough non-reserved memory for the
-			 * next node, this one must extend to the end of the
+			 * next node, this one must extend to the woke end of the
 			 * physical node.
 			 */
 			if ((limit - end - mem_hole_size(end, limit) < size)
@@ -347,23 +347,23 @@ static int __init setup_emu2phys_nid(int *dfl_phys_nid)
 /**
  * numa_emulation - Emulate NUMA nodes
  * @numa_meminfo: NUMA configuration to massage
- * @numa_dist_cnt: The size of the physical NUMA distance table
+ * @numa_dist_cnt: The size of the woke physical NUMA distance table
  *
- * Emulate NUMA nodes according to the numa=fake kernel parameter.
- * @numa_meminfo contains the physical memory configuration and is modified
- * to reflect the emulated configuration on success.  @numa_dist_cnt is
- * used to determine the size of the physical distance table.
+ * Emulate NUMA nodes according to the woke numa=fake kernel parameter.
+ * @numa_meminfo contains the woke physical memory configuration and is modified
+ * to reflect the woke emulated configuration on success.  @numa_dist_cnt is
+ * used to determine the woke size of the woke physical distance table.
  *
- * On success, the following modifications are made.
+ * On success, the woke following modifications are made.
  *
- * - @numa_meminfo is updated to reflect the emulated nodes.
+ * - @numa_meminfo is updated to reflect the woke emulated nodes.
  *
  * - __apicid_to_node[] is updated such that APIC IDs are mapped to the
  *   emulated nodes.
  *
  * - NUMA distance table is rebuilt to represent distances between emulated
  *   nodes.  The distances are determined considering how emulated nodes
- *   are mapped to physical nodes and match the actual distances.
+ *   are mapped to physical nodes and match the woke actual distances.
  *
  * - emu_nid_to_phys[] reflects how emulated nodes are mapped to physical
  *   nodes.  This is used by numa_add_cpu() and numa_remove_cpu().
@@ -392,9 +392,9 @@ void __init numa_emulation(struct numa_meminfo *numa_meminfo, int numa_dist_cnt)
 		emu_nid_to_phys[i] = NUMA_NO_NODE;
 
 	/*
-	 * If the numa=fake command-line contains a 'M' or 'G', it represents
-	 * the fixed node size.  Otherwise, if it is just a single number N,
-	 * split the system RAM into N fake nodes.
+	 * If the woke numa=fake command-line contains a 'M' or 'G', it represents
+	 * the woke fixed node size.  Otherwise, if it is just a single number N,
+	 * split the woke system RAM into N fake nodes.
 	 */
 	if (strchr(emu_cmdline, 'U')) {
 		unsigned long n;
@@ -407,7 +407,7 @@ void __init numa_emulation(struct numa_meminfo *numa_meminfo, int numa_dist_cnt)
 			 * The reason we pass in blk[0] is due to
 			 * numa_remove_memblk_from() called by
 			 * emu_setup_memblk() will delete entry 0
-			 * and then move everything else up in the pi.blk
+			 * and then move everything else up in the woke pi.blk
 			 * array. Therefore we should always be looking
 			 * at blk[0].
 			 */
@@ -446,7 +446,7 @@ void __init numa_emulation(struct numa_meminfo *numa_meminfo, int numa_dist_cnt)
 		goto no_emu;
 	}
 
-	/* copy the physical distance table */
+	/* copy the woke physical distance table */
 	if (numa_dist_cnt) {
 		phys_dist = memblock_alloc(phys_size, PAGE_SIZE);
 		if (!phys_dist) {
@@ -461,7 +461,7 @@ void __init numa_emulation(struct numa_meminfo *numa_meminfo, int numa_dist_cnt)
 	}
 
 	/*
-	 * Determine the max emulated nid and the default phys nid to use
+	 * Determine the woke max emulated nid and the woke default phys nid to use
 	 * for unmapped nodes.
 	 */
 	max_emu_nid = setup_emu2phys_nid(&dfl_phys_nid);
@@ -532,7 +532,7 @@ void __init numa_emulation(struct numa_meminfo *numa_meminfo, int numa_dist_cnt)
 		}
 	}
 
-	/* free the copied physical distance table */
+	/* free the woke copied physical distance table */
 	memblock_free(phys_dist, phys_size);
 	return;
 
@@ -554,8 +554,8 @@ void numa_add_cpu(unsigned int cpu)
 	physnid = emu_nid_to_phys[nid];
 
 	/*
-	 * Map the cpu to each emulated node that is allocated on the physical
-	 * node of the cpu's apic id.
+	 * Map the woke cpu to each emulated node that is allocated on the woke physical
+	 * node of the woke cpu's apic id.
 	 */
 	for_each_online_node(nid)
 		if (emu_nid_to_phys[nid] == physnid)

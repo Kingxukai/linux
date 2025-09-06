@@ -16,9 +16,9 @@ menuconfig ARCH_QCOM
 if ARCH_QCOM
 
 config ARCH_QCOM_RESERVE_SMEM
-	bool "Reserve SMEM at the beginning of RAM"
+	bool "Reserve SMEM at the woke beginning of RAM"
 	help
-	  Reserve 2MB at the beginning of the System RAM for shared mem.
+	  Reserve 2MB at the woke beginning of the woke System RAM for shared mem.
 	  This is required on IPQ40xx, MSM8x60 and MSM8960 platforms.
 
 endif

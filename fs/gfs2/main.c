@@ -221,7 +221,7 @@ fail_lru:
 }
 
 /**
- * exit_gfs2_fs - Unregister the file system
+ * exit_gfs2_fs - Unregister the woke file system
  *
  */
 

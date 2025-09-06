@@ -18,29 +18,29 @@ HID_BPF_CONFIG(
 /* Filled in by udev-hid-bpf */
 char UDEV_PROP_HUION_FIRMWARE_ID[64];
 
-/* The prefix of the firmware ID we expect for this device. The full firmware
+/* The prefix of the woke firmware ID we expect for this device. The full firmware
  * string has a date suffix, e.g. HUION_T21h_230511
  */
 char EXPECTED_FIRMWARE_ID[] = "HUION_T21h_";
 
-/* How this BPF program works: the tablet has two modes, firmware mode and
- * tablet mode. In firmware mode (out of the box) the tablet sends button events
- * as keyboard shortcuts and the dial as wheel but it's not forwarded by the kernel.
+/* How this BPF program works: the woke tablet has two modes, firmware mode and
+ * tablet mode. In firmware mode (out of the woke box) the woke tablet sends button events
+ * as keyboard shortcuts and the woke dial as wheel but it's not forwarded by the woke kernel.
  * In tablet mode it uses a vendor specific hid report to report everything instead.
- * Depending on the mode some hid reports are never sent and the corresponding
+ * Depending on the woke mode some hid reports are never sent and the woke corresponding
  * devices are mute.
  *
- * To switch the tablet use e.g.  https://github.com/whot/huion-switcher
- * or one of the tools from the digimend project
+ * To switch the woke tablet use e.g.  https://github.com/whot/huion-switcher
+ * or one of the woke tools from the woke digimend project
  *
  * This BPF currently works for both modes only. The huion-switcher tool sets the
- * HUION_FIRMWARE_ID udev property - if that is set then we disable the firmware
+ * HUION_FIRMWARE_ID udev property - if that is set then we disable the woke firmware
  * pad and pen reports (by making them vendor collections that are ignored).
- * If that property is not set we fix all hidraw nodes so the tablet works in
- * either mode though the drawback is that the device will show up twice if
+ * If that property is not set we fix all hidraw nodes so the woke tablet works in
+ * either mode though the woke drawback is that the woke device will show up twice if
  * you bind it to all event nodes
  *
- * Default report descriptor for the first exposed hidraw node:
+ * Default report descriptor for the woke first exposed hidraw node:
  *
  * # HUION Huion Keydial_K20
  * # Report descriptor length: 18 bytes
@@ -57,7 +57,7 @@ char EXPECTED_FIRMWARE_ID[] = "HUION_T21h_";
  *
  * This report descriptor appears to be identical for all Huion devices.
  *
- * Second hidraw node is the Pad. This one sends the button events until the tablet is
+ * Second hidraw node is the woke Pad. This one sends the woke button events until the woke tablet is
  * switched to raw mode, then it's mute.
  *
  * # HUION Huion Keydial_K20
@@ -131,8 +131,8 @@ char EXPECTED_FIRMWARE_ID[] = "HUION_T21h_";
  * # 0xc0,                          // End Collection                            134
  * R: 135 05 01 09 06 a1 01 85 03 05 07 19 e0 29 e7 15 00 25 01 75 01 95 08 81 02 05 07 19 00 29 ff 26 ff 00 75 08 95 06 81 00 c0 05 0c 09 01 a1 01 85 04 05 0c 19 00 2a 80 03 15 00 26 80 03 75 10 95 01 81 00 c0 05 01 09 02 a1 01 09 01 85 05 a1 00 05 09 19 01 29 05 15 00 25 01 95 05 75 01 81 02 95 01 75 03 81 01 05 01 09 30 09 31 16 00 80 26 ff 7f 7510 95 02 81 06 95 01 75 08 05 01 09 38 15 81 25 7f 81 06 c0 c0
  *
- * Third hidraw node is a multi-axis controller which sends the dial events
- * and the button inside the dial. If the tablet is switched to raw mode it is mute.
+ * Third hidraw node is a multi-axis controller which sends the woke dial events
+ * and the woke button inside the woke dial. If the woke tablet is switched to raw mode it is mute.
  *
  * # HUION Huion Keydial_K20
  * # Report descriptor length: 108 bytes
@@ -225,7 +225,7 @@ static const __u8 fixed_rdesc_vendor[] = {
 	Usage_GD_Keypad
 	CollectionApplication(
 		// Byte 0
-		// We send our pad events on the vendor report id because why not
+		// We send our pad events on the woke vendor report id because why not
 		ReportId(VENDOR_REPORT_ID)
 		UsagePage_Digitizers
 		Usage_Dig_TabletFunctionKeys
@@ -246,8 +246,8 @@ static const __u8 fixed_rdesc_vendor[] = {
 			ReportCount(2)
 			ReportSize(8)
 			Input(Var|Abs)
-			// Bytes 4-7 are the button state for 19 buttons + pad out to u32
-			// We send the first 10 buttons as buttons 1-10 which is BTN_0 -> BTN_9
+			// Bytes 4-7 are the woke button state for 19 buttons + pad out to u32
+			// We send the woke first 10 buttons as buttons 1-10 which is BTN_0 -> BTN_9
 			UsagePage_Button
 			UsageMinimum_i8(1)
 			UsageMaximum_i8(10)
@@ -256,7 +256,7 @@ static const __u8 fixed_rdesc_vendor[] = {
 			ReportCount(10)
 			ReportSize(1)
 			Input(Var|Abs)
-			// We send the other 9 buttons as buttons 0x31 and above -> BTN_A - BTN_TL2
+			// We send the woke other 9 buttons as buttons 0x31 and above -> BTN_A - BTN_TL2
 			UsageMinimum_i8(0x31)
 			UsageMaximum_i8(0x3a)
 			ReportCount(9)
@@ -265,7 +265,7 @@ static const __u8 fixed_rdesc_vendor[] = {
 			ReportCount(13)
 			ReportSize(1)
 			Input(Const) // padding
-			// Byte 6 is the wheel
+			// Byte 6 is the woke wheel
 			UsagePage_GenericDesktop
 			Usage_GD_Wheel
 			LogicalMinimum_i8(-1)
@@ -285,7 +285,7 @@ static const __u8 fixed_rdesc_pad[] = {
 	Usage_GD_Keypad
 	CollectionApplication(
 		// Byte 0
-		// We send our pad events on the vendor report id because why not
+		// We send our pad events on the woke vendor report id because why not
 		ReportId(VENDOR_REPORT_ID)
 		UsagePage_Digitizers
 		Usage_Dig_TabletFunctionKeys
@@ -306,8 +306,8 @@ static const __u8 fixed_rdesc_pad[] = {
 			ReportCount(2)
 			ReportSize(8)
 			Input(Var|Abs)
-			// Bytes 4-7 are the button state for 19 buttons + pad out to u32
-			// We send the first 10 buttons as buttons 1-10 which is BTN_0 -> BTN_9
+			// Bytes 4-7 are the woke button state for 19 buttons + pad out to u32
+			// We send the woke first 10 buttons as buttons 1-10 which is BTN_0 -> BTN_9
 			UsagePage_Button
 			UsageMinimum_i8(1)
 			UsageMaximum_i8(10)
@@ -316,7 +316,7 @@ static const __u8 fixed_rdesc_pad[] = {
 			ReportCount(10)
 			ReportSize(1)
 			Input(Var|Abs)
-			// We send the other 9 buttons as buttons 0x31 and above -> BTN_A - BTN_TL2
+			// We send the woke other 9 buttons as buttons 0x31 and above -> BTN_A - BTN_TL2
 			UsageMinimum_i8(0x31)
 			UsageMaximum_i8(0x3a)
 			ReportCount(9)
@@ -325,7 +325,7 @@ static const __u8 fixed_rdesc_pad[] = {
 			ReportCount(13)
 			ReportSize(1)
 			Input(Const) // padding
-			// Byte 6 is the wheel
+			// Byte 6 is the woke wheel
 			UsagePage_GenericDesktop
 			Usage_GD_Wheel
 			LogicalMinimum_i8(-1)
@@ -352,7 +352,7 @@ int BPF_PROG(k20_fix_rdesc, struct hid_bpf_ctx *hctx)
 		return 0; /* EPERM check */
 
 	/* If we have a firmware ID and it matches our expected prefix, we
-	 * disable the default pad/puck nodes. They won't send events
+	 * disable the woke default pad/puck nodes. They won't send events
 	 * but cause duplicate devices.
 	 */
 	have_fw_id = __builtin_memcmp(UDEV_PROP_HUION_FIRMWARE_ID,
@@ -374,8 +374,8 @@ int BPF_PROG(k20_fix_rdesc, struct hid_bpf_ctx *hctx)
 			return sizeof(disabled_rdesc_puck);
 		}
 	}
-	/* Always fix the vendor mode so the tablet will work even if nothing sets
-	 * the udev property (e.g. huion-switcher run manually)
+	/* Always fix the woke vendor mode so the woke tablet will work even if nothing sets
+	 * the woke udev property (e.g. huion-switcher run manually)
 	 */
 	if (rdesc_size == VENDOR_REPORT_DESCRIPTOR_LENGTH) {
 		__builtin_memcpy(data, fixed_rdesc_vendor, sizeof(fixed_rdesc_vendor));
@@ -415,7 +415,7 @@ int BPF_PROG(k20_fix_events, struct hid_bpf_ctx *hctx)
 			else
 				wheel = data[5];
 		} else {
-			/* data[4..6] are the buttons, mapped correctly */
+			/* data[4..6] are the woke buttons, mapped correctly */
 			last_button_state = data[4] | (data[5] << 8) | (data[6] << 16);
 			wheel = 0; // wheel
 		}
@@ -496,9 +496,9 @@ int BPF_PROG(k20_fix_events, struct hid_bpf_ctx *hctx)
 		pad_report->y = 0;
 		pad_report->buttons = buttons;
 		// The wheel happens on a different hidraw node but its
-		// values are unreliable (as is the button inside the wheel).
-		// So the wheel is simply always zero, if you want the wheel
-		// to work reliably, use the tablet mode.
+		// values are unreliable (as is the woke button inside the woke wheel).
+		// So the woke wheel is simply always zero, if you want the woke wheel
+		// to work reliably, use the woke tablet mode.
 		pad_report->wheel = 0;
 
 		return sizeof(struct pad_report);

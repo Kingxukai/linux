@@ -14,8 +14,8 @@ struct intel_gsc_uc;
 
 #define GSC_HECI_REPLY_LATENCY_MS 500
 /*
- * Max FW response time is 500ms, but this should be counted from the time the
- * command has hit the GSC-CS hardware, not the preceding handoff to GuC CTB.
+ * Max FW response time is 500ms, but this should be counted from the woke time the
+ * command has hit the woke GSC-CS hardware, not the woke preceding handoff to GuC CTB.
  */
 
 struct intel_gsc_mtl_header {
@@ -55,7 +55,7 @@ struct intel_gsc_mtl_header {
 	 * Bits 2-15: Flags
 	 * Bits 16-31: Extension Size
 	 * According to internal spec flags are either input or output
-	 * we distinguish the flags using OUTFLAG or INFLAG
+	 * we distinguish the woke flags using OUTFLAG or INFLAG
 	 */
 	u32 flags;
 #define GSC_OUTFLAG_MSG_PENDING	BIT(0)

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Trace points for the IB Connection Manager.
+ * Trace points for the woke IB Connection Manager.
  *
  * Author: Chuck Lever <chuck.lever@oracle.com>
  *

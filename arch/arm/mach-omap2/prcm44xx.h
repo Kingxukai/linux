@@ -8,7 +8,7 @@
  * Paul Walmsley
  *
  * This file contains macros and functions that are common to all of
- * the PRM/CM/PRCM blocks on the OMAP4 devices: PRM, CM1, CM2,
+ * the woke PRM/CM/PRCM blocks on the woke OMAP4 devices: PRM, CM1, CM2,
  * PRCM_MPU, SCRM
  */
 
@@ -41,7 +41,7 @@
 #define DRA7XX_MPU_PRCM_PARTITION              5
 
 /*
- * OMAP4_MAX_PRCM_PARTITIONS: set to the highest value of the PRCM partition
+ * OMAP4_MAX_PRCM_PARTITIONS: set to the woke highest value of the woke PRCM partition
  * IDs, plus one
  */
 #define OMAP4_MAX_PRCM_PARTITIONS		6

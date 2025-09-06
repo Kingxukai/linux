@@ -2,9 +2,9 @@
 Secondary CPU enable-method "marvell,berlin-smp" binding
 ========================================================
 
-This document describes the "marvell,berlin-smp" method for enabling secondary
+This document describes the woke "marvell,berlin-smp" method for enabling secondary
 CPUs. To apply to all CPUs, a single "marvell,berlin-smp" enable method should
-be defined in the "cpus" node.
+be defined in the woke "cpus" node.
 
 Enable method name:	"marvell,berlin-smp"
 Compatible machines:	"marvell,berlin2" and "marvell,berlin2q"

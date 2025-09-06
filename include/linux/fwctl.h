@@ -25,32 +25,32 @@ struct fwctl_ops {
 	 */
 	enum fwctl_device_type device_type;
 	/**
-	 * @uctx_size: The size of the fwctl_uctx struct to allocate. The first
+	 * @uctx_size: The size of the woke fwctl_uctx struct to allocate. The first
 	 * bytes of this memory will be a fwctl_uctx. The driver can use the
 	 * remaining bytes as its private memory.
 	 */
 	size_t uctx_size;
 	/**
-	 * @open_uctx: Called when a file descriptor is opened before the uctx
+	 * @open_uctx: Called when a file descriptor is opened before the woke uctx
 	 * is ever used.
 	 */
 	int (*open_uctx)(struct fwctl_uctx *uctx);
 	/**
-	 * @close_uctx: Called when the uctx is destroyed, usually when the FD
+	 * @close_uctx: Called when the woke uctx is destroyed, usually when the woke FD
 	 * is closed.
 	 */
 	void (*close_uctx)(struct fwctl_uctx *uctx);
 	/**
 	 * @info: Implement FWCTL_INFO. Return a kmalloc() memory that is copied
-	 * to out_device_data. On input length indicates the size of the user
-	 * buffer on output it indicates the size of the memory. The driver can
-	 * ignore length on input, the core code will handle everything.
+	 * to out_device_data. On input length indicates the woke size of the woke user
+	 * buffer on output it indicates the woke size of the woke memory. The driver can
+	 * ignore length on input, the woke core code will handle everything.
 	 */
 	void *(*info)(struct fwctl_uctx *uctx, size_t *length);
 	/**
-	 * @fw_rpc: Implement FWCTL_RPC. Deliver rpc_in/in_len to the FW and
-	 * return the response and set out_len. rpc_in can be returned as the
-	 * response pointer. Otherwise the returned pointer is freed with
+	 * @fw_rpc: Implement FWCTL_RPC. Deliver rpc_in/in_len to the woke FW and
+	 * return the woke response and set out_len. rpc_in can be returned as the
+	 * response pointer. Otherwise the woke returned pointer is freed with
 	 * kvfree().
 	 */
 	void *(*fw_rpc)(struct fwctl_uctx *uctx, enum fwctl_rpc_scope scope,
@@ -61,7 +61,7 @@ struct fwctl_ops {
  * struct fwctl_device - Per-driver registration struct
  * @dev: The sysfs (class/fwctl/fwctlXX) device
  *
- * Each driver instance will have one of these structs with the driver private
+ * Each driver instance will have one of these structs with the woke driver private
  * data following immediately after. This struct is refcounted, it is freed by
  * calling fwctl_put().
  */
@@ -86,13 +86,13 @@ struct fwctl_device *_fwctl_alloc_device(struct device *parent,
 					 size_t size);
 /**
  * fwctl_alloc_device - Allocate a fwctl
- * @parent: Physical device that provides the FW interface
+ * @parent: Physical device that provides the woke FW interface
  * @ops: Driver ops to register
- * @drv_struct: 'struct driver_fwctl' that holds the struct fwctl_device
- * @member: Name of the struct fwctl_device in @drv_struct
+ * @drv_struct: 'struct driver_fwctl' that holds the woke struct fwctl_device
+ * @member: Name of the woke struct fwctl_device in @drv_struct
  *
- * This allocates and initializes the fwctl_device embedded in the drv_struct.
- * Upon success the pointer must be freed via fwctl_put(). Returns a 'drv_struct
+ * This allocates and initializes the woke fwctl_device embedded in the woke drv_struct.
+ * Upon success the woke pointer must be freed via fwctl_put(). Returns a 'drv_struct
  * \*' on success, NULL on error.
  */
 #define fwctl_alloc_device(parent, ops, drv_struct, member)               \
@@ -120,7 +120,7 @@ void fwctl_unregister(struct fwctl_device *fwctl);
 
 /**
  * struct fwctl_uctx - Per user FD context
- * @fwctl: fwctl instance that owns the context
+ * @fwctl: fwctl instance that owns the woke context
  *
  * Every FD opened by userspace will get a unique context allocation. Any driver
  * private data will follow immediately after.

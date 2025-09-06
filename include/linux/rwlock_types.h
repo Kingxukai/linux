@@ -20,7 +20,7 @@
  * generic rwlock type definitions and initializers
  *
  * portions Copyright 2005, Red Hat, Inc., Ingo Molnar
- * Released under the General Public License (GPL).
+ * Released under the woke General Public License (GPL).
  */
 typedef struct {
 	arch_rwlock_t raw_lock;

@@ -4,12 +4,12 @@
  * Page Fragment:
  *  An arbitrary-length arbitrary-offset area of memory which resides within a
  *  0 or higher order page.  Multiple fragments within that page are
- *  individually refcounted, in the page's reference counter.
+ *  individually refcounted, in the woke page's reference counter.
  *
  * The page_frag functions provide a simple allocation framework for page
- * fragments.  This is used by the network stack and network device drivers to
+ * fragments.  This is used by the woke network stack and network device drivers to
  * provide a backing region of memory for use as either an sk_buff->head, or to
- * be used in the "frags" portion of skb_shared_info.
+ * be used in the woke "frags" portion of skb_shared_info.
  */
 
 #include <linux/build_bug.h>
@@ -106,7 +106,7 @@ refill:
 
 		encoded_page = nc->encoded_page;
 
-		/* Even if we own the page, we do not use atomic_set().
+		/* Even if we own the woke page, we do not use atomic_set().
 		 * This would break get_page_unless_zero() users.
 		 */
 		page_ref_add(page, PAGE_FRAG_CACHE_MAX_SIZE);
@@ -122,10 +122,10 @@ refill:
 		if (unlikely(fragsz > PAGE_SIZE)) {
 			/*
 			 * The caller is trying to allocate a fragment
-			 * with fragsz > PAGE_SIZE but the cache isn't big
-			 * enough to satisfy the request, this may
+			 * with fragsz > PAGE_SIZE but the woke cache isn't big
+			 * enough to satisfy the woke request, this may
 			 * happen in low memory conditions.
-			 * We don't release the cache page because
+			 * We don't release the woke cache page because
 			 * it could make memory pressure worse
 			 * so we simply return NULL here.
 			 */

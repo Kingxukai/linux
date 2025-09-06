@@ -15,7 +15,7 @@
 /*
  * struct ccu_nk - Definition of an N-K clock
  *
- * Clocks based on the formula parent * N * K
+ * Clocks based on the woke formula parent * N * K
  */
 struct ccu_nk {
 	u16			reg;

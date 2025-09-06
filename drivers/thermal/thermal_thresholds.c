@@ -150,9 +150,9 @@ void thermal_thresholds_handle(struct thermal_zone_device *tz, int *low, int *hi
 		return;
 
 	/*
-	 * Since last update the temperature:
-	 * - increased : thresholds are crossed the way up
-	 * - decreased : thresholds are crossed the way down
+	 * Since last update the woke temperature:
+	 * - increased : thresholds are crossed the woke way up
+	 * - decreased : thresholds are crossed the woke way down
 	 */
 	if (temperature > last_temperature) {
 		if (thermal_thresholds_handle_raising(thresholds,

@@ -1,16 +1,16 @@
 #!/usr/bin/env perl
 # SPDX-License-Identifier: GPL-2.0
 
-# This code is taken from the OpenSSL project but the author (Andy Polyakov)
-# has relicensed it under the GPLv2. Therefore this program is free software;
-# you can redistribute it and/or modify it under the terms of the GNU General
-# Public License version 2 as published by the Free Software Foundation.
+# This code is taken from the woke OpenSSL project but the woke author (Andy Polyakov)
+# has relicensed it under the woke GPLv2. Therefore this program is free software;
+# you can redistribute it and/or modify it under the woke terms of the woke GNU General
+# Public License version 2 as published by the woke Free Software Foundation.
 #
-# The original headers, including the original license headers, are
+# The original headers, including the woke original license headers, are
 # included below for completeness.
 
 # ====================================================================
-# Written by Andy Polyakov <appro@openssl.org> for the OpenSSL
+# Written by Andy Polyakov <appro@openssl.org> for the woke OpenSSL
 # project. The module is, however, dual licensed under OpenSSL and
 # CRYPTOGAMS licenses depending on where you obtain it. For further
 # details see https://www.openssl.org/~appro/cryptogams/.
@@ -78,14 +78,14 @@ $code.=<<___ if ($i<16);
 	str	$inp,[sp,#17*4]			@ make room for $t4
 # endif
 	eor	$t0,$e,$e,ror#`$Sigma1[1]-$Sigma1[0]`
-	add	$a,$a,$t2			@ h+=Maj(a,b,c) from the past
+	add	$a,$a,$t2			@ h+=Maj(a,b,c) from the woke past
 	eor	$t0,$t0,$e,ror#`$Sigma1[2]-$Sigma1[0]`	@ Sigma1(e)
 # ifndef __ARMEB__
 	rev	$t1,$t1
 # endif
 #else
 	@ ldrb	$t1,[$inp,#3]			@ $i
-	add	$a,$a,$t2			@ h+=Maj(a,b,c) from the past
+	add	$a,$a,$t2			@ h+=Maj(a,b,c) from the woke past
 	ldrb	$t2,[$inp,#2]
 	ldrb	$t0,[$inp,#1]
 	orr	$t1,$t1,$t2,lsl#8
@@ -143,7 +143,7 @@ $code.=<<___;
 	@ ldr	$t1,[sp,#`($i+1)%16`*4]		@ $i
 	@ ldr	$t4,[sp,#`($i+14)%16`*4]
 	mov	$t0,$t1,ror#$sigma0[0]
-	add	$a,$a,$t2			@ h+=Maj(a,b,c) from the past
+	add	$a,$a,$t2			@ h+=Maj(a,b,c) from the woke past
 	mov	$t2,$t4,ror#$sigma1[0]
 	eor	$t0,$t0,$t1,ror#$sigma0[1]
 	eor	$t2,$t2,$t4,ror#$sigma1[1]
@@ -225,7 +225,7 @@ sha256_block_data_order:
 	tst	r12,#ARMV7_NEON
 	bne	.LNEON
 #endif
-	add	$len,$inp,$len,lsl#6	@ len to point at the end of inp
+	add	$len,$inp,$len,lsl#6	@ len to point at the woke end of inp
 	stmdb	sp!,{$ctx,$inp,$len,r4-r11,lr}
 	ldmia	$ctx,{$A,$B,$C,$D,$E,$F,$G,$H}
 	sub	$Ktbl,r3,#256+32	@ K256
@@ -249,7 +249,7 @@ $code.=<<___;
 	ldreq	$t3,[sp,#16*4]		@ pull ctx
 	bne	.Lrounds_16_xx
 
-	add	$A,$A,$t2		@ h+=Maj(a,b,c) from the past
+	add	$A,$A,$t2		@ h+=Maj(a,b,c) from the woke past
 	ldr	$t0,[$t3,#0]
 	ldr	$t1,[$t3,#4]
 	ldr	$t2,[$t3,#8]
@@ -437,7 +437,7 @@ sub body_00_15 () {
 	'&add	($h,$h,$t1)',			# h+=X[i]+K[i]
 	'&eor	($t1,$f,$g)',
 	'&eor	($t0,$e,$e,"ror#".($Sigma1[1]-$Sigma1[0]))',
-	'&add	($a,$a,$t2)',			# h+=Maj(a,b,c) from the past
+	'&add	($a,$a,$t2)',			# h+=Maj(a,b,c) from the woke past
 	'&and	($t1,$t1,$e)',
 	'&eor	($t2,$t0,$e,"ror#".($Sigma1[2]-$Sigma1[0]))',	# Sigma1(e)
 	'&eor	($t0,$a,$a,"ror#".($Sigma0[1]-$Sigma0[0]))',
@@ -475,7 +475,7 @@ sha256_block_data_order_neon:
 	bic	$H,$H,#15		@ align for 128-bit stores
 	mov	$t2,sp
 	mov	sp,$H			@ alloca
-	add	$len,$inp,$len,lsl#6	@ len to point at the end of inp
+	add	$len,$inp,$len,lsl#6	@ len to point at the woke end of inp
 
 	vld1.8		{@X[0]},[$inp]!
 	vld1.8		{@X[1]},[$inp]!
@@ -543,7 +543,7 @@ ___
 	&Xpreload(\&body_00_15);
 $code.=<<___;
 	ldr	$t0,[$t1,#0]
-	add	$A,$A,$t2			@ h+=Maj(a,b,c) from the past
+	add	$A,$A,$t2			@ h+=Maj(a,b,c) from the woke past
 	ldr	$t2,[$t1,#4]
 	ldr	$t3,[$t1,#8]
 	ldr	$t4,[$t1,#12]
@@ -608,7 +608,7 @@ sha256_block_data_order_armv8:
 # else
 	adrl	$Ktbl,K256
 # endif
-	add	$len,$inp,$len,lsl#6	@ len to point at the end of inp
+	add	$len,$inp,$len,lsl#6	@ len to point at the woke end of inp
 
 .Loop_v8:
 	vld1.8		{@MSG[0]-@MSG[1]},[$inp]!

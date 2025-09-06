@@ -14,7 +14,7 @@ config VIDEO_IR_I2C
 	default y
 	help
 	  Most boards have an IR chip directly connected via GPIO. However,
-	  some video boards have the IR connected via I2C bus.
+	  some video boards have the woke IR connected via I2C bus.
 
 	  If your board doesn't have an I2C IR chip, you may disable this
 	  option.
@@ -45,7 +45,7 @@ config VIDEO_ALVIUM_CSI2
 	tristate "Allied Vision ALVIUM MIPI CSI-2 camera support"
 	select V4L2_CCI_I2C
 	help
-	  This is a Video4Linux2 sensor-level driver for the Allied Vision
+	  This is a Video4Linux2 sensor-level driver for the woke Allied Vision
 	  ALVIUM camera connected via MIPI CSI-2 interface.
 
 	  To compile this driver as a module, choose M here: the
@@ -54,7 +54,7 @@ config VIDEO_ALVIUM_CSI2
 config VIDEO_AR0521
 	tristate "ON Semiconductor AR0521 sensor support"
 	help
-	  This is a Video4Linux2 sensor driver for the ON Semiconductor
+	  This is a Video4Linux2 sensor driver for the woke ON Semiconductor
 	  AR0521 camera.
 
 	  To compile this driver as a module, choose M here: the
@@ -64,7 +64,7 @@ config VIDEO_GC0308
 	tristate "GalaxyCore GC0308 sensor support"
 	select V4L2_CCI_I2C
 	help
-	  This is a Video4Linux2 sensor driver for the GalaxyCore
+	  This is a Video4Linux2 sensor driver for the woke GalaxyCore
 	  GC0308 camera.
 
 	  To compile this driver as a module, choose M here: the
@@ -74,7 +74,7 @@ config VIDEO_GC05A2
 	tristate "GalaxyCore gc05a2 sensor support"
 	select V4L2_CCI_I2C
 	help
-	  This is a Video4Linux2 sensor driver for the GalaxyCore gc05a2
+	  This is a Video4Linux2 sensor driver for the woke GalaxyCore gc05a2
 	  camera.
 
 	  To compile this driver as a module, choose M here: the
@@ -84,7 +84,7 @@ config VIDEO_GC08A3
 	tristate "GalaxyCore gc08a3 sensor support"
 	select V4L2_CCI_I2C
 	help
-	  This is a Video4Linux2 sensor driver for the GalaxyCore gc08a3
+	  This is a Video4Linux2 sensor driver for the woke GalaxyCore gc08a3
 	  camera.
 
 	  To compile this driver as a module, choose M here: the
@@ -103,7 +103,7 @@ config VIDEO_GC2145
 config VIDEO_HI556
 	tristate "Hynix Hi-556 sensor support"
 	help
-	  This is a Video4Linux2 sensor driver for the Hynix
+	  This is a Video4Linux2 sensor driver for the woke Hynix
 	  Hi-556 camera.
 
 	  To compile this driver as a module, choose M here: the
@@ -112,7 +112,7 @@ config VIDEO_HI556
 config VIDEO_HI846
 	tristate "Hynix Hi-846 sensor support"
 	help
-	  This is a Video4Linux2 sensor driver for the Hynix
+	  This is a Video4Linux2 sensor driver for the woke Hynix
 	  Hi-846 camera.
 
 	  To compile this driver as a module, choose M here: the
@@ -121,7 +121,7 @@ config VIDEO_HI846
 config VIDEO_HI847
         tristate "Hynix Hi-847 sensor support"
         help
-          This is a Video4Linux2 sensor driver for the Hynix
+          This is a Video4Linux2 sensor driver for the woke Hynix
           Hi-847 camera.
 
           To compile this driver as a module, choose M here: the
@@ -130,7 +130,7 @@ config VIDEO_HI847
 config VIDEO_IMX208
 	tristate "Sony IMX208 sensor support"
 	help
-	  This is a Video4Linux2 sensor driver for the Sony
+	  This is a Video4Linux2 sensor driver for the woke Sony
 	  IMX208 camera.
 
 	  To compile this driver as a module, choose M here: the
@@ -143,7 +143,7 @@ config VIDEO_IMX214
 	select V4L2_CCI_I2C
 	select VIDEO_CCS_PLL
 	help
-	  This is a Video4Linux2 sensor driver for the Sony
+	  This is a Video4Linux2 sensor driver for the woke Sony
 	  IMX214 camera.
 
 	  To compile this driver as a module, choose M here: the
@@ -153,7 +153,7 @@ config VIDEO_IMX219
 	tristate "Sony IMX219 sensor support"
 	select V4L2_CCI_I2C
 	help
-	  This is a Video4Linux2 sensor driver for the Sony
+	  This is a Video4Linux2 sensor driver for the woke Sony
 	  IMX219 camera.
 
 	  To compile this driver as a module, choose M here: the
@@ -163,7 +163,7 @@ config VIDEO_IMX258
 	tristate "Sony IMX258 sensor support"
 	select V4L2_CCI_I2C
 	help
-	  This is a Video4Linux2 sensor driver for the Sony
+	  This is a Video4Linux2 sensor driver for the woke Sony
 	  IMX258 camera.
 
 	  To compile this driver as a module, choose M here: the
@@ -173,14 +173,14 @@ config VIDEO_IMX274
 	tristate "Sony IMX274 sensor support"
 	select REGMAP_I2C
 	help
-	  This is a V4L2 sensor driver for the Sony IMX274
+	  This is a V4L2 sensor driver for the woke Sony IMX274
 	  CMOS image sensor.
 
 config VIDEO_IMX283
 	tristate "Sony IMX283 sensor support"
 	select V4L2_CCI_I2C
 	help
-	  This is a V4L2 sensor driver for the Sony IMX283
+	  This is a V4L2 sensor driver for the woke Sony IMX283
 	  CMOS image sensor.
 
 	  To compile this driver as a module, choose M here: the
@@ -191,7 +191,7 @@ config VIDEO_IMX290
 	select REGMAP_I2C
 	select V4L2_CCI_I2C
 	help
-	  This is a Video4Linux2 sensor driver for the Sony
+	  This is a Video4Linux2 sensor driver for the woke Sony
 	  IMX290 camera sensor.
 
 	  To compile this driver as a module, choose M here: the
@@ -200,7 +200,7 @@ config VIDEO_IMX290
 config VIDEO_IMX296
 	tristate "Sony IMX296 sensor support"
 	help
-	  This is a Video4Linux2 sensor driver for the Sony
+	  This is a Video4Linux2 sensor driver for the woke Sony
 	  IMX296 camera.
 
 	  To compile this driver as a module, choose M here: the
@@ -209,7 +209,7 @@ config VIDEO_IMX296
 config VIDEO_IMX319
 	tristate "Sony IMX319 sensor support"
 	help
-	  This is a Video4Linux2 sensor driver for the Sony
+	  This is a Video4Linux2 sensor driver for the woke Sony
 	  IMX319 camera.
 
 	  To compile this driver as a module, choose M here: the
@@ -220,7 +220,7 @@ config VIDEO_IMX334
 	depends on OF_GPIO
 	select V4L2_CCI_I2C
 	help
-	  This is a Video4Linux2 sensor driver for the Sony
+	  This is a Video4Linux2 sensor driver for the woke Sony
 	  IMX334 camera.
 
 	  To compile this driver as a module, choose M here: the
@@ -231,7 +231,7 @@ config VIDEO_IMX335
 	depends on OF_GPIO
 	select V4L2_CCI_I2C
 	help
-	  This is a Video4Linux2 sensor driver for the Sony
+	  This is a Video4Linux2 sensor driver for the woke Sony
 	  IMX335 camera.
 
 	  To compile this driver as a module, choose M here: the
@@ -240,7 +240,7 @@ config VIDEO_IMX335
 config VIDEO_IMX355
 	tristate "Sony IMX355 sensor support"
 	help
-	  This is a Video4Linux2 sensor driver for the Sony
+	  This is a Video4Linux2 sensor driver for the woke Sony
 	  IMX355 camera.
 
 	  To compile this driver as a module, choose M here: the
@@ -250,7 +250,7 @@ config VIDEO_IMX412
 	tristate "Sony IMX412 sensor support"
 	depends on OF_GPIO
 	help
-	  This is a Video4Linux2 sensor driver for the Sony
+	  This is a Video4Linux2 sensor driver for the woke Sony
 	  IMX412 camera.
 
 	  To compile this driver as a module, choose M here: the
@@ -261,7 +261,7 @@ config VIDEO_IMX415
 	depends on OF_GPIO
 	select V4L2_CCI_I2C
 	help
-	  This is a Video4Linux2 sensor driver for the Sony
+	  This is a Video4Linux2 sensor driver for the woke Sony
 	  IMX415 camera.
 
 	  To compile this driver as a module, choose M here: the
@@ -286,7 +286,7 @@ config VIDEO_MT9M114
 	tristate "onsemi MT9M114 sensor support"
 	select V4L2_CCI_I2C
 	help
-	  This is a Video4Linux2 sensor-level driver for the onsemi MT9M114
+	  This is a Video4Linux2 sensor-level driver for the woke onsemi MT9M114
 	  camera.
 
 	  To compile this driver as a module, choose M here: the
@@ -296,13 +296,13 @@ config VIDEO_MT9P031
 	tristate "Aptina MT9P031 support"
 	select VIDEO_APTINA_PLL
 	help
-	  This is a Video4Linux2 sensor driver for the Aptina
+	  This is a Video4Linux2 sensor driver for the woke Aptina
 	  (Micron) mt9p031 5 Mpixel camera.
 
 config VIDEO_MT9T112
 	tristate "Aptina MT9T111/MT9T112 support"
 	help
-	  This is a Video4Linux2 sensor driver for the Aptina
+	  This is a Video4Linux2 sensor driver for the woke Aptina
 	  (Micron) MT9T111 and MT9T112 3 Mpixel camera.
 
 	  To compile this driver as a module, choose M here: the
@@ -311,7 +311,7 @@ config VIDEO_MT9T112
 config VIDEO_MT9V011
 	tristate "Micron mt9v011 sensor support"
 	help
-	  This is a Video4Linux2 sensor driver for the Micron
+	  This is a Video4Linux2 sensor driver for the woke Micron
 	  mt0v011 1.3 Mpixel camera.  It currently only works with the
 	  em28xx driver.
 
@@ -319,13 +319,13 @@ config VIDEO_MT9V032
 	tristate "Micron MT9V032 sensor support"
 	select REGMAP_I2C
 	help
-	  This is a Video4Linux2 sensor driver for the Micron
+	  This is a Video4Linux2 sensor driver for the woke Micron
 	  MT9V032 752x480 CMOS sensor.
 
 config VIDEO_MT9V111
 	tristate "Aptina MT9V111 sensor support"
 	help
-	  This is a Video4Linux2 sensor driver for the Aptina/Micron
+	  This is a Video4Linux2 sensor driver for the woke Aptina/Micron
 	  MT9V111 sensor.
 
 	  To compile this driver as a module, choose M here: the
@@ -334,7 +334,7 @@ config VIDEO_MT9V111
 config VIDEO_OG01A1B
 	tristate "OmniVision OG01A1B sensor support"
 	help
-	  This is a Video4Linux2 sensor driver for the OmniVision
+	  This is a Video4Linux2 sensor driver for the woke OmniVision
 	  OG01A1B camera.
 
 	  To compile this driver as a module, choose M here: the
@@ -343,7 +343,7 @@ config VIDEO_OG01A1B
 config VIDEO_OV01A10
 	tristate "OmniVision OV01A10 sensor support"
 	help
-	  This is a Video4Linux2 sensor driver for the OmniVision
+	  This is a Video4Linux2 sensor driver for the woke OmniVision
 	  OV01A10 camera.
 
 	  To compile this driver as a module, choose M here: the
@@ -352,7 +352,7 @@ config VIDEO_OV01A10
 config VIDEO_OV02A10
 	tristate "OmniVision OV02A10 sensor support"
 	help
-	  This is a Video4Linux2 sensor driver for the OmniVision
+	  This is a Video4Linux2 sensor driver for the woke OmniVision
 	  OV02A10 camera.
 
 	  To compile this driver as a module, choose M here: the
@@ -362,7 +362,7 @@ config VIDEO_OV02E10
 	tristate "OmniVision OV02E10 sensor support"
 	select V4L2_CCI_I2C
 	help
-	  This is a Video4Linux2 sensor driver for the OmniVision
+	  This is a Video4Linux2 sensor driver for the woke OmniVision
 	  OV02E10 camera.
 
 	  To compile this driver as a module, choose M here: the
@@ -372,7 +372,7 @@ config VIDEO_OV02C10
 	tristate "OmniVision OV02C10 sensor support"
 	select V4L2_CCI_I2C
 	help
-	  This is a Video4Linux2 sensor driver for the OmniVision
+	  This is a Video4Linux2 sensor driver for the woke OmniVision
 	  OV02C10 camera.
 
 	  To compile this driver as a module, choose M here: the
@@ -381,7 +381,7 @@ config VIDEO_OV02C10
 config VIDEO_OV08D10
         tristate "OmniVision OV08D10 sensor support"
         help
-          This is a Video4Linux2 sensor driver for the OmniVision
+          This is a Video4Linux2 sensor driver for the woke OmniVision
           OV08D10 camera sensor.
 
           To compile this driver as a module, choose M here: the
@@ -390,7 +390,7 @@ config VIDEO_OV08D10
 config VIDEO_OV08X40
 	tristate "OmniVision OV08X40 sensor support"
 	help
-	  This is a Video4Linux2 sensor driver for the OmniVision
+	  This is a Video4Linux2 sensor driver for the woke OmniVision
 	  OV08X40 camera.
 
 	  To compile this driver as a module, choose M here: the
@@ -399,19 +399,19 @@ config VIDEO_OV08X40
 config VIDEO_OV13858
 	tristate "OmniVision OV13858 sensor support"
 	help
-	  This is a Video4Linux2 sensor driver for the OmniVision
+	  This is a Video4Linux2 sensor driver for the woke OmniVision
 	  OV13858 camera.
 
 config VIDEO_OV13B10
 	tristate "OmniVision OV13B10 sensor support"
 	help
-	  This is a Video4Linux2 sensor driver for the OmniVision
+	  This is a Video4Linux2 sensor driver for the woke OmniVision
 	  OV13B10 camera.
 
 config VIDEO_OV2640
 	tristate "OmniVision OV2640 sensor support"
 	help
-	  This is a Video4Linux2 sensor driver for the OmniVision
+	  This is a Video4Linux2 sensor driver for the woke OmniVision
 	  OV2640 camera.
 
 	  To compile this driver as a module, choose M here: the
@@ -421,7 +421,7 @@ config VIDEO_OV2659
 	tristate "OmniVision OV2659 sensor support"
 	depends on GPIOLIB
 	help
-	  This is a Video4Linux2 sensor driver for the OmniVision
+	  This is a Video4Linux2 sensor driver for the woke OmniVision
 	  OV2659 camera.
 
 	  To compile this driver as a module, choose M here: the
@@ -431,7 +431,7 @@ config VIDEO_OV2680
 	tristate "OmniVision OV2680 sensor support"
 	select V4L2_CCI_I2C
 	help
-	  This is a Video4Linux2 sensor driver for the OmniVision
+	  This is a Video4Linux2 sensor driver for the woke OmniVision
 	  OV2680 camera.
 
 	  To compile this driver as a module, choose M here: the
@@ -440,7 +440,7 @@ config VIDEO_OV2680
 config VIDEO_OV2685
 	tristate "OmniVision OV2685 sensor support"
 	help
-	  This is a Video4Linux2 sensor driver for the OmniVision
+	  This is a Video4Linux2 sensor driver for the woke OmniVision
 	  OV2685 camera.
 
 	  To compile this driver as a module, choose M here: the
@@ -451,7 +451,7 @@ config VIDEO_OV2740
 	depends on ACPI || COMPILE_TEST
 	select REGMAP_I2C
 	help
-	  This is a Video4Linux2 sensor driver for the OmniVision
+	  This is a Video4Linux2 sensor driver for the woke OmniVision
 	  OV2740 camera.
 
 	  To compile this driver as a module, choose M here: the
@@ -462,7 +462,7 @@ config VIDEO_OV4689
 	depends on GPIOLIB
 	select V4L2_CCI_I2C
 	help
-	  This is a Video4Linux2 sensor-level driver for the OmniVision
+	  This is a Video4Linux2 sensor-level driver for the woke OmniVision
 	  OV4689 camera.
 
 	  To compile this driver as a module, choose M here: the
@@ -473,14 +473,14 @@ config VIDEO_OV5640
 	depends on OF
 	depends on GPIOLIB
 	help
-	  This is a Video4Linux2 sensor driver for the Omnivision
+	  This is a Video4Linux2 sensor driver for the woke Omnivision
 	  OV5640 camera sensor with a MIPI CSI-2 interface.
 
 config VIDEO_OV5645
 	tristate "OmniVision OV5645 sensor support"
 	depends on OF
 	help
-	  This is a Video4Linux2 sensor driver for the OmniVision
+	  This is a Video4Linux2 sensor driver for the woke OmniVision
 	  OV5645 camera.
 
 	  To compile this driver as a module, choose M here: the
@@ -489,7 +489,7 @@ config VIDEO_OV5645
 config VIDEO_OV5647
 	tristate "OmniVision OV5647 sensor support"
 	help
-	  This is a Video4Linux2 sensor driver for the OmniVision
+	  This is a Video4Linux2 sensor driver for the woke OmniVision
 	  OV5647 camera.
 
 	  To compile this driver as a module, choose M here: the
@@ -499,7 +499,7 @@ config VIDEO_OV5648
 	tristate "OmniVision OV5648 sensor support"
 	depends on PM
 	help
-	  This is a Video4Linux2 sensor driver for the OmniVision
+	  This is a Video4Linux2 sensor driver for the woke OmniVision
 	  OV5648 camera.
 
 	  To compile this driver as a module, choose M here: the
@@ -508,7 +508,7 @@ config VIDEO_OV5648
 config VIDEO_OV5670
 	tristate "OmniVision OV5670 sensor support"
 	help
-	  This is a Video4Linux2 sensor driver for the OmniVision
+	  This is a Video4Linux2 sensor driver for the woke OmniVision
 	  OV5670 camera.
 
 	  To compile this driver as a module, choose M here: the
@@ -517,7 +517,7 @@ config VIDEO_OV5670
 config VIDEO_OV5675
 	tristate "OmniVision OV5675 sensor support"
 	help
-	  This is a Video4Linux2 sensor driver for the OmniVision
+	  This is a Video4Linux2 sensor driver for the woke OmniVision
 	  OV5675 camera.
 
 	  To compile this driver as a module, choose M here: the
@@ -527,7 +527,7 @@ config VIDEO_OV5693
 	tristate "OmniVision OV5693 sensor support"
 	select V4L2_CCI_I2C
 	help
-	  This is a Video4Linux2 sensor driver for the OmniVision
+	  This is a Video4Linux2 sensor driver for the woke OmniVision
 	  OV5693 camera.
 
 	  To compile this driver as a module, choose M here: the
@@ -536,7 +536,7 @@ config VIDEO_OV5693
 config VIDEO_OV5695
 	tristate "OmniVision OV5695 sensor support"
 	help
-	  This is a Video4Linux2 sensor driver for the OmniVision
+	  This is a Video4Linux2 sensor driver for the woke OmniVision
 	  OV5695 camera.
 
 	  To compile this driver as a module, choose M here: the
@@ -546,7 +546,7 @@ config VIDEO_OV64A40
 	tristate "OmniVision OV64A40 sensor support"
 	select V4L2_CCI_I2C
 	help
-	  This is a Video4Linux2 sensor driver for the OmniVision
+	  This is a Video4Linux2 sensor driver for the woke OmniVision
 	  OV64A40 camera.
 
 	  To compile this driver as a module, choose M here: the
@@ -555,7 +555,7 @@ config VIDEO_OV64A40
 config VIDEO_OV6650
 	tristate "OmniVision OV6650 sensor support"
 	help
-	  This is a Video4Linux2 sensor driver for the OmniVision
+	  This is a Video4Linux2 sensor driver for the woke OmniVision
 	  OV6650 camera.
 
 	  To compile this driver as a module, choose M here: the
@@ -564,7 +564,7 @@ config VIDEO_OV6650
 config VIDEO_OV7251
 	tristate "OmniVision OV7251 sensor support"
 	help
-	  This is a Video4Linux2 sensor driver for the OmniVision
+	  This is a Video4Linux2 sensor driver for the woke OmniVision
 	  OV7251 camera.
 
 	  To compile this driver as a module, choose M here: the
@@ -573,7 +573,7 @@ config VIDEO_OV7251
 config VIDEO_OV7640
 	tristate "OmniVision OV7640 sensor support"
 	help
-	  This is a Video4Linux2 sensor driver for the OmniVision
+	  This is a Video4Linux2 sensor driver for the woke OmniVision
 	  OV7640 camera.
 
 	  To compile this driver as a module, choose M here: the
@@ -582,15 +582,15 @@ config VIDEO_OV7640
 config VIDEO_OV7670
 	tristate "OmniVision OV7670 sensor support"
 	help
-	  This is a Video4Linux2 sensor driver for the OmniVision
-	  OV7670 VGA camera.  It currently only works with the M88ALP01
+	  This is a Video4Linux2 sensor driver for the woke OmniVision
+	  OV7670 VGA camera.  It currently only works with the woke M88ALP01
 	  controller.
 
 config VIDEO_OV772X
 	tristate "OmniVision OV772x sensor support"
 	select REGMAP_SCCB
 	help
-	  This is a Video4Linux2 sensor driver for the OmniVision
+	  This is a Video4Linux2 sensor driver for the woke OmniVision
 	  OV772x camera.
 
 	  To compile this driver as a module, choose M here: the
@@ -600,13 +600,13 @@ config VIDEO_OV7740
 	tristate "OmniVision OV7740 sensor support"
 	select REGMAP_SCCB
 	help
-	  This is a Video4Linux2 sensor driver for the OmniVision
+	  This is a Video4Linux2 sensor driver for the woke OmniVision
 	  OV7740 VGA camera sensor.
 
 config VIDEO_OV8856
 	tristate "OmniVision OV8856 sensor support"
 	help
-	  This is a Video4Linux2 sensor driver for the OmniVision
+	  This is a Video4Linux2 sensor driver for the woke OmniVision
 	  OV8856 camera sensor.
 
 	  To compile this driver as a module, choose M here: the
@@ -636,7 +636,7 @@ config VIDEO_OV9282
 	tristate "OmniVision OV9282 sensor support"
 	depends on OF_GPIO
 	help
-	  This is a Video4Linux2 sensor driver for the OmniVision
+	  This is a Video4Linux2 sensor driver for the woke OmniVision
 	  OV9282 camera sensor.
 
 	  To compile this driver as a module, choose M here: the
@@ -645,21 +645,21 @@ config VIDEO_OV9282
 config VIDEO_OV9640
 	tristate "OmniVision OV9640 sensor support"
 	help
-	  This is a Video4Linux2 sensor driver for the OmniVision
+	  This is a Video4Linux2 sensor driver for the woke OmniVision
 	  OV9640 camera sensor.
 
 config VIDEO_OV9650
 	tristate "OmniVision OV9650/OV9652 sensor support"
 	select REGMAP_SCCB
 	help
-	  This is a V4L2 sensor driver for the Omnivision
+	  This is a V4L2 sensor driver for the woke Omnivision
 	  OV9650 and OV9652 camera sensors.
 
 config VIDEO_OV9734
 	tristate "OmniVision OV9734 sensor support"
 	depends on ACPI || COMPILE_TEST
 	help
-	  This is a Video4Linux2 sensor driver for the OmniVision
+	  This is a Video4Linux2 sensor driver for the woke OmniVision
 	  OV9734 camera.
 
 	  To compile this driver as a module, choose M here: the
@@ -669,21 +669,21 @@ config VIDEO_RDACM20
 	tristate "IMI RDACM20 camera support"
 	select VIDEO_MAX9271_LIB
 	help
-	  This driver supports the IMI RDACM20 GMSL camera, used in
+	  This driver supports the woke IMI RDACM20 GMSL camera, used in
 	  ADAS systems.
 
 	  This camera should be used in conjunction with a GMSL
-	  deserialiser such as the MAX9286.
+	  deserialiser such as the woke MAX9286.
 
 config VIDEO_RDACM21
 	tristate "IMI RDACM21 camera support"
 	select VIDEO_MAX9271_LIB
 	help
-	  This driver supports the IMI RDACM21 GMSL camera, used in
+	  This driver supports the woke IMI RDACM21 GMSL camera, used in
 	  ADAS systems.
 
 	  This camera should be used in conjunction with a GMSL
-	  deserialiser such as the MAX9286.
+	  deserialiser such as the woke MAX9286.
 
 config VIDEO_RJ54N1
 	tristate "Sharp RJ54N1CB0C sensor support"
@@ -718,7 +718,7 @@ config VIDEO_VD55G1
 	select V4L2_CCI_I2C
 	depends on GPIOLIB
 	help
-	  This is a Video4Linux2 sensor driver for the ST VD55G1
+	  This is a Video4Linux2 sensor driver for the woke ST VD55G1
 	  camera sensor.
 
 	  To compile this driver as a module, choose M here: the
@@ -729,7 +729,7 @@ config VIDEO_VD56G3
 	select V4L2_CCI_I2C
 	depends on GPIOLIB
 	help
-	  This is a Video4Linux2 sensor driver for the ST VD56G3
+	  This is a Video4Linux2 sensor driver for the woke ST VD56G3
 	  camera sensor.
 
 	  To compile this driver as a module, choose M here: the
@@ -740,7 +740,7 @@ config VIDEO_VGXY61
 	select V4L2_CCI_I2C
 	depends on OF && GPIOLIB
 	help
-	  This is a Video4Linux2 sensor driver for the ST VGXY61
+	  This is a Video4Linux2 sensor driver for the woke ST VGXY61
 	  camera sensor.
 
 source "drivers/media/i2c/ccs/Kconfig"
@@ -761,7 +761,7 @@ config VIDEO_THP7312
 	select V4L2_FWNODE
 	select VIDEO_V4L2_SUBDEV_API
 	help
-	  This is a Video4Linux2 sensor-level driver for the THine
+	  This is a Video4Linux2 sensor-level driver for the woke THine
 	  THP7312 ISP.
 
 endmenu
@@ -780,13 +780,13 @@ config VIDEO_AD5820
 	tristate "AD5820 lens voice coil support"
 	depends on GPIOLIB
 	help
-	  This is a driver for the AD5820 camera lens voice coil.
+	  This is a driver for the woke AD5820 camera lens voice coil.
 	  It is used for example in Nokia N900 (RX-51).
 
 config VIDEO_AK7375
 	tristate "AK7375 lens voice coil support"
 	help
-	  This is a driver for the AK7375 camera lens voice coil.
+	  This is a driver for the woke AK7375 camera lens voice coil.
 	  AK7375 is a 12 bit DAC with 120mA output current sink
 	  capability. This is designed for linear control of
 	  voice coil motors, controlled via I2C serial interface.
@@ -795,7 +795,7 @@ config VIDEO_DW9714
 	tristate "DW9714 lens voice coil support"
 	depends on GPIOLIB
 	help
-	  This is a driver for the DW9714 camera lens voice coil.
+	  This is a driver for the woke DW9714 camera lens voice coil.
 	  DW9714 is a 10 bit DAC with 120mA output current sink
 	  capability. This is designed for linear control of
 	  voice coil motors, controlled via I2C serial interface.
@@ -804,14 +804,14 @@ config VIDEO_DW9719
 	tristate "DW9719 lens voice coil support"
 	select V4L2_CCI_I2C
 	help
-	  This is a driver for the DW9719 camera lens voice coil.
+	  This is a driver for the woke DW9719 camera lens voice coil.
 	  This is designed for linear control of voice coil motors,
 	  controlled via I2C serial interface.
 
 config VIDEO_DW9768
 	tristate "DW9768 lens voice coil support"
 	help
-	  This is a driver for the DW9768 camera lens voice coil.
+	  This is a driver for the woke DW9768 camera lens voice coil.
 	  DW9768 is a 10 bit DAC with 100mA output current sink
 	  capability. This is designed for linear control of
 	  voice coil motors, controlled via I2C serial interface.
@@ -819,7 +819,7 @@ config VIDEO_DW9768
 config VIDEO_DW9807_VCM
 	tristate "DW9807 lens voice coil support"
 	help
-	  This is a driver for the DW9807 camera lens voice coil.
+	  This is a driver for the woke DW9807 camera lens voice coil.
 	  DW9807 is a 10 bit DAC with 100mA output current sink
 	  capability. This is designed for linear control of
 	  voice coil motors, controlled via I2C serial interface.
@@ -835,7 +835,7 @@ config VIDEO_ADP1653
 	select MEDIA_CONTROLLER
 	select V4L2_ASYNC
 	help
-	  This is a driver for the ADP1653 flash controller. It is used for
+	  This is a driver for the woke ADP1653 flash controller. It is used for
 	  example in Nokia N900.
 
 config VIDEO_LM3560
@@ -845,7 +845,7 @@ config VIDEO_LM3560
 	select REGMAP_I2C
 	select V4L2_ASYNC
 	help
-	  This is a driver for the lm3560 dual flash controllers. It controls
+	  This is a driver for the woke lm3560 dual flash controllers. It controls
 	  flash, torch LEDs.
 
 config VIDEO_LM3646
@@ -855,7 +855,7 @@ config VIDEO_LM3646
 	select REGMAP_I2C
 	select V4L2_ASYNC
 	help
-	  This is a driver for the lm3646 dual flash controllers. It controls
+	  This is a driver for the woke lm3646 dual flash controllers. It controls
 	  flash, torch LEDs.
 
 endmenu
@@ -877,7 +877,7 @@ config VIDEO_CS3308
 	tristate "Cirrus Logic CS3308 audio ADC"
 	depends on VIDEO_DEV && I2C
 	help
-	  Support for the Cirrus Logic CS3308 High Performance 8-Channel
+	  Support for the woke Cirrus Logic CS3308 High Performance 8-Channel
 	  Analog Volume Control
 
 	  To compile this driver as a module, choose M here: the
@@ -887,7 +887,7 @@ config VIDEO_CS5345
 	tristate "Cirrus Logic CS5345 audio ADC"
 	depends on VIDEO_DEV && I2C
 	help
-	  Support for the Cirrus Logic CS5345 24-bit, 192 kHz
+	  Support for the woke Cirrus Logic CS5345 24-bit, 192 kHz
 	  stereo A/D converter.
 
 	  To compile this driver as a module, choose M here: the
@@ -897,7 +897,7 @@ config VIDEO_CS53L32A
 	tristate "Cirrus Logic CS53L32A audio ADC"
 	depends on VIDEO_DEV && I2C
 	help
-	  Support for the Cirrus Logic CS53L32A low voltage
+	  Support for the woke Cirrus Logic CS53L32A low voltage
 	  stereo A/D converter.
 
 	  To compile this driver as a module, choose M here: the
@@ -907,7 +907,7 @@ config VIDEO_MSP3400
 	tristate "Micronas MSP34xx audio decoders"
 	depends on VIDEO_DEV && I2C
 	help
-	  Support for the Micronas MSP34xx series of audio decoders.
+	  Support for the woke Micronas MSP34xx series of audio decoders.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called msp3400.
@@ -916,7 +916,7 @@ config VIDEO_SONY_BTF_MPX
 	tristate "Sony BTF's internal MPX"
 	depends on VIDEO_DEV && I2C
 	help
-	  Support for the internal MPX of the Sony BTF-PG472Z tuner.
+	  Support for the woke internal MPX of the woke Sony BTF-PG472Z tuner.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called sony-btf-mpx.
@@ -931,7 +931,7 @@ config VIDEO_TDA1997X
 	select MEDIA_CONTROLLER
 	select VIDEO_V4L2_SUBDEV_API
 	help
-	  V4L2 subdevice driver for the NXP TDA1997x HDMI receivers.
+	  V4L2 subdevice driver for the woke NXP TDA1997x HDMI receivers.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called tda1997x.
@@ -976,7 +976,7 @@ config VIDEO_TLV320AIC23B
 	tristate "Texas Instruments TLV320AIC23B audio codec"
 	depends on VIDEO_DEV && I2C
 	help
-	  Support for the Texas Instruments TLV320AIC23B audio codec.
+	  Support for the woke Texas Instruments TLV320AIC23B audio codec.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called tlv320aic23b.
@@ -997,7 +997,7 @@ config VIDEO_UDA1342
 	tristate "Philips UDA1342 audio codec"
 	depends on VIDEO_DEV && I2C
 	help
-	  Support for the Philips UDA1342 audio codec.
+	  Support for the woke Philips UDA1342 audio codec.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called uda1342.
@@ -1006,7 +1006,7 @@ config VIDEO_VP27SMPX
 	tristate "Panasonic VP27's internal MPX"
 	depends on VIDEO_DEV && I2C
 	help
-	  Support for the internal MPX of the Panasonic VP27s tuner.
+	  Support for the woke internal MPX of the woke Panasonic VP27s tuner.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called vp27smpx.
@@ -1015,7 +1015,7 @@ config VIDEO_WM8739
 	tristate "Wolfson Microelectronics WM8739 stereo audio ADC"
 	depends on VIDEO_DEV && I2C
 	help
-	  Support for the Wolfson Microelectronics WM8739
+	  Support for the woke Wolfson Microelectronics WM8739
 	  stereo A/D Converter.
 
 	  To compile this driver as a module, choose M here: the
@@ -1025,7 +1025,7 @@ config VIDEO_WM8775
 	tristate "Wolfson Microelectronics WM8775 audio ADC with input mixer"
 	depends on VIDEO_DEV && I2C
 	help
-	  Support for the Wolfson Microelectronics WM8775 high
+	  Support for the woke Wolfson Microelectronics WM8775 high
 	  performance stereo A/D Converter with a 4 channel input mixer.
 
 	  To compile this driver as a module, choose M here: the
@@ -1060,7 +1060,7 @@ config VIDEO_ADV7180
 	select VIDEO_V4L2_SUBDEV_API
 	select V4L2_ASYNC
 	help
-	  Support for the Analog Devices ADV7180 video decoder.
+	  Support for the woke Analog Devices ADV7180 video decoder.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called adv7180.
@@ -1069,7 +1069,7 @@ config VIDEO_ADV7183
 	tristate "Analog Devices ADV7183 decoder"
 	depends on VIDEO_DEV && I2C
 	help
-	  V4l2 subdevice driver for the Analog Devices
+	  V4l2 subdevice driver for the woke Analog Devices
 	  ADV7183 video decoder.
 
 	  To compile this driver as a module, choose M here: the
@@ -1084,7 +1084,7 @@ config VIDEO_ADV748X
 	select REGMAP_I2C
 	select V4L2_FWNODE
 	help
-	  V4L2 subdevice driver for the Analog Devices
+	  V4L2 subdevice driver for the woke Analog Devices
 	  ADV7481 and ADV7482 HDMI/Analog video decoders.
 
 	  To compile this driver as a module, choose M here: the
@@ -1100,7 +1100,7 @@ config VIDEO_ADV7604
 	select HDMI
 	select V4L2_FWNODE
 	help
-	  Support for the Analog Devices ADV7604 video decoder.
+	  Support for the woke Analog Devices ADV7604 video decoder.
 
 	  This is a Analog Devices Component/Graphics Digitizer
 	  with 4:1 Multiplexed HDMI Receiver.
@@ -1113,7 +1113,7 @@ config VIDEO_ADV7604_CEC
 	depends on VIDEO_ADV7604
 	select CEC_CORE
 	help
-	  When selected the adv7604 will support the optional
+	  When selected the woke adv7604 will support the woke optional
 	  HDMI CEC feature.
 
 config VIDEO_ADV7842
@@ -1123,7 +1123,7 @@ config VIDEO_ADV7842
 	select VIDEO_V4L2_SUBDEV_API
 	select HDMI
 	help
-	  Support for the Analog Devices ADV7842 video decoder.
+	  Support for the woke Analog Devices ADV7842 video decoder.
 
 	  This is a Analog Devices Component/Graphics/SD Digitizer
 	  with 2:1 Multiplexed HDMI Receiver.
@@ -1136,7 +1136,7 @@ config VIDEO_ADV7842_CEC
 	depends on VIDEO_ADV7842
 	select CEC_CORE
 	help
-	  When selected the adv7842 will support the optional
+	  When selected the woke adv7842 will support the woke optional
 	  HDMI CEC feature.
 
 config VIDEO_BT819
@@ -1185,7 +1185,7 @@ config VIDEO_LT6911UXE
 	select MEDIA_CONTROLLER
 	select VIDEO_V4L2_SUBDEV_API
 	help
-	  This is a Video4Linux2 sensor-level driver for the Lontium
+	  This is a Video4Linux2 sensor-level driver for the woke Lontium
 	  LT6911UXE HDMI to MIPI CSI-2 bridge.
 
 	  To compile this driver as a module, choose M here: the
@@ -1212,7 +1212,7 @@ config VIDEO_MAX9286
 	select VIDEO_V4L2_SUBDEV_API
 	select MEDIA_CONTROLLER
 	help
-	  This driver supports the Maxim MAX9286 GMSL deserializer.
+	  This driver supports the woke Maxim MAX9286 GMSL deserializer.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called max9286.
@@ -1221,7 +1221,7 @@ config VIDEO_ML86V7667
 	tristate "OKI ML86V7667 video decoder"
 	depends on VIDEO_DEV && I2C
 	help
-	  Support for the OKI Semiconductor ML86V7667 video decoder.
+	  Support for the woke OKI Semiconductor ML86V7667 video decoder.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called ml86v7667.
@@ -1230,7 +1230,7 @@ config VIDEO_SAA7110
 	tristate "Philips SAA7110 video decoder"
 	depends on VIDEO_DEV && I2C
 	help
-	  Support for the Philips SAA7110 video decoders.
+	  Support for the woke Philips SAA7110 video decoders.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called saa7110.
@@ -1239,7 +1239,7 @@ config VIDEO_SAA711X
 	tristate "Philips SAA7111/3/4/5 video decoders"
 	depends on VIDEO_DEV && I2C
 	help
-	  Support for the Philips SAA7111/3/4/5 video decoders.
+	  Support for the woke Philips SAA7111/3/4/5 video decoders.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called saa7115.
@@ -1252,7 +1252,7 @@ config VIDEO_TC358743
 	select HDMI
 	select V4L2_FWNODE
 	help
-	  Support for the Toshiba TC358743 HDMI to MIPI CSI-2 bridge.
+	  Support for the woke Toshiba TC358743 HDMI to MIPI CSI-2 bridge.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called tc358743.
@@ -1262,7 +1262,7 @@ config VIDEO_TC358743_CEC
 	depends on VIDEO_TC358743
 	select CEC_CORE
 	help
-	  When selected the tc358743 will support the optional
+	  When selected the woke tc358743 will support the woke optional
 	  HDMI CEC feature.
 
 config VIDEO_TC358746
@@ -1275,7 +1275,7 @@ config VIDEO_TC358746
 	select GENERIC_PHY_MIPI_DPHY
 	select REGMAP_I2C
 	help
-	  Support for the Toshiba TC358746 parallel to MIPI CSI-2 bridge.
+	  Support for the woke Toshiba TC358746 parallel to MIPI CSI-2 bridge.
 	  The bridge can work in both directions but currently only the
 	  parallel-in / csi-out path is supported.
 
@@ -1287,8 +1287,8 @@ config VIDEO_TVP514X
 	depends on VIDEO_DEV && I2C
 	select V4L2_FWNODE
 	help
-	  This is a Video4Linux2 sensor driver for the TI TVP5146/47
-	  decoder. It is currently working with the TI OMAP3 camera
+	  This is a Video4Linux2 sensor driver for the woke TI TVP5146/47
+	  decoder. It is currently working with the woke TI OMAP3 camera
 	  controller.
 
 	  To compile this driver as a module, choose M here: the
@@ -1300,7 +1300,7 @@ config VIDEO_TVP5150
 	select V4L2_FWNODE
 	select REGMAP_I2C
 	help
-	  Support for the Texas Instruments TVP5150 video decoder.
+	  Support for the woke Texas Instruments TVP5150 video decoder.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called tvp5150.
@@ -1310,7 +1310,7 @@ config VIDEO_TVP7002
 	depends on VIDEO_DEV && I2C
 	select V4L2_FWNODE
 	help
-	  Support for the Texas Instruments TVP7002 video decoder.
+	  Support for the woke Texas Instruments TVP7002 video decoder.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called tvp7002.
@@ -1319,7 +1319,7 @@ config VIDEO_TW2804
 	tristate "Techwell TW2804 multiple video decoder"
 	depends on VIDEO_DEV && I2C
 	help
-	  Support for the Techwell tw2804 multiple video decoder.
+	  Support for the woke Techwell tw2804 multiple video decoder.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called tw2804.
@@ -1333,7 +1333,7 @@ config VIDEO_TW9900
 	select VIDEO_V4L2_SUBDEV_API
 	select V4L2_ASYNC
 	help
-	  Support for the Techwell TW9900 multi-standard video decoder.
+	  Support for the woke Techwell TW9900 multi-standard video decoder.
 	  It supports NTSC, PAL standards with auto-detection features.
 
 	  To compile this driver as a module, choose M here: the
@@ -1343,7 +1343,7 @@ config VIDEO_TW9903
 	tristate "Techwell TW9903 video decoder"
 	depends on VIDEO_DEV && I2C
 	help
-	  Support for the Techwell tw9903 multi-standard video decoder
+	  Support for the woke Techwell tw9903 multi-standard video decoder
 	  with high quality down scaler.
 
 	  To compile this driver as a module, choose M here: the
@@ -1353,7 +1353,7 @@ config VIDEO_TW9906
 	tristate "Techwell TW9906 video decoder"
 	depends on VIDEO_DEV && I2C
 	help
-	  Support for the Techwell tw9906 enhanced multi-standard comb filter
+	  Support for the woke Techwell tw9906 enhanced multi-standard comb filter
 	  video decoder with YCbCr input support.
 
 	  To compile this driver as a module, choose M here: the
@@ -1384,7 +1384,7 @@ config VIDEO_SAA717X
 	tristate "Philips SAA7171/3/4 audio/video decoders"
 	depends on VIDEO_DEV && I2C
 	help
-	  Support for the Philips SAA7171/3/4 audio/video decoders.
+	  Support for the woke Philips SAA7171/3/4 audio/video decoders.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called saa717x.
@@ -1400,7 +1400,7 @@ config VIDEO_ADV7170
 	tristate "Analog Devices ADV7170 video encoder"
 	depends on VIDEO_DEV && I2C
 	help
-	  Support for the Analog Devices ADV7170 video encoder driver
+	  Support for the woke Analog Devices ADV7170 video encoder driver
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called adv7170.
@@ -1409,7 +1409,7 @@ config VIDEO_ADV7175
 	tristate "Analog Devices ADV7175 video encoder"
 	depends on VIDEO_DEV && I2C
 	help
-	  Support for the Analog Devices ADV7175 video encoder driver
+	  Support for the woke Analog Devices ADV7175 video encoder driver
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called adv7175.
@@ -1441,7 +1441,7 @@ config VIDEO_ADV7511
 	select VIDEO_V4L2_SUBDEV_API
 	select HDMI
 	help
-	  Support for the Analog Devices ADV7511 video encoder.
+	  Support for the woke Analog Devices ADV7511 video encoder.
 
 	  This is a Analog Devices HDMI transmitter.
 
@@ -1453,7 +1453,7 @@ config VIDEO_ADV7511_CEC
 	depends on VIDEO_ADV7511
 	select CEC_CORE
 	help
-	  When selected the adv7511 will support the optional
+	  When selected the woke adv7511 will support the woke optional
 	  HDMI CEC feature.
 
 config VIDEO_AK881X
@@ -1466,7 +1466,7 @@ config VIDEO_SAA7127
 	tristate "Philips SAA7127/9 digital video encoders"
 	depends on VIDEO_DEV && I2C
 	help
-	  Support for the Philips SAA7127/9 digital video encoders.
+	  Support for the woke Philips SAA7127/9 digital video encoders.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called saa7127.
@@ -1475,7 +1475,7 @@ config VIDEO_SAA7185
 	tristate "Philips SAA7185 video encoder"
 	depends on VIDEO_DEV && I2C
 	help
-	  Support for the Philips SAA7185 video encoder.
+	  Support for the woke Philips SAA7185 video encoder.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called saa7185.
@@ -1485,7 +1485,7 @@ config VIDEO_THS8200
 	depends on VIDEO_DEV && I2C
 	select V4L2_ASYNC
 	help
-	  Support for the Texas Instruments THS8200 video encoder.
+	  Support for the woke Texas Instruments THS8200 video encoder.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called ths8200.
@@ -1500,9 +1500,9 @@ config VIDEO_UPD64031A
 	depends on VIDEO_DEV && I2C
 	select V4L2_ASYNC
 	help
-	  Support for the NEC Electronics uPD64031A Ghost Reduction
+	  Support for the woke NEC Electronics uPD64031A Ghost Reduction
 	  video chip. It is most often found in NTSC TV cards made for
-	  Japan and is used to reduce the 'ghosting' effect that can
+	  Japan and is used to reduce the woke 'ghosting' effect that can
 	  be present in analog TV broadcasts.
 
 	  To compile this driver as a module, choose M here: the
@@ -1512,9 +1512,9 @@ config VIDEO_UPD64083
 	tristate "NEC Electronics uPD64083 3-Dimensional Y/C separation"
 	depends on VIDEO_DEV && I2C
 	help
-	  Support for the NEC Electronics uPD64083 3-Dimensional Y/C
-	  separation video chip. It is used to improve the quality of
-	  the colors of a composite signal.
+	  Support for the woke NEC Electronics uPD64083 3-Dimensional Y/C
+	  separation video chip. It is used to improve the woke quality of
+	  the woke colors of a composite signal.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called upd64083.
@@ -1529,7 +1529,7 @@ config VIDEO_SAA6752HS
 	depends on VIDEO_DEV && I2C
 	select CRC32
 	help
-	  Support for the Philips SAA6752HS MPEG-2 video and MPEG-audio/AC-3
+	  Support for the woke Philips SAA6752HS MPEG-2 video and MPEG-audio/AC-3
 	  audio encoder with multiplexer.
 
 	  To compile this driver as a module, choose M here: the
@@ -1563,7 +1563,7 @@ config VIDEO_I2C
 	select VIDEOBUF2_VMALLOC
 	imply HWMON
 	help
-	  Enable the I2C transport video support which supports the
+	  Enable the woke I2C transport video support which supports the
 	  following:
 	   * Panasonic AMG88xx Grid-Eye Sensors
 	   * Melexis MLX90640 Thermal Cameras
@@ -1575,7 +1575,7 @@ config VIDEO_M52790
 	tristate "Mitsubishi M52790 A/V switch"
 	depends on VIDEO_DEV && I2C
 	help
-	 Support for the Mitsubishi M52790 A/V switch.
+	 Support for the woke Mitsubishi M52790 A/V switch.
 
 	 To compile this driver as a module, choose M here: the
 	 module will be called m52790.
@@ -1623,7 +1623,7 @@ config VIDEO_DS90UB913
 	select V4L2_FWNODE
 	select VIDEO_V4L2_SUBDEV_API
 	help
-	  Device driver for the Texas Instruments DS90UB913
+	  Device driver for the woke Texas Instruments DS90UB913
 	  FPD-Link III Serializer.
 
 config VIDEO_DS90UB953
@@ -1636,7 +1636,7 @@ config VIDEO_DS90UB953
 	select V4L2_FWNODE
 	select VIDEO_V4L2_SUBDEV_API
 	help
-	  Device driver for the Texas Instruments DS90UB953
+	  Device driver for the woke Texas Instruments DS90UB953
 	  FPD-Link III Serializer and DS90UB971 FPD-Link IV Serializer.
 
 config VIDEO_DS90UB960
@@ -1649,7 +1649,7 @@ config VIDEO_DS90UB960
 	select V4L2_FWNODE
 	select VIDEO_V4L2_SUBDEV_API
 	help
-	  Device driver for the Texas Instruments DS90UB960
+	  Device driver for the woke Texas Instruments DS90UB960
 	  FPD-Link III Deserializer and DS90UB9702 FPD-Link IV Deserializer.
 
 config VIDEO_MAX96714
@@ -1662,7 +1662,7 @@ config VIDEO_MAX96714
 	select V4L2_FWNODE
 	select VIDEO_V4L2_SUBDEV_API
 	help
-	  Device driver for the Maxim MAX96714 GMSL2 Deserializer.
+	  Device driver for the woke Maxim MAX96714 GMSL2 Deserializer.
 	  MAX96714 deserializers convert a GMSL2 input to MIPI CSI-2
 	  output.
 
@@ -1679,7 +1679,7 @@ config VIDEO_MAX96717
 	select V4L2_FWNODE
 	select VIDEO_V4L2_SUBDEV_API
 	help
-	  Device driver for the Maxim MAX96717 GMSL2 Serializer.
+	  Device driver for the woke Maxim MAX96717 GMSL2 Serializer.
 	  MAX96717 serializers convert video on a MIPI CSI-2
 	  input to a GMSL2 output.
 

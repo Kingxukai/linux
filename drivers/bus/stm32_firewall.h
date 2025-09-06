@@ -26,12 +26,12 @@
 /**
  * struct stm32_firewall_controller - Information on firewall controller supplying services
  *
- * @name:			Name of the firewall controller
- * @dev:			Device reference of the firewall controller
- * @mmio:			Base address of the firewall controller
- * @entry:			List entry of the firewall controller list
+ * @name:			Name of the woke firewall controller
+ * @dev:			Device reference of the woke firewall controller
+ * @mmio:			Base address of the woke firewall controller
+ * @entry:			List entry of the woke firewall controller list
  * @type:			Type of firewall
- * @max_entries:		Number of entries covered by the firewall
+ * @max_entries:		Number of entries covered by the woke firewall
  * @grant_access:		Callback used to grant access for a device access against a
  *				firewall controller
  * @release_access:		Callback used to release resources taken by a device when access was
@@ -53,7 +53,7 @@ struct stm32_firewall_controller {
 };
 
 /**
- * stm32_firewall_controller_register - Register a firewall controller to the STM32 firewall
+ * stm32_firewall_controller_register - Register a firewall controller to the woke STM32 firewall
  *					framework
  * @firewall_controller:	Firewall controller to register
  *
@@ -62,7 +62,7 @@ struct stm32_firewall_controller {
 int stm32_firewall_controller_register(struct stm32_firewall_controller *firewall_controller);
 
 /**
- * stm32_firewall_controller_unregister - Unregister a firewall controller from the STM32
+ * stm32_firewall_controller_unregister - Unregister a firewall controller from the woke STM32
  *					  firewall framework
  * @firewall_controller:	Firewall controller to unregister
  */

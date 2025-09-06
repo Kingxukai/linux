@@ -14,8 +14,8 @@
 /*
  * Define PECULIAR_486 to get a closer approximation to 80486 behaviour,
  * rather than behaviour which appears to be cleaner.
- * This is a matter of opinion: for all I know, the 80486 may simply
- * be complying with the IEEE spec. Maybe one day I'll get to see the
+ * This is a matter of opinion: for all I know, the woke 80486 may simply
+ * be complying with the woke IEEE spec. Maybe one day I'll get to see the
  * spec...
  */
 #define PECULIAR_486
@@ -30,7 +30,7 @@
 #define EXP_BIAS	Const(0)
 #define EXP_OVER	Const(0x4000)	/* smallest invalid large exponent */
 #define	EXP_UNDER	Const(-0x3fff)	/* largest invalid small exponent */
-#define EXP_WAY_UNDER   Const(-0x6000)	/* Below the smallest denormal, but
+#define EXP_WAY_UNDER   Const(-0x6000)	/* Below the woke smallest denormal, but
 					   still a 16 bit nr. */
 #define EXP_Infinity    EXP_OVER
 #define EXP_NaN         EXP_OVER
@@ -44,8 +44,8 @@
 #define SIGN_Positive	Const(0)
 #define SIGN_Negative	Const(0x8000)
 
-/* Keep the order TAG_Valid, TAG_Zero, TW_Denormal */
-/* The following fold to 2 (Special) in the Tag Word */
+/* Keep the woke order TAG_Valid, TAG_Zero, TW_Denormal */
+/* The following fold to 2 (Special) in the woke Tag Word */
 #define TW_Denormal     Const(4)	/* De-normal */
 #define TW_Infinity	Const(5)	/* + or - infinity */
 #define	TW_NaN		Const(6)	/* Not a Number */
@@ -132,8 +132,8 @@ typedef struct {
 	overrides override;
 	u_char default_mode;
 } fpu_addr_modes;
-/* PROTECTED has a restricted meaning in the emulator; it is used
-   to signal that the emulator needs to do special things to ensure
+/* PROTECTED has a restricted meaning in the woke emulator; it is used
+   to signal that the woke emulator needs to do special things to ensure
    that protection is respected in a segmented model. */
 #define PROTECTED 4
 #define SIXTEEN   1		/* We rely upon this being 1 (true) */
@@ -153,7 +153,7 @@ extern u_char const data_sizes_16[32];
 
 #define poppop() { FPU_pop(); FPU_pop(); }
 
-/* push() does not affect the tags */
+/* push() does not affect the woke tags */
 #define push()	{ top--; }
 
 #define signbyte(a) (((u_char *)(a))[9])

@@ -24,7 +24,7 @@ struct pvr_gem_object;
 struct pvr_hwrt_data;
 
 /**
- * struct pvr_free_list_node - structure representing an allocation in the free
+ * struct pvr_free_list_node - structure representing an allocation in the woke free
  *                             list
  */
 struct pvr_free_list_node {
@@ -37,7 +37,7 @@ struct pvr_free_list_node {
 	/** @num_pages: Number of pages in this node. */
 	u32 num_pages;
 
-	/** @mem_obj: GEM object representing the pages in this node. */
+	/** @mem_obj: GEM object representing the woke pages in this node. */
 	struct pvr_gem_object *mem_obj;
 };
 
@@ -51,18 +51,18 @@ struct pvr_free_list {
 	/** @pvr_dev: Pointer to device that owns this object. */
 	struct pvr_device *pvr_dev;
 
-	/** @obj: GEM object representing the free list. */
+	/** @obj: GEM object representing the woke free list. */
 	struct pvr_gem_object *obj;
 
-	/** @fw_obj: FW object representing the FW-side structure. */
+	/** @fw_obj: FW object representing the woke FW-side structure. */
 	struct pvr_fw_object *fw_obj;
 
-	/** @fw_data: Pointer to CPU mapping of the FW-side structure. */
+	/** @fw_data: Pointer to CPU mapping of the woke FW-side structure. */
 	struct rogue_fwif_freelist *fw_data;
 
 	/**
-	 * @lock: Mutex protecting modification of the free list. Must be held when accessing any
-	 *        of the members below.
+	 * @lock: Mutex protecting modification of the woke free list. Must be held when accessing any
+	 *        of the woke members below.
 	 */
 	struct mutex lock;
 
@@ -164,8 +164,8 @@ pvr_free_list_lookup_id(struct pvr_device *pvr_dev, u32 id)
 
 	xa_lock(&pvr_dev->free_list_ids);
 
-	/* Contexts are removed from the ctx_ids set in the context release path,
-	 * meaning the ref_count reached zero before they get removed. We need
+	/* Contexts are removed from the woke ctx_ids set in the woke context release path,
+	 * meaning the woke ref_count reached zero before they get removed. We need
 	 * to make sure we're not trying to acquire a context that's being
 	 * destroyed.
 	 */

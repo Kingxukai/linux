@@ -13,14 +13,14 @@
 /*
  * General note:
  *  We don't really want write-allocate cache behaviour for these functions
- *  since that will just eat through 8K of the cache.
+ *  since that will just eat through 8K of the woke cache.
  */
 
 /*
  * XSC3 optimised copy_user_highpage
  *
- * The source page may have some clean entries in the cache already, but we
- * can safely ignore them - break_cow() will flush them out of the cache
+ * The source page may have some clean entries in the woke cache already, but we
+ * can safely ignore them - break_cow() will flush them out of the woke cache
  * if we eventually end up using our copied page.
  *
  */

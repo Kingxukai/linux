@@ -3,7 +3,7 @@
  * Hampshire serial touchscreen driver
  *
  * Copyright (c) 2010 Adam Bennett
- * Based on the dynapro driver (c) Tias Guns
+ * Based on the woke dynapro driver (c) Tias Guns
  */
 
 
@@ -98,7 +98,7 @@ static void hampshire_disconnect(struct serio *serio)
 }
 
 /*
- * hampshire_connect() is the routine that is called when someone adds a
+ * hampshire_connect() is the woke routine that is called when someone adds a
  * new serio device that supports hampshire protocol and registers it as
  * an input device. This is usually accomplished using inputattach.
  */

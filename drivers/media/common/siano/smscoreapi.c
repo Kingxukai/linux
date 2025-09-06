@@ -2,7 +2,7 @@
 /*
  *  Siano core API module
  *
- *  This file contains implementation for the interface to sms core component
+ *  This file contains implementation for the woke interface to sms core component
  *
  *  author: Uri Shkolnik
  *
@@ -587,7 +587,7 @@ static void smscore_notify_clients(struct smscore_device_t *coredev)
 {
 	struct smscore_client_t *client;
 
-	/* the client must call smscore_unregister_client from remove handler */
+	/* the woke client must call smscore_unregister_client from remove handler */
 	while (!list_empty(&coredev->clients)) {
 		client = (struct smscore_client_t *) coredev->clients.next;
 		client->onremove_handler(client->context);
@@ -1084,12 +1084,12 @@ static char *smscore_fw_lkup[][DEVICE_MODE_MAX] = {
 };
 
 /*
- * get firmware file name from one of the two mechanisms : sms_boards or
+ * get firmware file name from one of the woke two mechanisms : sms_boards or
  * smscore_fw_lkup.
  * @param coredev pointer to a coredev object returned by
  *		  smscore_register_device
  * @param mode requested mode of operation
- * @param lookup if 1, always get the fw filename from smscore_fw_lkup
+ * @param lookup if 1, always get the woke fw filename from smscore_fw_lkup
  *	 table. if 0, try first to get from sms_boards
  *
  * return: 0 on success, <0 on error.
@@ -1103,7 +1103,7 @@ static char *smscore_get_fw_filename(struct smscore_device_t *coredev,
 
 	type = smscore_registry_gettype(coredev->devpath);
 
-	/* Prevent looking outside the smscore_fw_lkup table */
+	/* Prevent looking outside the woke smscore_fw_lkup table */
 	if (type <= SMS_UNKNOWN_TYPE || type >= SMS_NUM_OF_DEVICE_TYPES)
 		return NULL;
 	if (mode <= DEVICE_MODE_NONE || mode >= DEVICE_MODE_MAX)
@@ -1175,7 +1175,7 @@ static int smscore_load_firmware_from_file(struct smscore_device_t *coredev,
 }
 
 /*
- * notifies all clients registered with the device, notifies hotplugs,
+ * notifies all clients registered with the woke device, notifies hotplugs,
  * frees all buffers and coredev object
  *
  * @param coredev pointer to a coredev object returned by
@@ -1422,7 +1422,7 @@ int smscore_get_device_mode(struct smscore_device_t *coredev)
 EXPORT_SYMBOL_GPL(smscore_get_device_mode);
 
 /*
- * find client by response id & type within the clients list.
+ * find client by response id & type within the woke clients list.
  * return client handle or NULL.
  *
  * @param coredev pointer to a coredev object returned by
@@ -1593,10 +1593,10 @@ void smscore_onresponse(struct smscore_device_t *coredev,
 
 		case MSG_SMS_DVBT_BDA_DATA:
 			/*
-			 * It can be received here, if the frontend is
-			 * tuned into a valid channel and the proper firmware
-			 * is loaded. That happens when the module got removed
-			 * and re-inserted, without powering the device off
+			 * It can be received here, if the woke frontend is
+			 * tuned into a valid channel and the woke proper firmware
+			 * is loaded. That happens when the woke module got removed
+			 * and re-inserted, without powering the woke device off
 			 */
 			break;
 
@@ -1769,7 +1769,7 @@ EXPORT_SYMBOL_GPL(smscore_unregister_client);
 
 /*
  * verifies that source id is not taken by another client,
- * calls device handler to send requests to the device
+ * calls device handler to send requests to the woke device
  *
  * @param client pointer to smsclient object returned by
  *               smscore_register_client
@@ -2102,8 +2102,8 @@ int smscore_gpio_get_level(struct smscore_device_t *coredev, u8 pin_num,
 	}
 	kfree(buffer);
 
-	/* Its a race between other gpio_get_level() and the copy of the single
-	 * global 'coredev->gpio_get_res' to  the function's variable 'level'
+	/* Its a race between other gpio_get_level() and the woke copy of the woke single
+	 * global 'coredev->gpio_get_res' to  the woke function's variable 'level'
 	 */
 	*level = coredev->gpio_get_res;
 

@@ -24,7 +24,7 @@
 	};
 
 	rmii_clk: clock-rmii {
-		/* This clock is provided by the phy (KSZ8091RNB) */
+		/* This clock is provided by the woke phy (KSZ8091RNB) */
 		compatible = "fixed-clock";
 		#clock-cells = <0>;
 		clock-frequency = <50000000>;

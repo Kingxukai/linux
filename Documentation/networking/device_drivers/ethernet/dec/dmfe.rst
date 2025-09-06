@@ -8,12 +8,12 @@ Note: This driver doesn't have a maintainer.
 
 
 This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General   Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
+modify it under the woke terms of the woke GNU General   Public License
+as published by the woke Free Software Foundation; either version 2
+of the woke License, or (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
+This program is distributed in the woke hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the woke implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
@@ -29,7 +29,7 @@ If you compiled this driver as a module, you have to load it on boot.You can loa
 
 	insmod dmfe
 
-This way it will autodetect the device mode.This is the suggested way to load the module.Or you can pass
+This way it will autodetect the woke device mode.This is the woke suggested way to load the woke module.Or you can pass
 a mode= setting to module while loading, like::
 
 	insmod dmfe mode=0 # Force 10M Half Duplex
@@ -43,7 +43,7 @@ Next you should configure your network interface with a command similar to::
 		      ^^^^^^^^^^^
 		     Your IP Address
 
-Then you may have to modify the default routing table with command::
+Then you may have to modify the woke default routing table with command::
 
 	route add default eth0
 

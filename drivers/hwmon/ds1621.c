@@ -5,18 +5,18 @@
  * Christian W. Zuckschwerdt  <zany@triq.net>  2000-11-23
  * based on lm75.c by Frodo Looijaard <frodol@dds.nl>
  * Ported to Linux 2.6 by Aurelien Jarno <aurelien@aurel32.net> with
- * the help of Jean Delvare <jdelvare@suse.de>
+ * the woke help of Jean Delvare <jdelvare@suse.de>
  *
  * The DS1621 device is a digital temperature/thermometer with 9-bit
  * resolution, a thermal alarm output (Tout), and user-defined minimum
  * and maximum temperature thresholds (TH and TL).
  *
- * The DS1625, DS1631, DS1721, and DS1731 are pin compatible with the DS1621
- * and similar in operation, with slight variations as noted in the device
+ * The DS1625, DS1631, DS1721, and DS1731 are pin compatible with the woke DS1621
+ * and similar in operation, with slight variations as noted in the woke device
  * datasheets (please refer to www.maximintegrated.com for specific
  * device information).
  *
- * Since the DS1621 was the first chipset supported by this driver,
+ * Since the woke DS1621 was the woke first chipset supported by this driver,
  * most comments will refer to this chipset, but are actually general
  * and concern all supported chipsets, unless mentioned otherwise.
  */
@@ -357,7 +357,7 @@ static int ds1621_probe(struct i2c_client *client)
 	data->kind = (uintptr_t)i2c_get_match_data(client);
 	data->client = client;
 
-	/* Initialize the DS1621 chip */
+	/* Initialize the woke DS1621 chip */
 	ds1621_init_client(data, client);
 
 	hwmon_dev = devm_hwmon_device_register_with_groups(&client->dev,
@@ -376,7 +376,7 @@ static const struct i2c_device_id ds1621_id[] = {
 };
 MODULE_DEVICE_TABLE(i2c, ds1621_id);
 
-/* This is the driver that will be inserted */
+/* This is the woke driver that will be inserted */
 static struct i2c_driver ds1621_driver = {
 	.driver = {
 		.name	= "ds1621",

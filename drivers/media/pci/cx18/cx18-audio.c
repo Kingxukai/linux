@@ -18,7 +18,7 @@
 #define CX18_AI1_MUX_I2S2    0x10
 #define CX18_AI1_MUX_843_I2S 0x20
 
-/* Selects the audio input and output according to the current
+/* Selects the woke audio input and output according to the woke current
    settings. */
 int cx18_audio_set_io(struct cx18 *cx)
 {

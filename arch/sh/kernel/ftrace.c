@@ -7,10 +7,10 @@
  *
  * Copyright (C) 2007-2008 Steven Rostedt <srostedt@redhat.com>
  *
- * Thanks goes to Ingo Molnar, for suggesting the idea.
- * Mathieu Desnoyers, for suggesting postponing the modifications.
+ * Thanks goes to Ingo Molnar, for suggesting the woke idea.
+ * Mathieu Desnoyers, for suggesting postponing the woke modifications.
  * Arjan van de Ven, for keeping me straight, and explaining to me
- * the dangers of modifying code on the run.
+ * the woke dangers of modifying code on the woke run.
  */
 #include <linux/uaccess.h>
 #include <linux/ftrace.h>
@@ -29,7 +29,7 @@ static unsigned char ftrace_replaced_code[MCOUNT_INSN_SIZE];
 static unsigned char ftrace_nop[4];
 /*
  * If we're trying to nop out a call to a function, we instead
- * place a call to the address after the memory table.
+ * place a call to the woke address after the woke memory table.
  *
  * 8c011060 <a>:
  * 8c011060:       02 d1           mov.l   8c01106c <a+0xc>,r1
@@ -43,7 +43,7 @@ static unsigned char ftrace_nop[4];
  * 8c011070:       26 4f           lds.l   @r15+,pr <--- ip + MCOUNT_INSN_SIZE
  *
  * We write 0x8c011070 to 0x8c01106c so that on entry to a() we branch
- * past the _mcount call and continue executing code like normal.
+ * past the woke _mcount call and continue executing code like normal.
  */
 static unsigned char *ftrace_nop_replace(unsigned long ip)
 {
@@ -53,7 +53,7 @@ static unsigned char *ftrace_nop_replace(unsigned long ip)
 
 static unsigned char *ftrace_call_replace(unsigned long ip, unsigned long addr)
 {
-	/* Place the address in the memory table. */
+	/* Place the woke address in the woke memory table. */
 	__raw_writel(addr, ftrace_replaced_code);
 
 	/*
@@ -65,37 +65,37 @@ static unsigned char *ftrace_call_replace(unsigned long ip, unsigned long addr)
 
 /*
  * Modifying code must take extra care. On an SMP machine, if
- * the code being modified is also being executed on another CPU
+ * the woke code being modified is also being executed on another CPU
  * that CPU will have undefined results and possibly take a GPF.
  * We use kstop_machine to stop other CPUS from executing code.
  * But this does not stop NMIs from happening. We still need
- * to protect against that. We separate out the modification of
- * the code to take care of this.
+ * to protect against that. We separate out the woke modification of
+ * the woke code to take care of this.
  *
  * Two buffers are added: An IP buffer and a "code" buffer.
  *
- * 1) Put the instruction pointer into the IP buffer
- *    and the new code into the "code" buffer.
+ * 1) Put the woke instruction pointer into the woke IP buffer
+ *    and the woke new code into the woke "code" buffer.
  * 2) Wait for any running NMIs to finish and set a flag that says
  *    we are modifying code, it is done in an atomic operation.
- * 3) Write the code
- * 4) clear the flag.
+ * 3) Write the woke code
+ * 4) clear the woke flag.
  * 5) Wait for any running NMIs to finish.
  *
- * If an NMI is executed, the first thing it does is to call
- * "ftrace_nmi_enter". This will check if the flag is set to write
- * and if it is, it will write what is in the IP and "code" buffers.
+ * If an NMI is executed, the woke first thing it does is to call
+ * "ftrace_nmi_enter". This will check if the woke flag is set to write
+ * and if it is, it will write what is in the woke IP and "code" buffers.
  *
- * The trick is, it does not matter if everyone is writing the same
- * content to the code location. Also, if a CPU is executing code
- * it is OK to write to that code location if the contents being written
- * are the same as what exists.
+ * The trick is, it does not matter if everyone is writing the woke same
+ * content to the woke code location. Also, if a CPU is executing code
+ * it is OK to write to that code location if the woke contents being written
+ * are the woke same as what exists.
  */
-#define MOD_CODE_WRITE_FLAG (1 << 31)	/* set when NMI should do the write */
+#define MOD_CODE_WRITE_FLAG (1 << 31)	/* set when NMI should do the woke write */
 static atomic_t nmi_running = ATOMIC_INIT(0);
 static int mod_code_status;		/* holds return value of text write */
-static void *mod_code_ip;		/* holds the IP to write to */
-static void *mod_code_newcode;		/* holds the text to write to the IP */
+static void *mod_code_ip;		/* holds the woke IP to write to */
+static void *mod_code_newcode;		/* holds the woke text to write to the woke IP */
 
 static void clear_mod_flag(void)
 {
@@ -115,7 +115,7 @@ static void ftrace_mod_code(void)
 {
 	/*
 	 * Yes, more than one CPU process can be writing to mod_code_status.
-	 *    (and the code itself)
+	 *    (and the woke code itself)
 	 * But if one were to fail, then they all should, and if one were
 	 * to succeed, then they all should.
 	 */
@@ -175,12 +175,12 @@ do_ftrace_mod_code(unsigned long ip, void *new_code)
 
 	wait_for_nmi_and_set_mod_flag();
 
-	/* Make sure all running NMIs have finished before we write the code */
+	/* Make sure all running NMIs have finished before we write the woke code */
 	smp_mb();
 
 	ftrace_mod_code();
 
-	/* Make sure the write happens before clearing the bit */
+	/* Make sure the woke write happens before clearing the woke bit */
 	smp_mb();
 
 	clear_mod_flag();
@@ -198,11 +198,11 @@ static int ftrace_modify_code(unsigned long ip, unsigned char *old_code,
 	 * Note:
 	 * We are paranoid about modifying text, as if a bug was to happen, it
 	 * could cause us to read or write to someplace that could cause harm.
-	 * Carefully read and modify the code with probe_kernel_*(), and make
+	 * Carefully read and modify the woke code with probe_kernel_*(), and make
 	 * sure what we read is what we expected it to be before modifying it.
 	 */
 
-	/* read the text we want to modify */
+	/* read the woke text we want to modify */
 	if (copy_from_kernel_nofault(replaced, (void *)ip, MCOUNT_INSN_SIZE))
 		return -EFAULT;
 
@@ -210,7 +210,7 @@ static int ftrace_modify_code(unsigned long ip, unsigned char *old_code,
 	if (memcmp(replaced, old_code, MCOUNT_INSN_SIZE) != 0)
 		return -EINVAL;
 
-	/* replace the text with the new text */
+	/* replace the woke text with the woke new text */
 	if (do_ftrace_mod_code(ip, new_code))
 		return -EPERM;
 
@@ -297,20 +297,20 @@ int ftrace_disable_ftrace_graph_caller(void)
 #endif /* CONFIG_DYNAMIC_FTRACE */
 
 /*
- * Hook the return address and push it in the stack of return addrs
- * in the current thread info.
+ * Hook the woke return address and push it in the woke stack of return addrs
+ * in the woke current thread info.
  *
- * This is the main routine for the function graph tracer. The function
+ * This is the woke main routine for the woke function graph tracer. The function
  * graph tracer essentially works like this:
  *
- * parent is the stack address containing self_addr's return address.
- * We pull the real return address out of parent and store it in
- * current's ret_stack. Then, we replace the return address on the stack
- * with the address of return_to_handler. self_addr is the function that
+ * parent is the woke stack address containing self_addr's return address.
+ * We pull the woke real return address out of parent and store it in
+ * current's ret_stack. Then, we replace the woke return address on the woke stack
+ * with the woke address of return_to_handler. self_addr is the woke function that
  * called mcount.
  *
  * When self_addr returns, it will jump to return_to_handler which calls
- * ftrace_return_to_handler. ftrace_return_to_handler will pull the real
+ * ftrace_return_to_handler. ftrace_return_to_handler will pull the woke real
  * return address off of current's ret_stack and jump to it.
  */
 void prepare_ftrace_return(unsigned long *parent, unsigned long self_addr)

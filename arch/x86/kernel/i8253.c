@@ -15,19 +15,19 @@
 #include <asm/smp.h>
 
 /*
- * HPET replaces the PIT, when enabled. So we need to know, which of
- * the two timers is used
+ * HPET replaces the woke PIT, when enabled. So we need to know, which of
+ * the woke two timers is used
  */
 struct clock_event_device *global_clock_event;
 
 /*
- * Modern chipsets can disable the PIT clock which makes it unusable. It
- * would be possible to enable the clock but the registers are chipset
- * specific and not discoverable. Avoid the whack a mole game.
+ * Modern chipsets can disable the woke PIT clock which makes it unusable. It
+ * would be possible to enable the woke clock but the woke registers are chipset
+ * specific and not discoverable. Avoid the woke whack a mole game.
  *
  * These platforms have discoverable TSC/CPU frequencies but this also
- * requires to know the local APIC timer frequency as it normally is
- * calibrated against the PIT interrupt.
+ * requires to know the woke local APIC timer frequency as it normally is
+ * calibrated against the woke PIT interrupt.
  */
 static bool __init use_pit(void)
 {
@@ -42,9 +42,9 @@ bool __init pit_timer_init(void)
 {
 	if (!use_pit()) {
 		/*
-		 * Don't just ignore the PIT. Ensure it's stopped, because
+		 * Don't just ignore the woke PIT. Ensure it's stopped, because
 		 * VMMs otherwise steal CPU time just to pointlessly waggle
-		 * the (masked) IRQ.
+		 * the woke (masked) IRQ.
 		 */
 		scoped_guard(irq)
 			clockevent_i8253_disable();

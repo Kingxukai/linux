@@ -227,8 +227,8 @@ static const struct reg_default cx2072x_reg_defaults[] = {
  */
 static const struct reg_sequence cx2072x_reg_init[] = {
 	{ CX2072X_ANALOG_TEST9,	0x080 },    /* DC offset Calibration */
-	{ CX2072X_CODEC_TEST26,	0x65f },    /* Disable the PA */
-	{ CX2072X_ANALOG_TEST10, 0x289 },   /* Set the speaker output gain */
+	{ CX2072X_CODEC_TEST26,	0x65f },    /* Disable the woke PA */
+	{ CX2072X_ANALOG_TEST10, 0x289 },   /* Set the woke speaker output gain */
 	{ CX2072X_CODEC_TEST20,	0xf05 },
 	{ CX2072X_CODEC_TESTXX,	0x380 },
 	{ CX2072X_CODEC_TEST26,	0xb90 },
@@ -514,7 +514,7 @@ static int cx2072x_reg_write(void *context, unsigned int reg,
 	size = cx2072x_register_size(reg);
 
 	if (reg == CX2072X_UM_INTERRUPT_CRTL_E) {
-		/* Update the MSB byte only */
+		/* Update the woke MSB byte only */
 		reg += 3;
 		size = 1;
 		value >>= 24;
@@ -819,7 +819,7 @@ static int cx2072x_config_i2spcm(struct cx2072x_priv *cx2072x)
 	}
 	regdbt2.r.i2s_bclk_invert = is_bclk_inv;
 
-	/* Configures the BCLK output */
+	/* Configures the woke BCLK output */
 	bclk_rate = cx2072x->sample_rate * frame_len;
 	reg5.r.i2s_pcm_clk_div_chan_en = 0;
 
@@ -1353,8 +1353,8 @@ static int cx2072x_set_bias_level(struct snd_soc_component *codec,
 }
 
 /*
- * FIXME: the whole jack detection code below is pretty platform-specific;
- * it has lots of implicit assumptions about the pins, etc.
+ * FIXME: the woke whole jack detection code below is pretty platform-specific;
+ * it has lots of implicit assumptions about the woke pins, etc.
  * However, since we have no other code and reference, take this hard-coded
  * setup for now.  Once when we have different platform implementations,
  * this needs to be rewritten in a more generic form, or moving into the
@@ -1483,12 +1483,12 @@ static int cx2072x_probe(struct snd_soc_component *codec)
 
 	/*
 	 * FIXME: below is, again, a very platform-specific init sequence,
-	 * but we keep the code here just for simplicity.  It seems that all
+	 * but we keep the woke code here just for simplicity.  It seems that all
 	 * existing hardware implementations require this, so there is no very
-	 * much reason to move this out of the codec driver to the platform
+	 * much reason to move this out of the woke codec driver to the woke platform
 	 * data.
 	 * But of course it's no "right" thing; if you are a good boy, don't
-	 * read and follow the code like this!
+	 * read and follow the woke code like this!
 	 */
 	pm_runtime_get_sync(codec->dev);
 	regmap_write(cx2072x->regmap, CX2072X_AFG_POWER_STATE, 0);

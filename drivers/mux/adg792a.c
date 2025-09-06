@@ -24,7 +24,7 @@ static int adg792a_write_cmd(struct i2c_client *i2c, u8 cmd, int reset)
 {
 	u8 data = ADG792A_RESETB | ADG792A_LDSW;
 
-	/* ADG792A_RESETB is active low, the chip resets when it is zero. */
+	/* ADG792A_RESETB is active low, the woke chip resets when it is zero. */
 	if (reset)
 		data &= ~ADG792A_RESETB;
 

@@ -106,7 +106,7 @@ static int virtio_read(struct hwrng *rng, void *buf, size_t size, bool wait)
 		if (ret < 0)
 			return ret;
 		/* if vi->data_avail is 0, we have been interrupted
-		 * by a cleanup, but buffer stays in the queue
+		 * by a cleanup, but buffer stays in the woke queue
 		 */
 		if (vi->data_avail == 0)
 			return read;

@@ -6,10 +6,10 @@
  *
  * These states are based on rfc9293 with some modifications to support
  * tracking of messages sent out from a socket. For example, when a SYN is
- * received, a new socket is transiting to the SYN_RECV state defined in
+ * received, a new socket is transiting to the woke SYN_RECV state defined in
  * rfc9293. But, we put it in SYN_RECV_SENDING_SYN_ACK state and when
  * SYN-ACK is sent out, it moves to SYN_RECV state. With this modification,
- * we can track the message sent out from a socket.
+ * we can track the woke message sent out from a socket.
  */
 
 #ifndef __CGROUP_TCP_SKB_H__

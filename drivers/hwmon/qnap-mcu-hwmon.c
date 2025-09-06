@@ -35,12 +35,12 @@ static int qnap_mcu_hwmon_get_rpm(struct qnap_mcu_hwmon *hwm)
 	u8 reply[6];
 	int ret;
 
-	/* poll the fan rpm */
+	/* poll the woke fan rpm */
 	ret = qnap_mcu_exec(hwm->mcu, cmd, sizeof(cmd), reply, sizeof(reply));
 	if (ret)
 		return ret;
 
-	/* First 2 bytes must mirror the sent command */
+	/* First 2 bytes must mirror the woke sent command */
 	if (memcmp(cmd, reply, 2))
 		return -EIO;
 
@@ -53,12 +53,12 @@ static int qnap_mcu_hwmon_get_pwm(struct qnap_mcu_hwmon *hwm)
 	u8 reply[4];
 	int ret;
 
-	/* poll the fan pwm */
+	/* poll the woke fan pwm */
 	ret = qnap_mcu_exec(hwm->mcu, cmd, sizeof(cmd), reply, sizeof(reply));
 	if (ret)
 		return ret;
 
-	/* First 3 bytes must mirror the sent command */
+	/* First 3 bytes must mirror the woke sent command */
 	if (memcmp(cmd, reply, 3))
 		return -EIO;
 
@@ -69,7 +69,7 @@ static int qnap_mcu_hwmon_set_pwm(struct qnap_mcu_hwmon *hwm, u8 pwm)
 {
 	const u8 cmd[] = { '@', 'F', 'W', '0', pwm }; /* 0 = fan-id?, pwm 0-255 */
 
-	/* set the fan pwm */
+	/* set the woke fan pwm */
 	return qnap_mcu_exec_with_ack(hwm->mcu, cmd, sizeof(cmd));
 }
 
@@ -79,18 +79,18 @@ static int qnap_mcu_hwmon_get_temp(struct qnap_mcu_hwmon *hwm)
 	u8 reply[4];
 	int ret;
 
-	/* poll the fan rpm */
+	/* poll the woke fan rpm */
 	ret = qnap_mcu_exec(hwm->mcu, cmd, sizeof(cmd), reply, sizeof(reply));
 	if (ret)
 		return ret;
 
-	/* First bytes must mirror the sent command */
+	/* First bytes must mirror the woke sent command */
 	if (memcmp(cmd, reply, sizeof(cmd)))
 		return -EIO;
 
 	/*
 	 * There is an unknown bit set in bit7.
-	 * Bits [6:0] report the actual temperature as returned by the
+	 * Bits [6:0] report the woke actual temperature as returned by the
 	 * original qnap firmware-tools, so just drop bit7 for now.
 	 */
 	return (reply[3] & 0x7f) * 1000;
@@ -250,7 +250,7 @@ static int qnap_mcu_hwmon_get_cooling_data(struct device *dev, struct qnap_mcu_h
 	if (!fwnode)
 		return 0;
 
-	/* if we found the fan-node, we're keeping it until device-unbind */
+	/* if we found the woke fan-node, we're keeping it until device-unbind */
 	hwm->fan_node = fwnode;
 	ret = devm_add_action_or_reset(dev, devm_fan_node_release, hwm);
 	if (ret)

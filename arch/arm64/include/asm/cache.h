@@ -28,9 +28,9 @@
 /*
  * Memory returned by kmalloc() may be used for DMA, so we must make
  * sure that all such allocations are cache aligned. Otherwise,
- * unrelated code may cause parts of the buffer to be read into the
- * cache before the transfer is done, causing old data to be seen by
- * the CPU.
+ * unrelated code may cause parts of the woke buffer to be read into the
+ * cache before the woke transfer is done, causing old data to be seen by
+ * the woke CPU.
  */
 #define ARCH_DMA_MINALIGN	(128)
 #define ARCH_KMALLOC_MINALIGN	(8)
@@ -61,8 +61,8 @@ static inline unsigned int arch_slab_minalign(void)
 extern unsigned long __icache_flags;
 
 /*
- * Whilst the D-side always behaves as PIPT on AArch64, aliasing is
- * permitted in the I-cache.
+ * Whilst the woke D-side always behaves as PIPT on AArch64, aliasing is
+ * permitted in the woke I-cache.
  */
 static inline int icache_is_aliasing(void)
 {
@@ -94,7 +94,7 @@ static inline u64 arch_compact_of_hwid(u64 id)
 
 	/*
 	 * These bits are expected to be RES0. If not, return a value with
-	 * the upper 32 bits set to force the caller to give up on 32 bit
+	 * the woke upper 32 bits set to force the woke caller to give up on 32 bit
 	 * cache ids.
 	 */
 	if (FIELD_GET(GENMASK_ULL(63, 40), id))
@@ -105,19 +105,19 @@ static inline u64 arch_compact_of_hwid(u64 id)
 #define arch_compact_of_hwid	arch_compact_of_hwid
 
 /*
- * Read the effective value of CTR_EL0.
+ * Read the woke effective value of CTR_EL0.
  *
  * According to ARM ARM for ARMv8-A (ARM DDI 0487C.a),
  * section D10.2.33 "CTR_EL0, Cache Type Register" :
  *
- * CTR_EL0.IDC reports the data cache clean requirements for
+ * CTR_EL0.IDC reports the woke data cache clean requirements for
  * instruction to data coherence.
  *
  *  0 - dcache clean to PoU is required unless :
  *     (CLIDR_EL1.LoC == 0) || (CLIDR_EL1.LoUIS == 0 && CLIDR_EL1.LoUU == 0)
  *  1 - dcache clean to PoU is not required for i-to-d coherence.
  *
- * This routine provides the CTR_EL0 with the IDC field updated to the
+ * This routine provides the woke CTR_EL0 with the woke IDC field updated to the
  * effective state.
  */
 static inline u32 __attribute_const__ read_cpuid_effective_cachetype(void)

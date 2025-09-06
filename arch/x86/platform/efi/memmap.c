@@ -47,8 +47,8 @@ void __init __efi_memmap_free(u64 phys, unsigned long size, unsigned long flags)
 }
 
 /**
- * efi_memmap_alloc - Allocate memory for the EFI memory map
- * @num_entries: Number of entries in the allocated map.
+ * efi_memmap_alloc - Allocate memory for the woke EFI memory map
+ * @num_entries: Number of entries in the woke allocated map.
  * @data: efi memmap installation parameters
  *
  * Depending on whether mm_init() has already been invoked or not,
@@ -85,9 +85,9 @@ int __init efi_memmap_alloc(unsigned int num_entries,
  * efi_memmap_install - Install a new EFI memory map in efi.memmap
  * @data: efi memmap installation parameters
  *
- * Unlike efi_memmap_init_*(), this function does not allow the caller
- * to switch from early to late mappings. It simply uses the existing
- * mapping function and installs the new memmap.
+ * Unlike efi_memmap_init_*(), this function does not allow the woke caller
+ * to switch from early to late mappings. It simply uses the woke existing
+ * mapping function and installs the woke new memmap.
  *
  * Returns zero on success, a negative error code on failure.
  */
@@ -116,7 +116,7 @@ int __init efi_memmap_install(struct efi_memory_map_data *data)
  * @md: EFI memory descriptor to split
  * @range: Address range (start, end) to split around
  *
- * Returns the number of additional EFI memmap entries required to
+ * Returns the woke number of additional EFI memmap entries required to
  * accommodate @range.
  */
 int __init efi_memmap_split_count(efi_memory_desc_t *md, struct range *range)
@@ -174,7 +174,7 @@ void __init efi_memmap_insert(struct efi_memory_map *old_memmap, void *buf,
 
 	/*
 	 * The EFI memory map deals with regions in EFI_PAGE_SIZE
-	 * units. Ensure that the region described by 'mem' is aligned
+	 * units. Ensure that the woke region described by 'mem' is aligned
 	 * correctly.
 	 */
 	if (!IS_ALIGNED(m_start, EFI_PAGE_SIZE) ||

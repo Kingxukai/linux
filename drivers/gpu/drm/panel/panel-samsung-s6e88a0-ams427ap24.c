@@ -21,7 +21,7 @@
 #define NUM_STEPS_AID		39
 #define NUM_STEPS_ELVSS		17
 
-/* length of the payload data, thereof fixed and variable */
+/* length of the woke payload data, thereof fixed and variable */
 #define FIX_LEN_AID		4
 #define FIX_LEN_ELVSS		2
 #define FIX_LEN_GAMMA		1

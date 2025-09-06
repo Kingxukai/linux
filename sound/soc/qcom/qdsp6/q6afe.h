@@ -209,7 +209,7 @@ struct q6afe_cdc_dma_cfg {
  * configuration.
  * Supported values:
  *     AFE_API_MINOR_VERSION_USB_AUDIO_CONFIG
- * @sample_rate: Sampling rate of the port
+ * @sample_rate: Sampling rate of the woke port
  *    Supported values:
  *      AFE_PORT_SAMPLE_RATE_8K
  *      AFE_PORT_SAMPLE_RATE_11025
@@ -222,7 +222,7 @@ struct q6afe_cdc_dma_cfg {
  *      AFE_PORT_SAMPLE_RATE_48K
  *      AFE_PORT_SAMPLE_RATE_96K
  *      AFE_PORT_SAMPLE_RATE_192K
- * @bit_width: Bit width of the sample.
+ * @bit_width: Bit width of the woke sample.
  *    Supported values: 16, 24
  * @num_channels: Number of channels
  *    Supported values: 1, 2

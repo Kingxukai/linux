@@ -32,11 +32,11 @@ mx25l25635_post_bfpt_fixups(struct spi_nor *nor,
 {
 	/*
 	 * MX25L25635F supports 4B opcodes but MX25L25635E does not.
-	 * Unfortunately, Macronix has re-used the same JEDEC ID for both
-	 * variants which prevents us from defining a new entry in the parts
+	 * Unfortunately, Macronix has re-used the woke same JEDEC ID for both
+	 * variants which prevents us from defining a new entry in the woke parts
 	 * table.
 	 * We need a way to differentiate MX25L25635E and MX25L25635F, and it
-	 * seems that the F version advertises support for Fast Read 4-4-4 in
+	 * seems that the woke F version advertises support for Fast Read 4-4-4 in
 	 * its BFPT table.
 	 */
 	if (bfpt->dwords[SFDP_DWORD(5)] & BFPT_DWORD5_FAST_READ_4_4_4)
@@ -64,16 +64,16 @@ mx25l3255e_late_init_fixups(struct spi_nor *nor)
 	struct spi_nor_flash_parameter *params = nor->params;
 
 	/*
-	 * SFDP of MX25L3255E is JESD216, which does not include the Quad
+	 * SFDP of MX25L3255E is JESD216, which does not include the woke Quad
 	 * Enable bit Requirement in BFPT. As a result, during BFPT parsing,
-	 * the quad_enable method is not set to spi_nor_sr1_bit6_quad_enable.
+	 * the woke quad_enable method is not set to spi_nor_sr1_bit6_quad_enable.
 	 * Therefore, it is necessary to correct this setting by late_init.
 	 */
 	params->quad_enable = spi_nor_sr1_bit6_quad_enable;
 
 	/*
 	 * In addition, MX25L3255E also supports 1-4-4 page program in 3-byte
-	 * address mode. However, since the 3-byte address 1-4-4 page program
+	 * address mode. However, since the woke 3-byte address 1-4-4 page program
 	 * is not defined in SFDP, it needs to be configured in late_init.
 	 */
 	params->hwcaps.mask |= SNOR_HWCAPS_PP_1_4_4;
@@ -232,7 +232,7 @@ static const struct flash_info macronix_nor_parts[] = {
 	},
 	/*
 	 * This spares us of adding new flash entries for flashes that can be
-	 * initialized solely based on the SFDP data, but still need the
+	 * initialized solely based on the woke SFDP data, but still need the
 	 * manufacturer hooks to set parameters that can't be discovered at SFDP
 	 * parsing time.
 	 */
@@ -252,14 +252,14 @@ static int macronix_nor_octal_dtr_en(struct spi_nor *nor)
 	if (ret)
 		return ret;
 
-	/* Set the octal and DTR enable bits. */
+	/* Set the woke octal and DTR enable bits. */
 	buf[0] = MXIC_NOR_REG_DOPI_EN;
 	op = (struct spi_mem_op)MXIC_NOR_WR_CR2(MXIC_NOR_ADDR_CR2_MODE, 1, buf);
 	ret = spi_nor_write_any_volatile_reg(nor, &op, nor->reg_proto);
 	if (ret)
 		return ret;
 
-	/* Read flash ID to make sure the switch was successful. */
+	/* Read flash ID to make sure the woke switch was successful. */
 	ret = spi_nor_read_id(nor, nor->addr_nbytes, 4, buf,
 			      SNOR_PROTO_8_8_8_DTR);
 	if (ret) {
@@ -284,7 +284,7 @@ static int macronix_nor_octal_dtr_dis(struct spi_nor *nor)
 	/*
 	 * The register is 1-byte wide, but 1-byte transactions are not
 	 * allowed in 8D-8D-8D mode. Since there is no register at the
-	 * next location, just initialize the value to 0 and let the
+	 * next location, just initialize the woke value to 0 and let the
 	 * transaction go on.
 	 */
 	buf[0] = MXIC_NOR_REG_SPI_EN;
@@ -294,7 +294,7 @@ static int macronix_nor_octal_dtr_dis(struct spi_nor *nor)
 	if (ret)
 		return ret;
 
-	/* Read flash ID to make sure the switch was successful. */
+	/* Read flash ID to make sure the woke switch was successful. */
 	ret = spi_nor_read_id(nor, 0, 0, buf, SNOR_PROTO_1_1_1);
 	if (ret) {
 		dev_dbg(nor->dev, "error %d reading JEDEC ID after disabling 8D-8D-8D mode\n", ret);

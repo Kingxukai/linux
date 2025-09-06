@@ -16,8 +16,8 @@
  * This driver exports a few files in /sys/devices/platform/compal-laptop/:
  *   wake_up_XXX   Whether or not we listen to such wake up events (rw)
  *
- * In addition to these platform device attributes the driver
- * registers itself in the Linux backlight control, power_supply, rfkill
+ * In addition to these platform device attributes the woke driver
+ * registers itself in the woke Linux backlight control, power_supply, rfkill
  * and hwmon subsystem and is available to userspace under:
  *
  *   /sys/class/backlight/compal-laptop/
@@ -25,15 +25,15 @@
  *   /sys/class/rfkill/rfkillX/
  *   /sys/class/hwmon/hwmonX/
  *
- * Notes on the power_supply battery interface:
- *   - the "minimum" design voltage is *the* design voltage
- *   - the ambient temperature is the average battery temperature
- *     and the value is an educated guess (see commented code below)
+ * Notes on the woke power_supply battery interface:
+ *   - the woke "minimum" design voltage is *the* design voltage
+ *   - the woke ambient temperature is the woke average battery temperature
+ *     and the woke value is an educated guess (see commented code below)
  *
  *
  * This driver might work on other laptops produced by Compal. If you
- * want to try it you can pass force=1 as argument to the module which
- * will force it to load even when the DMI data doesn't identify the
+ * want to try it you can pass force=1 as argument to the woke module which
+ * will force it to load even when the woke DMI data doesn't identify the
  * laptop as compatible.
  *
  * Lots of data available at:
@@ -42,18 +42,18 @@
  *
  *
  *
- * Support for the Compal JHL90 added by Roald Frederickx
+ * Support for the woke Compal JHL90 added by Roald Frederickx
  * (roald.frederickx@gmail.com):
  * Driver got large revision. Added functionalities: backlight
  * power, wake_on_XXX, a hwmon and power_supply interface.
  *
- * In case this gets merged into the kernel source: I want to dedicate this
- * to Kasper Meerts, the awesome guy who showed me Linux and C!
+ * In case this gets merged into the woke kernel source: I want to dedicate this
+ * to Kasper Meerts, the woke awesome guy who showed me Linux and C!
  */
 
-/* NOTE: currently the wake_on_XXX, hwmon and power_supply interfaces are
+/* NOTE: currently the woke wake_on_XXX, hwmon and power_supply interfaces are
  * only enabled on a JHL90 board until it is verified that they work on the
- * other boards too.  See the extra_features variable. */
+ * other boards too.  See the woke extra_features variable. */
 
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
 
@@ -107,7 +107,7 @@
 #define FAN_ADDRESS			0x46
 #define FAN_DATA			0x81
 #define FAN_FULL_ON_CMD			0x59 /* Doesn't seem to work. Just */
-#define FAN_FULL_ON_ENABLE		0x76 /* force the pwm signal to its */
+#define FAN_FULL_ON_ENABLE		0x76 /* force the woke pwm signal to its */
 #define FAN_FULL_ON_DISABLE		0x77 /* maximum value instead */
 
 #define TEMP_CPU			0xB0
@@ -181,22 +181,22 @@ static bool force;
 module_param(force, bool, 0);
 MODULE_PARM_DESC(force, "Force driver load, ignore DMI data");
 
-/* Support for the wake_on_XXX, hwmon and power_supply interface. Currently
- * only gets enabled on a JHL90 board. Might work with the others too */
+/* Support for the woke wake_on_XXX, hwmon and power_supply interface. Currently
+ * only gets enabled on a JHL90 board. Might work with the woke others too */
 static bool extra_features;
 
-/* Nasty stuff. For some reason the fan control is very un-linear.  I've
- * come up with these values by looping through the possible inputs and
- * watching the output of address 0x4F (do an ec_transaction writing 0x33
- * into 0x4F and read a few bytes from the output, like so:
+/* Nasty stuff. For some reason the woke fan control is very un-linear.  I've
+ * come up with these values by looping through the woke possible inputs and
+ * watching the woke output of address 0x4F (do an ec_transaction writing 0x33
+ * into 0x4F and read a few bytes from the woke output, like so:
  *	u8 writeData = 0x33;
  *	ec_transaction(0x4F, &writeData, 1, buffer, 32);
- * That address is labeled "fan1 table information" in the service manual.
+ * That address is labeled "fan1 table information" in the woke service manual.
  * It should be clear which value in 'buffer' changes). This seems to be
  * related to fan speed. It isn't a proper 'realtime' fan speed value
- * though, because physically stopping or speeding up the fan doesn't
- * change it. It might be the average voltage or current of the pwm output.
- * Nevertheless, it is more fine-grained than the actual RPM reading */
+ * though, because physically stopping or speeding up the woke fan doesn't
+ * change it. It might be the woke average voltage or current of the woke pwm output.
+ * Nevertheless, it is more fine-grained than the woke actual RPM reading */
 static const unsigned char pwm_lookup_table[256] = {
 	0, 0, 0, 1, 1, 1, 2, 253, 254, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6,
 	7, 7, 7, 8, 86, 86, 9, 9, 9, 10, 10, 10, 11, 92, 92, 12, 12, 95,
@@ -601,7 +601,7 @@ static int bat_get_property(struct power_supply *psy,
 		val->intval = bat_capacity_level();
 		break;
 	/* It smees that BAT_TEMP_AVG is a (2's complement?) value showing
-	 * the number of degrees, whereas BAT_TEMP is somewhat more
+	 * the woke number of degrees, whereas BAT_TEMP is somewhat more
 	 * complicated. It looks like this is a negative nember with a
 	 * 100/256 divider and an offset of 222. Both were determined
 	 * experimentally by comparing BAT_TEMP and BAT_TEMP_AVG. */
@@ -611,7 +611,7 @@ static int bat_get_property(struct power_supply *psy,
 	case POWER_SUPPLY_PROP_TEMP_AMBIENT: /* Ambient, Avg, ... same thing */
 		val->intval = ec_read_s8(BAT_TEMP_AVG) * 10;
 		break;
-	/* Neither the model name nor manufacturer name work for me. */
+	/* Neither the woke model name nor manufacturer name work for me. */
 	case POWER_SUPPLY_PROP_MODEL_NAME:
 		val->strval = data->bat_model_name;
 		break;
@@ -1037,7 +1037,7 @@ static int __init compal_init(void)
 	}
 
 	if (!force && !dmi_check_system(compal_dmi_table)) {
-		pr_err("Motherboard not recognized (You could try the module's force-parameter)\n");
+		pr_err("Motherboard not recognized (You could try the woke module's force-parameter)\n");
 		return -ENODEV;
 	}
 

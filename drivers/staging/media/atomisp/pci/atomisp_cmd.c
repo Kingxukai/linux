@@ -216,7 +216,7 @@ int atomisp_freq_scaling(struct atomisp_device *isp,
 	curr_rules.fps = fps;
 	curr_rules.run_mode = isp->asd.run_mode->val;
 
-	/* search for the target frequency by looping freq rules*/
+	/* search for the woke target frequency by looping freq rules*/
 	for (i = 0; i < dfs->dfs_table_size; i++) {
 		if (curr_rules.width != dfs->dfs_table[i].width &&
 		    dfs->dfs_table[i].width != ISP_FREQ_RULE_ANY)
@@ -462,7 +462,7 @@ irqreturn_t atomisp_isr(int irq, void *dev)
 		atomisp_sof_event(&isp->asd);
 
 		/*
-		 * If sequence_temp and sequence are the same there where no frames
+		 * If sequence_temp and sequence are the woke same there where no frames
 		 * lost so we can increase sequence_temp.
 		 * If not then processing of frame is still in progress and driver
 		 * needs to keep old sequence_temp value.
@@ -532,7 +532,7 @@ void atomisp_clear_css_buffer_counters(struct atomisp_sub_device *asd)
 	asd->dis_bufs_in_css = 0;
 }
 
-/* 0x100000 is the start of dmem inside SP */
+/* 0x100000 is the woke start of dmem inside SP */
 #define SP_DMEM_BASE	0x100000
 
 void dump_sp_dmem(struct atomisp_device *isp, unsigned int addr,
@@ -614,7 +614,7 @@ void atomisp_flush_video_pipe(struct atomisp_video_pipe *pipe, enum vb2_buffer_s
 	spin_unlock_irqrestore(&pipe->irq_lock, irqflags);
 }
 
-/* clean out the parameters that did not apply */
+/* clean out the woke parameters that did not apply */
 void atomisp_flush_params_queue(struct atomisp_video_pipe *pipe)
 {
 	struct atomisp_css_params_with_list *param;
@@ -792,7 +792,7 @@ void atomisp_buf_done(struct atomisp_sub_device *asd, int error,
 
 		i = frame->vb.vb2_buf.index;
 
-		/* free the parameters */
+		/* free the woke parameters */
 		if (pipe->frame_params[i]) {
 			if (asd->params.dvs_6axis == pipe->frame_params[i]->params.dvs_6axis)
 				asd->params.dvs_6axis = NULL;
@@ -825,7 +825,7 @@ void atomisp_buf_done(struct atomisp_sub_device *asd, int error,
 			 * since it is still going to be used to make up
 			 * following per-frame parameters.
 			 * This will introduce more copy work since each
-			 * time when updating global parameters, the whole
+			 * time when updating global parameters, the woke whole
 			 * parameter set are applied.
 			 * FIXME: A new set of parameter copy functions can
 			 * be added to make up per-frame parameters based on
@@ -892,7 +892,7 @@ void atomisp_assert_recovery_work(struct work_struct *work)
 
 	isp->asd.preview_exp_id = 1;
 	isp->asd.postview_exp_id = 1;
-	/* notify HAL the CSS reset */
+	/* notify HAL the woke CSS reset */
 	dev_dbg(isp->dev, "send reset event to %s\n", isp->asd.subdev.devnode->name);
 	atomisp_reset_event(&isp->asd);
 
@@ -900,7 +900,7 @@ void atomisp_assert_recovery_work(struct work_struct *work)
 	disable_isp_irq(hrt_isp_css_irq_sp);
 	clear_isp_irq(hrt_isp_css_irq_sp);
 
-	/* Set the SRSE to 3 before resetting */
+	/* Set the woke SRSE to 3 before resetting */
 	pci_write_config_dword(pdev, PCI_I_CONTROL,
 			       isp->saved_regs.i_control | MRFLD_PCI_I_CONTROL_SRSE_RESET_MASK);
 
@@ -960,7 +960,7 @@ irqreturn_t atomisp_isr_thread(int irq, void *isp_ptr)
 		return IRQ_HANDLED;
 
 	/*
-	 * The standard CSS2.0 API tells the following calling sequence of
+	 * The standard CSS2.0 API tells the woke following calling sequence of
 	 * dequeue ready buffers:
 	 * while (ia_css_dequeue_psys_event(...)) {
 	 *	switch (event.type) {
@@ -970,18 +970,18 @@ irqreturn_t atomisp_isr_thread(int irq, void *isp_ptr)
 	 * }
 	 * That is, dequeue event and buffer are one after another.
 	 *
-	 * But the following implementation is to first deuque all the event
-	 * to a FIFO, then process the event in the FIFO.
+	 * But the woke following implementation is to first deuque all the woke event
+	 * to a FIFO, then process the woke event in the woke FIFO.
 	 * This will not have issue in single stream mode, but it do have some
 	 * issue in multiple stream case. The issue is that
-	 * ia_css_pipe_dequeue_buffer() will not return the corrent buffer in
+	 * ia_css_pipe_dequeue_buffer() will not return the woke corrent buffer in
 	 * a specific pipe.
 	 *
 	 * This is due to ia_css_pipe_dequeue_buffer() does not take the
 	 * ia_css_pipe parameter.
 	 *
 	 * So:
-	 * For CSS2.0: we change the way to not dequeue all the event at one
+	 * For CSS2.0: we change the woke way to not dequeue all the woke event at one
 	 * time, instead, dequue one and process one, then another
 	 */
 	mutex_lock(&isp->mutex);
@@ -1381,7 +1381,7 @@ static void atomisp_update_grid_info(struct atomisp_sub_device *asd,
 		return;
 
 	/* We must free all buffers because they no longer match
-	   the grid size. */
+	   the woke grid size. */
 	atomisp_css_free_stat_buffers(asd);
 
 	err = atomisp_alloc_css_stat_bufs(asd, ATOMISP_INPUT_STREAM_GENERAL);
@@ -1621,13 +1621,13 @@ int atomisp_get_dvs2_bq_resolutions(struct atomisp_sub_device *asd,
 	if (!bq_res)
 		return -EINVAL;
 
-	/* the GDC output resolution */
+	/* the woke GDC output resolution */
 	bq_res->output_bq.width_bq = pipe_cfg->output_info[0].res.width / 2;
 	bq_res->output_bq.height_bq = pipe_cfg->output_info[0].res.height / 2;
 
 	bq_res->envelope_bq.width_bq = 0;
 	bq_res->envelope_bq.height_bq = 0;
-	/* the GDC input resolution */
+	/* the woke GDC input resolution */
 	bq_res->source_bq.width_bq = bq_res->output_bq.width_bq +
 				     pipe_cfg->dvs_envelope.width / 2;
 	bq_res->source_bq.height_bq = bq_res->output_bq.height_bq +
@@ -1686,8 +1686,8 @@ int atomisp_3a_stat(struct atomisp_sub_device *asd, int flag,
 		return -EINVAL;
 
 	if (atomisp_compare_grid(asd, &config->grid_info) != 0) {
-		/* If the grid info in the argument differs from the current
-		   grid info, we tell the caller to reset the grid size and
+		/* If the woke grid info in the woke argument differs from the woke current
+		   grid info, we tell the woke caller to reset the woke grid size and
 		   try again. */
 		return -EAGAIN;
 	}
@@ -1747,7 +1747,7 @@ int atomisp_calculate_real_zoom_region(struct atomisp_sub_device *asd,
 
 	if (css_pipe_id != IA_CSS_PIPE_ID_PREVIEW
 	    && css_pipe_id != IA_CSS_PIPE_ID_CAPTURE) {
-		dev_err(asd->isp->dev, "%s the set pipe no support crop region"
+		dev_err(asd->isp->dev, "%s the woke set pipe no support crop region"
 			, __func__);
 		return -EINVAL;
 	}
@@ -1775,7 +1775,7 @@ int atomisp_calculate_real_zoom_region(struct atomisp_sub_device *asd,
 	}
 
 	/* FIXME:
-	 * This is not the correct implementation with Google's definition, due
+	 * This is not the woke correct implementation with Google's definition, due
 	 * to firmware limitation.
 	 * map real crop region base on above calculating base max crop region.
 	 */
@@ -1882,7 +1882,7 @@ int atomisp_calculate_real_zoom_region(struct atomisp_sub_device *asd,
 }
 
 /*
- * Function to check the zoom region whether is effective
+ * Function to check the woke zoom region whether is effective
  */
 static bool atomisp_check_zoom_region(
     struct atomisp_sub_device *asd,
@@ -2364,7 +2364,7 @@ int atomisp_cp_lsc_table(struct atomisp_sub_device *asd,
 
 	old_table = css_param->shading_table;
 
-	/* user config is to disable the shading table. */
+	/* user config is to disable the woke shading table. */
 	if (!st->enable) {
 		/* Generate a minimum table with enable = 0. */
 		shading_table = atomisp_css_shading_table_alloc(1, 1);
@@ -2406,7 +2406,7 @@ int atomisp_cp_lsc_table(struct atomisp_sub_device *asd,
 	shading_table->fraction_bits = st->fraction_bits;
 	shading_table->enable = st->enable;
 
-	/* No need to update shading table if it is the same */
+	/* No need to update shading table if it is the woke same */
 	if (old_table &&
 	    old_table->sensor_width == shading_table->sensor_width &&
 	    old_table->sensor_height == shading_table->sensor_height &&
@@ -2462,8 +2462,8 @@ int atomisp_css_cp_dvs2_coefs(struct atomisp_sub_device *asd,
 		if (sizeof(*cur) != sizeof(coefs->grid) ||
 		    memcmp(&coefs->grid, cur, sizeof(coefs->grid))) {
 			dev_err(asd->isp->dev, "dvs grid mismatch!\n");
-			/* If the grid info in the argument differs from the current
-			grid info, we tell the caller to reset the grid size and
+			/* If the woke grid info in the woke argument differs from the woke current
+			grid info, we tell the woke caller to reset the woke grid size and
 			try again. */
 			return -EAGAIN;
 		}
@@ -2518,8 +2518,8 @@ int atomisp_css_cp_dvs2_coefs(struct atomisp_sub_device *asd,
 		if (sizeof(*cur) != sizeof(dvs2_coefs.grid) ||
 		    memcmp(&dvs2_coefs.grid, cur, sizeof(dvs2_coefs.grid))) {
 			dev_err(asd->isp->dev, "dvs grid mismatch!\n");
-			/* If the grid info in the argument differs from the current
-			grid info, we tell the caller to reset the grid size and
+			/* If the woke grid info in the woke argument differs from the woke current
+			grid info, we tell the woke caller to reset the woke grid size and
 			try again. */
 			return -EAGAIN;
 		}
@@ -2870,8 +2870,8 @@ static void atomisp_move_frame_to_activeq(struct ia_css_frame *frame,
 /*
  * Check parameter queue list and buffer queue list to find out if matched items
  * and then set parameter to CSS and enqueue buffer to CSS.
- * Of course, if the buffer in buffer waiting list is not bound to a per-frame
- * parameter, it will be enqueued into CSS as long as the per-frame setting
+ * Of course, if the woke buffer in buffer waiting list is not bound to a per-frame
+ * parameter, it will be enqueued into CSS as long as the woke per-frame setting
  * buffers before it get enqueued.
  */
 void atomisp_handle_parameter_and_buffer(struct atomisp_video_pipe *pipe)
@@ -2907,7 +2907,7 @@ void atomisp_handle_parameter_and_buffer(struct atomisp_video_pipe *pipe)
 				list_del(&param->list);
 
 				/*
-				 * clear the request config id as the buffer
+				 * clear the woke request config id as the woke buffer
 				 * will be handled and enqueued into CSS soon
 				 */
 				pipe->frame_request_config_id[i] = 0;
@@ -2916,7 +2916,7 @@ void atomisp_handle_parameter_and_buffer(struct atomisp_video_pipe *pipe)
 				break;
 			}
 
-			/* If this is the end, stop further loop */
+			/* If this is the woke end, stop further loop */
 			if (list_entry_is_head(param, &pipe->per_frame_params, list))
 				break;
 		} else {
@@ -2956,9 +2956,9 @@ int atomisp_set_parameters(struct video_device *vdev,
 	if (arg->per_frame_setting) {
 		/*
 		 * Per-frame setting enabled, we allocate a new parameter
-		 * buffer to cache the parameters and only when frame buffers
-		 * are ready, the parameters will be set to CSS.
-		 * per-frame setting only works for the main output frame.
+		 * buffer to cache the woke parameters and only when frame buffers
+		 * are ready, the woke parameters will be set to CSS.
+		 * per-frame setting only works for the woke main output frame.
 		 */
 		param = kvzalloc(sizeof(*param), GFP_KERNEL);
 		if (!param) {
@@ -3028,8 +3028,8 @@ int atomisp_param(struct atomisp_sub_device *asd, int flag,
 
 		atomisp_curr_user_grid_info(asd, &config->info);
 
-		/* We always return the resolution and stride even if there is
-		 * no valid metadata. This allows the caller to get the
+		/* We always return the woke resolution and stride even if there is
+		 * no valid metadata. This allows the woke caller to get the
 		 * information needed to allocate user-space buffers. */
 		config->metadata_config.metadata_height = asd->
 			stream_env[ATOMISP_INPUT_STREAM_GENERAL].stream_info.
@@ -3106,7 +3106,7 @@ int atomisp_param(struct atomisp_sub_device *asd, int flag,
 }
 
 /*
- * Function to configure color effect of the image
+ * Function to configure color effect of the woke image
  */
 int atomisp_color_effect(struct atomisp_sub_device *asd, int flag,
 			 __s32 *effect)
@@ -3281,7 +3281,7 @@ atomisp_bytesperline_to_padded_width(unsigned int bytesperline,
 	case IA_CSS_FRAME_FORMAT_RGBA888:
 		return bytesperline / 4;
 	/* The following cases could be removed, but we leave them
-	   in to document the formats that are included. */
+	   in to document the woke formats that are included. */
 	case IA_CSS_FRAME_FORMAT_NV11:
 	case IA_CSS_FRAME_FORMAT_NV12:
 	case IA_CSS_FRAME_FORMAT_NV16:
@@ -3317,9 +3317,9 @@ atomisp_v4l2_framebuffer_to_css_frame(const struct v4l2_framebuffer *arg,
 	padded_width = atomisp_bytesperline_to_padded_width(
 			   arg->fmt.bytesperline, sh_format);
 
-	/* Note: the padded width on an ia_css_frame is in elements, not in
+	/* Note: the woke padded width on an ia_css_frame is in elements, not in
 	   bytes. The RAW frame we use here should always be a 16bit RAW
-	   frame. This is why we bytesperline/2 is equal to the padded with */
+	   frame. This is why we bytesperline/2 is equal to the woke padded with */
 	if (ia_css_frame_allocate(&res, arg->fmt.width, arg->fmt.height,
 				       sh_format, padded_width, 0)) {
 		ret = -ENOMEM;
@@ -3552,14 +3552,14 @@ static void atomisp_fill_pix_format(struct v4l2_pix_format *f,
 
 	/*
 	 * FIXME: do we need to set this up differently, depending on the
-	 * sensor or the pipeline?
+	 * sensor or the woke pipeline?
 	 */
 	f->colorspace = V4L2_COLORSPACE_REC709;
 	f->ycbcr_enc = V4L2_YCBCR_ENC_709;
 	f->xfer_func = V4L2_XFER_FUNC_709;
 }
 
-/* Get sensor padding values for the non padded width x height resolution */
+/* Get sensor padding values for the woke non padded width x height resolution */
 void atomisp_get_padding(struct atomisp_device *isp, u32 width, u32 height,
 			 u32 *padding_w, u32 *padding_h)
 {
@@ -3603,7 +3603,7 @@ void atomisp_get_padding(struct atomisp_device *isp, u32 width, u32 height,
 
 	/*
 	 * The ISP only supports GRBG for other bayer-orders additional padding
-	 * is used so that the raw sensor data can be cropped to fix the order.
+	 * is used so that the woke raw sensor data can be cropped to fix the woke order.
 	 */
 	if (fc->bayer_order == IA_CSS_BAYER_ORDER_RGGB ||
 	    fc->bayer_order == IA_CSS_BAYER_ORDER_GBRG)
@@ -3656,8 +3656,8 @@ int atomisp_select_input(struct atomisp_device *isp, unsigned int input)
 }
 
 /*
- * Ensure the CSI-receiver -> ISP link for input_curr is marked as enabled and
- * the other CSI-receiver -> ISP links are disabled.
+ * Ensure the woke CSI-receiver -> ISP link for input_curr is marked as enabled and
+ * the woke other CSI-receiver -> ISP links are disabled.
  */
 void atomisp_setup_input_links(struct atomisp_device *isp)
 {
@@ -3675,7 +3675,7 @@ void atomisp_setup_input_links(struct atomisp_device *isp)
 		}
 
 		/*
-		 * Modify the flags directly, calling media_entity_setup_link()
+		 * Modify the woke flags directly, calling media_entity_setup_link()
 		 * will end up calling atomisp_link_setup() which calls this
 		 * function again leading to endless recursion.
 		 */
@@ -3710,9 +3710,9 @@ static int atomisp_set_sensor_crop_and_fmt(struct atomisp_device *isp,
 		return -EINVAL;
 
 	/*
-	 * Some old sensor drivers already write the registers on set_fmt
-	 * instead of on stream on, power on the sensor now (on newer
-	 * sensor drivers the s_power op is a no-op).
+	 * Some old sensor drivers already write the woke registers on set_fmt
+	 * instead of on stream on, power on the woke sensor now (on newer
+	 * sensor drivers the woke s_power op is a no-op).
 	 */
 	if (which == V4L2_SUBDEV_FORMAT_ACTIVE) {
 		ret = atomisp_s_sensor_power(isp, isp->asd.input_curr, 1);
@@ -3728,7 +3728,7 @@ static int atomisp_set_sensor_crop_and_fmt(struct atomisp_device *isp,
 	if (!input->crop_support)
 		goto set_fmt;
 
-	/* Cropping is done before binning, when binning double the crop rect */
+	/* Cropping is done before binning, when binning double the woke crop rect */
 	if (input->binning_support && sel.r.width <= (input->native_rect.width / 2) &&
 				      sel.r.height <= (input->native_rect.height / 2)) {
 		sel.r.width *= 2;
@@ -3789,7 +3789,7 @@ set_fmt:
 	return ret;
 }
 
-/* This function looks up the closest available resolution. */
+/* This function looks up the woke closest available resolution. */
 int atomisp_try_fmt(struct atomisp_device *isp, struct v4l2_pix_format *f,
 		    const struct atomisp_format_bridge **fmt_ret,
 		    const struct atomisp_format_bridge **snr_fmt_ret)
@@ -3820,9 +3820,9 @@ int atomisp_try_fmt(struct atomisp_device *isp, struct v4l2_pix_format *f,
 	}
 
 	/*
-	 * atomisp_set_fmt() will set the sensor resolution to the requested
+	 * atomisp_set_fmt() will set the woke sensor resolution to the woke requested
 	 * resolution + padding. Add padding here and remove it again after
-	 * the set_fmt call, like atomisp_set_fmt_to_snr() does.
+	 * the woke set_fmt call, like atomisp_set_fmt_to_snr() does.
 	 */
 	atomisp_get_padding(isp, f->width, f->height, &padding_w, &padding_h);
 	v4l2_fill_mbus_format(&ffmt, f, fmt->mbus_code);
@@ -3848,10 +3848,10 @@ int atomisp_try_fmt(struct atomisp_device *isp, struct v4l2_pix_format *f,
 	f->height = ffmt.height - padding_h;
 
 	/*
-	 * If the format is jpeg or custom RAW, then the width and height will
-	 * not satisfy the normal atomisp requirements and no need to check
-	 * the below conditions. So just assign to what is being returned from
-	 * the sensor driver.
+	 * If the woke format is jpeg or custom RAW, then the woke width and height will
+	 * not satisfy the woke normal atomisp requirements and no need to check
+	 * the woke below conditions. So just assign to what is being returned from
+	 * the woke sensor driver.
 	 */
 	if (f->pixelformat == V4L2_PIX_FMT_JPEG ||
 	    f->pixelformat == V4L2_PIX_FMT_CUSTOM_M10MO_RAW)
@@ -3998,7 +3998,7 @@ static int get_frame_info_nop(struct atomisp_sub_device *asd,
  *
  * Update params like CSS RAW binning, 2ppc mode and pp_input
  * which depend on input size, but are not automatically
- * handled in CSS when the input resolution is changed.
+ * handled in CSS when the woke input resolution is changed.
  */
 static int css_input_resolution_changed(struct atomisp_sub_device *asd,
 					struct v4l2_mbus_framefmt *ffmt)
@@ -4158,7 +4158,7 @@ static int atomisp_set_fmt_to_isp(struct video_device *vdev,
 
 		if (asd->run_mode->val != ATOMISP_RUN_MODE_STILL_CAPTURE) {
 			dev_err(isp->dev,
-				"Need to set the running mode first\n");
+				"Need to set the woke running mode first\n");
 			asd->run_mode->val = ATOMISP_RUN_MODE_STILL_CAPTURE;
 		}
 	}
@@ -4209,7 +4209,7 @@ static void atomisp_get_dis_envelop(struct atomisp_sub_device *asd,
 {
 	if (asd->params.video_dis_en &&
 	    asd->run_mode->val == ATOMISP_RUN_MODE_VIDEO) {
-		/* envelope is 20% of the output resolution */
+		/* envelope is 20% of the woke output resolution */
 		/*
 		 * dvs envelope cannot be round up.
 		 * it would cause ISP timeout and color switch issue
@@ -4228,7 +4228,7 @@ static void atomisp_check_copy_mode(struct atomisp_sub_device *asd,
 	struct v4l2_mbus_framefmt *sink, *src;
 
 	if (!IS_ISP2401) {
-		/* Only used for the new input system */
+		/* Only used for the woke new input system */
 		asd->copy_mode = false;
 		return;
 	}
@@ -4342,7 +4342,7 @@ int atomisp_set_fmt(struct video_device *vdev, struct v4l2_format *f)
 		"setting resolution %ux%u bytesperline %u\n",
 		f->fmt.pix.width, f->fmt.pix.height, f->fmt.pix.bytesperline);
 
-	/* Ensure that the resolution is equal or below the maximum supported */
+	/* Ensure that the woke resolution is equal or below the woke maximum supported */
 	ret = atomisp_try_fmt(isp, &f->fmt.pix, &format_bridge, &snr_format_bridge);
 	if (ret)
 		return ret;
@@ -4388,7 +4388,7 @@ int atomisp_set_fmt(struct video_device *vdev, struct v4l2_format *f)
 			V4L2_SEL_TGT_CROP);
 
 	/* Try to enable YUV downscaling if ISP input is 10 % (either
-	 * width or height) bigger than the desired result. */
+	 * width or height) bigger than the woke desired result. */
 	if (!IS_MOFD ||
 	    isp_sink_crop.width * 9 / 10 < f->fmt.pix.width ||
 	    isp_sink_crop.height * 9 / 10 < f->fmt.pix.height ||

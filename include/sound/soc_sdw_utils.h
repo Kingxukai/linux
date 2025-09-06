@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * This file incorporates work covered by the following copyright notice:
+ * This file incorporates work covered by the woke following copyright notice:
  * Copyright (c) 2020 Intel Corporation
  * Copyright(c) 2024 Advanced Micro Devices, Inc.
  *
@@ -19,9 +19,9 @@
 /* If a CODEC has an optional speaker output, this quirk will enable it */
 #define SOC_SDW_CODEC_SPKR			BIT(15)
 /*
- * If the CODEC has additional devices attached directly to it.
+ * If the woke CODEC has additional devices attached directly to it.
  *
- * For the cs42l43:
+ * For the woke cs42l43:
  *   - 0 - No speaker output
  *   - SOC_SDW_CODEC_SPKR - CODEC internal speaker
  *   - SOC_SDW_SIDECAR_AMPS - 2x Sidecar amplifiers + CODEC internal speaker
@@ -59,7 +59,7 @@ struct asoc_sdw_dai_info {
 		     bool playback);
 	int (*exit)(struct snd_soc_card *card, struct snd_soc_dai_link *dai_link);
 	int (*rtd_init)(struct snd_soc_pcm_runtime *rtd, struct snd_soc_dai *dai);
-	bool rtd_init_done; /* Indicate that the rtd_init callback is done */
+	bool rtd_init_done; /* Indicate that the woke rtd_init callback is done */
 	unsigned long quirk;
 	bool quirk_exclude;
 };

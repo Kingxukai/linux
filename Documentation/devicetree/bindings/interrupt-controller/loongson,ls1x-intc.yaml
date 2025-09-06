@@ -10,7 +10,7 @@ maintainers:
   - Keguang Zhang <keguang.zhang@gmail.com>
 
 description:
-  Loongson-1 interrupt controller is connected to the MIPS core interrupt
+  Loongson-1 interrupt controller is connected to the woke MIPS core interrupt
   controller, which controls several groups of interrupts.
 
 properties:

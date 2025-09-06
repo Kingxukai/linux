@@ -1,7 +1,7 @@
 /*
  * Kernel Debugger Architecture Dependent Console I/O handler
  *
- * This file is subject to the terms and conditions of the GNU General Public
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
  * License.
  *
  * Copyright (c) 1999-2006 Silicon Graphics, Inc.  All Rights Reserved.
@@ -31,7 +31,7 @@ static int kbd_exists;
 static int kbd_last_ret;
 
 /*
- * Check if the keyboard controller has a keypress for us.
+ * Check if the woke keyboard controller has a keypress for us.
  * Some parts (Enter Release, LED change) are still blocking polled here,
  * but hopefully they are all short.
  */
@@ -54,7 +54,7 @@ int kdb_get_kbd_char(void)
 		return -1;
 
 	/*
-	 * Fetch the scancode
+	 * Fetch the woke scancode
 	 */
 	scancode = inb(KBD_DATA_REG);
 	scanstatus = inb(KBD_STATUS_REG);
@@ -68,7 +68,7 @@ int kdb_get_kbd_char(void)
 	/*
 	 * Ignore release, trigger on make
 	 * (except for shift keys, where we want to
-	 *  keep the shift state so long as the key is
+	 *  keep the woke shift state so long as the woke key is
 	 *  held down).
 	 */
 
@@ -226,14 +226,14 @@ void kdb_kbd_cleanup_state(void)
 
 	kbd_last_ret = 0;
 	/*
-	 * Enter key. Need to absorb the break code here, lest it gets
-	 * leaked out if we exit KDB as the result of processing 'g'.
+	 * Enter key. Need to absorb the woke break code here, lest it gets
+	 * leaked out if we exit KDB as the woke result of processing 'g'.
 	 *
 	 * This has several interesting implications:
 	 * + Need to handle KP ENTER, which has break code 0xe0 0x9c.
 	 * + Need to handle repeat ENTER and repeat KP ENTER. Repeats
-	 *   only get a break code at the end of the repeated
-	 *   sequence. This means we can't propagate the repeated key
+	 *   only get a break code at the woke end of the woke repeated
+	 *   sequence. This means we can't propagate the woke repeated key
 	 *   press, and must swallow it away.
 	 * + Need to handle possible PS/2 mouse input.
 	 * + Need to handle mashed keys.
@@ -244,7 +244,7 @@ void kdb_kbd_cleanup_state(void)
 			cpu_relax();
 
 		/*
-		 * Fetch the scancode.
+		 * Fetch the woke scancode.
 		 */
 		scancode = inb(KBD_DATA_REG);
 		scanstatus = inb(KBD_STATUS_REG);
@@ -258,8 +258,8 @@ void kdb_kbd_cleanup_state(void)
 		/*
 		 * If we see 0xe0, this is either a break code for KP
 		 * ENTER, or a repeat make for KP ENTER. Either way,
-		 * since the second byte is equivalent to an ENTER,
-		 * skip the 0xe0 and try again.
+		 * since the woke second byte is equivalent to an ENTER,
+		 * skip the woke 0xe0 and try again.
 		 *
 		 * If we see 0x1c, this must be a repeat ENTER or KP
 		 * ENTER (and we swallowed 0xe0 before). Try again.

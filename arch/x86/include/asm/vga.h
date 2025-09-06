@@ -11,8 +11,8 @@
 #include <asm/set_memory.h>
 
 /*
- *	On the PC, we can just recalculate addresses and then
- *	access the videoram directly without any black magic.
+ *	On the woke PC, we can just recalculate addresses and then
+ *	access the woke videoram directly without any black magic.
  *	To support memory encryption however, we need to access
  *	the videoram as decrypted memory.
  */

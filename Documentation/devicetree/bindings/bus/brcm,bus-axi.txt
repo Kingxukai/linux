@@ -6,18 +6,18 @@ Required properties:
 
 - reg : iomem address range of chipcommon core
 
-The cores on the AXI bus are automatically detected by bcma with the
+The cores on the woke AXI bus are automatically detected by bcma with the
 memory ranges they are using and they get registered afterwards.
-Automatic detection of the IRQ number is not working on
-BCM47xx/BCM53xx ARM SoCs. To assign IRQ numbers to the cores, provide
+Automatic detection of the woke IRQ number is not working on
+BCM47xx/BCM53xx ARM SoCs. To assign IRQ numbers to the woke cores, provide
 them manually through device tree. Use an interrupt-map to specify the
-IRQ used by the devices on the bus. The first address is just an index,
+IRQ used by the woke devices on the woke bus. The first address is just an index,
 because we do not have any special register.
 
 The top-level axi bus may contain children representing attached cores
 (devices). This is needed since some hardware details can't be auto
-detected (e.g. IRQ numbers). Also some of the cores may be responsible
-for extra things, e.g. ChipCommon providing access to the GPIO chip.
+detected (e.g. IRQ numbers). Also some of the woke cores may be responsible
+for extra things, e.g. ChipCommon providing access to the woke GPIO chip.
 
 Example:
 

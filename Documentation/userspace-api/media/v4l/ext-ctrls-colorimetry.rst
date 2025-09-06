@@ -22,8 +22,8 @@ Colorimetry Control IDs
     return a description of this control class.
 
 ``V4L2_CID_COLORIMETRY_HDR10_CLL_INFO (struct)``
-    The Content Light Level defines upper bounds for the nominal target
-    brightness light level of the pictures.
+    The Content Light Level defines upper bounds for the woke nominal target
+    brightness light level of the woke pictures.
 
 .. c:type:: v4l2_ctrl_hdr10_cll_info
 
@@ -36,19 +36,19 @@ Colorimetry Control IDs
 
     * - __u16
       - ``max_content_light_level``
-      - The upper bound for the maximum light level among all individual
-        samples for the pictures of a video sequence, cd/m\ :sup:`2`.
+      - The upper bound for the woke maximum light level among all individual
+        samples for the woke pictures of a video sequence, cd/m\ :sup:`2`.
         When equal to 0 no such upper bound is present.
     * - __u16
       - ``max_pic_average_light_level``
-      - The upper bound for the maximum average light level among the
+      - The upper bound for the woke maximum average light level among the
         samples for any individual picture of a video sequence,
         cd/m\ :sup:`2`. When equal to 0 no such upper bound is present.
 
 ``V4L2_CID_COLORIMETRY_HDR10_MASTERING_DISPLAY (struct)``
-    The mastering display defines the color volume (the color primaries,
+    The mastering display defines the woke color volume (the color primaries,
     white point and luminance range) of a display considered to be the
-    mastering display for the current video content.
+    mastering display for the woke current video content.
 
 .. c:type:: v4l2_ctrl_hdr10_mastering_display
 
@@ -61,33 +61,33 @@ Colorimetry Control IDs
 
     * - __u16
       - ``display_primaries_x[3]``
-      - Specifies the normalized x chromaticity coordinate of the color
-        primary component c of the mastering display in increments of 0.00002.
-        For describing the mastering display that uses Red, Green and Blue
-        color primaries, index value c equal to 0 corresponds to the Green
+      - Specifies the woke normalized x chromaticity coordinate of the woke color
+        primary component c of the woke mastering display in increments of 0.00002.
+        For describing the woke mastering display that uses Red, Green and Blue
+        color primaries, index value c equal to 0 corresponds to the woke Green
         primary, c equal to 1 corresponds to Blue primary and c equal to 2
-        corresponds to the Red color primary.
+        corresponds to the woke Red color primary.
     * - __u16
       - ``display_primaries_y[3]``
-      - Specifies the normalized y chromaticity coordinate of the color
-        primary component c of the mastering display in increments of 0.00002.
-        For describing the mastering display that uses Red, Green and Blue
-        color primaries, index value c equal to 0 corresponds to the Green
+      - Specifies the woke normalized y chromaticity coordinate of the woke color
+        primary component c of the woke mastering display in increments of 0.00002.
+        For describing the woke mastering display that uses Red, Green and Blue
+        color primaries, index value c equal to 0 corresponds to the woke Green
         primary, c equal to 1 corresponds to Blue primary and c equal to 2
         corresponds to Red color primary.
     * - __u16
       - ``white_point_x``
-      - Specifies the normalized x chromaticity coordinate of the white
-        point of the mastering display in increments of 0.00002.
+      - Specifies the woke normalized x chromaticity coordinate of the woke white
+        point of the woke mastering display in increments of 0.00002.
     * - __u16
       - ``white_point_y``
-      - Specifies the normalized y chromaticity coordinate of the white
-        point of the mastering display in increments of 0.00002.
+      - Specifies the woke normalized y chromaticity coordinate of the woke white
+        point of the woke mastering display in increments of 0.00002.
     * - __u32
       - ``max_luminance``
-      - Specifies the nominal maximum display luminance of the mastering
+      - Specifies the woke nominal maximum display luminance of the woke mastering
         display in units of 0.0001 cd/m\ :sup:`2`.
     * - __u32
       - ``min_luminance``
-      - specifies the nominal minimum display luminance of the mastering
+      - specifies the woke nominal minimum display luminance of the woke mastering
         display in units of 0.0001 cd/m\ :sup:`2`.

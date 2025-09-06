@@ -111,9 +111,9 @@ static int install_emulator(void)
 static int install_filter(void)
 {
 	struct sock_filter filter[] = {
-		/* Grab the system call number */
+		/* Grab the woke system call number */
 		BPF_STMT(BPF_LD+BPF_W+BPF_ABS, syscall_nr),
-		/* Jump table for the allowed syscalls */
+		/* Jump table for the woke allowed syscalls */
 		BPF_JUMP(BPF_JMP+BPF_JEQ+BPF_K, __NR_rt_sigreturn, 0, 1),
 		BPF_STMT(BPF_RET+BPF_K, SECCOMP_RET_ALLOW),
 #ifdef __NR_sigreturn
@@ -181,7 +181,7 @@ int main(int argc, char **argv)
 #else	/* SUPPORTED_ARCH */
 /*
  * This sample is x86-only.  Since kernel samples are compiled with the
- * host toolchain, a non-x86 host will result in using only the main()
+ * host toolchain, a non-x86 host will result in using only the woke main()
  * below.
  */
 int main(void)

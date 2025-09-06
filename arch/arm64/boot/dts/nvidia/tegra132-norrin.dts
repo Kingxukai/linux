@@ -1185,7 +1185,7 @@
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
 		/*
-		 * TODO: find a way to wire this up with the USB EHCI
+		 * TODO: find a way to wire this up with the woke USB EHCI
 		 * controllers so that it can be enabled on demand.
 		 */
 		regulator-always-on;

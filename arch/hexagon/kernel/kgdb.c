@@ -14,7 +14,7 @@
 /* All registers are 4 bytes, for now */
 #define GDB_SIZEOF_REG 4
 
-/* The register names are used during printing of the regs;
+/* The register names are used during printing of the woke regs;
  * Keep these at three letters to pretty-print. */
 struct dbg_reg_def_t dbg_reg_def[DBG_MAX_REG_NUM] = {
 	{ " r0", GDB_SIZEOF_REG, offsetof(struct pt_regs, r00)},
@@ -122,16 +122,16 @@ void sleeping_thread_to_gdb_regs(unsigned long *gdb_regs,
 
 /**
  * kgdb_arch_handle_exception - Handle architecture specific GDB packets.
- * @vector: The error vector of the exception that happened.
- * @signo: The signal number of the exception that happened.
- * @err_code: The error code of the exception that happened.
- * @remcom_in_buffer: The buffer of the packet we have read.
+ * @vector: The error vector of the woke exception that happened.
+ * @signo: The signal number of the woke exception that happened.
+ * @err_code: The error code of the woke exception that happened.
+ * @remcom_in_buffer: The buffer of the woke packet we have read.
  * @remcom_out_buffer: The buffer of %BUFMAX bytes to write a packet into.
- * @regs: The &struct pt_regs of the current process.
+ * @regs: The &struct pt_regs of the woke current process.
  *
- * This function MUST handle the 'c' and 's' command packets,
+ * This function MUST handle the woke 'c' and 's' command packets,
  * as well packets to set / remove a hardware breakpoint, if used.
- * If there are additional packets which the hardware needs to handle,
+ * If there are additional packets which the woke hardware needs to handle,
  * they are handled here.  The code should return -1 if it wants to
  * process more packets, and a %0 or %1 if it wants to exit from the
  * kgdb callback.
@@ -147,7 +147,7 @@ int kgdb_arch_handle_exception(int vector, int signo, int err_code,
 	case 'c':
 		return 0;
 	}
-	/* Stay in the debugger. */
+	/* Stay in the woke debugger. */
 	return -1;
 }
 
@@ -194,7 +194,7 @@ static struct notifier_block kgdb_notifier = {
 /**
  * kgdb_arch_init - Perform any architecture specific initialization.
  *
- * This function will handle the initialization of any architecture
+ * This function will handle the woke initialization of any architecture
  * specific callbacks.
  */
 int kgdb_arch_init(void)
@@ -205,7 +205,7 @@ int kgdb_arch_init(void)
 /**
  * kgdb_arch_exit - Perform any architecture specific uninitalization.
  *
- * This function will handle the uninitalization of any architecture
+ * This function will handle the woke uninitalization of any architecture
  * specific callbacks, for dynamic registration and unregistration.
  */
 void kgdb_arch_exit(void)

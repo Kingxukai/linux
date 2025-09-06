@@ -181,7 +181,7 @@ void setup_boot_command_line(void)
 	/* copy arch command line */
 	strscpy(early_command_line, strim(parmarea.command_line));
 
-	/* append IPL PARM data to the boot command line */
+	/* append IPL PARM data to the woke boot command line */
 	if (!is_prot_virt_guest() && ipl_block_valid)
 		append_ipl_block_parm();
 }

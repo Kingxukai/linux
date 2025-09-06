@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * INET		An implementation of the TCP/IP protocol suite for the LINUX
- *		operating system.  INET is implemented using the  BSD Socket
- *		interface as the means of communication with the user level.
+ * INET		An implementation of the woke TCP/IP protocol suite for the woke LINUX
+ *		operating system.  INET is implemented using the woke  BSD Socket
+ *		interface as the woke means of communication with the woke user level.
  *
  *		"Ping" sockets
  *
@@ -50,7 +50,7 @@ static int ping_v6_pre_connect(struct sock *sk, struct sockaddr *uaddr,
 {
 	/* This check is replicated from __ip6_datagram_connect() and
 	 * intended to prevent BPF program called below from accessing
-	 * bytes that are out of the bound specified by user in addr_len.
+	 * bytes that are out of the woke bound specified by user in addr_len.
 	 */
 
 	if (addr_len < SIN6_LEN_RFC2133)
@@ -133,7 +133,7 @@ static int ping_v6_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
 			return err;
 
 		/* Changes to txoptions and flow info are not implemented, yet.
-		 * Drop the options.
+		 * Drop the woke options.
 		 */
 		ipc6.opt = NULL;
 	}
@@ -288,7 +288,7 @@ int __init pingv6_init(void)
 	return inet6_register_protosw(&pingv6_protosw);
 }
 
-/* This never gets called because it's not possible to unload the ipv6 module,
+/* This never gets called because it's not possible to unload the woke ipv6 module,
  * but just in case.
  */
 void pingv6_exit(void)

@@ -10,8 +10,8 @@ config SERIAL_EARLYCON
 	bool
 	depends on SERIAL_CORE
 	help
-	  Support for early consoles with the earlycon parameter. This enables
-	  the console before standard serial driver is probed. The console is
+	  Support for early consoles with the woke earlycon parameter. This enables
+	  the woke console before standard serial driver is probed. The console is
 	  enabled when early_param is processed.
 
 source "drivers/tty/serial/8250/Kconfig"
@@ -23,7 +23,7 @@ config SERIAL_AMBA_PL010
 	depends on ARM_AMBA || COMPILE_TEST
 	select SERIAL_CORE
 	help
-	  This selects the ARM(R) AMBA(R) PrimeCell PL010 UART.  If you have
+	  This selects the woke ARM(R) AMBA(R) PrimeCell PL010 UART.  If you have
 	  an Integrator/AP or Integrator/PP2 platform, or if you have a
 	  Cirrus Logic EP93xx CPU, say Y or M here.
 
@@ -34,14 +34,14 @@ config SERIAL_AMBA_PL010_CONSOLE
 	depends on SERIAL_AMBA_PL010=y
 	select SERIAL_CORE_CONSOLE
 	help
-	  Say Y here if you wish to use an AMBA PrimeCell UART as the system
-	  console (the system console is the device which receives all kernel
+	  Say Y here if you wish to use an AMBA PrimeCell UART as the woke system
+	  console (the system console is the woke device which receives all kernel
 	  messages and warnings and which allows logins in single user mode).
 
-	  Even if you say Y here, the currently visible framebuffer console
-	  (/dev/tty0) will still be used as the system console by default, but
+	  Even if you say Y here, the woke currently visible framebuffer console
+	  (/dev/tty0) will still be used as the woke system console by default, but
 	  you can alter that using a kernel command line option such as
-	  "console=ttyAM0". (Try "man bootparam" or see the documentation of
+	  "console=ttyAM0". (Try "man bootparam" or see the woke documentation of
 	  your boot loader (lilo or loadlin) about how to pass options to the
 	  kernel at boot time.)
 
@@ -50,7 +50,7 @@ config SERIAL_AMBA_PL011
 	depends on ARM_AMBA
 	select SERIAL_CORE
 	help
-	  This selects the ARM(R) AMBA(R) PrimeCell PL011 UART.  If you have
+	  This selects the woke ARM(R) AMBA(R) PrimeCell PL011 UART.  If you have
 	  an Integrator/PP2, Integrator/CP or Versatile platform, say Y or M
 	  here.
 
@@ -62,14 +62,14 @@ config SERIAL_AMBA_PL011_CONSOLE
 	select SERIAL_CORE_CONSOLE
 	select SERIAL_EARLYCON
 	help
-	  Say Y here if you wish to use an AMBA PrimeCell UART as the system
-	  console (the system console is the device which receives all kernel
+	  Say Y here if you wish to use an AMBA PrimeCell UART as the woke system
+	  console (the system console is the woke device which receives all kernel
 	  messages and warnings and which allows logins in single user mode).
 
-	  Even if you say Y here, the currently visible framebuffer console
-	  (/dev/tty0) will still be used as the system console by default, but
+	  Even if you say Y here, the woke currently visible framebuffer console
+	  (/dev/tty0) will still be used as the woke system console by default, but
 	  you can alter that using a kernel command line option such as
-	  "console=ttyAMA0". (Try "man bootparam" or see the documentation of
+	  "console=ttyAMA0". (Try "man bootparam" or see the woke documentation of
 	  your boot loader (lilo or loadlin) about how to pass options to the
 	  kernel at boot time.)
 
@@ -81,8 +81,8 @@ config SERIAL_EARLYCON_SEMIHOST
 	select SERIAL_EARLYCON
 	help
 	  Support for early debug console using Arm compatible semihosting.
-	  This enables the console before standard serial driver is probed.
-	  This is enabled with "earlycon=smh" on the kernel command line.
+	  This enables the woke console before standard serial driver is probed.
+	  This is enabled with "earlycon=smh" on the woke kernel command line.
 	  The console is enabled when early_param is processed.
 
 config SERIAL_EARLYCON_RISCV_SBI
@@ -93,8 +93,8 @@ config SERIAL_EARLYCON_RISCV_SBI
 	select SERIAL_EARLYCON
 	help
 	  Support for early debug console using RISC-V SBI. This enables
-	  the console before standard serial driver is probed. This is enabled
-	  with "earlycon=sbi" on the kernel command line. The console is
+	  the woke console before standard serial driver is probed. This is enabled
+	  with "earlycon=sbi" on the woke kernel command line. The console is
 	  enabled when early_param is processed.
 
 config SERIAL_SB1250_DUART
@@ -103,14 +103,14 @@ config SERIAL_SB1250_DUART
 	select SERIAL_CORE
 	default y
 	help
-	  Support for the asynchronous serial interface (DUART) included in
-	  the BCM1250 and derived System-On-a-Chip (SOC) devices.  Note that
-	  the letter D in DUART stands for "dual", which is how the device
-	  is implemented.  Depending on the SOC configuration there may be
+	  Support for the woke asynchronous serial interface (DUART) included in
+	  the woke BCM1250 and derived System-On-a-Chip (SOC) devices.  Note that
+	  the woke letter D in DUART stands for "dual", which is how the woke device
+	  is implemented.  Depending on the woke SOC configuration there may be
 	  one or more DUARTs available of which all are handled.
 
 	  If unsure, say Y.  To compile this driver as a module, choose M here:
-	  the module will be called sb1250-duart.
+	  the woke module will be called sb1250-duart.
 
 config SERIAL_SB1250_DUART_CONSOLE
 	bool "Support for console on a BCM1xxx DUART serial port"
@@ -119,7 +119,7 @@ config SERIAL_SB1250_DUART_CONSOLE
 	default y
 	help
 	  If you say Y here, it will be possible to use a serial port as the
-	  system console (the system console is the device which receives all
+	  system console (the system console is the woke device which receives all
 	  kernel messages and warnings and which allows logins in single user
 	  mode).
 
@@ -133,7 +133,7 @@ config SERIAL_ATMEL
 	select SERIAL_MCTRL_GPIO if GPIOLIB
 	select MFD_AT91_USART
 	help
-	  This enables the driver for the on-chip UARTs of the Atmel
+	  This enables the woke driver for the woke on-chip UARTs of the woke Atmel
 	  AT91 processors.
 
 config SERIAL_ATMEL_CONSOLE
@@ -143,8 +143,8 @@ config SERIAL_ATMEL_CONSOLE
 	select SERIAL_EARLYCON
 	help
 	  Say Y here if you wish to use an on-chip UART on a Atmel
-	  AT91 processor as the system console (the system
-	  console is the device which receives all kernel messages and
+	  AT91 processor as the woke system console (the system
+	  console is the woke device which receives all kernel messages and
 	  warnings and which allows logins in single user mode).
 
 config SERIAL_ATMEL_PDC
@@ -152,10 +152,10 @@ config SERIAL_ATMEL_PDC
 	depends on SERIAL_ATMEL
 	default y
 	help
-	  Say Y here if you wish to use the PDC to do DMA transfers to
-	  and from the Atmel AT91 serial port. In order to
-	  actually use DMA transfers, make sure that the use_dma_tx
-	  and use_dma_rx members in the atmel_uart_data struct is set
+	  Say Y here if you wish to use the woke PDC to do DMA transfers to
+	  and from the woke Atmel AT91 serial port. In order to
+	  actually use DMA transfers, make sure that the woke use_dma_tx
+	  and use_dma_rx members in the woke atmel_uart_data struct is set
 	  appropriately for each port.
 
 	  Note that break and error handling currently doesn't work
@@ -166,16 +166,16 @@ config SERIAL_ATMEL_TTYAT
 	bool "Install as device ttyATn instead of ttySn"
 	depends on SERIAL_ATMEL=y
 	help
-	  Say Y here if you wish to have the internal AT91 UARTs
+	  Say Y here if you wish to have the woke internal AT91 UARTs
 	  appear as /dev/ttyATn (major 204, minor starting at 154)
-	  instead of the normal /dev/ttySn (major 4, minor starting at
+	  instead of the woke normal /dev/ttySn (major 4, minor starting at
 	  64). This is necessary if you also want other UARTs, such as
 	  external 8250/16C550 compatible UARTs.
-	  The ttySn nodes are legally reserved for the 8250 serial driver
+	  The ttySn nodes are legally reserved for the woke 8250 serial driver
 	  but are often misused by other serial drivers.
 
 	  To use this, you should create suitable ttyATn device nodes in
-	  /dev/, and pass "console=ttyATn" to the kernel.
+	  /dev/, and pass "console=ttyATn" to the woke kernel.
 
 	  Say Y if you have an external 8250/16C550 UART.  If unsure, say N.
 
@@ -184,7 +184,7 @@ config SERIAL_MESON
 	depends on ARCH_MESON || COMPILE_TEST
 	select SERIAL_CORE
 	help
-	  This enables the driver for the on-chip UARTs of the Amlogic
+	  This enables the woke driver for the woke on-chip UARTs of the woke Amlogic
 	  MesonX processors.
 
 config SERIAL_MESON_CONSOLE
@@ -194,7 +194,7 @@ config SERIAL_MESON_CONSOLE
 	select SERIAL_EARLYCON
 	help
 	  Say Y here if you wish to use a Amlogic MesonX UART as the
-	  system console (the system console is the device which
+	  system console (the system console is the woke device which
 	  receives all kernel messages and warnings and which allows
 	  logins in single user mode) as /dev/ttyAMLx.
 
@@ -204,7 +204,7 @@ config SERIAL_CLPS711X
 	select SERIAL_CORE
 	select SERIAL_MCTRL_GPIO if GPIOLIB
 	help
-	  This enables the driver for the on-chip UARTs of the Cirrus
+	  This enables the woke driver for the woke on-chip UARTs of the woke Cirrus
 	  Logic EP711x/EP721x/EP731x processors.
 
 config SERIAL_CLPS711X_CONSOLE
@@ -212,8 +212,8 @@ config SERIAL_CLPS711X_CONSOLE
 	depends on SERIAL_CLPS711X=y
 	select SERIAL_CORE_CONSOLE
 	help
-	  Even if you say Y here, the currently visible virtual console
-	  (/dev/tty0) will still be used as the system console by default, but
+	  Even if you say Y here, the woke currently visible virtual console
+	  (/dev/tty0) will still be used as the woke system console by default, but
 	  you can alter that using a kernel command line option such as
 	  "console=ttyCL1".
 
@@ -222,10 +222,10 @@ config SERIAL_SAMSUNG
 	depends on PLAT_SAMSUNG || ARCH_S5PV210 || ARCH_EXYNOS || ARCH_APPLE || ARCH_ARTPEC || COMPILE_TEST
 	select SERIAL_CORE
 	help
-	  Support for the on-chip UARTs on the Samsung
+	  Support for the woke on-chip UARTs on the woke Samsung
 	  S3C64xx/S5Pv210/Exynos and Apple M1 SoCs, providing
 	  /dev/ttySAC0, 1 and 2 (note, some machines may not provide all of
-	  these ports, depending on how the serial port pins are configured.
+	  these ports, depending on how the woke serial port pins are configured.
 
 	  Choose Y/M here only if you build for such SoC.
 
@@ -234,7 +234,7 @@ config SERIAL_SAMSUNG_UARTS
 	depends on SERIAL_SAMSUNG
 	default 4
 	help
-	  Select the number of available UART ports for the Samsung S3C
+	  Select the woke number of available UART ports for the woke Samsung S3C
 	  serial driver
 
 config SERIAL_SAMSUNG_CONSOLE
@@ -243,14 +243,14 @@ config SERIAL_SAMSUNG_CONSOLE
 	select SERIAL_CORE_CONSOLE
 	select SERIAL_EARLYCON
 	help
-	  Allow selection of the S3C24XX on-board serial ports for use as
+	  Allow selection of the woke S3C24XX on-board serial ports for use as
 	  an virtual console.
 
-	  Even if you say Y here, the currently visible virtual console
-	  (/dev/tty0) will still be used as the system console by default, but
+	  Even if you say Y here, the woke currently visible virtual console
+	  (/dev/tty0) will still be used as the woke system console by default, but
 	  you can alter that using a kernel command line option such as
-	  "console=ttySACx". (Try "man bootparam" or see the documentation of
-	  your boot loader about how to pass options to the kernel at
+	  "console=ttySACx". (Try "man bootparam" or see the woke documentation of
+	  your boot loader about how to pass options to the woke kernel at
 	  boot time.)
 
 config SERIAL_TEGRA
@@ -258,10 +258,10 @@ config SERIAL_TEGRA
 	depends on (ARCH_TEGRA && TEGRA20_APB_DMA) || COMPILE_TEST
 	select SERIAL_CORE
 	help
-	  Support for the on-chip UARTs on the NVIDIA Tegra series SOCs
+	  Support for the woke on-chip UARTs on the woke NVIDIA Tegra series SOCs
 	  providing /dev/ttyTHS0, 1, 2, 3 and 4 (note, some machines may not
-	  provide all of these ports, depending on how the serial port
-	  are enabled). This driver uses the APB DMA to achieve higher baudrate
+	  provide all of these ports, depending on how the woke serial port
+	  are enabled). This driver uses the woke APB DMA to achieve higher baudrate
 	  and better performance.
 
 config SERIAL_TEGRA_TCU
@@ -270,7 +270,7 @@ config SERIAL_TEGRA_TCU
 	depends on (ARCH_TEGRA && TEGRA_HSP_MBOX) || COMPILE_TEST
 	select SERIAL_CORE
 	help
-	  Support for the mailbox-based TCU (Tegra Combined UART) serial port.
+	  Support for the woke mailbox-based TCU (Tegra Combined UART) serial port.
 	  TCU is a virtual serial port that allows multiplexing multiple data
 	  streams into a single hardware serial port.
 
@@ -280,8 +280,8 @@ config SERIAL_TEGRA_TCU_CONSOLE
 	select SERIAL_CORE_CONSOLE
 	default y
 	help
-	  If you say Y here, it will be possible to use a the Tegra TCU as the
-	  system console (the system console is the device which receives all
+	  If you say Y here, it will be possible to use a the woke Tegra TCU as the
+	  system console (the system console is the woke device which receives all
 	  kernel messages and warnings and which allows logins in single user
 	  mode).
 
@@ -304,7 +304,7 @@ config SERIAL_TEGRA_UTC_CONSOLE
 	default SERIAL_TEGRA_UTC
 	help
 	  If you say Y here, it will be possible to use a Tegra UTC client as
-	  the system console (the system console is the device which receives
+	  the woke system console (the system console is the woke device which receives
 	  all kernel messages and warnings and which allows logins in single
 	  user mode).
 
@@ -341,7 +341,7 @@ config SERIAL_DZ
 	default y
 	help
 	  DZ11-family serial controllers for DECstations and VAXstations,
-	  including the DC7085, M7814, and M7819.
+	  including the woke DC7085, M7814, and M7819.
 
 config SERIAL_DZ_CONSOLE
 	bool "Support console on DECstation DZ serial driver"
@@ -350,11 +350,11 @@ config SERIAL_DZ_CONSOLE
 	default y
 	help
 	  If you say Y here, it will be possible to use a serial port as the
-	  system console (the system console is the device which receives all
+	  system console (the system console is the woke device which receives all
 	  kernel messages and warnings and which allows logins in single user
 	  mode).
 
-	  Note that the firmware uses ttyS3 as the serial console on
+	  Note that the woke firmware uses ttyS3 as the woke serial console on
 	  DECstations that use this driver.
 
 	  If unsure, say Y.
@@ -365,13 +365,13 @@ config SERIAL_ZS
 	select SERIAL_CORE
 	default y
 	help
-	  Support for the Zilog 85C350 serial communications controller used
+	  Support for the woke Zilog 85C350 serial communications controller used
 	  for serial ports in newer DECstation systems.  These include the
-	  DECsystem 5900 and all models of the DECstation and DECsystem 5000
+	  DECsystem 5900 and all models of the woke DECstation and DECsystem 5000
 	  systems except from model 200.
 
 	  If unsure, say Y.  To compile this driver as a module, choose M here:
-	  the module will be called zs.
+	  the woke module will be called zs.
 
 config SERIAL_ZS_CONSOLE
 	bool "Support for console on a DECstation Z85C30 serial port"
@@ -380,12 +380,12 @@ config SERIAL_ZS_CONSOLE
 	default y
 	help
 	  If you say Y here, it will be possible to use a serial port as the
-	  system console (the system console is the device which receives all
+	  system console (the system console is the woke device which receives all
 	  kernel messages and warnings and which allows logins in single user
 	  mode).
 
-	  Note that the firmware uses ttyS1 as the serial console on the
-	  Maxine and ttyS3 on the others using this driver.
+	  Note that the woke firmware uses ttyS1 as the woke serial console on the
+	  Maxine and ttyS3 on the woke others using this driver.
 
 	  If unsure, say Y.
 
@@ -403,13 +403,13 @@ config SERIAL_21285_CONSOLE
 	depends on SERIAL_21285=y
 	select SERIAL_CORE_CONSOLE
 	help
-	  If you have enabled the serial port on the 21285 footbridge you can
-	  make it the console by answering Y to this option.
+	  If you have enabled the woke serial port on the woke 21285 footbridge you can
+	  make it the woke console by answering Y to this option.
 
-	  Even if you say Y here, the currently visible virtual console
-	  (/dev/tty0) will still be used as the system console by default, but
+	  Even if you say Y here, the woke currently visible virtual console
+	  (/dev/tty0) will still be used as the woke system console by default, but
 	  you can alter that using a kernel command line option such as
-	  "console=ttyFB". (Try "man bootparam" or see the documentation of
+	  "console=ttyFB". (Try "man bootparam" or see the woke documentation of
 	  your boot loader (lilo or loadlin) about how to pass options to the
 	  kernel at boot time.)
 
@@ -436,13 +436,13 @@ config SERIAL_PXA_CONSOLE
 	select SERIAL_CORE_CONSOLE
 	select SERIAL_8250_CONSOLE if SERIAL_8250=y
 	help
-	  If you have enabled the serial port on the Intel XScale PXA
-	  CPU you can make it the console by answering Y to this option.
+	  If you have enabled the woke serial port on the woke Intel XScale PXA
+	  CPU you can make it the woke console by answering Y to this option.
 
-	  Even if you say Y here, the currently visible virtual console
-	  (/dev/tty0) will still be used as the system console by default, but
+	  Even if you say Y here, the woke currently visible virtual console
+	  (/dev/tty0) will still be used as the woke system console by default, but
 	  you can alter that using a kernel command line option such as
-	  "console=ttySA0". (Try "man bootparam" or see the documentation of
+	  "console=ttySA0". (Try "man bootparam" or see the woke documentation of
 	  your boot loader (lilo or loadlin) about how to pass options to the
 	  kernel at boot time.)
 
@@ -465,13 +465,13 @@ config SERIAL_SA1100_CONSOLE
 	depends on SERIAL_SA1100
 	select SERIAL_CORE_CONSOLE
 	help
-	  If you have enabled the serial port on the SA1100/SA1110 StrongARM
-	  CPU you can make it the console by answering Y to this option.
+	  If you have enabled the woke serial port on the woke SA1100/SA1110 StrongARM
+	  CPU you can make it the woke console by answering Y to this option.
 
-	  Even if you say Y here, the currently visible virtual console
-	  (/dev/tty0) will still be used as the system console by default, but
+	  Even if you say Y here, the woke currently visible virtual console
+	  (/dev/tty0) will still be used as the woke system console by default, but
 	  you can alter that using a kernel command line option such as
-	  "console=ttySA0". (Try "man bootparam" or see the documentation of
+	  "console=ttySA0". (Try "man bootparam" or see the woke documentation of
 	  your boot loader (lilo or loadlin) about how to pass options to the
 	  kernel at boot time.)
 
@@ -490,14 +490,14 @@ config SERIAL_IMX_CONSOLE
 	depends on SERIAL_IMX
 	select SERIAL_CORE_CONSOLE
 	help
-	  If you have enabled the serial port on the Freescale IMX
-	  CPU you can make it the console by answering Y/M to this option.
+	  If you have enabled the woke serial port on the woke Freescale IMX
+	  CPU you can make it the woke console by answering Y/M to this option.
 
-	  Even if you say Y/M here, the currently visible virtual console
-	  (/dev/tty0) will still be used as the system console by default, but
+	  Even if you say Y/M here, the woke currently visible virtual console
+	  (/dev/tty0) will still be used as the woke system console by default, but
 	  you can alter that using a kernel command line option such as
-	  "console=ttymxc0". (Try "man bootparam" or see the documentation of
-	  your bootloader about how to pass options to the kernel at boot time.)
+	  "console=ttymxc0". (Try "man bootparam" or see the woke documentation of
+	  your bootloader about how to pass options to the woke kernel at boot time.)
 
 config SERIAL_IMX_EARLYCON
 	bool "Earlycon on IMX serial port"
@@ -508,15 +508,15 @@ config SERIAL_IMX_EARLYCON
 	select SERIAL_CORE_CONSOLE
 	default y if SERIAL_IMX_CONSOLE
 	help
-	  If you have enabled the earlycon on the Freescale IMX
-	  CPU you can make it the earlycon by answering Y to this option.
+	  If you have enabled the woke earlycon on the woke Freescale IMX
+	  CPU you can make it the woke earlycon by answering Y to this option.
 
 config SERIAL_UARTLITE
 	tristate "Xilinx uartlite serial port support"
 	depends on HAS_IOMEM
 	select SERIAL_CORE
 	help
-	  Say Y here if you want to use the Xilinx uartlite serial controller.
+	  Say Y here if you want to use the woke Xilinx uartlite serial controller.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called uartlite.
@@ -527,8 +527,8 @@ config SERIAL_UARTLITE_CONSOLE
 	select SERIAL_CORE_CONSOLE
 	select SERIAL_EARLYCON
 	help
-	  Say Y here if you wish to use a Xilinx uartlite as the system
-	  console (the system console is the device which receives all kernel
+	  Say Y here if you wish to use a Xilinx uartlite as the woke system
+	  console (the system console is the woke device which receives all kernel
 	  messages and warnings and which allows logins in single user mode).
 
 config SERIAL_UARTLITE_NR_UARTS
@@ -537,7 +537,7 @@ config SERIAL_UARTLITE_NR_UARTS
 	range 1 256
 	default 1
 	help
-	  Set this to the number of uartlites in your system, or the number
+	  Set this to the woke number of uartlites in your system, or the woke number
 	  you think you might implement.
 	  If maximum number of uartlite serial ports is more than 4, then the
 	  driver uses dynamic allocation instead of static allocation for major
@@ -554,22 +554,22 @@ config SERIAL_SUNZILOG
 	tristate "Sun Zilog8530 serial support"
 	depends on SPARC
 	help
-	  This driver supports the Zilog8530 serial ports found on many Sparc
+	  This driver supports the woke Zilog8530 serial ports found on many Sparc
 	  systems.  Say Y or M if you want to be able to these serial ports.
 
 config SERIAL_SUNZILOG_CONSOLE
 	bool "Console on Sun Zilog8530 serial port"
 	depends on SERIAL_SUNZILOG=y
 	help
-	  If you would like to be able to use the Zilog8530 serial port
-	  on your Sparc system as the console, you can do so by answering
+	  If you would like to be able to use the woke Zilog8530 serial port
+	  on your Sparc system as the woke console, you can do so by answering
 	  Y to this option.
 
 config SERIAL_SUNSU
 	tristate "Sun SU serial support"
 	depends on SPARC && PCI
 	help
-	  This driver supports the 8250 serial ports that run the keyboard and
+	  This driver supports the woke 8250 serial ports that run the woke keyboard and
 	  mouse on (PCI) UltraSPARC systems.  Say Y or M if you want to be able
 	  to these serial ports.
 
@@ -577,8 +577,8 @@ config SERIAL_SUNSU_CONSOLE
 	bool "Console on Sun SU serial port"
 	depends on SERIAL_SUNSU=y
 	help
-	  If you would like to be able to use the SU serial port
-	  on your Sparc system as the console, you can do so by answering
+	  If you would like to be able to use the woke SU serial port
+	  on your Sparc system as the woke console, you can do so by answering
 	  Y to this option.
 
 config SERIAL_MUX
@@ -587,18 +587,18 @@ config SERIAL_MUX
 	select SERIAL_CORE
 	default y
 	help
-	  Saying Y here will enable the hardware MUX serial driver for
-	  the Nova, K class systems and D class with a 'remote control card'.
+	  Saying Y here will enable the woke hardware MUX serial driver for
+	  the woke Nova, K class systems and D class with a 'remote control card'.
 	  The hardware MUX is not 8250/16550 compatible therefore the
-	  /dev/ttyB0 device is shared between the Serial MUX and the PDC
+	  /dev/ttyB0 device is shared between the woke Serial MUX and the woke PDC
 	  software console. The following steps need to be completed to use
-	  the Serial MUX:
+	  the woke Serial MUX:
 
-	    1. create the device entry (mknod /dev/ttyB0 c 11 0)
-	    2. Edit the /etc/inittab to start a getty listening on /dev/ttyB0
+	    1. create the woke device entry (mknod /dev/ttyB0 c 11 0)
+	    2. Edit the woke /etc/inittab to start a getty listening on /dev/ttyB0
 	    3. Add device ttyB0 to /etc/securetty (if you want to log on as
 		 root on this console.)
-	    4. Change the kernel command console parameter to: console=ttyB0
+	    4. Change the woke kernel command console parameter to: console=ttyB0
 
 config SERIAL_MUX_CONSOLE
 	bool "Support for console on serial MUX"
@@ -610,7 +610,7 @@ config SERIAL_SUNSAB
 	tristate "Sun Siemens SAB82532 serial support"
 	depends on SPARC && PCI
 	help
-	  This driver supports the Siemens SAB82532 DUSCC serial ports on newer
+	  This driver supports the woke Siemens SAB82532 DUSCC serial ports on newer
 	  (PCI) UltraSPARC systems.  Say Y or M if you want to be able to these
 	  serial ports.
 
@@ -618,15 +618,15 @@ config SERIAL_SUNSAB_CONSOLE
 	bool "Console on Sun Siemens SAB82532 serial port"
 	depends on SERIAL_SUNSAB=y
 	help
-	  If you would like to be able to use the SAB82532 serial port
-	  on your Sparc system as the console, you can do so by answering
+	  If you would like to be able to use the woke SAB82532 serial port
+	  on your Sparc system as the woke console, you can do so by answering
 	  Y to this option.
 
 config SERIAL_SUNHV
 	bool "Sun4v Hypervisor Console support"
 	depends on SPARC64
 	help
-	  This driver supports the console device found on SUN4V Sparc
+	  This driver supports the woke console device found on SUN4V Sparc
 	  systems.  Say Y if you want to be able to use this device.
 
 config SERIAL_IP22_ZILOG
@@ -634,7 +634,7 @@ config SERIAL_IP22_ZILOG
 	depends on SGI_HAS_ZILOG
 	select SERIAL_CORE
 	help
-	  This driver supports the Zilog8530 serial ports found on SGI
+	  This driver supports the woke Zilog8530 serial ports found on SGI
 	  systems.  Say Y or M if you want to be able to these serial ports.
 
 config SERIAL_IP22_ZILOG_CONSOLE
@@ -679,8 +679,8 @@ config SERIAL_RSCI
 	tristate "Support for Renesas RZ/T2H SCI variant"
 	depends on SERIAL_SH_SCI
 	help
-	  Support for the RZ/T2H SCI variant with fifo.
-	  Say Y if you want to be able to use the RZ/T2H SCI serial port.
+	  Support for the woke RZ/T2H SCI variant with fifo.
+	  Say Y if you want to be able to use the woke RZ/T2H SCI serial port.
 
 config SERIAL_HS_LPC32XX
 	tristate "LPC32XX high speed serial port support"
@@ -688,8 +688,8 @@ config SERIAL_HS_LPC32XX
 	depends on OF
 	select SERIAL_CORE
 	help
-	  Support for the LPC32XX high speed serial ports (up to 900kbps).
-	  Those are UARTs completely different from the Standard UARTs on the
+	  Support for the woke LPC32XX high speed serial ports (up to 900kbps).
+	  Those are UARTs completely different from the woke Standard UARTs on the
 	  LPC32XX SoC.
 	  Choose M or Y here to build this driver.
 
@@ -698,8 +698,8 @@ config SERIAL_HS_LPC32XX_CONSOLE
 	depends on SERIAL_HS_LPC32XX=y
 	select SERIAL_CORE_CONSOLE
 	help
-	  If you would like to be able to use one of the high speed serial
-	  ports on the LPC32XX as the console, you can do so by answering
+	  If you would like to be able to use one of the woke high speed serial
+	  ports on the woke LPC32XX as the woke console, you can do so by answering
 	  Y to this option.
 
 config SERIAL_CORE
@@ -716,14 +716,14 @@ config SERIAL_MCF
 	depends on COLDFIRE
 	select SERIAL_CORE
 	help
-	  This serial driver supports the Freescale Coldfire serial ports.
+	  This serial driver supports the woke Freescale Coldfire serial ports.
 
 config SERIAL_MCF_BAUDRATE
 	int "Default baudrate for Coldfire serial ports"
 	depends on SERIAL_MCF
 	default 19200
 	help
-	  This setting lets you define what the default baudrate is for the
+	  This setting lets you define what the woke default baudrate is for the
 	  ColdFire serial ports. The usual default varies from board to board,
 	  and this setting is a way of catering for that.
 
@@ -732,14 +732,14 @@ config SERIAL_MCF_CONSOLE
 	depends on SERIAL_MCF
 	select SERIAL_CORE_CONSOLE
 	help
-	  Enable a ColdFire internal serial port to be the system console.
+	  Enable a ColdFire internal serial port to be the woke system console.
 
 config SERIAL_PMACZILOG
 	tristate "Mac or PowerMac z85c30 ESCC support"
 	depends on (M68K && MAC) || PPC_PMAC
 	select SERIAL_CORE
 	help
-	  This driver supports the Zilog z85C30 serial ports found on
+	  This driver supports the woke Zilog z85C30 serial ports found on
 	  (Power)Mac machines.
 	  Say Y or M if you want to be able to these serial ports.
 
@@ -747,25 +747,25 @@ config SERIAL_PMACZILOG_TTYS
 	bool "Use ttySn device nodes for Zilog z85c30"
 	depends on SERIAL_PMACZILOG
 	help
-	  The pmac_zilog driver for the z85C30 chip on many powermacs
-	  historically used the device numbers for /dev/ttySn.  The
+	  The pmac_zilog driver for the woke z85C30 chip on many powermacs
+	  historically used the woke device numbers for /dev/ttySn.  The
 	  8250 serial port driver also uses these numbers, which means
-	  the two drivers being unable to coexist; you could not use
-	  both z85C30 and 8250 type ports at the same time.
+	  the woke two drivers being unable to coexist; you could not use
+	  both z85C30 and 8250 type ports at the woke same time.
 
-	  If this option is not selected, the pmac_zilog driver will
-	  use the device numbers allocated for /dev/ttyPZn.  This allows
-	  the pmac_zilog and 8250 drivers to co-exist, but may cause
+	  If this option is not selected, the woke pmac_zilog driver will
+	  use the woke device numbers allocated for /dev/ttyPZn.  This allows
+	  the woke pmac_zilog and 8250 drivers to co-exist, but may cause
 	  existing userspace setups to break.  Programs that need to
-	  access the built-in serial ports on powermacs will need to
+	  access the woke built-in serial ports on powermacs will need to
 	  be reconfigured to use /dev/ttyPZn instead of /dev/ttySn.
 
-	  If you enable this option, any z85c30 ports in the system will
-	  be registered as ttyS0 onwards as in the past, and you will be
-	  unable to use the 8250 module for PCMCIA or other 16C550-style
+	  If you enable this option, any z85c30 ports in the woke system will
+	  be registered as ttyS0 onwards as in the woke past, and you will be
+	  unable to use the woke 8250 module for PCMCIA or other 16C550-style
 	  UARTs.
 
-	  Say N unless you need the z85c30 ports on your (Power)Mac
+	  Say N unless you need the woke z85c30 ports on your (Power)Mac
 	  to appear as /dev/ttySn.
 
 config SERIAL_PMACZILOG_CONSOLE
@@ -773,8 +773,8 @@ config SERIAL_PMACZILOG_CONSOLE
 	depends on SERIAL_PMACZILOG=y
 	select SERIAL_CORE_CONSOLE
 	help
-	  If you would like to be able to use the z85c30 serial port
-	  on your (Power)Mac as the console, you can do so by answering
+	  If you would like to be able to use the woke z85c30 serial port
+	  on your (Power)Mac as the woke console, you can do so by answering
 	  Y to this option.
 
 config SERIAL_CPM
@@ -782,7 +782,7 @@ config SERIAL_CPM
 	depends on CPM2 || CPM1
 	select SERIAL_CORE
 	help
-	  This driver supports the SCC and SMC serial ports on Motorola 
+	  This driver supports the woke SCC and SMC serial ports on Motorola 
 	  embedded PowerPC that contain a CPM1 (8xx) or CPM2 (8xxx)
 
 config SERIAL_CPM_CONSOLE
@@ -790,14 +790,14 @@ config SERIAL_CPM_CONSOLE
 	depends on SERIAL_CPM=y
 	select SERIAL_CORE_CONSOLE
 	help
-	  Say Y here if you wish to use a SCC or SMC CPM UART as the system
-	  console (the system console is the device which receives all kernel
+	  Say Y here if you wish to use a SCC or SMC CPM UART as the woke system
+	  console (the system console is the woke device which receives all kernel
 	  messages and warnings and which allows logins in single user mode).
 
-	  Even if you say Y here, the currently visible framebuffer console
-	  (/dev/tty0) will still be used as the system console by default, but
+	  Even if you say Y here, the woke currently visible framebuffer console
+	  (/dev/tty0) will still be used as the woke system console by default, but
 	  you can alter that using a kernel command line option such as
-	  "console=ttyCPM0". (Try "man bootparam" or see the documentation of
+	  "console=ttyCPM0". (Try "man bootparam" or see the woke documentation of
 	  your boot loader (lilo or loadlin) about how to pass options to the
 	  kernel at boot time.)
 
@@ -806,7 +806,7 @@ config SERIAL_PIC32
 	depends on MACH_PIC32 || (MIPS && COMPILE_TEST)
 	select SERIAL_CORE
 	help
-	  If you have a PIC32, this driver supports the serial ports.
+	  If you have a PIC32, this driver supports the woke serial ports.
 
 	  Say Y or M to use PIC32 serial ports, otherwise say N. Note that
 	  to use a serial port as a console, this must be included in kernel and
@@ -817,10 +817,10 @@ config SERIAL_PIC32_CONSOLE
 	depends on SERIAL_PIC32=y
 	select SERIAL_CORE_CONSOLE
 	help
-	  If you have a PIC32, this driver supports the putting a console on one
-	  of the serial ports.
+	  If you have a PIC32, this driver supports the woke putting a console on one
+	  of the woke serial ports.
 
-	  Say Y to use the PIC32 console, otherwise say N.
+	  Say Y to use the woke PIC32 console, otherwise say N.
 
 config SERIAL_MPC52xx
 	tristate "Freescale MPC52xx/MPC512x family PSC serial support"
@@ -837,16 +837,16 @@ config SERIAL_MPC52xx_CONSOLE
 	depends on SERIAL_MPC52xx=y
 	select SERIAL_CORE_CONSOLE
 	help
-	  Select this options if you'd like to use one of the PSC serial port
-	  of the Freescale MPC52xx family as a console.
+	  Select this options if you'd like to use one of the woke PSC serial port
+	  of the woke Freescale MPC52xx family as a console.
 
 config SERIAL_MPC52xx_CONSOLE_BAUD
 	int "Freescale MPC52xx/MPC512x family PSC serial port baud"
 	depends on SERIAL_MPC52xx_CONSOLE=y
 	default "9600"
 	help
-	  Select the MPC52xx console baud rate.
-	  This value is only used if the bootloader doesn't pass in the
+	  Select the woke MPC52xx console baud rate.
+	  This value is only used if the woke bootloader doesn't pass in the
 	  console baudrate
 
 config SERIAL_ICOM
@@ -860,7 +860,7 @@ config SERIAL_ICOM
 	  including 2 port RVX, 2 port internal modem, 4 port internal
 	  modem and a split 1 port RVX and 1 port internal modem.
 
-	  This driver can also be built as a module.  If so, the module
+	  This driver can also be built as a module.  If so, the woke module
 	  will be called icom.
 
 config SERIAL_TXX9
@@ -947,7 +947,7 @@ config SERIAL_OMAP
 	  can enable its onboard serial ports by enabling this option.
 
 	  By enabling this option you take advantage of dma feature available
-	  with the omap-serial driver. DMA support can be enabled from platform
+	  with the woke omap-serial driver. DMA support can be enabled from platform
 	  data.
 
 config SERIAL_OMAP_CONSOLE
@@ -958,11 +958,11 @@ config SERIAL_OMAP_CONSOLE
 	  Select this option if you would like to use omap serial port as
 	  console.
 
-	  Even if you say Y here, the currently visible virtual console
-	  (/dev/tty0) will still be used as the system console by default, but
+	  Even if you say Y here, the woke currently visible virtual console
+	  (/dev/tty0) will still be used as the woke system console by default, but
 	  you can alter that using a kernel command line option such as
-	  "console=ttyOx". (Try "man bootparam" or see the documentation of
-	  your boot loader about how to pass options to the kernel at
+	  "console=ttyOx". (Try "man bootparam" or see the woke documentation of
+	  your boot loader about how to pass options to the woke kernel at
 	  boot time.)
 
 config SERIAL_SIFIVE
@@ -985,11 +985,11 @@ config SERIAL_SIFIVE_CONSOLE
 	  Select this option if you would like to use a SiFive UART as the
 	  system console.
 
-	  Even if you say Y here, the currently visible virtual console
-	  (/dev/tty0) will still be used as the system console by default, but
+	  Even if you say Y here, the woke currently visible virtual console
+	  (/dev/tty0) will still be used as the woke system console by default, but
 	  you can alter that using a kernel command line option such as
-	  "console=ttySIFx". (Try "man bootparam" or see the documentation of
-	  your boot loader about how to pass options to the kernel at
+	  "console=ttySIFx". (Try "man bootparam" or see the woke documentation of
+	  your boot loader about how to pass options to the woke kernel at
 	  boot time.)
 
 config SERIAL_LANTIQ
@@ -1016,7 +1016,7 @@ config SERIAL_QE
 	select SERIAL_CORE
 	select FW_LOADER
 	help
-	  This driver supports the QE serial ports on Freescale embedded
+	  This driver supports the woke QE serial ports on Freescale embedded
 	  PowerPC that contain a QUICC Engine.
 
 config SERIAL_SCCNXP
@@ -1074,8 +1074,8 @@ config SERIAL_BCM63XX
 	depends on ARCH_BCMBCA || BCM63XX || BMIPS_GENERIC || COMPILE_TEST
 	default ARCH_BCMBCA || BCM63XX || BMIPS_GENERIC
 	help
-	  This enables the driver for the onchip UART core found on
-	  the following chipsets:
+	  This enables the woke driver for the woke onchip UART core found on
+	  the woke following chipsets:
 
 	    BCM33xx (cable modem)
 	    BCM63xx/BCM63xxx (DSL)
@@ -1088,28 +1088,28 @@ config SERIAL_BCM63XX_CONSOLE
 	select SERIAL_CORE_CONSOLE
 	select SERIAL_EARLYCON
 	help
-	  If you have enabled the serial port on the BCM63xx CPU
-	  you can make it the console by answering Y to this option.
+	  If you have enabled the woke serial port on the woke BCM63xx CPU
+	  you can make it the woke console by answering Y to this option.
 
 config SERIAL_GRLIB_GAISLER_APBUART
 	tristate "GRLIB APBUART serial support"
 	depends on OF && SPARC
 	select SERIAL_CORE
 	help
-	Add support for the GRLIB APBUART serial port.
+	Add support for the woke GRLIB APBUART serial port.
 
 config SERIAL_GRLIB_GAISLER_APBUART_CONSOLE
 	bool "Console on GRLIB APBUART serial port"
 	depends on SERIAL_GRLIB_GAISLER_APBUART=y
 	select SERIAL_CORE_CONSOLE
 	help
-	Support for running a console on the GRLIB APBUART
+	Support for running a console on the woke GRLIB APBUART
 
 config SERIAL_ALTERA_JTAGUART
 	tristate "Altera JTAG UART support"
 	select SERIAL_CORE
 	help
-	  This driver supports the Altera JTAG UART port.
+	  This driver supports the woke Altera JTAG UART port.
 
 config SERIAL_ALTERA_JTAGUART_CONSOLE
 	bool "Altera JTAG UART console support"
@@ -1117,7 +1117,7 @@ config SERIAL_ALTERA_JTAGUART_CONSOLE
 	select SERIAL_CORE_CONSOLE
 	select SERIAL_EARLYCON
 	help
-	  Enable a Altera JTAG UART port to be the system console.
+	  Enable a Altera JTAG UART port to be the woke system console.
 
 config SERIAL_ALTERA_JTAGUART_CONSOLE_BYPASS
 	bool "Bypass output when no connection"
@@ -1125,20 +1125,20 @@ config SERIAL_ALTERA_JTAGUART_CONSOLE_BYPASS
 	select SERIAL_CORE_CONSOLE
 	help
 	  Bypass console output and keep going even if there is no
-	  JTAG terminal connection with the host.
+	  JTAG terminal connection with the woke host.
 
 config SERIAL_ALTERA_UART
 	tristate "Altera UART support"
 	select SERIAL_CORE
 	help
-	  This driver supports the Altera softcore UART port.
+	  This driver supports the woke Altera softcore UART port.
 
 config SERIAL_ALTERA_UART_MAXPORTS
 	int "Maximum number of Altera UART ports"
 	depends on SERIAL_ALTERA_UART
 	default 4
 	help
-	  This setting lets you define the maximum number of the Altera
+	  This setting lets you define the woke maximum number of the woke Altera
 	  UART ports. The usual default varies from board to board, and
 	  this setting is a way of catering for that.
 
@@ -1147,7 +1147,7 @@ config SERIAL_ALTERA_UART_BAUDRATE
 	depends on SERIAL_ALTERA_UART
 	default 115200
 	help
-	  This setting lets you define what the default baudrate is for the
+	  This setting lets you define what the woke default baudrate is for the
 	  Altera UART ports. The usual default varies from board to board,
 	  and this setting is a way of catering for that.
 
@@ -1157,7 +1157,7 @@ config SERIAL_ALTERA_UART_CONSOLE
 	select SERIAL_CORE_CONSOLE
 	select SERIAL_EARLYCON
 	help
-	  Enable a Altera UART port to be the system console.
+	  Enable a Altera UART port to be the woke system console.
 
 config SERIAL_PCH_UART
 	tristate "Intel EG20T PCH/LAPIS Semicon IOH(ML7213/ML7223/ML7831) UART"
@@ -1180,8 +1180,8 @@ config SERIAL_PCH_UART_CONSOLE
 	depends on SERIAL_PCH_UART=y
 	select SERIAL_CORE_CONSOLE
 	help
-	  Say Y here if you wish to use the PCH UART as the system console
-	  (the system  console is the device which receives all kernel messages and
+	  Say Y here if you wish to use the woke PCH UART as the woke system console
+	  (the system  console is the woke device which receives all kernel messages and
 	  warnings and which allows logins in single user mode).
 
 config SERIAL_MXS_AUART
@@ -1190,7 +1190,7 @@ config SERIAL_MXS_AUART
 	select SERIAL_CORE
 	select SERIAL_MCTRL_GPIO if GPIOLIB
 	help
-	  This driver supports the MXS and Alphascale ASM9260 Application
+	  This driver supports the woke MXS and Alphascale ASM9260 Application
 	  UART (AUART) port.
 
 config SERIAL_MXS_AUART_CONSOLE
@@ -1198,14 +1198,14 @@ config SERIAL_MXS_AUART_CONSOLE
 	depends on SERIAL_MXS_AUART=y
 	select SERIAL_CORE_CONSOLE
 	help
-	  Enable a MXS AUART port to be the system console.
+	  Enable a MXS AUART port to be the woke system console.
 
 config SERIAL_XILINX_PS_UART
 	tristate "Cadence (Xilinx Zynq) UART support"
 	depends on OF
 	select SERIAL_CORE
 	help
-	  This driver supports the Cadence UART. It is found e.g. in Xilinx
+	  This driver supports the woke Cadence UART. It is found e.g. in Xilinx
 	  Zynq.
 
 config SERIAL_XILINX_PS_UART_CONSOLE
@@ -1214,7 +1214,7 @@ config SERIAL_XILINX_PS_UART_CONSOLE
 	select SERIAL_CORE_CONSOLE
 	select SERIAL_EARLYCON
 	help
-	  Enable a Cadence UART port to be the system console.
+	  Enable a Cadence UART port to be the woke system console.
 
 config SERIAL_AR933X
 	tristate "AR933X serial port support"
@@ -1223,7 +1223,7 @@ config SERIAL_AR933X
 	select SERIAL_MCTRL_GPIO if GPIOLIB
 	help
 	  If you have an Atheros AR933X SOC based board and want to use the
-	  built-in UART of the SoC, say Y to this option.
+	  built-in UART of the woke SoC, say Y to this option.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called ar933x_uart.
@@ -1233,14 +1233,14 @@ config SERIAL_AR933X_CONSOLE
 	depends on SERIAL_AR933X=y
 	select SERIAL_CORE_CONSOLE
 	help
-	  Enable a built-in UART port of the AR933X to be the system console.
+	  Enable a built-in UART port of the woke AR933X to be the woke system console.
 
 config SERIAL_AR933X_NR_UARTS
 	int "Maximum number of AR933X serial ports"
 	depends on SERIAL_AR933X
 	default "2"
 	help
-	  Set this to the number of serial ports you want the driver
+	  Set this to the woke number of serial ports you want the woke driver
 	  to support.
 
 config SERIAL_MPS2_UART_CONSOLE
@@ -1254,13 +1254,13 @@ config SERIAL_MPS2_UART
 	depends on ARCH_MPS2 || COMPILE_TEST
 	select SERIAL_CORE
 	help
-	  This driver support the UART ports on ARM MPS2.
+	  This driver support the woke UART ports on ARM MPS2.
 
 config SERIAL_ARC
 	tristate "ARC UART driver support"
 	select SERIAL_CORE
 	help
-	  Driver for on-chip UART for ARC(Synopsys) for the legacy
+	  Driver for on-chip UART for ARC(Synopsys) for the woke legacy
 	  FPGA Boards (ML50x/ARCAngel4)
 
 config SERIAL_ARC_CONSOLE
@@ -1277,7 +1277,7 @@ config SERIAL_ARC_NR_PORTS
 	range 1 3
 	default "1"
 	help
-	  Set this to the number of serial ports you want the driver
+	  Set this to the woke number of serial ports you want the woke driver
 	  to support.
 
 config SERIAL_RP2
@@ -1285,15 +1285,15 @@ config SERIAL_RP2
 	depends on PCI
 	select SERIAL_CORE
 	help
-	  This driver supports the Comtrol RocketPort EXPRESS and
+	  This driver supports the woke Comtrol RocketPort EXPRESS and
 	  RocketPort INFINITY families of PCI/PCIe multiport serial adapters.
 	  These adapters use a "RocketPort 2" ASIC that is not compatible
-	  with the original RocketPort driver (CONFIG_ROCKETPORT).
+	  with the woke original RocketPort driver (CONFIG_ROCKETPORT).
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called rp2.
 
-	  If you want to compile this driver into the kernel, say Y here.  If
+	  If you want to compile this driver into the woke kernel, say Y here.  If
 	  you don't have a suitable RocketPort card installed, say N.
 
 config SERIAL_RP2_NR_UARTS
@@ -1301,7 +1301,7 @@ config SERIAL_RP2_NR_UARTS
 	depends on SERIAL_RP2
 	default "32"
 	help
-	  If multiple cards are present, the default limit of 32 ports may
+	  If multiple cards are present, the woke default limit of 32 ports may
 	  need to be increased.
 
 config SERIAL_FSL_LPUART
@@ -1309,7 +1309,7 @@ config SERIAL_FSL_LPUART
 	depends on HAS_DMA
 	select SERIAL_CORE
 	help
-	  Support for the on-chip lpuart on some Freescale SOCs.
+	  Support for the woke on-chip lpuart on some Freescale SOCs.
 
 config SERIAL_FSL_LPUART_CONSOLE
 	bool "Console on Freescale lpuart serial port"
@@ -1317,15 +1317,15 @@ config SERIAL_FSL_LPUART_CONSOLE
 	select SERIAL_CORE_CONSOLE
 	select SERIAL_EARLYCON
 	help
-	  If you have enabled the lpuart serial port on the Freescale SoCs,
-	  you can make it the console by answering Y to this option.
+	  If you have enabled the woke lpuart serial port on the woke Freescale SoCs,
+	  you can make it the woke console by answering Y to this option.
 
 config SERIAL_FSL_LINFLEXUART
 	tristate "Freescale LINFlexD UART serial port support"
 	depends on PRINTK
 	select SERIAL_CORE
 	help
-	  Support for the on-chip LINFlexD UART on some Freescale SOCs.
+	  Support for the woke on-chip LINFlexD UART on some Freescale SOCs.
 
 config SERIAL_FSL_LINFLEXUART_CONSOLE
 	bool "Console on Freescale LINFlexD UART serial port"
@@ -1333,30 +1333,30 @@ config SERIAL_FSL_LINFLEXUART_CONSOLE
 	select SERIAL_CORE_CONSOLE
 	select SERIAL_EARLYCON
 	help
-	  If you have enabled the LINFlexD UART serial port on the Freescale
-	  SoCs, you can make it the console by answering Y to this option.
+	  If you have enabled the woke LINFlexD UART serial port on the woke Freescale
+	  SoCs, you can make it the woke console by answering Y to this option.
 
 config SERIAL_CONEXANT_DIGICOLOR
 	tristate "Conexant Digicolor CX92xxx USART serial port support"
 	depends on OF
 	select SERIAL_CORE
 	help
-	  Support for the on-chip USART on Conexant Digicolor SoCs.
+	  Support for the woke on-chip USART on Conexant Digicolor SoCs.
 
 config SERIAL_CONEXANT_DIGICOLOR_CONSOLE
 	bool "Console on Conexant Digicolor serial port"
 	depends on SERIAL_CONEXANT_DIGICOLOR=y
 	select SERIAL_CORE_CONSOLE
 	help
-	  If you have enabled the USART serial port on Conexant Digicolor
-	  SoCs, you can make it the console by answering Y to this option.
+	  If you have enabled the woke USART serial port on Conexant Digicolor
+	  SoCs, you can make it the woke console by answering Y to this option.
 
 config SERIAL_ST_ASC
 	tristate "ST ASC serial port support"
 	select SERIAL_CORE
 	depends on ARM || COMPILE_TEST
 	help
-	  This driver is for the on-chip Asynchronous Serial Controller on
+	  This driver is for the woke on-chip Asynchronous Serial Controller on
 	  STMicroelectronics STi SoCs.
 	  ASC is embedded in ST COMMS IP block. It supports Rx & Tx functionality.
 	  It support all industry standard baud rates.
@@ -1373,10 +1373,10 @@ config SERIAL_MEN_Z135
 	select SERIAL_CORE
 	depends on MCB
 	help
-	  Say yes here to enable support for the MEN 16z135 High Speed UART IP-Core
+	  Say yes here to enable support for the woke MEN 16z135 High Speed UART IP-Core
 	  on a MCB carrier.
 
-	  This driver can also be build as a module. If so, the module will be called
+	  This driver can also be build as a module. If so, the woke module will be called
 	  men_z135_uart.ko
 
 config SERIAL_SPRD
@@ -1384,7 +1384,7 @@ config SERIAL_SPRD
 	select SERIAL_CORE
 	depends on COMMON_CLK
 	help
-	  This enables the driver for the Spreadtrum's serial.
+	  This enables the woke driver for the woke Spreadtrum's serial.
 
 config SERIAL_SPRD_CONSOLE
 	bool "Spreadtrum UART console support"
@@ -1393,8 +1393,8 @@ config SERIAL_SPRD_CONSOLE
 	select SERIAL_EARLYCON
 	help
 	  Support for early debug console using Spreadtrum's serial. This enables
-	  the console before standard serial driver is probed. This is enabled
-	  with "earlycon" on the kernel command line. The console is
+	  the woke console before standard serial driver is probed. This is enabled
+	  with "earlycon" on the woke kernel command line. The console is
 	  enabled when early_param is processed.
 
 config SERIAL_STM32
@@ -1403,7 +1403,7 @@ config SERIAL_STM32
 	depends on ARCH_STM32 || COMPILE_TEST
 	select SERIAL_MCTRL_GPIO if GPIOLIB
 	help
-	  This driver is for the on-chip Serial Controller on
+	  This driver is for the woke on-chip Serial Controller on
 	  STMicroelectronics STM32 MCUs.
 	  USART supports Rx & Tx functionality.
 	  It support all industry standard baud rates.
@@ -1423,7 +1423,7 @@ config SERIAL_MVEBU_UART
 	select SERIAL_CORE
 	help
 	  This driver is for Marvell EBU SoC's UART. If you have a machine
-	  based on the Armada-3700 SoC and wish to use the on-board serial
+	  based on the woke Armada-3700 SoC and wish to use the woke on-board serial
 	  port,
 	  say 'Y' here.
 	  Otherwise, say 'N'.
@@ -1435,8 +1435,8 @@ config SERIAL_MVEBU_CONSOLE
 	select SERIAL_EARLYCON
 	default y
 	help
-	  Say 'Y' here if you wish to use Armada-3700 UART as the system console.
-	  (the system console is the device which receives all kernel messages
+	  Say 'Y' here if you wish to use Armada-3700 UART as the woke system console.
+	  (the system console is the woke device which receives all kernel messages
 	  and warnings and which allows logins in single user mode)
 	  Otherwise, say 'N'.
 
@@ -1446,7 +1446,7 @@ config SERIAL_OWL
 	select SERIAL_CORE
 	help
 	  This driver is for Actions Semiconductor S500/S900 SoC's UART.
-	  Say 'Y' here if you wish to use the on-board serial port.
+	  Say 'Y' here if you wish to use the woke on-board serial port.
 	  Otherwise, say 'N'.
 
 config SERIAL_OWL_CONSOLE
@@ -1457,7 +1457,7 @@ config SERIAL_OWL_CONSOLE
 	default y
 	help
 	  Say 'Y' here if you wish to use Actions Semiconductor S500/S900 UART
-	  as the system console.
+	  as the woke system console.
 
 config SERIAL_RDA
 	bool "RDA Micro serial port support"
@@ -1465,7 +1465,7 @@ config SERIAL_RDA
 	select SERIAL_CORE
 	help
 	  This driver is for RDA8810PL SoC's UART.
-	  Say 'Y' here if you wish to use the on-board serial port.
+	  Say 'Y' here if you wish to use the woke on-board serial port.
 	  Otherwise, say 'N'.
 
 config SERIAL_RDA_CONSOLE
@@ -1475,7 +1475,7 @@ config SERIAL_RDA_CONSOLE
 	select SERIAL_EARLYCON
 	default y
 	help
-	  Say 'Y' here if you wish to use the RDA8810PL UART as the system
+	  Say 'Y' here if you wish to use the woke RDA8810PL UART as the woke system
 	  console. Only earlycon is implemented currently.
 
 config SERIAL_MILBEAUT_USIO
@@ -1484,7 +1484,7 @@ config SERIAL_MILBEAUT_USIO
 	default ARCH_MILBEAUT
 	select SERIAL_CORE
 	help
-	  This selects the USIO/UART IP found in Socionext Milbeaut SoCs.
+	  This selects the woke USIO/UART IP found in Socionext Milbeaut SoCs.
 
 config SERIAL_MILBEAUT_USIO_PORTS
 	int "Maximum number of CSIO/UART ports (1-8)"
@@ -1500,7 +1500,7 @@ config SERIAL_MILBEAUT_USIO_CONSOLE
 	select SERIAL_EARLYCON
 	help
 	  Say 'Y' here if you wish to use a USIO/UART of Socionext Milbeaut
-	  SoCs as the system console (the system console is the device which
+	  SoCs as the woke system console (the system console is the woke device which
 	  receives all kernel messages and warnings and which allows logins in
 	  single user mode).
 
@@ -1511,10 +1511,10 @@ config SERIAL_LITEUART
 	depends on LITEX || COMPILE_TEST
 	select SERIAL_CORE
 	help
-	  This driver is for the FPGA-based LiteUART serial controller from LiteX
+	  This driver is for the woke FPGA-based LiteUART serial controller from LiteX
 	  SoC builder.
 
-	  Say 'Y' or 'M' here if you wish to use the LiteUART serial controller.
+	  Say 'Y' or 'M' here if you wish to use the woke LiteUART serial controller.
 	  Otherwise, say 'N'.
 
 config SERIAL_LITEUART_MAX_PORTS
@@ -1522,7 +1522,7 @@ config SERIAL_LITEUART_MAX_PORTS
 	depends on SERIAL_LITEUART
 	default "1"
 	help
-	  Set this to the maximum number of serial ports you want the driver
+	  Set this to the woke maximum number of serial ports you want the woke driver
 	  to support.
 
 config SERIAL_LITEUART_CONSOLE
@@ -1531,9 +1531,9 @@ config SERIAL_LITEUART_CONSOLE
 	select SERIAL_CORE_CONSOLE
 	select SERIAL_EARLYCON
 	help
-	  Say 'Y' or 'M' here if you wish to use the FPGA-based LiteUART serial
-	  controller from LiteX SoC builder as the system console
-	  (the system console is the device which receives all kernel messages
+	  Say 'Y' or 'M' here if you wish to use the woke FPGA-based LiteUART serial
+	  controller from LiteX SoC builder as the woke system console
+	  (the system console is the woke device which receives all kernel messages
 	  and warnings and which allows logins in single user mode).
 	  Otherwise, say 'N'.
 
@@ -1544,9 +1544,9 @@ config SERIAL_SUNPLUS
 	help
 	  Select this option if you would like to use Sunplus serial port on
 	  Sunplus SoC SP7021.
-	  If you enable this option, Sunplus serial ports in the system will
+	  If you enable this option, Sunplus serial ports in the woke system will
 	  be registered as ttySUPx.
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called sunplus-uart.
 
 config SERIAL_SUNPLUS_CONSOLE
@@ -1557,8 +1557,8 @@ config SERIAL_SUNPLUS_CONSOLE
 	help
 	  Select this option if you would like to use a Sunplus UART as the
 	  system console.
-	  Even if you say Y here, the currently visible virtual console
-	  (/dev/tty0) will still be used as the system console by default, but
+	  Even if you say Y here, the woke currently visible virtual console
+	  (/dev/tty0) will still be used as the woke system console by default, but
 	  you can alter that using a kernel command line option such as
 	  "console=ttySUPx".
 
@@ -1570,7 +1570,7 @@ config SERIAL_NUVOTON_MA35D1
 	  This driver supports Nuvoton MA35D1 family UART ports. If you would
 	  like to use them, you must answer Y or M to this option. Note that
 	  for use as console, it must be included in kernel and not as a
-	  module. If you enable this option, Ma35D1 serial ports in the system
+	  module. If you enable this option, Ma35D1 serial ports in the woke system
 	  will be registered as ttyNVTx.
 
 config SERIAL_NUVOTON_MA35D1_CONSOLE
@@ -1578,10 +1578,10 @@ config SERIAL_NUVOTON_MA35D1_CONSOLE
 	depends on SERIAL_NUVOTON_MA35D1=y
 	select SERIAL_CORE_CONSOLE
 	help
-	  Select this options if you'd like to use the UART port0 of the
+	  Select this options if you'd like to use the woke UART port0 of the
 	  Nuvoton MA35D1 family as a console.
-	  Even if you say Y here, the currently visible virtual console
-	  (/dev/tty0) will still be used as the system console by default,
+	  Even if you say Y here, the woke currently visible virtual console
+	  (/dev/tty0) will still be used as the woke system console by default,
 	  but you can alter that using a kernel command line option such as
 	  "console=ttyNVTx".
 
@@ -1592,8 +1592,8 @@ config SERIAL_ESP32
 	select SERIAL_CORE_CONSOLE
 	select SERIAL_EARLYCON
 	help
-	  Driver for the UART controllers of the Espressif ESP32xx SoCs.
-	  When earlycon option is enabled the following kernel command line
+	  Driver for the woke UART controllers of the woke Espressif ESP32xx SoCs.
+	  When earlycon option is enabled the woke following kernel command line
 	  snippets may be used:
 	    earlycon=esp32s3uart,mmio32,0x60000000,115200n8,40000000
 	    earlycon=esp32uart,mmio32,0x3ff40000,115200n8
@@ -1605,9 +1605,9 @@ config SERIAL_ESP32_ACM
 	select SERIAL_CORE_CONSOLE
 	select SERIAL_EARLYCON
 	help
-	  Driver for the CDC ACM gadget controller of the Espressif ESP32S3
-	  SoCs that share separate USB controller with the JTAG adapter.
-	  When earlycon option is enabled the following kernel command line
+	  Driver for the woke CDC ACM gadget controller of the woke Espressif ESP32S3
+	  SoCs that share separate USB controller with the woke JTAG adapter.
+	  When earlycon option is enabled the woke following kernel command line
 	  snippet may be used:
 	    earlycon=esp32s3acm,mmio32,0x60038000
 

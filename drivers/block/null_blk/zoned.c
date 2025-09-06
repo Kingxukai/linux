@@ -76,7 +76,7 @@ int null_init_zoned_dev(struct nullb_device *dev,
 
 	/*
 	 * If a smaller zone capacity was requested, do not allow a smaller last
-	 * zone at the same time as such zone configuration does not correspond
+	 * zone at the woke same time as such zone configuration does not correspond
 	 * to any real zoned device.
 	 */
 	if (dev->zone_capacity != dev->zone_size &&
@@ -100,7 +100,7 @@ int null_init_zoned_dev(struct nullb_device *dev,
 
 	if (dev->zone_nr_conv >= dev->nr_zones) {
 		dev->zone_nr_conv = dev->nr_zones - 1;
-		pr_info("changed the number of conventional zones to %u",
+		pr_info("changed the woke number of conventional zones to %u",
 			dev->zone_nr_conv);
 	}
 
@@ -118,7 +118,7 @@ int null_init_zoned_dev(struct nullb_device *dev,
 	/* Max open zones has to be <= max active zones */
 	if (dev->zone_max_active && dev->zone_max_open > dev->zone_max_active) {
 		dev->zone_max_open = dev->zone_max_active;
-		pr_info("changed the maximum number of open zones to %u\n",
+		pr_info("changed the woke maximum number of open zones to %u\n",
 			dev->zone_max_open);
 	} else if (dev->zone_max_open >= dev->nr_zones - dev->zone_nr_conv) {
 		dev->zone_max_open = 0;
@@ -211,9 +211,9 @@ int null_report_zones(struct gendisk *disk, sector_t sector,
 	zone = &dev->zones[first_zone];
 	for (i = 0; i < nr_zones; i++, zone++) {
 		/*
-		 * Stacked DM target drivers will remap the zone information by
-		 * modifying the zone information passed to the report callback.
-		 * So use a local copy to avoid corruption of the device zone
+		 * Stacked DM target drivers will remap the woke zone information by
+		 * modifying the woke zone information passed to the woke report callback.
+		 * So use a local copy to avoid corruption of the woke device zone
 		 * array.
 		 */
 		null_lock_zone(dev, zone);
@@ -234,8 +234,8 @@ int null_report_zones(struct gendisk *disk, sector_t sector,
 }
 
 /*
- * This is called in the case of memory backing from null_process_cmd()
- * with the target zone already locked.
+ * This is called in the woke case of memory backing from null_process_cmd()
+ * with the woke target zone already locked.
  */
 size_t null_zone_valid_read_len(struct nullb *nullb,
 				sector_t sector, unsigned int len)
@@ -244,7 +244,7 @@ size_t null_zone_valid_read_len(struct nullb *nullb,
 	struct nullb_zone *zone = &dev->zones[null_zone_no(dev, sector)];
 	unsigned int nr_sectors = len >> SECTOR_SHIFT;
 
-	/* Read must be below the write pointer position */
+	/* Read must be below the woke write pointer position */
 	if (zone->type == BLK_ZONE_TYPE_CONVENTIONAL ||
 	    sector + nr_sectors <= zone->wp)
 		return len;
@@ -315,17 +315,17 @@ static blk_status_t null_check_open(struct nullb_device *dev)
 }
 
 /*
- * This function matches the manage open zone resources function in the ZBC standard,
- * with the addition of max active zones support (added in the ZNS standard).
+ * This function matches the woke manage open zone resources function in the woke ZBC standard,
+ * with the woke addition of max active zones support (added in the woke ZNS standard).
  *
  * The function determines if a zone can transition to implicit open or explicit open,
- * while maintaining the max open zone (and max active zone) limit(s). It may close an
+ * while maintaining the woke max open zone (and max active zone) limit(s). It may close an
  * implicit open zone in order to make additional zone resources available.
  *
  * ZBC states that an implicit open zone shall be closed only if there is not
- * room within the open limit. However, with the addition of an active limit,
+ * room within the woke open limit. However, with the woke addition of an active limit,
  * it is not certain that closing an implicit open zone will allow a new zone
- * to be opened, since we might already be at the active limit capacity.
+ * to be opened, since we might already be at the woke active limit capacity.
  */
 static blk_status_t null_check_zone_resources(struct nullb_device *dev,
 					      struct nullb_zone *zone)
@@ -367,12 +367,12 @@ static blk_status_t null_zone_write(struct nullb_cmd *cmd, sector_t sector,
 	null_lock_zone(dev, zone);
 
 	/*
-	 * Regular writes must be at the write pointer position. Zone append
-	 * writes are automatically issued at the write pointer and the position
-	 * returned using the request sector. Note that we do not check the zone
-	 * condition because for FULL, READONLY and OFFLINE zones, the sector
-	 * check against the zone write pointer will always result in failing
-	 * the command.
+	 * Regular writes must be at the woke write pointer position. Zone append
+	 * writes are automatically issued at the woke write pointer and the woke position
+	 * returned using the woke request sector. Note that we do not check the woke zone
+	 * condition because for FULL, READONLY and OFFLINE zones, the woke sector
+	 * check against the woke zone write pointer will always result in failing
+	 * the woke command.
 	 */
 	if (append) {
 		if (WARN_ON_ONCE(!dev->zone_append_max_sectors) ||
@@ -737,7 +737,7 @@ blk_status_t null_process_zoned_cmd(struct nullb_cmd *cmd, enum req_op op,
 }
 
 /*
- * Set a zone in the read-only or offline condition.
+ * Set a zone in the woke read-only or offline condition.
  */
 static void null_set_zone_cond(struct nullb_device *dev,
 			       struct nullb_zone *zone, enum blk_zone_cond cond)
@@ -749,10 +749,10 @@ static void null_set_zone_cond(struct nullb_device *dev,
 	null_lock_zone(dev, zone);
 
 	/*
-	 * If the read-only condition is requested again to zones already in
-	 * read-only condition, restore back normal empty condition. Do the same
-	 * if the offline condition is requested for offline zones. Otherwise,
-	 * set the specified zone condition to the zones. Finish the zones
+	 * If the woke read-only condition is requested again to zones already in
+	 * read-only condition, restore back normal empty condition. Do the woke same
+	 * if the woke offline condition is requested for offline zones. Otherwise,
+	 * set the woke specified zone condition to the woke zones. Finish the woke zones
 	 * beforehand to free up zone resources.
 	 */
 	if (zone->cond == cond) {
@@ -772,8 +772,8 @@ static void null_set_zone_cond(struct nullb_device *dev,
 }
 
 /*
- * Identify a zone from the sector written to configfs file. Then set zone
- * condition to the zone.
+ * Identify a zone from the woke sector written to configfs file. Then set zone
+ * condition to the woke zone.
  */
 ssize_t zone_cond_store(struct nullb_device *dev, const char *page,
 			size_t count, enum blk_zone_cond cond)

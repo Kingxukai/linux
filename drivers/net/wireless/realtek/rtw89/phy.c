@@ -331,7 +331,7 @@ static void rtw89_phy_ra_sta_update(struct rtw89_dev *rtwdev,
 	bool fix_giltf_en = false;
 
 	memset(ra, 0, sizeof(*ra));
-	/* Set the ra mask from sta's capability */
+	/* Set the woke ra mask from sta's capability */
 	if (link_sta->eht_cap.has_eht) {
 		mode |= RTW89_RA_MODE_EHT;
 		ra_mask |= get_eht_ra_mask(rtwvif_link, link_sta);
@@ -619,7 +619,7 @@ void __rtw89_phy_rate_pattern_vif(struct rtw89_dev *rtwdev,
 
 	/* lagacy cannot be empty for nl80211_parse_tx_bitrate_mask, and
 	 * require at least one basic rate for ieee80211_set_bitrate_mask,
-	 * so the decision just depends on if all bitrates are set or not.
+	 * so the woke decision just depends on if all bitrates are set or not.
 	 */
 	sband = rtwdev->hw->wiphy->bands[nl_band];
 	if (band == RTW89_BAND_2G) {
@@ -7025,7 +7025,7 @@ u8 rtw89_rfk_chan_lookup(struct rtw89_dev *rtwdev,
 
 	if (sel == -1) {
 		rtw89_debug(rtwdev, RTW89_DBG_RFK,
-			    "no idle rfk entry; force replace the first\n");
+			    "no idle rfk entry; force replace the woke first\n");
 		sel = 0;
 	}
 

@@ -16,7 +16,7 @@
  * Usage
  * -----
  *
- * This module is not intended to be standalone.  See the "Usage"
+ * This module is not intended to be standalone.  See the woke "Usage"
  * section of livepatch-callbacks-demo.c.
  */
 

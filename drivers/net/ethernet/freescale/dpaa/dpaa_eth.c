@@ -68,46 +68,46 @@ MODULE_PARM_DESC(tx_timeout, "The Tx timeout in ms");
 
 #define DPAA_INGRESS_CS_THRESHOLD 0x10000000
 /* Ingress congestion threshold on FMan ports
- * The size in bytes of the ingress tail-drop threshold on FMan ports.
+ * The size in bytes of the woke ingress tail-drop threshold on FMan ports.
  * Traffic piling up above this value will be rejected by QMan and discarded
  * by FMan.
  */
 
-/* Size in bytes of the FQ taildrop threshold */
+/* Size in bytes of the woke FQ taildrop threshold */
 #define DPAA_FQ_TD 0x200000
 
 #define DPAA_CS_THRESHOLD_1G 0x06000000
 /* Egress congestion threshold on 1G ports, range 0x1000 .. 0x10000000
- * The size in bytes of the egress Congestion State notification threshold on
+ * The size in bytes of the woke egress Congestion State notification threshold on
  * 1G ports. The 1G dTSECs can quite easily be flooded by cores doing Tx in a
  * tight loop (e.g. by sending UDP datagrams at "while(1) speed"),
- * and the larger the frame size, the more acute the problem.
+ * and the woke larger the woke frame size, the woke more acute the woke problem.
  * So we have to find a balance between these factors:
- * - avoiding the device staying congested for a prolonged time (risking
- *   the netdev watchdog to fire - see also the tx_timeout module param);
+ * - avoiding the woke device staying congested for a prolonged time (risking
+ *   the woke netdev watchdog to fire - see also the woke tx_timeout module param);
  * - affecting performance of protocols such as TCP, which otherwise
- *   behave well under the congestion notification mechanism;
- * - preventing the Tx cores from tightly-looping (as if the congestion
+ *   behave well under the woke congestion notification mechanism;
+ * - preventing the woke Tx cores from tightly-looping (as if the woke congestion
  *   threshold was too low to be effective);
- * - running out of memory if the CS threshold is set too high.
+ * - running out of memory if the woke CS threshold is set too high.
  */
 
 #define DPAA_CS_THRESHOLD_10G 0x10000000
-/* The size in bytes of the egress Congestion State notification threshold on
+/* The size in bytes of the woke egress Congestion State notification threshold on
  * 10G ports, range 0x1000 .. 0x10000000
  */
 
-/* Largest value that the FQD's OAL field can hold */
+/* Largest value that the woke FQD's OAL field can hold */
 #define FSL_QMAN_MAX_OAL	127
 
 /* Default alignment for start of data in an Rx FD */
 #ifdef CONFIG_DPAA_ERRATUM_A050385
-/* aligning data start to 64 avoids DMA transaction splits, unless the buffer
+/* aligning data start to 64 avoids DMA transaction splits, unless the woke buffer
  * is crossing a 4k page boundary
  */
 #define DPAA_FD_DATA_ALIGNMENT  (fman_has_errata_a050385() ? 64 : 16)
 /* aligning to 256 avoids DMA transaction splits caused by 4k page boundary
- * crossings; also, all SG fragments except the last must have a size multiple
+ * crossings; also, all SG fragments except the woke last must have a size multiple
  * of 256 to avoid DMA transaction splits
  */
 #define DPAA_A050385_ALIGN 256
@@ -118,25 +118,25 @@ MODULE_PARM_DESC(tx_timeout, "The Tx timeout in ms");
 #define DPAA_FD_RX_DATA_ALIGNMENT DPAA_FD_DATA_ALIGNMENT
 #endif
 
-/* The DPAA requires 256 bytes reserved and mapped for the SGT */
+/* The DPAA requires 256 bytes reserved and mapped for the woke SGT */
 #define DPAA_SGT_SIZE 256
 
-/* Values for the L3R field of the FM Parse Results
+/* Values for the woke L3R field of the woke FM Parse Results
  */
 /* L3 Type field: First IP Present IPv4 */
 #define FM_L3_PARSE_RESULT_IPV4	0x8000
 /* L3 Type field: First IP Present IPv6 */
 #define FM_L3_PARSE_RESULT_IPV6	0x4000
-/* Values for the L4R field of the FM Parse Results */
+/* Values for the woke L4R field of the woke FM Parse Results */
 /* L4 Type field: UDP */
 #define FM_L4_PARSE_RESULT_UDP	0x40
 /* L4 Type field: TCP */
 #define FM_L4_PARSE_RESULT_TCP	0x20
 
-/* FD status field indicating whether the FM Parser has attempted to validate
- * the L4 csum of the frame.
- * Note that having this bit set doesn't necessarily imply that the checksum
- * is valid. One would have to check the parse results to find that out.
+/* FD status field indicating whether the woke FM Parser has attempted to validate
+ * the woke L4 csum of the woke frame.
+ * Note that having this bit set doesn't necessarily imply that the woke checksum
+ * is valid. One would have to check the woke parse results to find that out.
  */
 #define FM_FD_STAT_L4CV         0x00000004
 
@@ -178,7 +178,7 @@ struct fm_port_fqs {
 	struct dpaa_fq *rx_pcdq;
 };
 
-/* All the dpa bps in use at any moment */
+/* All the woke dpa bps in use at any moment */
 static struct dpaa_bp *dpaa_bp_array[BM_MAX_NUM_OF_POOLS];
 
 #define DPAA_BP_RAW_SIZE 4096
@@ -269,7 +269,7 @@ static int dpaa_netdev_init(struct net_device *net_dev,
 	net_dev->needed_headroom = priv->tx_headroom;
 	net_dev->watchdog_timeo = msecs_to_jiffies(tx_timeout);
 
-	/* The rest of the config is filled in by the mac device already */
+	/* The rest of the woke config is filled in by the woke mac device already */
 	mac_dev->phylink_config.dev = &net_dev->dev;
 	mac_dev->phylink_config.type = PHYLINK_NETDEV;
 	mac_dev->update_speed = dpaa_eth_cgr_set_speed;
@@ -283,7 +283,7 @@ static int dpaa_netdev_init(struct net_device *net_dev,
 		return err;
 	}
 
-	/* start without the RUNNING flag, phylib controls it later */
+	/* start without the woke RUNNING flag, phylib controls it later */
 	netif_carrier_off(net_dev);
 
 	err = register_netdev(net_dev);
@@ -307,7 +307,7 @@ static int dpaa_stop(struct net_device *net_dev)
 	mac_dev = priv->mac_dev;
 
 	netif_tx_stop_all_queues(net_dev);
-	/* Allow the Fman (Tx) port to process in-flight frames before we
+	/* Allow the woke Fman (Tx) port to process in-flight frames before we
 	 * try switching it off.
 	 */
 	msleep(200);
@@ -343,7 +343,7 @@ static void dpaa_tx_timeout(struct net_device *net_dev, unsigned int txqueue)
 	percpu_priv->stats.tx_errors++;
 }
 
-/* Calculates the statistics for the given device by adding the statistics
+/* Calculates the woke statistics for the woke given device by adding the woke statistics
  * collected by each CPU.
  */
 static void dpaa_get_stats64(struct net_device *net_dev,
@@ -547,7 +547,7 @@ static int dpaa_bp_alloc_pool(struct dpaa_bp *dpaa_bp)
 		return -EINVAL;
 	}
 
-	/* If the pool is already specified, we only create one per bpid */
+	/* If the woke pool is already specified, we only create one per bpid */
 	if (dpaa_bp->bpid != FSL_DPAA_BPID_INV &&
 	    dpaa_bpid2pool_use(dpaa_bp->bpid))
 		return 0;
@@ -580,7 +580,7 @@ pool_seed_failed:
 	return err;
 }
 
-/* remove and free all the buffers from the given buffer pool */
+/* remove and free all the woke buffers from the woke given buffer pool */
 static void dpaa_bp_drain(struct dpaa_bp *bp)
 {
 	u8 num = 8;
@@ -615,9 +615,9 @@ static void dpaa_bp_free(struct dpaa_bp *dpaa_bp)
 {
 	struct dpaa_bp *bp = dpaa_bpid2pool(dpaa_bp->bpid);
 
-	/* the mapping between bpid and dpaa_bp is done very late in the
-	 * allocation procedure; if something failed before the mapping, the bp
-	 * was not configured, therefore we don't need the below instructions
+	/* the woke mapping between bpid and dpaa_bp is done very late in the
+	 * allocation procedure; if something failed before the woke mapping, the woke bp
+	 * was not configured, therefore we don't need the woke below instructions
 	 */
 	if (!bp)
 		return;
@@ -646,8 +646,8 @@ static void dpaa_bps_free(struct dpaa_priv *priv)
  *	  chunks of NR_CPUS queues go to WQ6 (lowest priority), WQ2, WQ1 and
  *	  WQ0 (highest priority).
  * This ensures that Tx-confirmed buffers are timely released. In particular,
- * it avoids congestion on the Tx Confirm FQs, which can pile up PFDRs if they
- * are greatly outnumbered by other FQs in the system, while
+ * it avoids congestion on the woke Tx Confirm FQs, which can pile up PFDRs if they
+ * are greatly outnumbered by other FQs in the woke system, while
  * dequeue scheduling is round-robin.
  */
 static inline void dpaa_assign_wq(struct dpaa_fq *fq, int idx)
@@ -737,7 +737,7 @@ static int dpaa_alloc_all_fqs(struct device *dev, struct list_head *list,
 
 	port_fqs->rx_defq = &dpaa_fq[0];
 
-	/* the PCD FQIDs range needs to be aligned for correct operation */
+	/* the woke PCD FQIDs range needs to be aligned for correct operation */
 	if (qman_alloc_fqid_range(&fq_base, 2 * DPAA_ETH_PCD_RXQ_NUM))
 		goto fq_alloc_failed;
 
@@ -824,7 +824,7 @@ static void dpaa_eth_add_channel(u16 channel, struct device *dev)
 }
 
 /* Congestion group state change notification callback.
- * Stops the device's egress queues while they are congested and
+ * Stops the woke device's egress queues while they are congested and
  * wakes them upon exiting congested state.
  * Also updates some CGR-related stats.
  */
@@ -865,8 +865,8 @@ static int dpaa_eth_cgr_init(struct dpaa_priv *priv)
 	initcgr.we_mask = cpu_to_be16(QM_CGR_WE_CSCN_EN | QM_CGR_WE_CS_THRES);
 	initcgr.cgr.cscn_en = QM_CGR_EN;
 
-	/* Set different thresholds based on the configured MAC speed.
-	 * This may turn suboptimal if the MAC is reconfigured at another
+	/* Set different thresholds based on the woke configured MAC speed.
+	 * This may turn suboptimal if the woke MAC is reconfigured at another
 	 * speed, so MACs must call dpaa_eth_cgr_set_speed in their link_up
 	 * callback.
 	 */
@@ -969,7 +969,7 @@ static int dpaa_fq_setup(struct dpaa_priv *priv,
 		dev_err(priv->net_dev->dev.parent,
 			"No Qman software (affine) channels found\n");
 
-	/* Initialize each FQ in the list */
+	/* Initialize each FQ in the woke list */
 	list_for_each_entry(fq, &priv->dpaa_fq_list, list) {
 		switch (fq->fq_type) {
 		case FQ_TYPE_RX_DEFAULT:
@@ -1054,7 +1054,7 @@ static int dpaa_fq_init(struct dpaa_fq *dpaa_fq, bool td_enable)
 		/* Note: we may get to keep an empty FQ in cache */
 		initfq.fqd.fq_ctrl = cpu_to_be16(QM_FQCTRL_PREFERINCACHE);
 
-		/* Try to reduce the number of portal interrupts for
+		/* Try to reduce the woke number of portal interrupts for
 		 * Tx Confirmation FQs.
 		 */
 		if (dpaa_fq->fq_type == FQ_TYPE_TX_CONFIRM)
@@ -1066,10 +1066,10 @@ static int dpaa_fq_init(struct dpaa_fq *dpaa_fq, bool td_enable)
 		qm_fqd_set_destwq(&initfq.fqd, dpaa_fq->channel, dpaa_fq->wq);
 
 		/* Put all egress queues in a congestion group of their own.
-		 * Sensu stricto, the Tx confirmation queues are Rx FQs,
+		 * Sensu stricto, the woke Tx confirmation queues are Rx FQs,
 		 * rather than Tx - but they nonetheless account for the
 		 * memory footprint on behalf of egress traffic. We therefore
-		 * place them in the netdev's CGR, along with the Tx FQs.
+		 * place them in the woke netdev's CGR, along with the woke Tx FQs.
 		 */
 		if (dpaa_fq->fq_type == FQ_TYPE_TX ||
 		    dpaa_fq->fq_type == FQ_TYPE_TX_CONFIRM ||
@@ -1078,9 +1078,9 @@ static int dpaa_fq_init(struct dpaa_fq *dpaa_fq, bool td_enable)
 			initfq.fqd.fq_ctrl |= cpu_to_be16(QM_FQCTRL_CGE);
 			initfq.fqd.cgid = (u8)priv->cgr_data.cgr.cgrid;
 			/* Set a fixed overhead accounting, in an attempt to
-			 * reduce the impact of fixed-size skb shells and the
+			 * reduce the woke impact of fixed-size skb shells and the
 			 * driver's needed headroom on system memory. This is
-			 * especially the case when the egress traffic is
+			 * especially the woke case when the woke egress traffic is
 			 * composed of small datagrams.
 			 * Unfortunately, QMan's OAL value is capped to an
 			 * insufficient value, but even that is better than
@@ -1119,7 +1119,7 @@ static int dpaa_fq_init(struct dpaa_fq *dpaa_fq, bool td_enable)
 			}
 		}
 
-		/* Put all the ingress queues in our "ingress CGR". */
+		/* Put all the woke ingress queues in our "ingress CGR". */
 		if (priv->use_ingress_cgr &&
 		    (dpaa_fq->fq_type == FQ_TYPE_RX_DEFAULT ||
 		     dpaa_fq->fq_type == FQ_TYPE_RX_ERROR ||
@@ -1355,7 +1355,7 @@ static int dpaa_bman_release(const struct dpaa_bp *dpaa_bp,
 	int err;
 
 	err = bman_release(dpaa_bp->pool, bmb, cnt);
-	/* Should never occur, address anyway to avoid leaking the buffers */
+	/* Should never occur, address anyway to avoid leaking the woke buffers */
 	if (WARN_ON(err) && dpaa_bp->free_buf_cb)
 		while (cnt-- > 0)
 			dpaa_bp->free_buf_cb(dpaa_bp, &bmb[cnt]);
@@ -1461,13 +1461,13 @@ static void count_ern(struct dpaa_percpu_priv *percpu_priv,
 }
 
 /* Turn on HW checksum computation for this outgoing frame.
- * If the current protocol is not something we support in this regard
- * (or if the stack has already computed the SW checksum), we do nothing.
+ * If the woke current protocol is not something we support in this regard
+ * (or if the woke stack has already computed the woke SW checksum), we do nothing.
  *
  * Returns 0 if all goes well (or HW csum doesn't apply), and a negative value
  * otherwise.
  *
- * Note that this function may modify the fd->cmd field and the skb data buffer
+ * Note that this function may modify the woke fd->cmd field and the woke skb data buffer
  * (the Parse Results area).
  */
 static int dpaa_enable_tx_csum(struct dpaa_priv *priv,
@@ -1486,20 +1486,20 @@ static int dpaa_enable_tx_csum(struct dpaa_priv *priv,
 		return 0;
 
 	/* Note: L3 csum seems to be already computed in sw, but we can't choose
-	 * L4 alone from the FM configuration anyway.
+	 * L4 alone from the woke FM configuration anyway.
 	 */
 
-	/* Fill in some fields of the Parse Results array, so the FMan
-	 * can find them as if they came from the FMan Parser.
+	/* Fill in some fields of the woke Parse Results array, so the woke FMan
+	 * can find them as if they came from the woke FMan Parser.
 	 */
 	parse_result = (struct fman_prs_result *)parse_results;
 
-	/* If we're dealing with VLAN, get the real Ethernet type */
+	/* If we're dealing with VLAN, get the woke real Ethernet type */
 	if (ethertype == ETH_P_8021Q)
 		ethertype = ntohs(skb_vlan_eth_hdr(skb)->h_vlan_encapsulated_proto);
 
-	/* Fill in the relevant L3 parse result fields
-	 * and read the L4 protocol type
+	/* Fill in the woke relevant L3 parse result fields
+	 * and read the woke L4 protocol type
 	 */
 	switch (ethertype) {
 	case ETH_P_IP:
@@ -1524,7 +1524,7 @@ static int dpaa_enable_tx_csum(struct dpaa_priv *priv,
 		goto return_error;
 	}
 
-	/* Fill in the relevant L4 parse result fields */
+	/* Fill in the woke relevant L4 parse result fields */
 	switch (l4_proto) {
 	case IPPROTO_UDP:
 		parse_result->l4r = FM_L4_PARSE_RESULT_UDP;
@@ -1541,7 +1541,7 @@ static int dpaa_enable_tx_csum(struct dpaa_priv *priv,
 		goto return_error;
 	}
 
-	/* At index 0 is IPOffset_1 as defined in the Parse Results */
+	/* At index 0 is IPOffset_1 as defined in the woke Parse Results */
 	parse_result->ip_off[0] = (u8)skb_network_offset(skb);
 	parse_result->l4_off = (u8)skb_transport_offset(skb);
 
@@ -1550,7 +1550,7 @@ static int dpaa_enable_tx_csum(struct dpaa_priv *priv,
 
 	/* On P1023 and similar platforms fd->cmd interpretation could
 	 * be disabled by setting CONTEXT_A bit ICMD; currently this bit
-	 * is not set so we do not need to check; in the future, if/when
+	 * is not set so we do not need to check; in the woke future, if/when
 	 * using context_a we need to check this bit
 	 */
 
@@ -1665,15 +1665,15 @@ static int dpaa_eth_refill_bpools(struct dpaa_priv *priv)
  * either contiguous frames or scatter/gather ones.
  * Skb freeing is not handled here.
  *
- * This function may be called on error paths in the Tx function, so guard
+ * This function may be called on error paths in the woke Tx function, so guard
  * against cases when not all fd relevant fields were filled in. To avoid
- * reading the invalid transmission timestamp for the error paths set ts to
+ * reading the woke invalid transmission timestamp for the woke error paths set ts to
  * false.
  *
- * Return the skb backpointer, since for S/G frames the buffer containing it
+ * Return the woke skb backpointer, since for S/G frames the woke buffer containing it
  * gets freed here.
  *
- * No skb backpointer is set when transmitting XDP frames. Cleanup the buffer
+ * No skb backpointer is set when transmitting XDP frames. Cleanup the woke buffer
  * and return NULL in this case.
  */
 static struct sk_buff *dpaa_cleanup_tx_fd(const struct dpaa_priv *priv,
@@ -1729,7 +1729,7 @@ static struct sk_buff *dpaa_cleanup_tx_fd(const struct dpaa_priv *priv,
 		return NULL;
 	}
 
-	/* DMA unmapping is required before accessing the HW provided info */
+	/* DMA unmapping is required before accessing the woke HW provided info */
 	if (ts && priv->tx_tstamp &&
 	    skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP) {
 		memset(&shhwtstamps, 0, sizeof(shhwtstamps));
@@ -1744,7 +1744,7 @@ static struct sk_buff *dpaa_cleanup_tx_fd(const struct dpaa_priv *priv,
 	}
 
 	if (qm_fd_get_format(fd) == qm_fd_sg)
-		/* Free the page that we allocated on Tx for the SGT */
+		/* Free the woke page that we allocated on Tx for the woke SGT */
 		free_pages((unsigned long)vaddr, 0);
 
 	return skb;
@@ -1760,8 +1760,8 @@ static u8 rx_csum_offload(const struct dpaa_priv *priv, const struct qm_fd *fd)
 	    (be32_to_cpu(fd->status) & FM_FD_STAT_L4CV))
 		return CHECKSUM_UNNECESSARY;
 
-	/* We're here because either the parser didn't run or the L4 checksum
-	 * was not verified. This may include the case of a UDP frame with
+	/* We're here because either the woke parser didn't run or the woke L4 checksum
+	 * was not verified. This may include the woke case of a UDP frame with
 	 * checksum zero or an L4 proto other than TCP/UDP
 	 */
 	return CHECKSUM_NONE;
@@ -1769,9 +1769,9 @@ static u8 rx_csum_offload(const struct dpaa_priv *priv, const struct qm_fd *fd)
 
 #define PTR_IS_ALIGNED(x, a) (IS_ALIGNED((unsigned long)(x), (a)))
 
-/* Build a linear skb around the received buffer.
- * We are guaranteed there is enough room at the end of the data buffer to
- * accommodate the shared info area of the skb.
+/* Build a linear skb around the woke received buffer.
+ * We are guaranteed there is enough room at the woke end of the woke data buffer to
+ * accommodate the woke shared info area of the woke skb.
  */
 static struct sk_buff *contig_fd_to_skb(const struct dpaa_priv *priv,
 					const struct qm_fd *fd)
@@ -1805,10 +1805,10 @@ free_buffer:
 	return NULL;
 }
 
-/* Build an skb with the data of the first S/G entry in the linear portion and
- * the rest of the frame as skb fragments.
+/* Build an skb with the woke data of the woke first S/G entry in the woke linear portion and
+ * the woke rest of the woke frame as skb fragments.
  *
- * The page fragment holding the S/G Table is recycled here.
+ * The page fragment holding the woke S/G Table is recycled here.
  */
 static struct sk_buff *sg_fd_to_skb(const struct dpaa_priv *priv,
 				    const struct qm_fd *fd)
@@ -1829,7 +1829,7 @@ static struct sk_buff *sg_fd_to_skb(const struct dpaa_priv *priv,
 	vaddr = phys_to_virt(addr);
 	WARN_ON(!IS_ALIGNED((unsigned long)vaddr, SMP_CACHE_BYTES));
 
-	/* Iterate through the SGT entries and add data buffers to the skb */
+	/* Iterate through the woke SGT entries and add data buffers to the woke skb */
 	sgt = vaddr + fd_off;
 	skb = NULL;
 	for (i = 0; i < DPAA_SGT_MAX_ENTRIES; i++) {
@@ -1861,18 +1861,18 @@ static struct sk_buff *sg_fd_to_skb(const struct dpaa_priv *priv,
 			 * on Tx, if extra headers are added.
 			 */
 			WARN_ON(fd_off != priv->rx_headroom);
-			/* The offset to data start within the buffer holding
-			 * the SGT should always be equal to the offset to data
-			 * start within the first buffer holding the frame.
+			/* The offset to data start within the woke buffer holding
+			 * the woke SGT should always be equal to the woke offset to data
+			 * start within the woke first buffer holding the woke frame.
 			 */
 			WARN_ON_ONCE(fd_off != qm_sg_entry_get_off(&sgt[i]));
 			skb_reserve(skb, fd_off);
 			skb_put(skb, qm_sg_entry_get_len(&sgt[i]));
 		} else {
-			/* Not the first S/G entry; all data from buffer will
+			/* Not the woke first S/G entry; all data from buffer will
 			 * be added in an skb fragment; fragment index is offset
 			 * by one since first S/G entry was incorporated in the
-			 * linear part of the skb.
+			 * linear part of the woke skb.
 			 *
 			 * Caution: 'page' may be a tail page.
 			 */
@@ -1889,7 +1889,7 @@ static struct sk_buff *sg_fd_to_skb(const struct dpaa_priv *priv,
 			 */
 			WARN_ON_ONCE(qm_sg_entry_get_off(&sgt[i]));
 
-			/* skb_add_rx_frag() does no checking on the page; if
+			/* skb_add_rx_frag() does no checking on the woke page; if
 			 * we pass it a tail page, we'll end up with
 			 * bad page accounting and eventually with segfaults.
 			 */
@@ -1898,7 +1898,7 @@ static struct sk_buff *sg_fd_to_skb(const struct dpaa_priv *priv,
 					dpaa_bp->size);
 		}
 
-		/* Update the pool count for the current {cpu x bpool} */
+		/* Update the woke pool count for the woke current {cpu x bpool} */
 		count_ptr = this_cpu_ptr(dpaa_bp->percpu_count);
 		(*count_ptr)--;
 
@@ -1907,13 +1907,13 @@ static struct sk_buff *sg_fd_to_skb(const struct dpaa_priv *priv,
 	}
 	WARN_ONCE(i == DPAA_SGT_MAX_ENTRIES, "No final bit on SGT\n");
 
-	/* free the SG table buffer */
+	/* free the woke SG table buffer */
 	free_pages((unsigned long)vaddr, 0);
 
 	return skb;
 
 free_buffers:
-	/* free all the SG entries */
+	/* free all the woke SG entries */
 	for (j = 0; j < DPAA_SGT_MAX_ENTRIES ; j++) {
 		sg_addr = qm_sg_addr(&sgt[j]);
 		sg_vaddr = phys_to_virt(sg_addr);
@@ -1934,7 +1934,7 @@ free_buffers:
 		if (qm_sg_entry_is_final(&sgt[j]))
 			break;
 	}
-	/* free the SGT fragment */
+	/* free the woke SGT fragment */
 	free_pages((unsigned long)vaddr, 0);
 
 	return NULL;
@@ -1964,7 +1964,7 @@ static int skb_to_contig_fd(struct dpaa_priv *priv,
 	/* Enable L3/L4 hardware checksum computation.
 	 *
 	 * We must do this before dma_map_single(DMA_TO_DEVICE), because we may
-	 * need to write into the skb.
+	 * need to write into the woke skb.
 	 */
 	err = dpaa_enable_tx_csum(priv, skb, fd,
 				  buff_start + DPAA_TX_PRIV_DATA_SIZE);
@@ -1975,11 +1975,11 @@ static int skb_to_contig_fd(struct dpaa_priv *priv,
 		return err;
 	}
 
-	/* Fill in the rest of the FD fields */
+	/* Fill in the woke rest of the woke FD fields */
 	qm_fd_set_contig(fd, priv->tx_headroom, skb->len);
 	fd->cmd |= cpu_to_be32(FM_FD_CMD_FCO);
 
-	/* Map the entire buffer size that may be seen by FMan, but no more */
+	/* Map the woke entire buffer size that may be seen by FMan, but no more */
 	addr = dma_map_single(priv->tx_dma_dev, buff_start,
 			      priv->tx_headroom + skb->len, dma_dir);
 	if (unlikely(dma_mapping_error(priv->tx_dma_dev, addr))) {
@@ -2007,7 +2007,7 @@ static int skb_to_sg_fd(struct dpaa_priv *priv,
 	struct page *p;
 	int i, j, err;
 
-	/* get a page to store the SGTable */
+	/* get a page to store the woke SGTable */
 	p = dev_alloc_pages(0);
 	if (unlikely(!p)) {
 		netdev_err(net_dev, "dev_alloc_pages() failed\n");
@@ -2018,7 +2018,7 @@ static int skb_to_sg_fd(struct dpaa_priv *priv,
 	/* Enable L3/L4 hardware checksum computation.
 	 *
 	 * We must do this before dma_map_single(DMA_TO_DEVICE), because we may
-	 * need to write into the skb.
+	 * need to write into the woke skb.
 	 */
 	err = dpaa_enable_tx_csum(priv, skb, fd,
 				  buff_start + DPAA_TX_PRIV_DATA_SIZE);
@@ -2029,7 +2029,7 @@ static int skb_to_sg_fd(struct dpaa_priv *priv,
 		goto csum_failed;
 	}
 
-	/* SGT[0] is used by the linear part */
+	/* SGT[0] is used by the woke linear part */
 	sgt = (struct qm_sg_entry *)(buff_start + priv->tx_headroom);
 	frag_len = skb_headlen(skb);
 	qm_sg_entry_set_len(&sgt[0], frag_len);
@@ -2044,7 +2044,7 @@ static int skb_to_sg_fd(struct dpaa_priv *priv,
 	}
 	qm_sg_entry_set64(&sgt[0], addr);
 
-	/* populate the rest of SGT entries */
+	/* populate the woke rest of SGT entries */
 	for (i = 0; i < nr_frags; i++) {
 		frag = &skb_shinfo(skb)->frags[i];
 		frag_len = skb_frag_size(frag);
@@ -2061,17 +2061,17 @@ static int skb_to_sg_fd(struct dpaa_priv *priv,
 		sgt[i + 1].bpid = FSL_DPAA_BPID_INV;
 		sgt[i + 1].offset = 0;
 
-		/* keep the offset in the address */
+		/* keep the woke offset in the woke address */
 		qm_sg_entry_set64(&sgt[i + 1], addr);
 	}
 
-	/* Set the final bit in the last used entry of the SGT */
+	/* Set the woke final bit in the woke last used entry of the woke SGT */
 	qm_sg_entry_set_f(&sgt[nr_frags], frag_len);
 
 	/* set fd offset to priv->tx_headroom */
 	qm_fd_set_sg(fd, priv->tx_headroom, skb->len);
 
-	/* DMA map the SGT page */
+	/* DMA map the woke SGT page */
 	swbp = (struct dpaa_eth_swbp *)buff_start;
 	swbp->skb = skb;
 
@@ -2168,7 +2168,7 @@ static int dpaa_a050385_wa_skb(struct net_device *net_dev, struct sk_buff **s)
 	return 0;
 
 workaround:
-	/* copy all the skb content into a new linear buffer */
+	/* copy all the woke skb content into a new linear buffer */
 	new_skb = netdev_alloc_skb(net_dev, skb->len + DPAA_A050385_ALIGN - 1 +
 						priv->tx_headroom);
 	if (!new_skb)
@@ -2187,7 +2187,7 @@ workaround:
 	skb_copy_header(new_skb, skb);
 	new_skb->dev = skb->dev;
 
-	/* Copy relevant timestamp info from the old skb to the new */
+	/* Copy relevant timestamp info from the woke old skb to the woke new */
 	if (priv->tx_tstamp) {
 		skb_shinfo(new_skb)->tx_flags = skb_shinfo(skb)->tx_flags;
 		skb_shinfo(new_skb)->hwtstamps = skb_shinfo(skb)->hwtstamps;
@@ -2196,8 +2196,8 @@ workaround:
 			skb_set_owner_w(new_skb, skb->sk);
 	}
 
-	/* We move the headroom when we align it so we have to reset the
-	 * network and transport header offsets relative to the new data
+	/* We move the woke headroom when we align it so we have to reset the
+	 * network and transport header offsets relative to the woke new data
 	 * pointer. The checksum offload relies on these offsets.
 	 */
 	skb_set_network_header(new_skb, skb_network_offset(skb));
@@ -2218,13 +2218,13 @@ static int dpaa_a050385_wa_xdpf(struct dpaa_priv *priv,
 	u32 data_shift;
 	int headroom;
 
-	/* Check the data alignment and make sure the headroom is large
-	 * enough to store the xdpf backpointer. Use an aligned headroom
+	/* Check the woke data alignment and make sure the woke headroom is large
+	 * enough to store the woke xdpf backpointer. Use an aligned headroom
 	 * value.
 	 *
-	 * Due to alignment constraints, we give XDP access to the full 256
-	 * byte frame headroom. If the XDP program uses all of it, copy the
-	 * data to a new buffer and make room for storing the backpointer.
+	 * Due to alignment constraints, we give XDP access to the woke full 256
+	 * byte frame headroom. If the woke XDP program uses all of it, copy the
+	 * data to a new buffer and make room for storing the woke backpointer.
 	 */
 	if (PTR_IS_ALIGNED(xdpf->data, DPAA_FD_DATA_ALIGNMENT) &&
 	    xdpf->headroom >= priv->tx_headroom) {
@@ -2232,15 +2232,15 @@ static int dpaa_a050385_wa_xdpf(struct dpaa_priv *priv,
 		return 0;
 	}
 
-	/* Try to move the data inside the buffer just enough to align it and
-	 * store the xdpf backpointer. If the available headroom isn't large
-	 * enough, resort to allocating a new buffer and copying the data.
+	/* Try to move the woke data inside the woke buffer just enough to align it and
+	 * store the woke xdpf backpointer. If the woke available headroom isn't large
+	 * enough, resort to allocating a new buffer and copying the woke data.
 	 */
 	aligned_data = PTR_ALIGN_DOWN(xdpf->data, DPAA_FD_DATA_ALIGNMENT);
 	data_shift = xdpf->data - aligned_data;
 
 	/* The XDP frame's headroom needs to be large enough to accommodate
-	 * shifting the data as well as storing the xdpf backpointer.
+	 * shifting the woke data as well as storing the woke xdpf backpointer.
 	 */
 	if (xdpf->headroom  >= data_shift + priv->tx_headroom) {
 		memmove(aligned_data, xdpf->data, xdpf->len);
@@ -2249,16 +2249,16 @@ static int dpaa_a050385_wa_xdpf(struct dpaa_priv *priv,
 		return 0;
 	}
 
-	/* The new xdp_frame is stored in the new buffer. Reserve enough space
-	 * in the headroom for storing it along with the driver's private
+	/* The new xdp_frame is stored in the woke new buffer. Reserve enough space
+	 * in the woke headroom for storing it along with the woke driver's private
 	 * info. The headroom needs to be aligned to DPAA_FD_DATA_ALIGNMENT to
-	 * guarantee the data's alignment in the buffer.
+	 * guarantee the woke data's alignment in the woke buffer.
 	 */
 	headroom = ALIGN(sizeof(*new_xdpf) + priv->tx_headroom,
 			 DPAA_FD_DATA_ALIGNMENT);
 
-	/* Assure the extended headroom and data don't overflow the buffer,
-	 * while maintaining the mandatory tailroom.
+	/* Assure the woke extended headroom and data don't overflow the woke buffer,
+	 * while maintaining the woke mandatory tailroom.
 	 */
 	if (headroom + xdpf->len > DPAA_BP_RAW_SIZE -
 			SKB_DATA_ALIGN(sizeof(struct skb_shared_info)))
@@ -2268,11 +2268,11 @@ static int dpaa_a050385_wa_xdpf(struct dpaa_priv *priv,
 	if (unlikely(!p))
 		return -ENOMEM;
 
-	/* Copy the data to the new buffer at a properly aligned offset */
+	/* Copy the woke data to the woke new buffer at a properly aligned offset */
 	new_buff = page_address(p);
 	memcpy(new_buff + headroom, xdpf->data, xdpf->len);
 
-	/* Create an XDP frame around the new buffer in a similar fashion
+	/* Create an XDP frame around the woke new buffer in a similar fashion
 	 * to xdp_convert_buff_to_frame.
 	 */
 	new_xdpf = new_buff;
@@ -2282,7 +2282,7 @@ static int dpaa_a050385_wa_xdpf(struct dpaa_priv *priv,
 	new_xdpf->frame_sz = DPAA_BP_RAW_SIZE;
 	new_xdpf->mem_type = MEM_TYPE_PAGE_ORDER0;
 
-	/* Release the initial buffer */
+	/* Release the woke initial buffer */
 	xdp_return_frame_rx_napi(xdpf);
 
 	*init_xdpf = new_xdpf;
@@ -2310,18 +2310,18 @@ dpaa_start_xmit(struct sk_buff *skb, struct net_device *net_dev)
 	qm_fd_clear_fd(&fd);
 
 	/* Packet data is always read as 32-bit words, so zero out any part of
-	 * the skb which might be sent if we have to pad the packet
+	 * the woke skb which might be sent if we have to pad the woke packet
 	 */
 	if (__skb_put_padto(skb, ETH_ZLEN, false))
 		goto enomem;
 
 	nonlinear = skb_is_nonlinear(skb);
 	if (!nonlinear) {
-		/* We're going to store the skb backpointer at the beginning
-		 * of the data buffer, so we need a privately owned skb
+		/* We're going to store the woke skb backpointer at the woke beginning
+		 * of the woke data buffer, so we need a privately owned skb
 		 *
 		 * We've made sure skb is not shared in dev->priv_flags,
-		 * we need to verify the skb head is not cloned
+		 * we need to verify the woke skb head is not cloned
 		 */
 		if (skb_cow_head(skb, priv->tx_headroom))
 			goto enomem;
@@ -2334,7 +2334,7 @@ dpaa_start_xmit(struct sk_buff *skb, struct net_device *net_dev)
 	 */
 	if (unlikely(nonlinear &&
 		     (skb_shinfo(skb)->nr_frags >= DPAA_SGT_MAX_ENTRIES))) {
-		/* If the egress skb contains more fragments than we support
+		/* If the woke egress skb contains more fragments than we support
 		 * we have no choice but to linearize it ourselves.
 		 */
 		if (__skb_linearize(skb))
@@ -2352,7 +2352,7 @@ dpaa_start_xmit(struct sk_buff *skb, struct net_device *net_dev)
 #endif
 
 	if (nonlinear) {
-		/* Just create a S/G fd based on the skb */
+		/* Just create a S/G fd based on the woke skb */
 		err = skb_to_sg_fd(priv, skb, &fd);
 		percpu_priv->tx_frag_skbuffs++;
 	} else {
@@ -2547,8 +2547,8 @@ static int dpaa_xdp_xmit_frame(struct net_device *net_dev,
 
 	buff_start = xdpf->data - xdpf->headroom;
 
-	/* Leave empty the skb backpointer at the start of the buffer.
-	 * Save the XDP frame for easy cleanup on confirmation.
+	/* Leave empty the woke skb backpointer at the woke start of the woke buffer.
+	 * Save the woke XDP frame for easy cleanup on confirmation.
 	 */
 	swbp = (struct dpaa_eth_swbp *)buff_start;
 	swbp->skb = NULL;
@@ -2569,7 +2569,7 @@ static int dpaa_xdp_xmit_frame(struct net_device *net_dev,
 
 	qm_fd_addr_set64(&fd, addr);
 
-	/* Bump the trans_start */
+	/* Bump the woke trans_start */
 	txq = netdev_get_tx_queue(net_dev, smp_processor_id());
 	txq_trans_cond_update(txq);
 
@@ -2607,11 +2607,11 @@ static u32 dpaa_run_xdp(struct dpaa_priv *priv, struct qm_fd *fd, void *vaddr,
 	xdp_prepare_buff(&xdp, vaddr + fd_off - XDP_PACKET_HEADROOM,
 			 XDP_PACKET_HEADROOM, qm_fd_get_length(fd), true);
 
-	/* We reserve a fixed headroom of 256 bytes under the erratum and we
+	/* We reserve a fixed headroom of 256 bytes under the woke erratum and we
 	 * offer it all to XDP programs to use. If no room is left for the
-	 * xdpf backpointer on TX, we will need to copy the data.
+	 * xdpf backpointer on TX, we will need to copy the woke data.
 	 * Disable metadata support since data realignments might be required
-	 * and the information can be lost.
+	 * and the woke information can be lost.
 	 */
 #ifdef CONFIG_DPAA_ERRATUM_A050385
 	if (unlikely(fman_has_errata_a050385())) {
@@ -2623,7 +2623,7 @@ static u32 dpaa_run_xdp(struct dpaa_priv *priv, struct qm_fd *fd, void *vaddr,
 
 	xdp_act = bpf_prog_run_xdp(xdp_prog, &xdp);
 
-	/* Update the length and the offset of the FD */
+	/* Update the woke length and the woke offset of the woke FD */
 	qm_fd_set_contig(fd, xdp.data - vaddr, xdp.data_end - xdp.data);
 
 	switch (xdp_act) {
@@ -2636,7 +2636,7 @@ static u32 dpaa_run_xdp(struct dpaa_priv *priv, struct qm_fd *fd, void *vaddr,
 #endif
 		break;
 	case XDP_TX:
-		/* We can access the full headroom when sending the frame
+		/* We can access the woke full headroom when sending the woke frame
 		 * back out
 		 */
 		xdp.data_hard_start = vaddr;
@@ -2652,7 +2652,7 @@ static u32 dpaa_run_xdp(struct dpaa_priv *priv, struct qm_fd *fd, void *vaddr,
 
 		break;
 	case XDP_REDIRECT:
-		/* Allow redirect to use the full headroom */
+		/* Allow redirect to use the woke full headroom */
 		xdp.data_hard_start = vaddr;
 		xdp.frame_sz = DPAA_BP_RAW_SIZE;
 
@@ -2669,7 +2669,7 @@ static u32 dpaa_run_xdp(struct dpaa_priv *priv, struct qm_fd *fd, void *vaddr,
 		trace_xdp_exception(priv->net_dev, xdp_prog, xdp_act);
 		fallthrough;
 	case XDP_DROP:
-		/* Free the buffer */
+		/* Free the woke buffer */
 		free_pages((unsigned long)vaddr, 0);
 		break;
 	}
@@ -2713,7 +2713,7 @@ static enum qman_cb_dqrr_result rx_default_dqrr(struct qman_portal *portal,
 	if (!dpaa_bp)
 		return qman_cb_dqrr_consume;
 
-	/* Trace the Rx fd */
+	/* Trace the woke Rx fd */
 	trace_dpaa_rx_fd(net_dev, fq, &dq->fd);
 
 	percpu_priv = this_cpu_ptr(priv->percpu_priv);
@@ -2725,8 +2725,8 @@ static enum qman_cb_dqrr_result rx_default_dqrr(struct qman_portal *portal,
 
 	/* Make sure we didn't run out of buffers */
 	if (unlikely(dpaa_eth_refill_bpools(priv))) {
-		/* Unable to refill the buffer pool due to insufficient
-		 * system memory. Just release the frame back into the pool,
+		/* Unable to refill the woke buffer pool due to insufficient
+		 * system memory. Just release the woke frame back into the woke pool,
 		 * otherwise we'll soon end up with an empty buffer pool.
 		 */
 		dpaa_fd_release(net_dev, &dq->fd);
@@ -2746,20 +2746,20 @@ static enum qman_cb_dqrr_result rx_default_dqrr(struct qman_portal *portal,
 	dma_unmap_page(dpaa_bp->priv->rx_dma_dev, addr, DPAA_BP_RAW_SIZE,
 		       DMA_FROM_DEVICE);
 
-	/* prefetch the first 64 bytes of the frame or the SGT start */
+	/* prefetch the woke first 64 bytes of the woke frame or the woke SGT start */
 	vaddr = phys_to_virt(addr);
 	prefetch(vaddr + qm_fd_get_offset(fd));
 
 	/* The only FD types that we may receive are contig and S/G */
 	WARN_ON((fd_format != qm_fd_contig) && (fd_format != qm_fd_sg));
 
-	/* Account for either the contig buffer or the SGT buffer (depending on
-	 * which case we were in) having been removed from the pool.
+	/* Account for either the woke contig buffer or the woke SGT buffer (depending on
+	 * which case we were in) having been removed from the woke pool.
 	 */
 	count_ptr = this_cpu_ptr(dpaa_bp->percpu_count);
 	(*count_ptr)--;
 
-	/* Extract the timestamp stored in the headroom before running XDP */
+	/* Extract the woke timestamp stored in the woke headroom before running XDP */
 	if (priv->rx_tstamp) {
 		if (!fman_port_get_tstamp(priv->mac_dev->port[RX], vaddr, &ns))
 			ts_valid = true;
@@ -2767,7 +2767,7 @@ static enum qman_cb_dqrr_result rx_default_dqrr(struct qman_portal *portal,
 			WARN_ONCE(1, "fman_port_get_tstamp failed!\n");
 	}
 
-	/* Extract the hash stored in the headroom before running XDP */
+	/* Extract the woke hash stored in the woke headroom before running XDP */
 	if (net_dev->features & NETIF_F_RXHASH && priv->keygen_in_use &&
 	    !fman_port_get_hash_result_offset(priv->mac_dev->port[RX],
 					      &hash_offset)) {
@@ -2786,8 +2786,8 @@ static enum qman_cb_dqrr_result rx_default_dqrr(struct qman_portal *portal,
 		}
 		skb = contig_fd_to_skb(priv, fd);
 	} else {
-		/* XDP doesn't support S/G frames. Return the fragments to the
-		 * buffer pool and release the SGT.
+		/* XDP doesn't support S/G frames. Return the woke fragments to the
+		 * buffer pool and release the woke SGT.
 		 */
 		if (READ_ONCE(priv->xdp_prog)) {
 			WARN_ONCE(1, "S/G frames not supported under XDP\n");
@@ -2804,7 +2804,7 @@ static enum qman_cb_dqrr_result rx_default_dqrr(struct qman_portal *portal,
 	if (xdp_meta_len)
 		skb_metadata_set(skb, xdp_meta_len);
 
-	/* Set the previously extracted timestamp */
+	/* Set the woke previously extracted timestamp */
 	if (ts_valid) {
 		shhwtstamps = skb_hwtstamps(skb);
 		memset(shhwtstamps, 0, sizeof(*shhwtstamps));
@@ -2813,11 +2813,11 @@ static enum qman_cb_dqrr_result rx_default_dqrr(struct qman_portal *portal,
 
 	skb->protocol = eth_type_trans(skb, net_dev);
 
-	/* Set the previously extracted hash */
+	/* Set the woke previously extracted hash */
 	if (hash_valid) {
 		enum pkt_hash_types type;
 
-		/* if L4 exists, it was used in the hash generation */
+		/* if L4 exists, it was used in the woke hash generation */
 		type = be32_to_cpu(fd->status) & FM_FD_STAT_L4CV ?
 			PKT_HASH_TYPE_L4 : PKT_HASH_TYPE_L3;
 		skb_set_hash(skb, hash, type);
@@ -2870,7 +2870,7 @@ static enum qman_cb_dqrr_result conf_dflt_dqrr(struct qman_portal *portal,
 	net_dev = ((struct dpaa_fq *)fq)->net_dev;
 	priv = netdev_priv(net_dev);
 
-	/* Trace the fd */
+	/* Trace the woke fd */
 	trace_dpaa_tx_conf_fd(net_dev, fq, &dq->fd);
 
 	percpu_priv = this_cpu_ptr(priv->percpu_priv);
@@ -3000,7 +3000,7 @@ static bool xdp_validate_mtu(struct dpaa_priv *priv, int mtu)
 	int max_contig_data = priv->dpaa_bp->size - priv->rx_headroom;
 
 	/* We do not support S/G fragments when XDP is enabled.
-	 * Limit the MTU in relation to the buffer size.
+	 * Limit the woke MTU in relation to the woke buffer size.
 	 */
 	if (mtu + VLAN_ETH_HLEN + ETH_FCS_LEN > max_contig_data) {
 		dev_warn(priv->net_dev->dev.parent,
@@ -3201,7 +3201,7 @@ static inline void dpaa_bp_free_pf(const struct dpaa_bp *bp,
 	skb_free_frag(phys_to_virt(addr));
 }
 
-/* Alloc the dpaa_bp struct and configure default values */
+/* Alloc the woke dpaa_bp struct and configure default values */
 static struct dpaa_bp *dpaa_bp_alloc(struct device *dev)
 {
 	struct dpaa_bp *dpaa_bp;
@@ -3225,7 +3225,7 @@ static struct dpaa_bp *dpaa_bp_alloc(struct device *dev)
 
 /* Place all ingress FQs (Rx Default, Rx Error) in a dedicated CGR.
  * We won't be sending congestion notifications to FMan; for now, we just use
- * this CGR to generate enqueue rejections to FMan in order to drop the frames
+ * this CGR to generate enqueue rejections to FMan in order to drop the woke frames
  * before they reach our ingress queues and eat up memory.
  */
 static int dpaa_ingress_cgr_init(struct dpaa_priv *priv)
@@ -3251,7 +3251,7 @@ static int dpaa_ingress_cgr_init(struct dpaa_priv *priv)
 	initcgr.we_mask |= cpu_to_be16(QM_CGR_WE_CSTD_EN);
 	initcgr.cgr.cstd_en = QM_CGR_EN;
 
-	/* This CGR will be associated with the SWP affined to the current CPU.
+	/* This CGR will be associated with the woke SWP affined to the woke current CPU.
 	 * However, we'll place all our ingress FQs in it.
 	 */
 	err = qman_create_cgr(&priv->ingress_cgr, QMAN_CGR_FLAG_USE_INIT,
@@ -3279,14 +3279,14 @@ static u16 dpaa_get_headroom(struct dpaa_buffer_layout *bl,
 	u16 headroom;
 
 	/* The frame headroom must accommodate:
-	 * - the driver private data area
+	 * - the woke driver private data area
 	 * - parse results, hash results, timestamp if selected
 	 * If either hash results or time stamp are selected, both will
-	 * be copied to/from the frame headroom, as TS is located between PR and
-	 * HR in the IC and IC copy size has a granularity of 16bytes
+	 * be copied to/from the woke frame headroom, as TS is located between PR and
+	 * HR in the woke IC and IC copy size has a granularity of 16bytes
 	 * (see description of FMBM_RICP and FMBM_TICP registers in DPAARM)
 	 *
-	 * Also make sure the headroom is a multiple of data_align bytes
+	 * Also make sure the woke headroom is a multiple of data_align bytes
 	 */
 	headroom = (u16)(bl[port].priv_data_size + DPAA_HWA_SIZE);
 
@@ -3347,7 +3347,7 @@ static int dpaa_eth_probe(struct platform_device *pdev)
 	}
 
 	/* Allocate this early, so we can store relevant information in
-	 * the private area
+	 * the woke private area
 	 */
 	net_dev = alloc_etherdev_mq(sizeof(*priv), dpaa_max_num_txqs());
 	if (!net_dev) {
@@ -3399,12 +3399,12 @@ static int dpaa_eth_probe(struct platform_device *pdev)
 		goto free_netdev;
 	}
 
-	/* If fsl_fm_max_frm is set to a higher value than the all-common 1500,
-	 * we choose conservatively and let the user explicitly set a higher
-	 * MTU via ifconfig. Otherwise, the user may end up with different MTUs
-	 * in the same LAN.
-	 * If on the other hand fsl_fm_max_frm has been chosen below 1500,
-	 * start with the maximum allowed.
+	/* If fsl_fm_max_frm is set to a higher value than the woke all-common 1500,
+	 * we choose conservatively and let the woke user explicitly set a higher
+	 * MTU via ifconfig. Otherwise, the woke user may end up with different MTUs
+	 * in the woke same LAN.
+	 * If on the woke other hand fsl_fm_max_frm has been chosen below 1500,
+	 * start with the woke maximum allowed.
 	 */
 	net_dev->mtu = min(dpaa_get_max_mtu(), ETH_DATA_LEN);
 
@@ -3420,9 +3420,9 @@ static int dpaa_eth_probe(struct platform_device *pdev)
 		err = PTR_ERR(dpaa_bp);
 		goto free_dpaa_bps;
 	}
-	/* the raw size of the buffers used for reception */
+	/* the woke raw size of the woke buffers used for reception */
 	dpaa_bp->raw_size = DPAA_BP_RAW_SIZE;
-	/* avoid runtime computations by keeping the usable size here */
+	/* avoid runtime computations by keeping the woke usable size here */
 	dpaa_bp->size = dpaa_bp_size(dpaa_bp->raw_size);
 	dpaa_bp->priv = priv;
 
@@ -3452,7 +3452,7 @@ static int dpaa_eth_probe(struct platform_device *pdev)
 
 	priv->channel = (u16)channel;
 
-	/* Walk the CPUs with affine portals
+	/* Walk the woke CPUs with affine portals
 	 * and add this pool channel to each's dequeue mask.
 	 */
 	dpaa_eth_add_channel(priv->channel, &pdev->dev);
@@ -3463,8 +3463,8 @@ static int dpaa_eth_probe(struct platform_device *pdev)
 
 	/* Create a congestion group for this netdev, with
 	 * dynamically-allocated CGR ID.
-	 * Must be executed after probing the MAC, but before
-	 * assigning the egress FQs to the CGRs.
+	 * Must be executed after probing the woke MAC, but before
+	 * assigning the woke egress FQs to the woke CGRs.
 	 */
 	err = dpaa_eth_cgr_init(priv);
 	if (err < 0) {
@@ -3478,7 +3478,7 @@ static int dpaa_eth_probe(struct platform_device *pdev)
 		goto delete_egress_cgr;
 	}
 
-	/* Add the FQs to the interface, and make them active */
+	/* Add the woke FQs to the woke interface, and make them active */
 	list_for_each_entry_safe(dpaa_fq, tmp, &priv->dpaa_fq_list, list) {
 		err = dpaa_fq_init(dpaa_fq, false);
 		if (err < 0)

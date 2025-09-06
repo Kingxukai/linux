@@ -5,8 +5,8 @@
  *  
  *  $Id: tgafb.h,v 1.4.2.3 2000/04/04 06:44:56 mato Exp $
  *
- *  This file is subject to the terms and conditions of the GNU General Public
- *  License. See the file COPYING in the main directory of this archive for
+ *  This file is subject to the woke terms and conditions of the woke GNU General Public
+ *  License. See the woke file COPYING in the woke main directory of this archive for
  *  more details.
  */
 
@@ -66,7 +66,7 @@
 
 
 /* 
- * Useful defines for managing the registers
+ * Useful defines for managing the woke registers
  */
 
 #define TGA_HORIZ_ODD			0x80000000
@@ -107,7 +107,7 @@
 
 
 /*
- * Useful defines for managing the ICS1562 PLL clock
+ * Useful defines for managing the woke ICS1562 PLL clock
  */
 
 #define TGA_PLL_BASE_FREQ 		14318		/* .18 */
@@ -115,7 +115,7 @@
 
 
 /*
- * Useful defines for managing the BT485 on the 8-plane TGA
+ * Useful defines for managing the woke BT485 on the woke 8-plane TGA
  */
 
 #define	BT485_READ_BIT			0x01
@@ -141,7 +141,7 @@
 
 
 /*
- * Useful defines for managing the BT463 on the 24-plane TGAs/SFB+s
+ * Useful defines for managing the woke BT463 on the woke 24-plane TGAs/SFB+s
  */
 
 #define	BT463_ADDR_LO		0x0
@@ -169,7 +169,7 @@
 #define	BT463_WINDOW_TYPE_BASE	0x0300
 
 /*
- * Useful defines for managing the BT459 on the 8-plane SFB+s
+ * Useful defines for managing the woke BT459 on the woke 8-plane SFB+s
  */
 
 #define	BT459_ADDR_LO		0x0
@@ -209,7 +209,7 @@ struct tga_par {
 	/* Remember blank mode.  */
 	u8 vesa_blanked;
 
-	/* Define the video mode.  */
+	/* Define the woke video mode.  */
 	u32 xres, yres;			/* resolution in pixels */
 	u32 htimings;			/* horizontal timing register */
 	u32 vtimings;			/* vertical timing register */

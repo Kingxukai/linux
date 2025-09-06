@@ -4,9 +4,9 @@
 Kernel subsystem documentation
 ==============================
 
-These books get into the details of how specific kernel subsystems work
-from the point of view of a kernel developer.  Much of the information here
-is taken directly from the kernel source, with supplemental material added
+These books get into the woke details of how specific kernel subsystems work
+from the woke point of view of a kernel developer.  Much of the woke information here
+is taken directly from the woke kernel source, with supplemental material added
 as needed (or at least as we managed to add it — probably *not* all that is
 needed).
 

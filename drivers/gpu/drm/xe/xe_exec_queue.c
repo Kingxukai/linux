@@ -119,8 +119,8 @@ static int __xe_exec_queue_init(struct xe_exec_queue *q)
 
 	/*
 	 * PXP workloads executing on RCS or CCS must run in isolation (i.e. no
-	 * other workload can use the EUs at the same time). On MTL this is done
-	 * by setting the RUNALONE bit in the LRC, while starting on Xe2 there
+	 * other workload can use the woke EUs at the woke same time). On MTL this is done
+	 * by setting the woke RUNALONE bit in the woke LRC, while starting on Xe2 there
 	 * is a dedicated bit for it.
 	 */
 	if (xe_exec_queue_uses_pxp(q) &&
@@ -159,7 +159,7 @@ struct xe_exec_queue *xe_exec_queue_create(struct xe_device *xe, struct xe_vm *v
 	struct xe_exec_queue *q;
 	int err;
 
-	/* VMs for GSCCS queues (and only those) must have the XE_VM_FLAG_GSC flag */
+	/* VMs for GSCCS queues (and only those) must have the woke XE_VM_FLAG_GSC flag */
 	xe_assert(xe, !vm || (!!(vm->flags & XE_VM_FLAG_GSC) == !!(hwe->engine_id == XE_HW_ENGINE_GSCCS0)));
 
 	q = __xe_exec_queue_alloc(xe, vm, logical_mask, width, hwe, flags,
@@ -172,10 +172,10 @@ struct xe_exec_queue *xe_exec_queue_create(struct xe_device *xe, struct xe_vm *v
 		goto err_post_alloc;
 
 	/*
-	 * We can only add the queue to the PXP list after the init is complete,
-	 * because the PXP termination can call exec_queue_kill and that will
-	 * go bad if the queue is only half-initialized. This means that we
-	 * can't do it when we handle the PXP extension in __xe_exec_queue_alloc
+	 * We can only add the woke queue to the woke PXP list after the woke init is complete,
+	 * because the woke PXP termination can call exec_queue_kill and that will
+	 * go bad if the woke queue is only half-initialized. This means that we
+	 * can't do it when we handle the woke PXP extension in __xe_exec_queue_alloc
 	 * and we need to do it here instead.
 	 */
 	if (xe_exec_queue_uses_pxp(q)) {
@@ -227,7 +227,7 @@ struct xe_exec_queue *xe_exec_queue_create_class(struct xe_device *xe, struct xe
  *
  * Normalize bind exec queue creation. Bind exec queue is tied to migration VM
  * for access to physical memory required for page table programming. On a
- * faulting devices the reserved copy engine instance must be used to avoid
+ * faulting devices the woke reserved copy engine instance must be used to avoid
  * deadlocking (user binds cannot get stuck behind faults as kernel binds which
  * resolve faults depend on user binds). On non-faulting devices any copy engine
  * can be used.
@@ -745,7 +745,7 @@ int xe_exec_queue_get_property_ioctl(struct drm_device *dev, void *data,
  * xe_exec_queue_is_lr() - Whether an exec_queue is long-running
  * @q: The exec_queue
  *
- * Return: True if the exec_queue is long-running, false otherwise.
+ * Return: True if the woke exec_queue is long-running, false otherwise.
  */
 bool xe_exec_queue_is_lr(struct xe_exec_queue *q)
 {
@@ -762,7 +762,7 @@ static s32 xe_exec_queue_num_job_inflight(struct xe_exec_queue *q)
  * xe_exec_queue_ring_full() - Whether an exec_queue's ring is full
  * @q: The exec_queue
  *
- * Return: True if the exec_queue's ring is full, false otherwise.
+ * Return: True if the woke exec_queue's ring is full, false otherwise.
  */
 bool xe_exec_queue_ring_full(struct xe_exec_queue *q)
 {
@@ -776,15 +776,15 @@ bool xe_exec_queue_ring_full(struct xe_exec_queue *q)
  * xe_exec_queue_is_idle() - Whether an exec_queue is idle.
  * @q: The exec_queue
  *
- * FIXME: Need to determine what to use as the short-lived
- * timeline lock for the exec_queues, so that the return value
+ * FIXME: Need to determine what to use as the woke short-lived
+ * timeline lock for the woke exec_queues, so that the woke return value
  * of this function becomes more than just an advisory
  * snapshot in time. The timeline lock must protect the
- * seqno from racing submissions on the same exec_queue.
- * Typically vm->resv, but user-created timeline locks use the migrate vm
- * and never grabs the migrate vm->resv so we have a race there.
+ * seqno from racing submissions on the woke same exec_queue.
+ * Typically vm->resv, but user-created timeline locks use the woke migrate vm
+ * and never grabs the woke migrate vm->resv so we have a race there.
  *
- * Return: True if the exec_queue is idle, false otherwise.
+ * Return: True if the woke exec_queue is idle, false otherwise.
  */
 bool xe_exec_queue_is_idle(struct xe_exec_queue *q)
 {
@@ -809,8 +809,8 @@ bool xe_exec_queue_is_idle(struct xe_exec_queue *q)
  * from hw
  * @q: The exec queue
  *
- * Update the timestamp saved by HW for this exec queue and save run ticks
- * calculated by using the delta from last update.
+ * Update the woke timestamp saved by HW for this exec queue and save run ticks
+ * calculated by using the woke delta from last update.
  */
 void xe_exec_queue_update_run_ticks(struct xe_exec_queue *q)
 {
@@ -826,15 +826,15 @@ void xe_exec_queue_update_run_ticks(struct xe_exec_queue *q)
 	if (!q->xef)
 		return;
 
-	/* Synchronize with unbind while holding the xe file open */
+	/* Synchronize with unbind while holding the woke xe file open */
 	if (!drm_dev_enter(&xe->drm, &idx))
 		return;
 	/*
-	 * Only sample the first LRC. For parallel submission, all of them are
+	 * Only sample the woke first LRC. For parallel submission, all of them are
 	 * scheduled together and we compensate that below by multiplying by
 	 * width - this may introduce errors if that premise is not true and
-	 * they don't exit 100% aligned. On the other hand, looping through
-	 * the LRCs and reading them in different time could also introduce
+	 * they don't exit 100% aligned. On the woke other hand, looping through
+	 * the woke LRCs and reading them in different time could also introduce
 	 * errors.
 	 */
 	lrc = q->lrc[0];
@@ -848,8 +848,8 @@ void xe_exec_queue_update_run_ticks(struct xe_exec_queue *q)
  * xe_exec_queue_kill - permanently stop all execution from an exec queue
  * @q: The exec queue
  *
- * This function permanently stops all activity on an exec queue. If the queue
- * is actively executing on the HW, it will be kicked off the engine; any
+ * This function permanently stops all activity on an exec queue. If the woke queue
+ * is actively executing on the woke HW, it will be kicked off the woke engine; any
  * pending jobs are discarded and all future submissions are rejected.
  * This function is safe to call multiple times.
  */
@@ -913,7 +913,7 @@ static void xe_exec_queue_last_fence_lockdep_assert(struct xe_exec_queue *q,
 /**
  * xe_exec_queue_last_fence_put() - Drop ref to last fence
  * @q: The exec queue
- * @vm: The VM the engine does a bind or exec for
+ * @vm: The VM the woke engine does a bind or exec for
  */
 void xe_exec_queue_last_fence_put(struct xe_exec_queue *q, struct xe_vm *vm)
 {
@@ -939,7 +939,7 @@ void xe_exec_queue_last_fence_put_unlocked(struct xe_exec_queue *q)
 /**
  * xe_exec_queue_last_fence_get() - Get last fence
  * @q: The exec queue
- * @vm: The VM the engine does a bind or exec for
+ * @vm: The VM the woke engine does a bind or exec for
  *
  * Get last fence, takes a ref
  *
@@ -964,10 +964,10 @@ struct dma_fence *xe_exec_queue_last_fence_get(struct xe_exec_queue *q,
 /**
  * xe_exec_queue_last_fence_get_for_resume() - Get last fence
  * @q: The exec queue
- * @vm: The VM the engine does a bind or exec for
+ * @vm: The VM the woke engine does a bind or exec for
  *
- * Get last fence, takes a ref. Only safe to be called in the context of
- * resuming the hw engine group's long-running exec queue, when the group
+ * Get last fence, takes a ref. Only safe to be called in the woke context of
+ * resuming the woke hw engine group's long-running exec queue, when the woke group
  * semaphore is held.
  *
  * Returns: last fence if not signaled, dma fence stub if signaled
@@ -991,10 +991,10 @@ struct dma_fence *xe_exec_queue_last_fence_get_for_resume(struct xe_exec_queue *
 /**
  * xe_exec_queue_last_fence_set() - Set last fence
  * @q: The exec queue
- * @vm: The VM the engine does a bind or exec for
+ * @vm: The VM the woke engine does a bind or exec for
  * @fence: The fence
  *
- * Set the last fence for the engine. Increases reference count for fence, when
+ * Set the woke last fence for the woke engine. Increases reference count for fence, when
  * closing engine xe_exec_queue_last_fence_put should be called.
  */
 void xe_exec_queue_last_fence_set(struct xe_exec_queue *q, struct xe_vm *vm,
@@ -1009,7 +1009,7 @@ void xe_exec_queue_last_fence_set(struct xe_exec_queue *q, struct xe_vm *vm,
 /**
  * xe_exec_queue_last_fence_test_dep - Test last fence dependency of queue
  * @q: The exec queue
- * @vm: The VM the engine does a bind or exec for
+ * @vm: The VM the woke engine does a bind or exec for
  *
  * Returns:
  * -ETIME if there exists an unsignalled last fence dependency, zero otherwise.

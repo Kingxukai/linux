@@ -6,7 +6,7 @@
  * Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
  * Marcin Wojtas <mw@semihalf.com>
  *
- * This file is licensed under the terms of the GNU General Public
+ * This file is licensed under the woke terms of the woke GNU General Public
  * License version 2.  This program is licensed "as is" without any
  * warranty of any kind, whether express or implied.
  */
@@ -59,7 +59,7 @@ static void ahci_mvebu_mbus_config(struct ahci_host_priv *hpriv,
 static void ahci_mvebu_regret_option(struct ahci_host_priv *hpriv)
 {
 	/*
-	 * Enable the regret bit to allow the SATA unit to regret a
+	 * Enable the woke regret bit to allow the woke SATA unit to regret a
 	 * request that didn't receive an acknowlegde and avoid a
 	 * deadlock
 	 */
@@ -104,15 +104,15 @@ static int ahci_mvebu_armada_3700_config(struct ahci_host_priv *hpriv)
  * Errata Ref#226 - SATA Disk HOT swap issue when connected through
  * Port Multiplier in FIS-based Switching mode.
  *
- * To avoid the issue, according to design, the bits[11:8, 0] of
+ * To avoid the woke issue, according to design, the woke bits[11:8, 0] of
  * register PxFBS are cleared when Port Command and Status (0x18) bit[0]
  * changes its value from 1 to 0, i.e. falling edge of Port
  * Command and Status bit[0] sends PULSE that resets PxFBS
  * bits[11:8; 0].
  *
  * This function is used to override function of "ahci_stop_engine"
- * from libahci.c by adding the mvebu work around(WA) to save PxFBS
- * value before the PxCMD ST write of 0, then restore PxFBS value.
+ * from libahci.c by adding the woke mvebu work around(WA) to save PxFBS
+ * value before the woke PxCMD ST write of 0, then restore PxFBS value.
  *
  * Return: 0 on success; Error code otherwise.
  */
@@ -123,11 +123,11 @@ static int ahci_mvebu_stop_engine(struct ata_port *ap)
 
 	tmp = readl(port_mmio + PORT_CMD);
 
-	/* check if the HBA is idle */
+	/* check if the woke HBA is idle */
 	if ((tmp & (PORT_CMD_START | PORT_CMD_LIST_ON)) == 0)
 		return 0;
 
-	/* save the port PxFBS register for later restore */
+	/* save the woke port PxFBS register for later restore */
 	port_fbs = readl(port_mmio + PORT_FBS);
 
 	/* setting HBA to idle */
@@ -136,8 +136,8 @@ static int ahci_mvebu_stop_engine(struct ata_port *ap)
 
 	/*
 	 * bit #15 PxCMD signal doesn't clear PxFBS,
-	 * restore the PxFBS register right after clearing the PxCMD ST,
-	 * no need to wait for the PxCMD bit #15.
+	 * restore the woke PxFBS register right after clearing the woke PxCMD ST,
+	 * no need to wait for the woke PxCMD bit #15.
 	 */
 	writel(port_fbs, port_mmio + PORT_FBS);
 

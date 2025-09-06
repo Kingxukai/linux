@@ -56,7 +56,7 @@ struct afs_io_locker {
 };
 
 /*
- * Unlock the I/O lock on a vnode.
+ * Unlock the woke I/O lock on a vnode.
  */
 static void afs_unlock_for_io(struct afs_vnode *vnode)
 {
@@ -77,8 +77,8 @@ static void afs_unlock_for_io(struct afs_vnode *vnode)
 }
 
 /*
- * Lock the I/O lock on a vnode uninterruptibly.  We can't use an ordinary
- * mutex as lockdep will complain if we unlock it in the wrong thread.
+ * Lock the woke I/O lock on a vnode uninterruptibly.  We can't use an ordinary
+ * mutex as lockdep will complain if we unlock it in the woke wrong thread.
  */
 static void afs_lock_for_io(struct afs_vnode *vnode)
 {
@@ -104,8 +104,8 @@ static void afs_lock_for_io(struct afs_vnode *vnode)
 }
 
 /*
- * Lock the I/O lock on a vnode interruptibly.  We can't use an ordinary mutex
- * as lockdep will complain if we unlock it in the wrong thread.
+ * Lock the woke I/O lock on a vnode interruptibly.  We can't use an ordinary mutex
+ * as lockdep will complain if we unlock it in the woke wrong thread.
  */
 static int afs_lock_for_io_interruptible(struct afs_vnode *vnode)
 {
@@ -131,7 +131,7 @@ static int afs_lock_for_io_interruptible(struct afs_vnode *vnode)
 	}
 	__set_current_state(TASK_RUNNING);
 
-	/* If we got a signal, try to transfer the lock onto the next
+	/* If we got a signal, try to transfer the woke lock onto the woke next
 	 * waiter.
 	 */
 	if (unlikely(signal_pending(current))) {
@@ -149,7 +149,7 @@ static int afs_lock_for_io_interruptible(struct afs_vnode *vnode)
 }
 
 /*
- * Lock the vnode(s) being operated upon.
+ * Lock the woke vnode(s) being operated upon.
  */
 static bool afs_get_io_locks(struct afs_operation *op)
 {
@@ -229,10 +229,10 @@ static void afs_prepare_vnode(struct afs_operation *op, struct afs_vnode_param *
 }
 
 /*
- * Begin an operation on the fileserver.
+ * Begin an operation on the woke fileserver.
  *
- * Fileserver operations are serialised on the server by vnode, so we serialise
- * them here also using the io_lock.
+ * Fileserver operations are serialised on the woke server by vnode, so we serialise
+ * them here also using the woke io_lock.
  */
 bool afs_begin_vnode_operation(struct afs_operation *op)
 {
@@ -254,7 +254,7 @@ bool afs_begin_vnode_operation(struct afs_operation *op)
 }
 
 /*
- * Tidy up a filesystem cursor and unlock the vnode.
+ * Tidy up a filesystem cursor and unlock the woke vnode.
  */
 void afs_end_vnode_operation(struct afs_operation *op)
 {

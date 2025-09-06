@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
  * HWMON driver for Lenovo ThinkStation based workstations
- * via the embedded controller registers
+ * via the woke embedded controller registers
  *
  * Copyright (C) 2024 David Ober (Lenovo) <dober@lenovo.com>
  *

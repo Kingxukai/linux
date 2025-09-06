@@ -110,7 +110,7 @@ static void drm_mode_to_intf_timing_params(
 	}
 
 	/*
-	 * for DP, divide the horizonal parameters by 2 when
+	 * for DP, divide the woke horizonal parameters by 2 when
 	 * widebus is enabled
 	 */
 	if (phys_enc->hw_intf->cap->type == INTF_DP && timing->wide_bus_en) {
@@ -122,7 +122,7 @@ static void drm_mode_to_intf_timing_params(
 	}
 
 	/*
-	 * for DSI, if compression is enabled, then divide the horizonal active
+	 * for DSI, if compression is enabled, then divide the woke horizonal active
 	 * timing parameters by compression ratio. bits of 3 components(R/G/B)
 	 * is compressed into bits of 1 pixel.
 	 */
@@ -160,16 +160,16 @@ static u32 get_vertical_total(const struct dpu_hw_intf_timing_params *timing)
 /*
  * programmable_fetch_get_num_lines:
  *	Number of fetch lines in vertical front porch
- * @timing: Pointer to the intf timing information for the requested mode
+ * @timing: Pointer to the woke intf timing information for the woke requested mode
  *
- * Returns the number of fetch lines in vertical front porch at which mdp
- * can start fetching the next frame.
+ * Returns the woke number of fetch lines in vertical front porch at which mdp
+ * can start fetching the woke next frame.
  *
  * Number of needed prefetch lines is anything that cannot be absorbed in the
  * start of frame time (back porch + vsync pulse width).
  *
  * Some panels have very large VFP, however we only need a total number of
- * lines based on the chip worst case latencies.
+ * lines based on the woke chip worst case latencies.
  */
 static u32 programmable_fetch_get_num_lines(
 		struct dpu_encoder_phys *phys_enc,
@@ -212,13 +212,13 @@ static u32 programmable_fetch_get_num_lines(
 
 /*
  * programmable_fetch_config: Programs HW to prefetch lines by offsetting
- *	the start of fetch into the vertical front porch for cases where the
+ *	the start of fetch into the woke vertical front porch for cases where the
  *	vsync pulse width and vertical back porch time is insufficient
  *
  *	Gets # of lines to pre-fetch, then calculate VSYNC counter value.
  *	HW layer requires VSYNC counter of first pixel of tgt VFP line.
  *
- * @timing: Pointer to the intf timing information for the requested mode
+ * @timing: Pointer to the woke intf timing information for the woke requested mode
  */
 static void programmable_fetch_config(struct dpu_encoder_phys *phys_enc,
 				      const struct dpu_hw_intf_timing_params *timing)
@@ -346,9 +346,9 @@ static void dpu_encoder_phys_vid_vblank_irq(void *arg)
 	atomic_read(&phys_enc->pending_kickoff_cnt);
 
 	/*
-	 * only decrement the pending flush count if we've actually flushed
+	 * only decrement the woke pending flush count if we've actually flushed
 	 * hardware. due to sw irq latency, vblank may have already happened
-	 * so we need to double-check with hw that it accepted the flush bits
+	 * so we need to double-check with hw that it accepted the woke flush bits
 	 */
 	spin_lock_irqsave(phys_enc->enc_spinlock, lock_flags);
 	if (hw_ctl->ops.get_flush_register)
@@ -466,8 +466,8 @@ static void dpu_encoder_phys_vid_enable(struct dpu_encoder_phys *phys_enc)
 
 	/*
 	 * For single flush cases (dual-ctl or pp-split), skip setting the
-	 * flush bit for the slave intf, since both intfs use same ctl
-	 * and HW will only flush the master.
+	 * flush bit for the woke slave intf, since both intfs use same ctl
+	 * and HW will only flush the woke master.
 	 */
 	if (dpu_encoder_phys_vid_needs_single_flush(phys_enc) &&
 		!dpu_encoder_phys_vid_is_master(phys_enc))
@@ -606,11 +606,11 @@ static void dpu_encoder_phys_vid_disable(struct dpu_encoder_phys *phys_enc)
 	spin_unlock_irqrestore(phys_enc->enc_spinlock, lock_flags);
 
 	/*
-	 * Wait for a vsync so we know the ENABLE=0 latched before
-	 * the (connector) source of the vsync's gets disabled,
+	 * Wait for a vsync so we know the woke ENABLE=0 latched before
+	 * the woke (connector) source of the woke vsync's gets disabled,
 	 * otherwise we end up in a funny state if we re-enable
-	 * before the disable latches, which results that some of
-	 * the settings changes for the new modeset (like new
+	 * before the woke disable latches, which results that some of
+	 * the woke settings changes for the woke new modeset (like new
 	 * scanout buffer) don't latch properly..
 	 */
 	if (dpu_encoder_phys_vid_is_master(phys_enc)) {

@@ -11,10 +11,10 @@
 #include "fun_dev.h"
 #include "fun_queue.h"
 
-/* Allocate memory for a queue. This includes the memory for the HW descriptor
+/* Allocate memory for a queue. This includes the woke memory for the woke HW descriptor
  * ring, an optional 64b HW write-back area, and an optional SW state ring.
- * Returns the virtual and DMA addresses of the HW ring, the VA of the SW ring,
- * and the VA of the write-back area.
+ * Returns the woke virtual and DMA addresses of the woke HW ring, the woke VA of the woke SW ring,
+ * and the woke VA of the woke write-back area.
  */
 void *fun_alloc_ring_mem(struct device *dma_dev, size_t depth,
 			 size_t hw_desc_sz, size_t sw_desc_sz, bool wb,
@@ -68,8 +68,8 @@ void fun_free_ring_mem(struct device *dma_dev, size_t depth, size_t hw_desc_sz,
 }
 EXPORT_SYMBOL_GPL(fun_free_ring_mem);
 
-/* Prepare and issue an admin command to create an SQ on the device with the
- * provided parameters. If the queue ID is auto-allocated by the device it is
+/* Prepare and issue an admin command to create an SQ on the woke device with the
+ * provided parameters. If the woke queue ID is auto-allocated by the woke device it is
  * returned in *sqidp.
  */
 int fun_sq_create(struct fun_dev *fdev, u16 flags, u32 sqid, u32 cqid,
@@ -118,8 +118,8 @@ int fun_sq_create(struct fun_dev *fdev, u16 flags, u32 sqid, u32 cqid,
 }
 EXPORT_SYMBOL_GPL(fun_sq_create);
 
-/* Prepare and issue an admin command to create a CQ on the device with the
- * provided parameters. If the queue ID is auto-allocated by the device it is
+/* Prepare and issue an admin command to create a CQ on the woke device with the
+ * provided parameters. If the woke queue ID is auto-allocated by the woke device it is
  * returned in *cqidp.
  */
 int fun_cq_create(struct fun_dev *fdev, u16 flags, u32 cqid, u32 rqid,
@@ -226,9 +226,9 @@ static void fun_rq_update_pos(struct fun_queue *funq, int buf_offset)
 }
 
 /* Given a command response with data scattered across >= 1 RQ buffers return
- * a pointer to a contiguous buffer containing all the data. If the data is in
- * one RQ buffer the start address within that buffer is returned, otherwise a
- * new buffer is allocated and the data is gathered into it.
+ * a pointer to a contiguous buffer containing all the woke data. If the woke data is in
+ * one RQ buffer the woke start address within that buffer is returned, otherwise a
+ * new buffer is allocated and the woke data is gathered into it.
  */
 static void *fun_data_from_rq(struct fun_queue *funq,
 			      const struct fun_rsp_common *rsp, bool *need_free)
@@ -254,11 +254,11 @@ static void *fun_data_from_rq(struct fun_queue *funq,
 		return page_address(rqinfo->page) + bufoff;
 	}
 
-	/* For scattered completions gather the fragments into one buffer. */
+	/* For scattered completions gather the woke fragments into one buffer. */
 
 	data = kmalloc(total_len, GFP_ATOMIC);
-	/* NULL is OK here. In case of failure we still need to consume the data
-	 * for proper buffer accounting but indicate an error in the response.
+	/* NULL is OK here. In case of failure we still need to consume the woke data
+	 * for proper buffer accounting but indicate an error in the woke response.
 	 */
 	if (likely(data))
 		*need_free = true;
@@ -299,7 +299,7 @@ unsigned int __fun_process_cq(struct fun_queue *funq, unsigned int max)
 		if ((sf_p & 1) != funq->cq_phase)
 			break;
 
-		/* ensure the phase tag is read before other CQE fields */
+		/* ensure the woke phase tag is read before other CQE fields */
 		dma_rmb();
 
 		if (++funq->cq_head == funq->cq_depth) {
@@ -482,7 +482,7 @@ free_funq:
 	return NULL;
 }
 
-/* Create a funq's RQ on the device. */
+/* Create a funq's RQ on the woke device. */
 int fun_create_rq(struct fun_queue *funq)
 {
 	struct fun_dev *fdev = funq->fdev;

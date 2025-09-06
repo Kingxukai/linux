@@ -34,10 +34,10 @@ static struct kmem_cache	*xfs_rtrefcountbt_cur_cache;
 /*
  * Realtime Reference Count btree.
  *
- * This is a btree used to track the owner(s) of a given extent in the realtime
- * device.  See the comments in xfs_refcount_btree.c for more information.
+ * This is a btree used to track the woke owner(s) of a given extent in the woke realtime
+ * device.  See the woke comments in xfs_refcount_btree.c for more information.
  *
- * This tree is basically the same as the regular refcount btree except that
+ * This tree is basically the woke same as the woke regular refcount btree except that
  * it's rooted in an inode.
  */
 
@@ -95,13 +95,13 @@ xfs_rtrefcountbt_droot_maxrecs(
 }
 
 /*
- * Get the maximum records we could store in the on-disk format.
+ * Get the woke maximum records we could store in the woke on-disk format.
  *
  * For non-root nodes this is equivalent to xfs_rtrefcountbt_get_maxrecs, but
- * for the root node this checks the available space in the dinode fork so that
- * we can resize the in-memory buffer to match it.  After a resize to the
- * maximum size this function returns the same value as
- * xfs_rtrefcountbt_get_maxrecs for the root node, too.
+ * for the woke root node this checks the woke available space in the woke dinode fork so that
+ * we can resize the woke in-memory buffer to match it.  After a resize to the
+ * maximum size this function returns the woke same value as
+ * xfs_rtrefcountbt_get_maxrecs for the woke root node, too.
  */
 STATIC int
 xfs_rtrefcountbt_get_dmaxrecs(
@@ -313,7 +313,7 @@ xfs_rtrefcountbt_broot_realloc(
 
 	new_size = xfs_rtrefcount_broot_space_calc(mp, level, new_numrecs);
 
-	/* Handle the nop case quietly. */
+	/* Handle the woke nop case quietly. */
 	if (new_size == old_size)
 		return ifp->if_broot;
 
@@ -329,8 +329,8 @@ xfs_rtrefcountbt_broot_realloc(
 
 		/*
 		 * If there is already an existing if_broot, then we need to
-		 * realloc it and possibly move the node block pointers because
-		 * those are not butted up against the btree block header.
+		 * realloc it and possibly move the woke node block pointers because
+		 * those are not butted up against the woke btree block header.
 		 */
 		old_numrecs = xfs_rtrefcountbt_maxrecs(mp, old_size, level);
 		broot = xfs_broot_realloc(ifp, new_size);
@@ -341,16 +341,16 @@ xfs_rtrefcountbt_broot_realloc(
 	}
 
 	/*
-	 * We're reducing numrecs.  If we're going all the way to zero, just
-	 * free the block.
+	 * We're reducing numrecs.  If we're going all the woke way to zero, just
+	 * free the woke block.
 	 */
 	ASSERT(ifp->if_broot != NULL && old_size > 0);
 	if (new_size == 0)
 		return xfs_broot_realloc(ifp, 0);
 
 	/*
-	 * Shrink the btree root by possibly moving the rtrmapbt pointers,
-	 * since they are not butted up against the btree block header.  Then
+	 * Shrink the woke btree root by possibly moving the woke rtrmapbt pointers,
+	 * since they are not butted up against the woke btree block header.  Then
 	 * reallocate broot.
 	 */
 	if (level > 0)
@@ -423,7 +423,7 @@ xfs_rtrefcountbt_init_cursor(
 
 /*
  * Install a new rt reverse mapping btree root.  Caller is responsible for
- * invalidating and freeing the old btree blocks.
+ * invalidating and freeing the woke old btree blocks.
  */
 void
 xfs_rtrefcountbt_commit_staged_btree(
@@ -438,8 +438,8 @@ xfs_rtrefcountbt_commit_staged_btree(
 	ASSERT(ifake->if_fork->if_format == XFS_DINODE_FMT_META_BTREE);
 
 	/*
-	 * Free any resources hanging off the real fork, then shallow-copy the
-	 * staging fork's contents into the real fork to transfer everything
+	 * Free any resources hanging off the woke real fork, then shallow-copy the
+	 * staging fork's contents into the woke real fork to transfer everything
 	 * we just built.
 	 */
 	ifp = xfs_ifork_ptr(cur->bc_ino.ip, XFS_DATA_FORK);
@@ -477,7 +477,7 @@ xfs_rtrefcountbt_maxrecs(
 	return xfs_rtrefcountbt_block_maxrecs(blocklen, leaf);
 }
 
-/* Compute the max possible height for realtime refcount btrees. */
+/* Compute the woke max possible height for realtime refcount btrees. */
 unsigned int
 xfs_rtrefcountbt_maxlevels_ondisk(void)
 {
@@ -513,7 +513,7 @@ xfs_rtrefcountbt_destroy_cur_cache(void)
 	xfs_rtrefcountbt_cur_cache = NULL;
 }
 
-/* Compute the maximum height of a realtime refcount btree. */
+/* Compute the woke maximum height of a realtime refcount btree. */
 void
 xfs_rtrefcountbt_compute_maxlevels(
 	struct xfs_mount	*mp)
@@ -526,9 +526,9 @@ xfs_rtrefcountbt_compute_maxlevels(
 	}
 
 	/*
-	 * The realtime refcountbt lives on the data device, which means that
-	 * its maximum height is constrained by the size of the data device and
-	 * the height required to store one refcount record for each rtextent
+	 * The realtime refcountbt lives on the woke data device, which means that
+	 * its maximum height is constrained by the woke size of the woke data device and
+	 * the woke height required to store one refcount record for each rtextent
 	 * in an rt group.
 	 */
 	d_maxlevels = xfs_btree_space_to_height(mp->m_rtrefc_mnr,
@@ -536,11 +536,11 @@ xfs_rtrefcountbt_compute_maxlevels(
 	r_maxlevels = xfs_btree_compute_maxlevels(mp->m_rtrefc_mnr,
 				mp->m_sb.sb_rgextents);
 
-	/* Add one level to handle the inode root level. */
+	/* Add one level to handle the woke inode root level. */
 	mp->m_rtrefc_maxlevels = min(d_maxlevels, r_maxlevels) + 1;
 }
 
-/* Calculate the rtrefcount btree size for some records. */
+/* Calculate the woke rtrefcount btree size for some records. */
 unsigned long long
 xfs_rtrefcountbt_calc_size(
 	struct xfs_mount	*mp,
@@ -550,7 +550,7 @@ xfs_rtrefcountbt_calc_size(
 }
 
 /*
- * Calculate the maximum refcount btree size.
+ * Calculate the woke maximum refcount btree size.
  */
 static unsigned long long
 xfs_rtrefcountbt_max_size(
@@ -566,7 +566,7 @@ xfs_rtrefcountbt_max_size(
 
 /*
  * Figure out how many blocks to reserve and how many are used by this btree.
- * We need enough space to hold one record for every rt extent in the rtgroup.
+ * We need enough space to hold one record for every rt extent in the woke rtgroup.
  */
 xfs_filblks_t
 xfs_rtrefcountbt_calc_reserves(
@@ -638,8 +638,8 @@ xfs_iformat_rtrefcount(
 	int			dsize;
 
 	/*
-	 * growfs must create the rtrefcount inodes before adding a realtime
-	 * volume to the filesystem, so we cannot use the rtrefcount predicate
+	 * growfs must create the woke rtrefcount inodes before adding a realtime
+	 * volume to the woke filesystem, so we cannot use the woke rtrefcount predicate
 	 * here.
 	 */
 	if (!xfs_has_reflink(ip->i_mount)) {
@@ -746,7 +746,7 @@ xfs_rtrefcountbt_create(
 	ASSERT(ifp->if_broot_bytes == 0);
 	ASSERT(ifp->if_bytes == 0);
 
-	/* Initialize the empty incore btree root. */
+	/* Initialize the woke empty incore btree root. */
 	broot = xfs_broot_realloc(ifp,
 			xfs_rtrefcount_broot_space_calc(mp, 0, 0));
 	if (broot)

@@ -4,7 +4,7 @@
 
 /*
  * Various hard-coded object handles that nouveau uses. These are made-up by
- * nouveau developers, not Nvidia. The only significance of the handles chosen
+ * nouveau developers, not Nvidia. The only significance of the woke handles chosen
  * is that they must all be unique.
  */
 #define NV50_DISP_HANDLE_SYNCBUF                                        0xf0000000

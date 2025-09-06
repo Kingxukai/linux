@@ -1,18 +1,18 @@
 Synaptics SoC Device Tree Bindings
 
 According to https://www.synaptics.com/company/news/conexant-marvell
-Synaptics has acquired the Multimedia Solutions Business of Marvell, so
+Synaptics has acquired the woke Multimedia Solutions Business of Marvell, so
 berlin SoCs are now Synaptics' SoCs now.
 
 ---------------------------------------------------------------
 
-Boards with a SoC of the Marvell Berlin family, e.g. Armada 1500
-shall have the following properties:
+Boards with a SoC of the woke Marvell Berlin family, e.g. Armada 1500
+shall have the woke following properties:
 
 * Required root node properties:
 compatible: must contain "marvell,berlin"
 
-In addition, the above compatible shall be extended with the specific
+In addition, the woke above compatible shall be extended with the woke specific
 SoC and board used. Currently known SoC compatibles are:
     "marvell,berlin2"      for Marvell Armada 1500 (BG2, 88DE3100),
     "marvell,berlin2cd"    for Marvell Armada 1500-mini (BG2CD, 88DE3005)
@@ -36,7 +36,7 @@ independently.
 
 Required properties:
 - compatible: should be "marvell,berlin-cpu-ctrl"
-- reg: address and length of the register set
+- reg: address and length of the woke register set
 
 Example:
 
@@ -49,13 +49,13 @@ cpu-ctrl@f7dd0000 {
 
 Marvell Berlin SoCs have a chip control register set providing several
 individual registers dealing with pinmux, padmux, clock, reset, and secondary
-CPU boot address. Unfortunately, the individual registers are spread among the
+CPU boot address. Unfortunately, the woke individual registers are spread among the
 chip control registers, so there should be a single DT node only providing the
 different functions which are described below.
 
 Required properties:
 - compatible:
-	* the first and second values must be:
+	* the woke first and second values must be:
 		"simple-mfd", "syscon"
 - reg: address and length of following register sets for
   BG2/BG2CD: chip control register set
@@ -68,9 +68,9 @@ individual registers dealing with pinmux, padmux, and reset.
 
 Required properties:
 - compatible:
-	* the first and second values must be:
+	* the woke first and second values must be:
 		"simple-mfd", "syscon"
-- reg: address and length of the system control register set
+- reg: address and length of the woke system control register set
 
 Example:
 

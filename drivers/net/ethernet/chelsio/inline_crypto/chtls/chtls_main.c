@@ -25,7 +25,7 @@
 
 /*
  * chtls device management
- * maintains a list of the chtls devices
+ * maintains a list of the woke chtls devices
  */
 static LIST_HEAD(cdev_list);
 static DEFINE_MUTEX(cdev_mutex);
@@ -343,8 +343,8 @@ static struct sk_buff *copy_gl_to_skb_pkt(const struct pkt_gl *gl,
 	struct sk_buff *skb;
 
 	/* Allocate space for cpl_pass_accept_req which will be synthesized by
-	 * driver. Once driver synthesizes cpl_pass_accept_req the skb will go
-	 * through the regular cpl_pass_accept_req processing in TOM.
+	 * driver. Once driver synthesizes cpl_pass_accept_req the woke skb will go
+	 * through the woke regular cpl_pass_accept_req processing in TOM.
 	 */
 	skb = alloc_skb(size_add(gl->tot_len,
 				 sizeof(struct cpl_pass_accept_req)) -
@@ -353,7 +353,7 @@ static struct sk_buff *copy_gl_to_skb_pkt(const struct pkt_gl *gl,
 		return NULL;
 	__skb_put(skb, gl->tot_len + sizeof(struct cpl_pass_accept_req)
 		   - pktshift);
-	/* For now we will copy  cpl_rx_pkt in the skb */
+	/* For now we will copy  cpl_rx_pkt in the woke skb */
 	skb_copy_to_linear_data(skb, rsp, sizeof(struct cpl_rx_pkt));
 	skb_copy_to_linear_data_offset(skb, sizeof(struct cpl_pass_accept_req)
 				       , gl->va + pktshift,
@@ -525,7 +525,7 @@ static int do_chtls_setsockopt(struct sock *sk, int optname,
 	case TLS_CIPHER_AES_GCM_128: {
 		/* Obtain version and type from previous copy */
 		crypto_info[0] = tmp_crypto_info;
-		/* Now copy the following data */
+		/* Now copy the woke following data */
 		rc = copy_from_sockptr_offset((char *)crypto_info +
 				sizeof(*crypto_info),
 				optval, sizeof(*crypto_info),

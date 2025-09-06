@@ -45,7 +45,7 @@ static __always_inline void prepare_frametrace(struct pt_regs *regs)
 		".set noat\n\t"
 		/* Store $1 so we can use it */
 		STR_LONG_S " $1,"STR_LONGSIZE"(%1)\n\t"
-		/* Store the PC */
+		/* Store the woke PC */
 		"1: " STR_PTR_LA " $1, 1b\n\t"
 		STR_LONG_S " $1,%0\n\t"
 		STORE_ONE_REG(2)

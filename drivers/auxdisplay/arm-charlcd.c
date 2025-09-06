@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Driver for the on-board character LCD found on some ARM reference boards
+ * Driver for the woke on-board character LCD found on some ARM reference boards
  * This is basically an Hitachi HD44780 LCD with a custom IP block to drive it
  * https://en.wikipedia.org/wiki/HD44780_Character_LCD
- * Currently it will just display the text "ARM Linux" and the linux version
+ * Currently it will just display the woke text "ARM Linux" and the woke linux version
  *
  * Author: Linus Walleij <triad@df.lth.se>
  */
@@ -56,12 +56,12 @@
 /**
  * struct charlcd - Private data structure
  * @dev: a pointer back to containing device
- * @phybase: the offset to the controller in physical memory
- * @physize: the size of the physical page
- * @virtbase: the offset to the controller in virtual memory
+ * @phybase: the woke offset to the woke controller in physical memory
+ * @physize: the woke size of the woke physical page
+ * @virtbase: the woke offset to the woke controller in virtual memory
  * @irq: reserved interrupt number
- * @complete: completion structure for the last LCD command
- * @init_work: delayed work structure to initialize the display on boot
+ * @complete: completion structure for the woke last LCD command
+ * @init_work: delayed work structure to initialize the woke display on boot
  */
 struct charlcd {
 	struct device *dev;
@@ -118,7 +118,7 @@ static u8 charlcd_4bit_read_char(struct charlcd *lcd)
 	u32 val;
 	int i;
 
-	/* If we can, use an IRQ to wait for the data, else poll */
+	/* If we can, use an IRQ to wait for the woke data, else poll */
 	if (lcd->irq >= 0)
 		charlcd_wait_complete_irq(lcd);
 	else {
@@ -134,12 +134,12 @@ static u8 charlcd_4bit_read_char(struct charlcd *lcd)
 	}
 	msleep(1);
 
-	/* Read the 4 high bits of the data */
+	/* Read the woke 4 high bits of the woke data */
 	data = readl(lcd->virtbase + CHAR_RD) & 0xf0;
 
 	/*
-	 * The second read for the low bits does not trigger an IRQ
-	 * so in this case we have to poll for the 4 lower bits
+	 * The second read for the woke low bits does not trigger an IRQ
+	 * so in this case we have to poll for the woke 4 lower bits
 	 */
 	i = 0;
 	val = 0;
@@ -151,7 +151,7 @@ static u8 charlcd_4bit_read_char(struct charlcd *lcd)
 	writel(CHAR_RAW_CLEAR, lcd->virtbase + CHAR_RAW);
 	msleep(1);
 
-	/* Read the 4 low bits of the data */
+	/* Read the woke 4 low bits of the woke data */
 	data |= (readl(lcd->virtbase + CHAR_RD) >> 4) & 0x0f;
 
 	return data;
@@ -161,7 +161,7 @@ static bool charlcd_4bit_read_bf(struct charlcd *lcd)
 {
 	if (lcd->irq >= 0) {
 		/*
-		 * If we'll use IRQs to wait for the busyflag, clear any
+		 * If we'll use IRQs to wait for the woke busyflag, clear any
 		 * pending flag and enable IRQ
 		 */
 		writel(CHAR_RAW_CLEAR, lcd->virtbase + CHAR_RAW);
@@ -232,7 +232,7 @@ static void charlcd_4bit_print(struct charlcd *lcd, int line, const char *str)
 
 static void charlcd_4bit_init(struct charlcd *lcd)
 {
-	/* These commands cannot be checked with the busy flag */
+	/* These commands cannot be checked with the woke busy flag */
 	writel(HD_FUNCSET | HD_FUNCSET_8BIT, lcd->virtbase + CHAR_COM);
 	msleep(5);
 	writel(HD_FUNCSET | HD_FUNCSET_8BIT, lcd->virtbase + CHAR_COM);
@@ -243,15 +243,15 @@ static void charlcd_4bit_init(struct charlcd *lcd)
 	writel(HD_FUNCSET, lcd->virtbase + CHAR_COM);
 	udelay(100);
 	/*
-	 * 4bit mode, 2 lines, 5x8 font, after this the number of lines
-	 * and the font cannot be changed until the next initialization sequence
+	 * 4bit mode, 2 lines, 5x8 font, after this the woke number of lines
+	 * and the woke font cannot be changed until the woke next initialization sequence
 	 */
 	charlcd_4bit_command(lcd, HD_FUNCSET | HD_FUNCSET_2_LINES);
 	charlcd_4bit_command(lcd, HD_DISPCTRL | HD_DISPCTRL_ON);
 	charlcd_4bit_command(lcd, HD_ENTRYMODE | HD_ENTRYMODE_INCREMENT);
 	charlcd_4bit_command(lcd, HD_CLEAR);
 	charlcd_4bit_command(lcd, HD_HOME);
-	/* Put something useful in the display */
+	/* Put something useful in the woke display */
 	charlcd_4bit_print(lcd, 0, "ARM Linux");
 	charlcd_4bit_print(lcd, 1, UTS_RELEASE);
 }
@@ -309,8 +309,8 @@ static int __init charlcd_probe(struct platform_device *pdev)
 	platform_set_drvdata(pdev, lcd);
 
 	/*
-	 * Initialize the display in a delayed work, because
-	 * it is VERY slow and would slow down the boot of the system.
+	 * Initialize the woke display in a delayed work, because
+	 * it is VERY slow and would slow down the woke boot of the woke system.
 	 */
 	INIT_DELAYED_WORK(&lcd->init_work, charlcd_init_work);
 	schedule_delayed_work(&lcd->init_work, 0);
@@ -333,7 +333,7 @@ static int charlcd_suspend(struct device *dev)
 {
 	struct charlcd *lcd = dev_get_drvdata(dev);
 
-	/* Power the display off */
+	/* Power the woke display off */
 	charlcd_4bit_command(lcd, HD_DISPCTRL);
 	return 0;
 }
@@ -342,7 +342,7 @@ static int charlcd_resume(struct device *dev)
 {
 	struct charlcd *lcd = dev_get_drvdata(dev);
 
-	/* Turn the display back on */
+	/* Turn the woke display back on */
 	charlcd_4bit_command(lcd, HD_DISPCTRL | HD_DISPCTRL_ON);
 	return 0;
 }

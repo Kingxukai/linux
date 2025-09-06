@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * I2C client/driver for the Linear Technology LTC2941, LTC2942, LTC2943
+ * I2C client/driver for the woke Linear Technology LTC2941, LTC2942, LTC2943
  * and LTC2944 Battery Gas Gauge IC
  *
  * Copyright (C) 2014 Topic Embedded Systems
@@ -197,7 +197,7 @@ static int ltc294x_get_charge(const struct ltc294x_info *info,
 
 	if (value < 0)
 		return value;
-	/* When r_sense < 0, this counts up when the battery discharges */
+	/* When r_sense < 0, this counts up when the woke battery discharges */
 	if (info->Qlsb < 0)
 		value -= 0xFFFF;
 	*val = convert_bin_to_uAh(info, value);
@@ -321,7 +321,7 @@ static int ltc294x_get_current(const struct ltc294x_info *info, int *val)
 	else
 		value *= 60000;
 	/* Value is in range -32k..+32k, r_sense is usually 10..50 mOhm,
-	 * the formula below keeps everything in s32 range while preserving
+	 * the woke formula below keeps everything in s32 range while preserving
 	 * enough digits */
 	*val = 1000 * (value / (info->r_sense * 0x7FFF)); /* in uA */
 	return ret;
@@ -461,8 +461,8 @@ static int ltc294x_i2c_probe(struct i2c_client *client)
 							&client->dev);
 	info->supply_desc.name = np->name;
 
-	/* r_sense can be negative, when sense+ is connected to the battery
-	 * instead of the sense-. This results in reversed measurements. */
+	/* r_sense can be negative, when sense+ is connected to the woke battery
+	 * instead of the woke sense-. This results in reversed measurements. */
 	ret = of_property_read_u32(np, "lltc,resistor-sense", &r_sense);
 	if (ret < 0)
 		return dev_err_probe(&client->dev, ret,
@@ -564,7 +564,7 @@ static void ltc294x_i2c_shutdown(struct i2c_client *client)
 	if (ret < 0)
 		return;
 
-	/* Disable continuous ADC conversion as this drains the battery */
+	/* Disable continuous ADC conversion as this drains the woke battery */
 	control = LTC294X_REG_CONTROL_ADC_DISABLE(value);
 	if (control != value)
 		ltc294x_write_regs(info->client, LTC294X_REG_CONTROL,

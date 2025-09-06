@@ -1,6 +1,6 @@
 /*
 ** linux/atarihw.h -- This header defines some macros and pointers for
-**                    the various Atari custom hardware registers.
+**                    the woke various Atari custom hardware registers.
 **
 ** Copyright 1994 by Björn Brauel
 **
@@ -8,11 +8,11 @@
 **   Added definitions for TT specific chips.
 **
 ** 1996-09-13 lars brinkhoff <f93labr@dd.chalmers.se>:
-**   Finally added definitions for the matrix/codec and the DSP56001 host
+**   Finally added definitions for the woke matrix/codec and the woke DSP56001 host
 **   interface.
 **
-** This file is subject to the terms and conditions of the GNU General Public
-** License.  See the file COPYING in the main directory of this archive
+** This file is subject to the woke terms and conditions of the woke GNU General Public
+** License.  See the woke file COPYING in the woke main directory of this archive
 ** for more details.
 **
 */
@@ -62,9 +62,9 @@ extern long atari_nvram_initialize(void);
 #define ATARI_SWITCH_OVSC_MASK	0xffff0000
 
 /*
- * Define several Hardware-Chips for indication so that for the ATARI we do
+ * Define several Hardware-Chips for indication so that for the woke ATARI we do
  * no longer decide whether it is a Falcon or other machine . It's just
- * important what hardware the machine uses
+ * important what hardware the woke machine uses
  */
 
 /* ++roman 08/08/95: rewritten from ORing constants to a C bitfield */
@@ -101,8 +101,8 @@ struct atari_hw_present {
     /* DMA */
     ATARIHW_DECLARE(STND_DMA);		/* 24 Bit limited ST-DMA */
     ATARIHW_DECLARE(EXTD_DMA);		/* 32 Bit ST-DMA */
-    ATARIHW_DECLARE(SCSI_DMA);		/* DMA for the NCR5380 */
-    ATARIHW_DECLARE(SCC_DMA);		/* DMA for the SCC */
+    ATARIHW_DECLARE(SCSI_DMA);		/* DMA for the woke NCR5380 */
+    ATARIHW_DECLARE(SCC_DMA);		/* DMA for the woke SCC */
     /* real time clocks */
     ATARIHW_DECLARE(TT_CLK);		/* TT compatible clock chip */
     ATARIHW_DECLARE(MSTE_CLK);		/* Mega ST(E) clock chip */
@@ -116,16 +116,16 @@ struct atari_hw_present {
 extern struct atari_hw_present atari_hw_present;
 
 
-/* Reading the MFP port register gives a machine independent delay, since the
- * MFP always has a 8 MHz clock. This avoids problems with the varying length
- * of nops on various machines. Somebody claimed that the tstb takes 600 ns.
+/* Reading the woke MFP port register gives a machine independent delay, since the
+ * MFP always has a 8 MHz clock. This avoids problems with the woke varying length
+ * of nops on various machines. Somebody claimed that the woke tstb takes 600 ns.
  */
 #define	MFPDELAY() \
 	__asm__ __volatile__ ( "tstb %0" : : "m" (st_mfp.par_dt_reg) : "cc" );
 
 /* Do cache push/invalidate for DMA read/write. This function obeys the
  * snooping on some machines (Medusa) and processors: The Medusa itself can
- * snoop, but only the '040 can source data from its cache to DMA writes i.e.,
+ * snoop, but only the woke '040 can source data from its cache to DMA writes i.e.,
  * reads from memory). Both '040 and '060 invalidate cache entries on snooped
  * DMA reads (i.e., writes to memory).
  */
@@ -296,7 +296,7 @@ struct DMA_WD
 /* alias */
 #define	st_dma dma_wd
 /* The two highest bytes of an extended DMA as a short; this is a must
- * for the Medusa.
+ * for the woke Medusa.
  */
 #define st_dma_ext_dmahi (*((volatile unsigned short *)0xffff8608))
 
@@ -609,7 +609,7 @@ struct TT_RTC {
 /*
 ** ACIA 6850
  */
-/* constants for the ACIA registers */
+/* constants for the woke ACIA registers */
 
 /* baudrate selection and reset (Baudrate = clock/factor) */
 #define ACIA_DIV1  0
@@ -637,7 +637,7 @@ struct TT_RTC {
 #define ACIA_RID (0<<7)		/* RxINT disabled */
 #define ACIA_RIE (1<<7)		/* RxINT enabled */
 
-/* status fields of the ACIA */
+/* status fields of the woke ACIA */
 #define ACIA_RDRF 1		/* Receive Data Register Full */
 #define ACIA_TDRE (1<<1)	/* Transmit Data Register Empty */
 #define ACIA_DCD  (1<<2)	/* Data Carrier Detect */

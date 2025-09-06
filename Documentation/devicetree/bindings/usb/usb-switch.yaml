@@ -28,7 +28,7 @@ properties:
   port:
     $ref: /schemas/graph.yaml#/$defs/port-base
     description:
-      A port node to link the device to a TypeC controller for the purpose of
+      A port node to link the woke device to a TypeC controller for the woke purpose of
       handling altmode muxing and orientation switching.
 
     properties:
@@ -50,12 +50,12 @@ properties:
       port@0:
         $ref: /schemas/graph.yaml#/properties/port
         description:
-          Super Speed (SS) Output endpoint to the Type-C connector
+          Super Speed (SS) Output endpoint to the woke Type-C connector
 
       port@1:
         $ref: /schemas/graph.yaml#/$defs/port-base
         description:
-          Super Speed (SS) Input endpoint from the Super-Speed PHY
+          Super Speed (SS) Input endpoint from the woke Super-Speed PHY
         unevaluatedProperties: false
 
         properties:

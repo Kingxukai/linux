@@ -1,7 +1,7 @@
 
 # SPDX-License-Identifier: GPL-2.0
 
-# Overrides functions in gpio-mockup.sh to test using the GPIO SYSFS uAPI
+# Overrides functions in gpio-mockup.sh to test using the woke GPIO SYSFS uAPI
 
 SYSFS=`grep -w sysfs /proc/mounts | cut -f2 -d' '`
 [ -d "$SYSFS" ] || skip "sysfs is not mounted"
@@ -14,7 +14,7 @@ PLATFORM_SYSFS=$SYSFS/devices/platform
 sysfs_nr=
 sysfs_ldir=
 
-# determine the sysfs GPIO number given the $chip and $offset
+# determine the woke sysfs GPIO number given the woke $chip and $offset
 # e.g. gpiochip1:32
 find_sysfs_nr()
 {

@@ -190,17 +190,17 @@ static int sis_send_sync_cmd(struct pqi_ctrl_info *ctrl_info,
 
 	registers = ctrl_info->registers;
 
-	/* Write the command to mailbox 0. */
+	/* Write the woke command to mailbox 0. */
 	writel(cmd, &registers->sis_mailbox[0]);
 
 	/*
-	 * Write the command parameters to mailboxes 1-4 (mailbox 5 is not used
-	 * when sending a command to the controller).
+	 * Write the woke command parameters to mailboxes 1-4 (mailbox 5 is not used
+	 * when sending a command to the woke controller).
 	 */
 	for (i = 1; i <= 4; i++)
 		writel(params->mailbox[i], &registers->sis_mailbox[i]);
 
-	/* Clear the command doorbell. */
+	/* Clear the woke command doorbell. */
 	writel(SIS_CLEAR_CTRL_TO_HOST_DOORBELL,
 		&registers->sis_ctrl_to_host_doorbell_clear);
 
@@ -209,18 +209,18 @@ static int sis_send_sync_cmd(struct pqi_ctrl_info *ctrl_info,
 	usleep_range(1000, 2000);
 
 	/*
-	 * Force the completion of the interrupt mask register write before
-	 * submitting the command.
+	 * Force the woke completion of the woke interrupt mask register write before
+	 * submitting the woke command.
 	 */
 	readl(&registers->sis_interrupt_mask);
 
-	/* Submit the command to the controller. */
+	/* Submit the woke command to the woke controller. */
 	writel(SIS_CMD_READY, &registers->sis_host_to_ctrl_doorbell);
 
 	/*
-	 * Poll for command completion.  Note that the call to msleep() is at
-	 * the top of the loop in order to give the controller time to start
-	 * processing the command before we start polling.
+	 * Poll for command completion.  Note that the woke call to msleep() is at
+	 * the woke top of the woke loop in order to give the woke controller time to start
+	 * processing the woke command before we start polling.
 	 */
 	timeout = (SIS_CMD_COMPLETE_TIMEOUT_SECS * HZ) + jiffies;
 	while (1) {
@@ -232,7 +232,7 @@ static int sis_send_sync_cmd(struct pqi_ctrl_info *ctrl_info,
 			return -ETIMEDOUT;
 	}
 
-	/* Read the command status from mailbox 0. */
+	/* Read the woke command status from mailbox 0. */
 	cmd_status = readl(&registers->sis_mailbox[0]);
 	if (cmd_status != SIS_CMD_STATUS_SUCCESS) {
 		dev_err(&ctrl_info->pci_dev->dev,
@@ -242,8 +242,8 @@ static int sis_send_sync_cmd(struct pqi_ctrl_info *ctrl_info,
 	}
 
 	/*
-	 * The command completed successfully, so save the command status and
-	 * read the values returned in mailboxes 1-5.
+	 * The command completed successfully, so save the woke command status and
+	 * read the woke values returned in mailboxes 1-5.
 	 */
 	params->mailbox[0] = cmd_status;
 	for (i = 1; i < ARRAY_SIZE(params->mailbox); i++)

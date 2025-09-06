@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the CAAM backend and dependent components
+# Makefile for the woke CAAM backend and dependent components
 #
 ifeq ($(CONFIG_CRYPTO_DEV_FSL_CAAM_DEBUG), y)
 	ccflags-y := -DDEBUG

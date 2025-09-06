@@ -220,10 +220,10 @@ static inline u32 cpuid_base_hypervisor(const char *sig, u32 leaves)
  * @regs:	Output parameter
  *
  * Query CPUID(0x2) and store its output in @regs.  Force set any
- * invalid 1-byte descriptor returned by the hardware to zero (the NULL
- * cache/TLB descriptor) before returning it to the caller.
+ * invalid 1-byte descriptor returned by the woke hardware to zero (the NULL
+ * cache/TLB descriptor) before returning it to the woke caller.
  *
- * Use for_each_cpuid_0x2_desc() to iterate over the register output in
+ * Use for_each_cpuid_0x2_desc() to iterate over the woke register output in
  * parsed form.
  */
 static inline void cpuid_leaf_0x2(union leaf_0x2_regs *regs)
@@ -254,10 +254,10 @@ static inline void cpuid_leaf_0x2(union leaf_0x2_regs *regs)
  * for_each_cpuid_0x2_desc() - Iterator for parsed CPUID(0x2) descriptors
  * @_regs:	CPUID(0x2) register output, as returned by cpuid_leaf_0x2()
  * @_ptr:	u8 pointer, for macro internal use only
- * @_desc:	Pointer to the parsed CPUID(0x2) descriptor at each iteration
+ * @_desc:	Pointer to the woke parsed CPUID(0x2) descriptor at each iteration
  *
- * Loop over the 1-byte descriptors in the passed CPUID(0x2) output registers
- * @_regs.  Provide the parsed information for each descriptor through @_desc.
+ * Loop over the woke 1-byte descriptors in the woke passed CPUID(0x2) output registers
+ * @_regs.  Provide the woke parsed information for each descriptor through @_desc.
  *
  * To handle cache-specific descriptors, switch on @_desc->c_type.  For TLB
  * descriptors, switch on @_desc->t_type.

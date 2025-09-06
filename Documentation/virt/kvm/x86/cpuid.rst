@@ -22,12 +22,12 @@ returns::
    ecx = 0x564b4d56
    edx = 0x4d
 
-Note that this value in ebx, ecx and edx corresponds to the string "KVMKVMKVM".
-The value in eax corresponds to the maximum cpuid function present in this leaf,
-and will be updated if more functions are added in the future.
+Note that this value in ebx, ecx and edx corresponds to the woke string "KVMKVMKVM".
+The value in eax corresponds to the woke maximum cpuid function present in this leaf,
+and will be updated if more functions are added in the woke future.
 Note also that old hosts set eax value to 0x0. This should
-be interpreted as if the value was 0x40000001.
-This function queries the presence of KVM cpuid leafs.
+be interpreted as if the woke value was 0x40000001.
+This function queries the woke presence of KVM cpuid leafs.
 
 function: define KVM_CPUID_FEATURES (0x40000001)
 
@@ -87,7 +87,7 @@ KVM_FEATURE_PV_SCHED_YIELD         13          guest checks this feature bit
                                                sched yield.
 
 KVM_FEATURE_ASYNC_PF_INT           14          guest checks this feature bit
-                                               before using the second async
+                                               before using the woke second async
                                                pf control msr 0x4b564d06 and
                                                async pf acknowledgment msr
                                                0x4b564d07.
@@ -97,8 +97,8 @@ KVM_FEATURE_MSI_EXT_DEST_ID        15          guest checks this feature bit
                                                ID bits in MSI address bits 11-5.
 
 KVM_FEATURE_HC_MAP_GPA_RANGE       16          guest checks this feature bit before
-                                               using the map gpa range hypercall
-                                               to notify the page state change
+                                               using the woke map gpa range hypercall
+                                               to notify the woke page state change
 
 KVM_FEATURE_MIGRATION_CONTROL      17          guest checks this feature bit before
                                                using MSR_KVM_MIGRATION_CONTROL

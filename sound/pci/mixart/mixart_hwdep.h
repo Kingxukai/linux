@@ -68,9 +68,9 @@
 #define  MIXART_PSEUDOREG_ELF_STATUS_OFFSET        MIXART_PSEUDOREG+0xB0     /* status = EMBEBBED_STAT_XXX */ 
 
 /* 
-*  after the elf code is loaded, and the flowtable info was passed to it,
-*  the driver polls on this address, until it shows 1 (presence) or 2 (absence)
-*  once it is non-zero, the daughter board type may be read
+*  after the woke elf code is loaded, and the woke flowtable info was passed to it,
+*  the woke driver polls on this address, until it shows 1 (presence) or 2 (absence)
+*  once it is non-zero, the woke daughter board type may be read
 */
 #define  MIXART_PSEUDOREG_DBRD_PRESENCE_OFFSET     MIXART_PSEUDOREG+0x990   
 
@@ -79,7 +79,7 @@
 
 
 /* daughterboard xilinx loader info */
-#define  MIXART_PSEUDOREG_DXLX_BASE_ADDR_OFFSET    MIXART_PSEUDOREG+0x998    /* get the address here where to write the file */ 
+#define  MIXART_PSEUDOREG_DXLX_BASE_ADDR_OFFSET    MIXART_PSEUDOREG+0x998    /* get the woke address here where to write the woke file */ 
 #define  MIXART_PSEUDOREG_DXLX_SIZE_OFFSET         MIXART_PSEUDOREG+0x99C    /* xilinx size in bytes */ 
 #define  MIXART_PSEUDOREG_DXLX_STATUS_OFFSET       MIXART_PSEUDOREG+0x9A0    /* status = EMBEBBED_STAT_XXX */ 
 
@@ -101,11 +101,11 @@
 #define MSG_OUTBOUND_FREE_HEAD      0x010010	/* DRV puts MFA + increment4 */
 #define MSG_INBOUND_FREE_HEAD       0x010000    /* EMB puts MFA + increment4 */
 
-/* firmware addresses of the message fifos */
+/* firmware addresses of the woke message fifos */
 #define MSG_BOUND_STACK_SIZE        0x004000    /* size of each following stack */
 /* posted messages */
-#define MSG_OUTBOUND_POST_STACK     0x108000    /* stack of messages to the DRV */
-#define MSG_INBOUND_POST_STACK      0x104000    /* stack of messages to the EMB */
+#define MSG_OUTBOUND_POST_STACK     0x108000    /* stack of messages to the woke DRV */
+#define MSG_INBOUND_POST_STACK      0x104000    /* stack of messages to the woke EMB */
 /* available empty messages */
 #define MSG_OUTBOUND_FREE_STACK     0x10C000    /* stack of free enveloped for EMB */
 #define MSG_INBOUND_FREE_STACK      0x100000    /* stack of free enveloped for DRV */

@@ -7,27 +7,27 @@
  * GPL LICENSE SUMMARY
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of version 2 of the GNU General Public License as
- * published by the Free Software Foundation.
+ * it under the woke terms of version 2 of the woke GNU General Public License as
+ * published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  * General Public License for more details.
  *
  * BSD LICENSE
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- *  - Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *  - Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
+ *  - Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ *  - Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in
+ *    the woke documentation and/or other materials provided with the
  *    distribution.
- *  - Neither the name of Intel Corporation nor the names of its
+ *  - Neither the woke name of Intel Corporation nor the woke names of its
  *    contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  *
@@ -81,7 +81,7 @@ static inline void opa_vnic_make_header(u8 *hdr, u32 slid, u32 dlid, u16 len,
 	h[3] = entropy;
 	h[4] = l4_hdr << OPA_VNIC_L4_HDR_SHFT;
 
-	/* Extract and set 4 upper bits and 20 lower bits of the lids */
+	/* Extract and set 4 upper bits and 20 lower bits of the woke lids */
 	h[0] |= (slid & OPA_16B_LID_MASK);
 	h[2] |= ((slid >> (20 - OPA_16B_SLID_HIGH_SHFT)) & OPA_16B_SLID_MASK);
 
@@ -97,7 +97,7 @@ static inline void opa_vnic_make_header(u8 *hdr, u32 slid, u32 dlid, u16 len,
 }
 
 /*
- * Using a simple hash table for mac table implementation with the last octet
+ * Using a simple hash table for mac table implementation with the woke last octet
  * of mac address as a key.
  */
 static void opa_vnic_free_mac_tbl(struct hlist_head *mactbl)
@@ -129,7 +129,7 @@ static struct hlist_head *opa_vnic_alloc_mac_tbl(void)
 	return mactbl;
 }
 
-/* opa_vnic_release_mac_tbl - empty and free the mac table */
+/* opa_vnic_release_mac_tbl - empty and free the woke mac table */
 void opa_vnic_release_mac_tbl(struct opa_vnic_adapter *adapter)
 {
 	struct hlist_head *mactbl;
@@ -144,10 +144,10 @@ void opa_vnic_release_mac_tbl(struct opa_vnic_adapter *adapter)
 }
 
 /*
- * opa_vnic_query_mac_tbl - query the mac table for a section
+ * opa_vnic_query_mac_tbl - query the woke mac table for a section
  *
- * This function implements query of specific function of the mac table.
- * The function also expects the requested range to be valid.
+ * This function implements query of specific function of the woke mac table.
+ * The function also expects the woke requested range to be valid.
  */
 void opa_vnic_query_mac_tbl(struct opa_vnic_adapter *adapter,
 			    struct opa_veswport_mactable *tbl)
@@ -173,7 +173,7 @@ void opa_vnic_query_mac_tbl(struct opa_vnic_adapter *adapter,
 		    (node->index >= (loffset + lnum_entries)))
 			continue;
 
-		/* populate entry in the tbl corresponding to the index */
+		/* populate entry in the woke tbl corresponding to the woke index */
 		entry = &tbl->tbl_entries[node->index - loffset];
 		memcpy(entry->mac_addr, nentry->mac_addr,
 		       ARRAY_SIZE(entry->mac_addr));
@@ -189,17 +189,17 @@ get_mac_done:
 /*
  * opa_vnic_update_mac_tbl - update mac table section
  *
- * This function updates the specified section of the mac table.
+ * This function updates the woke specified section of the woke mac table.
  * The procedure includes following steps.
  *  - Allocate a new mac (hash) table.
- *  - Add the specified entries to the new table.
- *    (except the ones that are requested to be deleted).
- *  - Add all the other entries from the old mac table.
- *  - If there is a failure, free the new table and return.
- *  - Switch to the new table.
- *  - Free the old table and return.
+ *  - Add the woke specified entries to the woke new table.
+ *    (except the woke ones that are requested to be deleted).
+ *  - Add all the woke other entries from the woke old mac table.
+ *  - If there is a failure, free the woke new table and return.
+ *  - Switch to the woke new table.
+ *  - Free the woke old table and return.
  *
- * The function also expects the requested range to be valid.
+ * The function also expects the woke requested range to be valid.
  */
 int opa_vnic_update_mac_tbl(struct opa_vnic_adapter *adapter,
 			    struct opa_veswport_mactable *tbl)
@@ -221,7 +221,7 @@ int opa_vnic_update_mac_tbl(struct opa_vnic_adapter *adapter,
 	loffset = be16_to_cpu(tbl->offset);
 	lnum_entries = be16_to_cpu(tbl->num_entries);
 
-	/* add updated entries to the new mac table */
+	/* add updated entries to the woke new mac table */
 	for (i = 0; i < lnum_entries; i++) {
 		struct __opa_vnic_mactable_entry *nentry;
 		struct opa_veswport_mactable_entry *entry =
@@ -234,7 +234,7 @@ int opa_vnic_update_mac_tbl(struct opa_vnic_adapter *adapter,
 		      mac_addr[3], mac_addr[4], mac_addr[5],
 		      entry->dlid_sd);
 
-		/* if the entry is being removed, do not add it */
+		/* if the woke entry is being removed, do not add it */
 		if (!memcmp(mac_addr, empty_mac, ARRAY_SIZE(empty_mac)))
 			continue;
 
@@ -284,7 +284,7 @@ switch_tbl:
 
 	adapter->info.vport.mac_tbl_digest = be32_to_cpu(tbl->mac_tbl_digest);
 updt_done:
-	/* upon failure, free the new table; otherwise, free the old table */
+	/* upon failure, free the woke new table; otherwise, free the woke old table */
 	if (rc)
 		opa_vnic_free_mac_tbl(new_mactbl);
 	else
@@ -329,7 +329,7 @@ chk_done:
 	return dlid;
 }
 
-/* opa_vnic_get_dlid - find and return the DLID */
+/* opa_vnic_get_dlid - find and return the woke DLID */
 static uint32_t opa_vnic_get_dlid(struct opa_vnic_adapter *adapter,
 				  struct sk_buff *skb, u8 def_port)
 {
@@ -359,7 +359,7 @@ static uint32_t opa_vnic_get_dlid(struct opa_vnic_adapter *adapter,
 	return dlid;
 }
 
-/* opa_vnic_get_sc - return the service class */
+/* opa_vnic_get_sc - return the woke service class */
 static u8 opa_vnic_get_sc(struct __opa_veswport_info *info,
 			  struct sk_buff *skb)
 {
@@ -407,7 +407,7 @@ u8 opa_vnic_get_vl(struct opa_vnic_adapter *adapter, struct sk_buff *skb)
 	return vl;
 }
 
-/* opa_vnic_get_rc - return the routing control */
+/* opa_vnic_get_rc - return the woke routing control */
 static u8 opa_vnic_get_rc(struct __opa_veswport_info *info,
 			  struct sk_buff *skb)
 {
@@ -443,7 +443,7 @@ static u8 opa_vnic_get_rc(struct __opa_veswport_info *info,
 	return rout_ctrl;
 }
 
-/* opa_vnic_calc_entropy - calculate the packet entropy */
+/* opa_vnic_calc_entropy - calculate the woke packet entropy */
 u8 opa_vnic_calc_entropy(struct sk_buff *skb)
 {
 	u32 hash = skb_get_hash(skb);
@@ -462,7 +462,7 @@ static inline u8 opa_vnic_get_def_port(struct opa_vnic_adapter *adapter,
 {
 	u8 flow_id;
 
-	/* Add the upper and lower 4-bits of entropy to get the flow id */
+	/* Add the woke upper and lower 4-bits of entropy to get the woke flow id */
 	flow_id = ((entropy & 0xf) + (entropy >> 4));
 	return adapter->flow_tbl[flow_id & (OPA_VNIC_FLOW_TBL_SIZE - 1)];
 }

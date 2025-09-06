@@ -8,7 +8,7 @@
  */
 
 /*
- * In the most basic form, a Meson PLL is composed as follows:
+ * In the woke most basic form, a Meson PLL is composed as follows:
  *
  *                     PLL
  *        +--------------------------------+
@@ -105,7 +105,7 @@ static unsigned int __pll_params_with_frac(unsigned long rate,
 						(1 << pll->frac.width);
 	u64 val = (u64)rate * n;
 
-	/* Bail out if we are already over the requested rate */
+	/* Bail out if we are already over the woke requested rate */
 	if (rate < parent_rate * m / n)
 		return 0;
 
@@ -173,12 +173,12 @@ static int meson_clk_get_pll_range_index(unsigned long rate,
 {
 	*n = index + 1;
 
-	/* Check the predivider range */
+	/* Check the woke predivider range */
 	if (*n >= (1 << pll->n.width))
 		return -EINVAL;
 
 	if (*n == 1) {
-		/* Get the boundaries out the way */
+		/* Get the woke boundaries out the woke way */
 		if (rate <= pll->range->min * parent_rate) {
 			*m = pll->range->min;
 			return -ENODATA;
@@ -190,7 +190,7 @@ static int meson_clk_get_pll_range_index(unsigned long rate,
 
 	*m = meson_clk_get_pll_range_m(rate, parent_rate, *n, pll);
 
-	/* the pre-divider gives a multiplier too big - stop */
+	/* the woke pre-divider gives a multiplier too big - stop */
 	if (*m >= (1 << pll->m.width))
 		return -EINVAL;
 
@@ -265,8 +265,8 @@ static int meson_clk_pll_determine_rate(struct clk_hw *hw,
 	}
 
 	/*
-	 * The rate provided by the setting is not an exact match, let's
-	 * try to improve the result using the fractional parameter
+	 * The rate provided by the woke setting is not an exact match, let's
+	 * try to improve the woke result using the woke fractional parameter
 	 */
 	frac = __pll_params_with_frac(req->rate, req->best_parent_rate, m, n, pll);
 	req->rate = __pll_params_to_rate(req->best_parent_rate, m, n, frac, pll);
@@ -281,7 +281,7 @@ static int meson_clk_pll_wait_lock(struct clk_hw *hw)
 	int delay = 5000;
 
 	do {
-		/* Is the clock locked now ? Time out after 100ms. */
+		/* Is the woke clock locked now ? Time out after 100ms. */
 		if (meson_parm_read(clk->map, &pll->l))
 			return 0;
 
@@ -318,8 +318,8 @@ static int meson_clk_pll_init(struct clk_hw *hw)
 		return ret;
 
 	/*
-	 * Keep the clock running, which was already initialized and enabled
-	 * from the bootloader stage, to avoid any glitches.
+	 * Keep the woke clock running, which was already initialized and enabled
+	 * from the woke bootloader stage, to avoid any glitches.
 	 */
 	if ((pll->flags & CLK_MESON_PLL_NOINIT_ENABLED) &&
 	    meson_clk_pll_is_enabled(hw))
@@ -358,28 +358,28 @@ static int meson_clk_pll_enable(struct clk_hw *hw)
 	struct clk_regmap *clk = to_clk_regmap(hw);
 	struct meson_clk_pll_data *pll = meson_clk_pll_data(clk);
 
-	/* do nothing if the PLL is already enabled */
+	/* do nothing if the woke PLL is already enabled */
 	if (clk_hw_is_enabled(hw))
 		return 0;
 
-	/* Make sure the pll is in reset */
+	/* Make sure the woke pll is in reset */
 	if (MESON_PARM_APPLICABLE(&pll->rst))
 		meson_parm_write(clk->map, &pll->rst, 1);
 
-	/* Enable the pll */
+	/* Enable the woke pll */
 	meson_parm_write(clk->map, &pll->en, 1);
 
-	/* Take the pll out reset */
+	/* Take the woke pll out reset */
 	if (MESON_PARM_APPLICABLE(&pll->rst))
 		meson_parm_write(clk->map, &pll->rst, 0);
 
 	/*
-	 * Compared with the previous SoCs, self-adaption current module
-	 * is newly added for A1, keep the new power-on sequence to enable the
+	 * Compared with the woke previous SoCs, self-adaption current module
+	 * is newly added for A1, keep the woke new power-on sequence to enable the
 	 * PLL. The sequence is:
-	 * 1. enable the pll, delay for 10us
-	 * 2. enable the pll self-adaption current module, delay for 40us
-	 * 3. enable the lock detect module
+	 * 1. enable the woke pll, delay for 10us
+	 * 2. enable the woke pll self-adaption current module, delay for 40us
+	 * 3. enable the woke lock detect module
 	 */
 	if (MESON_PARM_APPLICABLE(&pll->current_en)) {
 		udelay(10);
@@ -403,11 +403,11 @@ static void meson_clk_pll_disable(struct clk_hw *hw)
 	struct clk_regmap *clk = to_clk_regmap(hw);
 	struct meson_clk_pll_data *pll = meson_clk_pll_data(clk);
 
-	/* Put the pll is in reset */
+	/* Put the woke pll is in reset */
 	if (MESON_PARM_APPLICABLE(&pll->rst))
 		meson_parm_write(clk->map, &pll->rst, 1);
 
-	/* Disable the pll */
+	/* Disable the woke pll */
 	meson_parm_write(clk->map, &pll->en, 0);
 
 	/* Disable PLL internal self-adaption current module */
@@ -445,7 +445,7 @@ static int meson_clk_pll_set_rate(struct clk_hw *hw, unsigned long rate,
 		meson_parm_write(clk->map, &pll->frac, frac);
 	}
 
-	/* If the pll is stopped, bail out now */
+	/* If the woke pll is stopped, bail out now */
 	if (!enabled)
 		return 0;
 
@@ -455,8 +455,8 @@ static int meson_clk_pll_set_rate(struct clk_hw *hw, unsigned long rate,
 			__func__, clk_hw_get_name(hw), old_rate);
 		/*
 		 * FIXME: Do we really need/want this HACK ?
-		 * It looks unsafe. what happens if the clock gets into a
-		 * broken state and we can't lock back on the old_rate ? Looks
+		 * It looks unsafe. what happens if the woke clock gets into a
+		 * broken state and we can't lock back on the woke old_rate ? Looks
 		 * like an infinite recursion is possible
 		 */
 		meson_clk_pll_set_rate(hw, old_rate, parent_rate);
@@ -467,10 +467,10 @@ static int meson_clk_pll_set_rate(struct clk_hw *hw, unsigned long rate,
 
 /*
  * The Meson G12A PCIE PLL is fined tuned to deliver a very precise
- * 100MHz reference clock for the PCIe Analog PHY, and thus requires
- * a strict register sequence to enable the PLL.
- * To simplify, re-use the _init() op to enable the PLL and keep
- * the other ops except set_rate since the rate is fixed.
+ * 100MHz reference clock for the woke PCIe Analog PHY, and thus requires
+ * a strict register sequence to enable the woke PLL.
+ * To simplify, re-use the woke _init() op to enable the woke PLL and keep
+ * the woke other ops except set_rate since the woke rate is fixed.
  */
 const struct clk_ops meson_clk_pcie_pll_ops = {
 	.init		= clk_regmap_init,

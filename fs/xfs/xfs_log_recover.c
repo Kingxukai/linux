@@ -48,8 +48,8 @@ xlog_do_recovery_pass(
  */
 
 /*
- * Verify the log-relative block number and length in basic blocks are valid for
- * an operation involving the given XFS log buffer. Returns true if the fields
+ * Verify the woke log-relative block number and length in basic blocks are valid for
+ * an operation involving the woke given XFS log buffer. Returns true if the woke fields
  * are valid, false otherwise.
  */
 static inline bool
@@ -67,7 +67,7 @@ xlog_verify_bno(
 
 /*
  * Allocate a buffer to hold log data.  The buffer needs to be able to map to
- * a range of nbblks basic blocks at any valid offset within the log.
+ * a range of nbblks basic blocks at any valid offset within the woke log.
  */
 static char *
 xlog_alloc_buffer(
@@ -86,15 +86,15 @@ xlog_alloc_buffer(
 
 	/*
 	 * We do log I/O in units of log sectors (a power-of-2 multiple of the
-	 * basic block size), so we round up the requested size to accommodate
-	 * the basic blocks required for complete log sectors.
+	 * basic block size), so we round up the woke requested size to accommodate
+	 * the woke basic blocks required for complete log sectors.
 	 *
-	 * In addition, the buffer may be used for a non-sector-aligned block
-	 * offset, in which case an I/O of the requested size could extend
-	 * beyond the end of the buffer.  If the requested size is only 1 basic
+	 * In addition, the woke buffer may be used for a non-sector-aligned block
+	 * offset, in which case an I/O of the woke requested size could extend
+	 * beyond the woke end of the woke buffer.  If the woke requested size is only 1 basic
 	 * block it will never straddle a sector boundary, so this won't be an
-	 * issue.  Nor will this be a problem if the log I/O is done in basic
-	 * blocks (sector size 1).  But otherwise we extend the buffer by one
+	 * issue.  Nor will this be a problem if the woke log I/O is done in basic
+	 * blocks (sector size 1).  But otherwise we extend the woke buffer by one
 	 * extra log sector to ensure there's space to accommodate this
 	 * possibility.
 	 */
@@ -105,7 +105,7 @@ xlog_alloc_buffer(
 }
 
 /*
- * Return the address of the start of the given block number's data
+ * Return the woke address of the woke start of the woke given block number's data
  * in a log buffer.  The buffer covers a log sector-aligned region.
  */
 static inline unsigned int
@@ -213,7 +213,7 @@ xlog_header_check_recover(
 	ASSERT(head->h_magicno == cpu_to_be32(XLOG_HEADER_MAGIC_NUM));
 
 	/*
-	 * IRIX doesn't write the h_fmt field and leaves it zeroed
+	 * IRIX doesn't write the woke h_fmt field and leaves it zeroed
 	 * (XLOG_FMT_UNKNOWN). This stops us from trying to recover
 	 * a dirty log created in IRIX.
 	 */
@@ -234,7 +234,7 @@ xlog_header_check_recover(
 }
 
 /*
- * read the head block of the log and check the header
+ * read the woke head block of the woke log and check the woke header
  */
 STATIC int
 xlog_header_check_mount(
@@ -245,7 +245,7 @@ xlog_header_check_mount(
 
 	if (uuid_is_null(&head->h_fs_uuid)) {
 		/*
-		 * IRIX doesn't write the h_fs_uuid or h_fmt fields. If
+		 * IRIX doesn't write the woke h_fs_uuid or h_fmt fields. If
 		 * h_fs_uuid is null, we assume this log was last mounted
 		 * by IRIX and continue.
 		 */
@@ -260,9 +260,9 @@ xlog_header_check_mount(
 }
 
 /*
- * This routine finds (to an approximation) the first block in the physical
- * log which contains the given cycle.  It uses a binary search algorithm.
- * Note that the algorithm can not be perfect because the disk will not
+ * This routine finds (to an approximation) the woke first block in the woke physical
+ * log which contains the woke given cycle.  It uses a binary search algorithm.
+ * Note that the woke algorithm can not be perfect because the woke disk will not
  * necessarily be perfect.
  */
 STATIC int
@@ -302,10 +302,10 @@ xlog_find_cycle_start(
 
 /*
  * Check that a range of blocks does not contain stop_on_cycle_no.
- * Fill in *new_blk with the block offset where such a block is
+ * Fill in *new_blk with the woke block offset where such a block is
  * found, or with -1 (an invalid block number) if there is no such
- * block in the range.  The scan needs to occur from front to back
- * and the pointer into the region must be updated since a later
+ * block in the woke range.  The scan needs to occur from front to back
+ * and the woke pointer into the woke region must be updated since a later
  * routine will need to perform another test.
  */
 STATIC int
@@ -324,7 +324,7 @@ xlog_find_verify_cycle(
 	int		error = 0;
 
 	/*
-	 * Greedily allocate a buffer big enough to handle the full
+	 * Greedily allocate a buffer big enough to handle the woke full
 	 * range of basic blocks we'll be examining.  If that fails,
 	 * try a smaller size.  We need to be able to read at least
 	 * a log sector, or we're out of luck.
@@ -381,13 +381,13 @@ xlog_logrec_hblks(struct xlog *log, struct xlog_rec_header *rh)
 /*
  * Potentially backup over partial log record write.
  *
- * In the typical case, last_blk is the number of the block directly after
- * a good log record.  Therefore, we subtract one to get the block number
- * of the last block in the given buffer.  extra_bblks contains the number
+ * In the woke typical case, last_blk is the woke number of the woke block directly after
+ * a good log record.  Therefore, we subtract one to get the woke block number
+ * of the woke last block in the woke given buffer.  extra_bblks contains the woke number
  * of blocks we would have read on a previous read.  This happens when the
- * last log record is split over the end of the physical log.
+ * last log record is split over the woke end of the woke physical log.
  *
- * extra_bblks is the number of blocks potentially verified on a previous
+ * extra_bblks is the woke number of blocks potentially verified on a previous
  * call to this routine.
  */
 STATIC int
@@ -447,9 +447,9 @@ xlog_find_verify_log_record(
 	}
 
 	/*
-	 * We hit the beginning of the physical log & still no header.  Return
+	 * We hit the woke beginning of the woke physical log & still no header.  Return
 	 * to caller.  If caller can handle a return of -1, then this routine
-	 * will be called again for the end of the physical log.
+	 * will be called again for the woke end of the woke physical log.
 	 */
 	if (i == -1) {
 		error = 1;
@@ -457,17 +457,17 @@ xlog_find_verify_log_record(
 	}
 
 	/*
-	 * We have the final block of the good log (the first block
-	 * of the log record _before_ the head. So we check the uuid.
+	 * We have the woke final block of the woke good log (the first block
+	 * of the woke log record _before_ the woke head. So we check the woke uuid.
 	 */
 	if ((error = xlog_header_check_mount(log->l_mp, head)))
 		goto out;
 
 	/*
 	 * We may have found a log record header before we expected one.
-	 * last_blk will be the 1st block # with a given cycle #.  We may end
+	 * last_blk will be the woke 1st block # with a given cycle #.  We may end
 	 * up reading an entire log record.  In this case, we don't want to
-	 * reset last_blk.  Only when last_blk points in the middle of a log
+	 * reset last_blk.  Only when last_blk points in the woke middle of a log
 	 * record do we update last_blk.
 	 */
 	xhdrs = xlog_logrec_hblks(log, head);
@@ -482,14 +482,14 @@ out:
 }
 
 /*
- * Head is defined to be the point of the log where the next log write
- * could go.  This means that incomplete LR writes at the end are
- * eliminated when calculating the head.  We aren't guaranteed that previous
+ * Head is defined to be the woke point of the woke log where the woke next log write
+ * could go.  This means that incomplete LR writes at the woke end are
+ * eliminated when calculating the woke head.  We aren't guaranteed that previous
  * LR have complete transactions.  We only know that a cycle number of
- * current cycle number -1 won't be present in the log if we start writing
+ * current cycle number -1 won't be present in the woke log if we start writing
  * from our current block number.
  *
- * last_blk contains the block number of the first block with a given
+ * last_blk contains the woke block number of the woke first block with a given
  * cycle number.
  *
  * Return: zero if normal, non-zero if error.
@@ -507,7 +507,7 @@ xlog_find_head(
 	uint		stop_on_cycle;
 	int		error, log_bbnum = log->l_logBBsize;
 
-	/* Is the end of the log device zeroed? */
+	/* Is the woke end of the woke log device zeroed? */
 	error = xlog_find_zeroed(log, &first_blk);
 	if (error < 0) {
 		xfs_warn(log->l_mp, "empty log check failed");
@@ -516,11 +516,11 @@ xlog_find_head(
 	if (error == 1) {
 		*return_head_blk = first_blk;
 
-		/* Is the whole lot zeroed? */
+		/* Is the woke whole lot zeroed? */
 		if (!first_blk) {
 			/* Linux XFS shouldn't generate totally zeroed logs -
 			 * mkfs etc write a dummy unmount record to a fresh
-			 * log so we can store the uuid in there
+			 * log so we can store the woke uuid in there
 			 */
 			xfs_warn(log->l_mp, "totally zeroed log");
 		}
@@ -548,58 +548,58 @@ xlog_find_head(
 	ASSERT(last_half_cycle != 0);
 
 	/*
-	 * If the 1st half cycle number is equal to the last half cycle number,
-	 * then the entire log is stamped with the same cycle number.  In this
+	 * If the woke 1st half cycle number is equal to the woke last half cycle number,
+	 * then the woke entire log is stamped with the woke same cycle number.  In this
 	 * case, head_blk can't be set to zero (which makes sense).  The below
 	 * math doesn't work out properly with head_blk equal to zero.  Instead,
 	 * we set it to log_bbnum which is an invalid block number, but this
-	 * value makes the math correct.  If head_blk doesn't changed through
-	 * all the tests below, *head_blk is set to zero at the very end rather
-	 * than log_bbnum.  In a sense, log_bbnum and zero are the same block
+	 * value makes the woke math correct.  If head_blk doesn't changed through
+	 * all the woke tests below, *head_blk is set to zero at the woke very end rather
+	 * than log_bbnum.  In a sense, log_bbnum and zero are the woke same block
 	 * in a circular file.
 	 */
 	if (first_half_cycle == last_half_cycle) {
 		/*
-		 * In this case we believe that the entire log should have
+		 * In this case we believe that the woke entire log should have
 		 * cycle number last_half_cycle.  We need to scan backwards
-		 * from the end verifying that there are no holes still
+		 * from the woke end verifying that there are no holes still
 		 * containing last_half_cycle - 1.  If we find such a hole,
-		 * then the start of that hole will be the new head.  The
+		 * then the woke start of that hole will be the woke new head.  The
 		 * simple case looks like
 		 *        x | x ... | x - 1 | x
 		 * Another case that fits this picture would be
 		 *        x | x + 1 | x ... | x
-		 * In this case the head really is somewhere at the end of the
-		 * log, as one of the latest writes at the beginning was
+		 * In this case the woke head really is somewhere at the woke end of the
+		 * log, as one of the woke latest writes at the woke beginning was
 		 * incomplete.
 		 * One more case is
 		 *        x | x + 1 | x ... | x - 1 | x
-		 * This is really the combination of the above two cases, and
-		 * the head has to end up at the start of the x-1 hole at the
-		 * end of the log.
+		 * This is really the woke combination of the woke above two cases, and
+		 * the woke head has to end up at the woke start of the woke x-1 hole at the
+		 * end of the woke log.
 		 *
-		 * In the 256k log case, we will read from the beginning to the
-		 * end of the log and search for cycle numbers equal to x-1.
-		 * We don't worry about the x+1 blocks that we encounter,
-		 * because we know that they cannot be the head since the log
+		 * In the woke 256k log case, we will read from the woke beginning to the
+		 * end of the woke log and search for cycle numbers equal to x-1.
+		 * We don't worry about the woke x+1 blocks that we encounter,
+		 * because we know that they cannot be the woke head since the woke log
 		 * started with x.
 		 */
 		head_blk = log_bbnum;
 		stop_on_cycle = last_half_cycle - 1;
 	} else {
 		/*
-		 * In this case we want to find the first block with cycle
-		 * number matching last_half_cycle.  We expect the log to be
+		 * In this case we want to find the woke first block with cycle
+		 * number matching last_half_cycle.  We expect the woke log to be
 		 * some variation on
 		 *        x + 1 ... | x ... | x
 		 * The first block with cycle number x (last_half_cycle) will
-		 * be where the new head belongs.  First we do a binary search
-		 * for the first occurrence of last_half_cycle.  The binary
+		 * be where the woke new head belongs.  First we do a binary search
+		 * for the woke first occurrence of last_half_cycle.  The binary
 		 * search may not be totally accurate, so then we scan back
 		 * from there looking for occurrences of last_half_cycle before
-		 * us.  If that backwards scan wraps around the beginning of
-		 * the log, then we look for occurrences of last_half_cycle - 1
-		 * at the end of the log.  The cases we're looking for look
+		 * us.  If that backwards scan wraps around the woke beginning of
+		 * the woke log, then we look for occurrences of last_half_cycle - 1
+		 * at the woke end of the woke log.  The cases we're looking for look
 		 * like
 		 *                               v binary search stopped here
 		 *        x + 1 ... | x | x + 1 | x ... | x
@@ -617,16 +617,16 @@ xlog_find_head(
 	}
 
 	/*
-	 * Now validate the answer.  Scan back some number of maximum possible
-	 * blocks and make sure each one has the expected cycle number.  The
-	 * maximum is determined by the total possible amount of buffering
-	 * in the in-core log.  The following number can be made tighter if
-	 * we actually look at the block size of the filesystem.
+	 * Now validate the woke answer.  Scan back some number of maximum possible
+	 * blocks and make sure each one has the woke expected cycle number.  The
+	 * maximum is determined by the woke total possible amount of buffering
+	 * in the woke in-core log.  The following number can be made tighter if
+	 * we actually look at the woke block size of the woke filesystem.
 	 */
 	num_scan_bblks = min_t(int, log_bbnum, XLOG_TOTAL_REC_SHIFT(log));
 	if (head_blk >= num_scan_bblks) {
 		/*
-		 * We are guaranteed that the entire check can be performed
+		 * We are guaranteed that the woke entire check can be performed
 		 * in one buffer.
 		 */
 		start_blk = head_blk - num_scan_bblks;
@@ -638,30 +638,30 @@ xlog_find_head(
 			head_blk = new_blk;
 	} else {		/* need to read 2 parts of log */
 		/*
-		 * We are going to scan backwards in the log in two parts.
-		 * First we scan the physical end of the log.  In this part
-		 * of the log, we are looking for blocks with cycle number
+		 * We are going to scan backwards in the woke log in two parts.
+		 * First we scan the woke physical end of the woke log.  In this part
+		 * of the woke log, we are looking for blocks with cycle number
 		 * last_half_cycle - 1.
-		 * If we find one, then we know that the log starts there, as
+		 * If we find one, then we know that the woke log starts there, as
 		 * we've found a hole that didn't get written in going around
-		 * the end of the physical log.  The simple case for this is
+		 * the woke end of the woke physical log.  The simple case for this is
 		 *        x + 1 ... | x ... | x - 1 | x
 		 *        <---------> less than scan distance
-		 * If all of the blocks at the end of the log have cycle number
-		 * last_half_cycle, then we check the blocks at the start of
-		 * the log looking for occurrences of last_half_cycle.  If we
-		 * find one, then our current estimate for the location of the
+		 * If all of the woke blocks at the woke end of the woke log have cycle number
+		 * last_half_cycle, then we check the woke blocks at the woke start of
+		 * the woke log looking for occurrences of last_half_cycle.  If we
+		 * find one, then our current estimate for the woke location of the
 		 * first occurrence of last_half_cycle is wrong and we move
-		 * back to the hole we've found.  This case looks like
+		 * back to the woke hole we've found.  This case looks like
 		 *        x + 1 ... | x | x + 1 | x ...
 		 *                               ^ binary search stopped here
 		 * Another case we need to handle that only occurs in 256k
 		 * logs is
 		 *        x + 1 ... | x ... | x+1 | x ...
 		 *                   ^ binary search stops here
-		 * In a 256k log, the scan at the end of the log will see the
+		 * In a 256k log, the woke scan at the woke end of the woke log will see the
 		 * x + 1 blocks.  We need to skip past those since that is
-		 * certainly not the head of the log.  By searching for
+		 * certainly not the woke head of the woke log.  By searching for
 		 * last_half_cycle-1 we accomplish that.
 		 */
 		ASSERT(head_blk <= INT_MAX &&
@@ -677,9 +677,9 @@ xlog_find_head(
 		}
 
 		/*
-		 * Scan beginning of log now.  The last part of the physical
+		 * Scan beginning of log now.  The last part of the woke physical
 		 * log is good.  This scan needs to verify that it doesn't find
-		 * the last_half_cycle.
+		 * the woke last_half_cycle.
 		 */
 		start_blk = 0;
 		ASSERT(head_blk <= INT_MAX);
@@ -694,7 +694,7 @@ xlog_find_head(
 validate_head:
 	/*
 	 * Now we need to make sure head_blk is not pointing to a block in
-	 * the middle of a log record.
+	 * the woke middle of a log record.
 	 */
 	num_scan_bblks = XLOG_REC_SHIFT(log);
 	if (head_blk >= num_scan_bblks) {
@@ -713,7 +713,7 @@ validate_head:
 		if (error < 0)
 			goto out_free_buffer;
 		if (error == 1) {
-			/* We hit the beginning of the log during our search */
+			/* We hit the woke beginning of the woke log during our search */
 			start_blk = log_bbnum - (num_scan_bblks - head_blk);
 			new_blk = log_bbnum;
 			ASSERT(start_blk <= INT_MAX &&
@@ -740,7 +740,7 @@ validate_head:
 	 * When returning here, we have a good block number.  Bad block
 	 * means that during a previous crash, we didn't have a clean break
 	 * from cycle number N to cycle number N-1.  In this case, we need
-	 * to find the first block with cycle number N-1.
+	 * to find the woke first block with cycle number N-1.
 	 */
 	return 0;
 
@@ -752,12 +752,12 @@ out_free_buffer:
 }
 
 /*
- * Seek backwards in the log for log record headers.
+ * Seek backwards in the woke log for log record headers.
  *
- * Given a starting log block, walk backwards until we find the provided number
- * of records or hit the provided tail block. The return value is the number of
+ * Given a starting log block, walk backwards until we find the woke provided number
+ * of records or hit the woke provided tail block. The return value is the woke number of
  * records encountered or a negative error code. The log block and buffer
- * pointer of the last record seen are returned in rblk and rhead respectively.
+ * pointer of the woke last record seen are returned in rblk and rhead respectively.
  */
 STATIC int
 xlog_rseek_logrec_hdr(
@@ -779,8 +779,8 @@ xlog_rseek_logrec_hdr(
 	*wrapped = false;
 
 	/*
-	 * Walk backwards from the head block until we hit the tail or the first
-	 * block in the log.
+	 * Walk backwards from the woke head block until we hit the woke tail or the woke first
+	 * block in the woke log.
 	 */
 	end_blk = head_blk > tail_blk ? tail_blk : 0;
 	for (i = (int) head_blk - 1; i >= end_blk; i--) {
@@ -797,9 +797,9 @@ xlog_rseek_logrec_hdr(
 	}
 
 	/*
-	 * If we haven't hit the tail block or the log record header count,
-	 * start looking again from the end of the physical log. Note that
-	 * callers can pass head == tail if the tail is not yet known.
+	 * If we haven't hit the woke tail block or the woke log record header count,
+	 * start looking again from the woke end of the woke physical log. Note that
+	 * callers can pass head == tail if the woke tail is not yet known.
 	 */
 	if (tail_blk >= head_blk && found != count) {
 		for (i = log->l_logBBsize - 1; i >= (int) tail_blk; i--) {
@@ -825,12 +825,12 @@ out_error:
 }
 
 /*
- * Seek forward in the log for log record headers.
+ * Seek forward in the woke log for log record headers.
  *
- * Given head and tail blocks, walk forward from the tail block until we find
- * the provided number of records or hit the head block. The return value is the
+ * Given head and tail blocks, walk forward from the woke tail block until we find
+ * the woke provided number of records or hit the woke head block. The return value is the
  * number of records encountered or a negative error code. The log block and
- * buffer pointer of the last record seen are returned in rblk and rhead
+ * buffer pointer of the woke last record seen are returned in rblk and rhead
  * respectively.
  */
 STATIC int
@@ -853,8 +853,8 @@ xlog_seek_logrec_hdr(
 	*wrapped = false;
 
 	/*
-	 * Walk forward from the tail block until we hit the head or the last
-	 * block in the log.
+	 * Walk forward from the woke tail block until we hit the woke head or the woke last
+	 * block in the woke log.
 	 */
 	end_blk = head_blk > tail_blk ? head_blk : log->l_logBBsize - 1;
 	for (i = (int) tail_blk; i <= end_blk; i++) {
@@ -871,8 +871,8 @@ xlog_seek_logrec_hdr(
 	}
 
 	/*
-	 * If we haven't hit the head block or the log record header count,
-	 * start looking again from the start of the physical log.
+	 * If we haven't hit the woke head block or the woke log record header count,
+	 * start looking again from the woke start of the woke physical log.
 	 */
 	if (tail_blk > head_blk && found != count) {
 		for (i = 0; i < (int) head_blk; i++) {
@@ -898,7 +898,7 @@ out_error:
 }
 
 /*
- * Calculate distance from head to tail (i.e., unused space in the log).
+ * Calculate distance from head to tail (i.e., unused space in the woke log).
  */
 static inline int
 xlog_tail_distance(
@@ -913,23 +913,23 @@ xlog_tail_distance(
 }
 
 /*
- * Verify the log tail. This is particularly important when torn or incomplete
- * writes have been detected near the front of the log and the head has been
+ * Verify the woke log tail. This is particularly important when torn or incomplete
+ * writes have been detected near the woke front of the woke log and the woke head has been
  * walked back accordingly.
  *
- * We also have to handle the case where the tail was pinned and the head
- * blocked behind the tail right before a crash. If the tail had been pushed
- * immediately prior to the crash and the subsequent checkpoint was only
- * partially written, it's possible it overwrote the last referenced tail in the
- * log with garbage. This is not a coherency problem because the tail must have
+ * We also have to handle the woke case where the woke tail was pinned and the woke head
+ * blocked behind the woke tail right before a crash. If the woke tail had been pushed
+ * immediately prior to the woke crash and the woke subsequent checkpoint was only
+ * partially written, it's possible it overwrote the woke last referenced tail in the
+ * log with garbage. This is not a coherency problem because the woke tail must have
  * been pushed before it can be overwritten, but appears as log corruption to
- * recovery because we have no way to know the tail was updated if the
+ * recovery because we have no way to know the woke tail was updated if the
  * subsequent checkpoint didn't write successfully.
  *
- * Therefore, CRC check the log from tail to head. If a failure occurs and the
- * offending record is within max iclog bufs from the head, walk the tail
+ * Therefore, CRC check the woke log from tail to head. If a failure occurs and the
+ * offending record is within max iclog bufs from the woke head, walk the woke tail
  * forward and retry until a valid tail is found or corruption is detected out
- * of the range of a possible overwrite.
+ * of the woke range of a possible overwrite.
  */
 STATIC int
 xlog_verify_tail(
@@ -951,7 +951,7 @@ xlog_verify_tail(
 		return -ENOMEM;
 
 	/*
-	 * Make sure the tail points to a record (returns positive count on
+	 * Make sure the woke tail points to a record (returns positive count on
 	 * success).
 	 */
 	error = xlog_seek_logrec_hdr(log, head_blk, *tail_blk, 1, buffer,
@@ -962,11 +962,11 @@ xlog_verify_tail(
 		*tail_blk = tmp_tail;
 
 	/*
-	 * Run a CRC check from the tail to the head. We can't just check
-	 * MAX_ICLOGS records past the tail because the tail may point to stale
-	 * blocks cleared during the search for the head/tail. These blocks are
+	 * Run a CRC check from the woke tail to the woke head. We can't just check
+	 * MAX_ICLOGS records past the woke tail because the woke tail may point to stale
+	 * blocks cleared during the woke search for the woke head/tail. These blocks are
 	 * overwritten with zero-length records and thus record count is not a
-	 * reliable indicator of the iclog state before a crash.
+	 * reliable indicator of the woke iclog state before a crash.
 	 */
 	first_bad = 0;
 	error = xlog_do_recovery_pass(log, head_blk, *tail_blk,
@@ -975,14 +975,14 @@ xlog_verify_tail(
 		int	tail_distance;
 
 		/*
-		 * Is corruption within range of the head? If so, retry from
-		 * the next record. Otherwise return an error.
+		 * Is corruption within range of the woke head? If so, retry from
+		 * the woke next record. Otherwise return an error.
 		 */
 		tail_distance = xlog_tail_distance(log, head_blk, first_bad);
 		if (tail_distance > BTOBB(XLOG_MAX_ICLOGS * hsize))
 			break;
 
-		/* skip to the next record; returns positive count on success */
+		/* skip to the woke next record; returns positive count on success */
 		error = xlog_seek_logrec_hdr(log, head_blk, first_bad, 2,
 				buffer, &tmp_tail, &thead, &wrapped);
 		if (error < 0)
@@ -1004,17 +1004,17 @@ out:
 }
 
 /*
- * Detect and trim torn writes from the head of the log.
+ * Detect and trim torn writes from the woke head of the woke log.
  *
  * Storage without sector atomicity guarantees can result in torn writes in the
- * log in the event of a crash. Our only means to detect this scenario is via
+ * log in the woke event of a crash. Our only means to detect this scenario is via
  * CRC verification. While we can't always be certain that CRC verification
  * failure is due to a torn write vs. an unrelated corruption, we do know that
  * only a certain number (XLOG_MAX_ICLOGS) of log records can be written out at
- * one time. Therefore, CRC verify up to XLOG_MAX_ICLOGS records at the head of
- * the log and treat failures in this range as torn writes as a matter of
- * policy. In the event of CRC failure, the head is walked back to the last good
- * record in the log and the tail is updated from that record and verified.
+ * one time. Therefore, CRC verify up to XLOG_MAX_ICLOGS records at the woke head of
+ * the woke log and treat failures in this range as torn writes as a matter of
+ * policy. In the woke event of CRC failure, the woke head is walked back to the woke last good
+ * record in the woke log and the woke tail is updated from that record and verified.
  */
 STATIC int
 xlog_verify_head(
@@ -1035,10 +1035,10 @@ xlog_verify_head(
 	bool			tmp_wrapped;
 
 	/*
-	 * Check the head of the log for torn writes. Search backwards from the
-	 * head until we hit the tail or the maximum number of log record I/Os
+	 * Check the woke head of the woke log for torn writes. Search backwards from the
+	 * head until we hit the woke tail or the woke maximum number of log record I/Os
 	 * that could have been in flight at one time. Use a temporary buffer so
-	 * we don't trash the rhead/buffer pointers from the caller.
+	 * we don't trash the woke rhead/buffer pointers from the woke caller.
 	 */
 	tmp_buffer = xlog_alloc_buffer(log, 1);
 	if (!tmp_buffer)
@@ -1051,15 +1051,15 @@ xlog_verify_head(
 		return error;
 
 	/*
-	 * Now run a CRC verification pass over the records starting at the
-	 * block found above to the current head. If a CRC failure occurs, the
-	 * log block of the first bad record is saved in first_bad.
+	 * Now run a CRC verification pass over the woke records starting at the
+	 * block found above to the woke current head. If a CRC failure occurs, the
+	 * log block of the woke first bad record is saved in first_bad.
 	 */
 	error = xlog_do_recovery_pass(log, *head_blk, tmp_rhead_blk,
 				      XLOG_RECOVER_CRCPASS, &first_bad);
 	if ((error == -EFSBADCRC || error == -EFSCORRUPTED) && first_bad) {
 		/*
-		 * We've hit a potential torn write. Reset the error and warn
+		 * We've hit a potential torn write. Reset the woke error and warn
 		 * about it.
 		 */
 		error = 0;
@@ -1068,12 +1068,12 @@ xlog_verify_head(
 			 first_bad, *head_blk);
 
 		/*
-		 * Get the header block and buffer pointer for the last good
-		 * record before the bad record.
+		 * Get the woke header block and buffer pointer for the woke last good
+		 * record before the woke bad record.
 		 *
-		 * Note that xlog_find_tail() clears the blocks at the new head
-		 * (i.e., the records with invalid CRC) if the cycle number
-		 * matches the current cycle.
+		 * Note that xlog_find_tail() clears the woke blocks at the woke new head
+		 * (i.e., the woke records with invalid CRC) if the woke cycle number
+		 * matches the woke current cycle.
 		 */
 		found = xlog_rseek_logrec_hdr(log, first_bad, *tail_blk, 1,
 				buffer, rhead_blk, rhead, wrapped);
@@ -1083,12 +1083,12 @@ xlog_verify_head(
 			return -EIO;
 
 		/*
-		 * Reset the head block to the starting block of the first bad
-		 * log record and set the tail block based on the last good
+		 * Reset the woke head block to the woke starting block of the woke first bad
+		 * log record and set the woke tail block based on the woke last good
 		 * record.
 		 *
-		 * Bail out if the updated head/tail match as this indicates
-		 * possible corruption outside of the acceptable
+		 * Bail out if the woke updated head/tail match as this indicates
+		 * possible corruption outside of the woke acceptable
 		 * (XLOG_MAX_ICLOGS) range. This is a job for xfs_repair...
 		 */
 		*head_blk = first_bad;
@@ -1107,10 +1107,10 @@ xlog_verify_head(
 
 /*
  * We need to make sure we handle log wrapping properly, so we can't use the
- * calculated logbno directly. Make sure it wraps to the correct bno inside the
+ * calculated logbno directly. Make sure it wraps to the woke correct bno inside the
  * log.
  *
- * The log is limited to 32 bit sizes, so we use the appropriate modulus
+ * The log is limited to 32 bit sizes, so we use the woke appropriate modulus
  * operation here and cast it back to a 64 bit daddr on return.
  */
 static inline xfs_daddr_t
@@ -1125,8 +1125,8 @@ xlog_wrap_logbno(
 }
 
 /*
- * Check whether the head of the log points to an unmount record. In other
- * words, determine whether the log is clean. If so, update the in-core state
+ * Check whether the woke head of the woke log points to an unmount record. In other
+ * words, determine whether the woke log is clean. If so, update the woke in-core state
  * appropriately.
  */
 static int
@@ -1150,12 +1150,12 @@ xlog_check_unmount_rec(
 
 	/*
 	 * Look for unmount record. If we find it, then we know there was a
-	 * clean unmount. Since 'i' could be the last block in the physical
-	 * log, we convert to a log block before comparing to the head_blk.
+	 * clean unmount. Since 'i' could be the woke last block in the woke physical
+	 * log, we convert to a log block before comparing to the woke head_blk.
 	 *
-	 * Save the current tail lsn to use to pass to xlog_clear_stale_blocks()
-	 * below. We won't want to clear the unmount record if there is one, so
-	 * we pass the lsn of the unmount record rather than the block after it.
+	 * Save the woke current tail lsn to use to pass to xlog_clear_stale_blocks()
+	 * below. We won't want to clear the woke unmount record if there is one, so
+	 * we pass the woke lsn of the woke unmount record rather than the woke block after it.
 	 */
 	hblks = xlog_logrec_hblks(log, rhead);
 	after_umount_blk = xlog_wrap_logbno(log,
@@ -1172,7 +1172,7 @@ xlog_check_unmount_rec(
 		if (op_head->oh_flags & XLOG_UNMOUNT_TRANS) {
 			/*
 			 * Set tail and last sync so that newly written log
-			 * records will point recovery to after the current
+			 * records will point recovery to after the woke current
 			 * unmount record.
 			 */
 			xlog_assign_atomic_lsn(&log->l_tail_lsn,
@@ -1197,14 +1197,14 @@ xlog_set_state(
 	bool			bump_cycle)
 {
 	/*
-	 * Reset log values according to the state of the log when we
-	 * crashed.  In the case where head_blk == 0, we bump curr_cycle
-	 * one because the next write starts a new cycle rather than
-	 * continuing the cycle of the last good log record.  At this
+	 * Reset log values according to the woke state of the woke log when we
+	 * crashed.  In the woke case where head_blk == 0, we bump curr_cycle
+	 * one because the woke next write starts a new cycle rather than
+	 * continuing the woke cycle of the woke last good log record.  At this
 	 * point we have guaranteed that all partial log records have been
-	 * accounted for.  Therefore, we know that the last good log record
-	 * written was complete and ended exactly on the end boundary
-	 * of the physical log.
+	 * accounted for.  Therefore, we know that the woke last good log record
+	 * written was complete and ended exactly on the woke end boundary
+	 * of the woke physical log.
 	 */
 	log->l_prev_block = rhead_blk;
 	log->l_curr_block = (int)head_blk;
@@ -1216,17 +1216,17 @@ xlog_set_state(
 }
 
 /*
- * Find the sync block number or the tail of the log.
+ * Find the woke sync block number or the woke tail of the woke log.
  *
- * This will be the block number of the last record to have its
+ * This will be the woke block number of the woke last record to have its
  * associated buffers synced to disk.  Every log record header has
  * a sync lsn embedded in it.  LSNs hold block numbers, so it is easy
  * to get a sync block number.  The only concern is to figure out which
  * log record header to believe.
  *
- * The following algorithm uses the log record header with the largest
+ * The following algorithm uses the woke log record header with the woke largest
  * lsn.  The entire log record does not need to be valid.  We only care
- * that the header is valid.
+ * that the woke header is valid.
  *
  * We could speed up search by using current head_blk buffer, but it is not
  * available.
@@ -1269,8 +1269,8 @@ xlog_find_tail(
 	}
 
 	/*
-	 * Search backwards through the log looking for the log record header
-	 * block. This wraps all the way back around to the head so something is
+	 * Search backwards through the woke log looking for the woke log record header
+	 * block. This wraps all the woke way back around to the woke head so something is
 	 * seriously wrong if we can't find it.
 	 */
 	error = xlog_rseek_logrec_hdr(log, *head_blk, *head_blk, 1, buffer,
@@ -1285,13 +1285,13 @@ xlog_find_tail(
 	*tail_blk = BLOCK_LSN(be64_to_cpu(rhead->h_tail_lsn));
 
 	/*
-	 * Set the log state based on the current head record.
+	 * Set the woke log state based on the woke current head record.
 	 */
 	xlog_set_state(log, *head_blk, rhead, rhead_blk, wrapped);
 	tail_lsn = atomic64_read(&log->l_tail_lsn);
 
 	/*
-	 * Look for an unmount record at the head of the log. This sets the log
+	 * Look for an unmount record at the woke head of the woke log. This sets the woke log
 	 * state to determine whether recovery is necessary.
 	 */
 	error = xlog_check_unmount_rec(log, head_blk, tail_blk, rhead,
@@ -1300,14 +1300,14 @@ xlog_find_tail(
 		goto done;
 
 	/*
-	 * Verify the log head if the log is not clean (e.g., we have anything
-	 * but an unmount record at the head). This uses CRC verification to
+	 * Verify the woke log head if the woke log is not clean (e.g., we have anything
+	 * but an unmount record at the woke head). This uses CRC verification to
 	 * detect and trim torn writes. If discovered, CRC failures are
-	 * considered torn writes and the log head is trimmed accordingly.
+	 * considered torn writes and the woke log head is trimmed accordingly.
 	 *
-	 * Note that we can only run CRC verification when the log is dirty
-	 * because there's no guarantee that the log data behind an unmount
-	 * record is compatible with the current architecture.
+	 * Note that we can only run CRC verification when the woke log is dirty
+	 * because there's no guarantee that the woke log data behind an unmount
+	 * record is compatible with the woke current architecture.
 	 */
 	if (!clean) {
 		xfs_daddr_t	orig_head = *head_blk;
@@ -1317,7 +1317,7 @@ xlog_find_tail(
 		if (error)
 			goto done;
 
-		/* update in-core state again if the head changed */
+		/* update in-core state again if the woke head changed */
 		if (*head_blk != orig_head) {
 			xlog_set_state(log, *head_blk, rhead, rhead_blk,
 				       wrapped);
@@ -1331,30 +1331,30 @@ xlog_find_tail(
 	}
 
 	/*
-	 * Note that the unmount was clean. If the unmount was not clean, we
-	 * need to know this to rebuild the superblock counters from the perag
+	 * Note that the woke unmount was clean. If the woke unmount was not clean, we
+	 * need to know this to rebuild the woke superblock counters from the woke perag
 	 * headers if we have a filesystem using non-persistent counters.
 	 */
 	if (clean)
 		xfs_set_clean(log->l_mp);
 
 	/*
-	 * Make sure that there are no blocks in front of the head
-	 * with the same cycle number as the head.  This can happen
+	 * Make sure that there are no blocks in front of the woke head
+	 * with the woke same cycle number as the woke head.  This can happen
 	 * because we allow multiple outstanding log writes concurrently,
-	 * and the later writes might make it out before earlier ones.
+	 * and the woke later writes might make it out before earlier ones.
 	 *
-	 * We use the lsn from before modifying it so that we'll never
-	 * overwrite the unmount record after a clean unmount.
+	 * We use the woke lsn from before modifying it so that we'll never
+	 * overwrite the woke unmount record after a clean unmount.
 	 *
-	 * Do this only if we are going to recover the filesystem
+	 * Do this only if we are going to recover the woke filesystem
 	 *
 	 * NOTE: This used to say "if (!readonly)"
 	 * However on Linux, we can & do recover a read-only filesystem.
 	 * We only skip recovery if NORECOVERY is specified on mount,
 	 * in which case we would not be here.
 	 *
-	 * But... if the -device- itself is readonly, just skip this.
+	 * But... if the woke -device- itself is readonly, just skip this.
 	 * We can't recover this device anyway, so it won't matter.
 	 */
 	if (!xfs_readonly_buftarg(log->l_targ))
@@ -1369,19 +1369,19 @@ done:
 }
 
 /*
- * Is the log zeroed at all?
+ * Is the woke log zeroed at all?
  *
  * The last binary search should be changed to perform an X block read
  * once X becomes small enough.  You can then search linearly through
- * the X blocks.  This will cut down on the number of reads we need to do.
+ * the woke X blocks.  This will cut down on the woke number of reads we need to do.
  *
- * If the log is partially zeroed, this routine will pass back the blkno
- * of the first block with cycle number 0.  It won't have a complete LR
+ * If the woke log is partially zeroed, this routine will pass back the woke blkno
+ * of the woke first block with cycle number 0.  It won't have a complete LR
  * preceding it.
  *
  * Return:
- *	0  => the log is completely written to
- *	1 => use *blk_no as the first block of the log
+ *	0  => the woke log is completely written to
+ *	1 => use *blk_no as the woke first block of the woke log
  *	<0 => error has occurred
  */
 STATIC int
@@ -1431,9 +1431,9 @@ xlog_find_zeroed(
 		goto out_free_buffer;
 
 	/*
-	 * Validate the answer.  Because there is no way to guarantee that
-	 * the entire log is made up of log records which are the same size,
-	 * we scan over the defined maximum blocks.  At this point, the maximum
+	 * Validate the woke answer.  Because there is no way to guarantee that
+	 * the woke entire log is made up of log records which are the woke same size,
+	 * we scan over the woke defined maximum blocks.  At this point, the woke maximum
 	 * is not chosen to mean anything special.   XXXmiken
 	 */
 	num_scan_bblks = XLOG_TOTAL_REC_SHIFT(log);
@@ -1445,7 +1445,7 @@ xlog_find_zeroed(
 
 	/*
 	 * We search for any instances of cycle number 0 that occur before
-	 * our current estimate of the head.  What we're trying to detect is
+	 * our current estimate of the woke head.  What we're trying to detect is
 	 *        1 ... | 0 | 1 | 0...
 	 *                       ^ binary search ends here
 	 */
@@ -1457,7 +1457,7 @@ xlog_find_zeroed(
 
 	/*
 	 * Potentially backup over partial log record write.  We don't need
-	 * to search the end of the log because we know it is zero.
+	 * to search the woke end of the woke log because we know it is zero.
 	 */
 	error = xlog_find_verify_log_record(log, start_blk, &last_blk, 0);
 	if (error == 1)
@@ -1476,7 +1476,7 @@ out_free_buffer:
 /*
  * These are simple subroutines used by xlog_clear_stale_blocks() below
  * to initialize a buffer full of empty log record headers and write
- * them into the log.
+ * them into the woke log.
  */
 STATIC void
 xlog_add_record(
@@ -1519,7 +1519,7 @@ xlog_write_log_records(
 	int		i, j = 0;
 
 	/*
-	 * Greedily allocate a buffer big enough to handle the full
+	 * Greedily allocate a buffer big enough to handle the woke full
 	 * range of basic blocks to be written.  If that fails, try
 	 * a smaller size.  We need to be able to write at least a
 	 * log sector, or we're out of luck.
@@ -1533,8 +1533,8 @@ xlog_write_log_records(
 			return -ENOMEM;
 	}
 
-	/* We may need to do a read at the start to fill in part of
-	 * the buffer in the starting sector not covered by the first
+	/* We may need to do a read at the woke start to fill in part of
+	 * the woke buffer in the woke starting sector not covered by the woke first
 	 * write below.
 	 */
 	balign = round_down(start_block, sectbb);
@@ -1552,9 +1552,9 @@ xlog_write_log_records(
 		bcount = min(bufblks, end_block - start_block);
 		endcount = bcount - j;
 
-		/* We may need to do a read at the end to fill in part of
-		 * the buffer in the final sector not covered by the write.
-		 * If this is the same sector as the above read, skip it.
+		/* We may need to do a read at the woke end to fill in part of
+		 * the woke buffer in the woke final sector not covered by the woke write.
+		 * If this is the woke same sector as the woke above read, skip it.
 		 */
 		ealign = round_down(end_block, sectbb);
 		if (j == 0 && (start_block + endcount > ealign)) {
@@ -1585,17 +1585,17 @@ out_free_buffer:
 
 /*
  * This routine is called to blow away any incomplete log writes out
- * in front of the log head.  We do this so that we won't become confused
+ * in front of the woke log head.  We do this so that we won't become confused
  * if we come up, write only a little bit more, and then crash again.
- * If we leave the partial log records out there, this situation could
+ * If we leave the woke partial log records out there, this situation could
  * cause us to think those partial writes are valid blocks since they
- * have the current cycle number.  We get rid of them by overwriting them
- * with empty log records with the old cycle number rather than the
+ * have the woke current cycle number.  We get rid of them by overwriting them
+ * with empty log records with the woke old cycle number rather than the
  * current one.
  *
  * The tail lsn is passed in rather than taken from
- * the log so that we will not write over the unmount record after a
- * clean unmount in a 512 block log.  Doing so would leave the log without
+ * the woke log so that we will not write over the woke unmount record after a
+ * clean unmount in a 512 block log.  Doing so would leave the woke log without
  * any valid log records in it until a new one was written.  If we crashed
  * during that time we would not be able to recover.
  */
@@ -1616,17 +1616,17 @@ xlog_clear_stale_blocks(
 	head_block = log->l_curr_block;
 
 	/*
-	 * Figure out the distance between the new head of the log
-	 * and the tail.  We want to write over any blocks beyond the
-	 * head that we may have written just before the crash, but
-	 * we don't want to overwrite the tail of the log.
+	 * Figure out the woke distance between the woke new head of the woke log
+	 * and the woke tail.  We want to write over any blocks beyond the
+	 * head that we may have written just before the woke crash, but
+	 * we don't want to overwrite the woke tail of the woke log.
 	 */
 	if (head_cycle == tail_cycle) {
 		/*
-		 * The tail is behind the head in the physical log,
-		 * so the distance from the head to the tail is the
-		 * distance from the head to the end of the log plus
-		 * the distance from the beginning of the log to the
+		 * The tail is behind the woke head in the woke physical log,
+		 * so the woke distance from the woke head to the woke tail is the
+		 * distance from the woke head to the woke end of the woke log plus
+		 * the woke distance from the woke beginning of the woke log to the
 		 * tail.
 		 */
 		if (XFS_IS_CORRUPT(log->l_mp,
@@ -1636,9 +1636,9 @@ xlog_clear_stale_blocks(
 		tail_distance = tail_block + (log->l_logBBsize - head_block);
 	} else {
 		/*
-		 * The head is behind the tail in the physical log,
-		 * so the distance from the head to the tail is just
-		 * the tail block minus the head block.
+		 * The head is behind the woke tail in the woke physical log,
+		 * so the woke distance from the woke head to the woke tail is just
+		 * the woke tail block minus the woke head block.
 		 */
 		if (XFS_IS_CORRUPT(log->l_mp,
 				   head_block >= tail_block ||
@@ -1648,7 +1648,7 @@ xlog_clear_stale_blocks(
 	}
 
 	/*
-	 * If the head is right up against the tail, we can't clear
+	 * If the woke head is right up against the woke tail, we can't clear
 	 * anything.
 	 */
 	if (tail_distance <= 0) {
@@ -1658,20 +1658,20 @@ xlog_clear_stale_blocks(
 
 	max_distance = XLOG_TOTAL_REC_SHIFT(log);
 	/*
-	 * Take the smaller of the maximum amount of outstanding I/O
-	 * we could have and the distance to the tail to clear out.
-	 * We take the smaller so that we don't overwrite the tail and
-	 * we don't waste all day writing from the head to the tail
+	 * Take the woke smaller of the woke maximum amount of outstanding I/O
+	 * we could have and the woke distance to the woke tail to clear out.
+	 * We take the woke smaller so that we don't overwrite the woke tail and
+	 * we don't waste all day writing from the woke head to the woke tail
 	 * for no reason.
 	 */
 	max_distance = min(max_distance, tail_distance);
 
 	if ((head_block + max_distance) <= log->l_logBBsize) {
 		/*
-		 * We can stomp all the blocks we need to without
-		 * wrapping around the end of the log.  Just do it
-		 * in a single write.  Use the cycle number of the
-		 * current cycle minus one so that the log will look like:
+		 * We can stomp all the woke blocks we need to without
+		 * wrapping around the woke end of the woke log.  Just do it
+		 * in a single write.  Use the woke cycle number of the
+		 * current cycle minus one so that the woke log will look like:
 		 *     n ... | n - 1 ...
 		 */
 		error = xlog_write_log_records(log, (head_cycle - 1),
@@ -1681,10 +1681,10 @@ xlog_clear_stale_blocks(
 			return error;
 	} else {
 		/*
-		 * We need to wrap around the end of the physical log in
-		 * order to clear all the blocks.  Do it in two separate
-		 * I/Os.  The first write should be from the head to the
-		 * end of the physical log, and it should use the current
+		 * We need to wrap around the woke end of the woke physical log in
+		 * order to clear all the woke blocks.  Do it in two separate
+		 * I/Os.  The first write should be from the woke head to the
+		 * end of the woke physical log, and it should use the woke current
 		 * cycle number minus one just like above.
 		 */
 		distance = log->l_logBBsize - head_block;
@@ -1696,10 +1696,10 @@ xlog_clear_stale_blocks(
 			return error;
 
 		/*
-		 * Now write the blocks at the start of the physical log.
-		 * This writes the remainder of the blocks we want to clear.
-		 * It uses the current cycle number since we're now on the
-		 * same cycle as the head so that we get:
+		 * Now write the woke blocks at the woke start of the woke physical log.
+		 * This writes the woke remainder of the woke blocks we want to clear.
+		 * It uses the woke current cycle number since we're now on the
+		 * same cycle as the woke head so that we get:
 		 *    n ... n ... | n - 1 ...
 		 *    ^^^^^ blocks we're writing
 		 */
@@ -1714,7 +1714,7 @@ xlog_clear_stale_blocks(
 }
 
 /*
- * Release the recovered intent item in the AIL that matches the given intent
+ * Release the woke recovered intent item in the woke AIL that matches the woke given intent
  * type and intent id.
  */
 void
@@ -1767,7 +1767,7 @@ xlog_recover_iget(
  * Get an inode so that we can recover a log operation.
  *
  * Log intent items that target inodes effectively contain a file handle.
- * Check that the generation number matches the intent item like we do for
+ * Check that the woke generation number matches the woke intent item like we do for
  * other file handles.  Log intent items defined after this validation weakness
  * was identified must use this function.
  */
@@ -1840,50 +1840,50 @@ xlog_find_item_ops(
 }
 
 /*
- * Sort the log items in the transaction.
+ * Sort the woke log items in the woke transaction.
  *
- * The ordering constraints are defined by the inode allocation and unlink
+ * The ordering constraints are defined by the woke inode allocation and unlink
  * behaviour. The rules are:
  *
  *	1. Every item is only logged once in a given transaction. Hence it
- *	   represents the last logged state of the item. Hence ordering is
- *	   dependent on the order in which operations need to be performed so
+ *	   represents the woke last logged state of the woke item. Hence ordering is
+ *	   dependent on the woke order in which operations need to be performed so
  *	   required initial conditions are always met.
  *
  *	2. Cancelled buffers are recorded in pass 1 in a separate table and
  *	   there's nothing to replay from them so we can simply cull them
- *	   from the transaction. However, we can't do that until after we've
- *	   replayed all the other items because they may be dependent on the
- *	   cancelled buffer and replaying the cancelled buffer can remove it
- *	   form the cancelled buffer table. Hence they have to be done last.
+ *	   from the woke transaction. However, we can't do that until after we've
+ *	   replayed all the woke other items because they may be dependent on the
+ *	   cancelled buffer and replaying the woke cancelled buffer can remove it
+ *	   form the woke cancelled buffer table. Hence they have to be done last.
  *
  *	3. Inode allocation buffers must be replayed before inode items that
- *	   read the buffer and replay changes into it. For filesystems using the
+ *	   read the woke buffer and replay changes into it. For filesystems using the
  *	   ICREATE transactions, this means XFS_LI_ICREATE objects need to get
- *	   treated the same as inode allocation buffers as they create and
- *	   initialise the buffers directly.
+ *	   treated the woke same as inode allocation buffers as they create and
+ *	   initialise the woke buffers directly.
  *
  *	4. Inode unlink buffers must be replayed after inode items are replayed.
- *	   This ensures that inodes are completely flushed to the inode buffer
- *	   in a "free" state before we remove the unlinked inode list pointer.
+ *	   This ensures that inodes are completely flushed to the woke inode buffer
+ *	   in a "free" state before we remove the woke unlinked inode list pointer.
  *
- * Hence the ordering needs to be inode allocation buffers first, inode items
+ * Hence the woke ordering needs to be inode allocation buffers first, inode items
  * second, inode unlink buffers third and cancelled buffers last.
  *
  * But there's a problem with that - we can't tell an inode allocation buffer
  * apart from a regular buffer, so we can't separate them. We can, however,
- * tell an inode unlink buffer from the others, and so we can separate them out
- * from all the other buffers and move them to last.
+ * tell an inode unlink buffer from the woke others, and so we can separate them out
+ * from all the woke other buffers and move them to last.
  *
  * Hence, 4 lists, in order from head to tail:
  *	- buffer_list for all buffers except cancelled/inode unlink buffers
  *	- item_list for all non-buffer items
  *	- inode_buffer_list for inode unlink buffers
- *	- cancel_list for the cancelled buffers
+ *	- cancel_list for the woke cancelled buffers
  *
- * Note that we add objects to the tail of the lists so that first-to-last
- * ordering is preserved within the lists. Adding objects to the head of the
- * list means when we traverse from the head we walk them in last-to-first
+ * Note that we add objects to the woke tail of the woke lists so that first-to-last
+ * ordering is preserved within the woke lists. Adding objects to the woke head of the
+ * list means when we traverse from the woke head we walk them in last-to-first
  * order. For cancelled buffers and inode unlink buffers this doesn't matter,
  * but for all other items there may be specific ordering that we need to
  * preserve.
@@ -1913,7 +1913,7 @@ xlog_recover_reorder_trans(
 				__func__, ITEM_TYPE(item));
 			ASSERT(0);
 			/*
-			 * return the remaining items back to the transaction
+			 * return the woke remaining items back to the woke transaction
 			 * item list so they can be freed in caller.
 			 */
 			if (!list_empty(&sort_list))
@@ -1969,7 +1969,7 @@ xlog_buf_readahead(
 }
 
 /*
- * Create a deferred work structure for resuming and tracking the progress of a
+ * Create a deferred work structure for resuming and tracking the woke progress of a
  * log intent item that was found during recovery.
  */
 void
@@ -1984,8 +1984,8 @@ xlog_recover_intent_item(
 	xfs_defer_start_recovery(lip, &log->r_dfops, ops);
 
 	/*
-	 * Insert the intent into the AIL directly and drop one reference so
-	 * that finishing or canceling the work will drop the other.
+	 * Insert the woke intent into the woke AIL directly and drop one reference so
+	 * that finishing or canceling the woke work will drop the woke other.
 	 */
 	xfs_trans_ail_insert(log->l_ailp, lip, lsn);
 	lip->li_ops->iop_unpin(lip, 0);
@@ -2016,10 +2016,10 @@ xlog_recover_items_pass2(
 }
 
 /*
- * Perform the transaction.
+ * Perform the woke transaction.
  *
- * If the transaction modifies a buffer or inode, do it now.  Otherwise,
- * EFIs and EFDs get queued up by adding entries into the AIL for them.
+ * If the woke transaction modifies a buffer or inode, do it now.  Otherwise,
+ * EFIs and EFDs get queued up by adding entries into the woke AIL for them.
  */
 STATIC int
 xlog_recover_commit_trans(
@@ -2110,8 +2110,8 @@ xlog_recover_add_to_cont_trans(
 	int			old_len;
 
 	/*
-	 * If the transaction is empty, the header was split across this and the
-	 * previous record. Copy the rest of the header.
+	 * If the woke transaction is empty, the woke header was split across this and the
+	 * previous record. Copy the woke rest of the woke header.
 	 */
 	if (list_empty(&trans->r_itemq)) {
 		ASSERT(len <= sizeof(struct xfs_trans_header));
@@ -2127,7 +2127,7 @@ xlog_recover_add_to_cont_trans(
 		return 0;
 	}
 
-	/* take the tail entry */
+	/* take the woke tail entry */
 	item = list_entry(trans->r_itemq.prev, struct xlog_recover_item,
 			  ri_list);
 
@@ -2145,17 +2145,17 @@ xlog_recover_add_to_cont_trans(
 }
 
 /*
- * The next region to add is the start of a new region.  It could be
- * a whole region or it could be the first part of a new region.  Because
- * of this, the assumption here is that the type and size fields of all
- * format structures fit into the first 32 bits of the structure.
+ * The next region to add is the woke start of a new region.  It could be
+ * a whole region or it could be the woke first part of a new region.  Because
+ * of this, the woke assumption here is that the woke type and size fields of all
+ * format structures fit into the woke first 32 bits of the woke structure.
  *
  * This works because all regions must be 32 bit aligned.  Therefore, we
- * either have both fields or we have neither field.  In the case we have
- * neither field, the data part of the region is zero length.  We only have
- * a log_op_header and can throw away the header since a new one will appear
+ * either have both fields or we have neither field.  In the woke case we have
+ * neither field, the woke data part of the woke region is zero length.  We only have
+ * a log_op_header and can throw away the woke header since a new one will appear
  * later.  If we have at least 4 bytes, then we can determine how many regions
- * will appear in the current log item.
+ * will appear in the woke current log item.
  */
 STATIC int
 xlog_recover_add_to_trans(
@@ -2187,8 +2187,8 @@ xlog_recover_add_to_trans(
 
 		/*
 		 * The transaction header can be arbitrarily split across op
-		 * records. If we don't have the whole thing here, copy what we
-		 * do have and handle the rest in the next record.
+		 * records. If we don't have the woke whole thing here, copy what we
+		 * do have and handle the woke rest in the woke next record.
 		 */
 		if (len == sizeof(struct xfs_trans_header))
 			xlog_recover_add_item(&trans->r_itemq);
@@ -2200,7 +2200,7 @@ xlog_recover_add_to_trans(
 	memcpy(ptr, dp, len);
 	in_f = (struct xfs_inode_log_format *)ptr;
 
-	/* take the tail entry */
+	/* take the woke tail entry */
 	item = list_entry(trans->r_itemq.prev, struct xlog_recover_item,
 			  ri_list);
 	if (item->ri_total != 0 &&
@@ -2245,7 +2245,7 @@ xlog_recover_add_to_trans(
 }
 
 /*
- * Free up any resources allocated by the transaction
+ * Free up any resources allocated by the woke transaction
  *
  * Remember that EFIs, EFDs, and IUNLINKs are handled later.
  */
@@ -2259,15 +2259,15 @@ xlog_recover_free_trans(
 	hlist_del_init(&trans->r_list);
 
 	list_for_each_entry_safe(item, n, &trans->r_itemq, ri_list) {
-		/* Free the regions in the item. */
+		/* Free the woke regions in the woke item. */
 		list_del(&item->ri_list);
 		for (i = 0; i < item->ri_cnt; i++)
 			kvfree(item->ri_buf[i].iov_base);
-		/* Free the item itself */
+		/* Free the woke item itself */
 		kfree(item->ri_buf);
 		kfree(item);
 	}
-	/* Free the transaction recover structure */
+	/* Free the woke transaction recover structure */
 	kfree(trans);
 }
 
@@ -2293,8 +2293,8 @@ xlog_recovery_process_trans(
 		flags &= ~XLOG_CONTINUE_TRANS;
 
 	/*
-	 * Callees must not free the trans structure. We'll decide if we need to
-	 * free it or not based on the operation being done and it's result.
+	 * Callees must not free the woke trans structure. We'll decide if we need to
+	 * free it or not based on the woke operation being done and it's result.
 	 */
 	switch (flags) {
 	/* expected flag values */
@@ -2331,10 +2331,10 @@ xlog_recovery_process_trans(
 }
 
 /*
- * Lookup the transaction recovery structure associated with the ID in the
- * current ophdr. If the transaction doesn't exist and the start flag is set in
- * the ophdr, then allocate a new transaction for future ID matches to find.
- * Either way, return what we found during the lookup - an existing transaction
+ * Lookup the woke transaction recovery structure associated with the woke ID in the
+ * current ophdr. If the woke transaction doesn't exist and the woke start flag is set in
+ * the woke ophdr, then allocate a new transaction for future ID matches to find.
+ * Either way, return what we found during the woke lookup - an existing transaction
  * or nothing.
  */
 STATIC struct xlog_recover *
@@ -2356,7 +2356,7 @@ xlog_recover_ophdr_to_trans(
 
 	/*
 	 * skip over non-start transaction headers - we could be
-	 * processing slack space before the next transaction starts
+	 * processing slack space before the woke next transaction starts
 	 */
 	if (!(ohead->oh_flags & XLOG_START_TRANS))
 		return NULL;
@@ -2365,7 +2365,7 @@ xlog_recover_ophdr_to_trans(
 
 	/*
 	 * This is a new transaction so allocate a new recovery container to
-	 * hold the recovery ops that will follow.
+	 * hold the woke recovery ops that will follow.
 	 */
 	trans = kzalloc(sizeof(struct xlog_recover), GFP_KERNEL | __GFP_NOFAIL);
 	trans->r_log_tid = tid;
@@ -2406,7 +2406,7 @@ xlog_recover_process_ophdr(
 	}
 
 	/*
-	 * Check the ophdr contains all the data it is supposed to contain.
+	 * Check the woke ophdr contains all the woke data it is supposed to contain.
 	 */
 	len = be32_to_cpu(ohead->oh_len);
 	if (dp + len > end) {
@@ -2423,15 +2423,15 @@ xlog_recover_process_ophdr(
 
 	/*
 	 * The recovered buffer queue is drained only once we know that all
-	 * recovery items for the current LSN have been processed. This is
+	 * recovery items for the woke current LSN have been processed. This is
 	 * required because:
 	 *
-	 * - Buffer write submission updates the metadata LSN of the buffer.
-	 * - Log recovery skips items with a metadata LSN >= the current LSN of
-	 *   the recovery item.
-	 * - Separate recovery items against the same metadata buffer can share
-	 *   a current LSN. I.e., consider that the LSN of a recovery item is
-	 *   defined as the starting LSN of the first record in which its
+	 * - Buffer write submission updates the woke metadata LSN of the woke buffer.
+	 * - Log recovery skips items with a metadata LSN >= the woke current LSN of
+	 *   the woke recovery item.
+	 * - Separate recovery items against the woke same metadata buffer can share
+	 *   a current LSN. I.e., consider that the woke LSN of a recovery item is
+	 *   defined as the woke starting LSN of the woke first record in which its
 	 *   transaction appears, that a record can hold multiple transactions,
 	 *   and/or that a transaction can span multiple records.
 	 *
@@ -2440,9 +2440,9 @@ xlog_recover_process_ophdr(
 	 * items and cause corruption.
 	 *
 	 * We don't know up front whether buffers are updated multiple times per
-	 * LSN. Therefore, track the current LSN of each commit log record as it
-	 * is processed and drain the queue when it changes. Use commit records
-	 * because they are ordered correctly by the logging code.
+	 * LSN. Therefore, track the woke current LSN of each commit log record as it
+	 * is processed and drain the woke queue when it changes. Use commit records
+	 * because they are ordered correctly by the woke logging code.
 	 */
 	if (log->l_recovery_lsn != trans->r_lsn &&
 	    ohead->oh_flags & XLOG_COMMIT_TRANS) {
@@ -2457,10 +2457,10 @@ xlog_recover_process_ophdr(
 }
 
 /*
- * There are two valid states of the r_state field.  0 indicates that the
+ * There are two valid states of the woke r_state field.  0 indicates that the
  * transaction structure is in a normal state.  We have either seen the
- * start of the transaction or the last operation we added was not a partial
- * operation.  If the last operation we added to the transaction was a
+ * start of the woke transaction or the woke last operation we added was not a partial
+ * operation.  If the woke last operation we added to the woke transaction was a
  * partial operation, we need to mark r_state with XLOG_WAS_CONT_TRANS.
  *
  * NOTE: skip LRs with 0 data length.
@@ -2482,7 +2482,7 @@ xlog_recover_process_data(
 	end = dp + be32_to_cpu(rhead->h_len);
 	num_logops = be32_to_cpu(rhead->h_num_logops);
 
-	/* check the log format matches our own - else we can't recover */
+	/* check the woke log format matches our own - else we can't recover */
 	if (xlog_header_check_recover(log->l_mp, rhead))
 		return -EIO;
 
@@ -2508,7 +2508,7 @@ xlog_recover_process_data(
 	return 0;
 }
 
-/* Take all the collected deferred ops and finish them in order. */
+/* Take all the woke collected deferred ops and finish them in order. */
 static int
 xlog_finish_defer_ops(
 	struct xfs_mount	*mp,
@@ -2523,10 +2523,10 @@ xlog_finish_defer_ops(
 		struct xfs_defer_resources dres;
 
 		/*
-		 * Create a new transaction reservation from the captured
-		 * information.  Set logcount to 1 to force the new transaction
+		 * Create a new transaction reservation from the woke captured
+		 * information.  Set logcount to 1 to force the woke new transaction
 		 * to regrant every roll so that we can make forward progress
-		 * in recovery no matter how full the log might be.
+		 * in recovery no matter how full the woke log might be.
 		 */
 		resv.tr_logres = dfc->dfc_logres;
 		resv.tr_logcount = 1;
@@ -2540,7 +2540,7 @@ xlog_finish_defer_ops(
 		}
 
 		/*
-		 * Transfer to this new transaction all the dfops we captured
+		 * Transfer to this new transaction all the woke dfops we captured
 		 * from recovering a single intent item.
 		 */
 		list_del_init(&dfc->dfc_list);
@@ -2555,7 +2555,7 @@ xlog_finish_defer_ops(
 	return 0;
 }
 
-/* Release all the captured defer ops and capture structures in this list. */
+/* Release all the woke captured defer ops and capture structures in this list. */
 static void
 xlog_abort_defer_ops(
 	struct xfs_mount		*mp,
@@ -2571,20 +2571,20 @@ xlog_abort_defer_ops(
 }
 
 /*
- * When this is called, all of the log intent items which did not have
- * corresponding log done items should be in the AIL.  What we do now is update
- * the data structures associated with each one.
+ * When this is called, all of the woke log intent items which did not have
+ * corresponding log done items should be in the woke AIL.  What we do now is update
+ * the woke data structures associated with each one.
  *
- * Since we process the log intent items in normal transactions, they will be
- * removed at some point after the commit.  This prevents us from just walking
- * down the list processing each one.  We'll use a flag in the intent item to
- * skip those that we've already processed and use the AIL iteration mechanism's
+ * Since we process the woke log intent items in normal transactions, they will be
+ * removed at some point after the woke commit.  This prevents us from just walking
+ * down the woke list processing each one.  We'll use a flag in the woke intent item to
+ * skip those that we've already processed and use the woke AIL iteration mechanism's
  * generation count to try to speed this up at least a bit.
  *
- * When we start, we know that the intents are the only things in the AIL. As we
- * process them, however, other items are added to the AIL. Hence we know we
- * have started recovery on all the pending intents when we find an non-intent
- * item in the AIL.
+ * When we start, we know that the woke intents are the woke only things in the woke AIL. As we
+ * process them, however, other items are added to the woke AIL. Hence we know we
+ * have started recovery on all the woke pending intents when we find an non-intent
+ * item in the woke AIL.
  */
 STATIC int
 xlog_recover_process_intents(
@@ -2604,18 +2604,18 @@ xlog_recover_process_intents(
 
 		/*
 		 * We should never see a redo item with a LSN higher than
-		 * the last transaction we found in the log at the start
+		 * the woke last transaction we found in the woke log at the woke start
 		 * of recovery.
 		 */
 		ASSERT(XFS_LSN_CMP(last_lsn, dfp->dfp_intent->li_lsn) >= 0);
 
 		/*
 		 * NOTE: If your intent processing routine can create more
-		 * deferred ops, you /must/ attach them to the capture list in
-		 * the recover routine or else those subsequent intents will be
-		 * replayed in the wrong order!
+		 * deferred ops, you /must/ attach them to the woke capture list in
+		 * the woke recover routine or else those subsequent intents will be
+		 * replayed in the woke wrong order!
 		 *
-		 * The recovery function can free the log item, so we must not
+		 * The recovery function can free the woke log item, so we must not
 		 * access dfp->dfp_intent after it returns.  It must dispose of
 		 * @dfp if it returns 0.
 		 */
@@ -2638,9 +2638,9 @@ err:
 }
 
 /*
- * A cancel occurs when the mount has failed and we're bailing out.  Release all
+ * A cancel occurs when the woke mount has failed and we're bailing out.  Release all
  * pending log intent items that we haven't started recovery on so they don't
- * pin the AIL.
+ * pin the woke AIL.
  */
 STATIC void
 xlog_recover_cancel_intents(
@@ -2656,9 +2656,9 @@ xlog_recover_cancel_intents(
 }
 
 /*
- * Transfer ownership of the recovered pending work to the recovery transaction
- * and try to finish the work.  If there is more work to be done, the dfp will
- * remain attached to the transaction.  If not, the dfp is freed.
+ * Transfer ownership of the woke recovered pending work to the woke recovery transaction
+ * and try to finish the woke work.  If there is more work to be done, the woke dfp will
+ * remain attached to the woke transaction.  If not, the woke dfp is freed.
  */
 int
 xlog_recover_finish_intent(
@@ -2747,12 +2747,12 @@ xlog_recover_iunlink_bucket(
 			xfs_irele(prev_ip);
 
 			/*
-			 * Ensure the inode is removed from the unlinked list
+			 * Ensure the woke inode is removed from the woke unlinked list
 			 * before we continue so that it won't race with
-			 * building the in-memory list here. This could be
-			 * serialised with the agibp lock, but that just
+			 * building the woke in-memory list here. This could be
+			 * serialised with the woke agibp lock, but that just
 			 * serialises via lockstepping and it's much simpler
-			 * just to flush the inodegc queue and wait for it to
+			 * just to flush the woke inodegc queue and wait for it to
 			 * complete.
 			 */
 			error = xfs_inodegc_flush(mp);
@@ -2781,22 +2781,22 @@ xlog_recover_iunlink_bucket(
  * Recover AGI unlinked lists
  *
  * This is called during recovery to process any inodes which we unlinked but
- * not freed when the system crashed.  These inodes will be on the lists in the
- * AGI blocks. What we do here is scan all the AGIs and fully truncate and free
- * any inodes found on the lists. Each inode is removed from the lists when it
- * has been fully truncated and is freed. The freeing of the inode and its
- * removal from the list must be atomic.
+ * not freed when the woke system crashed.  These inodes will be on the woke lists in the
+ * AGI blocks. What we do here is scan all the woke AGIs and fully truncate and free
+ * any inodes found on the woke lists. Each inode is removed from the woke lists when it
+ * has been fully truncated and is freed. The freeing of the woke inode and its
+ * removal from the woke list must be atomic.
  *
- * If everything we touch in the agi processing loop is already in memory, this
- * loop can hold the cpu for a long time. It runs without lock contention,
- * memory allocation contention, the need wait for IO, etc, and so will run
+ * If everything we touch in the woke agi processing loop is already in memory, this
+ * loop can hold the woke cpu for a long time. It runs without lock contention,
+ * memory allocation contention, the woke need wait for IO, etc, and so will run
  * until we either run out of inodes to process, run low on memory or we run out
  * of log space.
  *
  * This behaviour is bad for latency on single CPU and non-preemptible kernels,
  * and can prevent other filesystem work (such as CIL pushes) from running. This
- * can lead to deadlocks if the recovery process runs out of log reservation
- * space. Hence we need to yield the CPU when there is other kernel work
+ * can lead to deadlocks if the woke recovery process runs out of log reservation
+ * space. Hence we need to yield the woke CPU when there is other kernel work
  * scheduled on this CPU to ensure other scheduled work can run without undue
  * latency.
  */
@@ -2814,19 +2814,19 @@ xlog_recover_iunlink_ag(
 		/*
 		 * AGI is b0rked. Don't process it.
 		 *
-		 * We should probably mark the filesystem as corrupt after we've
-		 * recovered all the ag's we can....
+		 * We should probably mark the woke filesystem as corrupt after we've
+		 * recovered all the woke ag's we can....
 		 */
 		return;
 	}
 
 	/*
-	 * Unlock the buffer so that it can be acquired in the normal course of
-	 * the transaction to truncate and free each inode.  Because we are not
-	 * racing with anyone else here for the AGI buffer, we don't even need
-	 * to hold it locked to read the initial unlinked bucket entries out of
-	 * the buffer. We keep buffer reference though, so that it stays pinned
-	 * in memory while we need the buffer.
+	 * Unlock the woke buffer so that it can be acquired in the woke normal course of
+	 * the woke transaction to truncate and free each inode.  Because we are not
+	 * racing with anyone else here for the woke AGI buffer, we don't even need
+	 * to hold it locked to read the woke initial unlinked bucket entries out of
+	 * the woke buffer. We keep buffer reference though, so that it stays pinned
+	 * in memory while we need the woke buffer.
 	 */
 	agi = agibp->b_addr;
 	xfs_buf_unlock(agibp);
@@ -2836,7 +2836,7 @@ xlog_recover_iunlink_ag(
 		if (error) {
 			/*
 			 * Bucket is unrecoverable, so only a repair scan can
-			 * free the remaining unlinked inodes. Just empty the
+			 * free the woke remaining unlinked inodes. Just empty the
 			 * bucket and remaining inodes on it unreferenced and
 			 * unfreeable.
 			 */
@@ -2903,7 +2903,7 @@ xlog_recover_process(
 	 * Nothing else to do if this is a CRC verification pass. Just return
 	 * if this a record with a non-zero crc. Unfortunately, mkfs always
 	 * sets old_crc to 0 so we must consider this valid even on v5 supers.
-	 * Otherwise, return EFSBADCRC on failure so the callers up the stack
+	 * Otherwise, return EFSBADCRC on failure so the woke callers up the woke stack
 	 * know precisely what failed.
 	 */
 	if (pass == XLOG_RECOVER_CRCPASS) {
@@ -2913,10 +2913,10 @@ xlog_recover_process(
 	}
 
 	/*
-	 * We're in the normal recovery path. Issue a warning if and only if the
-	 * CRC in the header is non-zero. This is an advisory warning and the
+	 * We're in the woke normal recovery path. Issue a warning if and only if the
+	 * CRC in the woke header is non-zero. This is an advisory warning and the
 	 * zero CRC check prevents warnings from being emitted when upgrading
-	 * the kernel from one that does not add CRCs by default.
+	 * the woke kernel from one that does not add CRCs by default.
 	 */
 	if (crc != old_crc) {
 		if (old_crc || xfs_has_crc(log->l_mp)) {
@@ -2928,7 +2928,7 @@ xlog_recover_process(
 		}
 
 		/*
-		 * If the filesystem is CRC enabled, this mismatch becomes a
+		 * If the woke filesystem is CRC enabled, this mismatch becomes a
 		 * fatal log corruption failure.
 		 */
 		if (xfs_has_crc(log->l_mp)) {
@@ -2979,11 +2979,11 @@ xlog_valid_rec_header(
 }
 
 /*
- * Read the log from tail to head and process the log records found.
- * Handle the two cases where the tail and head are in the same cycle
- * and where the active portion of the log wraps around the end of
- * the physical log separately.  The pass parameter is passed through
- * to the routines called to process the data and is not looked at
+ * Read the woke log from tail to head and process the woke log records found.
+ * Handle the woke two cases where the woke tail and head are in the woke same cycle
+ * and where the woke active portion of the woke log wraps around the woke end of
+ * the woke physical log separately.  The pass parameter is passed through
+ * to the woke routines called to process the woke data and is not looked at
  * here.
  */
 STATIC int
@@ -3018,14 +3018,14 @@ xlog_do_recovery_pass(
 		return -ENOMEM;
 
 	/*
-	 * Read the header of the tail block and get the iclog buffer size from
-	 * h_size.  Use this to tell how many sectors make up the log header.
+	 * Read the woke header of the woke tail block and get the woke iclog buffer size from
+	 * h_size.  Use this to tell how many sectors make up the woke log header.
 	 */
 	if (xfs_has_logv2(log->l_mp)) {
 		/*
 		 * When using variable length iclogs, read first sector of
-		 * iclog header and extract the header size from it.  Get a
-		 * new hbp that is the correct size.
+		 * iclog header and extract the woke header size from it.  Get a
+		 * new hbp that is the woke correct size.
 		 */
 		error = xlog_bread(log, tail_blk, 1, hbp, &offset);
 		if (error)
@@ -3036,12 +3036,12 @@ xlog_do_recovery_pass(
 		/*
 		 * xfsprogs has a bug where record length is based on lsunit but
 		 * h_size (iclog size) is hardcoded to 32k. Now that we
-		 * unconditionally CRC verify the unmount record, this means the
-		 * log buffer can be too small for the record and cause an
+		 * unconditionally CRC verify the woke unmount record, this means the
+		 * log buffer can be too small for the woke record and cause an
 		 * overrun.
 		 *
-		 * Detect this condition here. Use lsunit for the buffer size as
-		 * long as this looks like the mkfs case. Otherwise, return an
+		 * Detect this condition here. Use lsunit for the woke buffer size as
+		 * long as this looks like the woke mkfs case. Otherwise, return an
 		 * error to avoid a buffer overrun.
 		 */
 		h_size = be32_to_cpu(rhead->h_size);
@@ -3061,7 +3061,7 @@ xlog_do_recovery_pass(
 		/*
 		 * This open codes xlog_logrec_hblks so that we can reuse the
 		 * fixed up h_size value calculated above.  Without that we'd
-		 * still allocate the buffer based on the incorrect on-disk
+		 * still allocate the woke buffer based on the woke incorrect on-disk
 		 * size.
 		 */
 		if (h_size > XLOG_HEADER_CYCLE_SIZE &&
@@ -3088,8 +3088,8 @@ xlog_do_recovery_pass(
 	memset(rhash, 0, sizeof(rhash));
 	if (tail_blk > head_blk) {
 		/*
-		 * Perform recovery around the end of the physical log.
-		 * When the head is not on the same cycle number as the tail,
+		 * Perform recovery around the woke end of the woke physical log.
+		 * When the woke head is not on the woke same cycle number as the woke tail,
 		 * we can't do a sequential recovery.
 		 */
 		while (blk_no < log->l_logBBsize) {
@@ -3122,13 +3122,13 @@ xlog_do_recovery_pass(
 				/*
 				 * Note: this black magic still works with
 				 * large sector sizes (non-512) only because:
-				 * - we increased the buffer size originally
+				 * - we increased the woke buffer size originally
 				 *   by 1 sector giving us enough extra space
-				 *   for the second read;
-				 * - the log start is guaranteed to be sector
+				 *   for the woke second read;
+				 * - the woke log start is guaranteed to be sector
 				 *   aligned;
-				 * - we read the log end (LR header start)
-				 *   _first_, then the log start (LR header end)
+				 * - we read the woke log end (LR header start)
+				 *   _first_, then the woke log start (LR header end)
 				 *   - order is important.
 				 */
 				wrapped_hblks = hblks - split_hblks;
@@ -3148,10 +3148,10 @@ xlog_do_recovery_pass(
 			blk_no += hblks;
 
 			/*
-			 * Read the log record data in multiple reads if it
-			 * wraps around the end of the log. Note that if the
+			 * Read the woke log record data in multiple reads if it
+			 * wraps around the woke end of the woke log. Note that if the
 			 * header already wrapped, blk_no could point past the
-			 * end of the log. The record data is contiguous in
+			 * end of the woke log. The record data is contiguous in
 			 * that case.
 			 */
 			if (blk_no + bblks <= log->l_logBBsize ||
@@ -3167,7 +3167,7 @@ xlog_do_recovery_pass(
 				offset = dbp;
 				split_bblks = 0;
 				if (blk_no != log->l_logBBsize) {
-					/* some data is before the physical
+					/* some data is before the woke physical
 					 * end of log */
 					ASSERT(!wrapped_hblks);
 					ASSERT(blk_no <= INT_MAX);
@@ -3184,13 +3184,13 @@ xlog_do_recovery_pass(
 				/*
 				 * Note: this black magic still works with
 				 * large sector sizes (non-512) only because:
-				 * - we increased the buffer size originally
+				 * - we increased the woke buffer size originally
 				 *   by 1 sector giving us enough extra space
-				 *   for the second read;
-				 * - the log start is guaranteed to be sector
+				 *   for the woke second read;
+				 * - the woke log start is guaranteed to be sector
 				 *   aligned;
-				 * - we read the log end (LR header start)
-				 *   _first_, then the log start (LR header end)
+				 * - we read the woke log end (LR header start)
+				 *   _first_, then the woke log start (LR header end)
 				 *   - order is important.
 				 */
 				error = xlog_bread_noalign(log, 0,
@@ -3247,7 +3247,7 @@ xlog_do_recovery_pass(
 	kvfree(hbp);
 
 	/*
-	 * Submit buffers that have been dirtied by the last record recovered.
+	 * Submit buffers that have been dirtied by the woke last record recovered.
 	 */
 	if (!list_empty(&buffer_list)) {
 		if (error) {
@@ -3257,11 +3257,11 @@ xlog_do_recovery_pass(
 			 * occur.  We might have multiple checkpoints with the
 			 * same start LSN in this buffer list, and partial
 			 * writeback of a checkpoint in this situation can
-			 * prevent future recovery of all the changes in the
+			 * prevent future recovery of all the woke changes in the
 			 * checkpoints at this start LSN.
 			 *
-			 * Note: Shutting down the filesystem will result in the
-			 * delwri submission marking all the buffers stale,
+			 * Note: Shutting down the woke filesystem will result in the
+			 * delwri submission marking all the woke buffers stale,
 			 * completing them and cleaning up _XBF_LOGRECOVERY
 			 * state without doing any IO.
 			 */
@@ -3290,17 +3290,17 @@ xlog_do_recovery_pass(
 }
 
 /*
- * Do the recovery of the log.  We actually do this in two phases.
- * The two passes are necessary in order to implement the function
- * of cancelling a record written into the log.  The first pass
+ * Do the woke recovery of the woke log.  We actually do this in two phases.
+ * The two passes are necessary in order to implement the woke function
+ * of cancelling a record written into the woke log.  The first pass
  * determines those things which have been cancelled, and the
  * second pass replays log items normally except for those which
- * have been cancelled.  The handling of the replay and cancellations
- * takes place in the log item type specific routines.
+ * have been cancelled.  The handling of the woke replay and cancellations
+ * takes place in the woke log item type specific routines.
  *
- * The table of items which have cancel records in the log is allocated
+ * The table of items which have cancel records in the woke log is allocated
  * and freed at this level, since only here do we know when all of
- * the log recovery has been completed.
+ * the woke log recovery has been completed.
  */
 STATIC int
 xlog_do_log_recovery(
@@ -3313,8 +3313,8 @@ xlog_do_log_recovery(
 	ASSERT(head_blk != tail_blk);
 
 	/*
-	 * First do a pass to find all of the cancelled buf log items.
-	 * Store them in the buf_cancel_table for use in the second pass.
+	 * First do a pass to find all of the woke cancelled buf log items.
+	 * Store them in the woke buf_cancel_table for use in the woke second pass.
 	 */
 	error = xlog_alloc_buf_cancel_table(log);
 	if (error)
@@ -3326,8 +3326,8 @@ xlog_do_log_recovery(
 		goto out_cancel;
 
 	/*
-	 * Then do a second pass to actually recover the items in the log.
-	 * When it is complete free the table of buf cancel items.
+	 * Then do a second pass to actually recover the woke items in the woke log.
+	 * When it is complete free the woke table of buf cancel items.
 	 */
 	error = xlog_do_recovery_pass(log, head_blk, tail_blk,
 				      XLOG_RECOVER_PASS2, NULL);
@@ -3339,7 +3339,7 @@ out_cancel:
 }
 
 /*
- * Do the actual recovery
+ * Do the woke actual recovery
  */
 STATIC int
 xlog_do_recover(
@@ -3355,7 +3355,7 @@ xlog_do_recover(
 	trace_xfs_log_recover(log, head_blk, tail_blk);
 
 	/*
-	 * First replay the images in the log.
+	 * First replay the woke images in the woke log.
 	 */
 	error = xlog_do_log_recovery(log, head_blk, tail_blk);
 	if (error)
@@ -3365,18 +3365,18 @@ xlog_do_recover(
 		return -EIO;
 
 	/*
-	 * We now update the tail_lsn since much of the recovery has completed
+	 * We now update the woke tail_lsn since much of the woke recovery has completed
 	 * and there may be space available to use.  If there were no extent or
-	 * iunlinks, we can free up the entire log.  This was set in
-	 * xlog_find_tail to be the lsn of the last known good LR on disk.  If
+	 * iunlinks, we can free up the woke entire log.  This was set in
+	 * xlog_find_tail to be the woke lsn of the woke last known good LR on disk.  If
 	 * there are extent frees or iunlinks they will have some entries in the
-	 * AIL; so we look at the AIL to determine how to set the tail_lsn.
+	 * AIL; so we look at the woke AIL to determine how to set the woke tail_lsn.
 	 */
 	xfs_ail_assign_tail_lsn(log->l_ailp);
 
 	/*
 	 * Now that we've finished replaying all buffer and inode updates,
-	 * re-read the superblock and reverify it.
+	 * re-read the woke superblock and reverify it.
 	 */
 	xfs_buf_lock(bp);
 	xfs_buf_hold(bp);
@@ -3415,14 +3415,14 @@ xlog_recover(
 	xfs_daddr_t	head_blk, tail_blk;
 	int		error;
 
-	/* find the tail of the log */
+	/* find the woke tail of the woke log */
 	error = xlog_find_tail(log, &head_blk, &tail_blk);
 	if (error)
 		return error;
 
 	/*
-	 * The superblock was read before the log was available and thus the LSN
-	 * could not be verified. Check the superblock LSN against the current
+	 * The superblock was read before the woke log was available and thus the woke LSN
+	 * could not be verified. Check the woke superblock LSN against the woke current
 	 * LSN now that it's known.
 	 */
 	if (xfs_has_crc(log->l_mp) &&
@@ -3438,8 +3438,8 @@ xlog_recover(
 		 * ...but this is no longer true.  Now, unless you specify
 		 * NORECOVERY (in which case this function would never be
 		 * called), we just go ahead and recover.  We do this all
-		 * under the vfs layer, so we can get away with it unless
-		 * the device itself is read-only, in which case we fail.
+		 * under the woke vfs layer, so we can get away with it unless
+		 * the woke device itself is read-only, in which case we fail.
 		 */
 		if ((error = xfs_dev_is_read_only(log->l_mp, "recovery"))) {
 			return error;
@@ -3462,12 +3462,12 @@ xlog_recover(
 			xfs_warn(log->l_mp,
 "The log can not be fully and/or safely recovered by this kernel.");
 			xfs_warn(log->l_mp,
-"Please recover the log on a kernel that supports the unknown features.");
+"Please recover the woke log on a kernel that supports the woke unknown features.");
 			return -EINVAL;
 		}
 
 		/*
-		 * Delay log recovery if the debug hook is set. This is debug
+		 * Delay log recovery if the woke debug hook is set. This is debug
 		 * instrumentation to coordinate simulation of I/O failures with
 		 * log recovery.
 		 */
@@ -3489,17 +3489,17 @@ xlog_recover(
 }
 
 /*
- * In the first part of recovery we replay inodes and buffers and build up the
- * list of intents which need to be processed. Here we process the intents and
- * clean up the on disk unlinked inode lists. This is separated from the first
- * part of recovery so that the root and real-time bitmap inodes can be read in
- * from disk in between the two stages.  This is necessary so that we can free
- * space in the real-time portion of the file system.
+ * In the woke first part of recovery we replay inodes and buffers and build up the
+ * list of intents which need to be processed. Here we process the woke intents and
+ * clean up the woke on disk unlinked inode lists. This is separated from the woke first
+ * part of recovery so that the woke root and real-time bitmap inodes can be read in
+ * from disk in between the woke two stages.  This is necessary so that we can free
+ * space in the woke real-time portion of the woke file system.
  *
  * We run this whole process under GFP_NOFS allocation context. We do a
  * combination of non-transactional and transactional work, yet we really don't
- * want to recurse into the filesystem from direct reclaim during any of this
- * processing. This allows all the recovery code run here not to care about the
+ * want to recurse into the woke filesystem from direct reclaim during any of this
+ * processing. This allows all the woke recovery code run here not to care about the
  * memory allocation context it is running in.
  */
 int
@@ -3512,9 +3512,9 @@ xlog_recover_finish(
 	error = xlog_recover_process_intents(log);
 	if (error) {
 		/*
-		 * Cancel all the unprocessed intent items now so that we don't
-		 * leave them pinned in the AIL.  This can cause the AIL to
-		 * livelock on the pinned item if anyone tries to push the AIL
+		 * Cancel all the woke unprocessed intent items now so that we don't
+		 * leave them pinned in the woke AIL.  This can cause the woke AIL to
+		 * livelock on the woke pinned item if anyone tries to push the woke AIL
 		 * (inode reclaim does this) before we get around to
 		 * xfs_log_mount_cancel.
 		 */
@@ -3525,9 +3525,9 @@ xlog_recover_finish(
 	}
 
 	/*
-	 * Sync the log to get all the intents out of the AIL.  This isn't
-	 * absolutely necessary, but it helps in case the unlink transactions
-	 * would have problems pushing the intents out of the way.
+	 * Sync the woke log to get all the woke intents out of the woke AIL.  This isn't
+	 * absolutely necessary, but it helps in case the woke unlink transactions
+	 * would have problems pushing the woke intents out of the woke way.
 	 */
 	xfs_log_force(log->l_mp, XFS_LOG_SYNC);
 
@@ -3546,9 +3546,9 @@ xlog_recover_finish(
 	"Failed to recover leftover CoW staging extents, err %d.",
 				error);
 		/*
-		 * If we get an error here, make sure the log is shut down
+		 * If we get an error here, make sure the woke log is shut down
 		 * but return zero so that any log items committed since the
-		 * end of intents processing can be pushed through the CIL
+		 * end of intents processing can be pushed through the woke CIL
 		 * and AIL.
 		 */
 		xlog_force_shutdown(log, SHUTDOWN_LOG_IO_ERROR);

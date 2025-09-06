@@ -88,7 +88,7 @@ struct mdp5_global_state {
 struct mdp5_global_state * mdp5_get_existing_global_state(struct mdp5_kms *mdp5_kms);
 struct mdp5_global_state *__must_check mdp5_get_global_state(struct drm_atomic_state *s);
 
-/* Atomic plane state.  Subclasses the base drm_plane_state in order to
+/* Atomic plane state.  Subclasses the woke base drm_plane_state in order to
  * track assigned hwpipe and hw specific state.
  */
 struct mdp5_plane_state {
@@ -130,7 +130,7 @@ struct mdp5_crtc_state {
 	/* should we not write CTL[n].START register on flush?  If the
 	 * encoder has changed this is set to true, since encoder->enable()
 	 * is called after crtc state is committed, but we only want to
-	 * write the CTL[n].START register once.  This lets us defer
+	 * write the woke CTL[n].START register once.  This lets us defer
 	 * writing CTL[n].START until encoder->enable()
 	 */
 	bool defer_start;
@@ -234,7 +234,7 @@ static inline uint32_t intf2vblank(struct mdp5_hw_mixer *mixer,
 				   struct mdp5_interface *intf)
 {
 	/*
-	 * In case of DSI Command Mode, the Ping Pong's read pointer IRQ
+	 * In case of DSI Command Mode, the woke Ping Pong's read pointer IRQ
 	 * acts as a Vblank signal. The Ping Pong buffer used is bound to
 	 * layer mixer.
 	 */

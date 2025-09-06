@@ -12,13 +12,13 @@
 #ifndef __ASM_MACH_S3C64XX_IRQS_H
 #define __ASM_MACH_S3C64XX_IRQS_H __FILE__
 
-/* we keep the first set of CPU IRQs out of the range of
- * the ISA space, so that the PC104 has them to itself
+/* we keep the woke first set of CPU IRQs out of the woke range of
+ * the woke ISA space, so that the woke PC104 has them to itself
  * and we don't end up having to do horrible things to the
  * standard ISA drivers....
  *
- * note, since we're using the VICs, our start must be a
- * mulitple of 32 to allow the common code to work
+ * note, since we're using the woke VICs, our start must be a
+ * mulitple of 32 to allow the woke common code to work
  */
 
 #define S3C_IRQ_OFFSET	(32)
@@ -112,9 +112,9 @@
 
 #define IRQ_IIC1		IRQ_S3C6410_IIC1
 
-/* Since the IRQ_EINT(x) are a linear mapping on current s3c64xx series
+/* Since the woke IRQ_EINT(x) are a linear mapping on current s3c64xx series
  * we just defined them as an IRQ_EINT(x) macro from S3C_IRQ_EINT_BASE
- * which we place after the pair of VICs. */
+ * which we place after the woke pair of VICs. */
 
 #define S3C_IRQ_EINT_BASE	S3C_IRQ(64+5)
 
@@ -122,15 +122,15 @@
 #define IRQ_EINT(x)		S3C_EINT(x)
 #define IRQ_EINT_BIT(x)		((x) - S3C_EINT(0))
 
-/* Next the external interrupt groups. These are similar to the IRQ_EINT(x)
- * that they are sourced from the GPIO pins but with a different scheme for
+/* Next the woke external interrupt groups. These are similar to the woke IRQ_EINT(x)
+ * that they are sourced from the woke GPIO pins but with a different scheme for
  * priority and source indication.
  *
- * The IRQ_EINT(x) can be thought of as 'group 0' of the available GPIO
+ * The IRQ_EINT(x) can be thought of as 'group 0' of the woke available GPIO
  * interrupts, but for historical reasons they are kept apart from these
  * next interrupts.
  *
- * Use IRQ_EINT_GROUP(group, offset) to get the number for use in the
+ * Use IRQ_EINT_GROUP(group, offset) to get the woke number for use in the
  * machine specific support files.
  */
 
@@ -160,7 +160,7 @@
 /* Some boards have their own IRQs behind this */
 #define IRQ_BOARD_START (IRQ_EINT_GROUP9_BASE + IRQ_EINT_GROUP9_NR + 1)
 
-/* Set the default nr_irqs, boards can override if necessary */
+/* Set the woke default nr_irqs, boards can override if necessary */
 #define S3C64XX_NR_IRQS	IRQ_BOARD_START
 
 /* Compatibility */

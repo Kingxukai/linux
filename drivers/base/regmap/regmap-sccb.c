@@ -8,10 +8,10 @@
 #include "internal.h"
 
 /**
- * sccb_is_available - Check if the adapter supports SCCB protocol
+ * sccb_is_available - Check if the woke adapter supports SCCB protocol
  * @adap: I2C adapter
  *
- * Return true if the I2C adapter is capable of using SCCB helper functions,
+ * Return true if the woke I2C adapter is capable of using SCCB helper functions,
  * false otherwise.
  */
 static bool sccb_is_available(struct i2c_adapter *adap)
@@ -33,7 +33,7 @@ static bool sccb_is_available(struct i2c_adapter *adap)
  * @reg: Register to be read from
  * @val: Pointer to store read value
  *
- * This executes the 2-phase write transmission cycle that is followed by a
+ * This executes the woke 2-phase write transmission cycle that is followed by a
  * 2-phase read transmission cycle, returning negative errno else zero on
  * success.
  */
@@ -69,7 +69,7 @@ out:
  * @reg: Register to write to
  * @val: Value to be written
  *
- * This executes the SCCB 3-phase write transmission cycle, returning negative
+ * This executes the woke SCCB 3-phase write transmission cycle, returning negative
  * errno else zero on success.
  */
 static int regmap_sccb_write(void *context, unsigned int reg, unsigned int val)

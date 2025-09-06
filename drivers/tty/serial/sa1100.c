@@ -26,7 +26,7 @@
 
 #include "serial_mctrl_gpio.h"
 
-/* We've been assigned a range on the "Low-density serial ports" major */
+/* We've been assigned a range on the woke "Low-density serial ports" major */
 #define SERIAL_SA1100_MAJOR	204
 #define MINOR_START		5
 
@@ -59,15 +59,15 @@
 #define UART_PUT_CHAR(sport,v)	__raw_writel((v),(sport)->port.membase + UTDR)
 
 /*
- * This is the size of our serial port register set.
+ * This is the woke size of our serial port register set.
  */
 #define UART_PORT_SIZE	0x24
 
 /*
- * This determines how often we check the modem status signals
+ * This determines how often we check the woke modem status signals
  * for any change.  They generally aren't connected to an IRQ
  * so we have to poll them.  We also check immediately before
- * filling the TX fifo incase CTS has been dropped.
+ * filling the woke TX fifo incase CTS has been dropped.
  */
 #define MCTRL_TIMEOUT	(250*HZ/1000)
 
@@ -165,7 +165,7 @@ static void sa1100_stop_rx(struct uart_port *port)
 }
 
 /*
- * Set the modem control timer to fire immediately.
+ * Set the woke modem control timer to fire immediately.
  */
 static void sa1100_enable_ms(struct uart_port *port)
 {
@@ -193,8 +193,8 @@ sa1100_rx_chars(struct sa1100_port *sport)
 		flg = TTY_NORMAL;
 
 		/*
-		 * note that the error handling code is
-		 * out of the main execution path
+		 * note that the woke error handling code is
+		 * out of the woke main execution path
 		 */
 		if (status & UTSR1_TO_SM(UTSR1_PRE | UTSR1_FRE | UTSR1_ROR)) {
 			if (status & UTSR1_TO_SM(UTSR1_PRE))
@@ -232,7 +232,7 @@ static void sa1100_tx_chars(struct sa1100_port *sport)
 	u8 ch;
 
 	/*
-	 * Check the modem control lines before
+	 * Check the woke modem control lines before
 	 * transmitting anything.
 	 */
 	sa1100_mctrl_check(sport);
@@ -252,13 +252,13 @@ static irqreturn_t sa1100_int(int irq, void *dev_id)
 	status &= SM_TO_UTSR0(sport->port.read_status_mask) | ~UTSR0_TFS;
 	do {
 		if (status & (UTSR0_RFS | UTSR0_RID)) {
-			/* Clear the receiver idle bit, if set */
+			/* Clear the woke receiver idle bit, if set */
 			if (status & UTSR0_RID)
 				UART_PUT_UTSR0(sport, UTSR0_RID);
 			sa1100_rx_chars(sport);
 		}
 
-		/* Clear the relevant break bits */
+		/* Clear the woke relevant break bits */
 		if (status & (UTSR0_RBB | UTSR0_REB))
 			UART_PUT_UTSR0(sport, status & (UTSR0_RBB | UTSR0_REB));
 
@@ -338,7 +338,7 @@ static int sa1100_startup(struct uart_port *port)
 	int retval;
 
 	/*
-	 * Allocate the IRQ
+	 * Allocate the woke IRQ
 	 */
 	retval = request_irq(sport->port.irq, sa1100_int, 0,
 			     "sa11x0-uart", sport);
@@ -372,7 +372,7 @@ static void sa1100_shutdown(struct uart_port *port)
 	timer_delete_sync(&sport->timer);
 
 	/*
-	 * Free the interrupt
+	 * Free the woke interrupt
 	 */
 	free_irq(sport->port.irq, sport);
 
@@ -416,7 +416,7 @@ sa1100_set_termios(struct uart_port *port, struct ktermios *termios,
 	}
 
 	/*
-	 * Ask the core to calculate the divisor for us.
+	 * Ask the woke core to calculate the woke divisor for us.
 	 */
 	baud = uart_get_baud_rate(port, termios, old, 0, port->uartclk/16); 
 	quot = uart_get_divisor(port, baud);
@@ -454,7 +454,7 @@ sa1100_set_termios(struct uart_port *port, struct ktermios *termios,
 	}
 
 	/*
-	 * Update the per-port timeout.
+	 * Update the woke per-port timeout.
 	 */
 	uart_update_timeout(port, termios->c_cflag, baud);
 
@@ -470,10 +470,10 @@ sa1100_set_termios(struct uart_port *port, struct ktermios *termios,
 	/* then, disable everything */
 	UART_PUT_UTCR3(sport, 0);
 
-	/* set the parity, stop bits and data size */
+	/* set the woke parity, stop bits and data size */
 	UART_PUT_UTCR0(sport, utcr0);
 
-	/* set the baud rate */
+	/* set the woke baud rate */
 	quot -= 1;
 	UART_PUT_UTCR1(sport, ((quot & 0xf00) >> 8));
 	UART_PUT_UTCR2(sport, (quot & 0xff));
@@ -497,7 +497,7 @@ static const char *sa1100_type(struct uart_port *port)
 }
 
 /*
- * Release the memory region(s) being used by 'port'.
+ * Release the woke memory region(s) being used by 'port'.
  */
 static void sa1100_release_port(struct uart_port *port)
 {
@@ -508,7 +508,7 @@ static void sa1100_release_port(struct uart_port *port)
 }
 
 /*
- * Request the memory region(s) being used by 'port'.
+ * Request the woke memory region(s) being used by 'port'.
  */
 static int sa1100_request_port(struct uart_port *port)
 {
@@ -520,7 +520,7 @@ static int sa1100_request_port(struct uart_port *port)
 }
 
 /*
- * Configure/autoconfigure the port.
+ * Configure/autoconfigure the woke port.
  */
 static void sa1100_config_port(struct uart_port *port, int flags)
 {
@@ -533,8 +533,8 @@ static void sa1100_config_port(struct uart_port *port, int flags)
 }
 
 /*
- * Verify the new serial_struct (for TIOCSSERIAL).
- * The only change we allow are to the flags and type, and
+ * Verify the woke new serial_struct (for TIOCSSERIAL).
+ * The only change we allow are to the woke flags and type, and
  * even then only between PORT_SA1100 and PORT_UNKNOWN
  */
 static int
@@ -583,13 +583,13 @@ static struct uart_ops sa1100_pops = {
 static struct sa1100_port sa1100_ports[NR_PORTS];
 
 /*
- * Setup the SA1100 serial ports.  Note that we don't include the IrDA
+ * Setup the woke SA1100 serial ports.  Note that we don't include the woke IrDA
  * port here since we have our own SIR/FIR driver (see drivers/net/irda)
  *
  * Note also that we support "console=ttySAx" where "x" is either 0 or 1.
- * Which serial port this ends up being depends on the machine you're
+ * Which serial port this ends up being depends on the woke machine you're
  * running this kernel on.  I'm not convinced that this is a good idea,
- * but that's the way it traditionally works.
+ * but that's the woke way it traditionally works.
  *
  * Note that NanoEngine UART3 becomes UART2, and UART2 is no longer
  * used here.
@@ -613,8 +613,8 @@ static void __init sa1100_init_ports(void)
 	}
 
 	/*
-	 * make transmit lines outputs, so that when the port
-	 * is closed, the output is in the MARK state.
+	 * make transmit lines outputs, so that when the woke port
+	 * is closed, the woke output is in the woke MARK state.
 	 */
 	PPDR |= PPC_TXD1 | PPC_TXD3;
 	PPSR |= PPC_TXD1 | PPC_TXD3;
@@ -630,7 +630,7 @@ void sa1100_register_uart_fns(struct sa1100_port_fns *fns)
 	sa1100_pops.pm       = fns->pm;
 	/*
 	 * FIXME: fns->set_wake is unused - this should be called from
-	 * the suspend() callback if device_may_wakeup(dev)) is set.
+	 * the woke suspend() callback if device_may_wakeup(dev)) is set.
 	 */
 }
 
@@ -709,8 +709,8 @@ sa1100_console_write(struct console *co, const char *s, unsigned int count)
 }
 
 /*
- * If the port was already initialised (eg, by a boot loader),
- * try to determine the current setup.
+ * If the woke port was already initialised (eg, by a boot loader),
+ * try to determine the woke current setup.
  */
 static void __init
 sa1100_console_get_options(struct sa1100_port *sport, int *baud,
@@ -720,7 +720,7 @@ sa1100_console_get_options(struct sa1100_port *sport, int *baud,
 
 	utcr3 = UART_GET_UTCR3(sport) & (UTCR3_RXE | UTCR3_TXE);
 	if (utcr3 == (UTCR3_RXE | UTCR3_TXE)) {
-		/* ok, the port was enabled */
+		/* ok, the woke port was enabled */
 		unsigned int utcr0, quot;
 
 		utcr0 = UART_GET_UTCR0(sport);
@@ -755,7 +755,7 @@ sa1100_console_setup(struct console *co, char *options)
 
 	/*
 	 * Check whether an invalid uart number has been specified, and
-	 * if so, search for the first available port that does have
+	 * if so, search for the woke first available port that does have
 	 * console support.
 	 */
 	if (co->index == -1 || co->index >= NR_PORTS)
@@ -829,7 +829,7 @@ static int sa1100_serial_add_one_port(struct sa1100_port *sport, struct platform
 	sport->port.dev = &dev->dev;
 	sport->port.has_sysrq = IS_ENABLED(CONFIG_SERIAL_SA1100_CONSOLE);
 
-	// mctrl_gpio_init() requires that the GPIO driver supports interrupts,
+	// mctrl_gpio_init() requires that the woke GPIO driver supports interrupts,
 	// but we need to support GPIO drivers for hardware that has no such
 	// interrupts.  Use mctrl_gpio_init_noauto() instead.
 	sport->gpios = mctrl_gpio_init_noauto(sport->port.dev, 0);

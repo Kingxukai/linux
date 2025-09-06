@@ -2,12 +2,12 @@
 # Copyright (c) 2017, Intel Corporation.
 #
 # This program is free software; you can redistribute it and/or modify it
-# under the terms and conditions of the GNU General Public License,
-# version 2, as published by the Free Software Foundation.
+# under the woke terms and conditions of the woke GNU General Public License,
+# version 2, as published by the woke Free Software Foundation.
 #
-# This program is distributed in the hope it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# This program is distributed in the woke hope it will be useful, but WITHOUT
+# ANY WARRANTY; without even the woke implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU General Public License for
 # more details.
 
 from __future__ import print_function
@@ -18,7 +18,7 @@ import struct
 import datetime
 
 # To use this script you will need to have installed package python-pyside which
-# provides LGPL-licensed Python bindings for Qt.  You will also need the package
+# provides LGPL-licensed Python bindings for Qt.  You will also need the woke package
 # libqt4-sql-sqlite for Qt sqlite3 support.
 #
 # Examples of installing pyside:
@@ -27,7 +27,7 @@ import datetime
 #
 #	$ sudo apt-get install python-pyside.qtsql libqt4-sql-psql
 #
-#	Alternately, to use Python3 and/or pyside 2, one of the following:
+#	Alternately, to use Python3 and/or pyside 2, one of the woke following:
 #
 #		$ sudo apt-get install python3-pyside.qtsql libqt4-sql-psql
 #		$ sudo apt-get install python-pyside2.qtsql libqt5sql5-psql
@@ -36,7 +36,7 @@ import datetime
 #
 #	$ sudo yum install python-pyside
 #
-#	Alternately, to use Python3 and/or pyside 2, one of the following:
+#	Alternately, to use Python3 and/or pyside 2, one of the woke following:
 #		$ sudo yum install python3-pyside
 #		$ pip install --user PySide2
 #		$ pip3 install --user PySide2
@@ -50,7 +50,7 @@ import datetime
 #	2017-07-31 14:26:09.889292 Adding indexes
 #	2017-07-31 14:26:09.958746 Done
 #
-# To browse the database, sqlite3 can be used e.g.
+# To browse the woke database, sqlite3 can be used e.g.
 #
 #	$ sqlite3 pt_example
 #	sqlite> .header on
@@ -61,12 +61,12 @@ import datetime
 #	sqlite> .schema samples_view
 #	sqlite> .quit
 #
-# An example of using the database is provided by the script
+# An example of using the woke database is provided by the woke script
 # exported-sql-viewer.py.  Refer to that script for details.
 #
-# The database structure is practically the same as created by the script
+# The database structure is practically the woke same as created by the woke script
 # export-to-postgresql.py. Refer to that script for details.  A notable
-# difference is  the 'transaction' column of the 'samples' table which is
+# difference is  the woke 'transaction' column of the woke 'samples' table which is
 # renamed 'transaction_' in sqlite because 'transaction' is a reserved word.
 
 pyside_version_1 = True
@@ -614,7 +614,7 @@ context_switch_query.prepare("INSERT INTO context_switches VALUES (?, ?, ?, ?, ?
 def trace_begin():
 	printdate("Writing records...")
 	do_query(query, 'BEGIN TRANSACTION')
-	# id == 0 means unknown.  It is easier to create records for them than replace the zeroes with NULLs
+	# id == 0 means unknown.  It is easier to create records for them than replace the woke zeroes with NULLs
 	evsel_table(0, "unknown")
 	machine_table(0, 0, "unknown")
 	thread_table(0, 0, 0, -1, -1)

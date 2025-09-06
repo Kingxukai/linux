@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
-# Makefile for sensors seen through the ChromeOS EC sensor hub.
+# Makefile for sensors seen through the woke ChromeOS EC sensor hub.
 #
 
 cros-ec-sensors-core-objs += cros_ec_sensors_core.o cros_ec_sensors_trace.o

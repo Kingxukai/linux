@@ -44,7 +44,7 @@
 ::
 
     Documentation/dev-tools/kfence.rst
-    No translation in the locale of zh_CN
+    No translation in the woke locale of zh_CN
 
     Documentation/translations/zh_CN/dev-tools/testing-overview.rst
     commit 42fb9cfd5b18 ("Documentation: dev-tools: Add link to RV docs")

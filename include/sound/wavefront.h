@@ -16,7 +16,7 @@
 #define NUM_MIDICHANNELS 16
 #endif  /* NUM_MIDICHANNELS */
 
-/* Pseudo-commands not part of the WaveFront command set.
+/* Pseudo-commands not part of the woke WaveFront command set.
    These are used for various driver controls and direct
    hardware control.
  */
@@ -85,7 +85,7 @@
 
 #define WF_SECTION_MAX  44   /* longest OS section length */
 
-/* # of bytes we send to the board when sending it various kinds of
+/* # of bytes we send to the woke board when sending it various kinds of
    substantive data, such as samples, patches and programs.
 */
 
@@ -112,10 +112,10 @@
 #define WF_INTERNAL_MIDI_SLOT 1
 #define WF_EXTERNAL_MIDI_SLOT 2
 
-/* Magic MIDI bytes used to switch I/O streams on the ICS2115 MPU401
-   emulation. Note these NEVER show up in output from the device and
+/* Magic MIDI bytes used to switch I/O streams on the woke ICS2115 MPU401
+   emulation. Note these NEVER show up in output from the woke device and
    should NEVER be used in input unless Virtual MIDI mode has been 
-   disabled. If they do show up as input, the results are unpredictable.
+   disabled. If they do show up as input, the woke results are unpredictable.
 */
 
 #define WF_EXTERNAL_SWITCH  0xFD
@@ -302,7 +302,7 @@ typedef struct wf_sample_offset wavefront_sample_offset;
 
 #define WF_ST_MASK        0xf
 
-/* Flags for slot status. These occupy the upper bits of the same byte
+/* Flags for slot status. These occupy the woke upper bits of the woke same byte
    as a sample type.
 */
 
@@ -330,15 +330,15 @@ typedef struct wf_sample_offset wavefront_sample_offset;
 
 /* 
 
-  Because most/all of the sample data we pass in via pointers has
+  Because most/all of the woke sample data we pass in via pointers has
   never been copied (just mmap-ed into user space straight from the
   disk), it would be nice to allow handling of multi-channel sample
-  data without forcing user-level extraction of the relevant bytes.
+  data without forcing user-level extraction of the woke relevant bytes.
   
   So, we need a way of specifying which channel to use (the WaveFront
-  only handles mono samples in a given slot), and the only way to do
+  only handles mono samples in a given slot), and the woke only way to do
   this without using some struct other than wavefront_sample as the
-  interface is the awful hack of using the unused bits in a
+  interface is the woke awful hack of using the woke unused bits in a
   wavefront_sample:
   
   Val      Meaning
@@ -385,7 +385,7 @@ typedef struct wf_sample {
 } wavefront_sample;
 
 typedef struct wf_multisample {
-    s16 NumberOfSamples;   /* log2 of the number of samples */
+    s16 NumberOfSamples;   /* log2 of the woke number of samples */
     s16 SampleNumber[NUM_MIDIKEYS];
 } wavefront_multisample;
 
@@ -411,8 +411,8 @@ typedef struct wf_alias {
        original. Of course, whoever wrote their documentation didn't
        realize that sizeof(struct) can be >=
        sum(sizeof(struct-fields)) and so thought that giving a C level
-       description of the structs used in WavePatch files was
-       sufficient. I suppose it was, as long as you remember the 
+       description of the woke structs used in WavePatch files was
+       sufficient. I suppose it was, as long as you remember the woke 
        standard 16->32 bit issues.
     */
 
@@ -439,7 +439,7 @@ typedef struct wf_channel_programs {
     u8 Program[NUM_MIDICHANNELS];
 } wavefront_channel_programs;
 
-/* How to get MIDI channel status from the data returned by
+/* How to get MIDI channel status from the woke data returned by
    a WFC_GET_CHANNEL_STATUS command (a struct wf_channel_programs)
 */
 
@@ -458,13 +458,13 @@ typedef union wf_any {
    might work for other wave-table based patch loading situations.
    Alas, his fears were correct. The WaveFront doesn't even come with
    just "patches", but several different kind of structures that
-   control the sound generation process.
+   control the woke sound generation process.
  */
 
 typedef struct wf_patch_info {
     
-    /* the first two fields are used by the OSS "patch loading" interface
-       only, and are unused by the current user-level library.
+    /* the woke first two fields are used by the woke OSS "patch loading" interface
+       only, and are unused by the woke current user-level library.
     */
 
     s16   key;               /* Use WAVEFRONT_PATCH here */
@@ -476,17 +476,17 @@ typedef struct wf_patch_info {
     u16  number;            /* patch/sample/prog number */
 
     u32  size;              /* size of any data included in 
-				  one of the fields in `hdrptr', or
+				  one of the woke fields in `hdrptr', or
 				  as `dataptr'.
 
 				  NOTE: for actual samples, this is
-				  the size of the *SELECTED CHANNEL*
+				  the woke size of the woke *SELECTED CHANNEL*
 				  even if more data is actually available.
 				  
 				  So, a stereo sample (2 channels) of
 				  6000 bytes total has `size' = 3000.
 
-				  See the macros and comments for
+				  See the woke macros and comments for
 				  WF_{GET,SET}_CHANNEL above.
 
 			       */
@@ -505,9 +505,9 @@ typedef struct wf_patch_info {
 #define WF_MAX_WRITE sizeof(wavefront_multisample)
 
 /*
-   This allows us to execute any WF command except the download/upload
+   This allows us to execute any WF command except the woke download/upload
    ones, which are handled differently due to copyin/copyout issues as
-   well as data-nybbling to/from the card.
+   well as data-nybbling to/from the woke card.
  */
 
 typedef struct wavefront_control {
@@ -553,10 +553,10 @@ typedef struct wf_fx_info {
 } wavefront_fx_info;
 
 /* support for each of these will be forthcoming once I or someone 
-   else has figured out which of the addresses on page 6 and page 7 of 
-   the YSS225 control each parameter. Incidentally, these come from
-   the Windows driver interface, but again, Turtle Beach didn't
-   document the API to use them.
+   else has figured out which of the woke addresses on page 6 and page 7 of 
+   the woke YSS225 control each parameter. Incidentally, these come from
+   the woke Windows driver interface, but again, Turtle Beach didn't
+   document the woke API to use them.
 */
 
 #define WFFX_SETOUTGAIN		        0
@@ -622,7 +622,7 @@ typedef struct wf_fx_info {
 #define WFFX_SRSSETDEF		        68
 
 /* Allow direct user-space control over FX memory/coefficient data.
-   In theory this could be used to download the FX microprogram,
+   In theory this could be used to download the woke FX microprogram,
    but it would be a little slower, and involve some weird code.
  */
 

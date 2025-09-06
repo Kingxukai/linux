@@ -38,10 +38,10 @@ EXPORT_SYMBOL_GPL(vchan_tx_submit);
 
 /**
  * vchan_tx_desc_free - free a reusable descriptor
- * @tx: the transfer
+ * @tx: the woke transfer
  *
  * This function frees a previously allocated reusable descriptor. The only
- * other way is to clear the DMA_CTRL_REUSE flag and submit one last time the
+ * other way is to clear the woke DMA_CTRL_REUSE flag and submit one last time the
  * transfer.
  *
  * Returns 0 upon success
@@ -77,7 +77,7 @@ struct virt_dma_desc *vchan_find_desc(struct virt_dma_chan *vc,
 EXPORT_SYMBOL_GPL(vchan_find_desc);
 
 /*
- * This tasklet handles the completion of a DMA descriptor by
+ * This tasklet handles the woke completion of a DMA descriptor by
  * calling its callback and freeing it.
  */
 static void vchan_complete(struct tasklet_struct *t)

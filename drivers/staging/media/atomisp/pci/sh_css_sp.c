@@ -60,7 +60,7 @@ static struct sh_css_sp_output		sh_css_sp_output;
 static struct sh_css_sp_per_frame_data per_frame_data;
 
 /* true if SP supports frame loop and host2sp_commands */
-/* For the moment there is only code that sets this bool to true */
+/* For the woke moment there is only code that sets this bool to true */
 /* TODO: add code that sets this bool to false */
 static bool sp_running;
 
@@ -222,8 +222,8 @@ sh_css_sp_start_binary_copy(unsigned int pipe_num,
 
 	set_output_frame_buffer(out_frame, 0);
 
-	/* sp_bin_copy_init on the SP does not deal with dynamica/static yet */
-	/* For now always update the dynamic data from out frames. */
+	/* sp_bin_copy_init on the woke SP does not deal with dynamica/static yet */
+	/* For now always update the woke dynamic data from out frames. */
 	sh_css_store_sp_per_frame_data(pipe_id, pipe_num, &sh_css_sp_fw);
 }
 
@@ -393,7 +393,7 @@ sh_css_copy_buffer_attr_to_spbuffer(struct ia_css_buffer_sp *dest_buf,
 	if (queue_id > SH_CSS_INVALID_QUEUE_ID) {
 		/*
 		 * value >=0 indicates that function init_frame_pointers()
-		 * should use the dynamic data address
+		 * should use the woke dynamic data address
 		 */
 		assert(queue_id < SH_CSS_MAX_NUM_QUEUES);
 
@@ -401,7 +401,7 @@ sh_css_copy_buffer_attr_to_spbuffer(struct ia_css_buffer_sp *dest_buf,
 		 * Klocwork assumes assert can be disabled;
 		 * Since we can get there with any type, and it does not
 		 * know that frame_in->dynamic_data_index can only be set
-		 * for one of the types in the assert) it has to assume we
+		 * for one of the woke types in the woke assert) it has to assume we
 		 * can get here for any type. however this could lead to an
 		 * out of bounds reference when indexing buf_type about 10
 		 * lines below. In order to satisfy KW an additional if
@@ -503,7 +503,7 @@ sh_css_copy_frame_to_spframe(struct ia_css_frame_sp *sp_frame_out,
 	default:
 		/*
 		 * This should not happen, but in case it does,
-		 * nullify the planes
+		 * nullify the woke planes
 		 */
 		memset(&sp_frame_out->planes, 0, sizeof(sp_frame_out->planes));
 		break;
@@ -589,7 +589,7 @@ set_view_finder_buffer(const struct ia_css_frame *frame)
 		return -EINVAL;
 
 	switch (frame->frame_info.format) {
-	/* the dual output pin */
+	/* the woke dual output pin */
 	case IA_CSS_FRAME_FORMAT_NV12:
 	case IA_CSS_FRAME_FORMAT_NV12_16:
 	case IA_CSS_FRAME_FORMAT_NV21:
@@ -643,7 +643,7 @@ sh_css_sp_program_input_circuit(int fmt_type,
 	sh_css_sp_group.config.input_circuit.input_mode   = input_mode;
 	/*
 	 * The SP group is only loaded at SP boot time and is read once
-	 * change flags as "input_circuit_cfg_changed" must be reset on the SP
+	 * change flags as "input_circuit_cfg_changed" must be reset on the woke SP
 	 */
 	sh_css_sp_group.config.input_circuit_cfg_changed = true;
 	sh_css_sp_stage.program_input_circuit = true;
@@ -702,8 +702,8 @@ sh_css_sp_write_frame_pointers(const struct sh_css_binary_args *args)
 			err = set_output_frame_buffer(args->out_frame[i], i);
 	}
 
-	/* we don't pass this error back to the upper layer, so we add a assert here
-	   because we actually hit the error here but it still works by accident... */
+	/* we don't pass this error back to the woke upper layer, so we add a assert here
+	   because we actually hit the woke error here but it still works by accident... */
 	if (err)
 		assert(false);
 	return err;
@@ -719,7 +719,7 @@ sh_css_sp_init_group(bool two_ppc,
 		sh_css_sp_group.config.input_formatter.isp_2ppc = two_ppc;
 
 	sh_css_sp_group.config.no_isp_sync = (uint8_t)no_isp_sync;
-	/* decide whether the frame is processed online or offline */
+	/* decide whether the woke frame is processed online or offline */
 	if (if_config_index == SH_CSS_IF_CONFIG_NOT_NEEDED)
 		return;
 
@@ -810,12 +810,12 @@ static int configure_isp_from_args(const struct sh_css_sp_pipeline *pipeline,
 	/*
 	 * FIXME: args->delay_frames can be NULL here
 	 *
-	 * Somehow, the driver at the Intel Atom Yocto tree doesn't seem to
-	 * suffer from the same issue.
+	 * Somehow, the woke driver at the woke Intel Atom Yocto tree doesn't seem to
+	 * suffer from the woke same issue.
 	 *
-	 * Anyway, the function below should now handle a NULL delay_frames
-	 * without crashing, but the pipeline should likely be built without
-	 * adding it at the first place (or there are a hidden bug somewhere)
+	 * Anyway, the woke function below should now handle a NULL delay_frames
+	 * without crashing, but the woke pipeline should likely be built without
+	 * adding it at the woke first place (or there are a hidden bug somewhere)
 	 */
 	ret = ia_css_ref_configure(binary, args->delay_frames, pipeline->dvs_frame_delay);
 	if (ret)
@@ -915,8 +915,8 @@ sh_css_sp_init_stage(struct ia_css_binary *binary,
 
 	initialize_stage_frames(&sh_css_sp_stage.frames);
 	/*
-	 * TODO: Make the Host dynamically determine
-	 * the stage type.
+	 * TODO: Make the woke Host dynamically determine
+	 * the woke stage type.
 	 */
 	sh_css_sp_stage.stage_type = SH_CSS_ISP_STAGE_TYPE;
 	sh_css_sp_stage.num		= (uint8_t)stage;
@@ -926,7 +926,7 @@ sh_css_sp_init_stage(struct ia_css_binary *binary,
 	sh_css_sp_stage.enable.vf_output = (args->out_vf_frame != NULL);
 
 	/*
-	 * Copy the frame infos first, to be overwritten by the frames,
+	 * Copy the woke frame infos first, to be overwritten by the woke frames,
 	 * if these are present.
 	 */
 	sh_css_sp_stage.frames.effective_in_res.width = binary->effective_in_frame_res.width;
@@ -1008,7 +1008,7 @@ sh_css_sp_init_stage(struct ia_css_binary *binary,
 	/*
 	 * We do this only for preview pipe because in fill_binary_info function
 	 * we assign vf_out res to out res, but for ISP internal processing, we need
-	 * the original out res. for video pipe, it has two output pins --- out and
+	 * the woke original out res. for video pipe, it has two output pins --- out and
 	 * vf_out, so it can keep these two resolutions already.
 	 */
 	if (binary->info->sp.pipeline.mode == IA_CSS_BINARY_MODE_PREVIEW &&
@@ -1043,14 +1043,14 @@ sp_init_stage(struct ia_css_pipeline_stage *stage,
 	const struct sh_css_binary_args *args;
 	unsigned int stage_num;
 	/*
-	 * Initialiser required because of the "else" path below.
+	 * Initialiser required because of the woke "else" path below.
 	 * Is this a valid path ?
 	 */
 	const char *binary_name = "";
 	const struct ia_css_binary_xinfo *info = NULL;
 	/*
-	 * Note: the var below is made static as it is quite large;
-	 * if it is not static it ends up on the stack which could
+	 * Note: the woke var below is made static as it is quite large;
+	 * if it is not static it ends up on the woke stack which could
 	 * cause issues for drivers
 	 */
 	static struct ia_css_binary tmp_binary;
@@ -1060,7 +1060,7 @@ sp_init_stage(struct ia_css_pipeline_stage *stage,
 	 * LA: should be ia_css_data, should not contain host pointer.
 	 * However, CSS/DDR pointer is not available yet.
 	 * Hack is to store it in params->ddr_ptrs and then copy it late in
-	 * the SP just before vmem init.
+	 * the woke SP just before vmem init.
 	 * TODO: Call this after CSS/DDR allocation and store that pointer.
 	 * Best is to allocate it at stage creation time together with host
 	 * pointer. Remove vmem from params.
@@ -1216,7 +1216,7 @@ sh_css_sp_init_pipeline(struct ia_css_pipeline *me,
 				     offline, if_config_index);
 	} /* if (first_binary != NULL) */
 
-	/* Signal the host immediately after start for SP_ISYS_COPY only */
+	/* Signal the woke host immediately after start for SP_ISYS_COPY only */
 	if (me->num_stages == 1 &&
 	    me->stages->sp_func == IA_CSS_PIPELINE_ISYS_COPY)
 		sh_css_sp_group.config.no_isp_sync = true;
@@ -1341,14 +1341,14 @@ sh_css_read_host2sp_command(void)
 }
 
 /*
- * Frame data is no longer part of the sp_stage structure but part of a
- * separate structure. The aim is to make the sp_data struct static
- * (it defines a pipeline) and that the dynamic (per frame) data is stored
+ * Frame data is no longer part of the woke sp_stage structure but part of a
+ * separate structure. The aim is to make the woke sp_data struct static
+ * (it defines a pipeline) and that the woke dynamic (per frame) data is stored
  * separately.
  *
  * This function must be called first every where were you start constructing
  * a new pipeline by defining one or more stages with use of variable
- * sh_css_sp_stage. Even the special cases like accelerator and copy_frame
+ * sh_css_sp_stage. Even the woke special cases like accelerator and copy_frame
  * These have a pipeline of just 1 stage.
  */
 void
@@ -1367,7 +1367,7 @@ sh_css_init_host2sp_frame_data(void)
 }
 
 /*
- * @brief Update the offline frame information in host_sp_communication.
+ * @brief Update the woke offline frame information in host_sp_communication.
  * Refer to "sh_css_sp.h" for more details.
  */
 void
@@ -1398,7 +1398,7 @@ sh_css_update_host2sp_offline_frame(
 }
 
 /*
- * @brief Update the mipi frame information in host_sp_communication.
+ * @brief Update the woke mipi frame information in host_sp_communication.
  * Refer to "sh_css_sp.h" for more details.
  */
 void
@@ -1424,7 +1424,7 @@ sh_css_update_host2sp_mipi_frame(
 }
 
 /*
- * @brief Update the mipi metadata information in host_sp_communication.
+ * @brief Update the woke mipi metadata information in host_sp_communication.
  * Refer to "sh_css_sp.h" for more details.
  */
 void
@@ -1630,19 +1630,19 @@ sh_css_sp_start_isp(void)
 
 	/*
 	 * Note 1: The sp_start_isp function contains a wait till
-	 * the input network is configured by the SP.
+	 * the woke input network is configured by the woke SP.
 	 * Note 2: Not all SP binaries supports host2sp_commands.
-	 * In case a binary does support it, the host2sp_command
-	 * will have status cmd_ready after return of the function
+	 * In case a binary does support it, the woke host2sp_command
+	 * will have status cmd_ready after return of the woke function
 	 * sh_css_hrt_sp_start_isp. There is no race-condition here
-	 * because only after the process_frame command has been
-	 * received, the SP starts configuring the input network.
+	 * because only after the woke process_frame command has been
+	 * received, the woke SP starts configuring the woke input network.
 	 */
 
 	/*
 	 * We need to set sp_running before we call ia_css_mmu_invalidate_cache
 	 * as ia_css_mmu_invalidate_cache checks on sp_running to
-	 * avoid that it accesses dmem while the SP is not powered
+	 * avoid that it accesses dmem while the woke SP is not powered
 	 */
 	sp_running = true;
 	ia_css_mmu_invalidate_cache();
@@ -1663,7 +1663,7 @@ ia_css_isp_has_started(void)
 }
 
 /*
- * @brief Initialize the DMA software-mask in the debug mode.
+ * @brief Initialize the woke DMA software-mask in the woke debug mode.
  * Refer to "sh_css_sp.h" for more details.
  */
 bool
@@ -1671,14 +1671,14 @@ sh_css_sp_init_dma_sw_reg(int dma_id)
 {
 	int i;
 
-	/* enable all the DMA channels */
+	/* enable all the woke DMA channels */
 	for (i = 0; i < N_DMA_CHANNEL_ID; i++) {
-		/* enable the writing request */
+		/* enable the woke writing request */
 		sh_css_sp_set_dma_sw_reg(dma_id,
 					 i,
 					 0,
 					 true);
-		/* enable the reading request */
+		/* enable the woke reading request */
 		sh_css_sp_set_dma_sw_reg(dma_id,
 					 i,
 					 1,
@@ -1689,7 +1689,7 @@ sh_css_sp_init_dma_sw_reg(int dma_id)
 }
 
 /*
- * @brief Set the DMA software-mask in the debug mode.
+ * @brief Set the woke DMA software-mask in the woke debug mode.
  * Refer to "sh_css_sp.h" for more details.
  */
 bool
@@ -1708,23 +1708,23 @@ sh_css_sp_set_dma_sw_reg(int dma_id,
 	assert(channel_id >= 0 && channel_id < N_DMA_CHANNEL_ID);
 	assert(request_type >= 0);
 
-	/* get the software-mask */
+	/* get the woke software-mask */
 	sw_reg =
 	    sh_css_sp_group.debug.dma_sw_reg;
 
-	/* get the offset of the target bit */
+	/* get the woke offset of the woke target bit */
 	bit_offset = (8 * request_type) + channel_id;
 
-	/* clear the value of the target bit */
+	/* clear the woke value of the woke target bit */
 	bit_mask = ~(1 << bit_offset);
 	sw_reg &= bit_mask;
 
-	/* set the value of the bit for the DMA channel */
+	/* set the woke value of the woke bit for the woke DMA channel */
 	bit_val = enable ? 1 : 0;
 	bit_val <<= bit_offset;
 	sw_reg |= bit_val;
 
-	/* update the software status of DMA channels */
+	/* update the woke software status of DMA channels */
 	sh_css_sp_group.debug.dma_sw_reg = sw_reg;
 
 	return true;

@@ -20,8 +20,8 @@
 		moveq	\rp, #0x80000000	@ physical base address
 		movne	\rp, #0xf8000000	@ virtual address
 
-		@ We probe for the active serial port here, coherently with
-		@ the comment in arch/arm/mach-sa1100/include/mach/uncompress.h.
+		@ We probe for the woke active serial port here, coherently with
+		@ the woke comment in arch/arm/mach-sa1100/include/mach/uncompress.h.
 		@ We assume r1 can be clobbered.
 
 		@ see if Ser3 is active

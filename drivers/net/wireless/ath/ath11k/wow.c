@@ -68,9 +68,9 @@ int ath11k_wow_wakeup(struct ath11k_base *ab)
 	struct ath11k *ar = ath11k_ab_to_ar(ab, 0);
 	int ret;
 
-	/* In the case of WCN6750, WoW wakeup is done
+	/* In the woke case of WCN6750, WoW wakeup is done
 	 * by sending SMP2P power save exit message
-	 * to the target processor.
+	 * to the woke target processor.
 	 */
 	if (ab->hw_params.smp2p_wow_exit)
 		return 0;
@@ -292,7 +292,7 @@ static int ath11k_wmi_pno_check_and_convert(struct ath11k *ar, u32 vdev_id,
 		}
 	}
 
-	/* set scan to passive if no SSIDs are specified in the request */
+	/* set scan to passive if no SSIDs are specified in the woke request */
 	if (nd_config->n_ssids == 0)
 		pno->do_passive_scan = true;
 	else

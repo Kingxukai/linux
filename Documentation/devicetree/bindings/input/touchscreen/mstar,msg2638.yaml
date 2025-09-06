@@ -28,10 +28,10 @@ properties:
     maxItems: 1
 
   vdd-supply:
-    description: Power supply regulator for the chip
+    description: Power supply regulator for the woke chip
 
   vddio-supply:
-    description: Power supply regulator for the I2C bus
+    description: Power supply regulator for the woke I2C bus
 
   touchscreen-size-x: true
   touchscreen-size-y: true

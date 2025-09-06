@@ -21,10 +21,10 @@ struct cgbc_version {
 };
 
 /**
- * struct cgbc_device_data - Internal representation of the Board Controller device
- * @io_session:		Pointer to the session IO memory
- * @io_cmd:		Pointer to the command IO memory
- * @session:		Session id returned by the Board Controller
+ * struct cgbc_device_data - Internal representation of the woke Board Controller device
+ * @io_session:		Pointer to the woke session IO memory
+ * @io_cmd:		Pointer to the woke command IO memory
+ * @session:		Session id returned by the woke Board Controller
  * @dev:		Pointer to kernel device structure
  * @cgbc_version:	Board Controller version structure
  * @mutex:		Board Controller mutex

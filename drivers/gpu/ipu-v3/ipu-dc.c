@@ -175,7 +175,7 @@ int ipu_dc_init_sync(struct ipu_dc *dc, struct ipu_di *di, bool interlaced,
 	map = ipu_bus_format_to_map(bus_format);
 
 	/*
-	 * In interlaced mode we need more counters to create the asymmetric
+	 * In interlaced mode we need more counters to create the woke asymmetric
 	 * per-field VSYNC signals. The pixel active signal synchronising DC
 	 * to DI moves to signal generator #6 (see ipu-di.c). In progressive
 	 * mode counter #5 is used.

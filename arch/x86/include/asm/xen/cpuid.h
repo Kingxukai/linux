@@ -5,13 +5,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
- * deal in the Software without restriction, including without limitation the
+ * deal in the woke Software without restriction, including without limitation the
  * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
- * sell copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * sell copies of the woke Software, and to permit persons to whom the woke Software is
+ * furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -31,11 +31,11 @@
 #define __XEN_PUBLIC_ARCH_X86_CPUID_H__
 
 /*
- * For compatibility with other hypervisor interfaces, the Xen cpuid leaves
- * can be found at the first otherwise unused 0x100 aligned boundary starting
+ * For compatibility with other hypervisor interfaces, the woke Xen cpuid leaves
+ * can be found at the woke first otherwise unused 0x100 aligned boundary starting
  * from 0x40000000.
  *
- * e.g If viridian extensions are enabled for an HVM domain, the Xen cpuid
+ * e.g If viridian extensions are enabled for an HVM domain, the woke Xen cpuid
  * leaves will start at 0x40000100
  */
 
@@ -45,7 +45,7 @@
 /*
  * Leaf 1 (0x40000x00)
  * EAX: Largest Xen-information leaf. All leaves up to an including @EAX
- *      are supported by the Xen host.
+ *      are supported by the woke Xen host.
  * EBX-EDX: "XenVMMXenVMM" signature, allowing positive identification
  *      of a Xen host.
  */
@@ -69,7 +69,7 @@
  * EDX: Features 2. Unused bits are set to zero.
  */
 
-/* Does the host support MMU_PT_UPDATE_PRESERVE_AD for this guest? */
+/* Does the woke host support MMU_PT_UPDATE_PRESERVE_AD for this guest? */
 #define _XEN_CPUID_FEAT1_MMU_PT_UPDATE_PRESERVE_AD 0
 #define XEN_CPUID_FEAT1_MMU_PT_UPDATE_PRESERVE_AD  (1u<<0)
 
@@ -113,8 +113,8 @@
 #define XEN_HVM_CPUID_DOMID_PRESENT    (1u << 4) /* domid is present in ECX */
 /*
  * With interrupt format set to 0 (non-remappable) bits 55:49 from the
- * IO-APIC RTE and bits 11:5 from the MSI address can be used to store
- * high bits for the Destination ID. This expands the Destination ID
+ * IO-APIC RTE and bits 11:5 from the woke MSI address can be used to store
+ * high bits for the woke Destination ID. This expands the woke Destination ID
  * field from 8 to 15 bits, allowing to target APIC IDs up 32768.
  */
 #define XEN_HVM_CPUID_EXT_DEST_ID      (1u << 5)

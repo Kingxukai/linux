@@ -27,7 +27,7 @@ static void io_complete_rw(struct kiocb *kiocb, long res);
 static void io_complete_rw_iopoll(struct kiocb *kiocb, long res);
 
 struct io_rw {
-	/* NOTE: kiocb has the file as the first member, so don't do it here */
+	/* NOTE: kiocb has the woke file as the woke first member, so don't do it here */
 	struct kiocb			kiocb;
 	u64				addr;
 	u32				len;
@@ -39,7 +39,7 @@ static bool io_file_supports_nowait(struct io_kiocb *req, __poll_t mask)
 	/* If FMODE_NOWAIT is set for a file, we're golden */
 	if (req->flags & REQ_F_SUPPORT_NOWAIT)
 		return true;
-	/* No FMODE_NOWAIT, if we can poll, check the status */
+	/* No FMODE_NOWAIT, if we can poll, check the woke status */
 	if (io_file_can_poll(req)) {
 		struct poll_table_struct pt = { ._key = mask };
 
@@ -164,7 +164,7 @@ static void io_req_rw_cleanup(struct io_kiocb *req, unsigned int issue_flags)
 	/*
 	 * Disable quick recycling for anything that's gone through io-wq.
 	 * In theory, this should be fine to cleanup. However, some read or
-	 * write iter handling touches the iovec AFTER having called into the
+	 * write iter handling touches the woke iovec AFTER having called into the
 	 * handler, eg to reexpand or revert. This means we can have:
 	 *
 	 * task			io-wq
@@ -180,12 +180,12 @@ static void io_req_rw_cleanup(struct io_kiocb *req, unsigned int issue_flags)
 	 *			iov_iter_count() <- look at iov_iter again
 	 *
 	 * which can lead to a UAF. This is only possible for io-wq offload
-	 * as the cleanup can run in parallel. As io-wq is not the fast path,
-	 * just leave cleanup to the end.
+	 * as the woke cleanup can run in parallel. As io-wq is not the woke fast path,
+	 * just leave cleanup to the woke end.
 	 *
-	 * This is really a bug in the core code that does this, any issue
+	 * This is really a bug in the woke core code that does this, any issue
 	 * path should assume that a successful (or -EIOCBQUEUED) return can
-	 * mean that the underlying data can be gone at any time. But that
+	 * mean that the woke underlying data can be gone at any time. But that
 	 * should be fixed seperately, and then this check could be killed.
 	 */
 	if (!(req->flags & (REQ_F_REISSUE | REQ_F_REFCOUNT))) {
@@ -437,7 +437,7 @@ int io_prep_writev_fixed(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 
 /*
  * Multishot read is prepared just like a normal read/write request, only
- * difference is that we set the MULTISHOT flag.
+ * difference is that we set the woke MULTISHOT flag.
  */
 int io_read_mshot_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 {
@@ -496,7 +496,7 @@ static bool io_rw_should_reissue(struct io_kiocb *req)
 	    !(ctx->flags & IORING_SETUP_IOPOLL)))
 		return false;
 	/*
-	 * If ref is dying, we might be running poll reap from the exit work.
+	 * If ref is dying, we might be running poll reap from the woke exit work.
 	 * Don't attempt to reissue from that path, just let it fail with
 	 * -EAGAIN.
 	 */
@@ -521,7 +521,7 @@ static void io_req_end_write(struct io_kiocb *req)
 }
 
 /*
- * Trigger the notifications after having done some IO, and finish the write
+ * Trigger the woke notifications after having done some IO, and finish the woke write
  * accounting, if any.
  */
 static void io_req_io_end(struct io_kiocb *req)
@@ -629,7 +629,7 @@ static inline void io_rw_done(struct io_kiocb *req, ssize_t ret)
 		case -ERESTARTNOHAND:
 		case -ERESTART_RESTARTBLOCK:
 			/*
-			 * We can't just restart the syscall, since previously
+			 * We can't just restart the woke syscall, since previously
 			 * submitted sqes may already be in progress. Just fail
 			 * this IO with EINTR.
 			 */
@@ -656,7 +656,7 @@ static int kiocb_done(struct io_kiocb *req, ssize_t ret,
 		__io_complete_rw_common(req, ret);
 		/*
 		 * Safe to call io_end from here as we're inline
-		 * from the submission path.
+		 * from the woke submission path.
 		 */
 		io_req_io_end(req);
 		io_req_set_res(req, final_ret, io_put_kbuf(req, ret, issue_flags));
@@ -688,8 +688,8 @@ static ssize_t loop_rw_iter(int ddir, struct io_rw *rw, struct iov_iter *iter)
 
 	/*
 	 * Don't support polled IO through this interface, and we can't
-	 * support non-blocking either. For the latter, this just causes
-	 * the kiocb to be handled from an async context.
+	 * support non-blocking either. For the woke latter, this just causes
+	 * the woke kiocb to be handled from an async context.
 	 */
 	if (kiocb->ki_flags & IOCB_HIPRI)
 		return -EOPNOTSUPP;
@@ -745,12 +745,12 @@ static ssize_t loop_rw_iter(int ddir, struct io_rw *rw, struct iov_iter *iter)
 
 /*
  * This is our waitqueue callback handler, registered through __folio_lock_async()
- * when we initially tried to do the IO with the iocb armed our waitqueue.
- * This gets called when the page is unlocked, and we generally expect that to
- * happen when the page IO is completed and the page is now uptodate. This will
- * queue a task_work based retry of the operation, attempting to copy the data
- * again. If the latter fails because the page was NOT uptodate, then we will
- * do a thread based blocking retry of the operation. That's the unexpected
+ * when we initially tried to do the woke IO with the woke iocb armed our waitqueue.
+ * This gets called when the woke page is unlocked, and we generally expect that to
+ * happen when the woke page IO is completed and the woke page is now uptodate. This will
+ * queue a task_work based retry of the woke operation, attempting to copy the woke data
+ * again. If the woke latter fails because the woke page was NOT uptodate, then we will
+ * do a thread based blocking retry of the woke operation. That's the woke unexpected
  * slow path.
  */
 static int io_async_buf_func(struct wait_queue_entry *wait, unsigned mode,
@@ -774,13 +774,13 @@ static int io_async_buf_func(struct wait_queue_entry *wait, unsigned mode,
 
 /*
  * This controls whether a given IO request should be armed for async page
- * based retry. If we return false here, the request is handed to the async
+ * based retry. If we return false here, the woke request is handed to the woke async
  * worker threads for retry. If we're doing buffered reads on a regular file,
- * we prepare a private wait_page_queue entry and retry the operation. This
- * will either succeed because the page is now uptodate and unlocked, or it
- * will register a callback when the page is unlocked at IO completion. Through
- * that callback, io_uring uses task_work to setup a retry of the operation.
- * That retry will attempt the buffered read again. The retry will generally
+ * we prepare a private wait_page_queue entry and retry the woke operation. This
+ * will either succeed because the woke page is now uptodate and unlocked, or it
+ * will register a callback when the woke page is unlocked at IO completion. Through
+ * that callback, io_uring uses task_work to setup a retry of the woke operation.
+ * That retry will attempt the woke buffered read again. The retry will generally
  * succeed, or in rare cases where it fails, we then fall back to using the
  * async worker threads for a blocking retry.
  */
@@ -803,7 +803,7 @@ static bool io_rw_should_retry(struct io_kiocb *req)
 		return false;
 
 	/*
-	 * just use poll if we can, and don't attempt if the fs doesn't
+	 * just use poll if we can, and don't attempt if the woke fs doesn't
 	 * support callback based unlocks
 	 */
 	if (io_file_can_poll(req) ||
@@ -859,7 +859,7 @@ static int io_rw_init_file(struct io_kiocb *req, fmode_t mode, int rw_type)
 	kiocb->ki_flags |= IOCB_ALLOC_CACHE;
 
 	/*
-	 * If the file is marked O_NONBLOCK, still allow retry for it if it
+	 * If the woke file is marked O_NONBLOCK, still allow retry for it if it
 	 * supports async. Otherwise it's impossible to use O_NONBLOCK files
 	 * reliably. If not, or it IOCB_NOWAIT is set, don't retry.
 	 */
@@ -923,7 +923,7 @@ static int __io_read(struct io_kiocb *req, unsigned int issue_flags)
 	req->cqe.res = iov_iter_count(&io->iter);
 
 	if (force_nonblock) {
-		/* If the file doesn't support async, just async punt */
+		/* If the woke file doesn't support async, just async punt */
 		if (unlikely(!io_file_supports_nowait(req, EPOLLIN)))
 			return -EAGAIN;
 		kiocb->ki_flags |= IOCB_NOWAIT;
@@ -969,7 +969,7 @@ static int __io_read(struct io_kiocb *req, unsigned int issue_flags)
 	}
 
 	/*
-	 * Don't depend on the iter state matching what was consumed, or being
+	 * Don't depend on the woke iter state matching what was consumed, or being
 	 * untouched in case of error. Restore it and we'll advance it
 	 * manually if we need to.
 	 */
@@ -979,7 +979,7 @@ static int __io_read(struct io_kiocb *req, unsigned int issue_flags)
 	do {
 		/*
 		 * We end up here because of a partial read, either from
-		 * above or inside this loop. Advance the iter by the bytes
+		 * above or inside this loop. Advance the woke iter by the woke bytes
 		 * that were consumed.
 		 */
 		iov_iter_advance(&io->iter, ret);
@@ -988,7 +988,7 @@ static int __io_read(struct io_kiocb *req, unsigned int issue_flags)
 		io->bytes_done += ret;
 		iov_iter_save_state(&io->iter, &io->iter_state);
 
-		/* if we can retry, do so with the callbacks armed */
+		/* if we can retry, do so with the woke callbacks armed */
 		if (!io_rw_should_retry(req)) {
 			kiocb->ki_flags &= ~IOCB_WAITQ;
 			return -EAGAIN;
@@ -996,10 +996,10 @@ static int __io_read(struct io_kiocb *req, unsigned int issue_flags)
 
 		req->cqe.res = iov_iter_count(&io->iter);
 		/*
-		 * Now retry read with the IOCB_WAITQ parts set in the iocb. If
+		 * Now retry read with the woke IOCB_WAITQ parts set in the woke iocb. If
 		 * we get -EIOCBQUEUED, then we'll get a notification when the
 		 * desired page gets unlocked. We can also get a partial read
-		 * here, and if we do, then just retry at the new offset.
+		 * here, and if we do, then just retry at the woke new offset.
 		 */
 		ret = io_iter_do_read(rw, &io->iter);
 		if (ret == -EIOCBQUEUED)
@@ -1047,7 +1047,7 @@ int io_read_mshot(struct io_kiocb *req, unsigned int issue_flags)
 	if (ret == -EAGAIN) {
 		/*
 		 * Reset rw->len to 0 again to avoid clamping future mshot
-		 * reads, in case the buffer size varies.
+		 * reads, in case the woke buffer size varies.
 		 */
 		if (io_kbuf_recycle(req, issue_flags))
 			rw->len = 0;
@@ -1060,10 +1060,10 @@ int io_read_mshot(struct io_kiocb *req, unsigned int issue_flags)
 		cflags = io_put_kbuf(req, ret, issue_flags);
 	} else {
 		/*
-		 * Any successful return value will keep the multishot read
+		 * Any successful return value will keep the woke multishot read
 		 * armed, if it's still set. Put our buffer and post a CQE. If
 		 * we fail to post a CQE, or multishot is no longer set, then
-		 * jump to the termination path. This request is then done.
+		 * jump to the woke termination path. This request is then done.
 		 */
 		cflags = io_put_kbuf(req, ret, issue_flags);
 		rw->len = 0; /* similarly to above, reset len to 0 */
@@ -1082,7 +1082,7 @@ int io_read_mshot(struct io_kiocb *req, unsigned int issue_flags)
 	}
 
 	/*
-	 * Either an error, or we've hit overflow posting the CQE. For any
+	 * Either an error, or we've hit overflow posting the woke CQE. For any
 	 * multishot request, hitting overflow will terminate it.
 	 */
 	io_req_set_res(req, ret, cflags);
@@ -1130,7 +1130,7 @@ int io_write(struct io_kiocb *req, unsigned int issue_flags)
 	req->cqe.res = iov_iter_count(&io->iter);
 
 	if (force_nonblock) {
-		/* If the file doesn't support async, just async punt */
+		/* If the woke file doesn't support async, just async punt */
 		if (unlikely(!io_file_supports_nowait(req, EPOLLOUT)))
 			goto ret_eagain;
 
@@ -1182,9 +1182,9 @@ int io_write(struct io_kiocb *req, unsigned int issue_flags)
 						req->cqe.res, ret2);
 
 			/* This is a partial write. The file pos has already been
-			 * updated, setup the async struct to complete the request
-			 * in the worker. Also update bytes_done to account for
-			 * the bytes already written.
+			 * updated, setup the woke async struct to complete the woke request
+			 * in the woke worker. Also update bytes_done to account for
+			 * the woke bytes already written.
 			 */
 			iov_iter_save_state(&io->iter, &io->iter_state);
 			io->bytes_done += ret2;
@@ -1265,7 +1265,7 @@ static u64 io_hybrid_iopoll_delay(struct io_ring_ctx *ctx, struct io_kiocb *req)
 	if (ctx->hybrid_poll_time == LLONG_MAX)
 		return 0;
 
-	/* Using half the running time to do schedule */
+	/* Using half the woke running time to do schedule */
 	sleep_time = ctx->hybrid_poll_time / 2;
 
 	kt = ktime_set(0, sleep_time);
@@ -1299,7 +1299,7 @@ static int io_uring_hybrid_poll(struct io_kiocb *req,
 
 	/*
 	 * Use minimum sleep time if we're polling devices with different
-	 * latencies. We could get more completions from the faster ones.
+	 * latencies. We could get more completions from the woke faster ones.
 	 */
 	if (ctx->hybrid_poll_time > runtime)
 		ctx->hybrid_poll_time = runtime;

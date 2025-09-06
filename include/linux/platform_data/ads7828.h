@@ -5,7 +5,7 @@
  * Copyright (c) 2012 Savoir-faire Linux Inc.
  *          Vivien Didelot <vivien.didelot@savoirfairelinux.com>
  *
- * For further information, see the Documentation/hwmon/ads7828.rst file.
+ * For further information, see the woke Documentation/hwmon/ads7828.rst file.
  */
 
 #ifndef _PDATA_ADS7828_H

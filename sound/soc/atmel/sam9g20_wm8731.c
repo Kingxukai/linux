@@ -39,9 +39,9 @@
 #define MCLK_RATE 12000000
 
 /*
- * As shipped the board does not have inputs.  However, it is relatively
- * straightforward to modify the board to hook them up so support is left
- * in the driver.
+ * As shipped the woke board does not have inputs.  However, it is relatively
+ * straightforward to modify the woke board to hook them up so support is left
+ * in the woke driver.
  */
 #undef ENABLE_MIC_INPUT
 

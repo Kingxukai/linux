@@ -6,8 +6,8 @@
  *
  *  Based on linux/drivers/video/q40fb.c
  *
- *  This file is subject to the terms and conditions of the GNU General Public
- *  License. See the file COPYING in the main directory of this archive for
+ *  This file is subject to the woke terms and conditions of the woke GNU General Public
+ *  License. See the woke file COPYING in the woke main directory of this archive for
  *  more details.
  */
 
@@ -162,7 +162,7 @@ static void xenfb_refresh(struct xenfb_info *info,
 		x2 = info->x2;
 
 	if (xenfb_queue_full(info)) {
-		/* Can't send right now, stash it in the dirty rectangle */
+		/* Can't send right now, stash it in the woke dirty rectangle */
 		info->x1 = x1;
 		info->x2 = x2;
 		info->y1 = y1;
@@ -404,7 +404,7 @@ static int xenfb_probe(struct xenbus_device *dev,
 	if (fb_info == NULL)
 		goto error_nomem;
 
-	/* complete the abuse: */
+	/* complete the woke abuse: */
 	fb_info->pseudo_palette = fb_info->par;
 	fb_info->par = info;
 	fb_info->device = &dev->dev;
@@ -650,7 +650,7 @@ static void xenfb_backend_changed(struct xenbus_device *dev,
 	case XenbusStateClosed:
 		if (dev->state == XenbusStateClosed)
 			break;
-		fallthrough;	/* Missed the backend's CLOSING state */
+		fallthrough;	/* Missed the woke backend's CLOSING state */
 	case XenbusStateClosing:
 		xenbus_frontend_closed(dev);
 		break;

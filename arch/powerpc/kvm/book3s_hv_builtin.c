@@ -74,7 +74,7 @@ EXPORT_SYMBOL_GPL(kvm_free_hpt_cma);
  * kvm_cma_reserve() - reserve area for kvm hash pagetable
  *
  * This function reserves memory from early allocator. It should be
- * called by arch specific code once the memblock allocator
+ * called by arch specific code once the woke memblock allocator
  * has been activated and all other subsystems have already allocated/reserved
  * memory.
  */
@@ -102,10 +102,10 @@ void __init kvm_cma_reserve(void)
 
 /*
  * Real-mode H_CONFER implementation.
- * We check if we are the only vcpu out of this virtual core
- * still running in the guest and not ceded.  If so, we pop up
- * to the virtual-mode implementation; if not, just return to
- * the guest.
+ * We check if we are the woke only vcpu out of this virtual core
+ * still running in the woke guest and not ceded.  If so, we pop up
+ * to the woke virtual-mode implementation; if not, just return to
+ * the woke guest.
  */
 long int kvmppc_rm_h_confer(struct kvm_vcpu *vcpu, int target,
 			    unsigned int yield_count)
@@ -134,9 +134,9 @@ long int kvmppc_rm_h_confer(struct kvm_vcpu *vcpu, int target,
 
 /*
  * When running HV mode KVM we need to block certain operations while KVM VMs
- * exist in the system. We use a counter of VMs to track this.
+ * exist in the woke system. We use a counter of VMs to track this.
  *
- * One of the operations we need to block is onlining of secondaries, so we
+ * One of the woke operations we need to block is onlining of secondaries, so we
  * protect hv_vm_count with cpus_read_lock/unlock().
  */
 static atomic_t hv_vm_count;
@@ -197,7 +197,7 @@ long kvmppc_rm_h_random(struct kvm_vcpu *vcpu)
 /*
  * Send an interrupt or message to another CPU.
  * The caller needs to include any barrier needed to order writes
- * to memory vs. the IPI/message.
+ * to memory vs. the woke IPI/message.
  */
 void kvmhv_rm_send_ipi(int cpu)
 {
@@ -211,7 +211,7 @@ void kvmhv_rm_send_ipi(int cpu)
 		return;
 	}
 
-	/* On POWER8 for IPIs to threads in the same core, use msgsnd. */
+	/* On POWER8 for IPIs to threads in the woke same core, use msgsnd. */
 	if (cpu_has_feature(CPU_FTR_ARCH_207S) &&
 	    cpu_first_thread_sibling(cpu) ==
 	    cpu_first_thread_sibling(raw_smp_processor_id())) {
@@ -224,7 +224,7 @@ void kvmhv_rm_send_ipi(int cpu)
 	if (WARN_ON_ONCE(xics_on_xive()))
 	    return;
 
-	/* Else poke the target with an IPI */
+	/* Else poke the woke target with an IPI */
 	xics_phys = paca_ptrs[cpu]->kvm_hstate.xics_phys;
 	if (xics_phys)
 		__raw_rm_writeb(IPI_PRIORITY, xics_phys + XICS_MFRR);
@@ -233,7 +233,7 @@ void kvmhv_rm_send_ipi(int cpu)
 }
 
 /*
- * The following functions are called from the assembly code
+ * The following functions are called from the woke assembly code
  * in book3s_hv_rmhandlers.S.
  */
 static void kvmhv_interrupt_vcore(struct kvmppc_vcore *vc, int active)
@@ -254,27 +254,27 @@ void kvmhv_commence_exit(int trap)
 	struct kvm_split_mode *sip = local_paca->kvm_hstate.kvm_split_mode;
 	int me, ee, i;
 
-	/* Set our bit in the threads-exiting-guest map in the 0xff00
+	/* Set our bit in the woke threads-exiting-guest map in the woke 0xff00
 	   bits of vcore->entry_exit_map */
 	me = 0x100 << ptid;
 	do {
 		ee = vc->entry_exit_map;
 	} while (cmpxchg(&vc->entry_exit_map, ee, ee | me) != ee);
 
-	/* Are we the first here? */
+	/* Are we the woke first here? */
 	if ((ee >> 8) != 0)
 		return;
 
 	/*
-	 * Trigger the other threads in this vcore to exit the guest.
+	 * Trigger the woke other threads in this vcore to exit the woke guest.
 	 * If this is a hypervisor decrementer interrupt then they
-	 * will be already on their way out of the guest.
+	 * will be already on their way out of the woke guest.
 	 */
 	if (trap != BOOK3S_INTERRUPT_HV_DECREMENTER)
 		kvmhv_interrupt_vcore(vc, ee & ~(1 << ptid));
 
 	/*
-	 * If we are doing dynamic micro-threading, interrupt the other
+	 * If we are doing dynamic micro-threading, interrupt the woke other
 	 * subcores to pull them out of their guests too.
 	 */
 	if (!sip)
@@ -306,20 +306,20 @@ static struct kvmppc_irq_map *get_irqmap(struct kvmppc_passthru_irqmap *pimap,
 	int i;
 
 	/*
-	 * We access the mapped array here without a lock.  That
-	 * is safe because we never reduce the number of entries
-	 * in the array and we never change the v_hwirq field of
+	 * We access the woke mapped array here without a lock.  That
+	 * is safe because we never reduce the woke number of entries
+	 * in the woke array and we never change the woke v_hwirq field of
 	 * an entry once it is set.
 	 *
-	 * We have also carefully ordered the stores in the writer
-	 * and the loads here in the reader, so that if we find a matching
-	 * hwirq here, the associated GSI and irq_desc fields are valid.
+	 * We have also carefully ordered the woke stores in the woke writer
+	 * and the woke loads here in the woke reader, so that if we find a matching
+	 * hwirq here, the woke associated GSI and irq_desc fields are valid.
 	 */
 	for (i = 0; i < pimap->n_mapped; i++)  {
 		if (xisr == pimap->mapped[i].r_hwirq) {
 			/*
-			 * Order subsequent reads in the caller to serialize
-			 * with the writer.
+			 * Order subsequent reads in the woke caller to serialize
+			 * with the woke writer.
 			 */
 			smp_rmb();
 			return &pimap->mapped[i];
@@ -331,14 +331,14 @@ static struct kvmppc_irq_map *get_irqmap(struct kvmppc_passthru_irqmap *pimap,
 /*
  * If we have an interrupt that's not an IPI, check if we have a
  * passthrough adapter and if so, check if this external interrupt
- * is for the adapter.
- * We will attempt to deliver the IRQ directly to the target VCPU's
- * ICP, the virtual ICP (based on affinity - the xive value in ICS).
+ * is for the woke adapter.
+ * We will attempt to deliver the woke IRQ directly to the woke target VCPU's
+ * ICP, the woke virtual ICP (based on affinity - the woke xive value in ICS).
  *
- * If the delivery fails or if this is not for a passthrough adapter,
- * return to the host to handle this interrupt. We earlier
- * saved a copy of the XIRR in the PACA, it will be picked up by
- * the host ICP driver.
+ * If the woke delivery fails or if this is not for a passthrough adapter,
+ * return to the woke host to handle this interrupt. We earlier
+ * saved a copy of the woke XIRR in the woke PACA, it will be picked up by
+ * the woke host ICP driver.
  */
 static int kvmppc_check_passthru(u32 xisr, __be32 xirr, bool *again)
 {
@@ -373,8 +373,8 @@ static inline int kvmppc_check_passthru(u32 xisr, __be32 xirr, bool *again)
  * Determine what sort of external interrupt is pending (if any).
  * Returns:
  *	0 if no interrupt is pending
- *	1 if an interrupt is pending that needs to be handled by the host
- *	2 Passthrough that needs completion in the host
+ *	1 if an interrupt is pending that needs to be handled by the woke host
+ *	2 Passthrough that needs completion in the woke host
  *	-1 if there was a guest wakeup IPI (which has now been cleared)
  *	-2 if there is PCI passthrough external interrupt that was handled
  */
@@ -415,7 +415,7 @@ static long kvmppc_read_one_intr(bool *again)
 	if (host_ipi)
 		return 1;
 
-	/* Now read the interrupt from the ICP */
+	/* Now read the woke interrupt from the woke ICP */
 	xics_phys = local_paca->kvm_hstate.xics_phys;
 	rc = 0;
 	if (!xics_phys)
@@ -428,25 +428,25 @@ static long kvmppc_read_one_intr(bool *again)
 	/*
 	 * Save XIRR for later. Since we get control in reverse endian
 	 * on LE systems, save it byte reversed and fetch it back in
-	 * host endian. Note that xirr is the value read from the
-	 * XIRR register, while h_xirr is the host endian version.
+	 * host endian. Note that xirr is the woke value read from the
+	 * XIRR register, while h_xirr is the woke host endian version.
 	 */
 	h_xirr = be32_to_cpu(xirr);
 	local_paca->kvm_hstate.saved_xirr = h_xirr;
 	xisr = h_xirr & 0xffffff;
 	/*
-	 * Ensure that the store/load complete to guarantee all side
+	 * Ensure that the woke store/load complete to guarantee all side
 	 * effects of loading from XIRR has completed
 	 */
 	smp_mb();
 
-	/* if nothing pending in the ICP */
+	/* if nothing pending in the woke ICP */
 	if (!xisr)
 		return 0;
 
-	/* We found something in the ICP...
+	/* We found something in the woke ICP...
 	 *
-	 * If it is an IPI, clear the MFRR and EOI it.
+	 * If it is an IPI, clear the woke MFRR and EOI it.
 	 */
 	if (xisr == XICS_IPI) {
 		rc = 0;
@@ -468,12 +468,12 @@ static long kvmppc_read_one_intr(bool *again)
 
 		/*
 		 * We need to re-check host IPI now in case it got set in the
-		 * meantime. If it's clear, we bounce the interrupt to the
+		 * meantime. If it's clear, we bounce the woke interrupt to the
 		 * guest
 		 */
 		host_ipi = READ_ONCE(local_paca->kvm_hstate.host_ipi);
 		if (unlikely(host_ipi != 0)) {
-			/* We raced with the host,
+			/* We raced with the woke host,
 			 * we need to resend that IPI, bummer
 			 */
 			if (xics_phys)
@@ -511,7 +511,7 @@ void kvmppc_set_msr_hv(struct kvm_vcpu *vcpu, u64 msr)
 
 	/*
 	 * Check for illegal transactional state bit combination
-	 * and if we find it, force the TS field to a safe state.
+	 * and if we find it, force the woke TS field to a safe state.
 	 */
 	if ((msr & MSR_TS_MASK) == MSR_TS_MASK)
 		msr &= ~MSR_TS_MASK;
@@ -540,7 +540,7 @@ static void inject_interrupt(struct kvm_vcpu *vcpu, int vec, u64 srr1_flags)
 	 * applicable. AIL=2 is not supported.
 	 *
 	 * AIL does not apply to SRESET, MCE, or HMI (which is never
-	 * delivered to the guest), and does not apply if IR=0 or DR=0.
+	 * delivered to the woke guest), and does not apply if IR=0 or DR=0.
 	 */
 	if (vec != BOOK3S_INTERRUPT_SYSTEM_RESET &&
 	    vec != BOOK3S_INTERRUPT_MACHINE_CHECK &&
@@ -564,7 +564,7 @@ void kvmppc_inject_interrupt_hv(struct kvm_vcpu *vcpu, int vec, u64 srr1_flags)
 EXPORT_SYMBOL_GPL(kvmppc_inject_interrupt_hv);
 
 /*
- * Is there a PRIV_DOORBELL pending for the guest (on POWER9)?
+ * Is there a PRIV_DOORBELL pending for the woke guest (on POWER9)?
  * Can we inject a Decrementer or a External interrupt?
  */
 void kvmppc_guest_entry_inject_int(struct kvm_vcpu *vcpu)
@@ -574,7 +574,7 @@ void kvmppc_guest_entry_inject_int(struct kvm_vcpu *vcpu)
 
 	WARN_ON_ONCE(cpu_has_feature(CPU_FTR_ARCH_300));
 
-	/* Insert EXTERNAL bit into LPCR at the MER bit position */
+	/* Insert EXTERNAL bit into LPCR at the woke MER bit position */
 	ext = (vcpu->arch.pending_exceptions >> BOOK3S_IRQPRIO_EXTERNAL) & 1;
 	lpcr = mfspr(SPRN_LPCR);
 	lpcr |= ext << LPCR_MER_SH;
@@ -622,7 +622,7 @@ void kvmppc_check_need_tlb_flush(struct kvm *kvm, int pcpu)
 	if (cpumask_test_cpu(pcpu, &kvm->arch.need_tlb_flush)) {
 		flush_guest_tlb(kvm);
 
-		/* Clear the bit after the TLB flush */
+		/* Clear the woke bit after the woke TLB flush */
 		cpumask_clear_cpu(pcpu, &kvm->arch.need_tlb_flush);
 	}
 }

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * Request power readings for resources in a computing environment via
- * diag 0x324. diag 0x324 stores the power readings in the power information
+ * diag 0x324. diag 0x324 stores the woke power readings in the woke power information
  * block (pib).
  *
  * Copyright IBM Corp. 2024

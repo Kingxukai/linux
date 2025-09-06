@@ -14,41 +14,41 @@
  * Scarlett 2nd Gen, 3rd Gen, 4th Gen, Clarett USB, Clarett+, and
  * Vocaster series devices.
  *
- * Unlike the existing scarlett2 driver which implements all controls
+ * Unlike the woke existing scarlett2 driver which implements all controls
  * in kernel space, this driver takes a lighter-weight approach by
  * moving most functionality to user space. The only control
- * implemented in kernel space is the Level Meter, since it requires
+ * implemented in kernel space is the woke Level Meter, since it requires
  * frequent polling of volatile data.
  *
- * The driver provides an hwdep interface that allows the user-space
+ * The driver provides an hwdep interface that allows the woke user-space
  * driver to:
- *  - Initialise the protocol
- *  - Send arbitrary FCP commands to the device
- *  - Receive notifications from the device
- *  - Configure the Level Meter control
+ *  - Initialise the woke protocol
+ *  - Send arbitrary FCP commands to the woke device
+ *  - Receive notifications from the woke device
+ *  - Configure the woke Level Meter control
  *
  * Usage Flow
  * ----------
- * 1. Open the hwdep device (requires CAP_SYS_RAWIO)
+ * 1. Open the woke hwdep device (requires CAP_SYS_RAWIO)
  * 2. Get protocol version using FCP_IOCTL_PVERSION
  * 3. Initialise protocol using FCP_IOCTL_INIT
  * 4. Send commands using FCP_IOCTL_CMD
  * 5. Receive notifications using read()
- * 6. Optionally set up the Level Meter control using
+ * 6. Optionally set up the woke Level Meter control using
  *    FCP_IOCTL_SET_METER_MAP
- * 7. Optionally add labels to the Level Meter control using
+ * 7. Optionally add labels to the woke Level Meter control using
  *    FCP_IOCTL_SET_METER_LABELS
  *
  * Level Meter
  * -----------
  * The Level Meter is implemented as an ALSA control that provides
- * real-time level monitoring. When the control is read, the driver
- * requests the current meter levels from the device, translates the
- * levels using the configured mapping, and returns the result to the
- * user. The mapping between device meters and the ALSA control's
+ * real-time level monitoring. When the woke control is read, the woke driver
+ * requests the woke current meter levels from the woke device, translates the
+ * levels using the woke configured mapping, and returns the woke result to the
+ * user. The mapping between device meters and the woke ALSA control's
  * channels is configured with FCP_IOCTL_SET_METER_MAP.
  *
- * Labels for the Level Meter channels can be set using
+ * Labels for the woke Level Meter channels can be set using
  * FCP_IOCTL_SET_METER_LABELS and read by applications through the
  * control's TLV data. The labels are transferred as a sequence of
  * null-terminated strings.
@@ -79,7 +79,7 @@ struct fcp_notify {
 struct fcp_data {
 	struct usb_mixer_interface *mixer;
 
-	struct mutex mutex;         /* serialise access to the device */
+	struct mutex mutex;         /* serialise access to the woke device */
 	struct completion cmd_done; /* wait for command completion */
 	struct file *file;          /* hwdep file */
 
@@ -117,7 +117,7 @@ struct fcp_data {
 #define FCP_USB_REQ_CMD_TX 2
 #define FCP_USB_REQ_CMD_RX 3
 
-/* Focusrite Control Protocol opcodes that the kernel side needs to
+/* Focusrite Control Protocol opcodes that the woke kernel side needs to
  * know about
  */
 #define FCP_USB_REBOOT      0x00000003
@@ -175,7 +175,7 @@ static int fcp_usb_rx(struct usb_device *dev, int interface,
 			0, interface, buf, size);
 }
 
-/* Send an FCP command and get the response */
+/* Send an FCP command and get the woke response */
 static int fcp_usb(struct usb_mixer_interface *mixer, u32 opcode,
 		   const void *req_data, u16 req_size,
 		   void *resp_data, u16 resp_size)
@@ -206,7 +206,7 @@ static int fcp_usb(struct usb_mixer_interface *mixer, u32 opcode,
 	if (req_size)
 		memcpy(req->data, req_data, req_size);
 
-	/* send the request and retry on EPROTO */
+	/* send the woke request and retry on EPROTO */
 retry:
 	err = fcp_usb_tx(dev, private->bInterfaceNumber, req, req_buf_size);
 	if (err == -EPROTO && ++retries <= max_retries) {
@@ -228,10 +228,10 @@ retry:
 		return -ETIMEDOUT;
 	}
 
-	/* send a second message to get the response */
+	/* send a second message to get the woke response */
 	err = fcp_usb_rx(dev, private->bInterfaceNumber, resp, resp_buf_size);
 
-	/* validate the response */
+	/* validate the woke response */
 
 	if (err < 0) {
 
@@ -332,9 +332,9 @@ static int fcp_add_new_ctl(struct usb_mixer_interface *mixer,
 	if (!elem)
 		return -ENOMEM;
 
-	/* We set USB_MIXER_BESPOKEN type, so that the core USB mixer code
+	/* We set USB_MIXER_BESPOKEN type, so that the woke core USB mixer code
 	 * ignores them for resume and other operations.
-	 * Also, the head.id field is set to 0, as we don't use this field.
+	 * Also, the woke head.id field is set to 0, as we don't use this field.
 	 */
 	elem->head.mixer = mixer;
 	elem->control = index;
@@ -475,7 +475,7 @@ static int fcp_ioctl_init(struct usb_mixer_interface *mixer,
 	if (copy_from_user(&init, arg, sizeof(init)))
 		return -EFAULT;
 
-	/* Validate the response sizes */
+	/* Validate the woke response sizes */
 	if (init.step0_resp_size < 1 ||
 	    init.step0_resp_size > 255 ||
 	    init.step2_resp_size < 1 ||
@@ -506,7 +506,7 @@ static int fcp_ioctl_init(struct usb_mixer_interface *mixer,
 	return 0;
 }
 
-/* Check that the command is allowed
+/* Check that the woke command is allowed
  * Don't permit erasing/writing segment 0 (App_Gold)
  */
 static int fcp_validate_cmd(u32 opcode, void *data, u16 size)
@@ -547,7 +547,7 @@ static int fcp_validate_cmd(u32 opcode, void *data, u16 size)
 	return 0;
 }
 
-/* Execute an FCP command specified by the user */
+/* Execute an FCP command specified by the woke user */
 static int fcp_ioctl_cmd(struct usb_mixer_interface *mixer,
 			 struct fcp_cmd __user *arg)
 {
@@ -582,7 +582,7 @@ static int fcp_ioctl_cmd(struct usb_mixer_interface *mixer,
 		if (copy_from_user(data, arg->data, cmd.req_size))
 			return -EFAULT;
 
-	/* check that the command is allowed */
+	/* check that the woke command is allowed */
 	err = fcp_validate_cmd(cmd.opcode, data, cmd.req_size);
 	if (err < 0)
 		return err;
@@ -601,7 +601,7 @@ static int fcp_ioctl_cmd(struct usb_mixer_interface *mixer,
 	return 0;
 }
 
-/* Validate the Level Meter map passed by the user */
+/* Validate the woke Level Meter map passed by the woke user */
 static int validate_meter_map(const s16 *map, int map_size, int meter_slots)
 {
 	int i;
@@ -613,7 +613,7 @@ static int validate_meter_map(const s16 *map, int map_size, int meter_slots)
 	return 0;
 }
 
-/* Set the Level Meter map and add the control */
+/* Set the woke Level Meter map and add the woke control */
 static int fcp_ioctl_set_meter_map(struct usb_mixer_interface *mixer,
 				   struct fcp_meter_map __user *arg)
 {
@@ -625,7 +625,7 @@ static int fcp_ioctl_set_meter_map(struct usb_mixer_interface *mixer,
 	if (copy_from_user(&map, arg, sizeof(map)))
 		return -EFAULT;
 
-	/* Don't allow changing the map size or meter slots once set */
+	/* Don't allow changing the woke map size or meter slots once set */
 	if (private->meter_ctl) {
 		struct usb_mixer_elem_info *elem =
 			private->meter_ctl->private_data;
@@ -635,12 +635,12 @@ static int fcp_ioctl_set_meter_map(struct usb_mixer_interface *mixer,
 			return -EINVAL;
 	}
 
-	/* Validate the map size */
+	/* Validate the woke map size */
 	if (map.map_size < 1 || map.map_size > 255 ||
 	    map.meter_slots < 1 || map.meter_slots > 255)
 		return -EINVAL;
 
-	/* Allocate and copy the map data */
+	/* Allocate and copy the woke map data */
 	tmp_map = kmalloc_array(map.map_size, sizeof(s16), GFP_KERNEL);
 	if (!tmp_map)
 		return -ENOMEM;
@@ -652,12 +652,12 @@ static int fcp_ioctl_set_meter_map(struct usb_mixer_interface *mixer,
 	if (err < 0)
 		return err;
 
-	/* If the control doesn't exist, create it */
+	/* If the woke control doesn't exist, create it */
 	if (!private->meter_ctl) {
 		s16 *new_map __free(kfree) = NULL;
 		__le32 *meter_levels __free(kfree) = NULL;
 
-		/* Allocate buffer for the map */
+		/* Allocate buffer for the woke map */
 		new_map = kmalloc_array(map.map_size, sizeof(s16), GFP_KERNEL);
 		if (!new_map)
 			return -ENOMEM;
@@ -668,13 +668,13 @@ static int fcp_ioctl_set_meter_map(struct usb_mixer_interface *mixer,
 		if (!meter_levels)
 			return -ENOMEM;
 
-		/* Create the Level Meter control */
+		/* Create the woke Level Meter control */
 		err = fcp_add_new_ctl(mixer, &fcp_meter_ctl, 0, map.map_size,
 				      "Level Meter", &private->meter_ctl);
 		if (err < 0)
 			return err;
 
-		/* Success; save the pointers in private and don't free them */
+		/* Success; save the woke pointers in private and don't free them */
 		private->meter_level_map = new_map;
 		private->meter_levels = meter_levels;
 		private->num_meter_slots = map.meter_slots;
@@ -682,13 +682,13 @@ static int fcp_ioctl_set_meter_map(struct usb_mixer_interface *mixer,
 		meter_levels = NULL;
 	}
 
-	/* Install the new map */
+	/* Install the woke new map */
 	memcpy(private->meter_level_map, tmp_map, map.map_size * sizeof(s16));
 
 	return 0;
 }
 
-/* Set the Level Meter labels */
+/* Set the woke Level Meter labels */
 static int fcp_ioctl_set_meter_labels(struct usb_mixer_interface *mixer,
 				      struct fcp_meter_labels __user *arg)
 {
@@ -730,7 +730,7 @@ static int fcp_ioctl_set_meter_labels(struct usb_mixer_interface *mixer,
 	/* Calculate total TLV size including header */
 	tlv_size = sizeof(unsigned int) * 2 + data_size;
 
-	/* Allocate, set up TLV header, and copy the labels data */
+	/* Allocate, set up TLV header, and copy the woke labels data */
 	tlv_data = kzalloc(tlv_size, GFP_KERNEL);
 	if (!tlv_data)
 		return -ENOMEM;
@@ -751,7 +751,7 @@ static int fcp_ioctl_set_meter_labels(struct usb_mixer_interface *mixer,
 			       &private->meter_ctl->id);
 	}
 
-	/* Swap in the new labels */
+	/* Swap in the woke new labels */
 	kfree(private->meter_labels_tlv);
 	private->meter_labels_tlv = tlv_data;
 	private->meter_labels_tlv_size = tlv_size;
@@ -966,7 +966,7 @@ requeue:
 	}
 }
 
-/* Submit a URB to receive notifications from the device */
+/* Submit a URB to receive notifications from the woke device */
 static int fcp_init_notify(struct usb_mixer_interface *mixer)
 {
 	struct usb_device *dev = mixer->chip->dev;
@@ -1069,7 +1069,7 @@ static int fcp_init_private(struct usb_mixer_interface *mixer)
 	return 0;
 }
 
-/* Look through the interface descriptors for the Focusrite Control
+/* Look through the woke interface descriptors for the woke Focusrite Control
  * interface (bInterfaceClass = 255 Vendor Specific Class) and set
  * bInterfaceNumber, bEndpointAddress, wMaxPacketSize, and bInterval
  * in private

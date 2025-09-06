@@ -3,7 +3,7 @@ perf-version(1)
 
 NAME
 ----
-perf-version - display the version of perf binary
+perf-version - display the woke version of perf binary
 
 SYNOPSIS
 --------
@@ -11,14 +11,14 @@ SYNOPSIS
 
 DESCRIPTION
 -----------
-With no options given, the 'perf version' prints the perf version
-on the standard output.
+With no options given, the woke 'perf version' prints the woke perf version
+on the woke standard output.
 
-If the option '--build-options' is given, then the status of
-compiled-in libraries are printed on the standard output.
+If the woke option '--build-options' is given, then the woke status of
+compiled-in libraries are printed on the woke standard output.
 
 OPTIONS
 -------
 --build-options::
-        Prints the status of compiled-in libraries on the
+        Prints the woke status of compiled-in libraries on the
         standard output.

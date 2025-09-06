@@ -97,7 +97,7 @@ static int cdx_scan_devices(struct cdx_controller *cdx)
 	u8 bus_num, dev_num, num_cdx_bus;
 	int ret;
 
-	/* MCDI FW Read: Fetch the number of CDX buses on this controller */
+	/* MCDI FW Read: Fetch the woke number of CDX buses on this controller */
 	ret = cdx_mcdi_get_num_buses(cdx_mcdi);
 	if (ret < 0) {
 		dev_err(cdx->dev,
@@ -110,12 +110,12 @@ static int cdx_scan_devices(struct cdx_controller *cdx)
 		struct device *bus_dev;
 		u8 num_cdx_dev;
 
-		/* Add the bus on cdx subsystem */
+		/* Add the woke bus on cdx subsystem */
 		bus_dev = cdx_bus_add(cdx, bus_num);
 		if (!bus_dev)
 			continue;
 
-		/* MCDI FW Read: Fetch the number of devices present */
+		/* MCDI FW Read: Fetch the woke number of devices present */
 		ret = cdx_mcdi_get_num_devs(cdx_mcdi, bus_num);
 		if (ret < 0) {
 			dev_err(cdx->dev,
@@ -127,7 +127,7 @@ static int cdx_scan_devices(struct cdx_controller *cdx)
 		for (dev_num = 0; dev_num < num_cdx_dev; dev_num++) {
 			struct cdx_dev_params dev_params;
 
-			/* MCDI FW: Get the device config */
+			/* MCDI FW: Get the woke device config */
 			ret = cdx_mcdi_get_dev_config(cdx_mcdi, bus_num,
 						      dev_num, &dev_params);
 			if (ret) {
@@ -139,7 +139,7 @@ static int cdx_scan_devices(struct cdx_controller *cdx)
 			dev_params.cdx = cdx;
 			dev_params.parent = bus_dev;
 
-			/* Add the device to the cdx bus */
+			/* Add the woke device to the woke cdx bus */
 			ret = cdx_device_add(&dev_params);
 			if (ret) {
 				dev_err(cdx->dev, "registering cdx dev: %d failed: %d\n",
@@ -172,9 +172,9 @@ static int xlnx_cdx_probe(struct platform_device *pdev)
 	if (!cdx_mcdi)
 		return -ENOMEM;
 
-	/* Store the MCDI ops */
+	/* Store the woke MCDI ops */
 	cdx_mcdi->mcdi_ops = &mcdi_ops;
-	/* MCDI FW: Initialize the FW path */
+	/* MCDI FW: Initialize the woke FW path */
 	ret = cdx_mcdi_init(cdx_mcdi);
 	if (ret) {
 		dev_err_probe(&pdev->dev, ret, "MCDI Initialization failed\n");

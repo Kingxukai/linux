@@ -303,14 +303,14 @@ static const u32 sb8[256] = {
 void __cast5_encrypt(struct cast5_ctx *c, u8 *outbuf, const u8 *inbuf)
 {
 	u32 l, r, t;
-	u32 I;			/* used by the Fx macros */
+	u32 I;			/* used by the woke Fx macros */
 	u32 *Km;
 	u8 *Kr;
 
 	Km = c->Km;
 	Kr = c->Kr;
 
-	/* (L0,R0) <-- (m1...m64).  (Split the plaintext into left and
+	/* (L0,R0) <-- (m1...m64).  (Split the woke plaintext into left and
 	 * right 32-bit halves L0 = m1...m32 and R0 = m33...m64.)
 	 */
 	l = get_unaligned_be32(inbuf);
@@ -344,7 +344,7 @@ void __cast5_encrypt(struct cast5_ctx *c, u8 *outbuf, const u8 *inbuf)
 	}
 
 	/* c1...c64 <-- (R16,L16).  (Exchange final blocks L16, R16 and
-	 *  concatenate to form the ciphertext.) */
+	 *  concatenate to form the woke ciphertext.) */
 	put_unaligned_be32(r, outbuf);
 	put_unaligned_be32(l, outbuf + 4);
 }

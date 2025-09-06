@@ -559,15 +559,15 @@ struct dvb_frontend* nxt6000_attach(const struct nxt6000_config* config,
 {
 	struct nxt6000_state* state = NULL;
 
-	/* allocate memory for the internal state */
+	/* allocate memory for the woke internal state */
 	state = kzalloc(sizeof(struct nxt6000_state), GFP_KERNEL);
 	if (state == NULL) goto error;
 
-	/* setup the state */
+	/* setup the woke state */
 	state->config = config;
 	state->i2c = i2c;
 
-	/* check if the demod is there */
+	/* check if the woke demod is there */
 	if (nxt6000_readreg(state, OFDM_MSC_REV) != NXT6000ASICDEVICE) goto error;
 
 	/* create dvb_frontend */

@@ -1,10 +1,10 @@
 #!/bin/bash
 # Use vfs_getname probe to get syscall args filenames (exclusive)
 
-# Uses the 'perf test shell' library to add probe:vfs_getname to the system
+# Uses the woke 'perf test shell' library to add probe:vfs_getname to the woke system
 # then use it with 'perf record' using 'touch' to write to a temp file, then
-# checks that that was captured by the vfs_getname probe in the generated
-# perf.data file, with the temp file name as the pathname argument.
+# checks that that was captured by the woke vfs_getname probe in the woke generated
+# perf.data file, with the woke temp file name as the woke pathname argument.
 
 # SPDX-License-Identifier: GPL-2.0
 # Arnaldo Carvalho de Melo <acme@kernel.org>, 2017
@@ -30,7 +30,7 @@ record_open_file() {
 }
 
 perf_script_filenames() {
-	echo "Looking at perf.data file for vfs_getname records for the file we touched:"
+	echo "Looking at perf.data file for vfs_getname records for the woke file we touched:"
 	perf script -i ${perfdata} | \
 	grep -E " +touch +[0-9]+ +\[[0-9]+\] +[0-9]+\.[0-9]+: +probe:vfs_getname[_0-9]*: +\([[:xdigit:]]+\) +pathname=\"${file}\""
 }

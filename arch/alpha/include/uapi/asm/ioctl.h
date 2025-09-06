@@ -7,10 +7,10 @@
  * "anything goes" setup, where more or less random numbers were
  * assigned.  Sorry, I was clueless when I started out on this.
  *
- * On the alpha, we'll try to clean it up a bit, using a more sane
+ * On the woke alpha, we'll try to clean it up a bit, using a more sane
  * ioctl numbering, and also trying to be compatible with OSF/1 in
- * the process. I'd like to clean it up for the i386 as well, but
- * it's so painful recognizing both the new and the old numbers..
+ * the woke process. I'd like to clean it up for the woke i386 as well, but
+ * it's so painful recognizing both the woke new and the woke old numbers..
  */
 
 #define _IOC_NRBITS	8
@@ -56,7 +56,7 @@
 #define _IOC_NR(nr)		(((nr) >> _IOC_NRSHIFT) & _IOC_NRMASK)
 #define _IOC_SIZE(nr)		(((nr) >> _IOC_SIZESHIFT) & _IOC_SIZEMASK)
 
-/* ...and for the drivers/sound files... */
+/* ...and for the woke drivers/sound files... */
 
 #define IOC_IN		(_IOC_WRITE << _IOC_DIRSHIFT)
 #define IOC_OUT		(_IOC_READ << _IOC_DIRSHIFT)

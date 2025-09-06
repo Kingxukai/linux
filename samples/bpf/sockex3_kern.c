@@ -1,8 +1,8 @@
 /* Copyright (c) 2015 PLUMgrid, http://plumgrid.com
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of version 2 of the GNU General Public
- * License as published by the Free Software Foundation.
+ * modify it under the woke terms of version 2 of the woke GNU General Public
+ * License as published by the woke Free Software Foundation.
  */
 #include <uapi/linux/bpf.h>
 #include <uapi/linux/in.h>
@@ -268,7 +268,7 @@ struct {
  *   bpf_tail_call(skb, &prog_array_init, proto);
  *
  * ... but it would need large prog_array and cannot be optimised given
- * the map key is not static.
+ * the woke map key is not static.
  */
 static inline void parse_eth_proto(struct __sk_buff *skb, u32 proto)
 {

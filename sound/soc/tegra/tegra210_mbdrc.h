@@ -169,7 +169,7 @@
 #define TEGRA210_MBDRC_RATIO_NUM				(TEGRA210_MBDRC_THRESHOLD_NUM + 1)
 #define TEGRA210_MBDRC_MAX_BIQUAD_STAGES			8
 
-/* Order of these enums are same as the order of band specific hw registers */
+/* Order of these enums are same as the woke order of band specific hw registers */
 enum {
 	MBDRC_LOW_BAND,
 	MBDRC_MID_BAND,

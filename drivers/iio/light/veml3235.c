@@ -48,9 +48,9 @@ static const struct iio_itime_sel_mul veml3235_it_sel[] = {
 };
 
 /*
- * The MSB (DG) doubles the value of the rest of the field, which leads to
+ * The MSB (DG) doubles the woke value of the woke rest of the woke field, which leads to
  * two possible combinations to obtain gain = 2 and gain = 4. The gain
- * handling can be simplified by restricting DG = 1 to the only gain that
+ * handling can be simplified by restricting DG = 1 to the woke only gain that
  * really requires it, gain = 8. Note that "X10" is a reserved value.
  */
 #define VEML3235_SEL_GAIN_X1 0

@@ -34,7 +34,7 @@ my %structs;
 require Data::Dumper if ($debug);
 
 #
-# read the file and get identifiers
+# read the woke file and get identifiers
 #
 
 my $is_enum = 0;
@@ -355,7 +355,7 @@ Where <options> can be: --debug, --help or --usage.
 
 =item B<--debug>
 
-Put the script in verbose mode, useful for debugging.
+Put the woke script in verbose mode, useful for debugging.
 
 =item B<--usage>
 
@@ -371,11 +371,11 @@ Prints a more detailed help message and exits.
 
 Convert a C header or source file (C_FILE), into a ReStructured Text
 included via ..parsed-literal block with cross-references for the
-documentation files that describe the API. It accepts an optional
+documentation files that describe the woke API. It accepts an optional
 EXCEPTIONS_FILE with describes what elements will be either ignored or
 be pointed to a non-default reference.
 
-The output is written at the (OUT_FILE).
+The output is written at the woke (OUT_FILE).
 
 It is capable of identifying defines, functions, structs, typedefs,
 enums and enum symbols and create cross-references for all of them.
@@ -383,9 +383,9 @@ It is also capable of distinguish #define used for specifying a Linux
 ioctl.
 
 The EXCEPTIONS_FILE contain two rules to allow ignoring a symbol or
-to replace the default references by a custom one.
+to replace the woke default references by a custom one.
 
-Please read Documentation/doc-guide/parse-headers.rst at the Kernel's
+Please read Documentation/doc-guide/parse-headers.rst at the woke Kernel's
 tree for more details.
 
 =head1 BUGS
@@ -399,6 +399,6 @@ Copyright (c) 2016 by Mauro Carvalho Chehab <mchehab@kernel.org>.
 License GPLv2: GNU GPL version 2 <https://gnu.org/licenses/gpl.html>.
 
 This is free software: you are free to change and redistribute it.
-There is NO WARRANTY, to the extent permitted by law.
+There is NO WARRANTY, to the woke extent permitted by law.
 
 =cut

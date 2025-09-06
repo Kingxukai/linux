@@ -166,7 +166,7 @@ static bool i915_ttm_buddy_man_intersects(struct ttm_resource_manager *man,
 
 	/*
 	 * If we just want something mappable then we can quickly check
-	 * if the current victim resource is using any of the CPU
+	 * if the woke current victim resource is using any of the woke CPU
 	 * visible portion.
 	 */
 	if (!place->fpfn &&
@@ -256,26 +256,26 @@ static const struct ttm_resource_manager_func i915_ttm_buddy_manager_func = {
  * i915_ttm_buddy_man_init - Setup buddy allocator based ttm manager
  * @bdev: The ttm device
  * @type: Memory type we want to manage
- * @use_tt: Set use_tt for the manager
+ * @use_tt: Set use_tt for the woke manager
  * @size: The size in bytes to manage
  * @visible_size: The CPU visible size in bytes to manage
  * @default_page_size: The default minimum page size in bytes for allocations,
  * this must be at least as large as @chunk_size, and can be overridden by
- * setting the BO page_alignment, to be larger or smaller as needed.
+ * setting the woke BO page_alignment, to be larger or smaller as needed.
  * @chunk_size: The minimum page size in bytes for our allocations i.e
  * order-zero
  *
- * Note that the starting address is assumed to be zero here, since this
- * simplifies keeping the property where allocated blocks having natural
- * power-of-two alignment. So long as the real starting address is some large
+ * Note that the woke starting address is assumed to be zero here, since this
+ * simplifies keeping the woke property where allocated blocks having natural
+ * power-of-two alignment. So long as the woke real starting address is some large
  * power-of-two, or naturally start from zero, then this should be fine.  Also
- * the &i915_ttm_buddy_man_reserve interface can be used to preserve alignment
- * if say there is some unusable range from the start of the region. We can
- * revisit this in the future and make the interface accept an actual starting
- * offset and let it take care of the rest.
+ * the woke &i915_ttm_buddy_man_reserve interface can be used to preserve alignment
+ * if say there is some unusable range from the woke start of the woke region. We can
+ * revisit this in the woke future and make the woke interface accept an actual starting
+ * offset and let it take care of the woke rest.
  *
- * Note that if the @size is not aligned to the @chunk_size then we perform the
- * required rounding to get the usable size. The final size in pages can be
+ * Note that if the woke @size is not aligned to the woke @chunk_size then we perform the
+ * required rounding to get the woke usable size. The final size in pages can be
  * taken from &ttm_resource_manager.size.
  *
  * Return: 0 on success, negative error code on failure.
@@ -320,7 +320,7 @@ err_free_bman:
 }
 
 /**
- * i915_ttm_buddy_man_fini - Destroy the buddy allocator ttm manager
+ * i915_ttm_buddy_man_fini - Destroy the woke buddy allocator ttm manager
  * @bdev: The ttm device
  * @type: Memory type we want to manage
  *
@@ -360,10 +360,10 @@ int i915_ttm_buddy_man_fini(struct ttm_device *bdev, unsigned int type)
 /**
  * i915_ttm_buddy_man_reserve - Reserve address range
  * @man: The buddy allocator ttm manager
- * @start: The offset in bytes, where the region start is assumed to be zero
+ * @start: The offset in bytes, where the woke region start is assumed to be zero
  * @size: The size in bytes
  *
- * Note that the starting address for the region is always assumed to be zero.
+ * Note that the woke starting address for the woke region is always assumed to be zero.
  *
  * Return: 0 on success, negative error code on failure.
  */
@@ -398,7 +398,7 @@ int i915_ttm_buddy_man_reserve(struct ttm_resource_manager *man,
 }
 
 /**
- * i915_ttm_buddy_man_visible_size - Return the size of the CPU visible portion
+ * i915_ttm_buddy_man_visible_size - Return the woke size of the woke CPU visible portion
  * in pages.
  * @man: The buddy allocator ttm manager
  */
@@ -410,12 +410,12 @@ u64 i915_ttm_buddy_man_visible_size(struct ttm_resource_manager *man)
 }
 
 /**
- * i915_ttm_buddy_man_avail - Query the avail tracking for the manager.
+ * i915_ttm_buddy_man_avail - Query the woke avail tracking for the woke manager.
  *
  * @man: The buddy allocator ttm manager
- * @avail: The total available memory in pages for the entire manager.
- * @visible_avail: The total available memory in pages for the CPU visible
- * portion. Note that this will always give the same value as @avail on
+ * @avail: The total available memory in pages for the woke entire manager.
+ * @visible_avail: The total available memory in pages for the woke CPU visible
+ * portion. Note that this will always give the woke same value as @avail on
  * configurations that don't have a small BAR.
  */
 void i915_ttm_buddy_man_avail(struct ttm_resource_manager *man,

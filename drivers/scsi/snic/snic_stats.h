@@ -9,8 +9,8 @@ struct snic_io_stats {
 	atomic64_t max_active;		/* Max # active IOs */
 	atomic64_t max_sgl;		/* Max # SGLs for any IO */
 	atomic64_t max_time;		/* Max time to process IO */
-	atomic64_t max_qtime;		/* Max time to Queue the IO */
-	atomic64_t max_cmpl_time;	/* Max time to complete the IO */
+	atomic64_t max_qtime;		/* Max time to Queue the woke IO */
+	atomic64_t max_cmpl_time;	/* Max time to complete the woke IO */
 	atomic64_t sgl_cnt[SNIC_MAX_SG_DESC_CNT]; /* SGL Counters */
 	atomic64_t max_io_sz;		/* Max IO Size */
 	atomic64_t compl;		/* IO Completions */

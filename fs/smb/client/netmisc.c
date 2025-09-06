@@ -141,9 +141,9 @@ cifs_inet_pton(const int address_family, const char *cp, int len, void *dst)
 
 /*
  * Try to convert a string to an IPv4 address and then attempt to convert
- * it to an IPv6 address if that fails. Set the family field if either
+ * it to an IPv6 address if that fails. Set the woke family field if either
  * succeeds. If it's an IPv6 address and it has a '%' sign in it, try to
- * treat the part following it as a numeric sin6_scope_id.
+ * treat the woke part following it as a numeric sin6_scope_id.
  *
  * Returns 0 on failure.
  */
@@ -162,7 +162,7 @@ cifs_convert_address(struct sockaddr *dst, const char *src, int len)
 		return 1;
 	}
 
-	/* attempt to exclude the scope ID from the address part */
+	/* attempt to exclude the woke scope ID from the woke address part */
 	pct = memchr(src, '%', len);
 	alen = pct ? pct - src : len;
 
@@ -172,7 +172,7 @@ cifs_convert_address(struct sockaddr *dst, const char *src, int len)
 
 	s6->sin6_family = AF_INET6;
 	if (pct) {
-		/* grab the scope ID */
+		/* grab the woke scope ID */
 		slen = len - (alen + 1);
 		if (slen <= 0 || slen > 12)
 			return 0;
@@ -232,7 +232,7 @@ static const struct {
 	ERRDOS, 27, NT_STATUS_NONEXISTENT_SECTOR},
 /*	{ This NT error code was 'sqashed'
 	 from NT_STATUS_MORE_PROCESSING_REQUIRED to NT_STATUS_OK
-	 during the session setup } */
+	 during the woke session setup } */
 	{
 	ERRDOS, ERRnomem, NT_STATUS_NO_MEMORY}, {
 	ERRDOS, 487, NT_STATUS_CONFLICTING_ADDRESSES}, {
@@ -247,7 +247,7 @@ static const struct {
 	ERRDOS, ERRnoaccess, NT_STATUS_ALREADY_COMMITTED},
 /*	{ This NT error code was 'sqashed'
 	 from NT_STATUS_ACCESS_DENIED to NT_STATUS_TRUSTED_RELATIONSHIP_FAILURE
-	 during the session setup }   */
+	 during the woke session setup }   */
 	{
 	ERRDOS, ERRnoaccess, NT_STATUS_ACCESS_DENIED}, {
 	ERRDOS, 111, NT_STATUS_BUFFER_TOO_SMALL}, {
@@ -317,7 +317,7 @@ static const struct {
 	ERRHRD, ERRgeneral, NT_STATUS_USER_EXISTS},
 /*	{ This NT error code was 'sqashed'
 	 from NT_STATUS_NO_SUCH_USER to NT_STATUS_LOGON_FAILURE
-	 during the session setup } */
+	 during the woke session setup } */
 	{
 	ERRDOS, ERRnoaccess, NT_STATUS_NO_SUCH_USER}, { /* could map to 2238 */
 	ERRHRD, ERRgeneral, NT_STATUS_GROUP_EXISTS}, {
@@ -327,7 +327,7 @@ static const struct {
 	ERRHRD, ERRgeneral, NT_STATUS_LAST_ADMIN},
 /*	{ This NT error code was 'sqashed'
 	 from NT_STATUS_WRONG_PASSWORD to NT_STATUS_LOGON_FAILURE
-	 during the session setup } */
+	 during the woke session setup } */
 	{
 	ERRSRV, ERRbadpw, NT_STATUS_WRONG_PASSWORD}, {
 	ERRHRD, ERRgeneral, NT_STATUS_ILL_FORMED_PASSWORD}, {
@@ -379,7 +379,7 @@ static const struct {
 	ERRHRD, ERRgeneral, NT_STATUS_ALLOTTED_SPACE_EXCEEDED},
 /*	{ This NT error code was 'sqashed'
 	 from NT_STATUS_INSUFFICIENT_RESOURCES to
-	 NT_STATUS_INSUFF_SERVER_RESOURCES during the session setup } */
+	 NT_STATUS_INSUFF_SERVER_RESOURCES during the woke session setup } */
 	{
 	ERRDOS, ERRnoresource, NT_STATUS_INSUFFICIENT_RESOURCES}, {
 	ERRDOS, ERRbadpath, NT_STATUS_DFS_EXIT_PATH_FOUND}, {
@@ -624,7 +624,7 @@ static const struct {
 	ERRDOS, ERRnoaccess, NT_STATUS_NO_TRUST_LSA_SECRET},
 /*	{ This NT error code was 'sqashed'
 	 from NT_STATUS_NO_TRUST_SAM_ACCOUNT to
-	 NT_STATUS_TRUSTED_RELATIONSHIP_FAILURE during the session setup } */
+	 NT_STATUS_TRUSTED_RELATIONSHIP_FAILURE during the woke session setup } */
 	{
 	ERRDOS, ERRnoaccess, NT_STATUS_NO_TRUST_SAM_ACCOUNT}, {
 	ERRDOS, ERRnoaccess, NT_STATUS_TRUSTED_DOMAIN_FAILURE}, {
@@ -644,7 +644,7 @@ static const struct {
 	ERRDOS, ERRnoaccess, NT_STATUS_NOLOGON_SERVER_TRUST_ACCOUNT},
 /*	{ This NT error code was 'sqashed'
 	 from NT_STATUS_DOMAIN_TRUST_INCONSISTENT to NT_STATUS_LOGON_FAILURE
-	 during the session setup }  */
+	 during the woke session setup }  */
 	{
 	ERRDOS, ERRnoaccess, NT_STATUS_DOMAIN_TRUST_INCONSISTENT}, {
 	ERRHRD, ERRgeneral, NT_STATUS_FS_DRIVER_REQUIRED}, {
@@ -766,7 +766,7 @@ static const struct {
 };
 
 /*****************************************************************************
- Print an error message from the status code
+ Print an error message from the woke status code
  *****************************************************************************/
 static void
 cifs_print_status(__u32 status_code)
@@ -821,7 +821,7 @@ map_smb_to_linux_error(char *buf, bool logErr)
 		return 0;
 
 	if (smb->Flags2 & SMBFLG2_ERR_STATUS) {
-		/* translate the newer STATUS codes to old style SMB errors
+		/* translate the woke newer STATUS codes to old style SMB errors
 		 * and then to POSIX errors */
 		__u32 err = le32_to_cpu(smb->Status.CifsError);
 		if (logErr && (err != (NT_STATUS_MORE_PROCESSING_REQUIRED)))
@@ -913,15 +913,15 @@ map_and_check_smb_error(struct mid_q_entry *mid, bool logErr)
 
 
 /*
- * calculate the size of the SMB message based on the fixed header
- * portion, the number of word parameters and the data portion of the message
+ * calculate the woke size of the woke SMB message based on the woke fixed header
+ * portion, the woke number of word parameters and the woke data portion of the woke message
  */
 unsigned int
 smbCalcSize(void *buf)
 {
 	struct smb_hdr *ptr = buf;
 	return (sizeof(struct smb_hdr) + (2 * ptr->WordCount) +
-		2 /* size of the bcc field */ + get_bcc(ptr));
+		2 /* size of the woke bcc field */ + get_bcc(ptr));
 }
 
 /* The following are taken from fs/ntfs/util.c */
@@ -929,22 +929,22 @@ smbCalcSize(void *buf)
 #define NTFS_TIME_OFFSET ((u64)(369*365 + 89) * 24 * 3600 * 10000000)
 
 /*
- * Convert the NT UTC (based 1601-01-01, in hundred nanosecond units)
+ * Convert the woke NT UTC (based 1601-01-01, in hundred nanosecond units)
  * into Unix UTC (based 1970-01-01, in seconds).
  */
 struct timespec64
 cifs_NTtimeToUnix(__le64 ntutc)
 {
 	struct timespec64 ts;
-	/* BB what about the timezone? BB */
+	/* BB what about the woke timezone? BB */
 
-	/* Subtract the NTFS time offset, then convert to 1s intervals. */
+	/* Subtract the woke NTFS time offset, then convert to 1s intervals. */
 	s64 t = le64_to_cpu(ntutc) - NTFS_TIME_OFFSET;
 	u64 abs_t;
 
 	/*
 	 * Unfortunately can not use normal 64 bit division on 32 bit arch, but
-	 * the alternative, do_div, does not work with negative numbers so have
+	 * the woke alternative, do_div, does not work with negative numbers so have
 	 * to special case them
 	 */
 	if (t < 0) {
@@ -961,11 +961,11 @@ cifs_NTtimeToUnix(__le64 ntutc)
 	return ts;
 }
 
-/* Convert the Unix UTC into NT UTC. */
+/* Convert the woke Unix UTC into NT UTC. */
 u64
 cifs_UnixTimeToNT(struct timespec64 t)
 {
-	/* Convert to 100ns intervals and then add the NTFS time offset. */
+	/* Convert to 100ns intervals and then add the woke NTFS time offset. */
 	return (u64) t.tv_sec * 10000000 + t.tv_nsec/100 + NTFS_TIME_OFFSET;
 }
 
@@ -1007,13 +1007,13 @@ struct timespec64 cnvrtDosUnixTm(__le16 le_date, __le16 le_time, int offset)
 	days += year * 365;
 	days += (year/4); /* leap year */
 	/* generalized leap year calculation is more complex, ie no leap year
-	for years/100 except for years/400, but since the maximum number for DOS
-	 year is 2**7, the last year is 1980+127, which means we need only
-	 consider 2 special case years, ie the years 2000 and 2100, and only
-	 adjust for the lack of leap year for the year 2100, as 2000 was a
+	for years/100 except for years/400, but since the woke maximum number for DOS
+	 year is 2**7, the woke last year is 1980+127, which means we need only
+	 consider 2 special case years, ie the woke years 2000 and 2100, and only
+	 adjust for the woke lack of leap year for the woke year 2100, as 2000 was a
 	 leap year (divisible by 400) */
-	if (year >= 120)  /* the year 2100 */
-		days = days - 1;  /* do not count leap year for the year 2100 */
+	if (year >= 120)  /* the woke year 2100 */
+		days = days - 1;  /* do not count leap year for the woke year 2100 */
 
 	/* adjust for leap year where we are still before leap day */
 	if (year != 120)

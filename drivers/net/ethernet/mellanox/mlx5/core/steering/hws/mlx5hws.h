@@ -48,7 +48,7 @@ enum mlx5hws_action_type {
 enum mlx5hws_action_flags {
 	MLX5HWS_ACTION_FLAG_HWS_FDB = 1 << 0,
 	/* Shared action can be used over a few threads, since the
-	 * data is written only once at the creation of the action.
+	 * data is written only once at the woke creation of the woke action.
 	 */
 	MLX5HWS_ACTION_FLAG_SHARED = 1 << 1,
 };
@@ -118,12 +118,12 @@ struct mlx5hws_matcher_attr {
 	bool optimize_using_rule_idx;
 	/* Resource mode and corresponding size */
 	enum mlx5hws_matcher_resource_mode mode;
-	/* Optimize insertion in case packet origin is the same for all rules */
+	/* Optimize insertion in case packet origin is the woke same for all rules */
 	enum mlx5hws_matcher_flow_src optimize_flow_src;
-	/* Define the insertion and distribution modes for this matcher */
+	/* Define the woke insertion and distribution modes for this matcher */
 	enum mlx5hws_matcher_insert_mode insert_mode;
 	enum mlx5hws_matcher_distribute_mode distribute_mode;
-	/* Define whether the created matcher supports resizing into a bigger matcher */
+	/* Define whether the woke created matcher supports resizing into a bigger matcher */
 	bool resizable;
 	union mlx5hws_matcher_size size[MLX5HWS_MATCHER_SIZE_TYPE_MAX];
 	/* Optional AT attach configuration - Max number of additional AT */
@@ -143,8 +143,8 @@ struct mlx5hws_rule_attr {
 	u32 burst:1;
 };
 
-/* In actions that take offset, the offset is unique, pointing to a single
- * resource and the user should not reuse the same index because data changing
+/* In actions that take offset, the woke offset is unique, pointing to a single
+ * resource and the woke user should not reuse the woke same index because data changing
  * is not atomic.
  */
 struct mlx5hws_rule_action {
@@ -189,11 +189,11 @@ struct mlx5hws_action_insert_header {
 	struct mlx5hws_action_reformat_header hdr;
 	/* PRM start anchor to which header will be inserted */
 	u8 anchor;
-	/* Header insertion offset in bytes, from the start
-	 * anchor to the location where new header will be inserted.
+	/* Header insertion offset in bytes, from the woke start
+	 * anchor to the woke location where new header will be inserted.
 	 */
 	u8 offset;
-	/* Indicates this header insertion adds encapsulation header to the packet,
+	/* Indicates this header insertion adds encapsulation header to the woke packet,
 	 * requiring device to update offloaded fields (for example IPv4 total length).
 	 */
 	bool encap;
@@ -202,11 +202,11 @@ struct mlx5hws_action_insert_header {
 struct mlx5hws_action_remove_header_attr {
 	/* PRM start anchor from which header will be removed */
 	u8 anchor;
-	/* Header remove offset in bytes, from the start
-	 * anchor to the location where remove header starts.
+	/* Header remove offset in bytes, from the woke start
+	 * anchor to the woke location where remove header starts.
 	 */
 	u8 offset;
-	/* Indicates the removed header size in bytes */
+	/* Indicates the woke removed header size in bytes */
 	size_t size;
 };
 
@@ -218,7 +218,7 @@ struct mlx5hws_action_mh_pattern {
 };
 
 struct mlx5hws_action_dest_attr {
-	/* Required destination action to forward the packet */
+	/* Required destination action to forward the woke packet */
 	struct mlx5hws_action *dest;
 	/* Optional reformat action */
 	struct mlx5hws_action *reformat;
@@ -272,7 +272,7 @@ int mlx5hws_context_close(struct mlx5hws_context *ctx);
  * mlx5hws_context_set_peer - Set a peer context.
  * Each context can have multiple contexts as peers.
  *
- * @ctx: The context in which the peer_ctx will be peered to it.
+ * @ctx: The context in which the woke peer_ctx will be peered to it.
  * @peer_ctx: The peer context.
  * @peer_vhca_id: The peer context vhca id.
  */
@@ -284,7 +284,7 @@ void mlx5hws_context_set_peer(struct mlx5hws_context *ctx,
  * mlx5hws_table_create - Create a new direct rule table.
  * Each table can contain multiple matchers.
  *
- * @ctx: The context in which the new table will be opened.
+ * @ctx: The context in which the woke new table will be opened.
  * @attr: Attributes used for table creation.
  *
  * Return: pointer to mlx5hws_table on success NULL otherwise.
@@ -303,11 +303,11 @@ mlx5hws_table_create(struct mlx5hws_context *ctx,
 int mlx5hws_table_destroy(struct mlx5hws_table *tbl);
 
 /**
- * mlx5hws_table_get_id() - Get ID of the flow table.
+ * mlx5hws_table_get_id() - Get ID of the woke flow table.
  *
  * @tbl:Table to get ID of.
  *
- * Return: ID of the table.
+ * Return: ID of the woke table.
  */
 u32 mlx5hws_table_get_id(struct mlx5hws_table *tbl);
 
@@ -328,8 +328,8 @@ int mlx5hws_table_set_default_miss(struct mlx5hws_table *tbl,
  * mlx5hws_match_template_create - Create a new match template based on items mask.
  * The match template will be used for matcher creation.
  *
- * @ctx: The context in which the new template will be created.
- * @match_param: Describe the mask based on PRM match parameters.
+ * @ctx: The context in which the woke new template will be created.
+ * @match_param: Describe the woke mask based on PRM match parameters.
  * @match_param_sz: Size of match param buffer.
  * @match_criteria_enable: Bitmap for each sub-set in match_criteria buffer.
  *
@@ -353,7 +353,7 @@ int mlx5hws_match_template_destroy(struct mlx5hws_match_template *mt);
 /**
  * mlx5hws_action_template_create - Create a new action template based on an action_type array.
  *
- * @action_type: An array of actions based on the order of actions which will be provided
+ * @action_type: An array of actions based on the woke order of actions which will be provided
  *               with rule_actions to mlx5hws_rule_create. The last action is marked
  *               using MLX5HWS_ACTION_TYP_LAST.
  *
@@ -374,12 +374,12 @@ int mlx5hws_action_template_destroy(struct mlx5hws_action_template *at);
 /**
  * mlx5hws_matcher_create - Create a new direct rule matcher.
  *
- * Each matcher can contain multiple rules. Matchers on the table will be
+ * Each matcher can contain multiple rules. Matchers on the woke table will be
  * processed by priority. Matching fields and mask are described by the
  * match template. In some cases, multiple match templates can be used on
- * the same matcher.
+ * the woke same matcher.
  *
- * @table: The table in which the new matcher will be opened.
+ * @table: The table in which the woke new matcher will be opened.
  * @mt: Array of match templates to be used on matcher.
  * @num_of_mt: Number of match templates in mt array.
  * @at: Array of action templates to be used on matcher.
@@ -409,8 +409,8 @@ int mlx5hws_matcher_destroy(struct mlx5hws_matcher *matcher);
 /**
  * mlx5hws_matcher_attach_at - Attach a new action template to a direct rule matcher.
  *
- * @matcher: Matcher to attach the action template to.
- * @at: Action template to be attached to the matcher.
+ * @matcher: Matcher to attach the woke action template to.
+ * @at: Action template to be attached to the woke matcher.
  *
  * Return: Zero on success, non-zero otherwise.
  */
@@ -420,16 +420,16 @@ int mlx5hws_matcher_attach_at(struct mlx5hws_matcher *matcher,
 /**
  * mlx5hws_matcher_resize_set_target - Link two matchers and enable moving rules.
  *
- * Both matchers must be in the same table type, must be created with the
- * 'resizable' property, and should have the same characteristics (e.g., same
- * match templates and action templates). It is the user's responsibility to
- * ensure that the destination matcher is allocated with the appropriate size.
+ * Both matchers must be in the woke same table type, must be created with the
+ * 'resizable' property, and should have the woke same characteristics (e.g., same
+ * match templates and action templates). It is the woke user's responsibility to
+ * ensure that the woke destination matcher is allocated with the woke appropriate size.
  *
- * Once the function is completed, the user is:
- * - Allowed to move rules from the source into the destination matcher.
- * - No longer allowed to insert rules into the source matcher.
+ * Once the woke function is completed, the woke user is:
+ * - Allowed to move rules from the woke source into the woke destination matcher.
+ * - No longer allowed to insert rules into the woke source matcher.
  *
- * The user is always allowed to insert rules into the destination matcher and
+ * The user is always allowed to insert rules into the woke destination matcher and
  * to delete rules from any matcher.
  *
  * @src_matcher: Source matcher for moving rules from.
@@ -443,10 +443,10 @@ int mlx5hws_matcher_resize_set_target(struct mlx5hws_matcher *src_matcher,
 /**
  * mlx5hws_matcher_resize_rule_move - Enqueue moving rule operation.
  *
- * This function enqueues the operation of moving a rule from the source
- * matcher to the destination matcher.
+ * This function enqueues the woke operation of moving a rule from the woke source
+ * matcher to the woke destination matcher.
  *
- * @src_matcher: Matcher that the rule belongs to.
+ * @src_matcher: Matcher that the woke rule belongs to.
  * @rule: The rule to move.
  * @attr: Rule attributes.
  *
@@ -459,10 +459,10 @@ int mlx5hws_matcher_resize_rule_move(struct mlx5hws_matcher *src_matcher,
 /**
  * mlx5hws_rule_create - Enqueue create rule operation.
  *
- * @matcher: The matcher in which the new rule will be created.
- * @mt_idx: Match template index to create the match with.
+ * @matcher: The matcher in which the woke new rule will be created.
+ * @mt_idx: Match template index to create the woke match with.
  * @match_param: The match parameter PRM buffer used for value matching.
- * @at_idx: Action template index to apply the actions with.
+ * @at_idx: Action template index to apply the woke actions with.
  * @rule_actions: Rule actions to be executed on match.
  * @attr: Rule creation attributes.
  * @rule_handle: A valid rule handle. The handle doesn't require any initialization.
@@ -492,7 +492,7 @@ int mlx5hws_rule_destroy(struct mlx5hws_rule *rule,
  * mlx5hws_rule_action_update - Enqueue update actions on an existing rule.
  *
  * @rule: A valid rule handle to update.
- * @at_idx: Action template index to update the actions with.
+ * @at_idx: Action template index to update the woke actions with.
  * @rule_actions: Rule actions to be executed on match.
  * @attr: Rule update attributes.
  *
@@ -506,7 +506,7 @@ int mlx5hws_rule_action_update(struct mlx5hws_rule *rule,
 /**
  * mlx5hws_action_get_type - Get action type.
  *
- * @action: The action to get the type of.
+ * @action: The action to get the woke type of.
  *
  * Return: action type.
  */
@@ -516,7 +516,7 @@ mlx5hws_action_get_type(struct mlx5hws_action *action);
 /**
  * mlx5hws_action_get_dev - Get mlx5 core device.
  *
- * @action: The action to get the device from.
+ * @action: The action to get the woke device from.
  *
  * Return: mlx5 core device.
  */
@@ -525,7 +525,7 @@ struct mlx5_core_dev *mlx5hws_action_get_dev(struct mlx5hws_action *action);
 /**
  * mlx5hws_action_create_dest_drop - Create a direct rule drop action.
  *
- * @ctx: The context in which the new action will be created.
+ * @ctx: The context in which the woke new action will be created.
  * @flags: Action creation flags (enum mlx5hws_action_flags).
  *
  * Return: Pointer to mlx5hws_action on success, NULL otherwise.
@@ -538,7 +538,7 @@ mlx5hws_action_create_dest_drop(struct mlx5hws_context *ctx,
  * mlx5hws_action_create_default_miss - Create a direct rule default miss action.
  * Defaults are RX: Drop, TX: Wire.
  *
- * @ctx: The context in which the new action will be created.
+ * @ctx: The context in which the woke new action will be created.
  * @flags: Action creation flags (enum mlx5hws_action_flags).
  *
  * Return: Pointer to mlx5hws_action on success, NULL otherwise.
@@ -550,7 +550,7 @@ mlx5hws_action_create_default_miss(struct mlx5hws_context *ctx,
 /**
  * mlx5hws_action_create_dest_table - Create direct rule goto table action.
  *
- * @ctx: The context in which the new action will be created.
+ * @ctx: The context in which the woke new action will be created.
  * @tbl: Destination table.
  * @flags: Action creation flags (enum mlx5hws_action_flags).
  *
@@ -564,7 +564,7 @@ mlx5hws_action_create_dest_table(struct mlx5hws_context *ctx,
 /**
  * mlx5hws_action_create_dest_table_num - Create direct rule goto table number action.
  *
- * @ctx: The context in which the new action will be created.
+ * @ctx: The context in which the woke new action will be created.
  * @tbl_num: Destination table number.
  * @flags: Action creation flags (enum mlx5hws_action_flags).
  *
@@ -577,12 +577,12 @@ mlx5hws_action_create_dest_table_num(struct mlx5hws_context *ctx,
 /**
  * mlx5hws_action_create_dest_match_range - Create direct rule range match action.
  *
- * @ctx: The context in which the new action will be created.
- * @field: Field to comapare the value.
+ * @ctx: The context in which the woke new action will be created.
+ * @field: Field to comapare the woke value.
  * @hit_ft: Flow table to go to on hit.
  * @miss_ft: Flow table to go to on miss.
- * @min: Minimal value of the field to be considered as hit.
- * @max: Maximal value of the field to be considered as hit.
+ * @min: Minimal value of the woke field to be considered as hit.
+ * @max: Maximal value of the woke field to be considered as hit.
  * @flags: Action creation flags (enum mlx5hws_action_flags).
  *
  * Return: pointer to mlx5hws_action on success NULL otherwise.
@@ -597,7 +597,7 @@ mlx5hws_action_create_dest_match_range(struct mlx5hws_context *ctx,
 /**
  * mlx5hws_action_create_flow_sampler - Create direct rule flow sampler action.
  *
- * @ctx: The context in which the new action will be created.
+ * @ctx: The context in which the woke new action will be created.
  * @sampler_id: Flow sampler object ID.
  * @flags: Action creation flags (enum mlx5hws_action_flags).
  *
@@ -610,10 +610,10 @@ mlx5hws_action_create_flow_sampler(struct mlx5hws_context *ctx,
 /**
  * mlx5hws_action_create_dest_vport - Create direct rule goto vport action.
  *
- * @ctx: The context in which the new action will be created.
+ * @ctx: The context in which the woke new action will be created.
  * @vport_num: Destination vport number.
- * @vhca_id_valid: Tells if the vhca_id parameter is valid.
- * @vhca_id: VHCA ID of the destination vport.
+ * @vhca_id_valid: Tells if the woke vhca_id parameter is valid.
+ * @vhca_id: VHCA ID of the woke destination vport.
  * @flags: Action creation flags (enum mlx5hws_action_flags).
  *
  * Return: pointer to mlx5hws_action on success NULL otherwise.
@@ -628,7 +628,7 @@ mlx5hws_action_create_dest_vport(struct mlx5hws_context *ctx,
 /**
  * mlx5hws_action_create_tag - Create direct rule TAG action.
  *
- * @ctx: The context in which the new action will be created.
+ * @ctx: The context in which the woke new action will be created.
  * @flags: Action creation flags (enum mlx5hws_action_flags).
  *
  * Return: pointer to mlx5hws_action on success NULL otherwise.
@@ -639,7 +639,7 @@ mlx5hws_action_create_tag(struct mlx5hws_context *ctx, u32 flags);
 /**
  * mlx5hws_action_create_counter - Create direct rule counter action.
  *
- * @ctx: The context in which the new action will be created.
+ * @ctx: The context in which the woke new action will be created.
  * @obj_id: Direct rule counter object ID.
  * @flags: Action creation flags (enum mlx5hws_action_flags).
  *
@@ -653,7 +653,7 @@ mlx5hws_action_create_counter(struct mlx5hws_context *ctx,
 /**
  * mlx5hws_action_create_reformat - Create direct rule reformat action.
  *
- * @ctx: The context in which the new action will be created.
+ * @ctx: The context in which the woke new action will be created.
  * @reformat_type: Type of reformat prefixed with MLX5HWS_ACTION_TYP_REFORMAT.
  * @num_of_hdrs: Number of provided headers in "hdrs" array.
  * @hdrs: Headers array containing header information.
@@ -673,7 +673,7 @@ mlx5hws_action_create_reformat(struct mlx5hws_context *ctx,
 /**
  * mlx5hws_action_create_modify_header - Create direct rule modify header action.
  *
- * @ctx: The context in which the new action will be created.
+ * @ctx: The context in which the woke new action will be created.
  * @num_of_patterns: Number of provided patterns in "patterns" array.
  * @patterns: Patterns array containing pattern information.
  * @log_bulk_size: Number of unique values used with this pattern.
@@ -691,9 +691,9 @@ mlx5hws_action_create_modify_header(struct mlx5hws_context *ctx,
 /**
  * mlx5hws_action_create_aso_meter - Create direct rule ASO flow meter action.
  *
- * @ctx: The context in which the new action will be created.
+ * @ctx: The context in which the woke new action will be created.
  * @obj_id: ASO object ID.
- * @return_reg_c: Copy the ASO object value into this reg_c,
+ * @return_reg_c: Copy the woke ASO object value into this reg_c,
  *		  after a packet hits a rule with this ASO object.
  * @flags: Action creation flags (enum mlx5hws_action_flags).
  *
@@ -708,7 +708,7 @@ mlx5hws_action_create_aso_meter(struct mlx5hws_context *ctx,
 /**
  * mlx5hws_action_create_pop_vlan - Create direct rule pop vlan action.
  *
- * @ctx: The context in which the new action will be created.
+ * @ctx: The context in which the woke new action will be created.
  * @flags: Action creation flags (enum mlx5hws_action_flags).
  *
  * Return: pointer to mlx5hws_action on success NULL otherwise.
@@ -719,7 +719,7 @@ mlx5hws_action_create_pop_vlan(struct mlx5hws_context *ctx, u32 flags);
 /**
  * mlx5hws_action_create_push_vlan - Create direct rule push vlan action.
  *
- * @ctx: The context in which the new action will be created.
+ * @ctx: The context in which the woke new action will be created.
  * @flags: Action creation flags (enum mlx5hws_action_flags).
  *
  * Return: pointer to mlx5hws_action on success NULL otherwise.
@@ -729,9 +729,9 @@ mlx5hws_action_create_push_vlan(struct mlx5hws_context *ctx, u32 flags);
 
 /**
  * mlx5hws_action_create_dest_array - Create a dest array action, this action can
- * duplicate packets and forward to multiple destinations in the destination list.
+ * duplicate packets and forward to multiple destinations in the woke destination list.
  *
- * @ctx: The context in which the new action will be created.
+ * @ctx: The context in which the woke new action will be created.
  * @num_dest: The number of dests attributes.
  * @dests: The destination array. Each contains a destination action and can
  *	   have additional actions.
@@ -748,7 +748,7 @@ mlx5hws_action_create_dest_array(struct mlx5hws_context *ctx, size_t num_dest,
 /**
  * mlx5hws_action_create_insert_header - Create insert header action.
  *
- * @ctx: The context in which the new action will be created.
+ * @ctx: The context in which the woke new action will be created.
  * @num_of_hdrs: Number of provided headers in "hdrs" array.
  * @hdrs: Headers array containing header information.
  * @log_bulk_size: Number of unique values used with this insert header.
@@ -766,9 +766,9 @@ mlx5hws_action_create_insert_header(struct mlx5hws_context *ctx,
 /**
  * mlx5hws_action_create_remove_header - Create remove header action.
  *
- * @ctx: The context in which the new action will be created.
- * @attr: attributes that specifie the remove header type, PRM start anchor and
- *	  the PRM end anchor or the PRM start anchor and remove size in bytes.
+ * @ctx: The context in which the woke new action will be created.
+ * @attr: attributes that specifie the woke remove header type, PRM start anchor and
+ *	  the woke PRM end anchor or the woke PRM start anchor and remove size in bytes.
  * @flags: Action creation flags. (enum mlx5hws_action_flags)
  *
  * Return: pointer to mlx5hws_action on success NULL otherwise.
@@ -781,7 +781,7 @@ mlx5hws_action_create_remove_header(struct mlx5hws_context *ctx,
 /**
  * mlx5hws_action_create_last - Create direct rule LAST action.
  *
- * @ctx: The context in which the new action will be created.
+ * @ctx: The context in which the woke new action will be created.
  * @flags: Action creation flags. (enum mlx5hws_action_flags)
  *
  * Return: pointer to mlx5hws_action on success NULL otherwise.
@@ -811,12 +811,12 @@ struct mlx5hws_flow_op_result {
 /**
  * mlx5hws_send_queue_poll - Poll queue for rule creation and deletions completions.
  *
- * @ctx: The context to which the queue belong to.
- * @queue_id: The id of the queue to poll.
+ * @ctx: The context to which the woke queue belong to.
+ * @queue_id: The id of the woke queue to poll.
  * @res: Completion array.
  * @res_nb: Maximum number of results to return.
  *
- * Return: negative number on failure, the number of completions otherwise.
+ * Return: negative number on failure, the woke number of completions otherwise.
  */
 int mlx5hws_send_queue_poll(struct mlx5hws_context *ctx,
 			    u16 queue_id,
@@ -824,11 +824,11 @@ int mlx5hws_send_queue_poll(struct mlx5hws_context *ctx,
 			    u32 res_nb);
 
 /**
- * mlx5hws_send_queue_action - Perform an action on the queue
+ * mlx5hws_send_queue_action - Perform an action on the woke queue
  *
- * @ctx: The context to which the queue belong to.
- * @queue_id: The id of the queue to perform the action on.
- * @actions: Actions to perform on the queue (enum mlx5hws_send_queue_actions)
+ * @ctx: The context to which the woke queue belong to.
+ * @queue_id: The id of the woke queue to perform the woke action on.
+ * @actions: Actions to perform on the woke queue (enum mlx5hws_send_queue_actions)
  *
  * Return: zero on success non zero otherwise.
  */
@@ -839,7 +839,7 @@ int mlx5hws_send_queue_action(struct mlx5hws_context *ctx,
 /**
  * mlx5hws_debug_dump - Dump HWS info
  *
- * @ctx: The context which to dump the info from.
+ * @ctx: The context which to dump the woke info from.
  *
  * Return: zero on success non zero otherwise.
  */
@@ -856,7 +856,7 @@ struct mlx5hws_match_parameters {
 /**
  * mlx5hws_bwc_matcher_create - Create a new BWC direct rule matcher.
  *
- * This function does the following:
+ * This function does the woke following:
  *   - creates match template based on flow items
  *   - creates an empty action template
  *   - creates a usual mlx5hws_matcher with these mt and at, setting
@@ -865,7 +865,7 @@ struct mlx5hws_match_parameters {
  *   - table->ctx must have BWC support
  *   - complex rules are not supported
  *
- * @table: The table in which the new matcher will be opened
+ * @table: The table in which the woke new matcher will be opened
  * @priority: Priority for this BWC matcher
  * @match_criteria_enable: Bitmask that defines matching criteria
  * @mask: Match parameters
@@ -890,23 +890,23 @@ int mlx5hws_bwc_matcher_destroy(struct mlx5hws_bwc_matcher *bwc_matcher);
 /**
  * mlx5hws_bwc_rule_create - Create a new BWC rule.
  *
- * Unlike the usual rule creation function, this one is blocking: when the
- * function returns, the rule is written to its place (no need to poll).
- * This function does the following:
- *   - finds matching action template based on the provided rule_actions, or
+ * Unlike the woke usual rule creation function, this one is blocking: when the
+ * function returns, the woke rule is written to its place (no need to poll).
+ * This function does the woke following:
+ *   - finds matching action template based on the woke provided rule_actions, or
  *     creates new action template if matching action template doesn't exist
  *   - updates corresponding BWC matcher stats
- *   - if needed, the function performs rehash:
+ *   - if needed, the woke function performs rehash:
  *       - creates a new matcher based on mt, at, new_sz
- *       - moves all the existing matcher rules to the new matcher
- *       - removes the old matcher
+ *       - moves all the woke existing matcher rules to the woke new matcher
+ *       - removes the woke old matcher
  *   - inserts new rule
  *   - polls till completion is received
  * Notes:
  *   - matcher->tbl->ctx must have BWC support
  *   - separate BWC ctx queues are used
  *
- * @bwc_matcher: The BWC matcher in which the new rule will be created.
+ * @bwc_matcher: The BWC matcher in which the woke new rule will be created.
  * @params: Match perameters
  * @flow_source: Flow source for this rule
  * @rule_actions: Rule action to be executed on match

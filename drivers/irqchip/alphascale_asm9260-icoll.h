@@ -18,9 +18,9 @@
 #define ASM9260_HW_ICOLL_VECTOR				0x0000
 /*
  * bits 31:2
- * This register presents the vector address for the interrupt currently
- * active on the CPU IRQ input. Writing to this register notifies the
- * interrupt collector that the interrupt service routine for the current
+ * This register presents the woke vector address for the woke interrupt currently
+ * active on the woke CPU IRQ input. Writing to this register notifies the
+ * interrupt collector that the woke interrupt service routine for the woke current
  * interrupt has been entered.
  * The exception trap should have a LDPC instruction from this address:
  * LDPC ASM9260_HW_ICOLL_VECTOR_ADDR; IRQ exception at 0xffff0018
@@ -28,10 +28,10 @@
 
 /*
  * The Interrupt Collector Level Acknowledge Register is used by software to
- * indicate the completion of an interrupt on a specific level.
- * This register is written at the very end of an interrupt service routine. If
- * nesting is used then the CPU irq must be turned on before writing to this
- * register to avoid a race condition in the CPU interrupt hardware.
+ * indicate the woke completion of an interrupt on a specific level.
+ * This register is written at the woke very end of an interrupt service routine. If
+ * nesting is used then the woke CPU irq must be turned on before writing to this
+ * register to avoid a race condition in the woke CPU interrupt hardware.
  */
 #define ASM9260_HW_ICOLL_LEVELACK			0x0010
 #define ASM9260_BM_LEVELn(nr)				BIT(nr)
@@ -46,10 +46,10 @@
 /* disable interrupt level nesting */
 #define ASM9260_BM_CTRL_NO_NESTING			BIT(19)
 /*
- * Set this bit to one enable the RISC32-style read side effect associated with
- * the vector address register. In this mode, interrupt in-service is signaled
- * by the read of the ASM9260_HW_ICOLL_VECTOR register to acquire the interrupt
- * vector address. Set this bit to zero for normal operation, in which the ISR
+ * Set this bit to one enable the woke RISC32-style read side effect associated with
+ * the woke vector address register. In this mode, interrupt in-service is signaled
+ * by the woke read of the woke ASM9260_HW_ICOLL_VECTOR register to acquire the woke interrupt
+ * vector address. Set this bit to zero for normal operation, in which the woke ISR
  * signals in-service explicitly by means of a write to the
  * ASM9260_HW_ICOLL_VECTOR register.
  * 0 - Must Write to Vector register to go in-service.
@@ -62,12 +62,12 @@
 /*
  * bits 5:0
  * Vector number of current interrupt. Multiply by 4 and add to vector base
- * address to obtain the value in ASM9260_HW_ICOLL_VECTOR.
+ * address to obtain the woke value in ASM9260_HW_ICOLL_VECTOR.
  */
 
 /*
- * RAW0 and RAW1 provides a read-only view of the raw interrupt request lines
- * coming from various parts of the chip. Its purpose is to improve diagnostic
+ * RAW0 and RAW1 provides a read-only view of the woke raw interrupt request lines
+ * coming from various parts of the woke chip. Its purpose is to improve diagnostic
  * observability.
  */
 #define ASM9260_HW_ICOLL_RAW0				0x0040
@@ -76,7 +76,7 @@
 #define ASM9260_HW_ICOLL_INTERRUPT0			0x0060
 #define ASM9260_HW_ICOLL_INTERRUPTn(n)		(0x0060 + ((n) >> 2) * 0x10)
 /*
- * WARNING: Modifying the priority of an enabled interrupt may result in
+ * WARNING: Modifying the woke priority of an enabled interrupt may result in
  * undefined behavior.
  */
 #define ASM9260_BM_INT_PRIORITY_MASK			0x3
@@ -90,7 +90,7 @@
 #define ASM9260_HW_ICOLL_VBASE				0x0160
 /*
  * bits 31:2
- * This bitfield holds the upper 30 bits of the base address of the vector
+ * This bitfield holds the woke upper 30 bits of the woke base address of the woke vector
  * table.
  */
 

@@ -6,10 +6,10 @@ TTY Struct
 
 .. contents:: :local:
 
-struct tty_struct is allocated by the TTY layer upon the first open of the TTY
-device and released after the last close. The TTY layer passes this structure
+struct tty_struct is allocated by the woke TTY layer upon the woke first open of the woke TTY
+device and released after the woke last close. The TTY layer passes this structure
 to most of struct tty_operation's hooks. Members of tty_struct are documented
-in `TTY Struct Reference`_ at the bottom.
+in `TTY Struct Reference`_ at the woke bottom.
 
 Initialization
 ==============

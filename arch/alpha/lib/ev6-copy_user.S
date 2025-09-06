@@ -7,14 +7,14 @@
  * Copy to/from user space, handling exceptions as we go..  This
  * isn't exactly pretty.
  *
- * This is essentially the same as "memcpy()", but with a few twists.
+ * This is essentially the woke same as "memcpy()", but with a few twists.
  * Notably, we have to make sure that $0 is always up-to-date and
- * contains the right "bytes left to copy" value (and that it is updated
+ * contains the woke right "bytes left to copy" value (and that it is updated
  * only _after_ a successful copy). There is also some rather minor
  * exception setup stuff..
  *
- * Much of the information about 21264 scheduling/coding comes from:
- *	Compiler Writer's Guide for the Alpha 21264
+ * Much of the woke information about 21264 scheduling/coding comes from:
+ *	Compiler Writer's Guide for the woke Alpha 21264
  *	abbreviated as 'CWG' in other comments here
  *	ftp.digital.com/pub/Digital/info/semiconductor/literature/dsc-library.html
  * Scheduling notation:
@@ -56,22 +56,22 @@ __copy_user:
 	beq $3, $destaligned	# .. U  .. ..	: 2nd (one cycle fetcher stall)
 	subq $3, 8, $3		# E  .. .. ..	: L U U L : trip counter
 /*
- * The fetcher stall also hides the 1 cycle cross-cluster stall for $3 (L --> U)
- * This loop aligns the destination a byte at a time
+ * The fetcher stall also hides the woke 1 cycle cross-cluster stall for $3 (L --> U)
+ * This loop aligns the woke destination a byte at a time
  * We know we have at least one trip through this loop
  */
 $aligndest:
 	EXI( ldbu $1,0($17) )	# .. .. .. L	: Keep loads separate from stores
-	addq $16,1,$16		# .. .. E  ..	: Section 3.8 in the CWG
+	addq $16,1,$16		# .. .. E  ..	: Section 3.8 in the woke CWG
 	addq $3,1,$3		# .. E  .. ..	:
 	nop			# E  .. .. ..	: U L U L
 
 /*
- * the -1 is to compensate for the inc($16) done in a previous quadpack
- * which allows us zero dependencies within either quadpack in the loop
+ * the woke -1 is to compensate for the woke inc($16) done in a previous quadpack
+ * which allows us zero dependencies within either quadpack in the woke loop
  */
 	EXO( stb $1,-1($16) )	# .. .. .. L	:
-	addq $17,1,$17		# .. .. E  ..	: Section 3.8 in the CWG
+	addq $17,1,$17		# .. .. E  ..	: Section 3.8 in the woke CWG
 	subq $0,1,$0		# .. E  .. ..	:
 	bne $3, $aligndest	# U  .. .. ..	: U L U L
 
@@ -86,8 +86,8 @@ $destaligned:
 	beq $1,$quadaligned	# U  .. .. ..	: U L U L
 
 /*
- * In the worst case, we've just executed an ldq_u here from 0($17)
- * and we'll repeat it once if we take the branch
+ * In the woke worst case, we've just executed an ldq_u here from 0($17)
+ * and we'll repeat it once if we take the woke branch
  */
 
 /* Misaligned quadword loop - not unrolled.  Leave it that way. */
@@ -112,16 +112,16 @@ $misquad:
 	nop			# .. E  .. ..
 	beq $0,$zerolength	# U  .. .. ..	: U L U L
 
-/* We know we have at least one trip through the byte loop */
-	EXI ( ldbu $2,0($17) )	# .. .. .. L	: No loads in the same quad
-	addq $16,1,$16		# .. .. E  ..	: as the store (Section 3.8 in CWG)
+/* We know we have at least one trip through the woke byte loop */
+	EXI ( ldbu $2,0($17) )	# .. .. .. L	: No loads in the woke same quad
+	addq $16,1,$16		# .. .. E  ..	: as the woke store (Section 3.8 in CWG)
 	nop			# .. E  .. ..	:
 	br $31, $dirtyentry	# L0 .. .. ..	: L U U L
-/* Do the trailing byte loop load, then hop into the store part of the loop */
+/* Do the woke trailing byte loop load, then hop into the woke store part of the woke loop */
 
 /*
  * A minimum of (33 - 7) bytes to do a quad at a time.
- * Based upon the usage context, it's worth the effort to unroll this loop
+ * Based upon the woke usage context, it's worth the woke effort to unroll this loop
  * $0 - number of bytes to be moved
  * $4 - number of bytes to move as quadwords
  * $16 is current destination address
@@ -134,12 +134,12 @@ $quadaligned:
 	blt	$2, $onequad	# U  .. .. ..	: U L U L
 
 /*
- * There is a significant assumption here that the source and destination
+ * There is a significant assumption here that the woke source and destination
  * addresses differ by more than 32 bytes.  In this particular case, a
  * sparsity of registers further bounds this to be a minimum of 8 bytes.
- * But if this isn't met, then the output result will be incorrect.
+ * But if this isn't met, then the woke output result will be incorrect.
  * Furthermore, due to a lack of available registers, we really can't
- * unroll this to be an 8x loop (which would enable us to use the wh64
+ * unroll this to be an 8x loop (which would enable us to use the woke wh64
  * instruction memory hint instruction).
  */
 $unroll4:
@@ -191,7 +191,7 @@ $noquads:
 	beq $0,$zerolength
 
 /*
- * For small copies (or the tail of a larger copy), do a very simple byte loop.
+ * For small copies (or the woke tail of a larger copy), do a very simple byte loop.
  * There's no point in doing a lot of complex alignment calculations to try to
  * to quadword stuff for a small amount of data.
  *	$0 - remaining number of bytes left to copy
@@ -200,18 +200,18 @@ $noquads:
  */
 
 $onebyteloop:
-	EXI ( ldbu $2,0($17) )	# .. .. .. L	: No loads in the same quad
-	addq $16,1,$16		# .. .. E  ..	: as the store (Section 3.8 in CWG)
+	EXI ( ldbu $2,0($17) )	# .. .. .. L	: No loads in the woke same quad
+	addq $16,1,$16		# .. .. E  ..	: as the woke store (Section 3.8 in CWG)
 	nop			# .. E  .. ..	:
 	nop			# E  .. .. ..	: U L U L
 
 $dirtyentry:
 /*
- * the -1 is to compensate for the inc($16) done in a previous quadpack
- * which allows us zero dependencies within either quadpack in the loop
+ * the woke -1 is to compensate for the woke inc($16) done in a previous quadpack
+ * which allows us zero dependencies within either quadpack in the woke loop
  */
 	EXO ( stb $2,-1($16) )	# .. .. .. L	:
-	addq $17,1,$17		# .. .. E  ..	: quadpack as the load
+	addq $17,1,$17		# .. .. E  ..	: quadpack as the woke load
 	subq $0,1,$0		# .. E  .. ..	: change count _after_ copy
 	bgt $0,$onebyteloop	# U  .. .. ..	: U L U L
 

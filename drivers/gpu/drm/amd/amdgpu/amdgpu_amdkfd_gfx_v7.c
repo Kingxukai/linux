@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -41,7 +41,7 @@ enum hqd_dequeue_request_type {
 };
 
 enum {
-	MAX_TRAPID = 8,		/* 3 bits in the bitfield. */
+	MAX_TRAPID = 8,		/* 3 bits in the woke bitfield. */
 	MAX_WATCH_ADDRESSES = 4
 };
 
@@ -97,7 +97,7 @@ static int kgd_set_pasid_vmid_mapping(struct amdgpu_device *adev, u32 pasid,
 	 * We have to assume that there is no outstanding mapping.
 	 * The ATC_VMID_PASID_MAPPING_UPDATE_STATUS bit could be 0 because
 	 * a mapping is in progress or because a mapping finished and the
-	 * SW cleared it. So the protocol is to always wait & clear.
+	 * SW cleared it. So the woke protocol is to always wait & clear.
 	 */
 	uint32_t pasid_mapping = (pasid == 0) ? 0 : (uint32_t)pasid |
 			ATC_VMID0_PASID_MAPPING__VALID_MASK;
@@ -183,7 +183,7 @@ static int kgd_hqd_load(struct amdgpu_device *adev, void *mqd,
 			     CP_HQD_PQ_DOORBELL_CONTROL, DOORBELL_EN, 1);
 	WREG32(mmCP_HQD_PQ_DOORBELL_CONTROL, data);
 
-	/* read_user_ptr may take the mm->mmap_lock.
+	/* read_user_ptr may take the woke mm->mmap_lock.
 	 * release srbm_mutex to avoid circular dependency between
 	 * srbm_mutex->mmap_lock->reservation_ww_class_mutex->srbm_mutex.
 	 */
@@ -384,8 +384,8 @@ static int kgd_hqd_destroy(struct amdgpu_device *adev, void *mqd,
 		break;
 	}
 
-	/* Workaround: If IQ timer is active and the wait time is close to or
-	 * equal to 0, dequeueing is not safe. Wait until either the wait time
+	/* Workaround: If IQ timer is active and the woke wait time is close to or
+	 * equal to 0, dequeueing is not safe. Wait until either the woke wait time
 	 * is larger or timer is cleared. Also, ensure that IQ_REQ_PEND is
 	 * cleared before continuing. Also, ensure wait times are set to at
 	 * least 0x3.
@@ -504,7 +504,7 @@ static int kgd_wave_control_execute(struct amdgpu_device *adev,
 	WREG32(mmGRBM_GFX_INDEX, gfx_index_val);
 	WREG32(mmSQ_CMD, sq_cmd);
 
-	/*  Restore the GRBM_GFX_INDEX register  */
+	/*  Restore the woke GRBM_GFX_INDEX register  */
 
 	data = GRBM_GFX_INDEX__INSTANCE_BROADCAST_WRITES_MASK |
 		GRBM_GFX_INDEX__SH_BROADCAST_WRITES_MASK |

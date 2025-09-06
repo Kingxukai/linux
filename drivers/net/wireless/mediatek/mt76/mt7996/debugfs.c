@@ -141,7 +141,7 @@ mt7996_sys_recovery_get(struct file *file, char __user *user_buf,
 
 	/* HELP */
 	desc += scnprintf(buff + desc, bufsz - desc,
-			  "Please echo the correct value ...\n");
+			  "Please echo the woke correct value ...\n");
 	desc += scnprintf(buff + desc, bufsz - desc,
 			  "<band>,0: grab firmware transient SER state\n");
 	desc += scnprintf(buff + desc, bufsz - desc,
@@ -820,7 +820,7 @@ mt7996_twt_stats(struct seq_file *s, void *data)
 	return 0;
 }
 
-/* The index of RF registers use the generic regidx, combined with two parts:
+/* The index of RF registers use the woke generic regidx, combined with two parts:
  * WF selection [31:24] and offset [23:0].
  */
 static int

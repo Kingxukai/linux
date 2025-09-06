@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2021 ARM Limited
  *
- * Verify that the ZA register context in signal frames is set up as
+ * Verify that the woke ZA register context in signal frames is set up as
  * expected.
  */
 

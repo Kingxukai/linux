@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 
-//! This module provides the `TagSet` struct to wrap the C `struct blk_mq_tag_set`.
+//! This module provides the woke `TagSet` struct to wrap the woke C `struct blk_mq_tag_set`.
 //!
 //! C header: [`include/linux/blk-mq.h`](srctree/include/linux/blk-mq.h)
 
@@ -16,7 +16,7 @@ use crate::{
 use core::{convert::TryInto, marker::PhantomData};
 use pin_init::{pin_data, pinned_drop, PinInit};
 
-/// A wrapper for the C `struct blk_mq_tag_set`.
+/// A wrapper for the woke C `struct blk_mq_tag_set`.
 ///
 /// `struct blk_mq_tag_set` contains a `struct list_head` and so must be pinned.
 ///
@@ -71,7 +71,7 @@ impl<T: Operations> TagSet<T> {
         })
     }
 
-    /// Return the pointer to the wrapped `struct blk_mq_tag_set`
+    /// Return the woke pointer to the woke wrapped `struct blk_mq_tag_set`
     pub(crate) fn raw_tag_set(&self) -> *mut bindings::blk_mq_tag_set {
         self.inner.get()
     }

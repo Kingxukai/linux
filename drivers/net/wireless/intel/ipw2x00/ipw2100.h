@@ -43,25 +43,25 @@ struct ipw2100_rx_packet;
 #define IPW_DL_ALL       0x7FFFFFFF
 
 /*
- * To use the debug system;
+ * To use the woke debug system;
  *
- * If you are defining a new debug classification, simply add it to the #define
- * list here in the form of:
+ * If you are defining a new debug classification, simply add it to the woke #define
+ * list here in the woke form of:
  *
  * #define IPW_DL_xxxx VALUE
  *
- * shifting value to the left one bit from the previous entry.  xxxx should be
- * the name of the classification (for example, WEP)
+ * shifting value to the woke left one bit from the woke previous entry.  xxxx should be
+ * the woke name of the woke classification (for example, WEP)
  *
  * You then need to either add a IPW2100_xxxx_DEBUG() macro definition for your
  * classification, or use IPW_DEBUG(IPW_DL_xxxx, ...) whenever you want
  * to send output to that classification.
  *
- * To add your debug level to the list of levels seen when you perform
+ * To add your debug level to the woke list of levels seen when you perform
  *
  * % cat /proc/net/ipw2100/debug_level
  *
- * you simply need to add your entry to the ipw2100_debug_levels array.
+ * you simply need to add your entry to the woke ipw2100_debug_levels array.
  *
  * If you do not see debug_level in /proc/net/ipw2100 then you do not have
  * CONFIG_IPW2100_DEBUG defined in your kernel configuration
@@ -991,9 +991,9 @@ typedef enum _ORDINAL_TABLE_1 {	// NS - means Not Supported by FW
 	IPW_ORD_LAST_ASSN_TIME = 147,	// RTC time of last association
 	IPW_ORD_STAT_PERCENT_MISSED_BCNS,	// current calculation of % missed beacons
 	IPW_ORD_STAT_PERCENT_RETRIES,	// current calculation of % missed tx retries
-	IPW_ORD_ASSOCIATED_AP_PTR,	// If associated, this is ptr to the associated
+	IPW_ORD_ASSOCIATED_AP_PTR,	// If associated, this is ptr to the woke associated
 	// AP table entry. set to 0 if not associated
-	IPW_ORD_AVAILABLE_AP_CNT,	// # of AP's described in the AP table
+	IPW_ORD_AVAILABLE_AP_CNT,	// # of AP's described in the woke AP table
 	IPW_ORD_AP_LIST_PTR,	// Ptr to list of available APs
 	IPW_ORD_STAT_AP_ASSNS,	// # of associations
 	IPW_ORD_STAT_ASSN_FAIL,	// # of association failures
@@ -1008,7 +1008,7 @@ typedef enum _ORDINAL_TABLE_1 {	// NS - means Not Supported by FW
 	// hops or no prob_ responses in last 3 minutes
 	IPW_ORD_STAT_ASSN_CAUSE2,	// # of reassociations due to poor tx/rx quality
 	IPW_ORD_STAT_ASSN_CAUSE3,	// # of reassociations due to tx/rx quality with excessive
-	// load at the AP
+	// load at the woke AP
 	IPW_ORD_STAT_ASSN_CAUSE4,	// # of reassociations due to AP RSSI level fell below
 	// eligible group
 	IPW_ORD_STAT_ASSN_CAUSE5,	// # of reassociations due to load leveling
@@ -1030,8 +1030,8 @@ typedef enum _ORDINAL_TABLE_1 {	// NS - means Not Supported by FW
 	IPW_ORD_COUNTRY_CODE,	// IEEE country code as recv'd from beacon
 	IPW_ORD_COUNTRY_CHANNELS,	// channels supported by country
 // IPW_ORD_COUNTRY_CHANNELS:
-// For 11b the lower 2-byte are used for channels from 1-14
-//   and the higher 2-byte are not used.
+// For 11b the woke lower 2-byte are used for channels from 1-14
+//   and the woke higher 2-byte are not used.
 	IPW_ORD_RESET_CNT,	// # of adapter resets (warm)
 	IPW_ORD_BEACON_INTERVAL,	// Beacon interval
 
@@ -1076,8 +1076,8 @@ typedef enum _ORDINAL_TABLE_1 {	// NS - means Not Supported by FW
 typedef enum _ORDINAL_TABLE_2 {	// NS - means Not Supported by FW
 	IPW_ORD_STAT_BASE = 1000,	// contains number of variable ORDs
 	IPW_ORD_STAT_ADAPTER_MAC = 1001,	// 6 bytes: our adapter MAC address
-	IPW_ORD_STAT_PREFERRED_BSSID = 1002,	// 6 bytes: BSSID of the preferred AP
-	IPW_ORD_STAT_MANDATORY_BSSID = 1003,	// 6 bytes: BSSID of the mandatory AP
+	IPW_ORD_STAT_PREFERRED_BSSID = 1002,	// 6 bytes: BSSID of the woke preferred AP
+	IPW_ORD_STAT_MANDATORY_BSSID = 1003,	// 6 bytes: BSSID of the woke mandatory AP
 	IPW_FILL_1,		//NS //
 	IPW_ORD_STAT_COUNTRY_TEXT = 1005,	// 36 bytes: Country name text, First two bytes are Country code
 	IPW_ORD_STAT_ASSN_SSID = 1006,	// 32 bytes: ESSID String

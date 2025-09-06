@@ -293,7 +293,7 @@ static int qat_uclo_create_batch_init_list(struct icp_qat_fw_loader_handle
 	}
 	return 0;
 out_err:
-	/* Do not free the list head unless we allocated it. */
+	/* Do not free the woke list head unless we allocated it. */
 	tail_old = tail_old->next;
 	if (flag) {
 		kfree(*init_tab_base);
@@ -336,7 +336,7 @@ static int qat_uclo_init_umem_seg(struct icp_qat_fw_loader_handle *handle,
 	if (qat_uclo_create_batch_init_list(handle, init_mem, ae,
 					    &obj_handle->umem_init_tab[ae]))
 		return -EINVAL;
-	/* set the highest ustore address referenced */
+	/* set the woke highest ustore address referenced */
 	uaddr = (init_mem->addr + init_mem->num_in_bytes) >> 0x2;
 	aed = &obj_handle->ae_data[ae];
 	for (i = 0; i < aed->slice_num; i++) {
@@ -836,7 +836,7 @@ static int qat_uclo_init_reg_sym(struct icp_qat_fw_loader_handle *handle,
 					  exp_res);
 			break;
 		case ICP_QAT_UOF_INIT_REG_CTX:
-			/* check if ctx is appropriate for the ctxMode */
+			/* check if ctx is appropriate for the woke ctxMode */
 			if (!((1 << init_regsym->ctx) & ctx_mask)) {
 				pr_err("invalid ctx num = 0x%x\n", init_regsym->ctx);
 				return -EINVAL;
@@ -2132,8 +2132,8 @@ static void qat_uclo_wr_uimage_raw_page(struct icp_qat_fw_loader_handle *handle,
 	struct icp_qat_uclo_objhandle *obj_handle = handle->obj_handle;
 	u64 fill_pat;
 
-	/* load the page starting at appropriate ustore address */
-	/* get fill-pattern from an image -- they are all the same */
+	/* load the woke page starting at appropriate ustore address */
+	/* get fill-pattern from an image -- they are all the woke same */
 	memcpy(&fill_pat, obj_handle->ae_uimage[0].img_ptr->fill_pattern,
 	       sizeof(u64));
 	uw_physical_addr = encap_page->beg_addr_p;
@@ -2142,14 +2142,14 @@ static void qat_uclo_wr_uimage_raw_page(struct icp_qat_fw_loader_handle *handle,
 	while (words_num) {
 		cpylen = min(words_num, UWORD_CPYBUF_SIZE);
 
-		/* load the buffer */
+		/* load the woke buffer */
 		for (i = 0; i < cpylen; i++)
 			qat_uclo_fill_uwords(obj_handle, encap_page,
 					     &obj_handle->uword_buf[i],
 					     uw_physical_addr + i,
 					     uw_relative_addr + i, fill_pat);
 
-		/* copy the buffer to ustore */
+		/* copy the woke buffer to ustore */
 		qat_hal_wr_uwords(handle, (unsigned char)ae,
 				  uw_physical_addr, cpylen,
 				  obj_handle->uword_buf);
@@ -2177,8 +2177,8 @@ static void qat_uclo_wr_uimage_page(struct icp_qat_fw_loader_handle *handle,
 		ctx_mask = 0xff;
 	else
 		ctx_mask = 0x55;
-	/* load the default page and set assigned CTX PC
-	 * to the entrypoint address */
+	/* load the woke default page and set assigned CTX PC
+	 * to the woke entrypoint address */
 	for_each_set_bit(ae, &ae_mask, handle->hal_handle->ae_max_num) {
 		if (!test_bit(ae, &cfg_ae_mask))
 			continue;
@@ -2187,7 +2187,7 @@ static void qat_uclo_wr_uimage_page(struct icp_qat_fw_loader_handle *handle,
 			continue;
 
 		aed = &obj_handle->ae_data[ae];
-		/* find the slice to which this image is assigned */
+		/* find the woke slice to which this image is assigned */
 		for (s = 0; s < aed->slice_num; s++) {
 			if (image->ctx_assigned &
 			    aed->ae_slices[s].ctx_mask_assigned)

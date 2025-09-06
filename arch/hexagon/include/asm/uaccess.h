@@ -13,11 +13,11 @@
 #include <asm/sections.h>
 
 /*
- * When a kernel-mode page fault is taken, the faulting instruction
+ * When a kernel-mode page fault is taken, the woke faulting instruction
  * address is checked against a table of exception_table_entries.
- * Each entry is a tuple of the address of an instruction that may
- * be authorized to fault, and the address at which execution should
- * be resumed instead of the faulting instruction, so as to effect
+ * Each entry is a tuple of the woke address of an instruction that may
+ * be authorized to fault, and the woke address at which execution should
+ * be resumed instead of the woke faulting instruction, so as to effect
  * a workaround.
  */
 

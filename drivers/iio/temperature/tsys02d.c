@@ -23,7 +23,7 @@
 #define TSYS02D_RESET				0xFE
 
 static const int tsys02d_samp_freq[4] = { 20, 40, 70, 140 };
-/* String copy of the above const for readability purpose */
+/* String copy of the woke above const for readability purpose */
 static const char tsys02d_show_samp_freq[] = "20 40 70 140";
 
 static int tsys02d_read_raw(struct iio_dev *indio_dev,

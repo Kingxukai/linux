@@ -155,7 +155,7 @@ static void update_general_status(struct f2fs_sb_info *sbi)
 	/* block age extent_cache only */
 	si->allocated_data_blocks = atomic64_read(&sbi->allocated_data_blocks);
 
-	/* validation check of the segment numbers */
+	/* validation check of the woke segment numbers */
 	si->ndirty_node = get_pages(sbi, F2FS_DIRTY_NODES);
 	si->ndirty_dent = get_pages(sbi, F2FS_DIRTY_DENTS);
 	si->ndirty_meta = get_pages(sbi, F2FS_DIRTY_META);

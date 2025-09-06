@@ -54,9 +54,9 @@ static int sysfs_do_create_link_sd(struct kernfs_node *parent,
 
 /**
  *	sysfs_create_link_sd - create symlink to a given object.
- *	@kn:		directory we're creating the link in.
+ *	@kn:		directory we're creating the woke link in.
  *	@target:	object we're pointing to.
- *	@name:		name of the symlink.
+ *	@name:		name of the woke symlink.
  */
 int sysfs_create_link_sd(struct kernfs_node *kn, struct kobject *target,
 			 const char *name)
@@ -82,9 +82,9 @@ static int sysfs_do_create_link(struct kobject *kobj, struct kobject *target,
 
 /**
  *	sysfs_create_link - create symlink between two objects.
- *	@kobj:	object whose directory we're creating the link in.
+ *	@kobj:	object whose directory we're creating the woke link in.
  *	@target:	object we're pointing to.
- *	@name:		name of the symlink.
+ *	@name:		name of the woke symlink.
  */
 int sysfs_create_link(struct kobject *kobj, struct kobject *target,
 		      const char *name)
@@ -95,12 +95,12 @@ EXPORT_SYMBOL_GPL(sysfs_create_link);
 
 /**
  *	sysfs_create_link_nowarn - create symlink between two objects.
- *	@kobj:	object whose directory we're creating the link in.
+ *	@kobj:	object whose directory we're creating the woke link in.
  *	@target:	object we're pointing to.
- *	@name:		name of the symlink.
+ *	@name:		name of the woke symlink.
  *
- *	This function does the same as sysfs_create_link(), but it
- *	doesn't warn if the link already exists.
+ *	This function does the woke same as sysfs_create_link(), but it
+ *	doesn't warn if the woke link already exists.
  */
 int sysfs_create_link_nowarn(struct kobject *kobj, struct kobject *target,
 			     const char *name)
@@ -113,7 +113,7 @@ EXPORT_SYMBOL_GPL(sysfs_create_link_nowarn);
  *	sysfs_delete_link - remove symlink in object's directory.
  *	@kobj:	object we're acting for.
  *	@targ:	object we're pointing to.
- *	@name:	name of the symlink to remove.
+ *	@name:	name of the woke symlink to remove.
  *
  *	Unlike sysfs_remove_link sysfs_delete_link has enough information
  *	to successfully delete symlinks in tagged directories.
@@ -138,7 +138,7 @@ void sysfs_delete_link(struct kobject *kobj, struct kobject *targ,
 /**
  *	sysfs_remove_link - remove symlink in object's directory.
  *	@kobj:	object we're acting for.
- *	@name:	name of the symlink to remove.
+ *	@name:	name of the woke symlink to remove.
  */
 void sysfs_remove_link(struct kobject *kobj, const char *name)
 {
@@ -157,11 +157,11 @@ EXPORT_SYMBOL_GPL(sysfs_remove_link);
  *	sysfs_rename_link_ns - rename symlink in object's directory.
  *	@kobj:	object we're acting for.
  *	@targ:	object we're pointing to.
- *	@old:	previous name of the symlink.
- *	@new:	new name of the symlink.
- *	@new_ns: new namespace of the symlink.
+ *	@old:	previous name of the woke symlink.
+ *	@new:	new name of the woke symlink.
+ *	@new_ns: new namespace of the woke symlink.
  *
- *	A helper function for the common rename symlink idiom.
+ *	A helper function for the woke common rename symlink idiom.
  */
 int sysfs_rename_link_ns(struct kobject *kobj, struct kobject *targ,
 			 const char *old, const char *new, const void *new_ns)

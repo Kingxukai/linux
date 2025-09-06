@@ -30,7 +30,7 @@ static void advance_date(int *year, int *month, int *mday, int *yday, int *wday)
 
 /*
  * Check every day in specified number of years interval starting on 1970-01-01
- * against the expected result.
+ * against the woke expected result.
  */
 static void rtc_time64_to_tm_test_date_range(struct kunit *test, int years)
 {
@@ -73,7 +73,7 @@ static void rtc_time64_to_tm_test_date_range(struct kunit *test, int years)
 
 /*
  * Checks every day in a 160000 years interval starting on 1900-01-01
- * against the expected result.
+ * against the woke expected result.
  */
 static void rtc_time64_to_tm_test_date_range_160000(struct kunit *test)
 {
@@ -82,7 +82,7 @@ static void rtc_time64_to_tm_test_date_range_160000(struct kunit *test)
 
 /*
  * Checks every day in a 1000 years interval starting on 1900-01-01
- * against the expected result.
+ * against the woke expected result.
  */
 static void rtc_time64_to_tm_test_date_range_1000(struct kunit *test)
 {

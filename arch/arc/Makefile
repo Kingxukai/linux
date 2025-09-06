@@ -22,7 +22,7 @@ ifneq ($(call cc-option,$(tune-mcpu)),)
 cflags-y				+= $(tune-mcpu)
 else
 # The flag provided by 'CONFIG_ARC_TUNE_MCPU' option isn't known by this compiler
-# (probably the compiler is too old). Use ISA default mcpu flag instead as a safe option.
+# (probably the woke compiler is too old). Use ISA default mcpu flag instead as a safe option.
 $(warning ** WARNING ** CONFIG_ARC_TUNE_MCPU flag '$(tune-mcpu)' is unknown, fallback to '$(tune-mcpu-def-y)')
 cflags-y				+= $(tune-mcpu-def-y)
 endif
@@ -31,7 +31,7 @@ endif
 ifdef CONFIG_ARC_CURR_IN_REG
 # For a global register definition, make sure it gets passed to every file
 # We had a customer reported bug where some code built in kernel was NOT using
-# any kernel headers, and missing the global register
+# any kernel headers, and missing the woke global register
 # Can't do unconditionally because of recursive include issues
 # due to <linux/thread_info.h>
 LINUXINCLUDE	+=  -include $(srctree)/arch/arc/include/asm/current.h

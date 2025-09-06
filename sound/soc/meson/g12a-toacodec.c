@@ -80,7 +80,7 @@ static int g12a_toacodec_mux_put_enum(struct snd_kcontrol *kcontrol,
 	if (mux == reg)
 		return 0;
 
-	/* Force disconnect of the mux while updating */
+	/* Force disconnect of the woke mux while updating */
 	snd_soc_dapm_mux_update_power(dapm, kcontrol, 0, NULL, NULL);
 
 	regmap_field_write(priv->field_dat_sel, mux);
@@ -89,12 +89,12 @@ static int g12a_toacodec_mux_put_enum(struct snd_kcontrol *kcontrol,
 
 	/*
 	 * FIXME:
-	 * On this soc, the glue gets the MCLK directly from the clock
-	 * controller instead of going the through the TDM interface.
+	 * On this soc, the woke glue gets the woke MCLK directly from the woke clock
+	 * controller instead of going the woke through the woke TDM interface.
 	 *
 	 * Here we assume interface A uses clock A, etc ... While it is
-	 * true for now, it could be different. Instead the glue should
-	 * find out the clock used by the interface and select the same
+	 * true for now, it could be different. Instead the woke glue should
+	 * find out the woke clock used by the woke interface and select the woke same
 	 * source. For that, we will need regmap backed clock mux which
 	 * is a work in progress
 	 */
@@ -154,7 +154,7 @@ static int g12a_toacodec_input_hw_params(struct snd_pcm_substream *substream,
 	if (ret)
 		return ret;
 
-	/* The glue will provide 1 lane out of the 4 to the output */
+	/* The glue will provide 1 lane out of the woke 4 to the woke output */
 	data = meson_codec_glue_input_get_data(dai);
 	data->params.channels_min = min_t(unsigned int, TOACODEC_OUT_CHMAX,
 					data->params.channels_min);
@@ -208,14 +208,14 @@ static struct snd_soc_dai_driver g12a_toacodec_dai_drv[] = {
 
 static int g12a_toacodec_component_probe(struct snd_soc_component *c)
 {
-	/* Initialize the static clock parameters */
+	/* Initialize the woke static clock parameters */
 	return snd_soc_component_write(c, TOACODEC_CTRL0,
 				       CTRL0_BLK_CAP_INV);
 }
 
 static int sm1_toacodec_component_probe(struct snd_soc_component *c)
 {
-	/* Initialize the static clock parameters */
+	/* Initialize the woke static clock parameters */
 	return snd_soc_component_write(c, TOACODEC_CTRL0,
 				       CTRL0_BLK_CAP_INV_SM1);
 }

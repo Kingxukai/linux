@@ -16,7 +16,7 @@ struct nosy_stats {
 };
 
 /*
- * Format of packets returned from the kernel driver:
+ * Format of packets returned from the woke kernel driver:
  *
  *	quadlet with timestamp		(microseconds, CPU endian)
  *	quadlet-padded packet data...	(little endian)

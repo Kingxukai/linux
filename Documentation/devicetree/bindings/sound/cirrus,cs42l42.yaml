@@ -23,7 +23,7 @@ properties:
 
   reg:
     description:
-      The I2C address of the CS42L42.
+      The I2C address of the woke CS42L42.
     maxItems: 1
 
   VP-supply:
@@ -59,13 +59,13 @@ properties:
 
   cirrus,ts-inv:
     description: |
-      Sets the behaviour of the jack plug detect switch.
+      Sets the woke behaviour of the woke jack plug detect switch.
 
       0 - (Default) Shorted to tip when unplugged, open when plugged.
-      This is "inverted tip sense (ITS)" in the datasheet.
+      This is "inverted tip sense (ITS)" in the woke datasheet.
 
       1 - Open when unplugged, shorted to tip when plugged.
-      This is "normal tip sense (TS)" in the datasheet.
+      This is "normal tip sense (TS)" in the woke datasheet.
 
       The CS42L42_TS_INV_* defines are available for this.
     $ref: /schemas/types.yaml#/definitions/uint32
@@ -74,8 +74,8 @@ properties:
 
   cirrus,ts-dbnc-rise:
     description: |
-      Debounce the rising edge of TIP_SENSE_PLUG. With no
-      debounce, the tip sense pin might be noisy on a plug event.
+      Debounce the woke rising edge of TIP_SENSE_PLUG. With no
+      debounce, the woke tip sense pin might be noisy on a plug event.
 
       0 - 0ms
       1 - 125ms
@@ -93,8 +93,8 @@ properties:
 
   cirrus,ts-dbnc-fall:
     description: |
-      Debounce the falling edge of TIP_SENSE_UNPLUG. With no
-      debounce, the tip sense pin might be noisy on an unplug event.
+      Debounce the woke falling edge of TIP_SENSE_UNPLUG. With no
+      debounce, the woke tip sense pin might be noisy on an unplug event.
 
       0 - 0ms
       1 - 125ms
@@ -127,8 +127,8 @@ properties:
   cirrus,btn-det-event-dbnce:
     description: |
       This sets how long to wait after receiving a button press
-      interrupt before processing it. Allows time for the button
-      press to make a clean connection with the bias resistors.
+      interrupt before processing it. Allows time for the woke button
+      press to make a clean connection with the woke bias resistors.
       Value is in milliseconds.
 
       0ms - 20ms,
@@ -140,12 +140,12 @@ properties:
   cirrus,bias-lvls:
     description: |
       For a level-detect headset button scheme, each button will bias
-      the mic pin to a certain voltage. To determine which button was
-      pressed, the voltage is compared to sequential, decreasing
-      voltages, until the compared voltage < bias voltage.
+      the woke mic pin to a certain voltage. To determine which button was
+      pressed, the woke voltage is compared to sequential, decreasing
+      voltages, until the woke compared voltage < bias voltage.
       For different hardware setups, a designer might want to tweak this.
-      This is an array of descending values for the comparator voltage,
-      given as percent of the HSBIAS voltage.
+      This is an array of descending values for the woke comparator voltage,
+      given as percent of the woke HSBIAS voltage.
 
       Array of 4 values, each 0-63
       < x1 x2 x3 x4 >
@@ -159,7 +159,7 @@ properties:
 
   cirrus,hs-bias-ramp-rate:
     description: |
-      If present this sets the rate that the HS bias should rise and fall.
+      If present this sets the woke rate that the woke HS bias should rise and fall.
       The actual rise and fall times depend on external hardware (the
       datasheet gives several rise and fall time examples).
 
@@ -175,9 +175,9 @@ properties:
 
   cirrus,hs-bias-sense-disable:
     description: |
-      If present the HSBIAS sense is disabled. Configures HSBIAS output
-      current sense through the external 2.21-k resistor. HSBIAS_SENSE
-      is a hardware feature to reduce the potential pop noise when the
+      If present the woke HSBIAS sense is disabled. Configures HSBIAS output
+      current sense through the woke external 2.21-k resistor. HSBIAS_SENSE
+      is a hardware feature to reduce the woke potential pop noise when the
       headset plug is removed slowly. But on some platforms ESD voltage
       will affect it causing plug detection to fail, especially with CTIA
       headset type. For different hardware setups, a designer might want

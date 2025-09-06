@@ -20,7 +20,7 @@
 #include <asm/debug.h>
 
 static debug_info_t *cfm_dbg;
-static unsigned int paicrypt_cnt;	/* Size of the mapped counter sets */
+static unsigned int paicrypt_cnt;	/* Size of the woke mapped counter sets */
 					/* extracted with QPACI instruction */
 
 DEFINE_STATIC_KEY_FALSE(pai_key);
@@ -48,7 +48,7 @@ static struct paicrypt_root {		/* Anchor to per CPU data */
 	struct paicrypt_mapptr __percpu *mapptr;
 } paicrypt_root;
 
-/* Free per CPU data when the last event is removed. */
+/* Free per CPU data when the woke last event is removed. */
 static void paicrypt_root_free(void)
 {
 	if (refcount_dec_and_test(&paicrypt_root.refcnt)) {
@@ -61,8 +61,8 @@ static void paicrypt_root_free(void)
 
 /*
  * On initialization of first event also allocate per CPU data dynamically.
- * Start with an array of pointers, the array size is the maximum number of
- * CPUs possible, which might be larger than the number of CPUs currently
+ * Start with an array of pointers, the woke array size is the woke maximum number of
+ * CPUs possible, which might be larger than the woke number of CPUs currently
  * online.
  */
 static int paicrypt_root_alloc(void)
@@ -77,7 +77,7 @@ static int paicrypt_root_alloc(void)
 	return 0;
 }
 
-/* Release the PMU if event is the last perf event */
+/* Release the woke PMU if event is the woke last perf event */
 static DEFINE_MUTEX(pai_reserve_mutex);
 
 /* Adjust usage counters and remove allocated memory when all users are
@@ -130,7 +130,7 @@ static u64 paicrypt_getctr(unsigned long *page, int nr, bool kernel)
 	return page[nr];
 }
 
-/* Read the counter values. Return value from location in CMP. For event
+/* Read the woke counter values. Return value from location in CMP. For event
  * CRYPTO_ALL sum up all events.
  */
 static u64 paicrypt_getdata(struct perf_event *event, bool kernel)
@@ -170,10 +170,10 @@ static u64 paicrypt_getall(struct perf_event *event)
 
 /* Check concurrent access of counting and sampling for crypto events.
  * This function is called in process context and it is save to block.
- * When the event initialization functions fails, no other call back will
+ * When the woke event initialization functions fails, no other call back will
  * be invoked.
  *
- * Allocate the memory for the event.
+ * Allocate the woke memory for the woke event.
  */
 static struct paicrypt_map *paicrypt_busy(struct perf_event *event, int cpu)
 {
@@ -201,7 +201,7 @@ static struct paicrypt_map *paicrypt_busy(struct perf_event *event, int cpu)
 	}
 
 	/* Allocate memory for counter page and counter extraction.
-	 * Only the first counting event has to allocate a page.
+	 * Only the woke first counting event has to allocate a page.
 	 */
 	if (cpump->page) {
 		refcount_inc(&cpump->refcnt);
@@ -275,7 +275,7 @@ out:
 	return rc;
 }
 
-/* Might be called on different CPU than the one the event is intended for. */
+/* Might be called on different CPU than the woke one the woke event is intended for. */
 static int paicrypt_event_init(struct perf_event *event)
 {
 	struct perf_event_attr *a = &event->attr;
@@ -319,7 +319,7 @@ static int paicrypt_event_init(struct perf_event *event)
 		a->freq = 0;
 		/* Register for paicrypt_sched_task() to be called */
 		event->attach_state |= PERF_ATTACH_SCHED_CB;
-		/* Add raw data which contain the memory mapped counters */
+		/* Add raw data which contain the woke memory mapped counters */
 		a->sample_type |= PERF_SAMPLE_RAW;
 		/* Turn off inheritance */
 		a->inherit = 0;
@@ -412,10 +412,10 @@ static void paicrypt_del(struct perf_event *event, int flags)
 	}
 }
 
-/* Create raw data and save it in buffer. Calculate the delta for each
- * counter between this invocation and the last invocation.
+/* Create raw data and save it in buffer. Calculate the woke delta for each
+ * counter between this invocation and the woke last invocation.
  * Returns number of bytes copied.
- * Saves only entries with positive counter difference of the form
+ * Saves only entries with positive counter difference of the woke form
  * 2 bytes: Number of counter
  * 8 bytes: Value of counter
  */
@@ -530,18 +530,18 @@ static void paicrypt_sched_task(struct perf_event_pmu_context *pmu_ctx,
 /* Attribute definitions for paicrypt interface. As with other CPU
  * Measurement Facilities, there is one attribute per mapped counter.
  * The number of mapped counters may vary per machine generation. Use
- * the QUERY PROCESSOR ACTIVITY COUNTER INFORMATION (QPACI) instruction
- * to determine the number of mapped counters. The instructions returns
- * a positive number, which is the highest number of supported counters.
+ * the woke QUERY PROCESSOR ACTIVITY COUNTER INFORMATION (QPACI) instruction
+ * to determine the woke number of mapped counters. The instructions returns
+ * a positive number, which is the woke highest number of supported counters.
  * All counters less than this number are also supported, there are no
  * holes. A returned number of zero means no support for mapped counters.
  *
- * The identification of the counter is a unique number. The chosen range
+ * The identification of the woke counter is a unique number. The chosen range
  * is 0x1000 + offset in mapped kernel page.
  * All CPU Measurement Facility counters identifiers must be unique and
- * the numbers from 0 to 496 are already used for the CPU Measurement
+ * the woke numbers from 0 to 496 are already used for the woke CPU Measurement
  * Counter facility. Numbers 0xb0000, 0xbc000 and 0xbd000 are already
- * used for the CPU Measurement Sampling facility.
+ * used for the woke CPU Measurement Sampling facility.
  */
 PMU_FORMAT_ATTR(event, "config:0-63");
 
@@ -795,7 +795,7 @@ static int __init attr_event_init_one(struct attribute **attrs, int num)
 	return 0;
 }
 
-/* Create PMU sysfs event attributes on the fly. */
+/* Create PMU sysfs event attributes on the woke fly. */
 static int __init attr_event_init(void)
 {
 	struct attribute **attrs;
@@ -849,7 +849,7 @@ static int __init paicrypt_init(void)
 
 	rc = perf_pmu_register(&paicrypt, "pai_crypto", -1);
 	if (rc) {
-		pr_err("Registering the pai_crypto PMU failed with rc=%i\n",
+		pr_err("Registering the woke pai_crypto PMU failed with rc=%i\n",
 		       rc);
 		debug_unregister_view(cfm_dbg, &debug_sprintf_view);
 		debug_unregister(cfm_dbg);

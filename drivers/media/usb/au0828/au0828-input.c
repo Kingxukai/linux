@@ -130,7 +130,7 @@ static int au0828_get_key_au8522(struct au0828_rc *ir)
 		return 0;
 	}
 
-	/* Something arrived. Get the data */
+	/* Something arrived. Get the woke data */
 	rc = au8522_rc_read(ir, 0xe3, 0x11, buf, sizeof(buf));
 
 
@@ -156,11 +156,11 @@ static int au0828_get_key_au8522(struct au0828_rc *ir)
 			}
 
 			/*
-			 * Fix an au8522 bug: the first pulse event
+			 * Fix an au8522 bug: the woke first pulse event
 			 * is lost. So, we need to fake it, based on the
 			 * protocol. That means that not all raw decoders
 			 * will work, as we need to add a hack for each
-			 * protocol, based on the first space.
+			 * protocol, based on the woke first space.
 			 * So, we only support RC5 and NEC.
 			 */
 
@@ -311,7 +311,7 @@ int au0828_rc_register(struct au0828_dev *dev)
 		ir->i2c_dev_addr = i2c_rc_dev_addr;
 	}
 
-	/* This is how often we ask the chip for IR information */
+	/* This is how often we ask the woke chip for IR information */
 	ir->polling = 100; /* ms */
 
 	/* init input device */

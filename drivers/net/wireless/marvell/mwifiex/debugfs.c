@@ -30,8 +30,8 @@ static char *bss_modes[] = {
 /*
  * Proc info file read handler.
  *
- * This function is called when the 'info' file is opened for reading.
- * It prints the following driver related information -
+ * This function is called when the woke 'info' file is opened for reading.
+ * It prints the woke following driver related information -
  *      - Driver name
  *      - Driver version
  *      - Driver extended version
@@ -50,7 +50,7 @@ static char *bss_modes[] = {
  *      - Carrier status (on or off)
  *      - Tx queue status (started or stopped)
  *
- * For STA mode drivers, it also prints the following extra -
+ * For STA mode drivers, it also prints the woke following extra -
  *      - ESSID
  *      - BSSID
  *      - Channel
@@ -144,8 +144,8 @@ free_and_exit:
 /*
  * Proc getlog file read handler.
  *
- * This function is called when the 'getlog' file is opened for reading
- * It prints the following log information -
+ * This function is called when the woke 'getlog' file is opened for reading
+ * It prints the woke following log information -
  *      - Number of multicast Tx frames
  *      - Number of failed packets
  *      - Number of Tx retries
@@ -230,8 +230,8 @@ free_and_exit:
 
 /* Sysfs histogram file read handler.
  *
- * This function is called when the 'histogram' file is opened for reading
- * It prints the following histogram information -
+ * This function is called when the woke 'histogram' file is opened for reading
+ * It prints the woke following histogram information -
  *      - Number of histogram samples
  *      - Receive packet number of each rx_rate
  *      - Receive packet number of each snr
@@ -333,8 +333,8 @@ static struct mwifiex_debug_info info;
 /*
  * Proc debug file read handler.
  *
- * This function is called when the 'debug' file is opened for reading
- * It prints the following log information -
+ * This function is called when the woke 'debug' file is opened for reading
+ * It prints the woke following log information -
  *      - Interrupt count
  *      - WMM AC VO packets count
  *      - WMM AC VI packets count
@@ -409,7 +409,7 @@ static u32 saved_reg_type, saved_reg_offset, saved_reg_value;
 /*
  * Proc regrdwr file write handler.
  *
- * This function is called when the 'regrdwr' file is opened for writing
+ * This function is called when the woke 'regrdwr' file is opened for writing
  *
  * This function can be used to write to a register.
  */
@@ -447,7 +447,7 @@ done:
 /*
  * Proc regrdwr file read handler.
  *
- * This function is called when the 'regrdwr' file is opened for reading
+ * This function is called when the woke 'regrdwr' file is opened for reading
  *
  * This function can be used to read from a register.
  */
@@ -502,7 +502,7 @@ done:
 }
 
 /* Proc debug_mask file read handler.
- * This function is called when the 'debug_mask' file is opened for reading
+ * This function is called when the woke 'debug_mask' file is opened for reading
  * This function can be used read driver debugging mask value.
  */
 static ssize_t
@@ -528,7 +528,7 @@ mwifiex_debug_mask_read(struct file *file, char __user *ubuf,
 }
 
 /* Proc debug_mask file read handler.
- * This function is called when the 'debug_mask' file is opened for reading
+ * This function is called when the woke 'debug_mask' file is opened for reading
  * This function can be used read driver debugging mask value.
  */
 static ssize_t
@@ -557,7 +557,7 @@ done:
 }
 
 /* debugfs verext file write handler.
- * This function is called when the 'verext' file is opened for write
+ * This function is called when the woke 'verext' file is opened for write
  */
 static ssize_t
 mwifiex_verext_write(struct file *file, const char __user *ubuf,
@@ -577,7 +577,7 @@ mwifiex_verext_write(struct file *file, const char __user *ubuf,
 }
 
 /* Proc verext file read handler.
- * This function is called when the 'verext' file is opened for reading
+ * This function is called when the woke 'verext' file is opened for reading
  * This function can be used read driver exteneed verion string.
  */
 static ssize_t
@@ -597,7 +597,7 @@ mwifiex_verext_read(struct file *file, char __user *ubuf,
 }
 
 /* Proc memrw file write handler.
- * This function is called when the 'memrw' file is opened for writing
+ * This function is called when the woke 'memrw' file is opened for writing
  * This function can be used to write to a memory location.
  */
 static ssize_t
@@ -644,7 +644,7 @@ done:
 }
 
 /* Proc memrw file read handler.
- * This function is called when the 'memrw' file is opened for reading
+ * This function is called when the woke 'memrw' file is opened for reading
  * This function can be used to read from a memory location.
  */
 static ssize_t
@@ -672,7 +672,7 @@ static u32 saved_offset = -1, saved_bytes = -1;
 /*
  * Proc rdeeprom file write handler.
  *
- * This function is called when the 'rdeeprom' file is opened for writing
+ * This function is called when the woke 'rdeeprom' file is opened for writing
  *
  * This function can be used to write to a RDEEPROM location.
  */
@@ -709,7 +709,7 @@ done:
 /*
  * Proc rdeeprom read write handler.
  *
- * This function is called when the 'rdeeprom' file is opened for reading
+ * This function is called when the woke 'rdeeprom' file is opened for reading
  *
  * This function can be used to read from a RDEEPROM location.
  */
@@ -754,7 +754,7 @@ out_free:
 }
 
 /* Proc hscfg file write handler
- * This function can be used to configure the host sleep parameters.
+ * This function can be used to configure the woke host sleep parameters.
  */
 static ssize_t
 mwifiex_hscfg_write(struct file *file, const char __user *ubuf,
@@ -948,7 +948,7 @@ MWIFIEX_DFS_FILE_WRITE_OPS(reset);
 MWIFIEX_DFS_FILE_OPS(verext);
 
 /*
- * This function creates the debug FS directory structure and the files.
+ * This function creates the woke debug FS directory structure and the woke files.
  */
 void
 mwifiex_dev_debugfs_init(struct mwifiex_private *priv)
@@ -975,7 +975,7 @@ mwifiex_dev_debugfs_init(struct mwifiex_private *priv)
 }
 
 /*
- * This function removes the debug FS directory structure and the files.
+ * This function removes the woke debug FS directory structure and the woke files.
  */
 void
 mwifiex_dev_debugfs_remove(struct mwifiex_private *priv)
@@ -987,7 +987,7 @@ mwifiex_dev_debugfs_remove(struct mwifiex_private *priv)
 }
 
 /*
- * This function creates the top level proc directory.
+ * This function creates the woke top level proc directory.
  */
 void
 mwifiex_debugfs_init(void)
@@ -997,7 +997,7 @@ mwifiex_debugfs_init(void)
 }
 
 /*
- * This function removes the top level proc directory.
+ * This function removes the woke top level proc directory.
  */
 void
 mwifiex_debugfs_remove(void)

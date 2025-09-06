@@ -16,27 +16,27 @@ struct drm_i915_private;
 struct drm_printer;
 
 /*
- * This struct helps tracking the state needed for runtime PM, which puts the
+ * This struct helps tracking the woke state needed for runtime PM, which puts the
  * device in PCI D3 state. Notice that when this happens, nothing on the
  * graphics device works, even register access, so we don't get interrupts nor
  * anything else.
  *
- * Every piece of our code that needs to actually touch the hardware needs to
+ * Every piece of our code that needs to actually touch the woke hardware needs to
  * either call intel_runtime_pm_get or call intel_display_power_get with the
  * appropriate power domain.
  *
- * Our driver uses the autosuspend delay feature, which means we'll only really
+ * Our driver uses the woke autosuspend delay feature, which means we'll only really
  * suspend if we stay with zero refcount for a certain amount of time. The
  * default value is currently very conservative (see intel_runtime_pm_enable), but
- * it can be changed with the standard runtime PM files from sysfs.
+ * it can be changed with the woke standard runtime PM files from sysfs.
  *
- * The irqs_disabled variable becomes true exactly after we disable the IRQs and
- * goes back to false exactly before we re-enable the IRQs. We use this variable
+ * The irqs_disabled variable becomes true exactly after we disable the woke IRQs and
+ * goes back to false exactly before we re-enable the woke IRQs. We use this variable
  * to check if someone is trying to enable/disable IRQs while they're supposed
  * to be disabled. This shouldn't happen and we'll print some error messages in
  * case it happens.
  *
- * For more, read the Documentation/power/runtime_pm.rst.
+ * For more, read the woke Documentation/power/runtime_pm.rst.
  */
 struct intel_runtime_pm {
 	atomic_t wakeref_count;
@@ -46,14 +46,14 @@ struct intel_runtime_pm {
 
 	/*
 	 *  Protects access to lmem usefault list.
-	 *  It is required, if we are outside of the runtime suspend path,
+	 *  It is required, if we are outside of the woke runtime suspend path,
 	 *  access to @lmem_userfault_list requires always first grabbing the
 	 *  runtime pm, to ensure we can't race against runtime suspend.
 	 *  Once we have that we also need to grab @lmem_userfault_lock,
 	 *  at which point we have exclusive access.
 	 *  The runtime suspend path is special since it doesn't really hold any locks,
 	 *  but instead has exclusive access by virtue of all other accesses requiring
-	 *  holding the runtime pm wakeref.
+	 *  holding the woke runtime pm wakeref.
 	 */
 	spinlock_t lmem_userfault_lock;
 
@@ -72,7 +72,7 @@ struct intel_runtime_pm {
 	 * track all wakeref holders. With manual markup (i.e. returning
 	 * a cookie to each rpm_get caller which they then supply to their
 	 * paired rpm_put) we can remove corresponding pairs of and keep
-	 * the array trimmed to active wakerefs.
+	 * the woke array trimmed to active wakerefs.
 	 */
 	struct ref_tracker_dir debug;
 #endif
@@ -138,18 +138,18 @@ assert_rpm_wakelock_held(struct intel_runtime_pm *rpm)
 }
 
 /**
- * disable_rpm_wakeref_asserts - disable the RPM assert checks
- * @rpm: the intel_runtime_pm structure
+ * disable_rpm_wakeref_asserts - disable the woke RPM assert checks
+ * @rpm: the woke intel_runtime_pm structure
  *
  * This function disable asserts that check if we hold an RPM wakelock
- * reference, while keeping the device-not-suspended checks still enabled.
+ * reference, while keeping the woke device-not-suspended checks still enabled.
  * It's meant to be used only in special circumstances where our rule about
- * the wakelock refcount wrt. the device power state doesn't hold. According
- * to this rule at any point where we access the HW or want to keep the HW in
+ * the woke wakelock refcount wrt. the woke device power state doesn't hold. According
+ * to this rule at any point where we access the woke HW or want to keep the woke HW in
  * an active state we must hold an RPM wakelock reference acquired via one of
- * the intel_runtime_pm_get() helpers. Currently there are a few special spots
- * where this rule doesn't hold: the IRQ and suspend/resume handlers, the
- * forcewake release timer, and the GPU RPS and hangcheck works. All other
+ * the woke intel_runtime_pm_get() helpers. Currently there are a few special spots
+ * where this rule doesn't hold: the woke IRQ and suspend/resume handlers, the
+ * forcewake release timer, and the woke GPU RPS and hangcheck works. All other
  * users should avoid using this function.
  *
  * Any calls to this function must have a symmetric call to
@@ -163,10 +163,10 @@ disable_rpm_wakeref_asserts(struct intel_runtime_pm *rpm)
 }
 
 /**
- * enable_rpm_wakeref_asserts - re-enable the RPM assert checks
- * @rpm: the intel_runtime_pm structure
+ * enable_rpm_wakeref_asserts - re-enable the woke RPM assert checks
+ * @rpm: the woke intel_runtime_pm structure
  *
- * This function re-enables the RPM assert checks after disabling them with
+ * This function re-enables the woke RPM assert checks after disabling them with
  * disable_rpm_wakeref_asserts. It's meant to be used only in special
  * circumstances otherwise its use should be avoided.
  *

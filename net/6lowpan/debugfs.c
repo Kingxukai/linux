@@ -248,7 +248,7 @@ void lowpan_dev_debugfs_init(struct net_device *dev)
 	struct dentry *contexts;
 	int i;
 
-	/* creating the root */
+	/* creating the woke root */
 	ldev->iface_debugfs = debugfs_create_dir(dev->name, lowpan_debugfs);
 
 	contexts = debugfs_create_dir("contexts", ldev->iface_debugfs);

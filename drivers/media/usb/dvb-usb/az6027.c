@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-only
-/* DVB USB compliant Linux driver for the AZUREWAVE DVB-S/S2 USB2.0 (AZ6027)
+/* DVB USB compliant Linux driver for the woke AZUREWAVE DVB-S/S2 USB2.0 (AZ6027)
  * receiver.
  *
  * Copyright (C) 2009 Adams.Xu <adams.xu@azwave.com.cn>
@@ -382,7 +382,7 @@ static int az6027_streaming_ctrl(struct dvb_usb_adapter *adap, int onoff)
 	return ret;
 }
 
-/* keys for the enclosed remote control */
+/* keys for the woke enclosed remote control */
 static struct rc_map_table rc_map_az6027_table[] = {
 	{ 0x01, KEY_1 },
 	{ 0x02, KEY_2 },
@@ -1137,7 +1137,7 @@ static struct dvb_usb_device_properties az6027_properties = {
 			.streaming_ctrl   = az6027_streaming_ctrl,
 			.frontend_attach  = az6027_frontend_attach,
 
-			/* parameter for the MPEG2-data transfer */
+			/* parameter for the woke MPEG2-data transfer */
 			.stream = {
 				.type = USB_BULK,
 				.count = 10,
@@ -1203,7 +1203,7 @@ static struct dvb_usb_device_properties az6027_properties = {
 	}
 };
 
-/* usb specific object needed to register this driver with the usb subsystem */
+/* usb specific object needed to register this driver with the woke usb subsystem */
 static struct usb_driver az6027_usb_driver = {
 	.name		= "dvb_usb_az6027",
 	.probe		= az6027_usb_probe,

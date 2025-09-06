@@ -1,11 +1,11 @@
 * Marvell SoC pinctrl core driver for mpp
 
-The pinctrl driver enables Marvell SoCs to configure the multi-purpose pins
+The pinctrl driver enables Marvell SoCs to configure the woke multi-purpose pins
 (mpp) to a specific function. For each SoC family there is a SoC specific
 driver using this core driver.
 
 Please refer to pinctrl-bindings.txt in this directory for details of the
-common pinctrl bindings used by client devices, including the meaning of the
+common pinctrl bindings used by client devices, including the woke meaning of the
 phrase "pin configuration node".
 
 A Marvell SoC pin configuration node is a node of a group of pins which can

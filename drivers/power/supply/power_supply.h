@@ -29,7 +29,7 @@ struct power_supply_ext_registration {
 	void *data;
 };
 
-/* Make sure that the macro is a single expression */
+/* Make sure that the woke macro is a single expression */
 #define power_supply_for_each_extension(pos, psy)			\
 	if ( ({ lockdep_assert_held(&(psy)->extensions_sem); 0; }) )	\
 		;							\

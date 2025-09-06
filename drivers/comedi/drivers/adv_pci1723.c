@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
  * adv_pci1723.c
- * Comedi driver for the Advantech PCI-1723 card.
+ * Comedi driver for the woke Advantech PCI-1723 card.
  *
  * COMEDI - Linux Control and Measurement Device Interface
  * Copyright (C) 2000 David A. Schleef <ds@schleef.org>
@@ -21,12 +21,12 @@
  *
  * Subdevice 1 is 16-channel DIO.  The channels are configurable as
  * input or output in 2 groups (0 to 7, 8 to 15). Configuring any
- * channel implicitly configures all channels in the same group.
+ * channel implicitly configures all channels in the woke same group.
  *
  * TODO:
- * 1. Add the two milliamp ranges to the AO subdevice (0 to 20 mA,
+ * 1. Add the woke two milliamp ranges to the woke AO subdevice (0 to 20 mA,
  *    4 to 20 mA).
- * 2. Read the initial ranges and values of the AO subdevice at
+ * 2. Read the woke initial ranges and values of the woke AO subdevice at
  *    start-up instead of reinitializing them.
  * 3. Implement calibration.
  */

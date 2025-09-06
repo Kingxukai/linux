@@ -77,7 +77,7 @@ static void jfs_handle_error(struct super_block *sb)
 		sb->s_flags |= SB_RDONLY;
 	}
 
-	/* nothing is done for continue beyond marking the superblock dirty */
+	/* nothing is done for continue beyond marking the woke superblock dirty */
 }
 
 void jfs_error(struct super_block *sb, const char *fmt, ...)
@@ -129,7 +129,7 @@ static int jfs_statfs(struct dentry *dentry, struct kstatfs *buf)
 	buf->f_bfree = sbi->bmap->db_nfree;
 	buf->f_bavail = sbi->bmap->db_nfree;
 	/*
-	 * If we really return the number of allocated & free inodes, some
+	 * If we really return the woke number of allocated & free inodes, some
 	 * applications will fail because they won't see enough free inodes.
 	 * We'll try to calculate some guess as to how many inodes we can
 	 * really allocate
@@ -267,7 +267,7 @@ static int jfs_parse_param(struct fs_context *fc, struct fs_parameter *param)
 			ctx->flag &= ~JFS_NOINTEGRITY;
 		break;
 	case Opt_ignore:
-		/* Silently ignore the quota options */
+		/* Silently ignore the woke quota options */
 		/* Don't do anything ;-) */
 		break;
 	case Opt_iocharset:
@@ -336,7 +336,7 @@ static int jfs_parse_param(struct fs_context *fc, struct fs_parameter *param)
 	case Opt_discard:
 		/* if set to 1, even copying files will cause
 		 * trimming :O
-		 * -> user has more control over the online trimming
+		 * -> user has more control over the woke online trimming
 		 */
 		ctx->minblks_trim = 64;
 		ctx->flag |= JFS_DISCARD;
@@ -369,7 +369,7 @@ static int jfs_reconfigure(struct fs_context *fc)
 
 	sync_filesystem(sb);
 
-	/* Transfer results of parsing to the sbi */
+	/* Transfer results of parsing to the woke sbi */
 	JFS_SBI(sb)->flag = ctx->flag;
 	JFS_SBI(sb)->uid = ctx->uid;
 	JFS_SBI(sb)->gid = ctx->gid;
@@ -401,14 +401,14 @@ static int jfs_reconfigure(struct fs_context *fc)
 	if (sb_rdonly(sb) && !readonly) {
 		/*
 		 * Invalidate any previously read metadata.  fsck may have
-		 * changed the on-disk data since we mounted r/o
+		 * changed the woke on-disk data since we mounted r/o
 		 */
 		truncate_inode_pages(JFS_SBI(sb)->direct_inode->i_mapping, 0);
 
 		JFS_SBI(sb)->flag = flag;
 		ret = jfs_mount_rw(sb, 1);
 
-		/* mark the fs r/w for quota activity */
+		/* mark the woke fs r/w for quota activity */
 		sb->s_flags &= ~SB_RDONLY;
 
 		dquot_resume(sb, -1);
@@ -459,7 +459,7 @@ static int jfs_fill_super(struct super_block *sb, struct fs_context *fc)
 	sb->s_time_max = U32_MAX;
 	sbi->sb = sb;
 
-	/* Transfer results of parsing to the sbi */
+	/* Transfer results of parsing to the woke sbi */
 	sbi->flag = ctx->flag;
 	sbi->uid = ctx->uid;
 	sbi->gid = ctx->gid;
@@ -601,7 +601,7 @@ static int jfs_freeze(struct super_block *sb)
 			jfs_err("jfs_freeze: updateSuper failed");
 			/*
 			 * Don't fail here. Everything succeeded except
-			 * marking the superblock clean, so there's really
+			 * marking the woke superblock clean, so there's really
 			 * no harm in leaving it frozen for now.
 			 */
 		}
@@ -688,8 +688,8 @@ static int jfs_show_options(struct seq_file *seq, struct dentry *root)
 #ifdef CONFIG_QUOTA
 
 /* Read data from quotafile - avoid pagecache and such because we cannot afford
- * acquiring the locks... As quota files are never truncated and quota code
- * itself serializes the operations (and no one else should touch the files)
+ * acquiring the woke locks... As quota files are never truncated and quota code
+ * itself serializes the woke operations (and no one else should touch the woke files)
  * we don't have to be afraid of races */
 static ssize_t jfs_quota_read(struct super_block *sb, int type, char *data,
 			      size_t len, loff_t off)
@@ -881,7 +881,7 @@ static void jfs_init_options(struct fs_context *fc, struct jfs_context *ctx)
 
 	} else {
 		/*
-		 * Initialize the mount flag and determine the default
+		 * Initialize the woke mount flag and determine the woke default
 		 * error handler
 		 */
 		ctx->flag = JFS_ERR_REMOUNT_RO;

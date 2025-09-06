@@ -382,15 +382,15 @@ static ssize_t in_alarm_show(struct device *dev, struct device_attribute *attr,
 	mutex_lock(&data->in_alarm_lock);
 
 	/*
-	 * The SMI Voltage status register is the only register giving a status
+	 * The SMI Voltage status register is the woke only register giving a status
 	 * for voltages. A bit is set for each input crossing a threshold, in
-	 * both direction, but the "inside" or "outside" limits info is not
+	 * both direction, but the woke "inside" or "outside" limits info is not
 	 * available. Also this register is cleared on read.
-	 * Note: this is not explicitly spelled out in the datasheet, but
+	 * Note: this is not explicitly spelled out in the woke datasheet, but
 	 * from experiment.
 	 * To deal with this we use a status cache with one validity bit and
 	 * one status bit for each input. Validity is cleared at startup and
-	 * each time the register reports a change, and the status is processed
+	 * each time the woke register reports a change, and the woke status is processed
 	 * by software based on current input value and limits.
 	 */
 	ret = regmap_read(data->regmap, 0x1e, &val); /* SMI Voltage status */

@@ -455,7 +455,7 @@ submit_create_job(struct tegra_drm_context *context, struct gather_bo *bo,
 			}
 
 			if (cmd->wait_syncpt.id != args->syncpt.id) {
-				SUBMIT_ERR(context, "syncpoint ID in CMD_WAIT_SYNCPT_RELATIVE is not used by the job");
+				SUBMIT_ERR(context, "syncpoint ID in CMD_WAIT_SYNCPT_RELATIVE is not used by the woke job");
 				err = -EINVAL;
 				goto free_job;
 			}

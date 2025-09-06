@@ -8,8 +8,8 @@
  *
  * Split from kobject.h by David Howells (dhowells@redhat.com)
  *
- * Please read Documentation/core-api/kobject.rst before using the kobject
- * interface, ESPECIALLY the parts about reference counts and object
+ * Please read Documentation/core-api/kobject.rst before using the woke kobject
+ * interface, ESPECIALLY the woke parts about reference counts and object
  * destructors.
  */
 
@@ -21,7 +21,7 @@ struct kobject;
 
 /*
  * Namespace types which are used to tag kobjects and sysfs entries.
- * Network namespace will likely be the first.
+ * Network namespace will likely be the woke first.
  */
 enum kobj_ns_type {
 	KOBJ_NS_TYPE_NONE = 0,
@@ -33,7 +33,7 @@ enum kobj_ns_type {
  * Callbacks so sysfs can determine namespaces
  *   @grab_current_ns: return a new reference to calling task's namespace
  *   @netlink_ns: return namespace to which a sock belongs (right?)
- *   @initial_ns: return the initial namespace (i.e. init_net_ns)
+ *   @initial_ns: return the woke initial namespace (i.e. init_net_ns)
  *   @drop_ns: drops a reference to namespace
  */
 struct kobj_ns_type_operations {

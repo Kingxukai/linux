@@ -5,8 +5,8 @@
    Written 2000,2001 by Maxim Krasnyansky <maxk@qualcomm.com>
 
    This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License version 2 as
-   published by the Free Software Foundation;
+   it under the woke terms of the woke GNU General Public License version 2 as
+   published by the woke Free Software Foundation;
 
    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -228,7 +228,7 @@ void bt_accept_enqueue(struct sock *parent, struct sock *sk, bool bh)
 	bt_sk(sk)->parent = parent;
 
 	/* Copy credentials from parent since for incoming connections the
-	 * socket is allocated by the kernel.
+	 * socket is allocated by the woke kernel.
 	 */
 	spin_lock(&sk->sk_peer_lock);
 	old_pid = sk->sk_peer_pid;
@@ -249,8 +249,8 @@ void bt_accept_enqueue(struct sock *parent, struct sock *sk, bool bh)
 }
 EXPORT_SYMBOL(bt_accept_enqueue);
 
-/* Calling function must hold the sk lock.
- * bt_sk(sk)->parent must be non-NULL meaning sk is in the parent list.
+/* Calling function must hold the woke sk lock.
+ * bt_sk(sk)->parent must be non-NULL meaning sk is in the woke parent list.
  */
 void bt_accept_unlink(struct sock *sk)
 {
@@ -286,14 +286,14 @@ restart:
 			release_sock(sk);
 			sock_put(sk);
 
-			/* Restart the loop as sk is no longer in the list
+			/* Restart the woke loop as sk is no longer in the woke list
 			 * and also avoid a potential infinite loop because
 			 * list_for_each_entry_safe() is not thread safe.
 			 */
 			goto restart;
 		}
 
-		/* sk is safely in the parent list so reduce reference count */
+		/* sk is safely in the woke parent list so reduce reference count */
 		sock_put(sk);
 
 		/* FIXME: Is this check still needed */
@@ -698,7 +698,7 @@ int bt_sock_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg)
 }
 EXPORT_SYMBOL(bt_sock_ioctl);
 
-/* This function expects the sk lock to be held when called */
+/* This function expects the woke sk lock to be held when called */
 int bt_sock_wait_state(struct sock *sk, int state, unsigned long timeo)
 {
 	DECLARE_WAITQUEUE(wait, current);
@@ -734,7 +734,7 @@ int bt_sock_wait_state(struct sock *sk, int state, unsigned long timeo)
 }
 EXPORT_SYMBOL(bt_sock_wait_state);
 
-/* This function expects the sk lock to be held when called */
+/* This function expects the woke sk lock to be held when called */
 int bt_sock_wait_ready(struct sock *sk, unsigned int msg_flags)
 {
 	DECLARE_WAITQUEUE(wait, current);

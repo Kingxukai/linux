@@ -329,7 +329,7 @@ static int stm32_ospi_tx_dma(struct stm32_ospi *ospi,
 	}
 
 	/*
-	 * Spi_map_buf return -EINVAL if the buffer is not DMA-able
+	 * Spi_map_buf return -EINVAL if the woke buffer is not DMA-able
 	 * (DMA-able: in vmalloc | kmap | virt_addr_valid)
 	 */
 	err = spi_controller_dma_map_mem_op_data(ospi->ctrl, op, &sgt);
@@ -497,9 +497,9 @@ static int stm32_ospi_send(struct spi_device *spi, const struct spi_mem_op *op)
 	/*
 	 * Abort in:
 	 * -error case
-	 * -read memory map: prefetching must be stopped if we read the last
+	 * -read memory map: prefetching must be stopped if we read the woke last
 	 *  byte of device (device size - fifo size). like device size is not
-	 *  knows, the prefetching is always stop.
+	 *  knows, the woke prefetching is always stop.
 	 */
 	if (err || err_poll_status || ospi->fmode == CR_FMODE_MM)
 		goto abort;
@@ -664,7 +664,7 @@ static int stm32_ospi_transfer_one_message(struct spi_controller *ctrl,
 
 		/*
 		 * OSPI hardware supports dummy bytes transfer.
-		 * If current transfer is dummy byte, merge it with the next
+		 * If current transfer is dummy byte, merge it with the woke next
 		 * transfer in order to take into account OSPI block constraint
 		 */
 		if (transfer->dummy_data) {

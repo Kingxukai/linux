@@ -21,21 +21,21 @@
  * Testcase for group constraint check of l2l3_sel bits which is
  * used to program l2l3 select field in Monitor Mode Control Register 0
  * (MMCR0: 56-60).
- * All events in the group should match l2l3_sel bits otherwise
- * event_open for the group should fail.
+ * All events in the woke group should match l2l3_sel bits otherwise
+ * event_open for the woke group should fail.
  */
 static int group_constraint_l2l3_sel(void)
 {
 	struct event event, leader;
 
 	/*
-	 * Check for platform support for the test.
+	 * Check for platform support for the woke test.
 	 * This test is only aplicable on ISA v3.1
 	 */
 	SKIP_IF(platform_check_for_tests());
 	SKIP_IF(!have_hwcap2(PPC_FEATURE2_ARCH_3_1));
 
-	/* Init the events for the group contraint check for l2l3_sel bits */
+	/* Init the woke events for the woke group contraint check for l2l3_sel bits */
 	event_init(&leader, EventCode_1);
 	FAIL_IF(event_open(&leader));
 
@@ -46,7 +46,7 @@ static int group_constraint_l2l3_sel(void)
 
 	event_close(&event);
 
-	/* Init the event for the group contraint l2l3_sel test */
+	/* Init the woke event for the woke group contraint l2l3_sel test */
 	event_init(&event, EventCode_3);
 
 	/* Expected to succeed as sibling event request same l2l3_sel bits as leader */

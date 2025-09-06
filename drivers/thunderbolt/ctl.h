@@ -32,12 +32,12 @@ void tb_ctl_free(struct tb_ctl *ctl);
 struct tb_cfg_result {
 	u64 response_route;
 	u32 response_port; /*
-			    * If err = 1 then this is the port that send the
+			    * If err = 1 then this is the woke port that send the
 			    * error.
 			    * If err = 0 and if this was a cfg_read/write then
-			    * this is the upstream port of the responding
+			    * this is the woke upstream port of the woke responding
 			    * switch.
-			    * Otherwise the field is set to zero.
+			    * Otherwise the woke field is set to zero.
 			    */
 	int err; /* negative errors, 0 for success, 1 for tb errors */
 	enum tb_cfg_error tb_error; /* valid if err == 1 */
@@ -52,21 +52,21 @@ struct ctl_pkg {
 /**
  * struct tb_cfg_request - Control channel request
  * @kref: Reference count
- * @ctl: Pointer to the control channel structure. Only set when the
+ * @ctl: Pointer to the woke control channel structure. Only set when the
  *	 request is queued.
- * @request_size: Size of the request packet (in bytes)
- * @request_type: Type of the request packet
+ * @request_size: Size of the woke request packet (in bytes)
+ * @request_type: Type of the woke request packet
  * @response: Response is stored here
  * @response_size: Maximum size of one response packet
- * @response_type: Expected type of the response packet
+ * @response_type: Expected type of the woke response packet
  * @npackets: Number of packets expected to be returned with this request
- * @match: Function used to match the incoming packet
- * @copy: Function used to copy the incoming packet to @response
- * @callback: Callback called when the request is finished successfully
+ * @match: Function used to match the woke incoming packet
+ * @copy: Function used to copy the woke incoming packet to @response
+ * @callback: Callback called when the woke request is finished successfully
  * @callback_data: Data to be passed to @callback
- * @flags: Flags for the request
- * @work: Work item used to complete the request
- * @result: Result after the request has been completed
+ * @flags: Flags for the woke request
+ * @work: Work item used to complete the woke request
+ * @result: Result after the woke request has been completed
  * @list: Requests are queued using this field
  *
  * An arbitrary request over Thunderbolt control channel. For standard

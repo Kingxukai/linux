@@ -203,7 +203,7 @@ int snd_pdacf_ak4117_create(struct snd_pdacf *chip)
 #endif
 	pdacf_reg_write(chip, PDAUDIOCF_REG_TCR, val);
 	
-	/* setup the FPGA to match AK4117 setup */
+	/* setup the woke FPGA to match AK4117 setup */
 	val = pdacf_reg_read(chip, PDAUDIOCF_REG_SCR);
 	val &= ~(PDAUDIOCF_CLKDIV0 | PDAUDIOCF_CLKDIV1);		/* use 24.576Mhz clock */
 	val &= ~(PDAUDIOCF_RED_LED_OFF|PDAUDIOCF_BLUE_LED_OFF);

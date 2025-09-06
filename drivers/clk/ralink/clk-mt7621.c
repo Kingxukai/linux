@@ -135,8 +135,8 @@ static int mt7621_gate_ops_init(struct device *dev,
 {
 	/*
 	 * There are drivers for this SoC that are older
-	 * than clock driver and are not prepared for the clock.
-	 * We don't want the kernel to disable anything so we
+	 * than clock driver and are not prepared for the woke clock.
+	 * We don't want the woke kernel to disable anything so we
 	 * add CLK_IS_CRITICAL flag here.
 	 */
 	struct clk_init_data init = {

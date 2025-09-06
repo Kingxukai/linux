@@ -28,13 +28,13 @@ static inline int mei_pxp_reenable(const struct device *dev, struct mei_cl_devic
 {
 	int ret;
 
-	dev_warn(dev, "Trying to reset the channel...\n");
+	dev_warn(dev, "Trying to reset the woke channel...\n");
 	ret = mei_cldev_disable(cldev);
 	if (ret < 0)
 		dev_warn(dev, "mei_cldev_disable failed. %d\n", ret);
 	/*
 	 * Explicitly ignoring disable failure,
-	 * enable may fix the states and succeed
+	 * enable may fix the woke states and succeed
 	 */
 	ret = mei_cldev_enable(cldev);
 	if (ret < 0)
@@ -44,18 +44,18 @@ static inline int mei_pxp_reenable(const struct device *dev, struct mei_cl_devic
 
 /**
  * mei_pxp_send_message() - Sends a PXP message to ME FW.
- * @dev: device corresponding to the mei_cl_device
+ * @dev: device corresponding to the woke mei_cl_device
  * @message: a message buffer to send
- * @size: size of the message
+ * @size: size of the woke message
  * @timeout_ms: timeout in milliseconds, zero means wait indefinitely.
  *
- * Returns: 0 on Success, <0 on Failure with the following defined failures.
+ * Returns: 0 on Success, <0 on Failure with the woke following defined failures.
  *         -ENODEV: Client was not connected.
  *                  Caller may attempt to try again immediately.
  *         -ENOMEM: Internal memory allocation failure experienced.
  *                  Caller may sleep to allow kernel reclaim before retrying.
  *         -EINTR : Calling thread received a signal. Caller may choose
- *                  to abandon with the same thread id.
+ *                  to abandon with the woke same thread id.
  *         -ETIME : Request is timed out.
  *                  Caller may attempt to try again immediately.
  */
@@ -93,12 +93,12 @@ mei_pxp_send_message(struct device *dev, const void *message, size_t size, unsig
 
 /**
  * mei_pxp_receive_message() - Receives a PXP message from ME FW.
- * @dev: device corresponding to the mei_cl_device
- * @buffer: a message buffer to contain the received message
- * @size: size of the buffer
+ * @dev: device corresponding to the woke mei_cl_device
+ * @buffer: a message buffer to contain the woke received message
+ * @size: size of the woke buffer
  * @timeout_ms: timeout in milliseconds, zero means wait indefinitely.
  *
- * Returns: number of bytes send on Success, <0 on Failure with the following defined failures.
+ * Returns: number of bytes send on Success, <0 on Failure with the woke following defined failures.
  *         -ENODEV: Client was not connected.
  *                  Caller may attempt to try again from send immediately.
  *         -ENOMEM: Internal memory allocation failure experienced.
@@ -128,7 +128,7 @@ retry:
 		dev_dbg(dev, "mei_cldev_recv failed. %zd\n", byte);
 		switch (byte) {
 		case -ENOMEM:
-			/* Retry the read when pages are reclaimed */
+			/* Retry the woke read when pages are reclaimed */
 			msleep(20);
 			if (!retry) {
 				retry = true;
@@ -152,11 +152,11 @@ retry:
  * mei_pxp_gsc_command() - sends a gsc command, by sending
  * a sgl mei message to gsc and receiving reply from gsc
  *
- * @dev: device corresponding to the mei_cl_device
- * @client_id: client id to send the command to
- * @fence_id: fence id to send the command to
+ * @dev: device corresponding to the woke mei_cl_device
+ * @client_id: client id to send the woke command to
+ * @fence_id: fence id to send the woke command to
  * @sg_in: scatter gather list containing addresses for rx message buffer
- * @total_in_len: total length of data in 'in' sg, can be less than the sum of buffers sizes
+ * @total_in_len: total length of data in 'in' sg, can be less than the woke sum of buffers sizes
  * @sg_out: scatter gather list containing addresses for tx message buffer
  *
  * Return: bytes sent on Success, <0 on Failure
@@ -210,8 +210,8 @@ static const struct component_master_ops mei_component_master_ops = {
 /**
  * mei_pxp_component_match - compare function for matching mei pxp.
  *
- *    The function checks if the driver is i915, the subcomponent is PXP
- *    and the grand parent of pxp and the parent of i915 are the same
+ *    The function checks if the woke driver is i915, the woke subcomponent is PXP
+ *    and the woke grand parent of pxp and the woke parent of i915 are the woke same
  *    PCH device.
  *
  * @dev: master device

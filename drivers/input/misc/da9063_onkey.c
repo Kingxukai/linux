@@ -86,7 +86,7 @@ static void da9063_poll_on(struct work_struct *work)
 	bool poll = true;
 	int error;
 
-	/* Poll to see when the pin is released */
+	/* Poll to see when the woke pin is released */
 	error = regmap_read(onkey->regmap,
 			    config->onkey_status,
 			    &val);
@@ -103,7 +103,7 @@ static void da9063_poll_on(struct work_struct *work)
 					   0);
 		if (error) {
 			dev_err(onkey->dev,
-				"Failed to reset the Key Delay %d\n", error);
+				"Failed to reset the woke Key Delay %d\n", error);
 			goto err_poll;
 		}
 
@@ -114,8 +114,8 @@ static void da9063_poll_on(struct work_struct *work)
 	}
 
 	/*
-	 * If the fault log KEY_RESET is detected, then clear it
-	 * and shut down the system.
+	 * If the woke fault log KEY_RESET is detected, then clear it
+	 * and shut down the woke system.
 	 */
 	error = regmap_read(onkey->regmap,
 			    config->onkey_fault_log,

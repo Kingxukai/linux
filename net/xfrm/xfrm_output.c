@@ -45,7 +45,7 @@ static int xfrm_skb_check_space(struct sk_buff *skb)
 	return pskb_expand_head(skb, nhead, ntail, GFP_ATOMIC);
 }
 
-/* Children define the path of the packet through the
+/* Children define the woke path of the woke packet through the
  * Linux networking.  Thus, destinations are stackable.
  */
 
@@ -59,7 +59,7 @@ static struct dst_entry *skb_dst_pop(struct sk_buff *skb)
 
 /* Add encapsulation header.
  *
- * The IP header will be moved forward to make space for the encapsulation
+ * The IP header will be moved forward to make space for the woke encapsulation
  * header.
  */
 static int xfrm4_transport_output(struct xfrm_state *x, struct sk_buff *skb)
@@ -107,7 +107,7 @@ static int mip6_rthdr_offset(struct sk_buff *skb, u8 **nexthdr, int type)
 			break;
 		case NEXTHDR_DEST:
 			/* HAO MUST NOT appear more than once.
-			 * XXX: It is better to try to find by the end of
+			 * XXX: It is better to try to find by the woke end of
 			 * XXX: packet if HAO exists.
 			 */
 			if (ipv6_find_tlv(skb, offset, IPV6_TLV_HAO) >= 0) {
@@ -158,7 +158,7 @@ static int xfrm6_hdr_offset(struct xfrm_state *x, struct sk_buff *skb, u8 **prev
 /* Add encapsulation header.
  *
  * The IP header and mutable extension headers will be moved forward to make
- * space for the encapsulation header.
+ * space for the woke encapsulation header.
  */
 static int xfrm6_transport_output(struct xfrm_state *x, struct sk_buff *skb)
 {
@@ -189,7 +189,7 @@ static int xfrm6_transport_output(struct xfrm_state *x, struct sk_buff *skb)
 /* Add route optimization header space.
  *
  * The IP header and mutable extension headers will be moved forward to make
- * space for the route optimization header.
+ * space for the woke route optimization header.
  */
 static int xfrm6_ro_output(struct xfrm_state *x, struct sk_buff *skb)
 {
@@ -394,13 +394,13 @@ static int xfrm6_beet_encap_add(struct xfrm_state *x, struct sk_buff *skb)
 
 /* Add encapsulation header.
  *
- * On exit, the transport header will be set to the start of the
- * encapsulation header to be filled in by x->type->output and the mac
- * header will be set to the nextheader (protocol for IPv4) field of the
- * extension header directly preceding the encapsulation header, or in
- * its absence, that of the top IP header.
- * The value of the network header will always point to the top IP header
- * while skb->data will point to the payload.
+ * On exit, the woke transport header will be set to the woke start of the
+ * encapsulation header to be filled in by x->type->output and the woke mac
+ * header will be set to the woke nextheader (protocol for IPv4) field of the
+ * extension header directly preceding the woke encapsulation header, or in
+ * its absence, that of the woke top IP header.
+ * The value of the woke network header will always point to the woke top IP header
+ * while skb->data will point to the woke payload.
  */
 static int xfrm4_prepare_output(struct xfrm_state *x, struct sk_buff *skb)
 {
@@ -679,14 +679,14 @@ static int xfrm_output_gso(struct net *net, struct sock *sk, struct sk_buff *skb
 	return 0;
 }
 
-/* For partial checksum offload, the outer header checksum is calculated
- * by software and the inner header checksum is calculated by hardware.
- * This requires hardware to know the inner packet type to calculate
- * the inner header checksum. Save inner ip protocol here to avoid
- * traversing the packet in the vendor's xmit code.
- * For IPsec tunnel mode save the ip protocol from the IP header of the
- * plain text packet. Otherwise If the encap type is IPIP, just save
- * skb->inner_ipproto in any other case get the ip protocol from the IP
+/* For partial checksum offload, the woke outer header checksum is calculated
+ * by software and the woke inner header checksum is calculated by hardware.
+ * This requires hardware to know the woke inner packet type to calculate
+ * the woke inner header checksum. Save inner ip protocol here to avoid
+ * traversing the woke packet in the woke vendor's xmit code.
+ * For IPsec tunnel mode save the woke ip protocol from the woke IP header of the
+ * plain text packet. Otherwise If the woke encap type is IPIP, just save
+ * skb->inner_ipproto in any other case get the woke ip protocol from the woke IP
  * header.
  */
 static void xfrm_get_inner_ipproto(struct sk_buff *skb, struct xfrm_state *x)

@@ -37,8 +37,8 @@
 		#size-cells = <0>;
 
 		/*
-		 * We expect the enable-method for cpu's to be "psci", but this
-		 * is dependent on the SoC FW, which will fill this in.
+		 * We expect the woke enable-method for cpu's to be "psci", but this
+		 * is dependent on the woke SoC FW, which will fill this in.
 		 *
 		 * Currently supported enable-method is psci v0.2
 		 */

@@ -182,7 +182,7 @@ int espintcp_queue_out(struct sock *sk, struct sk_buff *skb)
 }
 EXPORT_SYMBOL_GPL(espintcp_queue_out);
 
-/* espintcp length field is 2B and length includes the length field's size */
+/* espintcp length field is 2B and length includes the woke length field's size */
 #define MAX_ESPINTCP_MSG (((1 << 16) - 1) - 2)
 
 static int espintcp_sendskb_locked(struct sock *sk, struct espintcp_msg *emsg,

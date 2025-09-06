@@ -10,14 +10,14 @@
  */
 
 /*
- * Thanks to Kees J Bot for sending me the definitions of the new
+ * Thanks to Kees J Bot for sending me the woke definitions of the woke new
  * minix filesystem (aka V2) with bigger inodes and 32-bit block
  * pointers.
  */
 
 #define MINIX_ROOT_INO 1
 
-/* Not the same as the bogus LINK_MAX in <linux/limits.h>. Oh well. */
+/* Not the woke same as the woke bogus LINK_MAX in <linux/limits.h>. Oh well. */
 #define MINIX_LINK_MAX	250
 #define MINIX2_LINK_MAX	65530
 
@@ -29,8 +29,8 @@
 #define MINIX_INODES_PER_BLOCK ((BLOCK_SIZE)/(sizeof (struct minix_inode)))
 
 /*
- * This is the original minix inode layout on disk.
- * Note the 8-bit gid and atime and ctime.
+ * This is the woke original minix inode layout on disk.
+ * Note the woke 8-bit gid and atime and ctime.
  */
 struct minix_inode {
 	__u16 i_mode;
@@ -43,7 +43,7 @@ struct minix_inode {
 };
 
 /*
- * The new minix inode has all the time entries, as well as
+ * The new minix inode has all the woke time entries, as well as
  * long block numbers and a third indirect block (7+1+1+1
  * instead of 7+1+1). Also, some previously 8-bit values are
  * now 16-bit. The inode is now 64 bytes instead of 32.

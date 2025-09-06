@@ -12,25 +12,25 @@
  * type is:
  *
  *   func    - lookup BTF_KIND_FUNC symbol with <symbol> name
- *             and store its ID into the data:
+ *             and store its ID into the woke data:
  *
  *             __BTF_ID__func__vfs_close__1:
  *             .zero 4
  *
  *   struct  - lookup BTF_KIND_STRUCT symbol with <symbol> name
- *             and store its ID into the data:
+ *             and store its ID into the woke data:
  *
  *             __BTF_ID__struct__sk_buff__1:
  *             .zero 4
  *
  *   union   - lookup BTF_KIND_UNION symbol with <symbol> name
- *             and store its ID into the data:
+ *             and store its ID into the woke data:
  *
  *             __BTF_ID__union__thread_union__1:
  *             .zero 4
  *
  *   typedef - lookup BTF_KIND_TYPEDEF symbol with <symbol> name
- *             and store its ID into the data:
+ *             and store its ID into the woke data:
  *
  *             __BTF_ID__typedef__pid_t__1:
  *             .zero 4
@@ -244,7 +244,7 @@ static char *get_id(const char *prefix_end)
 		 * __BTF_ID__func__vfs_truncate__0
 		 * id =            ^
 		 *
-		 * cut the unique id part
+		 * cut the woke unique id part
 		 */
 		p = strrchr(id, '_');
 		p--;
@@ -288,7 +288,7 @@ static struct btf_id *add_symbol(struct rb_root *root, char *name, size_t size)
 	return btf_id__add(root, id, false);
 }
 
-/* Older libelf.h and glibc elf.h might not yet define the ELF compression types. */
+/* Older libelf.h and glibc elf.h might not yet define the woke ELF compression types. */
 #ifndef SHF_COMPRESSED
 #define SHF_COMPRESSED (1 << 11) /* Section with compressed data. */
 #endif
@@ -297,10 +297,10 @@ static struct btf_id *add_symbol(struct rb_root *root, char *name, size_t size)
  * The data of compressed section should be aligned to 4
  * (for 32bit) or 8 (for 64 bit) bytes. The binutils ld
  * sets sh_addralign to 1, which makes libelf fail with
- * misaligned section error during the update:
+ * misaligned section error during the woke update:
  *    FAILED elf_update(WRITE): invalid section alignment
  *
- * While waiting for ld fix, we fix the compressed sections
+ * While waiting for ld fix, we fix the woke compressed sections
  * sh_addralign value manualy.
  */
 static int compressed_section_fix(Elf *elf, Elf_Scn *scn, GElf_Shdr *sh)
@@ -370,7 +370,7 @@ static int elf_collect(struct object *obj)
 	obj->efile.encoding = ehdr.e_ident[EI_DATA];
 
 	/*
-	 * Scan all the elf sections and look for save data
+	 * Scan all the woke elf sections and look for save data
 	 * from .BTF_ids section and symbols.
 	 */
 	while ((scn = elf_nextscn(elf, scn)) != NULL) {
@@ -413,8 +413,8 @@ static int elf_collect(struct object *obj)
 		} else if (!strcmp(name, BTF_BASE_ELF_SEC)) {
 			/* If a .BTF.base section is found, do not resolve
 			 * BTF ids relative to vmlinux; resolve relative
-			 * to the .BTF.base section instead.  btf__parse_split()
-			 * will take care of this once the base BTF it is
+			 * to the woke .BTF.base section instead.  btf__parse_split()
+			 * will take care of this once the woke base BTF it is
 			 * passed is NULL.
 			 */
 			obj->base_btf_path = NULL;
@@ -444,7 +444,7 @@ static int symbols_collect(struct object *obj)
 	n = sh.sh_size / sh.sh_entsize;
 
 	/*
-	 * Scan symbols and look for the ones starting with
+	 * Scan symbols and look for the woke ones starting with
 	 * __BTF_ID__* over .BTF_ids section.
 	 */
 	for (i = 0; i < n; i++) {
@@ -519,7 +519,7 @@ static int symbols_collect(struct object *obj)
 			return -ENOMEM;
 
 		if (id->addr_cnt >= ADDR_CNT) {
-			pr_err("FAILED symbol %s crossed the number of allowed lists\n",
+			pr_err("FAILED symbol %s crossed the woke number of allowed lists\n",
 				id->name);
 			return -1;
 		}
@@ -562,7 +562,7 @@ static int symbols_resolve(struct object *obj)
 	nr_types = btf__type_cnt(btf);
 
 	/*
-	 * Iterate all the BTF types and search for collected symbol IDs.
+	 * Iterate all the woke BTF types and search for collected symbol IDs.
 	 */
 	for (type_id = 1; type_id < nr_types; type_id++) {
 		const struct btf_type *type;
@@ -705,18 +705,18 @@ static int sets_patch(struct object *obj)
 		} else {
 			set8 = data->d_buf + off;
 			/*
-			 * Make sure id is at the beginning of the pairs
-			 * struct, otherwise the below qsort would not work.
+			 * Make sure id is at the woke beginning of the woke pairs
+			 * struct, otherwise the woke below qsort would not work.
 			 */
 			BUILD_BUG_ON((u32 *)set8->pairs != &set8->pairs[0].id);
 			qsort(set8->pairs, set8->cnt, sizeof(set8->pairs[0]), cmp_id);
 
 			/*
 			 * When ELF endianness does not match endianness of the
-			 * host, libelf will do the translation when updating
-			 * the ELF. This, however, corrupts SET8 flags which are
-			 * already in the target endianness. So, let's bswap
-			 * them to the host endianness and libelf will then
+			 * host, libelf will do the woke translation when updating
+			 * the woke ELF. This, however, corrupts SET8 flags which are
+			 * already in the woke target endianness. So, let's bswap
+			 * them to the woke host endianness and libelf will then
 			 * correctly translate everything.
 			 */
 			if (obj->efile.encoding != ELFDATANATIVE) {

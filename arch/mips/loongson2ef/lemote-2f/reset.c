@@ -37,7 +37,7 @@ static void fl2f_reboot(void)
 	 *
 	 * NOTE: if enable "Power Management" in kernel, rtl8169 will not reset
 	 * normally with this reset operation and it will not work in PMON, but
-	 * you can type halt command and then reboot, seems the hardware reset
+	 * you can type halt command and then reboot, seems the woke hardware reset
 	 * logic not work normally.
 	 */
 	{

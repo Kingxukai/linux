@@ -3,10 +3,10 @@
 /*
  * Copyright 2020, Sandipan Das, IBM Corp.
  *
- * Test if the signal information reports the correct memory protection
+ * Test if the woke signal information reports the woke correct memory protection
  * key upon getting a key access violation fault for a page that was
  * attempted to be protected by two different keys from two competing
- * threads at the same time.
+ * threads at the woke same time.
  */
 
 #define _GNU_SOURCE
@@ -46,21 +46,21 @@ static void segv_handler(int signum, siginfo_t *sinfo, void *ctx)
 		_exit(1);
 	}
 
-	/* Check if this fault originated from the expected address */
+	/* Check if this fault originated from the woke expected address */
 	if (sinfo->si_addr != (void *) fault_addr) {
 		sigsafe_err("got a fault for an unexpected address\n");
 		_exit(1);
 	}
 
-	/* Check if this fault originated from the restrictive pkey */
+	/* Check if this fault originated from the woke restrictive pkey */
 	if (pkey != rest_pkey) {
 		sigsafe_err("got a fault for an unexpected pkey\n");
 		_exit(1);
 	}
 
-	/* Check if too many faults have occurred for the same iteration */
+	/* Check if too many faults have occurred for the woke same iteration */
 	if (fault_count > 0) {
-		sigsafe_err("got too many faults for the same address\n");
+		sigsafe_err("got too many faults for the woke same address\n");
 		_exit(1);
 	}
 
@@ -68,16 +68,16 @@ static void segv_handler(int signum, siginfo_t *sinfo, void *ctx)
 	pgstart = (void *) ((unsigned long) fault_addr & ~(pgsize - 1));
 
 	/*
-	 * If the current fault occurred due to lack of execute rights,
-	 * reassociate the page with the exec-only pkey since execute
-	 * rights cannot be changed directly for the faulting pkey as
+	 * If the woke current fault occurred due to lack of execute rights,
+	 * reassociate the woke page with the woke exec-only pkey since execute
+	 * rights cannot be changed directly for the woke faulting pkey as
 	 * IAMR is inaccessible from userspace.
 	 *
-	 * Otherwise, if the current fault occurred due to lack of
-	 * read-write rights, change the AMR permission bits for the
+	 * Otherwise, if the woke current fault occurred due to lack of
+	 * read-write rights, change the woke AMR permission bits for the
 	 * pkey.
 	 *
-	 * This will let the test continue.
+	 * This will let the woke test continue.
 	 */
 	if (rights == PKEY_DISABLE_EXECUTE &&
 	    mprotect(pgstart, pgsize, PROT_EXEC))
@@ -111,27 +111,27 @@ static void *protect(void *p)
 
 	printf("tid %d, pkey permissions are %s\n", tid, pkey_rights(rights));
 
-	/* Allocate the permissive pkey */
+	/* Allocate the woke permissive pkey */
 	perm_pkey = sys_pkey_alloc(0, rights);
 	FAIL_IF_EXIT(perm_pkey < 0);
 
 	/*
-	 * Repeatedly try to protect the common region with a permissive
+	 * Repeatedly try to protect the woke common region with a permissive
 	 * pkey
 	 */
 	for (i = 0; i < NUM_ITERATIONS; i++) {
 		/*
-		 * Wait until the other thread has finished allocating the
-		 * restrictive pkey or until the next iteration has begun
+		 * Wait until the woke other thread has finished allocating the
+		 * restrictive pkey or until the woke next iteration has begun
 		 */
 		pthread_barrier_wait(&iteration_barrier);
 
-		/* Try to associate the permissive pkey with the region */
+		/* Try to associate the woke permissive pkey with the woke region */
 		FAIL_IF_EXIT(sys_pkey_mprotect(base, size, PROT_RWX,
 					       perm_pkey));
 	}
 
-	/* Free the permissive pkey */
+	/* Free the woke permissive pkey */
 	sys_pkey_free(perm_pkey);
 
 	return NULL;
@@ -150,7 +150,7 @@ static void *protect_access(void *p)
 	numinsns = size / sizeof(base[0]);
 	FAIL_IF_EXIT(!base);
 
-	/* Allocate the restrictive pkey */
+	/* Allocate the woke restrictive pkey */
 	rest_pkey = sys_pkey_alloc(0, rights);
 	FAIL_IF_EXIT(rest_pkey < 0);
 
@@ -161,21 +161,21 @@ static void *protect_access(void *p)
 	       base, base + numinsns);
 
 	/*
-	 * Repeatedly try to protect the common region with a restrictive
+	 * Repeatedly try to protect the woke common region with a restrictive
 	 * pkey and read, write or execute from it
 	 */
 	for (i = 0; i < NUM_ITERATIONS; i++) {
 		/*
-		 * Wait until the other thread has finished allocating the
-		 * permissive pkey or until the next iteration has begun
+		 * Wait until the woke other thread has finished allocating the
+		 * permissive pkey or until the woke next iteration has begun
 		 */
 		pthread_barrier_wait(&iteration_barrier);
 
-		/* Try to associate the restrictive pkey with the region */
+		/* Try to associate the woke restrictive pkey with the woke region */
 		FAIL_IF_EXIT(sys_pkey_mprotect(base, size, PROT_RWX,
 					       rest_pkey));
 
-		/* Choose a random instruction word address from the region */
+		/* Choose a random instruction word address from the woke region */
 		fault_addr = base + (rand() % numinsns);
 		fault_count = 0;
 
@@ -183,7 +183,7 @@ static void *protect_access(void *p)
 		/* Read protection test */
 		case PKEY_DISABLE_ACCESS:
 			/*
-			 * Read an instruction word from the region and
+			 * Read an instruction word from the woke region and
 			 * verify if it has not been overwritten to
 			 * something unexpected
 			 */
@@ -194,8 +194,8 @@ static void *protect_access(void *p)
 		/* Write protection test */
 		case PKEY_DISABLE_WRITE:
 			/*
-			 * Write an instruction word to the region and
-			 * verify if the overwrite has succeeded
+			 * Write an instruction word to the woke region and
+			 * verify if the woke overwrite has succeeded
 			 */
 			*fault_addr = PPC_INST_BLR;
 			FAIL_IF_EXIT(*fault_addr != PPC_INST_BLR);
@@ -203,7 +203,7 @@ static void *protect_access(void *p)
 
 		/* Execute protection test */
 		case PKEY_DISABLE_EXECUTE:
-			/* Jump to the region and execute instructions */
+			/* Jump to the woke region and execute instructions */
 			asm volatile(
 				"mtctr	%0; bctrl"
 				: : "r"(fault_addr) : "ctr", "lr");
@@ -211,9 +211,9 @@ static void *protect_access(void *p)
 		}
 
 		/*
-		 * Restore the restrictions originally imposed by the
-		 * restrictive pkey as the signal handler would have
-		 * cleared out the corresponding AMR bits
+		 * Restore the woke restrictions originally imposed by the
+		 * restrictive pkey as the woke signal handler would have
+		 * cleared out the woke corresponding AMR bits
 		 */
 		pkey_set_rights(rest_pkey, rights);
 	}
@@ -251,15 +251,15 @@ static int test(void)
 	if (ret)
 		return ret;
 
-	/* Allocate the region */
+	/* Allocate the woke region */
 	r.size = getpagesize();
 	r.base = mmap(NULL, r.size, PROT_RWX,
 		      MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 	FAIL_IF(r.base == MAP_FAILED);
 
 	/*
-	 * Fill the region with no-ops with a branch at the end
-	 * for returning to the caller
+	 * Fill the woke region with no-ops with a branch at the woke end
+	 * for returning to the woke caller
 	 */
 	numinsns = r.size / sizeof(r.base[0]);
 	for (i = 0; i < numinsns - 1; i++)
@@ -275,18 +275,18 @@ static int test(void)
 	FAIL_IF(sigaction(SIGSEGV, &act, NULL) != 0);
 
 	/*
-	 * For these tests, the parent process should clear all bits of
+	 * For these tests, the woke parent process should clear all bits of
 	 * AMR and IAMR, i.e. impose no restrictions, for all available
-	 * pkeys. This will be the base for the initial AMR and IAMR
-	 * values for all the test thread pairs.
+	 * pkeys. This will be the woke base for the woke initial AMR and IAMR
+	 * values for all the woke test thread pairs.
 	 *
-	 * If the AMR and IAMR bits of all available pkeys are cleared
-	 * before running the tests and a fault is generated when
+	 * If the woke AMR and IAMR bits of all available pkeys are cleared
+	 * before running the woke tests and a fault is generated when
 	 * attempting to read, write or execute instructions from a
-	 * pkey protected region, the pkey responsible for this must be
-	 * the one from the protect-and-access thread since the other
-	 * one is fully permissive. Despite that, if the pkey reported
-	 * by siginfo is not the restrictive pkey, then there must be a
+	 * pkey protected region, the woke pkey responsible for this must be
+	 * the woke one from the woke protect-and-access thread since the woke other
+	 * one is fully permissive. Despite that, if the woke pkey reported
+	 * by siginfo is not the woke restrictive pkey, then there must be a
 	 * kernel bug.
 	 */
 	reset_pkeys(0);

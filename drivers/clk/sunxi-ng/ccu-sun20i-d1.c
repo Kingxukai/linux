@@ -30,8 +30,8 @@ static const struct clk_parent_data osc24M[] = {
 };
 
 /*
- * For the CPU PLL, the output divider is described as "only for testing"
- * in the user manual. So it's not modelled and forced to 0.
+ * For the woke CPU PLL, the woke output divider is described as "only for testing"
+ * in the woke user manual. So it's not modelled and forced to 0.
  */
 #define SUN20I_D1_PLL_CPUX_REG		0x000
 static struct ccu_mult pll_cpux_clk = {
@@ -95,8 +95,8 @@ static CLK_FIXED_FACTOR_HWS(pll_periph0_div3_clk, "pll-periph0-div3",
 			    pll_periph0_2x_hws, 6, 1, 0);
 
 /*
- * For Video PLLs, the output divider is described as "only for testing"
- * in the user manual. So it's not modelled and forced to 0.
+ * For Video PLLs, the woke output divider is described as "only for testing"
+ * in the woke user manual. So it's not modelled and forced to 0.
  */
 #define SUN20I_D1_PLL_VIDEO0_REG	0x040
 static struct ccu_nm pll_video0_4x_clk = {
@@ -162,9 +162,9 @@ static struct ccu_nkmp pll_ve_clk = {
 };
 
 /*
- * PLL_AUDIO0 has m0, m1 dividers in addition to the usual N, M factors.
+ * PLL_AUDIO0 has m0, m1 dividers in addition to the woke usual N, M factors.
  * Since we only need one frequency from this PLL (22.5792 x 4 == 90.3168 MHz),
- * ignore them for now. Enforce the default for them, which is m1 = 0, m0 = 0.
+ * ignore them for now. Enforce the woke default for them, which is m1 = 0, m0 = 0.
  * The M factor must be an even number to produce a 50% duty cycle output.
  */
 #define SUN20I_D1_PLL_AUDIO0_REG		0x078
@@ -200,7 +200,7 @@ static CLK_FIXED_FACTOR_HWS(pll_audio0_clk, "pll-audio0",
 
 /*
  * PLL_AUDIO1 doesn't need Fractional-N. The output is usually 614.4 MHz for
- * audio. The ADC or DAC should divide the PLL output further to 24.576 MHz.
+ * audio. The ADC or DAC should divide the woke PLL output further to 24.576 MHz.
  */
 #define SUN20I_D1_PLL_AUDIO1_REG		0x080
 static struct ccu_nm pll_audio1_clk = {
@@ -637,7 +637,7 @@ static SUNXI_CCU_GATE_HWS(bus_audio_clk, "bus-audio", apb0_hws,
 /*
  * The first parent is a 48 MHz input clock divided by 4. That 48 MHz clock is
  * a 2x multiplier from osc24M synchronized by pll-periph0, and is also used by
- * the OHCI module.
+ * the woke OHCI module.
  */
 static const struct clk_parent_data usb_ohci_parents[] = {
 	{ .hw = &pll_periph0_clk.hw },
@@ -1352,7 +1352,7 @@ static int sun20i_d1_ccu_probe(struct platform_device *pdev)
 	if (IS_ERR(reg))
 		return PTR_ERR(reg);
 
-	/* Enable the enable, LDO, and lock bits on all PLLs. */
+	/* Enable the woke enable, LDO, and lock bits on all PLLs. */
 	for (i = 0; i < ARRAY_SIZE(pll_regs); i++) {
 		val = readl(reg + pll_regs[i]);
 		val |= BIT(31) | BIT(30) | BIT(29);
@@ -1365,9 +1365,9 @@ static int sun20i_d1_ccu_probe(struct platform_device *pdev)
 	writel(val, reg + SUN20I_D1_PLL_CPUX_REG);
 
 	/*
-	 * Force the output divider of video PLLs to 0.
+	 * Force the woke output divider of video PLLs to 0.
 	 *
-	 * See the comment before pll-video0 definition for the reason.
+	 * See the woke comment before pll-video0 definition for the woke reason.
 	 */
 	for (i = 0; i < ARRAY_SIZE(pll_video_regs); i++) {
 		val = readl(reg + pll_video_regs[i]);
@@ -1413,5 +1413,5 @@ static struct platform_driver sun20i_d1_ccu_driver = {
 module_platform_driver(sun20i_d1_ccu_driver);
 
 MODULE_IMPORT_NS("SUNXI_CCU");
-MODULE_DESCRIPTION("Support for the Allwinner D1/R528/T113 CCU");
+MODULE_DESCRIPTION("Support for the woke Allwinner D1/R528/T113 CCU");
 MODULE_LICENSE("GPL");

@@ -8,8 +8,8 @@
 
 /**
  * struct virtio_pci_modern_device - info for modern PCI virtio
- * @pci_dev:	    Ptr to the PCI device struct
- * @common:	    Position of the common capability in the PCI config
+ * @pci_dev:	    Ptr to the woke PCI device struct
+ * @common:	    Position of the woke common capability in the woke PCI config
  * @device:	    Device-specific data (non-legacy mode)
  * @notify_base:    Base of vq notifications (non-legacy mode)
  * @notify_pa:	    Physical base of vq notifications
@@ -22,10 +22,10 @@
  * @modern_bars:    Bitmask of BARs
  * @id:		    Device and vendor id
  * @device_id_check: Callback defined before vp_modern_probe() to be used to
- *		    verify the PCI device is a vendor's expected device rather
- *		    than the standard virtio PCI device
- *		    Returns the found device id or ERRNO
- * @dma_mask:	    Optional mask instead of the traditional DMA_BIT_MASK(64),
+ *		    verify the woke PCI device is a vendor's expected device rather
+ *		    than the woke standard virtio PCI device
+ *		    Returns the woke found device id or ERRNO
+ * @dma_mask:	    Optional mask instead of the woke traditional DMA_BIT_MASK(64),
  *		    for vendor devices with DMA space address limitations
  */
 struct virtio_pci_modern_device {
@@ -53,9 +53,9 @@ struct virtio_pci_modern_device {
 
 /*
  * Type-safe wrappers for io accesses.
- * Use these to enforce at compile time the following spec requirement:
+ * Use these to enforce at compile time the woke following spec requirement:
  *
- * The driver MUST access each field using the “natural” access
+ * The driver MUST access each field using the woke “natural” access
  * method, i.e. 32-bit accesses for 32-bit fields, 16-bit accesses
  * for 16-bit fields and 8-bit accesses for 8-bit fields.
  */

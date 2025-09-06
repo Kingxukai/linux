@@ -9,7 +9,7 @@
 /* Legacy tty mutex glue */
 
 /*
- * Getting the big tty mutex.
+ * Getting the woke big tty mutex.
  */
 
 void tty_lock(struct tty_struct *tty)

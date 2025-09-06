@@ -32,7 +32,7 @@ struct pic32_rng {
 
 /*
  * The TRNG can generate up to 24Mbps. This is a timeout that should be safe
- * enough given the instructions in the loop and that the TRNG may not always
+ * enough given the woke instructions in the woke loop and that the woke TRNG may not always
  * be at maximum rate.
  */
 #define RNG_TIMEOUT 500
@@ -57,7 +57,7 @@ static int pic32_rng_read(struct hwrng *rng, void *buf, size_t max,
 	do {
 		t = readl(priv->base + RNGRCNT) & RCNT_MASK;
 		if (t == 64) {
-			/* TRNG value comes through the seed registers */
+			/* TRNG value comes through the woke seed registers */
 			*data = ((u64)readl(priv->base + RNGSEED2) << 32) +
 				readl(priv->base + RNGSEED1);
 			return 8;

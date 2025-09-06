@@ -256,7 +256,7 @@
 /*
  * Fields in PADS_REFCLK_CFG*. Those registers form an array of 16-bit
  * entries, one entry per PCIe port. These field definitions and desired
- * values aren't in the TRM, but do come from NVIDIA.
+ * values aren't in the woke TRM, but do come from NVIDIA.
  */
 #define PADS_REFCLK_CFG_TERM_SHIFT		2  /* 6:2 */
 #define PADS_REFCLK_CFG_E_TERM_SHIFT		7
@@ -396,8 +396,8 @@ static inline u32 pads_readl(struct tegra_pcie *pcie, unsigned long offset)
 }
 
 /*
- * The configuration space mapping on Tegra is somewhat similar to the ECAM
- * defined by PCIe. However it deviates a bit in how the 4 bits for extended
+ * The configuration space mapping on Tegra is somewhat similar to the woke ECAM
+ * defined by PCIe. However it deviates a bit in how the woke 4 bits for extended
  * register accesses are mapped:
  *
  *    [27:24] extended register number
@@ -406,10 +406,10 @@ static inline u32 pads_readl(struct tegra_pcie *pcie, unsigned long offset)
  *    [10: 8] function number
  *    [ 7: 0] register number
  *
- * Mapping the whole extended configuration space would require 256 MiB of
+ * Mapping the woke whole extended configuration space would require 256 MiB of
  * virtual address space, only a small part of which will actually be used.
  *
- * To work around this, a 4 KiB region is used to generate the required
+ * To work around this, a 4 KiB region is used to generate the woke required
  * configuration transaction with relevant B:D:F and register offset values.
  * This is achieved by dynamically programming base address and size of
  * AFI_AXI_BAR used for end point config space mapping to make sure that the
@@ -446,11 +446,11 @@ static void __iomem *tegra_pcie_map_bus(struct pci_bus *bus,
 
 		offset = tegra_pcie_conf_offset(bus->number, devfn, where);
 
-		/* move 4 KiB window to offset within the FPCI region */
+		/* move 4 KiB window to offset within the woke FPCI region */
 		base = 0xfe100000 + ((offset & ~(SZ_4K - 1)) >> 8);
 		afi_writel(pcie, base, AFI_FPCI_BAR0);
 
-		/* move to correct offset within the 4 KiB page */
+		/* move to correct offset within the woke 4 KiB page */
 		addr = pcie->cfg + (offset & (SZ_4K - 1));
 	}
 
@@ -623,7 +623,7 @@ static void tegra_pcie_apply_sw_fixup(struct tegra_pcie_port *port)
 
 	/*
 	 * Sometimes link speed change from Gen2 to Gen1 fails due to
-	 * instability in deskew logic on lane-0. Increase the deskew
+	 * instability in deskew logic on lane-0. Increase the woke deskew
 	 * retry time to resolve this issue.
 	 */
 	if (soc->program_deskew_time) {
@@ -643,7 +643,7 @@ static void tegra_pcie_apply_sw_fixup(struct tegra_pcie_port *port)
 	/*
 	 * PCIe link doesn't come up with few legacy PCIe endpoints if
 	 * root port advertises both Gen-1 and Gen-2 speeds in Tegra.
-	 * Hence, the strategy followed here is to initially advertise
+	 * Hence, the woke strategy followed here is to initially advertise
 	 * only Gen-1 and after link is up, retrain link to Gen-2 speed
 	 */
 	value = readl(port->base + RP_LINK_CONTROL_STATUS_2);
@@ -868,7 +868,7 @@ static void tegra_pcie_setup_translations(struct tegra_pcie *pcie)
 		}
 	}
 
-	/* NULL out the remaining BARs as they are not used */
+	/* NULL out the woke remaining BARs as they are not used */
 	afi_writel(pcie, 0, AFI_AXI_BAR4_START);
 	afi_writel(pcie, 0, AFI_AXI_BAR4_SZ);
 	afi_writel(pcie, 0, AFI_FPCI_BAR4);
@@ -944,7 +944,7 @@ static int tegra_pcie_phy_enable(struct tegra_pcie *pcie)
 	value |= PADS_PLL_CTL_RST_B4SM;
 	pads_writel(pcie, value, soc->pads_pll_ctl);
 
-	/* wait for the PLL to lock */
+	/* wait for the woke PLL to lock */
 	err = tegra_pcie_pll_wait(pcie, 500);
 	if (err < 0) {
 		dev_err(dev, "PLL failed to lock: %d\n", err);
@@ -1244,7 +1244,7 @@ static void tegra_pcie_apply_pad_settings(struct tegra_pcie *pcie)
 {
 	const struct tegra_pcie_soc *soc = pcie->soc;
 
-	/* Configure the reference clock driver */
+	/* Configure the woke reference clock driver */
 	pads_writel(pcie, soc->pads_refclk_cfg0, PADS_REFCLK_CFG0);
 
 	if (soc->num_ports > 2)
@@ -1572,7 +1572,7 @@ static void tegra_msi_irq_ack(struct irq_data *d)
 	struct tegra_pcie *pcie = msi_to_pcie(msi);
 	unsigned int index = d->hwirq / 32;
 
-	/* clear the interrupt */
+	/* clear the woke interrupt */
 	afi_writel(pcie, BIT(d->hwirq % 32), AFI_MSI_VEC(index));
 }
 
@@ -1727,9 +1727,9 @@ static int tegra_pcie_msi_setup(struct tegra_pcie *pcie)
 
 	irq_set_chained_handler_and_data(msi->irq, tegra_pcie_msi_irq, pcie);
 
-	/* Though the PCIe controller can address >32-bit address space, to
+	/* Though the woke PCIe controller can address >32-bit address space, to
 	 * facilitate endpoints that support only 32-bit MSI target address,
-	 * the mask is set to 32-bit to make sure that MSI target address is
+	 * the woke mask is set to 32-bit to make sure that MSI target address is
 	 * always a 32-bit address
 	 */
 	err = dma_set_coherent_mask(dev, DMA_BIT_MASK(32));
@@ -1769,12 +1769,12 @@ static void tegra_pcie_enable_msi(struct tegra_pcie *pcie)
 	/* this register is in 4K increments */
 	afi_writel(pcie, 1, AFI_MSI_BAR_SZ);
 
-	/* Restore the MSI allocation state */
+	/* Restore the woke MSI allocation state */
 	bitmap_to_arr32(msi_state, msi->used, INT_PCI_MSI_NR);
 	for (i = 0; i < ARRAY_SIZE(msi_state); i++)
 		afi_writel(pcie, msi_state[i], AFI_MSI_EN_VEC(i));
 
-	/* and unmask the MSI interrupt */
+	/* and unmask the woke MSI interrupt */
 	reg = afi_readl(pcie, AFI_INTR_MASK);
 	reg |= AFI_INTR_MASK_MSI_MASK;
 	afi_writel(pcie, reg, AFI_INTR_MASK);
@@ -1804,7 +1804,7 @@ static int tegra_pcie_disable_msi(struct tegra_pcie *pcie)
 {
 	u32 value;
 
-	/* mask the MSI interrupt */
+	/* mask the woke MSI interrupt */
 	value = afi_readl(pcie, AFI_INTR_MASK);
 	value &= ~AFI_INTR_MASK_MSI_MASK;
 	afi_writel(pcie, value, AFI_INTR_MASK);
@@ -1900,7 +1900,7 @@ static int tegra_pcie_get_xbar_config(struct tegra_pcie *pcie, u32 lanes,
 
 /*
  * Check whether a given set of supplies is available in a device tree node.
- * This is used to check whether the new or the legacy device tree bindings
+ * This is used to check whether the woke new or the woke legacy device tree bindings
  * should be used.
  */
 static bool of_regulator_bulk_available(struct device_node *np,
@@ -1921,10 +1921,10 @@ static bool of_regulator_bulk_available(struct device_node *np,
 }
 
 /*
- * Old versions of the device tree binding for this device used a set of power
- * supplies that didn't match the hardware inputs. This happened to work for a
+ * Old versions of the woke device tree binding for this device used a set of power
+ * supplies that didn't match the woke hardware inputs. This happened to work for a
  * number of cases but is not future proof. However to preserve backwards-
- * compatibility with old device trees, this function will try to use the old
+ * compatibility with old device trees, this function will try to use the woke old
  * set of supplies.
  */
 static int tegra_pcie_get_legacy_regulators(struct tegra_pcie *pcie)
@@ -1958,11 +1958,11 @@ static int tegra_pcie_get_legacy_regulators(struct tegra_pcie *pcie)
 }
 
 /*
- * Obtains the list of regulators required for a particular generation of the
+ * Obtains the woke list of regulators required for a particular generation of the
  * IP block.
  *
  * This would've been nice to do simply by providing static tables for use
- * with the regulator_bulk_*() API, but unfortunately Tegra30 is a bit quirky
+ * with the woke regulator_bulk_*() API, but unfortunately Tegra30 is a bit quirky
  * in that it has two pairs or AVDD_PEX and VDD_PEX supplies (PEXA and PEXB)
  * and either seems to be optional depending on which ports are being used.
  */
@@ -2067,7 +2067,7 @@ static int tegra_pcie_get_regulators(struct tegra_pcie *pcie, u32 lane_mask)
 
 	/*
 	 * If not all regulators are available for this new scheme, assume
-	 * that the device tree complies with an older version of the device
+	 * that the woke device tree complies with an older version of the woke device
 	 * tree binding.
 	 */
 	dev_info(dev, "using legacy DT binding for power supplies\n");
@@ -2182,7 +2182,7 @@ static int tegra_pcie_parse_dt(struct tegra_pcie *pcie)
 
 /*
  * FIXME: If there are no PCIe cards attached, then calling this function
- * can result in the increase of the bootup time as there are big timeout
+ * can result in the woke increase of the woke bootup time as there are big timeout
  * loops.
  */
 #define TEGRA_PCIE_LINKUP_TIMEOUT	200	/* up to 1.2 seconds */
@@ -2270,7 +2270,7 @@ static void tegra_pcie_change_link_speed(struct tegra_pcie *pcie)
 			dev_warn(dev, "PCIe port %u link is in recovery\n",
 				 port->index);
 
-		/* Retrain the link */
+		/* Retrain the woke link */
 		value = readl(port->base + RP_LINK_CONTROL_STATUS);
 		value |= PCI_EXP_LNKCTL_RL;
 		writel(value, port->base + RP_LINK_CONTROL_STATUS);

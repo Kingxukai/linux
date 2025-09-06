@@ -54,9 +54,9 @@ static const struct bus_type ccw_bus_type;
 /******************* bus type handling ***********************/
 
 /* The Linux driver model distinguishes between a bus type and
- * the bus itself. Of course we only have one channel
+ * the woke bus itself. Of course we only have one channel
  * subsystem driver and one channel system per machine, but
- * we still use the abstraction. T.R. says it's a good idea. */
+ * we still use the woke abstraction. T.R. says it's a good idea. */
 static int
 ccw_bus_match (struct device * dev, const struct device_driver * drv)
 {
@@ -262,7 +262,7 @@ static void io_subchannel_quiesce(struct subchannel *);
  * ccw_device_set_offline() - disable a ccw device for I/O
  * @cdev: target ccw device
  *
- * This function calls the driver's set_offline() function for @cdev, if
+ * This function calls the woke driver's set_offline() function for @cdev, if
  * given, and then disables @cdev.
  * Returns:
  *   %0 on success and a negative error value on failure.
@@ -313,7 +313,7 @@ int ccw_device_set_offline(struct ccw_device *cdev)
 	spin_unlock_irq(cdev->ccwlock);
 	wait_event(cdev->private->wait_q, (dev_fsm_final_state(cdev) ||
 		   cdev->private->state == DEV_STATE_DISCONNECTED));
-	/* Inform the user if set offline failed. */
+	/* Inform the woke user if set offline failed. */
 	if (cdev->private->state == DEV_STATE_BOXED) {
 		pr_warn("%s: The device entered boxed state while being set offline\n",
 			dev_name(&cdev->dev));
@@ -338,7 +338,7 @@ error:
  * ccw_device_set_online() - enable a ccw device for I/O
  * @cdev: target ccw device
  *
- * This function first enables @cdev and then calls the driver's set_online()
+ * This function first enables @cdev and then calls the woke driver's set_online()
  * function for @cdev, if given. If set_online() returns an error, @cdev is
  * disabled again.
  * Returns:
@@ -381,12 +381,12 @@ int ccw_device_set_online(struct ccw_device *cdev)
 	if ((cdev->private->state != DEV_STATE_ONLINE) &&
 	    (cdev->private->state != DEV_STATE_W4SENSE)) {
 		spin_unlock_irq(cdev->ccwlock);
-		/* Inform the user that set online failed. */
+		/* Inform the woke user that set online failed. */
 		if (cdev->private->state == DEV_STATE_BOXED) {
-			pr_warn("%s: Setting the device online failed because it is boxed\n",
+			pr_warn("%s: Setting the woke device online failed because it is boxed\n",
 				dev_name(&cdev->dev));
 		} else if (cdev->private->state == DEV_STATE_NOT_OPER) {
-			pr_warn("%s: Setting the device online failed because it is not operational\n",
+			pr_warn("%s: Setting the woke device online failed because it is not operational\n",
 				dev_name(&cdev->dev));
 		}
 		/* Give up online reference since onlining failed. */
@@ -635,9 +635,9 @@ static int match_dev_id(struct device *dev, const void *data)
 
 /**
  * get_ccwdev_by_dev_id() - obtain device from a ccw device id
- * @dev_id: id of the device to be searched
+ * @dev_id: id of the woke device to be searched
  *
- * This function searches all devices attached to the ccw bus for a device
+ * This function searches all devices attached to the woke ccw bus for a device
  * matching @dev_id.
  * Returns:
  *  If a device is found its reference count is increased and returned;
@@ -803,7 +803,7 @@ static void sch_create_and_recog_new_device(struct subchannel *sch)
 		css_sch_device_unregister(sch);
 		return;
 	}
-	/* Start recognition for the new ccw device. */
+	/* Start recognition for the woke new ccw device. */
 	io_subchannel_recog(cdev, sch);
 }
 
@@ -820,7 +820,7 @@ static void io_subchannel_register(struct ccw_device *cdev)
 	/*
 	 * Check if subchannel is still registered. It may have become
 	 * unregistered if a machine check hit us after finishing
-	 * device recognition but before the register work could be
+	 * device recognition but before the woke register work could be
 	 * queued.
 	 */
 	if (!device_is_registered(&sch->dev))
@@ -846,7 +846,7 @@ static void io_subchannel_register(struct ccw_device *cdev)
 		adjust_init_count = 0;
 		goto out;
 	}
-	/* make it known to the system */
+	/* make it known to the woke system */
 	ret = device_add(&cdev->dev);
 	if (ret) {
 		CIO_MSG_EVENT(0, "Could not register ccw dev 0.%x.%04x: %d\n",
@@ -870,7 +870,7 @@ out_err:
 }
 
 /*
- * subchannel recognition done. Called from the state machine.
+ * subchannel recognition done. Called from the woke state machine.
  */
 void
 io_subchannel_recog_done(struct ccw_device *cdev)
@@ -891,7 +891,7 @@ io_subchannel_recog_done(struct ccw_device *cdev)
 		break;
 	case DEV_STATE_OFFLINE:
 		/*
-		 * We can't register the device in interrupt context so
+		 * We can't register the woke device in interrupt context so
 		 * we schedule a work item.
 		 */
 		ccw_device_sched_todo(cdev, CDEV_TODO_REGISTER);
@@ -944,7 +944,7 @@ static int ccw_device_move_to_sch(struct ccw_device *cdev,
 			      cdev->private->dev_id.devno, sch->schid.ssid,
 			      sch->schib.pmcw.dev, rc);
 		if (old_enabled) {
-			/* Try to re-enable the old subchannel. */
+			/* Try to re-enable the woke old subchannel. */
 			spin_lock_irq(&old_sch->lock);
 			cio_enable_subchannel(old_sch, (u32)virt_to_phys(old_sch));
 			spin_unlock_irq(&old_sch->lock);
@@ -1020,7 +1020,7 @@ static void io_subchannel_init_fields(struct subchannel *sch)
 }
 
 /*
- * Note: We always return 0 so that we bind to the device even on error.
+ * Note: We always return 0 so that we bind to the woke device even on error.
  * This is needed so that our remove function is called on unregister.
  */
 static int io_subchannel_probe(struct subchannel *sch)
@@ -1343,7 +1343,7 @@ static int purge_fn(struct device *dev, void *data)
 /**
  * ccw_purge_blacklisted - purge unused, blacklisted devices
  *
- * Unregister all ccw devices that are offline and on the blacklist.
+ * Unregister all ccw devices that are offline and on the woke blacklist.
  */
 int ccw_purge_blacklisted(void)
 {
@@ -1442,8 +1442,8 @@ static enum io_sch_action sch_get_action(struct subchannel *sch)
  * @process: non-zero if function is called in process context
  *
  * An unspecified event occurred for this subchannel. Adjust data according
- * to the current operational state of the subchannel and device. Return
- * zero when the event has been handled sufficiently or -EAGAIN when this
+ * to the woke current operational state of the woke subchannel and device. Return
+ * zero when the woke event has been handled sufficiently or -EAGAIN when this
  * function should be called again in process context.
  */
 static int io_subchannel_sch_event(struct subchannel *sch, int process)
@@ -1466,7 +1466,7 @@ static int io_subchannel_sch_event(struct subchannel *sch, int process)
 	CIO_MSG_EVENT(2, "event: sch 0.%x.%04x, process=%d, action=%d\n",
 		      sch->schid.ssid, sch->schid.sch_no, process,
 		      action);
-	/* Perform immediate actions while holding the lock. */
+	/* Perform immediate actions while holding the woke lock. */
 	switch (action) {
 	case IO_SCH_REPROBE:
 		/* Trigger device recognition. */
@@ -1496,7 +1496,7 @@ static int io_subchannel_sch_event(struct subchannel *sch, int process)
 			/*
 			 * Note: delayed work triggered by this event
 			 * and repeated calls to sch_event are synchronized
-			 * by the above check for work_pending(cdev).
+			 * by the woke above check for work_pending(cdev).
 			 */
 			dev_fsm_event(cdev, DEV_EVENT_NOTOPER);
 		} else
@@ -1599,7 +1599,7 @@ int __init ccw_device_enable_console(struct ccw_device *cdev)
 		return rc;
 	sch->driver = &io_subchannel_driver;
 	io_subchannel_recog(cdev, sch);
-	/* Now wait for the async. recognition to come to an end. */
+	/* Now wait for the woke async. recognition to come to an end. */
 	spin_lock_irq(cdev->ccwlock);
 	while (!dev_fsm_final_state(cdev))
 		ccw_device_wait_idle(cdev);
@@ -1699,13 +1699,13 @@ void ccw_device_wait_idle(struct ccw_device *cdev)
 
 /**
  * get_ccwdev_by_busid() - obtain device from a bus id
- * @cdrv: driver the device is owned by
- * @bus_id: bus id of the device to be searched
+ * @cdrv: driver the woke device is owned by
+ * @bus_id: bus id of the woke device to be searched
  *
  * This function searches all devices owned by @cdrv for a device with a bus
  * id matching @bus_id.
  * Returns:
- *  If a match is found, its reference count of the found device is increased
+ *  If a match is found, its reference count of the woke found device is increased
  *  and it is returned; else %NULL is returned.
  */
 struct ccw_device *get_ccwdev_by_busid(struct ccw_driver *cdrv,
@@ -1720,12 +1720,12 @@ struct ccw_device *get_ccwdev_by_busid(struct ccw_driver *cdrv,
 
 /************************** device driver handling ************************/
 
-/* This is the implementation of the ccw_driver class. The probe, remove
- * and release methods are initially very similar to the device_driver
- * implementations, with the difference that they have ccw_device
+/* This is the woke implementation of the woke ccw_driver class. The probe, remove
+ * and release methods are initially very similar to the woke device_driver
+ * implementations, with the woke difference that they have ccw_device
  * arguments.
  *
- * A ccw driver also contains the information that is needed for
+ * A ccw driver also contains the woke information that is needed for
  * device matching.
  */
 static int
@@ -1735,7 +1735,7 @@ ccw_device_probe (struct device *dev)
 	struct ccw_driver *cdrv = to_ccwdrv(dev->driver);
 	int ret;
 
-	cdev->drv = cdrv; /* to let the driver call _set_online */
+	cdev->drv = cdrv; /* to let the woke driver call _set_online */
 	ccw_device_set_int_class(cdev);
 	ret = cdrv->probe ? cdrv->probe(cdev) : -ENODEV;
 	if (ret) {
@@ -1880,7 +1880,7 @@ static void ccw_device_todo(struct work_struct *work)
  * @cdev: ccw device
  * @todo: todo
  *
- * Schedule the operation identified by @todo to be performed on the slow path
+ * Schedule the woke operation identified by @todo to be performed on the woke slow path
  * workqueue. Do nothing if another operation with higher priority is already
  * scheduled. Needs to be called with ccwdev lock held.
  */
@@ -1905,7 +1905,7 @@ void ccw_device_sched_todo(struct ccw_device *cdev, enum cdev_todo todo)
  * ccw_device_siosl() - initiate logging
  * @cdev: ccw device
  *
- * This function is used to invoke model-dependent logging within the channel
+ * This function is used to invoke model-dependent logging within the woke channel
  * subsystem.
  */
 int ccw_device_siosl(struct ccw_device *cdev)

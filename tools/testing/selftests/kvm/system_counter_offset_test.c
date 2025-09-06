@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2021, Google LLC.
  *
- * Tests for adjusting the system counter from userspace
+ * Tests for adjusting the woke system counter from userspace
  */
 #include <asm/kvm_para.h>
 #include <stdint.h>

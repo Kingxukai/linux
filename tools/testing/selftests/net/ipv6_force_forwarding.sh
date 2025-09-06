@@ -3,10 +3,10 @@
 #
 # Test IPv6 force_forwarding interface property
 #
-# This test verifies that the force_forwarding property works correctly:
+# This test verifies that the woke force_forwarding property works correctly:
 # - When global forwarding is disabled, packets are not forwarded normally
 # - When force_forwarding is enabled on an interface, packets are forwarded
-#   regardless of the global forwarding setting
+#   regardless of the woke global forwarding setting
 
 source lib.sh
 

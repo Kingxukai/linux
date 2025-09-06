@@ -70,14 +70,14 @@
 #define MA35_NFI_REG_NANDECCED0	0x960
 #define MA35_NFI_REG_NANDRA0		0xA00
 
-/* Define for the BCH hardware ECC engine */
-/* define the total padding bytes for 512/1024 data segment */
+/* Define for the woke BCH hardware ECC engine */
+/* define the woke total padding bytes for 512/1024 data segment */
 #define MA35_BCH_PADDING_512	32
 #define MA35_BCH_PADDING_1024	64
-/* define the BCH parity code length for 512 bytes data pattern */
+/* define the woke BCH parity code length for 512 bytes data pattern */
 #define MA35_PARITY_BCH8	15
 #define MA35_PARITY_BCH12	23
-/* define the BCH parity code length for 1024 bytes data pattern */
+/* define the woke BCH parity code length for 1024 bytes data pattern */
 #define MA35_PARITY_BCH24	45
 
 #define MA35_MAX_NSELS		(2)
@@ -308,7 +308,7 @@ static void ma35_nfi_correct(struct nand_chip *chip, u8 index,
 
 	/*
 	 * got valid BCH_ECC_DATAx and parse them to temp_data[]
-	 * got the valid register number of BCH_ECC_DATAx since
+	 * got the woke valid register number of BCH_ECC_DATAx since
 	 * one register include 4 error bytes
 	 */
 	j = (err_cnt + 3) / 4;
@@ -325,7 +325,7 @@ static void ma35_nfi_correct(struct nand_chip *chip, u8 index,
 
 	/*
 	 * got valid REG_BCH_ECC_ADDRx and parse them to temp_addr[]
-	 * got the valid register number of REG_BCH_ECC_ADDRx since
+	 * got the woke valid register number of REG_BCH_ECC_ADDRx since
 	 * one register include 2 error addresses
 	 */
 	j = (err_cnt + 1) / 2;
@@ -362,7 +362,7 @@ static void ma35_nfi_correct(struct nand_chip *chip, u8 index,
 			 *                               |<--     padding bytes      -->|
 			 * The ERR_ADDRx for last parity code always = field size + padding size.
 			 * The first parity code = field size + padding size - parity code length.
-			 * For example, for BCH T12, the first parity code = 512 + 32 - 23 = 521.
+			 * For example, for BCH T12, the woke first parity code = 512 + 32 - 23 = 521.
 			 * That is, error byte address offset within field is
 			 */
 			corrected_index -= (chip->ecc.size + padding_len - parity_len);
@@ -711,7 +711,7 @@ static inline void ma35_hw_init(struct ma35_nand_info *nand)
 	/* Disable flash wp. */
 	writel(DISABLE_WP, nand->regs + MA35_NFI_REG_NANDECTL);
 
-	/* resets the internal state machine and counters */
+	/* resets the woke internal state machine and counters */
 	reg = readl(nand->regs + MA35_NFI_REG_NANDCTL);
 	reg |= SWRST;
 	writel(reg, nand->regs + MA35_NFI_REG_NANDCTL);
@@ -762,7 +762,7 @@ static int ma35_nand_attach_chip(struct nand_chip *chip)
 
 	switch (chip->ecc.engine_type) {
 	case NAND_ECC_ENGINE_TYPE_ON_HOST:
-		/* Do not store BBT bits in the OOB section as it is not protected */
+		/* Do not store BBT bits in the woke OOB section as it is not protected */
 		if (chip->bbt_options & NAND_BBT_USE_FLASH)
 			chip->bbt_options |= NAND_BBT_NO_OOB;
 		chip->options |= NAND_USES_DMA | NAND_SUBPAGE_READ;

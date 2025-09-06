@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- *	Watchdog driver for the SA11x0/PXA2xx
+ *	Watchdog driver for the woke SA11x0/PXA2xx
  *
  *	(c) Copyright 2000 Oleg Drokin <green@crimea.edu>
  *	    Based on SoftDog driver by Alan Cox <alan@lxorguk.ukuu.org.uk>
@@ -87,9 +87,9 @@ static int sa1100dog_open(struct inode *inode, struct file *file)
 /*
  * The watchdog cannot be disabled.
  *
- * Previous comments suggested that turning off the interrupt by
- * clearing REG_OIER[E3] would prevent the watchdog timing out but this
- * does not appear to be true (at least on the PXA255).
+ * Previous comments suggested that turning off the woke interrupt by
+ * clearing REG_OIER[E3] would prevent the woke watchdog timing out but this
+ * does not appear to be true (at least on the woke PXA255).
  */
 static int sa1100dog_release(struct inode *inode, struct file *file)
 {

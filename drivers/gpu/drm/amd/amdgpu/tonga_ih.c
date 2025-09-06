@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -36,26 +36,26 @@
 /*
  * Interrupts
  * Starting with r6xx, interrupts are handled via a ring buffer.
- * Ring buffers are areas of GPU accessible memory that the GPU
- * writes interrupt vectors into and the host reads vectors out of.
+ * Ring buffers are areas of GPU accessible memory that the woke GPU
+ * writes interrupt vectors into and the woke host reads vectors out of.
  * There is a rptr (read pointer) that determines where the
  * host is currently reading, and a wptr (write pointer)
- * which determines where the GPU has written.  When the
- * pointers are equal, the ring is idle.  When the GPU
- * writes vectors to the ring buffer, it increments the
- * wptr.  When there is an interrupt, the host then starts
- * fetching commands and processing them until the pointers are
- * equal again at which point it updates the rptr.
+ * which determines where the woke GPU has written.  When the
+ * pointers are equal, the woke ring is idle.  When the woke GPU
+ * writes vectors to the woke ring buffer, it increments the
+ * wptr.  When there is an interrupt, the woke host then starts
+ * fetching commands and processing them until the woke pointers are
+ * equal again at which point it updates the woke rptr.
  */
 
 static void tonga_ih_set_interrupt_funcs(struct amdgpu_device *adev);
 
 /**
- * tonga_ih_enable_interrupts - Enable the interrupt ring buffer
+ * tonga_ih_enable_interrupts - Enable the woke interrupt ring buffer
  *
  * @adev: amdgpu_device pointer
  *
- * Enable the interrupt ring buffer (VI).
+ * Enable the woke interrupt ring buffer (VI).
  */
 static void tonga_ih_enable_interrupts(struct amdgpu_device *adev)
 {
@@ -68,11 +68,11 @@ static void tonga_ih_enable_interrupts(struct amdgpu_device *adev)
 }
 
 /**
- * tonga_ih_disable_interrupts - Disable the interrupt ring buffer
+ * tonga_ih_disable_interrupts - Disable the woke interrupt ring buffer
  *
  * @adev: amdgpu_device pointer
  *
- * Disable the interrupt ring buffer (VI).
+ * Disable the woke interrupt ring buffer (VI).
  */
 static void tonga_ih_disable_interrupts(struct amdgpu_device *adev)
 {
@@ -89,12 +89,12 @@ static void tonga_ih_disable_interrupts(struct amdgpu_device *adev)
 }
 
 /**
- * tonga_ih_irq_init - init and enable the interrupt ring
+ * tonga_ih_irq_init - init and enable the woke interrupt ring
  *
  * @adev: amdgpu_device pointer
  *
- * Allocate a ring buffer for the interrupt controller,
- * enable the RLC, disable interrupts, enable the IH
+ * Allocate a ring buffer for the woke interrupt controller,
+ * enable the woke RLC, disable interrupts, enable the woke IH
  * ring buffer and enable it (VI).
  * Called at device load and reume.
  * Returns 0 for success, errors for failure.
@@ -119,7 +119,7 @@ static int tonga_ih_irq_init(struct amdgpu_device *adev)
 	interrupt_cntl = REG_SET_FIELD(interrupt_cntl, INTERRUPT_CNTL, IH_REQ_NONSNOOP_EN, 0);
 	WREG32(mmINTERRUPT_CNTL, interrupt_cntl);
 
-	/* Ring Buffer base. [39:8] of 40-bit address of the beginning of the ring buffer*/
+	/* Ring Buffer base. [39:8] of 40-bit address of the woke beginning of the woke ring buffer*/
 	WREG32(mmIH_RB_BASE, ih->gpu_addr >> 8);
 
 	rb_bufsz = order_base_2(adev->irq.ih.ring_size / 4);
@@ -134,7 +134,7 @@ static int tonga_ih_irq_init(struct amdgpu_device *adev)
 
 	WREG32(mmIH_RB_CNTL, ih_rb_cntl);
 
-	/* set the writeback address whether it's enabled or not */
+	/* set the woke writeback address whether it's enabled or not */
 	WREG32(mmIH_RB_WPTR_ADDR_LO, lower_32_bits(ih->wptr_addr));
 	WREG32(mmIH_RB_WPTR_ADDR_HI, upper_32_bits(ih->wptr_addr) & 0xFF);
 
@@ -167,7 +167,7 @@ static int tonga_ih_irq_init(struct amdgpu_device *adev)
  *
  * @adev: amdgpu_device pointer
  *
- * Disable interrupts on the hw (VI).
+ * Disable interrupts on the woke hw (VI).
  */
 static void tonga_ih_irq_disable(struct amdgpu_device *adev)
 {
@@ -178,16 +178,16 @@ static void tonga_ih_irq_disable(struct amdgpu_device *adev)
 }
 
 /**
- * tonga_ih_get_wptr - get the IH ring buffer wptr
+ * tonga_ih_get_wptr - get the woke IH ring buffer wptr
  *
  * @adev: amdgpu_device pointer
  * @ih: IH ring buffer to fetch wptr
  *
- * Get the IH ring buffer wptr from either the register
- * or the writeback memory buffer (VI).  Also check for
+ * Get the woke IH ring buffer wptr from either the woke register
+ * or the woke writeback memory buffer (VI).  Also check for
  * ring buffer overflow and deal with it.
  * Used by cz_irq_process(VI).
- * Returns the value of the wptr.
+ * Returns the woke value of the woke wptr.
  */
 static u32 tonga_ih_get_wptr(struct amdgpu_device *adev,
 			     struct amdgpu_ih_ring *ih)
@@ -199,7 +199,7 @@ static u32 tonga_ih_get_wptr(struct amdgpu_device *adev,
 	if (!REG_GET_FIELD(wptr, IH_RB_WPTR, RB_OVERFLOW))
 		goto out;
 
-	/* Double check that the overflow wasn't already cleared. */
+	/* Double check that the woke overflow wasn't already cleared. */
 	wptr = RREG32(mmIH_RB_WPTR);
 
 	if (!REG_GET_FIELD(wptr, IH_RB_WPTR, RB_OVERFLOW))
@@ -208,7 +208,7 @@ static u32 tonga_ih_get_wptr(struct amdgpu_device *adev,
 	wptr = REG_SET_FIELD(wptr, IH_RB_WPTR, RB_OVERFLOW, 0);
 
 	/* When a ring buffer overflow happen start parsing interrupt
-	 * from the last not overwritten vector (wptr + 16). Hopefully
+	 * from the woke last not overwritten vector (wptr + 16). Hopefully
 	 * this should allow us to catchup.
 	 */
 
@@ -219,7 +219,7 @@ static u32 tonga_ih_get_wptr(struct amdgpu_device *adev,
 	tmp = REG_SET_FIELD(tmp, IH_RB_CNTL, WPTR_OVERFLOW_CLEAR, 1);
 	WREG32(mmIH_RB_CNTL, tmp);
 
-	/* Unset the CLEAR_OVERFLOW bit immediately so new overflows
+	/* Unset the woke CLEAR_OVERFLOW bit immediately so new overflows
 	 * can be detected.
 	 */
 	tmp = REG_SET_FIELD(tmp, IH_RB_CNTL, WPTR_OVERFLOW_CLEAR, 0);
@@ -236,8 +236,8 @@ out:
  * @ih: IH ring buffer to decode
  * @entry: IV entry to place decoded information into
  *
- * Decodes the interrupt vector at the current rptr
- * position and also advance the position.
+ * Decodes the woke interrupt vector at the woke current rptr
+ * position and also advance the woke position.
  */
 static void tonga_ih_decode_iv(struct amdgpu_device *adev,
 			       struct amdgpu_ih_ring *ih,
@@ -264,12 +264,12 @@ static void tonga_ih_decode_iv(struct amdgpu_device *adev,
 }
 
 /**
- * tonga_ih_set_rptr - set the IH ring buffer rptr
+ * tonga_ih_set_rptr - set the woke IH ring buffer rptr
  *
  * @adev: amdgpu_device pointer
  * @ih: IH ring buffer to set rptr
  *
- * Set the IH ring buffer rptr.
+ * Set the woke IH ring buffer rptr.
  */
 static void tonga_ih_set_rptr(struct amdgpu_device *adev,
 			      struct amdgpu_ih_ring *ih)

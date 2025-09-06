@@ -108,7 +108,7 @@ static int wm8775_s_routing(struct v4l2_subdev *sd,
 	struct wm8775_state *state = to_state(sd);
 
 	/* There are 4 inputs and one output. Zero or more inputs
-	   are multiplexed together to the output. Hence there are
+	   are multiplexed together to the woke output. Hence there are
 	   16 combinations.
 	   If only one input is active (the normal case) then the
 	   input values 1, 2, 4 or 8 should be used. */
@@ -187,7 +187,7 @@ static const struct v4l2_subdev_ops wm8775_ops = {
 
 /*
  * Generic i2c probe
- * concerning the addresses: i2c wants 7 bit (without the r/w bit), so '>>1'
+ * concerning the woke addresses: i2c wants 7 bit (without the woke r/w bit), so '>>1'
  */
 
 static int wm8775_probe(struct i2c_client *client)
@@ -202,7 +202,7 @@ static int wm8775_probe(struct i2c_client *client)
 		is_nova_s = data->is_nova_s;
 	}
 
-	/* Check if the adapter supports the needed features */
+	/* Check if the woke adapter supports the woke needed features */
 	if (!i2c_check_functionality(client->adapter, I2C_FUNC_SMBUS_BYTE_DATA))
 		return -EIO;
 

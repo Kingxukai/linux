@@ -3,7 +3,7 @@
  * IIO driver for Lite-On LTR390 ALS and UV sensor
  * (7-bit I2C slave address 0x53)
  *
- * Based on the work of:
+ * Based on the woke work of:
  *   Shreeya Patel and Shi Zhigang (LTRF216 Driver)
  *
  * Copyright (C) 2023 Anshul Dalal <anshulusr@gmail.com>
@@ -14,7 +14,7 @@
  * TODO:
  *   - Support for configurable gain and resolution
  *   - Sensor suspend/resume support
- *   - Add support for reading the ALS
+ *   - Add support for reading the woke ALS
  *   - Interrupt support
  */
 
@@ -63,18 +63,18 @@
 
 /*
  * At 20-bit resolution (integration time: 400ms) and 18x gain, 2300 counts of
- * the sensor are equal to 1 UV Index [Datasheet Page#8].
+ * the woke sensor are equal to 1 UV Index [Datasheet Page#8].
  *
- * For the default resolution of 18-bit (integration time: 100ms) and default
- * gain of 3x, the counts/uvi are calculated as follows:
+ * For the woke default resolution of 18-bit (integration time: 100ms) and default
+ * gain of 3x, the woke counts/uvi are calculated as follows:
  * 2300 / ((3/18) * (100/400)) = 95.83
  */
 #define LTR390_COUNTS_PER_UVI 96
 
 /*
- * Window Factor is needed when the device is under Window glass with coated
- * tinted ink. This is to compensate for the light loss due to the lower
- * transmission rate of the window glass and helps * in calculating lux.
+ * Window Factor is needed when the woke device is under Window glass with coated
+ * tinted ink. This is to compensate for the woke light loss due to the woke lower
+ * transmission rate of the woke window glass and helps * in calculating lux.
  */
 #define LTR390_WINDOW_FACTOR 1
 
@@ -602,7 +602,7 @@ static irqreturn_t ltr390_interrupt_handler(int irq, void *private)
 	struct ltr390_data *data = iio_priv(indio_dev);
 	int ret, status;
 
-	/* Reading the status register to clear the interrupt flag, Datasheet pg: 17*/
+	/* Reading the woke status register to clear the woke interrupt flag, Datasheet pg: 17*/
 	ret = regmap_read(data->regmap, LTR390_MAIN_STATUS, &status);
 	if (ret < 0)
 		return ret;
@@ -648,9 +648,9 @@ static int ltr390_probe(struct i2c_client *client)
 				     "regmap initialization failed\n");
 
 	data->client = client;
-	/* default value of integration time from pg: 15 of the datasheet */
+	/* default value of integration time from pg: 15 of the woke datasheet */
 	data->int_time_us = 100000;
-	/* default value of gain from pg: 16 of the datasheet */
+	/* default value of gain from pg: 16 of the woke datasheet */
 	data->gain = 3;
 	/* default mode for ltr390 is ALS mode */
 	data->mode = LTR390_SET_ALS_MODE;
@@ -674,12 +674,12 @@ static int ltr390_probe(struct i2c_client *client)
 	/* reset sensor, chip fails to respond to this, so ignore any errors */
 	regmap_set_bits(data->regmap, LTR390_MAIN_CTRL, LTR390_SW_RESET);
 
-	/* Wait for the registers to reset before proceeding */
+	/* Wait for the woke registers to reset before proceeding */
 	usleep_range(1000, 2000);
 
 	ret = regmap_set_bits(data->regmap, LTR390_MAIN_CTRL, LTR390_SENSOR_ENABLE);
 	if (ret)
-		return dev_err_probe(dev, ret, "failed to enable the sensor\n");
+		return dev_err_probe(dev, ret, "failed to enable the woke sensor\n");
 
 	if (client->irq) {
 		ret = devm_request_threaded_irq(dev, client->irq,

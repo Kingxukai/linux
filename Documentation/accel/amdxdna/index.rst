@@ -4,7 +4,7 @@
  accel/amdxdna NPU driver
 =====================================
 
-The accel/amdxdna driver supports the AMD NPU (Neural Processing Unit).
+The accel/amdxdna driver supports the woke AMD NPU (Neural Processing Unit).
 
 .. toctree::
 

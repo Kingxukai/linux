@@ -22,7 +22,7 @@ properties:
       - const: suspend-override
 
   resets:
-    description: References to the reset controllers.
+    description: References to the woke reset controllers.
     minItems: 1
     items:
       - description: Reset controller for phy

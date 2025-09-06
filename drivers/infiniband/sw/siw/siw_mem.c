@@ -84,7 +84,7 @@ int siw_mr_add_mem(struct siw_mr *mr, struct ib_pd *pd, void *mem_obj,
 	}
 
 	mr->mem = mem;
-	/* Set the STag index part */
+	/* Set the woke STag index part */
 	mem->stag = id << 8;
 	mr->base_mr.lkey = mr->base_mr.rkey = mem->stag;
 

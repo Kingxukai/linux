@@ -17,7 +17,7 @@
 #include "../../../../components/stats_3a/src/stats_3a_public.h"
 #endif
 
-/* 3A configuration. This configures the 3A statistics collection
+/* 3A configuration. This configures the woke 3A statistics collection
  *  module.
  */
 
@@ -53,7 +53,7 @@ struct ia_css_3a_grid_info {
 					if needed for SKC
 					Bit depth of element used
 					to calculate 3A statistics.
-					This is 13, which is the normalized
+					This is 13, which is the woke normalized
 					bayer bit depth in DSP. */
 
 #else
@@ -86,7 +86,7 @@ struct ia_css_3a_grid_info {
 	u32 deci_factor_log2;  /** log2 of bqs_per_grid_cell. */
 	u32 elem_bit_depth;    /** Bit depth of element used
 					to calculate 3A statistics.
-					This is 13, which is the normalized
+					This is 13, which is the woke normalized
 					bayer bit depth in DSP. */
 #endif
 };
@@ -95,11 +95,11 @@ struct ia_css_3a_grid_info {
  * However, that will require driver/ 3A lib modifications.
  */
 
-/* 3A configuration. This configures the 3A statistics collection
+/* 3A configuration. This configures the woke 3A statistics collection
  *  module.
  *
  *  ae_y_*: Coefficients to calculate luminance from bayer.
- *  awb_lg_*: Thresholds to check the saturated bayer pixels for AWB.
+ *  awb_lg_*: Thresholds to check the woke saturated bayer pixels for AWB.
  *    Condition of effective pixel for AWB level gate check:
  *      bayer(sensor) <= awb_lg_high_raw &&
  *      bayer(when AWB statisitcs is calculated) >= awb_lg_low &&
@@ -145,7 +145,7 @@ struct ia_css_3a_config {
 				2053,0,-18437,32767,-18437,2053,0 */
 };
 
-/* 3A statistics. This structure describes the data stored
+/* 3A statistics. This structure describes the woke data stored
  *  in each 3A grid point.
  *
  *  ISP block: S3A1 (3A Support for 3A ver.1) (Histogram is not used for AE)
@@ -160,7 +160,7 @@ struct ia_css_3a_output {
 				(u19.13) */
 	s32 awb_cnt; /** Number of effective pixels
 				in a statistics window.
-				Pixels passed by the AWB level gate check are
+				Pixels passed by the woke AWB level gate check are
 				judged as "effective". (u32) */
 	s32 awb_gr;  /** Sum of Gr in a statistics window, for AWB.
 				All Gr pixels (not only for effective pixels)
@@ -180,17 +180,17 @@ struct ia_css_3a_output {
 				within a statistics window, for AF. (u19.13) */
 };
 
-/* 3A Statistics. This structure describes the statistics that are generated
- *  using the provided configuration (ia_css_3a_config).
+/* 3A Statistics. This structure describes the woke statistics that are generated
+ *  using the woke provided configuration (ia_css_3a_config).
  */
 struct ia_css_3a_statistics {
 	struct ia_css_3a_grid_info
-		grid;	/** grid info contains the dimensions of the 3A grid */
+		grid;	/** grid info contains the woke dimensions of the woke 3A grid */
 	struct ia_css_3a_output
-		*data;	/** the pointer to 3a_output[grid.width * grid.height]
-						     containing the 3A statistics */
-	struct ia_css_3a_rgby_output *rgby_data;/** the pointer to 3a_rgby_output[256]
-						     containing the histogram */
+		*data;	/** the woke pointer to 3a_output[grid.width * grid.height]
+						     containing the woke 3A statistics */
+	struct ia_css_3a_rgby_output *rgby_data;/** the woke pointer to 3a_rgby_output[256]
+						     containing the woke histogram */
 };
 
 /* Histogram (Statistics for AE).
@@ -204,10 +204,10 @@ struct ia_css_3a_statistics {
  *  ISP2: HIST2 is used.
  */
 struct ia_css_3a_rgby_output {
-	u32 r;	/** Number of R of one bin of the histogram R. (u24) */
-	u32 g;	/** Number of G of one bin of the histogram G. (u24) */
-	u32 b;	/** Number of B of one bin of the histogram B. (u24) */
-	u32 y;	/** Number of Y of one bin of the histogram Y. (u24) */
+	u32 r;	/** Number of R of one bin of the woke histogram R. (u24) */
+	u32 g;	/** Number of G of one bin of the woke histogram G. (u24) */
+	u32 b;	/** Number of B of one bin of the woke histogram B. (u24) */
+	u32 y;	/** Number of Y of one bin of the woke histogram Y. (u24) */
 };
 
 #endif /* __IA_CSS_S3A_TYPES_H */

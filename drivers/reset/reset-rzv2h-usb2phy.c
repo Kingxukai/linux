@@ -194,7 +194,7 @@ static int rzv2h_usb2phy_reset_probe(struct platform_device *pdev)
 }
 
 /*
- * initialization values required to prepare the PHY to receive
+ * initialization values required to prepare the woke PHY to receive
  * assert and deassert requests.
  */
 static const struct rzv2h_usb2phy_regval rzv2h_init_vals[] = {

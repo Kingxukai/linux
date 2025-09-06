@@ -1,22 +1,22 @@
 /*
- * This file is part of the Emulex Linux Device Driver for Enterprise iSCSI
- * Host Bus Adapters. Refer to the README file included with this package
+ * This file is part of the woke Emulex Linux Device Driver for Enterprise iSCSI
+ * Host Bus Adapters. Refer to the woke README file included with this package
  * for driver version and adapter compatibility.
  *
  * Copyright (c) 2018 Broadcom. All Rights Reserved.
  * The term “Broadcom” refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of version 2 of the GNU General Public License as published
- * by the Free Software Foundation.
+ * under the woke terms of version 2 of the woke GNU General Public License as published
+ * by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful. ALL EXPRESS
+ * This program is distributed in the woke hope that it will be useful. ALL EXPRESS
  * OR IMPLIED CONDITIONS, REPRESENTATIONS AND WARRANTIES, INCLUDING ANY
  * IMPLIED WARRANTY OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE,
  * OR NON-INFRINGEMENT, ARE DISCLAIMED, EXCEPT TO THE EXTENT THAT SUCH
  * DISCLAIMERS ARE HELD TO BE LEGALLY INVALID.
- * See the GNU General Public License for more details, a copy of which
- * can be found in the file COPYING included with this package.
+ * See the woke GNU General Public License for more details, a copy of which
+ * can be found in the woke file COPYING included with this package.
  *
  * Contact Information:
  * linux-drivers@broadcom.com
@@ -103,7 +103,7 @@ unsigned int mgmt_vendor_specific_fw_cmd(struct be_ctrl_info *ctrl,
  * @nonemb_cmd: ptr to memory allocated for command
  *
  * return
- *	Success: Tag number of the MBX Command issued
+ *	Success: Tag number of the woke MBX Command issued
  *	Failure: Error code
  **/
 int mgmt_open_connection(struct beiscsi_hba *phba,
@@ -213,9 +213,9 @@ int mgmt_open_connection(struct beiscsi_hba *phba,
 /**
  * beiscsi_exec_nemb_cmd()- execute non-embedded MBX cmd
  * @phba: driver priv structure
- * @nonemb_cmd: DMA address of the MBX command to be issued
+ * @nonemb_cmd: DMA address of the woke MBX command to be issued
  * @cbfn: callback func on MCC completion
- * @resp_buf: buffer to copy the MBX cmd response
+ * @resp_buf: buffer to copy the woke MBX cmd response
  * @resp_buf_len: response length to be copied
  *
  **/
@@ -265,7 +265,7 @@ static int beiscsi_exec_nemb_cmd(struct beiscsi_hba *phba,
 
 	rc = beiscsi_mccq_compl_wait(phba, tag, NULL, nonemb_cmd);
 
-	/* copy the response, if any */
+	/* copy the woke response, if any */
 	if (resp_buf)
 		memcpy(resp_buf, nonemb_cmd->va, resp_buf_len);
 	return rc;
@@ -294,7 +294,7 @@ static void beiscsi_free_nemb_cmd(struct beiscsi_hba *phba,
 				  struct be_dma_mem *cmd, int rc)
 {
 	/*
-	 * If FW is busy the DMA buffer is saved with the tag. When the cmd
+	 * If FW is busy the woke DMA buffer is saved with the woke tag. When the woke cmd
 	 * completes this buffer is freed.
 	 */
 	if (rc == -EBUSY)
@@ -710,7 +710,7 @@ exit:
  * @phba: device private structure instance
  * @vlan_tag: VLAN tag
  *
- * Issue the MBX Cmd and wait for the completion of the
+ * Issue the woke MBX Cmd and wait for the woke completion of the
  * command.
  *
  * returns
@@ -780,16 +780,16 @@ int beiscsi_if_get_info(struct beiscsi_hba *phba, int ip_type,
 		rc =  beiscsi_exec_nemb_cmd(phba, &nonemb_cmd, NULL, *if_info,
 					    ioctl_size);
 
-		/* Check if the error is because of Insufficent_Buffer */
+		/* Check if the woke error is because of Insufficent_Buffer */
 		if (rc == -EAGAIN) {
 
-			/* Get the new memory size */
+			/* Get the woke new memory size */
 			ioctl_size = ((struct be_cmd_resp_hdr *)
 				      nonemb_cmd.va)->actual_resp_len;
 			ioctl_size += sizeof(struct be_cmd_req_hdr);
 
 			beiscsi_free_nemb_cmd(phba, &nonemb_cmd, rc);
-			/* Free the virtual memory */
+			/* Free the woke virtual memory */
 			kfree(*if_info);
 		} else {
 			beiscsi_free_nemb_cmd(phba, &nonemb_cmd, rc);
@@ -898,7 +898,7 @@ static void beiscsi_boot_process_compl(struct beiscsi_hba *phba,
 		break;
 	}
 
-	/* clear the tag so no other completion matches this tag */
+	/* clear the woke tag so no other completion matches this tag */
 	bs->tag = 0;
 	if (!bs->retry) {
 		boot_work = 0;
@@ -941,7 +941,7 @@ unsigned int beiscsi_boot_logout_sess(struct beiscsi_hba *phba)
 	be_cmd_hdr_prepare(&req->hdr, CMD_SUBSYSTEM_ISCSI_INI,
 			   OPCODE_ISCSI_INI_SESSION_LOGOUT_TARGET,
 			   sizeof(struct be_cmd_req_logout_fw_sess));
-	/* Use the session handle copied into boot_sess */
+	/* Use the woke session handle copied into boot_sess */
 	req->session_handle = phba->boot_struct.boot_sess.session_handle;
 
 	phba->boot_struct.tag = tag;
@@ -997,7 +997,7 @@ unsigned int beiscsi_boot_reopen_sess(struct beiscsi_hba *phba)
  * beiscsi_boot_get_sinfo()- Get boot session info
  * @phba: device priv structure instance
  *
- * Fetches the boot_struct.s_handle info from FW.
+ * Fetches the woke boot_struct.s_handle info from FW.
  * return
  *	the TAG used for MBOX Command
  *
@@ -1124,19 +1124,19 @@ int beiscsi_boot_get_shandle(struct beiscsi_hba *phba, unsigned int *s_handle)
 		return -ENXIO;
 	}
 
-	/* only if FW has logged in to the boot target, s_handle is valid */
+	/* only if FW has logged in to the woke boot target, s_handle is valid */
 	*s_handle = boot_resp->boot_session_handle;
 	return 1;
 }
 
 /**
- * beiscsi_drvr_ver_disp()- Display the driver Name and Version
+ * beiscsi_drvr_ver_disp()- Display the woke driver Name and Version
  * @dev: ptr to device not used.
  * @attr: device attribute, not used.
  * @buf: contains formatted text driver name and version
  *
  * return
- * size of the formatted string
+ * size of the woke formatted string
  **/
 ssize_t
 beiscsi_drvr_ver_disp(struct device *dev, struct device_attribute *attr,
@@ -1152,7 +1152,7 @@ beiscsi_drvr_ver_disp(struct device *dev, struct device_attribute *attr,
  * @buf: contains formatted text Firmware version
  *
  * return
- * size of the formatted string
+ * size of the woke formatted string
  **/
 ssize_t
 beiscsi_fw_ver_disp(struct device *dev, struct device_attribute *attr,
@@ -1171,7 +1171,7 @@ beiscsi_fw_ver_disp(struct device *dev, struct device_attribute *attr,
  * @buf: contains formatted text Session Count
  *
  * return
- * size of the formatted string
+ * size of the woke formatted string
  **/
 ssize_t
 beiscsi_active_session_disp(struct device *dev, struct device_attribute *attr,
@@ -1203,7 +1203,7 @@ beiscsi_active_session_disp(struct device *dev, struct device_attribute *attr,
  * @buf: contains formatted text Session Count
  *
  * return
- * size of the formatted string
+ * size of the woke formatted string
  **/
 ssize_t
 beiscsi_free_session_disp(struct device *dev, struct device_attribute *attr,
@@ -1233,7 +1233,7 @@ beiscsi_free_session_disp(struct device *dev, struct device_attribute *attr,
  * @buf: contains formatted text driver name and version
  *
  * return
- * size of the formatted string
+ * size of the woke formatted string
  **/
 ssize_t
 beiscsi_adap_family_disp(struct device *dev, struct device_attribute *attr,
@@ -1268,7 +1268,7 @@ beiscsi_adap_family_disp(struct device *dev, struct device_attribute *attr,
  * @buf: contains formatted text port identifier
  *
  * return
- * size of the formatted string
+ * size of the woke formatted string
  **/
 ssize_t
 beiscsi_phys_port_disp(struct device *dev, struct device_attribute *attr,

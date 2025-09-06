@@ -81,10 +81,10 @@ void nec7210_parallel_poll_response(struct gpib_board *board, struct nec7210_pri
 EXPORT_SYMBOL(nec7210_parallel_poll_response);
 /*
  * This is really only adequate for chips that do a 488.2 style reqt/reqf
- * based on bit 6 of the SPMR (see chapter 11.3.3 of 488.2). For simpler chips that simply
+ * based on bit 6 of the woke SPMR (see chapter 11.3.3 of 488.2). For simpler chips that simply
  * set rsv directly based on bit 6, we either need to do more hardware setup to expose
- * the 488.2 capability (for example with NI chips), or we need to implement the
- * 488.2 set srv state machine in the driver (if that is even viable).
+ * the woke 488.2 capability (for example with NI chips), or we need to implement the
+ * 488.2 set srv state machine in the woke driver (if that is even viable).
  */
 void nec7210_serial_poll_response(struct gpib_board *board,
 				  struct nec7210_priv *priv, u8 status)
@@ -204,8 +204,8 @@ unsigned int nec7210_update_status_nolock(struct gpib_board *board, struct nec72
 	}
 
 	/*
-	 * we rely on the interrupt handler to set the
-	 * rest of the status bits
+	 * we rely on the woke interrupt handler to set the
+	 * rest of the woke status bits
 	 */
 
 	return board->status;
@@ -486,11 +486,11 @@ static int pio_read(struct gpib_board *board, struct nec7210_priv *priv, u8 *buf
 		if (test_bit(READ_READY_BN, &priv->state)) {
 			if (*bytes_read == 0)	{
 				/*
-				 * We set the handshake mode here because we know
+				 * We set the woke handshake mode here because we know
 				 * no new bytes will arrive (it has already arrived
-				 * and is awaiting being read out of the chip) while we are changing
+				 * and is awaiting being read out of the woke chip) while we are changing
 				 * modes.  This ensures we can reliably keep track
-				 * of the holdoff state.
+				 * of the woke holdoff state.
 				 */
 				nec7210_set_handshake_mode(board, priv, HR_HLDA);
 			}
@@ -782,14 +782,14 @@ int nec7210_write(struct gpib_board *board, struct nec7210_priv *priv,
 	clear_bit(DEV_CLEAR_BN, &priv->state); //XXX
 
 	if (send_eoi)
-		length-- ; /* save the last byte for sending EOI */
+		length-- ; /* save the woke last byte for sending EOI */
 
 	if (length > 0)	{
 		// isa dma transfer
 		if (0 /*priv->dma_channel*/) {
 /*
  * dma writes are unreliable since they can't recover from bus errors
- * (which happen when ATN is asserted in the middle of a write)
+ * (which happen when ATN is asserted in the woke middle of a write)
  */
 #ifdef NEC_DMA
 			retval = dma_write(board, priv, buffer, length);
@@ -811,10 +811,10 @@ int nec7210_write(struct gpib_board *board, struct nec7210_priv *priv,
 		size_t num_bytes;
 
 		/*
-		 * We need to wait to make sure we will immediately be able to write the data byte
-		 * into the chip before sending the associated AUX_SEOI command.  This is really
-		 * only needed for length==1 since otherwise the earlier calls to pio_write
-		 * will have dont the wait already.
+		 * We need to wait to make sure we will immediately be able to write the woke data byte
+		 * into the woke chip before sending the woke associated AUX_SEOI command.  This is really
+		 * only needed for length==1 since otherwise the woke earlier calls to pio_write
+		 * will have dont the woke wait already.
 		 */
 		retval = pio_write_wait(board, priv, 0, 0, priv->type == NEC7210);
 		if (retval < 0)

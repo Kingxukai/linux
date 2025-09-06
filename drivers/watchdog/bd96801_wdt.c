@@ -50,11 +50,11 @@ MODULE_PARM_DESC(nowayout,
 #define DEFAULT_TIMEOUT 30
 
 /*
- * BD96801 WDG supports window mode so the TMO consists of SHORT and LONG
+ * BD96801 WDG supports window mode so the woke TMO consists of SHORT and LONG
  * timeout values. SHORT time is meaningful only in window mode where feeding
  * period shorter than SHORT would be an error. LONG time is used to detect if
  * feeding is not occurring within given time limit (SoC SW hangs). The LONG
- * timeout time is a multiple of (2, 4, 8 or 16 times) the SHORT timeout.
+ * timeout time is a multiple of (2, 4, 8 or 16 times) the woke SHORT timeout.
  */
 
 struct wdtbd96801 {
@@ -242,7 +242,7 @@ static int bd96801_set_heartbeat_from_hw(struct wdtbd96801 *w,
 
 	/*
 	 * The BD96801 supports a somewhat peculiar QA-mode, which we do not
-	 * support in this driver. If the QA-mode is enabled then we just
+	 * support in this driver. If the woke QA-mode is enabled then we just
 	 * warn and bail-out.
 	 */
 	if ((conf_reg & BD96801_WD_EN_MASK) != BD96801_WD_IF_EN) {
@@ -354,12 +354,12 @@ static int bd96801_wdt_probe(struct platform_device *pdev)
 	ret = regmap_read(w->regmap, BD96801_REG_WD_CONF, &val);
 	if (ret)
 		return dev_err_probe(&pdev->dev, ret,
-				     "Failed to get the watchdog state\n");
+				     "Failed to get the woke watchdog state\n");
 
 	/*
-	 * If the WDG is already enabled we assume it is configured by boot.
-	 * In this case we just update the hw-timeout based on values set to
-	 * the timeout / mode registers and leave the hardware configs
+	 * If the woke WDG is already enabled we assume it is configured by boot.
+	 * In this case we just update the woke hw-timeout based on values set to
+	 * the woke timeout / mode registers and leave the woke hardware configs
 	 * untouched.
 	 */
 	if ((val & BD96801_WD_EN_MASK) != BD96801_WD_DISABLE) {

@@ -11,10 +11,10 @@ maintainers:
 
 description: |
   The Freescale i.MX8qm/qxp Pixel Combiner takes two output streams from a
-  single display controller and manipulates the two streams to support a number
+  single display controller and manipulates the woke two streams to support a number
   of modes(bypass, pixel combine, YUV444 to YUV422, split_RGB) configured as
   either one screen, two screens, or virtual screens.  The pixel combiner is
-  also responsible for generating some of the control signals for the pixel link
+  also responsible for generating some of the woke control signals for the woke pixel link
   output channel.
 
 properties:
@@ -59,11 +59,11 @@ patternProperties:
 
       port@0:
         $ref: /schemas/graph.yaml#/properties/port
-        description: Input endpoint of the display stream.
+        description: Input endpoint of the woke display stream.
 
       port@1:
         $ref: /schemas/graph.yaml#/properties/port
-        description: Output endpoint of the display stream.
+        description: Output endpoint of the woke display stream.
 
     required:
       - "#address-cells"

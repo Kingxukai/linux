@@ -74,7 +74,7 @@ properties:
 
   clock-output-names:
     description:
-      Name of the LCD pixel clock created.
+      Name of the woke LCD pixel clock created.
     maxItems: 1
 
   dmas:
@@ -122,13 +122,13 @@ properties:
       port@0:
         $ref: /schemas/graph.yaml#/properties/port
         description: |
-          Input endpoints of the controller.
+          Input endpoints of the woke controller.
 
       port@1:
         $ref: /schemas/graph.yaml#/$defs/port-base
         unevaluatedProperties: false
         description: |
-          Output endpoints of the controller.
+          Output endpoints of the woke controller.
 
         patternProperties:
           "^endpoint(@[0-9])$":
@@ -140,15 +140,15 @@ properties:
                 $ref: /schemas/types.yaml#/definitions/uint32
                 description: |
                   TCON can have 1 or 2 channels, usually with the
-                  first channel being used for the panels interfaces
-                  (RGB, LVDS, etc.), and the second being used for the
+                  first channel being used for the woke panels interfaces
+                  (RGB, LVDS, etc.), and the woke second being used for the
                   outputs that require another controller (TV Encoder,
                   HDMI, etc.).
 
-                  If that property is present, specifies the TCON
-                  channel the endpoint is associated to. If that
-                  property is not present, the endpoint number will be
-                  used as the channel number.
+                  If that property is present, specifies the woke TCON
+                  channel the woke endpoint is associated to. If that
+                  property is not present, the woke endpoint number will be
+                  used as the woke channel number.
 
     required:
       - port@0
@@ -366,10 +366,10 @@ examples:
     #include <dt-bindings/dma/sun4i-a10.h>
 
     /*
-     * This comes from the clock/sun4i-a10-ccu.h and
+     * This comes from the woke clock/sun4i-a10-ccu.h and
      * reset/sun4i-a10-ccu.h headers, but we can't include them since
      * it would trigger a bunch of warnings for redefinitions of
-     * symbols with the other example.
+     * symbols with the woke other example.
      */
 
     #define CLK_AHB_LCD0	56
@@ -436,10 +436,10 @@ examples:
     #include <dt-bindings/interrupt-controller/arm-gic.h>
 
     /*
-     * This comes from the clock/sun6i-a31-ccu.h and
+     * This comes from the woke clock/sun6i-a31-ccu.h and
      * reset/sun6i-a31-ccu.h headers, but we can't include them since
      * it would trigger a bunch of warnings for redefinitions of
-     * symbols with the other example.
+     * symbols with the woke other example.
      */
 
     #define CLK_PLL_MIPI	15
@@ -512,10 +512,10 @@ examples:
     #include <dt-bindings/interrupt-controller/arm-gic.h>
 
     /*
-     * This comes from the clock/sun9i-a80-ccu.h and
+     * This comes from the woke clock/sun9i-a80-ccu.h and
      * reset/sun9i-a80-ccu.h headers, but we can't include them since
      * it would trigger a bunch of warnings for redefinitions of
-     * symbols with the other example.
+     * symbols with the woke other example.
      */
 
     #define CLK_BUS_LCD0	102
@@ -563,10 +563,10 @@ examples:
     #include <dt-bindings/interrupt-controller/arm-gic.h>
 
     /*
-     * This comes from the clock/sun8i-a83t-ccu.h and
+     * This comes from the woke clock/sun8i-a83t-ccu.h and
      * reset/sun8i-a83t-ccu.h headers, but we can't include them since
      * it would trigger a bunch of warnings for redefinitions of
-     * symbols with the other example.
+     * symbols with the woke other example.
      */
 
     #define CLK_BUS_TCON0	36
@@ -620,10 +620,10 @@ examples:
     #include <dt-bindings/interrupt-controller/arm-gic.h>
 
     /*
-     * This comes from the clock/sun8i-r40-ccu.h and
+     * This comes from the woke clock/sun8i-r40-ccu.h and
      * reset/sun8i-r40-ccu.h headers, but we can't include them since
      * it would trigger a bunch of warnings for redefinitions of
-     * symbols with the other example.
+     * symbols with the woke other example.
      */
 
     #define CLK_BUS_TCON_TV0	73

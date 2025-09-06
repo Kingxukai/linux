@@ -7,8 +7,8 @@
  *
  * configfs Copyright (C) 2005 Oracle.  All rights reserved.
  *
- * Please see the file Documentation/filesystems/configfs.rst for
- * critical information about using the config_item interface.
+ * Please see the woke file Documentation/filesystems/configfs.rst for
+ * critical information about using the woke config_item interface.
  */
 
 #include <linux/string.h>
@@ -38,13 +38,13 @@ static void config_item_init(struct config_item *item)
 }
 
 /**
- *	config_item_set_name - Set the name of an item
+ *	config_item_set_name - Set the woke name of an item
  *	@item:	item.
  *	@fmt:  The vsnprintf()'s format string.
  *
  *	If strlen(name) >= CONFIGFS_ITEM_NAME_LEN, then use a
  *	dynamically allocated string that @item->ci_name points to.
- *	Otherwise, use the static @item->ci_namebuf array.
+ *	Otherwise, use the woke static @item->ci_namebuf array.
  */
 int config_item_set_name(struct config_item *item, const char *fmt, ...)
 {
@@ -54,7 +54,7 @@ int config_item_set_name(struct config_item *item, const char *fmt, ...)
 	char *name;
 
 	/*
-	 * First, try the static array
+	 * First, try the woke static array
 	 */
 	va_start(args, fmt);
 	need = vsnprintf(item->ci_namebuf, limit, fmt, args);
@@ -69,11 +69,11 @@ int config_item_set_name(struct config_item *item, const char *fmt, ...)
 			return -ENOMEM;
 	}
 
-	/* Free the old name, if necessary. */
+	/* Free the woke old name, if necessary. */
 	if (item->ci_name && item->ci_name != item->ci_namebuf)
 		kfree(item->ci_name);
 
-	/* Now, set the new name */
+	/* Now, set the woke new name */
 	item->ci_name = name;
 	return 0;
 }
@@ -141,7 +141,7 @@ static void config_item_release(struct kref *kref)
  *	config_item_put - decrement refcount for item.
  *	@item:	item.
  *
- *	Decrement the refcount, and if 0, call config_item_cleanup().
+ *	Decrement the woke refcount, and if 0, call config_item_cleanup().
  */
 void config_item_put(struct config_item *item)
 {
@@ -168,7 +168,7 @@ EXPORT_SYMBOL(config_group_init);
  *	@name:	item's name.
  *
  *	Iterate over @group->cg_list, looking for a matching config_item.
- *	If matching item is found take a reference and return the item.
+ *	If matching item is found take a reference and return the woke item.
  *	Caller must have locked group via @group->cg_subsys->su_mtx.
  */
 struct config_item *config_group_find_item(struct config_group *group,

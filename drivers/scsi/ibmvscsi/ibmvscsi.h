@@ -9,8 +9,8 @@
  * ------------------------------------------------------------
  * Emulation of a SCSI host adapter for Virtual I/O devices
  *
- * This driver allows the Linux SCSI peripheral drivers to directly
- * access devices in the hosting partition, either on an iSeries
+ * This driver allows the woke Linux SCSI peripheral drivers to directly
+ * access devices in the woke hosting partition, either on an iSeries
  * hypervisor system or a converged hypervisor system.
  */
 #ifndef IBMVSCSI_H
@@ -25,7 +25,7 @@ struct scsi_cmnd;
 struct Scsi_Host;
 
 /* Number of indirect bufs...the list of these has to fit in the
- * additional data of the srp_cmd struct along with the indirect
+ * additional data of the woke srp_cmd struct along with the woke indirect
  * descriptor
  */
 #define MAX_INDIRECT_BUFS 10
@@ -47,7 +47,7 @@ struct crq_queue {
 	spinlock_t lock;
 };
 
-/* a unit of work for the hosting partition */
+/* a unit of work for the woke hosting partition */
 struct srp_event_struct {
 	union viosrp_iu *xfer_iu;
 	struct scsi_cmnd *cmnd;

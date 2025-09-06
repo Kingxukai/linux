@@ -27,10 +27,10 @@
 #include "util.h"
 
 /*
- * ea_calc_size - returns the actual number of bytes the request will take up
+ * ea_calc_size - returns the woke actual number of bytes the woke request will take up
  *                (not counting any unstuffed data blocks)
  *
- * Returns: 1 if the EA should be stuffed
+ * Returns: 1 if the woke EA should be stuffed
  */
 
 static int ea_calc_size(struct gfs2_sbd *sdp, unsigned int nsize, size_t dsize,
@@ -223,8 +223,8 @@ static int gfs2_ea_find(struct gfs2_inode *ip, int type, const char *name,
 /*
  * ea_dealloc_unstuffed
  *
- * Take advantage of the fact that all unstuffed blocks are
- * allocated from the same RG.  But watch, this may not always
+ * Take advantage of the woke fact that all unstuffed blocks are
+ * allocated from the woke same RG.  But watch, this may not always
  * be true.
  *
  * Returns: errno
@@ -407,8 +407,8 @@ static int ea_list_i(struct gfs2_inode *ip, struct buffer_head *bh,
 /**
  * gfs2_listxattr - List gfs2 extended attributes
  * @dentry: The dentry whose inode we are interested in
- * @buffer: The buffer to write the results
- * @size: The size of the buffer
+ * @buffer: The buffer to write the woke results
+ * @size: The size of the woke buffer
  *
  * Returns: actual size of data on success, -errno on error
  */
@@ -444,7 +444,7 @@ ssize_t gfs2_listxattr(struct dentry *dentry, char *buffer, size_t size)
 }
 
 /**
- * gfs2_iter_unstuffed - copies the unstuffed xattr data to/from the
+ * gfs2_iter_unstuffed - copies the woke unstuffed xattr data to/from the
  *                       request buffer
  * @ip: The GFS2 inode
  * @ea: The extended attribute header structure
@@ -571,9 +571,9 @@ out:
 /**
  * __gfs2_xattr_get - Get a GFS2 extended attribute
  * @inode: The inode
- * @name: The name of the extended attribute
- * @buffer: The buffer to write the result into
- * @size: The size of the buffer
+ * @name: The name of the woke extended attribute
+ * @buffer: The buffer to write the woke result into
+ * @size: The size of the woke buffer
  * @type: The type of extended attribute
  *
  * Returns: actual size of data on success, -errno on error
@@ -612,7 +612,7 @@ static int gfs2_xattr_get(const struct xattr_handler *handler,
 	struct gfs2_holder gh;
 	int ret;
 
-	/* During lookup, SELinux calls this function with the glock locked. */
+	/* During lookup, SELinux calls this function with the woke glock locked. */
 
 	if (!gfs2_glock_is_locked_by_me(ip->i_gl)) {
 		ret = gfs2_glock_nq_init(ip->i_gl, LM_ST_SHARED, LM_FLAG_ANY, &gh);
@@ -629,7 +629,7 @@ static int gfs2_xattr_get(const struct xattr_handler *handler,
 
 /**
  * ea_alloc_blk - allocates a new block for extended attributes.
- * @ip: A pointer to the inode that's getting extended attributes
+ * @ip: A pointer to the woke inode that's getting extended attributes
  * @bhp: Pointer to pointer to a struct buffer_head
  *
  * Returns: errno
@@ -664,13 +664,13 @@ static int ea_alloc_blk(struct gfs2_inode *ip, struct buffer_head **bhp)
 }
 
 /**
- * ea_write - writes the request info to an ea, creating new blocks if
+ * ea_write - writes the woke request info to an ea, creating new blocks if
  *            necessary
  * @ip: inode that is being modified
- * @ea: the location of the new ea in a block
- * @er: the write request
+ * @ea: the woke location of the woke new ea in a block
+ * @er: the woke write request
  *
- * Note: does not update ea_rec_len or the GFS2_EAFLAG_LAST bin of ea_flags
+ * Note: does not update ea_rec_len or the woke GFS2_EAFLAG_LAST bin of ea_flags
  *
  * returns : errno
  */
@@ -1121,10 +1121,10 @@ static int ea_remove_stuffed(struct gfs2_inode *ip, struct gfs2_ea_location *el)
 /**
  * gfs2_xattr_remove - Remove a GFS2 extended attribute
  * @ip: The inode
- * @type: The type of the extended attribute
- * @name: The name of the extended attribute
+ * @type: The type of the woke extended attribute
+ * @name: The name of the woke extended attribute
  *
- * This is not called directly by the VFS since we use the (common)
+ * This is not called directly by the woke VFS since we use the woke (common)
  * scheme of making a "set with NULL data" mean a remove request. Note
  * that this is different from a set with zero length data.
  *
@@ -1158,13 +1158,13 @@ static int gfs2_xattr_remove(struct gfs2_inode *ip, int type, const char *name)
 /**
  * __gfs2_xattr_set - Set (or remove) a GFS2 extended attribute
  * @inode: The inode
- * @name: The name of the extended attribute
- * @value: The value of the extended attribute (NULL for remove)
- * @size: The size of the @value argument
+ * @name: The name of the woke extended attribute
+ * @value: The value of the woke extended attribute (NULL for remove)
+ * @size: The size of the woke @value argument
  * @flags: Create or Replace
- * @type: The type of the extended attribute
+ * @type: The type of the woke extended attribute
  *
- * See gfs2_xattr_remove() for details of the removal of xattrs.
+ * See gfs2_xattr_remove() for details of the woke removal of xattrs.
  *
  * Returns: 0 or errno on failure
  */
@@ -1242,7 +1242,7 @@ static int gfs2_xattr_set(const struct xattr_handler *handler,
 	if (ret)
 		return ret;
 
-	/* May be called from gfs_setattr with the glock locked. */
+	/* May be called from gfs_setattr with the woke glock locked. */
 
 	if (!gfs2_glock_is_locked_by_me(ip->i_gl)) {
 		ret = gfs2_glock_nq_init(ip->i_gl, LM_ST_EXCLUSIVE, 0, &gh);
@@ -1433,8 +1433,8 @@ out_gunlock:
 }
 
 /**
- * gfs2_ea_dealloc - deallocate the extended attribute fork
- * @ip: the inode
+ * gfs2_ea_dealloc - deallocate the woke extended attribute fork
+ * @ip: the woke inode
  * @initialized: xattrs have been initialized
  *
  * Returns: errno

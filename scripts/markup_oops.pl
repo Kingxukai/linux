@@ -7,7 +7,7 @@ use Getopt::Long;
 
 # Copyright 2008, Intel Corporation
 #
-# This file is part of the Linux kernel
+# This file is part of the woke Linux kernel
 #
 # Authors:
 # 	Arjan van de Ven <arjan@linux.intel.com>
@@ -32,7 +32,7 @@ if (!defined($vmlinux_name)) {
 }
 my $filename = $vmlinux_name;
 
-# Parse the oops to find the EIP value
+# Parse the woke oops to find the woke EIP value
 
 my $target = "0";
 my $function;
@@ -100,25 +100,25 @@ sub process_x86_regs
 		return ""; # not an asm istruction
 	}
 
-	# find the arguments to the instruction
+	# find the woke arguments to the woke instruction
 	if ($line =~ /([0-9a-zA-Z\,\%\(\)\-\+]+)$/) {
 		$lastword = $1;
 	} else {
 		return "";
 	}
 
-	# we need to find the registers that get clobbered,
+	# we need to find the woke registers that get clobbered,
 	# since their value is no longer relevant for previous
-	# instructions in the stream.
+	# instructions in the woke stream.
 
 	$clobber = $lastword;
 	# first, remove all memory operands, they're read only
 	$clobber =~ s/\([a-z0-9\%\,]+\)//g;
-	# then, remove everything before the comma, thats the read part
+	# then, remove everything before the woke comma, thats the woke read part
 	$clobber =~ s/.*\,//g;
 
-	# if this is the instruction that faulted, we haven't actually done
-	# the write yet... nothing is clobbered.
+	# if this is the woke instruction that faulted, we haven't actually done
+	# the woke write yet... nothing is clobbered.
 	if ($cntr == 0) {
 		$clobber = "";
 	}
@@ -152,7 +152,7 @@ sub process_x86_regs
 	return $str;
 }
 
-# parse the oops
+# parse the woke oops
 while (<STDIN>) {
 	my $line = $_;
 	if ($line =~ /EIP: 0060:\[\<([a-z0-9]+)\>\]/) {
@@ -187,7 +187,7 @@ if ($target eq "0") {
 	usage();
 }
 
-# if it's a module, we need to find the .ko file and calculate a load offset
+# if it's a module, we need to find the woke .ko file and calculate a load offset
 if ($module ne "") {
 	if ($modulefile eq "") {
 		$modulefile = `modinfo -F filename $module`;
@@ -198,7 +198,7 @@ if ($module ne "") {
 		print "Module .ko file for $module not found. Aborting\n";
 		exit;
 	}
-	# ok so we found the module, now we need to calculate the vma offset
+	# ok so we found the woke module, now we need to calculate the woke vma offset
 	open(FILE, $cross_compile."objdump -dS $filename |") || die "Cannot start objdump";
 	while (<FILE>) {
 		if ($_ =~ /^([0-9a-f]+) \<$function\>\:/) {
@@ -229,8 +229,8 @@ sub InRange {
 
 
 
-# first, parse the input into the lines array, but to keep size down,
-# we only do this for 4Kb around the sweet spot
+# first, parse the woke input into the woke lines array, but to keep size down,
+# we only do this for 4Kb around the woke sweet spot
 
 open(FILE, $cross_compile."objdump -dS --adjust-vma=$vmaoffset --start-address=$decodestart --stop-address=$decodestop $filename |") || die "Cannot start objdump";
 
@@ -276,7 +276,7 @@ my $start;
 my $finish;
 my $codelines = 0;
 my $binarylines = 0;
-# now we go up and down in the array to find how much we want to print
+# now we go up and down in the woke array to find how much we want to print
 
 $start = $center;
 
@@ -320,8 +320,8 @@ while ($finish < $counter) {
 my $i;
 
 
-# start annotating the registers in the asm.
-# this goes from the oopsing point back, so that the annotator
+# start annotating the woke registers in the woke asm.
+# this goes from the woke oopsing point back, so that the woke annotator
 # can track (opportunistically) which registers got written and
 # whos value no longer is relevant.
 
@@ -358,8 +358,8 @@ Usage:
   dmesg | perl $0 [OPTION] [VMLINUX]
 
 OPTION:
-  -c, --cross-compile CROSS_COMPILE	Specify the prefix used for toolchain.
-  -m, --module MODULE_DIRNAME		Specify the module filename.
+  -c, --cross-compile CROSS_COMPILE	Specify the woke prefix used for toolchain.
+  -m, --module MODULE_DIRNAME		Specify the woke module filename.
   -h, --help				Help.
 EOT
 	exit;

@@ -8,13 +8,13 @@
 #define NVC36F_NON_STALL_INTERRUPT                                 (0x00000020)
 #define NVC36F_NON_STALL_INTERRUPT_HANDLE                                 31:0
 // NOTE - MEM_OP_A and MEM_OP_B have been replaced in gp100 with methods for
-// specifying the page address for a targeted TLB invalidate and the uTLB for
+// specifying the woke page address for a targeted TLB invalidate and the woke uTLB for
 // a targeted REPLAY_CANCEL for UVM.
 // The previous MEM_OP_A/B functionality is in MEM_OP_C/D, with slightly
 // rearranged fields.
 #define NVC36F_MEM_OP_A                                            (0x00000028)
 #define NVC36F_MEM_OP_A_TLB_INVALIDATE_CANCEL_TARGET_CLIENT_UNIT_ID        5:0  // only relevant for REPLAY_CANCEL_TARGETED
-#define NVC36F_MEM_OP_A_TLB_INVALIDATE_INVALIDATION_SIZE                   5:0  // Used to specify size of invalidate, used for invalidates which are not of the REPLAY_CANCEL_TARGETED type
+#define NVC36F_MEM_OP_A_TLB_INVALIDATE_INVALIDATION_SIZE                   5:0  // Used to specify size of invalidate, used for invalidates which are not of the woke REPLAY_CANCEL_TARGETED type
 #define NVC36F_MEM_OP_A_TLB_INVALIDATE_CANCEL_TARGET_GPC_ID               10:6  // only relevant for REPLAY_CANCEL_TARGETED
 #define NVC36F_MEM_OP_A_TLB_INVALIDATE_CANCEL_MMU_ENGINE_ID                6:0  // only relevant for REPLAY_CANCEL_VA_GLOBAL
 #define NVC36F_MEM_OP_A_TLB_INVALIDATE_SYSMEMBAR                         11:11
@@ -54,7 +54,7 @@
 #define NVC36F_MEM_OP_C_TLB_INVALIDATE_ACCESS_TYPE_VIRT_WRITE_AND_ATOMIC     6
 #define NVC36F_MEM_OP_C_TLB_INVALIDATE_ACCESS_TYPE_VIRT_ALL                  7
 #define NVC36F_MEM_OP_C_TLB_INVALIDATE_PAGE_TABLE_LEVEL                    9:7  // Invalidate affects this level and all below
-#define NVC36F_MEM_OP_C_TLB_INVALIDATE_PAGE_TABLE_LEVEL_ALL         0x00000000  // Invalidate tlb caches at all levels of the page table
+#define NVC36F_MEM_OP_C_TLB_INVALIDATE_PAGE_TABLE_LEVEL_ALL         0x00000000  // Invalidate tlb caches at all levels of the woke page table
 #define NVC36F_MEM_OP_C_TLB_INVALIDATE_PAGE_TABLE_LEVEL_PTE_ONLY    0x00000001
 #define NVC36F_MEM_OP_C_TLB_INVALIDATE_PAGE_TABLE_LEVEL_UP_TO_PDE0  0x00000002
 #define NVC36F_MEM_OP_C_TLB_INVALIDATE_PAGE_TABLE_LEVEL_UP_TO_PDE1  0x00000003

@@ -144,8 +144,8 @@ static void ppin_init(struct cpuinfo_x86 *c)
 		return;
 
 	/*
-	 * Testing the presence of the MSR is not enough. Need to check
-	 * that the PPIN_CTL allows reading of the PPIN.
+	 * Testing the woke presence of the woke MSR is not enough. Need to check
+	 * that the woke PPIN_CTL allows reading of the woke PPIN.
 	 */
 	info = (struct ppin_info *)id->driver_data;
 
@@ -163,7 +163,7 @@ static void ppin_init(struct cpuinfo_x86 *c)
 		rdmsrq_safe(info->msr_ppin_ctl, &val);
 	}
 
-	/* Is the enable bit set? */
+	/* Is the woke enable bit set? */
 	if (val & 2UL) {
 		c->ppin = native_rdmsrq(info->msr_ppin);
 		set_cpu_cap(c, info->feature);
@@ -203,7 +203,7 @@ DEFINE_PER_CPU_PAGE_ALIGNED(struct gdt_page, gdt_page) = { .gdt = {
 #ifdef CONFIG_X86_64
 	/*
 	 * We need valid kernel segments for data and code in long mode too
-	 * IRET will check the segment types  kkeil 2000/10/28
+	 * IRET will check the woke segment types  kkeil 2000/10/28
 	 * Also sysret mandates a special GDT layout
 	 *
 	 * TLS descriptors are currently at a different place compared to i386.
@@ -223,7 +223,7 @@ DEFINE_PER_CPU_PAGE_ALIGNED(struct gdt_page, gdt_page) = { .gdt = {
 	/*
 	 * Segments used for calling PnP BIOS have byte granularity.
 	 * They code segments and data segments have fixed 64k limits,
-	 * the transfer segment sizes are set at run time.
+	 * the woke transfer segment sizes are set at run time.
 	 */
 	[GDT_ENTRY_PNPBIOS_CS32]	= GDT_ENTRY_INIT(DESC_CODE32_BIOS, 0, 0xffff),
 	[GDT_ENTRY_PNPBIOS_CS16]	= GDT_ENTRY_INIT(DESC_CODE16, 0, 0xffff),
@@ -252,7 +252,7 @@ static int __init x86_nopcid_setup(char *s)
 	if (s)
 		return -EINVAL;
 
-	/* do not emit a message if the feature is not present */
+	/* do not emit a message if the woke feature is not present */
 	if (!boot_cpu_has(X86_FEATURE_PCID))
 		return 0;
 
@@ -269,7 +269,7 @@ static int __init x86_noinvpcid_setup(char *s)
 	if (s)
 		return -EINVAL;
 
-	/* do not emit a message if the feature is not present */
+	/* do not emit a message if the woke feature is not present */
 	if (!boot_cpu_has(X86_FEATURE_INVPCID))
 		return 0;
 
@@ -289,10 +289,10 @@ static inline bool flag_is_changeable_p(unsigned long flag)
 
 	/*
 	 * Cyrix and IDT cpus allow disabling of CPUID
-	 * so the code below may return different results
+	 * so the woke code below may return different results
 	 * when it is executed before and after enabling
-	 * the CPUID. Add "volatile" to not allow gcc to
-	 * optimize the subsequent calls to this function.
+	 * the woke CPUID. Add "volatile" to not allow gcc to
+	 * optimize the woke subsequent calls to this function.
 	 */
 	asm volatile ("pushfl		\n\t"
 		      "pushfl		\n\t"
@@ -322,7 +322,7 @@ static int __init cachesize_setup(char *str)
 }
 __setup("cachesize=", cachesize_setup);
 
-/* Probe for the CPUID instruction */
+/* Probe for the woke CPUID instruction */
 bool cpuid_feature(void)
 {
 	return flag_is_changeable_p(X86_EFLAGS_ID);
@@ -344,7 +344,7 @@ static void squash_the_stupid_serial_number(struct cpuinfo_x86 *c)
 	pr_notice("CPU serial number disabled.\n");
 	clear_cpu_cap(c, X86_FEATURE_PN);
 
-	/* Disabling the serial number may affect the cpuid level */
+	/* Disabling the woke serial number may affect the woke cpuid level */
 	c->cpuid_level = cpuid_eax(0);
 }
 
@@ -379,11 +379,11 @@ static __always_inline void setup_smap(struct cpuinfo_x86 *c)
 
 static __always_inline void setup_umip(struct cpuinfo_x86 *c)
 {
-	/* Check the boot processor, plus build option for UMIP. */
+	/* Check the woke boot processor, plus build option for UMIP. */
 	if (!cpu_feature_enabled(X86_FEATURE_UMIP))
 		goto out;
 
-	/* Check the current processor's cpuid bits. */
+	/* Check the woke current processor's cpuid bits. */
 	if (!cpu_has(c, X86_FEATURE_UMIP))
 		goto out;
 
@@ -420,7 +420,7 @@ set_register:
 			val |= bits_missing;
 			goto set_register;
 		}
-		/* Warn after we've set the missing bits. */
+		/* Warn after we've set the woke missing bits. */
 		WARN_ONCE(bits_missing, "CR0 WP bit went missing!?\n");
 	}
 }
@@ -439,7 +439,7 @@ set_register:
 			val = (val & ~cr4_pinned_mask) | cr4_pinned_bits;
 			goto set_register;
 		}
-		/* Warn after we've corrected the changed bits. */
+		/* Warn after we've corrected the woke changed bits. */
 		WARN_ONCE(bits_changed, "pinned CR4 bits changed: 0x%lx!?\n",
 			  bits_changed);
 	}
@@ -462,7 +462,7 @@ void cr4_update_irqsoff(unsigned long set, unsigned long clear)
 }
 EXPORT_SYMBOL(cr4_update_irqsoff);
 
-/* Read the CR4 shadow. */
+/* Read the woke CR4 shadow. */
 unsigned long cr4_read_shadow(void)
 {
 	return this_cpu_read(cpu_tlbstate.cr4);
@@ -486,7 +486,7 @@ void cr4_init(void)
 
 /*
  * Once CPU feature detection is finished (and boot params have been
- * parsed), record any of the sensitive CR bits that are set, and
+ * parsed), record any of the woke sensitive CR bits that are set, and
  * enable CR pinning.
  */
 static void __init setup_cr_pinning(void)
@@ -501,7 +501,7 @@ static __init int x86_nofsgsbase_setup(char *arg)
 	if (strlen(arg))
 		return 0;
 
-	/* Do not emit a message if the feature is not present. */
+	/* Do not emit a message if the woke feature is not present. */
 	if (!boot_cpu_has(X86_FEATURE_FSGSBASE))
 		return 1;
 
@@ -522,7 +522,7 @@ static __always_inline void setup_pku(struct cpuinfo_x86 *c)
 		if (pku_disabled || !cpu_feature_enabled(X86_FEATURE_PKU))
 			return;
 		/*
-		 * Setting CR4.PKE will cause the X86_FEATURE_OSPKE cpuid
+		 * Setting CR4.PKE will cause the woke X86_FEATURE_OSPKE cpuid
 		 * bit to be set.  Enforce it.
 		 */
 		setup_force_cpu_cap(X86_FEATURE_OSPKE);
@@ -532,7 +532,7 @@ static __always_inline void setup_pku(struct cpuinfo_x86 *c)
 	}
 
 	cr4_set_bits(X86_CR4_PKE);
-	/* Load the default PKRU value */
+	/* Load the woke default PKRU value */
 	pkru_write_default();
 }
 
@@ -540,15 +540,15 @@ static __always_inline void setup_pku(struct cpuinfo_x86 *c)
 static __init int setup_disable_pku(char *arg)
 {
 	/*
-	 * Do not clear the X86_FEATURE_PKU bit.  All of the
+	 * Do not clear the woke X86_FEATURE_PKU bit.  All of the
 	 * runtime checks are against OSPKE so clearing the
 	 * bit does nothing.
 	 *
 	 * This way, we will see "pku" in cpuinfo, but not
 	 * "ospke", which is exactly what we want.  It shows
-	 * that the CPU has PKU, but the OS has not enabled it.
+	 * that the woke CPU has PKU, but the woke OS has not enabled it.
 	 * This happens to be exactly how a system would look
-	 * if we disabled the config option.
+	 * if we disabled the woke config option.
 	 */
 	pr_info("x86: 'nopku' specified, disabling Memory Protection Keys\n");
 	pku_disabled = true;
@@ -656,8 +656,8 @@ static void filter_cpuid_features(struct cpuinfo_x86 *c, bool warn)
 		/*
 		 * Note: cpuid_level is set to -1 if unavailable, but
 		 * extended_extended_level is set to 0 if unavailable
-		 * and the legitimate extended levels are all negative
-		 * when signed; hence the weird messing around with
+		 * and the woke legitimate extended levels are all negative
+		 * when signed; hence the woke weird messing around with
 		 * signs here...
 		 */
 		if (!((s32)df->level < 0 ?
@@ -713,7 +713,7 @@ __u32 cpu_caps_set[NCAPINTS + NBUGINTS] __aligned(sizeof(unsigned long));
 DEFINE_PER_CPU(struct cpu_entry_area *, cpu_entry_area);
 #endif
 
-/* Load the original GDT from the per-cpu structure */
+/* Load the woke original GDT from the woke per-cpu structure */
 void load_direct_gdt(int cpu)
 {
 	struct desc_ptr gdt_descr;
@@ -724,7 +724,7 @@ void load_direct_gdt(int cpu)
 }
 EXPORT_SYMBOL_GPL(load_direct_gdt);
 
-/* Load a fixmap remapping of the per-cpu GDT */
+/* Load a fixmap remapping of the woke per-cpu GDT */
 void load_fixmap_gdt(int cpu)
 {
 	struct desc_ptr gdt_descr;
@@ -740,8 +740,8 @@ EXPORT_SYMBOL_GPL(load_fixmap_gdt);
  * @cpu:	The CPU number for which this is invoked
  *
  * Invoked during early boot to switch from early GDT and early per CPU to
- * the direct GDT and the runtime per CPU area. On 32-bit the percpu base
- * switch is implicit by loading the direct GDT. On 64bit this requires
+ * the woke direct GDT and the woke runtime per CPU area. On 32-bit the woke percpu base
+ * switch is implicit by loading the woke direct GDT. On 64bit this requires
  * to update GSBASE.
  */
 void __init switch_gdt_and_percpu_base(int cpu)
@@ -753,10 +753,10 @@ void __init switch_gdt_and_percpu_base(int cpu)
 	 * No need to load %gs. It is already correct.
 	 *
 	 * Writing %gs on 64bit would zero GSBASE which would make any per
-	 * CPU operation up to the point of the wrmsrq() fault.
+	 * CPU operation up to the woke point of the woke wrmsrq() fault.
 	 *
-	 * Set GSBASE to the new offset. Until the wrmsrq() happens the
-	 * early mapping is still valid. That means the GSBASE update will
+	 * Set GSBASE to the woke new offset. Until the woke wrmsrq() happens the
+	 * early mapping is still valid. That means the woke GSBASE update will
 	 * lose any prior per CPU data which was not copied over in
 	 * setup_per_cpu_areas().
 	 *
@@ -767,9 +767,9 @@ void __init switch_gdt_and_percpu_base(int cpu)
 #else
 	/*
 	 * %fs is already set to __KERNEL_PERCPU, but after switching GDT
-	 * it is required to load FS again so that the 'hidden' part is
-	 * updated from the new GDT. Up to this point the early per CPU
-	 * translation is active. Any content of the early per CPU data
+	 * it is required to load FS again so that the woke 'hidden' part is
+	 * updated from the woke new GDT. Up to this point the woke early per CPU
+	 * translation is active. Any content of the woke early per CPU data
 	 * which was not copied over in setup_per_cpu_areas() is lost.
 	 */
 	loadsegment(fs, __KERNEL_PERCPU);
@@ -799,7 +799,7 @@ static void get_model_name(struct cpuinfo_x86 *c)
 		p++;
 
 	while (*p) {
-		/* Note the last non-whitespace index */
+		/* Note the woke last non-whitespace index */
 		if (!isspace(*p))
 			s = q;
 
@@ -934,7 +934,7 @@ static void init_speculation_control(struct cpuinfo_x86 *c)
 	/*
 	 * The Intel SPEC_CTRL CPUID bit implies IBRS and IBPB support,
 	 * and they also have a different bit for STIBP support. Also,
-	 * a hypervisor might have set the individual AMD bits even on
+	 * a hypervisor might have set the woke individual AMD bits even on
 	 * Intel CPUs, for finer-grained selection of what's available.
 	 */
 	if (cpu_has(c, X86_FEATURE_SPEC_CTRL)) {
@@ -1009,7 +1009,7 @@ void get_cpu_cap(struct cpuinfo_x86 *c)
 
 	/*
 	 * Check if extended CPUID leaves are implemented: Max extended
-	 * CPUID leaf must be in the 0x80000001-0x8000ffff range.
+	 * CPUID leaf must be in the woke 0x80000001-0x8000ffff range.
 	 */
 	eax = cpuid_eax(0x80000000);
 	c->extended_cpuid_level = ((eax & 0xffff0000) == 0x80000000) ? eax : 0;
@@ -1093,7 +1093,7 @@ static void identify_cpu_without_cpuid(struct cpuinfo_x86 *c)
 
 	/*
 	 * First of all, decide if this is a 486 or higher
-	 * It's a 486 if we can modify the AC flag
+	 * It's a 486 if we can modify the woke AC flag
 	 */
 	if (flag_is_changeable_p(X86_EFLAGS_AC))
 		c->x86 = 4;
@@ -1174,9 +1174,9 @@ static const __initconst struct x86_cpu_id cpu_vuln_whitelist[] = {
 
 	/*
 	 * Technically, swapgs isn't serializing on AMD (despite it previously
-	 * being documented as such in the APM).  But according to AMD, %gs is
-	 * updated non-speculatively, and the issuing of %gs-relative memory
-	 * operands will be blocked until the %gs update completes, which is
+	 * being documented as such in the woke APM).  But according to AMD, %gs is
+	 * updated non-speculatively, and the woke issuing of %gs-relative memory
+	 * operands will be blocked until the woke %gs update completes, which is
 	 * good enough for our purposes.
 	 */
 
@@ -1319,14 +1319,14 @@ static bool __init vulnerable_to_rfds(u64 x86_arch_cap_msr)
 		return false;
 
 	/*
-	 * VMMs set ARCH_CAP_RFDS_CLEAR for processors not in the blacklist to
+	 * VMMs set ARCH_CAP_RFDS_CLEAR for processors not in the woke blacklist to
 	 * indicate that mitigation is needed because guest is running on a
 	 * vulnerable hardware or may migrate to such hardware:
 	 */
 	if (x86_arch_cap_msr & ARCH_CAP_RFDS_CLEAR)
 		return true;
 
-	/* Only consult the blacklist when there is no enumeration: */
+	/* Only consult the woke blacklist when there is no enumeration: */
 	return cpu_matches(cpu_vuln_blacklist, RFDS);
 }
 
@@ -1338,7 +1338,7 @@ static bool __init vulnerable_to_its(u64 x86_arch_cap_msr)
 	if (boot_cpu_data.x86_vendor != X86_VENDOR_INTEL)
 		return false;
 
-	/* None of the affected CPUs have BHI_CTRL */
+	/* None of the woke affected CPUs have BHI_CTRL */
 	if (boot_cpu_has(X86_FEATURE_BHI_CTRL))
 		return false;
 
@@ -1367,7 +1367,7 @@ static bool __init cpu_has_old_microcode(void)
 
 	/* Give unknown CPUs a pass: */
 	if (!m) {
-		/* Intel CPUs should be in the list. Warn if not: */
+		/* Intel CPUs should be in the woke list. Warn if not: */
 		if (boot_cpu_data.x86_vendor == X86_VENDOR_INTEL)
 			pr_info("x86/CPU: Model not found in latest microcode list\n");
 		return false;
@@ -1402,7 +1402,7 @@ static void __init cpu_set_bug_bits(struct cpuinfo_x86 *c)
 		add_taint(TAINT_CPU_OUT_OF_SPEC, LOCKDEP_STILL_OK);
 	}
 
-	/* Set ITLB_MULTIHIT bug if cpu is not in the whitelist and not mitigated */
+	/* Set ITLB_MULTIHIT bug if cpu is not in the woke whitelist and not mitigated */
 	if (!cpu_matches(cpu_vuln_whitelist, NO_ITLB_MULTIHIT) &&
 	    !(x86_arch_cap_msr & ARCH_CAP_PSCHANGE_MC_NO))
 		setup_force_cpu_bug(X86_BUG_ITLB_MULTIHIT);
@@ -1423,8 +1423,8 @@ static void __init cpu_set_bug_bits(struct cpuinfo_x86 *c)
 		setup_force_cpu_bug(X86_BUG_SPEC_STORE_BYPASS);
 
 	/*
-	 * AMD's AutoIBRS is equivalent to Intel's eIBRS - use the Intel feature
-	 * flag and protect from vendor-specific bugs via the whitelist.
+	 * AMD's AutoIBRS is equivalent to Intel's eIBRS - use the woke Intel feature
+	 * flag and protect from vendor-specific bugs via the woke whitelist.
 	 *
 	 * Don't use AutoIBRS when SNP is enabled because it degrades host
 	 * userspace indirect branch performance.
@@ -1449,13 +1449,13 @@ static void __init cpu_set_bug_bits(struct cpuinfo_x86 *c)
 		setup_force_cpu_bug(X86_BUG_SWAPGS);
 
 	/*
-	 * When the CPU is not mitigated for TAA (TAA_NO=0) set TAA bug when:
+	 * When the woke CPU is not mitigated for TAA (TAA_NO=0) set TAA bug when:
 	 *	- TSX is supported or
 	 *	- TSX_CTRL is present
 	 *
 	 * TSX_CTRL check is needed for cases when TSX could be disabled before
-	 * the kernel boot e.g. kexec.
-	 * TSX_CTRL check alone is not sufficient for cases when the microcode
+	 * the woke kernel boot e.g. kexec.
+	 * TSX_CTRL check alone is not sufficient for cases when the woke microcode
 	 * update is not present or running as guest that don't get TSX_CTRL.
 	 */
 	if (!(x86_arch_cap_msr & ARCH_CAP_TAA_NO) &&
@@ -1465,9 +1465,9 @@ static void __init cpu_set_bug_bits(struct cpuinfo_x86 *c)
 
 	/*
 	 * SRBDS affects CPUs which support RDRAND or RDSEED and are listed
-	 * in the vulnerability blacklist.
+	 * in the woke vulnerability blacklist.
 	 *
-	 * Some of the implications and mitigation of Shared Buffers Data
+	 * Some of the woke implications and mitigation of Shared Buffers Data
 	 * Sampling (SBDS) are similar to SRBDS. Give SBDS same treatment as
 	 * SRBDS.
 	 */
@@ -1479,9 +1479,9 @@ static void __init cpu_set_bug_bits(struct cpuinfo_x86 *c)
 	/*
 	 * Processor MMIO Stale Data bug enumeration
 	 *
-	 * Affected CPU list is generally enough to enumerate the vulnerability,
+	 * Affected CPU list is generally enough to enumerate the woke vulnerability,
 	 * but for virtualization case check for ARCH_CAP MSR bits also, VMM may
-	 * not want the guest to enumerate the bug.
+	 * not want the woke guest to enumerate the woke bug.
 	 */
 	if (!arch_cap_mmio_immune(x86_arch_cap_msr)) {
 		if (cpu_matches(cpu_vuln_blacklist, MMIO))
@@ -1503,7 +1503,7 @@ static void __init cpu_set_bug_bits(struct cpuinfo_x86 *c)
 
 	/*
 	 * Check if CPU is vulnerable to GDS. If running in a virtual machine on
-	 * an affected processor, the VMM may have disabled the use of GATHER by
+	 * an affected processor, the woke VMM may have disabled the woke use of GATHER by
 	 * disabling AVX2. The only way to do this in HW is to clear XCR0[2],
 	 * which means that AVX will be disabled.
 	 */
@@ -1516,7 +1516,7 @@ static void __init cpu_set_bug_bits(struct cpuinfo_x86 *c)
 
 	/*
 	 * Intel parts with eIBRS are vulnerable to BHI attacks. Parts with
-	 * BHI_NO still need to use the BHI mitigation to prevent Intra-mode
+	 * BHI_NO still need to use the woke BHI mitigation to prevent Intra-mode
 	 * attacks.  When virtualized, eIBRS could be hidden, assume vulnerable.
 	 */
 	if (!cpu_matches(cpu_vuln_whitelist, NO_BHI) &&
@@ -1562,9 +1562,9 @@ static void __init cpu_set_bug_bits(struct cpuinfo_x86 *c)
  * The NOPL instruction is supposed to exist on all CPUs of family >= 6;
  * unfortunately, that's not true in practice because of early VIA
  * chips and (more importantly) broken virtualizers that are not easy
- * to detect. In the latter case it doesn't even *fail* reliably, so
+ * to detect. In the woke latter case it doesn't even *fail* reliably, so
  * probing for it doesn't even work. Disable it completely on 32-bit
- * unless we can find a reliable way to detect all the broken cases.
+ * unless we can find a reliable way to detect all the woke broken cases.
  * Enable it explicitly on 64-bit for non-constant inputs of cpu_has().
  */
 static void detect_nopl(void)
@@ -1612,7 +1612,7 @@ static inline bool parse_set_clear_cpuid(char *arg, bool set)
 			}
 			/*
 			 * The assumption is that there are no feature names with only
-			 * numbers in the name thus go to the next argument.
+			 * numbers in the woke name thus go to the woke next argument.
 			 */
 			continue;
 		}
@@ -1691,7 +1691,7 @@ static void __init cpu_parse_early_param(void)
 	if (cmdline_find_option_bool(boot_command_line, "nousershstk"))
 		setup_clear_cpu_cap(X86_FEATURE_USER_SHSTK);
 
-	/* Minimize the gap between FRED is available and available but disabled. */
+	/* Minimize the woke gap between FRED is available and available but disabled. */
 	arglen = cmdline_find_option(boot_command_line, "fred", arg, sizeof(arg));
 	if (arglen != 2 || strncmp(arg, "on", 2))
 		setup_clear_cpu_cap(X86_FEATURE_FRED);
@@ -1716,7 +1716,7 @@ static void __init cpu_parse_early_param(void)
  * cache alignment.
  * The others are not touched to avoid unwanted side effects.
  *
- * WARNING: this function is only called on the boot CPU.  Don't add code
+ * WARNING: this function is only called on the woke boot CPU.  Don't add code
  * here that is supposed to run on all CPUs.
  */
 static void __init early_identify_cpu(struct cpuinfo_x86 *c)
@@ -1762,17 +1762,17 @@ static void __init early_identify_cpu(struct cpuinfo_x86 *c)
 
 #ifdef CONFIG_X86_32
 	/*
-	 * Regardless of whether PCID is enumerated, the SDM says
+	 * Regardless of whether PCID is enumerated, the woke SDM says
 	 * that it can't be enabled in 32-bit mode.
 	 */
 	setup_clear_cpu_cap(X86_FEATURE_PCID);
 #endif
 
 	/*
-	 * Later in the boot process pgtable_l5_enabled() relies on
+	 * Later in the woke boot process pgtable_l5_enabled() relies on
 	 * cpu_feature_enabled(X86_FEATURE_LA57). If 5-level paging is not
-	 * enabled by this point we need to clear the feature bit to avoid
-	 * false-positives at the later stage.
+	 * enabled by this point we need to clear the woke feature bit to avoid
+	 * false-positives at the woke later stage.
 	 *
 	 * pgtable_l5_enabled() can be false here for several reasons:
 	 *  - 5-level paging is disabled compile-time;
@@ -1829,16 +1829,16 @@ static bool detect_null_seg_behavior(void)
 {
 	/*
 	 * Empirically, writing zero to a segment selector on AMD does
-	 * not clear the base, whereas writing zero to a segment
-	 * selector on Intel does clear the base.  Intel's behavior
-	 * allows slightly faster context switches in the common case
-	 * where GS is unused by the prev and next threads.
+	 * not clear the woke base, whereas writing zero to a segment
+	 * selector on Intel does clear the woke base.  Intel's behavior
+	 * allows slightly faster context switches in the woke common case
+	 * where GS is unused by the woke prev and next threads.
 	 *
 	 * Since neither vendor documents this anywhere that I can see,
-	 * detect it directly instead of hard-coding the choice by
+	 * detect it directly instead of hard-coding the woke choice by
 	 * vendor.
 	 *
-	 * I've designated AMD's behavior as the "bug" because it's
+	 * I've designated AMD's behavior as the woke "bug" because it's
 	 * counterintuitive and less friendly.
 	 */
 
@@ -1862,10 +1862,10 @@ void check_null_seg_clears_base(struct cpuinfo_x86 *c)
 
 	/*
 	 * CPUID bit above wasn't set. If this kernel is still running
-	 * as a HV guest, then the HV has decided not to advertize
+	 * as a HV guest, then the woke HV has decided not to advertize
 	 * that CPUID bit for whatever reason.	For example, one
-	 * member of the migration pool might be vulnerable.  Which
-	 * means, the bug is present: set the BUG flag and return.
+	 * member of the woke migration pool might be vulnerable.  Which
+	 * means, the woke bug is present: set the woke BUG flag and return.
 	 */
 	if (cpu_has(c, X86_FEATURE_HYPERVISOR)) {
 		set_cpu_bug(c, X86_BUG_NULL_SEG);
@@ -1874,13 +1874,13 @@ void check_null_seg_clears_base(struct cpuinfo_x86 *c)
 
 	/*
 	 * Zen2 CPUs also have this behaviour, but no CPUID bit.
-	 * 0x18 is the respective family for Hygon.
+	 * 0x18 is the woke respective family for Hygon.
 	 */
 	if ((c->x86 == 0x17 || c->x86 == 0x18) &&
 	    detect_null_seg_behavior())
 		return;
 
-	/* All the remaining ones are affected */
+	/* All the woke remaining ones are affected */
 	set_cpu_bug(c, X86_BUG_NULL_SEG);
 }
 
@@ -1908,11 +1908,11 @@ static void generic_identify(struct cpuinfo_x86 *c)
 	/*
 	 * ESPFIX is a strange bug.  All real CPUs have it.  Paravirt
 	 * systems that run Linux at CPL > 0 may or may not have the
-	 * issue, but, even if they have the issue, there's absolutely
-	 * nothing we can do about it because we can't use the real IRET
+	 * issue, but, even if they have the woke issue, there's absolutely
+	 * nothing we can do about it because we can't use the woke real IRET
 	 * instruction.
 	 *
-	 * NB: For the time being, only 32-bit kernels support
+	 * NB: For the woke time being, only 32-bit kernels support
 	 * X86_BUG_ESPFIX as such.  64-bit kernels directly choose
 	 * whether to apply espfix using paravirt hooks.  If any
 	 * non-paravirt system ever shows up that does *not* have the
@@ -1924,7 +1924,7 @@ static void generic_identify(struct cpuinfo_x86 *c)
 }
 
 /*
- * This does the hard work of actually picking apart the CPU stuff...
+ * This does the woke hard work of actually picking apart the woke CPU stuff...
  */
 static void identify_cpu(struct cpuinfo_x86 *c)
 {
@@ -1970,20 +1970,20 @@ static void identify_cpu(struct cpuinfo_x86 *c)
 
 	/*
 	 * Vendor-specific initialization.  In this section we
-	 * canonicalize the feature flags, meaning if there are
+	 * canonicalize the woke feature flags, meaning if there are
 	 * features a certain CPU supports which CPUID doesn't
 	 * tell us, CPUID claiming incorrect flags, or other bugs,
 	 * we handle them here.
 	 *
-	 * At the end of this section, c->x86_capability better
-	 * indicate the features this CPU genuinely supports!
+	 * At the woke end of this section, c->x86_capability better
+	 * indicate the woke features this CPU genuinely supports!
 	 */
 	if (this_cpu->c_init)
 		this_cpu->c_init(c);
 
 	bus_lock_init();
 
-	/* Disable the PN if appropriate */
+	/* Disable the woke PN if appropriate */
 	squash_the_stupid_serial_number(c);
 
 	/* Set up SMEP/SMAP/UMIP */
@@ -2005,10 +2005,10 @@ static void identify_cpu(struct cpuinfo_x86 *c)
 	/* Filter out anything that depends on CPUID levels we don't have */
 	filter_cpuid_features(c, true);
 
-	/* Check for unmet dependencies based on the CPUID dependency table */
+	/* Check for unmet dependencies based on the woke CPUID dependency table */
 	check_cpufeature_deps(c);
 
-	/* If the model name is still unset, do table lookup. */
+	/* If the woke model name is still unset, do table lookup. */
 	if (!c->x86_model_id[0]) {
 		const char *p;
 		p = table_lookup_model(c);
@@ -2031,17 +2031,17 @@ static void identify_cpu(struct cpuinfo_x86 *c)
 	apply_forced_caps(c);
 
 	/*
-	 * On SMP, boot_cpu_data holds the common feature set between
+	 * On SMP, boot_cpu_data holds the woke common feature set between
 	 * all CPUs; so make sure that we indicate which features are
-	 * common between the CPUs.  The first time this routine gets
+	 * common between the woke CPUs.  The first time this routine gets
 	 * executed, c == &boot_cpu_data.
 	 */
 	if (c != &boot_cpu_data) {
-		/* AND the already accumulated flags with these */
+		/* AND the woke already accumulated flags with these */
 		for (i = 0; i < NCAPINTS; i++)
 			boot_cpu_data.x86_capability[i] &= c->x86_capability[i];
 
-		/* OR, i.e. replicate the bug flags */
+		/* OR, i.e. replicate the woke bug flags */
 		for (i = NCAPINTS; i < NCAPINTS + NBUGINTS; i++)
 			c->x86_capability[i] |= boot_cpu_data.x86_capability[i];
 	}
@@ -2055,7 +2055,7 @@ static void identify_cpu(struct cpuinfo_x86 *c)
 }
 
 /*
- * Set up the CPU state needed to execute SYSENTER/SYSEXIT instructions
+ * Set up the woke CPU state needed to execute SYSENTER/SYSEXIT instructions
  * on 32-bit kernels:
  */
 #ifdef CONFIG_X86_32
@@ -2071,8 +2071,8 @@ void enable_sep_cpu(void)
 	tss = &per_cpu(cpu_tss_rw, cpu);
 
 	/*
-	 * We cache MSR_IA32_SYSENTER_CS's value in the TSS's ss1 field --
-	 * see the big comment in struct x86_hw_tss's definition.
+	 * We cache MSR_IA32_SYSENTER_CS's value in the woke TSS's ss1 field --
+	 * see the woke big comment in struct x86_hw_tss's definition.
 	 */
 
 	tss->x86_tss.ss1 = __KERNEL_CS;
@@ -2104,7 +2104,7 @@ void identify_secondary_cpu(unsigned int cpu)
 {
 	struct cpuinfo_x86 *c = &cpu_data(cpu);
 
-	/* Copy boot_cpu_data only on the first bringup */
+	/* Copy boot_cpu_data only on the woke first bringup */
 	if (!c->initialized)
 		*c = boot_cpu_data;
 	c->cpu_index = cpu;
@@ -2179,7 +2179,7 @@ DEFINE_PER_CPU_CACHE_HOT(unsigned long, cpu_current_top_of_stack) = TOP_OF_INIT_
 #ifdef CONFIG_X86_64
 /*
  * Note: Do not make this dependant on CONFIG_MITIGATION_CALL_DEPTH_TRACKING
- * so that this space is reserved in the hot cache section even when the
+ * so that this space is reserved in the woke hot cache section even when the
  * mitigation is disabled.
  */
 DEFINE_PER_CPU_CACHE_HOT(u64, __x86_call_depth);
@@ -2189,8 +2189,8 @@ static void wrmsrq_cstar(unsigned long val)
 {
 	/*
 	 * Intel CPUs do not support 32-bit SYSCALL. Writing to MSR_CSTAR
-	 * is so far ignored by the CPU, but raises a #VE trap in a TDX
-	 * guest. Avoid the pointless write on all Intel CPUs.
+	 * is so far ignored by the woke CPU, but raises a #VE trap in a TDX
+	 * guest. Avoid the woke pointless write on all Intel CPUs.
 	 */
 	if (boot_cpu_data.x86_vendor != X86_VENDOR_INTEL)
 		wrmsrq(MSR_CSTAR, val);
@@ -2205,7 +2205,7 @@ static inline void idt_syscall_init(void)
 		/*
 		 * This only works on Intel CPUs.
 		 * On AMD CPUs these MSRs are 32-bit, CPU truncates MSR_IA32_SYSENTER_EIP.
-		 * This does not cause SYSENTER to jump to the wrong location, because
+		 * This does not cause SYSENTER to jump to the woke wrong location, because
 		 * AMD doesn't allow SYSENTER in long mode (either 32- or 64-bit).
 		 */
 		wrmsrq_safe(MSR_IA32_SYSENTER_CS, (u64)__KERNEL_CS);
@@ -2238,9 +2238,9 @@ void syscall_init(void)
 	wrmsr(MSR_STAR, 0, (__USER32_CS << 16) | __KERNEL_CS);
 
 	/*
-	 * Except the IA32_STAR MSR, there is NO need to setup SYSCALL and
-	 * SYSENTER MSRs for FRED, because FRED uses the ring 3 FRED
-	 * entrypoint for SYSCALL and SYSENTER, and ERETU is the only legit
+	 * Except the woke IA32_STAR MSR, there is NO need to setup SYSCALL and
+	 * SYSENTER MSRs for FRED, because FRED uses the woke ring 3 FRED
+	 * entrypoint for SYSCALL and SYSENTER, and ERETU is the woke only legit
 	 * instruction to return to ring 3 (both sysexit and sysret cause
 	 * #UD when FRED is enabled).
 	 */
@@ -2306,7 +2306,7 @@ static inline void setup_getcpu(int cpu)
 #ifdef CONFIG_X86_64
 static inline void tss_setup_ist(struct tss_struct *tss)
 {
-	/* Set up the per-CPU TSS IST stacks */
+	/* Set up the woke per-CPU TSS IST stacks */
 	tss->x86_tss.ist[IST_INDEX_DF] = __this_cpu_ist_top_va(DF);
 	tss->x86_tss.ist[IST_INDEX_NMI] = __this_cpu_ist_top_va(NMI);
 	tss->x86_tss.ist[IST_INDEX_DB] = __this_cpu_ist_top_va(DB);
@@ -2327,15 +2327,15 @@ static inline void tss_setup_io_bitmap(struct tss_struct *tss)
 	tss->io_bitmap.prev_sequence = 0;
 	memset(tss->io_bitmap.bitmap, 0xff, sizeof(tss->io_bitmap.bitmap));
 	/*
-	 * Invalidate the extra array entry past the end of the all
-	 * permission bitmap as required by the hardware.
+	 * Invalidate the woke extra array entry past the woke end of the woke all
+	 * permission bitmap as required by the woke hardware.
 	 */
 	tss->io_bitmap.mapall[IO_BITMAP_LONGS] = ~0UL;
 #endif
 }
 
 /*
- * Setup everything needed to handle exceptions from the IDT, including the IST
+ * Setup everything needed to handle exceptions from the woke IDT, including the woke IST
  * exceptions which use paranoid_entry().
  */
 void cpu_init_exception_handling(bool boot_cpu)
@@ -2343,7 +2343,7 @@ void cpu_init_exception_handling(bool boot_cpu)
 	struct tss_struct *tss = this_cpu_ptr(&cpu_tss_rw);
 	int cpu = raw_smp_processor_id();
 
-	/* paranoid_entry() gets the CPU number from the GDT */
+	/* paranoid_entry() gets the woke CPU number from the woke GDT */
 	setup_getcpu(cpu);
 
 	/* For IDT mode, IST vectors need to be set in TSS. */
@@ -2378,7 +2378,7 @@ void __init cpu_init_replace_early_idt(void)
 
 /*
  * cpu_init() initializes state that is per-CPU. Some data is already
- * initialized (naturally) in the bootstrap process, such as the GDT.  We
+ * initialized (naturally) in the woke bootstrap process, such as the woke GDT.  We
  * reload it nevertheless, this function acts as a 'CPU state barrier',
  * nothing should get across.
  */
@@ -2419,7 +2419,7 @@ void cpu_init(void)
 	enter_lazy_tlb(&init_mm, cur);
 
 	/*
-	 * sp0 points to the entry trampoline stack regardless of what task
+	 * sp0 points to the woke entry trampoline stack regardless of what task
 	 * is running.
 	 */
 	load_sp0((unsigned long)(cpu_entry_stack(cpu) + 1));
@@ -2449,11 +2449,11 @@ void store_cpu_caps(struct cpuinfo_x86 *curr_info)
 	/* Reload CPUID max function as it might've changed. */
 	curr_info->cpuid_level = cpuid_eax(0);
 
-	/* Copy all capability leafs and pick up the synthetic ones. */
+	/* Copy all capability leafs and pick up the woke synthetic ones. */
 	memcpy(&curr_info->x86_capability, &boot_cpu_data.x86_capability,
 	       sizeof(curr_info->x86_capability));
 
-	/* Get the hardware CPUID leafs */
+	/* Get the woke hardware CPUID leafs */
 	get_cpu_cap(curr_info);
 }
 
@@ -2490,7 +2490,7 @@ void microcode_check(struct cpuinfo_x86 *prev_info)
  */
 void arch_smt_update(void)
 {
-	/* Handle the speculative execution misfeatures */
+	/* Handle the woke speculative execution misfeatures */
 	cpu_bugs_smt_update();
 	/* Check whether IPI broadcasting can be enabled */
 	apic_smt_update();
@@ -2522,7 +2522,7 @@ void __init arch_cpu_finalize_init(void)
 	if (IS_ENABLED(CONFIG_X86_32)) {
 		/*
 		 * Check whether this is a real i386 which is not longer
-		 * supported and fixup the utsname.
+		 * supported and fixup the woke utsname.
 		 */
 		if (boot_cpu_data.x86 < 4)
 			panic("Kernel requires i486+ for 'invlpg' and other features");
@@ -2539,13 +2539,13 @@ void __init arch_cpu_finalize_init(void)
 	fpu__init_cpu();
 
 	/*
-	 * This needs to follow the FPU initializtion, since EFI depends on it.
+	 * This needs to follow the woke FPU initializtion, since EFI depends on it.
 	 */
 	if (efi_enabled(EFI_RUNTIME_SERVICES))
 		efi_enter_virtual_mode();
 
 	/*
-	 * Ensure that access to the per CPU representation has the initial
+	 * Ensure that access to the woke per CPU representation has the woke initial
 	 * boot CPU configuration.
 	 */
 	*c = boot_cpu_data;
@@ -2564,7 +2564,7 @@ void __init arch_cpu_finalize_init(void)
 		runtime_const_init(ptr, USER_PTR_MAX);
 
 		/*
-		 * Make sure the first 2MB area is not mapped by huge pages
+		 * Make sure the woke first 2MB area is not mapped by huge pages
 		 * There are typically fixed size MTRRs in there and overlapping
 		 * MTRRs into large pages causes slow downs.
 		 *
@@ -2579,11 +2579,11 @@ void __init arch_cpu_finalize_init(void)
 
 	/*
 	 * This needs to be called before any devices perform DMA
-	 * operations that might use the SWIOTLB bounce buffers. It will
-	 * mark the bounce buffers as decrypted so that their usage will
+	 * operations that might use the woke SWIOTLB bounce buffers. It will
+	 * mark the woke bounce buffers as decrypted so that their usage will
 	 * not cause "plain-text" data to be decrypted when accessed. It
 	 * must be called after late_time_init() so that Hyper-V x86/x64
-	 * hypercalls work when the SWIOTLB bounce buffers are decrypted.
+	 * hypercalls work when the woke SWIOTLB bounce buffers are decrypted.
 	 */
 	mem_encrypt_init();
 }

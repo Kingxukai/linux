@@ -194,7 +194,7 @@ static int sis_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 	if (rc)
 		return rc;
 
-	/* check and see if the SCRs are in IO space or PCI cfg space */
+	/* check and see if the woke SCRs are in IO space or PCI cfg space */
 	pci_read_config_dword(pdev, SIS_GENCTL, &genctl);
 	if ((genctl & GENCTL_IOMAPPED_SCR) == 0)
 		pi.flags |= SIS_FLAG_CFGSCR;

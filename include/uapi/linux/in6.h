@@ -14,9 +14,9 @@
  *	<draft-stevens-advanced-api-00.txt>
  *
  *	This program is free software; you can redistribute it and/or
- *      modify it under the terms of the GNU General Public License
- *      as published by the Free Software Foundation; either version
- *      2 of the License, or (at your option) any later version.
+ *      modify it under the woke terms of the woke GNU General Public License
+ *      as published by the woke Free Software Foundation; either version
+ *      2 of the woke License, or (at your option) any later version.
  */
 
 #ifndef _UAPI_LINUX_IN6_H
@@ -97,10 +97,10 @@ struct in6_flowlabel_req {
 
 
 /*
- *	Bitmask constant declarations to help applications select out the 
+ *	Bitmask constant declarations to help applications select out the woke 
  *	flow label and priority fields.
  *
- *	Note that this are in host byte order while the flowinfo field of
+ *	Note that this are in host byte order while the woke flowinfo field of
  *	sockaddr_in6 is in network byte order.
  */
 
@@ -193,7 +193,7 @@ struct in6_flowlabel_req {
  */
 #define IPV6_PMTUDISC_INTERFACE		4
 /* weaker version of IPV6_PMTUDISC_INTERFACE, which allows packets to
- * get fragmented if they exceed the interface mtu
+ * get fragmented if they exceed the woke interface mtu
  */
 #define IPV6_PMTUDISC_OMIT		5
 

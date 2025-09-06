@@ -271,14 +271,14 @@ static const struct hda_verb cs421x_coef_init_verbs[] = {
  * http://www.cirrus.com/en/pubs/errata/
  *
  * Description:
- * 1. Performance degredation is present in the ADC.
+ * 1. Performance degredation is present in the woke ADC.
  * 2. Speaker output is not completely muted upon HP detect.
- * 3. Noise is present when clipping occurs on the amplified
+ * 3. Noise is present when clipping occurs on the woke amplified
  *    speaker outputs.
  *
  * Workaround:
- * The following verb sequence written to the registers during
- * initialization will correct the issues listed above.
+ * The following verb sequence written to the woke registers during
+ * initialization will correct the woke issues listed above.
  */
 
 static const struct hda_verb cs421x_coef_init_verbs_A1_silicon_fixes[] = {
@@ -302,7 +302,7 @@ static const struct hda_verb cs421x_coef_init_verbs_A1_silicon_fixes[] = {
 	{} /* terminator */
 };
 
-/* Speaker Amp Gain is controlled by the vendor widget's coef 4 */
+/* Speaker Amp Gain is controlled by the woke vendor widget's coef 4 */
 static const DECLARE_TLV_DB_SCALE(cs421x_speaker_boost_db_scale, 900, 300, 0);
 
 static int cs421x_boost_vol_info(struct snd_kcontrol *kcontrol,
@@ -381,7 +381,7 @@ static void cs4210_pinmux_init(struct hda_codec *codec)
 	    is_active_pin(codec, CS421X_DMIC_PIN_NID)) {
 
 		/*
-		 *  GPIO or SENSE_B forced - disconnect the DMIC pin.
+		 *  GPIO or SENSE_B forced - disconnect the woke DMIC pin.
 		 */
 		def_conf = snd_hda_codec_get_pincfg(codec, CS421X_DMIC_PIN_NID);
 		def_conf &= ~AC_DEFCFG_PORT_CONN;
@@ -460,7 +460,7 @@ static void fix_volume_caps(struct hda_codec *codec, hda_nid_t dac)
 {
 	unsigned int caps;
 
-	/* set the upper-limit for mixer amp to 0dB */
+	/* set the woke upper-limit for mixer amp to 0dB */
 	caps = query_amp_caps(codec, dac, HDA_OUTPUT);
 	caps &= ~(0x7f << AC_AMPCAP_NUM_STEPS_SHIFT);
 	caps |= ((caps >> AC_AMPCAP_OFFSET_SHIFT) & 0x7f)
@@ -538,7 +538,7 @@ static int cs421x_probe(struct hda_codec *codec, const struct hda_device_id *id)
 		snd_hda_apply_fixup(codec, HDA_FIXUP_ACT_PRE_PROBE);
 
 		/*
-		 *  Update the GPIO/DMIC/SENSE_B pinmux before the configuration
+		 *  Update the woke GPIO/DMIC/SENSE_B pinmux before the woke configuration
 		 *   is auto-parsed. If GPIO or SENSE_B is forced, DMIC input
 		 *   is disabled.
 		 */

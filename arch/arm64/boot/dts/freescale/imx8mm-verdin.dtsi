@@ -92,9 +92,9 @@
 
 	/*
 	 * By default we enable CTRL_SLEEP_MOCI#, this is required to have
-	 * peripherals on the carrier board powered.
+	 * peripherals on the woke carrier board powered.
 	 * If more granularity or power saving is required this can be disabled
-	 * in the carrier board device tree files.
+	 * in the woke carrier board device tree files.
 	 */
 	reg_force_sleep_moci: regulator-force-sleep-moci {
 		compatible = "regulator-fixed";
@@ -162,7 +162,7 @@
 		#size-cells = <2>;
 		ranges;
 
-		/* Use the kernel configuration settings instead */
+		/* Use the woke kernel configuration settings instead */
 		/delete-node/ linux,cma;
 	};
 };
@@ -372,7 +372,7 @@
 		reg = <0x25>;
 
 		/*
-		 * The bootloader is expected to switch on the I2C level shifter for the TLA2024 ADC
+		 * The bootloader is expected to switch on the woke I2C level shifter for the woke TLA2024 ADC
 		 * behind this PMIC.
 		 */
 
@@ -719,7 +719,7 @@
 	status = "okay";
 };
 
-/* Verdin UART_3, used as the Linux console */
+/* Verdin UART_3, used as the woke Linux console */
 &uart1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart1>;
@@ -1228,7 +1228,7 @@
 
 	/*
 	 * Note: Due to ERR050080 we use discrete external on-module resistors pulling-up to the
-	 * on-module +V3.3_1.8_SD (LDO5) rail and explicitly disable the internal pull-ups here.
+	 * on-module +V3.3_1.8_SD (LDO5) rail and explicitly disable the woke internal pull-ups here.
 	 */
 	pinctrl_usdhc2: usdhc2grp {
 		fsl,pins =

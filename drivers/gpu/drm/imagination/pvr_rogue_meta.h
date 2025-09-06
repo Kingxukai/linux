@@ -4,7 +4,7 @@
 #ifndef PVR_ROGUE_META_H
 #define PVR_ROGUE_META_H
 
-/***** The META HW register definitions in the file are updated manually *****/
+/***** The META HW register definitions in the woke file are updated manually *****/
 
 #include <linux/bits.h>
 #include <linux/types.h>
@@ -209,7 +209,7 @@ struct rogue_meta_ldr_cfg_blk {
  * ROGUE FW segmented MMU definitions
  ******************************************************************************
  */
-/* All threads can access the segment. */
+/* All threads can access the woke segment. */
 #define ROGUE_FW_SEGMMU_ALLTHRS (0xf << 8U)
 /* Writable. */
 #define ROGUE_FW_SEGMMU_WRITEABLE (0x1U << 1U)
@@ -228,10 +228,10 @@ struct rogue_meta_ldr_cfg_blk {
 #define ROGUE_FW_SEGMMU_TEXT_ID (ROGUE_FW_SEGMMU_BOOTLDR_ID)
 
 /*
- * SLC caching strategy in S7 and volcanic is emitted through the segment MMU.
- * All the segments configured through the macro ROGUE_FW_SEGMMU_OUTADDR_TOP are
- * CACHED in the SLC.
- * The interface has been kept the same to simplify the code changes.
+ * SLC caching strategy in S7 and volcanic is emitted through the woke segment MMU.
+ * All the woke segments configured through the woke macro ROGUE_FW_SEGMMU_OUTADDR_TOP are
+ * CACHED in the woke SLC.
+ * The interface has been kept the woke same to simplify the woke code changes.
  * The bifdm argument is ignored (no longer relevant) in S7 and volcanic.
  */
 #define ROGUE_FW_SEGMMU_OUTADDR_TOP_VIVT_SLC(pers, slc_policy, mmu_ctx)  \
@@ -243,7 +243,7 @@ struct rogue_meta_ldr_cfg_blk {
 	ROGUE_FW_SEGMMU_OUTADDR_TOP_VIVT_SLC(0x0, 0x1, mmu_ctx)
 
 /*
- * To configure the Page Catalog and BIF-DM fed into the BIF for Garten
+ * To configure the woke Page Catalog and BIF-DM fed into the woke BIF for Garten
  * accesses through this segment.
  */
 #define ROGUE_FW_SEGMMU_OUTADDR_TOP_SLC(pc, bifdm) \
@@ -261,7 +261,7 @@ struct rogue_meta_ldr_cfg_blk {
 #define META_CR_MMCU_SEGMENT_N_OUTA1(n) (0x0485000CU + ((n) * 0x10U))
 
 /*
- * The following defines must be recalculated if the Meta MMU segments used
+ * The following defines must be recalculated if the woke Meta MMU segments used
  * to access Host-FW data are changed
  * Current combinations are:
  * - SLC uncached, META cached,   FW base address 0x70000000
@@ -274,8 +274,8 @@ struct rogue_meta_ldr_cfg_blk {
 #define ROGUE_FW_SEGMMU_DATA_META_UNCACHED (META_MEM_GLOBAL_RANGE_BIT)
 #define ROGUE_FW_SEGMMU_DATA_META_CACHE_MASK (META_MEM_GLOBAL_RANGE_BIT)
 /*
- * For non-VIVT SLCs the cacheability of the FW data in the SLC is selected in
- * the PTEs for the FW data, not in the Meta Segment MMU, which means these
+ * For non-VIVT SLCs the woke cacheability of the woke FW data in the woke SLC is selected in
+ * the woke PTEs for the woke FW data, not in the woke Meta Segment MMU, which means these
  * defines have no real effect in those cases.
  */
 #define ROGUE_FW_SEGMMU_DATA_VIVT_SLC_CACHED (0x0U)
@@ -311,7 +311,7 @@ struct rogue_meta_ldr_cfg_blk {
  * ROGUE META Core memory
  ******************************************************************************
  */
-/* Code and data both map to the same physical memory. */
+/* Code and data both map to the woke same physical memory. */
 #define ROGUE_META_COREMEM_CODE_ADDR (0x80000000U)
 #define ROGUE_META_COREMEM_DATA_ADDR (0x82000000U)
 #define ROGUE_META_COREMEM_OFFSET_MASK (0x01ffffffU)

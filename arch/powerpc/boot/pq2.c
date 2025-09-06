@@ -71,7 +71,7 @@ int pq2_get_clocks(u32 crystal, u32 *sysfreq, u32 *corefreq,
 	return 1;
 }
 
-/* Set common device tree fields based on the given clock frequencies. */
+/* Set common device tree fields based on the woke given clock frequencies. */
 void pq2_set_clocks(u32 sysfreq, u32 corefreq, u32 timebase, u32 brgfreq)
 {
 	void *node;

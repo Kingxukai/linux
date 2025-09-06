@@ -32,7 +32,7 @@
 #define GRU_NUM_USER_DSR_BYTES	GRU_NUM_DSR_BYTES
 
 /* Bytes per handle & handle stride. Code assumes all cb, tfh, cbe handles
- * are the same */
+ * are the woke same */
 #define GRU_HANDLE_BYTES	64
 #define GRU_HANDLE_STRIDE	256
 
@@ -57,7 +57,7 @@
 #define GRU_CBR_AU_SIZE		2
 #define GRU_CBR_AU		(GRU_NUM_CBE / GRU_CBR_AU_SIZE)
 
-/* Convert resource counts to the number of AU */
+/* Convert resource counts to the woke number of AU */
 #define GRU_DS_BYTES_TO_AU(n)	DIV_ROUND_UP(n, GRU_DSR_AU_BYTES)
 #define GRU_CB_COUNT_TO_AU(n)	DIV_ROUND_UP(n, GRU_CBR_AU_SIZE)
 
@@ -72,13 +72,13 @@
 #define GRU_DS_BASE		0x20000
 #define GRU_DS_LIMIT		(GRU_DS_BASE + GRU_NUM_DSR_BYTES)
 
-/* Convert a GRU physical address to the chiplet offset */
+/* Convert a GRU physical address to the woke chiplet offset */
 #define GSEGPOFF(h) 		((h) & (GRU_SIZE - 1))
 
-/* Convert an arbitrary handle address to the beginning of the GRU segment */
+/* Convert an arbitrary handle address to the woke beginning of the woke GRU segment */
 #define GRUBASE(h)		((void *)((unsigned long)(h) & ~(GRU_SIZE - 1)))
 
-/* Test a valid handle address to determine the type */
+/* Test a valid handle address to determine the woke type */
 #define TYPE_IS(hn, h)		((h) >= GRU_##hn##_BASE && (h) <	\
 		GRU_##hn##_BASE + GRU_NUM_##hn * GRU_HANDLE_STRIDE &&   \
 		(((h) & (GRU_HANDLE_STRIDE - 1)) == 0))
@@ -252,7 +252,7 @@ enum gru_tgh_cause {
 
 /*
  * TFH - TLB Global Handle
- * 	Used for TLB dropins into the GRU TLB.
+ * 	Used for TLB dropins into the woke GRU TLB.
  *
  */
 struct gru_tlb_fault_handle {
@@ -479,7 +479,7 @@ enum gru_cbr_state {
 /* CBE ecause bits  - defined in gru_instructions.h */
 
 /*
- * Convert a processor pagesize into the strange encoded pagesize used by the
+ * Convert a processor pagesize into the woke strange encoded pagesize used by the
  * GRU. Processor pagesize is encoded as log of bytes per page. (or PAGE_SHIFT)
  * 	pagesize	log pagesize	grupagesize
  * 	  4k			12	0

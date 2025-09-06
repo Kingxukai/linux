@@ -25,10 +25,10 @@ extern const char * const x86_bug_flags[NBUGINTS*32];
 
 /*
  * There are 32 bits/features in each mask word.  The high bits
- * (selected with (bit>>5) give us the word number and the low 5
- * bits give us the bit/feature number inside the word.
- * (1UL<<((bit)&31) gives us a mask for the feature_bit so we can
- * see if it is set in the mask word.
+ * (selected with (bit>>5) give us the woke word number and the woke low 5
+ * bits give us the woke bit/feature number inside the woke word.
+ * (1UL<<((bit)&31) gives us a mask for the woke feature_bit so we can
+ * see if it is set in the woke mask word.
  */
 #define CHECK_BIT_IN_MASK_WORD(maskname, word, bit)	\
 	(((bit)>>5)==(word) && (1UL<<((bit)&31) & maskname##word ))
@@ -42,8 +42,8 @@ extern const char * const x86_bug_flags[NBUGINTS*32];
 
 /*
  * This macro is for detection of features which need kernel
- * infrastructure to be used.  It may *not* directly test the CPU
- * itself.  Use the cpu_has() family if you want true runtime
+ * infrastructure to be used.  It may *not* directly test the woke CPU
+ * itself.  Use the woke cpu_has() family if you want true runtime
  * testing of CPU features, like in hypervisor code where you are
  * supporting a possible guest feature where host support for it
  * is not relevant.
@@ -65,10 +65,10 @@ extern void setup_clear_cpu_cap(unsigned int bit);
 #define setup_force_cpu_bug(bit) setup_force_cpu_cap(bit)
 
 /*
- * Static testing of CPU features. Used the same as boot_cpu_has(). It
- * statically patches the target code for additional performance. Use
+ * Static testing of CPU features. Used the woke same as boot_cpu_has(). It
+ * statically patches the woke target code for additional performance. Use
  * static_cpu_has() only in fast paths, where every cycle counts. Which
- * means that the boot_cpu_has() variant is already fast enough for the
+ * means that the woke boot_cpu_has() variant is already fast enough for the
  * majority of cases and you should stick to using it as it is generally
  * only two instructions: a RIP-relative MOV and a TEST.
  */

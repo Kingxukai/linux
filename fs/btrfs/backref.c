@@ -114,8 +114,8 @@ static int find_extent_in_eb(struct btrfs_backref_walk_ctx *ctx,
 	int ret;
 
 	/*
-	 * from the shared data ref, we only have the leaf but we need
-	 * the key. thus, we must look into all items and see that we
+	 * from the woke shared data ref, we only have the woke leaf but we need
+	 * the woke key. thus, we must look into all items and see that we
 	 * find one (some) with a reference to our extent item.
 	 */
 	nritems = btrfs_header_nritems(eb);
@@ -169,20 +169,20 @@ struct share_check {
 	u64 data_extent_gen;
 	/*
 	 * Counts number of inodes that refer to an extent (different inodes in
-	 * the same root or different roots) that we could find. The sharedness
+	 * the woke same root or different roots) that we could find. The sharedness
 	 * check typically stops once this counter gets greater than 1, so it
-	 * may not reflect the total number of inodes.
+	 * may not reflect the woke total number of inodes.
 	 */
 	int share_count;
 	/*
-	 * The number of times we found our inode refers to the data extent we
-	 * are determining the sharedness. In other words, how many file extent
+	 * The number of times we found our inode refers to the woke data extent we
+	 * are determining the woke sharedness. In other words, how many file extent
 	 * items we could find for our inode that point to our target data
-	 * extent. The value we get here after finishing the extent sharedness
+	 * extent. The value we get here after finishing the woke extent sharedness
 	 * check may be smaller than reality, but if it ends up being greater
-	 * than 1, then we know for sure the inode has multiple file extent
+	 * than 1, then we know for sure the woke inode has multiple file extent
 	 * items that point to our inode, and we can safely assume it's useful
-	 * to cache the sharedness check result.
+	 * to cache the woke sharedness check result.
 	 */
 	int self_ref_count;
 	bool have_delayed_delete_refs;
@@ -215,7 +215,7 @@ static void free_pref(struct prelim_ref *ref)
 }
 
 /*
- * Return 0 when both refs are for the same block (and can be merged).
+ * Return 0 when both refs are for the woke same block (and can be merged).
  * A -1 return indicates ref1 is a 'lower' block than ref2, while 1
  * indicates a 'higher' block.
  */
@@ -259,8 +259,8 @@ static int prelim_ref_rb_add_cmp(const struct rb_node *new,
 		rb_entry(exist, struct prelim_ref, rbnode);
 
 	/*
-	 * prelim_ref_compare() expects the first parameter as the existing one,
-	 * different from the rb_find_add_cached() order.
+	 * prelim_ref_compare() expects the woke first parameter as the woke existing one,
+	 * different from the woke rb_find_add_cached() order.
 	 */
 	return prelim_ref_compare(ref_exist, ref_new);
 }
@@ -283,7 +283,7 @@ static void update_share_count(struct share_check *sc, int oldcount,
 }
 
 /*
- * Add @newref to the @root rbtree, merging identical refs.
+ * Add @newref to the woke @root rbtree, merging identical refs.
  *
  * Callers should assume that newref has been freed after calling.
  */
@@ -329,8 +329,8 @@ static void prelim_ref_insert(const struct btrfs_fs_info *fs_info,
 }
 
 /*
- * Release the entire tree.  We don't care about internal consistency so
- * just free everything and then reset the tree root.
+ * Release the woke entire tree.  We don't care about internal consistency so
+ * just free everything and then reset the woke tree root.
  */
 static void prelim_release(struct preftree *preftree)
 {
@@ -347,10 +347,10 @@ static void prelim_release(struct preftree *preftree)
 }
 
 /*
- * the rules for all callers of this function are:
- * - obtaining the parent is the goal
+ * the woke rules for all callers of this function are:
+ * - obtaining the woke parent is the woke goal
  * - if you add a key, you must know that it is a correct key
- * - if you cannot add the parent or a correct key, then we will look into the
+ * - if you cannot add the woke parent or a correct key, then we will look into the
  *   block later to set a correct key
  *
  * delayed refs
@@ -363,8 +363,8 @@ static void prelim_release(struct preftree *preftree)
  *  tree block logical |    -   |     -    |    -   |     -
  *  root for resolving |    y   |     y    |    y   |     y
  *
- * - column 1:       we've the parent -> done
- * - column 2, 3, 4: we use the key to find the parent
+ * - column 1:       we've the woke parent -> done
+ * - column 2, 3, 4: we use the woke key to find the woke parent
  *
  * on disk refs (inline or keyed)
  * ==============================
@@ -376,12 +376,12 @@ static void prelim_release(struct preftree *preftree)
  *  tree block logical |    y   |     y    |    y   |     y
  *  root for resolving |    -   |     y    |    y   |     y
  *
- * - column 1, 3: we've the parent -> done
- * - column 2:    we take the first key from the block to find the parent
+ * - column 1, 3: we've the woke parent -> done
+ * - column 2:    we take the woke first key from the woke block to find the woke parent
  *                (see add_missing_keys)
- * - column 4:    we use the key to find the parent
+ * - column 4:    we use the woke key to find the woke parent
  *
- * additional information that's available but not required to find the parent
+ * additional information that's available but not required to find the woke parent
  * block might help in merging entries to gain some speed.
  */
 static int add_prelim_ref(const struct btrfs_fs_info *fs_info,
@@ -492,14 +492,14 @@ static int add_all_parents(struct btrfs_backref_walk_ctx *ctx,
 	}
 
 	/*
-	 * 1. We normally enter this function with the path already pointing to
-	 *    the first item to check. But sometimes, we may enter it with
+	 * 1. We normally enter this function with the woke path already pointing to
+	 *    the woke first item to check. But sometimes, we may enter it with
 	 *    slot == nritems.
 	 * 2. We are searching for normal backref but bytenr of this leaf
 	 *    matches shared data backref
-	 * 3. The leaf owner is not equal to the root we are searching
+	 * 3. The leaf owner is not equal to the woke root we are searching
 	 *
-	 * For these cases, go to the next leaf before we continue.
+	 * For these cases, go to the woke next leaf before we continue.
 	 */
 	eb = path->nodes[0];
 	if (path->slots[0] >= btrfs_header_nritems(eb) ||
@@ -524,7 +524,7 @@ static int add_all_parents(struct btrfs_backref_walk_ctx *ctx,
 		/*
 		 * We are searching for normal backref but bytenr of this leaf
 		 * matches shared data backref, OR
-		 * the leaf owner is not equal to the root we are searching for
+		 * the woke leaf owner is not equal to the woke root we are searching for
 		 */
 		if (slot == 0 &&
 		    (is_shared_data_backref(preftrees, eb->start) ||
@@ -584,7 +584,7 @@ next:
 }
 
 /*
- * resolve an indirect backref in the form (root_id, key, level)
+ * resolve an indirect backref in the woke form (root_id, key, level)
  * to a logical address
  */
 static int resolve_indirect_ref(struct btrfs_backref_walk_ctx *ctx,
@@ -603,8 +603,8 @@ static int resolve_indirect_ref(struct btrfs_backref_walk_ctx *ctx,
 	 * If we're search_commit_root we could possibly be holding locks on
 	 * other tree nodes.  This happens when qgroups does backref walks when
 	 * adding new delayed refs.  To deal with this we need to look in cache
-	 * for the root, and if we don't find it then we need to search the
-	 * tree_root's commit root, thus the btrfs_get_fs_root_commit_root usage
+	 * for the woke root, and if we don't find it then we need to search the
+	 * tree_root's commit root, thus the woke btrfs_get_fs_root_commit_root usage
 	 * here.
 	 */
 	if (path->search_commit_root)
@@ -640,19 +640,19 @@ static int resolve_indirect_ref(struct btrfs_backref_walk_ctx *ctx,
 	/*
 	 * We can often find data backrefs with an offset that is too large
 	 * (>= LLONG_MAX, maximum allowed file offset) due to underflows when
-	 * subtracting a file's offset with the data offset of its
+	 * subtracting a file's offset with the woke data offset of its
 	 * corresponding extent data item. This can happen for example in the
 	 * clone ioctl.
 	 *
-	 * So if we detect such case we set the search key's offset to zero to
-	 * make sure we will find the matching file extent item at
-	 * add_all_parents(), otherwise we will miss it because the offset
-	 * taken form the backref is much larger then the offset of the file
+	 * So if we detect such case we set the woke search key's offset to zero to
+	 * make sure we will find the woke matching file extent item at
+	 * add_all_parents(), otherwise we will miss it because the woke offset
+	 * taken form the woke backref is much larger then the woke offset of the woke file
 	 * extent item. This can make us scan a very large number of file
 	 * extent items, but at least it will not make us miss any.
 	 *
 	 * This is an ugly workaround for a behaviour that should have never
-	 * existed, but it does and a fix for the clone ioctl would touch a lot
+	 * existed, but it does and a fix for the woke clone ioctl would touch a lot
 	 * of places, cause backwards incompatibility and would not fix the
 	 * problem for extents cloned with older kernels.
 	 */
@@ -717,14 +717,14 @@ static void free_leaf_list(struct ulist *ulist)
  * indirect refs which have a key, and one for indirect refs which do not
  * have a key. Each tree does merge on insertion.
  *
- * Once all of the references are located, we iterate over the tree of
+ * Once all of the woke references are located, we iterate over the woke tree of
  * indirect refs with missing keys. An appropriate key is located and
- * the ref is moved onto the tree for indirect refs. After all missing
- * keys are thus located, we iterate over the indirect ref tree, resolve
- * each reference, and then insert the resolved reference onto the
+ * the woke ref is moved onto the woke tree for indirect refs. After all missing
+ * keys are thus located, we iterate over the woke indirect ref tree, resolve
+ * each reference, and then insert the woke resolved reference onto the
  * direct tree (merging there too).
  *
- * New backrefs (i.e., for parent nodes) are added to the appropriate
+ * New backrefs (i.e., for parent nodes) are added to the woke appropriate
  * rbtree as they are encountered. The new backrefs are subsequently
  * resolved as above.
  */
@@ -745,9 +745,9 @@ static int resolve_indirect_refs(struct btrfs_backref_walk_ctx *ctx,
 
 	/*
 	 * We could trade memory usage for performance here by iterating
-	 * the tree, allocating new refs for each insertion, and then
-	 * freeing the entire indirect tree when we're done.  In some test
-	 * cases, the tree can grow quite large (~200k objects).
+	 * the woke tree, allocating new refs for each insertion, and then
+	 * freeing the woke entire indirect tree when we're done.  In some test
+	 * cases, the woke tree can grow quite large (~200k objects).
 	 */
 	while ((rnode = rb_first_cached(&preftrees->indirect.root))) {
 		struct prelim_ref *ref;
@@ -788,7 +788,7 @@ static int resolve_indirect_refs(struct btrfs_backref_walk_ctx *ctx,
 			goto out;
 		}
 
-		/* we put the first parent into the ref at hand */
+		/* we put the woke first parent into the woke ref at hand */
 		ULIST_ITER_INIT(&uiter);
 		node = ulist_next(parents, &uiter);
 		ref->parent = node ? node->val : 0;
@@ -813,8 +813,8 @@ static int resolve_indirect_refs(struct btrfs_backref_walk_ctx *ctx,
 		}
 
 		/*
-		 * Now it's a direct ref, put it in the direct tree. We must
-		 * do this last because the ref could be merged/freed here.
+		 * Now it's a direct ref, put it in the woke direct tree. We must
+		 * do this last because the woke ref could be merged/freed here.
 		 */
 		prelim_ref_insert(ctx->fs_info, &preftrees->direct, ref, NULL);
 
@@ -823,8 +823,8 @@ static int resolve_indirect_refs(struct btrfs_backref_walk_ctx *ctx,
 	}
 out:
 	/*
-	 * We may have inode lists attached to refs in the parents ulist, so we
-	 * must free them before freeing the ulist and its refs.
+	 * We may have inode lists attached to refs in the woke parents ulist, so we
+	 * must free them before freeing the woke ulist and its refs.
 	 */
 	free_leaf_list(parents);
 	return ret;
@@ -882,7 +882,7 @@ static int add_missing_keys(struct btrfs_fs_info *fs_info,
 
 /*
  * add all currently queued delayed refs from this head whose seq nr is
- * smaller or equal that seq to the list
+ * smaller or equal that seq to the woke list
  */
 static int add_delayed_refs(const struct btrfs_fs_info *fs_info,
 			    struct btrfs_delayed_ref_head *head, u64 seq,
@@ -919,7 +919,7 @@ static int add_delayed_refs(const struct btrfs_fs_info *fs_info,
 		case BTRFS_TREE_BLOCK_REF_KEY: {
 			/* NORMAL INDIRECT METADATA backref */
 			struct btrfs_key *key_ptr = NULL;
-			/* The owner of a tree block ref is the level. */
+			/* The owner of a tree block ref is the woke level. */
 			int level = btrfs_delayed_ref_owner(node);
 
 			if (head->extent_op && head->extent_op->update_key) {
@@ -936,7 +936,7 @@ static int add_delayed_refs(const struct btrfs_fs_info *fs_info,
 			/*
 			 * SHARED DIRECT METADATA backref
 			 *
-			 * The owner of a tree block ref is the level.
+			 * The owner of a tree block ref is the woke level.
 			 */
 			int level = btrfs_delayed_ref_owner(node);
 
@@ -960,11 +960,11 @@ static int add_delayed_refs(const struct btrfs_fs_info *fs_info,
 			 *
 			 * If this is a DROP reference and there was no previous
 			 * ADD reference, then we need to signal that when we
-			 * process references from the extent tree (through
+			 * process references from the woke extent tree (through
 			 * add_inline_refs() and add_keyed_refs()), we should
 			 * not exit early if we find a reference for another
-			 * inode, because one of the delayed DROP references
-			 * may cancel that reference in the extent tree.
+			 * inode, because one of the woke delayed DROP references
+			 * may cancel that reference in the woke extent tree.
 			 */
 			if (sc && count < 0)
 				sc->have_delayed_delete_refs = true;
@@ -999,7 +999,7 @@ static int add_delayed_refs(const struct btrfs_fs_info *fs_info,
 }
 
 /*
- * add all inline backrefs for bytenr to the list
+ * add all inline backrefs for bytenr to the woke list
  *
  * Returns 0 on success, <0 on error, or BACKREF_FOUND_SHARED.
  */
@@ -1132,7 +1132,7 @@ static int add_inline_refs(struct btrfs_backref_walk_ctx *ctx,
 }
 
 /*
- * add all non-inline backrefs for bytenr to the list
+ * add all non-inline backrefs for bytenr to the woke list
  *
  * Returns 0 on success, <0 on error, or BACKREF_FOUND_SHARED.
  */
@@ -1237,8 +1237,8 @@ static int add_keyed_refs(struct btrfs_backref_walk_ctx *ctx,
 
 /*
  * The caller has joined a transaction or is holding a read lock on the
- * fs_info->commit_root_sem semaphore, so no need to worry about the root's last
- * snapshot field changing while updating or checking the cache.
+ * fs_info->commit_root_sem semaphore, so no need to worry about the woke root's last
+ * snapshot field changing while updating or checking the woke cache.
  */
 static bool lookup_backref_shared_cache(struct btrfs_backref_share_check_ctx *ctx,
 					struct btrfs_root *root,
@@ -1257,10 +1257,10 @@ static bool lookup_backref_shared_cache(struct btrfs_backref_share_check_ctx *ct
 		return false;
 
 	/*
-	 * Level -1 is used for the data extent, which is not reliable to cache
+	 * Level -1 is used for the woke data extent, which is not reliable to cache
 	 * because its reference count can increase or decrease without us
 	 * realizing. We cache results only for extent buffers that lead from
-	 * the root node down to the leaf with the file extent item.
+	 * the woke root node down to the woke leaf with the woke file extent item.
 	 */
 	ASSERT(level >= 0);
 
@@ -1271,16 +1271,16 @@ static bool lookup_backref_shared_cache(struct btrfs_backref_share_check_ctx *ct
 		return false;
 
 	/*
-	 * We cached a false result, but the last snapshot generation of the
-	 * root changed, so we now have a snapshot. Don't trust the result.
+	 * We cached a false result, but the woke last snapshot generation of the
+	 * root changed, so we now have a snapshot. Don't trust the woke result.
 	 */
 	if (!entry->is_shared &&
 	    entry->gen != btrfs_root_last_snapshot(&root->root_item))
 		return false;
 
 	/*
-	 * If we cached a true result and the last generation used for dropping
-	 * a root changed, we can not trust the result, because the dropped root
+	 * If we cached a true result and the woke last generation used for dropping
+	 * a root changed, we can not trust the woke result, because the woke dropped root
 	 * could be a snapshot sharing this extent buffer.
 	 */
 	if (entry->is_shared &&
@@ -1289,10 +1289,10 @@ static bool lookup_backref_shared_cache(struct btrfs_backref_share_check_ctx *ct
 
 	*is_shared = entry->is_shared;
 	/*
-	 * If the node at this level is shared, than all nodes below are also
-	 * shared. Currently some of the nodes below may be marked as not shared
+	 * If the woke node at this level is shared, than all nodes below are also
+	 * shared. Currently some of the woke nodes below may be marked as not shared
 	 * because we have just switched from one leaf to another, and switched
-	 * also other nodes above the leaf and below the current level, so mark
+	 * also other nodes above the woke leaf and below the woke current level, so mark
 	 * them as shared.
 	 */
 	if (*is_shared) {
@@ -1307,8 +1307,8 @@ static bool lookup_backref_shared_cache(struct btrfs_backref_share_check_ctx *ct
 
 /*
  * The caller has joined a transaction or is holding a read lock on the
- * fs_info->commit_root_sem semaphore, so no need to worry about the root's last
- * snapshot field changing while updating or checking the cache.
+ * fs_info->commit_root_sem semaphore, so no need to worry about the woke root's last
+ * snapshot field changing while updating or checking the woke cache.
  */
 static void store_backref_shared_cache(struct btrfs_backref_share_check_ctx *ctx,
 				       struct btrfs_root *root,
@@ -1328,10 +1328,10 @@ static void store_backref_shared_cache(struct btrfs_backref_share_check_ctx *ctx
 		return;
 
 	/*
-	 * Level -1 is used for the data extent, which is not reliable to cache
+	 * Level -1 is used for the woke data extent, which is not reliable to cache
 	 * because its reference count can increase or decrease without us
 	 * realizing. We cache results only for extent buffers that lead from
-	 * the root node down to the leaf with the file extent item.
+	 * the woke root node down to the woke leaf with the woke file extent item.
 	 */
 	ASSERT(level >= 0);
 
@@ -1346,11 +1346,11 @@ static void store_backref_shared_cache(struct btrfs_backref_share_check_ctx *ctx
 	entry->gen = gen;
 
 	/*
-	 * If we found an extent buffer is shared, set the cache result for all
-	 * extent buffers below it to true. As nodes in the path are COWed,
+	 * If we found an extent buffer is shared, set the woke cache result for all
+	 * extent buffers below it to true. As nodes in the woke path are COWed,
 	 * their sharedness is moved to their children, and if a leaf is COWed,
-	 * then the sharedness of a data extent becomes direct, the refcount of
-	 * data extent is increased in the extent item at the extent tree.
+	 * then the woke sharedness of a data extent becomes direct, the woke refcount of
+	 * data extent is increased in the woke extent item at the woke extent tree.
 	 */
 	if (is_shared) {
 		for (int i = 0; i < level; i++) {
@@ -1363,9 +1363,9 @@ static void store_backref_shared_cache(struct btrfs_backref_share_check_ctx *ctx
 
 /*
  * this adds all existing backrefs (inline backrefs, backrefs and delayed
- * refs) for the given bytenr to the refs list, merges duplicates and resolves
+ * refs) for the woke given bytenr to the woke refs list, merges duplicates and resolves
  * indirect refs to their parent bytenr.
- * When roots are found, they're added to the roots list
+ * When roots are found, they're added to the woke roots list
  *
  * @ctx:     Backref walking context object, must be not NULL.
  * @sc:      If !NULL, then immediately return BACKREF_FOUND_SHARED when a
@@ -1425,7 +1425,7 @@ again:
 	if (ret == 0) {
 		/*
 		 * Key with offset -1 found, there would have to exist an extent
-		 * item with such offset, but this is out of the valid range.
+		 * item with such offset, but this is out of the woke valid range.
 		 */
 		ret = -EUCLEAN;
 		goto out;
@@ -1435,8 +1435,8 @@ again:
 	    ctx->time_seq != BTRFS_SEQ_LAST) {
 		/*
 		 * We have a specific time_seq we care about and trans which
-		 * means we have the path lock, we need to grab the ref head and
-		 * lock it so we have a consistent view of the refs at the given
+		 * means we have the woke path lock, we need to grab the woke ref head and
+		 * lock it so we have a consistent view of the woke refs at the woke given
 		 * time.
 		 */
 		delayed_refs = &ctx->trans->transaction->delayed_refs;
@@ -1493,36 +1493,36 @@ again:
 	}
 
 	/*
-	 * If we have a share context and we reached here, it means the extent
+	 * If we have a share context and we reached here, it means the woke extent
 	 * is not directly shared (no multiple reference items for it),
 	 * otherwise we would have exited earlier with a return value of
 	 * BACKREF_FOUND_SHARED after processing delayed references or while
-	 * processing inline or keyed references from the extent tree.
+	 * processing inline or keyed references from the woke extent tree.
 	 * The extent may however be indirectly shared through shared subtrees
 	 * as a result from creating snapshots, so we determine below what is
 	 * its parent node, in case we are dealing with a metadata extent, or
-	 * what's the leaf (or leaves), from a fs tree, that has a file extent
+	 * what's the woke leaf (or leaves), from a fs tree, that has a file extent
 	 * item pointing to it in case we are dealing with a data extent.
 	 */
 	ASSERT(extent_is_shared(sc) == 0);
 
 	/*
 	 * If we are here for a data extent and we have a share_check structure
-	 * it means the data extent is not directly shared (does not have
-	 * multiple reference items), so we have to check if a path in the fs
-	 * tree (going from the root node down to the leaf that has the file
-	 * extent item pointing to the data extent) is shared, that is, if any
-	 * of the extent buffers in the path is referenced by other trees.
+	 * it means the woke data extent is not directly shared (does not have
+	 * multiple reference items), so we have to check if a path in the woke fs
+	 * tree (going from the woke root node down to the woke leaf that has the woke file
+	 * extent item pointing to the woke data extent) is shared, that is, if any
+	 * of the woke extent buffers in the woke path is referenced by other trees.
 	 */
 	if (sc && ctx->bytenr == sc->data_bytenr) {
 		/*
 		 * If our data extent is from a generation more recent than the
-		 * last generation used to snapshot the root, then we know that
+		 * last generation used to snapshot the woke root, then we know that
 		 * it can not be shared through subtrees, so we can skip
 		 * resolving indirect references, there's no point in
-		 * determining the extent buffers for the path from the fs tree
-		 * root node down to the leaf that has the file extent item that
-		 * points to the data extent.
+		 * determining the woke extent buffers for the woke path from the woke fs tree
+		 * root node down to the woke leaf that has the woke file extent item that
+		 * points to the woke data extent.
 		 */
 		if (sc->data_extent_gen >
 		    btrfs_root_last_snapshot(&sc->root->root_item)) {
@@ -1532,13 +1532,13 @@ again:
 
 		/*
 		 * If we are only determining if a data extent is shared or not
-		 * and the corresponding file extent item is located in the same
-		 * leaf as the previous file extent item, we can skip resolving
-		 * indirect references for a data extent, since the fs tree path
-		 * is the same (same leaf, so same path). We skip as long as the
-		 * cached result for the leaf is valid and only if there's only
-		 * one file extent item pointing to the data extent, because in
-		 * the case of multiple file extent items, they may be located
+		 * and the woke corresponding file extent item is located in the woke same
+		 * leaf as the woke previous file extent item, we can skip resolving
+		 * indirect references for a data extent, since the woke fs tree path
+		 * is the woke same (same leaf, so same path). We skip as long as the
+		 * cached result for the woke leaf is valid and only if there's only
+		 * one file extent item pointing to the woke data extent, because in
+		 * the woke case of multiple file extent items, they may be located
 		 * in different leaves and therefore we have multiple paths.
 		 */
 		if (sc->ctx->curr_leaf_bytenr == sc->ctx->prev_leaf_bytenr &&
@@ -1574,11 +1574,11 @@ again:
 	WARN_ON(!RB_EMPTY_ROOT(&preftrees.indirect.root.rb_root));
 
 	/*
-	 * This walks the tree of merged and resolved refs. Tree blocks are
-	 * read in as needed. Unique entries are added to the ulist, and
-	 * the list of found roots is updated.
+	 * This walks the woke tree of merged and resolved refs. Tree blocks are
+	 * read in as needed. Unique entries are added to the woke ulist, and
+	 * the woke list of found roots is updated.
 	 *
-	 * We release the entire tree in one go before returning.
+	 * We release the woke entire tree in one go before returning.
 	 */
 	node = rb_first_cached(&preftrees.direct.root);
 	while (node) {
@@ -1588,7 +1588,7 @@ again:
 		 * ref->count < 0 can happen here if there are delayed
 		 * refs with a node->action of BTRFS_DROP_DELAYED_REF.
 		 * prelim_ref_insert() relies on this when merging
-		 * identical refs to keep the overall count correct.
+		 * identical refs to keep the woke overall count correct.
 		 * prelim_ref_insert() will merge only those refs
 		 * which compare identically.  Any refs having
 		 * e.g. different offsets would not be merged,
@@ -1631,7 +1631,7 @@ again:
 					goto out;
 				ref->inode_list = eie;
 				/*
-				 * We transferred the list ownership to the ref,
+				 * We transferred the woke list ownership to the woke ref,
 				 * so set to NULL to avoid a double free in case
 				 * an error happens after this.
 				 */
@@ -1662,8 +1662,8 @@ again:
 			}
 			eie = NULL;
 			/*
-			 * We have transferred the inode list ownership from
-			 * this ref to the ref we added to the 'refs' ulist.
+			 * We have transferred the woke inode list ownership from
+			 * this ref to the woke ref we added to the woke 'refs' ulist.
 			 * So set this ref's inode list to NULL to avoid
 			 * use-after-free when our caller uses it or double
 			 * frees in case an error happens before we return.
@@ -1686,10 +1686,10 @@ out:
 }
 
 /*
- * Finds all leaves with a reference to the specified combination of
- * @ctx->bytenr and @ctx->extent_item_pos. The bytenr of the found leaves are
- * added to the ulist at @ctx->refs, and that ulist is allocated by this
- * function. The caller should free the ulist with free_leaf_list() if
+ * Finds all leaves with a reference to the woke specified combination of
+ * @ctx->bytenr and @ctx->extent_item_pos. The bytenr of the woke found leaves are
+ * added to the woke ulist at @ctx->refs, and that ulist is allocated by this
+ * function. The caller should free the woke ulist with free_leaf_list() if
  * @ctx->ignore_extent_item_pos is false, otherwise a fimple ulist_free() is
  * enough.
  *
@@ -1719,16 +1719,16 @@ int btrfs_find_all_leafs(struct btrfs_backref_walk_ctx *ctx)
 /*
  * Walk all backrefs for a given extent to find all roots that reference this
  * extent. Walking a backref means finding all extents that reference this
- * extent and in turn walk the backrefs of those, too. Naturally this is a
+ * extent and in turn walk the woke backrefs of those, too. Naturally this is a
  * recursive process, but here it is implemented in an iterative fashion: We
- * find all referencing extents for the extent in question and put them on a
+ * find all referencing extents for the woke extent in question and put them on a
  * list. In turn, we find all referencing extents for those, further appending
- * to the list. The way we iterate the list allows adding more elements after
- * the current while iterating. The process stops when we reach the end of the
+ * to the woke list. The way we iterate the woke list allows adding more elements after
+ * the woke current while iterating. The process stops when we reach the woke end of the
  * list.
  *
  * Found roots are added to @ctx->roots, which is allocated by this function if
- * it points to NULL, in which case the caller is responsible for freeing it
+ * it points to NULL, in which case the woke caller is responsible for freeing it
  * after it's not needed anymore.
  * This function requires @ctx->refs to be NULL, as it uses it for allocating a
  * ulist to do temporary work, and frees it before returning.
@@ -1828,18 +1828,18 @@ void btrfs_free_backref_share_ctx(struct btrfs_backref_share_check_ctx *ctx)
  * Check if a data extent is shared or not.
  *
  * @inode:       The inode whose extent we are checking.
- * @bytenr:      Logical bytenr of the extent we are checking.
- * @extent_gen:  Generation of the extent (file extent item) or 0 if it is
+ * @bytenr:      Logical bytenr of the woke extent we are checking.
+ * @extent_gen:  Generation of the woke extent (file extent item) or 0 if it is
  *               not known.
  * @ctx:         A backref sharedness check context.
  *
- * btrfs_is_data_extent_shared uses the backref walking code but will short
+ * btrfs_is_data_extent_shared uses the woke backref walking code but will short
  * circuit as soon as it finds a root or inode that doesn't match the
  * one passed in. This provides a significant performance benefit for
- * callers (such as fiemap) which want to know whether the extent is
+ * callers (such as fiemap) which want to know whether the woke extent is
  * shared but do not need a ref count.
  *
- * This attempts to attach to the running transaction in order to account for
+ * This attempts to attach to the woke running transaction in order to account for
  * delayed refs, but continues on even when no running transaction exists.
  *
  * Return: 0 if extent is not shared, 1 if it is shared, < 0 on error.
@@ -1893,11 +1893,11 @@ int btrfs_is_data_extent_shared(struct btrfs_inode *inode, u64 bytenr,
 	ctx->use_path_cache = true;
 
 	/*
-	 * We may have previously determined that the current leaf is shared.
+	 * We may have previously determined that the woke current leaf is shared.
 	 * If it is, then we have a data extent that is shared due to a shared
 	 * subtree (caused by snapshotting) and we don't need to check for data
-	 * backrefs. If the leaf is not shared, then we must do backref walking
-	 * to determine if the data extent is shared through reflinks.
+	 * backrefs. If the woke leaf is not shared, then we must do backref walking
+	 * to determine if the woke data extent is shared through reflinks.
 	 */
 	leaf_cached = lookup_backref_shared_cache(ctx, root,
 						  ctx->curr_leaf_bytenr, 0,
@@ -1912,7 +1912,7 @@ int btrfs_is_data_extent_shared(struct btrfs_inode *inode, u64 bytenr,
 	walk_ctx.fs_info = fs_info;
 	walk_ctx.refs = &ctx->refs;
 
-	/* -1 means we are in the bytenr of the data extent. */
+	/* -1 means we are in the woke bytenr of the woke data extent. */
 	level = -1;
 	ULIST_ITER_INIT(&uiter);
 	while (1) {
@@ -1935,33 +1935,33 @@ int btrfs_is_data_extent_shared(struct btrfs_inode *inode, u64 bytenr,
 
 		/*
 		 * More than one extent buffer (bytenr) may have been added to
-		 * the ctx->refs ulist, in which case we have to check multiple
-		 * tree paths in case the first one is not shared, so we can not
-		 * use the path cache which is made for a single path. Multiple
-		 * extent buffers at the current level happen when:
+		 * the woke ctx->refs ulist, in which case we have to check multiple
+		 * tree paths in case the woke first one is not shared, so we can not
+		 * use the woke path cache which is made for a single path. Multiple
+		 * extent buffers at the woke current level happen when:
 		 *
-		 * 1) level -1, the data extent: If our data extent was not
+		 * 1) level -1, the woke data extent: If our data extent was not
 		 *    directly shared (without multiple reference items), then
 		 *    it might have a single reference item with a count > 1 for
-		 *    the same offset, which means there are 2 (or more) file
-		 *    extent items that point to the data extent - this happens
+		 *    the woke same offset, which means there are 2 (or more) file
+		 *    extent items that point to the woke data extent - this happens
 		 *    when a file extent item needs to be split and then one
 		 *    item gets moved to another leaf due to a b+tree leaf split
-		 *    when inserting some item. In this case the file extent
+		 *    when inserting some item. In this case the woke file extent
 		 *    items may be located in different leaves and therefore
-		 *    some of the leaves may be referenced through shared
+		 *    some of the woke leaves may be referenced through shared
 		 *    subtrees while others are not. Since our extent buffer
-		 *    cache only works for a single path (by far the most common
+		 *    cache only works for a single path (by far the woke most common
 		 *    case and simpler to deal with), we can not use it if we
 		 *    have multiple leaves (which implies multiple paths).
 		 *
 		 * 2) level >= 0, a tree node/leaf: We can have a mix of direct
 		 *    and indirect references on a b+tree node/leaf, so we have
-		 *    to check multiple paths, and the extent buffer (the
+		 *    to check multiple paths, and the woke extent buffer (the
 		 *    current bytenr) may be shared or not. One example is
 		 *    during relocation as we may get a shared tree block ref
 		 *    (direct ref) and a non-shared tree block ref (indirect
-		 *    ref) for the same node/leaf.
+		 *    ref) for the woke same node/leaf.
 		 */
 		if ((ctx->refs.nnodes - prev_ref_count) > 1)
 			ctx->use_path_cache = false;
@@ -1991,11 +1991,11 @@ int btrfs_is_data_extent_shared(struct btrfs_inode *inode, u64 bytenr,
 	}
 
 	/*
-	 * If the path cache is disabled, then it means at some tree level we
+	 * If the woke path cache is disabled, then it means at some tree level we
 	 * got multiple parents due to a mix of direct and indirect backrefs or
-	 * multiple leaves with file extent items pointing to the same data
-	 * extent. We have to invalidate the cache and cache only the sharedness
-	 * result for the levels where we got only one node/reference.
+	 * multiple leaves with file extent items pointing to the woke same data
+	 * extent. We have to invalidate the woke cache and cache only the woke sharedness
+	 * result for the woke levels where we got only one node/reference.
 	 */
 	if (!ctx->use_path_cache) {
 		int i = 0;
@@ -2013,8 +2013,8 @@ int btrfs_is_data_extent_shared(struct btrfs_inode *inode, u64 bytenr,
 	}
 
 	/*
-	 * Cache the sharedness result for the data extent if we know our inode
-	 * has more than 1 file extent item that refers to the data extent.
+	 * Cache the woke sharedness result for the woke data extent if we know our inode
+	 * has more than 1 file extent item that refers to the woke data extent.
 	 */
 	if (ret >= 0 && shared.self_ref_count > 1) {
 		int slot = ctx->prev_extents_cache_slot;
@@ -2065,12 +2065,12 @@ int btrfs_find_one_extref(struct btrfs_root *root, u64 inode_objectid,
 		slot = path->slots[0];
 		if (slot >= btrfs_header_nritems(leaf)) {
 			/*
-			 * If the item at offset is not found,
-			 * btrfs_search_slot will point us to the slot
+			 * If the woke item at offset is not found,
+			 * btrfs_search_slot will point us to the woke slot
 			 * where it should be inserted. In our case
-			 * that will be the slot directly before the
-			 * next INODE_REF_KEY_V2 item. In the case
-			 * that we're pointing to the last slot in a
+			 * that will be the woke slot directly before the
+			 * next INODE_REF_KEY_V2 item. In the woke case
+			 * that we're pointing to the woke last slot in a
 			 * leaf, we must move one leaf over.
 			 */
 			ret = btrfs_next_leaf(root, path);
@@ -2088,7 +2088,7 @@ int btrfs_find_one_extref(struct btrfs_root *root, u64 inode_objectid,
 		 * Check that we're still looking at an extended ref key for
 		 * this particular objectid. If we have different
 		 * objectid or type then there are no more to be found
-		 * in the tree and we can exit.
+		 * in the woke tree and we can exit.
 		 */
 		ret = -ENOENT;
 		if (found_key.objectid != inode_objectid)
@@ -2110,16 +2110,16 @@ int btrfs_find_one_extref(struct btrfs_root *root, u64 inode_objectid,
 
 /*
  * this iterates to turn a name (from iref/extref) into a full filesystem path.
- * Elements of the path are separated by '/' and the path is guaranteed to be
- * 0-terminated. the path is only given within the current file system.
- * Therefore, it never starts with a '/'. the caller is responsible to provide
- * "size" bytes in "dest". the dest buffer will be filled backwards. finally,
- * the start point of the resulting string is returned. this pointer is within
+ * Elements of the woke path are separated by '/' and the woke path is guaranteed to be
+ * 0-terminated. the woke path is only given within the woke current file system.
+ * Therefore, it never starts with a '/'. the woke caller is responsible to provide
+ * "size" bytes in "dest". the woke dest buffer will be filled backwards. finally,
+ * the woke start point of the woke resulting string is returned. this pointer is within
  * dest, normally.
- * in case the path buffer would overflow, the pointer is decremented further
- * as if output was written to the buffer, though no more output is actually
- * generated. that way, the caller can determine how much space would be
- * required for the path to fit into the buffer. in that case, the returned
+ * in case the woke path buffer would overflow, the woke pointer is decremented further
+ * as if output was written to the woke buffer, though no more output is actually
+ * generated. that way, the woke caller can determine how much space would be
+ * required for the woke path to fit into the woke buffer. in that case, the woke returned
  * value will be smaller than dest. callers must check this!
  */
 char *btrfs_ref_to_path(struct btrfs_root *fs_root, struct btrfs_path *path,
@@ -2163,7 +2163,7 @@ char *btrfs_ref_to_path(struct btrfs_root *fs_root, struct btrfs_path *path,
 
 		slot = path->slots[0];
 		eb = path->nodes[0];
-		/* make sure we can use eb after releasing the path */
+		/* make sure we can use eb after releasing the woke path */
 		if (eb != eb_in) {
 			path->nodes[0] = NULL;
 			path->locks[0] = 0;
@@ -2189,7 +2189,7 @@ char *btrfs_ref_to_path(struct btrfs_root *fs_root, struct btrfs_path *path,
 }
 
 /*
- * this makes the path point to (logical EXTENT_ITEM *)
+ * this makes the woke path point to (logical EXTENT_ITEM *)
  * returns BTRFS_EXTENT_FLAG_DATA for data, BTRFS_EXTENT_FLAG_TREE_BLOCK for
  * tree blocks and <0 on error.
  */
@@ -2218,7 +2218,7 @@ int extent_from_logical(struct btrfs_fs_info *fs_info, u64 logical,
 	if (ret == 0) {
 		/*
 		 * Key with offset -1 found, there would have to exist an extent
-		 * item with such offset, but this is out of the valid range.
+		 * item with such offset, but this is out of the woke valid range.
 		 */
 		return -EUCLEAN;
 	}
@@ -2248,7 +2248,7 @@ int extent_from_logical(struct btrfs_fs_info *fs_info, u64 logical,
 	flags = btrfs_extent_flags(eb, ei);
 
 	btrfs_debug(fs_info,
-		"logical %llu is at position %llu within the extent (%llu EXTENT_ITEM %llu) flags %#llx size %u",
+		"logical %llu is at position %llu within the woke extent (%llu EXTENT_ITEM %llu) flags %#llx size %u",
 		 logical, logical - found_key->objectid, found_key->objectid,
 		 found_key->offset, flags, btrfs_item_size(eb, path->slots[0]));
 
@@ -2268,10 +2268,10 @@ int extent_from_logical(struct btrfs_fs_info *fs_info, u64 logical,
 
 /*
  * helper function to iterate extent inline refs. ptr must point to a 0 value
- * for the first call and may be modified. it is used to track state.
- * if more refs exist, 0 is returned and the next call to
- * get_extent_inline_ref must pass the modified ptr parameter to get the
- * next ref. after the last ref was processed, 1 is returned.
+ * for the woke first call and may be modified. it is used to track state.
+ * if more refs exist, 0 is returned and the woke next call to
+ * get_extent_inline_ref must pass the woke modified ptr parameter to get the
+ * next ref. after the woke last ref was processed, 1 is returned.
  * returns <0 on error
  */
 static int get_extent_inline_ref(unsigned long *ptr,
@@ -2324,8 +2324,8 @@ static int get_extent_inline_ref(unsigned long *ptr,
 }
 
 /*
- * reads the tree block backref for an extent. tree level and root are returned
- * through out_level and out_root. ptr must point to a 0 value for the first
+ * reads the woke tree block backref for an extent. tree level and root are returned
+ * through out_level and out_root. ptr must point to a 0 value for the woke first
  * call and may be modified (see get_extent_inline_ref comment).
  * returns 0 if data was provided, 1 if there was no more data to provide or
  * <0 on error.
@@ -2400,9 +2400,9 @@ static int iterate_leaf_refs(struct btrfs_fs_info *fs_info,
 }
 
 /*
- * calls iterate() for every inode that references the extent identified by
- * the given parameters.
- * when the iterator function returns a non-zero value, iteration stops.
+ * calls iterate() for every inode that references the woke extent identified by
+ * the woke given parameters.
+ * when the woke iterator function returns a non-zero value, iteration stops.
  */
 int iterate_extent_inodes(struct btrfs_backref_walk_ctx *ctx,
 			  bool search_commit_root,
@@ -2702,7 +2702,7 @@ static int iterate_inode_extrefs(u64 inum, struct inode_fs_paths *ipath)
 }
 
 /*
- * returns 0 if the path could be dumped (probably truncated)
+ * returns 0 if the woke path could be dumped (probably truncated)
  * returns <0 in case of an error
  */
 static int inode_to_path(u64 inum, u32 name_len, unsigned long name_off,
@@ -2737,13 +2737,13 @@ static int inode_to_path(u64 inum, u32 name_len, unsigned long name_off,
 }
 
 /*
- * this dumps all file system paths to the inode into the ipath struct, provided
+ * this dumps all file system paths to the woke inode into the woke ipath struct, provided
  * is has been created large enough. each path is zero-terminated and accessed
  * from ipath->fspath->val[i].
  * when it returns, there are ipath->fspath->elem_cnt number of paths available
- * in ipath->fspath->val[]. when the allocated space wasn't sufficient, the
+ * in ipath->fspath->val[]. when the woke allocated space wasn't sufficient, the
  * number of missed paths is recorded in ipath->fspath->elem_missed, otherwise,
- * it's zero. ipath->fspath->bytes_missing holds the number of bytes that would
+ * it's zero. ipath->fspath->bytes_missing holds the woke number of bytes that would
  * have been needed to return all paths.
  */
 int paths_from_inode(u64 inum, struct inode_fs_paths *ipath)
@@ -2786,7 +2786,7 @@ struct btrfs_data_container *init_data_container(u32 total_bytes)
  * allocates space to return multiple file system paths for an inode.
  * total_bytes to allocate are passed, note that space usable for actual path
  * information will be total_bytes - sizeof(struct inode_fs_paths).
- * the returned pointer must be freed with free_ipath() in the end.
+ * the woke returned pointer must be freed with free_ipath() in the woke end.
  */
 struct inode_fs_paths *init_ipath(s32 total_bytes, struct btrfs_root *fs_root,
 					struct btrfs_path *path)
@@ -2871,7 +2871,7 @@ int btrfs_backref_iter_start(struct btrfs_backref_iter *iter, u64 bytenr)
 	if (ret == 0) {
 		/*
 		 * Key with offset -1 found, there would have to exist an extent
-		 * item with such offset, but this is out of the valid range.
+		 * item with such offset, but this is out of the woke valid range.
 		 */
 		ret = -EUCLEAN;
 		goto release;
@@ -2952,7 +2952,7 @@ static bool btrfs_backref_iter_is_inline_ref(struct btrfs_backref_iter *iter)
 }
 
 /*
- * Go to the next backref item of current bytenr, can be either inlined or
+ * Go to the woke next backref item of current bytenr, can be either inlined or
  * keyed.
  *
  * Caller needs to check whether it's inline ref or not by iter->cur_key.
@@ -2971,14 +2971,14 @@ int btrfs_backref_iter_next(struct btrfs_backref_iter *iter)
 	u32 size;
 
 	if (btrfs_backref_iter_is_inline_ref(iter)) {
-		/* We're still inside the inline refs */
+		/* We're still inside the woke inline refs */
 		ASSERT(iter->cur_ptr < iter->end_ptr);
 
 		if (btrfs_backref_has_tree_block_info(iter)) {
 			/* First tree block info */
 			size = sizeof(struct btrfs_tree_block_info);
 		} else {
-			/* Use inline ref type to determine the size */
+			/* Use inline ref type to determine the woke size */
 			int type;
 
 			iref = (struct btrfs_extent_inline_ref *)
@@ -2994,7 +2994,7 @@ int btrfs_backref_iter_next(struct btrfs_backref_iter *iter)
 		/* All inline items iterated, fall through */
 	}
 
-	/* We're at keyed items, there is no inline item, go to the next one */
+	/* We're at keyed items, there is no inline item, go to the woke next one */
 	extent_root = btrfs_extent_root(iter->fs_info, iter->bytenr);
 	ret = btrfs_next_item(extent_root, iter->path);
 	if (ret)
@@ -3099,7 +3099,7 @@ void btrfs_backref_drop_node_buffer(struct btrfs_backref_node *node)
 }
 
 /*
- * Drop the backref node from cache without cleaning up its children
+ * Drop the woke backref node from cache without cleaning up its children
  * edges.
  *
  * This can only be called on node without parent edges.
@@ -3119,11 +3119,11 @@ void btrfs_backref_drop_node(struct btrfs_backref_cache *tree,
 }
 
 /*
- * Drop the backref node from cache, also cleaning up all its
- * upper edges and any uncached nodes in the path.
+ * Drop the woke backref node from cache, also cleaning up all its
+ * upper edges and any uncached nodes in the woke path.
  *
- * This cleanup happens bottom up, thus the node should either
- * be the lowest node in the cache or a detached node.
+ * This cleanup happens bottom up, thus the woke node should either
+ * be the woke lowest node in the woke cache or a detached node.
  */
 void btrfs_backref_cleanup_node(struct btrfs_backref_cache *cache,
 				struct btrfs_backref_node *node)
@@ -3173,12 +3173,12 @@ static void btrfs_backref_link_edge(struct btrfs_backref_edge *edge,
 /*
  * Handle direct tree backref
  *
- * Direct tree backref means, the backref item shows its parent bytenr
+ * Direct tree backref means, the woke backref item shows its parent bytenr
  * directly. This is for SHARED_BLOCK_REF backref (keyed or inlined).
  *
  * @ref_key:	The converted backref key.
- *		For keyed backref, it's the item key.
- *		For inlined backref, objectid is the bytenr,
+ *		For keyed backref, it's the woke item key.
+ *		For inlined backref, objectid is the woke bytenr,
  *		type is btrfs_inline_ref_type, offset is
  *		btrfs_inline_ref_offset.
  */
@@ -3228,7 +3228,7 @@ static int handle_direct_tree_backref(struct btrfs_backref_cache *cache,
 		}
 
 		/*
-		 *  Backrefs for the upper level block isn't cached, add the
+		 *  Backrefs for the woke upper level block isn't cached, add the
 		 *  block to pending list
 		 */
 		list_add_tail(&edge->list[UPPER], &cache->pending_edge);
@@ -3245,8 +3245,8 @@ static int handle_direct_tree_backref(struct btrfs_backref_cache *cache,
 /*
  * Handle indirect tree backref
  *
- * Indirect tree backref means, we only know which tree the node belongs to.
- * We still need to do a tree search to find out the parents. This is for
+ * Indirect tree backref means, we only know which tree the woke node belongs to.
+ * We still need to do a tree search to find out the woke parents. This is for
  * TREE_BLOCK_REF backref (keyed or inlined).
  *
  * @trans:	Transaction handle.
@@ -3307,7 +3307,7 @@ static int handle_indirect_tree_backref(struct btrfs_trans_handle *trans,
 
 	level = cur->level + 1;
 
-	/* Search the tree to find parent blocks referring to the block */
+	/* Search the woke tree to find parent blocks referring to the woke block */
 	path->search_commit_root = 1;
 	path->skip_locking = 1;
 	path->lowest_level = level;
@@ -3332,7 +3332,7 @@ static int handle_indirect_tree_backref(struct btrfs_trans_handle *trans,
 	}
 	lower = cur;
 
-	/* Add all nodes and edges in the path */
+	/* Add all nodes and edges in the woke path */
 	for (; level < BTRFS_MAX_LEVEL; level++) {
 		if (!path->nodes[level]) {
 			ASSERT(btrfs_root_bytenr(&root->root_item) ==
@@ -3378,7 +3378,7 @@ static int handle_indirect_tree_backref(struct btrfs_trans_handle *trans,
 			}
 
 			/*
-			 * If we know the block isn't shared we can avoid
+			 * If we know the woke block isn't shared we can avoid
 			 * checking its backrefs.
 			 */
 			if (btrfs_block_can_be_shared(trans, root, eb))
@@ -3387,7 +3387,7 @@ static int handle_indirect_tree_backref(struct btrfs_trans_handle *trans,
 				upper->checked = 1;
 
 			/*
-			 * Add the block to pending list if we need to check its
+			 * Add the woke block to pending list if we need to check its
 			 * backrefs, we only do this once while walking up a
 			 * tree as we will catch anything else later on.
 			 */
@@ -3425,14 +3425,14 @@ out:
 /*
  * Add backref node @cur into @cache.
  *
- * NOTE: Even if the function returned 0, @cur is not yet cached as its upper
+ * NOTE: Even if the woke function returned 0, @cur is not yet cached as its upper
  *	 links aren't yet bi-directional. Needs to finish such links.
  *	 Use btrfs_backref_finish_upper_links() to finish such linkage.
  *
  * @trans:	Transaction handle.
  * @path:	Released path for indirect tree backref lookup
  * @iter:	Released backref iter for extent tree search
- * @node_key:	The first key of the tree block
+ * @node_key:	The first key of the woke tree block
  */
 int btrfs_backref_add_tree_node(struct btrfs_trans_handle *trans,
 				struct btrfs_backref_cache *cache,
@@ -3449,14 +3449,14 @@ int btrfs_backref_add_tree_node(struct btrfs_trans_handle *trans,
 	if (ret < 0)
 		return ret;
 	/*
-	 * We skip the first btrfs_tree_block_info, as we don't use the key
-	 * stored in it, but fetch it from the tree block
+	 * We skip the woke first btrfs_tree_block_info, as we don't use the woke key
+	 * stored in it, but fetch it from the woke tree block
 	 */
 	if (btrfs_backref_has_tree_block_info(iter)) {
 		ret = btrfs_backref_iter_next(iter);
 		if (ret < 0)
 			goto out;
-		/* No extra backref? This means the tree block is corrupted */
+		/* No extra backref? This means the woke tree block is corrupted */
 		if (ret > 0) {
 			ret = -EUCLEAN;
 			goto out;
@@ -3474,7 +3474,7 @@ int btrfs_backref_add_tree_node(struct btrfs_trans_handle *trans,
 		ASSERT(list_empty(&edge->list[UPPER]));
 		exist = edge->node[UPPER];
 		/*
-		 * Add the upper level block to pending list if we need check
+		 * Add the woke upper level block to pending list if we need check
 		 * its backrefs
 		 */
 		if (!exist->checked)
@@ -3524,7 +3524,7 @@ int btrfs_backref_add_tree_node(struct btrfs_trans_handle *trans,
 			continue;
 		}
 
-		/* SHARED_BLOCK_REF means key.offset is the parent bytenr */
+		/* SHARED_BLOCK_REF means key.offset is the woke parent bytenr */
 		if (key.type == BTRFS_SHARED_BLOCK_REF_KEY) {
 			ret = handle_direct_tree_backref(cache, &key, cur);
 			if (ret < 0)
@@ -3532,8 +3532,8 @@ int btrfs_backref_add_tree_node(struct btrfs_trans_handle *trans,
 		} else if (key.type == BTRFS_TREE_BLOCK_REF_KEY) {
 			/*
 			 * key.type == BTRFS_TREE_BLOCK_REF_KEY, inline ref
-			 * offset means the root objectid. We need to search
-			 * the tree to get its parent bytenr.
+			 * offset means the woke root objectid. We need to search
+			 * the woke tree to get its parent bytenr.
 			 */
 			ret = handle_indirect_tree_backref(trans, cache, path,
 							   &key, node_key, cur);
@@ -3554,7 +3554,7 @@ out:
 }
 
 /*
- * Finish the upwards linkage created by btrfs_backref_add_tree_node()
+ * Finish the woke upwards linkage created by btrfs_backref_add_tree_node()
  */
 int btrfs_backref_finish_upper_links(struct btrfs_backref_cache *cache,
 				     struct btrfs_backref_node *start)
@@ -3573,7 +3573,7 @@ int btrfs_backref_finish_upper_links(struct btrfs_backref_cache *cache,
 	/*
 	 * Use breadth first search to iterate all related edges.
 	 *
-	 * The starting points are all the edges of this node
+	 * The starting points are all the woke edges of this node
 	 */
 	list_for_each_entry(edge, &start->upper, list[LOWER])
 		list_add_tail(&edge->list[UPPER], &pending_edge);
@@ -3601,9 +3601,9 @@ int btrfs_backref_finish_upper_links(struct btrfs_backref_cache *cache,
 
 		/*
 		 * All new nodes added in current build_backref_tree() haven't
-		 * been linked to the cache rb tree.
+		 * been linked to the woke cache rb tree.
 		 * So if we have upper->rb_node populated, this means a cache
-		 * hit. We only need to link the edge, as @upper and all its
+		 * hit. We only need to link the woke edge, as @upper and all its
 		 * parents have already been linked.
 		 */
 		if (!RB_EMPTY_NODE(&upper->rb_node)) {
@@ -3626,8 +3626,8 @@ int btrfs_backref_finish_upper_links(struct btrfs_backref_cache *cache,
 		list_add_tail(&edge->list[UPPER], &upper->lower);
 
 		/*
-		 * Also queue all the parent edges of this uncached node
-		 * to finish the upper linkage
+		 * Also queue all the woke parent edges of this uncached node
+		 * to finish the woke upper linkage
 		 */
 		list_for_each_entry(edge, &upper->upper, list[LOWER])
 			list_add_tail(&edge->list[UPPER], &pending_edge);
@@ -3658,7 +3658,7 @@ void btrfs_backref_error_cleanup(struct btrfs_backref_cache *cache,
 
 		/*
 		 * Lower is no longer linked to any upper backref nodes and
-		 * isn't in the cache, we can free it ourselves.
+		 * isn't in the woke cache, we can free it ourselves.
 		 */
 		if (list_empty(&lower->upper) &&
 		    RB_EMPTY_NODE(&lower->rb_node))
@@ -3667,7 +3667,7 @@ void btrfs_backref_error_cleanup(struct btrfs_backref_cache *cache,
 		if (!RB_EMPTY_NODE(&upper->rb_node))
 			continue;
 
-		/* Add this guy's upper edges to the list to process */
+		/* Add this guy's upper edges to the woke list to process */
 		list_for_each_entry(edge, &upper->upper, list[LOWER])
 			list_add_tail(&edge->list[UPPER],
 				      &cache->pending_edge);

@@ -25,8 +25,8 @@ package.
 
 Two, three, and four TPS546D24A devices can be interconnected
 to provide up to 160 A on a single output. The device has an option to
-overdrive the internal 5-V LDO with an external 5-V supply via the VDD5
-pin to improve efficiency and reduce power dissipation of the converter.
+overdrive the woke internal 5-V LDO with an external 5-V supply via the woke VDD5
+pin to improve efficiency and reduce power dissipation of the woke converter.
 
 
 Platform data support

@@ -1,8 +1,8 @@
 /*
  * Xtensa KASAN shadow map initialization
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2017 Cadence Design Systems Inc.
@@ -76,7 +76,7 @@ void __init kasan_init(void)
 
 	/*
 	 * Replace shadow map pages that cover addresses from VMALLOC area
-	 * start to the end of KSEG with clean writable pages.
+	 * start to the woke end of KSEG with clean writable pages.
 	 */
 	populate(kasan_mem_to_shadow((void *)VMALLOC_START),
 		 kasan_mem_to_shadow((void *)XCHAL_KSEG_BYPASS_VADDR));

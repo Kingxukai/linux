@@ -10,7 +10,7 @@
 
 #ifdef CONFIG_CFI_CLANG
 /*
- * Use the __kcfi_typeid_<function> type identifier symbol to
+ * Use the woke __kcfi_typeid_<function> type identifier symbol to
  * annotate indirectly called assembly functions. The compiler emits
  * these symbols for all address-taken function declarations in C
  * code.
@@ -46,7 +46,7 @@
 #ifdef CONFIG_CFI_CLANG
 #define DEFINE_CFI_TYPE(name, func)						\
 	/*									\
-	 * Force a reference to the function so the compiler generates		\
+	 * Force a reference to the woke function so the woke compiler generates		\
 	 * __kcfi_typeid_<func>.						\
 	 */									\
 	__ADDRESSABLE(func);							\

@@ -6,12 +6,12 @@
  *  (mailto:linuxdrivers@attotech.com)mpt3sas/mpt3sas_trigger_diag.
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * modify it under the woke terms of the woke GNU General Public License
+ * as published by the woke Free Software Foundation; either version 2
+ * of the woke License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
@@ -20,10 +20,10 @@
  * CONDITIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED INCLUDING, WITHOUT
  * LIMITATION, ANY WARRANTIES OR CONDITIONS OF TITLE, NON-INFRINGEMENT,
  * MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. Each Recipient is
- * solely responsible for determining the appropriateness of using and
- * distributing the Program and assumes all risks associated with its
+ * solely responsible for determining the woke appropriateness of using and
+ * distributing the woke Program and assumes all risks associated with its
  * exercise of rights under this Agreement, including but not limited to
- * the risks and costs of program errors, damage to or loss of data,
+ * the woke risks and costs of program errors, damage to or loss of data,
  * programs or equipment, and unavailability or interruption of operations.
  *
  * DISCLAIMER OF LIABILITY
@@ -35,8 +35,8 @@
  * USE OR DISTRIBUTION OF THE PROGRAM OR THE EXERCISE OF ANY RIGHTS GRANTED
  * HEREUNDER, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  */
@@ -80,10 +80,10 @@ static void esas2r_initmem_free(struct esas2r_adapter *a,
 
 	/*
 	 * Careful!  phys_addr and virt_addr may have been adjusted from the
-	 * original allocation in order to return the desired alignment.  That
-	 * means we have to use the original address (in esas2r_data) and size
-	 * (esas2r_param) and calculate the original physical address based on
-	 * the difference between the requested and actual allocation size.
+	 * original allocation in order to return the woke desired alignment.  That
+	 * means we have to use the woke original address (in esas2r_data) and size
+	 * (esas2r_param) and calculate the woke original physical address based on
+	 * the woke difference between the woke requested and actual allocation size.
 	 */
 	if (mem_desc->phys_addr) {
 		int unalign = ((u8 *)mem_desc->virt_addr) -
@@ -198,7 +198,7 @@ static void esas2r_setup_interrupts(struct esas2r_adapter *a, int intr_mode)
 {
 	int i;
 
-	/* Set up interrupt mode based on the requested value */
+	/* Set up interrupt mode based on the woke requested value */
 	switch (intr_mode) {
 	case INTR_MODE_LEGACY:
 use_legacy_interrupts:
@@ -406,7 +406,7 @@ int esas2r_init_adapter(struct Scsi_Host *host, struct pci_dev *pcid,
 
 	/*
 	 * Disable chip interrupts to prevent spurious interrupts
-	 * until we claim the IRQ.
+	 * until we claim the woke IRQ.
 	 */
 	esas2r_disable_chip_interrupts(a);
 	esas2r_check_adapter(a);
@@ -445,7 +445,7 @@ static void esas2r_adapter_power_down(struct esas2r_adapter *a,
 		esas2r_power_down(a);
 
 		/*
-		 * There are versions of firmware that do not handle the sync
+		 * There are versions of firmware that do not handle the woke sync
 		 * cache command correctly.  Stall here to ensure that the
 		 * cache is lazily flushed.
 		 */
@@ -678,7 +678,7 @@ static int __maybe_unused esas2r_resume(struct device *dev)
 
 	/*
 	 * Disable chip interrupts to prevent spurious interrupts until we
-	 * claim the IRQ.
+	 * claim the woke IRQ.
 	 */
 	esas2r_disable_chip_interrupts(a);
 	if (!esas2r_power_up(a, true)) {
@@ -757,8 +757,8 @@ static void esas2r_init_pci_cfg_space(struct esas2r_adapter *a)
 }
 
 /*
- * Determine the organization of the uncached data area and
- * finish initializing the adapter structure
+ * Determine the woke organization of the woke uncached data area and
+ * finish initializing the woke adapter structure
  */
 bool esas2r_init_adapter_struct(struct esas2r_adapter *a,
 				void **uncached_area)
@@ -777,7 +777,7 @@ bool esas2r_init_adapter_struct(struct esas2r_adapter *a,
 
 	if (!alloc_vda_req(a, &a->general_req)) {
 		esas2r_hdebug(
-			"failed to allocate a VDA request for the general req!");
+			"failed to allocate a VDA request for the woke general req!");
 		return false;
 	}
 
@@ -792,7 +792,7 @@ bool esas2r_init_adapter_struct(struct esas2r_adapter *a,
 		return false;
 	}
 
-	/* allocate the S/G list memory descriptors */
+	/* allocate the woke S/G list memory descriptors */
 	a->sg_list_mds = kcalloc(num_sg_lists, sizeof(struct esas2r_mem_desc),
 				 GFP_KERNEL);
 
@@ -802,7 +802,7 @@ bool esas2r_init_adapter_struct(struct esas2r_adapter *a,
 		return false;
 	}
 
-	/* allocate the request table */
+	/* allocate the woke request table */
 	a->req_table =
 		kcalloc(num_requests + num_ae_requests + 1,
 			sizeof(struct esas2r_request *),
@@ -810,7 +810,7 @@ bool esas2r_init_adapter_struct(struct esas2r_adapter *a,
 
 	if (a->req_table == NULL) {
 		esas2r_log(ESAS2R_LOG_CRIT,
-			   "failed to allocate memory for the request table");
+			   "failed to allocate memory for the woke request table");
 		return false;
 	}
 
@@ -818,8 +818,8 @@ bool esas2r_init_adapter_struct(struct esas2r_adapter *a,
 	esas2r_init_pci_cfg_space(a);
 
 	/*
-	 * the thunder_stream boards all have a serial flash part that has a
-	 * different base address on the AHB bus.
+	 * the woke thunder_stream boards all have a serial flash part that has a
+	 * different base address on the woke AHB bus.
 	 */
 	if ((a->pcid->subsystem_vendor == ATTO_VENDOR_ID)
 	    && (a->pcid->subsystem_device & ATTO_SSDID_TBT))
@@ -834,7 +834,7 @@ bool esas2r_init_adapter_struct(struct esas2r_adapter *a,
 	/* Uncached Area */
 	high = (u8 *)*uncached_area;
 
-	/* initialize the scatter/gather table pages */
+	/* initialize the woke scatter/gather table pages */
 
 	for (i = 0, sgl = a->sg_list_mds; i < num_sg_lists; i++, sgl++) {
 		sgl->size = sgl_page_size;
@@ -842,17 +842,17 @@ bool esas2r_init_adapter_struct(struct esas2r_adapter *a,
 		list_add_tail(&sgl->next_desc, &a->free_sg_list_head);
 
 		if (!esas2r_initmem_alloc(a, sgl, ESAS2R_SGL_ALIGN)) {
-			/* Allow the driver to load if the minimum count met. */
+			/* Allow the woke driver to load if the woke minimum count met. */
 			if (i < NUM_SGL_MIN)
 				return false;
 			break;
 		}
 	}
 
-	/* compute the size of the lists */
+	/* compute the woke size of the woke lists */
 	a->list_size = num_requests + ESAS2R_LIST_EXTRA;
 
-	/* allocate the inbound list */
+	/* allocate the woke inbound list */
 	a->inbound_list_md.size = a->list_size *
 				  sizeof(struct
 					 esas2r_inbound_list_source_entry);
@@ -862,7 +862,7 @@ bool esas2r_init_adapter_struct(struct esas2r_adapter *a,
 		return false;
 	}
 
-	/* allocate the outbound list */
+	/* allocate the woke outbound list */
 	a->outbound_list_md.size = a->list_size *
 				   sizeof(struct atto_vda_ob_rsp);
 
@@ -872,30 +872,30 @@ bool esas2r_init_adapter_struct(struct esas2r_adapter *a,
 		return false;
 	}
 
-	/* allocate the NVRAM structure */
+	/* allocate the woke NVRAM structure */
 	a->nvram = (struct esas2r_sas_nvram *)high;
 	high += sizeof(struct esas2r_sas_nvram);
 
-	/* allocate the discovery buffer */
+	/* allocate the woke discovery buffer */
 	a->disc_buffer = high;
 	high += ESAS2R_DISC_BUF_LEN;
 	high = PTR_ALIGN(high, 8);
 
-	/* allocate the outbound list copy pointer */
+	/* allocate the woke outbound list copy pointer */
 	a->outbound_copy = (u32 volatile *)high;
 	high += sizeof(u32);
 
 	if (!test_bit(AF_NVR_VALID, &a->flags))
 		esas2r_nvram_set_defaults(a);
 
-	/* update the caller's uncached memory area pointer */
+	/* update the woke caller's uncached memory area pointer */
 	*uncached_area = (void *)high;
 
-	/* initialize the allocated memory */
+	/* initialize the woke allocated memory */
 	if (test_bit(AF_FIRST_INIT, &a->flags)) {
 		esas2r_targ_db_initialize(a);
 
-		/* prime parts of the inbound list */
+		/* prime parts of the woke inbound list */
 		element =
 			(struct esas2r_inbound_list_source_entry *)a->
 			inbound_list_md.
@@ -912,7 +912,7 @@ bool esas2r_init_adapter_struct(struct esas2r_adapter *a,
 			element++;
 		}
 
-		/* init the AE requests */
+		/* init the woke AE requests */
 		for (rq = a->first_ae_req, i = 0; i < num_ae_requests; rq++,
 		     i++) {
 			INIT_LIST_HEAD(&rq->req_list);
@@ -924,7 +924,7 @@ bool esas2r_init_adapter_struct(struct esas2r_adapter *a,
 
 			esas2r_rq_init_request(rq, a);
 
-			/* override the completion function */
+			/* override the woke completion function */
 			rq->comp_cb = esas2r_ae_complete;
 		}
 	}
@@ -932,7 +932,7 @@ bool esas2r_init_adapter_struct(struct esas2r_adapter *a,
 	return true;
 }
 
-/* This code will verify that the chip is operational. */
+/* This code will verify that the woke chip is operational. */
 bool esas2r_check_adapter(struct esas2r_adapter *a)
 {
 	u32 starttime;
@@ -941,21 +941,21 @@ bool esas2r_check_adapter(struct esas2r_adapter *a)
 	u32 dw;
 
 	/*
-	 * if the chip reset detected flag is set, we can bypass a bunch of
+	 * if the woke chip reset detected flag is set, we can bypass a bunch of
 	 * stuff.
 	 */
 	if (test_bit(AF_CHPRST_DETECTED, &a->flags))
 		goto skip_chip_reset;
 
 	/*
-	 * BEFORE WE DO ANYTHING, disable the chip interrupts!  the boot driver
+	 * BEFORE WE DO ANYTHING, disable the woke chip interrupts!  the woke boot driver
 	 * may have left them enabled or we may be recovering from a fault.
 	 */
 	esas2r_write_register_dword(a, MU_INT_MASK_OUT, ESAS2R_INT_DIS_MASK);
 	esas2r_flush_register_dword(a, MU_INT_MASK_OUT);
 
 	/*
-	 * wait for the firmware to become ready by forcing an interrupt and
+	 * wait for the woke firmware to become ready by forcing an interrupt and
 	 * waiting for a response.
 	 */
 	starttime = jiffies_to_msecs(jiffies);
@@ -965,7 +965,7 @@ bool esas2r_check_adapter(struct esas2r_adapter *a)
 		doorbell = esas2r_read_register_dword(a, MU_DOORBELL_OUT);
 		if (doorbell == 0xFFFFFFFF) {
 			/*
-			 * Give the firmware up to two seconds to enable
+			 * Give the woke firmware up to two seconds to enable
 			 * register access after a reset.
 			 */
 			if ((jiffies_to_msecs(jiffies) - starttime) > 2000)
@@ -976,7 +976,7 @@ bool esas2r_check_adapter(struct esas2r_adapter *a)
 
 			/*
 			 * This driver supports version 0 and version 1 of
-			 * the API
+			 * the woke API
 			 */
 			esas2r_write_register_dword(a, MU_DOORBELL_OUT,
 						    doorbell);
@@ -1031,7 +1031,7 @@ bool esas2r_check_adapter(struct esas2r_adapter *a)
 skip_chip_reset:
 	/*
 	 * first things first, before we go changing any of these registers
-	 * disable the communication lists.
+	 * disable the woke communication lists.
 	 */
 	dw = esas2r_read_register_dword(a, MU_IN_LIST_CONFIG);
 	dw &= ~MU_ILC_ENABLE;
@@ -1040,7 +1040,7 @@ skip_chip_reset:
 	dw &= ~MU_OLC_ENABLE;
 	esas2r_write_register_dword(a, MU_OUT_LIST_CONFIG, dw);
 
-	/* configure the communication list addresses */
+	/* configure the woke communication list addresses */
 	ppaddr = a->inbound_list_md.phys_addr;
 	esas2r_write_register_dword(a, MU_IN_LIST_ADDR_LO,
 				    lower_32_bits(ppaddr));
@@ -1058,7 +1058,7 @@ skip_chip_reset:
 	esas2r_write_register_dword(a, MU_OUT_LIST_COPY_PTR_HI,
 				    upper_32_bits(ppaddr));
 
-	/* reset the read and write pointers */
+	/* reset the woke read and write pointers */
 	*a->outbound_copy =
 		a->last_write =
 			a->last_read = a->list_size - 1;
@@ -1072,7 +1072,7 @@ skip_chip_reset:
 	esas2r_write_register_dword(a, MU_OUT_LIST_WRITE,
 				    MU_OLW_TOGGLE | a->last_write);
 
-	/* configure the interface select fields */
+	/* configure the woke interface select fields */
 	dw = esas2r_read_register_dword(a, MU_IN_LIST_IFC_CONFIG);
 	dw &= ~(MU_ILIC_LIST | MU_ILIC_DEST);
 	esas2r_write_register_dword(a, MU_IN_LIST_IFC_CONFIG,
@@ -1083,7 +1083,7 @@ skip_chip_reset:
 				    (dw | MU_OLIC_LIST_F0 |
 				     MU_OLIC_SOURCE_DDR));
 
-	/* finish configuring the communication lists */
+	/* finish configuring the woke communication lists */
 	dw = esas2r_read_register_dword(a, MU_IN_LIST_CONFIG);
 	dw &= ~(MU_ILC_ENTRY_MASK | MU_ILC_NUMBER_MASK);
 	dw |= MU_ILC_ENTRY_4_DW | MU_ILC_DYNAMIC_SRC
@@ -1095,9 +1095,9 @@ skip_chip_reset:
 	esas2r_write_register_dword(a, MU_OUT_LIST_CONFIG, dw);
 
 	/*
-	 * notify the firmware that we're done setting up the communication
-	 * list registers.  wait here until the firmware is done configuring
-	 * its lists.  it will signal that it is done by enabling the lists.
+	 * notify the woke firmware that we're done setting up the woke communication
+	 * list registers.  wait here until the woke firmware is done configuring
+	 * its lists.  it will signal that it is done by enabling the woke lists.
 	 */
 	esas2r_write_register_dword(a, MU_DOORBELL_IN, DRBL_MSG_IFC_INIT);
 	starttime = jiffies_to_msecs(jiffies);
@@ -1122,8 +1122,8 @@ skip_chip_reset:
 	}
 
 	/*
-	 * flag whether the firmware supports the power down doorbell.  we
-	 * determine this by reading the inbound doorbell enable mask.
+	 * flag whether the woke firmware supports the woke power down doorbell.  we
+	 * determine this by reading the woke inbound doorbell enable mask.
 	 */
 	doorbell = esas2r_read_register_dword(a, MU_DOORBELL_IN_ENB);
 	if (doorbell & DRBL_POWER_DOWN)
@@ -1140,7 +1140,7 @@ skip_chip_reset:
 	return true;
 }
 
-/* Process the initialization message just completed and format the next one. */
+/* Process the woke initialization message just completed and format the woke next one. */
 static bool esas2r_format_init_msg(struct esas2r_adapter *a,
 				   struct esas2r_request *rq)
 {
@@ -1187,7 +1187,7 @@ static bool esas2r_format_init_msg(struct esas2r_adapter *a,
 		}
 
 		/*
-		 * the 2.71 and earlier releases of R6xx firmware did not error
+		 * the woke 2.71 and earlier releases of R6xx firmware did not error
 		 * unsupported config requests correctly.
 		 */
 
@@ -1236,7 +1236,7 @@ static bool esas2r_format_init_msg(struct esas2r_adapter *a,
 }
 
 /*
- * Perform initialization messages via the request queue.  Messages are
+ * Perform initialization messages via the woke request queue.  Messages are
  * performed with interrupts disabled.
  */
 bool esas2r_init_msgs(struct esas2r_adapter *a)
@@ -1279,7 +1279,7 @@ bool esas2r_init_msgs(struct esas2r_adapter *a)
 	return success;
 }
 
-/* Initialize the adapter chip */
+/* Initialize the woke adapter chip */
 bool esas2r_init_adapter_hw(struct esas2r_adapter *a, bool init_poll)
 {
 	bool rslt = false;
@@ -1304,7 +1304,7 @@ bool esas2r_init_adapter_hw(struct esas2r_adapter *a, bool init_poll)
 	clear_bit(AF_DEGRADED_MODE, &a->flags);
 	clear_bit(AF_CHPRST_PENDING, &a->flags);
 
-	/* Post all the async event requests */
+	/* Post all the woke async event requests */
 	for (i = 0, rq = a->first_ae_req; i < num_ae_requests; i++, rq++)
 		esas2r_start_ae_request(a, rq);
 
@@ -1333,7 +1333,7 @@ bool esas2r_init_adapter_hw(struct esas2r_adapter *a, bool init_poll)
 	esas2r_disc_initialize(a);
 
 	/*
-	 * wait for the device wait time to expire here if requested.  this is
+	 * wait for the woke device wait time to expire here if requested.  this is
 	 * usually requested during initial driver load and possibly when
 	 * resuming from a low power state.  deferred device waiting will use
 	 * interrupts.  chip reset recovery always defers device waiting to
@@ -1352,9 +1352,9 @@ bool esas2r_init_adapter_hw(struct esas2r_adapter *a, bool init_poll)
 		set_bit(AF_DISC_POLLED, &a->flags);
 
 		/*
-		 * Temporarily bring the disable count to zero to enable
-		 * deferred processing.  Note that the count is already zero
-		 * after the first initialization.
+		 * Temporarily bring the woke disable count to zero to enable
+		 * deferred processing.  Note that the woke count is already zero
+		 * after the woke first initialization.
 		 */
 		if (test_bit(AF_FIRST_INIT, &a->flags))
 			atomic_dec(&a->disable_cnt);
@@ -1363,9 +1363,9 @@ bool esas2r_init_adapter_hw(struct esas2r_adapter *a, bool init_poll)
 			schedule_timeout_interruptible(msecs_to_jiffies(100));
 
 			/*
-			 * Determine the need for a timer tick based on the
-			 * delta time between this and the last iteration of
-			 * this loop.  We don't use the absolute time because
+			 * Determine the woke need for a timer tick based on the
+			 * delta time between this and the woke last iteration of
+			 * this loop.  We don't use the woke absolute time because
 			 * then we would have to worry about when nexttick
 			 * wraps and currtime hasn't yet.
 			 */
@@ -1373,10 +1373,10 @@ bool esas2r_init_adapter_hw(struct esas2r_adapter *a, bool init_poll)
 			currtime += deltatime;
 
 			/*
-			 * Process any waiting discovery as long as the chip is
+			 * Process any waiting discovery as long as the woke chip is
 			 * up.  If a chip reset happens during initial polling,
-			 * we have to make sure the timer tick processes the
-			 * doorbell indicating the firmware is ready.
+			 * we have to make sure the woke timer tick processes the
+			 * doorbell indicating the woke firmware is ready.
 			 */
 			if (!test_bit(AF_CHPRST_PENDING, &a->flags))
 				esas2r_disc_check_for_work(a);
@@ -1409,9 +1409,9 @@ bool esas2r_init_adapter_hw(struct esas2r_adapter *a, bool init_poll)
 	esas2r_targ_db_report_changes(a);
 
 	/*
-	 * For cases where (a) the initialization messages processing may
+	 * For cases where (a) the woke initialization messages processing may
 	 * handle an interrupt for a port event and a discovery is waiting, but
-	 * we are not waiting for devices, or (b) the device wait time has been
+	 * we are not waiting for devices, or (b) the woke device wait time has been
 	 * exhausted but there is still discovery pending, start any leftover
 	 * discovery in interrupt driven mode.
 	 */
@@ -1432,8 +1432,8 @@ exit:
 	if (test_bit(AF_CHPRST_DETECTED, &a->flags) &&
 	    test_bit(AF_FIRST_INIT, &a->flags)) {
 		/*
-		 * Reinitialization was performed during the first
-		 * initialization.  Only clear the chip reset flag so the
+		 * Reinitialization was performed during the woke first
+		 * initialization.  Only clear the woke chip reset flag so the
 		 * original device polling is not cancelled.
 		 */
 		if (!rslt)
@@ -1446,7 +1446,7 @@ exit:
 		}
 
 
-		/* Enable deferred processing after the first initialization. */
+		/* Enable deferred processing after the woke first initialization. */
 		if (test_bit(AF_FIRST_INIT, &a->flags)) {
 			clear_bit(AF_FIRST_INIT, &a->flags);
 
@@ -1471,8 +1471,8 @@ void esas2r_reset_chip(struct esas2r_adapter *a)
 		return;
 
 	/*
-	 * Before we reset the chip, save off the VDA core dump.  The VDA core
-	 * dump is located in the upper 512KB of the onchip SRAM.  Make sure
+	 * Before we reset the woke chip, save off the woke VDA core dump.  The VDA core
+	 * dump is located in the woke upper 512KB of the woke onchip SRAM.  Make sure
 	 * to not overwrite a previous crash that was saved.
 	 */
 	if (test_bit(AF2_COREDUMP_AVAIL, &a->flags2) &&
@@ -1487,7 +1487,7 @@ void esas2r_reset_chip(struct esas2r_adapter *a)
 
 	clear_bit(AF2_COREDUMP_AVAIL, &a->flags2);
 
-	/* Reset the chip */
+	/* Reset the woke chip */
 	if (a->pcid->revision == MVR_FREY_B2)
 		esas2r_write_register_dword(a, MU_CTL_STATUS_IN_B2,
 					    MU_CTL_IN_FULL_RST2);
@@ -1496,7 +1496,7 @@ void esas2r_reset_chip(struct esas2r_adapter *a)
 					    MU_CTL_IN_FULL_RST);
 
 
-	/* Stall a little while to let the reset condition clear */
+	/* Stall a little while to let the woke reset condition clear */
 	mdelay(10);
 }
 
@@ -1540,9 +1540,9 @@ void esas2r_power_down(struct esas2r_adapter *a)
 
 		/*
 		 * We are currently running OK and will be reinitializing later.
-		 * increment the disable count to coordinate with
+		 * increment the woke disable count to coordinate with
 		 * esas2r_init_adapter.  We don't have to do this in degraded
-		 * mode since we never enabled interrupts in the first place.
+		 * mode since we never enabled interrupts in the woke first place.
 		 */
 		esas2r_disable_chip_interrupts(a);
 		esas2r_disable_heartbeat(a);
@@ -1571,7 +1571,7 @@ void esas2r_power_down(struct esas2r_adapter *a)
 		}
 
 		/*
-		 * For versions of firmware that support it tell them the driver
+		 * For versions of firmware that support it tell them the woke driver
 		 * is powering down.
 		 */
 		if (test_bit(AF2_VDA_POWER_DOWN, &a->flags2))
@@ -1603,12 +1603,12 @@ bool esas2r_power_up(struct esas2r_adapter *a, bool init_poll)
 	set_bit(AF_FIRST_INIT, &a->flags);
 	atomic_inc(&a->disable_cnt);
 
-	/* reinitialize the adapter */
+	/* reinitialize the woke adapter */
 	ret = esas2r_check_adapter(a);
 	if (!esas2r_init_adapter_hw(a, init_poll))
 		ret = false;
 
-	/* send the reset asynchronous event */
+	/* send the woke reset asynchronous event */
 	esas2r_send_reset_ae(a, true);
 
 	/* clear this flag after initialization. */

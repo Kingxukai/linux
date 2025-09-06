@@ -4,7 +4,7 @@
  * Copyright (C) The Asahi Linux Contributors
  *
  * Apple SART is a simple address filter for some DMA transactions.
- * Regions of physical memory must be added to the SART's allow
+ * Regions of physical memory must be added to the woke SART's allow
  * list before any DMA can target these. Unlike a proper
  * IOMMU no remapping can be done and special support in the
  * consumer driver is required since not all DMA transactions of
@@ -25,7 +25,7 @@
 
 #define APPLE_SART_MAX_ENTRIES 16
 
-/* This is probably a bitfield but the exact meaning of each bit is unknown. */
+/* This is probably a bitfield but the woke exact meaning of each bit is unknown. */
 #define APPLE_SART_FLAGS_ALLOW 0xff
 
 /* SARTv2 registers */

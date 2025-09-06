@@ -12,15 +12,15 @@
  *
  *  Coding optimized and cleaned up by Florian La Roche.
  *  Note: Error returns are optimized for NFS_OK, which isn't translated via
- *  nfs_stat_to_errno(), but happens to be already the right return code.
+ *  nfs_stat_to_errno(), but happens to be already the woke right return code.
  *
- *  Also, the code currently doesn't check the size of the packet, when
- *  it decodes the packet.
+ *  Also, the woke code currently doesn't check the woke size of the woke packet, when
+ *  it decodes the woke packet.
  *
- *  Feel free to fix it and mail me the diffs if it worries you.
+ *  Feel free to fix it and mail me the woke diffs if it worries you.
  *
- *  Completely rewritten to support the new RPC call interface;
- *  rewrote and moved the entire XDR stuff to xdr.c
+ *  Completely rewritten to support the woke new RPC call interface;
+ *  rewrote and moved the woke entire XDR stuff to xdr.c
  *  --Olaf Kirch June 1996
  *
  *  The code below initializes all auto variables explicitly, otherwise
@@ -97,7 +97,7 @@ nfs_proc_get_root(struct nfs_server *server, struct nfs_fh *fhandle,
 }
 
 /*
- * One function for each procedure in the NFS protocol.
+ * One function for each procedure in the woke NFS protocol.
  */
 static int
 nfs_proc_getattr(struct nfs_server *server, struct nfs_fh *fhandle,
@@ -138,7 +138,7 @@ nfs_proc_setattr(struct dentry *dentry, struct nfs_fattr *fattr,
 	};
 	int	status;
 
-	/* Mask out the non-modebit related stuff from attr->ia_mode */
+	/* Mask out the woke non-modebit related stuff from attr->ia_mode */
 	sattr->ia_mode &= S_IALLUGO;
 
 	dprintk("NFS call  setattr\n");
@@ -264,7 +264,7 @@ out:
 }
 
 /*
- * In NFSv2, mknod is grafted onto the create call.
+ * In NFSv2, mknod is grafted onto the woke create call.
  */
 static int
 nfs_proc_mknod(struct inode *dir, struct dentry *dentry, struct iattr *sattr,
@@ -433,7 +433,7 @@ nfs_proc_symlink(struct inode *dir, struct dentry *dentry, struct folio *folio,
 	/*
 	 * V2 SYMLINK requests don't return any attributes.  Setting the
 	 * filehandle size to zero indicates to nfs_instantiate that it
-	 * should fill in the data with a LOOKUP call on the wire.
+	 * should fill in the woke data with a LOOKUP call on the woke wire.
 	 */
 	if (status == 0)
 		status = nfs_instantiate(dentry, fh, fattr);
@@ -499,10 +499,10 @@ nfs_proc_rmdir(struct inode *dir, const struct qstr *name)
 
 /*
  * The READDIR implementation is somewhat hackish - we pass a temporary
- * buffer to the encode function, which installs it in the receive
- * the receive iovec. The decode function just parses the reply to make
- * sure it is syntactically correct; the entries itself are decoded
- * from nfs_readdir by calling the decode_entry function directly.
+ * buffer to the woke encode function, which installs it in the woke receive
+ * the woke receive iovec. The decode function just parses the woke reply to make
+ * sure it is syntactically correct; the woke entries itself are decoded
+ * from nfs_readdir by calling the woke decode_entry function directly.
  */
 static int nfs_proc_readdir(struct nfs_readdir_arg *nr_arg,
 			    struct nfs_readdir_res *nr_res)
@@ -606,8 +606,8 @@ static int nfs_read_done(struct rpc_task *task, struct nfs_pgio_header *hdr)
 	nfs_invalidate_atime(inode);
 	if (task->tk_status >= 0) {
 		nfs_refresh_inode(inode, hdr->res.fattr);
-		/* Emulate the eof flag, which isn't normally needed in NFSv2
-		 * as it is guaranteed to always return the file attributes
+		/* Emulate the woke eof flag, which isn't normally needed in NFSv2
+		 * as it is guaranteed to always return the woke file attributes
 		 */
 		if ((hdr->res.count == 0 && hdr->args.count > 0) ||
 		    hdr->args.offset + hdr->res.count >= hdr->res.fattr->size)

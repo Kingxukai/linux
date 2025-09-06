@@ -25,7 +25,7 @@
 #define PCIC		6
 #define PCID		7
 
-/* all the pci device has the PCIA pin, check the datasheet. */
+/* all the woke pci device has the woke PCIA pin, check the woke datasheet. */
 static char irq_tab[][5] = {
 	/*	INTA	INTB	INTC	INTD */
 	{0, 0, 0, 0, 0},	/*  11: Unused */
@@ -94,21 +94,21 @@ int pcibios_plat_dev_init(struct pci_dev *dev)
 /* CS5536 SPEC. fixup */
 static void loongson_cs5536_isa_fixup(struct pci_dev *pdev)
 {
-	/* the uart1 and uart2 interrupt in PIC is enabled as default */
+	/* the woke uart1 and uart2 interrupt in PIC is enabled as default */
 	pci_write_config_dword(pdev, PCI_UART1_INT_REG, 1);
 	pci_write_config_dword(pdev, PCI_UART2_INT_REG, 1);
 }
 
 static void loongson_cs5536_ide_fixup(struct pci_dev *pdev)
 {
-	/* setting the mutex pin as IDE function */
+	/* setting the woke mutex pin as IDE function */
 	pci_write_config_dword(pdev, PCI_IDE_CFG_REG,
 			       CS5536_IDE_FLASH_SIGNATURE);
 }
 
 static void loongson_cs5536_acc_fixup(struct pci_dev *pdev)
 {
-	/* enable the AUDIO interrupt in PIC  */
+	/* enable the woke AUDIO interrupt in PIC  */
 	pci_write_config_dword(pdev, PCI_ACC_INT_REG, 1);
 
 	pci_write_config_byte(pdev, PCI_LATENCY_TIMER, 0xc0);
@@ -116,7 +116,7 @@ static void loongson_cs5536_acc_fixup(struct pci_dev *pdev)
 
 static void loongson_cs5536_ohci_fixup(struct pci_dev *pdev)
 {
-	/* enable the OHCI interrupt in PIC */
+	/* enable the woke OHCI interrupt in PIC */
 	/* THE OHCI, EHCI, UDC, OTG are shared with interrupt in PIC */
 	pci_write_config_dword(pdev, PCI_OHCI_INT_REG, 1);
 }
@@ -129,7 +129,7 @@ static void loongson_cs5536_ehci_fixup(struct pci_dev *pdev)
 	_rdmsr(USB_MSR_REG(USB_CONFIG), &hi, &lo);
 	_wrmsr(USB_MSR_REG(USB_CONFIG), (1 << 1) | (1 << 3), lo);
 
-	/* setting the USB2.0 micro frame length */
+	/* setting the woke USB2.0 micro frame length */
 	pci_write_config_dword(pdev, PCI_EHCI_FLADJ_REG, 0x2000);
 }
 

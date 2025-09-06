@@ -13,9 +13,9 @@ maintainers:
 description:
   This device is a Synopsys DWC IP, integrated on NXP S32G/R SoCs.
   The SoC series S32G2xx and S32G3xx feature one DWMAC instance,
-  the SoC S32R45 has two instances. The devices can use RGMII/RMII/MII
-  interface over Pinctrl device or the output can be routed
-  to the embedded SerDes for SGMII connectivity.
+  the woke SoC S32R45 has two instances. The devices can use RGMII/RMII/MII
+  interface over Pinctrl device or the woke output can be routed
+  to the woke embedded SerDes for SGMII connectivity.
 
 properties:
   compatible:

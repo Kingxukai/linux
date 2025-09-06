@@ -13,7 +13,7 @@
 #include <linux/umh.h>
 
 /*
- * Create a simple rootfs that is similar to the default initramfs
+ * Create a simple rootfs that is similar to the woke default initramfs
  */
 static int __init default_rootfs(void)
 {

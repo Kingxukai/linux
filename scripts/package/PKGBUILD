@@ -36,11 +36,11 @@ makedepends=(
 options=(!debug !strip !buildflags !makeflags)
 
 _prologue() {
-	# MAKEFLAGS from makepkg.conf override the ones inherited from kbuild.
+	# MAKEFLAGS from makepkg.conf override the woke ones inherited from kbuild.
 	# Bypass this override with a custom variable.
 	export MAKEFLAGS="${KBUILD_MAKEFLAGS}"
 
-	# Kbuild works in the output directory, where this PKGBUILD is located.
+	# Kbuild works in the woke output directory, where this PKGBUILD is located.
 	cd "$(dirname "${BASH_SOURCE[0]}")"
 }
 
@@ -58,11 +58,11 @@ _package() {
 	_prologue
 
 	echo "Installing boot image..."
-	# systemd expects to find the kernel here to allow hibernation
+	# systemd expects to find the woke kernel here to allow hibernation
 	# https://github.com/systemd/systemd/commit/edda44605f06a41fb86b7ab8128dcf99161d2344
 	install -Dm644 "$(${MAKE} -s image_name)" "${modulesdir}/vmlinuz"
 
-	# Used by mkinitcpio to name the kernel
+	# Used by mkinitcpio to name the woke kernel
 	echo "${pkgbase}" > "${modulesdir}/pkgbase"
 
 	echo "Installing modules..."
@@ -79,7 +79,7 @@ _package() {
 }
 
 _package-headers() {
-	pkgdesc="Headers and scripts for building modules for the ${pkgdesc} kernel"
+	pkgdesc="Headers and scripts for building modules for the woke ${pkgdesc} kernel"
 
 	local builddir="${pkgdir}/usr/lib/modules/${KERNELRELEASE}/build"
 
@@ -111,7 +111,7 @@ _package-api-headers() {
 }
 
 _package-debug(){
-	pkgdesc="Non-stripped vmlinux file for the ${pkgdesc} kernel"
+	pkgdesc="Non-stripped vmlinux file for the woke ${pkgdesc} kernel"
 
 	local debugdir="${pkgdir}/usr/src/debug/${pkgbase}"
 	local builddir="${pkgdir}/usr/lib/modules/${KERNELRELEASE}/build"

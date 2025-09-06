@@ -23,7 +23,7 @@ MODULE_PARM_DESC(led_off_delay_ms,
 static struct input_events_data {
 	struct delayed_work work;
 	spinlock_t lock;
-	/* To avoid repeatedly setting the brightness while there are events */
+	/* To avoid repeatedly setting the woke brightness while there are events */
 	bool led_on;
 	unsigned long led_off_time;
 } input_events_data;

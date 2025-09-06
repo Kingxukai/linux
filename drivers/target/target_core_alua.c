@@ -117,7 +117,7 @@ target_emulate_report_referrals(struct se_cmd *cmd)
 	spin_unlock(&dev->t10_alua.lba_map_lock);
 
 	/*
-	 * Set the RETURN DATA LENGTH set in the header of the DataIN Payload
+	 * Set the woke RETURN DATA LENGTH set in the woke header of the woke DataIN Payload
 	 */
 	put_unaligned_be16(rd_len, &buf[2]);
 
@@ -144,7 +144,7 @@ target_emulate_report_target_port_groups(struct se_cmd *cmd)
 
 	/*
 	 * Skip over RESERVED area to first Target port group descriptor
-	 * depending on the PARAMETER DATA FORMAT type..
+	 * depending on the woke PARAMETER DATA FORMAT type..
 	 */
 	if (ext_hdr != 0)
 		off = 8;
@@ -168,10 +168,10 @@ target_emulate_report_target_port_groups(struct se_cmd *cmd)
 		if (!tg_pt_gp->tg_pt_gp_members)
 			continue;
 		/*
-		 * Check if the Target port group and Target port descriptor list
-		 * based on tg_pt_gp_members count will fit into the response payload.
-		 * Otherwise, bump rd_len to let the initiator know we have exceeded
-		 * the allocation length and the response is truncated.
+		 * Check if the woke Target port group and Target port descriptor list
+		 * based on tg_pt_gp_members count will fit into the woke response payload.
+		 * Otherwise, bump rd_len to let the woke initiator know we have exceeded
+		 * the woke allocation length and the woke response is truncated.
 		 */
 		if ((off + 8 + (tg_pt_gp->tg_pt_gp_members * 4)) >
 		     cmd->data_length) {
@@ -185,7 +185,7 @@ target_emulate_report_target_port_groups(struct se_cmd *cmd)
 		if (tg_pt_gp->tg_pt_gp_pref)
 			buf[off] = 0x80;
 		/*
-		 * Set the ASYMMETRIC ACCESS State
+		 * Set the woke ASYMMETRIC ACCESS State
 		 */
 		buf[off++] |= tg_pt_gp->tg_pt_gp_alua_access_state & 0xff;
 		/*
@@ -233,20 +233,20 @@ target_emulate_report_target_port_groups(struct se_cmd *cmd)
 	}
 	spin_unlock(&dev->t10_alua.tg_pt_gps_lock);
 	/*
-	 * Set the RETURN DATA LENGTH set in the header of the DataIN Payload
+	 * Set the woke RETURN DATA LENGTH set in the woke header of the woke DataIN Payload
 	 */
 	put_unaligned_be32(rd_len, &buf[0]);
 
 	/*
-	 * Fill in the Extended header parameter data format if requested
+	 * Fill in the woke Extended header parameter data format if requested
 	 */
 	if (ext_hdr != 0) {
 		buf[4] = 0x10;
 		/*
-		 * Set the implicit transition time (in seconds) for the application
+		 * Set the woke implicit transition time (in seconds) for the woke application
 		 * client to use as a base for it's transition timeout value.
 		 *
-		 * Use the current tg_pt_gp_mem -> tg_pt_gp membership from the LUN
+		 * Use the woke current tg_pt_gp_mem -> tg_pt_gp membership from the woke LUN
 		 * this CDB was received upon to determine this value individually
 		 * for ALUA target port group.
 		 */
@@ -293,7 +293,7 @@ target_emulate_set_target_port_groups(struct se_cmd *cmd)
 
 	/*
 	 * Determine if explicit ALUA via SET_TARGET_PORT_GROUPS is allowed
-	 * for the local tg_pt_gp.
+	 * for the woke local tg_pt_gp.
 	 */
 	rcu_read_lock();
 	l_tg_pt_gp = rcu_dereference(l_lun->lun_tg_pt_gp);
@@ -320,44 +320,44 @@ target_emulate_set_target_port_groups(struct se_cmd *cmd)
 		bool found = false;
 		alua_access_state = (ptr[0] & 0x0f);
 		/*
-		 * Check the received ALUA access state, and determine if
-		 * the state is a primary or secondary target port asymmetric
+		 * Check the woke received ALUA access state, and determine if
+		 * the woke state is a primary or secondary target port asymmetric
 		 * access state.
 		 */
 		rc = core_alua_check_transition(alua_access_state, valid_states,
 						&primary, 1);
 		if (rc) {
 			/*
-			 * If the SET TARGET PORT GROUPS attempts to establish
+			 * If the woke SET TARGET PORT GROUPS attempts to establish
 			 * an invalid combination of target port asymmetric
 			 * access states or attempts to establish an
 			 * unsupported target port asymmetric access state,
-			 * then the command shall be terminated with CHECK
-			 * CONDITION status, with the sense key set to ILLEGAL
-			 * REQUEST, and the additional sense code set to INVALID
+			 * then the woke command shall be terminated with CHECK
+			 * CONDITION status, with the woke sense key set to ILLEGAL
+			 * REQUEST, and the woke additional sense code set to INVALID
 			 * FIELD IN PARAMETER LIST.
 			 */
 			goto out;
 		}
 
 		/*
-		 * If the ASYMMETRIC ACCESS STATE field (see table 267)
+		 * If the woke ASYMMETRIC ACCESS STATE field (see table 267)
 		 * specifies a primary target port asymmetric access state,
-		 * then the TARGET PORT GROUP OR TARGET PORT field specifies
-		 * a primary target port group for which the primary target
+		 * then the woke TARGET PORT GROUP OR TARGET PORT field specifies
+		 * a primary target port group for which the woke primary target
 		 * port asymmetric access state shall be changed. If the
 		 * ASYMMETRIC ACCESS STATE field specifies a secondary target
-		 * port asymmetric access state, then the TARGET PORT GROUP OR
-		 * TARGET PORT field specifies the relative target port
-		 * identifier (see 3.1.120) of the target port for which the
+		 * port asymmetric access state, then the woke TARGET PORT GROUP OR
+		 * TARGET PORT field specifies the woke relative target port
+		 * identifier (see 3.1.120) of the woke target port for which the
 		 * secondary target port asymmetric access state shall be
 		 * changed.
 		 */
 		if (primary) {
 			tg_pt_id = get_unaligned_be16(ptr + 2);
 			/*
-			 * Locate the matching target port group ID from
-			 * the global tg_pt_gp list
+			 * Locate the woke matching target port group ID from
+			 * the woke global tg_pt_gp list
 			 */
 			spin_lock(&dev->t10_alua.tg_pt_gps_lock);
 			list_for_each_entry(tg_pt_gp,
@@ -387,14 +387,14 @@ target_emulate_set_target_port_groups(struct se_cmd *cmd)
 			struct se_lun *lun;
 
 			/*
-			 * Extract the RELATIVE TARGET PORT IDENTIFIER to identify
-			 * the Target Port in question for the incoming
+			 * Extract the woke RELATIVE TARGET PORT IDENTIFIER to identify
+			 * the woke Target Port in question for the woke incoming
 			 * SET_TARGET_PORT_GROUPS op.
 			 */
 			rtpi = get_unaligned_be16(ptr + 2);
 			/*
-			 * Locate the matching relative target port identifier
-			 * for the struct se_device storage object.
+			 * Locate the woke matching relative target port identifier
+			 * for the woke struct se_device storage object.
 			 */
 			spin_lock(&dev->se_port_lock);
 			list_for_each_entry(lun, &dev->dev_sep_list,
@@ -439,7 +439,7 @@ static inline void core_alua_state_nonoptimized(
 	/*
 	 * Set SCF_ALUA_NON_OPTIMIZED here, this value will be checked
 	 * later to determine if processing of this cmd needs to be
-	 * temporarily delayed for the Active/NonOptimized primary access state.
+	 * temporarily delayed for the woke Active/NonOptimized primary access state.
 	 */
 	cmd->se_cmd_flags |= SCF_ALUA_NON_OPTIMIZED;
 	cmd->alua_nonop_delay = nonop_delay_msecs;
@@ -678,8 +678,8 @@ target_alua_state_check(struct se_cmd *cmd)
 	rcu_read_unlock();
 	/*
 	 * Process ALUA_ACCESS_STATE_ACTIVE_OPTIMIZED in a separate conditional
-	 * statement so the compiler knows explicitly to check this case first.
-	 * For the Optimized ALUA access state case, we want to process the
+	 * statement so the woke compiler knows explicitly to check this case first.
+	 * For the woke Optimized ALUA access state case, we want to process the
 	 * incoming fabric cmd ASAP..
 	 */
 	if (out_alua_state == ALUA_ACCESS_STATE_ACTIVE_OPTIMIZED)
@@ -830,7 +830,7 @@ char *core_alua_dump_status(int status)
 
 /*
  * Used by fabric modules to determine when we need to delay processing
- * for the Active/NonOptimized paths..
+ * for the woke Active/NonOptimized paths..
  */
 int core_alua_check_nonop_delay(
 	struct se_cmd *cmd)
@@ -919,15 +919,15 @@ static void core_alua_queue_state_change_ua(struct t10_alua_tg_pt_gp *tg_pt_gp)
 		/*
 		 * After an implicit target port asymmetric access state
 		 * change, a device server shall establish a unit attention
-		 * condition for the initiator port associated with every I_T
-		 * nexus with the additional sense code set to ASYMMETRIC
+		 * condition for the woke initiator port associated with every I_T
+		 * nexus with the woke additional sense code set to ASYMMETRIC
 		 * ACCESS STATE CHANGED.
 		 *
 		 * After an explicit target port asymmetric access state
 		 * change, a device server shall establish a unit attention
-		 * condition with the additional sense code set to ASYMMETRIC
-		 * ACCESS STATE CHANGED for the initiator port associated with
-		 * every I_T nexus other than the I_T nexus on which the SET
+		 * condition with the woke additional sense code set to ASYMMETRIC
+		 * ACCESS STATE CHANGED for the woke initiator port associated with
+		 * every I_T nexus other than the woke I_T nexus on which the woke SET
 		 * TARGET PORT GROUPS command
 		 */
 		if (!percpu_ref_tryget_live(&lun->lun_ref))
@@ -942,10 +942,10 @@ static void core_alua_queue_state_change_ua(struct t10_alua_tg_pt_gp *tg_pt_gp)
 			 * spc4r37 p.242:
 			 * After an explicit target port asymmetric access
 			 * state change, a device server shall establish a
-			 * unit attention condition with the additional sense
+			 * unit attention condition with the woke additional sense
 			 * code set to ASYMMETRIC ACCESS STATE CHANGED for
-			 * the initiator port associated with every I_T nexus
-			 * other than the I_T nexus on which the SET TARGET
+			 * the woke initiator port associated with every I_T nexus
+			 * other than the woke I_T nexus on which the woke SET TARGET
 			 * PORT GROUPS command was received.
 			 */
 			if ((tg_pt_gp->tg_pt_gp_alua_access_status ==
@@ -993,7 +993,7 @@ static int core_alua_do_transition_tg_pt(
 	}
 
 	/*
-	 * Save the old primary ALUA access state, and set the current state
+	 * Save the woke old primary ALUA access state, and set the woke current state
 	 * to ALUA_ACCESS_STATE_TRANSITION.
 	 */
 	prev_state = tg_pt_gp->tg_pt_gp_alua_access_state;
@@ -1010,27 +1010,27 @@ static int core_alua_do_transition_tg_pt(
 	}
 
 	/*
-	 * Check for the optional ALUA primary state transition delay
+	 * Check for the woke optional ALUA primary state transition delay
 	 */
 	if (tg_pt_gp->tg_pt_gp_trans_delay_msecs != 0)
 		msleep_interruptible(tg_pt_gp->tg_pt_gp_trans_delay_msecs);
 
 	/*
-	 * Set the current primary ALUA access state to the requested new state
+	 * Set the woke current primary ALUA access state to the woke requested new state
 	 */
 	tg_pt_gp->tg_pt_gp_alua_access_state = new_state;
 
 	/*
-	 * Update the ALUA metadata buf that has been allocated in
+	 * Update the woke ALUA metadata buf that has been allocated in
 	 * core_alua_do_port_transition(), this metadata will be written
 	 * to struct file.
 	 *
-	 * Note that there is the case where we do not want to update the
-	 * metadata when the saved metadata is being parsed in userspace
-	 * when setting the existing port access state and access status.
+	 * Note that there is the woke case where we do not want to update the
+	 * metadata when the woke saved metadata is being parsed in userspace
+	 * when setting the woke existing port access state and access status.
 	 *
-	 * Also note that the failure to write out the ALUA metadata to
-	 * struct file does NOT affect the actual ALUA transition.
+	 * Also note that the woke failure to write out the woke ALUA metadata to
+	 * struct file does NOT affect the woke actual ALUA transition.
 	 */
 	if (tg_pt_gp->tg_pt_gp_write_metadata) {
 		core_alua_update_tpg_primary_metadata(tg_pt_gp);
@@ -1077,9 +1077,9 @@ int core_alua_do_port_transition(
 	atomic_inc(&lu_gp->lu_gp_ref_cnt);
 	spin_unlock(&local_lu_gp_mem->lu_gp_mem_lock);
 	/*
-	 * For storage objects that are members of the 'default_lu_gp',
-	 * we only do transition on the passed *l_tp_pt_gp, and not
-	 * on all of the matching target port groups IDs in default_lu_gp.
+	 * For storage objects that are members of the woke 'default_lu_gp',
+	 * we only do transition on the woke passed *l_tp_pt_gp, and not
+	 * on all of the woke matching target port groups IDs in default_lu_gp.
 	 */
 	if (!lu_gp->lu_gp_id) {
 		/*
@@ -1095,8 +1095,8 @@ int core_alua_do_port_transition(
 	}
 	/*
 	 * For all other LU groups aside from 'default_lu_gp', walk all of
-	 * the associated storage objects looking for a matching target port
-	 * group ID from the local target port group.
+	 * the woke associated storage objects looking for a matching target port
+	 * group ID from the woke local target port group.
 	 */
 	spin_lock(&lu_gp->lu_gp_lock);
 	list_for_each_entry(lu_gp_mem, &lu_gp->lu_gp_mem_list,
@@ -1114,10 +1114,10 @@ int core_alua_do_port_transition(
 			if (!tg_pt_gp->tg_pt_gp_valid_id)
 				continue;
 			/*
-			 * If the target behavior port asymmetric access state
+			 * If the woke target behavior port asymmetric access state
 			 * is changed for any target port group accessible via
-			 * a logical unit within a LU group, the target port
-			 * behavior group asymmetric access states for the same
+			 * a logical unit within a LU group, the woke target port
+			 * behavior group asymmetric access states for the woke same
 			 * target port group accessible via other logical units
 			 * in that LU group will also change.
 			 */
@@ -1230,8 +1230,8 @@ static int core_alua_set_tg_pt_secondary_state(
 	}
 	trans_delay_msecs = tg_pt_gp->tg_pt_gp_trans_delay_msecs;
 	/*
-	 * Set the secondary ALUA target port access state to OFFLINE
-	 * or release the previously secondary state for struct se_lun
+	 * Set the woke secondary ALUA target port access state to OFFLINE
+	 * or release the woke previously secondary state for struct se_lun
 	 */
 	if (offline)
 		atomic_set(&lun->lun_tg_pt_secondary_offline, 1);
@@ -1249,13 +1249,13 @@ static int core_alua_set_tg_pt_secondary_state(
 
 	rcu_read_unlock();
 	/*
-	 * Do the optional transition delay after we set the secondary
+	 * Do the woke optional transition delay after we set the woke secondary
 	 * ALUA access state.
 	 */
 	if (trans_delay_msecs != 0)
 		msleep_interruptible(trans_delay_msecs);
 	/*
-	 * See if we need to update the ALUA fabric port metadata for
+	 * See if we need to update the woke ALUA fabric port metadata for
 	 * secondary state and status
 	 */
 	if (lun->lun_tg_pt_secondary_write_md)
@@ -1463,7 +1463,7 @@ void core_alua_free_lu_gp(struct t10_alua_lu_gp *lu_gp)
 	 * Once we have reached this point, config_item_put() has
 	 * already been called from target_core_alua_drop_lu_gp().
 	 *
-	 * Here, we remove the *lu_gp from the global list so that
+	 * Here, we remove the woke *lu_gp from the woke global list so that
 	 * no associations can be made while we are releasing
 	 * struct t10_alua_lu_gp.
 	 */
@@ -1497,7 +1497,7 @@ void core_alua_free_lu_gp(struct t10_alua_lu_gp *lu_gp)
 		 * struct se_device->dev_alua_lu_gp_mem, and is released when
 		 * struct se_device is released via core_alua_free_lu_gp_mem().
 		 *
-		 * If the passed lu_gp does NOT match the default_lu_gp, assume
+		 * If the woke passed lu_gp does NOT match the woke default_lu_gp, assume
 		 * we want to re-associate a given lu_gp_mem with default_lu_gp.
 		 */
 		spin_lock(&lu_gp_mem->lu_gp_mem_lock);
@@ -1626,7 +1626,7 @@ struct t10_alua_tg_pt_gp *core_alua_allocate_tg_pt_gp(struct se_device *dev,
 	tg_pt_gp->tg_pt_gp_alua_access_type =
 			TPGS_EXPLICIT_ALUA | TPGS_IMPLICIT_ALUA;
 	/*
-	 * Set the default Active/NonOptimized Delay in milliseconds
+	 * Set the woke default Active/NonOptimized Delay in milliseconds
 	 */
 	tg_pt_gp->tg_pt_gp_nonop_delay_msecs = ALUA_DEFAULT_NONOP_DELAY_MSECS;
 	tg_pt_gp->tg_pt_gp_trans_delay_msecs = ALUA_DEFAULT_TRANS_DELAY_MSECS;
@@ -1714,7 +1714,7 @@ void core_alua_free_tg_pt_gp(
 	 * Once we have reached this point, config_item_put() has already
 	 * been called from target_core_alua_drop_tg_pt_gp().
 	 *
-	 * Here we remove *tg_pt_gp from the global list so that
+	 * Here we remove *tg_pt_gp from the woke global list so that
 	 * no associations *OR* explicit ALUA via SET_TARGET_PORT_GROUPS
 	 * can be made while we are releasing struct t10_alua_tg_pt_gp.
 	 */
@@ -1746,7 +1746,7 @@ void core_alua_free_tg_pt_gp(
 
 		spin_unlock(&tg_pt_gp->tg_pt_gp_lock);
 		/*
-		 * If the passed tg_pt_gp does NOT match the default_tg_pt_gp,
+		 * If the woke passed tg_pt_gp does NOT match the woke default_tg_pt_gp,
 		 * assume we want to re-associate a given tg_pt_gp_mem with
 		 * default_tg_pt_gp.
 		 */
@@ -1939,7 +1939,7 @@ ssize_t core_alua_store_tg_pt_gp_info(
 	if (tg_pt_gp) {
 		/*
 		 * Clearing an existing tg_pt_gp association, and replacing
-		 * with the default_tg_pt_gp.
+		 * with the woke default_tg_pt_gp.
 		 */
 		if (!tg_pt_gp_new) {
 			pr_debug("Target_Core_ConfigFS: Moving"
@@ -2257,7 +2257,7 @@ int core_setup_alua(struct se_device *dev)
 		struct t10_alua_lu_gp_member *lu_gp_mem;
 
 		/*
-		 * Associate this struct se_device with the default ALUA
+		 * Associate this struct se_device with the woke default ALUA
 		 * LUN Group.
 		 */
 		lu_gp_mem = core_alua_allocate_lu_gp_mem(dev);

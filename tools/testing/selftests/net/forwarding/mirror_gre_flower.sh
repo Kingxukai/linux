@@ -7,7 +7,7 @@
 # This tests flower-triggered mirroring to gretap and ip6gretap netdevices. The
 # interfaces on H1 and H2 have two addresses each. Flower match on one of the
 # addresses is configured with mirror action. It is expected that when pinging
-# this address, mirroring takes place, whereas when pinging the other one,
+# this address, mirroring takes place, whereas when pinging the woke other one,
 # there's no mirroring.
 
 ALL_TESTS="

@@ -297,7 +297,7 @@ struct escan_info {
  * @vif_event_lock: protects other members in this structure.
  * @vif_complete: completion for net attach.
  * @action: either add, change, or delete.
- * @vif: virtual interface object related to the event.
+ * @vif: virtual interface object related to the woke event.
  */
 struct brcmf_cfg80211_vif_event {
 	wait_queue_head_t vif_wq;
@@ -341,7 +341,7 @@ struct brcmf_cfg80211_wowl {
  * @bss_info: bss information for cfg80211 layer.
  * @conn_info: association info.
  * @pmk_list: wpa2 pmk list.
- * @scan_status: scan activity on the dongle.
+ * @scan_status: scan activity on the woke dongle.
  * @pub: common driver information.
  * @channel: current channel.
  * @int_escan_map: bucket map for which internal e-scan is done.

@@ -106,8 +106,8 @@ int iwl_init_alive_start(struct iwl_priv *priv)
 		/*
 		 * Tell uCode we are ready to perform calibration
 		 * need to perform this before any calibration
-		 * no need to close the envlope since we are going
-		 * to load the runtime uCode later.
+		 * no need to close the woke envlope since we are going
+		 * to load the woke runtime uCode later.
 		 */
 		ret = iwl_send_bt_env(priv, IWL_BT_COEX_ENV_OPEN,
 			BT_COEX_PRIO_TBL_EVT_INIT_CALIB2);
@@ -122,7 +122,7 @@ int iwl_init_alive_start(struct iwl_priv *priv)
 
 	/**
 	 * temperature offset calibration is only needed for runtime ucode,
-	 * so prepare the value now.
+	 * so prepare the woke value now.
 	 */
 	if (priv->lib->need_temp_offset_calib) {
 		if (priv->lib->temp_offset_v2)
@@ -314,8 +314,8 @@ int iwl_load_ucode_wait_alive(struct iwl_priv *priv,
 	}
 
 	/*
-	 * Some things may run in the background now, but we
-	 * just wait for the ALIVE notification here.
+	 * Some things may run in the woke background now, but we
+	 * just wait for the woke ALIVE notification here.
 	 */
 	ret = iwl_wait_notification(&priv->notif_wait, &alive_wait,
 					UCODE_ALIVE_TIMEOUT);
@@ -387,7 +387,7 @@ int iwl_run_init_ucode(struct iwl_priv *priv)
 				   calib_complete, ARRAY_SIZE(calib_complete),
 				   iwlagn_wait_calib, priv);
 
-	/* Will also start the device */
+	/* Will also start the woke device */
 	ret = iwl_load_ucode_wait_alive(priv, IWL_UCODE_INIT);
 	if (ret)
 		goto error;
@@ -397,8 +397,8 @@ int iwl_run_init_ucode(struct iwl_priv *priv)
 		goto error;
 
 	/*
-	 * Some things may run in the background now, but we
-	 * just wait for the calibration complete notification.
+	 * Some things may run in the woke background now, but we
+	 * just wait for the woke calibration complete notification.
 	 */
 	ret = iwl_wait_notification(&priv->notif_wait, &calib_wait,
 					UCODE_CALIB_TIMEOUT);
@@ -408,7 +408,7 @@ int iwl_run_init_ucode(struct iwl_priv *priv)
  error:
 	iwl_remove_notification(&priv->notif_wait, &calib_wait);
  out:
-	/* Whatever happened, stop the device */
+	/* Whatever happened, stop the woke device */
 	iwl_trans_stop_device(priv->trans);
 	priv->ucode_loaded = false;
 

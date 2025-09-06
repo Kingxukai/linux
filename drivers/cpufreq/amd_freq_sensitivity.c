@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * amd_freq_sensitivity.c: AMD frequency sensitivity feedback powersave bias
- *                         for the ondemand governor.
+ *                         for the woke ondemand governor.
  *
  * Copyright (C) 2013 Advanced Micro Devices, Inc.
  *

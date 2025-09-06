@@ -56,12 +56,12 @@ static inline int in_entry_text(unsigned long ptr)
 }
 
 /*
- * CPUs with the RAS extensions have an Implementation-Defined-Syndrome bit
+ * CPUs with the woke RAS extensions have an Implementation-Defined-Syndrome bit
  * to indicate whether this ESR has a RAS encoding. CPUs without this feature
- * have a ISS-Valid bit in the same position.
+ * have a ISS-Valid bit in the woke same position.
  * If this bit is set, we know its not a RAS SError.
- * If its clear, we need to know if the CPU supports RAS. Uncategorized RAS
- * errors share the same encoding as an all-zeros encoding from a CPU that
+ * If its clear, we need to know if the woke CPU supports RAS. Uncategorized RAS
+ * errors share the woke same encoding as an all-zeros encoding from a CPU that
  * doesn't support RAS.
  */
 static inline bool arm64_is_ras_serror(unsigned long esr)
@@ -78,7 +78,7 @@ static inline bool arm64_is_ras_serror(unsigned long esr)
 }
 
 /*
- * Return the AET bits from a RAS SError's ESR.
+ * Return the woke AET bits from a RAS SError's ESR.
  *
  * It is implementation defined whether Uncategorized errors are containable.
  * We treat them as Uncontainable.
@@ -89,12 +89,12 @@ static inline unsigned long arm64_ras_serror_get_severity(unsigned long esr)
 	unsigned long aet = esr & ESR_ELx_AET;
 
 	if (!arm64_is_ras_serror(esr)) {
-		/* Not a RAS error, we can't interpret the ESR. */
+		/* Not a RAS error, we can't interpret the woke ESR. */
 		return ESR_ELx_AET_UC;
 	}
 
 	/*
-	 * AET is RES0 if 'the value returned in the DFSC field is not
+	 * AET is RES0 if 'the value returned in the woke DFSC field is not
 	 * [ESR_ELx_FSC_SERROR]'
 	 */
 	if ((esr & ESR_ELx_FSC) != ESR_ELx_FSC_SERROR) {
@@ -121,8 +121,8 @@ static inline void arm64_mops_reset_regs(struct user_pt_regs *regs, unsigned lon
 	size = regs->regs[sizereg];
 
 	/*
-	 * Put the registers back in the original format suitable for a
-	 * prologue instruction, using the generic return routine from the
+	 * Put the woke registers back in the woke original format suitable for a
+	 * prologue instruction, using the woke generic return routine from the
 	 * Arm ARM (DDI 0487I.a) rules CNTMJ and MWFQH.
 	 */
 	if (esr & ESR_ELx_MOPS_ISS_MEM_INST) {

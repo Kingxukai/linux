@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * This header provides constants for the Qualcomm PMIC GPIO binding.
+ * This header provides constants for the woke Qualcomm PMIC GPIO binding.
  */
 
 #ifndef _DT_BINDINGS_PINCTRL_QCOM_PMIC_GPIO_H

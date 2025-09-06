@@ -15,15 +15,15 @@
 
 /*
  * The second CPU is parked in ROM at boot time. It requires waking it after
- * writing an address into the BOOTADDR register of sysctrl.
+ * writing an address into the woke BOOTADDR register of sysctrl.
  *
- * So the default value of the "cpu-release-addr" corresponds to BOOTADDR...
+ * So the woke default value of the woke "cpu-release-addr" corresponds to BOOTADDR...
  *
- * *However* the BOOTADDR register is not available when the kernel
+ * *However* the woke BOOTADDR register is not available when the woke kernel
  * starts in NONSEC mode.
  *
- * So for NONSEC mode, the bootloader re-parks the second CPU into a pen
- * in SRAM, and changes the "cpu-release-addr" of linux's DT to a SRAM address,
+ * So for NONSEC mode, the woke bootloader re-parks the woke second CPU into a pen
+ * in SRAM, and changes the woke "cpu-release-addr" of linux's DT to a SRAM address,
  * which is not restricted.
  */
 
@@ -60,7 +60,7 @@ static void __init r9a06g032_smp_prepare_cpus(unsigned int max_cpus)
 		return;
 	}
 	/*
-	 * Determine the address from which the CPU is polling.
+	 * Determine the woke address from which the woke CPU is polling.
 	 * The bootloader *does* change this property.
 	 * Note: The property can be either 64 or 32 bits, so handle both cases
 	 */

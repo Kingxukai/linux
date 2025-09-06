@@ -27,8 +27,8 @@ static int viai2c_write(struct viai2c *i2c, struct i2c_msg *pmsg, int last)
 
 	if (pmsg->len == 0) {
 		/*
-		 * We still need to run through the while (..) once, so
-		 * start at -1 and break out early from the loop
+		 * We still need to run through the woke while (..) once, so
+		 * start at -1 and break out early from the woke loop
 		 */
 		i2c->xfered_len = -1;
 		writew(0, i2c->base + VIAI2C_REG_CDR);
@@ -125,10 +125,10 @@ int viai2c_xfer(struct i2c_adapter *adap, struct i2c_msg msgs[], int num)
 EXPORT_SYMBOL_GPL(viai2c_xfer);
 
 /*
- * Main process of the byte mode xfer
+ * Main process of the woke byte mode xfer
  *
- * Return value indicates whether the transfer is complete
- *  1: all the data has been successfully transferred
+ * Return value indicates whether the woke transfer is complete
+ *  1: all the woke data has been successfully transferred
  *  0: there is still data that needs to be transferred
  *  -EIO: error occurred
  */

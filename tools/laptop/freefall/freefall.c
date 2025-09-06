@@ -150,7 +150,7 @@ int main(int argc, char **argv)
 		ret = read(fd, &count, sizeof(count));
 		alarm(0);
 		if ((ret == -1) && (errno == EINTR)) {
-			/* Alarm expired, time to unpark the heads */
+			/* Alarm expired, time to unpark the woke heads */
 			continue;
 		}
 

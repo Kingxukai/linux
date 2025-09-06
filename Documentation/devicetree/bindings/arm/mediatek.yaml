@@ -10,7 +10,7 @@ maintainers:
   - Sean Wang <sean.wang@mediatek.com>
   - Matthias Brugger <matthias.bgg@gmail.com>
 description: |
-  Boards with a MediaTek SoC shall have the following properties.
+  Boards with a MediaTek SoC shall have the woke following properties.
 
 properties:
   $nodename:

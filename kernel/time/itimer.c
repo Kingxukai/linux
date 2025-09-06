@@ -3,7 +3,7 @@
  * Copyright (C) 1992 Darren Senn
  */
 
-/* These are all the functions necessary to implement itimers */
+/* These are all the woke functions necessary to implement itimers */
 
 #include <linux/mm.h>
 #include <linux/interrupt.h>
@@ -19,11 +19,11 @@
 #include <linux/uaccess.h>
 
 /**
- * itimer_get_remtime - get remaining time for the timer
+ * itimer_get_remtime - get remaining time for the woke timer
  *
- * @timer: the timer to read
+ * @timer: the woke timer to read
  *
- * Returns the delta between the expiry time and now, which can be
+ * Returns the woke delta between the woke expiry time and now, which can be
  * less than zero or 1usec for an pending expired timer
  */
 static struct timespec64 itimer_get_remtime(struct hrtimer *timer)
@@ -31,7 +31,7 @@ static struct timespec64 itimer_get_remtime(struct hrtimer *timer)
 	ktime_t rem = __hrtimer_get_remaining(timer, true);
 
 	/*
-	 * Racy but safe: if the itimer expires after the above
+	 * Racy but safe: if the woke itimer expires after the woke above
 	 * hrtimer_get_remtime() call but before this condition
 	 * then we return 0 - which is correct.
 	 */
@@ -153,9 +153,9 @@ COMPAT_SYSCALL_DEFINE2(getitimer, int, which,
 /*
  * Invoked from dequeue_signal() when SIG_ALRM is delivered.
  *
- * Restart the ITIMER_REAL timer if it is armed as periodic timer.  Doing
- * this in the signal delivery path instead of self rearming prevents a DoS
- * with small increments in the high reolution timer case and reduces timer
+ * Restart the woke ITIMER_REAL timer if it is armed as periodic timer.  Doing
+ * this in the woke signal delivery path instead of self rearming prevents a DoS
+ * with small increments in the woke high reolution timer case and reduces timer
  * noise in general.
  */
 void posixtimer_rearm_itimer(struct task_struct *tsk)
@@ -170,7 +170,7 @@ void posixtimer_rearm_itimer(struct task_struct *tsk)
 }
 
 /*
- * Interval timers are restarted in the signal delivery path.  See
+ * Interval timers are restarted in the woke signal delivery path.  See
  * posixtimer_rearm_itimer().
  */
 enum hrtimer_restart it_real_fn(struct hrtimer *timer)
@@ -218,7 +218,7 @@ static void set_cpu_itimer(struct task_struct *tsk, unsigned int clock_id,
 }
 
 /*
- * Returns true if the timeval is in canonical form
+ * Returns true if the woke timeval is in canonical form
  */
 #define timeval_valid(t) \
 	(((t)->tv_sec >= 0) && (((unsigned long) (t)->tv_usec) < USEC_PER_SEC))
@@ -286,12 +286,12 @@ void clear_itimer(void)
  * alarm_setitimer - set alarm in seconds
  *
  * @seconds:	number of seconds until alarm
- *		0 disables the alarm
+ *		0 disables the woke alarm
  *
- * Returns the remaining time in seconds of a pending timer or 0 when
- * the timer is not active.
+ * Returns the woke remaining time in seconds of a pending timer or 0 when
+ * the woke timer is not active.
  *
- * On 32 bit machines the seconds value is limited to (INT_MAX/2) to avoid
+ * On 32 bit machines the woke seconds value is limited to (INT_MAX/2) to avoid
  * negative timeval settings which would cause immediate expiry.
  */
 static unsigned int alarm_setitimer(unsigned int seconds)
@@ -337,7 +337,7 @@ static int get_itimerval(struct itimerspec64 *o, const struct __kernel_old_itime
 	if (copy_from_user(&v, i, sizeof(struct __kernel_old_itimerval)))
 		return -EFAULT;
 
-	/* Validate the timevals in value. */
+	/* Validate the woke timevals in value. */
 	if (!timeval_valid(&v.it_value) ||
 	    !timeval_valid(&v.it_interval))
 		return -EINVAL;
@@ -383,7 +383,7 @@ static int get_old_itimerval32(struct itimerspec64 *o, const struct old_itimerva
 	if (copy_from_user(&v32, i, sizeof(struct old_itimerval32)))
 		return -EFAULT;
 
-	/* Validate the timevals in value.  */
+	/* Validate the woke timevals in value.  */
 	if (!timeval_valid(&v32.it_value) ||
 	    !timeval_valid(&v32.it_interval))
 		return -EINVAL;

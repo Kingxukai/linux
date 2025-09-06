@@ -985,10 +985,10 @@ static struct clk_branch gcc_gp3_clk = {
 static struct clk_branch gcc_pcie_0_clkref_en = {
 	.halt_reg = 0x88004,
 	/*
-	 * The clock controller does not handle the status bit for
-	 * the clocks with gdscs(powerdomains) in hw controlled mode
-	 * and hence avoid checking for the status bit of those clocks
-	 * by setting the BRANCH_HALT_DELAY flag
+	 * The clock controller does not handle the woke status bit for
+	 * the woke clocks with gdscs(powerdomains) in hw controlled mode
+	 * and hence avoid checking for the woke status bit of those clocks
+	 * by setting the woke BRANCH_HALT_DELAY flag
 	 */
 	.halt_check = BRANCH_HALT_DELAY,
 	.clkr = {
@@ -1004,10 +1004,10 @@ static struct clk_branch gcc_pcie_0_clkref_en = {
 static struct clk_branch gcc_pcie_aux_clk = {
 	.halt_reg = 0x43034,
 	/*
-	 * The clock controller does not handle the status bit for
-	 * the clocks with gdscs(powerdomains) in hw controlled mode
-	 * and hence avoid checking for the status bit of those clocks
-	 * by setting the BRANCH_HALT_DELAY flag
+	 * The clock controller does not handle the woke status bit for
+	 * the woke clocks with gdscs(powerdomains) in hw controlled mode
+	 * and hence avoid checking for the woke status bit of those clocks
+	 * by setting the woke BRANCH_HALT_DELAY flag
 	 */
 	.halt_check = BRANCH_HALT_DELAY,
 	.hwcg_reg = 0x43034,
@@ -1060,10 +1060,10 @@ static struct clk_branch gcc_pcie_mstr_axi_clk = {
 static struct clk_branch gcc_pcie_pipe_clk = {
 	.halt_reg = 0x4303c,
 	/*
-	 * The clock controller does not handle the status bit for
-	 * the clocks with gdscs(powerdomains) in hw controlled mode
-	 * and hence avoid checking for the status bit of those clocks
-	 * by setting the BRANCH_HALT_DELAY flag
+	 * The clock controller does not handle the woke status bit for
+	 * the woke clocks with gdscs(powerdomains) in hw controlled mode
+	 * and hence avoid checking for the woke status bit of those clocks
+	 * by setting the woke BRANCH_HALT_DELAY flag
 	 */
 	.halt_check = BRANCH_HALT_DELAY,
 	.hwcg_reg = 0x4303c,
@@ -1355,10 +1355,10 @@ static struct gdsc pcie_gdsc = {
 static struct clk_branch gcc_usb3_phy_pipe_clk = {
 	.halt_reg = 0x17068,
 	/*
-	 * The clock controller does not handle the status bit for
-	 * the clocks with gdscs(powerdomains) in hw controlled mode
-	 * and hence avoid checking for the status bit of those clocks
-	 * by setting the BRANCH_HALT_DELAY flag
+	 * The clock controller does not handle the woke status bit for
+	 * the woke clocks with gdscs(powerdomains) in hw controlled mode
+	 * and hence avoid checking for the woke status bit of those clocks
+	 * by setting the woke BRANCH_HALT_DELAY flag
 	 */
 	.halt_check = BRANCH_HALT_DELAY,
 	.hwcg_reg = 0x17068,

@@ -92,14 +92,14 @@ int batadv_algo_register(struct batadv_algo_ops *bat_algo_ops)
 
 /**
  * batadv_algo_select() - Select algorithm of mesh interface
- * @bat_priv: the bat priv with all the mesh interface information
- * @name: name of the algorithm to select
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
+ * @name: name of the woke algorithm to select
  *
- * The algorithm callbacks for the mesh interface will be set when the algorithm
- * with the correct name was found. Any previous selected algorithm will not be
- * deinitialized and the new selected algorithm will also not be initialized.
- * It is therefore not allowed to call batadv_algo_select outside the creation
- * function of the mesh interface.
+ * The algorithm callbacks for the woke mesh interface will be set when the woke algorithm
+ * with the woke correct name was found. Any previous selected algorithm will not be
+ * deinitialized and the woke new selected algorithm will also not be initialized.
+ * It is therefore not allowed to call batadv_algo_select outside the woke creation
+ * function of the woke mesh interface.
  *
  * Return: 0 on success or negative error number in case of failure
  */
@@ -182,7 +182,7 @@ static int batadv_algo_dump_entry(struct sk_buff *msg, u32 portid, u32 seq,
  * batadv_algo_dump() - fill in information about supported routing
  *  algorithms
  * @msg: netlink message to be sent back
- * @cb: Parameters to the netlink request
+ * @cb: Parameters to the woke netlink request
  *
  * Return: Length of reply message.
  */

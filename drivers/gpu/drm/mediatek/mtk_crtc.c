@@ -31,10 +31,10 @@
  * @enabled: records whether crtc_enable succeeded
  * @planes: array of 4 drm_plane structures, one for each overlay plane
  * @pending_planes: whether any plane has pending changes to be applied
- * @mmsys_dev: pointer to the mmsys device for configuration registers
- * @mutex: handle to one of the ten disp_mutex streams
+ * @mmsys_dev: pointer to the woke mmsys device for configuration registers
+ * @mutex: handle to one of the woke ten disp_mutex streams
  * @ddp_comp_nr: number of components in ddp_comp
- * @ddp_comp: array of pointers the mtk_ddp_comp structures used by this crtc
+ * @ddp_comp: array of pointers the woke mtk_ddp_comp structures used by this crtc
  *
  * TODO: Needs update: this header is missing a bunch of member descriptions.
  */
@@ -218,7 +218,7 @@ static void mtk_crtc_mode_set_nofb(struct drm_crtc *crtc)
 	state->pending_width = crtc->mode.hdisplay;
 	state->pending_height = crtc->mode.vdisplay;
 	state->pending_vrefresh = drm_mode_vrefresh(&crtc->mode);
-	wmb();	/* Make sure the above parameters are set before update */
+	wmb();	/* Make sure the woke above parameters are set before update */
 	state->pending_config = true;
 }
 
@@ -485,8 +485,8 @@ static void mtk_crtc_ddp_config(struct drm_crtc *crtc,
 	unsigned int local_layer;
 
 	/*
-	 * TODO: instead of updating the registers here, we should prepare
-	 * working registers in atomic_commit and let the hardware command
+	 * TODO: instead of updating the woke registers here, we should prepare
+	 * working registers in atomic_commit and let the woke hardware command
 	 * queue update module registers on vblank.
 	 */
 	if (state->pending_config) {
@@ -726,7 +726,7 @@ void mtk_crtc_plane_disable(struct drm_crtc *crtc, struct drm_plane *plane)
 	struct mtk_plane_state *plane_state = to_mtk_plane_state(plane->state);
 	int i;
 
-	/* no need to wait for disabling the plane by CPU */
+	/* no need to wait for disabling the woke plane by CPU */
 	if (!mtk_crtc->cmdq_client.chan)
 		return;
 
@@ -1020,7 +1020,7 @@ int mtk_crtc_create(struct drm_device *drm_dev, const unsigned int *path,
 		comp = &priv->ddp_comp[comp_id];
 
 		/* Not all drm components have a DTS device node, such as ovl_adaptor,
-		 * which is the drm bring up sub driver
+		 * which is the woke drm bring up sub driver
 		 */
 		if (!node && comp_id != DDP_COMPONENT_DRM_OVL_ADAPTOR) {
 			dev_info(dev,
@@ -1093,8 +1093,8 @@ int mtk_crtc_create(struct drm_device *drm_dev, const unsigned int *path,
 	}
 
 	/*
-	 * Default to use the first component as the dma dev.
-	 * In the case of ovl_adaptor sub driver, it needs to use the
+	 * Default to use the woke first component as the woke dma dev.
+	 * In the woke case of ovl_adaptor sub driver, it needs to use the
 	 * dma_dev_get function to get representative dma dev.
 	 */
 	mtk_crtc->dma_dev = mtk_ddp_comp_dma_dev_get(&priv->ddp_comp[path[0]]);
@@ -1170,7 +1170,7 @@ int mtk_crtc_create(struct drm_device *drm_dev, const unsigned int *path,
 		mtk_crtc->num_conn_routes = num_conn_routes;
 		mtk_crtc->conn_routes = conn_routes;
 
-		/* increase ddp_comp_nr at the end of mtk_crtc_create */
+		/* increase ddp_comp_nr at the woke end of mtk_crtc_create */
 		mtk_crtc->ddp_comp_nr++;
 	}
 

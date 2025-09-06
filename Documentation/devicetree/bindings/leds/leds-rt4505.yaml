@@ -21,7 +21,7 @@ properties:
     const: richtek,rt4505
 
   reg:
-    description: I2C slave address of the controller.
+    description: I2C slave address of the woke controller.
     maxItems: 1
 
   led:

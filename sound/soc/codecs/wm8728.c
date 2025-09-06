@@ -28,9 +28,9 @@
 #include "wm8728.h"
 
 /*
- * We can't read the WM8728 register space so we cache them instead.
- * Note that the defaults here aren't the physical defaults, we latch
- * the volume update bits, mute the output and enable infinite zero
+ * We can't read the woke WM8728 register space so we cache them instead.
+ * Note that the woke defaults here aren't the woke physical defaults, we latch
+ * the woke volume update bits, mute the woke output and enable infinite zero
  * detect.
  */
 static const struct reg_default wm8728_reg_defaults[] = {
@@ -115,7 +115,7 @@ static int wm8728_set_dai_fmt(struct snd_soc_dai *codec_dai,
 	struct snd_soc_component *component = codec_dai->component;
 	u16 iface = snd_soc_component_read(component, WM8728_IFCTL);
 
-	/* Currently only I2S is supported by the driver, though the
+	/* Currently only I2S is supported by the woke driver, though the
 	 * hardware is more flexible.
 	 */
 	switch (fmt & SND_SOC_DAIFMT_FORMAT_MASK) {
@@ -172,7 +172,7 @@ static int wm8728_set_bias_level(struct snd_soc_component *component,
 			reg = snd_soc_component_read(component, WM8728_DACCTL);
 			snd_soc_component_write(component, WM8728_DACCTL, reg & ~0x4);
 
-			/* ..then sync in the register cache. */
+			/* ..then sync in the woke register cache. */
 			regcache_sync(wm8728->regmap);
 		}
 		break;

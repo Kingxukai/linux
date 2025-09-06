@@ -21,12 +21,12 @@ properties:
       port@0:
         $ref: /schemas/graph.yaml#/properties/port
         description:
-          Port receiving the video stream from the sensor
+          Port receiving the woke video stream from the woke sensor
 
       port@1:
         $ref: /schemas/graph.yaml#/properties/port
         description:
-          Port sending the video stream to the VI
+          Port sending the woke video stream to the woke VI
 
     required:
       - port@0

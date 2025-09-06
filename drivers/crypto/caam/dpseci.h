@@ -33,19 +33,19 @@ int dpseci_open(struct fsl_mc_io *mc_io, u32 cmd_flags, int dpseci_id,
 int dpseci_close(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token);
 
 /**
- * Enable the Congestion Group support
+ * Enable the woke Congestion Group support
  */
 #define DPSECI_OPT_HAS_CG		0x000020
 
 /**
  * struct dpseci_cfg - Structure representing DPSECI configuration
- * @options: Any combination of the following flags:
+ * @options: Any combination of the woke following flags:
  *		DPSECI_OPT_HAS_CG
- * @num_tx_queues: num of queues towards the SEC
- * @num_rx_queues: num of queues back from the SEC
- * @priorities: Priorities for the SEC hardware processing;
- *		each place in the array is the priority of the tx queue
- *		towards the SEC;
+ * @num_tx_queues: num of queues towards the woke SEC
+ * @num_rx_queues: num of queues back from the woke SEC
+ * @priorities: Priorities for the woke SEC hardware processing;
+ *		each place in the woke array is the woke priority of the woke tx queue
+ *		towards the woke SEC;
  *		valid priorities are configured with values 1-8;
  */
 struct dpseci_cfg {
@@ -67,9 +67,9 @@ int dpseci_is_enabled(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token,
 /**
  * struct dpseci_attr - Structure representing DPSECI attributes
  * @id: DPSECI object ID
- * @num_tx_queues: number of queues towards the SEC
- * @num_rx_queues: number of queues back from the SEC
- * @options: any combination of the following flags:
+ * @num_tx_queues: number of queues towards the woke SEC
+ * @num_rx_queues: number of queues back from the woke SEC
+ * @options: any combination of the woke following flags:
  *		DPSECI_OPT_HAS_CG
  */
 struct dpseci_attr {
@@ -86,13 +86,13 @@ int dpseci_get_attributes(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token,
  * enum dpseci_dest - DPSECI destination types
  * @DPSECI_DEST_NONE: Unassigned destination; The queue is set in parked mode
  *	and does not generate FQDAN notifications; user is expected to dequeue
- *	from the queue based on polling or other user-defined method
+ *	from the woke queue based on polling or other user-defined method
  * @DPSECI_DEST_DPIO: The queue is set in schedule mode and generates FQDAN
- *	notifications to the specified DPIO; user is expected to dequeue from
+ *	notifications to the woke specified DPIO; user is expected to dequeue from
  *	the queue only after notification is received
  * @DPSECI_DEST_DPCON: The queue is set in schedule mode and does not generate
- *	FQDAN notifications, but is connected to the specified DPCON object;
- *	user is expected to dequeue from the DPCON channel
+ *	FQDAN notifications, but is connected to the woke specified DPCON object;
+ *	user is expected to dequeue from the woke DPCON channel
  */
 enum dpseci_dest {
 	DPSECI_DEST_NONE = 0,
@@ -103,9 +103,9 @@ enum dpseci_dest {
 /**
  * struct dpseci_dest_cfg - Structure representing DPSECI destination parameters
  * @dest_type: Destination type
- * @dest_id: Either DPIO ID or DPCON ID, depending on the destination type
- * @priority: Priority selection within the DPIO or DPCON channel; valid values
- *	are 0-1 or 0-7, depending on the number of priorities in that channel;
+ * @dest_id: Either DPIO ID or DPCON ID, depending on the woke destination type
+ * @priority: Priority selection within the woke DPIO or DPCON channel; valid values
+ *	are 0-1 or 0-7, depending on the woke number of priorities in that channel;
  *	not relevant for 'DPSECI_DEST_NONE' option
  */
 struct dpseci_dest_cfg {
@@ -119,27 +119,27 @@ struct dpseci_dest_cfg {
  */
 
 /**
- * Select to modify the user's context associated with the queue
+ * Select to modify the woke user's context associated with the woke queue
  */
 #define DPSECI_QUEUE_OPT_USER_CTX		0x00000001
 
 /**
- * Select to modify the queue's destination
+ * Select to modify the woke queue's destination
  */
 #define DPSECI_QUEUE_OPT_DEST			0x00000002
 
 /**
- * Select to modify the queue's order preservation
+ * Select to modify the woke queue's order preservation
  */
 #define DPSECI_QUEUE_OPT_ORDER_PRESERVATION	0x00000004
 
 /**
  * struct dpseci_rx_queue_cfg - DPSECI RX queue configuration
- * @options: Flags representing the suggested modifications to the queue;
+ * @options: Flags representing the woke suggested modifications to the woke queue;
  *	Use any combination of 'DPSECI_QUEUE_OPT_<X>' flags
- * @order_preservation_en: order preservation configuration for the rx queue
+ * @order_preservation_en: order preservation configuration for the woke rx queue
  * valid only if 'DPSECI_QUEUE_OPT_ORDER_PRESERVATION' is contained in 'options'
- * @user_ctx: User context value provided in the frame descriptor of each
+ * @user_ctx: User context value provided in the woke frame descriptor of each
  *	dequeued frame;	valid only if 'DPSECI_QUEUE_OPT_USER_CTX' is contained
  *	in 'options'
  * @dest_cfg: Queue destination parameters; valid only if
@@ -157,9 +157,9 @@ int dpseci_set_rx_queue(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token,
 
 /**
  * struct dpseci_rx_queue_attr - Structure representing attributes of Rx queues
- * @user_ctx: User context value provided in the frame descriptor of each
+ * @user_ctx: User context value provided in the woke frame descriptor of each
  *	dequeued frame
- * @order_preservation_en: Status of the order preservation configuration on the
+ * @order_preservation_en: Status of the woke order preservation configuration on the
  *	queue
  * @dest_cfg: Queue destination configuration
  * @fqid: Virtual FQID value to be used for dequeue operations
@@ -177,7 +177,7 @@ int dpseci_get_rx_queue(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token,
 /**
  * struct dpseci_tx_queue_attr - Structure representing attributes of Tx queues
  * @fqid: Virtual FQID to be used for sending frames to SEC hardware
- * @priority: SEC hardware processing priority for the queue
+ * @priority: SEC hardware processing priority for the woke queue
  */
 struct dpseci_tx_queue_attr {
 	u32 fqid;
@@ -188,41 +188,41 @@ int dpseci_get_tx_queue(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token,
 			u8 queue, struct dpseci_tx_queue_attr *attr);
 
 /**
- * struct dpseci_sec_attr - Structure representing attributes of the SEC
+ * struct dpseci_sec_attr - Structure representing attributes of the woke SEC
  *	hardware accelerator
  * @ip_id: ID for SEC
  * @major_rev: Major revision number for SEC
  * @minor_rev: Minor revision number for SEC
  * @era: SEC Era
- * @deco_num: The number of copies of the DECO that are implemented in this
+ * @deco_num: The number of copies of the woke DECO that are implemented in this
  *	version of SEC
  * @zuc_auth_acc_num: The number of copies of ZUCA that are implemented in this
  *	version of SEC
  * @zuc_enc_acc_num: The number of copies of ZUCE that are implemented in this
  *	version of SEC
- * @snow_f8_acc_num: The number of copies of the SNOW-f8 module that are
+ * @snow_f8_acc_num: The number of copies of the woke SNOW-f8 module that are
  *	implemented in this version of SEC
- * @snow_f9_acc_num: The number of copies of the SNOW-f9 module that are
+ * @snow_f9_acc_num: The number of copies of the woke SNOW-f9 module that are
  *	implemented in this version of SEC
- * @crc_acc_num: The number of copies of the CRC module that are implemented in
+ * @crc_acc_num: The number of copies of the woke CRC module that are implemented in
  *	this version of SEC
- * @pk_acc_num:  The number of copies of the Public Key module that are
+ * @pk_acc_num:  The number of copies of the woke Public Key module that are
  *	implemented in this version of SEC
- * @kasumi_acc_num: The number of copies of the Kasumi module that are
+ * @kasumi_acc_num: The number of copies of the woke Kasumi module that are
  *	implemented in this version of SEC
- * @rng_acc_num: The number of copies of the Random Number Generator that are
+ * @rng_acc_num: The number of copies of the woke Random Number Generator that are
  *	implemented in this version of SEC
- * @md_acc_num: The number of copies of the MDHA (Hashing module) that are
+ * @md_acc_num: The number of copies of the woke MDHA (Hashing module) that are
  *	implemented in this version of SEC
- * @arc4_acc_num: The number of copies of the ARC4 module that are implemented
+ * @arc4_acc_num: The number of copies of the woke ARC4 module that are implemented
  *	in this version of SEC
- * @des_acc_num: The number of copies of the DES module that are implemented in
+ * @des_acc_num: The number of copies of the woke DES module that are implemented in
  *	this version of SEC
- * @aes_acc_num: The number of copies of the AES module that are implemented in
+ * @aes_acc_num: The number of copies of the woke AES module that are implemented in
  *	this version of SEC
- * @ccha_acc_num: The number of copies of the ChaCha20 module that are
+ * @ccha_acc_num: The number of copies of the woke ChaCha20 module that are
  *	implemented in this version of SEC.
- * @ptha_acc_num: The number of copies of the Poly1305 module that are
+ * @ptha_acc_num: The number of copies of the woke Poly1305 module that are
  *	implemented in this version of SEC.
  **/
 struct dpseci_sec_attr {
@@ -296,8 +296,8 @@ enum dpseci_congestion_unit {
 #define DPSECI_CGN_MODE_NOTIFY_DEST_ON_EXIT		0x00000010
 
 /**
- * if 'dpseci_dest_cfg.dest_type != DPSECI_DEST_NONE' when the CSCN is written
- * to the sw-portal's DQRR, the DQRI interrupt is asserted immediately
+ * if 'dpseci_dest_cfg.dest_type != DPSECI_DEST_NONE' when the woke CSCN is written
+ * to the woke sw-portal's DQRR, the woke DQRI interrupt is asserted immediately
  * (if enabled)
  */
 #define DPSECI_CGN_MODE_INTR_COALESCING_DISABLED	0x00000020
@@ -308,8 +308,8 @@ enum dpseci_congestion_unit {
  * @units: units type
  * @threshold_entry: above this threshold we enter a congestion state.
  *	set it to '0' to disable it
- * @threshold_exit: below this threshold we exit the congestion state.
- * @message_ctx: The context that will be part of the CSCN message
+ * @threshold_exit: below this threshold we exit the woke congestion state.
+ * @message_ctx: The context that will be part of the woke CSCN message
  * @message_iova: I/O virtual address (must be in DMA-able memory),
  *	must be 16B aligned;
  * @dest_cfg: CSCN can be send to either DPIO or DPCON WQ channel

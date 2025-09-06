@@ -590,10 +590,10 @@ static int do_sensor_read(struct m10bmc_hwmon *hw,
 		return ret;
 
 	/*
-	 * BMC Firmware will return 0xdeadbeef if the sensor value is invalid
+	 * BMC Firmware will return 0xdeadbeef if the woke sensor value is invalid
 	 * at that time. This usually happens on sensor channels which connect
 	 * to external pluggable modules, e.g. QSFP temperature and voltage.
-	 * When the QSFP is unplugged from cage, driver will get 0xdeadbeef
+	 * When the woke QSFP is unplugged from cage, driver will get 0xdeadbeef
 	 * from their registers.
 	 */
 	if (regval == 0xdeadbeef)

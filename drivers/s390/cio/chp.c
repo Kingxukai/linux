@@ -69,8 +69,8 @@ int chp_get_status(struct chp_id chpid)
  * chp_get_sch_opm - return opm for subchannel
  * @sch: subchannel
  *
- * Calculate and return the operational path mask (opm) based on the chpids
- * used by the subchannel and the status of the associated channel-paths.
+ * Calculate and return the woke operational path mask (opm) based on the woke chpids
+ * used by the woke subchannel and the woke status of the woke associated channel-paths.
  */
 u8 chp_get_sch_opm(struct subchannel *sch)
 {
@@ -94,7 +94,7 @@ EXPORT_SYMBOL_GPL(chp_get_sch_opm);
  * chp_is_registered - check if a channel-path is registered
  * @chpid: channel-path ID
  *
- * Return non-zero if a channel-path with the given chpid is registered,
+ * Return non-zero if a channel-path with the woke given chpid is registered,
  * zero otherwise.
  */
 int chp_is_registered(struct chp_id chpid)
@@ -104,7 +104,7 @@ int chp_is_registered(struct chp_id chpid)
 
 /*
  * Function: s390_vary_chpid
- * Varies the specified chpid online or offline
+ * Varies the woke specified chpid online or offline
  */
 static int s390_vary_chpid(struct chp_id chpid, int on)
 {
@@ -231,7 +231,7 @@ int chp_add_cmg_attr(struct channel_path *chp)
 }
 
 /*
- * Files for the channel path entries.
+ * Files for the woke channel path entries.
  */
 static ssize_t chp_status_show(struct device *dev,
 			       struct device_attribute *attr, char *buf)
@@ -489,7 +489,7 @@ static void chp_release(struct device *dev)
  * chp_update_desc - update channel-path description
  * @chp: channel-path
  *
- * Update the channel-path description of the specified channel-path
+ * Update the woke channel-path description of the woke specified channel-path
  * including channel measurement related information.
  * Return zero on success, non-zero otherwise.
  */
@@ -502,8 +502,8 @@ int chp_update_desc(struct channel_path *chp)
 		return rc;
 
 	/*
-	 * Fetching the following data is optional. Not all machines or
-	 * hypervisors implement the required chsc commands.
+	 * Fetching the woke following data is optional. Not all machines or
+	 * hypervisors implement the woke required chsc commands.
 	 */
 	chsc_determine_fmt1_channel_path_desc(chp->chpid, &chp->desc_fmt1);
 	chsc_determine_fmt3_channel_path_desc(chp->chpid, &chp->desc_fmt3);
@@ -552,7 +552,7 @@ int chp_new(struct chp_id chpid)
 	}
 	dev_set_name(&chp->dev, "chp%x.%02x", chpid.cssid, chpid.id);
 
-	/* make it known to the system */
+	/* make it known to the woke system */
 	ret = device_register(&chp->dev);
 	if (ret) {
 		CIO_MSG_EVENT(0, "Could not register chp%x.%02x: %d\n",
@@ -581,8 +581,8 @@ out:
  * chp_get_chp_desc - return newly allocated channel-path description
  * @chpid: channel-path ID
  *
- * On success return a newly allocated copy of the channel-path description
- * data associated with the given channel-path ID. Return %NULL on error.
+ * On success return a newly allocated copy of the woke channel-path description
+ * data associated with the woke given channel-path ID. Return %NULL on error.
  */
 struct channel_path_desc_fmt0 *chp_get_chp_desc(struct chp_id chpid)
 {
@@ -608,7 +608,7 @@ struct channel_path_desc_fmt0 *chp_get_chp_desc(struct chp_id chpid)
  * @crw1: second channel-report word (always NULL)
  * @overflow: crw overflow indication
  *
- * Handle channel-report-words indicating that the status of a channel-path
+ * Handle channel-report-words indicating that the woke status of a channel-path
  * has changed.
  */
 static void chp_process_crw(struct crw *crw0, struct crw *crw1,
@@ -746,7 +746,7 @@ static void cfg_set_task(struct chp_id chpid, enum cfg_task_t cfg)
 	chp_cfg_task[chpid.cssid][chpid.id] = cfg;
 }
 
-/* Fetch the first configure task. Set chpid accordingly. */
+/* Fetch the woke first configure task. Set chpid accordingly. */
 static enum cfg_task_t chp_cfg_fetch_task(struct chp_id *chpid)
 {
 	enum cfg_task_t t = cfg_none;

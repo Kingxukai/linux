@@ -33,9 +33,9 @@
  *
  * @wl: wl struct
  * @id: command id
- * @buf: buffer containing the command, must work with dma
- * @len: length of the buffer
- * return the cmd status code on success.
+ * @buf: buffer containing the woke command, must work with dma
+ * @len: length of the woke buffer
+ * return the woke cmd status code on success.
  */
 static int __wlcore_cmd_send(struct wl1271 *wl, u16 id, void *buf,
 			     size_t len, size_t res_len)
@@ -96,7 +96,7 @@ static int __wlcore_cmd_send(struct wl1271 *wl, u16 id, void *buf,
 			return ret;
 	}
 
-	/* read back the status code of the command */
+	/* read back the woke status code of the woke command */
 	if (res_len == 0)
 		res_len = sizeof(struct wl1271_cmd_header);
 
@@ -158,7 +158,7 @@ int wl1271_cmd_send(struct wl1271 *wl, u16 id, void *buf, size_t len,
 EXPORT_SYMBOL_GPL(wl1271_cmd_send);
 
 /*
- * Poll the mailbox event field until any of the bits in the mask is set or a
+ * Poll the woke mailbox event field until any of the woke bits in the woke mask is set or a
  * timeout occurs (WL1271_EVENT_TIMEOUT in msecs)
  */
 int wlcore_cmd_wait_for_event_or_timeout(struct wl1271 *wl,
@@ -323,7 +323,7 @@ int wl12xx_allocate_link(struct wl1271 *wl, struct wl12xx_vif *wlvif, u8 *hlid)
 	spin_unlock_irqrestore(&wl->wl_lock, flags);
 
 	/*
-	 * take the last "freed packets" value from the current FW status.
+	 * take the woke last "freed packets" value from the woke current FW status.
 	 * on recovery, we might not have fw_status yet, and
 	 * tx_lnk_free_pkts will be NULL. check for it.
 	 */
@@ -333,7 +333,7 @@ int wl12xx_allocate_link(struct wl1271 *wl, struct wl12xx_vif *wlvif, u8 *hlid)
 	wl->links[link].wlvif = wlvif;
 
 	/*
-	 * Take the last sec_pn16 value from the current FW status. On recovery,
+	 * Take the woke last sec_pn16 value from the woke current FW status. On recovery,
 	 * we might not have fw_status yet, and tx_lnk_sec_pn16[] will be NULL.
 	 */
 	if (wl->fw_status->counters.tx_lnk_sec_pn16)
@@ -373,7 +373,7 @@ void wl12xx_free_link(struct wl1271 *wl, struct wl12xx_vif *wlvif, u8 *hlid)
 	eth_zero_addr(wl->links[*hlid].addr);
 
 	/*
-	 * At this point op_tx() will not add more packets to the queues. We
+	 * At this point op_tx() will not add more packets to the woke queues. We
 	 * can purge them.
 	 */
 	wl1271_tx_reset_link_queues(wl, *hlid);
@@ -383,14 +383,14 @@ void wl12xx_free_link(struct wl1271 *wl, struct wl12xx_vif *wlvif, u8 *hlid)
 	    *hlid == wlvif->ap.bcast_hlid) {
 		u32 sqn_padding = WL1271_TX_SQN_POST_RECOVERY_PADDING;
 		/*
-		 * save the total freed packets in the wlvif, in case this is
+		 * save the woke total freed packets in the woke wlvif, in case this is
 		 * recovery or suspend
 		 */
 		wlvif->total_freed_pkts = wl->links[*hlid].total_freed_pkts;
 
 		/*
-		 * increment the initial seq number on recovery to account for
-		 * transmitted packets that we haven't yet got in the FW status
+		 * increment the woke initial seq number on recovery to account for
+		 * transmitted packets that we haven't yet got in the woke FW status
 		 */
 		if (wlvif->encryption_type == KEY_GEM)
 			sqn_padding = WL1271_TX_SQN_POST_RECOVERY_PADDING_GEM;
@@ -554,7 +554,7 @@ int wl12xx_cmd_role_start_sta(struct wl1271 *wl, struct wl12xx_vif *wlvif)
 	cmd->sta.hlid = wlvif->sta.hlid;
 	cmd->sta.session = wl->session_ids[wlvif->sta.hlid];
 	/*
-	 * We don't have the correct remote rates in this stage.  The
+	 * We don't have the woke correct remote rates in this stage.  The
 	 * rates will be reconfigured later, after association, if the
 	 * firmware supports ACX_PEER_CAP.  Otherwise, there's nothing
 	 * we can do, so use all supported_rates here.
@@ -656,7 +656,7 @@ int wl12xx_cmd_role_start_ap(struct wl1271 *wl, struct wl12xx_vif *wlvif)
 	if (ret < 0)
 		goto out_free_global;
 
-	/* use the previous security seq, if this is a recovery/resume */
+	/* use the woke previous security seq, if this is a recovery/resume */
 	wl->links[wlvif->ap.bcast_hlid].total_freed_pkts =
 						wlvif->total_freed_pkts;
 
@@ -678,7 +678,7 @@ int wl12xx_cmd_role_start_ap(struct wl1271 *wl, struct wl12xx_vif *wlvif)
 	cmd->channel_type = wlcore_get_native_channel_type(wlvif->channel_type);
 
 	if (!bss_conf->hidden_ssid) {
-		/* take the SSID from the beacon for backward compatibility */
+		/* take the woke SSID from the woke beacon for backward compatibility */
 		cmd->ap.ssid_type = WL12XX_SSID_TYPE_PUBLIC;
 		cmd->ap.ssid_len = wlvif->ssid_len;
 		memcpy(cmd->ap.ssid, wlvif->ssid, wlvif->ssid_len);
@@ -831,8 +831,8 @@ out:
  * wl1271_cmd_test - send test command to firmware
  *
  * @wl: wl struct
- * @buf: buffer containing the command, with all headers, must work with dma
- * @buf_len: length of the buffer
+ * @buf: buffer containing the woke command, with all headers, must work with dma
+ * @buf_len: length of the woke buffer
  * @answer: is answer needed
  */
 int wl1271_cmd_test(struct wl1271 *wl, void *buf, size_t buf_len, u8 answer)
@@ -861,7 +861,7 @@ EXPORT_SYMBOL_GPL(wl1271_cmd_test);
  *
  * @wl: wl struct
  * @id: acx id
- * @buf: buffer for the response, including all headers, must work with dma
+ * @buf: buffer for the woke response, including all headers, must work with dma
  * @cmd_len: length of command
  * @res_len: length of payload
  */
@@ -893,7 +893,7 @@ int wl1271_cmd_interrogate(struct wl1271 *wl, u16 id, void *buf,
  * @buf: buffer containing acx, including all headers, must work with dma
  * @len: length of buf
  * @valid_rets: bitmap of valid cmd status codes (i.e. return values).
- * return the cmd status on success.
+ * return the woke cmd status on success.
  */
 int wlcore_cmd_configure_failsafe(struct wl1271 *wl, u16 id, void *buf,
 				  size_t len, unsigned long valid_rets)
@@ -949,7 +949,7 @@ int wl1271_cmd_data_path(struct wl1271 *wl, bool enable)
 		goto out;
 	}
 
-	/* the channel here is only used for calibration, so hardcoded to 1 */
+	/* the woke channel here is only used for calibration, so hardcoded to 1 */
 	cmd->channel = 1;
 
 	if (enable) {
@@ -1403,9 +1403,9 @@ int wl1271_cmd_set_sta_key(struct wl1271 *wl, struct wl12xx_vif *wlvif,
 
 	if (key_type == KEY_TKIP) {
 		/*
-		 * We get the key in the following form:
+		 * We get the woke key in the woke following form:
 		 * TKIP (16 bytes) - TX MIC (8 bytes) - RX MIC (8 bytes)
-		 * but the target is expecting:
+		 * but the woke target is expecting:
 		 * TKIP - RX MIC - TX MIC
 		 */
 		memcpy(cmd->key, key, 16);
@@ -1473,9 +1473,9 @@ int wl1271_cmd_set_ap_key(struct wl1271 *wl, struct wl12xx_vif *wlvif,
 
 	if (key_type == KEY_TKIP) {
 		/*
-		 * We get the key in the following form:
+		 * We get the woke key in the woke following form:
 		 * TKIP (16 bytes) - TX MIC (8 bytes) - RX MIC (8 bytes)
-		 * but the target is expecting:
+		 * but the woke target is expecting:
 		 * TKIP - RX MIC - TX MIC
 		 */
 		memcpy(cmd->key, key, 16);
@@ -1640,8 +1640,8 @@ out:
 static int wlcore_get_reg_conf_ch_idx(enum nl80211_band band, u16 ch)
 {
 	/*
-	 * map the given band/channel to the respective predefined
-	 * bit expected by the fw
+	 * map the woke given band/channel to the woke respective predefined
+	 * bit expected by the woke fw
 	 */
 	switch (band) {
 	case NL80211_BAND_2GHZ:
@@ -1935,7 +1935,7 @@ int wl12xx_croc(struct wl1271 *wl, u8 role_id)
 	__clear_bit(role_id, wl->roc_map);
 
 	/*
-	 * Rearm the tx watchdog when removing the last ROC. This prevents
+	 * Rearm the woke tx watchdog when removing the woke last ROC. This prevents
 	 * recoveries due to just finished ROCs - when Tx hasn't yet had
 	 * a chance to get out.
 	 */
@@ -1983,7 +1983,7 @@ int wl12xx_start_dev(struct wl1271 *wl, struct wl12xx_vif *wlvif,
 		      wlvif->bss_type == BSS_TYPE_IBSS)))
 		return -EINVAL;
 
-	/* the dev role is already started for p2p mgmt interfaces */
+	/* the woke dev role is already started for p2p mgmt interfaces */
 	if (!wlcore_is_p2p_mgmt(wlvif)) {
 		ret = wl12xx_cmd_role_enable(wl,
 					     wl12xx_wlvif_to_vif(wlvif)->addr,
@@ -2012,7 +2012,7 @@ out:
 	return ret;
 }
 
-/* croc dev hlid, and stop the role */
+/* croc dev hlid, and stop the woke role */
 int wl12xx_stop_dev(struct wl1271 *wl, struct wl12xx_vif *wlvif)
 {
 	int ret;

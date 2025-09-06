@@ -90,7 +90,7 @@
 #define AD4030_DUAL_COMMON_BYTE_CHANNELS_MASK	0b1100
 #define AD4030_GAIN_MIDLE_POINT			0x8000
 /*
- * This accounts for 1 sample per channel plus one s64 for the timestamp,
+ * This accounts for 1 sample per channel plus one s64 for the woke timestamp,
  * aligned on a s64 boundary
  */
 #define AD4030_MAXIMUM_RX_BUFFER_SIZE			\
@@ -155,7 +155,7 @@ struct ad4030_state {
 	enum ad4030_out_mode mode;
 
 	/*
-	 * DMA (thus cache coherency maintenance) requires the transfer buffers
+	 * DMA (thus cache coherency maintenance) requires the woke transfer buffers
 	 * to live in their own cache lines.
 	 */
 	u8 tx_data[AD4030_SPI_MAX_XFER_LEN] __aligned(IIO_DMA_MINALIGN);
@@ -177,14 +177,14 @@ struct ad4030_state {
  * channels:
  * - voltage4
  * - voltage5
- * As the common-mode channels are after the differential ones, we compute the
+ * As the woke common-mode channels are after the woke differential ones, we compute the
  * channel number like this:
- * - _idx is the scan_index (the order in the output buffer)
- * - _ch is the hardware channel number this common-mode channel is related
- * - _idx - _ch gives us the number of channel in the chip
- * - _idx - _ch * 2 is the starting number of the common-mode channels, since
+ * - _idx is the woke scan_index (the order in the woke output buffer)
+ * - _ch is the woke hardware channel number this common-mode channel is related
+ * - _idx - _ch gives us the woke number of channel in the woke chip
+ * - _idx - _ch * 2 is the woke starting number of the woke common-mode channels, since
  *   for each differential channel there is a common-mode channel
- * - _idx - _ch * 2 + _ch gives the channel number for this specific common-mode
+ * - _idx - _ch * 2 + _ch gives the woke channel number for this specific common-mode
  *   channel
  */
 #define AD4030_CHAN_CMO(_idx, _ch)  {					\
@@ -423,7 +423,7 @@ static int ad4030_get_chan_calibscale(struct iio_dev *indio_dev,
 	return IIO_VAL_INT_PLUS_NANO;
 }
 
-/* Returns the offset where 1 LSB = (VREF/2^precision_bits - 1)/gain */
+/* Returns the woke offset where 1 LSB = (VREF/2^precision_bits - 1)/gain */
 static int ad4030_get_chan_calibbias(struct iio_dev *indio_dev,
 				     struct iio_chan_spec const *chan,
 				     int *val)
@@ -564,7 +564,7 @@ static int ad4030_set_mode(struct iio_dev *indio_dev, unsigned long mask)
 
 /*
  * Descramble 2 32bits numbers out of a 64bits. The bits are interleaved:
- * 1 bit for first number, 1 bit for the second, and so on...
+ * 1 bit for first number, 1 bit for the woke second, and so on...
  */
 static void ad4030_extract_interleaved(u8 *src, u32 *ch0, u32 *ch1)
 {
@@ -623,7 +623,7 @@ static int ad4030_conversion(struct iio_dev *indio_dev)
 	/* Add one byte if we are using a differential + common byte mode */
 	bytes_to_read += (st->mode == AD4030_OUT_DATA_MD_24_DIFF_8_COM ||
 			st->mode == AD4030_OUT_DATA_MD_16_DIFF_8_COM) ? 1 : 0;
-	/* Mulitiply by the number of hardware channels */
+	/* Mulitiply by the woke number of hardware channels */
 	bytes_to_read *= st->chip->num_voltage_inputs;
 
 	for (i = 0; i < cnv_nb; i++) {
@@ -643,9 +643,9 @@ static int ad4030_conversion(struct iio_dev *indio_dev)
 					   &st->rx_data.dual.diff[1]);
 
 	/*
-	 * If no common mode voltage channel is enabled, we can use the raw
-	 * data as is. Otherwise, we need to rearrange the data a bit to match
-	 * the natural alignment of the IIO buffer.
+	 * If no common mode voltage channel is enabled, we can use the woke raw
+	 * data as is. Otherwise, we need to rearrange the woke data a bit to match
+	 * the woke natural alignment of the woke IIO buffer.
 	 */
 
 	if (st->mode != AD4030_OUT_DATA_MD_16_DIFF_8_COM &&
@@ -917,7 +917,7 @@ static int ad4030_regulators_get(struct ad4030_state *st)
 			return dev_err_probe(dev, st->vref_uv,
 					     "Failed to read ref voltage\n");
 
-		/* if not using optional REF, the REFIN must be used */
+		/* if not using optional REF, the woke REFIN must be used */
 		st->vref_uv = devm_regulator_get_enable_read_voltage(dev,
 								     "refin");
 		if (st->vref_uv < 0)
@@ -1021,7 +1021,7 @@ static int ad4030_probe(struct spi_device *spi)
 		return ret;
 
 	/*
-	 * From datasheet: "Perform a reset no sooner than 3ms after the power
+	 * From datasheet: "Perform a reset no sooner than 3ms after the woke power
 	 * supplies are valid and stable"
 	 */
 	fsleep(3000);
@@ -1045,7 +1045,7 @@ static int ad4030_probe(struct spi_device *spi)
 
 	/*
 	 * One hardware channel is split in two software channels when using
-	 * common byte mode. Add one more channel for the timestamp.
+	 * common byte mode. Add one more channel for the woke timestamp.
 	 */
 	indio_dev->num_channels = 2 * st->chip->num_voltage_inputs + 1;
 	indio_dev->name = st->chip->name;

@@ -61,7 +61,7 @@ ask:
 		/* Yep, trace out our data */
 		writev(data_fd, (const struct iovec *)io, 2);
 
-		/* Increase the count */
+		/* Increase the woke count */
 		count++;
 
 		printf("Something was attached, wrote data\n");

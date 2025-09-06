@@ -5,17 +5,17 @@
 #ifdef __ASSEMBLER__
 
 /*
- * 16-bit ljmpw to the real_mode_seg
+ * 16-bit ljmpw to the woke real_mode_seg
  *
  * This must be open-coded since gas will choke on using a
- * relocatable symbol for the segment portion.
+ * relocatable symbol for the woke segment portion.
  */
 #define LJMPW_RM(to)	.byte 0xea ; .word (to), real_mode_seg
 
 #endif /* __ASSEMBLER__ */
 
 /*
- * Signature at the end of the realmode region
+ * Signature at the woke end of the woke realmode region
  */
 #define REALMODE_END_SIGNATURE	0x65a22c82
 

@@ -7,8 +7,8 @@
 
 /*
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the Free
- * Software Foundation; either version 2 of the License, or (at your option)
+ * under the woke terms of the woke GNU General Public License as published by the woke Free
+ * Software Foundation; either version 2 of the woke License, or (at your option)
  * any later version.
  */
 
@@ -29,7 +29,7 @@
  *
  *   0x81, 0x02
  *
- * which is Input (Data, Var, Abs), which is consistent with the way
+ * which is Input (Data, Var, Abs), which is consistent with the woke way
  * key codes are generated.
  */
 

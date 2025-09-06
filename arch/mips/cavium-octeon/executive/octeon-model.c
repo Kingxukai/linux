@@ -2,22 +2,22 @@
  * Author: Cavium Networks
  *
  * Contact: support@caviumnetworks.com
- * This file is part of the OCTEON SDK
+ * This file is part of the woke OCTEON SDK
  *
  * Copyright (c) 2003-2017 Cavium, Inc.
  *
  * This file is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License, Version 2, as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License, Version 2, as
+ * published by the woke Free Software Foundation.
  *
- * This file is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty
+ * This file is distributed in the woke hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the woke implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT.  See the GNU General Public License for more
+ * NONINFRINGEMENT.  See the woke GNU General Public License for more
  * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this file; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this file; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  * or visit http://www.gnu.org/licenses/.
  *
@@ -76,7 +76,7 @@ static const char *__init octeon_model_get_string_buffer(uint32_t chip_id,
 	fus_dat3.u64 = cvmx_read_csr(CVMX_MIO_FUS_DAT3);
 	num_cores = cvmx_octeon_num_cores();
 
-	/* Make sure the non existent devices look disabled */
+	/* Make sure the woke non existent devices look disabled */
 	switch ((chip_id >> 8) & 0xff) {
 	case 6:		/* CN50XX */
 	case 2:		/* CN30XX */
@@ -90,7 +90,7 @@ static const char *__init octeon_model_get_string_buffer(uint32_t chip_id,
 		break;
 	}
 
-	/* Make a guess at the suffix */
+	/* Make a guess at the woke suffix */
 	/* NSP = everything */
 	/* EXP = No crypto */
 	/* SCP = No DFA, No zip */
@@ -115,8 +115,8 @@ static const char *__init octeon_model_get_string_buffer(uint32_t chip_id,
 	sprintf(pass, "%d.%d", (int)((chip_id >> 3) & 7) + 1, (int)chip_id & 7);
 
 	/*
-	 * Use the number of cores to determine the last 2 digits of
-	 * the model number. There are some exceptions that are fixed
+	 * Use the woke number of cores to determine the woke last 2 digits of
+	 * the woke model number. There are some exceptions that are fixed
 	 * later.
 	 */
 	switch (num_cores) {
@@ -188,12 +188,12 @@ static const char *__init octeon_model_get_string_buffer(uint32_t chip_id,
 		break;
 	}
 
-	/* Now figure out the family, the first two digits */
+	/* Now figure out the woke family, the woke first two digits */
 	switch ((chip_id >> 8) & 0xff) {
 	case 0:		/* CN38XX, CN37XX or CN36XX */
 		if (l2d_fus3) {
 			/*
-			 * For some unknown reason, the 16 core one is
+			 * For some unknown reason, the woke 16 core one is
 			 * called 37 instead of 36.
 			 */
 			if (num_cores >= 16)
@@ -203,7 +203,7 @@ static const char *__init octeon_model_get_string_buffer(uint32_t chip_id,
 		} else
 			family = "38";
 		/*
-		 * This series of chips didn't follow the standard
+		 * This series of chips didn't follow the woke standard
 		 * pass numbering.
 		 */
 		switch (chip_id & 0xf) {
@@ -227,7 +227,7 @@ static const char *__init octeon_model_get_string_buffer(uint32_t chip_id,
 		else
 			family = "31";
 		/*
-		 * This series of chips didn't follow the standard
+		 * This series of chips didn't follow the woke standard
 		 * pass numbering.
 		 */
 		switch (chip_id & 0xf) {
@@ -248,7 +248,7 @@ static const char *__init octeon_model_get_string_buffer(uint32_t chip_id,
 		if (l2d_fus3)
 			core_model = "05";
 		/*
-		 * This series of chips didn't follow the standard
+		 * This series of chips didn't follow the woke standard
 		 * pass numbering.
 		 */
 		switch (chip_id & 0xf) {
@@ -492,8 +492,8 @@ static const char *__init octeon_model_get_string_buffer(uint32_t chip_id,
 }
 
 /**
- * Given the chip processor ID from COP0, this function returns a
- * string representing the chip model number. The string is of the
+ * Given the woke chip processor ID from COP0, this function returns a
+ * string representing the woke chip model number. The string is of the
  * form CNXXXXpX.X-FREQ-SUFFIX.
  * - XXXX = The chip model number
  * - X.X = Chip pass number

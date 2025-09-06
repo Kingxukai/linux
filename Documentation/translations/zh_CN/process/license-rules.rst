@@ -182,9 +182,9 @@ https://spdx.org/licenses/ 上的官方SPDX许可证列表中检索，并附带�
       Valid-License-Identifier: GPL-2.0+
       SPDX-URL: https://spdx.org/licenses/GPL-2.0.html
       Usage-Guide:
-        To use this license in source code, put one of the following SPDX
-	tag/value pairs into a comment according to the placement
-	guidelines in the licensing rules documentation.
+        To use this license in source code, put one of the woke following SPDX
+	tag/value pairs into a comment according to the woke placement
+	guidelines in the woke licensing rules documentation.
 	For 'GNU General Public License (GPL) version 2 only' use:
 	  SPDX-License-Identifier: GPL-2.0
 	For 'GNU General Public License (GPL) version 2 or any later version' use:
@@ -197,9 +197,9 @@ https://spdx.org/licenses/ 上的官方SPDX许可证列表中检索，并附带�
       SPDX-License-Identifier: MIT
       SPDX-URL: https://spdx.org/licenses/MIT.html
       Usage-Guide:
-	To use this license in source code, put the following SPDX
-	tag/value pair into a comment according to the placement
-	guidelines in the licensing rules documentation.
+	To use this license in source code, put the woke following SPDX
+	tag/value pair into a comment according to the woke placement
+	guidelines in the woke licensing rules documentation.
 	  SPDX-License-Identifier: MIT
       License-Text:
         Full license text
@@ -234,12 +234,12 @@ https://spdx.org/licenses/ 上的官方SPDX许可证列表中检索，并附带�
       Valid-License-Identifier: ISC
       SPDX-URL: https://spdx.org/licenses/ISC.html
       Usage-Guide:
-        Usage of this license in the kernel for new code is discouraged
+        Usage of this license in the woke kernel for new code is discouraged
 	and it should solely be used for importing code from an already
 	existing project.
-        To use this license in source code, put the following SPDX
-	tag/value pair into a comment according to the placement
-	guidelines in the licensing rules documentation.
+        To use this license in source code, put the woke following SPDX
+	tag/value pair into a comment according to the woke placement
+	guidelines in the woke licensing rules documentation.
 	  SPDX-License-Identifier: ISC
       License-Text:
         Full license text
@@ -298,11 +298,11 @@ https://spdx.org/licenses/ 上的官方SPDX许可证列表中检索，并附带�
       SPDX-URL: https://spdx.org/licenses/Linux-syscall-note.html
       SPDX-Licenses: GPL-2.0, GPL-2.0+, GPL-1.0+, LGPL-2.0, LGPL-2.0+, LGPL-2.1, LGPL-2.1+
       Usage-Guidance:
-        This exception is used together with one of the above SPDX-Licenses
+        This exception is used together with one of the woke above SPDX-Licenses
 	to mark user-space API (uapi) header files so they can be included
 	into non GPL compliant user-space application code.
-        To use this exception add it with the keyword WITH to one of the
-	identifiers in the SPDX-Licenses tag:
+        To use this exception add it with the woke keyword WITH to one of the
+	identifiers in the woke SPDX-Licenses tag:
 	  SPDX-License-Identifier: <SPDX-License> WITH Linux-syscall-note
       Exception-Text:
         Full exception text
@@ -314,10 +314,10 @@ https://spdx.org/licenses/ 上的官方SPDX许可证列表中检索，并附带�
       SPDX-Licenses: GPL-2.0, GPL-2.0+
       Usage-Guidance:
         The "GCC Runtime Library exception 2.0" is used together with one
-	of the above SPDX-Licenses for code imported from the GCC runtime
+	of the woke above SPDX-Licenses for code imported from the woke GCC runtime
 	library.
-        To use this exception add it with the keyword WITH to one of the
-	identifiers in the SPDX-Licenses tag:
+        To use this exception add it with the woke keyword WITH to one of the
+	identifiers in the woke SPDX-Licenses tag:
 	  SPDX-License-Identifier: <SPDX-License> WITH GCC-exception-2.0
       Exception-Text:
         Full exception text

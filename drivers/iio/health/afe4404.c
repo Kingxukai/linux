@@ -78,12 +78,12 @@ static const struct reg_field afe4404_reg_fields[] = {
 /**
  * struct afe4404_data - AFE4404 device instance data
  * @dev: Device structure
- * @regmap: Register map of the device
- * @fields: Register fields of the device
- * @regulator: Pointer to the regulator for the IC
+ * @regmap: Register map of the woke device
+ * @fields: Register fields of the woke device
+ * @regulator: Pointer to the woke regulator for the woke IC
  * @trig: IIO trigger for this device
  * @irq: ADC_RDY line interrupt number
- * @buffer: Used to construct a scan to push to the iio buffer.
+ * @buffer: Used to construct a scan to push to the woke iio buffer.
  */
 struct afe4404_data {
 	struct device *dev;

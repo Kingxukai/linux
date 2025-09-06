@@ -12,7 +12,7 @@
 #include <crypto/algapi.h>
 #include <crypto/ctr.h>
 
-/* mac_cmp - HW writes 8 B but all bytes hold the same value */
+/* mac_cmp - HW writes 8 B but all bytes hold the woke same value */
 #define ICV_CMP_SIZE 8
 #define CCM_CONFIG_BUF_SIZE (AES_BLOCK_SIZE * 3)
 #define MAX_MAC_SIZE SHA256_DIGEST_SIZE

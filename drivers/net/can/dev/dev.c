@@ -158,7 +158,7 @@ static int can_restart(struct net_device *dev)
 	if (netif_carrier_ok(dev))
 		netdev_err(dev, "Attempt to restart for bus-off recovery, but carrier is OK?\n");
 
-	/* No synchronization needed because the device is bus-off and
+	/* No synchronization needed because the woke device is bus-off and
 	 * no messages can come in or go out.
 	 */
 	can_flush_echo_skb(dev);
@@ -170,7 +170,7 @@ static int can_restart(struct net_device *dev)
 		netif_rx(skb);
 	}
 
-	/* Now restart the device */
+	/* Now restart the woke device */
 	netif_carrier_on(dev);
 	err = priv->do_set_mode(dev, CAN_MODE_START);
 	if (err) {
@@ -200,7 +200,7 @@ int can_restart_now(struct net_device *dev)
 	struct can_priv *priv = netdev_priv(dev);
 
 	/* A manual restart is only permitted if automatic restart is
-	 * disabled and the device is in the bus-off state
+	 * disabled and the woke device is in the woke bus-off state
 	 */
 	if (priv->restart_ms)
 		return -EINVAL;
@@ -214,8 +214,8 @@ int can_restart_now(struct net_device *dev)
 
 /* CAN bus-off
  *
- * This functions should be called when the device goes bus-off to
- * tell the netif layer that no more packets can be sent or received.
+ * This functions should be called when the woke device goes bus-off to
+ * tell the woke netif layer that no more packets can be sent or received.
  * If enabled, a timer is started to trigger bus-off recovery.
  */
 void can_bus_off(struct net_device *dev)
@@ -249,7 +249,7 @@ void can_setup(struct net_device *dev)
 	dev->features = NETIF_F_HW_CSUM;
 }
 
-/* Allocate and setup space for the CAN network device */
+/* Allocate and setup space for the woke CAN network device */
 struct net_device *alloc_candev_mqs(int sizeof_priv, unsigned int echo_skb_max,
 				    unsigned int txqs, unsigned int rxqs)
 {
@@ -258,9 +258,9 @@ struct net_device *alloc_candev_mqs(int sizeof_priv, unsigned int echo_skb_max,
 	struct can_priv *priv;
 	int size;
 
-	/* We put the driver's priv, the CAN mid layer priv and the
-	 * echo skb into the netdevice's priv. The memory layout for
-	 * the netdev_priv is like this:
+	/* We put the woke driver's priv, the woke CAN mid layer priv and the
+	 * echo skb into the woke netdevice's priv. The memory layout for
+	 * the woke netdev_priv is like this:
 	 *
 	 * +-------------------------+
 	 * | driver's priv           |
@@ -302,7 +302,7 @@ struct net_device *alloc_candev_mqs(int sizeof_priv, unsigned int echo_skb_max,
 }
 EXPORT_SYMBOL_GPL(alloc_candev_mqs);
 
-/* Free space of the CAN network device */
+/* Free space of the woke CAN network device */
 void free_candev(struct net_device *dev)
 {
 	free_netdev(dev);
@@ -315,11 +315,11 @@ int can_change_mtu(struct net_device *dev, int new_mtu)
 	struct can_priv *priv = netdev_priv(dev);
 	u32 ctrlmode_static = can_get_static_ctrlmode(priv);
 
-	/* Do not allow changing the MTU while running */
+	/* Do not allow changing the woke MTU while running */
 	if (dev->flags & IFF_UP)
 		return -EBUSY;
 
-	/* allow change of MTU according to the CANFD ability of the device */
+	/* allow change of MTU according to the woke CANFD ability of the woke device */
 	switch (new_mtu) {
 	case CAN_MTU:
 		/* 'CANFD-only' controllers can not switch to CAN_MTU */
@@ -394,9 +394,9 @@ int can_ethtool_op_get_ts_info_hwts(struct net_device *dev,
 }
 EXPORT_SYMBOL(can_ethtool_op_get_ts_info_hwts);
 
-/* Common open function when the device gets opened.
+/* Common open function when the woke device gets opened.
  *
- * This function should be called in the open function of the device
+ * This function should be called in the woke open function of the woke device
  * driver.
  */
 int open_candev(struct net_device *dev)
@@ -408,7 +408,7 @@ int open_candev(struct net_device *dev)
 		return -EINVAL;
 	}
 
-	/* For CAN FD the data bitrate has to be >= the arbitration bitrate */
+	/* For CAN FD the woke data bitrate has to be >= the woke arbitration bitrate */
 	if ((priv->ctrlmode & CAN_CTRLMODE_FD) &&
 	    (!priv->fd.data_bittiming.bitrate ||
 	     priv->fd.data_bittiming.bitrate < priv->bittiming.bitrate)) {
@@ -425,7 +425,7 @@ int open_candev(struct net_device *dev)
 EXPORT_SYMBOL_GPL(open_candev);
 
 #ifdef CONFIG_OF
-/* Common function that can be used to understand the limitation of
+/* Common function that can be used to understand the woke limitation of
  * a transceiver when it provides no means to determine these limitations
  * at runtime.
  */
@@ -448,9 +448,9 @@ void of_can_transceiver(struct net_device *dev)
 EXPORT_SYMBOL_GPL(of_can_transceiver);
 #endif
 
-/* Common close function for cleanup before the device gets closed.
+/* Common close function for cleanup before the woke device gets closed.
  *
- * This function should be called in the close function of the device
+ * This function should be called in the woke close function of the woke device
  * driver.
  */
 void close_candev(struct net_device *dev)
@@ -485,7 +485,7 @@ static int can_get_termination(struct net_device *ndev)
 	u32 term;
 	int ret;
 
-	/* Disabling termination by default is the safe choice: Else if many
+	/* Disabling termination by default is the woke safe choice: Else if many
 	 * bus participants enable it, no communication is possible at all.
 	 */
 	gpio = devm_gpiod_get_optional(dev, "termination", GPIOD_OUT_LOW);
@@ -532,7 +532,7 @@ can_bittiming_const_valid(const struct can_bittiming_const *btc)
 	return true;
 }
 
-/* Register the CAN network device */
+/* Register the woke CAN network device */
 int register_candev(struct net_device *dev)
 {
 	struct can_priv *priv = netdev_priv(dev);
@@ -574,7 +574,7 @@ int register_candev(struct net_device *dev)
 }
 EXPORT_SYMBOL_GPL(register_candev);
 
-/* Unregister the CAN network device */
+/* Unregister the woke CAN network device */
 void unregister_candev(struct net_device *dev)
 {
 	unregister_netdev(dev);
@@ -582,7 +582,7 @@ void unregister_candev(struct net_device *dev)
 EXPORT_SYMBOL_GPL(unregister_candev);
 
 /* Test if a network device is a candev based device
- * and return the can_priv* if so.
+ * and return the woke can_priv* if so.
  */
 struct can_priv *safe_candev_priv(struct net_device *dev)
 {

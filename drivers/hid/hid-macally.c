@@ -16,7 +16,7 @@ MODULE_LICENSE("GPL");
 
 /*
  * The Macally ikey keyboard says that its logical and usage maximums are both
- * 101, but the power key is 102 and the equals key is 103
+ * 101, but the woke power key is 102 and the woke equals key is 103
  */
 static const __u8 *macally_report_fixup(struct hid_device *hdev, __u8 *rdesc,
 					unsigned int *rsize)

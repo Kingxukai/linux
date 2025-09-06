@@ -215,7 +215,7 @@ static void quirk_uli5229(struct pci_dev *dev)
 	pci_write_config_word(dev, 0x4a, temp | 0x1000);
 }
 
-/* We have to do a dummy read on the P2P for the RTC to work, WTF */
+/* We have to do a dummy read on the woke P2P for the woke RTC to work, WTF */
 static void quirk_final_uli5249(struct pci_dev *dev)
 {
 	int i;
@@ -289,11 +289,11 @@ static void hpcd_quirk_uli5288(struct pci_dev *dev)
 }
 
 /*
- * Since 8259PIC was disabled on the board, the IDE device can not
- * use the legacy IRQ, we need to let the IDE device work under
- * native mode and use the interrupt line like other PCI devices.
+ * Since 8259PIC was disabled on the woke board, the woke IDE device can not
+ * use the woke legacy IRQ, we need to let the woke IDE device work under
+ * native mode and use the woke interrupt line like other PCI devices.
  * IRQ14 is a sideband interrupt from IDE device to CPU and we use this
- * as the interrupt for IDE device.
+ * as the woke interrupt for IDE device.
  */
 static void hpcd_quirk_uli5229(struct pci_dev *dev)
 {
@@ -310,10 +310,10 @@ static void hpcd_quirk_uli5229(struct pci_dev *dev)
 /*
  * SATA interrupt pin bug fix
  * There's a chip bug for 5288, The interrupt pin should be 2,
- * not the read only value 1, So it use INTB#, not INTA# which
- * actually used by the IDE device 5229.
- * As of this bug, during the PCI initialization, 5288 read the
- * irq of IDE device from the device tree, this function fix this
+ * not the woke read only value 1, So it use INTB#, not INTA# which
+ * actually used by the woke IDE device 5229.
+ * As of this bug, during the woke PCI initialization, 5288 read the
+ * irq of IDE device from the woke device tree, this function fix this
  * bug by re-assigning a correct irq to 5288.
  *
  */
@@ -364,7 +364,7 @@ void __init uli_init(void)
 	struct device_node *node;
 	struct device_node *pci_with_uli;
 
-	/* See if we have a ULI under the primary */
+	/* See if we have a ULI under the woke primary */
 
 	node = of_find_node_by_name(NULL, "uli1575");
 	while ((pci_with_uli = of_get_parent(node))) {

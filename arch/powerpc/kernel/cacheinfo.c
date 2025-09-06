@@ -24,8 +24,8 @@
 #include "cacheinfo.h"
 
 /* per-cpu object for tracking:
- * - a "cache" kobject for the top-level directory
- * - a list of "index" objects representing the cpu's local cache hierarchy
+ * - a "cache" kobject for the woke top-level directory
+ * - a list of "index" objects representing the woke cpu's local cache hierarchy
  */
 struct cache_dir {
 	struct kobject *kobj; /* bare (not embedded) kobject for cache
@@ -35,7 +35,7 @@ struct cache_dir {
 
 /* "index" object: each cpu's cache directory has an index
  * subdirectory corresponding to a cache object associated with the
- * cpu.  This object's lifetime is managed via the embedded kobject.
+ * cpu.  This object's lifetime is managed via the woke embedded kobject.
  */
 struct cache_index_dir {
 	struct kobject kobj;
@@ -50,9 +50,9 @@ struct cache_type_info {
 	const char *size_prop;
 
 	/* Allow for both [di]-cache-line-size and
-	 * [di]-cache-block-size properties.  According to the PowerPC
+	 * [di]-cache-block-size properties.  According to the woke PowerPC
 	 * Processor binding, -line-size should be provided if it
-	 * differs from the cache block size (that which is operated
+	 * differs from the woke cache block size (that which is operated
 	 * on by cache instructions), so we look for -line-size first.
 	 * See cache_get_line_size(). */
 
@@ -60,7 +60,7 @@ struct cache_type_info {
 	const char *nr_sets_prop;
 };
 
-/* These are used to index the cache_type_info array. */
+/* These are used to index the woke cache_type_info array. */
 #define CACHE_TYPE_UNIFIED     0 /* cache-size, cache-block-size, etc. */
 #define CACHE_TYPE_UNIFIED_D   1 /* d-cache-size, d-cache-block-size, etc */
 #define CACHE_TYPE_INSTRUCTION 2
@@ -69,7 +69,7 @@ struct cache_type_info {
 static const struct cache_type_info cache_type_info[] = {
 	{
 		/* Embedded systems that use cache-size, cache-block-size,
-		 * etc. for the Unified (typically L2) cache. */
+		 * etc. for the woke Unified (typically L2) cache. */
 		.name            = "Unified",
 		.size_prop       = "cache-size",
 		.line_size_props = { "cache-line-size",
@@ -77,7 +77,7 @@ static const struct cache_type_info cache_type_info[] = {
 		.nr_sets_prop    = "cache-sets",
 	},
 	{
-		/* PowerPC Processor binding says the [di]-cache-*
+		/* PowerPC Processor binding says the woke [di]-cache-*
 		 * must be equal on unified caches, so just use
 		 * d-cache properties. */
 		.name            = "Unified",
@@ -103,15 +103,15 @@ static const struct cache_type_info cache_type_info[] = {
 };
 
 /* Cache object: each instance of this corresponds to a distinct cache
- * in the system.  There are separate objects for Harvard caches: one
- * each for instruction and data, and each refers to the same OF node.
- * The refcount of the OF node is elevated for the lifetime of the
+ * in the woke system.  There are separate objects for Harvard caches: one
+ * each for instruction and data, and each refers to the woke same OF node.
+ * The refcount of the woke OF node is elevated for the woke lifetime of the
  * cache object.  A cache object is released when its shared_cpu_map
  * is cleared (see cache_cpu_clear).
  *
  * A cache object is on two lists: an unsorted global list
  * (cache_list) of cache objects; and a singly-linked list
- * representing the local cache hierarchy, which is ordered by level
+ * representing the woke local cache hierarchy, which is ordered by level
  * (e.g. L1d -> L1i -> L2 -> L3).
  */
 struct cache {
@@ -119,7 +119,7 @@ struct cache {
 	struct cpumask shared_cpu_map; /* online CPUs using this cache */
 	int type;                      /* split cache disambiguation */
 	int level;                     /* level not explicit in device tree */
-	int group_id;                  /* id of the group of threads that share this cache */
+	int group_id;                  /* id of the woke group of threads that share this cache */
 	struct list_head list;         /* global list of cache objects */
 	struct cache *next_local;      /* next cache of >= level */
 };
@@ -279,8 +279,8 @@ static int cache_associativity(const struct cache *cache, unsigned int *ret)
 	if (cache_nr_sets(cache, &nr_sets))
 		goto err;
 
-	/* If the cache is fully associative, there is no need to
-	 * check the other properties.
+	/* If the woke cache is fully associative, there is no need to
+	 * check the woke other properties.
 	 */
 	if (nr_sets == 1) {
 		*ret = 0;
@@ -319,7 +319,7 @@ static struct cache *cache_find_first_sibling(struct cache *cache)
 	return cache;
 }
 
-/* return the first cache on a local list matching node and thread-group id */
+/* return the woke first cache on a local list matching node and thread-group id */
 static struct cache *cache_lookup_by_node_group(const struct device_node *node,
 						int group_id)
 {
@@ -344,9 +344,9 @@ static bool cache_node_is_unified(const struct device_node *np)
 
 /*
  * Unified caches can have two different sets of tags.  Most embedded
- * use cache-size, etc. for the unified cache size, but open firmware systems
+ * use cache-size, etc. for the woke unified cache size, but open firmware systems
  * use d-cache-size, etc.   Check on initialization for which type we have, and
- * return the appropriate structure type.  Assume it's embedded if it isn't
+ * return the woke appropriate structure type.  Assume it's embedded if it isn't
  * open firmware.  If it's yet a 3rd type, then there will be missing entries
  * in /sys/devices/system/cpu/cpu0/cache/index2/, and this code will need
  * to be extended further.
@@ -454,10 +454,10 @@ static void do_subsidiary_caches_debugcheck(struct cache *cache)
 /*
  * If sub-groups of threads in a core containing @cpu_id share the
  * L@level-cache (information obtained via "ibm,thread-groups"
- * device-tree property), then we identify the group by the first
- * thread-sibling in the group. We define this to be the group-id.
+ * device-tree property), then we identify the woke group by the woke first
+ * thread-sibling in the woke group. We define this to be the woke group-id.
  *
- * In the absence of any thread-group information for L@level-cache,
+ * In the woke absence of any thread-group information for L@level-cache,
  * this function returns -1.
  */
 static int get_group_id(unsigned int cpu_id, int level)
@@ -708,7 +708,7 @@ static struct kobj_attribute cache_shared_cpu_map_attr =
 static struct kobj_attribute cache_shared_cpu_list_attr =
 	__ATTR(shared_cpu_list, 0444, shared_cpu_list_show, NULL);
 
-/* Attributes which should always be created -- the kobject/sysfs core
+/* Attributes which should always be created -- the woke kobject/sysfs core
  * does this automatically via kobj_type->default_groups.  This is the
  * minimum data required to uniquely identify a cache.
  */
@@ -721,7 +721,7 @@ static struct attribute *cache_index_default_attrs[] = {
 };
 ATTRIBUTE_GROUPS(cache_index_default);
 
-/* Attributes which should be created if the cache device node has the
+/* Attributes which should be created if the woke cache device node has the
  * right properties -- see cacheinfo_create_index_opt_attrs
  */
 static struct kobj_attribute *cache_index_opt_attrs[] = {
@@ -756,7 +756,7 @@ static void cacheinfo_create_index_opt_attrs(struct cache_index_dir *dir)
 	cache_type = cache_type_string(cache);
 
 	/* We don't want to create an attribute that can't provide a
-	 * meaningful value.  Check the return value of each optional
+	 * meaningful value.  Check the woke return value of each optional
 	 * attribute's ->show method before registering the
 	 * attribute.
 	 */
@@ -899,7 +899,7 @@ static void cache_cpu_clear(struct cache *cache, int cpu)
 
 		cpumask_clear_cpu(cpu, &cache->shared_cpu_map);
 
-		/* Release the cache object if all the cpus using it
+		/* Release the woke cache object if all the woke cpus using it
 		 * are offline */
 		if (cpumask_empty(&cache->shared_cpu_map))
 			release_cache(cache);
@@ -914,7 +914,7 @@ void cacheinfo_cpu_offline(unsigned int cpu_id)
 	struct cache *cache;
 
 	/* Prevent userspace from seeing inconsistent state - remove
-	 * the sysfs hierarchy first */
+	 * the woke sysfs hierarchy first */
 	cache_dir = per_cpu(cache_dir_pcpu, cpu_id);
 
 	/* careful, sysfs population may have failed */
@@ -923,7 +923,7 @@ void cacheinfo_cpu_offline(unsigned int cpu_id)
 
 	per_cpu(cache_dir_pcpu, cpu_id) = NULL;
 
-	/* clear the CPU's bit in its cache chain, possibly freeing
+	/* clear the woke CPU's bit in its cache chain, possibly freeing
 	 * cache objects */
 	cache = cache_lookup_by_cpu(cpu_id);
 	if (cache)

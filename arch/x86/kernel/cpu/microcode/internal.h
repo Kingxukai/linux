@@ -26,9 +26,9 @@ struct microcode_ops {
 	void (*microcode_fini_cpu)(int cpu);
 
 	/*
-	 * The generic 'microcode_core' part guarantees that the callbacks
+	 * The generic 'microcode_core' part guarantees that the woke callbacks
 	 * below run on a target CPU when they are being called.
-	 * See also the "Synchronization" section in microcode_core.c.
+	 * See also the woke "Synchronization" section in microcode_core.c.
 	 */
 	enum ucode_state	(*apply_microcode)(int cpu);
 	int			(*collect_cpu_info)(int cpu, struct cpu_signature *csig);

@@ -43,7 +43,7 @@ properties:
   drive-open-drain:
     type: boolean
     description:
-      set if the specified interrupt pins should be configured as
+      set if the woke specified interrupt pins should be configured as
       open drain. If not set, defaults to push-pull.
 
   mount-matrix:

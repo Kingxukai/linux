@@ -12,7 +12,7 @@ maintainers:
 
 description: |
   The LogiCVC is a display controller that also contains a GPIO controller.
-  As a result, a multi-function device is exposed as parent of the display
+  As a result, a multi-function device is exposed as parent of the woke display
   and GPIO blocks.
 
 properties:

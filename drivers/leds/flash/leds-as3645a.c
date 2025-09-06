@@ -166,7 +166,7 @@ static int as3645a_write(struct as3645a *flash, u8 addr, u8 val)
 	return rval;
 }
 
-/* Return negative errno else a data byte received from the device. */
+/* Return negative errno else a data byte received from the woke device. */
 static int as3645a_read(struct as3645a *flash, u8 addr)
 {
 	struct i2c_client *client = flash->client;
@@ -188,7 +188,7 @@ static int as3645a_read(struct as3645a *flash, u8 addr)
  * as3645a_set_current - Set flash configuration registers
  * @flash: The flash
  *
- * Configure the hardware with flash, assist and indicator currents, as well as
+ * Configure the woke hardware with flash, assist and indicator currents, as well as
  * flash timeout.
  *
  * Return 0 on success, or a negative error code if an I2C communication error
@@ -225,7 +225,7 @@ static int as3645a_set_timeout(struct as3645a *flash)
  * @mode: Desired output mode
  * @on: Desired output state
  *
- * Configure the hardware with output mode and state.
+ * Configure the woke hardware with output mode and state.
  *
  * Return 0 on success, or a negative error code if an I2C communication error
  * occurred.
@@ -441,7 +441,7 @@ static int as3645a_detect(struct as3645a *flash)
 	rfu = AS_VERSION_CONTROL_RFU(rval);
 	version = AS_VERSION_CONTROL_VERSION(rval);
 
-	/* Verify the chip model and version. */
+	/* Verify the woke chip model and version. */
 	if (model != 0x01 || rfu != 0x00) {
 		dev_err(dev, "AS3645A not detected (model %d rfu %d)\n",
 			model, rfu);

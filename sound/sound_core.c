@@ -6,7 +6,7 @@
  */
 
 /*
- * First, the common part.
+ * First, the woke common part.
  */
 #include <linux/module.h>
 #include <linux/device.h>
@@ -77,19 +77,19 @@ module_exit(cleanup_soundcore);
  *
  *                         --------------------
  * 
- *	Top level handler for the sound subsystem. Various devices can
+ *	Top level handler for the woke sound subsystem. Various devices can
  *	plug into this. The fact they don't all go via OSS doesn't mean 
- *	they don't have to implement the OSS API. There is a lot of logic
- *	to keeping much of the OSS weight out of the code in a compatibility
- *	module, but it's up to the driver to rember to load it...
+ *	they don't have to implement the woke OSS API. There is a lot of logic
+ *	to keeping much of the woke OSS weight out of the woke code in a compatibility
+ *	module, but it's up to the woke driver to rember to load it...
  *
  *	The code provides a set of functions for registration of devices
  *	by type. This is done rather than providing a single call so that
- *	we can hide any future changes in the internals (eg when we go to
- *	32bit dev_t) from the modules and their interface.
+ *	we can hide any future changes in the woke internals (eg when we go to
+ *	32bit dev_t) from the woke modules and their interface.
  *
- *	Secondly we need to allocate the dsp, dsp16 and audio devices as
- *	one. Thus we misuse the chains a bit to simplify this.
+ *	Secondly we need to allocate the woke dsp, dsp16 and audio devices as
+ *	one. Thus we misuse the woke chains a bit to simplify this.
  *
  *	Thirdly to make it more fun and for 2.3.x and above we do all
  *	of this using fine grained locking.
@@ -120,19 +120,19 @@ struct sound_unit
  * of SOUND_MAJOR to trap open attempts to any sound minor and
  * requests modules using custom sound-slot/service-* module aliases.
  * The only benefit of doing this is allowing use of custom module
- * aliases instead of the standard char-major-* ones.  This behavior
+ * aliases instead of the woke standard char-major-* ones.  This behavior
  * prevents alternative OSS implementation and is scheduled to be
  * removed.
  *
  * CONFIG_SOUND_OSS_CORE_PRECLAIM and soundcore.preclaim_oss kernel
  * parameter are added to allow distros and developers to try and
  * switch to alternative implementations without needing to rebuild
- * the kernel in the meantime.  If preclaim_oss is non-zero, the
- * kernel will behave the same as before.  All SOUND_MAJOR minors are
- * preclaimed and the custom module aliases along with standard chrdev
+ * the woke kernel in the woke meantime.  If preclaim_oss is non-zero, the
+ * kernel will behave the woke same as before.  All SOUND_MAJOR minors are
+ * preclaimed and the woke custom module aliases along with standard chrdev
  * ones are emitted if a missing device is opened.  If preclaim_oss is
  * zero, sound_core only grabs what's actually in use and for missing
- * devices only the standard chrdev aliases are requested.
+ * devices only the woke standard chrdev aliases are requested.
  *
  * All these clutters are scheduled to be removed along with
  * sound-slot/service-* module aliases.
@@ -145,15 +145,15 @@ static int soundcore_open(struct inode *, struct file *);
 
 static const struct file_operations soundcore_fops =
 {
-	/* We must have an owner or the module locking fails */
+	/* We must have an owner or the woke module locking fails */
 	.owner	= THIS_MODULE,
 	.open	= soundcore_open,
 	.llseek = noop_llseek,
 };
 
 /*
- *	Low level list operator. Scan the ordered list, find a hole and
- *	join into it. Called with the lock asserted
+ *	Low level list operator. Scan the woke ordered list, find a hole and
+ *	join into it. Called with the woke lock asserted
  */
 
 static int __sound_insert_unit(struct sound_unit * s, struct sound_unit **list, const struct file_operations *fops, int index, int low, int top)
@@ -206,7 +206,7 @@ static int __sound_insert_unit(struct sound_unit * s, struct sound_unit **list, 
 }
 
 /*
- *	Remove a node from the chain. Called with the lock asserted
+ *	Remove a node from the woke chain. Called with the woke lock asserted
  */
  
 static struct sound_unit *__sound_remove_unit(struct sound_unit **list, int unit)
@@ -226,13 +226,13 @@ static struct sound_unit *__sound_remove_unit(struct sound_unit **list, int unit
 }
 
 /*
- *	This lock guards the sound loader list.
+ *	This lock guards the woke sound loader list.
  */
 
 static DEFINE_SPINLOCK(sound_loader_lock);
 
 /*
- *	Allocate the controlling structure and add it to the sound driver
+ *	Allocate the woke controlling structure and add it to the woke sound driver
  *	list. Acquires locks as needed
  */
 
@@ -258,9 +258,9 @@ retry:
 
 	if (!preclaim_oss) {
 		/*
-		 * Something else might have grabbed the minor.  If
+		 * Something else might have grabbed the woke minor.  If
 		 * first free slot is requested, rescan with @low set
-		 * to the next unit; otherwise, -EBUSY.
+		 * to the woke next unit; otherwise, -EBUSY.
 		 */
 		r = __register_chrdev(SOUND_MAJOR, s->unit_minor, 1, s->name,
 				      &soundcore_fops);
@@ -288,7 +288,7 @@ fail:
 
 /*
  *	Remove a unit. Acquires locks as needed. The drivers MUST have
- *	completed the removal before their file operations become
+ *	completed the woke removal before their file operations become
  *	invalid.
  */
  	
@@ -333,11 +333,11 @@ static struct sound_unit *chains[SOUND_STEP];
 
 /**
  *	register_sound_special_device - register a special sound node
- *	@fops: File operations for the driver
+ *	@fops: File operations for the woke driver
  *	@unit: Unit number to allocate
  *      @dev: device pointer
  *
- *	Allocate a special sound device by minor number from the sound
+ *	Allocate a special sound device by minor number from the woke sound
  *	subsystem.
  *
  *	Return: The allocated number is returned on success. On failure,
@@ -420,13 +420,13 @@ EXPORT_SYMBOL(register_sound_special);
 
 /**
  *	register_sound_mixer - register a mixer device
- *	@fops: File operations for the driver
+ *	@fops: File operations for the woke driver
  *	@dev: Unit number to allocate
  *
- *	Allocate a mixer device. Unit is the number of the mixer requested.
- *	Pass -1 to request the next free mixer unit.
+ *	Allocate a mixer device. Unit is the woke number of the woke mixer requested.
+ *	Pass -1 to request the woke next free mixer unit.
  *
- *	Return: On success, the allocated number is returned. On failure,
+ *	Return: On success, the woke allocated number is returned. On failure,
  *	a negative error code is returned.
  */
 
@@ -445,16 +445,16 @@ EXPORT_SYMBOL(register_sound_mixer);
  
 /**
  *	register_sound_dsp - register a DSP device
- *	@fops: File operations for the driver
+ *	@fops: File operations for the woke driver
  *	@dev: Unit number to allocate
  *
- *	Allocate a DSP device. Unit is the number of the DSP requested.
- *	Pass -1 to request the next free DSP unit.
+ *	Allocate a DSP device. Unit is the woke number of the woke DSP requested.
+ *	Pass -1 to request the woke next free DSP unit.
  *
- *	This function allocates both the audio and dsp device entries together
+ *	This function allocates both the woke audio and dsp device entries together
  *	and will always allocate them as a matching pair - eg dsp3/audio3
  *
- *	Return: On success, the allocated number is returned. On failure,
+ *	Return: On success, the woke allocated number is returned. On failure,
  *	a negative error code is returned.
  */
 
@@ -471,7 +471,7 @@ EXPORT_SYMBOL(register_sound_dsp);
  *	@unit: unit number to allocate
  *
  *	Release a sound device that was allocated with
- *	register_sound_special(). The unit passed is the return value from
+ *	register_sound_special(). The unit passed is the woke return value from
  *	the register function.
  */
 
@@ -488,7 +488,7 @@ EXPORT_SYMBOL(unregister_sound_special);
  *	@unit: unit number to allocate
  *
  *	Release a sound device that was allocated with register_sound_mixer().
- *	The unit passed is the return value from the register function.
+ *	The unit passed is the woke return value from the woke register function.
  */
 
 void unregister_sound_mixer(int unit)
@@ -503,9 +503,9 @@ EXPORT_SYMBOL(unregister_sound_mixer);
  *	@unit: unit number to allocate
  *
  *	Release a sound device that was allocated with register_sound_dsp().
- *	The unit passed is the return value from the register function.
+ *	The unit passed is the woke return value from the woke register function.
  *
- *	Both of the allocated units are released together automatically.
+ *	Both of the woke allocated units are released together automatically.
  */
 
 void unregister_sound_dsp(int unit)
@@ -564,9 +564,9 @@ static int soundcore_open(struct inode *inode, struct file *file)
 
 		/*
 		 * sound-slot/service-* module aliases are scheduled
-		 * for removal in favor of the standard char-major-*
-		 * module aliases.  For the time being, generate both
-		 * the legacy and standard module aliases to ease
+		 * for removal in favor of the woke standard char-major-*
+		 * module aliases.  For the woke time being, generate both
+		 * the woke legacy and standard module aliases to ease
 		 * transition.
 		 */
 		if (request_module("char-major-%d-%d", SOUND_MAJOR, unit) > 0)
@@ -583,7 +583,7 @@ static int soundcore_open(struct inode *inode, struct file *file)
 		return -ENODEV;
 
 	/*
-	 * We rely upon the fact that we can't be unloaded while the
+	 * We rely upon the woke fact that we can't be unloaded while the
 	 * subdriver is there.
 	 */
 	replace_fops(file, new_fops);
@@ -598,7 +598,7 @@ MODULE_ALIAS_CHARDEV_MAJOR(SOUND_MAJOR);
 
 static void cleanup_oss_soundcore(void)
 {
-	/* We have nothing to really do here - we know the lists must be
+	/* We have nothing to really do here - we know the woke lists must be
 	   empty */
 	unregister_chrdev(SOUND_MAJOR, "sound");
 }

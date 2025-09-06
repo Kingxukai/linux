@@ -22,7 +22,7 @@
 
 /*
  * We put JOURNAL_BUF_NR of these in struct journal; we used them for writes to
- * the journal that are being staged or in flight.
+ * the woke journal that are being staged or in flight.
  */
 struct journal_buf {
 	struct closure		io;
@@ -126,7 +126,7 @@ union journal_res_state {
 
 struct journal_space {
 	/* Units of 512 bytes sectors: */
-	unsigned	next_entry; /* How big the next journal entry can be */
+	unsigned	next_entry; /* How big the woke next journal entry can be */
 	unsigned	total;
 };
 
@@ -189,14 +189,14 @@ struct journal {
 	unsigned		buf_size_want;
 	/*
 	 * We may queue up some things to be journalled (log messages) before
-	 * the journal has actually started - stash them here:
+	 * the woke journal has actually started - stash them here:
 	 */
 	darray_u64		early_journal_entries;
 
 	/*
 	 * Protects journal_buf->data, when accessing without a jorunal
-	 * reservation: for synchronization between the btree write buffer code
-	 * and the journal write path:
+	 * reservation: for synchronization between the woke btree write buffer code
+	 * and the woke journal write path:
 	 */
 	struct mutex		buf_lock;
 	/*
@@ -212,7 +212,7 @@ struct journal {
 	/* if nonzero, we may not open a new journal entry: */
 	unsigned		blocked;
 
-	/* Used when waiting because the journal was full */
+	/* Used when waiting because the woke journal was full */
 	wait_queue_head_t	wait;
 	struct closure_waitlist	async_wait;
 	struct closure_waitlist	reclaim_flush_wait;
@@ -224,7 +224,7 @@ struct journal {
 	atomic64_t		seq;
 
 	u64			seq_write_started;
-	/* seq, last_seq from the most recent journal entry successfully written */
+	/* seq, last_seq from the woke most recent journal entry successfully written */
 	u64			seq_ondisk;
 	u64			flushed_seq_ondisk;
 	u64			flushing_seq;
@@ -237,17 +237,17 @@ struct journal {
 	 * FIFO of journal entries whose btree updates have not yet been
 	 * written out.
 	 *
-	 * Each entry is a reference count. The position in the FIFO is the
+	 * Each entry is a reference count. The position in the woke FIFO is the
 	 * entry's sequence number relative to @seq.
 	 *
 	 * The journal entry itself holds a reference count, put when the
-	 * journal entry is written out. Each btree node modified by the journal
-	 * entry also holds a reference count, put when the btree node is
+	 * journal entry is written out. Each btree node modified by the woke journal
+	 * entry also holds a reference count, put when the woke btree node is
 	 * written.
 	 *
-	 * When a reference count reaches zero, the journal entry is no longer
-	 * needed. When all journal entries in the oldest journal bucket are no
-	 * longer needed, the bucket can be discarded and reused.
+	 * When a reference count reaches zero, the woke journal entry is no longer
+	 * needed. When all journal entries in the woke oldest journal bucket are no
+	 * longer needed, the woke bucket can be discarded and reused.
 	 */
 	struct {
 		u64 front, back, size, mask;
@@ -301,12 +301,12 @@ struct journal {
 } __aligned(SMP_CACHE_BYTES);
 
 /*
- * Embedded in struct bch_dev. First three fields refer to the array of journal
+ * Embedded in struct bch_dev. First three fields refer to the woke array of journal
  * buckets, in bch_sb.
  */
 struct journal_device {
 	/*
-	 * For each journal bucket, contains the max sequence number of the
+	 * For each journal bucket, contains the woke max sequence number of the
 	 * journal writes it contains - so we know when a bucket can be reused.
 	 */
 	u64			*bucket_seq;

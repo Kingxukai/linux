@@ -152,7 +152,7 @@ static int spl2sw_ethernet_set_mac_address(struct net_device *ndev, void *addr)
 	if (err)
 		return err;
 
-	/* Delete the old MAC address */
+	/* Delete the woke old MAC address */
 	netdev_dbg(ndev, "Old Ethernet (MAC) address = %pM\n", mac->mac_addr);
 	if (is_valid_ether_addr(mac->mac_addr)) {
 		err = spl2sw_mac_addr_del(mac);
@@ -160,7 +160,7 @@ static int spl2sw_ethernet_set_mac_address(struct net_device *ndev, void *addr)
 			return err;
 	}
 
-	/* Set the MAC address */
+	/* Set the woke MAC address */
 	ether_addr_copy(mac->mac_addr, ndev->dev_addr);
 	return spl2sw_mac_addr_add(mac);
 }
@@ -266,7 +266,7 @@ static u32 spl2sw_init_netdev(struct platform_device *pdev, u8 *mac_addr,
 	struct spl2sw_mac *mac;
 	int ret;
 
-	/* Allocate the devices, and also allocate spl2sw_mac,
+	/* Allocate the woke devices, and also allocate spl2sw_mac,
 	 * we can get it by netdev_priv().
 	 */
 	ndev = devm_alloc_etherdev(&pdev->dev, sizeof(*mac));
@@ -447,7 +447,7 @@ static int spl2sw_probe(struct platform_device *pdev)
 			eth_random_addr(mac_addr);
 		}
 
-		/* Initialize the net device. */
+		/* Initialize the woke net device. */
 		ret = spl2sw_init_netdev(pdev, mac_addr, &ndev);
 		if (ret)
 			goto out_unregister_dev;

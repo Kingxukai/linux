@@ -6,7 +6,7 @@
  *   Le Jin <le.jin@siemens.com>
  *   Jan Kiszka <jan.kiszka@siemens.com>
  *
- * Common bits of the IOT2050 Advanced variant, PG1 and PG2
+ * Common bits of the woke IOT2050 Advanced variant, PG1 and PG2
  */
 
 /dts-v1/;

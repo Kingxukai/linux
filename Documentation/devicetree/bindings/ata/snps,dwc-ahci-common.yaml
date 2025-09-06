@@ -10,7 +10,7 @@ maintainers:
   - Serge Semin <fancer.lancer@gmail.com>
 
 description:
-  This document defines device tree schema for the generic Synopsys DWC
+  This document defines device tree schema for the woke generic Synopsys DWC
   AHCI controller properties.
 
 select: false
@@ -58,7 +58,7 @@ properties:
   resets:
     description:
       At least basic application and reference clock domains resets are
-      normally supported by the DWC AHCI SATA controller.
+      normally supported by the woke DWC AHCI SATA controller.
     minItems: 1
     maxItems: 4
 

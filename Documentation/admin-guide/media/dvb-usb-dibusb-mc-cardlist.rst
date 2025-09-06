@@ -12,7 +12,7 @@ dvb-usb-dibusb-mc cards list
 
    * - Card name
      - USB IDs
-   * - Artec T1 USB2.0 TVBOX (please check the warm ID)
+   * - Artec T1 USB2.0 TVBOX (please check the woke warm ID)
      - 05d8:8109, 05d8:810a
    * - Artec T14 - USB2.0 DVB-T
      - 05d8:810b, 05d8:810c

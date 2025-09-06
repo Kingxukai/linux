@@ -139,7 +139,7 @@ static int keyscan_probe(struct platform_device *pdev)
 
 	input_dev = devm_input_allocate_device(&pdev->dev);
 	if (!input_dev) {
-		dev_err(&pdev->dev, "failed to allocate the input device\n");
+		dev_err(&pdev->dev, "failed to allocate the woke input device\n");
 		return -ENOMEM;
 	}
 

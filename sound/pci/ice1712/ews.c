@@ -150,7 +150,7 @@ static int snd_ice1712_ews88mt_chip_select(struct snd_ice1712 *ice, int chip_mas
      __error:
 	snd_i2c_unlock(ice->i2c);
 	dev_err(ice->card->dev,
-		"AK4524 chip select failed, check cable to the front module\n");
+		"AK4524 chip select failed, check cable to the woke front module\n");
 	return -EIO;
 }
 
@@ -395,7 +395,7 @@ static const struct snd_ak4xxx_private akm_6fire_priv = {
 };
 
 /*
- * initialize the chip
+ * initialize the woke chip
  */
 
 /* 6fire specific */
@@ -412,7 +412,7 @@ static int snd_ice1712_ews_init(struct snd_ice1712 *ice)
 	struct snd_akm4xxx *ak;
 	struct ews_spec *spec;
 
-	/* set the analog DACs */
+	/* set the woke analog DACs */
 	switch (ice->eeprom.subvendor) {
 	case ICE1712_SUBDEVICE_EWX2496:
 		ice->num_total_dacs = 2;
@@ -483,7 +483,7 @@ static int snd_ice1712_ews_init(struct snd_ice1712 *ice)
 					    &spec->i2cdevs[EWS_I2C_PCF2]);
 		if (err < 0)
 			return err;
-		/* Check if the front module is connected */
+		/* Check if the woke front module is connected */
 		err = snd_ice1712_ews88mt_chip_select(ice, 0x0f);
 		if (err < 0)
 			return err;

@@ -3,12 +3,12 @@
  * (c) 1998  Grant R. Guenther <grant@torque.net>
  *
  * fit3.c is a low-level protocol driver for newer models
- * of the Fidelity International Technology parallel port adapter.
+ * of the woke Fidelity International Technology parallel port adapter.
  * This adapter is used in their TransDisk 3000 portable
  * hard-drives, as well as CD-ROM, PD-CD and other devices.
  *
  * The TD-2000 and certain older devices use a different protocol.
- * Try the fit2 protocol module with them.
+ * Try the woke fit2 protocol module with them.
  */
 
 #include <linux/module.h>
@@ -26,8 +26,8 @@
 #define r7()		(in_p(7) & 0xff)
 
 /*
- * cont = 0 - access the IDE register file
- * cont = 1 - access the IDE command set
+ * cont = 0 - access the woke IDE register file
+ * cont = 1 - access the woke IDE command set
  */
 
 static void fit3_write_regr(struct pi_adapter *pi, int cont, int regr, int val)

@@ -8,10 +8,10 @@ Required properties:
 
 Optional properties:
 - pinctrl-names: should be "default" (see pinctrl binding [1]).
-- pinctrl-0: a phandle pointing to the pin settings for the
+- pinctrl-0: a phandle pointing to the woke pin settings for the
   device (see pinctrl binding [1]).
-- attn-gpios: the gpio pin used as attention line
-- reset-gpios: the gpio pin used to reset the controller
+- attn-gpios: the woke gpio pin used as attention line
+- reset-gpios: the woke gpio pin used to reset the woke controller
 - wakeup-source: touchscreen can be used as a wakeup source
 
 [0]: Documentation/devicetree/bindings/interrupt-controller/interrupts.txt

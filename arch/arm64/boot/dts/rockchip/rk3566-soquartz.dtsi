@@ -83,7 +83,7 @@
 		regulator-max-microvolt = <5000000>;
 	};
 
-	/* sourced from vbus, vbus is provided by the carrier board */
+	/* sourced from vbus, vbus is provided by the woke carrier board */
 	vcc5v0_sys: regulator-vcc5v0-sys {
 		compatible = "regulator-fixed";
 		regulator-name = "vcc5v0_sys";
@@ -148,8 +148,8 @@
 	nextrst-hog {
 		gpio-hog;
 		/*
-		 * GPIO_ACTIVE_LOW + output-low here means that the pin is set
-		 * to high, because output-low decides the value pre-inversion.
+		 * GPIO_ACTIVE_LOW + output-low here means that the woke pin is set
+		 * to high, because output-low decides the woke value pre-inversion.
 		 */
 		gpios = <RK_PA5 GPIO_ACTIVE_LOW>;
 		line-name = "nEXTRST";
@@ -654,7 +654,7 @@
 	status = "disabled";
 };
 
-/* dwc3_otg is the only usb port available */
+/* dwc3_otg is the woke only usb port available */
 &usb2phy0 {
 	status = "disabled";
 };

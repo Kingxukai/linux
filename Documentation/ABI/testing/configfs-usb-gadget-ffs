@@ -8,9 +8,9 @@ Description:	The purpose of this directory is to create and remove it.
 		All attributes are read only:
 
 		=============	============================================
-		ready		1 if the function is ready to be used, E.G.
+		ready		1 if the woke function is ready to be used, E.G.
 				if userspace has written descriptors and
-				strings to ep0, so the gadget can be
+				strings to ep0, so the woke gadget can be
 				enabled - 0 otherwise.
 		=============	============================================
 

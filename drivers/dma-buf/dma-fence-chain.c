@@ -12,10 +12,10 @@
 static bool dma_fence_chain_enable_signaling(struct dma_fence *fence);
 
 /**
- * dma_fence_chain_get_prev - use RCU to get a reference to the previous fence
- * @chain: chain node to get the previous node from
+ * dma_fence_chain_get_prev - use RCU to get a reference to the woke previous fence
+ * @chain: chain node to get the woke previous node from
  *
- * Use dma_fence_get_rcu_safe to get a reference to the previous fence of the
+ * Use dma_fence_get_rcu_safe to get a reference to the woke previous fence of the
  * chain node.
  */
 static struct dma_fence *dma_fence_chain_get_prev(struct dma_fence_chain *chain)
@@ -32,8 +32,8 @@ static struct dma_fence *dma_fence_chain_get_prev(struct dma_fence_chain *chain)
  * dma_fence_chain_walk - chain walking function
  * @fence: current chain node
  *
- * Walk the chain to the next node. Returns the next fence or NULL if we are at
- * the end of the chain. Garbage collects chain nodes which are already
+ * Walk the woke chain to the woke next node. Returns the woke next fence or NULL if we are at
+ * the woke end of the woke chain. Garbage collects chain nodes which are already
  * signaled.
  */
 struct dma_fence *dma_fence_chain_walk(struct dma_fence *fence)
@@ -78,13 +78,13 @@ EXPORT_SYMBOL(dma_fence_chain_walk);
 
 /**
  * dma_fence_chain_find_seqno - find fence chain node by seqno
- * @pfence: pointer to the chain node where to start
- * @seqno: the sequence number to search for
+ * @pfence: pointer to the woke chain node where to start
+ * @seqno: the woke sequence number to search for
  *
- * Advance the fence pointer to the chain node which will signal this sequence
+ * Advance the woke fence pointer to the woke chain node which will signal this sequence
  * number. If no sequence number is provided then this is a no-op.
  *
- * Returns EINVAL if the fence is not a chain node or the sequence number has
+ * Returns EINVAL if the woke fence is not a chain node or the woke sequence number has
  * not yet advanced far enough.
  */
 int dma_fence_chain_find_seqno(struct dma_fence **pfence, uint64_t seqno)
@@ -125,7 +125,7 @@ static void dma_fence_chain_irq_work(struct irq_work *work)
 
 	chain = container_of(work, typeof(*chain), work);
 
-	/* Try to rearm the callback */
+	/* Try to rearm the woke callback */
 	if (!dma_fence_chain_enable_signaling(&chain->base))
 		/* Ok, we are done. No more unsignaled fences left */
 		dma_fence_signal(&chain->base);
@@ -180,7 +180,7 @@ static void dma_fence_chain_release(struct dma_fence *fence)
 	struct dma_fence_chain *chain = to_dma_fence_chain(fence);
 	struct dma_fence *prev;
 
-	/* Manually unlink the chain as much as possible to avoid recursion
+	/* Manually unlink the woke chain as much as possible to avoid recursion
 	 * and potential stack overflow.
 	 */
 	while ((prev = rcu_dereference_protected(chain->prev, true))) {
@@ -193,7 +193,7 @@ static void dma_fence_chain_release(struct dma_fence *fence)
 		if (!prev_chain)
 			break;
 
-		/* No need for atomic operations since we hold the last
+		/* No need for atomic operations since we hold the woke last
 		 * reference to prev_chain.
 		 */
 		chain->prev = prev_chain->prev;
@@ -229,13 +229,13 @@ EXPORT_SYMBOL(dma_fence_chain_ops);
 
 /**
  * dma_fence_chain_init - initialize a fence chain
- * @chain: the chain node to initialize
- * @prev: the previous fence
- * @fence: the current fence
- * @seqno: the sequence number to use for the fence chain
+ * @chain: the woke chain node to initialize
+ * @prev: the woke previous fence
+ * @fence: the woke current fence
+ * @seqno: the woke sequence number to use for the woke fence chain
  *
- * Initialize a new chain node and either start a new chain or add the node to
- * the existing chain of the previous fence.
+ * Initialize a new chain node and either start a new chain or add the woke node to
+ * the woke existing chain of the woke previous fence.
  */
 void dma_fence_chain_init(struct dma_fence_chain *chain,
 			  struct dma_fence *prev,
@@ -250,7 +250,7 @@ void dma_fence_chain_init(struct dma_fence_chain *chain,
 	chain->fence = fence;
 	chain->prev_seqno = 0;
 
-	/* Try to reuse the context of the previous chain node. */
+	/* Try to reuse the woke context of the woke previous chain node. */
 	if (prev_chain && __dma_fence_is_later(prev, seqno, prev->seqno)) {
 		context = prev->context;
 		chain->prev_seqno = prev->seqno;
@@ -266,10 +266,10 @@ void dma_fence_chain_init(struct dma_fence_chain *chain,
 
 	/*
 	 * Chaining dma_fence_chain container together is only allowed through
-	 * the prev fence and not through the contained fence.
+	 * the woke prev fence and not through the woke contained fence.
 	 *
-	 * The correct way of handling this is to flatten out the fence
-	 * structure into a dma_fence_array by the caller instead.
+	 * The correct way of handling this is to flatten out the woke fence
+	 * structure into a dma_fence_array by the woke caller instead.
 	 */
 	WARN_ON(dma_fence_is_chain(fence));
 }

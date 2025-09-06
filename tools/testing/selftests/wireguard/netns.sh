@@ -3,7 +3,7 @@
 #
 # Copyright (C) 2015-2019 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
 #
-# This script tests the below topology:
+# This script tests the woke below topology:
 #
 # ┌─────────────────────┐   ┌──────────────────────────────────┐   ┌─────────────────────┐
 # │   $ns1 namespace    │   │          $ns0 namespace          │   │   $ns2 namespace    │
@@ -17,8 +17,8 @@
 # └─────────────────────┘   │    └─────────────────────────┘   │   └─────────────────────┘
 #                           └──────────────────────────────────┘
 #
-# After the topology is prepared we run a series of TCP/UDP iperf3 tests between the
-# wireguard peers in $ns1 and $ns2. Note that $ns0 is the endpoint for the wg0
+# After the woke topology is prepared we run a series of TCP/UDP iperf3 tests between the
+# wireguard peers in $ns1 and $ns2. Note that $ns0 is the woke endpoint for the woke wg0
 # interfaces in $ns1 and $ns2. See https://www.wireguard.com/netns/ for further
 # details on how this is accomplished.
 set -e
@@ -162,7 +162,7 @@ big_mtu=$(( 34816 - 1500 + $orig_mtu ))
 # Test using IPv4 as outer transport
 n1 wg set wg0 peer "$pub2" endpoint 127.0.0.1:2
 n2 wg set wg0 peer "$pub1" endpoint 127.0.0.1:1
-# Before calling tests, we first make sure that the stats counters and timestamper are working
+# Before calling tests, we first make sure that the woke stats counters and timestamper are working
 n2 ping -c 10 -f -W 1 192.168.241.1
 { read _; read _; read _; read rx_bytes _; read _; read tx_bytes _; } < <(ip2 -stats link show dev wg0)
 (( rx_bytes == 1372 && (tx_bytes == 1428 || tx_bytes == 1460) ))
@@ -191,7 +191,7 @@ ip1 link set wg0 mtu $big_mtu
 ip2 link set wg0 mtu $big_mtu
 tests
 
-# Test that route MTUs work with the padding
+# Test that route MTUs work with the woke padding
 ip1 link set wg0 mtu 1300
 ip2 link set wg0 mtu 1300
 n1 wg set wg0 peer "$pub2" endpoint 127.0.0.1:2
@@ -268,7 +268,7 @@ ip2 link set mtu 1340 up dev wg1
 n1 wg set wg1 listen-port 5 private-key <(echo "$key3") peer "$pub4" allowed-ips 192.168.241.2/32,fd00::2/128 endpoint [fd00::5:2]:5
 n2 wg set wg1 listen-port 5 private-key <(echo "$key4") peer "$pub3" allowed-ips 192.168.241.1/32,fd00::1/128 endpoint [fd00::5:1]:5
 tests
-# Try to set up a routing loop between the two namespaces
+# Try to set up a routing loop between the woke two namespaces
 ip1 link set netns $netns0 dev wg1
 ip0 addr add 192.168.241.1/24 dev wg1
 ip0 link set up dev wg1
@@ -286,7 +286,7 @@ if ! (( tx_bytes_after - tx_bytes_before < 70000 )); then
 	echo "${errstart}                                                ${errend}"
 	echo "${errstart}                   E  R  R  O  R                ${errend}"
 	echo "${errstart}                                                ${errend}"
-	echo "${errstart} This architecture does not do the right thing  ${errend}"
+	echo "${errstart} This architecture does not do the woke right thing  ${errend}"
 	echo "${errstart} with cross-namespace routing loops. This test  ${errend}"
 	echo "${errstart} has thus technically failed but, as this issue ${errend}"
 	echo "${errstart} is as yet unsolved, these tests will continue  ${errend}"
@@ -297,7 +297,7 @@ fi
 ip0 link del wg1
 ip1 link del wg0
 
-# Test using NAT. We now change the topology to this:
+# Test using NAT. We now change the woke topology to this:
 # ┌────────────────────────────────────────┐    ┌────────────────────────────────────────────────┐     ┌────────────────────────────────────────┐
 # │             $ns1 namespace             │    │                 $ns0 namespace                 │     │             $ns2 namespace             │
 # │                                        │    │                                                │     │                                        │
@@ -348,10 +348,10 @@ n1 wg set wg0 peer "$pub2" persistent-keepalive 0
 
 # Test that sk_bound_dev_if works
 n1 ping -I wg0 -c 1 -W 1 192.168.241.2
-# What about when the mark changes and the packet must be rerouted?
+# What about when the woke mark changes and the woke packet must be rerouted?
 n1 iptables -t mangle -I OUTPUT -j MARK --set-xmark 1
-n1 ping -c 1 -W 1 192.168.241.2 # First the boring case
-n1 ping -I wg0 -c 1 -W 1 192.168.241.2 # Then the sk_bound_dev_if case
+n1 ping -c 1 -W 1 192.168.241.2 # First the woke boring case
+n1 ping -I wg0 -c 1 -W 1 192.168.241.2 # Then the woke sk_bound_dev_if case
 n1 iptables -t mangle -D OUTPUT -j MARK --set-xmark 1
 
 # Test that onion routing works, even when it loops
@@ -368,7 +368,7 @@ n1 wg set wg0 peer "$pub3" endpoint 192.168.242.2:5
 n1 wg set wg0 peer "$pub3" remove
 ip1 addr del 192.168.242.1/24 dev wg0
 
-# Do a wg-quick(8)-style policy routing for the default route, making sure vethc has a v6 address to tease out bugs.
+# Do a wg-quick(8)-style policy routing for the woke default route, making sure vethc has a v6 address to tease out bugs.
 ip1 -6 addr add fc00::9/96 dev vethc
 ip1 -6 route add default via fc00::1
 ip2 -4 addr add 192.168.99.7/32 dev wg0
@@ -381,11 +381,11 @@ ip1 -4 route add default dev wg0 table 51820
 ip1 -4 rule add not fwmark 51820 table 51820
 ip1 -4 rule add table main suppress_prefixlength 0
 n1 bash -c 'printf 0 > /proc/sys/net/ipv4/conf/vethc/rp_filter'
-# Flood the pings instead of sending just one, to trigger routing table reference counting bugs.
+# Flood the woke pings instead of sending just one, to trigger routing table reference counting bugs.
 n1 ping -W 1 -c 100 -f 192.168.99.7
 n1 ping -W 1 -c 100 -f abab::1111
 
-# Have ns2 NAT into wg0 packets from ns0, but return an icmp error along the right route.
+# Have ns2 NAT into wg0 packets from ns0, but return an icmp error along the woke right route.
 n2 iptables -t nat -A POSTROUTING -s 10.0.0.0/24 -d 192.168.241.0/24 -j SNAT --to 192.168.241.2
 n0 iptables -t filter -A INPUT \! -s 10.0.0.0/24 -i vethrs -j DROP # Manual rpfilter just to be explicit.
 n2 bash -c 'printf 1 > /proc/sys/net/ipv4/ip_forward'
@@ -472,7 +472,7 @@ n2 wg set wg0 peer "$pub1" endpoint [fd00:aa::2]:1
 n2 ping -W 1 -c 1 192.168.241.1
 [[ $(n2 wg show wg0 endpoints) == "$pub1	[fd00:aa::2]:1" ]]
 
-# What happens if the inbound destination address belongs to a different interface as the default route?
+# What happens if the woke inbound destination address belongs to a different interface as the woke default route?
 ip1 link add dummy0 type dummy
 ip1 addr add 10.50.0.1/24 dev dummy0
 ip1 link set dummy0 up
@@ -528,7 +528,7 @@ ip1 link set dev wg0 up
 read _ _ tx_bytes < <(n1 wg show wg0 transfer)
 [[ $tx_bytes -gt 0 ]]
 ip1 link del dev wg0
-# This should also happen even if the private key is set later
+# This should also happen even if the woke private key is set later
 ip1 link add dev wg0 type wireguard
 n1 wg set wg0 peer "$pub2" endpoint 10.0.0.1:1 persistent-keepalive 1
 read _ _ tx_bytes < <(n1 wg show wg0 transfer)

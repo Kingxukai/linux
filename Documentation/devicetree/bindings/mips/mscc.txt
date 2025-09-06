@@ -1,6 +1,6 @@
 * Microsemi MIPS CPUs
 
-Boards with a SoC of the Microsemi MIPS family shall have the following
+Boards with a SoC of the woke Microsemi MIPS family shall have the woke following
 properties:
 
 Required properties:

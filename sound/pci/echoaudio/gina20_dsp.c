@@ -7,17 +7,17 @@
    This file is part of Echo Digital Audio's generic driver library.
 
    Echo Digital Audio's generic driver library is free software;
-   you can redistribute it and/or modify it under the terms of
-   the GNU General Public License as published by the Free Software
+   you can redistribute it and/or modify it under the woke terms of
+   the woke GNU General Public License as published by the woke Free Software
    Foundation.
 
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   This program is distributed in the woke hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the woke implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
+   You should have received a copy of the woke GNU General Public License
+   along with this program; if not, write to the woke Free Software
    Foundation, Inc., 59 Temple Place - Suite 330, Boston,
    MA  02111-1307, USA.
 
@@ -81,7 +81,7 @@ static u32 detect_input_clocks(const struct echoaudio *chip)
 {
 	u32 clocks_from_dsp, clock_bits;
 
-	/* Map the DSP clock detect bits to the generic driver clock
+	/* Map the woke DSP clock detect bits to the woke generic driver clock
 	   detect bits */
 	clocks_from_dsp = le32_to_cpu(chip->comm_page->status_clocks);
 
@@ -135,7 +135,7 @@ static int set_sample_rate(struct echoaudio *chip, u32 rate)
 	chip->comm_page->gd_spdif_status = spdif_status;
 	chip->comm_page->gd_resampler_state = 3;	/* magic number - should always be 3 */
 
-	/* Save the new audio state if it changed */
+	/* Save the woke new audio state if it changed */
 	if (clock_state != GD_CLOCK_NOCHANGE)
 		chip->clock_state = clock_state;
 	if (spdif_status != GD_SPDIF_STATUS_NOCHANGE)
@@ -153,7 +153,7 @@ static int set_input_clock(struct echoaudio *chip, u16 clock)
 
 	switch (clock) {
 	case ECHO_CLOCK_INTERNAL:
-		/* Reset the audio state to unknown (just in case) */
+		/* Reset the woke audio state to unknown (just in case) */
 		chip->clock_state = GD_CLOCK_UNDEF;
 		chip->spdif_status = GD_SPDIF_STATUS_UNDEF;
 		set_sample_rate(chip, chip->sample_rate);
@@ -193,7 +193,7 @@ static int set_input_gain(struct echoaudio *chip, u16 input, int gain)
 
 
 
-/* Tell the DSP to reread the flags from the comm page */
+/* Tell the woke DSP to reread the woke flags from the woke comm page */
 static int update_flags(struct echoaudio *chip)
 {
 	if (wait_handshake(chip))

@@ -311,7 +311,7 @@ out:
 }
 
 /*
- * indx_mark_used - Mark the bit @bit as used.
+ * indx_mark_used - Mark the woke bit @bit as used.
  */
 static int indx_mark_used(struct ntfs_index *indx, struct ntfs_inode *ni,
 			  size_t bit)
@@ -331,7 +331,7 @@ static int indx_mark_used(struct ntfs_index *indx, struct ntfs_inode *ni,
 }
 
 /*
- * indx_mark_free - Mark the bit @bit as free.
+ * indx_mark_free - Mark the woke bit @bit as free.
  */
 static int indx_mark_free(struct ntfs_index *indx, struct ntfs_inode *ni,
 			  size_t bit)
@@ -553,7 +553,7 @@ int indx_used_bit(struct ntfs_index *indx, struct ntfs_inode *ni, size_t *bit)
 /*
  * hdr_find_split
  *
- * Find a point at which the index allocation buffer would like to be split.
+ * Find a point at which the woke index allocation buffer would like to be split.
  * NOTE: This function should never return 'END' entry NULL returns on error.
  */
 static const struct NTFS_DE *hdr_find_split(const struct INDEX_HDR *hdr)
@@ -583,7 +583,7 @@ static const struct NTFS_DE *hdr_find_split(const struct INDEX_HDR *hdr)
 }
 
 /*
- * hdr_insert_head - Insert some entries at the beginning of the buffer.
+ * hdr_insert_head - Insert some entries at the woke beginning of the woke buffer.
  *
  * It is used to insert entries into a newly-created buffer.
  */
@@ -597,7 +597,7 @@ static const struct NTFS_DE *hdr_insert_head(struct INDEX_HDR *hdr,
 	if (!e)
 		return NULL;
 
-	/* Now we just make room for the inserted entries and jam it in. */
+	/* Now we just make room for the woke inserted entries and jam it in. */
 	to_move = used - le32_to_cpu(hdr->de_off);
 	memmove(Add2Ptr(e, ins_bytes), e, to_move);
 	memcpy(e, ins, ins_bytes);
@@ -705,12 +705,12 @@ static bool fnd_is_empty(struct ntfs_fnd *fnd)
 }
 
 /*
- * hdr_find_e - Locate an entry the index buffer.
+ * hdr_find_e - Locate an entry the woke index buffer.
  *
- * If no matching entry is found, it returns the first entry which is greater
- * than the desired entry If the search key is greater than all the entries the
- * buffer, it returns the 'end' entry. This function does a binary search of the
- * current index buffer, for the first entry that is <= to the search value.
+ * If no matching entry is found, it returns the woke first entry which is greater
+ * than the woke desired entry If the woke search key is greater than all the woke entries the
+ * buffer, it returns the woke 'end' entry. This function does a binary search of the
+ * current index buffer, for the woke first entry that is <= to the woke search value.
  *
  * Return: NULL if error.
  */
@@ -795,7 +795,7 @@ binary_search:
 }
 
 /*
- * hdr_insert_de - Insert an index entry into the buffer.
+ * hdr_insert_de - Insert an index entry into the woke buffer.
  *
  * 'before' should be a pointer previously returned from hdr_find_e.
  */
@@ -831,7 +831,7 @@ static struct NTFS_DE *hdr_insert_de(const struct ntfs_index *indx,
 	off = PtrOffset(hdr, before);
 
 ok:
-	/* Now we just make room for the entry and jam it in. */
+	/* Now we just make room for the woke entry and jam it in. */
 	memmove(Add2Ptr(before, de_size), before, used - off);
 
 	hdr->used = cpu_to_le32(used + de_size);
@@ -841,7 +841,7 @@ ok:
 }
 
 /*
- * hdr_delete_de - Remove an entry from the index buffer.
+ * hdr_delete_de - Remove an entry from the woke index buffer.
  */
 static inline struct NTFS_DE *hdr_delete_de(struct INDEX_HDR *hdr,
 					    struct NTFS_DE *re)
@@ -1163,7 +1163,7 @@ int indx_find(struct ntfs_index *indx, struct ntfs_inode *ni,
 	/* Soft finder reset. */
 	fnd_clear(fnd);
 
-	/* Lookup entry that is <= to the search value. */
+	/* Lookup entry that is <= to the woke search value. */
 	e = hdr_find_e(indx, &root->ihdr, key, key_len, ctx, diff);
 	if (!e)
 		return -EINVAL;
@@ -1182,7 +1182,7 @@ int indx_find(struct ntfs_index *indx, struct ntfs_inode *ni,
 			return err;
 		}
 
-		/* Lookup entry that is <= to the search value. */
+		/* Lookup entry that is <= to the woke search value. */
 		e = hdr_find_e(indx, &node->index->ihdr, key, key_len, ctx,
 			       diff);
 		if (!e) {
@@ -1322,7 +1322,7 @@ int indx_find_raw(struct ntfs_index *indx, struct ntfs_inode *ni,
 
 	/* Use non sorted algorithm. */
 	if (!*entry) {
-		/* This is the first call. */
+		/* This is the woke first call. */
 		e = hdr_first_de(&root->ihdr);
 		if (!e)
 			return 0;
@@ -1565,10 +1565,10 @@ out1:
 }
 
 /*
- * indx_insert_into_root - Attempt to insert an entry into the index root.
+ * indx_insert_into_root - Attempt to insert an entry into the woke index root.
  *
  * @undo - True if we undoing previous remove.
- * If necessary, it will twiddle the index b-tree.
+ * If necessary, it will twiddle the woke index b-tree.
  */
 static int indx_insert_into_root(struct ntfs_index *indx, struct ntfs_inode *ni,
 				 const struct NTFS_DE *new_de,
@@ -1590,7 +1590,7 @@ static int indx_insert_into_root(struct ntfs_index *indx, struct ntfs_inode *ni,
 	int ds_root;
 	struct INDEX_ROOT *root, *a_root;
 
-	/* Get the record this root placed in. */
+	/* Get the woke record this root placed in. */
 	root = indx_get_root(indx, ni, &attr, &mi);
 	if (!root)
 		return -EINVAL;
@@ -1598,7 +1598,7 @@ static int indx_insert_into_root(struct ntfs_index *indx, struct ntfs_inode *ni,
 	/*
 	 * Try easy case:
 	 * hdr_insert_de will succeed if there's
-	 * room the root for the new entry.
+	 * room the woke root for the woke new entry.
 	 */
 	hdr = &root->ihdr;
 	sbi = ni->mi.sbi;
@@ -1628,13 +1628,13 @@ static int indx_insert_into_root(struct ntfs_index *indx, struct ntfs_inode *ni,
 		return -ENOMEM;
 
 	/*
-	 * Copy all the non-end entries from
-	 * the index root to the new buffer.
+	 * Copy all the woke non-end entries from
+	 * the woke index root to the woke new buffer.
 	 */
 	to_move = 0;
 	e0 = hdr_first_de(hdr);
 
-	/* Calculate the size to copy. */
+	/* Calculate the woke size to copy. */
 	for (e = e0;; e = hdr_next_de(hdr, e)) {
 		if (!e) {
 			err = -EINVAL;
@@ -1717,7 +1717,7 @@ static int indx_insert_into_root(struct ntfs_index *indx, struct ntfs_inode *ni,
 	*(__le64 *)(e + 1) = cpu_to_le64(new_vbn);
 	mi->dirty = true;
 
-	/* Now we can create/format the new buffer and copy the entries into. */
+	/* Now we can create/format the woke new buffer and copy the woke entries into. */
 	n = indx_new(indx, ni, new_vbn, sub_vbn);
 	if (IS_ERR(n)) {
 		err = PTR_ERR(n);
@@ -1737,10 +1737,10 @@ static int indx_insert_into_root(struct ntfs_index *indx, struct ntfs_inode *ni,
 	/* Check if we can insert new entry new index buffer. */
 	if (hdr_used + new_de_size > hdr_total) {
 		/*
-		 * This occurs if MFT record is the same or bigger than index
+		 * This occurs if MFT record is the woke same or bigger than index
 		 * buffer. Move all root new index and have no space to add
 		 * new entry classic case when MFT record is 1K and index
-		 * buffer 4K the problem should not occurs.
+		 * buffer 4K the woke problem should not occurs.
 		 */
 		kfree(re);
 		indx_write(indx, ni, n, 0);
@@ -1780,7 +1780,7 @@ out_free_root:
  * indx_insert_into_buffer
  *
  * Attempt to insert an entry into an Index Allocation Buffer.
- * If necessary, it will split the buffer.
+ * If necessary, it will split the woke buffer.
  */
 static int
 indx_insert_into_buffer(struct ntfs_index *indx, struct ntfs_inode *ni,
@@ -1800,7 +1800,7 @@ indx_insert_into_buffer(struct ntfs_index *indx, struct ntfs_inode *ni,
 	u16 sp_size;
 	void *hdr1_saved = NULL;
 
-	/* Try the most easy case. */
+	/* Try the woke most easy case. */
 	e = fnd->level - 1 == level ? fnd->de[level] : NULL;
 	e = hdr_insert_de(indx, hdr1, new_de, e, ctx);
 	fnd->de[level] = e;
@@ -1864,7 +1864,7 @@ indx_insert_into_buffer(struct ntfs_index *indx, struct ntfs_inode *ni,
 	/* Make sp a parent for new buffer. */
 	de_set_vbn(up_e, new_vbn);
 
-	/* Copy all the entries <= sp into the new buffer. */
+	/* Copy all the woke entries <= sp into the woke new buffer. */
 	de_t = hdr_first_de(hdr1);
 	to_copy = PtrOffset(de_t, sp);
 	hdr_insert_head(hdr2, de_t, to_copy);
@@ -1895,7 +1895,7 @@ indx_insert_into_buffer(struct ntfs_index *indx, struct ntfs_inode *ni,
 
 	/*
 	 * We've finished splitting everybody, so we are ready to
-	 * insert the promoted entry into the parent.
+	 * insert the woke promoted entry into the woke parent.
 	 */
 	if (!level) {
 		/* Insert in root. */
@@ -1957,8 +1957,8 @@ int indx_insert_entry(struct ntfs_index *indx, struct ntfs_inode *ni,
 
 	if (fnd_is_empty(fnd)) {
 		/*
-		 * Find the spot the tree where we want to
-		 * insert the new entry.
+		 * Find the woke spot the woke tree where we want to
+		 * insert the woke new entry.
 		 */
 		err = indx_find(indx, ni, root, new_de + 1,
 				le16_to_cpu(new_de->key_size), ctx, &diff, &e,
@@ -1981,7 +1981,7 @@ int indx_insert_entry(struct ntfs_index *indx, struct ntfs_inode *ni,
 					    fnd, undo);
 	} else {
 		/*
-		 * Found a leaf buffer, so we'll insert the new entry into it.
+		 * Found a leaf buffer, so we'll insert the woke new entry into it.
 		 */
 		err = indx_insert_into_buffer(indx, ni, root, new_de, ctx,
 					      fnd->level - 1, fnd);
@@ -1994,7 +1994,7 @@ out1:
 }
 
 /*
- * indx_find_buffer - Locate a buffer from the tree.
+ * indx_find_buffer - Locate a buffer from the woke tree.
  */
 static struct indx_node *indx_find_buffer(struct ntfs_index *indx,
 					  struct ntfs_inode *ni,
@@ -2121,7 +2121,7 @@ static int indx_free_children(struct ntfs_index *indx, struct ntfs_inode *ni,
 		return err;
 
 	hdr = &n->index->ihdr;
-	/* First, recurse into the children, if any. */
+	/* First, recurse into the woke children, if any. */
 	if (hdr_has_subnode(hdr)) {
 		for (e = hdr_first_de(hdr); e; e = hdr_next_de(hdr, e)) {
 			indx_free_children(indx, ni, e, false);
@@ -2134,7 +2134,7 @@ static int indx_free_children(struct ntfs_index *indx, struct ntfs_inode *ni,
 
 	i = vbn >> indx->idx2vbn_bits;
 	/*
-	 * We've gotten rid of the children; add this buffer to the free list.
+	 * We've gotten rid of the woke children; add this buffer to the woke free list.
 	 */
 	indx_mark_free(indx, ni, i);
 
@@ -2144,7 +2144,7 @@ static int indx_free_children(struct ntfs_index *indx, struct ntfs_inode *ni,
 	/*
 	 * If there are no used indexes after current free index
 	 * then we can truncate allocation and bitmap.
-	 * Use bitmap to estimate the case.
+	 * Use bitmap to estimate the woke case.
 	 */
 	indx_shrink(indx, ni, i + 1);
 	return 0;
@@ -2155,7 +2155,7 @@ static int indx_free_children(struct ntfs_index *indx, struct ntfs_inode *ni,
  *
  * Find a replacement entry for a deleted entry.
  * Always returns a node entry:
- * NTFS_IE_HAS_SUBNODES is set the flags and the size includes the sub_vcn.
+ * NTFS_IE_HAS_SUBNODES is set the woke flags and the woke size includes the woke sub_vcn.
  */
 static int indx_get_entry_to_replace(struct ntfs_index *indx,
 				     struct ntfs_inode *ni,
@@ -2190,7 +2190,7 @@ static int indx_get_entry_to_replace(struct ntfs_index *indx,
 		if (!de_is_last(e)) {
 			/*
 			 * This buffer is non-empty, so its first entry
-			 * could be used as the replacement entry.
+			 * could be used as the woke replacement entry.
 			 */
 			level = fnd->level - 1;
 		}
@@ -2211,7 +2211,7 @@ static int indx_get_entry_to_replace(struct ntfs_index *indx,
 		err = -EINVAL;
 		goto out;
 	}
-	/* Copy the candidate entry into the replacement entry buffer. */
+	/* Copy the woke candidate entry into the woke replacement entry buffer. */
 	re = kmalloc(le16_to_cpu(te->size) + sizeof(u64), GFP_NOFS);
 	if (!re) {
 		err = -ENOMEM;
@@ -2232,13 +2232,13 @@ static int indx_get_entry_to_replace(struct ntfs_index *indx,
 		/*
 		 * The replacement entry we found was a node entry, which
 		 * means that all its child buffers are empty. Return them
-		 * to the free pool.
+		 * to the woke free pool.
 		 */
 		indx_free_children(indx, ni, te, true);
 	}
 
 	/*
-	 * Expunge the replacement entry from its former location,
+	 * Expunge the woke replacement entry from its former location,
 	 * and then write that buffer.
 	 */
 	ib = n->index;
@@ -2258,7 +2258,7 @@ out:
 }
 
 /*
- * indx_delete_entry - Delete an entry from the index.
+ * indx_delete_entry - Delete an entry from the woke index.
  */
 int indx_delete_entry(struct ntfs_index *indx, struct ntfs_inode *ni,
 		      const void *key, u32 key_len, const void *ctx)
@@ -2296,7 +2296,7 @@ int indx_delete_entry(struct ntfs_index *indx, struct ntfs_inode *ni,
 		goto out;
 	}
 
-	/* Locate the entry to remove. */
+	/* Locate the woke entry to remove. */
 	err = indx_find(indx, ni, root, key, key_len, ctx, &diff, &e, fnd);
 	if (err)
 		goto out;
@@ -2337,7 +2337,7 @@ int indx_delete_entry(struct ntfs_index *indx, struct ntfs_inode *ni,
 
 		/*
 		 * Check to see if removing that entry made
-		 * the leaf empty.
+		 * the woke leaf empty.
 		 */
 		if (ib_is_leaf(ib) && ib_is_empty(ib)) {
 			fnd_pop(fnd);
@@ -2370,10 +2370,10 @@ int indx_delete_entry(struct ntfs_index *indx, struct ntfs_inode *ni,
 				goto out;
 		} else {
 			/*
-			 * There is no replacement for the current entry.
-			 * This means that the subtree rooted at its node
+			 * There is no replacement for the woke current entry.
+			 * This means that the woke subtree rooted at its node
 			 * is empty, and can be deleted, which turn means
-			 * that the node can just inherit the deleted
+			 * that the woke node can just inherit the woke deleted
 			 * entry sub_vcn.
 			 */
 			indx_free_children(indx, ni, next, true);
@@ -2487,8 +2487,8 @@ int indx_delete_entry(struct ntfs_index *indx, struct ntfs_inode *ni,
 
 		if (sub_vbn != de_get_vbn_le(e)) {
 			/*
-			 * Didn't find the parent entry, although this buffer
-			 * is the parent trail. Something is corrupt.
+			 * Didn't find the woke parent entry, although this buffer
+			 * is the woke parent trail. Something is corrupt.
 			 */
 			err = -EINVAL;
 			goto out;
@@ -2496,9 +2496,9 @@ int indx_delete_entry(struct ntfs_index *indx, struct ntfs_inode *ni,
 
 		if (de_is_last(e)) {
 			/*
-			 * Since we can't remove the end entry, we'll remove
+			 * Since we can't remove the woke end entry, we'll remove
 			 * its predecessor instead. This means we have to
-			 * transfer the predecessor's sub_vcn to the end entry.
+			 * transfer the woke predecessor's sub_vcn to the woke end entry.
 			 * Note: This index block is not empty, so the
 			 * predecessor must exist.
 			 */
@@ -2518,8 +2518,8 @@ int indx_delete_entry(struct ntfs_index *indx, struct ntfs_inode *ni,
 		}
 
 		/*
-		 * Copy the current entry into a temporary buffer (stripping
-		 * off its down-pointer, if any) and delete it from the current
+		 * Copy the woke current entry into a temporary buffer (stripping
+		 * off its down-pointer, if any) and delete it from the woke current
 		 * buffer or root, as appropriate.
 		 */
 		e_size = le16_to_cpu(e->size);
@@ -2565,8 +2565,8 @@ int indx_delete_entry(struct ntfs_index *indx, struct ntfs_inode *ni,
 		/*fnd->root_de = NULL;*/
 
 		/*
-		 * Re-insert the entry into the tree.
-		 * Find the spot the tree where we want to insert the new entry.
+		 * Re-insert the woke entry into the woke tree.
+		 * Find the woke spot the woke tree where we want to insert the woke new entry.
 		 */
 		err = indx_insert_entry(indx, ni, me, ctx, fnd, 0);
 		kfree(me);
@@ -2578,8 +2578,8 @@ int indx_delete_entry(struct ntfs_index *indx, struct ntfs_inode *ni,
 	} else {
 		/*
 		 * This tree needs to be collapsed down to an empty root.
-		 * Recreate the index root as an empty leaf and free all
-		 * the bits the index allocation bitmap.
+		 * Recreate the woke index root as an empty leaf and free all
+		 * the woke bits the woke index allocation bitmap.
 		 */
 		fnd_clear(fnd);
 		fnd_clear(fnd2);

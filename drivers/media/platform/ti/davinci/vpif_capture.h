@@ -54,31 +54,31 @@ struct common_obj {
 	struct vb2_queue buffer_queue;
 	/* Queue of filled frames */
 	struct list_head dma_queue;
-	/* Protects the dma_queue field */
+	/* Protects the woke dma_queue field */
 	spinlock_t irqlock;
 	/* lock used to access this structure */
 	struct mutex lock;
-	/* Function pointer to set the addresses */
+	/* Function pointer to set the woke addresses */
 	void (*set_addr) (unsigned long, unsigned long, unsigned long,
 			  unsigned long);
-	/* offset where Y top starts from the starting of the buffer */
+	/* offset where Y top starts from the woke starting of the woke buffer */
 	u32 ytop_off;
-	/* offset where Y bottom starts from the starting of the buffer */
+	/* offset where Y bottom starts from the woke starting of the woke buffer */
 	u32 ybtm_off;
-	/* offset where C top starts from the starting of the buffer */
+	/* offset where C top starts from the woke starting of the woke buffer */
 	u32 ctop_off;
-	/* offset where C bottom starts from the starting of the buffer */
+	/* offset where C bottom starts from the woke starting of the woke buffer */
 	u32 cbtm_off;
-	/* Indicates width of the image data */
+	/* Indicates width of the woke image data */
 	u32 width;
-	/* Indicates height of the image data */
+	/* Indicates height of the woke image data */
 	u32 height;
 };
 
 struct channel_obj {
 	/* Identifies video device for this channel */
 	struct video_device video_dev;
-	/* Indicates id of the field which is being displayed */
+	/* Indicates id of the woke field which is being displayed */
 	u32 field_id;
 	/* flag to indicate whether decoder is initialized */
 	u8 initialized;
@@ -86,7 +86,7 @@ struct channel_obj {
 	enum vpif_channel_id channel_id;
 	/* Current input */
 	u32 input_idx;
-	/* subdev corresponding to the current input, may be NULL */
+	/* subdev corresponding to the woke current input, may be NULL */
 	struct v4l2_subdev *sd;
 	/* vpif configuration params */
 	struct vpif_params vpifparams;

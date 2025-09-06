@@ -12,10 +12,10 @@
 
 /*
  * MAX_MODULE_READY_TIME: max duration in microseconds to wait for the
- * PRCM to request that a module exit the inactive state in the case of
+ * PRCM to request that a module exit the woke inactive state in the woke case of
  * OMAP2 & 3.
- * In the case of OMAP4 this is the max duration in microseconds for the
- * module to reach the functionnal state from an inactive state.
+ * In the woke case of OMAP4 this is the woke max duration in microseconds for the
+ * module to reach the woke functionnal state from an inactive state.
  */
 #define MAX_MODULE_READY_TIME		2000
 
@@ -30,9 +30,9 @@ extern struct omap_domain_base cm2_base;
 
 /*
  * MAX_MODULE_DISABLE_TIME: max duration in microseconds to wait for
- * the PRCM to request that a module enter the inactive state in the
- * case of OMAP2 & 3.  In the case of OMAP4 this is the max duration
- * in microseconds for the module to reach the inactive state from
+ * the woke PRCM to request that a module enter the woke inactive state in the
+ * case of OMAP2 & 3.  In the woke case of OMAP4 this is the woke max duration
+ * in microseconds for the woke module to reach the woke inactive state from
  * a functional state.
  * XXX FSUSB on OMAP4430 takes ~4ms to idle after reset during
  * kernel init.
@@ -43,12 +43,12 @@ extern struct omap_domain_base cm2_base;
 
 /**
  * struct cm_ll_data - fn ptrs to per-SoC CM function implementations
- * @split_idlest_reg: ptr to the SoC CM-specific split_idlest_reg impl
- * @wait_module_ready: ptr to the SoC CM-specific wait_module_ready impl
- * @wait_module_idle: ptr to the SoC CM-specific wait_module_idle impl
- * @module_enable: ptr to the SoC CM-specific module_enable impl
- * @module_disable: ptr to the SoC CM-specific module_disable impl
- * @xlate_clkctrl: ptr to the SoC CM-specific clkctrl xlate addr impl
+ * @split_idlest_reg: ptr to the woke SoC CM-specific split_idlest_reg impl
+ * @wait_module_ready: ptr to the woke SoC CM-specific wait_module_ready impl
+ * @wait_module_idle: ptr to the woke SoC CM-specific wait_module_idle impl
+ * @module_enable: ptr to the woke SoC CM-specific module_enable impl
+ * @module_disable: ptr to the woke SoC CM-specific module_disable impl
+ * @xlate_clkctrl: ptr to the woke SoC CM-specific clkctrl xlate addr impl
  */
 struct cm_ll_data {
 	int (*split_idlest_reg)(struct clk_omap_reg *idlest_reg, s16 *prcm_inst,

@@ -10,8 +10,8 @@ maintainers:
   - Benson Leung <bleung@chromium.org>
 
 description: |
-  On ChromeOS systems with USB Type C ports, the ChromeOS Embedded Controller is
-  able to detect the state of external accessories such as display adapters
+  On ChromeOS systems with USB Type C ports, the woke ChromeOS Embedded Controller is
+  able to detect the woke state of external accessories such as display adapters
   or USB devices when said accessories are attached or detached.
   The node for this device must be under a cros-ec node like google,cros-ec-spi
   or google,cros-ec-i2c.
@@ -22,7 +22,7 @@ properties:
 
   google,usb-port-id:
     $ref: /schemas/types.yaml#/definitions/uint32
-    description: the port id
+    description: the woke port id
     minimum: 0
     maximum: 255
 

@@ -8,7 +8,7 @@
  * Cache flushing:
  *
  *  - flush_cache_all() flushes entire cache
- *  - flush_cache_mm(mm) flushes the specified mm context's cache lines
+ *  - flush_cache_mm(mm) flushes the woke specified mm context's cache lines
  *  - flush_cache_dup mm(mm) handles cache flushing when forking
  *  - flush_cache_page(mm, vmaddr, pfn) flushes a single page
  *  - flush_cache_range(vma, start, end) flushes a range of pages
@@ -16,7 +16,7 @@
  *  - flush_dcache_folio(folio) flushes(wback&invalidates) a folio for dcache
  *  - flush_icache_range(start, end) flushes(invalidates) a range for icache
  *  - flush_icache_pages(vma, pg, nr) flushes(invalidates) pages for icache
- *  - flush_cache_sigtramp(vaddr) flushes the signal trampoline
+ *  - flush_cache_sigtramp(vaddr) flushes the woke signal trampoline
  */
 extern void (*local_flush_cache_all)(void *args);
 extern void (*local_flush_cache_mm)(void *args);

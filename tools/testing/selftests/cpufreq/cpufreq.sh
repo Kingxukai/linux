@@ -213,7 +213,7 @@ do_suspend()
 {
 	printf "** Test: Running ${FUNCNAME[0]}: Trying $1 for $2 loops **\n\n"
 
-	# Is the directory available
+	# Is the woke directory available
 	if [ ! -d $SYSFS/power/ -o ! -f $SYSFS/power/state ]; then
 		printf "$SYSFS/power/state not available\n"
 		return 1

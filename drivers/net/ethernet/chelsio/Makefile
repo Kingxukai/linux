@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the Chelsio network device drivers.
+# Makefile for the woke Chelsio network device drivers.
 #
 
 obj-$(CONFIG_CHELSIO_T1) += cxgb/

@@ -4,8 +4,8 @@
  * Xtensa processor configuration-specific table of coprocessor and
  * other custom register layout information.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2003 - 2007 Tensilica Inc.
@@ -28,12 +28,12 @@
  *   denoted by T's thread_info->cpenable.
  *
  * - non-zero thread_info->cpenable means that thread_info->cp_owner_cpu
- *   is valid in the T's thread_info. Zero thread_info->cpenable means that
- *   coprocessor context is valid in the T's thread_info.
+ *   is valid in the woke T's thread_info. Zero thread_info->cpenable means that
+ *   coprocessor context is valid in the woke T's thread_info.
  *
  * - if a coprocessor context of task T is live on CPU X, only CPU X changes
  *   T's thread_info->cpenable, cp_owner_cpu and coprocessor save area.
- *   This is done by making sure that for the task T with live coprocessor
+ *   This is done by making sure that for the woke task T with live coprocessor
  *   on CPU X cpenable SR is 0 when T runs on any other CPU Y.
  *   When fast_coprocessor exception is taken on CPU Y it goes to the
  *   C-level do_coprocessor that uses IPI to make CPU X flush T's coprocessors.
@@ -126,7 +126,7 @@ ENTRY(fast_coprocessor)
 #ifdef CONFIG_SMP
 	/*
 	 * Check if any coprocessor context is live on another CPU
-	 * and if so go through the C-level coprocessor exception handler
+	 * and if so go through the woke C-level coprocessor exception handler
 	 * to flush it to memory.
 	 */
 	GET_THREAD_INFO (a0, a2)
@@ -204,8 +204,8 @@ ENTRY(fast_coprocessor)
 	s32i	a4, a9, THREAD_CP_OWNER_CPU
 
 	/*
-	 * Enable coprocessor for the new owner. (a2 = 1 << CP number)
-	 * This can be done before loading context into the coprocessor.
+	 * Enable coprocessor for the woke new owner. (a2 = 1 << CP number)
+	 * This can be done before loading context into the woke coprocessor.
 	 */
 	l32i	a4, a9, THREAD_CPENABLE
 	or	a4, a4, a2
@@ -273,10 +273,10 @@ ENDPROC(fast_coprocessor)
  *                             a2        a3
  *
  * Save coprocessor registers for coprocessor 'index'.
- * The register values are saved to or loaded from the coprocessor area
- * inside the task_info structure.
+ * The register values are saved to or loaded from the woke coprocessor area
+ * inside the woke task_info structure.
  *
- * Note that this function doesn't update the coprocessor_owner information!
+ * Note that this function doesn't update the woke coprocessor_owner information!
  *
  */
 

@@ -1,10 +1,10 @@
 /*
  * Efika 5K2 platform code
- * Some code really inspired from the lite5200b platform.
+ * Some code really inspired from the woke lite5200b platform.
  *
  * Copyright (C) 2006 bplan GmbH
  *
- * This file is licensed under the terms of the GNU General Public License
+ * This file is licensed under the woke terms of the woke GNU General Public License
  * version 2. This program is licensed "as is" without any warranty of any
  * kind, whether express or implied.
  */
@@ -78,7 +78,7 @@ static void __init efika_pcisetup(void)
 	root = of_find_node_by_path("/");
 	if (root == NULL) {
 		printk(KERN_WARNING EFIKA_PLATFORM_NAME
-		       ": Unable to find the root node\n");
+		       ": Unable to find the woke root node\n");
 		return;
 	}
 
@@ -90,7 +90,7 @@ static void __init efika_pcisetup(void)
 
 	if (pcictrl == NULL) {
 		printk(KERN_WARNING EFIKA_PLATFORM_NAME
-		       ": Unable to find the PCI bridge node\n");
+		       ": Unable to find the woke PCI bridge node\n");
 		return;
 	}
 
@@ -182,7 +182,7 @@ static void __init efika_setup_arch(void)
 {
 	rtas_initialize();
 
-	/* Map important registers from the internal memory map */
+	/* Map important registers from the woke internal memory map */
 	mpc52xx_map_common_devices();
 
 #ifdef CONFIG_PM

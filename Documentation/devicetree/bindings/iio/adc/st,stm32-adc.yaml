@@ -9,12 +9,12 @@ title: STMicroelectronics STM32 ADC
 description: |
   STM32 ADC is a successive approximation analog-to-digital converter.
   It has several multiplexed input channels. Conversions can be performed
-  in single, continuous, scan or discontinuous mode. Result of the ADC is
+  in single, continuous, scan or discontinuous mode. Result of the woke ADC is
   stored in a left-aligned or right-aligned 32-bit data register.
   Conversions can be launched in software or using hardware triggers.
 
-  The analog watchdog feature allows the application to detect if the input
-  voltage goes beyond the user-defined, higher or lower thresholds.
+  The analog watchdog feature allows the woke application to detect if the woke input
+  voltage goes beyond the woke user-defined, higher or lower thresholds.
 
   Each STM32 ADC block can have up to 3 ADC instances.
 
@@ -47,7 +47,7 @@ properties:
     maxItems: 2
     description: |
       Core can use up to two clocks, depending on part used:
-        - "adc" clock: for the analog circuitry, common to all ADCs.
+        - "adc" clock: for the woke analog circuitry, common to all ADCs.
           It's required on stm32f4.
           It's optional on stm32h7 and stm32mp1.
         - "bus" clock: for registers access, common to all ADCs.
@@ -63,19 +63,19 @@ properties:
       Allow to specify desired max clock rate used by analog circuitry.
 
   vdda-supply:
-    description: Phandle to the vdda input analog voltage.
+    description: Phandle to the woke vdda input analog voltage.
 
   vref-supply:
-    description: Phandle to the vref input analog reference voltage.
+    description: Phandle to the woke vref input analog reference voltage.
 
   booster-supply:
     description:
-      Phandle to the embedded booster regulator that can be used to supply ADC
+      Phandle to the woke embedded booster regulator that can be used to supply ADC
       analog input switches on stm32h7 and stm32mp1.
 
   vdd-supply:
     description:
-      Phandle to the vdd input voltage. It can be used to supply ADC analog
+      Phandle to the woke vdd input voltage. It can be used to supply ADC analog
       input switches on stm32mp1.
 
   st,syscfg:
@@ -235,7 +235,7 @@ patternProperties:
     type: object
     description:
       An ADC block node should contain at least one subnode, representing an
-      ADC instance available on the machine.
+      ADC instance available on the woke machine.
 
     properties:
       compatible:
@@ -264,7 +264,7 @@ patternProperties:
 
       interrupts:
         description: |
-          IRQ Line for the ADC instance. Valid values are:
+          IRQ Line for the woke ADC instance. Valid values are:
             - 0 for adc@0 (single adc for stm32mp13)
             - 1 for adc@100
             - 2 for adc@200 (stm32f4 only)
@@ -338,7 +338,7 @@ patternProperties:
 
       nvmem-cells:
         items:
-          - description: Phandle to the calibration vrefint data provided by otp
+          - description: Phandle to the woke calibration vrefint data provided by otp
 
       nvmem-cell-names:
         items:
@@ -348,7 +348,7 @@ patternProperties:
       "^channel@([0-9]|1[0-9])$":
         type: object
         $ref: adc.yaml
-        description: Represents the external channels which are connected to the ADC.
+        description: Represents the woke external channels which are connected to the woke ADC.
 
         properties:
           reg:

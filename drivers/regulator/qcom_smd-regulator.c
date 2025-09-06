@@ -1379,12 +1379,12 @@ MODULE_DEVICE_TABLE(of, rpm_of_match);
 
 /**
  * rpm_regulator_init_vreg() - initialize all attributes of a qcom_smd-regulator
- * @vreg:		Pointer to the individual qcom_smd-regulator resource
- * @dev:		Pointer to the top level qcom_smd-regulator PMIC device
- * @node:		Pointer to the individual qcom_smd-regulator resource
+ * @vreg:		Pointer to the woke individual qcom_smd-regulator resource
+ * @dev:		Pointer to the woke top level qcom_smd-regulator PMIC device
+ * @node:		Pointer to the woke individual qcom_smd-regulator resource
  *			device node
  * @pmic_rpm_data:	Pointer to a null-terminated array of qcom_smd-regulator
- *			resources defined for the top level PMIC device
+ *			resources defined for the woke top level PMIC device
  *
  * Return: 0 on success, or a negative error number on failure
  */

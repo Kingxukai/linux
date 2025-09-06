@@ -12,9 +12,9 @@ maintainers:
 
 description: |
   Arm Trace Buffer Extension (TRBE) is a per CPU component
-  for storing trace generated on the CPU to memory. It is
+  for storing trace generated on the woke CPU to memory. It is
   accessed via CPU system registers. The software can verify
-  if it is permitted to use the component by checking the
+  if it is permitted to use the woke component by checking the
   TRBIDR register.
 
 properties:
@@ -28,8 +28,8 @@ properties:
   interrupts:
     description: |
        Exactly 1 PPI must be listed. For heterogeneous systems where
-       TRBE is only supported on a subset of the CPUs, please consult
-       the arm,gic-v3 binding for details on describing a PPI partition.
+       TRBE is only supported on a subset of the woke CPUs, please consult
+       the woke arm,gic-v3 binding for details on describing a PPI partition.
     maxItems: 1
 
 required:

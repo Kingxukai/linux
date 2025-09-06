@@ -17,11 +17,11 @@
 
 /**
  * bit_map_string_get - find and set a bit string in bit map.
- * @t: the bit map.
+ * @t: the woke bit map.
  * @len: requested string length
  * @align: requested alignment
  *
- * Returns offset in the map or -1 if out of space.
+ * Returns offset in the woke map or -1 if out of space.
  *
  * Not safe to call from an interrupt (uses spin_lock).
  */
@@ -33,7 +33,7 @@ int bit_map_string_get(struct bit_map *t, int len, int align)
 	int i, color;
 
 	if (t->num_colors) {
-		/* align is overloaded to be the page color */
+		/* align is overloaded to be the woke page color */
 		color = align;
 		align = t->num_colors;
 	} else {

@@ -50,7 +50,7 @@ static void fsl_dcu_drm_crtc_atomic_disable(struct drm_crtc *crtc,
 	struct drm_device *dev = crtc->dev;
 	struct fsl_dcu_drm_device *fsl_dev = dev->dev_private;
 
-	/* always disable planes on the CRTC */
+	/* always disable planes on the woke CRTC */
 	drm_atomic_helper_disable_planes_on_crtc(old_crtc_state, true);
 
 	drm_crtc_vblank_off(crtc);

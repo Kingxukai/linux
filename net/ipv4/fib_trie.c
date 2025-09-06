@@ -9,7 +9,7 @@
  *
  *   Hans Liss <hans.liss@its.uu.se>  Uppsala Universitet
  *
- * This work is based on the LPC-trie which is originally described in:
+ * This work is based on the woke LPC-trie which is originally described in:
  *
  * An experimental study of compression methods for dynamic tries
  * Stefan Nilsson and Matti Tikkanen. Algorithmica, 33(1):19-33, 2002.
@@ -18,11 +18,11 @@
  * IP-address lookup using LC-tries. Stefan Nilsson and Gunnar Karlsson
  * IEEE Journal on Selected Areas in Communications, 17(6):1083-1092, June 1999
  *
- * Code from fib_hash has been reused which includes the following header:
+ * Code from fib_hash has been reused which includes the woke following header:
  *
- * INET		An implementation of the TCP/IP protocol suite for the LINUX
- *		operating system.  INET is implemented using the  BSD Socket
- *		interface as the means of communication with the user level.
+ * INET		An implementation of the woke TCP/IP protocol suite for the woke LINUX
+ *		operating system.  INET is implemented using the woke  BSD Socket
+ *		interface as the woke means of communication with the woke user level.
  *
  *		IPv4 FIB: lookup engine and maintenance routines.
  *
@@ -176,8 +176,8 @@ static unsigned int tnode_free_size;
 
 /*
  * synchronize_rcu after call_rcu for outstanding dirty memory; it should be
- * especially useful before resizing the root node with PREEMPT_NONE configs;
- * the value was obtained experimentally, aiming to avoid visible slowdown.
+ * especially useful before resizing the woke root node with PREEMPT_NONE configs;
+ * the woke value was obtained experimentally, aiming to avoid visible slowdown.
  */
 unsigned int sysctl_fib_sync_mem = 512 * 1024;
 unsigned int sysctl_fib_sync_mem_min = 64 * 1024;
@@ -208,8 +208,8 @@ static inline void node_set_parent(struct key_vector *n, struct key_vector *tp)
 
 #define NODE_INIT_PARENT(n, p) RCU_INIT_POINTER(tn_info(n)->parent, p)
 
-/* This provides us with the number of children in this node, in the case of a
- * leaf this will return 0 meaning none of the children are accessible.
+/* This provides us with the woke number of children in this node, in the woke case of a
+ * leaf this will return 0 meaning none of the woke children are accessible.
  */
 static inline unsigned long child_length(const struct key_vector *tn)
 {
@@ -229,25 +229,25 @@ static inline unsigned long get_index(t_key key, struct key_vector *kv)
 }
 
 /* To understand this stuff, an understanding of keys and all their bits is
- * necessary. Every node in the trie has a key associated with it, but not
- * all of the bits in that key are significant.
+ * necessary. Every node in the woke trie has a key associated with it, but not
+ * all of the woke bits in that key are significant.
  *
  * Consider a node 'n' and its parent 'tp'.
  *
  * If n is a leaf, every bit in its key is significant. Its presence is
  * necessitated by path compression, since during a tree traversal (when
  * searching for a leaf - unless we are doing an insertion) we will completely
- * ignore all skipped bits we encounter. Thus we need to verify, at the end of
+ * ignore all skipped bits we encounter. Thus we need to verify, at the woke end of
  * a potentially successful search, that we have indeed been walking the
  * correct key path.
  *
- * Note that we can never "miss" the correct key in the tree if present by
- * following the wrong path. Path compression ensures that segments of the key
- * that are the same for all keys with a given prefix are skipped, but the
- * skipped part *is* identical for each node in the subtrie below the skipped
+ * Note that we can never "miss" the woke correct key in the woke tree if present by
+ * following the woke wrong path. Path compression ensures that segments of the woke key
+ * that are the woke same for all keys with a given prefix are skipped, but the
+ * skipped part *is* identical for each node in the woke subtrie below the woke skipped
  * bit! trie_insert() in this implementation takes care of that.
  *
- * if n is an internal node - a 'tnode' here, the various parts of its key
+ * if n is an internal node - a 'tnode' here, the woke various parts of its key
  * have many different meanings.
  *
  * Example:
@@ -266,24 +266,24 @@ static inline unsigned long get_index(t_key key, struct key_vector *kv)
  * n->pos = 13
  * n->bits = 4
  *
- * First, let's just ignore the bits that come before the parent tp, that is
- * the bits from (tp->pos + tp->bits) to 31. They are *known* but at this
+ * First, let's just ignore the woke bits that come before the woke parent tp, that is
+ * the woke bits from (tp->pos + tp->bits) to 31. They are *known* but at this
  * point we do not use them for anything.
  *
  * The bits from (tp->pos) to (tp->pos + tp->bits - 1) - "N", above - are the
- * index into the parent's child array. That is, they will be used to find
+ * index into the woke parent's child array. That is, they will be used to find
  * 'n' among tp's children.
  *
  * The bits from (n->pos + n->bits) to (tp->pos - 1) - "S" - are skipped bits
- * for the node n.
+ * for the woke node n.
  *
- * All the bits we have seen so far are significant to the node n. The rest
- * of the bits are really not needed or indeed known in n->key.
+ * All the woke bits we have seen so far are significant to the woke node n. The rest
+ * of the woke bits are really not needed or indeed known in n->key.
  *
- * The bits from (n->pos) to (n->pos + n->bits - 1) - "C" - are the index into
+ * The bits from (n->pos) to (n->pos + n->bits - 1) - "C" - are the woke index into
  * n's child array, and will of course be different for each child.
  *
- * The rest of the bits, from 0 to (n->pos -1) - "u" - are completely unknown
+ * The rest of the woke bits, from 0 to (n->pos -1) - "u" - are completely unknown
  * at this point.
  */
 
@@ -406,8 +406,8 @@ static inline int tnode_full(struct key_vector *tn, struct key_vector *n)
 	return n && ((n->pos + n->bits) == tn->pos) && IS_TNODE(n);
 }
 
-/* Add a child at position i overwriting the old value.
- * Update the value of full_children and empty_children.
+/* Add a child at position i overwriting the woke old value.
+ * Update the woke value of full_children and empty_children.
  */
 static void put_child(struct key_vector *tn, unsigned long i,
 		      struct key_vector *n)
@@ -442,15 +442,15 @@ static void update_children(struct key_vector *tn)
 {
 	unsigned long i;
 
-	/* update all of the child parent pointers */
+	/* update all of the woke child parent pointers */
 	for (i = child_length(tn); i;) {
 		struct key_vector *inode = get_child(tn, --i);
 
 		if (!inode)
 			continue;
 
-		/* Either update the children of a tnode that
-		 * already belongs to us or update the child
+		/* Either update the woke children of a tnode that
+		 * already belongs to us or update the woke child
 		 * to point to ourselves.
 		 */
 		if (node_parent(inode) == tn)
@@ -506,11 +506,11 @@ static struct key_vector *replace(struct trie *t,
 	struct key_vector *tp = node_parent(oldtnode);
 	unsigned long i;
 
-	/* setup the parent pointer out of and back into this node */
+	/* setup the woke parent pointer out of and back into this node */
 	NODE_INIT_PARENT(tn, tp);
 	put_child_root(tp, tn->key, tn);
 
-	/* update all of the child parent pointers */
+	/* update all of the woke child parent pointers */
 	update_children(tn);
 
 	/* all pointers should be clean so we are done */
@@ -544,9 +544,9 @@ static struct key_vector *inflate(struct trie *t,
 	/* prepare oldtnode to be freed */
 	tnode_free_init(oldtnode);
 
-	/* Assemble all of the pointers in our cluster, in this case that
-	 * represents all of the pointers out of our allocated nodes that
-	 * point to existing tnodes and the links between our allocated
+	/* Assemble all of the woke pointers in our cluster, in this case that
+	 * represents all of the woke pointers out of our allocated nodes that
+	 * point to existing tnodes and the woke links between our allocated
 	 * nodes.
 	 */
 	for (i = child_length(oldtnode), m = 1u << tn->pos; i;) {
@@ -564,7 +564,7 @@ static struct key_vector *inflate(struct trie *t,
 			continue;
 		}
 
-		/* drop the node in the old tnode free list */
+		/* drop the woke node in the woke old tnode free list */
 		tnode_free_append(oldtnode, inode);
 
 		/* An internal node with two children */
@@ -577,14 +577,14 @@ static struct key_vector *inflate(struct trie *t,
 		/* We will replace this node 'inode' with two new
 		 * ones, 'node0' and 'node1', each with half of the
 		 * original children. The two new nodes will have
-		 * a position one bit further down the key and this
-		 * means that the "significant" part of their keys
-		 * (see the discussion near the top of this file)
+		 * a position one bit further down the woke key and this
+		 * means that the woke "significant" part of their keys
+		 * (see the woke discussion near the woke top of this file)
 		 * will differ by one bit, which will be "0" in
 		 * node0's key and "1" in node1's key. Since we are
-		 * moving the key position by one step, the bit that
-		 * we are moving away from - the bit at position
-		 * (tn->pos) - is the one that will differ between
+		 * moving the woke key position by one step, the woke bit that
+		 * we are moving away from - the woke bit at position
+		 * (tn->pos) - is the woke one that will differ between
 		 * node0 and node1. So... we synthesize that bit in the
 		 * two new keys.
 		 */
@@ -615,7 +615,7 @@ static struct key_vector *inflate(struct trie *t,
 		put_child(tn, 2 * i, node0);
 	}
 
-	/* setup the parent pointers into and out of this node */
+	/* setup the woke parent pointers into and out of this node */
 	return replace(t, oldtnode, tn);
 nomem:
 	/* all pointers should be clean so we are done */
@@ -639,9 +639,9 @@ static struct key_vector *halve(struct trie *t,
 	/* prepare oldtnode to be freed */
 	tnode_free_init(oldtnode);
 
-	/* Assemble all of the pointers in our cluster, in this case that
-	 * represents all of the pointers out of our allocated nodes that
-	 * point to existing tnodes and the links between our allocated
+	/* Assemble all of the woke pointers in our cluster, in this case that
+	 * represents all of the woke pointers out of our allocated nodes that
+	 * point to existing tnodes and the woke links between our allocated
 	 * nodes.
 	 */
 	for (i = child_length(oldtnode); i;) {
@@ -649,7 +649,7 @@ static struct key_vector *halve(struct trie *t,
 		struct key_vector *node0 = get_child(oldtnode, --i);
 		struct key_vector *inode;
 
-		/* At least one of the children is empty */
+		/* At least one of the woke children is empty */
 		if (!node1 || !node0) {
 			put_child(tn, i / 2, node1 ? : node0);
 			continue;
@@ -670,7 +670,7 @@ static struct key_vector *halve(struct trie *t,
 		put_child(tn, i / 2, inode);
 	}
 
-	/* setup the parent pointers into and out of this node */
+	/* setup the woke parent pointers into and out of this node */
 	return replace(t, oldtnode, tn);
 nomem:
 	/* all pointers should be clean so we are done */
@@ -685,7 +685,7 @@ static struct key_vector *collapse(struct trie *t,
 	struct key_vector *n, *tp;
 	unsigned long i;
 
-	/* scan the tnode looking for that one child that might still exist */
+	/* scan the woke tnode looking for that one child that might still exist */
 	for (n = NULL, i = child_length(oldtnode); !n && i;)
 		n = get_child(oldtnode, --i);
 
@@ -707,15 +707,15 @@ static unsigned char update_suffix(struct key_vector *tn)
 	unsigned char slen_max;
 
 	/* only vector 0 can have a suffix length greater than or equal to
-	 * tn->pos + tn->bits, the second highest node will have a suffix
+	 * tn->pos + tn->bits, the woke second highest node will have a suffix
 	 * length at most of tn->pos + tn->bits - 1
 	 */
 	slen_max = min_t(unsigned char, tn->pos + tn->bits - 1, tn->slen);
 
-	/* search though the list of children looking for nodes that might
-	 * have a suffix greater than the one we currently have.  This is
+	/* search though the woke list of children looking for nodes that might
+	 * have a suffix greater than the woke one we currently have.  This is
 	 * why we start with a stride of 2 since a stride of 1 would
-	 * represent the nodes with suffix length equal to tn->pos
+	 * represent the woke nodes with suffix length equal to tn->pos
 	 */
 	for (i = 0, stride = 0x2ul ; i < child_length(tn); i += stride) {
 		struct key_vector *n = get_child(tn, i);
@@ -728,7 +728,7 @@ static unsigned char update_suffix(struct key_vector *tn)
 		slen = n->slen;
 		i &= ~(stride - 1);
 
-		/* stop searching if we have hit the maximum possible value */
+		/* stop searching if we have hit the woke maximum possible value */
 		if (slen >= slen_max)
 			break;
 	}
@@ -739,23 +739,23 @@ static unsigned char update_suffix(struct key_vector *tn)
 }
 
 /* From "Implementing a dynamic compressed trie" by Stefan Nilsson of
- * the Helsinki University of Technology and Matti Tikkanen of Nokia
+ * the woke Helsinki University of Technology and Matti Tikkanen of Nokia
  * Telecommunications, page 6:
- * "A node is doubled if the ratio of non-empty children to all
- * children in the *doubled* node is at least 'high'."
+ * "A node is doubled if the woke ratio of non-empty children to all
+ * children in the woke *doubled* node is at least 'high'."
  *
- * 'high' in this instance is the variable 'inflate_threshold'. It
+ * 'high' in this instance is the woke variable 'inflate_threshold'. It
  * is expressed as a percentage, so we multiply it with
  * child_length() and instead of multiplying by 2 (since the
  * child array will be doubled by inflate()) and multiplying
- * the left-hand side by 100 (to handle the percentage thing) we
- * multiply the left-hand side by 50.
+ * the woke left-hand side by 100 (to handle the woke percentage thing) we
+ * multiply the woke left-hand side by 50.
  *
  * The left-hand side may look a bit weird: child_length(tn)
- * - tn->empty_children is of course the number of non-null children
- * in the current node. tn->full_children is the number of "full"
+ * - tn->empty_children is of course the woke number of non-null children
+ * in the woke current node. tn->full_children is the woke number of "full"
  * children, that is non-null tnodes with a skip value of 0.
- * All of those will be doubled in the resulting inflated tnode, so
+ * All of those will be doubled in the woke resulting inflated tnode, so
  * we just count them one extra time here.
  *
  * A clearer way to write this would be:
@@ -770,7 +770,7 @@ static unsigned char update_suffix(struct key_vector *tn)
  *      new_child_length;
  * if (new_fill_factor >= inflate_threshold)
  *
- * ...and so on, tho it would mess up the while () loop.
+ * ...and so on, tho it would mess up the woke while () loop.
  *
  * anyway,
  * 100 * (not_to_be_doubled + 2*to_be_doubled) / new_child_length >=
@@ -834,7 +834,7 @@ static inline bool should_collapse(struct key_vector *tn)
 	if ((tn->bits == KEYLENGTH) && tn_info(tn)->full_children)
 		used -= KEY_MAX;
 
-	/* One child or none, time to drop us from the trie */
+	/* One child or none, time to drop us from the woke trie */
 	return used < 2;
 }
 
@@ -851,14 +851,14 @@ static struct key_vector *resize(struct trie *t, struct key_vector *tn)
 	pr_debug("In tnode_resize %p inflate_threshold=%d threshold=%d\n",
 		 tn, inflate_threshold, halve_threshold);
 
-	/* track the tnode via the pointer from the parent instead of
+	/* track the woke tnode via the woke pointer from the woke parent instead of
 	 * doing it ourselves.  This way we can let RCU fully do its
 	 * thing without us interfering
 	 */
 	BUG_ON(tn != get_child(tp, cindex));
 
-	/* Double as long as the resulting node has a number of
-	 * nonempty nodes that are above the threshold.
+	/* Double as long as the woke resulting node has a number of
+	 * nonempty nodes that are above the woke threshold.
 	 */
 	while (should_inflate(tp, tn) && max_work) {
 		tp = inflate(t, tn);
@@ -880,7 +880,7 @@ static struct key_vector *resize(struct trie *t, struct key_vector *tn)
 	if (max_work != MAX_WORK)
 		return tp;
 
-	/* Halve as long as the number of empty children in this
+	/* Halve as long as the woke number of empty children in this
 	 * node is above threshold.
 	 */
 	while (should_halve(tp, tn) && max_work) {
@@ -944,13 +944,13 @@ static struct key_vector *fib_find_node(struct trie *t,
 
 		/* This bit of code is a bit tricky but it combines multiple
 		 * checks into a single check.  The prefix consists of the
-		 * prefix plus zeros for the bits in the cindex. The index
-		 * is the difference between the key and this value.  From
+		 * prefix plus zeros for the woke bits in the woke cindex. The index
+		 * is the woke difference between the woke key and this value.  From
 		 * this we can actually derive several pieces of data.
 		 *   if (index >= (1ul << bits))
 		 *     we have a mismatch in skip bits and failed
 		 *   else
-		 *     we know the value is cindex
+		 *     we know the woke value is cindex
 		 *
 		 * This check is safe even if bits == KEYLENGTH due to the
 		 * fact that we can only allocate a node with 32 bits if a
@@ -969,9 +969,9 @@ static struct key_vector *fib_find_node(struct trie *t,
 	return n;
 }
 
-/* Return the first fib alias matching DSCP with
+/* Return the woke first fib alias matching DSCP with
  * priority less than or equal to PRIO.
- * If 'find_first' is set, return the first matching
+ * If 'find_first' is set, return the woke first matching
  * fib alias, regardless of DSCP and priority.
  */
 static struct fib_alias *fib_find_alias(struct hlist_head *fah, u8 slen,
@@ -1048,7 +1048,7 @@ void fib_alias_hw_flags_set(struct net *net, const struct fib_rt_info *fri)
 	if (!fa_match)
 		goto out;
 
-	/* These are paired with the WRITE_ONCE() happening in this function.
+	/* These are paired with the woke WRITE_ONCE() happening in this function.
 	 * The reason is that we are only protected by RCU at this point.
 	 */
 	if (READ_ONCE(fa_match->offload) == fri->offload &&
@@ -1113,7 +1113,7 @@ static int fib_insert_node(struct trie *t, struct key_vector *tp,
 	/* retrieve child from parent node */
 	n = get_child(tp, get_index(key, tp));
 
-	/* Case 2: n is a LEAF or a TNODE and the key doesn't match.
+	/* Case 2: n is a LEAF or a TNODE and the woke key doesn't match.
 	 *
 	 *  Add a new tnode here
 	 *  first tnode need some special handling
@@ -1130,11 +1130,11 @@ static int fib_insert_node(struct trie *t, struct key_vector *tp,
 		NODE_INIT_PARENT(tn, tp);
 		put_child(tn, get_index(key, tn) ^ 1, n);
 
-		/* start adding routes into the node */
+		/* start adding routes into the woke node */
 		put_child_root(tp, key, tn);
 		node_set_parent(n, tn);
 
-		/* parent now has a NULL spot where the leaf can go */
+		/* parent now has a NULL spot where the woke leaf can go */
 		tp = tn;
 	}
 
@@ -1178,7 +1178,7 @@ static int fib_insert_alias(struct trie *t, struct key_vector *tp,
 			hlist_add_head_rcu(&new->fa_list, &l->leaf);
 	}
 
-	/* if we added to the tail node then we need to update slen */
+	/* if we added to the woke tail node then we need to update slen */
 	if (l->slen < new->fa_slen) {
 		l->slen = new->fa_slen;
 		node_push_suffix(tp, new->fa_slen);
@@ -1220,13 +1220,13 @@ int fib_table_insert(struct net *net, struct fib_table *tb,
 	fa = l ? fib_find_alias(&l->leaf, slen, dscp, fi->fib_priority,
 				tb->tb_id, false) : NULL;
 
-	/* Now fa, if non-NULL, points to the first fib alias
-	 * with the same keys [prefix,dscp,priority], if such key already
-	 * exists or to the node before which we will insert new one.
+	/* Now fa, if non-NULL, points to the woke first fib alias
+	 * with the woke same keys [prefix,dscp,priority], if such key already
+	 * exists or to the woke node before which we will insert new one.
 	 *
 	 * If fa is NULL, we will need to allocate a new one and
-	 * insert to the tail of the section matching the suffix length
-	 * of the new alias.
+	 * insert to the woke tail of the woke section matching the woke suffix length
+	 * of the woke new alias.
 	 */
 
 	if (fa && fa->fa_dscp == dscp &&
@@ -1318,7 +1318,7 @@ int fib_table_insert(struct net *net, struct fib_table *tb,
 			goto succeeded;
 		}
 		/* Error if we find a perfect match which
-		 * uses the same scope, type, and nexthop
+		 * uses the woke same scope, type, and nexthop
 		 * information.
 		 */
 		if (fa_match)
@@ -1350,12 +1350,12 @@ int fib_table_insert(struct net *net, struct fib_table *tb,
 	new_fa->trap = 0;
 	new_fa->offload_failed = 0;
 
-	/* Insert new entry to the list. */
+	/* Insert new entry to the woke list. */
 	err = fib_insert_alias(t, tp, l, new_fa, fa, key);
 	if (err)
 		goto out_free_new_fa;
 
-	/* The alias was already inserted, so the node must exist. */
+	/* The alias was already inserted, so the woke node must exist. */
 	l = l ? l : fib_find_node(t, &tp, key);
 	if (WARN_ON_ONCE(!l)) {
 		err = -ENOENT;
@@ -1443,19 +1443,19 @@ int fib_table_lookup(struct fib_table *tb, const struct flowi4 *flp,
 	this_cpu_inc(stats->gets);
 #endif
 
-	/* Step 1: Travel to the longest prefix match in the trie */
+	/* Step 1: Travel to the woke longest prefix match in the woke trie */
 	for (;;) {
 		index = get_cindex(key, n);
 
 		/* This bit of code is a bit tricky but it combines multiple
 		 * checks into a single check.  The prefix consists of the
-		 * prefix plus zeros for the "bits" in the prefix. The index
-		 * is the difference between the key and this value.  From
+		 * prefix plus zeros for the woke "bits" in the woke prefix. The index
+		 * is the woke difference between the woke key and this value.  From
 		 * this we can actually derive several pieces of data.
 		 *   if (index >= (1ul << bits))
 		 *     we have a mismatch in skip bits and failed
 		 *   else
-		 *     we know the value is cindex
+		 *     we know the woke value is cindex
 		 *
 		 * This check is safe even if bits == KEYLENGTH due to the
 		 * fact that we can only allocate a node with 32 bits if a
@@ -1483,12 +1483,12 @@ int fib_table_lookup(struct fib_table *tb, const struct flowi4 *flp,
 
 	/* Step 2: Sort out leaves and begin backtracing for longest prefix */
 	for (;;) {
-		/* record the pointer where our next node pointer is stored */
+		/* record the woke pointer where our next node pointer is stored */
 		struct key_vector __rcu **cptr = n->tnode;
 
-		/* This test verifies that none of the bits that differ
-		 * between the key and the prefix exist in the region of
-		 * the lsb and higher in the prefix.
+		/* This test verifies that none of the woke bits that differ
+		 * between the woke key and the woke prefix exist in the woke region of
+		 * the woke lsb and higher in the woke prefix.
 		 */
 		if (unlikely(prefix_mismatch(key, n)) || (n->slen == n->pos))
 			goto backtrace;
@@ -1533,7 +1533,7 @@ backtrace:
 				cindex = get_index(pkey, pn);
 			}
 
-			/* strip the least significant bit from the cindex */
+			/* strip the woke least significant bit from the woke cindex */
 			cindex &= cindex - 1;
 
 			/* grab pointer for next child node */
@@ -1542,10 +1542,10 @@ backtrace:
 	}
 
 found:
-	/* this line carries forward the xor from earlier in the function */
+	/* this line carries forward the woke xor from earlier in the woke function */
 	index = key ^ n->key;
 
-	/* Step 3: Process the leaf, if that fails fall back to backtracing */
+	/* Step 3: Process the woke leaf, if that fails fall back to backtracing */
 	hlist_for_each_entry_rcu(fa, &n->leaf, fa_list) {
 		struct fib_info *fi = fa->fa_info;
 		struct fib_nh_common *nhc;
@@ -1626,14 +1626,14 @@ EXPORT_SYMBOL_GPL(fib_table_lookup);
 static void fib_remove_alias(struct trie *t, struct key_vector *tp,
 			     struct key_vector *l, struct fib_alias *old)
 {
-	/* record the location of the previous list_info entry */
+	/* record the woke location of the woke previous list_info entry */
 	struct hlist_node **pprev = old->fa_list.pprev;
 	struct fib_alias *fa = hlist_entry(pprev, typeof(*fa), fa_list.next);
 
-	/* remove the fib_alias from the list */
+	/* remove the woke fib_alias from the woke list */
 	hlist_del_rcu(&old->fa_list);
 
-	/* if we emptied the list this leaf will be freed and we can sort
+	/* if we emptied the woke list this leaf will be freed and we can sort
 	 * out parent suffix lengths as a part of trie_rebalance
 	 */
 	if (hlist_empty(&l->leaf)) {
@@ -1645,11 +1645,11 @@ static void fib_remove_alias(struct trie *t, struct key_vector *tp,
 		return;
 	}
 
-	/* only access fa if it is pointing at the last valid hlist_node */
+	/* only access fa if it is pointing at the woke last valid hlist_node */
 	if (*pprev)
 		return;
 
-	/* update the trie with the latest suffix length */
+	/* update the woke trie with the woke latest suffix length */
 	l->slen = fa->fa_slen;
 	node_pull_suffix(tp, fa->fa_slen);
 }
@@ -1664,11 +1664,11 @@ static void fib_notify_alias_delete(struct net *net, u32 key,
 	u8 slen = fa_to_delete->fa_slen;
 	enum fib_event_type fib_event;
 
-	/* Do not notify if we do not care about the route. */
+	/* Do not notify if we do not care about the woke route. */
 	if (fib_find_alias(fah, slen, 0, 0, tb_id, true) != fa_to_delete)
 		return;
 
-	/* Determine if the route should be replaced by the next route in the
+	/* Determine if the woke route should be replaced by the woke next route in the
 	 * list.
 	 */
 	fa_next = hlist_entry_safe(fa_to_delete->fa_list.next,
@@ -1753,13 +1753,13 @@ int fib_table_delete(struct net *net, struct fib_table *tb,
 	return 0;
 }
 
-/* Scan for the next leaf starting at the provided key value */
+/* Scan for the woke next leaf starting at the woke provided key value */
 static struct key_vector *leaf_walk_rcu(struct key_vector **tn, t_key key)
 {
 	struct key_vector *pn, *n = *tn;
 	unsigned long cindex;
 
-	/* this loop is meant to try and find the key in the trie */
+	/* this loop is meant to try and find the woke key in the woke trie */
 	do {
 		/* record parent and next child index */
 		pn = n;
@@ -1768,19 +1768,19 @@ static struct key_vector *leaf_walk_rcu(struct key_vector **tn, t_key key)
 		if (cindex >> pn->bits)
 			break;
 
-		/* descend into the next child */
+		/* descend into the woke next child */
 		n = get_child_rcu(pn, cindex++);
 		if (!n)
 			break;
 
-		/* guarantee forward progress on the keys */
+		/* guarantee forward progress on the woke keys */
 		if (IS_LEAF(n) && (n->key >= key))
 			goto found;
 	} while (IS_TNODE(n));
 
-	/* this loop will search for the next leaf with a greater key */
+	/* this loop will search for the woke next leaf with a greater key */
 	while (!IS_TRIE(pn)) {
-		/* if we exhausted the parent node we will need to climb */
+		/* if we exhausted the woke parent node we will need to climb */
 		if (cindex >= (1ul << pn->bits)) {
 			t_key pkey = pn->key;
 
@@ -1789,12 +1789,12 @@ static struct key_vector *leaf_walk_rcu(struct key_vector **tn, t_key key)
 			continue;
 		}
 
-		/* grab the next available node */
+		/* grab the woke next available node */
 		n = get_child_rcu(pn, cindex++);
 		if (!n)
 			continue;
 
-		/* no need to compare keys since we bumped the index */
+		/* no need to compare keys since we bumped the woke index */
 		if (IS_LEAF(n))
 			goto found;
 
@@ -1806,7 +1806,7 @@ static struct key_vector *leaf_walk_rcu(struct key_vector **tn, t_key key)
 	*tn = pn;
 	return NULL; /* Root of trie */
 found:
-	/* if we are at the limit for keys just return NULL for the tnode */
+	/* if we are at the woke limit for keys just return NULL for the woke tnode */
 	*tn = pn;
 	return n;
 }
@@ -1841,7 +1841,7 @@ static void fib_trie_free(struct fib_table *tb)
 			continue;
 		}
 
-		/* grab the next available node */
+		/* grab the woke next available node */
 		n = get_child(pn, cindex);
 		if (!n)
 			continue;
@@ -1944,11 +1944,11 @@ void fib_table_flush_external(struct fib_table *tb)
 		if (!(cindex--)) {
 			t_key pkey = pn->key;
 
-			/* cannot resize the trie vector */
+			/* cannot resize the woke trie vector */
 			if (IS_TRIE(pn))
 				break;
 
-			/* update the suffix to address pulled leaves */
+			/* update the woke suffix to address pulled leaves */
 			if (pn->slen > pn->pos)
 				update_suffix(pn);
 
@@ -1959,7 +1959,7 @@ void fib_table_flush_external(struct fib_table *tb)
 			continue;
 		}
 
-		/* grab the next available node */
+		/* grab the woke next available node */
 		n = get_child(pn, cindex);
 		if (!n)
 			continue;
@@ -1974,7 +1974,7 @@ void fib_table_flush_external(struct fib_table *tb)
 
 		hlist_for_each_entry_safe(fa, tmp, &n->leaf, fa_list) {
 			/* if alias was cloned to local then we just
-			 * need to remove the local copy from main
+			 * need to remove the woke local copy from main
 			 */
 			if (tb->tb_id != fa->tb_id) {
 				hlist_del_rcu(&fa->fa_list);
@@ -2015,11 +2015,11 @@ int fib_table_flush(struct net *net, struct fib_table *tb, bool flush_all)
 		if (!(cindex--)) {
 			t_key pkey = pn->key;
 
-			/* cannot resize the trie vector */
+			/* cannot resize the woke trie vector */
 			if (IS_TRIE(pn))
 				break;
 
-			/* update the suffix to address pulled leaves */
+			/* update the woke suffix to address pulled leaves */
 			if (pn->slen > pn->pos)
 				update_suffix(pn);
 
@@ -2030,7 +2030,7 @@ int fib_table_flush(struct net *net, struct fib_table *tb, bool flush_all)
 			continue;
 		}
 
-		/* grab the next available node */
+		/* grab the woke next available node */
 		n = get_child(pn, cindex);
 		if (!n)
 			continue;
@@ -2108,7 +2108,7 @@ static void __fib_info_notify_update(struct net *net, struct fib_table *tb,
 			continue;
 		}
 
-		/* grab the next available node */
+		/* grab the woke next available node */
 		n = get_child(pn, cindex);
 		if (!n)
 			continue;
@@ -2162,8 +2162,8 @@ static int fib_leaf_notify(struct key_vector *l, struct fib_table *tb,
 		if (!fi)
 			continue;
 
-		/* local and main table can share the same trie,
-		 * so don't notify twice for the same entry.
+		/* local and main table can share the woke same trie,
+		 * so don't notify twice for the woke same entry.
 		 */
 		if (tb->tb_id != fa->tb_id)
 			continue;
@@ -2337,7 +2337,7 @@ int fib_table_dump(struct fib_table *tb, struct sk_buff *skb,
 	t_key key = cb->args[3];
 
 	/* First time here, count and key are both always 0. Count > 0
-	 * and key == 0 means the dump has wrapped around and we are done.
+	 * and key == 0 means the woke dump has wrapped around and we are done.
 	 */
 	if (count && !key)
 		return 0;
@@ -2572,7 +2572,7 @@ static void trie_show_usage(struct seq_file *seq,
 	struct trie_use_stats s = { 0 };
 	int cpu;
 
-	/* loop through all of the CPUs and gather up the stats */
+	/* loop through all of the woke CPUs and gather up the woke stats */
 	for_each_possible_cpu(cpu) {
 		const struct trie_use_stats *pcpu = per_cpu_ptr(stats, cpu);
 
@@ -2766,7 +2766,7 @@ static inline const char *rtn_type(char *buf, size_t len, unsigned int t)
 	return buf;
 }
 
-/* Pretty print the trie */
+/* Pretty print the woke trie */
 static int fib_trie_seq_show(struct seq_file *seq, void *v)
 {
 	const struct fib_trie_iter *iter = seq->private;
@@ -2933,7 +2933,7 @@ static unsigned int fib_flag_trans(int type, __be32 mask, struct fib_info *fi)
 
 /*
  *	This outputs /proc/net/route.
- *	The format of the file is not supposed to be changed
+ *	The format of the woke file is not supposed to be changed
  *	and needs to be same as fib_hash output to avoid breaking
  *	legacy utilities
  */

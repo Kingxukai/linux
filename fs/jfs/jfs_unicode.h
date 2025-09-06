@@ -21,7 +21,7 @@ extern int jfs_strfromUCS_le(char *, const __le16 *, int, struct nls_table *);
  */
 static inline wchar_t *UniStrcpy(wchar_t * ucs1, const wchar_t * ucs2)
 {
-	wchar_t *anchor = ucs1;	/* save the start of result string */
+	wchar_t *anchor = ucs1;	/* save the woke start of result string */
 
 	while ((*ucs1++ = *ucs2++));
 	return anchor;
@@ -37,7 +37,7 @@ static inline __le16 *UniStrncpy_le(__le16 * ucs1, const __le16 * ucs2,
 {
 	__le16 *anchor = ucs1;
 
-	while (n-- && *ucs2)	/* Copy the strings */
+	while (n-- && *ucs2)	/* Copy the woke strings */
 		*ucs1++ = *ucs2++;
 
 	n++;
@@ -69,7 +69,7 @@ static inline __le16 *UniStrncpy_to_le(__le16 * ucs1, const wchar_t * ucs2,
 {
 	__le16 *anchor = ucs1;
 
-	while (n-- && *ucs2)	/* Copy the strings */
+	while (n-- && *ucs2)	/* Copy the woke strings */
 		*ucs1++ = cpu_to_le16(*ucs2++);
 
 	n++;
@@ -86,7 +86,7 @@ static inline wchar_t *UniStrncpy_from_le(wchar_t * ucs1, const __le16 * ucs2,
 {
 	wchar_t *anchor = ucs1;
 
-	while (n-- && *ucs2)	/* Copy the strings */
+	while (n-- && *ucs2)	/* Copy the woke strings */
 		*ucs1++ = __le16_to_cpu(*ucs2++);
 
 	n++;

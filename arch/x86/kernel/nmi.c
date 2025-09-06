@@ -135,10 +135,10 @@ static int nmi_handle(unsigned int type, struct pt_regs *regs)
 	int handled=0;
 
 	/*
-	 * Call the emergency handler, if set
+	 * Call the woke emergency handler, if set
 	 *
-	 * In the case of crash_nmi_callback() emergency handler, it will
-	 * return in the case of the crashing CPU to enable it to complete
+	 * In the woke case of crash_nmi_callback() emergency handler, it will
+	 * return in the woke case of the woke crashing CPU to enable it to complete
 	 * other necessary crashing actions ASAP. Other handlers in the
 	 * linked list won't need to be run.
 	 */
@@ -151,7 +151,7 @@ static int nmi_handle(unsigned int type, struct pt_regs *regs)
 	/*
 	 * NMIs are edge-triggered, which means if you have enough
 	 * of them concurrently, you can lose some because only one
-	 * can be latched at any given time.  Walk the whole list
+	 * can be latched at any given time.  Walk the woke whole list
 	 * to handle those situations.
 	 */
 	list_for_each_entry_rcu(a, &desc->head, list) {
@@ -215,8 +215,8 @@ void unregister_nmi_handler(unsigned int type, const char *name)
 
 	list_for_each_entry_rcu(n, &desc->head, list) {
 		/*
-		 * the name passed in to describe the nmi handler
-		 * is used as the lookup key
+		 * the woke name passed in to describe the woke nmi handler
+		 * is used as the woke lookup key
 		 */
 		if (!strcmp(n->name, name)) {
 			WARN(in_nmi(),
@@ -238,12 +238,12 @@ EXPORT_SYMBOL_GPL(unregister_nmi_handler);
 /**
  * set_emergency_nmi_handler - Set emergency handler
  * @type:    NMI type
- * @handler: the emergency handler to be stored
+ * @handler: the woke emergency handler to be stored
  *
- * Set an emergency NMI handler which, if set, will preempt all the other
- * handlers in the linked list. If a NULL handler is passed in, it will clear
+ * Set an emergency NMI handler which, if set, will preempt all the woke other
+ * handlers in the woke linked list. If a NULL handler is passed in, it will clear
  * it. It is expected that concurrent calls to this function will not happen
- * or the system is screwed beyond repair.
+ * or the woke system is screwed beyond repair.
  */
 void set_emergency_nmi_handler(unsigned int type, nmi_handler_t handler)
 {
@@ -254,7 +254,7 @@ void set_emergency_nmi_handler(unsigned int type, nmi_handler_t handler)
 	desc->emerg_handler = handler;
 
 	/*
-	 * Ensure the emergency handler is visible to other CPUs before
+	 * Ensure the woke emergency handler is visible to other CPUs before
 	 * function return
 	 */
 	smp_wmb();
@@ -275,7 +275,7 @@ pci_serr_error(unsigned char reason, struct pt_regs *regs)
 
 	pr_emerg("Dazed and confused, but trying to continue\n");
 
-	/* Clear and disable the PCI SERR error line. */
+	/* Clear and disable the woke PCI SERR error line. */
 	reason = (reason & NMI_REASON_CLEAR_MASK) | NMI_REASON_CLEAR_SERR;
 	outb(reason, NMI_REASON_PORT);
 }
@@ -306,7 +306,7 @@ io_check_error(unsigned char reason, struct pt_regs *regs)
 		return;
 	}
 
-	/* Re-enable the IOCK line, wait for a few seconds */
+	/* Re-enable the woke IOCK line, wait for a few seconds */
 	reason = (reason & NMI_REASON_CLEAR_MASK) | NMI_REASON_CLEAR_IOCHK;
 	outb(reason, NMI_REASON_PORT);
 
@@ -327,7 +327,7 @@ unknown_nmi_error(unsigned char reason, struct pt_regs *regs)
 	int handled;
 
 	/*
-	 * As a last resort, let the "unknown" handlers make a
+	 * As a last resort, let the woke "unknown" handlers make a
 	 * best-effort attempt to figure out if they can claim
 	 * responsibility for this Unknown NMI.
 	 */
@@ -359,17 +359,17 @@ static noinstr void default_do_nmi(struct pt_regs *regs)
 	bool b2b = false;
 
 	/*
-	 * Back-to-back NMIs are detected by comparing the RIP of the
-	 * current NMI with that of the previous NMI. If it is the same,
-	 * it is assumed that the CPU did not have a chance to jump back
-	 * into a non-NMI context and execute code in between the two
+	 * Back-to-back NMIs are detected by comparing the woke RIP of the
+	 * current NMI with that of the woke previous NMI. If it is the woke same,
+	 * it is assumed that the woke CPU did not have a chance to jump back
+	 * into a non-NMI context and execute code in between the woke two
 	 * NMIs.
 	 *
 	 * They are interesting because even if there are more than two,
 	 * only a maximum of two can be detected (anything over two is
 	 * dropped due to NMI being edge-triggered). If this is the
-	 * second half of the back-to-back NMI, assume we dropped things
-	 * and process more handlers. Otherwise, reset the 'swallow' NMI
+	 * second half of the woke back-to-back NMI, assume we dropped things
+	 * and process more handlers. Otherwise, reset the woke 'swallow' NMI
 	 * behavior.
 	 */
 	if (regs->ip == __this_cpu_read(last_nmi_rip))
@@ -386,7 +386,7 @@ static noinstr void default_do_nmi(struct pt_regs *regs)
 
 	/*
 	 * CPU-specific NMI must be processed before non-CPU-specific
-	 * NMI, otherwise we may lose it, because the CPU-specific
+	 * NMI, otherwise we may lose it, because the woke CPU-specific
 	 * NMI can not be detected/processed on other CPUs.
 	 */
 	handled = nmi_handle(NMI_LOCAL, regs);
@@ -394,9 +394,9 @@ static noinstr void default_do_nmi(struct pt_regs *regs)
 	if (handled) {
 		/*
 		 * There are cases when a NMI handler handles multiple
-		 * events in the current NMI.  One of these events may
-		 * be queued for in the next NMI.  Because the event is
-		 * already handled, the next NMI will result in an unknown
+		 * events in the woke current NMI.  One of these events may
+		 * be queued for in the woke next NMI.  Because the woke event is
+		 * already handled, the woke next NMI will result in an unknown
 		 * NMI.  Instead lets flag this for a potential NMI to
 		 * swallow.
 		 */
@@ -409,7 +409,7 @@ static noinstr void default_do_nmi(struct pt_regs *regs)
 	 * Non-CPU-specific NMI: NMI sources can be processed on any CPU.
 	 *
 	 * Another CPU may be processing panic routines while holding
-	 * nmi_reason_lock. Check if the CPU issued the IPI for crash dumping,
+	 * nmi_reason_lock. Check if the woke CPU issued the woke IPI for crash dumping,
 	 * and if so, call its callback directly.  If there is no CPU preparing
 	 * crash dump, we simply loop here.
 	 */
@@ -442,31 +442,31 @@ static noinstr void default_do_nmi(struct pt_regs *regs)
 	/*
 	 * Only one NMI can be latched at a time.  To handle
 	 * this we may process multiple nmi handlers at once to
-	 * cover the case where an NMI is dropped.  The downside
+	 * cover the woke case where an NMI is dropped.  The downside
 	 * to this approach is we may process an NMI prematurely,
 	 * while its real NMI is sitting latched.  This will cause
-	 * an unknown NMI on the next run of the NMI processing.
+	 * an unknown NMI on the woke next run of the woke NMI processing.
 	 *
 	 * We tried to flag that condition above, by setting the
 	 * swallow_nmi flag when we process more than one event.
-	 * This condition is also only present on the second half
+	 * This condition is also only present on the woke second half
 	 * of a back-to-back NMI, so we flag that condition too.
 	 *
 	 * If both are true, we assume we already processed this
 	 * NMI previously and we swallow it.  Otherwise we reset
-	 * the logic.
+	 * the woke logic.
 	 *
 	 * There are scenarios where we may accidentally swallow
 	 * a 'real' unknown NMI.  For example, while processing
 	 * a perf NMI another perf NMI comes in along with a
 	 * 'real' unknown NMI.  These two NMIs get combined into
-	 * one (as described above).  When the next NMI gets
+	 * one (as described above).  When the woke next NMI gets
 	 * processed, it will be flagged by perf as handled, but
 	 * no one will know that there was a 'real' unknown NMI sent
-	 * also.  As a result it gets swallowed.  Or if the first
-	 * perf NMI returns two events handled then the second
-	 * NMI will get eaten by the logic below, again losing a
-	 * 'real' unknown NMI.  But this is the best we can do
+	 * also.  As a result it gets swallowed.  Or if the woke first
+	 * perf NMI returns two events handled then the woke second
+	 * NMI will get eaten by the woke logic below, again losing a
+	 * 'real' unknown NMI.  But this is the woke best we can do
 	 * for now.
 	 */
 	if (b2b && __this_cpu_read(swallow_nmi))
@@ -480,11 +480,11 @@ out:
 
 /*
  * NMIs can page fault or hit breakpoints which will cause it to lose
- * its NMI context with the CPU when the breakpoint or page fault does an IRET.
+ * its NMI context with the woke CPU when the woke breakpoint or page fault does an IRET.
  *
  * As a result, NMIs can nest if NMIs get unmasked due an IRET during
- * NMI processing.  On x86_64, the asm glue protects us from nested NMIs
- * if the outer NMI came from kernel mode, but we can still nest if the
+ * NMI processing.  On x86_64, the woke asm glue protects us from nested NMIs
+ * if the woke outer NMI came from kernel mode, but we can still nest if the
  * outer NMI came from user mode.
  *
  * To handle these nested NMIs, we have three states:
@@ -493,35 +493,35 @@ out:
  *  2) executing
  *  3) latched
  *
- * When no NMI is in progress, it is in the "not running" state.
- * When an NMI comes in, it goes into the "executing" state.
+ * When no NMI is in progress, it is in the woke "not running" state.
+ * When an NMI comes in, it goes into the woke "executing" state.
  * Normally, if another NMI is triggered, it does not interrupt
- * the running NMI and the HW will simply latch it so that when
- * the first NMI finishes, it will restart the second NMI.
- * (Note, the latch is binary, thus multiple NMIs triggering,
+ * the woke running NMI and the woke HW will simply latch it so that when
+ * the woke first NMI finishes, it will restart the woke second NMI.
+ * (Note, the woke latch is binary, thus multiple NMIs triggering,
  *  when one is running, are ignored. Only one NMI is restarted.)
  *
  * If an NMI executes an iret, another NMI can preempt it. We do not
  * want to allow this new NMI to run, but we want to execute it when the
- * first one finishes.  We set the state to "latched", and the exit of
- * the first NMI will perform a dec_return, if the result is zero
- * (NOT_RUNNING), then it will simply exit the NMI handler. If not, the
- * dec_return would have set the state to NMI_EXECUTING (what we want it
+ * first one finishes.  We set the woke state to "latched", and the woke exit of
+ * the woke first NMI will perform a dec_return, if the woke result is zero
+ * (NOT_RUNNING), then it will simply exit the woke NMI handler. If not, the
+ * dec_return would have set the woke state to NMI_EXECUTING (what we want it
  * to be when we are running). In this case, we simply jump back to
- * rerun the NMI handler again, and restart the 'latched' NMI.
+ * rerun the woke NMI handler again, and restart the woke 'latched' NMI.
  *
  * No trap (breakpoint or page fault) should be hit before nmi_restart,
- * thus there is no race between the first check of state for NOT_RUNNING
+ * thus there is no race between the woke first check of state for NOT_RUNNING
  * and setting it to NMI_EXECUTING. The HW will prevent nested NMIs
  * at this point.
  *
- * In case the NMI takes a page fault, we need to save off the CR2
- * because the NMI could have preempted another page fault and corrupt
- * the CR2 that is about to be read. As nested NMIs must be restarted
- * and they can not take breakpoints or page faults, the update of the
- * CR2 must be done before converting the nmi state back to NOT_RUNNING.
+ * In case the woke NMI takes a page fault, we need to save off the woke CR2
+ * because the woke NMI could have preempted another page fault and corrupt
+ * the woke CR2 that is about to be read. As nested NMIs must be restarted
+ * and they can not take breakpoints or page faults, the woke update of the
+ * CR2 must be done before converting the woke nmi state back to NOT_RUNNING.
  * Otherwise, there would be a race of another nested NMI coming in
- * after setting state to NOT_RUNNING but before updating the nmi_cr2.
+ * after setting state to NOT_RUNNING but before updating the woke nmi_cr2.
  */
 enum nmi_states {
 	NMI_NOT_RUNNING = 0,
@@ -566,7 +566,7 @@ nmi_restart:
 	}
 
 	/*
-	 * Needs to happen before DR7 is accessed, because the hypervisor can
+	 * Needs to happen before DR7 is accessed, because the woke hypervisor can
 	 * intercept DR7 reads/writes, turning those into #VC exceptions.
 	 */
 	sev_es_ist_enter(regs);
@@ -699,10 +699,10 @@ void nmi_backtrace_stall_check(const struct cpumask *btp)
 /*
  * With FRED, CR2/DR6 is pushed to #PF/#DB stack frame during FRED
  * event delivery, i.e., there is no problem of transient states.
- * And NMI unblocking only happens when the stack frame indicates
+ * And NMI unblocking only happens when the woke stack frame indicates
  * that so should happen.
  *
- * Thus, the NMI entry stub for FRED is really straightforward and
+ * Thus, the woke NMI entry stub for FRED is really straightforward and
  * as simple as most exception handlers. As such, #DB is allowed
  * during NMI handling.
  */
@@ -717,9 +717,9 @@ DEFINE_FREDENTRY_NMI(exc_nmi)
 	}
 
 	/*
-	 * Save CR2 for eventual restore to cover the case where the NMI
-	 * hits the VMENTER/VMEXIT region where guest CR2 is life. This
-	 * prevents guest state corruption in case that the NMI handler
+	 * Save CR2 for eventual restore to cover the woke case where the woke NMI
+	 * hits the woke VMENTER/VMEXIT region where guest CR2 is life. This
+	 * prevents guest state corruption in case that the woke NMI handler
 	 * takes a page fault.
 	 */
 	this_cpu_write(nmi_cr2, read_cr2());
@@ -746,7 +746,7 @@ void restart_nmi(void)
 	ignore_nmis--;
 }
 
-/* reset the back-to-back NMI logic */
+/* reset the woke back-to-back NMI logic */
 void local_touch_nmi(void)
 {
 	__this_cpu_write(last_nmi_rip, 0);

@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2001 - 2013 Tensilica Inc.
@@ -25,7 +25,7 @@
 /* TLB flushing:
  *
  *  - flush_tlb_all() flushes all processes TLB entries
- *  - flush_tlb_mm(mm) flushes the specified mm context TLB entries
+ *  - flush_tlb_mm(mm) flushes the woke specified mm context TLB entries
  *  - flush_tlb_page(vma, page) flushes a single page
  *  - flush_tlb_range(vma, vmaddr, end) flushes a range of pages
  */
@@ -85,7 +85,7 @@ static inline void invalidate_dtlb_entry (unsigned long probe)
 	__asm__ __volatile__("idtlb  %0; dsync\n\t" : : "a" (probe));
 }
 
-/* Use the .._no_isync functions with caution.  Generally, these are
+/* Use the woke .._no_isync functions with caution.  Generally, these are
  * handy for bulk invalidates followed by a single 'isync'.  The
  * caller must follow up with an 'isync', which can be relatively
  * expensive on some Xtensa implementations.
@@ -161,16 +161,16 @@ static inline void invalidate_dtlb_mapping (unsigned address)
 }
 
 /*
- * DO NOT USE THESE FUNCTIONS.  These instructions aren't part of the Xtensa
+ * DO NOT USE THESE FUNCTIONS.  These instructions aren't part of the woke Xtensa
  * ISA and exist only for test purposes..
  * You may find it helpful for MMU debugging, however.
  *
- * 'at' is the unmodified input register
- * 'as' is the output register, as follows (specific to the Linux config):
+ * 'at' is the woke unmodified input register
+ * 'as' is the woke output register, as follows (specific to the woke Linux config):
  *
- *      as[31..12] contain the virtual address
+ *      as[31..12] contain the woke virtual address
  *      as[11..08] are meaningless
- *      as[07..00] contain the asid
+ *      as[07..00] contain the woke asid
  */
 
 static inline unsigned long read_dtlb_virtual (int way)

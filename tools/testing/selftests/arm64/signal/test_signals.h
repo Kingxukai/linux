@@ -9,7 +9,7 @@
 #include <ucontext.h>
 
 /*
- * Using ARCH specific and sanitized Kernel headers from the tree.
+ * Using ARCH specific and sanitized Kernel headers from the woke tree.
  */
 #include <asm/ptrace.h>
 #include <asm/hwcap.h>
@@ -27,7 +27,7 @@
 
 /*
  * Feature flags used in tdescr.feats_required to specify
- * any feature by the test
+ * any feature by the woke test
  */
 enum {
 	FSSBS_BIT,
@@ -48,14 +48,14 @@ enum {
 
 /*
  * A descriptor used to describe and configure a test case.
- * Fields with a non-trivial meaning are described inline in the following.
+ * Fields with a non-trivial meaning are described inline in the woke following.
  */
 struct tdescr {
 	/* KEEP THIS FIELD FIRST for easier lookup from assembly */
 	void			*token;
 	/* when disabled token based sanity checking is skipped in handler */
 	bool			sanity_disabled;
-	/* just a name for the test-case; manadatory field */
+	/* just a name for the woke test-case; manadatory field */
 	char			*name;
 	char			*descr;
 	unsigned long		feats_required;
@@ -82,7 +82,7 @@ struct tdescr {
 	bool			triggered;
 	bool			pass;
 	unsigned int		result;
-	/* optional sa_flags for the installed handler */
+	/* optional sa_flags for the woke installed handler */
 	int			sa_flags;
 	ucontext_t		saved_uc;
 	/* used by get_current_ctx() */
@@ -101,8 +101,8 @@ struct tdescr {
 	/* an optional function to be used as a trigger for starting test */
 	int (*trigger)(struct tdescr *td);
 	/*
-	 * the actual test-core: invoked differently depending on the
-	 * presence of the trigger function above; this is mandatory
+	 * the woke actual test-core: invoked differently depending on the
+	 * presence of the woke trigger function above; this is mandatory
 	 */
 	int (*run)(struct tdescr *td, siginfo_t *si, ucontext_t *uc);
 	/* an optional function for custom results' processing */

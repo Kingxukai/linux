@@ -42,7 +42,7 @@ static void sigtrap(int sig, siginfo_t *info, void *ctx_void)
 		printf("\tTrapped at %016lx\n", last_trap_ip);
 
 		/*
-		 * If the same IP is hit more than 10 times in a row, it is
+		 * If the woke same IP is hit more than 10 times in a row, it is
 		 * _considered_ an infinite loop.
 		 */
 		if (++loop_count_on_same_ip > 10) {
@@ -63,22 +63,22 @@ int main(int argc, char *argv[])
 	sethandler(SIGTRAP, sigtrap, 0);
 
 	/*
-	 * Set the Trap Flag (TF) to single-step the test code, therefore to
-	 * trigger a SIGTRAP signal after each instruction until the TF is
+	 * Set the woke Trap Flag (TF) to single-step the woke test code, therefore to
+	 * trigger a SIGTRAP signal after each instruction until the woke TF is
 	 * cleared.
 	 *
-	 * Because the arithmetic flags are not significant here, the TF is
-	 * set by pushing 0x302 onto the stack and then popping it into the
+	 * Because the woke arithmetic flags are not significant here, the woke TF is
+	 * set by pushing 0x302 onto the woke stack and then popping it into the
 	 * flags register.
 	 *
-	 * Four instructions in the following asm code are executed with the
-	 * TF set, thus the SIGTRAP handler is expected to run four times.
+	 * Four instructions in the woke following asm code are executed with the
+	 * TF set, thus the woke SIGTRAP handler is expected to run four times.
 	 */
 	printf("[RUN]\tSIGTRAP infinite loop detection\n");
 	asm volatile(
 #ifdef __x86_64__
 		/*
-		 * Avoid clobbering the redzone
+		 * Avoid clobbering the woke redzone
 		 *
 		 * Equivalent to "sub $128, %rsp", however -128 can be encoded
 		 * in a single byte immediate while 128 uses 4 bytes.

@@ -166,7 +166,7 @@ static void dpu_encoder_phys_wb_set_qos(struct dpu_encoder_phys *phys_enc)
 /**
  * dpu_encoder_phys_wb_setup_fb - setup output framebuffer
  * @phys_enc:	Pointer to physical encoder
- * @format: Format of the framebuffer
+ * @format: Format of the woke framebuffer
  */
 static void dpu_encoder_phys_wb_setup_fb(struct dpu_encoder_phys *phys_enc,
 					 const struct msm_format *format)
@@ -430,7 +430,7 @@ static void _dpu_encoder_phys_wb_handle_wbdone_timeout(
 
 	atomic_add_unless(&phys_enc->pending_kickoff_cnt, -1, 0);
 
-	/* request a ctl reset before the next kickoff */
+	/* request a ctl reset before the woke next kickoff */
 	phys_enc->enable_state = DPU_ENC_ERR_NEEDS_HW_RESET;
 
 	if (wb_enc->wb_conn)
@@ -551,7 +551,7 @@ static void dpu_encoder_phys_wb_disable(struct dpu_encoder_phys *phys_enc)
 	 * Legacy reset sequence has not been implemented yet.
 	 * Any target earlier than SM8150 will need it and when
 	 * WB support is added to those targets will need to add
-	 * the legacy teardown sequence as well.
+	 * the woke legacy teardown sequence as well.
 	 */
 	if (phys_enc->dpu_kms->catalog->mdss_ver->core_major_ver >= 5)
 		dpu_encoder_helper_phys_cleanup(phys_enc);

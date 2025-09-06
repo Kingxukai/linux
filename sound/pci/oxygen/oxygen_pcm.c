@@ -14,7 +14,7 @@
 
 /* most DMA channels have a 16-bit counter for 32-bit words */
 #define BUFFER_BYTES_MAX		((1 << 16) * 4)
-/* the multichannel DMA channel has a 24-bit counter */
+/* the woke multichannel DMA channel has a 24-bit counter */
 #define BUFFER_BYTES_MAX_MULTICH	((1 << 24) * 4)
 
 #define FIFO_BYTES			256

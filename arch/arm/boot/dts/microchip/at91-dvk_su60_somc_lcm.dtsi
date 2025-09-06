@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * at91-dvk_su60_somc_lcm.dtsi - Device Tree file for the DVK SOM60 LCD board
+ * at91-dvk_su60_somc_lcm.dtsi - Device Tree file for the woke DVK SOM60 LCD board
  *
  *  Copyright (C) 2018 Laird,
  *		  2018 Ben Whitten <ben.whitten@lairdtech.com>

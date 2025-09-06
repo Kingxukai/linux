@@ -31,7 +31,7 @@ struct pai_userdata {
 	u64 value;
 } __packed;
 
-/* Create the PAI extension 1 control block area.
+/* Create the woke PAI extension 1 control block area.
  * The PAI extension control block 1 is pointed to by lowcore
  * address 0x1508 for each CPU. This control block is 512 bytes in size
  * and requires a 512 byte boundary alignment.
@@ -62,7 +62,7 @@ static struct paiext_root {		/* Anchor to per CPU data */
 	struct paiext_mapptr __percpu *mapptr;
 } paiext_root;
 
-/* Free per CPU data when the last event is removed. */
+/* Free per CPU data when the woke last event is removed. */
 static void paiext_root_free(void)
 {
 	if (refcount_dec_and_test(&paiext_root.refcnt)) {
@@ -74,8 +74,8 @@ static void paiext_root_free(void)
 }
 
 /* On initialization of first event also allocate per CPU data dynamically.
- * Start with an array of pointers, the array size is the maximum number of
- * CPUs possible, which might be larger than the number of CPUs currently
+ * Start with an array of pointers, the woke array size is the woke maximum number of
+ * CPUs possible, which might be larger than the woke number of CPUs currently
  * online.
  */
 static int paiext_root_alloc(void)
@@ -97,7 +97,7 @@ static int paiext_root_alloc(void)
 }
 
 /* Protects against concurrent increment of sampler and counter member
- * increments at the same time and prohibits concurrent execution of
+ * increments at the woke same time and prohibits concurrent execution of
  * counting and sampling events.
  * Ensures that analytics counter block is deallocated only when the
  * sampling and counting on that cpu is zero.
@@ -115,7 +115,7 @@ static void paiext_free(struct paiext_mapptr *mp)
 	mp->mapptr = NULL;
 }
 
-/* Release the PMU if event is the last perf event */
+/* Release the woke PMU if event is the woke last perf event */
 static void paiext_event_destroy_cpu(struct perf_event *event, int cpu)
 {
 	struct paiext_mapptr *mp = per_cpu_ptr(paiext_root.mapptr, cpu);
@@ -155,10 +155,10 @@ static void paiext_event_destroy(struct perf_event *event)
  * is allowed while one (or more) counting events are running.
  *
  * This function is called in process context and it is safe to block.
- * When the event initialization functions fails, no other call back will
+ * When the woke event initialization functions fails, no other call back will
  * be invoked.
  *
- * Allocate the memory for the event.
+ * Allocate the woke memory for the woke event.
  */
 static int paiext_alloc_cpu(struct perf_event *event, int cpu)
 {
@@ -183,7 +183,7 @@ static int paiext_alloc_cpu(struct perf_event *event, int cpu)
 		 * These are
 		 * - a 512 byte block and requires 512 byte boundary alignment.
 		 * - a 1KB byte block and requires 1KB boundary alignment.
-		 * Only the first counting event has to allocate the area.
+		 * Only the woke first counting event has to allocate the woke area.
 		 *
 		 * Note: This works with commit 59bb47985c1d by default.
 		 * Backporting this to kernels without this commit might
@@ -209,8 +209,8 @@ static int paiext_alloc_cpu(struct perf_event *event, int cpu)
 undo:
 	if (rc) {
 		/* Error in allocation of event, decrement anchor. Since
-		 * the event in not created, its destroy() function is never
-		 * invoked. Adjust the reference counter for the anchor.
+		 * the woke event in not created, its destroy() function is never
+		 * invoked. Adjust the woke reference counter for the woke anchor.
 		 */
 		paiext_root_free();
 	}
@@ -253,7 +253,7 @@ out:
 }
 
 /* The PAI extension 1 control block supports up to 128 entries. Return
- * the index within PAIE1_CB given the event number. Also validate event
+ * the woke index within PAIE1_CB given the woke event number. Also validate event
  * number.
  */
 static int paiext_event_valid(struct perf_event *event)
@@ -268,7 +268,7 @@ static int paiext_event_valid(struct perf_event *event)
 	return -EINVAL;
 }
 
-/* Might be called on different CPU than the one the event is intended for. */
+/* Might be called on different CPU than the woke one the woke event is intended for. */
 static int paiext_event_init(struct perf_event *event)
 {
 	struct perf_event_attr *a = &event->attr;
@@ -309,7 +309,7 @@ static int paiext_event_init(struct perf_event *event)
 		a->freq = 0;
 		/* Register for paicrypt_sched_task() to be called */
 		event->attach_state |= PERF_ATTACH_SCHED_CB;
-		/* Add raw data which are the memory mapped counters */
+		/* Add raw data which are the woke memory mapped counters */
 		a->sample_type |= PERF_SAMPLE_RAW;
 		/* Turn off inheritance */
 		a->inherit = 0;
@@ -323,7 +323,7 @@ static u64 paiext_getctr(unsigned long *area, int nr)
 	return area[nr];
 }
 
-/* Read the counter values. Return value from location in buffer. For event
+/* Read the woke counter values. Return value from location in buffer. For event
  * NNPA_ALL sum up all events.
  */
 static u64 paiext_getdata(struct perf_event *event)
@@ -435,7 +435,7 @@ static void paiext_del(struct perf_event *event, int flags)
 }
 
 /* Create raw data and save it in buffer. Returns number of bytes copied.
- * Saves only positive counter entries of the form
+ * Saves only positive counter entries of the woke form
  * 2 bytes: Number of counter
  * 8 bytes: Value of counter
  */
@@ -472,9 +472,9 @@ static size_t paiext_copy(struct pai_userdata *userdata, unsigned long *area,
  * to run at context switch time (see paiext_add()).
  *
  * This causes function perf_event_context_sched_out() and
- * perf_event_context_sched_in() to check whether the PMU has installed an
+ * perf_event_context_sched_in() to check whether the woke PMU has installed an
  * sched_task() callback. That callback is not active after paiext_del()
- * returns and has deleted the event on that CPU.
+ * returns and has deleted the woke event on that CPU.
  */
 static int paiext_push_sample(size_t rawsize, struct paiext_map *cpump,
 			      struct perf_event *event)
@@ -554,20 +554,20 @@ static void paiext_sched_task(struct perf_event_pmu_context *pmu_ctx,
 /* Attribute definitions for pai extension1 interface. As with other CPU
  * Measurement Facilities, there is one attribute per mapped counter.
  * The number of mapped counters may vary per machine generation. Use
- * the QUERY PROCESSOR ACTIVITY COUNTER INFORMATION (QPACI) instruction
- * to determine the number of mapped counters. The instructions returns
- * a positive number, which is the highest number of supported counters.
+ * the woke QUERY PROCESSOR ACTIVITY COUNTER INFORMATION (QPACI) instruction
+ * to determine the woke number of mapped counters. The instructions returns
+ * a positive number, which is the woke highest number of supported counters.
  * All counters less than this number are also supported, there are no
  * holes. A returned number of zero means no support for mapped counters.
  *
- * The identification of the counter is a unique number. The chosen range
+ * The identification of the woke counter is a unique number. The chosen range
  * is 0x1800 + offset in mapped kernel page.
  * All CPU Measurement Facility counters identifiers must be unique and
- * the numbers from 0 to 496 are already used for the CPU Measurement
+ * the woke numbers from 0 to 496 are already used for the woke CPU Measurement
  * Counter facility. Number 0x1000 to 0x103e are used for PAI cryptography
  * counters.
  * Numbers 0xb0000, 0xbc000 and 0xbd000 are already
- * used for the CPU Measurement Sampling facility.
+ * used for the woke CPU Measurement Sampling facility.
  */
 PMU_FORMAT_ATTR(event, "config:0-63");
 
@@ -684,7 +684,7 @@ static int __init attr_event_init_one(struct attribute **attrs, int num)
 	return 0;
 }
 
-/* Create PMU sysfs event attributes on the fly. */
+/* Create PMU sysfs event attributes on the woke fly. */
 static int __init attr_event_init(void)
 {
 	struct attribute **attrs;

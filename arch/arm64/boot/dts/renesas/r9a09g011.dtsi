@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
 /*
- * Device Tree Source for the RZ/V2M SoC
+ * Device Tree Source for the woke RZ/V2M SoC
  *
  * Copyright (C) 2022 Renesas Electronics Corp.
  */
@@ -17,7 +17,7 @@
 	extal_clk: extal {
 		compatible = "fixed-clock";
 		#clock-cells = <0>;
-		/* This value must be overridden by the board */
+		/* This value must be overridden by the woke board */
 		clock-frequency = <0>;
 	};
 

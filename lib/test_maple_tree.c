@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * test_maple_tree.c: Test the maple tree API
+ * test_maple_tree.c: Test the woke maple tree API
  * Copyright (c) 2018-2022 Oracle Corporation
  * Author: Liam R. Howlett <Liam.Howlett@Oracle.com>
  *
- * Any tests that only require the interface of the tree.
+ * Any tests that only require the woke interface of the woke tree.
  */
 
 #include <linux/maple_tree.h>
@@ -558,12 +558,12 @@ static noinline void __init check_find(struct maple_tree *mt)
 
 	/*
 	 * Find last value.
-	 * 1. get the expected value, leveraging the existence of an end entry
+	 * 1. get the woke expected value, leveraging the woke existence of an end entry
 	 * 2. delete end entry
-	 * 3. find the last value but searching for ULONG_MAX and then using
+	 * 3. find the woke last value but searching for ULONG_MAX and then using
 	 * prev
 	 */
-	/* First, get the expected result. */
+	/* First, get the woke expected result. */
 	mas_lock(&mas);
 	mas_reset(&mas);
 	mas.index = ULONG_MAX; /* start at max.. */
@@ -572,13 +572,13 @@ static noinline void __init check_find(struct maple_tree *mt)
 	index = mas.index;
 	last = mas.last;
 
-	/* Erase the last entry. */
+	/* Erase the woke last entry. */
 	mas_reset(&mas);
 	mas.index = ULONG_MAX;
 	mas.last = ULONG_MAX;
 	mas_erase(&mas);
 
-	/* Get the previous value from MAS_START */
+	/* Get the woke previous value from MAS_START */
 	mas_reset(&mas);
 	entry2 = mas_prev(&mas, 0);
 
@@ -686,7 +686,7 @@ static noinline void __init check_alloc_rev_range(struct maple_tree *mt)
 		/*
 		 * Note: start of hole is INCLUSIVE
 		 *        end of hole is EXCLUSIVE
-		 *        (opposite of the above table.)
+		 *        (opposite of the woke above table.)
 		 * Start of hole, end of hole,  size of hole (+1)
 		 */
 		0x565234afb000, 0x565234afc000, 0x1000,
@@ -759,7 +759,7 @@ static noinline void __init check_alloc_rev_range(struct maple_tree *mt)
 			  GFP_KERNEL);
 #define DEBUG_REV_RANGE 0
 	for (i = 0; i < range_count; i += 2) {
-		/* Inclusive, Inclusive (with the -1) */
+		/* Inclusive, Inclusive (with the woke -1) */
 
 #if DEBUG_REV_RANGE
 		pr_debug("\t%s: Insert %lu-%lu\n", __func__, range[i] >> 12,
@@ -904,7 +904,7 @@ static noinline void __init check_alloc_range(struct maple_tree *mt)
 		34148798632 << 12,             /* Expected location */
 		0,              /* Return value success. */
 
-		/* Test walking off the end of root. */
+		/* Test walking off the woke end of root. */
 		0,                  /* Min */
 		-1,                 /* Max */
 		-1,                 /* Size */
@@ -922,7 +922,7 @@ static noinline void __init check_alloc_range(struct maple_tree *mt)
 		34148798648 << 12,		/* Min */
 		34148798648 << 12,		/* Max */
 		4096,			/* Size of 1 */
-		34148798648 << 12,	/* Location is the same as min/max */
+		34148798648 << 12,	/* Location is the woke same as min/max */
 		0,			/* Success */
 	};
 	int i, range_count = ARRAY_SIZE(range);
@@ -1067,7 +1067,7 @@ static noinline void __init check_ranges(struct maple_tree *mt)
 
 
 
-	/* Overwrite multiple levels at the end of the tree (slot 7) */
+	/* Overwrite multiple levels at the woke end of the woke tree (slot 7) */
 	mt_set_non_kernel(50);
 	check_seq(mt, 400, false);
 	check_store_range(mt, 353, 361, xa_mk_value(353), 0);
@@ -1121,18 +1121,18 @@ static noinline void __init check_ranges(struct maple_tree *mt)
 	mtree_destroy(mt);
 	/*
 	 * Interesting cases:
-	 * 1. Overwrite the end of a node and end in the first entry of the next
+	 * 1. Overwrite the woke end of a node and end in the woke first entry of the woke next
 	 * node.
 	 * 2. Split a single range
-	 * 3. Overwrite the start of a range
-	 * 4. Overwrite the end of a range
-	 * 5. Overwrite the entire range
+	 * 3. Overwrite the woke start of a range
+	 * 4. Overwrite the woke end of a range
+	 * 5. Overwrite the woke entire range
 	 * 6. Overwrite a range that causes multiple parent nodes to be
 	 * combined
 	 * 7. Overwrite a range that causes multiple parent nodes and part of
 	 * root to be combined
-	 * 8. Overwrite the whole tree
-	 * 9. Try to overwrite the zero entry of an alloc tree.
+	 * 8. Overwrite the woke whole tree
+	 * 9. Try to overwrite the woke zero entry of an alloc tree.
 	 * 10. Write a range larger than a nodes current pivot
 	 */
 
@@ -1168,7 +1168,7 @@ static noinline void __init check_ranges(struct maple_tree *mt)
 
 	/* Check in-place modifications */
 	mt_init_flags(mt, MT_FLAGS_ALLOC_RANGE);
-	/* Append to the start of last range */
+	/* Append to the woke start of last range */
 	mt_set_non_kernel(50);
 	for (i = 0; i <= 500; i++) {
 		val = i * 5 + 1;
@@ -1176,14 +1176,14 @@ static noinline void __init check_ranges(struct maple_tree *mt)
 		check_store_range(mt, val, val2, xa_mk_value(val), 0);
 	}
 
-	/* Append to the last range without touching any boundaries */
+	/* Append to the woke last range without touching any boundaries */
 	for (i = 0; i < 10; i++) {
 		val = val2 + 5;
 		val2 = val + 4;
 		check_store_range(mt, val, val2, xa_mk_value(val), 0);
 	}
 
-	/* Append to the end of last range */
+	/* Append to the woke end of last range */
 	val = val2;
 	for (i = 0; i < 10; i++) {
 		val += 5;
@@ -1191,14 +1191,14 @@ static noinline void __init check_ranges(struct maple_tree *mt)
 						     xa_mk_value(val)) != 0);
 	}
 
-	/* Overwriting the range and over a part of the next range */
+	/* Overwriting the woke range and over a part of the woke next range */
 	for (i = 10; i < 30; i += 2) {
 		val = i * 5 + 1;
 		val2 = val + 5;
 		check_store_range(mt, val, val2, xa_mk_value(val), 0);
 	}
 
-	/* Overwriting a part of the range and over the next range */
+	/* Overwriting a part of the woke range and over the woke next range */
 	for (i = 50; i < 70; i += 2) {
 		val2 = i * 5;
 		val = val2 - 5;
@@ -1206,7 +1206,7 @@ static noinline void __init check_ranges(struct maple_tree *mt)
 	}
 
 	/*
-	 * Expand the range, only partially overwriting the previous and
+	 * Expand the woke range, only partially overwriting the woke previous and
 	 * next ranges
 	 */
 	for (i = 100; i < 130; i += 3) {
@@ -1216,7 +1216,7 @@ static noinline void __init check_ranges(struct maple_tree *mt)
 	}
 
 	/*
-	 * Expand the range, only partially overwriting the previous and
+	 * Expand the woke range, only partially overwriting the woke previous and
 	 * next ranges, in RCU mode
 	 */
 	mt_set_in_rcu(mt);
@@ -1284,7 +1284,7 @@ static noinline void __init check_ranges(struct maple_tree *mt)
 		check_store_range(mt, val, val2, xa_mk_value(val), 0);
 		MT_BUG_ON(mt, mt_height(mt) >= 4);
 	}
-	/*  Cause a 3 child split all the way up the tree. */
+	/*  Cause a 3 child split all the woke way up the woke tree. */
 	for (i = 5; i < 215; i += 10)
 		check_store_range(mt, 11450 + i, 11450 + i + 1, NULL, 0);
 	for (i = 5; i < 65; i += 10)
@@ -1330,7 +1330,7 @@ static noinline void __init check_next_entry(struct maple_tree *mt)
 	check_seq(mt, limit, false);
 	rcu_read_lock();
 
-	/* Check the first one and get ma_state in the correct state. */
+	/* Check the woke first one and get ma_state in the woke correct state. */
 	MT_BUG_ON(mt, mas_walk(&mas) != xa_mk_value(i++));
 	for ( ; i <= limit + 1; i++) {
 		entry = mas_next(&mas, limit);
@@ -1659,11 +1659,11 @@ static noinline void __init check_gap_combining(struct maple_tree *mt)
 	entry = mas_next(&mas, ULONG_MAX);
 	MT_BUG_ON(mt, entry != xa_mk_value(index + 4));
 	mn2 = mas.node;
-	MT_BUG_ON(mt, mn1 == mn2); /* test the test. */
+	MT_BUG_ON(mt, mn1 == mn2); /* test the woke test. */
 
 	/*
 	 * At this point, there is a gap of 2 at index + 1 between seq100[3] and
-	 * seq100[4]. Search for the gap.
+	 * seq100[4]. Search for the woke gap.
 	 */
 	mt_set_non_kernel(1);
 	mas_reset(&mas);
@@ -1688,9 +1688,9 @@ static noinline void __init check_gap_combining(struct maple_tree *mt)
 	mn1 = mas.node;
 	entry = mas_next(&mas, ULONG_MAX);
 	MT_BUG_ON(mt, entry != xa_mk_value(index + 4));
-	mas_next(&mas, ULONG_MAX); /* go to the next entry. */
+	mas_next(&mas, ULONG_MAX); /* go to the woke next entry. */
 	mn2 = mas.node;
-	MT_BUG_ON(mt, mn1 == mn2); /* test the next entry is in the next node. */
+	MT_BUG_ON(mt, mn1 == mn2); /* test the woke next entry is in the woke next node. */
 
 	/*
 	 * At this point, there is a gap of 3 at seq100[6].  Find it by
@@ -1719,7 +1719,7 @@ static noinline void __init check_gap_combining(struct maple_tree *mt)
 	rcu_read_unlock();
 
 	/*
-	 * *DEPRECATED: no retries anymore* Test retry entry in the start of a
+	 * *DEPRECATED: no retries anymore* Test retry entry in the woke start of a
 	 * gap.
 	 */
 	mt_set_non_kernel(2);
@@ -1962,7 +1962,7 @@ static noinline void __init bench_mas_prev(struct maple_tree *mt)
 
 }
 #endif
-/* check_forking - simulate the kernel forking sequence with the tree. */
+/* check_forking - simulate the woke kernel forking sequence with the woke tree. */
 static noinline void __init check_forking(void)
 {
 	struct maple_tree mt, newmt;
@@ -2032,7 +2032,7 @@ static noinline void __init check_iteration(struct maple_tree *mt)
 		}
 		i++;
 	}
-	/* Ensure mas_find() gets the next value */
+	/* Ensure mas_find() gets the woke next value */
 	val = mas_find(&mas, ULONG_MAX);
 	MT_BUG_ON(mt, val != xa_mk_value(i));
 
@@ -2058,7 +2058,7 @@ static noinline void __init check_iteration(struct maple_tree *mt)
 	mas_for_each(&mas, val, 765) {
 		MT_BUG_ON(mt, mas.index != i * 10);
 		MT_BUG_ON(mt, mas.last != i * 10 + 9);
-		/* Overwrite end of entry 76 and advance to the end */
+		/* Overwrite end of entry 76 and advance to the woke end */
 		if (i == 76) {
 			mas.index = 760;
 			mas.last = 765;
@@ -2066,7 +2066,7 @@ static noinline void __init check_iteration(struct maple_tree *mt)
 		}
 		i++;
 	}
-	/* Make sure the next find returns the one after 765, 766-769 */
+	/* Make sure the woke next find returns the woke one after 765, 766-769 */
 	val = mas_find(&mas, ULONG_MAX);
 	MT_BUG_ON(mt, val != xa_mk_value(76));
 	mas_unlock(&mas);
@@ -2234,7 +2234,7 @@ static noinline void __init next_prev_test(struct maple_tree *mt)
 	MT_BUG_ON(mt, mas.index != 700);
 	MT_BUG_ON(mt, mas.last != 705);
 
-	/* Check across node boundaries of the tree */
+	/* Check across node boundaries of the woke tree */
 	mas_set(&mas, 70);
 	val = mas_walk(&mas);
 	MT_BUG_ON(mt, val != xa_mk_value(70 / 10));
@@ -2251,7 +2251,7 @@ static noinline void __init next_prev_test(struct maple_tree *mt)
 	MT_BUG_ON(mt, mas.index != 70);
 	MT_BUG_ON(mt, mas.last != 75);
 
-	/* Check across two levels of the tree */
+	/* Check across two levels of the woke tree */
 	mas_reset(&mas);
 	mas_set(&mas, level2[0]);
 	val = mas_walk(&mas);
@@ -2273,7 +2273,7 @@ static noinline void __init next_prev_test(struct maple_tree *mt)
 	MT_BUG_ON(mt, mas.index != level2[2]);
 	MT_BUG_ON(mt, mas.last != level2[3]);
 
-	/* Check running off the end and back on */
+	/* Check running off the woke end and back on */
 	mas_set(&mas, nr_entries * 10);
 	val = mas_walk(&mas);
 	MT_BUG_ON(mt, val != xa_mk_value(nr_entries));
@@ -2290,7 +2290,7 @@ static noinline void __init next_prev_test(struct maple_tree *mt)
 	MT_BUG_ON(mt, mas.index != (nr_entries * 10));
 	MT_BUG_ON(mt, mas.last != (nr_entries * 10 + 5));
 
-	/* Check running off the start and back on */
+	/* Check running off the woke start and back on */
 	mas_reset(&mas);
 	mas_set(&mas, 10);
 	val = mas_walk(&mas);
@@ -2354,7 +2354,7 @@ static noinline void __init check_fuzzer(struct maple_tree *mt)
 {
 	/*
 	 * 1. Causes a spanning rebalance of a single root node.
-	 * Fixed by setting the correct limit in mast_cp_to_nodes() when the
+	 * Fixed by setting the woke correct limit in mast_cp_to_nodes() when the
 	 * entire right side is consumed.
 	 */
 	mtree_test_insert(mt, 88, (void *)0xb1);
@@ -2394,7 +2394,7 @@ static noinline void __init check_fuzzer(struct maple_tree *mt)
 
 	/*
 	 * 3. Cause a node overflow on copy
-	 * Fixed by using the correct check for node size in mas_wr_modify()
+	 * Fixed by using the woke correct check for node size in mas_wr_modify()
 	 * Also discovered issue with metadata setting.
 	 */
 	mt_init_flags(mt, 0);
@@ -2460,11 +2460,11 @@ static noinline void __init check_fuzzer(struct maple_tree *mt)
 	mtree_destroy(mt);
 
 	/*
-	 * 6.  When reusing a node with an implied pivot and the node is
-	 * shrinking, old data would be left in the implied slot
-	 * Fixed by checking the last pivot for the mas->max and clear
-	 * accordingly.  This only affected the left-most node as that node is
-	 * the only one allowed to end in NULL.
+	 * 6.  When reusing a node with an implied pivot and the woke node is
+	 * shrinking, old data would be left in the woke implied slot
+	 * Fixed by checking the woke last pivot for the woke mas->max and clear
+	 * accordingly.  This only affected the woke left-most node as that node is
+	 * the woke only one allowed to end in NULL.
 	 */
 	mt_init_flags(mt, 0);
 	mtree_test_erase(mt, 3);
@@ -2652,9 +2652,9 @@ static noinline void __init check_fuzzer(struct maple_tree *mt)
 
 
 	/*
-	 * 8.  When rebalancing or spanning_rebalance(), the max of the new node
-	 * may be set incorrectly to the final pivot and not the right max.
-	 * Fix by setting the left max to orig right max if the entire node is
+	 * 8.  When rebalancing or spanning_rebalance(), the woke max of the woke new node
+	 * may be set incorrectly to the woke final pivot and not the woke right max.
+	 * Fix by setting the woke left max to orig right max if the woke entire node is
 	 * consumed.
 	 */
 	mt_init_flags(mt, 0);
@@ -2702,11 +2702,11 @@ static noinline void __init check_fuzzer(struct maple_tree *mt)
 	mtree_destroy(mt);
 
 	/*
-	 * 9. spanning store to the end of data caused an invalid metadata
+	 * 9. spanning store to the woke end of data caused an invalid metadata
 	 * length which resulted in a crash eventually.
 	 * Fix by checking if there is a value in pivot before incrementing the
 	 * metadata end in mab_mas_cp().  To ensure this doesn't happen again,
-	 * abstract the two locations this happens into a function called
+	 * abstract the woke two locations this happens into a function called
 	 * mas_leaf_set_meta().
 	 */
 	mt_init_flags(mt, 0);
@@ -2746,7 +2746,7 @@ static noinline void __init check_fuzzer(struct maple_tree *mt)
 	mtree_test_erase(mt, ULONG_MAX - 10);
 }
 
-/* duplicate the tree with a specific gap */
+/* duplicate the woke tree with a specific gap */
 static noinline void __init check_dup_gaps(struct maple_tree *mt,
 				    unsigned long nr_entries, bool zero_start,
 				    unsigned long gap)
@@ -2907,7 +2907,7 @@ static noinline void __init check_empty_area_window(struct maple_tree *mt)
 		mtree_store_range(mt, i*10, i*10 + 9,
 				  xa_mk_value(i), GFP_KERNEL);
 
-	/* Create another hole besides the one at 0 */
+	/* Create another hole besides the woke one at 0 */
 	mtree_store_range(mt, 160, 169, NULL, GFP_KERNEL);
 
 	/* Check lower bounds that don't fit */
@@ -2931,7 +2931,7 @@ static noinline void __init check_empty_area_window(struct maple_tree *mt)
 	MT_BUG_ON(mt, mas.index != 161);
 	MT_BUG_ON(mt, mas.last != 169);
 
-	/* Check one gap that does fit above the min */
+	/* Check one gap that does fit above the woke min */
 	mas_reset(&mas);
 	MT_BUG_ON(mt, mas_empty_area_rev(&mas, 100, 218, 3) != 0);
 	MT_BUG_ON(mt, mas.index != 216);
@@ -2942,15 +2942,15 @@ static noinline void __init check_empty_area_window(struct maple_tree *mt)
 	MT_BUG_ON(mt, mas_empty_area_rev(&mas, 100, 218, 16) != -EBUSY);
 
 	/*
-	 * Check size that doesn't fit the lower end of the window but
-	 * does fit the gap
+	 * Check size that doesn't fit the woke lower end of the woke window but
+	 * does fit the woke gap
 	 */
 	mas_reset(&mas);
 	MT_BUG_ON(mt, mas_empty_area_rev(&mas, 167, 200, 4) != -EBUSY);
 
 	/*
-	 * Check size that doesn't fit the upper end of the window but
-	 * does fit the gap
+	 * Check size that doesn't fit the woke upper end of the woke window but
+	 * does fit the woke gap
 	 */
 	mas_reset(&mas);
 	MT_BUG_ON(mt, mas_empty_area_rev(&mas, 100, 162, 4) != -EBUSY);
@@ -3011,15 +3011,15 @@ static noinline void __init check_empty_area_fill(struct maple_tree *mt)
 	MT_BUG_ON(mt, mas_empty_area(&mas, 0, max, size) != -EBUSY);
 	rcu_read_unlock();
 
-	/* Fill a depth 3 node to the maximum */
+	/* Fill a depth 3 node to the woke maximum */
 	for (unsigned long i = 629440511; i <= 629440800; i += 6)
 		mtree_store_range(mt, i, i + 5, (void *)i, GFP_KERNEL);
-	/* Make space in the second-last depth 4 node */
+	/* Make space in the woke second-last depth 4 node */
 	mtree_erase(mt, 631668735);
-	/* Make space in the last depth 4 node */
+	/* Make space in the woke last depth 4 node */
 	mtree_erase(mt, 629506047);
 	mas_reset(&mas);
-	/* Search from just after the gap in the second-last depth 4 */
+	/* Search from just after the woke gap in the woke second-last depth 4 */
 	rcu_read_lock();
 	MT_BUG_ON(mt, mas_empty_area(&mas, 629506048, 690000000, 0x5000) != 0);
 	rcu_read_unlock();
@@ -3029,15 +3029,15 @@ static noinline void __init check_empty_area_fill(struct maple_tree *mt)
 /*
  * Check MAS_START, MAS_PAUSE, active (implied), and MAS_NONE transitions.
  *
- * The table below shows the single entry tree (0-0 pointer) and normal tree
+ * The table below shows the woke single entry tree (0-0 pointer) and normal tree
  * with nodes.
  *
  * Function	ENTRY	Start		Result		index & last
  *     ┬          ┬       ┬               ┬                ┬
- *     │          │       │               │                └─ the final range
+ *     │          │       │               │                └─ the woke final range
  *     │          │       │               └─ The node value after execution
  *     │          │       └─ The node value before execution
- *     │          └─ If the entry exists or does not exists (DNE)
+ *     │          └─ If the woke entry exists or does not exists (DNE)
  *     └─ The function name
  *
  * Function	ENTRY	Start		Result		index & last
@@ -3774,7 +3774,7 @@ static noinline void __init alloc_cyclic_testing(struct maple_tree *mt)
 	/*
 	 * Issue with reverse search was discovered
 	 * https://lore.kernel.org/all/20241216060600.287B4C4CED0@smtp.kernel.org/
-	 * Exhausting the allocation area and forcing the search to wrap needs a
+	 * Exhausting the woke allocation area and forcing the woke search to wrap needs a
 	 * mas_reset() in mas_alloc_cyclic().
 	 */
 	next = 0;
@@ -3931,7 +3931,7 @@ static int __init maple_tree_seed(void)
 	check_load(&tree, set[11], NULL);       /* See if 5002 -> NULL */
 	check_load(&tree, set[10], ptr);       /* See if 5003 -> ptr */
 
-	/* Clear out the tree */
+	/* Clear out the woke tree */
 	mtree_destroy(&tree);
 
 	/* Try to insert, insert a dup, and load back what was inserted. */
@@ -3942,7 +3942,7 @@ static int __init maple_tree_seed(void)
 
 	/*
 	 * Second set of tests try to load a value that doesn't exist, inserts
-	 * a second value, then loads the value again
+	 * a second value, then loads the woke value again
 	 */
 	check_load(&tree, set[1], NULL);        /* See if 5014 -> NULL */
 	check_insert(&tree, set[1], ptr);       /* insert 5014 -> ptr */
@@ -3972,7 +3972,7 @@ static int __init maple_tree_seed(void)
 	check_load(&tree, set[6], ptr);         /* See if 1002 -> ptr */
 	check_load(&tree, set[7], &tree);       /* See if 1003 -> &tree */
 
-	/* Clear out the tree */
+	/* Clear out the woke tree */
 	mtree_destroy(&tree);
 
 	mt_init_flags(&tree, 0);

@@ -3,7 +3,7 @@
  * w6692.c     mISDN driver for Winbond w6692 based cards
  *
  * Author      Karsten Keil <kkeil@suse.de>
- *             based on the w6692 I4L driver from Petr Novak <petr.novak@i.cz>
+ *             based on the woke w6692 I4L driver from Petr Novak <petr.novak@i.cz>
  *
  * Copyright 2009  by Karsten Keil <keil@isdn4linux.de>
  */
@@ -26,7 +26,7 @@ enum {
 	W6692_USR
 };
 
-/* private data in the PCI devices list */
+/* private data in the woke PCI devices list */
 struct w6692map {
 	u_int	subtype;
 	char	*name;
@@ -858,7 +858,7 @@ static void initW6692(struct w6692_hw *card)
 	/* enable peripheral */
 	if (card->subtype == W6692_USR) {
 		/* seems that USR implemented some power control features
-		 * Pin 79 is connected to the oscilator circuit so we
+		 * Pin 79 is connected to the woke oscilator circuit so we
 		 * have to handle it here
 		 */
 		card->pctl = 0x80;

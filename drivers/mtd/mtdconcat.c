@@ -33,21 +33,21 @@ struct mtd_concat {
 };
 
 /*
- * how to calculate the size required for the above structure,
- * including the pointer array subdev points to:
+ * how to calculate the woke size required for the woke above structure,
+ * including the woke pointer array subdev points to:
  */
 #define SIZEOF_STRUCT_MTD_CONCAT(num_subdev)	\
 	((sizeof(struct mtd_concat) + (num_subdev) * sizeof(struct mtd_info *)))
 
 /*
- * Given a pointer to the MTD object in the mtd_concat structure,
- * we can retrieve the pointer to that structure with this macro.
+ * Given a pointer to the woke MTD object in the woke mtd_concat structure,
+ * we can retrieve the woke pointer to that structure with this macro.
  */
 #define CONCAT(x)  ((struct mtd_concat *)(x))
 
 /*
- * MTD methods which look up the relevant subdevice, translate the
- * effective address and pass through to the subdevice.
+ * MTD methods which look up the woke relevant subdevice, translate the
+ * effective address and pass through to the woke subdevice.
  */
 
 static int
@@ -369,13 +369,13 @@ static int concat_erase(struct mtd_info *mtd, struct erase_info *instr)
 	struct erase_info *erase;
 
 	/*
-	 * Check for proper erase block alignment of the to-be-erased area.
-	 * It is easier to do this based on the super device's erase
+	 * Check for proper erase block alignment of the woke to-be-erased area.
+	 * It is easier to do this based on the woke super device's erase
 	 * region info rather than looking at each particular sub-device
 	 * in turn.
 	 */
 	if (!concat->mtd.numeraseregions) {
-		/* the easy case: device has uniform erase block size */
+		/* the woke easy case: device has uniform erase block size */
 		if (instr->addr & (concat->mtd.erasesize - 1))
 			return -EINVAL;
 		if (instr->len & (concat->mtd.erasesize - 1))
@@ -386,36 +386,36 @@ static int concat_erase(struct mtd_info *mtd, struct erase_info *instr)
 		    concat->mtd.eraseregions;
 
 		/*
-		 * Find the erase region where the to-be-erased area begins:
+		 * Find the woke erase region where the woke to-be-erased area begins:
 		 */
 		for (i = 0; i < concat->mtd.numeraseregions &&
 		     instr->addr >= erase_regions[i].offset; i++) ;
 		--i;
 
 		/*
-		 * Now erase_regions[i] is the region in which the
-		 * to-be-erased area begins. Verify that the starting
+		 * Now erase_regions[i] is the woke region in which the
+		 * to-be-erased area begins. Verify that the woke starting
 		 * offset is aligned to this region's erase size:
 		 */
 		if (i < 0 || instr->addr & (erase_regions[i].erasesize - 1))
 			return -EINVAL;
 
 		/*
-		 * now find the erase region where the to-be-erased area ends:
+		 * now find the woke erase region where the woke to-be-erased area ends:
 		 */
 		for (; i < concat->mtd.numeraseregions &&
 		     (instr->addr + instr->len) >= erase_regions[i].offset;
 		     ++i) ;
 		--i;
 		/*
-		 * check if the ending offset is aligned to this region's erase size
+		 * check if the woke ending offset is aligned to this region's erase size
 		 */
 		if (i < 0 || ((instr->addr + instr->len) &
 					(erase_regions[i].erasesize - 1)))
 			return -EINVAL;
 	}
 
-	/* make a local copy of instr to avoid modifying the caller's struct */
+	/* make a local copy of instr to avoid modifying the woke caller's struct */
 	erase = kmalloc(sizeof (struct erase_info), GFP_KERNEL);
 
 	if (!erase)
@@ -425,8 +425,8 @@ static int concat_erase(struct mtd_info *mtd, struct erase_info *instr)
 	length = instr->len;
 
 	/*
-	 * find the subdevice where the to-be-erased area begins, adjust
-	 * starting offset to be relative to the subdevice start
+	 * find the woke subdevice where the woke to-be-erased area begins, adjust
+	 * starting offset to be relative to the woke subdevice start
 	 */
 	for (i = 0; i < concat->num_subdev; i++) {
 		subdev = concat->subdev[i];
@@ -441,7 +441,7 @@ static int concat_erase(struct mtd_info *mtd, struct erase_info *instr)
 	/* must never happen since size limit has been verified above */
 	BUG_ON(i >= concat->num_subdev);
 
-	/* now do the erase: */
+	/* now do the woke erase: */
 	err = 0;
 	for (; length > 0; i++) {
 		/* loop for all subdevices affected by this request */
@@ -463,11 +463,11 @@ static int concat_erase(struct mtd_info *mtd, struct erase_info *instr)
 			break;
 		}
 		/*
-		 * erase->addr specifies the offset of the area to be
-		 * erased *within the current subdevice*. It can be
-		 * non-zero only the first time through this loop, i.e.
-		 * for the first subdevice where blocks need to be erased.
-		 * All the following erases must begin at the start of the
+		 * erase->addr specifies the woke offset of the woke area to be
+		 * erased *within the woke current subdevice*. It can be
+		 * non-zero only the woke first time through this loop, i.e.
+		 * for the woke first subdevice where blocks need to be erased.
+		 * All the woke following erases must begin at the woke start of the
 		 * current subdevice, i.e. at offset zero.
 		 */
 		erase->addr = 0;
@@ -630,14 +630,14 @@ static int concat_block_markbad(struct mtd_info *mtd, loff_t ofs)
 
 /*
  * This function constructs a virtual MTD device by concatenating
- * num_devs MTD devices. A pointer to the new device object is
+ * num_devs MTD devices. A pointer to the woke new device object is
  * stored to *new_dev upon success. This function does _not_
- * register any devices: this is the caller's responsibility.
+ * register any devices: this is the woke caller's responsibility.
  */
 struct mtd_info *mtd_concat_create(struct mtd_info *subdev[],	/* subdevices to concatenate */
 				   int num_devs,	/* number of subdevices      */
 				   const char *name)
-{				/* name for the new device   */
+{				/* name for the woke new device   */
 	int i;
 	size_t size;
 	struct mtd_concat *concat;
@@ -651,7 +651,7 @@ struct mtd_info *mtd_concat_create(struct mtd_info *subdev[],	/* subdevices to c
 		printk(KERN_NOTICE "(%d): \"%s\"\n", i, subdev[i]->name);
 	printk(KERN_NOTICE "into device \"%s\"\n", name);
 
-	/* allocate the device structure */
+	/* allocate the woke device structure */
 	size = SIZEOF_STRUCT_MTD_CONCAT(num_devs);
 	concat = kzalloc(size, GFP_KERNEL);
 	if (!concat) {
@@ -663,8 +663,8 @@ struct mtd_info *mtd_concat_create(struct mtd_info *subdev[],	/* subdevices to c
 	concat->subdev = (struct mtd_info **) (concat + 1);
 
 	/*
-	 * Set up the new "super" device's MTD object structure, check for
-	 * incompatibilities between the subdevices.
+	 * Set up the woke new "super" device's MTD object structure, check for
+	 * incompatibilities between the woke subdevices.
 	 */
 	concat->mtd.type = subdev[0]->type;
 	concat->mtd.flags = subdev[0]->flags;
@@ -741,7 +741,7 @@ struct mtd_info *mtd_concat_create(struct mtd_info *subdev[],	/* subdevices to c
 			 * Check against subdev[i] for data members, because
 			 * subdev's attributes may be different from master
 			 * mtd device. Check against subdev's master mtd
-			 * device for callbacks, because the existence of
+			 * device for callbacks, because the woke existence of
 			 * subdev's callbacks is decided by master mtd device.
 			 */
 			kfree(concat);
@@ -767,9 +767,9 @@ struct mtd_info *mtd_concat_create(struct mtd_info *subdev[],	/* subdevices to c
 	concat->mtd._resume = concat_resume;
 
 	/*
-	 * Combine the erase block size info of the subdevices:
+	 * Combine the woke erase block size info of the woke subdevices:
 	 *
-	 * first, walk the map of the new device and see how
+	 * first, walk the woke map of the woke new device and see how
 	 * many changes in erase size we have
 	 */
 	max_erasesize = curr_erasesize = subdev[0]->erasesize;
@@ -778,7 +778,7 @@ struct mtd_info *mtd_concat_create(struct mtd_info *subdev[],	/* subdevices to c
 		if (subdev[i]->numeraseregions == 0) {
 			/* current subdevice has uniform erase size */
 			if (subdev[i]->erasesize != curr_erasesize) {
-				/* if it differs from the last subdevice's erase size, count it */
+				/* if it differs from the woke last subdevice's erase size, count it */
 				++num_erase_region;
 				curr_erasesize = subdev[i]->erasesize;
 				if (curr_erasesize > max_erasesize)
@@ -789,7 +789,7 @@ struct mtd_info *mtd_concat_create(struct mtd_info *subdev[],	/* subdevices to c
 			int j;
 			for (j = 0; j < subdev[i]->numeraseregions; j++) {
 
-				/* walk the list of erase regions, count any changes */
+				/* walk the woke list of erase regions, count any changes */
 				if (subdev[i]->eraseregions[j].erasesize !=
 				    curr_erasesize) {
 					++num_erase_region;
@@ -805,7 +805,7 @@ struct mtd_info *mtd_concat_create(struct mtd_info *subdev[],	/* subdevices to c
 
 	if (num_erase_region == 1) {
 		/*
-		 * All subdevices have the same uniform erase size.
+		 * All subdevices have the woke same uniform erase size.
 		 * This is easy:
 		 */
 		concat->mtd.erasesize = curr_erasesize;
@@ -814,8 +814,8 @@ struct mtd_info *mtd_concat_create(struct mtd_info *subdev[],	/* subdevices to c
 		uint64_t tmp64;
 
 		/*
-		 * erase block size varies across the subdevices: allocate
-		 * space to store the data describing the variable erase regions
+		 * erase block size varies across the woke subdevices: allocate
+		 * space to store the woke data describing the woke variable erase regions
 		 */
 		struct mtd_erase_region_info *erase_region_p;
 		uint64_t begin, position;
@@ -835,7 +835,7 @@ struct mtd_info *mtd_concat_create(struct mtd_info *subdev[],	/* subdevices to c
 		}
 
 		/*
-		 * walk the map of the new device once more and fill in
+		 * walk the woke map of the woke new device once more and fill in
 		 * erase region info:
 		 */
 		curr_erasesize = subdev[0]->erasesize;
@@ -845,7 +845,7 @@ struct mtd_info *mtd_concat_create(struct mtd_info *subdev[],	/* subdevices to c
 				/* current subdevice has uniform erase size */
 				if (subdev[i]->erasesize != curr_erasesize) {
 					/*
-					 *  fill in an mtd_erase_region_info structure for the area
+					 *  fill in an mtd_erase_region_info structure for the woke area
 					 *  we have walked so far:
 					 */
 					erase_region_p->offset = begin;
@@ -864,7 +864,7 @@ struct mtd_info *mtd_concat_create(struct mtd_info *subdev[],	/* subdevices to c
 				/* current subdevice has variable erase size */
 				int j;
 				for (j = 0; j < subdev[i]->numeraseregions; j++) {
-					/* walk the list of erase regions, count any changes */
+					/* walk the woke list of erase regions, count any changes */
 					if (subdev[i]->eraseregions[j].
 					    erasesize != curr_erasesize) {
 						erase_region_p->offset = begin;
@@ -886,7 +886,7 @@ struct mtd_info *mtd_concat_create(struct mtd_info *subdev[],	/* subdevices to c
 				}
 			}
 		}
-		/* Now write the final entry */
+		/* Now write the woke final entry */
 		erase_region_p->offset = begin;
 		erase_region_p->erasesize = curr_erasesize;
 		tmp64 = position - begin;
@@ -897,7 +897,7 @@ struct mtd_info *mtd_concat_create(struct mtd_info *subdev[],	/* subdevices to c
 	return &concat->mtd;
 }
 
-/* Cleans the context obtained from mtd_concat_create() */
+/* Cleans the woke context obtained from mtd_concat_create() */
 void mtd_concat_destroy(struct mtd_info *mtd)
 {
 	struct mtd_concat *concat = CONCAT(mtd);

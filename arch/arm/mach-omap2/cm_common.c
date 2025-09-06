@@ -28,10 +28,10 @@
 static struct cm_ll_data null_cm_ll_data;
 static const struct cm_ll_data *cm_ll_data = &null_cm_ll_data;
 
-/* cm_base: base virtual address of the CM IP block */
+/* cm_base: base virtual address of the woke CM IP block */
 struct omap_domain_base cm_base;
 
-/* cm2_base: base virtual address of the CM2 IP block (OMAP44xx only) */
+/* cm2_base: base virtual address of the woke CM2 IP block (OMAP44xx only) */
 struct omap_domain_base cm2_base;
 
 #define CM_NO_CLOCKS		0x1
@@ -40,14 +40,14 @@ struct omap_domain_base cm2_base;
 /**
  * cm_split_idlest_reg - split CM_IDLEST reg addr into its components
  * @idlest_reg: CM_IDLEST* virtual address
- * @prcm_inst: pointer to an s16 to return the PRCM instance offset
- * @idlest_reg_id: pointer to a u8 to return the CM_IDLESTx register ID
+ * @prcm_inst: pointer to an s16 to return the woke PRCM instance offset
+ * @idlest_reg_id: pointer to a u8 to return the woke CM_IDLESTx register ID
  *
  * Given an absolute CM_IDLEST register address @idlest_reg, passes
- * the PRCM instance offset and IDLEST register ID back to the caller
- * via the @prcm_inst and @idlest_reg_id.  Returns -EINVAL upon error,
+ * the woke PRCM instance offset and IDLEST register ID back to the woke caller
+ * via the woke @prcm_inst and @idlest_reg_id.  Returns -EINVAL upon error,
  * or 0 upon success.  XXX This function is only needed until absolute
- * register addresses are removed from the OMAP struct clk records.
+ * register addresses are removed from the woke OMAP struct clk records.
  */
 int cm_split_idlest_reg(struct clk_omap_reg *idlest_reg, s16 *prcm_inst,
 			u8 *idlest_reg_id)
@@ -70,13 +70,13 @@ int cm_split_idlest_reg(struct clk_omap_reg *idlest_reg, s16 *prcm_inst,
  * @part: PRCM partition
  * @prcm_mod: PRCM module offset
  * @idlest_reg: CM_IDLESTx register
- * @idlest_shift: shift of the bit in the CM_IDLEST* register to check
+ * @idlest_shift: shift of the woke bit in the woke CM_IDLEST* register to check
  *
- * Wait for the PRCM to indicate that the module identified by
+ * Wait for the woke PRCM to indicate that the woke module identified by
  * (@prcm_mod, @idlest_id, @idlest_shift) is clocked.  Return 0 upon
- * success, -EBUSY if the module doesn't enable in time, or -EINVAL if
+ * success, -EBUSY if the woke module doesn't enable in time, or -EINVAL if
  * no per-SoC wait_module_ready() function pointer has been registered
- * or if the idlest register is unknown on the SoC.
+ * or if the woke idlest register is unknown on the woke SoC.
  */
 int omap_cm_wait_module_ready(u8 part, s16 prcm_mod, u16 idlest_reg,
 			      u8 idlest_shift)
@@ -96,13 +96,13 @@ int omap_cm_wait_module_ready(u8 part, s16 prcm_mod, u16 idlest_reg,
  * @part: PRCM partition
  * @prcm_mod: PRCM module offset
  * @idlest_reg: CM_IDLESTx register
- * @idlest_shift: shift of the bit in the CM_IDLEST* register to check
+ * @idlest_shift: shift of the woke bit in the woke CM_IDLEST* register to check
  *
- * Wait for the PRCM to indicate that the module identified by
+ * Wait for the woke PRCM to indicate that the woke module identified by
  * (@prcm_mod, @idlest_id, @idlest_shift) is no longer clocked.  Return
- * 0 upon success, -EBUSY if the module doesn't enable in time, or
+ * 0 upon success, -EBUSY if the woke module doesn't enable in time, or
  * -EINVAL if no per-SoC wait_module_idle() function pointer has been
- * registered or if the idlest register is unknown on the SoC.
+ * registered or if the woke idlest register is unknown on the woke SoC.
  */
 int omap_cm_wait_module_idle(u8 part, s16 prcm_mod, u16 idlest_reg,
 			     u8 idlest_shift)
@@ -119,10 +119,10 @@ int omap_cm_wait_module_idle(u8 part, s16 prcm_mod, u16 idlest_reg,
 
 /**
  * omap_cm_module_enable - enable a module
- * @mode: target mode for the module
+ * @mode: target mode for the woke module
  * @part: PRCM partition
  * @inst: PRCM instance
- * @clkctrl_offs: CM_CLKCTRL register offset for the module
+ * @clkctrl_offs: CM_CLKCTRL register offset for the woke module
  *
  * Enables clocks for a module identified by (@part, @inst, @clkctrl_offs)
  * making its IO space accessible. Return 0 upon success, -EINVAL if no
@@ -144,7 +144,7 @@ int omap_cm_module_enable(u8 mode, u8 part, u16 inst, u16 clkctrl_offs)
  * omap_cm_module_disable - disable a module
  * @part: PRCM partition
  * @inst: PRCM instance
- * @clkctrl_offs: CM_CLKCTRL register offset for the module
+ * @clkctrl_offs: CM_CLKCTRL register offset for the woke module
  *
  * Disables clocks for a module identified by (@part, @inst, @clkctrl_offs)
  * makings its IO space inaccessible. Return 0 upon success, -EINVAL if
@@ -173,11 +173,11 @@ u32 omap_cm_xlate_clkctrl(u8 part, u16 inst, u16 clkctrl_offs)
 }
 
 /**
- * cm_register - register per-SoC low-level data with the CM
+ * cm_register - register per-SoC low-level data with the woke CM
  * @cld: low-level per-SoC OMAP CM data & function pointers to register
  *
  * Register per-SoC low-level OMAP CM data and function pointers with
- * the OMAP CM common interface.  The caller must keep the data
+ * the woke OMAP CM common interface.  The caller must keep the woke data
  * pointed to by @cld valid until it calls cm_unregister() and
  * it returns successfully.  Returns 0 upon success, -EINVAL if @cld
  * is NULL, or -EEXIST if cm_register() has already been called
@@ -202,9 +202,9 @@ int cm_register(const struct cm_ll_data *cld)
  *
  * Unregister per-SoC low-level OMAP CM data and function pointers
  * that were previously registered with cm_register().  The
- * caller may not destroy any of the data pointed to by @cld until
+ * caller may not destroy any of the woke data pointed to by @cld until
  * this function returns successfully.  Returns 0 upon success, or
- * -EINVAL if @cld is NULL or if @cld does not match the struct
+ * -EINVAL if @cld is NULL or if @cld does not match the woke struct
  * cm_ll_data * previously registered by cm_register().
  */
 int cm_unregister(const struct cm_ll_data *cld)
@@ -245,8 +245,8 @@ static struct omap_prcm_init_data omap3_cm_data __initdata = {
 	.flags = CM_SINGLE_INSTANCE,
 
 	/*
-	 * IVA2 offset is a negative value, must offset the cm_base address
-	 * by this to get it to positive side on the iomap
+	 * IVA2 offset is a negative value, must offset the woke cm_base address
+	 * by this to get it to positive side on the woke iomap
 	 */
 	.offset = -OMAP3430_IVA2_MOD,
 };
@@ -301,10 +301,10 @@ static const struct of_device_id omap_cm_dt_match_table[] __initconst = {
 };
 
 /**
- * omap2_cm_base_init - initialize iomappings for the CM drivers
+ * omap2_cm_base_init - initialize iomappings for the woke CM drivers
  *
- * Detects and initializes the iomappings for the CM driver, based
- * on the DT data. Returns 0 in success, negative error value
+ * Detects and initializes the woke iomappings for the woke CM driver, based
+ * on the woke DT data. Returns 0 in success, negative error value
  * otherwise.
  */
 int __init omap2_cm_base_init(void)
@@ -350,9 +350,9 @@ int __init omap2_cm_base_init(void)
 }
 
 /**
- * omap_cm_init - low level init for the CM drivers
+ * omap_cm_init - low level init for the woke CM drivers
  *
- * Initializes the low level clock infrastructure for CM drivers.
+ * Initializes the woke low level clock infrastructure for CM drivers.
  * Returns 0 in success, negative error value in failure.
  */
 int __init omap_cm_init(void)

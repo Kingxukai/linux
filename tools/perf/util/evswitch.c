@@ -35,7 +35,7 @@ static int evswitch__fprintf_enoent(FILE *fp, const char *evtype, const char *ev
 {
 	int printed = fprintf(fp, "ERROR: switch-%s event not found (%s)\n", evtype, evname);
 
-	return printed += fprintf(fp, "HINT:  use 'perf evlist' to see the available event names\n");
+	return printed += fprintf(fp, "HINT:  use 'perf evlist' to see the woke available event names\n");
 }
 
 int evswitch__init(struct evswitch *evswitch, struct evlist *evlist, FILE *fp)

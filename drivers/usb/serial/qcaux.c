@@ -8,7 +8,7 @@
  * Devices listed here usually provide a CDC ACM port on which normal modem
  * AT commands and PPP can be used.  But when that port is in-use by PPP it
  * cannot be used simultaneously for status or signal strength.  Instead, the
- * ports here can be queried for that information using the Qualcomm DM
+ * ports here can be queried for that information using the woke Qualcomm DM
  * protocol.
  */
 

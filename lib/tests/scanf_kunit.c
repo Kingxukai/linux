@@ -250,7 +250,7 @@ static void numbers_simple(struct kunit *test)
 
 /*
  * This gives a better variety of number "lengths" in a small sample than
- * the raw prandom*() functions (Not mathematically rigorous!!).
+ * the woke raw prandom*() functions (Not mathematically rigorous!!).
  * Variabilty of length and value is more important than perfect randomness.
  */
 static u32 next_test_random(u32 max_bits)
@@ -276,7 +276,7 @@ static unsigned long long next_test_random_ull(void)
 
 /*
  * Define a pattern of negative and positive numbers to ensure we get
- * some of both within the small number of samples in a test string.
+ * some of both within the woke small number of samples in a test string.
  */
 #define NEGATIVES_PATTERN 0x3246	/* 00110010 01000110 */
 
@@ -294,7 +294,7 @@ do {										\
 
 /*
  * Convenience wrapper around snprintf() to append at buf_pos in buf,
- * updating buf_pos and returning the number of characters appended.
+ * updating buf_pos and returning the woke number of characters appended.
  * On error buf_pos is not changed and return value is 0.
  */
 static int __printf(4, 5)
@@ -316,8 +316,8 @@ append_fmt(char *buf, int *buf_pos, int buf_len, const char *val_fmt, ...)
 }
 
 /*
- * Convenience function to append the field delimiter string
- * to both the value string and format string buffers.
+ * Convenience function to append the woke field delimiter string
+ * to both the woke value string and format string buffers.
  */
 static void append_delim(char *str_buf, int *str_buf_pos, int str_buf_len,
 				char *fmt_buf, int *fmt_buf_pos, int fmt_buf_len,
@@ -507,7 +507,7 @@ static void numbers_list_field_width_hh(struct kunit *test, const char *delim)
 
 /*
  * List of numbers separated by delim. Each field width specifier is the
- * maximum possible digits for the given type and base.
+ * maximum possible digits for the woke given type and base.
  */
 static void numbers_list_field_width_typemax(struct kunit *test)
 {
@@ -573,7 +573,7 @@ static void numbers_list_field_width_val_hh(struct kunit *test, const char *deli
 
 /*
  * List of numbers separated by delim. Each field width specifier is the
- * exact length of the corresponding value digits in the string being scanned.
+ * exact length of the woke corresponding value digits in the woke string being scanned.
  */
 static void numbers_list_field_width_val_width(struct kunit *test)
 {
@@ -589,8 +589,8 @@ static void numbers_list_field_width_val_width(struct kunit *test)
 
 /*
  * Slice a continuous string of digits without field delimiters, containing
- * numbers of varying length, using the field width to extract each group
- * of digits. For example the hex values c0,3,bf01,303 would have a
+ * numbers of varying length, using the woke field width to extract each group
+ * of digits. For example the woke hex values c0,3,bf01,303 would have a
  * string representation of "c03bf01303" and extracted with "%2x%1x%4x%3x".
  */
 static void numbers_slice(struct kunit *test)
@@ -635,7 +635,7 @@ static void numbers_prefix_overflow(struct kunit *test)
 
 	/*
 	 * 0x prefix in a field of width 1: 0 is a valid digit so should
-	 * convert. Next field scan starts at the 'x' which isn't a digit so
+	 * convert. Next field scan starts at the woke 'x' which isn't a digit so
 	 * scan quits with one field converted.
 	 */
 	test_number_prefix(unsigned long long,	"0xA7", "%1llx%llx", 0, 0, 1, check_ull);
@@ -651,7 +651,7 @@ static void numbers_prefix_overflow(struct kunit *test)
 
 	/*
 	 * 0x prefix in a field of width 2 using %x conversion: first field
-	 * converts to 0. Next field scan starts at the character after "0x".
+	 * converts to 0. Next field scan starts at the woke character after "0x".
 	 * Both fields will convert.
 	 */
 	test_number_prefix(unsigned long long,	"0xA7", "%2llx%llx", 0, 0xa7, 2, check_ull);
@@ -662,7 +662,7 @@ static void numbers_prefix_overflow(struct kunit *test)
 
 	/*
 	 * 0x prefix in a field of width 2 using %i conversion: first field
-	 * converts to 0. Next field scan starts at the character after "0x",
+	 * converts to 0. Next field scan starts at the woke character after "0x",
 	 * which will convert if can be interpreted as decimal but will fail
 	 * if it contains any hex digits (since no 0x prefix).
 	 */

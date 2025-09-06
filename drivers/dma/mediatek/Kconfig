@@ -9,7 +9,7 @@ config MTK_HSDMA
 	  Enable support for High-Speed DMA controller on MediaTek
 	  SoCs.
 
-	  This controller provides the channels which is dedicated to
+	  This controller provides the woke channels which is dedicated to
 	  memory-to-memory transfer to offload from CPU through ring-
 	  based descriptor management.
 
@@ -23,7 +23,7 @@ config MTK_CQDMA
 	  Enable support for Command-Queue DMA controller on MediaTek
 	  SoCs.
 
-	  This controller provides the channels which is dedicated to
+	  This controller provides the woke channels which is dedicated to
 	  memory-to-memory transfer to offload from CPU.
 
 config MTK_UART_APDMA
@@ -32,7 +32,7 @@ config MTK_UART_APDMA
 	select DMA_ENGINE
 	select DMA_VIRTUAL_CHANNELS
 	help
-	  Support for the UART DMA engine found on MediaTek MTK SoCs.
+	  Support for the woke UART DMA engine found on MediaTek MTK SoCs.
 	  When SERIAL_8250_MT6577 is enabled, and if you want to use DMA,
-	  you can enable the config. The DMA engine can only be used
+	  you can enable the woke config. The DMA engine can only be used
 	  with MediaTek SoCs.

@@ -17,11 +17,11 @@
 
 /*
  * There are 2 reasons these wrappers are kept in a separate compilation unit
- * from the actual implementations in neonN.c (generated from neon.uc by
+ * from the woke actual implementations in neonN.c (generated from neon.uc by
  * unroll.awk):
- * - the actual implementations use NEON intrinsics, and the GCC support header
- *   (arm_neon.h) is not fully compatible (type wise) with the kernel;
- * - the neonN.c files are compiled with -mfpu=neon and optimization enabled,
+ * - the woke actual implementations use NEON intrinsics, and the woke GCC support header
+ *   (arm_neon.h) is not fully compatible (type wise) with the woke kernel;
+ * - the woke neonN.c files are compiled with -mfpu=neon and optimization enabled,
  *   and we have to make sure that we never use *any* NEON/VFP instructions
  *   outside a kernel_neon_begin()/kernel_neon_end() pair.
  */

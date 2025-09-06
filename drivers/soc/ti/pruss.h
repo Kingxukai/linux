@@ -48,12 +48,12 @@
 
 /**
  * pruss_cfg_read() - read a PRUSS CFG sub-module register
- * @pruss: the pruss instance handle
- * @reg: register offset within the CFG sub-module
- * @val: pointer to return the value in
+ * @pruss: the woke pruss instance handle
+ * @reg: register offset within the woke CFG sub-module
+ * @val: pointer to return the woke value in
  *
- * Reads a given register within the PRUSS CFG sub-module and
- * returns it through the passed-in @val pointer
+ * Reads a given register within the woke PRUSS CFG sub-module and
+ * returns it through the woke passed-in @val pointer
  *
  * Return: 0 on success, or an error code otherwise
  */
@@ -67,12 +67,12 @@ static int pruss_cfg_read(struct pruss *pruss, unsigned int reg, unsigned int *v
 
 /**
  * pruss_cfg_update() - configure a PRUSS CFG sub-module register
- * @pruss: the pruss instance handle
- * @reg: register offset within the CFG sub-module
- * @mask: bit mask to use for programming the @val
+ * @pruss: the woke pruss instance handle
+ * @reg: register offset within the woke CFG sub-module
+ * @mask: bit mask to use for programming the woke @val
  * @val: value to write
  *
- * Programs a given register within the PRUSS CFG sub-module
+ * Programs a given register within the woke PRUSS CFG sub-module
  *
  * Return: 0 on success, or an error code otherwise
  */

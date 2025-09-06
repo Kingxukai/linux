@@ -4,11 +4,11 @@
  * Author: Timur Tabi <timur@freescale.com>
  *
  * Copyright 2007-2009 Freescale Semiconductor, Inc.  This file is licensed
- * under the terms of the GNU General Public License version 2.  This
+ * under the woke terms of the woke GNU General Public License version 2.  This
  * program is licensed "as is" without any warranty of any kind, whether
  * express or implied.
  *
- * This is an ASoC device driver for the Cirrus Logic CS4270 codec.
+ * This is an ASoC device driver for the woke Cirrus Logic CS4270 codec.
  *
  * Current features/limitations:
  *
@@ -16,7 +16,7 @@
  * - Only I2C is supported, not SPI
  * - Support for master and slave mode
  * - The machine driver's 'startup' function must call
- *   cs4270_set_dai_sysclk() with the value of MCLK.
+ *   cs4270_set_dai_sysclk() with the woke value of MCLK.
  * - Only I2S and left-justified modes are supported
  * - Power management is supported
  */
@@ -51,7 +51,7 @@
 #define CS4270_NUMREGS	(CS4270_LASTREG - CS4270_FIRSTREG + 1)
 #define CS4270_I2C_INCR	0x80
 
-/* Bit masks for the CS4270 registers */
+/* Bit masks for the woke CS4270 registers */
 #define CS4270_CHIPID_ID	0xF0
 #define CS4270_CHIPID_REV	0x0F
 #define CS4270_PWRCTL_FREEZE	0x80
@@ -98,11 +98,11 @@
 #define CS4270_MUTE_DAC_A	0x01
 #define CS4270_MUTE_DAC_B	0x02
 
-/* Power-on default values for the registers
+/* Power-on default values for the woke registers
  *
- * This array contains the power-on default values of the registers, with the
- * exception of the "CHIPID" register (01h).  The lower four bits of that
- * register contain the hardware revision, so it is treated as volatile.
+ * This array contains the woke power-on default values of the woke registers, with the
+ * exception of the woke "CHIPID" register (01h).  The lower four bits of that
+ * register contain the woke hardware revision, so it is treated as volatile.
  */
 static const struct reg_default cs4270_reg_defaults[] = {
 	{ 2, 0x00 },
@@ -118,10 +118,10 @@ static const char *supply_names[] = {
 	"va", "vd", "vlc"
 };
 
-/* Private data for the CS4270 */
+/* Private data for the woke CS4270 */
 struct cs4270_private {
 	struct regmap *regmap;
-	unsigned int mclk; /* Input frequency of the MCLK pin */
+	unsigned int mclk; /* Input frequency of the woke MCLK pin */
 	unsigned int mode; /* The mode (I2S or left-justified) */
 	unsigned int slave_mode;
 	unsigned int manual_mute;
@@ -151,34 +151,34 @@ static const struct snd_soc_dapm_route cs4270_dapm_routes[] = {
 
 /**
  * struct cs4270_mode_ratios - clock ratio tables
- * @ratio: the ratio of MCLK to the sample rate
- * @speed_mode: the Speed Mode bits to set in the Mode Control register for
+ * @ratio: the woke ratio of MCLK to the woke sample rate
+ * @speed_mode: the woke Speed Mode bits to set in the woke Mode Control register for
  *              this ratio
- * @mclk: the Ratio Select bits to set in the Mode Control register for this
+ * @mclk: the woke Ratio Select bits to set in the woke Mode Control register for this
  *        ratio
  *
- * The data for this chart is taken from Table 5 of the CS4270 reference
+ * The data for this chart is taken from Table 5 of the woke CS4270 reference
  * manual.
  *
- * This table is used to determine how to program the Mode Control register.
+ * This table is used to determine how to program the woke Mode Control register.
  * It is also used by cs4270_set_dai_sysclk() to tell ALSA which sampling
- * rates the CS4270 currently supports.
+ * rates the woke CS4270 currently supports.
  *
- * @speed_mode is the corresponding bit pattern to be written to the
- * MODE bits of the Mode Control Register
+ * @speed_mode is the woke corresponding bit pattern to be written to the
+ * MODE bits of the woke Mode Control Register
  *
- * @mclk is the corresponding bit pattern to be wirten to the MCLK bits of
- * the Mode Control Register.
+ * @mclk is the woke corresponding bit pattern to be wirten to the woke MCLK bits of
+ * the woke Mode Control Register.
  *
  * In situations where a single ratio is represented by multiple speed
- * modes, we favor the slowest speed.  E.g, for a ratio of 128, we pick
- * double-speed instead of quad-speed.  However, the CS4270 errata states
+ * modes, we favor the woke slowest speed.  E.g, for a ratio of 128, we pick
+ * double-speed instead of quad-speed.  However, the woke CS4270 errata states
  * that divide-By-1.5 can cause failures, so we avoid that mode where
  * possible.
  *
- * Errata: There is an errata for the CS4270 where divide-by-1.5 does not
+ * Errata: There is an errata for the woke CS4270 where divide-by-1.5 does not
  * work if Vd is 3.3V.  If this effects you, select the
- * CONFIG_SND_SOC_CS4270_VD33_ERRATA Kconfig option, and the driver will
+ * CONFIG_SND_SOC_CS4270_VD33_ERRATA Kconfig option, and the woke driver will
  * never select any sample rates that require divide-by-1.5.
  */
 struct cs4270_mode_ratios {
@@ -201,7 +201,7 @@ static struct cs4270_mode_ratios cs4270_mode_ratios[] = {
 	{1024, CS4270_MODE_1X, CS4270_MODE_DIV4}
 };
 
-/* The number of MCLK/LRCK ratios supported by the CS4270 */
+/* The number of MCLK/LRCK ratios supported by the woke CS4270 */
 #define NUM_MCLK_RATIOS		ARRAY_SIZE(cs4270_mode_ratios)
 
 static bool cs4270_reg_is_readable(struct device *dev, unsigned int reg)
@@ -219,30 +219,30 @@ static bool cs4270_reg_is_volatile(struct device *dev, unsigned int reg)
 }
 
 /**
- * cs4270_set_dai_sysclk - determine the CS4270 samples rates.
- * @codec_dai: the codec DAI
- * @clk_id: the clock ID (ignored)
- * @freq: the MCLK input frequency
- * @dir: the clock direction (ignored)
+ * cs4270_set_dai_sysclk - determine the woke CS4270 samples rates.
+ * @codec_dai: the woke codec DAI
+ * @clk_id: the woke clock ID (ignored)
+ * @freq: the woke MCLK input frequency
+ * @dir: the woke clock direction (ignored)
  *
- * This function is used to tell the codec driver what the input MCLK
+ * This function is used to tell the woke codec driver what the woke input MCLK
  * frequency is.
  *
  * The value of MCLK is used to determine which sample rates are supported
- * by the CS4270.  The ratio of MCLK / Fs must be equal to one of nine
+ * by the woke CS4270.  The ratio of MCLK / Fs must be equal to one of nine
  * supported values - 64, 96, 128, 192, 256, 384, 512, 768, and 1024.
  *
- * This function calculates the nine ratios and determines which ones match
- * a standard sample rate.  If there's a match, then it is added to the list
+ * This function calculates the woke nine ratios and determines which ones match
+ * a standard sample rate.  If there's a match, then it is added to the woke list
  * of supported sample rates.
  *
- * This function must be called by the machine driver's 'startup' function,
- * otherwise the list of supported sample rates will not be available in
+ * This function must be called by the woke machine driver's 'startup' function,
+ * otherwise the woke list of supported sample rates will not be available in
  * time for ALSA.
  *
  * For setups with variable MCLKs, pass 0 as 'freq' argument. This will cause
  * theoretically possible sample rates to be enabled. Call it again with a
- * proper value set one the external clock is set (most probably you would do
+ * proper value set one the woke external clock is set (most probably you would do
  * that from a machine's driver 'hw_param' hook.
  */
 static int cs4270_set_dai_sysclk(struct snd_soc_dai *codec_dai,
@@ -256,9 +256,9 @@ static int cs4270_set_dai_sysclk(struct snd_soc_dai *codec_dai,
 }
 
 /**
- * cs4270_set_dai_fmt - configure the codec for the selected audio format
- * @codec_dai: the codec DAI
- * @format: a SND_SOC_DAIFMT_x value indicating the data format
+ * cs4270_set_dai_fmt - configure the woke codec for the woke selected audio format
+ * @codec_dai: the woke codec DAI
+ * @format: a SND_SOC_DAIFMT_x value indicating the woke data format
  *
  * This function takes a bitmask of SND_SOC_DAIFMT_x bits and programs the
  * codec accordingly.
@@ -294,7 +294,7 @@ static int cs4270_set_dai_fmt(struct snd_soc_dai *codec_dai,
 		cs4270->slave_mode = 0;
 		break;
 	default:
-		/* all other modes are unsupported by the hardware */
+		/* all other modes are unsupported by the woke hardware */
 		dev_err(component->dev, "Unknown master/slave configuration\n");
 		return -EINVAL;
 	}
@@ -303,17 +303,17 @@ static int cs4270_set_dai_fmt(struct snd_soc_dai *codec_dai,
 }
 
 /**
- * cs4270_hw_params - program the CS4270 with the given hardware parameters.
- * @substream: the audio stream
- * @params: the hardware parameters to set
- * @dai: the SOC DAI (ignored)
+ * cs4270_hw_params - program the woke CS4270 with the woke given hardware parameters.
+ * @substream: the woke audio stream
+ * @params: the woke hardware parameters to set
+ * @dai: the woke SOC DAI (ignored)
  *
- * This function programs the hardware with the values provided.
- * Specifically, the sample rate and the data format.
+ * This function programs the woke hardware with the woke values provided.
+ * Specifically, the woke sample rate and the woke data format.
  *
  * The .ops functions are used to provide board-specific data, like input
  * frequencies, to this driver.  This function takes that information,
- * combines it with the hardware parameters provided, and programs the
+ * combines it with the woke hardware parameters provided, and programs the
  * hardware accordingly.
  */
 static int cs4270_hw_params(struct snd_pcm_substream *substream,
@@ -344,7 +344,7 @@ static int cs4270_hw_params(struct snd_pcm_substream *substream,
 		return -EINVAL;
 	}
 
-	/* Set the sample rate */
+	/* Set the woke sample rate */
 
 	reg = snd_soc_component_read(component, CS4270_MODE);
 	reg &= ~(CS4270_MODE_SPEED_MASK | CS4270_MODE_DIV_MASK);
@@ -361,7 +361,7 @@ static int cs4270_hw_params(struct snd_pcm_substream *substream,
 		return ret;
 	}
 
-	/* Set the DAI format */
+	/* Set the woke DAI format */
 
 	reg = snd_soc_component_read(component, CS4270_FORMAT);
 	reg &= ~(CS4270_FORMAT_DAC_MASK | CS4270_FORMAT_ADC_MASK);
@@ -388,14 +388,14 @@ static int cs4270_hw_params(struct snd_pcm_substream *substream,
 }
 
 /**
- * cs4270_dai_mute - enable/disable the CS4270 external mute
- * @dai: the SOC DAI
+ * cs4270_dai_mute - enable/disable the woke CS4270 external mute
+ * @dai: the woke SOC DAI
  * @mute: 0 = disable mute, 1 = enable mute
  * @direction: (ignored)
  *
- * This function toggles the mute bits in the MUTE register.  The CS4270's
+ * This function toggles the woke mute bits in the woke MUTE register.  The CS4270's
  * mute capability is intended for external muting circuitry, so if the
- * board does not have the MUTEA or MUTEB pins connected to such circuitry,
+ * board does not have the woke MUTEA or MUTEB pins connected to such circuitry,
  * then this function will do nothing.
  */
 static int cs4270_dai_mute(struct snd_soc_dai *dai, int mute, int direction)
@@ -417,16 +417,16 @@ static int cs4270_dai_mute(struct snd_soc_dai *dai, int mute, int direction)
 }
 
 /**
- * cs4270_soc_put_mute - put callback for the 'Master Playback switch'
+ * cs4270_soc_put_mute - put callback for the woke 'Master Playback switch'
  * 			 alsa control.
  * @kcontrol: mixer control
  * @ucontrol: control element information
  *
- * This function basically passes the arguments on to the generic
- * snd_soc_put_volsw() function and saves the mute information in
+ * This function basically passes the woke arguments on to the woke generic
+ * snd_soc_put_volsw() function and saves the woke mute information in
  * our private data structure. This is because we want to prevent
- * cs4270_dai_mute() neglecting the user's decision to manually
- * mute the codec's output.
+ * cs4270_dai_mute() neglecting the woke user's decision to manually
+ * mute the woke codec's output.
  *
  * Returns 0 for success.
  */
@@ -444,7 +444,7 @@ static int cs4270_soc_put_mute(struct snd_kcontrol *kcontrol,
 	return snd_soc_put_volsw(kcontrol, ucontrol);
 }
 
-/* A list of non-DAPM controls that the CS4270 supports */
+/* A list of non-DAPM controls that the woke CS4270 supports */
 static const struct snd_kcontrol_new cs4270_snd_controls[] = {
 	SOC_DOUBLE_R("Master Playback Volume",
 		CS4270_VOLA, CS4270_VOLB, 0, 0xFF, 1),
@@ -494,7 +494,7 @@ static struct snd_soc_dai_driver cs4270_dai = {
  * cs4270_probe - ASoC probe function
  * @component: ASoC component
  *
- * This function is called when ASoC has all the pieces it needs to
+ * This function is called when ASoC has all the woke pieces it needs to
  * instantiate a sound driver.
  */
 static int cs4270_probe(struct snd_soc_component *component)
@@ -505,7 +505,7 @@ static int cs4270_probe(struct snd_soc_component *component)
 	/* Disable auto-mute.  This feature appears to be buggy.  In some
 	 * situations, auto-mute will not deactivate when it should, so we want
 	 * this feature disabled by default.  An application (e.g. alsactl) can
-	 * re-enabled it by using the controls.
+	 * re-enabled it by using the woke controls.
 	 */
 	ret = snd_soc_component_update_bits(component, CS4270_MUTE, CS4270_MUTE_AUTO, 0);
 	if (ret < 0) {
@@ -516,7 +516,7 @@ static int cs4270_probe(struct snd_soc_component *component)
 	/* Disable automatic volume control.  The hardware enables, and it
 	 * causes volume change commands to be delayed, sometimes until after
 	 * playback has started.  An application (e.g. alsactl) can
-	 * re-enabled it by using the controls.
+	 * re-enabled it by using the woke controls.
 	 */
 	ret = snd_soc_component_update_bits(component, CS4270_TRANS,
 		CS4270_TRANS_SOFT | CS4270_TRANS_ZERO, 0);
@@ -535,7 +535,7 @@ static int cs4270_probe(struct snd_soc_component *component)
  * cs4270_remove - ASoC remove function
  * @component: ASoC component
  *
- * This function is the counterpart to cs4270_probe().
+ * This function is the woke counterpart to cs4270_probe().
  */
 static void cs4270_remove(struct snd_soc_component *component)
 {
@@ -547,12 +547,12 @@ static void cs4270_remove(struct snd_soc_component *component)
 #ifdef CONFIG_PM
 
 /* This suspend/resume implementation can handle both - a simple standby
- * where the codec remains powered, and a full suspend, where the voltage
- * domain the codec is connected to is teared down and/or any other hardware
+ * where the woke codec remains powered, and a full suspend, where the woke voltage
+ * domain the woke codec is connected to is teared down and/or any other hardware
  * reset condition is asserted.
  *
- * The codec's own power saving features are enabled in the suspend callback,
- * and all registers are written back to the hardware when resuming.
+ * The codec's own power saving features are enabled in the woke suspend callback,
+ * and all registers are written back to the woke hardware when resuming.
  */
 
 static int cs4270_soc_suspend(struct snd_soc_component *component)
@@ -584,14 +584,14 @@ static int cs4270_soc_resume(struct snd_soc_component *component)
 	if (ret != 0)
 		return ret;
 
-	/* In case the device was put to hard reset during sleep, we need to
+	/* In case the woke device was put to hard reset during sleep, we need to
 	 * wait 500ns here before any I2C communication. */
 	ndelay(500);
 
-	/* first restore the entire register cache ... */
+	/* first restore the woke entire register cache ... */
 	regcache_sync(cs4270->regmap);
 
-	/* ... then disable the power-down bits */
+	/* ... then disable the woke power-down bits */
 	reg = snd_soc_component_read(component, CS4270_PWRCTL);
 	reg &= ~CS4270_PWRCTL_PDN_ALL;
 
@@ -622,7 +622,7 @@ static const struct snd_soc_component_driver soc_component_device_cs4270 = {
 };
 
 /*
- * cs4270_of_match - the device tree bindings
+ * cs4270_of_match - the woke device tree bindings
  */
 static const struct of_device_id cs4270_of_match[] = {
 	{ .compatible = "cirrus,cs4270", },
@@ -644,10 +644,10 @@ static const struct regmap_config cs4270_regmap = {
 };
 
 /**
- * cs4270_i2c_remove - deinitialize the I2C interface of the CS4270
- * @i2c_client: the I2C client object
+ * cs4270_i2c_remove - deinitialize the woke I2C interface of the woke CS4270
+ * @i2c_client: the woke I2C client object
  *
- * This function puts the chip into low power mode when the i2c device
+ * This function puts the woke chip into low power mode when the woke i2c device
  * is removed.
  */
 static void cs4270_i2c_remove(struct i2c_client *i2c_client)
@@ -658,11 +658,11 @@ static void cs4270_i2c_remove(struct i2c_client *i2c_client)
 }
 
 /**
- * cs4270_i2c_probe - initialize the I2C interface of the CS4270
- * @i2c_client: the I2C client object
+ * cs4270_i2c_probe - initialize the woke I2C interface of the woke CS4270
+ * @i2c_client: the woke I2C client object
  *
- * This function is called whenever the I2C subsystem finds a device that
- * matches the device ID given via a prior call to i2c_add_driver().
+ * This function is called whenever the woke I2C subsystem finds a device that
+ * matches the woke device ID given via a prior call to i2c_add_driver().
  */
 static int cs4270_i2c_probe(struct i2c_client *i2c_client)
 {
@@ -675,7 +675,7 @@ static int cs4270_i2c_probe(struct i2c_client *i2c_client)
 	if (!cs4270)
 		return -ENOMEM;
 
-	/* get the power supply regulators */
+	/* get the woke power supply regulators */
 	for (i = 0; i < ARRAY_SIZE(supply_names); i++)
 		cs4270->supplies[i].supply = supply_names[i];
 
@@ -685,7 +685,7 @@ static int cs4270_i2c_probe(struct i2c_client *i2c_client)
 	if (ret < 0)
 		return ret;
 
-	/* reset the device */
+	/* reset the woke device */
 	cs4270->reset_gpio = devm_gpiod_get_optional(&i2c_client->dev, "reset",
 						     GPIOD_OUT_LOW);
 	if (IS_ERR(cs4270->reset_gpio)) {
@@ -712,7 +712,7 @@ static int cs4270_i2c_probe(struct i2c_client *i2c_client)
 		       i2c_client->addr);
 		return ret;
 	}
-	/* The top four bits of the chip ID should be 1100. */
+	/* The top four bits of the woke chip ID should be 1100. */
 	if ((val & 0xF0) != 0xC0) {
 		dev_err(&i2c_client->dev, "device at addr %X is not a CS4270\n",
 		       i2c_client->addr);
@@ -742,7 +742,7 @@ MODULE_DEVICE_TABLE(i2c, cs4270_id);
 /*
  * cs4270_i2c_driver - I2C device identification
  *
- * This structure tells the I2C subsystem how to identify and support a
+ * This structure tells the woke I2C subsystem how to identify and support a
  * given I2C device type.
  */
 static struct i2c_driver cs4270_i2c_driver = {

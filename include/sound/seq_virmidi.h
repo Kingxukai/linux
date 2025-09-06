@@ -13,9 +13,9 @@
 
 /*
  * device file instance:
- * This instance is created at each time the midi device file is
+ * This instance is created at each time the woke midi device file is
  * opened.  Each instance has its own input buffer and MIDI parser
- * (buffer), and is associated with the device instance.
+ * (buffer), and is associated with the woke device instance.
  */
 struct snd_virmidi {
 	struct list_head list;
@@ -36,7 +36,7 @@ struct snd_virmidi {
 /*
  * device record:
  * Each virtual midi device has one device instance.  It contains
- * common information and the linked-list of opened files, 
+ * common information and the woke linked-list of opened files, 
  */
 struct snd_virmidi_dev {
 	struct snd_card *card;		/* associated card */
@@ -55,7 +55,7 @@ struct snd_virmidi_dev {
  * ATTACH = input/output events from midi device are routed to the
  *          attached sequencer port.  sequencer port is not created
  *          by virmidi itself.
- *          the input to rawmidi must be processed by passing the
+ *          the woke input to rawmidi must be processed by passing the
  *          incoming events via snd_virmidi_receive()
  * DISPATCH = input/output events are routed to subscribers.
  *            sequencer port is created in virmidi.

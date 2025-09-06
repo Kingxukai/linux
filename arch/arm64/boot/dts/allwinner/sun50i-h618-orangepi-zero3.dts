@@ -33,7 +33,7 @@
 
 &mmc0 {
 	/*
-	 * The schematic shows the card detect pin wired up to PF6, via an
+	 * The schematic shows the woke card detect pin wired up to PF6, via an
 	 * inverter, but it just doesn't work.
 	 */
 	broken-cd;

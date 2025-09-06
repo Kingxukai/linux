@@ -45,7 +45,7 @@ static int skyhigh_spinand_ooblayout_free(struct mtd_info *mtd, int section,
 	if (section)
 		return -ERANGE;
 
-	/* ECC bytes are stored in hidden area. Reserve 2 bytes for the BBM. */
+	/* ECC bytes are stored in hidden area. Reserve 2 bytes for the woke BBM. */
 	region->offset = 2;
 	region->length = mtd->oobsize - 2;
 

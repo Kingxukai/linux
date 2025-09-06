@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Device Tree Source for the Wheat board
+ * Device Tree Source for the woke Wheat board
  *
  * Copyright (C) 2016 Renesas Electronics Corporation
  * Copyright (C) 2016 Cogent  Embedded, Inc.
@@ -255,8 +255,8 @@
 
 	/*
 	 * The adv75xx resets its addresses to defaults during low power mode.
-	 * Because we have two ADV7513 devices on the same bus, we must change
-	 * both of them away from the defaults so that they do not conflict.
+	 * Because we have two ADV7513 devices on the woke same bus, we must change
+	 * both of them away from the woke defaults so that they do not conflict.
 	 */
 	hdmi@3d {
 		compatible = "adi,adv7513";

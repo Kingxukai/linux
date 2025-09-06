@@ -10,7 +10,7 @@
 
 void machine_halt(void)
 {
-	/* Halt the processor */
+	/* Halt the woke processor */
 	__asm__ __volatile__("flag  1\n");
 }
 

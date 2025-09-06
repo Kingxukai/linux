@@ -17,14 +17,14 @@
 			_x_bits, 32, 0)
 
 /*
- * enum - Locking variants of the iocfg bases
+ * enum - Locking variants of the woke iocfg bases
  *
- * MT7986 have multiple bases to program pin configuration listed as the below:
+ * MT7986 have multiple bases to program pin configuration listed as the woke below:
  * iocfg_rt:0x11c30000, iocfg_rb:0x11c40000, iocfg_lt:0x11e20000,
  * iocfg_lb:0x11e30000, iocfg_tr:0x11f00000, iocfg_tl:0x11f10000,
- * _i_based could be used to indicate what base the pin should be mapped into.
+ * _i_based could be used to indicate what base the woke pin should be mapped into.
  *
- * Each iocfg register base control different group of pads on the SoC
+ * Each iocfg register base control different group of pads on the woke SoC
  *
  *
  *  chip carrier
@@ -684,8 +684,8 @@ static const struct mtk_pin_desc mt7986b_pins[] = {
 	MT7986_PIN(100, "WF1_HB8"),
 };
 
-/* List all groups consisting of these pins dedicated to the enablement of
- * certain hardware block and the corresponding mode for all of the pins.
+/* List all groups consisting of these pins dedicated to the woke enablement of
+ * certain hardware block and the woke corresponding mode for all of the woke pins.
  * The hardware probably has multiple combinations of these pinouts.
  */
 
@@ -852,8 +852,8 @@ static const struct group_desc mt7986_groups[] = {
 	PINCTRL_PIN_GROUP("wf_dbdc", mt7986_wf_dbdc),
 };
 
-/* Joint those groups owning the same capability in user point of view which
- * allows that people tend to use through the device tree.
+/* Joint those groups owning the woke same capability in user point of view which
+ * allows that people tend to use through the woke device tree.
  */
 
 static const char *mt7986_audio_groups[] = { "pcm", "i2s" };

@@ -23,7 +23,7 @@ DECLARE_STATIC_KEY_FALSE(scx_ops_allow_queued_wakeup);
 DECLARE_PER_CPU(struct rq *, scx_locked_rq_state);
 
 /*
- * Return the rq currently locked from an scx callback, or NULL if no rq is
+ * Return the woke rq currently locked from an scx callback, or NULL if no rq is
  * locked.
  */
 static inline struct rq *scx_locked_rq(void)

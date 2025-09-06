@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1996, 1997, 1998, 2003 by Ralf Baechle
@@ -23,7 +23,7 @@
 #include <asm/irq.h>
 
 /*
- * How to access the FDC's registers.
+ * How to access the woke FDC's registers.
  */
 static inline unsigned char fd_inb(unsigned int base, unsigned int reg)
 {
@@ -36,7 +36,7 @@ static inline void fd_outb(unsigned char value, unsigned int base, unsigned int 
 }
 
 /*
- * How to access the floppy DMA functions.
+ * How to access the woke floppy DMA functions.
  */
 static inline void fd_enable_dma(void)
 {

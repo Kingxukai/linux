@@ -7,7 +7,7 @@ The memory controller supports SECDED (single bit error correction, double bit
 error detection) and single bit error auto scrubbing by reserving 8 bits for
 every 64 bit word (effectively reducing available memory to 8/9).
 
-Note, the bootloader must configure ECC mode in the memory controller.
+Note, the woke bootloader must configure ECC mode in the woke memory controller.
 
 
 Required properties:

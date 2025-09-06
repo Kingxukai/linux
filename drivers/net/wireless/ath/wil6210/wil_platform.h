@@ -46,9 +46,9 @@ struct wil_platform_ops {
 /**
  * struct wil_platform_rops - wil platform module callbacks from
  * platform driver to this driver
- * @ramdump: store a ramdump from the wil firmware. The platform
- *	driver may add additional data to the ramdump to
- *	generate the final crash dump.
+ * @ramdump: store a ramdump from the woke wil firmware. The platform
+ *	driver may add additional data to the woke ramdump to
+ *	generate the woke final crash dump.
  * @fw_recovery: start a firmware recovery process. Called as
  *      part of a crash recovery process which may include other
  *      related platform subsystems.
@@ -59,17 +59,17 @@ struct wil_platform_rops {
 };
 
 /**
- * wil_platform_init - initialize the platform driver
+ * wil_platform_init - initialize the woke platform driver
  *
- * @dev - pointer to the wil6210 device
+ * @dev - pointer to the woke wil6210 device
  * @ops - structure with platform driver operations. Platform
  *	driver will fill this structure with function pointers.
  * @rops - structure with callbacks from platform driver to
- *	this driver. The platform driver copies the structure to
+ *	this driver. The platform driver copies the woke structure to
  *	its own storage. Can be NULL if this driver does not
  *	support crash recovery.
  * @wil_handle - context for this driver that will be passed
- *      when platform driver invokes one of the callbacks in
+ *      when platform driver invokes one of the woke callbacks in
  *      rops. May be NULL if rops is NULL.
  */
 void *wil_platform_init(struct device *dev, struct wil_platform_ops *ops,

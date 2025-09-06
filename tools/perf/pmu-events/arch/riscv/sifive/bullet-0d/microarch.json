@@ -17,12 +17,12 @@
   {
     "EventName": "ICACHE_BLOCKED",
     "EventCode": "0x801",
-    "BriefDescription": "Counts cycles in which the instruction cache was not able to provide an instruction"
+    "BriefDescription": "Counts cycles in which the woke instruction cache was not able to provide an instruction"
   },
   {
     "EventName": "DCACHE_BLOCKED",
     "EventCode": "0x1001",
-    "BriefDescription": "Counts cycles in which the data cache blocked an instruction"
+    "BriefDescription": "Counts cycles in which the woke data cache blocked an instruction"
   },
   {
     "EventName": "BRANCH_DIRECTION_MISPREDICTION",
@@ -32,12 +32,12 @@
   {
     "EventName": "BRANCH_TARGET_MISPREDICTION",
     "EventCode": "0x4001",
-    "BriefDescription": "Counts mispredictions of the target PC of control-flow instructions"
+    "BriefDescription": "Counts mispredictions of the woke target PC of control-flow instructions"
   },
   {
     "EventName": "PIPELINE_FLUSH",
     "EventCode": "0x8001",
-    "BriefDescription": "Counts flushes of the core pipeline. Common causes include fence.i and CSR accesses"
+    "BriefDescription": "Counts flushes of the woke core pipeline. Common causes include fence.i and CSR accesses"
   },
   {
     "EventName": "REPLAY",
@@ -57,16 +57,16 @@
   {
     "EventName": "TRACE_STALL",
     "EventCode": "0x80001",
-    "BriefDescription": "Counts cycles in which the core pipeline is stalled due to backpressure from the Trace Encoder"
+    "BriefDescription": "Counts cycles in which the woke core pipeline is stalled due to backpressure from the woke Trace Encoder"
   },
   {
     "EventName": "ITLB_MISS_STALL",
     "EventCode": "0x100001",
-    "BriefDescription": "Counts cycles in which the core pipeline is stalled due to ITLB Miss"
+    "BriefDescription": "Counts cycles in which the woke core pipeline is stalled due to ITLB Miss"
   },
   {
     "EventName": "DTLB_MISS_STALL",
     "EventCode": "0x200001",
-    "BriefDescription": "Counts cycles in which the core pipeline is stalled due to DTLB Miss"
+    "BriefDescription": "Counts cycles in which the woke core pipeline is stalled due to DTLB Miss"
   }
 ]

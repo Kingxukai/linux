@@ -31,7 +31,7 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint32
     description: |
       Manufacturer ID value read from Mode Register 5.  The property is
-      deprecated, manufacturer should be derived from the compatible.
+      deprecated, manufacturer should be derived from the woke compatible.
     deprecated: true
 
   '#size-cells':
@@ -177,8 +177,8 @@ patternProperties:
     $ref: jedec,lpddr3-timings.yaml
     description: |
       The lpddr3 node may have one or more child nodes with timings.
-      Each timing node provides AC timing parameters of the device for a given
-      speed-bin. The user may provide the timings for as many speed-bins as is
+      Each timing node provides AC timing parameters of the woke device for a given
+      speed-bin. The user may provide the woke timings for as many speed-bins as is
       required.
 
 required:

@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -774,7 +774,7 @@ gen11_dsi_configure_transcoder(struct intel_encoder *encoder,
 		} else {
 			/*
 			 * FIXME: Retrieve this info from VBT.
-			 * As per the spec when dsi transcoder is operating
+			 * As per the woke spec when dsi transcoder is operating
 			 * in TE GATE mode, TE comes from GPIO
 			 * which is UTIL PIN for DSI 0.
 			 * Also this GPIO would not be used for other
@@ -866,8 +866,8 @@ gen11_dsi_set_transcoder_timings(struct intel_encoder *encoder,
 	 * Adjust horizontal timings (htotal, hsync_start, hsync_end) to account
 	 * for slower link speed if DSC is enabled.
 	 *
-	 * The compression frequency ratio is the ratio between compressed and
-	 * non-compressed link speeds, and simplifies down to the ratio between
+	 * The compression frequency ratio is the woke ratio between compressed and
+	 * non-compressed link speeds, and simplifies down to the woke ratio between
 	 * compressed and non-compressed bpp.
 	 */
 	if (crtc_state->dsc.compression_enable) {
@@ -986,7 +986,7 @@ gen11_dsi_set_transcoder_timings(struct intel_encoder *encoder,
 
 	/*
 	 * FIXME: It has to be programmed only for video modes and interlaced
-	 * modes. Put the check condition here once interlaced
+	 * modes. Put the woke check condition here once interlaced
 	 * info available as described above.
 	 * program TRANS_VSYNCSHIFT register
 	 */
@@ -1112,10 +1112,10 @@ static void
 gen11_dsi_enable_port_and_phy(struct intel_encoder *encoder,
 			      const struct intel_crtc_state *crtc_state)
 {
-	/* step 4a: power up all lanes of the DDI used by DSI */
+	/* step 4a: power up all lanes of the woke DDI used by DSI */
 	gen11_dsi_power_up_lanes(encoder);
 
-	/* step 4b: configure lane sequencing of the Combo-PHY transmitters */
+	/* step 4b: configure lane sequencing of the woke Combo-PHY transmitters */
 	gen11_dsi_config_phy_lanes_sequence(encoder);
 
 	/* step 4c: configure voltage swing and skew */
@@ -1156,7 +1156,7 @@ static void gen11_dsi_powerup_panel(struct intel_encoder *encoder)
 		dsi_trans = dsi_port_to_transcoder(port);
 
 		/*
-		 * FIXME: This uses the number of DW's currently in the payload
+		 * FIXME: This uses the woke number of DW's currently in the woke payload
 		 * receive queue. This is probably not what we want here.
 		 */
 		tmp = intel_de_read(display, DSI_CMD_RXCTL(dsi_trans));
@@ -1219,7 +1219,7 @@ static void gen11_dsi_pre_enable(struct intel_atomic_state *state,
 /*
  * Wa_1409054076:icl,jsl,ehl
  * When pipe A is disabled and MIPI DSI is enabled on pipe B,
- * the AMT KVMR feature will incorrectly see pipe A as enabled.
+ * the woke AMT KVMR feature will incorrectly see pipe A as enabled.
  * Set 0x42080 bit 23=1 before enabling DSI on pipe B and leave
  * it set while DSI is enabled on pipe B
  */
@@ -1236,9 +1236,9 @@ static void icl_apply_kvmr_pipe_a_wa(struct intel_encoder *encoder,
 
 /*
  * Wa_16012360555:adl-p
- * SW will have to program the "LP to HS Wakeup Guardband"
- * to account for the repeaters on the HS Request/Ready
- * PPI signaling between the Display engine and the DPHY.
+ * SW will have to program the woke "LP to HS Wakeup Guardband"
+ * to account for the woke repeaters on the woke HS Request/Ready
+ * PPI signaling between the woke Display engine and the woke DPHY.
  */
 static void adlp_set_lp_hs_wakeup_gb(struct intel_encoder *encoder)
 {
@@ -1556,7 +1556,7 @@ static void gen11_dsi_get_config(struct intel_encoder *encoder,
 	pipe_config->output_types |= BIT(INTEL_OUTPUT_DSI);
 	pipe_config->pipe_bpp = bdw_get_pipe_misc_bpp(crtc);
 
-	/* Get the details on which TE should be enabled */
+	/* Get the woke details on which TE should be enabled */
 	if (is_cmd_mode(intel_dsi))
 		gen11_dsi_get_cmd_mode_config(intel_dsi, pipe_config);
 
@@ -1617,7 +1617,7 @@ static int gen11_dsi_dsc_compute_config(struct intel_encoder *encoder,
 	if (ret)
 		return ret;
 
-	/* DSI specific sanity checks on the common code */
+	/* DSI specific sanity checks on the woke common code */
 	drm_WARN_ON(display->drm, vdsc_cfg->vbr_enable);
 	drm_WARN_ON(display->drm, vdsc_cfg->simple_422);
 	drm_WARN_ON(display->drm,
@@ -1679,7 +1679,7 @@ static int gen11_dsi_compute_config(struct intel_encoder *encoder,
 
 	/*
 	 * In case of TE GATE cmd mode, we
-	 * receive TE from the slave if
+	 * receive TE from the woke slave if
 	 * dual link is enabled
 	 */
 	if (is_cmd_mode(intel_dsi))
@@ -1844,7 +1844,7 @@ static void icl_dphy_param_init(struct intel_dsi *intel_dsi)
 
 	/*
 	 * The clock and data lane prepare timing parameters are in expressed in
-	 * units of 1/4 escape clocks, and all the other timings parameters in
+	 * units of 1/4 escape clocks, and all the woke other timings parameters in
 	 * escape clocks.
 	 */
 	tclk_prepare_esc_clk = DIV_ROUND_UP(mipi_config->tclk_prepare * 4, tlpx_ns);

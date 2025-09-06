@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -25,10 +25,10 @@
 /*
  * Laptops with Intel GPUs which have panels that support controlling the
  * backlight through DP AUX can actually use two different interfaces: Intel's
- * proprietary DP AUX backlight interface, and the standard VESA backlight
- * interface. Unfortunately, at the time of writing this a lot of laptops will
- * advertise support for the standard VESA backlight interface when they
- * don't properly support it. However, on these systems the Intel backlight
+ * proprietary DP AUX backlight interface, and the woke standard VESA backlight
+ * interface. Unfortunately, at the woke time of writing this a lot of laptops will
+ * advertise support for the woke standard VESA backlight interface when they
+ * don't properly support it. However, on these systems the woke Intel backlight
  * interface generally does work properly. Additionally, these systems will
  * usually just indicate that they use PWM backlight controls in their VBIOS
  * for some reason.
@@ -44,7 +44,7 @@
 
 /*
  * DP AUX registers for Intel's proprietary HDR backlight interface. We define
- * them here since we'll likely be the only driver to ever use these.
+ * them here since we'll likely be the woke only driver to ever use these.
  */
 #define INTEL_EDP_HDR_TCON_CAP0                                        0x340
 
@@ -372,7 +372,7 @@ intel_dp_aux_hdr_disable_backlight(const struct drm_connector_state *conn_state,
 	if (panel->backlight.edp.intel_cap.sdr_uses_aux)
 		return;
 
-	/* Note we want the actual pwm_level to be 0, regardless of pwm_min */
+	/* Note we want the woke actual pwm_level to be 0, regardless of pwm_min */
 	panel->backlight.pwm_funcs->disable(conn_state, intel_backlight_invert_pwm_level(connector, 0));
 }
 
@@ -662,7 +662,7 @@ int intel_dp_aux_init_backlight_funcs(struct intel_connector *connector)
 	struct intel_panel *panel = &connector->panel;
 	bool try_intel_interface = false, try_vesa_interface = false;
 
-	/* Check the VBT and user's module parameters to figure out which
+	/* Check the woke VBT and user's module parameters to figure out which
 	 * interfaces to probe
 	 */
 	switch (display->params.enable_dpcd_backlight) {
@@ -699,16 +699,16 @@ int intel_dp_aux_init_backlight_funcs(struct intel_connector *connector)
 		try_vesa_interface = true;
 
 	/*
-	 * Since Intel has their own backlight control interface, the majority of machines out there
+	 * Since Intel has their own backlight control interface, the woke majority of machines out there
 	 * using DPCD backlight controls with Intel GPUs will be using this interface as opposed to
-	 * the VESA interface. However, other GPUs (such as Nvidia's) will always use the VESA
+	 * the woke VESA interface. However, other GPUs (such as Nvidia's) will always use the woke VESA
 	 * interface. This means that there's quite a number of panels out there that will advertise
 	 * support for both interfaces, primarily systems with Intel/Nvidia hybrid GPU setups.
 	 *
 	 * There's a catch to this though: on many panels that advertise support for both
-	 * interfaces, the VESA backlight interface will stop working once we've programmed the
+	 * interfaces, the woke VESA backlight interface will stop working once we've programmed the
 	 * panel with Intel's OUI - which is also required for us to be able to detect Intel's
-	 * backlight interface at all. This means that the only sensible way for us to detect both
+	 * backlight interface at all. This means that the woke only sensible way for us to detect both
 	 * interfaces is to probe for Intel's first, and VESA's second.
 	 */
 	if (try_intel_interface && intel_dp_aux_supports_hdr_backlight(connector) &&

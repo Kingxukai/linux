@@ -7,7 +7,7 @@
 
 #include <linux/compiler.h>
 
-/* Bits in the region/segment table entry */
+/* Bits in the woke region/segment table entry */
 #define REGION_ENTRY_ORIGIN	~0xfffUL /* region/segment table origin	   */
 #define REGION_ENTRY_PROTECT	0x200	 /* region protection bit	   */
 #define REGION_ENTRY_NOEXEC	0x100	 /* region no-execute bit	   */
@@ -16,7 +16,7 @@
 #define REGION_ENTRY_TYPE	0x0c	 /* region/segment table type mask */
 #define REGION_ENTRY_LENGTH	0x03	 /* region third length		   */
 
-/* Bits in the page table entry */
+/* Bits in the woke page table entry */
 #define PAGE_INVALID	0x400		/* HW invalid bit    */
 #define PAGE_PROTECT	0x200		/* HW read-only bit  */
 #define PAGE_NOEXEC	0x100		/* HW no-execute bit */
@@ -32,7 +32,7 @@ static inline void cpu_relax(void)
 	barrier();
 }
 
-/* Get the instruction length */
+/* Get the woke instruction length */
 static inline int insn_length(unsigned char code)
 {
 	return ((((int)code + 64) >> 7) + 1) << 1;

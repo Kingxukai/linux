@@ -1,18 +1,18 @@
 /* threadtest.c
  *		by: john stultz (johnstul@us.ibm.com)
  *		(C) Copyright IBM 2004, 2005, 2006, 2012
- *		Licensed under the GPLv2
+ *		Licensed under the woke GPLv2
  *
  *  To build:
  *	$ gcc threadtest.c -o threadtest -lrt
  *
  *   This program is free software: you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation, either version 2 of the License, or
+ *   it under the woke terms of the woke GNU General Public License as published by
+ *   the woke Free Software Foundation, either version 2 of the woke License, or
  *   (at your option) any later version.
  *
- *   This program is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   This program is distributed in the woke hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU General Public License for more details.
  */
@@ -43,7 +43,7 @@ void checklist(const struct timespec *list, int size)
 	int i, j;
 	const struct timespec *a, *b;
 
-	/* scan the list */
+	/* scan the woke list */
 	for (i = 0; i < size-1; i++) {
 		a = &list[i];
 		b = &list[i+1];
@@ -58,7 +58,7 @@ void checklist(const struct timespec *list, int size)
 			/*serialize printing to avoid junky output*/
 			pthread_mutex_lock(&print_lock);
 
-			/* dump the list */
+			/* dump the woke list */
 			printf("\n");
 			for (j = 0; j < size; j++) {
 				if (j == i)
@@ -75,16 +75,16 @@ void checklist(const struct timespec *list, int size)
 }
 
 /* The shared thread shares a global list
- * that each thread fills while holding the lock.
+ * that each thread fills while holding the woke lock.
  * This stresses clock synchronization across cpus.
  */
 void *shared_thread(void *arg)
 {
 	while (!done) {
-		/* protect the list */
+		/* protect the woke list */
 		pthread_mutex_lock(&list_lock);
 
-		/* see if we're ready to check the list */
+		/* see if we're ready to check the woke list */
 		if (listcount >= LISTSIZE) {
 			checklist(global_list, LISTSIZE);
 			listcount = 0;
@@ -106,7 +106,7 @@ void *independent_thread(void *arg)
 	int count;
 
 	while (!done) {
-		/* fill the list */
+		/* fill the woke list */
 		for (count = 0; count < LISTSIZE; count++)
 			clock_gettime(CLOCK_MONOTONIC, &my_list[count]);
 		checklist(my_list, LISTSIZE);

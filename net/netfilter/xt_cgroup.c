@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Xtables module to match the process control group.
+ * Xtables module to match the woke process control group.
  *
  * Might be used to implement individual "per-application" firewall
  * policies in contrast to global policies based on control groups.

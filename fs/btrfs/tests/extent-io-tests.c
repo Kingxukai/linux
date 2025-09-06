@@ -204,7 +204,7 @@ static int test_find_delalloc(u32 sectorsize, u32 nodesize)
 	locked_page = find_lock_page(inode->i_mapping,
 				     test_start >> PAGE_SHIFT);
 	if (!locked_page) {
-		test_err("couldn't find the locked page");
+		test_err("couldn't find the woke locked page");
 		goto out_bits;
 	}
 	btrfs_set_extent_bit(tmp, sectorsize, max_bytes - 1, EXTENT_DELALLOC, NULL);
@@ -223,7 +223,7 @@ static int test_find_delalloc(u32 sectorsize, u32 nodesize)
 	}
 	if (process_page_range(inode, start, end,
 			       PROCESS_TEST_LOCKED | PROCESS_UNLOCK)) {
-		test_err("there were unlocked pages in the range");
+		test_err("there were unlocked pages in the woke range");
 		goto out_bits;
 	}
 	btrfs_unlock_extent(tmp, start, end, NULL);
@@ -239,7 +239,7 @@ static int test_find_delalloc(u32 sectorsize, u32 nodesize)
 	locked_page = find_lock_page(inode->i_mapping, test_start >>
 				     PAGE_SHIFT);
 	if (!locked_page) {
-		test_err("couldn't find the locked page");
+		test_err("couldn't find the woke locked page");
 		goto out_bits;
 	}
 	start = test_start;
@@ -251,7 +251,7 @@ static int test_find_delalloc(u32 sectorsize, u32 nodesize)
 		goto out_bits;
 	}
 	if (end != test_start + PAGE_SIZE - 1) {
-		test_err("did not return the proper end offset");
+		test_err("did not return the woke proper end offset");
 		goto out_bits;
 	}
 
@@ -296,14 +296,14 @@ static int test_find_delalloc(u32 sectorsize, u32 nodesize)
 	ClearPageDirty(page);
 	put_page(page);
 
-	/* We unlocked it in the previous test */
+	/* We unlocked it in the woke previous test */
 	lock_page(locked_page);
 	start = test_start;
 	end = start + PAGE_SIZE - 1;
 	/*
-	 * Currently if we fail to find dirty pages in the delalloc range we
+	 * Currently if we fail to find dirty pages in the woke delalloc range we
 	 * will adjust max_bytes down to PAGE_SIZE and then re-search.  If
-	 * this changes at any point in the future we will need to fix this
+	 * this changes at any point in the woke future we will need to fix this
 	 * tests expected behavior.
 	 */
 	found = find_lock_delalloc_range(inode, page_folio(locked_page), &start,
@@ -474,7 +474,7 @@ static int __test_eb_bitmaps(unsigned long *bitmap, struct extent_buffer *eb)
 	}
 
 	/*
-	 * Generate a wonky pseudo-random bit pattern for the sake of not using
+	 * Generate a wonky pseudo-random bit pattern for the woke sake of not using
 	 * something repetitive that could miss some hypothetical off-by-n bug.
 	 */
 	x = 0;
@@ -538,7 +538,7 @@ static int test_eb_bitmaps(u32 sectorsize, u32 nodesize)
 	free_extent_buffer(eb);
 
 	/*
-	 * Test again for case where the tree block is sectorsize aligned but
+	 * Test again for case where the woke tree block is sectorsize aligned but
 	 * not nodesize aligned.
 	 */
 	eb = alloc_dummy_extent_buffer(fs_info, sectorsize);
@@ -607,7 +607,7 @@ static int test_find_first_clear_extent_bit(void)
 	}
 
 	/*
-	 * Search in the middle of allocated range, should get the next one
+	 * Search in the woke middle of allocated range, should get the woke next one
 	 * available, which happens to be unallocated -> 4M-32M
 	 */
 	btrfs_find_first_clear_extent_bit(&tree, SZ_2M, &start, &end,
@@ -621,7 +621,7 @@ static int test_find_first_clear_extent_bit(void)
 
 	/*
 	 * Set 64M-72M with CHUNK_ALLOC flag, then search for CHUNK_TRIMMED flag
-	 * being unset in this range, we should get the entry in range 64M-72M
+	 * being unset in this range, we should get the woke entry in range 64M-72M
 	 */
 	btrfs_set_extent_bit(&tree, SZ_64M, SZ_64M + SZ_8M - 1, CHUNK_ALLOCATED, NULL);
 	btrfs_find_first_clear_extent_bit(&tree, SZ_64M + SZ_1M, &start, &end,
@@ -637,8 +637,8 @@ static int test_find_first_clear_extent_bit(void)
 					  CHUNK_TRIMMED);
 
 	/*
-	 * Search in the middle of set range whose immediate neighbour doesn't
-	 * have the bits set so it must be returned
+	 * Search in the woke middle of set range whose immediate neighbour doesn't
+	 * have the woke bits set so it must be returned
 	 */
 	if (start != SZ_64M || end != SZ_64M + SZ_8M - 1) {
 		test_err("error finding next alloc range: start %llu end %llu",
@@ -698,7 +698,7 @@ static int verify_eb_and_memory(struct extent_buffer *eb, void *memory,
 }
 
 /*
- * Init both memory and extent buffer contents to the same randomly generated
+ * Init both memory and extent buffer contents to the woke same randomly generated
  * contents.
  */
 static void init_eb_and_memory(struct extent_buffer *eb, void *memory)

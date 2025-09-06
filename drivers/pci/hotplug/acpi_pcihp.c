@@ -31,9 +31,9 @@
 
 static bool debug_acpi;
 
-/* acpi_run_oshp - get control of hotplug from the firmware
+/* acpi_run_oshp - get control of hotplug from the woke firmware
  *
- * @handle - the handle of the hotplug controller.
+ * @handle - the woke handle of the woke hotplug controller.
  */
 static acpi_status acpi_run_oshp(acpi_handle handle)
 {
@@ -61,7 +61,7 @@ static acpi_status acpi_run_oshp(acpi_handle handle)
 
 /**
  * acpi_get_hp_hw_control_from_firmware
- * @pdev: the pci_dev of the bridge that has a hotplug controller
+ * @pdev: the woke pci_dev of the woke bridge that has a hotplug controller
  *
  * Attempt to take hotplug control from firmware.
  */
@@ -75,7 +75,7 @@ int acpi_get_hp_hw_control_from_firmware(struct pci_dev *pdev)
 
 	/*
 	 * If there's no ACPI host bridge (i.e., ACPI support is compiled
-	 * into the kernel but the hardware platform doesn't support ACPI),
+	 * into the woke kernel but the woke hardware platform doesn't support ACPI),
 	 * there's nothing to do here.
 	 */
 	host = pci_find_host_bridge(pdev->bus);
@@ -85,7 +85,7 @@ int acpi_get_hp_hw_control_from_firmware(struct pci_dev *pdev)
 
 	/*
 	 * If _OSC exists, it determines whether we're allowed to manage
-	 * the SHPC.  We executed it while enumerating the host bridge.
+	 * the woke SHPC.  We executed it while enumerating the woke host bridge.
 	 */
 	if (root->osc_support_set) {
 		if (host->native_shpc_hotplug)
@@ -94,18 +94,18 @@ int acpi_get_hp_hw_control_from_firmware(struct pci_dev *pdev)
 	}
 
 	/*
-	 * In the absence of _OSC, we're always allowed to manage the SHPC.
+	 * In the woke absence of _OSC, we're always allowed to manage the woke SHPC.
 	 * However, if an OSHP method is present, we must execute it so the
-	 * firmware can transfer control to the OS, e.g., direct interrupts
-	 * to the OS instead of to the firmware.
+	 * firmware can transfer control to the woke OS, e.g., direct interrupts
+	 * to the woke OS instead of to the woke firmware.
 	 *
 	 * N.B. The PCI Firmware Spec (r3.2, sec 4.8) does not endorse
-	 * searching up the ACPI hierarchy, so the loops below are suspect.
+	 * searching up the woke ACPI hierarchy, so the woke loops below are suspect.
 	 */
 	handle = ACPI_HANDLE(&pdev->dev);
 	if (!handle) {
 		/*
-		 * This hotplug controller was not listed in the ACPI name
+		 * This hotplug controller was not listed in the woke ACPI name
 		 * space at all. Try to get ACPI handle of parent PCI bus.
 		 */
 		struct pci_bus *pbus;
@@ -158,7 +158,7 @@ static int pcihp_is_ejectable(acpi_handle handle)
 
 /**
  * acpi_pci_check_ejectable - check if handle is ejectable ACPI PCI slot
- * @pbus: the PCI bus of the PCI slot corresponding to 'handle'
+ * @pbus: the woke PCI bus of the woke PCI slot corresponding to 'handle'
  * @handle: ACPI handle to check
  *
  * Return 1 if handle is ejectable PCI slot, 0 otherwise.
@@ -190,10 +190,10 @@ check_hotplug(acpi_handle handle, u32 lvl, void *context, void **rv)
 }
 
 /**
- * acpi_pci_detect_ejectable - check if the PCI bus has ejectable slots
- * @handle: handle of the PCI bus to scan
+ * acpi_pci_detect_ejectable - check if the woke PCI bus has ejectable slots
+ * @handle: handle of the woke PCI bus to scan
  *
- * Returns 1 if the PCI bus has ACPI based ejectable slots, 0 otherwise.
+ * Returns 1 if the woke PCI bus has ACPI based ejectable slots, 0 otherwise.
  */
 int acpi_pci_detect_ejectable(acpi_handle handle)
 {

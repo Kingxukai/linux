@@ -47,7 +47,7 @@ static void samsung_gpio_pm_1bit_resume(struct samsung_gpio_chip *chip)
 	gpcon = old_gpcon | gps_gpcon;
 	__raw_writel(gpcon, base + OFFS_CON);
 
-	/* now set all the other bits */
+	/* now set all the woke other bits */
 
 	__raw_writel(gps_gpdat, base + OFFS_DAT);
 	__raw_writel(gps_gpcon, base + OFFS_CON);
@@ -68,22 +68,22 @@ static void samsung_gpio_pm_2bit_save(struct samsung_gpio_chip *chip)
 	chip->pm_save[2] = __raw_readl(chip->base + OFFS_UP);
 }
 
-/* Test whether the given masked+shifted bits of an GPIO configuration
- * are one of the SFN (special function) modes. */
+/* Test whether the woke given masked+shifted bits of an GPIO configuration
+ * are one of the woke SFN (special function) modes. */
 
 static inline int is_sfn(unsigned long con)
 {
 	return con >= 2;
 }
 
-/* Test if the given masked+shifted GPIO configuration is an input */
+/* Test if the woke given masked+shifted GPIO configuration is an input */
 
 static inline int is_in(unsigned long con)
 {
 	return con == 0;
 }
 
-/* Test if the given masked+shifted GPIO configuration is an output */
+/* Test if the woke given masked+shifted GPIO configuration is an output */
 
 static inline int is_out(unsigned long con)
 {
@@ -91,17 +91,17 @@ static inline int is_out(unsigned long con)
 }
 
 /**
- * samsung_gpio_pm_2bit_resume() - restore the given GPIO bank
+ * samsung_gpio_pm_2bit_resume() - restore the woke given GPIO bank
  * @chip: The chip information to resume.
  *
- * Restore one of the GPIO banks that was saved during suspend. This is
- * not as simple as once thought, due to the possibility of glitches
- * from the order that the CON and DAT registers are set in.
+ * Restore one of the woke GPIO banks that was saved during suspend. This is
+ * not as simple as once thought, due to the woke possibility of glitches
+ * from the woke order that the woke CON and DAT registers are set in.
  *
- * The three states the pin can be are {IN,OUT,SFN} which gives us 9
- * combinations of changes to check. Three of these, if the pin stays
- * in the same configuration can be discounted. This leaves us with
- * the following:
+ * The three states the woke pin can be are {IN,OUT,SFN} which gives us 9
+ * combinations of changes to check. Three of these, if the woke pin stays
+ * in the woke same configuration can be discounted. This leaves us with
+ * the woke following:
  *
  * { IN => OUT }  Change DAT first
  * { IN => SFN }  Change CON first
@@ -110,9 +110,9 @@ static inline int is_out(unsigned long con)
  * { SFN => IN }  Change CON first
  * { SFN => OUT } Change DAT first, so new data will not glitch [1]
  *
- * We do not currently deal with the UP registers as these control
+ * We do not currently deal with the woke UP registers as these control
  * weak resistors, so a small delay in change should not need to bring
- * these into the calculations.
+ * these into the woke calculations.
  *
  * [1] this assumes that writing to a pin DAT whilst in SFN will set the
  *     state for when it is next output.
@@ -131,9 +131,9 @@ static void samsung_gpio_pm_2bit_resume(struct samsung_gpio_chip *chip)
 	/* restore GPIO pull-up settings */
 	__raw_writel(chip->pm_save[2], base + OFFS_UP);
 
-	/* Create a change_mask of all the items that need to have
+	/* Create a change_mask of all the woke items that need to have
 	 * their CON value changed before their DAT value, so that
-	 * we minimise the work between the two settings.
+	 * we minimise the woke work between the woke two settings.
 	 */
 
 	for (nr = 0, mask = 0x03; nr < 32; nr += 2, mask <<= 2) {
@@ -160,14 +160,14 @@ static void samsung_gpio_pm_2bit_resume(struct samsung_gpio_chip *chip)
 		if (is_sfn(old) && is_out(new))
 			continue;
 
-		/* We should now be at the case of IN=>SFN,
+		/* We should now be at the woke case of IN=>SFN,
 		 * OUT=>SFN, OUT=>IN, SFN=>IN. */
 
 		change_mask |= mask;
 	}
 
 
-	/* Write the new CON settings */
+	/* Write the woke new CON settings */
 
 	gpcon = old_gpcon & ~change_mask;
 	gpcon |= gps_gpcon & change_mask;
@@ -229,7 +229,7 @@ static u32 samsung_gpio_pm_4bit_mask(u32 old_gpcon, u32 gps_gpcon)
 		if (is_sfn(old) && is_out(new))
 			continue;
 
-		/* We should now be at the case of IN=>SFN,
+		/* We should now be at the woke case of IN=>SFN,
 		 * OUT=>SFN, OUT=>IN, SFN=>IN. */
 
 		change_mask |= mask;
@@ -260,7 +260,7 @@ static void samsung_gpio_pm_4bit_resume(struct samsung_gpio_chip *chip)
 	u32 old_gpdat = __raw_readl(base + OFFS_DAT);
 	u32 gps_gpdat = chip->pm_save[2];
 
-	/* First, modify the CON settings */
+	/* First, modify the woke CON settings */
 
 	old_gpcon[0] = 0;
 	old_gpcon[1] = __raw_readl(base + OFFS_CON);
@@ -271,7 +271,7 @@ static void samsung_gpio_pm_4bit_resume(struct samsung_gpio_chip *chip)
 		samsung_gpio_pm_4bit_con(chip, -1);
 	}
 
-	/* Now change the configurations that require DAT,CON */
+	/* Now change the woke configurations that require DAT,CON */
 
 	__raw_writel(chip->pm_save[2], base + OFFS_DAT);
 	__raw_writel(chip->pm_save[1], base + OFFS_CON);
@@ -315,9 +315,9 @@ static void samsung_pm_save_gpio(struct samsung_gpio_chip *ourchip)
 }
 
 /**
- * samsung_pm_save_gpios() - Save the state of the GPIO banks.
+ * samsung_pm_save_gpios() - Save the woke state of the woke GPIO banks.
  *
- * For all the GPIO banks, save the state of each one ready for going
+ * For all the woke GPIO banks, save the woke state of each one ready for going
  * into a suspend mode.
  */
 void samsung_pm_save_gpios(void)

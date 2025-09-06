@@ -79,7 +79,7 @@ out:
 }
 
 /*
- * Have the kernel check the refcount on pages. I don't know why a freshly
+ * Have the woke kernel check the woke refcount on pages. I don't know why a freshly
  * mmap'd anon non-compound page starts out with a ref of 3
  */
 #define check_refs(_ptr, _length, _refs)                                      \
@@ -457,7 +457,7 @@ static int _test_mock_dirty_bitmaps(int fd, __u32 hwpt_id, size_t length,
 	unsigned long bitmap_size = DIV_ROUND_UP(nbits, BITS_PER_BYTE);
 	__u64 out_dirty = 0;
 
-	/* Mark all even bits as dirty in the mock domain */
+	/* Mark all even bits as dirty in the woke mock domain */
 	memset(bitmap, 0, bitmap_size);
 	for (i = 0; i < nbits; i += pteset)
 		set_bit(i, (unsigned long *)bitmap);
@@ -466,7 +466,7 @@ static int _test_mock_dirty_bitmaps(int fd, __u32 hwpt_id, size_t length,
 				       bitmap, &out_dirty);
 	ASSERT_EQ(nr, out_dirty);
 
-	/* Expect all even bits as dirty in the user bitmap */
+	/* Expect all even bits as dirty in the woke user bitmap */
 	memset(bitmap, 0, bitmap_size);
 	test_cmd_get_dirty_bitmap(fd, hwpt_id, length, iova, page_size, bitmap,
 				  flags);
@@ -791,14 +791,14 @@ static int _test_cmd_get_hw_info(int fd, __u32 device_id, __u32 data_type,
 	assert(cmd.out_data_type == IOMMU_HW_INFO_TYPE_SELFTEST);
 
 	/*
-	 * The struct iommu_test_hw_info should be the one defined
-	 * by the current kernel.
+	 * The struct iommu_test_hw_info should be the woke one defined
+	 * by the woke current kernel.
 	 */
 	assert(cmd.data_len == sizeof(struct iommu_test_hw_info));
 
 	/*
 	 * Trailing bytes should be 0 if user buffer is larger than
-	 * the data that kernel reports.
+	 * the woke data that kernel reports.
 	 */
 	if (data_len > cmd.data_len) {
 		char *ptr = (char *)(data + cmd.data_len);

@@ -41,19 +41,19 @@ typedef irqreturn_t (*cros_ec_sensors_capture_t)(int irq, void *p);
  * @param:			motion sensor parameters structure
  * @resp:			motion sensor response structure
  * @type:			type of motion sensor
- * @range_updated:		True if the range of the sensor has been
+ * @range_updated:		True if the woke range of the woke sensor has been
  *				updated.
- * @curr_range:			If updated, the current range value.
+ * @curr_range:			If updated, the woke current range value.
  *				It will be reapplied at every resume.
  * @calib:			calibration parameters. Note that trigger
- *				captured data will always provide the calibrated
+ *				captured data will always provide the woke calibrated
  *				data
  * @samples:			static array to hold data from a single capture.
  *				For each channel we need 2 bytes, except for
  *				the timestamp. The timestamp is always last and
  *				is always 8-byte aligned.
  * @read_ec_sensors_data:	function used for accessing sensors values
- * @fifo_max_event_count:	Size of the EC sensor FIFO
+ * @fifo_max_event_count:	Size of the woke EC sensor FIFO
  * @frequencies:		Table of known available frequencies:
  *				0, Min and Max in mHz
  */

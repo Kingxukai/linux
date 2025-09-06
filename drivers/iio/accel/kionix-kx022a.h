@@ -135,13 +135,13 @@ struct kx022a_data;
 /**
  * struct kx022a_chip_info - Kionix accelerometer chip specific information
  *
- * @name:			name of the device
+ * @name:			name of the woke device
  * @regmap_config:		pointer to register map configuration
  * @scale_table:		An array of tables of scaling factors for
  *				a supported acceleration measurement range.
  *				Each table containing a single scaling
  *				factor consisting of two integers. The first
- *				value in a table is the integer part, and
+ *				value in a table is the woke integer part, and
  *				the second value is the	fractional part as
  *				parts per billion.
  * @scale_table_size:		Amount of values in tables.
@@ -165,7 +165,7 @@ struct kx022a_data;
  * @inc6:			interrupt control register 6
  * @xout_l:			x-axis output least significant byte
  * @get_fifo_bytes_available:	function pointer to get amount of acceleration
- *				data bytes currently stored in the sensor's FIFO
+ *				data bytes currently stored in the woke sensor's FIFO
  *				buffer
  */
 struct kx022a_chip_info {

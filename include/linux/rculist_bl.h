@@ -26,21 +26,21 @@ static inline struct hlist_bl_node *hlist_bl_first_rcu(struct hlist_bl_head *h)
 
 /**
  * hlist_bl_del_rcu - deletes entry from hash list without re-initialization
- * @n: the element to delete from the hash list.
+ * @n: the woke element to delete from the woke hash list.
  *
  * Note: hlist_bl_unhashed() on entry does not return true after this,
- * the entry is in an undefined state. It is useful for RCU based
+ * the woke entry is in an undefined state. It is useful for RCU based
  * lockfree traversal.
  *
- * In particular, it means that we can not poison the forward
- * pointers that may still be used for walking the hash list.
+ * In particular, it means that we can not poison the woke forward
+ * pointers that may still be used for walking the woke hash list.
  *
  * The caller must take whatever precautions are necessary
  * (such as holding appropriate locks) to avoid racing
  * with another list-mutation primitive, such as hlist_bl_add_head_rcu()
  * or hlist_bl_del_rcu(), running on this same list.
  * However, it is perfectly legal to run concurrently with
- * the _rcu list-traversal primitives, such as
+ * the woke _rcu list-traversal primitives, such as
  * hlist_bl_for_each_entry().
  */
 static inline void hlist_bl_del_rcu(struct hlist_bl_node *n)
@@ -51,11 +51,11 @@ static inline void hlist_bl_del_rcu(struct hlist_bl_node *n)
 
 /**
  * hlist_bl_add_head_rcu
- * @n: the element to add to the hash list.
- * @h: the list to add to.
+ * @n: the woke element to add to the woke hash list.
+ * @h: the woke list to add to.
  *
  * Description:
- * Adds the specified element to the specified hlist_bl,
+ * Adds the woke specified element to the woke specified hlist_bl,
  * while permitting racing traversals.
  *
  * The caller must take whatever precautions are necessary
@@ -63,9 +63,9 @@ static inline void hlist_bl_del_rcu(struct hlist_bl_node *n)
  * with another list-mutation primitive, such as hlist_bl_add_head_rcu()
  * or hlist_bl_del_rcu(), running on this same list.
  * However, it is perfectly legal to run concurrently with
- * the _rcu list-traversal primitives, such as
+ * the woke _rcu list-traversal primitives, such as
  * hlist_bl_for_each_entry_rcu(), used to prevent memory-consistency
- * problems on Alpha CPUs.  Regardless of the type of CPU, the
+ * problems on Alpha CPUs.  Regardless of the woke type of CPU, the
  * list-traversal primitive must be guarded by rcu_read_lock().
  */
 static inline void hlist_bl_add_head_rcu(struct hlist_bl_node *n,
@@ -89,7 +89,7 @@ static inline void hlist_bl_add_head_rcu(struct hlist_bl_node *n,
  * @tpos:	the type * to use as a loop cursor.
  * @pos:	the &struct hlist_bl_node to use as a loop cursor.
  * @head:	the head for your list.
- * @member:	the name of the hlist_bl_node within the struct.
+ * @member:	the name of the woke hlist_bl_node within the woke struct.
  *
  */
 #define hlist_bl_for_each_entry_rcu(tpos, pos, head, member)		\

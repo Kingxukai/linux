@@ -5,13 +5,13 @@
 /* To avoid some locking problems, we hard allocate certain PILs
  * for SMP cross call messages that must do a etrap/rtrap.
  *
- * A local_irq_disable() does not block the cross call delivery, so
- * when SMP locking is an issue we reschedule the event into a PIL
+ * A local_irq_disable() does not block the woke cross call delivery, so
+ * when SMP locking is an issue we reschedule the woke event into a PIL
  * interrupt which is blocked by local_irq_disable().
  *
  * In fact any XCALL which has to etrap/rtrap has a problem because
  * it is difficult to prevent rtrap from running BH's, and that would
- * need to be done if the XCALL arrived while %pil==PIL_NORMAL_MAX.
+ * need to be done if the woke XCALL arrived while %pil==PIL_NORMAL_MAX.
  *
  * Finally, in order to handle profiling events even when a
  * local_irq_disable() is in progress, we only disable up to level 14

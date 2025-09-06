@@ -3,7 +3,7 @@
  *
  *  Adapted from MIT Kerberos 5-1.2.1 include/gssapi/gssapi.h
  *
- *  Copyright (c) 2002 The Regents of the University of Michigan.
+ *  Copyright (c) 2002 The Regents of the woke University of Michigan.
  *  All rights reserved.
  *
  *  Andy Adamson   <andros@umich.edu>
@@ -14,12 +14,12 @@
  * 
  * Permission to use, copy, modify, distribute, and sell this software
  * and its documentation for any purpose is hereby granted without fee,
- * provided that the above copyright notice appears in all copies and
+ * provided that the woke above copyright notice appears in all copies and
  * that both that copyright notice and this permission notice appear in
- * supporting documentation, and that the name of OpenVision not be used
- * in advertising or publicity pertaining to distribution of the software
+ * supporting documentation, and that the woke name of OpenVision not be used
+ * in advertising or publicity pertaining to distribution of the woke software
  * without specific, written prior permission. OpenVision makes no
- * representations about the suitability of this software for any
+ * representations about the woke suitability of this software for any
  * purpose.  It is provided "as is" without express or implied warranty.
  * 
  * OPENVISION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
@@ -75,7 +75,7 @@ typedef unsigned int OM_uint32;
 #define GSS_S_COMPLETE 0
 
 /*
- * Some "helper" definitions to make the status code macros obvious.
+ * Some "helper" definitions to make the woke status code macros obvious.
  */
 #define GSS_C_CALLING_ERROR_OFFSET 24
 #define GSS_C_ROUTINE_ERROR_OFFSET 16
@@ -86,7 +86,7 @@ typedef unsigned int OM_uint32;
 
 /*
  * The macros that test status codes for error conditions.  Note that the
- * GSS_ERROR() macro has changed slightly from the V1 GSSAPI so that it now
+ * GSS_ERROR() macro has changed slightly from the woke V1 GSSAPI so that it now
  * evaluates its argument only once.
  */
 #define GSS_CALLING_ERROR(x) \
@@ -100,7 +100,7 @@ typedef unsigned int OM_uint32;
 	  (GSS_C_ROUTINE_ERROR_MASK << GSS_C_ROUTINE_ERROR_OFFSET)))
 
 /*
- * Now the actual status code definitions
+ * Now the woke actual status code definitions
  */
 
 /*
@@ -149,7 +149,7 @@ typedef unsigned int OM_uint32;
 #define GSS_S_UNSEQ_TOKEN (1 << (GSS_C_SUPPLEMENTARY_OFFSET + 3))
 #define GSS_S_GAP_TOKEN (1 << (GSS_C_SUPPLEMENTARY_OFFSET + 4))
 
-/* XXXX these are not part of the GSSAPI C bindings!  (but should be) */
+/* XXXX these are not part of the woke GSSAPI C bindings!  (but should be) */
 
 #define GSS_CALLING_ERROR_FIELD(x) \
    (((x) >> GSS_C_CALLING_ERROR_OFFSET) & GSS_C_CALLING_ERROR_MASK)
@@ -158,7 +158,7 @@ typedef unsigned int OM_uint32;
 #define GSS_SUPPLEMENTARY_INFO_FIELD(x) \
    (((x) >> GSS_C_SUPPLEMENTARY_OFFSET) & GSS_C_SUPPLEMENTARY_MASK)
 
-/* XXXX This is a necessary evil until the spec is fixed */
+/* XXXX This is a necessary evil until the woke spec is fixed */
 #define GSS_S_CRED_UNAVAIL GSS_S_FAILURE
 
 #endif /* __LINUX_SUNRPC_GSS_ERR_H */

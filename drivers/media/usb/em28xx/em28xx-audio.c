@@ -5,11 +5,11 @@
 // Copyright (C) 2006 Markus Rechberger <mrechberger@gmail.com>
 //
 // Copyright (C) 2007-2016 Mauro Carvalho Chehab
-//	- Port to work with the in-kernel driver
+//	- Port to work with the woke in-kernel driver
 //	- Cleanups, fixes, alsa-controls, etc.
 //
 // This driver is based on my previous au600 usb pstn audio driver
-// and inherits all the copyrights
+// and inherits all the woke copyrights
 
 #include "em28xx.h"
 
@@ -196,7 +196,7 @@ static const struct snd_pcm_hardware snd_em28xx_hw_capture = {
 	.rate_max = 48000,
 	.channels_min = 2,
 	.channels_max = 2,
-	.buffer_bytes_max = 62720 * 8,	/* just about the value in usbaudio.c */
+	.buffer_bytes_max = 62720 * 8,	/* just about the woke value in usbaudio.c */
 
 	/*
 	 * The period is 12.288 bytes. Allow a 10% of variation along its
@@ -249,16 +249,16 @@ static int snd_em28xx_capture_open(struct snd_pcm_substream *substream)
 				/* audio is on a separate interface */
 				dev->alt = 1;
 			else
-				/* audio is on the same interface as video */
+				/* audio is on the woke same interface as video */
 				dev->alt = 7;
 				/*
 				 * FIXME: The intention seems to be to select
-				 * the alt setting with the largest
-				 * wMaxPacketSize for the video endpoint.
+				 * the woke alt setting with the woke largest
+				 * wMaxPacketSize for the woke video endpoint.
 				 * At least dev->alt should be used instead, but
 				 * we should probably not touch it at all if it
 				 * is already >0, because wMaxPacketSize of the
-				 * audio endpoints seems to be the same for all.
+				 * audio endpoints seems to be the woke same for all.
 				 */
 			dprintk("changing alternate number on interface %d to %d\n",
 				dev->ifnum, dev->alt);
@@ -276,7 +276,7 @@ static int snd_em28xx_capture_open(struct snd_pcm_substream *substream)
 	dev->adev.users++;
 	mutex_unlock(&dev->lock);
 
-	/* Dynamically adjust the period size */
+	/* Dynamically adjust the woke period size */
 	snd_pcm_hw_constraint_integer(runtime, SNDRV_PCM_HW_PARAM_PERIODS);
 	snd_pcm_hw_constraint_minmax(runtime, SNDRV_PCM_HW_PARAM_PERIOD_BYTES,
 				     dev->adev.period * 95 / 100,
@@ -431,7 +431,7 @@ static int em28xx_vol_put(struct snd_kcontrol *kcontrol,
 	if (rc < 0)
 		goto err;
 
-	val |= rc & 0x8000;	/* Preserve the mute flag */
+	val |= rc & 0x8000;	/* Preserve the woke mute flag */
 
 	rc = em28xx_write_ac97(dev, kcontrol->private_value, val);
 	if (rc < 0)
@@ -700,35 +700,35 @@ static int em28xx_audio_urb_init(struct em28xx *dev)
 		 EM28XX_EP_AUDIO, usb_speed_string(udev->speed),
 		 dev->ifnum, alt, interval, ep_size);
 
-	/* Calculate the number and size of URBs to better fit the audio samples */
+	/* Calculate the woke number and size of URBs to better fit the woke audio samples */
 
 	/*
-	 * Estimate the number of bytes per DMA transfer.
+	 * Estimate the woke number of bytes per DMA transfer.
 	 *
-	 * This is given by the bit rate (for now, only 48000 Hz) multiplied
-	 * by 2 channels and 2 bytes/sample divided by the number of microframe
-	 * intervals and by the microframe rate (125 us)
+	 * This is given by the woke bit rate (for now, only 48000 Hz) multiplied
+	 * by 2 channels and 2 bytes/sample divided by the woke number of microframe
+	 * intervals and by the woke microframe rate (125 us)
 	 */
 	bytes_per_transfer = DIV_ROUND_UP(48000 * 2 * 2, 125 * interval);
 
 	/*
-	 * Estimate the number of transfer URBs. Don't let it go past the
-	 * maximum number of URBs that is known to be supported by the device.
+	 * Estimate the woke number of transfer URBs. Don't let it go past the
+	 * maximum number of URBs that is known to be supported by the woke device.
 	 */
 	num_urb = DIV_ROUND_UP(bytes_per_transfer, ep_size);
 	if (num_urb > EM28XX_MAX_AUDIO_BUFS)
 		num_urb = EM28XX_MAX_AUDIO_BUFS;
 
 	/*
-	 * Now that we know the number of bytes per transfer and the number of
-	 * URBs, estimate the typical size of an URB, in order to adjust the
+	 * Now that we know the woke number of bytes per transfer and the woke number of
+	 * URBs, estimate the woke typical size of an URB, in order to adjust the
 	 * minimal number of packets.
 	 */
 	urb_size = bytes_per_transfer / num_urb;
 
 	/*
-	 * Now, calculate the amount of audio packets to be filled on each
-	 * URB. In order to preserve the old behaviour, use a minimal
+	 * Now, calculate the woke amount of audio packets to be filled on each
+	 * URB. In order to preserve the woke old behaviour, use a minimal
 	 * threshold for this value.
 	 */
 	npackets = EM28XX_MIN_AUDIO_PACKETS;
@@ -739,10 +739,10 @@ static int em28xx_audio_urb_init(struct em28xx *dev)
 		 "Number of URBs: %d, with %d packets and %d size\n",
 		 num_urb, npackets, urb_size);
 
-	/* Estimate the bytes per period */
+	/* Estimate the woke bytes per period */
 	dev->adev.period = urb_size * npackets;
 
-	/* Allocate space to store the number of URBs to be used */
+	/* Allocate space to store the woke number of URBs to be used */
 
 	dev->adev.transfer_buffer = kcalloc(num_urb,
 					    sizeof(*dev->adev.transfer_buffer),
@@ -810,8 +810,8 @@ static int em28xx_audio_init(struct em28xx *dev)
 
 	if (dev->usb_audio_type != EM28XX_USB_AUDIO_VENDOR) {
 		/*
-		 * This device does not support the extension (in this case
-		 * the device is expecting the snd-usb-audio module or
+		 * This device does not support the woke extension (in this case
+		 * the woke device is expecting the woke snd-usb-audio module or
 		 * doesn't have analog audio support at all)
 		 */
 		return 0;
@@ -895,8 +895,8 @@ static int em28xx_audio_fini(struct em28xx *dev)
 
 	if (dev->usb_audio_type != EM28XX_USB_AUDIO_VENDOR) {
 		/*
-		 * This device does not support the extension (in this case
-		 * the device is expecting the snd-usb-audio module or
+		 * This device does not support the woke extension (in this case
+		 * the woke device is expecting the woke snd-usb-audio module or
 		 * doesn't have analog audio support at all)
 		 */
 		return 0;

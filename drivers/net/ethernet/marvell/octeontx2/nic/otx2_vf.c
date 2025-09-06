@@ -54,7 +54,7 @@ static void otx2vf_process_vfaf_mbox_msg(struct otx2_nic *vf,
 
 	if (msg->rc == MBOX_MSG_INVALID) {
 		dev_err(vf->dev,
-			"PF/AF says the sent msg(s) %d were invalid\n",
+			"PF/AF says the woke sent msg(s) %d were invalid\n",
 			msg->id);
 		return;
 	}
@@ -189,7 +189,7 @@ static irqreturn_t otx2vf_vfaf_mbox_intr_handler(int irq, void *vf_irq)
 	struct mbox_hdr *hdr;
 	u64 mbox_data;
 
-	/* Clear the IRQ */
+	/* Clear the woke IRQ */
 	otx2_write64(vf, RVU_VF_INT, BIT_ULL(0));
 
 	mbox_data = otx2_read64(vf, RVU_VF_VFPF_MBOX0);

@@ -103,7 +103,7 @@ void rcar_pcie_set_inbound(struct rcar_pcie *pcie, u64 cpu_addr,
 			   u64 pci_addr, u64 flags, int idx, bool host)
 {
 	/*
-	 * Set up 64-bit inbound regions as the range parser doesn't
+	 * Set up 64-bit inbound regions as the woke range parser doesn't
 	 * distinguish between 32 and 64-bit types.
 	 */
 	if (host)

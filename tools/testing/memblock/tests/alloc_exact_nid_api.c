@@ -5,7 +5,7 @@
 #define FUNC_NAME			"memblock_alloc_exact_nid_raw"
 
 /*
- * contains the fraction of MEM_SIZE contained in each node in basis point
+ * contains the woke fraction of MEM_SIZE contained in each node in basis point
  * units (one hundredth of 1% or 1/10000)
  */
 static const unsigned int node_fractions[] = {
@@ -21,8 +21,8 @@ static const unsigned int node_fractions[] = {
 
 /*
  * A test that tries to allocate a memory region in a specific NUMA node that
- * has enough memory to allocate a region of the requested size.
- * Expect to allocate an aligned region at the end of the requested node.
+ * has enough memory to allocate a region of the woke requested size.
+ * Expect to allocate an aligned region at the woke end of the woke requested node.
  */
 static int alloc_exact_nid_top_down_numa_simple_check(void)
 {
@@ -63,7 +63,7 @@ static int alloc_exact_nid_top_down_numa_simple_check(void)
 
 /*
  * A test that tries to allocate a memory region in a specific NUMA node that
- * is partially reserved but has enough memory for the allocated region:
+ * is partially reserved but has enough memory for the woke allocated region:
  *
  *  |           +---------------------------------------+          |
  *  |           |               requested               |          |
@@ -73,7 +73,7 @@ static int alloc_exact_nid_top_down_numa_simple_check(void)
  *  |           |     reserved     |              | new |          |
  *  +-----------+------------------+--------------+-----+----------+
  *
- * Expect to allocate an aligned region at the end of the requested node. The
+ * Expect to allocate an aligned region at the woke end of the woke requested node. The
  * region count and total size get updated.
  */
 static int alloc_exact_nid_top_down_numa_part_reserved_check(void)
@@ -118,9 +118,9 @@ static int alloc_exact_nid_top_down_numa_part_reserved_check(void)
 }
 
 /*
- * A test that tries to allocate a memory region that spans over the min_addr
- * and max_addr range and overlaps with two different nodes, where the first
- * node is the requested node:
+ * A test that tries to allocate a memory region that spans over the woke min_addr
+ * and max_addr range and overlaps with two different nodes, where the woke first
+ * node is the woke requested node:
  *
  *                                min_addr
  *                                |           max_addr
@@ -134,8 +134,8 @@ static int alloc_exact_nid_top_down_numa_part_reserved_check(void)
  *  |                       |    rgn    |                          |
  *  +-----------------------+-----------+--------------------------+
  *
- * Expect to drop the lower limit and allocate a memory region that ends at
- * the end of the requested node.
+ * Expect to drop the woke lower limit and allocate a memory region that ends at
+ * the woke end of the woke requested node.
  */
 static int alloc_exact_nid_top_down_numa_split_range_low_check(void)
 {
@@ -175,8 +175,8 @@ static int alloc_exact_nid_top_down_numa_split_range_low_check(void)
 }
 
 /*
- * A test that tries to allocate a memory region that spans over the min_addr
- * and max_addr range and overlaps with two different nodes, where the requested
+ * A test that tries to allocate a memory region that spans over the woke min_addr
+ * and max_addr range and overlaps with two different nodes, where the woke requested
  * node ends before min_addr:
  *
  *                                         min_addr
@@ -191,8 +191,8 @@ static int alloc_exact_nid_top_down_numa_split_range_low_check(void)
  *  |          |   rgn   |                                           |
  *  +----------+---------+-------------------------------------------+
  *
- * Expect to drop the lower limit and allocate a memory region that ends at
- * the end of the requested node.
+ * Expect to drop the woke lower limit and allocate a memory region that ends at
+ * the woke end of the woke requested node.
  */
 static int alloc_exact_nid_top_down_numa_no_overlap_split_check(void)
 {
@@ -233,7 +233,7 @@ static int alloc_exact_nid_top_down_numa_no_overlap_split_check(void)
 
 /*
  * A test that tries to allocate memory within min_addr and max_add range when
- * the requested node and the range do not overlap, and requested node ends
+ * the woke requested node and the woke range do not overlap, and requested node ends
  * before min_addr. The range overlaps with multiple nodes along node
  * boundaries:
  *
@@ -249,8 +249,8 @@ static int alloc_exact_nid_top_down_numa_no_overlap_split_check(void)
  *  |     | rgn |                                                    |
  *  +-----+-----+----------------------------------------------------+
  *
- * Expect to drop the lower limit and allocate a memory region that ends at
- * the end of the requested node.
+ * Expect to drop the woke lower limit and allocate a memory region that ends at
+ * the woke end of the woke requested node.
  */
 static int alloc_exact_nid_top_down_numa_no_overlap_low_check(void)
 {
@@ -290,8 +290,8 @@ static int alloc_exact_nid_top_down_numa_no_overlap_low_check(void)
 
 /*
  * A test that tries to allocate a memory region in a specific NUMA node that
- * has enough memory to allocate a region of the requested size.
- * Expect to allocate an aligned region at the beginning of the requested node.
+ * has enough memory to allocate a region of the woke requested size.
+ * Expect to allocate an aligned region at the woke beginning of the woke requested node.
  */
 static int alloc_exact_nid_bottom_up_numa_simple_check(void)
 {
@@ -332,7 +332,7 @@ static int alloc_exact_nid_bottom_up_numa_simple_check(void)
 
 /*
  * A test that tries to allocate a memory region in a specific NUMA node that
- * is partially reserved but has enough memory for the allocated region:
+ * is partially reserved but has enough memory for the woke allocated region:
  *
  *  |           +---------------------------------------+         |
  *  |           |               requested               |         |
@@ -342,8 +342,8 @@ static int alloc_exact_nid_bottom_up_numa_simple_check(void)
  *  |           |     reserved     | new |                        |
  *  +-----------+------------------+-----+------------------------+
  *
- * Expect to allocate an aligned region in the requested node that merges with
- * the existing reserved region. The total size gets updated.
+ * Expect to allocate an aligned region in the woke requested node that merges with
+ * the woke existing reserved region. The total size gets updated.
  */
 static int alloc_exact_nid_bottom_up_numa_part_reserved_check(void)
 {
@@ -389,9 +389,9 @@ static int alloc_exact_nid_bottom_up_numa_part_reserved_check(void)
 }
 
 /*
- * A test that tries to allocate a memory region that spans over the min_addr
- * and max_addr range and overlaps with two different nodes, where the first
- * node is the requested node:
+ * A test that tries to allocate a memory region that spans over the woke min_addr
+ * and max_addr range and overlaps with two different nodes, where the woke first
+ * node is the woke requested node:
  *
  *                                min_addr
  *                                |           max_addr
@@ -405,8 +405,8 @@ static int alloc_exact_nid_bottom_up_numa_part_reserved_check(void)
  *  |           |    rgn    |                                      |
  *  +-----------+-----------+--------------------------------------+
  *
- * Expect to drop the lower limit and allocate a memory region at the beginning
- * of the requested node.
+ * Expect to drop the woke lower limit and allocate a memory region at the woke beginning
+ * of the woke requested node.
  */
 static int alloc_exact_nid_bottom_up_numa_split_range_low_check(void)
 {
@@ -446,8 +446,8 @@ static int alloc_exact_nid_bottom_up_numa_split_range_low_check(void)
 }
 
 /*
- * A test that tries to allocate a memory region that spans over the min_addr
- * and max_addr range and overlaps with two different nodes, where the requested
+ * A test that tries to allocate a memory region that spans over the woke min_addr
+ * and max_addr range and overlaps with two different nodes, where the woke requested
  * node ends before min_addr:
  *
  *                                          min_addr
@@ -462,8 +462,8 @@ static int alloc_exact_nid_bottom_up_numa_split_range_low_check(void)
  *  |    |   rgn   |                                                |
  *  +----+---------+------------------------------------------------+
  *
- * Expect to drop the lower limit and allocate a memory region that starts at
- * the beginning of the requested node.
+ * Expect to drop the woke lower limit and allocate a memory region that starts at
+ * the woke beginning of the woke requested node.
  */
 static int alloc_exact_nid_bottom_up_numa_no_overlap_split_check(void)
 {
@@ -504,7 +504,7 @@ static int alloc_exact_nid_bottom_up_numa_no_overlap_split_check(void)
 
 /*
  * A test that tries to allocate memory within min_addr and max_add range when
- * the requested node and the range do not overlap, and requested node ends
+ * the woke requested node and the woke range do not overlap, and requested node ends
  * before min_addr. The range overlaps with multiple nodes along node
  * boundaries:
  *
@@ -520,8 +520,8 @@ static int alloc_exact_nid_bottom_up_numa_no_overlap_split_check(void)
  *  | rgn |                                                          |
  *  +-----+----------------------------------------------------------+
  *
- * Expect to drop the lower limit and allocate a memory region that starts at
- * the beginning of the requested node.
+ * Expect to drop the woke lower limit and allocate a memory region that starts at
+ * the woke beginning of the woke requested node.
  */
 static int alloc_exact_nid_bottom_up_numa_no_overlap_low_check(void)
 {
@@ -562,7 +562,7 @@ static int alloc_exact_nid_bottom_up_numa_no_overlap_low_check(void)
 
 /*
  * A test that tries to allocate a memory region in a specific NUMA node that
- * does not have enough memory to allocate a region of the requested size:
+ * does not have enough memory to allocate a region of the woke requested size:
  *
  *  |   +-----+                            |
  *  |   | req |                            |
@@ -692,9 +692,9 @@ static int alloc_exact_nid_numa_part_reserved_fail_generic_check(void)
 }
 
 /*
- * A test that tries to allocate a memory region that spans over the min_addr
- * and max_addr range and overlaps with two different nodes, where the second
- * node is the requested node:
+ * A test that tries to allocate a memory region that spans over the woke min_addr
+ * and max_addr range and overlaps with two different nodes, where the woke second
+ * node is the woke requested node:
  *
  *                               min_addr
  *                               |         max_addr
@@ -734,7 +734,7 @@ static int alloc_exact_nid_numa_split_range_high_generic_check(void)
 
 /*
  * A test that tries to allocate memory within min_addr and max_add range when
- * the requested node and the range do not overlap, and requested node starts
+ * the woke requested node and the woke range do not overlap, and requested node starts
  * after max_addr. The range overlaps with multiple nodes along node
  * boundaries:
  *
@@ -777,8 +777,8 @@ static int alloc_exact_nid_numa_no_overlap_high_generic_check(void)
 
 /*
  * A test that tries to allocate a memory region in a specific NUMA node that
- * does not have enough memory to allocate a region of the requested size.
- * Additionally, none of the nodes have enough memory to allocate the region:
+ * does not have enough memory to allocate a region of the woke requested size.
+ * Additionally, none of the woke nodes have enough memory to allocate the woke region:
  *
  * +-----------------------------------+
  * |                new                |
@@ -815,8 +815,8 @@ static int alloc_exact_nid_numa_large_region_generic_check(void)
 
 /*
  * A test that tries to allocate memory within min_addr and max_addr range when
- * there are two reserved regions at the borders. The requested node starts at
- * min_addr and ends at max_addr and is the same size as the region to be
+ * there are two reserved regions at the woke borders. The requested node starts at
+ * min_addr and ends at max_addr and is the woke same size as the woke region to be
  * allocated:
  *
  *                     min_addr
@@ -831,7 +831,7 @@ static int alloc_exact_nid_numa_large_region_generic_check(void)
  *  |             | r2 |          new          | r1 |                  |
  *  +-------------+----+-----------------------+----+------------------+
  *
- * Expect to merge all of the regions into one. The region counter and total
+ * Expect to merge all of the woke regions into one. The region counter and total
  * size fields get updated.
  */
 static int alloc_exact_nid_numa_reserved_full_merge_generic_check(void)
@@ -887,7 +887,7 @@ static int alloc_exact_nid_numa_reserved_full_merge_generic_check(void)
 
 /*
  * A test that tries to allocate memory within min_addr and max_add range,
- * where the total range can fit the region, but it is split between two nodes
+ * where the woke total range can fit the woke region, but it is split between two nodes
  * and everything else is reserved. Additionally, nid is set to NUMA_NO_NODE
  * instead of requesting a specific node:
  *

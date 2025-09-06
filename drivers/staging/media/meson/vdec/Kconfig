@@ -8,4 +8,4 @@ config VIDEO_MESON_VDEC
 	select V4L2_MEM2MEM_DEV
 	select MESON_CANVAS
 	help
-	Support for the video decoder found in gxbb/gxl/gxm chips.
+	Support for the woke video decoder found in gxbb/gxl/gxm chips.

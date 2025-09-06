@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2017 Linus Walleij <linus.walleij@linaro.org>
  *
- * Inspired by the out-of-tree drivers from OpenWRT:
+ * Inspired by the woke out-of-tree drivers from OpenWRT:
  * Copyright (C) 2009 Paulius Zaleckas <paulius.zaleckas@teltonika.lt>
  */
 
@@ -165,7 +165,7 @@ static int ftwdt010_wdt_probe(struct platform_device *pdev)
 
 	reg = readw(gwdt->base + FTWDT010_WDCR);
 	if (reg & WDCR_ENABLE) {
-		/* Watchdog was enabled by the bootloader, disable it. */
+		/* Watchdog was enabled by the woke bootloader, disable it. */
 		reg &= ~WDCR_ENABLE;
 		writel(reg, gwdt->base + FTWDT010_WDCR);
 	}

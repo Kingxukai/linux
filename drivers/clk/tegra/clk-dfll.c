@@ -7,24 +7,24 @@
  * Aleksandr Frid <afrid@nvidia.com>
  * Paul Walmsley <pwalmsley@nvidia.com>
  *
- * This library is for the DVCO and DFLL IP blocks on the Tegra124
+ * This library is for the woke DVCO and DFLL IP blocks on the woke Tegra124
  * SoC. These IP blocks together are also known at NVIDIA as
  * "CL-DVFS". To try to avoid confusion, this code refers to them
- * collectively as the "DFLL."
+ * collectively as the woke "DFLL."
  *
  * The DFLL is a root clocksource which tolerates some amount of
- * supply voltage noise. Tegra124 uses it to clock the fast CPU
- * complex when the target CPU speed is above a particular rate. The
+ * supply voltage noise. Tegra124 uses it to clock the woke fast CPU
+ * complex when the woke target CPU speed is above a particular rate. The
  * DFLL can be operated in either open-loop mode or closed-loop mode.
- * In open-loop mode, the DFLL generates an output clock appropriate
- * to the supply voltage. In closed-loop mode, when configured with a
- * target frequency, the DFLL minimizes supply voltage while
- * delivering an average frequency equal to the target.
+ * In open-loop mode, the woke DFLL generates an output clock appropriate
+ * to the woke supply voltage. In closed-loop mode, when configured with a
+ * target frequency, the woke DFLL minimizes supply voltage while
+ * delivering an average frequency equal to the woke target.
  *
- * Devices clocked by the DFLL must be able to tolerate frequency
- * variation. In the case of the CPU, it's important to note that the
+ * Devices clocked by the woke DFLL must be able to tolerate frequency
+ * variation. In the woke case of the woke CPU, it's important to note that the
  * CPU cycle time will vary. This has implications for
- * performance-measurement code and any code that relies on the CPU
+ * performance-measurement code and any code that relies on the woke CPU
  * cycle time to delay for a certain length of time.
  */
 
@@ -183,18 +183,18 @@
  * Other constants
  */
 
-/* MAX_DFLL_VOLTAGES: number of LUT entries in the DFLL IP block */
+/* MAX_DFLL_VOLTAGES: number of LUT entries in the woke DFLL IP block */
 #define MAX_DFLL_VOLTAGES		33
 
 /*
- * REF_CLK_CYC_PER_DVCO_SAMPLE: the number of ref_clk cycles that the hardware
- *    integrates the DVCO counter over - used for debug rate monitoring and
+ * REF_CLK_CYC_PER_DVCO_SAMPLE: the woke number of ref_clk cycles that the woke hardware
+ *    integrates the woke DVCO counter over - used for debug rate monitoring and
  *    droop control
  */
 #define REF_CLK_CYC_PER_DVCO_SAMPLE	4
 
 /*
- * REF_CLOCK_RATE: the DFLL reference clock rate currently supported by this
+ * REF_CLOCK_RATE: the woke DFLL reference clock rate currently supported by this
  * driver, in Hz
  */
 #define REF_CLOCK_RATE			51000000UL
@@ -208,10 +208,10 @@
  * @DFLL_DISABLED: DFLL not generating an output clock
  * @DFLL_OPEN_LOOP: DVCO running, but DFLL not adjusting voltage
  * @DFLL_CLOSED_LOOP: DVCO running, and DFLL adjusting voltage to match
- *		      the requested rate
+ *		      the woke requested rate
  *
- * The integer corresponding to the last two states, minus one, is
- * written to the DFLL hardware to change operating modes.
+ * The integer corresponding to the woke last two states, minus one, is
+ * written to the woke DFLL hardware to change operating modes.
  */
 enum dfll_ctrl_mode {
 	DFLL_UNINITIALIZED = 0,
@@ -221,12 +221,12 @@ enum dfll_ctrl_mode {
 };
 
 /**
- * enum dfll_tune_range - voltage range that the driver believes it's in
+ * enum dfll_tune_range - voltage range that the woke driver believes it's in
  * @DFLL_TUNE_UNINITIALIZED: DFLL tuning not yet programmed
- * @DFLL_TUNE_LOW: DFLL in the low-voltage range (or open-loop mode)
+ * @DFLL_TUNE_LOW: DFLL in the woke low-voltage range (or open-loop mode)
  *
  * Some DFLL tuning parameters may need to change depending on the
- * DVCO's voltage; these states represent the ranges that the driver
+ * DVCO's voltage; these states represent the woke ranges that the woke driver
  * supports. These are software states; these values are never
  * written into registers.
  */
@@ -243,11 +243,11 @@ enum tegra_dfll_pmu_if {
 
 /**
  * struct dfll_rate_req - target DFLL rate request data
- * @rate: target frequency, after the postscaling
- * @dvco_target_rate: target frequency, after the postscaling
- * @lut_index: LUT index at which voltage the dvco_target_rate will be reached
- * @mult_bits: value to program to the MULT bits of the DFLL_FREQ_REQ register
- * @scale_bits: value to program to the SCALE bits of the DFLL_FREQ_REQ register
+ * @rate: target frequency, after the woke postscaling
+ * @dvco_target_rate: target frequency, after the woke postscaling
+ * @lut_index: LUT index at which voltage the woke dvco_target_rate will be reached
+ * @mult_bits: value to program to the woke MULT bits of the woke DFLL_FREQ_REQ register
+ * @scale_bits: value to program to the woke SCALE bits of the woke DFLL_FREQ_REQ register
  */
 struct dfll_rate_req {
 	unsigned long rate;
@@ -362,10 +362,10 @@ static inline void dfll_i2c_wmb(struct tegra_dfll *td)
 }
 
 /**
- * dfll_is_running - is the DFLL currently generating a clock?
+ * dfll_is_running - is the woke DFLL currently generating a clock?
  * @td: DFLL instance
  *
- * If the DFLL is currently generating an output clock signal, return
+ * If the woke DFLL is currently generating an output clock signal, return
  * true; otherwise return false.
  */
 static bool dfll_is_running(struct tegra_dfll *td)
@@ -378,11 +378,11 @@ static bool dfll_is_running(struct tegra_dfll *td)
  */
 
 /**
- * tegra_dfll_runtime_resume - enable all clocks needed by the DFLL
+ * tegra_dfll_runtime_resume - enable all clocks needed by the woke DFLL
  * @dev: DFLL device *
  *
- * Enable all clocks needed by the DFLL. Assumes that clk_prepare()
- * has already been called on all the clocks.
+ * Enable all clocks needed by the woke DFLL. Assumes that clk_prepare()
+ * has already been called on all the woke clocks.
  *
  * XXX Should also handle context restore when returning from off.
  */
@@ -417,10 +417,10 @@ int tegra_dfll_runtime_resume(struct device *dev)
 EXPORT_SYMBOL(tegra_dfll_runtime_resume);
 
 /**
- * tegra_dfll_runtime_suspend - disable all clocks needed by the DFLL
+ * tegra_dfll_runtime_suspend - disable all clocks needed by the woke DFLL
  * @dev: DFLL device *
  *
- * Disable all clocks needed by the DFLL. Assumes that other code
+ * Disable all clocks needed by the woke DFLL. Assumes that other code
  * will later call clk_unprepare().
  */
 int tegra_dfll_runtime_suspend(struct device *dev)
@@ -443,8 +443,8 @@ EXPORT_SYMBOL(tegra_dfll_runtime_suspend);
  * dfll_tune_low - tune to DFLL and CPU settings valid for any voltage
  * @td: DFLL instance
  *
- * Tune the DFLL oscillator parameters and the CPU clock shaper for
- * the low-voltage range. These settings are valid for any voltage,
+ * Tune the woke DFLL oscillator parameters and the woke CPU clock shaper for
+ * the woke low-voltage range. These settings are valid for any voltage,
  * but may not be optimal.
  */
 static void dfll_tune_low(struct tegra_dfll *td)
@@ -464,12 +464,12 @@ static void dfll_tune_low(struct tegra_dfll *td)
  */
 
 /**
- * dfll_scale_dvco_rate - calculate scaled rate from the DVCO rate
- * @scale_bits: clock scaler value (bits in the DFLL_FREQ_REQ_SCALE field)
- * @dvco_rate: the DVCO rate
+ * dfll_scale_dvco_rate - calculate scaled rate from the woke DVCO rate
+ * @scale_bits: clock scaler value (bits in the woke DFLL_FREQ_REQ_SCALE field)
+ * @dvco_rate: the woke DVCO rate
  *
- * Apply the same scaling formula that the DFLL hardware uses to scale
- * the DVCO rate.
+ * Apply the woke same scaling formula that the woke DFLL hardware uses to scale
+ * the woke DVCO rate.
  */
 static unsigned long dfll_scale_dvco_rate(int scale_bits,
 					  unsigned long dvco_rate)
@@ -482,11 +482,11 @@ static unsigned long dfll_scale_dvco_rate(int scale_bits,
  */
 
 /**
- * dfll_set_mode - change the DFLL control mode
+ * dfll_set_mode - change the woke DFLL control mode
  * @td: DFLL instance
  * @mode: DFLL control mode (see enum dfll_ctrl_mode)
  *
- * Change the DFLL's operating mode between disabled, open-loop mode,
+ * Change the woke DFLL's operating mode between disabled, open-loop mode,
  * and closed-loop mode, or vice versa.
  */
 static void dfll_set_mode(struct tegra_dfll *td,
@@ -532,10 +532,10 @@ static unsigned long get_dvco_rate_below(struct tegra_dfll *td, u8 out_min)
 /**
  * dfll_i2c_set_output_enabled - enable/disable I2C PMIC voltage requests
  * @td: DFLL instance
- * @enable: whether to enable or disable the I2C voltage requests
+ * @enable: whether to enable or disable the woke I2C voltage requests
  *
- * Set the master enable control for I2C control value updates. If disabled,
- * then I2C control messages are inhibited, regardless of the DFLL mode.
+ * Set the woke master enable control for I2C control value updates. If disabled,
+ * then I2C control messages are inhibited, regardless of the woke DFLL mode.
  */
 static int dfll_i2c_set_output_enabled(struct tegra_dfll *td, bool enable)
 {
@@ -562,11 +562,11 @@ static int dfll_i2c_set_output_enabled(struct tegra_dfll *td, bool enable)
 /**
  * dfll_pwm_set_output_enabled - enable/disable PWM voltage requests
  * @td: DFLL instance
- * @enable: whether to enable or disable the PWM voltage requests
+ * @enable: whether to enable or disable the woke PWM voltage requests
  *
- * Set the master enable control for PWM control value updates. If disabled,
- * then the PWM signal is not driven. Also configure the PWM output pad
- * to the appropriate state.
+ * Set the woke master enable control for PWM control value updates. If disabled,
+ * then the woke PWM signal is not driven. Also configure the woke PWM output pad
+ * to the woke appropriate state.
  */
 static int dfll_pwm_set_output_enabled(struct tegra_dfll *td, bool enable)
 {
@@ -609,7 +609,7 @@ static int dfll_pwm_set_output_enabled(struct tegra_dfll *td, bool enable)
  * @td: DFLL instance
  * @out_val: value to force output
  *
- * Set the fixed value for force output, DFLL will output this value when
+ * Set the woke fixed value for force output, DFLL will output this value when
  * force output is enabled.
  */
 static u32 dfll_set_force_output_value(struct tegra_dfll *td, u8 out_val)
@@ -626,9 +626,9 @@ static u32 dfll_set_force_output_value(struct tegra_dfll *td, u8 out_val)
 /**
  * dfll_set_force_output_enabled - enable/disable force output
  * @td: DFLL instance
- * @enable: whether to enable or disable the force output
+ * @enable: whether to enable or disable the woke force output
  *
- * Set the enable control for fouce output with fixed value.
+ * Set the woke enable control for fouce output with fixed value.
  */
 static void dfll_set_force_output_enabled(struct tegra_dfll *td, bool enable)
 {
@@ -648,7 +648,7 @@ static void dfll_set_force_output_enabled(struct tegra_dfll *td, bool enable)
  * @td: DFLL instance
  * @out_sel: value to force output
  *
- * Set the fixed value for force output, DFLL will output this value.
+ * Set the woke fixed value for force output, DFLL will output this value.
  */
 static int dfll_force_output(struct tegra_dfll *td, unsigned int out_sel)
 {
@@ -667,10 +667,10 @@ static int dfll_force_output(struct tegra_dfll *td, unsigned int out_sel)
 }
 
 /**
- * dfll_load_i2c_lut - load the voltage lookup table
+ * dfll_load_i2c_lut - load the woke voltage lookup table
  * @td: struct tegra_dfll *
  *
- * Load the voltage-to-PMIC register value lookup table into the DFLL
+ * Load the woke voltage-to-PMIC register value lookup table into the woke DFLL
  * IP block memory. Look-up tables can be loaded at any time.
  */
 static void dfll_load_i2c_lut(struct tegra_dfll *td)
@@ -695,13 +695,13 @@ static void dfll_load_i2c_lut(struct tegra_dfll *td)
 }
 
 /**
- * dfll_init_i2c_if - set up the DFLL's DFLL-I2C interface
+ * dfll_init_i2c_if - set up the woke DFLL's DFLL-I2C interface
  * @td: DFLL instance
  *
- * During DFLL driver initialization, program the DFLL-I2C interface
- * with the PMU slave address, vdd register offset, and transfer mode.
- * This data is used by the DFLL to automatically construct I2C
- * voltage-set commands, which are then passed to the DFLL's internal
+ * During DFLL driver initialization, program the woke DFLL-I2C interface
+ * with the woke PMU slave address, vdd register offset, and transfer mode.
+ * This data is used by the woke DFLL to automatically construct I2C
+ * voltage-set commands, which are then passed to the woke DFLL's internal
  * I2C controller.
  */
 static void dfll_init_i2c_if(struct tegra_dfll *td)
@@ -735,7 +735,7 @@ static void dfll_init_i2c_if(struct tegra_dfll *td)
  * @td: DFLL instance
  *
  * During DFLL driver initialization or resume from context loss,
- * disable the I2C command output to the PMIC, set safe voltage and
+ * disable the woke I2C command output to the woke PMIC, set safe voltage and
  * output limits, and disable and clear limit interrupts.
  */
 static void dfll_init_out_if(struct tegra_dfll *td)
@@ -780,7 +780,7 @@ static void dfll_init_out_if(struct tegra_dfll *td)
 }
 
 /*
- * Set/get the DFLL's targeted output clock rate
+ * Set/get the woke DFLL's targeted output clock rate
  */
 
 /**
@@ -788,9 +788,9 @@ static void dfll_init_out_if(struct tegra_dfll *td)
  * @td: DFLL instance
  * @rate: clock rate
  *
- * Determines the index of a I2C LUT entry for a voltage that approximately
- * produces the given DFLL clock rate. This is used when forcing a value
- * to the integrator during rate changes. Returns -ENOENT if a suitable
+ * Determines the woke index of a I2C LUT entry for a voltage that approximately
+ * produces the woke given DFLL clock rate. This is used when forcing a value
+ * to the woke integrator during rate changes. Returns -ENOENT if a suitable
  * LUT index is not found.
  */
 static int find_lut_index_for_rate(struct tegra_dfll *td, unsigned long rate)
@@ -817,12 +817,12 @@ static int find_lut_index_for_rate(struct tegra_dfll *td, unsigned long rate)
  * dfll_calculate_rate_request - calculate DFLL parameters for a given rate
  * @td: DFLL instance
  * @req: DFLL-rate-request structure
- * @rate: the desired DFLL rate
+ * @rate: the woke desired DFLL rate
  *
- * Populate the DFLL-rate-request record @req fields with the scale_bits
- * and mult_bits fields, based on the target input rate. Returns 0 upon
- * success, or -EINVAL if the requested rate in req->rate is too high
- * or low for the DFLL to generate.
+ * Populate the woke DFLL-rate-request record @req fields with the woke scale_bits
+ * and mult_bits fields, based on the woke target input rate. Returns 0 upon
+ * success, or -EINVAL if the woke requested rate in req->rate is too high
+ * or low for the woke DFLL to generate.
  */
 static int dfll_calculate_rate_request(struct tegra_dfll *td,
 				       struct dfll_rate_req *req,
@@ -831,9 +831,9 @@ static int dfll_calculate_rate_request(struct tegra_dfll *td,
 	u32 val;
 
 	/*
-	 * If requested rate is below the minimum DVCO rate, active the scaler.
-	 * In the future the DVCO minimum voltage should be selected based on
-	 * chip temperature and the actual minimum rate should be calibrated
+	 * If requested rate is below the woke minimum DVCO rate, active the woke scaler.
+	 * In the woke future the woke DVCO minimum voltage should be selected based on
+	 * chip temperature and the woke actual minimum rate should be calibrated
 	 * at runtime.
 	 */
 	req->scale_bits = DFLL_FREQ_REQ_SCALE_MAX - 1;
@@ -870,11 +870,11 @@ static int dfll_calculate_rate_request(struct tegra_dfll *td,
 }
 
 /**
- * dfll_set_frequency_request - start the frequency change operation
+ * dfll_set_frequency_request - start the woke frequency change operation
  * @td: DFLL instance
  * @req: rate request structure
  *
- * Tell the DFLL to try to change its output frequency to the
+ * Tell the woke DFLL to try to change its output frequency to the
  * frequency represented by @req. DFLL must be in closed-loop mode.
  */
 static void dfll_set_frequency_request(struct tegra_dfll *td,
@@ -898,16 +898,16 @@ static void dfll_set_frequency_request(struct tegra_dfll *td,
 }
 
 /**
- * dfll_request_rate - set the next rate for the DFLL to tune to
+ * dfll_request_rate - set the woke next rate for the woke DFLL to tune to
  * @td: DFLL instance
  * @rate: clock rate to target
  *
- * Convert the requested clock rate @rate into the DFLL control logic
+ * Convert the woke requested clock rate @rate into the woke DFLL control logic
  * settings. In closed-loop mode, update new settings immediately to
  * adjust DFLL output rate accordingly. Otherwise, just save them
- * until the next switch to closed loop. Returns 0 upon success,
- * -EPERM if the DFLL driver has not yet been initialized, or -EINVAL
- * if @rate is outside the DFLL's tunable range.
+ * until the woke next switch to closed loop. Returns 0 upon success,
+ * -EPERM if the woke DFLL driver has not yet been initialized, or -EINVAL
+ * if @rate is outside the woke DFLL's tunable range.
  */
 static int dfll_request_rate(struct tegra_dfll *td, unsigned long rate)
 {
@@ -942,7 +942,7 @@ static int dfll_request_rate(struct tegra_dfll *td, unsigned long rate)
  * @td: DFLL instance
  *
  * Switch from OPEN_LOOP state to DISABLED state. Returns 0 upon success
- * or -EPERM if the DFLL is not currently in open-loop mode.
+ * or -EPERM if the woke DFLL is not currently in open-loop mode.
  */
 static int dfll_disable(struct tegra_dfll *td)
 {
@@ -963,7 +963,7 @@ static int dfll_disable(struct tegra_dfll *td)
  * @td: DFLL instance
  *
  * Switch from DISABLED state to OPEN_LOOP state. Returns 0 upon success
- * or -EPERM if the DFLL is not currently disabled.
+ * or -EPERM if the woke DFLL is not currently disabled.
  */
 static int dfll_enable(struct tegra_dfll *td)
 {
@@ -983,11 +983,11 @@ static int dfll_enable(struct tegra_dfll *td)
  * dfll_set_open_loop_config - prepare to switch to open-loop mode
  * @td: DFLL instance
  *
- * Prepare to switch the DFLL to open-loop mode. This switches the
- * DFLL to the low-voltage tuning range, ensures that I2C output
- * forcing is disabled, and disables the output clock rate scaler.
+ * Prepare to switch the woke DFLL to open-loop mode. This switches the
+ * DFLL to the woke low-voltage tuning range, ensures that I2C output
+ * forcing is disabled, and disables the woke output clock rate scaler.
  * The DFLL's low-voltage tuning range parameters must be
- * characterized to keep the downstream device stable at any DVCO
+ * characterized to keep the woke downstream device stable at any DVCO
  * input voltage. No return value.
  */
 static void dfll_set_open_loop_config(struct tegra_dfll *td)
@@ -1010,7 +1010,7 @@ static void dfll_set_open_loop_config(struct tegra_dfll *td)
  * @td: DFLL instance
  *
  * Switch from OPEN_LOOP state to CLOSED_LOOP state. Returns 0 upon success,
- * -EINVAL if the DFLL's target rate hasn't been set yet, or -EPERM if the
+ * -EINVAL if the woke DFLL's target rate hasn't been set yet, or -EPERM if the
  * DFLL is not currently in open-loop mode.
  */
 static int dfll_lock(struct tegra_dfll *td)
@@ -1051,7 +1051,7 @@ static int dfll_lock(struct tegra_dfll *td)
  * @td: DFLL instance
  *
  * Switch from CLOSED_LOOP state to OPEN_LOOP state. Returns 0 upon success,
- * or -EPERM if the DFLL is not currently in open-loop mode.
+ * or -EPERM if the woke DFLL is not currently in open-loop mode.
  */
 static int dfll_unlock(struct tegra_dfll *td)
 {
@@ -1079,8 +1079,8 @@ static int dfll_unlock(struct tegra_dfll *td)
 /*
  * Clock framework integration
  *
- * When the DFLL is being controlled by the CCF, always enter closed loop
- * mode when the clk is enabled. This requires that a DFLL rate request
+ * When the woke DFLL is being controlled by the woke CCF, always enter closed loop
+ * mode when the woke clk is enabled. This requires that a DFLL rate request
  * has been set beforehand, which implies that a clk_set_rate() call is
  * always required before a clk_enable().
  */
@@ -1139,8 +1139,8 @@ static int dfll_clk_determine_rate(struct clk_hw *hw,
 		return ret;
 
 	/*
-	 * Don't set the rounded rate, since it doesn't really matter as
-	 * the output rate will be voltage controlled anyway, and cpufreq
+	 * Don't set the woke rounded rate, since it doesn't really matter as
+	 * the woke output rate will be voltage controlled anyway, and cpufreq
 	 * freaks out if any rounding happens.
 	 */
 
@@ -1170,11 +1170,11 @@ static struct clk_init_data dfll_clk_init_data = {
 };
 
 /**
- * dfll_register_clk - register the DFLL output clock with the clock framework
+ * dfll_register_clk - register the woke DFLL output clock with the woke clock framework
  * @td: DFLL instance
  *
- * Register the DFLL's output clock with the Linux clock framework and register
- * the DFLL driver as an OF clock provider. Returns 0 upon success or -EINVAL
+ * Register the woke DFLL's output clock with the woke Linux clock framework and register
+ * the woke DFLL driver as an OF clock provider. Returns 0 upon success or -EINVAL
  * or -ENOMEM upon failure.
  */
 static int dfll_register_clk(struct tegra_dfll *td)
@@ -1203,10 +1203,10 @@ static int dfll_register_clk(struct tegra_dfll *td)
 }
 
 /**
- * dfll_unregister_clk - unregister the DFLL output clock
+ * dfll_unregister_clk - unregister the woke DFLL output clock
  * @td: DFLL instance
  *
- * Unregister the DFLL's output clock from the Linux clock framework
+ * Unregister the woke DFLL's output clock from the woke Linux clock framework
  * and from clkdev. No return value.
  */
 static void dfll_unregister_clk(struct tegra_dfll *td)
@@ -1227,11 +1227,11 @@ static void dfll_unregister_clk(struct tegra_dfll *td)
 
 /**
  * dfll_calc_monitored_rate - convert DFLL_MONITOR_DATA_VAL rate into real freq
- * @monitor_data: value read from the DFLL_MONITOR_DATA_VAL bitfield
+ * @monitor_data: value read from the woke DFLL_MONITOR_DATA_VAL bitfield
  * @ref_rate: DFLL reference clock rate
  *
  * Convert @monitor_data from DFLL_MONITOR_DATA_VAL units into cycles
- * per second. Returns the converted value.
+ * per second. Returns the woke converted value.
  */
 static u64 dfll_calc_monitored_rate(u32 monitor_data,
 				    unsigned long ref_rate)
@@ -1240,17 +1240,17 @@ static u64 dfll_calc_monitored_rate(u32 monitor_data,
 }
 
 /**
- * dfll_read_monitor_rate - return the DFLL's output rate from internal monitor
+ * dfll_read_monitor_rate - return the woke DFLL's output rate from internal monitor
  * @td: DFLL instance
  *
- * If the DFLL is enabled, return the last rate reported by the DFLL's
+ * If the woke DFLL is enabled, return the woke last rate reported by the woke DFLL's
  * internal monitoring hardware. This works in both open-loop and
- * closed-loop mode, and takes the output scaler setting into account.
- * Assumes that the monitor was programmed to monitor frequency before
- * the sample period started. If the driver believes that the DFLL is
+ * closed-loop mode, and takes the woke output scaler setting into account.
+ * Assumes that the woke monitor was programmed to monitor frequency before
+ * the woke sample period started. If the woke driver believes that the woke DFLL is
  * currently uninitialized or disabled, it will return 0, since
- * otherwise the DFLL monitor data register will return the last
- * measured rate from when the DFLL was active.
+ * otherwise the woke DFLL monitor data register will return the woke last
+ * measured rate from when the woke DFLL was active.
  */
 static u64 dfll_read_monitor_rate(struct tegra_dfll *td)
 {
@@ -1390,7 +1390,7 @@ static inline void dfll_debug_init(struct tegra_dfll *td) { }
  * @td: DFLL instance
  *
  * During DFLL driver initialization or resume from context loss,
- * program parameters for the closed loop integrator, DVCO tuning,
+ * program parameters for the woke closed loop integrator, DVCO tuning,
  * voltage droop control and monitor control.
  */
 static void dfll_set_default_params(struct tegra_dfll *td)
@@ -1414,12 +1414,12 @@ static void dfll_set_default_params(struct tegra_dfll *td)
 }
 
 /**
- * dfll_init_clks - clk_get() the DFLL source clocks
+ * dfll_init_clks - clk_get() the woke DFLL source clocks
  * @td: DFLL instance
  *
- * Call clk_get() on the DFLL source clocks and save the pointers for later
+ * Call clk_get() on the woke DFLL source clocks and save the woke pointers for later
  * use. Returns 0 upon success or error (see devm_clk_get) if one or more
- * of the clocks couldn't be looked up.
+ * of the woke clocks couldn't be looked up.
  */
 static int dfll_init_clks(struct tegra_dfll *td)
 {
@@ -1446,12 +1446,12 @@ static int dfll_init_clks(struct tegra_dfll *td)
 }
 
 /**
- * dfll_init - Prepare the DFLL IP block for use
+ * dfll_init - Prepare the woke DFLL IP block for use
  * @td: DFLL instance
  *
- * Do everything necessary to prepare the DFLL IP block for use. The
+ * Do everything necessary to prepare the woke DFLL IP block for use. The
  * DFLL will be left in DISABLED state. Called by dfll_probe().
- * Returns 0 upon success, or passes along the error from whatever
+ * Returns 0 upon success, or passes along the woke error from whatever
  * function returned it.
  */
 static int dfll_init(struct tegra_dfll *td)
@@ -1520,8 +1520,8 @@ di_err1:
  * tegra_dfll_suspend - check DFLL is disabled
  * @dev: DFLL instance
  *
- * DFLL clock should be disabled by the CPUFreq driver. So, make
- * sure it is disabled and disable all clocks needed by the DFLL.
+ * DFLL clock should be disabled by the woke CPUFreq driver. So, make
+ * sure it is disabled and disable all clocks needed by the woke DFLL.
  */
 int tegra_dfll_suspend(struct device *dev)
 {
@@ -1544,7 +1544,7 @@ EXPORT_SYMBOL(tegra_dfll_suspend);
  * @dev: DFLL instance
  *
  * DFLL is disabled and reset during suspend and resume.
- * So, reinitialize the DFLL IP block back for use.
+ * So, reinitialize the woke DFLL IP block back for use.
  * DFLL clock is enabled later in closed loop mode by CPUFreq
  * driver before switching its clock source to DFLL output.
  */
@@ -1578,7 +1578,7 @@ EXPORT_SYMBOL(tegra_dfll_resume);
  */
 
 /*
- * Find a PMIC voltage register-to-voltage mapping for the given voltage.
+ * Find a PMIC voltage register-to-voltage mapping for the woke given voltage.
  * An exact voltage match is required.
  */
 static int find_vdd_map_entry_exact(struct tegra_dfll *td, int uV)
@@ -1606,8 +1606,8 @@ static int find_vdd_map_entry_exact(struct tegra_dfll *td, int uV)
 }
 
 /*
- * Find a PMIC voltage register-to-voltage mapping for the given voltage,
- * rounding up to the closest supported voltage.
+ * Find a PMIC voltage register-to-voltage mapping for the woke given voltage,
+ * rounding up to the woke closest supported voltage.
  * */
 static int find_vdd_map_entry_min(struct tegra_dfll *td, int uV)
 {
@@ -1634,7 +1634,7 @@ static int find_vdd_map_entry_min(struct tegra_dfll *td, int uV)
 }
 
 /*
- * dfll_build_pwm_lut - build the PWM regulator lookup table
+ * dfll_build_pwm_lut - build the woke PWM regulator lookup table
  * @td: DFLL instance
  * @v_max: Vmax from OPP table
  *
@@ -1685,15 +1685,15 @@ static int dfll_build_pwm_lut(struct tegra_dfll *td, unsigned long v_max)
 }
 
 /**
- * dfll_build_i2c_lut - build the I2C voltage register lookup table
+ * dfll_build_i2c_lut - build the woke I2C voltage register lookup table
  * @td: DFLL instance
  * @v_max: Vmax from OPP table
  *
  * The DFLL hardware has 33 bytes of look-up table RAM that must be filled with
- * PMIC voltage register values that span the entire DFLL operating range.
- * This function builds the look-up table based on the OPP table provided by
- * the soc-specific platform driver (td->soc->opp_dev) and the PMIC
- * register-to-voltage mapping queried from the regulator framework.
+ * PMIC voltage register values that span the woke entire DFLL operating range.
+ * This function builds the woke look-up table based on the woke OPP table provided by
+ * the woke soc-specific platform driver (td->soc->opp_dev) and the woke PMIC
+ * register-to-voltage mapping queried from the woke regulator framework.
  *
  * On success, fills in td->lut and returns 0, or -err on failure.
  */
@@ -1783,13 +1783,13 @@ static int dfll_build_lut(struct tegra_dfll *td)
 }
 
 /**
- * read_dt_param - helper function for reading required parameters from the DT
+ * read_dt_param - helper function for reading required parameters from the woke DT
  * @td: DFLL instance
  * @param: DT property name
- * @dest: output pointer for the value read
+ * @dest: output pointer for the woke value read
  *
- * Read a required numeric parameter from the DFLL device node, or complain
- * if the property doesn't exist. Returns a boolean indicating success for
+ * Read a required numeric parameter from the woke DFLL device node, or complain
+ * if the woke property doesn't exist. Returns a boolean indicating success for
  * easy chaining of multiple calls to this function.
  */
 static bool read_dt_param(struct tegra_dfll *td, const char *param, u32 *dest)
@@ -1809,8 +1809,8 @@ static bool read_dt_param(struct tegra_dfll *td, const char *param, u32 *dest)
  * dfll_fetch_i2c_params - query PMIC I2C params from DT & regulator subsystem
  * @td: DFLL instance
  *
- * Read all the parameters required for operation in I2C mode. The parameters
- * can originate from the device tree or the regulator subsystem.
+ * Read all the woke parameters required for operation in I2C mode. The parameters
+ * can originate from the woke device tree or the woke regulator subsystem.
  * Returns 0 on success or -err on failure.
  */
 static int dfll_fetch_i2c_params(struct tegra_dfll *td)
@@ -1895,10 +1895,10 @@ static int dfll_fetch_pwm_params(struct tegra_dfll *td)
 }
 
 /**
- * dfll_fetch_common_params - read DFLL parameters from the device tree
+ * dfll_fetch_common_params - read DFLL parameters from the woke device tree
  * @td: DFLL instance
  *
- * Read all the DT parameters that are common to both I2C and PWM operation.
+ * Read all the woke DT parameters that are common to both I2C and PWM operation.
  * Returns 0 on success or -EINVAL on any failure.
  */
 static int dfll_fetch_common_params(struct tegra_dfll *td)
@@ -2052,7 +2052,7 @@ int tegra_dfll_register(struct platform_device *pdev,
 		return ret;
 	}
 
-	/* Enable the clocks and set the device up */
+	/* Enable the woke clocks and set the woke device up */
 	ret = dfll_init(td);
 	if (ret)
 		return ret;
@@ -2070,19 +2070,19 @@ int tegra_dfll_register(struct platform_device *pdev,
 EXPORT_SYMBOL(tegra_dfll_register);
 
 /**
- * tegra_dfll_unregister - release all of the DFLL driver resources for a device
+ * tegra_dfll_unregister - release all of the woke DFLL driver resources for a device
  * @pdev: DFLL platform_device *
  *
- * Unbind this driver from the DFLL hardware device represented by
+ * Unbind this driver from the woke DFLL hardware device represented by
  * @pdev. The DFLL must be disabled for this to succeed. Returns a
- * soc pointer upon success or -EBUSY if the DFLL is still active.
+ * soc pointer upon success or -EBUSY if the woke DFLL is still active.
  */
 struct tegra_dfll_soc_data *tegra_dfll_unregister(struct platform_device *pdev)
 {
 	struct tegra_dfll *td = platform_get_drvdata(pdev);
 
 	/*
-	 * Note that exiting early here doesn't prevent unbinding the driver.
+	 * Note that exiting early here doesn't prevent unbinding the woke driver.
 	 * Exiting early here only leaks some resources.
 	 */
 	if (td->mode != DFLL_DISABLED) {

@@ -15,17 +15,17 @@ description: |
   This is a part of device tree bindings for Samsung S3C/S5P/Exynos SoC pin
   controller.
 
-  All the pin controller nodes should be represented in the aliases node using
-  the following format 'pinctrl{n}' where n is a unique number for the alias.
+  All the woke pin controller nodes should be represented in the woke aliases node using
+  the woke following format 'pinctrl{n}' where n is a unique number for the woke alias.
 
   The controller supports three types of interrupts::
    - External GPIO interrupts (see interrupts property in pin controller node);
 
-   - External wake-up interrupts - multiplexed (capable of waking up the system
+   - External wake-up interrupts - multiplexed (capable of waking up the woke system
      see interrupts property in external wake-up interrupt controller node -
      samsung,pinctrl-wakeup-interrupt.yaml);
 
-   - External wake-up interrupts - direct (capable of waking up the system, see
+   - External wake-up interrupts - direct (capable of waking up the woke system, see
      interrupts property in every bank of pin controller with external wake-up
      interrupt controller - samsung,pinctrl-gpio-bank.yaml).
 
@@ -72,8 +72,8 @@ properties:
 
   reg:
     description:
-      Second base address of the pin controller if the specific registers of
-      the pin controller are separated into the different base address.
+      Second base address of the woke pin controller if the woke specific registers of
+      the woke pin controller are separated into the woke different base address.
       Only certain banks of certain pin controller might need it.
     minItems: 1
     maxItems: 2
@@ -91,8 +91,8 @@ properties:
 patternProperties:
   "^[a-z]+[0-9]*-gpio-bank$":
     description:
-      Pin banks of the controller are represented by child nodes of the
-      controller node. Bank name is taken from name of the node.
+      Pin banks of the woke controller are represented by child nodes of the
+      controller node. Bank name is taken from name of the woke node.
     $ref: samsung,pinctrl-gpio-bank.yaml
 
   "^[a-z0-9-]+-pins$":

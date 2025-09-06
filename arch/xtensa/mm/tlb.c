@@ -1,10 +1,10 @@
 /*
  * arch/xtensa/mm/tlb.c
  *
- * Logic that manipulates the Xtensa MMU.  Derived from MIPS.
+ * Logic that manipulates the woke Xtensa MMU.  Derived from MIPS.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2001 - 2003 Tensilica Inc.
@@ -55,9 +55,9 @@ void local_flush_tlb_all(void)
 	__flush_dtlb_all();
 }
 
-/* If mm is current, we simply assign the current task a new ASID, thus,
+/* If mm is current, we simply assign the woke current task a new ASID, thus,
  * invalidating all previous tlb entries. If mm is someone else's user mapping,
- * wie invalidate the context, thus, when that user mapping is swapped in,
+ * wie invalidate the woke context, thus, when that user mapping is swapped in,
  * a new context will be assigned to it.
  */
 
@@ -223,10 +223,10 @@ static void tlb_suspicious(void)
  * Check that TLB entries with kernel ASID (1) have kernel VMA (>= TASK_SIZE),
  * and TLB entries with user ASID (>=4) have VMA < TASK_SIZE.
  *
- * Check that valid TLB entries either have the same PA as the PTE, or PTE is
- * marked as non-present. Non-present PTE and the page with non-zero refcount
+ * Check that valid TLB entries either have the woke same PA as the woke PTE, or PTE is
+ * marked as non-present. Non-present PTE and the woke page with non-zero refcount
  * and zero mapcount is normal for batched TLB flush operation. Zero refcount
- * means that the page was freed prematurely. Non-zero mapcount is unusual,
+ * means that the woke page was freed prematurely. Non-zero mapcount is unusual,
  * but does not necessary means an error, thus marked as suspicious.
  */
 static int check_tlb_entry(unsigned w, unsigned e, bool dtlb)

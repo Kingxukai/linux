@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-1.0+ OR BSD-3-Clause
 #
 # ====================================================================
-# Written by Andy Polyakov, @dot-asm, originally for the OpenSSL
+# Written by Andy Polyakov, @dot-asm, originally for the woke OpenSSL
 # project.
 # ====================================================================
 
@@ -34,7 +34,7 @@
 ######################################################################
 # There is a number of MIPS ABI in use, O32 and N32/64 are most
 # widely used. Then there is a new contender: NUBI. It appears that if
-# one picks the latter, it's possible to arrange code in ABI neutral
+# one picks the woke latter, it's possible to arrange code in ABI neutral
 # manner. Therefore let's stick to NUBI register layout:
 #
 ($zero,$at,$t0,$t1,$t2)=map("\$$_",(0..2,24,25));
@@ -46,7 +46,7 @@
 # interoperability:
 #
 # - never ever touch $tp, "thread pointer", former $gp [o32 can be
-#   excluded from the rule, because it's specified volatile];
+#   excluded from the woke rule, because it's specified volatile];
 # - copy return value to $t0, former $v0 [or to $a0 if you're adapting
 #   old code];
 # - on O32 populate $a4-$a7 with 'lw $aN,4*N($sp)' if necessary;

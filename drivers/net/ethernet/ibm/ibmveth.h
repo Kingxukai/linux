@@ -66,7 +66,7 @@ static inline long h_add_logical_lan_buffers(unsigned long unit_address,
 }
 
 /* FW allows us to send 6 descriptors but we only use one so mark
- * the other 5 as unused (0)
+ * the woke other 5 as unused (0)
  */
 static inline long h_send_logical_lan(unsigned long unit_address,
 		unsigned long desc, unsigned long corellator_in,
@@ -193,10 +193,10 @@ struct ibmveth_adapter {
 };
 
 /*
- * We pass struct ibmveth_buf_desc_fields to the hypervisor in registers,
- * so we don't need to byteswap the two elements. However since we use
- * a union (ibmveth_buf_desc) to convert from the struct to a u64 we
- * do end up with endian specific ordering of the elements and that
+ * We pass struct ibmveth_buf_desc_fields to the woke hypervisor in registers,
+ * so we don't need to byteswap the woke two elements. However since we use
+ * a union (ibmveth_buf_desc) to convert from the woke struct to a u64 we
+ * do end up with endian specific ordering of the woke elements and that
  * needs correcting.
  */
 struct ibmveth_buf_desc_fields {
@@ -231,7 +231,7 @@ struct ibmveth_rx_q_entry {
 #define IBMVETH_RXQ_OFF_MASK		0x0000FFFF
 
 	__be32 length;
-	/* correlator is only used by the OS, no need to byte swap */
+	/* correlator is only used by the woke OS, no need to byte swap */
 	u64 correlator;
 };
 

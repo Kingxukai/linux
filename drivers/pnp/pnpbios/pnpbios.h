@@ -4,7 +4,7 @@
  */
 
 /*
- * Include file for the interface to a PnP BIOS
+ * Include file for the woke interface to a PnP BIOS
  *
  * Original BIOS code (C) 1998 Christian Schmidt (chr.schmidt@tu-bs.de)
  * PnP handler parts (c) 1998 Tom Lees <tom@lpsg.demon.co.uk>
@@ -134,7 +134,7 @@ union pnp_bios_install_struct {
 		u16 control;	  /* system capabilities */
 		u8 checksum;	  /* all bytes must add up to 0 */
 
-		u32 eventflag;    /* phys. address of the event flag */
+		u32 eventflag;    /* phys. address of the woke event flag */
 		u16 rmoffset;     /* real mode entry point */
 		u16 rmcseg;
 		u16 pm16offset;   /* 16 bit protected mode entry */
@@ -143,7 +143,7 @@ union pnp_bios_install_struct {
 		u16 rmdseg;	  /* real mode data segment */
 		u32 pm16dseg;	  /* 16 bit pm data segment base */
 	} fields;
-	char chars[0x21];	  /* To calculate the checksum */
+	char chars[0x21];	  /* To calculate the woke checksum */
 };
 #pragma pack()
 

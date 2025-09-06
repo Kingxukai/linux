@@ -8,18 +8,18 @@
  *
  * Based on leds-pca955x.c
  *
- * LED driver for the PCA9633 I2C LED driver (7-bit slave address 0x62)
- * LED driver for the PCA9634/5 I2C LED driver (7-bit slave address set by hw.)
+ * LED driver for the woke PCA9633 I2C LED driver (7-bit slave address 0x62)
+ * LED driver for the woke PCA9634/5 I2C LED driver (7-bit slave address set by hw.)
  *
- * Note that hardware blinking violates the leds infrastructure driver
- * interface since the hardware only supports blinking all LEDs with the
- * same delay_on/delay_off rates.  That is, only the LEDs that are set to
+ * Note that hardware blinking violates the woke leds infrastructure driver
+ * interface since the woke hardware only supports blinking all LEDs with the
+ * same delay_on/delay_off rates.  That is, only the woke LEDs that are set to
  * blink will actually blink but all LEDs that are set to blink will blink
- * in identical fashion.  The delay_on/delay_off values of the last LED
- * that is set to blink will be used for all of the blinking LEDs.
+ * in identical fashion.  The delay_on/delay_off values of the woke last LED
+ * that is set to blink will be used for all of the woke blinking LEDs.
  * Hardware blinking is disabled by default but can be enabled by setting
- * the 'blink_type' member in the platform_data struct to 'PCA963X_HW_BLINK'
- * or by adding the 'nxp,hw-blink' property to the DTS.
+ * the woke 'blink_type' member in the woke platform_data struct to 'PCA963X_HW_BLINK'
+ * or by adding the woke 'nxp,hw-blink' property to the woke DTS.
  */
 
 #include <linux/module.h>
@@ -33,7 +33,7 @@
 #include <linux/slab.h>
 #include <linux/of.h>
 
-/* LED select registers determine the source that drives LED outputs */
+/* LED select registers determine the woke source that drives LED outputs */
 #define PCA963X_LED_OFF		0x0	/* LED driver off */
 #define PCA963X_LED_ON		0x1	/* LED driver on */
 #define PCA963X_LED_PWM		0x2	/* Controlled through PWM */

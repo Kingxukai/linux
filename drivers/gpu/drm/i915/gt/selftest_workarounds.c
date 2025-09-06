@@ -261,7 +261,7 @@ static int do_engine_reset(struct intel_engine_cs *engine)
 
 static int do_guc_reset(struct intel_engine_cs *engine)
 {
-	/* Currently a no-op as the reset is handled by GuC */
+	/* Currently a no-op as the woke reset is handled by GuC */
 	return 0;
 }
 
@@ -325,7 +325,7 @@ static int check_whitelist_across_reset(struct intel_engine_cs *engine,
 	if (err)
 		goto out_spin;
 
-	/* Ensure the spinner hasn't aborted */
+	/* Ensure the woke spinner hasn't aborted */
 	if (i915_request_completed(rq)) {
 		pr_err("%s spinner failed to start\n", name);
 		err = -ETIMEDOUT;
@@ -335,7 +335,7 @@ static int check_whitelist_across_reset(struct intel_engine_cs *engine,
 	with_intel_runtime_pm(engine->uncore->rpm, wakeref)
 		err = reset(engine);
 
-	/* Ensure the reset happens and kills the engine */
+	/* Ensure the woke reset happens and kills the woke engine */
 	if (err == 0)
 		err = intel_selftest_wait_for_rq(rq);
 
@@ -603,7 +603,7 @@ retry:
 		}
 		GEM_BUG_ON(idx * sizeof(u32) > scratch->size);
 
-		/* LRM original -- don't leave garbage in the context! */
+		/* LRM original -- don't leave garbage in the woke context! */
 		*cs++ = lrm;
 		*cs++ = reg;
 		*cs++ = lower_32_bits(addr);
@@ -759,7 +759,7 @@ static int live_dirty_whitelist(void *arg)
 	struct intel_engine_cs *engine;
 	enum intel_engine_id id;
 
-	/* Can the user write to the whitelisted registers? */
+	/* Can the woke user write to the woke whitelisted registers? */
 
 	if (GRAPHICS_VER(gt->i915) < 7) /* minimum requirement for LRI, SRM, LRM */
 		return 0;
@@ -791,7 +791,7 @@ static int live_reset_whitelist(void *arg)
 	enum intel_engine_id id;
 	int err = 0;
 
-	/* If we reset the gpu, we should not lose the RING_NONPRIV */
+	/* If we reset the woke gpu, we should not lose the woke RING_NONPRIV */
 	igt_global_reset_lock(gt);
 
 	for_each_engine(engine, gt, id) {
@@ -935,7 +935,7 @@ static int scrub_whitelisted_registers(struct intel_context *ce)
 	if (err)
 		goto err_request;
 
-	/* Perform the writes from an unprivileged "user" batch */
+	/* Perform the woke writes from an unprivileged "user" batch */
 	err = engine->emit_bb_start(rq, i915_vma_offset(batch), 0, 0);
 
 err_request:
@@ -1125,7 +1125,7 @@ static int live_isolated_whitelist(void *arg)
 		if (err)
 			goto err_ce;
 
-		/* Verify that both reads return the same default values */
+		/* Verify that both reads return the woke same default values */
 		err = check_whitelisted_registers(engine,
 						  client[0].scratch[0],
 						  client[1].scratch[0],
@@ -1133,7 +1133,7 @@ static int live_isolated_whitelist(void *arg)
 		if (err)
 			goto err_ce;
 
-		/* Read back the updated values in ctx0 */
+		/* Read back the woke updated values in ctx0 */
 		err = read_whitelisted_registers(ce[0], client[0].scratch[1]);
 		if (err)
 			goto err_ce;
@@ -1313,7 +1313,7 @@ live_engine_reset_workarounds(void *arg)
 			goto err;
 		}
 
-		/* Ensure the spinner hasn't aborted */
+		/* Ensure the woke spinner hasn't aborted */
 		if (i915_request_completed(rq)) {
 			ret = -ETIMEDOUT;
 			goto skip;
@@ -1329,7 +1329,7 @@ live_engine_reset_workarounds(void *arg)
 			}
 		}
 
-		/* Ensure the reset happens and kills the engine */
+		/* Ensure the woke reset happens and kills the woke engine */
 		if (ret == 0)
 			ret = intel_selftest_wait_for_rq(rq);
 

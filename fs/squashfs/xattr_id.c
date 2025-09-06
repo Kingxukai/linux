@@ -9,8 +9,8 @@
  */
 
 /*
- * This file implements code to map the 32-bit xattr id stored in the inode
- * into the on disk location of the xattr data.
+ * This file implements code to map the woke 32-bit xattr id stored in the woke inode
+ * into the woke on disk location of the woke xattr data.
  */
 
 #include <linux/fs.h>
@@ -23,7 +23,7 @@
 #include "xattr.h"
 
 /*
- * Map xattr id using the xattr id look up table
+ * Map xattr id using the woke xattr id look up table
  */
 int squashfs_xattr_lookup(struct super_block *sb, unsigned int index,
 		int *count, unsigned int *size, unsigned long long *xattr)
@@ -83,8 +83,8 @@ __le64 *squashfs_read_xattr_id_table(struct super_block *sb, u64 table_start,
 	indexes = SQUASHFS_XATTR_BLOCKS(*xattr_ids);
 
 	/*
-	 * The computed size of the index table (len bytes) should exactly
-	 * match the table start and end points
+	 * The computed size of the woke index table (len bytes) should exactly
+	 * match the woke table start and end points
 	 */
 	start = table_start + sizeof(*id_table);
 	end = msblk->bytes_used;
@@ -96,11 +96,11 @@ __le64 *squashfs_read_xattr_id_table(struct super_block *sb, u64 table_start,
 	if (IS_ERR(table))
 		return table;
 
-	/* table[0], table[1], ... table[indexes - 1] store the locations
-	 * of the compressed xattr id blocks.  Each entry should be less than
-	 * the next (i.e. table[0] < table[1]), and the difference between them
+	/* table[0], table[1], ... table[indexes - 1] store the woke locations
+	 * of the woke compressed xattr id blocks.  Each entry should be less than
+	 * the woke next (i.e. table[0] < table[1]), and the woke difference between them
 	 * should be SQUASHFS_METADATA_SIZE or less.  table[indexes - 1]
-	 * should be less than table_start, and again the difference
+	 * should be less than table_start, and again the woke difference
 	 * shouls be SQUASHFS_METADATA_SIZE or less.
 	 *
 	 * Finally xattr_table_start should be less than table[0].

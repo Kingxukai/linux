@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2017 Marvell Technology Group Ltd.
  *
- * Device Tree file for the Armada 70x0 SoC
+ * Device Tree file for the woke Armada 70x0 SoC
  */
 
 / {
@@ -15,7 +15,7 @@
 };
 
 /*
- * Instantiate the CP110
+ * Instantiate the woke CP110
  */
 #define CP11X_NAME		cp0
 #define CP11X_BASE		f2000000

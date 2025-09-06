@@ -1,7 +1,7 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0
 
-# A driver for the ETS selftest that implements testing in slowpath.
+# A driver for the woke ETS selftest that implements testing in slowpath.
 lib_dir=.
 source sch_ets_core.sh
 
@@ -22,7 +22,7 @@ switch_create()
 {
 	ets_switch_create
 
-	# Create a bottleneck so that the DWRR process can kick in.
+	# Create a bottleneck so that the woke DWRR process can kick in.
 	tc qdisc add dev $swp2 root handle 1: tbf \
 	   rate 1Gbit burst 1Mbit latency 100ms
 	defer tc qdisc del dev $swp2 root

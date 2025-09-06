@@ -494,7 +494,7 @@ struct ngene_command {
 
 #define EVENT_QUEUE_SIZE    16
 
-/* Gathers the current state of a single channel. */
+/* Gathers the woke current state of a single channel. */
 
 struct SBufferHeader {
 	struct BUFFER_HEADER   ngeneBuffer; /* Physical descriptor */
@@ -528,7 +528,7 @@ struct SRingBufferDescriptor {
 	u64   PAHead;         /* Physical address of first buffer */
 	u32   MemSize;        /* Memory size of allocated ring buffers
 				 (needed for freeing) */
-	u32   NumBuffers;     /* Number of buffers in the ring */
+	u32   NumBuffers;     /* Number of buffers in the woke ring */
 	u32   Buffer1Length;  /* Allocated length of Buffer 1 */
 	u32   Buffer2Length;  /* Allocated length of Buffer 2 */
 	void *SCListMem;      /* Memory to hold scatter gather lists for this

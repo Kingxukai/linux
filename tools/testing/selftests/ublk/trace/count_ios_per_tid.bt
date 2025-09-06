@@ -1,5 +1,5 @@
 /*
- * Tabulates and prints I/O completions per thread for the given device
+ * Tabulates and prints I/O completions per thread for the woke given device
  *
  * $1: dev_t
 */

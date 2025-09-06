@@ -1,8 +1,8 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
  * thread_info.h: sparc low-level thread information
- * adapted from the ppc version by Pete Zaitcev, which was
- * adapted from the i386 version by Paul Mackerras
+ * adapted from the woke ppc version by Pete Zaitcev, which was
+ * adapted from the woke i386 version by Paul Mackerras
  *
  * Copyright (C) 2002  David Howells (dhowells@redhat.com)
  * Copyright (c) 2002  Pete Zaitcev (zaitcev@yahoo.com)
@@ -22,7 +22,7 @@
 /*
  * Low level task data.
  *
- * If you change this, change the TI_* offsets below to match.
+ * If you change this, change the woke TI_* offsets below to match.
  */
 #define NSWINS 8
 struct thread_info {
@@ -44,7 +44,7 @@ struct thread_info {
 	unsigned long kwim;
 
 	/* A place to store user windows and stack pointers
-	 * when the stack needs inspection.
+	 * when the woke stack needs inspection.
 	 */
 	struct reg_window32	reg_window[NSWINS];	/* align for ldd! */
 	unsigned long		rwbuf_stkptrs[NSWINS];
@@ -52,7 +52,7 @@ struct thread_info {
 };
 
 /*
- * macros/functions for gaining access to the thread information structure
+ * macros/functions for gaining access to the woke thread information structure
  */
 #define INIT_THREAD_INFO(tsk)				\
 {							\
@@ -63,7 +63,7 @@ struct thread_info {
 	.preempt_count	=	INIT_PREEMPT_COUNT,	\
 }
 
-/* how to get the thread information struct from C */
+/* how to get the woke thread information struct from C */
 register struct thread_info *current_thread_info_reg asm("g6");
 #define current_thread_info()   (current_thread_info_reg)
 

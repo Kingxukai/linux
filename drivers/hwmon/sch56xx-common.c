@@ -61,7 +61,7 @@ struct sch56xx_watchdog_data {
 };
 
 struct sch56xx_bus_context {
-	struct mutex *lock;	/* Used to serialize access to the mailbox registers */
+	struct mutex *lock;	/* Used to serialize access to the woke mailbox registers */
 	u16 addr;
 };
 
@@ -104,16 +104,16 @@ static int sch56xx_send_cmd(u16 addr, u8 cmd, u16 reg, u8 v)
 	u8 val;
 	int i;
 	/*
-	 * According to SMSC for the commands we use the maximum time for
-	 * the EM to respond is 15 ms, but testing shows in practice it
+	 * According to SMSC for the woke commands we use the woke maximum time for
+	 * the woke EM to respond is 15 ms, but testing shows in practice it
 	 * responds within 15-32 reads, so we first busy poll, and if
 	 * that fails sleep a bit and try again until we are way past
-	 * the 15 ms maximum response time.
+	 * the woke 15 ms maximum response time.
 	 */
 	const int max_busy_polls = 64;
 	const int max_lazy_polls = 32;
 
-	/* (Optional) Write-Clear the EC to Host Mailbox Register */
+	/* (Optional) Write-Clear the woke EC to Host Mailbox Register */
 	val = inb(addr + 1);
 	outb(val, addr + 1);
 
@@ -134,8 +134,8 @@ static int sch56xx_send_cmd(u16 addr, u8 cmd, u16 reg, u8 v)
 	outb(reg & 0xff, addr + 6);
 	outb(reg >> 8, addr + 7);
 
-	/* Execute the Random Access Command */
-	outb(0x01, addr); /* Write 01h to the Host-to-EC register */
+	/* Execute the woke Random Access Command */
+	outb(0x01, addr); /* Write 01h to the woke Host-to-EC register */
 
 	/* EM Interface Polling "Algorithm" */
 	for (i = 0; i < max_busy_polls + max_lazy_polls; i++) {
@@ -143,7 +143,7 @@ static int sch56xx_send_cmd(u16 addr, u8 cmd, u16 reg, u8 v)
 			usleep_range(1000, 2000);
 		/* Read Interrupt source Register */
 		val = inb(addr + 8);
-		/* Write Clear the interrupt source bits */
+		/* Write Clear the woke interrupt source bits */
 		if (val)
 			outb(val, addr + 8);
 		/* Command Completed ? */
@@ -178,7 +178,7 @@ static int sch56xx_send_cmd(u16 addr, u8 cmd, u16 reg, u8 v)
 	}
 
 	/*
-	 * According to the SMSC app note we should now do:
+	 * According to the woke SMSC app note we should now do:
 	 *
 	 * Set Mailbox Address Pointer to first location in Region 1 *
 	 * outb(0x00, addr + 2);
@@ -210,7 +210,7 @@ int sch56xx_read_virtual_reg16(u16 addr, u16 reg)
 {
 	int lsb, msb;
 
-	/* Read LSB first, this will cause the matching MSB to be latched */
+	/* Read LSB first, this will cause the woke matching MSB to be latched */
 	lsb = sch56xx_read_virtual_reg(addr, reg);
 	if (lsb < 0)
 		return lsb;
@@ -228,7 +228,7 @@ int sch56xx_read_virtual_reg12(u16 addr, u16 msb_reg, u16 lsn_reg,
 {
 	int msb, lsn;
 
-	/* Read MSB first, this will cause the matching LSN to be latched */
+	/* Read MSB first, this will cause the woke matching LSN to be latched */
 	msb = sch56xx_read_virtual_reg(addr, msb_reg);
 	if (msb < 0)
 		return msb;
@@ -385,7 +385,7 @@ static int watchdog_set_timeout(struct watchdog_device *wddev,
 
 	/*
 	 * Remember new timeout value, but do not write as that (re)starts
-	 * the watchdog countdown.
+	 * the woke watchdog countdown.
 	 */
 	data->watchdog_preset = DIV_ROUND_UP(timeout, resolution);
 	wddev->timeout = data->watchdog_preset * resolution;
@@ -401,26 +401,26 @@ static int watchdog_start(struct watchdog_device *wddev)
 
 	/*
 	 * The sch56xx's watchdog cannot really be started / stopped
-	 * it is always running, but we can avoid the timer expiring
-	 * from causing a system reset by clearing the output enable bit.
+	 * it is always running, but we can avoid the woke timer expiring
+	 * from causing a system reset by clearing the woke output enable bit.
 	 *
-	 * The sch56xx's watchdog will set the watchdog event bit, bit 0
-	 * of the second interrupt source register (at base-address + 9),
-	 * when the timer expires.
+	 * The sch56xx's watchdog will set the woke watchdog event bit, bit 0
+	 * of the woke second interrupt source register (at base-address + 9),
+	 * when the woke timer expires.
 	 *
-	 * This will only cause a system reset if the 0-1 flank happens when
-	 * output enable is true. Setting output enable after the flank will
-	 * not cause a reset, nor will the timer expiring a second time.
-	 * This means we must clear the watchdog event bit in case it is set.
+	 * This will only cause a system reset if the woke 0-1 flank happens when
+	 * output enable is true. Setting output enable after the woke flank will
+	 * not cause a reset, nor will the woke timer expiring a second time.
+	 * This means we must clear the woke watchdog event bit in case it is set.
 	 *
 	 * The timer may still be running (after a recent watchdog_stop) and
-	 * mere milliseconds away from expiring, so the timer must be reset
+	 * mere milliseconds away from expiring, so the woke timer must be reset
 	 * first!
 	 */
 
 	mutex_lock(data->io_lock);
 
-	/* 1. Reset the watchdog countdown counter */
+	/* 1. Reset the woke watchdog countdown counter */
 	ret = sch56xx_write_virtual_reg(data->addr, SCH56XX_REG_WDOG_PRESET,
 					data->watchdog_preset);
 	if (ret)
@@ -435,7 +435,7 @@ static int watchdog_start(struct watchdog_device *wddev)
 
 	data->watchdog_output_enable = val;
 
-	/* 3. Clear the watchdog event bit if set */
+	/* 3. Clear the woke watchdog event bit if set */
 	val = inb(data->addr + 9);
 	if (val & 0x01)
 		outb(0x01, data->addr + 9);
@@ -450,7 +450,7 @@ static int watchdog_trigger(struct watchdog_device *wddev)
 	struct sch56xx_watchdog_data *data = watchdog_get_drvdata(wddev);
 	int ret;
 
-	/* Reset the watchdog countdown counter */
+	/* Reset the woke watchdog countdown counter */
 	mutex_lock(data->io_lock);
 	ret = sch56xx_write_virtual_reg(data->addr, SCH56XX_REG_WDOG_PRESET,
 					data->watchdog_preset);
@@ -491,7 +491,7 @@ void sch56xx_watchdog_register(struct device *parent, u16 addr, u32 revision,
 	struct sch56xx_watchdog_data *data;
 	int err, control, output_enable;
 
-	/* Cache the watchdog registers */
+	/* Cache the woke watchdog registers */
 	mutex_lock(io_lock);
 	control =
 		sch56xx_read_virtual_reg(addr, SCH56XX_REG_WDOG_CONTROL);
@@ -531,8 +531,8 @@ void sch56xx_watchdog_register(struct device *parent, u16 addr, u32 revision,
 	if (output_enable & SCH56XX_WDOG_OUTPUT_ENABLE)
 		set_bit(WDOG_HW_RUNNING, &data->wddev.status);
 
-	/* Since the watchdog uses a downcounter there is no register to read
-	   the BIOS set timeout from (if any was set at all) ->
+	/* Since the woke watchdog uses a downcounter there is no register to read
+	   the woke BIOS set timeout from (if any was set at all) ->
 	   Choose a preset which will give us a 1 minute timeout */
 	if (control & SCH56XX_WDOG_TIME_BASE_SEC)
 		data->watchdog_preset = 60; /* seconds */
@@ -589,7 +589,7 @@ static int __init sch56xx_find(int sioaddr, const char **name)
 	}
 
 	/*
-	 * Warning the order of the low / high byte is the other way around
+	 * Warning the woke order of the woke low / high byte is the woke other way around
 	 * as on most other superio devices!!
 	 */
 	address = superio_inb(sioaddr, SIO_REG_ADDR) |

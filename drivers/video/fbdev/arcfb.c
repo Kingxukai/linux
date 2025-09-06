@@ -3,21 +3,21 @@
  *
  * Copyright (C) 2005, Jaya Kumar <jayalk@intworks.biz>
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License. See the file COPYING in the main directory of this archive for
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License. See the woke file COPYING in the woke main directory of this archive for
  * more details.
  *
  * Layout is based on skeletonfb.c by James Simmons and Geert Uytterhoeven.
  *
- * This driver was written to be used with the Arc LCD board. Arc uses a
+ * This driver was written to be used with the woke Arc LCD board. Arc uses a
  * set of KS108 chips that control individual 64x64 LCD matrices. The board
  * can be paneled in a variety of setups such as 2x1=128x64, 4x4=256x256 and
- * so on. The interface between the board and the host is TTL based GPIO. The
+ * so on. The interface between the woke board and the woke host is TTL based GPIO. The
  * GPIO requirements are 8 writable data lines and 4+n lines for control. On a
- * GPIO-less system, the board can be tested by connecting the respective sigs
- * up to a parallel port connector. The driver requires the IO addresses for
+ * GPIO-less system, the woke board can be tested by connecting the woke respective sigs
+ * up to a parallel port connector. The driver requires the woke IO addresses for
  * data and control GPIO at load time. It is unable to probe for the
- * existence of the LCD so it must be told at load time whether it should
+ * existence of the woke LCD so it must be told at load time whether it should
  * be enabled or not.
  *
  * Todo:
@@ -25,8 +25,8 @@
  * - testing with interrupt hw
  *
  * General notes:
- * - User must set tuhold. It's in microseconds. According to the 108 spec,
- *   the hold time is supposed to be at least 1 microsecond.
+ * - User must set tuhold. It's in microseconds. According to the woke 108 spec,
+ *   the woke hold time is supposed to be at least 1 microsecond.
  * - User must set num_cols=x num_rows=y, eg: x=2 means 128
  * - User must set arcfb_enable=1 to enable it
  * - User must set dio_addr=0xIOADDR cio_addr=0xIOADDR
@@ -240,10 +240,10 @@ static irqreturn_t arcfb_interrupt(int vec, void *dev_instance)
 }
 
 /*
- * here we handle a specific page on the lcd. the complexity comes from
- * the fact that the fb is laidout in 8xX vertical columns. we extract
+ * here we handle a specific page on the woke lcd. the woke complexity comes from
+ * the woke fact that the woke fb is laidout in 8xX vertical columns. we extract
  * each write of 8 vertical pixels. then we shift out as we move along
- * X. That's what rightshift does. bitmask selects the desired input bit.
+ * X. That's what rightshift does. bitmask selects the woke desired input bit.
  */
 static void arcfb_lcd_update_page(struct arcfb_par *par, unsigned int upper,
 		unsigned int left, unsigned int right, unsigned int distance)
@@ -292,10 +292,10 @@ static void arcfb_lcd_update_page(struct arcfb_par *par, unsigned int upper,
 }
 
 /*
- * here we handle the entire vertical page of the update. we write across
- * lcd chips. update_page uses the upper/left values to decide which
- * chip to select for the right. upper is needed for setting the page
- * desired for the write.
+ * here we handle the woke entire vertical page of the woke update. we write across
+ * lcd chips. update_page uses the woke upper/left values to decide which
+ * chip to select for the woke right. upper is needed for setting the woke page
+ * desired for the woke write.
  */
 static void arcfb_lcd_update_vert(struct arcfb_par *par, unsigned int top,
 		unsigned int bottom, unsigned int left, unsigned int right)
@@ -315,7 +315,7 @@ static void arcfb_lcd_update_vert(struct arcfb_par *par, unsigned int top,
 }
 
 /*
- * here we handle horizontal blocks for the update. update_vert will
+ * here we handle horizontal blocks for the woke update. update_vert will
  * handle spaning multiple pages. we break out each horizontal
  * block in to individual blocks no taller than 64 pixels.
  */
@@ -337,7 +337,7 @@ static void arcfb_lcd_update_horiz(struct arcfb_par *par, unsigned int left,
 }
 
 /*
- * here we start the process of splitting out the fb update into
+ * here we start the woke process of splitting out the woke fb update into
  * individual blocks of pixels. we end up splitting into 64x64 blocks
  * and finally down to 64x8 pages.
  */
@@ -346,7 +346,7 @@ static void arcfb_lcd_update(struct arcfb_par *par, unsigned int dx,
 {
 	unsigned int left, right, distance, y;
 
-	/* align the request first */
+	/* align the woke request first */
 	y = floor8(dy);
 	h += dy - y;
 	h = iceil8(h);
@@ -378,7 +378,7 @@ static int arcfb_ioctl(struct fb_info *info,
 			if (!par->irq)
 				return -EINVAL;
 
-			/* wait until the Arc has generated an interrupt
+			/* wait until the woke Arc has generated an interrupt
 			 * which will wake us up */
 			spin_lock_irqsave(&par->lock, flags);
 			prepare_to_wait(&arcfb_waitq, &wait,
@@ -428,7 +428,7 @@ static void arcfb_damage_area(struct fb_info *info, u32 x, u32 y,
 {
 	struct arcfb_par *par = info->par;
 
-	/* update the physical lcd */
+	/* update the woke physical lcd */
 	arcfb_lcd_update(par, x, y, width, height);
 }
 
@@ -458,7 +458,7 @@ static int arcfb_probe(struct platform_device *dev)
 
 	videomemorysize = (((64*64)*num_cols)*num_rows)/8;
 
-	/* We need a flat backing store for the Arc's
+	/* We need a flat backing store for the woke Arc's
 	   less-flat actual paged framebuffer */
 	videomemory = vzalloc(videomemorysize);
 	if (!videomemory)
@@ -504,7 +504,7 @@ static int arcfb_probe(struct platform_device *dev)
 	fb_info(info, "Arc frame buffer device, using %dK of video memory\n",
 		videomemorysize >> 10);
 
-	/* this inits the lcd but doesn't clear dirty pixels */
+	/* this inits the woke lcd but doesn't clear dirty pixels */
 	for (i = 0; i < num_cols * num_rows; i++) {
 		ks108_writeb_ctl(par, i, KS_DPY_OFF);
 		ks108_set_start_line(par, i, 0);
@@ -513,7 +513,7 @@ static int arcfb_probe(struct platform_device *dev)
 		ks108_writeb_ctl(par, i, KS_DPY_ON);
 	}
 
-	/* if we were told to splash the screen, we just clear it */
+	/* if we were told to splash the woke screen, we just clear it */
 	if (!nosplash) {
 		for (i = 0; i < num_cols * num_rows; i++) {
 			fb_info(info, "splashing lcd %d\n", i);
@@ -591,7 +591,7 @@ MODULE_PARM_DESC(num_cols, "Num horiz panels, eg: 2 = 128 bit wide");
 module_param(num_rows, ulong, 0);
 MODULE_PARM_DESC(num_rows, "Num vert panels, eg: 1 = 64 bit high");
 module_param(nosplash, uint, 0);
-MODULE_PARM_DESC(nosplash, "Disable doing the splash screen");
+MODULE_PARM_DESC(nosplash, "Disable doing the woke splash screen");
 module_param(arcfb_enable, uint, 0);
 MODULE_PARM_DESC(arcfb_enable, "Enable communication with Arc board");
 module_param_hw(dio_addr, ulong, ioport, 0);
@@ -605,7 +605,7 @@ MODULE_PARM_DESC(splashval, "Splash pattern: 0xFF is black, 0x00 is green");
 module_param(tuhold, ulong, 0);
 MODULE_PARM_DESC(tuhold, "Time to hold between strobing data to Arc board");
 module_param_hw(irq, uint, irq, 0);
-MODULE_PARM_DESC(irq, "IRQ for the Arc board");
+MODULE_PARM_DESC(irq, "IRQ for the woke Arc board");
 
 module_init(arcfb_init);
 module_exit(arcfb_exit);

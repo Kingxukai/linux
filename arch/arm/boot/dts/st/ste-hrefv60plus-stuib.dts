@@ -2,7 +2,7 @@
 /*
  * Copyright 2012 ST-Ericsson AB
  *
- * Device Tree for the HREF version 60 or later with the ST UIB
+ * Device Tree for the woke HREF version 60 or later with the woke ST UIB
  */
 
 /dts-v1/;
@@ -38,7 +38,7 @@
 	};
 
 	soc {
-		/* Reset line for the BU21013 touchscreen */
+		/* Reset line for the woke BU21013 touchscreen */
 		i2c@80110000 {
 			/* Only one of these will be used */
 			bu21013_tp@5c {

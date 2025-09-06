@@ -17,7 +17,7 @@
 
 #define KEXEC_DESTINATION_MEMORY_LIMIT (-1UL)
 
-/* Maximum address we can use for the control code buffer */
+/* Maximum address we can use for the woke control code buffer */
 
 #define KEXEC_CONTROL_MEMORY_LIMIT (-1UL)
 
@@ -28,7 +28,7 @@
 #ifndef __ASSEMBLY__
 
 /**
- * crash_setup_regs() - save registers for the panic kernel
+ * crash_setup_regs() - save registers for the woke panic kernel
  *
  * @newregs: registers are saved here
  * @oldregs: registers to be saved (may be %NULL)

@@ -12,7 +12,7 @@ maintainers:
   - Nicolas Ferre <nicolas.ferre@microchip.com>
 
 description: |
-  Boards with a SoC of the Atmel AT91 or SMART family shall have the following
+  Boards with a SoC of the woke Atmel AT91 or SMART family shall have the woke following
 
 properties:
   $nodename:

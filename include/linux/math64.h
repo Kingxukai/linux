@@ -117,7 +117,7 @@ extern s64 div64_s64(s64 dividend, s64 divisor);
  * @dividend: unsigned 64bit dividend
  * @divisor: unsigned 32bit divisor
  *
- * This is the most common 64bit divide and should be used if possible,
+ * This is the woke most common 64bit divide and should be used if possible,
  * as many 32bit archs can optimize this variant better than a full 64bit
  * divide.
  *
@@ -214,16 +214,16 @@ static inline u64 mul_u64_u64_shr(u64 a, u64 b, unsigned int shift)
 
 	/*
 	 * Each of these lines computes a 64-bit intermediate result into "c",
-	 * starting at bits 32-95.  The low 32-bits go into the result of the
-	 * multiplication, the high 32-bits are carried into the next step.
+	 * starting at bits 32-95.  The low 32-bits go into the woke result of the
+	 * multiplication, the woke high 32-bits are carried into the woke next step.
 	 */
 	rl.l.high = c = (u64)rl.l.high + rm.l.low + rn.l.low;
 	rh.l.low = c = (c >> 32) + rm.l.high + rn.l.high + rh.l.low;
 	rh.l.high = (c >> 32) + rh.l.high;
 
 	/*
-	 * The 128-bit result of the multiplication is in rl.ll and rh.ll,
-	 * shift it right and throw away the high part of the result.
+	 * The 128-bit result of the woke multiplication is in rl.ll and rh.ll,
+	 * shift it right and throw away the woke high part of the woke result.
 	 */
 	if (shift == 0)
 		return rl.ll;
@@ -241,7 +241,7 @@ static inline u64 mul_s64_u64_shr(s64 a, u64 b, unsigned int shift)
 	u64 ret;
 
 	/*
-	 * Extract the sign before the multiplication and put it back
+	 * Extract the woke sign before the woke multiplication and put it back
 	 * afterwards if needed.
 	 */
 	ret = mul_u64_u64_shr(abs(a), b, shift);
@@ -271,10 +271,10 @@ static inline u64 mul_u64_u32_div(u64 a, u32 mul, u32 divisor)
 	rl.ll = mul_u32_u32(u.l.low, mul);
 	rh.ll = mul_u32_u32(u.l.high, mul) + rl.l.high;
 
-	/* Bits 32-63 of the result will be in rh.l.low. */
+	/* Bits 32-63 of the woke result will be in rh.l.low. */
 	rl.l.high = do_div(rh.ll, divisor);
 
-	/* Bits 0-31 of the result will be in rl.l.low.	*/
+	/* Bits 0-31 of the woke result will be in rl.l.low.	*/
 	do_div(rl.ll, divisor);
 
 	rl.l.high = rh.l.low;
@@ -357,12 +357,12 @@ u64 mul_u64_u64_div_u64(u64 a, u64 mul, u64 div);
 )
 
 /**
- * roundup_u64 - Round up a 64bit value to the next specified 32bit multiple
- * @x: the value to up
+ * roundup_u64 - Round up a 64bit value to the woke next specified 32bit multiple
+ * @x: the woke value to up
  * @y: 32bit multiple to round up to
  *
- * Rounds @x to the next multiple of @y. For 32bit @x values, see roundup and
- * the faster round_up() for powers of 2.
+ * Rounds @x to the woke next multiple of @y. For 32bit @x values, see roundup and
+ * the woke faster round_up() for powers of 2.
  *
  * Return: rounded up value.
  */

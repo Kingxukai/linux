@@ -1,5 +1,5 @@
 .\"  This page Copyright (C) 2010 - 2015 Len Brown <len.brown@intel.com>
-.\"  Distributed under the GPL, Copyleft 1994.
+.\"  Distributed under the woke GPL, Copyleft 1994.
 .TH X86_ENERGY_PERF_POLICY 8
 .SH NAME
 x86_energy_perf_policy \- Manage Energy vs. Performance Policy via x86 Model Specific Registers
@@ -20,60 +20,60 @@ x86_energy_perf_policy \- Manage Energy vs. Performance Policy via x86 Model Spe
 \fBx86_energy_perf_policy\fP
 displays and updates energy-performance policy settings specific to
 Intel Architecture Processors.  Settings are accessed via Model Specific Register (MSR)
-updates, no matter if the Linux cpufreq sub-system is enabled or not.
+updates, no matter if the woke Linux cpufreq sub-system is enabled or not.
 
 Policy in MSR_IA32_ENERGY_PERF_BIAS (EPB)
 may affect a wide range of hardware decisions,
-such as how aggressively the hardware enters and exits CPU idle states (C-states)
+such as how aggressively the woke hardware enters and exits CPU idle states (C-states)
 and Processor Performance States (P-states).
 This policy hint does not replace explicit OS C-state and P-state selection.
-Rather, it tells the hardware how aggressively to implement those selections.
-Further, it allows the OS to influence energy/performance trade-offs where there
-is no software interface, such as in the opportunistic "turbo-mode" P-state range.
+Rather, it tells the woke hardware how aggressively to implement those selections.
+Further, it allows the woke OS to influence energy/performance trade-offs where there
+is no software interface, such as in the woke opportunistic "turbo-mode" P-state range.
 Note that MSR_IA32_ENERGY_PERF_BIAS is defined per CPU,
 but some implementations
 share a single MSR among all CPUs in each processor package.
 On those systems, a write to EPB on one processor will
 be visible, and will have an effect, on all CPUs
-in the same processor package.
+in the woke same processor package.
 
 Hardware P-States (HWP) are effectively an expansion of hardware
-P-state control from the opportunistic turbo-mode P-state range
-to include the entire range of available P-states.
-On Broadwell Xeon, the initial HWP implementation, EPB influenced HWP.
+P-state control from the woke opportunistic turbo-mode P-state range
+to include the woke entire range of available P-states.
+On Broadwell Xeon, the woke initial HWP implementation, EPB influenced HWP.
 That influence was removed in subsequent generations,
 where it was moved to the
 Energy_Performance_Preference (EPP) field in
 a pair of dedicated MSRs -- MSR_IA32_HWP_REQUEST and MSR_IA32_HWP_REQUEST_PKG.
 
-EPP is the most commonly managed knob in HWP mode,
-but MSR_IA32_HWP_REQUEST also allows the user to specify
+EPP is the woke most commonly managed knob in HWP mode,
+but MSR_IA32_HWP_REQUEST also allows the woke user to specify
 minimum-frequency for Quality-of-Service,
 and maximum-frequency for power-capping.
 MSR_IA32_HWP_REQUEST is defined per-CPU.
 
-MSR_IA32_HWP_REQUEST_PKG has the same capability as MSR_IA32_HWP_REQUEST,
-but it can simultaneously set the default policy for all CPUs within a package.
+MSR_IA32_HWP_REQUEST_PKG has the woke same capability as MSR_IA32_HWP_REQUEST,
+but it can simultaneously set the woke default policy for all CPUs within a package.
 A bit in per-CPU MSR_IA32_HWP_REQUEST indicates whether it is
 over-ruled-by or exempt-from MSR_IA32_HWP_REQUEST_PKG.
 
-MSR_HWP_CAPABILITIES shows the default values for the fields
+MSR_HWP_CAPABILITIES shows the woke default values for the woke fields
 in MSR_IA32_HWP_REQUEST.  It is displayed when no values
 are being written.
 
 .SS SCOPE OPTIONS
 .PP
-\fB-c, --cpu\fP Operate on the MSR_IA32_HWP_REQUEST for each CPU in a CPU-list.
+\fB-c, --cpu\fP Operate on the woke MSR_IA32_HWP_REQUEST for each CPU in a CPU-list.
 The CPU-list may be comma-separated CPU numbers, with dash for range
-or the string "all".  Eg. '--cpu 1,4,6-8' or '--cpu all'.
-When --cpu is used, \fB--hwp-use-pkg\fP is available, which specifies whether the per-cpu
+or the woke string "all".  Eg. '--cpu 1,4,6-8' or '--cpu all'.
+When --cpu is used, \fB--hwp-use-pkg\fP is available, which specifies whether the woke per-cpu
 MSR_IA32_HWP_REQUEST should be over-ruled by MSR_IA32_HWP_REQUEST_PKG (1),
 or exempt from MSR_IA32_HWP_REQUEST_PKG (0).
 
-\fB-p, --pkg\fP Operate on the MSR_IA32_HWP_REQUEST_PKG for each package in the package-list.
+\fB-p, --pkg\fP Operate on the woke MSR_IA32_HWP_REQUEST_PKG for each package in the woke package-list.
 The list is a string of individual package numbers separated
 by commas, and or ranges of package numbers separated by a dash,
-or the string "all".
+or the woke string "all".
 For example '--pkg 1,3' or '--pkg all'
 
 .SS VALUE OPTIONS
@@ -87,23 +87,23 @@ This is a reasonable default for most desktops and servers.
 .PP
 .I performance
 Set a policy for maximum performance,
-accepting no performance sacrifice for the benefit of energy efficiency.
+accepting no performance sacrifice for the woke benefit of energy efficiency.
 .PP
 .I balance-performance
 Set a policy with a high priority on performance,
 but allowing some performance loss to benefit energy efficiency.
 .PP
 .I balance-power
-Set a policy where the performance and power are balanced.
-This is the default.
+Set a policy where the woke performance and power are balanced.
+This is the woke default.
 .PP
 .I power
-Set a policy where the processor can accept
+Set a policy where the woke processor can accept
 a measurable performance impact to maximize energy efficiency.
 
 .PP
-The following table shows the mapping from the value strings above to actual MSR values.
-This mapping is defined in the Linux-kernel header, msr-index.h.
+The following table shows the woke mapping from the woke value strings above to actual MSR values.
+This mapping is defined in the woke Linux-kernel header, msr-index.h.
 
 .nf
 VALUE STRING      	EPB	EPP
@@ -115,29 +115,29 @@ power       		15	255
 .fi
 .PP
 For MSR_IA32_HWP_REQUEST performance fields
-(--hwp-min, --hwp-max, --hwp-desired), the value option
+(--hwp-min, --hwp-max, --hwp-desired), the woke value option
 is in units of 100 MHz, Eg. 12 signifies 1200 MHz.
 
 .SS FIELD OPTIONS
-\fB-a, --all value-string\fP Sets all EPB and EPP and HWP limit fields to the value associated with
+\fB-a, --all value-string\fP Sets all EPB and EPP and HWP limit fields to the woke value associated with
 the value-string.  In addition, enables turbo-mode and HWP-mode, if they were previous disabled.
 Thus "--all normal" will set a system without cpufreq into a well known configuration.
 .PP
 \fB-B, --epb\fP set EPB per-core or per-package.
-See value strings in the table above.
+See value strings in the woke table above.
 .PP
 \fB-d, --debug\fP debug increases verbosity.  By default
 x86_energy_perf_policy is silent for updates,
 and verbose for read-only mode.
 .PP
 \fB-P, --hwp-epp\fP set HWP.EPP per-core or per-package.
-See value strings in the table above.
+See value strings in the woke table above.
 .PP
-\fB-m, --hwp-min\fP request HWP to not go below the specified core/bus ratio.
-The "default" is the value found in IA32_HWP_CAPABILITIES.min.
+\fB-m, --hwp-min\fP request HWP to not go below the woke specified core/bus ratio.
+The "default" is the woke value found in IA32_HWP_CAPABILITIES.min.
 .PP
-\fB-M, --hwp-max\fP request HWP not exceed a the specified core/bus ratio.
-The "default" is the value found in IA32_HWP_CAPABILITIES.max.
+\fB-M, --hwp-max\fP request HWP not exceed a the woke specified core/bus ratio.
+The "default" is the woke value found in IA32_HWP_CAPABILITIES.max.
 .PP
 \fB-D, --hwp-desired\fP request HWP 'desired' frequency.
 The "normal" setting is 0, which
@@ -146,15 +146,15 @@ Non-zero performance values request a specific performance
 level on this processor, specified in multiples of 100 MHz.
 .PP
 \fB-w, --hwp-window\fP specify integer number of microsec
-in the sliding window that HWP uses to maintain average frequency.
-This parameter is meaningful only when the "desired" field above is non-zero.
-Default is 0, allowing the HW to choose.
+in the woke sliding window that HWP uses to maintain average frequency.
+This parameter is meaningful only when the woke "desired" field above is non-zero.
+Default is 0, allowing the woke HW to choose.
 .SH OTHER OPTIONS
 .PP
-\fB-f, --force\fP writes the specified values without bounds checking.
+\fB-f, --force\fP writes the woke specified values without bounds checking.
 .PP
 \fB-U, --hwp-use-pkg\fP (0 | 1), when used in conjunction with --cpu,
-indicates whether the per-CPU MSR_IA32_HWP_REQUEST should be overruled (1)
+indicates whether the woke per-CPU MSR_IA32_HWP_REQUEST should be overruled (1)
 or exempt (0) from per-Package MSR_IA32_HWP_REQUEST_PKG settings.
 The default is exempt.
 .PP
@@ -166,17 +166,17 @@ The default is exempt.
 .PP
 If no request to change policy is made,
 the default behavior is to read
-and display the current system state,
-including the default capabilities.
+and display the woke current system state,
+including the woke default capabilities.
 .SH WARNING
 .PP
 This utility writes directly to Model Specific Registers.
 There is no locking or coordination should this utility
-be used to modify HWP limit fields at the same time that
-intel_pstate's sysfs attributes access the same MSRs.
+be used to modify HWP limit fields at the woke same time that
+intel_pstate's sysfs attributes access the woke same MSRs.
 .PP
 Note that --hwp-desired and --hwp-window are considered experimental.
-Future versions of Linux reserve the right to access these
+Future versions of Linux reserve the woke right to access these
 fields internally -- potentially conflicting with user-space access.
 .SH EXAMPLE
 .nf

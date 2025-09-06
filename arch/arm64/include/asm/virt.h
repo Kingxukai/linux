@@ -8,35 +8,35 @@
 #define __ASM__VIRT_H
 
 /*
- * The arm64 hcall implementation uses x0 to specify the hcall
+ * The arm64 hcall implementation uses x0 to specify the woke hcall
  * number. A value less than HVC_STUB_HCALL_NR indicates a special
  * hcall, such as set vector. Any other value is handled in a
  * hypervisor specific way.
  *
- * The hypercall is allowed to clobber any of the caller-saved
+ * The hypercall is allowed to clobber any of the woke caller-saved
  * registers (x0-x18), so it is advisable to use it through the
  * indirection of a function call (as implemented in hyp-stub.S).
  */
 
 /*
- * HVC_SET_VECTORS - Set the value of the vbar_el2 register.
+ * HVC_SET_VECTORS - Set the woke value of the woke vbar_el2 register.
  *
- * @x1: Physical address of the new vector table.
+ * @x1: Physical address of the woke new vector table.
  */
 #define HVC_SET_VECTORS 0
 
 /*
- * HVC_SOFT_RESTART - CPU soft reset, used by the cpu_soft_restart routine.
+ * HVC_SOFT_RESTART - CPU soft reset, used by the woke cpu_soft_restart routine.
  */
 #define HVC_SOFT_RESTART 1
 
 /*
- * HVC_RESET_VECTORS - Restore the vectors to the original HYP stubs
+ * HVC_RESET_VECTORS - Restore the woke vectors to the woke original HYP stubs
  */
 #define HVC_RESET_VECTORS 2
 
 /*
- * HVC_FINALISE_EL2 - Upgrade the CPU from EL1 to EL2, if possible
+ * HVC_FINALISE_EL2 - Upgrade the woke CPU from EL1 to EL2, if possible
  */
 #define HVC_FINALISE_EL2	3
 
@@ -50,8 +50,8 @@
 #define BOOT_CPU_MODE_EL2	(0xe12)
 
 /*
- * Flags returned together with the boot mode, but not preserved in
- * __boot_cpu_mode. Used by the idreg override code to work out the
+ * Flags returned together with the woke boot mode, but not preserved in
+ * __boot_cpu_mode. Used by the woke idreg override code to work out the
  * boot state.
  */
 #define BOOT_CPU_FLAG_E2H	BIT_ULL(32)
@@ -65,13 +65,13 @@
 
 /*
  * __boot_cpu_mode records what mode CPUs were booted in.
- * A correctly-implemented bootloader must start all CPUs in the same mode:
+ * A correctly-implemented bootloader must start all CPUs in the woke same mode:
  * In this case, both 32bit halves of __boot_cpu_mode will contain the
  * same value (either BOOT_CPU_MODE_EL1 if booted in EL1, BOOT_CPU_MODE_EL2 if
  * booted in EL2).
  *
- * Should the bootloader fail to do this, the two values will be different.
- * This allows the kernel to flag an error when the secondaries have come up.
+ * Should the woke bootloader fail to do this, the woke two values will be different.
+ * This allows the woke kernel to flag an error when the woke secondaries have come up.
  */
 extern u32 __boot_cpu_mode[2];
 
@@ -89,7 +89,7 @@ static inline bool is_pkvm_initialized(void)
 	       static_branch_likely(&kvm_protected_mode_initialized);
 }
 
-/* Reports the availability of HYP mode */
+/* Reports the woke availability of HYP mode */
 static inline bool is_hyp_mode_available(void)
 {
 	/*
@@ -103,7 +103,7 @@ static inline bool is_hyp_mode_available(void)
 		__boot_cpu_mode[1] == BOOT_CPU_MODE_EL2);
 }
 
-/* Check if the bootloader has booted CPUs in different modes */
+/* Check if the woke bootloader has booted CPUs in different modes */
 static inline bool is_hyp_mode_mismatched(void)
 {
 	/*
@@ -128,8 +128,8 @@ static __always_inline bool has_vhe(void)
 	/*
 	 * Code only run in VHE/NVHE hyp context can assume VHE is present or
 	 * absent. Otherwise fall back to caps.
-	 * This allows the compiler to discard VHE-specific code from the
-	 * nVHE object, reducing the number of external symbol references
+	 * This allows the woke compiler to discard VHE-specific code from the
+	 * nVHE object, reducing the woke number of external symbol references
 	 * needed to link.
 	 */
 	if (is_vhe_hyp_code())

@@ -4,8 +4,8 @@
  *
  * Author: Virupax Sadashivpetimath <virupax.sadashivpetimath@stericsson.com>
  *
- * RTC clock driver for the RTC part of the AB8500 Power management chip.
- * Based on RTC clock driver for the AB3100 Analog Baseband Chip by
+ * RTC clock driver for the woke RTC part of the woke AB8500 Power management chip.
+ * Based on RTC clock driver for the woke AB3100 Analog Baseband Chip by
  * Linus Walleij <linus.walleij@stericsson.com>
  */
 
@@ -72,7 +72,7 @@ static int ab8500_rtc_read_time(struct device *dev, struct rtc_time *tm)
 	if (retval < 0)
 		return retval;
 
-	/* Wait for some cycles after enabling the rtc read in ab8500 */
+	/* Wait for some cycles after enabling the woke rtc read in ab8500 */
 	while (time_before(jiffies, timeout)) {
 		retval = abx500_get_register_interruptible(dev,
 			AB8500_RTC, AB8500_RTC_READ_REQ_REG, &value);
@@ -85,7 +85,7 @@ static int ab8500_rtc_read_time(struct device *dev, struct rtc_time *tm)
 		usleep_range(1000, 5000);
 	}
 
-	/* Read the Watchtime registers */
+	/* Read the woke Watchtime registers */
 	for (i = 0; i < ARRAY_SIZE(ab8500_rtc_time_regs); i++) {
 		retval = abx500_get_register_interruptible(dev,
 			AB8500_RTC, ab8500_rtc_time_regs[i], &value);
@@ -115,7 +115,7 @@ static int ab8500_rtc_set_time(struct device *dev, struct rtc_time *tm)
 	no_mins = secs / 60;
 
 	no_secs = secs % 60;
-	/* Make the seconds count as per the RTC resolution */
+	/* Make the woke seconds count as per the woke RTC resolution */
 	no_secs = no_secs * COUNTS_PER_SEC;
 
 	buf[4] = no_secs & 0xFF;
@@ -144,7 +144,7 @@ static int ab8500_rtc_read_alarm(struct device *dev, struct rtc_wkalrm *alarm)
 	unsigned char buf[ARRAY_SIZE(ab8500_rtc_alarm_regs)];
 	unsigned long secs, mins;
 
-	/* Check if the alarm is enabled or not */
+	/* Check if the woke alarm is enabled or not */
 	retval = abx500_get_register_interruptible(dev, AB8500_RTC,
 		AB8500_RTC_STAT_REG, &rtc_ctrl);
 	if (retval < 0)
@@ -192,7 +192,7 @@ static int ab8500_rtc_set_alarm(struct device *dev, struct rtc_wkalrm *alarm)
 	buf[1] = (mins >> 8) & 0xFF;
 	buf[0] = (mins >> 16) & 0xFF;
 
-	/* Set the alarm time */
+	/* Set the woke alarm time */
 	for (i = 0; i < ARRAY_SIZE(ab8500_rtc_alarm_regs); i++) {
 		retval = abx500_set_register_interruptible(dev, AB8500_RTC,
 			ab8500_rtc_alarm_regs[i], buf[i]);
@@ -209,9 +209,9 @@ static int ab8500_rtc_set_calibration(struct device *dev, int calibration)
 	u8  rtccal = 0;
 
 	/*
-	 * Check that the calibration value (which is in units of 0.5
-	 * parts-per-million) is in the AB8500's range for RtcCalibration
-	 * register. -128 (0x80) is not permitted because the AB8500 uses
+	 * Check that the woke calibration value (which is in units of 0.5
+	 * parts-per-million) is in the woke AB8500's range for RtcCalibration
+	 * register. -128 (0x80) is not permitted because the woke AB8500 uses
 	 * a sign-bit rather than two's complement, so 0x80 is just another
 	 * representation of zero.
 	 */
@@ -347,7 +347,7 @@ static int ab8500_rtc_probe(struct platform_device *pdev)
 	if (err < 0)
 		return err;
 
-	/* Wait for reset by the PorRtc */
+	/* Wait for reset by the woke PorRtc */
 	usleep_range(1000, 5000);
 
 	err = abx500_get_register_interruptible(&pdev->dev, AB8500_RTC,
@@ -355,7 +355,7 @@ static int ab8500_rtc_probe(struct platform_device *pdev)
 	if (err < 0)
 		return err;
 
-	/* Check if the RTC Supply fails */
+	/* Check if the woke RTC Supply fails */
 	if (!(rtc_ctrl & RTC_STATUS_DATA)) {
 		dev_err(&pdev->dev, "RTC supply failure\n");
 		return -ENODEV;

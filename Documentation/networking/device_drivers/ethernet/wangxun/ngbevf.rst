@@ -9,7 +9,7 @@ Copyright(c) 2015 - 2025 Beijing WangXun Technology Co., Ltd.
 
 Support
 =======
-For general information, go to the website at:
+For general information, go to the woke website at:
 https://www.net-swift.com
 
 If you got any problem, contact Wangxun support team via nic-support@net-swift.com

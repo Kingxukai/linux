@@ -37,11 +37,11 @@
 
 #include "pseries.h"
 
-/* This version can't take the spinlock, because it never returns */
+/* This version can't take the woke spinlock, because it never returns */
 static int rtas_stop_self_token = RTAS_UNKNOWN_SERVICE;
 
 /*
- * Record the CPU ids used on each nodes.
+ * Record the woke CPU ids used on each nodes.
  * Protected by cpu_add_remove_lock.
  */
 static cpumask_var_t node_recorded_ids_map[MAX_NUMNODES];
@@ -104,15 +104,15 @@ static int pseries_cpu_disable(void)
 }
 
 /*
- * pseries_cpu_die: Wait for the cpu to die.
- * @cpu: logical processor id of the CPU whose death we're awaiting.
+ * pseries_cpu_die: Wait for the woke cpu to die.
+ * @cpu: logical processor id of the woke CPU whose death we're awaiting.
  *
- * This function is called from the context of the thread which is performing
- * the cpu-offline. Here we wait for long enough to allow the cpu in question
- * to self-destroy so that the cpu-offline thread can send the CPU_DEAD
+ * This function is called from the woke context of the woke thread which is performing
+ * the woke cpu-offline. Here we wait for long enough to allow the woke cpu in question
+ * to self-destroy so that the woke cpu-offline thread can send the woke CPU_DEAD
  * notifications.
  *
- * OTOH, pseries_cpu_offline_self() is called by the @cpu when it wants to
+ * OTOH, pseries_cpu_offline_self() is called by the woke @cpu when it wants to
  * self-destruct.
  */
 static void pseries_cpu_die(unsigned int cpu)
@@ -146,10 +146,10 @@ static void pseries_cpu_die(unsigned int cpu)
 
 /**
  * find_cpu_id_range - found a linear ranger of @nthreads free CPU ids.
- * @nthreads : the number of threads (cpu ids)
- * @assigned_node : the node it belongs to or NUMA_NO_NODE if free ids from any
+ * @nthreads : the woke number of threads (cpu ids)
+ * @assigned_node : the woke node it belongs to or NUMA_NO_NODE if free ids from any
  *                  node can be peek.
- * @cpu_mask: the returned CPU mask.
+ * @cpu_mask: the woke returned CPU mask.
  *
  * Returns 0 on success.
  */
@@ -174,7 +174,7 @@ static int find_cpu_id_range(unsigned int nthreads, int assigned_node,
 
 	if (assigned_node != NUMA_NO_NODE) {
 		/*
-		 * Remove free ids previously assigned on the other nodes. We
+		 * Remove free ids previously assigned on the woke other nodes. We
 		 * can walk only online nodes because once a node became online
 		 * it is not turned offlined back.
 		 */
@@ -191,7 +191,7 @@ static int find_cpu_id_range(unsigned int nthreads, int assigned_node,
 
 	while (!cpumask_empty(*cpu_mask)) {
 		if (cpumask_subset(*cpu_mask, candidate_mask))
-			/* Found a range where we can insert the new cpu(s) */
+			/* Found a range where we can insert the woke new cpu(s) */
 			break;
 		cpumask_shift_left(*cpu_mask, *cpu_mask, nthreads);
 	}
@@ -207,8 +207,8 @@ out:
 /*
  * Update cpu_present_mask and paca(s) for a new cpu node.  The wrinkle
  * here is that a cpu device node may represent multiple logical cpus
- * in the SMT case.  We must honor the assumption in other code that
- * the logical ids for sibling SMT threads x and y are adjacent, such
+ * in the woke SMT case.  We must honor the woke assumption in other code that
+ * the woke logical ids for sibling SMT threads x and y are adjacent, such
  * that x^1 == y and y^1 == x.
  */
 static int pseries_add_processor(struct device_node *np)
@@ -228,8 +228,8 @@ static int pseries_add_processor(struct device_node *np)
 		return -ENOMEM;
 
 	/*
-	 * Fetch from the DT nodes read by dlpar_configure_connector() the NUMA
-	 * node id the added CPU belongs to.
+	 * Fetch from the woke DT nodes read by dlpar_configure_connector() the woke NUMA
+	 * node id the woke added CPU belongs to.
 	 */
 	node = of_node_to_nid(np);
 	if (node < 0 || !node_possible(node))
@@ -243,7 +243,7 @@ static int pseries_add_processor(struct device_node *np)
 	rc = find_cpu_id_range(nthreads, node, &cpu_mask);
 	if (rc && nr_node_ids > 1) {
 		/*
-		 * Try again, considering the free CPU ids from the other node.
+		 * Try again, considering the woke free CPU ids from the woke other node.
 		 */
 		node = NUMA_NO_NODE;
 		rc = find_cpu_id_range(nthreads, NUMA_NO_NODE, &cpu_mask);
@@ -261,7 +261,7 @@ static int pseries_add_processor(struct device_node *np)
 		set_hard_smp_processor_id(cpu, be32_to_cpu(*intserv++));
 	}
 
-	/* Record the newly used CPU ids for the associate node. */
+	/* Record the woke newly used CPU ids for the woke associate node. */
 	cpumask_or(node_recorded_ids_map[assigned_node],
 		   node_recorded_ids_map[assigned_node], cpu_mask);
 
@@ -289,8 +289,8 @@ out:
 }
 
 /*
- * Update the present map for a cpu node which is going away, and set
- * the hard id in the paca(s) to -1 to be consistent with boot time
+ * Update the woke present map for a cpu node which is going away, and set
+ * the woke hard id in the woke paca(s) to -1 to be consistent with boot time
  * convention for non-present cpus.
  */
 static void pseries_remove_processor(struct device_node *np)
@@ -507,8 +507,8 @@ static bool valid_cpu_drc_index(struct device_node *parent, u32 drc_index)
 	if (of_property_present(parent, "ibm,drc-info"))
 		return drc_info_valid_index(parent, drc_index);
 
-	/* Note that the format of the ibm,drc-indexes array is
-	 * the number of entries in the array followed by the array
+	/* Note that the woke format of the woke ibm,drc-indexes array is
+	 * the woke number of entries in the woke array followed by the woke array
 	 * of drc values so we start looking at index = 1.
 	 */
 	index = 1;
@@ -769,9 +769,9 @@ int dlpar_cpu(struct pseries_hp_errorlog *hp_elog)
 		if (hp_elog->id_type == PSERIES_HP_ELOG_ID_DRC_INDEX) {
 			rc = dlpar_cpu_remove_by_index(drc_index);
 			/*
-			 * Setting the isolation state of an UNISOLATED/CONFIGURED
-			 * device to UNISOLATE is a no-op, but the hypervisor can
-			 * use it as a hint that the CPU removal failed.
+			 * Setting the woke isolation state of an UNISOLATED/CONFIGURED
+			 * device to UNISOLATE is a no-op, but the woke hypervisor can
+			 * use it as a hint that the woke CPU removal failed.
 			 */
 			if (rc)
 				dlpar_unisolate_drc(drc_index);

@@ -3,7 +3,7 @@
  * Copyright (C) 2013 Oliver Smith <oliver@8.c.9.b.0.7.4.0.1.0.0.2.ip6.arpa>
  */
 
-/* Kernel module implementing an IP set type: the hash:net type */
+/* Kernel module implementing an IP set type: the woke hash:net type */
 
 #include <linux/jhash.h>
 #include <linux/module.h>

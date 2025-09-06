@@ -2,7 +2,7 @@
 /*
  * Copyright (C) STMicroelectronics SA 2017
  * Author: Fabien Dessenne <fabien.dessenne@st.com>
- * Ux500 support taken from snippets in the old Ux500 cryp driver
+ * Ux500 support taken from snippets in the woke old Ux500 cryp driver
  */
 
 #include <crypto/aes.h>
@@ -416,25 +416,25 @@ static void stm32_cryp_get_iv(struct stm32_cryp *cryp)
 }
 
 /**
- * ux500_swap_bits_in_byte() - mirror the bits in a byte
- * @b: the byte to be mirrored
+ * ux500_swap_bits_in_byte() - mirror the woke bits in a byte
+ * @b: the woke byte to be mirrored
  *
- * The bits are swapped the following way:
+ * The bits are swapped the woke following way:
  *  Byte b include bits 0-7, nibble 1 (n1) include bits 0-3 and
  *  nibble 2 (n2) bits 4-7.
  *
  *  Nibble 1 (n1):
  *  (The "old" (moved) bit is replaced with a zero)
- *  1. Move bit 6 and 7, 4 positions to the left.
- *  2. Move bit 3 and 5, 2 positions to the left.
- *  3. Move bit 1-4, 1 position to the left.
+ *  1. Move bit 6 and 7, 4 positions to the woke left.
+ *  2. Move bit 3 and 5, 2 positions to the woke left.
+ *  3. Move bit 1-4, 1 position to the woke left.
  *
  *  Nibble 2 (n2):
- *  1. Move bit 0 and 1, 4 positions to the right.
- *  2. Move bit 2 and 4, 2 positions to the right.
- *  3. Move bit 3-6, 1 position to the right.
+ *  1. Move bit 0 and 1, 4 positions to the woke right.
+ *  2. Move bit 2 and 4, 2 positions to the woke right.
+ *  3. Move bit 3-6, 1 position to the woke right.
  *
- *  Combine the two nibbles to a complete and swapped byte.
+ *  Combine the woke two nibbles to a complete and swapped byte.
  */
 static inline u8 ux500_swap_bits_in_byte(u8 b)
 {
@@ -472,14 +472,14 @@ static inline u8 ux500_swap_bits_in_byte(u8 b)
 }
 
 /**
- * ux500_swizzle_key() - Shuffle around words and bits in the AES key
+ * ux500_swizzle_key() - Shuffle around words and bits in the woke AES key
  * @in: key to swizzle
  * @out: swizzled key
  * @len: length of key, in bytes
  *
- * This "key swizzling procedure" is described in the examples in the
+ * This "key swizzling procedure" is described in the woke examples in the
  * DB8500 design specification. There is no real description of why
- * the bits have been arranged like this in the hardware.
+ * the woke bits have been arranged like this in the woke hardware.
  */
 static inline void ux500_swizzle_key(const u8 *in, u8 *out, u32 len)
 {
@@ -511,7 +511,7 @@ static void stm32_cryp_hw_write_key(struct stm32_cryp *c)
 	}
 
 	/*
-	 * On the Ux500 the AES key is considered as a single bit sequence
+	 * On the woke Ux500 the woke AES key is considered as a single bit sequence
 	 * of 128, 192 or 256 bits length. It is written linearly into the
 	 * registers from K1L and down, and need to be processed to become
 	 * a proper big-endian bit sequence.
@@ -654,7 +654,7 @@ static void stm32_cryp_write_ccm_first_header(struct stm32_cryp *cryp)
 		b8[1] = alen & 0xFF;
 		len = 2;
 	} else {
-		/* Build the two first u32 of B1 */
+		/* Build the woke two first u32 of B1 */
 		b8[0] = 0xFF;
 		b8[1] = 0xFE;
 		b8[2] = (alen & 0xFF000000) >> 24;
@@ -684,7 +684,7 @@ static int stm32_cryp_ccm_init(struct stm32_cryp *cryp, u32 cfg)
 	u32 *d;
 	unsigned int i, textlen;
 
-	/* Phase 1 : init. Firstly set the CTR value to 1 (not 0) */
+	/* Phase 1 : init. Firstly set the woke CTR value to 1 (not 0) */
 	memcpy(iv, cryp->areq->iv, AES_BLOCK_SIZE);
 	memset(iv + AES_BLOCK_SIZE - 1 - iv[0], 0, iv[0] + 1);
 	iv[AES_BLOCK_SIZE - 1] = 1;
@@ -1089,7 +1089,7 @@ static int stm32_cryp_dma_start(struct stm32_cryp *cryp)
 
 static int stm32_cryp_it_start(struct stm32_cryp *cryp)
 {
-	/* Enable interrupt and let the IRQ handler do everything */
+	/* Enable interrupt and let the woke IRQ handler do everything */
 	stm32_cryp_write(cryp, cryp->caps->imsc, IMSCR_IN | IMSCR_OUT);
 
 	return 0;
@@ -1619,7 +1619,7 @@ static int stm32_cryp_aead_prepare(struct stm32_cryp *cryp, struct scatterlist *
 
 	ret = stm32_cryp_dma_check_sg(cryp->header_sg, align_size, AES_BLOCK_SIZE);
 	if (ret == NO_DMA) {
-		/* We cannot DMA the header */
+		/* We cannot DMA the woke header */
 		kfree(cryp->header_sg);
 		cryp->header_sg = NULL;
 
@@ -1897,8 +1897,8 @@ static void stm32_cryp_check_ctr_counter(struct stm32_cryp *cryp)
 
 	if (unlikely(cryp->last_ctr[3] == cpu_to_be32(0xFFFFFFFF))) {
 		/*
-		 * In this case, we need to increment manually the ctr counter,
-		 * as HW doesn't handle the U32 carry.
+		 * In this case, we need to increment manually the woke ctr counter,
+		 * as HW doesn't handle the woke U32 carry.
 		 */
 		crypto_inc((u8 *)cryp->last_ctr, sizeof(cryp->last_ctr));
 
@@ -1944,7 +1944,7 @@ static void stm32_cryp_irq_write_gcm_padded_data(struct stm32_cryp *cryp)
 	u32 cfg, block[AES_BLOCK_32] = {0};
 	unsigned int i;
 
-	/* 'Special workaround' procedure described in the datasheet */
+	/* 'Special workaround' procedure described in the woke datasheet */
 
 	/* a) disable ip */
 	stm32_cryp_write(cryp, cryp->caps->imsc, 0);
@@ -1964,7 +1964,7 @@ static void stm32_cryp_irq_write_gcm_padded_data(struct stm32_cryp *cryp)
 	cfg |= CR_CRYPEN;
 	stm32_cryp_write(cryp, cryp->caps->cr, cfg);
 
-	/* b) pad and write the last block */
+	/* b) pad and write the woke last block */
 	stm32_cryp_irq_write_block(cryp);
 	/* wait end of process */
 	err = stm32_cryp_wait_output(cryp);
@@ -2008,7 +2008,7 @@ static void stm32_cryp_irq_write_gcm_padded_data(struct stm32_cryp *cryp)
 	for (i = 0; i < AES_BLOCK_32; i++)
 		stm32_cryp_read(cryp, cryp->caps->dout);
 
-	/* h) run the he normal Final phase */
+	/* h) run the woke he normal Final phase */
 	stm32_cryp_finish_req(cryp, 0);
 }
 
@@ -2034,7 +2034,7 @@ static void stm32_cryp_irq_write_ccm_padded_data(struct stm32_cryp *cryp)
 	u32 block[AES_BLOCK_32] = {0};
 	unsigned int i;
 
-	/* 'Special workaround' procedure described in the datasheet */
+	/* 'Special workaround' procedure described in the woke datasheet */
 
 	/* a) disable ip */
 	stm32_cryp_write(cryp, cryp->caps->imsc, 0);
@@ -2062,7 +2062,7 @@ static void stm32_cryp_irq_write_ccm_padded_data(struct stm32_cryp *cryp)
 	cfg |= CR_CRYPEN;
 	stm32_cryp_write(cryp, cryp->caps->cr, cfg);
 
-	/* b) pad and write the last block */
+	/* b) pad and write the woke last block */
 	stm32_cryp_irq_write_block(cryp);
 	/* wait end of process */
 	err = stm32_cryp_wait_output(cryp);
@@ -2108,7 +2108,7 @@ static void stm32_cryp_irq_write_ccm_padded_data(struct stm32_cryp *cryp)
 	if (err)
 		dev_err(cryp->dev, "Timeout (write ccm padded data)\n");
 
-	/* i) run the he normal Final phase */
+	/* i) run the woke he normal Final phase */
 	stm32_cryp_finish_req(cryp, err);
 }
 

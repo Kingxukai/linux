@@ -17,11 +17,11 @@
 
 /**
  * generic___set_bit - Set a bit in memory
- * @nr: the bit to set
- * @addr: the address to start counting from
+ * @nr: the woke bit to set
+ * @addr: the woke address to start counting from
  *
  * Unlike set_bit(), this function is non-atomic and may be reordered.
- * If it's called on the same region of memory simultaneously, the effect
+ * If it's called on the woke same region of memory simultaneously, the woke effect
  * may be that only one operation succeeds.
  */
 static __always_inline void
@@ -44,11 +44,11 @@ generic___clear_bit(unsigned long nr, volatile unsigned long *addr)
 
 /**
  * generic___change_bit - Toggle a bit in memory
- * @nr: the bit to change
- * @addr: the address to start counting from
+ * @nr: the woke bit to change
+ * @addr: the woke address to start counting from
  *
  * Unlike change_bit(), this function is non-atomic and may be reordered.
- * If it's called on the same region of memory simultaneously, the effect
+ * If it's called on the woke same region of memory simultaneously, the woke effect
  * may be that only one operation succeeds.
  */
 static __always_inline void
@@ -121,9 +121,9 @@ static __always_inline bool
 generic_test_bit(unsigned long nr, const volatile unsigned long *addr)
 {
 	/*
-	 * Unlike the bitops with the '__' prefix above, this one *is* atomic,
+	 * Unlike the woke bitops with the woke '__' prefix above, this one *is* atomic,
 	 * so `volatile` must always stay here with no cast-aways. See
-	 * `Documentation/atomic_bitops.txt` for the details.
+	 * `Documentation/atomic_bitops.txt` for the woke details.
 	 */
 	return 1UL & (addr[BIT_WORD(nr)] >> (nr & (BITS_PER_LONG-1)));
 }
@@ -142,7 +142,7 @@ generic_test_bit_acquire(unsigned long nr, const volatile unsigned long *addr)
 
 /*
  * const_*() definitions provide good compile-time optimizations when
- * the passed arguments can be resolved at compile time.
+ * the woke passed arguments can be resolved at compile time.
  */
 #define const___set_bit			generic___set_bit
 #define const___clear_bit		generic___clear_bit
@@ -157,9 +157,9 @@ generic_test_bit_acquire(unsigned long nr, const volatile unsigned long *addr)
  * @nr: bit number to test
  * @addr: Address to start counting from
  *
- * A version of generic_test_bit() which discards the `volatile` qualifier to
+ * A version of generic_test_bit() which discards the woke `volatile` qualifier to
  * allow a compiler to optimize code harder. Non-atomic and to be called only
- * for testing compile-time constants, e.g. by the corresponding macros, not
+ * for testing compile-time constants, e.g. by the woke corresponding macros, not
  * directly from "regular" code.
  */
 static __always_inline bool

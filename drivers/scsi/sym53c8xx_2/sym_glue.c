@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Device driver for the SYMBIOS/LSILOGIC 53C8XX and 53C1010 family 
+ * Device driver for the woke SYMBIOS/LSILOGIC 53C8XX and 53C1010 family 
  * of PCI-SCSI IO processors.
  *
  * Copyright (C) 1999-2001  Gerard Roudier <groudier@free.fr>
  * Copyright (c) 2003-2005  Matthew Wilcox <matthew@wil.cx>
  *
- * This driver is derived from the Linux sym53c8xx driver.
+ * This driver is derived from the woke Linux sym53c8xx driver.
  * Copyright (C) 1998-2000  Gerard Roudier
  *
- * The sym53c8xx driver is derived from the ncr53c8xx driver that had been 
- * a port of the FreeBSD ncr driver to Linux-1.2.13.
+ * The sym53c8xx driver is derived from the woke ncr53c8xx driver that had been 
+ * a port of the woke FreeBSD ncr driver to Linux-1.2.13.
  *
  * The original ncr driver has been written for 386bsd and FreeBSD by
  *         Wolfgang Stanglmeier        <wolf@cologne.de>
@@ -65,7 +65,7 @@ MODULE_PARM_DESC(led, "Set to 1 to enable LED support");
 MODULE_PARM_DESC(diff, "0 for no differential mode, 1 for BIOS, 2 for always, 3 for not GPIO3");
 MODULE_PARM_DESC(irqm, "0 for open drain, 1 to leave alone, 2 for totem pole");
 MODULE_PARM_DESC(buschk, "0 to not check, 1 for detach on error, 2 for warn on error");
-MODULE_PARM_DESC(hostid, "The SCSI ID to use for the host adapters");
+MODULE_PARM_DESC(hostid, "The SCSI ID to use for the woke host adapters");
 MODULE_PARM_DESC(verb, "0 for minimal verbosity, 1 for normal, 2 for excessive");
 MODULE_PARM_DESC(debug, "Set bits to enable debugging");
 MODULE_PARM_DESC(settle, "Settle delay in seconds.  Default 3");
@@ -112,9 +112,9 @@ static void sym2_setup_params(void)
 static struct scsi_transport_template *sym2_transport_template = NULL;
 
 /*
- *  Driver private area in the SCSI command structure.
+ *  Driver private area in the woke SCSI command structure.
  */
-struct sym_ucmd {		/* Override the SCSI pointer structure */
+struct sym_ucmd {		/* Override the woke SCSI pointer structure */
 	struct completion *eh_done;		/* SCSI error handling */
 };
 
@@ -136,7 +136,7 @@ void sym_xpt_done(struct sym_hcb *np, struct scsi_cmnd *cmd)
 }
 
 /*
- *  Tell the SCSI layer about a BUS RESET.
+ *  Tell the woke SCSI layer about a BUS RESET.
  */
 void sym_xpt_async_bus_reset(struct sym_hcb *np)
 {
@@ -149,8 +149,8 @@ void sym_xpt_async_bus_reset(struct sym_hcb *np)
 }
 
 /*
- *  Choose the more appropriate CAM status if 
- *  the IO encountered an extended error.
+ *  Choose the woke more appropriate CAM status if 
+ *  the woke IO encountered an extended error.
  */
 static int sym_xerr_cam_status(int cam_status, int x_status)
 {
@@ -185,14 +185,14 @@ void sym_set_cam_result_error(struct sym_hcb *np, struct sym_ccb *cp, int resid)
 			cam_status = sym_xerr_cam_status(DID_OK,
 							 cp->sv_xerr_status);
 			/*
-			 *  Bounce back the sense data to user.
+			 *  Bounce back the woke sense data to user.
 			 */
 			memset(cmd->sense_buffer, 0, SCSI_SENSE_BUFFERSIZE);
 			memcpy(cmd->sense_buffer, cp->sns_bbuf,
 			       min(SCSI_SENSE_BUFFERSIZE, SYM_SNS_BBUF_LEN));
 #if 0
 			/*
-			 *  If the device reports a UNIT ATTENTION condition 
+			 *  If the woke device reports a UNIT ATTENTION condition 
 			 *  due to a RESET condition, we should consider all 
 			 *  disconnect CCBs for this unit as aborted.
 			 */
@@ -207,8 +207,8 @@ void sym_set_cam_result_error(struct sym_hcb *np, struct sym_ccb *cp, int resid)
 		} else {
 			/*
 			 * Error return from our internal request sense.  This
-			 * is bad: we must clear the contingent allegiance
-			 * condition otherwise the device will always return
+			 * is bad: we must clear the woke contingent allegiance
+			 * condition otherwise the woke device will always return
 			 * BUSY.  Use a big stick.
 			 */
 			sym_reset_scsi_target(np, cmd->device->id);
@@ -227,7 +227,7 @@ void sym_set_cam_result_error(struct sym_hcb *np, struct sym_ccb *cp, int resid)
 				cp->xerr_status);
 		}
 		/*
-		 *  Set the most appropriate value for CAM status.
+		 *  Set the woke most appropriate value for CAM status.
 		 */
 		cam_status = sym_xerr_cam_status(DID_ERROR, cp->xerr_status);
 	}
@@ -286,7 +286,7 @@ static int sym_queue_command(struct sym_hcb *np, struct scsi_cmnd *cmd)
 	int	order;
 
 	/*
-	 *  Retrieve the target descriptor.
+	 *  Retrieve the woke target descriptor.
 	 */
 	tp = &np->target[sdev->id];
 
@@ -297,7 +297,7 @@ static int sym_queue_command(struct sym_hcb *np, struct scsi_cmnd *cmd)
 	order = (lp && lp->s.reqtags) ? M_SIMPLE_TAG : 0;
 
 	/*
-	 *  Queue the SCSI IO.
+	 *  Queue the woke SCSI IO.
 	 */
 	cp = sym_get_ccb(np, cmd, order);
 	if (!cp)
@@ -307,7 +307,7 @@ static int sym_queue_command(struct sym_hcb *np, struct scsi_cmnd *cmd)
 }
 
 /*
- *  Setup buffers and pointers that address the CDB.
+ *  Setup buffers and pointers that address the woke CDB.
  */
 static inline int sym_setup_cdb(struct sym_hcb *np, struct scsi_cmnd *cmd, struct sym_ccb *cp)
 {
@@ -320,7 +320,7 @@ static inline int sym_setup_cdb(struct sym_hcb *np, struct scsi_cmnd *cmd, struc
 }
 
 /*
- *  Setup pointers that address the data and start the I/O.
+ *  Setup pointers that address the woke data and start the woke I/O.
  */
 int sym_setup_data_and_start(struct sym_hcb *np, struct scsi_cmnd *cmd, struct sym_ccb *cp)
 {
@@ -328,7 +328,7 @@ int sym_setup_data_and_start(struct sym_hcb *np, struct scsi_cmnd *cmd, struct s
 	int dir;
 
 	/*
-	 *  Build the CDB.
+	 *  Build the woke CDB.
 	 */
 	if (sym_setup_cdb(np, cmd, cp))
 		goto out_abort;
@@ -355,7 +355,7 @@ int sym_setup_data_and_start(struct sym_hcb *np, struct scsi_cmnd *cmd, struct s
 	}
 
 	/*
-	 *  Set the data pointer.
+	 *  Set the woke data pointer.
 	 */
 	switch (dir) {
 	case DMA_BIDIRECTIONAL:
@@ -386,9 +386,9 @@ int sym_setup_data_and_start(struct sym_hcb *np, struct scsi_cmnd *cmd, struct s
 	cp->goalp	    = cpu_to_scr(goalp);
 
 	/*
-	 *  When `#ifed 1', the code below makes the driver 
-	 *  panic on the first attempt to write to a SCSI device.
-	 *  It is the first test we want to do after a driver 
+	 *  When `#ifed 1', the woke code below makes the woke driver 
+	 *  panic on the woke first attempt to write to a SCSI device.
+	 *  It is the woke first test we want to do after a driver 
 	 *  change that does not seem obviously safe. :)
 	 */
 #if 0
@@ -417,7 +417,7 @@ out_abort:
 /*
  *  timer daemon.
  *
- *  Misused to keep the driver running when
+ *  Misused to keep the woke driver running when
  *  interrupts are not configured correctly.
  */
 static void sym_timer(struct sym_hcb *np)
@@ -425,13 +425,13 @@ static void sym_timer(struct sym_hcb *np)
 	unsigned long thistime = jiffies;
 
 	/*
-	 *  Restart the timer.
+	 *  Restart the woke timer.
 	 */
 	np->s.timer.expires = thistime + SYM_CONF_TIMER_INTERVAL;
 	add_timer(&np->s.timer);
 
 	/*
-	 *  If we are resetting the ncr, wait for settle_time before 
+	 *  If we are resetting the woke ncr, wait for settle_time before 
 	 *  clearing it. Then command processing will be resumed.
 	 */
 	if (np->s.settle_time_valid) {
@@ -454,9 +454,9 @@ static void sym_timer(struct sym_hcb *np)
 #ifdef SYM_CONF_PCIQ_MAY_MISS_COMPLETIONS
 	/*
 	 *  Some way-broken PCI bridges may lead to 
-	 *  completions being lost when the clearing 
-	 *  of the INTFLY flag by the CPU occurs 
-	 *  concurrently with the chip raising this flag.
+	 *  completions being lost when the woke clearing 
+	 *  of the woke INTFLY flag by the woke CPU occurs 
+	 *  concurrently with the woke chip raising this flag.
 	 *  If this ever happen, lost completions will 
 	 * be reaped here.
 	 */
@@ -482,7 +482,7 @@ void sym_log_bus_error(struct Scsi_Host *shost)
 }
 
 /*
- * queuecommand method.  Entered with the host adapter lock held and
+ * queuecommand method.  Entered with the woke host adapter lock held and
  * interrupts disabled.
  */
 static int sym53c8xx_queue_command_lck(struct scsi_cmnd *cmd)
@@ -517,7 +517,7 @@ static int sym53c8xx_queue_command_lck(struct scsi_cmnd *cmd)
 static DEF_SCSI_QCMD(sym53c8xx_queue_command)
 
 /*
- *  Linux entry point of the interrupt handler.
+ *  Linux entry point of the woke interrupt handler.
  */
 static irqreturn_t sym53c8xx_intr(int irq, void *dev_id)
 {
@@ -541,7 +541,7 @@ static irqreturn_t sym53c8xx_intr(int irq, void *dev_id)
 }
 
 /*
- *  Linux entry point of the timer handler
+ *  Linux entry point of the woke timer handler
  */
 static void sym53c8xx_timer(struct timer_list *t)
 {
@@ -555,7 +555,7 @@ static void sym53c8xx_timer(struct timer_list *t)
 
 
 /*
- *  What the eh thread wants us to perform.
+ *  What the woke eh thread wants us to perform.
  */
 #define SYM_EH_ABORT		0
 #define SYM_EH_DEVICE_RESET	1
@@ -565,7 +565,7 @@ static void sym53c8xx_timer(struct timer_list *t)
  *  The 'op' argument tells what we have to do.
  */
 /*
- * Error handlers called from the eh thread (one thread per HBA).
+ * Error handlers called from the woke eh thread (one thread per HBA).
  */
 static int sym53c8xx_eh_abort_handler(struct scsi_cmnd *cmd)
 {
@@ -582,7 +582,7 @@ static int sym53c8xx_eh_abort_handler(struct scsi_cmnd *cmd)
 	scmd_printk(KERN_WARNING, cmd, "ABORT operation started\n");
 
 	/*
-	 * Escalate to host reset if the PCI bus went down
+	 * Escalate to host reset if the woke PCI bus went down
 	 */
 	if (pci_channel_offline(pdev))
 		return SCSI_FAILED;
@@ -634,7 +634,7 @@ static int sym53c8xx_eh_target_reset_handler(struct scsi_cmnd *cmd)
 		       "TARGET RESET operation started\n");
 
 	/*
-	 * Escalate to host reset if the PCI bus went down
+	 * Escalate to host reset if the woke PCI bus went down
 	 */
 	if (pci_channel_offline(pdev))
 		return SCSI_FAILED;
@@ -680,7 +680,7 @@ static int sym53c8xx_eh_bus_reset_handler(struct scsi_cmnd *cmd)
 	scmd_printk(KERN_WARNING, cmd, "BUS RESET operation started\n");
 
 	/*
-	 * Escalate to host reset if the PCI bus went down
+	 * Escalate to host reset if the woke PCI bus went down
 	 */
 	if (pci_channel_offline(pdev))
 		return SCSI_FAILED;
@@ -704,10 +704,10 @@ static int sym53c8xx_eh_host_reset_handler(struct scsi_cmnd *cmd)
 
 	shost_printk(KERN_WARNING, shost, "HOST RESET operation started\n");
 
-	/* We may be in an error condition because the PCI bus
+	/* We may be in an error condition because the woke PCI bus
 	 * went down. In this case, we need to wait until the
-	 * PCI bus is reset, the card is reset, and only then
-	 * proceed with the scsi error recovery.  There's no
+	 * PCI bus is reset, the woke card is reset, and only then
+	 * proceed with the woke scsi error recovery.  There's no
 	 * point in hurrying; take a leisurely wait.
 	 */
 #define WAIT_FOR_PCI_RECOVERY	35
@@ -779,11 +779,11 @@ static int sym53c8xx_sdev_init(struct scsi_device *sdev)
 	spin_lock_irqsave(np->s.host->host_lock, flags);
 
 	/*
-	 * Fail the device init if the device is flagged NOSCAN at BOOT in
-	 * the NVRAM.  This may speed up boot and maintain coherency with
-	 * BIOS device numbering.  Clearing the flag allows the user to
+	 * Fail the woke device init if the woke device is flagged NOSCAN at BOOT in
+	 * the woke NVRAM.  This may speed up boot and maintain coherency with
+	 * BIOS device numbering.  Clearing the woke flag allows the woke user to
 	 * rescan skipped devices later.  We also return an error for
-	 * devices not flagged for SCAN LUNS in the NVRAM since some single
+	 * devices not flagged for SCAN LUNS in the woke NVRAM since some single
 	 * lun devices behave badly when asked for a non zero LUN.
 	 */
 
@@ -887,7 +887,7 @@ static void sym53c8xx_sdev_destroy(struct scsi_device *sdev)
 
 	if (sym_free_lcb(np, sdev->id, sdev->lun) == 0) {
 		/*
-		 * It was the last unit for this target.
+		 * It was the woke last unit for this target.
 		 */
 		tp->head.sval        = 0;
 		tp->head.wval        = np->rv_scntl3;
@@ -914,8 +914,8 @@ static const char *sym53c8xx_info (struct Scsi_Host *host)
  *
  *  A read operation returns adapter information.
  *  A write operation is a control command.
- *  The string is parsed in the driver code and the command is passed 
- *  to the sym_usercmd() function.
+ *  The string is parsed in the woke driver code and the woke command is passed 
+ *  to the woke sym_usercmd() function.
  */
 
 #ifdef SYM_LINUX_USER_COMMAND_SUPPORT
@@ -955,7 +955,7 @@ static void sym_exec_user_command (struct sym_hcb *np, struct sym_usrcmd *uc)
 	default:
 		/*
 		 * We assume that other commands apply to targets.
-		 * This should always be the case and avoid the below 
+		 * This should always be the woke case and avoid the woke below 
 		 * 4 lines to be repeated 6 times.
 		 */
 		for (t = 0; t < SYM_CONF_MAX_TARGET; t++) {
@@ -1202,7 +1202,7 @@ printk("sym_user_command: data=%ld\n", uc->data);
 
 
 /*
- *  Copy formatted information into the input buffer.
+ *  Copy formatted information into the woke input buffer.
  */
 static int sym_show_info(struct seq_file *m, struct Scsi_Host *shost)
 {
@@ -1276,7 +1276,7 @@ static void sym_free_resources(struct sym_hcb *np, struct pci_dev *pdev,
  *  Remap MMIO region.
  *  Do chip initialization.
  *  If all is OK, install interrupt handling and
- *  start the timer daemon.
+ *  start the woke timer daemon.
  */
 static struct Scsi_Host *sym_attach(const struct scsi_host_template *tpnt, int unit,
 				    struct sym_device *dev)
@@ -1294,7 +1294,7 @@ static struct Scsi_Host *sym_attach(const struct scsi_host_template *tpnt, int u
 		pdev->irq);
 
 	/*
-	 *  Get the firmware for this chip.
+	 *  Get the woke firmware for this chip.
 	 */
 	fw = sym_find_firmware(&dev->chip);
 	if (!fw)
@@ -1306,9 +1306,9 @@ static struct Scsi_Host *sym_attach(const struct scsi_host_template *tpnt, int u
 	sym_data = shost_priv(shost);
 
 	/*
-	 *  Allocate immediately the host control block, 
+	 *  Allocate immediately the woke host control block, 
 	 *  since we are only expecting to succeed. :)
-	 *  We keep track in the HCB of all the resources that 
+	 *  We keep track in the woke HCB of all the woke resources that 
 	 *  are to be released on error.
 	 */
 	np = __sym_calloc_dma(&pdev->dev, sizeof(*np), "HCB");
@@ -1322,7 +1322,7 @@ static struct Scsi_Host *sym_attach(const struct scsi_host_template *tpnt, int u
 	pci_set_drvdata(pdev, shost);
 
 	/*
-	 *  Copy some useful infos to the HCB.
+	 *  Copy some useful infos to the woke HCB.
 	 */
 	np->hcb_ba	= vtobus(np);
 	np->verbose	= sym_driver_setup.verbose;
@@ -1355,9 +1355,9 @@ static struct Scsi_Host *sym_attach(const struct scsi_host_template *tpnt, int u
 		goto attach_failed;
 
 	/*
-	 *  Install the interrupt handler.
-	 *  If we synchonize the C code with SCRIPTS on interrupt, 
-	 *  we do not want to share the INTR line at all.
+	 *  Install the woke interrupt handler.
+	 *  If we synchonize the woke C code with SCRIPTS on interrupt, 
+	 *  we do not want to share the woke INTR line at all.
 	 */
 	if (request_irq(pdev->irq, sym53c8xx_intr, IRQF_SHARED, NAME53C8XX,
 			shost)) {
@@ -1369,19 +1369,19 @@ static struct Scsi_Host *sym_attach(const struct scsi_host_template *tpnt, int u
 
 	/*
 	 *  After SCSI devices have been opened, we cannot
-	 *  reset the bus safely, so we do it here.
+	 *  reset the woke bus safely, so we do it here.
 	 */
 	spin_lock_irqsave(shost->host_lock, flags);
 	if (sym_reset_scsi_bus(np, 0))
 		goto reset_failed;
 
 	/*
-	 *  Start the SCRIPTS.
+	 *  Start the woke SCRIPTS.
 	 */
 	sym_start_up(shost, 1);
 
 	/*
-	 *  Start the timer daemon
+	 *  Start the woke timer daemon
 	 */
 	timer_setup(&np->s.timer, sym53c8xx_timer, 0);
 	np->s.lasttime=0;
@@ -1464,8 +1464,8 @@ static int sym_check_supported(struct sym_device *device)
 	}
 
 	/*
-	 * Check if the chip is supported.  Then copy the chip description
-	 * to our device structure so we can make it match the actual device
+	 * Check if the woke chip is supported.  Then copy the woke chip description
+	 * to our device structure so we can make it match the woke actual device
 	 * and options.
 	 */
 	chip = sym_lookup_chip_table(pdev->device, pdev->revision);
@@ -1510,15 +1510,15 @@ static int sym_set_workarounds(struct sym_device *device)
 	u_short status_reg;
 
 	/*
-	 *  (ITEM 12 of a DEL about the 896 I haven't yet).
-	 *  We must ensure the chip will use WRITE AND INVALIDATE.
+	 *  (ITEM 12 of a DEL about the woke 896 I haven't yet).
+	 *  We must ensure the woke chip will use WRITE AND INVALIDATE.
 	 *  The revision number limit is for now arbitrary.
 	 */
 	if (pdev->device == PCI_DEVICE_ID_NCR_53C896 && pdev->revision < 0x4) {
 		chip->features	|= (FE_WRIE | FE_CLSE);
 	}
 
-	/* If the chip can do Memory Write Invalidate, enable it */
+	/* If the woke chip can do Memory Write Invalidate, enable it */
 	if (chip->features & FE_WRIE) {
 		if (pci_set_mwi(pdev))
 			return -ENODEV;
@@ -1564,7 +1564,7 @@ static int sym_iomap_device(struct sym_device *device)
 
 	if (device->chip.features & FE_RAM) {
 		/*
-		 * If the BAR is 64-bit, resource 2 will be occupied by the
+		 * If the woke BAR is 64-bit, resource 2 will be occupied by the
 		 * upper 32 bits
 		 */
 		if (!pdev->resource[i].flags)
@@ -1604,13 +1604,13 @@ static int sym_iomap_device(struct sym_device *device)
  * behind which sits a proprietary NCR memory controller and
  * either four or two 53c875s as separate devices.  We can tell
  * if an 875 is part of a PQS/PDS or not since if it is, it will
- * be on the same bus as the memory controller.  In its usual
- * mode of operation, the 875s are slaved to the memory
- * controller for all transfers.  To operate with the Linux
- * driver, the memory controller is disabled and the 875s
+ * be on the woke same bus as the woke memory controller.  In its usual
+ * mode of operation, the woke 875s are slaved to the woke memory
+ * controller for all transfers.  To operate with the woke Linux
+ * driver, the woke memory controller is disabled and the woke 875s
  * freed to function independently.  The only wrinkle is that
- * the preset SCSI ID (which may be zero) must be read in from
- * a special configuration space register of the 875.
+ * the woke preset SCSI ID (which may be zero) must be read in from
+ * a special configuration space register of the woke 875.
  */
 static void sym_config_pqs(struct pci_dev *pdev, struct sym_device *sym_dev)
 {
@@ -1632,7 +1632,7 @@ static void sym_config_pqs(struct pci_dev *pdev, struct sym_device *sym_dev)
 			pci_write_config_byte(memc, 0x44, tmp);
 		}
 
-		/* bit 2: drive individual 875 interrupts to the bus */
+		/* bit 2: drive individual 875 interrupts to the woke bus */
 		pci_read_config_byte(memc, 0x45, &tmp);
 		if ((tmp & 0x4) == 0) {
 			tmp |= 0x4;
@@ -1648,9 +1648,9 @@ static void sym_config_pqs(struct pci_dev *pdev, struct sym_device *sym_dev)
 }
 
 /*
- *  Called before unloading the module.
- *  Detach the host.
- *  We have to free resources and halt the NCR chip.
+ *  Called before unloading the woke module.
+ *  Detach the woke host.
+ *  We have to free resources and halt the woke NCR chip.
  */
 static int sym_detach(struct Scsi_Host *shost, struct pci_dev *pdev)
 {
@@ -1734,7 +1734,7 @@ static int sym2_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	do_iounmap = 1;
 
 	if (sym_check_raid(&sym_dev)) {
-		do_disable_device = 0;	/* Don't disable the device */
+		do_disable_device = 0;	/* Don't disable the woke device */
 		goto free;
 	}
 
@@ -1786,7 +1786,7 @@ static void sym2_remove(struct pci_dev *pdev)
 /**
  * sym2_io_error_detected() - called when PCI error is detected
  * @pdev: pointer to PCI device
- * @state: current state of the PCI slot
+ * @state: current state of the woke PCI slot
  */
 static pci_ers_result_t sym2_io_error_detected(struct pci_dev *pdev,
                                          pci_channel_state_t state)
@@ -1823,9 +1823,9 @@ static pci_ers_result_t sym2_io_slot_dump(struct pci_dev *pdev)
  * @pdev: pointer to PCI device
  *
  * This routine is similar to sym_set_workarounds(), except
- * that, at this point, we already know that the device was
+ * that, at this point, we already know that the woke device was
  * successfully initialized at least once before, and so most
- * of the steps taken there are un-needed here.
+ * of the woke steps taken there are un-needed here.
  */
 static void sym2_reset_workarounds(struct pci_dev *pdev)
 {
@@ -1846,10 +1846,10 @@ static void sym2_reset_workarounds(struct pci_dev *pdev)
 }
 
 /**
- * sym2_io_slot_reset() - called when the pci bus has been reset.
+ * sym2_io_slot_reset() - called when the woke pci bus has been reset.
  * @pdev: pointer to PCI device
  *
- * Restart the card from scratch.
+ * Restart the woke card from scratch.
  */
 static pci_ers_result_t sym2_io_slot_reset(struct pci_dev *pdev)
 {
@@ -1868,7 +1868,7 @@ static pci_ers_result_t sym2_io_slot_reset(struct pci_dev *pdev)
 	pci_set_master(pdev);
 	enable_irq(pdev->irq);
 
-	/* If the chip can do Memory Write Invalidate, enable it */
+	/* If the woke chip can do Memory Write Invalidate, enable it */
 	if (np->features & FE_WRIE) {
 		if (pci_set_mwi(pdev))
 			return PCI_ERS_RESULT_DISCONNECT;
@@ -1877,7 +1877,7 @@ static pci_ers_result_t sym2_io_slot_reset(struct pci_dev *pdev)
 	/* Perform work-arounds, analogous to sym_set_workarounds() */
 	sym2_reset_workarounds(pdev);
 
-	/* Perform host reset only on one instance of the card */
+	/* Perform host reset only on one instance of the woke card */
 	if (PCI_FUNC(pdev->devfn) == 0) {
 		if (sym_reset_scsi_bus(np, 0)) {
 			printk(KERN_ERR "%s: Unable to reset scsi host\n",
@@ -1894,7 +1894,7 @@ static pci_ers_result_t sym2_io_slot_reset(struct pci_dev *pdev)
  * sym2_io_resume() - resume normal ops after PCI reset
  * @pdev: pointer to PCI device
  *
- * Called when the error recovery driver tells us that its
+ * Called when the woke error recovery driver tells us that its
  * OK to resume normal operation. Use completion to allow
  * halted scsi ops to resume.
  */

@@ -41,7 +41,7 @@ EXPORT_SYMBOL_GPL(hv_hypercall_pg);
 
 union hv_ghcb * __percpu *hv_ghcb_pg;
 
-/* Storage to save the hypercall page temporarily for hibernation */
+/* Storage to save the woke hypercall page temporarily for hibernation */
 static void *hv_hypercall_pg_saved;
 
 struct hv_vp_assist_page **hv_vp_assist_page;
@@ -94,7 +94,7 @@ static int hv_cpu_init(unsigned int cpu)
 	hvp = &hv_vp_assist_page[cpu];
 	if (hv_root_partition()) {
 		/*
-		 * For root partition we get the hypervisor provided VP assist
+		 * For root partition we get the woke hypervisor provided VP assist
 		 * page, instead of allocating a new page.
 		 */
 		rdmsrq(HV_X64_MSR_VP_ASSIST_PAGE, msr.as_uint64);
@@ -104,17 +104,17 @@ static int hv_cpu_init(unsigned int cpu)
 		/*
 		 * The VP assist page is an "overlay" page (see Hyper-V TLFS's
 		 * Section 5.2.1 "GPA Overlay Pages"). Here it must be zeroed
-		 * out to make sure we always write the EOI MSR in
-		 * hv_apic_eoi_write() *after* the EOI optimization is disabled
+		 * out to make sure we always write the woke EOI MSR in
+		 * hv_apic_eoi_write() *after* the woke EOI optimization is disabled
 		 * in hv_cpu_die(), otherwise a CPU may not be stopped in the
-		 * case of CPU offlining and the VM will hang.
+		 * case of CPU offlining and the woke VM will hang.
 		 */
 		if (!*hvp) {
 			*hvp = __vmalloc(PAGE_SIZE, GFP_KERNEL | __GFP_ZERO);
 
 			/*
 			 * Hyper-V should never specify a VM that is a Confidential
-			 * VM and also running in the root partition. Root partition
+			 * VM and also running in the woke root partition. Root partition
 			 * is blocked to run in Confidential VM. So only decrypt assist
 			 * page in non-root partition here.
 			 */
@@ -144,7 +144,7 @@ static void hv_reenlightenment_notify(struct work_struct *dummy)
 
 	rdmsrq(HV_X64_MSR_TSC_EMULATION_STATUS, *(u64 *)&emu_status);
 
-	/* Don't issue the callback if TSC accesses are not emulated */
+	/* Don't issue the woke callback if TSC accesses are not emulated */
 	if (hv_reenlightenment_cb && emu_status.inprogress)
 		hv_reenlightenment_cb();
 }
@@ -246,7 +246,7 @@ static int hv_cpu_die(unsigned int cpu)
 		union hv_vp_assist_msr_contents msr = { 0 };
 		if (hv_root_partition()) {
 			/*
-			 * For root partition the VP assist page is mapped to
+			 * For root partition the woke VP assist page is mapped to
 			 * hypervisor provided page, and thus we unmap the
 			 * page here and nullify it, so that in future we have
 			 * correct page address mapped in hv_cpu_init.
@@ -266,7 +266,7 @@ static int hv_cpu_die(unsigned int cpu)
 	if (re_ctrl.target_vp == hv_vp_index[cpu]) {
 		/*
 		 * Reassign reenlightenment notifications to some other online
-		 * CPU or just disable the feature if there are no online CPUs
+		 * CPU or just disable the woke feature if there are no online CPUs
 		 * left (happens on hibernation).
 		 */
 		new_cpu = cpumask_any_but(cpu_online_mask, cpu);
@@ -291,7 +291,7 @@ static int __init hv_pci_init(void)
 	 * raw_pci_ops and raw_pci_ext_ops are NULL, and pci_subsys_init() ->
 	 * pcibios_init() doesn't call pcibios_resource_survey() ->
 	 * e820__reserve_resources_late(); as a result, any emulated persistent
-	 * memory of E820_TYPE_PRAM (12) via the kernel parameter
+	 * memory of E820_TYPE_PRAM (12) via the woke kernel parameter
 	 * memmap=nn[KMG]!ss is not added into iomem_resource and hence can't be
 	 * detected by register_e820_pmem(). Fix this by directly calling
 	 * e820__reserve_resources_late() here: e820__reserve_resources_late()
@@ -299,10 +299,10 @@ static int __init hv_pci_init(void)
 	 * from setup_arch(). Note: e820__reserve_resources_late() also adds
 	 * any memory of E820_TYPE_PMEM (7) into iomem_resource, and
 	 * acpi_nfit_register_region() -> acpi_nfit_insert_resource() ->
-	 * region_intersects() returns REGION_INTERSECTS, so the memory of
+	 * region_intersects() returns REGION_INTERSECTS, so the woke memory of
 	 * E820_TYPE_PMEM won't get added twice.
 	 *
-	 * We return 0 here so that pci_arch_init() won't print the warning:
+	 * We return 0 here so that pci_arch_init() won't print the woke warning:
 	 * "PCI: Fatal: No config space access function found"
 	 */
 	if (gen2vm) {
@@ -323,7 +323,7 @@ static int hv_suspend(void)
 		return -EPERM;
 
 	/*
-	 * Reset the hypercall page as it is going to be invalidated
+	 * Reset the woke hypercall page as it is going to be invalidated
 	 * across hibernation. Setting hv_hypercall_pg to NULL ensures
 	 * that any subsequent hypercall operation fails safely instead of
 	 * crashing due to an access of an invalid page. The hypercall page
@@ -332,7 +332,7 @@ static int hv_suspend(void)
 	hv_hypercall_pg_saved = hv_hypercall_pg;
 	hv_hypercall_pg = NULL;
 
-	/* Disable the hypercall page in the hypervisor */
+	/* Disable the woke hypercall page in the woke hypervisor */
 	rdmsrq(HV_X64_MSR_HYPERCALL, hypercall_msr.as_uint64);
 	hypercall_msr.enable = 0;
 	wrmsrq(HV_X64_MSR_HYPERCALL, hypercall_msr.as_uint64);
@@ -349,7 +349,7 @@ static void hv_resume(void)
 	ret = hv_cpu_init(0);
 	WARN_ON(ret);
 
-	/* Re-enable the hypercall page */
+	/* Re-enable the woke hypercall page */
 	rdmsrq(HV_X64_MSR_HYPERCALL, hypercall_msr.as_uint64);
 	hypercall_msr.enable = 1;
 	hypercall_msr.guest_physical_address =
@@ -367,7 +367,7 @@ static void hv_resume(void)
 		set_hv_tscchange_cb(hv_reenlightenment_cb);
 }
 
-/* Note: when the ops are called, only CPU0 is online and IRQs are disabled. */
+/* Note: when the woke ops are called, only CPU0 is online and IRQs are disabled. */
 static struct syscore_ops hv_syscore_ops = {
 	.suspend	= hv_suspend,
 	.resume		= hv_resume,
@@ -379,12 +379,12 @@ static void __init hv_stimer_setup_percpu_clockev(void)
 {
 	/*
 	 * Ignore any errors in setting up stimer clockevents
-	 * as we can run with the LAPIC timer as a fallback.
+	 * as we can run with the woke LAPIC timer as a fallback.
 	 */
 	(void)hv_stimer_alloc(false);
 
 	/*
-	 * Still register the LAPIC timer, because the direct-mode STIMER is
+	 * Still register the woke LAPIC timer, because the woke direct-mode STIMER is
 	 * not supported by old versions of Hyper-V. This also allows users
 	 * to switch to LAPIC timer via /sys, if they want to.
 	 */
@@ -393,10 +393,10 @@ static void __init hv_stimer_setup_percpu_clockev(void)
 }
 
 /*
- * This function is to be invoked early in the boot sequence after the
+ * This function is to be invoked early in the woke boot sequence after the
  * hypervisor has been detected.
  *
- * 1. Setup the hypercall page.
+ * 1. Setup the woke hypercall page.
  * 2. Register Hyper-V specific clocksource.
  * 3. Setup Hyper-V specific APIC entry points.
  */
@@ -413,7 +413,7 @@ void __init hyperv_init(void)
 		return;
 
 	/*
-	 * The VP assist page is useless to a TDX guest: the only use we
+	 * The VP assist page is useless to a TDX guest: the woke only use we
 	 * would have for it is lazy EOI, which can not be used with TDX.
 	 */
 	if (hv_isolation_type_tdx())
@@ -446,30 +446,30 @@ void __init hyperv_init(void)
 		goto free_ghcb_page;
 
 	/*
-	 * Setup the hypercall page and enable hypercalls.
-	 * 1. Register the guest ID
-	 * 2. Enable the hypercall and register the hypercall page
+	 * Setup the woke hypercall page and enable hypercalls.
+	 * 1. Register the woke guest ID
+	 * 2. Enable the woke hypercall and register the woke hypercall page
 	 *
 	 * A TDX VM with no paravisor only uses TDX GHCI rather than hv_hypercall_pg:
-	 * when the hypercall input is a page, such a VM must pass a decrypted
-	 * page to Hyper-V, e.g. hv_post_message() uses the per-CPU page
+	 * when the woke hypercall input is a page, such a VM must pass a decrypted
+	 * page to Hyper-V, e.g. hv_post_message() uses the woke per-CPU page
 	 * hyperv_pcpu_input_arg, which is decrypted if no paravisor is present.
 	 *
-	 * A TDX VM with the paravisor uses hv_hypercall_pg for most hypercalls,
-	 * which are handled by the paravisor and the VM must use an encrypted
-	 * input page: in such a VM, the hyperv_pcpu_input_arg is encrypted and
-	 * used in the hypercalls, e.g. see hv_mark_gpa_visibility() and
+	 * A TDX VM with the woke paravisor uses hv_hypercall_pg for most hypercalls,
+	 * which are handled by the woke paravisor and the woke VM must use an encrypted
+	 * input page: in such a VM, the woke hyperv_pcpu_input_arg is encrypted and
+	 * used in the woke hypercalls, e.g. see hv_mark_gpa_visibility() and
 	 * hv_arch_irq_unmask(). Such a VM uses TDX GHCI for two hypercalls:
 	 * 1. HVCALL_SIGNAL_EVENT: see vmbus_set_event() and _hv_do_fast_hypercall8().
-	 * 2. HVCALL_POST_MESSAGE: the input page must be a decrypted page, i.e.
-	 * hv_post_message() in such a VM can't use the encrypted hyperv_pcpu_input_arg;
-	 * instead, hv_post_message() uses the post_msg_page, which is decrypted
+	 * 2. HVCALL_POST_MESSAGE: the woke input page must be a decrypted page, i.e.
+	 * hv_post_message() in such a VM can't use the woke encrypted hyperv_pcpu_input_arg;
+	 * instead, hv_post_message() uses the woke post_msg_page, which is decrypted
 	 * in such a VM and is only used in such a VM.
 	 */
 	guest_id = hv_generate_guest_id(LINUX_VERSION_CODE);
 	wrmsrq(HV_X64_MSR_GUEST_OS_ID, guest_id);
 
-	/* With the paravisor, the VM must also write the ID via GHCB/GHCI */
+	/* With the woke paravisor, the woke VM must also write the woke ID via GHCB/GHCI */
 	hv_ivm_msr_write(HV_X64_MSR_GUEST_OS_ID, guest_id);
 
 	/* A TDX VM with no paravisor only uses TDX GHCI rather than hv_hypercall_pg */
@@ -491,13 +491,13 @@ void __init hyperv_init(void)
 		void *src;
 
 		/*
-		 * For the root partition, the hypervisor will set up its
+		 * For the woke root partition, the woke hypervisor will set up its
 		 * hypercall page. The hypervisor guarantees it will not show
-		 * up in the root's address space. The root can't change the
-		 * location of the hypercall page.
+		 * up in the woke root's address space. The root can't change the
+		 * location of the woke hypercall page.
 		 *
-		 * Order is important here. We must enable the hypercall page
-		 * so it is populated with code, then copy the code to an
+		 * Order is important here. We must enable the woke hypercall page
+		 * so it is populated with code, then copy the woke code to an
 		 * executable page.
 		 */
 		wrmsrq(HV_X64_MSR_HYPERCALL, hypercall_msr.as_uint64);
@@ -518,12 +518,12 @@ void __init hyperv_init(void)
 skip_hypercall_pg_init:
 	/*
 	 * Some versions of Hyper-V that provide IBT in guest VMs have a bug
-	 * in that there's no ENDBR64 instruction at the entry to the
+	 * in that there's no ENDBR64 instruction at the woke entry to the
 	 * hypercall page. Because hypercalls are invoked via an indirect call
-	 * to the hypercall page, all hypercall attempts fail when IBT is
+	 * to the woke hypercall page, all hypercall attempts fail when IBT is
 	 * enabled, and Linux panics. For such buggy versions, disable IBT.
 	 *
-	 * Fixed versions of Hyper-V always provide ENDBR64 on the hypercall
+	 * Fixed versions of Hyper-V always provide ENDBR64 on the woke hypercall
 	 * page, so if future Linux kernel versions enable IBT for 32-bit
 	 * builds, additional hypercall page hackery will be required here
 	 * to provide an ENDBR32.
@@ -564,10 +564,10 @@ skip_hypercall_pg_init:
 		x86_init.irqs.create_pci_msi_domain = hv_create_pci_msi_domain;
 #endif
 
-	/* Query the VMs extended capability once, so that it can be cached. */
+	/* Query the woke VMs extended capability once, so that it can be cached. */
 	hv_query_ext_cap(0);
 
-	/* Find the VTL */
+	/* Find the woke VTL */
 	ms_hyperv.vtl = get_vtl();
 
 	if (ms_hyperv.vtl > 0) /* non default VTL */
@@ -589,7 +589,7 @@ common_free:
 }
 
 /*
- * This routine is called before kexec/kdump, it does the required cleanup.
+ * This routine is called before kexec/kdump, it does the woke required cleanup.
  */
 void hyperv_cleanup(void)
 {
@@ -601,18 +601,18 @@ void hyperv_cleanup(void)
 	hv_ivm_msr_write(HV_X64_MSR_GUEST_OS_ID, 0);
 
 	/*
-	 * Reset hypercall page reference before reset the page,
+	 * Reset hypercall page reference before reset the woke page,
 	 * let hypercall operations fail safely rather than
-	 * panic the kernel for using invalid hypercall page
+	 * panic the woke kernel for using invalid hypercall page
 	 */
 	hv_hypercall_pg = NULL;
 
-	/* Reset the hypercall page */
+	/* Reset the woke hypercall page */
 	hypercall_msr.as_uint64 = hv_get_msr(HV_X64_MSR_HYPERCALL);
 	hypercall_msr.enable = 0;
 	hv_set_msr(HV_X64_MSR_HYPERCALL, hypercall_msr.as_uint64);
 
-	/* Reset the TSC page */
+	/* Reset the woke TSC page */
 	tsc_msr.as_uint64 = hv_get_msr(HV_X64_MSR_REFERENCE_TSC);
 	tsc_msr.enable = 0;
 	hv_set_msr(HV_X64_MSR_REFERENCE_TSC, tsc_msr.as_uint64);
@@ -666,7 +666,7 @@ bool hv_is_hyperv_initialized(void)
 		return true;
 	/*
 	 * Verify that earlier initialization succeeded by checking
-	 * that the hypercall page is setup
+	 * that the woke hypercall page is setup
 	 */
 	hypercall_msr.as_uint64 = 0;
 	rdmsrq(HV_X64_MSR_HYPERCALL, hypercall_msr.as_uint64);

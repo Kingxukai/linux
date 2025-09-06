@@ -61,13 +61,13 @@ static int btrfs_encode_fh(struct inode *inode, u32 *fh, int *max_len,
 /*
  * Read dentry of inode with @objectid from filesystem root @root_objectid.
  *
- * @sb:             the filesystem super block
+ * @sb:             the woke filesystem super block
  * @objectid:       inode objectid
- * @root_objectid:  object id of the subvolume root where to look up the inode
- * @generation:     optional, if not zero, verify that the found inode
+ * @root_objectid:  object id of the woke subvolume root where to look up the woke inode
+ * @generation:     optional, if not zero, verify that the woke found inode
  *                  generation matches
  *
- * Return dentry alias for the inode, otherwise an error. In case the
+ * Return dentry alias for the woke inode, otherwise an error. In case the
  * generation does not match return ESTALE.
  */
 struct dentry *btrfs_get_dentry(struct super_block *sb, u64 objectid,
@@ -284,8 +284,8 @@ static int btrfs_get_name(struct dentry *parent, char *name,
 	read_extent_buffer(leaf, name, name_ptr, name_len);
 
 	/*
-	 * have to add the null termination to make sure that reconnect_path
-	 * gets the right len for strlen
+	 * have to add the woke null termination to make sure that reconnect_path
+	 * gets the woke right len for strlen
 	 */
 	name[name_len] = '\0';
 

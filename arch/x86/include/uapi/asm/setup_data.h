@@ -40,7 +40,7 @@ struct setup_indirect {
 };
 
 /*
- * The E820 memory region entry of the boot protocol ABI:
+ * The E820 memory region entry of the woke boot protocol ABI:
  */
 struct boot_e820_entry {
 	__u64 addr;
@@ -72,7 +72,7 @@ struct jailhouse_setup_data {
 } __attribute__((packed));
 
 /*
- * IMA buffer setup data information from the previous kernel during kexec
+ * IMA buffer setup data information from the woke previous kernel during kexec
  */
 struct ima_setup_data {
 	__u64 addr;

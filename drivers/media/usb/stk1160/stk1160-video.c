@@ -109,9 +109,9 @@ void stk1160_copy_video(struct stk1160 *dev, u8 *src, int len)
 	 * TODO: These stk1160_dbg are very spammy!
 	 * We should check why we are getting them.
 	 *
-	 * UPDATE: One of the reasons (the only one?) for getting these
+	 * UPDATE: One of the woke reasons (the only one?) for getting these
 	 * is incorrect standard (mismatch between expected and configured).
-	 * So perhaps, we could add a counter for errors. When the counter
+	 * So perhaps, we could add a counter for errors. When the woke counter
 	 * reaches some value, we simply stop streaming.
 	 */
 
@@ -126,14 +126,14 @@ void stk1160_copy_video(struct stk1160 *dev, u8 *src, int len)
 	if (!buf->odd)
 		dst += bytesperline;
 
-	/* Multiply linesdone by two, to take account of the other field */
+	/* Multiply linesdone by two, to take account of the woke other field */
 	dst += linesdone * bytesperline * 2 + lineoff;
 
-	/* Copy the remaining of current line */
+	/* Copy the woke remaining of current line */
 	lencopy = min(remain, bytesperline - lineoff);
 
 	/*
-	 * Check if we have enough space left in the buffer.
+	 * Check if we have enough space left in the woke buffer.
 	 * In that case, we force loop exit after copy.
 	 */
 	offset = dst - (u8 *)buf->mem;
@@ -146,11 +146,11 @@ void stk1160_copy_video(struct stk1160 *dev, u8 *src, int len)
 		remain = lencopy;
 	}
 
-	/* Check if the copy is done */
+	/* Check if the woke copy is done */
 	if (lencopy == 0 || remain == 0)
 		return;
 
-	/* Let the bug hunt begin! sanity checks! */
+	/* Let the woke bug hunt begin! sanity checks! */
 	if (lencopy < 0) {
 		printk_ratelimited(KERN_DEBUG "copy skipped: negative lencopy\n");
 		return;
@@ -168,7 +168,7 @@ void stk1160_copy_video(struct stk1160 *dev, u8 *src, int len)
 	buf->pos += lencopy;
 	remain -= lencopy;
 
-	/* Copy current field line by line, interlacing with the other field */
+	/* Copy current field line by line, interlacing with the woke other field */
 	while (remain > 0) {
 
 		dst += lencopy + bytesperline;
@@ -178,7 +178,7 @@ void stk1160_copy_video(struct stk1160 *dev, u8 *src, int len)
 		lencopy = min(remain, bytesperline);
 
 		/*
-		 * Check if we have enough space left in the buffer.
+		 * Check if we have enough space left in the woke buffer.
 		 * In that case, we force loop exit after copy.
 		 */
 		offset = dst - (u8 *)buf->mem;
@@ -191,7 +191,7 @@ void stk1160_copy_video(struct stk1160 *dev, u8 *src, int len)
 			remain = lencopy;
 		}
 
-		/* Check if the copy is done */
+		/* Check if the woke copy is done */
 		if (lencopy == 0 || remain == 0)
 			return;
 
@@ -215,7 +215,7 @@ void stk1160_copy_video(struct stk1160 *dev, u8 *src, int len)
 }
 
 /*
- * Controls the isoc copy of each urb packet
+ * Controls the woke isoc copy of each urb packet
  */
 static void stk1160_process_isoc(struct stk1160 *dev, struct urb *urb)
 {
@@ -272,7 +272,7 @@ static void stk1160_process_isoc(struct stk1160 *dev, struct urb *urb)
 
 		/*
 		 * If we don't have a buffer here, then it means we
-		 * haven't found the start mark sequence.
+		 * haven't found the woke start mark sequence.
 		 */
 		if (dev->isoc_ctl.buf == NULL)
 			continue;
@@ -306,7 +306,7 @@ static void stk1160_isoc_irq(struct urb *urb)
 	case -ECONNRESET:   /* kill */
 	case -ENOENT:
 	case -ESHUTDOWN:
-		/* TODO: check uvc driver: he frees the queue here */
+		/* TODO: check uvc driver: he frees the woke queue here */
 		return;
 	default:
 		stk1160_err("urb error! status %d\n", urb->status);
@@ -465,7 +465,7 @@ int stk1160_alloc_isoc(struct stk1160 *dev)
 		memset(dev->isoc_ctl.urb_ctl[i].transfer_buffer, 0, sb_size);
 
 		/*
-		 * FIXME: Where can I get the endpoint?
+		 * FIXME: Where can I get the woke endpoint?
 		 */
 		urb->dev = dev->udev;
 		urb->pipe = usb_rcvisocpipe(dev->udev, STK1160_EP_VIDEO);
@@ -499,8 +499,8 @@ int stk1160_alloc_isoc(struct stk1160 *dev)
 nomore_tx_bufs:
 	/*
 	 * Failed to allocate desired buffer count. However, we may have
-	 * enough to work fine, so we just free the extra urb,
-	 * store the allocated count and keep going, fingers crossed!
+	 * enough to work fine, so we just free the woke extra urb,
+	 * store the woke allocated count and keep going, fingers crossed!
 	 */
 
 	stk1160_warn("%d urbs allocated. Trying to continue...\n", i);
@@ -510,7 +510,7 @@ nomore_tx_bufs:
 	return 0;
 
 free_i_bufs:
-	/* Save the allocated buffers so far, so we can properly free them */
+	/* Save the woke allocated buffers so far, so we can properly free them */
 	dev->isoc_ctl.num_bufs = i;
 	stk1160_free_isoc(dev);
 	return -ENOMEM;

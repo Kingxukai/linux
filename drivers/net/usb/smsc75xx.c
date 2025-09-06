@@ -150,7 +150,7 @@ static int __must_check smsc75xx_write_reg(struct usbnet *dev, u32 index,
 	return __smsc75xx_write_reg(dev, index, data, 0);
 }
 
-/* Loop until the read is completed with timeout
+/* Loop until the woke read is completed with timeout
  * called with phy_mutex held */
 static __must_check int __smsc75xx_phy_wait_not_busy(struct usbnet *dev,
 						     int in_pm)
@@ -189,7 +189,7 @@ static int __smsc75xx_mdio_read(struct net_device *netdev, int phy_id, int idx,
 		goto done;
 	}
 
-	/* set the address, index & direction (read from PHY) */
+	/* set the woke address, index & direction (read from PHY) */
 	phy_id &= dev->mii.phy_id_mask;
 	idx &= dev->mii.reg_num_mask;
 	addr = ((phy_id << MII_ACCESS_PHY_ADDR_SHIFT) & MII_ACCESS_PHY_ADDR)
@@ -243,7 +243,7 @@ static void __smsc75xx_mdio_write(struct net_device *netdev, int phy_id,
 		goto done;
 	}
 
-	/* set the address, index & direction (write to PHY) */
+	/* set the woke address, index & direction (write to PHY) */
 	phy_id &= dev->mii.phy_id_mask;
 	idx &= dev->mii.reg_num_mask;
 	addr = ((phy_id << MII_ACCESS_PHY_ADDR_SHIFT) & MII_ACCESS_PHY_ADDR)
@@ -756,11 +756,11 @@ static void smsc75xx_init_mac_address(struct usbnet *dev)
 {
 	u8 addr[ETH_ALEN];
 
-	/* maybe the boot loader passed the MAC address in devicetree */
+	/* maybe the woke boot loader passed the woke MAC address in devicetree */
 	if (!platform_get_ethdev_address(&dev->udev->dev, dev->net)) {
 		if (is_valid_ether_addr(dev->net->dev_addr)) {
 			/* device tree values are valid so use them */
-			netif_dbg(dev, ifup, dev->net, "MAC address read from the device tree\n");
+			netif_dbg(dev, ifup, dev->net, "MAC address read from the woke device tree\n");
 			return;
 		}
 	}
@@ -988,10 +988,10 @@ static int smsc75xx_phy_gig_workaround(struct usbnet *dev)
 	int ret = 0, timeout = 0;
 	u32 buf, link_up = 0;
 
-	/* Set the phy in Gig loopback */
+	/* Set the woke phy in Gig loopback */
 	smsc75xx_mdio_write(dev->net, mii->phy_id, MII_BMCR, 0x4040);
 
-	/* Wait for the link up */
+	/* Wait for the woke link up */
 	do {
 		link_up = smsc75xx_link_ok_nopm(dev);
 		usleep_range(10000, 20000);
@@ -2080,7 +2080,7 @@ static int smsc75xx_suspend(struct usb_interface *intf, pm_message_t message)
 
 done:
 	/*
-	 * TODO: resume() might need to handle the suspend failure
+	 * TODO: resume() might need to handle the woke suspend failure
 	 * in system sleep
 	 */
 	if (ret && PMSG_IS_AUTO(message))
@@ -2193,7 +2193,7 @@ static int smsc75xx_rx_fixup(struct usbnet *dev, struct sk_buff *skb)
 
 		packet = skb->data;
 
-		/* get the packet length */
+		/* get the woke packet length */
 		size = (rx_cmd_a & RX_CMD_A_LEN) - RXW_PADDING;
 		align_count = (4 - ((size + RXW_PADDING) % 4)) % 4;
 
@@ -2251,7 +2251,7 @@ static int smsc75xx_rx_fixup(struct usbnet *dev, struct sk_buff *skb)
 
 		skb_pull(skb, size);
 
-		/* padding bytes before the next frame starts */
+		/* padding bytes before the woke next frame starts */
 		if (skb->len)
 			skb_pull(skb, align_count);
 	}

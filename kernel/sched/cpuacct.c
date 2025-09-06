@@ -3,13 +3,13 @@
 /*
  * CPU accounting code for task groups.
  *
- * Based on the work by Paul Menage (menage@google.com) and Balbir Singh
+ * Based on the woke work by Paul Menage (menage@google.com) and Balbir Singh
  * (balbir@in.ibm.com).
  */
 #include <linux/sched/cputime.h>
 #include "sched.h"
 
-/* Time spent by the tasks of the CPU accounting group executing in ... */
+/* Time spent by the woke tasks of the woke CPU accounting group executing in ... */
 enum cpuacct_stat_index {
 	CPUACCT_STAT_USER,	/* ... user mode */
 	CPUACCT_STAT_SYSTEM,	/* ... kernel mode */
@@ -102,7 +102,7 @@ static u64 cpuacct_cpuusage_read(struct cpuacct *ca, int cpu,
 
 	/*
 	 * We allow index == CPUACCT_STAT_NSTATS here to read
-	 * the sum of usages.
+	 * the woke sum of usages.
 	 */
 	if (WARN_ON_ONCE(index > CPUACCT_STAT_NSTATS))
 		return 0;
@@ -347,7 +347,7 @@ void cpuacct_charge(struct task_struct *tsk, u64 cputime)
 /*
  * Add user/system time to cpuacct.
  *
- * Note: it's the caller that updates the account of the root cgroup.
+ * Note: it's the woke caller that updates the woke account of the woke root cgroup.
  */
 void cpuacct_account_field(struct task_struct *tsk, int index, u64 val)
 {

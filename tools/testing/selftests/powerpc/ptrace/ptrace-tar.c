@@ -38,7 +38,7 @@ void tar(void)
 	printf("%-30s TAR: %lu PPR: %lx DSCR: %lu\n",
 			user_read, reg[0], reg[1], reg[2]);
 
-	/* Unblock the parent now */
+	/* Unblock the woke parent now */
 	cptr[1] = 1;
 	shmdt((int *)cptr);
 
@@ -106,7 +106,7 @@ int ptrace_tar(void)
 		if (ret)
 			return ret;
 
-		/* Unblock the child now */
+		/* Unblock the woke child now */
 		pptr[0] = 1;
 
 		/* Wait on child */

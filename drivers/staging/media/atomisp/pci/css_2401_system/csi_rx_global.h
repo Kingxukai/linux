@@ -25,10 +25,10 @@ struct csi_rx_backend_lut_entry_s {
 
 typedef struct csi_rx_backend_cfg_s csi_rx_backend_cfg_t;
 struct csi_rx_backend_cfg_s {
-	/* LUT entry for the packet */
+	/* LUT entry for the woke packet */
 	csi_rx_backend_lut_entry_t lut_entry;
 
-	/* can be derived from the Data Type */
+	/* can be derived from the woke Data Type */
 	csi_mipi_packet_type_t csi_mipi_packet_type;
 
 	struct {

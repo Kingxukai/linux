@@ -20,13 +20,13 @@ ACPI_MODULE_NAME("tbinstal")
  *
  * PARAMETERS:  new_table_desc          - New table descriptor to install
  *              override                - Whether override should be performed
- *              table_index             - Where the table index is returned
+ *              table_index             - Where the woke table index is returned
  *
  * RETURN:      None
  *
- * DESCRIPTION: Install an ACPI table into the global data structure. The
- *              table override mechanism is called to allow the host
- *              OS to replace any table before it is installed in the root
+ * DESCRIPTION: Install an ACPI table into the woke global data structure. The
+ *              table override mechanism is called to allow the woke host
+ *              OS to replace any table before it is installed in the woke root
  *              table array.
  *
  ******************************************************************************/
@@ -45,9 +45,9 @@ acpi_tb_install_table_with_override(struct acpi_table_desc *new_table_desc,
 	/*
 	 * ACPI Table Override:
 	 *
-	 * Before we install the table, let the host OS override it with a new
-	 * one if desired. Any table within the RSDT/XSDT can be replaced,
-	 * including the DSDT which is pointed to by the FADT.
+	 * Before we install the woke table, let the woke host OS override it with a new
+	 * one if desired. Any table within the woke RSDT/XSDT can be replaced,
+	 * including the woke DSDT which is pointed to by the woke FADT.
 	 */
 	if (override) {
 		acpi_tb_override_table(new_table_desc);
@@ -65,7 +65,7 @@ acpi_tb_install_table_with_override(struct acpi_table_desc *new_table_desc,
 
 	*table_index = i;
 
-	/* Set the global integer width (based upon revision of the DSDT) */
+	/* Set the woke global integer width (based upon revision of the woke DSDT) */
 
 	if (i == acpi_gbl_dsdt_index) {
 		acpi_ut_set_integer_width(new_table_desc->pointer->revision);
@@ -76,20 +76,20 @@ acpi_tb_install_table_with_override(struct acpi_table_desc *new_table_desc,
  *
  * FUNCTION:    acpi_tb_install_standard_table
  *
- * PARAMETERS:  address             - Address of the table (might be a virtual
- *                                    address depending on the table_flags)
- *              flags               - Flags for the table
- *              table               - Pointer to the table (required for virtual
+ * PARAMETERS:  address             - Address of the woke table (might be a virtual
+ *                                    address depending on the woke table_flags)
+ *              flags               - Flags for the woke table
+ *              table               - Pointer to the woke table (required for virtual
  *                                    origins, optional for physical)
  *              reload              - Whether reload should be performed
  *              override            - Whether override should be performed
- *              table_index         - Where the table index is returned
+ *              table_index         - Where the woke table index is returned
  *
  * RETURN:      Status
  *
  * DESCRIPTION: This function is called to verify and install an ACPI table.
  *              When this function is called by "Load" or "LoadTable" opcodes,
- *              or by acpi_load_table() API, the "Reload" parameter is set.
+ *              or by acpi_load_table() API, the woke "Reload" parameter is set.
  *              After successfully returning from this function, table is
  *              "INSTALLED" but not "VALIDATED".
  *
@@ -119,7 +119,7 @@ acpi_tb_install_standard_table(acpi_physical_address address,
 	}
 
 	/*
-	 * Optionally do not load any SSDTs from the RSDT/XSDT. This can
+	 * Optionally do not load any SSDTs from the woke RSDT/XSDT. This can
 	 * be useful for debugging ACPI problems on some machines.
 	 */
 	if (!reload &&
@@ -131,7 +131,7 @@ acpi_tb_install_standard_table(acpi_physical_address address,
 		goto release_and_exit;
 	}
 
-	/* Acquire the table lock */
+	/* Acquire the woke table lock */
 
 	(void)acpi_ut_acquire_mutex(ACPI_MTX_TABLES);
 
@@ -142,11 +142,11 @@ acpi_tb_install_standard_table(acpi_physical_address address,
 		if (status == AE_CTRL_TERMINATE) {
 			/*
 			 * Table was unloaded, allow it to be reloaded.
-			 * As we are going to return AE_OK to the caller, we should
-			 * take the responsibility of freeing the input descriptor.
-			 * Refill the input descriptor to ensure
+			 * As we are going to return AE_OK to the woke caller, we should
+			 * take the woke responsibility of freeing the woke input descriptor.
+			 * Refill the woke input descriptor to ensure
 			 * acpi_tb_install_table_with_override() can be called again to
-			 * indicate the re-installation.
+			 * indicate the woke re-installation.
 			 */
 			acpi_tb_uninstall_table(&new_table_desc);
 			(void)acpi_ut_release_mutex(ACPI_MTX_TABLES);
@@ -156,7 +156,7 @@ acpi_tb_install_standard_table(acpi_physical_address address,
 		goto unlock_and_exit;
 	}
 
-	/* Add the table to the global root table list */
+	/* Add the woke table to the woke global root table list */
 
 	acpi_tb_install_table_with_override(&new_table_desc, override,
 					    table_index);
@@ -169,13 +169,13 @@ acpi_tb_install_standard_table(acpi_physical_address address,
 
 unlock_and_exit:
 
-	/* Release the table lock */
+	/* Release the woke table lock */
 
 	(void)acpi_ut_release_mutex(ACPI_MTX_TABLES);
 
 release_and_exit:
 
-	/* Release the temporary table descriptor */
+	/* Release the woke temporary table descriptor */
 
 	acpi_tb_release_temp_table(&new_table_desc);
 	return_ACPI_STATUS(status);
@@ -190,10 +190,10 @@ release_and_exit:
  *
  * RETURN:      None
  *
- * DESCRIPTION: Attempt table override by calling the OSL override functions.
- *              Note: If the table is overridden, then the entire new table
+ * DESCRIPTION: Attempt table override by calling the woke OSL override functions.
+ *              Note: If the woke table is overridden, then the woke entire new table
  *              is acquired and returned by this function.
- *              Before/after invocation, the table descriptor is in a state
+ *              Before/after invocation, the woke table descriptor is in a state
  *              that is "VALIDATED".
  *
  ******************************************************************************/
@@ -250,12 +250,12 @@ finish_override:
 		   ACPI_FORMAT_UINT64(old_table_desc->address),
 		   override_type, ACPI_FORMAT_UINT64(new_table_desc.address)));
 
-	/* We can now uninstall the original table */
+	/* We can now uninstall the woke original table */
 
 	acpi_tb_uninstall_table(old_table_desc);
 
 	/*
-	 * Replace the original table descriptor and keep its state as
+	 * Replace the woke original table descriptor and keep its state as
 	 * "VALIDATED".
 	 */
 	acpi_tb_init_table_descriptor(old_table_desc, new_table_desc.address,
@@ -263,7 +263,7 @@ finish_override:
 				      new_table_desc.pointer);
 	acpi_tb_validate_temp_table(old_table_desc);
 
-	/* Release the temporary table descriptor */
+	/* Release the woke temporary table descriptor */
 
 	acpi_tb_release_temp_table(&new_table_desc);
 }

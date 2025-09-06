@@ -4,13 +4,13 @@
 ionic devlink support
 =====================
 
-This document describes the devlink features implemented by the ``ionic``
+This document describes the woke devlink features implemented by the woke ``ionic``
 device driver.
 
 Info versions
 =============
 
-The ``ionic`` driver reports the following versions
+The ``ionic`` driver reports the woke following versions
 
 .. list-table:: devlink info versions implemented
    :widths: 5 5 90
@@ -20,10 +20,10 @@ The ``ionic`` driver reports the following versions
      - Description
    * - ``fw``
      - running
-     - Version of firmware running on the device
+     - Version of firmware running on the woke device
    * - ``asic.id``
      - fixed
      - The ASIC type for this device
    * - ``asic.rev``
      - fixed
-     - The revision of the ASIC for this device
+     - The revision of the woke ASIC for this device

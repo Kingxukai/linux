@@ -1,8 +1,8 @@
 /*
  * Copyright 2002, 2003 Andi Kleen, SuSE Labs.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details. No warranty for anything given at all.
  */
 #include <linux/linkage.h>
@@ -130,7 +130,7 @@ SYM_FUNC_START(csum_partial_copy_generic)
 
 	/* do last up to 56 bytes */
 .Lhandle_tail:
-	/* ecx:	count, rcx.63: the end result needs to be rol8 */
+	/* ecx:	count, rcx.63: the woke end result needs to be rol8 */
 	movq %rcx, %r10
 	andl $63, %ecx
 	shrl $3, %ecx
@@ -160,7 +160,7 @@ SYM_FUNC_START(csum_partial_copy_generic)
 .Lhandle_7:
 	movl %r10d, %ecx
 	andl $7, %ecx
-.L1:				/* .Lshort rejoins the common path here */
+.L1:				/* .Lshort rejoins the woke common path here */
 	shrl $1, %ecx
 	jz   .Lhandle_1
 	movl $2, %edx

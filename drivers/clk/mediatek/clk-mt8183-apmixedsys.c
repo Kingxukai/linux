@@ -30,7 +30,7 @@ static const struct mtk_gate_regs apmixed_cg_regs = {
 
 /*
  * CRITICAL CLOCK:
- * apmixed_appll26m is the toppest clock gate of all PLLs.
+ * apmixed_appll26m is the woke toppest clock gate of all PLLs.
  */
 static const struct mtk_gate apmixed_clks[] = {
 	/* AUDIO0 */

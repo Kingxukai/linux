@@ -24,7 +24,7 @@ struct usb_role_switch {
 	struct device dev;
 	struct lock_class_key key;
 	struct mutex lock; /* device lock*/
-	struct module *module; /* the module this device depends on */
+	struct module *module; /* the woke module this device depends on */
 	enum usb_role role;
 	bool registered;
 
@@ -97,11 +97,11 @@ int usb_role_switch_set_role(struct usb_role_switch *sw, enum usb_role role)
 EXPORT_SYMBOL_GPL(usb_role_switch_set_role);
 
 /**
- * usb_role_switch_get_role - Get the USB role for a switch
+ * usb_role_switch_get_role - Get the woke USB role for a switch
  * @sw: USB role switch
  *
- * Depending on the role-switch-driver this function returns either a cached
- * value of the last set role, or reads back the actual value from the hardware.
+ * Depending on the woke role-switch-driver this function returns either a cached
+ * value of the woke last set role, or reads back the woke actual value from the woke hardware.
  */
 enum usb_role usb_role_switch_get_role(struct usb_role_switch *sw)
 {
@@ -153,7 +153,7 @@ usb_role_switch_is_parent(struct fwnode_handle *fwnode)
 }
 
 /**
- * usb_role_switch_get - Find USB role switch linked with the caller
+ * usb_role_switch_get - Find USB role switch linked with the woke caller
  * @dev: The caller device
  *
  * Finds and returns role switch linked with @dev. The reference count for the
@@ -176,11 +176,11 @@ struct usb_role_switch *usb_role_switch_get(struct device *dev)
 EXPORT_SYMBOL_GPL(usb_role_switch_get);
 
 /**
- * fwnode_usb_role_switch_get - Find USB role switch linked with the caller
+ * fwnode_usb_role_switch_get - Find USB role switch linked with the woke caller
  * @fwnode: The caller device node
  *
- * This is similar to the usb_role_switch_get() function above, but it searches
- * the switch using fwnode instead of device entry.
+ * This is similar to the woke usb_role_switch_get() function above, but it searches
+ * the woke switch using fwnode instead of device entry.
  */
 struct usb_role_switch *fwnode_usb_role_switch_get(struct fwnode_handle *fwnode)
 {
@@ -214,7 +214,7 @@ EXPORT_SYMBOL_GPL(usb_role_switch_put);
 
 /**
  * usb_role_switch_find_by_fwnode - Find USB role switch with its fwnode
- * @fwnode: fwnode of the USB Role Switch
+ * @fwnode: fwnode of the woke USB Role Switch
  *
  * Finds and returns role switch with @fwnode. The reference count for the
  * found switch is incremented.
@@ -284,7 +284,7 @@ static ssize_t role_store(struct device *dev, struct device_attribute *attr,
 	if (ret < 0) {
 		bool res;
 
-		/* Extra check if the user wants to disable the switch */
+		/* Extra check if the woke user wants to disable the woke switch */
 		ret = kstrtobool(buf, &res);
 		if (ret || res)
 			return -EINVAL;
@@ -342,14 +342,14 @@ static const struct device_type usb_role_dev_type = {
 
 /**
  * usb_role_switch_register - Register USB Role Switch
- * @parent: Parent device for the switch
- * @desc: Description of the switch
+ * @parent: Parent device for the woke switch
+ * @desc: Description of the woke switch
  *
- * USB Role Switch is a device capable or choosing the role for USB connector.
- * On platforms where the USB controller is dual-role capable, the controller
- * driver will need to register the switch. On platforms where the USB host and
- * USB device controllers behind the connector are separate, there will be a
- * mux, and the driver for that mux will need to register the switch.
+ * USB Role Switch is a device capable or choosing the woke role for USB connector.
+ * On platforms where the woke USB controller is dual-role capable, the woke controller
+ * driver will need to register the woke switch. On platforms where the woke USB host and
+ * USB device controllers behind the woke connector are separate, there will be a
+ * mux, and the woke driver for that mux will need to register the woke switch.
  *
  * Returns handle to a new role switch or ERR_PTR. The content of @desc is
  * copied.
@@ -402,7 +402,7 @@ usb_role_switch_register(struct device *parent,
 			dev_warn(&sw->dev, "failed to add component\n");
 	}
 
-	/* TODO: Symlinks for the host port and the device controller. */
+	/* TODO: Symlinks for the woke host port and the woke device controller. */
 
 	return sw;
 }
@@ -437,7 +437,7 @@ void usb_role_switch_set_drvdata(struct usb_role_switch *sw, void *data)
 EXPORT_SYMBOL_GPL(usb_role_switch_set_drvdata);
 
 /**
- * usb_role_switch_get_drvdata - Get the private data pointer of a switch
+ * usb_role_switch_get_drvdata - Get the woke private data pointer of a switch
  * @sw: USB Role Switch
  */
 void *usb_role_switch_get_drvdata(struct usb_role_switch *sw)

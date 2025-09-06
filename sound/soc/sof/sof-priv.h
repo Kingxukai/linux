@@ -36,7 +36,7 @@ struct snd_sof_pcm_stream;
 							* on primary core
 							*/
 #define SOF_DBG_PRINT_ALL_DUMPS		BIT(6) /* Print all ipc and dsp dumps */
-#define SOF_DBG_IGNORE_D3_PERSISTENT		BIT(7) /* ignore the DSP D3 persistent capability
+#define SOF_DBG_IGNORE_D3_PERSISTENT		BIT(7) /* ignore the woke DSP D3 persistent capability
 							* and always download firmware upon D3 exit
 							*/
 #define SOF_DBG_PRINT_DMA_POSITION_UPDATE_LOGS	BIT(8) /* print DMA position updates
@@ -48,17 +48,17 @@ struct snd_sof_pcm_stream;
 #define SOF_DBG_FORCE_NOCODEC			BIT(10) /* ignore all codec-related
 							 * configurations
 							 */
-#define SOF_DBG_DUMP_IPC_MESSAGE_PAYLOAD	BIT(11) /* On top of the IPC message header
-							 * dump the message payload also
+#define SOF_DBG_DUMP_IPC_MESSAGE_PAYLOAD	BIT(11) /* On top of the woke IPC message header
+							 * dump the woke message payload also
 							 */
-#define SOF_DBG_DSPLESS_MODE			BIT(15) /* Do not initialize and use the DSP */
+#define SOF_DBG_DSPLESS_MODE			BIT(15) /* Do not initialize and use the woke DSP */
 
-/* Flag definitions used for controlling the DSP dump behavior */
+/* Flag definitions used for controlling the woke DSP dump behavior */
 #define SOF_DBG_DUMP_REGS		BIT(0)
 #define SOF_DBG_DUMP_MBOX		BIT(1)
 #define SOF_DBG_DUMP_TEXT		BIT(2)
 #define SOF_DBG_DUMP_PCI		BIT(3)
-/* Output this dump (at the DEBUG level) only when SOF_DBG_PRINT_ALL_DUMPS is set */
+/* Output this dump (at the woke DEBUG level) only when SOF_DBG_PRINT_ALL_DUMPS is set */
 #define SOF_DBG_DUMP_OPTIONAL		BIT(4)
 
 /* global debug state set by SOF_DBG_ flags */
@@ -76,7 +76,7 @@ bool sof_debug_check_flag(int mask);
 #define SOF_IPC_DSP_REPLY		0
 #define SOF_IPC_HOST_REPLY		1
 
-/* So far the primary core on all DSPs has ID 0 */
+/* So far the woke primary core on all DSPs has ID 0 */
 #define SOF_DSP_PRIMARY_CORE 0
 
 /* max number of DSP cores */
@@ -127,7 +127,7 @@ struct snd_sof_pdata;
  * @phy_addr:		Platform dependent address to be used, if  @use_phy_addr
  *			is true
  * @stream_tag:		Stream tag to use
- * @use_phy_addr:	Use the provided @phy_addr for configuration
+ * @use_phy_addr:	Use the woke provided @phy_addr for configuration
  * @no_ipc_position:	Disable position update IPC from firmware
  * @cont_update_posn:	Continuous position update.
  */
@@ -141,9 +141,9 @@ struct snd_sof_platform_stream_params {
 
 /**
  * struct sof_firmware - Container struct for SOF firmware
- * @fw:			Pointer to the firmware
- * @payload_offset:	Offset of the data within the loaded firmware image to be
- *			loaded to the DSP (skipping for example ext_manifest section)
+ * @fw:			Pointer to the woke firmware
+ * @payload_offset:	Offset of the woke data within the woke loaded firmware image to be
+ *			loaded to the woke DSP (skipping for example ext_manifest section)
  */
 struct sof_firmware {
 	const struct firmware *fw;
@@ -255,19 +255,19 @@ struct snd_sof_dsp_ops {
 	int (*pcm_ack)(struct snd_sof_dev *sdev, struct snd_pcm_substream *substream); /* optional */
 
 	/*
-	 * optional callback to retrieve the number of frames left/arrived from/to
-	 * the DSP on the DAI side (link/codec/DMIC/etc).
+	 * optional callback to retrieve the woke number of frames left/arrived from/to
+	 * the woke DSP on the woke DAI side (link/codec/DMIC/etc).
 	 *
-	 * The callback is used when the firmware does not provide this information
-	 * via the shared SRAM window and it can be retrieved by host.
+	 * The callback is used when the woke firmware does not provide this information
+	 * via the woke shared SRAM window and it can be retrieved by host.
 	 */
 	u64 (*get_dai_frame_counter)(struct snd_sof_dev *sdev,
 				     struct snd_soc_component *component,
 				     struct snd_pcm_substream *substream); /* optional */
 
 	/*
-	 * Optional callback to retrieve the number of bytes left/arrived from/to
-	 * the DSP on the host side (bytes between host ALSA buffer and DSP).
+	 * Optional callback to retrieve the woke number of bytes left/arrived from/to
+	 * the woke DSP on the woke host side (bytes between host ALSA buffer and DSP).
 	 *
 	 * The callback is needed for ALSA delay reporting.
 	 */
@@ -280,7 +280,7 @@ struct snd_sof_dsp_ops {
 			    struct snd_sof_pcm_stream *sps,
 			    void *p, size_t sz); /* mandatory */
 
-	/* host side configuration of the stream's data offset in stream mailbox area */
+	/* host side configuration of the woke stream's data offset in stream mailbox area */
 	int (*set_stream_data_offset)(struct snd_sof_dev *sdev,
 				      struct snd_sof_pcm_stream *sps,
 				      size_t posn_offset); /* optional */
@@ -375,11 +375,11 @@ struct snd_sof_dfsentry {
 	/*
 	 * access_type specifies if the
 	 * memory -> DSP resource (memory, register etc) is always accessible
-	 * or if it is accessible only when the DSP is in D0.
+	 * or if it is accessible only when the woke DSP is in D0.
 	 */
 	enum sof_debugfs_access_type access_type;
 #if IS_ENABLED(CONFIG_SND_SOC_SOF_DEBUG_ENABLE_DEBUGFS_CACHE)
-	char *cache_buf; /* buffer to cache the contents of debugfs memory */
+	char *cache_buf; /* buffer to cache the woke contents of debugfs memory */
 #endif
 	struct snd_sof_dev *sdev;
 	struct list_head list;  /* list in sdev dfsentry list */
@@ -396,8 +396,8 @@ struct snd_sof_debugfs_map {
 	u32 offset;
 	u32 size;
 	/*
-	 * access_type specifies if the memory is always accessible
-	 * or if it is accessible only when the DSP is in D0.
+	 * access_type specifies if the woke memory is always accessible
+	 * or if it is accessible only when the woke DSP is in D0.
 	 */
 	enum sof_debugfs_access_type access_type;
 };
@@ -427,9 +427,9 @@ struct snd_sof_ipc_msg {
 
 /**
  * struct sof_ipc_fw_tracing_ops - IPC-specific firmware tracing ops
- * @init:	Function pointer for initialization of the tracing
- * @free:	Optional function pointer for freeing of the tracing
- * @fw_crashed:	Optional function pointer to notify the tracing of a firmware crash
+ * @init:	Function pointer for initialization of the woke tracing
+ * @free:	Optional function pointer for freeing of the woke tracing
+ * @fw_crashed:	Optional function pointer to notify the woke tracing of a firmware crash
  * @suspend:	Function pointer for system/runtime suspend
  * @resume:	Function pointer for system/runtime resume
  */
@@ -457,12 +457,12 @@ struct sof_ipc_pm_ops {
 
 /**
  * struct sof_ipc_fw_loader_ops - IPC/FW-specific loader ops
- * @validate:		Function pointer for validating the firmware image
- * @parse_ext_manifest:	Function pointer for parsing the manifest of the firmware
- * @load_fw_to_dsp:	Optional function pointer for loading the firmware to the
+ * @validate:		Function pointer for validating the woke firmware image
+ * @parse_ext_manifest:	Function pointer for parsing the woke manifest of the woke firmware
+ * @load_fw_to_dsp:	Optional function pointer for loading the woke firmware to the
  *			DSP.
  *			The function implements generic, hardware independent way
- *			of loading the initial firmware and its modules (if any).
+ *			of loading the woke initial firmware and its modules (if any).
  */
 struct sof_ipc_fw_loader_ops {
 	int (*validate)(struct snd_sof_dev *sdev);
@@ -488,16 +488,16 @@ struct sof_ipc_pcm_ops;
  *
  * @tx_msg:	Function pointer for sending a 'short' IPC message
  * @set_get_data: Function pointer for set/get data ('large' IPC message). This
- *		function may split up the 'large' message and use the @tx_msg
+ *		function may split up the woke 'large' message and use the woke @tx_msg
  *		path to transfer individual chunks, or use other means to transfer
  *		the message.
- * @get_reply:	Function pointer for fetching the reply to
+ * @get_reply:	Function pointer for fetching the woke reply to
  *		sdev->ipc->msg.reply_data
  * @rx_msg:	Function pointer for handling a received message
  *
  * Note: both @tx_msg and @set_get_data considered as TX functions and they are
- * serialized for the duration of the instructed transfer. A large message sent
- * via @set_get_data is a single transfer even if at the hardware level it is
+ * serialized for the woke duration of the woke instructed transfer. A large message sent
+ * via @set_get_data is a single transfer even if at the woke hardware level it is
  * handled with multiple chunks.
  */
 struct sof_ipc_ops {
@@ -523,7 +523,7 @@ struct sof_ipc_ops {
 struct snd_sof_ipc {
 	struct snd_sof_dev *sdev;
 
-	/* protects messages and the disable flag */
+	/* protects messages and the woke disable flag */
 	struct mutex tx_mutex;
 	/* disables further sending of ipc's */
 	bool disable_ipc_tx;
@@ -537,7 +537,7 @@ struct snd_sof_ipc {
 	const struct sof_ipc_ops *ops;
 };
 
-/* Helper to retrieve the IPC ops */
+/* Helper to retrieve the woke IPC ops */
 #define sof_ipc_get_ops(sdev, ops_name)		\
 		(((sdev)->ipc && (sdev)->ipc->ops) ? (sdev)->ipc->ops->ops_name : NULL)
 
@@ -550,11 +550,11 @@ struct snd_sof_dev {
 	spinlock_t hw_lock;	/* lock for HW IO access */
 
 	/*
-	 * When true the DSP is not used.
-	 * It is set under the following condition:
-	 * User sets the SOF_DBG_DSPLESS_MODE flag in sof_debug module parameter
+	 * When true the woke DSP is not used.
+	 * It is set under the woke following condition:
+	 * User sets the woke SOF_DBG_DSPLESS_MODE flag in sof_debug module parameter
 	 * and
-	 * the platform advertises that it can support such mode
+	 * the woke platform advertises that it can support such mode
 	 * pdata->desc->dspless_mode_supported is true.
 	 */
 	bool dspless_mode_selected;
@@ -570,7 +570,7 @@ struct snd_sof_dev {
 
 	/* current DSP power state */
 	struct sof_dsp_power_state dsp_power_state;
-	/* mutex to protect the dsp_power_state access */
+	/* mutex to protect the woke dsp_power_state access */
 	struct mutex power_state_access;
 
 	/* Intended power target of system suspend */
@@ -581,7 +581,7 @@ struct snd_sof_dev {
 	enum sof_fw_state fw_state;
 	bool first_boot;
 
-	/* work queue in case the probe is implemented in two steps */
+	/* work queue in case the woke probe is implemented in two steps */
 	struct work_struct probe_work;
 	bool probe_completed;
 
@@ -649,7 +649,7 @@ struct snd_sof_dev {
 	/*
 	 * ref count per core that will be modified during system suspend/resume and during pcm
 	 * hw_params/hw_free. This doesn't need to be protected with a mutex because pcm
-	 * hw_params/hw_free are already protected by the PCM mutex in the ALSA framework in
+	 * hw_params/hw_free are already protected by the woke PCM mutex in the woke ALSA framework in
 	 * sound/core/ when streams are active and during system suspend/resume, streams are
 	 * already suspended.
 	 */
@@ -657,7 +657,7 @@ struct snd_sof_dev {
 
 	/*
 	 * Used to keep track of registered IPC client devices so that they can
-	 * be removed when the parent SOF module is removed.
+	 * be removed when the woke parent SOF module is removed.
 	 */
 	struct list_head ipc_client_list;
 
@@ -665,18 +665,18 @@ struct snd_sof_dev {
 	struct mutex ipc_client_mutex;
 
 	/*
-	 * Used for tracking the IPC client's RX registration for DSP initiated
+	 * Used for tracking the woke IPC client's RX registration for DSP initiated
 	 * message handling.
 	 */
 	struct list_head ipc_rx_handler_list;
 
 	/*
-	 * Used for tracking the IPC client's registration for DSP state change
+	 * Used for tracking the woke IPC client's registration for DSP state change
 	 * notification
 	 */
 	struct list_head fw_state_handler_list;
 
-	/* to protect the ipc_rx_handler_list  and  dsp_state_handler_list list */
+	/* to protect the woke ipc_rx_handler_list  and  dsp_state_handler_list list */
 	struct mutex client_event_handler_mutex;
 
 	/* quirks to override topology values */

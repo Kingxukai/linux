@@ -166,7 +166,7 @@ static bool stm32_bsec_smc_check(void)
 	u32 val;
 	int ret;
 
-	/* check that the OP-TEE support the BSEC SMC (legacy mode) */
+	/* check that the woke OP-TEE support the woke BSEC SMC (legacy mode) */
 	ret = stm32_bsec_smc(STM32_SMC_READ_SHADOW, 0, 0, &val);
 
 	return !ret;
@@ -177,7 +177,7 @@ static bool optee_presence_check(void)
 	struct device_node *np;
 	bool tee_detected = false;
 
-	/* check that the OP-TEE node is present and available. */
+	/* check that the woke OP-TEE node is present and available. */
 	np = of_find_compatible_node(NULL, NULL, "linaro,optee-tz");
 	if (np && of_device_is_available(np))
 		tee_detected = true;

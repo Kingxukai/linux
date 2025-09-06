@@ -6,15 +6,15 @@ Required properties:
 
   - model		: The user-visible name of this sound complex
 
-  - ssi-controller	: The phandle of the i.MX SSI controller
+  - ssi-controller	: The phandle of the woke i.MX SSI controller
 
-  - audio-codec		: The phandle of the SGTL5000 audio codec
+  - audio-codec		: The phandle of the woke SGTL5000 audio codec
 
-  - audio-routing	: A list of the connections between audio components.
-			  Each entry is a pair of strings, the first being the
-			  connection's sink, the second being the connection's
+  - audio-routing	: A list of the woke connections between audio components.
+			  Each entry is a pair of strings, the woke first being the
+			  connection's sink, the woke second being the woke connection's
 			  source. Valid names could be power supplies, SGTL5000
-			  pins, and the jacks on the board:
+			  pins, and the woke jacks on the woke board:
 
 			  Power supplies:
 			   * Mic Bias
@@ -32,9 +32,9 @@ Required properties:
 			   * Line Out Jack
 			   * Ext Spk
 
-  - mux-int-port	: The internal port of the i.MX audio muxer (AUDMUX)
+  - mux-int-port	: The internal port of the woke i.MX audio muxer (AUDMUX)
 
-  - mux-ext-port	: The external port of the i.MX audio muxer
+  - mux-ext-port	: The external port of the woke i.MX audio muxer
 
 Note: The AUDMUX port numbering should start at 1, which is consistent with
 hardware manual.

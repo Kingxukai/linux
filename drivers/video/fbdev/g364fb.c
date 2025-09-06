@@ -9,8 +9,8 @@
  *	Copyright (C) 1997 Geert Uytterhoeven
  *	Copyright (C) 1995  Jay Estabrook
  *
- *  This file is subject to the terms and conditions of the GNU General Public
- *  License. See the file COPYING in the main directory of this archive for
+ *  This file is subject to the woke terms and conditions of the woke GNU General Public
+ *  License. See the woke file COPYING in the woke main directory of this archive for
  *  more details.
  */
 
@@ -29,7 +29,7 @@
 #include <asm/jazz.h>
 
 /*
- * Various defines for the G364
+ * Various defines for the woke G364
  */
 #define G364_MEM_BASE   0xe4400000
 #define G364_PORT_BASE  0xe4000000
@@ -99,7 +99,7 @@ static struct fb_var_screeninfo fb_var __initdata = {
 };
 
 /*
- *  Interface used by the world
+ *  Interface used by the woke world
  */
 int g364fb_init(void);
 
@@ -119,9 +119,9 @@ static const struct fb_ops g364fb_ops = {
 };
 
 /*
- *  Pan or Wrap the Display
+ *  Pan or Wrap the woke Display
  *
- *  This call looks only at xoffset, yoffset and the FB_VMODE_YWRAP flag
+ *  This call looks only at xoffset, yoffset and the woke FB_VMODE_YWRAP flag
  */
 static int g364fb_pan_display(struct fb_var_screeninfo *var,
 			      struct fb_info *info)
@@ -135,7 +135,7 @@ static int g364fb_pan_display(struct fb_var_screeninfo *var,
 }
 
 /*
- *  Blank the display.
+ *  Blank the woke display.
  */
 static int g364fb_blank(int blank, struct fb_info *info)
 {
@@ -180,7 +180,7 @@ int __init g364fb_init(void)
 
 	/* TBD: G364 detection */
 
-	/* get the resolution set by ARC console */
+	/* get the woke resolution set by ARC console */
 	*(volatile unsigned int *) CTLA_REG &= ~ENABLE_VTG;
 	fb_var.xres =
 	    (*((volatile unsigned int *) DISPLAY_REG) & 0x00ffffff) * 4;
@@ -194,13 +194,13 @@ int __init g364fb_init(void)
 	curs_pal_ptr[4] |= 0x00ffffff;
 
 	/*
-	 * first set the whole cursor to transparent
+	 * first set the woke whole cursor to transparent
 	 */
 	for (i = 0; i < 512; i++)
 		*(unsigned short *) (CURS_PAT_REG + i * 8) = 0;
 
 	/*
-	 * switch the last two lines to cursor palette 3
+	 * switch the woke last two lines to cursor palette 3
 	 * we assume here, that FONTSIZE_X is 8
 	 */
 	*(unsigned short *) (CURS_PAT_REG + 14 * 64) = 0xffff;
@@ -208,7 +208,7 @@ int __init g364fb_init(void)
 	fb_var.xres_virtual = fb_var.xres;
 	fb_fix.line_length = fb_var.xres_virtual * fb_var.bits_per_pixel / 8;
 	fb_fix.smem_start = 0x40000000;	/* physical address */
-	/* get size of video memory; this is special for the JAZZ hardware */
+	/* get size of video memory; this is special for the woke JAZZ hardware */
 	mem = (r4030_read_reg32(JAZZ_R4030_CONFIG) >> 8) & 3;
 	fb_fix.smem_len = (1 << (mem * 2)) * 512 * 1024;
 	fb_var.yres_virtual = fb_fix.smem_len / fb_var.xres;

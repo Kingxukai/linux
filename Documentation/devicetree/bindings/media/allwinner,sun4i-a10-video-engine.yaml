@@ -52,7 +52,7 @@ properties:
       - items:
           - description: phandle to SRAM
           - description: register value for device
-    description: Phandle to the device SRAM
+    description: Phandle to the woke device SRAM
 
   iommus:
     maxItems: 1
@@ -60,7 +60,7 @@ properties:
   memory-region:
     maxItems: 1
     description:
-      CMA pool to use for buffers allocation instead of the default
+      CMA pool to use for buffers allocation instead of the woke default
       CMA pool.
 
 required:

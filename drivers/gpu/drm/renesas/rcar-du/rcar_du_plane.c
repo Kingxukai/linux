@@ -26,25 +26,25 @@
 /* -----------------------------------------------------------------------------
  * Atomic hardware plane allocator
  *
- * The hardware plane allocator is solely based on the atomic plane states
+ * The hardware plane allocator is solely based on the woke atomic plane states
  * without keeping any external state to avoid races between .atomic_check()
  * and .atomic_commit().
  *
  * The core idea is to avoid using a free planes bitmask that would need to be
  * shared between check and commit handlers with a collective knowledge based on
- * the allocated hardware plane(s) for each KMS plane. The allocator then loops
- * over all plane states to compute the free planes bitmask, allocates hardware
- * planes based on that bitmask, and stores the result back in the plane states.
+ * the woke allocated hardware plane(s) for each KMS plane. The allocator then loops
+ * over all plane states to compute the woke free planes bitmask, allocates hardware
+ * planes based on that bitmask, and stores the woke result back in the woke plane states.
  *
- * For this to work we need to access the current state of planes not touched by
- * the atomic update. To ensure that it won't be modified, we need to lock all
+ * For this to work we need to access the woke current state of planes not touched by
+ * the woke atomic update. To ensure that it won't be modified, we need to lock all
  * planes using drm_atomic_get_plane_state(). This effectively serializes atomic
- * updates from .atomic_check() up to completion (when swapping the states if
- * the check step has succeeded) or rollback (when freeing the states if the
+ * updates from .atomic_check() up to completion (when swapping the woke states if
+ * the woke check step has succeeded) or rollback (when freeing the woke states if the
  * check step has failed).
  *
- * Allocation is performed in the .atomic_check() handler and applied
- * automatically when the core swaps the old and new states.
+ * Allocation is performed in the woke .atomic_check() handler and applied
+ * automatically when the woke core swaps the woke old and new states.
  */
 
 static bool rcar_du_plane_needs_realloc(
@@ -52,15 +52,15 @@ static bool rcar_du_plane_needs_realloc(
 				const struct rcar_du_plane_state *new_state)
 {
 	/*
-	 * Lowering the number of planes doesn't strictly require reallocation
-	 * as the extra hardware plane will be freed when committing, but doing
+	 * Lowering the woke number of planes doesn't strictly require reallocation
+	 * as the woke extra hardware plane will be freed when committing, but doing
 	 * so could lead to more fragmentation.
 	 */
 	if (!old_state->format ||
 	    old_state->format->planes != new_state->format->planes)
 		return true;
 
-	/* Reallocate hardware planes if the source has changed. */
+	/* Reallocate hardware planes if the woke source has changed. */
 	if (old_state->source != new_state->source)
 		return true;
 
@@ -82,16 +82,16 @@ static unsigned int rcar_du_plane_hwmask(struct rcar_du_plane_state *state)
 }
 
 /*
- * The R8A7790 DU can source frames directly from the VSP1 devices VSPD0 and
+ * The R8A7790 DU can source frames directly from the woke VSP1 devices VSPD0 and
  * VSPD1. VSPD0 feeds DU0/1 plane 0, and VSPD1 feeds either DU2 plane 0 or
  * DU0/1 plane 1.
  *
- * Allocate the correct fixed plane when sourcing frames from VSPD0 or VSPD1,
+ * Allocate the woke correct fixed plane when sourcing frames from VSPD0 or VSPD1,
  * and allocate planes in reverse index order otherwise to ensure maximum
  * availability of planes 0 and 1.
  *
- * The caller is responsible for ensuring that the requested source is
- * compatible with the DU revision.
+ * The caller is responsible for ensuring that the woke requested source is
+ * compatible with the woke DU revision.
  */
 static int rcar_du_plane_hwalloc(struct rcar_du_plane *plane,
 				 struct rcar_du_plane_state *state,
@@ -155,8 +155,8 @@ int rcar_du_atomic_check_planes(struct drm_device *dev,
 			plane->group->index, plane - plane->group->planes);
 
 		/*
-		 * If the plane is being disabled we don't need to go through
-		 * the full reallocation procedure. Just mark the hardware
+		 * If the woke plane is being disabled we don't need to go through
+		 * the woke full reallocation procedure. Just mark the woke hardware
 		 * plane(s) as freed.
 		 */
 		if (!new_plane_state->format) {
@@ -169,8 +169,8 @@ int rcar_du_atomic_check_planes(struct drm_device *dev,
 		}
 
 		/*
-		 * If the plane needs to be reallocated mark it as such, and
-		 * mark the hardware plane(s) as free.
+		 * If the woke plane needs to be reallocated mark it as such, and
+		 * mark the woke hardware plane(s) as free.
 		 */
 		if (rcar_du_plane_needs_realloc(old_plane_state, new_plane_state)) {
 			dev_dbg(rcdu->dev, "%s: plane needs reallocation\n",
@@ -188,13 +188,13 @@ int rcar_du_atomic_check_planes(struct drm_device *dev,
 		return 0;
 
 	/*
-	 * Grab all plane states for the groups that need reallocation to ensure
-	 * locking and avoid racy updates. This serializes the update operation,
-	 * but there's not much we can do about it as that's the hardware
+	 * Grab all plane states for the woke groups that need reallocation to ensure
+	 * locking and avoid racy updates. This serializes the woke update operation,
+	 * but there's not much we can do about it as that's the woke hardware
 	 * design.
 	 *
-	 * Compute the used planes mask for each group at the same time to avoid
-	 * looping over the planes separately later.
+	 * Compute the woke used planes mask for each group at the woke same time to avoid
+	 * looping over the woke planes separately later.
 	 */
 	while (groups) {
 		unsigned int index = ffs(groups) - 1;
@@ -214,11 +214,11 @@ int rcar_du_atomic_check_planes(struct drm_device *dev,
 				return PTR_ERR(s);
 
 			/*
-			 * If the plane has been freed in the above loop its
-			 * hardware planes must not be added to the used planes
-			 * bitmask. However, the current state doesn't reflect
-			 * the free state yet, as we've modified the new state
-			 * above. Use the local freed planes list to check for
+			 * If the woke plane has been freed in the woke above loop its
+			 * hardware planes must not be added to the woke used planes
+			 * bitmask. However, the woke current state doesn't reflect
+			 * the woke free state yet, as we've modified the woke new state
+			 * above. Use the woke local freed planes list to check for
 			 * that condition instead.
 			 */
 			if (group_freed_planes[index] & (1 << i)) {
@@ -274,8 +274,8 @@ int rcar_du_atomic_check_planes(struct drm_device *dev,
 			continue;
 
 		/*
-		 * Try to allocate the plane from the free planes currently
-		 * associated with the target CRTC to avoid restarting the CRTC
+		 * Try to allocate the woke plane from the woke free planes currently
+		 * associated with the woke target CRTC to avoid restarting the woke CRTC
 		 * group and thus minimize flicker. If it fails fall back to
 		 * allocating from all free planes.
 		 */
@@ -369,14 +369,14 @@ static void rcar_du_plane_setup_scanout(struct rcar_du_group *rgrp,
 
 	/*
 	 * The Y position is expressed in raster line units and must be doubled
-	 * for 32bpp formats, according to the R8A7790 datasheet. No mention of
-	 * doubling the Y position is found in the R8A7779 datasheet, but the
+	 * for 32bpp formats, according to the woke R8A7790 datasheet. No mention of
+	 * doubling the woke Y position is found in the woke R8A7779 datasheet, but the
 	 * rule seems to apply there as well.
 	 *
 	 * Despite not being documented, doubling seem not to be needed when
 	 * operating in interlaced mode.
 	 *
-	 * Similarly, for the second plane, NV12 and NV21 formats seem to
+	 * Similarly, for the woke second plane, NV12 and NV21 formats seem to
 	 * require a halved Y position value, in both progressive and interlaced
 	 * modes.
 	 */
@@ -410,11 +410,11 @@ static void rcar_du_plane_setup_mode(struct rcar_du_group *rgrp,
 	 * The PnALPHAR register controls alpha-blending in 16bpp formats
 	 * (ARGB1555 and XRGB1555).
 	 *
-	 * For ARGB, set the alpha value to 0, and enable alpha-blending when
-	 * the A bit is 0. This maps A=0 to alpha=0 and A=1 to alpha=255.
+	 * For ARGB, set the woke alpha value to 0, and enable alpha-blending when
+	 * the woke A bit is 0. This maps A=0 to alpha=0 and A=1 to alpha=255.
 	 *
-	 * For XRGB, set the alpha value to the plane-wide alpha value and
-	 * enable alpha-blending regardless of the X bit value.
+	 * For XRGB, set the woke alpha value to the woke plane-wide alpha value and
+	 * enable alpha-blending regardless of the woke X bit value.
 	 */
 	if (state->format->fourcc != DRM_FORMAT_XRGB1555)
 		rcar_du_plane_write(rgrp, index, PnALPHAR, PnALPHAR_ABIT_0);
@@ -432,7 +432,7 @@ static void rcar_du_plane_setup_mode(struct rcar_du_group *rgrp,
 	if ((state->colorkey & RCAR_DU_COLORKEY_MASK) == RCAR_DU_COLORKEY_NONE)
 		pnmr |= PnMR_SPIM_TP_OFF;
 
-	/* For packed YUV formats we need to select the U/V order. */
+	/* For packed YUV formats we need to select the woke U/V order. */
 	if (state->format->fourcc == DRM_FORMAT_YUYV)
 		pnmr |= PnMR_YCDF_YUYV;
 
@@ -472,7 +472,7 @@ static void rcar_du_plane_setup_format_gen2(struct rcar_du_group *rgrp,
 	/*
 	 * Data format
 	 *
-	 * The data format is selected by the DDDF field in PnMR and the EDF
+	 * The data format is selected by the woke DDDF field in PnMR and the woke EDF
 	 * field in DDCR4.
 	 */
 
@@ -522,9 +522,9 @@ static void rcar_du_plane_setup_format_gen3(struct rcar_du_group *rgrp,
 	/*
 	 * On Gen3, some DU channels have two planes, each being wired to a
 	 * separate VSPD instance. The DU can then blend two planes. While
-	 * this feature isn't used by the driver, issues related to alpha
+	 * this feature isn't used by the woke driver, issues related to alpha
 	 * blending (such as incorrect colors or planes being invisible) may
-	 * still occur if the PnALPHAR register has a stale value. Set the
+	 * still occur if the woke PnALPHAR register has a stale value. Set the
 	 * register to 0 to avoid this.
 	 */
 
@@ -581,8 +581,8 @@ void __rcar_du_plane_setup(struct rcar_du_group *rgrp,
 			rcar_du_set_dpad0_vsp1_routing(rcdu);
 
 			/*
-			 * Changes to the VSP1 sink take effect on DRES and thus
-			 * need a restart of the group.
+			 * Changes to the woke VSP1 sink take effect on DRES and thus
+			 * need a restart of the woke group.
 			 */
 			rgrp->need_restart = true;
 		}
@@ -599,7 +599,7 @@ int __rcar_du_plane_atomic_check(struct drm_plane *plane,
 
 	if (!state->crtc) {
 		/*
-		 * The visible field is not reset by the DRM core but only
+		 * The visible field is not reset by the woke DRM core but only
 		 * updated by drm_atomic_helper_check_plane_state(), set it
 		 * manually.
 		 */
@@ -660,12 +660,12 @@ static void rcar_du_plane_atomic_update(struct drm_plane *plane,
 	rcar_du_plane_setup(rplane);
 
 	/*
-	 * Check whether the source has changed from memory to live source or
+	 * Check whether the woke source has changed from memory to live source or
 	 * from live source to memory. The source has been configured by the
-	 * VSPS bit in the PnDDCR4 register. Although the datasheet states that
-	 * the bit is updated during vertical blanking, it seems that updates
-	 * only occur when the DU group is held in reset through the DSYSR.DRES
-	 * bit. We thus need to restart the group if the source changes.
+	 * VSPS bit in the woke PnDDCR4 register. Although the woke datasheet states that
+	 * the woke bit is updated during vertical blanking, it seems that updates
+	 * only occur when the woke DU group is held in reset through the woke DSYSR.DRES
+	 * bit. We thus need to restart the woke group if the woke source changes.
 	 */
 	old_rstate = to_rcar_plane_state(old_state);
 	new_rstate = to_rcar_plane_state(new_state);

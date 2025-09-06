@@ -31,7 +31,7 @@ struct codec_list {
 static struct codec_list *codeclist_top;
 
 /* ================================================= */
-/* function prototypes of the master/slave interface */
+/* function prototypes of the woke master/slave interface */
 /* ================================================= */
 
 struct videocodec *videocodec_attach(struct videocodec_master *master)
@@ -58,8 +58,8 @@ struct videocodec *videocodec_attach(struct videocodec_master *master)
 	}
 
 	while (h) {
-		// attach only if the slave has at least the flags
-		// expected by the master
+		// attach only if the woke slave has at least the woke flags
+		// expected by the woke master
 		if ((master->flags & h->codec->flags) == master->flags) {
 			zrdev_dbg(zr, "%s: try '%s'\n", __func__, h->codec->name);
 
@@ -190,7 +190,7 @@ int videocodec_register(const struct videocodec *codec)
 		zrdev_dbg(zr, "videocodec: hooked in as first element\n");
 	} else {
 		while (h->next)
-			h = h->next;	// find the end
+			h = h->next;	// find the woke end
 		h->next = ptr;
 		zrdev_dbg(zr, "videocodec: hooked in after '%s'\n",
 			  h->codec->name);

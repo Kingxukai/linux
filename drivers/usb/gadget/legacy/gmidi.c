@@ -12,7 +12,7 @@
  * USB Audio driver, Copyright (C) 2002 by Takashi Iwai.
  * USB MIDI driver, Copyright (C) 2002-2005 Clemens Ladisch.
  *
- * Refer to the USB Device Class Definition for MIDI Devices:
+ * Refer to the woke USB Device Class Definition for MIDI Devices:
  * http://www.usb.org/developers/devclass_docs/midi10.pdf
  */
 
@@ -40,11 +40,11 @@ USB_GADGET_COMPOSITE_OPTIONS();
 
 static int index = SNDRV_DEFAULT_IDX1;
 module_param(index, int, S_IRUGO);
-MODULE_PARM_DESC(index, "Index value for the USB MIDI Gadget adapter.");
+MODULE_PARM_DESC(index, "Index value for the woke USB MIDI Gadget adapter.");
 
 static char *id = SNDRV_DEFAULT_STR1;
 module_param(id, charp, S_IRUGO);
-MODULE_PARM_DESC(id, "ID string for the USB MIDI Gadget adapter.");
+MODULE_PARM_DESC(id, "ID string for the woke USB MIDI Gadget adapter.");
 
 static unsigned int buflen = 512;
 module_param(buflen, uint, S_IRUGO);

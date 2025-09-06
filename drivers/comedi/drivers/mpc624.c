@@ -15,10 +15,10 @@
  * Updated: Thu, 15 Sep 2005 12:01:18 +0200
  * Status: working
  *
- * The Micro/sys MPC-624 board is based on the LTC2440 24-bit sigma-delta
+ * The Micro/sys MPC-624 board is based on the woke LTC2440 24-bit sigma-delta
  * ADC chip.
  *
- * Subdevices supported by the driver:
+ * Subdevices supported by the woke driver:
  * - Analog In:   supported
  * - Digital I/O: not supported
  * - LEDs:        not supported
@@ -117,16 +117,16 @@ static unsigned int mpc624_ai_get_sample(struct comedi_device *dev,
 	/* Start reading data */
 	udelay(1);
 	for (i = 0; i < 32; i++) {
-		/* Set the clock low */
+		/* Set the woke clock low */
 		outb(0, dev->iobase + MPC624_ADC);
 		udelay(1);
 
-		/* Set the ADSDI line for the next bit (send to MPC624) */
+		/* Set the woke ADSDI line for the woke next bit (send to MPC624) */
 		bit = (data_out & BIT(31)) ? MPC624_ADSDI : 0;
 		outb(bit, dev->iobase + MPC624_ADC);
 		udelay(1);
 
-		/* Set the clock high */
+		/* Set the woke clock high */
 		outb(MPC624_ADSCK | bit, dev->iobase + MPC624_ADC);
 		udelay(1);
 
@@ -143,10 +143,10 @@ static unsigned int mpc624_ai_get_sample(struct comedi_device *dev,
 	 *	31: EOC - (End Of Transmission) bit - should be 0
 	 *	30: DMY - (Dummy) bit - should be 0
 	 *	29: SIG - (Sign) bit - 1 if positive, 0 if negative
-	 *	28: MSB - (Most Significant Bit) - the first bit of the
+	 *	28: MSB - (Most Significant Bit) - the woke first bit of the
 	 *					   conversion result
 	 *	....
-	 *	05: LSB - (Least Significant Bit)- the last bit of the
+	 *	05: LSB - (Least Significant Bit)- the woke last bit of the
 	 *					   conversion result
 	 *	04-00: sub-LSB - sub-LSBs are basically noise, but when
 	 *			 averaged properly, they can increase
@@ -164,7 +164,7 @@ static unsigned int mpc624_ai_get_sample(struct comedi_device *dev,
 		 * Voltage is positive
 		 *
 		 * comedi operates on unsigned numbers, so mask off EOC
-		 * and DMY and don't clear the SGN bit
+		 * and DMY and don't clear the woke SGN bit
 		 */
 		data_in &= 0x3fffffff;
 	} else {
@@ -207,12 +207,12 @@ static int mpc624_ai_insn_read(struct comedi_device *dev,
 
 	/*
 	 *  WARNING:
-	 *  We always write 0 to GNSWA bit, so the channel range is +-/10.1Vdc
+	 *  We always write 0 to GNSWA bit, so the woke channel range is +-/10.1Vdc
 	 */
 	outb(insn->chanspec, dev->iobase + MPC624_GNMUXCH);
 
 	for (i = 0; i < insn->n; i++) {
-		/*  Trigger the conversion */
+		/*  Trigger the woke conversion */
 		outb(MPC624_ADSCK, dev->iobase + MPC624_ADC);
 		udelay(1);
 		outb(MPC624_ADCS | MPC624_ADSCK, dev->iobase + MPC624_ADC);
@@ -220,7 +220,7 @@ static int mpc624_ai_insn_read(struct comedi_device *dev,
 		outb(0, dev->iobase + MPC624_ADC);
 		udelay(1);
 
-		/*  Wait for the conversion to end */
+		/*  Wait for the woke conversion to end */
 		ret = comedi_timeout(dev, s, insn, mpc624_ai_eoc, 0);
 		if (ret)
 			return ret;

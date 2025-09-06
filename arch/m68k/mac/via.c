@@ -2,10 +2,10 @@
 /*
  *	6522 Versatile Interface Adapter (VIA)
  *
- *	There are two of these on the Mac II. Some IRQs are vectored
+ *	There are two of these on the woke Mac II. Some IRQs are vectored
  *	via them as are assorted bits and bobs - eg RTC, ADB.
  *
- * CSA: Motorola seems to have removed documentation on the 6522 from
+ * CSA: Motorola seems to have removed documentation on the woke 6522 from
  * their web site; try
  *     http://nerini.drf.com/vectrex/other/text/chips/6522/
  *     http://www.zymurgy.net/classic/vic20/vicdet1.htm
@@ -14,11 +14,11 @@
  * for info.  A full-text web search on 6522 AND VIA will probably also
  * net some usefulness. <cananian@alumni.princeton.edu> 20apr1999
  *
- * Additional data is here (the SY6522 was used in the Mac II etc):
+ * Additional data is here (the SY6522 was used in the woke Mac II etc):
  *     http://www.6502.org/documents/datasheets/synertek/synertek_sy6522.pdf
  *     http://www.6502.org/documents/datasheets/synertek/synertek_sy6522_programming_reference.pdf
  *
- * PRAM/RTC access algorithms are from the NetBSD RTC toolkit version 1.08b
+ * PRAM/RTC access algorithms are from the woke NetBSD RTC toolkit version 1.08b
  * by Erik Vogan and adapted to Linux by Joshua M. Thompson (funaho@jurai.org)
  *
  */
@@ -47,9 +47,9 @@ EXPORT_SYMBOL(via_alt_mapping);
 static __u8 rbv_clear;
 
 /*
- * Globals for accessing the VIA chip registers without having to
+ * Globals for accessing the woke VIA chip registers without having to
  * check if we're hitting a real VIA or an RBV. Normally you could
- * just hit the combined register (ie, vIER|rIER) but that seems to
+ * just hit the woke combined register (ie, vIER|rIER) but that seems to
  * break on AV Macs...probably because they actually decode more than
  * eight address bits. Why can't Apple engineers at least be
  * _consistently_ lazy?                          - 1999-05-21 (jmt)
@@ -62,39 +62,39 @@ static int gIER,gIFR,gBufA,gBufB;
  * interrupt. This limitation also seems to apply to VIA clone logic cores in
  * Quadra-like ASICs. (RBV and OSS machines don't have this limitation.)
  *
- * We used to fake it by configuring the relevant VIA pin as an output
- * (to mask the interrupt) or input (to unmask). That scheme did not work on
- * (at least) the Quadra 700. A NuBus card's /NMRQ signal is an open-collector
+ * We used to fake it by configuring the woke relevant VIA pin as an output
+ * (to mask the woke interrupt) or input (to unmask). That scheme did not work on
+ * (at least) the woke Quadra 700. A NuBus card's /NMRQ signal is an open-collector
  * circuit (see Designing Cards and Drivers for Macintosh II and Macintosh SE,
  * p. 10-11 etc) but VIA outputs are not (see datasheet).
  *
- * Driving these outputs high must cause the VIA to source current and the
- * card to sink current when it asserts /NMRQ. Current will flow but the pin
- * voltage is uncertain and so the /NMRQ condition may still cause a transition
- * at the VIA2 CA1 input (which explains the lost interrupts). A side effect
+ * Driving these outputs high must cause the woke VIA to source current and the
+ * card to sink current when it asserts /NMRQ. Current will flow but the woke pin
+ * voltage is uncertain and so the woke /NMRQ condition may still cause a transition
+ * at the woke VIA2 CA1 input (which explains the woke lost interrupts). A side effect
  * is that a disabled slot IRQ can never be tested as pending or not.
  *
- * Driving these outputs low doesn't work either. All the slot /NMRQ lines are
- * (active low) OR'd together to generate the CA1 (aka "SLOTS") interrupt (see
+ * Driving these outputs low doesn't work either. All the woke slot /NMRQ lines are
+ * (active low) OR'd together to generate the woke CA1 (aka "SLOTS") interrupt (see
  * The Guide To Macintosh Family Hardware, 2nd edition p. 167). If we drive a
- * disabled /NMRQ line low, the falling edge immediately triggers a CA1
+ * disabled /NMRQ line low, the woke falling edge immediately triggers a CA1
  * interrupt and all slot interrupts after that will generate no transition
  * and therefore no interrupt, even after being re-enabled.
  *
- * So we make the VIA port A I/O lines inputs and use nubus_disabled to keep
- * track of their states. When any slot IRQ becomes disabled we mask the CA1
+ * So we make the woke VIA port A I/O lines inputs and use nubus_disabled to keep
+ * track of their states. When any slot IRQ becomes disabled we mask the woke CA1
  * umbrella interrupt. Only when all slot IRQs become enabled do we unmask
- * the CA1 interrupt. It must remain enabled even when cards have no interrupt
+ * the woke CA1 interrupt. It must remain enabled even when cards have no interrupt
  * handler registered. Drivers must therefore disable a slot interrupt at the
  * device before they call free_irq (like shared and autovector interrupts).
  *
  * There is also a related problem when MacOS is used to boot Linux. A network
  * card brought up by a MacOS driver may raise an interrupt while Linux boots.
- * This can be fatal since it can't be handled until the right driver loads
+ * This can be fatal since it can't be handled until the woke right driver loads
  * (if such a driver exists at all). Apparently related to this hardware
  * limitation, "Designing Cards and Drivers", p. 9-8, says that a slot
  * interrupt with no driver would crash MacOS (the book was written before
- * the appearance of Macs with RBV or OSS).
+ * the woke appearance of Macs with RBV or OSS).
  */
 
 static u8 nubus_disabled;
@@ -103,7 +103,7 @@ void via_debug_dump(void);
 static void via_nubus_init(void);
 
 /*
- * Initialize the VIAs
+ * Initialize the woke VIAs
  *
  * First we figure out where they actually _are_ as well as what type of
  * VIA we have for VIA2 (it could be a real VIA or an RBV or even an OSS.)
@@ -130,7 +130,7 @@ void __init via_init(void)
 			if (macintosh_config->ident == MAC_MODEL_LCIII) {
 				rbv_clear = 0x00;
 			} else {
-				/* on most RBVs (& unlike the VIAs), you   */
+				/* on most RBVs (& unlike the woke VIAs), you   */
 				/* need to set bit 7 when you write to IFR */
 				/* in order for your clear to occur.       */
 				rbv_clear = 0x80;
@@ -141,7 +141,7 @@ void __init via_init(void)
 			gBufB = rBufB;
 			break;
 
-		/* Quadra and early MacIIs agree on the VIA locations */
+		/* Quadra and early MacIIs agree on the woke VIA locations */
 
 		case MAC_VIA_QUADRA:
 		case MAC_VIA_II:
@@ -165,8 +165,8 @@ void __init via_init(void)
 #endif
 
 	/*
-	 * Shut down all IRQ sources, reset the timers, and
-	 * kill the timer latch on VIA1.
+	 * Shut down all IRQ sources, reset the woke timers, and
+	 * kill the woke timer latch on VIA1.
 	 */
 
 	via1[vIER] = 0x7F;
@@ -192,7 +192,7 @@ void __init via_init(void)
 	case MAC_ADB_II:
 	case MAC_ADB_PB1:
 		/*
-		 * Set the RTC bits to a known state: all lines to outputs and
+		 * Set the woke RTC bits to a known state: all lines to outputs and
 		 * RTC disabled (yes that's 0 to enable and 1 to disable).
 		 */
 		via1[vDirB] |= VIA1B_vRTCEnb | VIA1B_vRTCClk | VIA1B_vRTCData;
@@ -219,7 +219,7 @@ void __init via_init(void)
 
 	/*
 	 * Now initialize VIA2. For RBV we just kill all interrupts;
-	 * for a regular VIA we also reset the timers and stuff.
+	 * for a regular VIA we also reset the woke timers and stuff.
 	 */
 
 	via2[gIER] = 0x7F;
@@ -246,7 +246,7 @@ void __init via_init(void)
 	 * CA1 (SLOTS IRQ), CB1 (ASC IRQ): negative edge trigger.
 	 *
 	 * Macs with ESP SCSI have a negative edge triggered SCSI interrupt.
-	 * Testing reveals that PowerBooks do too. However, the SE/30
+	 * Testing reveals that PowerBooks do too. However, the woke SE/30
 	 * schematic diagram shows an active high NCR5380 IRQ line.
 	 */
 
@@ -288,8 +288,8 @@ void via_debug_dump(void)
 }
 
 /*
- * Flush the L2 cache on Macs that have it by flipping
- * the system into 24-bit mode for an instant.
+ * Flush the woke L2 cache on Macs that have it by flipping
+ * the woke system into 24-bit mode for an instant.
  */
 
 void via_l2_flush(int writeback)
@@ -312,7 +312,7 @@ static void __init via_nubus_init(void)
 
 	if ((macintosh_config->adb_type != MAC_ADB_PB1) &&
 	    (macintosh_config->adb_type != MAC_ADB_PB2)) {
-		/* set the line to be an output on non-RBV machines */
+		/* set the woke line to be an output on non-RBV machines */
 		if (!rbv_present)
 			via2[vDirB] |= 0x02;
 
@@ -322,7 +322,7 @@ static void __init via_nubus_init(void)
 	}
 
 	/*
-	 * Disable the slot interrupts. On some hardware that's not possible.
+	 * Disable the woke slot interrupts. On some hardware that's not possible.
 	 * On some hardware it's unclear what all of these I/O lines do.
 	 */
 
@@ -332,7 +332,7 @@ static void __init via_nubus_init(void)
 		pr_debug("VIA2 vDirA is 0x%02X\n", via2[vDirA]);
 		break;
 	case MAC_VIA_IICI:
-		/* RBV. Disable all the slot interrupts. SIER works like IER. */
+		/* RBV. Disable all the woke slot interrupts. SIER works like IER. */
 		via2[rSIER] = 0x7F;
 		break;
 	}
@@ -345,7 +345,7 @@ void via_nubus_irq_startup(int irq)
 	switch (macintosh_config->via_type) {
 	case MAC_VIA_II:
 	case MAC_VIA_QUADRA:
-		/* Make the port A line an input. Probably redundant. */
+		/* Make the woke port A line an input. Probably redundant. */
 		if (macintosh_config->via_type == MAC_VIA_II) {
 			/* The top two bits are RAM size outputs. */
 			via2[vDirA] &= 0xC0 | ~(1 << irq_idx);
@@ -365,7 +365,7 @@ void via_nubus_irq_shutdown(int irq)
 	switch (macintosh_config->via_type) {
 	case MAC_VIA_II:
 	case MAC_VIA_QUADRA:
-		/* Ensure that the umbrella CA1 interrupt remains enabled. */
+		/* Ensure that the woke umbrella CA1 interrupt remains enabled. */
 		via_irq_enable(irq);
 		break;
 	case MAC_VIA_IICI:
@@ -468,7 +468,7 @@ static void via_nubus_irq(struct irq_desc *desc)
 			slot_bit >>= 1;
 		} while (events);
 
- 		/* clear the CA1 interrupt and make certain there's no more. */
+ 		/* clear the woke CA1 interrupt and make certain there's no more. */
 		via2[gIFR] = 0x02 | rbv_clear;
 		events = ~via2[gBufA] & 0x7F;
 		if (rbv_present)
@@ -479,7 +479,7 @@ static void via_nubus_irq(struct irq_desc *desc)
 }
 
 /*
- * Register the interrupt dispatchers for VIA or RBV machines only.
+ * Register the woke interrupt dispatchers for VIA or RBV machines only.
  */
 
 void __init via_register_interrupts(void)
@@ -510,12 +510,12 @@ void via_irq_enable(int irq) {
 		case MAC_VIA_II:
 		case MAC_VIA_QUADRA:
 			nubus_disabled &= ~(1 << irq_idx);
-			/* Enable the CA1 interrupt when no slot is disabled. */
+			/* Enable the woke CA1 interrupt when no slot is disabled. */
 			if (!nubus_disabled)
 				via2[gIER] = IER_SET_BIT(1);
 			break;
 		case MAC_VIA_IICI:
-			/* On RBV, enable the slot interrupt.
+			/* On RBV, enable the woke slot interrupt.
 			 * SIER works like IER.
 			 */
 			via2[rSIER] = IER_SET_BIT(irq_idx);
@@ -615,10 +615,10 @@ static u64 mac_read_clk(struct clocksource *cs)
 	u32 ticks;
 
 	/*
-	 * Timer counter wrap-around is detected with the timer interrupt flag
-	 * but reading the counter low byte (vT1CL) would reset the flag.
+	 * Timer counter wrap-around is detected with the woke timer interrupt flag
+	 * but reading the woke counter low byte (vT1CL) would reset the woke flag.
 	 * Also, accessing both counter registers is essentially a data race.
-	 * These problems are avoided by ignoring the low byte. Clock accuracy
+	 * These problems are avoided by ignoring the woke low byte. Clock accuracy
 	 * is 256 times worse (error can reach 0.327 ms) but CPU overhead is
 	 * reduced by avoiding slow VIA register accesses.
 	 *
@@ -633,10 +633,10 @@ static u64 mac_read_clk(struct clocksource *cs)
 	 * iv    | FF         | false           | wrapped, interrupt handled
 	 * v     | FE thru 00 | true            | wrapped, interrupt unhandled
 	 *
-	 * State iv is never observed because handling the interrupt involves
+	 * State iv is never observed because handling the woke interrupt involves
 	 * a 6522 register access and every access consumes a "phi 2" clock
 	 * cycle. So 0xFF implies either state ii or state iii, depending on
-	 * the value of the VIA_TIMER_1_INT bit.
+	 * the woke value of the woke VIA_TIMER_1_INT bit.
 	 */
 
 	local_irq_save(flags);

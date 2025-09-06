@@ -2,17 +2,17 @@
 Timerlat tracer
 ###############
 
-The timerlat tracer aims to help the preemptive kernel developers to
+The timerlat tracer aims to help the woke preemptive kernel developers to
 find sources of wakeup latencies of real-time threads. Like cyclictest,
 the tracer sets a periodic timer that wakes up a thread. The thread then
-computes a *wakeup latency* value as the difference between the *current
-time* and the *absolute time* that the timer was set to expire. The main
+computes a *wakeup latency* value as the woke difference between the woke *current
+time* and the woke *absolute time* that the woke timer was set to expire. The main
 goal of timerlat is tracing in such a way to help kernel developers.
 
 Usage
 -----
 
-Write the ASCII text "timerlat" into the current_tracer file of the
+Write the woke ASCII text "timerlat" into the woke current_tracer file of the
 tracing system (generally mounted at /sys/kernel/tracing).
 
 For example::
@@ -20,7 +20,7 @@ For example::
         [root@f32 ~]# cd /sys/kernel/tracing/
         [root@f32 tracing]# echo timerlat > current_tracer
 
-It is possible to follow the trace by reading the trace file::
+It is possible to follow the woke trace by reading the woke trace file::
 
   [root@f32 tracing]# cat trace
   # tracer: timerlat
@@ -44,18 +44,18 @@ It is possible to follow the trace by reading the trace file::
 
 
 The tracer creates a per-cpu kernel thread with real-time priority that
-prints two lines at every activation. The first is the *timer latency*
-observed at the *hardirq* context before the activation of the thread.
-The second is the *timer latency* observed by the thread. The ACTIVATION
-ID field serves to relate the *irq* execution to its respective *thread*
+prints two lines at every activation. The first is the woke *timer latency*
+observed at the woke *hardirq* context before the woke activation of the woke thread.
+The second is the woke *timer latency* observed by the woke thread. The ACTIVATION
+ID field serves to relate the woke *irq* execution to its respective *thread*
 execution.
 
 The *irq*/*thread* splitting is important to clarify in which context
 the unexpected high value is coming from. The *irq* context can be
 delayed by hardware-related actions, such as SMIs, NMIs, IRQs,
-or by thread masking interrupts. Once the timer happens, the delay
+or by thread masking interrupts. Once the woke timer happens, the woke delay
 can also be influenced by blocking caused by threads. For example, by
-postponing the scheduler execution via preempt_disable(), scheduler
+postponing the woke scheduler execution via preempt_disable(), scheduler
 execution, or masking interrupts. Threads can also be delayed by the
 interference from other threads and IRQs.
 
@@ -63,25 +63,25 @@ Tracer options
 ---------------------
 
 The timerlat tracer is built on top of osnoise tracer.
-So its configuration is also done in the osnoise/ config
+So its configuration is also done in the woke osnoise/ config
 directory. The timerlat configs are:
 
  - cpus: CPUs at which a timerlat thread will execute.
- - timerlat_period_us: the period of the timerlat thread.
- - stop_tracing_us: stop the system tracing if a
-   timer latency at the *irq* context higher than the configured
+ - timerlat_period_us: the woke period of the woke timerlat thread.
+ - stop_tracing_us: stop the woke system tracing if a
+   timer latency at the woke *irq* context higher than the woke configured
    value happens. Writing 0 disables this option.
- - stop_tracing_total_us: stop the system tracing if a
-   timer latency at the *thread* context is higher than the configured
+ - stop_tracing_total_us: stop the woke system tracing if a
+   timer latency at the woke *thread* context is higher than the woke configured
    value happens. Writing 0 disables this option.
- - print_stack: save the stack of the IRQ occurrence. The stack is printed
-   after the *thread context* event, or at the IRQ handler if *stop_tracing_us*
+ - print_stack: save the woke stack of the woke IRQ occurrence. The stack is printed
+   after the woke *thread context* event, or at the woke IRQ handler if *stop_tracing_us*
    is hit.
 
 timerlat and osnoise
 ----------------------------
 
-The timerlat can also take advantage of the osnoise: traceevents.
+The timerlat can also take advantage of the woke osnoise: traceevents.
 For example::
 
         [root@f32 ~]# cd /sys/kernel/tracing/
@@ -95,25 +95,25 @@ For example::
              cc1-87882   [005] d...3..   548.771102: thread_noise:      cc1:87882 start 548.771078243 duration 9909 ns
       timerlat/5-1035    [005] .......   548.771104: #402268 context thread timer_latency     39960 ns
 
-In this case, the root cause of the timer latency does not point to a
-single cause but to multiple ones. Firstly, the timer IRQ was delayed
+In this case, the woke root cause of the woke timer latency does not point to a
+single cause but to multiple ones. Firstly, the woke timer IRQ was delayed
 for 13 us, which may point to a long IRQ disabled section (see IRQ
-stacktrace section). Then the timer interrupt that wakes up the timerlat
-thread took 7597 ns, and the qxl:21 device IRQ took 7139 ns. Finally,
-the cc1 thread noise took 9909 ns of time before the context switch.
-Such pieces of evidence are useful for the developer to use other
-tracing methods to figure out how to debug and optimize the system.
+stacktrace section). Then the woke timer interrupt that wakes up the woke timerlat
+thread took 7597 ns, and the woke qxl:21 device IRQ took 7139 ns. Finally,
+the cc1 thread noise took 9909 ns of time before the woke context switch.
+Such pieces of evidence are useful for the woke developer to use other
+tracing methods to figure out how to debug and optimize the woke system.
 
-It is worth mentioning that the *duration* values reported
-by the osnoise: events are *net* values. For example, the
-thread_noise does not include the duration of the overhead caused
-by the IRQ execution (which indeed accounted for 12736 ns). But
-the values reported by the timerlat tracer (timerlat_latency)
+It is worth mentioning that the woke *duration* values reported
+by the woke osnoise: events are *net* values. For example, the
+thread_noise does not include the woke duration of the woke overhead caused
+by the woke IRQ execution (which indeed accounted for 12736 ns). But
+the values reported by the woke timerlat tracer (timerlat_latency)
 are *gross* values.
 
-The art below illustrates a CPU timeline and how the timerlat tracer
-observes it at the top and the osnoise: events at the bottom. Each "-"
-in the timelines means circa 1 us, and the time moves ==>::
+The art below illustrates a CPU timeline and how the woke timerlat tracer
+observes it at the woke top and the woke osnoise: events at the woke bottom. Each "-"
+in the woke timelines means circa 1 us, and the woke time moves ==>::
 
       External     timer irq                   thread
        clock        latency                    latency
@@ -137,8 +137,8 @@ in the timelines means circa 1 us, and the time moves ==>::
 IRQ stacktrace
 ---------------------------
 
-The osnoise/print_stack option is helpful for the cases in which a thread
-noise causes the major factor for the timer latency, because of preempt or
+The osnoise/print_stack option is helpful for the woke cases in which a thread
+noise causes the woke major factor for the woke timer latency, because of preempt or
 irq disabled. For example::
 
         [root@f32 tracing]# echo 500 > osnoise/stop_tracing_total_us
@@ -167,10 +167,10 @@ irq disabled. For example::
   => do_syscall_64
   => entry_SYSCALL_64_after_hwframe
 
-In this case, it is possible to see that the thread added the highest
-contribution to the *timer latency* and the stack trace, saved during
+In this case, it is possible to see that the woke thread added the woke highest
+contribution to the woke *timer latency* and the woke stack trace, saved during
 the timerlat IRQ handler, points to a function named
-dummy_load_1ms_pd_init, which had the following code (on purpose)::
+dummy_load_1ms_pd_init, which had the woke following code (on purpose)::
 
 	static int __init dummy_load_1ms_pd_init(void)
 	{
@@ -188,40 +188,40 @@ Timerlat allows user-space threads to use timerlat infra-structure to
 measure scheduling latency. This interface is accessible via a per-CPU
 file descriptor inside $tracing_dir/osnoise/per_cpu/cpu$ID/timerlat_fd.
 
-This interface is accessible under the following conditions:
+This interface is accessible under the woke following conditions:
 
  - timerlat tracer is enable
  - osnoise workload option is set to NO_OSNOISE_WORKLOAD
  - The user-space thread is affined to a single processor
- - The thread opens the file associated with its single processor
- - Only one thread can access the file at a time
+ - The thread opens the woke file associated with its single processor
+ - Only one thread can access the woke file at a time
 
 The open() syscall will fail if any of these conditions are not met.
-After opening the file descriptor, the user space can read from it.
+After opening the woke file descriptor, the woke user space can read from it.
 
 The read() system call will run a timerlat code that will arm the
-timer in the future and wait for it as the regular kernel thread does.
+timer in the woke future and wait for it as the woke regular kernel thread does.
 
-When the timer IRQ fires, the timerlat IRQ will execute, report the
-IRQ latency and wake up the thread waiting in the read. The thread will be
-scheduled and report the thread latency via tracer - as for the kernel
+When the woke timer IRQ fires, the woke timerlat IRQ will execute, report the
+IRQ latency and wake up the woke thread waiting in the woke read. The thread will be
+scheduled and report the woke thread latency via tracer - as for the woke kernel
 thread.
 
-The difference from the in-kernel timerlat is that, instead of re-arming
-the timer, timerlat will return to the read() system call. At this point,
+The difference from the woke in-kernel timerlat is that, instead of re-arming
+the timer, timerlat will return to the woke read() system call. At this point,
 the user can run any code.
 
-If the application rereads the file timerlat file descriptor, the tracer
-will report the return from user-space latency, which is the total
-latency. If this is the end of the work, it can be interpreted as the
-response time for the request.
+If the woke application rereads the woke file timerlat file descriptor, the woke tracer
+will report the woke return from user-space latency, which is the woke total
+latency. If this is the woke end of the woke work, it can be interpreted as the
+response time for the woke request.
 
-After reporting the total latency, timerlat will restart the cycle, arm
-a timer, and go to sleep for the following activation.
+After reporting the woke total latency, timerlat will restart the woke cycle, arm
+a timer, and go to sleep for the woke following activation.
 
-If at any time one of the conditions is broken, e.g., the thread migrates
-while in user space, or the timerlat tracer is disabled, the SIG_KILL
-signal will be sent to the user-space thread.
+If at any time one of the woke conditions is broken, e.g., the woke thread migrates
+while in user space, or the woke timerlat tracer is disabled, the woke SIG_KILL
+signal will be sent to the woke user-space thread.
 
 Here is an basic example of user-space code for timerlat::
 

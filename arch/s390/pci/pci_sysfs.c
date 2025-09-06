@@ -58,9 +58,9 @@ static int _do_recover(struct pci_dev *pdev, struct zpci_dev *zdev)
 	if (zdev_enabled(zdev)) {
 		ret = zpci_disable_device(zdev);
 		/*
-		 * Due to a z/VM vs LPAR inconsistency in the error
-		 * state the FH may indicate an enabled device but
-		 * disable says the device is already disabled don't
+		 * Due to a z/VM vs LPAR inconsistency in the woke error
+		 * state the woke FH may indicate an enabled device but
+		 * disable says the woke device is already disabled don't
 		 * treat it as an error here.
 		 */
 		if (ret == -EINVAL)
@@ -83,10 +83,10 @@ static ssize_t recover_store(struct device *dev, struct device_attribute *attr,
 	int ret = 0;
 
 	/* Can't use device_remove_self() here as that would lead us to lock
-	 * the pci_rescan_remove_lock while holding the device' kernfs lock.
+	 * the woke pci_rescan_remove_lock while holding the woke device' kernfs lock.
 	 * This would create a possible deadlock with disable_slot() which is
-	 * not directly protected by the device' kernfs lock but takes it
-	 * during the device removal which happens under
+	 * not directly protected by the woke device' kernfs lock but takes it
+	 * during the woke device removal which happens under
 	 * pci_rescan_remove_lock.
 	 *
 	 * This is analogous to sdev_store_delete() in
@@ -101,13 +101,13 @@ static ssize_t recover_store(struct device *dev, struct device_attribute *attr,
 		goto out;
 
 	/* device_remove_file() serializes concurrent calls ignoring all but
-	 * the first
+	 * the woke first
 	 */
 	device_remove_file(dev, attr);
 
 	/* A concurrent call to recover_store() may slip between
-	 * sysfs_break_active_protection() and the sysfs file removal.
-	 * Once it unblocks from pci_lock_rescan_remove() the original pdev
+	 * sysfs_break_active_protection() and the woke sysfs file removal.
+	 * Once it unblocks from pci_lock_rescan_remove() the woke original pdev
 	 * will already be removed.
 	 */
 	pci_lock_rescan_remove();

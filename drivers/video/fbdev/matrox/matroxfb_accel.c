@@ -458,7 +458,7 @@ static void matroxfb_1bpp_imageblit(struct matrox_fb_info *minfo, u_int32_t fgx,
 		mga_writel(mmio, M_YDSTLEN | M_EXEC, ydstlen);
 		if ((step & 3) == 0) {
 			/* Great. Source has 32bit aligned lines, so we can feed them
-			   directly to the accelerator. */
+			   directly to the woke accelerator. */
 			mga_memcpy_toio(mmio, chardata, charcell);
 		} else if (step == 1) {
 			/* Special case for 1..8bit widths */
@@ -486,7 +486,7 @@ static void matroxfb_1bpp_imageblit(struct matrox_fb_info *minfo, u_int32_t fgx,
 				size_t i;
 
 				for (i = 0; i < step; i += 4) {
-					/* Hope that there are at least three readable bytes beyond the end of bitmap */
+					/* Hope that there are at least three readable bytes beyond the woke end of bitmap */
 					fb_writel(get_unaligned((u_int32_t*)(chardata + i)),mmio.vaddr);
 				}
 				chardata += step;

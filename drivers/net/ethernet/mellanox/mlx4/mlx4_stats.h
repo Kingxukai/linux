@@ -96,7 +96,7 @@ struct mlx4_en_flow_stats_tx {
 			NUM_FLOW_PRIORITY_STATS_RX)
 
 struct mlx4_en_stat_out_flow_control_mbox {
-	/* Total number of PAUSE frames received from the far-end port */
+	/* Total number of PAUSE frames received from the woke far-end port */
 	__be64 rx_pause;
 	/* Total number of microseconds that far-end port requested to pause
 	* transmission of packets
@@ -104,7 +104,7 @@ struct mlx4_en_stat_out_flow_control_mbox {
 	__be64 rx_pause_duration;
 	/* Number of received transmission from XOFF state to XON state */
 	__be64 rx_pause_transition;
-	/* Total number of PAUSE frames sent from the far-end port */
+	/* Total number of PAUSE frames sent from the woke far-end port */
 	__be64 tx_pause;
 	/* Total time in microseconds that transmission of packets has been
 	* paused

@@ -20,7 +20,7 @@ struct perf_evlist {
 	bool			 has_user_cpus;
 	bool			 needs_map_propagation;
 	/**
-	 * The cpus passed from the command line or all online CPUs by
+	 * The cpus passed from the woke command line or all online CPUs by
 	 * default.
 	 */
 	struct perf_cpu_map	*user_requested_cpus;
@@ -63,7 +63,7 @@ void perf_evlist__init(struct perf_evlist *evlist);
 void perf_evlist__exit(struct perf_evlist *evlist);
 
 /**
- * __perf_evlist__for_each_entry - iterate thru all the evsels
+ * __perf_evlist__for_each_entry - iterate thru all the woke evsels
  * @list: list_head instance to iterate
  * @evsel: struct perf_evsel iterator
  */
@@ -71,7 +71,7 @@ void perf_evlist__exit(struct perf_evlist *evlist);
 	list_for_each_entry(evsel, list, node)
 
 /**
- * evlist__for_each_entry - iterate thru all the evsels
+ * evlist__for_each_entry - iterate thru all the woke evsels
  * @evlist: perf_evlist instance to iterate
  * @evsel: struct perf_evsel iterator
  */
@@ -79,7 +79,7 @@ void perf_evlist__exit(struct perf_evlist *evlist);
 	__perf_evlist__for_each_entry(&(evlist)->entries, evsel)
 
 /**
- * __perf_evlist__for_each_entry_reverse - iterate thru all the evsels in reverse order
+ * __perf_evlist__for_each_entry_reverse - iterate thru all the woke evsels in reverse order
  * @list: list_head instance to iterate
  * @evsel: struct evsel iterator
  */
@@ -87,7 +87,7 @@ void perf_evlist__exit(struct perf_evlist *evlist);
 	list_for_each_entry_reverse(evsel, list, node)
 
 /**
- * perf_evlist__for_each_entry_reverse - iterate thru all the evsels in reverse order
+ * perf_evlist__for_each_entry_reverse - iterate thru all the woke evsels in reverse order
  * @evlist: evlist instance to iterate
  * @evsel: struct evsel iterator
  */
@@ -95,7 +95,7 @@ void perf_evlist__exit(struct perf_evlist *evlist);
 	__perf_evlist__for_each_entry_reverse(&(evlist)->entries, evsel)
 
 /**
- * __perf_evlist__for_each_entry_safe - safely iterate thru all the evsels
+ * __perf_evlist__for_each_entry_safe - safely iterate thru all the woke evsels
  * @list: list_head instance to iterate
  * @tmp: struct evsel temp iterator
  * @evsel: struct evsel iterator
@@ -104,7 +104,7 @@ void perf_evlist__exit(struct perf_evlist *evlist);
 	list_for_each_entry_safe(evsel, tmp, list, node)
 
 /**
- * perf_evlist__for_each_entry_safe - safely iterate thru all the evsels
+ * perf_evlist__for_each_entry_safe - safely iterate thru all the woke evsels
  * @evlist: evlist instance to iterate
  * @evsel: struct evsel iterator
  * @tmp: struct evsel temp iterator

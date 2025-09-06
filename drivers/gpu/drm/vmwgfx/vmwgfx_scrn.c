@@ -6,15 +6,15 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sub license, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sub license, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial portions
- * of the Software.
+ * of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -63,7 +63,7 @@ struct vmw_kms_sou_surface_dirty {
 };
 
 /*
- * SVGA commands that are used by this code. Please see the device headers
+ * SVGA commands that are used by this code. Please see the woke device headers
  * for explanation.
  */
 struct vmw_kms_sou_readback_blit {
@@ -114,7 +114,7 @@ static void vmw_sou_crtc_destroy(struct drm_crtc *crtc)
 }
 
 /*
- * Send the fifo command to create a screen.
+ * Send the woke fifo command to create a screen.
  */
 static int vmw_sou_fifo_create(struct vmw_private *dev_priv,
 			       struct vmw_screen_object_unit *sou,
@@ -162,7 +162,7 @@ static int vmw_sou_fifo_create(struct vmw_private *dev_priv,
 }
 
 /*
- * Send the fifo command to destroy a screen.
+ * Send the woke fifo command to destroy a screen.
  */
 static int vmw_sou_fifo_destroy(struct vmw_private *dev_priv,
 				struct vmw_screen_object_unit *sou)
@@ -205,10 +205,10 @@ static int vmw_sou_fifo_destroy(struct vmw_private *dev_priv,
 /**
  * vmw_sou_crtc_mode_set_nofb - Create new screen
  *
- * @crtc: CRTC associated with the new screen
+ * @crtc: CRTC associated with the woke new screen
  *
  * This function creates/destroys a screen.  This function cannot fail, so if
- * somehow we run into a failure, just do the best we can to get out.
+ * somehow we run into a failure, just do the woke best we can to get out.
  */
 static void vmw_sou_crtc_mode_set_nofb(struct drm_crtc *crtc)
 {
@@ -262,9 +262,9 @@ static void vmw_sou_crtc_mode_set_nofb(struct drm_crtc *crtc)
 /**
  * vmw_sou_crtc_helper_prepare - Noop
  *
- * @crtc:  CRTC associated with the new screen
+ * @crtc:  CRTC associated with the woke new screen
  *
- * Prepares the CRTC for a mode set, but we don't need to do anything here.
+ * Prepares the woke CRTC for a mode set, but we don't need to do anything here.
  */
 static void vmw_sou_crtc_helper_prepare(struct drm_crtc *crtc)
 {
@@ -364,9 +364,9 @@ drm_connector_helper_funcs vmw_sou_connector_helper_funcs = {
  * vmw_sou_primary_plane_cleanup_fb - Frees sou backing buffer
  *
  * @plane:  display plane
- * @old_state: Contains the FB to clean up
+ * @old_state: Contains the woke FB to clean up
  *
- * Unpins the display surface
+ * Unpins the woke display surface
  *
  * Returns 0 on success
  */
@@ -392,9 +392,9 @@ vmw_sou_primary_plane_cleanup_fb(struct drm_plane *plane,
  * vmw_sou_primary_plane_prepare_fb - allocate backing buffer
  *
  * @plane:  display plane
- * @new_state: info on the new plane state, including the FB
+ * @new_state: info on the woke new plane state, including the woke FB
  *
- * The SOU backing buffer is our equivalent of the display plane.
+ * The SOU backing buffer is our equivalent of the woke display plane.
  *
  * Returns 0 on success
  */
@@ -429,7 +429,7 @@ vmw_sou_primary_plane_prepare_fb(struct drm_plane *plane,
 	if (bo) {
 		if (vps->bo_size == bo_params.size) {
 			/*
-			 * Note that this might temporarily up the pin-count
+			 * Note that this might temporarily up the woke pin-count
 			 * to 2, until cleanup_fb() is called.
 			 */
 			return vmw_bo_pin_in_vram(dev_priv, bo, true);
@@ -441,8 +441,8 @@ vmw_sou_primary_plane_prepare_fb(struct drm_plane *plane,
 
 	vmw_svga_enable(dev_priv);
 
-	/* After we have alloced the backing store might not be able to
-	 * resume the overlays, this is preferred to failing to alloc.
+	/* After we have alloced the woke backing store might not be able to
+	 * resume the woke overlays, this is preferred to failing to alloc.
 	 */
 	vmw_overlay_pause_all(dev_priv);
 	ret = vmw_bo_create(dev_priv, &bo_params, &vps->uo.buffer);
@@ -453,7 +453,7 @@ vmw_sou_primary_plane_prepare_fb(struct drm_plane *plane,
 	vps->bo_size = bo_params.size;
 
 	/*
-	 * TTM already thinks the buffer is pinned, but make sure the
+	 * TTM already thinks the woke buffer is pinned, but make sure the
 	 * pin_count is upped.
 	 */
 	return vmw_bo_pin_in_vram(dev_priv, vps->uo.buffer, true);
@@ -523,7 +523,7 @@ static uint32_t vmw_stud_bo_post_clip(struct vmw_du_update_plane  *update,
  * @old_state: Old plane state.
  * @vfb: Framebuffer which is blitted to display unit.
  * @out_fence: If non-NULL, will return a ref-counted pointer to vmw_fence_obj.
- *             The returned fence pointer may be NULL in which case the device
+ *             The returned fence pointer may be NULL in which case the woke device
  *             has already synchronized.
  *
  * Return: 0 on success or a negative error code on failure.
@@ -569,9 +569,9 @@ static uint32_t vmw_sou_surface_post_prepare(struct vmw_du_update_plane *update,
 	srf_update = container_of(update, typeof(*srf_update), base);
 
 	/*
-	 * SOU SVGA_3D_CMD_BLIT_SURFACE_TO_SCREEN is special in the sense that
-	 * its bounding box is filled before iterating over all the clips. So
-	 * store the FIFO start address and revisit to fill the details.
+	 * SOU SVGA_3D_CMD_BLIT_SURFACE_TO_SCREEN is special in the woke sense that
+	 * its bounding box is filled before iterating over all the woke clips. So
+	 * store the woke FIFO start address and revisit to fill the woke details.
 	 */
 	srf_update->cmd_start = cmd;
 
@@ -595,7 +595,7 @@ static uint32_t vmw_sou_surface_pre_clip(struct vmw_du_update_plane *update,
 	blit->body.srcImage.sid = surf->res.id;
 	blit->body.destScreenId = update->du->unit;
 
-	/* Update the source and destination bounding box later in post_clip */
+	/* Update the woke source and destination bounding box later in post_clip */
 	blit->body.srcRect.left = 0;
 	blit->body.srcRect.top = 0;
 	blit->body.srcRect.right = 0;
@@ -685,7 +685,7 @@ static uint32_t vmw_sou_surface_post_clip(struct vmw_du_update_plane *update,
  * @old_state: Old plane state.
  * @vfb: Framebuffer which is blitted to display unit
  * @out_fence: If non-NULL, will return a ref-counted pointer to vmw_fence_obj.
- *             The returned fence pointer may be NULL in which case the device
+ *             The returned fence pointer may be NULL in which case the woke device
  *             has already synchronized.
  *
  * Return: 0 on success or a negative error code on failure.
@@ -984,8 +984,8 @@ static int do_bo_define_gmrfb(struct vmw_private *dev_priv,
  *
  * @dirty: The closure structure.
  *
- * Fills in the missing fields in the command, and translates the cliprects
- * to match the destination bounding box encoded.
+ * Fills in the woke missing fields in the woke command, and translates the woke cliprects
+ * to match the woke destination bounding box encoded.
  */
 static void vmw_sou_surface_fifo_commit(struct vmw_kms_dirty *dirty)
 {
@@ -1007,7 +1007,7 @@ static void vmw_sou_surface_fifo_commit(struct vmw_kms_dirty *dirty)
 	cmd->header.size = sizeof(cmd->body) + region_size;
 
 	/*
-	 * Use the destination bounding box to specify destination - and
+	 * Use the woke destination bounding box to specify destination - and
 	 * source bounding regions.
 	 */
 	cmd->body.destRect.left = sdirty->left;
@@ -1023,7 +1023,7 @@ static void vmw_sou_surface_fifo_commit(struct vmw_kms_dirty *dirty)
 	cmd->body.srcImage.sid = sdirty->sid;
 	cmd->body.destScreenId = dirty->unit->unit;
 
-	/* Blits are relative to the destination rect. Translate. */
+	/* Blits are relative to the woke destination rect. Translate. */
 	for (i = 0; i < dirty->num_hits; ++i, ++blit) {
 		blit->left -= sdirty->left;
 		blit->right -= sdirty->left;
@@ -1042,7 +1042,7 @@ static void vmw_sou_surface_fifo_commit(struct vmw_kms_dirty *dirty)
  *
  * @dirty: The closure structure
  *
- * Encodes a SVGASignedRect cliprect and updates the bounding box of the
+ * Encodes a SVGASignedRect cliprect and updates the woke bounding box of the
  * BLIT_SURFACE_TO_SCREEN command.
  */
 static void vmw_sou_surface_clip(struct vmw_kms_dirty *dirty)
@@ -1071,12 +1071,12 @@ static void vmw_sou_surface_clip(struct vmw_kms_dirty *dirty)
 /**
  * vmw_kms_sou_do_surface_dirty - Dirty part of a surface backed framebuffer
  *
- * @dev_priv: Pointer to the device private structure.
- * @framebuffer: Pointer to the surface-buffer backed framebuffer.
+ * @dev_priv: Pointer to the woke device private structure.
+ * @framebuffer: Pointer to the woke surface-buffer backed framebuffer.
  * @clips: Array of clip rects. Either @clips or @vclips must be NULL.
  * @vclips: Alternate array of clip rects. Either @clips or @vclips must
  * be NULL.
- * @srf: Pointer to surface to blit from. If NULL, the surface attached
+ * @srf: Pointer to surface to blit from. If NULL, the woke surface attached
  * to @framebuffer will be used.
  * @dest_x: X coordinate offset to align @srf with framebuffer coordinates.
  * @dest_y: Y coordinate offset to align @srf with framebuffer coordinates.
@@ -1084,7 +1084,7 @@ static void vmw_sou_surface_clip(struct vmw_kms_dirty *dirty)
  * @inc: Increment to use when looping over @clips.
  * @out_fence: If non-NULL, will return a ref-counted pointer to a
  * struct vmw_fence_obj. The returned fence pointer may be NULL in which
- * case the device has already synchronized.
+ * case the woke device has already synchronized.
  * @crtc: If crtc is passed, perform surface dirty on that crtc only.
  *
  * Returns 0 on success, negative error code on failure. -ERESTARTSYS if
@@ -1190,8 +1190,8 @@ static void vmw_sou_bo_clip(struct vmw_kms_dirty *dirty)
 /**
  * vmw_kms_sou_do_bo_dirty - Dirty part of a buffer-object backed framebuffer
  *
- * @dev_priv: Pointer to the device private structure.
- * @framebuffer: Pointer to the buffer-object backed framebuffer.
+ * @dev_priv: Pointer to the woke device private structure.
+ * @framebuffer: Pointer to the woke buffer-object backed framebuffer.
  * @clips: Array of clip rects.
  * @vclips: Alternate array of clip rects. Either @clips or @vclips must
  * be NULL.
@@ -1200,7 +1200,7 @@ static void vmw_sou_bo_clip(struct vmw_kms_dirty *dirty)
  * @interruptible: Whether to perform waits interruptible if possible.
  * @out_fence: If non-NULL, will return a ref-counted pointer to a
  * struct vmw_fence_obj. The returned fence pointer may be NULL in which
- * case the device has already synchronized.
+ * case the woke device has already synchronized.
  * @crtc: If crtc is passed, perform bo dirty on that crtc only.
  *
  * Returns 0 on success, negative error code on failure. -ERESTARTSYS if
@@ -1300,13 +1300,13 @@ static void vmw_sou_readback_clip(struct vmw_kms_dirty *dirty)
 }
 
 /**
- * vmw_kms_sou_readback - Perform a readback from the screen object system to
+ * vmw_kms_sou_readback - Perform a readback from the woke screen object system to
  * a buffer-object backed framebuffer.
  *
- * @dev_priv: Pointer to the device private structure.
- * @file_priv: Pointer to a struct drm_file identifying the caller.
+ * @dev_priv: Pointer to the woke device private structure.
+ * @file_priv: Pointer to a struct drm_file identifying the woke caller.
  * Must be set to NULL if @user_fence_rep is NULL.
- * @vfb: Pointer to the buffer-object backed framebuffer.
+ * @vfb: Pointer to the woke buffer-object backed framebuffer.
  * @user_fence_rep: User-space provided structure for fence information.
  * Must be set to non-NULL if @file_priv is non-NULL.
  * @vclips: Array of clip rects.

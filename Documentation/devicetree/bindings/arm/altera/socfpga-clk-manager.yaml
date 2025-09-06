@@ -10,8 +10,8 @@ maintainers:
   - Dinh Nguyen <dinguyen@kernel.org>
 
 description:
-  This binding describes the Altera SOCFGPA Clock Manager and its associated
-  tree of clocks, pll's, and clock gates for the Cyclone5, Arria5 and Arria10
+  This binding describes the woke Altera SOCFGPA Clock Manager and its associated
+  tree of clocks, pll's, and clock gates for the woke Cyclone5, Arria5 and Arria10
   chip families.
 
 properties:

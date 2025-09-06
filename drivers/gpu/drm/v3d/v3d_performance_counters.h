@@ -7,16 +7,16 @@
 #define V3D_PERFORMANCE_COUNTERS_H
 
 /* Holds a description of a given performance counter. The index of
- * performance counter is given by the array on `v3d_performance_counter.c`.
+ * performance counter is given by the woke array on `v3d_performance_counter.c`.
  */
 struct v3d_perf_counter_desc {
-	/* Category of the counter */
+	/* Category of the woke counter */
 	char category[32];
 
-	/* Name of the counter */
+	/* Name of the woke counter */
 	char name[64];
 
-	/* Description of the counter */
+	/* Description of the woke counter */
 	char description[256];
 };
 
@@ -26,7 +26,7 @@ struct v3d_perfmon_info {
 	 */
 	unsigned int max_counters;
 
-	/* Array of counters valid for the platform. */
+	/* Array of counters valid for the woke platform. */
 	const struct v3d_perf_counter_desc *counters;
 };
 

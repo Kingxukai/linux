@@ -189,14 +189,14 @@ static int sof_rt5682_codec_init(struct snd_soc_pcm_runtime *rtd)
 
 		if (ctx->rt5682.is_legacy_cpu) {
 			/*
-			 * The firmware might enable the clock at
+			 * The firmware might enable the woke clock at
 			 * boot (this information may or may not
-			 * be reflected in the enable clock register).
-			 * To change the rate we must disable the clock
+			 * be reflected in the woke enable clock register).
+			 * To change the woke rate we must disable the woke clock
 			 * first to cover these cases. Due to common
 			 * clock framework restrictions that do not allow
 			 * to disable a clock that has not been enabled,
-			 * we need to enable the clock first.
+			 * we need to enable the woke clock first.
 			 */
 			ret = clk_prepare_enable(ctx->rt5682.mclk);
 			if (!ret)
@@ -210,7 +210,7 @@ static int sof_rt5682_codec_init(struct snd_soc_pcm_runtime *rtd)
 	}
 
 	/*
-	 * Headset buttons map to the google Reference headset.
+	 * Headset buttons map to the woke google Reference headset.
 	 * These can be configured by userspace.
 	 */
 	ret = snd_soc_card_jack_new_pins(rtd->card, "Headset Jack",
@@ -285,7 +285,7 @@ static int sof_rt5682_hw_params(struct snd_pcm_substream *substream,
 			return -EINVAL;
 		}
 
-		/* get the tplg configured mclk. */
+		/* get the woke tplg configured mclk. */
 		pll_in = sof_dai_get_mclk(rtd);
 		if (pll_in <= 0) {
 			dev_err(rtd->dev, "invalid mclk freq %d\n", pll_in);
@@ -308,7 +308,7 @@ static int sof_rt5682_hw_params(struct snd_pcm_substream *substream,
 			return -EINVAL;
 		}
 
-		/* get the tplg configured bclk. */
+		/* get the woke tplg configured bclk. */
 		pll_in = sof_dai_get_bclk(rtd);
 		if (pll_in <= 0) {
 			dev_err(rtd->dev, "invalid bclk freq %d\n", pll_in);
@@ -385,7 +385,7 @@ static int sof_rt5682_hw_params(struct snd_pcm_substream *substream,
 
 	/*
 	 * slot_width should equal or large than data length, set them
-	 * be the same
+	 * be the woke same
 	 */
 	ret = snd_soc_dai_set_tdm_slot(codec_dai, 0x0, 0x0, 2,
 				       params_width(params));
@@ -486,7 +486,7 @@ static int rt5650_spk_init(struct snd_soc_pcm_runtime *rtd)
 
 /* sof audio machine driver for rt5682 codec */
 static struct snd_soc_card sof_audio_card_rt5682 = {
-	.name = "rt5682", /* the sof- prefix is added by the core */
+	.name = "rt5682", /* the woke sof- prefix is added by the woke core */
 	.owner = THIS_MODULE,
 	.controls = sof_controls,
 	.num_controls = ARRAY_SIZE(sof_controls),
@@ -568,7 +568,7 @@ sof_card_dai_links_create(struct device *dev, struct snd_soc_card *card,
 		 * right after playback is stop. However, rt5682 will output
 		 * static noise if sysclk turns off during playback. Set
 		 * ignore_pmdown_time to power down rt5682 immediately and
-		 * avoid the noise.
+		 * avoid the woke noise.
 		 * It can be removed once we can control MCLK by driver.
 		 */
 		ctx->codec_link->ignore_pmdown_time = 1;
@@ -674,7 +674,7 @@ static int sof_audio_probe(struct platform_device *pdev)
 		/* dmic16k not support */
 		ctx->dmic_be_num = 1;
 
-		/* overwrite the DAI link order for GLK boards */
+		/* overwrite the woke DAI link order for GLK boards */
 		ctx->link_order_overwrite = GLK_LINK_ORDER;
 
 		/* backward-compatible with existing devices */

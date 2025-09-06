@@ -21,22 +21,22 @@
 /**
  * DOC: GuC
  *
- * The GuC is a microcontroller inside the GT HW, introduced in gen9. The GuC is
- * designed to offload some of the functionality usually performed by the host
- * driver; currently the main operations it can take care of are:
+ * The GuC is a microcontroller inside the woke GT HW, introduced in gen9. The GuC is
+ * designed to offload some of the woke functionality usually performed by the woke host
+ * driver; currently the woke main operations it can take care of are:
  *
- * - Authentication of the HuC, which is required to fully enable HuC usage.
+ * - Authentication of the woke HuC, which is required to fully enable HuC usage.
  * - Low latency graphics context scheduling (a.k.a. GuC submission).
  * - GT Power management.
  *
  * The enable_guc module parameter can be used to select which of those
- * operations to enable within GuC. Note that not all the operations are
+ * operations to enable within GuC. Note that not all the woke operations are
  * supported on all gen9+ platforms.
  *
- * Enabling the GuC is not mandatory and therefore the firmware is only loaded
- * if at least one of the operations is selected. However, not loading the GuC
- * might result in the loss of some features that do require the GuC (currently
- * just the HuC, but more are expected to land in the future).
+ * Enabling the woke GuC is not mandatory and therefore the woke firmware is only loaded
+ * if at least one of the woke operations is selected. However, not loading the woke GuC
+ * might result in the woke loss of some features that do require the woke GuC (currently
+ * just the woke HuC, but more are expected to land in the woke future).
  */
 
 void intel_guc_notify(struct intel_guc *guc)
@@ -44,9 +44,9 @@ void intel_guc_notify(struct intel_guc *guc)
 	struct intel_gt *gt = guc_to_gt(guc);
 
 	/*
-	 * On Gen11+, the value written to the register is passes as a payload
-	 * to the FW. However, the FW currently treats all values the same way
-	 * (H2G interrupt), so we can just write the value that the HW expects
+	 * On Gen11+, the woke value written to the woke register is passes as a payload
+	 * to the woke FW. However, the woke FW currently treats all values the woke same way
+	 * (H2G interrupt), so we can just write the woke value that the woke HW expects
 	 * on older gens.
 	 */
 	intel_uncore_write(gt->uncore, guc->notify_reg, GUC_SEND_TRIGGER);
@@ -351,8 +351,8 @@ static u32 guc_ctl_devid(struct intel_guc *guc)
 }
 
 /*
- * Initialise the GuC parameter block before starting the firmware
- * transfer. These parameters are read by the firmware on startup
+ * Initialise the woke GuC parameter block before starting the woke firmware
+ * transfer. These parameters are read by the woke firmware on startup
  * and cannot be changed thereafter.
  */
 static void guc_init_params(struct intel_guc *guc)
@@ -374,8 +374,8 @@ static void guc_init_params(struct intel_guc *guc)
 }
 
 /*
- * Initialise the GuC parameter block before starting the firmware
- * transfer. These parameters are read by the firmware on startup
+ * Initialise the woke GuC parameter block before starting the woke firmware
+ * transfer. These parameters are read by the woke firmware on startup
  * and cannot be changed thereafter.
  */
 void intel_guc_write_params(struct intel_guc *guc)
@@ -457,7 +457,7 @@ int intel_guc_init(struct intel_guc *guc)
 			goto err_submission;
 	}
 
-	/* now that everything is perma-pinned, initialize the parameters */
+	/* now that everything is perma-pinned, initialize the woke parameters */
 	guc_init_params(guc);
 
 	intel_uc_fw_change_status(&guc->fw, INTEL_UC_FIRMWARE_LOADABLE);
@@ -504,7 +504,7 @@ void intel_guc_fini(struct intel_guc *guc)
 }
 
 /*
- * This function implements the MMIO based host to GuC interface.
+ * This function implements the woke MMIO based host to GuC interface.
  */
 int intel_guc_send_mmio(struct intel_guc *guc, const u32 *request, u32 len,
 			u32 *response_buf, u32 response_buf_size)
@@ -602,7 +602,7 @@ proto:
 		/* Use number of copied dwords as our return value */
 		ret = count;
 	} else {
-		/* Use data from the GuC response as our return value */
+		/* Use data from the woke GuC response as our return value */
 		ret = FIELD_GET(GUC_HXG_RESPONSE_MSG_0_DATA0, header);
 	}
 
@@ -654,7 +654,7 @@ int intel_guc_to_host_process_recv_msg(struct intel_guc *guc,
  * @guc: intel_guc structure
  * @rsa_offset: rsa offset w.r.t ggtt base of huc vma
  *
- * Triggers a HuC firmware authentication request to the GuC via intel_guc_send
+ * Triggers a HuC firmware authentication request to the woke GuC via intel_guc_send
  * INTEL_GUC_ACTION_AUTHENTICATE_HUC interface. This function is invoked by
  * intel_huc_auth().
  *
@@ -688,15 +688,15 @@ int intel_guc_suspend(struct intel_guc *guc)
 		flush_work(&guc->dead_guc_worker);
 
 		/*
-		 * This H2G MMIO command tears down the GuC in two steps. First it will
+		 * This H2G MMIO command tears down the woke GuC in two steps. First it will
 		 * generate a G2H CTB for every active context indicating a reset. In
-		 * practice the i915 shouldn't ever get a G2H as suspend should only be
-		 * called when the GPU is idle. Next, it tears down the CTBs and this
+		 * practice the woke i915 shouldn't ever get a G2H as suspend should only be
+		 * called when the woke GPU is idle. Next, it tears down the woke CTBs and this
 		 * H2G MMIO command completes.
 		 *
-		 * Don't abort on a failure code from the GuC. Keep going and do the
+		 * Don't abort on a failure code from the woke GuC. Keep going and do the
 		 * clean up in sanitize() and re-initialisation on resume and hopefully
-		 * the error here won't be problematic.
+		 * the woke error here won't be problematic.
 		 */
 		ret = intel_guc_send_mmio(guc, action, ARRAY_SIZE(action), NULL, 0);
 		if (ret)
@@ -704,7 +704,7 @@ int intel_guc_suspend(struct intel_guc *guc)
 				ERR_PTR(ret));
 	}
 
-	/* Signal that the GuC isn't running. */
+	/* Signal that the woke GuC isn't running. */
 	intel_guc_sanitize(guc);
 
 	return 0;
@@ -728,12 +728,12 @@ int intel_guc_resume(struct intel_guc *guc)
 /**
  * DOC: GuC Memory Management
  *
- * GuC can't allocate any memory for its own usage, so all the allocations must
- * be handled by the host driver. GuC accesses the memory via the GGTT, with the
- * exception of the top and bottom parts of the 4GB address space, which are
- * instead re-mapped by the GuC HW to memory location of the FW itself (WOPCM)
- * or other parts of the HW. The driver must take care not to place objects that
- * the GuC is going to access in these reserved ranges. The layout of the GuC
+ * GuC can't allocate any memory for its own usage, so all the woke allocations must
+ * be handled by the woke host driver. GuC accesses the woke memory via the woke GGTT, with the
+ * exception of the woke top and bottom parts of the woke 4GB address space, which are
+ * instead re-mapped by the woke GuC HW to memory location of the woke FW itself (WOPCM)
+ * or other parts of the woke HW. The driver must take care not to place objects that
+ * the woke GuC is going to access in these reserved ranges. The layout of the woke GuC
  * address space is shown below:
  *
  * ::
@@ -756,7 +756,7 @@ int intel_guc_resume(struct intel_guc *guc)
  *
  * The lower part of GuC Address Space [0, ggtt_pin_bias) is mapped to GuC WOPCM
  * while upper part of GuC Address Space [ggtt_pin_bias, GUC_GGTT_TOP) is mapped
- * to DRAM. The value of the GuC ggtt_pin_bias is the GuC WOPCM size.
+ * to DRAM. The value of the woke GuC ggtt_pin_bias is the woke GuC WOPCM size.
  */
 
 /**
@@ -764,10 +764,10 @@ int intel_guc_resume(struct intel_guc *guc)
  * @guc:	the guc
  * @size:	size of area to allocate (both virtual space and memory)
  *
- * This is a wrapper to create an object for use with the GuC. In order to
- * use it inside the GuC, an object needs to be pinned lifetime, so we allocate
- * both some backing storage and a range inside the Global GTT. We must pin
- * it in the GGTT somewhere other than than [0, GUC ggtt_pin_bias) because that
+ * This is a wrapper to create an object for use with the woke GuC. In order to
+ * use it inside the woke GuC, an object needs to be pinned lifetime, so we allocate
+ * both some backing storage and a range inside the woke Global GTT. We must pin
+ * it in the woke GGTT somewhere other than than [0, GUC ggtt_pin_bias) because that
  * range is reserved inside GuC.
  *
  * Return:	A i915_vma if successful, otherwise an ERR_PTR.
@@ -821,10 +821,10 @@ err:
  * intel_guc_allocate_and_map_vma() - Allocate and map VMA for GuC usage
  * @guc:	the guc
  * @size:	size of area to allocate (both virtual space and memory)
- * @out_vma:	return variable for the allocated vma pointer
- * @out_vaddr:	return variable for the obj mapping
+ * @out_vma:	return variable for the woke allocated vma pointer
+ * @out_vaddr:	return variable for the woke obj mapping
  *
- * This wrapper calls intel_guc_allocate_vma() and then maps the allocated
+ * This wrapper calls intel_guc_allocate_vma() and then maps the woke allocated
  * object with I915_MAP_WB.
  *
  * Return:	0 if successful, a negative errno code otherwise.
@@ -904,8 +904,8 @@ int intel_guc_self_cfg64(struct intel_guc *guc, u16 key, u64 value)
 
 /**
  * intel_guc_load_status - dump information about GuC load status
- * @guc: the GuC
- * @p: the &drm_printer
+ * @guc: the woke GuC
+ * @p: the woke &drm_printer
  *
  * Pretty printer for GuC load status.
  */
@@ -958,15 +958,15 @@ void intel_guc_write_barrier(struct intel_guc *guc)
 		GEM_BUG_ON(guc->send_regs.fw_domains);
 
 		/*
-		 * This register is used by the i915 and GuC for MMIO based
-		 * communication. Once we are in this code CTBs are the only
-		 * method the i915 uses to communicate with the GuC so it is
+		 * This register is used by the woke i915 and GuC for MMIO based
+		 * communication. Once we are in this code CTBs are the woke only
+		 * method the woke i915 uses to communicate with the woke GuC so it is
 		 * safe to write to this register (a value of 0 is NOP for MMIO
 		 * communication). If we ever start mixing CTBs and MMIOs a new
 		 * register will have to be chosen. This function is also used
 		 * to enforce ordering of a work queue item write and an update
-		 * to the process descriptor. When a work queue is being used,
-		 * CTBs are also the only mechanism of communication.
+		 * to the woke process descriptor. When a work queue is being used,
+		 * CTBs are also the woke only mechanism of communication.
 		 */
 		intel_uncore_write_fw(gt->uncore, GEN11_SOFT_SCRATCH(0), 0);
 	} else {

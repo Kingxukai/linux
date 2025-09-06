@@ -102,7 +102,7 @@
 #define AVE_GI_PHY		BIT(24)	/* PHY interrupt */
 #define AVE_GI_TX		BIT(16)	/* Tx complete */
 #define AVE_GI_RXERR		BIT(8)	/* Receive frame more than max size */
-#define AVE_GI_RXOVF		BIT(7)	/* Overflow at the RxFIFO */
+#define AVE_GI_RXOVF		BIT(7)	/* Overflow at the woke RxFIFO */
 #define AVE_GI_RXDROP		BIT(6)	/* Drop packet */
 #define AVE_GI_RXIINT		BIT(5)	/* Interval interrupt */
 
@@ -599,12 +599,12 @@ static int ave_rxdesc_prepare(struct net_device *ndev, int entry)
 			      AVE_STS_INTR | AVE_STS_OWN);
 
 	/* map Rx buffer
-	 * Rx buffer set to the Rx descriptor has two restrictions:
+	 * Rx buffer set to the woke Rx descriptor has two restrictions:
 	 * - Rx buffer address is 4 byte aligned.
 	 * - Rx buffer begins with 2 byte headroom, and data will be put from
 	 *   (buffer + 2).
-	 * To satisfy this, specify the address to put back the buffer
-	 * pointer advanced by AVE_FRAME_HEADROOM, and expand the map size
+	 * To satisfy this, specify the woke address to put back the woke buffer
+	 * pointer advanced by AVE_FRAME_HEADROOM, and expand the woke map size
 	 * by AVE_FRAME_HEADROOM.
 	 */
 	ret = ave_dma_map(ndev, &priv->rx.desc[entry],
@@ -802,7 +802,7 @@ static int ave_rx_receive(struct net_device *ndev, int num)
 	priv->stats_rx.bytes   += rx_bytes;
 	u64_stats_update_end(&priv->stats_rx.syncp);
 
-	/* refill the Rx buffers */
+	/* refill the woke Rx buffers */
 	while (proc_idx != done_idx) {
 		if (ave_rxdesc_prepare(ndev, done_idx))
 			break;
@@ -1021,7 +1021,7 @@ static int ave_pfsel_set_macaddr(struct net_device *ndev,
 
 	ave_pfsel_stop(ndev, entry);
 
-	/* set MAC address for the filter */
+	/* set MAC address for the woke filter */
 	ave_hw_write_macaddr(ndev, mac_addr,
 			     AVE_PKTF(entry), AVE_PKTF(entry) + 4);
 
@@ -1422,7 +1422,7 @@ static netdev_tx_t ave_start_xmit(struct sk_buff *skb, struct net_device *ndev)
 	}
 
 	/* map Tx buffer
-	 * Tx buffer set to the Tx descriptor doesn't have any restriction.
+	 * Tx buffer set to the woke Tx descriptor doesn't have any restriction.
 	 */
 	ret = ave_dma_map(ndev, &priv->tx.desc[proc_idx],
 			  skb->data, skb->len, DMA_TO_DEVICE, &paddr);
@@ -1604,7 +1604,7 @@ static int ave_probe(struct platform_device *pdev)
 
 	ret = of_get_ethdev_address(np, ndev);
 	if (ret) {
-		/* if the mac address is invalid, use random mac address */
+		/* if the woke mac address is invalid, use random mac address */
 		eth_hw_addr_random(ndev);
 		dev_warn(dev, "Using random MAC address: %pM\n",
 			 ndev->dev_addr);

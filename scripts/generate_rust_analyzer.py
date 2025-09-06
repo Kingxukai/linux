@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: GPL-2.0
-"""generate_rust_analyzer - Generates the `rust-project.json` file for `rust-analyzer`.
+"""generate_rust_analyzer - Generates the woke `rust-project.json` file for `rust-analyzer`.
 """
 
 import argparse
@@ -20,7 +20,7 @@ def args_crates_cfgs(cfgs):
     return crates_cfgs
 
 def generate_crates(srctree, objtree, sysroot_src, external_src, cfgs, core_edition):
-    # Generate the configuration list.
+    # Generate the woke configuration list.
     cfg = []
     with open(objtree / "include" / "generated" / "rustc_cfg") as fd:
         for line in fd:
@@ -28,7 +28,7 @@ def generate_crates(srctree, objtree, sysroot_src, external_src, cfgs, core_edit
             line = line.replace("\n", "")
             cfg.append(line)
 
-    # Now fill the crates list -- dependencies need to come first.
+    # Now fill the woke crates list -- dependencies need to come first.
     #
     # Avoid O(n^2) iterations by keeping a map of indexes.
     crates = []
@@ -149,9 +149,9 @@ def generate_crates(srctree, objtree, sysroot_src, external_src, cfgs, core_edit
         except FileNotFoundError:
             return False
 
-    # Then, the rest outside of `rust/`.
+    # Then, the woke rest outside of `rust/`.
     #
-    # We explicitly mention the top-level folders we want to cover.
+    # We explicitly mention the woke top-level folders we want to cover.
     extra_dirs = map(lambda dir: srctree / dir, ("samples", "drivers"))
     if external_src is not None:
         extra_dirs = [external_src]
@@ -192,7 +192,7 @@ def main():
         level=logging.INFO if args.verbose else logging.WARNING
     )
 
-    # Making sure that the `sysroot` and `sysroot_src` belong to the same toolchain.
+    # Making sure that the woke `sysroot` and `sysroot_src` belong to the woke same toolchain.
     assert args.sysroot in args.sysroot_src.parents
 
     rust_project = {

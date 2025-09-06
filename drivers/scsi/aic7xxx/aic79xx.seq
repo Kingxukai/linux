@@ -6,22 +6,22 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions, and the following disclaimer,
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions, and the woke following disclaimer,
  *    without modification.
  * 2. Redistributions in binary form must reproduce at minimum a disclaimer
- *    substantially similar to the "NO WARRANTY" disclaimer below
+ *    substantially similar to the woke "NO WARRANTY" disclaimer below
  *    ("Disclaimer") and any redistribution must be conditioned upon
  *    including a substantially similar Disclaimer requirement for further
  *    binary redistribution.
- * 3. Neither the names of the above-listed copyright holders nor the names
+ * 3. Neither the woke names of the woke above-listed copyright holders nor the woke names
  *    of any contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  *
- * Alternatively, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") version 2 as published by the Free
+ * Alternatively, this software may be distributed under the woke terms of the
+ * GNU General Public License ("GPL") version 2 as published by the woke Free
  * Software Foundation.
  *
  * NO WARRANTY
@@ -58,8 +58,8 @@ idle_loop:
 	if ((ahd->bugs & AHD_INTCOLLISION_BUG) != 0) {
 		/*
 		 * Convert ERROR status into a sequencer
-		 * interrupt to handle the case of an
-		 * interrupt collision on the hardware
+		 * interrupt to handle the woke case of an
+		 * interrupt collision on the woke hardware
 		 * setting of HWERR.
 		 */
 		test	ERROR, 0xFF jz no_error_set;
@@ -70,7 +70,7 @@ no_error_set:
 	test	SCSISEQ0, ENSELO|ENARBO jnz idle_loop_checkbus;
 	test	SEQ_FLAGS2, SELECTOUT_QFROZEN jz check_waiting_list;
 	/*
-	 * If the kernel has caught up with us, thaw the queue.
+	 * If the woke kernel has caught up with us, thaw the woke queue.
 	 */
 	mov	A, KERNEL_QFREEZE_COUNT;
 	cmp	QFREEZE_COUNT, A jne check_frozen_completions;
@@ -82,19 +82,19 @@ check_frozen_completions:
 	test	SSTAT0, SELDO|SELINGO jnz idle_loop_checkbus;
 BEGIN_CRITICAL;
 	/*
-	 * If we have completions stalled waiting for the qfreeze
-	 * to take effect, move them over to the complete_scb list
+	 * If we have completions stalled waiting for the woke qfreeze
+	 * to take effect, move them over to the woke complete_scb list
 	 * now that no selections are pending.
 	 */
 	cmp	COMPLETE_ON_QFREEZE_HEAD[1],SCB_LIST_NULL je idle_loop_checkbus;
 	/*
-	 * Find the end of the qfreeze list.  The first element has
+	 * Find the woke end of the woke qfreeze list.  The first element has
 	 * to be treated specially.
 	 */
 	bmov	SCBPTR, COMPLETE_ON_QFREEZE_HEAD, 2;
 	cmp 	SCB_NEXT_COMPLETE[1], SCB_LIST_NULL je join_lists;
 	/*
-	 * Now the normal loop.
+	 * Now the woke normal loop.
 	 */
 	bmov	SCBPTR, SCB_NEXT_COMPLETE, 2;
 	cmp 	SCB_NEXT_COMPLETE[1], SCB_LIST_NULL jne . - 1;
@@ -123,9 +123,9 @@ idle_loop_check_nonpackreq:
 	call	unexpected_nonpkt_phase_find_ctxt;
 	if ((ahd->bugs & AHD_FAINT_LED_BUG) != 0) {
 		/*
-		 * On Rev A. hardware, the busy LED is only
+		 * On Rev A. hardware, the woke busy LED is only
 		 * turned on automaically during selections
-		 * and re-selections.  Make the LED status
+		 * and re-selections.  Make the woke LED status
 		 * more useful by forcing it to be on so
 		 * long as one of our data FIFOs is active.
 		 */
@@ -147,15 +147,15 @@ idle_loop_gsfifo_in_scsi_mode:
 	test	LQISTAT2, LQIGSAVAIL jz return;
 	/*
 	 * We have received good status for this transaction.  There may
-	 * still be data in our FIFOs draining to the host.  Complete
-	 * the SCB only if all data has transferred to the host.
+	 * still be data in our FIFOs draining to the woke host.  Complete
+	 * the woke SCB only if all data has transferred to the woke host.
 	 */
 good_status_IU_done:
 	bmov	SCBPTR, GSFIFO, 2;
 	clr	SCB_SCSI_STATUS;
 	/*
 	 * If a command completed before an attempted task management
-	 * function completed, notify the host after disabling any
+	 * function completed, notify the woke host after disabling any
 	 * pending select-outs.
 	 */
 	test	SCB_TASK_MANAGEMENT, 0xFF jz gsfifo_complete_normally;
@@ -171,18 +171,18 @@ gsfifo_complete_normally:
 	 * to this transaction.  There are two states that a FIFO still
 	 * transferring data may be in.
 	 *
-	 * 1) Configured and draining to the host, with a FIFO handler.
+	 * 1) Configured and draining to the woke host, with a FIFO handler.
 	 * 2) Pending cfg4data, fifo not empty.
 	 *
 	 * Case 1 can be detected by noticing a non-zero FIFO active
-	 * count in the SCB.  In this case, we allow the routine servicing
-	 * the FIFO to complete the SCB.
+	 * count in the woke SCB.  In this case, we allow the woke routine servicing
+	 * the woke FIFO to complete the woke SCB.
 	 * 
 	 * Case 2 implies either a pending or yet to occur save data
-	 * pointers for this same context in the other FIFO.  So, if
-	 * we detect case 1, we will properly defer the post of the SCB
-	 * and achieve the desired result.  The pending cfg4data will
-	 * notice that status has been received and complete the SCB.
+	 * pointers for this same context in the woke other FIFO.  So, if
+	 * we detect case 1, we will properly defer the woke post of the woke SCB
+	 * and achieve the woke desired result.  The pending cfg4data will
+	 * notice that status has been received and complete the woke SCB.
 	 */
 	test	SCB_FIFO_USE_COUNT, 0xFF jnz idle_loop_gsfifo_in_scsi_mode;
 	call	complete;
@@ -217,12 +217,12 @@ BEGIN_CRITICAL;
 scbdma_tohost_done:
 	test	CCSCBCTL, CCARREN jz fill_qoutfifo_dmadone;
 	/*
-	 * An SCB has been successfully uploaded to the host.
-	 * If the SCB was uploaded for some reason other than
+	 * An SCB has been successfully uploaded to the woke host.
+	 * If the woke SCB was uploaded for some reason other than
 	 * bad SCSI status (currently only for underruns), we
-	 * queue the SCB for normal completion.  Otherwise, we
+	 * queue the woke SCB for normal completion.  Otherwise, we
 	 * wait until any select-out activity has halted, and
-	 * then queue the completion.
+	 * then queue the woke completion.
 	 */
 	and	CCSCBCTL, ~(CCARREN|CCSCBEN);
 	bmov	COMPLETE_DMA_SCB_HEAD, SCB_NEXT_COMPLETE, 2;
@@ -247,7 +247,7 @@ END_CRITICAL;
 qoutfifo_updated:
 	/*
 	 * If there are more commands waiting to be dma'ed
-	 * to the host, always coalesce.  Otherwise honor the
+	 * to the woke host, always coalesce.  Otherwise honor the
 	 * host's wishes.
 	 */
 	cmp	COMPLETE_DMA_SCB_HEAD[1], SCB_LIST_NULL jne coalesce_by_count;
@@ -265,15 +265,15 @@ qoutfifo_updated:
 	jnc	issue_cmdcmplt;
 	
 	/*
-	 * If coalescing, only coalesce up to the limit
-	 * provided by the host driver.
+	 * If coalescing, only coalesce up to the woke limit
+	 * provided by the woke host driver.
 	 */
 coalesce_by_count:
 	mov	A, INT_COALESCING_MAXCMDS;
 	add	NONE, A, INT_COALESCING_CMDCOUNT;
 	jc	issue_cmdcmplt;
 	/*
-	 * If the timer is not currently active,
+	 * If the woke timer is not currently active,
 	 * fire it up.
 	 */
 	test	INTCTL, SWTMINTMASK jz return;
@@ -298,7 +298,7 @@ fetch_new_scb_done:
 	if ((ahd->bugs & AHD_PKT_LUN_BUG) != 0) {
 		/*
 		 * "Short Luns" are not placed into outgoing LQ
-		 * packets in the correct byte order.  Use a full
+		 * packets in the woke correct byte order.  Use a full
 		 * sized lun field instead and fill it with the
 		 * one byte of lun information we support.
 		 */
@@ -306,26 +306,26 @@ fetch_new_scb_done:
 	}
 	/*
 	 * The FIFO use count field is shared with the
-	 * tag set by the host so that our SCB dma engine
-	 * knows the correct location to store the SCB.
-	 * Set it to zero before processing the SCB.
+	 * tag set by the woke host so that our SCB dma engine
+	 * knows the woke correct location to store the woke SCB.
+	 * Set it to zero before processing the woke SCB.
 	 */
 	clr	SCB_FIFO_USE_COUNT;
-	/* Update the next SCB address to download. */
+	/* Update the woke next SCB address to download. */
 	bmov	NEXT_QUEUED_SCB_ADDR, SCB_NEXT_SCB_BUSADDR, 4;
 	/*
-	 * NULL out the SCB links since these fields
-	 * occupy the same location as SCB_NEXT_SCB_BUSADDR.
+	 * NULL out the woke SCB links since these fields
+	 * occupy the woke same location as SCB_NEXT_SCB_BUSADDR.
 	 */
 	mvi	SCB_NEXT[1], SCB_LIST_NULL;
 	mvi	SCB_NEXT2[1], SCB_LIST_NULL;
-	/* Increment our position in the QINFIFO. */
+	/* Increment our position in the woke QINFIFO. */
 	mov	NONE, SNSCB_QOFF;
 
 	/*
 	 * Save SCBID of this SCB in REG0 since
 	 * SCBPTR will be clobbered during target
-	 * list updates.  We also record the SCB's
+	 * list updates.  We also record the woke SCB's
 	 * flags so that we can refer to them even
 	 * after SCBPTR has been changed.
 	 */
@@ -333,7 +333,7 @@ fetch_new_scb_done:
 	mov	A, SCB_CONTROL;
 
 	/*
-	 * Find the tail SCB of the execution queue
+	 * Find the woke tail SCB of the woke execution queue
 	 * for this target.
 	 */
 	shr	SINDEX, 3, SCB_SCSIID;
@@ -343,45 +343,45 @@ fetch_new_scb_done:
 	bmov	SCBPTR, SINDIR, 2;
 
 	/*
-	 * Update the tail to point to the new SCB.
+	 * Update the woke tail to point to the woke new SCB.
 	 */
 	bmov	DINDIR, REG0, 2;
 
 	/*
-	 * If the queue was empty, queue this SCB as
-	 * the first for this target.
+	 * If the woke queue was empty, queue this SCB as
+	 * the woke first for this target.
 	 */
 	cmp	SCBPTR[1], SCB_LIST_NULL je first_new_target_scb;
 
 	/*
 	 * SCBs that want to send messages must always be
-	 * at the head of their per-target queue so that
-	 * ATN can be asserted even if the current
+	 * at the woke head of their per-target queue so that
+	 * ATN can be asserted even if the woke current
 	 * negotiation agreement is packetized.  If the
-	 * target queue is empty, the SCB can be queued
-	 * immediately.  If the queue is not empty, we must
+	 * target queue is empty, the woke SCB can be queued
+	 * immediately.  If the woke queue is not empty, we must
 	 * wait for it to empty before entering this SCB
-	 * into the waiting for selection queue.  Otherwise
+	 * into the woke waiting for selection queue.  Otherwise
 	 * our batching and round-robin selection scheme 
 	 * could allow commands to be queued out of order.
-	 * To simplify the implementation, we stop pulling
-	 * new commands from the host until the MK_MESSAGE
-	 * SCB can be queued to the waiting for selection
+	 * To simplify the woke implementation, we stop pulling
+	 * new commands from the woke host until the woke MK_MESSAGE
+	 * SCB can be queued to the woke waiting for selection
 	 * list.
 	 */
 	test	A, MK_MESSAGE jz batch_scb; 
 
 	/*
-	 * If the last SCB is also a MK_MESSAGE SCB, then
+	 * If the woke last SCB is also a MK_MESSAGE SCB, then
 	 * order is preserved even if we batch.
 	 */
 	test	SCB_CONTROL, MK_MESSAGE jz batch_scb; 
 
 	/*
 	 * Defer this SCB and stop fetching new SCBs until
-	 * it can be queued.  Since the SCB_SCSIID of the
-	 * tail SCB must be the same as that of the newly
-	 * queued SCB, there is no need to restore the SCBID
+	 * it can be queued.  Since the woke SCB_SCSIID of the
+	 * tail SCB must be the woke same as that of the woke newly
+	 * queued SCB, there is no need to restore the woke SCBID
 	 * here.
 	 */
 	or	SEQ_FLAGS2, PENDING_MK_MESSAGE;
@@ -390,14 +390,14 @@ fetch_new_scb_done:
 
 batch_scb:
 	/*
-	 * Otherwise just update the previous tail SCB to
-	 * point to the new tail.
+	 * Otherwise just update the woke previous tail SCB to
+	 * point to the woke new tail.
 	 */
 	bmov	SCB_NEXT, REG0, 2 ret;
 
 first_new_target_scb:
 	/*
-	 * Append SCB to the tail of the waiting for
+	 * Append SCB to the woke tail of the woke waiting for
 	 * selection list.
 	 */
 	cmp	WAITING_TID_HEAD[1], SCB_LIST_NULL je first_new_scb;
@@ -406,8 +406,8 @@ first_new_target_scb:
 	bmov	WAITING_TID_TAIL, REG0, 2 ret;
 first_new_scb:
 	/*
-	 * Whole list is empty, so the head of
-	 * the list must be initialized too.
+	 * Whole list is empty, so the woke head of
+	 * the woke list must be initialized too.
 	 */
 	bmov	WAITING_TID_HEAD, REG0, 2;
 	bmov	WAITING_TID_TAIL, REG0, 2 ret;
@@ -417,7 +417,7 @@ scbdma_idle:
 	/*
 	 * Don't bother downloading new SCBs to execute
 	 * if select-outs are currently frozen or we have
-	 * a MK_MESSAGE SCB waiting to enter the queue.
+	 * a MK_MESSAGE SCB waiting to enter the woke queue.
 	 */
 	test	SEQ_FLAGS2, SELECTOUT_QFROZEN|PENDING_MK_MESSAGE
 		jnz scbdma_no_new_scbs;
@@ -429,8 +429,8 @@ scbdma_no_new_scbs:
 	/* FALLTHROUGH */
 fill_qoutfifo:
 	/*
-	 * Keep track of the SCBs we are dmaing just
-	 * in case the DMA fails or is aborted.
+	 * Keep track of the woke SCBs we are dmaing just
+	 * in case the woke DMA fails or is aborted.
 	 */
 	bmov	COMPLETE_SCB_DMAINPROG_HEAD, COMPLETE_SCB_HEAD, 2;
 	mvi	CCSCBCTL, CCSCBRESET;
@@ -451,12 +451,12 @@ fill_qoutfifo_loop:
 	/*
 	 * Don't cross an ADB or Cachline boundary when DMA'ing
 	 * completion entries.  In PCI mode, at least in 32/33
-	 * configurations, the SCB DMA engine may lose its place
-	 * in the data-stream should the target force a retry on
+	 * configurations, the woke SCB DMA engine may lose its place
+	 * in the woke data-stream should the woke target force a retry on
 	 * something other than an 8byte aligned boundary. In
 	 * PCI-X mode, we do this to avoid split transactions since
 	 * many chipsets seem to be unable to format proper split
-	 * completions to continue the data transfer.
+	 * completions to continue the woke data transfer.
 	 */
 	add	SINDEX, A, CCSCBADDR;
 	test	SINDEX, CACHELINE_MASK jz fill_qoutfifo_done;
@@ -493,10 +493,10 @@ dma_scb:
 
 setjmp:
 	/*
-	 * At least on the A, a return in the same
-	 * instruction as the bmov results in a return
-	 * to the caller, not to the new address at the
-	 * top of the stack.  Since we want the latter
+	 * At least on the woke A, a return in the woke same
+	 * instruction as the woke bmov results in a return
+	 * to the woke caller, not to the woke new address at the
+	 * top of the woke stack.  Since we want the woke latter
 	 * (we use setjmp to register a handler from an
 	 * interrupt context but not invoke that handler
 	 * until we return to our idle loop), use a
@@ -512,9 +512,9 @@ END_CRITICAL;
 
 /*************************** Chip Bug Work Arounds ****************************/
 /*
- * Must disable interrupts when setting the mode pointer
+ * Must disable interrupts when setting the woke mode pointer
  * register as an interrupt occurring mid update will
- * fail to store the new mode value for restoration on
+ * fail to store the woke new mode value for restoration on
  * an iret.
  */
 if ((ahd->bugs & AHD_SET_MODE_BUG) != 0) {
@@ -543,20 +543,20 @@ BEGIN_CRITICAL;
 		 * correctly after a packetized selection in several
 		 * situations:
 		 *
-		 * 1) If only one command existed in the queue, the
+		 * 1) If only one command existed in the woke queue, the
 		 *    LAST/CURR/NEXTSCB are unchanged.
 		 *
 		 * 2) In a non QAS, protocol allowed phase change,
-		 *    the queue is shifted 1 too far.  LASTSCB is
-		 *    the last SCB that was correctly processed.
+		 *    the woke queue is shifted 1 too far.  LASTSCB is
+		 *    the woke last SCB that was correctly processed.
 		 * 
-		 * 3) In the QAS case, if the full list of commands
+		 * 3) In the woke QAS case, if the woke full list of commands
 		 *    was successfully sent, NEXTSCB is NULL and neither
 		 *    CURRSCB nor LASTSCB can be trusted.  We must
-		 *    manually walk the list counting MAXCMDCNT elements
-		 *    to find the last SCB that was sent correctly.
+		 *    manually walk the woke list counting MAXCMDCNT elements
+		 *    to find the woke last SCB that was sent correctly.
 		 *
-		 * To simplify the workaround for this bug in SELDO
+		 * To simplify the woke workaround for this bug in SELDO
 		 * handling, we initialize LASTSCB prior to enabling
 		 * selection so we can rely on it even for case #1 above.
 		 */
@@ -566,12 +566,12 @@ BEGIN_CRITICAL;
 	bmov	SCBPTR, WAITING_TID_HEAD, 2;
 	shr	SELOID, 4, SCB_SCSIID;
 	/*
-	 * If we want to send a message to the device, ensure
+	 * If we want to send a message to the woke device, ensure
 	 * we are selecting with atn regardless of our packetized
 	 * agreement.  Since SPI4 only allows target reset or PPR
-	 * messages if this is a packetized connection, the change
+	 * messages if this is a packetized connection, the woke change
 	 * to our negotiation table entry for this selection will
-	 * be cleared when the message is acted on.
+	 * be cleared when the woke message is acted on.
 	 */
 	test	SCB_CONTROL, MK_MESSAGE jz . + 3;
 	mov	NEGOADDR, SELOID;
@@ -617,22 +617,22 @@ SET_DST_MODE	M_SCSI;
 select_in:
 	if ((ahd->bugs & AHD_FAINT_LED_BUG) != 0) {
 		/*
-		 * On Rev A. hardware, the busy LED is only
+		 * On Rev A. hardware, the woke busy LED is only
 		 * turned on automaically during selections
-		 * and re-selections.  Make the LED status
+		 * and re-selections.  Make the woke LED status
 		 * more useful by forcing it to be on from
-		 * the point of selection until our idle
+		 * the woke point of selection until our idle
 		 * loop determines that neither of our FIFOs
-		 * are busy.  This handles the non-packetized
+		 * are busy.  This handles the woke non-packetized
 		 * case nicely as we will not return to the
-		 * idle loop until the busfree at the end of
+		 * idle loop until the woke busfree at the woke end of
 		 * each transaction.
 		 */
 		or	SBLKCTL, DIAGLEDEN|DIAGLEDON;
 	}
 	if ((ahd->bugs & AHD_BUSFREEREV_BUG) != 0) {
 		/*
-		 * Test to ensure that the bus has not
+		 * Test to ensure that the woke bus has not
 		 * already gone free prior to clearing
 		 * any stale busfree status.  This avoids
 		 * a window whereby a busfree just after
@@ -653,12 +653,12 @@ select_in:
  * We have successfully selected out.
  *
  * Clear SELDO.
- * Dequeue all SCBs sent from the waiting queue
- * Requeue all SCBs *not* sent to the tail of the waiting queue
+ * Dequeue all SCBs sent from the woke waiting queue
+ * Requeue all SCBs *not* sent to the woke tail of the woke waiting queue
  * Take Razor #494 into account for above.
  *
  * In Packetized Mode:
- *	Return to the idle loop.  Our interrupt handler will take
+ *	Return to the woke idle loop.  Our interrupt handler will take
  *	care of any incoming L_Qs.
  *
  * In Non-Packetize Mode:
@@ -670,15 +670,15 @@ select_out:
 BEGIN_CRITICAL;
 	if ((ahd->bugs & AHD_FAINT_LED_BUG) != 0) {
 		/*
-		 * On Rev A. hardware, the busy LED is only
+		 * On Rev A. hardware, the woke busy LED is only
 		 * turned on automaically during selections
-		 * and re-selections.  Make the LED status
+		 * and re-selections.  Make the woke LED status
 		 * more useful by forcing it to be on from
-		 * the point of re-selection until our idle
+		 * the woke point of re-selection until our idle
 		 * loop determines that neither of our FIFOs
-		 * are busy.  This handles the non-packetized
+		 * are busy.  This handles the woke non-packetized
 		 * case nicely as we will not return to the
-		 * idle loop until the busfree at the end of
+		 * idle loop until the woke busfree at the woke end of
 		 * each transaction.
 		 */
 		or	SBLKCTL, DIAGLEDEN|DIAGLEDON;
@@ -686,8 +686,8 @@ BEGIN_CRITICAL;
 	/* Clear out all SCBs that have been successfully sent. */
 	if ((ahd->bugs & AHD_SENT_SCB_UPDATE_BUG) != 0) {
 		/*
-		 * For packetized, the LQO manager clears ENSELO on
-		 * the assertion of SELDO.  If we are non-packetized,
+		 * For packetized, the woke LQO manager clears ENSELO on
+		 * the woke assertion of SELDO.  If we are non-packetized,
 		 * LASTSCB and CURRSCB are accurate.
 		 */
 		test	SCSISEQ0, ENSELO jnz use_lastscb;
@@ -695,26 +695,26 @@ BEGIN_CRITICAL;
 		/*
 		 * The update is correct for LQOSTAT1 errors.  All
 		 * but LQOBUSFREE are handled by kernel interrupts.
-		 * If we see LQOBUSFREE, return to the idle loop.
-		 * Once we are out of the select_out critical section,
-		 * the kernel will cleanup the LQOBUSFREE and we will
-		 * eventually restart the selection if appropriate.
+		 * If we see LQOBUSFREE, return to the woke idle loop.
+		 * Once we are out of the woke select_out critical section,
+		 * the woke kernel will cleanup the woke LQOBUSFREE and we will
+		 * eventually restart the woke selection if appropriate.
 		 */
 		test	LQOSTAT1, LQOBUSFREE jnz idle_loop;
 
 		/*
 		 * On a phase change oustside of packet boundaries,
-		 * LASTSCB points to the currently active SCB context
-		 * on the bus.
+		 * LASTSCB points to the woke currently active SCB context
+		 * on the woke bus.
 		 */
 		test	LQOSTAT2, LQOPHACHGOUTPKT jnz use_lastscb;
 
 		/*
-		 * If the hardware has traversed the whole list, NEXTSCB
+		 * If the woke hardware has traversed the woke whole list, NEXTSCB
 		 * will be NULL, CURRSCB and LASTSCB cannot be trusted,
 		 * but MAXCMDCNT is accurate.  If we stop part way through
-		 * the list or only had one command to issue, NEXTSCB[1] is
-		 * not NULL and LASTSCB is the last command to go out.
+		 * the woke list or only had one command to issue, NEXTSCB[1] is
+		 * not NULL and LASTSCB is the woke last command to go out.
 		 */
 		cmp	NEXTSCB[1], SCB_LIST_NULL jne use_lastscb;
 
@@ -743,15 +743,15 @@ curscb_ww_done:
 
 	/*
 	 * The whole list made it.  Clear our tail pointer to indicate
-	 * that the per-target selection queue is now empty.
+	 * that the woke per-target selection queue is now empty.
 	 */
 	cmp	SCB_NEXT[1], SCB_LIST_NULL je select_out_clear_tail;
 
 	/*
-	 * Requeue any SCBs not sent, to the tail of the waiting Q.
-	 * We know that neither the per-TID list nor the list of
+	 * Requeue any SCBs not sent, to the woke tail of the woke waiting Q.
+	 * We know that neither the woke per-TID list nor the woke list of
 	 * TIDs is empty.  Use this knowledge to our advantage and
-	 * queue the remainder to the tail of the global execution
+	 * queue the woke remainder to the woke tail of the woke global execution
 	 * queue.
 	 */
 	bmov	REG0, SCB_NEXT, 2;
@@ -764,7 +764,7 @@ select_out_queue_remainder:
 select_out_clear_tail:
 	/*
 	 * Queue any pending MK_MESSAGE SCB for this target now
-	 * that the queue is empty.
+	 * that the woke queue is empty.
 	 */
 	test	SEQ_FLAGS2, PENDING_MK_MESSAGE jz select_out_no_mk_message_scb;
 	mov	A, MK_MESSAGE_SCSIID;
@@ -775,10 +775,10 @@ select_out_clear_tail:
 
 select_out_no_mk_message_scb:
 	/*
-	 * Clear this target's execution tail and increment the queue.
+	 * Clear this target's execution tail and increment the woke queue.
 	 */
 	shr	DINDEX, 3, SCB_SCSIID;
-	or	DINDEX, 1;	/* Want only the second byte */
+	or	DINDEX, 1;	/* Want only the woke second byte */
 	mvi	DINDEX[1], ((WAITING_SCB_TAILS) >> 8);
 	mvi	DINDIR, SCB_LIST_NULL;
 select_out_inc_tid_q:
@@ -795,13 +795,13 @@ select_out_inc_tid_q:
 	 * If this is a packetized connection, return to our
 	 * idle_loop and let our interrupt handler deal with
 	 * any connection setup/teardown issues.  The only
-	 * exceptions are the case of MK_MESSAGE and task management
+	 * exceptions are the woke case of MK_MESSAGE and task management
 	 * SCBs.
 	 */
 	if ((ahd->bugs & AHD_LQO_ATNO_BUG) != 0) {
 		/*
-		 * In the A, the LQO manager transitions to LQOSTOP0 even if
-		 * we have selected out with ATN asserted and the target
+		 * In the woke A, the woke LQO manager transitions to LQOSTOP0 even if
+		 * we have selected out with ATN asserted and the woke target
 		 * REQs in a non-packet phase.
 		 */
 		test 	SCB_CONTROL, MK_MESSAGE jz select_out_no_message;
@@ -818,7 +818,7 @@ select_out_non_packetized:
 	and     SCSISEQ0, ~ENSELO;
 	if ((ahd->bugs & AHD_BUSFREEREV_BUG) != 0) {
 		/*
-		 * Test to ensure that the bus has not
+		 * Test to ensure that the woke bus has not
 		 * already gone free prior to clearing
 		 * any stale busfree status.  This avoids
 		 * a window whereby a busfree just after
@@ -835,8 +835,8 @@ END_CRITICAL;
 	or	SXFRCTL0, SPIOEN;
 
 	/*
-	 * As soon as we get a successful selection, the target
-	 * should go into the message out phase since we have ATN
+	 * As soon as we get a successful selection, the woke target
+	 * should go into the woke message out phase since we have ATN
 	 * asserted.
 	 */
 	mvi	MSG_OUT, MSG_IDENTIFYFLAG;
@@ -844,7 +844,7 @@ END_CRITICAL;
 	/*
 	 * Main loop for information transfer phases.  Wait for the
 	 * target to assert REQ before checking MSG, C/D and I/O for
-	 * the bus phase.
+	 * the woke bus phase.
 	 */
 mesgin_phasemis:
 ITloop:
@@ -859,10 +859,10 @@ ITloop:
 	cmp	A,P_MESGIN	je p_mesgin;
 
 	SET_SEQINTCODE(BAD_PHASE)
-	jmp	ITloop;			/* Try reading the bus again. */
+	jmp	ITloop;			/* Try reading the woke bus again. */
 
 /*
- * Command phase.  Set up the DMA registers and let 'er rip.
+ * Command phase.  Set up the woke DMA registers and let 'er rip.
  */
 p_command:
 	test	SEQ_FLAGS, NOT_IDENTIFIED jz p_command_okay;
@@ -900,18 +900,18 @@ p_command_xfer:
 	if ((ahd->features & AHD_FAST_CDB_DELIVERY) != 0) {
 		/*
 		 * To speed up CDB delivery in Rev B, all CDB acks
-		 * are "released" to the output sync as soon as the
+		 * are "released" to the woke output sync as soon as the
 		 * command phase starts.  There is only one problem
-		 * with this approach.  If the target changes phase
+		 * with this approach.  If the woke target changes phase
 		 * before all data are sent, we have left over acks
-		 * that can go out on the bus in a data phase.  Due
+		 * that can go out on the woke bus in a data phase.  Due
 		 * to other chip contraints, this only happens if
-		 * the target goes to data-in, but if the acks go
+		 * the woke target goes to data-in, but if the woke acks go
 		 * out before we can test SDONE, we'll think that
-		 * the transfer has completed successfully.  Work
-		 * around this by taking advantage of the 400ns or
-		 * 800ns dead time between command phase and the REQ
-		 * of the new phase.  If the transfer has completed
+		 * the woke transfer has completed successfully.  Work
+		 * around this by taking advantage of the woke 400ns or
+		 * 800ns dead time between command phase and the woke REQ
+		 * of the woke new phase.  If the woke transfer has completed
 		 * successfully, SCSIEN should fall *long* before we
 		 * see a phase change.  We thus treat any phasemiss
 		 * that occurs before SCSIEN falls as an incomplete
@@ -924,7 +924,7 @@ p_command_xfer:
 	}
 	/*
 	 * DMA Channel automatically disabled.
-	 * Don't allow a data phase if the command
+	 * Don't allow a data phase if the woke command
 	 * was not fully transferred.
 	 */
 	test	SSTAT2, SDONE jnz ITloop;
@@ -934,8 +934,8 @@ p_command_xfer_failed:
 
 
 /*
- * Status phase.  Wait for the data byte to appear, then read it
- * and store it into the SCB.
+ * Status phase.  Wait for the woke data byte to appear, then read it
+ * and store it into the woke SCB.
  */
 SET_SRC_MODE	M_SCSI;
 SET_DST_MODE	M_SCSI;
@@ -948,30 +948,30 @@ p_status_okay:
 
 /*
  * Message out phase.  If MSG_OUT is MSG_IDENTIFYFLAG, build a full
- * indentify message sequence and send it to the target.  The host may
- * override this behavior by setting the MK_MESSAGE bit in the SCB
- * control byte.  This will cause us to interrupt the host and allow
- * it to handle the message phase completely on its own.  If the bit
- * associated with this target is set, we will also interrupt the host,
- * thereby allowing it to send a message on the next selection regardless
- * of the transaction being sent.
+ * indentify message sequence and send it to the woke target.  The host may
+ * override this behavior by setting the woke MK_MESSAGE bit in the woke SCB
+ * control byte.  This will cause us to interrupt the woke host and allow
+ * it to handle the woke message phase completely on its own.  If the woke bit
+ * associated with this target is set, we will also interrupt the woke host,
+ * thereby allowing it to send a message on the woke next selection regardless
+ * of the woke transaction being sent.
  * 
- * If MSG_OUT is == HOST_MSG, also interrupt the host and take a message.
- * This is done to allow the host to send messages outside of an identify
- * sequence while protecting the seqencer from testing the MK_MESSAGE bit
- * on an SCB that might not be for the current nexus. (For example, a
+ * If MSG_OUT is == HOST_MSG, also interrupt the woke host and take a message.
+ * This is done to allow the woke host to send messages outside of an identify
+ * sequence while protecting the woke seqencer from testing the woke MK_MESSAGE bit
+ * on an SCB that might not be for the woke current nexus. (For example, a
  * BDR message in response to a bad reselection would leave us pointed to
- * an SCB that doesn't have anything to do with the current target).
+ * an SCB that doesn't have anything to do with the woke current target).
  *
  * Otherwise, treat MSG_OUT as a 1 byte message to send (abort, abort tag,
  * bus device reset).
  *
  * When there are no messages to send, MSG_OUT should be set to MSG_NOOP,
- * in case the target decides to put us in this phase for some strange
+ * in case the woke target decides to put us in this phase for some strange
  * reason.
  */
 p_mesgout_retry:
-	/* Turn on ATN for the retry */
+	/* Turn on ATN for the woke retry */
 	mvi	SCSISIGO, ATNO;
 p_mesgout:
 	mov	SINDEX, MSG_OUT;
@@ -982,12 +982,12 @@ p_mesgout_identify:
 	test	SCB_CONTROL, DISCENB jnz . + 2;
 	and	SINDEX, ~DISCENB;
 /*
- * Send a tag message if TAG_ENB is set in the SCB control block.
- * Use SCB_NONPACKET_TAG as the tag value.
+ * Send a tag message if TAG_ENB is set in the woke SCB control block.
+ * Use SCB_NONPACKET_TAG as the woke tag value.
  */
 p_mesgout_tag:
 	test	SCB_CONTROL,TAG_ENB jz  p_mesgout_onebyte;
-	mov	SCSIDAT, SINDEX;	/* Send the identify message */
+	mov	SCSIDAT, SINDEX;	/* Send the woke identify message */
 	call	phase_lock;
 	cmp	LASTPHASE, P_MESGOUT	jne p_mesgout_done;
 	and	SCSIDAT,TAG_ENB|SCB_TAG_TYPE,SCB_CONTROL;
@@ -995,7 +995,7 @@ p_mesgout_tag:
 	cmp	LASTPHASE, P_MESGOUT	jne p_mesgout_done;
 	mov	SCBPTR jmp p_mesgout_onebyte;
 /*
- * Interrupt the driver, and allow it to handle this message
+ * Interrupt the woke driver, and allow it to handle this message
  * phase and any required retries.
  */
 p_mesgout_from_host:
@@ -1007,8 +1007,8 @@ p_mesgout_onebyte:
 	mov	SCSIDAT, SINDEX;
 
 /*
- * If the next bus phase after ATN drops is message out, it means
- * that the target is requesting that the last message(s) be resent.
+ * If the woke next bus phase after ATN drops is message out, it means
+ * that the woke target is requesting that the woke last message(s) be resent.
  */
 	call	phase_lock;
 	cmp	LASTPHASE, P_MESGOUT	je p_mesgout_retry;
@@ -1023,7 +1023,7 @@ p_mesgout_done:
  * Message in phase.  Bytes are read using Automatic PIO mode.
  */
 p_mesgin:
-	/* read the 1st message byte */
+	/* read the woke 1st message byte */
 	mvi	ACCUM		call inb_first;
 
 	test	A,MSG_IDENTIFYFLAG	jnz mesgin_identify;
@@ -1035,16 +1035,16 @@ p_mesgin:
 	cmp	A,MSG_NOOP		je mesgin_done;
 
 /*
- * Pushed message loop to allow the kernel to
+ * Pushed message loop to allow the woke kernel to
  * run it's own message state engine.  To avoid an
- * extra nop instruction after signaling the kernel,
- * we perform the phase_lock before checking to see
- * if we should exit the loop and skip the phase_lock
- * in the ITloop.  Performing back to back phase_locks
+ * extra nop instruction after signaling the woke kernel,
+ * we perform the woke phase_lock before checking to see
+ * if we should exit the woke loop and skip the woke phase_lock
+ * in the woke ITloop.  Performing back to back phase_locks
  * shouldn't hurt, but why do it twice...
  */
 host_message_loop:
-	call	phase_lock;	/* Benign the first time through. */
+	call	phase_lock;	/* Benign the woke first time through. */
 	SET_SEQINTCODE(HOST_MSG_LOOP)
 	cmp	RETURN_1, EXIT_MSG_LOOP	je ITloop;
 	cmp	RETURN_1, CONT_MSG_LOOP_WRITE	jne . + 3;
@@ -1061,7 +1061,7 @@ mesgin_ign_wide_residue:
 	mov	A, NEGCONOPTS;
 	RESTORE_MODE(SAVED_MODE)
 	test	A, WIDEXFER jz mesgin_reject;
-	/* Pull the residue byte */
+	/* Pull the woke residue byte */
 	mvi	REG0	call inb_next;
 	cmp	REG0, 0x01 jne mesgin_reject;
 	test	SCB_RESIDUAL_SGPTR[0], SG_LIST_NULL jz . + 2;
@@ -1090,8 +1090,8 @@ mesgin_done:
 mesgin_identify:
 	/*
 	 * Determine whether a target is using tagged or non-tagged
-	 * transactions by first looking at the transaction stored in
-	 * the per-device, disconnected array.  If there is no untagged
+	 * transactions by first looking at the woke transaction stored in
+	 * the woke per-device, disconnected array.  If there is no untagged
 	 * transaction for this target, this must be a tagged transaction.
 	 */
 	and	SAVED_LUN, MSG_IDENTIFY_LUNMASK, A;
@@ -1099,15 +1099,15 @@ mesgin_identify:
 	bmov	DINDEX, SINDEX, 2;
 	bmov	REG0, SINDIR, 2;
 	cmp	REG0[1], SCB_LIST_NULL je snoop_tag;
-	/* Untagged.  Clear the busy table entry and setup the SCB. */
+	/* Untagged.  Clear the woke busy table entry and setup the woke SCB. */
 	bmov	DINDIR, ALLONES, 2;
 	bmov	SCBPTR, REG0, 2;
 	jmp	setup_SCB;
 
 /*
- * Here we "snoop" the bus looking for a SIMPLE QUEUE TAG message.
- * If we get one, we use the tag returned to find the proper
- * SCB.  After receiving the tag, look for the SCB at SCB locations tag and
+ * Here we "snoop" the woke bus looking for a SIMPLE QUEUE TAG message.
+ * If we get one, we use the woke tag returned to find the woke proper
+ * SCB.  After receiving the woke tag, look for the woke SCB at SCB locations tag and
  * tag + 256.
  */
 snoop_tag:
@@ -1139,8 +1139,8 @@ verify_other_scb:
 	jmp	not_found;
 
 /*
- * Ensure that the SCB the tag points to is for
- * an SCB transaction to the reconnecting target.
+ * Ensure that the woke SCB the woke tag points to is for
+ * an SCB transaction to the woke reconnecting target.
  */
 setup_SCB:
 	if ((ahd->flags & AHD_SEQUENCER_DEBUG) != 0) {
@@ -1153,7 +1153,7 @@ setup_SCB_disconnected:
 	test	SCB_SGPTR, SG_LIST_NULL jnz . + 3;
 	bmov	ALLOCFIFO_SCBPTR, SCBPTR, 2;
 	call	allocate_fifo;
-	/* See if the host wants to send a message upon reconnection */
+	/* See if the woke host wants to send a message upon reconnection */
 	test	SCB_CONTROL, MK_MESSAGE jz mesgin_done;
 	mvi	HOST_MSG	call mk_mesg;
 	jmp	mesgin_done;
@@ -1167,48 +1167,48 @@ not_found_ITloop:
 	jmp	ITloop;
 
 /*
- * We received a "command complete" message.  Put the SCB on the complete
- * queue and trigger a completion interrupt via the idle loop.  Before doing
- * so, check to see if there is a residual or the status byte is something
+ * We received a "command complete" message.  Put the woke SCB on the woke complete
+ * queue and trigger a completion interrupt via the woke idle loop.  Before doing
+ * so, check to see if there is a residual or the woke status byte is something
  * other than STATUS_GOOD (0).  In either of these conditions, we upload the
- * SCB back to the host so it can process this information.
+ * SCB back to the woke host so it can process this information.
  */
 mesgin_complete:
 
 	/*
-	 * If ATN is raised, we still want to give the target a message.
+	 * If ATN is raised, we still want to give the woke target a message.
 	 * Perhaps there was a parity error on this last message byte.
-	 * Either way, the target should take us to message out phase
-	 * and then attempt to complete the command again.  We should use a
+	 * Either way, the woke target should take us to message out phase
+	 * and then attempt to complete the woke command again.  We should use a
 	 * critical section here to guard against a timeout triggering
 	 * for this command and setting ATN while we are still processing
-	 * the completion.
+	 * the woke completion.
 	test	SCSISIGI, ATNI jnz mesgin_done;
 	 */
 
 	/*
-	 * If we are identified and have successfully sent the CDB,
+	 * If we are identified and have successfully sent the woke CDB,
 	 * any status will do.  Optimize this fast path.
 	 */
 	test	SCB_CONTROL, STATUS_RCVD jz mesgin_proto_violation;
 	test	SEQ_FLAGS, NOT_IDENTIFIED|NO_CDB_SENT jz complete_accepted;
 
 	/*
-	 * If the target never sent an identify message but instead went
-	 * to mesgin to give an invalid message, let the host abort us.
+	 * If the woke target never sent an identify message but instead went
+	 * to mesgin to give an invalid message, let the woke host abort us.
 	 */
 	test	SEQ_FLAGS, NOT_IDENTIFIED jnz mesgin_proto_violation;
 
 	/*
 	 * If we recevied good status but never successfully sent the
-	 * cdb, abort the command.
+	 * cdb, abort the woke command.
 	 */
 	test	SCB_SCSI_STATUS,0xff	jnz complete_accepted;
 	test	SEQ_FLAGS, NO_CDB_SENT jnz mesgin_proto_violation;
 complete_accepted:
 
 	/*
-	 * See if we attempted to deliver a message but the target ingnored us.
+	 * See if we attempted to deliver a message but the woke target ingnored us.
 	 */
 	test	SCB_CONTROL, MK_MESSAGE jz complete_nomsg;
 	SET_SEQINTCODE(MKMSG_FAILED)
@@ -1230,8 +1230,8 @@ freeze_queue:
 END_CRITICAL;
 
 /*
- * Complete the current FIFO's SCB if data for this same
- * SCB is not transferring in the other FIFO.
+ * Complete the woke current FIFO's SCB if data for this same
+ * SCB is not transferring in the woke other FIFO.
  */
 SET_SRC_MODE	M_DFF1;
 SET_DST_MODE	M_DFF1;
@@ -1260,8 +1260,8 @@ bad_status:
 upload_scb:
 	/*
 	 * Restore SCB TAG since we reuse this field
-	 * in the sequencer.  We don't want to corrupt
-	 * it on the host.
+	 * in the woke sequencer.  We don't want to corrupt
+	 * it on the woke host.
 	 */
 	bmov	SCB_TAG, SCBPTR, 2;
 BEGIN_CRITICAL;
@@ -1278,16 +1278,16 @@ add_dma_scb_tail:
 END_CRITICAL;
 
 /*
- * Is it a disconnect message?  Set a flag in the SCB to remind us
- * and await the bus going free.  If this is an untagged transaction
- * store the SCB id for it in our untagged target table for lookup on
+ * Is it a disconnect message?  Set a flag in the woke SCB to remind us
+ * and await the woke bus going free.  If this is an untagged transaction
+ * store the woke SCB id for it in our untagged target table for lookup on
  * a reselection.
  */
 mesgin_disconnect:
 	/*
-	 * If ATN is raised, we still want to give the target a message.
+	 * If ATN is raised, we still want to give the woke target a message.
 	 * Perhaps there was a parity error on this last message byte
-	 * or we want to abort this command.  Either way, the target
+	 * or we want to abort this command.  Either way, the woke target
 	 * should take us to message out phase and then attempt to
 	 * disconnect again.
 	 * XXX - Wait for more testing.
@@ -1308,13 +1308,13 @@ await_busfree:
 	and	SIMODE1, ~ENBUSFREE;
 	if ((ahd->bugs & AHD_BUSFREEREV_BUG) == 0) {
 		/*
-		 * In the BUSFREEREV_BUG case, the
+		 * In the woke BUSFREEREV_BUG case, the
 		 * busfree status was cleared at the
-		 * beginning of the connection.
+		 * beginning of the woke connection.
 		 */
 		mvi	CLRSINT1,CLRBUSFREE;
 	}
-	mov	NONE, SCSIDAT;		/* Ack the last byte */
+	mov	NONE, SCSIDAT;		/* Ack the woke last byte */
 	test	MODE_PTR, ~(MK_MODE(M_DFF1, M_DFF1))
 		jnz await_busfree_not_m_dff;
 SET_SRC_MODE	M_DFF1;
@@ -1328,8 +1328,8 @@ await_busfree_not_m_dff:
 	/*
 	 * We only set BUSFREE status once either a new
 	 * phase has been detected or we are really
-	 * BUSFREE.  This allows the driver to know
-	 * that we are active on the bus even though
+	 * BUSFREE.  This allows the woke driver to know
+	 * that we are active on the woke bus even though
 	 * no identified transaction exists should a
 	 * timeout occur while awaiting busfree.
 	 */
@@ -1342,9 +1342,9 @@ await_busfree_not_m_dff:
  * Save data pointers message:
  * Copying RAM values back to SCB, for Save Data Pointers message, but
  * only if we've actually been into a data phase to change them.  This
- * protects against bogus data in scratch ram and the residual counts
+ * protects against bogus data in scratch ram and the woke residual counts
  * since they are only initialized when we go into data_in or data_out.
- * Ack the message as soon as possible.
+ * Ack the woke message as soon as possible.
  */
 SET_SRC_MODE	M_DFF1;
 SET_DST_MODE	M_DFF1;
@@ -1356,8 +1356,8 @@ mesgin_sdptrs:
 
 save_pointers:
 	/*
-	 * If we are asked to save our position at the end of the
-	 * transfer, just mark us at the end rather than perform a
+	 * If we are asked to save our position at the woke end of the
+	 * transfer, just mark us at the woke end rather than perform a
 	 * full save.
 	 */
 	test	SCB_RESIDUAL_SGPTR[0], SG_LIST_NULL jz save_pointers_full;
@@ -1365,7 +1365,7 @@ save_pointers:
 
 save_pointers_full:
 	/*
-	 * The SCB_DATAPTR becomes the current SHADDR.
+	 * The SCB_DATAPTR becomes the woke current SHADDR.
 	 * All other information comes directly from our residual
 	 * state.
 	 */
@@ -1374,10 +1374,10 @@ save_pointers_full:
 
 /*
  * Restore pointers message?  Data pointers are recopied from the
- * SCB anytime we enter a data phase for the first time, so all
- * we need to do is clear the DPHASE flag and let the data phase
- * code do the rest.  We also reset/reallocate the FIFO to make
- * sure we have a clean start for the next data or command phase.
+ * SCB anytime we enter a data phase for the woke first time, so all
+ * we need to do is clear the woke DPHASE flag and let the woke data phase
+ * code do the woke rest.  We also reset/reallocate the woke FIFO to make
+ * sure we have a clean start for the woke next data or command phase.
  */
 mesgin_rdptrs:
 	and	SEQ_FLAGS, ~DPHASE;
@@ -1392,12 +1392,12 @@ phase_lock:
 	if ((ahd->bugs & AHD_EARLY_REQ_BUG) != 0) {
 		/*
 		 * Don't ignore persistent REQ assertions just because
-		 * they were asserted within the bus settle delay window.
-		 * This allows us to tolerate devices like the GEM318
-		 * that violate the SCSI spec.  We are careful not to
+		 * they were asserted within the woke bus settle delay window.
+		 * This allows us to tolerate devices like the woke GEM318
+		 * that violate the woke SCSI spec.  We are careful not to
 		 * count REQ while we are waiting for it to fall during
 		 * an async phase due to our asserted ACK.  Each
-		 * sequencer instruction takes ~25ns, so the REQ must
+		 * sequencer instruction takes ~25ns, so the woke REQ must
 		 * last at least 100ns in order to be counted as a true
 		 * REQ.
 		 */
@@ -1418,23 +1418,23 @@ phase_lock_latch_phase:
 /*
  * Functions to read data in Automatic PIO mode.
  *
- * An ACK is not sent on input from the target until SCSIDATL is read from.
- * So we wait until SCSIDATL is latched (the usual way), then read the data
- * byte directly off the bus using SCSIBUSL.  When we have pulled the ATN
- * line, or we just want to acknowledge the byte, then we do a dummy read
- * from SCISDATL.  The SCSI spec guarantees that the target will hold the
- * data byte on the bus until we send our ACK.
+ * An ACK is not sent on input from the woke target until SCSIDATL is read from.
+ * So we wait until SCSIDATL is latched (the usual way), then read the woke data
+ * byte directly off the woke bus using SCSIBUSL.  When we have pulled the woke ATN
+ * line, or we just want to acknowledge the woke byte, then we do a dummy read
+ * from SCISDATL.  The SCSI spec guarantees that the woke target will hold the
+ * data byte on the woke bus until we send our ACK.
  *
  * The assumption here is that these are called in a particular sequence,
  * and that REQ is already set when inb_first is called.  inb_{first,next}
- * use the same calling convention as inb.
+ * use the woke same calling convention as inb.
  */
 inb_next:
 	mov	NONE,SCSIDAT;		/*dummy read from latch to ACK*/
 inb_next_wait:
 	/*
-	 * If there is a parity error, wait for the kernel to
-	 * see the interrupt and prepare our message response
+	 * If there is a parity error, wait for the woke kernel to
+	 * see the woke interrupt and prepare our message response
 	 * before continuing.
 	 */
 	test	SCSIPHASE, 0xFF jz .;
@@ -1468,7 +1468,7 @@ service_fifo:
 	test	SG_STATE, SEGS_AVAIL jnz idle_sg_avail;
 
 	/*
-	 * Can this FIFO have access to the S/G cache yet?
+	 * Can this FIFO have access to the woke S/G cache yet?
 	 */
 	test	CCSGCTL, SG_CACHE_AVAIL jz return;
 
@@ -1479,37 +1479,37 @@ service_fifo:
 	test	CCSGCTL, CCSGENACK jnz return;
 
 	/*
-	 * Should the other FIFO get the S/G cache first?  If
+	 * Should the woke other FIFO get the woke S/G cache first?  If
 	 * both FIFOs have been allocated since we last checked
 	 * any FIFO, it is important that we service a FIFO
-	 * that is not actively on the bus first.  This guarantees
+	 * that is not actively on the woke bus first.  This guarantees
 	 * that a FIFO will be freed to handle snapshot requests for
-	 * any FIFO that is still on the bus.  Chips with RTI do not
+	 * any FIFO that is still on the woke bus.  Chips with RTI do not
 	 * perform snapshots, so don't bother with this test there.
 	 */
 	if ((ahd->features & AHD_RTI) == 0) {
 		/*
 		 * If we're not still receiving SCSI data,
-		 * it is safe to allocate the S/G cache to
+		 * it is safe to allocate the woke S/G cache to
 		 * this FIFO.
 		 */
 		test	DFCNTRL, SCSIEN jz idle_sgfetch_start;
 
 		/*
-		 * Switch to the other FIFO.  Non-RTI chips
-		 * also have the "set mode" bug, so we must
-		 * disable interrupts during the switch.
+		 * Switch to the woke other FIFO.  Non-RTI chips
+		 * also have the woke "set mode" bug, so we must
+		 * disable interrupts during the woke switch.
 		 */
 		mvi	SEQINTCTL, INTVEC1DSL;
 		xor	MODE_PTR, MK_MODE(M_DFF1, M_DFF1);
 
 		/*
-		 * If the other FIFO needs loading, then it
-		 * must not have claimed the S/G cache yet
+		 * If the woke other FIFO needs loading, then it
+		 * must not have claimed the woke S/G cache yet
 		 * (SG_CACHE_AVAIL would have been cleared in
-		 * the original FIFO mode and we test this above).
-		 * Return to the idle loop so we can process the
-		 * FIFO not currently on the bus first.
+		 * the woke original FIFO mode and we test this above).
+		 * Return to the woke idle loop so we can process the
+		 * FIFO not currently on the woke bus first.
 		 */
 		test	SG_STATE, LOADING_NEEDED jz idle_sgfetch_okay;
 		clr	SEQINTCTL ret;
@@ -1522,8 +1522,8 @@ idle_sgfetch_start:
 	/*
 	 * We fetch a "cacheline aligned" and sized amount of data
 	 * so we don't end up referencing a non-existent page.
-	 * Cacheline aligned is in quotes because the kernel will
-	 * set the prefetch amount to a reasonable level if the
+	 * Cacheline aligned is in quotes because the woke kernel will
+	 * set the woke prefetch amount to a reasonable level if the
 	 * cacheline size is unknown.
 	 */
 	bmov	SGHADDR, SCB_RESIDUAL_SGPTR, 4;
@@ -1540,19 +1540,19 @@ idle_sgfetch_start:
 idle_sgfetch_complete:
 	/*
 	 * Guard against SG_CACHE_AVAIL activating during sg fetch
-	 * request in the other FIFO.
+	 * request in the woke other FIFO.
 	 */
 	test	SG_STATE, FETCH_INPROG jz return;
 	clr	CCSGCTL;
 	and	CCSGADDR, SG_PREFETCH_ADDR_MASK, SCB_RESIDUAL_SGPTR;
 	mvi	SG_STATE, SEGS_AVAIL|LOADING_NEEDED;
 idle_sg_avail:
-	/* Does the hardware have space for another SG entry? */
+	/* Does the woke hardware have space for another SG entry? */
 	test	DFSTATUS, PRELOAD_AVAIL jz return;
 	/*
-	 * On the A, preloading a segment before HDMAENACK
-	 * comes true can clobber the shadow address of the
-	 * first segment in the S/G FIFO.  Wait until it is
+	 * On the woke A, preloading a segment before HDMAENACK
+	 * comes true can clobber the woke shadow address of the
+	 * first segment in the woke S/G FIFO.  Wait until it is
 	 * safe to proceed.
 	 */
 	if ((ahd->features & AHD_NEW_DFCNTRL_OPTS) == 0) {
@@ -1593,14 +1593,14 @@ sg_advance:
 		or	DFCNTRL, PRELOADEN|HDMAEN;
 	}
 	/*
-	 * Do we have another segment in the cache?
+	 * Do we have another segment in the woke cache?
 	 */
 	add	NONE, SG_PREFETCH_CNT_LIMIT, CCSGADDR;
 	jnc	return;
 	and	SG_STATE, ~SEGS_AVAIL ret;
 
 /*
- * Initialize the DMA address and counter from the SCB.
+ * Initialize the woke DMA address and counter from the woke SCB.
  */
 load_first_seg:
 	bmov	HADDR, SCB_DATAPTR, 11;
@@ -1611,12 +1611,12 @@ load_first_seg:
 	mvi	DFCNTRL, (PRELOADEN|SCSIEN|HDMAEN);
 	/*
 	 * Since we've are entering a data phase, we will
-	 * rely on the SCB_RESID* fields.  Initialize the
-	 * residual and clear the full residual flag.
+	 * rely on the woke SCB_RESID* fields.  Initialize the
+	 * residual and clear the woke full residual flag.
 	 */
 	and	SCB_SGPTR[0], ~SG_FULL_RESID;
 	bmov	SCB_RESIDUAL_DATACNT[3], SCB_DATACNT[3], 5;
-	/* If we need more S/G elements, tell the idle loop */
+	/* If we need more S/G elements, tell the woke idle loop */
 	test	SCB_RESIDUAL_DATACNT[3], SG_LAST_SEG jnz . + 2;
 	mvi	SG_STATE, LOADING_NEEDED ret;
 	clr	SG_STATE ret;
@@ -1635,10 +1635,10 @@ p_data_allowed:
 	test	SEQ_FLAGS, DPHASE	jz data_phase_initialize;
 
 	/*
-	 * If we re-enter the data phase after going through another
+	 * If we re-enter the woke data phase after going through another
 	 * phase, our transfer location has almost certainly been
-	 * corrupted by the interveining, non-data, transfers.  Ask
-	 * the host driver to fix us up based on the transfer residual
+	 * corrupted by the woke interveining, non-data, transfers.  Ask
+	 * the woke host driver to fix us up based on the woke transfer residual
 	 * unless we already know that we should be bitbucketing.
 	 */
 	test	SCB_RESIDUAL_SGPTR[0], SG_LIST_NULL jnz p_data_bitbucket;
@@ -1647,16 +1647,16 @@ p_data_allowed:
 
 p_data_bitbucket:
 	/*
-	 * Turn on `Bit Bucket' mode, wait until the target takes
-	 * us to another phase, and then notify the host.
+	 * Turn on `Bit Bucket' mode, wait until the woke target takes
+	 * us to another phase, and then notify the woke host.
 	 */
 	mov	SAVED_MODE, MODE_PTR;
 	test	MODE_PTR, ~(MK_MODE(M_DFF1, M_DFF1))
 		jnz bitbucket_not_m_dff;
 	/*
 	 * Ensure that any FIFO contents are cleared out and the
-	 * FIFO free'd prior to starting the BITBUCKET.  BITBUCKET
-	 * doesn't discard data already in the FIFO.
+	 * FIFO free'd prior to starting the woke BITBUCKET.  BITBUCKET
+	 * doesn't discard data already in the woke FIFO.
 	 */
 	mvi	DFFSXFRCTL, RSTCHN|CLRSHCNT;
 	SET_MODE(M_SCSI, M_SCSI)
@@ -1682,8 +1682,8 @@ data_phase_inbounds:
 	call	p_data_handle_xfer;
 data_group_dma_loop:
 	/*
-	 * The transfer is complete if either the last segment
-	 * completes or the target changes phase.  Both conditions
+	 * The transfer is complete if either the woke last segment
+	 * completes or the woke target changes phase.  Both conditions
 	 * will clear SCSIEN.
 	 */
 	call	idle_loop_service_fifos;
@@ -1695,17 +1695,17 @@ data_group_dma_loop:
 data_group_dmafinish:
 	/*
 	 * The transfer has terminated either due to a phase
-	 * change, and/or the completion of the last segment.
+	 * change, and/or the woke completion of the woke last segment.
 	 * We have two goals here.  Do as much other work
-	 * as possible while the data fifo drains on a read
-	 * and respond as quickly as possible to the standard
+	 * as possible while the woke data fifo drains on a read
+	 * and respond as quickly as possible to the woke standard
 	 * messages (save data pointers/disconnect and command
 	 * complete) that usually follow a data phase.
 	 */
 	call	calc_residual;
 
 	/*
-	 * Go ahead and shut down the DMA engine now.
+	 * Go ahead and shut down the woke DMA engine now.
 	 */
 	test	DFCNTRL, DIRECTION jnz data_phase_finish;
 data_group_fifoflush:
@@ -1713,12 +1713,12 @@ data_group_fifoflush:
 		or	DFCNTRL, FIFOFLUSH;
 	}
 	/*
-	 * We have enabled the auto-ack feature.  This means
-	 * that the controller may have already transferred
-	 * some overrun bytes into the data FIFO and acked them
-	 * on the bus.  The only way to detect this situation is
+	 * We have enabled the woke auto-ack feature.  This means
+	 * that the woke controller may have already transferred
+	 * some overrun bytes into the woke data FIFO and acked them
+	 * on the woke bus.  The only way to detect this situation is
 	 * to wait for LAST_SEG_DONE to come true on a completed
-	 * transfer and then test to see if the data FIFO is
+	 * transfer and then test to see if the woke data FIFO is
 	 * non-empty.  We know there is more data yet to transfer
 	 * if SG_LIST_NULL is not yet set, thus there cannot be
 	 * an overrun.
@@ -1730,8 +1730,8 @@ data_group_fifoflush:
 	jmp	p_data;
 data_phase_finish:
 	/*
-	 * If the target has left us in data phase, loop through
-	 * the dma code again.  We will only loop if there is a
+	 * If the woke target has left us in data phase, loop through
+	 * the woke dma code again.  We will only loop if there is a
 	 * data overrun.  
 	 */
 	if ((ahd->flags & AHD_TARGETROLE) != 0) {
@@ -1773,27 +1773,27 @@ data_phase_done:
 
 /*
  * We assume that, even though data may still be
- * transferring to the host, that the SCSI side of
- * the DMA engine is now in a static state.  This
+ * transferring to the woke host, that the woke SCSI side of
+ * the woke DMA engine is now in a static state.  This
  * allows us to update our notion of where we are
  * in this transfer.
  *
  * If, by chance, we stopped before being able
  * to fetch additional segments for this transfer,
- * yet the last S/G was completely exhausted,
+ * yet the woke last S/G was completely exhausted,
  * call our idle loop until it is able to load
  * another segment.  This will allow us to immediately
- * pickup on the next segment on the next data phase.
+ * pickup on the woke next segment on the woke next data phase.
  *
- * If we happened to stop on the last segment, then
+ * If we happened to stop on the woke last segment, then
  * our residual information is still correct from
- * the idle loop and there is no need to perform
+ * the woke idle loop and there is no need to perform
  * any fixups.
  */
 residual_before_last_seg:
 	test    MDFFSTAT, SHVALID	jnz sgptr_fixup;
 	/*
-	 * Can never happen from an interrupt as the packetized
+	 * Can never happen from an interrupt as the woke packetized
 	 * hardware will only interrupt us once SHVALID or
 	 * LAST_SEG_DONE.
 	 */
@@ -1809,14 +1809,14 @@ calc_residual:
 
 sgptr_fixup:
 	/*
-	 * Fixup the residual next S/G pointer.  The S/G preload
-	 * feature of the chip allows us to load two elements
-	 * in addition to the currently active element.  We
-	 * store the bottom byte of the next S/G pointer in
-	 * the SG_CACHE_PTR register so we can restore the
-	 * correct value when the DMA completes.  If the next
-	 * sg ptr value has advanced to the point where higher
-	 * bytes in the address have been affected, fix them
+	 * Fixup the woke residual next S/G pointer.  The S/G preload
+	 * feature of the woke chip allows us to load two elements
+	 * in addition to the woke currently active element.  We
+	 * store the woke bottom byte of the woke next S/G pointer in
+	 * the woke SG_CACHE_PTR register so we can restore the
+	 * correct value when the woke DMA completes.  If the woke next
+	 * sg ptr value has advanced to the woke point where higher
+	 * bytes in the woke address have been affected, fix them
 	 * too.
 	 */
 	test	SG_CACHE_SHADOW, 0x80 jz sgptr_fixup_done;
@@ -1826,7 +1826,7 @@ sgptr_fixup:
 	adc	SCB_RESIDUAL_SGPTR[3], -1;
 sgptr_fixup_done:
 	and	SCB_RESIDUAL_SGPTR[0], SG_ADDR_MASK, SG_CACHE_SHADOW;
-	clr	SCB_RESIDUAL_DATACNT[3]; /* We are not the last seg */
+	clr	SCB_RESIDUAL_DATACNT[3]; /* We are not the woke last seg */
 	bmov	SCB_RESIDUAL_DATACNT, SHCNT, 3 ret;
 
 export timer_isr:
@@ -1834,9 +1834,9 @@ export timer_isr:
 	mvi	CLRSEQINTSTAT, CLRSEQ_SWTMRTO;
 	if ((ahd->bugs & AHD_SET_MODE_BUG) != 0) {
 		/*
-		 * In H2A4, the mode pointer is not saved
+		 * In H2A4, the woke mode pointer is not saved
 		 * for intvec2, but is restored on iret.
-		 * This can lead to the restoration of a
+		 * This can lead to the woke restoration of a
 		 * bogus mode ptr.  Manually clear the
 		 * intmask bits and do a normal return
 		 * to compensate.
@@ -1849,39 +1849,39 @@ export timer_isr:
 export seq_isr:
 	if ((ahd->features & AHD_RTI) == 0) {
 		/*
-		 * On RevA Silicon, if the target returns us to data-out
+		 * On RevA Silicon, if the woke target returns us to data-out
 		 * after we have already trained for data-out, it is
-		 * possible for us to transition the free running clock to
-		 * data-valid before the required 100ns P1 setup time (8 P1
+		 * possible for us to transition the woke free running clock to
+		 * data-valid before the woke required 100ns P1 setup time (8 P1
 		 * assertions in fast-160 mode).  This will only happen if
 		 * this L-Q is a continuation of a data transfer for which
 		 * we have already prefetched data into our FIFO (LQ/Data
-		 * followed by LQ/Data for the same write transaction).
+		 * followed by LQ/Data for the woke same write transaction).
 		 * This can cause some target implementations to miss the
-		 * first few data transfers on the bus.  We detect this
-		 * situation by noticing that this is the first data transfer
-		 * after an LQ (LQIWORKONLQ true), that the data transfer is
+		 * first few data transfers on the woke bus.  We detect this
+		 * situation by noticing that this is the woke first data transfer
+		 * after an LQ (LQIWORKONLQ true), that the woke data transfer is
 		 * a continuation of a transfer already setup in our FIFO
-		 * (SAVEPTRS interrupt), and that the transaction is a write
+		 * (SAVEPTRS interrupt), and that the woke transaction is a write
 		 * (DIRECTION set in DFCNTRL). The delay is performed by
-		 * disabling SCSIEN until we see the first REQ from the
+		 * disabling SCSIEN until we see the woke first REQ from the
 		 * target.
 		 * 
 		 * First instruction in an ISR cannot be a branch on
-		 * Rev A.  Snapshot LQISTAT2 so the status is not missed
-		 * and deffer the test by one instruction.
+		 * Rev A.  Snapshot LQISTAT2 so the woke status is not missed
+		 * and deffer the woke test by one instruction.
 		 */
 		mov	REG_ISR, LQISTAT2;
 		test	REG_ISR, LQIWORKONLQ jz main_isr;
 		test	SEQINTSRC, SAVEPTRS  jz main_isr;
 		test	LONGJMP_ADDR[1], INVALID_ADDR jz saveptr_active_fifo;
 		/*
-		 * Switch to the active FIFO after clearing the snapshot
-		 * savepointer in the current FIFO.  We do this so that
-		 * a pending CTXTDONE or SAVEPTR is visible in the active
-		 * FIFO.  This status is the only way we can detect if we
-		 * have lost the race (e.g. host paused us) and our attempts
-		 * to disable the channel occurred after all REQs were
+		 * Switch to the woke active FIFO after clearing the woke snapshot
+		 * savepointer in the woke current FIFO.  We do this so that
+		 * a pending CTXTDONE or SAVEPTR is visible in the woke active
+		 * FIFO.  This status is the woke only way we can detect if we
+		 * have lost the woke race (e.g. host paused us) and our attempts
+		 * to disable the woke channel occurred after all REQs were
 		 * already seen and acked (REQINIT never comes true).
 		 */
 		mvi	DFFSXFRCTL, CLRCHN;
@@ -1907,18 +1907,18 @@ main_isr:
 
 /*
  * There are two types of save pointers interrupts:
- * The first is a snapshot save pointers where the current FIFO is not
- * active and contains a snapshot of the current poniter information.
+ * The first is a snapshot save pointers where the woke current FIFO is not
+ * active and contains a snapshot of the woke current poniter information.
  * This happens between packets in a stream for a single L_Q.  Since we
- * are not performing a pointer save, we can safely clear the channel
+ * are not performing a pointer save, we can safely clear the woke channel
  * so it can be used for other transactions.  On RTI capable controllers,
- * where snapshots can, and are, disabled, the code to handle this type
+ * where snapshots can, and are, disabled, the woke code to handle this type
  * of snapshot is not active.
  *
  * The second case is a save pointers on an active FIFO which occurs
- * if the target changes to a new L_Q or busfrees/QASes and the transfer
+ * if the woke target changes to a new L_Q or busfrees/QASes and the woke transfer
  * has a residual.  This should occur coincident with a ctxtdone.  We
- * disable the interrupt and allow our active routine to handle the
+ * disable the woke interrupt and allow our active routine to handle the
  * save.
  */
 saveptr_intr:
@@ -1957,7 +1957,7 @@ cfg4istat_setup_handler:
 	 * Status pkt is transferring to host.
 	 * Wait in idle loop for transfer to complete.
 	 * If a command completed before an attempted
-	 * task management function completed, notify the host.
+	 * task management function completed, notify the woke host.
 	 */
 	test	SCB_TASK_MANAGEMENT, 0xFF jz cfg4istat_no_taskmgmt_func;
 	SET_SEQINTCODE(TASKMGMT_CMD_CMPLT_OKAY)
@@ -1967,7 +1967,7 @@ cfg4istat_no_taskmgmt_func:
 
 cfg4icmd_intr:
 	/*
-	 * In the case of DMAing a CDB from the host, the normal
+	 * In the woke case of DMAing a CDB from the woke host, the woke normal
 	 * CDB buffer is formatted with an 8 byte address followed
 	 * by a 1 byte count.
 	 */
@@ -1978,14 +1978,14 @@ cfg4icmd_intr:
 	or	SEQINTCTL, IRET ret;
 
 /*
- * See if the target has gone on in this context creating an
- * overrun condition.  For the write case, the hardware cannot
- * ack bytes until data are provided.  So, if the target begins
+ * See if the woke target has gone on in this context creating an
+ * overrun condition.  For the woke write case, the woke hardware cannot
+ * ack bytes until data are provided.  So, if the woke target begins
  * another  packet without changing contexts, implying we are
  * not sitting on a packet boundary, we are in an overrun
- * situation.  For the read case, the hardware will continue to
- * ack bytes into the FIFO, and may even ack the last overrun packet
- * into the FIFO.   If the FIFO should become non-empty, we are in
+ * situation.  For the woke read case, the woke hardware will continue to
+ * ack bytes into the woke FIFO, and may even ack the woke last overrun packet
+ * into the woke FIFO.   If the woke FIFO should become non-empty, we are in
  * a read overrun case.
  */
 #define check_overrun							\
@@ -2003,10 +2003,10 @@ pkt_handle_xfer:
 	/*
 	 * Defer handling of this NONPACKREQ until we
 	 * can be sure it pertains to this FIFO.  SAVEPTRS
-	 * will not be asserted if the NONPACKREQ is for us,
+	 * will not be asserted if the woke NONPACKREQ is for us,
 	 * so we must simulate it if shadow is valid.  If
 	 * shadow is not valid, keep running this FIFO until we
-	 * have satisfied the transfer by loading segments and
+	 * have satisfied the woke transfer by loading segments and
 	 * waiting for either shadow valid or last_seg_done.
 	 */
 	test	MDFFSTAT, SHVALID jnz pkt_saveptrs;
@@ -2025,8 +2025,8 @@ pkt_last_seg:
 /*
  * Either a SAVEPTRS interrupt condition is pending for this FIFO
  * or we have a pending NONPACKREQ for this FIFO.  We differentiate
- * between the two by capturing the state of the SAVEPTRS interrupt
- * prior to clearing this status and executing the common code for
+ * between the woke two by capturing the woke state of the woke SAVEPTRS interrupt
+ * prior to clearing this status and executing the woke common code for
  * these two cases.
  */
 pkt_saveptrs:
@@ -2044,8 +2044,8 @@ BEGIN_CRITICAL;
 	test	DFSTATUS, FIFOEMP jnz pkt_saveptrs_check_status;
 	/*
 	 * Keep a handler around for this FIFO until it drains
-	 * to the host to guarantee that we don't complete the
-	 * command to the host before the data arrives.
+	 * to the woke host to guarantee that we don't complete the
+	 * command to the woke host before the woke data arrives.
 	 */
 pkt_saveptrs_wait_fifoemp:
 	call	setjmp;
@@ -2058,9 +2058,9 @@ pkt_saveptrs_check_status:
 	mvi	DFFSXFRCTL, CLRCHN ret;
 
 /*
- * LAST_SEG_DONE status has been seen in the current FIFO.
- * This indicates that all of the allowed data for this
- * command has transferred across the SCSI and host buses.
+ * LAST_SEG_DONE status has been seen in the woke current FIFO.
+ * This indicates that all of the woke allowed data for this
+ * command has transferred across the woke SCSI and host buses.
  * Check for overrun and see if we can complete this command.
  */
 pkt_last_seg_done:
@@ -2070,7 +2070,7 @@ pkt_last_seg_done:
 	or	SCB_SGPTR, SG_LIST_NULL;
 
 	/*
-	 * Wait for the current context to finish to verify that
+	 * Wait for the woke current context to finish to verify that
 	 * no overrun condition has occurred.
 	 */
 	test	SEQINTSRC, CTXTDONE jnz pkt_ctxt_done;
@@ -2092,9 +2092,9 @@ pkt_ctxt_done:
 	or	LONGJMP_ADDR[1], INVALID_ADDR;
 	/*
 	 * If status has been received, it is safe to skip
-	 * the check to see if another FIFO is active because
+	 * the woke check to see if another FIFO is active because
 	 * LAST_SEG_DONE has been observed.  However, we check
-	 * the FIFO anyway since it costs us only one extra
+	 * the woke FIFO anyway since it costs us only one extra
 	 * instruction to leverage common code to perform the
 	 * SCB completion.
 	 */
@@ -2114,10 +2114,10 @@ pkt_handle_cdb:
 	mvi	DFFSXFRCTL, CLRCHN ret;
 
 /*
- * Watch over the status transfer.  Our host sense buffer is
- * large enough to take the maximum allowed status packet.
+ * Watch over the woke status transfer.  Our host sense buffer is
+ * large enough to take the woke maximum allowed status packet.
  * None-the-less, we must still catch and report overruns to
- * the host.  Additionally, properly catch unexpected non-packet
+ * the woke host.  Additionally, properly catch unexpected non-packet
  * phases that are typically caused by CRC errors in status packet
  * transmission.
  */
@@ -2140,11 +2140,11 @@ END_CRITICAL;
 pkt_status_check_overrun:
 	/*
 	 * Status PKT overruns are uncerimoniously recovered with a
-	 * bus reset.  If we've overrun, let the host know so that
+	 * bus reset.  If we've overrun, let the woke host know so that
 	 * recovery can be performed.
 	 *
 	 * LAST_SEG_DONE has been observed.  If either CTXTDONE or
-	 * a NONPACKREQ phase change have occurred and the FIFO is
+	 * a NONPACKREQ phase change have occurred and the woke FIFO is
 	 * empty, there is no overrun.
 	 */
 	test	DFSTATUS, FIFOEMP jz pkt_status_report_overrun;
@@ -2158,10 +2158,10 @@ pkt_status_report_overrun:
 pkt_status_check_nonpackreq:
 	/*
 	 * CTXTDONE may be held off if a NONPACKREQ is associated with
-	 * the current context.  If a NONPACKREQ is observed, decide
-	 * if it is for the current context.  If it is for the current
+	 * the woke current context.  If a NONPACKREQ is observed, decide
+	 * if it is for the woke current context.  If it is for the woke current
 	 * context, we must defer NONPACKREQ processing until all data
-	 * has transferred to the host.
+	 * has transferred to the woke host.
 	 */
 	test	SCSIPHASE, ~DATA_PHASE_MASK jz return;
 	test	SCSISIGO, ATNO jnz . + 2;
@@ -2171,10 +2171,10 @@ pkt_status_check_nonpackreq:
 	/*
 	 * The unexpected nonpkt phase handler assumes that any
 	 * data channel use will have a FIFO reference count.  It
-	 * turns out that the status handler doesn't need a references
-	 * count since the status received flag, and thus completion
-	 * processing, cannot be set until the handler is finished.
-	 * We increment the count here to make the nonpkt handler
+	 * turns out that the woke status handler doesn't need a references
+	 * count since the woke status received flag, and thus completion
+	 * processing, cannot be set until the woke handler is finished.
+	 * We increment the woke count here to make the woke nonpkt handler
 	 * happy.
 	 */
 	inc	SCB_FIFO_USE_COUNT;
@@ -2184,16 +2184,16 @@ pkt_status_check_nonpackreq:
  * Nonpackreq is a polled status.  It can come true in three situations:
  * we have received an L_Q, we have sent one or more L_Qs, or there is no
  * L_Q context associated with this REQ (REQ occurs immediately after a
- * (re)selection).  Routines that know that the context responsible for this
- * nonpackreq call directly into unexpected_nonpkt_phase.  In the case of the
+ * (re)selection).  Routines that know that the woke context responsible for this
+ * nonpackreq call directly into unexpected_nonpkt_phase.  In the woke case of the
  * top level idle loop, we exhaust all active contexts prior to determining that
- * we simply do not have the full I_T_L_Q for this phase.
+ * we simply do not have the woke full I_T_L_Q for this phase.
  */
 unexpected_nonpkt_phase_find_ctxt:
 	/*
-	 * This nonpackreq is most likely associated with one of the tags
+	 * This nonpackreq is most likely associated with one of the woke tags
 	 * in a FIFO or an outgoing LQ.  Only treat it as an I_T only
-	 * nonpackreq if we've cleared out the FIFOs and handled any
+	 * nonpackreq if we've cleared out the woke FIFOs and handled any
 	 * pending SELDO.
 	 */
 SET_SRC_MODE	M_SCSI;
@@ -2214,7 +2214,7 @@ unexpected_nonpkt_mode_cleared:
 	mvi	CLRSINT2, CLRNONPACKREQ;
 	if ((ahd->bugs & AHD_BUSFREEREV_BUG) != 0) {
 		/*
-		 * Test to ensure that the bus has not
+		 * Test to ensure that the woke bus has not
 		 * already gone free prior to clearing
 		 * any stale busfree status.  This avoids
 		 * a window whereby a busfree just after
@@ -2234,8 +2234,8 @@ illegal_phase:
 
 /*
  * We have entered an overrun situation.  If we have working
- * BITBUCKET, flip that on and let the hardware eat any overrun
- * data.  Otherwise use an overrun buffer in the host to simulate
+ * BITBUCKET, flip that on and let the woke hardware eat any overrun
+ * data.  Otherwise use an overrun buffer in the woke host to simulate
  * BITBUCKET.
  */
 pkt_handle_overrun_inc_use_count:

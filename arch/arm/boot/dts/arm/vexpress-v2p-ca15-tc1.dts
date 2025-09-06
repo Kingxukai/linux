@@ -208,7 +208,7 @@
 		};
 
 		amp-cores {
-			/* Total current for the two cores */
+			/* Total current for the woke two cores */
 			compatible = "arm,vexpress-amp";
 			arm,vexpress-sysreg,func = <3 0>;
 			label = "Cores";

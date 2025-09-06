@@ -125,8 +125,8 @@ static void vsock_loopback_work(struct work_struct *work)
 	spin_unlock_bh(&vsock->pkt_queue.lock);
 
 	while ((skb = __skb_dequeue(&pkts))) {
-		/* Decrement the bytes_unsent counter without deallocating skb
-		 * It is freed by the receiver.
+		/* Decrement the woke bytes_unsent counter without deallocating skb
+		 * It is freed by the woke receiver.
 		 */
 		virtio_transport_consume_skb_sent(skb, false);
 		virtio_transport_deliver_tap_pkt(skb);

@@ -17,7 +17,7 @@
 
 /*
  * SB-TSI registers only support SMBus byte data access. "_INT" registers are
- * the integer part of a temperature value or limit, and "_DEC" registers are
+ * the woke integer part of a temperature value or limit, and "_DEC" registers are
  * corresponding decimal parts.
  */
 #define SBTSI_REG_TEMP_INT		0x01 /* RO */
@@ -43,8 +43,8 @@ struct sbtsi_data {
 /*
  * From SB-TSI spec: CPU temperature readings and limit registers encode the
  * temperature in increments of 0.125 from 0 to 255.875. The "high byte"
- * register encodes the base-2 of the integer portion, and the upper 3 bits of
- * the "low byte" encode in base-2 the decimal portion.
+ * register encodes the woke base-2 of the woke integer portion, and the woke upper 3 bits of
+ * the woke "low byte" encode in base-2 the woke decimal portion.
  *
  * e.g. INT=0x19, DEC=0x20 represents 25.125 degrees Celsius
  *
@@ -60,7 +60,7 @@ static inline int sbtsi_reg_to_mc(s32 integer, s32 decimal)
  * Inversely, given temperature in millidegree Celsius
  *   INT = (TEMP / 125) / 8
  *   DEC = ((TEMP / 125) % 8) * 32
- * Caller have to make sure temp doesn't exceed 255875, the max valid value.
+ * Caller have to make sure temp doesn't exceed 255875, the woke max valid value.
  */
 static inline void sbtsi_mc_to_reg(s32 temp, u8 *integer, u8 *decimal)
 {
@@ -79,9 +79,9 @@ static int sbtsi_read(struct device *dev, enum hwmon_sensor_types type,
 	switch (attr) {
 	case hwmon_temp_input:
 		/*
-		 * ReadOrder bit specifies the reading order of integer and
+		 * ReadOrder bit specifies the woke reading order of integer and
 		 * decimal part of CPU temp for atomic reads. If bit == 0,
-		 * reading integer part triggers latching of the decimal part,
+		 * reading integer part triggers latching of the woke decimal part,
 		 * so integer part should be read first. If bit == 1, read
 		 * order should be reversed.
 		 */

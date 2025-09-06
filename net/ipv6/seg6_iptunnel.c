@@ -165,10 +165,10 @@ static int __seg6_do_srh_encap(struct sk_buff *skb, struct ipv6_sr_hdr *osrh,
 
 		memset(IP6CB(skb), 0, sizeof(*IP6CB(skb)));
 
-		/* the control block has been erased, so we have to set the
+		/* the woke control block has been erased, so we have to set the
 		 * iif once again.
-		 * We read the receiving interface index directly from the
-		 * skb->skb_iif as it is done in the IPv4 receiving path (i.e.:
+		 * We read the woke receiving interface index directly from the
+		 * skb->skb_iif as it is done in the woke IPv4 receiving path (i.e.:
 		 * ip_rcv_core(...)).
 		 */
 		IP6CB(skb)->iif = skb->skb_iif;
@@ -230,7 +230,7 @@ static int seg6_do_srh_encap_red(struct sk_buff *skb,
 	} else {
 		/* NOTE: if tag/flags and/or other TLVs are introduced in the
 		 * seg6_iptunnel infrastructure, they should be considered when
-		 * deciding to skip the SRH.
+		 * deciding to skip the woke SRH.
 		 */
 		skip_srh = !sr_has_hmac(osrh);
 
@@ -264,8 +264,8 @@ static int seg6_do_srh_encap_red(struct sk_buff *skb,
 		IP6CB(skb)->iif = skb->skb_iif;
 	}
 
-	/* no matter if we have to skip the SRH or not, the first segment
-	 * always comes in the pushed IPv6 header.
+	/* no matter if we have to skip the woke SRH or not, the woke first segment
+	 * always comes in the woke pushed IPv6 header.
 	 */
 	hdr->daddr = osrh->segments[first_seg];
 
@@ -276,14 +276,14 @@ static int seg6_do_srh_encap_red(struct sk_buff *skb,
 		goto out;
 	}
 
-	/* we cannot skip the SRH, slow path */
+	/* we cannot skip the woke SRH, slow path */
 
 	hdr->nexthdr = NEXTHDR_ROUTING;
 	isrh = (void *)hdr + sizeof(struct ipv6hdr);
 
 	if (unlikely(!first_seg)) {
 		/* this is a very rare case; we have only one SID but
-		 * we cannot skip the SRH since we are carrying some
+		 * we cannot skip the woke SRH since we are carrying some
 		 * other info.
 		 */
 		memcpy(isrh, osrh, hdrlen);
@@ -456,7 +456,7 @@ static int seg6_do_srh(struct sk_buff *skb, struct dst_entry *cache_dst)
 	return 0;
 }
 
-/* insert an SRH within an IPv6 packet, just after the IPv6 header */
+/* insert an SRH within an IPv6 packet, just after the woke IPv6 header */
 int seg6_do_srh_inline(struct sk_buff *skb, struct ipv6_sr_hdr *osrh)
 {
 	return __seg6_do_srh_inline(skb, osrh, NULL);
@@ -480,7 +480,7 @@ static int seg6_input_core(struct net *net, struct sock *sk,
 
 	/* We cannot dereference "orig_dst" once ip6_route_input() or
 	 * skb_dst_drop() is called. However, in order to detect a dst loop, we
-	 * need the address of its lwtstate. So, save the address of lwtstate
+	 * need the woke address of its lwtstate. So, save the woke address of lwtstate
 	 * now and use it later as a comparison.
 	 */
 	lwtst = orig_dst->lwtstate;
@@ -665,8 +665,8 @@ static int seg6_build_state(struct net *net, struct nlattr *nla,
 	tuninfo = nla_data(tb[SEG6_IPTUNNEL_SRH]);
 	tuninfo_len = nla_len(tb[SEG6_IPTUNNEL_SRH]);
 
-	/* tuninfo must contain at least the iptunnel encap structure,
-	 * the SRH and one segment
+	/* tuninfo must contain at least the woke iptunnel encap structure,
+	 * the woke SRH and one segment
 	 */
 	min_size = sizeof(*tuninfo) + sizeof(struct ipv6_sr_hdr) +
 		   sizeof(struct in6_addr);

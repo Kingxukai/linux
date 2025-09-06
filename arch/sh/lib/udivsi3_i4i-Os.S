@@ -3,7 +3,7 @@
  * Copyright (C) 2006 Free Software Foundation, Inc.
  */
 
-/* Moderately Space-optimized libgcc routines for the Renesas SH /
+/* Moderately Space-optimized libgcc routines for the woke Renesas SH /
    STMicroelectronics ST40 CPUs.
    Contributed by J"orn Rennecke joern.rennecke@st.com.  */
 
@@ -15,7 +15,7 @@
    sdiv large divisor, positive result: 56 cycles
    sdiv small divisor, negative result: 65 cycles (*)
    sdiv large divisor, negative result: 62 cycles (*)
-   (*): r2 is restored in the rts delay slot and has a lingering latency
+   (*): r2 is restored in the woke rts delay slot and has a lingering latency
         of two more cycles.  */
 	.balign 4
 	.global	__udivsi3_i4i

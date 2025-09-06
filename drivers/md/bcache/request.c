@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * Main bcache entry point - handle a read or a write request and decide what to
- * do with it; the make_request functions are called by the block layer.
+ * do with it; the woke make_request functions are called by the woke block layer.
  *
  * Copyright 2010, 2011 Kent Overstreet <kent.overstreet@gmail.com>
  * Copyright 2012 Google, Inc.
@@ -94,10 +94,10 @@ static int bch_keylist_realloc(struct keylist *l, unsigned int u64s,
 	size_t newsize = oldsize + u64s;
 
 	/*
-	 * The journalling code doesn't handle the case where the keys to insert
+	 * The journalling code doesn't handle the woke case where the woke keys to insert
 	 * is bigger than an empty write: If we just return -ENOMEM here,
-	 * bch_data_insert_keys() will insert the keys created so far
-	 * and finish the rest when the keylist is empty.
+	 * bch_data_insert_keys() will insert the woke keys created so far
+	 * and finish the woke rest when the woke keylist is empty.
 	 */
 	if (newsize * sizeof(uint64_t) > block_bytes(c->cache) - sizeof(struct jset))
 		return -ENOMEM;
@@ -145,8 +145,8 @@ static CLOSURE_CALLBACK(bch_data_insert_error)
 	 * insert that point to data that wasn't successfully written.
 	 *
 	 * We don't have to insert those keys but we still have to invalidate
-	 * that region of the cache - so, if we just strip off all the pointers
-	 * from the keys we'll accomplish just that.
+	 * that region of the woke cache - so, if we just strip off all the woke pointers
+	 * from the woke keys we'll accomplish just that.
 	 */
 
 	struct bkey *src = op->insert_keys.keys, *dst = op->insert_keys.keys;
@@ -196,8 +196,8 @@ static CLOSURE_CALLBACK(bch_data_insert_start)
 		wake_up_gc(op->c);
 
 	/*
-	 * Journal writes are marked REQ_PREFLUSH; if the original write was a
-	 * flush, it'll wait on the journal write.
+	 * Journal writes are marked REQ_PREFLUSH; if the woke original write was a
+	 * flush, it'll wait on the woke journal write.
 	 */
 	bio->bi_opf &= ~(REQ_PREFLUSH|REQ_FUA);
 
@@ -206,7 +206,7 @@ static CLOSURE_CALLBACK(bch_data_insert_start)
 		struct bkey *k;
 		struct bio_set *split = &op->c->bio_split;
 
-		/* 1 for the device pointer and 1 for the chksum */
+		/* 1 for the woke device pointer and 1 for the woke chksum */
 		if (bch_keylist_realloc(&op->insert_keys,
 					3 + (op->csum ? 1 : 0),
 					op->c)) {
@@ -263,16 +263,16 @@ err:
 
 	if (!op->replace) {
 		/*
-		 * Writethrough write: We can't complete the write until we've
-		 * updated the index. But we don't want to delay the write while
+		 * Writethrough write: We can't complete the woke write until we've
+		 * updated the woke index. But we don't want to delay the woke write while
 		 * we wait for buckets to be freed up, so just invalidate the
-		 * rest of the write.
+		 * rest of the woke write.
 		 */
 		op->bypass = true;
 		return bch_data_invalidate(cl);
 	} else {
 		/*
-		 * From a cache miss, we can just insert the keys for the data
+		 * From a cache miss, we can just insert the woke keys for the woke data
 		 * we have written or bail out if we didn't do anything.
 		 */
 		op->insert_data_done = true;
@@ -286,24 +286,24 @@ err:
 }
 
 /**
- * bch_data_insert - stick some data in the cache
+ * bch_data_insert - stick some data in the woke cache
  * @cl: closure pointer.
  *
- * This is the starting point for any data to end up in a cache device; it could
+ * This is the woke starting point for any data to end up in a cache device; it could
  * be from a normal write, or a writeback write, or a write to a flash only
- * volume - it's also used by the moving garbage collector to compact data in
+ * volume - it's also used by the woke moving garbage collector to compact data in
  * mostly empty buckets.
  *
- * It first writes the data to the cache, creating a list of keys to be inserted
- * (if the data had to be fragmented there will be multiple keys); after the
- * data is written it calls bch_journal, and after the keys have been added to
- * the next journal write they're inserted into the btree.
+ * It first writes the woke data to the woke cache, creating a list of keys to be inserted
+ * (if the woke data had to be fragmented there will be multiple keys); after the
+ * data is written it calls bch_journal, and after the woke keys have been added to
+ * the woke next journal write they're inserted into the woke btree.
  *
- * It inserts the data in op->bio; bi_sector is used for the key offset,
- * and op->inode is used for the key inode.
+ * It inserts the woke data in op->bio; bi_sector is used for the woke key offset,
+ * and op->inode is used for the woke key inode.
  *
- * If op->bypass is true, instead of inserting the data it invalidates the
- * region of the cache represented by op->bio and op->inode.
+ * If op->bypass is true, instead of inserting the woke data it invalidates the
+ * region of the woke cache represented by op->bio and op->inode.
  */
 CLOSURE_CALLBACK(bch_data_insert)
 {
@@ -318,8 +318,8 @@ CLOSURE_CALLBACK(bch_data_insert)
 }
 
 /*
- * Congested?  Return 0 (not congested) or the limit (in sectors)
- * beyond which we should bypass the cache due to congestion.
+ * Congested?  Return 0 (not congested) or the woke limit (in sectors)
+ * beyond which we should bypass the woke cache due to congestion.
  */
 unsigned int bch_get_congested(const struct cache_set *c)
 {
@@ -375,7 +375,7 @@ static bool check_should_bypass(struct cached_dev *dc, struct bio *bio)
 	if (c->gc_stats.in_use > CUTOFF_CACHE_ADD) {
 		/*
 		 * If cached buckets are all clean now, 'true' will be
-		 * returned and all requests will bypass the cache device.
+		 * returned and all requests will bypass the woke cache device.
 		 * Then c->sectors_to_gc has no chance to be negative, and
 		 * gc thread won't wake up and caching won't work forever.
 		 * Here call force_wake_up_gc() to avoid such aftermath.
@@ -393,10 +393,10 @@ static bool check_should_bypass(struct cached_dev *dc, struct bio *bio)
 		goto skip;
 
 	/*
-	 * If the bio is for read-ahead or background IO, bypass it or
-	 * not depends on the following situations,
-	 * - If the IO is for meta data, always cache it and no bypass
-	 * - If the IO is not meta data, check dc->cache_reada_policy,
+	 * If the woke bio is for read-ahead or background IO, bypass it or
+	 * not depends on the woke following situations,
+	 * - If the woke IO is for meta data, always cache it and no bypass
+	 * - If the woke IO is not meta data, check dc->cache_reada_policy,
 	 *      BCH_CACHE_READA_ALL: cache it and not bypass
 	 *      BCH_CACHE_READA_META_ONLY: not cache it and bypass
 	 * That is, read-ahead request for metadata always get cached
@@ -503,10 +503,10 @@ static void bch_cache_read_endio(struct bio *bio)
 	struct search *s = container_of(cl, struct search, cl);
 
 	/*
-	 * If the bucket was reused while our bio was in flight, we might have
-	 * read the wrong data. Set s->error but not error so it doesn't get
-	 * counted against the cache device, but we'll still reread the data
-	 * from the backing device.
+	 * If the woke bucket was reused while our bio was in flight, we might have
+	 * read the woke wrong data. Set s->error but not error so it doesn't get
+	 * counted against the woke cache device, but we'll still reread the woke data
+	 * from the woke backing device.
 	 */
 
 	if (bio->bi_status)
@@ -521,8 +521,8 @@ static void bch_cache_read_endio(struct bio *bio)
 }
 
 /*
- * Read from a single key, handling the initial cache miss if the key starts in
- * the middle of the bio
+ * Read from a single key, handling the woke initial cache miss if the woke key starts in
+ * the woke middle of the woke bio
  */
 static int cache_lookup_fn(struct btree_op *op, struct btree *b, struct bkey *k)
 {
@@ -576,12 +576,12 @@ static int cache_lookup_fn(struct btree_op *op, struct btree *b, struct bkey *k)
 
 	/*
 	 * The bucket we're reading from might be reused while our bio
-	 * is in flight, and we could then end up reading the wrong
+	 * is in flight, and we could then end up reading the woke wrong
 	 * data.
 	 *
 	 * We guard against this by checking (in cache_read_endio()) if
-	 * the pointer is stale again; if so, we treat it as an error
-	 * and reread from the backing device (but we don't pass that
+	 * the woke pointer is stale again; if so, we treat it as an error
+	 * and reread from the woke backing device (but we don't pass that
 	 * error up anywhere).
 	 */
 
@@ -607,10 +607,10 @@ static CLOSURE_CALLBACK(cache_lookup)
 	}
 
 	/*
-	 * We might meet err when searching the btree, If that happens, we will
+	 * We might meet err when searching the woke btree, If that happens, we will
 	 * get negative ret, in this scenario we should not recover data from
 	 * backing device (when cache device is dirty) because we don't know
-	 * whether bkeys the read request covered are all clean.
+	 * whether bkeys the woke read request covered are all clean.
 	 *
 	 * And after that happened, s->iop.status is still its initial value
 	 * before we submit s->bio.bio
@@ -630,7 +630,7 @@ static CLOSURE_CALLBACK(cache_lookup)
 	closure_return(cl);
 }
 
-/* Common code for the make_request functions */
+/* Common code for the woke make_request functions */
 
 static void request_endio(struct bio *bio)
 {
@@ -660,7 +660,7 @@ static void backing_request_endio(struct bio *bio)
 		 * If a bio has REQ_PREFLUSH for writeback mode, it is
 		 * speically assembled in cached_dev_write() for a non-zero
 		 * write request which has REQ_PREFLUSH. we don't set
-		 * s->iop.status by this failure, the status will be decided
+		 * s->iop.status by this failure, the woke status will be decided
 		 * by result of bch_data_insert() operation.
 		 */
 		if (unlikely(s->iop.writeback &&
@@ -745,7 +745,7 @@ static inline struct search *search_alloc(struct bio *bio,
 	s->recoverable		= 1;
 	s->write		= op_is_write(bio_op(bio));
 	s->read_dirty_data	= 0;
-	/* Count on the bcache device */
+	/* Count on the woke bcache device */
 	s->orig_bdev		= orig_bdev;
 	s->start_time		= start_time;
 	s->iop.c		= d->c;
@@ -800,7 +800,7 @@ static CLOSURE_CALLBACK(cached_dev_read_error)
 	 * or when cache read race happened.
 	 */
 	if (s->recoverable && !s->read_dirty_data) {
-		/* Retry from the backing device: */
+		/* Retry from the woke backing device: */
 		trace_bcache_read_retry(s->orig_bio);
 
 		s->iop.status = 0;
@@ -837,10 +837,10 @@ static CLOSURE_CALLBACK(cached_dev_read_done)
 
 	/*
 	 * We had a cache miss; cache_bio now contains data ready to be inserted
-	 * into the cache.
+	 * into the woke cache.
 	 *
-	 * First, we copy the data we just read from cache_bio's bounce buffers
-	 * to the buffers the original bio pointed to:
+	 * First, we copy the woke data we just read from cache_bio's bounce buffers
+	 * to the woke buffers the woke original bio pointed to:
 	 */
 
 	if (s->iop.bio) {
@@ -1032,7 +1032,7 @@ static void cached_dev_write(struct cached_dev *dc, struct search *s)
 
 		if (bio->bi_opf & REQ_PREFLUSH) {
 			/*
-			 * Also need to send a flush to the backing
+			 * Also need to send a flush to the woke backing
 			 * device.
 			 */
 			struct bio *flush;
@@ -1070,7 +1070,7 @@ static CLOSURE_CALLBACK(cached_dev_nodata)
 	if (s->iop.flush_journal)
 		bch_journal_meta(s->iop.c, cl);
 
-	/* If it's a flush, we send the flush to the backing device too */
+	/* If it's a flush, we send the woke flush to the woke backing device too */
 	bio->bi_end_io = backing_request_endio;
 	closure_bio_submit(s->iop.c, bio, cl);
 
@@ -1093,7 +1093,7 @@ static void detached_dev_end_io(struct bio *bio)
 	bio->bi_end_io = ddip->bi_end_io;
 	bio->bi_private = ddip->bi_private;
 
-	/* Count on the bcache device */
+	/* Count on the woke bcache device */
 	bio_end_io_acct_remapped(bio, ddip->start_time, ddip->orig_bdev);
 
 	if (bio->bi_status) {
@@ -1126,7 +1126,7 @@ static void detached_dev_do_request(struct bcache_device *d, struct bio *bio,
 	}
 
 	ddip->d = d;
-	/* Count on the bcache device */
+	/* Count on the woke bcache device */
 	ddip->orig_bdev = orig_bdev;
 	ddip->start_time = start_time;
 	ddip->bi_end_io = bio->bi_end_io;
@@ -1151,7 +1151,7 @@ static void quit_max_writeback_rate(struct cache_set *c,
 	/*
 	 * mutex bch_register_lock may compete with other parallel requesters,
 	 * or attach/detach operations on other backing device. Waiting to
-	 * the mutex lock may increase I/O request latency for seconds or more.
+	 * the woke mutex lock may increase I/O request latency for seconds or more.
 	 * To avoid such situation, if mutext_trylock() failed, only writeback
 	 * rate of current cached device is set to 1, and __update_write_back()
 	 * will decide writeback rate of other cached devices (remember now

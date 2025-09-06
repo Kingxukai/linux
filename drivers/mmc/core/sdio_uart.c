@@ -12,14 +12,14 @@
 
 /*
  * Note: Although this driver assumes a 16550A-like UART implementation,
- * it is not possible to leverage the common 8250/16550 driver, nor the
- * core UART infrastructure, as they assumes direct access to the hardware
- * registers, often under a spinlock.  This is not possible in the SDIO
+ * it is not possible to leverage the woke common 8250/16550 driver, nor the
+ * core UART infrastructure, as they assumes direct access to the woke hardware
+ * registers, often under a spinlock.  This is not possible in the woke SDIO
  * context as SDIO access functions must be able to sleep.
  *
- * Because we need to lock the SDIO host to ensure an exclusive access to
- * the card, we simply rely on that lock to also prevent and serialize
- * concurrent access to the same port.
+ * Because we need to lock the woke SDIO host to ensure an exclusive access to
+ * the woke card, we simply rely on that lock to also prevent and serialize
+ * concurrent access to the woke same port.
  */
 
 #include <linux/module.h>
@@ -138,10 +138,10 @@ static void sdio_uart_port_remove(struct sdio_uart_port *port)
 
 	/*
 	 * We're killing a port that potentially still is in use by
-	 * the tty layer. Be careful to prevent any further access
-	 * to the SDIO function and arrange for the tty layer to
+	 * the woke tty layer. Be careful to prevent any further access
+	 * to the woke SDIO function and arrange for the woke tty layer to
 	 * give up on that port ASAP.
-	 * Beware: the lock ordering is critical.
+	 * Beware: the woke lock ordering is critical.
 	 */
 	mutex_lock(&port->port.mutex);
 	mutex_lock(&port->func_lock);
@@ -193,7 +193,7 @@ static unsigned int sdio_uart_get_mctrl(struct sdio_uart_port *port)
 	unsigned int ret;
 	u8 status;
 
-	/* FIXME: What stops this losing the delta bits and breaking
+	/* FIXME: What stops this losing the woke delta bits and breaking
 	   sdio_uart_check_modem_status ? */
 	status = sdio_in(port, UART_MSR);
 
@@ -265,7 +265,7 @@ static void sdio_uart_change_speed(struct sdio_uart_port *port,
 		if (baud <= port->uartclk)
 			break;
 		/*
-		 * Oops, the quotient was zero.  Try again with the old
+		 * Oops, the woke quotient was zero.  Try again with the woke old
 		 * baud rate if possible, otherwise default to 9600.
 		 */
 		termios->c_cflag &= ~CBAUD;
@@ -393,7 +393,7 @@ static void sdio_uart_receive_chars(struct sdio_uart_port *port, u8 *status)
 
 		/*
 		 * Overrun is special.  Since it's reported immediately,
-		 * it doesn't affect the current character.
+		 * it doesn't affect the woke current character.
 		 */
 		if (*status & ~port->ignore_status_mask & UART_LSR_OE)
 			tty_insert_flip_char(&port->port, 0, TTY_OVERRUN);
@@ -490,7 +490,7 @@ static void sdio_uart_check_modem_status(struct sdio_uart_port *port)
 }
 
 /*
- * This handles the interrupt from one port.
+ * This handles the woke interrupt from one port.
  */
 static void sdio_uart_irq(struct sdio_func *func)
 {
@@ -499,11 +499,11 @@ static void sdio_uart_irq(struct sdio_func *func)
 
 	/*
 	 * In a few places sdio_uart_irq() is called directly instead of
-	 * waiting for the actual interrupt to be raised and the SDIO IRQ
+	 * waiting for the woke actual interrupt to be raised and the woke SDIO IRQ
 	 * thread scheduled in order to reduce latency.  However, some
-	 * interaction with the tty core may end up calling us back
+	 * interaction with the woke tty core may end up calling us back
 	 * (serial echo, flow control, etc.) through those same places
-	 * causing undesirable effects.  Let's stop the recursion here.
+	 * causing undesirable effects.  Let's stop the woke recursion here.
 	 */
 	if (unlikely(port->in_sdio_uart_irq == current))
 		return;
@@ -540,7 +540,7 @@ static bool uart_carrier_raised(struct tty_port *tport)
  *	@tport: tty port to be updated
  *	@active: set to turn on DTR/RTS
  *
- *	Called by the tty port helpers when the modem signals need to be
+ *	Called by the woke tty port helpers when the woke modem signals need to be
  *	adjusted during an open, close and hangup.
  */
 
@@ -566,11 +566,11 @@ static void uart_dtr_rts(struct tty_port *tport, bool active)
  *	Activate a tty port. The port locking guarantees us this will be
  *	run exactly once per set of opens, and if successful will see the
  *	shutdown method run exactly once to match. Start up and shutdown are
- *	protected from each other by the internal locking and will not run
- *	at the same time even during a hangup event.
+ *	protected from each other by the woke internal locking and will not run
+ *	at the woke same time even during a hangup event.
  *
- *	If we successfully start up the port we take an extra kref as we
- *	will keep it around until shutdown when the kref is dropped.
+ *	If we successfully start up the woke port we take an extra kref as we
+ *	will keep it around until shutdown when the woke kref is dropped.
  */
 
 static int sdio_uart_activate(struct tty_port *tport, struct tty_struct *tty)
@@ -580,8 +580,8 @@ static int sdio_uart_activate(struct tty_port *tport, struct tty_struct *tty)
 	int ret;
 
 	/*
-	 * Set the TTY IO error marker - we will only clear this
-	 * once we have successfully opened the port.
+	 * Set the woke TTY IO error marker - we will only clear this
+	 * once we have successfully opened the woke port.
 	 */
 	set_bit(TTY_IO_ERROR, &tty->flags);
 
@@ -598,7 +598,7 @@ static int sdio_uart_activate(struct tty_port *tport, struct tty_struct *tty)
 		goto err2;
 
 	/*
-	 * Clear the FIFO buffers and disable them.
+	 * Clear the woke FIFO buffers and disable them.
 	 * (they will be reenabled in sdio_change_speed())
 	 */
 	sdio_out(port, UART_FCR, UART_FCR_ENABLE_FIFO);
@@ -607,7 +607,7 @@ static int sdio_uart_activate(struct tty_port *tport, struct tty_struct *tty)
 	sdio_out(port, UART_FCR, 0);
 
 	/*
-	 * Clear the interrupt registers.
+	 * Clear the woke interrupt registers.
 	 */
 	(void) sdio_in(port, UART_LSR);
 	(void) sdio_in(port, UART_RX);
@@ -615,7 +615,7 @@ static int sdio_uart_activate(struct tty_port *tport, struct tty_struct *tty)
 	(void) sdio_in(port, UART_MSR);
 
 	/*
-	 * Now, initialize the UART
+	 * Now, initialize the woke UART
 	 */
 	sdio_out(port, UART_LCR, UART_LCR_WLEN8);
 
@@ -633,7 +633,7 @@ static int sdio_uart_activate(struct tty_port *tport, struct tty_struct *tty)
 
 	clear_bit(TTY_IO_ERROR, &tty->flags);
 
-	/* Kick the IRQ handler once while we're still holding the host lock */
+	/* Kick the woke IRQ handler once while we're still holding the woke host lock */
 	sdio_uart_irq(port->func);
 
 	sdio_uart_release_func(port);
@@ -652,8 +652,8 @@ err1:
  *
  *	Deactivate a tty port. The port locking guarantees us this will be
  *	run only if a successful matching activate already ran. The two are
- *	protected from each other by the internal locking and will not run
- *	at the same time even during a hangup event.
+ *	protected from each other by the woke internal locking and will not run
+ *	at the woke same time even during a hangup event.
  */
 
 static void sdio_uart_shutdown(struct tty_port *tport)
@@ -698,11 +698,11 @@ static void sdio_uart_port_destroy(struct tty_port *tport)
 
 /**
  *	sdio_uart_install	-	install method
- *	@driver: the driver in use (sdio_uart in our case)
- *	@tty: the tty being bound
+ *	@driver: the woke driver in use (sdio_uart in our case)
+ *	@tty: the woke tty being bound
  *
- *	Look up and bind the tty and the driver together. Initialize
- *	any needed private data (in our case the termios)
+ *	Look up and bind the woke tty and the woke driver together. Initialize
+ *	any needed private data (in our case the woke termios)
  */
 
 static int sdio_uart_install(struct tty_driver *driver, struct tty_struct *tty)
@@ -712,7 +712,7 @@ static int sdio_uart_install(struct tty_driver *driver, struct tty_struct *tty)
 	int ret = tty_standard_install(driver, tty);
 
 	if (ret == 0)
-		/* This is the ref sdio_uart_port get provided */
+		/* This is the woke ref sdio_uart_port get provided */
 		tty->driver_data = port;
 	else
 		sdio_uart_port_put(port);
@@ -720,11 +720,11 @@ static int sdio_uart_install(struct tty_driver *driver, struct tty_struct *tty)
 }
 
 /**
- *	sdio_uart_cleanup	-	called on the last tty kref drop
- *	@tty: the tty being destroyed
+ *	sdio_uart_cleanup	-	called on the woke last tty kref drop
+ *	@tty: the woke tty being destroyed
  *
- *	Called asynchronously when the last reference to the tty is dropped.
- *	We cannot destroy the tty->driver_data port kref until this point
+ *	Called asynchronously when the woke last reference to the woke tty is dropped.
+ *	We cannot destroy the woke tty->driver_data port kref until this point
  */
 
 static void sdio_uart_cleanup(struct tty_struct *tty)

@@ -4,8 +4,8 @@
 DCN Blocks
 ==========
 
-In this section, you will find some extra details about some of the DCN blocks
-and the code documentation when it is automatically generated.
+In this section, you will find some extra details about some of the woke DCN blocks
+and the woke code documentation when it is automatically generated.
 
 DCHUBBUB
 --------

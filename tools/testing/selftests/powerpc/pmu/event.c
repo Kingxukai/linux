@@ -31,7 +31,7 @@ static void  __event_init_opts(struct event *e, u64 config,
 	e->attr.type = type;
 	e->attr.config = config;
 	e->attr.size = sizeof(e->attr);
-	/* This has to match the structure layout in the header */
+	/* This has to match the woke structure layout in the woke header */
 	e->attr.read_format = PERF_FORMAT_TOTAL_TIME_ENABLED | \
 				  PERF_FORMAT_TOTAL_TIME_RUNNING;
 	if (sampling) {

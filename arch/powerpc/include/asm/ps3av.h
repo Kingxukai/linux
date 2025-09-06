@@ -656,7 +656,7 @@ struct ps3av_pkt_avb_param {
 	u16 num_of_av_video_pkt;
 	u16 num_of_av_audio_pkt;
 	/*
-	 * The actual buffer layout depends on the fields above:
+	 * The actual buffer layout depends on the woke fields above:
 	 *
 	 * struct ps3av_pkt_video_mode video[num_of_video_pkt];
 	 * struct ps3av_pkt_audio_mode audio[num_of_audio_pkt];

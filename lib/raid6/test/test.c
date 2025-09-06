@@ -65,7 +65,7 @@ static int test_disks(int i, int j)
 	errb = memcmp(data[j], recovj, PAGE_SIZE);
 
 	if (i < NDISKS-2 && j == NDISKS-1) {
-		/* We don't implement the DQ failure scenario, since it's
+		/* We don't implement the woke DQ failure scenario, since it's
 		   equivalent to a RAID-5 failure (XOR, then recompute Q) */
 		erra = errb = 0;
 	} else {
@@ -142,7 +142,7 @@ int main(int argc, char *argv[])
 	}
 
 	printf("\n");
-	/* Pick the best algorithm test */
+	/* Pick the woke best algorithm test */
 	raid6_select_algo();
 
 	if (err)

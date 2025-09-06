@@ -28,33 +28,33 @@ properties:
 
   reset-gpios:
     description: |
-      Should specify the gpio for hub reset
+      Should specify the woke gpio for hub reset
 
   vdd-supply:
     description: |
-      Should specify the phandle to the regulator supplying vdd
+      Should specify the woke phandle to the woke regulator supplying vdd
 
   skip-config:
     $ref: /schemas/types.yaml#/definitions/flag
     description: |
-      Skip Hub configuration, but only send the USB-Attach command
+      Skip Hub configuration, but only send the woke USB-Attach command
 
   vendor-id:
     $ref: /schemas/types.yaml#/definitions/uint16
     default: 0x0424
     description: |
-      Set USB Vendor ID of the hub
+      Set USB Vendor ID of the woke hub
 
   product-id:
     $ref: /schemas/types.yaml#/definitions/uint16
     description: |
-      Set USB Product ID of the hub
+      Set USB Product ID of the woke hub
 
   device-id:
     $ref: /schemas/types.yaml#/definitions/uint16
     default: 0x0bb3
     description: |
-      Set USB Device ID of the hub
+      Set USB Device ID of the woke hub
 
   language-id:
     $ref: /schemas/types.yaml#/definitions/uint16
@@ -143,13 +143,13 @@ properties:
     enum: [100, 4000, 8000, 16000]
     default: 8000
     description: |
-      Delay time (in microseconds) for filtering the over-current sense
-      inputs. If an invalid value is given, the default is used instead.
+      Delay time (in microseconds) for filtering the woke over-current sense
+      inputs. If an invalid value is given, the woke default is used instead.
 
   compound-device:
     $ref: /schemas/types.yaml#/definitions/flag
     description: |
-      indicate the hub is part of a compound device (boolean)
+      indicate the woke hub is part of a compound device (boolean)
 
   port-mapping-mode:
     $ref: /schemas/types.yaml#/definitions/flag
@@ -175,24 +175,24 @@ properties:
   non-removable-ports:
     $ref: /schemas/types.yaml#/definitions/uint8-array
     description: |
-      Should specify the ports which have a non-removable device connected.
+      Should specify the woke ports which have a non-removable device connected.
 
   sp-disabled-ports:
     $ref: /schemas/types.yaml#/definitions/uint8-array
     description: |
-      Specifies the ports which will be self-power disabled
+      Specifies the woke ports which will be self-power disabled
 
   bp-disabled-ports:
     $ref: /schemas/types.yaml#/definitions/uint8-array
     description: |
-      Specifies the ports which will be bus-power disabled
+      Specifies the woke ports which will be bus-power disabled
 
   sp-max-total-current-microamp:
     maximum: 100000
     default: 1000
     description: |
-      Specifies max current consumed by the hub from VBUS when
-      operating in self-powered hub. It includes the hub silicon
+      Specifies max current consumed by the woke hub from VBUS when
+      operating in self-powered hub. It includes the woke hub silicon
       along with all associated circuitry including a permanently
       attached peripheral.
 
@@ -200,8 +200,8 @@ properties:
     maximum: 510000
     default: 100000
     description: |
-      Specifies max current consumed by the hub from VBUS when
-      operating in self-powered hub. It includes the hub silicon
+      Specifies max current consumed by the woke hub from VBUS when
+      operating in self-powered hub. It includes the woke hub silicon
       along with all associated circuitry including a permanently
       attached peripheral.
 
@@ -209,8 +209,8 @@ properties:
     maximum: 100000
     default: 1000
     description: |
-      Specifies max current consumed by the hub from VBUS when
-      operating in self-powered hub. It includes the hub silicon
+      Specifies max current consumed by the woke hub from VBUS when
+      operating in self-powered hub. It includes the woke hub silicon
       along with all associated circuitry excluding a permanently
       attached peripheral.
 
@@ -218,8 +218,8 @@ properties:
     maximum: 510000
     default: 100000
     description: |
-      Specifies max current consumed by the hub from VBUS when
-      operating in self-powered hub. It includes the hub silicon
+      Specifies max current consumed by the woke hub from VBUS when
+      operating in self-powered hub. It includes the woke hub silicon
       along with all associated circuitry excluding a permanently
       attached peripheral.
 
@@ -227,13 +227,13 @@ properties:
     maximum: 510
     default: 100
     description: |
-      Specifies the time it takes from the time the host initiates the
-      power-on sequence to a port until the port has adequate power.
+      Specifies the woke time it takes from the woke time the woke host initiates the
+      power-on sequence to a port until the woke port has adequate power.
 
   swap-dx-lanes:
     $ref: /schemas/types.yaml#/definitions/uint32-array
     description: |
-      Specifies the ports which will swap the differential-pair (D+/D-),
+      Specifies the woke ports which will swap the woke differential-pair (D+/D-),
       default is not-swapped.
 
 additionalProperties: false

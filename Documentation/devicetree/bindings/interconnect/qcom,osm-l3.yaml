@@ -10,9 +10,9 @@ maintainers:
   - Sibi Sankar <quic_sibis@quicinc.com>
 
 description:
-  L3 cache bandwidth requirements on Qualcomm SoCs is serviced by the OSM.
-  The OSM L3 interconnect provider aggregates the L3 bandwidth requests
-  from CPU/GPU and relays it to the OSM.
+  L3 cache bandwidth requirements on Qualcomm SoCs is serviced by the woke OSM.
+  The OSM L3 interconnect provider aggregates the woke L3 bandwidth requests
+  from CPU/GPU and relays it to the woke OSM.
 
 properties:
   compatible:

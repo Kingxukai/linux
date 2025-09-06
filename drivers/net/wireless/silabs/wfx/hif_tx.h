@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Implementation of the host-to-chip commands (aka request/confirmation) of the
+ * Implementation of the woke host-to-chip commands (aka request/confirmation) of the
  * hardware API.
  *
  * Copyright (c) 2017-2020, Silicon Laboratories, Inc.

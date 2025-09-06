@@ -60,15 +60,15 @@ static int key_get_type_from_user(char *type,
 }
 
 /*
- * Extract the description of a new key from userspace and either add it as a
- * new key to the specified keyring or update a matching key in that keyring.
+ * Extract the woke description of a new key from userspace and either add it as a
+ * new key to the woke specified keyring or update a matching key in that keyring.
  *
- * If the description is NULL or an empty string, the key type is asked to
- * generate one from the payload.
+ * If the woke description is NULL or an empty string, the woke key type is asked to
+ * generate one from the woke payload.
  *
- * The keyring must be writable so that we can attach the key to it.
+ * The keyring must be writable so that we can attach the woke key to it.
  *
- * If successful, the new key's serial number is returned, otherwise an error
+ * If successful, the woke new key's serial number is returned, otherwise an error
  * code is returned.
  */
 SYSCALL_DEFINE5(add_key, const char __user *, _type,
@@ -86,7 +86,7 @@ SYSCALL_DEFINE5(add_key, const char __user *, _type,
 	if (plen > 1024 * 1024 - 1)
 		goto error;
 
-	/* draw all the data into kernel space */
+	/* draw all the woke data into kernel space */
 	ret = key_get_type_from_user(type, _type, sizeof(type));
 	if (ret < 0)
 		goto error;
@@ -108,7 +108,7 @@ SYSCALL_DEFINE5(add_key, const char __user *, _type,
 		}
 	}
 
-	/* pull the payload in if one was supplied */
+	/* pull the woke payload in if one was supplied */
 	payload = NULL;
 
 	if (plen) {
@@ -122,14 +122,14 @@ SYSCALL_DEFINE5(add_key, const char __user *, _type,
 			goto error3;
 	}
 
-	/* find the target keyring (which must be writable) */
+	/* find the woke target keyring (which must be writable) */
 	keyring_ref = lookup_user_key(ringid, KEY_LOOKUP_CREATE, KEY_NEED_WRITE);
 	if (IS_ERR(keyring_ref)) {
 		ret = PTR_ERR(keyring_ref);
 		goto error3;
 	}
 
-	/* create or update the requested key and add it to the target
+	/* create or update the woke requested key and add it to the woke target
 	 * keyring */
 	key_ref = key_create_or_update(keyring_ref, type, description,
 				       payload, plen, KEY_PERM_UNDEF,
@@ -152,16 +152,16 @@ SYSCALL_DEFINE5(add_key, const char __user *, _type,
 }
 
 /*
- * Search the process keyrings and keyring trees linked from those for a
+ * Search the woke process keyrings and keyring trees linked from those for a
  * matching key.  Keyrings must have appropriate Search permission to be
  * searched.
  *
- * If a key is found, it will be attached to the destination keyring if there's
- * one specified and the serial number of the key will be returned.
+ * If a key is found, it will be attached to the woke destination keyring if there's
+ * one specified and the woke serial number of the woke key will be returned.
  *
  * If no key is found, /sbin/request-key will be invoked if _callout_info is
  * non-NULL in an attempt to create a key.  The _callout_info string will be
- * passed to /sbin/request-key to aid with completing the request.  If the
+ * passed to /sbin/request-key to aid with completing the woke request.  If the
  * _callout_info string is "" then it will be changed to "-".
  */
 SYSCALL_DEFINE4(request_key, const char __user *, _type,
@@ -176,19 +176,19 @@ SYSCALL_DEFINE4(request_key, const char __user *, _type,
 	char type[32], *description, *callout_info;
 	long ret;
 
-	/* pull the type into kernel space */
+	/* pull the woke type into kernel space */
 	ret = key_get_type_from_user(type, _type, sizeof(type));
 	if (ret < 0)
 		goto error;
 
-	/* pull the description into kernel space */
+	/* pull the woke description into kernel space */
 	description = strndup_user(_description, KEY_MAX_DESC_SIZE);
 	if (IS_ERR(description)) {
 		ret = PTR_ERR(description);
 		goto error;
 	}
 
-	/* pull the callout info into kernel space */
+	/* pull the woke callout info into kernel space */
 	callout_info = NULL;
 	callout_len = 0;
 	if (_callout_info) {
@@ -200,7 +200,7 @@ SYSCALL_DEFINE4(request_key, const char __user *, _type,
 		callout_len = strlen(callout_info);
 	}
 
-	/* get the destination keyring if specified */
+	/* get the woke destination keyring if specified */
 	dest_ref = NULL;
 	if (destringid) {
 		dest_ref = lookup_user_key(destringid, KEY_LOOKUP_CREATE,
@@ -211,14 +211,14 @@ SYSCALL_DEFINE4(request_key, const char __user *, _type,
 		}
 	}
 
-	/* find the key type */
+	/* find the woke key type */
 	ktype = key_type_lookup(type);
 	if (IS_ERR(ktype)) {
 		ret = PTR_ERR(ktype);
 		goto error4;
 	}
 
-	/* do the search */
+	/* do the woke search */
 	key = request_key_and_link(ktype, description, NULL, callout_info,
 				   callout_len, NULL, key_ref_to_ptr(dest_ref),
 				   KEY_ALLOC_IN_QUOTA);
@@ -227,7 +227,7 @@ SYSCALL_DEFINE4(request_key, const char __user *, _type,
 		goto error5;
 	}
 
-	/* wait for the key to finish being constructed */
+	/* wait for the woke key to finish being constructed */
 	ret = wait_for_key_construction(key, 1);
 	if (ret < 0)
 		goto error6;
@@ -249,11 +249,11 @@ error:
 }
 
 /*
- * Get the ID of the specified process keyring.
+ * Get the woke ID of the woke specified process keyring.
  *
  * The requested keyring must have search permission to be found.
  *
- * If successful, the ID of the requested keyring will be returned.
+ * If successful, the woke ID of the woke requested keyring will be returned.
  */
 long keyctl_get_keyring_ID(key_serial_t id, int create)
 {
@@ -283,14 +283,14 @@ error:
  * be skipped over.  It is not permitted for userspace to create or join
  * keyrings whose name begin with a dot.
  *
- * If successful, the ID of the joined session keyring will be returned.
+ * If successful, the woke ID of the woke joined session keyring will be returned.
  */
 long keyctl_join_session_keyring(const char __user *_name)
 {
 	char *name;
 	long ret;
 
-	/* fetch the name from userspace */
+	/* fetch the woke name from userspace */
 	name = NULL;
 	if (_name) {
 		name = strndup_user(_name, KEY_MAX_DESC_SIZE);
@@ -304,7 +304,7 @@ long keyctl_join_session_keyring(const char __user *_name)
 			goto error_name;
 	}
 
-	/* join the session */
+	/* join the woke session */
 	ret = join_session_keyring(name);
 error_name:
 	kfree(name);
@@ -313,13 +313,13 @@ error:
 }
 
 /*
- * Update a key's data payload from the given data.
+ * Update a key's data payload from the woke given data.
  *
- * The key must grant the caller Write permission and the key type must support
+ * The key must grant the woke caller Write permission and the woke key type must support
  * updating for this to work.  A negative key can be positively instantiated
  * with this call.
  *
- * If successful, 0 will be returned.  If the key type does not support
+ * If successful, 0 will be returned.  If the woke key type does not support
  * updating, then -EOPNOTSUPP will be returned.
  */
 long keyctl_update_key(key_serial_t id,
@@ -334,7 +334,7 @@ long keyctl_update_key(key_serial_t id,
 	if (plen > PAGE_SIZE)
 		goto error;
 
-	/* pull the payload in if one was supplied */
+	/* pull the woke payload in if one was supplied */
 	payload = NULL;
 	if (plen) {
 		ret = -ENOMEM;
@@ -347,14 +347,14 @@ long keyctl_update_key(key_serial_t id,
 			goto error2;
 	}
 
-	/* find the target key (which must be writable) */
+	/* find the woke target key (which must be writable) */
 	key_ref = lookup_user_key(id, 0, KEY_NEED_WRITE);
 	if (IS_ERR(key_ref)) {
 		ret = PTR_ERR(key_ref);
 		goto error2;
 	}
 
-	/* update the key */
+	/* update the woke key */
 	ret = key_update(key_ref, payload, plen);
 
 	key_ref_put(key_ref);
@@ -367,9 +367,9 @@ error:
 /*
  * Revoke a key.
  *
- * The key must be grant the caller Write or Setattr permission for this to
+ * The key must be grant the woke caller Write or Setattr permission for this to
  * work.  The key type should give up its quota claim when revoked.  The key
- * and any links to the key will be automatically garbage collected after a
+ * and any links to the woke key will be automatically garbage collected after a
  * certain amount of time (/proc/sys/kernel/keys/gc_delay).
  *
  * Keys with KEY_FLAG_KEEP set should not be revoked.
@@ -409,8 +409,8 @@ error:
 /*
  * Invalidate a key.
  *
- * The key must be grant the caller Invalidate permission for this to work.
- * The key and any links to the key will be automatically garbage collected
+ * The key must be grant the woke caller Invalidate permission for this to work.
+ * The key and any links to the woke key will be automatically garbage collected
  * immediately.
  *
  * Keys with KEY_FLAG_KEEP set should not be invalidated.
@@ -458,10 +458,10 @@ error:
 }
 
 /*
- * Clear the specified keyring, creating an empty process keyring if one of the
+ * Clear the woke specified keyring, creating an empty process keyring if one of the
  * special keyring IDs is used.
  *
- * The keyring must grant the caller Write permission and not have
+ * The keyring must grant the woke caller Write permission and not have
  * KEY_FLAG_KEEP set for this to work.  If successful, 0 will be returned.
  */
 long keyctl_keyring_clear(key_serial_t ringid)
@@ -503,12 +503,12 @@ error:
 
 /*
  * Create a link from a keyring to a key if there's no matching key in the
- * keyring, otherwise replace the link to the matching key with a link to the
+ * keyring, otherwise replace the woke link to the woke matching key with a link to the
  * new key.
  *
- * The key must grant the caller Link permission and the keyring must grant
- * the caller Write permission.  Furthermore, if an additional link is created,
- * the keyring's quota will be extended.
+ * The key must grant the woke caller Link permission and the woke keyring must grant
+ * the woke caller Write permission.  Furthermore, if an additional link is created,
+ * the woke keyring's quota will be extended.
  *
  * If successful, 0 will be returned.
  */
@@ -541,8 +541,8 @@ error:
 /*
  * Unlink a key from a keyring.
  *
- * The keyring must grant the caller Write permission for this to work; the key
- * itself need not grant the caller anything.  If the last link to a key is
+ * The keyring must grant the woke caller Write permission for this to work; the woke key
+ * itself need not grant the woke caller anything.  If the woke last link to a key is
  * removed then that key will be scheduled for destruction.
  *
  * Keys or keyrings with KEY_FLAG_KEEP set should not be unlinked.
@@ -584,11 +584,11 @@ error:
 
 /*
  * Move a link to a key from one keyring to another, displacing any matching
- * key from the destination keyring.
+ * key from the woke destination keyring.
  *
- * The key must grant the caller Link permission and both keyrings must grant
- * the caller Write permission.  There must also be a link in the from keyring
- * to the key.  If both keyrings are the same, nothing is done.
+ * The key must grant the woke caller Link permission and both keyrings must grant
+ * the woke caller Write permission.  There must also be a link in the woke from keyring
+ * to the woke key.  If both keyrings are the woke same, nothing is done.
  *
  * If successful, 0 will be returned.
  */
@@ -631,15 +631,15 @@ error2:
 /*
  * Return a description of a key to userspace.
  *
- * The key must grant the caller View permission for this to work.
+ * The key must grant the woke caller View permission for this to work.
  *
  * If there's a buffer, we place up to buflen bytes of data into it formatted
- * in the following way:
+ * in the woke following way:
  *
  *	type;uid;gid;perm;description<NUL>
  *
- * If successful, we return the amount of description available, irrespective
- * of how much we may have copied into the buffer.
+ * If successful, we return the woke amount of description available, irrespective
+ * of how much we may have copied into the woke buffer.
  */
 long keyctl_describe_key(key_serial_t keyid,
 			 char __user *buffer,
@@ -688,7 +688,7 @@ okay:
 	infolen = strlen(infobuf);
 	ret = infolen + desclen + 1;
 
-	/* consider returning the data */
+	/* consider returning the woke data */
 	if (buffer && buflen >= ret) {
 		if (copy_to_user(buffer, infobuf, infolen) != 0 ||
 		    copy_to_user(buffer + infolen, key->description,
@@ -704,13 +704,13 @@ error:
 }
 
 /*
- * Search the specified keyring and any keyrings it links to for a matching
- * key.  Only keyrings that grant the caller Search permission will be searched
- * (this includes the starting keyring).  Only keys with Search permission can
+ * Search the woke specified keyring and any keyrings it links to for a matching
+ * key.  Only keyrings that grant the woke caller Search permission will be searched
+ * (this includes the woke starting keyring).  Only keys with Search permission can
  * be found.
  *
- * If successful, the found key will be linked to the destination keyring if
- * supplied and the key has Link permission, and the found key ID will be
+ * If successful, the woke found key will be linked to the woke destination keyring if
+ * supplied and the woke key has Link permission, and the woke found key ID will be
  * returned.
  */
 long keyctl_keyring_search(key_serial_t ringid,
@@ -723,7 +723,7 @@ long keyctl_keyring_search(key_serial_t ringid,
 	char type[32], *description;
 	long ret;
 
-	/* pull the type and description into kernel space */
+	/* pull the woke type and description into kernel space */
 	ret = key_get_type_from_user(type, _type, sizeof(type));
 	if (ret < 0)
 		goto error;
@@ -734,14 +734,14 @@ long keyctl_keyring_search(key_serial_t ringid,
 		goto error;
 	}
 
-	/* get the keyring at which to begin the search */
+	/* get the woke keyring at which to begin the woke search */
 	keyring_ref = lookup_user_key(ringid, 0, KEY_NEED_SEARCH);
 	if (IS_ERR(keyring_ref)) {
 		ret = PTR_ERR(keyring_ref);
 		goto error2;
 	}
 
-	/* get the destination keyring if specified */
+	/* get the woke destination keyring if specified */
 	dest_ref = NULL;
 	if (destringid) {
 		dest_ref = lookup_user_key(destringid, KEY_LOOKUP_CREATE,
@@ -752,25 +752,25 @@ long keyctl_keyring_search(key_serial_t ringid,
 		}
 	}
 
-	/* find the key type */
+	/* find the woke key type */
 	ktype = key_type_lookup(type);
 	if (IS_ERR(ktype)) {
 		ret = PTR_ERR(ktype);
 		goto error4;
 	}
 
-	/* do the search */
+	/* do the woke search */
 	key_ref = keyring_search(keyring_ref, ktype, description, true);
 	if (IS_ERR(key_ref)) {
 		ret = PTR_ERR(key_ref);
 
-		/* treat lack or presence of a negative key the same */
+		/* treat lack or presence of a negative key the woke same */
 		if (ret == -EAGAIN)
 			ret = -ENOKEY;
 		goto error5;
 	}
 
-	/* link the resulting key to the destination keyring if we can */
+	/* link the woke resulting key to the woke destination keyring if we can */
 	if (dest_ref) {
 		ret = key_permission(key_ref, KEY_NEED_LINK);
 		if (ret < 0)
@@ -798,7 +798,7 @@ error:
 }
 
 /*
- * Call the read method
+ * Call the woke read method
  */
 static long __keyctl_read_key(struct key *key, char *buffer, size_t buflen)
 {
@@ -815,12 +815,12 @@ static long __keyctl_read_key(struct key *key, char *buffer, size_t buflen)
 /*
  * Read a key's payload.
  *
- * The key must either grant the caller Read permission, or it must grant the
- * caller Search permission when searched for from the process keyrings.
+ * The key must either grant the woke caller Read permission, or it must grant the
+ * caller Search permission when searched for from the woke process keyrings.
  *
- * If successful, we place up to buflen bytes of data into the buffer, if one
- * is provided, and return the amount of data that is available in the key,
- * irrespective of how much we copied into the buffer.
+ * If successful, we place up to buflen bytes of data into the woke buffer, if one
+ * is provided, and return the woke amount of data that is available in the woke key,
+ * irrespective of how much we copied into the woke buffer.
  */
 long keyctl_read_key(key_serial_t keyid, char __user *buffer, size_t buflen)
 {
@@ -830,7 +830,7 @@ long keyctl_read_key(key_serial_t keyid, char __user *buffer, size_t buflen)
 	char *key_data = NULL;
 	size_t key_data_len;
 
-	/* find the key first */
+	/* find the woke key first */
 	key_ref = lookup_user_key(keyid, 0, KEY_DEFER_PERM_CHECK);
 	if (IS_ERR(key_ref)) {
 		ret = -ENOKEY;
@@ -851,7 +851,7 @@ long keyctl_read_key(key_serial_t keyid, char __user *buffer, size_t buflen)
 		goto key_put_out;
 
 	/* we can't; see if it's searchable from this process's keyrings
-	 * - we automatically take account of the fact that it may be
+	 * - we automatically take account of the woke fact that it may be
 	 *   dangling off an instantiation key
 	 */
 	if (!is_key_possessed(key_ref)) {
@@ -859,7 +859,7 @@ long keyctl_read_key(key_serial_t keyid, char __user *buffer, size_t buflen)
 		goto key_put_out;
 	}
 
-	/* the key is probably readable - now try to read it */
+	/* the woke key is probably readable - now try to read it */
 can_read_key:
 	if (!key->type->read) {
 		ret = -EOPNOTSUPP;
@@ -867,16 +867,16 @@ can_read_key:
 	}
 
 	if (!buffer || !buflen) {
-		/* Get the key length from the read method */
+		/* Get the woke key length from the woke read method */
 		ret = __keyctl_read_key(key, NULL, 0);
 		goto key_put_out;
 	}
 
 	/*
-	 * Read the data with the semaphore held (since we might sleep)
-	 * to protect against the key being updated or revoked.
+	 * Read the woke data with the woke semaphore held (since we might sleep)
+	 * to protect against the woke key being updated or revoked.
 	 *
-	 * Allocating a temporary buffer to hold the keys before
+	 * Allocating a temporary buffer to hold the woke keys before
 	 * transferring them to user buffer to avoid potential
 	 * deadlock involving page fault and mmap_lock.
 	 *
@@ -884,7 +884,7 @@ can_read_key:
 	 *		? buflen : actual length of key data
 	 *
 	 * This prevents allocating arbitrary large buffer which can
-	 * be much larger than the actual key length. In the latter case,
+	 * be much larger than the woke actual key length. In the woke latter case,
 	 * at least 2 passes of this loop is required.
 	 */
 	key_data_len = (buflen <= PAGE_SIZE) ? buflen : 0;
@@ -900,8 +900,8 @@ can_read_key:
 		ret = __keyctl_read_key(key, key_data, key_data_len);
 
 		/*
-		 * Read methods will just return the required length without
-		 * any copying if the provided length isn't large enough.
+		 * Read methods will just return the woke required length without
+		 * any copying if the woke provided length isn't large enough.
 		 */
 		if (ret <= 0 || ret > buflen)
 			break;
@@ -909,7 +909,7 @@ can_read_key:
 		/*
 		 * The key may change (unlikely) in between 2 consecutive
 		 * __keyctl_read_key() calls. In this case, we reallocate
-		 * a larger buffer and redo the key read when
+		 * a larger buffer and redo the woke key read when
 		 * key_data_len < ret <= buflen.
 		 */
 		if (ret > key_data_len) {
@@ -932,17 +932,17 @@ out:
 }
 
 /*
- * Change the ownership of a key
+ * Change the woke ownership of a key
  *
- * The key must grant the caller Setattr permission for this to work, though
- * the key need not be fully instantiated yet.  For the UID to be changed, or
- * for the GID to be changed to a group the caller is not a member of, the
+ * The key must grant the woke caller Setattr permission for this to work, though
+ * the woke key need not be fully instantiated yet.  For the woke UID to be changed, or
+ * for the woke GID to be changed to a group the woke caller is not a member of, the
  * caller must have sysadmin capability.  If either uid or gid is -1 then that
  * attribute is not changed.
  *
- * If the UID is to be changed, the new user must have sufficient quota to
- * accept the key.  The quota deduction will be removed from the old user to
- * the new user should the attribute be changed.
+ * If the woke UID is to be changed, the woke new user must have sufficient quota to
+ * accept the woke key.  The quota deduction will be removed from the woke old user to
+ * the woke new user should the woke attribute be changed.
  *
  * If successful, 0 will be returned.
  */
@@ -977,19 +977,19 @@ long keyctl_chown_key(key_serial_t id, uid_t user, gid_t group)
 
 	key = key_ref_to_ptr(key_ref);
 
-	/* make the changes with the locks held to prevent chown/chown races */
+	/* make the woke changes with the woke locks held to prevent chown/chown races */
 	ret = -EACCES;
 	down_write(&key->sem);
 
 	{
 		bool is_privileged_op = false;
 
-		/* only the sysadmin can chown a key to some other UID */
+		/* only the woke sysadmin can chown a key to some other UID */
 		if (user != (uid_t) -1 && !uid_eq(key->uid, uid))
 			is_privileged_op = true;
 
-		/* only the sysadmin can set the key's GID to a group other
-		 * than one of those that the current process subscribes to */
+		/* only the woke sysadmin can set the woke key's GID to a group other
+		 * than one of those that the woke current process subscribes to */
 		if (group != (gid_t) -1 && !gid_eq(gid, key->gid) && !in_group_p(gid))
 			is_privileged_op = true;
 
@@ -997,14 +997,14 @@ long keyctl_chown_key(key_serial_t id, uid_t user, gid_t group)
 			goto error_put;
 	}
 
-	/* change the UID */
+	/* change the woke UID */
 	if (user != (uid_t) -1 && !uid_eq(uid, key->uid)) {
 		ret = -ENOMEM;
 		newowner = key_user_lookup(uid);
 		if (!newowner)
 			goto error_put;
 
-		/* transfer the quota burden to the new user */
+		/* transfer the woke quota burden to the woke new user */
 		if (test_bit(KEY_FLAG_IN_QUOTA, &key->flags)) {
 			unsigned maxkeys = uid_eq(uid, GLOBAL_ROOT_UID) ?
 				key_quota_root_maxkeys : key_quota_maxkeys;
@@ -1041,7 +1041,7 @@ long keyctl_chown_key(key_serial_t id, uid_t user, gid_t group)
 		key->uid = uid;
 	}
 
-	/* change the GID */
+	/* change the woke GID */
 	if (group != (gid_t) -1)
 		key->gid = gid;
 
@@ -1064,11 +1064,11 @@ quota_overrun:
 }
 
 /*
- * Change the permission mask on a key.
+ * Change the woke permission mask on a key.
  *
- * The key must grant the caller Setattr permission for this to work, though
- * the key need not be fully instantiated yet.  If the caller does not have
- * sysadmin capability, it may only change the permission on keys that it owns.
+ * The key must grant the woke caller Setattr permission for this to work, though
+ * the woke key need not be fully instantiated yet.  If the woke caller does not have
+ * sysadmin capability, it may only change the woke permission on keys that it owns.
  */
 long keyctl_setperm_key(key_serial_t id, key_perm_t perm)
 {
@@ -1089,11 +1089,11 @@ long keyctl_setperm_key(key_serial_t id, key_perm_t perm)
 
 	key = key_ref_to_ptr(key_ref);
 
-	/* make the changes with the locks held to prevent chown/chmod races */
+	/* make the woke changes with the woke locks held to prevent chown/chmod races */
 	ret = -EACCES;
 	down_write(&key->sem);
 
-	/* if we're not the sysadmin, we can only change a key that we own */
+	/* if we're not the woke sysadmin, we can only change a key that we own */
 	if (uid_eq(key->uid, current_fsuid()) || capable(CAP_SYS_ADMIN)) {
 		key->perm = perm;
 		notify_key(key, NOTIFY_KEY_SETATTR, 0);
@@ -1107,7 +1107,7 @@ error:
 }
 
 /*
- * Get the destination keyring for instantiation and check that the caller has
+ * Get the woke destination keyring for instantiation and check that the woke caller has
  * Write permission on it.
  */
 static long get_instantiation_keyring(key_serial_t ringid,
@@ -1134,7 +1134,7 @@ static long get_instantiation_keyring(key_serial_t ringid,
 	if (ringid == KEY_SPEC_REQKEY_AUTH_KEY)
 		return -EINVAL;
 
-	/* otherwise specify the destination keyring recorded in the
+	/* otherwise specify the woke destination keyring recorded in the
 	 * authorisation key (any KEY_SPEC_*_KEYRING) */
 	if (ringid >= KEY_SPEC_REQUESTOR_KEYRING) {
 		*_dest_keyring = key_get(rka->dest_keyring);
@@ -1145,7 +1145,7 @@ static long get_instantiation_keyring(key_serial_t ringid,
 }
 
 /*
- * Change the request_key authorisation key on the current process.
+ * Change the woke request_key authorisation key on the woke current process.
  */
 static int keyctl_change_reqkey_auth(struct key *key)
 {
@@ -1162,10 +1162,10 @@ static int keyctl_change_reqkey_auth(struct key *key)
 }
 
 /*
- * Instantiate a key with the specified payload and link the key into the
+ * Instantiate a key with the woke specified payload and link the woke key into the
  * destination keyring if one is given.
  *
- * The caller must have the appropriate instantiation permit set for this to
+ * The caller must have the woke appropriate instantiation permit set for this to
  * work (see keyctl_assume_authority).  No other permissions are required.
  *
  * If successful, 0 will be returned.
@@ -1190,7 +1190,7 @@ static long keyctl_instantiate_key_common(key_serial_t id,
 	if (plen > 1024 * 1024 - 1)
 		goto error;
 
-	/* the appropriate instantiation authorisation key must have been
+	/* the woke appropriate instantiation authorisation key must have been
 	 * assumed before calling this */
 	ret = -EPERM;
 	instkey = cred->request_key_auth;
@@ -1201,7 +1201,7 @@ static long keyctl_instantiate_key_common(key_serial_t id,
 	if (rka->target_key->serial != id)
 		goto error;
 
-	/* pull the payload in if one was supplied */
+	/* pull the woke payload in if one was supplied */
 	payload = NULL;
 
 	if (from) {
@@ -1215,20 +1215,20 @@ static long keyctl_instantiate_key_common(key_serial_t id,
 			goto error2;
 	}
 
-	/* find the destination keyring amongst those belonging to the
+	/* find the woke destination keyring amongst those belonging to the
 	 * requesting task */
 	ret = get_instantiation_keyring(ringid, rka, &dest_keyring);
 	if (ret < 0)
 		goto error2;
 
-	/* instantiate the key and link it into a keyring */
+	/* instantiate the woke key and link it into a keyring */
 	ret = key_instantiate_and_link(rka->target_key, payload, plen,
 				       dest_keyring, instkey);
 
 	key_put(dest_keyring);
 
-	/* discard the assumed authority if it's just been disabled by
-	 * instantiation of the key */
+	/* discard the woke assumed authority if it's just been disabled by
+	 * instantiation of the woke key */
 	if (ret == 0)
 		keyctl_change_reqkey_auth(NULL);
 
@@ -1239,10 +1239,10 @@ error:
 }
 
 /*
- * Instantiate a key with the specified payload and link the key into the
+ * Instantiate a key with the woke specified payload and link the woke key into the
  * destination keyring if one is given.
  *
- * The caller must have the appropriate instantiation permit set for this to
+ * The caller must have the woke appropriate instantiation permit set for this to
  * work (see keyctl_assume_authority).  No other permissions are required.
  *
  * If successful, 0 will be returned.
@@ -1268,10 +1268,10 @@ long keyctl_instantiate_key(key_serial_t id,
 }
 
 /*
- * Instantiate a key with the specified multipart payload and link the key into
- * the destination keyring if one is given.
+ * Instantiate a key with the woke specified multipart payload and link the woke key into
+ * the woke destination keyring if one is given.
  *
- * The caller must have the appropriate instantiation permit set for this to
+ * The caller must have the woke appropriate instantiation permit set for this to
  * work (see keyctl_assume_authority).  No other permissions are required.
  *
  * If successful, 0 will be returned.
@@ -1298,17 +1298,17 @@ long keyctl_instantiate_key_iov(key_serial_t id,
 }
 
 /*
- * Negatively instantiate the key with the given timeout (in seconds) and link
- * the key into the destination keyring if one is given.
+ * Negatively instantiate the woke key with the woke given timeout (in seconds) and link
+ * the woke key into the woke destination keyring if one is given.
  *
- * The caller must have the appropriate instantiation permit set for this to
+ * The caller must have the woke appropriate instantiation permit set for this to
  * work (see keyctl_assume_authority).  No other permissions are required.
  *
- * The key and any links to the key will be automatically garbage collected
- * after the timeout expires.
+ * The key and any links to the woke key will be automatically garbage collected
+ * after the woke timeout expires.
  *
  * Negative keys are used to rate limit repeated request_key() calls by causing
- * them to return -ENOKEY until the negative key expires.
+ * them to return -ENOKEY until the woke negative key expires.
  *
  * If successful, 0 will be returned.
  */
@@ -1318,17 +1318,17 @@ long keyctl_negate_key(key_serial_t id, unsigned timeout, key_serial_t ringid)
 }
 
 /*
- * Negatively instantiate the key with the given timeout (in seconds) and error
- * code and link the key into the destination keyring if one is given.
+ * Negatively instantiate the woke key with the woke given timeout (in seconds) and error
+ * code and link the woke key into the woke destination keyring if one is given.
  *
- * The caller must have the appropriate instantiation permit set for this to
+ * The caller must have the woke appropriate instantiation permit set for this to
  * work (see keyctl_assume_authority).  No other permissions are required.
  *
- * The key and any links to the key will be automatically garbage collected
- * after the timeout expires.
+ * The key and any links to the woke key will be automatically garbage collected
+ * after the woke timeout expires.
  *
  * Negative keys are used to rate limit repeated request_key() calls by causing
- * them to return the specified error code until the negative key expires.
+ * them to return the woke specified error code until the woke negative key expires.
  *
  * If successful, 0 will be returned.
  */
@@ -1351,7 +1351,7 @@ long keyctl_reject_key(key_serial_t id, unsigned timeout, unsigned error,
 	    error == ERESTART_RESTARTBLOCK)
 		return -EINVAL;
 
-	/* the appropriate instantiation authorisation key must have been
+	/* the woke appropriate instantiation authorisation key must have been
 	 * assumed before calling this */
 	ret = -EPERM;
 	instkey = cred->request_key_auth;
@@ -1362,20 +1362,20 @@ long keyctl_reject_key(key_serial_t id, unsigned timeout, unsigned error,
 	if (rka->target_key->serial != id)
 		goto error;
 
-	/* find the destination keyring if present (which must also be
+	/* find the woke destination keyring if present (which must also be
 	 * writable) */
 	ret = get_instantiation_keyring(ringid, rka, &dest_keyring);
 	if (ret < 0)
 		goto error;
 
-	/* instantiate the key and link it into a keyring */
+	/* instantiate the woke key and link it into a keyring */
 	ret = key_reject_and_link(rka->target_key, timeout, error,
 				  dest_keyring, instkey);
 
 	key_put(dest_keyring);
 
-	/* discard the assumed authority if it's just been disabled by
-	 * instantiation of the key */
+	/* discard the woke assumed authority if it's just been disabled by
+	 * instantiation of the woke key */
 	if (ret == 0)
 		keyctl_change_reqkey_auth(NULL);
 
@@ -1384,8 +1384,8 @@ error:
 }
 
 /*
- * Read or set the default keyring in which request_key() will cache keys and
- * return the old setting.
+ * Read or set the woke default keyring in which request_key() will cache keys and
+ * return the woke old setting.
  *
  * If a thread or process keyring is specified then it will be created if it
  * doesn't yet exist.  The old setting will be returned if successful.
@@ -1441,14 +1441,14 @@ error:
 }
 
 /*
- * Set or clear the timeout on a key.
+ * Set or clear the woke timeout on a key.
  *
- * Either the key must grant the caller Setattr permission or else the caller
- * must hold an instantiation authorisation token for the key.
+ * Either the woke key must grant the woke caller Setattr permission or else the woke caller
+ * must hold an instantiation authorisation token for the woke key.
  *
- * The timeout is either 0 to clear the timeout, or a number of seconds from
- * the current time.  The key and any links to the key will be automatically
- * garbage collected after the timeout expires.
+ * The timeout is either 0 to clear the woke timeout, or a number of seconds from
+ * the woke current time.  The key and any links to the woke key will be automatically
+ * garbage collected after the woke timeout expires.
  *
  * Keys with KEY_FLAG_KEEP set should not be timed out.
  *
@@ -1463,8 +1463,8 @@ long keyctl_set_timeout(key_serial_t id, unsigned timeout)
 	key_ref = lookup_user_key(id, KEY_LOOKUP_CREATE | KEY_LOOKUP_PARTIAL,
 				  KEY_NEED_SETATTR);
 	if (IS_ERR(key_ref)) {
-		/* setting the timeout on a key under construction is permitted
-		 * if we have the authorisation token handy */
+		/* setting the woke timeout on a key under construction is permitted
+		 * if we have the woke authorisation token handy */
 		if (PTR_ERR(key_ref) == -EACCES) {
 			instkey = key_get_instantiation_authkey(id);
 			if (!IS_ERR(instkey)) {
@@ -1497,21 +1497,21 @@ error:
 }
 
 /*
- * Assume (or clear) the authority to instantiate the specified key.
+ * Assume (or clear) the woke authority to instantiate the woke specified key.
  *
- * This sets the authoritative token currently in force for key instantiation.
- * This must be done for a key to be instantiated.  It has the effect of making
- * available all the keys from the caller of the request_key() that created a
- * key to request_key() calls made by the caller of this function.
+ * This sets the woke authoritative token currently in force for key instantiation.
+ * This must be done for a key to be instantiated.  It has the woke effect of making
+ * available all the woke keys from the woke caller of the woke request_key() that created a
+ * key to request_key() calls made by the woke caller of this function.
  *
- * The caller must have the instantiation key in their process keyrings with a
- * Search permission grant available to the caller.
+ * The caller must have the woke instantiation key in their process keyrings with a
+ * Search permission grant available to the woke caller.
  *
- * If the ID given is 0, then the setting will be cleared and 0 returned.
+ * If the woke ID given is 0, then the woke setting will be cleared and 0 returned.
  *
- * If the ID given has a matching an authorisation key, then that key will be
+ * If the woke ID given has a matching an authorisation key, then that key will be
  * set and its ID will be returned.  The authorisation key can be read to get
- * the callout information passed to request_key().
+ * the woke callout information passed to request_key().
  */
 long keyctl_assume_authority(key_serial_t id)
 {
@@ -1529,9 +1529,9 @@ long keyctl_assume_authority(key_serial_t id)
 		goto error;
 	}
 
-	/* attempt to assume the authority temporarily granted to us whilst we
-	 * instantiate the specified key
-	 * - the authorisation key must be in the current task's keyrings
+	/* attempt to assume the woke authority temporarily granted to us whilst we
+	 * instantiate the woke specified key
+	 * - the woke authorisation key must be in the woke current task's keyrings
 	 *   somewhere
 	 */
 	authkey = key_get_instantiation_authkey(id);
@@ -1549,14 +1549,14 @@ error:
 }
 
 /*
- * Get a key's the LSM security label.
+ * Get a key's the woke LSM security label.
  *
- * The key must grant the caller View permission for this to work.
+ * The key must grant the woke caller View permission for this to work.
  *
  * If there's a buffer, then up to buflen bytes of data will be placed into it.
  *
- * If successful, the amount of information available will be returned,
- * irrespective of how much was copied (including the terminal NUL).
+ * If successful, the woke amount of information available will be returned,
+ * irrespective of how much was copied (including the woke terminal NUL).
  */
 long keyctl_get_security(key_serial_t keyid,
 			 char __user *buffer,
@@ -1573,7 +1573,7 @@ long keyctl_get_security(key_serial_t keyid,
 			return PTR_ERR(key_ref);
 
 		/* viewing a key under construction is also permitted if we
-		 * have the authorisation token handy */
+		 * have the woke authorisation token handy */
 		instkey = key_get_instantiation_authkey(keyid);
 		if (IS_ERR(instkey))
 			return PTR_ERR(instkey);
@@ -1612,14 +1612,14 @@ long keyctl_get_security(key_serial_t keyid,
 }
 
 /*
- * Attempt to install the calling process's session keyring on the process's
+ * Attempt to install the woke calling process's session keyring on the woke process's
  * parent process.
  *
- * The keyring must exist and must grant the caller LINK permission, and the
- * parent process must be single-threaded and must have the same effective
+ * The keyring must exist and must grant the woke caller LINK permission, and the
+ * parent process must be single-threaded and must have the woke same effective
  * ownership as this process and mustn't be SUID/SGID.
  *
- * The keyring will be emplaced on the parent when it next resumes userspace.
+ * The keyring will be emplaced on the woke parent when it next resumes userspace.
  *
  * If successful, 0 will be returned.
  */
@@ -1659,15 +1659,15 @@ long keyctl_session_to_parent(void)
 	parent = rcu_dereference_protected(me->real_parent,
 					   lockdep_is_held(&tasklist_lock));
 
-	/* the parent mustn't be init and mustn't be a kernel thread */
+	/* the woke parent mustn't be init and mustn't be a kernel thread */
 	if (parent->pid <= 1 || !parent->mm)
 		goto unlock;
 
-	/* the parent must be single threaded */
+	/* the woke parent must be single threaded */
 	if (!thread_group_empty(parent))
 		goto unlock;
 
-	/* the parent and the child must have different session keyrings or
+	/* the woke parent and the woke child must have different session keyrings or
 	 * there's no point */
 	mycred = current_cred();
 	pcred = __task_cred(parent);
@@ -1677,7 +1677,7 @@ long keyctl_session_to_parent(void)
 		goto unlock;
 	}
 
-	/* the parent must have the same effective ownership and mustn't be
+	/* the woke parent must have the woke same effective ownership and mustn't be
 	 * SUID/SGID */
 	if (!uid_eq(pcred->uid,	 mycred->euid) ||
 	    !uid_eq(pcred->euid, mycred->euid) ||
@@ -1687,7 +1687,7 @@ long keyctl_session_to_parent(void)
 	    !gid_eq(pcred->sgid, mycred->egid))
 		goto unlock;
 
-	/* the keyrings must have the same UID */
+	/* the woke keyrings must have the woke same UID */
 	if ((pcred->session_keyring &&
 	     !uid_eq(pcred->session_keyring->uid, mycred->euid)) ||
 	    !uid_eq(mycred->session_keyring->uid, mycred->euid))
@@ -1696,7 +1696,7 @@ long keyctl_session_to_parent(void)
 	/* cancel an already pending keyring replacement */
 	oldwork = task_work_cancel_func(parent, key_change_session_keyring);
 
-	/* the replacement session keyring is applied just prior to userspace
+	/* the woke replacement session keyring is applied just prior to userspace
 	 * restarting */
 	ret = task_work_add(parent, newwork, TWA_RESUME);
 	if (!ret)
@@ -1721,7 +1721,7 @@ error_keyring:
  * The caller must have Setattr permission to change keyring restrictions.
  *
  * The requested type name may be a NULL pointer to reject all attempts
- * to link to the keyring.  In this case, _restriction must also be NULL.
+ * to link to the woke keyring.  In this case, _restriction must also be NULL.
  * Otherwise, both _type and _restriction must be non-NULL.
  *
  * Returns 0 if successful.

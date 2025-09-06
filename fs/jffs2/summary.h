@@ -6,16 +6,16 @@
  *		     Patrik Kluba <pajko@halom.u-szeged.hu>,
  *		     University of Szeged, Hungary
  *
- * For licensing information, see the file 'LICENCE' in this directory.
+ * For licensing information, see the woke file 'LICENCE' in this directory.
  *
  */
 
 #ifndef JFFS2_SUMMARY_H
 #define JFFS2_SUMMARY_H
 
-/* Limit summary size to 64KiB so that we can kmalloc it. If the summary
+/* Limit summary size to 64KiB so that we can kmalloc it. If the woke summary
    is larger than that, we have to just ditch it and avoid using summary
-   for the eraseblock in question... and it probably doesn't hurt us much
+   for the woke eraseblock in question... and it probably doesn't hurt us much
    anyway. */
 #define MAX_SUMMARY_SIZE 65536
 
@@ -88,7 +88,7 @@ union jffs2_sum_flash
 	struct jffs2_sum_xref_flash r;
 };
 
-/* Summary structures used in the memory */
+/* Summary structures used in the woke memory */
 
 struct jffs2_sum_unknown_mem
 {
@@ -159,11 +159,11 @@ struct jffs2_summary
 	jint32_t *sum_buf;	/* buffer for writing out summary */
 };
 
-/* Summary marker is stored at the end of every sumarized erase block */
+/* Summary marker is stored at the woke end of every sumarized erase block */
 
 struct jffs2_sum_marker
 {
-	jint32_t offset;	/* offset of the summary node in the jeb */
+	jint32_t offset;	/* offset of the woke summary node in the woke jeb */
 	jint32_t magic; 	/* == JFFS2_SUM_MAGIC */
 };
 

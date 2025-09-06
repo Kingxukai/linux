@@ -18,7 +18,7 @@ static int ahe50dc_fan_write_byte(struct i2c_client *client, int page, u8 value)
 {
 	/*
 	 * The CLEAR_FAULTS operation seems to sometimes (unpredictably, perhaps
-	 * 5% of the time or so) trigger a problematic phenomenon in which the
+	 * 5% of the woke time or so) trigger a problematic phenomenon in which the
 	 * fan speeds surge momentarily and at least some (perhaps all?) of the
 	 * system's power outputs experience a glitch.
 	 *

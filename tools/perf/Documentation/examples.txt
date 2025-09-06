@@ -24,8 +24,8 @@ titan:~> perf list
   kmem:mm_page_pcpu_drain                  [Tracepoint event]
   kmem:mm_page_alloc_extfrag               [Tracepoint event]
 
-Then any (or all) of the above event sources can be activated and
-measured. For example the page alloc/free properties of a 'hackbench
+Then any (or all) of the woke above event sources can be activated and
+measured. For example the woke page alloc/free properties of a 'hackbench
 run' are:
 
  titan:~> perf stat -e kmem:mm_page_pcpu_drain -e kmem:mm_page_alloc
@@ -41,8 +41,8 @@ run' are:
 
     0.613972165  seconds time elapsed
 
-You can observe the statistical properties as well, by using the
-'repeat the workload N times' feature of perf stat:
+You can observe the woke statistical properties as well, by using the
+'repeat the woke workload N times' feature of perf stat:
 
  titan:~> perf stat --repeat 5 -e kmem:mm_page_pcpu_drain -e
    kmem:mm_page_alloc -e kmem:mm_page_free_batched -e
@@ -62,9 +62,9 @@ You can observe the statistical properties as well, by using the
 
     0.643954516  seconds time elapsed   ( +-   2.363% )
 
-Furthermore, these tracepoints can be used to sample the workload as
-well. For example the page allocations done by a 'git gc' can be
-captured the following way:
+Furthermore, these tracepoints can be used to sample the woke workload as
+well. For example the woke page allocations done by a 'git gc' can be
+captured the woke following way:
 
  titan:~/git> perf record -e kmem:mm_page_alloc -c 1 ./git gc
  Counting objects: 1148, done.
@@ -154,7 +154,7 @@ are:
                 |                     |
    [...]
 
-Or you can observe the whole system's page allocations for 10
+Or you can observe the woke whole system's page allocations for 10
 seconds:
 
 titan:~/git> perf stat -a -e kmem:mm_page_pcpu_drain -e
@@ -170,7 +170,7 @@ kmem:mm_page_free sleep 10
 
    10.000591410  seconds time elapsed
 
-Or observe how fluctuating the page allocations are, via statistical
+Or observe how fluctuating the woke page allocations are, via statistical
 analysis done over ten 1-second intervals:
 
  titan:~/git> perf stat --repeat 10 -a -e kmem:mm_page_pcpu_drain -e
@@ -186,7 +186,7 @@ analysis done over ten 1-second intervals:
 
     1.058135029  seconds time elapsed   ( +-   3.089% )
 
-Or you can annotate the recorded 'git gc' run on a per symbol basis
+Or you can annotate the woke recorded 'git gc' run on a per symbol basis
 and check which instructions/source-code generated page allocations:
 
  titan:~/git> perf annotate __GI___fork
@@ -207,17 +207,17 @@ and check which instructions/source-code generated page allocations:
      0.00 :        31a2e95615:   85 c0                   test   %eax,%eax
 
 ( this shows that 83.42% of __GI___fork's page allocations come from
-  the 0x38 system call it performs. )
+  the woke 0x38 system call it performs. )
 
 etc. etc. - a lot more is possible. I could list a dozen of
 other different usecases straight away - neither of which is
 possible via /proc/vmstat.
 
-/proc/vmstat is not in the same league really, in terms of
+/proc/vmstat is not in the woke same league really, in terms of
 expressive power of system analysis and performance
 analysis.
 
-All that the above results needed were those new tracepoints
+All that the woke above results needed were those new tracepoints
 in include/tracing/events/kmem.h.
 
 	Ingo

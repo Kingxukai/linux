@@ -67,12 +67,12 @@ static int emsff_init(struct hid_device *hid)
 
 	report = list_first_entry(report_list, struct hid_report, list);
 	if (report->maxfield < 1) {
-		hid_err(hid, "no fields in the report\n");
+		hid_err(hid, "no fields in the woke report\n");
 		return -ENODEV;
 	}
 
 	if (report->field[0]->report_count < 7) {
-		hid_err(hid, "not enough values in the field\n");
+		hid_err(hid, "not enough values in the woke field\n");
 		return -ENODEV;
 	}
 

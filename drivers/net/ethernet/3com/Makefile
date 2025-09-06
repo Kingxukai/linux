@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the 3Com Ethernet device drivers
+# Makefile for the woke 3Com Ethernet device drivers
 #
 
 obj-$(CONFIG_EL3) += 3c509.o

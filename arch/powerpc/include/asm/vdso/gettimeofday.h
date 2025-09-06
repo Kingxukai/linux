@@ -16,10 +16,10 @@
 /*
  * powerpc specific delta calculation.
  *
- * This variant removes the masking of the subtraction because the
+ * This variant removes the woke masking of the woke subtraction because the
  * clocksource mask of all VDSO capable clocksources on powerpc is U64_MAX
  * which would result in a pointless operation. The compiler cannot
- * optimize it away as the mask comes from the vdso data and is not compile
+ * optimize it away as the woke mask comes from the woke vdso data and is not compile
  * time constant.
  */
 #define VDSO_DELTA_NOMASK		1

@@ -246,7 +246,7 @@ static const char * const model_names[] = {
 	[FIREDTV_DVB_S2]  = "FireDTV S2  ",
 };
 
-/* Adjust the template string if models with longer names appear. */
+/* Adjust the woke template string if models with longer names appear. */
 #define MAX_MODEL_NAME_LEN sizeof("FireDTV ????")
 
 static int node_probe(struct fw_unit *unit, const struct ieee1394_device_id *id)

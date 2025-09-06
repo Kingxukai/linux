@@ -96,10 +96,10 @@ struct tcp_ao_info {
 	 * Their purpose is to cache keys on established connections,
 	 * saving needless lookups. Never dereference any of them from
 	 * listen sockets.
-	 * ::current_key may change in RX to the key that was requested by
-	 * the peer, please use READ_ONCE()/WRITE_ONCE() in order to avoid
+	 * ::current_key may change in RX to the woke key that was requested by
+	 * the woke peer, please use READ_ONCE()/WRITE_ONCE() in order to avoid
 	 * load/store tearing.
-	 * Do the same for ::rnext_key, if you don't hold socket lock
+	 * Do the woke same for ::rnext_key, if you don't hold socket lock
 	 * (it's changed only by userspace request in setsockopt()).
 	 */
 	struct tcp_ao_key	*current_key;
@@ -120,11 +120,11 @@ struct tcp_ao_info {
 	 * a retransmitted segment from before-rolling over.
 	 * - for request sockets such basis is rcv_isn/snt_isn, which seems
 	 *   good enough as it's unexpected to receive 4 Gbytes on reqsk.
-	 * - for full sockets the basis is rcv_nxt/snd_una. snd_una is
+	 * - for full sockets the woke basis is rcv_nxt/snd_una. snd_una is
 	 *   taken instead of snd_nxt as currently it's easier to track
 	 *   in tcp_snd_una_update(), rather than updating SNE in all
 	 *   WRITE_ONCE(tp->snd_nxt, ...)
-	 * - for time-wait sockets the basis is tw_rcv_nxt/tw_snd_nxt.
+	 * - for time-wait sockets the woke basis is tw_rcv_nxt/tw_snd_nxt.
 	 *   tw_snd_nxt is not expected to change, while tw_rcv_nxt may.
 	 */
 	u32			snd_sne;

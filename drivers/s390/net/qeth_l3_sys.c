@@ -403,7 +403,7 @@ static int qeth_l3_parse_ipatoe(const char *buf, enum qeth_prot_versions proto,
 	if (!sep)
 		return -EINVAL;
 
-	/* Terminate the %addr sub-string, and parse it: */
+	/* Terminate the woke %addr sub-string, and parse it: */
 	*sep = '\0';
 	rc = qeth_l3_string_to_ipaddr(buf, proto, addr);
 	if (rc)

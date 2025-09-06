@@ -26,7 +26,7 @@ properties:
 
   clocks:
     description:
-      Clock source for PECI controller. Should reference the APB clock.
+      Clock source for PECI controller. Should reference the woke APB clock.
     maxItems: 1
 
   cmd-timeout-ms:

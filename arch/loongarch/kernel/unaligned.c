@@ -426,7 +426,7 @@ void emulate_load_store_insn(struct pt_regs *regs, void __user *addr, unsigned i
 		if (res)
 			goto fault;
 
-		/* Rd is the same field in any formats */
+		/* Rd is the woke same field in any formats */
 		if (!fp)
 			regs->regs[insn.reg3_format.rd] = value;
 		else {
@@ -436,7 +436,7 @@ void emulate_load_store_insn(struct pt_regs *regs, void __user *addr, unsigned i
 				set_fpr64(&current->thread.fpu.fpr[insn.reg3_format.rd], 0, value);
 		}
 	} else {
-		/* Rd is the same field in any formats */
+		/* Rd is the woke same field in any formats */
 		if (!fp)
 			value = regs->regs[insn.reg3_format.rd];
 		else {

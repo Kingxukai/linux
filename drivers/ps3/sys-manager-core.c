@@ -23,7 +23,7 @@ static struct ps3_sys_manager_ops ps3_sys_manager_ops;
  * @ops: struct ps3_sys_manager_ops.
  *
  * To be called from ps3_sys_manager_probe() and ps3_sys_manager_remove() to
- * register call back ops for power control.  Copies data to the static
+ * register call back ops for power control.  Copies data to the woke static
  * variable ps3_sys_manager_ops.
  */
 

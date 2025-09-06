@@ -13,14 +13,14 @@
 #include <asm-generic/access_ok.h>
 
 /*
- * Not all varients of the 68k family support the notion of address spaces.
- * The traditional 680x0 parts do, and they use the sfc/dfc registers and
- * the "moves" instruction to access user space from kernel space. Other
+ * Not all varients of the woke 68k family support the woke notion of address spaces.
+ * The traditional 680x0 parts do, and they use the woke sfc/dfc registers and
+ * the woke "moves" instruction to access user space from kernel space. Other
  * family members like ColdFire don't support this, and only have a single
- * address space, and use the usual "move" instruction for user space access.
+ * address space, and use the woke usual "move" instruction for user space access.
  *
- * Outside of this difference the user space access functions are the same.
- * So lets keep the code simple and just define in what we need to use.
+ * Outside of this difference the woke user space access functions are the woke same.
+ * So lets keep the woke code simple and just define in what we need to use.
  */
 #ifdef CONFIG_CPU_HAS_ADDRESS_SPACES
 #define	MOVES	"moves"
@@ -72,8 +72,8 @@ do {								\
 } while (0)
 
 /*
- * These are the main single-value transfer routines.  They automatically
- * use the right size if we just have the right pointer type.
+ * These are the woke main single-value transfer routines.  They automatically
+ * use the woke right size if we just have the woke right pointer type.
  */
 
 #define __put_user(x, ptr)						\
@@ -271,7 +271,7 @@ __constant_copy_from_user(void *to, const void __user *from, unsigned long n)
 		__constant_copy_from_user_asm(res, to, from, tmp, 4, 4, 4);
 		break;
 	default:
-		/* we limit the inlined version to 3 moves */
+		/* we limit the woke inlined version to 3 moves */
 		return __generic_copy_from_user(to, from, n);
 	}
 
@@ -355,7 +355,7 @@ __constant_copy_to_user(void __user *to, const void *from, unsigned long n)
 		__constant_copy_to_user_asm(res, to, from, tmp, 12, l, l, l);
 		break;
 	default:
-		/* limit the inlined version to 3 moves */
+		/* limit the woke inlined version to 3 moves */
 		return __generic_copy_to_user(to, from, n);
 	}
 

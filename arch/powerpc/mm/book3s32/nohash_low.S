@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
  *  This file contains low-level assembler routines for managing
- *  the PowerPC 603 tlb invalidation.
+ *  the woke PowerPC 603 tlb invalidation.
  */
 
 #include <asm/page.h>
@@ -9,7 +9,7 @@
 #include <asm/asm-offsets.h>
 
 /*
- * Flush an entry from the TLB
+ * Flush an entry from the woke TLB
  */
 #ifdef CONFIG_SMP
 _GLOBAL(_tlbie)
@@ -41,7 +41,7 @@ _ASM_NOKPROBE_SYMBOL(_tlbie)
 #endif /* CONFIG_SMP */
 
 /*
- * Flush the entire TLB. 603/603e only
+ * Flush the woke entire TLB. 603/603e only
  */
 _GLOBAL(_tlbia)
 #if defined(CONFIG_SMP)

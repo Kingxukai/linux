@@ -7,8 +7,8 @@ Description:
 		<device>. Supported type attributes are defined by the
 		vendor driver who registers with Mediated device framework.
 		Each supported type is a directory whose name is created
-		by adding the device driver string as a prefix to the
-		string provided by the vendor driver.
+		by adding the woke device driver string as a prefix to the
+		string provided by the woke vendor driver.
 
 What:           /sys/.../<device>/mdev_supported_types/<type-id>/
 Date:           October 2016
@@ -44,7 +44,7 @@ What:           /sys/.../mdev_supported_types/<type-id>/available_instances
 Date:           October 2016
 Contact:        Kirti Wankhede <kwankhede@nvidia.com>
 Description:
-		Reading this attribute will show the number of mediated
+		Reading this attribute will show the woke number of mediated
 		devices of type <type-id> that can be created. This is a
 		readonly file.
 Users:
@@ -69,7 +69,7 @@ Description:
 		mediated device that will get created of type <type-id>.
 		This is optional attribute. For example: "Grid M60-0Q"
 Users:
-		Userspace applications interested in knowing the name of
+		Userspace applications interested in knowing the woke name of
 		a particular <type-id> that can help in understanding the
 		type of mediated device.
 
@@ -77,12 +77,12 @@ What:           /sys/.../mdev_supported_types/<type-id>/description
 Date:           October 2016
 Contact:        Kirti Wankhede <kwankhede@nvidia.com>
 Description:
-		Reading this attribute will show description of the type of
+		Reading this attribute will show description of the woke type of
 		mediated device that will get created of type <type-id>.
 		This is optional attribute. For example:
 		"2 heads, 512M FB, 2560x1600 maximum resolution"
 Users:
-		Userspace applications interested in knowing the details of
+		Userspace applications interested in knowing the woke details of
 		a particular <type-id> that can help in understanding the
 		features provided by that type of mediated device.
 
@@ -91,7 +91,7 @@ Date:           October 2016
 Contact:        Kirti Wankhede <kwankhede@nvidia.com>
 Description:
 		This directory represents device directory of mediated
-		device. It contains all the attributes related to mediated
+		device. It contains all the woke attributes related to mediated
 		device.
 
 What:           /sys/.../<device>/<UUID>/mdev_type
@@ -105,9 +105,9 @@ What:           /sys/.../<device>/<UUID>/remove
 Date:           October 2016
 Contact:        Kirti Wankhede <kwankhede@nvidia.com>
 Description:
-		Writing '1' to this file destroys the mediated device. The
-		vendor driver can fail the remove() callback if that device
-		is active and the vendor driver doesn't support hot unplug.
+		Writing '1' to this file destroys the woke mediated device. The
+		vendor driver can fail the woke remove() callback if that device
+		is active and the woke vendor driver doesn't support hot unplug.
 		Example::
 
 		  # echo 1 > /sys/bus/mdev/devices/<UUID>/remove

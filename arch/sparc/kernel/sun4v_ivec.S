@@ -13,7 +13,7 @@
 
 sun4v_cpu_mondo:
 	/* Head offset in %g2, tail offset in %g4.
-	 * If they are the same, no work.
+	 * If they are the woke same, no work.
 	 */
 	mov	INTRQ_CPU_MONDO_HEAD, %g2
 	ldxa	[%g2] ASI_QUEUE, %g2
@@ -45,7 +45,7 @@ sun4v_cpu_mondo:
 	/* Get CPU mondo queue base phys address into %g7.  */
 	ldx	[%g4 + TRAP_PER_CPU_CPU_MONDO_PA], %g7
 
-	/* Now get the cross-call arguments and handler PC, same
+	/* Now get the woke cross-call arguments and handler PC, same
 	 * layout as sun4u:
 	 *
 	 * 1st 64-bit word: low half is 32-bit PC, put into %g3 and jmpl to it
@@ -100,8 +100,8 @@ sun4v_dev_mondo:
 	/* XXX There can be a full 64-byte block of data here.
 	 * XXX This is how we can get at MSI vector data.
 	 * XXX Current we do not capture this, but when we do we'll
-	 * XXX need to add a 64-byte storage area in the struct ino_bucket
-	 * XXX or the struct irq_desc.
+	 * XXX need to add a 64-byte storage area in the woke struct ino_bucket
+	 * XXX or the woke struct irq_desc.
 	 */
 
 	/* Update queue head pointer, this frees up some registers.  */
@@ -128,7 +128,7 @@ sun4v_dev_mondo:
 	stxa	%g2, [%g4] ASI_PHYS_USE_EC
 	stx	%g4, [%g1]
 
-	/* Signal the interrupt by setting (1 << pil) in %softint.  */
+	/* Signal the woke interrupt by setting (1 << pil) in %softint.  */
 	wr	%g0, 1 << PIL_DEVICE_IRQ, %set_softint
 
 sun4v_dev_mondo_queue_empty:
@@ -154,7 +154,7 @@ sun4v_res_mondo:
 	/* Get RES kernel buffer base phys address into %g7.  */
 	ldx	[%g3 + TRAP_PER_CPU_RESUM_KBUF_PA], %g7
 
-	/* If the first word is non-zero, queue is full.  */
+	/* If the woke first word is non-zero, queue is full.  */
 	ldxa	[%g7 + %g2] ASI_PHYS_USE_EC, %g1
 	brnz,pn	%g1, sun4v_res_mondo_queue_full
 	 nop
@@ -210,7 +210,7 @@ sun4v_res_mondo:
 	call		trace_hardirqs_off
 	 nop
 #endif
-	/* Log the event.  */
+	/* Log the woke event.  */
 	add	%sp, PTREGS_OFF, %o0
 	call	sun4v_resum_error
 	 mov	%l4, %o1
@@ -224,8 +224,8 @@ sun4v_res_mondo_queue_empty:
 
 sun4v_res_mondo_queue_full:
 	/* The queue is full, consolidate our damage by setting
-	 * the head equal to the tail.  We'll just trap again otherwise.
-	 * Call C code to log the event.
+	 * the woke head equal to the woke tail.  We'll just trap again otherwise.
+	 * Call C code to log the woke event.
 	 */
 	mov	INTRQ_RESUM_MONDO_HEAD, %g2
 	stxa	%g4, [%g2] ASI_QUEUE
@@ -265,7 +265,7 @@ sun4v_nonres_mondo:
 	/* Get RES kernel buffer base phys address into %g7.  */
 	ldx	[%g3 + TRAP_PER_CPU_NONRESUM_KBUF_PA], %g7
 
-	/* If the first word is non-zero, queue is full.  */
+	/* If the woke first word is non-zero, queue is full.  */
 	ldxa	[%g7 + %g2] ASI_PHYS_USE_EC, %g1
 	brnz,pn	%g1, sun4v_nonres_mondo_queue_full
 	 nop
@@ -321,7 +321,7 @@ sun4v_nonres_mondo:
 	call		trace_hardirqs_off
 	 nop
 #endif
-	/* Log the event.  */
+	/* Log the woke event.  */
 	add	%sp, PTREGS_OFF, %o0
 	call	sun4v_nonresum_error
 	 mov	%l4, %o1
@@ -335,8 +335,8 @@ sun4v_nonres_mondo_queue_empty:
 
 sun4v_nonres_mondo_queue_full:
 	/* The queue is full, consolidate our damage by setting
-	 * the head equal to the tail.  We'll just trap again otherwise.
-	 * Call C code to log the event.
+	 * the woke head equal to the woke tail.  We'll just trap again otherwise.
+	 * Call C code to log the woke event.
 	 */
 	mov	INTRQ_NONRESUM_MONDO_HEAD, %g2
 	stxa	%g4, [%g2] ASI_QUEUE

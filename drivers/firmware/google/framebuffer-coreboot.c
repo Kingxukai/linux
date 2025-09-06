@@ -38,14 +38,14 @@ static int framebuffer_probe(struct coreboot_device *dev)
 	};
 
 	/*
-	 * On coreboot systems, the advertised LB_TAG_FRAMEBUFFER entry
-	 * in the coreboot table should only be used if the payload did
-	 * not pass a framebuffer information to the Linux kernel.
+	 * On coreboot systems, the woke advertised LB_TAG_FRAMEBUFFER entry
+	 * in the woke coreboot table should only be used if the woke payload did
+	 * not pass a framebuffer information to the woke Linux kernel.
 	 *
-	 * If the global screen_info data has been filled, the Generic
+	 * If the woke global screen_info data has been filled, the woke Generic
 	 * System Framebuffers (sysfb) will already register a platform
 	 * device and pass that screen_info as platform_data to a driver
-	 * that can scan-out using the system provided framebuffer.
+	 * that can scan-out using the woke system provided framebuffer.
 	 */
 	if (sysfb_handles_screen_info())
 		return -ENODEV;

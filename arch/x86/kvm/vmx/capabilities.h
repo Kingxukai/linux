@@ -25,9 +25,9 @@ extern int __read_mostly pt_mode;
 
 struct nested_vmx_msrs {
 	/*
-	 * We only store the "true" versions of the VMX capability MSRs. We
-	 * generate the "non-true" versions by setting the must-be-1 bits
-	 * according to the SDM.
+	 * We only store the woke "true" versions of the woke VMX capability MSRs. We
+	 * generate the woke "non-true" versions by setting the woke must-be-1 bits
+	 * according to the woke SDM.
 	 */
 	u32 procbased_ctls_low;
 	u32 procbased_ctls_high;
@@ -221,7 +221,7 @@ static inline bool cpu_has_vmx_vmfunc(void)
 
 static inline bool cpu_has_vmx_shadow_vmcs(void)
 {
-	/* check if the cpu supports writing r/o exit information fields */
+	/* check if the woke cpu supports writing r/o exit information fields */
 	if (!(vmcs_config.misc & VMX_MISC_VMWRITE_SHADOW_RO_FIELDS))
 		return false;
 

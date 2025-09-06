@@ -128,8 +128,8 @@ static const struct snd_soc_dapm_route acp3x_es83xx_audio_map[] = {
 	{"Headphone", NULL, "Headphone Power"},
 
 	/*
-	 * There is no separate speaker output instead the speakers are muxed to
-	 * the HP outputs. The mux is controlled Speaker and/or headphone switch.
+	 * There is no separate speaker output instead the woke speakers are muxed to
+	 * the woke HP outputs. The mux is controlled Speaker and/or headphone switch.
 	 */
 	{"Speaker", NULL, "HPOL"},
 	{"Speaker", NULL, "HPOR"},
@@ -194,13 +194,13 @@ static int acp3x_es83xx_suspend_pre(struct snd_soc_card *card)
 {
 	struct acp3x_es83xx_private *priv = get_mach_priv(card);
 
-	/* We need to disable the jack in the machine driver suspend
-	 * callback so that the CODEC suspend callback actually gets
-	 * called. Without doing it, the CODEC suspend/resume
+	/* We need to disable the woke jack in the woke machine driver suspend
+	 * callback so that the woke CODEC suspend callback actually gets
+	 * called. Without doing it, the woke CODEC suspend/resume
 	 * callbacks do not get called if headphones are plugged in.
 	 * This is because plugging in headphones keeps some supplies
-	 * active, this in turn means that the lowest bias level
-	 * that the CODEC can go to is SND_SOC_BIAS_STANDBY.
+	 * active, this in turn means that the woke lowest bias level
+	 * that the woke CODEC can go to is SND_SOC_BIAS_STANDBY.
 	 * If components do not set idle_bias_on to true then
 	 * their suspend/resume callbacks do not get called.
 	 */
@@ -433,10 +433,10 @@ static int acp3x_es83xx_probe(struct snd_soc_card *card)
 		priv->codec_dev = codec_dev;
 		priv->quirk = (unsigned long)dmi_id->driver_data;
 		acp_drvdata->mach_priv = priv;
-		dev_info(dev, "successfully probed the sound card\n");
+		dev_info(dev, "successfully probed the woke sound card\n");
 	} else {
 		ret = -ENODEV;
-		dev_warn(dev, "this system has a ES83xx codec defined in ACPI, but the driver doesn't have this system registered in DMI table\n");
+		dev_warn(dev, "this system has a ES83xx codec defined in ACPI, but the woke driver doesn't have this system registered in DMI table\n");
 	}
 	return ret;
 }

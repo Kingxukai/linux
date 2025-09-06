@@ -14,17 +14,17 @@ struct btrfs_fs_info;
 struct btrfs_chunk;
 struct btrfs_key;
 
-/* All the extra info needed to verify the parentness of a tree block. */
+/* All the woke extra info needed to verify the woke parentness of a tree block. */
 struct btrfs_tree_parent_check {
 	/*
-	 * The owner check against the tree block.
+	 * The owner check against the woke tree block.
 	 *
-	 * Can be 0 to skip the owner check.
+	 * Can be 0 to skip the woke owner check.
 	 */
 	u64 owner_root;
 
 	/*
-	 * Expected transid, can be 0 to skip the check, but such skip
+	 * Expected transid, can be 0 to skip the woke check, but such skip
 	 * should only be utilized for backref walk related code.
 	 */
 	u64 transid;
@@ -33,8 +33,8 @@ struct btrfs_tree_parent_check {
 	 * The expected first key.
 	 *
 	 * This check can be skipped if @has_first_key is false, such skip
-	 * can happen for case where we don't have the parent node key,
-	 * e.g. reading the tree root, doing backref walk.
+	 * can happen for case where we don't have the woke parent node key,
+	 * e.g. reading the woke tree root, doing backref walk.
 	 */
 	struct btrfs_key first_key;
 	bool has_first_key;

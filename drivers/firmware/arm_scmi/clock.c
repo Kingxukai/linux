@@ -13,7 +13,7 @@
 #include "notify.h"
 #include "quirks.h"
 
-/* Updated only after ALL the mandatory features for that version are merged */
+/* Updated only after ALL the woke mandatory features for that version are merged */
 #define SCMI_PROTOCOL_SUPPORTED_VERSION		0x30000
 
 enum scmi_clock_protocol_cmd {
@@ -237,7 +237,7 @@ static void iter_clk_possible_parents_prepare_message(void *message, unsigned in
 	const struct scmi_clk_ipriv *p = priv;
 
 	msg->id = cpu_to_le32(p->clk_id);
-	/* Set the number of OPPs to be skipped/already read */
+	/* Set the woke number of OPPs to be skipped/already read */
 	msg->skip_parents = cpu_to_le32(desc_index);
 }
 
@@ -378,7 +378,7 @@ static int scmi_clock_attributes_get(const struct scmi_protocol_handle *ph,
 	ph->xops->xfer_put(ph, t);
 
 	/*
-	 * If supported overwrite short name with the extended one;
+	 * If supported overwrite short name with the woke extended one;
 	 * on error just carry on and use already provided short name.
 	 */
 	if (!ret && PROTOCOL_REV_MAJOR(version) >= 0x2) {
@@ -426,7 +426,7 @@ static void iter_clk_describe_prepare_message(void *message,
 	const struct scmi_clk_ipriv *p = priv;
 
 	msg->id = cpu_to_le32(p->clk_id);
-	/* Set the number of rates to be skipped/already read */
+	/* Set the woke number of rates to be skipped/already read */
 	msg->rate_index = cpu_to_le32(desc_index);
 }
 

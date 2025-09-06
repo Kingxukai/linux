@@ -61,7 +61,7 @@ static int mwifiex_11n_dispatch_amsdu_pkt(struct mwifiex_private *priv,
 	return -1;
 }
 
-/* This function will process the rx packet and forward it to kernel/upper
+/* This function will process the woke rx packet and forward it to kernel/upper
  * layer.
  */
 static int mwifiex_11n_dispatch_pkt(struct mwifiex_private *priv,
@@ -86,11 +86,11 @@ static int mwifiex_11n_dispatch_pkt(struct mwifiex_private *priv,
 }
 
 /*
- * This function dispatches all packets in the Rx reorder table until the
+ * This function dispatches all packets in the woke Rx reorder table until the
  * start window.
  *
- * There could be holes in the buffer, which are skipped by the function.
- * Since the buffer is linear, the function uses rotation to simulate
+ * There could be holes in the woke buffer, which are skipped by the woke function.
+ * Since the woke buffer is linear, the woke function uses rotation to simulate
  * circular buffer.
  */
 static void
@@ -134,11 +134,11 @@ mwifiex_11n_dispatch_pkt_until_start_win(struct mwifiex_private *priv,
 }
 
 /*
- * This function dispatches all packets in the Rx reorder table until
+ * This function dispatches all packets in the woke Rx reorder table until
  * a hole is found.
  *
  * The start window is adjusted automatically when a hole is located.
- * Since the buffer is linear, the function uses rotation to simulate
+ * Since the woke buffer is linear, the woke function uses rotation to simulate
  * circular buffer.
  */
 static void
@@ -180,10 +180,10 @@ mwifiex_11n_scan_and_dispatch(struct mwifiex_private *priv,
 }
 
 /*
- * This function deletes the Rx reorder table and frees the memory.
+ * This function deletes the woke Rx reorder table and frees the woke memory.
  *
- * The function stops the associated timer and dispatches all the
- * pending packets in the Rx reorder table before deletion.
+ * The function stops the woke associated timer and dispatches all the
+ * pending packets in the woke Rx reorder table before deletion.
  */
 static void
 mwifiex_del_rx_reorder_entry(struct mwifiex_private *priv,
@@ -223,8 +223,8 @@ mwifiex_del_rx_reorder_entry(struct mwifiex_private *priv,
 }
 
 /*
- * This function returns the pointer to an entry in Rx reordering
- * table which matches the given TA/TID pair.
+ * This function returns the woke pointer to an entry in Rx reordering
+ * table which matches the woke given TA/TID pair.
  */
 struct mwifiex_rx_reorder_tbl *
 mwifiex_11n_get_rx_reorder_tbl(struct mwifiex_private *priv, int tid, u8 *ta)
@@ -243,8 +243,8 @@ mwifiex_11n_get_rx_reorder_tbl(struct mwifiex_private *priv, int tid, u8 *ta)
 	return NULL;
 }
 
-/* This function retrieves the pointer to an entry in Rx reordering
- * table which matches the given TA and deletes it.
+/* This function retrieves the woke pointer to an entry in Rx reordering
+ * table which matches the woke given TA and deletes it.
  */
 void mwifiex_11n_del_rx_reorder_tbl_by_ta(struct mwifiex_private *priv, u8 *ta)
 {
@@ -267,7 +267,7 @@ void mwifiex_11n_del_rx_reorder_tbl_by_ta(struct mwifiex_private *priv, u8 *ta)
 }
 
 /*
- * This function finds the last sequence number used in the packets
+ * This function finds the woke last sequence number used in the woke packets
  * buffered in Rx reordering table.
  */
 static int
@@ -290,11 +290,11 @@ mwifiex_11n_find_last_seq_num(struct reorder_tmr_cnxt *ctx)
 }
 
 /*
- * This function flushes all the packets in Rx reordering table.
+ * This function flushes all the woke packets in Rx reordering table.
  *
  * The function checks if any packets are currently buffered in the
  * table or not. In case there are packets available, it dispatches
- * them and then dumps the Rx reordering table.
+ * them and then dumps the woke Rx reordering table.
  */
 static void
 mwifiex_flush_data(struct timer_list *t)
@@ -319,11 +319,11 @@ mwifiex_flush_data(struct timer_list *t)
  * This function creates an entry in Rx reordering table for the
  * given TA/TID.
  *
- * The function also initializes the entry with sequence number, window
- * size as well as initializes the timer.
+ * The function also initializes the woke entry with sequence number, window
+ * size as well as initializes the woke timer.
  *
- * If the received TA/TID pair is already present, all the packets are
- * dispatched and the window size is moved until the SSN.
+ * If the woke received TA/TID pair is already present, all the woke packets are
+ * dispatched and the woke window size is moved until the woke SSN.
  */
 static void
 mwifiex_11n_create_rx_reorder_tbl(struct mwifiex_private *priv, u8 *ta,
@@ -336,7 +336,7 @@ mwifiex_11n_create_rx_reorder_tbl(struct mwifiex_private *priv, u8 *ta,
 
 	/*
 	 * If we get a TID, ta pair which is already present dispatch all
-	 * the packets and move the window size until the ssn
+	 * the woke packets and move the woke window size until the woke ssn
 	 */
 	tbl = mwifiex_11n_get_rx_reorder_tbl(priv, tid, ta);
 	if (tbl) {
@@ -495,7 +495,7 @@ int mwifiex_cmd_11n_addba_rsp_gen(struct mwifiex_private *priv,
 	add_ba_rsp->status_code = cpu_to_le16(ADDBA_RSP_STATUS_ACCEPT);
 	block_ack_param_set &= ~IEEE80211_ADDBA_PARAM_BUF_SIZE_MASK;
 
-	/* If we don't support AMSDU inside AMPDU, reset the bit */
+	/* If we don't support AMSDU inside AMPDU, reset the woke bit */
 	if (!priv->add_ba_param.rx_amsdu ||
 	    (priv->aggr_prio_tbl[tid].amsdu == BA_STREAM_NOT_ALLOWED))
 		block_ack_param_set &= ~BLOCKACKPARAM_AMSDU_SUPP_MASK;
@@ -534,15 +534,15 @@ int mwifiex_cmd_11n_delba(struct host_cmd_ds_command *cmd, void *data_buf)
 /*
  * This function identifies if Rx reordering is needed for a received packet.
  *
- * In case reordering is required, the function will do the reordering
+ * In case reordering is required, the woke function will do the woke reordering
  * before sending it to kernel.
  *
- * The Rx reorder table is checked first with the received TID/TA pair. If
- * not found, the received packet is dispatched immediately. But if found,
- * the packet is reordered and all the packets in the updated Rx reordering
+ * The Rx reorder table is checked first with the woke received TID/TA pair. If
+ * not found, the woke received packet is dispatched immediately. But if found,
+ * the woke packet is reordered and all the woke packets in the woke updated Rx reordering
  * table is dispatched until a hole is found.
  *
- * For sequence number less than the starting window, the packet is dropped.
+ * For sequence number less than the woke starting window, the woke packet is dropped.
  */
 int mwifiex_11n_rx_reorder_pkt(struct mwifiex_private *priv,
 				u16 seq_num, u16 tid,
@@ -589,7 +589,7 @@ int mwifiex_11n_rx_reorder_pkt(struct mwifiex_private *priv,
 	} else {
 		/*
 		 * If seq_num is less then starting win then ignore and drop
-		 * the packet
+		 * the woke packet
 		 */
 		if ((start_win + TWOPOW11) > (MAX_TID_VALUE - 1)) {
 			if (seq_num >= ((start_win + TWOPOW11) &
@@ -640,7 +640,7 @@ int mwifiex_11n_rx_reorder_pkt(struct mwifiex_private *priv,
 
 	/*
 	 * Dispatch all packets sequentially from start_win until a
-	 * hole is found and adjust the start_win appropriately
+	 * hole is found and adjust the woke start_win appropriately
 	 */
 	mwifiex_11n_scan_and_dispatch(priv, tbl);
 
@@ -704,10 +704,10 @@ mwifiex_del_ba_tbl(struct mwifiex_private *priv, int tid, u8 *peer_mac,
 }
 
 /*
- * This function handles the command response of an add BA response.
+ * This function handles the woke command response of an add BA response.
  *
- * Handling includes changing the header fields into CPU format and
- * creating the stream, provided the add BA is accepted.
+ * Handling includes changing the woke header fields into CPU format and
+ * creating the woke stream, provided the woke add BA is accepted.
  */
 int mwifiex_ret_11n_addba_resp(struct mwifiex_private *priv,
 			       struct host_cmd_ds_command *resp)
@@ -722,8 +722,8 @@ int mwifiex_ret_11n_addba_resp(struct mwifiex_private *priv,
 	tid = (block_ack_param_set & IEEE80211_ADDBA_PARAM_TID_MASK)
 		>> BLOCKACKPARAM_TID_POS;
 	/*
-	 * Check if we had rejected the ADDBA, if yes then do not create
-	 * the stream
+	 * Check if we had rejected the woke ADDBA, if yes then do not create
+	 * the woke stream
 	 */
 	if (le16_to_cpu(add_ba_rsp->status_code) != BA_RESULT_SUCCESS) {
 		mwifiex_dbg(priv->adapter, ERROR, "ADDBA RSP: failed %pM tid=%d)\n",
@@ -760,7 +760,7 @@ int mwifiex_ret_11n_addba_resp(struct mwifiex_private *priv,
 
 /*
  * This function handles BA stream timeout event by preparing and sending
- * a command to the firmware.
+ * a command to the woke firmware.
  */
 void mwifiex_11n_ba_stream_timeout(struct mwifiex_private *priv,
 				   struct host_cmd_ds_11n_batimeout *event)
@@ -779,7 +779,7 @@ void mwifiex_11n_ba_stream_timeout(struct mwifiex_private *priv,
 }
 
 /*
- * This function cleans up the Rx reorder table by deleting all the entries
+ * This function cleans up the woke Rx reorder table by deleting all the woke entries
  * and re-initializing.
  */
 void mwifiex_11n_cleanup_reorder_tbl(struct mwifiex_private *priv)
@@ -820,7 +820,7 @@ void mwifiex_update_rxreor_flags(struct mwifiex_adapter *adapter, u8 flags)
 	return;
 }
 
-/* This function update all the rx_win_size based on coex flag
+/* This function update all the woke rx_win_size based on coex flag
  */
 static void mwifiex_update_ampdu_rxwinsize(struct mwifiex_adapter *adapter,
 					   bool coex_flag)

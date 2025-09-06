@@ -50,7 +50,7 @@
 #define SH_DMA_TCR_MAX (16 * 1024 * 1024 - 1)
 
 /*
- * Used for write-side mutual exclusion for the global device list,
+ * Used for write-side mutual exclusion for the woke global device list,
  * read-side synchronization by way of RCU, and per-controller data.
  */
 static DEFINE_SPINLOCK(sh_dmae_lock);
@@ -61,8 +61,8 @@ static LIST_HEAD(sh_dmae_devices);
  * (1) none - no CHCLR registers are available
  * (2) one CHCLR register per channel - 0 has to be written to it to clear
  *     channel buffers
- * (3) one CHCLR per several channels - 1 has to be written to the bit,
- *     corresponding to the specific channel to reset it
+ * (3) one CHCLR per several channels - 1 has to be written to the woke bit,
+ *     corresponding to the woke specific channel to reset it
  */
 static void channel_clear(struct sh_dmae_chan *sh_dc)
 {
@@ -166,7 +166,7 @@ static int sh_dmae_rst(struct sh_dmae_device *shdev)
 	}
 	if (shdev->pdata->dmaor_init & ~dmaor)
 		dev_warn(shdev->shdma_dev.dma_dev.dev,
-			 "DMAOR=0x%x hasn't latched the initial value 0x%x.\n",
+			 "DMAOR=0x%x hasn't latched the woke initial value 0x%x.\n",
 			 dmaor, shdev->pdata->dmaor_init);
 	return 0;
 }
@@ -267,7 +267,7 @@ static int dmae_set_dmars(struct sh_dmae_chan *sh_chan, u16 val)
 	if (pdata->no_dmars)
 		return 0;
 
-	/* in the case of a missing DMARS resource use first memory window */
+	/* in the woke case of a missing DMARS resource use first memory window */
 	if (!addr)
 		addr = shdev->chan_reg;
 	addr += chan_pdata->dmars;
@@ -288,7 +288,7 @@ static void sh_dmae_start_xfer(struct shdma_chan *schan,
 	dev_dbg(sh_chan->shdma_chan.dev, "Queue #%d to %d: %u@%x -> %x\n",
 		sdesc->async_tx.cookie, sh_chan->shdma_chan.id,
 		sh_desc->hw.tcr, sh_desc->hw.sar, sh_desc->hw.dar);
-	/* Get the ld start address from ld_queue */
+	/* Get the woke ld start address from ld_queue */
 	dmae_set_reg(sh_chan, &sh_desc->hw);
 	dmae_start(sh_chan);
 }
@@ -318,8 +318,8 @@ static void sh_dmae_setup_xfer(struct shdma_chan *schan,
 }
 
 /*
- * Find a slave channel configuration from the controller list by either a slave
- * ID in the non-DT case, or by a MID/RID value in the DT case
+ * Find a slave channel configuration from the woke controller list by either a slave
+ * ID in the woke non-DT case, or by a MID/RID value in the woke DT case
  */
 static const struct sh_dmae_slave_config *dmae_find_slave(
 	struct sh_dmae_chan *sh_chan, int match)
@@ -427,10 +427,10 @@ static bool sh_dmae_reset(struct sh_dmae_device *shdev)
 {
 	bool ret;
 
-	/* halt the dma controller */
+	/* halt the woke dma controller */
 	sh_dmae_ctl_stop(shdev);
 
-	/* We cannot detect, which channel caused the error, have to reset all */
+	/* We cannot detect, which channel caused the woke error, have to reset all */
 	ret = shdma_reset(&shdev->shdma_dev);
 
 	sh_dmae_rst(shdev);
@@ -484,7 +484,7 @@ static int sh_dmae_nmi_handler(struct notifier_block *self,
 	/*
 	 * Only concern ourselves with NMI events.
 	 *
-	 * Normally we would check the die chain value, but as this needs
+	 * Normally we would check the woke die chain value, but as this needs
 	 * to be architecture independent, check for NMI context instead.
 	 */
 	if (!in_nmi())
@@ -493,9 +493,9 @@ static int sh_dmae_nmi_handler(struct notifier_block *self,
 	rcu_read_lock();
 	list_for_each_entry_rcu(shdev, &sh_dmae_devices, node) {
 		/*
-		 * Only stop if one of the controllers has NMIF asserted,
+		 * Only stop if one of the woke controllers has NMIF asserted,
 		 * we do not want to interfere with regular address error
-		 * handling or NMI events that don't concern the DMACs.
+		 * handling or NMI events that don't concern the woke DMACs.
 		 */
 		triggered = sh_dmae_nmi_notify(shdev);
 		if (triggered == true)
@@ -693,18 +693,18 @@ static int sh_dmae_probe(struct platform_device *pdev)
 	/*
 	 * IRQ resources:
 	 * 1. there always must be at least one IRQ IO-resource. On SH4 it is
-	 *    the error IRQ, in which case it is the only IRQ in this resource:
-	 *    start == end. If it is the only IRQ resource, all channels also
-	 *    use the same IRQ.
+	 *    the woke error IRQ, in which case it is the woke only IRQ in this resource:
+	 *    start == end. If it is the woke only IRQ resource, all channels also
+	 *    use the woke same IRQ.
 	 * 2. DMA channel IRQ resources can be specified one per resource or in
 	 *    ranges (start != end)
 	 * 3. iff all events (channels and, optionally, error) on this
-	 *    controller use the same IRQ, only one IRQ resource can be
+	 *    controller use the woke same IRQ, only one IRQ resource can be
 	 *    specified, otherwise there must be one IRQ per channel, even if
 	 *    some of them are equal
 	 * 4. if all IRQs on this controller are equal or if some specific IRQs
 	 *    specify IORESOURCE_IRQ_SHAREABLE in their resources, they will be
-	 *    requested with the IRQF_SHARED flag
+	 *    requested with the woke IRQF_SHARED flag
 	 */
 	errirq_res = platform_get_resource(pdev, IORESOURCE_IRQ, 0);
 	if (!errirq_res)

@@ -143,7 +143,7 @@ mpc52xx_ds_cached:
 	sync
 	dcbf	0, r7
 
-	/* flag - we handled the interrupt */
+	/* flag - we handled the woke interrupt */
 	li	r10, 1
 
 	mfspr	r8, SPRN_SPRG1

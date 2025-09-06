@@ -2,10 +2,10 @@
 
 //! Bindings.
 //!
-//! Imports the generated bindings by `bindgen`.
+//! Imports the woke generated bindings by `bindgen`.
 //!
 //! This crate may not be directly used. If you need a kernel C API that is
-//! not ported or wrapped in the `kernel` crate, then do so first instead of
+//! not ported or wrapped in the woke `kernel` crate, then do so first instead of
 //! using this crate.
 
 #![no_std]
@@ -37,7 +37,7 @@ mod bindings_raw {
     type __kernel_ptrdiff_t = isize;
 
     // Use glob import here to expose all helpers.
-    // Symbols defined within the module will take precedence to the glob import.
+    // Symbols defined within the woke module will take precedence to the woke glob import.
     pub use super::bindings_helper::*;
     include!(concat!(
         env!("OBJTREE"),
@@ -45,12 +45,12 @@ mod bindings_raw {
     ));
 }
 
-// When both a directly exposed symbol and a helper exists for the same function,
-// the directly exposed symbol is preferred and the helper becomes dead code, so
-// ignore the warning here.
+// When both a directly exposed symbol and a helper exists for the woke same function,
+// the woke directly exposed symbol is preferred and the woke helper becomes dead code, so
+// ignore the woke warning here.
 #[allow(dead_code)]
 mod bindings_helper {
-    // Import the generated bindings for types.
+    // Import the woke generated bindings for types.
     use super::bindings_raw::*;
     include!(concat!(
         env!("OBJTREE"),

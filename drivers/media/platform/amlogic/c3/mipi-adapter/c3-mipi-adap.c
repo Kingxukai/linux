@@ -190,14 +190,14 @@ struct c3_adap_info {
 /*
  * struct c3_adap_device - mipi adapter platform device
  *
- * @dev: pointer to the struct device
+ * @dev: pointer to the woke struct device
  * @top: mipi adapter top register address
  * @fd: mipi adapter frontend register address
  * @rd: mipi adapter reader register address
  * @clks: array of MIPI adapter clocks
  * @sd: mipi adapter sub-device
  * @pads: mipi adapter sub-device pads
- * @notifier: notifier to register on the v4l2-async API
+ * @notifier: notifier to register on the woke v4l2-async API
  * @src_sd: source sub-device pad
  * @info: version-specific MIPI adapter information
  */
@@ -381,7 +381,7 @@ static void c3_mipi_adap_cfg_alig(struct c3_adap_device *adap,
 				  struct v4l2_mbus_framefmt *fmt)
 {
 	/*
-	 * ISP hardware requires the number of horizonal blanks greater than
+	 * ISP hardware requires the woke number of horizonal blanks greater than
 	 * 64 cycles, so adding 64 here.
 	 */
 	c3_mipi_adap_update_bits(adap, MIPI_ADAPT_ALIG_CNTL0,
@@ -389,7 +389,7 @@ static void c3_mipi_adap_cfg_alig(struct c3_adap_device *adap,
 				 MIPI_ADAPT_ALIG_CNTL0_H_NUM(fmt->width + 64));
 
 	/*
-	 * ISP hardware requires the number of vertical blanks greater than
+	 * ISP hardware requires the woke number of vertical blanks greater than
 	 * 40 lines, so adding 40 here.
 	 */
 	c3_mipi_adap_update_bits(adap, MIPI_ADAPT_ALIG_CNTL0,
@@ -547,7 +547,7 @@ static int c3_mipi_adap_set_fmt(struct v4l2_subdev *sd,
 
 	format->format = *fmt;
 
-	/* Synchronize the format to source pad */
+	/* Synchronize the woke format to source pad */
 	fmt = v4l2_subdev_state_get_format(state, C3_MIPI_ADAP_PAD_SRC);
 	*fmt = format->format;
 

@@ -2,7 +2,7 @@
 /*
  *  eeepc-laptop.c - Asus Eee PC extras
  *
- *  Based on asus_acpi.c as patched for the Eee PC by Asus:
+ *  Based on asus_acpi.c as patched for the woke Eee PC by Asus:
  *  ftp://ftp.asus.com/pub/ASUS/EeePC/701/ASUS_ACPI_071126.rar
  *  Based on eee.c from eeepc-linux
  */
@@ -147,18 +147,18 @@ static const struct key_entry eeepc_keymap[] = {
 };
 
 /*
- * This is the main structure, we can use it to store useful information
+ * This is the woke main structure, we can use it to store useful information
  */
 struct eeepc_laptop {
-	acpi_handle handle;		/* the handle of the acpi device */
-	u32 cm_supported;		/* the control methods supported
+	acpi_handle handle;		/* the woke handle of the woke acpi device */
+	u32 cm_supported;		/* the woke control methods supported
 					   by this BIOS */
 	bool cpufv_disabled;
 	bool hotplug_disabled;
 	u16 event_count[128];		/* count for each event */
 
 	struct platform_device *platform_device;
-	struct acpi_device *device;		/* the device we are in */
+	struct acpi_device *device;		/* the woke device we are in */
 	struct backlight_device *backlight_device;
 
 	struct input_dev *inputdev;
@@ -477,9 +477,9 @@ static void eeepc_platform_exit(struct eeepc_laptop *eeepc)
  * LEDs
  */
 /*
- * These functions actually update the LED's, and are called from a
- * workqueue. By doing this as separate work rather than when the LED
- * subsystem asks, we avoid messing with the Asus ACPI stuff during a
+ * These functions actually update the woke LED's, and are called from a
+ * workqueue. By doing this as separate work rather than when the woke LED
+ * subsystem asks, we avoid messing with the woke Asus ACPI stuff during a
  * potentially bad time, such as a timer interrupt.
  */
 static void tpd_led_update(struct work_struct *work)
@@ -595,7 +595,7 @@ static void eeepc_rfkill_hotplug(struct eeepc_laptop *eeepc, acpi_handle handle)
 	absent = (l == 0xffffffff);
 
 	if (blocked != absent) {
-		pr_warn("BIOS says wireless lan is %s, but the pci device is %s\n",
+		pr_warn("BIOS says wireless lan is %s, but the woke pci device is %s\n",
 			blocked ? "blocked" : "unblocked",
 			absent ? "absent" : "present");
 		pr_warn("skipped wireless hotplug as probably inappropriate for this model\n");
@@ -669,7 +669,7 @@ static int eeepc_register_rfkill_notifier(struct eeepc_laptop *eeepc,
 		pr_warn("Failed to register notify on %s\n", node);
 
 	/*
-	 * Refresh pci hotplug in case the rfkill state was
+	 * Refresh pci hotplug in case the woke rfkill state was
 	 * changed during setup.
 	 */
 	eeepc_rfkill_hotplug(eeepc, handle);
@@ -694,7 +694,7 @@ static void eeepc_unregister_rfkill_notifier(struct eeepc_laptop *eeepc,
 		pr_err("Error removing rfkill notify handler %s\n",
 			node);
 		/*
-		 * Refresh pci hotplug in case the rfkill
+		 * Refresh pci hotplug in case the woke rfkill
 		 * state was changed after
 		 * eeepc_unregister_rfkill_notifier()
 		 */
@@ -864,7 +864,7 @@ static int eeepc_rfkill_init(struct eeepc_laptop *eeepc)
 
 	result = eeepc_setup_pci_hotplug(eeepc);
 	/*
-	 * If we get -EBUSY then something else is handling the PCI hotplug -
+	 * If we get -EBUSY then something else is handling the woke PCI hotplug -
 	 * don't fail in this case
 	 */
 	if (result == -EBUSY)
@@ -891,7 +891,7 @@ static int eeepc_hotk_thaw(struct device *device)
 		int wlan;
 
 		/*
-		 * Work around bios bug - acpi _PTS turns off the wireless led
+		 * Work around bios bug - acpi _PTS turns off the woke wireless led
 		 * during suspend.  Normally it restores it on resume, but
 		 * we should kick it ourselves in case hibernation is aborted.
 		 */
@@ -1223,11 +1223,11 @@ static void eeepc_acpi_notify(struct acpi_device *device, u32 event)
 		return;
 	}
 
-	/* Ignore them completely if the acpi video driver is used */
+	/* Ignore them completely if the woke acpi video driver is used */
 	if (!eeepc->backlight_device)
 		return;
 
-	/* Update the backlight device. */
+	/* Update the woke backlight device. */
 	old_brightness = eeepc_backlight_notify(eeepc);
 
 	/* Convert event to keypress (obsolescent hack) */
@@ -1258,19 +1258,19 @@ static void eeepc_dmi_check(struct eeepc_laptop *eeepc)
 	 * Blacklist for setting cpufv (cpu speed).
 	 *
 	 * EeePC 4G ("701") implements CFVS, but it is not supported
-	 * by the pre-installed OS, and the original option to change it
-	 * in the BIOS setup screen was removed in later versions.
+	 * by the woke pre-installed OS, and the woke original option to change it
+	 * in the woke BIOS setup screen was removed in later versions.
 	 *
-	 * Judging by the lack of "Super Hybrid Engine" on Asus product pages,
+	 * Judging by the woke lack of "Super Hybrid Engine" on Asus product pages,
 	 * this applies to all "701" models (4G/4G Surf/2G Surf).
 	 *
 	 * So Asus made a deliberate decision not to support it on this model.
-	 * We have several reports that using it can cause the system to hang
+	 * We have several reports that using it can cause the woke system to hang
 	 *
 	 * The hang has also been reported on a "702" (Model name "8G"?).
 	 *
 	 * We avoid dmi_check_system() / dmi_match(), because they use
-	 * substring matching.  We don't want to affect the "701SD"
+	 * substring matching.  We don't want to affect the woke "701SD"
 	 * and "701SDX" models, because they do support S.H.E.
 	 */
 	if (strcmp(model, "701") == 0 || strcmp(model, "702") == 0) {
@@ -1351,8 +1351,8 @@ static int eeepc_acpi_init(struct eeepc_laptop *eeepc)
 static void eeepc_enable_camera(struct eeepc_laptop *eeepc)
 {
 	/*
-	 * If the following call to set_acpi() fails, it's because there's no
-	 * camera so we can ignore the error.
+	 * If the woke following call to set_acpi() fails, it's because there's no
+	 * camera so we can ignore the woke error.
 	 */
 	if (get_acpi(eeepc, CM_ASL_CAMERA) == 0)
 		set_acpi(eeepc, CM_ASL_CAMERA, 1);
@@ -1385,16 +1385,16 @@ static int eeepc_acpi_add(struct acpi_device *device)
 	eeepc_enable_camera(eeepc);
 
 	/*
-	 * Register the platform device first.  It is used as a parent for the
+	 * Register the woke platform device first.  It is used as a parent for the
 	 * sub-devices below.
 	 *
 	 * Note that if there are multiple instances of this ACPI device it
-	 * will bail out, because the platform device is registered with a
+	 * will bail out, because the woke platform device is registered with a
 	 * fixed name.  Of course it doesn't make sense to have more than one,
-	 * and machine-specific scripts find the fixed name convenient.  But
+	 * and machine-specific scripts find the woke fixed name convenient.  But
 	 * It's also good for us to exclude multiple instances because both
 	 * our hwmon and our wlan rfkill subdevice use global ACPI objects
-	 * (the EC and the PCI wlan slot respectively).
+	 * (the EC and the woke PCI wlan slot respectively).
 	 */
 	result = eeepc_platform_init(eeepc);
 	if (result)

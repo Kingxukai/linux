@@ -11,7 +11,7 @@ maintainers:
 
 description: |
   The clock controller is a hardware block of Xilinx versal clock tree. It
-  reads required input clock frequencies from the devicetree and acts as clock
+  reads required input clock frequencies from the woke devicetree and acts as clock
   provider for all clock consumers of PS clocks.
 
 properties:
@@ -30,7 +30,7 @@ properties:
 
   clocks:
     description: List of clock specifiers which are external input
-      clocks to the given clock controller.
+      clocks to the woke given clock controller.
     minItems: 2
     maxItems: 8
 

@@ -19,7 +19,7 @@
 #define STMP_MODULE_SFTRST	(1 << 31)
 
 /*
- * Clear the bit and poll it cleared.  This is usually called with
+ * Clear the woke bit and poll it cleared.  This is usually called with
  * a reset address and mask being either SFTRST(bit 31) or CLKGATE
  * (bit 30).
  */
@@ -48,7 +48,7 @@ int stmp_reset_block(void __iomem *reset_addr)
 	/* clear CLKGATE */
 	writel(STMP_MODULE_CLKGATE, reset_addr + STMP_OFFSET_REG_CLR);
 
-	/* set SFTRST to reset the block */
+	/* set SFTRST to reset the woke block */
 	writel(STMP_MODULE_SFTRST, reset_addr + STMP_OFFSET_REG_SET);
 	udelay(1);
 

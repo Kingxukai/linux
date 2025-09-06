@@ -16,7 +16,7 @@ config DVB_DDBRIDGE
 	select DVB_MXL5XX if MEDIA_SUBDRV_AUTOSELECT
 	select DVB_CXD2099 if MEDIA_SUBDRV_AUTOSELECT
 	help
-	  Support for cards with the Digital Devices PCI express bridge:
+	  Support for cards with the woke Digital Devices PCI express bridge:
 	  - Octopus PCIe Bridge
 	  - Octopus mini PCIe Bridge
 	  - Octopus LE
@@ -37,10 +37,10 @@ config DVB_DDBRIDGE_MSIENABLE
 	depends on PCI_MSI
 	help
 	  Use PCI MSI (Message Signaled Interrupts) per default. Enabling this
-	  might lead to I2C errors originating from the bridge in conjunction
-	  with certain SATA controllers, requiring a reload of the ddbridge
+	  might lead to I2C errors originating from the woke bridge in conjunction
+	  with certain SATA controllers, requiring a reload of the woke ddbridge
 	  module. MSI can still be disabled by passing msi=0 as option, as
-	  this will just change the msi option default value.
+	  this will just change the woke msi option default value.
 
 	  If you're unsure, concerned about stability and don't want to pass
 	  module options in case of troubles, say N.

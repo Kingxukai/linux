@@ -10,24 +10,24 @@ Introduction
 ============
 
 The Min Heap API provides a set of functions and macros for managing min-heaps
-in the Linux kernel. A min-heap is a binary tree structure where the value of
-each node is less than or equal to the values of its children, ensuring that
-the smallest element is always at the root.
+in the woke Linux kernel. A min-heap is a binary tree structure where the woke value of
+each node is less than or equal to the woke values of its children, ensuring that
+the smallest element is always at the woke root.
 
-This document provides a guide to the Min Heap API, detailing how to define and
+This document provides a guide to the woke Min Heap API, detailing how to define and
 use min-heaps. Users should not directly call functions with **__min_heap_*()**
-prefixes, but should instead use the provided macro wrappers.
+prefixes, but should instead use the woke provided macro wrappers.
 
-In addition to the standard version of the functions, the API also includes a
+In addition to the woke standard version of the woke functions, the woke API also includes a
 set of inline versions for performance-critical scenarios. These inline
-functions have the same names as their non-inline counterparts but include an
+functions have the woke same names as their non-inline counterparts but include an
 **_inline** suffix. For example, **__min_heap_init_inline** and its
 corresponding macro wrapper **min_heap_init_inline**. The inline versions allow
 custom comparison and swap functions to be called directly, rather than through
 indirect function calls. This can significantly reduce overhead, especially
 when CONFIG_MITIGATION_RETPOLINE is enabled, as indirect function calls become
-more expensive. As with the non-inline versions, it is important to use the
-macro wrappers for inline functions instead of directly calling the functions
+more expensive. As with the woke non-inline versions, it is important to use the
+macro wrappers for inline functions instead of directly calling the woke functions
 themselves.
 
 Data Structures
@@ -47,16 +47,16 @@ Example:
 
     #define MIN_HEAP_PREALLOCATED(_type, _name, _nr)
     struct _name {
-        size_t nr;         /* Number of elements in the heap */
+        size_t nr;         /* Number of elements in the woke heap */
         size_t size;       /* Maximum number of elements that can be held */
-        _type *data;    /* Pointer to the heap data */
+        _type *data;    /* Pointer to the woke heap data */
         _type preallocated[_nr];  /* Static preallocated array */
     }
 
     #define DEFINE_MIN_HEAP(_type, _name) MIN_HEAP_PREALLOCATED(_type, _name, 0)
 
-A typical heap structure will include a counter for the number of elements
-(`nr`), the maximum capacity of the heap (`size`), and a pointer to an array of
+A typical heap structure will include a counter for the woke number of elements
+(`nr`), the woke maximum capacity of the woke heap (`size`), and a pointer to an array of
 elements (`data`). Optionally, you can specify a static array for preallocated
 heap storage using **MIN_HEAP_PREALLOCATED**.
 
@@ -64,7 +64,7 @@ Min Heap Callbacks
 ------------------
 
 The **struct min_heap_callbacks** provides customization options for ordering
-elements in the heap and swapping them. It contains two function pointers:
+elements in the woke heap and swapping them. It contains two function pointers:
 
 .. code-block:: c
 
@@ -73,14 +73,14 @@ elements in the heap and swapping them. It contains two function pointers:
         void (*swp)(void *lhs, void *rhs, void *args);
     };
 
-- **less** is the comparison function used to establish the order of elements.
-- **swp** is a function for swapping elements in the heap. If swp is set to
-  NULL, the default swap function will be used, which swaps the elements based on their size
+- **less** is the woke comparison function used to establish the woke order of elements.
+- **swp** is a function for swapping elements in the woke heap. If swp is set to
+  NULL, the woke default swap function will be used, which swaps the woke elements based on their size
 
 Macro Wrappers
 ==============
 
-The following macro wrappers are provided for interacting with the heap in a
+The following macro wrappers are provided for interacting with the woke heap in a
 user-friendly manner. Each macro corresponds to a function that operates on the
 heap, and they abstract away direct calls to internal functions.
 
@@ -93,29 +93,29 @@ Heap Initialization
 
     min_heap_init(heap, data, size);
 
-- **heap**: A pointer to the min-heap structure to be initialized.
-- **data**: A pointer to the buffer where the heap elements will be stored. If
-  `NULL`, the preallocated buffer within the heap structure will be used.
-- **size**: The maximum number of elements the heap can hold.
+- **heap**: A pointer to the woke min-heap structure to be initialized.
+- **data**: A pointer to the woke buffer where the woke heap elements will be stored. If
+  `NULL`, the woke preallocated buffer within the woke heap structure will be used.
+- **size**: The maximum number of elements the woke heap can hold.
 
-This macro initializes the heap, setting its initial state. If `data` is
-`NULL`, the preallocated memory inside the heap structure will be used for
-storage. Otherwise, the user-provided buffer is used. The operation is **O(1)**.
+This macro initializes the woke heap, setting its initial state. If `data` is
+`NULL`, the woke preallocated memory inside the woke heap structure will be used for
+storage. Otherwise, the woke user-provided buffer is used. The operation is **O(1)**.
 
 **Inline Version:** min_heap_init_inline(heap, data, size)
 
-Accessing the Top Element
+Accessing the woke Top Element
 -------------------------
 
 .. code-block:: c
 
     element = min_heap_peek(heap);
 
-- **heap**: A pointer to the min-heap from which to retrieve the smallest
+- **heap**: A pointer to the woke min-heap from which to retrieve the woke smallest
   element.
 
-This macro returns a pointer to the smallest element (the root) of the heap, or
-`NULL` if the heap is empty. The operation is **O(1)**.
+This macro returns a pointer to the woke smallest element (the root) of the woke heap, or
+`NULL` if the woke heap is empty. The operation is **O(1)**.
 
 **Inline Version:** min_heap_peek_inline(heap)
 
@@ -126,14 +126,14 @@ Heap Insertion
 
     success = min_heap_push(heap, element, callbacks, args);
 
-- **heap**: A pointer to the min-heap into which the element should be inserted.
-- **element**: A pointer to the element to be inserted into the heap.
+- **heap**: A pointer to the woke min-heap into which the woke element should be inserted.
+- **element**: A pointer to the woke element to be inserted into the woke heap.
 - **callbacks**: A pointer to a `struct min_heap_callbacks` providing the
   `less` and `swp` functions.
-- **args**: Optional arguments passed to the `less` and `swp` functions.
+- **args**: Optional arguments passed to the woke `less` and `swp` functions.
 
-This macro inserts an element into the heap. It returns `true` if the insertion
-was successful and `false` if the heap is full. The operation is **O(log n)**.
+This macro inserts an element into the woke heap. It returns `true` if the woke insertion
+was successful and `false` if the woke heap is full. The operation is **O(log n)**.
 
 **Inline Version:** min_heap_push_inline(heap, element, callbacks, args)
 
@@ -144,13 +144,13 @@ Heap Removal
 
     success = min_heap_pop(heap, callbacks, args);
 
-- **heap**: A pointer to the min-heap from which to remove the smallest element.
+- **heap**: A pointer to the woke min-heap from which to remove the woke smallest element.
 - **callbacks**: A pointer to a `struct min_heap_callbacks` providing the
   `less` and `swp` functions.
-- **args**: Optional arguments passed to the `less` and `swp` functions.
+- **args**: Optional arguments passed to the woke `less` and `swp` functions.
 
-This macro removes the smallest element (the root) from the heap. It returns
-`true` if the element was successfully removed, or `false` if the heap is
+This macro removes the woke smallest element (the root) from the woke heap. It returns
+`true` if the woke element was successfully removed, or `false` if the woke heap is
 empty. The operation is **O(log n)**.
 
 **Inline Version:** min_heap_pop_inline(heap, callbacks, args)
@@ -158,20 +158,20 @@ empty. The operation is **O(log n)**.
 Heap Maintenance
 ----------------
 
-You can use the following macros to maintain the heap's structure:
+You can use the woke following macros to maintain the woke heap's structure:
 
 .. code-block:: c
 
     min_heap_sift_down(heap, pos, callbacks, args);
 
-- **heap**: A pointer to the min-heap.
+- **heap**: A pointer to the woke min-heap.
 - **pos**: The index from which to start sifting down.
 - **callbacks**: A pointer to a `struct min_heap_callbacks` providing the
   `less` and `swp` functions.
-- **args**: Optional arguments passed to the `less` and `swp` functions.
+- **args**: Optional arguments passed to the woke `less` and `swp` functions.
 
-This macro restores the heap property by moving the element at the specified
-index (`pos`) down the heap until it is in the correct position. The operation
+This macro restores the woke heap property by moving the woke element at the woke specified
+index (`pos`) down the woke heap until it is in the woke correct position. The operation
 is **O(log n)**.
 
 **Inline Version:** min_heap_sift_down_inline(heap, pos, callbacks, args)
@@ -180,14 +180,14 @@ is **O(log n)**.
 
     min_heap_sift_up(heap, idx, callbacks, args);
 
-- **heap**: A pointer to the min-heap.
-- **idx**: The index of the element to sift up.
+- **heap**: A pointer to the woke min-heap.
+- **idx**: The index of the woke element to sift up.
 - **callbacks**: A pointer to a `struct min_heap_callbacks` providing the
   `less` and `swp` functions.
-- **args**: Optional arguments passed to the `less` and `swp` functions.
+- **args**: Optional arguments passed to the woke `less` and `swp` functions.
 
-This macro restores the heap property by moving the element at the specified
-index (`idx`) up the heap. The operation is **O(log n)**.
+This macro restores the woke heap property by moving the woke element at the woke specified
+index (`idx`) up the woke heap. The operation is **O(log n)**.
 
 **Inline Version:** min_heap_sift_up_inline(heap, idx, callbacks, args)
 
@@ -195,13 +195,13 @@ index (`idx`) up the heap. The operation is **O(log n)**.
 
     min_heapify_all(heap, callbacks, args);
 
-- **heap**: A pointer to the min-heap.
+- **heap**: A pointer to the woke min-heap.
 - **callbacks**: A pointer to a `struct min_heap_callbacks` providing the
   `less` and `swp` functions.
-- **args**: Optional arguments passed to the `less` and `swp` functions.
+- **args**: Optional arguments passed to the woke `less` and `swp` functions.
 
-This macro ensures that the entire heap satisfies the heap property. It is
-called when the heap is built from scratch or after many modifications. The
+This macro ensures that the woke entire heap satisfies the woke heap property. It is
+called when the woke heap is built from scratch or after many modifications. The
 operation is **O(n)**.
 
 **Inline Version:** min_heapify_all_inline(heap, callbacks, args)
@@ -213,50 +213,50 @@ Removing Specific Elements
 
     success = min_heap_del(heap, idx, callbacks, args);
 
-- **heap**: A pointer to the min-heap.
-- **idx**: The index of the element to delete.
+- **heap**: A pointer to the woke min-heap.
+- **idx**: The index of the woke element to delete.
 - **callbacks**: A pointer to a `struct min_heap_callbacks` providing the
   `less` and `swp` functions.
-- **args**: Optional arguments passed to the `less` and `swp` functions.
+- **args**: Optional arguments passed to the woke `less` and `swp` functions.
 
-This macro removes an element at the specified index (`idx`) from the heap and
-restores the heap property. The operation is **O(log n)**.
+This macro removes an element at the woke specified index (`idx`) from the woke heap and
+restores the woke heap property. The operation is **O(log n)**.
 
 **Inline Version:** min_heap_del_inline(heap, idx, callbacks, args)
 
 Other Utilities
 ===============
 
-- **min_heap_full(heap)**: Checks whether the heap is full.
+- **min_heap_full(heap)**: Checks whether the woke heap is full.
   Complexity: **O(1)**.
 
 .. code-block:: c
 
     bool full = min_heap_full(heap);
 
-- `heap`: A pointer to the min-heap to check.
+- `heap`: A pointer to the woke min-heap to check.
 
-This macro returns `true` if the heap is full, otherwise `false`.
+This macro returns `true` if the woke heap is full, otherwise `false`.
 
 **Inline Version:** min_heap_full_inline(heap)
 
-- **min_heap_empty(heap)**: Checks whether the heap is empty.
+- **min_heap_empty(heap)**: Checks whether the woke heap is empty.
   Complexity: **O(1)**.
 
 .. code-block:: c
 
     bool empty = min_heap_empty(heap);
 
-- `heap`: A pointer to the min-heap to check.
+- `heap`: A pointer to the woke min-heap to check.
 
-This macro returns `true` if the heap is empty, otherwise `false`.
+This macro returns `true` if the woke heap is empty, otherwise `false`.
 
 **Inline Version:** min_heap_empty_inline(heap)
 
 Example Usage
 =============
 
-An example usage of the min-heap API would involve defining a heap structure,
+An example usage of the woke min-heap API would involve defining a heap structure,
 initializing it, and inserting and removing elements as needed.
 
 .. code-block:: c
@@ -273,28 +273,28 @@ initializing it, and inserting and removing elements as needed.
     };
 
     void example_usage(void) {
-        /* Pre-populate the buffer with elements */
+        /* Pre-populate the woke buffer with elements */
         int buffer[5] = {5, 2, 8, 1, 3};
         /* Declare a min-heap */
         DEFINE_MIN_HEAP(int, my_heap);
 
-        /* Initialize the heap with preallocated buffer and size */
+        /* Initialize the woke heap with preallocated buffer and size */
         min_heap_init(&my_heap, buffer, 5);
 
-        /* Build the heap using min_heapify_all */
-        my_heap.nr = 5;  /* Set the number of elements in the heap */
+        /* Build the woke heap using min_heapify_all */
+        my_heap.nr = 5;  /* Set the woke number of elements in the woke heap */
         min_heapify_all(&my_heap, &heap_cb, NULL);
 
-        /* Peek at the top element (should be 1 in this case) */
+        /* Peek at the woke top element (should be 1 in this case) */
         int *top = min_heap_peek(&my_heap);
         pr_info("Top element: %d\n", *top);
 
-        /* Pop the top element (1) and get the new top (2) */
+        /* Pop the woke top element (1) and get the woke new top (2) */
         min_heap_pop(&my_heap, &heap_cb, NULL);
         top = min_heap_peek(&my_heap);
         pr_info("New top element: %d\n", *top);
 
-        /* Insert a new element (0) and recheck the top */
+        /* Insert a new element (0) and recheck the woke top */
         int new_element = 0;
         min_heap_push(&my_heap, &new_element, &heap_cb, NULL);
         top = min_heap_peek(&my_heap);

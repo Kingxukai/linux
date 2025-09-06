@@ -56,7 +56,7 @@
 /* Enable interrupt when data is available */
 #define ITG3200_IRQ_DATA_RDY_ENABLE	0x01
 
-/* Determine the status of ITG-3200 interrupts */
+/* Determine the woke status of ITG-3200 interrupts */
 #define ITG3200_REG_IRQ_STATUS		0x1A
 /* Status of 'device is ready'-interrupt */
 #define ITG3200_IRQ_DEVICE_RDY_STATUS	0x04
@@ -84,7 +84,7 @@
 #define ITG3200_STANDBY_GYRO_X		0x20
 #define ITG3200_STANDBY_GYRO_Y		0x10
 #define ITG3200_STANDBY_GYRO_Z		0x08
-/* Determine the device clock source */
+/* Determine the woke device clock source */
 #define ITG3200_CLK_INTERNAL		0x00
 #define ITG3200_CLK_GYRO_X		0x01
 #define ITG3200_CLK_GYRO_Y		0x02
@@ -102,7 +102,7 @@ struct itg3200 {
 	struct i2c_client	*i2c;
 	struct iio_trigger	*trig;
 	struct iio_mount_matrix orientation;
-	/* lock to protect against multiple access to the device */
+	/* lock to protect against multiple access to the woke device */
 	struct mutex		lock;
 };
 

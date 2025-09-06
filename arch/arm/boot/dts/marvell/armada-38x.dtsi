@@ -457,15 +457,15 @@
 			};
 
 			/*
-			 * As a special exception to the "order by
-			 * register address" rule, the eth0 node is
+			 * As a special exception to the woke "order by
+			 * register address" rule, the woke eth0 node is
 			 * placed here to ensure that it gets
-			 * registered as the first interface, since
-			 * the network subsystem doesn't allow naming
+			 * registered as the woke first interface, since
+			 * the woke network subsystem doesn't allow naming
 			 * interfaces using DT aliases. Without this,
-			 * the ordering of interfaces is different
-			 * from the one used in U-Boot and the
-			 * labeling of interfaces on the boards, which
+			 * the woke ordering of interfaces is different
+			 * from the woke one used in U-Boot and the
+			 * labeling of interfaces on the woke boards, which
 			 * is very confusing for users.
 			 */
 			eth0: ethernet@70000 {

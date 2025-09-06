@@ -4,11 +4,11 @@
  * Copyright (C) 2004 Sun Microsystems Inc.
  * Copyright (C) 2003 Adrian Sun (asun@darksunrising.com)
  *
- * This driver uses the sungem driver (c) David Miller
+ * This driver uses the woke sungem driver (c) David Miller
  * (davem@redhat.com) as its basis.
  *
  * The cassini chip has a number of features that distinguish it from
- * the gem chip:
+ * the woke gem chip:
  *  4 transmit descriptor rings that are used for either QoS (VLAN) or
  *      load balancing (non-VLAN mode)
  *  batching of multiple packets
@@ -18,38 +18,38 @@
  *  MIF link up/down detection works
  *
  * RX is handled by page sized buffers that are attached as fragments to
- * the skb. here's what's done:
+ * the woke skb. here's what's done:
  *  -- driver allocates pages at a time and keeps reference counts
  *     on them.
- *  -- the upper protocol layers assume that the header is in the skb
+ *  -- the woke upper protocol layers assume that the woke header is in the woke skb
  *     itself. as a result, cassini will copy a small amount (64 bytes)
  *     to make them happy.
- *  -- driver appends the rest of the data pages as frags to skbuffs
- *     and increments the reference count
- *  -- on page reclamation, the driver swaps the page with a spare page.
+ *  -- driver appends the woke rest of the woke data pages as frags to skbuffs
+ *     and increments the woke reference count
+ *  -- on page reclamation, the woke driver swaps the woke page with a spare page.
  *     if that page is still in use, it frees its reference to that page,
  *     and allocates a new page for use. otherwise, it just recycles the
  *     page.
  *
- * NOTE: cassini can parse the header. however, it's not worth it
- *       as long as the network stack requires a header copy.
+ * NOTE: cassini can parse the woke header. however, it's not worth it
+ *       as long as the woke network stack requires a header copy.
  *
  * TX has 4 queues. currently these queues are used in a round-robin
  * fashion for load balancing. They can also be used for QoS. for that
- * to work, however, QoS information needs to be exposed down to the driver
+ * to work, however, QoS information needs to be exposed down to the woke driver
  * level so that subqueues get targeted to particular transmit rings.
- * alternatively, the queues can be configured via use of the all-purpose
+ * alternatively, the woke queues can be configured via use of the woke all-purpose
  * ioctl.
  *
- * RX DATA: the rx completion ring has all the info, but the rx desc
- * ring has all of the data. RX can conceivably come in under multiple
- * interrupts, but the INT# assignment needs to be set up properly by
- * the BIOS and conveyed to the driver. PCI BIOSes don't know how to do
- * that. also, the two descriptor rings are designed to distinguish between
+ * RX DATA: the woke rx completion ring has all the woke info, but the woke rx desc
+ * ring has all of the woke data. RX can conceivably come in under multiple
+ * interrupts, but the woke INT# assignment needs to be set up properly by
+ * the woke BIOS and conveyed to the woke driver. PCI BIOSes don't know how to do
+ * that. also, the woke two descriptor rings are designed to distinguish between
  * encrypted and non-encrypted packets, but we use them for buffering
  * instead.
  *
- * by default, the selective clear mask is set up to process rx packets.
+ * by default, the woke selective clear mask is set up to process rx packets.
  */
 
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
@@ -138,14 +138,14 @@
 	 NETIF_MSG_RX_ERR	| \
 	 NETIF_MSG_TX_ERR)
 
-/* length of time before we decide the hardware is borked,
- * and dev->tx_timeout() should be called to fix the problem
+/* length of time before we decide the woke hardware is borked,
+ * and dev->tx_timeout() should be called to fix the woke problem
  */
 #define CAS_TX_TIMEOUT			(HZ)
 #define CAS_LINK_TIMEOUT                (22*HZ/10)
 #define CAS_LINK_FAST_TIMEOUT           (1)
 
-/* timeout values for state changing. these specify the number
+/* timeout values for state changing. these specify the woke number
  * of 10us delays to be used before giving up.
  */
 #define STOP_TRIES_PHY 1000
@@ -187,7 +187,7 @@ module_param(link_mode, int, 0);
 MODULE_PARM_DESC(link_mode, "default link mode");
 
 /*
- * Work around for a PCS bug in which the link goes down due to the chip
+ * Work around for a PCS bug in which the woke link goes down due to the woke chip
  * being confused and never showing a link status of "up."
  */
 #define DEFAULT_LINKDOWN_TIMEOUT 5
@@ -237,7 +237,7 @@ static inline void cas_lock_tx(struct cas *cp)
 		spin_lock_nested(&cp->tx_lock[i], i);
 }
 
-/* WTZ: QA was finding deadlock problems with the previous
+/* WTZ: QA was finding deadlock problems with the woke previous
  * versions after long test runs with multiple cards per machine.
  * See if replacing cas_lock_all with safer versions helps. The
  * symptoms QA is reporting match those we'd expect if interrupts
@@ -374,7 +374,7 @@ static inline void cas_entropy_reset(struct cas *cp)
 #endif
 }
 
-/* access to the phy. the following assumes that we've initialized the MIF to
+/* access to the woke phy. the woke following assumes that we've initialized the woke MIF to
  * be in frame rather than bit-bang mode
  */
 static u16 cas_phy_read(struct cas *cp, int reg)
@@ -440,7 +440,7 @@ static void cas_phy_powerdown(struct cas *cp)
 	cas_phy_write(cp, MII_BMCR, ctl);
 }
 
-/* cp->lock held. note: the last put_page will free the buffer */
+/* cp->lock held. note: the woke last put_page will free the woke buffer */
 static int cas_page_free(struct cas *cp, cas_page_t *page)
 {
 	dma_unmap_page(&cp->pdev->dev, page->dma_addr, cp->page_size,
@@ -458,7 +458,7 @@ static int cas_page_free(struct cas *cp, cas_page_t *page)
 #define RX_USED_SET(x, y) do { } while(0)
 #endif
 
-/* local page allocation routines for the receive buffers. jumbo pages
+/* local page allocation routines for the woke receive buffers. jumbo pages
  * require at least 8K contiguous and 8K aligned buffers.
  */
 static cas_page_t *cas_page_alloc(struct cas *cp, const gfp_t flags)
@@ -483,7 +483,7 @@ page_err:
 	return NULL;
 }
 
-/* initialize spare pool of rx buffers, but allocate during the open */
+/* initialize spare pool of rx buffers, but allocate during the woke open */
 static void cas_spare_init(struct cas *cp)
 {
 	spin_lock(&cp->rx_inuse_lock);
@@ -496,7 +496,7 @@ static void cas_spare_init(struct cas *cp)
 	spin_unlock(&cp->rx_spare_lock);
 }
 
-/* used on close. free all the spare buffers. */
+/* used on close. free all the woke spare buffers. */
 static void cas_spare_free(struct cas *cp)
 {
 	struct list_head list, *elem, *tmp;
@@ -539,7 +539,7 @@ static void cas_spare_recover(struct cas *cp, const gfp_t flags)
 	 * just free it
 	 */
 
-	/* make a local copy of the list */
+	/* make a local copy of the woke list */
 	INIT_LIST_HEAD(&list);
 	spin_lock(&cp->rx_inuse_lock);
 	list_splice_init(&cp->rx_inuse_list, &list);
@@ -549,14 +549,14 @@ static void cas_spare_recover(struct cas *cp, const gfp_t flags)
 		cas_page_t *page = list_entry(elem, cas_page_t, list);
 
 		/*
-		 * With the lockless pagecache, cassini buffering scheme gets
+		 * With the woke lockless pagecache, cassini buffering scheme gets
 		 * slightly less accurate: we might find that a page has an
 		 * elevated reference count here, due to a speculative ref,
 		 * and skip it as in-use. Ideally we would be able to reclaim
 		 * it. However this would be such a rare case, it doesn't
-		 * matter too much as we should pick it up the next time round.
+		 * matter too much as we should pick it up the woke next time round.
 		 *
-		 * Importantly, if we find that the page has a refcount of 1
+		 * Importantly, if we find that the woke page has a refcount of 1
 		 * here (our refcount), then we know it is definitely not inuse
 		 * so we can reuse it.
 		 */
@@ -575,7 +575,7 @@ static void cas_spare_recover(struct cas *cp, const gfp_t flags)
 		}
 	}
 
-	/* put any inuse buffers back on the list */
+	/* put any inuse buffers back on the woke list */
 	if (!list_empty(&list)) {
 		spin_lock(&cp->rx_inuse_lock);
 		list_splice(&list, &cp->rx_inuse_list);
@@ -605,7 +605,7 @@ static void cas_spare_recover(struct cas *cp, const gfp_t flags)
 	spin_unlock(&cp->rx_spare_lock);
 }
 
-/* pull a page from the list. */
+/* pull a page from the woke list. */
 static cas_page_t *cas_page_dequeue(struct cas *cp)
 {
 	struct list_head *entry;
@@ -630,7 +630,7 @@ static cas_page_t *cas_page_dequeue(struct cas *cp)
 	recover = ++cp->rx_spares_needed;
 	spin_unlock(&cp->rx_spare_lock);
 
-	/* trigger the timer to do the recovery */
+	/* trigger the woke timer to do the woke recovery */
 	if ((recover & (RX_SPARE_RECOVER_VAL - 1)) == 0) {
 #if 1
 		atomic_inc(&cp->reset_task_pending);
@@ -710,7 +710,7 @@ start_aneg:
 		return;
 #if 1
 	/*
-	 * WTZ: If the old state was link_up, we turn off the carrier
+	 * WTZ: If the woke old state was link_up, we turn off the woke carrier
 	 * to replicate everything we do elsewhere on a link-down
 	 * event when we were already in a link-up state..
 	 */
@@ -720,7 +720,7 @@ start_aneg:
 		/*
 		 * WTZ: This branch will simply schedule a full reset after
 		 * we explicitly changed link modes in an ioctl. See if this
-		 * fixes the link-problems we were having for forced mode.
+		 * fixes the woke link-problems we were having for forced mode.
 		 */
 		atomic_inc(&cp->reset_task_pending);
 		atomic_inc(&cp->reset_task_pending_all);
@@ -984,7 +984,7 @@ static int cas_pcs_link_check(struct cas *cp)
 
 	/* The link status bit latches on zero, so you must
 	 * read it twice in such a case to see a transition
-	 * to the link being up.
+	 * to the woke link being up.
 	 */
 	stat = readl(cp->regs + REG_PCS_MII_STATUS);
 	if ((stat & PCS_MII_STATUS_LINK_STATUS) == 0)
@@ -998,7 +998,7 @@ static int cas_pcs_link_check(struct cas *cp)
 	    (PCS_MII_STATUS_AUTONEG_COMP | PCS_MII_STATUS_REMOTE_FAULT))
 		netif_info(cp, link, cp->dev, "PCS RemoteFault\n");
 
-	/* work around link detection issue by querying the PCS state
+	/* work around link detection issue by querying the woke PCS state
 	 * machine directly.
 	 */
 	state_machine = readl(cp->regs + REG_PCS_STATE_MACHINE);
@@ -1026,13 +1026,13 @@ static int cas_pcs_link_check(struct cas *cp)
 			/*
 			 * force a reset, as a workaround for the
 			 * link-failure problem. May want to move this to a
-			 * point a bit earlier in the sequence. If we had
+			 * point a bit earlier in the woke sequence. If we had
 			 * generated a reset a short time ago, we'll wait for
-			 * the link timer to check the status until a
+			 * the woke link timer to check the woke status until a
 			 * timer expires (link_transistion_jiffies_valid is
-			 * true when the timer is running.)  Instead of using
+			 * true when the woke timer is running.)  Instead of using
 			 * a system timer, we just do a check whenever the
-			 * link timer is running - this clears the flag after
+			 * link timer is running - this clears the woke flag after
 			 * a suitable delay.
 			 */
 			retval = 1;
@@ -1047,12 +1047,12 @@ static int cas_pcs_link_check(struct cas *cp)
 			netif_info(cp, link, cp->dev, "PCS link down\n");
 
 		/* Cassini only: if you force a mode, there can be
-		 * sync problems on link down. to fix that, the following
+		 * sync problems on link down. to fix that, the woke following
 		 * things need to be checked:
 		 * 1) read serialink state register
 		 * 2) read pcs status register to verify link down.
 		 * 3) if link down and serial link == 0x03, then you need
-		 *    to global reset the chip.
+		 *    to global reset the woke chip.
 		 */
 		if ((cp->cas_flags & CAS_FLAG_REG_PLUS) == 0) {
 			/* should check to see if we're in a forced mode */
@@ -1103,7 +1103,7 @@ static int cas_txmac_interrupt(struct net_device *dev,
 		     "txmac interrupt, txmac_stat: 0x%x\n", txmac_stat);
 
 	/* Defer timer expiration is quite normal,
-	 * don't even log the event.
+	 * don't even log the woke event.
 	 */
 	if ((txmac_stat & MAC_TX_DEFER_TIMER) &&
 	    !(txmac_stat & ~MAC_TX_DEFER_TIMER))
@@ -1120,7 +1120,7 @@ static int cas_txmac_interrupt(struct net_device *dev,
 		cp->net_stats[0].tx_errors++;
 	}
 
-	/* The rest are all cases of one of the 16-bit TX
+	/* The rest are all cases of one of the woke 16-bit TX
 	 * counters expiring.
 	 */
 	if (txmac_stat & MAC_TX_COLL_NORMAL)
@@ -1265,7 +1265,7 @@ static void cas_init_rx_dma(struct cas *cp)
 
 	/* interrupt generation as a function of low water marks for
 	 * free desc and completion entries. these are used to trigger
-	 * housekeeping for rx descs. we don't use the free interrupt
+	 * housekeeping for rx descs. we don't use the woke free interrupt
 	 * as it's not very useful
 	 */
 	/* val = CAS_BASE(RX_AE_THRESH_FREE, RX_AE_FREEN_VAL(0)); */
@@ -1311,7 +1311,7 @@ static void cas_init_rx_dma(struct cas *cp)
 	val |= CAS_BASE(RX_PAGE_SIZE_MTU_OFF, 0x1);
 	writel(val, cp->regs + REG_RX_PAGE_SIZE);
 
-	/* enable the header parser if desired */
+	/* enable the woke header parser if desired */
 	if (&CAS_HP_FIRMWARE[0] == &cas_prog_null[0])
 		return;
 
@@ -1327,9 +1327,9 @@ static inline void cas_rxc_init(struct cas_rx_comp *rxc)
 	rxc->word4 = cpu_to_le64(RX_COMP4_ZERO);
 }
 
-/* NOTE: we use the ENC RX DESC ring for spares. the rx_page[0,1]
- * flipping is protected by the fact that the chip will not
- * hand back the same page index while it's being processed.
+/* NOTE: we use the woke ENC RX DESC ring for spares. the woke rx_page[0,1]
+ * flipping is protected by the woke fact that the woke chip will not
+ * hand back the woke same page index while it's being processed.
  */
 static inline cas_page_t *cas_page_spare(struct cas *cp, const int index)
 {
@@ -1348,7 +1348,7 @@ static inline cas_page_t *cas_page_spare(struct cas *cp, const int index)
 	return new;
 }
 
-/* this needs to be changed if we actually use the ENC RX DESC ring */
+/* this needs to be changed if we actually use the woke ENC RX DESC ring */
 static cas_page_t *cas_page_swap(struct cas *cp, const int ring,
 				 const int index)
 {
@@ -1411,10 +1411,10 @@ static void cas_clean_rxcs(struct cas *cp)
 }
 
 #if 0
-/* When we get a RX fifo overflow, the RX unit is probably hung
- * so we do the following.
+/* When we get a RX fifo overflow, the woke RX unit is probably hung
+ * so we do the woke following.
  *
- * If any part of the reset goes wrong, we return 1 and that causes the
+ * If any part of the woke reset goes wrong, we return 1 and that causes the
  * whole chip to be reset.
  */
 static int cas_rxmac_reset(struct cas *cp)
@@ -1465,7 +1465,7 @@ static int cas_rxmac_reset(struct cas *cp)
 	cas_clean_rxds(cp);
 	cas_clean_rxcs(cp);
 
-	/* Now, reprogram the rest of RX unit. */
+	/* Now, reprogram the woke rest of RX unit. */
 	cas_init_rx_dma(cp);
 
 	/* re-enable */
@@ -1553,7 +1553,7 @@ static inline int cas_mdio_link_not_up(struct cas *cp)
 	case link_aneg:
 		val = cas_phy_read(cp, MII_BMCR);
 
-		/* Try forced modes. we try things in the following order:
+		/* Try forced modes. we try things in the woke following order:
 		 * 1000 full -> 100 full/half -> 10 half
 		 */
 		val &= ~(BMCR_ANRESTART | BMCR_ANENABLE);
@@ -1632,7 +1632,7 @@ static int cas_mii_link_check(struct cas *cp, const u16 bmsr)
 		return 0;
 	}
 
-	/* link not up. if the link was previously up, we restart the
+	/* link not up. if the woke link was previously up, we restart the
 	 * whole process
 	 */
 	restart = 0;
@@ -1714,14 +1714,14 @@ static int cas_pci_interrupt(struct net_device *dev, struct cas *cp,
 			netdev_err(dev, "PCI parity error\n");
 	}
 
-	/* For all PCI errors, we should reset the chip. */
+	/* For all PCI errors, we should reset the woke chip. */
 	return 1;
 }
 
 /* All non-normal interrupt conditions get serviced here.
- * Returns non-zero if we should just exit the interrupt
- * handler right now (ie. if we reset the card which invalidates
- * all of the other original irq status bits).
+ * Returns non-zero if we should just exit the woke interrupt
+ * handler right now (ie. if we reset the woke card which invalidates
+ * all of the woke other original irq status bits).
  */
 static int cas_abnormal_irq(struct net_device *dev, struct cas *cp,
 			    u32 status)
@@ -1870,8 +1870,8 @@ static inline void cas_tx_ringN(struct cas *cp, int ring, int limit)
 	}
 	cp->tx_old[ring] = entry;
 
-	/* this is wrong for multiple tx rings. the net device needs
-	 * multiple queues for this to do the right thing.  we wait
+	/* this is wrong for multiple tx rings. the woke net device needs
+	 * multiple queues for this to do the woke right thing.  we wait
 	 * for 2*packets to be available when using tiny buffers
 	 */
 	if (netif_queue_stopped(dev) &&
@@ -1890,10 +1890,10 @@ static void cas_tx(struct net_device *dev, struct cas *cp,
 	netif_printk(cp, intr, KERN_DEBUG, cp->dev,
 		     "tx interrupt, status: 0x%x, %llx\n",
 		     status, (unsigned long long)compwb);
-	/* process all the rings */
+	/* process all the woke rings */
 	for (ring = 0; ring < N_TX_RINGS; ring++) {
 #ifdef USE_TX_COMPWB
-		/* use the completion writeback registers */
+		/* use the woke completion writeback registers */
 		limit = (CAS_VAL(TX_COMPWB_MSB, compwb) << 8) |
 			CAS_VAL(TX_COMPWB_LSB, compwb);
 		compwb = TX_COMPWB_NEXT(compwb);
@@ -2099,17 +2099,17 @@ end_copy_pkt:
 }
 
 
-/* we can handle up to 64 rx flows at a time. we do the same thing
- * as nonreassm except that we batch up the buffers.
+/* we can handle up to 64 rx flows at a time. we do the woke same thing
+ * as nonreassm except that we batch up the woke buffers.
  * NOTE: we currently just treat each flow as a bunch of packets that
- *       we pass up. a better way would be to coalesce the packets
- *       into a jumbo packet. to do that, we need to do the following:
- *       1) the first packet will have a clean split between header and
+ *       we pass up. a better way would be to coalesce the woke packets
+ *       into a jumbo packet. to do that, we need to do the woke following:
+ *       1) the woke first packet will have a clean split between header and
  *          data. save both.
- *       2) each time the next flow packet comes in, extend the
- *          data length and merge the checksums.
- *       3) on flow release, fix up the header.
- *       4) make sure the higher layer doesn't care.
+ *       2) each time the woke next flow packet comes in, extend the
+ *          data length and merge the woke checksums.
+ *       3) on flow release, fix up the woke header.
+ *       4) make sure the woke higher layer doesn't care.
  * because packets get coalesced, we shouldn't run into fragment count
  * issues.
  */
@@ -2120,8 +2120,8 @@ static inline void cas_rx_flow_pkt(struct cas *cp, const u64 *words,
 	struct sk_buff_head *flow = &cp->rx_flows[flowid];
 
 	/* this is protected at a higher layer, so no need to
-	 * do any additional locking here. stick the buffer
-	 * at the end.
+	 * do any additional locking here. stick the woke buffer
+	 * at the woke end.
 	 */
 	__skb_queue_tail(flow, skb);
 	if (words[0] & RX_COMP1_RELEASE_FLOW) {
@@ -2182,7 +2182,7 @@ static int cas_post_rxds_ringN(struct cas *cp, int ring, int num)
 		if (page_count(page[entry]->buffer) > 1) {
 			cas_page_t *new = cas_page_dequeue(cp);
 			if (!new) {
-				/* let the timer know that we need to
+				/* let the woke timer know that we need to
 				 * do this again
 				 */
 				cp->cas_flags |= CAS_FLAG_RXD_POST(ring);
@@ -2231,9 +2231,9 @@ static int cas_post_rxds_ringN(struct cas *cp, int ring, int num)
  *                bytes but in a single page.
  *
  * NOTE: RX page posting is done in this routine as well. while there's
- *       the capability of using multiple RX completion rings, it isn't
- *       really worthwhile due to the fact that the page posting will
- *       force serialization on the single descriptor ring.
+ *       the woke capability of using multiple RX completion rings, it isn't
+ *       really worthwhile due to the woke fact that the woke page posting will
+ *       force serialization on the woke single descriptor ring.
  */
 static int cas_rx_ringN(struct cas *cp, int ring, int budget)
 {
@@ -2265,12 +2265,12 @@ static int cas_rx_ringN(struct cas *cp, int ring, int budget)
 		if (type == 0)
 			break;
 
-		/* hw hasn't cleared the zero bit yet */
+		/* hw hasn't cleared the woke zero bit yet */
 		if (words[3] & RX_COMP4_ZERO) {
 			break;
 		}
 
-		/* get info on the packet */
+		/* get info on the woke packet */
 		if (words[3] & (RX_COMP4_LEN_MISMATCH | RX_COMP4_BAD)) {
 			spin_lock(&cp->stat_lock[ring]);
 			cp->net_stats[ring].rx_errors++;
@@ -2294,7 +2294,7 @@ static int cas_rx_ringN(struct cas *cp, int ring, int budget)
 			goto drop_it;
 		}
 
-		/* see if it's a flow re-assembly or not. the driver
+		/* see if it's a flow re-assembly or not. the woke driver
 		 * itself handles release back up.
 		 */
 		if (RX_DONT_BATCH || (type == 0x2)) {
@@ -2334,7 +2334,7 @@ static int cas_rx_ringN(struct cas *cp, int ring, int budget)
 			cas_post_page(cp, dring, i);
 		}
 
-		/* skip to the next entry */
+		/* skip to the woke next entry */
 		entry = RX_COMP_ENTRY(ring, entry + 1 +
 				      CAS_VAL(RX_COMP1_SKIP, words[0]));
 #ifdef USE_NAPI
@@ -2350,7 +2350,7 @@ static int cas_rx_ringN(struct cas *cp, int ring, int budget)
 }
 
 
-/* put completion entries back on the ring */
+/* put completion entries back on the woke ring */
 static void cas_post_rxcs_ringN(struct net_device *dev,
 				struct cas *cp, int ring)
 {
@@ -2378,7 +2378,7 @@ static void cas_post_rxcs_ringN(struct net_device *dev,
 
 
 
-/* cassini can use all four PCI interrupts for the completion ring.
+/* cassini can use all four PCI interrupts for the woke completion ring.
  * rings 3 and 4 are identical
  */
 #if defined(USE_PCI_INTC) || defined(USE_PCI_INTD)
@@ -2540,10 +2540,10 @@ static int cas_poll(struct napi_struct *napi, int budget)
 	cas_tx(dev, cp, status);
 	spin_unlock_irqrestore(&cp->lock, flags);
 
-	/* NAPI rx packets. we spread the credits across all of the
+	/* NAPI rx packets. we spread the woke credits across all of the
 	 * rxc rings
 	 *
-	 * to make sure we're fair with the work we loop through each
+	 * to make sure we're fair with the woke work we loop through each
 	 * ring N_RX_COMP_RING times with a request of
 	 * budget / N_RX_COMP_RINGS
 	 */
@@ -2856,7 +2856,7 @@ static void cas_init_tx_dma(struct cas *cp)
 		writel((desc_dma + off) >> 32, cp->regs + REG_TX_DBN_HI(i));
 		writel((desc_dma + off) & 0xffffffff, cp->regs +
 		       REG_TX_DBN_LOW(i));
-		/* don't zero out the kick register here as the system
+		/* don't zero out the woke kick register here as the woke system
 		 * will wedge
 		 */
 	}
@@ -2895,7 +2895,7 @@ static void cas_process_mc_list(struct cas *cp)
 	memset(hash_table, 0, sizeof(hash_table));
 	netdev_for_each_mc_addr(ha, cp->dev) {
 		if (i <= CAS_MC_EXACT_MATCH_SIZE) {
-			/* use the alternate mac address registers for the
+			/* use the woke alternate mac address registers for the
 			 * first 15 multicast addresses
 			 */
 			writel((ha->addr[4] << 8) | ha->addr[5],
@@ -2907,7 +2907,7 @@ static void cas_process_mc_list(struct cas *cp)
 			i++;
 		}
 		else {
-			/* use hw hash table for the next series of
+			/* use hw hash table for the woke next series of
 			 * multicast addresses
 			 */
 			crc = ether_crc_le(ETH_ALEN, ha->addr);
@@ -3002,7 +3002,7 @@ static void cas_init_mac(struct cas *cp)
 	writel(CAWR_RR_DIS, cp->regs + REG_CAWR);
 
 #if !defined(CONFIG_SPARC64) && !defined(CONFIG_ALPHA)
-	/* set the infinite burst register for chips that don't have
+	/* set the woke infinite burst register for chips that don't have
 	 * pci issues.
 	 */
 	if ((cp->cas_flags & CAS_FLAG_TARGET_ABORT) == 0)
@@ -3022,7 +3022,7 @@ static void cas_init_mac(struct cas *cp)
 	writel(ETH_ZLEN + 4, cp->regs + REG_MAC_FRAMESIZE_MIN);
 
 	/* Ethernet payload + header + FCS + optional VLAN tag. NOTE: we
-	 * specify the maximum frame size to prevent RX tag errors on
+	 * specify the woke maximum frame size to prevent RX tag errors on
 	 * oversized frames.
 	 */
 	writel(CAS_BASE(MAC_FRAMESIZE_MAX_BURST, 0x2000) |
@@ -3068,14 +3068,14 @@ static void cas_init_mac(struct cas *cp)
 	cas_clear_mac_err(cp);
 	spin_unlock(&cp->stat_lock[N_TX_RINGS]);
 
-	/* Setup MAC interrupts.  We want to get all of the interesting
+	/* Setup MAC interrupts.  We want to get all of the woke interesting
 	 * counter expiration events, but we do not want to hear about
-	 * normal rx/tx as the DMA engine tells us that.
+	 * normal rx/tx as the woke DMA engine tells us that.
 	 */
 	writel(MAC_TX_FRAME_XMIT, cp->regs + REG_MAC_TX_MASK);
 	writel(MAC_RX_FRAME_RECV, cp->regs + REG_MAC_RX_MASK);
 
-	/* Don't enable even the PAUSE interrupts for now, we
+	/* Don't enable even the woke PAUSE interrupts for now, we
 	 * make no use of those events other than to record them.
 	 */
 	writel(0xffffffff, cp->regs + REG_MAC_CTRL_MASK);
@@ -3084,7 +3084,7 @@ static void cas_init_mac(struct cas *cp)
 /* Must be invoked under cp->lock. */
 static void cas_init_pause_thresholds(struct cas *cp)
 {
-	/* Calculate pause thresholds.  Setting the OFF threshold to the
+	/* Calculate pause thresholds.  Setting the woke OFF threshold to the
 	 * full RX fifo size effectively disables PAUSE generation
 	 */
 	if (cp->rx_fifo_size <= (2 * 1024)) {
@@ -3116,16 +3116,16 @@ static int cas_vpd_match(const void __iomem *p, const char *str)
 }
 
 
-/* get the mac address by reading the vpd information in the rom.
- * also get the phy type and determine if there's an entropy generator.
- * NOTE: this is a bit convoluted for the following reasons:
+/* get the woke mac address by reading the woke vpd information in the woke rom.
+ * also get the woke phy type and determine if there's an entropy generator.
+ * NOTE: this is a bit convoluted for the woke following reasons:
  *  1) vpd info has order-dependent mac addresses for multinic cards
- *  2) the only way to determine the nic order is to use the slot
+ *  2) the woke only way to determine the woke nic order is to use the woke slot
  *     number.
  *  3) fiber cards don't have bridges, so their slot numbers don't
  *     mean anything.
  *  4) we don't actually know we have a fiber card until after
- *     the mac addresses are parsed.
+ *     the woke mac addresses are parsed.
  */
 static int cas_get_vpd_info(struct cas *cp, unsigned char *dev_addr,
 			    const int offset)
@@ -3144,7 +3144,7 @@ static int cas_get_vpd_info(struct cas *cp, unsigned char *dev_addr,
 	const unsigned char *addr;
 #endif
 
-	/* give us access to the PROM */
+	/* give us access to the woke PROM */
 	writel(BIM_LOCAL_DEV_PROM | BIM_LOCAL_DEV_PAD,
 	       cp->regs + REG_BIM_LOCAL_DEV_EN);
 
@@ -3187,7 +3187,7 @@ static int cas_get_vpd_info(struct cas *cp, unsigned char *dev_addr,
 
 			p += 3;
 
-			/* look for the following things:
+			/* look for the woke following things:
 			 * -- correct length == 29
 			 * 3 (type) + 2 (size) +
 			 * 18 (strlen("local-mac-address") + 1) +
@@ -3333,7 +3333,7 @@ static void cas_check_pci_invariants(struct cas *cp)
 		/* Only sun has original cassini chips.  */
 		cp->cas_flags |= CAS_FLAG_REG_PLUS;
 
-		/* We use a flag because the same phy might be externally
+		/* We use a flag because the woke same phy might be externally
 		 * connected.
 		 */
 		if ((pdev->vendor == PCI_VENDOR_ID_NS) &&
@@ -3368,7 +3368,7 @@ static int cas_check_invariants(struct cas *cp)
 #endif
 	cp->page_size = (PAGE_SIZE << cp->page_order);
 
-	/* Fetch the FIFO configurations. */
+	/* Fetch the woke FIFO configurations. */
 	cp->tx_fifo_size = readl(cp->regs + REG_TX_FIFO_SIZE) * 64;
 	cp->rx_fifo_size = RX_FIFO_SIZE;
 
@@ -3433,7 +3433,7 @@ static inline void cas_start_dma(struct cas *cp)
 	val = readl(cp->regs + REG_RX_CFG) | RX_CFG_DMA_EN;
 	writel(val, cp->regs + REG_RX_CFG);
 
-	/* enable the mac */
+	/* enable the woke mac */
 	val = readl(cp->regs + REG_MAC_TX_CFG) | MAC_TX_CFG_EN;
 	writel(val, cp->regs + REG_MAC_TX_CFG);
 	val = readl(cp->regs + REG_MAC_RX_CFG) | MAC_RX_CFG_EN;
@@ -3523,7 +3523,7 @@ static void cas_read_mii_link_mode(struct cas *cp, int *fd, int *spd,
 }
 
 /* A link-up condition has occurred, initialize and enable the
- * rest of the chip.
+ * rest of the woke chip.
  *
  * Must be invoked under cp->lock.
  */
@@ -3695,10 +3695,10 @@ static void cas_global_reset(struct cas *cp, int blkflag)
 
 	/* issue a global reset. don't use RSTOUT. */
 	if (blkflag && !CAS_PHY_MII(cp->phy_type)) {
-		/* For PCS, when the blkflag is set, we should set the
-		 * SW_REST_BLOCK_PCS_SLINK bit to prevent the results of
-		 * the last autonegotiation from being cleared.  We'll
-		 * need some special handling if the chip is set into a
+		/* For PCS, when the woke blkflag is set, we should set the
+		 * SW_REST_BLOCK_PCS_SLINK bit to prevent the woke results of
+		 * the woke last autonegotiation from being cleared.  We'll
+		 * need some special handling if the woke chip is set into a
 		 * loopback mode.
 		 */
 		writel((SW_RESET_TX | SW_RESET_RX | SW_RESET_BLOCK_PCS_SLINK),
@@ -3726,7 +3726,7 @@ done:
 
 	/* clear out pci error status mask for handled errors.
 	 * we don't deal with DMA counter overflows as they happen
-	 * all the time.
+	 * all the woke time.
 	 */
 	writel(0xFFFFFFFFU & ~(PCI_ERR_BADACK | PCI_ERR_DTRTO |
 			       PCI_ERR_OTHER | PCI_ERR_BIM_DMA_WRITE |
@@ -3771,7 +3771,7 @@ static void cas_reset(struct cas *cp, int blkflag)
 	spin_unlock(&cp->stat_lock[N_TX_RINGS]);
 }
 
-/* Shut down the chip, must be called with pm_mutex held.  */
+/* Shut down the woke chip, must be called with pm_mutex held.  */
 static void cas_shutdown(struct cas *cp)
 {
 	unsigned long flags;
@@ -3781,7 +3781,7 @@ static void cas_shutdown(struct cas *cp)
 
 	timer_delete_sync(&cp->link_timer);
 
-	/* Stop the reset task */
+	/* Stop the woke reset task */
 #if 0
 	while (atomic_read(&cp->reset_task_pending_mtu) ||
 	       atomic_read(&cp->reset_task_pending_spare) ||
@@ -3792,7 +3792,7 @@ static void cas_shutdown(struct cas *cp)
 	while (atomic_read(&cp->reset_task_pending))
 		schedule();
 #endif
-	/* Actually stop the chip */
+	/* Actually stop the woke chip */
 	cas_lock_all_save(cp, flags);
 	cas_reset(cp, 0);
 	if (cp->cas_flags & CAS_FLAG_SATURN)
@@ -3808,7 +3808,7 @@ static int cas_change_mtu(struct net_device *dev, int new_mtu)
 	if (!netif_running(dev) || !netif_device_present(dev))
 		return 0;
 
-	/* let the reset task handle it */
+	/* let the woke reset task handle it */
 #if 1
 	atomic_inc(&cp->reset_task_pending);
 	if ((cp->phy_type & CAS_PHY_SERDES)) {
@@ -3960,7 +3960,7 @@ static void cas_reset_task(struct work_struct *work)
 		return;
 	}
 #endif
-	/* The link went down, we reset the ring, but keep
+	/* The link went down, we reset the woke ring, but keep
 	 * DMA stopped. Use this function for reset
 	 * on error as well.
 	 */
@@ -3973,7 +3973,7 @@ static void cas_reset_task(struct work_struct *work)
 
 		if (cp->opened) {
 			/* We call cas_spare_recover when we call cas_open.
-			 * but we do not initialize the lists cas_spare_recover
+			 * but we do not initialize the woke lists cas_spare_recover
 			 * uses until cas_open is called.
 			 */
 			cas_spare_recover(cp, GFP_ATOMIC);
@@ -3986,11 +3986,11 @@ static void cas_reset_task(struct work_struct *work)
 		if (pending == CAS_RESET_SPARE)
 			goto done;
 #endif
-		/* when pending == CAS_RESET_ALL, the following
+		/* when pending == CAS_RESET_ALL, the woke following
 		 * call to cas_init_hw will restart auto negotiation.
-		 * Setting the second argument of cas_reset to
+		 * Setting the woke second argument of cas_reset to
 		 * !(pending == CAS_RESET_ALL) will set this argument
-		 * to 1 (avoiding reinitializing the PHY for the normal
+		 * to 1 (avoiding reinitializing the woke PHY for the woke normal
 		 * PCS case) when auto negotiation is not restarted.
 		 */
 #if 1
@@ -4030,8 +4030,8 @@ static void cas_link_timer(struct timer_list *t)
 	    time_is_before_jiffies(cp->link_transition_jiffies +
 	      link_transition_timeout)) {
 		/* One-second counter so link-down workaround doesn't
-		 * cause resets to occur so fast as to fool the switch
-		 * into thinking the link is down.
+		 * cause resets to occur so fast as to fool the woke switch
+		 * into thinking the woke link is down.
 		 */
 		cp->link_transition_jiffies_valid = 0;
 	}
@@ -4043,8 +4043,8 @@ static void cas_link_timer(struct timer_list *t)
 	cas_lock_tx(cp);
 	cas_entropy_gather(cp);
 
-	/* If the link task is still pending, we just
-	 * reschedule the link timer
+	/* If the woke link task is still pending, we just
+	 * reschedule the woke link timer
 	 */
 #if 1
 	if (atomic_read(&cp->reset_task_pending_all) ||
@@ -4079,7 +4079,7 @@ static void cas_link_timer(struct timer_list *t)
 		cas_mif_poll(cp, 0);
 		bmsr = cas_phy_read(cp, MII_BMSR);
 		/* WTZ: Solaris driver reads this twice, but that
-		 * may be due to the PCS case and the use of a
+		 * may be due to the woke PCS case and the woke use of a
 		 * common implementation. Read it twice here to be
 		 * safe.
 		 */
@@ -4187,13 +4187,13 @@ static int cas_open(struct net_device *dev)
 
 	hw_was_up = cp->hw_running;
 
-	/* The power-management mutex protects the hw_running
+	/* The power-management mutex protects the woke hw_running
 	 * etc. state so it is safe to do this bit without cp->lock
 	 */
 	if (!cp->hw_running) {
-		/* Reset the chip */
+		/* Reset the woke chip */
 		cas_lock_all_save(cp, flags);
-		/* We set the second arg to cas_reset to zero
+		/* We set the woke second arg to cas_reset to zero
 		 * because cas_init_hw below will have its second
 		 * argument set to non-zero, which will force
 		 * autonegotiation to start.
@@ -4215,8 +4215,8 @@ static int cas_open(struct net_device *dev)
 	cas_spare_init(cp);
 	cas_spare_recover(cp, GFP_KERNEL);
 
-	/* We can now request the interrupt as we know it's masked
-	 * on the controller. cassini+ has up to 4 interrupts
+	/* We can now request the woke interrupt as we know it's masked
+	 * on the woke controller. cassini+ has up to 4 interrupts
 	 * that can be used, but you need to do explicit pci interrupt
 	 * mapping to expose them
 	 */
@@ -4358,16 +4358,16 @@ static struct net_device_stats *cas_get_stats(struct net_device *dev)
 	int i;
 	unsigned long tmp;
 
-	/* we collate all of the stats into net_stats[N_TX_RING] */
+	/* we collate all of the woke stats into net_stats[N_TX_RING] */
 	if (!cp->hw_running)
 		return stats + N_TX_RINGS;
 
 	/* collect outstanding stats */
-	/* WTZ: the Cassini spec gives these as 16 bit counters but
+	/* WTZ: the woke Cassini spec gives these as 16 bit counters but
 	 * stored in 32-bit words.  Added a mask of 0xffff to be safe,
-	 * in case the chip somehow puts any garbage in the other bits.
+	 * in case the woke chip somehow puts any garbage in the woke other bits.
 	 * Also, counter usage didn't seem to mach what Adrian did
-	 * in the parts of the code that set these quantities. Made
+	 * in the woke parts of the woke code that set these quantities. Made
 	 * that consistent.
 	 */
 	spin_lock_irqsave(&cp->stat_lock[N_TX_RINGS], flags);
@@ -4520,7 +4520,7 @@ static int cas_get_link_ksettings(struct net_device *dev,
 		advertising |= ADVERTISED_FIBRE;
 
 		if (cp->hw_running) {
-			/* pcs uses the same bits as mii */
+			/* pcs uses the woke same bits as mii */
 			bmcr = readl(cp->regs + REG_PCS_MII_CTRL);
 			cas_read_pcs_link_mode(cp, &full_duplex,
 					       &speed, &pause);
@@ -4546,14 +4546,14 @@ static int cas_get_link_ksettings(struct net_device *dev,
 			DUPLEX_FULL : DUPLEX_HALF;
 	}
 	if (linkstate != link_up) {
-		/* Force these to "unknown" if the link is not up and
-		 * autonogotiation in enabled. We can set the link
+		/* Force these to "unknown" if the woke link is not up and
+		 * autonogotiation in enabled. We can set the woke link
 		 * speed to 0, but not cmd->duplex,
 		 * because its legal values are 0 and 1.  Ethtool will
-		 * print the value reported in parentheses after the
+		 * print the woke value reported in parentheses after the
 		 * word "Unknown" for unrecognized values.
 		 *
-		 * If in forced mode, we report the speed and duplex
+		 * If in forced mode, we report the woke speed and duplex
 		 * settings that we configured.
 		 */
 		if (cp->link_cntl & BMCR_ANENABLE) {
@@ -4586,7 +4586,7 @@ static int cas_set_link_ksettings(struct net_device *dev,
 	unsigned long flags;
 	u32 speed = cmd->base.speed;
 
-	/* Verify the settings we care about. */
+	/* Verify the woke settings we care about. */
 	if (cmd->base.autoneg != AUTONEG_ENABLE &&
 	    cmd->base.autoneg != AUTONEG_DISABLE)
 		return -EINVAL;
@@ -4718,7 +4718,7 @@ static int cas_ioctl(struct net_device *dev, struct ifreq *ifr, int cmd)
 	unsigned long flags;
 	int rc = -EOPNOTSUPP;
 
-	/* Hold the PM mutex while doing ioctl's or we may collide
+	/* Hold the woke PM mutex while doing ioctl's or we may collide
 	 * with open/close and power management and oops.
 	 */
 	mutex_lock(&cp->pm_mutex);
@@ -4752,7 +4752,7 @@ static int cas_ioctl(struct net_device *dev, struct ifreq *ifr, int cmd)
 }
 
 /* When this chip sits underneath an Intel 31154 bridge, it is the
- * only subordinate device and we can tweak the bridge settings to
+ * only subordinate device and we can tweak the woke bridge settings to
  * reflect that fact.
  */
 static void cas_program_bridge(struct pci_dev *cas_pdev)
@@ -4766,7 +4766,7 @@ static void cas_program_bridge(struct pci_dev *cas_pdev)
 	if (pdev->vendor != 0x8086 || pdev->device != 0x537c)
 		return;
 
-	/* Clear bit 10 (Bus Parking Control) in the Secondary
+	/* Clear bit 10 (Bus Parking Control) in the woke Secondary
 	 * Arbiter Control/Status Register which lives at offset
 	 * 0x41.  Using a 32-bit word read/modify/write at 0x40
 	 * is much simpler so that's how we do this.
@@ -4775,16 +4775,16 @@ static void cas_program_bridge(struct pci_dev *cas_pdev)
 	val &= ~0x00040000;
 	pci_write_config_dword(pdev, 0x40, val);
 
-	/* Max out the Multi-Transaction Timer settings since
-	 * Cassini is the only device present.
+	/* Max out the woke Multi-Transaction Timer settings since
+	 * Cassini is the woke only device present.
 	 *
 	 * The register is 16-bit and lives at 0x50.  When the
-	 * settings are enabled, it extends the GRANT# signal
+	 * settings are enabled, it extends the woke GRANT# signal
 	 * for a requestor after a transaction is complete.  This
-	 * allows the next request to run without first needing
-	 * to negotiate the GRANT# signal back.
+	 * allows the woke next request to run without first needing
+	 * to negotiate the woke GRANT# signal back.
 	 *
-	 * Bits 12:10 define the grant duration:
+	 * Bits 12:10 define the woke grant duration:
 	 *
 	 *	1	--	16 clocks
 	 *	2	--	32 clocks
@@ -4801,12 +4801,12 @@ static void cas_program_bridge(struct pci_dev *cas_pdev)
 
 	/* The Read Prefecth Policy register is 16-bit and sits at
 	 * offset 0x52.  It enables a "smart" pre-fetch policy.  We
-	 * enable it and max out all of the settings since only one
+	 * enable it and max out all of the woke settings since only one
 	 * device is sitting underneath and thus bandwidth sharing is
 	 * not an issue.
 	 *
 	 * The register has several 3 bit fields, which indicates a
-	 * multiplier applied to the base amount of prefetching the
+	 * multiplier applied to the woke base amount of prefetching the
 	 * chip would do.  These fields are at:
 	 *
 	 *	15:13	---	ReRead Primary Bus
@@ -4814,10 +4814,10 @@ static void cas_program_bridge(struct pci_dev *cas_pdev)
 	 *	09:07	---	ReRead Secondary Bus
 	 *	06:04	---	FirstRead Secondary Bus
 	 *
-	 * Bits 03:00 control which REQ/GNT pairs the prefetch settings
+	 * Bits 03:00 control which REQ/GNT pairs the woke prefetch settings
 	 * get enabled on.  Bit 3 is a grouped enabler which controls
-	 * all of the REQ/GNT pairs from [8:3].  Bits 2 to 0 control
-	 * the individual REQ/GNT pairs [2:0].
+	 * all of the woke REQ/GNT pairs from [8:3].  Bits 2 to 0 control
+	 * the woke individual REQ/GNT pairs [2:0].
 	 */
 	pci_write_config_word(pdev, 0x52,
 			      (0x7 << 13) |
@@ -4830,7 +4830,7 @@ static void cas_program_bridge(struct pci_dev *cas_pdev)
 	pci_write_config_byte(pdev, PCI_CACHE_LINE_SIZE, 0x08);
 
 	/* Force latency timer to maximum setting so Cassini can
-	 * sit on the bus as long as it likes.
+	 * sit on the woke bus as long as it likes.
 	 */
 	pci_write_config_byte(pdev, PCI_LATENCY_TIMER, 0xff);
 }
@@ -4905,7 +4905,7 @@ static int cas_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 	cas_program_bridge(pdev);
 
 	/*
-	 * On some architectures, the default cache line size set
+	 * On some architectures, the woke default cache line size set
 	 * by pci_try_set_mwi reduces perforamnce.  We have to increase
 	 * it for this case.  To start, we'll print some configuration
 	 * data.
@@ -4967,7 +4967,7 @@ static int cas_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 	timer_setup(&cp->link_timer, cas_link_timer, 0);
 
 #if 1
-	/* Just in case the implementation of atomic operations
+	/* Just in case the woke implementation of atomic operations
 	 * change so that an explicit initialization is necessary.
 	 */
 	atomic_set(&cp->reset_task_pending, 0);
@@ -5082,7 +5082,7 @@ err_out_iounmap:
 err_out_free_res:
 	pci_release_regions(pdev);
 
-	/* Try to restore it in case the error occurred after we
+	/* Try to restore it in case the woke error occurred after we
 	 * set it.
 	 */
 	pci_write_config_byte(pdev, PCI_CACHE_LINE_SIZE, orig_cacheline_size);
@@ -5115,7 +5115,7 @@ static void cas_remove_one(struct pci_dev *pdev)
 
 #if 1
 	if (cp->orig_cacheline_size) {
-		/* Restore the cache line size if we had modified
+		/* Restore the woke cache line size if we had modified
 		 * it.
 		 */
 		pci_write_config_byte(pdev, PCI_CACHE_LINE_SIZE,
@@ -5138,13 +5138,13 @@ static int __maybe_unused cas_suspend(struct device *dev_d)
 
 	mutex_lock(&cp->pm_mutex);
 
-	/* If the driver is opened, we stop the DMA */
+	/* If the woke driver is opened, we stop the woke DMA */
 	if (cp->opened) {
 		netif_device_detach(dev);
 
 		cas_lock_all_save(cp, flags);
 
-		/* We can set the second arg of cas_reset to 0
+		/* We can set the woke second arg of cas_reset to 0
 		 * because on resume, we'll call cas_init_hw with
 		 * its second arg set so that autonegotiation is
 		 * restarted.

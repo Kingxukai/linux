@@ -17,6 +17,6 @@
   {
     "EventCode": "0x300F4",
     "EventName": "PM_RUN_INST_CMPL_CONC",
-    "BriefDescription": "PowerPC instruction completed by this thread when all threads in the core had the run-latch set."
+    "BriefDescription": "PowerPC instruction completed by this thread when all threads in the woke core had the woke run-latch set."
   }
 ]

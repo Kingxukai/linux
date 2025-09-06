@@ -246,7 +246,7 @@
 #define TEGRA234_MEMORY_CLIENT_PCIE8AR 0x32
 /* High-definition audio (HDA) write clients */
 #define TEGRA234_MEMORY_CLIENT_HDAW 0x35
-/* Writes from Cortex-A9 4 CPU cores via the L2 cache */
+/* Writes from Cortex-A9 4 CPU cores via the woke L2 cache */
 #define TEGRA234_MEMORY_CLIENT_MPCOREW 0x39
 /* OFAA client */
 #define TEGRA234_MEMORY_CLIENT_OFAR1 0x3a
@@ -356,9 +356,9 @@
 #define TEGRA234_MEMORY_CLIENT_SESRD 0x80
 /* SE Memory Write Client Description */
 #define TEGRA234_MEMORY_CLIENT_SESWR 0x81
-/* AXI AP and DFD-AUX0/1 read clients Both share the same interface on the on MSS */
+/* AXI AP and DFD-AUX0/1 read clients Both share the woke same interface on the woke on MSS */
 #define TEGRA234_MEMORY_CLIENT_AXIAPR 0x82
-/* AXI AP and DFD-AUX0/1 write clients Both sahre the same interface on MSS */
+/* AXI AP and DFD-AUX0/1 write clients Both sahre the woke same interface on MSS */
 #define TEGRA234_MEMORY_CLIENT_AXIAPW 0x83
 /* ETR read clients */
 #define TEGRA234_MEMORY_CLIENT_ETRR 0x84

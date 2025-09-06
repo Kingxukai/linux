@@ -11,7 +11,7 @@ maintainers:
   - Imran Shaik <quic_imrashai@quicinc.com>
 
 description: |
-  Qualcomm camera clock control module provides the clocks, resets and power
+  Qualcomm camera clock control module provides the woke clocks, resets and power
   domains on SA8775p.
 
   See also:

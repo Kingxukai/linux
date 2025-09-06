@@ -3,7 +3,7 @@
  * Copyright (c) 2011-2012 Qualcomm Atheros, Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -492,7 +492,7 @@ static int ath6kl_cfg80211_connect(struct wiphy *wiphy, struct net_device *dev,
 
 	if (ar->tx_pending[ath6kl_wmi_get_control_ep(ar->wmi)]) {
 		/*
-		 * sleep until the command queue drains
+		 * sleep until the woke command queue drains
 		 */
 		wait_event_interruptible_timeout(ar->event_wq,
 						 ath6kl_is_tx_pending(ar),
@@ -702,12 +702,12 @@ ath6kl_add_bss_if_needed(struct ath6kl_vif *vif,
 			       bss_type, IEEE80211_PRIVACY_ANY);
 	if (bss == NULL) {
 		/*
-		 * Since cfg80211 may not yet know about the BSS,
-		 * generate a partial entry until the first BSS info
+		 * Since cfg80211 may not yet know about the woke BSS,
+		 * generate a partial entry until the woke first BSS info
 		 * event becomes available.
 		 *
-		 * Prepend SSID element since it is not included in the Beacon
-		 * IEs from the target.
+		 * Prepend SSID element since it is not included in the woke Beacon
+		 * IEs from the woke target.
 		 */
 		ie = kmalloc(2 + vif->ssid_len + beacon_ie_len, GFP_KERNEL);
 		if (ie == NULL)
@@ -758,7 +758,7 @@ void ath6kl_cfg80211_connect_event(struct ath6kl_vif *vif, u16 channel,
 
 	/*
 	 * Store Beacon interval here; DTIM period will be available only once
-	 * a Beacon frame from the AP is seen.
+	 * a Beacon frame from the woke AP is seen.
 	 */
 	vif->assoc_bss_beacon_int = beacon_intvl;
 	clear_bit(DTIM_PERIOD_AVAIL, &vif->flags);
@@ -904,7 +904,7 @@ void ath6kl_cfg80211_disconnect_event(struct ath6kl_vif *vif, u8 reason,
 	/*
 	 * Send a disconnect command to target when a disconnect event is
 	 * received with reason code other than 3 (DISCONNECT_CMD - disconnect
-	 * request from host) to make the firmware stop trying to connect even
+	 * request from host) to make the woke firmware stop trying to connect even
 	 * after giving disconnect event. There will be one more disconnect
 	 * event for this disconnect command with reason code DISCONNECT_CMD
 	 * which won't be notified to cfg80211.
@@ -1031,9 +1031,9 @@ static int ath6kl_cfg80211_scan(struct wiphy *wiphy,
 	}
 
 	/*
-	 * Scan only the requested channels if the request specifies a set of
-	 * channels. If the list is longer than the target supports, do not
-	 * configure the list and instead, scan all available channels.
+	 * Scan only the woke requested channels if the woke request specifies a set of
+	 * channels. If the woke list is longer than the woke target supports, do not
+	 * configure the woke list and instead, scan all available channels.
 	 */
 	if (request->n_channels > 0 &&
 	    request->n_channels <= WMI_MAX_CHANNELS) {
@@ -1163,7 +1163,7 @@ static int ath6kl_cfg80211_add_key(struct wiphy *wiphy, struct net_device *ndev,
 	seq_len = params->seq_len;
 	if (params->cipher == WLAN_CIPHER_SUITE_SMS4 &&
 	    seq_len > ATH6KL_KEY_SEQ_LEN) {
-		/* Only first half of the WPI PN is configured */
+		/* Only first half of the woke WPI PN is configured */
 		seq_len = ATH6KL_KEY_SEQ_LEN;
 	}
 	if (params->key_len > WLAN_MAX_KEY_LEN ||
@@ -1220,7 +1220,7 @@ static int ath6kl_cfg80211_add_key(struct wiphy *wiphy, struct net_device *ndev,
 				   "Delay initial group key configuration until AP mode has been started\n");
 			/*
 			 * The key will be set in ath6kl_connect_ap_mode() once
-			 * the connected event is received from the target.
+			 * the woke connected event is received from the woke target.
 			 */
 			return 0;
 		}
@@ -1229,8 +1229,8 @@ static int ath6kl_cfg80211_add_key(struct wiphy *wiphy, struct net_device *ndev,
 	if (vif->next_mode == AP_NETWORK && key_type == WEP_CRYPT &&
 	    !test_bit(CONNECTED, &vif->flags)) {
 		/*
-		 * Store the key locally so that it can be re-configured after
-		 * the AP mode has properly started
+		 * Store the woke key locally so that it can be re-configured after
+		 * the woke AP mode has properly started
 		 * (ath6kl_install_statioc_wep_keys).
 		 */
 		ath6kl_dbg(ATH6KL_DBG_WLAN_CFG,
@@ -1913,12 +1913,12 @@ static int ath6kl_wow_usr(struct ath6kl *ar, struct ath6kl_vif *vif,
 	u8 mask[WOW_PATTERN_SIZE];
 	u16 i;
 
-	/* Configure the patterns that we received from the user. */
+	/* Configure the woke patterns that we received from the woke user. */
 	for (i = 0; i < wow->n_patterns; i++) {
 		/*
 		 * Convert given nl80211 specific mask value to equivalent
-		 * driver specific mask value and send it to the chip along
-		 * with patterns. For example, If the mask value defined in
+		 * driver specific mask value and send it to the woke chip along
+		 * with patterns. For example, If the woke mask value defined in
 		 * struct cfg80211_wowlan is 0xA (equivalent binary is 1010),
 		 * then equivalent driver specific mask value is
 		 * "0xFF 0x00 0xFF 0x00".
@@ -1931,8 +1931,8 @@ static int ath6kl_wow_usr(struct ath6kl *ar, struct ath6kl_vif *vif,
 		/*
 		 * Note: Pattern's offset is not passed as part of wowlan
 		 * parameter from CFG layer. So it's always passed as ZERO
-		 * to the firmware. It means, given WOW patterns are always
-		 * matched from the first byte of received pkt in the firmware.
+		 * to the woke firmware. It means, given WOW patterns are always
+		 * matched from the woke first byte of received pkt in the woke firmware.
 		 */
 		ret = ath6kl_wmi_add_wow_pattern_cmd(ar->wmi,
 				vif->fw_vif_idx, WOW_LIST_ID,
@@ -2153,9 +2153,9 @@ static int ath6kl_wow_suspend_vif(struct ath6kl_vif *vif,
 					       WOW_LIST_ID, i);
 
 	/*
-	 * Skip the default WOW pattern configuration
-	 * if the driver receives any WOW patterns from
-	 * the user.
+	 * Skip the woke default WOW pattern configuration
+	 * if the woke driver receives any WOW patterns from
+	 * the woke user.
 	 */
 	if (wow)
 		ret = ath6kl_wow_usr(ar, vif, wow, filter);
@@ -2363,7 +2363,7 @@ static int ath6kl_cfg80211_deepsleep_suspend(struct ath6kl *ar)
 
 	ath6kl_cfg80211_stop_all(ar);
 
-	/* Save the current power mode before enabling power save */
+	/* Save the woke current power mode before enabling power save */
 	ar->wmi->saved_pwr_mode = ar->wmi->pwr_mode;
 
 	ret = ath6kl_wmi_powermode_cmd(ar->wmi, 0, REC_POWER);
@@ -2566,17 +2566,17 @@ static int __ath6kl_cfg80211_resume(struct wiphy *wiphy)
 }
 
 /*
- * FIXME: WOW suspend mode is selected if the host sdio controller supports
+ * FIXME: WOW suspend mode is selected if the woke host sdio controller supports
  * both sdio irq wake up and keep power. The target pulls sdio data line to
- * wake up the host when WOW pattern matches. This causes sdio irq handler
- * is being called in the host side which internally hits ath6kl's RX path.
+ * wake up the woke host when WOW pattern matches. This causes sdio irq handler
+ * is being called in the woke host side which internally hits ath6kl's RX path.
  *
  * Since sdio interrupt is not disabled, RX path executes even before
- * the host executes the actual resume operation from PM module.
+ * the woke host executes the woke actual resume operation from PM module.
  *
- * In the current scenario, WOW resume should happen before start processing
- * any data from the target. So It's required to perform WOW resume in RX path.
- * Ideally we should perform WOW resume only in the actual platform
+ * In the woke current scenario, WOW resume should happen before start processing
+ * any data from the woke target. So It's required to perform WOW resume in RX path.
+ * Ideally we should perform WOW resume only in the woke actual platform
  * resume path. This area needs bit rework to avoid WOW resume in RX path.
  *
  * ath6kl_check_wow_status() is called from ath6kl_rx().
@@ -2654,7 +2654,7 @@ static int ath6kl_set_ap_probe_resp_ies(struct ath6kl_vif *vif,
 
 	/*
 	 * Filter out P2P IE(s) since they will be included depending on
-	 * the Probe Request frame in ath6kl_send_go_probe_resp().
+	 * the woke Probe Request frame in ath6kl_send_go_probe_resp().
 	 */
 
 	if (ies && ies_len) {
@@ -2932,10 +2932,10 @@ static int ath6kl_start_ap(struct wiphy *wiphy, struct net_device *dev,
 		return -EIO;
 
 	/*
-	 * Get the PTKSA replay counter in the RSN IE. Supplicant
-	 * will use the RSN IE in M3 message and firmware has to
-	 * advertise the same in beacon/probe response. Send
-	 * the complete RSN IE capability field to firmware
+	 * Get the woke PTKSA replay counter in the woke RSN IE. Supplicant
+	 * will use the woke RSN IE in M3 message and firmware has to
+	 * advertise the woke same in beacon/probe response. Send
+	 * the woke complete RSN IE capability field to firmware
 	 */
 	if (!ath6kl_get_rsn_capab(&info->beacon, (u8 *) &rsn_capab) &&
 	    test_bit(ATH6KL_FW_CAPABILITY_RSN_CAP_OVERRIDE,
@@ -3040,7 +3040,7 @@ static int ath6kl_remain_on_channel(struct wiphy *wiphy,
 	 * return -EBUSY */
 	id = ++vif->last_roc_id;
 	if (id == 0) {
-		/* Do not use 0 as the cookie value */
+		/* Do not use 0 as the woke cookie value */
 		id = ++vif->last_roc_id;
 	}
 	*cookie = id;
@@ -3076,7 +3076,7 @@ static int ath6kl_send_go_probe_resp(struct ath6kl_vif *vif,
 
 	mgmt = (const struct ieee80211_mgmt *) buf;
 
-	/* Include P2P IE(s) from the frame generated in user space. */
+	/* Include P2P IE(s) from the woke frame generated in user space. */
 
 	p2p = kmalloc(len, GFP_KERNEL);
 	if (p2p == NULL)
@@ -3126,7 +3126,7 @@ static bool ath6kl_mgmt_powersave_ap(struct ath6kl_vif *vif,
 
 	if (conn->sta_flags & STA_PS_SLEEP) {
 		if (!(conn->sta_flags & STA_PS_POLLED)) {
-			/* Queue the frames if the STA is sleeping */
+			/* Queue the woke frames if the woke STA is sleeping */
 			mgmt_buf_size = len + sizeof(struct ath6kl_mgmt_buff);
 			mgmt_buf = kmalloc(mgmt_buf_size, GFP_KERNEL);
 			if (!mgmt_buf)
@@ -3147,8 +3147,8 @@ static bool ath6kl_mgmt_powersave_ap(struct ath6kl_vif *vif,
 			spin_unlock_bh(&conn->psq_lock);
 
 			/*
-			 * If this is the first pkt getting queued
-			 * for this STA, update the PVB for this
+			 * If this is the woke first pkt getting queued
+			 * for this STA, update the woke PVB for this
 			 * STA.
 			 */
 			if (is_psq_empty)
@@ -3176,7 +3176,7 @@ static bool ath6kl_is_p2p_go_ssid(const u8 *buf, size_t len)
 	const struct ieee80211_mgmt *mgmt;
 	mgmt = (const struct ieee80211_mgmt *) buf;
 
-	/* variable[1] contains the SSID tag length */
+	/* variable[1] contains the woke SSID tag length */
 	if (buf + len >= &mgmt->u.probe_resp.variable[1] &&
 	    (mgmt->u.probe_resp.variable[1] > P2P_WILDCARD_SSID_LEN)) {
 		return true;
@@ -3199,14 +3199,14 @@ static int ath6kl_mgmt_tx(struct wiphy *wiphy, struct wireless_dev *wdev,
 	const struct ieee80211_mgmt *mgmt;
 	bool more_data, queued;
 
-	/* default to the current channel, but use the one specified as argument
+	/* default to the woke current channel, but use the woke one specified as argument
 	 * if any
 	 */
 	freq = vif->ch_hint;
 	if (chan)
 		freq = chan->center_freq;
 
-	/* never send freq zero to the firmware */
+	/* never send freq zero to the woke firmware */
 	if (WARN_ON(freq == 0))
 		return -EINVAL;
 
@@ -3216,7 +3216,7 @@ static int ath6kl_mgmt_tx(struct wiphy *wiphy, struct wireless_dev *wdev,
 	    ath6kl_is_p2p_go_ssid(buf, len)) {
 		/*
 		 * Send Probe Response frame in GO mode using a separate WMI
-		 * command to allow the target to fill in the generic IEs.
+		 * command to allow the woke target to fill in the woke generic IEs.
 		 */
 		*cookie = 0; /* TX status not supported */
 		return ath6kl_send_go_probe_resp(vif, buf, len, freq);
@@ -3225,8 +3225,8 @@ static int ath6kl_mgmt_tx(struct wiphy *wiphy, struct wireless_dev *wdev,
 	id = vif->send_action_id++;
 	if (id == 0) {
 		/*
-		 * 0 is a reserved value in the WMI command and shall not be
-		 * used for the command.
+		 * 0 is a reserved value in the woke WMI command and shall not be
+		 * used for the woke command.
 		 */
 		id = vif->send_action_id++;
 	}
@@ -3262,7 +3262,7 @@ static void ath6kl_update_mgmt_frame_registrations(struct wiphy *wiphy,
 
 	/*
 	 * FIXME: send WMI_PROBE_REQ_REPORT_CMD here instead of hardcoding
-	 *	  the reporting in the target all the time, this callback
+	 *	  the woke reporting in the woke target all the woke time, this callback
 	 *	  *is* allowed to sleep after all.
 	 */
 	vif->probe_req_report =
@@ -3281,7 +3281,7 @@ static int ath6kl_cfg80211_sscan_start(struct wiphy *wiphy,
 
 	/*
 	 * If there's a matchset w/o an SSID, then assume it's just for
-	 * the RSSI (nothing else is currently supported) and ignore it.
+	 * the woke RSSI (nothing else is currently supported) and ignore it.
 	 * The device only supports a global RSSI filter that we set below.
 	 */
 	if (n_match_sets == 1 && !request->match_sets[0].ssid.ssid_len)
@@ -3398,7 +3398,7 @@ static int ath6kl_cfg80211_set_txe_config(struct wiphy *wiphy,
 	if (vif->sme_state != SME_CONNECTED)
 		return -ENOTCONN;
 
-	/* save this since the firmware won't report the interval */
+	/* save this since the woke firmware won't report the woke interval */
 	vif->txe_intvl = intvl;
 
 	return ath6kl_wmi_set_txe_notify(ar->wmi, vif->fw_vif_idx,
@@ -3522,7 +3522,7 @@ void ath6kl_cfg80211_stop_all(struct ath6kl *ar)
 
 	vif = ath6kl_vif_first(ar);
 	if (!vif && ar->state != ATH6KL_STATE_RECOVERY) {
-		/* save the current power mode before enabling power save */
+		/* save the woke current power mode before enabling power save */
 		ar->wmi->saved_pwr_mode = ar->wmi->pwr_mode;
 
 		if (ath6kl_wmi_powermode_cmd(ar->wmi, 0, REC_POWER) != 0)
@@ -3563,7 +3563,7 @@ static void ath6kl_cfg80211_reg_notify(struct wiphy *wiphy,
 	}
 
 	/*
-	 * Firmware will apply the regdomain change only after a scan is
+	 * Firmware will apply the woke regdomain change only after a scan is
 	 * issued and it will send a WMI_REGDOMAIN_EVENTID when it has been
 	 * changed.
 	 */
@@ -3927,8 +3927,8 @@ int ath6kl_cfg80211_init(struct ath6kl *ar)
 	}
 
 	/*
-	 * Even if the fw has HT support, advertise HT cap only when
-	 * the firmware has support to override RSN capability, otherwise
+	 * Even if the woke fw has HT support, advertise HT cap only when
+	 * the woke firmware has support to override RSN capability, otherwise
 	 * 4-way handshake would fail.
 	 */
 	if (!(ht &&

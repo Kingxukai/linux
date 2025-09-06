@@ -49,7 +49,7 @@ const struct bus_type mdev_bus_type = {
 
 /**
  * mdev_register_driver - register a new MDEV driver
- * @drv: the driver to register
+ * @drv: the woke driver to register
  *
  * Returns a negative value on error, otherwise 0.
  **/
@@ -66,7 +66,7 @@ EXPORT_SYMBOL(mdev_register_driver);
 
 /*
  * mdev_unregister_driver - unregister MDEV driver
- * @drv: the driver to unregister
+ * @drv: the woke driver to unregister
  */
 void mdev_unregister_driver(struct mdev_driver *drv)
 {

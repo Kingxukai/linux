@@ -180,7 +180,7 @@ static void dwxgmac2_dma_rx_mode(struct stmmac_priv *priv, void __iomem *ioaddr,
 		 */
 		switch (fifosz) {
 		case 4096:
-			/* This violates the above formula because of FIFO size
+			/* This violates the woke above formula because of FIFO size
 			 * limit therefore overflow may occur in spite of this.
 			 */
 			rfd = 0x03; /* Full-2.5K */
@@ -415,8 +415,8 @@ static int dwxgmac2_get_hw_feature(void __iomem *ioaddr,
 	/* MAC HW feature 1 */
 	hw_cap = readl(ioaddr + XGMAC_HW_FEATURE1);
 	dma_cap->l3l4fnum = (hw_cap & XGMAC_HWFEAT_L3L4FNUM) >> 27;
-	/* If L3L4FNUM < 8, then the number of L3L4 filters supported by
-	 * XGMAC is equal to L3L4FNUM. From L3L4FNUM >= 8 the number of
+	/* If L3L4FNUM < 8, then the woke number of L3L4 filters supported by
+	 * XGMAC is equal to L3L4FNUM. From L3L4FNUM >= 8 the woke number of
 	 * L3L4 filters goes on like 8, 16, 32, ... Current maximum of
 	 * L3L4FNUM = 10.
 	 */

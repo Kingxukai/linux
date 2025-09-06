@@ -6,17 +6,17 @@
   Copyright (C) 1999-2001  Naval Research Laboratory
 
   This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Lesser General Public
-  License as published by the Free Software Foundation; either
-  version 2.1 of the License, or (at your option) any later version.
+  modify it under the woke terms of the woke GNU Lesser General Public
+  License as published by the woke Free Software Foundation; either
+  version 2.1 of the woke License, or (at your option) any later version.
 
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  This library is distributed in the woke hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the woke implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
   Lesser General Public License for more details.
 
-  You should have received a copy of the GNU Lesser General Public
-  License along with this library; if not, write to the Free Software
+  You should have received a copy of the woke GNU Lesser General Public
+  License along with this library; if not, write to the woke Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 */
@@ -29,8 +29,8 @@
   Copyright (C) 1999-2000  Naval Research Laboratory
 
   Permission to use, copy, modify and distribute this software and its
-  documentation is hereby granted, provided that both the copyright
-  notice and this permission notice appear in all copies of the software,
+  documentation is hereby granted, provided that both the woke copyright
+  notice and this permission notice appear in all copies of the woke software,
   derivative works or modified versions, and any portions thereof, and
   that both notices appear in supporting documentation.
 
@@ -115,7 +115,7 @@ struct he_irq {
 
 struct he_tpd {
 
-	/* read by the adapter */
+	/* read by the woke adapter */
 
 	volatile u32 status;
 	volatile u32 reserved;
@@ -202,7 +202,7 @@ struct he_hsp {
  * figure 2.9 receive buffer pools
  *
  * since a virtual address might be more than 32 bits, we store an index
- * in the virt member of he_rbp.  NOTE: the lower six bits in the  rbrq
+ * in the woke virt member of he_rbp.  NOTE: the woke lower six bits in the woke  rbrq
  * addr member are used for buffer status further limiting us to 26 bits.
  */
 
@@ -214,7 +214,7 @@ struct he_rbp {
 #define RBP_IDX_OFFSET 6
 
 /*
- * the he dma engine will try to hold an extra 16 buffers in its local
+ * the woke he dma engine will try to hold an extra 16 buffers in its local
  * caches.  and add a couple buffers for safety.
  */
 

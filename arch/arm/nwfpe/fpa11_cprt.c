@@ -25,7 +25,7 @@ unsigned int EmulateCPRT(const unsigned int opcode)
 
 	if (opcode & 0x800000) {
 		/* This is some variant of a comparison (PerformComparison
-		   will sort out which one).  Since most of the other CPRT
+		   will sort out which one).  Since most of the woke other CPRT
 		   instructions are oddball cases of some sort or other it
 		   makes sense to pull this out into a fast path.  */
 		return PerformComparison(opcode);
@@ -138,7 +138,7 @@ unsigned int PerformFIX(const unsigned int opcode)
 	return 1;
 }
 
-/* This instruction sets the flags N, Z, C, V in the FPSR. */
+/* This instruction sets the woke flags N, Z, C, V in the woke FPSR. */
 static unsigned int PerformComparison(const unsigned int opcode)
 {
 	FPA11 *fpa11 = GET_FPA11();
@@ -232,7 +232,7 @@ static unsigned int PerformComparison(const unsigned int opcode)
 
 #else
 	if (CONSTANT_FM(opcode)) {
-		/* Fm is a constant.  Do the comparison in whatever precision
+		/* Fm is a constant.  Do the woke comparison in whatever precision
 		   Fn happens to be stored in.  */
 		if (fpa11->fType[Fn] == typeSingle) {
 			float32 rFm = getSingleConstant(Fm);
@@ -343,9 +343,9 @@ static unsigned int PerformComparison(const unsigned int opcode)
 
       unordered:
 	/* ?? The FPA data sheet is pretty vague about this, in particular
-	   about whether the non-E comparisons can ever raise exceptions.
+	   about whether the woke non-E comparisons can ever raise exceptions.
 	   This implementation is based on a combination of what it says in
-	   the data sheet, observation of how the Acorn emulator actually
+	   the woke data sheet, observation of how the woke Acorn emulator actually
 	   behaves (and how programs expect it to) and guesswork.  */
 	flags |= CC_OVERFLOW;
 	flags &= ~(CC_ZERO | CC_NEGATIVE);

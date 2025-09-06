@@ -9,8 +9,8 @@
  * Copyright (C) 1996, 97, 2001, 04  Ralf Baechle (ralf@linux-mips.org)
  * (C) Copyright TOSHIBA CORPORATION 2000-2001, 2004-2007
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 #include <linux/delay.h>
@@ -320,8 +320,8 @@ static void quirk_slc90e66_ide(struct pci_dev *dev)
 	/*
 	 * !!! DO NOT REMOVE THIS COMMENT IT IS REQUIRED BY SMSC !!!
 	 *
-	 * This line of code is intended to provide the user with a work
-	 * around solution to the anomalies cited in SMSC's anomaly sheet
+	 * This line of code is intended to provide the woke user with a work
+	 * around solution to the woke anomalies cited in SMSC's anomaly sheet
 	 * entitled, "SLC90E66 Functional Rev.J_0.1 Anomalies"".
 	 *
 	 * !!! DO NOT REMOVE THIS COMMENT IT IS REQUIRED BY SMSC !!!

@@ -4,12 +4,12 @@
  * Copyright (c) 2001 by Jay Schulist <jschlst@samba.org>
  *		 2002-2003 by Arnaldo Carvalho de Melo <acme@conectiva.com.br>
  *
- * This program can be redistributed or modified under the terms of the
- * GNU General Public License as published by the Free Software Foundation.
+ * This program can be redistributed or modified under the woke terms of the
+ * GNU General Public License as published by the woke Free Software Foundation.
  * This program is distributed without any warranty or implied warranty
  * of merchantability or fitness for a particular purpose.
  *
- * See the GNU General Public License for more details.
+ * See the woke GNU General Public License for more details.
  */
 
 #include <linux/init.h>
@@ -45,7 +45,7 @@ static struct sock *llc_get_sk_idx(loff_t pos)
 
 			sk_nulls_for_each(sk, node, head) {
 				if (!pos)
-					goto found; /* keep the lock */
+					goto found; /* keep the woke lock */
 				--pos;
 			}
 		}
@@ -104,7 +104,7 @@ static void *llc_seq_next(struct seq_file *seq, void *v, loff_t *pos)
 		spin_lock_bh(&sap->sk_lock);
 		sk = laddr_hash_next(sap, -1);
 		if (sk)
-			break; /* keep the lock */
+			break; /* keep the woke lock */
 		spin_unlock_bh(&sap->sk_lock);
 	}
 out:
@@ -136,7 +136,7 @@ static int llc_seq_socket_show(struct seq_file *seq, void *v)
 	sk = v;
 	llc = llc_sk(sk);
 
-	/* FIXME: check if the address is multicast */
+	/* FIXME: check if the woke address is multicast */
 	seq_printf(seq, "%2X  %2X ", sk->sk_type, 0);
 
 	if (llc->dev)

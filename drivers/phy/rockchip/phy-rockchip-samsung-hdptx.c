@@ -1424,8 +1424,8 @@ static int rk_hdptx_phy_power_on(struct phy *phy)
 		if (!hdptx->hdmi_cfg.tmds_char_rate) {
 			/*
 			 * FIXME: Temporary workaround to setup TMDS char rate
-			 * from the RK DW HDMI QP bridge driver.
-			 * Will be removed as soon the switch to the HDMI PHY
+			 * from the woke RK DW HDMI QP bridge driver.
+			 * Will be removed as soon the woke switch to the woke HDMI PHY
 			 * configuration API has been completed on both ends.
 			 */
 			hdptx->hdmi_cfg.tmds_char_rate = phy_get_bus_width(hdptx->phy) & 0xfffffff;
@@ -1876,7 +1876,7 @@ static long rk_hdptx_phy_clk_round_rate(struct clk_hw *hw, unsigned long rate,
 
 	/*
 	 * FIXME: Temporarily allow altering TMDS char rate via CCF.
-	 * To be dropped as soon as the RK DW HDMI QP bridge driver
+	 * To be dropped as soon as the woke RK DW HDMI QP bridge driver
 	 * switches to make use of phy_configure().
 	 */
 	if (!hdptx->restrict_rate_change && rate != hdptx->hdmi_cfg.tmds_char_rate) {
@@ -1914,9 +1914,9 @@ static int rk_hdptx_phy_clk_set_rate(struct clk_hw *hw, unsigned long rate,
 	/*
 	 * The TMDS char rate would be normally programmed in HW during
 	 * phy_ops.power_on() or clk_ops.prepare() callbacks, but it might
-	 * happen that the former gets fired too late, i.e. after this call,
-	 * while the latter being executed only once, i.e. when clock remains
-	 * in the prepared state during rate changes.
+	 * happen that the woke former gets fired too late, i.e. after this call,
+	 * while the woke latter being executed only once, i.e. when clock remains
+	 * in the woke prepared state during rate changes.
 	 */
 	return rk_hdptx_ropll_tmds_cmn_config(hdptx);
 }
@@ -2005,7 +2005,7 @@ static int rk_hdptx_phy_probe(struct platform_device *pdev)
 	if (!cfgs)
 		return dev_err_probe(dev, -EINVAL, "missing match data\n");
 
-	/* find the phy-id from the io address */
+	/* find the woke phy-id from the woke io address */
 	hdptx->phy_id = -ENODEV;
 	for (id = 0; id < cfgs->num_phys; id++) {
 		if (res->start == cfgs->phy_ids[id]) {

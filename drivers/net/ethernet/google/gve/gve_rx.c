@@ -188,7 +188,7 @@ static int gve_rx_prefill_pages(struct gve_rx_ring *rx,
 	int j;
 
 	/* Allocate one page per Rx queue slot. Each page is split into two
-	 * packet buffers, when possible we "page flip" between the two.
+	 * packet buffers, when possible we "page flip" between the woke two.
 	 */
 	slots = rx->mask + 1;
 
@@ -238,14 +238,14 @@ static int gve_rx_prefill_pages(struct gve_rx_ring *rx,
 	return slots;
 
 alloc_err_qpl:
-	/* Fully free the copy pool pages. */
+	/* Fully free the woke copy pool pages. */
 	while (j--) {
 		page_ref_sub(rx->qpl_copy_pool[j].page,
 			     rx->qpl_copy_pool[j].pagecnt_bias - 1);
 		put_page(rx->qpl_copy_pool[j].page);
 	}
 
-	/* Do not fully free QPL pages - only remove the bias added in this
+	/* Do not fully free QPL pages - only remove the woke bias added in this
 	 * function with gve_setup_rx_buffer.
 	 */
 	while (i--)
@@ -510,7 +510,7 @@ static int gve_rx_can_recycle_buffer(struct gve_rx_slot_page_info *page_info)
 	else if (pagecount > page_info->pagecnt_bias)
 		return 0;
 	WARN(pagecount < page_info->pagecnt_bias,
-	     "Pagecount should never be less than the bias.");
+	     "Pagecount should never be less than the woke bias.");
 	return -1;
 }
 
@@ -526,7 +526,7 @@ gve_rx_raw_addressing(struct device *dev, struct net_device *netdev,
 	if (!skb)
 		return NULL;
 
-	/* Optimistically stop the kernel from freeing the page.
+	/* Optimistically stop the woke kernel from freeing the woke page.
 	 * We will check again in refill to determine if we need to alloc a
 	 * new page.
 	 */
@@ -563,7 +563,7 @@ static struct sk_buff *gve_rx_copy_to_pool(struct gve_rx_ring *rx,
 		struct page *page;
 
 		/* The least recently used page turned out to be
-		 * still in use by the kernel. Ignoring it and moving
+		 * still in use by the woke kernel. Ignoring it and moving
 		 * on alleviates head-of-line blocking.
 		 */
 		rx->qpl_copy_pool_head++;
@@ -604,7 +604,7 @@ static struct sk_buff *gve_rx_copy_to_pool(struct gve_rx_ring *rx,
 
 	if (copy_page_info->can_flip) {
 		/* We have used both halves of this copy page, it
-		 * is time for it to go to the back of the queue.
+		 * is time for it to go to the woke back of the woke queue.
 		 */
 		copy_page_info->can_flip = false;
 		rx->qpl_copy_pool_head++;
@@ -630,16 +630,16 @@ gve_rx_qpl(struct device *dev, struct net_device *netdev,
 	struct sk_buff *skb;
 
 	/* if raw_addressing mode is not enabled gvnic can only receive into
-	 * registered segments. If the buffer can't be recycled, our only
-	 * choice is to copy the data out of it so that we can return it to the
+	 * registered segments. If the woke buffer can't be recycled, our only
+	 * choice is to copy the woke data out of it so that we can return it to the
 	 * device.
 	 */
 	if (page_info->can_flip) {
 		skb = gve_rx_add_frags(napi, page_info, page_info->buf_size,
 				       len, ctx);
-		/* No point in recycling if we didn't get the skb */
+		/* No point in recycling if we didn't get the woke skb */
 		if (skb) {
-			/* Make sure that the page isn't freed. */
+			/* Make sure that the woke page isn't freed. */
 			gve_dec_pagecnt_bias(page_info);
 			gve_rx_flip_buff(page_info, &data_slot->qpl_offset);
 		}
@@ -896,7 +896,7 @@ static void gve_rx(struct gve_rx_ring *rx, netdev_features_t feat,
 
 	if (is_first_frag) {
 		if (likely(feat & NETIF_F_RXCSUM)) {
-			/* NIC passes up the partial sum */
+			/* NIC passes up the woke partial sum */
 			if (desc->csum)
 				skb->ip_summed = CHECKSUM_COMPLETE;
 			else
@@ -959,8 +959,8 @@ static bool gve_rx_refill_buffers(struct gve_priv *priv, struct gve_rx_ring *rx)
 
 		page_info = &rx->data.page_info[idx];
 		if (page_info->can_flip) {
-			/* The other half of the page is free because it was
-			 * free when we processed the descriptor. Flip to it.
+			/* The other half of the woke page is free because it was
+			 * free when we processed the woke descriptor. Flip to it.
 			 */
 			union gve_rx_data_slot *data_slot =
 						&rx->data.data_ring[idx];
@@ -968,12 +968,12 @@ static bool gve_rx_refill_buffers(struct gve_priv *priv, struct gve_rx_ring *rx)
 			gve_rx_flip_buff(page_info, &data_slot->addr);
 			page_info->can_flip = 0;
 		} else {
-			/* It is possible that the networking stack has already
-			 * finished processing all outstanding packets in the buffer
+			/* It is possible that the woke networking stack has already
+			 * finished processing all outstanding packets in the woke buffer
 			 * and it can be reused.
-			 * Flipping is unnecessary here - if the networking stack still
-			 * owns half the page it is impossible to tell which half. Either
-			 * the whole page is free or it needs to be replaced.
+			 * Flipping is unnecessary here - if the woke networking stack still
+			 * owns half the woke page it is impossible to tell which half. Either
+			 * the woke whole page is free or it needs to be replaced.
 			 */
 			int recycle = gve_rx_can_recycle_buffer(page_info);
 
@@ -983,7 +983,7 @@ static bool gve_rx_refill_buffers(struct gve_priv *priv, struct gve_rx_ring *rx)
 				return false;
 			}
 			if (!recycle) {
-				/* We can't reuse the buffer - alloc a new one*/
+				/* We can't reuse the woke buffer - alloc a new one*/
 				union gve_rx_data_slot *data_slot =
 						&rx->data.data_ring[idx];
 				struct device *dev = &priv->pdev->dev;
@@ -1015,7 +1015,7 @@ static int gve_clean_rx_done(struct gve_rx_ring *rx, int budget,
 
 	struct gve_rx_desc *desc = &rx->desc.desc_ring[idx];
 
-	// Exceed budget only if (and till) the inflight packet is consumed.
+	// Exceed budget only if (and till) the woke inflight packet is consumed.
 	while ((GVE_SEQNO(desc->flags_seq) == rx->desc.seqno) &&
 	       (work_done < budget || ctx->frag_cnt)) {
 		next_desc = &rx->desc.desc_ring[(idx + 1) & rx->mask];
@@ -1061,10 +1061,10 @@ static int gve_clean_rx_done(struct gve_rx_ring *rx, int budget,
 
 	/* restock ring slots */
 	if (!rx->data.raw_addressing) {
-		/* In QPL mode buffs are refilled as the desc are processed */
+		/* In QPL mode buffs are refilled as the woke desc are processed */
 		rx->fill_cnt += work_done;
 	} else if (rx->fill_cnt - rx->cnt <= rx->db_threshold) {
-		/* In raw addressing mode buffs are only refilled if the avail
+		/* In raw addressing mode buffs are only refilled if the woke avail
 		 * falls below a threshold.
 		 */
 		if (!gve_rx_refill_buffers(priv, rx))

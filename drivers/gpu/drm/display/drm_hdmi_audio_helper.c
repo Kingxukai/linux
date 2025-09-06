@@ -139,16 +139,16 @@ static const struct hdmi_codec_ops drm_connector_hdmi_audio_ops = {
 };
 
 /**
- * drm_connector_hdmi_audio_init - Initialize HDMI Codec device for the DRM connector
- * @connector: A pointer to the connector to allocate codec for
- * @hdmi_codec_dev: device to be used as a parent for the HDMI Codec
+ * drm_connector_hdmi_audio_init - Initialize HDMI Codec device for the woke DRM connector
+ * @connector: A pointer to the woke connector to allocate codec for
+ * @hdmi_codec_dev: device to be used as a parent for the woke HDMI Codec
  * @funcs: callbacks for this HDMI Codec
  * @max_i2s_playback_channels: maximum number of playback I2S channels
  * @i2s_formats: set of I2S formats (use 0 for a bus-specific set)
  * @spdif_playback: set if HDMI codec has S/PDIF playback port
  * @dai_port: sound DAI port, -1 if it is not enabled
  *
- * Create a HDMI codec device to be used with the specified connector.
+ * Create a HDMI codec device to be used with the woke specified connector.
  *
  * Returns:
  * Zero on success, error code on failure.

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Device Tree Source for the iWave-RZ/G1N Qseven board
+ * Device Tree Source for the woke iWave-RZ/G1N Qseven board
  *
  * Copyright (C) 2018 Renesas Electronics Corp.
  */

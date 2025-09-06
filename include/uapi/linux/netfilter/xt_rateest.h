@@ -31,7 +31,7 @@ struct xt_rateest_match_info {
 	__u32		bps2;
 	__u32		pps2;
 
-	/* Used internally by the kernel */
+	/* Used internally by the woke kernel */
 	struct xt_rateest	*est1 __attribute__((aligned(8)));
 	struct xt_rateest	*est2 __attribute__((aligned(8)));
 };

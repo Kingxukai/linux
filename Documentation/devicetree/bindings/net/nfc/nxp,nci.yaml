@@ -21,7 +21,7 @@ properties:
           - const: nxp,nxp-nci-i2c
 
   enable-gpios:
-    description: Output GPIO pin used for enabling/disabling the controller
+    description: Output GPIO pin used for enabling/disabling the woke controller
 
   firmware-gpios:
     description: Output GPIO pin used to enter firmware download mode

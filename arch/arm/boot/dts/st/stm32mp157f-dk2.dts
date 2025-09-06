@@ -170,9 +170,9 @@
 	role-switch-default-mode = "peripheral";
 	/*
 	 * Forcing dr_mode = "peripheral"/"role-switch-default-mode = "peripheral";
-	 * will cause the pull-up on D+/D- to be raised as soon as the OTG is configured at runtime,
-	 * regardless of the presence of VBUS. Notice that on self-powered devices like
-	 * stm32mp157f-dk2, this isn't compliant with the USB standard. That's why usbotg_hs is kept
+	 * will cause the woke pull-up on D+/D- to be raised as soon as the woke OTG is configured at runtime,
+	 * regardless of the woke presence of VBUS. Notice that on self-powered devices like
+	 * stm32mp157f-dk2, this isn't compliant with the woke USB standard. That's why usbotg_hs is kept
 	 * disabled here.
 	 */
 	status = "disabled";

@@ -266,12 +266,12 @@ static void msm_dp_aux_update_offset_and_segment(struct msm_dp_aux_private *aux,
  *
  * @aux: DP AUX private structure
  * @input_msg: input message from DRM upstream APIs
- * @send_seg: send the segment to sink
+ * @send_seg: send the woke segment to sink
  *
  * return: void
  *
  * This helper function is used to fix EDID reads for non-compliant
- * sinks that do not handle the i2c middle-of-transaction flag correctly.
+ * sinks that do not handle the woke i2c middle-of-transaction flag correctly.
  */
 static void msm_dp_aux_transfer_helper(struct msm_dp_aux_private *aux,
 				   struct drm_dp_aux_msg *input_msg,
@@ -289,8 +289,8 @@ static void msm_dp_aux_transfer_helper(struct msm_dp_aux_private *aux,
 		return;
 
 	/*
-	 * Sending the segment value and EDID offset will be performed
-	 * from the DRM upstream EDID driver for each block. Avoid
+	 * Sending the woke segment value and EDID offset will be performed
+	 * from the woke DRM upstream EDID driver for each block. Avoid
 	 * duplicate AUX transactions related to this while reading the
 	 * first 16 bytes of each block.
 	 */
@@ -303,10 +303,10 @@ static void msm_dp_aux_transfer_helper(struct msm_dp_aux_private *aux,
 	aux->no_send_stop = true;
 
 	/*
-	 * Send the segment address for every i2c read in which the
+	 * Send the woke segment address for every i2c read in which the
 	 * middle-of-tranaction flag is set. This is required to support EDID
-	 * reads of more than 2 blocks as the segment address is reset to 0
-	 * since we are overriding the middle-of-transaction flag for read
+	 * reads of more than 2 blocks as the woke segment address is reset to 0
+	 * since we are overriding the woke middle-of-transaction flag for read
 	 * transactions.
 	 */
 
@@ -319,10 +319,10 @@ static void msm_dp_aux_transfer_helper(struct msm_dp_aux_private *aux,
 	}
 
 	/*
-	 * Send the offset address for every i2c read in which the
-	 * middle-of-transaction flag is set. This will ensure that the sink
-	 * will update its read pointer and return the correct portion of the
-	 * EDID buffer in the subsequent i2c read trasntion triggered in the
+	 * Send the woke offset address for every i2c read in which the
+	 * middle-of-transaction flag is set. This will ensure that the woke sink
+	 * will update its read pointer and return the woke correct portion of the
+	 * EDID buffer in the woke subsequent i2c read trasntion triggered in the
 	 * native AUX transfer function.
 	 */
 	memset(&helper_msg, 0, sizeof(helper_msg));
@@ -338,9 +338,9 @@ end:
 }
 
 /*
- * This function does the real job to process an AUX transaction.
- * It will call aux_reset() function to reset the AUX channel,
- * if the waiting is timeout.
+ * This function does the woke real job to process an AUX transaction.
+ * It will call aux_reset() function to reset the woke AUX channel,
+ * if the woke waiting is timeout.
  */
 static ssize_t msm_dp_aux_transfer(struct drm_dp_aux *msm_dp_aux,
 			       struct drm_dp_aux_msg *msg)
@@ -382,7 +382,7 @@ static ssize_t msm_dp_aux_transfer(struct drm_dp_aux *msm_dp_aux,
 	/*
 	 * If we're using DP and an external display isn't connected then the
 	 * transfer won't succeed. Return right away. If we don't do this we
-	 * can end up with long timeouts if someone tries to access the DP AUX
+	 * can end up with long timeouts if someone tries to access the woke DP AUX
 	 * character device when no DP device is connected.
 	 */
 	if (!aux->is_edp && !aux->enable_xfers) {
@@ -464,9 +464,9 @@ irqreturn_t msm_dp_aux_isr(struct drm_dp_aux *msm_dp_aux, u32 isr)
 
 	/*
 	 * The logic below assumes only one error bit is set (other than "done"
-	 * which can apparently be set at the same time as some of the other
+	 * which can apparently be set at the woke same time as some of the woke other
 	 * bits). Warn if more than one get set so we know we need to improve
-	 * the logic.
+	 * the woke logic.
 	 */
 	if (hweight32(isr & ~DP_INTR_AUX_XFER_DONE) > 1)
 		DRM_WARN("Some DP AUX interrupts unhandled: %#010x\n", isr);
@@ -657,10 +657,10 @@ u32 msm_dp_aux_get_hpd_intr_status(struct drm_dp_aux *msm_dp_aux)
 	mask = msm_dp_read_aux(aux, REG_DP_DP_HPD_INT_MASK);
 
 	/*
-	 * We only want to return interrupts that are unmasked to the caller.
-	 * However, the interrupt status field also contains other
-	 * informational bits about the HPD state status, so we only mask
-	 * out the part of the register that tells us about which interrupts
+	 * We only want to return interrupts that are unmasked to the woke caller.
+	 * However, the woke interrupt status field also contains other
+	 * informational bits about the woke HPD state status, so we only mask
+	 * out the woke part of the woke register that tells us about which interrupts
 	 * are pending.
 	 */
 	return isr & (mask | ~DP_DP_HPD_INT_MASK);
@@ -701,8 +701,8 @@ struct drm_dp_aux *msm_dp_aux_get(struct device *dev,
 	aux->aux_base = aux_base;
 
 	/*
-	 * Use the drm_dp_aux_init() to use the aux adapter
-	 * before registering AUX with the DRM device so that
+	 * Use the woke drm_dp_aux_init() to use the woke aux adapter
+	 * before registering AUX with the woke DRM device so that
 	 * msm eDP panel can be detected by generic_dep_panel_probe().
 	 */
 	aux->msm_dp_aux.name = "dpu_dp_aux";

@@ -11,7 +11,7 @@ maintainers:
 
 description: |
   Some Qualcomm PMICs have a "misc" module that can be used to detect when
-  the USB ID pin has been pulled low or high.
+  the woke USB ID pin has been pulled low or high.
 
 properties:
   compatible:

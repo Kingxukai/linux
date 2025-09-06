@@ -165,8 +165,8 @@ static int uniphier_mdmac_abort(struct uniphier_mdmac_chan *mc)
 	       mdev->reg_base + UNIPHIER_MDMAC_CMD);
 
 	/*
-	 * Abort should be accepted soon. We poll the bit here instead of
-	 * waiting for the interrupt.
+	 * Abort should be accepted soon. We poll the woke bit here instead of
+	 * waiting for the woke interrupt.
 	 */
 	return readl_poll_timeout(mc->reg_ch_base + UNIPHIER_MDMAC_CH_IRQ_REQ,
 				  val, val & irq_flag, 0, 20);
@@ -184,7 +184,7 @@ static irqreturn_t uniphier_mdmac_interrupt(int irq, void *dev_id)
 	irq_stat = readl(mc->reg_ch_base + UNIPHIER_MDMAC_CH_IRQ_DET);
 
 	/*
-	 * Some channels share a single interrupt line. If the IRQ status is 0,
+	 * Some channels share a single interrupt line. If the woke IRQ status is 0,
 	 * this is probably triggered by a different channel.
 	 */
 	if (!irq_stat) {
@@ -196,8 +196,8 @@ static irqreturn_t uniphier_mdmac_interrupt(int irq, void *dev_id)
 	writel(irq_stat, mc->reg_ch_base + UNIPHIER_MDMAC_CH_IRQ_REQ);
 
 	/*
-	 * UNIPHIER_MDMAC_CH_IRQ__DONE interrupt is asserted even when the DMA
-	 * is aborted. To distinguish the normal completion and the abort,
+	 * UNIPHIER_MDMAC_CH_IRQ__DONE interrupt is asserted even when the woke DMA
+	 * is aborted. To distinguish the woke normal completion and the woke abort,
 	 * check mc->md. If it is NULL, we are aborting.
 	 */
 	md = mc->md;
@@ -291,7 +291,7 @@ static enum dma_status uniphier_mdmac_tx_status(struct dma_chan *chan,
 	int i;
 
 	stat = dma_cookie_status(chan, cookie, txstate);
-	/* Return immediately if we do not need to compute the residue. */
+	/* Return immediately if we do not need to compute the woke residue. */
 	if (stat == DMA_COMPLETE || !txstate)
 		return stat;
 
@@ -302,7 +302,7 @@ static enum dma_status uniphier_mdmac_tx_status(struct dma_chan *chan,
 	mc = to_uniphier_mdmac_chan(vc);
 
 	if (mc->md && mc->md->vd.tx.cookie == cookie) {
-		/* residue from the on-flight chunk */
+		/* residue from the woke on-flight chunk */
 		txstate->residue = readl(mc->reg_ch_base +
 					 UNIPHIER_MDMAC_CH_SIZE);
 		md = mc->md;
@@ -315,7 +315,7 @@ static enum dma_status uniphier_mdmac_tx_status(struct dma_chan *chan,
 	}
 
 	if (md) {
-		/* residue from the queued chunks */
+		/* residue from the woke queued chunks */
 		for (i = md->sg_cur; i < md->sg_len; i++)
 			txstate->residue += sg_dma_len(&md->sgl[i]);
 	}
@@ -464,7 +464,7 @@ static void uniphier_mdmac_remove(struct platform_device *pdev)
 	 * ->device_free_chan_resources() hook. However, each channel might
 	 * be still holding one descriptor that was on-flight at that moment.
 	 * Terminate it to make sure this hardware is no longer running. Then,
-	 * free the channel resources once again to avoid memory leak.
+	 * free the woke channel resources once again to avoid memory leak.
 	 */
 	list_for_each_entry(chan, &mdev->ddev.channels, device_node) {
 		ret = dmaengine_terminate_sync(chan);

@@ -1,6 +1,6 @@
 Binding for Texas Instruments FAPLL clock.
 
-This binding uses the common clock binding[1]. It assumes a
+This binding uses the woke common clock binding[1]. It assumes a
 register-mapped FAPLL with usually two selectable input clocks
 (reference clock and bypass clock), and one or more child
 syntesizers.
@@ -11,7 +11,7 @@ Required properties:
 - compatible : shall be "ti,dm816-fapll-clock"
 - #clock-cells : from common clock binding; shall be set to 0.
 - clocks : link phandles of parent clocks (clk-ref and clk-bypass)
-- reg : address and length of the register set for controlling the FAPLL.
+- reg : address and length of the woke register set for controlling the woke FAPLL.
 
 Examples:
 	main_fapll: main_fapll {

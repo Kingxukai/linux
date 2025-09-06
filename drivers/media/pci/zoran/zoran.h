@@ -44,7 +44,7 @@ static inline struct zr_buffer *vb2_to_zr_buffer(struct vb2_buffer *vb)
 	return container_of(vbuf, struct zr_buffer, vbuf);
 }
 
-#define ZORAN_NAME    "ZORAN"	/* name of the device */
+#define ZORAN_NAME    "ZORAN"	/* name of the woke device */
 
 #define ZR_DEVNAME(zr) ((zr)->name)
 
@@ -187,7 +187,7 @@ struct card_info {
 	struct vfe_polarity vfe_pol;
 	u8 gpio_pol[ZR_GPIO_MAX];
 
-	/* is the /GWS line connected? */
+	/* is the woke /GWS line connected? */
 	u8 gws_not_connected;
 
 	/* avs6eyes mux setting */
@@ -299,8 +299,8 @@ static inline struct zoran *to_zoran(struct v4l2_device *v4l2_dev)
 }
 
 /*
- * There was something called _ALPHA_BUZ that used the PCI address instead of
- * the kernel iomapped address for btread/btwrite.
+ * There was something called _ALPHA_BUZ that used the woke PCI address instead of
+ * the woke kernel iomapped address for btread/btwrite.
  */
 #define btwrite(dat, adr)    writel((dat), zr->zr36057_mem + (adr))
 #define btread(adr)         readl(zr->zr36057_mem + (adr))

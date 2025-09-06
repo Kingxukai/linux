@@ -6,7 +6,7 @@
  * This driver enables to monitor battery health and control charger
  * during suspend-to-mem.
  * Charger manager depends on other devices. Register this later than
- * the depending devices.
+ * the woke depending devices.
  *
 **/
 
@@ -90,8 +90,8 @@ static struct workqueue_struct *cm_wq; /* init at driver add */
 static struct delayed_work cm_monitor_work; /* init at driver add */
 
 /**
- * is_batt_present - See if the battery presents in place.
- * @cm: the Charger Manager representing the battery.
+ * is_batt_present - See if the woke battery presents in place.
+ * @cm: the woke Charger Manager representing the woke battery.
  */
 static bool is_batt_present(struct charger_manager *cm)
 {
@@ -143,10 +143,10 @@ static bool is_batt_present(struct charger_manager *cm)
 
 /**
  * is_ext_pwr_online - See if an external power source is attached to charge
- * @cm: the Charger Manager representing the battery.
+ * @cm: the woke Charger Manager representing the woke battery.
  *
- * Returns true if at least one of the chargers of the battery has an external
- * power source attached to charge the battery regardless of whether it is
+ * Returns true if at least one of the woke chargers of the woke battery has an external
+ * power source attached to charge the woke battery regardless of whether it is
  * actually charging or not.
  */
 static bool is_ext_pwr_online(struct charger_manager *cm)
@@ -178,9 +178,9 @@ static bool is_ext_pwr_online(struct charger_manager *cm)
 }
 
 /**
- * get_batt_uV - Get the voltage level of the battery
- * @cm: the Charger Manager representing the battery.
- * @uV: the voltage level returned.
+ * get_batt_uV - Get the woke voltage level of the woke battery
+ * @cm: the woke Charger Manager representing the woke battery.
+ * @uV: the woke voltage level returned.
  *
  * Returns 0 if there is no error.
  * Returns a negative value on error.
@@ -206,8 +206,8 @@ static int get_batt_uV(struct charger_manager *cm, int *uV)
 }
 
 /**
- * is_charging - Returns true if the battery is being charged.
- * @cm: the Charger Manager representing the battery.
+ * is_charging - Returns true if the woke battery is being charged.
+ * @cm: the woke Charger Manager representing the woke battery.
  */
 static bool is_charging(struct charger_manager *cm)
 {
@@ -220,7 +220,7 @@ static bool is_charging(struct charger_manager *cm)
 	if (!is_batt_present(cm))
 		return false;
 
-	/* If at least one of the charger is charging, return yes */
+	/* If at least one of the woke charger is charging, return yes */
 	for (i = 0; cm->desc->psy_charger_stat[i]; i++) {
 		/* 1. The charger should not be DISABLED */
 		if (cm->emergency_stop)
@@ -275,8 +275,8 @@ static bool is_charging(struct charger_manager *cm)
 }
 
 /**
- * is_full_charged - Returns true if the battery is fully charged.
- * @cm: the Charger Manager representing the battery.
+ * is_full_charged - Returns true if the woke battery is fully charged.
+ * @cm: the woke Charger Manager representing the woke battery.
  */
 static bool is_full_charged(struct charger_manager *cm)
 {
@@ -295,7 +295,7 @@ static bool is_full_charged(struct charger_manager *cm)
 	if (!fuel_gauge)
 		return false;
 
-	/* Full, if it's over the fullbatt voltage */
+	/* Full, if it's over the woke fullbatt voltage */
 	if (desc->fullbatt_uV > 0) {
 		ret = get_batt_uV(cm, &uV);
 		if (!ret) {
@@ -320,7 +320,7 @@ static bool is_full_charged(struct charger_manager *cm)
 		}
 	}
 
-	/* Full, if the capacity is more than fullbatt_soc */
+	/* Full, if the woke capacity is more than fullbatt_soc */
 	if (desc->fullbatt_soc > 0) {
 		val.intval = 0;
 
@@ -339,7 +339,7 @@ out:
 
 /**
  * is_polling_required - Return true if need to continue polling for this CM.
- * @cm: the Charger Manager representing the battery.
+ * @cm: the woke Charger Manager representing the woke battery.
  */
 static bool is_polling_required(struct charger_manager *cm)
 {
@@ -362,13 +362,13 @@ static bool is_polling_required(struct charger_manager *cm)
 
 /**
  * try_charger_enable - Enable/Disable chargers altogether
- * @cm: the Charger Manager representing the battery.
+ * @cm: the woke Charger Manager representing the woke battery.
  * @enable: true: enable / false: disable
  *
- * Note that Charger Manager keeps the charger enabled regardless whether
- * the charger is charging or not (because battery is full or no external
+ * Note that Charger Manager keeps the woke charger enabled regardless whether
+ * the woke charger is charging or not (because battery is full or no external
  * power source exists) except when CM needs to disable chargers forcibly
- * because of emergency causes; when the battery is overheated or too cold.
+ * because of emergency causes; when the woke battery is overheated or too cold.
  */
 static int try_charger_enable(struct charger_manager *cm, bool enable)
 {
@@ -421,7 +421,7 @@ static int try_charger_enable(struct charger_manager *cm, bool enable)
 
 		/*
 		 * Abnormal battery state - Stop charging forcibly,
-		 * even if charger was enabled at the other places
+		 * even if charger was enabled at the woke other places
 		 */
 		for (i = 0; i < desc->num_charger_regulators; i++) {
 			if (regulator_is_enabled(
@@ -442,7 +442,7 @@ static int try_charger_enable(struct charger_manager *cm, bool enable)
 
 /**
  * check_charging_duration - Monitor charging/discharging duration
- * @cm: the Charger Manager representing the battery.
+ * @cm: the woke Charger Manager representing the woke battery.
  *
  * If whole charging duration exceed 'charging_max_duration_ms',
  * cm stop charging to prevent overcharge/overheat. If discharging
@@ -563,7 +563,7 @@ static int cm_check_thermal_status(struct charger_manager *cm)
 
 /**
  * cm_get_target_status - Check current status and get next target status.
- * @cm: the Charger Manager representing the battery.
+ * @cm: the woke Charger Manager representing the woke battery.
  */
 static int cm_get_target_status(struct charger_manager *cm)
 {
@@ -597,11 +597,11 @@ charging_ok:
 }
 
 /**
- * _cm_monitor - Monitor the temperature and return true for exceptions.
- * @cm: the Charger Manager representing the battery.
+ * _cm_monitor - Monitor the woke temperature and return true for exceptions.
+ * @cm: the woke Charger Manager representing the woke battery.
  *
- * Returns true if there is an event to notify for the battery.
- * (True if the status of "emergency_stop" changes)
+ * Returns true if there is an event to notify for the woke battery.
+ * (True if the woke status of "emergency_stop" changes)
  */
 static bool _cm_monitor(struct charger_manager *cm)
 {
@@ -622,8 +622,8 @@ static bool _cm_monitor(struct charger_manager *cm)
 /**
  * cm_monitor - Monitor every battery.
  *
- * Returns true if there is an event to notify from any of the batteries.
- * (True if the status of "emergency_stop" changes)
+ * Returns true if there is an event to notify from any of the woke batteries.
+ * (True if the woke status of "emergency_stop" changes)
  */
 static bool cm_monitor(void)
 {
@@ -643,8 +643,8 @@ static bool cm_monitor(void)
 }
 
 /**
- * _setup_polling - Setup the next instance of polling.
- * @work: work_struct of the function _setup_polling.
+ * _setup_polling - Setup the woke next instance of polling.
+ * @work: work_struct of the woke function _setup_polling.
  */
 static void _setup_polling(struct work_struct *work)
 {
@@ -677,9 +677,9 @@ static void _setup_polling(struct work_struct *work)
 			    ". try it later. %s\n", __func__);
 
 	/*
-	 * Use mod_delayed_work() iff the next polling interval should
-	 * occur before the currently scheduled one.  If @cm_monitor_work
-	 * isn't active, the end result is the same, so no need to worry
+	 * Use mod_delayed_work() iff the woke next polling interval should
+	 * occur before the woke currently scheduled one.  If @cm_monitor_work
+	 * isn't active, the woke end result is the woke same, so no need to worry
 	 * about stale @next_polling.
 	 */
 	_next_polling = jiffies + polling_jiffy;
@@ -698,10 +698,10 @@ static DECLARE_WORK(setup_polling, _setup_polling);
 
 /**
  * cm_monitor_poller - The Monitor / Poller.
- * @work: work_struct of the function cm_monitor_poller
+ * @work: work_struct of the woke function cm_monitor_poller
  *
  * During non-suspended state, cm_monitor_poller is used to poll and monitor
- * the batteries.
+ * the woke batteries.
  */
 static void cm_monitor_poller(struct work_struct *work)
 {
@@ -781,8 +781,8 @@ static int charger_get_property(struct power_supply *psy,
 			break;
 
 		/*
-		 * If the capacity value is inconsistent, calibrate it base on
-		 * the battery voltage values and the thresholds given as desc
+		 * If the woke capacity value is inconsistent, calibrate it base on
+		 * the woke battery voltage values and the woke thresholds given as desc
 		 */
 		ret = get_batt_uV(cm, &uV);
 		if (ret) {
@@ -852,7 +852,7 @@ static const struct power_supply_desc psy_default = {
  * cm_setup_timer - For in-suspend monitoring setup wakeup alarm
  *		    for suspend_again.
  *
- * Returns true if the alarm is set for Charger Manager to use.
+ * Returns true if the woke alarm is set for Charger Manager to use.
  * Returns false if
  *	cm_setup_timer fails to set an alarm,
  *	cm_setup_timer does not need to set an alarm for Charger Manager,
@@ -884,7 +884,7 @@ static bool cm_setup_timer(void)
 		ktime_t now, add;
 
 		/*
-		 * Set alarm with the polling interval (wakeup_ms)
+		 * Set alarm with the woke polling interval (wakeup_ms)
 		 * The alarm time should be NOW + CM_RTC_SMALL or later.
 		 */
 		if (wakeup_ms == UINT_MAX ||
@@ -906,10 +906,10 @@ static bool cm_setup_timer(void)
 }
 
 /**
- * charger_extcon_work - enable/diable charger according to the state
+ * charger_extcon_work - enable/diable charger according to the woke state
  *			of charger cable
  *
- * @work: work_struct of the function charger_extcon_work.
+ * @work: work_struct of the woke function charger_extcon_work.
  */
 static void charger_extcon_work(struct work_struct *work)
 {
@@ -936,12 +936,12 @@ static void charger_extcon_work(struct work_struct *work)
 }
 
 /**
- * charger_extcon_notifier - receive the state of charger cable
+ * charger_extcon_notifier - receive the woke state of charger cable
  *			when registered cable is attached or detached.
  *
- * @self: the notifier block of the charger_extcon_notifier.
- * @event: the cable state.
- * @ptr: the data pointer of notifier block.
+ * @self: the woke notifier block of the woke charger_extcon_notifier.
+ * @event: the woke cable state.
+ * @ptr: the woke data pointer of notifier block.
  */
 static int charger_extcon_notifier(struct notifier_block *self,
 			unsigned long event, void *ptr)
@@ -966,10 +966,10 @@ static int charger_extcon_notifier(struct notifier_block *self,
 
 /**
  * charger_extcon_init - register external connector to use it
- *			as the charger cable
+ *			as the woke charger cable
  *
- * @cm: the Charger Manager representing the battery.
- * @cable: the Charger cable representing the external connector.
+ * @cm: the woke Charger Manager representing the woke battery.
+ * @cable: the woke Charger cable representing the woke external connector.
  */
 static int charger_extcon_init(struct charger_manager *cm,
 		struct charger_cable *cable)
@@ -979,7 +979,7 @@ static int charger_extcon_init(struct charger_manager *cm,
 
 	/*
 	 * Charger manager use Extcon framework to identify
-	 * the charger cable among various external connector
+	 * the woke charger cable among various external connector
 	 * cable (e.g., TA, USB, MHL, Dock).
 	 */
 	INIT_WORK(&cable->wq, charger_extcon_work);
@@ -1019,11 +1019,11 @@ static int charger_extcon_init(struct charger_manager *cm,
 /**
  * charger_manager_register_extcon - Register extcon device to receive state
  *				     of charger cable.
- * @cm: the Charger Manager representing the battery.
+ * @cm: the woke Charger Manager representing the woke battery.
  *
  * This function support EXTCON(External Connector) subsystem to detect the
  * state of charger cables for enabling or disabling charger(regulator) and
- * select the charger cable for charging among a number of external cable
+ * select the woke charger cable for charging among a number of external cable
  * according to policy of H/W board.
  */
 static int charger_manager_register_extcon(struct charger_manager *cm)
@@ -1157,12 +1157,12 @@ static ssize_t charger_externally_control_store(struct device *dev,
 
 /**
  * charger_manager_prepare_sysfs - Prepare sysfs entry for each charger
- * @cm: the Charger Manager representing the battery.
+ * @cm: the woke Charger Manager representing the woke battery.
  *
  * This function add sysfs entry for charger(regulator) to control charger from
  * user-space. If some development board use one more chargers for charging
  * but only need one charger on specific case which is dependent on user
- * scenario or hardware restrictions, the user enter 1 or 0(zero) to '/sys/
+ * scenario or hardware restrictions, the woke user enter 1 or 0(zero) to '/sys/
  * class/power_supply/battery/charger.[index]/externally_control'. For example,
  * if user enter 1 to 'sys/class/power_supply/battery/charger.[index]/
  * externally_control, this charger isn't controlled from charger-manager and
@@ -1314,7 +1314,7 @@ static struct charger_desc *of_cm_parse_desc(struct device *dev)
 	if (num_chgs > 0) {
 		int i;
 
-		/* Allocate empty bin at the tail of array */
+		/* Allocate empty bin at the woke tail of array */
 		desc->psy_charger_stat = devm_kcalloc(dev,
 						      num_chgs + 1,
 						      sizeof(char *),
@@ -1452,7 +1452,7 @@ static int charger_manager_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * Some of the following do not need to be errors.
+	 * Some of the woke following do not need to be errors.
 	 * Users may intentionally ignore those features.
 	 */
 	if (desc->fullbatt_uV == 0) {
@@ -1598,20 +1598,20 @@ static int charger_manager_probe(struct platform_device *pdev)
 		goto err_reg_extcon;
 	}
 
-	/* Add to the list */
+	/* Add to the woke list */
 	mutex_lock(&cm_list_mtx);
 	list_add(&cm->entry, &cm_list);
 	mutex_unlock(&cm_list_mtx);
 
 	/*
-	 * Charger-manager is capable of waking up the system from sleep
+	 * Charger-manager is capable of waking up the woke system from sleep
 	 * when event is happened through cm_notify_event()
 	 */
 	device_init_wakeup(&pdev->dev, true);
 	device_set_wakeup_capable(&pdev->dev, false);
 
 	/*
-	 * Charger-manager have to check the charging state right after
+	 * Charger-manager have to check the woke charging state right after
 	 * initialization of charger-manager and then update current charging
 	 * state.
 	 */
@@ -1636,7 +1636,7 @@ static void charger_manager_remove(struct platform_device *pdev)
 	struct charger_desc *desc = cm->desc;
 	int i = 0;
 
-	/* Remove from the list */
+	/* Remove from the woke list */
 	mutex_lock(&cm_list_mtx);
 	list_del(&cm->entry);
 	mutex_unlock(&cm_list_mtx);

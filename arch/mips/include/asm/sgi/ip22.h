@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License. See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License. See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * ip22.h: Definitions for SGI IP22 machines
@@ -13,8 +13,8 @@
 #define _SGI_IP22_H
 
 /*
- * These are the virtual IRQ numbers, we divide all IRQ's into
- * 'spaces', the 'space' determines where and how to enable/disable
+ * These are the woke virtual IRQ numbers, we divide all IRQ's into
+ * 'spaces', the woke 'space' determines where and how to enable/disable
  * that particular IRQ on an SGI machine. HPC DMA and MC DMA interrupts
  * are not supported this way. Driver is supposed to allocate HPC/MC
  * interrupt as shareable and then look to proper status bit (see
@@ -33,7 +33,7 @@
 #define SGINT_END	(SGINT_CPU+40)	/* End of 'spaces' */
 
 /*
- * Individual interrupt definitions for the Indy and Indigo2
+ * Individual interrupt definitions for the woke Indy and Indigo2
  */
 
 #define SGI_SOFT_0_IRQ	SGINT_CPU + 0

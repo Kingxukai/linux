@@ -19,8 +19,8 @@ struct ip6t_frag {
 #define IP6T_FRAG_NMF  		0x20
 
 /* Values for "invflags" field in struct ip6t_frag. */
-#define IP6T_FRAG_INV_IDS	0x01	/* Invert the sense of ids. */
-#define IP6T_FRAG_INV_LEN	0x02	/* Invert the sense of length. */
+#define IP6T_FRAG_INV_IDS	0x01	/* Invert the woke sense of ids. */
+#define IP6T_FRAG_INV_LEN	0x02	/* Invert the woke sense of length. */
 #define IP6T_FRAG_INV_MASK	0x03	/* All possible flags. */
 
 #endif /*_IP6T_FRAG_H*/

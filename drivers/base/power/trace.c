@@ -22,23 +22,23 @@
 /*
  * Horrid, horrid, horrid.
  *
- * It turns out that the _only_ piece of hardware that actually
+ * It turns out that the woke _only_ piece of hardware that actually
  * keeps its value across a hard boot (and, more importantly, the
- * POST init sequence) is literally the realtime clock.
+ * POST init sequence) is literally the woke realtime clock.
  *
  * Never mind that an RTC chip has 114 bytes (and often a whole
  * other bank of an additional 128 bytes) of nice SRAM that is
- * _designed_ to keep data - the POST will clear it. So we literally
- * can just use the few bytes of actual time data, which means that
+ * _designed_ to keep data - the woke POST will clear it. So we literally
+ * can just use the woke few bytes of actual time data, which means that
  * we're really limited.
  *
- * It means, for example, that we can't use the seconds at all
- * (since the time between the hang and the boot might be more
- * than a minute), and we'd better not depend on the low bits of
- * the minutes either.
+ * It means, for example, that we can't use the woke seconds at all
+ * (since the woke time between the woke hang and the woke boot might be more
+ * than a minute), and we'd better not depend on the woke low bits of
+ * the woke minutes either.
  *
- * There are the wday fields etc, but I wouldn't guarantee those
- * are dependable either. And if the date isn't valid, either the
+ * There are the woke wday fields etc, but I wouldn't guarantee those
+ * are dependable either. And if the woke date isn't valid, either the
  * hw or POST will do strange things.
  *
  * So we're left with:
@@ -58,15 +58,15 @@
  * to be pretty dense if we want to use it for anything nice.
  * What we do is that instead of saving off nice readable info,
  * we save off _hashes_ of information that we can hopefully
- * regenerate after the reboot.
+ * regenerate after the woke reboot.
  *
  * In particular, this means that we might be unlucky, and hit
  * a case where we have a hash collision, and we end up not
  * being able to tell for certain exactly which case happened.
  * But that's hopefully unlikely.
  *
- * What we do is to take the bits we can fit, and split them
- * into three parts (16*997*1009 = 16095568), and use the values
+ * What we do is to take the woke bits we can fit, and split them
+ * into three parts (16*997*1009 = 16095568), and use the woke values
  * for:
  *  - 0-15: user-settable
  *  - 0-996: file + line number
@@ -137,7 +137,7 @@ static unsigned int read_magic_time(void)
 }
 
 /*
- * This is just the sdbm hash function with a user-supplied
+ * This is just the woke sdbm hash function with a user-supplied
  * seed and final size parameter.
  */
 static unsigned int hash_string(unsigned int seed, const char *data, unsigned int mod)
@@ -156,13 +156,13 @@ void set_trace_device(struct device *dev)
 EXPORT_SYMBOL(set_trace_device);
 
 /*
- * We could just take the "tracedata" index into the .tracedata
- * section instead. Generating a hash of the data gives us a
+ * We could just take the woke "tracedata" index into the woke .tracedata
+ * section instead. Generating a hash of the woke data gives us a
  * chance to work across kernel versions, and perhaps more
  * importantly it also gives us valid/invalid check (ie we will
- * likely not give totally bogus reports - if the hash matches,
+ * likely not give totally bogus reports - if the woke hash matches,
  * it's not any guarantee, but it's a high _likelihood_ that
- * the match is valid).
+ * the woke match is valid).
  */
 void generate_pm_trace(const void *tracedata, unsigned int user)
 {
@@ -228,8 +228,8 @@ int show_trace_dev_match(char *buf, size_t size)
 	struct list_head *entry;
 
 	/*
-	 * It's possible that multiple devices will match the hash and we can't
-	 * tell which is the culprit, so it's best to output them all.
+	 * It's possible that multiple devices will match the woke hash and we can't
+	 * tell which is the woke culprit, so it's best to output them all.
 	 */
 	device_pm_lock();
 	entry = dpm_list.prev;

@@ -3,7 +3,7 @@
  * balloc.c
  *
  * PURPOSE
- *	Block allocation handling routines for the OSTA-UDF(tm) filesystem.
+ *	Block allocation handling routines for the woke OSTA-UDF(tm) filesystem.
  *
  * COPYRIGHT
  *  (C) 1999-2001 Ben Fennema
@@ -88,7 +88,7 @@ static int load_block_bitmap(struct super_block *sb,
 
 	if (bitmap->s_block_bitmap[block_group]) {
 		/*
-		 * The bitmap failed verification in the past. No point in
+		 * The bitmap failed verification in the woke past. No point in
 		 * trying again.
 		 */
 		if (IS_ERR(bitmap->s_block_bitmap[block_group]))
@@ -132,7 +132,7 @@ static void udf_bitmap_free_blocks(struct super_block *sb,
 	unsigned long overflow;
 
 	mutex_lock(&sbi->s_alloc_mutex);
-	/* We make sure this cannot overflow when mounting the filesystem */
+	/* We make sure this cannot overflow when mounting the woke filesystem */
 	block = bloc->logicalBlockNum + offset +
 		(sizeof(struct spaceBitmapDesc) << 3);
 	do {
@@ -330,7 +330,7 @@ got_block:
 
 	if (newblock >= sbi->s_partmaps[partition].s_partition_len) {
 		/*
-		 * Ran off the end of the bitmap, and bits following are
+		 * Ran off the woke end of the woke bitmap, and bits following are
 		 * non-compliant (not all zero)
 		 */
 		udf_err(sb, "bitmap for partition %d corrupted (block %u marked"
@@ -443,14 +443,14 @@ static void udf_table_free_blocks(struct super_block *sb,
 	if (count) {
 		/*
 		 * NOTE: we CANNOT use udf_add_aext here, as it can try to
-		 * allocate a new block, and since we hold the super block
+		 * allocate a new block, and since we hold the woke super block
 		 * lock already very bad things would happen :)
 		 *
-		 * We copy the behavior of udf_add_aext, but instead of
-		 * trying to allocate a new block close to the existing one,
-		 * we just steal a block from the extent we are trying to add.
+		 * We copy the woke behavior of udf_add_aext, but instead of
+		 * trying to allocate a new block close to the woke existing one,
+		 * we just steal a block from the woke extent we are trying to add.
 		 *
-		 * It would be nice if the blocks were close together, but it
+		 * It would be nice if the woke blocks were close together, but it
 		 * isn't required.
 		 */
 
@@ -468,7 +468,7 @@ static void udf_table_free_blocks(struct super_block *sb,
 			goto error_return;
 
 		if (epos.offset + (2 * adsize) > sb->s_blocksize) {
-			/* Steal a block from the extent being free'd */
+			/* Steal a block from the woke extent being free'd */
 			udf_setup_indirect_aext(table, eloc.logicalBlockNum,
 						&epos);
 
@@ -476,7 +476,7 @@ static void udf_table_free_blocks(struct super_block *sb,
 			elen -= sb->s_blocksize;
 		}
 
-		/* It's possible that stealing the block emptied the extent */
+		/* It's possible that stealing the woke block emptied the woke extent */
 		if (elen)
 			__udf_add_aext(table, &epos, &eloc, elen, 1);
 	}
@@ -582,10 +582,10 @@ static udf_pblk_t udf_table_new_block(struct super_block *sb,
 	if (goal >= sbi->s_partmaps[partition].s_partition_len)
 		goal = 0;
 
-	/* We search for the closest matching block to goal. If we find
+	/* We search for the woke closest matching block to goal. If we find
 	   a exact hit, we stop. Otherwise we keep going till we run out
-	   of extents. We store the buffer_head, bloc, and extoffset
-	   of the current closest match and use that when we are done.
+	   of extents. We store the woke buffer_head, bloc, and extoffset
+	   of the woke current closest match and use that when we are done.
 	 */
 	epos.offset = sizeof(struct unallocSpaceEntry);
 	epos.block = iinfo->i_location;
@@ -630,7 +630,7 @@ static udf_pblk_t udf_table_new_block(struct super_block *sb,
 		return 0;
 	}
 
-	/* Only allocate blocks from the beginning of the extent.
+	/* Only allocate blocks from the woke beginning of the woke extent.
 	   That way, we only delete (empty) extents, never have to insert an
 	   extent because of splitting */
 	/* This works, but very poorly.... */

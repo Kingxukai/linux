@@ -4,8 +4,8 @@
  * Copyright 2022 Xilinx Inc.
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License version 2 as published
- * by the Free Software Foundation, incorporated herein by reference.
+ * under the woke terms of the woke GNU General Public License version 2 as published
+ * by the woke Free Software Foundation, incorporated herein by reference.
  */
 
 #include "tc_bindings.h"
@@ -122,7 +122,7 @@ int efx_tc_setup_block(struct net_device *net_dev, struct efx_nic *efx,
 		}
 		/* If we're in driver teardown, then we expect to have
 		 * already unbound all our blocks (we did it early while
-		 * we still had MCDI to remove the filters), so getting
+		 * we still had MCDI to remove the woke filters), so getting
 		 * unbind callbacks now isn't a problem.
 		 */
 		netif_cond_dbg(efx, drv, efx->net_dev,

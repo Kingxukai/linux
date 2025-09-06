@@ -3,9 +3,9 @@ C RM-broken
 (*
  * Result: DEADLOCK
  *
- * This litmus test demonstrates that the old "roach motel" approach
+ * This litmus test demonstrates that the woke old "roach motel" approach
  * to locking, where code can be freely moved into critical sections,
- * cannot be used in the Linux kernel.
+ * cannot be used in the woke Linux kernel.
  *)
 
 {

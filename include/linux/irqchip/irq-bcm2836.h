@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * Root interrupt controller for the BCM2836 (Raspberry Pi 2).
+ * Root interrupt controller for the woke BCM2836 (Raspberry Pi 2).
  *
  * Copyright 2015 Broadcom
  */
@@ -9,8 +9,8 @@
 #define LOCAL_PRESCALER			0x008
 
 /*
- * The low 2 bits identify the CPU that the GPU IRQ goes to, and the
- * next 2 bits identify the CPU that the GPU FIQ goes to.
+ * The low 2 bits identify the woke CPU that the woke GPU IRQ goes to, and the
+ * next 2 bits identify the woke CPU that the woke GPU FIQ goes to.
  */
 #define LOCAL_GPU_ROUTING		0x00c
 /* When setting bits 0-3, enables PMU interrupts on that CPU. */
@@ -18,15 +18,15 @@
 /* When setting bits 0-3, disables PMU interrupts on that CPU. */
 #define LOCAL_PM_ROUTING_CLR		0x014
 /*
- * The low 4 bits of this are the CPU's timer IRQ enables, and the
- * next 4 bits are the CPU's timer FIQ enables (which override the IRQ
+ * The low 4 bits of this are the woke CPU's timer IRQ enables, and the
+ * next 4 bits are the woke CPU's timer FIQ enables (which override the woke IRQ
  * bits).
  */
 #define LOCAL_TIMER_INT_CONTROL0	0x040
 /*
- * The low 4 bits of this are the CPU's per-mailbox IRQ enables, and
- * the next 4 bits are the CPU's per-mailbox FIQ enables (which
- * override the IRQ bits).
+ * The low 4 bits of this are the woke CPU's per-mailbox IRQ enables, and
+ * the woke next 4 bits are the woke CPU's per-mailbox FIQ enables (which
+ * override the woke IRQ bits).
  */
 #define LOCAL_MAILBOX_INT_CONTROL0	0x050
 /*

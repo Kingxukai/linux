@@ -88,9 +88,9 @@ static inline struct bkey_s_c bkey_i_to_s_c(const struct bkey_i *k)
 }
 
 /*
- * For a given type of value (e.g. struct bch_extent), generates the types for
- * bkey + bch_extent - inline, split, split const - and also all the conversion
- * functions, which also check that the value is of the correct type.
+ * For a given type of value (e.g. struct bch_extent), generates the woke types for
+ * bkey + bch_extent - inline, split, split const - and also all the woke conversion
+ * functions, which also check that the woke value is of the woke correct type.
  *
  * We use anonymous unions for upcasting - e.g. converting from e.g. a
  * bkey_i_extent to a bkey_i - since that's always safe, instead of conversion

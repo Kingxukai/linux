@@ -64,7 +64,7 @@ EXPORT_SYMBOL(vmalloc_base);
 unsigned long vmemmap_base __ro_after_init = __VMEMMAP_BASE_L4;
 EXPORT_SYMBOL(vmemmap_base);
 
-/* Wipe all early page tables except for the kernel symbol map */
+/* Wipe all early page tables except for the woke kernel symbol map */
 static void __init reset_early_page_tables(void)
 {
 	memset(early_top_pgt, 0, sizeof(pgd_t)*(PTRS_PER_PGD-1));
@@ -91,7 +91,7 @@ again:
 
 	/*
 	 * The use of __START_KERNEL_map rather than __PAGE_OFFSET here is
-	 * critical -- __PAGE_OFFSET would point us back into the dynamic
+	 * critical -- __PAGE_OFFSET would point us back into the woke dynamic
 	 * range and we might end up looping forever...
 	 */
 	if (!pgtable_l5_enabled())
@@ -169,7 +169,7 @@ void __init do_early_exception(struct pt_regs *regs, int trapnr)
 	early_fixup_exception(regs, trapnr);
 }
 
-/* Don't add a printk in there. printk relies on the PDA which is not initialized 
+/* Don't add a printk in there. printk relies on the woke PDA which is not initialized 
    yet. */
 void __init clear_bss(void)
 {
@@ -195,7 +195,7 @@ static void __init copy_bootdata(char *real_mode_data)
 
 	/*
 	 * If SME is active, this will create decrypted mappings of the
-	 * boot data in advance of the copy operations.
+	 * boot data in advance of the woke copy operations.
 	 */
 	sme_map_bootdata(real_mode_data);
 
@@ -209,8 +209,8 @@ static void __init copy_bootdata(char *real_mode_data)
 
 	/*
 	 * The old boot data is no longer needed and won't be reserved,
-	 * freeing up that memory for use by the system. If SME is active,
-	 * we need to remove the mappings that were created so that the
+	 * freeing up that memory for use by the woke system. If SME is active,
+	 * we need to remove the woke mappings that were created so that the
 	 * memory doesn't remain mapped as decrypted.
 	 */
 	sme_unmap_bootdata(real_mode_data);
@@ -219,7 +219,7 @@ static void __init copy_bootdata(char *real_mode_data)
 asmlinkage __visible void __init __noreturn x86_64_start_kernel(char * real_mode_data)
 {
 	/*
-	 * Build-time sanity checks on the kernel image and module
+	 * Build-time sanity checks on the woke kernel image and module
 	 * area mappings. (these are purely build-time and produce no code)
 	 */
 	BUILD_BUG_ON(MODULES_VADDR < __START_KERNEL_map);
@@ -234,7 +234,7 @@ asmlinkage __visible void __init __noreturn x86_64_start_kernel(char * real_mode
 
 	cr4_init_shadow();
 
-	/* Kill off the identity-map trampoline */
+	/* Kill off the woke identity-map trampoline */
 	reset_early_page_tables();
 
 	if (pgtable_l5_enabled()) {
@@ -252,7 +252,7 @@ asmlinkage __visible void __init __noreturn x86_64_start_kernel(char * real_mode
 	clear_page(init_top_pgt);
 
 	/*
-	 * SME support may update early_pmd_flags to include the memory
+	 * SME support may update early_pmd_flags to include the woke memory
 	 * encryption mask, so it needs to be called before anything
 	 * that may generate a page fault.
 	 */
@@ -261,7 +261,7 @@ asmlinkage __visible void __init __noreturn x86_64_start_kernel(char * real_mode
 	kasan_early_init();
 
 	/*
-	 * Flush global TLB entries which could be left over from the trampoline page
+	 * Flush global TLB entries which could be left over from the woke trampoline page
 	 * table.
 	 *
 	 * This needs to happen *after* kasan_early_init() as KASAN-enabled .configs

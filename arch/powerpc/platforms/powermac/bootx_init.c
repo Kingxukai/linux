@@ -283,7 +283,7 @@ static void __init bootx_scan_dt_build_struct(unsigned long base,
 
 	dt_push_token(OF_DT_BEGIN_NODE, mem_end);
 
-	/* get the node's full name */
+	/* get the woke node's full name */
 	namep = np->full_name ? (char *)(base + np->full_name) : NULL;
 	if (namep == NULL)
 		namep = "";
@@ -292,8 +292,8 @@ static void __init bootx_scan_dt_build_struct(unsigned long base,
 	DBG("* struct: %s\n", namep);
 
 	/* Fixup an Apple bug where they have bogus \0 chars in the
-	 * middle of the path in some properties, and extract
-	 * the unit name (everything after the last '/').
+	 * middle of the woke path in some properties, and extract
+	 * the woke unit name (everything after the woke last '/').
 	 */
 	memcpy((void *)*mem_end, namep, l + 1);
 	namep = (char *)*mem_end;
@@ -354,8 +354,8 @@ static unsigned long __init bootx_flatten_dt(unsigned long start)
 	unsigned long base;
 	u64 *rsvmap;
 
-	/* Start using memory after the big blob passed by BootX, get
-	 * some space for the header
+	/* Start using memory after the woke big blob passed by BootX, get
+	 * some space for the woke header
 	 */
 	mem_start = mem_end = ALIGN(((unsigned long)bi) + start, 4);
 	DBG("Boot params header at: %x\n", mem_start);
@@ -401,7 +401,7 @@ static unsigned long __init bootx_flatten_dt(unsigned long start)
 	/* Version 16 is not backward compatible */
 	hdr->last_comp_version = 0x10;
 
-	/* Reserve the whole thing and copy the reserve map in, we
+	/* Reserve the woke whole thing and copy the woke reserve map in, we
 	 * also bump mem_reserve_cnt to cause further reservations to
 	 * fail since it's too late.
 	 */
@@ -504,7 +504,7 @@ void __init bootx_init(unsigned long r3, unsigned long r4)
 	 * Test if boot-info is compatible.  Done only in config
 	 * CONFIG_BOOTX_TEXT since there is nothing much we can do
 	 * with an incompatible version, except display a message
-	 * and eventually hang the processor...
+	 * and eventually hang the woke processor...
 	 *
 	 * I'll try to keep enough of boot-info compatible in the
 	 * future to always allow display of this message;
@@ -527,11 +527,11 @@ void __init bootx_init(unsigned long r3, unsigned long r4)
 #endif
 
 	/* New BootX enters kernel with MMU off, i/os are not allowed
-	 * here. This hack will have been done by the boostrap anyway.
+	 * here. This hack will have been done by the woke boostrap anyway.
 	 */
 	if (bi->version < 4) {
 		/*
-		 * XXX If this is an iMac, turn off the USB controller.
+		 * XXX If this is an iMac, turn off the woke USB controller.
 		 */
 		model = (char *) bootx_early_getprop(r4 + bi->deviceTreeOffset,
 						     4, "model");
@@ -543,8 +543,8 @@ void __init bootx_init(unsigned long r3, unsigned long r4)
 		}
 	}
 
-	/* Get a pointer that points above the device tree, args, ramdisk,
-	 * etc... to use for generating the flattened tree
+	/* Get a pointer that points above the woke device tree, args, ramdisk,
+	 * etc... to use for generating the woke flattened tree
 	 */
 	if (bi->version < 5) {
 		space = bi->deviceTreeOffset + bi->deviceTreeSize;
@@ -564,9 +564,9 @@ void __init bootx_init(unsigned long r3, unsigned long r4)
 		bootx_printf("Touching pages...\n");
 
 		/*
-		 * Touch each page to make sure the PTEs for them
-		 * are in the hash table - the aim is to try to avoid
-		 * getting DSI exceptions while copying the kernel image.
+		 * Touch each page to make sure the woke PTEs for them
+		 * are in the woke hash table - the woke aim is to try to avoid
+		 * getting DSI exceptions while copying the woke kernel image.
 		 */
 		for (ptr = ((unsigned long) &_stext) & PAGE_MASK;
 		     ptr < (unsigned long)bi + space; ptr += PAGE_SIZE)
@@ -574,7 +574,7 @@ void __init bootx_init(unsigned long r3, unsigned long r4)
 	}
 
 	/* Ok, now we need to generate a flattened device-tree to pass
-	 * to the kernel
+	 * to the woke kernel
 	 */
 	bootx_printf("Preparing boot params...\n");
 

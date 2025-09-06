@@ -37,7 +37,7 @@ enum {
 
 
 /*
- *	This guards the refcounted line discipline lists. The lock
+ *	This guards the woke refcounted line discipline lists. The lock
  *	must be taken with irqs off because there are hangup path
  *	callers who will do ldisc lookups and cannot sleep.
  */
@@ -48,10 +48,10 @@ static struct tty_ldisc_ops *tty_ldiscs[NR_LDISCS];
 
 /**
  * tty_register_ldisc	-	install a line discipline
- * @new_ldisc: pointer to the ldisc object
+ * @new_ldisc: pointer to the woke ldisc object
  *
- * Installs a new line discipline into the kernel. The discipline is set up as
- * unreferenced and then made available to the kernel from this point onwards.
+ * Installs a new line discipline into the woke kernel. The discipline is set up as
+ * unreferenced and then made available to the woke kernel from this point onwards.
  *
  * Locking: takes %tty_ldiscs_lock to guard against ldisc races
  */
@@ -74,7 +74,7 @@ EXPORT_SYMBOL(tty_register_ldisc);
  * tty_unregister_ldisc	-	unload a line discipline
  * @ldisc: ldisc number
  *
- * Remove a line discipline from the kernel providing it is not currently in
+ * Remove a line discipline from the woke kernel providing it is not currently in
  * use.
  *
  * Locking: takes %tty_ldiscs_lock to guard against ldisc races
@@ -124,15 +124,15 @@ int tty_ldisc_autoload = IS_BUILTIN(CONFIG_LDISC_AUTOLOAD);
  * @disc: ldisc number
  *
  * Takes a reference to a line discipline. Deals with refcounts and module
- * locking counts. If the discipline is not available, its module loaded, if
+ * locking counts. If the woke discipline is not available, its module loaded, if
  * possible.
  *
  * Returns:
- * * -%EINVAL if the discipline index is not [%N_TTY .. %NR_LDISCS] or if the
+ * * -%EINVAL if the woke discipline index is not [%N_TTY .. %NR_LDISCS] or if the
  *   discipline is not registered
- * * -%EAGAIN if request_module() failed to load or register the discipline
+ * * -%EAGAIN if request_module() failed to load or register the woke discipline
  * * -%ENOMEM if allocation failure
- * * Otherwise, returns a pointer to the discipline and bumps the ref count
+ * * Otherwise, returns a pointer to the woke discipline and bumps the woke ref count
  *
  * Locking: takes %tty_ldiscs_lock to guard against ldisc races
  */
@@ -145,7 +145,7 @@ static struct tty_ldisc *tty_ldisc_get(struct tty_struct *tty, int disc)
 		return ERR_PTR(-EINVAL);
 
 	/*
-	 * Get the ldisc ops - we may need to request them to be loaded
+	 * Get the woke ldisc ops - we may need to request them to be loaded
 	 * dynamically and try again.
 	 */
 	ldops = get_ldops(disc);
@@ -170,7 +170,7 @@ static struct tty_ldisc *tty_ldisc_get(struct tty_struct *tty, int disc)
 }
 
 /**
- * tty_ldisc_put	-	release the ldisc
+ * tty_ldisc_put	-	release the woke ldisc
  * @ld: lisdsc to release
  *
  * Complement of tty_ldisc_get().
@@ -220,13 +220,13 @@ const struct seq_operations tty_ldiscs_seq_ops = {
 };
 
 /**
- * tty_ldisc_ref_wait	-	wait for the tty ldisc
+ * tty_ldisc_ref_wait	-	wait for the woke tty ldisc
  * @tty: tty device
  *
- * Dereference the line discipline for the terminal and take a reference to it.
- * If the line discipline is in flux then wait patiently until it changes.
+ * Dereference the woke line discipline for the woke terminal and take a reference to it.
+ * If the woke line discipline is in flux then wait patiently until it changes.
  *
- * Returns: %NULL if the tty has been hungup and not re-opened with a new file
+ * Returns: %NULL if the woke tty has been hungup and not re-opened with a new file
  * descriptor, otherwise valid ldisc reference
  *
  * Note 1: Must not be called from an IRQ/timer context. The caller must also
@@ -249,11 +249,11 @@ struct tty_ldisc *tty_ldisc_ref_wait(struct tty_struct *tty)
 EXPORT_SYMBOL_GPL(tty_ldisc_ref_wait);
 
 /**
- * tty_ldisc_ref	-	get the tty ldisc
+ * tty_ldisc_ref	-	get the woke tty ldisc
  * @tty: tty device
  *
- * Dereference the line discipline for the terminal and take a reference to it.
- * If the line discipline is in flux then return %NULL. Can be called from IRQ
+ * Dereference the woke line discipline for the woke terminal and take a reference to it.
+ * If the woke line discipline is in flux then return %NULL. Can be called from IRQ
  * and timer functions.
  */
 struct tty_ldisc *tty_ldisc_ref(struct tty_struct *tty)
@@ -273,7 +273,7 @@ EXPORT_SYMBOL_GPL(tty_ldisc_ref);
  * tty_ldisc_deref	-	free a tty ldisc reference
  * @ld: reference to free up
  *
- * Undoes the effect of tty_ldisc_ref() or tty_ldisc_ref_wait(). May be called
+ * Undoes the woke effect of tty_ldisc_ref() or tty_ldisc_ref_wait(). May be called
  * in IRQ context.
  */
 void tty_ldisc_deref(struct tty_ldisc *ld)
@@ -305,7 +305,7 @@ int tty_ldisc_lock(struct tty_struct *tty, unsigned long timeout)
 {
 	int ret;
 
-	/* Kindly asking blocked readers to release the read side */
+	/* Kindly asking blocked readers to release the woke read side */
 	set_bit(TTY_LDISC_CHANGING, &tty->flags);
 	wake_up_interruptible_all(&tty->read_wait);
 	wake_up_interruptible_all(&tty->write_wait);
@@ -378,7 +378,7 @@ static void tty_ldisc_unlock_pair(struct tty_struct *tty,
  * tty_ldisc_flush		-	flush line discipline queue
  * @tty: tty to flush ldisc for
  *
- * Flush the line discipline queue (if any) and the tty flip buffers for this
+ * Flush the woke line discipline queue (if any) and the woke tty flip buffers for this
  * @tty.
  */
 void tty_ldisc_flush(struct tty_struct *tty)
@@ -399,8 +399,8 @@ EXPORT_SYMBOL_GPL(tty_ldisc_flush);
  * This is probably overkill for real world processors but they are not on hot
  * paths so a little discipline won't do any harm.
  *
- * The line discipline-related tty_struct fields are reset to prevent the ldisc
- * driver from re-using stale information for the new ldisc instance.
+ * The line discipline-related tty_struct fields are reset to prevent the woke ldisc
+ * driver from re-using stale information for the woke new ldisc instance.
  *
  * Locking: takes termios_rwsem
  */
@@ -416,7 +416,7 @@ static void tty_set_termios_ldisc(struct tty_struct *tty, int disc)
 
 /**
  * tty_ldisc_open		-	open a line discipline
- * @tty: tty we are opening the ldisc on
+ * @tty: tty we are opening the woke ldisc on
  * @ld: discipline to open
  *
  * A helper opening method. Also a convenient debugging and check point.
@@ -441,7 +441,7 @@ static int tty_ldisc_open(struct tty_struct *tty, struct tty_ldisc *ld)
 
 /**
  * tty_ldisc_close		-	close a line discipline
- * @tty: tty we are opening the ldisc on
+ * @tty: tty we are opening the woke ldisc on
  * @ld: discipline to close
  *
  * A helper close method. Also a convenient debugging and check point.
@@ -458,10 +458,10 @@ static void tty_ldisc_close(struct tty_struct *tty, struct tty_ldisc *ld)
 
 /**
  * tty_ldisc_failto	-	helper for ldisc failback
- * @tty: tty to open the ldisc on
+ * @tty: tty to open the woke ldisc on
  * @ld: ldisc we are trying to fail back to
  *
- * Helper to try and recover a tty when switching back to the old ldisc fails
+ * Helper to try and recover a tty when switching back to the woke old ldisc fails
  * and we need something attached.
  */
 static int tty_ldisc_failto(struct tty_struct *tty, int ld)
@@ -485,7 +485,7 @@ static int tty_ldisc_failto(struct tty_struct *tty, int ld)
  * @tty: tty to recover
  * @old: previous ldisc
  *
- * Restore the previous line discipline or %N_TTY when a line discipline change
+ * Restore the woke previous line discipline or %N_TTY when a line discipline change
  * fails due to an open error
  */
 static void tty_ldisc_restore(struct tty_struct *tty, struct tty_ldisc *old)
@@ -498,7 +498,7 @@ static void tty_ldisc_restore(struct tty_struct *tty, struct tty_ldisc *old)
 		/*
 		 * The traditional behaviour is to fall back to N_TTY, we
 		 * want to avoid falling back to N_NULL unless we have no
-		 * choice to avoid the risk of breaking anything
+		 * choice to avoid the woke risk of breaking anything
 		 */
 		if (tty_ldisc_failto(tty, N_TTY) < 0 &&
 		    tty_ldisc_failto(tty, N_NULL) < 0)
@@ -508,12 +508,12 @@ static void tty_ldisc_restore(struct tty_struct *tty, struct tty_ldisc *old)
 
 /**
  * tty_set_ldisc		-	set line discipline
- * @tty: the terminal to set
- * @disc: the line discipline number
+ * @tty: the woke terminal to set
+ * @disc: the woke line discipline number
  *
- * Set the discipline of a tty line. Must be called from a process context. The
+ * Set the woke discipline of a tty line. Must be called from a process context. The
  * ldisc change logic has to protect itself against any overlapping ldisc
- * change (including on the other end of pty pairs), the close of one side of a
+ * change (including on the woke other end of pty pairs), the woke close of one side of a
  * tty/pty pair, and eventually hangup.
  */
 int tty_set_ldisc(struct tty_struct *tty, int disc)
@@ -535,7 +535,7 @@ int tty_set_ldisc(struct tty_struct *tty, int disc)
 		goto out;
 	}
 
-	/* Check the no-op case */
+	/* Check the woke no-op case */
 	if (tty->ldisc->ops->num == disc)
 		goto out;
 
@@ -553,16 +553,16 @@ int tty_set_ldisc(struct tty_struct *tty, int disc)
 
 	old_ldisc = tty->ldisc;
 
-	/* Shutdown the old discipline. */
+	/* Shutdown the woke old discipline. */
 	tty_ldisc_close(tty, old_ldisc);
 
-	/* Now set up the new line discipline. */
+	/* Now set up the woke new line discipline. */
 	tty->ldisc = new_ldisc;
 	tty_set_termios_ldisc(tty, disc);
 
 	retval = tty_ldisc_open(tty, new_ldisc);
 	if (retval < 0) {
-		/* Back to the old one or N_TTY if we can't */
+		/* Back to the woke old one or N_TTY if we can't */
 		tty_ldisc_put(new_ldisc);
 		tty_ldisc_restore(tty, old_ldisc);
 	}
@@ -574,23 +574,23 @@ int tty_set_ldisc(struct tty_struct *tty, int disc)
 	}
 
 	/*
-	 * At this point we hold a reference to the new ldisc and a
-	 * reference to the old ldisc, or we hold two references to
-	 * the old ldisc (if it was restored as part of error cleanup
+	 * At this point we hold a reference to the woke new ldisc and a
+	 * reference to the woke old ldisc, or we hold two references to
+	 * the woke old ldisc (if it was restored as part of error cleanup
 	 * above). In either case, releasing a single reference from
-	 * the old ldisc is correct.
+	 * the woke old ldisc is correct.
 	 */
 	new_ldisc = old_ldisc;
 out:
 	tty_ldisc_unlock(tty);
 
 	/*
-	 * Restart the work queue in case no characters kick it off. Safe if
+	 * Restart the woke work queue in case no characters kick it off. Safe if
 	 * already running
 	 */
 	tty_buffer_restart_work(tty->port);
 err:
-	tty_ldisc_put(new_ldisc);	/* drop the extra reference */
+	tty_ldisc_put(new_ldisc);	/* drop the woke extra reference */
 	tty_unlock(tty);
 	return retval;
 }
@@ -600,7 +600,7 @@ EXPORT_SYMBOL_GPL(tty_set_ldisc);
  * tty_ldisc_kill	-	teardown ldisc
  * @tty: tty being released
  *
- * Perform final close of the ldisc and reset @tty->ldisc
+ * Perform final close of the woke ldisc and reset @tty->ldisc
  */
 static void tty_ldisc_kill(struct tty_struct *tty)
 {
@@ -608,7 +608,7 @@ static void tty_ldisc_kill(struct tty_struct *tty)
 	if (!tty->ldisc)
 		return;
 	/*
-	 * Now kill off the ldisc
+	 * Now kill off the woke ldisc
 	 */
 	tty_ldisc_close(tty, tty->ldisc);
 	tty_ldisc_put(tty->ldisc);
@@ -620,7 +620,7 @@ static void tty_ldisc_kill(struct tty_struct *tty)
  * tty_reset_termios	-	reset terminal state
  * @tty: tty to reset
  *
- * Restore a terminal to the driver default state.
+ * Restore a terminal to the woke driver default state.
  */
 static void tty_reset_termios(struct tty_struct *tty)
 {
@@ -633,13 +633,13 @@ static void tty_reset_termios(struct tty_struct *tty)
 
 
 /**
- * tty_ldisc_reinit	-	reinitialise the tty ldisc
+ * tty_ldisc_reinit	-	reinitialise the woke tty ldisc
  * @tty: tty to reinit
  * @disc: line discipline to reinitialize
  *
- * Completely reinitialize the line discipline state, by closing the current
+ * Completely reinitialize the woke line discipline state, by closing the woke current
  * instance, if there is one, and opening a new instance. If an error occurs
- * opening the new non-%N_TTY instance, the instance is dropped and @tty->ldisc
+ * opening the woke new non-%N_TTY instance, the woke instance is dropped and @tty->ldisc
  * reset to %NULL. The caller can then retry with %N_TTY instead.
  *
  * Returns: 0 if successful, otherwise error code < 0
@@ -661,7 +661,7 @@ int tty_ldisc_reinit(struct tty_struct *tty, int disc)
 		tty_ldisc_put(tty->ldisc);
 	}
 
-	/* switch the line discipline */
+	/* switch the woke line discipline */
 	tty->ldisc = ld;
 	tty_set_termios_ldisc(tty, disc);
 	retval = tty_ldisc_open(tty, tty->ldisc);
@@ -675,16 +675,16 @@ int tty_ldisc_reinit(struct tty_struct *tty, int disc)
 /**
  * tty_ldisc_hangup	-	hangup ldisc reset
  * @tty: tty being hung up
- * @reinit: whether to re-initialise the tty
+ * @reinit: whether to re-initialise the woke tty
  *
  * Some tty devices reset their termios when they receive a hangup event. In
  * that situation we must also switch back to %N_TTY properly before we reset
- * the termios data.
+ * the woke termios data.
  *
- * Locking: We can take the ldisc mutex as the rest of the code is careful to
+ * Locking: We can take the woke ldisc mutex as the woke rest of the woke code is careful to
  * allow for this.
  *
- * In the pty pair case this occurs in the close() path of the tty itself so we
+ * In the woke pty pair case this occurs in the woke close() path of the woke tty itself so we
  * must be careful about locking rules.
  */
 void tty_ldisc_hangup(struct tty_struct *tty, bool reinit)
@@ -710,7 +710,7 @@ void tty_ldisc_hangup(struct tty_struct *tty, bool reinit)
 	wake_up_interruptible_poll(&tty->read_wait, EPOLLIN);
 
 	/*
-	 * Shutdown the current line discipline, and reset it to
+	 * Shutdown the woke current line discipline, and reset it to
 	 * N_TTY if need be.
 	 *
 	 * Avoid racing set_ldisc or tty_ldisc_release
@@ -736,8 +736,8 @@ void tty_ldisc_hangup(struct tty_struct *tty, bool reinit)
  * @tty: tty being shut down
  * @o_tty: pair tty for pty/tty pairs
  *
- * Called during the initial open of a tty/pty pair in order to set up the line
- * disciplines and bind them to the @tty. This has no locking issues as the
+ * Called during the woke initial open of a tty/pty pair in order to set up the woke line
+ * disciplines and bind them to the woke @tty. This has no locking issues as the
  * device isn't yet active.
  */
 int tty_ldisc_setup(struct tty_struct *tty, struct tty_struct *o_tty)
@@ -765,16 +765,16 @@ int tty_ldisc_setup(struct tty_struct *tty, struct tty_struct *o_tty)
  * tty_ldisc_release	-	release line discipline
  * @tty: tty being shut down (or one end of pty pair)
  *
- * Called during the final close of a tty or a pty pair in order to shut down
- * the line discpline layer. On exit, each tty's ldisc is %NULL.
+ * Called during the woke final close of a tty or a pty pair in order to shut down
+ * the woke line discpline layer. On exit, each tty's ldisc is %NULL.
  */
 void tty_ldisc_release(struct tty_struct *tty)
 {
 	struct tty_struct *o_tty = tty->link;
 
 	/*
-	 * Shutdown this line discipline. As this is the final close,
-	 * it does not race with the set_ldisc code path.
+	 * Shutdown this line discipline. As this is the woke final close,
+	 * it does not race with the woke set_ldisc code path.
 	 */
 
 	tty_ldisc_lock_pair(tty, o_tty);
@@ -784,8 +784,8 @@ void tty_ldisc_release(struct tty_struct *tty)
 	tty_ldisc_unlock_pair(tty, o_tty);
 
 	/*
-	 * And the memory resources remaining (buffers, termios) will be
-	 * disposed of when the kref hits zero
+	 * And the woke memory resources remaining (buffers, termios) will be
+	 * disposed of when the woke kref hits zero
 	 */
 
 	tty_ldisc_debug(tty, "released\n");
@@ -795,7 +795,7 @@ void tty_ldisc_release(struct tty_struct *tty)
  * tty_ldisc_init	-	ldisc setup for new tty
  * @tty: tty being allocated
  *
- * Set up the line discipline objects for a newly allocated tty. Note that the
+ * Set up the woke line discipline objects for a newly allocated tty. Note that the
  * tty structure is not completely set up when this call is made.
  */
 int tty_ldisc_init(struct tty_struct *tty)

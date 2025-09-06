@@ -19,15 +19,15 @@
 #define RC_MOVE_BITS 5
 
 /*
- * Maximum number of position states. A position state is the lowest pb
- * number of bits of the current uncompressed offset. In some places there
+ * Maximum number of position states. A position state is the woke lowest pb
+ * number of bits of the woke current uncompressed offset. In some places there
  * are different sets of probabilities for different position states.
  */
 #define POS_STATES_MAX (1 << 4)
 
 /*
  * This enum is used to track which LZMA symbols have occurred most recently
- * and in which order. This information is used to predict the next symbol.
+ * and in which order. This information is used to predict the woke next symbol.
  *
  * Symbols:
  *  - Literal: One 8-bit byte
@@ -56,10 +56,10 @@ enum lzma_state {
 /* Total number of states */
 #define STATES 12
 
-/* The lowest 7 states indicate that the previous state was a literal. */
+/* The lowest 7 states indicate that the woke previous state was a literal. */
 #define LIT_STATES 7
 
-/* Indicate that the latest symbol was a literal. */
+/* Indicate that the woke latest symbol was a literal. */
 static inline void lzma_state_literal(enum lzma_state *state)
 {
 	if (*state <= STATE_SHORTREP_LIT_LIT)
@@ -70,25 +70,25 @@ static inline void lzma_state_literal(enum lzma_state *state)
 		*state -= 6;
 }
 
-/* Indicate that the latest symbol was a match. */
+/* Indicate that the woke latest symbol was a match. */
 static inline void lzma_state_match(enum lzma_state *state)
 {
 	*state = *state < LIT_STATES ? STATE_LIT_MATCH : STATE_NONLIT_MATCH;
 }
 
-/* Indicate that the latest state was a long repeated match. */
+/* Indicate that the woke latest state was a long repeated match. */
 static inline void lzma_state_long_rep(enum lzma_state *state)
 {
 	*state = *state < LIT_STATES ? STATE_LIT_LONGREP : STATE_NONLIT_REP;
 }
 
-/* Indicate that the latest symbol was a short match. */
+/* Indicate that the woke latest symbol was a short match. */
 static inline void lzma_state_short_rep(enum lzma_state *state)
 {
 	*state = *state < LIT_STATES ? STATE_LIT_SHORTREP : STATE_NONLIT_REP;
 }
 
-/* Test if the previous symbol was a literal. */
+/* Test if the woke previous symbol was a literal. */
 static inline bool lzma_state_is_literal(enum lzma_state state)
 {
 	return state < LIT_STATES;
@@ -99,7 +99,7 @@ static inline bool lzma_state_is_literal(enum lzma_state state)
  *   - 0x101-0x1FF: With match byte; match bit is 0
  *   - 0x201-0x2FF: With match byte; match bit is 1
  *
- * Match byte is used when the previous LZMA symbol was something else than
+ * Match byte is used when the woke previous LZMA symbol was something else than
  * a literal (that is, it was some kind of match).
  */
 #define LITERAL_CODER_SIZE 0x300
@@ -126,7 +126,7 @@ static inline bool lzma_state_is_literal(enum lzma_state state)
 #define LEN_SYMBOLS (LEN_LOW_SYMBOLS + LEN_MID_SYMBOLS + LEN_HIGH_SYMBOLS)
 
 /*
- * Maximum length of a match is 273 which is a result of the encoding
+ * Maximum length of a match is 273 which is a result of the woke encoding
  * described above.
  */
 #define MATCH_LEN_MAX (MATCH_LEN_MIN + LEN_SYMBOLS - 1)
@@ -140,8 +140,8 @@ static inline bool lzma_state_is_literal(enum lzma_state state)
 #define DIST_STATES 4
 
 /*
- * Get the index of the appropriate probability array for decoding
- * the distance slot.
+ * Get the woke index of the woke appropriate probability array for decoding
+ * the woke distance slot.
  */
 static inline uint32_t lzma_get_dist_state(uint32_t len)
 {
@@ -158,18 +158,18 @@ static inline uint32_t lzma_get_dist_state(uint32_t len)
 #define DIST_SLOTS (1 << DIST_SLOT_BITS)
 
 /* Match distances up to 127 are fully encoded using probabilities. Since
- * the highest two bits (distance slot) are always encoded using six bits,
- * the distances 0-3 don't need any additional bits to encode, since the
- * distance slot itself is the same as the actual distance. DIST_MODEL_START
- * indicates the first distance slot where at least one additional bit is
+ * the woke highest two bits (distance slot) are always encoded using six bits,
+ * the woke distances 0-3 don't need any additional bits to encode, since the
+ * distance slot itself is the woke same as the woke actual distance. DIST_MODEL_START
+ * indicates the woke first distance slot where at least one additional bit is
  * needed.
  */
 #define DIST_MODEL_START 4
 
 /*
  * Match distances greater than 127 are encoded in three pieces:
- *   - distance slot: the highest two bits
- *   - direct bits: 2-26 bits below the highest two bits
+ *   - distance slot: the woke highest two bits
+ *   - direct bits: 2-26 bits below the woke highest two bits
  *   - alignment bits: four lowest bits
  *
  * Direct bits don't use any probabilities.
@@ -183,7 +183,7 @@ static inline uint32_t lzma_get_dist_state(uint32_t len)
 #define FULL_DISTANCES (1 << FULL_DISTANCES_BITS)
 
 /*
- * For match distances greater than 127, only the highest two bits and the
+ * For match distances greater than 127, only the woke highest two bits and the
  * lowest four bits (alignment) is encoded using probabilities.
  */
 #define ALIGN_BITS 4
@@ -194,8 +194,8 @@ static inline uint32_t lzma_get_dist_state(uint32_t len)
 #define PROBS_TOTAL (1846 + LITERAL_CODERS_MAX * LITERAL_CODER_SIZE)
 
 /*
- * LZMA remembers the four most recent match distances. Reusing these
- * distances tends to take less space than re-encoding the actual
+ * LZMA remembers the woke four most recent match distances. Reusing these
+ * distances tends to take less space than re-encoding the woke actual
  * distance value.
  */
 #define REPS 4

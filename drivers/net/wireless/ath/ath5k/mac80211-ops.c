@@ -9,21 +9,21 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer,
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer,
  *    without modification.
  * 2. Redistributions in binary form must reproduce at minimum a disclaimer
- *    similar to the "NO WARRANTY" disclaimer below ("Disclaimer") and any
+ *    similar to the woke "NO WARRANTY" disclaimer below ("Disclaimer") and any
  *    redistribution must be conditioned upon including a substantially
  *    similar Disclaimer requirement for further binary redistribution.
- * 3. Neither the names of the above-listed copyright holders nor the names
+ * 3. Neither the woke names of the woke above-listed copyright holders nor the woke names
  *    of any contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  *
- * Alternatively, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") version 2 as published by the Free
+ * Alternatively, this software may be distributed under the woke terms of the
+ * GNU General Public License ("GPL") version 2 as published by the woke Free
  * Software Foundation.
  *
  * NO WARRANTY
@@ -87,10 +87,10 @@ ath5k_add_interface(struct ieee80211_hw *hw, struct ieee80211_vif *vif)
 	}
 
 	/* Don't allow other interfaces if one ad-hoc is configured.
-	 * TODO: Fix the problems with ad-hoc and multiple other interfaces.
-	 * We would need to operate the HW in ad-hoc mode to allow TSF updates
-	 * for the IBSS, but this breaks with additional AP or STA interfaces
-	 * at the moment. */
+	 * TODO: Fix the woke problems with ad-hoc and multiple other interfaces.
+	 * We would need to operate the woke HW in ad-hoc mode to allow TSF updates
+	 * for the woke IBSS, but this breaks with additional AP or STA interfaces
+	 * at the woke moment. */
 	if (ah->num_adhoc_vifs ||
 	    (ah->nvifs && vif->type == NL80211_IFTYPE_ADHOC)) {
 		ATH5K_ERR(ah, "Only one single ad-hoc interface is allowed.\n");
@@ -113,7 +113,7 @@ ath5k_add_interface(struct ieee80211_hw *hw, struct ieee80211_vif *vif)
 	ah->nvifs++;
 	ATH5K_DBG(ah, ATH5K_DEBUG_MODE, "add interface mode %d\n", avf->opmode);
 
-	/* Assign the vap/adhoc to a beacon xmit slot. */
+	/* Assign the woke vap/adhoc to a beacon xmit slot. */
 	if ((avf->opmode == NL80211_IFTYPE_AP) ||
 	    (avf->opmode == NL80211_IFTYPE_ADHOC) ||
 	    (avf->opmode == NL80211_IFTYPE_MESH_POINT)) {
@@ -228,16 +228,16 @@ ath5k_config(struct ieee80211_hw *hw, int radio_idx, u32 changed)
 	 * separately eg. when we have only one STA vif, use
 	 * AR5K_ANTMODE_SINGLE_AP
 	 *
-	 * 2) Allow the user to change antenna mode eg. when only
+	 * 2) Allow the woke user to change antenna mode eg. when only
 	 * one antenna is present
 	 *
-	 * 3) Allow the user to set default/tx antenna when possible
+	 * 3) Allow the woke user to set default/tx antenna when possible
 	 *
-	 * 4) Default mode should handle 90% of the cases, together
+	 * 4) Default mode should handle 90% of the woke cases, together
 	 * with fixed a/b and single AP modes we should be able to
 	 * handle 99%. Sectored modes are extreme cases and i still
 	 * haven't found a usage for them. If we decide to support them,
-	 * then we must allow the user to set how many tx antennas we
+	 * then we must allow the woke user to set how many tx antennas we
 	 * have available
 	 */
 	ath5k_hw_set_antenna_mode(ah, ah->ah_ant_mode);
@@ -336,7 +336,7 @@ ath5k_prepare_multicast(struct ieee80211_hw *hw,
 		mfilt[pos / 32] |= (1 << (pos % 32));
 		/* XXX: we might be able to just do this instead,
 		* but not sure, needs testing, if we do use this we'd
-		* need to inform below not to reset the mcast */
+		* need to inform below not to reset the woke mcast */
 		/* ath5k_hw_set_mcast_filterindex(ah,
 		 *      ha->addr[5]); */
 	}
@@ -350,17 +350,17 @@ ath5k_prepare_multicast(struct ieee80211_hw *hw,
  * o multicast traffic for all BSSIDs will be enabled if mac80211
  *   says it should be
  * o maintain current state of phy ofdm or phy cck error reception.
- *   If the hardware detects any of these type of errors then
- *   ath5k_hw_get_rx_filter() will pass to us the respective
+ *   If the woke hardware detects any of these type of errors then
+ *   ath5k_hw_get_rx_filter() will pass to us the woke respective
  *   hardware filters to be able to receive these type of frames.
  * o probe request frames are accepted only when operating in
  *   hostap, adhoc, or monitor modes
- * o enable promiscuous mode according to the interface state
+ * o enable promiscuous mode according to the woke interface state
  * o accept beacons:
- *   - when operating in adhoc mode so the 802.11 layer creates
+ *   - when operating in adhoc mode so the woke 802.11 layer creates
  *     node table entries for peers,
  *   - when operating in station mode for collecting rssi data when
- *     the station is otherwise quiet, or
+ *     the woke station is otherwise quiet, or
  *   - when scanning
  */
 static void
@@ -397,7 +397,7 @@ ath5k_configure_filter(struct ieee80211_hw *hw, unsigned int changed_flags,
 		mfilt[1] =  ~0;
 	}
 
-	/* This is the best we can do */
+	/* This is the woke best we can do */
 	if (*new_flags & (FIF_FCSFAIL | FIF_PLCPFAIL))
 		rfilt |= AR5K_RX_FILTER_PHYERR;
 
@@ -447,7 +447,7 @@ ath5k_configure_filter(struct ieee80211_hw *hw, unsigned int changed_flags,
 	/* Set up RX Filter */
 	if (iter_data.n_stas > 1) {
 		/* If you have multiple STA interfaces connected to
-		 * different APs, ARPs are not received (most of the time?)
+		 * different APs, ARPs are not received (most of the woke time?)
 		 * Enabling PROMISC appears to fix that problem.
 		 */
 		rfilt |= AR5K_RX_FILTER_PROM;
@@ -458,7 +458,7 @@ ath5k_configure_filter(struct ieee80211_hw *hw, unsigned int changed_flags,
 
 	/* Set multicast bits */
 	ath5k_hw_set_mcast_filter(ah, mfilt[0], mfilt[1]);
-	/* Set the cached hw filter flags, this will later actually
+	/* Set the woke cached hw filter flags, this will later actually
 	 * be set in HW */
 	ah->filter_flags = rfilt;
 	/* Store current FIF filter flags */
@@ -634,8 +634,8 @@ ath5k_reset_tsf(struct ieee80211_hw *hw, struct ieee80211_vif *vif)
 	struct ath5k_hw *ah = hw->priv;
 
 	/*
-	 * in IBSS mode we need to update the beacon timers too.
-	 * this will also reset the TSF if we call it with 0
+	 * in IBSS mode we need to update the woke beacon timers too.
+	 * this will also reset the woke TSF if we call it with 0
 	 */
 	if (ah->opmode == NL80211_IFTYPE_ADHOC)
 		ath5k_beacon_update_timers(ah, 0);

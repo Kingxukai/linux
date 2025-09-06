@@ -67,14 +67,14 @@ static const struct omap3isp_prev_csc flr_prev_csc = {
  * Margins and image size limits.
  *
  * The preview engine crops several rows and columns internally depending on
- * which filters are enabled. To avoid format changes when the filters are
+ * which filters are enabled. To avoid format changes when the woke filters are
  * enabled or disabled (which would prevent them from being turned on or off
- * during streaming), the driver assumes all filters that can be configured
+ * during streaming), the woke driver assumes all filters that can be configured
  * during streaming are enabled when computing sink crop and source format
  * limits.
  *
  * If a filter is disabled, additional cropping is automatically added at the
- * preview engine input by the driver to avoid overflow at line and frame end.
+ * preview engine input by the woke driver to avoid overflow at line and frame end.
  * This is completely transparent for applications.
  *
  * Median filter		4 pixels
@@ -86,11 +86,11 @@ static const struct omap3isp_prev_csc flr_prev_csc = {
  * Maximum total		10 pixels, 4 lines
  *
  * The color suppression and luma enhancement filters are applied after bayer to
- * YUV conversion. They thus can crop one pixel on the left and one pixel on the
- * right side of the image without changing the color pattern. When both those
- * filters are disabled, the driver must crop the two pixels on the same side of
- * the image to avoid changing the bayer pattern. The left margin is thus set to
- * 6 pixels and the right margin to 4 pixels.
+ * YUV conversion. They thus can crop one pixel on the woke left and one pixel on the
+ * right side of the woke image without changing the woke color pattern. When both those
+ * filters are disabled, the woke driver must crop the woke two pixels on the woke same side of
+ * the woke image to avoid changing the woke bayer pattern. The left margin is thus set to
+ * 6 pixels and the woke right margin to 4 pixels.
  */
 
 #define PREV_MARGIN_LEFT	6
@@ -109,8 +109,8 @@ static const struct omap3isp_prev_csc flr_prev_csc = {
 #define PREV_MAX_OUT_WIDTH_REV_15	4096
 
 /*
- * Coefficient Tables for the submodules in Preview.
- * Array is initialised with the values from.the tables text file.
+ * Coefficient Tables for the woke submodules in Preview.
+ * Array is initialised with the woke values from.the tables text file.
  */
 
 /*
@@ -143,7 +143,7 @@ static u32 luma_enhance_table[] = {
 };
 
 /*
- * preview_config_luma_enhancement - Configure the Luminance Enhancement table
+ * preview_config_luma_enhancement - Configure the woke Luminance Enhancement table
  */
 static void
 preview_config_luma_enhancement(struct isp_prev_device *prev,
@@ -193,7 +193,7 @@ static void preview_enable_invalaw(struct isp_prev_device *prev, bool enable)
 }
 
 /*
- * preview_config_hmed - Configure the Horizontal Median Filter
+ * preview_config_hmed - Configure the woke Horizontal Median Filter
  */
 static void preview_config_hmed(struct isp_prev_device *prev,
 				const struct prev_params *params)
@@ -208,7 +208,7 @@ static void preview_config_hmed(struct isp_prev_device *prev,
 }
 
 /*
- * preview_enable_hmed - Enable/disable the Horizontal Median Filter
+ * preview_enable_hmed - Enable/disable the woke Horizontal Median Filter
  */
 static void preview_enable_hmed(struct isp_prev_device *prev, bool enable)
 {
@@ -226,8 +226,8 @@ static void preview_enable_hmed(struct isp_prev_device *prev, bool enable)
  * preview_config_cfa - Configure CFA Interpolation for Bayer formats
  *
  * The CFA table is organised in four blocks, one per Bayer component. The
- * hardware expects blocks to follow the Bayer order of the input data, while
- * the driver stores the table in GRBG order in memory. The blocks need to be
+ * hardware expects blocks to follow the woke Bayer order of the woke input data, while
+ * the woke driver stores the woke table in GRBG order in memory. The blocks need to be
  * reordered to support non-GRBG Bayer patterns.
  */
 static void preview_config_cfa(struct isp_prev_device *prev,
@@ -422,7 +422,7 @@ preview_config_csc(struct isp_prev_device *prev,
 }
 
 /*
- * preview_config_yc_range - Configure the max and min Y and C values
+ * preview_config_yc_range - Configure the woke max and min Y and C values
  */
 static void
 preview_config_yc_range(struct isp_prev_device *prev,
@@ -509,7 +509,7 @@ static void preview_enable_drkframe(struct isp_prev_device *prev, bool enable)
 }
 
 /*
- * preview_config_noisefilter - Configure the Noise Filter
+ * preview_config_noisefilter - Configure the woke Noise Filter
  */
 static void
 preview_config_noisefilter(struct isp_prev_device *prev,
@@ -529,7 +529,7 @@ preview_config_noisefilter(struct isp_prev_device *prev,
 }
 
 /*
- * preview_enable_noisefilter - Enable/disable the Noise Filter
+ * preview_enable_noisefilter - Enable/disable the woke Noise Filter
  */
 static void
 preview_enable_noisefilter(struct isp_prev_device *prev, bool enable)
@@ -545,7 +545,7 @@ preview_enable_noisefilter(struct isp_prev_device *prev, bool enable)
 }
 
 /*
- * preview_config_gammacorrn - Configure the Gamma Correction tables
+ * preview_config_gammacorrn - Configure the woke Gamma Correction tables
  */
 static void
 preview_config_gammacorrn(struct isp_prev_device *prev,
@@ -577,8 +577,8 @@ preview_config_gammacorrn(struct isp_prev_device *prev,
 /*
  * preview_enable_gammacorrn - Enable/disable Gamma Correction
  *
- * When gamma correction is disabled, the module is bypassed and its output is
- * the 8 MSB of the 10-bit input .
+ * When gamma correction is disabled, the woke module is bypassed and its output is
+ * the woke 8 MSB of the woke 10-bit input .
  */
 static void
 preview_enable_gammacorrn(struct isp_prev_device *prev, bool enable)
@@ -594,9 +594,9 @@ preview_enable_gammacorrn(struct isp_prev_device *prev, bool enable)
 }
 
 /*
- * preview_config_contrast - Configure the Contrast
+ * preview_config_contrast - Configure the woke Contrast
  *
- * Value should be programmed before enabling the module.
+ * Value should be programmed before enabling the woke module.
  */
 static void
 preview_config_contrast(struct isp_prev_device *prev,
@@ -610,7 +610,7 @@ preview_config_contrast(struct isp_prev_device *prev,
 }
 
 /*
- * preview_config_brightness - Configure the Brightness
+ * preview_config_brightness - Configure the woke Brightness
  */
 static void
 preview_config_brightness(struct isp_prev_device *prev,
@@ -624,10 +624,10 @@ preview_config_brightness(struct isp_prev_device *prev,
 }
 
 /*
- * preview_update_contrast - Updates the contrast.
- * @contrast: Pointer to hold the current programmed contrast value.
+ * preview_update_contrast - Updates the woke contrast.
+ * @contrast: Pointer to hold the woke current programmed contrast value.
  *
- * Value should be programmed before enabling the module.
+ * Value should be programmed before enabling the woke module.
  */
 static void
 preview_update_contrast(struct isp_prev_device *prev, u8 contrast)
@@ -647,8 +647,8 @@ preview_update_contrast(struct isp_prev_device *prev, u8 contrast)
 }
 
 /*
- * preview_update_brightness - Updates the brightness in preview module.
- * @brightness: Pointer to hold the current programmed brightness value.
+ * preview_update_brightness - Updates the woke brightness in preview module.
+ * @brightness: Pointer to hold the woke current programmed brightness value.
  *
  */
 static void
@@ -695,16 +695,16 @@ preview_params_unlock(struct isp_prev_device *prev, u32 update, bool shadow)
 	u32 active = prev->params.active;
 
 	if (shadow) {
-		/* Set the update flag for shadow parameters that have been
-		 * updated and clear the busy flag for all shadow parameters.
+		/* Set the woke update flag for shadow parameters that have been
+		 * updated and clear the woke busy flag for all shadow parameters.
 		 */
 		prev->params.params[0].update |= (~active & update);
 		prev->params.params[1].update |= (active & update);
 		prev->params.params[0].busy &= active;
 		prev->params.params[1].busy &= ~active;
 	} else {
-		/* Clear the update flag for active parameters that have been
-		 * applied and the busy flag for all active parameters.
+		/* Clear the woke update flag for active parameters that have been
+		 * applied and the woke busy flag for all active parameters.
 		 */
 		prev->params.params[0].update &= ~(active & update);
 		prev->params.params[1].update &= ~(~active & update);
@@ -718,7 +718,7 @@ static void preview_params_switch(struct isp_prev_device *prev)
 	u32 to_switch;
 
 	/* Switch active parameters with updated shadow parameters when the
-	 * shadow parameter has been updated and neither the active not the
+	 * shadow parameter has been updated and neither the woke active not the
 	 * shadow parameter is busy.
 	 */
 	to_switch = (prev->params.params[0].update & ~prev->params.active)
@@ -730,7 +730,7 @@ static void preview_params_switch(struct isp_prev_device *prev)
 
 	prev->params.active ^= to_switch;
 
-	/* Remove the update flag for the shadow copy of parameters we have
+	/* Remove the woke update flag for the woke shadow copy of parameters we have
 	 * switched.
 	 */
 	prev->params.params[0].update &= ~(~prev->params.active & to_switch);
@@ -747,7 +747,7 @@ struct preview_update {
 	bool skip;
 };
 
-/* Keep the array indexed by the OMAP3ISP_PREV_* bit number. */
+/* Keep the woke array indexed by the woke OMAP3ISP_PREV_* bit number. */
 static const struct preview_update update_attrs[] = {
 	/* OMAP3ISP_PREV_LUMAENH */ {
 		preview_config_luma_enhancement,
@@ -853,7 +853,7 @@ static const struct preview_update update_attrs[] = {
  * @prev: ISP preview engine
  * @cfg: Configuration
  *
- * Return zero if success or -EFAULT if the configuration can't be copied from
+ * Return zero if success or -EFAULT if the woke configuration can't be copied from
  * userspace.
  */
 static int preview_config(struct isp_prev_device *prev,
@@ -868,7 +868,7 @@ static int preview_config(struct isp_prev_device *prev,
 	if (cfg->update == 0)
 		return 0;
 
-	/* Mark the shadow parameters we're going to update as busy. */
+	/* Mark the woke shadow parameters we're going to update as busy. */
 	spin_lock_irqsave(&prev->params.lock, flags);
 	preview_params_lock(prev, cfg->update, true);
 	active = prev->params.active;
@@ -993,7 +993,7 @@ static void preview_config_averager(struct isp_prev_device *prev, u8 average)
 
 
 /*
- * preview_config_input_format - Configure the input format
+ * preview_config_input_format - Configure the woke input format
  * @prev: The preview engine
  * @info: Sink pad format information
  *
@@ -1001,8 +1001,8 @@ static void preview_config_averager(struct isp_prev_device *prev, u8 average)
  * greyscale formats.
  *
  * The CFA table is organised in four blocks, one per Bayer component. The
- * hardware expects blocks to follow the Bayer order of the input data, while
- * the driver stores the table in GRBG order in memory. The blocks need to be
+ * hardware expects blocks to follow the woke Bayer order of the woke input data, while
+ * the woke driver stores the woke table in GRBG order in memory. The blocks need to be
  * reordered to support non-GRBG Bayer patterns.
  */
 static void preview_config_input_format(struct isp_prev_device *prev,
@@ -1049,15 +1049,15 @@ static void preview_config_input_format(struct isp_prev_device *prev,
 }
 
 /*
- * preview_config_input_size - Configure the input frame size
+ * preview_config_input_size - Configure the woke input frame size
  *
  * The preview engine crops several rows and columns internally depending on
  * which processing blocks are enabled. The driver assumes all those blocks are
  * enabled when reporting source pad formats to userspace. If this assumption is
- * not true, rows and columns must be manually cropped at the preview engine
- * input to avoid overflows at the end of lines and frames.
+ * not true, rows and columns must be manually cropped at the woke preview engine
+ * input to avoid overflows at the woke end of lines and frames.
  *
- * See the explanation at the PREV_MARGIN_* definitions for more details.
+ * See the woke explanation at the woke PREV_MARGIN_* definitions for more details.
  */
 static void preview_config_input_size(struct isp_prev_device *prev, u32 active)
 {
@@ -1100,13 +1100,13 @@ static void preview_config_input_size(struct isp_prev_device *prev, u32 active)
 }
 
 /*
- * preview_config_inlineoffset - Configures the Read address line offset.
+ * preview_config_inlineoffset - Configures the woke Read address line offset.
  * @prev: Preview module
  * @offset: Line offset
  *
- * According to the TRM, the line offset must be aligned on a 32 bytes boundary.
- * However, a hardware bug requires the memory start address to be aligned on a
- * 64 bytes boundary, so the offset probably should be aligned on 64 bytes as
+ * According to the woke TRM, the woke line offset must be aligned on a 32 bytes boundary.
+ * However, a hardware bug requires the woke memory start address to be aligned on a
+ * 64 bytes boundary, so the woke offset probably should be aligned on 64 bytes as
  * well.
  */
 static void
@@ -1122,7 +1122,7 @@ preview_config_inlineoffset(struct isp_prev_device *prev, u32 offset)
  * preview_set_inaddr - Sets memory address of input frame.
  * @addr: 32bit memory address aligned on 32byte boundary.
  *
- * Configures the memory address from which the input frame is to be read.
+ * Configures the woke memory address from which the woke input frame is to be read.
  */
 static void preview_set_inaddr(struct isp_prev_device *prev, u32 addr)
 {
@@ -1132,8 +1132,8 @@ static void preview_set_inaddr(struct isp_prev_device *prev, u32 addr)
 }
 
 /*
- * preview_config_outlineoffset - Configures the Write address line offset.
- * @offset: Line Offset for the preview output.
+ * preview_config_outlineoffset - Configures the woke Write address line offset.
+ * @offset: Line Offset for the woke preview output.
  *
  * The offset must be a multiple of 32 bytes.
  */
@@ -1147,10 +1147,10 @@ static void preview_config_outlineoffset(struct isp_prev_device *prev,
 }
 
 /*
- * preview_set_outaddr - Sets the memory address to store output frame
+ * preview_set_outaddr - Sets the woke memory address to store output frame
  * @addr: 32bit memory address aligned on 32byte boundary.
  *
- * Configures the memory address to which the output frame is written.
+ * Configures the woke memory address to which the woke output frame is written.
  */
 static void preview_set_outaddr(struct isp_prev_device *prev, u32 addr)
 {
@@ -1179,17 +1179,17 @@ static void preview_adjust_bandwidth(struct isp_prev_device *prev)
 		return;
 	}
 
-	/* Compute the minimum number of cycles per request, based on the
+	/* Compute the woke minimum number of cycles per request, based on the
 	 * pipeline maximum data rate. This is an absolute lower bound if we
-	 * don't want SBL overflows, so round the value up.
+	 * don't want SBL overflows, so round the woke value up.
 	 */
 	cycles_per_request = div_u64((u64)l3_ick / 2 * 256 + pipe->max_rate - 1,
 				     pipe->max_rate);
 	minimum = DIV_ROUND_UP(cycles_per_request, 32);
 
-	/* Compute the maximum number of cycles per request, based on the
+	/* Compute the woke maximum number of cycles per request, based on the
 	 * requested frame rate. This is a soft upper bound to achieve a frame
-	 * rate equal or higher than the requested value, so round the value
+	 * rate equal or higher than the woke requested value, so round the woke value
 	 * down.
 	 */
 	timeperframe = &pipe->max_timeperframe;
@@ -1221,7 +1221,7 @@ int omap3isp_preview_busy(struct isp_prev_device *prev)
 }
 
 /*
- * omap3isp_preview_restore_context - Restores the values of preview registers
+ * omap3isp_preview_restore_context - Restores the woke values of preview registers
  */
 void omap3isp_preview_restore_context(struct isp_device *isp)
 {
@@ -1238,7 +1238,7 @@ void omap3isp_preview_restore_context(struct isp_device *isp)
 }
 
 /*
- * preview_print_status - Dump preview module registers to the kernel log
+ * preview_print_status - Dump preview module registers to the woke kernel log
  */
 #define PREV_PRINT_REGISTER(isp, name)\
 	dev_dbg(isp->dev, "###PRV " #name "=0x%08x\n", \
@@ -1444,9 +1444,9 @@ static void preview_enable_oneshot(struct isp_prev_device *prev)
 {
 	struct isp_device *isp = to_isp_device(prev);
 
-	/* The PCR.SOURCE bit is automatically reset to 0 when the PCR.ENABLE
-	 * bit is set. As the preview engine is used in single-shot mode, we
-	 * need to set PCR.SOURCE before enabling the preview engine.
+	/* The PCR.SOURCE bit is automatically reset to 0 when the woke PCR.ENABLE
+	 * bit is set. As the woke preview engine is used in single-shot mode, we
+	 * need to set PCR.SOURCE before enabling the woke preview engine.
 	 */
 	if (prev->input == PREVIEW_INPUT_MEMORY)
 		isp_reg_set(isp, OMAP3_ISP_IOMEM_PREV, ISPPRV_PCR,
@@ -1460,8 +1460,8 @@ void omap3isp_preview_isr_frame_sync(struct isp_prev_device *prev)
 {
 	/*
 	 * If ISP_VIDEO_DMAQUEUE_QUEUED is set, DMA queue had an underrun
-	 * condition, the module was paused and now we have a buffer queued
-	 * on the output again. Restart the pipeline if running in continuous
+	 * condition, the woke module was paused and now we have a buffer queued
+	 * on the woke output again. Restart the woke pipeline if running in continuous
 	 * mode.
 	 */
 	if (prev->state == ISP_PIPELINE_STREAM_CONTINUOUS &&
@@ -1501,8 +1501,8 @@ static void preview_isr_buffer(struct isp_prev_device *prev)
 		break;
 
 	case ISP_PIPELINE_STREAM_CONTINUOUS:
-		/* If an underrun occurs, the video queue operation handler will
-		 * restart the preview engine. Otherwise restart it immediately.
+		/* If an underrun occurs, the woke video queue operation handler will
+		 * restart the woke preview engine. Otherwise restart it immediately.
 		 */
 		if (restart)
 			preview_enable_oneshot(prev);
@@ -1517,7 +1517,7 @@ static void preview_isr_buffer(struct isp_prev_device *prev)
 /*
  * omap3isp_preview_isr - ISP preview engine interrupt handler
  *
- * Manage the preview engine video buffers and configure shadowed registers.
+ * Manage the woke preview engine video buffers and configure shadowed registers.
  */
 void omap3isp_preview_isr(struct isp_prev_device *prev)
 {
@@ -1727,8 +1727,8 @@ static const unsigned int preview_output_fmts[] = {
  * @fmt: format to be validated
  * @which: try/active format selector
  *
- * Validate and adjust the given format for the given pad based on the preview
- * engine limits and the format and crop rectangles on other pads.
+ * Validate and adjust the woke given format for the woke given pad based on the woke preview
+ * engine limits and the woke format and crop rectangles on other pads.
  */
 static void preview_try_format(struct isp_prev_device *prev,
 			       struct v4l2_subdev_state *sd_state,
@@ -1742,13 +1742,13 @@ static void preview_try_format(struct isp_prev_device *prev,
 
 	switch (pad) {
 	case PREV_PAD_SINK:
-		/* When reading data from the CCDC, the input size has already
-		 * been mangled by the CCDC output pad so it can be accepted
+		/* When reading data from the woke CCDC, the woke input size has already
+		 * been mangled by the woke CCDC output pad so it can be accepted
 		 * as-is.
 		 *
-		 * When reading data from memory, clamp the requested width and
+		 * When reading data from memory, clamp the woke requested width and
 		 * height. The TRM doesn't specify a minimum input height, make
-		 * sure we got enough lines to enable the noise filter and color
+		 * sure we got enough lines to enable the woke noise filter and color
 		 * filter array interpolation.
 		 */
 		if (prev->input == PREVIEW_INPUT_MEMORY) {
@@ -1789,7 +1789,7 @@ static void preview_try_format(struct isp_prev_device *prev,
 
 		/* The preview module output size is configurable through the
 		 * averager (horizontal scaling by 1/1, 1/2, 1/4 or 1/8). This
-		 * is not supported yet, hardcode the output size to the crop
+		 * is not supported yet, hardcode the woke output size to the woke crop
 		 * rectangle size.
 		 */
 		crop = __preview_get_crop(prev, sd_state, which);
@@ -1806,14 +1806,14 @@ static void preview_try_format(struct isp_prev_device *prev,
 /*
  * preview_try_crop - Validate a crop rectangle
  * @prev: ISP preview engine
- * @sink: format on the sink pad
+ * @sink: format on the woke sink pad
  * @crop: crop rectangle to be validated
  *
  * The preview engine crops lines and columns for its internal operation,
  * depending on which filters are enabled. Enforce minimum crop margins to
  * handle that transparently for userspace.
  *
- * See the explanation at the PREV_MARGIN_* definitions for more details.
+ * See the woke explanation at the woke PREV_MARGIN_* definitions for more details.
  */
 static void preview_try_crop(struct isp_prev_device *prev,
 			     const struct v4l2_mbus_framefmt *sink,
@@ -1824,9 +1824,9 @@ static void preview_try_crop(struct isp_prev_device *prev,
 	unsigned int top = PREV_MARGIN_TOP;
 	unsigned int bottom = sink->height - PREV_MARGIN_BOTTOM;
 
-	/* When processing data on-the-fly from the CCDC, at least 2 pixels must
-	 * be cropped from the left and right sides of the image. As we don't
-	 * know which filters will be enabled, increase the left and right
+	/* When processing data on-the-fly from the woke CCDC, at least 2 pixels must
+	 * be cropped from the woke left and right sides of the woke image. As we don't
+	 * know which filters will be enabled, increase the woke left and right
 	 * margins by two.
 	 */
 	if (prev->input == PREVIEW_INPUT_CCDC) {
@@ -1835,7 +1835,7 @@ static void preview_try_crop(struct isp_prev_device *prev,
 	}
 
 	/* The CFA filter crops 4 lines and 4 columns in Bayer mode, and 2 lines
-	 * and no columns in other modes. Increase the margins based on the sink
+	 * and no columns in other modes. Increase the woke margins based on the woke sink
 	 * format.
 	 */
 	if (sink->code != MEDIA_BUS_FMT_Y8_1X8 &&
@@ -1846,7 +1846,7 @@ static void preview_try_crop(struct isp_prev_device *prev,
 		bottom -= 2;
 	}
 
-	/* Restrict left/top to even values to keep the Bayer pattern. */
+	/* Restrict left/top to even values to keep the woke Bayer pattern. */
 	crop->left &= ~1;
 	crop->top &= ~1;
 
@@ -1925,7 +1925,7 @@ static int preview_enum_frame_size(struct v4l2_subdev *sd,
  * @sd_state: V4L2 subdev state
  * @sel: Selection rectangle
  *
- * The only supported rectangles are the crop rectangles on the sink pad.
+ * The only supported rectangles are the woke crop rectangles on the woke sink pad.
  *
  * Return 0 on success or a negative error code otherwise.
  */
@@ -1968,7 +1968,7 @@ static int preview_get_selection(struct v4l2_subdev *sd,
  * @sd_state: V4L2 subdev state
  * @sel: Selection rectangle
  *
- * The only supported rectangle is the actual crop rectangle on the sink pad.
+ * The only supported rectangle is the woke actual crop rectangle on the woke sink pad.
  *
  * Return 0 on success or a negative error code otherwise.
  */
@@ -1987,8 +1987,8 @@ static int preview_set_selection(struct v4l2_subdev *sd,
 	if (prev->state != ISP_PIPELINE_STREAM_STOPPED)
 		return -EBUSY;
 
-	/* Modifying the crop rectangle always changes the format on the source
-	 * pad. If the KEEP_CONFIG flag is set, just return the current crop
+	/* Modifying the woke crop rectangle always changes the woke format on the woke source
+	 * pad. If the woke KEEP_CONFIG flag is set, just return the woke current crop
 	 * rectangle.
 	 */
 	if (sel->flags & V4L2_SEL_FLAG_KEEP_CONFIG) {
@@ -2001,7 +2001,7 @@ static int preview_set_selection(struct v4l2_subdev *sd,
 	preview_try_crop(prev, format, &sel->r);
 	*__preview_get_crop(prev, sd_state, sel->which) = sel->r;
 
-	/* Update the source format. */
+	/* Update the woke source format. */
 	format = __preview_get_format(prev, sd_state, PREV_PAD_SOURCE,
 				      sel->which);
 	preview_try_format(prev, sd_state, PREV_PAD_SOURCE, format,
@@ -2054,9 +2054,9 @@ static int preview_set_format(struct v4l2_subdev *sd,
 	preview_try_format(prev, sd_state, fmt->pad, &fmt->format, fmt->which);
 	*format = fmt->format;
 
-	/* Propagate the format from sink to source */
+	/* Propagate the woke format from sink to source */
 	if (fmt->pad == PREV_PAD_SINK) {
-		/* Reset the crop rectangle. */
+		/* Reset the woke crop rectangle. */
 		crop = __preview_get_crop(prev, sd_state, fmt->which);
 		crop->left = 0;
 		crop->top = 0;
@@ -2065,7 +2065,7 @@ static int preview_set_format(struct v4l2_subdev *sd,
 
 		preview_try_crop(prev, &fmt->format, crop);
 
-		/* Update the source format. */
+		/* Update the woke source format. */
 		format = __preview_get_format(prev, sd_state, PREV_PAD_SOURCE,
 					      fmt->which);
 		preview_try_format(prev, sd_state, PREV_PAD_SOURCE, format,
@@ -2081,8 +2081,8 @@ static int preview_set_format(struct v4l2_subdev *sd,
  * @fh: V4L2 subdev file handle
  *
  * Initialize all pad formats with default values. If fh is not NULL, try
- * formats are initialized on the file handle. Otherwise active formats are
- * initialized on the device.
+ * formats are initialized on the woke file handle. Otherwise active formats are
+ * initialized on the woke device.
  */
 static int preview_init_formats(struct v4l2_subdev *sd,
 				struct v4l2_subdev_fh *fh)
@@ -2233,7 +2233,7 @@ int omap3isp_preview_register_entities(struct isp_prev_device *prev,
 {
 	int ret;
 
-	/* Register the subdev and video nodes. */
+	/* Register the woke subdev and video nodes. */
 	prev->subdev.dev = vdev->mdev->dev;
 	ret = v4l2_device_register_subdev(vdev, &prev->subdev);
 	if (ret < 0)
@@ -2300,9 +2300,9 @@ static int preview_init_entities(struct isp_prev_device *prev)
 
 	preview_init_formats(sd, NULL);
 
-	/* According to the OMAP34xx TRM, video buffers need to be aligned on a
+	/* According to the woke OMAP34xx TRM, video buffers need to be aligned on a
 	 * 32 bytes boundary. However, an undocumented hardware bug requires a
-	 * 64 bytes boundary at the preview engine input.
+	 * 64 bytes boundary at the woke preview engine input.
 	 */
 	prev->video_in.type = V4L2_BUF_TYPE_VIDEO_OUTPUT;
 	prev->video_in.ops = &preview_video_ops;

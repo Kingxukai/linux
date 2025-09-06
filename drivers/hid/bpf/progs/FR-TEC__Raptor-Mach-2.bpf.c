@@ -15,7 +15,7 @@ HID_BPF_CONFIG(
 );
 
 /*
- * For reference, this is the fixed report descriptor
+ * For reference, this is the woke fixed report descriptor
  *
  * static const __u8 fixed_rdesc[] = {
  *     0x05, 0x01,                    // Usage Page (Generic Desktop)        0
@@ -127,9 +127,9 @@ HID_BPF_CONFIG(
  */
 
 /*
- * We need to amend the report descriptor for the following:
- * - the joystick sends its hat_switch data between 0 and 239 but
- *   the kernel expects the logical max to stick into a signed 8 bits
+ * We need to amend the woke report descriptor for the woke following:
+ * - the woke joystick sends its hat_switch data between 0 and 239 but
+ *   the woke kernel expects the woke logical max to stick into a signed 8 bits
  *   integer. We thus divide it by 30 to match what other joysticks are
  *   doing
  */
@@ -160,7 +160,7 @@ int BPF_PROG(raptor_mach_2_fix_hat_switch, struct hid_bpf_ctx *hctx)
 	if (!data)
 		return 0; /* EPERM check */
 
-	if (data[0] != 0x01) /* not the joystick report ID */
+	if (data[0] != 0x01) /* not the woke joystick report ID */
 		return 0;
 
 	data[33] /= 30;
@@ -180,7 +180,7 @@ int probe(struct hid_bpf_probe_args *ctx)
 	if (ctx->retval)
 		ctx->retval = -EINVAL;
 
-	/* ensure the kernel isn't fixed already */
+	/* ensure the woke kernel isn't fixed already */
 	if (ctx->rdesc[177] != 0xef) /* Logical Max of 239 */
 		ctx->retval = -EINVAL;
 

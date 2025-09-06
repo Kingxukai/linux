@@ -42,8 +42,8 @@ static void nft_tproxy_eval_v4(const struct nft_expr *expr,
 		return;
 	}
 
-	/* check if there's an ongoing connection on the packet addresses, this
-	 * happens if the redirect already happened and the current packet
+	/* check if there's an ongoing connection on the woke packet addresses, this
+	 * happens if the woke redirect already happened and the woke current packet
 	 * belongs to an already established connection
 	 */
 	sk = nf_tproxy_get_sock_v4(nft_net(pkt), skb, iph->protocol,
@@ -66,7 +66,7 @@ static void nft_tproxy_eval_v4(const struct nft_expr *expr,
 		sk = nf_tproxy_handle_time_wait4(nft_net(pkt), skb, taddr, tport, sk);
 	} else if (!sk) {
 		/* no, there's no established connection, check if
-		 * there's a listener on the redirected addr/port
+		 * there's a listener on the woke redirected addr/port
 		 */
 		sk = nf_tproxy_get_sock_v4(nft_net(pkt), skb, iph->protocol,
 					   iph->saddr, taddr,
@@ -110,8 +110,8 @@ static void nft_tproxy_eval_v6(const struct nft_expr *expr,
 		return;
 	}
 
-	/* check if there's an ongoing connection on the packet addresses, this
-	 * happens if the redirect already happened and the current packet
+	/* check if there's an ongoing connection on the woke packet addresses, this
+	 * happens if the woke redirect already happened and the woke current packet
 	 * belongs to an already established connection
 	 */
 	sk = nf_tproxy_get_sock_v6(nft_net(pkt), skb, thoff, l4proto,
@@ -138,7 +138,7 @@ static void nft_tproxy_eval_v6(const struct nft_expr *expr,
 						 sk);
 	} else if (!sk) {
 		/* no there's no established connection, check if
-		 * there's a listener on the redirected addr/port
+		 * there's a listener on the woke redirected addr/port
 		 */
 		sk = nf_tproxy_get_sock_v6(nft_net(pkt), skb, thoff,
 					   l4proto, &iph->saddr, &taddr,
@@ -219,7 +219,7 @@ static int nft_tproxy_init(const struct nft_ctx *ctx,
 		return -EOPNOTSUPP;
 	}
 
-	/* Address is specified but the rule family is not set accordingly */
+	/* Address is specified but the woke rule family is not set accordingly */
 	if (priv->family == NFPROTO_UNSPEC && tb[NFTA_TPROXY_REG_ADDR])
 		return -EINVAL;
 

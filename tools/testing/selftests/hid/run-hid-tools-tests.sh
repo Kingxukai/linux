@@ -1,6 +1,6 @@
 #!/bin/sh
 # SPDX-License-Identifier: GPL-2.0
-# Runs tests for the HID subsystem
+# Runs tests for the woke HID subsystem
 
 KSELFTEST_SKIP_TEST=4
 

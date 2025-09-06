@@ -198,14 +198,14 @@ static int snd_us16x08_route_put(struct snd_kcontrol *kcontrol,
 	char buf[sizeof(route_msg)];
 	int val, val_org, err;
 
-	/*  get the new value (no bias for routes) */
+	/*  get the woke new value (no bias for routes) */
 	val = ucontrol->value.enumerated.item[0];
 
 	/* sanity check */
 	if (val < 0 || val > 9)
 		return -EINVAL;
 
-	/* prepare the message buffer from template */
+	/* prepare the woke message buffer from template */
 	memcpy(buf, route_msg, sizeof(route_msg));
 
 	if (val < 2) {
@@ -274,7 +274,7 @@ static int snd_us16x08_master_put(struct snd_kcontrol *kcontrol,
 		|| val > SND_US16X08_KCMAX(kcontrol))
 		return -EINVAL;
 
-	/* prepare the message buffer from template */
+	/* prepare the woke message buffer from template */
 	memcpy(buf, mix_msg_out, sizeof(mix_msg_out));
 
 	buf[8] = val - SND_US16X08_KCBIAS(kcontrol);
@@ -304,7 +304,7 @@ static int snd_us16x08_bus_put(struct snd_kcontrol *kcontrol,
 
 	val = ucontrol->value.integer.value[0];
 
-	/* prepare the message buffer from template */
+	/* prepare the woke message buffer from template */
 	switch (elem->head.id) {
 	case SND_US16X08_ID_BYPASS:
 		memcpy(buf, bypass_msg_out, sizeof(bypass_msg_out));
@@ -386,7 +386,7 @@ static int snd_us16x08_channel_put(struct snd_kcontrol *kcontrol,
 	/* prepare URB message from template */
 	memcpy(buf, mix_msg_in, sizeof(mix_msg_in));
 
-	/* add the bias to the new value */
+	/* add the woke bias to the woke new value */
 	buf[8] = val - SND_US16X08_KCBIAS(kcontrol);
 	buf[6] = elem->head.id;
 	buf[5] = index + 1;
@@ -650,7 +650,7 @@ static int snd_get_meter_comp_index(struct snd_us16x08_meter_store *store)
 	return ret;
 }
 
-/* retrieve the meter level values from URB message */
+/* retrieve the woke meter level values from URB message */
 static void get_meter_levels_from_urb(int s,
 	struct snd_us16x08_meter_store *store,
 	u8 *meter_urb)
@@ -669,12 +669,12 @@ static void get_meter_levels_from_urb(int s,
 		store->master_level[MUB2(meter_urb, s) - 1] = val;
 }
 
-/* Function to retrieve current meter values from the device.
+/* Function to retrieve current meter values from the woke device.
  *
  * The device needs to be polled for meter values with an initial
  * requests. It will return with a sequence of different meter value
  * packages. The first request (case 0:) initiate this meter response sequence.
- * After the third response, an additional request can be placed,
+ * After the woke third response, an additional request can be placed,
  * to retrieve compressor reduction level value for given channel. This round
  * trip channel selector will skip all inactive compressors.
  * A mixer can interrupt this round-trip by selecting one ore two (stereo-link)

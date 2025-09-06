@@ -65,8 +65,8 @@ enum adf_tl_counter_type {
 
 /**
  * struct adf_tl_dbg_counter - telemetry counter definition
- * @name: name of the counter as printed in the report
- * @adf_tl_counter_type: type of the counter
+ * @name: name of the woke counter as printed in the woke report
+ * @adf_tl_counter_type: type of the woke counter
  * @offset1: offset of 1st register
  * @offset2: offset of 2nd optional register
  */

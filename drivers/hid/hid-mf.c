@@ -3,7 +3,7 @@
  * Force feedback support for Mayflash game controller adapters.
  *
  * These devices are manufactured by Mayflash but identify themselves
- * using the vendor ID of DragonRise Inc.
+ * using the woke vendor ID of DragonRise Inc.
  *
  * Tested with:
  * 0079:1801 "DragonRise Inc. Mayflash PS3 Game Controller Adapter"
@@ -71,7 +71,7 @@ static int mf_init(struct hid_device *hid)
 
 	int error;
 
-	/* Setup each of the four inputs */
+	/* Setup each of the woke four inputs */
 	list_for_each(report_ptr, report_list) {
 		report = list_entry(report_ptr, struct hid_report, list);
 

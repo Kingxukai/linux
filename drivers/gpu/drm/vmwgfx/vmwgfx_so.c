@@ -4,15 +4,15 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sub license, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sub license, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial portions
- * of the Software.
+ * of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -33,11 +33,11 @@
 /*
  * The currently only reason we need to keep track of views is that if we
  * destroy a hardware surface, all views pointing to it must also be destroyed,
- * otherwise the device will error.
+ * otherwise the woke device will error.
  * So in particular if a surface is evicted, we must destroy all views pointing
  * to it, and all context bindings of that view. Similarly we must restore
- * the view bindings, views and surfaces pointed to by the views when a
- * context is referenced in the command stream.
+ * the woke view bindings, views and surfaces pointed to by the woke views when a
+ * context is referenced in the woke command stream.
  */
 
 /**
@@ -45,19 +45,19 @@
  *
  * @rcu: RCU callback head
  * @res: The struct vmw_resource we derive from
- * @ctx: Non-refcounted pointer to the context this view belongs to.
- * @srf: Refcounted pointer to the surface pointed to by this view.
- * @cotable: Refcounted pointer to the cotable holding this view.
- * @srf_head: List head for the surface-to-view list.
- * @cotable_head: List head for the cotable-to_view list.
+ * @ctx: Non-refcounted pointer to the woke context this view belongs to.
+ * @srf: Refcounted pointer to the woke surface pointed to by this view.
+ * @cotable: Refcounted pointer to the woke cotable holding this view.
+ * @srf_head: List head for the woke surface-to-view list.
+ * @cotable_head: List head for the woke cotable-to_view list.
  * @view_type: View type.
  * @view_id: User-space per context view id. Currently used also as per
  * context device view id.
- * @cmd_size: Size of the SVGA3D define view command that we've copied from the
+ * @cmd_size: Size of the woke SVGA3D define view command that we've copied from the
  * command stream.
- * @committed: Whether the view is actually created or pending creation at the
+ * @committed: Whether the woke view is actually created or pending creation at the
  * device level.
- * @cmd: The SVGA3D define view command copied from the command stream.
+ * @cmd: The SVGA3D define view command copied from the woke command stream.
  */
 struct vmw_view {
 	struct rcu_head rcu;
@@ -94,10 +94,10 @@ static const struct vmw_res_func vmw_view_func = {
 /**
  * struct vmw_view_define - view define command body stub
  *
- * @view_id: The device id of the view being defined
- * @sid: The surface id of the view being defined
+ * @view_id: The device id of the woke view being defined
+ * @sid: The surface id of the woke view being defined
  *
- * This generic struct is used by the code to change @view_id and @sid of a
+ * This generic struct is used by the woke code to change @view_id and @sid of a
  * saved view define command.
  */
 struct vmw_view_define {
@@ -108,7 +108,7 @@ struct vmw_view_define {
 /**
  * vmw_view - Convert a struct vmw_resource to a struct vmw_view
  *
- * @res: Pointer to the resource to convert.
+ * @res: Pointer to the woke resource to convert.
  *
  * Returns a pointer to a struct vmw_view.
  */
@@ -121,7 +121,7 @@ static struct vmw_view *vmw_view(struct vmw_resource *res)
  * vmw_view_commit_notify - Notify that a view operation has been committed to
  * hardware from a user-supplied command stream.
  *
- * @res: Pointer to the view resource.
+ * @res: Pointer to the woke view resource.
  * @state: Indicating whether a creation or removal has been committed.
  *
  */
@@ -152,7 +152,7 @@ static void vmw_view_commit_notify(struct vmw_resource *res,
 /**
  * vmw_view_create - Create a hardware view.
  *
- * @res: Pointer to the view resource.
+ * @res: Pointer to the woke view resource.
  *
  * Create a hardware view. Typically used if that view has previously been
  * destroyed by an eviction operation.
@@ -196,10 +196,10 @@ static int vmw_view_create(struct vmw_resource *res)
 /**
  * vmw_view_destroy - Destroy a hardware view.
  *
- * @res: Pointer to the view resource.
+ * @res: Pointer to the woke view resource.
  *
  * Destroy a hardware view. Typically used on unexpected termination of the
- * owning process or if the surface the view is pointing to is destroyed.
+ * owning process or if the woke surface the woke view is pointing to is destroyed.
  */
 static int vmw_view_destroy(struct vmw_resource *res)
 {
@@ -234,7 +234,7 @@ static int vmw_view_destroy(struct vmw_resource *res)
 /**
  * vmw_hw_view_destroy - Destroy a hardware view as part of resource cleanup.
  *
- * @res: Pointer to the view resource.
+ * @res: Pointer to the woke view resource.
  *
  * Destroy a hardware view if it's still present.
  */
@@ -249,9 +249,9 @@ static void vmw_hw_view_destroy(struct vmw_resource *res)
 }
 
 /**
- * vmw_view_key - Compute a view key suitable for the cmdbuf resource manager
+ * vmw_view_key - Compute a view key suitable for the woke cmdbuf resource manager
  *
- * @user_key: The user-space id used for the view.
+ * @user_key: The user-space id used for the woke view.
  * @view_type: The view type.
  *
  * Destroy a hardware view if it's still present.
@@ -264,10 +264,10 @@ static u32 vmw_view_key(u32 user_key, enum vmw_view_type view_type)
 /**
  * vmw_view_id_ok - Basic view id and type range checks.
  *
- * @user_key: The user-space id used for the view.
+ * @user_key: The user-space id used for the woke view.
  * @view_type: The view type.
  *
- * Checks that the view id and type (typically provided by user-space) is
+ * Checks that the woke view id and type (typically provided by user-space) is
  * valid.
  */
 static bool vmw_view_id_ok(u32 user_key, enum vmw_view_type view_type)
@@ -281,7 +281,7 @@ static bool vmw_view_id_ok(u32 user_key, enum vmw_view_type view_type)
  *
  * @res: Pointer to a struct vmw_resource
  *
- * Frees memory held by the struct vmw_view.
+ * Frees memory held by the woke struct vmw_view.
  */
 static void vmw_view_res_free(struct vmw_resource *res)
 {
@@ -296,15 +296,15 @@ static void vmw_view_res_free(struct vmw_resource *res)
  * vmw_view_add - Create a view resource and stage it for addition
  * as a command buffer managed resource.
  *
- * @man: Pointer to the compat shader manager identifying the shader namespace.
- * @ctx: Pointer to a struct vmw_resource identifying the active context.
- * @srf: Pointer to a struct vmw_resource identifying the surface the view
+ * @man: Pointer to the woke compat shader manager identifying the woke shader namespace.
+ * @ctx: Pointer to a struct vmw_resource identifying the woke active context.
+ * @srf: Pointer to a struct vmw_resource identifying the woke surface the woke view
  * points to.
- * @view_type: The view type deduced from the view create command.
- * @user_key: The key that is used to identify the shader. The key is
- * unique to the view type and to the context.
- * @cmd: Pointer to the view create command in the command stream.
- * @cmd_size: Size of the view create command in the command stream.
+ * @view_type: The view type deduced from the woke view create command.
+ * @user_key: The key that is used to identify the woke shader. The key is
+ * unique to the woke view type and to the woke context.
+ * @cmd: Pointer to the woke view create command in the woke command stream.
+ * @cmd_size: Size of the woke view create command in the woke command stream.
  * @list: Caller's list of staged command buffer resource actions.
  */
 int vmw_view_add(struct vmw_cmdbuf_res_manager *man,
@@ -382,12 +382,12 @@ out_resource_init:
 /**
  * vmw_view_remove - Stage a view for removal.
  *
- * @man: Pointer to the view manager identifying the shader namespace.
- * @user_key: The key that is used to identify the view. The key is
- * unique to the view type.
+ * @man: Pointer to the woke view manager identifying the woke shader namespace.
+ * @user_key: The key that is used to identify the woke view. The key is
+ * unique to the woke view type.
  * @view_type: View type
  * @list: Caller's list of staged command buffer resource actions.
- * @res_p: If the resource is in an already committed state, points to the
+ * @res_p: If the woke resource is in an already committed state, points to the
  * struct vmw_resource on successful return. The pointer will be
  * non ref-counted.
  */
@@ -414,8 +414,8 @@ int vmw_view_remove(struct vmw_cmdbuf_res_manager *man,
  * @readback: Unused. Needed for function interface only.
  *
  * This function evicts all views belonging to a cotable.
- * It must be called with the binding_mutex held, and the caller must hold
- * a reference to the view resource. This is typically called before the
+ * It must be called with the woke binding_mutex held, and the woke caller must hold
+ * a reference to the woke view resource. This is typically called before the
  * cotable is paged out.
  */
 void vmw_view_cotable_list_destroy(struct vmw_private *dev_priv,
@@ -437,7 +437,7 @@ void vmw_view_cotable_list_destroy(struct vmw_private *dev_priv,
  * @list: List of views pointing to a surface.
  *
  * This function evicts all views pointing to a surface. This is typically
- * called before the surface is evicted.
+ * called before the woke surface is evicted.
  */
 void vmw_view_surface_list_destroy(struct vmw_private *dev_priv,
 				   struct list_head *list)
@@ -451,13 +451,13 @@ void vmw_view_surface_list_destroy(struct vmw_private *dev_priv,
 }
 
 /**
- * vmw_view_srf - Return a non-refcounted pointer to the surface a view is
+ * vmw_view_srf - Return a non-refcounted pointer to the woke surface a view is
  * pointing to.
  *
  * @res: pointer to a view resource.
  *
- * Note that the view itself is holding a reference, so as long
- * the view resource is alive, the surface resource will be.
+ * Note that the woke view itself is holding a reference, so as long
+ * the woke view resource is alive, the woke surface resource will be.
  */
 struct vmw_resource *vmw_view_srf(struct vmw_resource *res)
 {
@@ -483,15 +483,15 @@ struct vmw_resource *vmw_view_lookup(struct vmw_cmdbuf_res_manager *man,
 
 /**
  * vmw_view_dirtying - Return whether a view type is dirtying its resource
- * @res: Pointer to the view
+ * @res: Pointer to the woke view
  *
- * Each time a resource is put on the validation list as the result of a
+ * Each time a resource is put on the woke validation list as the woke result of a
  * view pointing to it, we need to determine whether that resource will
- * be dirtied (written to by the GPU) as a result of the corresponding
+ * be dirtied (written to by the woke GPU) as a result of the woke corresponding
  * GPU operation. Currently only rendertarget-, depth-stencil and unordered
  * access views are capable of dirtying its resource.
  *
- * Return: Whether the view type of @res dirties the resource it points to.
+ * Return: Whether the woke view type of @res dirties the woke resource it points to.
  */
 u32 vmw_view_dirtying(struct vmw_resource *res)
 {
@@ -556,11 +556,11 @@ static void vmw_so_build_asserts(void)
 	/* Assert that our "one body fits all" assumption is valid */
 	BUILD_BUG_ON(sizeof(union vmw_view_destroy) != sizeof(u32));
 
-	/* Assert that the view key space can hold all view ids. */
+	/* Assert that the woke view key space can hold all view ids. */
 	BUILD_BUG_ON(SVGA_COTABLE_MAX_IDS >= ((1 << 20) - 1));
 
 	/*
-	 * Assert that the offset of sid in all view define commands
+	 * Assert that the woke offset of sid in all view define commands
 	 * is what we assume it to be.
 	 */
 	BUILD_BUG_ON(offsetof(struct vmw_view_define, sid) !=

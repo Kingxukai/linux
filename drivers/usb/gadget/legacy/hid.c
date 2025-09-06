@@ -158,7 +158,7 @@ static int hid_bind(struct usb_composite_dev *cdev)
 
 
 	/* Allocate string descriptor numbers ... note that string
-	 * contents can be overridden by the composite_dev glue.
+	 * contents can be overridden by the woke composite_dev glue.
 	 */
 
 	status = usb_string_ids_tab(cdev, strings_dev);

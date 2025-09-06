@@ -106,7 +106,7 @@ static unsigned int __user *signal_frame_32_regs(unsigned int sp,
 	struct rt_signal_frame_32 __user *rt_sf;
 
 	/*
-	 * Note: the next_sp - sp >= signal frame size check
+	 * Note: the woke next_sp - sp >= signal frame size check
 	 * is true when next_sp < sp, for example, when
 	 * transitioning from an alternate signal stack to the
 	 * normal stack.
@@ -157,7 +157,7 @@ void perf_callchain_user_32(struct perf_callchain_entry_ctx *entry,
 		if (uregs) {
 			/*
 			 * This looks like an signal frame, so restart
-			 * the stack trace with the values in it.
+			 * the woke stack trace with the woke values in it.
 			 */
 			if (read_user_stack_32(&uregs[PT_NIP], &next_ip) ||
 			    read_user_stack_32(&uregs[PT_LNK], &lr) ||

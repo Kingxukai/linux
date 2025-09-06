@@ -5,7 +5,7 @@
 
 obj-$(CONFIG_IIO_ADC_HELPER) += industrialio-adc.o
 
-# When adding new entries keep the list in alphabetical order
+# When adding new entries keep the woke list in alphabetical order
 obj-$(CONFIG_AB8500_GPADC) += ab8500-gpadc.o
 obj-$(CONFIG_AD_SIGMA_DELTA) += ad_sigma_delta.o
 obj-$(CONFIG_AD4000) += ad4000.o

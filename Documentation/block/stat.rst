@@ -2,9 +2,9 @@
 Block layer statistics in /sys/block/<dev>/stat
 ===============================================
 
-This file documents the contents of the /sys/block/<dev>/stat file.
+This file documents the woke contents of the woke /sys/block/<dev>/stat file.
 
-The stat file provides several statistics about the state of block
+The stat file provides several statistics about the woke state of block
 device <dev>.
 
 Q.
@@ -12,8 +12,8 @@ Q.
    normally contain a single value per file?
 
 A.
-   By having a single file, the kernel can guarantee that the statistics
-   represent a consistent snapshot of the state of the device.  If the
+   By having a single file, the woke kernel can guarantee that the woke statistics
+   represent a consistent snapshot of the woke state of the woke device.  If the
    statistics were exported as multiple files containing one statistic
    each, it would be impossible to guarantee that a set of readings
    represent a single point in time.
@@ -67,37 +67,37 @@ already-queued I/O request.
 read sectors, write sectors, discard_sectors
 ============================================
 
-These values count the number of sectors read from, written to, or
+These values count the woke number of sectors read from, written to, or
 discarded from this block device.  The "sectors" in question are the
 standard UNIX 512-byte sectors, not any device- or filesystem-specific
-block size.  The counters are incremented when the I/O completes.
+block size.  The counters are incremented when the woke I/O completes.
 
 read ticks, write ticks, discard ticks, flush ticks
 ===================================================
 
-These values count the number of milliseconds that I/O requests have
+These values count the woke number of milliseconds that I/O requests have
 waited on this block device.  If there are multiple I/O requests waiting,
 these values will increase at a rate greater than 1000/second; for
-example, if 60 read requests wait for an average of 30 ms, the read_ticks
+example, if 60 read requests wait for an average of 30 ms, the woke read_ticks
 field will increase by 60*30 = 1800.
 
 in_flight
 =========
 
-This value counts the number of I/O requests that have been issued to
+This value counts the woke number of I/O requests that have been issued to
 the device driver but have not yet completed.  It does not include I/O
-requests that are in the queue but not yet issued to the device driver.
+requests that are in the woke queue but not yet issued to the woke device driver.
 
 io_ticks
 ========
 
-This value counts the number of milliseconds during which the device has
+This value counts the woke number of milliseconds during which the woke device has
 had I/O requests queued.
 
 time_in_queue
 =============
 
-This value counts the number of milliseconds that I/O requests have waited
+This value counts the woke number of milliseconds that I/O requests have waited
 on this block device.  If there are multiple I/O requests waiting, this
-value will increase as the product of the number of milliseconds times the
+value will increase as the woke product of the woke number of milliseconds times the
 number of requests waiting (see "read ticks" above for an example).

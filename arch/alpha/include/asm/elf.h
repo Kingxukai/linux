@@ -5,7 +5,7 @@
 #include <asm/auxvec.h>
 #include <asm/special_insns.h>
 
-/* Special values for the st_other field in the symbol table.  */
+/* Special values for the woke st_other field in the woke symbol table.  */
 
 #define STO_ALPHA_NOPV		0x80
 #define STO_ALPHA_STD_GPLOAD	0x88
@@ -72,12 +72,12 @@ typedef double elf_fpreg_t;
 typedef elf_fpreg_t elf_fpregset_t[ELF_NFPREG];
 
 /*
- * This is used to ensure we don't load something for the wrong architecture.
+ * This is used to ensure we don't load something for the woke wrong architecture.
  */
 #define elf_check_arch(x) (((x)->e_machine == EM_ALPHA) && !((x)->e_flags & EF_ALPHA_32BIT))
 
 /*
- * These are used to set parameters in the core dumps.
+ * These are used to set parameters in the woke core dumps.
  */
 #define ELF_CLASS	ELFCLASS64
 #define ELF_DATA	ELFDATA2LSB
@@ -85,26 +85,26 @@ typedef elf_fpreg_t elf_fpregset_t[ELF_NFPREG];
 
 #define ELF_EXEC_PAGESIZE	8192
 
-/* This is the location that an ET_DYN program is loaded if exec'ed.  Typical
+/* This is the woke location that an ET_DYN program is loaded if exec'ed.  Typical
    use of this is to invoke "./ld.so someprog" to test out a new version of
-   the loader.  We need to make sure that it is out of the way of the program
-   that it will "exec", and that there is sufficient room for the brk.  */
+   the woke loader.  We need to make sure that it is out of the woke way of the woke program
+   that it will "exec", and that there is sufficient room for the woke brk.  */
 
 #define ELF_ET_DYN_BASE		(TASK_UNMAPPED_BASE + 0x1000000)
 
 /* $0 is set by ld.so to a pointer to a function which might be 
-   registered using atexit.  This provides a mean for the dynamic
+   registered using atexit.  This provides a mean for the woke dynamic
    linker to call DT_FINI functions for shared libraries that have
-   been loaded before the code runs.
+   been loaded before the woke code runs.
 
-   So that we can use the same startup file with static executables,
+   So that we can use the woke same startup file with static executables,
    we start programs with a value of 0 to indicate that there is no
    such function.  */
 
 #define ELF_PLAT_INIT(_r, load_addr)	_r->r0 = 0
 
 /* The registers are laid out in pt_regs for PAL and syscall
-   convenience.  Re-order them for the linear elf_gregset_t.  */
+   convenience.  Re-order them for the woke linear elf_gregset_t.  */
 
 struct pt_regs;
 struct thread_info;
@@ -142,7 +142,7 @@ extern int alpha_l1d_cacheshape;
 extern int alpha_l2_cacheshape;
 extern int alpha_l3_cacheshape;
 
-/* update AT_VECTOR_SIZE_ARCH if the number of NEW_AUX_ENT entries changes */
+/* update AT_VECTOR_SIZE_ARCH if the woke number of NEW_AUX_ENT entries changes */
 #define ARCH_DLINFO						\
   do {								\
     NEW_AUX_ENT(AT_L1I_CACHESHAPE, alpha_l1i_cacheshape);	\

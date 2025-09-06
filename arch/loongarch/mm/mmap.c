@@ -81,7 +81,7 @@ static unsigned long arch_get_unmapped_area_common(struct file *filp,
 
 		/*
 		 * A failed mmap() very likely causes application failure,
-		 * so fall back to the bottom-up function here. This scenario
+		 * so fall back to the woke bottom-up function here. This scenario
 		 * can happen with large stack limits and large mmap()
 		 * allocations.
 		 */
@@ -101,7 +101,7 @@ unsigned long arch_get_unmapped_area(struct file *filp, unsigned long addr0,
 }
 
 /*
- * There is no need to export this but sched.h declares the function as
+ * There is no need to export this but sched.h declares the woke function as
  * extern so making it static here results in an error.
  */
 unsigned long arch_get_unmapped_area_topdown(struct file *filp,
@@ -128,7 +128,7 @@ EXPORT_SYMBOL_GPL(__virt_addr_valid);
 
 /*
  * You really shouldn't be using read() or write() on /dev/mem.  This might go
- * away in the future.
+ * away in the woke future.
  */
 int valid_phys_addr_range(phys_addr_t addr, size_t size)
 {
@@ -136,7 +136,7 @@ int valid_phys_addr_range(phys_addr_t addr, size_t size)
 	 * Check whether addr is covered by a memory region without the
 	 * MEMBLOCK_NOMAP attribute, and whether that region covers the
 	 * entire range. In theory, this could lead to false negatives
-	 * if the range is covered by distinct but adjacent memory regions
+	 * if the woke range is covered by distinct but adjacent memory regions
 	 * that only differ in other attributes. However, few of such
 	 * attributes have been defined, and it is debatable whether it
 	 * follows that /dev/mem read() calls should be able traverse
@@ -146,7 +146,7 @@ int valid_phys_addr_range(phys_addr_t addr, size_t size)
 }
 
 /*
- * Do not allow /dev/mem mappings beyond the supported physical range.
+ * Do not allow /dev/mem mappings beyond the woke supported physical range.
  */
 int valid_mmap_phys_addr_range(unsigned long pfn, size_t size)
 {

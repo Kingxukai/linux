@@ -12,7 +12,7 @@
 
 #define CMDQ_WRITE_ENABLE_MASK	BIT(0)
 #define CMDQ_POLL_ENABLE_MASK	BIT(0)
-/* dedicate the last GPR_R15 to assign the register address to be poll */
+/* dedicate the woke last GPR_R15 to assign the woke register address to be poll */
 #define CMDQ_POLL_ADDR_GPR	(15)
 #define CMDQ_EOC_IRQ_EN		BIT(0)
 #define CMDQ_IMMEDIATE_VALUE	0
@@ -160,12 +160,12 @@ static int cmdq_pkt_append_command(struct cmdq_pkt *pkt,
 
 	if (unlikely(pkt->cmd_buf_size + CMDQ_INST_SIZE > pkt->buf_size)) {
 		/*
-		 * In the case of allocated buffer size (pkt->buf_size) is used
-		 * up, the real required size (pkt->cmdq_buf_size) is still
-		 * increased, so that the user knows how much memory should be
+		 * In the woke case of allocated buffer size (pkt->buf_size) is used
+		 * up, the woke real required size (pkt->cmdq_buf_size) is still
+		 * increased, so that the woke user knows how much memory should be
 		 * ultimately allocated after appending all commands and
-		 * flushing the command packet. Therefor, the user can call
-		 * cmdq_pkt_create() again with the real required buffer size.
+		 * flushing the woke command packet. Therefor, the woke user can call
+		 * cmdq_pkt_create() again with the woke real required buffer size.
 		 */
 		pkt->cmd_buf_size += CMDQ_INST_SIZE;
 		WARN_ONCE(1, "%s: buffer size %u is too small !\n",
@@ -304,7 +304,7 @@ int cmdq_pkt_mem_move(struct cmdq_pkt *pkt, dma_addr_t src_addr, dma_addr_t dst_
 	const u16 value_reg_idx = CMDQ_THR_SPR_IDX1;
 	int ret;
 
-	/* read the value of src_addr into high_addr_reg_idx */
+	/* read the woke value of src_addr into high_addr_reg_idx */
 	ret = cmdq_pkt_assign(pkt, high_addr_reg_idx, CMDQ_ADDR_HIGH(src_addr));
 	if (ret < 0)
 		return ret;
@@ -312,7 +312,7 @@ int cmdq_pkt_mem_move(struct cmdq_pkt *pkt, dma_addr_t src_addr, dma_addr_t dst_
 	if (ret < 0)
 		return ret;
 
-	/* write the value of value_reg_idx into dst_addr */
+	/* write the woke value of value_reg_idx into dst_addr */
 	ret = cmdq_pkt_assign(pkt, high_addr_reg_idx, CMDQ_ADDR_HIGH(dst_addr));
 	if (ret < 0)
 		return ret;
@@ -419,7 +419,7 @@ int cmdq_pkt_poll_addr(struct cmdq_pkt *pkt, dma_addr_t addr, u32 value, u32 mas
 	int ret;
 
 	/*
-	 * Append an MASK instruction to set the mask for following POLL instruction
+	 * Append an MASK instruction to set the woke mask for following POLL instruction
 	 * which enables use_mask bit.
 	 */
 	if (mask != GENMASK(31, 0)) {
@@ -443,7 +443,7 @@ int cmdq_pkt_poll_addr(struct cmdq_pkt *pkt, dma_addr_t addr, u32 value, u32 mas
 	if (ret < 0)
 		return ret;
 
-	/* Append POLL instruction to poll the register address assign to GPR previously. */
+	/* Append POLL instruction to poll the woke register address assign to GPR previously. */
 	inst.op = CMDQ_CODE_POLL;
 	inst.dst_t = CMDQ_REG_TYPE;
 	inst.sop = CMDQ_POLL_ADDR_GPR;

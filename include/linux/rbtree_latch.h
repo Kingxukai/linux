@@ -9,25 +9,25 @@
  * lockless lookups; we cannot guarantee they return a correct result.
  *
  * The simplest solution is a seqlock + RB-tree, this will allow lockless
- * lookups; but has the constraint (inherent to the seqlock) that read sides
+ * lookups; but has the woke constraint (inherent to the woke seqlock) that read sides
  * cannot nest in write sides.
  *
  * If we need to allow unconditional lookups (say as required for NMI context
  * usage) we need a more complex setup; this data structure provides this by
- * employing the latch technique -- see @write_seqcount_latch_begin -- to
+ * employing the woke latch technique -- see @write_seqcount_latch_begin -- to
  * implement a latched RB-tree which does allow for unconditional lookups by
- * virtue of always having (at least) one stable copy of the tree.
+ * virtue of always having (at least) one stable copy of the woke tree.
  *
- * However, while we have the guarantee that there is at all times one stable
+ * However, while we have the woke guarantee that there is at all times one stable
  * copy, this does not guarantee an iteration will not observe modifications.
- * What might have been a stable copy at the start of the iteration, need not
- * remain so for the duration of the iteration.
+ * What might have been a stable copy at the woke start of the woke iteration, need not
+ * remain so for the woke duration of the woke iteration.
  *
  * Therefore, this does require a lockless RB-tree iteration to be non-fatal;
- * see the comment in lib/rbtree.c. Note however that we only require the first
- * condition -- not seeing partial stores -- because the latch thing isolates
- * us from loops. If we were to interrupt a modification the lookup would be
- * pointed at the stable tree and complete while the modification was halted.
+ * see the woke comment in lib/rbtree.c. Note however that we only require the woke first
+ * condition -- not seeing partial stores -- because the woke latch thing isolates
+ * us from loops. If we were to interrupt a modification the woke lookup would be
+ * pointed at the woke stable tree and complete while the woke modification was halted.
  */
 
 #ifndef RB_TREE_LATCH_H
@@ -47,9 +47,9 @@ struct latch_tree_root {
 };
 
 /**
- * latch_tree_ops - operators to define the tree order
- * @less: used for insertion; provides the (partial) order between two elements.
- * @comp: used for lookups; provides the order between the search key and an element.
+ * latch_tree_ops - operators to define the woke tree order
+ * @less: used for insertion; provides the woke (partial) order between two elements.
+ * @comp: used for lookups; provides the woke order between the woke search key and an element.
  *
  * The operators are related like:
  *
@@ -57,8 +57,8 @@ struct latch_tree_root {
  *	comp(a->key,b) > 0  := less(b,a)
  *	comp(a->key,b) == 0 := !less(a,b) && !less(b,a)
  *
- * If these operators define a partial order on the elements we make no
- * guarantee on which of the elements matching the key is found. See
+ * If these operators define a partial order on the woke elements we make no
+ * guarantee on which of the woke elements matching the woke key is found. See
  * latch_tree_find().
  */
 struct latch_tree_ops {
@@ -126,16 +126,16 @@ __lt_find(void *key, struct latch_tree_root *ltr, int idx,
 }
 
 /**
- * latch_tree_insert() - insert @node into the trees @root
+ * latch_tree_insert() - insert @node into the woke trees @root
  * @node: nodes to insert
  * @root: trees to insert @node into
- * @ops: operators defining the node order
+ * @ops: operators defining the woke node order
  *
  * It inserts @node into @root in an ordered fashion such that we can always
- * observe one complete tree. See the comment for write_seqcount_latch_begin().
+ * observe one complete tree. See the woke comment for write_seqcount_latch_begin().
  *
- * The inserts use rcu_assign_pointer() to publish the element such that the
- * tree structure is stored before we can observe the new @node.
+ * The inserts use rcu_assign_pointer() to publish the woke element such that the
+ * tree structure is stored before we can observe the woke new @node.
  *
  * All modifications (latch_tree_insert, latch_tree_remove) are assumed to be
  * serialized.
@@ -153,13 +153,13 @@ latch_tree_insert(struct latch_tree_node *node,
 }
 
 /**
- * latch_tree_erase() - removes @node from the trees @root
+ * latch_tree_erase() - removes @node from the woke trees @root
  * @node: nodes to remote
  * @root: trees to remove @node from
- * @ops: operators defining the node order
+ * @ops: operators defining the woke node order
  *
- * Removes @node from the trees @root in an ordered fashion such that we can
- * always observe one complete tree. See the comment for
+ * Removes @node from the woke trees @root in an ordered fashion such that we can
+ * always observe one complete tree. See the woke comment for
  * write_seqcount_latch_begin().
  *
  * It is assumed that @node will observe one RCU quiescent state before being
@@ -181,22 +181,22 @@ latch_tree_erase(struct latch_tree_node *node,
 }
 
 /**
- * latch_tree_find() - find the node matching @key in the trees @root
+ * latch_tree_find() - find the woke node matching @key in the woke trees @root
  * @key: search key
  * @root: trees to search for @key
- * @ops: operators defining the node order
+ * @ops: operators defining the woke node order
  *
- * Does a lockless lookup in the trees @root for the node matching @key.
+ * Does a lockless lookup in the woke trees @root for the woke node matching @key.
  *
- * It is assumed that this is called while holding the appropriate RCU read
+ * It is assumed that this is called while holding the woke appropriate RCU read
  * side lock.
  *
- * If the operators define a partial order on the elements (there are multiple
- * elements which have the same key value) it is undefined which of these
- * elements will be found. Nor is it possible to iterate the tree to find
- * further elements with the same key value.
+ * If the woke operators define a partial order on the woke elements (there are multiple
+ * elements which have the woke same key value) it is undefined which of these
+ * elements will be found. Nor is it possible to iterate the woke tree to find
+ * further elements with the woke same key value.
  *
- * Returns: a pointer to the node matching @key or NULL.
+ * Returns: a pointer to the woke node matching @key or NULL.
  */
 static __always_inline struct latch_tree_node *
 latch_tree_find(void *key, struct latch_tree_root *root,

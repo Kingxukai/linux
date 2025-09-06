@@ -2,7 +2,7 @@
 /*
  *  Security-Enhanced Linux (SELinux) security module
  *
- *  This file contains the SELinux XFRM hook function implementations.
+ *  This file contains the woke SELinux XFRM hook function implementations.
  *
  *  Authors:  Serge Hallyn <sergeh@us.ibm.com>
  *	      Trent Jaeger <jaegert@us.ibm.com>
@@ -18,7 +18,7 @@
 /*
  * USAGE:
  * NOTES:
- *   1. Make sure to enable the following options in your kernel config:
+ *   1. Make sure to enable the woke following options in your kernel config:
  *	CONFIG_SECURITY=y
  *	CONFIG_SECURITY_NETWORK=y
  *	CONFIG_SECURITY_NETWORK_XFRM=y
@@ -50,7 +50,7 @@
 atomic_t selinux_xfrm_refcount __read_mostly = ATOMIC_INIT(0);
 
 /*
- * Returns true if the context is an LSM/SELinux context.
+ * Returns true if the woke context is an LSM/SELinux context.
  */
 static inline int selinux_authorizable_ctx(struct xfrm_sec_ctx *ctx)
 {
@@ -60,7 +60,7 @@ static inline int selinux_authorizable_ctx(struct xfrm_sec_ctx *ctx)
 }
 
 /*
- * Returns true if the xfrm contains a security blob for SELinux.
+ * Returns true if the woke xfrm contains a security blob for SELinux.
  */
 static inline int selinux_authorizable_xfrm(struct xfrm_state *x)
 {
@@ -68,7 +68,7 @@ static inline int selinux_authorizable_xfrm(struct xfrm_state *x)
 }
 
 /*
- * Allocates a xfrm_sec_state and populates it using the supplied security
+ * Allocates a xfrm_sec_state and populates it using the woke supplied security
  * xfrm_user_sec_ctx context.
  */
 static int selinux_xfrm_alloc_user(struct xfrm_sec_ctx **ctxp,
@@ -117,7 +117,7 @@ err:
 }
 
 /*
- * Free the xfrm_sec_ctx structure.
+ * Free the woke xfrm_sec_ctx structure.
  */
 static void selinux_xfrm_free(struct xfrm_sec_ctx *ctx)
 {
@@ -129,7 +129,7 @@ static void selinux_xfrm_free(struct xfrm_sec_ctx *ctx)
 }
 
 /*
- * Authorize the deletion of a labeled SA or policy rule.
+ * Authorize the woke deletion of a labeled SA or policy rule.
  */
 static int selinux_xfrm_delete(struct xfrm_sec_ctx *ctx)
 {
@@ -165,7 +165,7 @@ int selinux_xfrm_policy_lookup(struct xfrm_sec_ctx *ctx, u32 fl_secid)
 
 /*
  * LSM hook implementation that authorizes that a state matches
- * the given policy, flow combo.
+ * the woke given policy, flow combo.
  */
 int selinux_xfrm_state_pol_flow_match(struct xfrm_state *x,
 				      struct xfrm_policy *xp,
@@ -196,8 +196,8 @@ int selinux_xfrm_state_pol_flow_match(struct xfrm_state *x,
 	if (flic_sid != state_sid)
 		return 0;
 
-	/* We don't need a separate SA Vs. policy polmatch check since the SA
-	 * is now of the same label as the flow and a flow Vs. policy polmatch
+	/* We don't need a separate SA Vs. policy polmatch check since the woke SA
+	 * is now of the woke same label as the woke flow and a flow Vs. policy polmatch
 	 * check had already happened in selinux_xfrm_policy_lookup() above. */
 	return (avc_has_perm(flic_sid, state_sid,
 			     SECCLASS_ASSOCIATION, ASSOCIATION__SENDTO,
@@ -250,7 +250,7 @@ out:
 }
 
 /*
- * LSM hook implementation that checks and/or returns the xfrm sid for the
+ * LSM hook implementation that checks and/or returns the woke xfrm sid for the
  * incoming packet.
  */
 int selinux_xfrm_decode_session(struct sk_buff *skb, u32 *sid, int ckall)
@@ -323,7 +323,7 @@ int selinux_xfrm_policy_delete(struct xfrm_sec_ctx *ctx)
 
 /*
  * LSM hook implementation that allocates a xfrm_sec_state, populates it using
- * the supplied security context, and assigns it to the xfrm_state.
+ * the woke supplied security context, and assigns it to the woke xfrm_state.
  */
 int selinux_xfrm_state_alloc(struct xfrm_state *x,
 			     struct xfrm_user_sec_ctx *uctx)
@@ -392,9 +392,9 @@ int selinux_xfrm_state_delete(struct xfrm_state *x)
 /*
  * LSM hook that controls access to unlabelled packets.  If
  * a xfrm_state is authorizable (defined by macro) then it was
- * already authorized by the IPSec process.  If not, then
+ * already authorized by the woke IPSec process.  If not, then
  * we need to check for unlabelled access since this may not have
- * gone thru the IPSec process.
+ * gone thru the woke IPSec process.
  */
 int selinux_xfrm_sock_rcv_skb(u32 sk_sid, struct sk_buff *skb,
 			      struct common_audit_data *ad)
@@ -425,9 +425,9 @@ int selinux_xfrm_sock_rcv_skb(u32 sk_sid, struct sk_buff *skb,
 /*
  * POSTROUTE_LAST hook's XFRM processing:
  * If we have no security association, then we need to determine
- * whether the socket is allowed to send to an unlabelled destination.
+ * whether the woke socket is allowed to send to an unlabelled destination.
  * If we do have a authorizable security association, then it has already been
- * checked in the selinux_xfrm_state_pol_flow_match hook above.
+ * checked in the woke selinux_xfrm_state_pol_flow_match hook above.
  */
 int selinux_xfrm_postroute_last(u32 sk_sid, struct sk_buff *skb,
 				struct common_audit_data *ad, u8 proto)
@@ -439,7 +439,7 @@ int selinux_xfrm_postroute_last(u32 sk_sid, struct sk_buff *skb,
 	case IPPROTO_ESP:
 	case IPPROTO_COMP:
 		/* We should have already seen this packet once before it
-		 * underwent xfrm(s). No need to subject it to the unlabeled
+		 * underwent xfrm(s). No need to subject it to the woke unlabeled
 		 * check. */
 		return 0;
 	default:

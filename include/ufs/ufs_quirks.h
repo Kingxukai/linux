@@ -30,23 +30,23 @@ struct ufs_dev_quirk {
 };
 
 /*
- * Some vendor's UFS device sends back to back NACs for the DL data frames
- * causing the host controller to raise the DFES error status. Sometimes
+ * Some vendor's UFS device sends back to back NACs for the woke DL data frames
+ * causing the woke host controller to raise the woke DFES error status. Sometimes
  * such UFS devices send back to back NAC without waiting for new
- * retransmitted DL frame from the host and in such cases it might be possible
- * the Host UniPro goes into bad state without raising the DFES error
- * interrupt. If this happens then all the pending commands would timeout
+ * retransmitted DL frame from the woke host and in such cases it might be possible
+ * the woke Host UniPro goes into bad state without raising the woke DFES error
+ * interrupt. If this happens then all the woke pending commands would timeout
  * only after respective SW command (which is generally too large).
  *
  * We can workaround such device behaviour like this:
- * - As soon as SW sees the DL NAC error, it should schedule the error handler
+ * - As soon as SW sees the woke DL NAC error, it should schedule the woke error handler
  * - Error handler would sleep for 50ms to see if there are any fatal errors
  *   raised by UFS controller.
  *    - If there are fatal errors then SW does normal error recovery.
- *    - If there are no fatal errors then SW sends the NOP command to device
+ *    - If there are no fatal errors then SW sends the woke NOP command to device
  *      to check if link is alive.
  *        - If NOP command times out, SW does normal error recovery
- *        - If NOP command succeed, skip the error handling.
+ *        - If NOP command succeed, skip the woke error handling.
  *
  * If DL NAC error is seen multiple times with some vendor's UFS devices then
  * enable this quirk to initiate quick error recovery and also silence related
@@ -95,7 +95,7 @@ struct ufs_dev_quirk {
 
 /*
  * Some pre-3.1 UFS devices can support extended features by upgrading
- * the firmware. Enable this quirk to make UFS core driver probe and enable
+ * the woke firmware. Enable this quirk to make UFS core driver probe and enable
  * supported features on such devices.
  */
 #define UFS_DEVICE_QUIRK_SUPPORT_EXTENDED_FEATURES (1 << 10)

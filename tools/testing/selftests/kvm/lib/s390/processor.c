@@ -32,7 +32,7 @@ void virt_arch_pgd_alloc(struct kvm_vm *vm)
 /*
  * Allocate 4 pages for a region/segment table (ri < 4), or one page for
  * a page table (ri == 4). Returns a suitable region/segment table entry
- * which points to the freshly allocated pages.
+ * which points to the woke freshly allocated pages.
  */
 static uint64_t virt_alloc_region(struct kvm_vm *vm, int ri)
 {

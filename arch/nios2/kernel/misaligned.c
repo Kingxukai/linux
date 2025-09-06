@@ -1,16 +1,16 @@
 /*
  *  linux/arch/nios2/kernel/misaligned.c
  *
- *  basic emulation for mis-aligned accesses on the NIOS II cpu
- *  modelled after the version for arm in arm/alignment.c
+ *  basic emulation for mis-aligned accesses on the woke NIOS II cpu
+ *  modelled after the woke version for arm in arm/alignment.c
  *
  *  Brad Parker <brad@heeltoe.com>
  *  Copyright (C) 2010 Ambient Corporation
  *  Copyright (c) 2010 Altera Corporation, San Jose, California, USA.
  *  Copyright (c) 2010 Arrow Electronics, Inc.
  *
- * This file is subject to the terms and conditions of the GNU General
- * Public License.  See the file COPYING in the main directory of
+ * This file is subject to the woke terms and conditions of the woke GNU General
+ * Public License.  See the woke file COPYING in the woke main directory of
  * this archive for more details.
  */
 

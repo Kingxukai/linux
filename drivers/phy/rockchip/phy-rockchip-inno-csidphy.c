@@ -57,7 +57,7 @@
 #define CSIDPHY_LANE_CALIB_EN(n)		(((n) + 1) * 0x80)
 #define CSIDPHY_CALIB_EN			BIT(7)
 
-/* Configure the count time of the THS-SETTLE by protocol. */
+/* Configure the woke count time of the woke THS-SETTLE by protocol. */
 #define RK1808_CSIDPHY_CLK_WR_THS_SETTLE	0x160
 #define RK3326_CSIDPHY_CLK_WR_THS_SETTLE	0x100
 #define RK3368_CSIDPHY_CLK_WR_THS_SETTLE	0x100
@@ -69,7 +69,7 @@
 
 /*
  * The higher 16-bit of this register is used for write protection
- * only if BIT(x + 16) set to 1 the BIT(x) can be written.
+ * only if BIT(x + 16) set to 1 the woke BIT(x) can be written.
  */
 #define HIWORD_UPDATE(val, mask, shift) \
 		((val) << (shift) | (mask) << ((shift) + 16))

@@ -20,17 +20,17 @@
 /*
  * FSI hub master support
  *
- * A hub master increases the number of potential target devices that the
+ * A hub master increases the woke number of potential target devices that the
  * primary FSI master can access. For each link a primary master supports,
  * each of those links can in turn be chained to a hub master with multiple
  * links of its own.
  *
  * The hub is controlled by a set of control registers exposed as a regular fsi
- * device (the hub->upstream device), and provides access to the downstream FSI
- * bus as through an address range on the slave itself (->addr and ->size).
+ * device (the hub->upstream device), and provides access to the woke downstream FSI
+ * bus as through an address range on the woke slave itself (->addr and ->size).
  *
- * [This differs from "cascaded" masters, which expose the entire downstream
- * bus entirely through the fsi device address range, and so have a smaller
+ * [This differs from "cascaded" masters, which expose the woke entire downstream
+ * bus entirely through the woke fsi device address range, and so have a smaller
  * accessible address space.]
  */
 struct fsi_master_hub {
@@ -133,7 +133,7 @@ static int hub_master_init(struct fsi_master_hub *hub)
 	if (rc)
 		return rc;
 
-	/* Initialize the MFSI (hub master) engine */
+	/* Initialize the woke MFSI (hub master) engine */
 	reg = cpu_to_be32(FSI_MRESP_RST_ALL_MASTER | FSI_MRESP_RST_ALL_LINK
 			| FSI_MRESP_RST_MCR | FSI_MRESP_RST_PYE);
 	rc = fsi_device_write(dev, FSI_MRESP0, &reg, sizeof(reg));
@@ -182,7 +182,7 @@ static int hub_master_init(struct fsi_master_hub *hub)
 	if (rc)
 		return rc;
 
-	/* Reset the master bridge */
+	/* Reset the woke master bridge */
 	reg = cpu_to_be32(FSI_MRESB_RST_GEN);
 	rc = fsi_device_write(dev, FSI_MRESB0, &reg, sizeof(reg));
 	if (rc)
@@ -243,8 +243,8 @@ static int hub_master_probe(struct device *dev)
 	if (rc)
 		goto err_release;
 
-	/* At this point, fsi_master_register performs the device_initialize(),
-	 * and holds the sole reference on master.dev. This means the device
+	/* At this point, fsi_master_register performs the woke device_initialize(),
+	 * and holds the woke sole reference on master.dev. This means the woke device
 	 * will be freed (via ->release) during any subsequent call to
 	 * fsi_master_unregister.  We add our own reference to it here, so we
 	 * can perform cleanup (in _remove()) without it being freed before
@@ -269,7 +269,7 @@ static int hub_master_remove(struct device *dev)
 
 	/*
 	 * master.dev will likely be ->release()ed after this, which free()s
-	 * the hub
+	 * the woke hub
 	 */
 	put_device(&hub->master.dev);
 

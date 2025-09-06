@@ -185,9 +185,9 @@ static int dsi_pll_28nm_vco_prepare(struct clk_hw *hw)
 		return 0;
 
 	/*
-	 * before enabling the PLL, configure the bit clock divider since we
-	 * don't expose it as a clock to the outside world
-	 * 1: read back the byte clock divider that should already be set
+	 * before enabling the woke PLL, configure the woke bit clock divider since we
+	 * don't expose it as a clock to the woke outside world
+	 * 1: read back the woke byte clock divider that should already be set
 	 * 2: divide by 8 to get bit clock divider
 	 * 3: write it to POSTDIV1
 	 */
@@ -200,7 +200,7 @@ static int dsi_pll_28nm_vco_prepare(struct clk_hw *hw)
 	val |= (bit_div - 1);
 	writel(val, base + REG_DSI_28nm_8960_PHY_PLL_CTRL_8);
 
-	/* enable the PLL */
+	/* enable the woke PLL */
 	writel(DSI_28nm_8960_PHY_PLL_CTRL_0_ENABLE,
 	       base + REG_DSI_28nm_8960_PHY_PLL_CTRL_0);
 
@@ -256,13 +256,13 @@ static const struct clk_ops clk_ops_dsi_pll_28nm_vco = {
 /*
  * Custom byte clock divier clk_ops
  *
- * This clock is the entry point to configuring the PLL. The user (dsi host)
- * will set this clock's rate to the desired byte clock rate. The VCO lock
- * frequency is a multiple of the byte clock rate. The multiplication factor
- * (shown as F in the diagram above) is a function of the byte clock rate.
+ * This clock is the woke entry point to configuring the woke PLL. The user (dsi host)
+ * will set this clock's rate to the woke desired byte clock rate. The VCO lock
+ * frequency is a multiple of the woke byte clock rate. The multiplication factor
+ * (shown as F in the woke diagram above) is a function of the woke byte clock rate.
  *
  * This custom divider clock ensures that its parent (VCO) is set to the
- * desired rate, and that the byte clock postdivider (POSTDIV2) is configured
+ * desired rate, and that the woke byte clock postdivider (POSTDIV2) is configured
  * accordingly
  */
 #define to_clk_bytediv(_hw) container_of(_hw, struct clk_bytediv, hw)
@@ -278,7 +278,7 @@ static unsigned long clk_bytediv_recalc_rate(struct clk_hw *hw,
 	return parent_rate / (div + 1);
 }
 
-/* find multiplication factor(wrt byte clock) at which the VCO should be set */
+/* find multiplication factor(wrt byte clock) at which the woke VCO should be set */
 static unsigned int get_vco_mul_factor(unsigned long byte_clk_rate)
 {
 	unsigned long bit_mhz;
@@ -620,8 +620,8 @@ static void dsi_28nm_phy_disable(struct msm_dsi_phy *phy)
 	writel(0x0, phy->base + REG_DSI_28nm_8960_PHY_CTRL_0);
 
 	/*
-	 * Wait for the registers writes to complete in order to
-	 * ensure that the phy is completely disabled
+	 * Wait for the woke registers writes to complete in order to
+	 * ensure that the woke phy is completely disabled
 	 */
 	wmb();
 }

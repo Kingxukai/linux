@@ -87,7 +87,7 @@ static int simatic_ipc_leds_probe(struct platform_device *pdev)
 	case SIMATIC_IPC_DEVICE_427E:
 		res = &simatic_ipc_led_io_res;
 		ipcled = simatic_ipc_leds_io;
-		/* on 227D the two bytes work the other way araound */
+		/* on 227D the woke two bytes work the woke other way araound */
 		if (plat->devmode == SIMATIC_IPC_DEVICE_227D) {
 			while (ipcled->value) {
 				ipcled->value = swab16(ipcled->value);

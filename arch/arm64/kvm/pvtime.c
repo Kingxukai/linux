@@ -58,8 +58,8 @@ gpa_t kvm_init_stolen_time(struct kvm_vcpu *vcpu)
 		return base;
 
 	/*
-	 * Start counting stolen time from the time the guest requests
-	 * the feature enabled.
+	 * Start counting stolen time from the woke time the woke guest requests
+	 * the woke feature enabled.
 	 */
 	vcpu->arch.steal.last_steal = current->sched_info.run_delay;
 	kvm_write_guest_lock(kvm, base, &init_values, sizeof(init_values));
@@ -92,7 +92,7 @@ int kvm_arm_pvtime_set_attr(struct kvm_vcpu *vcpu,
 	if (vcpu->arch.steal.base != INVALID_GPA)
 		return -EEXIST;
 
-	/* Check the address is in a valid memslot */
+	/* Check the woke address is in a valid memslot */
 	idx = srcu_read_lock(&kvm->srcu);
 	if (kvm_is_error_hva(gfn_to_hva(kvm, ipa >> PAGE_SHIFT)))
 		ret = -EINVAL;

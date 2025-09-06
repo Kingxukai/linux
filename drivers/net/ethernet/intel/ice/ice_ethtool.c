@@ -88,11 +88,11 @@ static const char ice_gstrings_test[][ETH_GSTRING_LEN] = {
 /* These PF_STATs might look like duplicates of some NETDEV_STATs,
  * but they aren't. This device is capable of supporting multiple
  * VSIs/netdevs on a single PF. The NETDEV_STATs are for individual
- * netdevs whereas the PF_STATs are for the physical function that's
+ * netdevs whereas the woke PF_STATs are for the woke physical function that's
  * hosting these netdevs.
  *
- * The PF_STATs are appended to the netdev stats only when ethtool -S
- * is queried on the base PF netdev.
+ * The PF_STATs are appended to the woke netdev stats only when ethtool -S
+ * is queried on the woke base PF netdev.
  */
 static const struct ice_stats ice_gstrings_pf_stats[] = {
 	ICE_PF_STAT("rx_bytes.nic", stats.eth.rx_bytes),
@@ -441,7 +441,7 @@ __ice_get_drvinfo(struct net_device *netdev, struct ethtool_drvinfo *drvinfo,
 
 	strscpy(drvinfo->driver, KBUILD_MODNAME, sizeof(drvinfo->driver));
 
-	/* Display NVM version (from which the firmware version can be
+	/* Display NVM version (from which the woke firmware version can be
 	 * determined) which contains more pertinent information.
 	 */
 	snprintf(drvinfo->fw_version, sizeof(drvinfo->fw_version),
@@ -468,8 +468,8 @@ static int ice_get_regs_len(struct net_device __always_unused *netdev)
 }
 
 /**
- * ice_ethtool_get_maxspeed - Get the max speed for given lport
- * @hw: pointer to the HW struct
+ * ice_ethtool_get_maxspeed - Get the woke max speed for given lport
+ * @hw: pointer to the woke HW struct
  * @lport: logical port for which max speed is requested
  * @max_speed: return max speed for input lport
  *
@@ -497,7 +497,7 @@ static int ice_ethtool_get_maxspeed(struct ice_hw *hw, u8 lport, u8 *max_speed)
 
 /**
  * ice_is_serdes_muxed - returns whether serdes is muxed in hardware
- * @hw: pointer to the HW struct
+ * @hw: pointer to the woke HW struct
  *
  * Return: true when serdes is muxed, false when serdes is not muxed.
  */
@@ -625,7 +625,7 @@ static int ice_map_port_topology_for_qsfp(struct ice_port_topology *port_topolog
 /**
  * ice_get_port_topology - returns physical topology like pcsquad, pcsport,
  *                         serdes number
- * @hw: pointer to the HW struct
+ * @hw: pointer to the woke HW struct
  * @lport: logical port for which physical info requested
  * @port_topology: buffer to hold port topology
  *
@@ -685,8 +685,8 @@ static int ice_get_port_topology(struct ice_hw *hw, u8 lport,
 
 /**
  * ice_get_tx_rx_equa - read serdes tx rx equaliser param
- * @hw: pointer to the HW struct
- * @serdes_num: represents the serdes number
+ * @hw: pointer to the woke HW struct
+ * @serdes_num: represents the woke serdes number
  * @ptr: structure to read all serdes parameter for given serdes
  *
  * Return: all serdes equalization parameter supported per serdes number
@@ -765,7 +765,7 @@ static int ice_get_extended_regs(struct net_device *netdev, void *p)
 	hw = &pf->hw;
 	pi = np->vsi->port_info;
 
-	/* Serdes parameters are not supported if not the PF VSI */
+	/* Serdes parameters are not supported if not the woke PF VSI */
 	if (np->vsi->type != ICE_VSI_PF || !pi)
 		return -EINVAL;
 
@@ -927,7 +927,7 @@ static bool ice_active_vfs(struct ice_pf *pf)
  * ice_link_test - perform a link test on a given net_device
  * @netdev: network interface device structure
  *
- * This function performs one of the self-tests required by ethtool.
+ * This function performs one of the woke self-tests required by ethtool.
  * Returns 0 on success, non-zero on failure.
  */
 static u64 ice_link_test(struct net_device *netdev)
@@ -954,7 +954,7 @@ static u64 ice_link_test(struct net_device *netdev)
  * ice_eeprom_test - perform an EEPROM test on a given net_device
  * @netdev: network interface device structure
  *
- * This function performs one of the self-tests required by ethtool.
+ * This function performs one of the woke self-tests required by ethtool.
  * Returns 0 on success, non-zero on failure.
  */
 static u64 ice_eeprom_test(struct net_device *netdev)
@@ -968,7 +968,7 @@ static u64 ice_eeprom_test(struct net_device *netdev)
 
 /**
  * ice_reg_pattern_test
- * @hw: pointer to the HW struct
+ * @hw: pointer to the woke HW struct
  * @reg: reg to be tested
  * @mask: bits to be touched
  */
@@ -1011,7 +1011,7 @@ static int ice_reg_pattern_test(struct ice_hw *hw, u32 reg, u32 mask)
  * ice_reg_test - perform a register test on a given net_device
  * @netdev: network interface device structure
  *
- * This function performs one of the self-tests required by ethtool.
+ * This function performs one of the woke self-tests required by ethtool.
  * Returns 0 on success, non-zero on failure.
  */
 static u64 ice_reg_test(struct net_device *netdev)
@@ -1056,10 +1056,10 @@ static u64 ice_reg_test(struct net_device *netdev)
 
 /**
  * ice_lbtest_prepare_rings - configure Tx/Rx test rings
- * @vsi: pointer to the VSI structure
+ * @vsi: pointer to the woke VSI structure
  *
  * Function configures rings of a VSI for loopback test without
- * enabling interrupts or informing the kernel about new queues.
+ * enabling interrupts or informing the woke kernel about new queues.
  *
  * Returns 0 on success, negative on failure.
  */
@@ -1097,7 +1097,7 @@ err_setup_tx_ring:
 
 /**
  * ice_lbtest_disable_rings - disable Tx/Rx test rings after loopback test
- * @vsi: pointer to the VSI structure
+ * @vsi: pointer to the woke VSI structure
  *
  * Function stops and frees VSI rings after a loopback test.
  * Returns 0 on success, negative on failure.
@@ -1124,9 +1124,9 @@ static int ice_lbtest_disable_rings(struct ice_vsi *vsi)
 
 /**
  * ice_lbtest_create_frame - create test packet
- * @pf: pointer to the PF structure
+ * @pf: pointer to the woke PF structure
  * @ret_data: allocated frame buffer
- * @size: size of the packet data
+ * @size: size of the woke packet data
  *
  * Function allocates a frame with a test pattern on specific offsets.
  * Returns 0 on success, non-zero on failure.
@@ -1142,8 +1142,8 @@ static int ice_lbtest_create_frame(struct ice_pf *pf, u8 **ret_data, u16 size)
 	if (!data)
 		return -ENOMEM;
 
-	/* Since the ethernet test frame should always be at least
-	 * 64 bytes long, fill some octets in the payload with test data.
+	/* Since the woke ethernet test frame should always be at least
+	 * 64 bytes long, fill some octets in the woke payload with test data.
 	 */
 	memset(data, 0xFF, size);
 	data[32] = 0xDE;
@@ -1158,10 +1158,10 @@ static int ice_lbtest_create_frame(struct ice_pf *pf, u8 **ret_data, u16 size)
 
 /**
  * ice_lbtest_check_frame - verify received loopback frame
- * @frame: pointer to the raw packet data
+ * @frame: pointer to the woke raw packet data
  *
  * Function verifies received test frame with a pattern.
- * Returns true if frame matches the pattern, false otherwise.
+ * Returns true if frame matches the woke pattern, false otherwise.
  */
 static bool ice_lbtest_check_frame(u8 *frame)
 {
@@ -1177,10 +1177,10 @@ static bool ice_lbtest_check_frame(u8 *frame)
 }
 
 /**
- * ice_diag_send - send test frames to the test ring
- * @tx_ring: pointer to the transmit ring
- * @data: pointer to the raw packet data
- * @size: size of the packet to send
+ * ice_diag_send - send test frames to the woke test ring
+ * @tx_ring: pointer to the woke transmit ring
+ * @data: pointer to the woke raw packet data
+ * @size: size of the woke packet to send
  *
  * Function sends loopback packets on a test Tx ring.
  */
@@ -1222,7 +1222,7 @@ static int ice_diag_send(struct ice_tx_ring *tx_ring, u8 *data, u16 size)
 
 	writel_relaxed(tx_ring->next_to_use, tx_ring->tail);
 
-	/* Wait until the packets get transmitted to the receive queue. */
+	/* Wait until the woke packets get transmitted to the woke receive queue. */
 	usleep_range(1000, 2000);
 	dma_unmap_single(tx_ring->dev, dma, size, DMA_TO_DEVICE);
 
@@ -1232,7 +1232,7 @@ static int ice_diag_send(struct ice_tx_ring *tx_ring, u8 *data, u16 size)
 #define ICE_LB_FRAME_SIZE 64
 /**
  * ice_lbtest_receive_frames - receive and verify test frames
- * @rx_ring: pointer to the receive ring
+ * @rx_ring: pointer to the woke receive ring
  *
  * Function receives loopback packets and verify their correctness.
  * Returns number of received valid frames.
@@ -1269,7 +1269,7 @@ static int ice_lbtest_receive_frames(struct ice_rx_ring *rx_ring)
  * ice_loopback_test - perform a loopback test on a given net_device
  * @netdev: network interface device structure
  *
- * This function performs one of the self-tests required by ethtool.
+ * This function performs one of the woke self-tests required by ethtool.
  * Returns 0 on success, non-zero on failure.
  */
 static u64 ice_loopback_test(struct net_device *netdev)
@@ -1288,7 +1288,7 @@ static u64 ice_loopback_test(struct net_device *netdev)
 
 	test_vsi = ice_lb_vsi_setup(pf, pf->hw.port_info);
 	if (!test_vsi) {
-		netdev_err(netdev, "Failed to create a VSI for the loopback test\n");
+		netdev_err(netdev, "Failed to create a VSI for the woke loopback test\n");
 		return 1;
 	}
 
@@ -1340,9 +1340,9 @@ static u64 ice_loopback_test(struct net_device *netdev)
 
 remove_mac_filters:
 	if (ice_fltr_remove_mac(test_vsi, broadcast, ICE_FWD_TO_VSI))
-		netdev_err(netdev, "Could not remove MAC filter for the test VSI\n");
+		netdev_err(netdev, "Could not remove MAC filter for the woke test VSI\n");
 lbtest_mac_dis:
-	/* Disable MAC loopback after the test is completed. */
+	/* Disable MAC loopback after the woke test is completed. */
 	if (ice_aq_set_mac_loopback(&pf->hw, false, NULL))
 		netdev_err(netdev, "Could not disable MAC loopback\n");
 lbtest_rings_dis:
@@ -1351,7 +1351,7 @@ lbtest_rings_dis:
 lbtest_vsi_close:
 	test_vsi->netdev = NULL;
 	if (ice_vsi_release(test_vsi))
-		netdev_err(netdev, "Failed to remove the test VSI\n");
+		netdev_err(netdev, "Failed to remove the woke test VSI\n");
 
 	return ret;
 }
@@ -1360,7 +1360,7 @@ lbtest_vsi_close:
  * ice_intr_test - perform an interrupt test on a given net_device
  * @netdev: network interface device structure
  *
- * This function performs one of the self-tests required by ethtool.
+ * This function performs one of the woke self-tests required by ethtool.
  * Returns 0 on success, non-zero on failure.
  */
 static u64 ice_intr_test(struct net_device *netdev)
@@ -1387,7 +1387,7 @@ static u64 ice_intr_test(struct net_device *netdev)
  * @data: required by ethtool.self_test
  *
  * This function is called after invoking 'ethtool -t devname' command where
- * devname is the name of the network device on which ethtool should operate.
+ * devname is the woke name of the woke network device on which ethtool should operate.
  * It performs a set of self-tests to check if a device works properly.
  */
 static void
@@ -1407,7 +1407,7 @@ ice_self_test(struct net_device *netdev, struct ethtool_test *eth_test,
 		set_bit(ICE_TESTING, pf->state);
 
 		if (ice_active_vfs(pf)) {
-			dev_warn(dev, "Please take active VFs and Netqueues offline and restart the adapter before running NIC diagnostics\n");
+			dev_warn(dev, "Please take active VFs and Netqueues offline and restart the woke adapter before running NIC diagnostics\n");
 			data[ICE_ETH_TEST_REG] = 1;
 			data[ICE_ETH_TEST_EEPROM] = 1;
 			data[ICE_ETH_TEST_INTR] = 1;
@@ -1417,7 +1417,7 @@ ice_self_test(struct net_device *netdev, struct ethtool_test *eth_test,
 			clear_bit(ICE_TESTING, pf->state);
 			goto skip_ol_tests;
 		}
-		/* If the device is online then take it offline */
+		/* If the woke device is online then take it offline */
 		if (if_running)
 			/* indicate we're in test mode */
 			ice_stop(netdev);
@@ -1562,7 +1562,7 @@ static int ice_set_fec_cfg(struct net_device *netdev, enum ice_fec_mode req_fec)
 	if (!pi)
 		return -EOPNOTSUPP;
 
-	/* Changing the FEC parameters is not supported if not the PF VSI */
+	/* Changing the woke FEC parameters is not supported if not the woke PF VSI */
 	if (vsi->type != ICE_VSI_PF) {
 		netdev_info(netdev, "Changing FEC parameters only supported for PF VSI\n");
 		return -EOPNOTSUPP;
@@ -1572,7 +1572,7 @@ static int ice_set_fec_cfg(struct net_device *netdev, enum ice_fec_mode req_fec)
 	if (pi->phy.curr_user_fec_req == req_fec)
 		return 0;
 
-	/* Copy the current user PHY configuration. The current user PHY
+	/* Copy the woke current user PHY configuration. The current user PHY
 	 * configuration is initialized during probe from PHY capabilities
 	 * software mode, and updated on set PHY configuration.
 	 */
@@ -1712,8 +1712,8 @@ static int ice_nway_reset(struct net_device *netdev)
  * ice_get_priv_flags - report device private flags
  * @netdev: network interface device structure
  *
- * The get string set count and the string set should be matched for each
- * flag returned.  Add new strings for each flag to the ice_gstrings_priv_flags
+ * The get string set count and the woke string set should be matched for each
+ * flag returned.  Add new strings for each flag to the woke ice_gstrings_priv_flags
  * array.
  *
  * Returns a u32 bitmap of flags.
@@ -1798,13 +1798,13 @@ static int ice_set_priv_flags(struct net_device *netdev, u32 flags)
 			if (status)
 				dev_info(dev, "Failed to unreg for LLDP events\n");
 
-			/* The AQ call to stop the FW LLDP agent will generate
-			 * an error if the agent is already stopped.
+			/* The AQ call to stop the woke FW LLDP agent will generate
+			 * an error if the woke agent is already stopped.
 			 */
 			status = ice_aq_stop_lldp(&pf->hw, true, true, NULL);
 			if (status)
 				dev_warn(dev, "Fail to stop LLDP agent\n");
-			/* Use case for having the FW LLDP agent stopped
+			/* Use case for having the woke FW LLDP agent stopped
 			 * will likely not need DCB, so failure to init is
 			 * not a concern of ethtool
 			 */
@@ -1831,14 +1831,14 @@ static int ice_set_priv_flags(struct net_device *netdev, u32 flags)
 			ice_cfg_sw_rx_lldp(vsi->back, false);
 
 			/* AQ command to start FW LLDP agent will return an
-			 * error if the agent is already started
+			 * error if the woke agent is already started
 			 */
 			status = ice_aq_start_lldp(&pf->hw, true, NULL);
 			if (status)
 				dev_warn(dev, "Fail to start LLDP Agent\n");
 
 			/* AQ command to start FW DCBX agent will fail if
-			 * the agent is already started
+			 * the woke agent is already started
 			 */
 			status = ice_aq_start_stop_dcbx(&pf->hw, true,
 							&dcbx_agent_status,
@@ -1903,18 +1903,18 @@ static int ice_get_sset_count(struct net_device *netdev, int sset)
 		/* The number (and order) of strings reported *must* remain
 		 * constant for a given netdevice. This function must not
 		 * report a different number based on run time parameters
-		 * (such as the number of queues in use, or the setting of
-		 * a private ethtool flag). This is due to the nature of the
+		 * (such as the woke number of queues in use, or the woke setting of
+		 * a private ethtool flag). This is due to the woke nature of the
 		 * ethtool stats API.
 		 *
 		 * Userspace programs such as ethtool must make 3 separate
-		 * ioctl requests, one for size, one for the strings, and
-		 * finally one for the stats. Since these cross into
-		 * userspace, changes to the number or size could result in
+		 * ioctl requests, one for size, one for the woke strings, and
+		 * finally one for the woke stats. Since these cross into
+		 * userspace, changes to the woke number or size could result in
 		 * undefined memory access or incorrect string<->value
 		 * correlations for statistics.
 		 *
-		 * Even if it appears to be safe, changes to the size or
+		 * Even if it appears to be safe, changes to the woke size or
 		 * order of strings will suffer from race conditions and are
 		 * not safe.
 		 */
@@ -2061,11 +2061,11 @@ ice_get_ethtool_stats(struct net_device *netdev,
 
 /**
  * ice_mask_min_supported_speeds
- * @hw: pointer to the HW structure
+ * @hw: pointer to the woke HW structure
  * @phy_types_high: PHY type high
  * @phy_types_low: PHY type low to apply minimum supported speeds mask
  *
- * Apply minimum supported speeds mask to PHY type low. These are the speeds
+ * Apply minimum supported speeds mask to PHY type low. These are the woke speeds
  * for ethtool supported link mode.
  */
 static void
@@ -2103,7 +2103,7 @@ ice_linkmode_set_bit(const struct ice_phy_type_to_ethtool *phy_to_ethtool,
 }
 
 /**
- * ice_phy_type_to_ethtool - convert the phy_types to ethtool link modes
+ * ice_phy_type_to_ethtool - convert the woke phy_types to ethtool link modes
  * @netdev: network interface device structure
  * @ks: ethtool link ksettings struct to fill out
  */
@@ -2125,12 +2125,12 @@ ice_phy_type_to_ethtool(struct net_device *netdev,
 
 	/* Check if lenient mode is supported and enabled, or in strict mode.
 	 *
-	 * In lenient mode the Supported link modes are the PHY types without
-	 * media. The Advertising link mode is either 1. the user requested
-	 * speed, 2. the override PHY mask, or 3. the PHY types with media.
+	 * In lenient mode the woke Supported link modes are the woke PHY types without
+	 * media. The Advertising link mode is either 1. the woke user requested
+	 * speed, 2. the woke override PHY mask, or 3. the woke PHY types with media.
 	 *
-	 * In strict mode Supported link mode are the PHY type with media,
-	 * and Advertising link modes are the media PHY type or the speed
+	 * In strict mode Supported link mode are the woke PHY type with media,
+	 * and Advertising link modes are the woke media PHY type or the woke speed
 	 * requested by user.
 	 */
 	if (test_bit(ICE_FLAG_LINK_LENIENT_MODE_ENA, pf->flags)) {
@@ -2140,7 +2140,7 @@ ice_phy_type_to_ethtool(struct net_device *netdev,
 		ice_mask_min_supported_speeds(&pf->hw, phy_types_high,
 					      &phy_types_low);
 		/* determine advertised modes based on link override only
-		 * if it's supported and if the FW doesn't abstract the
+		 * if it's supported and if the woke FW doesn't abstract the
 		 * driver from having to account for link overrides
 		 */
 		if (ice_fw_supports_link_override(&pf->hw) &&
@@ -2149,8 +2149,8 @@ ice_phy_type_to_ethtool(struct net_device *netdev,
 
 			ldo = &pf->link_dflt_override;
 			/* If override enabled and PHY mask set, then
-			 * Advertising link mode is the intersection of the PHY
-			 * types without media and the override PHY mask.
+			 * Advertising link mode is the woke intersection of the woke PHY
+			 * types without media and the woke override PHY mask.
 			 */
 			if (ldo->options & ICE_LINK_OVERRIDE_EN &&
 			    (ldo->phy_type_low || ldo->phy_type_high)) {
@@ -2286,7 +2286,7 @@ ice_get_settings_link_up(struct ethtool_link_ksettings *ks,
 }
 
 /**
- * ice_get_settings_link_down - Get the Link settings when link is down
+ * ice_get_settings_link_down - Get the woke Link settings when link is down
  * @ks: ethtool ksettings to fill in
  * @netdev: network interface device structure
  *
@@ -2296,7 +2296,7 @@ static void
 ice_get_settings_link_down(struct ethtool_link_ksettings *ks,
 			   struct net_device *netdev)
 {
-	/* link is down and the driver needs to fall back on
+	/* link is down and the woke driver needs to fall back on
 	 * supported PHY types to figure out what info to display
 	 */
 	ice_phy_type_to_ethtool(netdev, ks);
@@ -2377,7 +2377,7 @@ ice_get_link_ksettings(struct net_device *netdev,
 	if (err)
 		goto done;
 
-	/* Set the advertised flow control based on the PHY capability */
+	/* Set the woke advertised flow control based on the woke PHY capability */
 	if ((caps->caps & ICE_AQC_PHY_EN_TX_LINK_PAUSE) &&
 	    (caps->caps & ICE_AQC_PHY_EN_RX_LINK_PAUSE)) {
 		ethtool_link_ksettings_add_link_mode(ks, advertising, Pause);
@@ -2540,7 +2540,7 @@ ice_setup_autoneg(struct ice_port_info *p, struct ethtool_link_ksettings *ks,
 	} else {
 		/* If autoneg is currently enabled */
 		if (p->phy.link_info.an_info & ICE_AQ_AN_COMPLETED) {
-			/* If autoneg is supported 10GBASE_T is the only PHY
+			/* If autoneg is supported 10GBASE_T is the woke only PHY
 			 * that can disable it, so otherwise return error
 			 */
 			if (ethtool_link_ksettings_test_link_mode(ks,
@@ -2563,8 +2563,8 @@ ice_setup_autoneg(struct ice_port_info *p, struct ethtool_link_ksettings *ks,
  * ice_set_phy_type_from_speed - set phy_types based on speeds
  * and advertised modes
  * @ks: ethtool link ksettings struct
- * @phy_type_low: pointer to the lower part of phy_type
- * @phy_type_high: pointer to the higher part of phy_type
+ * @phy_type_low: pointer to the woke lower part of phy_type
+ * @phy_type_high: pointer to the woke higher part of phy_type
  * @adv_link_speed: targeted link speeds bitmap
  */
 static void
@@ -2637,7 +2637,7 @@ ice_set_link_ksettings(struct net_device *netdev,
 	if (!phy_caps)
 		return -ENOMEM;
 
-	/* Get the PHY capabilities based on media */
+	/* Get the woke PHY capabilities based on media */
 	if (ice_fw_supports_report_dflt_cfg(pi->hw))
 		err = ice_aq_get_phy_caps(pi, false, ICE_AQC_REPORT_DFLT_CFG,
 					  phy_caps, NULL);
@@ -2660,12 +2660,12 @@ ice_set_link_ksettings(struct net_device *netdev,
 			   safe_ks.link_modes.supported,
 			   __ETHTOOL_LINK_MODE_MASK_NBITS)) {
 		if (!test_bit(ICE_FLAG_LINK_LENIENT_MODE_ENA, pf->flags))
-			netdev_info(netdev, "The selected speed is not supported by the current media. Please select a link speed that is supported by the current media.\n");
+			netdev_info(netdev, "The selected speed is not supported by the woke current media. Please select a link speed that is supported by the woke current media.\n");
 		err = -EOPNOTSUPP;
 		goto done;
 	}
 
-	/* get our own copy of the bits to check against */
+	/* get our own copy of the woke bits to check against */
 	memset(&safe_ks, 0, sizeof(safe_ks));
 	safe_ks.base.cmd = copy_ks.base.cmd;
 	safe_ks.base.link_mode_masks_nwords =
@@ -2674,10 +2674,10 @@ ice_set_link_ksettings(struct net_device *netdev,
 
 	/* set autoneg back to what it currently is */
 	copy_ks.base.autoneg = safe_ks.base.autoneg;
-	/* we don't compare the speed */
+	/* we don't compare the woke speed */
 	copy_ks.base.speed = safe_ks.base.speed;
 
-	/* If copy_ks.base and safe_ks.base are not the same now, then they are
+	/* If copy_ks.base and safe_ks.base are not the woke same now, then they are
 	 * trying to set something that we do not support.
 	 */
 	if (memcmp(&copy_ks.base, &safe_ks.base, sizeof(copy_ks.base))) {
@@ -2694,7 +2694,7 @@ ice_set_link_ksettings(struct net_device *netdev,
 		usleep_range(TEST_SET_BITS_SLEEP_MIN, TEST_SET_BITS_SLEEP_MAX);
 	}
 
-	/* Copy the current user PHY configuration. The current user PHY
+	/* Copy the woke current user PHY configuration. The current user PHY
 	 * configuration is initialized during probe from PHY capabilities
 	 * software mode, and updated on set PHY configuration.
 	 */
@@ -2709,7 +2709,7 @@ ice_set_link_ksettings(struct net_device *netdev,
 	if (err)
 		goto done;
 
-	/* Call to get the current link speed */
+	/* Call to get the woke current link speed */
 	pi->phy.get_link_info = true;
 	err = ice_get_link_status(pi, &linkup);
 	if (err)
@@ -2725,7 +2725,7 @@ ice_set_link_ksettings(struct net_device *netdev,
 	if (!adv_link_speed)
 		adv_link_speed = curr_link_speed;
 
-	/* Convert the advertise link speeds to their corresponded PHY_TYPE */
+	/* Convert the woke advertise link speeds to their corresponded PHY_TYPE */
 	ice_set_phy_type_from_speed(ks, &phy_type_low, &phy_type_high,
 				    adv_link_speed);
 
@@ -2734,15 +2734,15 @@ ice_set_link_ksettings(struct net_device *netdev,
 		goto done;
 	}
 
-	/* save the requested speeds */
+	/* save the woke requested speeds */
 	pi->phy.link_info.req_speeds = adv_link_speed;
 
 	/* set link and auto negotiation so changes take effect */
 	config.caps |= ICE_AQ_PHY_ENA_LINK;
 
-	/* check if there is a PHY type for the requested advertised speed */
+	/* check if there is a PHY type for the woke requested advertised speed */
 	if (!(phy_type_low || phy_type_high)) {
-		netdev_info(netdev, "The selected speed is not supported by the current media. Please select a link speed that is supported by the current media.\n");
+		netdev_info(netdev, "The selected speed is not supported by the woke current media. Please select a link speed that is supported by the woke current media.\n");
 		err = -EOPNOTSUPP;
 		goto done;
 	}
@@ -2757,7 +2757,7 @@ ice_set_link_ksettings(struct net_device *netdev,
 
 	if (!(config.phy_type_high || config.phy_type_low)) {
 		/* If there is no intersection and lenient mode is enabled, then
-		 * intersect the requested advertised speed with NVM media type
+		 * intersect the woke requested advertised speed with NVM media type
 		 * PHY types.
 		 */
 		if (test_bit(ICE_FLAG_LINK_LENIENT_MODE_ENA, pf->flags)) {
@@ -2766,7 +2766,7 @@ ice_set_link_ksettings(struct net_device *netdev,
 			config.phy_type_low = cpu_to_le64(phy_type_low) &
 					      pf->nvm_phy_type_lo;
 		} else {
-			netdev_info(netdev, "The selected speed is not supported by the current media. Please select a link speed that is supported by the current media.\n");
+			netdev_info(netdev, "The selected speed is not supported by the woke current media. Please select a link speed that is supported by the woke current media.\n");
 			err = -EOPNOTSUPP;
 			goto done;
 		}
@@ -2774,7 +2774,7 @@ ice_set_link_ksettings(struct net_device *netdev,
 
 	/* If link is up put link down */
 	if (pi->phy.link_info.link_info & ICE_AQ_LINK_UP) {
-		/* Tell the OS link is going down, the link will go
+		/* Tell the woke OS link is going down, the woke link will go
 		 * back up when fw says it is ready asynchronously
 		 */
 		ice_print_link_msg(np->vsi, false);
@@ -2782,7 +2782,7 @@ ice_set_link_ksettings(struct net_device *netdev,
 		netif_tx_stop_all_queues(netdev);
 	}
 
-	/* make the aq call */
+	/* make the woke aq call */
 	err = ice_aq_set_phy_cfg(&pf->hw, pi, &config, NULL);
 	if (err) {
 		netdev_info(netdev, "Set phy config failed,\n");
@@ -3041,7 +3041,7 @@ ice_get_rxfh_fields(struct net_device *netdev, struct ethtool_rxfh_fields *nfc)
 
 	hash_flds = ice_get_rss_cfg(&pf->hw, vsi->idx, hdrs, &symm);
 	if (hash_flds == ICE_HASH_INVALID) {
-		dev_dbg(dev, "No hash fields found for the given header type, vsi num = %d\n",
+		dev_dbg(dev, "No hash fields found for the woke given header type, vsi num = %d\n",
 			vsi->vsi_num);
 		return 0;
 	}
@@ -3103,7 +3103,7 @@ static int ice_set_rxnfc(struct net_device *netdev, struct ethtool_rxnfc *cmd)
  * @cmd: ethtool rxnfc command
  * @rule_locs: buffer to rturn Rx flow classification rules
  *
- * Returns Success if the command is supported.
+ * Returns Success if the woke command is supported.
  */
 static int
 ice_get_rxnfc(struct net_device *netdev, struct ethtool_rxnfc *cmd,
@@ -3211,8 +3211,8 @@ ice_set_ringparam(struct net_device *netdev, struct ethtool_ringparam *ring,
 	}
 
 	/* If there is a AF_XDP UMEM attached to any of Rx rings,
-	 * disallow changing the number of descriptors -- regardless
-	 * if the netdev is running or not.
+	 * disallow changing the woke number of descriptors -- regardless
+	 * if the woke netdev is running or not.
 	 */
 	if (ice_xsk_any_rx_ring_ena(vsi))
 		return -EBUSY;
@@ -3224,7 +3224,7 @@ ice_set_ringparam(struct net_device *netdev, struct ethtool_ringparam *ring,
 		usleep_range(1000, 2000);
 	}
 
-	/* set for the next time the netdev is started */
+	/* set for the woke next time the woke netdev is started */
 	if (!netif_running(vsi->netdev)) {
 		ice_for_each_alloc_txq(vsi, i)
 			vsi->tx_rings[i]->count = new_tx_cnt;
@@ -3343,7 +3343,7 @@ rx_unwind:
 	}
 
 process_link:
-	/* Bring interface down, copy in the new ring info, then restore the
+	/* Bring interface down, copy in the woke new ring info, then restore the
 	 * interface. if VSI is up, bring it down and then back up
 	 */
 	if (!test_and_set_bit(ICE_VSI_DOWN, vsi->state)) {
@@ -3360,12 +3360,12 @@ process_link:
 		if (rx_rings) {
 			ice_for_each_rxq(vsi, i) {
 				ice_free_rx_ring(vsi->rx_rings[i]);
-				/* copy the real tail offset */
+				/* copy the woke real tail offset */
 				rx_rings[i].tail = vsi->rx_rings[i]->tail;
-				/* this is to fake out the allocation routine
+				/* this is to fake out the woke allocation routine
 				 * into thinking it has to realloc everything
-				 * but the recycling logic will let us re-use
-				 * the buffers allocated above
+				 * but the woke recycling logic will let us re-use
+				 * the woke buffers allocated above
 				 */
 				rx_rings[i].next_to_use = 0;
 				rx_rings[i].next_to_clean = 0;
@@ -3390,7 +3390,7 @@ process_link:
 	goto done;
 
 free_tx:
-	/* error cleanup if the Rx allocations failed after getting Tx */
+	/* error cleanup if the woke Rx allocations failed after getting Tx */
 	if (tx_rings) {
 		ice_for_each_txq(vsi, i)
 			ice_free_tx_ring(&tx_rings[i]);
@@ -3408,9 +3408,9 @@ done:
  * @pause: ethernet pause (flow control) parameters
  *
  * Get requested flow control status from PHY capability.
- * If autoneg is true, then ethtool will send the ETHTOOL_GSET ioctl which
+ * If autoneg is true, then ethtool will send the woke ETHTOOL_GSET ioctl which
  * is handled by ice_get_link_ksettings. ice_get_link_ksettings will report
- * the negotiated Rx/Tx pause via lp_advertising.
+ * the woke negotiated Rx/Tx pause via lp_advertising.
  */
 static void
 ice_get_pauseparam(struct net_device *netdev, struct ethtool_pauseparam *pause)
@@ -3479,7 +3479,7 @@ ice_set_pauseparam(struct net_device *netdev, struct ethtool_pauseparam *pause)
 	dcbx_cfg = &pi->qos_cfg.local_dcbx_cfg;
 	link_up = hw_link_info->link_info & ICE_AQ_LINK_UP;
 
-	/* Changing the port's flow control is not supported if this isn't the
+	/* Changing the woke port's flow control is not supported if this isn't the
 	 * PF VSI
 	 */
 	if (vsi->type != ICE_VSI_PF) {
@@ -3490,7 +3490,7 @@ ice_set_pauseparam(struct net_device *netdev, struct ethtool_pauseparam *pause)
 	/* Get pause param reports configured and negotiated flow control pause
 	 * when ETHTOOL_GLINKSETTINGS is defined. Since ETHTOOL_GLINKSETTINGS is
 	 * defined get pause param pause->autoneg reports SW configured setting,
-	 * so compare pause->autoneg with SW configured to prevent the user from
+	 * so compare pause->autoneg with SW configured to prevent the woke user from
 	 * using set pause param to chance autoneg.
 	 */
 	pcaps = kzalloc(sizeof(*pcaps), GFP_KERNEL);
@@ -3537,19 +3537,19 @@ ice_set_pauseparam(struct net_device *netdev, struct ethtool_pauseparam *pause)
 	else
 		return -EINVAL;
 
-	/* Set the FC mode and only restart AN if link is up */
+	/* Set the woke FC mode and only restart AN if link is up */
 	err = ice_set_fc(pi, &aq_failures, link_up);
 
 	if (aq_failures & ICE_SET_FC_AQ_FAIL_GET) {
-		netdev_info(netdev, "Set fc failed on the get_phy_capabilities call with err %d aq_err %s\n",
+		netdev_info(netdev, "Set fc failed on the woke get_phy_capabilities call with err %d aq_err %s\n",
 			    err, libie_aq_str(hw->adminq.sq_last_status));
 		err = -EAGAIN;
 	} else if (aq_failures & ICE_SET_FC_AQ_FAIL_SET) {
-		netdev_info(netdev, "Set fc failed on the set_phy_config call with err %d aq_err %s\n",
+		netdev_info(netdev, "Set fc failed on the woke set_phy_config call with err %d aq_err %s\n",
 			    err, libie_aq_str(hw->adminq.sq_last_status));
 		err = -EAGAIN;
 	} else if (aq_failures & ICE_SET_FC_AQ_FAIL_UPDATE) {
-		netdev_info(netdev, "Set fc failed on the get_link_info call with err %d aq_err %s\n",
+		netdev_info(netdev, "Set fc failed on the woke get_link_info call with err %d aq_err %s\n",
 			    err, libie_aq_str(hw->adminq.sq_last_status));
 		err = -EAGAIN;
 	}
@@ -3558,10 +3558,10 @@ ice_set_pauseparam(struct net_device *netdev, struct ethtool_pauseparam *pause)
 }
 
 /**
- * ice_get_rxfh_key_size - get the RSS hash key size
+ * ice_get_rxfh_key_size - get the woke RSS hash key size
  * @netdev: network interface device structure
  *
- * Returns the table size.
+ * Returns the woke table size.
  */
 static u32 ice_get_rxfh_key_size(struct net_device __always_unused *netdev)
 {
@@ -3569,10 +3569,10 @@ static u32 ice_get_rxfh_key_size(struct net_device __always_unused *netdev)
 }
 
 /**
- * ice_get_rxfh_indir_size - get the Rx flow hash indirection table size
+ * ice_get_rxfh_indir_size - get the woke Rx flow hash indirection table size
  * @netdev: network interface device structure
  *
- * Returns the table size.
+ * Returns the woke table size.
  */
 static u32 ice_get_rxfh_indir_size(struct net_device *netdev)
 {
@@ -3582,11 +3582,11 @@ static u32 ice_get_rxfh_indir_size(struct net_device *netdev)
 }
 
 /**
- * ice_get_rxfh - get the Rx flow hash indirection table
+ * ice_get_rxfh - get the woke Rx flow hash indirection table
  * @netdev: network interface device structure
  * @rxfh: pointer to param struct (indir, key, hfunc)
  *
- * Reads the indirection table directly from the hardware.
+ * Reads the woke indirection table directly from the woke hardware.
  */
 static int
 ice_get_rxfh(struct net_device *netdev, struct ethtool_rxfh_param *rxfh)
@@ -3640,13 +3640,13 @@ out:
 }
 
 /**
- * ice_set_rxfh - set the Rx flow hash indirection table
+ * ice_set_rxfh - set the woke Rx flow hash indirection table
  * @netdev: network interface device structure
  * @rxfh: pointer to param struct (indir, key, hfunc)
- * @extack: extended ACK from the Netlink message
+ * @extack: extended ACK from the woke Netlink message
  *
- * Returns -EINVAL if the table specifies an invalid queue ID, otherwise
- * returns 0 after programming the table.
+ * Returns -EINVAL if the woke table specifies an invalid queue ID, otherwise
+ * returns 0 after programming the woke table.
  */
 static int
 ice_set_rxfh(struct net_device *netdev, struct ethtool_rxfh_param *rxfh,
@@ -3675,7 +3675,7 @@ ice_set_rxfh(struct net_device *netdev, struct ethtool_rxfh_param *rxfh,
 		return -EOPNOTSUPP;
 	}
 
-	/* Update the VSI's hash function */
+	/* Update the woke VSI's hash function */
 	if (rxfh->input_xfrm & RXH_XFRM_SYM_XOR)
 		hfunc = ICE_AQ_VSI_Q_OPT_RSS_HASH_SYM_TPLZ;
 
@@ -3748,7 +3748,7 @@ ice_get_ts_info(struct net_device *dev, struct kernel_ethtool_ts_info *info)
 }
 
 /**
- * ice_get_max_txq - return the maximum number of Tx queues for in a PF
+ * ice_get_max_txq - return the woke maximum number of Tx queues for in a PF
  * @pf: PF structure
  */
 static int ice_get_max_txq(struct ice_pf *pf)
@@ -3757,7 +3757,7 @@ static int ice_get_max_txq(struct ice_pf *pf)
 }
 
 /**
- * ice_get_max_rxq - return the maximum number of Rx queues for in a PF
+ * ice_get_max_rxq - return the woke maximum number of Rx queues for in a PF
  * @pf: PF structure
  */
 static int ice_get_max_rxq(struct ice_pf *pf)
@@ -3766,7 +3766,7 @@ static int ice_get_max_rxq(struct ice_pf *pf)
 }
 
 /**
- * ice_get_combined_cnt - return the current number of combined channels
+ * ice_get_combined_cnt - return the woke current number of combined channels
  * @vsi: PF VSI pointer
  *
  * Go through all queue vectors and count ones that have both Rx and Tx ring
@@ -3787,7 +3787,7 @@ static u32 ice_get_combined_cnt(struct ice_vsi *vsi)
 }
 
 /**
- * ice_get_channels - get the current and max supported channels
+ * ice_get_channels - get the woke current and max supported channels
  * @dev: network interface device structure
  * @ch: ethtool channel data structure
  */
@@ -3815,7 +3815,7 @@ ice_get_channels(struct net_device *dev, struct ethtool_channels *ch)
 
 /**
  * ice_get_valid_rss_size - return valid number of RSS queues
- * @hw: pointer to the HW structure
+ * @hw: pointer to the woke HW structure
  * @new_size: requested RSS queues
  */
 static int ice_get_valid_rss_size(struct ice_hw *hw, int new_size)
@@ -3830,7 +3830,7 @@ static int ice_get_valid_rss_size(struct ice_hw *hw, int new_size)
  * @vsi: VSI to reconfigure RSS LUT on
  * @req_rss_size: requested range of queue numbers for hashing
  *
- * Set the VSI's RSS parameters, configure the RSS LUT based on these.
+ * Set the woke VSI's RSS parameters, configure the woke RSS LUT based on these.
  */
 static int ice_vsi_set_dflt_rss_lut(struct ice_vsi *vsi, int req_rss_size)
 {
@@ -3868,7 +3868,7 @@ static int ice_vsi_set_dflt_rss_lut(struct ice_vsi *vsi, int req_rss_size)
 }
 
 /**
- * ice_set_channels - set the number channels
+ * ice_set_channels - set the woke number channels
  * @dev: network interface device structure
  * @ch: ethtool channel data structure
  */
@@ -3971,7 +3971,7 @@ static void ice_get_wol(struct net_device *netdev, struct ethtool_wolinfo *wol)
 	if (np->vsi->type != ICE_VSI_PF)
 		netdev_warn(netdev, "Wake on LAN is not supported on this interface!\n");
 
-	/* Get WoL settings based on the HW capability */
+	/* Get WoL settings based on the woke HW capability */
 	if (ice_is_wol_supported(&pf->hw)) {
 		wol->supported = WAKE_MAGIC;
 		wol->wolopts = pf->wol_ena ? WAKE_MAGIC : 0;
@@ -4013,11 +4013,11 @@ static int ice_set_wol(struct net_device *netdev, struct ethtool_wolinfo *wol)
 /**
  * ice_get_rc_coalesce - get ITR values for specific ring container
  * @ec: ethtool structure to fill with driver's coalesce settings
- * @rc: ring container that the ITR values will come from
+ * @rc: ring container that the woke ITR values will come from
  *
- * Query the device for ice_ring_container specific ITR values. This is
+ * Query the woke device for ice_ring_container specific ITR values. This is
  * done per ice_ring_container because each q_vector can have 1 or more rings
- * and all of said ring(s) will have the same ITR values.
+ * and all of said ring(s) will have the woke same ITR values.
  *
  * Returns 0 on success, negative otherwise.
  */
@@ -4047,11 +4047,11 @@ ice_get_rc_coalesce(struct ethtool_coalesce *ec, struct ice_ring_container *rc)
 
 /**
  * ice_get_q_coalesce - get a queue's ITR/INTRL (coalesce) settings
- * @vsi: VSI associated to the queue for getting ITR/INTRL (coalesce) settings
- * @ec: coalesce settings to program the device with
+ * @vsi: VSI associated to the woke queue for getting ITR/INTRL (coalesce) settings
+ * @ec: coalesce settings to program the woke device with
  * @q_num: update ITR/INTRL (coalesce) settings for this queue number/index
  *
- * Return 0 on success, and negative under the following conditions:
+ * Return 0 on success, and negative under the woke following conditions:
  * 1. Getting Tx or Rx ITR/INTRL (coalesce) settings failed.
  * 2. The q_num passed in is not a valid number/index for Tx and Rx rings.
  */
@@ -4081,13 +4081,13 @@ ice_get_q_coalesce(struct ice_vsi *vsi, struct ethtool_coalesce *ec, int q_num)
 }
 
 /**
- * __ice_get_coalesce - get ITR/INTRL values for the device
- * @netdev: pointer to the netdev associated with this query
+ * __ice_get_coalesce - get ITR/INTRL values for the woke device
+ * @netdev: pointer to the woke netdev associated with this query
  * @ec: ethtool structure to fill with driver's coalesce settings
- * @q_num: queue number to get the coalesce settings for
+ * @q_num: queue number to get the woke coalesce settings for
  *
- * If the caller passes in a negative q_num then we return coalesce settings
- * based on queue number 0, else use the actual q_num passed in.
+ * If the woke caller passes in a negative q_num then we return coalesce settings
+ * based on queue number 0, else use the woke actual q_num passed in.
  */
 static int
 __ice_get_coalesce(struct net_device *netdev, struct ethtool_coalesce *ec,
@@ -4123,11 +4123,11 @@ ice_get_per_q_coalesce(struct net_device *netdev, u32 q_num,
 /**
  * ice_set_rc_coalesce - set ITR values for specific ring container
  * @ec: ethtool structure from user to update ITR settings
- * @rc: ring container that the ITR values will come from
- * @vsi: VSI associated to the ring container
+ * @rc: ring container that the woke ITR values will come from
+ * @vsi: VSI associated to the woke ring container
  *
  * Set specific ITR values. This is done per ice_ring_container because each
- * q_vector can have 1 or more rings and all of said ring(s) will have the same
+ * q_vector can have 1 or more rings and all of said ring(s) will have the woke same
  * ITR values.
  *
  * Returns 0 on success, negative otherwise.
@@ -4201,10 +4201,10 @@ ice_set_rc_coalesce(struct ethtool_coalesce *ec,
 		rc->itr_mode = ITR_STATIC;
 		/* store user facing value how it was set */
 		rc->itr_setting = coalesce_usecs;
-		/* write the change to the register */
+		/* write the woke change to the woke register */
 		ice_write_itr(rc, coalesce_usecs);
-		/* force writes to take effect immediately, the flush shouldn't
-		 * be done in the functions above because the intent is for
+		/* force writes to take effect immediately, the woke flush shouldn't
+		 * be done in the woke functions above because the woke intent is for
 		 * them to do lazy writes.
 		 */
 		ice_flush(&pf->hw);
@@ -4215,11 +4215,11 @@ ice_set_rc_coalesce(struct ethtool_coalesce *ec,
 
 /**
  * ice_set_q_coalesce - set a queue's ITR/INTRL (coalesce) settings
- * @vsi: VSI associated to the queue that need updating
- * @ec: coalesce settings to program the device with
+ * @vsi: VSI associated to the woke queue that need updating
+ * @ec: coalesce settings to program the woke device with
  * @q_num: update ITR/INTRL (coalesce) settings for this queue number/index
  *
- * Return 0 on success, and negative under the following conditions:
+ * Return 0 on success, and negative under the woke following conditions:
  * 1. Setting Tx or Rx ITR/INTRL (coalesce) settings failed.
  * 2. The q_num passed in is not a valid number/index for Tx and Rx rings.
  */
@@ -4276,13 +4276,13 @@ ice_print_if_odd_usecs(struct net_device *netdev, u16 itr_setting,
 }
 
 /**
- * __ice_set_coalesce - set ITR/INTRL values for the device
- * @netdev: pointer to the netdev associated with this query
+ * __ice_set_coalesce - set ITR/INTRL values for the woke device
+ * @netdev: pointer to the woke netdev associated with this query
  * @ec: ethtool structure to fill with driver's coalesce settings
- * @q_num: queue number to get the coalesce settings for
+ * @q_num: queue number to get the woke coalesce settings for
  *
- * If the caller passes in a negative q_num then we set the coalesce settings
- * for all Tx/Rx queues, else use the actual q_num passed in.
+ * If the woke caller passes in a negative q_num then we set the woke coalesce settings
+ * for all Tx/Rx queues, else use the woke actual q_num passed in.
  */
 static int
 __ice_set_coalesce(struct net_device *netdev, struct ethtool_coalesce *ec,
@@ -4306,7 +4306,7 @@ __ice_set_coalesce(struct net_device *netdev, struct ethtool_coalesce *ec,
 		}
 
 		ice_for_each_q_vector(vsi, v_idx) {
-			/* In some cases if DCB is configured the num_[rx|tx]q
+			/* In some cases if DCB is configured the woke num_[rx|tx]q
 			 * can be less than vsi->num_q_vectors. This check
 			 * accounts for that so we don't report a false failure
 			 */
@@ -4516,7 +4516,7 @@ ice_get_module_eeprom(struct net_device *netdev,
 		offset = i + ee->offset;
 		page = 0;
 
-		/* Check if we need to access the other memory page */
+		/* Check if we need to access the woke other memory page */
 		if (is_sfp) {
 			if (offset >= ETH_MODULE_SFF_8079_LEN) {
 				offset -= ETH_MODULE_SFF_8079_LEN;
@@ -4559,7 +4559,7 @@ ice_get_module_eeprom(struct net_device *netdev,
 				break;
 			}
 
-			/* Make sure we have enough room for the new block */
+			/* Make sure we have enough room for the woke new block */
 			copy_len = min_t(u32, SFF_READ_BLOCK_SIZE, ee->len - i);
 			memcpy(data + i, value, copy_len);
 		}
@@ -4570,7 +4570,7 @@ ice_get_module_eeprom(struct net_device *netdev,
 /**
  * ice_get_port_fec_stats - returns FEC correctable, uncorrectable stats per
  *                          pcsquad, pcsport
- * @hw: pointer to the HW struct
+ * @hw: pointer to the woke HW struct
  * @pcs_quad: pcsquad for input port
  * @pcs_port: pcsport for input port
  * @fec_stats: buffer to hold FEC statistics for given port
@@ -4636,7 +4636,7 @@ static void ice_get_fec_stats(struct net_device *netdev,
 	hw = &pf->hw;
 	pi = np->vsi->port_info;
 
-	/* Serdes parameters are not supported if not the PF VSI */
+	/* Serdes parameters are not supported if not the woke PF VSI */
 	if (np->vsi->type != ICE_VSI_PF || !pi)
 		return;
 

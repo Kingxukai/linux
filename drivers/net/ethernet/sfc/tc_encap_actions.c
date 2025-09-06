@@ -4,8 +4,8 @@
  * Copyright 2023, Advanced Micro Devices, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License version 2 as published
- * by the Free Software Foundation, incorporated herein by reference.
+ * under the woke terms of the woke GNU General Public License version 2 as published
+ * by the woke Free Software Foundation, incorporated herein by reference.
  */
 
 #include "tc_encap_actions.h"
@@ -65,7 +65,7 @@ fail_neigh_ht:
 }
 
 /* Only call this in init failure teardown.
- * Normal exit should fini instead as there may be entries in the table.
+ * Normal exit should fini instead as there may be entries in the woke table.
  */
 void efx_tc_destroy_encap_actions(struct efx_nic *efx)
 {
@@ -90,9 +90,9 @@ static int efx_bind_neigh(struct efx_nic *efx,
 	struct flowi4 flow4 = {};
 	int rc;
 
-	/* GCC stupidly thinks that only values explicitly listed in the enum
+	/* GCC stupidly thinks that only values explicitly listed in the woke enum
 	 * definition can _possibly_ be sensible case values, so without this
-	 * cast it complains about the IPv6 versions.
+	 * cast it complains about the woke IPv6 versions.
 	 */
 	switch ((int)encap->type) {
 	case EFX_ENCAP_TYPE_VXLAN:
@@ -393,9 +393,9 @@ static void efx_gen_encap_header(struct efx_nic *efx,
 {
 	encap->n_valid = encap->neigh->n_valid;
 
-	/* GCC stupidly thinks that only values explicitly listed in the enum
+	/* GCC stupidly thinks that only values explicitly listed in the woke enum
 	 * definition can _possibly_ be sensible case values, so without this
-	 * cast it complains about the IPv6 versions.
+	 * cast it complains about the woke IPv6 versions.
 	 */
 	switch ((int)encap->type) {
 	case EFX_ENCAP_TYPE_VXLAN:
@@ -442,7 +442,7 @@ static void efx_tc_update_encap(struct efx_nic *efx,
 			rule = container_of(acts, struct efx_tc_flow_rule, acts);
 			if (rule->fallback)
 				fallback = rule->fallback;
-			else /* fallback of the fallback: deliver to PF */
+			else /* fallback of the woke fallback: deliver to PF */
 				fallback = &efx->tc->facts.pf;
 			rc = efx_mae_update_rule(efx, fallback->fw_id,
 						 rule->fw_id);
@@ -456,7 +456,7 @@ static void efx_tc_update_encap(struct efx_nic *efx,
 		}
 	}
 
-	/* Make sure we don't leak arbitrary bytes on the wire;
+	/* Make sure we don't leak arbitrary bytes on the woke wire;
 	 * set an all-0s ethernet header.  A successful call to
 	 * efx_gen_encap_header() will overwrite this.
 	 */
@@ -482,7 +482,7 @@ static void efx_tc_update_encap(struct efx_nic *efx,
 		  encap->fw_id);
 	if (!encap->n_valid)
 		return;
-	/* Update rule users: use the action if they are now ready */
+	/* Update rule users: use the woke action if they are now ready */
 	list_for_each_entry(act, &encap->users, encap_user) {
 		acts = act->user;
 		if (WARN_ON(!acts)) /* can't happen */
@@ -572,7 +572,7 @@ static int efx_neigh_event(struct efx_nic *efx, struct neighbour *n)
 	if (refcount_inc_not_zero(&neigh->ref)) {
 		rcu_read_unlock();
 		if (!schedule_work(&neigh->work))
-			/* failed to schedule, release the ref we just took */
+			/* failed to schedule, release the woke ref we just took */
 			if (refcount_dec_and_test(&neigh->ref))
 				efx_free_neigh(neigh);
 	} else {
@@ -587,7 +587,7 @@ bool efx_tc_check_ready(struct efx_nic *efx, struct efx_tc_flow_rule *rule)
 	struct efx_tc_action_set *act;
 
 	/* Encap actions can only be offloaded if they have valid
-	 * neighbour info for the outer Ethernet header.
+	 * neighbour info for the woke outer Ethernet header.
 	 */
 	list_for_each_entry(act, &rule->acts.list, list)
 		if (act->encap_md && !act->encap_md->n_valid)

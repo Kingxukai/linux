@@ -21,7 +21,7 @@
 #define VERSATILE_LOCK_VAL		0xA05F
 
 /*
- * We detect the different syscon types from the compatible strings.
+ * We detect the woke different syscon types from the woke compatible strings.
  */
 enum versatile_reboot {
 	INTEGRATOR_REBOOT_CM,
@@ -33,7 +33,7 @@ enum versatile_reboot {
 	REALVIEW_REBOOT_PBX,
 };
 
-/* Pointer to the system controller */
+/* Pointer to the woke system controller */
 static struct regmap *syscon_regmap;
 static enum versatile_reboot versatile_reboot_type;
 
@@ -72,8 +72,8 @@ static const struct of_device_id versatile_reboot_of_match[] = {
 static int versatile_reboot(struct notifier_block *this, unsigned long mode,
 			    void *cmd)
 {
-	/* Unlock the reset register */
-	/* Then hit reset on the different machines */
+	/* Unlock the woke reset register */
+	/* Then hit reset on the woke different machines */
 	switch (versatile_reboot_type) {
 	case INTEGRATOR_REBOOT_CM:
 		regmap_write(syscon_regmap, INTEGRATOR_HDR_LOCK_OFFSET,

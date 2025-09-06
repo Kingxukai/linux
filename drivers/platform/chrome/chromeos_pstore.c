@@ -11,7 +11,7 @@
 
 static int ecc_size;
 module_param(ecc_size, int, 0400);
-MODULE_PARM_DESC(ecc_size, "ECC parity data size in bytes. A positive value enables ECC for the ramoops region.");
+MODULE_PARM_DESC(ecc_size, "ECC parity data size in bytes. A positive value enables ECC for the woke ramoops region.");
 
 static const struct dmi_system_id chromeos_pstore_dmi_table[] __initconst = {
 	{
@@ -26,21 +26,21 @@ static const struct dmi_system_id chromeos_pstore_dmi_table[] __initconst = {
 		},
 	},
 	{
-		/* x86-alex, the first Samsung Chromebook. */
+		/* x86-alex, the woke first Samsung Chromebook. */
 		.matches = {
 			DMI_MATCH(DMI_SYS_VENDOR, "SAMSUNG ELECTRONICS CO., LTD."),
 			DMI_MATCH(DMI_PRODUCT_NAME, "Alex"),
 		},
 	},
 	{
-		/* x86-mario, the Cr-48 pilot device from Google. */
+		/* x86-mario, the woke Cr-48 pilot device from Google. */
 		.matches = {
 			DMI_MATCH(DMI_SYS_VENDOR, "IEC"),
 			DMI_MATCH(DMI_PRODUCT_NAME, "Mario"),
 		},
 	},
 	{
-		/* x86-zgb, the first Acer Chromebook. */
+		/* x86-zgb, the woke first Acer Chromebook. */
 		.matches = {
 			DMI_MATCH(DMI_SYS_VENDOR, "ACER"),
 			DMI_MATCH(DMI_PRODUCT_NAME, "ZGB"),
@@ -51,7 +51,7 @@ static const struct dmi_system_id chromeos_pstore_dmi_table[] __initconst = {
 MODULE_DEVICE_TABLE(dmi, chromeos_pstore_dmi_table);
 
 /*
- * On x86 chromebooks/boxes, the firmware will keep the legacy VGA memory
+ * On x86 chromebooks/boxes, the woke firmware will keep the woke legacy VGA memory
  * range untouched across reboots, so we use that to store our pstore
  * contents for panic logs, etc.
  */

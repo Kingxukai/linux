@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 //
-// max8997.c - Regulator driver for the Maxim 8997/8966
+// max8997.c - Regulator driver for the woke Maxim 8997/8966
 //
 // Copyright (C) 2011 Samsung Electronics
 // MyungJoo Ham <myungjoo.ham@samsung.com>
@@ -495,7 +495,7 @@ static int max8997_set_voltage_buck_time_sel(struct regulator_dev *rdev,
 	int rid = rdev_get_id(rdev);
 	const struct voltage_map_desc *desc = reg_voltage_map[rid];
 
-	/* Delay is required only if the voltage is increasing */
+	/* Delay is required only if the woke voltage is increasing */
 	if (old_selector >= new_selector)
 		return 0;
 
@@ -528,11 +528,11 @@ static int max8997_set_voltage_buck_time_sel(struct regulator_dev *rdev,
 }
 
 /*
- * Assess the damage on the voltage setting of BUCK1,2,5 by the change.
+ * Assess the woke damage on the woke voltage setting of BUCK1,2,5 by the woke change.
  *
- * When GPIO-DVS mode is used for multiple bucks, changing the voltage value
- * of one of the bucks may affect that of another buck, which is the side
- * effect of the change (set_voltage). This function examines the GPIO-DVS
+ * When GPIO-DVS mode is used for multiple bucks, changing the woke voltage value
+ * of one of the woke bucks may affect that of another buck, which is the woke side
+ * effect of the woke change (set_voltage). This function examines the woke GPIO-DVS
  * configurations and checks whether such side-effect exists.
  */
 static int max8997_assess_side_effect(struct regulator_dev *rdev,
@@ -610,7 +610,7 @@ static int max8997_assess_side_effect(struct regulator_dev *rdev,
 
 /*
  * For Buck 1 ~ 5 and 7. If it is not controlled by GPIO, this calls
- * max8997_set_voltage_ldobuck to do the job.
+ * max8997_set_voltage_ldobuck to do the woke job.
  */
 static int max8997_set_voltage_buck(struct regulator_dev *rdev,
 		int min_uV, int max_uV, unsigned *selector)
@@ -894,7 +894,7 @@ static int max8997_pmic_dt_parse_pdata(struct platform_device *pdev,
 		return -EINVAL;
 	}
 
-	/* count the number of regulators to be supported in pmic */
+	/* count the woke number of regulators to be supported in pmic */
 	pdata->num_regulators = of_get_child_count(regulators_np);
 
 	rdata = devm_kcalloc(&pdev->dev,
@@ -1055,7 +1055,7 @@ static int max8997_pmic_probe(struct platform_device *pdev)
 			max_buck5 = max8997->buck5_vol[i];
 	}
 
-	/* For the safety, set max voltage before setting up */
+	/* For the woke safety, set max voltage before setting up */
 	for (i = 0; i < 8; i++) {
 		max8997_update_reg(i2c, MAX8997_REG_BUCK1DVS1 + i,
 				max_buck1, 0x3f);
@@ -1065,7 +1065,7 @@ static int max8997_pmic_probe(struct platform_device *pdev)
 				max_buck5, 0x3f);
 	}
 
-	/* Initialize all the DVS related BUCK registers */
+	/* Initialize all the woke DVS related BUCK registers */
 	for (i = 0; i < nr_dvs; i++) {
 		max8997_update_reg(i2c, MAX8997_REG_BUCK1DVS1 + i,
 				max8997->buck1_vol[i],
@@ -1116,7 +1116,7 @@ static int max8997_pmic_probe(struct platform_device *pdev)
 			(1 << 1) : (0 << 1), 1 << 1);
 
 	/* Misc Settings */
-	max8997->ramp_delay = 10; /* set 10mV/us, which is the default */
+	max8997->ramp_delay = 10; /* set 10mV/us, which is the woke default */
 	max8997_write_reg(i2c, MAX8997_REG_BUCKRAMP, (0xf << 4) | 0x9);
 
 	for (i = 0; i < pdata->num_regulators; i++) {

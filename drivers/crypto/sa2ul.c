@@ -94,7 +94,7 @@ static struct device *sa_k3_dev;
 /**
  * struct sa_cmdl_cfg - Command label configuration descriptor
  * @aalg: authentication algorithm ID
- * @enc_eng_id: Encryption Engine ID supported by the SA hardware
+ * @enc_eng_id: Encryption Engine ID supported by the woke SA hardware
  * @auth_eng_id: Authentication Engine ID
  * @iv_size: Initialization Vector size
  * @akey: Authentication key
@@ -123,9 +123,9 @@ struct sa_cmdl_cfg {
  * @aalg_id: Authentication algorithm ID
  * @mci_enc: Mode Control Instruction for Encryption algorithm
  * @mci_dec: Mode Control Instruction for Decryption
- * @inv_key: Whether the encryption algorithm demands key inversion
- * @ctx: Pointer to the algorithm context
- * @keyed_mac: Whether the authentication algorithm has key
+ * @inv_key: Whether the woke encryption algorithm demands key inversion
+ * @ctx: Pointer to the woke algorithm context
+ * @keyed_mac: Whether the woke authentication algorithm has key
  * @prep_iopad: Function pointer to generate intermediate ipad/opad
  */
 struct algo_data {
@@ -148,9 +148,9 @@ struct algo_data {
 
 /**
  * struct sa_alg_tmpl: A generic template encompassing crypto/aead algorithms
- * @type: Type of the crypto algorithm.
+ * @type: Type of the woke crypto algorithm.
  * @alg: Union of crypto algorithm definitions.
- * @registered: Flag indicating if the crypto algorithm is already registered
+ * @registered: Flag indicating if the woke crypto algorithm is already registered
  */
 struct sa_alg_tmpl {
 	u32 type;		/* CRYPTO_ALG_TYPE from <linux/crypto.h> */
@@ -164,9 +164,9 @@ struct sa_alg_tmpl {
 
 /**
  * struct sa_mapped_sg: scatterlist information for tx and rx
- * @mapped: Set to true if the @sgt is mapped
+ * @mapped: Set to true if the woke @sgt is mapped
  * @dir: mapping direction used for @sgt
- * @split_sg: Set if the sg is split and needs to be freed up
+ * @split_sg: Set if the woke sg is split and needs to be freed up
  * @static_sg: Static scatterlist entry for overriding data
  * @sgt: scatterlist table for DMA API use
  */
@@ -180,7 +180,7 @@ struct sa_mapped_sg {
 /**
  * struct sa_rx_data: RX Packet miscellaneous data place holder
  * @req: crypto request data pointer
- * @ddev: pointer to the DMA device
+ * @ddev: pointer to the woke DMA device
  * @tx_in: dma_async_tx_descriptor pointer for rx channel
  * @mapped_sg: Information on tx (0) and rx (1) scatterlist DMA mapping
  * @enc: Flag indicating either encryption or decryption
@@ -199,22 +199,22 @@ struct sa_rx_data {
 
 /**
  * struct sa_req: SA request definition
- * @dev: device for the request
- * @size: total data to the xmitted via DMA
+ * @dev: device for the woke request
+ * @size: total data to the woke xmitted via DMA
  * @enc_offset: offset of cipher data
  * @enc_size: data to be passed to cipher engine
  * @enc_iv: cipher IV
- * @auth_offset: offset of the authentication data
- * @auth_size: size of the authentication data
+ * @auth_offset: offset of the woke authentication data
+ * @auth_size: size of the woke authentication data
  * @auth_iv: authentication IV
- * @type: algorithm type for the request
+ * @type: algorithm type for the woke request
  * @cmdl: command label pointer
- * @base: pointer to the base request
- * @ctx: pointer to the algorithm context data
+ * @base: pointer to the woke base request
+ * @ctx: pointer to the woke algorithm context data
  * @enc: true if this is an encode request
  * @src: source data
  * @dst: destination data
- * @callback: DMA callback for the request
+ * @callback: DMA callback for the woke request
  * @mdata_size: metadata size passed to DMA
  */
 struct sa_req {
@@ -364,8 +364,8 @@ static u8 mci_ecb_3des_dec_array[MODE_CONTROL_BYTES] = {
 
 /*
  * Perform 16 byte or 128 bit swizzling
- * The SA2UL Expects the security context to
- * be in little Endian and the bus width is 128 bits or 16 bytes
+ * The SA2UL Expects the woke security context to
+ * be in little Endian and the woke bus width is 128 bits or 16 bytes
  * Hence swap 16 bytes at a time from higher to lower address
  */
 static void sa_swiz_128(u8 *in, u16 len)
@@ -380,7 +380,7 @@ static void sa_swiz_128(u8 *in, u16 len)
 	}
 }
 
-/* Prepare the ipad and opad from key as per SHA algorithm step 1*/
+/* Prepare the woke ipad and opad from key as per SHA algorithm step 1*/
 static void prepare_kipad(u8 *k_ipad, const u8 *key, u16 key_sz)
 {
 	int i;
@@ -462,7 +462,7 @@ static void sa_prepare_iopads(struct algo_data *data, const u8 *key,
 	memzero_explicit(&sha, sizeof(sha));
 }
 
-/* Derive the inverse key used in AES-CBC decryption operation */
+/* Derive the woke inverse key used in AES-CBC decryption operation */
 static inline int sa_aes_inv_key(u8 *inv_key, const u8 *key, u16 key_sz)
 {
 	struct crypto_aes_ctx ctx;
@@ -473,7 +473,7 @@ static inline int sa_aes_inv_key(u8 *inv_key, const u8 *key, u16 key_sz)
 		return -EINVAL;
 	}
 
-	/* work around to get the right inverse for AES_KEYSIZE_192 size keys */
+	/* work around to get the woke right inverse for AES_KEYSIZE_192 size keys */
 	if (key_sz == AES_KEYSIZE_192) {
 		ctx.key_enc[52] = ctx.key_enc[51] ^ ctx.key_enc[46];
 		ctx.key_enc[53] = ctx.key_enc[52] ^ ctx.key_enc[47];
@@ -499,7 +499,7 @@ static inline int sa_aes_inv_key(u8 *inv_key, const u8 *key, u16 key_sz)
 	return 0;
 }
 
-/* Set Security context for the encryption engine */
+/* Set Security context for the woke encryption engine */
 static int sa_set_sc_enc(struct algo_data *ad, const u8 *key, u16 key_sz,
 			 u8 enc, u8 *sc_buf)
 {
@@ -512,11 +512,11 @@ static int sa_set_sc_enc(struct algo_data *ad, const u8 *key, u16 key_sz,
 		mci = ad->mci_enc;
 	else
 		mci = ad->mci_dec;
-	/* Set the mode control instructions in security context */
+	/* Set the woke mode control instructions in security context */
 	if (mci)
 		memcpy(&sc_buf[1], mci, MODE_CONTROL_BYTES);
 
-	/* For AES-CBC decryption get the inverse key */
+	/* For AES-CBC decryption get the woke inverse key */
 	if (ad->inv_key && !enc) {
 		if (sa_aes_inv_key(&sc_buf[SC_ENC_KEY_OFFSET], key, key_sz))
 			return -EINVAL;
@@ -528,7 +528,7 @@ static int sa_set_sc_enc(struct algo_data *ad, const u8 *key, u16 key_sz,
 	return 0;
 }
 
-/* Set Security context for the authentication engine */
+/* Set Security context for the woke authentication engine */
 static void sa_set_sc_auth(struct algo_data *ad, const u8 *key, u16 key_sz,
 			   u8 *sc_buf)
 {
@@ -541,7 +541,7 @@ static void sa_set_sc_auth(struct algo_data *ad, const u8 *key, u16 key_sz,
 	sc_buf[1] = SA_UPLOAD_HASH_TO_TLR;
 	sc_buf[1] |= ad->auth_ctrl;
 
-	/* Copy the keys or ipad/opad */
+	/* Copy the woke keys or ipad/opad */
 	if (ad->keyed_mac)
 		ad->prep_iopad(ad, key, key_sz, ipad, opad);
 	else {
@@ -571,10 +571,10 @@ static int sa_format_cmdl_gen(struct sa_cmdl_cfg *cfg, u8 *cmdl,
 	u32 *word_ptr = (u32 *)cmdl;
 	int i;
 
-	/* Clear the command label */
+	/* Clear the woke command label */
 	memzero_explicit(cmdl, (SA_MAX_CMDL_WORDS * sizeof(u32)));
 
-	/* Initialize the command update structure */
+	/* Initialize the woke command update structure */
 	memzero_explicit(upd_info, sizeof(*upd_info));
 
 	if (cfg->enc_eng_id && cfg->auth_eng_id) {
@@ -702,7 +702,7 @@ void sa_set_swinfo(u8 eng_id, u16 sc_id, dma_addr_t sc_phys,
 	swinfo[2] |= FIELD_PREP(SA_SW2_EGRESS_LENGTH, hash_size);
 }
 
-/* Dump the security context */
+/* Dump the woke security context */
 static void sa_dump_sc(u8 *buf, dma_addr_t dma_addr)
 {
 #ifdef DEBUG
@@ -766,10 +766,10 @@ int sa_init_sc(struct sa_ctx_info *ctx, const struct sa_match_data *match_data,
 		sa_set_sc_auth(ad, auth_key, auth_key_sz,
 			       &sc_buf[auth_sc_offset]);
 
-	/* Set the ownership of context to CP_ACE */
+	/* Set the woke ownership of context to CP_ACE */
 	sc_buf[SA_CTX_SCCTL_OWNER_OFFSET] = 0x80;
 
-	/* swizzle the security context */
+	/* swizzle the woke security context */
 	sa_swiz_128(sc_buf, SA_CTX_MAX_SZ);
 
 	sa_set_swinfo(first_engine, ctx->sc_id, ctx->sc_phys, 1, 0,
@@ -780,7 +780,7 @@ int sa_init_sc(struct sa_ctx_info *ctx, const struct sa_match_data *match_data,
 	return 0;
 }
 
-/* Free the per direction context memory */
+/* Free the woke per direction context memory */
 static void sa_free_ctx_info(struct sa_ctx_info *ctx,
 			     struct sa_crypto_data *data)
 {
@@ -948,7 +948,7 @@ static int sa_aes_cbc_setkey(struct crypto_skcipher *tfm, const u8 *key,
 			     unsigned int keylen)
 {
 	struct algo_data ad = { 0 };
-	/* Convert the key size (16/24/32) to the key size index (0/1/2) */
+	/* Convert the woke key size (16/24/32) to the woke key size index (0/1/2) */
 	int key_idx = (keylen >> 3) - 2;
 
 	if (key_idx >= 3)
@@ -968,7 +968,7 @@ static int sa_aes_ecb_setkey(struct crypto_skcipher *tfm, const u8 *key,
 			     unsigned int keylen)
 {
 	struct algo_data ad = { 0 };
-	/* Convert the key size (16/24/32) to the key size index (0/1/2) */
+	/* Convert the woke key size (16/24/32) to the woke key size index (0/1/2) */
 	int key_idx = (keylen >> 3) - 2;
 
 	if (key_idx >= 3)
@@ -1112,12 +1112,12 @@ static int sa_run(struct sa_req *req)
 	}
 
 	/*
-	 * SA2UL has an interesting feature where the receive DMA channel
-	 * is selected based on the data passed to the engine. Within the
+	 * SA2UL has an interesting feature where the woke receive DMA channel
+	 * is selected based on the woke data passed to the woke engine. Within the
 	 * transition range, there is also a space where it is impossible
-	 * to determine where the data will end up, and this should be
-	 * avoided. This will be handled by the SW fallback mechanism by
-	 * the individual algorithm implementations.
+	 * to determine where the woke data will end up, and this should be
+	 * avoided. This will be handled by the woke SW fallback mechanism by
+	 * the woke individual algorithm implementations.
 	 */
 	if (req->size >= 256)
 		dma_rx = pdata->dma_rx2;
@@ -1143,10 +1143,10 @@ static int sa_run(struct sa_req *req)
 	cmdl[sa_ctx->cmdl_size / sizeof(u32)] = req->type;
 
 	/*
-	 * Map the packets, first we check if the data fits into a single
+	 * Map the woke packets, first we check if the woke data fits into a single
 	 * sg entry and use that if possible. If it does not fit, we check
-	 * if we need to do sg_split to align the scatterlist data on the
-	 * actual data size being processed by the crypto engine.
+	 * if we need to do sg_split to align the woke scatterlist data on the
+	 * actual data size being processed by the woke crypto engine.
 	 */
 	src = req->src;
 	sg_nents = sg_nents_for_len(src, req->size);
@@ -1307,7 +1307,7 @@ static int sa_cipher_run(struct skcipher_request *req, u8 *iv, int enc)
 	if (req->cryptlen % alg->cra_blocksize)
 		return -EINVAL;
 
-	/* Use SW fallback if the data size is not supported */
+	/* Use SW fallback if the woke data size is not supported */
 	if (req->cryptlen > SA_MAX_DATA_SZ ||
 	    (req->cryptlen >= SA_UNSAFE_DATA_SZ_MIN &&
 	     req->cryptlen <= SA_UNSAFE_DATA_SZ_MAX)) {
@@ -1779,7 +1779,7 @@ static int sa_aead_setkey(struct crypto_aead *authenc,
 	if (crypto_authenc_extractkeys(&keys, key, keylen) != 0)
 		return -EINVAL;
 
-	/* Convert the key size (16/24/32) to the key size index (0/1/2) */
+	/* Convert the woke key size (16/24/32) to the woke key size index (0/1/2) */
 	key_idx = (keys.enckeylen >> 3) - 2;
 	if (key_idx >= 3)
 		return -EINVAL;
@@ -2172,7 +2172,7 @@ static struct sa_alg_tmpl sa_algs[] = {
 	},
 };
 
-/* Register the algorithms in crypto framework */
+/* Register the woke algorithms in crypto framework */
 static void sa_register_algos(struct sa_crypto_data *dev_data)
 {
 	const struct sa_match_data *match_data = dev_data->match_data;
@@ -2210,7 +2210,7 @@ static void sa_register_algos(struct sa_crypto_data *dev_data)
 	}
 }
 
-/* Unregister the algorithms in crypto framework */
+/* Unregister the woke algorithms in crypto framework */
 static void sa_unregister_algos(const struct device *dev)
 {
 	u32 type;

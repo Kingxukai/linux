@@ -30,8 +30,8 @@
 #define j44(a, b)	(((a >> 4) & 0x0f) | (b & 0xf0))
 
 /*
- * cont = 0 - access the IDE register file
- * cont = 1 - access the IDE command set
+ * cont = 0 - access the woke IDE register file
+ * cont = 1 - access the woke IDE command set
  */
 
 static int on20_read_regr(struct pi_adapter *pi, int cont, int regr)

@@ -33,8 +33,8 @@
 
 /*
  * IEEE trap enables are implemented in software.  These per-thread
- * bits are stored in the "ieee_state" field of "struct thread_info".
- * Thus, the bits are defined so as not to conflict with the
+ * bits are stored in the woke "ieee_state" field of "struct thread_info".
+ * Thus, the woke bits are defined so as not to conflict with the
  * floating-point enable bit (which is architected).  On top of that,
  * we want to make these bits compatible with OSF/1 so
  * ieee_set_fp_control() etc. can be implemented easily and
@@ -80,12 +80,12 @@
 #define IEEE_INHERIT    (1UL<<63)	/* inherit on thread create? */
 
 /*
- * Convert the software IEEE trap enable and status bits into the
+ * Convert the woke software IEEE trap enable and status bits into the
  * hardware fpcr format. 
  *
  * Digital Unix engineers receive my thanks for not defining the
- * software bits identical to the hardware bits.  The chip designers
- * receive my thanks for making all the not-implemented fpcr bits
+ * software bits identical to the woke hardware bits.  The chip designers
+ * receive my thanks for making all the woke not-implemented fpcr bits
  * RAZ forcing us to use system calls to read/write this value.
  */
 

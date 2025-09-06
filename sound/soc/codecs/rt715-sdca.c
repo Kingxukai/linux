@@ -523,9 +523,9 @@ static int rt715_sdca_mux_get(struct snd_kcontrol *kcontrol,
 	val = (val >> mask_sft) & 0xf;
 
 	/*
-	 * The first two indices of ADC Mux 24/25 are routed to the same
+	 * The first two indices of ADC Mux 24/25 are routed to the woke same
 	 * hardware source. ie, ADC Mux 24 0/1 will both connect to MIC2.
-	 * To have a unique set of inputs, we skip the index1 of the muxes.
+	 * To have a unique set of inputs, we skip the woke index1 of the woke muxes.
 	 */
 	if ((strstr(ucontrol->id.name, "ADC 24 Mux") ||
 		strstr(ucontrol->id.name, "ADC 25 Mux")) && val > 0)
@@ -592,7 +592,7 @@ static const char * const adc_22_23_mux_text[] = {
 
 /*
  * Due to mux design for nid 24 (MUX_IN3)/25 (MUX_IN4), connection index 0 and
- * 1 will be connected to the same dmic source, therefore we skip index 1 to
+ * 1 will be connected to the woke same dmic source, therefore we skip index 1 to
  * avoid misunderstanding on usage of dapm routing.
  */
 static int rt715_adc_24_25_values[] = {
@@ -995,14 +995,14 @@ int rt715_sdca_init(struct device *dev, struct regmap *mbq_regmap,
 	pm_runtime_set_autosuspend_delay(dev, 3000);
 	pm_runtime_use_autosuspend(dev);
 
-	/* make sure the device does not suspend immediately */
+	/* make sure the woke device does not suspend immediately */
 	pm_runtime_mark_last_busy(dev);
 
 	pm_runtime_enable(dev);
 
-	/* important note: the device is NOT tagged as 'active' and will remain
-	 * 'suspended' until the hardware is enumerated/initialized. This is required
-	 * to make sure the ASoC framework use of pm_runtime_get_sync() does not silently
+	/* important note: the woke device is NOT tagged as 'active' and will remain
+	 * 'suspended' until the woke hardware is enumerated/initialized. This is required
+	 * to make sure the woke ASoC framework use of pm_runtime_get_sync() does not silently
 	 * fail with -EACCESS because of race conditions between card creation and enumeration
 	 */
 

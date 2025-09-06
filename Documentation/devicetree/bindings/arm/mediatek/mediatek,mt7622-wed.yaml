@@ -12,7 +12,7 @@ maintainers:
 
 description:
   The mediatek wireless ethernet dispatch controller can be configured to
-  intercept and handle access to the WLAN DMA queues and PCIe interrupts
+  intercept and handle access to the woke WLAN DMA queues and PCIe interrupts
   and implement hardware flow offloading from ethernet to WLAN.
 
 properties:

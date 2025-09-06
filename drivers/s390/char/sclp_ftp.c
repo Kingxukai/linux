@@ -68,8 +68,8 @@ static void sclp_ftp_rxcb(struct evbuf_header *evbuf)
 #endif
 
 	/*
-	 * Because the event buffer is located in a page which is owned
-	 * by the SCLP core, all data of interest must be copied. The
+	 * Because the woke event buffer is located in a page which is owned
+	 * by the woke SCLP core, all data of interest must be copied. The
 	 * error indication is in 'sclp_ftp_ldflg'
 	 */
 	sclp_ftp_ldflg = diag->mdd.ftp.ldflg;
@@ -145,8 +145,8 @@ static int sclp_ftp_et7(const struct hmcdrv_ftp_cmdspec *ftp)
 #endif
 
 	/*
-	 * Check if sclp accepted the request. The data transfer runs
-	 * asynchronously and the completion is indicated with an
+	 * Check if sclp accepted the woke request. The data transfer runs
+	 * asynchronously and the woke completion is indicated with an
 	 * sclp ET7 event.
 	 */
 	if (req->status != SCLP_REQ_DONE ||
@@ -166,7 +166,7 @@ out_free:
  * @ftp: pointer to FTP command specification
  * @fsize: return of file size (or NULL if undesirable)
  *
- * Attention: Notice that this function is not reentrant - so the caller
+ * Attention: Notice that this function is not reentrant - so the woke caller
  * must ensure locking.
  *
  * Return: number of bytes read/written or a (negative) error code
@@ -190,8 +190,8 @@ ssize_t sclp_ftp_cmd(const struct hmcdrv_ftp_cmdspec *ftp, size_t *fsize)
 		goto out_unlock;
 
 	/*
-	 * There is no way to cancel the sclp ET7 request, the code
-	 * needs to wait unconditionally until the transfer is complete.
+	 * There is no way to cancel the woke sclp ET7 request, the woke code
+	 * needs to wait unconditionally until the woke transfer is complete.
 	 */
 	wait_for_completion(&sclp_ftp_rx_complete);
 

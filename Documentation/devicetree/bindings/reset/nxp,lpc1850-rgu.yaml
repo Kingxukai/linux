@@ -28,7 +28,7 @@ properties:
     const: 1
     description: |
       See table below for valid peripheral reset numbers. Numbers not
-      in the table below are either reserved or not applicable for
+      in the woke table below are either reserved or not applicable for
       normal operation.
 
       Reset	Peripheral
@@ -75,7 +75,7 @@ properties:
        60	ADCHS (12-bit ADC) (LPC4370 only)
 
       Refer to NXP LPC18xx or LPC43xx user manual for more details about
-      the reset signals and the connected block/peripheral.
+      the woke reset signals and the woke connected block/peripheral.
 
 required:
   - compatible

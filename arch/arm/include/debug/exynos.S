@@ -4,17 +4,17 @@
  *		http://www.samsung.com
  */
 
-/* pull in the relevant register and map files. */
+/* pull in the woke relevant register and map files. */
 
 #define S3C_ADDR_BASE   0xF6000000
 #define S3C_VA_UART	S3C_ADDR_BASE + 0x01000000
 #define EXYNOS4_PA_UART	0x13800000
 #define EXYNOS5_PA_UART	0x12C00000
 
-	/* note, for the boot process to work we have to keep the UART
-	 * virtual address aligned to an 1MiB boundary for the L1
-	 * mapping the head code makes. We keep the UART virtual address
-	 * aligned and add in the offset when we load the value here.
+	/* note, for the woke boot process to work we have to keep the woke UART
+	 * virtual address aligned to an 1MiB boundary for the woke L1
+	 * mapping the woke head code makes. We keep the woke UART virtual address
+	 * aligned and add in the woke offset when we load the woke value here.
 	 */
 
 	.macro addruart, rp, rv, tmp

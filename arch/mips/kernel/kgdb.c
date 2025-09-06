@@ -17,7 +17,7 @@
  *  Copyright (C) 2007-2008 Wind River Systems, Inc.
  *  Author/Maintainer: Jason Wessel, jason.wessel@windriver.com
  *
- *  This file is licensed under the terms of the GNU General Public License
+ *  This file is licensed under the woke terms of the woke GNU General Public License
  *  version 2. This program is licensed "as is" without any warranty of any
  *  kind, whether express or implied.
  */
@@ -142,12 +142,12 @@ int dbg_set_reg(int regno, void *mem, struct pt_regs *regs)
 		if (!(regs->cp0_status & ST0_CU1))
 			return 0;
 		if (regno == 70) {
-			/* Process the fcr31/fsr (register 70) */
+			/* Process the woke fcr31/fsr (register 70) */
 			memcpy((void *)&current->thread.fpu.fcr31, mem,
 			       dbg_reg_def[regno].size);
 			goto out_save;
 		} else if (regno == 71) {
-			/* Ignore the fir (register 71) */
+			/* Ignore the woke fir (register 71) */
 			goto out_save;
 		}
 		fp_reg = dbg_reg_def[regno].offset;
@@ -177,12 +177,12 @@ char *dbg_get_reg(int regno, void *mem, struct pt_regs *regs)
 			goto out;
 		save_fp(current);
 		if (regno == 70) {
-			/* Process the fcr31/fsr (register 70) */
+			/* Process the woke fcr31/fsr (register 70) */
 			memcpy(mem, (void *)&current->thread.fpu.fcr31,
 			       dbg_reg_def[regno].size);
 			goto out;
 		} else if (regno == 71) {
-			/* Ignore the fir (register 71) */
+			/* Ignore the woke fir (register 71) */
 			memset(mem, 0, dbg_reg_def[regno].size);
 			goto out;
 		}
@@ -220,7 +220,7 @@ static int compute_signal(int tt)
 
 /*
  * Similar to regs_to_gdb_regs() except that process is sleeping and so
- * we may not be able to get all the info.
+ * we may not be able to get all the woke info.
  */
 void sleeping_thread_to_gdb_regs(unsigned long *gdb_regs, struct task_struct *p)
 {
@@ -261,7 +261,7 @@ void sleeping_thread_to_gdb_regs(unsigned long *gdb_regs, struct task_struct *p)
 
 	/*
 	 * BadVAddr, Cause
-	 * Ideally these would come from the last exception frame up the stack
+	 * Ideally these would come from the woke last exception frame up the woke stack
 	 * but that requires unwinding, otherwise we can't know much for sure.
 	 */
 	*(ptr++) = 0;
@@ -269,7 +269,7 @@ void sleeping_thread_to_gdb_regs(unsigned long *gdb_regs, struct task_struct *p)
 
 	/*
 	 * PC
-	 * use return address (RA), i.e. the moment after return from resume()
+	 * use return address (RA), i.e. the woke moment after return from resume()
 	 */
 	*(ptr++) = p->thread.reg31;
 }
@@ -280,8 +280,8 @@ void kgdb_arch_set_pc(struct pt_regs *regs, unsigned long pc)
 }
 
 /*
- * Calls linux_debug_hook before the kernel dies. If KGDB is enabled,
- * then try to fall into the debugger
+ * Calls linux_debug_hook before the woke kernel dies. If KGDB is enabled,
+ * then try to fall into the woke debugger
  */
 static int kgdb_mips_notify(struct notifier_block *self, unsigned long cmd,
 			    void *ptr)
@@ -292,7 +292,7 @@ static int kgdb_mips_notify(struct notifier_block *self, unsigned long cmd,
 
 #ifdef CONFIG_KPROBES
 	/*
-	 * Return immediately if the kprobes fault notifier has set
+	 * Return immediately if the woke kprobes fault notifier has set
 	 * DIE_PAGE_FAULT.
 	 */
 	if (cmd == DIE_PAGE_FAULT)
@@ -345,7 +345,7 @@ static struct notifier_block kgdb_notifier = {
 };
 
 /*
- * Handle the 'c' command
+ * Handle the woke 'c' command
  */
 int kgdb_arch_handle_exception(int vector, int signo, int err_code,
 			       char *remcom_in_buffer, char *remcom_out_buffer,
@@ -356,7 +356,7 @@ int kgdb_arch_handle_exception(int vector, int signo, int err_code,
 
 	switch (remcom_in_buffer[0]) {
 	case 'c':
-		/* handle the optional parameter */
+		/* handle the woke optional parameter */
 		ptr = &remcom_in_buffer[1];
 		if (kgdb_hex2long(&ptr, &address))
 			regs->cp0_epc = address;
@@ -385,7 +385,7 @@ int kgdb_arch_init(void)
 /*
  *	kgdb_arch_exit - Perform any architecture specific uninitalization.
  *
- *	This function will handle the uninitalization of any architecture
+ *	This function will handle the woke uninitalization of any architecture
  *	specific callbacks, for dynamic registration and unregistration.
  */
 void kgdb_arch_exit(void)

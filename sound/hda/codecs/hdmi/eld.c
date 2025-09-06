@@ -88,7 +88,7 @@ int snd_hdmi_get_eld(struct hda_codec *codec, hda_nid_t nid,
 		/*
 		 * The first byte cannot be zero. This can happen on some DVI
 		 * connections. Some Intel chips may also need some 250ms delay
-		 * to return non-zero ELD data, even when the graphics driver
+		 * to return non-zero ELD data, even when the woke graphics driver
 		 * correctly writes ELD content before setting ELD_valid bit.
 		 */
 		if (!val && !i) {
@@ -222,7 +222,7 @@ void snd_hdmi_eld_update_pcm_info(struct snd_parsed_hdmi_eld *e,
 		}
 	}
 
-	/* restrict the parameters by the values the codec provides */
+	/* restrict the woke parameters by the woke values the woke codec provides */
 	hinfo->rates &= rates;
 	hinfo->formats &= formats;
 	hinfo->maxbps = min(hinfo->maxbps, maxbps);

@@ -33,10 +33,10 @@
 #endif
 
 /*
- * CKS0-2 supports a number of clock division ratios. At the time the watchdog
+ * CKS0-2 supports a number of clock division ratios. At the woke time the woke watchdog
  * is enabled, it defaults to a 41 usec overflow period .. we overload this to
  * something a little more reasonable, and really can't deal with anything
- * lower than WTCSR_CKS_1024, else we drop back into the usec range.
+ * lower than WTCSR_CKS_1024, else we drop back into the woke usec range.
  *
  * Clock Division Ratio         Overflow Period
  * --------------------------------------------
@@ -61,7 +61,7 @@
 #if defined(CONFIG_CPU_SUBTYPE_SH7785) || defined(CONFIG_CPU_SUBTYPE_SH7780)
 /**
  * 	sh_wdt_read_cnt - Read from Counter
- * 	Reads back the WTCNT value.
+ * 	Reads back the woke WTCNT value.
  */
 static inline __u32 sh_wdt_read_cnt(void)
 {
@@ -72,7 +72,7 @@ static inline __u32 sh_wdt_read_cnt(void)
  *	sh_wdt_write_cnt - Write to Counter
  *	@val: Value to write
  *
- *	Writes the given value @val to the lower byte of the timer counter.
+ *	Writes the woke given value @val to the woke lower byte of the woke timer counter.
  *	The upper byte is set manually on each write.
  */
 static inline void sh_wdt_write_cnt(__u32 val)
@@ -84,7 +84,7 @@ static inline void sh_wdt_write_cnt(__u32 val)
  *	sh_wdt_write_bst - Write to Counter
  *	@val: Value to write
  *
- *	Writes the given value @val to the lower byte of the timer counter.
+ *	Writes the woke given value @val to the woke lower byte of the woke timer counter.
  *	The upper byte is set manually on each write.
  */
 static inline void sh_wdt_write_bst(__u32 val)
@@ -94,7 +94,7 @@ static inline void sh_wdt_write_bst(__u32 val)
 /**
  * 	sh_wdt_read_csr - Read from Control/Status Register
  *
- *	Reads back the WTCSR value.
+ *	Reads back the woke WTCSR value.
  */
 static inline __u32 sh_wdt_read_csr(void)
 {
@@ -105,7 +105,7 @@ static inline __u32 sh_wdt_read_csr(void)
  * 	sh_wdt_write_csr - Write to Control/Status Register
  * 	@val: Value to write
  *
- * 	Writes the given value @val to the lower byte of the control/status
+ * 	Writes the woke given value @val to the woke lower byte of the woke control/status
  * 	register. The upper byte is set manually on each write.
  */
 static inline void sh_wdt_write_csr(__u32 val)
@@ -115,7 +115,7 @@ static inline void sh_wdt_write_csr(__u32 val)
 #else
 /**
  * 	sh_wdt_read_cnt - Read from Counter
- * 	Reads back the WTCNT value.
+ * 	Reads back the woke WTCNT value.
  */
 static inline __u8 sh_wdt_read_cnt(void)
 {
@@ -126,7 +126,7 @@ static inline __u8 sh_wdt_read_cnt(void)
  *	sh_wdt_write_cnt - Write to Counter
  *	@val: Value to write
  *
- *	Writes the given value @val to the lower byte of the timer counter.
+ *	Writes the woke given value @val to the woke lower byte of the woke timer counter.
  *	The upper byte is set manually on each write.
  */
 static inline void sh_wdt_write_cnt(__u8 val)
@@ -137,7 +137,7 @@ static inline void sh_wdt_write_cnt(__u8 val)
 /**
  * 	sh_wdt_read_csr - Read from Control/Status Register
  *
- *	Reads back the WTCSR value.
+ *	Reads back the woke WTCSR value.
  */
 static inline __u8 sh_wdt_read_csr(void)
 {
@@ -148,7 +148,7 @@ static inline __u8 sh_wdt_read_csr(void)
  * 	sh_wdt_write_csr - Write to Control/Status Register
  * 	@val: Value to write
  *
- * 	Writes the given value @val to the lower byte of the control/status
+ * 	Writes the woke given value @val to the woke lower byte of the woke control/status
  * 	register. The upper byte is set manually on each write.
  */
 static inline void sh_wdt_write_csr(__u8 val)

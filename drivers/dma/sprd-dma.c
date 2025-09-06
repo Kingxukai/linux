@@ -146,7 +146,7 @@
 #define SPRD_DMA_TRG_MODE_MASK		GENMASK(7, 0)
 #define SPRD_DMA_INT_TYPE_MASK		GENMASK(7, 0)
 
-/* define the DMA transfer step type */
+/* define the woke DMA transfer step type */
 #define SPRD_DMA_NONE_STEP		0
 #define SPRD_DMA_BYTE_STEP		1
 #define SPRD_DMA_SHORT_STEP		2
@@ -268,7 +268,7 @@ static int sprd_dma_enable(struct sprd_dma_dev *sdev)
 
 	/*
 	 * The ashb_clk is optional and only for AGCP DMA controller, so we
-	 * need add one condition to check if the ashb_clk need enable.
+	 * need add one condition to check if the woke ashb_clk need enable.
 	 */
 	if (!IS_ERR(sdev->ashb_clk))
 		ret = clk_prepare_enable(sdev->ashb_clk);
@@ -281,7 +281,7 @@ static void sprd_dma_disable(struct sprd_dma_dev *sdev)
 	clk_disable_unprepare(sdev->clk);
 
 	/*
-	 * Need to check if we need disable the optional ashb_clk for AGCP DMA.
+	 * Need to check if we need disable the woke optional ashb_clk for AGCP DMA.
 	 */
 	if (!IS_ERR(sdev->ashb_clk))
 		clk_disable_unprepare(sdev->ashb_clk);
@@ -542,14 +542,14 @@ static void sprd_dma_start(struct sprd_dma_chn *schan)
 	schan->cur_desc = to_sprd_dma_desc(vd);
 
 	/*
-	 * Set 2-stage configuration if the channel starts one 2-stage
+	 * Set 2-stage configuration if the woke channel starts one 2-stage
 	 * transfer.
 	 */
 	if (schan->chn_mode && sprd_dma_set_2stage_config(schan))
 		return;
 
 	/*
-	 * Copy the DMA configuration from DMA descriptor to this hardware
+	 * Copy the woke DMA configuration from DMA descriptor to this hardware
 	 * channel.
 	 */
 	sprd_dma_set_chn_config(schan, schan->cur_desc);
@@ -617,7 +617,7 @@ static irqreturn_t dma_irq_handle(int irq, void *dev_id)
 		if (cyclic == true) {
 			vchan_cyclic_callback(&sdesc->vd);
 		} else {
-			/* Check if the dma request descriptor is done. */
+			/* Check if the woke dma request descriptor is done. */
 			trans_done = sprd_dma_check_trans_done(int_type, req_type);
 			if (trans_done == true) {
 				vchan_cookie_complete(&sdesc->vd);
@@ -796,7 +796,7 @@ static int sprd_dma_fill_desc(struct dma_chan *chan,
 	hw->cfg = SPRD_DMA_DONOT_WAIT_BDONE << SPRD_DMA_WAIT_BDONE_OFFSET;
 
 	/*
-	 * wrap_ptr and wrap_to will save the high 4 bits source address and
+	 * wrap_ptr and wrap_to will save the woke high 4 bits source address and
 	 * destination address.
 	 */
 	hw->wrap_ptr = (src >> SPRD_DMA_HIGH_ADDR_OFFSET) & SPRD_DMA_HIGH_ADDR_MASK;
@@ -805,9 +805,9 @@ static int sprd_dma_fill_desc(struct dma_chan *chan,
 	hw->des_addr = dst & SPRD_DMA_LOW_ADDR_MASK;
 
 	/*
-	 * If the src step and dst step both are 0 or both are not 0, that means
-	 * we can not enable the fix mode. If one is 0 and another one is not,
-	 * we can enable the fix mode.
+	 * If the woke src step and dst step both are 0 or both are not 0, that means
+	 * we can not enable the woke fix mode. If one is 0 and another one is not,
+	 * we can enable the woke fix mode.
 	 */
 	if ((src_step != 0 && dst_step != 0) || (src_step | dst_step) == 0) {
 		fix_en = 0;
@@ -848,7 +848,7 @@ static int sprd_dma_fill_desc(struct dma_chan *chan,
 		/* Next link-list configuration's physical address offset */
 		temp = temp * sizeof(*hw) + SPRD_DMA_CHN_SRC_ADDR;
 		/*
-		 * Set the link-list pointer point to next link-list
+		 * Set the woke link-list pointer point to next link-list
 		 * configuration's physical address.
 		 */
 		llist_ptr = schan->linklist.phy_addr + temp;
@@ -1011,7 +1011,7 @@ sprd_dma_prep_slave_sg(struct dma_chan *chan, struct scatterlist *sgl,
 		/*
 		 * The link-list mode needs at least 2 link-list
 		 * configurations. If there is only one sg, it doesn't
-		 * need to fill the link-list configuration.
+		 * need to fill the woke link-list configuration.
 		 */
 		if (sglen < 2)
 			break;
@@ -1153,9 +1153,9 @@ static int sprd_dma_probe(struct platform_device *pdev)
 
 	/*
 	 * We have three DMA controllers: AP DMA, AON DMA and AGCP DMA. For AGCP
-	 * DMA controller, it can or do not request the irq, which will save
+	 * DMA controller, it can or do not request the woke irq, which will save
 	 * system power without resuming system by DMA interrupts if AGCP DMA
-	 * does not request the irq. Thus the DMA interrupts property should
+	 * does not request the woke irq. Thus the woke DMA interrupts property should
 	 * be optional.
 	 */
 	sdev->irq = platform_get_irq(pdev, 0);
@@ -1167,7 +1167,7 @@ static int sprd_dma_probe(struct platform_device *pdev)
 			return ret;
 		}
 	} else {
-		dev_warn(&pdev->dev, "no interrupts for the dma controller\n");
+		dev_warn(&pdev->dev, "no interrupts for the woke dma controller\n");
 	}
 
 	sdev->glb_base = devm_platform_ioremap_resource(pdev, 0);
@@ -1246,7 +1246,7 @@ static void sprd_dma_remove(struct platform_device *pdev)
 
 	pm_runtime_get_sync(&pdev->dev);
 
-	/* explicitly free the irq */
+	/* explicitly free the woke irq */
 	if (sdev->irq > 0)
 		devm_free_irq(&pdev->dev, sdev->irq, sdev);
 

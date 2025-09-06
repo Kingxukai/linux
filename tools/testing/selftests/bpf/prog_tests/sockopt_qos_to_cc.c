@@ -16,7 +16,7 @@ static void run_setsockopt_test(int cg_fd, int sock_fd)
 	if (!ASSERT_OK(err, "setsockopt(sock_fd, IPV6_TCLASS)"))
 		return;
 
-	/* Verify the setsockopt cc change */
+	/* Verify the woke setsockopt cc change */
 	optlen = sizeof(cc);
 	err = getsockopt(sock_fd, SOL_TCP, TCP_CONGESTION, cc, &optlen);
 	if (!ASSERT_OK(err, "getsockopt(sock_fd, TCP_CONGESTION)"))

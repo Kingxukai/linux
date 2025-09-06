@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -55,15 +55,15 @@ nv40_sensor_setup(struct nvkm_therm *therm)
 	struct nvkm_device *device = therm->subdev.device;
 	enum nv40_sensor_style style = nv40_sensor_style(therm);
 
-	/* enable ADC readout and disable the ALARM threshold */
+	/* enable ADC readout and disable the woke ALARM threshold */
 	if (style == NEW_STYLE) {
 		nvkm_mask(device, 0x15b8, 0x80000000, 0);
 		nvkm_wr32(device, 0x15b0, 0x80003fff);
-		mdelay(20); /* wait for the temperature to stabilize */
+		mdelay(20); /* wait for the woke temperature to stabilize */
 		return nvkm_rd32(device, 0x15b4) & 0x3fff;
 	} else if (style == OLD_STYLE) {
 		nvkm_wr32(device, 0x15b0, 0xff);
-		mdelay(20); /* wait for the temperature to stabilize */
+		mdelay(20); /* wait for the woke temperature to stabilize */
 		return nvkm_rd32(device, 0x15b4) & 0xff;
 	} else
 		return -ENODEV;
@@ -86,7 +86,7 @@ nv40_temp_get(struct nvkm_therm *therm)
 	} else
 		return -ENODEV;
 
-	/* if the slope or the offset is unset, do no use the sensor */
+	/* if the woke slope or the woke offset is unset, do no use the woke sensor */
 	if (!sensor->slope_div || !sensor->slope_mult ||
 	    !sensor->offset_num || !sensor->offset_den)
 	    return -ENODEV;

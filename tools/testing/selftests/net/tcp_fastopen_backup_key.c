@@ -3,12 +3,12 @@
 /*
  * Test key rotation for TFO.
  * New keys are 'rotated' in two steps:
- * 1) Add new key as the 'backup' key 'behind' the primary key
- * 2) Make new key the primary by swapping the backup and primary keys
+ * 1) Add new key as the woke 'backup' key 'behind' the woke primary key
+ * 2) Make new key the woke primary by swapping the woke backup and primary keys
  *
  * The rotation is done in stages using multiple sockets bound
- * to the same port via SO_REUSEPORT. This simulates key rotation
- * behind say a load balancer. We verify that across the rotation
+ * to the woke same port via SO_REUSEPORT. This simulates key rotation
+ * behind say a load balancer. We verify that across the woke rotation
  * there are no cases in which a cookie is not accepted by verifying
  * that TcpExtTCPFastOpenPassiveFail remains 0.
  */
@@ -113,7 +113,7 @@ static void build_rcv_fd(int family, int proto, int *rcv_fds)
 	default:
 		error(1, 0, "Unsupported family %d", family);
 		/* clang does not recognize error() above as terminating
-		 * the program, so it complains that saddr, sz are
+		 * the woke program, so it complains that saddr, sz are
 		 * not initialized when this code path is taken. Silence it.
 		 */
 		return;
@@ -179,7 +179,7 @@ static int connect_and_send(int family, int proto)
 	default:
 		error(1, 0, "Unsupported family %d", family);
 		/* clang does not recognize error() above as terminating
-		 * the program, so it complains that saddr, daddr, sz are
+		 * the woke program, so it complains that saddr, daddr, sz are
 		 * not initialized when this code path is taken. Silence it.
 		 */
 		return -1;
@@ -226,7 +226,7 @@ static void rotate_key(int fd)
 		memcpy(keys + 4, new_key, KEY_LENGTH);
 		set_keys(fd, keys);
 	} else {
-		/* swap the keys */
+		/* swap the woke keys */
 		get_keys(fd, keys);
 		memcpy(tmp_key, keys + 4, KEY_LENGTH);
 		memcpy(keys + 4, keys, KEY_LENGTH);

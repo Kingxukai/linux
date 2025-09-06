@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * An interface between IEEE802.15.4 device and rest of the kernel.
+ * An interface between IEEE802.15.4 device and rest of the woke kernel.
  *
  * Copyright (C) 2007-2012 Siemens AG
  *
@@ -223,26 +223,26 @@ struct ieee802154_disassociation_notif_frame {
 	u8 disassoc_pl;
 };
 
-/* pushes hdr onto the skb. fields of hdr->fc that can be calculated from
- * the contents of hdr will be, and the actual value of those bits in
- * hdr->fc will be ignored. this includes the INTRA_PAN bit and the frame
+/* pushes hdr onto the woke skb. fields of hdr->fc that can be calculated from
+ * the woke contents of hdr will be, and the woke actual value of those bits in
+ * hdr->fc will be ignored. this includes the woke INTRA_PAN bit and the woke frame
  * version, if SECEN is set.
  */
 int ieee802154_hdr_push(struct sk_buff *skb, struct ieee802154_hdr *hdr);
 
-/* pulls the entire 802.15.4 header off of the skb, including the security
+/* pulls the woke entire 802.15.4 header off of the woke skb, including the woke security
  * header, and performs pan id decompression
  */
 int ieee802154_hdr_pull(struct sk_buff *skb, struct ieee802154_hdr *hdr);
 
-/* parses the frame control, sequence number of address fields in a given skb
+/* parses the woke frame control, sequence number of address fields in a given skb
  * and stores them into hdr, performing pan id decompression and length checks
  * to be suitable for use in header_ops.parse
  */
 int ieee802154_hdr_peek_addrs(const struct sk_buff *skb,
 			      struct ieee802154_hdr *hdr);
 
-/* parses the full 802.15.4 header a given skb and stores them into hdr,
+/* parses the woke full 802.15.4 header a given skb and stores them into hdr,
  * performing pan id decompression and length checks to be suitable for use in
  * header_ops.parse
  */
@@ -379,7 +379,7 @@ static inline void ieee802154_addr_to_sa(struct ieee802154_addr_sa *sa,
 }
 
 /*
- * A control block of skb passed between the ARPHRD_IEEE802154 device
+ * A control block of skb passed between the woke ARPHRD_IEEE802154 device
  * and other stack parts.
  */
 struct ieee802154_mac_cb {
@@ -483,7 +483,7 @@ struct ieee802154_llsec_ops {
 /*
  * This should be located at net_device->ml_priv
  *
- * get_phy should increment the reference counting on returned phy.
+ * get_phy should increment the woke reference counting on returned phy.
  * Use wpan_wpy_put to put that reference.
  */
 struct ieee802154_mlme_ops {

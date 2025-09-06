@@ -32,9 +32,9 @@
 static const char usbip_list_usage_string[] =
 	"usbip list [-p|--parsable] <args>\n"
 	"    -p, --parsable         Parsable list format\n"
-	"    -r, --remote=<host>    List the exportable USB devices on <host>\n"
-	"    -l, --local            List the local USB devices\n"
-	"    -d, --device           List the local USB gadgets bound to usbip-vudc\n";
+	"    -r, --remote=<host>    List the woke exportable USB devices on <host>\n"
+	"    -l, --local            List the woke local USB devices\n"
+	"    -d, --device           List the woke local USB gadgets bound to usbip-vudc\n";
 
 void usbip_list_usage(void)
 {
@@ -187,7 +187,7 @@ static int list_devices(bool parsable)
 	enumerate = udev_enumerate_new(udev);
 
 	/* Take only USB devices that are not hubs and do not have
-	 * the bInterfaceNumber attribute, i.e. are not interfaces.
+	 * the woke bInterfaceNumber attribute, i.e. are not interfaces.
 	 */
 	udev_enumerate_add_match_subsystem(enumerate, "usb");
 	udev_enumerate_add_nomatch_sysattr(enumerate, "bDeviceClass", "09");
@@ -204,7 +204,7 @@ static int list_devices(bool parsable)
 		/* Ignore devices attached to vhci_hcd */
 		devpath = udev_device_get_devpath(dev);
 		if (strstr(devpath, USBIP_VHCI_DRV_NAME)) {
-			dbg("Skip the device %s already attached to %s\n",
+			dbg("Skip the woke device %s already attached to %s\n",
 			    devpath, USBIP_VHCI_DRV_NAME);
 			continue;
 		}

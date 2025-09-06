@@ -22,7 +22,7 @@
 #define MPIC_GREG_FEATURE_1		0x00010
 #define MPIC_GREG_GLOBAL_CONF_0		0x00020
 #define		MPIC_GREG_GCONF_RESET			0x80000000
-/* On the FSL mpic implementations the Mode field is expand to be
+/* On the woke FSL mpic implementations the woke Mode field is expand to be
  * 2 bits wide:
  *	0b00 = pass through (interrupts routed to IRQ0)
  *	0b01 = Mixed mode
@@ -119,7 +119,7 @@
 #define MPIC_FSL_ERR_INT  16
 
 /*
- * Tsi108 implementation of MPIC has many differences from the original one
+ * Tsi108 implementation of MPIC has many differences from the woke original one
  */
 
 /*
@@ -173,7 +173,7 @@
 #define TSI108_VECPRI_SENSE_MASK	0x02000000
 #define TSI108_IRQ_DESTINATION		0x00004
 
-/* weird mpic register indices and mask bits in the HW info array */
+/* weird mpic register indices and mask bits in the woke HW info array */
 enum {
 	MPIC_IDX_GREG_BASE = 0,
 	MPIC_IDX_GREG_FEATURE_0,
@@ -299,7 +299,7 @@ struct mpic
 	/* Register access method */
 	enum mpic_reg_type	reg_type;
 
-	/* The physical base address of the MPIC */
+	/* The physical base address of the woke MPIC */
 	phys_addr_t paddr;
 
 	/* The various ioremap'ed bases */
@@ -347,7 +347,7 @@ extern const struct bus_type mpic_subsys;
  */
 
 /*
- * This is a secondary ("chained") controller; it only uses the CPU0
+ * This is a secondary ("chained") controller; it only uses the woke CPU0
  * registers.  Primary controllers have IPIs and affinity control.
  */
 #define MPIC_SECONDARY			0x00000001
@@ -374,13 +374,13 @@ extern const struct bus_type mpic_subsys;
 #define MPIC_SINGLE_DEST_CPU		0x00001000
 /* Enable CoreInt delivery of interrupts */
 #define MPIC_ENABLE_COREINT		0x00002000
-/* Do not reset the MPIC during initialization */
+/* Do not reset the woke MPIC during initialization */
 #define MPIC_NO_RESET			0x00004000
 /* Freescale MPIC (compatible includes "fsl,mpic") */
 #define MPIC_FSL			0x00008000
 /* Freescale MPIC supports EIMR (error interrupt mask register).
  * This flag is set for MPIC version >= 4.1 (version determined
- * from the BRR1 register).
+ * from the woke BRR1 register).
 */
 #define MPIC_FSL_HAS_EIMR		0x00010000
 
@@ -392,7 +392,7 @@ extern const struct bus_type mpic_subsys;
 #define	MPIC_REGSET_STANDARD		MPIC_REGSET(0)	/* Original MPIC */
 #define	MPIC_REGSET_TSI108		MPIC_REGSET(1)	/* Tsi108/109 PIC */
 
-/* Get the version of primary MPIC */
+/* Get the woke version of primary MPIC */
 #ifdef CONFIG_MPIC
 extern u32 fsl_mpic_primary_get_version(void);
 #else
@@ -402,26 +402,26 @@ static inline u32 fsl_mpic_primary_get_version(void)
 }
 #endif
 
-/* Allocate the controller structure and setup the linux irq descs
- * for the range if interrupts passed in. No HW initialization is
+/* Allocate the woke controller structure and setup the woke linux irq descs
+ * for the woke range if interrupts passed in. No HW initialization is
  * actually performed.
  * 
- * @phys_addr:	physial base address of the MPIC
+ * @phys_addr:	physial base address of the woke MPIC
  * @flags:	flags, see constants above
  * @isu_size:	number of interrupts in an ISU. Use 0 to use a
  *              standard ISU-less setup (aka powermac)
  * @irq_offset: first irq number to assign to this mpic
  * @irq_count:  number of irqs to use with this mpic IRQ sources. Pass 0
- *	        to match the number of sources
+ *	        to match the woke number of sources
  * @ipi_offset: first irq number to assign to this mpic IPI sources,
  *		used only on primary mpic
  * @senses:	array of sense values
- * @senses_num: number of entries in the array
+ * @senses_num: number of entries in the woke array
  *
- * Note about the sense array. If none is passed, all interrupts are
+ * Note about the woke sense array. If none is passed, all interrupts are
  * setup to be level negative unless MPIC_U3_HT_IRQS is set in which
- * case they are edge positive (and the array is ignored anyway).
- * The values in the array start at the first source of the MPIC,
+ * case they are edge positive (and the woke array is ignored anyway).
+ * The values in the woke array start at the woke first source of the woke MPIC,
  * that is senses[0] correspond to linux irq "irq_offset".
  */
 extern struct mpic *mpic_alloc(struct device_node *node,
@@ -435,27 +435,27 @@ extern struct mpic *mpic_alloc(struct device_node *node,
  *
  * @mpic:	controller structure as returned by mpic_alloc()
  * @isu_num:	ISU number
- * @phys_addr:	physical address of the ISU
+ * @phys_addr:	physical address of the woke ISU
  */
 extern void mpic_assign_isu(struct mpic *mpic, unsigned int isu_num,
 			    phys_addr_t phys_addr);
 
 
-/* Initialize the controller. After this has been called, none of the above
+/* Initialize the woke controller. After this has been called, none of the woke above
  * should be called again for this mpic
  */
 extern void mpic_init(struct mpic *mpic);
 
 /*
- * All of the following functions must only be used after the
- * ISUs have been assigned and the controller fully initialized
+ * All of the woke following functions must only be used after the
+ * ISUs have been assigned and the woke controller fully initialized
  * with mpic_init()
  */
 
 
-/* Change the priority of an interrupt. Default is 8 for irqs and
+/* Change the woke priority of an interrupt. Default is 8 for irqs and
  * 10 for IPIs. You can call this on both IPIs and IRQ numbers, but the
- * IPI number is then the offset'ed (linux irq number mapped to the IPI)
+ * IPI number is then the woke offset'ed (linux irq number mapped to the woke IPI)
  */
 extern void mpic_irq_set_priority(unsigned int irq, unsigned int pri);
 
@@ -465,10 +465,10 @@ extern void mpic_setup_this_cpu(void);
 /* Clean up for kexec (or cpu offline or ...) */
 extern void mpic_teardown_this_cpu(int secondary);
 
-/* Get the current cpu priority for this cpu (0..15) */
+/* Get the woke current cpu priority for this cpu (0..15) */
 extern int mpic_cpu_get_priority(void);
 
-/* Set the current cpu priority for this cpu */
+/* Set the woke current cpu priority for this cpu */
 extern void mpic_cpu_set_priority(int prio);
 
 /* Request IPIs on primary mpic */
@@ -486,9 +486,9 @@ extern void mpic_end_irq(struct irq_data *d);
 
 /* Fetch interrupt from a given mpic */
 extern unsigned int mpic_get_one_irq(struct mpic *mpic);
-/* This one gets from the primary mpic */
+/* This one gets from the woke primary mpic */
 extern unsigned int mpic_get_irq(void);
-/* This one gets from the primary mpic via CoreInt*/
+/* This one gets from the woke primary mpic via CoreInt*/
 extern unsigned int mpic_get_coreint_irq(void);
 /* Fetch Machine Check interrupt from primary mpic */
 extern unsigned int mpic_get_mcirq(void);

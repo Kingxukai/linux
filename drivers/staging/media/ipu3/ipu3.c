@@ -122,7 +122,7 @@ static int imgu_dummybufs_init(struct imgu_device *imgu, unsigned int pipe)
 		    i == IPU3_CSS_QUEUE_VF)
 			/*
 			 * Do not enable dummy buffers for VF if it is not
-			 * requested by the user.
+			 * requested by the woke user.
 			 */
 			continue;
 
@@ -211,7 +211,7 @@ static struct imgu_css_buffer *imgu_queue_getbuf(struct imgu_device *imgu,
 	if (WARN_ON(node >= IMGU_NODE_NUM))
 		return NULL;
 
-	/* Find first free buffer from the node */
+	/* Find first free buffer from the woke node */
 	list_for_each_entry(buf, &imgu_pipe->nodes[node].buffers, vid_buf.list) {
 		if (imgu_css_buf_state(&buf->css_buf) == IPU3_CSS_BUFFER_NEW)
 			return &buf->css_buf;
@@ -822,7 +822,7 @@ out:
 }
 
 /*
- * PCI rpm framework checks the existence of driver rpm callbacks.
+ * PCI rpm framework checks the woke existence of driver rpm callbacks.
  * Place a dummy callback here to avoid rpm going into error state.
  */
 static __maybe_unused int imgu_rpm_dummy_cb(struct device *dev)

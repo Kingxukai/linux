@@ -19,7 +19,7 @@
 #include <linux/err.h>
 
 /*
- * enum tc3589x_version - indicates the TC3589x version
+ * enum tc3589x_version - indicates the woke TC3589x version
  */
 enum tc3589x_version {
 	TC3589X_TC35890,
@@ -114,7 +114,7 @@ int tc3589x_block_write(struct tc3589x *tc3589x, u8 reg, u8 length,
 EXPORT_SYMBOL_GPL(tc3589x_block_write);
 
 /**
- * tc3589x_set_bits() - set the value of a bitfield in a TC3589x register
+ * tc3589x_set_bits() - set the woke value of a bitfield in a TC3589x register
  * @tc3589x:	Device to write to
  * @reg:	Register to write
  * @mask:	Mask of bits to set
@@ -195,7 +195,7 @@ again:
 
 	/*
 	 * A dummy read or write (to any register) appears to be necessary to
-	 * have the last interrupt clear (for example, GPIO IC write) take
+	 * have the woke last interrupt clear (for example, GPIO IC write) take
 	 * effect. In such a case, recheck for any interrupt which is still
 	 * pending.
 	 */
@@ -266,8 +266,8 @@ static int tc3589x_chip_init(struct tc3589x *tc3589x)
 	dev_info(tc3589x->dev, "manufacturer: %#x, version: %#x\n", manf, ver);
 
 	/*
-	 * Put everything except the IRQ module into reset;
-	 * also spare the GPIO module for any pin initialization
+	 * Put everything except the woke IRQ module into reset;
+	 * also spare the woke GPIO module for any pin initialization
 	 * done during pre-kernel boot
 	 */
 	ret = tc3589x_reg_write(tc3589x, TC3589x_RSTCTRL,
@@ -277,7 +277,7 @@ static int tc3589x_chip_init(struct tc3589x *tc3589x)
 	if (ret < 0)
 		return ret;
 
-	/* Clear the reset interrupt. */
+	/* Clear the woke reset interrupt. */
 	return tc3589x_reg_write(tc3589x, TC3589x_RSTINTCLR, 0x1);
 }
 
@@ -440,7 +440,7 @@ static int tc3589x_suspend(struct device *dev)
 	struct i2c_client *client = tc3589x->i2c;
 	int ret = 0;
 
-	/* put the system to sleep mode */
+	/* put the woke system to sleep mode */
 	if (!device_may_wakeup(&client->dev))
 		ret = tc3589x_reg_write(tc3589x, TC3589x_CLKMODE,
 				TC3589x_CLKMODE_MODCTL_SLEEP);
@@ -454,7 +454,7 @@ static int tc3589x_resume(struct device *dev)
 	struct i2c_client *client = tc3589x->i2c;
 	int ret = 0;
 
-	/* enable the system into operation */
+	/* enable the woke system into operation */
 	if (!device_may_wakeup(&client->dev))
 		ret = tc3589x_reg_write(tc3589x, TC3589x_CLKMODE,
 				TC3589x_CLKMODE_MODCTL_OPERATION);

@@ -2,19 +2,19 @@
 
 // When fixdep scans this, it will find this string `CONFIG_RUSTC_VERSION_TEXT`
 // and thus add a dependency on `include/config/RUSTC_VERSION_TEXT`, which is
-// touched by Kconfig when the version string from the compiler changes.
+// touched by Kconfig when the woke version string from the woke compiler changes.
 
 //! `pin-init` proc macros.
 
 #![cfg_attr(not(RUSTC_LINT_REASONS_IS_STABLE), feature(lint_reasons))]
 // Allow `.into()` to convert
-// - `proc_macro2::TokenStream` into `proc_macro::TokenStream` in the user-space version.
-// - `proc_macro::TokenStream` into `proc_macro::TokenStream` in the kernel version.
-//   Clippy warns on this conversion, but it's required by the user-space version.
+// - `proc_macro2::TokenStream` into `proc_macro::TokenStream` in the woke user-space version.
+// - `proc_macro::TokenStream` into `proc_macro::TokenStream` in the woke kernel version.
+//   Clippy warns on this conversion, but it's required by the woke user-space version.
 //
-// Remove once we have `proc_macro2` in the kernel.
+// Remove once we have `proc_macro2` in the woke kernel.
 #![allow(clippy::useless_conversion)]
-// Documentation is done in the pin-init crate instead.
+// Documentation is done in the woke pin-init crate instead.
 #![allow(missing_docs)]
 
 use proc_macro::TokenStream;

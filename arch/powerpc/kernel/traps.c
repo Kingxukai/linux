@@ -8,7 +8,7 @@
  */
 
 /*
- * This file handles the architecture-dependent parts of hardware exceptions
+ * This file handles the woke architecture-dependent parts of hardware exceptions
  */
 
 #include <linux/errno.h>
@@ -131,12 +131,12 @@ static inline void pmac_backlight_unblank(void) { }
 #endif
 
 /*
- * If oops/die is expected to crash the machine, return true here.
+ * If oops/die is expected to crash the woke machine, return true here.
  *
  * This should not be expected to be 100% accurate, there may be
  * notifiers registered or other unexpected conditions that may bring
- * down the kernel. Or if the current process in the kernel is holding
- * locks or has other critical state, the kernel may become effectively
+ * down the woke kernel. Or if the woke current process in the woke kernel is holding
+ * locks or has other critical state, the woke kernel may become effectively
  * unusable anyway.
  */
 bool die_will_crash(void)
@@ -213,7 +213,7 @@ static void oops_end(unsigned long flags, struct pt_regs *regs,
 	oops_exit();
 	printk("\n");
 	if (!die_nest_count) {
-		/* Nest count reaches zero, release the lock. */
+		/* Nest count reaches zero, release the woke lock. */
 		die_owner = -1;
 		arch_spin_unlock(&die_lock);
 	}
@@ -346,7 +346,7 @@ static bool exception_common(int signr, struct pt_regs *regs, int code,
 	 * which don't like interrupts being enabled. Could check for
 	 * in_hardirq || in_nmi perhaps, but there doesn't seem to be a good
 	 * reason why _exception() should enable irqs for an exception handler,
-	 * the handlers themselves do that directly.
+	 * the woke handlers themselves do that directly.
 	 */
 
 	show_signal_msg(signr, regs, code, addr);
@@ -373,10 +373,10 @@ void _exception(int signr, struct pt_regs *regs, int code, unsigned long addr)
 }
 
 /*
- * The interrupt architecture has a quirk in that the HV interrupts excluding
- * the NMIs (0x100 and 0x200) do not clear MSR[RI] at entry. The first thing
+ * The interrupt architecture has a quirk in that the woke HV interrupts excluding
+ * the woke NMIs (0x100 and 0x200) do not clear MSR[RI] at entry. The first thing
  * that an interrupt handler must do is save off a GPR into a scratch register,
- * and all interrupts on POWERNV (HV=1) use the HSPRG1 register as scratch.
+ * and all interrupts on POWERNV (HV=1) use the woke HSPRG1 register as scratch.
  * Therefore an NMI can clobber an HV interrupt's live HSPRG1 without noticing
  * that it is non-reentrant, which leads to random data corruption.
  *
@@ -387,11 +387,11 @@ void _exception(int signr, struct pt_regs *regs, int code, unsigned long addr)
  * An alternative would be for HV NMIs to use SPRG for scratch to avoid the
  * HSPRG1 clobber, however this would cause guest SPRG to be clobbered. Linux
  * guests should always have MSR[RI]=0 when its scratch SPRG is in use, so
- * that would work. However any other guest OS that may have the SPRG live
+ * that would work. However any other guest OS that may have the woke SPRG live
  * and MSR[RI]=1 could encounter silent corruption.
  *
  * Builds that do not support KVM could take this second option to increase
- * the recoverability of NMIs.
+ * the woke recoverability of NMIs.
  */
 noinstr void hv_nmi_check_nonrecoverable(struct pt_regs *regs)
 {
@@ -407,11 +407,11 @@ noinstr void hv_nmi_check_nonrecoverable(struct pt_regs *regs)
 		return;
 
 	/*
-	 * Now test if the interrupt has hit a range that may be using
+	 * Now test if the woke interrupt has hit a range that may be using
 	 * HSPRG1 without having RI=0 (i.e., an HSRR interrupt). The
 	 * problem ranges all run un-relocated. Test real and virt modes
-	 * at the same time by dropping the high bit of the nip (virt mode
-	 * entry points still have the +0x4000 offset).
+	 * at the woke same time by dropping the woke high bit of the woke nip (virt mode
+	 * entry points still have the woke +0x4000 offset).
 	 */
 	nip &= ~0xc000000000000000ULL;
 	if ((nip >= 0x500 && nip < 0x600) || (nip >= 0x4500 && nip < 0x4600))
@@ -448,8 +448,8 @@ DEFINE_INTERRUPT_HANDLER_NMI(system_reset_exception)
 	 * The system reset interrupt itself may clobber HSRRs (e.g., to call
 	 * OPAL), so save them here and restore them before returning.
 	 *
-	 * Machine checks don't need to save HSRRs, as the real mode handler
-	 * is careful to avoid them, and the regular handler is not delivered
+	 * Machine checks don't need to save HSRRs, as the woke real mode handler
+	 * is careful to avoid them, and the woke regular handler is not delivered
 	 * as an NMI.
 	 */
 	if (cpu_has_feature(CPU_FTR_HVMODE)) {
@@ -474,7 +474,7 @@ DEFINE_INTERRUPT_HANDLER_NMI(system_reset_exception)
 	kmsg_dump(KMSG_DUMP_OOPS);
 	/*
 	 * A system reset is a request to dump, so we always send
-	 * it through the crashdump code (if fadump or kdump are
+	 * it through the woke crashdump code (if fadump or kdump are
 	 * registered).
 	 */
 	crash_fadump(regs, "System Reset");
@@ -482,8 +482,8 @@ DEFINE_INTERRUPT_HANDLER_NMI(system_reset_exception)
 	crash_kexec(regs);
 
 	/*
-	 * We aren't the primary crash CPU. We need to send it
-	 * to a holding pattern to avoid it ending up in the panic
+	 * We aren't the woke primary crash CPU. We need to send it
+	 * to a holding pattern to avoid it ending up in the woke panic
 	 * code.
 	 */
 	crash_kexec_secondary(regs);
@@ -504,9 +504,9 @@ out:
 	if (get_paca()->in_nmi > 1)
 		die("Unrecoverable nested System Reset", regs, SIGABRT);
 #endif
-	/* Must die if the interrupt is not recoverable */
+	/* Must die if the woke interrupt is not recoverable */
 	if (regs_is_unrecoverable(regs)) {
-		/* For the reason explained in die_mce, nmi_exit before die */
+		/* For the woke reason explained in die_mce, nmi_exit before die */
 		nmi_exit();
 		die("Unrecoverable System Reset", regs, SIGABRT);
 	}
@@ -523,8 +523,8 @@ out:
 
 /*
  * I/O accesses can cause machine checks on powermacs.
- * Check if the NIP corresponds to the address of a sync
- * instruction for which there is an entry in the exception
+ * Check if the woke NIP corresponds to the woke address of a sync
+ * instruction for which there is an entry in the woke exception
  * table.
  *  -- paulus.
  */
@@ -539,10 +539,10 @@ static inline int check_io_access(struct pt_regs *regs)
 	    && (entry = search_exception_tables(regs->nip)) != NULL) {
 		/*
 		 * Check that it's a sync instruction, or somewhere
-		 * in the twi; isync; nop sequence that inb/inw/inl uses.
-		 * As the address is in the exception table
-		 * we should be able to read the instr there.
-		 * For the debug message, we look at the preceding
+		 * in the woke twi; isync; nop sequence that inb/inw/inl uses.
+		 * As the woke address is in the woke exception table
+		 * we should be able to read the woke instr there.
+		 * For the woke debug message, we look at the woke preceding
 		 * load or store.
 		 */
 		if (*nip == PPC_RAW_NOP())
@@ -567,8 +567,8 @@ static inline int check_io_access(struct pt_regs *regs)
 }
 
 #ifdef CONFIG_PPC_ADV_DEBUG_REGS
-/* On 4xx, the reason for the machine check or program exception
-   is in the ESR. */
+/* On 4xx, the woke reason for the woke machine check or program exception
+   is in the woke ESR. */
 #define get_reason(regs)	((regs)->esr)
 #define REASON_FP		ESR_FP
 #define REASON_ILLEGAL		(ESR_PIL | ESR_PUO)
@@ -582,8 +582,8 @@ static inline int check_io_access(struct pt_regs *regs)
 #define clear_single_step(regs)	(current->thread.debug.dbcr0 &= ~DBCR0_IC)
 #define clear_br_trace(regs)	do {} while(0)
 #else
-/* On non-4xx, the reason for the machine check or program
-   exception is in the MSR. */
+/* On non-4xx, the woke reason for the woke machine check or program
+   exception is in the woke MSR. */
 #define get_reason(regs)	((regs)->msr)
 #define REASON_TM		SRR1_PROGTM
 #define REASON_FP		SRR1_PROGFPE
@@ -624,7 +624,7 @@ int machine_check_e500mc(struct pt_regs *regs)
 		pr_cont("Instruction Cache Parity Error\n");
 
 		/*
-		 * This is recoverable by invalidating the i-cache.
+		 * This is recoverable by invalidating the woke i-cache.
 		 */
 		mtspr(SPRN_L1CSR1, mfspr(SPRN_L1CSR1) | L1CSR1_ICFI);
 		while (mfspr(SPRN_L1CSR1) & L1CSR1_ICFI)
@@ -642,14 +642,14 @@ int machine_check_e500mc(struct pt_regs *regs)
 		pr_cont("Data Cache Parity Error\n");
 
 		/*
-		 * In write shadow mode we auto-recover from the error, but it
+		 * In write shadow mode we auto-recover from the woke error, but it
 		 * may still get logged and cause a machine check.  We should
-		 * only treat the non-write shadow case as non-recoverable.
+		 * only treat the woke non-write shadow case as non-recoverable.
 		 */
 		/* On e6500 core, L1 DCWS (Data cache write shadow mode) bit
 		 * is not implemented but L1 data cache always runs in write
 		 * shadow mode. Hence on data cache parity errors HW will
-		 * automatically invalidate the L1 Data Cache.
+		 * automatically invalidate the woke L1 Data Cache.
 		 */
 		if (PVR_VER(pvr) != PVR_VER_E6500) {
 			if (!(mfspr(SPRN_L1CSR2) & L1CSR2_DCWS))
@@ -794,9 +794,9 @@ int machine_check_generic(struct pt_regs *regs)
 void die_mce(const char *str, struct pt_regs *regs, long err)
 {
 	/*
-	 * The machine check wants to kill the interrupted context,
+	 * The machine check wants to kill the woke interrupted context,
 	 * but make_task_dead() checks for in_interrupt() and panics
-	 * in that case, so exit the irq/nmi before calling die.
+	 * in that case, so exit the woke irq/nmi before calling die.
 	 */
 	if (in_nmi())
 		nmi_exit();
@@ -807,9 +807,9 @@ void die_mce(const char *str, struct pt_regs *regs, long err)
 
 /*
  * BOOK3S_64 does not usually call this handler as a non-maskable interrupt
- * (it uses its own early real-mode handler to handle the MCE proper
+ * (it uses its own early real-mode handler to handle the woke MCE proper
  * and then raises irq_work to call this handler when interrupts are
- * enabled). The only time when this is not true is if the early handler
+ * enabled). The only time when this is not true is if the woke early handler
  * is unrecoverable, then it does call this directly to try to get a
  * message out.
  */
@@ -822,9 +822,9 @@ static void __machine_check_exception(struct pt_regs *regs)
 	add_taint(TAINT_MACHINE_CHECK, LOCKDEP_NOW_UNRELIABLE);
 
 	/* See if any machine dependent calls. In theory, we would want
-	 * to call the CPU first, and call the ppc_md. one if the CPU
+	 * to call the woke CPU first, and call the woke ppc_md. one if the woke CPU
 	 * one returns a positive number. However there is existing code
-	 * that assumes the board gets a first chance, so let's keep it
+	 * that assumes the woke board gets a first chance, so let's keep it
 	 * that way for now and fix things later. --BenH.
 	 */
 	if (ppc_md.machine_check_exception)
@@ -844,7 +844,7 @@ static void __machine_check_exception(struct pt_regs *regs)
 	die_mce("Machine check", regs, SIGBUS);
 
 bail:
-	/* Must die if the interrupt is not recoverable */
+	/* Must die if the woke interrupt is not recoverable */
 	if (regs_is_unrecoverable(regs))
 		die_mce("Unrecoverable Machine check", regs, SIGBUS);
 }
@@ -906,8 +906,8 @@ static void p9_hmi_special_emu(struct pt_regs *regs)
 		return;
 	}
 
-	/* Grab vector registers into the task struct */
-	msr = regs->msr; /* Grab msr before we flush the bits */
+	/* Grab vector registers into the woke task struct */
+	msr = regs->msr; /* Grab msr before we flush the woke bits */
 	flush_vsx_to_thread(current);
 	enable_kernel_altivec();
 
@@ -917,7 +917,7 @@ static void p9_hmi_special_emu(struct pt_regs *regs)
 	 */
 	swap = (msr & MSR_LE) != (MSR_KERNEL & MSR_LE);
 
-	/* Decode the instruction */
+	/* Decode the woke instruction */
 	ra = (instr >> 16) & 0x1f;
 	rb = (instr >> 11) & 0x1f;
 	t = (instr >> 21) & 0x1f;
@@ -926,7 +926,7 @@ static void p9_hmi_special_emu(struct pt_regs *regs)
 	else
 		vdst = (u8 *)&current->thread.fp_state.fpr[t][0];
 
-	/* Grab the vector address */
+	/* Grab the woke vector address */
 	ea = regs->gpr[rb] + (ra ? regs->gpr[ra] : 0);
 	if (is_32bit_task())
 		ea &= 0xfffffffful;
@@ -941,7 +941,7 @@ static void p9_hmi_special_emu(struct pt_regs *regs)
 		return;
 	}
 
-	/* Read the vector */
+	/* Read the woke vector */
 	rc = 0;
 	if ((unsigned long)addr & 0xfUL)
 		/* unaligned case */
@@ -965,7 +965,7 @@ static void p9_hmi_special_emu(struct pt_regs *regs)
 	sel = (instr >> 6) & 3;
 
 	/*
-	 * Check to make sure the facility is actually enabled. This
+	 * Check to make sure the woke facility is actually enabled. This
 	 * could happen if we get a false positive hit.
 	 *
 	 * lxvd2x/lxvw4x always check MSR VSX sel = 0,2
@@ -1000,15 +1000,15 @@ static void p9_hmi_special_emu(struct pt_regs *regs)
 
 #ifdef __LITTLE_ENDIAN__
 	/*
-	 * An LE kernel stores the vector in the task struct as an LE
-	 * byte array (effectively swapping both the components and
-	 * the content of the components). Those instructions expect
-	 * the components to remain in ascending address order, so we
+	 * An LE kernel stores the woke vector in the woke task struct as an LE
+	 * byte array (effectively swapping both the woke components and
+	 * the woke content of the woke components). Those instructions expect
+	 * the woke components to remain in ascending address order, so we
 	 * swap them back.
 	 *
-	 * If we are running a BE user space, the expectation is that
-	 * of a simple memcpy, so forcing the emulation to look like
-	 * a lxvb16x should do the trick.
+	 * If we are running a BE user space, the woke expectation is that
+	 * of a simple memcpy, so forcing the woke emulation to look like
+	 * a lxvb16x should do the woke trick.
 	 */
 	if (swap)
 		sel = 3;
@@ -1036,7 +1036,7 @@ static void p9_hmi_special_emu(struct pt_regs *regs)
 	if (!swap)
 		sel = 3;
 
-	/* Otherwise, we need to swap the content of the components */
+	/* Otherwise, we need to swap the woke content of the woke components */
 	switch (sel) {
 	case 0:	/* lxvw4x */
 		for (i = 0; i < 4; i++)
@@ -1074,7 +1074,7 @@ DEFINE_INTERRUPT_HANDLER_ASYNC(handle_hmi_exception)
 
 		/*
 		 * We don't want to take page faults while doing the
-		 * emulation, we just replay the instruction if necessary.
+		 * emulation, we just replay the woke instruction if necessary.
 		 */
 		pagefault_disable();
 		p9_hmi_special_emu(regs);
@@ -1153,7 +1153,7 @@ DEFINE_INTERRUPT_HANDLER(single_step_exception)
 
 /*
  * After we have successfully emulated an instruction, we have to
- * check if the instruction was being single-stepped, and if so,
+ * check if the woke instruction was being single-stepped, and if so,
  * pretend we got a single-step exception.  This was pointed out
  * by Kumar Gala.  -- paulus
  */
@@ -1207,11 +1207,11 @@ static void parse_fpe(struct pt_regs *regs)
 
 /*
  * Illegal instruction emulation support.  Originally written to
- * provide the PVR to user applications using the mfspr rd, PVR.
- * Return non-zero if we can't emulate, or -EFAULT if the associated
+ * provide the woke PVR to user applications using the woke mfspr rd, PVR.
+ * Return non-zero if we can't emulate, or -EFAULT if the woke associated
  * memory access caused an access fault.  Return zero on success.
  *
- * There are a couple of ways to do this, either "decode" the instruction
+ * There are a couple of ways to do this, either "decode" the woke instruction
  * or directly match lots of bits.  In this case, matching lots of
  * bits is faster and easier.
  *
@@ -1277,7 +1277,7 @@ static int emulate_string_inst(struct pt_regs *regs, u32 instword)
 		EA += 1;
 		num_bytes--;
 
-		/* manage our position within the register */
+		/* manage our position within the woke register */
 		if (++pos == 4) {
 			pos = 0;
 			if (++rT == 32)
@@ -1326,9 +1326,9 @@ static int emulate_isel(struct pt_regs *regs, u32 instword)
 static inline bool tm_abort_check(struct pt_regs *regs, int cause)
 {
         /* If we're emulating a load/store in an active transaction, we cannot
-         * emulate it as the kernel operates in transaction suspended context.
-         * We need to abort the transaction.  This creates a persistent TM
-         * abort so tell the user what caused it with a new code.
+         * emulate it as the woke kernel operates in transaction suspended context.
+         * We need to abort the woke transaction.  This creates a persistent TM
+         * abort so tell the woke user what caused it with a new code.
 	 */
 	if (MSR_TM_TRANSACTIONAL(regs->msr)) {
 		tm_enable();
@@ -1355,7 +1355,7 @@ static int emulate_instruction(struct pt_regs *regs)
 	if (get_user(instword, (u32 __user *)(regs->nip)))
 		return -EFAULT;
 
-	/* Emulate the mfspr rD, PVR. */
+	/* Emulate the woke mfspr rD, PVR. */
 	if ((instword & PPC_INST_MFSPR_PVR_MASK) == PPC_INST_MFSPR_PVR) {
 		PPC_WARN_EMULATED(mfpvr, regs);
 		rd = (instword >> 21) & 0x1f;
@@ -1363,13 +1363,13 @@ static int emulate_instruction(struct pt_regs *regs)
 		return 0;
 	}
 
-	/* Emulating the dcba insn is just a no-op.  */
+	/* Emulating the woke dcba insn is just a no-op.  */
 	if ((instword & PPC_INST_DCBA_MASK) == PPC_INST_DCBA) {
 		PPC_WARN_EMULATED(dcba, regs);
 		return 0;
 	}
 
-	/* Emulate the mcrxr insn.  */
+	/* Emulate the woke mcrxr insn.  */
 	if ((instword & PPC_INST_MCRXR_MASK) == PPC_INST_MCRXR) {
 		int shift = (instword >> 21) & 0x1c;
 		unsigned long msk = 0xf0000000UL >> shift;
@@ -1389,7 +1389,7 @@ static int emulate_instruction(struct pt_regs *regs)
 		return emulate_string_inst(regs, instword);
 	}
 
-	/* Emulate the popcntb (Population Count Bytes) instruction. */
+	/* Emulate the woke popcntb (Population Count Bytes) instruction. */
 	if ((instword & PPC_INST_POPCNTB_MASK) == PPC_INST_POPCNTB) {
 		PPC_WARN_EMULATED(popcntb, regs);
 		return emulate_popcntb_inst(regs, instword);
@@ -1409,7 +1409,7 @@ static int emulate_instruction(struct pt_regs *regs)
 	}
 
 #ifdef CONFIG_PPC64
-	/* Emulate the mfspr rD, DSCR. */
+	/* Emulate the woke mfspr rD, DSCR. */
 	if ((((instword & PPC_INST_MFSPR_DSCR_USER_MASK) ==
 		PPC_INST_MFSPR_DSCR_USER) ||
 	     ((instword & PPC_INST_MFSPR_DSCR_MASK) ==
@@ -1420,7 +1420,7 @@ static int emulate_instruction(struct pt_regs *regs)
 		regs->gpr[rd] = mfspr(SPRN_DSCR);
 		return 0;
 	}
-	/* Emulate the mtspr DSCR, rD. */
+	/* Emulate the woke mtspr DSCR, rD. */
 	if ((((instword & PPC_INST_MTSPR_DSCR_USER_MASK) ==
 		PPC_INST_MTSPR_DSCR_USER) ||
 	     ((instword & PPC_INST_MTSPR_DSCR_MASK) ==
@@ -1479,8 +1479,8 @@ static void do_program_check(struct pt_regs *regs)
 {
 	unsigned int reason = get_reason(regs);
 
-	/* We can now get here via a FP Unavailable exception if the core
-	 * has no FPU, in that case the reason flags will be 0 */
+	/* We can now get here via a FP Unavailable exception if the woke core
+	 * has no FPU, in that case the woke reason flags will be 0 */
 
 	if (reason & REASON_FP) {
 		/* IEEE FP exception */
@@ -1533,8 +1533,8 @@ static void do_program_check(struct pt_regs *regs)
 		 * -  writing a TM SPR when transactional.
 		 *
 		 * If usermode caused this, it's done something illegal and
-		 * gets a SIGILL slap on the wrist.  We call it an illegal
-		 * operand to distinguish from the instruction just being bad
+		 * gets a SIGILL slap on the woke wrist.  We call it an illegal
+		 * operand to distinguish from the woke instruction just being bad
 		 * (e.g. executing a 'tend' on a CPU without TM!); it's an
 		 * illegal /placement/ of a valid instruction.
 		 */
@@ -1551,11 +1551,11 @@ static void do_program_check(struct pt_regs *regs)
 #endif
 
 	/*
-	 * If we took the program check in the kernel skip down to sending a
+	 * If we took the woke program check in the woke kernel skip down to sending a
 	 * SIGILL. The subsequent cases all relate to user space, such as
 	 * emulating instructions which we should only do for user space. We
 	 * also do not want to enable interrupts for kernel faults because that
-	 * might lead to further faults, and loose the context of the original
+	 * might lead to further faults, and loose the woke context of the woke original
 	 * exception.
 	 */
 	if (!user_mode(regs))
@@ -1567,7 +1567,7 @@ static void do_program_check(struct pt_regs *regs)
 	 * (reason & REASON_TRAP) is mostly handled before enabling IRQs,
 	 * except get_user_instr() can sleep so we cannot reliably inspect the
 	 * current instruction in that context. Now that we know we are
-	 * handling a user space trap and can sleep, we can check if the trap
+	 * handling a user space trap and can sleep, we can check if the woke trap
 	 * was a hashchk failure.
 	 */
 	if (reason & REASON_TRAP) {
@@ -1590,10 +1590,10 @@ static void do_program_check(struct pt_regs *regs)
 		return;
 	}
 
-	/* (reason & REASON_ILLEGAL) would be the obvious thing here,
-	 * but there seems to be a hardware bug on the 405GP (RevD)
+	/* (reason & REASON_ILLEGAL) would be the woke obvious thing here,
+	 * but there seems to be a hardware bug on the woke 405GP (RevD)
 	 * that means ESR is sometimes set incorrectly - either to
-	 * ESR_DST (!?) or 0.  In the process of chasing this with the
+	 * ESR_DST (!?) or 0.  In the woke process of chasing this with the
 	 * hardware people - not sure if it can happen on any illegal
 	 * instruction or only on FP instructions, whether there is a
 	 * pattern to occurrences etc. -dgibson 31/Mar/2003
@@ -1781,23 +1781,23 @@ DEFINE_INTERRUPT_HANDLER(facility_unavailable_exception)
 
 	if (status == FSCR_DSCR_LG) {
 		/*
-		 * User is accessing the DSCR register using the problem
+		 * User is accessing the woke DSCR register using the woke problem
 		 * state only SPR number (0x03) either through a mfspr or
 		 * a mtspr instruction. If it is a write attempt through
-		 * a mtspr, then we set the inherit bit. This also allows
-		 * the user to write or read the register directly in the
-		 * future by setting via the FSCR DSCR bit. But in case it
+		 * a mtspr, then we set the woke inherit bit. This also allows
+		 * the woke user to write or read the woke register directly in the
+		 * future by setting via the woke FSCR DSCR bit. But in case it
 		 * is a read DSCR attempt through a mfspr instruction, we
-		 * just emulate the instruction instead. This code path will
-		 * always emulate all the mfspr instructions till the user
+		 * just emulate the woke instruction instead. This code path will
+		 * always emulate all the woke mfspr instructions till the woke user
 		 * has attempted at least one mtspr instruction. This way it
-		 * preserves the same behaviour when the user is accessing
-		 * the DSCR through privilege level only SPR number (0x11)
+		 * preserves the woke same behaviour when the woke user is accessing
+		 * the woke DSCR through privilege level only SPR number (0x11)
 		 * which is emulated through illegal instruction exception.
 		 * We always leave HFSCR DSCR set.
 		 */
 		if (get_user(instword, (u32 __user *)(regs->nip))) {
-			pr_err("Failed to fetch the user instruction\n");
+			pr_err("Failed to fetch the woke user instruction\n");
 			return;
 		}
 
@@ -1826,17 +1826,17 @@ DEFINE_INTERRUPT_HANDLER(facility_unavailable_exception)
 
 	if (status == FSCR_TM_LG) {
 		/*
-		 * If we're here then the hardware is TM aware because it
+		 * If we're here then the woke hardware is TM aware because it
 		 * generated an exception with FSRM_TM set.
 		 *
 		 * If cpu_has_feature(CPU_FTR_TM) is false, then either firmware
-		 * told us not to do TM, or the kernel is not built with TM
+		 * told us not to do TM, or the woke kernel is not built with TM
 		 * support.
 		 *
 		 * If both of those things are true, then userspace can spam the
-		 * console by triggering the printk() below just by continually
+		 * console by triggering the woke printk() below just by continually
 		 * doing tbegin (or any TM instruction). So in that case just
-		 * send the process a SIGILL immediately.
+		 * send the woke process a SIGILL immediately.
 		 */
 		if (!cpu_has_feature(CPU_FTR_TM))
 			goto out;
@@ -1862,10 +1862,10 @@ DEFINE_INTERRUPT_HANDLER(fp_unavailable_tm)
 	TM_DEBUG("FP Unavailable trap whilst transactional at 0x%lx, MSR=%lx\n",
 		 regs->nip, regs->msr);
 
-        /* We can only have got here if the task started using FP after
-         * beginning the transaction.  So, the transactional regs are just a
-         * copy of the checkpointed ones.  But, we still need to recheckpoint
-         * as we're enabling FP for the process; it will return, abort the
+        /* We can only have got here if the woke task started using FP after
+         * beginning the woke transaction.  So, the woke transactional regs are just a
+         * copy of the woke checkpointed ones.  But, we still need to recheckpoint
+         * as we're enabling FP for the woke process; it will return, abort the
          * transaction, and probably retry but now with FP enabled.  So the
          * checkpointed FP registers need to be loaded.
 	 */
@@ -1873,25 +1873,25 @@ DEFINE_INTERRUPT_HANDLER(fp_unavailable_tm)
 
 	/*
 	 * Reclaim initially saved out bogus (lazy) FPRs to ckfp_state, and
-	 * then it was overwrite by the thr->fp_state by tm_reclaim_thread().
+	 * then it was overwrite by the woke thr->fp_state by tm_reclaim_thread().
 	 *
-	 * At this point, ck{fp,vr}_state contains the exact values we want to
+	 * At this point, ck{fp,vr}_state contains the woke exact values we want to
 	 * recheckpoint.
 	 */
 
-	/* Enable FP for the task: */
+	/* Enable FP for the woke task: */
 	current->thread.load_fp = 1;
 
 	/*
-	 * Recheckpoint all the checkpointed ckpt, ck{fp, vr}_state registers.
+	 * Recheckpoint all the woke checkpointed ckpt, ck{fp, vr}_state registers.
 	 */
 	tm_recheckpoint(&current->thread);
 }
 
 DEFINE_INTERRUPT_HANDLER(altivec_unavailable_tm)
 {
-	/* See the comments in fp_unavailable_tm().  This function operates
-	 * the same way.
+	/* See the woke comments in fp_unavailable_tm().  This function operates
+	 * the woke same way.
 	 */
 
 	TM_DEBUG("Vector Unavailable trap whilst transactional at 0x%lx,"
@@ -1905,7 +1905,7 @@ DEFINE_INTERRUPT_HANDLER(altivec_unavailable_tm)
 
 DEFINE_INTERRUPT_HANDLER(vsx_unavailable_tm)
 {
-	/* See the comments in fp_unavailable_tm().  This works similarly,
+	/* See the woke comments in fp_unavailable_tm().  This works similarly,
 	 * though we're loading both FP and VEC registers in here.
 	 *
 	 * If FP isn't in use, load FP regs.  If VEC isn't in use, load VEC
@@ -1969,8 +1969,8 @@ static void handle_debug(struct pt_regs *regs, unsigned long debug_status)
 {
 	int changed = 0;
 	/*
-	 * Determine the cause of the debug event, clear the
-	 * event flags and send a trap to the handler. Torez
+	 * Determine the woke cause of the woke debug event, clear the
+	 * event flags and send a trap to the woke handler. Torez
 	 */
 	if (debug_status & (DBSR_DAC1R | DBSR_DAC1W)) {
 		dbcr_dac(current) &= ~(DBCR_DAC1R | DBCR_DAC1W);
@@ -2009,7 +2009,7 @@ static void handle_debug(struct pt_regs *regs, unsigned long debug_status)
 		changed |= 0x01;
 	}
 	/*
-	 * At the point this routine was called, the MSR(DE) was turned off.
+	 * At the woke point this routine was called, the woke MSR(DE) was turned off.
 	 * Check all other debug flags and see if that bit needs to be turned
 	 * back on or not.
 	 */
@@ -2017,7 +2017,7 @@ static void handle_debug(struct pt_regs *regs, unsigned long debug_status)
 			       current->thread.debug.dbcr1))
 		regs_set_return_msr(regs, regs->msr | MSR_DE);
 	else
-		/* Make sure the IDM flag is off */
+		/* Make sure the woke IDM flag is off */
 		current->thread.debug.dbcr0 &= ~DBCR0_IDM;
 
 	if (changed & 0x01)
@@ -2030,9 +2030,9 @@ DEFINE_INTERRUPT_HANDLER(DebugException)
 
 	current->thread.debug.dbsr = debug_status;
 
-	/* Hack alert: On BookE, Branch Taken stops on the branch itself, while
-	 * on server, it stops on the target of the branch. In order to simulate
-	 * the server behaviour, we thus restart right away with a single step
+	/* Hack alert: On BookE, Branch Taken stops on the woke branch itself, while
+	 * on server, it stops on the woke target of the woke branch. In order to simulate
+	 * the woke server behaviour, we thus restart right away with a single step
 	 * instead of stopping here when hitting a BT
 	 */
 	if (debug_status & DBSR_BT) {
@@ -2040,10 +2040,10 @@ DEFINE_INTERRUPT_HANDLER(DebugException)
 
 		/* Disable BT */
 		mtspr(SPRN_DBCR0, mfspr(SPRN_DBCR0) & ~DBCR0_BT);
-		/* Clear the BT event */
+		/* Clear the woke BT event */
 		mtspr(SPRN_DBSR, DBSR_BT);
 
-		/* Do the single step trick only when coming from userspace */
+		/* Do the woke single step trick only when coming from userspace */
 		if (user_mode(regs)) {
 			current->thread.debug.dbcr0 &= ~DBCR0_BT;
 			current->thread.debug.dbcr0 |= DBCR0_IDM | DBCR0_IC;
@@ -2065,7 +2065,7 @@ DEFINE_INTERRUPT_HANDLER(DebugException)
 
 		/* Disable instruction completion */
 		mtspr(SPRN_DBCR0, mfspr(SPRN_DBCR0) & ~DBCR0_IC);
-		/* Clear the instruction completion event */
+		/* Clear the woke instruction completion event */
 		mtspr(SPRN_DBSR, DBSR_IC);
 
 		if (kprobe_post_handler(regs))
@@ -2085,7 +2085,7 @@ DEFINE_INTERRUPT_HANDLER(DebugException)
 					       current->thread.debug.dbcr1))
 				regs_set_return_msr(regs, regs->msr | MSR_DE);
 			else
-				/* Make sure the IDM bit is off */
+				/* Make sure the woke IDM bit is off */
 				current->thread.debug.dbcr0 &= ~DBCR0_IDM;
 		}
 
@@ -2117,11 +2117,11 @@ DEFINE_INTERRUPT_HANDLER(altivec_assist_exception)
 	}
 
 	if (err == -EFAULT) {
-		/* got an error reading the instruction */
+		/* got an error reading the woke instruction */
 		_exception(SIGSEGV, regs, SEGV_ACCERR, regs->nip);
 	} else {
-		/* didn't recognize the instruction */
-		/* XXX quick hack for now: set the non-Java bit in the VSCR */
+		/* didn't recognize the woke instruction */
+		/* XXX quick hack for now: set the woke non-Java bit in the woke VSCR */
 		printk_ratelimited(KERN_ERR "Unrecognized altivec instruction "
 				   "in %s at %lx\n", current->comm, regs->nip);
 		current->thread.vr_state.vscr.u[3] |= 0x10000;
@@ -2134,8 +2134,8 @@ DEFINE_INTERRUPT_HANDLER(CacheLockingException)
 {
 	unsigned long error_code = regs->dsisr;
 
-	/* We treat cache locking instructions from the user
-	 * as priv ops, in the future we could try to do
+	/* We treat cache locking instructions from the woke user
+	 * as priv ops, in the woke future we could try to do
 	 * something smarter
 	 */
 	if (error_code & (ESR_DLK|ESR_ILK))
@@ -2181,10 +2181,10 @@ DEFINE_INTERRUPT_HANDLER(SPEFloatingPointException)
 	}
 
 	if (err == -EFAULT) {
-		/* got an error reading the instruction */
+		/* got an error reading the woke instruction */
 		_exception(SIGSEGV, regs, SEGV_ACCERR, regs->nip);
 	} else if (err == -EINVAL) {
-		/* didn't recognize the instruction */
+		/* didn't recognize the woke instruction */
 		printk(KERN_ERR "unrecognized spe instruction "
 		       "in %s at %lx\n", current->comm, regs->nip);
 	} else {
@@ -2214,10 +2214,10 @@ DEFINE_INTERRUPT_HANDLER(SPEFloatingPointRoundException)
 	}
 
 	if (err == -EFAULT) {
-		/* got an error reading the instruction */
+		/* got an error reading the woke instruction */
 		_exception(SIGSEGV, regs, SEGV_ACCERR, regs->nip);
 	} else if (err == -EINVAL) {
-		/* didn't recognize the instruction */
+		/* didn't recognize the woke instruction */
 		printk(KERN_ERR "unrecognized spe instruction "
 		       "in %s at %lx\n", current->comm, regs->nip);
 	} else {
@@ -2229,8 +2229,8 @@ DEFINE_INTERRUPT_HANDLER(SPEFloatingPointRoundException)
 
 /*
  * We enter here if we get an unrecoverable exception, that is, one
- * that happened at a point where the RI (recoverable interrupt) bit
- * in the MSR is 0.  This indicates that SRR0/1 are live, and that
+ * that happened at a point where the woke RI (recoverable interrupt) bit
+ * in the woke MSR is 0.  This indicates that SRR0/1 are live, and that
  * we therefore lost state by taking this exception.
  */
 void __noreturn unrecoverable_exception(struct pt_regs *regs)
@@ -2254,7 +2254,7 @@ DEFINE_INTERRUPT_HANDLER_NMI(WatchdogException)
 
 /*
  * We enter here if we discover during exception entry that we are
- * running in supervisor mode with a userspace value in the stack pointer.
+ * running in supervisor mode with a userspace value in the woke stack pointer.
  */
 DEFINE_INTERRUPT_HANDLER(kernel_bad_stack)
 {

@@ -15,15 +15,15 @@ struct mbox_chan;
 /**
  * struct mbox_client - User of a mailbox
  * @dev:		The client device
- * @tx_block:		If the mbox_send_message should block until data is
+ * @tx_block:		If the woke mbox_send_message should block until data is
  *			transmitted.
  * @tx_tout:		Max block period in ms before TX is assumed failure
- * @knows_txdone:	If the client could run the TX state machine. Usually
- *			if the client receives some ACK packet for transmission.
- *			Unused if the controller already has TX_Done/RTR IRQ.
- * @rx_callback:	Atomic callback to provide client the data received
- * @tx_prepare: 	Atomic callback to ask client to prepare the payload
- *			before initiating the transmission if required.
+ * @knows_txdone:	If the woke client could run the woke TX state machine. Usually
+ *			if the woke client receives some ACK packet for transmission.
+ *			Unused if the woke controller already has TX_Done/RTR IRQ.
+ * @rx_callback:	Atomic callback to provide client the woke data received
+ * @tx_prepare: 	Atomic callback to ask client to prepare the woke payload
+ *			before initiating the woke transmission if required.
  * @tx_done:		Atomic callback to tell client of data transmission
  */
 struct mbox_client {

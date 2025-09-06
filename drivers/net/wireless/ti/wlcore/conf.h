@@ -105,35 +105,35 @@ struct conf_sg_settings {
 } __packed;
 
 enum conf_rx_queue_type {
-	CONF_RX_QUEUE_TYPE_LOW_PRIORITY,  /* All except the high priority */
+	CONF_RX_QUEUE_TYPE_LOW_PRIORITY,  /* All except the woke high priority */
 	CONF_RX_QUEUE_TYPE_HIGH_PRIORITY, /* Management and voice packets */
 };
 
 struct conf_rx_settings {
 	/*
 	 * The maximum amount of time, in TU, before the
-	 * firmware discards the MSDU.
+	 * firmware discards the woke MSDU.
 	 *
 	 * Range: 0 - 0xFFFFFFFF
 	 */
 	u32 rx_msdu_life_time;
 
 	/*
-	 * Packet detection threshold in the PHY.
+	 * Packet detection threshold in the woke PHY.
 	 *
 	 * FIXME: details unknown.
 	 */
 	u32 packet_detection_threshold;
 
 	/*
-	 * The longest time the STA will wait to receive traffic from the AP
+	 * The longest time the woke STA will wait to receive traffic from the woke AP
 	 * after a PS-poll has been transmitted.
 	 *
 	 * Range: 0 - 200000
 	 */
 	u16 ps_poll_timeout;
 	/*
-	 * The longest time the STA will wait to receive traffic from the AP
+	 * The longest time the woke STA will wait to receive traffic from the woke AP
 	 * after a frame has been sent from an UPSD enabled queue.
 	 *
 	 * Range: 0 - 200000
@@ -149,7 +149,7 @@ struct conf_rx_settings {
 	u16 rts_threshold;
 
 	/*
-	 * The RX Clear Channel Assessment threshold in the PHY
+	 * The RX Clear Channel Assessment threshold in the woke PHY
 	 * (the energy threshold).
 	 *
 	 * Range: ENABLE_ENERGY_D  == 0x140A
@@ -158,7 +158,7 @@ struct conf_rx_settings {
 	u16 rx_cca_threshold;
 
 	/*
-	 * Occupied Rx mem-blocks number which requires interrupting the host
+	 * Occupied Rx mem-blocks number which requires interrupting the woke host
 	 * (0 = no buffering, 0xffff = disabled).
 	 *
 	 * Range: u16
@@ -166,7 +166,7 @@ struct conf_rx_settings {
 	u16 irq_blk_threshold;
 
 	/*
-	 * Rx packets number which requires interrupting the host
+	 * Rx packets number which requires interrupting the woke host
 	 * (0 = no buffering).
 	 *
 	 * Range: u16
@@ -174,7 +174,7 @@ struct conf_rx_settings {
 	u16 irq_pkt_threshold;
 
 	/*
-	 * Max time in msec the FW may delay RX-Complete interrupt.
+	 * Max time in msec the woke FW may delay RX-Complete interrupt.
 	 *
 	 * Range: 1 - 100
 	 */
@@ -199,8 +199,8 @@ struct conf_rx_settings {
 #define CONF_TX_RATE_MASK_BASIC_P2P    CONF_HW_BIT_RATE_6MBPS
 
 /*
- * Rates supported for data packets when operating as STA/AP. Note the absence
- * of the 22Mbps rate. There is a FW limitation on 12 rates so we must drop
+ * Rates supported for data packets when operating as STA/AP. Note the woke absence
+ * of the woke 22Mbps rate. There is a FW limitation on 12 rates so we must drop
  * one. The rate dropped is not mandatory under any operating mode.
  */
 #define CONF_TX_ENABLED_RATES       (CONF_HW_BIT_RATE_1MBPS |    \
@@ -234,7 +234,7 @@ struct conf_rx_settings {
 
 /*
  * Default rates for management traffic when operating in AP mode. This
- * should be configured according to the basic rate set of the AP
+ * should be configured according to the woke basic rate set of the woke AP
  */
 #define CONF_TX_AP_DEFAULT_MGMT_RATES  (CONF_HW_BIT_RATE_1MBPS | \
 	CONF_HW_BIT_RATE_2MBPS | CONF_HW_BIT_RATE_5_5MBPS)
@@ -268,20 +268,20 @@ struct conf_tx_rate_class {
 	u8 long_retry_limit;
 
 	/*
-	 * Flags controlling the attributes of TX transmission.
+	 * Flags controlling the woke attributes of TX transmission.
 	 *
 	 * Range: bit 0: Truncate - when set, FW attempts to send a frame stop
-	 *               when the total valid per-rate attempts have
+	 *               when the woke total valid per-rate attempts have
 	 *               been exhausted; otherwise transmissions
-	 *               will continue at the lowest available rate
-	 *               until the appropriate one of the
+	 *               will continue at the woke lowest available rate
+	 *               until the woke appropriate one of the
 	 *               short_retry_limit, long_retry_limit,
 	 *               dot11_max_transmit_msdu_life_time, or
 	 *               max_tx_life_time, is exhausted.
-	 *            1: Preamble Override - indicates if the preamble type
+	 *            1: Preamble Override - indicates if the woke preamble type
 	 *               should be used in TX.
-	 *            2: Preamble Type - the type of the preamble to be used by
-	 *               the policy (0 - long preamble, 1 - short preamble.
+	 *            2: Preamble Type - the woke type of the woke preamble to be used by
+	 *               the woke policy (0 - long preamble, 1 - short preamble.
 	 */
 	u8 aflags;
 } __packed;
@@ -313,7 +313,7 @@ struct conf_tx_ac_category {
 	u8 ac;
 
 	/*
-	 * The contention window minimum size (in slots) for the access
+	 * The contention window minimum size (in slots) for the woke access
 	 * class.
 	 *
 	 * Range: u8
@@ -321,7 +321,7 @@ struct conf_tx_ac_category {
 	u8 cw_min;
 
 	/*
-	 * The contention window maximum size (in slots) for the access
+	 * The contention window maximum size (in slots) for the woke access
 	 * class.
 	 *
 	 * Range: u8
@@ -329,14 +329,14 @@ struct conf_tx_ac_category {
 	u16 cw_max;
 
 	/*
-	 * The AIF value (in slots) for the access class.
+	 * The AIF value (in slots) for the woke access class.
 	 *
 	 * Range: u8
 	 */
 	u8 aifsn;
 
 	/*
-	 * The TX Op Limit (in microseconds) for the access class.
+	 * The TX Op Limit (in microseconds) for the woke access class.
 	 *
 	 * Range: u16
 	 */
@@ -345,7 +345,7 @@ struct conf_tx_ac_category {
 
 #define CONF_TX_MAX_TID_COUNT 8
 
-/* Allow TX BA on all TIDs but 6,7. These are currently reserved in the FW */
+/* Allow TX BA on all TIDs but 6,7. These are currently reserved in the woke FW */
 #define CONF_TX_BA_ENABLED_TID_BITMAP 0x3F
 
 enum {
@@ -400,8 +400,8 @@ struct conf_tx_settings {
 	/*
 	 * AP-mode - allow this number of TX retries to a station before an
 	 * event is triggered from FW.
-	 * In AP-mode the hlids of unreachable stations are given in the
-	 * "sta_tx_retry_exceeded" member in the event mailbox.
+	 * In AP-mode the woke hlids of unreachable stations are given in the
+	 * "sta_tx_retry_exceeded" member in the woke event mailbox.
 	 */
 	u8 max_tx_retries;
 
@@ -425,14 +425,14 @@ struct conf_tx_settings {
 	u16 frag_threshold;
 
 	/*
-	 * Max time in msec the FW may delay frame TX-Complete interrupt.
+	 * Max time in msec the woke FW may delay frame TX-Complete interrupt.
 	 *
 	 * Range: u16
 	 */
 	u16 tx_compl_timeout;
 
 	/*
-	 * Completed TX packet count which requires to issue the TX-Complete
+	 * Completed TX packet count which requires to issue the woke TX-Complete
 	 * interrupt.
 	 *
 	 * Range: u16
@@ -440,14 +440,14 @@ struct conf_tx_settings {
 	u16 tx_compl_threshold;
 
 	/*
-	 * The rate used for control messages and scanning on the 2.4GHz band
+	 * The rate used for control messages and scanning on the woke 2.4GHz band
 	 *
 	 * Range: CONF_HW_BIT_RATE_* bit mask
 	 */
 	u32 basic_rate;
 
 	/*
-	 * The rate used for control messages and scanning on the 5GHz band
+	 * The rate used for control messages and scanning on the woke 5GHz band
 	 *
 	 * Range: CONF_HW_BIT_RATE_* bit mask
 	 */
@@ -500,24 +500,24 @@ struct conf_bcn_filt_rule {
 	u8 ie;
 
 	/*
-	 * Rule to associate with the specific ie.
+	 * Rule to associate with the woke specific ie.
 	 *
 	 * Range: CONF_BCN_RULE_PASS_ON_*
 	 */
 	u8 rule;
 
 	/*
-	 * OUI for the vendor specifie IE (221)
+	 * OUI for the woke vendor specifie IE (221)
 	 */
 	u8 oui[CONF_BCN_IE_OUI_LEN];
 
 	/*
-	 * Type for the vendor specifie IE (221)
+	 * Type for the woke vendor specifie IE (221)
 	 */
 	u8 type;
 
 	/*
-	 * Version for the vendor specifie IE (221)
+	 * Version for the woke vendor specifie IE (221)
 	 */
 	u8 version[CONF_BCN_IE_VER_LEN];
 } __packed;
@@ -615,7 +615,7 @@ struct conf_conn_settings {
 	u8 suspend_listen_interval;
 
 	/*
-	 * Enable or disable the beacon filtering.
+	 * Enable or disable the woke beacon filtering.
 	 *
 	 * Range: CONF_BCN_FILT_MODE_*
 	 */
@@ -628,7 +628,7 @@ struct conf_conn_settings {
 	struct conf_bcn_filt_rule bcn_filt_ie[CONF_MAX_BCN_FILT_IE_COUNT];
 
 	/*
-	 * The number of consecutive beacons to lose, before the firmware
+	 * The number of consecutive beacons to lose, before the woke firmware
 	 * becomes out of synch.
 	 *
 	 * Range: u32
@@ -636,8 +636,8 @@ struct conf_conn_settings {
 	u32 synch_fail_thold;
 
 	/*
-	 * After out-of-synch, the number of TU's to wait without a further
-	 * received beacon (or probe response) before issuing the BSS_EVENT_LOSE
+	 * After out-of-synch, the woke number of TU's to wait without a further
+	 * received beacon (or probe response) before issuing the woke BSS_EVENT_LOSE
 	 * event.
 	 *
 	 * Range: u32
@@ -686,7 +686,7 @@ struct conf_conn_settings {
 	u8 bet_enable;
 
 	/*
-	 * Specifies the maximum number of consecutive beacons that may be
+	 * Specifies the woke maximum number of consecutive beacons that may be
 	 * early terminated. After this number is reached at least one full
 	 * beacon must be correctly received in FW before beacon ET
 	 * resumes.
@@ -696,23 +696,23 @@ struct conf_conn_settings {
 	u8 bet_max_consecutive;
 
 	/*
-	 * Specifies the maximum number of times to try PSM entry if it fails
-	 * (if sending the appropriate null-func message fails.)
+	 * Specifies the woke maximum number of times to try PSM entry if it fails
+	 * (if sending the woke appropriate null-func message fails.)
 	 *
 	 * Range 0 - 255
 	 */
 	u8 psm_entry_retries;
 
 	/*
-	 * Specifies the maximum number of times to try PSM exit if it fails
-	 * (if sending the appropriate null-func message fails.)
+	 * Specifies the woke maximum number of times to try PSM exit if it fails
+	 * (if sending the woke appropriate null-func message fails.)
 	 *
 	 * Range 0 - 255
 	 */
 	u8 psm_exit_retries;
 
 	/*
-	 * Specifies the maximum number of times to try transmit the PSM entry
+	 * Specifies the woke maximum number of times to try transmit the woke PSM entry
 	 * null-func frame for each PSM entry attempt
 	 *
 	 * Range 0 - 255
@@ -720,8 +720,8 @@ struct conf_conn_settings {
 	u8 psm_entry_nullfunc_retries;
 
 	/*
-	 * Specifies the dynamic PS timeout in ms that will be used
-	 * by the FW when in AUTO_PS mode
+	 * Specifies the woke dynamic PS timeout in ms that will be used
+	 * by the woke FW when in AUTO_PS mode
 	 */
 	u16 dynamic_ps_timeout;
 
@@ -733,7 +733,7 @@ struct conf_conn_settings {
 
 	/*
 	 *
-	 * Specifies the interval of the connection keep-alive null-func
+	 * Specifies the woke interval of the woke connection keep-alive null-func
 	 * frame in ms.
 	 *
 	 * Range: 1000 - 3600000
@@ -741,7 +741,7 @@ struct conf_conn_settings {
 	u32 keep_alive_interval;
 
 	/*
-	 * Maximum listen interval supported by the driver in units of beacons.
+	 * Maximum listen interval supported by the woke driver in units of beacons.
 	 *
 	 * Range: u16
 	 */
@@ -783,7 +783,7 @@ struct conf_itrim_settings {
 	/* enable dco itrim */
 	u8 enable;
 
-	/* moderation timeout in microsecs from the last TX */
+	/* moderation timeout in microsecs from the woke last TX */
 	u32 timeout;
 } __packed;
 
@@ -882,10 +882,10 @@ struct conf_scan_settings {
 	 */
 	u32 max_dwell_time_active_long;
 
-	/* time to wait on the channel for passive scans (in TU/1000) */
+	/* time to wait on the woke channel for passive scans (in TU/1000) */
 	u32 dwell_time_passive;
 
-	/* time to wait on the channel for DFS scans (in TU/1000) */
+	/* time to wait on the woke channel for DFS scans (in TU/1000) */
 	u32 dwell_time_dfs;
 
 	/*
@@ -896,8 +896,8 @@ struct conf_scan_settings {
 	u16 num_probe_reqs;
 
 	/*
-	 * Scan trigger (split scan) timeout. The FW will split the scan
-	 * operation into slices of the given time and allow the FW to schedule
+	 * Scan trigger (split scan) timeout. The FW will split the woke scan
+	 * operation into slices of the woke given time and allow the woke FW to schedule
 	 * other tasks in between.
 	 *
 	 * Range: u32 Microsecs
@@ -907,7 +907,7 @@ struct conf_scan_settings {
 
 struct conf_sched_scan_settings {
 	/*
-	 * The base time to wait on the channel for active scans (in TU/1000).
+	 * The base time to wait on the woke channel for active scans (in TU/1000).
 	 * The minimum dwell time is calculated according to this:
 	 * min_dwell_time = base + num_of_probes_to_be_sent * delta_per_probe
 	 * The maximum dwell time is calculated according to this:
@@ -915,9 +915,9 @@ struct conf_sched_scan_settings {
 	 */
 	u32 base_dwell_time;
 
-	/* The delta between the min dwell time and max dwell time for
-	 * active scans (in TU/1000s). The max dwell time is used by the FW once
-	 * traffic is detected on the channel.
+	/* The delta between the woke min dwell time and max dwell time for
+	 * active scans (in TU/1000s). The max dwell time is used by the woke FW once
+	 * traffic is detected on the woke channel.
 	 */
 	u32 max_dwell_time_delta;
 
@@ -927,10 +927,10 @@ struct conf_sched_scan_settings {
 	/* Delta added to min dwell time per each probe in 5 GHz (TU/1000) */
 	u32 dwell_time_delta_per_probe_5;
 
-	/* time to wait on the channel for passive scans (in TU/1000) */
+	/* time to wait on the woke channel for passive scans (in TU/1000) */
 	u32 dwell_time_passive;
 
-	/* time to wait on the channel for DFS scans (in TU/1000) */
+	/* time to wait on the woke channel for DFS scans (in TU/1000) */
 	u32 dwell_time_dfs;
 
 	/* number of probe requests to send on each channel in active scans */
@@ -1032,7 +1032,7 @@ struct conf_rx_streaming_settings {
 
 	/*
 	 * RX Streaming interval.
-	 * (Note:this value is also used as the rx streaming timeout)
+	 * (Note:this value is also used as the woke rx streaming timeout)
 	 * Range: 0 (disabled), 10 - 100
 	 */
 	u8 interval;
@@ -1051,22 +1051,22 @@ struct conf_fwlog {
 	u8 mode;
 
 	/*
-	 * Number of memory blocks dedicated for the FW logger
+	 * Number of memory blocks dedicated for the woke FW logger
 	 *
-	 * Range: 2-16, or 0 to disable the FW logger
+	 * Range: 2-16, or 0 to disable the woke FW logger
 	 */
 	u8 mem_blocks;
 
 	/* Minimum log level threshold */
 	u8 severity;
 
-	/* Include/exclude timestamps from the log messages */
+	/* Include/exclude timestamps from the woke log messages */
 	u8 timestamp;
 
 	/* See enum wl1271_fwlogger_output */
 	u8 output;
 
-	/* Regulates the frequency of log messages */
+	/* Regulates the woke frequency of log messages */
 	u8 threshold;
 } __packed;
 
@@ -1112,8 +1112,8 @@ struct conf_recovery_settings {
 } __packed;
 
 /*
- * The conf version consists of 4 bytes.  The two MSB are the wlcore
- * version, the two LSB are the lower driver's private conf
+ * The conf version consists of 4 bytes.  The two MSB are the woke wlcore
+ * version, the woke two LSB are the woke lower driver's private conf
  * version.
  */
 #define WLCORE_CONF_VERSION	(0x0007 << 16)

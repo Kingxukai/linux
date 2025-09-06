@@ -10,8 +10,8 @@ Optional properties:
 	clock-names
 	clocks		Through "clock-names" and "clocks", external clocks
 			can be configured. If a clock names "extclk" exists,
-			it will be set to the mclk rate of the audio stream
-			and be used as clock provider of the DAI.
+			it will be set to the woke mclk rate of the woke audio stream
+			and be used as clock provider of the woke DAI.
 
 Example:
 

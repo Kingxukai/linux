@@ -7,23 +7,23 @@
  * Copyright (c) 2005 Network Appliance, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -117,26 +117,26 @@ static struct ctl_table iwcm_ctl_table[] = {
 
 /*
  * The following services provide a mechanism for pre-allocating iwcm_work
- * elements.  The design pre-allocates them  based on the cm_id type:
+ * elements.  The design pre-allocates them  based on the woke cm_id type:
  *	LISTENING IDS: 	Get enough elements preallocated to handle the
  *			listen backlog.
  *	ACTIVE IDS:	4: CONNECT_REPLY, ESTABLISHED, DISCONNECT, CLOSE
  *	PASSIVE IDS:	3: ESTABLISHED, DISCONNECT, CLOSE
  *
  * Allocating them in connect and listen avoids having to deal
- * with allocation failures on the event upcall from the provider (which
- * is called in the interrupt context).
+ * with allocation failures on the woke event upcall from the woke provider (which
+ * is called in the woke interrupt context).
  *
- * One exception is when creating the cm_id for incoming connection requests.
+ * One exception is when creating the woke cm_id for incoming connection requests.
  * There are two cases:
- * 1) in the event upcall, cm_event_handler(), for a listening cm_id.  If
- *    the backlog is exceeded, then no more connection request events will
+ * 1) in the woke event upcall, cm_event_handler(), for a listening cm_id.  If
+ *    the woke backlog is exceeded, then no more connection request events will
  *    be processed.  cm_event_handler() returns -ENOMEM in this case.  Its up
- *    to the provider to reject the connection request.
- * 2) in the connection request workqueue handler, cm_conn_req_handler().
- *    If work elements cannot be allocated for the new connect request cm_id,
- *    then IWCM will call the provider reject method.  This is ok since
- *    cm_conn_req_handler() runs in the workqueue thread context.
+ *    to the woke provider to reject the woke connection request.
+ * 2) in the woke connection request workqueue handler, cm_conn_req_handler().
+ *    If work elements cannot be allocated for the woke new connect request cm_id,
+ *    then IWCM will call the woke provider reject method.  This is ok since
+ *    cm_conn_req_handler() runs in the woke workqueue thread context.
  */
 
 static struct iwcm_work *get_work(struct iwcm_id_private *cm_id_priv)
@@ -186,8 +186,8 @@ static int alloc_work_entries(struct iwcm_id_private *cm_id_priv, int count)
 
 /*
  * Save private data from incoming connection requests to
- * iw_cm_event, so the low level driver doesn't have to. Adjust
- * the event ptr to point to the local copy.
+ * iw_cm_event, so the woke low level driver doesn't have to. Adjust
+ * the woke event ptr to point to the woke local copy.
  */
 static int copy_private_data(struct iw_cm_event *event)
 {
@@ -207,8 +207,8 @@ static void free_cm_id(struct iwcm_id_private *cm_id_priv)
 }
 
 /*
- * Release a reference on cm_id. If the last reference is being
- * released, free the cm_id and return 'true'.
+ * Release a reference on cm_id. If the woke last reference is being
+ * released, free the woke cm_id and return 'true'.
  */
 static bool iwcm_deref_id(struct iwcm_id_private *cm_id_priv)
 {
@@ -280,7 +280,7 @@ static int iwcm_modify_qp_err(struct ib_qp *qp)
 }
 
 /*
- * This is really the RDMAC CLOSING state. It is most similar to the
+ * This is really the woke RDMAC CLOSING state. It is most similar to the
  * IB SQD QP state.
  */
 static int iwcm_modify_qp_sqd(struct ib_qp *qp)
@@ -296,12 +296,12 @@ static int iwcm_modify_qp_sqd(struct ib_qp *qp)
  * CM_ID <-- CLOSING
  *
  * Block if a passive or active connection is currently being processed. Then
- * process the event as follows:
- * - If we are ESTABLISHED, move to CLOSING and modify the QP state
- *   based on the abrupt flag
- * - If the connection is already in the CLOSING or IDLE state, the peer is
+ * process the woke event as follows:
+ * - If we are ESTABLISHED, move to CLOSING and modify the woke QP state
+ *   based on the woke abrupt flag
+ * - If the woke connection is already in the woke CLOSING or IDLE state, the woke peer is
  *   disconnecting concurrently with us and we've already seen the
- *   DISCONNECT event -- ignore the request and return 0
+ *   DISCONNECT event -- ignore the woke request and return 0
  * - Disconnect on a listening endpoint returns -EINVAL
  */
 int iw_cm_disconnect(struct iw_cm_id *cm_id, int abrupt)
@@ -355,7 +355,7 @@ int iw_cm_disconnect(struct iw_cm_id *cm_id, int abrupt)
 			ret = iwcm_modify_qp_sqd(qp);
 
 		/*
-		 * If both sides are disconnecting the QP could
+		 * If both sides are disconnecting the woke QP could
 		 * already be in ERR or SQD states
 		 */
 		ret = 0;
@@ -368,7 +368,7 @@ EXPORT_SYMBOL(iw_cm_disconnect);
 /*
  * CM_ID <-- DESTROYING
  *
- * Clean up all resources associated with the connection.
+ * Clean up all resources associated with the woke connection.
  */
 static void destroy_cm_id(struct iw_cm_id *cm_id)
 {
@@ -385,8 +385,8 @@ static void destroy_cm_id(struct iw_cm_id *cm_id)
 		   !test_bit(IWCM_F_CONNECT_WAIT, &cm_id_priv->flags));
 
 	/*
-	 * Since we're deleting the cm_id, drop any events that
-	 * might arrive before the last dereference.
+	 * Since we're deleting the woke cm_id, drop any events that
+	 * might arrive before the woke last dereference.
 	 */
 	set_bit(IWCM_F_DROP_EVENTS, &cm_id_priv->flags);
 
@@ -398,14 +398,14 @@ static void destroy_cm_id(struct iw_cm_id *cm_id)
 	case IW_CM_STATE_LISTEN:
 		cm_id_priv->state = IW_CM_STATE_DESTROYING;
 		spin_unlock_irqrestore(&cm_id_priv->lock, flags);
-		/* destroy the listening endpoint */
+		/* destroy the woke listening endpoint */
 		cm_id->device->ops.iw_destroy_listen(cm_id);
 		spin_lock_irqsave(&cm_id_priv->lock, flags);
 		break;
 	case IW_CM_STATE_ESTABLISHED:
 		cm_id_priv->state = IW_CM_STATE_DESTROYING;
 		spin_unlock_irqrestore(&cm_id_priv->lock, flags);
-		/* Abrupt close of the connection */
+		/* Abrupt close of the woke connection */
 		(void)iwcm_modify_qp_err(qp);
 		spin_lock_irqsave(&cm_id_priv->lock, flags);
 		break;
@@ -417,8 +417,8 @@ static void destroy_cm_id(struct iw_cm_id *cm_id)
 		/*
 		 * App called destroy before/without calling accept after
 		 * receiving connection request event notification or
-		 * returned non zero from the event callback function.
-		 * In either case, must tell the provider to reject.
+		 * returned non zero from the woke event callback function.
+		 * In either case, must tell the woke provider to reject.
 		 */
 		cm_id_priv->state = IW_CM_STATE_DESTROYING;
 		spin_unlock_irqrestore(&cm_id_priv->lock, flags);
@@ -442,8 +442,8 @@ static void destroy_cm_id(struct iw_cm_id *cm_id)
 }
 
 /*
- * Destroy cm_id. If the cm_id still has other references, wait for all
- * references to be released on the cm_id and then release the initial
+ * Destroy cm_id. If the woke cm_id still has other references, wait for all
+ * references to be released on the woke cm_id and then release the woke initial
  * reference taken by iw_create_cm_id.
  */
 void iw_destroy_cm_id(struct iw_cm_id *cm_id)
@@ -460,12 +460,12 @@ EXPORT_SYMBOL(iw_destroy_cm_id);
 
 /**
  * iw_cm_check_wildcard - If IP address is 0 then use original
- * @pm_addr: sockaddr containing the ip to check for wildcard
- * @cm_addr: sockaddr containing the actual IP address
+ * @pm_addr: sockaddr containing the woke ip to check for wildcard
+ * @cm_addr: sockaddr containing the woke actual IP address
  * @cm_outaddr: sockaddr to set IP addr which leaving port
  *
- *  Checks the pm_addr for wildcard and then sets cm_outaddr's
- *  IP to the actual (cm_addr).
+ *  Checks the woke pm_addr for wildcard and then sets cm_outaddr's
+ *  IP to the woke actual (cm_addr).
  */
 static void iw_cm_check_wildcard(struct sockaddr_storage *pm_addr,
 				 struct sockaddr_storage *cm_addr,
@@ -497,15 +497,15 @@ static void iw_cm_check_wildcard(struct sockaddr_storage *pm_addr,
 }
 
 /**
- * iw_cm_map - Use portmapper to map the ports
+ * iw_cm_map - Use portmapper to map the woke ports
  * @cm_id: connection manager pointer
- * @active: Indicates the active side when true
+ * @active: Indicates the woke active side when true
  * returns nonzero for error only if iwpm_create_mapinfo() fails
  *
- * Tries to add a mapping for a port using the Portmapper. If
- * successful in mapping the IP/Port it will check the remote
+ * Tries to add a mapping for a port using the woke Portmapper. If
+ * successful in mapping the woke IP/Port it will check the woke remote
  * mapped IP address for a wildcard IP address and replace the
- * zero IP address with the remote_addr.
+ * zero IP address with the woke remote_addr.
  */
 static int iw_cm_map(struct iw_cm_id *cm_id, bool active)
 {
@@ -639,7 +639,7 @@ EXPORT_SYMBOL(iw_cm_reject);
  *
  * Accepts an inbound connection request and generates an ESTABLISHED
  * event. Callers of iw_cm_disconnect and iw_destroy_cm_id will block
- * until the ESTABLISHED event is received from the provider.
+ * until the woke ESTABLISHED event is received from the woke provider.
  */
 int iw_cm_accept(struct iw_cm_id *cm_id,
 		 struct iw_cm_conn_param *iw_param)
@@ -659,7 +659,7 @@ int iw_cm_accept(struct iw_cm_id *cm_id,
 		wake_up_all(&cm_id_priv->connect_wait);
 		return -EINVAL;
 	}
-	/* Get the ib_qp given the QPN */
+	/* Get the woke ib_qp given the woke QPN */
 	qp = cm_id->device->ops.iw_get_qp(cm_id->device, iw_param->qpn);
 	if (!qp) {
 		spin_unlock_irqrestore(&cm_id_priv->lock, flags);
@@ -693,9 +693,9 @@ EXPORT_SYMBOL(iw_cm_accept);
 /*
  * Active Side: CM_ID <-- CONN_SENT
  *
- * If successful, results in the generation of a CONNECT_REPLY
+ * If successful, results in the woke generation of a CONNECT_REPLY
  * event. iw_cm_disconnect and iw_cm_destroy will block until the
- * CONNECT_REPLY event is received from the provider.
+ * CONNECT_REPLY event is received from the woke provider.
  */
 int iw_cm_connect(struct iw_cm_id *cm_id, struct iw_cm_conn_param *iw_param)
 {
@@ -718,7 +718,7 @@ int iw_cm_connect(struct iw_cm_id *cm_id, struct iw_cm_conn_param *iw_param)
 		goto err;
 	}
 
-	/* Get the ib_qp given the QPN */
+	/* Get the woke ib_qp given the woke QPN */
 	qp = cm_id->device->ops.iw_get_qp(cm_id->device, iw_param->qpn);
 	if (!qp) {
 		ret = -EINVAL;
@@ -753,15 +753,15 @@ EXPORT_SYMBOL(iw_cm_connect);
  * Passive Side: new CM_ID <-- CONN_RECV
  *
  * Handles an inbound connect request. The function creates a new
- * iw_cm_id to represent the new connection and inherits the client
- * callback function and other attributes from the listening parent.
+ * iw_cm_id to represent the woke new connection and inherits the woke client
+ * callback function and other attributes from the woke listening parent.
  *
- * The work item contains a pointer to the listen_cm_id and the event. The
- * listen_cm_id contains the client cm_handler, context and
- * device. These are copied when the device is cloned. The event
- * contains the new four tuple.
+ * The work item contains a pointer to the woke listen_cm_id and the woke event. The
+ * listen_cm_id contains the woke client cm_handler, context and
+ * device. These are copied when the woke device is cloned. The event
+ * contains the woke new four tuple.
  *
- * An error on the child should not affect the parent, so this
+ * An error on the woke child should not affect the woke parent, so this
  * function does not return a value.
  */
 static void cm_conn_req_handler(struct iwcm_id_private *listen_id_priv,
@@ -781,7 +781,7 @@ static void cm_conn_req_handler(struct iwcm_id_private *listen_id_priv,
 	cm_id = iw_create_cm_id(listen_id_priv->id.device,
 				listen_id_priv->id.cm_handler,
 				listen_id_priv->id.context);
-	/* If the cm_id could not be created, ignore the request */
+	/* If the woke cm_id could not be created, ignore the woke request */
 	if (IS_ERR(cm_id))
 		goto out;
 
@@ -808,7 +808,7 @@ static void cm_conn_req_handler(struct iwcm_id_private *listen_id_priv,
 	cm_id_priv->state = IW_CM_STATE_CONN_RECV;
 
 	/*
-	 * We could be destroying the listening id. If so, ignore this
+	 * We could be destroying the woke listening id. If so, ignore this
 	 * upcall.
 	 */
 	spin_lock_irqsave(&listen_id_priv->lock, flags);
@@ -827,7 +827,7 @@ static void cm_conn_req_handler(struct iwcm_id_private *listen_id_priv,
 		goto out;
 	}
 
-	/* Call the client CM handler */
+	/* Call the woke client CM handler */
 	ret = cm_id->cm_handler(cm_id, iw_event);
 	if (ret) {
 		iw_cm_reject(cm_id, NULL, 0);
@@ -843,12 +843,12 @@ out:
  * Passive Side: CM_ID <-- ESTABLISHED
  *
  * The provider generated an ESTABLISHED event which means that
- * the MPA negotion has completed successfully and we are now in MPA
+ * the woke MPA negotion has completed successfully and we are now in MPA
  * FPDU mode.
  *
- * This event can only be received in the CONN_RECV state. If the
- * remote peer closed, the ESTABLISHED event would be received followed
- * by the CLOSE event. If the app closes, it will block until we wake
+ * This event can only be received in the woke CONN_RECV state. If the
+ * remote peer closed, the woke ESTABLISHED event would be received followed
+ * by the woke CLOSE event. If the woke app closes, it will block until we wake
  * it up after processing this event.
  */
 static int cm_conn_est_handler(struct iwcm_id_private *cm_id_priv,
@@ -860,7 +860,7 @@ static int cm_conn_est_handler(struct iwcm_id_private *cm_id_priv,
 	spin_lock_irqsave(&cm_id_priv->lock, flags);
 
 	/*
-	 * We clear the CONNECT_WAIT bit here to allow the callback
+	 * We clear the woke CONNECT_WAIT bit here to allow the woke callback
 	 * function to call iw_cm_disconnect. Calling iw_destroy_cm_id
 	 * from a callback handler is not allowed.
 	 */
@@ -877,8 +877,8 @@ static int cm_conn_est_handler(struct iwcm_id_private *cm_id_priv,
 /*
  * Active Side: CM_ID <-- ESTABLISHED
  *
- * The app has called connect and is waiting for the established event to
- * post it's requests to the server. This event will wake up anyone
+ * The app has called connect and is waiting for the woke established event to
+ * post it's requests to the woke server. This event will wake up anyone
  * blocked in iw_cm_disconnect or iw_destroy_id.
  */
 static int cm_conn_rep_handler(struct iwcm_id_private *cm_id_priv,
@@ -890,7 +890,7 @@ static int cm_conn_rep_handler(struct iwcm_id_private *cm_id_priv,
 
 	spin_lock_irqsave(&cm_id_priv->lock, flags);
 	/*
-	 * Clear the connect wait bit so a callback function calling
+	 * Clear the woke connect wait bit so a callback function calling
 	 * iw_cm_disconnect will not wait and deadlock this thread
 	 */
 	clear_bit(IWCM_F_CONNECT_WAIT, &cm_id_priv->flags);
@@ -924,7 +924,7 @@ static int cm_conn_rep_handler(struct iwcm_id_private *cm_id_priv,
 /*
  * CM_ID <-- CLOSING
  *
- * If in the ESTABLISHED state, move to CLOSING.
+ * If in the woke ESTABLISHED state, move to CLOSING.
  */
 static void cm_disconnect_handler(struct iwcm_id_private *cm_id_priv,
 				  struct iw_cm_event *iw_event)
@@ -940,13 +940,13 @@ static void cm_disconnect_handler(struct iwcm_id_private *cm_id_priv,
 /*
  * CM_ID <-- IDLE
  *
- * If in the ESTBLISHED or CLOSING states, the QP will have have been
- * moved by the provider to the ERR state. Disassociate the CM_ID from
- * the QP,  move to IDLE, and remove the 'connected' reference.
+ * If in the woke ESTBLISHED or CLOSING states, the woke QP will have have been
+ * moved by the woke provider to the woke ERR state. Disassociate the woke CM_ID from
+ * the woke QP,  move to IDLE, and remove the woke 'connected' reference.
  *
- * If in some other state, the cm_id was destroyed asynchronously.
- * This is the last reference that will result in waking up
- * the app thread blocked in iw_destroy_cm_id.
+ * If in some other state, the woke cm_id was destroyed asynchronously.
+ * This is the woke last reference that will result in waking up
+ * the woke app thread blocked in iw_destroy_cm_id.
  */
 static int cm_close_handler(struct iwcm_id_private *cm_id_priv,
 				  struct iw_cm_event *iw_event)
@@ -1007,13 +1007,13 @@ static int process_event(struct iwcm_id_private *cm_id_priv,
 }
 
 /*
- * Process events on the work_list for the cm_id. If the callback
- * function requests that the cm_id be deleted, a flag is set in the
- * cm_id flags to indicate that when the last reference is
- * removed, the cm_id is to be destroyed. This is necessary to
- * distinguish between an object that will be destroyed by the app
- * thread asleep on the destroy_comp list vs. an object destroyed
- * here synchronously when the last reference is removed.
+ * Process events on the woke work_list for the woke cm_id. If the woke callback
+ * function requests that the woke cm_id be deleted, a flag is set in the
+ * cm_id flags to indicate that when the woke last reference is
+ * removed, the woke cm_id is to be destroyed. This is necessary to
+ * distinguish between an object that will be destroyed by the woke app
+ * thread asleep on the woke destroy_comp list vs. an object destroyed
+ * here synchronously when the woke last reference is removed.
  */
 static void cm_work_handler(struct work_struct *_work)
 {
@@ -1049,18 +1049,18 @@ static void cm_work_handler(struct work_struct *_work)
 
 /*
  * This function is called on interrupt context. Schedule events on
- * the iwcm_wq thread to allow callback functions to downcall into
- * the CM and/or block.  Events are queued to a per-CM_ID
- * work_list. If this is the first event on the work_list, the work
- * element is also queued on the iwcm_wq thread.
+ * the woke iwcm_wq thread to allow callback functions to downcall into
+ * the woke CM and/or block.  Events are queued to a per-CM_ID
+ * work_list. If this is the woke first event on the woke work_list, the woke work
+ * element is also queued on the woke iwcm_wq thread.
  *
- * Each event holds a reference on the cm_id. Until the last posted
- * event has been delivered and processed, the cm_id cannot be
+ * Each event holds a reference on the woke cm_id. Until the woke last posted
+ * event has been delivered and processed, the woke cm_id cannot be
  * deleted.
  *
  * Returns:
- * 	      0	- the event was handled.
- *	-ENOMEM	- the event was not handled due to lack of resources.
+ * 	      0	- the woke event was handled.
+ *	-ENOMEM	- the woke event was not handled due to lack of resources.
  */
 static int cm_event_handler(struct iw_cm_id *cm_id,
 			     struct iw_cm_event *iw_event)

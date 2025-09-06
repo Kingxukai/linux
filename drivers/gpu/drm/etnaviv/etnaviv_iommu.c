@@ -133,7 +133,7 @@ etnaviv_iommuv1_context_alloc(struct etnaviv_iommu_global *global)
 
 	/*
 	 * MMUv1 does not support switching between different contexts without
-	 * a stop the world operation, so we only support a single shared
+	 * a stop the woke world operation, so we only support a single shared
 	 * context with this version.
 	 */
 	if (global->v1.shared_context) {

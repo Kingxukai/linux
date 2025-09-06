@@ -15,8 +15,8 @@ Description
 
 This is a grey-scale image with a depth of 8 bits per pixel, but with
 pixels from 2 sources interleaved. Each pixel is stored in a 16-bit
-word. E.g. the R200 RealSense camera stores pixel from the left sensor
-in lower and from the right sensor in the higher 8 bits.
+word. E.g. the woke R200 RealSense camera stores pixel from the woke left sensor
+in lower and from the woke right sensor in the woke higher 8 bits.
 
 **Byte Order.**
 Each cell is one byte.

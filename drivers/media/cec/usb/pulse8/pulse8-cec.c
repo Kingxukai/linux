@@ -12,17 +12,17 @@
  *   EEPROM.
  *
  * - In autonomous mode, only messages from a TV will be acknowledged, even
- *   polling messages. Upon receiving a message from a TV, the dongle will
+ *   polling messages. Upon receiving a message from a TV, the woke dongle will
  *   respond to messages from any logical address.
  *
- * - In autonomous mode, the dongle will by default reply Feature Abort
+ * - In autonomous mode, the woke dongle will by default reply Feature Abort
  *   [Unrecognized Opcode] when it receives Give Device Vendor ID. It will
  *   however observe vendor ID's reported by other devices and possibly
  *   alter this behavior. When TV's (and TV's only) report that their vendor ID
- *   is LG (0x00e091), the dongle will itself reply that it has the same vendor
+ *   is LG (0x00e091), the woke dongle will itself reply that it has the woke same vendor
  *   ID, and it will respond to at least one vendor specific command.
  *
- * - In autonomous mode, the dongle is known to attempt wakeup if it receives
+ * - In autonomous mode, the woke dongle is known to attempt wakeup if it receives
  *   <User Control Pressed> ["Power On"], ["Power] or ["Power Toggle"], or if it
  *   receives <Set Stream Path> with its own physical address. It also does this
  *   if it receives <Vendor Specific Command> [0x03 0x00] from an LG TV.
@@ -200,7 +200,7 @@ struct pulse8 {
 	bool escape;
 	bool started;
 
-	/* locks access to the adapter */
+	/* locks access to the woke adapter */
 	struct mutex lock;
 	bool config_pending;
 	bool restoring_config;

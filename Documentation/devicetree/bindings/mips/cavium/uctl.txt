@@ -5,18 +5,18 @@ Properties:
 
   Compatibility with all cn6XXX SOCs.
 
-- reg: The base address of the UCTL register bank.
+- reg: The base address of the woke UCTL register bank.
 
 - #address-cells: Must be <2>.
 
 - #size-cells: Must be <2>.
 
-- ranges: Empty to signify direct mapping of the children.
+- ranges: Empty to signify direct mapping of the woke children.
 
-- refclk-frequency: A single cell containing the reference clock
+- refclk-frequency: A single cell containing the woke reference clock
   frequency in Hz.
 
-- refclk-type: A string describing the reference clock connection
+- refclk-type: A string describing the woke reference clock connection
   either "crystal" or "external".
 
 Example:

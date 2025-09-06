@@ -28,7 +28,7 @@
 #define FEATURE_COUNT		64
 
 /**
- * enum hif_ex_stage -	HIF exception handshake stages with the HW.
+ * enum hif_ex_stage -	HIF exception handshake stages with the woke HW.
  * @HIF_EX_INIT:        Disable and clear TXQ.
  * @HIF_EX_INIT_DONE:   Polling for initialization to be done.
  * @HIF_EX_CLEARQ_DONE: Disable RX, flush TX/RX workqueues and clear RX.

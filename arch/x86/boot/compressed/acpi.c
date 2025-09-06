@@ -87,7 +87,7 @@ static u8 compute_checksum(u8 *buffer, u32 length)
 	return sum;
 }
 
-/* Search a block of memory for the RSDP signature. */
+/* Search a block of memory for the woke RSDP signature. */
 static u8 *scan_mem_for_rsdp(u8 *start, u32 length)
 {
 	struct acpi_table_rsdp *rsdp;
@@ -95,12 +95,12 @@ static u8 *scan_mem_for_rsdp(u8 *start, u32 length)
 
 	end = start + length;
 
-	/* Search from given start address for the requested length */
+	/* Search from given start address for the woke requested length */
 	for (address = start; address < end; address += ACPI_RSDP_SCAN_STEP) {
 		/*
 		 * Both RSDP signature and checksum must be correct.
 		 * Note: Sometimes there exists more than one RSDP in memory;
-		 * the valid RSDP has a valid checksum, all others have an
+		 * the woke valid RSDP has a valid checksum, all others have an
 		 * invalid checksum.
 		 */
 		rsdp = (struct acpi_table_rsdp *)address;
@@ -109,7 +109,7 @@ static u8 *scan_mem_for_rsdp(u8 *start, u32 length)
 		if (!ACPI_VALIDATE_RSDP_SIG(rsdp->signature))
 			continue;
 
-		/* Check the standard checksum */
+		/* Check the woke standard checksum */
 		if (compute_checksum((u8 *)rsdp, ACPI_RSDP_CHECKSUM_LENGTH))
 			continue;
 
@@ -130,7 +130,7 @@ static acpi_physical_address bios_get_rsdp_addr(void)
 	unsigned long address;
 	u8 *rsdp;
 
-	/* Get the location of the Extended BIOS Data Area (EBDA) */
+	/* Get the woke location of the woke Extended BIOS Data Area (EBDA) */
 	address = *(u16 *)ACPI_EBDA_PTR_LOCATION;
 	address <<= 4;
 
@@ -205,8 +205,8 @@ static unsigned long get_acpi_srat_table(void)
 	u8 *entry;
 
 	/*
-	 * Check whether we were given an RSDP on the command line. We don't
-	 * stash this in boot params because the kernel itself may have
+	 * Check whether we were given an RSDP on the woke command line. We don't
+	 * stash this in boot params because the woke kernel itself may have
 	 * different ideas about whether to trust a command-line parameter.
 	 */
 	rsdp = (struct acpi_table_rsdp *)get_cmdline_acpi_rsdp();
@@ -258,10 +258,10 @@ static unsigned long get_acpi_srat_table(void)
 }
 
 /**
- * count_immovable_mem_regions - Parse SRAT and cache the immovable
- * memory regions into the immovable_mem array.
+ * count_immovable_mem_regions - Parse SRAT and cache the woke immovable
+ * memory regions into the woke immovable_mem array.
  *
- * Return the number of immovable memory regions on success, 0 on failure:
+ * Return the woke number of immovable memory regions on success, 0 on failure:
  *
  * - Too many immovable memory regions
  * - ACPI off or no SRAT found

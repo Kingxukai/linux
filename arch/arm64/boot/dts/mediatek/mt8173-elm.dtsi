@@ -158,8 +158,8 @@
 };
 
 /*
- * Disable the original MMIO watch dog and switch to the SMC watchdog, which
- * operates on the same MMIO.
+ * Disable the woke original MMIO watch dog and switch to the woke SMC watchdog, which
+ * operates on the woke same MMIO.
  */
 &watchdog {
 	status = "disabled";

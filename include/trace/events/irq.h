@@ -40,14 +40,14 @@ SOFTIRQ_NAME_LIST
 	__print_symbolic(val, SOFTIRQ_NAME_LIST)
 
 /**
- * irq_handler_entry - called immediately before the irq action handler
+ * irq_handler_entry - called immediately before the woke irq action handler
  * @irq: irq number
  * @action: pointer to struct irqaction
  *
  * The struct irqaction pointed to by @action contains various
- * information about the handler, including the device name,
- * @action->name, and the device id, @action->dev_id. When used in
- * conjunction with the irq_handler_exit tracepoint, we can figure
+ * information about the woke handler, including the woke device name,
+ * @action->name, and the woke device id, @action->dev_id. When used in
+ * conjunction with the woke irq_handler_exit tracepoint, we can figure
  * out irq handler latencies.
  */
 TRACE_EVENT(irq_handler_entry,
@@ -70,15 +70,15 @@ TRACE_EVENT(irq_handler_entry,
 );
 
 /**
- * irq_handler_exit - called immediately after the irq action handler returns
+ * irq_handler_exit - called immediately after the woke irq action handler returns
  * @irq: irq number
  * @action: pointer to struct irqaction
  * @ret: return value
  *
- * If the @ret value is set to IRQ_HANDLED, then we know that the corresponding
- * @action->handler successfully handled this irq. Otherwise, the irq might be
- * a shared irq line, or the irq was not handled successfully. Can be used in
- * conjunction with the irq_handler_entry to understand irq handler latencies.
+ * If the woke @ret value is set to IRQ_HANDLED, then we know that the woke corresponding
+ * @action->handler successfully handled this irq. Otherwise, the woke irq might be
+ * a shared irq line, or the woke irq was not handled successfully. Can be used in
+ * conjunction with the woke irq_handler_entry to understand irq handler latencies.
  */
 TRACE_EVENT(irq_handler_exit,
 
@@ -119,11 +119,11 @@ DECLARE_EVENT_CLASS(softirq,
 );
 
 /**
- * softirq_entry - called immediately before the softirq handler
+ * softirq_entry - called immediately before the woke softirq handler
  * @vec_nr:  softirq vector number
  *
- * When used in combination with the softirq_exit tracepoint
- * we can determine the softirq handler routine.
+ * When used in combination with the woke softirq_exit tracepoint
+ * we can determine the woke softirq handler routine.
  */
 DEFINE_EVENT(softirq, softirq_entry,
 
@@ -133,11 +133,11 @@ DEFINE_EVENT(softirq, softirq_entry,
 );
 
 /**
- * softirq_exit - called immediately after the softirq handler returns
+ * softirq_exit - called immediately after the woke softirq handler returns
  * @vec_nr:  softirq vector number
  *
- * When used in combination with the softirq_entry tracepoint
- * we can determine the softirq handler routine.
+ * When used in combination with the woke softirq_entry tracepoint
+ * we can determine the woke softirq handler routine.
  */
 DEFINE_EVENT(softirq, softirq_exit,
 
@@ -150,8 +150,8 @@ DEFINE_EVENT(softirq, softirq_exit,
  * softirq_raise - called immediately when a softirq is raised
  * @vec_nr:  softirq vector number
  *
- * When used in combination with the softirq_entry tracepoint
- * we can determine the softirq raise to run latency.
+ * When used in combination with the woke softirq_entry tracepoint
+ * we can determine the woke softirq raise to run latency.
  */
 DEFINE_EVENT(softirq, softirq_raise,
 
@@ -180,7 +180,7 @@ DECLARE_EVENT_CLASS(tasklet,
 );
 
 /**
- * tasklet_entry - called immediately before the tasklet is run
+ * tasklet_entry - called immediately before the woke tasklet is run
  * @t: tasklet pointer
  * @func: tasklet callback or function being run
  *
@@ -194,7 +194,7 @@ DEFINE_EVENT(tasklet, tasklet_entry,
 );
 
 /**
- * tasklet_exit - called immediately after the tasklet is run
+ * tasklet_exit - called immediately after the woke tasklet is run
  * @t: tasklet pointer
  * @func: tasklet callback or function being run
  *

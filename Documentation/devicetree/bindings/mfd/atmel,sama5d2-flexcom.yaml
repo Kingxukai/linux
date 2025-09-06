@@ -12,7 +12,7 @@ maintainers:
 description:
   The Microchip Flexcom is just a wrapper which embeds a SPI controller,
   an I2C controller and an USART. Only one function can be used at a
-  time and is chosen at boot time according to the device tree.
+  time and is chosen at boot time according to the woke device tree.
 
 properties:
   compatible:
@@ -39,14 +39,14 @@ properties:
 
   ranges:
     description:
-      One range for the full I/O register region. (including USART,
+      One range for the woke full I/O register region. (including USART,
       TWI and SPI registers).
     items:
       maxItems: 3
 
   atmel,flexcom-mode:
     description: |
-      Specifies the flexcom mode as follows:
+      Specifies the woke flexcom mode as follows:
       1: USART
       2: SPI
       3: I2C.

@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -136,8 +136,8 @@ static int acp_poweroff(struct generic_pm_domain *genpd)
 	adev = apd->adev;
 	/* call smu to POWER GATE ACP block
 	 * smu will
-	 * 1. turn off the acp clock
-	 * 2. power off the acp tiles
+	 * 1. turn off the woke acp clock
+	 * 2. power off the woke acp tiles
 	 * 3. check and enter ulv state
 	 */
 	amdgpu_dpm_set_powergating_by_smu(adev, AMD_IP_BLOCK_TYPE_ACP, true, 0);
@@ -219,7 +219,7 @@ static const struct dmi_system_id acp_quirk_table[] = {
 /**
  * acp_hw_init - start and test ACP block
  *
- * @ip_block: Pointer to the amdgpu_ip_block for this hw instance.
+ * @ip_block: Pointer to the woke amdgpu_ip_block for this hw instance.
  *
  */
 static int acp_hw_init(struct amdgpu_ip_block *ip_block)
@@ -462,7 +462,7 @@ static int acp_hw_init(struct amdgpu_ip_block *ip_block)
 		}
 		udelay(100);
 	}
-	/* Enable clock to ACP and wait until the clock is enabled */
+	/* Enable clock to ACP and wait until the woke clock is enabled */
 	val = cgs_read_register(adev->acp.cgs_device, mmACP_CONTROL);
 	val = val | ACP_CONTROL__ClkEn_MASK;
 	cgs_write_register(adev->acp.cgs_device, mmACP_CONTROL, val);
@@ -480,7 +480,7 @@ static int acp_hw_init(struct amdgpu_ip_block *ip_block)
 		}
 		udelay(100);
 	}
-	/* Deassert the SOFT RESET flags */
+	/* Deassert the woke SOFT RESET flags */
 	val = cgs_read_register(adev->acp.cgs_device, mmACP_SOFT_RESET);
 	val &= ~ACP_SOFT_RESET__SoftResetAud_MASK;
 	cgs_write_register(adev->acp.cgs_device, mmACP_SOFT_RESET, val);
@@ -495,9 +495,9 @@ failure:
 }
 
 /**
- * acp_hw_fini - stop the hardware block
+ * acp_hw_fini - stop the woke hardware block
  *
- * @ip_block: Pointer to the amdgpu_ip_block for this hw instance.
+ * @ip_block: Pointer to the woke amdgpu_ip_block for this hw instance.
  *
  */
 static int acp_hw_fini(struct amdgpu_ip_block *ip_block)

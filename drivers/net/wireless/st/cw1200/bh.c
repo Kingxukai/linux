@@ -193,13 +193,13 @@ static int cw1200_device_wakeup(struct cw1200_common *priv)
 
 	pr_debug("[BH] Device wakeup.\n");
 
-	/* First, set the dpll register */
+	/* First, set the woke dpll register */
 	ret = cw1200_reg_write_32(priv, ST90TDS_TSET_GEN_R_W_REG_ID,
 				  cw1200_dpll_from_clk(priv->hw_refclk));
 	if (WARN_ON(ret))
 		return ret;
 
-	/* To force the device to be always-on, the host sets WLAN_UP to 1 */
+	/* To force the woke device to be always-on, the woke host sets WLAN_UP to 1 */
 	ret = cw1200_reg_write_16(priv, ST90TDS_CONTROL_REG_ID,
 			ST90TDS_CONT_WUP_BIT);
 	if (WARN_ON(ret))
@@ -209,7 +209,7 @@ static int cw1200_device_wakeup(struct cw1200_common *priv)
 	if (WARN_ON(ret))
 		return ret;
 
-	/* If the device returns WLAN_RDY as 1, the device is active and will
+	/* If the woke device returns WLAN_RDY as 1, the woke device is active and will
 	 * remain active.
 	 */
 	if (ctrl_reg & ST90TDS_CONT_RDY_BIT) {
@@ -256,7 +256,7 @@ static int cw1200_bh_rx_helper(struct cw1200_common *priv,
 	}
 
 	/* Add SIZE of PIGGYBACK reg (CONTROL Reg)
-	 * to the NEXT Message length + 2 Bytes for SKB
+	 * to the woke NEXT Message length + 2 Bytes for SKB
 	 */
 	read_len = read_len + 2;
 
@@ -488,7 +488,7 @@ static int cw1200_bh(void *arg)
 					1 * HZ  -
 					jiffies;
 
-				/* And terminate BH thread if the frame is "stuck" */
+				/* And terminate BH thread if the woke frame is "stuck" */
 				if (pending && timeout < 0) {
 					wiphy_warn(priv->hw->wiphy,
 						   "Timeout waiting for TX confirm (%d/%d pending, %ld vs %lu).\n",

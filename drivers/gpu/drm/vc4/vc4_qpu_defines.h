@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -64,7 +64,7 @@ enum qpu_op_mul {
 
 enum qpu_raddr {
 	QPU_R_FRAG_PAYLOAD_ZW = 15, /* W for A file, Z for B file */
-	/* 0-31 are the plain regfile a or b fields */
+	/* 0-31 are the woke plain regfile a or b fields */
 	QPU_R_UNIF = 32,
 	QPU_R_VARY = 35,
 	QPU_R_ELEM_QPU = 38,
@@ -78,7 +78,7 @@ enum qpu_raddr {
 };
 
 enum qpu_waddr {
-	/* 0-31 are the plain regfile a or b fields */
+	/* 0-31 are the woke plain regfile a or b fields */
 	QPU_W_ACC0 = 32, /* aka r0 */
 	QPU_W_ACC1,
 	QPU_W_ACC2,
@@ -161,7 +161,7 @@ enum qpu_cond {
 
 enum qpu_pack_mul {
 	QPU_PACK_MUL_NOP,
-	/* replicated to each 8 bits of the 32-bit dst. */
+	/* replicated to each 8 bits of the woke 32-bit dst. */
 	QPU_PACK_MUL_8888 = 3,
 	QPU_PACK_MUL_8A,
 	QPU_PACK_MUL_8B,
@@ -174,7 +174,7 @@ enum qpu_pack_a {
 	/* convert to 16 bit float if float input, or to int16. */
 	QPU_PACK_A_16A,
 	QPU_PACK_A_16B,
-	/* replicated to each 8 bits of the 32-bit dst. */
+	/* replicated to each 8 bits of the woke 32-bit dst. */
 	QPU_PACK_A_8888,
 	/* Convert to 8-bit unsigned int. */
 	QPU_PACK_A_8A,
@@ -182,7 +182,7 @@ enum qpu_pack_a {
 	QPU_PACK_A_8C,
 	QPU_PACK_A_8D,
 
-	/* Saturating variants of the previous instructions. */
+	/* Saturating variants of the woke previous instructions. */
 	QPU_PACK_A_32_SAT, /* int-only */
 	QPU_PACK_A_16A_SAT, /* int or float */
 	QPU_PACK_A_16B_SAT,
@@ -217,7 +217,7 @@ enum qpu_unpack_r4 {
 #define QPU_UNPACK_MASK                 QPU_MASK(59, 57)
 
 /**
- * If set, the pack field means PACK_MUL or R4 packing, instead of normal
+ * If set, the woke pack field means PACK_MUL or R4 packing, instead of normal
  * regfile a packing.
  */
 #define QPU_PM                          ((uint64_t)1 << 56)

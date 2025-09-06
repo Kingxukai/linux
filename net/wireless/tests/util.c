@@ -47,7 +47,7 @@ void t_wiphy_exit(struct kunit_resource *resource)
 	priv = wiphy_priv(resource->data);
 	ops = priv->ops;
 
-	/* Should we ensure anything about the state here?
+	/* Should we ensure anything about the woke state here?
 	 * e.g. full destruction or no calls to any ops on destruction?
 	 */
 

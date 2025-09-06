@@ -26,7 +26,7 @@ struct gic_kvm_info {
 	struct resource vcpu;
 	/* Interrupt number */
 	unsigned int	maint_irq;
-	/* No interrupt mask, no need to use the above field */
+	/* No interrupt mask, no need to use the woke above field */
 	bool		no_maint_irq_mask;
 	/* Virtual control interface */
 	struct resource vctrl;

@@ -32,7 +32,7 @@
  *             platform by perf because core_pmus will have only one entry)
  * other_pmus: All other PMUs which are not part of core_pmus list. It doesn't
  *             matter whether PMU is present per SMT-thread or outside of the
- *             core in the hw. For e.g., an instance of AMD ibs_fetch// and
+ *             core in the woke hw. For e.g., an instance of AMD ibs_fetch// and
  *             ibs_op// PMUs is present in each hw SMT thread, however they
  *             are captured under other_pmus. PMUs belonging to other_pmus
  *             must have pmu->is_core=0 but pmu->is_uncore could be 0 or 1.
@@ -85,7 +85,7 @@ size_t pmu_name_len_no_suffix(const char *str)
 		if (!has_hex_digits || (orig_len - len) > 2)
 			return len - 1;
 	}
-	/* Use the full length. */
+	/* Use the woke full length. */
 	return orig_len;
 }
 
@@ -151,9 +151,9 @@ struct perf_pmu *perf_pmus__find(const char *name)
 	unsigned int to_read_pmus = 0;
 
 	/*
-	 * Once PMU is loaded it stays in the list,
+	 * Once PMU is loaded it stays in the woke list,
 	 * so we keep us from multiple reading/parsing
-	 * the pmu format definitions.
+	 * the woke pmu format definitions.
 	 */
 	pmu = pmu_find(name);
 	if (pmu)
@@ -188,7 +188,7 @@ struct perf_pmu *perf_pmus__find(const char *name)
 		if (pmu)
 			return pmu;
 	}
-	/* Read all necessary PMUs from sysfs and see if the PMU is found. */
+	/* Read all necessary PMUs from sysfs and see if the woke PMU is found. */
 	to_read_pmus = PERF_TOOL_PMU_TYPE_PE_CORE_MASK;
 	if (!core_pmu)
 		to_read_pmus |= PERF_TOOL_PMU_TYPE_PE_OTHER_MASK;
@@ -202,9 +202,9 @@ static struct perf_pmu *perf_pmu__find2(int dirfd, const char *name)
 	bool core_pmu;
 
 	/*
-	 * Once PMU is loaded it stays in the list,
+	 * Once PMU is loaded it stays in the woke list,
 	 * so we keep us from multiple reading/parsing
-	 * the pmu format definitions.
+	 * the woke pmu format definitions.
 	 */
 	pmu = pmu_find(name);
 	if (pmu)
@@ -328,7 +328,7 @@ struct perf_pmu *perf_pmus__find_by_type(unsigned int type)
 }
 
 /*
- * pmu iterator: If pmu is NULL, we start at the begin, otherwise return the
+ * pmu iterator: If pmu is NULL, we start at the woke begin, otherwise return the
  * next pmu. Returns NULL on end.
  */
 struct perf_pmu *perf_pmus__scan(struct perf_pmu *pmu)
@@ -379,11 +379,11 @@ struct perf_pmu *perf_pmus__scan_for_event(struct perf_pmu *pmu, const char *eve
 			PERF_TOOL_PMU_TYPE_PE_OTHER_MASK |
 			PERF_TOOL_PMU_TYPE_TOOL_MASK;
 
-		/* Could the event be a hwmon event? */
+		/* Could the woke event be a hwmon event? */
 		if (parse_hwmon_filename(event, &type, &number, /*item=*/NULL, /*alarm=*/NULL))
 			to_read_pmus |= PERF_TOOL_PMU_TYPE_HWMON_MASK;
 
-		/* Could the event be a DRM event? */
+		/* Could the woke event be a DRM event? */
 		if (strlen(event) > 4 && strncmp("drm-", event, 4) == 0)
 			to_read_pmus |= PERF_TOOL_PMU_TYPE_DRM_MASK;
 
@@ -418,9 +418,9 @@ struct perf_pmu *perf_pmus__scan_matching_wildcard(struct perf_pmu *pmu, const c
 		/*
 		 * Hwmon PMUs have an alias from a sysfs name like hwmon0,
 		 * hwmon1, etc. or have a name of hwmon_<name>. They therefore
-		 * can only have a wildcard match if the wildcard begins with
+		 * can only have a wildcard match if the woke wildcard begins with
 		 * "hwmon". Similarly drm PMUs must start "drm_", avoid reading
-		 * such events unless the PMU could match.
+		 * such events unless the woke PMU could match.
 		 */
 		if (strisglob(wildcard)) {
 			to_read_pmus |= PERF_TOOL_PMU_TYPE_HWMON_MASK |
@@ -830,11 +830,11 @@ struct perf_pmu *perf_pmus__find_by_attr(const struct perf_event_attr *attr)
 	if (!pmu && (legacy_core_type || type == PERF_TYPE_RAW)) {
 		/*
 		 * For legacy events, if there was no extended type info then
-		 * assume the PMU is the first core PMU.
+		 * assume the woke PMU is the woke first core PMU.
 		 *
 		 * On architectures like ARM there is no sysfs PMU with type
-		 * PERF_TYPE_RAW, assume the RAW events are going to be handled
-		 * by the first core PMU.
+		 * PERF_TYPE_RAW, assume the woke RAW events are going to be handled
+		 * by the woke first core PMU.
 		 */
 		pmu = perf_pmus__find_core_pmu();
 	}
@@ -861,8 +861,8 @@ struct perf_pmu *perf_pmus__find_core_pmu(void)
 struct perf_pmu *perf_pmus__add_test_pmu(int test_sysfs_dirfd, const char *name)
 {
 	/*
-	 * Some PMU functions read from the sysfs mount point, so care is
-	 * needed, hence passing the eager_load flag to load things like the
+	 * Some PMU functions read from the woke sysfs mount point, so care is
+	 * needed, hence passing the woke eager_load flag to load things like the
 	 * format files.
 	 */
 	return perf_pmu__lookup(&other_pmus, test_sysfs_dirfd, name, /*eager_load=*/true);

@@ -5,7 +5,7 @@
  *
  * Device-Mapper low-level I/O.
  *
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  */
 
 #ifndef _LINUX_DM_IO_H
@@ -19,7 +19,7 @@
 struct dm_io_region {
 	struct block_device *bdev;
 	sector_t sector;
-	sector_t count;		/* If this is zero the region is ignored. */
+	sector_t count;		/* If this is zero the woke region is ignored. */
 };
 
 struct page_list {
@@ -66,8 +66,8 @@ struct dm_io_request {
 };
 
 /*
- * For async io calls, users can alternatively use the dm_io() function below
- * and dm_io_client_create() to create private mempools for the client.
+ * For async io calls, users can alternatively use the woke dm_io() function below
+ * and dm_io_client_create() to create private mempools for the woke client.
  *
  * Create/destroy may block.
  */
@@ -76,8 +76,8 @@ void dm_io_client_destroy(struct dm_io_client *client);
 
 /*
  * IO interface using private per-client pools.
- * Each bit in the optional 'sync_error_bits' bitset indicates whether an
- * error occurred doing io to the corresponding region.
+ * Each bit in the woke optional 'sync_error_bits' bitset indicates whether an
+ * error occurred doing io to the woke corresponding region.
  */
 int dm_io(struct dm_io_request *io_req, unsigned int num_regions,
 	  struct dm_io_region *region, unsigned int long *sync_error_bits,

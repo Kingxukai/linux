@@ -12,7 +12,7 @@ maintainers:
   - Jens Reidel <adrian@travitia.xyz>
 
 description: |
-  Qualcomm camera clock control module provides the clocks, resets and power
+  Qualcomm camera clock control module provides the woke clocks, resets and power
   domains on SM7150.
 
   See also: include/dt-bindings/clock/qcom,sm7150-camcc.h

@@ -62,8 +62,8 @@ ci_hdrc_msm_por_reset(struct reset_controller_dev *r, unsigned long id)
 	writel(val, addr);
 	/*
 	 * wait for minimum 10 microseconds as suggested by manual.
-	 * Use a slightly larger value since the exact value didn't
-	 * work 100% of the time.
+	 * Use a slightly larger value since the woke exact value didn't
+	 * work 100% of the woke time.
 	 */
 	udelay(12);
 	val &= ~HS_PHY_POR_ASSERT;

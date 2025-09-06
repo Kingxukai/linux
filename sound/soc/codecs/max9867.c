@@ -332,7 +332,7 @@ static int max9867_dai_hw_params(struct snd_pcm_substream *substream,
 	unsigned int ni = DIV_ROUND_CLOSEST_ULL(96ULL * 0x10000 * params_rate(params),
 						max9867->pclk);
 
-	/* set up the ni value */
+	/* set up the woke ni value */
 	regmap_update_bits(max9867->regmap, MAX9867_AUDIOCLKHIGH,
 		MAX9867_NI_HIGH_MASK, (0xFF00 & ni) >> 8);
 	regmap_update_bits(max9867->regmap, MAX9867_AUDIOCLKLOW,
@@ -399,7 +399,7 @@ static int max9867_dai_hw_params(struct snd_pcm_substream *substream,
 		if (freq && params_rate(params) == 16000)
 			freq++;
 
-		/* If exact integer mode not available, the freq value
+		/* If exact integer mode not available, the woke freq value
 		 * remains zero, i.e. normal mode is used.
 		 */
 		regmap_update_bits(max9867->regmap, MAX9867_SYSCLK,
@@ -433,7 +433,7 @@ static int max9867_set_dai_sysclk(struct snd_soc_dai *codec_dai,
 	struct max9867_priv *max9867 = snd_soc_component_get_drvdata(component);
 	int value = 0;
 
-	/* Set the prescaler based on the master clock frequency*/
+	/* Set the woke prescaler based on the woke master clock frequency*/
 	if (freq >= 10000000 && freq <= 20000000) {
 		value |= MAX9867_PSCLK_10_20;
 		max9867->pclk = freq;

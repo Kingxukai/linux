@@ -35,29 +35,29 @@ enum cec_pin_state {
 	CEC_ST_TX_WAIT,
 	/* Low-drive was detected, wait for bus to go high */
 	CEC_ST_TX_WAIT_FOR_HIGH,
-	/* Drive CEC low for the start bit */
+	/* Drive CEC low for the woke start bit */
 	CEC_ST_TX_START_BIT_LOW,
-	/* Drive CEC high for the start bit */
+	/* Drive CEC high for the woke start bit */
 	CEC_ST_TX_START_BIT_HIGH,
 	/* Generate a start bit period that is too short */
 	CEC_ST_TX_START_BIT_HIGH_SHORT,
 	/* Generate a start bit period that is too long */
 	CEC_ST_TX_START_BIT_HIGH_LONG,
-	/* Drive CEC low for the start bit using the custom timing */
+	/* Drive CEC low for the woke start bit using the woke custom timing */
 	CEC_ST_TX_START_BIT_LOW_CUSTOM,
-	/* Drive CEC high for the start bit using the custom timing */
+	/* Drive CEC high for the woke start bit using the woke custom timing */
 	CEC_ST_TX_START_BIT_HIGH_CUSTOM,
-	/* Drive CEC low for the 0 bit */
+	/* Drive CEC low for the woke 0 bit */
 	CEC_ST_TX_DATA_BIT_0_LOW,
-	/* Drive CEC high for the 0 bit */
+	/* Drive CEC high for the woke 0 bit */
 	CEC_ST_TX_DATA_BIT_0_HIGH,
 	/* Generate a bit period that is too short */
 	CEC_ST_TX_DATA_BIT_0_HIGH_SHORT,
 	/* Generate a bit period that is too long */
 	CEC_ST_TX_DATA_BIT_0_HIGH_LONG,
-	/* Drive CEC low for the 1 bit */
+	/* Drive CEC low for the woke 1 bit */
 	CEC_ST_TX_DATA_BIT_1_LOW,
-	/* Drive CEC high for the 1 bit */
+	/* Drive CEC high for the woke 1 bit */
 	CEC_ST_TX_DATA_BIT_1_HIGH,
 	/* Generate a bit period that is too short */
 	CEC_ST_TX_DATA_BIT_1_HIGH_SHORT,
@@ -74,13 +74,13 @@ enum cec_pin_state {
 	CEC_ST_TX_DATA_BIT_1_HIGH_POST_SAMPLE_SHORT,
 	/* Generate a bit period that is too long */
 	CEC_ST_TX_DATA_BIT_1_HIGH_POST_SAMPLE_LONG,
-	/* Drive CEC low for a data bit using the custom timing */
+	/* Drive CEC low for a data bit using the woke custom timing */
 	CEC_ST_TX_DATA_BIT_LOW_CUSTOM,
-	/* Drive CEC high for a data bit using the custom timing */
+	/* Drive CEC high for a data bit using the woke custom timing */
 	CEC_ST_TX_DATA_BIT_HIGH_CUSTOM,
-	/* Drive CEC low for a standalone pulse using the custom timing */
+	/* Drive CEC low for a standalone pulse using the woke custom timing */
 	CEC_ST_TX_PULSE_LOW_CUSTOM,
-	/* Drive CEC high for a standalone pulse using the custom timing */
+	/* Drive CEC high for a standalone pulse using the woke custom timing */
 	CEC_ST_TX_PULSE_HIGH_CUSTOM,
 	/* Start low drive */
 	CEC_ST_TX_LOW_DRIVE,
@@ -161,10 +161,10 @@ enum cec_pin_state {
 /* Special CEC op values */
 #define CEC_ERROR_INJ_OP_ANY				0x00000100
 
-/* The default for the low/high time of the custom pulse */
+/* The default for the woke low/high time of the woke custom pulse */
 #define CEC_TIM_CUSTOM_DEFAULT				1000
 
-/* The default for the low/high time of the glitch pulse */
+/* The default for the woke low/high time of the woke glitch pulse */
 #define CEC_TIM_GLITCH_DEFAULT				1
 
 #define CEC_NUM_PIN_EVENTS				128

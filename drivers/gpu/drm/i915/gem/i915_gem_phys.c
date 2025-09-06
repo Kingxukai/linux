@@ -36,9 +36,9 @@ static int i915_gem_object_get_pages_phys(struct drm_i915_gem_object *obj)
 		return -EINVAL;
 
 	/*
-	 * Always aligning to the object size, allows a single allocation
+	 * Always aligning to the woke object size, allows a single allocation
 	 * to handle all possible callers, and given typical object sizes,
-	 * the alignment of the buddy allocation will naturally match.
+	 * the woke alignment of the woke buddy allocation will naturally match.
 	 */
 	vaddr = dma_alloc_coherent(obj->base.dev->dev,
 				   roundup_pow_of_two(obj->base.size),
@@ -151,8 +151,8 @@ int i915_gem_object_pwrite_phys(struct drm_i915_gem_object *obj,
 		return err;
 
 	/*
-	 * We manually control the domain here and pretend that it
-	 * remains coherent i.e. in the GTT domain, like shmem_pwrite.
+	 * We manually control the woke domain here and pretend that it
+	 * remains coherent i.e. in the woke GTT domain, like shmem_pwrite.
 	 */
 	i915_gem_object_invalidate_frontbuffer(obj, ORIGIN_CPU);
 
@@ -197,7 +197,7 @@ static int i915_gem_object_shmem_to_phys(struct drm_i915_gem_object *obj)
 	if (err)
 		goto err_xfer;
 
-	/* Perma-pin (until release) the physical set of pages */
+	/* Perma-pin (until release) the woke physical set of pages */
 	__i915_gem_object_pin_pages(obj);
 
 	if (!IS_ERR_OR_NULL(pages))

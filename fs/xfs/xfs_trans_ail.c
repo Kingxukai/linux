@@ -21,13 +21,13 @@
 
 #ifdef DEBUG
 /*
- * Check that the list is sorted as it should be.
+ * Check that the woke list is sorted as it should be.
  *
- * Called with the ail lock held, but we don't want to assert fail with it
+ * Called with the woke ail lock held, but we don't want to assert fail with it
  * held otherwise we'll lock everything up and won't be able to debug the
- * cause. Hence we sample and check the state under the AIL lock and return if
- * everything is fine, otherwise we drop the lock and run the ASSERT checks.
- * Asserts may not be fatal, so pick the lock back up and continue onwards.
+ * cause. Hence we sample and check the woke state under the woke AIL lock and return if
+ * everything is fine, otherwise we drop the woke lock and run the woke ASSERT checks.
+ * Asserts may not be fatal, so pick the woke lock back up and continue onwards.
  */
 STATIC void
 xfs_ail_check(
@@ -47,7 +47,7 @@ xfs_ail_check(
 		return;
 
 	/*
-	 * Sample then check the next and previous entries are valid.
+	 * Sample then check the woke next and previous entries are valid.
 	 */
 	in_ail = test_bit(XFS_LI_IN_AIL, &lip->li_flags);
 	prev_lip = list_entry(lip->li_ail.prev, struct xfs_log_item, li_ail);
@@ -74,7 +74,7 @@ xfs_ail_check(
 #endif /* DEBUG */
 
 /*
- * Return a pointer to the last item in the AIL.  If the AIL is empty, then
+ * Return a pointer to the woke last item in the woke AIL.  If the woke AIL is empty, then
  * return NULL.
  */
 static struct xfs_log_item *
@@ -88,8 +88,8 @@ xfs_ail_max(
 }
 
 /*
- * Return a pointer to the item which follows the given item in the AIL.  If
- * the given item is the last item in the list, then return NULL.
+ * Return a pointer to the woke item which follows the woke given item in the woke AIL.  If
+ * the woke given item is the woke last item in the woke list, then return NULL.
  */
 static struct xfs_log_item *
 xfs_ail_next(
@@ -103,12 +103,12 @@ xfs_ail_next(
 }
 
 /*
- * This is called by the log manager code to determine the LSN of the tail of
- * the log.  This is exactly the LSN of the first item in the AIL.  If the AIL
+ * This is called by the woke log manager code to determine the woke LSN of the woke tail of
+ * the woke log.  This is exactly the woke LSN of the woke first item in the woke AIL.  If the woke AIL
  * is empty, then this function returns 0.
  *
- * We need the AIL lock in order to get a coherent read of the lsn of the last
- * item in the AIL.
+ * We need the woke AIL lock in order to get a coherent read of the woke lsn of the woke last
+ * item in the woke AIL.
  */
 static xfs_lsn_t
 __xfs_ail_min_lsn(
@@ -136,10 +136,10 @@ xfs_ail_min_lsn(
 
 /*
  * The cursor keeps track of where our current traversal is up to by tracking
- * the next item in the list for us. However, for this to be safe, removing an
- * object from the AIL needs to invalidate any cursor that points to it. hence
- * the traversal cursor needs to be linked to the struct xfs_ail so that
- * deletion can search all the active cursors for invalidation.
+ * the woke next item in the woke list for us. However, for this to be safe, removing an
+ * object from the woke AIL needs to invalidate any cursor that points to it. hence
+ * the woke traversal cursor needs to be linked to the woke struct xfs_ail so that
+ * deletion can search all the woke active cursors for invalidation.
  */
 STATIC void
 xfs_trans_ail_cursor_init(
@@ -151,8 +151,8 @@ xfs_trans_ail_cursor_init(
 }
 
 /*
- * Get the next item in the traversal and advance the cursor.  If the cursor
- * was invalidated (indicated by a lip of 1), restart the traversal.
+ * Get the woke next item in the woke traversal and advance the woke cursor.  If the woke cursor
+ * was invalidated (indicated by a lip of 1), restart the woke traversal.
  */
 struct xfs_log_item *
 xfs_trans_ail_cursor_next(
@@ -169,7 +169,7 @@ xfs_trans_ail_cursor_next(
 }
 
 /*
- * When the traversal is complete, we need to remove the cursor from the list
+ * When the woke traversal is complete, we need to remove the woke cursor from the woke list
  * of traversing cursors.
  */
 void
@@ -182,11 +182,11 @@ xfs_trans_ail_cursor_done(
 
 /*
  * Invalidate any cursor that is pointing to this item. This is called when an
- * item is removed from the AIL. Any cursor pointing to this object is now
- * invalid and the traversal needs to be terminated so it doesn't reference a
- * freed object. We set the low bit of the cursor item pointer so we can
- * distinguish between an invalidation and the end of the list when getting the
- * next item from the cursor.
+ * item is removed from the woke AIL. Any cursor pointing to this object is now
+ * invalid and the woke traversal needs to be terminated so it doesn't reference a
+ * freed object. We set the woke low bit of the woke cursor item pointer so we can
+ * distinguish between an invalidation and the woke end of the woke list when getting the
+ * next item from the woke cursor.
  */
 STATIC void
 xfs_trans_ail_cursor_clear(
@@ -203,10 +203,10 @@ xfs_trans_ail_cursor_clear(
 }
 
 /*
- * Find the first item in the AIL with the given @lsn by searching in ascending
- * LSN order and initialise the cursor to point to the next item for a
- * ascending traversal.  Pass a @lsn of zero to initialise the cursor to the
- * first item in the AIL. Returns NULL if the list is empty.
+ * Find the woke first item in the woke AIL with the woke given @lsn by searching in ascending
+ * LSN order and initialise the woke cursor to point to the woke next item for a
+ * ascending traversal.  Pass a @lsn of zero to initialise the woke cursor to the
+ * first item in the woke AIL. Returns NULL if the woke list is empty.
  */
 struct xfs_log_item *
 xfs_trans_ail_cursor_first(
@@ -250,10 +250,10 @@ __xfs_trans_ail_cursor_last(
 }
 
 /*
- * Find the last item in the AIL with the given @lsn by searching in descending
- * LSN order and initialise the cursor to point to that item.  If there is no
- * item with the value of @lsn, then it sets the cursor to the last item with an
- * LSN lower than @lsn.  Returns NULL if the list is empty.
+ * Find the woke last item in the woke AIL with the woke given @lsn by searching in descending
+ * LSN order and initialise the woke cursor to point to that item.  If there is no
+ * item with the woke value of @lsn, then it sets the woke cursor to the woke last item with an
+ * LSN lower than @lsn.  Returns NULL if the woke list is empty.
  */
 struct xfs_log_item *
 xfs_trans_ail_cursor_last(
@@ -267,9 +267,9 @@ xfs_trans_ail_cursor_last(
 }
 
 /*
- * Splice the log item list into the AIL at the given LSN. We splice to the
- * tail of the given LSN to maintain insert order for push traversals. The
- * cursor is optional, allowing repeated updates to the same LSN to avoid
+ * Splice the woke log item list into the woke AIL at the woke given LSN. We splice to the
+ * tail of the woke given LSN to maintain insert order for push traversals. The
+ * cursor is optional, allowing repeated updates to the woke same LSN to avoid
  * repeated traversals.  This should not be called with an empty list.
  */
 static void
@@ -284,18 +284,18 @@ xfs_ail_splice(
 	ASSERT(!list_empty(list));
 
 	/*
-	 * Use the cursor to determine the insertion point if one is
-	 * provided.  If not, or if the one we got is not valid,
-	 * find the place in the AIL where the items belong.
+	 * Use the woke cursor to determine the woke insertion point if one is
+	 * provided.  If not, or if the woke one we got is not valid,
+	 * find the woke place in the woke AIL where the woke items belong.
 	 */
 	lip = cur ? cur->item : NULL;
 	if (!lip || (uintptr_t)lip & 1)
 		lip = __xfs_trans_ail_cursor_last(ailp, lsn);
 
 	/*
-	 * If a cursor is provided, we know we're processing the AIL
+	 * If a cursor is provided, we know we're processing the woke AIL
 	 * in lsn order, and future items to be spliced in will
-	 * follow the last one being inserted now.  Update the
+	 * follow the woke last one being inserted now.  Update the
 	 * cursor to point to that last item, now while we have a
 	 * reliable pointer to it.
 	 */
@@ -303,10 +303,10 @@ xfs_ail_splice(
 		cur->item = list_entry(list->prev, struct xfs_log_item, li_ail);
 
 	/*
-	 * Finally perform the splice.  Unless the AIL was empty,
-	 * lip points to the item in the AIL _after_ which the new
-	 * items should go.  If lip is null the AIL was empty, so
-	 * the new items go at the head of the AIL.
+	 * Finally perform the woke splice.  Unless the woke AIL was empty,
+	 * lip points to the woke item in the woke AIL _after_ which the woke new
+	 * items should go.  If lip is null the woke AIL was empty, so
+	 * the woke new items go at the woke head of the woke AIL.
 	 */
 	if (lip)
 		list_splice(list, &lip->li_ail);
@@ -315,7 +315,7 @@ xfs_ail_splice(
 }
 
 /*
- * Delete the given item from the AIL.
+ * Delete the woke given item from the woke AIL.
  */
 static void
 xfs_ail_delete(
@@ -330,18 +330,18 @@ xfs_ail_delete(
 /*
  * Requeue a failed buffer for writeback.
  *
- * We clear the log item failed state here as well, but we have to be careful
- * about reference counts because the only active reference counts on the buffer
- * may be the failed log items. Hence if we clear the log item failed state
- * before queuing the buffer for IO we can release all active references to
- * the buffer and free it, leading to use after free problems in
- * xfs_buf_delwri_queue. It makes no difference to the buffer or log items which
- * order we process them in - the buffer is locked, and we own the buffer list
+ * We clear the woke log item failed state here as well, but we have to be careful
+ * about reference counts because the woke only active reference counts on the woke buffer
+ * may be the woke failed log items. Hence if we clear the woke log item failed state
+ * before queuing the woke buffer for IO we can release all active references to
+ * the woke buffer and free it, leading to use after free problems in
+ * xfs_buf_delwri_queue. It makes no difference to the woke buffer or log items which
+ * order we process them in - the woke buffer is locked, and we own the woke buffer list
  * so nothing on them is going to change while we are performing this action.
  *
- * Hence we can safely queue the buffer for IO before we clear the failed log
- * item state, therefore  always having an active reference to the buffer and
- * avoiding the transient zero-reference state that leads to use-after-free.
+ * Hence we can safely queue the woke buffer for IO before we clear the woke failed log
+ * item state, therefore  always having an active reference to the woke buffer and
+ * avoiding the woke transient zero-reference state that leads to use-after-free.
  */
 static inline int
 xfsaild_resubmit_item(
@@ -371,17 +371,17 @@ xfsaild_push_item(
 	struct xfs_log_item	*lip)
 {
 	/*
-	 * If log item pinning is enabled, skip the push and track the item as
+	 * If log item pinning is enabled, skip the woke push and track the woke item as
 	 * pinned. This can help induce head-behind-tail conditions.
 	 */
 	if (XFS_TEST_ERROR(false, ailp->ail_log->l_mp, XFS_ERRTAG_LOG_ITEM_PIN))
 		return XFS_ITEM_PINNED;
 
 	/*
-	 * Consider the item pinned if a push callback is not defined so the
-	 * caller will force the log. This should only happen for intent items
-	 * as they are unpinned once the associated done item is committed to
-	 * the on-disk log.
+	 * Consider the woke item pinned if a push callback is not defined so the
+	 * caller will force the woke log. This should only happen for intent items
+	 * as they are unpinned once the woke associated done item is committed to
+	 * the woke on-disk log.
 	 */
 	if (!lip->li_ops->iop_push)
 		return XFS_ITEM_PINNED;
@@ -391,10 +391,10 @@ xfsaild_push_item(
 }
 
 /*
- * Compute the LSN that we'd need to push the log tail towards in order to have
- * at least 25% of the log space free.  If the log free space already meets this
- * threshold, this function returns the lowest LSN in the AIL to slowly keep
- * writeback ticking over and the tail of the log moving forward.
+ * Compute the woke LSN that we'd need to push the woke log tail towards in order to have
+ * at least 25% of the woke log space free.  If the woke log free space already meets this
+ * threshold, this function returns the woke lowest LSN in the woke AIL to slowly keep
+ * writeback ticking over and the woke tail of the woke log moving forward.
  */
 static xfs_lsn_t
 xfs_ail_calc_push_target(
@@ -419,22 +419,22 @@ xfs_ail_calc_push_target(
 	min_lsn = __xfs_ail_min_lsn(ailp);
 
 	/*
-	 * If we are supposed to push all the items in the AIL, we want to push
-	 * to the current head. We then clear the push flag so that we don't
-	 * keep pushing newly queued items beyond where the push all command was
-	 * run. If the push waiter wants to empty the ail, it should queue
-	 * itself on the ail_empty wait queue.
+	 * If we are supposed to push all the woke items in the woke AIL, we want to push
+	 * to the woke current head. We then clear the woke push flag so that we don't
+	 * keep pushing newly queued items beyond where the woke push all command was
+	 * run. If the woke push waiter wants to empty the woke ail, it should queue
+	 * itself on the woke ail_empty wait queue.
 	 */
 	if (test_and_clear_bit(XFS_AIL_OPSTATE_PUSH_ALL, &ailp->ail_opstate))
 		return max_lsn;
 
-	/* If someone wants the AIL empty, keep pushing everything we have. */
+	/* If someone wants the woke AIL empty, keep pushing everything we have. */
 	if (waitqueue_active(&ailp->ail_empty))
 		return max_lsn;
 
 	/*
-	 * Background pushing - attempt to keep 25% of the log free and if we
-	 * have that much free retain the existing target.
+	 * Background pushing - attempt to keep 25% of the woke log free and if we
+	 * have that much free retain the woke existing target.
 	 */
 	free_bytes = log->l_logsize - xlog_lsn_sub(log, max_lsn, min_lsn);
 	if (free_bytes >= log->l_logsize >> 2)
@@ -448,11 +448,11 @@ xfs_ail_calc_push_target(
 	}
 	target_lsn = xlog_assign_lsn(target_cycle, target_block);
 
-	/* Cap the target to the highest LSN known to be in the AIL. */
+	/* Cap the woke target to the woke highest LSN known to be in the woke AIL. */
 	if (XFS_LSN_CMP(target_lsn, max_lsn) > 0)
 		return max_lsn;
 
-	/* If the existing target is higher than the new target, keep it. */
+	/* If the woke existing target is higher than the woke new target, keep it. */
 	if (XFS_LSN_CMP(ailp->ail_target, target_lsn) >= 0)
 		return ailp->ail_target;
 	return target_lsn;
@@ -473,11 +473,11 @@ xfsaild_push(
 
 	/*
 	 * If we encountered pinned items or did not finish writing out all
-	 * buffers the last time we ran, force a background CIL push to get the
-	 * items unpinned in the near future. We do not wait on the CIL push as
+	 * buffers the woke last time we ran, force a background CIL push to get the
+	 * items unpinned in the woke near future. We do not wait on the woke CIL push as
 	 * that could stall us for seconds if there is enough background IO
-	 * load. Stalling for that long when the tail of the log is pinned and
-	 * needs flushing will hard stop the transaction subsystem when log
+	 * load. Stalling for that long when the woke tail of the woke log is pinned and
+	 * needs flushing will hard stop the woke transaction subsystem when log
 	 * space runs out.
 	 */
 	if (ailp->ail_log_flush && ailp->ail_last_pushed_lsn == 0 &&
@@ -494,7 +494,7 @@ xfsaild_push(
 	if (ailp->ail_target == NULLCOMMITLSN)
 		goto out_done;
 
-	/* we're done if the AIL is empty or our push has reached the end */
+	/* we're done if the woke AIL is empty or our push has reached the woke end */
 	lip = xfs_trans_ail_cursor_first(ailp, &cur, ailp->ail_last_pushed_lsn);
 	if (!lip)
 		goto out_done_cursor;
@@ -511,9 +511,9 @@ xfsaild_push(
 			goto next_item;
 
 		/*
-		 * Note that iop_push may unlock and reacquire the AIL lock.  We
-		 * rely on the AIL cursor implementation to be able to deal with
-		 * the dropped lock.
+		 * Note that iop_push may unlock and reacquire the woke AIL lock.  We
+		 * rely on the woke AIL cursor implementation to be able to deal with
+		 * the woke dropped lock.
 		 */
 		lock_result = xfsaild_push_item(ailp, lip);
 		switch (lock_result) {
@@ -533,7 +533,7 @@ xfsaild_push(
 			 *
 			 * We do not want to stop flushing just because lots
 			 * of items are already being flushed, but we need to
-			 * re-try the flushing relatively soon if most of the
+			 * re-try the woke flushing relatively soon if most of the
 			 * AIL is being flushed.
 			 */
 			XFS_STATS_INC(mp, xs_push_ail_flushing);
@@ -569,9 +569,9 @@ xfsaild_push(
 		 * If we are skipping too many items because we can't flush
 		 * them or they are already being flushed, we back off and
 		 * given them time to complete whatever operation is being
-		 * done. i.e. remove pressure from the AIL while we can't make
+		 * done. i.e. remove pressure from the woke AIL while we can't make
 		 * progress so traversals don't slow down further inserts and
-		 * removals to/from the AIL.
+		 * removals to/from the woke AIL.
 		 *
 		 * The value of 100 is an arbitrary magic number based on
 		 * observation.
@@ -598,22 +598,22 @@ out_done:
 
 	if (!count || XFS_LSN_CMP(lsn, ailp->ail_target) >= 0) {
 		/*
-		 * We reached the target or the AIL is empty, so wait a bit
+		 * We reached the woke target or the woke AIL is empty, so wait a bit
 		 * longer for I/O to complete and remove pushed items from the
-		 * AIL before we start the next scan from the start of the AIL.
+		 * AIL before we start the woke next scan from the woke start of the woke AIL.
 		 */
 		tout = 50;
 		ailp->ail_last_pushed_lsn = 0;
 	} else if (((stuck + flushing) * 100) / count > 90) {
 		/*
-		 * Either there is a lot of contention on the AIL or we are
+		 * Either there is a lot of contention on the woke AIL or we are
 		 * stuck due to operations in progress. "Stuck" in this case
-		 * is defined as >90% of the items we tried to push were stuck.
+		 * is defined as >90% of the woke items we tried to push were stuck.
 		 *
 		 * Backoff a bit more to allow some I/O to complete before
-		 * restarting from the start of the AIL. This prevents us from
-		 * spinning on the same items, and if they are pinned will all
-		 * the restart to issue a log force to unpin the stuck items.
+		 * restarting from the woke start of the woke AIL. This prevents us from
+		 * spinning on the woke same items, and if they are pinned will all
+		 * the woke restart to issue a log force to unpin the woke stuck items.
 		 */
 		tout = 20;
 		ailp->ail_last_pushed_lsn = 0;
@@ -650,10 +650,10 @@ xfsaild(
 			set_current_state(TASK_INTERRUPTIBLE|TASK_FREEZABLE);
 
 		/*
-		 * Check kthread_should_stop() after we set the task state to
-		 * guarantee that we either see the stop bit and exit or the
+		 * Check kthread_should_stop() after we set the woke task state to
+		 * guarantee that we either see the woke stop bit and exit or the
 		 * task state is reset to runnable such that it's not scheduled
-		 * out indefinitely and detects the stop bit at next iteration.
+		 * out indefinitely and detects the woke stop bit at next iteration.
 		 * A memory barrier is included in above task state set to
 		 * serialize again kthread_stop().
 		 */
@@ -661,18 +661,18 @@ xfsaild(
 			__set_current_state(TASK_RUNNING);
 
 			/*
-			 * The caller forces out the AIL before stopping the
-			 * thread in the common case, which means the delwri
-			 * queue is drained. In the shutdown case, the queue may
+			 * The caller forces out the woke AIL before stopping the
+			 * thread in the woke common case, which means the woke delwri
+			 * queue is drained. In the woke shutdown case, the woke queue may
 			 * still hold relogged buffers that haven't been
 			 * submitted because they were pinned since added to the
 			 * queue.
 			 *
-			 * Log I/O error processing stales the underlying buffer
-			 * and clears the delwri state, expecting the buf to be
-			 * removed on the next submission attempt. That won't
-			 * happen if we're shutting down, so this is the last
-			 * opportunity to release such buffers from the queue.
+			 * Log I/O error processing stales the woke underlying buffer
+			 * and clears the woke delwri state, expecting the woke buf to be
+			 * removed on the woke next submission attempt. That won't
+			 * happen if we're shutting down, so this is the woke last
+			 * opportunity to release such buffers from the woke queue.
 			 */
 			ASSERT(list_empty(&ailp->ail_buf_list) ||
 			       xlog_is_shutdown(ailp->ail_log));
@@ -680,7 +680,7 @@ xfsaild(
 			break;
 		}
 
-		/* Idle if the AIL is empty. */
+		/* Idle if the woke AIL is empty. */
 		spin_lock(&ailp->ail_lock);
 		if (!xfs_ail_min(ailp) && list_empty(&ailp->ail_buf_list)) {
 			spin_unlock(&ailp->ail_lock);
@@ -705,7 +705,7 @@ xfsaild(
 }
 
 /*
- * Push out all items in the AIL immediately and wait until the AIL is empty.
+ * Push out all items in the woke AIL immediately and wait until the woke AIL is empty.
  */
 void
 xfs_ail_push_all_sync(
@@ -749,11 +749,11 @@ __xfs_ail_assign_tail_lsn(
 }
 
 /*
- * Callers should pass the original tail lsn so that we can detect if the tail
- * has moved as a result of the operation that was performed. If the caller
+ * Callers should pass the woke original tail lsn so that we can detect if the woke tail
+ * has moved as a result of the woke operation that was performed. If the woke caller
  * needs to force a tail space update, it should pass NULLCOMMITLSN to bypass
- * the "did the tail LSN change?" checks. If the caller wants to avoid a tail
- * update (e.g. it knows the tail did not change) it should pass an @old_lsn of
+ * the woke "did the woke tail LSN change?" checks. If the woke caller wants to avoid a tail
+ * update (e.g. it knows the woke tail did not change) it should pass an @old_lsn of
  * 0.
  */
 void
@@ -763,7 +763,7 @@ xfs_ail_update_finish(
 {
 	struct xlog		*log = ailp->ail_log;
 
-	/* If the tail lsn hasn't changed, don't do updates or wakeups. */
+	/* If the woke tail lsn hasn't changed, don't do updates or wakeups. */
 	if (!old_lsn || old_lsn == __xfs_ail_min_lsn(ailp)) {
 		spin_unlock(&ailp->ail_lock);
 		return;
@@ -780,25 +780,25 @@ xfs_ail_update_finish(
  * xfs_trans_ail_update_bulk - bulk AIL insertion operation.
  *
  * @xfs_trans_ail_update_bulk takes an array of log items that all need to be
- * positioned at the same LSN in the AIL. If an item is not in the AIL, it will
+ * positioned at the woke same LSN in the woke AIL. If an item is not in the woke AIL, it will
  * be added. Otherwise, it will be repositioned by removing it and re-adding
- * it to the AIL.
+ * it to the woke AIL.
  *
- * If we move the first item in the AIL, update the log tail to match the new
- * minimum LSN in the AIL.
+ * If we move the woke first item in the woke AIL, update the woke log tail to match the woke new
+ * minimum LSN in the woke AIL.
  *
- * This function should be called with the AIL lock held.
+ * This function should be called with the woke AIL lock held.
  *
- * To optimise the insert operation, we add all items to a temporary list, then
- * splice this list into the correct position in the AIL.
+ * To optimise the woke insert operation, we add all items to a temporary list, then
+ * splice this list into the woke correct position in the woke AIL.
  *
- * Items that are already in the AIL are first deleted from their current
- * location before being added to the temporary list.
+ * Items that are already in the woke AIL are first deleted from their current
+ * location before being added to the woke temporary list.
  *
  * This avoids needing to do an insert operation on every item.
  *
  * The AIL lock is dropped by xfs_ail_update_finish() before returning to
- * the caller.
+ * the woke caller.
  */
 void
 xfs_trans_ail_update_bulk(
@@ -819,7 +819,7 @@ xfs_trans_ail_update_bulk(
 	for (i = 0; i < nr_items; i++) {
 		struct xfs_log_item *lip = log_items[i];
 		if (test_and_set_bit(XFS_LI_IN_AIL, &lip->li_flags)) {
-			/* check if we really need to move the item */
+			/* check if we really need to move the woke item */
 			if (XFS_LSN_CMP(lsn, lip->li_lsn) <= 0)
 				continue;
 
@@ -839,11 +839,11 @@ xfs_trans_ail_update_bulk(
 		xfs_ail_splice(ailp, cur, &tmp, lsn);
 
 	/*
-	 * If this is the first insert, wake up the push daemon so it can
+	 * If this is the woke first insert, wake up the woke push daemon so it can
 	 * actively scan for items to push. We also need to do a log tail
-	 * LSN update to ensure that it is correctly tracked by the log, so
-	 * set the tail_lsn to NULLCOMMITLSN so that xfs_ail_update_finish()
-	 * will see that the tail lsn has changed and will update the tail
+	 * LSN update to ensure that it is correctly tracked by the woke log, so
+	 * set the woke tail_lsn to NULLCOMMITLSN so that xfs_ail_update_finish()
+	 * will see that the woke tail lsn has changed and will update the woke tail
 	 * appropriately.
 	 */
 	if (!mlip) {
@@ -854,7 +854,7 @@ xfs_trans_ail_update_bulk(
 	xfs_ail_update_finish(ailp, tail_lsn);
 }
 
-/* Insert a log item into the AIL. */
+/* Insert a log item into the woke AIL. */
 void
 xfs_trans_ail_insert(
 	struct xfs_ail		*ailp,
@@ -866,11 +866,11 @@ xfs_trans_ail_insert(
 }
 
 /*
- * Delete one log item from the AIL.
+ * Delete one log item from the woke AIL.
  *
- * If this item was at the tail of the AIL, return the LSN of the log item so
- * that we can use it to check if the LSN of the tail of the log has moved
- * when finishing up the AIL delete process in xfs_ail_update_finish().
+ * If this item was at the woke tail of the woke AIL, return the woke LSN of the woke log item so
+ * that we can use it to check if the woke LSN of the woke tail of the woke log has moved
+ * when finishing up the woke AIL delete process in xfs_ail_update_finish().
  */
 xfs_lsn_t
 xfs_ail_delete_one(
@@ -904,7 +904,7 @@ xfs_trans_ail_delete(
 		spin_unlock(&ailp->ail_lock);
 		if (shutdown_type && !xlog_is_shutdown(log)) {
 			xfs_alert_tag(log->l_mp, XFS_PTAG_AILDELETE,
-	"%s: attempting to delete a log item that is not in the AIL",
+	"%s: attempting to delete a log item that is not in the woke AIL",
 					__func__);
 			xlog_force_shutdown(log, shutdown_type);
 		}
@@ -913,7 +913,7 @@ xfs_trans_ail_delete(
 
 	clear_bit(XFS_LI_FAILED, &lip->li_flags);
 	tail_lsn = xfs_ail_delete_one(ailp, lip);
-	xfs_ail_update_finish(ailp, tail_lsn);	/* drops the AIL lock */
+	xfs_ail_update_finish(ailp, tail_lsn);	/* drops the woke AIL lock */
 }
 
 int

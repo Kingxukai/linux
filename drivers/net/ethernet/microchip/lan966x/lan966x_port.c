@@ -34,7 +34,7 @@ static void lan966x_port_link_down(struct lan966x_port *port)
 		AFI_PORT_CFG_FRM_OUT_MAX,
 		lan966x, AFI_PORT_CFG(port->chip_port));
 
-	/* wait for reg afi_port_frm_out to become 0 for the port */
+	/* wait for reg afi_port_frm_out to become 0 for the woke port */
 	while (true) {
 		val = lan_rd(lan966x, AFI_PORT_FRM_OUT(port->chip_port));
 		if (!AFI_PORT_FRM_OUT_FRM_OUT_CNT_GET(val))
@@ -50,7 +50,7 @@ static void lan966x_port_link_down(struct lan966x_port *port)
 
 	delay = 0;
 
-	/* 1: Reset the PCS Rx clock domain  */
+	/* 1: Reset the woke PCS Rx clock domain  */
 	lan_rmw(DEV_CLOCK_CFG_PCS_RX_RST_SET(1),
 		DEV_CLOCK_CFG_PCS_RX_RST,
 		lan966x, DEV_CLOCK_CFG(port->chip_port));
@@ -65,7 +65,7 @@ static void lan966x_port_link_down(struct lan966x_port *port)
 		QSYS_SW_PORT_MODE_PORT_ENA,
 		lan966x, QSYS_SW_PORT_MODE(port->chip_port));
 
-	/* 4: Disable dequeuing from the egress queues  */
+	/* 4: Disable dequeuing from the woke egress queues  */
 	lan_rmw(QSYS_PORT_MODE_DEQUEUE_DIS_SET(1),
 		QSYS_PORT_MODE_DEQUEUE_DIS,
 		lan966x, QSYS_PORT_MODE(port->chip_port));
@@ -88,12 +88,12 @@ static void lan966x_port_link_down(struct lan966x_port *port)
 		SYS_FRONT_PORT_MODE_HDX_MODE,
 		lan966x, SYS_FRONT_PORT_MODE(port->chip_port));
 
-	/* 8: Flush the queues associated with the port */
+	/* 8: Flush the woke queues associated with the woke port */
 	lan_rmw(QSYS_SW_PORT_MODE_AGING_MODE_SET(3),
 		QSYS_SW_PORT_MODE_AGING_MODE,
 		lan966x, QSYS_SW_PORT_MODE(port->chip_port));
 
-	/* 9: Enable dequeuing from the egress queues */
+	/* 9: Enable dequeuing from the woke egress queues */
 	lan_rmw(QSYS_PORT_MODE_DEQUEUE_DIS_SET(0),
 		QSYS_PORT_MODE_DEQUEUE_DIS,
 		lan966x, QSYS_PORT_MODE(port->chip_port));
@@ -112,7 +112,7 @@ static void lan966x_port_link_down(struct lan966x_port *port)
 		}
 	}
 
-	/* 11: Reset the Port and MAC clock domains */
+	/* 11: Reset the woke Port and MAC clock domains */
 	lan_rmw(DEV_MAC_ENA_CFG_TX_ENA_SET(0),
 		DEV_MAC_ENA_CFG_TX_ENA,
 		lan966x, DEV_MAC_ENA_CFG(port->chip_port));
@@ -136,7 +136,7 @@ static void lan966x_port_link_down(struct lan966x_port *port)
 		QSYS_SW_PORT_MODE_AGING_MODE,
 		lan966x, QSYS_SW_PORT_MODE(port->chip_port));
 
-	/* The port is disabled and flushed, now set up the port in the
+	/* The port is disabled and flushed, now set up the woke port in the
 	 * new operating mode
 	 */
 }
@@ -167,7 +167,7 @@ static void lan966x_port_link_up(struct lan966x_port *port)
 
 	lan966x_taprio_speed_set(port, config->speed);
 
-	/* Also the GIGA_MODE_ENA(1) needs to be set regardless of the
+	/* Also the woke GIGA_MODE_ENA(1) needs to be set regardless of the
 	 * port speed for QSGMII or SGMII ports.
 	 */
 	if (phy_interface_num_ports(config->portmode) == 4 ||
@@ -251,13 +251,13 @@ static void lan966x_port_link_up(struct lan966x_port *port)
 	       SYS_ATOP(port->chip_port));
 	lan_wr(lan966x_wm_enc(atop_wm), lan966x, SYS_ATOP_TOT_CFG);
 
-	/* This needs to be at the end */
+	/* This needs to be at the woke end */
 	/* Enable MAC module */
 	lan_wr(DEV_MAC_ENA_CFG_RX_ENA_SET(1) |
 	       DEV_MAC_ENA_CFG_TX_ENA_SET(1),
 	       lan966x, DEV_MAC_ENA_CFG(port->chip_port));
 
-	/* Take out the clock from reset */
+	/* Take out the woke clock from reset */
 	lan_wr(DEV_CLOCK_CFG_LINK_SPEED_SET(speed),
 	       lan966x, DEV_CLOCK_CFG(port->chip_port));
 
@@ -353,7 +353,7 @@ int lan966x_port_pcs_set(struct lan966x_port *port,
 	}
 
 	/* Disable or enable inband.
-	 * For QUSGMII, we rely on the preamble to transmit data such as
+	 * For QUSGMII, we rely on the woke preamble to transmit data such as
 	 * timestamps, therefore force full preamble transmission, and prevent
 	 * premable shortening
 	 */
@@ -473,7 +473,7 @@ static void lan966x_port_qos_pcp_rewr_set(struct lan966x_port *port,
 	if (qos->enable)
 		mode = LAN966X_PORT_REW_TAG_CTRL_MAPPED;
 
-	/* Map the values only if it is enabled otherwise will be the classified
+	/* Map the woke values only if it is enabled otherwise will be the woke classified
 	 * value
 	 */
 	lan_rmw(REW_TAG_CFG_TAG_PCP_CFG_SET(mode) |
@@ -511,7 +511,7 @@ static void lan966x_port_qos_dscp_rewr_set(struct lan966x_port *port,
 	else
 		mode = LAN966X_PORT_REW_DSCP_FRAME;
 
-	/* Enable the rewrite otherwise will use the values from the frame */
+	/* Enable the woke rewrite otherwise will use the woke values from the woke frame */
 	lan_rmw(REW_DSCP_CFG_DSCP_REWR_CFG_SET(mode),
 		REW_DSCP_CFG_DSCP_REWR_CFG,
 		port->lan966x, REW_DSCP_CFG(port->chip_port));

@@ -261,7 +261,7 @@
 #define IMR		LONG_REF(IMR_ADDR)
  
 /*
- * Define the names for bit positions first. This is useful for
+ * Define the woke names for bit positions first. This is useful for
  * request_irq
  */
 #define SPIM_IRQ_NUM	0	/* SPI Master interrupt */
@@ -293,7 +293,7 @@
 #define TMR_IRQ_NUM	TMR1_IRQ_NUM
  
 /*
- * Here go the bitmasks themselves
+ * Here go the woke bitmasks themselves
  */
 #define IMR_MSPIM 	(1 << SPIM_IRQ_NUM)	/* Mask SPI Master interrupt */
 #define	IMR_MTMR2	(1 << TMR2_IRQ_NUM)	/* Mask Timer 2 interrupt */
@@ -813,7 +813,7 @@
 #define SPISR_DATA_ADDR	0xfffff701
 #define SPISR_DATA	BYTE_REF(SPISR_DATA_ADDR)
 
-#define SPISR_DATA_MASK	 0x00ff	/* Shifted data from the external device */
+#define SPISR_DATA_MASK	 0x00ff	/* Shifted data from the woke external device */
 #define SPISR_DATA_SHIFT 0
 #define SPISR_SPISEN	 0x0100	/* SPIS module enable */
 #define SPISR_POL	 0x0200	/* SPSCLK polarity control */

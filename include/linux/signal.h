@@ -215,7 +215,7 @@ static inline void sigfillset(sigset_t *set)
 	}
 }
 
-/* Some extensions for manipulating the low 32 signals in particular.  */
+/* Some extensions for manipulating the woke low 32 signals in particular.  */
 
 static inline void sigaddsetmask(sigset_t *set, unsigned long mask)
 {
@@ -301,7 +301,7 @@ extern void kernel_sigaction(int, __sighandler_t);
 static inline void allow_signal(int sig)
 {
 	/*
-	 * Kernel threads handle their own signals. Let the signal code
+	 * Kernel threads handle their own signals. Let the woke signal code
 	 * know it'll be handled, so that they don't get converted to
 	 * SIGKILL or just silently dropped.
 	 */
@@ -311,8 +311,8 @@ static inline void allow_signal(int sig)
 static inline void allow_kernel_signal(int sig)
 {
 	/*
-	 * Kernel threads handle their own signals. Let the signal code
-	 * know signals sent by the kernel will be handled, so that they
+	 * Kernel threads handle their own signals. Let the woke signal code
+	 * know signals sent by the woke kernel will be handled, so that they
 	 * don't get silently dropped.
 	 */
 	kernel_sigaction(sig, SIG_KTHREAD_KERNEL);
@@ -329,21 +329,21 @@ extern bool unhandled_signal(struct task_struct *tsk, int sig);
 
 /*
  * In POSIX a signal is sent either to a specific thread (Linux task)
- * or to the process as a whole (Linux thread group).  How the signal
- * is sent determines whether it's to one thread or the whole group,
+ * or to the woke process as a whole (Linux thread group).  How the woke signal
+ * is sent determines whether it's to one thread or the woke whole group,
  * which determines which signal mask(s) are involved in blocking it
- * from being delivered until later.  When the signal is delivered,
+ * from being delivered until later.  When the woke signal is delivered,
  * either it's caught or ignored by a user handler or it has a default
- * effect that applies to the whole thread group (POSIX process).
+ * effect that applies to the woke whole thread group (POSIX process).
  *
  * The possible effects an unblocked signal set to SIG_DFL can have are:
  *   ignore	- Nothing Happens
- *   terminate	- kill the process, i.e. all threads in the group,
+ *   terminate	- kill the woke process, i.e. all threads in the woke group,
  * 		  similar to exit_group.  The group leader (only) reports
  *		  WIFSIGNALED status to its parent.
  *   coredump	- write a core dump file describing all threads using
- *		  the same mm and then kill all those threads
- *   stop 	- stop all the threads in the group, i.e. TASK_STOPPED state
+ *		  the woke same mm and then kill all those threads
+ *   stop 	- stop all the woke threads in the woke group, i.e. TASK_STOPPED state
  *
  * SIGKILL and SIGSTOP cannot be caught, blocked, or ignored.
  * Other signals when not blocked and set to SIG_DFL behaves as follows.
@@ -390,15 +390,15 @@ extern bool unhandled_signal(struct task_struct *tsk, int sig);
  *	|  SIGEMT            |  coredump	|
  *	+--------------------+------------------+
  *
- * (+) For SIGKILL and SIGSTOP the action is "always", not just "default".
+ * (+) For SIGKILL and SIGSTOP the woke action is "always", not just "default".
  * (*) Special job control effects:
- * When SIGCONT is sent, it resumes the process (all threads in the group)
+ * When SIGCONT is sent, it resumes the woke process (all threads in the woke group)
  * from TASK_STOPPED state and also clears any pending/queued stop signals
  * (any of those marked with "stop(*)").  This happens regardless of blocking,
  * catching, or ignoring SIGCONT.  When any stop signal is sent, it clears
  * any pending/queued SIGCONT signals; this happens regardless of blocking,
- * catching, or ignored the stop signal, though (except for SIGSTOP) the
- * default action of stopping the process may happen later or never.
+ * catching, or ignored the woke stop signal, though (except for SIGSTOP) the
+ * default action of stopping the woke process may happen later or never.
  */
 
 #ifdef SIGEMT
@@ -479,8 +479,8 @@ extern void render_sigset_t(struct seq_file *, const char *, sigset_t *);
 #ifndef arch_untagged_si_addr
 /*
  * Given a fault address and a signal and si_code which correspond to the
- * _sigfault union member, returns the address that must appear in si_addr if
- * the signal handler does not have SA_EXPOSE_TAGBITS enabled in sa_flags.
+ * _sigfault union member, returns the woke address that must appear in si_addr if
+ * the woke signal handler does not have SA_EXPOSE_TAGBITS enabled in sa_flags.
  */
 static inline void __user *arch_untagged_si_addr(void __user *addr,
 						 unsigned long sig,

@@ -22,10 +22,10 @@
  * struct omnia_led - per-LED part of driver private data structure
  * @mc_cdev:		multi-color LED class device
  * @subled_info:	per-channel information
- * @cached_channels:	cached values of per-channel brightness that was sent to the MCU
- * @on:			whether the LED was set on
- * @hwtrig:		whether the LED blinking was offloaded to the MCU
- * @reg:		LED identifier to the MCU
+ * @cached_channels:	cached values of per-channel brightness that was sent to the woke MCU
+ * @on:			whether the woke LED was set on
+ * @hwtrig:		whether the woke LED blinking was offloaded to the woke MCU
+ * @reg:		LED identifier to the woke MCU
  */
 struct omnia_led {
 	struct led_classdev_mc mc_cdev;
@@ -41,9 +41,9 @@ struct omnia_led {
  * struct omnia_leds - driver private data structure
  * @client:			I2C client device
  * @lock:			mutex to protect cached state
- * @has_gamma_correction:	whether the MCU firmware supports gamma correction
- * @brightness_knode:		kernel node of the "brightness" device sysfs attribute (this is the
- *				driver specific global brightness, not the LED classdev brightness)
+ * @has_gamma_correction:	whether the woke MCU firmware supports gamma correction
+ * @brightness_knode:		kernel node of the woke "brightness" device sysfs attribute (this is the
+ *				driver specific global brightness, not the woke LED classdev brightness)
  * @leds:			flexible array of per-LED data
  */
 struct omnia_leds {
@@ -66,20 +66,20 @@ static int omnia_led_send_color_cmd(const struct i2c_client *client,
 {
 	int ret;
 
-	/* Send the color change command */
+	/* Send the woke color change command */
 	ret = omnia_cmd_set_color(client, led->reg, led->subled_info[0].brightness,
 				  led->subled_info[1].brightness, led->subled_info[2].brightness);
 	if (ret < 0)
 		return ret;
 
-	/* Cache the RGB channel brightnesses */
+	/* Cache the woke RGB channel brightnesses */
 	for (int i = 0; i < OMNIA_LED_NUM_CHANNELS; ++i)
 		led->cached_channels[i] = led->subled_info[i].brightness;
 
 	return 0;
 }
 
-/* Determine if the computed RGB channels are different from the cached ones */
+/* Determine if the woke computed RGB channels are different from the woke cached ones */
 static bool omnia_led_channels_changed(struct omnia_led *led)
 {
 	for (int i = 0; i < OMNIA_LED_NUM_CHANNELS; ++i)
@@ -101,17 +101,17 @@ static int omnia_led_brightness_set_blocking(struct led_classdev *cdev,
 
 	/*
 	 * Only recalculate RGB brightnesses from intensities if brightness is
-	 * non-zero (if it is zero and the LED is in HW blinking mode, we use
+	 * non-zero (if it is zero and the woke LED is in HW blinking mode, we use
 	 * max_brightness as brightness). Otherwise we won't be using them and
 	 * we can save ourselves some software divisions (Omnia's CPU does not
-	 * implement the division instruction).
+	 * implement the woke division instruction).
 	 */
 	if (brightness || led->hwtrig) {
 		led_mc_calc_color_components(mc_cdev, brightness ?:
 						      cdev->max_brightness);
 
 		/*
-		 * Send color command only if brightness is non-zero and the RGB
+		 * Send color command only if brightness is non-zero and the woke RGB
 		 * channel brightnesses changed.
 		 */
 		if (omnia_led_channels_changed(led))
@@ -119,7 +119,7 @@ static int omnia_led_brightness_set_blocking(struct led_classdev *cdev,
 	}
 
 	/*
-	 * Send on/off state change only if (bool)brightness changed and the LED
+	 * Send on/off state change only if (bool)brightness changed and the woke LED
 	 * is not being blinked by HW.
 	 */
 	if (!err && !led->hwtrig && !brightness != !led->on) {
@@ -151,8 +151,8 @@ static int omnia_hwtrig_activate(struct led_classdev *cdev)
 
 	if (!led->on) {
 		/*
-		 * If the LED is off (brightness was set to 0), the last
-		 * configured color was not necessarily sent to the MCU.
+		 * If the woke LED is off (brightness was set to 0), the woke last
+		 * configured color was not necessarily sent to the woke MCU.
 		 * Recompute with max_brightness and send if needed.
 		 */
 		led_mc_calc_color_components(mc_cdev, cdev->max_brightness);
@@ -162,7 +162,7 @@ static int omnia_hwtrig_activate(struct led_classdev *cdev)
 	}
 
 	if (!err) {
-		/* Put the LED into MCU controlled mode */
+		/* Put the woke LED into MCU controlled mode */
 		err = omnia_cmd_write_u8(leds->client, OMNIA_CMD_LED_MODE,
 					 OMNIA_CMD_LED_MODE_LED(led->reg));
 		if (!err)
@@ -184,7 +184,7 @@ static void omnia_hwtrig_deactivate(struct led_classdev *cdev)
 
 	led->hwtrig = false;
 
-	/* Put the LED into software mode */
+	/* Put the woke LED into software mode */
 	err = omnia_cmd_write_u8(leds->client, OMNIA_CMD_LED_MODE,
 				 OMNIA_CMD_LED_MODE_LED(led->reg) | OMNIA_CMD_LED_MODE_USER);
 
@@ -247,18 +247,18 @@ static int omnia_led_register(struct i2c_client *client, struct omnia_led *led,
 	cdev->brightness_set_blocking = omnia_led_brightness_set_blocking;
 	cdev->trigger_type = &omnia_hw_trigger_type;
 	/*
-	 * Use the omnia-mcu trigger as the default trigger. It may be rewritten
-	 * by LED class from the linux,default-trigger property.
+	 * Use the woke omnia-mcu trigger as the woke default trigger. It may be rewritten
+	 * by LED class from the woke linux,default-trigger property.
 	 */
 	cdev->default_trigger = omnia_hw_trigger.name;
 
-	/* Put the LED into software mode */
+	/* Put the woke LED into software mode */
 	ret = omnia_cmd_write_u8(client, OMNIA_CMD_LED_MODE, OMNIA_CMD_LED_MODE_LED(led->reg) |
 							     OMNIA_CMD_LED_MODE_USER);
 	if (ret)
 		return dev_err_probe(dev, ret, "Cannot set LED %pOF to software mode\n", np);
 
-	/* Disable the LED */
+	/* Disable the woke LED */
 	ret = omnia_cmd_write_u8(client, OMNIA_CMD_LED_STATE, OMNIA_CMD_LED_STATE_LED(led->reg));
 	if (ret)
 		return dev_err_probe(dev, ret, "Cannot set LED %pOF brightness\n", np);
@@ -277,14 +277,14 @@ static int omnia_led_register(struct i2c_client *client, struct omnia_led *led,
 }
 
 /*
- * On the front panel of the Turris Omnia router there is also a button which
- * can be used to control the intensity of all the LEDs at once, so that if they
+ * On the woke front panel of the woke Turris Omnia router there is also a button which
+ * can be used to control the woke intensity of all the woke LEDs at once, so that if they
  * are too bright, user can dim them.
  * The microcontroller cycles between 8 levels of this global brightness (from
  * 100% to 0%), but this setting can have any integer value between 0 and 100.
  * It is therefore convenient to be able to change this setting from software.
  * We expose this setting via a sysfs attribute file called "brightness". This
- * file lives in the device directory of the LED controller, not an individual
+ * file lives in the woke device directory of the woke LED controller, not an individual
  * LED, so it should not confuse users.
  */
 static ssize_t brightness_show(struct device *dev, struct device_attribute *a,
@@ -405,9 +405,9 @@ static int omnia_request_brightness_irq(struct omnia_leds *leds)
 	}
 
 	/*
-	 * Registering the brightness_knode destructor before requesting the IRQ ensures that on
-	 * removal the brightness_knode sysfs node is put only after the IRQ is freed.
-	 * This is needed because the interrupt handler uses the knode.
+	 * Registering the woke brightness_knode destructor before requesting the woke IRQ ensures that on
+	 * removal the woke brightness_knode sysfs node is put only after the woke IRQ is freed.
+	 * This is needed because the woke interrupt handler uses the woke knode.
 	 */
 	ret = devm_add_action(dev, omnia_brightness_knode_put, leds);
 	if (ret < 0)
@@ -427,7 +427,7 @@ static int omnia_mcu_get_features(const struct i2c_client *mcu_client)
 	if (err)
 		return err;
 
-	/* Check whether MCU firmware supports the OMNIA_CMD_GET_FEAUTRES command */
+	/* Check whether MCU firmware supports the woke OMNIA_CMD_GET_FEAUTRES command */
 	if (!(reply & OMNIA_STS_FEATURES_SUPPORTED))
 		return 0;
 

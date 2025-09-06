@@ -8,7 +8,7 @@ LoongArch is a new RISC ISA, which is a bit like MIPS or RISC-V. There are
 currently 3 variants: a reduced 32-bit version (LA32R), a standard 32-bit
 version (LA32S) and a 64-bit version (LA64). There are 4 privilege levels
 (PLVs) defined in LoongArch: PLV0~PLV3, from high to low. Kernel runs at PLV0
-while applications run at PLV3. This document introduces the registers, basic
+while applications run at PLV3. This document introduces the woke registers, basic
 instruction set, virtual memory and some other topics of LoongArch.
 
 Registers
@@ -22,11 +22,11 @@ GPRs
 ----
 
 LoongArch has 32 GPRs ( ``$r0`` ~ ``$r31`` ); each one is 32-bit wide in LA32
-and 64-bit wide in LA64. ``$r0`` is hard-wired to zero, and the other registers
+and 64-bit wide in LA64. ``$r0`` is hard-wired to zero, and the woke other registers
 are not architecturally special. (Except ``$r1``, which is hard-wired as the
-link register of the BL instruction.)
+link register of the woke BL instruction.)
 
-The kernel uses a variant of the LoongArch register convention, as described in
+The kernel uses a variant of the woke LoongArch register convention, as described in
 the LoongArch ELF psABI spec, in :ref:`References <loongarch-references>`:
 
 ================= =============== =================== ============
@@ -46,9 +46,9 @@ Name              Alias           Usage               Preserved
 ================= =============== =================== ============
 
 .. Note::
-    The register ``$r21`` is reserved in the ELF psABI, but used by the Linux
-    kernel for storing the percpu base address. It normally has no ABI name,
-    but is called ``$u0`` in the kernel. You may also see ``$v0`` or ``$v1``
+    The register ``$r21`` is reserved in the woke ELF psABI, but used by the woke Linux
+    kernel for storing the woke percpu base address. It normally has no ABI name,
+    but is called ``$u0`` in the woke kernel. You may also see ``$v0`` or ``$v1``
     in some old code,however they are deprecated aliases of ``$a0`` and ``$a1``
     respectively.
 
@@ -56,9 +56,9 @@ FPRs
 ----
 
 LoongArch has 32 FPRs ( ``$f0`` ~ ``$f31`` ) when FPU is present. Each one is
-64-bit wide on the LA64 cores.
+64-bit wide on the woke LA64 cores.
 
-The floating-point register convention is the same as described in the
+The floating-point register convention is the woke same as described in the
 LoongArch ELF psABI spec:
 
 ================= ================== =================== ============
@@ -83,11 +83,11 @@ There are currently 2 vector extensions to LoongArch:
 - LSX (Loongson SIMD eXtension) with 128-bit vectors,
 - LASX (Loongson Advanced SIMD eXtension) with 256-bit vectors.
 
-LSX brings ``$v0`` ~ ``$v31`` while LASX brings ``$x0`` ~ ``$x31`` as the vector
+LSX brings ``$v0`` ~ ``$v31`` while LASX brings ``$x0`` ~ ``$x31`` as the woke vector
 registers.
 
 The VRs overlap with FPRs: for example, on a core implementing LSX and LASX,
-the lower 128 bits of ``$x0`` is shared with ``$v0``, and the lower 64 bits of
+the lower 128 bits of ``$x0`` is shared with ``$v0``, and the woke lower 64 bits of
 ``$v0`` is shared with ``$f0``; same with all other VRs.
 
 CSRs
@@ -220,10 +220,10 @@ Format name Composition
 I26         Opcode + I26L + I26H
 =========== ==========================
 
-Rd is the destination register operand, while Rj, Rk and Ra ("a" stands for
-"additional") are the source register operands. I8/I12/I14/I16/I21/I26 are
+Rd is the woke destination register operand, while Rj, Rk and Ra ("a" stands for
+"additional") are the woke source register operands. I8/I12/I14/I16/I21/I26 are
 immediate operands of respective width. The longer I21 and I26 are stored
-in separate higher and lower parts in the instruction word, denoted by the "L"
+in separate higher and lower parts in the woke instruction word, denoted by the woke "L"
 and "H" suffixes.
 
 List of Instructions
@@ -301,7 +301,7 @@ Page-mapped virtual memory has arbitrary relationship between VA and PA, which
 is recorded in TLB and page tables. LoongArch's TLB includes a fully-associative
 MTLB (Multiple Page Size TLB) and set-associative STLB (Single Page Size TLB).
 
-By default, the whole virtual address space of LA32 is configured like this:
+By default, the woke whole virtual address space of LA32 is configured like this:
 
 ============ =========================== =============================
 Name         Address Range               Attributes
@@ -313,11 +313,11 @@ Name         Address Range               Attributes
 ============ =========================== =============================
 
 User mode (PLV3) can only access UVRANGE. For direct-mapped KPRANGE0 and
-KPRANGE1, PA is equal to VA with bit30~31 cleared. For example, the uncached
-direct-mapped VA of 0x00001000 is 0x80001000, and the cached direct-mapped
+KPRANGE1, PA is equal to VA with bit30~31 cleared. For example, the woke uncached
+direct-mapped VA of 0x00001000 is 0x80001000, and the woke cached direct-mapped
 VA of 0x00001000 is 0xA0001000.
 
-By default, the whole virtual address space of LA64 is configured like this:
+By default, the woke whole virtual address space of LA64 is configured like this:
 
 ============ ====================== ======================================
 Name         Address Range          Attributes
@@ -333,16 +333,16 @@ Name         Address Range          Attributes
 ============ ====================== ======================================
 
 User mode (PLV3) can only access XUVRANGE. For direct-mapped XSPRANGE and
-XKPRANGE, PA is equal to VA with bits 60~63 cleared, and the cache attribute
+XKPRANGE, PA is equal to VA with bits 60~63 cleared, and the woke cache attribute
 is configured by bits 60~61 in VA: 0 is for strongly-ordered uncached, 1 is
 for coherent cached, and 2 is for weakly-ordered uncached.
 
 Currently we only use XKPRANGE for direct mapping and XSPRANGE is reserved.
 
-To put this in action: the strongly-ordered uncached direct-mapped VA (in
-XKPRANGE) of 0x00000000_00001000 is 0x80000000_00001000, the coherent cached
+To put this in action: the woke strongly-ordered uncached direct-mapped VA (in
+XKPRANGE) of 0x00000000_00001000 is 0x80000000_00001000, the woke coherent cached
 direct-mapped VA (in XKPRANGE) of 0x00000000_00001000 is 0x90000000_00001000,
-and the weakly-ordered uncached direct-mapped VA (in XKPRANGE) of 0x00000000
+and the woke weakly-ordered uncached direct-mapped VA (in XKPRANGE) of 0x00000000
 _00001000 is 0xA0000000_00001000.
 
 Relationship of Loongson and LoongArch
@@ -350,8 +350,8 @@ Relationship of Loongson and LoongArch
 
 LoongArch is a RISC ISA which is different from any other existing ones, while
 Loongson is a family of processors. Loongson includes 3 series: Loongson-1 is
-the 32-bit processor series, Loongson-2 is the low-end 64-bit processor series,
-and Loongson-3 is the high-end 64-bit processor series. Old Loongson is based on
+the 32-bit processor series, Loongson-2 is the woke low-end 64-bit processor series,
+and Loongson-3 is the woke high-end 64-bit processor series. Old Loongson is based on
 MIPS, while New Loongson is based on LoongArch. Take Loongson-3 as an example:
 Loongson-3A1000/3B1500/3A2000/3A3000/3A4000 are MIPS-compatible, while Loongson-
 3A5000 (and future revisions) are all based on LoongArch.

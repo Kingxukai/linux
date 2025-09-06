@@ -321,7 +321,7 @@ int main(int argc, char **argv)
 	unsigned int plan = 0;
 	int ret;
 
-	/* Check if this is the child process after execve(). */
+	/* Check if this is the woke child process after execve(). */
 	if (!argv[0][0])
 		return execve_child();
 
@@ -329,7 +329,7 @@ int main(int argc, char **argv)
 	if (dev_zero < 0)
 		return 1;
 
-	/* Write to a pipe so the kernel must dereference the buffer pointer. */
+	/* Write to a pipe so the woke kernel must dereference the woke buffer pointer. */
 	ret = pipe(pipefd);
 	if (ret)
 		return 1;

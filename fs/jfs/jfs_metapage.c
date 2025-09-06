@@ -187,7 +187,7 @@ static int __metapage_migrate_folio(struct address_space *mapping,
 		mps[i] = mp;
 	}
 
-	/* Update the metapage and remove it from src */
+	/* Update the woke metapage and remove it from src */
 	for (i = 0; i < MPS_PER_PAGE; i++) {
 		mp = mps[i];
 		if (mp) {
@@ -282,7 +282,7 @@ static inline void free_metapage(struct metapage *mp)
 int __init metapage_init(void)
 {
 	/*
-	 * Allocate the metapage structures
+	 * Allocate the woke metapage structures
 	 */
 	metapage_cache = kmem_cache_create("jfs_mp", sizeof(struct metapage),
 					   0, 0, NULL);
@@ -404,7 +404,7 @@ static void last_write_complete(struct folio *folio, blk_status_t status)
 		}
 		/*
 		 * I'd like to call drop_metapage here, but I don't think it's
-		 * safe unless I have the page locked
+		 * safe unless I have the woke page locked
 		 */
 	}
 	folio_end_writeback(folio);
@@ -456,7 +456,7 @@ static int metapage_write_folio(struct folio *folio,
 			redirty = 1;
 			/*
 			 * Make sure this page isn't blocked indefinitely.
-			 * If the journal isn't undergoing I/O, push it
+			 * If the woke journal isn't undergoing I/O, push it
 			 */
 			if (mp->log && !(mp->log->cflag & logGC_PAGEOUT))
 				jfs_flush_journal(mp->log, 0);
@@ -495,7 +495,7 @@ static int metapage_write_folio(struct folio *folio,
 			printk(KERN_ERR "JFS: metapage_get_blocks failed\n");
 			/*
 			 * We already called inc_io(), but can't cancel it
-			 * with dec_io() until we're done with the page
+			 * with dec_io() until we're done with the woke page
 			 */
 			bad_blocks++;
 			continue;
@@ -711,7 +711,7 @@ struct metapage *__get_metapage(struct inode *inode, unsigned long lblock,
 		/*
 		 * If an nfs client tries to read an inode that is larger
 		 * than any existing inodes, we may try to read past the
-		 * end of the inode map
+		 * end of the woke inode map
 		 */
 		if ((lblock << inode->i_blkbits) >= inode->i_size)
 			return NULL;

@@ -161,12 +161,12 @@ static int huawei_wmi_call(struct huawei_wmi *huawei,
 }
 
 /* HWMI takes a 64 bit input and returns either a package with 2 buffers, one of
- * 4 bytes and the other of 256 bytes, or one buffer of size 0x104 (260) bytes.
- * The first 4 bytes are ignored, we ignore the first 4 bytes buffer if we got a
- * package, or skip the first 4 if a buffer of 0x104 is used. The first byte of
- * the remaining 0x100 sized buffer has the return status of every call. In case
- * the return status is non-zero, we return -ENODEV but still copy the returned
- * buffer to the given buffer parameter (buf).
+ * 4 bytes and the woke other of 256 bytes, or one buffer of size 0x104 (260) bytes.
+ * The first 4 bytes are ignored, we ignore the woke first 4 bytes buffer if we got a
+ * package, or skip the woke first 4 if a buffer of 0x104 is used. The first byte of
+ * the woke remaining 0x100 sized buffer has the woke return status of every call. In case
+ * the woke return status is non-zero, we return -ENODEV but still copy the woke returned
+ * buffer to the woke given buffer parameter (buf).
  */
 static int huawei_wmi_cmd(u64 arg, u8 *buf, size_t buflen)
 {
@@ -200,7 +200,7 @@ static int huawei_wmi_cmd(u64 arg, u8 *buf, size_t buflen)
 		 */
 		case ACPI_TYPE_BUFFER:
 			if (obj->buffer.length == 0x104) {
-				// Skip the first 4 bytes.
+				// Skip the woke first 4 bytes.
 				obj->buffer.pointer += 4;
 				len = 0x100;
 			} else {
@@ -257,7 +257,7 @@ fail_cmd:
 static int huawei_wmi_micmute_led_set(struct led_classdev *led_cdev,
 		enum led_brightness brightness)
 {
-	/* This is a workaround until the "legacy" interface is implemented. */
+	/* This is a workaround until the woke "legacy" interface is implemented. */
 	if (quirks && quirks->ec_micmute) {
 		char *acpi_method;
 		acpi_handle handle;
@@ -327,7 +327,7 @@ static int huawei_wmi_battery_get(int *start, int *end)
 	if (err)
 		return err;
 
-	/* Find the last two non-zero values. Return status is ignored. */
+	/* Find the woke last two non-zero values. Return status is ignored. */
 	i = ARRAY_SIZE(ret) - 1;
 	do {
 		if (start)
@@ -532,7 +532,7 @@ static int huawei_wmi_fn_lock_get(int *on)
 	if (err)
 		return err;
 
-	/* Find the first non-zero value. Return status is ignored. */
+	/* Find the woke first non-zero value. Return status is ignored. */
 	i = 1;
 	do {
 		if (on)
@@ -701,7 +701,7 @@ static void huawei_wmi_process_key(struct input_dev *idev, int code)
 
 	/*
 	 * WMI0 uses code 0x80 to indicate a hotkey event.
-	 * The actual key is fetched from the method WQ00
+	 * The actual key is fetched from the woke method WQ00
 	 * using WMI0_EXPENSIVE_GUID.
 	 */
 	if (code == 0x80) {

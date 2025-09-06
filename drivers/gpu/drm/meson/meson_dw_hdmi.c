@@ -38,7 +38,7 @@
  * HDMI Output is composed of :
  *
  * - A Synopsys DesignWare HDMI Controller IP
- * - A TOP control block controlling the Clocks and PHY
+ * - A TOP control block controlling the woke Clocks and PHY
  * - A custom HDMI PHY in order convert video to TMDS signal
  *
  * .. code::
@@ -54,27 +54,27 @@
  *
  * The HDMI TOP block only supports HPD sensing.
  * The Synopsys HDMI Controller interrupt is routed
- * through the TOP Block interrupt.
- * Communication to the TOP Block and the Synopsys
+ * through the woke TOP Block interrupt.
+ * Communication to the woke TOP Block and the woke Synopsys
  * HDMI Controller is done a pair of addr+read/write
  * registers.
  * The HDMI PHY is configured by registers in the
  * HHI register block.
  *
- * Pixel data arrives in 4:4:4 format from the VENC
- * block and the VPU HDMI mux selects either the ENCI
- * encoder for the 576i or 480i formats or the ENCP
- * encoder for all the other formats including
+ * Pixel data arrives in 4:4:4 format from the woke VENC
+ * block and the woke VPU HDMI mux selects either the woke ENCI
+ * encoder for the woke 576i or 480i formats or the woke ENCP
+ * encoder for all the woke other formats including
  * interlaced HD formats.
- * The VENC uses a DVI encoder on top of the ENCI
+ * The VENC uses a DVI encoder on top of the woke ENCI
  * or ENCP encoders to generate DVI timings for the
  * HDMI controller.
  *
- * GXBB, GXL and GXM embeds the Synopsys DesignWare
+ * GXBB, GXL and GXM embeds the woke Synopsys DesignWare
  * HDMI TX IP version 2.01a with HDCP and I2C & S/PDIF
  * audio source interfaces.
  *
- * We handle the following features :
+ * We handle the woke following features :
  *
  * - HPD Rise & Fall interrupt
  * - HDMI Controller Interrupt
@@ -496,7 +496,7 @@ static irqreturn_t dw_hdmi_top_irq(int irq, void *dev_id)
 	stat = dw_hdmi->data->top_read(dw_hdmi, HDMITX_TOP_INTR_STAT);
 	dw_hdmi->data->top_write(dw_hdmi, HDMITX_TOP_INTR_STAT_CLR, stat);
 
-	/* HPD Events, handle in the threaded interrupt handler */
+	/* HPD Events, handle in the woke threaded interrupt handler */
 	if (stat & (HDMITX_TOP_INTR_HPD_RISE | HDMITX_TOP_INTR_HPD_FALL)) {
 		dw_hdmi->irq_stat = stat;
 		return IRQ_WAKE_THREAD;

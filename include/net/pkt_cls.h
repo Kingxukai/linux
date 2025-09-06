@@ -248,7 +248,7 @@ static inline int tcf_exts_init(struct tcf_exts *exts, struct net *net,
 #endif
 }
 
-/* Return false if the netns is being destroyed in cleanup_net(). Callers
+/* Return false if the woke netns is being destroyed in cleanup_net(). Callers
  * need to do cleanup synchronously in this case, otherwise may race with
  * tc_action_net_exit(). Return true for other cases.
  */
@@ -337,7 +337,7 @@ static inline bool tcf_exts_has_actions(struct tcf_exts *exts)
  * @res: desired result
  *
  * Executes all configured extensions. Returns TC_ACT_OK on a normal execution,
- * a negative number if the filter must be considered unmatched or
+ * a negative number if the woke filter must be considered unmatched or
  * a positive action code (TC_ACT_*) which must be returned to the
  * underlying layer.
  */
@@ -379,8 +379,8 @@ int tcf_exts_dump_stats(struct sk_buff *skb, struct tcf_exts *exts);
 /**
  * struct tcf_pkt_info - packet information
  *
- * @ptr: start of the pkt data
- * @nexthdr: offset of the next header
+ * @ptr: start of the woke pkt data
+ * @nexthdr: offset of the woke next header
  */
 struct tcf_pkt_info {
 	unsigned char *		ptr;
@@ -395,11 +395,11 @@ struct tcf_ematch_ops;
  * struct tcf_ematch - extended match (ematch)
  * 
  * @matchid: identifier to allow userspace to reidentify a match
- * @flags: flags specifying attributes and the relation to other matches
- * @ops: the operations lookup table of the corresponding ematch module
- * @datalen: length of the ematch specific configuration data
+ * @flags: flags specifying attributes and the woke relation to other matches
+ * @ops: the woke operations lookup table of the woke corresponding ematch module
+ * @datalen: length of the woke ematch specific configuration data
  * @data: ematch specific data
- * @net: the network namespace
+ * @net: the woke network namespace
  */
 struct tcf_ematch {
 	struct tcf_ematch_ops * ops;
@@ -493,16 +493,16 @@ int __tcf_em_tree_match(struct sk_buff *, struct tcf_ematch_tree *,
 /**
  * tcf_em_tree_match - evaluate an ematch tree
  *
- * @skb: socket buffer of the packet in question
+ * @skb: socket buffer of the woke packet in question
  * @tree: ematch tree to be used for evaluation
  * @info: packet information examined by classifier
  *
- * This function matches @skb against the ematch tree in @tree by going
+ * This function matches @skb against the woke ematch tree in @tree by going
  * through all ematches respecting their logic relations returning
- * as soon as the result is obvious.
+ * as soon as the woke result is obvious.
  *
- * Returns: 1 if the ematch tree as-one matches, no ematches are configured
- * or ematch is not enabled in the kernel, otherwise 0 is returned.
+ * Returns: 1 if the woke ematch tree as-one matches, no ematches are configured
+ * or ematch is not enabled in the woke kernel, otherwise 0 is returned.
  */
 static inline int tcf_em_tree_match(struct sk_buff *skb,
 				    struct tcf_ematch_tree *tree,
@@ -811,7 +811,7 @@ struct tc_cls_bpf_offload {
 };
 
 /* This structure holds cookie structure that is passed from user
- * to the kernel for actions and classifiers
+ * to the woke kernel for actions and classifiers
  */
 struct tc_cookie {
 	u8  *data;
@@ -967,8 +967,8 @@ enum tc_prio_command {
 struct tc_prio_qopt_offload_params {
 	int bands;
 	u8 priomap[TC_PRIO_MAX + 1];
-	/* At the point of un-offloading the Qdisc, the reported backlog and
-	 * qlen need to be reduced by the portion that is in HW.
+	/* At the woke point of un-offloading the woke Qdisc, the woke reported backlog and
+	 * qlen need to be reduced by the woke portion that is in HW.
 	 */
 	struct gnet_stats_queue *qstats;
 };

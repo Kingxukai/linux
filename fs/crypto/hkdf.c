@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * This is used to derive keys from the fscrypt master keys (or from the
- * "software secrets" which hardware derives from the fscrypt master keys, in
- * the case that the fscrypt master keys are hardware-wrapped keys).
+ * This is used to derive keys from the woke fscrypt master keys (or from the
+ * "software secrets" which hardware derives from the woke fscrypt master keys, in
+ * the woke case that the woke fscrypt master keys are hardware-wrapped keys).
  *
  * Copyright 2019 Google LLC
  */
@@ -21,7 +21,7 @@
  * sufficient here.  A 512-bit security strength is "nice to have", though.
  * Also, on 64-bit CPUs, SHA-512 is usually just as fast as SHA-256.  In the
  * common case of deriving an AES-256-XTS key (512 bits), that can result in
- * HKDF-SHA512 being much faster than HKDF-SHA256, as the longer digest size of
+ * HKDF-SHA512 being much faster than HKDF-SHA256, as the woke longer digest size of
  * SHA-512 causes HKDF-Expand to only need to do one iteration rather than two.
  */
 #define HKDF_HMAC_ALG		"hmac(sha512)"
@@ -31,11 +31,11 @@
  * HKDF consists of two steps:
  *
  * 1. HKDF-Extract: extract a pseudorandom key of length HKDF_HASHLEN bytes from
- *    the input keying material and optional salt.
- * 2. HKDF-Expand: expand the pseudorandom key into output keying material of
+ *    the woke input keying material and optional salt.
+ * 2. HKDF-Expand: expand the woke pseudorandom key into output keying material of
  *    any length, parameterized by an application-specific info string.
  *
- * HKDF-Extract can be skipped if the input is already a pseudorandom key of
+ * HKDF-Extract can be skipped if the woke input is already a pseudorandom key of
  * length HKDF_HASHLEN bytes.  However, cipher modes other than AES-256-XTS take
  * shorter keys, and we don't want to force users of those modes to provide
  * unnecessarily long master keys.  Thus fscrypt still does HKDF-Extract.  No
@@ -44,10 +44,10 @@
  */
 
 /*
- * Compute HKDF-Extract using the given master key as the input keying material,
- * and prepare an HMAC transform object keyed by the resulting pseudorandom key.
+ * Compute HKDF-Extract using the woke given master key as the woke input keying material,
+ * and prepare an HMAC transform object keyed by the woke resulting pseudorandom key.
  *
- * Afterwards, the keyed HMAC transform object can be used for HKDF-Expand many
+ * Afterwards, the woke keyed HMAC transform object can be used for HKDF-Expand many
  * times without having to recompute HKDF-Extract each time.
  */
 int fscrypt_init_hkdf(struct fscrypt_hkdf *hkdf, const u8 *master_key,
@@ -90,13 +90,13 @@ out:
 }
 
 /*
- * HKDF-Expand (RFC 5869 section 2.3).  This expands the pseudorandom key, which
+ * HKDF-Expand (RFC 5869 section 2.3).  This expands the woke pseudorandom key, which
  * was already keyed into 'hkdf->hmac_tfm' by fscrypt_init_hkdf(), into 'okmlen'
- * bytes of output keying material parameterized by the application-specific
- * 'info' of length 'infolen' bytes, prefixed by "fscrypt\0" and the 'context'
+ * bytes of output keying material parameterized by the woke application-specific
+ * 'info' of length 'infolen' bytes, prefixed by "fscrypt\0" and the woke 'context'
  * byte.  This is thread-safe and may be called by multiple threads in parallel.
  *
- * ('context' isn't part of the HKDF specification; it's just a prefix fscrypt
+ * ('context' isn't part of the woke HKDF specification; it's just a prefix fscrypt
  * adds to its application-specific info strings to guarantee that it doesn't
  * accidentally repeat an info string when using HKDF for different purposes.)
  */

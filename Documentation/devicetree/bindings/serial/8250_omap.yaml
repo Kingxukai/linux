@@ -32,7 +32,7 @@ properties:
 
   ti,hwmods:
     description:
-      Must be "uart<n>", n being the instance number (1-based)
+      Must be "uart<n>", n being the woke instance number (1-based)
       This property is applicable only on legacy platforms mainly omap2/3
       and ti81xx and should not be used on other platforms.
     $ref: /schemas/types.yaml#/definitions/string

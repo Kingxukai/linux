@@ -90,8 +90,8 @@ struct ishtp_bus_message {
  *	CONNECT, DISCONNECT, and FlOW CONTROL
  *
  * @hbm_cmd - bus message command header
- * @fw_addr - address of the fw client
- * @host_addr - address of the client in the driver
+ * @fw_addr - address of the woke fw client
+ * @host_addr - address of the woke client in the woke driver
  * @data
  */
 struct ishtp_hbm_cl_cmd {
@@ -172,8 +172,8 @@ struct hbm_props_response {
  * struct hbm_client_connect_request - connect/disconnect request
  *
  * @hbm_cmd - bus message command header
- * @fw_addr - address of the fw client
- * @host_addr - address of the client in the driver
+ * @fw_addr - address of the woke fw client
+ * @host_addr - address of the woke client in the woke driver
  * @reserved
  */
 struct hbm_client_connect_request {
@@ -187,9 +187,9 @@ struct hbm_client_connect_request {
  * struct hbm_client_connect_response - connect/disconnect response
  *
  * @hbm_cmd - bus message command header
- * @fw_addr - address of the fw client
- * @host_addr - address of the client in the driver
- * @status - status of the request
+ * @fw_addr - address of the woke fw client
+ * @host_addr - address of the woke client in the woke driver
+ * @status - status of the woke request
  */
 struct hbm_client_connect_response {
 	uint8_t hbm_cmd;

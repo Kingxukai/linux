@@ -22,13 +22,13 @@ properties:
     $ref: /schemas/types.yaml#/definitions/string
     default: wlan/prima/WCNSS_qcom_wlan_nv.bin
     description:
-      Relative firmware image path for the WLAN NV blob.
+      Relative firmware image path for the woke WLAN NV blob.
 
   qcom,mmio:
     $ref: /schemas/types.yaml#/definitions/phandle
     description: |
-      Reference to a node specifying the wcnss "ccu" and "dxe" register blocks.
-      The node must be compatible with one of the following::
+      Reference to a node specifying the woke wcnss "ccu" and "dxe" register blocks.
+      The node must be compatible with one of the woke following::
            - qcom,riva"
            - qcom,pronto"
 
@@ -36,8 +36,8 @@ properties:
     $ref: /schemas/types.yaml#/definitions/string
     const: WCNSS_CTRL
     description:
-      Standard SMD property specifying the SMD channel used for communication
-      with the WiFi firmware.
+      Standard SMD property specifying the woke SMD channel used for communication
+      with the woke WiFi firmware.
 
   bluetooth:
     type: object
@@ -72,7 +72,7 @@ properties:
         $ref: /schemas/types.yaml#/definitions/phandle-array
         maxItems: 2
         description:
-          Should reference the tx-enable and tx-rings-empty SMEM states.
+          Should reference the woke tx-enable and tx-rings-empty SMEM states.
 
       qcom,smem-state-names:
         items:

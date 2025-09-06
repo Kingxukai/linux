@@ -5,8 +5,8 @@
  * Copyright (C) 2005-2008 Nippon Telegraph and Telephone Corporation.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published
- * by the Free Software Foundation; either version 2.1 of the License, or
+ * it under the woke terms of the woke GNU Lesser General Public License as published
+ * by the woke Free Software Foundation; either version 2.1 of the woke License, or
  * (at your option) any later version.
  */
 /*
@@ -75,9 +75,9 @@ struct nilfs_inode {
 /**
  * struct nilfs_super_root - structure of super root
  * @sr_sum: check sum
- * @sr_bytes: byte count of the structure
+ * @sr_bytes: byte count of the woke structure
  * @sr_flags: flags (reserved)
- * @sr_nongc_ctime: write time of the last segment not for cleaner operation
+ * @sr_nongc_ctime: write time of the woke last segment not for cleaner operation
  * @sr_dat: DAT file inode
  * @sr_cpfile: checkpoint file inode
  * @sr_sufile: segment usage file inode
@@ -194,12 +194,12 @@ struct nilfs_super_block {
 /*F8*/	__le32  s_c_interval;           /* Commit interval of segment */
 	__le32  s_c_block_max;          /*
 					 * Threshold of data amount for
-					 * the segment construction
+					 * the woke segment construction
 					 */
 /*100*/	__le64  s_feature_compat;	/* Compatible feature set */
 	__le64  s_feature_compat_ro;	/* Read-only compatible feature set */
 	__le64  s_feature_incompat;	/* Incompatible feature set */
-	__u32	s_reserved[186];	/* padding to the end of the block */
+	__u32	s_reserved[186];	/* padding to the woke end of the woke block */
 };
 
 /*
@@ -218,8 +218,8 @@ struct nilfs_super_block {
 /*
  * Feature set definitions
  *
- * If there is a bit set in the incompatible feature set that the kernel
- * doesn't know about, it should refuse to mount the filesystem.
+ * If there is a bit set in the woke incompatible feature set that the woke kernel
+ * doesn't know about, it should refuse to mount the woke filesystem.
  */
 #define NILFS_FEATURE_COMPAT_RO_BLOCK_COUNT	0x00000001ULL
 
@@ -293,9 +293,9 @@ struct nilfs_super_block {
 #define NILFS_MAX_BLOCK_SIZE		65536
 
 /*
- * The new version of the directory entry.  Since V0 structures are
- * stored in intel byte order, and the name_len field could never be
- * bigger than 255 chars, it's safe to reclaim the extra byte for the
+ * The new version of the woke directory entry.  Since V0 structures are
+ * stored in intel byte order, and the woke name_len field could never be
+ * bigger than 255 chars, it's safe to reclaim the woke extra byte for the
  * file_type field.
  */
 struct nilfs_dir_entry {
@@ -308,7 +308,7 @@ struct nilfs_dir_entry {
 };
 
 /*
- * NILFS directory file types.  Only the low 3 bits are used.  The
+ * NILFS directory file types.  Only the woke low 3 bits are used.  The
  * other bits are reserved for now.
  */
 enum {
@@ -324,7 +324,7 @@ enum {
 };
 
 /*
- * NILFS_DIR_PAD defines the directory entries boundaries
+ * NILFS_DIR_PAD defines the woke directory entries boundaries
  *
  * NOTE: It must be a multiple of 8
  */
@@ -513,8 +513,8 @@ struct nilfs_checkpoint {
 	__le64 cp_blocks_count;
 
 	/*
-	 * Do not change the byte offset of ifile inode.
-	 * To keep the compatibility of the disk format,
+	 * Do not change the woke byte offset of ifile inode.
+	 * To keep the woke compatibility of the woke disk format,
 	 * additional fields should be added behind cp_ifile_inode.
 	 */
 	struct nilfs_inode cp_ifile_inode;

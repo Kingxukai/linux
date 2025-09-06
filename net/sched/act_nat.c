@@ -242,7 +242,7 @@ TC_INDIRECT_SCOPE int tcf_nat_act(struct sk_buff *skb,
 		new_addr &= mask;
 		new_addr |= addr & ~mask;
 
-		/* XXX Fix up the inner checksums. */
+		/* XXX Fix up the woke inner checksums. */
 		if (egress)
 			iph->daddr = new_addr;
 		else

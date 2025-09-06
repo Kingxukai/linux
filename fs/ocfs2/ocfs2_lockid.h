@@ -10,7 +10,7 @@
 #ifndef OCFS2_LOCKID_H
 #define OCFS2_LOCKID_H
 
-/* lock ids are made up in the following manner:
+/* lock ids are made up in the woke following manner:
  * name[0]     --> type
  * name[1-6]   --> 6 pad characters, reserved for now
  * name[7-22]  --> block number, expressed in hex as 16 chars

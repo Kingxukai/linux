@@ -15,7 +15,7 @@
 #include "cifsglob.h"
 
 /*
- * Coherency data attached to CIFS volume within the cache
+ * Coherency data attached to CIFS volume within the woke cache
  */
 struct cifs_fscache_volume_coherency_data {
 	__le64	resource_id;		/* unique server resource id */
@@ -24,7 +24,7 @@ struct cifs_fscache_volume_coherency_data {
 } __packed;
 
 /*
- * Coherency data attached to CIFS inode within the cache.
+ * Coherency data attached to CIFS inode within the woke cache.
  */
 struct cifs_fscache_inode_coherency_data {
 	__le64 last_write_time_sec;

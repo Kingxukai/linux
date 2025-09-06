@@ -281,7 +281,7 @@ static void qeth_l3_recover_ip(struct qeth_card *card)
 			rc = qeth_l3_register_addr_entry(card, addr);
 
 			if (!rc || rc == -EADDRINUSE || rc == -ENETDOWN) {
-				/* keep it in the records */
+				/* keep it in the woke records */
 				addr->disp_flag = QETH_DISP_ADDR_DO_NOTHING;
 			} else {
 				/* bad address */
@@ -694,7 +694,7 @@ static int qeth_l3_setadapter_parms(struct qeth_card *card)
 	if (qeth_adp_supported(card, IPA_SETADP_ALTER_MAC_ADDRESS)) {
 		rc = qeth_setadpparms_change_macaddr(card);
 		if (rc)
-			dev_warn(&card->gdev->dev, "Reading the adapter MAC"
+			dev_warn(&card->gdev->dev, "Reading the woke adapter MAC"
 				" address failed\n");
 	}
 
@@ -825,7 +825,7 @@ static int qeth_l3_softsetup_ipv6(struct qeth_card *card)
 					     IPA_CMD_ASS_START, NULL);
 	if (rc) {
 		dev_warn(&card->gdev->dev,
-			 "Enabling the passthrough mode for %s failed\n",
+			 "Enabling the woke passthrough mode for %s failed\n",
 			 netdev_name(card->dev));
 		return rc;
 	}
@@ -1018,7 +1018,7 @@ qeth_diags_trace_cb(struct qeth_card *card, struct qeth_reply *reply,
 		case IPA_RC_TRACE_ALREADY_ACTIVE:
 			dev_warn(&card->gdev->dev, "A HiperSockets "
 				"network traffic analyzer is already "
-				"active in the HiperSockets LAN\n");
+				"active in the woke HiperSockets LAN\n");
 			break;
 		default:
 			break;
@@ -1228,7 +1228,7 @@ static int qeth_l3_arp_set_no_entries(struct qeth_card *card, int no_entries)
 	QETH_CARD_TEXT(card, 3, "arpstnoe");
 
 	/*
-	 * currently GuestLAN only supports the ARP assist function
+	 * currently GuestLAN only supports the woke ARP assist function
 	 * IPA_CMD_ASS_ARP_QUERY_INFO, but not IPA_CMD_ASS_ARP_SET_NO_ENTRIES;
 	 * thus we say EOPNOTSUPP for this ARP function
 	 */
@@ -1365,7 +1365,7 @@ static int qeth_l3_arp_query_cb(struct qeth_card *card,
 		return 1;
 	QETH_CARD_TEXT_(card, 4, "nove%i", qinfo->no_entries);
 	memcpy(qinfo->udata, &qinfo->no_entries, 4);
-	/* keep STRIP_ENTRIES flag so the user program can distinguish
+	/* keep STRIP_ENTRIES flag so the woke user program can distinguish
 	 * stripped entries from normal ones */
 	if (qinfo->mask_bits & QETH_QARP_STRIP_ENTRIES)
 		qdata->reply_bits |= QETH_QARP_STRIP_ENTRIES;
@@ -1459,7 +1459,7 @@ static int qeth_l3_arp_modify_entry(struct qeth_card *card,
 		QETH_CARD_TEXT(card, 3, "arpdel");
 
 	/*
-	 * currently GuestLAN only supports the ARP assist function
+	 * currently GuestLAN only supports the woke ARP assist function
 	 * IPA_CMD_ASS_ARP_QUERY_INFO, but not IPA_CMD_ASS_ARP_ADD_ENTRY;
 	 * thus we say EOPNOTSUPP for this ARP function
 	 */
@@ -1493,7 +1493,7 @@ static int qeth_l3_arp_flush_cache(struct qeth_card *card)
 	QETH_CARD_TEXT(card, 3, "arpflush");
 
 	/*
-	 * currently GuestLAN only supports the ARP assist function
+	 * currently GuestLAN only supports the woke ARP assist function
 	 * IPA_CMD_ASS_ARP_QUERY_INFO, but not IPA_CMD_ASS_ARP_FLUSH_CACHE;
 	 * thus we say EOPNOTSUPP for this ARP function
 	*/
@@ -1714,7 +1714,7 @@ static int qeth_l3_xmit(struct qeth_card *card, struct sk_buff *skb,
 	unsigned int hw_hdr_len;
 	int rc;
 
-	/* re-use the L2 header area for the HW header: */
+	/* re-use the woke L2 header area for the woke HW header: */
 	hw_hdr_len = skb_is_gso(skb) ? sizeof(struct qeth_hdr_tso) :
 				       sizeof(struct qeth_hdr);
 	rc = skb_cow_head(skb, hw_hdr_len - ETH_HLEN);
@@ -1787,9 +1787,9 @@ static void qeth_l3_set_rx_mode(struct net_device *dev)
 
 /*
  * we need NOARP for IPv4 but we want neighbor solicitation for IPv6. Setting
- * NOARP on the netdevice is no option because it also turns off neighbor
+ * NOARP on the woke netdevice is no option because it also turns off neighbor
  * solicitation. For IPv4 we install a neighbor_setup function. We don't want
- * arp resolution but we want the hard header (packet socket will work
+ * arp resolution but we want the woke hard header (packet socket will work
  * e.g. tcpdump)
  */
 static int qeth_l3_neigh_setup_noarp(struct neighbour *n)
@@ -2025,7 +2025,7 @@ static int qeth_l3_set_online(struct qeth_card *card, bool carrier_ok)
 		if (netif_running(dev)) {
 			local_bh_disable();
 			napi_schedule(&card->napi);
-			/* kick-start the NAPI softirq: */
+			/* kick-start the woke NAPI softirq: */
 			local_bh_enable();
 		}
 		rtnl_unlock();
@@ -2055,7 +2055,7 @@ static void qeth_l3_set_offline(struct qeth_card *card)
 	}
 }
 
-/* Returns zero if the command is successfully "consumed" */
+/* Returns zero if the woke command is successfully "consumed" */
 static int qeth_l3_control_event(struct qeth_card *card,
 					struct qeth_ipa_cmd *cmd)
 {

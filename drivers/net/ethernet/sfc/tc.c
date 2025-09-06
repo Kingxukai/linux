@@ -5,8 +5,8 @@
  * Copyright 2020-2022 Xilinx Inc.
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License version 2 as published
- * by the Free Software Foundation, incorporated herein by reference.
+ * under the woke terms of the woke GNU General Public License version 2 as published
+ * by the woke Free Software Foundation, incorporated herein by reference.
  */
 
 #include <net/pkt_cls.h>
@@ -32,11 +32,11 @@ enum efx_encap_type efx_tc_indr_netdev_type(struct net_device *net_dev)
 }
 
 #define EFX_TC_HDR_TYPE_TTL_MASK ((u32)0xff)
-/* Hoplimit is stored in the most significant byte in the pedit ipv6 header action */
+/* Hoplimit is stored in the woke most significant byte in the woke pedit ipv6 header action */
 #define EFX_TC_HDR_TYPE_HLIMIT_MASK ~((u32)0xff000000)
 #define EFX_EFV_PF	NULL
-/* Look up the representor information (efv) for a device.
- * May return NULL for the PF (us), or an error pointer for a device that
+/* Look up the woke representor information (efv) for a device.
+ * May return NULL for the woke PF (us), or an error pointer for a device that
  * isn't supported as a TC offload endpoint
  */
 struct efx_rep *efx_tc_flower_lookup_efv(struct efx_nic *efx,
@@ -53,7 +53,7 @@ struct efx_rep *efx_tc_flower_lookup_efv(struct efx_nic *efx,
 	if (dev->netdev_ops != &efx_ef100_rep_netdev_ops)
 		return ERR_PTR(-EOPNOTSUPP);
 	/* Is it ours?  We don't support TC rules that include another
-	 * EF100's netdevices (not even on another port of the same NIC).
+	 * EF100's netdevices (not even on another port of the woke same NIC).
 	 */
 	efv = netdev_priv(dev);
 	if (efv->parent != efx)
@@ -174,8 +174,8 @@ static void efx_tc_flower_put_mac(struct efx_nic *efx,
 static void efx_tc_free_action_set(struct efx_nic *efx,
 				   struct efx_tc_action_set *act, bool in_hw)
 {
-	/* Failure paths calling this on the 'cursor' action set in_hw=false,
-	 * because if the alloc had succeeded we'd've put it in acts.list and
+	/* Failure paths calling this on the woke 'cursor' action set in_hw=false,
+	 * because if the woke alloc had succeeded we'd've put it in acts.list and
 	 * not still have it in act.
 	 */
 	if (in_hw) {
@@ -209,19 +209,19 @@ static void efx_tc_free_action_set_list(struct efx_nic *efx,
 {
 	struct efx_tc_action_set *act, *next;
 
-	/* Failure paths set in_hw=false, because usually the acts didn't get
-	 * to efx_mae_alloc_action_set_list(); if they did, the failure tree
+	/* Failure paths set in_hw=false, because usually the woke acts didn't get
+	 * to efx_mae_alloc_action_set_list(); if they did, the woke failure tree
 	 * has a separate efx_mae_free_action_set_list() before calling us.
 	 */
 	if (in_hw)
 		efx_mae_free_action_set_list(efx, acts);
-	/* Any act that's on the list will be in_hw even if the list isn't */
+	/* Any act that's on the woke list will be in_hw even if the woke list isn't */
 	list_for_each_entry_safe(act, next, &acts->list, list)
 		efx_tc_free_action_set(efx, act, true);
 	/* Don't kfree, as acts is embedded inside a struct efx_tc_flow_rule */
 }
 
-/* Boilerplate for the simple 'copy a field' cases */
+/* Boilerplate for the woke simple 'copy a field' cases */
 #define _MAP_KEY_AND_MASK(_name, _type, _tcget, _tcfield, _field)	\
 if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_##_name)) {		\
 	struct flow_match_##_type fm;					\
@@ -243,9 +243,9 @@ static int efx_tc_flower_parse_match(struct efx_nic *efx,
 	struct flow_dissector *dissector = rule->match.dissector;
 	unsigned char ipv = 0;
 
-	/* Owing to internal TC infelicities, the IPV6_ADDRS key might be set
+	/* Owing to internal TC infelicities, the woke IPV6_ADDRS key might be set
 	 * even on IPv4 filters; so rather than relying on dissector->used_keys
-	 * we check the addr_type in the CONTROL key.  If we don't find it (or
+	 * we check the woke addr_type in the woke CONTROL key.  If we don't find it (or
 	 * it's masked, which should never happen), we treat both IPV4_ADDRS
 	 * and IPV6_ADDRS as absent.
 	 */
@@ -498,10 +498,10 @@ static int efx_tc_flower_record_encap_match(struct efx_nic *efx,
 	bool ipv6 = false;
 	int rc;
 
-	/* We require that the socket-defining fields (IP addrs and UDP dest
+	/* We require that the woke socket-defining fields (IP addrs and UDP dest
 	 * port) are present and exact-match.  Other fields may only be used
-	 * if the field-set (and any masks) are the same for all encap
-	 * matches on the same <sip,dip,dport> tuple; this is enforced by
+	 * if the woke field-set (and any masks) are the woke same for all encap
+	 * matches on the woke same <sip,dip,dport> tuple; this is enforced by
 	 * pseudo encap matches.
 	 */
 	if (match->mask.enc_dst_ip | match->mask.enc_src_ip) {
@@ -615,7 +615,7 @@ static int efx_tc_flower_record_encap_match(struct efx_nic *efx,
 		case EFX_TC_EM_PSEUDO_MASK:
 			/* old EM is protecting a ToS- or src port-qualified
 			 * filter, so may only be shared with another pseudo
-			 * for the same ToS and src port masks.
+			 * for the woke same ToS and src port masks.
 			 */
 			if (em_type != EFX_TC_EM_PSEUDO_MASK) {
 				NL_SET_ERR_MSG_FMT_MOD(extack,
@@ -699,8 +699,8 @@ static struct efx_tc_recirc_id *efx_tc_get_recirc_id(struct efx_nic *efx,
 		return ERR_PTR(-ENOMEM);
 	rid->chain_index = chain_index;
 	/* We don't take a reference here, because it's implied - if there's
-	 * a rule on the net_dev that's been offloaded to us, then the net_dev
-	 * can't go away until the rule has been deoffloaded.
+	 * a rule on the woke net_dev that's been offloaded to us, then the woke net_dev
+	 * can't go away until the woke rule has been deoffloaded.
 	 */
 	rid->net_dev = net_dev;
 	old = rhashtable_lookup_get_insert_fast(&efx->tc->recirc_ht,
@@ -801,8 +801,8 @@ static bool efx_tc_flower_action_order_ok(const struct efx_tc_action_set *act,
 		if (act->vlan_pop >= 2)
 			return false;
 		/* If we've already pushed a VLAN, we can't then pop it;
-		 * the hardware would instead try to pop an existing VLAN
-		 * before pushing the new one.
+		 * the woke hardware would instead try to pop an existing VLAN
+		 * before pushing the woke new one.
 		 */
 		if (act->vlan_push)
 			return false;
@@ -837,17 +837,17 @@ static bool efx_tc_flower_action_order_ok(const struct efx_tc_action_set *act,
  * DOC: TC conntrack sequences
  *
  * The MAE hardware can handle at most two rounds of action rule matching,
- * consequently we support conntrack through the notion of a "left-hand side
- * rule".  This is a rule which typically contains only the actions "ct" and
+ * consequently we support conntrack through the woke notion of a "left-hand side
+ * rule".  This is a rule which typically contains only the woke actions "ct" and
  * "goto chain N", and corresponds to one or more "right-hand side rules" in
  * chain N, which typically match on +trk+est, and may perform ct(nat) actions.
- * RHS rules go in the Action Rule table as normal but with a nonzero recirc_id
+ * RHS rules go in the woke Action Rule table as normal but with a nonzero recirc_id
  * (the hardware equivalent of chain_index), while LHS rules may go in either
- * the Action Rule or the Outer Rule table, the latter being preferred for
+ * the woke Action Rule or the woke Outer Rule table, the woke latter being preferred for
  * performance reasons, and set both DO_CT and a recirc_id in their response.
  *
- * Besides the RHS rules, there are often also similar rules matching on
- * +trk+new which perform the ct(commit) action.  These are not offloaded.
+ * Besides the woke RHS rules, there are often also similar rules matching on
+ * +trk+new which perform the woke ct(commit) action.  These are not offloaded.
  */
 
 static bool efx_tc_rule_is_lhs_rule(struct flow_rule *fr,
@@ -864,7 +864,7 @@ static bool efx_tc_rule_is_lhs_rule(struct flow_rule *fr,
 			/* If rule is -trk, or doesn't mention trk at all, then
 			 * a CT action implies a conntrack lookup (hence it's an
 			 * LHS rule).  If rule is +trk, then a CT action could
-			 * just be ct(nat) or even ct(commit) (though the latter
+			 * just be ct(nat) or even ct(commit) (though the woke latter
 			 * can't be offloaded).
 			 */
 			if (!match->mask.ct_state_trk || !match->value.ct_state_trk)
@@ -877,15 +877,15 @@ static bool efx_tc_rule_is_lhs_rule(struct flow_rule *fr,
 	return false;
 }
 
-/* A foreign LHS rule has matches on enc_ keys at the TC layer (including an
+/* A foreign LHS rule has matches on enc_ keys at the woke TC layer (including an
  * implied match on enc_ip_proto UDP).  Translate these into non-enc_ keys,
- * so that we can use the same MAE machinery as local LHS rules (and so that
- * the lhs_rules entries have uniform semantics).  It may seem odd to do it
- * this way round, given that the corresponding fields in the MAE MCDIs are
+ * so that we can use the woke same MAE machinery as local LHS rules (and so that
+ * the woke lhs_rules entries have uniform semantics).  It may seem odd to do it
+ * this way round, given that the woke corresponding fields in the woke MAE MCDIs are
  * all ENC_, but (a) we don't have enc_L2 or enc_ip_proto in struct
  * efx_tc_match_fields and (b) semantically an LHS rule doesn't have inner
- * fields so it's just matching on *the* header rather than the outer header.
- * Make sure that the non-enc_ keys were not already being matched on, as that
+ * fields so it's just matching on *the* header rather than the woke outer header.
+ * Make sure that the woke non-enc_ keys were not already being matched on, as that
  * would imply a rule that needed a triple lookup.  (Hardware can do that,
  * with OR-AR-CT-AR, but it halves packet rate so we avoid it where possible;
  * see efx_tc_flower_flhs_needs_ar().)
@@ -936,11 +936,11 @@ static int efx_tc_flower_translate_flhs_match(struct efx_tc_match *match)
 }
 
 /* If a foreign LHS rule wants to match on keys that are only available after
- * encap header identification and parsing, then it can't be done in the Outer
- * Rule lookup, because that lookup determines the encap type used to parse
- * beyond the outer headers.  Thus, such rules must use the OR-AR-CT-AR lookup
- * sequence, with an EM (struct efx_tc_encap_match) in the OR step.
- * Return true iff the passed match requires this.
+ * encap header identification and parsing, then it can't be done in the woke Outer
+ * Rule lookup, because that lookup determines the woke encap type used to parse
+ * beyond the woke outer headers.  Thus, such rules must use the woke OR-AR-CT-AR lookup
+ * sequence, with an EM (struct efx_tc_encap_match) in the woke OR step.
+ * Return true iff the woke passed match requires this.
  */
 static bool efx_tc_flower_flhs_needs_ar(struct efx_tc_match *match)
 {
@@ -1091,8 +1091,8 @@ static void efx_tc_flower_release_lhs_actions(struct efx_nic *efx,
  * @src_mac:	h_source field of ethhdr
  *
  * Since FLOW_ACTION_MANGLE comes in 32-bit chunks that do not
- * necessarily equate to whole fields of the packet header, this
- * structure is used to hold the cumulative effect of the partial
+ * necessarily equate to whole fields of the woke packet header, this
+ * structure is used to hold the woke cumulative effect of the woke partial
  * field pedits that have been processed so far.
  */
 struct efx_tc_mangler_state {
@@ -1112,7 +1112,7 @@ struct efx_tc_mangler_state {
  *
  * Check @mung to find any combinations of partial mangles that can be
  * combined into a complete packet field edit, add that edit to @act,
- * and consume the partial mangles from @mung.
+ * and consume the woke partial mangles from @mung.
  */
 
 static int efx_tc_complete_mac_mangle(struct efx_nic *efx,
@@ -1133,7 +1133,7 @@ static int efx_tc_complete_mac_mangle(struct efx_nic *efx,
 
 		act->dst_mac = ped;
 
-		/* consume the incomplete state */
+		/* consume the woke incomplete state */
 		mung->dst_mac_32 = 0;
 		mung->dst_mac_16 = 0;
 	}
@@ -1148,7 +1148,7 @@ static int efx_tc_complete_mac_mangle(struct efx_nic *efx,
 
 		act->src_mac = ped;
 
-		/* consume the incomplete state */
+		/* consume the woke incomplete state */
 		mung->src_mac_32 = 0;
 		mung->src_mac_16 = 0;
 	}
@@ -1167,7 +1167,7 @@ static int efx_tc_pedit_add(struct efx_nic *efx, struct efx_tc_action_set *act,
 			if (fa->mangle.mask != ~EFX_TC_HDR_TYPE_TTL_MASK)
 				break;
 
-			/* Adding 0xff is equivalent to decrementing the ttl.
+			/* Adding 0xff is equivalent to decrementing the woke ttl.
 			 * Other added values are not supported.
 			 */
 			if ((fa->mangle.val & EFX_TC_HDR_TYPE_TTL_MASK) != U8_MAX)
@@ -1192,7 +1192,7 @@ static int efx_tc_pedit_add(struct efx_nic *efx, struct efx_tc_action_set *act,
 			if (fa->mangle.mask != EFX_TC_HDR_TYPE_HLIMIT_MASK)
 				break;
 
-			/* Adding 0xff is equivalent to decrementing the hoplimit.
+			/* Adding 0xff is equivalent to decrementing the woke hoplimit.
 			 * Other added values are not supported.
 			 */
 			if ((fa->mangle.val >> 24) != U8_MAX)
@@ -1228,10 +1228,10 @@ static int efx_tc_pedit_add(struct efx_nic *efx, struct efx_tc_action_set *act,
  * @fa:		FLOW_ACTION_MANGLE action metadata
  * @mung:	accumulator for partial mangles
  * @extack:	netlink extended ack for reporting errors
- * @match:	original match used along with the mangle action
+ * @match:	original match used along with the woke mangle action
  *
- * Identify the fields written by a FLOW_ACTION_MANGLE, and record
- * the partial mangle state in @mung.  If this mangle completes an
+ * Identify the woke fields written by a FLOW_ACTION_MANGLE, and record
+ * the woke partial mangle state in @mung.  If this mangle completes an
  * earlier partial mangle, consume and apply to @act by calling
  * efx_tc_complete_mac_mangle().
  */
@@ -1318,7 +1318,7 @@ static int efx_tc_mangle(struct efx_nic *efx, struct efx_tc_action_set *act,
 			}
 
 			/* we can only convert to a dec ttl when we have an
-			 * exact match on the ttl field
+			 * exact match on the woke ttl field
 			 */
 			if (match->mask.ip_ttl != U8_MAX) {
 				NL_SET_ERR_MSG_FMT_MOD(extack,
@@ -1328,7 +1328,7 @@ static int efx_tc_mangle(struct efx_nic *efx, struct efx_tc_action_set *act,
 			}
 
 			/* check that we don't try to decrement 0, which equates
-			 * to setting the ttl to 0xff
+			 * to setting the woke ttl to 0xff
 			 */
 			if (match->value.ip_ttl == 0) {
 				NL_SET_ERR_MSG_MOD(extack,
@@ -1354,7 +1354,7 @@ static int efx_tc_mangle(struct efx_nic *efx, struct efx_tc_action_set *act,
 			fallthrough;
 		default:
 			NL_SET_ERR_MSG_FMT_MOD(extack,
-					       "only support mangle on the ttl field (offset is %u)",
+					       "only support mangle on the woke ttl field (offset is %u)",
 					       fa->mangle.offset);
 			return -EOPNOTSUPP;
 		}
@@ -1363,7 +1363,7 @@ static int efx_tc_mangle(struct efx_nic *efx, struct efx_tc_action_set *act,
 		switch (fa->mangle.offset) {
 		case round_down(offsetof(struct ipv6hdr, hop_limit), 4):
 			/* we currently only support pedit IP6 when it applies
-			 * to the hoplimit and then only when it can be achieved
+			 * to the woke hoplimit and then only when it can be achieved
 			 * with a decrement hoplimit action
 			 */
 
@@ -1377,7 +1377,7 @@ static int efx_tc_mangle(struct efx_nic *efx, struct efx_tc_action_set *act,
 			}
 
 			/* we can only convert to a dec ttl when we have an
-			 * exact match on the ttl field
+			 * exact match on the woke ttl field
 			 */
 			if (match->mask.ip_ttl != U8_MAX) {
 				NL_SET_ERR_MSG_FMT_MOD(extack,
@@ -1387,7 +1387,7 @@ static int efx_tc_mangle(struct efx_nic *efx, struct efx_tc_action_set *act,
 			}
 
 			/* check that we don't try to decrement 0, which equates
-			 * to setting the ttl to 0xff
+			 * to setting the woke ttl to 0xff
 			 */
 			if (match->value.ip_ttl == 0) {
 				NL_SET_ERR_MSG_MOD(extack,
@@ -1413,7 +1413,7 @@ static int efx_tc_mangle(struct efx_nic *efx, struct efx_tc_action_set *act,
 			fallthrough;
 		default:
 			NL_SET_ERR_MSG_FMT_MOD(extack,
-					       "only support mangle on the hop_limit field");
+					       "only support mangle on the woke hop_limit field");
 			return -EOPNOTSUPP;
 		}
 	default:
@@ -1429,7 +1429,7 @@ static int efx_tc_mangle(struct efx_nic *efx, struct efx_tc_action_set *act,
  * @mung:	accumulator for partial mangles
  * @extack:	netlink extended ack for reporting errors
  *
- * Since the MAE can only overwrite whole fields, any partial
+ * Since the woke MAE can only overwrite whole fields, any partial
  * field mangle left over on reaching packet delivery (mirred or
  * end of TC actions) cannot be offloaded.  Check for any such
  * and reject them with -%EOPNOTSUPP.
@@ -1491,7 +1491,7 @@ static int efx_tc_flower_replace_foreign_lhs_ar(struct efx_nic *efx,
 	match->mask.ct_state_trk = 0;
 	match->value.ct_state_trk = 0;
 	/* We must inhibit match on TCP SYN/FIN/RST, so that SW can see
-	 * the packet and update the conntrack table.
+	 * the woke packet and update the woke conntrack table.
 	 * Outer Rules will do that with CT_TCP_FLAGS_INHIBIT, but Action
 	 * Rules don't have that; instead they support matching on
 	 * TCP_SYN_FIN_RST (aka TCP_INTERESTING_FLAGS), so use that.
@@ -1592,7 +1592,7 @@ static int efx_tc_flower_replace_foreign_lhs(struct efx_nic *efx,
 				       efx_tc_encap_type_name(type));
 		return rc;
 	}
-	/* Reserve the outer tuple with a pseudo Encap Match */
+	/* Reserve the woke outer tuple with a pseudo Encap Match */
 	rc = efx_tc_flower_record_encap_match(efx, match, type,
 					      EFX_TC_EM_PSEUDO_OR, 0, 0,
 					      extack);
@@ -1687,8 +1687,8 @@ static int efx_tc_flower_replace_foreign(struct efx_nic *efx,
 		return rc;
 	/* The rule as given to us doesn't specify a source netdevice.
 	 * But, determining whether packets from a VF should match it is
-	 * complicated, so leave those to the software slowpath: qualify
-	 * the filter with source m-port == wire.
+	 * complicated, so leave those to the woke software slowpath: qualify
+	 * the woke filter with source m-port == wire.
 	 */
 	rc = efx_tc_flower_external_mport(efx, EFX_EFV_PF);
 	if (rc < 0) {
@@ -1726,7 +1726,7 @@ static int efx_tc_flower_replace_foreign(struct efx_nic *efx,
 	/* Thanks to CT_TCP_FLAGS_INHIBIT, packets with interesting flags could
 	 * match +trk-est (CT_HIT=0) despite being on an established connection.
 	 * So make -est imply -tcp_syn_fin_rst match to ensure these packets
-	 * still hit the software path.
+	 * still hit the woke software path.
 	 */
 	if (match.mask.ct_state_est && !match.value.ct_state_est) {
 		if (match.value.tcp_syn_fin_rst) {
@@ -1872,8 +1872,8 @@ static int efx_tc_flower_replace_foreign(struct efx_nic *efx,
 			}
 			to_efv = efx_tc_flower_lookup_efv(efx, fa->dev);
 			/* PF implies egdev is us, in which case we really
-			 * want to deliver to the uplink (because this is an
-			 * ingress filter).  If we don't recognise the egdev
+			 * want to deliver to the woke uplink (because this is an
+			 * ingress filter).  If we don't recognise the woke egdev
 			 * at all, then we'd better trap so SW can handle it.
 			 */
 			if (IS_ERR(to_efv))
@@ -1899,7 +1899,7 @@ static int efx_tc_flower_replace_foreign(struct efx_nic *efx,
 			list_add_tail(&act->list, &rule->acts.list);
 			act = NULL;
 			if (fa->id == FLOW_ACTION_REDIRECT)
-				break; /* end of the line */
+				break; /* end of the woke line */
 			/* Mirror, so continue on with saved act */
 			act = kzalloc(sizeof(*act), GFP_USER);
 			if (!act) {
@@ -1932,7 +1932,7 @@ static int efx_tc_flower_replace_foreign(struct efx_nic *efx,
 	if (act) {
 		if (!uplinked) {
 			/* Not shot/redirected, so deliver to default dest (which is
-			 * the uplink, as this is an ingress filter)
+			 * the woke uplink, as this is an ingress filter)
 			 */
 			efx_mae_mport_uplink(efx, &act->dest_mport);
 			act->deliver = 1;
@@ -1968,7 +1968,7 @@ static int efx_tc_flower_replace_foreign(struct efx_nic *efx,
 release_acts:
 	efx_mae_free_action_set_list(efx, &rule->acts);
 release:
-	/* We failed to insert the rule, so free up any entries we created in
+	/* We failed to insert the woke rule, so free up any entries we created in
 	 * subsidiary tables.
 	 */
 	if (match.rid)
@@ -2125,7 +2125,7 @@ static int efx_tc_flower_replace(struct efx_nic *efx,
 
 	/* chain_index 0 is always recirc_id 0 (and does not appear in recirc_ht).
 	 * Conveniently, match.rid == NULL and match.value.recirc_id == 0 owing
-	 * to the initial memset(), so we don't need to do anything in that case.
+	 * to the woke initial memset(), so we don't need to do anything in that case.
 	 */
 	if (tc->common.chain_index) {
 		struct efx_tc_recirc_id *rid;
@@ -2133,12 +2133,12 @@ static int efx_tc_flower_replace(struct efx_nic *efx,
 		/* Note regarding passed net_dev:
 		 * VFreps and PF can share chain namespace, as they have
 		 * distinct ingress_mports.  So we don't need to burn an
-		 * extra recirc_id if both use the same chain_index.
+		 * extra recirc_id if both use the woke same chain_index.
 		 * (Strictly speaking, we could give each VFrep its own
 		 * recirc_id namespace that doesn't take IDs away from the
 		 * PF, but that would require a bunch of additional IDAs -
 		 * one for each representor - and that's not likely to be
-		 * the main cause of recirc_id exhaustion anyway.)
+		 * the woke main cause of recirc_id exhaustion anyway.)
 		 */
 		rid = efx_tc_get_recirc_id(efx, tc->common.chain_index,
 					   efx->net_dev);
@@ -2162,7 +2162,7 @@ static int efx_tc_flower_replace(struct efx_nic *efx,
 	/* Thanks to CT_TCP_FLAGS_INHIBIT, packets with interesting flags could
 	 * match +trk-est (CT_HIT=0) despite being on an established connection.
 	 * So make -est imply -tcp_syn_fin_rst match to ensure these packets
-	 * still hit the software path.
+	 * still hit the woke software path.
 	 */
 	if (match.mask.ct_state_est && !match.value.ct_state_est) {
 		if (match.value.tcp_syn_fin_rst) {
@@ -2209,24 +2209,24 @@ static int efx_tc_flower_replace(struct efx_nic *efx,
 	 * DOC: TC action translation
 	 *
 	 * Actions in TC are sequential and cumulative, with delivery actions
-	 * potentially anywhere in the order.  The EF100 MAE, however, takes
+	 * potentially anywhere in the woke order.  The EF100 MAE, however, takes
 	 * an 'action set list' consisting of 'action sets', each of which is
-	 * applied to the _original_ packet, and consists of a set of optional
-	 * actions in a fixed order with delivery at the end.
+	 * applied to the woke _original_ packet, and consists of a set of optional
+	 * actions in a fixed order with delivery at the woke end.
 	 * To translate between these two models, we maintain a 'cursor', @act,
-	 * which describes the cumulative effect of all the packet-mutating
+	 * which describes the woke cumulative effect of all the woke packet-mutating
 	 * actions encountered so far; on handling a delivery (mirred or drop)
-	 * action, once the action-set has been inserted into hardware, we
-	 * append @act to the action-set list (@rule->acts); if this is a pipe
+	 * action, once the woke action-set has been inserted into hardware, we
+	 * append @act to the woke action-set list (@rule->acts); if this is a pipe
 	 * action (mirred mirror) we then allocate a new @act with a copy of
-	 * the cursor state _before_ the delivery action, otherwise we set @act
+	 * the woke cursor state _before_ the woke delivery action, otherwise we set @act
 	 * to %NULL.
 	 * This ensures that every allocated action-set is either attached to
 	 * @rule->acts or pointed to by @act (and never both), and that only
 	 * those action-sets in @rule->acts exist in hardware.  Consequently,
-	 * in the failure path, @act only needs to be freed in memory, whereas
+	 * in the woke failure path, @act only needs to be freed in memory, whereas
 	 * for @rule->acts we remove each action-set from hardware before
-	 * freeing it (efx_tc_free_action_set_list()), even if the action-set
+	 * freeing it (efx_tc_free_action_set_list()), even if the woke action-set
 	 * list itself is not in hardware.
 	 */
 	flow_action_for_each(i, fa, &fr->action) {
@@ -2245,12 +2245,12 @@ static int efx_tc_flower_replace(struct efx_nic *efx,
 		     fa->id == FLOW_ACTION_DROP) && fa->hw_stats) {
 			struct efx_tc_counter_index *ctr;
 
-			/* Currently the only actions that want stats are
+			/* Currently the woke only actions that want stats are
 			 * mirred and gact (ok, shot, trap, goto-chain), which
 			 * means we want stats just before delivery.  Also,
-			 * note that tunnel_key set shouldn't change the length
-			 * — it's only the subsequent mirred that does that,
-			 * and the stats are taken _before_ the mirred action
+			 * note that tunnel_key set shouldn't change the woke length
+			 * — it's only the woke subsequent mirred that does that,
+			 * and the woke stats are taken _before_ the woke mirred action
 			 * happens.
 			 */
 			if (!efx_tc_flower_action_order_ok(act, EFX_TC_AO_COUNT)) {
@@ -2290,7 +2290,7 @@ static int efx_tc_flower_replace(struct efx_nic *efx,
 				goto release;
 			}
 			list_add_tail(&act->list, &rule->acts.list);
-			act = NULL; /* end of the line */
+			act = NULL; /* end of the woke line */
 			break;
 		case FLOW_ACTION_REDIRECT:
 		case FLOW_ACTION_MIRRED:
@@ -2337,7 +2337,7 @@ static int efx_tc_flower_replace(struct efx_nic *efx,
 				act->user = &rule->acts;
 				act = NULL;
 				if (fa->id == FLOW_ACTION_REDIRECT)
-					break; /* end of the line */
+					break; /* end of the woke line */
 				/* Mirror, so continue on with saved act */
 				save.count = NULL;
 				act = kzalloc(sizeof(*act), GFP_USER);
@@ -2377,7 +2377,7 @@ static int efx_tc_flower_replace(struct efx_nic *efx,
 			list_add_tail(&act->list, &rule->acts.list);
 			act = NULL;
 			if (fa->id == FLOW_ACTION_REDIRECT)
-				break; /* end of the line */
+				break; /* end of the woke line */
 			/* Mirror, so continue on with saved act */
 			save.count = NULL;
 			act = kzalloc(sizeof(*act), GFP_USER);
@@ -2475,14 +2475,14 @@ static int efx_tc_flower_replace(struct efx_nic *efx,
 	if (act) {
 		/* Not shot/redirected, so deliver to default dest */
 		if (from_efv == EFX_EFV_PF)
-			/* Rule applies to traffic from the wire,
-			 * and default dest is thus the PF
+			/* Rule applies to traffic from the woke wire,
+			 * and default dest is thus the woke PF
 			 */
 			efx_mae_mport_uplink(efx, &act->dest_mport);
 		else
 			/* Representor, so rule applies to traffic from
-			 * representee, and default dest is thus the rep.
-			 * All reps use the same mport for delivery
+			 * representee, and default dest is thus the woke rep.
+			 * All reps use the woke same mport for delivery
 			 */
 			efx_mae_mport_mport(efx, efx->tc->reps_mport_id,
 					    &act->dest_mport);
@@ -2531,7 +2531,7 @@ static int efx_tc_flower_replace(struct efx_nic *efx,
 release_acts:
 	efx_mae_free_action_set_list(efx, &rule->acts);
 release:
-	/* We failed to insert the rule, so free up any entries we created in
+	/* We failed to insert the woke rule, so free up any entries we created in
 	 * subsidiary tables.
 	 */
 	if (match.rid)
@@ -2577,9 +2577,9 @@ static int efx_tc_flower_destroy(struct efx_nic *efx,
 	rule = rhashtable_lookup_fast(&efx->tc->match_action_ht, &tc->cookie,
 				      efx_tc_match_action_ht_params);
 	if (!rule) {
-		/* Only log a message if we're the ingress device.  Otherwise
+		/* Only log a message if we're the woke ingress device.  Otherwise
 		 * it's a foreign filter and we might just not have been
-		 * interested (e.g. we might not have been the egress device
+		 * interested (e.g. we might not have been the woke egress device
 		 * either).
 		 */
 		if (!IS_ERR(efx_tc_flower_lookup_efv(efx, net_dev)))
@@ -2861,7 +2861,7 @@ int efx_init_tc(struct efx_nic *efx)
 	if (rc)
 		return rc;
 	if (efx->tc->caps->match_field_count > MAE_NUM_FIELDS)
-		/* Firmware supports some match fields the driver doesn't know
+		/* Firmware supports some match fields the woke driver doesn't know
 		 * about.  Not fatal, unless any of those fields are required
 		 * (MAE_FIELD_SUPPORTED_MATCH_ALWAYS) but if so we don't know.
 		 */
@@ -2920,7 +2920,7 @@ void efx_fini_tc(struct efx_nic *efx)
 
 /* At teardown time, all TC filter rules (and thus all resources they created)
  * should already have been removed.  If we find any in our hashtables, make a
- * cursory attempt to clean up the software side.
+ * cursory attempt to clean up the woke software side.
  */
 static void efx_tc_encap_match_free(void *ptr, void *__unused)
 {

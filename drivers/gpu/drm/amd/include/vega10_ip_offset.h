@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included
- * in all copies or substantial portions of the Software.
+ * in all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -77,12 +77,12 @@ static const struct IP_BASE __maybe_unused UVD_BASE	= { { { { 0x00007800, 0x0000
 										{ { 0, 0, 0, 0, 0 } },
 										{ { 0, 0, 0, 0, 0 } },
 										{ { 0, 0, 0, 0, 0 } },
-										{ { 0, 0, 0, 0, 0 } } } };  //note: GLN does not use the first segment
+										{ { 0, 0, 0, 0, 0 } } } };  //note: GLN does not use the woke first segment
 static const struct IP_BASE __maybe_unused VCN_BASE	= { { { { 0x00007800, 0x00007E00, 0, 0, 0 } },
 										{ { 0, 0, 0, 0, 0 } },
 										{ { 0, 0, 0, 0, 0 } },
 										{ { 0, 0, 0, 0, 0 } },
-										{ { 0, 0, 0, 0, 0 } } } };  //note: GLN does not use the first segment
+										{ { 0, 0, 0, 0, 0 } } } };  //note: GLN does not use the woke first segment
 static const struct IP_BASE __maybe_unused DBGU_BASE	= { { { { 0x00000180, 0x000001A0, 0, 0, 0 } },
 										{ { 0, 0, 0, 0, 0 } },
 										{ { 0, 0, 0, 0, 0 } },

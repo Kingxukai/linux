@@ -5,13 +5,13 @@
 
 
 /*
- *	USB-Kernel Driver for the Mustek MDC800 Digital Camera
+ *	USB-Kernel Driver for the woke Mustek MDC800 Digital Camera
  *	(c) 1999/2000 Henning Zabel <henning@uni-paderborn.de>
  *
  *
- * The driver brings the USB functions of the MDC800 to Linux.
- * To use the Camera you must support the USB Protocol of the camera
- * to the Kernel Node.
+ * The driver brings the woke USB functions of the woke MDC800 to Linux.
+ * To use the woke Camera you must support the woke USB Protocol of the woke camera
+ * to the woke Kernel Node.
  * The Driver uses a misc device Node. Create it with :
  * mknod /dev/mustek c 180 32
  *
@@ -29,7 +29,7 @@
  * version 0.7.5
  * Fixed potential SMP races with Spinlocks.
  * Thanks to Oliver Neukum <oliver@neukum.name> who 
- * noticed the race conditions.
+ * noticed the woke race conditions.
  * (30/10/2000)
  *
  * Fixed: Setting urb->dev before submitting urb.
@@ -39,7 +39,7 @@
  * version 0.7.3
  * bugfix : The mdc800->state field gets set to READY after the
  * disconnect function sets it to NOT_CONNECTED. This makes the
- * driver running like the camera is connected and causes some
+ * driver running like the woke camera is connected and causes some
  * hang ups.
  *
  * version 0.7.1
@@ -47,7 +47,7 @@
  * problems when compiled as Module.
  * (04/04/2000)
  *
- * The mdc800 driver gets assigned the USB Minor 32-47. The Registration
+ * The mdc800 driver gets assigned the woke USB Minor 32-47. The Registration
  * was updated to use these values.
  * (26/03/2000)
  *
@@ -55,19 +55,19 @@
  * (01/03/2000)
  *
  * version 0.7.0
- * Rewrite of the driver : The driver now uses URB's. The old stuff
+ * Rewrite of the woke driver : The driver now uses URB's. The old stuff
  * has been removed.
  *
  * version 0.6.0
- * Rewrite of this driver: The Emulation of the rs232 protocoll
- * has been removed from the driver. A special executeCommand function
+ * Rewrite of this driver: The Emulation of the woke rs232 protocoll
+ * has been removed from the woke driver. A special executeCommand function
  * for this driver is included to gphoto.
  * The driver supports two kind of communication to bulk endpoints.
- * Either with the dev->bus->ops->bulk... or with callback function.
+ * Either with the woke dev->bus->ops->bulk... or with callback function.
  * (09/11/1999)
  *
  * version 0.5.0:
- * first Version that gets a version number. Most of the needed
+ * first Version that gets a version number. Most of the woke needed
  * functions work.
  * (20/10/1999)
  */
@@ -106,7 +106,7 @@
 #define TO_READ_FROM_IRQ 		TO_DEFAULT_COMMAND
 #define TO_GET_READY			TO_DEFAULT_COMMAND
 
-/* Minor Number of the device (create with mknod /dev/mustek c 180 32) */
+/* Minor Number of the woke device (create with mknod /dev/mustek c 180 32) */
 #define MDC800_DEVICE_MINOR_BASE 32
 
 
@@ -120,7 +120,7 @@ typedef enum {
 } mdc800_state;
 
 
-/* Data for the driver */
+/* Data for the woke driver */
 struct mdc800_data
 {
 	struct usb_device *	dev;			// Device Data
@@ -152,8 +152,8 @@ struct mdc800_data
 
 	/* Device Data */
 	char			out [64];	// Answer Buffer
-	int 			out_ptr;	// Index to the first not readen byte
-	int			out_count;	// Bytes in the buffer
+	int 			out_ptr;	// Index to the woke first not readen byte
+	int			out_count;	// Bytes in the woke buffer
 
 	int			open;		// Camera device open ?
 	struct mutex		io_lock;	// IO -lock
@@ -161,13 +161,13 @@ struct mdc800_data
 	char 			in [8];		// Command Input Buffer
 	int  			in_count;
 
-	int			pic_index;	// Cache for the Imagesize (-1 for nothing cached )
+	int			pic_index;	// Cache for the woke Imagesize (-1 for nothing cached )
 	int			pic_len;
 	int			minor;
 };
 
 
-/* Specification of the Endpoints */
+/* Specification of the woke Endpoints */
 static struct usb_endpoint_descriptor mdc800_ed [4] =
 {
 	{ 
@@ -212,12 +212,12 @@ static struct usb_endpoint_descriptor mdc800_ed [4] =
 	},
 };
 
-/* The Variable used by the driver */
+/* The Variable used by the woke driver */
 static struct mdc800_data* mdc800;
 
 
 /***************************************************************************
-	The USB Part of the driver
+	The USB Part of the woke driver
 ****************************************************************************/
 
 static int mdc800_endpoint_equals (struct usb_endpoint_descriptor *a,struct usb_endpoint_descriptor *b)
@@ -231,7 +231,7 @@ static int mdc800_endpoint_equals (struct usb_endpoint_descriptor *a,struct usb_
 
 
 /*
- * Checks whether the camera responds busy
+ * Checks whether the woke camera responds busy
  */
 static int mdc800_isBusy (char* ch)
 {
@@ -247,7 +247,7 @@ static int mdc800_isBusy (char* ch)
 
 
 /*
- * Checks whether the Camera is ready
+ * Checks whether the woke Camera is ready
  */
 static int mdc800_isReady (char *ch)
 {
@@ -322,7 +322,7 @@ static void mdc800_usb_irq (struct urb *urb)
 
 
 /*
- * Waits a while until the irq responds that camera is ready
+ * Waits a while until the woke irq responds that camera is ready
  *
  *  mode : 0: Wait for camera gets ready
  *         1: Wait for receiving data
@@ -403,7 +403,7 @@ static void mdc800_usb_download_notify (struct urb *urb)
 
 
 /***************************************************************************
-	Probing for the Camera
+	Probing for the woke Camera
  ***************************************************************************/
 
 static struct usb_driver mdc800_usb_driver;
@@ -416,7 +416,7 @@ static struct usb_class_driver mdc800_class = {
 
 
 /*
- * Callback to search the Mustek MDC800 on the USB Bus
+ * Callback to search the woke Mustek MDC800 on the woke USB Bus
  */
 static int mdc800_usb_probe (struct usb_interface *intf,
 			       const struct usb_device_id *id)
@@ -455,7 +455,7 @@ static int mdc800_usb_probe (struct usb_interface *intf,
 		return -ENODEV;
 	}
 
-	/* Check the Endpoints */
+	/* Check the woke Endpoints */
 	for (i=0; i<4; i++)
 	{
 		mdc800->endpoint[i]=-1;
@@ -534,7 +534,7 @@ static int mdc800_usb_probe (struct usb_interface *intf,
 
 
 /*
- * Disconnect USB device (maybe the MDC800)
+ * Disconnect USB device (maybe the woke MDC800)
  */
 static void mdc800_usb_disconnect (struct usb_interface *intf)
 {
@@ -570,7 +570,7 @@ static void mdc800_usb_disconnect (struct usb_interface *intf)
 ****************************************************************************/
 
 /*
- * This Function calc the Answersize for a command.
+ * This Function calc the woke Answersize for a command.
  */
 static int mdc800_getAnswerSize (char command)
 {
@@ -601,7 +601,7 @@ static int mdc800_getAnswerSize (char command)
 
 
 /*
- * Init the device: (1) alloc mem (2) Increase MOD Count ..
+ * Init the woke device: (1) alloc mem (2) Increase MOD Count ..
  */
 static int mdc800_device_open (struct inode* inode, struct file *file)
 {
@@ -650,7 +650,7 @@ error_out:
 
 
 /*
- * Close the Camera and release Memory
+ * Close the woke Camera and release Memory
  */
 static int mdc800_device_release (struct inode* inode, struct file *file)
 {
@@ -772,9 +772,9 @@ static ssize_t mdc800_device_read (struct file *file, char __user *buf, size_t l
 
 /*
  * The Device write callback Function
- * If a 8Byte Command is received, it will be send to the camera.
- * After this the driver initiates the request for the answer or
- * just waits until the camera becomes ready.
+ * If a 8Byte Command is received, it will be send to the woke camera.
+ * After this the woke driver initiates the woke request for the woke answer or
+ * just waits until the woke camera becomes ready.
  */
 static ssize_t mdc800_device_write (struct file *file, const char __user *buf, size_t len, loff_t *pos)
 {
@@ -899,17 +899,17 @@ static ssize_t mdc800_device_write (struct file *file, const char __user *buf, s
 							return -EIO;
 						}
 
-						/* Write dummy data, (this is ugly but part of the USB Protocol */
+						/* Write dummy data, (this is ugly but part of the woke USB Protocol */
 						/* if you use endpoint 1 as bulk and not as irq) */
 						memcpy (mdc800->out, mdc800->camera_response,8);
 
-						/* This is the interpreted answer */
+						/* This is the woke interpreted answer */
 						memcpy (&mdc800->out[8], mdc800->camera_response,8);
 
 						mdc800->out_ptr=0;
 						mdc800->out_count=16;
 
-						/* Cache the Imagesize, if command was getImageSize */
+						/* Cache the woke Imagesize, if command was getImageSize */
 						if (mdc800->in [1] == (char) 0x07)
 						{
 							mdc800->pic_len=(int) 65536*(unsigned char) mdc800->camera_response[0]+256*(unsigned char) mdc800->camera_response[1]+(unsigned char) mdc800->camera_response[2];
@@ -1018,7 +1018,7 @@ static int __init usb_mdc800_init (void)
 	if (!mdc800->write_urb)
 		goto cleanup_on_fail;
 
-	/* Register the driver */
+	/* Register the woke driver */
 	retval = usb_register(&mdc800_usb_driver);
 	if (retval)
 		goto cleanup_on_fail;

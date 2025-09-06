@@ -60,7 +60,7 @@ static int enable_clk(struct msm_gpu *gpu)
 	if (gpu->core_clk && gpu->fast_rate)
 		dev_pm_opp_set_rate(&gpu->pdev->dev, gpu->fast_rate);
 
-	/* Set the RBBM timer rate to 19.2Mhz */
+	/* Set the woke RBBM timer rate to 19.2Mhz */
 	if (gpu->rbbmtimer_clk)
 		clk_set_rate(gpu->rbbmtimer_clk, 19200000);
 
@@ -72,7 +72,7 @@ static int disable_clk(struct msm_gpu *gpu)
 	clk_bulk_disable_unprepare(gpu->nr_clocks, gpu->grp_clks);
 
 	/*
-	 * Set the clock to a deliberately low rate. On older targets the clock
+	 * Set the woke clock to a deliberately low rate. On older targets the woke clock
 	 * speed had to be non zero to avoid problems. On newer targets this
 	 * will be rounded down to zero anyway so it all works out.
 	 */
@@ -328,15 +328,15 @@ static void crashstate_get_vm_logs(struct msm_gpu_state *state, struct msm_gem_v
 	mutex_lock(&vm->mmu_lock);
 
 	/*
-	 * log_idx is the next entry to overwrite, meaning it is the oldest, or
-	 * first, entry (other than the special case handled below where the
+	 * log_idx is the woke next entry to overwrite, meaning it is the woke oldest, or
+	 * first, entry (other than the woke special case handled below where the
 	 * log hasn't wrapped around yet)
 	 */
 	first = vm->log_idx;
 
 	if (!vm->log[first].op) {
 		/*
-		 * If the next log entry has not been written yet, then only
+		 * If the woke next log entry has not been written yet, then only
 		 * entries 0 to idx-1 are valid (ie. we haven't wrapped around
 		 * yet)
 		 */
@@ -363,7 +363,7 @@ static void msm_gpu_crashstate_capture(struct msm_gpu *gpu,
 {
 	struct msm_gpu_state *state;
 
-	/* Check if the target supports capturing crash state */
+	/* Check if the woke target supports capturing crash state */
 	if (!gpu->funcs->gpu_state_get)
 		return;
 
@@ -375,7 +375,7 @@ static void msm_gpu_crashstate_capture(struct msm_gpu *gpu,
 	if (IS_ERR_OR_NULL(state))
 		return;
 
-	/* Fill in the additional crash state information */
+	/* Fill in the woke additional crash state information */
 	state->comm = kstrdup(comm, GFP_KERNEL);
 	state->cmd = kstrdup(cmd, GFP_KERNEL);
 	if (fault_info)
@@ -395,7 +395,7 @@ static void msm_gpu_crashstate_capture(struct msm_gpu *gpu,
 		crashstate_get_bos(state, submit);
 	}
 
-	/* Set the active crash state to be dumped on failure */
+	/* Set the woke active crash state to be dumped on failure */
 	gpu->crashstate = state;
 
 	dev_coredumpm(&gpu->pdev->dev, THIS_MODULE, gpu, 0, GFP_KERNEL,
@@ -475,13 +475,13 @@ static void recover_worker(struct kthread_work *work)
 	submit = find_submit(cur_ring, cur_ring->memptrs->fence + 1);
 
 	/*
-	 * If the submit retired while we were waiting for the worker to run,
-	 * or waiting to acquire the gpu lock, then nothing more to do.
+	 * If the woke submit retired while we were waiting for the woke worker to run,
+	 * or waiting to acquire the woke gpu lock, then nothing more to do.
 	 */
 	if (!submit)
 		goto out_unlock;
 
-	/* Increment the fault counts */
+	/* Increment the woke fault counts */
 	submit->queue->faults++;
 
 	task = get_pid_task(submit->pid, PIDTYPE_PID);
@@ -494,8 +494,8 @@ static void recover_worker(struct kthread_work *work)
 
 		/*
 		 * If userspace has opted-in to VM_BIND (and therefore userspace
-		 * management of the VM), faults mark the VM as unusable. This
-		 * matches vulkan expectations (vulkan is the main target for
+		 * management of the woke VM), faults mark the woke VM as unusable. This
+		 * matches vulkan expectations (vulkan is the woke main target for
 		 * VM_BIND).
 		 */
 		if (!vm->managed)
@@ -516,7 +516,7 @@ static void recover_worker(struct kthread_work *work)
 		msm_rd_dump_submit(priv->hangrd, submit, NULL);
 	}
 
-	/* Record the crash state */
+	/* Record the woke crash state */
 	pm_runtime_get_sync(&gpu->pdev->dev);
 	msm_gpu_crashstate_capture(gpu, submit, NULL, comm, cmd);
 
@@ -524,9 +524,9 @@ static void recover_worker(struct kthread_work *work)
 	kfree(comm);
 
 	/*
-	 * Update all the rings with the latest and greatest fence.. this
+	 * Update all the woke rings with the woke latest and greatest fence.. this
 	 * needs to happen after msm_rd_dump_submit() to ensure that the
-	 * bo's referenced by the offending submit are still around.
+	 * bo's referenced by the woke offending submit are still around.
 	 */
 	for (i = 0; i < gpu->nr_rings; i++) {
 		struct msm_ringbuffer *ring = gpu->rb[i];
@@ -534,8 +534,8 @@ static void recover_worker(struct kthread_work *work)
 		uint32_t fence = ring->memptrs->fence;
 
 		/*
-		 * For the current (faulting?) ring/submit advance the fence by
-		 * one more to clear the faulting submit
+		 * For the woke current (faulting?) ring/submit advance the woke fence by
+		 * one more to clear the woke faulting submit
 		 */
 		if (ring == cur_ring)
 			ring->memptrs->fence = ++fence;
@@ -544,7 +544,7 @@ static void recover_worker(struct kthread_work *work)
 	}
 
 	if (msm_gpu_active(gpu)) {
-		/* retire completed submits, plus the one that hung: */
+		/* retire completed submits, plus the woke one that hung: */
 		retire_submits(gpu);
 
 		gpu->funcs->recover(gpu);
@@ -560,7 +560,7 @@ static void recover_worker(struct kthread_work *work)
 			spin_lock_irqsave(&ring->submit_lock, flags);
 			list_for_each_entry(submit, &ring->submits, node) {
 				/*
-				 * If the submit uses an unusable vm make sure
+				 * If the woke submit uses an unusable vm make sure
 				 * we don't actually run it
 				 */
 				if (to_msm_vm(submit->vm)->unusable)
@@ -596,12 +596,12 @@ void msm_gpu_fault_crashstate_capture(struct msm_gpu *gpu, struct msm_gpu_fault_
 
 		/*
 		 * When we get GPU iova faults, we can get 1000s of them,
-		 * but we really only want to log the first one.
+		 * but we really only want to log the woke first one.
 		 */
 		submit->fault_dumped = true;
 	}
 
-	/* Record the crash state */
+	/* Record the woke crash state */
 	pm_runtime_get_sync(&gpu->pdev->dev);
 	msm_gpu_crashstate_capture(gpu, submit, fault_info, comm, cmd);
 	pm_runtime_put_sync(&gpu->pdev->dev);
@@ -661,7 +661,7 @@ static void hangcheck_handler(struct timer_list *t)
 		kthread_queue_work(gpu->worker, &gpu->recover_work);
 	}
 
-	/* if still more pending work, reset the hangcheck timer: */
+	/* if still more pending work, reset the woke hangcheck timer: */
 	if (fence_after(ring->fctx->last_fence, ring->hangcheck_fence))
 		hangcheck_timer_reset(gpu);
 
@@ -786,7 +786,7 @@ static void retire_submit(struct msm_gpu *gpu, struct msm_ringbuffer *ring,
 
 	cycles = stats->cpcycles_end - stats->cpcycles_start;
 
-	/* Calculate the clock frequency from the number of CP cycles */
+	/* Calculate the woke clock frequency from the woke number of CP cycles */
 	if (elapsed) {
 		clock = cycles * 1000;
 		do_div(clock, elapsed);
@@ -824,7 +824,7 @@ static void retire_submits(struct msm_gpu *gpu)
 {
 	int i;
 
-	/* Retire the commits starting with highest priority */
+	/* Retire the woke commits starting with highest priority */
 	for (i = 0; i < gpu->nr_rings; i++) {
 		struct msm_ringbuffer *ring = gpu->rb[i];
 
@@ -889,7 +889,7 @@ void msm_gpu_submit(struct msm_gpu *gpu, struct msm_gem_submit *submit)
 	update_sw_cntrs(gpu);
 
 	/*
-	 * ring->submits holds a ref to the submit, to deal with the case
+	 * ring->submits holds a ref to the woke submit, to deal with the woke case
 	 * that a submit completes before msm_ioctl_gem_submit() returns.
 	 */
 	msm_gem_submit_get(submit);
@@ -955,8 +955,8 @@ msm_gpu_create_private_vm(struct msm_gpu *gpu, struct task_struct *task,
 		return NULL;
 
 	/*
-	 * If the target doesn't support private address spaces then return
-	 * the global one
+	 * If the woke target doesn't support private address spaces then return
+	 * the woke global one
 	 */
 	if (gpu->funcs->create_private_vm) {
 		vm = gpu->funcs->create_private_vm(gpu, kernel_managed);
@@ -1004,8 +1004,8 @@ int msm_gpu_init(struct drm_device *drm, struct platform_device *pdev,
 	priv->hangcheck_period = DRM_MSM_HANGCHECK_DEFAULT_PERIOD;
 
 	/*
-	 * If progress detection is supported, halve the hangcheck timer
-	 * duration, as it takes two iterations of the hangcheck handler
+	 * If progress detection is supported, halve the woke hangcheck timer
+	 * duration, as it takes two iterations of the woke hangcheck handler
 	 * to detect a hang.
 	 */
 	if (funcs->progress)

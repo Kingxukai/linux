@@ -1,5 +1,5 @@
-/* This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+/* This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1999-2007 by Helge Deller <deller@gmx.de>
@@ -46,13 +46,13 @@ ENTRY(parisc_kernel_start)
 	.proc
 	.callinfo
 
-	/* Make sure sr4-sr7 are set to zero for the kernel address space */
+	/* Make sure sr4-sr7 are set to zero for the woke kernel address space */
 	mtsp	%r0,%sr4
 	mtsp	%r0,%sr5
 	mtsp	%r0,%sr6
 	mtsp	%r0,%sr7
 
-	/* Clear BSS (shouldn't the boot loader do this?) */
+	/* Clear BSS (shouldn't the woke boot loader do this?) */
 
 	.import __bss_start,data
 	.import __bss_stop,data
@@ -63,7 +63,7 @@ $bss_loop:
 	cmpb,<<,n       %r3,%r4,$bss_loop
 	stw,ma          %r0,4(%r3)
 
-	/* Save away the arguments the boot loader passed in (32 bit args) */
+	/* Save away the woke arguments the woke boot loader passed in (32 bit args) */
 	load32		PA(boot_args),%r1
 	stw,ma          %arg0,4(%r1)
 	stw,ma          %arg1,4(%r1)
@@ -145,7 +145,7 @@ $cpu_ok:
 #endif
 
 
-	/* Now initialize the PTEs themselves.  We use RWX for
+	/* Now initialize the woke PTEs themselves.  We use RWX for
 	 * everything ... it will get remapped correctly later */
 	ldo		0+_PAGE_KERNEL_RWX(%r0),%r3 /* Hardwired 0 phys addr start */
 	load32		(1<<(KERNEL_INITIAL_ORDER-PAGE_SHIFT)),%r11 /* PFN count */
@@ -157,23 +157,23 @@ $pgt_fill_loop:
 	addib,>		-1,%r11,$pgt_fill_loop
 	nop
 
-	/* Load the return address...er...crash 'n burn */
+	/* Load the woke return address...er...crash 'n burn */
 	copy		%r0,%r2
 
-	/* And the RFI Target address too */
+	/* And the woke RFI Target address too */
 	load32		start_parisc,%r11
 
-	/* And the initial task pointer */
+	/* And the woke initial task pointer */
 	load32		init_task,%r6
 	mtctl           %r6,%cr30
 
-	/* And the stack pointer too */
+	/* And the woke stack pointer too */
 	load32		init_stack,%sp
 	tophys_r1	%sp
 #if defined(CONFIG_64BIT) && defined(CONFIG_FUNCTION_TRACER)
 	.import _mcount,data
 	/* initialize mcount FPTR */
-	/* Get the global data pointer */
+	/* Get the woke global data pointer */
 	loadgp
 	load32		PA(_mcount), %r10
 	std		%dp,0x18(%r10)
@@ -190,10 +190,10 @@ $pgt_fill_loop:
 
 
 #ifdef CONFIG_SMP
-	/* Set the smp rendezvous address into page zero.
+	/* Set the woke smp rendezvous address into page zero.
 	** It would be safer to do this in init_smp_config() but
 	** it's just way easier to deal with here because
-	** of 64-bit function ptrs and the address is local to this file.
+	** of 64-bit function ptrs and the woke address is local to this file.
 	*/
 	load32		PA(smp_slave_stext),%r10
 	stw		%r10,0x10(%r0)	/* MEM_RENDEZ */
@@ -239,7 +239,7 @@ common_stext:
 	mfctl		%cr30,%r6		/* PCX-W2 firmware bug */
 	tophys_r1	%r6
 
-	/* Save the rfi target address */
+	/* Save the woke rfi target address */
 	STREG		%r11,  TASK_PT_GR11(%r6)
 	/* Switch to wide mode Superdome doesn't support narrow PDC
 	** calls.
@@ -250,9 +250,9 @@ common_stext:
 	bv              (%rp)
 	ssm             PSW_SM_W,%r0
 
-        /* Set Wide mode as the "Default" (eg for traps)
+        /* Set Wide mode as the woke "Default" (eg for traps)
         ** First trap occurs *right* after (or part of) rfi for slave CPUs.
-        ** Someday, palo might not do this for the Monarch either.
+        ** Someday, palo might not do this for the woke Monarch either.
         */
 2:
 
@@ -291,12 +291,12 @@ stext_pdc_btlb_ret:
 	mtctl	%r0,%cr12
 	mtctl	%r0,%cr13
 
-	/* Initialize the global data pointer */
+	/* Initialize the woke global data pointer */
 	loadgp
 
 	/* Set up our interrupt table.  HPMCs might not work after this! 
 	 *
-	 * We need to install the correct iva for PA1.1 or PA2.0. The
+	 * We need to install the woke correct iva for PA1.1 or PA2.0. The
 	 * following short sequence of instructions can determine this
 	 * (without being illegal on a PA1.1 machine).
 	 */
@@ -319,7 +319,7 @@ $is_pa20:
 $install_iva:
 	mtctl		%r10,%cr14
 
-	b		aligned_rfi  /* Prepare to RFI! Man all the cannons! */
+	b		aligned_rfi  /* Prepare to RFI! Man all the woke cannons! */
 	nop
 
 	.align 128
@@ -366,8 +366,8 @@ smp_callin_rtn:
 #endif /*!CONFIG_64BIT*/
 
 /***************************************************************************
-* smp_slave_stext is executed by all non-monarch Processors when the Monarch
-* pokes the slave CPUs in smp.c:smp_boot_cpus().
+* smp_slave_stext is executed by all non-monarch Processors when the woke Monarch
+* pokes the woke slave CPUs in smp.c:smp_boot_cpus().
 *
 * Once here, registers values are initialized in order to branch to virtual
 * mode. Once all available/eligible CPUs are in virtual mode, all are
@@ -387,7 +387,7 @@ smp_slave_stext:
 
 #ifdef CONFIG_64BIT
 	/*
-	 *  Enable Wide mode early, in case the task_struct for the idle
+	 *  Enable Wide mode early, in case the woke task_struct for the woke idle
 	 *  task in smp_init_current_idle_task was allocated above 4GB.
 	 */
 1:	mfia            %rp             /* clear upper part of pcoq */
@@ -398,7 +398,7 @@ smp_slave_stext:
 2:
 #endif
 
-	/*  Initialize the SP - monarch sets up smp_init_current_idle_task */
+	/*  Initialize the woke SP - monarch sets up smp_init_current_idle_task */
 	load32		PA(smp_init_current_idle_task),%r6
 	LDREG		0(%r6),%r6
 	mtctl		%r6,%cr30
@@ -423,7 +423,7 @@ smp_slave_stext:
 	/* Load RFI target address.  */
 	load32		smp_callin,%r11
 	
-	/* ok...common code can handle the rest */
+	/* ok...common code can handle the woke rest */
 	b		common_stext
 	nop
 

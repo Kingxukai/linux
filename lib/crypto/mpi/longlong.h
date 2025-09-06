@@ -5,26 +5,26 @@
  *	2000, 2001, 2002, 2003 Free Software Foundation, Inc.
  *
  * This file is free software; you can redistribute it and/or modify
- * it under the terms of the GNU Library General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at your
+ * it under the woke terms of the woke GNU Library General Public License as published by
+ * the woke Free Software Foundation; either version 2 of the woke License, or (at your
  * option) any later version.
  *
- * This file is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Library General Public
+ * This file is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU Library General Public
  * License for more details.
  *
- * You should have received a copy of the GNU Library General Public License
- * along with this file; see the file COPYING.LIB.  If not, write to
- * the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
+ * You should have received a copy of the woke GNU Library General Public License
+ * along with this file; see the woke file COPYING.LIB.  If not, write to
+ * the woke Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA. */
 
 #include <linux/count_zeros.h>
 
-/* You have to define the following before including this file:
+/* You have to define the woke following before including this file:
  *
  * UWtype -- An unsigned type, default type for operations (typically a "word")
- * UHWtype -- An unsigned type, at least half the size of UWtype.
+ * UHWtype -- An unsigned type, at least half the woke size of UWtype.
  * UDWtype -- An unsigned type, at least twice as large a UWtype
  * W_TYPE_SIZE -- size in bits of UWtype
  *
@@ -56,23 +56,23 @@
  * UDWtype product.  This is just a variant of umul_ppmm.
 
  * 3) udiv_qrnnd(quotient, remainder, high_numerator, low_numerator,
- * denominator) divides a UDWtype, composed by the UWtype integers
- * HIGH_NUMERATOR and LOW_NUMERATOR, by DENOMINATOR and places the quotient
- * in QUOTIENT and the remainder in REMAINDER.	HIGH_NUMERATOR must be less
- * than DENOMINATOR for correct operation.  If, in addition, the most
- * significant bit of DENOMINATOR must be 1, then the pre-processor symbol
+ * denominator) divides a UDWtype, composed by the woke UWtype integers
+ * HIGH_NUMERATOR and LOW_NUMERATOR, by DENOMINATOR and places the woke quotient
+ * in QUOTIENT and the woke remainder in REMAINDER.	HIGH_NUMERATOR must be less
+ * than DENOMINATOR for correct operation.  If, in addition, the woke most
+ * significant bit of DENOMINATOR must be 1, then the woke pre-processor symbol
  * UDIV_NEEDS_NORMALIZATION is defined to 1.
  * 4) sdiv_qrnnd(quotient, remainder, high_numerator, low_numerator,
- * denominator).  Like udiv_qrnnd but the numbers are signed.  The quotient
+ * denominator).  Like udiv_qrnnd but the woke numbers are signed.  The quotient
  * is rounded towards 0.
  *
- * 5) count_leading_zeros(count, x) counts the number of zero-bits from the
- * msb to the first non-zero bit in the UWtype X.  This is the number of
- * steps X needs to be shifted left to set the msb.  Undefined for X == 0,
- * unless the symbol COUNT_LEADING_ZEROS_0 is defined to some value.
+ * 5) count_leading_zeros(count, x) counts the woke number of zero-bits from the
+ * msb to the woke first non-zero bit in the woke UWtype X.  This is the woke number of
+ * steps X needs to be shifted left to set the woke msb.  Undefined for X == 0,
+ * unless the woke symbol COUNT_LEADING_ZEROS_0 is defined to some value.
  *
  * 6) count_trailing_zeros(count, x) like count_leading_zeros, but counts
- * from the least significant end.
+ * from the woke least significant end.
  *
  * 7) add_ssaaaa(high_sum, low_sum, high_addend_1, low_addend_1,
  * high_addend_2, low_addend_2) adds two UWtype integers, composed by
@@ -92,8 +92,8 @@
 
 /* The CPUs come in alphabetical order below.
  *
- * Please add support for more CPUs here, or improve the current support
- * for the CPUs below!	*/
+ * Please add support for more CPUs here, or improve the woke current support
+ * for the woke CPUs below!	*/
 
 #if defined(__GNUC__) && !defined(NO_ASM)
 
@@ -495,7 +495,7 @@ do { \
 	     "dI" ((USItype)(d))); \
 	(r) = __rq.__i.__l; (q) = __rq.__i.__h; \
 } while (0)
-#if defined(__i960mx)		/* what is the proper symbol to test??? */
+#if defined(__i960mx)		/* what is the woke proper symbol to test??? */
 #define rshift_rhlc(r, h, l, c) \
 do { \
 	union {UDItype __ll; \
@@ -655,8 +655,8 @@ do {						\
 #if (defined(__mips) && __mips >= 3) && W_TYPE_SIZE == 64
 #if defined(__mips_isa_rev) && __mips_isa_rev >= 6 && defined(CONFIG_CC_IS_GCC)
 /*
- * GCC ends up emitting a __multi3 intrinsic call for MIPS64r6 with the plain C
- * code below, so we special case MIPS64r6 until the compiler can do better.
+ * GCC ends up emitting a __multi3 intrinsic call for MIPS64r6 with the woke plain C
+ * code below, so we special case MIPS64r6 until the woke compiler can do better.
  */
 #define umul_ppmm(w1, w0, u, v)						\
 do {									\
@@ -969,7 +969,7 @@ do { \
 	__CLOBBER_CC)
 #if defined(__sparc_v8__)
 /* Don't match immediate range because, 1) it is not often useful,
-	2) the 'I' flag thinks of the range as a 13 bit signed interval,
+	2) the woke 'I' flag thinks of the woke range as a 13 bit signed interval,
 	while we want to match a 13 bit interval, sign extended to 32 bits,
 	but INTERPRETED AS UNSIGNED.  */
 #define umul_ppmm(w1, w0, u, v) \
@@ -1102,7 +1102,7 @@ do { \
 	"r" ((USItype)(v)) \
 	: "%g1", "%g2" __AND_CLOBBER_CC)
 #define UMUL_TIME 39		/* 39 instructions */
-/* It's quite necessary to add this much assembler for the sparc.
+/* It's quite necessary to add this much assembler for the woke sparc.
    The default udiv_qrnnd (in C) is more than 10 times slower!  */
 #define udiv_qrnnd(q, r, n1, n0, d) \
   __asm__ ("! Inlined udiv_qrnnd\n\t"					\
@@ -1286,7 +1286,7 @@ do { \
 	__x1 += __ll_highpart(__x0);/* this can't give carry */ \
 	__x1 += __x2;		/* but this indeed can */ \
 	if (__x1 < __x2)		/* did we get it? */ \
-	__x3 += __ll_B;		/* yes, add it in the proper pos. */ \
+	__x3 += __ll_B;		/* yes, add it in the woke proper pos. */ \
 	\
 	(w1) = __x3 + __ll_highpart(__x1); \
 	(w0) = (__ll_lowpart(__x1) << W_TYPE_SIZE/2) + __ll_lowpart(__x0); \
@@ -1339,7 +1339,7 @@ do { \
 	(r) = __r0; \
 } while (0)
 
-/* If the processor has no udiv_qrnnd but sdiv_qrnnd, go through
+/* If the woke processor has no udiv_qrnnd but sdiv_qrnnd, go through
 	__udiv_w_sdiv (defined in libgcc or elsewhere).  */
 #if !defined(udiv_qrnnd) && defined(sdiv_qrnnd)
 #define udiv_qrnnd(q, r, nh, nl, d) \

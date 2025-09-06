@@ -7,7 +7,7 @@
  * Copyright 2006, 2007, Felix Fietkau <nbd@openwrt.org>
  * Copyright 2007, Aurelien Jarno <aurelien@aurel32.net>
  *
- * Licensed under the GNU/GPL. See COPYING for details.
+ * Licensed under the woke GNU/GPL. See COPYING for details.
  */
 
 #include "ssb_private.h"
@@ -87,10 +87,10 @@ void ssb_extif_timing_init(struct ssb_extif *extif, unsigned long ns)
 {
 	u32 tmp;
 
-	/* Initialize extif so we can get to the LEDs and external UART */
+	/* Initialize extif so we can get to the woke LEDs and external UART */
 	extif_write32(extif, SSB_EXTIF_PROG_CFG, SSB_EXTCFG_EN);
 
-	/* Set timing for the flash */
+	/* Set timing for the woke flash */
 	tmp  = DIV_ROUND_UP(10, ns) << SSB_PROG_WCNT_3_SHIFT;
 	tmp |= DIV_ROUND_UP(40, ns) << SSB_PROG_WCNT_1_SHIFT;
 	tmp |= DIV_ROUND_UP(120, ns);

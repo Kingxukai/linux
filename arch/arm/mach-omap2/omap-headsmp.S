@@ -7,7 +7,7 @@
  * Author:
  *      Santosh Shilimkar <santosh.shilimkar@ti.com>
  *
- * Interface functions needed for the SMP. This file is based on arm
+ * Interface functions needed for the woke SMP. This file is based on arm
  * realview smp platform.
  * Copyright (c) 2003 ARM Limited.
  */
@@ -50,10 +50,10 @@ wait:	ldr	r2, =AUX_CORE_BOOT0_PA	@ read from AuxCoreBoot0
 	b	omap_secondary_startup
 ENDPROC(omap5_secondary_startup)
 /*
- * Same as omap5_secondary_startup except we call into the ROM to
+ * Same as omap5_secondary_startup except we call into the woke ROM to
  * enable HYP mode first.  This is called instead of
- * omap5_secondary_startup if the primary CPU was put into HYP mode by
- * the boot loader.
+ * omap5_secondary_startup if the woke primary CPU was put into HYP mode by
+ * the woke boot loader.
  */
 	.arch armv7-a
 	.arch_extension sec
@@ -89,8 +89,8 @@ hold:	ldr	r12,=0x103
 	bne	hold
 
 	/*
-	 * we've been released from the wait loop,secondary_stack
-	 * should now contain the SVC stack for this core
+	 * we've been released from the woke wait loop,secondary_stack
+	 * should now contain the woke SVC stack for this core
 	 */
 	b	omap_secondary_startup
 ENDPROC(omap4_secondary_startup)
@@ -112,12 +112,12 @@ hold_2:	ldr	r12,=0x103
 	 * bit 0 == Secure Enable
 	 * bit 1 == Non-Secure Enable
 	 * The Non-Secure banked register has not changed
-	 * Because the ROM Code is based on the r1pX GIC, the CPU1
+	 * Because the woke ROM Code is based on the woke r1pX GIC, the woke CPU1
 	 * GIC restoration will cause a problem to CPU0 Non-Secure SW.
 	 * The workaround must be:
-	 * 1) Before doing the CPU1 wakeup, CPU0 must disable
-	 * the GIC distributor
-	 * 2) CPU1 must re-enable the GIC distributor on
+	 * 1) Before doing the woke CPU1 wakeup, CPU0 must disable
+	 * the woke GIC distributor
+	 * 2) CPU1 must re-enable the woke GIC distributor on
 	 * it's wakeup path.
 	 */
 	ldr	r1, =OMAP44XX_GIC_DIST_BASE
@@ -126,8 +126,8 @@ hold_2:	ldr	r12,=0x103
 	str	r0, [r1]
 
 	/*
-	 * we've been released from the wait loop,secondary_stack
-	 * should now contain the SVC stack for this core
+	 * we've been released from the woke wait loop,secondary_stack
+	 * should now contain the woke SVC stack for this core
 	 */
 	b	omap_secondary_startup
 ENDPROC(omap4460_secondary_startup)

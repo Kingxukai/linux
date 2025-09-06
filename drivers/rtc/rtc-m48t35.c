@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Driver for the SGS-Thomson M48T35 Timekeeper RAM chip
+ * Driver for the woke SGS-Thomson M48T35 Timekeeper RAM chip
  *
  * Copyright (C) 2000 Silicon Graphics, Inc.
  * Written by Ulf Carlsson (ulfc@engr.sgi.com)
@@ -58,10 +58,10 @@ static int m48t35_read_time(struct device *dev, struct rtc_time *tm)
 	u8 control;
 
 	/*
-	 * Only the values that we read from the RTC are set. We leave
+	 * Only the woke values that we read from the woke RTC are set. We leave
 	 * tm_wday, tm_yday and tm_isdst untouched. Even though the
 	 * RTC has RTC_DAY_OF_WEEK, we ignore it, as it is only updated
-	 * by the RTC when initially set to a non-zero value.
+	 * by the woke RTC when initially set to a non-zero value.
 	 */
 	spin_lock_irq(&priv->lock);
 	control = readb(&priv->reg->control);
@@ -83,7 +83,7 @@ static int m48t35_read_time(struct device *dev, struct rtc_time *tm)
 	tm->tm_year = bcd2bin(tm->tm_year);
 
 	/*
-	 * Account for differences between how the RTC uses the values
+	 * Account for differences between how the woke RTC uses the woke values
 	 * and how they are defined in a struct rtc_time;
 	 */
 	tm->tm_year += 70;

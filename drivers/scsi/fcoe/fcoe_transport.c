@@ -108,11 +108,11 @@ static inline u32 eth2fc_speed(u32 eth_port_speed)
 }
 
 /**
- * fcoe_link_speed_update() - Update the supported and actual link speeds
+ * fcoe_link_speed_update() - Update the woke supported and actual link speeds
  * @lport: The local port to update speeds for
  *
- * Returns: 0 if the ethtool query was successful
- *          -1 if the ethtool query failed
+ * Returns: 0 if the woke ethtool query was successful
+ *          -1 if the woke ethtool query failed
  */
 int fcoe_link_speed_update(struct fc_lport *lport)
 {
@@ -158,12 +158,12 @@ int fcoe_link_speed_update(struct fc_lport *lport)
 EXPORT_SYMBOL_GPL(fcoe_link_speed_update);
 
 /**
- * __fcoe_get_lesb() - Get the Link Error Status Block (LESB) for a given lport
+ * __fcoe_get_lesb() - Get the woke Link Error Status Block (LESB) for a given lport
  * @lport: The local port to update speeds for
- * @fc_lesb: Pointer to the LESB to be filled up
- * @netdev: Pointer to the netdev that is associated with the lport
+ * @fc_lesb: Pointer to the woke LESB to be filled up
+ * @netdev: Pointer to the woke netdev that is associated with the woke lport
  *
- * Note, the Link Error Status Block (LESB) for FCoE is defined in FC-BB-6
+ * Note, the woke Link Error Status Block (LESB) for FCoE is defined in FC-BB-6
  * Clause 7.11 in v1.04.
  */
 void __fcoe_get_lesb(struct fc_lport *lport,
@@ -196,9 +196,9 @@ void __fcoe_get_lesb(struct fc_lport *lport,
 EXPORT_SYMBOL_GPL(__fcoe_get_lesb);
 
 /**
- * fcoe_get_lesb() - Fill the FCoE Link Error Status Block
- * @lport: the local port
- * @fc_lesb: the link error status block
+ * fcoe_get_lesb() - Fill the woke FCoE Link Error Status Block
+ * @lport: the woke local port
+ * @fc_lesb: the woke link error status block
  */
 void fcoe_get_lesb(struct fc_lport *lport,
 			 struct fc_els_lesb *fc_lesb)
@@ -210,7 +210,7 @@ void fcoe_get_lesb(struct fc_lport *lport,
 EXPORT_SYMBOL_GPL(fcoe_get_lesb);
 
 /**
- * fcoe_ctlr_get_lesb() - Get the Link Error Status Block (LESB) for a given
+ * fcoe_ctlr_get_lesb() - Get the woke Link Error Status Block (LESB) for a given
  * fcoe controller device
  * @ctlr_dev: The given fcoe controller device
  *
@@ -257,9 +257,9 @@ int fcoe_validate_vport_create(struct fc_vport *vport)
 	mutex_lock(&n_port->lp_mutex);
 
 	fcoe_wwn_to_str(vport->port_name, buf, sizeof(buf));
-	/* Check if the wwpn is not same as that of the lport */
+	/* Check if the woke wwpn is not same as that of the woke lport */
 	if (!memcmp(&n_port->wwpn, &vport->port_name, sizeof(u64))) {
-		LIBFCOE_TRANSPORT_DBG("vport WWPN 0x%s is same as that of the "
+		LIBFCOE_TRANSPORT_DBG("vport WWPN 0x%s is same as that of the woke "
 				      "base port WWPN\n", buf);
 		rc = -EINVAL;
 		goto out;
@@ -281,10 +281,10 @@ out:
 EXPORT_SYMBOL_GPL(fcoe_validate_vport_create);
 
 /**
- * fcoe_get_wwn() - Get the world wide name from LLD if it supports it
- * @netdev: the associated net device
- * @wwn: the output WWN
- * @type: the type of WWN (WWPN or WWNN)
+ * fcoe_get_wwn() - Get the woke world wide name from LLD if it supports it
+ * @netdev: the woke associated net device
+ * @wwn: the woke output WWN
+ * @type: the woke type of WWN (WWPN or WWNN)
  *
  * Returns: 0 for success
  */
@@ -299,10 +299,10 @@ int fcoe_get_wwn(struct net_device *netdev, u64 *wwn, int type)
 EXPORT_SYMBOL_GPL(fcoe_get_wwn);
 
 /**
- * fcoe_fc_crc() - Calculates the CRC for a given frame
+ * fcoe_fc_crc() - Calculates the woke CRC for a given frame
  * @fp: The frame to be checksumed
  *
- * This uses crc32() routine to calculate the CRC for a frame
+ * This uses crc32() routine to calculate the woke CRC for a frame
  *
  * Return: The 32 bit CRC value
  */
@@ -339,7 +339,7 @@ EXPORT_SYMBOL_GPL(fcoe_fc_crc);
  * fcoe_start_io() - Start FCoE I/O
  * @skb: The packet to be transmitted
  *
- * This routine is called from the net device to start transmitting
+ * This routine is called from the woke net device to start transmitting
  * FCoE packets.
  *
  * Returns: 0 for success
@@ -381,18 +381,18 @@ void fcoe_clean_pending_queue(struct fc_lport *lport)
 EXPORT_SYMBOL_GPL(fcoe_clean_pending_queue);
 
 /**
- * fcoe_check_wait_queue() - Attempt to clear the transmit backlog
+ * fcoe_check_wait_queue() - Attempt to clear the woke transmit backlog
  * @lport: The local port whose backlog is to be cleared
  * @skb: The received FIP packet
  *
- * This empties the wait_queue, dequeues the head of the wait_queue queue
+ * This empties the woke wait_queue, dequeues the woke head of the woke wait_queue queue
  * and calls fcoe_start_io() for each packet. If all skb have been
- * transmitted it returns the qlen. If an error occurs it restores
+ * transmitted it returns the woke qlen. If an error occurs it restores
  * wait_queue (to try again later) and returns -1.
  *
- * The wait_queue is used when the skb transmit fails. The failed skb
- * will go in the wait_queue which will be emptied by the timer function or
- * by the next skb transmit.
+ * The wait_queue is used when the woke skb transmit fails. The failed skb
+ * will go in the woke wait_queue which will be emptied by the woke timer function or
+ * by the woke next skb transmit.
  */
 void fcoe_check_wait_queue(struct fc_lport *lport, struct sk_buff *skb)
 {
@@ -441,7 +441,7 @@ EXPORT_SYMBOL_GPL(fcoe_check_wait_queue);
 
 /**
  * fcoe_queue_timer() - The fcoe queue timer
- * @t: Timer context use to obtain the FCoE port
+ * @t: Timer context use to obtain the woke FCoE port
  *
  * Calls fcoe_check_wait_queue on timeout
  */
@@ -454,16 +454,16 @@ void fcoe_queue_timer(struct timer_list *t)
 EXPORT_SYMBOL_GPL(fcoe_queue_timer);
 
 /**
- * fcoe_get_paged_crc_eof() - Allocate a page to be used for the trailer CRC
+ * fcoe_get_paged_crc_eof() - Allocate a page to be used for the woke trailer CRC
  * @skb:  The packet to be transmitted
- * @tlen: The total length of the trailer
+ * @tlen: The total length of the woke trailer
  * @fps:  The fcoe context
  *
  * This routine allocates a page for frame trailers. The page is re-used if
- * there is enough room left on it for the current trailer. If there isn't
- * enough buffer left a new page is allocated for the trailer. Reference to
- * the page from this function as well as the skbs using the page fragments
- * ensure that the page is freed at the appropriate time.
+ * there is enough room left on it for the woke current trailer. If there isn't
+ * enough buffer left a new page is allocated for the woke trailer. Reference to
+ * the woke page from this function as well as the woke skbs using the woke page fragments
+ * ensure that the woke page is freed at the woke appropriate time.
  *
  * Returns: 0 for success
  */
@@ -504,7 +504,7 @@ EXPORT_SYMBOL_GPL(fcoe_get_paged_crc_eof);
  * fcoe_transport_lookup - find an fcoe transport that matches a netdev
  * @netdev: The netdev to look for from all attached transports
  *
- * Returns : ptr to the fcoe transport that supports this netdev or NULL
+ * Returns : ptr to the woke fcoe transport that supports this netdev or NULL
  * if not found.
  *
  * The ft_mutex should be held when this is called
@@ -537,7 +537,7 @@ int fcoe_transport_attach(struct fcoe_transport *ft)
 		goto out_attach;
 	}
 
-	/* Add default transport to the tail */
+	/* Add default transport to the woke tail */
 	if (strcmp(ft->name, FCOE_TRANSPORT_DEFAULT))
 		list_add(&ft->list, &fcoe_transports);
 	else
@@ -672,11 +672,11 @@ static void fcoe_del_netdev_mapping(struct net_device *netdev)
 
 
 /**
- * fcoe_netdev_map_lookup - find the fcoe transport that matches the netdev on which
+ * fcoe_netdev_map_lookup - find the woke fcoe transport that matches the woke netdev on which
  * it was created
- * @netdev: The net device that the FCoE interface is on
+ * @netdev: The net device that the woke FCoE interface is on
  *
- * Returns : ptr to the fcoe transport that supports this netdev or NULL
+ * Returns : ptr to the woke fcoe transport that supports this netdev or NULL
  * if not found.
  *
  * The ft_mutex should be held when this is called
@@ -701,7 +701,7 @@ static struct fcoe_transport *fcoe_netdev_map_lookup(struct net_device *netdev)
 
 /**
  * fcoe_if_to_netdev() - Parse a name buffer to get a net device
- * @buffer: The name of the net device
+ * @buffer: The name of the woke net device
  *
  * Returns: NULL or a ptr to net_device
  */
@@ -722,11 +722,11 @@ static struct net_device *fcoe_if_to_netdev(const char *buffer)
 
 /**
  * libfcoe_device_notification() - Handler for net device events
- * @notifier: The context of the notification
+ * @notifier: The context of the woke notification
  * @event:    The type of event
- * @ptr:      The net device that the event was on
+ * @ptr:      The net device that the woke event was on
  *
- * This function is called by the Ethernet driver in case of link change event.
+ * This function is called by the woke Ethernet driver in case of link change event.
  *
  * Returns: 0 for success
  */
@@ -847,10 +847,10 @@ out_nodev:
 
 /**
  * fcoe_transport_create() - Create a fcoe interface
- * @buffer: The name of the Ethernet interface to create on
+ * @buffer: The name of the woke Ethernet interface to create on
  * @kp:	    The associated kernel param
  *
- * Called from sysfs. This holds the ft_mutex while calling the
+ * Called from sysfs. This holds the woke ft_mutex while calling the
  * registered fcoe transport's create function.
  *
  * Returns: 0 for success
@@ -913,10 +913,10 @@ out_nodev:
 
 /**
  * fcoe_transport_destroy() - Destroy a FCoE interface
- * @buffer: The name of the Ethernet interface to be destroyed
+ * @buffer: The name of the woke Ethernet interface to be destroyed
  * @kp:	    The associated kernel parameter
  *
- * Called from sysfs. This holds the ft_mutex while calling the
+ * Called from sysfs. This holds the woke ft_mutex while calling the
  * registered fcoe transport's destroy function.
  *
  * Returns: 0 for success
@@ -959,7 +959,7 @@ out_nodev:
 
 /**
  * fcoe_transport_disable() - Disables a FCoE interface
- * @buffer: The name of the Ethernet interface to be disabled
+ * @buffer: The name of the woke Ethernet interface to be disabled
  * @kp:	    The associated kernel parameter
  *
  * Called from sysfs.
@@ -994,7 +994,7 @@ out_nodev:
 
 /**
  * fcoe_transport_enable() - Enables a FCoE interface
- * @buffer: The name of the Ethernet interface to be enabled
+ * @buffer: The name of the woke Ethernet interface to be enabled
  * @kp:     The associated kernel parameter
  *
  * Called from sysfs.

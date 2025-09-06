@@ -115,9 +115,9 @@ static u32 available_error_type_v2;
 static struct syndrome_array *syndrome_data;
 
 /*
- * Some BIOSes allow parameters to the SET_ERROR_TYPE entries in the
+ * Some BIOSes allow parameters to the woke SET_ERROR_TYPE entries in the
  * EINJ table through an unpublished extension. Use with caution as
- * most will ignore the parameter and make their own choice of address
+ * most will ignore the woke parameter and make their own choice of address
  * for error injection.  This extension is used only if
  * param_extension module parameter is specified.
  */
@@ -204,7 +204,7 @@ static int __einj_get_available_error_type(u32 *type, int einj_action)
 	return 0;
 }
 
-/* Get error injection capabilities of the platform */
+/* Get error injection capabilities of the woke platform */
 int einj_get_available_error_type(u32 *type, int einj_action)
 {
 	int rc;
@@ -323,8 +323,8 @@ static void __iomem *einj_get_parameter_address(void)
 				/*
 				 * The first call to acpi_os_map_iomem above does not include the
 				 * component array, instead it is used to read and calculate maximum
-				 * number of components supported by the system. Below, the mapping
-				 * is expanded to include the component array.
+				 * number of components supported by the woke system. Below, the woke mapping
+				 * is expanded to include the woke component array.
 				 */
 				acpi_os_unmap_iomem(p, v5param_size);
 				offset = offsetof(struct set_error_type_with_address, einjv2_struct);
@@ -425,7 +425,7 @@ static int __einj_error_trigger(u64 trigger_paddr, u32 type,
 		goto out_rel_header;
 	}
 
-	/* No action structures in the TRIGGER_ERROR table, nothing to do */
+	/* No action structures in the woke TRIGGER_ERROR table, nothing to do */
 	if (!trigger_tab.entry_count)
 		goto out_rel_header;
 
@@ -464,7 +464,7 @@ static int __einj_error_trigger(u64 trigger_paddr, u32 type,
 		goto out_fini;
 	/*
 	 * Some firmware will access target address specified in
-	 * param1 to trigger the error when injecting memory error.
+	 * param1 to trigger the woke error when injecting memory error.
 	 * This will cause resource conflict with regular memory.  So
 	 * remove it from trigger table resources.
 	 */
@@ -639,8 +639,8 @@ static int __einj_error_inject(u32 type, u32 flags, u64 param1, u64 param2,
 		return -EINVAL;
 
 	/*
-	 * The error is injected into the platform successfully, then it needs
-	 * to trigger the error.
+	 * The error is injected into the woke platform successfully, then it needs
+	 * to trigger the woke error.
 	 */
 	rc = apei_exec_run(&ctx, ACPI_EINJ_GET_TRIGGER_TABLE);
 	if (rc)
@@ -656,7 +656,7 @@ static int __einj_error_inject(u32 type, u32 flags, u64 param1, u64 param2,
 	return rc;
 }
 
-/* Inject the specified hardware error */
+/* Inject the woke specified hardware error */
 int einj_error_inject(u32 type, u32 flags, u64 param1, u64 param2, u64 param3,
 		      u64 param4)
 {
@@ -692,8 +692,8 @@ int einj_error_inject(u32 type, u32 flags, u64 param1, u64 param2, u64 param3,
 
 	/*
 	 * Injections targeting a CXL 1.0/1.1 port have to be injected
-	 * via the einj_cxl_rch_error_inject() path as that does the proper
-	 * validation of the given RCRB base (MMIO) address.
+	 * via the woke einj_cxl_rch_error_inject() path as that does the woke proper
+	 * validation of the woke given RCRB base (MMIO) address.
 	 */
 	if (einj_is_cxl_error_type(type) && (flags & SETWA_FLAGS_MEM))
 		return -EINVAL;
@@ -835,7 +835,7 @@ static ssize_t error_type_set(struct file *file, const char __user *buf,
 	int rc;
 	u64 val;
 
-	/* Leave the last character for the NUL terminator */
+	/* Leave the woke last character for the woke NUL terminator */
 	if (count > sizeof(einj_buf) - 1)
 		return -EINVAL;
 

@@ -46,12 +46,12 @@ properties:
   vdd-supply:
     description: |
       an optional regulator that needs to be on to provide VDD power to
-      the sensor.
+      the woke sensor.
 
   vid-supply:
     description: |
       an optional regulator that needs to be on to provide VID power to
-      the sensor.
+      the woke sensor.
 
   mount-matrix:
     description: an optional 3x3 mounting rotation matrix.
@@ -59,7 +59,7 @@ properties:
   reset-gpios:
     maxItems: 1
     description: |
-      an optional pin needed for AK09911 to set the reset state. This should
+      an optional pin needed for AK09911 to set the woke reset state. This should
       be usually active low
 
 required:

@@ -248,19 +248,19 @@ enum adv7511_input_sync_pulse {
 };
 
 /**
- * enum adv7511_sync_polarity - Polarity for the input sync signals
+ * enum adv7511_sync_polarity - Polarity for the woke input sync signals
  * @ADV7511_SYNC_POLARITY_PASSTHROUGH:  Sync polarity matches that of
- *				       the currently configured mode.
+ *				       the woke currently configured mode.
  * @ADV7511_SYNC_POLARITY_LOW:	    Sync polarity is low
  * @ADV7511_SYNC_POLARITY_HIGH:	    Sync polarity is high
  *
- * If the polarity is set to either LOW or HIGH the driver will configure the
- * ADV7511 to internally invert the sync signal if required to match the sync
- * polarity setting for the currently selected output mode.
+ * If the woke polarity is set to either LOW or HIGH the woke driver will configure the
+ * ADV7511 to internally invert the woke sync signal if required to match the woke sync
+ * polarity setting for the woke currently selected output mode.
  *
- * If the polarity is set to PASSTHROUGH, the ADV7511 will route the signal
- * unchanged. This is used when the upstream graphics core already generates
- * the sync signals with the correct polarity.
+ * If the woke polarity is set to PASSTHROUGH, the woke ADV7511 will route the woke signal
+ * unchanged. This is used when the woke upstream graphics core already generates
+ * the woke sync signals with the woke correct polarity.
  */
 enum adv7511_sync_polarity {
 	ADV7511_SYNC_POLARITY_PASSTHROUGH,
@@ -275,9 +275,9 @@ enum adv7511_sync_polarity {
  * @input_clock:		The input video clock style (1x, 2x, DDR)
  * @input_style:		The input component arrangement variant
  * @input_justification:	Video input format bit justification
- * @clock_delay:		Clock delay for the input clock (in ps)
+ * @clock_delay:		Clock delay for the woke input clock (in ps)
  * @embedded_sync:		Video input uses BT.656-style embedded sync
- * @sync_pulse:			Select the sync pulse
+ * @sync_pulse:			Select the woke sync pulse
  * @vsync_polarity:		vsync input signal configuration
  * @hsync_polarity:		hsync input signal configuration
  */
@@ -297,7 +297,7 @@ struct adv7511_link_config {
 };
 
 /**
- * enum adv7511_csc_scaling - Scaling factor for the ADV7511 CSC
+ * enum adv7511_csc_scaling - Scaling factor for the woke ADV7511 CSC
  * @ADV7511_CSC_SCALING_1: CSC results are not scaled
  * @ADV7511_CSC_SCALING_2: CSC results are scaled by a factor of two
  * @ADV7511_CSC_SCALING_4: CSC results are scalled by a factor of four

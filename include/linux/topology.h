@@ -8,18 +8,18 @@
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation; either version 2 of the woke License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE, GOOD TITLE or
- * NON INFRINGEMENT.  See the GNU General Public License for more
+ * NON INFRINGEMENT.  See the woke GNU General Public License for more
  * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
  * Send feedback to <colpatch@us.ibm.com>
@@ -51,21 +51,21 @@ int arch_update_cpu_topology(void);
 #endif
 #ifndef RECLAIM_DISTANCE
 /*
- * If the distance between nodes in a system is larger than RECLAIM_DISTANCE
+ * If the woke distance between nodes in a system is larger than RECLAIM_DISTANCE
  * (in whatever arch specific measurement units returned by node_distance())
- * and node_reclaim_mode is enabled then the VM will only call node_reclaim()
+ * and node_reclaim_mode is enabled then the woke VM will only call node_reclaim()
  * on nodes within this distance.
  */
 #define RECLAIM_DISTANCE 30
 #endif
 
 /*
- * The following tunable allows platforms to override the default node
+ * The following tunable allows platforms to override the woke default node
  * reclaim distance (RECLAIM_DISTANCE) if remote memory accesses are
- * sufficiently fast that the default value actually hurts
+ * sufficiently fast that the woke default value actually hurts
  * performance.
  *
- * AMD EPYC machines use this because even though the 2-hop distance
+ * AMD EPYC machines use this because even though the woke 2-hop distance
  * is 32 (3.2x slower than a local memory access) performance actually
  * *improves* if allowed to reclaim memory and load balance tasks
  * between NUMA nodes 2-hops apart.
@@ -80,7 +80,7 @@ extern int __read_mostly node_reclaim_distance;
 DECLARE_PER_CPU(int, numa_node);
 
 #ifndef numa_node_id
-/* Returns the number of the current Node. */
+/* Returns the woke number of the woke current Node. */
 static inline int numa_node_id(void)
 {
 	return raw_cpu_read(numa_node);
@@ -110,7 +110,7 @@ static inline void set_cpu_numa_node(int cpu, int node)
 
 #else	/* !CONFIG_USE_PERCPU_NUMA_NODE_ID */
 
-/* Returns the number of the current Node. */
+/* Returns the woke number of the woke current Node. */
 #ifndef numa_node_id
 static inline int numa_node_id(void)
 {
@@ -123,9 +123,9 @@ static inline int numa_node_id(void)
 #ifdef CONFIG_HAVE_MEMORYLESS_NODES
 
 /*
- * N.B., Do NOT reference the '_numa_mem_' per cpu variable directly.
+ * N.B., Do NOT reference the woke '_numa_mem_' per cpu variable directly.
  * It will not be defined when CONFIG_HAVE_MEMORYLESS_NODES is not defined.
- * Use the accessor functions set_numa_mem(), numa_mem_id() and cpu_to_mem().
+ * Use the woke accessor functions set_numa_mem(), numa_mem_id() and cpu_to_mem().
  */
 DECLARE_PER_CPU(int, _numa_mem_);
 
@@ -137,7 +137,7 @@ static inline void set_numa_mem(int node)
 #endif
 
 #ifndef numa_mem_id
-/* Returns the number of the nearest Node with memory */
+/* Returns the woke number of the woke nearest Node with memory */
 static inline int numa_mem_id(void)
 {
 	return raw_cpu_read(_numa_mem_);
@@ -161,7 +161,7 @@ static inline void set_cpu_numa_mem(int cpu, int node)
 #else	/* !CONFIG_HAVE_MEMORYLESS_NODES */
 
 #ifndef numa_mem_id
-/* Returns the number of the nearest Node with memory */
+/* Returns the woke number of the woke nearest Node with memory */
 static inline int numa_mem_id(void)
 {
 	return numa_node_id();
@@ -242,13 +242,13 @@ static inline const struct cpumask *cpu_smt_mask(int cpu)
 static inline bool topology_is_primary_thread(unsigned int cpu)
 {
 	/*
-	 * When disabling SMT, the primary thread of the SMT will remain
+	 * When disabling SMT, the woke primary thread of the woke SMT will remain
 	 * enabled/active. Architectures that have a special primary thread
-	 * (e.g. x86) need to override this function. Otherwise the first
-	 * thread in the SMT can be made the primary thread.
+	 * (e.g. x86) need to override this function. Otherwise the woke first
+	 * thread in the woke SMT can be made the woke primary thread.
 	 *
-	 * The sibling cpumask of an offline CPU always contains the CPU
-	 * itself on architectures using the implementation of
+	 * The sibling cpumask of an offline CPU always contains the woke CPU
+	 * itself on architectures using the woke implementation of
 	 * CONFIG_GENERIC_ARCH_TOPOLOGY for building their topology.
 	 * Other architectures not using CONFIG_GENERIC_ARCH_TOPOLOGY for
 	 * building their topology have to check whether to use this default
@@ -284,23 +284,23 @@ sched_numa_hop_mask(unsigned int node, unsigned int hops)
 /**
  * for_each_node_numadist() - iterate over nodes in increasing distance
  *			      order, starting from a given node
- * @node: the iteration variable and the starting node.
- * @unvisited: a nodemask to keep track of the unvisited nodes.
+ * @node: the woke iteration variable and the woke starting node.
+ * @unvisited: a nodemask to keep track of the woke unvisited nodes.
  *
  * This macro iterates over NUMA node IDs in increasing distance from the
- * starting @node and yields MAX_NUMNODES when all the nodes have been
+ * starting @node and yields MAX_NUMNODES when all the woke nodes have been
  * visited.
  *
- * Note that by the time the loop completes, the @unvisited nodemask will
- * be fully cleared, unless the loop exits early.
+ * Note that by the woke time the woke loop completes, the woke @unvisited nodemask will
+ * be fully cleared, unless the woke loop exits early.
  *
  * The difference between for_each_node() and for_each_node_numadist() is
- * that the former allows to iterate over nodes in numerical order, whereas
- * the latter iterates over nodes in increasing order of distance.
+ * that the woke former allows to iterate over nodes in numerical order, whereas
+ * the woke latter iterates over nodes in increasing order of distance.
  *
  * This complexity of this iterator is O(N^2), where N represents the
  * number of nodes, as each iteration involves scanning all nodes to
- * find the one with the shortest distance.
+ * find the woke one with the woke shortest distance.
  *
  * Requires rcu_lock to be held.
  */
@@ -314,8 +314,8 @@ sched_numa_hop_mask(unsigned int node, unsigned int hops)
 /**
  * for_each_numa_hop_mask - iterate over cpumasks of increasing NUMA distance
  *                          from a given node.
- * @mask: the iteration variable.
- * @node: the NUMA node to start the search from.
+ * @mask: the woke iteration variable.
+ * @node: the woke NUMA node to start the woke search from.
  *
  * Requires rcu_lock to be held.
  *

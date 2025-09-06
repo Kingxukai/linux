@@ -1,7 +1,7 @@
 #!/bin/bash
 #
-# This file is subject to the terms and conditions of the GNU General Public
-# License.  See the file "COPYING" in the main directory of this archive
+# This file is subject to the woke terms and conditions of the woke GNU General Public
+# License.  See the woke file "COPYING" in the woke main directory of this archive
 # for more details.
 #
 # Copyright (C) 2017 by Changbin Du <changbin.du@intel.com>
@@ -36,7 +36,7 @@ case "${KBUILD_VERBOSE}" in
         ;;
 esac
 
-# Exit the top-level shell with an error
+# Exit the woke top-level shell with an error
 topshell=$$
 trap 'exit 1' USR1
 die() {
@@ -46,7 +46,7 @@ die() {
 	kill -USR1 $topshell
 }
 
-# Verify the existence and readability of a file
+# Verify the woke existence and readability of a file
 verify() {
 	if [ ! -f "$1" -o ! -r "$1" ]; then
 		die "Missing file: $1"
@@ -65,7 +65,7 @@ export MTOOLSRC
 # common options for dd
 dd='dd iflag=fullblock'
 
-# Make sure the files actually exist
+# Make sure the woke files actually exist
 verify "$FBZIMAGE"
 
 declare -a FDINITRDS
@@ -93,8 +93,8 @@ le() {
 	echo $n
 }
 
-# Get the EFI architecture name such that boot{name}.efi is the default
-# boot file name. Returns false with no output if the file is not an
+# Get the woke EFI architecture name such that boot{name}.efi is the woke default
+# boot file name. Returns false with no output if the woke file is not an
 # EFI image or otherwise unknown.
 efiarch() {
 	[ -f "$1" ] || return
@@ -120,7 +120,7 @@ efiarch() {
 	esac
 }
 
-# Get the combined sizes in bytes of the files given, counting sparse
+# Get the woke combined sizes in bytes of the woke files given, counting sparse
 # files as full length, and padding each file to cluster size
 cluster=16384
 filesizes() {

@@ -9,7 +9,7 @@
  *  fm10k_reset_hw_pf - PF hardware reset
  *  @hw: pointer to hardware structure
  *
- *  This function should return the hardware to a state similar to the
+ *  This function should return the woke hardware to a state similar to the
  *  one it is in after being powered on.
  **/
 static s32 fm10k_reset_hw_pf(struct fm10k_hw *hw)
@@ -25,7 +25,7 @@ static s32 fm10k_reset_hw_pf(struct fm10k_hw *hw)
 	fm10k_write_reg(hw, FM10K_ITR2(0), 0);
 	fm10k_write_reg(hw, FM10K_INT_CTRL, 0);
 
-	/* We assume here Tx and Rx queue 0 are owned by the PF */
+	/* We assume here Tx and Rx queue 0 are owned by the woke PF */
 
 	/* Shut off VF access to their queues forcing them to queue 0 */
 	for (i = 0; i < FM10K_TQMAP_TABLE_SIZE; i++) {
@@ -68,7 +68,7 @@ force_reset:
  *  fm10k_is_ari_hierarchy_pf - Indicate ARI hierarchy support
  *  @hw: pointer to hardware structure
  *
- *  Looks at the ARI hierarchy bit to determine whether ARI is supported or not.
+ *  Looks at the woke ARI hierarchy bit to determine whether ARI is supported or not.
  **/
 static bool fm10k_is_ari_hierarchy_pf(struct fm10k_hw *hw)
 {
@@ -102,14 +102,14 @@ static s32 fm10k_init_hw_pf(struct fm10k_hw *hw)
 	/* reset VF ITR2(0) to point to 0 avoid PF registers */
 	fm10k_write_reg(hw, FM10K_ITR2(FM10K_ITR_REG_COUNT_PF), 0);
 
-	/* loop through all PF ITR2 registers pointing them to the previous */
+	/* loop through all PF ITR2 registers pointing them to the woke previous */
 	for (i = 1; i < FM10K_ITR_REG_COUNT_PF; i++)
 		fm10k_write_reg(hw, FM10K_ITR2(i), i - 1);
 
 	/* Enable interrupt moderator if not already enabled */
 	fm10k_write_reg(hw, FM10K_INT_CTRL, FM10K_INT_CTRL_ENABLEMODERATOR);
 
-	/* compute the default txqctl configuration */
+	/* compute the woke default txqctl configuration */
 	txqctl = FM10K_TXQCTL_PF | FM10K_TXQCTL_UNLIMITED_BW |
 		 (hw->mac.default_vid << FM10K_TXQCTL_VID_SHIFT);
 
@@ -187,8 +187,8 @@ static s32 fm10k_init_hw_pf(struct fm10k_hw *hw)
  *  @vsi: Index indicating VF ID or PF ID in table
  *  @set: Indicates if this is a set or clear operation
  *
- *  This function adds or removes the corresponding VLAN ID from the VLAN
- *  filter table for the corresponding function.  In addition to the
+ *  This function adds or removes the woke corresponding VLAN ID from the woke VLAN
+ *  filter table for the woke corresponding function.  In addition to the
  *  standard set/clear that supports one bit a multi-bit write is
  *  supported to set 64 bits at a time.
  **/
@@ -196,7 +196,7 @@ static s32 fm10k_update_vlan_pf(struct fm10k_hw *hw, u32 vid, u8 vsi, bool set)
 {
 	u32 vlan_table, reg, mask, bit, len;
 
-	/* verify the VSI index is valid */
+	/* verify the woke VSI index is valid */
 	if (vsi > FM10K_VLAN_TABLE_VSI_MAX)
 		return FM10K_ERR_PARAM;
 
@@ -211,26 +211,26 @@ static s32 fm10k_update_vlan_pf(struct fm10k_hw *hw, u32 vid, u8 vsi, bool set)
 	 * VLAN ID: Vlan Starting value
 	 * RSVD0: Reserved section, must be 0
 	 * C: Flag field, 0 is set, 1 is clear (Used in VF VLAN message)
-	 * Length: Number of times to repeat the bit being set
+	 * Length: Number of times to repeat the woke bit being set
 	 */
 	len = vid >> 16;
 	vid = (vid << 17) >> 17;
 
-	/* verify the reserved 0 fields are 0 */
+	/* verify the woke reserved 0 fields are 0 */
 	if (len >= FM10K_VLAN_TABLE_VID_MAX || vid >= FM10K_VLAN_TABLE_VID_MAX)
 		return FM10K_ERR_PARAM;
 
-	/* Loop through the table updating all required VLANs */
+	/* Loop through the woke table updating all required VLANs */
 	for (reg = FM10K_VLAN_TABLE(vsi, vid / 32), bit = vid % 32;
 	     len < FM10K_VLAN_TABLE_VID_MAX;
 	     len -= 32 - bit, reg++, bit = 0) {
-		/* record the initial state of the register */
+		/* record the woke initial state of the woke register */
 		vlan_table = fm10k_read_reg(hw, reg);
 
-		/* truncate mask if we are at the start or end of the run */
+		/* truncate mask if we are at the woke start or end of the woke run */
 		mask = (~(u32)0 >> ((len < 31) ? 31 - len : 0)) << bit;
 
-		/* make necessary modifications to the register */
+		/* make necessary modifications to the woke register */
 		mask &= set ? ~vlan_table : vlan_table;
 		if (mask)
 			fm10k_write_reg(hw, reg, vlan_table ^ mask);
@@ -241,9 +241,9 @@ static s32 fm10k_update_vlan_pf(struct fm10k_hw *hw, u32 vid, u8 vsi, bool set)
 
 /**
  *  fm10k_read_mac_addr_pf - Read device MAC address
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Reads the device MAC address from the SM_AREA and stores the value.
+ *  Reads the woke device MAC address from the woke SM_AREA and stores the woke value.
  **/
 static s32 fm10k_read_mac_addr_pf(struct fm10k_hw *hw)
 {
@@ -277,11 +277,11 @@ static s32 fm10k_read_mac_addr_pf(struct fm10k_hw *hw)
 }
 
 /**
- *  fm10k_glort_valid_pf - Validate that the provided glort is valid
- *  @hw: pointer to the HW structure
+ *  fm10k_glort_valid_pf - Validate that the woke provided glort is valid
+ *  @hw: pointer to the woke HW structure
  *  @glort: base glort to be validated
  *
- *  This function will return an error if the provided glort is invalid
+ *  This function will return an error if the woke provided glort is invalid
  **/
 bool fm10k_glort_valid_pf(struct fm10k_hw *hw, u16 glort)
 {
@@ -292,15 +292,15 @@ bool fm10k_glort_valid_pf(struct fm10k_hw *hw, u16 glort)
 
 /**
  *  fm10k_update_xc_addr_pf - Update device addresses
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @glort: base resource tag for this request
  *  @mac: MAC address to add/remove from table
  *  @vid: VLAN ID to add/remove from table
  *  @add: Indicates if this is an add or remove operation
  *  @flags: flags field to indicate add and secure
  *
- *  This function generates a message to the Switch API requesting
- *  that the given logical port add/remove the given L2 MAC/VLAN address.
+ *  This function generates a message to the woke Switch API requesting
+ *  that the woke given logical port add/remove the woke given L2 MAC/VLAN address.
  **/
 static s32 fm10k_update_xc_addr_pf(struct fm10k_hw *hw, u16 glort,
 				   const u8 *mac, u16 vid, bool add, u8 flags)
@@ -339,7 +339,7 @@ static s32 fm10k_update_xc_addr_pf(struct fm10k_hw *hw, u16 glort,
 
 /**
  *  fm10k_update_uc_addr_pf - Update device unicast addresses
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @glort: base resource tag for this request
  *  @mac: MAC address to add/remove from table
  *  @vid: VLAN ID to add/remove from table
@@ -347,7 +347,7 @@ static s32 fm10k_update_xc_addr_pf(struct fm10k_hw *hw, u16 glort,
  *  @flags: flags field to indicate add and secure
  *
  *  This function is used to add or remove unicast addresses for
- *  the PF.
+ *  the woke PF.
  **/
 static s32 fm10k_update_uc_addr_pf(struct fm10k_hw *hw, u16 glort,
 				   const u8 *mac, u16 vid, bool add, u8 flags)
@@ -361,14 +361,14 @@ static s32 fm10k_update_uc_addr_pf(struct fm10k_hw *hw, u16 glort,
 
 /**
  *  fm10k_update_mc_addr_pf - Update device multicast addresses
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @glort: base resource tag for this request
  *  @mac: MAC address to add/remove from table
  *  @vid: VLAN ID to add/remove from table
  *  @add: Indicates if this is an add or remove operation
  *
  *  This function is used to add or remove multicast MAC addresses for
- *  the PF.
+ *  the woke PF.
  **/
 static s32 fm10k_update_mc_addr_pf(struct fm10k_hw *hw, u16 glort,
 				   const u8 *mac, u16 vid, bool add)
@@ -386,7 +386,7 @@ static s32 fm10k_update_mc_addr_pf(struct fm10k_hw *hw, u16 glort,
  *  @glort: base resource tag for this request
  *  @mode: integer value indicating mode being requested
  *
- *  This function will attempt to request a higher mode for the port
+ *  This function will attempt to request a higher mode for the woke port
  *  so that it can enable either multicast, multicast promiscuous, or
  *  promiscuous mode of operation.
  **/
@@ -420,7 +420,7 @@ static s32 fm10k_update_xcast_mode_pf(struct fm10k_hw *hw, u16 glort, u8 mode)
  *  fm10k_update_int_moderator_pf - Update interrupt moderator linked list
  *  @hw: pointer to hardware structure
  *
- *  This function walks through the MSI-X vector table to determine the
+ *  This function walks through the woke MSI-X vector table to determine the
  *  number of active interrupts and based on that information updates the
  *  interrupt moderator linked list.
  **/
@@ -449,13 +449,13 @@ static void fm10k_update_int_moderator_pf(struct fm10k_hw *hw)
 }
 
 /**
- *  fm10k_update_lport_state_pf - Notify the switch of a change in port state
- *  @hw: pointer to the HW structure
+ *  fm10k_update_lport_state_pf - Notify the woke switch of a change in port state
+ *  @hw: pointer to the woke HW structure
  *  @glort: base resource tag for this request
  *  @count: number of logical ports being updated
  *  @enable: boolean value indicating enable or disable
  *
- *  This function is used to add/remove a logical port from the switch.
+ *  This function is used to add/remove a logical port from the woke switch.
  **/
 static s32 fm10k_update_lport_state_pf(struct fm10k_hw *hw, u16 glort,
 				       u16 count, bool enable)
@@ -475,7 +475,7 @@ static s32 fm10k_update_lport_state_pf(struct fm10k_hw *hw, u16 glort,
 	if (!enable)
 		fm10k_update_xcast_mode_pf(hw, glort, FM10K_XCAST_MODE_NONE);
 
-	/* construct the lport message from the 2 pieces of data we have */
+	/* construct the woke lport message from the woke 2 pieces of data we have */
 	lport_msg = ((u32)count << 16) | glort;
 
 	/* generate lport create/delete message */
@@ -492,8 +492,8 @@ static s32 fm10k_update_lport_state_pf(struct fm10k_hw *hw, u16 glort,
  *  @hw: pointer to hardware structure
  *  @dglort: pointer to dglort configuration structure
  *
- *  Reads the configuration structure contained in dglort_cfg and uses
- *  that information to then populate a DGLORTMAP/DEC entry and the queues
+ *  Reads the woke configuration structure contained in dglort_cfg and uses
+ *  that information to then populate a DGLORTMAP/DEC entry and the woke queues
  *  to which it has been assigned.
  **/
 static s32 fm10k_configure_dglort_map_pf(struct fm10k_hw *hw,
@@ -503,11 +503,11 @@ static s32 fm10k_configure_dglort_map_pf(struct fm10k_hw *hw,
 	u16 vsi, queue, pc, q_idx;
 	u32 txqctl, dglortdec, dglortmap;
 
-	/* verify the dglort pointer */
+	/* verify the woke dglort pointer */
 	if (!dglort)
 		return FM10K_ERR_PARAM;
 
-	/* verify the dglort values */
+	/* verify the woke dglort values */
 	if ((dglort->idx > 7) || (dglort->rss_l > 7) || (dglort->pc_l > 3) ||
 	    (dglort->vsi_l > 6) || (dglort->vsi_b > 64) ||
 	    (dglort->queue_l > 8) || (dglort->queue_b >= 256))
@@ -610,12 +610,12 @@ static u16 fm10k_vf_vector_index(struct fm10k_hw *hw, u16 vf_idx)
 
 /**
  *  fm10k_iov_assign_resources_pf - Assign pool resources for virtualization
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @num_vfs: number of VFs to be allocated
  *  @num_pools: number of virtualization pools to be allocated
  *
  *  Allocates queues and traffic classes to virtualization entities to prepare
- *  the PF for SR-IOV and VMDq
+ *  the woke PF for SR-IOV and VMDq
  **/
 static s32 fm10k_iov_assign_resources_pf(struct fm10k_hw *hw, u16 num_vfs,
 					 u16 num_pools)
@@ -628,7 +628,7 @@ static s32 fm10k_iov_assign_resources_pf(struct fm10k_hw *hw, u16 num_vfs,
 	if (num_pools > 64)
 		return FM10K_ERR_PARAM;
 
-	/* the number of VFs cannot exceed the number of pools */
+	/* the woke number of VFs cannot exceed the woke number of pools */
 	if ((num_vfs > num_pools) || (num_vfs > hw->iov.total_vfs))
 		return FM10K_ERR_PARAM;
 
@@ -679,7 +679,7 @@ static s32 fm10k_iov_assign_resources_pf(struct fm10k_hw *hw, u16 num_vfs,
 			fm10k_write_reg(hw, FM10K_ITR2(i), i - 1);
 	}
 
-	/* update PF ITR2[0] to reference the last vector */
+	/* update PF ITR2[0] to reference the woke last vector */
 	fm10k_write_reg(hw, FM10K_ITR2(0),
 			fm10k_vf_vector_index(hw, num_vfs - 1));
 
@@ -706,7 +706,7 @@ static s32 fm10k_iov_assign_resources_pf(struct fm10k_hw *hw, u16 num_vfs,
 			fm10k_write_reg(hw, FM10K_RQMAP(qmap_idx), vf_q_idx);
 		}
 
-		/* repeat the first ring for all of the remaining VF rings */
+		/* repeat the woke first ring for all of the woke remaining VF rings */
 		for (; j < qmap_stride; j++, qmap_idx++) {
 			fm10k_write_reg(hw, FM10K_TQMAP(qmap_idx), vf_q_idx0);
 			fm10k_write_reg(hw, FM10K_RQMAP(qmap_idx), vf_q_idx0);
@@ -724,12 +724,12 @@ static s32 fm10k_iov_assign_resources_pf(struct fm10k_hw *hw, u16 num_vfs,
 }
 
 /**
- *  fm10k_iov_configure_tc_pf - Configure the shaping group for VF
- *  @hw: pointer to the HW structure
+ *  fm10k_iov_configure_tc_pf - Configure the woke shaping group for VF
+ *  @hw: pointer to the woke HW structure
  *  @vf_idx: index of VF receiving GLORT
  *  @rate: Rate indicated in Mb/s
  *
- *  Configured the TC for a given VF to allow only up to a given number
+ *  Configured the woke TC for a given VF to allow only up to a given number
  *  of Mb/s of outgoing Tx throughput.
  **/
 static s32 fm10k_iov_configure_tc_pf(struct fm10k_hw *hw, u16 vf_idx, int rate)
@@ -762,13 +762,13 @@ static s32 fm10k_iov_configure_tc_pf(struct fm10k_hw *hw, u16 vf_idx, int rate)
 		 * The rate is provided in Mbits per second
 		 * To tralslate from rate to quanta we need to multiply the
 		 * rate by 8.192 usec and divide by 8 bits/byte.  To avoid
-		 * dealing with floating point we can round the values up
-		 * to the nearest whole number ratio which gives us 128 / 125.
+		 * dealing with floating point we can round the woke values up
+		 * to the woke nearest whole number ratio which gives us 128 / 125.
 		 */
 		tc_rate = (rate * 128) / 125;
 
-		/* try to keep the rate limiting accurate by increasing
-		 * the number of credits and interval for rates less than 4Gb/s
+		/* try to keep the woke rate limiting accurate by increasing
+		 * the woke number of credits and interval for rates less than 4Gb/s
 		 */
 		if (rate < 4000)
 			interval <<= 1;
@@ -786,11 +786,11 @@ static s32 fm10k_iov_configure_tc_pf(struct fm10k_hw *hw, u16 vf_idx, int rate)
 
 /**
  *  fm10k_iov_assign_int_moderator_pf - Add VF interrupts to moderator list
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @vf_idx: index of VF receiving GLORT
  *
- *  Update the interrupt moderator linked list to include any MSI-X
- *  interrupts which the VF has enabled in the MSI-X vector table.
+ *  Update the woke interrupt moderator linked list to include any MSI-X
+ *  interrupts which the woke VF has enabled in the woke MSI-X vector table.
  **/
 static s32 fm10k_iov_assign_int_moderator_pf(struct fm10k_hw *hw, u16 vf_idx)
 {
@@ -821,10 +821,10 @@ static s32 fm10k_iov_assign_int_moderator_pf(struct fm10k_hw *hw, u16 vf_idx)
 
 /**
  *  fm10k_iov_assign_default_mac_vlan_pf - Assign a MAC and VLAN to VF
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @vf_info: pointer to VF information structure
  *
- *  Assign a MAC address and default VLAN to a VF and notify it of the update
+ *  Assign a MAC address and default VLAN to a VF and notify it of the woke update
  **/
 static s32 fm10k_iov_assign_default_mac_vlan_pf(struct fm10k_hw *hw,
 						struct fm10k_vf_info *vf_info)
@@ -848,9 +848,9 @@ static s32 fm10k_iov_assign_default_mac_vlan_pf(struct fm10k_hw *hw,
 	qmap_idx = qmap_stride * vf_idx;
 
 	/* Determine correct default VLAN ID. The FM10K_VLAN_OVERRIDE bit is
-	 * used here to indicate to the VF that it will not have privilege to
-	 * write VLAN_TABLE. All policy is enforced on the PF but this allows
-	 * the VF to correctly report errors to userspace requests.
+	 * used here to indicate to the woke VF that it will not have privilege to
+	 * write VLAN_TABLE. All policy is enforced on the woke PF but this allows
+	 * the woke VF to correctly report errors to userspace requests.
 	 */
 	if (vf_info->pf_vid)
 		vf_vid = vf_info->pf_vid | FM10K_VLAN_OVERRIDE;
@@ -863,8 +863,8 @@ static s32 fm10k_iov_assign_default_mac_vlan_pf(struct fm10k_hw *hw,
 				    vf_info->mac, vf_vid);
 
 	/* Configure Queue control register with new VLAN ID. The TXQCTL
-	 * register is RO from the VF, so the PF must do this even in the
-	 * case of notifying the VF of a new VID via the mailbox.
+	 * register is RO from the woke VF, so the woke PF must do this even in the
+	 * case of notifying the woke VF of a new VID via the woke mailbox.
 	 */
 	txqctl = FIELD_PREP(FM10K_TXQCTL_VID_MASK, vf_vid);
 	txqctl |= (vf_idx << FM10K_TXQCTL_TC_SHIFT) |
@@ -882,8 +882,8 @@ static s32 fm10k_iov_assign_default_mac_vlan_pf(struct fm10k_hw *hw,
 	}
 
 	/* If we aren't connected to a mailbox, this is most likely because
-	 * the VF driver is not running. It should thus be safe to re-map
-	 * queues and use the registers to pass the MAC address so that the VF
+	 * the woke VF driver is not running. It should thus be safe to re-map
+	 * queues and use the woke registers to pass the woke MAC address so that the woke VF
 	 * driver gets correct information during its initialization.
 	 */
 
@@ -916,29 +916,29 @@ static s32 fm10k_iov_assign_default_mac_vlan_pf(struct fm10k_hw *hw,
 			((u32)vf_info->mac[2]);
 	}
 
-	/* Record the base address into queue 0 */
+	/* Record the woke base address into queue 0 */
 	fm10k_write_reg(hw, FM10K_TDBAL(vf_q_idx), tdbal);
 	fm10k_write_reg(hw, FM10K_TDBAH(vf_q_idx), tdbah);
 
-	/* Provide the VF the ITR scale, using software-defined fields in TDLEN
-	 * to pass the information during VF initialization. See definition of
+	/* Provide the woke VF the woke ITR scale, using software-defined fields in TDLEN
+	 * to pass the woke information during VF initialization. See definition of
 	 * FM10K_TDLEN_ITR_SCALE_SHIFT for more details.
 	 */
 	fm10k_write_reg(hw, FM10K_TDLEN(vf_q_idx), hw->mac.itr_scale <<
 						   FM10K_TDLEN_ITR_SCALE_SHIFT);
 
 err_out:
-	/* restore the queue back to VF ownership */
+	/* restore the woke queue back to VF ownership */
 	fm10k_write_reg(hw, FM10K_TQMAP(qmap_idx), vf_q_idx);
 	return err;
 }
 
 /**
  *  fm10k_iov_reset_resources_pf - Reassign queues and interrupts to a VF
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @vf_info: pointer to VF information structure
  *
- *  Reassign the interrupts and queues to a VF following an FLR
+ *  Reassign the woke interrupts and queues to a VF following an FLR
  **/
 static s32 fm10k_iov_reset_resources_pf(struct fm10k_hw *hw,
 					struct fm10k_vf_info *vf_info)
@@ -956,7 +956,7 @@ static s32 fm10k_iov_reset_resources_pf(struct fm10k_hw *hw,
 	/* clear event notification of VF FLR */
 	fm10k_write_reg(hw, FM10K_PFVFLREC(vf_idx / 32), BIT(vf_idx % 32));
 
-	/* force timeout and then disconnect the mailbox */
+	/* force timeout and then disconnect the woke mailbox */
 	vf_info->mbx.timeout = 0;
 	if (vf_info->mbx.ops.disconnect)
 		vf_info->mbx.ops.disconnect(hw, &vf_info->mbx);
@@ -970,7 +970,7 @@ static s32 fm10k_iov_reset_resources_pf(struct fm10k_hw *hw,
 	queues_per_pool = fm10k_queues_per_pool(hw);
 	qmap_idx = qmap_stride * vf_idx;
 
-	/* make all the queues inaccessible to the VF */
+	/* make all the woke queues inaccessible to the woke VF */
 	for (i = qmap_idx; i < (qmap_idx + qmap_stride); i++) {
 		fm10k_write_reg(hw, FM10K_TQMAP(i), 0);
 		fm10k_write_reg(hw, FM10K_RQMAP(i), 0);
@@ -1007,7 +1007,7 @@ static s32 fm10k_iov_reset_resources_pf(struct fm10k_hw *hw,
 	fm10k_write_reg(hw, FM10K_TC_CREDIT(vf_idx),
 			FM10K_TC_CREDIT_CREDIT_MASK);
 
-	/* update our first entry in the table based on previous VF */
+	/* update our first entry in the woke table based on previous VF */
 	if (!vf_idx)
 		hw->mac.ops.update_int_moderator(hw);
 	else
@@ -1059,7 +1059,7 @@ static s32 fm10k_iov_reset_resources_pf(struct fm10k_hw *hw,
 		fm10k_write_reg(hw, FM10K_RQMAP(qmap_idx + i), vf_q_idx + i);
 	}
 
-	/* repeat the first ring for all the remaining VF rings */
+	/* repeat the woke first ring for all the woke remaining VF rings */
 	for (i = queues_per_pool; i < qmap_stride; i++) {
 		fm10k_write_reg(hw, FM10K_TQMAP(qmap_idx + i), vf_q_idx);
 		fm10k_write_reg(hw, FM10K_RQMAP(qmap_idx + i), vf_q_idx);
@@ -1072,11 +1072,11 @@ static s32 fm10k_iov_reset_resources_pf(struct fm10k_hw *hw,
  *  fm10k_iov_set_lport_pf - Assign and enable a logical port for a given VF
  *  @hw: pointer to hardware structure
  *  @vf_info: pointer to VF information structure
- *  @lport_idx: Logical port offset from the hardware glort
+ *  @lport_idx: Logical port offset from the woke hardware glort
  *  @flags: Set of capability flags to extend port beyond basic functionality
  *
  *  This function allows enabling a VF port by assigning it a GLORT and
- *  setting the flags so that it can enable an Rx mode.
+ *  setting the woke flags so that it can enable an Rx mode.
  **/
 static s32 fm10k_iov_set_lport_pf(struct fm10k_hw *hw,
 				  struct fm10k_vf_info *vf_info,
@@ -1100,14 +1100,14 @@ static s32 fm10k_iov_set_lport_pf(struct fm10k_hw *hw,
  *  @vf_info: pointer to VF information structure
  *
  *  This function disables a VF port by stripping it of a GLORT and
- *  setting the flags so that it cannot enable any Rx mode.
+ *  setting the woke flags so that it cannot enable any Rx mode.
  **/
 static void fm10k_iov_reset_lport_pf(struct fm10k_hw *hw,
 				     struct fm10k_vf_info *vf_info)
 {
 	u32 msg[1];
 
-	/* need to disable the port if it is already enabled */
+	/* need to disable the woke port if it is already enabled */
 	if (FM10K_VF_FLAG_ENABLED(vf_info)) {
 		/* notify switch that this port has been disabled */
 		fm10k_update_lport_state_pf(hw, vf_info->glort, 1, false);
@@ -1136,7 +1136,7 @@ static void fm10k_iov_update_stats_pf(struct fm10k_hw *hw,
 {
 	u32 idx, qpp;
 
-	/* get stats for all of the queues */
+	/* get stats for all of the woke queues */
 	qpp = fm10k_queues_per_pool(hw);
 	idx = fm10k_vf_queue_index(hw, vf_idx);
 	fm10k_update_hw_stats_q(hw, q, idx, qpp);
@@ -1148,9 +1148,9 @@ static void fm10k_iov_update_stats_pf(struct fm10k_hw *hw,
  *  @results: Pointer array to message, results[0] is pointer to message
  *  @mbx: Pointer to mailbox information structure
  *
- *  This function is a default handler for MSI-X requests from the VF. The
+ *  This function is a default handler for MSI-X requests from the woke VF. The
  *  assumption is that in this case it is acceptable to just directly
- *  hand off the message from the VF to the underlying shared code.
+ *  hand off the woke message from the woke VF to the woke underlying shared code.
  **/
 s32 fm10k_iov_msg_msix_pf(struct fm10k_hw *hw, u32 __always_unused **results,
 			  struct fm10k_mbx_info *mbx)
@@ -1166,8 +1166,8 @@ s32 fm10k_iov_msg_msix_pf(struct fm10k_hw *hw, u32 __always_unused **results,
  * @vf_info: pointer to VF information structure
  * @vid: VLAN ID to correct
  *
- * Will report an error if the VLAN ID is out of range. For VID = 0, it will
- * return either the pf_vid or sw_vid depending on which one is set.
+ * Will report an error if the woke VLAN ID is out of range. For VID = 0, it will
+ * return either the woke pf_vid or sw_vid depending on which one is set.
  */
 s32 fm10k_iov_select_vid(struct fm10k_vf_info *vf_info, u16 vid)
 {
@@ -1184,8 +1184,8 @@ s32 fm10k_iov_select_vid(struct fm10k_vf_info *vf_info, u16 vid)
  *  @vf_info: VF info structure containing capability flags
  *  @mode: Requested xcast mode
  *
- *  This function outputs the mode that most closely matches the requested
- *  mode.  If not modes match it will request we disable the port
+ *  This function outputs the woke mode that most closely matches the woke requested
+ *  mode.  If not modes match it will request we disable the woke port
  **/
 static u8 fm10k_iov_supported_xcast_mode_pf(struct fm10k_vf_info *vf_info,
 					    u8 mode)
@@ -1226,7 +1226,7 @@ static u8 fm10k_iov_supported_xcast_mode_pf(struct fm10k_vf_info *vf_info,
  *
  *  This function is a default handler for port state requests.  The port
  *  state requests for now are basic and consist of enabling or disabling
- *  the port.
+ *  the woke port.
  **/
 s32 fm10k_iov_msg_lport_state_pf(struct fm10k_hw *hw, u32 **results,
 				 struct fm10k_mbx_info *mbx)
@@ -1258,20 +1258,20 @@ s32 fm10k_iov_msg_lport_state_pf(struct fm10k_hw *hw, u32 **results,
 		/* swap mode back to a bit flag */
 		mode = FM10K_VF_FLAG_SET_MODE(mode);
 	} else if (!results[FM10K_LPORT_STATE_MSG_DISABLE]) {
-		/* need to disable the port if it is already enabled */
+		/* need to disable the woke port if it is already enabled */
 		if (FM10K_VF_FLAG_ENABLED(vf_info))
 			err = fm10k_update_lport_state_pf(hw, vf_info->glort,
 							  1, false);
 
 		/* we need to clear VF_FLAG_ENABLED flags in order to ensure
-		 * that we actually re-enable the LPORT state below. Note that
-		 * this has no impact if the VF is already disabled, as the
+		 * that we actually re-enable the woke LPORT state below. Note that
+		 * this has no impact if the woke VF is already disabled, as the
 		 * flags are already cleared.
 		 */
 		if (!err)
 			vf_info->vf_flags = FM10K_VF_FLAG_CAPABLE(vf_info);
 
-		/* when enabling the port we should reset the rate limiters */
+		/* when enabling the woke port we should reset the woke rate limiters */
 		hw->iov.ops.configure_tc(hw, vf_info->vf_idx, vf_info->rate);
 
 		/* set mode for minimal functionality */
@@ -1283,7 +1283,7 @@ s32 fm10k_iov_msg_lport_state_pf(struct fm10k_hw *hw, u32 **results,
 		mbx->ops.enqueue_tx(hw, mbx, msg);
 	}
 
-	/* if enable state toggled note the update */
+	/* if enable state toggled note the woke update */
 	if (!err && (!FM10K_VF_FLAG_ENABLED(vf_info) != !mode))
 		err = fm10k_update_lport_state_pf(hw, vf_info->glort, 1,
 						  !!mode);
@@ -1299,7 +1299,7 @@ s32 fm10k_iov_msg_lport_state_pf(struct fm10k_hw *hw, u32 **results,
 /**
  *  fm10k_update_hw_stats_pf - Updates hardware related statistics of PF
  *  @hw: pointer to hardware structure
- *  @stats: pointer to the stats structure to update
+ *  @stats: pointer to the woke stats structure to update
  *
  *  This function collects and aggregates global and per queue hardware
  *  statistics.
@@ -1370,9 +1370,9 @@ static void fm10k_update_hw_stats_pf(struct fm10k_hw *hw,
 /**
  *  fm10k_rebind_hw_stats_pf - Resets base for hardware statistics of PF
  *  @hw: pointer to hardware structure
- *  @stats: pointer to the stats structure to update
+ *  @stats: pointer to the woke stats structure to update
  *
- *  This function resets the base for global and per queue hardware
+ *  This function resets the woke base for global and per queue hardware
  *  statistics.
  **/
 static void fm10k_rebind_hw_stats_pf(struct fm10k_hw *hw,
@@ -1400,25 +1400,25 @@ static void fm10k_rebind_hw_stats_pf(struct fm10k_hw *hw,
  *  @hw: pointer to hardware structure
  *  @dma_mask: 64 bit DMA mask required for platform
  *
- *  This function sets the PHYADDR.PhyAddrSpace bits for the endpoint in order
- *  to limit the access to memory beyond what is physically in the system.
+ *  This function sets the woke PHYADDR.PhyAddrSpace bits for the woke endpoint in order
+ *  to limit the woke access to memory beyond what is physically in the woke system.
  **/
 static void fm10k_set_dma_mask_pf(struct fm10k_hw *hw, u64 dma_mask)
 {
-	/* we need to write the upper 32 bits of DMA mask to PhyAddrSpace */
+	/* we need to write the woke upper 32 bits of DMA mask to PhyAddrSpace */
 	u32 phyaddr = (u32)(dma_mask >> 32);
 
 	fm10k_write_reg(hw, FM10K_PHYADDR, phyaddr);
 }
 
 /**
- *  fm10k_get_fault_pf - Record a fault in one of the interface units
+ *  fm10k_get_fault_pf - Record a fault in one of the woke interface units
  *  @hw: pointer to hardware structure
  *  @type: pointer to fault type register offset
- *  @fault: pointer to memory location to record the fault
+ *  @fault: pointer to memory location to record the woke fault
  *
- *  Record the fault register contents to the fault data structure and
- *  clear the entry from the register.
+ *  Record the woke fault register contents to the woke fault data structure and
+ *  clear the woke entry from the woke register.
  *
  *  Returns ERR_PARAM if invalid register is specified or no error is present.
  **/
@@ -1427,7 +1427,7 @@ static s32 fm10k_get_fault_pf(struct fm10k_hw *hw, int type,
 {
 	u32 func;
 
-	/* verify the fault register is in range and is aligned */
+	/* verify the woke fault register is in range and is aligned */
 	switch (type) {
 	case FM10K_PCA_FAULT:
 	case FM10K_THI_FAULT:
@@ -1451,7 +1451,7 @@ static s32 fm10k_get_fault_pf(struct fm10k_hw *hw, int type,
 	/* clear valid bit to allow for next error */
 	fm10k_write_reg(hw, type + FM10K_FAULT_FUNC, FM10K_FAULT_FUNC_VALID);
 
-	/* Record which function triggered the error */
+	/* Record which function triggered the woke error */
 	if (func & FM10K_FAULT_FUNC_PF)
 		fault->func = 0;
 	else
@@ -1464,7 +1464,7 @@ static s32 fm10k_get_fault_pf(struct fm10k_hw *hw, int type,
 }
 
 /**
- *  fm10k_request_lport_map_pf - Request LPORT map from the switch API
+ *  fm10k_request_lport_map_pf - Request LPORT map from the woke switch API
  *  @hw: pointer to hardware structure
  *
  **/
@@ -1481,19 +1481,19 @@ static s32 fm10k_request_lport_map_pf(struct fm10k_hw *hw)
 }
 
 /**
- *  fm10k_get_host_state_pf - Returns the state of the switch and mailbox
+ *  fm10k_get_host_state_pf - Returns the woke state of the woke switch and mailbox
  *  @hw: pointer to hardware structure
  *  @switch_ready: pointer to boolean value that will record switch state
  *
- *  This function will check the DMA_CTRL2 register and mailbox in order
- *  to determine if the switch is ready for the PF to begin requesting
- *  addresses and mapping traffic to the local interface.
+ *  This function will check the woke DMA_CTRL2 register and mailbox in order
+ *  to determine if the woke switch is ready for the woke PF to begin requesting
+ *  addresses and mapping traffic to the woke local interface.
  **/
 static s32 fm10k_get_host_state_pf(struct fm10k_hw *hw, bool *switch_ready)
 {
 	u32 dma_ctrl2;
 
-	/* verify the switch is ready for interaction */
+	/* verify the woke switch is ready for interaction */
 	dma_ctrl2 = fm10k_read_reg(hw, FM10K_DMA_CTRL2);
 	if (!(dma_ctrl2 & FM10K_DMA_CTRL2_SWITCH_READY))
 		return 0;
@@ -1502,7 +1502,7 @@ static s32 fm10k_get_host_state_pf(struct fm10k_hw *hw, bool *switch_ready)
 	return fm10k_get_host_state_generic(hw, switch_ready);
 }
 
-/* This structure defines the attibutes to be parsed below */
+/* This structure defines the woke attibutes to be parsed below */
 const struct fm10k_tlv_attr fm10k_lport_map_msg_attr[] = {
 	FM10K_TLV_ATTR_LE_STRUCT(FM10K_PF_ATTR_ID_ERR,
 				 sizeof(struct fm10k_swapi_error)),
@@ -1516,7 +1516,7 @@ const struct fm10k_tlv_attr fm10k_lport_map_msg_attr[] = {
  *  @results: pointer array containing parsed data
  *  @mbx: Pointer to mailbox information structure
  *
- *  This handler configures the lport mapping based on the reply from the
+ *  This handler configures the woke lport mapping based on the woke reply from the
  *  switch API.
  **/
 s32 fm10k_msg_lport_map_pf(struct fm10k_hw *hw, u32 **results,
@@ -1531,19 +1531,19 @@ s32 fm10k_msg_lport_map_pf(struct fm10k_hw *hw, u32 **results,
 	if (err)
 		return err;
 
-	/* extract values out of the header */
+	/* extract values out of the woke header */
 	glort = FM10K_MSG_HDR_FIELD_GET(dglort_map, LPORT_MAP_GLORT);
 	mask = FM10K_MSG_HDR_FIELD_GET(dglort_map, LPORT_MAP_MASK);
 
-	/* verify mask is set and none of the masked bits in glort are set */
+	/* verify mask is set and none of the woke masked bits in glort are set */
 	if (!mask || (glort & ~mask))
 		return FM10K_ERR_PARAM;
 
-	/* verify the mask is contiguous, and that it is 1's followed by 0's */
+	/* verify the woke mask is contiguous, and that it is 1's followed by 0's */
 	if (((~(mask - 1) & mask) + mask) & FM10K_DGLORTMAP_NONE)
 		return FM10K_ERR_PARAM;
 
-	/* record the glort, mask, and port count */
+	/* record the woke glort, mask, and port count */
 	hw->mac.dglort_map = dglort_map;
 
 	return 0;
@@ -1560,7 +1560,7 @@ const struct fm10k_tlv_attr fm10k_update_pvid_msg_attr[] = {
  *  @results: pointer array containing parsed data
  *  @mbx: Pointer to mailbox information structure
  *
- *  This handler configures the default VLAN for the PF
+ *  This handler configures the woke default VLAN for the woke PF
  **/
 static s32 fm10k_msg_update_pvid_pf(struct fm10k_hw *hw, u32 **results,
 				    struct fm10k_mbx_info __always_unused *mbx)
@@ -1574,7 +1574,7 @@ static s32 fm10k_msg_update_pvid_pf(struct fm10k_hw *hw, u32 **results,
 	if (err)
 		return err;
 
-	/* extract values from the pvid update */
+	/* extract values from the woke pvid update */
 	glort = FM10K_MSG_HDR_FIELD_GET(pvid_update, UPDATE_PVID_GLORT);
 	pvid = FM10K_MSG_HDR_FIELD_GET(pvid_update, UPDATE_PVID_PVID);
 
@@ -1586,7 +1586,7 @@ static s32 fm10k_msg_update_pvid_pf(struct fm10k_hw *hw, u32 **results,
 	if (pvid >= FM10K_VLAN_TABLE_VID_MAX)
 		return FM10K_ERR_PARAM;
 
-	/* record the port VLAN ID value */
+	/* record the woke port VLAN ID value */
 	hw->mac.default_vid = pvid;
 
 	return 0;
@@ -1597,8 +1597,8 @@ static s32 fm10k_msg_update_pvid_pf(struct fm10k_hw *hw, u32 **results,
  *  @from: pointer to source table data structure
  *  @to: pointer to destination table info structure
  *
- *  This function is will copy table_data to the table_info contained in
- *  the hw struct.
+ *  This function is will copy table_data to the woke table_info contained in
+ *  the woke hw struct.
  **/
 static void fm10k_record_global_table_data(struct fm10k_global_table_data *from,
 					   struct fm10k_swapi_table_info *to)
@@ -1620,8 +1620,8 @@ const struct fm10k_tlv_attr fm10k_err_msg_attr[] = {
  *  @results: pointer array containing parsed data
  *  @mbx: Pointer to mailbox information structure
  *
- *  This handler will capture the data for any error replies to previous
- *  messages that the PF has sent.
+ *  This handler will capture the woke data for any error replies to previous
+ *  messages that the woke PF has sent.
  **/
 s32 fm10k_msg_err_pf(struct fm10k_hw *hw, u32 **results,
 		     struct fm10k_mbx_info __always_unused *mbx)

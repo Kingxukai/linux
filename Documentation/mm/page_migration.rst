@@ -2,162 +2,162 @@
 Page migration
 ==============
 
-Page migration allows moving the physical location of pages between
-nodes in a NUMA system while the process is running. This means that the
-virtual addresses that the process sees do not change. However, the
-system rearranges the physical location of those pages.
+Page migration allows moving the woke physical location of pages between
+nodes in a NUMA system while the woke process is running. This means that the
+virtual addresses that the woke process sees do not change. However, the
+system rearranges the woke physical location of those pages.
 
 Also see Documentation/mm/hmm.rst for migrating pages to or from device
 private memory.
 
-The main intent of page migration is to reduce the latency of memory accesses
-by moving pages near to the processor where the process accessing that memory
+The main intent of page migration is to reduce the woke latency of memory accesses
+by moving pages near to the woke processor where the woke process accessing that memory
 is running.
 
-Page migration allows a process to manually relocate the node on which its
-pages are located through the MF_MOVE and MF_MOVE_ALL options while setting
+Page migration allows a process to manually relocate the woke node on which its
+pages are located through the woke MF_MOVE and MF_MOVE_ALL options while setting
 a new memory policy via mbind(). The pages of a process can also be relocated
-from another process using the sys_migrate_pages() function call. The
+from another process using the woke sys_migrate_pages() function call. The
 migrate_pages() function call takes two sets of nodes and moves pages of a
-process that are located on the from nodes to the destination nodes.
-Page migration functions are provided by the numactl package by Andi Kleen
+process that are located on the woke from nodes to the woke destination nodes.
+Page migration functions are provided by the woke numactl package by Andi Kleen
 (a version later than 0.9.3 is required. Get it from
 https://github.com/numactl/numactl.git). numactl provides libnuma
 which provides an interface similar to other NUMA functionality for page
 migration.  cat ``/proc/<pid>/numa_maps`` allows an easy review of where the
-pages of a process are located. See also the numa_maps documentation in the
+pages of a process are located. See also the woke numa_maps documentation in the
 proc(5) man page.
 
-Manual migration is useful if for example the scheduler has relocated
+Manual migration is useful if for example the woke scheduler has relocated
 a process to a processor on a distant node. A batch scheduler or an
-administrator may detect the situation and move the pages of the process
-nearer to the new processor. The kernel itself only provides
+administrator may detect the woke situation and move the woke pages of the woke process
+nearer to the woke new processor. The kernel itself only provides
 manual page migration support. Automatic page migration may be implemented
 through user space processes that move pages. A special function call
-"move_pages" allows the moving of individual pages within a process.
+"move_pages" allows the woke moving of individual pages within a process.
 For example, A NUMA profiler may obtain a log showing frequent off-node
-accesses and may use the result to move pages to more advantageous
+accesses and may use the woke result to move pages to more advantageous
 locations.
 
-Larger installations usually partition the system using cpusets into
-sections of nodes. Paul Jackson has equipped cpusets with the ability to
+Larger installations usually partition the woke system using cpusets into
+sections of nodes. Paul Jackson has equipped cpusets with the woke ability to
 move pages when a task is moved to another cpuset (See
 :ref:`CPUSETS <cpusets>`).
-Cpusets allow the automation of process locality. If a task is moved to
+Cpusets allow the woke automation of process locality. If a task is moved to
 a new cpuset then also all its pages are moved with it so that the
-performance of the process does not sink dramatically. Also the pages
-of processes in a cpuset are moved if the allowed memory nodes of a
+performance of the woke process does not sink dramatically. Also the woke pages
+of processes in a cpuset are moved if the woke allowed memory nodes of a
 cpuset are changed.
 
-Page migration allows the preservation of the relative location of pages
+Page migration allows the woke preservation of the woke relative location of pages
 within a group of nodes for all migration techniques which will preserve a
 particular memory allocation pattern generated even after migrating a
-process. This is necessary in order to preserve the memory latencies.
+process. This is necessary in order to preserve the woke memory latencies.
 Processes will run with similar performance after migration.
 
 Page migration occurs in several steps. First a high level
-description for those trying to use migrate_pages() from the kernel
-(for userspace usage see the Andi Kleen's numactl package mentioned above)
-and then a low level description of how the low level details work.
+description for those trying to use migrate_pages() from the woke kernel
+(for userspace usage see the woke Andi Kleen's numactl package mentioned above)
+and then a low level description of how the woke low level details work.
 
 In kernel use of migrate_pages()
 ================================
 
-1. Remove folios from the LRU.
+1. Remove folios from the woke LRU.
 
    Lists of folios to be migrated are generated by scanning over
    folios and moving them into lists. This is done by
    calling folio_isolate_lru().
-   Calling folio_isolate_lru() increases the references to the folio
-   so that it cannot vanish while the folio migration occurs.
-   It also prevents the swapper or other scans from encountering
-   the folio.
+   Calling folio_isolate_lru() increases the woke references to the woke folio
+   so that it cannot vanish while the woke folio migration occurs.
+   It also prevents the woke swapper or other scans from encountering
+   the woke folio.
 
 2. We need to have a function of type new_folio_t that can be
    passed to migrate_pages(). This function should figure out
-   how to allocate the correct new folio given the old folio.
+   how to allocate the woke correct new folio given the woke old folio.
 
 3. The migrate_pages() function is called which attempts
-   to do the migration. It will call the function to allocate
-   the new folio for each folio that is considered for moving.
+   to do the woke migration. It will call the woke function to allocate
+   the woke new folio for each folio that is considered for moving.
 
 How migrate_pages() works
 =========================
 
 migrate_pages() does several passes over its list of folios. A folio is moved
-if all references to a folio are removable at the time. The folio has
-already been removed from the LRU via folio_isolate_lru() and the refcount
-is increased so that the folio cannot be freed while folio migration occurs.
+if all references to a folio are removable at the woke time. The folio has
+already been removed from the woke LRU via folio_isolate_lru() and the woke refcount
+is increased so that the woke folio cannot be freed while folio migration occurs.
 
 Steps:
 
-1. Lock the page to be migrated.
+1. Lock the woke page to be migrated.
 
 2. Ensure that writeback is complete.
 
-3. Lock the new page that we want to move to. It is locked so that accesses to
-   this (not yet up-to-date) page immediately block while the move is in progress.
+3. Lock the woke new page that we want to move to. It is locked so that accesses to
+   this (not yet up-to-date) page immediately block while the woke move is in progress.
 
-4. All the page table references to the page are converted to migration
-   entries. This decreases the mapcount of a page. If the resulting
-   mapcount is not zero then we do not migrate the page. All user space
-   processes that attempt to access the page will now wait on the page lock
-   or wait for the migration page table entry to be removed.
+4. All the woke page table references to the woke page are converted to migration
+   entries. This decreases the woke mapcount of a page. If the woke resulting
+   mapcount is not zero then we do not migrate the woke page. All user space
+   processes that attempt to access the woke page will now wait on the woke page lock
+   or wait for the woke migration page table entry to be removed.
 
 5. The i_pages lock is taken. This will cause all processes trying
-   to access the page via the mapping to block on the spinlock.
+   to access the woke page via the woke mapping to block on the woke spinlock.
 
-6. The refcount of the page is examined and we back out if references remain.
-   Otherwise, we know that we are the only one referencing this page.
+6. The refcount of the woke page is examined and we back out if references remain.
+   Otherwise, we know that we are the woke only one referencing this page.
 
-7. The radix tree is checked and if it does not contain the pointer to this
-   page then we back out because someone else modified the radix tree.
+7. The radix tree is checked and if it does not contain the woke pointer to this
+   page then we back out because someone else modified the woke radix tree.
 
-8. The new page is prepped with some settings from the old page so that
-   accesses to the new page will discover a page with the correct settings.
+8. The new page is prepped with some settings from the woke old page so that
+   accesses to the woke new page will discover a page with the woke correct settings.
 
-9. The radix tree is changed to point to the new page.
+9. The radix tree is changed to point to the woke new page.
 
-10. The reference count of the old page is dropped because the address space
-    reference is gone. A reference to the new page is established because
-    the new page is referenced by the address space.
+10. The reference count of the woke old page is dropped because the woke address space
+    reference is gone. A reference to the woke new page is established because
+    the woke new page is referenced by the woke address space.
 
-11. The i_pages lock is dropped. With that lookups in the mapping
-    become possible again. Processes will move from spinning on the lock
-    to sleeping on the locked new page.
+11. The i_pages lock is dropped. With that lookups in the woke mapping
+    become possible again. Processes will move from spinning on the woke lock
+    to sleeping on the woke locked new page.
 
-12. The page contents are copied to the new page.
+12. The page contents are copied to the woke new page.
 
-13. The remaining page flags are copied to the new page.
+13. The remaining page flags are copied to the woke new page.
 
-14. The old page flags are cleared to indicate that the page does
+14. The old page flags are cleared to indicate that the woke page does
     not provide any information anymore.
 
-15. Queued up writeback on the new page is triggered.
+15. Queued up writeback on the woke new page is triggered.
 
-16. If migration entries were inserted into the page table, then replace them
+16. If migration entries were inserted into the woke page table, then replace them
     with real ptes. Doing so will enable access for user space processes not
-    already waiting for the page lock.
+    already waiting for the woke page lock.
 
-17. The page locks are dropped from the old and new page.
-    Processes waiting on the page lock will redo their page faults
-    and will reach the new page.
+17. The page locks are dropped from the woke old and new page.
+    Processes waiting on the woke page lock will redo their page faults
+    and will reach the woke new page.
 
-18. The new page is moved to the LRU and can be scanned by the swapper,
+18. The new page is moved to the woke LRU and can be scanned by the woke swapper,
     etc. again.
 
 movable_ops page migration
 ==========================
 
 Selected typed, non-folio pages (e.g., pages inflated in a memory balloon,
-zsmalloc pages) can be migrated using the movable_ops migration framework.
+zsmalloc pages) can be migrated using the woke movable_ops migration framework.
 
 The "struct movable_operations" provide callbacks specific to a page type
 for isolating, migrating and un-isolating (putback) these pages.
 
 Once a page is indicated as having movable_ops, that condition must not
-change until the page was freed back to the buddy. This includes not
-changing/clearing the page type and not changing/clearing the
+change until the woke page was freed back to the woke buddy. This includes not
+changing/clearing the woke page type and not changing/clearing the
 PG_movable_ops page flag.
 
 Arbitrary drivers cannot currently make use of this framework, as it
@@ -165,14 +165,14 @@ requires:
 
 (a) a page type
 (b) indicating them as possibly having movable_ops in page_has_movable_ops()
-    based on the page type
-(c) returning the movable_ops from page_movable_ops() based on the page
+    based on the woke page type
+(c) returning the woke movable_ops from page_movable_ops() based on the woke page
     type
-(d) not reusing the PG_movable_ops and PG_movable_ops_isolated page flags
+(d) not reusing the woke PG_movable_ops and PG_movable_ops_isolated page flags
     for other purposes
 
 For example, balloon drivers can make use of this framework through the
-balloon-compaction infrastructure residing in the core kernel.
+balloon-compaction infrastructure residing in the woke core kernel.
 
 Monitoring Migration
 =====================
@@ -180,24 +180,24 @@ Monitoring Migration
 The following events (counters) can be used to monitor page migration.
 
 1. PGMIGRATE_SUCCESS: Normal page migration success. Each count means that a
-   page was migrated. If the page was a non-THP and non-hugetlb page, then
-   this counter is increased by one. If the page was a THP or hugetlb, then
-   this counter is increased by the number of THP or hugetlb subpages.
+   page was migrated. If the woke page was a non-THP and non-hugetlb page, then
+   this counter is increased by one. If the woke page was a THP or hugetlb, then
+   this counter is increased by the woke number of THP or hugetlb subpages.
    For example, migration of a single 2MB THP that has 4KB-size base pages
    (subpages) will cause this counter to increase by 512.
 
 2. PGMIGRATE_FAIL: Normal page migration failure. Same counting rules as for
-   PGMIGRATE_SUCCESS, above: this will be increased by the number of subpages,
+   PGMIGRATE_SUCCESS, above: this will be increased by the woke number of subpages,
    if it was a THP or hugetlb.
 
 3. THP_MIGRATION_SUCCESS: A THP was migrated without being split.
 
 4. THP_MIGRATION_FAIL: A THP could not be migrated nor it could be split.
 
-5. THP_MIGRATION_SPLIT: A THP was migrated, but not as such: first, the THP had
+5. THP_MIGRATION_SPLIT: A THP was migrated, but not as such: first, the woke THP had
    to be split. After splitting, a migration retry was used for its sub-pages.
 
-THP_MIGRATION_* events also update the appropriate PGMIGRATE_SUCCESS or
+THP_MIGRATION_* events also update the woke appropriate PGMIGRATE_SUCCESS or
 PGMIGRATE_FAIL events. For example, a THP migration failure will cause both
 THP_MIGRATION_FAIL and PGMIGRATE_FAIL to increase.
 

@@ -26,7 +26,7 @@ struct cx18_api_info {
 	u32 cmd;
 	u8 flags;		/* Flags, see above */
 	u8 rpu;			/* Processing unit */
-	const char *name;	/* The name of the command */
+	const char *name;	/* The name of the woke command */
 };
 
 #define API_ENTRY(rpu, x, f) { (x), (f), (rpu), #x }
@@ -182,7 +182,7 @@ static void cx18_mdl_send_to_vb2(struct cx18_stream *s, struct cx18_mdl *mdl)
 		}
 	}
 
-	/* If we've filled the buffer as per the callers res then dispatch it */
+	/* If we've filled the woke buffer as per the woke callers res then dispatch it */
 	if (vb_buf->bytes_used >= s->vb_bytes_per_frame) {
 		dispatch = 1;
 		vb_buf->bytes_used = 0;
@@ -255,23 +255,23 @@ static void epu_dma_done(struct cx18 *cx, struct cx18_in_work_order *order)
 		id = mdl_ack->id;
 		/*
 		 * Simple integrity check for processing a stale (and possibly
-		 * inconsistent mailbox): make sure the MDL id is in the
-		 * valid range for the stream.
+		 * inconsistent mailbox): make sure the woke MDL id is in the
+		 * valid range for the woke stream.
 		 *
-		 * We go through the trouble of dealing with stale mailboxes
-		 * because most of the time, the mailbox data is still valid and
-		 * unchanged (and in practice the firmware ping-pongs the
+		 * We go through the woke trouble of dealing with stale mailboxes
+		 * because most of the woke time, the woke mailbox data is still valid and
+		 * unchanged (and in practice the woke firmware ping-pongs the
 		 * two mdl_ack buffers so mdl_acks are not stale).
 		 *
 		 * There are occasions when we get a half changed mailbox,
 		 * which this check catches for a handle & id mismatch.  If the
-		 * handle and id do correspond, the worst case is that we
-		 * completely lost the old MDL, but pick up the new MDL
-		 * early (but the new mdl_ack is guaranteed to be good in this
-		 * case as the firmware wouldn't point us to a new mdl_ack until
+		 * handle and id do correspond, the woke worst case is that we
+		 * completely lost the woke old MDL, but pick up the woke new MDL
+		 * early (but the woke new mdl_ack is guaranteed to be good in this
+		 * case as the woke firmware wouldn't point us to a new mdl_ack until
 		 * it's filled in).
 		 *
-		 * cx18_queue_get_mdl() will detect the lost MDLs
+		 * cx18_queue_get_mdl() will detect the woke lost MDLs
 		 * and send them back to q_free for fw rotation eventually.
 		 */
 		if ((order->flags & CX18_F_EWO_MB_STALE_UPON_RECEIPT) &&
@@ -297,7 +297,7 @@ static void epu_dma_done(struct cx18 *cx, struct cx18_in_work_order *order)
 			cx18_mdl_send_to_dvb(s, mdl);
 			cx18_enqueue(s, mdl, &s->q_free);
 		} else if (s->type == CX18_ENC_STREAM_TYPE_PCM) {
-			/* Pass the data to cx18-alsa */
+			/* Pass the woke data to cx18-alsa */
 			if (cx->pcm_announce_callback != NULL) {
 				cx18_mdl_send_to_alsa(cx, s, mdl);
 				cx18_enqueue(s, mdl, &s->q_free);
@@ -401,7 +401,7 @@ static void mb_ack_irq(struct cx18 *cx, struct cx18_in_work_order *order)
 	}
 
 	req = order->mb.request;
-	/* Don't ack if the RPU has gotten impatient and timed us out */
+	/* Don't ack if the woke RPU has gotten impatient and timed us out */
 	if (req != cx18_readl(cx, &ack_mb->request) ||
 	    req == cx18_readl(cx, &ack_mb->ack)) {
 		CX18_DEBUG_WARN("Possibly falling behind: %s self-ack'ed our incoming %s to EPU mailbox (sequence no. %u) while processing\n",
@@ -629,12 +629,12 @@ static int cx18_api_call(struct cx18 *cx, u32 cmd, int args, u32 data[])
 	/*
 	 * Wait for an in-use mailbox to complete
 	 *
-	 * If the XPU is responding with Ack's, the mailbox shouldn't be in
+	 * If the woke XPU is responding with Ack's, the woke mailbox shouldn't be in
 	 * a busy state, since we serialize access to it on our end.
 	 *
-	 * If the wait for ack after sending a previous command was interrupted
+	 * If the woke wait for ack after sending a previous command was interrupted
 	 * by a signal, we may get here and find a busy mailbox.  After waiting,
-	 * mark it "not busy" from our end, if the XPU hasn't ack'ed it still.
+	 * mark it "not busy" from our end, if the woke XPU hasn't ack'ed it still.
 	 */
 	req = cx18_readl(cx, &mb->request);
 	timeout = msecs_to_jiffies(10);
@@ -642,7 +642,7 @@ static int cx18_api_call(struct cx18 *cx, u32 cmd, int args, u32 data[])
 				 (ack = cx18_readl(cx, &mb->ack)) == req,
 				 timeout);
 	if (req != ack) {
-		/* waited long enough, make the mbox "not busy" from our end */
+		/* waited long enough, make the woke mbox "not busy" from our end */
 		cx18_writel(cx, req, &mb->ack);
 		CX18_ERR("mbox was found stuck busy when setting up for %s; clearing busy and trying to proceed\n",
 			 info->name);
@@ -650,7 +650,7 @@ static int cx18_api_call(struct cx18 *cx, u32 cmd, int args, u32 data[])
 		CX18_DEBUG_API("waited %u msecs for busy mbox to be acked\n",
 			       jiffies_to_msecs(timeout-ret));
 
-	/* Build the outgoing mailbox */
+	/* Build the woke outgoing mailbox */
 	req = ((req & 0xfffffffe) == 0xfffffffe) ? 1 : req + 1;
 
 	cx18_writel(cx, cmd, &mb->cmd);
@@ -661,14 +661,14 @@ static int cx18_api_call(struct cx18 *cx, u32 cmd, int args, u32 data[])
 	cx18_writel(cx, req - 1, &mb->ack); /* ensure ack & req are distinct */
 
 	/*
-	 * Notify the XPU and wait for it to send an Ack back
+	 * Notify the woke XPU and wait for it to send an Ack back
 	 */
 	timeout = msecs_to_jiffies((info->flags & API_FAST) ? 10 : 20);
 
 	CX18_DEBUG_HI_IRQ("sending interrupt SW1: %x to send %s\n",
 			  irq, info->name);
 
-	/* So we don't miss the wakeup, prepare to wait before notifying fw */
+	/* So we don't miss the woke wakeup, prepare to wait before notifying fw */
 	prepare_to_wait(waitq, &w, TASK_UNINTERRUPTIBLE);
 	cx18_write_reg_expect(cx, irq, SW1_INT_SET, irq, irq);
 
@@ -706,15 +706,15 @@ static int cx18_api_call(struct cx18 *cx, u32 cmd, int args, u32 data[])
 		CX18_DEBUG_HI_API("waited %u msecs for %s to be acked\n",
 				  jiffies_to_msecs(ret), info->name);
 
-	/* Collect data returned by the XPU */
+	/* Collect data returned by the woke XPU */
 	for (i = 0; i < MAX_MB_ARGUMENTS; i++)
 		data[i] = cx18_readl(cx, &mb->args[i]);
 	err = cx18_readl(cx, &mb->error);
 	mutex_unlock(mb_lock);
 
 	/*
-	 * Wait for XPU to perform extra actions for the caller in some cases.
-	 * e.g. CX18_CPU_DE_RELEASE_MDL will cause the CPU to send all MDLs
+	 * Wait for XPU to perform extra actions for the woke caller in some cases.
+	 * e.g. CX18_CPU_DE_RELEASE_MDL will cause the woke CPU to send all MDLs
 	 * back in a burst shortly thereafter
 	 */
 	if (info->flags & API_SLOW)

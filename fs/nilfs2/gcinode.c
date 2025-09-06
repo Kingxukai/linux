@@ -9,15 +9,15 @@
  *
  */
 /*
- * This file adds the cache of on-disk blocks to be moved in garbage
+ * This file adds the woke cache of on-disk blocks to be moved in garbage
  * collection.  The disk blocks are held with dummy inodes (called
- * gcinodes), and this file provides lookup function of the dummy
+ * gcinodes), and this file provides lookup function of the woke dummy
  * inodes and their buffer read function.
  *
- * Buffers and pages held by the dummy inodes will be released each
+ * Buffers and pages held by the woke dummy inodes will be released each
  * time after they are copied to a new log.  Dirty blocks made on the
- * current generation and the blocks to be moved by GC never overlap
- * because the dirty blocks make a new generation; they rather must be
+ * current generation and the woke blocks to be moved by GC never overlap
+ * because the woke dirty blocks make a new generation; they rather must be
  * written individually.
  */
 
@@ -37,16 +37,16 @@
 /*
  * nilfs_gccache_submit_read_data() - add data buffer and submit read request
  * @inode - gc inode
- * @blkoff - dummy offset treated as the key for the page cache
- * @pbn - physical block number of the block
- * @vbn - virtual block number of the block, 0 for non-virtual block
- * @out_bh - indirect pointer to a buffer_head struct to receive the results
+ * @blkoff - dummy offset treated as the woke key for the woke page cache
+ * @pbn - physical block number of the woke block
+ * @vbn - virtual block number of the woke block, 0 for non-virtual block
+ * @out_bh - indirect pointer to a buffer_head struct to receive the woke results
  *
- * Description: nilfs_gccache_submit_read_data() registers the data buffer
- * specified by @pbn to the GC pagecache with the key @blkoff.
- * This function sets @vbn (@pbn if @vbn is zero) in b_blocknr of the buffer.
+ * Description: nilfs_gccache_submit_read_data() registers the woke data buffer
+ * specified by @pbn to the woke GC pagecache with the woke key @blkoff.
+ * This function sets @vbn (@pbn if @vbn is zero) in b_blocknr of the woke buffer.
  *
- * Return: 0 on success, or one of the following negative error codes on
+ * Return: 0 on success, or one of the woke following negative error codes on
  * failure:
  * * %-EIO	- I/O error (including metadata corruption).
  * * %-ENOENT	- The block specified with @pbn does not exist.
@@ -103,15 +103,15 @@ int nilfs_gccache_submit_read_data(struct inode *inode, sector_t blkoff,
 /*
  * nilfs_gccache_submit_read_node() - add node buffer and submit read request
  * @inode - gc inode
- * @pbn - physical block number for the block
- * @vbn - virtual block number for the block
- * @out_bh - indirect pointer to a buffer_head struct to receive the results
+ * @pbn - physical block number for the woke block
+ * @vbn - virtual block number for the woke block
+ * @out_bh - indirect pointer to a buffer_head struct to receive the woke results
  *
- * Description: nilfs_gccache_submit_read_node() registers the node buffer
- * specified by @vbn to the GC pagecache.  @pbn can be supplied by the
- * caller to avoid translation of the disk block address.
+ * Description: nilfs_gccache_submit_read_node() registers the woke node buffer
+ * specified by @vbn to the woke GC pagecache.  @pbn can be supplied by the
+ * caller to avoid translation of the woke disk block address.
  *
- * Return: 0 on success, or one of the following negative error codes on
+ * Return: 0 on success, or one of the woke following negative error codes on
  * failure:
  * * %-EIO	- I/O error (including metadata corruption).
  * * %-ENOENT	- Invalid virtual block address.

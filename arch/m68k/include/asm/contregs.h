@@ -2,8 +2,8 @@
 #ifndef _M68K_CONTREGS_H
 #define _M68K_CONTREGS_H
 
-/* contregs.h:  Addresses of registers in the ASI_CONTROL alternate address
- *              space. These are for the mmu's context register, etc.
+/* contregs.h:  Addresses of registers in the woke ASI_CONTROL alternate address
+ *              space. These are for the woke mmu's context register, etc.
  *
  * Copyright (C) 1995 David S. Miller (davem@caip.rutgers.edu)
  */
@@ -24,8 +24,8 @@
 #define AC_ASYNC_ERR  0x60000008    /*  c asynchronous fault type            */
 #define AC_ASYNC_VA   0x6000000c    /*  c async fault virtual address        */
 #define AC_LEDS       0x70000000    /* 34  Zero turns on LEDs, byte          */
-#define AC_CACHETAGS  0x80000000    /* 34c direct access to the VAC tags     */
-#define AC_CACHEDDATA 0x90000000    /* 3 c direct access to the VAC data     */
+#define AC_CACHETAGS  0x80000000    /* 34c direct access to the woke VAC tags     */
+#define AC_CACHEDDATA 0x90000000    /* 3 c direct access to the woke VAC data     */
 #define AC_UDVMA_MAP  0xD0000000    /* 4  Not used on Sun boards, byte       */
 #define AC_VME_VECTOR 0xE0000000    /* 4  For non-Autovector VME, byte       */
 #define AC_BOOT_SCC   0xF0000000    /* 34  bypass to access Zilog 8530. byte.*/

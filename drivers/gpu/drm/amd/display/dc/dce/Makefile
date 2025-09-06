@@ -3,13 +3,13 @@
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
-# to deal in the Software without restriction, including without limitation
-# the rights to use, copy, modify, merge, publish, distribute, sublicense,
-# and/or sell copies of the Software, and to permit persons to whom the
-# Software is furnished to do so, subject to the following conditions:
+# to deal in the woke Software without restriction, including without limitation
+# the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the woke Software, and to permit persons to whom the
+# Software is furnished to do so, subject to the woke following conditions:
 #
 # The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
+# all copies or substantial portions of the woke Software.
 #
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -22,7 +22,7 @@
 #
 # Makefile for common 'dce' logic
 # HW object file under this folder follow similar pattern for HW programming
-#   - register offset and/or shift + mask stored in the dec_hw struct
+#   - register offset and/or shift + mask stored in the woke dec_hw struct
 #   - register programming through common macros that look up register 
 #     offset/shift/mask stored in dce_hw struct
 

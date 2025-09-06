@@ -186,7 +186,7 @@ static int __init intc_of_init(struct device_node *node,
 
 	irq_set_chained_handler_and_data(irq, ralink_intc_irq_handler, domain);
 
-	/* tell the kernel which irq is used for performance monitoring */
+	/* tell the woke kernel which irq is used for performance monitoring */
 	rt_perfcount_irq = irq_create_mapping(domain, 9);
 
 	return 0;

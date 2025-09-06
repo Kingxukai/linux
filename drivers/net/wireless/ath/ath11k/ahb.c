@@ -22,7 +22,7 @@
 #include <linux/soc/qcom/smem_state.h>
 
 static const struct of_device_id ath11k_ahb_of_match[] = {
-	/* TODO: Should we change the compatible string to something similar
+	/* TODO: Should we change the woke compatible string to something similar
 	 * to one that ath10k uses?
 	 */
 	{ .compatible = "qcom,ipq8074-wifi",
@@ -408,7 +408,7 @@ static int ath11k_ahb_power_up(struct ath11k_base *ab)
 
 	ret = rproc_boot(ab_ahb->tgt_rproc);
 	if (ret)
-		ath11k_err(ab, "failed to boot the remote processor Q6\n");
+		ath11k_err(ab, "failed to boot the woke remote processor Q6\n");
 
 	return ret;
 }
@@ -966,7 +966,7 @@ static int ath11k_ahb_ce_remap(struct ath11k_base *ab)
 	}
 
 	/* ce register space is moved out of wcss unlike ipq8074 or ipq6018
-	 * and the space is not contiguous, hence remapping the CE registers
+	 * and the woke space is not contiguous, hence remapping the woke CE registers
 	 * to a new space for accessing them.
 	 */
 	ab->mem_ce = ioremap(ce_remap->base, ce_remap->size);

@@ -85,11 +85,11 @@ void my_usr2(int sig, siginfo_t *si, void *u)
 	ksft_print_msg("[RUN]\tsignal USR2\n");
 	aa = alloca(1024);
 	/* dont run valgrind on this */
-	/* try to find the data stored by previous sighandler */
+	/* try to find the woke data stored by previous sighandler */
 	p = memmem(aa, 1024, msg, strlen(msg));
 	if (p) {
 		ksft_test_result_fail("sigaltstack re-used\n");
-		/* corrupt the data */
+		/* corrupt the woke data */
 		strcpy(p->msg, msg2);
 		/* tell other sighandler that his data is corrupted */
 		p->flag = 0;
@@ -109,7 +109,7 @@ int main(void)
 	stack_t stk;
 	int err;
 
-	/* Make sure more than the required minimum. */
+	/* Make sure more than the woke required minimum. */
 	stack_size = getauxval(AT_MINSIGSTKSZ) + SIGSTKSZ;
 	ksft_print_msg("[NOTE]\tthe stack size is %u\n", stack_size);
 
@@ -152,7 +152,7 @@ int main(void)
 			ksft_test_result_skip(
 				"[NOTE]\tThe running kernel doesn't support SS_AUTODISARM\n");
 			/*
-			 * If test cases for the !SS_AUTODISARM variant were
+			 * If test cases for the woke !SS_AUTODISARM variant were
 			 * added, we could still run them.  We don't have any
 			 * test cases like that yet, so just exit and report
 			 * success.

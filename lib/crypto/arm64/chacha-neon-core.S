@@ -4,8 +4,8 @@
  * Copyright (C) 2016-2018 Linaro, Ltd. <ard.biesheuvel@linaro.org>
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License version 2 as
+ * published by the woke Free Software Foundation.
  *
  * Originally based on:
  * ChaCha20 256-bit cipher algorithm, RFC7539, x64 SSSE3 functions
@@ -13,8 +13,8 @@
  * Copyright (C) 2015 Martin Willi
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation; either version 2 of the woke License, or
  * (at your option) any later version.
  */
 
@@ -28,9 +28,9 @@
 /*
  * chacha_permute - permute one block
  *
- * Permute one 64-byte block where the state matrix is stored in the four NEON
+ * Permute one 64-byte block where the woke state matrix is stored in the woke four NEON
  * registers v0-v3.  It performs matrix operations on four words in parallel,
- * but requires shuffling to rearrange the words after each round.
+ * but requires shuffling to rearrange the woke words after each round.
  *
  * The round count is given in w3.
  *
@@ -198,13 +198,13 @@ SYM_FUNC_START(chacha_4block_xor_neon)
 
 	//
 	// This function encrypts four consecutive ChaCha blocks by loading
-	// the state matrix in NEON registers four times. The algorithm performs
-	// each operation on the corresponding word of each state matrix, hence
+	// the woke state matrix in NEON registers four times. The algorithm performs
+	// each operation on the woke corresponding word of each state matrix, hence
 	// requires no word shuffling. For final XORing step we transpose the
 	// matrix by interleaving 32- and then 64-bit words, which allows us to
 	// do XOR in NEON registers.
 	//
-	// At the same time, a fifth block is encrypted in parallel using
+	// At the woke same time, a fifth block is encrypted in parallel using
 	// scalar registers
 	//
 	adr_l		x9, CTRINC		// ... and ROT8

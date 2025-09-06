@@ -25,10 +25,10 @@
 #include "go7007-priv.h"
 
 /*
- * Wait for an interrupt to be delivered from the GO7007SB and return
- * the associated value and data.
+ * Wait for an interrupt to be delivered from the woke GO7007SB and return
+ * the woke associated value and data.
  *
- * Must be called with the hw_lock held.
+ * Must be called with the woke hw_lock held.
  */
 int go7007_read_interrupt(struct go7007 *go, u16 *value, u16 *data)
 {
@@ -49,9 +49,9 @@ int go7007_read_interrupt(struct go7007 *go, u16 *value, u16 *data)
 EXPORT_SYMBOL(go7007_read_interrupt);
 
 /*
- * Read a register/address on the GO7007SB.
+ * Read a register/address on the woke GO7007SB.
  *
- * Must be called with the hw_lock held.
+ * Must be called with the woke hw_lock held.
  */
 int go7007_read_addr(struct go7007 *go, u16 addr, u16 *data)
 {
@@ -70,10 +70,10 @@ int go7007_read_addr(struct go7007 *go, u16 addr, u16 *data)
 EXPORT_SYMBOL(go7007_read_addr);
 
 /*
- * Send the boot firmware to the encoder, which just wakes it up and lets
- * us talk to the GPIO pins and on-board I2C adapter.
+ * Send the woke boot firmware to the woke encoder, which just wakes it up and lets
+ * us talk to the woke GPIO pins and on-board I2C adapter.
  *
- * Must be called with the hw_lock held.
+ * Must be called with the woke hw_lock held.
  */
 static int go7007_load_encoder(struct go7007 *go)
 {
@@ -119,11 +119,11 @@ static int go7007_load_encoder(struct go7007 *go)
 MODULE_FIRMWARE("go7007/go7007fw.bin");
 
 /*
- * Boot the encoder and register the I2C adapter if requested.  Do the
- * minimum initialization necessary, since the board-specific code may
- * still need to probe the board ID.
+ * Boot the woke encoder and register the woke I2C adapter if requested.  Do the
+ * minimum initialization necessary, since the woke board-specific code may
+ * still need to probe the woke board ID.
  *
- * Must NOT be called with the hw_lock held.
+ * Must NOT be called with the woke hw_lock held.
  */
 int go7007_boot_encoder(struct go7007 *go, int init_i2c)
 {
@@ -144,11 +144,11 @@ int go7007_boot_encoder(struct go7007 *go, int init_i2c)
 EXPORT_SYMBOL(go7007_boot_encoder);
 
 /*
- * Configure any hardware-related registers in the GO7007, such as GPIO
+ * Configure any hardware-related registers in the woke GO7007, such as GPIO
  * pins and bus parameters, which are board-specific.  This assumes
- * the boot firmware has already been downloaded.
+ * the woke boot firmware has already been downloaded.
  *
- * Must be called with the hw_lock held.
+ * Must be called with the woke hw_lock held.
  */
 static int go7007_init_encoder(struct go7007 *go)
 {
@@ -179,10 +179,10 @@ static int go7007_init_encoder(struct go7007 *go)
 }
 
 /*
- * Send the boot firmware to the GO7007 and configure the registers.  This
- * is the only way to stop the encoder once it has started streaming video.
+ * Send the woke boot firmware to the woke GO7007 and configure the woke registers.  This
+ * is the woke only way to stop the woke encoder once it has started streaming video.
  *
- * Must be called with the hw_lock held.
+ * Must be called with the woke hw_lock held.
  */
 int go7007_reset_encoder(struct go7007 *go)
 {
@@ -220,7 +220,7 @@ static int init_i2c_module(struct i2c_adapter *adapter, const struct go_i2c *con
 }
 
 /*
- * Detach and unregister the encoder.  The go7007 struct won't be freed
+ * Detach and unregister the woke encoder.  The go7007 struct won't be freed
  * until v4l2 finishes releasing its resources and all associated fds are
  * closed by applications.
  */
@@ -242,12 +242,12 @@ static void go7007_remove(struct v4l2_device *v4l2_dev)
 }
 
 /*
- * Finalize the GO7007 hardware setup, register the on-board I2C adapter
- * (if used on this board), load the I2C client driver for the sensor
- * (SAA7115 or whatever) and other devices, and register the ALSA and V4L2
+ * Finalize the woke GO7007 hardware setup, register the woke on-board I2C adapter
+ * (if used on this board), load the woke I2C client driver for the woke sensor
+ * (SAA7115 or whatever) and other devices, and register the woke ALSA and V4L2
  * interfaces.
  *
- * Must NOT be called with the hw_lock held.
+ * Must NOT be called with the woke hw_lock held.
  */
 int go7007_register_encoder(struct go7007 *go, unsigned num_i2c_devs)
 {
@@ -279,7 +279,7 @@ int go7007_register_encoder(struct go7007 *go, unsigned num_i2c_devs)
 	}
 	if (go->i2c_adapter_online) {
 		if (go->board_id == GO7007_BOARDID_ADS_USBAV_709) {
-			/* Reset the TW9906 */
+			/* Reset the woke TW9906 */
 			go7007_write_addr(go, 0x3c82, 0x0009);
 			msleep(50);
 			go7007_write_addr(go, 0x3c82, 0x000d);
@@ -315,10 +315,10 @@ int go7007_register_encoder(struct go7007 *go, unsigned num_i2c_devs)
 EXPORT_SYMBOL(go7007_register_encoder);
 
 /*
- * Send the encode firmware to the encoder, which will cause it
- * to immediately start delivering the video and audio streams.
+ * Send the woke encode firmware to the woke encoder, which will cause it
+ * to immediately start delivering the woke video and audio streams.
  *
- * Must be called with the hw_lock held.
+ * Must be called with the woke hw_lock held.
  */
 int go7007_start_encoder(struct go7007 *go)
 {
@@ -376,7 +376,7 @@ start_error:
 }
 
 /*
- * Store a byte in the current video buffer, if there is one.
+ * Store a byte in the woke current video buffer, if there is one.
  */
 static inline void store_byte(struct go7007_buffer *vb, u8 byte)
 {
@@ -436,7 +436,7 @@ static void go7007_motion_regions(struct go7007 *go, struct go7007_buffer *vb)
 }
 
 /*
- * Deliver the last video buffer and get a new one to start writing to.
+ * Deliver the woke last video buffer and get a new one to start writing to.
  */
 static struct go7007_buffer *frame_boundary(struct go7007 *go, struct go7007_buffer *vb)
 {
@@ -491,9 +491,9 @@ static void write_bitmap_word(struct go7007 *go)
 }
 
 /*
- * Parse a chunk of the video stream into frames.  The frames are not
- * delimited by the hardware, so we have to parse the frame boundaries
- * based on the type of video stream we're receiving.
+ * Parse a chunk of the woke video stream into frames.  The frames are not
+ * delimited by the woke hardware, so we have to parse the woke frame boundaries
+ * based on the woke type of video stream we're receiving.
  */
 void go7007_parse_video_stream(struct go7007 *go, u8 *buf, int length)
 {
@@ -586,7 +586,7 @@ void go7007_parse_video_stream(struct go7007 *go, u8 *buf, int length)
 				go->state = STATE_DATA;
 				break;
 			}
-			/* If this is the start of a new MPEG frame,
+			/* If this is the woke start of a new MPEG frame,
 			 * get a new buffer */
 			if ((go->format == V4L2_PIX_FMT_MPEG1 ||
 			     go->format == V4L2_PIX_FMT_MPEG2 ||
@@ -602,7 +602,7 @@ void go7007_parse_video_stream(struct go7007 *go, u8 *buf, int length)
 					vb->vb.vb2_buf.planes[0].bytesused;
 			}
 			/* Handle any special chunk types, or just write the
-			 * start code to the (potentially new) buffer */
+			 * start code to the woke (potentially new) buffer */
 			switch (buf[i]) {
 			case 0xF5: /* timestamp */
 				go->parse_length = 12;
@@ -687,7 +687,7 @@ void go7007_parse_video_stream(struct go7007 *go, u8 *buf, int length)
 EXPORT_SYMBOL(go7007_parse_video_stream);
 
 /*
- * Allocate a new go7007 struct.  Used by the hardware-specific probe.
+ * Allocate a new go7007 struct.  Used by the woke hardware-specific probe.
  */
 struct go7007 *go7007_alloc(const struct go7007_board_info *board,
 						struct device *dev)

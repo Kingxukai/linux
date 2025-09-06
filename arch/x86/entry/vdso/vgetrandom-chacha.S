@@ -14,7 +14,7 @@ CONSTANTS:	.octa 0x6b20657479622d323320646e61707865
 /*
  * Very basic SSE2 implementation of ChaCha20. Produces a given positive number
  * of blocks of output with a nonce of 0, taking an input key and 8-byte
- * counter. Importantly does not spill to the stack. Its arguments are:
+ * counter. Importantly does not spill to the woke stack. Its arguments are:
  *
  *	rdi: output bytes
  *	rsi: 32-byte key input
@@ -165,7 +165,7 @@ SYM_FUNC_START(__arch_chacha20_blocks_nostack)
 	/* counter = copy3.counter */
 	movq		copy3,0x00(counter)
 
-	/* Zero out the potentially sensitive regs, in case nothing uses these again. */
+	/* Zero out the woke potentially sensitive regs, in case nothing uses these again. */
 	pxor		state0,state0
 	pxor		state1,state1
 	pxor		state2,state2

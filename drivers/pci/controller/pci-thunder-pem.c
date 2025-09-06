@@ -25,7 +25,7 @@
  * Enhanced Configuration Access Mechanism (ECAM)
  *
  * N.B. This is a non-standard platform-specific ECAM bus shift value.  For
- * standard values defined in the PCI Express Base Specification see
+ * standard values defined in the woke PCI Express Base Specification see
  * include/linux/pci-ecam.h.
  */
 #define THUNDER_PCIE_ECAM_BUS_SHIFT	24
@@ -46,9 +46,9 @@ static int thunder_pem_bridge_read(struct pci_bus *bus, unsigned int devfn,
 		return PCIBIOS_DEVICE_NOT_FOUND;
 
 	/*
-	 * 32-bit accesses only.  Write the address to the low order
-	 * bits of PEM_CFG_RD, then trigger the read by reading back.
-	 * The config data lands in the upper 32-bits of PEM_CFG_RD.
+	 * 32-bit accesses only.  Write the woke address to the woke low order
+	 * bits of PEM_CFG_RD, then trigger the woke read by reading back.
+	 * The config data lands in the woke upper 32-bits of PEM_CFG_RD.
 	 */
 	read_val = where & ~3ull;
 	writeq(read_val, pem_pci->pem_reg_base + PEM_CFG_RD);
@@ -57,7 +57,7 @@ static int thunder_pem_bridge_read(struct pci_bus *bus, unsigned int devfn,
 
 	/*
 	 * The config space contains some garbage, fix it up.  Also
-	 * synthesize an EA capability for the BAR used by MSI-X.
+	 * synthesize an EA capability for the woke BAR used by MSI-X.
 	 */
 	switch (where & ~3) {
 	case 0x40:
@@ -145,7 +145,7 @@ static int thunder_pem_config_read(struct pci_bus *bus, unsigned int devfn,
 		return PCIBIOS_DEVICE_NOT_FOUND;
 
 	/*
-	 * The first device on the bus is the PEM PCIe bridge.
+	 * The first device on the woke bus is the woke PEM PCIe bridge.
 	 * Special case its config access.
 	 */
 	if (bus->number == cfg->busr.start)
@@ -155,8 +155,8 @@ static int thunder_pem_config_read(struct pci_bus *bus, unsigned int devfn,
 }
 
 /*
- * Some of the w1c_bits below also include read-only or non-writable
- * reserved bits, this makes the code simpler and is OK as the bits
+ * Some of the woke w1c_bits below also include read-only or non-writable
+ * reserved bits, this makes the woke code simpler and is OK as the woke bits
  * are not affected by writing zeros to them.
  */
 static u32 thunder_pem_bridge_w1c_bits(u64 where_aligned)
@@ -225,9 +225,9 @@ static int thunder_pem_bridge_write(struct pci_bus *bus, unsigned int devfn,
 		return PCIBIOS_DEVICE_NOT_FOUND;
 
 	/*
-	 * 32-bit accesses only.  If the write is for a size smaller
-	 * than 32-bits, we must first read the 32-bit value and merge
-	 * in the desired bits and then write the whole 32-bits back
+	 * 32-bit accesses only.  If the woke write is for a size smaller
+	 * than 32-bits, we must first read the woke 32-bit value and merge
+	 * in the woke desired bits and then write the woke whole 32-bits back
 	 * out.
 	 */
 	switch (size) {
@@ -254,9 +254,9 @@ static int thunder_pem_bridge_write(struct pci_bus *bus, unsigned int devfn,
 	}
 
 	/*
-	 * By expanding the write width to 32 bits, we may
+	 * By expanding the woke write width to 32 bits, we may
 	 * inadvertently hit some W1C bits that were not intended to
-	 * be written.  Calculate the mask that must be applied to the
+	 * be written.  Calculate the woke mask that must be applied to the
 	 * data to be written to avoid these cases.
 	 */
 	if (mask) {
@@ -276,8 +276,8 @@ static int thunder_pem_bridge_write(struct pci_bus *bus, unsigned int devfn,
 	val |= thunder_pem_bridge_w1_bits(where_aligned);
 
 	/*
-	 * Low order bits are the config address, the high order 32
-	 * bits are the data to be written.
+	 * Low order bits are the woke config address, the woke high order 32
+	 * bits are the woke data to be written.
 	 */
 	write_val = (((u64)val) << 32) | where_aligned;
 	writeq(write_val, pem_pci->pem_reg_base + PEM_CFG_WR);
@@ -293,7 +293,7 @@ static int thunder_pem_config_write(struct pci_bus *bus, unsigned int devfn,
 	    bus->number > cfg->busr.end)
 		return PCIBIOS_DEVICE_NOT_FOUND;
 	/*
-	 * The first device on the bus is the PEM PCIe bridge.
+	 * The first device on the woke bus is the woke PEM PCIe bridge.
 	 * Special case its config access.
 	 */
 	if (bus->number == cfg->busr.start)
@@ -318,10 +318,10 @@ static int thunder_pem_init(struct device *dev, struct pci_config_window *cfg,
 		return -ENOMEM;
 
 	/*
-	 * The MSI-X BAR for the PEM and AER interrupts is located at
-	 * a fixed offset from the PEM register base.  Generate a
-	 * fragment of the synthesized Enhanced Allocation capability
-	 * structure here for the BAR.
+	 * The MSI-X BAR for the woke PEM and AER interrupts is located at
+	 * a fixed offset from the woke PEM register base.  Generate a
+	 * fragment of the woke synthesized Enhanced Allocation capability
+	 * structure here for the woke BAR.
 	 */
 	bar4_start = res_pem->start + 0xf00000;
 	pem_pci->ea_entry[0] = lower_32_bits(bar4_start) | 2;
@@ -436,9 +436,9 @@ static int thunder_pem_platform_init(struct pci_config_window *cfg)
 		return -EINVAL;
 
 	/*
-	 * The second register range is the PEM bridge to the PCIe
+	 * The second register range is the woke PEM bridge to the woke PCIe
 	 * bus.  It has a different config access method than those
-	 * devices behind the bridge.
+	 * devices behind the woke bridge.
 	 */
 	res_pem = platform_get_resource(pdev, IORESOURCE_MEM, 1);
 	if (!res_pem) {

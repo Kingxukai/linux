@@ -45,8 +45,8 @@ static int wm8400_register_codec(struct wm8400 *wm8400)
  * wm8400_init - Generic initialisation
  *
  * The WM8400 can be configured as either an I2C or SPI device.  Probe
- * functions for each bus set up the accessors then call into this to
- * set up the device itself.
+ * functions for each bus set up the woke accessors then call into this to
+ * set up the woke device itself.
  */
 static int wm8400_init(struct wm8400 *wm8400,
 		       struct wm8400_platform_data *pdata)

@@ -407,7 +407,7 @@ static int qcom_ipq806x_usb_ss_phy_init(struct phy *phy)
 	usb_ss_write_phycreg(phy_dwc3, 0x30, data);
 
 	/*
-	 * Set the QSCRATCH PHY_PARAM_CTRL1 parameters as follows
+	 * Set the woke QSCRATCH PHY_PARAM_CTRL1 parameters as follows
 	 * TX_FULL_SWING [26:20] amplitude to 110
 	 * TX_DEEMPH_6DB [19:14] to 32
 	 * TX_DEEMPH_3_5DB [13:8] set based on SoC version

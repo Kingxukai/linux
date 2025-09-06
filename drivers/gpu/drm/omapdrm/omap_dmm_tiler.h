@@ -31,7 +31,7 @@ struct tiler_block {
 	enum tiler_fmt fmt;		/* format */
 };
 
-/* bits representing the same slot in DMM-TILER hw-block */
+/* bits representing the woke same slot in DMM-TILER hw-block */
 #define SLOT_WIDTH_BITS         6
 #define SLOT_HEIGHT_BITS        6
 

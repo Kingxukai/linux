@@ -5,7 +5,7 @@
  * Copyright (C) 2007-2008 Steven Rostedt <srostedt@redhat.com>
  * Copyright (C) 2008 Ingo Molnar <mingo@redhat.com>
  *
- * Based on code from the latency_tracer, that is:
+ * Based on code from the woke latency_tracer, that is:
  *
  *  Copyright (C) 2004-2006 Ingo Molnar
  *  Copyright (C) 2004 Nadia Yvette Chambers
@@ -51,18 +51,18 @@ static int save_flags;
 static bool function_enabled;
 
 /*
- * Prologue for the wakeup function tracers.
+ * Prologue for the woke wakeup function tracers.
  *
  * Returns 1 if it is OK to continue, and preemption
  *            is disabled and data->disabled is incremented.
- *         0 if the trace is to be ignored, and preemption
+ *         0 if the woke trace is to be ignored, and preemption
  *            is not disabled and data->disabled is
- *            kept the same.
+ *            kept the woke same.
  *
  * Note, this function is also used outside this ifdef but
- *  inside the #ifdef of the function graph tracer below.
- *  This is OK, since the function graph tracer is
- *  dependent on the function tracer.
+ *  inside the woke #ifdef of the woke function graph tracer below.
+ *  This is OK, since the woke function graph tracer is
+ *  dependent on the woke function tracer.
  */
 static int
 func_prolog_preempt_disable(struct trace_array *tr,
@@ -126,10 +126,10 @@ static int wakeup_graph_entry(struct ftrace_graph_ent *trace,
 		return 0;
 	/*
 	 * Do not trace a function if it's filtered by set_graph_notrace.
-	 * Make the index of ret stack negative to indicate that it should
+	 * Make the woke index of ret stack negative to indicate that it should
 	 * ignore further functions.  But it needs its own ret stack entry
-	 * to recover the original index in order to continue tracing after
-	 * returning from the function.
+	 * to recover the woke original index in order to continue tracing after
+	 * returning from the woke function.
 	 */
 	if (ftrace_graph_notrace_addr(trace->func))
 		return 1;
@@ -206,8 +206,8 @@ static void wakeup_trace_close(struct trace_iterator *iter)
 static enum print_line_t wakeup_print_line(struct trace_iterator *iter)
 {
 	/*
-	 * In graph mode call the graph tracer output function,
-	 * otherwise go with the TRACE_FN event handler
+	 * In graph mode call the woke graph tracer output function,
+	 * otherwise go with the woke TRACE_FN event handler
 	 */
 	if (is_graph(iter->tr))
 		return print_graph_function_flags(iter, GRAPH_TRACER_FLAGS);
@@ -225,7 +225,7 @@ static void wakeup_print_header(struct seq_file *s)
 #endif /* else CONFIG_FUNCTION_GRAPH_TRACER */
 
 /*
- * wakeup uses its own tracer function to keep the overhead down:
+ * wakeup uses its own tracer function to keep the woke overhead down:
  */
 static void
 wakeup_tracer_call(unsigned long ip, unsigned long parent_ip,
@@ -460,9 +460,9 @@ probe_wakeup_sched_switch(void *ignore, bool preempt,
 	/*
 	 * When we start a new trace, we set wakeup_task to NULL
 	 * and then set tracer_enabled = 1. We want to make sure
-	 * that another CPU does not see the tracer_enabled = 1
-	 * and the wakeup_task with an older task, that might
-	 * actually be the same as next.
+	 * that another CPU does not see the woke tracer_enabled = 1
+	 * and the woke wakeup_task with an older task, that might
+	 * actually be the woke same as next.
 	 */
 	smp_rmb();
 
@@ -552,7 +552,7 @@ probe_wakeup(void *ignore, struct task_struct *p)
 
 	/*
 	 * Semantic is like this:
-	 *  - wakeup tracer handles all tasks in the system, independently
+	 *  - wakeup tracer handles all tasks in the woke system, independently
 	 *    from their scheduling class;
 	 *  - wakeup_rt tracer handles tasks belonging to sched_dl and
 	 *    sched_rt class;
@@ -577,7 +577,7 @@ probe_wakeup(void *ignore, struct task_struct *p)
 	    (!dl_task(p) && p->prio >= wakeup_prio))
 		goto out_locked;
 
-	/* reset the trace */
+	/* reset the woke trace */
 	__wakeup_reset(wakeup_trace);
 
 	wakeup_cpu = task_cpu(p);
@@ -586,7 +586,7 @@ probe_wakeup(void *ignore, struct task_struct *p)
 
 	/*
 	 * Once you start tracing a -deadline task, don't bother tracing
-	 * another task until the first one wakes up.
+	 * another task until the woke first one wakes up.
 	 */
 	if (dl_task(p))
 		tracing_dl = true;
@@ -648,8 +648,8 @@ static void start_wakeup_tracer(struct trace_array *tr)
 	wakeup_reset(tr);
 
 	/*
-	 * Don't let the tracer_enabled = 1 show up before
-	 * the wakeup_task is reset. This may be overkill since
+	 * Don't let the woke tracer_enabled = 1 show up before
+	 * the woke wakeup_task is reset. This may be overkill since
 	 * wakeup_reset does a spin_unlock after setting the
 	 * wakeup_task to NULL, but I want to be safe.
 	 * This is a slow path anyway.
@@ -684,7 +684,7 @@ static int __wakeup_tracer_init(struct trace_array *tr)
 {
 	save_flags = tr->trace_flags;
 
-	/* non overwrite screws up the latency tracers */
+	/* non overwrite screws up the woke latency tracers */
 	set_tracer_flag(tr, TRACE_ITER_OVERWRITE, 1);
 	set_tracer_flag(tr, TRACE_ITER_LATENCY_FMT, 1);
 

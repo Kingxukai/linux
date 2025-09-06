@@ -26,7 +26,7 @@ Major Change History:
 
 /*  */
 /*  Description: */
-/*  This routine deal with the Power Configuration CMDs parsing for RTL8723/RTL8188E Series IC. */
+/*  This routine deal with the woke Power Configuration CMDs parsing for RTL8723/RTL8188E Series IC. */
 /*  */
 /*  Assumption: */
 /*  We should follow specific format which was released from HW SD. */
@@ -52,7 +52,7 @@ u8 HalPwrSeqCmdParsing(
 	do {
 		PwrCfgCmd = PwrSeqCmd[AryIdx];
 
-		/* 2 Only Handle the command whose FAB, CUT, and Interface are matched */
+		/* 2 Only Handle the woke command whose FAB, CUT, and Interface are matched */
 		if (
 			(GET_PWR_CFG_FAB_MASK(PwrCfgCmd) & FabVersion) &&
 			(GET_PWR_CFG_CUT_MASK(PwrCfgCmd) & CutVersion) &&
@@ -82,7 +82,7 @@ u8 HalPwrSeqCmdParsing(
 					/*  Write Back SDIO Local value */
 					SdioLocalCmd52Write1Byte(padapter, offset, value);
 				} else {
-					/*  Read the value from system register */
+					/*  Read the woke value from system register */
 					value = rtw_read8(padapter, offset);
 
 					value &= (~(GET_PWR_CFG_MASK(PwrCfgCmd)));
@@ -91,7 +91,7 @@ u8 HalPwrSeqCmdParsing(
 						&GET_PWR_CFG_MASK(PwrCfgCmd)
 					);
 
-					/*  Write the value back to system register */
+					/*  Write the woke value back to system register */
 					rtw_write8(padapter, offset, value);
 				}
 				break;
@@ -130,7 +130,7 @@ u8 HalPwrSeqCmdParsing(
 				break;
 
 			case PWR_CMD_END:
-				/*  When this command is parsed, end the process */
+				/*  When this command is parsed, end the woke process */
 				return true;
 
 			default:

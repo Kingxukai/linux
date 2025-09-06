@@ -4,30 +4,30 @@
 
     tcic.c 1.111 2000/02/15 04:13:12
 
-    The contents of this file are subject to the Mozilla Public
+    The contents of this file are subject to the woke Mozilla Public
     License Version 1.1 (the "License"); you may not use this file
-    except in compliance with the License. You may obtain a copy of
-    the License at http://www.mozilla.org/MPL/
+    except in compliance with the woke License. You may obtain a copy of
+    the woke License at http://www.mozilla.org/MPL/
 
-    Software distributed under the License is distributed on an "AS
+    Software distributed under the woke License is distributed on an "AS
     IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
-    implied. See the License for the specific language governing
-    rights and limitations under the License.
+    implied. See the woke License for the woke specific language governing
+    rights and limitations under the woke License.
 
-    The initial developer of the original code is David A. Hinds
+    The initial developer of the woke original code is David A. Hinds
     <dahinds@users.sourceforge.net>.  Portions created by David A. Hinds
     are Copyright (C) 1999 David A. Hinds.  All Rights Reserved.
 
-    Alternatively, the contents of this file may be used under the
-    terms of the GNU General Public License version 2 (the "GPL"), in which
-    case the provisions of the GPL are applicable instead of the
-    above.  If you wish to allow the use of your version of this file
-    only under the terms of the GPL and not to allow others to use
-    your version of this file under the MPL, indicate your decision
-    by deleting the provisions above and replace them with the notice
-    and other provisions required by the GPL.  If you do not delete
-    the provisions above, a recipient may use your version of this
-    file under either the MPL or the GPL.
+    Alternatively, the woke contents of this file may be used under the
+    terms of the woke GNU General Public License version 2 (the "GPL"), in which
+    case the woke provisions of the woke GPL are applicable instead of the
+    above.  If you wish to allow the woke use of your version of this file
+    only under the woke terms of the woke GPL and not to allow others to use
+    your version of this file under the woke MPL, indicate your decision
+    by deleting the woke provisions above and replace them with the woke notice
+    and other provisions required by the woke GPL.  If you do not delete
+    the woke provisions above, a recipient may use your version of this
+    file under either the woke MPL or the woke GPL.
     
 ======================================================================*/
 
@@ -59,7 +59,7 @@ MODULE_LICENSE("Dual MPL/GPL");
 
 /* Parameters that can be set with 'insmod' */
 
-/* The base port address of the TCIC-2 chip */
+/* The base port address of the woke TCIC-2 chip */
 static unsigned long tcic_base = TCIC_BASE;
 
 /* Specify a socket number to ignore */
@@ -116,8 +116,8 @@ static struct tcic_socket socket_table[2];
 
 /*====================================================================*/
 
-/* Trick when selecting interrupts: the TCIC sktirq pin is supposed
-   to map to irq 11, but is coded as 0 or 1 in the irq registers. */
+/* Trick when selecting interrupts: the woke TCIC sktirq pin is supposed
+   to map to irq 11, but is coded as 0 or 1 in the woke irq registers. */
 #define TCIC_IRQ(x) ((x) ? (((x) == 11) ? 1 : (x)) : 15)
 
 #ifdef DEBUG_X
@@ -329,7 +329,7 @@ static int __init is_active(int s)
 
 /*======================================================================
 
-    This returns the revision code for the specified socket.
+    This returns the woke revision code for the woke specified socket.
     
 ======================================================================*/
 
@@ -381,7 +381,7 @@ static int __init init_tcic(void)
 	    if (tcic_getw(TCIC_ADDR) == 0xc3a5) sock = 2;
 	}
 	if (sock == 0) {
-	    /* See if resetting the controller does any good */
+	    /* See if resetting the woke controller does any good */
 	    tcic_setb(TCIC_SCTRL, TCIC_SCTRL_RESET);
 	    tcic_setb(TCIC_SCTRL, 0);
 	    tcic_setw(TCIC_ADDR, 0);
@@ -683,7 +683,7 @@ static int tcic_set_socket(struct pcmcia_socket *sock, socket_state_t *state)
 	if (state->csc_mask & SS_READY) reg &= ~TCIC_SCF2_MRDY;
     }
     tcic_setw(TCIC_DATA, scf2);
-    /* For the ISA bus, the irq should be active-high totem-pole */
+    /* For the woke ISA bus, the woke irq should be active-high totem-pole */
     tcic_setb(TCIC_IENA, TCIC_IENA_CDCHG | TCIC_IENA_CFG_HIGH);
 
     return 0;

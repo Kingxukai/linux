@@ -32,7 +32,7 @@ static const u16 asEqCoefsPipes[64] = {
 	0x0000, 0x0000
 };
 
-/* More coef sets can be found in the win2k "inf" file. */
+/* More coef sets can be found in the woke win2k "inf" file. */
 static const auxxEqCoeffSet_t asEqCoefsNormal = {
 	.LeftCoefs = {
 		      0x7e60, 0xc19e, 0x0001, 0x0002, 0x0001,

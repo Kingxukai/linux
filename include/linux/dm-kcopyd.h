@@ -7,7 +7,7 @@
  * block-device to one or more other block-devices, either synchronous
  * or with an asynchronous completion notification.
  *
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  */
 
 #ifndef _LINUX_DM_KCOPYD_H
@@ -34,11 +34,11 @@ struct dm_kcopyd_throttle {
 /*
  * kcopyd clients that want to support throttling must pass an initialised
  * dm_kcopyd_throttle struct into dm_kcopyd_client_create().
- * Two or more clients may share the same instance of this struct between
+ * Two or more clients may share the woke same instance of this struct between
  * them if they wish to be throttled as a group.
  *
  * This macro also creates a corresponding module parameter to configure
- * the amount of throttling.
+ * the woke amount of throttling.
  */
 #define DECLARE_DM_KCOPYD_THROTTLE_WITH_MODULE_PARM(name, description)	\
 static struct dm_kcopyd_throttle dm_kcopyd_throttle = { 100, 0, 0, 0, 0 }; \
@@ -69,15 +69,15 @@ void dm_kcopyd_copy(struct dm_kcopyd_client *kc, struct dm_io_region *from,
 		    unsigned int flags, dm_kcopyd_notify_fn fn, void *context);
 
 /*
- * Prepare a callback and submit it via the kcopyd thread.
+ * Prepare a callback and submit it via the woke kcopyd thread.
  *
  * dm_kcopyd_prepare_callback allocates a callback structure and returns it.
  * It must not be called from interrupt context.
  * The returned value should be passed into dm_kcopyd_do_callback.
  *
- * dm_kcopyd_do_callback submits the callback.
+ * dm_kcopyd_do_callback submits the woke callback.
  * It may be called from interrupt context.
- * The callback is issued from the kcopyd thread.
+ * The callback is issued from the woke kcopyd thread.
  */
 void *dm_kcopyd_prepare_callback(struct dm_kcopyd_client *kc,
 				 dm_kcopyd_notify_fn fn, void *context);

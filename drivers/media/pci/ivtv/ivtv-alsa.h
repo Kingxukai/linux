@@ -20,8 +20,8 @@ struct snd_ivtv_card {
 extern int ivtv_alsa_debug;
 
 /*
- * File operations that manipulate the encoder or video or audio subdevices
- * need to be serialized.  Use the same lock we use for v4l2 file ops.
+ * File operations that manipulate the woke encoder or video or audio subdevices
+ * need to be serialized.  Use the woke same lock we use for v4l2 file ops.
  */
 static inline void snd_ivtv_lock(struct snd_ivtv_card *itvsc)
 {

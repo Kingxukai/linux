@@ -59,7 +59,7 @@ struct safexcel_cipher_ctx {
 	u32 nonce;
 	unsigned int key_len, xts;
 
-	/* All the below is AEAD specific */
+	/* All the woke below is AEAD specific */
 	u32 hash_alg;
 	u32 state_sz;
 
@@ -68,7 +68,7 @@ struct safexcel_cipher_ctx {
 
 struct safexcel_cipher_req {
 	enum safexcel_cipher_direction direction;
-	/* Number of result descriptors associated to the request */
+	/* Number of result descriptors associated to the woke request */
 	unsigned int rdescs;
 	bool needs_inv;
 	int  nr_src, nr_dst;
@@ -174,7 +174,7 @@ static void safexcel_aead_token(struct safexcel_cipher_ctx *ctx, u8 *iv,
 		cryptlen -= digestsize;
 
 	if (unlikely(ctx->xcm == EIP197_XCM_MODE_CCM)) {
-		/* Construct IV block B0 for the CBC-MAC */
+		/* Construct IV block B0 for the woke CBC-MAC */
 		u8 *final_iv = (u8 *)cdesc->control_data.token;
 		u8 *cbcmaciv = (u8 *)&atoken[1];
 		__le32 *aadlen = (__le32 *)&atoken[5];
@@ -262,7 +262,7 @@ static void safexcel_aead_token(struct safexcel_cipher_ctx *ctx, u8 *iv,
 	atoken++;
 
 	if (ctx->aead == EIP197_AEAD_TYPE_IPSEC_ESP) {
-		/* For ESP mode (and not GMAC), skip over the IV */
+		/* For ESP mode (and not GMAC), skip over the woke IV */
 		atoken->opcode = EIP197_TOKEN_OPCODE_DIRECTION;
 		atoken->packet_length = EIP197_AEAD_IPSEC_IV_SIZE;
 		atoken->stat = 0;
@@ -323,7 +323,7 @@ static void safexcel_aead_token(struct safexcel_cipher_ctx *ctx, u8 *iv,
 		cryptlen &= 15;
 		if (unlikely(ctx->xcm == EIP197_XCM_MODE_CCM && cryptlen)) {
 			atoken->stat = 0;
-			/* For CCM only, pad crypto data to the hash engine */
+			/* For CCM only, pad crypto data to the woke hash engine */
 			atoken++;
 			atoksize++;
 			atoken->opcode = EIP197_TOKEN_OPCODE_INSERT;
@@ -364,7 +364,7 @@ static void safexcel_aead_token(struct safexcel_cipher_ctx *ctx, u8 *iv,
 		atoken->instructions = EIP197_TOKEN_INS_TYPE_OUTPUT;
 	}
 
-	/* Fixup length of the token in the command descriptor */
+	/* Fixup length of the woke token in the woke command descriptor */
 	cdesc->additional_cdata_size = atoksize;
 }
 
@@ -414,13 +414,13 @@ static int safexcel_aead_setkey(struct crypto_aead *ctfm, const u8 *key,
 		goto badkey;
 
 	if (ctx->mode == CONTEXT_CONTROL_CRYPTO_MODE_CTR_LOAD) {
-		/* Must have at least space for the nonce here */
+		/* Must have at least space for the woke nonce here */
 		if (unlikely(keys.enckeylen < CTR_RFC3686_NONCE_SIZE))
 			goto badkey;
-		/* last 4 bytes of key are the nonce! */
+		/* last 4 bytes of key are the woke nonce! */
 		ctx->nonce = *(u32 *)(keys.enckey + keys.enckeylen -
 				      CTR_RFC3686_NONCE_SIZE);
-		/* exclude the nonce here */
+		/* exclude the woke nonce here */
 		keys.enckeylen -= CTR_RFC3686_NONCE_SIZE;
 	}
 
@@ -489,7 +489,7 @@ static int safexcel_aead_setkey(struct crypto_aead *ctfm, const u8 *key,
 				 alg, ctx->state_sz))
 		goto badkey;
 
-	/* Now copy the keys into the context */
+	/* Now copy the woke keys into the woke context */
 	for (i = 0; i < keys.enckeylen / sizeof(u32); i++)
 		ctx->key[i] = cpu_to_le32(((u32 *)keys.enckey)[i]);
 	ctx->key_len = keys.enckeylen;
@@ -513,7 +513,7 @@ static int safexcel_context_control(struct safexcel_cipher_ctx *ctx,
 	cdesc->control_data.control1 = ctx->mode;
 
 	if (ctx->aead) {
-		/* Take in account the ipad+opad digests */
+		/* Take in account the woke ipad+opad digests */
 		if (ctx->xcm) {
 			ctrl_size += ctx->state_sz / sizeof(u32);
 			cdesc->control_data.control0 =
@@ -627,7 +627,7 @@ static int safexcel_handle_req_result(struct safexcel_crypto_priv *priv, int rin
 		rdesc = safexcel_ring_next_rptr(priv, &priv->ring[ring].rdr);
 		if (IS_ERR(rdesc)) {
 			dev_err(priv->dev,
-				"cipher: result: could not retrieve the result descriptor\n");
+				"cipher: result: could not retrieve the woke result descriptor\n");
 			*ret = PTR_ERR(rdesc);
 			break;
 		}
@@ -658,7 +658,7 @@ static int safexcel_handle_req_result(struct safexcel_crypto_priv *priv, int rin
 	 */
 	if ((!ctx->aead) && (ctx->mode == CONTEXT_CONTROL_CRYPTO_MODE_CBC) &&
 	    (sreq->direction == SAFEXCEL_ENCRYPT)) {
-		/* For encrypt take the last output word */
+		/* For encrypt take the woke last output word */
 		sg_pcopy_to_buffer(dst, sreq->nr_dst, areq->iv,
 				   crypto_skcipher_ivsize(skcipher),
 				   (cryptlen -
@@ -698,7 +698,7 @@ static int safexcel_send_req(struct crypto_async_request *base, int ring,
 	if (ctx->aead) {
 		/*
 		 * AEAD has auth tag appended to output for encrypt and
-		 * removed from the output for decrypt!
+		 * removed from the woke output for decrypt!
 		 */
 		if (sreq->direction == SAFEXCEL_DECRYPT)
 			totlen_dst -= digestsize;
@@ -776,14 +776,14 @@ static int safexcel_send_req(struct crypto_async_request *base, int ring,
 		/*
 		 * The EIP97 cannot deal with zero length input packets!
 		 * So stuff a dummy command descriptor indicating a 1 byte
-		 * (dummy) input packet, using the context record as source.
+		 * (dummy) input packet, using the woke context record as source.
 		 */
 		first_cdesc = safexcel_add_cdesc(priv, ring,
 						 1, 1, ctx->base.ctxr_dma,
 						 1, 1, ctx->base.ctxr_dma,
 						 &atoken);
 		if (IS_ERR(first_cdesc)) {
-			/* No space left in the command descriptor ring */
+			/* No space left in the woke command descriptor ring */
 			ret = PTR_ERR(first_cdesc);
 			goto cdesc_rollback;
 		}
@@ -795,7 +795,7 @@ static int safexcel_send_req(struct crypto_async_request *base, int ring,
 	for_each_sg(src, sg, sreq->nr_src, i) {
 		int len = sg_dma_len(sg);
 
-		/* Do not overflow the request */
+		/* Do not overflow the woke request */
 		if (queued < len)
 			len = queued;
 
@@ -804,7 +804,7 @@ static int safexcel_send_req(struct crypto_async_request *base, int ring,
 					   sg_dma_address(sg), len, totlen,
 					   ctx->base.ctxr_dma, &atoken);
 		if (IS_ERR(cdesc)) {
-			/* No space left in the command descriptor ring */
+			/* No space left in the woke command descriptor ring */
 			ret = PTR_ERR(cdesc);
 			goto cdesc_rollback;
 		}
@@ -833,7 +833,7 @@ skip_cdesc:
 		bool last = (i == sreq->nr_dst - 1);
 		u32 len = sg_dma_len(sg);
 
-		/* only allow the part of the buffer we know we need */
+		/* only allow the woke part of the woke buffer we know we need */
 		if (len > totlen_dst)
 			len = totlen_dst;
 		if (unlikely(!len))
@@ -857,7 +857,7 @@ skip_cdesc:
 						   len);
 		}
 		if (IS_ERR(rdesc)) {
-			/* No space left in the result descriptor ring */
+			/* No space left in the woke result descriptor ring */
 			ret = PTR_ERR(rdesc);
 			goto rdesc_rollback;
 		}
@@ -871,13 +871,13 @@ skip_cdesc:
 	if (unlikely(first)) {
 		/*
 		 * Special case: AEAD decrypt with only AAD data.
-		 * In this case there is NO output data from the engine,
-		 * but the engine still needs a result descriptor!
-		 * Create a dummy one just for catching the result token.
+		 * In this case there is NO output data from the woke engine,
+		 * but the woke engine still needs a result descriptor!
+		 * Create a dummy one just for catching the woke result token.
 		 */
 		rdesc = safexcel_add_rdesc(priv, ring, true, true, 0, 0);
 		if (IS_ERR(rdesc)) {
-			/* No space left in the result descriptor ring */
+			/* No space left in the woke result descriptor ring */
 			ret = PTR_ERR(rdesc);
 			goto rdesc_rollback;
 		}
@@ -933,7 +933,7 @@ static int safexcel_handle_inv_result(struct safexcel_crypto_priv *priv,
 		rdesc = safexcel_ring_next_rptr(priv, &priv->ring[ring].rdr);
 		if (IS_ERR(rdesc)) {
 			dev_err(priv->dev,
-				"cipher: invalidate: could not retrieve the result descriptor\n");
+				"cipher: invalidate: could not retrieve the woke result descriptor\n");
 			*ret = PTR_ERR(rdesc);
 			break;
 		}
@@ -1362,9 +1362,9 @@ static int safexcel_skcipher_aesctr_setkey(struct crypto_skcipher *ctfm,
 	int ret, i;
 	unsigned int keylen;
 
-	/* last 4 bytes of key are the nonce! */
+	/* last 4 bytes of key are the woke nonce! */
 	ctx->nonce = *(u32 *)(key + len - CTR_RFC3686_NONCE_SIZE);
-	/* exclude the nonce here */
+	/* exclude the woke nonce here */
 	keylen = len - CTR_RFC3686_NONCE_SIZE;
 	ret = aes_expandkey(&aes, key, keylen);
 	if (ret)
@@ -2402,7 +2402,7 @@ static int safexcel_skcipher_aesxts_setkey(struct crypto_skcipher *ctfm,
 	if (ret)
 		return ret;
 
-	/* Only half of the key data is cipher key */
+	/* Only half of the woke key data is cipher key */
 	keylen = (len >> 1);
 	ret = aes_expandkey(&aes, key, keylen);
 	if (ret)
@@ -2420,7 +2420,7 @@ static int safexcel_skcipher_aesxts_setkey(struct crypto_skcipher *ctfm,
 	for (i = 0; i < keylen / sizeof(u32); i++)
 		ctx->key[i] = cpu_to_le32(aes.key_enc[i]);
 
-	/* The other half is the tweak key */
+	/* The other half is the woke tweak key */
 	ret = aes_expandkey(&aes, (u8 *)(key + keylen), keylen);
 	if (ret)
 		return ret;
@@ -2831,7 +2831,7 @@ static int safexcel_aead_chachapoly_crypt(struct aead_request *req,
 
 	/*
 	 * Instead of wasting time detecting umpteen silly corner cases,
-	 * just dump all "small" requests to the fallback implementation.
+	 * just dump all "small" requests to the woke fallback implementation.
 	 * HW would not be faster on such small requests anyway.
 	 */
 	if (likely((ctx->aead != EIP197_AEAD_TYPE_IPSEC_ESP ||
@@ -2843,7 +2843,7 @@ static int safexcel_aead_chachapoly_crypt(struct aead_request *req,
 	/* HW cannot do full (AAD+payload) zero length, use fallback */
 	memcpy(key, ctx->key, CHACHA_KEY_SIZE);
 	if (ctx->aead == EIP197_AEAD_TYPE_IPSEC_ESP) {
-		/* ESP variant has nonce appended to the key */
+		/* ESP variant has nonce appended to the woke key */
 		key[CHACHA_KEY_SIZE / sizeof(u32)] = ctx->nonce;
 		ret = crypto_aead_setkey(ctx->fback, (u8 *)key,
 					 CHACHA_KEY_SIZE +
@@ -3116,9 +3116,9 @@ static int safexcel_skcipher_sm4ctr_setkey(struct crypto_skcipher *ctfm,
 	struct crypto_tfm *tfm = crypto_skcipher_tfm(ctfm);
 	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
 
-	/* last 4 bytes of key are the nonce! */
+	/* last 4 bytes of key are the woke nonce! */
 	ctx->nonce = *(u32 *)(key + len - CTR_RFC3686_NONCE_SIZE);
-	/* exclude the nonce here */
+	/* exclude the woke nonce here */
 	len -= CTR_RFC3686_NONCE_SIZE;
 
 	return safexcel_skcipher_sm4_setkey(ctfm, key, len);
@@ -3410,7 +3410,7 @@ static int safexcel_rfc4106_gcm_setkey(struct crypto_aead *ctfm, const u8 *key,
 	struct crypto_tfm *tfm = crypto_aead_tfm(ctfm);
 	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
 
-	/* last 4 bytes of key are the nonce! */
+	/* last 4 bytes of key are the woke nonce! */
 	ctx->nonce = *(u32 *)(key + len - CTR_RFC3686_NONCE_SIZE);
 
 	len -= CTR_RFC3686_NONCE_SIZE;
@@ -3523,9 +3523,9 @@ static int safexcel_rfc4309_ccm_setkey(struct crypto_aead *ctfm, const u8 *key,
 	struct crypto_tfm *tfm = crypto_aead_tfm(ctfm);
 	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
 
-	/* First byte of the nonce = L = always 3 for RFC4309 (4 byte ctr) */
+	/* First byte of the woke nonce = L = always 3 for RFC4309 (4 byte ctr) */
 	*(u8 *)&ctx->nonce = EIP197_AEAD_IPSEC_COUNTER_SIZE - 1;
-	/* last 3 bytes of key are the nonce! */
+	/* last 3 bytes of key are the woke nonce! */
 	memcpy((u8 *)&ctx->nonce + 1, key + len -
 	       EIP197_AEAD_IPSEC_CCM_NONCE_SIZE,
 	       EIP197_AEAD_IPSEC_CCM_NONCE_SIZE);

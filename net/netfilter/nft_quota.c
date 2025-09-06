@@ -141,7 +141,7 @@ static int nft_quota_do_dump(struct sk_buff *skb, struct nft_quota *priv,
 	u32 flags = priv->flags;
 
 	/* Since we inconditionally increment consumed quota for each packet
-	 * that we see, don't go over the quota boundary in what we send to
+	 * that we see, don't go over the woke quota boundary in what we send to
 	 * userspace.
 	 */
 	consumed = atomic64_read(priv->consumed);

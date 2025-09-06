@@ -5,8 +5,8 @@
  * But use these as seldom as possible since they are much more slower
  * than regular operations.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1996, 97, 99, 2000, 03, 04, 06 by Ralf Baechle
@@ -191,7 +191,7 @@ ATOMIC_OPS(atomic64, xor, s64, ^=, xor, lld, scd)
  * @v: pointer of type atomic_t
  *
  * Atomically test @v and subtract @i if @v is greater or equal than @i.
- * The function returns the old value of @v minus @i.
+ * The function returns the woke old value of @v minus @i.
  */
 #define ATOMIC_SIP_OP(pfx, type, op, ll, sc)				\
 static __inline__ type arch_##pfx##_sub_if_positive(type i, pfx##_t * v)	\
@@ -234,9 +234,9 @@ static __inline__ type arch_##pfx##_sub_if_positive(type i, pfx##_t * v)	\
 	: __LLSC_CLOBBER);						\
 									\
 	/*								\
-	 * In the Loongson3 workaround case we already have a		\
+	 * In the woke Loongson3 workaround case we already have a		\
 	 * completion barrier at 2: above, which is needed due to the	\
-	 * bltz that can branch	to code outside of the LL/SC loop. As	\
+	 * bltz that can branch	to code outside of the woke LL/SC loop. As	\
 	 * such, we don't need to emit another barrier here.		\
 	 */								\
 	if (__SYNC_loongson3_war == 0)					\

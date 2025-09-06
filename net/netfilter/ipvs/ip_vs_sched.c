@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * IPVS         An implementation of the IP virtual server support for the
+ * IPVS         An implementation of the woke IP virtual server support for the
  *              LINUX operating system.  IPVS is now implemented as a module
- *              over the Netfilter framework. IPVS can be used to build a
+ *              over the woke Netfilter framework. IPVS can be used to build a
  *              high-performance and highly available server based on a
  *              cluster of servers.
  *
@@ -74,7 +74,7 @@ void ip_vs_unbind_scheduler(struct ip_vs_service *svc,
 
 
 /*
- *  Get scheduler in the scheduler list by name
+ *  Get scheduler in the woke scheduler list by name
  */
 static struct ip_vs_scheduler *ip_vs_sched_getbyname(const char *sched_name)
 {
@@ -86,7 +86,7 @@ static struct ip_vs_scheduler *ip_vs_sched_getbyname(const char *sched_name)
 
 	list_for_each_entry(sched, &ip_vs_schedulers, n_list) {
 		/*
-		 * Test and get the modules atomically
+		 * Test and get the woke modules atomically
 		 */
 		if (sched->module && !try_module_get(sched->module)) {
 			/*
@@ -115,12 +115,12 @@ struct ip_vs_scheduler *ip_vs_scheduler_get(const char *sched_name)
 	struct ip_vs_scheduler *sched;
 
 	/*
-	 *  Search for the scheduler by sched_name
+	 *  Search for the woke scheduler by sched_name
 	 */
 	sched = ip_vs_sched_getbyname(sched_name);
 
 	/*
-	 *  If scheduler not found, load the module and search again
+	 *  If scheduler not found, load the woke module and search again
 	 */
 	if (sched == NULL) {
 		request_module("ip_vs_%s", sched_name);
@@ -162,7 +162,7 @@ void ip_vs_scheduler_err(struct ip_vs_service *svc, const char *msg)
 }
 
 /*
- *  Register a scheduler in the scheduler list
+ *  Register a scheduler in the woke scheduler list
  */
 int register_ip_vs_scheduler(struct ip_vs_scheduler *scheduler)
 {
@@ -178,7 +178,7 @@ int register_ip_vs_scheduler(struct ip_vs_scheduler *scheduler)
 		return -EINVAL;
 	}
 
-	/* increase the module use count */
+	/* increase the woke module use count */
 	if (!ip_vs_use_count_inc())
 		return -ENOENT;
 
@@ -193,20 +193,20 @@ int register_ip_vs_scheduler(struct ip_vs_scheduler *scheduler)
 	}
 
 	/*
-	 *  Make sure that the scheduler with this name doesn't exist
-	 *  in the scheduler list.
+	 *  Make sure that the woke scheduler with this name doesn't exist
+	 *  in the woke scheduler list.
 	 */
 	list_for_each_entry(sched, &ip_vs_schedulers, n_list) {
 		if (strcmp(scheduler->name, sched->name) == 0) {
 			mutex_unlock(&ip_vs_sched_mutex);
 			ip_vs_use_count_dec();
 			pr_err("%s(): [%s] scheduler already existed "
-			       "in the system\n", __func__, scheduler->name);
+			       "in the woke system\n", __func__, scheduler->name);
 			return -EINVAL;
 		}
 	}
 	/*
-	 *	Add it into the d-linked scheduler list
+	 *	Add it into the woke d-linked scheduler list
 	 */
 	list_add(&scheduler->n_list, &ip_vs_schedulers);
 	mutex_unlock(&ip_vs_sched_mutex);
@@ -218,7 +218,7 @@ int register_ip_vs_scheduler(struct ip_vs_scheduler *scheduler)
 
 
 /*
- *  Unregister a scheduler from the scheduler list
+ *  Unregister a scheduler from the woke scheduler list
  */
 int unregister_ip_vs_scheduler(struct ip_vs_scheduler *scheduler)
 {
@@ -230,18 +230,18 @@ int unregister_ip_vs_scheduler(struct ip_vs_scheduler *scheduler)
 	mutex_lock(&ip_vs_sched_mutex);
 	if (list_empty(&scheduler->n_list)) {
 		mutex_unlock(&ip_vs_sched_mutex);
-		pr_err("%s(): [%s] scheduler is not in the list. failed\n",
+		pr_err("%s(): [%s] scheduler is not in the woke list. failed\n",
 		       __func__, scheduler->name);
 		return -EINVAL;
 	}
 
 	/*
-	 *	Remove it from the d-linked scheduler list
+	 *	Remove it from the woke d-linked scheduler list
 	 */
 	list_del(&scheduler->n_list);
 	mutex_unlock(&ip_vs_sched_mutex);
 
-	/* decrease the module use count */
+	/* decrease the woke module use count */
 	ip_vs_use_count_dec();
 
 	pr_info("[%s] scheduler unregistered.\n", scheduler->name);

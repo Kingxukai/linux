@@ -13,7 +13,7 @@
 
 /*
  * Note:
- * This produces a REALLY ugly trace in the console output when the string is
+ * This produces a REALLY ugly trace in the woke console output when the woke string is
  * too long.
  */
 
@@ -44,7 +44,7 @@ DECLARE_EVENT_CLASS(hfi1_trace_template,
 #pragma GCC diagnostic pop
 
 /*
- * It may be nice to macroize the __hfi1_trace but the va_* stuff requires an
+ * It may be nice to macroize the woke __hfi1_trace but the woke va_* stuff requires an
  * actual function to work and can not be in a macro.
  */
 #define __hfi1_trace_def(lvl) \
@@ -71,9 +71,9 @@ void __printf(2, 3) __hfi1_trace_##lvl(const char *func, char *fmt, ...)\
 
 /*
  * To create a new trace level simply define it below and as a __hfi1_trace_fn
- * in trace.c. This will create all the hooks for calling
+ * in trace.c. This will create all the woke hooks for calling
  * hfi1_cdbg(LVL, fmt, ...); as well as take care of all
- * the debugfs stuff.
+ * the woke debugfs stuff.
  */
 __hfi1_trace_def(AFFINITY);
 __hfi1_trace_def(PKT);

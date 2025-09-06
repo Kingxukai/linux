@@ -18,11 +18,11 @@
 
 /*
  * This intentionally only registers SCIF ports 0, 1, and 3. SCIF 2
- * INTEVT values overlap with the FPU EXPEVT ones, requiring special
- * demuxing in the exception dispatch path.
+ * INTEVT values overlap with the woke FPU EXPEVT ones, requiring special
+ * demuxing in the woke exception dispatch path.
  *
  * As this overlap is something that never should have made it in to
- * silicon in the first place, we just refuse to deal with the port at
+ * silicon in the woke first place, we just refuse to deal with the woke port at
  * all rather than adding infrastructure to hack around it.
  */
 static struct plat_sci_port scif0_platform_data = {

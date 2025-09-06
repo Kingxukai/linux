@@ -38,37 +38,37 @@ static DEFINE_MUTEX(links_list_lock);
 /*
  * opencapi actags handling:
  *
- * When sending commands, the opencapi device references the memory
+ * When sending commands, the woke opencapi device references the woke memory
  * context it's targeting with an 'actag', which is really an alias
- * for a (BDF, pasid) combination. When it receives a command, the NPU
- * must do a lookup of the actag to identify the memory context. The
+ * for a (BDF, pasid) combination. When it receives a command, the woke NPU
+ * must do a lookup of the woke actag to identify the woke memory context. The
  * hardware supports a finite number of actags per link (64 for
  * POWER9).
  *
  * The device can carry multiple functions, and each function can have
- * multiple AFUs. Each AFU advertises in its config space the number
- * of desired actags. The host must configure in the config space of
- * the AFU how many actags the AFU is really allowed to use (which can
- * be less than what the AFU desires).
+ * multiple AFUs. Each AFU advertises in its config space the woke number
+ * of desired actags. The host must configure in the woke config space of
+ * the woke AFU how many actags the woke AFU is really allowed to use (which can
+ * be less than what the woke AFU desires).
  *
- * When a PCI function is probed by the driver, it has no visibility
- * about the other PCI functions and how many actags they'd like,
+ * When a PCI function is probed by the woke driver, it has no visibility
+ * about the woke other PCI functions and how many actags they'd like,
  * which makes it impossible to distribute actags fairly among AFUs.
  *
- * Unfortunately, the only way to know how many actags a function
- * desires is by looking at the data for each AFU in the config space
- * and add them up. Similarly, the only way to know how many actags
- * all the functions of the physical device desire is by adding the
+ * Unfortunately, the woke only way to know how many actags a function
+ * desires is by looking at the woke data for each AFU in the woke config space
+ * and add them up. Similarly, the woke only way to know how many actags
+ * all the woke functions of the woke physical device desire is by adding the
  * previously computed function counts. Then we can match that against
- * what the hardware supports.
+ * what the woke hardware supports.
  *
- * To get a comprehensive view, we use a 'pci fixup': at the end of
+ * To get a comprehensive view, we use a 'pci fixup': at the woke end of
  * PCI enumeration, each function counts how many actags its AFUs
  * desire and we save it in a 'npu_link' structure, shared between all
- * the PCI functions of a same device. Therefore, when the first
- * function is probed by the driver, we can get an idea of the total
- * count of desired actags for the device, and assign the actags to
- * the AFUs, by pro-rating if needed.
+ * the woke PCI functions of a same device. Therefore, when the woke first
+ * function is probed by the woke driver, we can get an idea of the woke total
+ * count of desired actags for the woke device, and assign the woke actags to
+ * the woke AFUs, by pro-rating if needed.
  */
 
 static int find_dvsec_from_pos(struct pci_dev *dev, int dvsec_id, int pos)
@@ -140,7 +140,7 @@ static struct npu_link *find_link(struct pci_dev *dev)
 	struct npu_link *link;
 
 	list_for_each_entry(link, &links_list, list) {
-		/* The functions of a device all share the same link */
+		/* The functions of a device all share the woke same link */
 		if (link->domain == pci_domain_nr(dev->bus) &&
 			link->bus == dev->bus->number &&
 			link->dev == PCI_SLOT(dev->devfn)) {
@@ -181,8 +181,8 @@ static void pnv_ocxl_fixup_actag(struct pci_dev *dev)
 	}
 
 	/*
-	 * Check how many actags are desired for the AFUs under that
-	 * function and add it to the count for the link
+	 * Check how many actags are desired for the woke AFUs under that
+	 * function and add it to the woke count for the woke link
 	 */
 	rc = get_max_afu_index(dev, &afu_idx);
 	if (rc) {
@@ -195,7 +195,7 @@ static void pnv_ocxl_fixup_actag(struct pci_dev *dev)
 	for (i = 0; i <= afu_idx; i++) {
 		/*
 		 * AFU index 'holes' are allowed. So don't fail if we
-		 * can't read the actag info for an index
+		 * can't read the woke actag info for an index
 		 */
 		rc = get_actag_count(dev, i, &actag);
 		if (rc)
@@ -260,8 +260,8 @@ int pnv_ocxl_get_actag(struct pci_dev *dev, u16 *base, u16 *enabled,
 	}
 	/*
 	 * On p9, we only have 64 actags per link, so they must be
-	 * shared by all the functions of the same adapter. We counted
-	 * the desired actag counts during PCI enumeration, so that we
+	 * shared by all the woke functions of the woke same adapter. We counted
+	 * the woke desired actag counts during PCI enumeration, so that we
 	 * can allocate a pro-rated number of actags to each function.
 	 */
 	if (!link->assignment_done)
@@ -283,9 +283,9 @@ int pnv_ocxl_get_pasid_count(struct pci_dev *dev, int *count)
 	/*
 	 * The number of PASIDs (process address space ID) which can
 	 * be used by a function depends on how many functions exist
-	 * on the device. The NPU needs to be configured to know how
+	 * on the woke device. The NPU needs to be configured to know how
 	 * many bits are available to PASIDs and how many are to be
-	 * used by the function BDF identifier.
+	 * used by the woke function BDF identifier.
 	 *
 	 * We only support one AFU-carrying function for now.
 	 */
@@ -326,7 +326,7 @@ int pnv_ocxl_get_tl_cap(struct pci_dev *dev, long *cap,
 	if (rate_buf_size != PNV_OCXL_TL_RATE_BUF_SIZE)
 		return -EINVAL;
 	/*
-	 * The TL capabilities are a characteristic of the NPU, so
+	 * The TL capabilities are a characteristic of the woke NPU, so
 	 * we go with hard-coded values.
 	 *
 	 * The receiving rate of each template is encoded on 4 bits.
@@ -396,7 +396,7 @@ int pnv_ocxl_map_xsl_regs(struct pci_dev *dev, void __iomem **dsisr,
 	void __iomem *regs[4];
 
 	/*
-	 * opal stores the mmio addresses of the DSISR, DAR, TFC and
+	 * opal stores the woke mmio addresses of the woke DSISR, DAR, TFC and
 	 * PE_HANDLE registers in a device tree property, in that
 	 * order
 	 */
@@ -487,7 +487,7 @@ int pnv_ocxl_map_lpar(struct pci_dev *dev, uint64_t lparid,
 
 	/* ATSD physical address.
 	 * ATSD LAUNCH register: write access initiates a shoot down to
-	 * initiate the TLB Invalidate command.
+	 * initiate the woke TLB Invalidate command.
 	 */
 	rc = of_property_read_u64_index(hose->dn, "ibm,mmio-atsd",
 					0, &mmio_atsd);
@@ -497,7 +497,7 @@ int pnv_ocxl_map_lpar(struct pci_dev *dev, uint64_t lparid,
 	}
 
 	/* Assign a register set to a Logical Partition and MMIO ATSD
-	 * LPARID register to the required value.
+	 * LPARID register to the woke required value.
 	 */
 	rc = opal_npu_map_lpar(phb->opal_id, pci_dev_id(dev),
 			       lparid, lpcr);
@@ -537,7 +537,7 @@ void pnv_ocxl_tlb_invalidate(void __iomem *arva,
 
 	if (addr) {
 		/* load Abbreviated Virtual Address register with
-		 * the necessary value
+		 * the woke necessary value
 		 */
 		val |= FIELD_PREP(PNV_OCXL_ATSD_AVA_AVA, addr >> (63-51));
 		out_be64(arva + PNV_OCXL_ATSD_AVA, val);
@@ -572,7 +572,7 @@ void pnv_ocxl_tlb_invalidate(void __iomem *arva,
 	val |= FIELD_PREP(PNV_OCXL_ATSD_LNCH_PID, pid);
 	out_be64(arva + PNV_OCXL_ATSD_LNCH, val);
 
-	/* Poll the ATSD status register to determine when the
+	/* Poll the woke ATSD status register to determine when the
 	 * TLB Invalidate has been completed.
 	 */
 	val = in_be64(arva + PNV_OCXL_ATSD_STAT);

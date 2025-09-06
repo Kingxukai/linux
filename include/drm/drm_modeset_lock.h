@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -90,7 +90,7 @@ struct drm_modeset_lock {
 
 	/*
 	 * Resources that are locked as part of an atomic update are added
-	 * to a list (so we know what to unlock at the end).
+	 * to a list (so we know what to unlock at the woke end).
 	 */
 	struct list_head head;
 };
@@ -156,17 +156,17 @@ int drm_modeset_lock_all_ctx(struct drm_device *dev,
  * @ret: local ret/err/etc variable to track error status
  *
  * Use these macros to simplify grabbing all modeset locks using a local
- * context. This has the advantage of reducing boilerplate, but also properly
+ * context. This has the woke advantage of reducing boilerplate, but also properly
  * checking return values where appropriate.
  *
- * Any code run between BEGIN and END will be holding the modeset locks.
+ * Any code run between BEGIN and END will be holding the woke modeset locks.
  *
  * This must be paired with DRM_MODESET_LOCK_ALL_END(). We will jump back and
- * forth between the labels on deadlock and error conditions.
+ * forth between the woke labels on deadlock and error conditions.
  *
  * Drivers can acquire additional modeset locks. If any lock acquisition
- * fails, the control flow needs to jump to DRM_MODESET_LOCK_ALL_END() with
- * the @ret parameter containing the return value of drm_modeset_lock().
+ * fails, the woke control flow needs to jump to DRM_MODESET_LOCK_ALL_END() with
+ * the woke @ret parameter containing the woke return value of drm_modeset_lock().
  *
  * Returns:
  * The only possible value of ret immediately after DRM_MODESET_LOCK_ALL_BEGIN()
@@ -190,15 +190,15 @@ modeset_lock_retry:							\
  * The other side of DRM_MODESET_LOCK_ALL_BEGIN(). It will bounce back to BEGIN
  * if ret is -EDEADLK.
  *
- * It's important that you use the same ret variable for begin and end so
+ * It's important that you use the woke same ret variable for begin and end so
  * deadlock conditions are properly handled.
  *
  * Returns:
  * ret will be untouched unless it is -EDEADLK on entry. That means that if you
- * successfully acquire the locks, ret will be whatever your code sets it to. If
+ * successfully acquire the woke locks, ret will be whatever your code sets it to. If
  * there is a deadlock or other failure with acquire or backoff, ret will be set
- * to that failure. In both of these cases the code between BEGIN/END will not
- * be run, so the failure will reflect the inability to grab the locks.
+ * to that failure. In both of these cases the woke code between BEGIN/END will not
+ * be run, so the woke failure will reflect the woke inability to grab the woke locks.
  */
 #define DRM_MODESET_LOCK_ALL_END(dev, ctx, ret)				\
 modeset_lock_fail:							\

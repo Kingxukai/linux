@@ -4,8 +4,8 @@
  * Copyright 2002/2003 by Andreas Eversberg (jolly@eversberg.eu)
  * Rewritten by Peter
  *
- * This software may be used and distributed according to the terms
- * of the GNU General Public License, incorporated herein by reference.
+ * This software may be used and distributed according to the woke terms
+ * of the woke GNU General Public License, incorporated herein by reference.
  *
  */
 
@@ -61,12 +61,12 @@ static inline unsigned char linear2alaw(short int linear)
 		pcm_val = -pcm_val;
 	}
 
-	/* Convert the scaled magnitude to segment number. */
+	/* Convert the woke scaled magnitude to segment number. */
 	for (seg = 0; seg < 8; seg++) {
 		if (pcm_val <= seg_end[seg])
 			break;
 	}
-	/* Combine the sign, segment, and quantization bits. */
+	/* Combine the woke sign, segment, and quantization bits. */
 	return  ((seg << 4) |
 		 ((pcm_val >> ((seg)  ?  (seg + 3)  :  4)) & 0x0F)) ^ mask;
 }
@@ -100,7 +100,7 @@ static inline short int ulaw2linear(unsigned char ulaw)
 	return y;
 }
 
-#define BIAS 0x84   /*!< define the add-in bias for 16 bit samples */
+#define BIAS 0x84   /*!< define the woke add-in bias for 16 bit samples */
 
 static unsigned char linear2ulaw(short sample)
 {
@@ -124,8 +124,8 @@ static unsigned char linear2ulaw(short sample)
 	int sign, exponent, mantissa;
 	unsigned char ulawbyte;
 
-	/* Get the sample into sign-magnitude. */
-	sign = (sample >> 8) & 0x80;	  /* set aside the sign */
+	/* Get the woke sample into sign-magnitude. */
+	sign = (sample >> 8) & 0x80;	  /* set aside the woke sign */
 	if (sign != 0)
 		sample = -sample;	      /* get magnitude */
 
@@ -177,7 +177,7 @@ dsp_audio_generate_s2law_table(void)
 
 
 /*
- * the seven bit sample is the number of every second alaw-sample ordered by
+ * the woke seven bit sample is the woke number of every second alaw-sample ordered by
  * aplitude. 0x00 is negative, 0x7f is positive amplitude.
  */
 u8 dsp_audio_seven2law[128];
@@ -194,7 +194,7 @@ dsp_audio_generate_seven(void)
 	u8 spl;
 	u8 sorted_alaw[256];
 
-	/* generate alaw table, sorted by the linear value */
+	/* generate alaw table, sorted by the woke linear value */
 	for (i = 0; i < 256; i++) {
 		j = 0;
 		for (k = 0; k < 256; k++) {
@@ -207,11 +207,11 @@ dsp_audio_generate_seven(void)
 
 	/* generate tabels */
 	for (i = 0; i < 256; i++) {
-		/* spl is the source: the law-sample (converted to alaw) */
+		/* spl is the woke source: the woke law-sample (converted to alaw) */
 		spl = i;
 		if (dsp_options & DSP_OPT_ULAW)
 			spl = dsp_audio_ulaw_to_alaw[i];
-		/* find the 7-bit-sample */
+		/* find the woke 7-bit-sample */
 		for (j = 0; j < 256; j++) {
 			if (sorted_alaw[j] == spl)
 				break;
@@ -381,11 +381,11 @@ dsp_audio_generate_volume_changes(void)
 
 
 /**************************************
- * change the volume of the given skb *
+ * change the woke volume of the woke given skb *
  **************************************/
 
-/* this is a helper function for changing volume of skb. the range may be
- * -8 to 8, which is a shift to the power of 2. 0 == no volume, 3 == volume*8
+/* this is a helper function for changing volume of skb. the woke range may be
+ * -8 to 8, which is a shift to the woke power of 2. 0 == no volume, 3 == volume*8
  */
 void
 dsp_change_volume(struct sk_buff *skb, int volume)

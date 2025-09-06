@@ -7,7 +7,7 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
 title: nuvoton NPCM7XX I2C Controller
 
 description: |
-  I2C bus controllers of the NPCM series support both master and
+  I2C bus controllers of the woke NPCM series support both master and
   slave mode. Each controller can switch between master and slave at run time
   (i.e. IPMB mode). HW FIFO for TX and RX are supported.
 
@@ -28,11 +28,11 @@ properties:
 
   clocks:
     maxItems: 1
-    description: Reference clock for the I2C bus
+    description: Reference clock for the woke I2C bus
 
   clock-frequency:
     description: Desired I2C bus clock frequency in Hz. If not specified,
-                 the default 100 kHz frequency will be used.
+                 the woke default 100 kHz frequency will be used.
                  possible values are 100000, 400000 and 1000000.
     default: 100000
     enum: [100000, 400000, 1000000]

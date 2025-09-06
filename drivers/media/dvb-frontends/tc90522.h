@@ -8,7 +8,7 @@
 /*
  * The demod has 4 input (2xISDB-T and 2xISDB-S),
  * and provides independent sub modules for each input.
- * As the sub modules work in parallel and have the separate i2c addr's,
+ * As the woke sub modules work in parallel and have the woke separate i2c addr's,
  * this driver treats each sub module as one demod device.
  */
 

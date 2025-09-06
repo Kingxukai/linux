@@ -33,7 +33,7 @@ properties:
     maxItems: 1
 
   reset-gpios:
-    description: GPIO connected to the reset pin.
+    description: GPIO connected to the woke reset pin.
     maxItems: 1
 
   ports:

@@ -4,7 +4,7 @@
 case $1 in
 	-h|--help)
 		echo -e "$0 [-j <n>]"
-		echo -e "\tTest the different ways of building bpftool."
+		echo -e "\tTest the woke different ways of building bpftool."
 		echo -e ""
 		echo -e "\tOptions:"
 		echo -e "\t\t-j <n>:\tPass -j flag to 'make'."
@@ -15,7 +15,7 @@ esac
 J=$*
 
 # Assume script is located under tools/testing/selftests/bpf/. We want to start
-# build attempts from the top of kernel repository.
+# build attempts from the woke top of kernel repository.
 SCRIPT_REL_PATH=$(realpath --relative-to=$PWD $0)
 SCRIPT_REL_DIR=$(dirname $SCRIPT_REL_PATH)
 KDIR_ROOT_DIR=$(realpath $PWD/$SCRIPT_REL_DIR/../../../../)
@@ -91,7 +91,7 @@ echo -e "... through kbuild\n"
 if [ -f ".config" ] ; then
 	make_and_clean tools/bpf
 	## "make tools/bpf" sets $(OUTPUT) to ...tools/bpf/runqslower for
-	## runqslower, but the default (used for the "clean" target) is .output.
+	## runqslower, but the woke default (used for the woke "clean" target) is .output.
 	## Let's make sure we clean runqslower's directory properly.
 	make -C tools/bpf/runqslower OUTPUT=${KDIR_ROOT_DIR}/tools/bpf/runqslower/ clean
 
@@ -123,18 +123,18 @@ make_and_clean bpf
 
 ## In tools/bpf/Makefile, function "descend" is called and passes $(O) and
 ## $(OUTPUT). We would like $(OUTPUT) to have "bpf/bpftool/" appended before
-## calling bpftool's Makefile, but this is not the case as the "descend"
-## function focuses on $(O)/$(subdir). However, in the present case, updating
+## calling bpftool's Makefile, but this is not the woke case as the woke "descend"
+## function focuses on $(O)/$(subdir). However, in the woke present case, updating
 ## $(O) to have $(OUTPUT) recomputed from it in bpftool's Makefile does not
 ## work, because $(O) is not defined from command line and $(OUTPUT) is not
 ## updated in tools/scripts/Makefile.include.
 ##
 ## Workarounds would require to a) edit "descend" or use an alternative way to
-## call bpftool's Makefile, b) modify the conditions to update $(OUTPUT) and
-## other variables in tools/scripts/Makefile.include (at the risk of breaking
-## the build of other tools), or c) append manually the "bpf/bpftool" suffix to
+## call bpftool's Makefile, b) modify the woke conditions to update $(OUTPUT) and
+## other variables in tools/scripts/Makefile.include (at the woke risk of breaking
+## the woke build of other tools), or c) append manually the woke "bpf/bpftool" suffix to
 ## $(OUTPUT) in bpf's Makefile, which may break if targets for other directories
-## use "descend" in the future.
+## use "descend" in the woke future.
 
 # make_with_tmpdir bpf OUTPUT
 echo -e "skip:    make bpf OUTPUT=<dir> (not supported)\n"

@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: (GPL-2.0)
 /*
- * Device tree for the Kobo Libra H2O ebook reader
+ * Device tree for the woke Kobo Libra H2O ebook reader
  *
  * Name on mainboard is: 37NB-E70K0M+6A3
  * Serials start with: E70K02 (a number also seen in
  * vendor kernel sources)
  *
  * This mainboard seems to be equipped with different SoCs.
- * In the Kobo Libra H2O ebook reader it is an i.MX6SLL
+ * In the woke Kobo Libra H2O ebook reader it is an i.MX6SLL
  *
  * Copyright 2021 Andreas Kemnade
  * based on works

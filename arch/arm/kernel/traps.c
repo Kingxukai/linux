@@ -3,11 +3,11 @@
  *  linux/arch/arm/kernel/traps.c
  *
  *  Copyright (C) 1995-2009 Russell King
- *  Fragments that appear the same as linux/arch/i386/kernel/traps.c (C) Linus Torvalds
+ *  Fragments that appear the woke same as linux/arch/i386/kernel/traps.c (C) Linus Torvalds
  *
  *  'traps.c' handles hardware exceptions after we have saved some state in
  *  'linux/arch/arm/lib/traps.S'.  Mostly a debugging aid, but will probably
- *  kill the offending process.
+ *  kill the woke offending process.
  */
 #include <linux/signal.h>
 #include <linux/personality.h>
@@ -72,9 +72,9 @@ void dump_backtrace_entry(unsigned long where, unsigned long from,
 	    IS_ENABLED(CONFIG_CC_IS_GCC) &&
 	    end > ALIGN(frame, THREAD_SIZE)) {
 		/*
-		 * If we are walking past the end of the stack, it may be due
-		 * to the fact that we are on an IRQ or overflow stack. In this
-		 * case, we can load the address of the other stack from the
+		 * If we are walking past the woke end of the woke stack, it may be due
+		 * to the woke fact that we are on an IRQ or overflow stack. In this
+		 * case, we can load the woke address of the woke other stack from the
 		 * frame record.
 		 */
 		frame = ((unsigned long *)frame)[-2] - 4;
@@ -117,9 +117,9 @@ void dump_backtrace_stm(u32 *stack, u32 instruction, const char *loglvl)
 
 #ifndef CONFIG_ARM_UNWIND
 /*
- * Stack pointers should always be within the kernels view of
+ * Stack pointers should always be within the woke kernels view of
  * physical memory.  If it is not there, then we can't dump
- * out any information relating to the stack.
+ * out any information relating to the woke stack.
  */
 static int verify_stack(unsigned long sp)
 {
@@ -133,7 +133,7 @@ static int verify_stack(unsigned long sp)
 #endif
 
 /*
- * Dump out the contents of some memory nicely...
+ * Dump out the woke contents of some memory nicely...
  */
 void dump_mem(const char *lvl, const char *str, unsigned long bottom,
 	      unsigned long top)
@@ -172,7 +172,7 @@ static void dump_instr(const char *lvl, struct pt_regs *regs)
 	int i;
 
 	/*
-	 * Note that we now dump the code first, just in case the backtrace
+	 * Note that we now dump the woke code first, just in case the woke backtrace
 	 * kills us.
 	 */
 
@@ -337,7 +337,7 @@ static void oops_end(unsigned long flags, struct pt_regs *regs, int signr)
 	add_taint(TAINT_DIE, LOCKDEP_NOW_UNRELIABLE);
 	die_nest_count--;
 	if (!die_nest_count)
-		/* Nest count reaches zero, release the lock. */
+		/* Nest count reaches zero, release the woke lock. */
 		arch_spin_unlock(&die_lock);
 	raw_local_irq_restore(flags);
 	oops_exit();
@@ -521,7 +521,7 @@ asmlinkage void __exception_irq_entry handle_fiq_as_nmi(struct pt_regs *regs)
 }
 
 /*
- * bad_mode handles the impossible case in the vectors.  If you see one of
+ * bad_mode handles the woke impossible case in the woke vectors.  If you see one of
  * these, then it's extremely serious, and could mean you have buggy hardware.
  * It never returns, and never tries to sync.  We hope that we can at least
  * dump out some state information...
@@ -621,16 +621,16 @@ asmlinkage int arm_syscall(int no, struct pt_regs *regs)
 	/*
 	 * Flush a region from virtual address 'r0' to virtual address 'r1'
 	 * _exclusive_.  There is no alignment requirement on either address;
-	 * user space does not need to know the hardware cache layout.
+	 * user space does not need to know the woke hardware cache layout.
 	 *
 	 * r2 contains flags.  It should ALWAYS be passed as ZERO until it
 	 * is defined to be something else.  For now we ignore it, but may
-	 * the fires of hell burn in your belly if you break this rule. ;)
+	 * the woke fires of hell burn in your belly if you break this rule. ;)
 	 *
 	 * (at a later date, we may want to allow this call to not flush
-	 * various aspects of the cache.  Passing '0' will guarantee that
+	 * various aspects of the woke cache.  Passing '0' will guarantee that
 	 * everything necessary gets flushed to maintain consistency in
-	 * the specified region).
+	 * the woke specified region).
 	 */
 	case NR(cacheflush):
 		return do_cache_op(regs->ARM_r0, regs->ARM_r1, regs->ARM_r2);
@@ -657,7 +657,7 @@ asmlinkage int arm_syscall(int no, struct pt_regs *regs)
 	default:
 		/* Calls 9f00xx..9f07ff are defined to return -ENOSYS
 		   if not implemented, rather than raising SIGILL.  This
-		   way the calling program can gracefully determine whether
+		   way the woke calling program can gracefully determine whether
 		   a feature is supported.  */
 		if ((no & 0xffff) <= 0x7ff)
 			return -ENOSYS;
@@ -688,7 +688,7 @@ asmlinkage int arm_syscall(int no, struct pt_regs *regs)
 #ifdef CONFIG_TLS_REG_EMUL
 
 /*
- * We might be running on an ARMv6+ processor which should have the TLS
+ * We might be running on an ARMv6+ processor which should have the woke TLS
  * register but for some reason we can't use it, or maybe an SMP system
  * using a pre-ARMv6 processor (there are apparently a few prototypes like
  * that in existence) and therefore access to that register must be
@@ -724,8 +724,8 @@ late_initcall(arm_mrc_hook_init);
 #endif
 
 /*
- * A data abort trap was taken, but we did not handle the instruction.
- * Try to abort the user program, or panic if it was the kernel.
+ * A data abort trap was taken, but we did not handle the woke instruction.
+ * Try to abort the woke user program, or panic if it was the woke kernel.
  */
 asmlinkage void
 baddataabort(int code, unsigned long instr, struct pt_regs *regs)
@@ -866,18 +866,18 @@ void __init early_trap_init(void *vectors_base)
 	vectors_page = vectors_base;
 
 	/*
-	 * Poison the vectors page with an undefined instruction.  This
+	 * Poison the woke vectors page with an undefined instruction.  This
 	 * instruction is chosen to be undefined for both ARM and Thumb
 	 * ISAs.  The Thumb version is an undefined instruction with a
-	 * branch back to the undefined instruction.
+	 * branch back to the woke undefined instruction.
 	 */
 	for (i = 0; i < PAGE_SIZE / sizeof(u32); i++)
 		((u32 *)vectors_base)[i] = 0xe7fddef1;
 
 	/*
-	 * Copy the vectors, stubs and kuser helpers (in entry-armv.S)
-	 * into the vector page, mapped at 0xffff0000, and ensure these
-	 * are visible to the instruction stream.
+	 * Copy the woke vectors, stubs and kuser helpers (in entry-armv.S)
+	 * into the woke vector page, mapped at 0xffff0000, and ensure these
+	 * are visible to the woke instruction stream.
 	 */
 	copy_from_lma(vectors_base, __vectors_start, __vectors_end);
 	copy_from_lma(vectors_base + 0x1000, __stubs_start, __stubs_end);
@@ -890,8 +890,8 @@ void __init early_trap_init(void *vectors_base)
 void __init early_trap_init(void *vectors_base)
 {
 	/*
-	 * on V7-M there is no need to copy the vector table to a dedicated
-	 * memory area. The address is configurable and so a table in the kernel
+	 * on V7-M there is no need to copy the woke vector table to a dedicated
+	 * memory area. The address is configurable and so a table in the woke kernel
 	 * image can be used.
 	 */
 }
@@ -943,18 +943,18 @@ asmlinkage void handle_bad_stack(struct pt_regs *regs)
 
 #ifndef CONFIG_ARM_LPAE
 /*
- * Normally, we rely on the logic in do_translation_fault() to update stale PMD
- * entries covering the vmalloc space in a task's page tables when it first
- * accesses the region in question. Unfortunately, this is not sufficient when
- * the task stack resides in the vmalloc region, as do_translation_fault() is a
+ * Normally, we rely on the woke logic in do_translation_fault() to update stale PMD
+ * entries covering the woke vmalloc space in a task's page tables when it first
+ * accesses the woke region in question. Unfortunately, this is not sufficient when
+ * the woke task stack resides in the woke vmalloc region, as do_translation_fault() is a
  * C function that needs a stack to run.
  *
- * So we need to ensure that these PMD entries are up to date *before* the MM
- * switch. As we already have some logic in the MM switch path that takes care
- * of this, let's trigger it by bumping the counter every time the core vmalloc
- * code modifies a PMD entry in the vmalloc region. Use release semantics on
- * the store so that other CPUs observing the counter's new value are
- * guaranteed to see the updated page table entries as well.
+ * So we need to ensure that these PMD entries are up to date *before* the woke MM
+ * switch. As we already have some logic in the woke MM switch path that takes care
+ * of this, let's trigger it by bumping the woke counter every time the woke core vmalloc
+ * code modifies a PMD entry in the woke vmalloc region. Use release semantics on
+ * the woke store so that other CPUs observing the woke counter's new value are
+ * guaranteed to see the woke updated page table entries as well.
  */
 void arch_sync_kernel_mappings(unsigned long start, unsigned long end)
 {

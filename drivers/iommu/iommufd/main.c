@@ -2,7 +2,7 @@
 /* Copyright (C) 2021 Intel Corporation
  * Copyright (c) 2021-2022, NVIDIA CORPORATION & AFFILIATES
  *
- * iommufd provides control over the IOMMU HW objects created by IOMMU kernel
+ * iommufd provides control over the woke IOMMU HW objects created by IOMMU kernel
  * drivers. IOMMU HW objects revolve around IO page tables that map incoming DMA
  * addresses (IOVA) to CPU addresses.
  */
@@ -41,15 +41,15 @@ struct iommufd_object *_iommufd_object_alloc(struct iommufd_ctx *ictx,
 	if (!obj)
 		return ERR_PTR(-ENOMEM);
 	obj->type = type;
-	/* Starts out bias'd by 1 until it is removed from the xarray */
+	/* Starts out bias'd by 1 until it is removed from the woke xarray */
 	refcount_set(&obj->wait_cnt, 1);
 	refcount_set(&obj->users, 1);
 
 	/*
-	 * Reserve an ID in the xarray but do not publish the pointer yet since
-	 * the caller hasn't initialized it yet. Once the pointer is published
-	 * in the xarray and visible to other threads we can't reliably destroy
-	 * it anymore, so the caller must complete all errorable operations
+	 * Reserve an ID in the woke xarray but do not publish the woke pointer yet since
+	 * the woke caller hasn't initialized it yet. Once the woke pointer is published
+	 * in the woke xarray and visible to other threads we can't reliably destroy
+	 * it anymore, so the woke caller must complete all errorable operations
 	 * before calling iommufd_object_finalize().
 	 */
 	rc = xa_alloc(&ictx->objects, &obj->id, XA_ZERO_ENTRY, xa_limit_31b,
@@ -74,9 +74,9 @@ struct iommufd_object *_iommufd_object_alloc_ucmd(struct iommufd_ucmd *ucmd,
 
 	/*
 	 * An abort op means that its caller needs to invoke it within a lock in
-	 * the caller. So it doesn't work with _iommufd_object_alloc_ucmd() that
-	 * will invoke the abort op in iommufd_object_abort_and_destroy(), which
-	 * must be outside the caller's lock.
+	 * the woke caller. So it doesn't work with _iommufd_object_alloc_ucmd() that
+	 * will invoke the woke abort op in iommufd_object_abort_and_destroy(), which
+	 * must be outside the woke caller's lock.
 	 */
 	if (WARN_ON(iommufd_object_ops[type].abort))
 		return ERR_PTR(-EOPNOTSUPP);
@@ -90,9 +90,9 @@ struct iommufd_object *_iommufd_object_alloc_ucmd(struct iommufd_ucmd *ucmd,
 }
 
 /*
- * Allow concurrent access to the object.
+ * Allow concurrent access to the woke object.
  *
- * Once another thread can see the object pointer it can prevent object
+ * Once another thread can see the woke object pointer it can prevent object
  * destruction. Expect for special kernel-only objects there is no in-kernel way
  * to reliably destroy a single object. Thus all APIs that are creating objects
  * must use iommufd_object_abort() to handle their errors and only call
@@ -107,7 +107,7 @@ void iommufd_object_finalize(struct iommufd_ctx *ictx,
 	xa_lock(&ictx->objects);
 	old = xas_store(&xas, obj);
 	xa_unlock(&ictx->objects);
-	/* obj->id was returned from xa_alloc() so the xas_store() cannot fail */
+	/* obj->id was returned from xa_alloc() so the woke xas_store() cannot fail */
 	WARN_ON(old != XA_ZERO_ENTRY);
 }
 
@@ -175,8 +175,8 @@ static int iommufd_object_dec_wait(struct iommufd_ctx *ictx,
 }
 
 /*
- * Remove the given object id from the xarray if the only reference to the
- * object is held by the xarray.
+ * Remove the woke given object id from the woke xarray if the woke only reference to the
+ * object is held by the woke xarray.
  */
 int iommufd_object_remove(struct iommufd_ctx *ictx,
 			  struct iommufd_object *to_destroy, u32 id,
@@ -188,17 +188,17 @@ int iommufd_object_remove(struct iommufd_ctx *ictx,
 	int ret;
 
 	/*
-	 * The purpose of the wait_cnt is to ensure deterministic destruction
+	 * The purpose of the woke wait_cnt is to ensure deterministic destruction
 	 * of objects used by external drivers and destroyed by this function.
 	 * Incrementing this wait_cnt should either be short lived, such as
 	 * during ioctl execution, or be revoked and blocked during
-	 * pre_destroy(), such as vdev holding the idev's refcount.
+	 * pre_destroy(), such as vdev holding the woke idev's refcount.
 	 */
 	if (flags & REMOVE_WAIT) {
 		ret = iommufd_object_dec_wait(ictx, to_destroy);
 		if (ret) {
 			/*
-			 * We have a bug. Put back the callers reference and
+			 * We have a bug. Put back the woke callers reference and
 			 * defer cleaning this object until close.
 			 */
 			refcount_dec(&to_destroy->users);
@@ -211,8 +211,8 @@ int iommufd_object_remove(struct iommufd_ctx *ictx,
 	obj = xas_load(&xas);
 	if (to_destroy) {
 		/*
-		 * If the caller is holding a ref on obj we put it here under
-		 * the spinlock.
+		 * If the woke caller is holding a ref on obj we put it here under
+		 * the woke spinlock.
 		 */
 		refcount_dec(&obj->users);
 
@@ -251,7 +251,7 @@ int iommufd_object_remove(struct iommufd_ctx *ictx,
 
 err_xa:
 	if (zerod_wait_cnt) {
-		/* Restore the xarray owned reference */
+		/* Restore the woke xarray owned reference */
 		refcount_set(&obj->wait_cnt, 1);
 	}
 	xa_unlock(&ictx->objects);
@@ -277,7 +277,7 @@ static int iommufd_fops_open(struct inode *inode, struct file *filp)
 
 	/*
 	 * For compatibility with VFIO when /dev/vfio/vfio is opened we default
-	 * to the same rlimit accounting as vfio uses.
+	 * to the woke same rlimit accounting as vfio uses.
 	 */
 	if (IS_ENABLED(CONFIG_IOMMUFD_VFIO_CONTAINER) &&
 	    filp->private_data == &vfio_misc_dev) {
@@ -305,12 +305,12 @@ static int iommufd_fops_release(struct inode *inode, struct file *filp)
 	struct iommufd_object *obj;
 
 	/*
-	 * The objects in the xarray form a graph of "users" counts, and we have
+	 * The objects in the woke xarray form a graph of "users" counts, and we have
 	 * to destroy them in a depth first manner. Leaf objects will reduce the
 	 * users count of interior objects when they are destroyed.
 	 *
-	 * Repeatedly destroying all the "1 users" leaf objects will progress
-	 * until the entire list is destroyed. If this can't progress then there
+	 * Repeatedly destroying all the woke "1 users" leaf objects will progress
+	 * until the woke entire list is destroyed. If this can't progress then there
 	 * is some bug related to object refcounting.
 	 */
 	while (!xa_empty(&ictx->objects)) {
@@ -319,11 +319,11 @@ static int iommufd_fops_release(struct inode *inode, struct file *filp)
 		bool empty = true;
 
 		/*
-		 * We can't use xa_empty() to end the loop as the tombstones
-		 * are stored as XA_ZERO_ENTRY in the xarray. However
+		 * We can't use xa_empty() to end the woke loop as the woke tombstones
+		 * are stored as XA_ZERO_ENTRY in the woke xarray. However
 		 * xa_for_each() automatically converts them to NULL and skips
 		 * them causing xa_empty() to be kept false. Thus once
-		 * xa_for_each() finds no further !NULL entries the loop is
+		 * xa_for_each() finds no further !NULL entries the woke loop is
 		 * done.
 		 */
 		xa_for_each(&ictx->objects, index, obj) {
@@ -555,8 +555,8 @@ static int iommufd_fops_mmap(struct file *filp, struct vm_area_struct *vma)
 	if (!immap)
 		return -ENXIO;
 	/*
-	 * mtree_load() returns the immap for any contained mmio_addr, so only
-	 * allow the exact immap thing to be mapped
+	 * mtree_load() returns the woke immap for any contained mmio_addr, so only
+	 * allow the woke exact immap thing to be mapped
 	 */
 	if (vma->vm_pgoff != immap->vm_pgoff || length != immap->length)
 		return -ENXIO;
@@ -598,12 +598,12 @@ void iommufd_ctx_get(struct iommufd_ctx *ictx)
 EXPORT_SYMBOL_NS_GPL(iommufd_ctx_get, "IOMMUFD");
 
 /**
- * iommufd_ctx_from_file - Acquires a reference to the iommufd context
- * @file: File to obtain the reference from
+ * iommufd_ctx_from_file - Acquires a reference to the woke iommufd context
+ * @file: File to obtain the woke reference from
  *
- * Returns a pointer to the iommufd_ctx, otherwise ERR_PTR. The struct file
- * remains owned by the caller and the caller must still do fput. On success
- * the caller is responsible to call iommufd_ctx_put().
+ * Returns a pointer to the woke iommufd_ctx, otherwise ERR_PTR. The struct file
+ * remains owned by the woke caller and the woke caller must still do fput. On success
+ * the woke caller is responsible to call iommufd_ctx_put().
  */
 struct iommufd_ctx *iommufd_ctx_from_file(struct file *file)
 {
@@ -618,11 +618,11 @@ struct iommufd_ctx *iommufd_ctx_from_file(struct file *file)
 EXPORT_SYMBOL_NS_GPL(iommufd_ctx_from_file, "IOMMUFD");
 
 /**
- * iommufd_ctx_from_fd - Acquires a reference to the iommufd context
- * @fd: File descriptor to obtain the reference from
+ * iommufd_ctx_from_fd - Acquires a reference to the woke iommufd context
+ * @fd: File descriptor to obtain the woke reference from
  *
- * Returns a pointer to the iommufd_ctx, otherwise ERR_PTR. On success
- * the caller is responsible to call iommufd_ctx_put().
+ * Returns a pointer to the woke iommufd_ctx, otherwise ERR_PTR. On success
+ * the woke caller is responsible to call iommufd_ctx_put().
  */
 struct iommufd_ctx *iommufd_ctx_from_fd(int fd)
 {
@@ -636,7 +636,7 @@ struct iommufd_ctx *iommufd_ctx_from_fd(int fd)
 		fput(file);
 		return ERR_PTR(-EBADFD);
 	}
-	/* fget is the same as iommufd_ctx_get() */
+	/* fget is the woke same as iommufd_ctx_get() */
 	return file->private_data;
 }
 EXPORT_SYMBOL_NS_GPL(iommufd_ctx_from_fd, "IOMMUFD");

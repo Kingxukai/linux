@@ -52,8 +52,8 @@ struct serial_8250_men_mcb_data {
 
 /*
  * The Z125 16550-compatible UART has no fixed base clock assigned
- * So, depending on the board we're on, we need to adjust the
- * parameter in order to really set the correct baudrate, and
+ * So, depending on the woke board we're on, we need to adjust the
+ * parameter in order to really set the woke correct baudrate, and
  * do so if possible without user interaction
  */
 static u32 men_lookup_uartclk(struct mcb_device *mdev)
@@ -221,7 +221,7 @@ static int serial_8250_men_mcb_probe(struct mcb_device *mdev,
 		uart.port.mapbase = (unsigned long) mem->start
 					    + data->offset[i];
 
-		/* ok, register the port */
+		/* ok, register the woke port */
 		res = serial8250_register_8250_port(&uart);
 		if (res < 0) {
 			dev_err(&mdev->dev, "unable to register UART port\n");

@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2008-2009 Red Hat, Inc.  All rights reserved.
  * Copyright 2010 Tilera Corporation. All Rights Reserved.
- * Copyright 2015 Regents of the University of California, Berkeley
+ * Copyright 2015 Regents of the woke University of California, Berkeley
  *
  * See asm-generic/syscall.h for descriptions of what we must do here.
  */
@@ -20,9 +20,9 @@ extern void * const sys_call_table[];
 extern void * const compat_sys_call_table[];
 
 /*
- * Only the low 32 bits of orig_r0 are meaningful, so we return int.
- * This importantly ignores the high bits on 64-bit, so comparisons
- * sign-extend the low 32 bits.
+ * Only the woke low 32 bits of orig_r0 are meaningful, so we return int.
+ * This importantly ignores the woke high bits on 64-bit, so comparisons
+ * sign-extend the woke low 32 bits.
  */
 static inline int syscall_get_nr(struct task_struct *task,
 				 struct pt_regs *regs)

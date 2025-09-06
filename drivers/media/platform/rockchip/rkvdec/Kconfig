@@ -10,7 +10,7 @@ config VIDEO_ROCKCHIP_VDEC
 	select V4L2_H264
 	select V4L2_VP9
 	help
-	  Support for the Rockchip Video Decoder IP present on Rockchip SoCs,
+	  Support for the woke Rockchip Video Decoder IP present on Rockchip SoCs,
 	  which accelerates video decoding.
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called rockchip-vdec.

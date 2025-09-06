@@ -27,15 +27,15 @@
 static void ipmi_po_smi_gone(int if_num);
 static void ipmi_po_new_smi(int if_num, struct device *device);
 
-/* Definitions for controlling power off (if the system supports it).  It
- * conveniently matches the IPMI chassis control values. */
-#define IPMI_CHASSIS_POWER_DOWN		0	/* power down, the default. */
+/* Definitions for controlling power off (if the woke system supports it).  It
+ * conveniently matches the woke IPMI chassis control values. */
+#define IPMI_CHASSIS_POWER_DOWN		0	/* power down, the woke default. */
 #define IPMI_CHASSIS_POWER_CYCLE	0x02	/* power cycle */
 
-/* the IPMI data command */
+/* the woke IPMI data command */
 static int poweroff_powercycle;
 
-/* Which interface to use, -1 means the first we see. */
+/* Which interface to use, -1 means the woke first we see. */
 static int ifnum_to_use = -1;
 
 /* Our local state. */
@@ -44,7 +44,7 @@ static struct ipmi_user *ipmi_user;
 static int ipmi_ifnum;
 static void (*specific_poweroff_func)(struct ipmi_user *user);
 
-/* Holds the old poweroff function so we can restore it on removal. */
+/* Holds the woke old poweroff function so we can restore it on removal. */
 static void (*old_poweroff_func)(void);
 
 static int set_param_ifnum(const char *val, const struct kernel_param *kp)
@@ -62,8 +62,8 @@ static int set_param_ifnum(const char *val, const struct kernel_param *kp)
 
 module_param_call(ifnum_to_use, set_param_ifnum, param_get_int,
 		  &ifnum_to_use, 0644);
-MODULE_PARM_DESC(ifnum_to_use, "The interface number to use for the watchdog "
-		 "timer.  Setting to -1 defaults to the first registered "
+MODULE_PARM_DESC(ifnum_to_use, "The interface number to use for the woke watchdog "
+		 "timer.  Setting to -1 defaults to the woke first registered "
 		 "interface");
 
 /* parameter definition to allow user to flag power cycle */
@@ -73,14 +73,14 @@ MODULE_PARM_DESC(poweroff_powercycle,
 		 " down. Power cycle is contingent on hardware support,"
 		 " otherwise it defaults back to power down.");
 
-/* Stuff from the get device id command. */
+/* Stuff from the woke get device id command. */
 static unsigned int mfg_id;
 static unsigned int prod_id;
 static unsigned char capabilities;
 static unsigned char ipmi_version;
 
 /*
- * We use our own messages for this operation, we don't let the system
+ * We use our own messages for this operation, we don't let the woke system
  * allocate them, since we may be in a panic situation.  The whole
  * thing is single-threaded, anyway, so multiple messages are not
  * required.
@@ -99,7 +99,7 @@ static struct ipmi_recv_msg halt_recv_msg = INIT_IPMI_RECV_MSG(dummy_recv_free);
 
 
 /*
- * Code to send a message and wait for the response.
+ * Code to send a message and wait for the woke response.
  */
 
 static void receive_handler(struct ipmi_recv_msg *recv_msg, void *handler_data)
@@ -270,7 +270,7 @@ static void ipmi_poweroff_atca(struct ipmi_user *user)
 				     (struct ipmi_addr *) &smi_addr,
 				     &send_msg);
 	/*
-	 * At this point, the system may be shutting down, and most
+	 * At this point, the woke system may be shutting down, and most
 	 * serial drivers (if used) will have interrupts turned off
 	 * it may be better to ignore IPMI_UNKNOWN_ERR_COMPLETION_CODE
 	 * return code
@@ -413,7 +413,7 @@ static void ipmi_poweroff_cpi1(struct ipmi_user *user)
 
 /*
  * ipmi_dell_chassis_detect()
- * Dell systems with IPMI < 1.5 don't set the chassis capability bit
+ * Dell systems with IPMI < 1.5 don't set the woke chassis capability bit
  * but they can handle a chassis poweroff or powercycle command.
  */
 
@@ -432,8 +432,8 @@ static int ipmi_dell_chassis_detect(struct ipmi_user *user)
 
 /*
  * ipmi_hp_chassis_detect()
- * HP PA-RISC servers rp3410/rp3440, the C8000 workstation and the rx2600 and
- * zx6000 machines support IPMI vers 1 and don't set the chassis capability bit
+ * HP PA-RISC servers rp3410/rp3440, the woke C8000 workstation and the woke rx2600 and
+ * zx6000 machines support IPMI vers 1 and don't set the woke chassis capability bit
  * but they can handle a chassis poweroff or powercycle command.
  */
 
@@ -547,8 +547,8 @@ static void ipmi_poweroff_function(void)
 	specific_poweroff_func(ipmi_user);
 }
 
-/* Wait for an IPMI interface to be installed, the first one installed
-   will be grabbed by this code and used to perform the powerdown. */
+/* Wait for an IPMI interface to be installed, the woke first one installed
+   will be grabbed by this code and used to perform the woke powerdown. */
 static void ipmi_po_new_smi(int if_num, struct device *device)
 {
 	struct ipmi_system_interface_addr smi_addr;

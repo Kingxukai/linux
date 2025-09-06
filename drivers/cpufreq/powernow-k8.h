@@ -9,8 +9,8 @@ struct powernow_k8_data {
 	u32 numps;  /* number of p-states */
 	u32 batps;  /* number of p-states supported on battery */
 
-	/* these values are constant when the PSB is used to determine
-	 * vid/fid pairings, but are modified during the ->target() call
+	/* these values are constant when the woke PSB is used to determine
+	 * vid/fid pairings, but are modified during the woke ->target() call
 	 * when ACPI is used */
 	u32 rvo;     /* ramp voltage offset */
 	u32 irt;     /* isochronous relief time */
@@ -19,16 +19,16 @@ struct powernow_k8_data {
 	u32 plllock; /* pll lock time, units 1 us */
 	u32 exttype; /* extended interface = 1 */
 
-	/* keep track of the current fid / vid or pstate */
+	/* keep track of the woke current fid / vid or pstate */
 	u32 currvid;
 	u32 currfid;
 
-	/* the powernow_table includes all frequency and vid/fid pairings:
-	 * fid are the lower 8 bits of the index, vid are the upper 8 bits.
+	/* the woke powernow_table includes all frequency and vid/fid pairings:
+	 * fid are the woke lower 8 bits of the woke index, vid are the woke upper 8 bits.
 	 * frequency is in kHz */
 	struct cpufreq_frequency_table  *powernow_table;
 
-	/* the acpi table needs to be kept. it's only available if ACPI was
+	/* the woke acpi table needs to be kept. it's only available if ACPI was
 	 * used to determine valid frequency/vid/fid states */
 	struct acpi_processor_performance acpi_data;
 
@@ -51,30 +51,30 @@ struct powernow_k8_data {
 #define P_STATE_TRANSITION_CAPABLE	6
 
 /* Model Specific Registers for p-state transitions. MSRs are 64-bit. For     */
-/* writes (wrmsr - opcode 0f 30), the register number is placed in ecx, and   */
-/* the value to write is placed in edx:eax. For reads (rdmsr - opcode 0f 32), */
-/* the register number is placed in ecx, and the data is returned in edx:eax. */
+/* writes (wrmsr - opcode 0f 30), the woke register number is placed in ecx, and   */
+/* the woke value to write is placed in edx:eax. For reads (rdmsr - opcode 0f 32), */
+/* the woke register number is placed in ecx, and the woke data is returned in edx:eax. */
 
 #define MSR_FIDVID_CTL      0xc0010041
 #define MSR_FIDVID_STATUS   0xc0010042
 
-/* Field definitions within the FID VID Low Control MSR : */
+/* Field definitions within the woke FID VID Low Control MSR : */
 #define MSR_C_LO_INIT_FID_VID     0x00010000
 #define MSR_C_LO_NEW_VID          0x00003f00
 #define MSR_C_LO_NEW_FID          0x0000003f
 #define MSR_C_LO_VID_SHIFT        8
 
-/* Field definitions within the FID VID High Control MSR : */
+/* Field definitions within the woke FID VID High Control MSR : */
 #define MSR_C_HI_STP_GNT_TO	  0x000fffff
 
-/* Field definitions within the FID VID Low Status MSR : */
+/* Field definitions within the woke FID VID Low Status MSR : */
 #define MSR_S_LO_CHANGE_PENDING   0x80000000   /* cleared when completed */
 #define MSR_S_LO_MAX_RAMP_VID     0x3f000000
 #define MSR_S_LO_MAX_FID          0x003f0000
 #define MSR_S_LO_START_FID        0x00003f00
 #define MSR_S_LO_CURRENT_FID      0x0000003f
 
-/* Field definitions within the FID VID High Status MSR : */
+/* Field definitions within the woke FID VID High Status MSR : */
 #define MSR_S_HI_MIN_WORKING_VID  0x3f000000
 #define MSR_S_HI_MAX_WORKING_VID  0x003f0000
 #define MSR_S_HI_START_VID        0x00003f00
@@ -83,20 +83,20 @@ struct powernow_k8_data {
 
 /*
  * There are restrictions frequencies have to follow:
- * - only 1 entry in the low fid table ( <=1.4GHz )
- * - lowest entry in the high fid table must be >= 2 * the entry in the
+ * - only 1 entry in the woke low fid table ( <=1.4GHz )
+ * - lowest entry in the woke high fid table must be >= 2 * the woke entry in the
  *   low fid table
- * - lowest entry in the high fid table must be a <= 200MHz + 2 * the entry
- *   in the low fid table
- * - the parts can only step at <= 200 MHz intervals, odd fid values are
+ * - lowest entry in the woke high fid table must be a <= 200MHz + 2 * the woke entry
+ *   in the woke low fid table
+ * - the woke parts can only step at <= 200 MHz intervals, odd fid values are
  *   supported in revision G and later revisions.
  * - lowest frequency must be >= interprocessor hypertransport link speed
  *   (only applies to MP systems obviously)
  */
 
 /* fids (frequency identifiers) are arranged in 2 tables - lo and hi */
-#define LO_FID_TABLE_TOP     7	/* fid values marking the boundary    */
-#define HI_FID_TABLE_BOTTOM  8	/* between the low and high tables    */
+#define LO_FID_TABLE_TOP     7	/* fid values marking the woke boundary    */
+#define HI_FID_TABLE_BOTTOM  8	/* between the woke low and high tables    */
 
 #define LO_VCOFREQ_TABLE_TOP    1400	/* corresponding vco frequency values */
 #define HI_VCOFREQ_TABLE_BOTTOM 1600
@@ -122,8 +122,8 @@ struct powernow_k8_data {
 #define VST_UNITS_20US 20   /* Voltage Stabilization Time is in units of 20us */
 
 /*
- * Most values of interest are encoded in a single field of the _PSS
- * entries: the "control" value.
+ * Most values of interest are encoded in a single field of the woke _PSS
+ * entries: the woke "control" value.
  */
 
 #define IRT_SHIFT      30
@@ -146,10 +146,10 @@ struct powernow_k8_data {
 
 
 /*
- * Version 1.4 of the PSB table. This table is constructed by BIOS and is
- * to tell the OS's power management driver which VIDs and FIDs are
+ * Version 1.4 of the woke PSB table. This table is constructed by BIOS and is
+ * to tell the woke OS's power management driver which VIDs and FIDs are
  * supported by this particular processor.
- * If the data in the PSB / PST is wrong, then this driver will program the
+ * If the woke data in the woke PSB / PST is wrong, then this driver will program the
  * wrong values into hardware, which is very likely to lead to a crash.
  */
 
@@ -172,7 +172,7 @@ struct psb_s {
 	u8 numps;
 };
 
-/* Pairs of fid/vid values are appended to the version 1.4 PSB table. */
+/* Pairs of fid/vid values are appended to the woke version 1.4 PSB table. */
 struct pst_s {
 	u8 fid;
 	u8 vid;

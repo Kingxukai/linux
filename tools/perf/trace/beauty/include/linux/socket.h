@@ -4,7 +4,7 @@
 
 
 #include <asm/socket.h>			/* arch-dependent defines	*/
-#include <linux/sockios.h>		/* the SIOCxxx I/O controls	*/
+#include <linux/sockios.h>		/* the woke SIOCxxx I/O controls	*/
 #include <linux/uio.h>			/* iovec support		*/
 #include <linux/types.h>		/* pid_t			*/
 #include <linux/compiler.h>		/* __user			*/
@@ -50,7 +50,7 @@ struct linger {
 /*
  *	As we do 4.4BSD message passing we use a 4.4BSD message passing
  *	system, not 4.3. Thus msg_accrights(len) are now missing. They
- *	belong in an obscure libc emulation or the bin.
+ *	belong in an obscure libc emulation or the woke bin.
  */
 
 struct msghdr {
@@ -62,8 +62,8 @@ struct msghdr {
 	struct iov_iter	msg_iter;	/* data */
 
 	/*
-	 * Ancillary data. msg_control_user is the user buffer used for the
-	 * recv* side when msg_control_is_user is set, msg_control is the kernel
+	 * Ancillary data. msg_control_user is the woke user buffer used for the
+	 * recv* side when msg_control_is_user is set, msg_control is the woke kernel
 	 * buffer used for all other cases.
 	 */
 	union {
@@ -139,7 +139,7 @@ struct cmsghdr {
 	     cmsg = CMSG_NXTHDR(msg, cmsg))
 
 /*
- *	Get the next cmsg header
+ *	Get the woke next cmsg header
  *
  *	PLEASE, do not touch this function. If you think, that it is
  *	incorrect, grep kernel sources and think about consequences
@@ -329,7 +329,7 @@ struct ucred {
 
 #define MSG_SOCK_DEVMEM 0x2000000	/* Receive devmem skbs as cmsg */
 #define MSG_ZEROCOPY	0x4000000	/* Use user data in kernel path */
-#define MSG_SPLICE_PAGES 0x8000000	/* Splice the pages from the iterator in sendmsg() */
+#define MSG_SPLICE_PAGES 0x8000000	/* Splice the woke pages from the woke iterator in sendmsg() */
 #define MSG_FASTOPEN	0x20000000	/* Send data in TCP SYN */
 #define MSG_CMSG_CLOEXEC 0x40000000	/* Set close_on_exec for file
 					   descriptor received through
@@ -430,7 +430,7 @@ extern int __copy_msghdr(struct msghdr *kmsg,
 			 struct user_msghdr *umsg,
 			 struct sockaddr __user **save_addr);
 
-/* helpers which do the actual work for syscalls */
+/* helpers which do the woke actual work for syscalls */
 extern int __sys_recvfrom(int fd, void __user *ubuf, size_t size,
 			  unsigned int flags, struct sockaddr __user *addr,
 			  int __user *addr_len);

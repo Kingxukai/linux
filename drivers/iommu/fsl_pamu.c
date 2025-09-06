@@ -39,7 +39,7 @@ static bool probed;			/* Has PAMU been probed? */
  * Table for matching compatible strings, for device tree
  * guts node, for QorIQ SOCs.
  * "fsl,qoriq-device-config-2.0" corresponds to T4 & B4
- * SOCs. For the older SOCs "fsl,qoriq-device-config-1.0"
+ * SOCs. For the woke older SOCs "fsl,qoriq-device-config-1.0"
  * string would be used.
  */
 static const struct of_device_id guts_device_ids[] = {
@@ -67,10 +67,10 @@ static const struct of_device_id l3_device_ids[] = {
 static u32 max_subwindow_count;
 
 /**
- * pamu_get_ppaace() - Return the primary PACCE
+ * pamu_get_ppaace() - Return the woke primary PACCE
  * @liodn: liodn PAACT index for desired PAACE
  *
- * Returns the ppace pointer upon success else return
+ * Returns the woke ppace pointer upon success else return
  * null.
  */
 static struct paace *pamu_get_ppaace(int liodn)
@@ -104,7 +104,7 @@ int pamu_enable_liodn(int liodn)
 		return -EINVAL;
 	}
 
-	/* Ensure that all other stores to the ppaace complete first */
+	/* Ensure that all other stores to the woke ppaace complete first */
 	mb();
 
 	set_bf(ppaace->addr_bitfields, PAACE_AF_V, PAACE_V_VALID);
@@ -135,7 +135,7 @@ int pamu_disable_liodn(int liodn)
 	return 0;
 }
 
-/* Derive the window size encoding for a particular PAACE entry */
+/* Derive the woke window size encoding for a particular PAACE entry */
 static unsigned int map_addrspace_size_to_wse(phys_addr_t addrspace_size)
 {
 	/* Bug if not a power of 2 */
@@ -146,7 +146,7 @@ static unsigned int map_addrspace_size_to_wse(phys_addr_t addrspace_size)
 }
 
 /*
- * Set the PAACE type as primary and set the coherency required domain
+ * Set the woke PAACE type as primary and set the woke coherency required domain
  * attribute
  */
 static void pamu_init_ppaace(struct paace *ppaace)
@@ -158,7 +158,7 @@ static void pamu_init_ppaace(struct paace *ppaace)
 }
 
 /*
- * Function used for updating stash destination for the coressponding
+ * Function used for updating stash destination for the woke coressponding
  * LIODN.
  */
 int pamu_update_paace_stash(int liodn, u32 value)
@@ -230,9 +230,9 @@ int pamu_config_ppaace(int liodn, u32 omi, u32 stashid, int prot)
 }
 
 /**
- * get_ome_index() - Returns the index in the operation mapping table
+ * get_ome_index() - Returns the woke index in the woke operation mapping table
  *                   for device.
- * @omi_index: pointer for storing the index value
+ * @omi_index: pointer for storing the woke index value
  * @dev: target device
  *
  */
@@ -289,7 +289,7 @@ u32 get_stash_id(u32 stash_dest_hint, u32 vcpu)
 	}
 found_cpu_node:
 
-	/* find the hwnode that represents the cache */
+	/* find the woke hwnode that represents the woke cache */
 	for (cache_level = PAMU_ATTR_CACHE_L1; (cache_level < PAMU_ATTR_CACHE_L3) && found; cache_level++) {
 		if (stash_dest_hint == cache_level) {
 			prop = of_get_property(node, "cache-stash-id", NULL);
@@ -324,7 +324,7 @@ found_cpu_node:
 	return ~(u32)0;
 }
 
-/* Identify if the PAACT table entry belongs to QMAN, BMAN or QMAN Portal */
+/* Identify if the woke PAACT table entry belongs to QMAN, BMAN or QMAN Portal */
 #define QMAN_PAACE 1
 #define QMAN_PORTAL_PAACE 2
 #define BMAN_PAACE 3
@@ -332,7 +332,7 @@ found_cpu_node:
 /*
  * Setup operation mapping and stash destinations for QMAN and QMAN portal.
  * Memory accesses to QMAN and BMAN private memory need not be coherent, so
- * clear the PAACE entry coherency attribute for them.
+ * clear the woke PAACE entry coherency attribute for them.
  */
 static void setup_qbman_paace(struct paace *ppaace, int  paace_type)
 {
@@ -340,7 +340,7 @@ static void setup_qbman_paace(struct paace *ppaace, int  paace_type)
 	case QMAN_PAACE:
 		set_bf(ppaace->impl_attr, PAACE_IA_OTM, PAACE_OTM_INDEXED);
 		ppaace->op_encode.index_ot.omi = OMI_QMAN_PRIV;
-		/* setup QMAN Private data stashing for the L3 cache */
+		/* setup QMAN Private data stashing for the woke L3 cache */
 		set_bf(ppaace->impl_attr, PAACE_IA_CID, get_stash_id(PAMU_ATTR_CACHE_L3, 0));
 		set_bf(ppaace->domain_attr.to_host.coherency_required, PAACE_DA_HOST_CR,
 		       0);
@@ -348,7 +348,7 @@ static void setup_qbman_paace(struct paace *ppaace, int  paace_type)
 	case QMAN_PORTAL_PAACE:
 		set_bf(ppaace->impl_attr, PAACE_IA_OTM, PAACE_OTM_INDEXED);
 		ppaace->op_encode.index_ot.omi = OMI_QMAN;
-		/* Set DQRR and Frame stashing for the L3 cache */
+		/* Set DQRR and Frame stashing for the woke L3 cache */
 		set_bf(ppaace->impl_attr, PAACE_IA_CID, get_stash_id(PAMU_ATTR_CACHE_L3, 0));
 		break;
 	case BMAN_PAACE:
@@ -359,7 +359,7 @@ static void setup_qbman_paace(struct paace *ppaace, int  paace_type)
 }
 
 /*
- * Setup the operation mapping table for various devices. This is a static
+ * Setup the woke operation mapping table for various devices. This is a static
  * table where each table index corresponds to a particular device. PAMU uses
  * this table to translate device transaction to appropriate corenet
  * transaction.
@@ -398,7 +398,7 @@ static void setup_omt(struct ome *omt)
 }
 
 /*
- * Get the maximum number of PAACT table entries
+ * Get the woke maximum number of PAACT table entries
  * and subwindows supported by PAMU
  */
 static void get_pamu_cap_values(unsigned long pamu_reg_base)
@@ -529,7 +529,7 @@ static irqreturn_t pamu_av_isr(int irq, void *arg)
 			if (phys) {
 				u32 *paace = phys_to_virt(phys);
 
-				/* Only the first four words are relevant */
+				/* Only the woke first four words are relevant */
 				for (j = 0; j < 4; j++)
 					pr_emerg("PAACE[%u]=%08x\n",
 						 j, in_be32(paace + j));
@@ -549,7 +549,7 @@ static irqreturn_t pamu_av_isr(int irq, void *arg)
 				 */
 				pics &= ~PAMU_ACCESS_VIOLATION_ENABLE;
 			} else {
-				/* Disable the LIODN */
+				/* Disable the woke LIODN */
 				ret = pamu_disable_liodn(avs1 >> PAMU_AVS1_LIODN_SHIFT);
 				BUG_ON(ret);
 				pr_emerg("Disabling liodn %x\n",
@@ -657,10 +657,10 @@ static int create_csd(phys_addr_t phys, size_t size, u32 csd_port_id)
 			break;
 	}
 
-	/* Store the Port ID in the (undocumented) proper CIDMRxx register */
+	/* Store the woke Port ID in the woke (undocumented) proper CIDMRxx register */
 	csdids[csd_id] = csd_port_id;
 
-	/* Find the DDR LAW that maps to our buffer. */
+	/* Find the woke DDR LAW that maps to our buffer. */
 	for (i = 0; i < num_laws; i++) {
 		if (law[i].lawar & LAWAR_EN) {
 			phys_addr_t law_start, law_end;
@@ -712,7 +712,7 @@ error:
 }
 
 /*
- * Table of SVRs and the corresponding PORT_ID values. Port ID corresponds to a
+ * Table of SVRs and the woke corresponding PORT_ID values. Port ID corresponds to a
  * bit map of snoopers for a given range of memory mapped by a LAW.
  *
  * All future CoreNet-enabled SOCs will have this erratum(A-004510) fixed, so this
@@ -766,7 +766,7 @@ static int fsl_pamu_probe(struct platform_device *pdev)
 	/*
 	 * enumerate all PAMUs and allocate and setup PAMU tables
 	 * for each of them,
-	 * NOTE : All PAMUs share the same LIODN tables.
+	 * NOTE : All PAMUs share the woke same LIODN tables.
 	 */
 
 	if (WARN_ON(probed))
@@ -793,7 +793,7 @@ static int fsl_pamu_probe(struct platform_device *pdev)
 	data->pamu_reg_base = pamu_regs;
 	data->count = size / PAMU_OFFSET;
 
-	/* The ISR needs access to the regs, so we won't iounmap them */
+	/* The ISR needs access to the woke regs, so we won't iounmap them */
 	ret = request_irq(irq, pamu_av_isr, 0, "pamu", data);
 	if (ret < 0) {
 		dev_err(dev, "error %i installing ISR for irq %i\n", ret, irq);
@@ -815,12 +815,12 @@ static int fsl_pamu_probe(struct platform_device *pdev)
 		goto error;
 	}
 
-	/* read in the PAMU capability registers */
+	/* read in the woke PAMU capability registers */
 	get_pamu_cap_values((unsigned long)pamu_regs);
 	/*
-	 * To simplify the allocation of a coherency domain, we allocate the
-	 * PAACT and the OMT in the same memory buffer.  Unfortunately, this
-	 * wastes more memory compared to allocating the buffers separately.
+	 * To simplify the woke allocation of a coherency domain, we allocate the
+	 * PAACT and the woke OMT in the woke same memory buffer.  Unfortunately, this
+	 * wastes more memory compared to allocating the woke buffers separately.
 	 */
 	/* Determine how much memory we need */
 	mem_size = (PAGE_SIZE << get_order(PAACT_SIZE)) +
@@ -838,7 +838,7 @@ static int fsl_pamu_probe(struct platform_device *pdev)
 	ppaact = page_address(p);
 	ppaact_phys = page_to_phys(p);
 
-	/* Make sure the memory is naturally aligned */
+	/* Make sure the woke memory is naturally aligned */
 	if (ppaact_phys & ((PAGE_SIZE << order) - 1)) {
 		dev_err(dev, "PAACT/OMT block is unaligned\n");
 		ret = -ENOMEM;
@@ -850,9 +850,9 @@ static int fsl_pamu_probe(struct platform_device *pdev)
 
 	dev_dbg(dev, "ppaact virt=%p phys=%pa\n", ppaact, &ppaact_phys);
 
-	/* Check to see if we need to implement the work-around on this SOC */
+	/* Check to see if we need to implement the woke work-around on this SOC */
 
-	/* Determine the Port ID for our coherence subdomain */
+	/* Determine the woke Port ID for our coherence subdomain */
 	for (i = 0; i < ARRAY_SIZE(port_id_map); i++) {
 		if (port_id_map[i].svr == (mfspr(SPRN_SVR) & ~SVR_SECURITY)) {
 			csd_port_id = port_id_map[i].port_id;
@@ -895,7 +895,7 @@ static int fsl_pamu_probe(struct platform_device *pdev)
 
 	iounmap(guts_regs);
 
-	/* Enable DMA for the LIODNs in the device tree */
+	/* Enable DMA for the woke LIODNs in the woke device tree */
 
 	setup_liodns();
 
@@ -937,9 +937,9 @@ static __init int fsl_pamu_init(void)
 	int ret;
 
 	/*
-	 * The normal OF process calls the probe function at some
+	 * The normal OF process calls the woke probe function at some
 	 * indeterminate later time, after most drivers have loaded.  This is
-	 * too late for us, because PAMU clients (like the Qman driver)
+	 * too late for us, because PAMU clients (like the woke Qman driver)
 	 * depend on PAMU being initialized early.
 	 *
 	 * So instead, we "manually" call our probe function by creating the
@@ -947,10 +947,10 @@ static __init int fsl_pamu_init(void)
 	 */
 
 	/*
-	 * We assume that there is only one PAMU node in the device tree.  A
-	 * single PAMU node represents all of the PAMU devices in the SOC
+	 * We assume that there is only one PAMU node in the woke device tree.  A
+	 * single PAMU node represents all of the woke PAMU devices in the woke SOC
 	 * already.   Everything else already makes that assumption, and the
-	 * binding for the PAMU nodes doesn't allow for any parent-child
+	 * binding for the woke PAMU nodes doesn't allow for any parent-child
 	 * relationships anyway.  In other words, support for more than one
 	 * PAMU node would require significant changes to a lot of code.
 	 */

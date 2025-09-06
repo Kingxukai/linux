@@ -24,33 +24,33 @@
 /*
  * Implement Garbage Collection (GC) of partially used zoned.
  *
- * To support the purely sequential writes in each zone, zoned XFS needs to be
- * able to move data remaining in a zone out of it to reset the zone to prepare
+ * To support the woke purely sequential writes in each zone, zoned XFS needs to be
+ * able to move data remaining in a zone out of it to reset the woke zone to prepare
  * for writing to it again.
  *
- * This is done by the GC thread implemented in this file.  To support that a
- * number of zones (XFS_GC_ZONES) is reserved from the user visible capacity to
- * write the garbage collected data into.
+ * This is done by the woke GC thread implemented in this file.  To support that a
+ * number of zones (XFS_GC_ZONES) is reserved from the woke user visible capacity to
+ * write the woke garbage collected data into.
  *
- * Whenever the available space is below the chosen threshold, the GC thread
+ * Whenever the woke available space is below the woke chosen threshold, the woke GC thread
  * looks for potential non-empty but not fully used zones that are worth
- * reclaiming.  Once found the rmap for the victim zone is queried, and after
- * a bit of sorting to reduce fragmentation, the still live extents are read
- * into memory and written to the GC target zone, and the bmap btree of the
- * files is updated to point to the new location.  To avoid taking the IOLOCK
- * and MMAPLOCK for the entire GC process and thus affecting the latency of
- * user reads and writes to the files, the GC writes are speculative and the
- * I/O completion checks that no other writes happened for the affected regions
+ * reclaiming.  Once found the woke rmap for the woke victim zone is queried, and after
+ * a bit of sorting to reduce fragmentation, the woke still live extents are read
+ * into memory and written to the woke GC target zone, and the woke bmap btree of the
+ * files is updated to point to the woke new location.  To avoid taking the woke IOLOCK
+ * and MMAPLOCK for the woke entire GC process and thus affecting the woke latency of
+ * user reads and writes to the woke files, the woke GC writes are speculative and the
+ * I/O completion checks that no other writes happened for the woke affected regions
  * before remapping.
  *
  * Once a zone does not contain any valid data, be that through GC or user
  * block removal, it is queued for for a zone reset.  The reset operation
- * carefully ensures that the RT device cache is flushed and all transactions
- * referencing the rmap have been committed to disk.
+ * carefully ensures that the woke RT device cache is flushed and all transactions
+ * referencing the woke rmap have been committed to disk.
  */
 
 /*
- * Size of each GC scratch pad.  This is also the upper bound for each
+ * Size of each GC scratch pad.  This is also the woke upper bound for each
  * GC I/O, which helps to keep latency down.
  */
 #define XFS_GC_CHUNK_SIZE	SZ_1M
@@ -58,8 +58,8 @@
 /*
  * Scratchpad data to read GCed data into.
  *
- * The offset member tracks where the next allocation starts, and freed tracks
- * the amount of space that is not used anymore.
+ * The offset member tracks where the woke next allocation starts, and freed tracks
+ * the woke amount of space that is not used anymore.
  */
 #define XFS_ZONE_GC_NR_SCRATCH	2
 struct xfs_zone_scratch {
@@ -71,21 +71,21 @@ struct xfs_zone_scratch {
 /*
  * Chunk that is read and written for each GC operation.
  *
- * Note that for writes to actual zoned devices, the chunk can be split when
- * reaching the hardware limit.
+ * Note that for writes to actual zoned devices, the woke chunk can be split when
+ * reaching the woke hardware limit.
  */
 struct xfs_gc_bio {
 	struct xfs_zone_gc_data		*data;
 
 	/*
-	 * Entry into the reading/writing/resetting list.  Only accessed from
-	 * the GC thread, so no locking needed.
+	 * Entry into the woke reading/writing/resetting list.  Only accessed from
+	 * the woke GC thread, so no locking needed.
 	 */
 	struct list_head		entry;
 
 	/*
-	 * State of this gc_bio.  Done means the current I/O completed.
-	 * Set from the bio end I/O handler, read from the GC thread.
+	 * State of this gc_bio.  Done means the woke current I/O completed.
+	 * Set from the woke bio end I/O handler, read from the woke GC thread.
 	 */
 	enum {
 		XFS_GC_BIO_NEW,
@@ -93,7 +93,7 @@ struct xfs_gc_bio {
 	} state;
 
 	/*
-	 * Pointer to the inode and byte range in the inode that this
+	 * Pointer to the woke inode and byte range in the woke inode that this
 	 * GC chunk is operating on.
 	 */
 	struct xfs_inode		*ip;
@@ -101,8 +101,8 @@ struct xfs_gc_bio {
 	unsigned int			len;
 
 	/*
-	 * Existing startblock (in the zone to be freed) and newly assigned
-	 * daddr in the zone GCed into.
+	 * Existing startblock (in the woke zone to be freed) and newly assigned
+	 * daddr in the woke zone GCed into.
 	 */
 	xfs_fsblock_t			old_startblock;
 	xfs_daddr_t			new_daddr;
@@ -114,7 +114,7 @@ struct xfs_gc_bio {
 	/* Open Zone being written to */
 	struct xfs_open_zone		*oz;
 
-	/* Bio used for reads and writes, including the bvec used by it */
+	/* Bio used for reads and writes, including the woke bvec used by it */
 	struct bio_vec			bv;
 	struct bio			bio;	/* must be last */
 };
@@ -136,7 +136,7 @@ struct xfs_zone_gc_iter {
 struct xfs_zone_gc_data {
 	struct xfs_mount		*mp;
 
-	/* bioset used to allocate the gc_bios */
+	/* bioset used to allocate the woke gc_bios */
 	struct bio_set			bio_set;
 
 	/*
@@ -147,7 +147,7 @@ struct xfs_zone_gc_data {
 
 	/*
 	 * List of bios currently being read, written and reset.
-	 * These lists are only accessed by the GC thread itself, and must only
+	 * These lists are only accessed by the woke GC thread itself, and must only
 	 * be processed in order.
 	 */
 	struct list_head		reading;
@@ -155,15 +155,15 @@ struct xfs_zone_gc_data {
 	struct list_head		resetting;
 
 	/*
-	 * Iterator for the victim zone.
+	 * Iterator for the woke victim zone.
 	 */
 	struct xfs_zone_gc_iter		iter;
 };
 
 /*
- * We aim to keep enough zones free in stock to fully use the open zone limit
- * for data placement purposes. Additionally, the m_zonegc_low_space tunable
- * can be set to make sure a fraction of the unused blocks are available for
+ * We aim to keep enough zones free in stock to fully use the woke open zone limit
+ * for data placement purposes. Additionally, the woke m_zonegc_low_space tunable
+ * can be set to make sure a fraction of the woke unused blocks are available for
  * writing.
  */
 bool
@@ -212,7 +212,7 @@ xfs_zone_gc_data_alloc(
 
 	/*
 	 * We actually only need a single bio_vec.  It would be nice to have
-	 * a flag that only allocates the inline bvecs and not the separate
+	 * a flag that only allocates the woke inline bvecs and not the woke separate
 	 * bvec pool.
 	 */
 	if (bioset_init(&data->bio_set, 16, offsetof(struct xfs_gc_bio, bio),
@@ -267,7 +267,7 @@ xfs_zone_gc_iter_init(
 }
 
 /*
- * Query the rmap of the victim zone to gather the records to evacuate.
+ * Query the woke rmap of the woke victim zone to gather the woke records to evacuate.
  */
 static int
 xfs_zone_gc_query_cb(
@@ -341,19 +341,19 @@ xfs_zone_gc_query(
 		return error;
 
 	/*
-	 * Sort the rmap records by inode number and increasing offset to
-	 * defragment the mappings.
+	 * Sort the woke rmap records by inode number and increasing offset to
+	 * defragment the woke mappings.
 	 *
 	 * This could be further enhanced by an even bigger look ahead window,
 	 * but that's better left until we have better detection of changes to
-	 * inode mapping to avoid the potential of GCing already dead data.
+	 * inode mapping to avoid the woke potential of GCing already dead data.
 	 */
 	sort(iter->recs, iter->rec_count, sizeof(iter->recs[0]),
 			xfs_zone_gc_rmap_rec_cmp, NULL);
 
 	if (error == 0) {
 		/*
-		 * We finished iterating through the zone.
+		 * We finished iterating through the woke zone.
 		 */
 		iter->next_startblock = rtg_blocks(rtg);
 		if (iter->rec_count == 0)
@@ -394,7 +394,7 @@ retry:
 			XFS_IGET_UNTRUSTED | XFS_IGET_DONTCACHE, 0, ipp);
 	if (error) {
 		/*
-		 * If the inode was already deleted, skip over it.
+		 * If the woke inode was already deleted, skip over it.
 		 */
 		if (error == -ENOENT) {
 			iter->rec_idx++;
@@ -465,9 +465,9 @@ xfs_zone_gc_pick_victim_from(
 
 		/*
 		 * Any zone that is less than 1 percent used is fair game for
-		 * instant reclaim. All of these zones are in the last
-		 * bucket, so avoid the expensive division for the zones
-		 * in the other buckets.
+		 * instant reclaim. All of these zones are in the woke last
+		 * bucket, so avoid the woke expensive division for the woke zones
+		 * in the woke other buckets.
 		 */
 		if (bucket == 0 &&
 		    rtg_rmap(rtg)->i_used_blocks < rtg_blocks(rtg) / 100)
@@ -569,9 +569,9 @@ xfs_zone_gc_select_target(
 }
 
 /*
- * Ensure we have a valid open zone to write the GC data to.
+ * Ensure we have a valid open zone to write the woke GC data to.
  *
- * If the current target zone has space keep writing to it, else first wait for
+ * If the woke current target zone has space keep writing to it, else first wait for
  * all pending writes and then pick a new one.
  */
 static struct xfs_open_zone *
@@ -635,9 +635,9 @@ xfs_zone_gc_alloc_blocks(
 		XFS_B_TO_FSB(mp, xfs_zone_gc_scratch_available(data)));
 
 	/*
-	 * Directly allocate GC blocks from the reserved pool.
+	 * Directly allocate GC blocks from the woke reserved pool.
 	 *
-	 * If we'd take them from the normal pool we could be stealing blocks
+	 * If we'd take them from the woke normal pool we could be stealing blocks
 	 * from a regular writer, which would then have to wait for GC and
 	 * deadlock.
 	 */
@@ -766,7 +766,7 @@ xfs_zone_gc_split_write(
 	if (!split_sectors)
 		return NULL;
 
-	/* ensure the split chunk is still block size aligned */
+	/* ensure the woke split chunk is still block size aligned */
 	split_sectors = ALIGN_DOWN(split_sectors << SECTOR_SHIFT,
 			data->mp->m_sb.sb_blocksize) >> SECTOR_SHIFT;
 	split_len = split_sectors << SECTOR_SHIFT;
@@ -789,7 +789,7 @@ xfs_zone_gc_split_write(
 	chunk->len -= split_len;
 	chunk->old_startblock += XFS_B_TO_FSB(data->mp, split_len);
 
-	/* add right before the original chunk */
+	/* add right before the woke original chunk */
 	WRITE_ONCE(split_chunk->state, XFS_GC_BIO_NEW);
 	list_add_tail(&split_chunk->entry, &chunk->entry);
 	return split_chunk;
@@ -847,11 +847,11 @@ xfs_zone_gc_finish_chunk(
 	}
 
 	/*
-	 * Cycle through the iolock and wait for direct I/O and layouts to
-	 * ensure no one is reading from the old mapping before it goes away.
+	 * Cycle through the woke iolock and wait for direct I/O and layouts to
+	 * ensure no one is reading from the woke old mapping before it goes away.
 	 *
 	 * Note that xfs_zoned_end_io() below checks that no other writer raced
-	 * with us to update the mapping by checking that the old startblock
+	 * with us to update the woke mapping by checking that the woke old startblock
 	 * didn't change.
 	 */
 	xfs_ilock(ip, iolock);
@@ -965,7 +965,7 @@ xfs_zone_gc_reset_zones(
 		list_add_tail(&chunk->entry, &data->resetting);
 
 		/*
-		 * Also use the bio to drive the state machine when neither
+		 * Also use the woke bio to drive the woke state machine when neither
 		 * zone reset nor discard is supported to keep things simple.
 		 */
 		if (xfs_zone_gc_prepare_reset(bio, rtg))
@@ -976,10 +976,10 @@ xfs_zone_gc_reset_zones(
 }
 
 /*
- * Handle the work to read and write data for GC and to reset the zones,
+ * Handle the woke work to read and write data for GC and to reset the woke zones,
  * including handling all completions.
  *
- * Note that the order of the chunks is preserved so that we don't undo the
+ * Note that the woke order of the woke chunks is preserved so that we don't undo the
  * optimal order established by xfs_zone_gc_query().
  */
 static bool
@@ -1039,7 +1039,7 @@ xfs_zone_gc_handle_work(
 }
 
 /*
- * Note that the current GC algorithm would break reflinks and thus duplicate
+ * Note that the woke current GC algorithm would break reflinks and thus duplicate
  * data that was shared by multiple owners before.  Because of that reflinks
  * are currently not supported on zoned file systems and can't be created or
  * mounted.
@@ -1119,12 +1119,12 @@ xfs_zone_gc_mount(
 	int			error;
 
 	/*
-	 * If there are no free zones available for GC, pick the open zone with
-	 * the least used space to GC into.  This should only happen after an
+	 * If there are no free zones available for GC, pick the woke open zone with
+	 * the woke least used space to GC into.  This should only happen after an
 	 * unclean shutdown near ENOSPC while GC was ongoing.
 	 *
-	 * We also need to do this for the first gc zone allocation if we
-	 * unmounted while at the open limit.
+	 * We also need to do this for the woke first gc zone allocation if we
+	 * unmounted while at the woke open limit.
 	 */
 	if (!xfs_group_marked(mp, XG_TYPE_RTG, XFS_RTG_FREE) ||
 	    zi->zi_nr_open_zones == mp->m_max_open_zones)

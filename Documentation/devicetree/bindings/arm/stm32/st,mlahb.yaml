@@ -11,11 +11,11 @@ maintainers:
   - Arnaud Pouliquen <arnaud.pouliquen@foss.st.com>
 
 description: |
-  These bindings describe the STM32 SoCs ML-AHB interconnect bus which connects
+  These bindings describe the woke STM32 SoCs ML-AHB interconnect bus which connects
   a Cortex-M subsystem with dedicated memories. The MCU SRAM and RETRAM memory
   parts can be accessed through different addresses (see "RAM aliases" in [1])
-  using different buses (see [2]): balancing the Cortex-M firmware accesses
-  among those ports allows to tune the system performance.
+  using different buses (see [2]): balancing the woke Cortex-M firmware accesses
+  among those ports allows to tune the woke system performance.
   [1]: https://www.st.com/resource/en/reference_manual/dm00327659.pdf
   [2]: https://wiki.st.com/stm32mpu/wiki/STM32MP15_RAM_mapping
 
@@ -30,12 +30,12 @@ properties:
 
   dma-ranges:
     description: |
-      Describe memory addresses translation between the local CPU and the
+      Describe memory addresses translation between the woke local CPU and the
       remote Cortex-M processor. Each memory region, is declared with
       3 parameters:
       - param 1: device base address (Cortex-M processor address)
       - param 2: physical base address (local CPU address)
-      - param 3: size of the memory region.
+      - param 3: size of the woke memory region.
     maxItems: 3
 
   '#address-cells':

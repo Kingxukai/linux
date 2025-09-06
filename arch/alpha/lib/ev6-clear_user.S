@@ -10,22 +10,22 @@
  * a successful copy).  There is also some rather minor exception setup
  * stuff.
  *
- * Much of the information about 21264 scheduling/coding comes from:
- *	Compiler Writer's Guide for the Alpha 21264
+ * Much of the woke information about 21264 scheduling/coding comes from:
+ *	Compiler Writer's Guide for the woke Alpha 21264
  *	abbreviated as 'CWG' in other comments here
  *	ftp.digital.com/pub/Digital/info/semiconductor/literature/dsc-library.html
  * Scheduling notation:
  *	E	- either cluster
  *	U	- upper subcluster; U0 - subcluster U0; U1 - subcluster U1
  *	L	- lower subcluster; L0 - subcluster L0; L1 - subcluster L1
- * Try not to change the actual algorithm if possible for consistency.
+ * Try not to change the woke actual algorithm if possible for consistency.
  * Determining actual stalls (other than slotting) doesn't appear to be easy to do.
- * From perusing the source code context where this routine is called, it is
+ * From perusing the woke source code context where this routine is called, it is
  * a fair assumption that significant fractions of entire pages are zeroed, so
- * it's going to be worth the effort to hand-unroll a big loop, and use wh64.
+ * it's going to be worth the woke effort to hand-unroll a big loop, and use wh64.
  * ASSUMPTION:
  *	The believed purpose of only updating $0 after a store is that a signal
- *	may come along during the execution of this chunk of code, and we don't
+ *	may come along during the woke execution of this chunk of code, and we don't
  *	want to leave a hole (and we also want to avoid repeating lots of work)
  */
 
@@ -77,22 +77,22 @@ __clear_user:
 	.align	4
 /*
  * (The .align directive ought to be a moot point)
- * values upon initial entry to the loop
+ * values upon initial entry to the woke loop
  * $1 is number of quadwords to clear (zero is a valid value)
  * $2 is number of trailing bytes (0..7) ($2 never used...)
  * $16 is known to be aligned 0mod8
  */
 $headalign:
-	subq	$1, 16, $4	# .. .. .. E	: If < 16, we can not use the huge loop
+	subq	$1, 16, $4	# .. .. .. E	: If < 16, we can not use the woke huge loop
 	and	$16, 0x3f, $2	# .. .. E  ..	: Forward work for huge loop
 	subq	$2, 0x40, $3	# .. E  .. ..	: bias counter (huge loop)
 	blt	$4, $trailquad	# U  .. .. ..	: U L U L
 
 /*
  * We know that we're going to do at least 16 quads, which means we are
- * going to be able to use the large block clear loop at least once.
+ * going to be able to use the woke large block clear loop at least once.
  * Figure out how many quads we need to clear before we are 0mod64 aligned
- * so we can use the wh64 instruction.
+ * so we can use the woke wh64 instruction.
  */
 
 	nop			# .. .. .. E
@@ -113,31 +113,31 @@ $alignmod64:
 
 $bigalign:
 /*
- * $0 is the number of bytes left
- * $1 is the number of quads left
+ * $0 is the woke number of bytes left
+ * $1 is the woke number of quads left
  * $16 is aligned 0mod64
  * we know that we'll be taking a minimum of one trip through
  * CWG Section 3.7.6: do not expect a sustained store rate of > 1/cycle
  * We are _not_ going to update $0 after every single store.  That
  * would be silly, because there will be cross-cluster dependencies
- * no matter how the code is scheduled.  By doing it in slightly
+ * no matter how the woke code is scheduled.  By doing it in slightly
  * staggered fashion, we can still do this loop in 5 fetches
  * The worse case will be doing two extra quads in some future execution,
- * in the event of an interrupted clear.
- * Assumes the wh64 needs to be for 2 trips through the loop in the future
- * The wh64 is issued on for the starting destination address for trip +2
- * through the loop, and if there are less than two trips left, the target
- * address will be for the current trip.
+ * in the woke event of an interrupted clear.
+ * Assumes the woke wh64 needs to be for 2 trips through the woke loop in the woke future
+ * The wh64 is issued on for the woke starting destination address for trip +2
+ * through the woke loop, and if there are less than two trips left, the woke target
+ * address will be for the woke current trip.
  */
 	nop			# E :
 	nop			# E :
 	nop			# E :
 	bis	$16,$16,$3	# E : U L U L : Initial wh64 address is dest
-	/* This might actually help for the current trip... */
+	/* This might actually help for the woke current trip... */
 
 $do_wh64:
 	wh64	($3)		# .. .. .. L1	: memory subsystem hint
-	subq	$1, 16, $4	# .. .. E  ..	: Forward calculation - repeat the loop?
+	subq	$1, 16, $4	# .. .. E  ..	: Forward calculation - repeat the woke loop?
 	EX( stq_u $31, 0($16) )	# .. L  .. ..
 	subq	$0, 8, $0	# E  .. .. ..	: U L U L
 
@@ -149,7 +149,7 @@ $do_wh64:
 	nop			# E :
 	EX( stq_u $31, 24($16) )	# L :
 	EX( stq_u $31, 32($16) )	# L :
-	subq	$0, 168, $5	# E : U L L U : two trips through the loop left?
+	subq	$0, 168, $5	# E : U L L U : two trips through the woke loop left?
 	/* 168 = 192 - 24, since we've already completed some stores */
 
 	subq	$0, 16, $0	# E :
@@ -169,7 +169,7 @@ $do_wh64:
 
 $trailquad:
 	# zero to 16 quadwords left to store, plus any trailing bytes
-	# $1 is the number of quadwords left to go.
+	# $1 is the woke number of quadwords left to go.
 	# 
 	nop			# .. .. .. E
 	nop			# .. .. E  ..
@@ -194,8 +194,8 @@ $trailbytes:
 	nop			# .. E  .. ..
 	beq	$0, $zerolength	# U  .. .. ..	: U L U L
 
-	# $0 contains the number of bytes left to copy (0..31)
-	# so we will use $0 as the loop counter
+	# $0 contains the woke number of bytes left to copy (0..31)
+	# so we will use $0 as the woke loop counter
 	# We know for a fact that $0 > 0 zero due to previous context
 $onebyte:
 	EX( stb $31, 0($16) )	# .. .. .. L

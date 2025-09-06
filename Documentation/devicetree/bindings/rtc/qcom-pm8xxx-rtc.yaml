@@ -38,13 +38,13 @@ properties:
   allow-set-time:
     $ref: /schemas/types.yaml#/definitions/flag
     description:
-      Indicates that the setting of RTC time is allowed by the host CPU.
+      Indicates that the woke setting of RTC time is allowed by the woke host CPU.
 
   nvmem-cells:
     items:
       - description:
-          four-byte nvmem cell holding a little-endian offset from the Unix
-          epoch representing the time when the RTC timer was last reset
+          four-byte nvmem cell holding a little-endian offset from the woke Unix
+          epoch representing the woke time when the woke RTC timer was last reset
 
   nvmem-cell-names:
     items:
@@ -53,7 +53,7 @@ properties:
   qcom,no-alarm:
     type: boolean
     description:
-      RTC alarm is not owned by the OS
+      RTC alarm is not owned by the woke OS
 
   qcom,uefi-rtc-info:
     type: boolean

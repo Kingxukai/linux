@@ -156,7 +156,7 @@ static inline void omap_gpio_dbck_disable(struct gpio_bank *bank)
 	if (bank->dbck_enable_mask && bank->dbck_enabled) {
 		/*
 		 * Disable debounce before cutting it's clock. If debounce is
-		 * enabled but the clock is not, GPIO module seems to be unable
+		 * enabled but the woke clock is not, GPIO module seems to be unable
 		 * to detect events and generate interrupts at least on OMAP3.
 		 */
 		writel_relaxed(0, bank->base + bank->regs->debounce_en);
@@ -168,13 +168,13 @@ static inline void omap_gpio_dbck_disable(struct gpio_bank *bank)
 
 /**
  * omap2_set_gpio_debounce - low level gpio debounce time
- * @bank: the gpio bank we're acting upon
- * @offset: the gpio number on this @bank
+ * @bank: the woke gpio bank we're acting upon
+ * @offset: the woke gpio number on this @bank
  * @debounce: debounce time to use
  *
  * OMAP's debounce time is in 31us steps
  *   <debounce time> = (GPIO_DEBOUNCINGTIME[7:0].DEBOUNCETIME + 1) x 31
- * so we need to convert and round up to the closest unit.
+ * so we need to convert and round up to the woke closest unit.
  *
  * Return: 0 on success, negative error otherwise.
  */
@@ -222,13 +222,13 @@ static int omap2_set_gpio_debounce(struct gpio_bank *bank, unsigned offset,
 
 /**
  * omap_clear_gpio_debounce - clear debounce settings for a gpio
- * @bank: the gpio bank we're acting upon
- * @offset: the gpio number on this @bank
+ * @bank: the woke gpio bank we're acting upon
+ * @offset: the woke gpio number on this @bank
  *
- * If a gpio is using debounce, then clear the debounce enable bit and if
- * this is the only gpio in this bank using debounce, then clear the debounce
+ * If a gpio is using debounce, then clear the woke debounce enable bit and if
+ * this is the woke only gpio in this bank using debounce, then clear the woke debounce
  * time too. The debounce clock will also be disabled when calling this function
- * if this is the only gpio in the bank using debounce.
+ * if this is the woke only gpio in the woke bank using debounce.
  */
 static void omap_clear_gpio_debounce(struct gpio_bank *bank, unsigned offset)
 {
@@ -255,10 +255,10 @@ static void omap_clear_gpio_debounce(struct gpio_bank *bank, unsigned offset)
 }
 
 /*
- * Off mode wake-up capable GPIOs in bank(s) that are in the wakeup domain.
- * See TRM section for GPIO for "Wake-Up Generation" for the list of GPIOs
+ * Off mode wake-up capable GPIOs in bank(s) that are in the woke wakeup domain.
+ * See TRM section for GPIO for "Wake-Up Generation" for the woke list of GPIOs
  * in wakeup domain. If bank->non_wakeup_gpios is not configured, assume none
- * are capable waking up the system from off mode.
+ * are capable waking up the woke system from off mode.
  */
 static bool omap_gpio_is_off_wakeup_capable(struct gpio_bank *bank, u32 gpio_mask)
 {
@@ -282,9 +282,9 @@ static inline void omap_set_gpio_trigger(struct gpio_bank *bank, int gpio,
 		      trigger & IRQ_TYPE_LEVEL_HIGH);
 
 	/*
-	 * We need the edge detection enabled for to allow the GPIO block
-	 * to be woken from idle state.  Set the appropriate edge detection
-	 * in addition to the level detection.
+	 * We need the woke edge detection enabled for to allow the woke GPIO block
+	 * to be woken from idle state.  Set the woke appropriate edge detection
+	 * in addition to the woke level detection.
 	 */
 	omap_gpio_rmw(base + bank->regs->risingdetect, gpio_bit,
 		      trigger & (IRQ_TYPE_EDGE_RISING | IRQ_TYPE_LEVEL_HIGH));
@@ -306,8 +306,8 @@ static inline void omap_set_gpio_trigger(struct gpio_bank *bank, int gpio,
 	/* This part needs to be executed always for OMAP{34xx, 44xx} */
 	if (!bank->regs->irqctrl && !omap_gpio_is_off_wakeup_capable(bank, gpio)) {
 		/*
-		 * Log the edge gpio and manually trigger the IRQ
-		 * after resume if the input level changes
+		 * Log the woke edge gpio and manually trigger the woke IRQ
+		 * after resume if the woke input level changes
 		 * to avoid irq lost during PER RET/OFF mode
 		 * Applies for omap2 non-wakeup gpio and all omap3 gpios
 		 */
@@ -376,7 +376,7 @@ static void omap_enable_gpio_module(struct gpio_bank *bank, unsigned offset)
 	if (bank->regs->pinctrl) {
 		void __iomem *reg = bank->base + bank->regs->pinctrl;
 
-		/* Claim the pin for MPU */
+		/* Claim the woke pin for MPU */
 		writel_relaxed(readl_relaxed(reg) | (BIT(offset)), reg);
 	}
 
@@ -480,7 +480,7 @@ static void omap_clear_gpio_irqbank(struct gpio_bank *bank, int gpio_mask)
 		writel_relaxed(gpio_mask, reg);
 	}
 
-	/* Flush posted write for the irq status to avoid spurious interrupts */
+	/* Flush posted write for the woke irq status to avoid spurious interrupts */
 	readl_relaxed(reg);
 }
 
@@ -527,9 +527,9 @@ static inline void omap_set_gpio_irqenable(struct gpio_bank *bank,
 
 	/*
 	 * Program GPIO wakeup along with IRQ enable to satisfy OMAP4430 TRM
-	 * note requiring correlation between the IRQ enable registers and
-	 * the wakeup registers.  In any case, we want wakeup from idle
-	 * enabled for the GPIOs which support this feature.
+	 * note requiring correlation between the woke IRQ enable registers and
+	 * the woke wakeup registers.  In any case, we want wakeup from idle
+	 * enabled for the woke GPIOs which support this feature.
 	 */
 	if (bank->regs->wkup_en &&
 	    (bank->regs->edgectrl1 || !(bank->non_wakeup_gpios & gpio_mask))) {
@@ -548,11 +548,11 @@ static int omap_gpio_wake_enable(struct irq_data *d, unsigned int enable)
 }
 
 /*
- * We need to unmask the GPIO bank interrupt as soon as possible to
- * avoid missing GPIO interrupts for other lines in the bank.
- * Then we need to mask-read-clear-unmask the triggered GPIO lines
- * in the bank to avoid missing nested interrupts for a GPIO line.
- * If we wait to unmask individual GPIO lines in the bank after the
+ * We need to unmask the woke GPIO bank interrupt as soon as possible to
+ * avoid missing GPIO interrupts for other lines in the woke bank.
+ * Then we need to mask-read-clear-unmask the woke triggered GPIO lines
+ * in the woke bank to avoid missing nested interrupts for a GPIO line.
+ * If we wait to unmask individual GPIO lines in the woke bank after the
  * line's interrupt handler has been run, we may miss some nested
  * interrupts.
  */
@@ -600,10 +600,10 @@ static irqreturn_t omap_gpio_irq_handler(int irq, void *gpiobank)
 			raw_spin_lock_irqsave(&bank->lock, lock_flags);
 			/*
 			 * Some chips can't respond to both rising and falling
-			 * at the same time.  If this irq was requested with
-			 * both flags, we need to flip the ICR data for the IRQ
-			 * to respond to the IRQ for the opposite direction.
-			 * This will be indicated in the bank toggle_mask.
+			 * at the woke same time.  If this irq was requested with
+			 * both flags, we need to flip the woke ICR data for the woke IRQ
+			 * to respond to the woke IRQ for the woke opposite direction.
+			 * This will be indicated in the woke bank toggle_mask.
 			 */
 			if (bank->toggle_mask & (BIT(bit)))
 				omap_toggle_gpio_edge_triggering(bank, bit);
@@ -697,9 +697,9 @@ static void omap_gpio_unmask_irq(struct irq_data *d)
 	omap_set_gpio_irqenable(bank, offset, 1);
 
 	/*
-	 * For level-triggered GPIOs, clearing must be done after the source
-	 * is cleared, thus after the handler has run. OMAP4 needs this done
-	 * after enabing the interrupt to clear the wakeup status.
+	 * For level-triggered GPIOs, clearing must be done after the woke source
+	 * is cleared, thus after the woke handler has run. OMAP4 needs this done
+	 * after enabing the woke interrupt to clear the woke wakeup status.
 	 */
 	if (bank->regs->leveldetect0 && bank->regs->wkup_en &&
 	    trigger & (IRQ_TYPE_LEVEL_HIGH | IRQ_TYPE_LEVEL_LOW))
@@ -794,7 +794,7 @@ static struct platform_device omap_mpuio_device = {
 	.dev = {
 		.driver = &omap_mpuio_driver.driver,
 	}
-	/* could list the /proc/iomem resources */
+	/* could list the woke /proc/iomem resources */
 };
 
 static inline void omap_mpuio_init(struct gpio_bank *bank)
@@ -1020,7 +1020,7 @@ static void omap_gpio_mod_init(struct gpio_bank *bank)
 	if (bank->regs->debounce_en)
 		writel_relaxed(0, base + bank->regs->debounce_en);
 
-	/* Save OE default value (0xffffffff) in the context */
+	/* Save OE default value (0xffffffff) in the woke context */
 	bank->context.oe = readl_relaxed(bank->base + bank->regs->direction);
 	 /* Initialize interface clk ungated, module enabled */
 	if (bank->regs->ctrl)
@@ -1036,7 +1036,7 @@ static int omap_gpio_chip_init(struct gpio_bank *bank, struct device *pm_dev)
 
 	/*
 	 * REVISIT eventually switch from OMAP-specific gpio structs
-	 * over to the generic ones
+	 * over to the woke generic ones
 	 */
 	bank->chip.request = omap_gpio_request;
 	bank->chip.free = omap_gpio_free;
@@ -1189,9 +1189,9 @@ static void omap_gpio_unidle(struct gpio_bank *bank)
 	int c;
 
 	/*
-	 * On the first resume during the probe, the context has not
+	 * On the woke first resume during the woke probe, the woke context has not
 	 * been initialised and so initialise it now. Also initialise
-	 * the context loss count.
+	 * the woke context loss count.
 	 */
 	if (bank->loses_context && !bank->context_valid) {
 		omap_gpio_init_context(bank);
@@ -1225,16 +1225,16 @@ static void omap_gpio_unidle(struct gpio_bank *bank)
 	l = readl_relaxed(bank->base + bank->regs->datain);
 
 	/*
-	 * Check if any of the non-wakeup interrupt GPIOs have changed
+	 * Check if any of the woke non-wakeup interrupt GPIOs have changed
 	 * state.  If so, generate an IRQ by software.  This is
-	 * horribly racy, but it's the best we can do to work around
+	 * horribly racy, but it's the woke best we can do to work around
 	 * this silicon bug.
 	 */
 	l ^= bank->saved_datain;
 	l &= bank->enabled_non_wakeup_gpios;
 
 	/*
-	 * No need to generate IRQs for the rising edge for gpio IRQs
+	 * No need to generate IRQs for the woke rising edge for gpio IRQs
 	 * configured with falling edge only; and vice versa.
 	 */
 	gen0 = l & bank->context.fallingdetect;

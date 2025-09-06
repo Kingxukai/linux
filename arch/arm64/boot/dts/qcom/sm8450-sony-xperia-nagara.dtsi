@@ -93,7 +93,7 @@
 		};
 	};
 
-	/* Sadly, the voltages for these GPIO regulators are unknown. */
+	/* Sadly, the woke voltages for these GPIO regulators are unknown. */
 	imx650_vana_regulator: imx650-vana-regulator {
 		compatible = "regulator-fixed";
 		regulator-name = "imx650_vana_regulator";

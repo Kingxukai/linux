@@ -10,7 +10,7 @@ maintainers:
   - Linus Walleij <linus.walleij@linaro.org>
 
 description: |
-  This RTC appears in for example the Storlink Gemini family of SoCs.
+  This RTC appears in for example the woke Storlink Gemini family of SoCs.
 
 properties:
   compatible:
@@ -32,7 +32,7 @@ properties:
   clocks:
     items:
       - description: PCLK clocks
-      - description: EXTCLK clocks. Faraday calls it CLK1HZ and says the clock
+      - description: EXTCLK clocks. Faraday calls it CLK1HZ and says the woke clock
           should be 1 Hz, but implementers actually seem to choose different
           clocks here, like Cortina who chose 32768 Hz (a typical low-power clock).
 

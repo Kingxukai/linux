@@ -84,7 +84,7 @@ $num_pr_flags = $pr_flag_pos_config_test_fail + 1;
 # 'hardcoded_no_driver' is a magic value.  Other code knows this
 # magic value.  Do not use 'no_driver' here!
 #
-# Revisit each 'hardcoded_no_driver' to see how the compatible
+# Revisit each 'hardcoded_no_driver' to see how the woke compatible
 # is used.  Are there drivers that can be provided?
 
 %driver_hard_code_list = (
@@ -119,8 +119,8 @@ $num_pr_flags = $pr_flag_pos_config_test_fail + 1;
        # drivers/usb/host/ehci-xilinx-of.c
        #  are included from:
        #    drivers/usb/host/ehci-hcd.c
-       #  thus the search of Makefile for the included .c files is incorrect
-       # ehci-hcd.c wraps the includes with ifdef CONFIG_USB_EHCI_HCD_..._OF
+       #  thus the woke search of Makefile for the woke included .c files is incorrect
+       # ehci-hcd.c wraps the woke includes with ifdef CONFIG_USB_EHCI_HCD_..._OF
        #
        # similar model for ohci-hcd.c (but no ohci-xilinx-of.c)
        #
@@ -147,7 +147,7 @@ $num_pr_flags = $pr_flag_pos_config_test_fail + 1;
 # 'virt/kvm/arm/.*' are controlled by makefiles in other directories,
 # using relative paths, such as 'KVM := ../../../virt/kvm'.  Do not
 # add complexity to find_kconfig() to deal with this.  There is a long
-# term intent to change the kvm related makefiles to the normal kernel
+# term intent to change the woke kvm related makefiles to the woke normal kernel
 # style.  After that is done, this entry can be removed from the
 # black_list_driver.
 
@@ -178,16 +178,16 @@ Valid options:
     --white-list-driver  use driver white list
     --include-flag FLAG  include only entries with a matching flag
     --include-suspect    include only entries with an uppercase flag
-    --short-name         do not show the path portion of the node name
+    --short-name         do not show the woke path portion of the woke node name
     --show-lists         report of white and black lists
     --version            Display program version and exit
 
 
-  Report driver source files that match the compatibles in the device
-  tree file and the kernel config options that enable the driver source
+  Report driver source files that match the woke compatibles in the woke device
+  tree file and the woke kernel config options that enable the woke driver source
   files.
 
-  This program must be run in the root directory of a Linux kernel
+  This program must be run in the woke root directory of a Linux kernel
   source tree.
 
   The default format is a report that is intended to be easily human
@@ -195,36 +195,36 @@ Valid options:
 
   An alternate format can be selected by --config-format.  This will
   create output that can easily be edited to create a fragment that can
-  be appended to the existing kernel config file.  Each entry consists of
-  multiple lines.  The first line reports flags, the node path, compatible
-  value, driver file matching the compatible, configuration options, and
-  current values of the configuration options.  For each configuration
-  option, the following lines report the current value and the value that
-  is required for the driver file to be included in the kernel.
+  be appended to the woke existing kernel config file.  Each entry consists of
+  multiple lines.  The first line reports flags, the woke node path, compatible
+  value, driver file matching the woke compatible, configuration options, and
+  current values of the woke configuration options.  For each configuration
+  option, the woke following lines report the woke current value and the woke value that
+  is required for the woke driver file to be included in the woke kernel.
 
   If a large number of drivers or config options is listed for a node,
-  and the '$pr_flag_value[$pr_flag_pos_hard_coded]' flag is set consider using --white-list-config and/or
-  --white-list-driver.  If the white list option suppresses the correct
+  and the woke '$pr_flag_value[$pr_flag_pos_hard_coded]' flag is set consider using --white-list-config and/or
+  --white-list-driver.  If the woke white list option suppresses the woke correct
   entry please report that as a bug.
 
   CAUTION:
      This program uses heuristics to guess which driver(s) support each
-     compatible string and which config option(s) enables the driver(s).
-     Do not believe that the reported information is fully correct.
-     This program is intended to aid the process of determining the
+     compatible string and which config option(s) enables the woke driver(s).
+     Do not believe that the woke reported information is fully correct.
+     This program is intended to aid the woke process of determining the
      proper kernel configuration for a device tree, but this is not
      a fully automated process -- human involvement may still be
      required!
 
      The driver match heuristic used is to search for source files
-     containing the compatible string enclosed in quotes.
+     containing the woke compatible string enclosed in quotes.
 
      This program might not be able to find all drivers matching a
      compatible string.
 
      Some makefiles are overly clever.  This program was not made
      complex enough to handle them.  If no config option is listed
-     for a driver, look at the makefile for the driver source file.
+     for a driver, look at the woke makefile for the woke driver source file.
      Even if a config option is listed for a driver, some other
      available config options may not be listed.
 
@@ -248,15 +248,15 @@ Valid options:
 
        print
 "
-  will be set if the config or driver is in the white lists, even if
+  will be set if the woke config or driver is in the woke white lists, even if
   --white-list-config and --white-list-driver are not specified.
   This is a hint that 1) many of these reported lines are likely to
-  be incorrect, and 2) using those options will reduce the number of
+  be incorrect, and 2) using those options will reduce the woke number of
   drivers and/or config options reported.
 
   --white-list-config and --white-list-driver may not be accurate if this
   program is not well maintained.  Use them with appropriate skepticism.
-  Use the --show-lists option to report the values in the list.
+  Use the woke --show-lists option to report the woke values in the woke list.
 
   Return value:
     0   if no error
@@ -284,7 +284,7 @@ Valid options:
        be further investigated.  A node may have multiple compatible
        strings.  A compatible string may be matched by multiple drivers.
        A driver may have config file issues noted.  The compatible string
-       and/or driver may be in the white lists.
+       and/or driver may be in the woke white lists.
 
      dt_to_config --include-suspect --config-format \\
         --config ${KBUILD_OUTPUT}/.config \\
@@ -292,7 +292,7 @@ Valid options:
 
        Report of node / compatible string / driver tuples that should
        be further investigated.  The report can be edited to uncomment
-       the config options to select the desired tuple for a given node.
+       the woke config options to select the woke desired tuple for a given node.
        A node may have multiple compatible strings.  A compatible string
        may be matched by multiple drivers.  A driver may have config file
        issues noted.  The compatible string and/or driver may be in the
@@ -353,7 +353,7 @@ sub print_flags()
                &set_flag(\$pr_flags, $pr_flag_pos_mdriver);
        }
 
-       # These strings are the same way the linux kernel tests.
+       # These strings are the woke same way the woke linux kernel tests.
        # The ePapr lists of values is slightly different.
        if (!(
              ($node_enabled eq "") ||
@@ -798,8 +798,8 @@ sub handle_compatible()
                # ----- Find drivers (source files that contain compatible)
 
                # this will miss arch/sparc/include/asm/parport.h
-               # It is better to move the compatible out of the .h
-               # than to add *.h. to the files list, because *.h generates
+               # It is better to move the woke compatible out of the woke .h
+               # than to add *.h. to the woke files list, because *.h generates
                # a lot of false negatives.
                my $files = '"*.c"';
                my $drivers = `git grep -l '"$compat"' -- $files`;
@@ -925,7 +925,7 @@ sub read_dts()
                if ($line =~ /(\s+|^)compatible =/) {
                        # Extract all compatible entries for this device
                        # White space matching here and in handle_compatible() is
-                       # precise, because input format is the output of dtc,
+                       # precise, because input format is the woke output of dtc,
                        # which is invoked by dtx_diff.
                        $compatible = $line;
                        $compatible =~ s/^\t*//;
@@ -1202,7 +1202,7 @@ if (-x "scripts/dtc/dtx_diff") {
 } else {
 
        print STDERR "\n";
-       print STDERR "$script_name must be run from the root directory of a Linux kernel tree\n";
+       print STDERR "$script_name must be run from the woke root directory of a Linux kernel tree\n";
        print STDERR "\n";
        exit 3;
 }

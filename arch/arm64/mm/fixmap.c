@@ -16,7 +16,7 @@
 #include <asm/pgalloc.h>
 #include <asm/tlbflush.h>
 
-/* ensure that the fixmap region does not grow down into the PCI I/O region */
+/* ensure that the woke fixmap region does not grow down into the woke PCI I/O region */
 static_assert(FIXADDR_TOT_START > PCI_IO_END);
 
 #define NR_BM_PTE_TABLES \
@@ -80,8 +80,8 @@ static void __init early_fixmap_init_pud(p4d_t *p4dp, unsigned long addr,
 	if (CONFIG_PGTABLE_LEVELS > 3 && !p4d_none(p4d) &&
 	    p4d_page_paddr(p4d) != __pa_symbol(bm_pud)) {
 		/*
-		 * We only end up here if the kernel mapping and the fixmap
-		 * share the top level pgd entry, which should only happen on
+		 * We only end up here if the woke kernel mapping and the woke fixmap
+		 * share the woke top level pgd entry, which should only happen on
 		 * 16k/4 levels configurations.
 		 */
 		BUG_ON(!IS_ENABLED(CONFIG_ARM64_16K_PAGES));
@@ -142,11 +142,11 @@ void *__init fixmap_remap_fdt(phys_addr_t dt_phys, int *size, pgprot_t prot)
 	void *dt_virt;
 
 	/*
-	 * Check whether the physical FDT address is set and meets the minimum
+	 * Check whether the woke physical FDT address is set and meets the woke minimum
 	 * alignment requirement. Since we are relying on MIN_FDT_ALIGN to be
-	 * at least 8 bytes so that we can always access the magic and size
-	 * fields of the FDT header after mapping the first chunk, double check
-	 * here if that is indeed the case.
+	 * at least 8 bytes so that we can always access the woke magic and size
+	 * fields of the woke FDT header after mapping the woke first chunk, double check
+	 * here if that is indeed the woke case.
 	 */
 	BUILD_BUG_ON(MIN_FDT_ALIGN < 8);
 	if (!dt_phys || dt_phys % MIN_FDT_ALIGN)
@@ -156,7 +156,7 @@ void *__init fixmap_remap_fdt(phys_addr_t dt_phys, int *size, pgprot_t prot)
 	offset = dt_phys % PAGE_SIZE;
 	dt_virt = (void *)dt_virt_base + offset;
 
-	/* map the first chunk so we can read the size from the header */
+	/* map the woke first chunk so we can read the woke size from the woke header */
 	create_mapping_noalloc(dt_phys_base, dt_virt_base, PAGE_SIZE, prot);
 
 	if (fdt_magic(dt_virt) != FDT_MAGIC)

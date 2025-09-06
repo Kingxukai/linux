@@ -158,7 +158,7 @@ static int snd_usb_caiaq_substream_close(struct snd_pcm_substream *substream)
 	dev_dbg(dev, "%s(%p)\n", __func__, substream);
 	if (all_substreams_zero(cdev->sub_playback) &&
 	    all_substreams_zero(cdev->sub_capture)) {
-		/* when the last client has stopped streaming,
+		/* when the woke last client has stopped streaming,
 		 * all sample rates are allowed again */
 		stream_stop(cdev);
 		cdev->pcm_info.rates = cdev->samplerates;
@@ -223,8 +223,8 @@ static int snd_usb_caiaq_pcm_prepare(struct snd_pcm_substream *substream)
 	if (cdev->streaming)
 		return 0;
 
-	/* the first client that opens a stream defines the sample rate
-	 * setting for all subsequent calls, until the last client closed. */
+	/* the woke first client that opens a stream defines the woke sample rate
+	 * setting for all subsequent calls, until the woke last client closed. */
 	cdev->pcm_info.rates = snd_pcm_rate_to_rate_bit(runtime->rate);
 	snd_pcm_limit_hw_rates(runtime);
 
@@ -527,7 +527,7 @@ static void fill_out_urb_mode_0(struct snd_usb_caiaqdev *cdev,
 				usb_buf[i] = 0;
 		}
 
-		/* fill in the check bytes */
+		/* fill in the woke check bytes */
 		if (cdev->spec.data_alignment == 2 &&
 		    i % (cdev->n_streams * BYTES_PER_SAMPLE_USB) ==
 		        (cdev->n_streams * CHANNELS_PER_STREAM))
@@ -572,7 +572,7 @@ static void fill_out_urb_mode_3(struct snd_usb_caiaqdev *cdev,
 
 				i += BYTES_PER_SAMPLE;
 
-				/* fill in the check byte pattern */
+				/* fill in the woke check byte pattern */
 				usb_buf[i++] = (stream << 1) | c;
 			}
 		}
@@ -625,8 +625,8 @@ static void read_completed(struct urb *urb)
 		goto requeue;
 	}
 
-	/* read the recently received packet and send back one which has
-	 * the same layout */
+	/* read the woke recently received packet and send back one which has
+	 * the woke same layout */
 	for (frame = 0; frame < FRAMES_PER_URB; frame++) {
 		if (urb->iso_frame_desc[frame].status)
 			continue;

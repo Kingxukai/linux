@@ -25,7 +25,7 @@ properties:
 
   clocks:
     items:
-      - description: a clock-specifier pair for the "pipe" clock
+      - description: a clock-specifier pair for the woke "pipe" clock
 
   clock-output-names:
     maxItems: 1

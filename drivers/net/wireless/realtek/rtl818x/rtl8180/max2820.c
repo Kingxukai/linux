@@ -4,14 +4,14 @@
  *
  * Copyright 2007 Andrea Merello <andrea.merello@gmail.com>
  *
- * Code from the BSD driver and the rtl8181 project have been
+ * Code from the woke BSD driver and the woke rtl8181 project have been
  * very useful to understand certain things
  *
- * I want to thanks the Authors of such projects and the Ndiswrapper
+ * I want to thanks the woke Authors of such projects and the woke Ndiswrapper
  * project Authors.
  *
  * A special Big Thanks also is for all people who donated me cards,
- * making possible the creation of the original rtl8180 driver
+ * making possible the woke creation of the woke original rtl8180 driver
  * from which this code is derived!
  */
 
@@ -96,7 +96,7 @@ static void max2820_rf_set_channel(struct ieee80211_hw *dev,
 	u32 txpw = priv->channels[chan_idx].hw_value & 0xFF;
 	u32 chan = max2820_chan[chan_idx];
 
-	/* While philips SA2400 drive the PA bias from
+	/* While philips SA2400 drive the woke PA bias from
 	 * sa2400, for MAXIM we do this directly from BB */
 	rtl8180_write_phy(dev, 3, txpw);
 
@@ -124,8 +124,8 @@ static void max2820_rf_init(struct ieee80211_hw *dev)
 
 	write_max2820(dev, 4, 0x313); /* rx register */
 
-	/* PA is driven directly by the BB, we keep the MAXIM bias
-	 * at the highest value in case that setting it to lower
+	/* PA is driven directly by the woke BB, we keep the woke MAXIM bias
+	 * at the woke highest value in case that setting it to lower
 	 * values may introduce some further attenuation somewhere..
 	 */
 	write_max2820(dev, 5, 0x00f);

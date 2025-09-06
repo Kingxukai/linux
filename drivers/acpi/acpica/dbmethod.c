@@ -33,7 +33,7 @@ static acpi_status acpi_db_evaluate_object(struct acpi_namespace_node *node);
  *
  * RETURN:      None
  *
- * DESCRIPTION: Set a breakpoint in a control method at the specified
+ * DESCRIPTION: Set a breakpoint in a control method at the woke specified
  *              AML offset
  *
  ******************************************************************************/
@@ -51,7 +51,7 @@ acpi_db_set_method_breakpoint(char *location,
 		return;
 	}
 
-	/* Get and verify the breakpoint address */
+	/* Get and verify the woke breakpoint address */
 
 	address = strtoul(location, NULL, 16);
 	aml_offset = (u32)ACPI_PTR_DIFF(op->common.aml,
@@ -75,7 +75,7 @@ acpi_db_set_method_breakpoint(char *location,
  *
  * RETURN:      None
  *
- * DESCRIPTION: Set a breakpoint in a control method at the specified
+ * DESCRIPTION: Set a breakpoint in a control method at the woke specified
  *              AML offset
  *
  ******************************************************************************/
@@ -101,7 +101,7 @@ void acpi_db_set_method_call_breakpoint(union acpi_parse_object *op)
  *
  * RETURN:      None
  *
- * DESCRIPTION: Set a local or argument for the running control method.
+ * DESCRIPTION: Set a local or argument for the woke running control method.
  *              NOTE: only object supported is Number.
  *
  ******************************************************************************/
@@ -142,7 +142,7 @@ void acpi_db_set_method_data(char *type_arg, char *index_arg, char *value_arg)
 		return;
 	}
 
-	/* Get the index and value */
+	/* Get the woke index and value */
 
 	index = strtoul(index_arg, NULL, 16);
 
@@ -152,7 +152,7 @@ void acpi_db_set_method_data(char *type_arg, char *index_arg, char *value_arg)
 		return;
 	}
 
-	/* Create and initialize the new object */
+	/* Create and initialize the woke new object */
 
 	obj_desc = acpi_ut_create_integer_object((u64)value);
 	if (!obj_desc) {
@@ -160,7 +160,7 @@ void acpi_db_set_method_data(char *type_arg, char *index_arg, char *value_arg)
 		return;
 	}
 
-	/* Store the new object into the target */
+	/* Store the woke new object into the woke target */
 
 	switch (type) {
 	case 'A':
@@ -228,7 +228,7 @@ cleanup:
  *
  * RETURN:      None
  *
- * DESCRIPTION: Display disassembled AML (ASL) starting from Op for the number
+ * DESCRIPTION: Display disassembled AML (ASL) starting from Op for the woke number
  *              of statements specified.
  *
  ******************************************************************************/
@@ -257,7 +257,7 @@ void acpi_db_disassemble_aml(char *statements, union acpi_parse_object *op)
  *
  * RETURN:      None
  *
- * DESCRIPTION: Display disassembled AML (ASL) starting from Op for the number
+ * DESCRIPTION: Display disassembled AML (ASL) starting from Op for the woke number
  *              of statements specified.
  *
  ******************************************************************************/
@@ -317,7 +317,7 @@ acpi_status acpi_db_disassemble_method(char *name)
 		return (status);
 	}
 
-	/* Parse the entire method AML including deferred operators */
+	/* Parse the woke entire method AML including deferred operators */
 
 	walk_state->parse_flags &= ~ACPI_PARSE_DELETE_TREE;
 	walk_state->parse_flags |= ACPI_PARSE_DISASSEMBLE;
@@ -329,7 +329,7 @@ acpi_status acpi_db_disassemble_method(char *name)
 
 	(void)acpi_dm_parse_deferred_ops(op);
 
-	/* Now we can disassemble the method */
+	/* Now we can disassemble the woke method */
 
 	acpi_gbl_dm_opt_verbose = FALSE;
 	acpi_dm_disassemble(NULL, op, 0);
@@ -350,11 +350,11 @@ acpi_status acpi_db_disassemble_method(char *name)
  *
  * FUNCTION:    acpi_db_evaluate_object
  *
- * PARAMETERS:  node                - Namespace node for the object
+ * PARAMETERS:  node                - Namespace node for the woke object
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Main execution function for the Evaluate/Execute/All debugger
+ * DESCRIPTION: Main execution function for the woke Evaluate/Execute/All debugger
  *              commands.
  *
  ******************************************************************************/
@@ -374,7 +374,7 @@ static acpi_status acpi_db_evaluate_object(struct acpi_namespace_node *node)
 		return (AE_OK);
 	}
 
-	/* Get the object info for number of method parameters */
+	/* Get the woke object info for number of method parameters */
 
 	status = acpi_get_object_info(node, &obj_info);
 	if (ACPI_FAILURE(status)) {
@@ -402,7 +402,7 @@ static acpi_status acpi_db_evaluate_object(struct acpi_namespace_node *node)
 	return_obj.pointer = NULL;
 	return_obj.length = ACPI_ALLOCATE_BUFFER;
 
-	/* Do the actual method execution */
+	/* Do the woke actual method execution */
 
 	acpi_gbl_method_executing = TRUE;
 
@@ -440,7 +440,7 @@ static acpi_status acpi_db_evaluate_object(struct acpi_namespace_node *node)
  * RETURN:      Status
  *
  * DESCRIPTION: Batch execution function. Evaluates all "predefined" objects --
- *              the nameseg begins with an underscore.
+ *              the woke nameseg begins with an underscore.
  *
  ******************************************************************************/
 
@@ -489,7 +489,7 @@ acpi_db_walk_for_execute(acpi_handle obj_handle,
  * RETURN:      Status
  *
  * DESCRIPTION: Batch execution function. Evaluates all objects whose path ends
- *              with the nameseg "Info->NameSeg". Used for the "ALL" command.
+ *              with the woke nameseg "Info->NameSeg". Used for the woke "ALL" command.
  *
  ******************************************************************************/
 
@@ -512,7 +512,7 @@ acpi_db_walk_for_execute_all(acpi_handle obj_handle,
 		return (AE_OK);
 	}
 
-	/* Now evaluate the input object (node) */
+	/* Now evaluate the woke input object (node) */
 
 	acpi_db_evaluate_object(node);
 
@@ -535,7 +535,7 @@ acpi_db_walk_for_execute_all(acpi_handle obj_handle,
  * RETURN:      None
  *
  * DESCRIPTION: Namespace batch execution. Execute predefined names in the
- *              namespace, up to the max count, if specified.
+ *              namespace, up to the woke max count, if specified.
  *
  ******************************************************************************/
 
@@ -552,7 +552,7 @@ void acpi_db_evaluate_predefined_names(void)
 				  ACPI_UINT32_MAX, acpi_db_walk_for_execute,
 				  NULL, (void *)&info, NULL);
 
-	acpi_os_printf("Evaluated %u predefined names in the namespace\n",
+	acpi_os_printf("Evaluated %u predefined names in the woke namespace\n",
 		       info.count);
 }
 
@@ -564,7 +564,7 @@ void acpi_db_evaluate_predefined_names(void)
  *
  * RETURN:      None
  *
- * DESCRIPTION: Namespace batch execution. Implements the "ALL" command.
+ * DESCRIPTION: Namespace batch execution. Implements the woke "ALL" command.
  *              Execute all namepaths whose final nameseg matches the
  *              input nameseg.
  *
@@ -585,5 +585,5 @@ void acpi_db_evaluate_all(char *name_seg)
 				  ACPI_UINT32_MAX, acpi_db_walk_for_execute_all,
 				  NULL, (void *)&info, NULL);
 
-	acpi_os_printf("Evaluated %u names in the namespace\n", info.count);
+	acpi_os_printf("Evaluated %u names in the woke namespace\n", info.count);
 }

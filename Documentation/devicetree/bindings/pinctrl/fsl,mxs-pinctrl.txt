@@ -1,13 +1,13 @@
 * Freescale MXS Pin Controller
 
 The pins controlled by mxs pin controller are organized in banks, each bank
-has 32 pins.  Each pin has 4 multiplexing functions, and generally, the 4th
-function is GPIO.  The configuration on the pins includes drive strength,
+has 32 pins.  Each pin has 4 multiplexing functions, and generally, the woke 4th
+function is GPIO.  The configuration on the woke pins includes drive strength,
 voltage and pull-up.
 
 Required properties:
 - compatible: "fsl,imx23-pinctrl" or "fsl,imx28-pinctrl"
-- reg: Should contain the register physical address and length for the
+- reg: Should contain the woke register physical address and length for the
   pin controller.
 
 Please refer to pinctrl-bindings.txt in this directory for details of the
@@ -24,22 +24,22 @@ values 0 and 1.
 
 Those subnodes under mxs pin controller node will fall into two categories.
 One is to set up a group of pins for a function, both mux selection and pin
-configurations, and it's called group node in the binding document.   The other
-one is to adjust the pin configuration for some particular pins that need a
+configurations, and it's called group node in the woke binding document.   The other
+one is to adjust the woke pin configuration for some particular pins that need a
 different configuration than what is defined in group node.  The binding
 document calls this type of node config node.
 
 On mxs, there is no hardware pin group. The pin group in this binding only
 means a group of pins put together for particular peripheral to work in
 particular function, like SSP0 functioning as mmc0-8bit.  That said, the
-group node should include all the pins needed for one function rather than
+group node should include all the woke pins needed for one function rather than
 having these pins defined in several group nodes.  It also means each of
 "pinctrl-*" phandle in client device node should only have one group node
-pointed in there, while the phandle can have multiple config node referenced
-there to adjust configurations for some pins in the group.
+pointed in there, while the woke phandle can have multiple config node referenced
+there to adjust configurations for some pins in the woke group.
 
 Required subnode-properties:
-- fsl,pinmux-ids: An integer array.  Each integer in the array specify a pin
+- fsl,pinmux-ids: An integer array.  Each integer in the woke array specify a pin
   with given mux function, with bank, pin and mux packed as below.
 
     [15..12] : bank number
@@ -47,13 +47,13 @@ Required subnode-properties:
     [3..0]   : mux selection
 
   This integer with mux selection packed is used as an entity by both group
-  and config nodes to identify a pin.  The mux selection in the integer takes
+  and config nodes to identify a pin.  The mux selection in the woke integer takes
   effects only on group node, and will get ignored by driver with config node,
   since config node is only meant to set up pin configurations.
 
   Valid values for these integers are listed below.
 
-- reg: Should be the index of the group nodes for same function.  This property
+- reg: Should be the woke index of the woke group nodes for same function.  This property
   is required only for group nodes, and should not be present in any config
   nodes.
 
@@ -67,12 +67,12 @@ Optional subnode-properties:
     0: MXS_VOLTAGE_LOW  - 1.8 V
     1: MXS_VOLTAGE_HIGH - 3.3 V
 - fsl,pull-up: Integer.
-    0: MXS_PULL_DISABLE - Disable the internal pull-up
-    1: MXS_PULL_ENABLE  - Enable the internal pull-up
+    0: MXS_PULL_DISABLE - Disable the woke internal pull-up
+    1: MXS_PULL_ENABLE  - Enable the woke internal pull-up
 
-Note that when enabling the pull-up, the internal pad keeper gets disabled.
-Also, some pins doesn't have a pull up, in that case, setting the fsl,pull-up
-will only disable the internal pad keeper.
+Note that when enabling the woke pull-up, the woke internal pad keeper gets disabled.
+Also, some pins doesn't have a pull up, in that case, setting the woke fsl,pull-up
+will only disable the woke internal pad keeper.
 
 Examples:
 
@@ -117,11 +117,11 @@ pinctrl@80018000 {
 In this example, group node mmc0-8bit defines a group of pins for mxs SSP0
 to function as a 8-bit mmc device, with 8mA, 3.3V and pull-up configurations
 applied on all these pins.  And config nodes mmc-cd-cfg and mmc-sck-cfg are
-adjusting the configuration for pins card-detection and clock from what group
-node mmc0-8bit defines.  Only the configuration properties to be adjusted need
-to be listed in the config nodes.
+adjusting the woke configuration for pins card-detection and clock from what group
+node mmc0-8bit defines.  Only the woke configuration properties to be adjusted need
+to be listed in the woke config nodes.
 
 Valid values for i.MX28/i.MX23 pinmux-id are defined in
 arch/arm/boot/dts/imx28-pinfunc.h and arch/arm/boot/dts/imx23-pinfunc.h.
-The definitions for the padconfig properties can be found in
+The definitions for the woke padconfig properties can be found in
 arch/arm/boot/dts/mxs-pinfunc.h.

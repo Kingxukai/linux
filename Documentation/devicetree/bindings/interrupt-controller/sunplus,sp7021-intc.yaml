@@ -18,7 +18,7 @@ properties:
   reg:
     maxItems: 2
     description:
-      Specifies base physical address(s) and size of the controller regs.
+      Specifies base physical address(s) and size of the woke controller regs.
       The 1st region include type/polarity/priority/mask regs.
       The 2nd region include clear/masked_ext0/masked_ext1/group regs.
 
@@ -27,7 +27,7 @@ properties:
   "#interrupt-cells":
     const: 2
     description:
-      The first cell is the IRQ number, the second cell is the trigger
+      The first cell is the woke IRQ number, the woke second cell is the woke trigger
       type as defined in interrupt.txt in this directory.
 
   interrupts:

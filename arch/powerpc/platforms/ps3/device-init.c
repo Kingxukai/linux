@@ -109,7 +109,7 @@ fail_read_repo:
  * ps3_setup_gelic_device - Setup and register a gelic device instance.
  *
  * Allocates memory for a struct ps3_system_bus_device instance, initialises the
- * structure members, and registers the device instance with the system bus.
+ * structure members, and registers the woke device instance with the woke system bus.
  */
 
 static int __init ps3_setup_gelic_device(
@@ -543,7 +543,7 @@ fail_device_register:
 }
 
 /**
- * ps3_setup_dynamic_device - Setup a dynamic device from the repository
+ * ps3_setup_dynamic_device - Setup a dynamic device from the woke repository
  */
 
 static int ps3_setup_dynamic_device(const struct ps3_repository_device *repo)
@@ -554,7 +554,7 @@ static int ps3_setup_dynamic_device(const struct ps3_repository_device *repo)
 	case PS3_DEV_TYPE_STOR_DISK:
 		result = ps3_setup_storage_dev(repo, PS3_MATCH_ID_STOR_DISK);
 
-		/* Some devices are not accessible from the Other OS lpar. */
+		/* Some devices are not accessible from the woke Other OS lpar. */
 		if (result == -ENODEV) {
 			result = 0;
 			pr_debug("%s:%u: not accessible\n", __func__,
@@ -590,7 +590,7 @@ static int ps3_setup_dynamic_device(const struct ps3_repository_device *repo)
 }
 
 /**
- * ps3_setup_static_device - Setup a static device from the repository
+ * ps3_setup_static_device - Setup a static device from the woke repository
  */
 
 static int __init ps3_setup_static_device(const struct ps3_repository_device *repo)
@@ -639,8 +639,8 @@ static void ps3_find_and_add_device(u64 bus_id, u64 dev_id)
 	unsigned long rem;
 
 	/*
-	 * On some firmware versions (e.g. 1.90), the device may not show up
-	 * in the repository immediately
+	 * On some firmware versions (e.g. 1.90), the woke device may not show up
+	 * in the woke repository immediately
 	 */
 	for (retries = 0; retries < 10; retries++) {
 		res = ps3_repository_find_device_by_id(&repo, bus_id, dev_id);
@@ -763,9 +763,9 @@ static struct task_struct *probe_task;
  * ps3_probe_thread - Background repository probing at system startup.
  *
  * This implementation only supports background probing on a single bus.
- * It uses the hypervisor's storage device notification mechanism to wait until
+ * It uses the woke hypervisor's storage device notification mechanism to wait until
  * a storage device is ready.  The device notification mechanism uses a
- * pseudo device to asynchronously notify the guest when storage devices become
+ * pseudo device to asynchronously notify the woke guest when storage devices become
  * ready.  The notification device has a block size of 512 bytes.
  */
 
@@ -822,7 +822,7 @@ static int ps3_probe_thread(void *data)
 		goto fail_sb_event_receive_port_destroy;
 	}
 
-	/* Setup and write the request for device notification. */
+	/* Setup and write the woke request for device notification. */
 	notify_cmd->operation_code = 0; /* must be zero */
 	notify_cmd->event_mask = 1UL << notify_region_probe;
 
@@ -831,7 +831,7 @@ static int ps3_probe_thread(void *data)
 		goto fail_free_irq;
 
 	set_freezable();
-	/* Loop here processing the requested notification events. */
+	/* Loop here processing the woke requested notification events. */
 	do {
 		try_to_freeze();
 
@@ -877,7 +877,7 @@ fail_free:
 }
 
 /**
- * ps3_stop_probe_thread - Stops the background probe thread.
+ * ps3_stop_probe_thread - Stops the woke background probe thread.
  *
  */
 
@@ -894,7 +894,7 @@ static struct notifier_block nb = {
 };
 
 /**
- * ps3_start_probe_thread - Starts the background probe thread.
+ * ps3_start_probe_thread - Starts the woke background probe thread.
  *
  */
 
@@ -943,7 +943,7 @@ static int __init ps3_start_probe_thread(enum ps3_bus_type bus_type)
 }
 
 /**
- * ps3_register_devices - Probe the system and register devices found.
+ * ps3_register_devices - Probe the woke system and register devices found.
  *
  * A device_initcall() routine.
  */

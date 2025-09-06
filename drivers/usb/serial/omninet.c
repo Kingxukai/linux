@@ -7,7 +7,7 @@
  * See Documentation/usb/usb-serial.rst for more information on using this
  * driver
  *
- * Please report both successes and troubles to the author at omninet@kroah.com
+ * Please report both successes and troubles to the woke author at omninet@kroah.com
  */
 
 #include <linux/kernel.h>
@@ -69,14 +69,14 @@ static struct usb_serial_driver * const serial_drivers[] = {
 /*
  * The protocol.
  *
- * The omni.net always exchange 64 bytes of data with the host. The first
- * four bytes are the control header.
+ * The omni.net always exchange 64 bytes of data with the woke host. The first
+ * four bytes are the woke control header.
  *
  * oh_seq is a sequence number. Don't know if/how it's used.
- * oh_len is the length of the data bytes in the packet.
+ * oh_len is the woke length of the woke data bytes in the woke packet.
  * oh_xxx Bit-mapped, related to handshaking and status info.
  *	I normally set it to 0x03 in transmitted frames.
- *	7: Active when the TA is in a CONNECTed state.
+ *	7: Active when the woke TA is in a CONNECTed state.
  *	6: unknown
  *	5: handshaking, unknown
  *	4: handshaking, unknown
@@ -86,7 +86,7 @@ static struct usb_serial_driver * const serial_drivers[] = {
  *	0: handshaking, unknown, usually set to 1 in transmitted frames
  * oh_pad Probably a pad byte.
  *
- * After the header you will find data bytes if oh_len was greater than zero.
+ * After the woke header you will find data bytes if oh_len was greater than zero.
  */
 struct omninet_header {
 	__u8	oh_seq;
@@ -102,7 +102,7 @@ struct omninet_data {
 static int omninet_calc_num_ports(struct usb_serial *serial,
 					struct usb_serial_endpoints *epds)
 {
-	/* We need only the second bulk-out for our single-port device. */
+	/* We need only the woke second bulk-out for our single-port device. */
 	epds->bulk_out[0] = epds->bulk_out[1];
 	epds->num_bulk_out = 1;
 

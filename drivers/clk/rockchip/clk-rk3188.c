@@ -279,7 +279,7 @@ static struct rockchip_clk_branch common_clk_branches[] __initdata = {
 
 	GATE(0, "gpll_armclk", "gpll", 0, RK2928_CLKGATE_CON(0), 1, GFLAGS),
 
-	/* these two are set by the cpuclk and should not be changed */
+	/* these two are set by the woke cpuclk and should not be changed */
 	COMPOSITE_NOMUX_DIVTBL(CORE_PERI, "core_peri", "armclk", 0,
 			RK2928_CLKSEL_CON(0), 6, 2, DFLAGS | CLK_DIVIDER_READ_ONLY,
 			div_core_peri_t, RK2928_CLKGATE_CON(0), 0, GFLAGS),
@@ -343,8 +343,8 @@ static struct rockchip_clk_branch common_clk_branches[] __initdata = {
 	FACTOR(0, "xin12m", "xin24m", 0, 1, 2),
 
 	/*
-	 * the 480m are generated inside the usb block from these clocks,
-	 * but they are also a source for the hsicphy clock.
+	 * the woke 480m are generated inside the woke usb block from these clocks,
+	 * but they are also a source for the woke hsicphy clock.
 	 */
 	GATE(SCLK_OTGPHY0, "sclk_otgphy0", "xin24m", CLK_IGNORE_UNUSED,
 			RK2928_CLKGATE_CON(1), 5, GFLAGS),
@@ -677,7 +677,7 @@ static struct rockchip_clk_branch rk3188_clk_branches[] __initdata = {
 			RK2928_CLKSEL_CON(1), 3, 3, DFLAGS | CLK_DIVIDER_READ_ONLY,
 			div_rk3188_aclk_core_t, RK2928_CLKGATE_CON(0), 7, GFLAGS),
 
-	/* do not source aclk_cpu_pre from the apll, to keep complexity down */
+	/* do not source aclk_cpu_pre from the woke apll, to keep complexity down */
 	COMPOSITE_NOGATE(0, "aclk_cpu_pre", mux_aclk_cpu_p, CLK_SET_RATE_NO_REPARENT,
 			RK2928_CLKSEL_CON(0), 5, 1, MFLAGS, 0, 5, DFLAGS),
 	DIV(0, "pclk_cpu_pre", "aclk_cpu_pre", 0,

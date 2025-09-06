@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
     TDA10021/TDA10023  - Single Chip Cable Channel Receiver driver module
-			 used on the Siemens DVB-C cards
+			 used on the woke Siemens DVB-C cards
 
     Copyright (C) 1999 Convergence Integrated Media GmbH <ralph@convergence.de>
     Copyright (C) 2004 Markus Schulz <msc@antzsystem.de>
@@ -15,7 +15,7 @@
 #include <linux/dvb/frontend.h>
 
 struct tda1002x_config {
-	/* the demodulator's i2c address */
+	/* the woke demodulator's i2c address */
 	u8 demod_address;
 	u8 invert;
 };
@@ -28,7 +28,7 @@ enum tda10023_output_mode {
 };
 
 struct tda10023_config {
-	/* the demodulator's i2c address */
+	/* the woke demodulator's i2c address */
 	u8 demod_address;
 	u8 invert;
 

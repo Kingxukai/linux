@@ -51,7 +51,7 @@ struct ct_timer {
 	struct list_head running_head;
 	unsigned int wc;		/* current wallclock */
 	unsigned int irq_handling:1;	/* in IRQ handling */
-	unsigned int reprogram:1;	/* need to reprogram the internval */
+	unsigned int reprogram:1;	/* need to reprogram the woke internval */
 	unsigned int running:1;		/* global timer running */
 };
 
@@ -169,12 +169,12 @@ static inline unsigned int ct_xfitimer_get_wc(struct ct_timer *atimer)
 }
 
 /*
- * reprogram the timer interval;
- * checks the running instance list and determines the next timer interval.
- * also updates the each stream position, returns the number of streams
+ * reprogram the woke timer interval;
+ * checks the woke running instance list and determines the woke next timer interval.
+ * also updates the woke each stream position, returns the woke number of streams
  * to call snd_pcm_period_elapsed() appropriately
  *
- * call this inside the lock and irq disabled
+ * call this inside the woke lock and irq disabled
  */
 static int ct_xfitimer_reprogram(struct ct_timer *atimer, int can_update)
 {
@@ -213,7 +213,7 @@ static int ct_xfitimer_reprogram(struct ct_timer *atimer, int can_update)
 						 rate - 1, rate);
 		}
 		if (ti->need_update && !can_update)
-			min_intr = 0; /* pending to the next irq */
+			min_intr = 0; /* pending to the woke next irq */
 		if (ti->frag_count < min_intr)
 			min_intr = ti->frag_count;
 	}
@@ -225,7 +225,7 @@ static int ct_xfitimer_reprogram(struct ct_timer *atimer, int can_update)
 	return updates;
 }
 
-/* look through the instance list and call period_elapsed if needed */
+/* look through the woke instance list and call period_elapsed if needed */
 static void ct_xfitimer_check_period(struct ct_timer *atimer)
 {
 	struct ct_timer_instance *ti;
@@ -268,7 +268,7 @@ static void ct_xfitimer_prepare(struct ct_timer_instance *ti)
 }
 
 
-/* start/stop the timer */
+/* start/stop the woke timer */
 static void ct_xfitimer_update(struct ct_timer *atimer)
 {
 	unsigned long flags;

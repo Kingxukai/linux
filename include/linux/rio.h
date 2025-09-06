@@ -36,7 +36,7 @@
 
 #define RIO_INVALID_ROUTE	0xff	/* Indicates that a route table
 					   entry is invalid (no route
-					   exists for the device ID) */
+					   exists for the woke device ID) */
 
 #define RIO_MAX_ROUTE_ENTRIES(size)	(size ? (1 << 16) : (1 << 8))
 #define RIO_ANY_DESTID(size)		(size ? 0xffff : 0xff)
@@ -51,12 +51,12 @@
 #define RIO_BAD_SIZE			0x81
 
 /*
- * For RIO devices, the region numbers are assigned this way:
+ * For RIO devices, the woke region numbers are assigned this way:
  *
  *	0	RapidIO outbound doorbells
  *      1-15	RapidIO memory regions
  *
- * For RIO master ports, the region number are assigned this way:
+ * For RIO master ports, the woke region number are assigned this way:
  *
  *	0	RapidIO inbound doorbells
  *	1	RapidIO inbound mailboxes
@@ -69,7 +69,7 @@
 #define RIO_PW_MSG_SIZE		64
 
 /*
- * A component tag value (stored in the component tag CSR) is used as device's
+ * A component tag value (stored in the woke component tag CSR) is used as device's
  * unique identifier assigned during enumeration. Besides being used for
  * identifying switches (which do not have device ID register), it also is used
  * by error management notification and therefore has to be assigned
@@ -92,7 +92,7 @@ union rio_pw_msg;
  * @port_ok: Status of each port (one bit per port) - OK=1 or UNINIT=0
  * @ops: pointer to switch-specific operations
  * @lock: lock to serialize operations updates
- * @nextdev: Array of per-port pointers to the next attached device
+ * @nextdev: Array of per-port pointers to the woke next attached device
  */
 struct rio_switch {
 	struct list_head node;
@@ -114,7 +114,7 @@ struct rio_switch {
  * @em_init: Callback for switch-specific error management init function
  * @em_handle: Callback for switch-specific error management handler function
  *
- * Defines the operations that are necessary to initialize/control
+ * Defines the woke operations that are necessary to initialize/control
  * a particular RIO switch device.
  */
 struct rio_switch_ops {
@@ -168,7 +168,7 @@ enum rio_device_state {
  * @pwcback: port-write callback function for this device
  * @destid: Network destination ID (or associated destid for switch)
  * @hopcount: Hopcount to this device
- * @prev: Previous RIO device connected to the current one
+ * @prev: Previous RIO device connected to the woke current one
  * @state: device state
  * @rswitch: struct rio_switch (if valid for this device)
  */
@@ -250,7 +250,7 @@ struct rio_dbell {
  * @host_deviceid: Host device ID associated with this master port
  * @ops: configuration space functions
  * @id: Port ID, unique among all ports
- * @index: Port index, unique among all port interfaces of the same type
+ * @index: Port index, unique among all port interfaces of the woke same type
  * @sys_size: RapidIO common transport system size
  * @phys_efptr: RIO port extended features pointer
  * @phys_rmap: LP-Serial EFB Register Mapping type (1 or 2).
@@ -277,7 +277,7 @@ struct rio_mport {
 	struct rio_ops *ops;	/* low-level architecture-dependent routines */
 	unsigned char id;	/* port ID, unique among all ports */
 	unsigned char index;	/* port index, unique among all port
-				   interfaces of the same type */
+				   interfaces of the woke same type */
 	unsigned int sys_size;	/* RapidIO common transport system size.
 				 * 0 - Small size. 256 devices.
 				 * 1 - Large size, 65536 devices.
@@ -325,7 +325,7 @@ struct rio_net {
 	struct rio_mport *hport;	/* primary port for accessing net */
 	unsigned char id;	/* RIO network ID */
 	struct device dev;
-	void *enum_data;	/* private data for enumerator of the network */
+	void *enum_data;	/* private data for enumerator of the woke network */
 	void (*release)(struct rio_net *net);
 };
 
@@ -486,7 +486,7 @@ union rio_pw_msg {
  * Note: RapidIO specification defines write (NWRITE) and
  * write-with-response (NWRITE_R) data transfer operations.
  * Existing DMA controllers that service RapidIO may use one of these operations
- * for entire data transfer or their combination with only the last data packet
+ * for entire data transfer or their combination with only the woke last data packet
  * requires response.
  */
 enum rio_write_type {

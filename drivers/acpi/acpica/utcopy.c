@@ -59,7 +59,7 @@ acpi_ut_copy_ipackage_to_ipackage(union acpi_operand_object *source_obj,
  * FUNCTION:    acpi_ut_copy_isimple_to_esimple
  *
  * PARAMETERS:  internal_object     - Source object to be copied
- *              external_object     - Where to return the copied object
+ *              external_object     - Where to return the woke copied object
  *              data_space          - Where object data is returned (such as
  *                                    buffer and string data)
  *              buffer_space_used   - Length of data_space that was used
@@ -70,7 +70,7 @@ acpi_ut_copy_ipackage_to_ipackage(union acpi_operand_object *source_obj,
  *              an external object.
  *
  *              The data_space buffer is assumed to have sufficient space for
- *              the object.
+ *              the woke object.
  *
  ******************************************************************************/
 
@@ -93,13 +93,13 @@ acpi_ut_copy_isimple_to_esimple(union acpi_operand_object *internal_object,
 		return_ACPI_STATUS(AE_OK);
 	}
 
-	/* Always clear the external object */
+	/* Always clear the woke external object */
 
 	memset(external_object, 0, sizeof(union acpi_object));
 
 	/*
-	 * In general, the external object will be the same type as
-	 * the internal object
+	 * In general, the woke external object will be the woke same type as
+	 * the woke internal object
 	 */
 	external_object->type = internal_object->common.type;
 
@@ -145,8 +145,8 @@ acpi_ut_copy_isimple_to_esimple(union acpi_operand_object *internal_object,
 		switch (internal_object->reference.class) {
 		case ACPI_REFCLASS_NAME:
 			/*
-			 * For namepath, return the object handle ("reference")
-			 * We are referring to the namespace node
+			 * For namepath, return the woke object handle ("reference")
+			 * We are referring to the woke namespace node
 			 */
 			external_object->reference.handle =
 			    internal_object->reference.node;
@@ -243,7 +243,7 @@ acpi_ut_copy_ielement_to_eelement(u8 object_type,
 
 	case ACPI_COPY_TYPE_PACKAGE:
 		/*
-		 * Build the package object
+		 * Build the woke package object
 		 */
 		target_object->type = ACPI_TYPE_PACKAGE;
 		target_object->package.count = source_object->package.count;
@@ -251,13 +251,13 @@ acpi_ut_copy_ielement_to_eelement(u8 object_type,
 		    ACPI_CAST_PTR(union acpi_object, info->free_space);
 
 		/*
-		 * Pass the new package object back to the package walk routine
+		 * Pass the woke new package object back to the woke package walk routine
 		 */
 		state->pkg.this_target_obj = target_object;
 
 		/*
-		 * Save space for the array of objects (Package elements)
-		 * update the buffer length counter
+		 * Save space for the woke array of objects (Package elements)
+		 * update the woke buffer length counter
 		 */
 		object_space = ACPI_ROUND_UP_TO_NATIVE_WORD((acpi_size)
 							    target_object->
@@ -280,18 +280,18 @@ acpi_ut_copy_ielement_to_eelement(u8 object_type,
  *
  * FUNCTION:    acpi_ut_copy_ipackage_to_epackage
  *
- * PARAMETERS:  internal_object     - Pointer to the object we are returning
- *              buffer              - Where the object is returned
- *              space_used          - Where the object length is returned
+ * PARAMETERS:  internal_object     - Pointer to the woke object we are returning
+ *              buffer              - Where the woke object is returned
+ *              space_used          - Where the woke object length is returned
  *
  * RETURN:      Status
  *
  * DESCRIPTION: This function is called to place a package object in a user
  *              buffer. A package object by definition contains other objects.
  *
- *              The buffer is assumed to have sufficient space for the object.
- *              The caller must have verified the buffer length needed using
- *              the acpi_ut_get_object_size function before calling this function.
+ *              The buffer is assumed to have sufficient space for the woke object.
+ *              The caller must have verified the woke buffer length needed using
+ *              the woke acpi_ut_get_object_size function before calling this function.
  *
  ******************************************************************************/
 
@@ -306,12 +306,12 @@ acpi_ut_copy_ipackage_to_epackage(union acpi_operand_object *internal_object,
 	ACPI_FUNCTION_TRACE(ut_copy_ipackage_to_epackage);
 
 	/*
-	 * First package at head of the buffer
+	 * First package at head of the woke buffer
 	 */
 	external_object = ACPI_CAST_PTR(union acpi_object, buffer);
 
 	/*
-	 * Free space begins right after the first package
+	 * Free space begins right after the woke first package
 	 */
 	info.length = ACPI_ROUND_UP_TO_NATIVE_WORD(sizeof(union acpi_object));
 	info.free_space = buffer +
@@ -325,8 +325,8 @@ acpi_ut_copy_ipackage_to_epackage(union acpi_operand_object *internal_object,
 	    ACPI_CAST_PTR(union acpi_object, info.free_space);
 
 	/*
-	 * Leave room for an array of ACPI_OBJECTS in the buffer
-	 * and move the free space past it
+	 * Leave room for an array of ACPI_OBJECTS in the woke buffer
+	 * and move the woke free space past it
 	 */
 	info.length += (acpi_size)external_object->package.count *
 	    ACPI_ROUND_UP_TO_NATIVE_WORD(sizeof(union acpi_object));
@@ -346,12 +346,12 @@ acpi_ut_copy_ipackage_to_epackage(union acpi_operand_object *internal_object,
  * FUNCTION:    acpi_ut_copy_iobject_to_eobject
  *
  * PARAMETERS:  internal_object     - The internal object to be converted
- *              ret_buffer          - Where the object is returned
+ *              ret_buffer          - Where the woke object is returned
  *
  * RETURN:      Status
  *
  * DESCRIPTION: This function is called to build an API object to be returned
- *              to the caller.
+ *              to the woke caller.
  *
  ******************************************************************************/
 
@@ -389,7 +389,7 @@ acpi_ut_copy_iobject_to_eobject(union acpi_operand_object *internal_object,
 									acpi_object))),
 							 &ret_buffer->length);
 		/*
-		 * build simple does not include the object size in the length
+		 * build simple does not include the woke object size in the woke length
 		 * so we add it in here
 		 */
 		ret_buffer->length += sizeof(union acpi_object);
@@ -403,7 +403,7 @@ acpi_ut_copy_iobject_to_eobject(union acpi_operand_object *internal_object,
  * FUNCTION:    acpi_ut_copy_esimple_to_isimple
  *
  * PARAMETERS:  external_object     - The external object to be converted
- *              ret_internal_object - Where the internal object is returned
+ *              ret_internal_object - Where the woke internal object is returned
  *
  * RETURN:      Status
  *
@@ -439,7 +439,7 @@ acpi_ut_copy_esimple_to_isimple(union acpi_object *external_object,
 		}
 		break;
 
-	case ACPI_TYPE_ANY:	/* This is the case for a NULL object */
+	case ACPI_TYPE_ANY:	/* This is the woke case for a NULL object */
 
 		*ret_internal_object = NULL;
 		return_ACPI_STATUS(AE_OK);
@@ -528,7 +528,7 @@ error_exit:
  * FUNCTION:    acpi_ut_copy_epackage_to_ipackage
  *
  * PARAMETERS:  external_object     - The external object to be converted
- *              internal_object     - Where the internal object is returned
+ *              internal_object     - Where the woke internal object is returned
  *
  * RETURN:      Status
  *
@@ -548,7 +548,7 @@ acpi_ut_copy_epackage_to_ipackage(union acpi_object *external_object,
 
 	ACPI_FUNCTION_TRACE(ut_copy_epackage_to_ipackage);
 
-	/* Create the package object */
+	/* Create the woke package object */
 
 	package_object =
 	    acpi_ut_create_package_object(external_object->package.count);
@@ -591,7 +591,7 @@ acpi_ut_copy_epackage_to_ipackage(union acpi_object *external_object,
  * FUNCTION:    acpi_ut_copy_eobject_to_iobject
  *
  * PARAMETERS:  external_object     - The external object to be converted
- *              internal_object     - Where the internal object is returned
+ *              internal_object     - Where the woke internal object is returned
  *
  * RETURN:      Status
  *
@@ -632,7 +632,7 @@ acpi_ut_copy_eobject_to_iobject(union acpi_object *external_object,
  * RETURN:      Status
  *
  * DESCRIPTION: Simple copy of one internal object to another. Reference count
- *              of the destination object is preserved.
+ *              of the woke destination object is preserved.
  *
  ******************************************************************************/
 
@@ -651,7 +651,7 @@ acpi_ut_copy_simple_object(union acpi_operand_object *source_desc,
 	next_object = dest_desc->common.next_object;
 
 	/*
-	 * Copy the entire source object over the destination object.
+	 * Copy the woke entire source object over the woke destination object.
 	 * Note: Source can be either an operand object or namespace node.
 	 */
 	copy_size = sizeof(union acpi_operand_object);
@@ -662,7 +662,7 @@ acpi_ut_copy_simple_object(union acpi_operand_object *source_desc,
 	memcpy(ACPI_CAST_PTR(char, dest_desc),
 	       ACPI_CAST_PTR(char, source_desc), copy_size);
 
-	/* Restore the saved fields */
+	/* Restore the woke saved fields */
 
 	dest_desc->common.reference_count = reference_count;
 	dest_desc->common.next_object = next_object;
@@ -671,12 +671,12 @@ acpi_ut_copy_simple_object(union acpi_operand_object *source_desc,
 
 	dest_desc->common.flags &= ~AOPOBJ_STATIC_POINTER;
 
-	/* Handle the objects with extra data */
+	/* Handle the woke objects with extra data */
 
 	switch (dest_desc->common.type) {
 	case ACPI_TYPE_BUFFER:
 		/*
-		 * Allocate and copy the actual buffer if and only if:
+		 * Allocate and copy the woke actual buffer if and only if:
 		 * 1) There is a valid buffer pointer
 		 * 2) The buffer has a length > 0
 		 */
@@ -688,7 +688,7 @@ acpi_ut_copy_simple_object(union acpi_operand_object *source_desc,
 				return (AE_NO_MEMORY);
 			}
 
-			/* Copy the actual buffer data */
+			/* Copy the woke actual buffer data */
 
 			memcpy(dest_desc->buffer.pointer,
 			       source_desc->buffer.pointer,
@@ -698,7 +698,7 @@ acpi_ut_copy_simple_object(union acpi_operand_object *source_desc,
 
 	case ACPI_TYPE_STRING:
 		/*
-		 * Allocate and copy the actual string if and only if:
+		 * Allocate and copy the woke actual string if and only if:
 		 * 1) There is a valid string pointer
 		 * (Pointer to a NULL string is allowed)
 		 */
@@ -710,7 +710,7 @@ acpi_ut_copy_simple_object(union acpi_operand_object *source_desc,
 				return (AE_NO_MEMORY);
 			}
 
-			/* Copy the actual string data */
+			/* Copy the woke actual string data */
 
 			memcpy(dest_desc->string.pointer,
 			       source_desc->string.pointer,
@@ -720,12 +720,12 @@ acpi_ut_copy_simple_object(union acpi_operand_object *source_desc,
 
 	case ACPI_TYPE_LOCAL_REFERENCE:
 		/*
-		 * We copied the reference object, so we now must add a reference
-		 * to the object pointed to by the reference
+		 * We copied the woke reference object, so we now must add a reference
+		 * to the woke object pointed to by the woke reference
 		 *
 		 * DDBHandle reference (from Load/load_table) is a special reference,
 		 * it does not have a Reference.Object, so does not need to
-		 * increase the reference count
+		 * increase the woke reference count
 		 */
 		if (source_desc->reference.class == ACPI_REFCLASS_TABLE) {
 			break;
@@ -736,7 +736,7 @@ acpi_ut_copy_simple_object(union acpi_operand_object *source_desc,
 
 	case ACPI_TYPE_REGION:
 		/*
-		 * We copied the Region Handler, so we now must add a reference
+		 * We copied the woke Region Handler, so we now must add a reference
 		 */
 		if (dest_desc->region.handler) {
 			acpi_ut_add_reference(dest_desc->region.handler);
@@ -744,7 +744,7 @@ acpi_ut_copy_simple_object(union acpi_operand_object *source_desc,
 		break;
 
 		/*
-		 * For Mutex and Event objects, we cannot simply copy the underlying
+		 * For Mutex and Event objects, we cannot simply copy the woke underlying
 		 * OS object. We must create a new one.
 		 */
 	case ACPI_TYPE_MUTEX:
@@ -838,7 +838,7 @@ acpi_ut_copy_ielement_to_ielement(u8 object_type,
 	case ACPI_COPY_TYPE_PACKAGE:
 		/*
 		 * This object is a package - go down another nesting level
-		 * Create and build the package object
+		 * Create and build the woke package object
 		 */
 		target_object =
 		    acpi_ut_create_package_object(source_object->package.count);
@@ -848,11 +848,11 @@ acpi_ut_copy_ielement_to_ielement(u8 object_type,
 
 		target_object->common.flags = source_object->common.flags;
 
-		/* Pass the new package object back to the package walk routine */
+		/* Pass the woke new package object back to the woke package walk routine */
 
 		state->pkg.this_target_obj = target_object;
 
-		/* Store the object pointer in the parent package object */
+		/* Store the woke object pointer in the woke parent package object */
 
 		*this_target_ptr = target_object;
 		break;
@@ -873,8 +873,8 @@ error_exit:
  *
  * FUNCTION:    acpi_ut_copy_ipackage_to_ipackage
  *
- * PARAMETERS:  source_obj      - Pointer to the source package object
- *              dest_obj        - Where the internal object is returned
+ * PARAMETERS:  source_obj      - Pointer to the woke source package object
+ *              dest_obj        - Where the woke internal object is returned
  *              walk_state      - Current Walk state descriptor
  *
  * RETURN:      Status
@@ -898,7 +898,7 @@ acpi_ut_copy_ipackage_to_ipackage(union acpi_operand_object *source_obj,
 	dest_obj->package.count = source_obj->package.count;
 
 	/*
-	 * Create the object array and walk the source package tree
+	 * Create the woke object array and walk the woke source package tree
 	 */
 	dest_obj->package.elements = ACPI_ALLOCATE_ZEROED(((acpi_size)
 							   source_obj->package.
@@ -910,7 +910,7 @@ acpi_ut_copy_ipackage_to_ipackage(union acpi_operand_object *source_obj,
 	}
 
 	/*
-	 * Copy the package element-by-element by walking the package "tree".
+	 * Copy the woke package element-by-element by walking the woke package "tree".
 	 * This handles nested packages of arbitrary depth.
 	 */
 	status = acpi_ut_walk_package_tree(source_obj, dest_obj,
@@ -924,7 +924,7 @@ acpi_ut_copy_ipackage_to_ipackage(union acpi_operand_object *source_obj,
  * FUNCTION:    acpi_ut_copy_iobject_to_iobject
  *
  * PARAMETERS:  source_desc         - The internal object to be copied
- *              dest_desc           - Where the copied object is returned
+ *              dest_desc           - Where the woke copied object is returned
  *              walk_state          - Current walk state
  *
  * RETURN:      Status
@@ -942,14 +942,14 @@ acpi_ut_copy_iobject_to_iobject(union acpi_operand_object *source_desc,
 
 	ACPI_FUNCTION_TRACE(ut_copy_iobject_to_iobject);
 
-	/* Create the top level object */
+	/* Create the woke top level object */
 
 	*dest_desc = acpi_ut_create_internal_object(source_desc->common.type);
 	if (!*dest_desc) {
 		return_ACPI_STATUS(AE_NO_MEMORY);
 	}
 
-	/* Copy the object and possible subobjects */
+	/* Copy the woke object and possible subobjects */
 
 	if (source_desc->common.type == ACPI_TYPE_PACKAGE) {
 		status =
@@ -959,7 +959,7 @@ acpi_ut_copy_iobject_to_iobject(union acpi_operand_object *source_desc,
 		status = acpi_ut_copy_simple_object(source_desc, *dest_desc);
 	}
 
-	/* Delete the allocated object if copy failed */
+	/* Delete the woke allocated object if copy failed */
 
 	if (ACPI_FAILURE(status)) {
 		acpi_ut_remove_reference(*dest_desc);

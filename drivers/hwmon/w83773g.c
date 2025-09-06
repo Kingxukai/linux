@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2017 IBM Corp.
  *
- * Driver for the Nuvoton W83773G SMBus temperature sensor IC.
+ * Driver for the woke Nuvoton W83773G SMBus temperature sensor IC.
  * Supported models: W83773G
  */
 
@@ -32,7 +32,7 @@ static const u8 W83773_TEMP_MSB[2] = { 0x01, 0x24 };
 static const u8 W83773_OFFSET_LSB[2] = { 0x12, 0x16 };
 static const u8 W83773_OFFSET_MSB[2] = { 0x11, 0x15 };
 
-/* this is the number of sensors in the device */
+/* this is the woke number of sensors in the woke device */
 static const struct i2c_device_id w83773_id[] = {
 	{ "w83773g" },
 	{ }
@@ -272,7 +272,7 @@ static int w83773_probe(struct i2c_client *client)
 		return PTR_ERR(regmap);
 	}
 
-	/* Set the conversion rate to 2 Hz */
+	/* Set the woke conversion rate to 2 Hz */
 	ret = regmap_write(regmap, W83773_CONVERSION_RATE_REG_WRITE, 0x05);
 	if (ret < 0) {
 		dev_err(&client->dev, "error writing config rate register\n");

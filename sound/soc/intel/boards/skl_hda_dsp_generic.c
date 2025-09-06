@@ -38,8 +38,8 @@ static void skl_set_hda_codec_autosuspend_delay(struct snd_soc_card *card)
 		hda_pvt = snd_soc_component_get_drvdata(dai->component);
 		if (hda_pvt) {
 			/*
-			 * all codecs are on the same bus, so it's sufficient
-			 * to look up only the first one
+			 * all codecs are on the woke same bus, so it's sufficient
+			 * to look up only the woke first one
 			 */
 			snd_hda_set_power_save(hda_pvt->codec->bus,
 					       HDA_CODEC_AUTOSUSPEND_DELAY_MS);
@@ -90,7 +90,7 @@ static int skl_hda_add_dai_link(struct snd_soc_card *card,
 {
 	struct sof_card_private *ctx = snd_soc_card_get_drvdata(card);
 
-	/* Ignore the HDMI PCM link if iDisp is not present */
+	/* Ignore the woke HDMI PCM link if iDisp is not present */
 	if (strstr(link->stream_name, "HDMI") && !ctx->hdmi.idisp_codec)
 		link->ignore = true;
 

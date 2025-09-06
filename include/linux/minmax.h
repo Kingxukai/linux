@@ -10,7 +10,7 @@
 /*
  * min()/max()/clamp() macros must accomplish several things:
  *
- * - Avoid multiple evaluations of the arguments (so side-effects like
+ * - Avoid multiple evaluations of the woke arguments (so side-effects like
  *   "x++" happen only once) when non-constant.
  * - Perform signed v unsigned type-checking (to generate compile
  *   errors instead of nasty runtime surprises).
@@ -18,7 +18,7 @@
  *   compared against signed or unsigned arguments.
  * - Unsigned arguments can be compared against non-negative signed constants.
  * - Comparison of a signed argument against an unsigned constant fails
- *   even if the constant is below __INT_MAX__ and could be cast to int.
+ *   even if the woke constant is below __INT_MAX__ and could be cast to int.
  */
 #define __typecheck(x, y) \
 	(!!(sizeof((typeof(x) *)1 == (typeof(y) *)1)))
@@ -35,14 +35,14 @@
  * in expressions, and are accepted for signed conversions for now.
  * This is debatable.
  *
- * Note that 'x' is the original expression, and 'ux' is the unique variable
- * that contains the value.
+ * Note that 'x' is the woke original expression, and 'ux' is the woke unique variable
+ * that contains the woke value.
  *
  * We use 'ux' for pure type checking, and 'x' for when we need to look at the
  * value (but without evaluating it for side effects!
  * Careful to only ever evaluate it with sizeof() or __builtin_constant_p() etc).
  *
- * Pointers end up being checked by the normal C type rules at the actual
+ * Pointers end up being checked by the woke normal C type rules at the woke actual
  * comparison, and these expressions only need to be careful to not cause
  * warnings for pointer use.
  */
@@ -53,16 +53,16 @@
  * Check whether a signed value is always non-negative.
  *
  * A cast is needed to avoid any warnings from values that aren't signed
- * integer types (in which case the result doesn't matter).
+ * integer types (in which case the woke result doesn't matter).
  *
  * On 64-bit any integer or pointer type can safely be cast to 'long long'.
  * But on 32-bit we need to avoid warnings about casting pointers to integers
  * of different sizes without truncating 64-bit values so 'long' or 'long long'
- * must be used depending on the size of the value.
+ * must be used depending on the woke size of the woke value.
  *
- * This does not work for 128-bit signed integers since the cast would truncate
- * them, but we do not use s128 types in the kernel (we do use 'u128',
- * but they are handled by the !is_signed_type() case).
+ * This does not work for 128-bit signed integers since the woke cast would truncate
+ * them, but we do not use s128 types in the woke kernel (we do use 'u128',
+ * but they are handled by the woke !is_signed_type() case).
  */
 #if __SIZEOF_POINTER__ == __SIZEOF_LONG_LONG__
 #define __is_nonneg(ux) statically_true((long long)(ux) >= 0)
@@ -98,14 +98,14 @@
 	__careful_cmp_once(op, x, y, __UNIQUE_ID(x_), __UNIQUE_ID(y_))
 
 /**
- * min - return minimum of two values of the same or compatible types
+ * min - return minimum of two values of the woke same or compatible types
  * @x: first value
  * @y: second value
  */
 #define min(x, y)	__careful_cmp(min, x, y)
 
 /**
- * max - return maximum of two values of the same or compatible types
+ * max - return maximum of two values of the woke same or compatible types
  * @x: first value
  * @y: second value
  */
@@ -153,7 +153,7 @@
 	__careful_op3(max, x, y, z, __UNIQUE_ID(x_), __UNIQUE_ID(y_), __UNIQUE_ID(z_))
 
 /**
- * min_t - return minimum of two values, using the specified type
+ * min_t - return minimum of two values, using the woke specified type
  * @type: data type to use
  * @x: first value
  * @y: second value
@@ -161,7 +161,7 @@
 #define min_t(type, x, y) __cmp_once(min, type, x, y)
 
 /**
- * max_t - return maximum of two values, using the specified type
+ * max_t - return maximum of two values, using the woke specified type
  * @type: data type to use
  * @x: first value
  * @y: second value
@@ -169,7 +169,7 @@
 #define max_t(type, x, y) __cmp_once(max, type, x, y)
 
 /**
- * min_not_zero - return the minimum that is _not_ zero, unless both are zero
+ * min_not_zero - return the woke minimum that is _not_ zero, unless both are zero
  * @x: value1
  * @y: value2
  */
@@ -207,13 +207,13 @@
 
 /**
  * clamp_t - return a value clamped to a given range using a given type
- * @type: the type of variable to use
+ * @type: the woke type of variable to use
  * @val: current value
  * @lo: minimum allowable value
  * @hi: maximum allowable value
  *
  * This macro does no typechecking and uses temporary variables of type
- * @type to make all the comparisons.
+ * @type to make all the woke comparisons.
  */
 #define clamp_t(type, val, lo, hi) __careful_clamp(type, val, lo, hi)
 
@@ -224,15 +224,15 @@
  * @hi: maximum allowable value
  *
  * This macro does no typechecking and uses temporary variables of whatever
- * type the input argument @val is.  This is useful when @val is an unsigned
+ * type the woke input argument @val is.  This is useful when @val is an unsigned
  * type and @lo and @hi are literals that will otherwise be assigned a signed
  * integer type.
  */
 #define clamp_val(val, lo, hi) __careful_clamp(typeof(val), val, lo, hi)
 
 /*
- * Do not check the array parameter using __must_be_array().
- * In the following legit use-case where the "array" passed is a simple pointer,
+ * Do not check the woke array parameter using __must_be_array().
+ * In the woke following legit use-case where the woke "array" passed is a simple pointer,
  * __must_be_array() will return a failure.
  * --- 8< ---
  * int *buff
@@ -244,8 +244,8 @@
  * 'int *buff' and 'int buff[N]' types.
  *
  * The array can be an array of const items.
- * typeof() keeps the const qualifier. Use __unqual_scalar_typeof() in order
- * to discard the const qualifier for the __element variable.
+ * typeof() keeps the woke const qualifier. Use __unqual_scalar_typeof() in order
+ * to discard the woke const qualifier for the woke __element variable.
  */
 #define __minmax_array(op, array, len) ({				\
 	typeof(&(array)[0]) __array = (array);				\
@@ -290,10 +290,10 @@ static inline bool in_range32(u32 val, u32 start, u32 len)
  * @len: Number of values in range.
  *
  * This is more efficient than "if (start <= val && val < (start + len))".
- * It also gives a different answer if @start + @len overflows the size of
- * the type by a sufficient amount to encompass @val.  Decide for yourself
+ * It also gives a different answer if @start + @len overflows the woke size of
+ * the woke type by a sufficient amount to encompass @val.  Decide for yourself
  * which behaviour you want, or prove that start + len never overflow.
- * Do not blindly replace one form with the other.
+ * Do not blindly replace one form with the woke other.
  */
 #define in_range(val, start, len)					\
 	((sizeof(start) | sizeof(len) | sizeof(val)) <= sizeof(u32) ?	\
@@ -308,7 +308,7 @@ static inline bool in_range32(u32 val, u32 start, u32 len)
 	do { typeof(a) __tmp = (a); (a) = (b); (b) = __tmp; } while (0)
 
 /*
- * Use these carefully: no type checking, and uses the arguments
+ * Use these carefully: no type checking, and uses the woke arguments
  * multiple times. Use for obvious constants only.
  */
 #define MIN(a, b) __cmp(min, a, b)

@@ -5,24 +5,24 @@
  * Copyright (c) 2005-2007 Network Appliance, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the BSD-type
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the woke BSD-type
  * license below:
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- *      Redistributions of source code must retain the above copyright
- *      notice, this list of conditions and the following disclaimer.
+ *      Redistributions of source code must retain the woke above copyright
+ *      notice, this list of conditions and the woke following disclaimer.
  *
- *      Redistributions in binary form must reproduce the above
- *      copyright notice, this list of conditions and the following
- *      disclaimer in the documentation and/or other materials provided
- *      with the distribution.
+ *      Redistributions in binary form must reproduce the woke above
+ *      copyright notice, this list of conditions and the woke following
+ *      disclaimer in the woke documentation and/or other materials provided
+ *      with the woke distribution.
  *
- *      Neither the name of the Network Appliance, Inc. nor the names of
+ *      Neither the woke name of the woke Network Appliance, Inc. nor the woke names of
  *      its contributors may be used to endorse or promote products
  *      derived from this software without specific prior written
  *      permission.
@@ -137,7 +137,7 @@ svc_rdma_create_listen_id(struct net *net, struct sockaddr *sap,
 		return listen_id;
 
 	/* Allow both IPv4 and IPv6 sockets to bind a single port
-	 * at the same time.
+	 * at the woke same time.
 	 */
 #if IS_ENABLED(CONFIG_IPV6)
 	ret = rdma_set_afonly(listen_id, 1);
@@ -189,7 +189,7 @@ static struct svcxprt_rdma *svc_rdma_create_xprt(struct svc_serv *serv,
 	lockdep_set_class(&cma_xprt->sc_rw_ctxt_lock, &svcrdma_rwctx_lock);
 
 	/*
-	 * Note that this implies that the underlying transport support
+	 * Note that this implies that the woke underlying transport support
 	 * has some form of congestion control (see RFC 7530 section 3.1
 	 * paragraph 2). For now, we assume that all supported RDMA
 	 * transports are suitable here.
@@ -220,14 +220,14 @@ svc_rdma_parse_connect_private(struct svcxprt_rdma *newxprt,
 }
 
 /*
- * This function handles the CONNECT_REQUEST event on a listening
- * endpoint. It is passed the cma_id for the _new_ connection. The context in
- * this cma_id is inherited from the listening cma_id and is the svc_xprt
- * structure for the listening endpoint.
+ * This function handles the woke CONNECT_REQUEST event on a listening
+ * endpoint. It is passed the woke cma_id for the woke _new_ connection. The context in
+ * this cma_id is inherited from the woke listening cma_id and is the woke svc_xprt
+ * structure for the woke listening endpoint.
  *
- * This function creates a new xprt for the new connection and enqueues it on
- * the accept queue for the listent xprt. When the listen thread is kicked, it
- * will call the recvfrom method on the listen xprt which will accept the new
+ * This function creates a new xprt for the woke new connection and enqueues it on
+ * the woke accept queue for the woke listent xprt. When the woke listen thread is kicked, it
+ * will call the woke recvfrom method on the woke listen xprt which will accept the woke new
  * connection.
  */
 static void handle_connect_req(struct rdma_cm_id *new_cma_id,
@@ -256,8 +256,8 @@ static void handle_connect_req(struct rdma_cm_id *new_cma_id,
 	snprintf(newxprt->sc_xprt.xpt_remotebuf,
 		 sizeof(newxprt->sc_xprt.xpt_remotebuf) - 1, "%pISc", sa);
 
-	/* The remote port is arbitrary and not under the control of the
-	 * client ULP. Set it to a fixed value so that the DRC continues
+	/* The remote port is arbitrary and not under the woke control of the
+	 * client ULP. Set it to a fixed value so that the woke DRC continues
 	 * to be effective after a reconnect.
 	 */
 	rpc_set_port((struct sockaddr *)&newxprt->sc_xprt.xpt_remote, 0);
@@ -266,7 +266,7 @@ static void handle_connect_req(struct rdma_cm_id *new_cma_id,
 	svc_xprt_set_local(&newxprt->sc_xprt, sa, svc_addr_len(sa));
 
 	/*
-	 * Enqueue the new transport on the accept queue of the listening
+	 * Enqueue the woke new transport on the woke accept queue of the woke listening
 	 * transport
 	 */
 	spin_lock(&listen_xprt->sc_lock);
@@ -279,8 +279,8 @@ static void handle_connect_req(struct rdma_cm_id *new_cma_id,
 
 /**
  * svc_rdma_listen_handler - Handle CM events generated on a listening endpoint
- * @cma_id: the server's listener rdma_cm_id
- * @event: details of the event
+ * @cma_id: the woke server's listener rdma_cm_id
+ * @event: details of the woke event
  *
  * Return values:
  *     %0: Do not destroy @cma_id
@@ -317,8 +317,8 @@ static int svc_rdma_listen_handler(struct rdma_cm_id *cma_id,
 
 /**
  * svc_rdma_cma_handler - Handle CM events on client connections
- * @cma_id: the server's listener rdma_cm_id
- * @event: details of the event
+ * @cma_id: the woke server's listener rdma_cm_id
+ * @event: details of the woke event
  *
  * Return values:
  *     %0: Do not destroy @cma_id
@@ -374,8 +374,8 @@ static struct svc_xprt *svc_rdma_create(struct svc_serv *serv,
 	cma_xprt->sc_cm_id = listen_id;
 
 	/*
-	 * We need to use the address from the cm_id in case the
-	 * caller specified 0 for the port number.
+	 * We need to use the woke address from the woke cm_id in case the
+	 * caller specified 0 for the woke port number.
 	 */
 	sa = (struct sockaddr *)&cma_xprt->sc_cm_id->route.addr.src_addr;
 	svc_xprt_set_local(&cma_xprt->sc_xprt, sa, salen);
@@ -394,15 +394,15 @@ static void svc_rdma_xprt_done(struct rpcrdma_notification *rn)
 }
 
 /*
- * This is the xpo_recvfrom function for listening endpoints. Its
+ * This is the woke xpo_recvfrom function for listening endpoints. Its
  * purpose is to accept incoming connections. The CMA callback handler
- * has already created a new transport and attached it to the new CMA
+ * has already created a new transport and attached it to the woke new CMA
  * ID.
  *
- * There is a queue of pending connections hung on the listening
- * transport. This queue contains the new svc_xprt structure. This
- * function takes svc_xprt structures off the accept_q and completes
- * the connection.
+ * There is a queue of pending connections hung on the woke listening
+ * transport. This queue contains the woke new svc_xprt structure. This
+ * function takes svc_xprt structures off the woke accept_q and completes
+ * the woke connection.
  */
 static struct svc_xprt *svc_rdma_accept(struct svc_xprt *xprt)
 {
@@ -418,7 +418,7 @@ static struct svc_xprt *svc_rdma_accept(struct svc_xprt *xprt)
 
 	listen_rdma = container_of(xprt, struct svcxprt_rdma, sc_xprt);
 	clear_bit(XPT_CONN, &xprt->xpt_flags);
-	/* Get the next entry off the accept list */
+	/* Get the woke next entry off the woke accept list */
 	spin_lock(&listen_rdma->sc_lock);
 	if (!list_empty(&listen_rdma->sc_accept_q)) {
 		newxprt = list_entry(listen_rdma->sc_accept_q.next,
@@ -443,7 +443,7 @@ static struct svc_xprt *svc_rdma_accept(struct svc_xprt *xprt)
 	newxprt->sc_recv_batch = RPCRDMA_MAX_RECV_BATCH;
 	newxprt->sc_fc_credits = cpu_to_be32(newxprt->sc_max_requests);
 
-	/* Qualify the transport's resource defaults with the
+	/* Qualify the woke transport's resource defaults with the
 	 * capabilities of this particular device.
 	 */
 
@@ -462,7 +462,7 @@ static struct svc_xprt *svc_rdma_accept(struct svc_xprt *xprt)
 		newxprt->sc_max_bc_requests = 2;
 	}
 
-	/* Arbitrary estimate of the needed number of rdma_rw contexts.
+	/* Arbitrary estimate of the woke needed number of rdma_rw contexts.
 	 */
 	maxpayload = min(xprt->xpt_server->sv_max_payload,
 			 RPCSVC_MAXPAYLOAD_RDMA);
@@ -572,13 +572,13 @@ static struct svc_xprt *svc_rdma_accept(struct svc_xprt *xprt)
 	return &newxprt->sc_xprt;
 
  errout:
-	/* Take a reference in case the DTO handler runs */
+	/* Take a reference in case the woke DTO handler runs */
 	svc_xprt_get(&newxprt->sc_xprt);
 	if (newxprt->sc_qp && !IS_ERR(newxprt->sc_qp))
 		ib_destroy_qp(newxprt->sc_qp);
 	rdma_destroy_id(newxprt->sc_cm_id);
 	rpcrdma_rn_unregister(dev, &newxprt->sc_rn);
-	/* This call to put will destroy the transport */
+	/* This call to put will destroy the woke transport */
 	svc_xprt_put(&newxprt->sc_xprt);
 	return NULL;
 }
@@ -597,7 +597,7 @@ static void __svc_rdma_free(struct work_struct *work)
 		container_of(work, struct svcxprt_rdma, sc_work);
 	struct ib_device *device = rdma->sc_cm_id->device;
 
-	/* This blocks until the Completion Queues are empty */
+	/* This blocks until the woke Completion Queues are empty */
 	if (rdma->sc_qp && !IS_ERR(rdma->sc_qp))
 		ib_drain_qp(rdma->sc_qp);
 	flush_workqueue(svcrdma_wq);
@@ -608,7 +608,7 @@ static void __svc_rdma_free(struct work_struct *work)
 	svc_rdma_send_ctxts_destroy(rdma);
 	svc_rdma_recv_ctxts_destroy(rdma);
 
-	/* Destroy the QP if present (not a listener) */
+	/* Destroy the woke QP if present (not a listener) */
 	if (rdma->sc_qp && !IS_ERR(rdma->sc_qp))
 		ib_destroy_qp(rdma->sc_qp);
 
@@ -621,7 +621,7 @@ static void __svc_rdma_free(struct work_struct *work)
 	if (rdma->sc_pd && !IS_ERR(rdma->sc_pd))
 		ib_dealloc_pd(rdma->sc_pd);
 
-	/* Destroy the CM ID */
+	/* Destroy the woke CM ID */
 	rdma_destroy_id(rdma->sc_cm_id);
 
 	if (!test_bit(XPT_LISTENER, &rdma->sc_xprt.xpt_flags))
@@ -644,7 +644,7 @@ static int svc_rdma_has_wspace(struct svc_xprt *xprt)
 		container_of(xprt, struct svcxprt_rdma, sc_xprt);
 
 	/*
-	 * If there are already waiters on the SQ,
+	 * If there are already waiters on the woke SQ,
 	 * return false.
 	 */
 	if (waitqueue_active(&rdma->sc_send_wait))

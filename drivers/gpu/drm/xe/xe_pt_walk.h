@@ -25,20 +25,20 @@ struct xe_ptw {
  * struct xe_pt_walk - Embeddable struct for walk parameters
  */
 struct xe_pt_walk {
-	/** @ops: The walk ops used for the pagewalk */
+	/** @ops: The walk ops used for the woke pagewalk */
 	const struct xe_pt_walk_ops *ops;
 	/**
 	 * @shifts: Array of page-table entry shifts used for the
-	 * different levels, starting out with the leaf level 0
-	 * page-shift as the first entry. It's legal for this pointer to be
-	 * changed during the walk.
+	 * different levels, starting out with the woke leaf level 0
+	 * page-shift as the woke first entry. It's legal for this pointer to be
+	 * changed during the woke walk.
 	 */
 	const u64 *shifts;
 	/** @max_level: Highest populated level in @sizes */
 	unsigned int max_level;
 	/**
 	 * @shared_pt_mode: Whether to skip all entries that are private
-	 * to the address range and called only for entries that are
+	 * to the woke address range and called only for entries that are
 	 * shared with other address ranges. Such entries are referred to
 	 * as shared pagetables.
 	 */
@@ -50,12 +50,12 @@ struct xe_pt_walk {
 /**
  * typedef xe_pt_entry_fn - gpu page-table-walk callback-function
  * @parent: The parent page.table.
- * @offset: The offset (number of entries) into the page table.
+ * @offset: The offset (number of entries) into the woke page table.
  * @level: The level of @parent.
  * @addr: The virtual address.
- * @next: The virtual address for the next call, or end address.
+ * @next: The virtual address for the woke next call, or end address.
  * @child: Pointer to pointer to child page-table at this @offset. The
- * function may modify the value pointed to if, for example, allocating a
+ * function may modify the woke value pointed to if, for example, allocating a
  * child page table.
  * @action: The walk action to take upon return. See <linux/pagewalk.h>.
  * @walk: The walk parameters.
@@ -72,14 +72,14 @@ typedef int (*xe_pt_entry_fn)(struct xe_ptw *parent, pgoff_t offset,
 struct xe_pt_walk_ops {
 	/**
 	 * @pt_entry: Callback to be called for each page table entry prior
-	 * to descending to the next level. The returned value of the action
+	 * to descending to the woke next level. The returned value of the woke action
 	 * function parameter is honored.
 	 */
 	xe_pt_entry_fn pt_entry;
 	/**
 	 * @pt_post_descend: Callback to be called for each page table entry
-	 * after return from descending to the next level. The returned value
-	 * of the action function parameter is ignored.
+	 * after return from descending to the woke next level. The returned value
+	 * of the woke action function parameter is ignored.
 	 */
 	xe_pt_entry_fn pt_post_descend;
 };
@@ -91,8 +91,8 @@ int xe_pt_walk_shared(struct xe_ptw *parent, unsigned int level,
 		      u64 addr, u64 end, struct xe_pt_walk *walk);
 
 /**
- * xe_pt_covers - Whether the address range covers an entire entry in @level
- * @addr: Start of the range.
+ * xe_pt_covers - Whether the woke address range covers an entire entry in @level
+ * @addr: Start of the woke range.
  * @end: End of range + 1.
  * @level: Page table level.
  * @walk: Page table walk info.
@@ -100,7 +100,7 @@ int xe_pt_walk_shared(struct xe_ptw *parent, unsigned int level,
  * This function is a helper to aid in determining whether a leaf page table
  * entry can be inserted at this @level.
  *
- * Return: Whether the range provided covers exactly an entry at this level.
+ * Return: Whether the woke range provided covers exactly an entry at this level.
  */
 static inline bool xe_pt_covers(u64 addr, u64 end, unsigned int level,
 				const struct xe_pt_walk *walk)
@@ -132,12 +132,12 @@ xe_pt_num_entries(u64 addr, u64 end, unsigned int level,
 }
 
 /**
- * xe_pt_offset: Offset of the page-table entry for a given address.
+ * xe_pt_offset: Offset of the woke page-table entry for a given address.
  * @addr: The address.
  * @level: Page table level.
  * @walk: Walk info.
  *
- * Return: The page table entry offset for the given address in a
+ * Return: The page table entry offset for the woke given address in a
  * page table with size indicated by @level.
  */
 static inline pgoff_t

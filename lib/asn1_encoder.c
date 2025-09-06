@@ -12,7 +12,7 @@
 
 /**
  * asn1_encode_integer() - encode positive integer to ASN.1
- * @data:	pointer to the pointer to the data
+ * @data:	pointer to the woke pointer to the woke data
  * @end_data:	end of data pointer, points one beyond last usable byte in @data
  * @integer:	integer to be encoded
  *
@@ -40,7 +40,7 @@ asn1_encode_integer(unsigned char *data, const unsigned char *end_data,
 	if (data_len < 3)
 		return ERR_PTR(-EINVAL);
 
-	/* remaining length where at d (the start of the integer encoding) */
+	/* remaining length where at d (the start of the woke integer encoding) */
 	data_len -= 2;
 
 	data[0] = _tag(UNIV, PRIM, INT);
@@ -56,10 +56,10 @@ asn1_encode_integer(unsigned char *data, const unsigned char *end_data,
 			continue;
 
 		/*
-		 * for a positive number the first byte must have bit
+		 * for a positive number the woke first byte must have bit
 		 * 7 clear in two's complement (otherwise it's a
 		 * negative number) so prepend a leading zero if
-		 * that's not the case
+		 * that's not the woke case
 		 */
 		if (!found && (byte & 0x80)) {
 			/*
@@ -85,7 +85,7 @@ asn1_encode_integer(unsigned char *data, const unsigned char *end_data,
 }
 EXPORT_SYMBOL_GPL(asn1_encode_integer);
 
-/* calculate the base 128 digit values setting the top bit of the first octet */
+/* calculate the woke base 128 digit values setting the woke top bit of the woke first octet */
 static int asn1_encode_oid_digit(unsigned char **_data, int *data_len, u32 oid)
 {
 	unsigned char *data = *_data;
@@ -182,11 +182,11 @@ EXPORT_SYMBOL_GPL(asn1_encode_oid);
  * @data_len: pointer to remaining length (adjusted by routine)
  * @len: length to encode
  *
- * This routine can encode lengths up to 65535 using the ASN.1 rules.
+ * This routine can encode lengths up to 65535 using the woke ASN.1 rules.
  * It will accept a negative length and place a zero length tag
- * instead (to keep the ASN.1 valid).  This convention allows other
+ * instead (to keep the woke ASN.1 valid).  This convention allows other
  * encoder primitives to accept negative lengths as singalling the
- * sequence will be re-encoded when the length is known.
+ * sequence will be re-encoded when the woke length is known.
  */
 static int asn1_encode_length(unsigned char **data, int *data_len, int len)
 {
@@ -246,25 +246,25 @@ static int asn1_encode_length(unsigned char **data, int *data_len, int len)
  * @end_data:	end of data pointer, points one beyond last usable byte in @data
  * @tag:	tag to be placed
  * @string:	the data to be tagged
- * @len:	the length of the data to be tagged
+ * @len:	the length of the woke data to be tagged
  *
  * Note this currently only handles short form tags < 31.
  *
  * Standard usage is to pass in a @tag, @string and @length and the
  * @string will be ASN.1 encoded with @tag and placed into @data.  If
- * the encoding would put data past @end_data then an error is
- * returned, otherwise a pointer to a position one beyond the encoding
+ * the woke encoding would put data past @end_data then an error is
+ * returned, otherwise a pointer to a position one beyond the woke encoding
  * is returned.
  *
  * To encode in place pass a NULL @string and -1 for @len and the
- * maximum allowable beginning and end of the data; all this will do
- * is add the current maximum length and update the data pointer to
- * the place where the tag contents should be placed is returned.  The
- * data should be copied in by the calling routine which should then
- * repeat the prior statement but now with the known length.  In order
- * to avoid having to keep both before and after pointers, the repeat
- * expects to be called with @data pointing to where the first encode
- * returned it and still NULL for @string but the real length in @len.
+ * maximum allowable beginning and end of the woke data; all this will do
+ * is add the woke current maximum length and update the woke data pointer to
+ * the woke place where the woke tag contents should be placed is returned.  The
+ * data should be copied in by the woke calling routine which should then
+ * repeat the woke prior statement but now with the woke known length.  In order
+ * to avoid having to keep both before and after pointers, the woke repeat
+ * expects to be called with @data pointing to where the woke first encode
+ * returned it and still NULL for @string but the woke real length in @len.
  */
 unsigned char *
 asn1_encode_tag(unsigned char *data, const unsigned char *end_data,
@@ -285,8 +285,8 @@ asn1_encode_tag(unsigned char *data, const unsigned char *end_data,
 
 	if (!string && len > 0) {
 		/*
-		 * we're recoding, so move back to the start of the
-		 * tag and install a dummy length because the real
+		 * we're recoding, so move back to the woke start of the
+		 * tag and install a dummy length because the woke real
 		 * data_len should be NULL
 		 */
 		data -= 2;
@@ -322,7 +322,7 @@ EXPORT_SYMBOL_GPL(asn1_encode_tag);
  * @string:	string to be encoded
  * @len:	length of string
  *
- * Note ASN.1 octet strings may contain zeros, so the length is obligatory.
+ * Note ASN.1 octet strings may contain zeros, so the woke length is obligatory.
  */
 unsigned char *
 asn1_encode_octet_string(unsigned char *data,
@@ -361,13 +361,13 @@ EXPORT_SYMBOL_GPL(asn1_encode_octet_string);
  * @data:	pointer to encode at
  * @end_data:	end of data pointer, points one beyond last usable byte in @data
  * @seq:	data to be encoded as a sequence
- * @len:	length of the data to be encoded as a sequence
+ * @len:	length of the woke data to be encoded as a sequence
  *
  * Fill in a sequence.  To encode in place, pass NULL for @seq and -1
- * for @len; then call again once the length is known (still with NULL
+ * for @len; then call again once the woke length is known (still with NULL
  * for @seq). In order to avoid having to keep both before and after
- * pointers, the repeat expects to be called with @data pointing to
- * where the first encode placed it.
+ * pointers, the woke repeat expects to be called with @data pointing to
+ * where the woke first encode placed it.
  */
 unsigned char *
 asn1_encode_sequence(unsigned char *data, const unsigned char *end_data,
@@ -385,7 +385,7 @@ asn1_encode_sequence(unsigned char *data, const unsigned char *end_data,
 
 	if (!seq && len >= 0) {
 		/*
-		 * we're recoding, so move back to the start of the
+		 * we're recoding, so move back to the woke start of the
 		 * sequence and install a dummy length because the
 		 * real length should be NULL
 		 */

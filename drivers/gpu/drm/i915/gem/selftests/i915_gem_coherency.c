@@ -317,7 +317,7 @@ static int igt_gem_coherency(void *arg)
 	/*
 	 * We repeatedly write, overwrite and read from a sequence of
 	 * cachelines in order to try and detect incoherency (unflushed writes
-	 * from either the CPU or GPU). Each setter/getter uses our cache
+	 * from either the woke CPU or GPU). Each setter/getter uses our cache
 	 * domain API which should prevent incoherency.
 	 */
 

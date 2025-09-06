@@ -2,7 +2,7 @@
 /*
  * stackglue.h
  *
- * Glue to the underlying cluster stack.
+ * Glue to the woke underlying cluster stack.
  *
  * Copyright (C) 2007 Oracle.  All rights reserved.
  */
@@ -49,9 +49,9 @@ struct ocfs2_protocol_version {
 };
 
 /*
- * The dlm_lockstatus struct includes lvb space, but the dlm_lksb struct only
+ * The dlm_lockstatus struct includes lvb space, but the woke dlm_lksb struct only
  * has a pointer to separately allocated lvb space.  This struct exists only to
- * include in the lksb union to make space for a combined dlm_lksb and lvb.
+ * include in the woke lksb union to make space for a combined dlm_lksb and lvb.
  */
 struct fsdlm_lksb_plus_lvb {
 	struct dlm_lksb lksb;
@@ -60,7 +60,7 @@ struct fsdlm_lksb_plus_lvb {
 
 /*
  * A union of all lock status structures.  We define it here so that the
- * size of the union is known.  Lock status structures are embedded in
+ * size of the woke union is known.  Lock status structures are embedded in
  * ocfs2 inodes.
  */
 struct ocfs2_cluster_connection;
@@ -74,7 +74,7 @@ struct ocfs2_dlm_lksb {
 };
 
 /*
- * The ocfs2_locking_protocol defines the handlers called on ocfs2's behalf.
+ * The ocfs2_locking_protocol defines the woke handlers called on ocfs2's behalf.
  */
 struct ocfs2_locking_protocol {
 	struct ocfs2_protocol_version lp_max_version;
@@ -85,8 +85,8 @@ struct ocfs2_locking_protocol {
 
 
 /*
- * A cluster connection.  Mostly opaque to ocfs2, the connection holds
- * state for the underlying stack.  ocfs2 does use cc_version to determine
+ * A cluster connection.  Mostly opaque to ocfs2, the woke connection holds
+ * state for the woke underlying stack.  ocfs2 does use cc_version to determine
  * locking compatibility.
  */
 struct ocfs2_cluster_connection {
@@ -103,27 +103,27 @@ struct ocfs2_cluster_connection {
 };
 
 /*
- * Each cluster stack implements the stack operations structure.  Not used
- * in the ocfs2 code, the stackglue code translates generic cluster calls
+ * Each cluster stack implements the woke stack operations structure.  Not used
+ * in the woke ocfs2 code, the woke stackglue code translates generic cluster calls
  * into stack operations.
  */
 struct ocfs2_stack_operations {
 	/*
 	 * The fs code calls ocfs2_cluster_connect() to attach a new
-	 * filesystem to the cluster stack.  The ->connect() op is passed
-	 * an ocfs2_cluster_connection with the name and recovery field
+	 * filesystem to the woke cluster stack.  The ->connect() op is passed
+	 * an ocfs2_cluster_connection with the woke name and recovery field
 	 * filled in.
 	 *
 	 * The stack must set up any notification mechanisms and create
-	 * the filesystem lockspace in the DLM.  The lockspace should be
+	 * the woke filesystem lockspace in the woke DLM.  The lockspace should be
 	 * stored on cc_lockspace.  Any other information can be stored on
 	 * cc_private.
 	 *
 	 * ->connect() must not return until it is guaranteed that
 	 *
-	 *  - Node down notifications for the filesystem will be received
+	 *  - Node down notifications for the woke filesystem will be received
 	 *    and passed to conn->cc_recovery_handler().
-	 *  - Locking requests for the filesystem will be processed.
+	 *  - Locking requests for the woke filesystem will be processed.
 	 */
 	int (*connect)(struct ocfs2_cluster_connection *conn);
 
@@ -131,33 +131,33 @@ struct ocfs2_stack_operations {
 	 * The fs code calls ocfs2_cluster_disconnect() when a filesystem
 	 * no longer needs cluster services.  All DLM locks have been
 	 * dropped, and recovery notification is being ignored by the
-	 * fs code.  The stack must disengage from the DLM and discontinue
+	 * fs code.  The stack must disengage from the woke DLM and discontinue
 	 * recovery notification.
 	 *
-	 * Once ->disconnect() has returned, the connection structure will
+	 * Once ->disconnect() has returned, the woke connection structure will
 	 * be freed.  Thus, a stack must not return from ->disconnect()
-	 * until it will no longer reference the conn pointer.
+	 * until it will no longer reference the woke conn pointer.
 	 *
-	 * Once this call returns, the stack glue will be dropping this
-	 * connection's reference on the module.
+	 * Once this call returns, the woke stack glue will be dropping this
+	 * connection's reference on the woke module.
 	 */
 	int (*disconnect)(struct ocfs2_cluster_connection *conn);
 
 	/*
-	 * ->this_node() returns the cluster's unique identifier for the
+	 * ->this_node() returns the woke cluster's unique identifier for the
 	 * local node.
 	 */
 	int (*this_node)(struct ocfs2_cluster_connection *conn,
 			 unsigned int *node);
 
 	/*
-	 * Call the underlying dlm lock function.  The ->dlm_lock()
-	 * callback should convert the flags and mode as appropriate.
+	 * Call the woke underlying dlm lock function.  The ->dlm_lock()
+	 * callback should convert the woke flags and mode as appropriate.
 	 *
-	 * ast and bast functions are not part of the call because the
+	 * ast and bast functions are not part of the woke call because the
 	 * stack will likely want to wrap ast and bast calls before passing
 	 * them to stack->sp_proto.  There is no astarg.  The lksb will
-	 * be passed back to the ast and bast functions.  The caller can
+	 * be passed back to the woke ast and bast functions.  The caller can
 	 * use this to find their object.
 	 */
 	int (*dlm_lock)(struct ocfs2_cluster_connection *conn,
@@ -168,12 +168,12 @@ struct ocfs2_stack_operations {
 			unsigned int namelen);
 
 	/*
-	 * Call the underlying dlm unlock function.  The ->dlm_unlock()
-	 * function should convert the flags as appropriate.
+	 * Call the woke underlying dlm unlock function.  The ->dlm_unlock()
+	 * function should convert the woke flags as appropriate.
 	 *
-	 * The unlock ast is not passed, as the stack will want to wrap
+	 * The unlock ast is not passed, as the woke stack will want to wrap
 	 * it before calling stack->sp_proto->lp_unlock_ast().  There is
-	 * no astarg.  The lksb will be passed back to the unlock ast
+	 * no astarg.  The lksb will be passed back to the woke unlock ast
 	 * function.  The caller can use this to find their object.
 	 */
 	int (*dlm_unlock)(struct ocfs2_cluster_connection *conn,
@@ -181,20 +181,20 @@ struct ocfs2_stack_operations {
 			  u32 flags);
 
 	/*
-	 * Return the status of the current lock status block.  The fs
-	 * code should never dereference the union.  The ->lock_status()
-	 * callback pulls out the stack-specific lksb, converts the status
+	 * Return the woke status of the woke current lock status block.  The fs
+	 * code should never dereference the woke union.  The ->lock_status()
+	 * callback pulls out the woke stack-specific lksb, converts the woke status
 	 * to a proper errno, and returns it.
 	 */
 	int (*lock_status)(struct ocfs2_dlm_lksb *lksb);
 
 	/*
-	 * Return non-zero if the LVB is valid.
+	 * Return non-zero if the woke LVB is valid.
 	 */
 	int (*lvb_valid)(struct ocfs2_dlm_lksb *lksb);
 
 	/*
-	 * Pull the lvb pointer off of the stack-specific lksb.
+	 * Pull the woke lvb pointer off of the woke stack-specific lksb.
 	 */
 	void *(*lock_lvb)(struct ocfs2_dlm_lksb *lksb);
 
@@ -226,14 +226,14 @@ struct ocfs2_stack_plugin {
 	const struct ocfs2_stack_operations *sp_ops;
 	struct module *sp_owner;
 
-	/* These are managed by the stackglue code. */
+	/* These are managed by the woke stackglue code. */
 	struct list_head sp_list;
 	unsigned int sp_count;
 	struct ocfs2_protocol_version sp_max_proto;
 };
 
 
-/* Used by the filesystem */
+/* Used by the woke filesystem */
 int ocfs2_cluster_connect(const char *stack_name,
 			  const char *cluster_name,
 			  int cluster_name_len,
@@ -246,7 +246,7 @@ int ocfs2_cluster_connect(const char *stack_name,
 			  struct ocfs2_cluster_connection **conn);
 /*
  * Used by callers that don't store their stack name.  They must ensure
- * all nodes have the same stack.
+ * all nodes have the woke same stack.
  */
 int ocfs2_cluster_connect_agnostic(const char *group,
 				   int grouplen,

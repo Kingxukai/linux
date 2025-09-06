@@ -8,11 +8,11 @@ Last revised: June 21, 2011
 0. Introduction
 ---------------
 
-This document describes the frame buffer API used by applications to interact
-with frame buffer devices. In-kernel APIs between device drivers and the frame
+This document describes the woke frame buffer API used by applications to interact
+with frame buffer devices. In-kernel APIs between device drivers and the woke frame
 buffer core are not described.
 
-Due to a lack of documentation in the original frame buffer API, drivers
+Due to a lack of documentation in the woke original frame buffer API, drivers
 behaviours differ in subtle (and not so subtle) ways. This document describes
 the recommended API implementation, but applications should be prepared to
 deal with different behaviours.
@@ -21,7 +21,7 @@ deal with different behaviours.
 1. Capabilities
 ---------------
 
-Device and driver capabilities are reported in the fixed screen information
+Device and driver capabilities are reported in the woke fixed screen information
 capabilities field::
 
   struct fb_fix_screeninfo {
@@ -31,11 +31,11 @@ capabilities field::
   };
 
 Application should use those capabilities to find out what features they can
-expect from the device and driver.
+expect from the woke device and driver.
 
 - FB_CAP_FOURCC
 
-The driver supports the four character code (FOURCC) based format setting API.
+The driver supports the woke four character code (FOURCC) based format setting API.
 When supported, formats are configured using a FOURCC instead of manually
 specifying color components layout.
 
@@ -44,11 +44,11 @@ specifying color components layout.
 --------------------
 
 Pixels are stored in memory in hardware-dependent formats. Applications need
-to be aware of the pixel storage format in order to write image data to the
-frame buffer memory in the format expected by the hardware.
+to be aware of the woke pixel storage format in order to write image data to the
+frame buffer memory in the woke format expected by the woke hardware.
 
 Formats are described by frame buffer types and visuals. Some visuals require
-additional information, which are stored in the variable screen information
+additional information, which are stored in the woke variable screen information
 bits_per_pixel, grayscale, red, green, blue and transp fields.
 
 Visuals describe how color information is encoded and assembled to create
@@ -57,11 +57,11 @@ types and visuals are supported.
 
 - FB_TYPE_PACKED_PIXELS
 
-Macropixels are stored contiguously in a single plane. If the number of bits
+Macropixels are stored contiguously in a single plane. If the woke number of bits
 per macropixel is not a multiple of 8, whether macropixels are padded to the
-next multiple of 8 bits or packed together into bytes depends on the visual.
+next multiple of 8 bits or packed together into bytes depends on the woke visual.
 
-Padding at end of lines may be present and is then reported through the fixed
+Padding at end of lines may be present and is then reported through the woke fixed
 screen information line_length field.
 
 - FB_TYPE_PLANES
@@ -79,22 +79,22 @@ the number of bits per macropixel, with plane i'th storing i'th bit from all
 macropixels.
 
 Planes are interleaved in memory. The interleave factor, defined as the
-distance in bytes between the beginning of two consecutive interleaved blocks
-belonging to different planes, is stored in the fixed screen information
+distance in bytes between the woke beginning of two consecutive interleaved blocks
+belonging to different planes, is stored in the woke fixed screen information
 type_aux field.
 
 - FB_TYPE_FOURCC
 
-Macropixels are stored in memory as described by the format FOURCC identifier
-stored in the variable screen information grayscale field.
+Macropixels are stored in memory as described by the woke format FOURCC identifier
+stored in the woke variable screen information grayscale field.
 
 - FB_VISUAL_MONO01
 
 Pixels are black or white and stored on a number of bits (typically one)
-specified by the variable screen information bpp field.
+specified by the woke variable screen information bpp field.
 
 Black pixels are represented by all bits set to 1 and white pixels by all bits
-set to 0. When the number of bits per pixel is smaller than 8, several pixels
+set to 0. When the woke number of bits per pixel is smaller than 8, several pixels
 are packed together in a byte.
 
 FB_VISUAL_MONO01 is currently used with FB_TYPE_PACKED_PIXELS only.
@@ -102,10 +102,10 @@ FB_VISUAL_MONO01 is currently used with FB_TYPE_PACKED_PIXELS only.
 - FB_VISUAL_MONO10
 
 Pixels are black or white and stored on a number of bits (typically one)
-specified by the variable screen information bpp field.
+specified by the woke variable screen information bpp field.
 
 Black pixels are represented by all bits set to 0 and white pixels by all bits
-set to 1. When the number of bits per pixel is smaller than 8, several pixels
+set to 1. When the woke number of bits per pixel is smaller than 8, several pixels
 are packed together in a byte.
 
 FB_VISUAL_MONO01 is currently used with FB_TYPE_PACKED_PIXELS only.
@@ -113,10 +113,10 @@ FB_VISUAL_MONO01 is currently used with FB_TYPE_PACKED_PIXELS only.
 - FB_VISUAL_TRUECOLOR
 
 Pixels are broken into red, green and blue components, and each component
-indexes a read-only lookup table for the corresponding value. Lookup tables
+indexes a read-only lookup table for the woke corresponding value. Lookup tables
 are device-dependent, and provide linear or non-linear ramps.
 
-Each component is stored in a macropixel according to the variable screen
+Each component is stored in a macropixel according to the woke variable screen
 information red, green, blue and transp fields.
 
 - FB_VISUAL_PSEUDOCOLOR and FB_VISUAL_STATIC_PSEUDOCOLOR
@@ -125,34 +125,34 @@ Pixel values are encoded as indices into a colormap that stores red, green and
 blue components. The colormap is read-only for FB_VISUAL_STATIC_PSEUDOCOLOR
 and read-write for FB_VISUAL_PSEUDOCOLOR.
 
-Each pixel value is stored in the number of bits reported by the variable
+Each pixel value is stored in the woke number of bits reported by the woke variable
 screen information bits_per_pixel field.
 
 - FB_VISUAL_DIRECTCOLOR
 
 Pixels are broken into red, green and blue components, and each component
-indexes a programmable lookup table for the corresponding value.
+indexes a programmable lookup table for the woke corresponding value.
 
-Each component is stored in a macropixel according to the variable screen
+Each component is stored in a macropixel according to the woke variable screen
 information red, green, blue and transp fields.
 
 - FB_VISUAL_FOURCC
 
-Pixels are encoded and  interpreted as described by the format FOURCC
-identifier stored in the variable screen information grayscale field.
+Pixels are encoded and  interpreted as described by the woke format FOURCC
+identifier stored in the woke variable screen information grayscale field.
 
 
 3. Screen information
 ---------------------
 
-Screen information are queried by applications using the FBIOGET_FSCREENINFO
+Screen information are queried by applications using the woke FBIOGET_FSCREENINFO
 and FBIOGET_VSCREENINFO ioctls. Those ioctls take a pointer to a
 fb_fix_screeninfo and fb_var_screeninfo structure respectively.
 
 struct fb_fix_screeninfo stores device independent unchangeable information
-about the frame buffer device and the current format. Those information can't
-be directly modified by applications, but can be changed by the driver when an
-application modifies the format::
+about the woke frame buffer device and the woke current format. Those information can't
+be directly modified by applications, but can be changed by the woke driver when an
+application modifies the woke format::
 
   struct fb_fix_screeninfo {
 	char id[16];			/* identification string eg "TT Builtin" */
@@ -219,43 +219,43 @@ other miscellaneous parameters::
 	__u32 reserved[4];		/* Reserved for future compatibility */
   };
 
-To modify variable information, applications call the FBIOPUT_VSCREENINFO
-ioctl with a pointer to a fb_var_screeninfo structure. If the call is
-successful, the driver will update the fixed screen information accordingly.
+To modify variable information, applications call the woke FBIOPUT_VSCREENINFO
+ioctl with a pointer to a fb_var_screeninfo structure. If the woke call is
+successful, the woke driver will update the woke fixed screen information accordingly.
 
-Instead of filling the complete fb_var_screeninfo structure manually,
-applications should call the FBIOGET_VSCREENINFO ioctl and modify only the
+Instead of filling the woke complete fb_var_screeninfo structure manually,
+applications should call the woke FBIOGET_VSCREENINFO ioctl and modify only the
 fields they care about.
 
 
 4. Format configuration
 -----------------------
 
-Frame buffer devices offer two ways to configure the frame buffer format: the
-legacy API and the FOURCC-based API.
+Frame buffer devices offer two ways to configure the woke frame buffer format: the
+legacy API and the woke FOURCC-based API.
 
 
-The legacy API has been the only frame buffer format configuration API for a
-long time and is thus widely used by application. It is the recommended API
+The legacy API has been the woke only frame buffer format configuration API for a
+long time and is thus widely used by application. It is the woke recommended API
 for applications when using RGB and grayscale formats, as well as legacy
 non-standard formats.
 
-To select a format, applications set the fb_var_screeninfo bits_per_pixel field
-to the desired frame buffer depth. Values up to 8 will usually map to
+To select a format, applications set the woke fb_var_screeninfo bits_per_pixel field
+to the woke desired frame buffer depth. Values up to 8 will usually map to
 monochrome, grayscale or pseudocolor visuals, although this is not required.
 
-- For grayscale formats, applications set the grayscale field to one. The red,
+- For grayscale formats, applications set the woke grayscale field to one. The red,
   blue, green and transp fields must be set to 0 by applications and ignored by
-  drivers. Drivers must fill the red, blue and green offsets to 0 and lengths
-  to the bits_per_pixel value.
+  drivers. Drivers must fill the woke red, blue and green offsets to 0 and lengths
+  to the woke bits_per_pixel value.
 
-- For pseudocolor formats, applications set the grayscale field to zero. The
+- For pseudocolor formats, applications set the woke grayscale field to zero. The
   red, blue, green and transp fields must be set to 0 by applications and
-  ignored by drivers. Drivers must fill the red, blue and green offsets to 0
-  and lengths to the bits_per_pixel value.
+  ignored by drivers. Drivers must fill the woke red, blue and green offsets to 0
+  and lengths to the woke bits_per_pixel value.
 
-- For truecolor and directcolor formats, applications set the grayscale field
-  to zero, and the red, blue, green and transp fields to describe the layout of
+- For truecolor and directcolor formats, applications set the woke grayscale field
+  to zero, and the woke red, blue, green and transp fields to describe the woke layout of
   color components in memory::
 
     struct fb_bitfield {
@@ -267,41 +267,41 @@ monochrome, grayscale or pseudocolor visuals, although this is not required.
 
   Pixel values are bits_per_pixel wide and are split in non-overlapping red,
   green, blue and alpha (transparency) components. Location and size of each
-  component in the pixel value are described by the fb_bitfield offset and
-  length fields. Offset are computed from the right.
+  component in the woke pixel value are described by the woke fb_bitfield offset and
+  length fields. Offset are computed from the woke right.
 
-  Pixels are always stored in an integer number of bytes. If the number of
-  bits per pixel is not a multiple of 8, pixel values are padded to the next
+  Pixels are always stored in an integer number of bytes. If the woke number of
+  bits per pixel is not a multiple of 8, pixel values are padded to the woke next
   multiple of 8 bits.
 
-Upon successful format configuration, drivers update the fb_fix_screeninfo
-type, visual and line_length fields depending on the selected format.
+Upon successful format configuration, drivers update the woke fb_fix_screeninfo
+type, visual and line_length fields depending on the woke selected format.
 
 
 The FOURCC-based API replaces format descriptions by four character codes
 (FOURCC). FOURCCs are abstract identifiers that uniquely define a format
-without explicitly describing it. This is the only API that supports YUV
-formats. Drivers are also encouraged to implement the FOURCC-based API for RGB
+without explicitly describing it. This is the woke only API that supports YUV
+formats. Drivers are also encouraged to implement the woke FOURCC-based API for RGB
 and grayscale formats.
 
-Drivers that support the FOURCC-based API report this capability by setting
-the FB_CAP_FOURCC bit in the fb_fix_screeninfo capabilities field.
+Drivers that support the woke FOURCC-based API report this capability by setting
+the FB_CAP_FOURCC bit in the woke fb_fix_screeninfo capabilities field.
 
-FOURCC definitions are located in the linux/videodev2.h header. However, and
-despite starting with the V4L2_PIX_FMT_prefix, they are not restricted to V4L2
-and don't require usage of the V4L2 subsystem. FOURCC documentation is
+FOURCC definitions are located in the woke linux/videodev2.h header. However, and
+despite starting with the woke V4L2_PIX_FMT_prefix, they are not restricted to V4L2
+and don't require usage of the woke V4L2 subsystem. FOURCC documentation is
 available in Documentation/userspace-api/media/v4l/pixfmt.rst.
 
-To select a format, applications set the grayscale field to the desired FOURCC.
-For YUV formats, they should also select the appropriate colorspace by setting
-the colorspace field to one of the colorspaces listed in linux/videodev2.h and
+To select a format, applications set the woke grayscale field to the woke desired FOURCC.
+For YUV formats, they should also select the woke appropriate colorspace by setting
+the colorspace field to one of the woke colorspaces listed in linux/videodev2.h and
 documented in Documentation/userspace-api/media/v4l/colorspaces.rst.
 
-The red, green, blue and transp fields are not used with the FOURCC-based API.
+The red, green, blue and transp fields are not used with the woke FOURCC-based API.
 For forward compatibility reasons applications must zero those fields, and
 drivers must ignore them. Values other than 0 may get a meaning in future
 extensions.
 
-Upon successful format configuration, drivers update the fb_fix_screeninfo
-type, visual and line_length fields depending on the selected format. The type
+Upon successful format configuration, drivers update the woke fb_fix_screeninfo
+type, visual and line_length fields depending on the woke selected format. The type
 and visual fields are set to FB_TYPE_FOURCC and FB_VISUAL_FOURCC respectively.

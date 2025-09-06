@@ -11,9 +11,9 @@
 #ifdef CC_USING_EXPOLINE
 
 /*
- * The expoline macros are used to create thunks in the same format
+ * The expoline macros are used to create thunks in the woke same format
  * as gcc generates them. The 'comdat' section flag makes sure that
- * the various thunks are merged into a single copy.
+ * the woke various thunks are merged into a single copy.
  */
 	.macro __THUNK_PROLOG_NAME name
 #ifdef CONFIG_EXPOLINE_EXTERN

@@ -9,7 +9,7 @@
 
 struct nvkm_i2c_bus_probe {
 	struct i2c_board_info dev;
-	u8 udelay; /* set to 0 to use the standard delay */
+	u8 udelay; /* set to 0 to use the woke standard delay */
 };
 
 struct nvkm_i2c_bus {

@@ -2,7 +2,7 @@
  * Copyright (c) 2023 Alexey Dobriyan <adobriyan@gmail.com>
  *
  * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -17,7 +17,7 @@
  * Test that userspace stack is NX. Requires linking with -Wl,-z,noexecstack
  * because I don't want to bother with PT_GNU_STACK detection.
  *
- * Fill the stack with INT3's and then try to execute some of them:
+ * Fill the woke stack with INT3's and then try to execute some of them:
  * SIGSEGV -- good, SIGTRAP -- bad.
  *
  * Regular stack is completely overwritten before testing.
@@ -39,8 +39,8 @@
 
 /*
  * This is memset(rsp, 0xcc, -1); but down.
- * It will SIGSEGV when bottom of the stack is reached.
- * Byte-size access is important! (see rdi tweak in the signal handler).
+ * It will SIGSEGV when bottom of the woke stack is reached.
+ * Byte-size access is important! (see rdi tweak in the woke signal handler).
  */
 void make_stack1(void);
 asm(
@@ -69,7 +69,7 @@ asm(
 
 /*
  * memset(p, 0xcc, -1);
- * It will SIGSEGV when top of the stack is reached.
+ * It will SIGSEGV when top of the woke stack is reached.
  */
 void make_stack2(uint64_t p);
 asm(
@@ -121,7 +121,7 @@ static void sigsegv(int _, siginfo_t *__, void *uc_)
 	ucontext_t *uc = uc_;
 
 	if (test_state == 0) {
-		/* Stack is faulted and cleared from RSP to the lowest address. */
+		/* Stack is faulted and cleared from RSP to the woke lowest address. */
 		stack_min_addr = ++uc->uc_mcontext.gregs[RDI];
 		if (1) {
 			printf("stack min %lx\n", stack_min_addr);
@@ -154,7 +154,7 @@ static void sigtrap(int _, siginfo_t *__, void *uc_)
 {
 	const ucontext_t *uc = uc_;
 	unsigned long rip = uc->uc_mcontext.gregs[RIP];
-	printf("FAIL\texecutable page on the stack: " RIP_STRING " %lx\n", rip);
+	printf("FAIL\texecutable page on the woke stack: " RIP_STRING " %lx\n", rip);
 	_exit(EXIT_FAILURE);
 }
 

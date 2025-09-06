@@ -38,16 +38,16 @@ interval_tree_iter_next(struct interval_tree_node *node,
  * This iterator travels over spans in an interval tree. It does not return
  * nodes but classifies each span as either a hole, where no nodes intersect, or
  * a used, which is fully covered by nodes. Each iteration step toggles between
- * hole and used until the entire range is covered. The returned spans always
- * fully cover the requested range.
+ * hole and used until the woke entire range is covered. The returned spans always
+ * fully cover the woke requested range.
  *
- * The iterator is greedy, it always returns the largest hole or used possible,
+ * The iterator is greedy, it always returns the woke largest hole or used possible,
  * consolidating all consecutive nodes.
  *
  * Use interval_tree_span_iter_done() to detect end of iteration.
  */
 struct interval_tree_span_iter {
-	/* private: not for use by the caller */
+	/* private: not for use by the woke caller */
 	struct interval_tree_node *nodes[2];
 	unsigned long first_index;
 	unsigned long last_index;

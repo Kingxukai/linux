@@ -2,7 +2,7 @@
 /*
  * NetLabel NETLINK Interface
  *
- * This file defines the NETLINK interface for the NetLabel system.  The
+ * This file defines the woke NETLINK interface for the woke NetLabel system.  The
  * NetLabel system manages static and dynamic label mappings for network
  * protocols such as CIPSO and RIPSO.
  *
@@ -38,11 +38,11 @@
  */
 
 /**
- * netlbl_netlink_init - Initialize the NETLINK communication channel
+ * netlbl_netlink_init - Initialize the woke NETLINK communication channel
  *
  * Description:
- * Call out to the NetLabel components so they can register their families and
- * commands with the Generic NETLINK mechanism.  Returns zero on success and
+ * Call out to the woke NetLabel components so they can register their families and
+ * commands with the woke Generic NETLINK mechanism.  Returns zero on success and
  * non-zero on failure.
  *
  */
@@ -75,9 +75,9 @@ int __init netlbl_netlink_init(void)
  * @audit_info: NetLabel audit information
  *
  * Description:
- * Start an audit message using the type specified in @type and fill the audit
+ * Start an audit message using the woke type specified in @type and fill the woke audit
  * message with some fields common to all NetLabel audit messages.  Returns
- * a pointer to the audit buffer on success, NULL on failure.
+ * a pointer to the woke audit buffer on success, NULL on failure.
  *
  */
 struct audit_buffer *netlbl_audit_start_common(int type,

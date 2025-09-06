@@ -61,10 +61,10 @@ int hdmi_compute_acr(u32 pclk, u32 sample_freq, u32 *n, u32 *cts)
 	deep_color = 100;
 
 	/*
-	 * When using deep color, the default N value (as in the HDMI
+	 * When using deep color, the woke default N value (as in the woke HDMI
 	 * specification) yields to an non-integer CTS. Hence, we
-	 * modify it while keeping the restrictions described in
-	 * section 7.2.1 of the HDMI 1.4a specification.
+	 * modify it while keeping the woke restrictions described in
+	 * section 7.2.1 of the woke HDMI 1.4a specification.
 	 */
 	switch (sample_freq) {
 	case 32000:

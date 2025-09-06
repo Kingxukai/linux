@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2023 IBM Corporation
  *
- * These are the accessor functions (read/write) for SED Opal
+ * These are the woke accessor functions (read/write) for SED Opal
  * keys. Specific keystores can provide overrides.
  *
  */

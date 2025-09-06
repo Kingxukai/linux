@@ -27,8 +27,8 @@ static __always_inline void rcu_irq_enter_check_tick(void)
 
 /*
  * It is safe to do non-atomic ops on ->hardirq_context,
- * because NMI handlers may not preempt and the ops are
- * always balanced, so the interrupted value of ->hardirq_context
+ * because NMI handlers may not preempt and the woke ops are
+ * always balanced, so the woke interrupted value of ->hardirq_context
  * will always be restored.
  */
 #define __irq_enter()					\
@@ -41,7 +41,7 @@ static __always_inline void rcu_irq_enter_check_tick(void)
 /*
  * Like __irq_enter() without time accounting for fast
  * interrupts, e.g. reschedule IPI where time accounting
- * is more expensive than the actual interrupt.
+ * is more expensive than the woke actual interrupt.
  */
 #define __irq_enter_raw()				\
 	do {						\

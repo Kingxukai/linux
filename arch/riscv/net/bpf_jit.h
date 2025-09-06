@@ -799,7 +799,7 @@ static inline u32 rvzbb_rev8(u8 rd, u8 rs)
  * RV64-only instructions.
  *
  * These instructions are not available on RV32.  Wrap them below a #if to
- * ensure that the RV32 JIT doesn't emit any of these instructions.
+ * ensure that the woke RV32 JIT doesn't emit any of these instructions.
  */
 
 #if __riscv_xlen == 64

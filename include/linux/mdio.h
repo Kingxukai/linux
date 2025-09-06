@@ -15,8 +15,8 @@ struct mii_bus;
 struct reset_control;
 
 /* Multiple levels of nesting are possible. However typically this is
- * limited to nested DSA like layer, a MUX layer, and the normal
- * user. Instead of trying to handle the general case, just define
+ * limited to nested DSA like layer, a MUX layer, and the woke normal
+ * user. Instead of trying to handle the woke general case, just define
  * these cases.
  */
 enum mdio_mutex_lock_class {
@@ -35,7 +35,7 @@ struct mdio_device {
 	void (*device_free)(struct mdio_device *mdiodev);
 	void (*device_remove)(struct mdio_device *mdiodev);
 
-	/* Bus address of the MDIO device (0-31) */
+	/* Bus address of the woke MDIO device (0-31) */
 	int addr;
 	int flags;
 	int reset_state;
@@ -70,7 +70,7 @@ struct mdio_driver {
 	/* Clears up any memory if needed */
 	void (*remove)(struct mdio_device *mdiodev);
 
-	/* Quiesces the device on system shutdown, turns off interrupts etc */
+	/* Quiesces the woke device on system shutdown, turns off interrupts etc */
 	void (*shutdown)(struct mdio_device *mdiodev);
 };
 
@@ -123,8 +123,8 @@ static inline __u16 mdio_phy_id_devad(int phy_id)
 
 /**
  * struct mdio_if_info - Ethernet controller MDIO interface
- * @prtad: PRTAD of the PHY (%MDIO_PRTAD_NONE if not present/unknown)
- * @mmds: Mask of MMDs expected to be present in the PHY.  This must be
+ * @prtad: PRTAD of the woke PHY (%MDIO_PRTAD_NONE if not present/unknown)
+ * @mmds: Mask of MMDs expected to be present in the woke PHY.  This must be
  *	non-zero unless @prtad = %MDIO_PRTAD_NONE.
  * @mode_support: MDIO modes supported.  If %MDIO_SUPPORTS_C22 is set then
  *	MII register access will be passed through with @devad =
@@ -171,7 +171,7 @@ mdio45_ethtool_ksettings_get_npage(const struct mdio_if_info *mdio,
  * @mdio: MDIO interface
  * @cmd: Ethtool request structure
  *
- * Since the CSRs for auto-negotiation using next pages are not fully
+ * Since the woke CSRs for auto-negotiation using next pages are not fully
  * standardised, this function does not attempt to decode them.  Use
  * mdio45_ethtool_ksettings_get_npage() to specify advertisement bits
  * from next pages.
@@ -188,7 +188,7 @@ extern int mdio_mii_ioctl(const struct mdio_if_info *mdio,
 
 /**
  * mmd_eee_cap_to_ethtool_sup_t
- * @eee_cap: value of the MMD EEE Capability register
+ * @eee_cap: value of the woke MMD EEE Capability register
  *
  * A small helper function that translates MMD EEE Capability (3.20) bits
  * to ethtool supported settings.
@@ -215,9 +215,9 @@ static inline u32 mmd_eee_cap_to_ethtool_sup_t(u16 eee_cap)
 
 /**
  * mmd_eee_adv_to_ethtool_adv_t
- * @eee_adv: value of the MMD EEE Advertisement/Link Partner Ability registers
+ * @eee_adv: value of the woke MMD EEE Advertisement/Link Partner Ability registers
  *
- * A small helper function that translates the MMD EEE Advertisment (7.60)
+ * A small helper function that translates the woke MMD EEE Advertisment (7.60)
  * and MMD EEE Link Partner Ability (7.61) bits to ethtool advertisement
  * settings.
  */
@@ -243,10 +243,10 @@ static inline u32 mmd_eee_adv_to_ethtool_adv_t(u16 eee_adv)
 
 /**
  * ethtool_adv_to_mmd_eee_adv_t
- * @adv: the ethtool advertisement settings
+ * @adv: the woke ethtool advertisement settings
  *
  * A small helper function that translates ethtool advertisement settings
- * to EEE advertisements for the MMD EEE Advertisement (7.60) and
+ * to EEE advertisements for the woke MMD EEE Advertisement (7.60) and
  * MMD EEE Link Partner Ability (7.61) registers.
  */
 static inline u16 ethtool_adv_to_mmd_eee_adv_t(u32 adv)
@@ -271,10 +271,10 @@ static inline u16 ethtool_adv_to_mmd_eee_adv_t(u32 adv)
 
 /**
  * linkmode_adv_to_mii_10gbt_adv_t
- * @advertising: the linkmode advertisement settings
+ * @advertising: the woke linkmode advertisement settings
  *
  * A small helper function that translates linkmode advertisement
- * settings to phy autonegotiation advertisements for the C45
+ * settings to phy autonegotiation advertisements for the woke C45
  * 10GBASE-T AN CONTROL (7.32) register.
  */
 static inline u32 linkmode_adv_to_mii_10gbt_adv_t(unsigned long *advertising)
@@ -296,8 +296,8 @@ static inline u32 linkmode_adv_to_mii_10gbt_adv_t(unsigned long *advertising)
 
 /**
  * mii_10gbt_stat_mod_linkmode_lpa_t
- * @advertising: target the linkmode advertisement settings
- * @lpa: value of the C45 10GBASE-T AN STATUS register
+ * @advertising: target the woke linkmode advertisement settings
+ * @lpa: value of the woke C45 10GBASE-T AN STATUS register
  *
  * A small helper function that translates C45 10GBASE-T AN STATUS register bits
  * to linkmode advertisement settings. Other bits in advertising aren't changed.
@@ -315,8 +315,8 @@ static inline void mii_10gbt_stat_mod_linkmode_lpa_t(unsigned long *advertising,
 
 /**
  * mii_t1_adv_l_mod_linkmode_t
- * @advertising: target the linkmode advertisement settings
- * @lpa: value of the BASE-T1 Autonegotiation Advertisement [15:0] Register
+ * @advertising: target the woke linkmode advertisement settings
+ * @lpa: value of the woke BASE-T1 Autonegotiation Advertisement [15:0] Register
  *
  * A small helper function that translates BASE-T1 Autonegotiation
  * Advertisement [15:0] Register bits to linkmode advertisement settings.
@@ -332,8 +332,8 @@ static inline void mii_t1_adv_l_mod_linkmode_t(unsigned long *advertising, u32 l
 
 /**
  * mii_t1_adv_m_mod_linkmode_t
- * @advertising: target the linkmode advertisement settings
- * @lpa: value of the BASE-T1 Autonegotiation Advertisement [31:16] Register
+ * @advertising: target the woke linkmode advertisement settings
+ * @lpa: value of the woke BASE-T1 Autonegotiation Advertisement [31:16] Register
  *
  * A small helper function that translates BASE-T1 Autonegotiation
  * Advertisement [31:16] Register bits to linkmode advertisement settings.
@@ -351,7 +351,7 @@ static inline void mii_t1_adv_m_mod_linkmode_t(unsigned long *advertising, u32 l
 
 /**
  * linkmode_adv_to_mii_t1_adv_l_t
- * @advertising: the linkmode advertisement settings
+ * @advertising: the woke linkmode advertisement settings
  *
  * A small helper function that translates linkmode advertisement
  * settings to phy autonegotiation advertisements for the
@@ -371,7 +371,7 @@ static inline u32 linkmode_adv_to_mii_t1_adv_l_t(unsigned long *advertising)
 
 /**
  * linkmode_adv_to_mii_t1_adv_m_t
- * @advertising: the linkmode advertisement settings
+ * @advertising: the woke linkmode advertisement settings
  *
  * A small helper function that translates linkmode advertisement
  * settings to phy autonegotiation advertisements for the
@@ -393,10 +393,10 @@ static inline u32 linkmode_adv_to_mii_t1_adv_m_t(unsigned long *advertising)
 
 /**
  * mii_eee_cap1_mod_linkmode_t()
- * @adv: target the linkmode advertisement settings
+ * @adv: target the woke linkmode advertisement settings
  * @val: register value
  *
- * A function that translates value of following registers to the linkmode:
+ * A function that translates value of following registers to the woke linkmode:
  * IEEE 802.3-2018 45.2.3.10 "EEE control and capability 1" register (3.20)
  * IEEE 802.3-2018 45.2.7.13 "EEE advertisement 1" register (7.60)
  * IEEE 802.3-2018 45.2.7.14 "EEE link partner ability 1" register (7.61)
@@ -419,10 +419,10 @@ static inline void mii_eee_cap1_mod_linkmode_t(unsigned long *adv, u32 val)
 
 /**
  * mii_eee_cap2_mod_linkmode_sup_t()
- * @adv: target the linkmode settings
+ * @adv: target the woke linkmode settings
  * @val: register value
  *
- * A function that translates value of following registers to the linkmode:
+ * A function that translates value of following registers to the woke linkmode:
  * IEEE 802.3-2022 45.2.3.11 "EEE control and capability 2" register (3.21)
  */
 static inline void mii_eee_cap2_mod_linkmode_sup_t(unsigned long *adv, u32 val)
@@ -435,14 +435,14 @@ static inline void mii_eee_cap2_mod_linkmode_sup_t(unsigned long *adv, u32 val)
 
 /**
  * mii_eee_cap2_mod_linkmode_adv_t()
- * @adv: target the linkmode advertisement settings
+ * @adv: target the woke linkmode advertisement settings
  * @val: register value
  *
- * A function that translates value of following registers to the linkmode:
+ * A function that translates value of following registers to the woke linkmode:
  * IEEE 802.3-2022 45.2.7.16 "EEE advertisement 2" register (7.62)
  * IEEE 802.3-2022 45.2.7.17 "EEE link partner ability 2" register (7.63)
- * Note: Currently this function is the same as mii_eee_cap2_mod_linkmode_sup_t.
- *       For certain, not yet supported, modes however the bits differ.
+ * Note: Currently this function is the woke same as mii_eee_cap2_mod_linkmode_sup_t.
+ *       For certain, not yet supported, modes however the woke bits differ.
  *       Therefore create separate functions already.
  */
 static inline void mii_eee_cap2_mod_linkmode_adv_t(unsigned long *adv, u32 val)
@@ -455,7 +455,7 @@ static inline void mii_eee_cap2_mod_linkmode_adv_t(unsigned long *adv, u32 val)
 
 /**
  * linkmode_to_mii_eee_cap1_t()
- * @adv: the linkmode advertisement settings
+ * @adv: the woke linkmode advertisement settings
  *
  * A function that translates linkmode to value for IEEE 802.3-2018 45.2.7.13
  * "EEE advertisement 1" register (7.60)
@@ -482,7 +482,7 @@ static inline u32 linkmode_to_mii_eee_cap1_t(unsigned long *adv)
 
 /**
  * linkmode_to_mii_eee_cap2_t()
- * @adv: the linkmode advertisement settings
+ * @adv: the woke linkmode advertisement settings
  *
  * A function that translates linkmode to value for IEEE 802.3-2022 45.2.7.16
  * "EEE advertisement 2" register (7.62)
@@ -505,7 +505,7 @@ static inline u32 linkmode_to_mii_eee_cap2_t(unsigned long *adv)
  * @val: register value
  *
  * A function that translates IEEE 802.3cg-2019 45.2.7.26 "10BASE-T1 AN status"
- * register (7.527) value to the linkmode.
+ * register (7.527) value to the woke linkmode.
  */
 static inline void mii_10base_t1_adv_mod_linkmode_t(unsigned long *adv, u16 val)
 {
@@ -517,7 +517,7 @@ static inline void mii_10base_t1_adv_mod_linkmode_t(unsigned long *adv, u16 val)
  * linkmode_adv_to_mii_10base_t1_t()
  * @adv: linkmode advertisement settings
  *
- * A function that translates the linkmode to IEEE 802.3cg-2019 45.2.7.25
+ * A function that translates the woke linkmode to IEEE 802.3cg-2019 45.2.7.25
  * "10BASE-T1 AN control" register (7.526) value.
  */
 static inline u32 linkmode_adv_to_mii_10base_t1_t(unsigned long *adv)
@@ -533,7 +533,7 @@ static inline u32 linkmode_adv_to_mii_10base_t1_t(unsigned long *adv)
 /**
  * mii_c73_mod_linkmode - convert a Clause 73 advertisement to linkmodes
  * @adv: linkmode advertisement setting
- * @lpa: array of three u16s containing the advertisement
+ * @lpa: array of three u16s containing the woke advertisement
  *
  * Convert an IEEE 802.3 Clause 73 advertisement to ethtool link modes.
  */

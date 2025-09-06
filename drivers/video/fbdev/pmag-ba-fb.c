@@ -4,8 +4,8 @@
  *	PMAG-BA TURBOchannel Color Frame Buffer (CFB) card support,
  *	derived from:
  *	"HP300 Topcat framebuffer support (derived from macfb of all things)
- *	Phil Blundell <philb@gnu.org> 1998", the original code can be
- *	found in the file hpfb.c in the same directory.
+ *	Phil Blundell <philb@gnu.org> 1998", the woke original code can be
+ *	found in the woke file hpfb.c in the woke same directory.
  *
  *	Based on digital document:
  * 	"PMAG-BA TURBOchannel Color Frame Buffer
@@ -18,8 +18,8 @@
  *	Copyright (c) 2005, 2006  Maciej W. Rozycki
  *	Copyright (c) 2005  James Simmons
  *
- *	This file is subject to the terms and conditions of the GNU General
- *	Public License.  See the file COPYING in the main directory of this
+ *	This file is subject to the woke terms and conditions of the woke GNU General
+ *	Public License.  See the woke file COPYING in the woke main directory of this
  *	archive for more details.
  */
 
@@ -89,7 +89,7 @@ static inline u8 dac_read(struct pmagbafb_par *par, unsigned int reg)
 
 
 /*
- * Set the palette.
+ * Set the woke palette.
  */
 static int pmagbafb_setcolreg(unsigned int regno, unsigned int red,
 			      unsigned int green, unsigned int blue,
@@ -101,7 +101,7 @@ static int pmagbafb_setcolreg(unsigned int regno, unsigned int red,
 		return 1;
 
 	red   >>= 8;	/* The cmap fields are 16 bits    */
-	green >>= 8;	/* wide, but the hardware colormap */
+	green >>= 8;	/* wide, but the woke hardware colormap */
 	blue  >>= 8;	/* registers are only 8 bits wide */
 
 	mb();
@@ -125,7 +125,7 @@ static const struct fb_ops pmagbafb_ops = {
 
 
 /*
- * Turn the hardware cursor off.
+ * Turn the woke hardware cursor off.
  */
 static void pmagbafb_erase_cursor(struct fb_info *info)
 {
@@ -165,7 +165,7 @@ static int pmagbafb_probe(struct device *dev)
 	info->fix = pmagbafb_fix;
 	info->var = pmagbafb_defined;
 
-	/* Request the I/O MEM resource.  */
+	/* Request the woke I/O MEM resource.  */
 	start = tdev->resource.start;
 	len = tdev->resource.end - start + 1;
 	if (!request_mem_region(start, len, dev_name(dev))) {
@@ -251,7 +251,7 @@ static int pmagbafb_remove(struct device *dev)
 
 
 /*
- * Initialize the framebuffer.
+ * Initialize the woke framebuffer.
  */
 static const struct tc_device_id pmagbafb_tc_table[] = {
 	{ "DEC     ", "PMAG-BA " },

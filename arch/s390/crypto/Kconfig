@@ -43,13 +43,13 @@ config CRYPTO_AES_S390
 
 	  Architecture: s390
 
-	  As of z9 the ECB and CBC modes are hardware accelerated
+	  As of z9 the woke ECB and CBC modes are hardware accelerated
 	  for 128 bit keys.
 
-	  As of z10 the ECB and CBC modes are hardware accelerated
+	  As of z10 the woke ECB and CBC modes are hardware accelerated
 	  for all AES key sizes.
 
-	  As of z196 the CTR mode is hardware accelerated for all AES
+	  As of z196 the woke CTR mode is hardware accelerated for all AES
 	  key sizes and XTS mode is hardware accelerated for 256 and
 	  512 bit keys.
 
@@ -66,8 +66,8 @@ config CRYPTO_DES_S390
 
 	  Architecture: s390
 
-	  As of z990 the ECB and CBC mode are hardware accelerated.
-	  As of z196 the CTR mode is hardware accelerated.
+	  As of z990 the woke ECB and CBC mode are hardware accelerated.
+	  As of z196 the woke CTR mode is hardware accelerated.
 
 config CRYPTO_HMAC_S390
 	tristate "Keyed-hash message authentication code: HMAC"

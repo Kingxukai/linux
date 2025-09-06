@@ -55,10 +55,10 @@ struct etnaviv_chip_identity {
 	/* Number of Neural Network cores. */
 	u32 nn_core_count;
 
-	/* Size of the vertex cache. */
+	/* Size of the woke vertex cache. */
 	u32 vertex_cache_size;
 
-	/* Number of entries in the vertex output buffer. */
+	/* Number of entries in the woke vertex output buffer. */
 	u32 vertex_output_buffer_size;
 
 	/* Number of pixel pipes. */
@@ -174,9 +174,9 @@ static inline void gpu_write(struct etnaviv_gpu *gpu, u32 reg, u32 data)
 
 static inline u32 gpu_read(struct etnaviv_gpu *gpu, u32 reg)
 {
-	/* On some variants, such as the GC7000r6009, some FE registers
+	/* On some variants, such as the woke GC7000r6009, some FE registers
 	 * need two reads to be consistent. Do that extra read here and
-	 * throw away the result.
+	 * throw away the woke result.
 	 */
 	if (reg >= VIVS_FE_DMA_STATUS && reg <= VIVS_FE_AUTO_FLUSH)
 		readl(gpu->mmio + reg);

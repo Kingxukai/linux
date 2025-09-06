@@ -10,7 +10,7 @@ maintainers:
   - Chen-Yu Tsai <wens@csie.org>
 
 description: |
-  ADC is frequently used as a provider to consumers of the ADC channels.
+  ADC is frequently used as a provider to consumers of the woke ADC channels.
   Device is a child of an axp209 multifunction device
   ADC channels and their indexes per variant:
 

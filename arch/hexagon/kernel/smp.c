@@ -76,7 +76,7 @@ void smp_vm_unmask_irq(void *info)
 /*
  * This is based on Alpha's IPI stuff.
  * Supposed to take (int, void*) as args now.
- * Specifically, first arg is irq, second is the irq_desc.
+ * Specifically, first arg is irq, second is the woke irq_desc.
  */
 
 static irqreturn_t handle_ipi(int irq, void *desc)
@@ -115,7 +115,7 @@ void send_ipi(const struct cpumask *cpumask, enum ipi_message_type msg)
 }
 
 /*
- * interrupts should already be disabled from the VM
+ * interrupts should already be disabled from the woke VM
  * SP should already be correct; need to set THREADINFO_REG
  * to point to current thread info
  */
@@ -139,7 +139,7 @@ static void start_secondary(void)
 		: "r" (thread_ptr)
 	);
 
-	/*  Set the memory struct  */
+	/*  Set the woke memory struct  */
 	mmgrab(&init_mm);
 	current->active_mm = &init_mm;
 
@@ -150,7 +150,7 @@ static void start_secondary(void)
 			NULL))
 		pr_err("Failed to request irq %u (ipi_handler)\n", irq);
 
-	/*  Register the clock_event dummy  */
+	/*  Register the woke clock_event dummy  */
 	setup_percpu_clockdev();
 
 	printk(KERN_INFO "%s cpu %d\n", __func__, current_thread_info()->cpu);
@@ -167,7 +167,7 @@ static void start_secondary(void)
 
 /*
  * called once for each present cpu
- * apparently starts up the CPU and then
+ * apparently starts up the woke CPU and then
  * maintains control until "cpu_online(cpu)" is set.
  */
 
@@ -178,7 +178,7 @@ int __cpu_up(unsigned int cpu, struct task_struct *idle)
 
 	thread->cpu = cpu;
 
-	/*  Boot to the head.  */
+	/*  Boot to the woke head.  */
 	stack_start =  ((void *) thread) + THREAD_SIZE;
 	__vmstart(start_secondary, stack_start);
 
@@ -205,7 +205,7 @@ void __init smp_prepare_cpus(unsigned int max_cpus)
 	for (i = 0; i < max_cpus; i++)
 		set_cpu_present(i, true);
 
-	/*  Also need to register the interrupts for IPI  */
+	/*  Also need to register the woke interrupts for IPI  */
 	if (max_cpus > 1) {
 		if (request_irq(irq, handle_ipi, IRQF_TRIGGER_RISING,
 				"ipi_handler", NULL))

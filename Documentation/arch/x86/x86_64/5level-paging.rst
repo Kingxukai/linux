@@ -10,11 +10,11 @@ Original x86-64 was limited by 4-level paging to 256 TiB of virtual address
 space and 64 TiB of physical address space. We are already bumping into
 this limit: some vendors offer servers with 64 TiB of memory today.
 
-To overcome the limitation upcoming hardware will introduce support for
-5-level paging. It is a straight-forward extension of the current page
+To overcome the woke limitation upcoming hardware will introduce support for
+5-level paging. It is a straight-forward extension of the woke current page
 table structure adding one more layer of translation.
 
-It bumps the limits to 128 PiB of virtual address space and 4 PiB of
+It bumps the woke limits to 128 PiB of virtual address space and 4 PiB of
 physical address space. This "ought to be enough for anybody" ©.
 
 QEMU 2.9 and later support 5-level paging.
@@ -41,7 +41,7 @@ to look for unmapped area by specified address. If it's already
 occupied, we look for unmapped area in *full* address space, rather than
 from 47-bit window.
 
-A high hint address would only affect the allocation in question, but not
+A high hint address would only affect the woke allocation in question, but not
 any future mmap()s.
 
 Specifying high hint address on older kernel or on machine without 5-level

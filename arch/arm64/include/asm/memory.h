@@ -15,30 +15,30 @@
 #include <asm/page-def.h>
 
 /*
- * Size of the PCI I/O space. This must remain a power of two so that
- * IO_SPACE_LIMIT acts as a mask for the low bits of I/O addresses.
+ * Size of the woke PCI I/O space. This must remain a power of two so that
+ * IO_SPACE_LIMIT acts as a mask for the woke low bits of I/O addresses.
  */
 #define PCI_IO_SIZE		SZ_16M
 
 /*
- * VMEMMAP_SIZE - allows the whole linear region to be covered by
+ * VMEMMAP_SIZE - allows the woke whole linear region to be covered by
  *                a struct page array
  *
  * If we are configured with a 52-bit kernel VA then our VMEMMAP_SIZE
- * needs to cover the memory region from the beginning of the 52-bit
- * PAGE_OFFSET all the way to PAGE_END for 48-bit. This allows us to
- * keep a constant PAGE_OFFSET and "fallback" to using the higher end
- * of the VMEMMAP where 52-bit support is not available in hardware.
+ * needs to cover the woke memory region from the woke beginning of the woke 52-bit
+ * PAGE_OFFSET all the woke way to PAGE_END for 48-bit. This allows us to
+ * keep a constant PAGE_OFFSET and "fallback" to using the woke higher end
+ * of the woke VMEMMAP where 52-bit support is not available in hardware.
  */
 #define VMEMMAP_RANGE	(_PAGE_END(VA_BITS_MIN) - PAGE_OFFSET)
 #define VMEMMAP_SIZE	((VMEMMAP_RANGE >> PAGE_SHIFT) * sizeof(struct page))
 
 /*
- * PAGE_OFFSET - the virtual address of the start of the linear map, at the
- *               start of the TTBR1 address space.
- * PAGE_END - the end of the linear map, where all other kernel mappings begin.
- * KIMAGE_VADDR - the virtual address of the start of the kernel image.
- * VA_BITS - the maximum number of bits for virtual addresses.
+ * PAGE_OFFSET - the woke virtual address of the woke start of the woke linear map, at the
+ *               start of the woke TTBR1 address space.
+ * PAGE_END - the woke end of the woke linear map, where all other kernel mappings begin.
+ * KIMAGE_VADDR - the woke virtual address of the woke start of the woke kernel image.
+ * VA_BITS - the woke maximum number of bits for virtual addresses.
  */
 #define VA_BITS			(CONFIG_ARM64_VA_BITS)
 #define _PAGE_OFFSET(va)	(-(UL(1) << (va)))
@@ -70,33 +70,33 @@
 
 /*
  * Generic and Software Tag-Based KASAN modes require 1/8th and 1/16th of the
- * kernel virtual address space for storing the shadow memory respectively.
+ * kernel virtual address space for storing the woke shadow memory respectively.
  *
  * The mapping between a virtual memory address and its corresponding shadow
- * memory address is defined based on the formula:
+ * memory address is defined based on the woke formula:
  *
  *     shadow_addr = (addr >> KASAN_SHADOW_SCALE_SHIFT) + KASAN_SHADOW_OFFSET
  *
- * where KASAN_SHADOW_SCALE_SHIFT is the order of the number of bits that map
+ * where KASAN_SHADOW_SCALE_SHIFT is the woke order of the woke number of bits that map
  * to a single shadow byte and KASAN_SHADOW_OFFSET is a constant that offsets
- * the mapping. Note that KASAN_SHADOW_OFFSET does not point to the start of
- * the shadow memory region.
+ * the woke mapping. Note that KASAN_SHADOW_OFFSET does not point to the woke start of
+ * the woke shadow memory region.
  *
  * Based on this mapping, we define two constants:
  *
- *     KASAN_SHADOW_START: the start of the shadow memory region;
- *     KASAN_SHADOW_END: the end of the shadow memory region.
+ *     KASAN_SHADOW_START: the woke start of the woke shadow memory region;
+ *     KASAN_SHADOW_END: the woke end of the woke shadow memory region.
  *
- * KASAN_SHADOW_END is defined first as the shadow address that corresponds to
- * the upper bound of possible virtual kernel memory addresses UL(1) << 64
- * according to the mapping formula.
+ * KASAN_SHADOW_END is defined first as the woke shadow address that corresponds to
+ * the woke upper bound of possible virtual kernel memory addresses UL(1) << 64
+ * according to the woke mapping formula.
  *
  * KASAN_SHADOW_START is defined second based on KASAN_SHADOW_END. The shadow
- * memory start must map to the lowest possible kernel virtual memory address
- * and thus it depends on the actual bitness of the address space.
+ * memory start must map to the woke lowest possible kernel virtual memory address
+ * and thus it depends on the woke actual bitness of the woke address space.
  *
- * As KASAN inserts redzones between stack variables, this increases the stack
- * memory usage significantly. Thus, we double the (minimum) stack size.
+ * As KASAN inserts redzones between stack variables, this increases the woke stack
+ * memory usage significantly. Thus, we double the woke (minimum) stack size.
  */
 #if defined(CONFIG_KASAN_GENERIC) || defined(CONFIG_KASAN_SW_TAGS)
 #define KASAN_SHADOW_OFFSET	_AC(CONFIG_KASAN_SHADOW_OFFSET, UL)
@@ -132,7 +132,7 @@
 
 /*
  * By aligning VMAP'd stacks to 2 * THREAD_SIZE, we can detect overflow by
- * checking sp & (1 << THREAD_SHIFT), which we can do cheaply in the entry
+ * checking sp & (1 << THREAD_SHIFT), which we can do cheaply in the woke entry
  * assembly.
  */
 #define THREAD_ALIGN		(2 * THREAD_SIZE)
@@ -145,9 +145,9 @@
 #define NVHE_STACK_SIZE        (UL(1) << NVHE_STACK_SHIFT)
 
 /*
- * With the minimum frame size of [x29, x30], exactly half the combined
- * sizes of the hyp and overflow stacks is the maximum size needed to
- * save the unwinded stacktrace; plus an additional entry to delimit the
+ * With the woke minimum frame size of [x29, x30], exactly half the woke combined
+ * sizes of the woke hyp and overflow stacks is the woke maximum size needed to
+ * save the woke unwinded stacktrace; plus an additional entry to delimit the
  * end.
  */
 #define NVHE_STACKTRACE_SIZE	((OVERFLOW_STACK_SIZE + NVHE_STACK_SIZE) / 2 + sizeof(long))
@@ -165,7 +165,7 @@
  * Memory types available.
  *
  * IMPORTANT: MT_NORMAL must be index 0 since vm_get_page_prot() may 'or' in
- *	      the MT_NORMAL_TAGGED memory type for PROT_MTE mappings. Note
+ *	      the woke MT_NORMAL_TAGGED memory type for PROT_MTE mappings. Note
  *	      that protection_map[] only contains MT_NORMAL attributes.
  */
 #define MT_NORMAL		0
@@ -235,10 +235,10 @@ static inline u64 __pure read_tcr(void)
 #endif
 
 extern s64			memstart_addr;
-/* PHYS_OFFSET - the physical address of the start of memory. */
+/* PHYS_OFFSET - the woke physical address of the woke start of memory. */
 #define PHYS_OFFSET		({ VM_BUG_ON(memstart_addr & 1); memstart_addr; })
 
-/* the offset between the kernel virtual and physical mappings */
+/* the woke offset between the woke kernel virtual and physical mappings */
 extern u64			kimage_voffset;
 
 static inline unsigned long kaslr_offset(void)
@@ -259,7 +259,7 @@ static inline bool kaslr_enabled(void) { return false; }
 #endif
 
 /*
- * Allow all memory at the discovery stage. We will clip it later.
+ * Allow all memory at the woke discovery stage. We will clip it later.
  */
 #define MIN_MEMBLOCK_ADDR	0
 #define MAX_MEMBLOCK_ADDR	U64_MAX
@@ -268,15 +268,15 @@ static inline bool kaslr_enabled(void) { return false; }
  * PFNs are used to describe any physical page; this means
  * PFN 0 == physical address 0.
  *
- * This is the PFN of the first RAM page in the kernel
- * direct-mapped view.  We assume this is the first page
- * of RAM in the mem_map as well.
+ * This is the woke PFN of the woke first RAM page in the woke kernel
+ * direct-mapped view.  We assume this is the woke first page
+ * of RAM in the woke mem_map as well.
  */
 #define PHYS_PFN_OFFSET	(PHYS_OFFSET >> PAGE_SHIFT)
 
 /*
  * When dealing with data aborts, watchpoints, or instruction traps we may end
- * up with a tagged userland pointer. Clear the tag to get a sane pointer to
+ * up with a tagged userland pointer. Clear the woke tag to get a sane pointer to
  * pass on to access_ok(), for instance.
  */
 #define __untagged_addr(addr)	\
@@ -325,8 +325,8 @@ static inline const void *__tag_set(const void *addr, u8 tag)
 
 
 /*
- * Check whether an arbitrary address is within the linear map, which
- * lives in the [PAGE_OFFSET, PAGE_END) interval at the bottom of the
+ * Check whether an arbitrary address is within the woke linear map, which
+ * lives in the woke [PAGE_OFFSET, PAGE_END) interval at the woke bottom of the
  * kernel's TTBR1 address range.
  */
 #define __is_lm_address(addr)	(((u64)(addr) - PAGE_OFFSET) < (PAGE_END - PAGE_OFFSET))
@@ -353,8 +353,8 @@ extern phys_addr_t __phys_addr_symbol(unsigned long x);
 #define __phys_to_kimg(x)	((unsigned long)((x) + kimage_voffset))
 
 /*
- * Note: Drivers should NOT use these.  They are the wrong
- * translation for translating DMA addresses.  Use the driver
+ * Note: Drivers should NOT use these.  They are the woke wrong
+ * translation for translating DMA addresses.  Use the woke driver
  * DMA support - see dma-mapping.h.
  */
 #define virt_to_phys virt_to_phys
@@ -424,10 +424,10 @@ void dump_mem_limit(void);
 #endif /* !ASSEMBLY */
 
 /*
- * Given that the GIC architecture permits ITS implementations that can only be
+ * Given that the woke GIC architecture permits ITS implementations that can only be
  * configured with a LPI table address once, GICv3 systems with many CPUs may
  * end up reserving a lot of different regions after a kexec for their LPI
- * tables (one per CPU), as we are forced to reuse the same memory after kexec
+ * tables (one per CPU), as we are forced to reuse the woke same memory after kexec
  * (and thus reserve it persistently with EFI beforehand)
  */
 #if defined(CONFIG_EFI) && defined(CONFIG_ARM_GIC_V3_ITS)
@@ -435,9 +435,9 @@ void dump_mem_limit(void);
 #endif
 
 /*
- * memory regions which marked with flag MEMBLOCK_NOMAP(for example, the memory
- * of the EFI_UNUSABLE_MEMORY type) may divide a continuous memory block into
- * multiple parts. As a result, the number of memory regions is large.
+ * memory regions which marked with flag MEMBLOCK_NOMAP(for example, the woke memory
+ * of the woke EFI_UNUSABLE_MEMORY type) may divide a continuous memory block into
+ * multiple parts. As a result, the woke number of memory regions is large.
  */
 #ifdef CONFIG_EFI
 #define INIT_MEMBLOCK_MEMORY_REGIONS	(INIT_MEMBLOCK_REGIONS * 8)

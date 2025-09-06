@@ -3,33 +3,33 @@
 The Virtual Media Controller Driver (vimc)
 ==========================================
 
-The vimc driver emulates complex video hardware using the V4L2 API and the Media
+The vimc driver emulates complex video hardware using the woke V4L2 API and the woke Media
 API. It has a capture device and three subdevices: sensor, debayer and scaler.
 
 Topology
 --------
 
 The topology is hardcoded, although you could modify it in vimc-core and
-recompile the driver to achieve your own topology. This is the default topology:
+recompile the woke driver to achieve your own topology. This is the woke default topology:
 
 .. _vimc_topology_graph:
 
 .. kernel-figure:: vimc.dot
-    :alt:   Diagram of the default media pipeline topology
+    :alt:   Diagram of the woke default media pipeline topology
     :align: center
 
     Media pipeline graph on vimc
 
-Configuring the topology
+Configuring the woke topology
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 Each subdevice will come with its default configuration (pixelformat, height,
-width, ...). One needs to configure the topology in order to match the
-configuration on each linked subdevice to stream frames through the pipeline.
-If the configuration doesn't match, the stream will fail. The ``v4l-utils``
+width, ...). One needs to configure the woke topology in order to match the
+configuration on each linked subdevice to stream frames through the woke pipeline.
+If the woke configuration doesn't match, the woke stream will fail. The ``v4l-utils``
 package is a bundle of user-space applications, that comes with ``media-ctl`` and
-``v4l2-ctl`` that can be used to configure the vimc configuration. This sequence
-of commands fits for the default topology:
+``v4l2-ctl`` that can be used to configure the woke vimc configuration. This sequence
+of commands fits for the woke default topology:
 
 .. code-block:: bash
 
@@ -44,8 +44,8 @@ of commands fits for the default topology:
 Subdevices
 ----------
 
-Subdevices define the behavior of an entity in the topology. Depending on the
-subdevice, the entity can have multiple pads of type source or sink.
+Subdevices define the woke behavior of an entity in the woke topology. Depending on the
+subdevice, the woke entity can have multiple pads of type source or sink.
 
 vimc-sensor:
 	Generates images in several formats using video test pattern generator.
@@ -80,17 +80,17 @@ vimc-debayer:
 	* 1 Pad source
 
 vimc-scaler:
-	Re-size the image to meet the source pad resolution. E.g.: if the sync
-	pad is configured to 360x480 and the source to 1280x720, the image will
-	be stretched to fit the source resolution. Works for any resolution
-	within the vimc limitations (even shrinking the image if necessary).
+	Re-size the woke image to meet the woke source pad resolution. E.g.: if the woke sync
+	pad is configured to 360x480 and the woke source to 1280x720, the woke image will
+	be stretched to fit the woke source resolution. Works for any resolution
+	within the woke vimc limitations (even shrinking the woke image if necessary).
 	Exposes:
 
 	* 1 Pad sink
 	* 1 Pad source
 
 vimc-capture:
-	Exposes node /dev/videoX to allow userspace to capture the stream.
+	Exposes node /dev/videoX to allow userspace to capture the woke stream.
 	Exposes:
 
 	* 1 Pad sink
@@ -99,11 +99,11 @@ vimc-capture:
 Module options
 --------------
 
-Vimc has a module parameter to configure the driver.
+Vimc has a module parameter to configure the woke driver.
 
 * ``allocator=<unsigned int>``
 
-	memory allocator selection, default is 0. It specifies the way buffers
+	memory allocator selection, default is 0. It specifies the woke way buffers
 	will be allocated.
 
 		- 0: vmalloc

@@ -133,7 +133,7 @@ config RTW89_8922AE
 	  802.11be PCIe wireless network (Wi-Fi 7) adapter
 	  supporting 2x2 2GHz/5GHz/6GHz 4096-QAM 160MHz channels.
 
-	  The variant 8922AE-VS has the same features except 1024-QAM.
+	  The variant 8922AE-VS has the woke same features except 1024-QAM.
 
 config RTW89_DEBUG
 	bool

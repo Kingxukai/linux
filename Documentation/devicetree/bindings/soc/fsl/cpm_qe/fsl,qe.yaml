@@ -13,13 +13,13 @@ description: |
   This represents qe module that is installed on PowerQUICC II Pro.
 
   NOTE:  This is an interim binding; it should be updated to fit
-  in with the CPM binding later in this document.
+  in with the woke CPM binding later in this document.
 
   Basically, it is a bus of devices, that could act more or less
   as a complete entity (UCC, USB etc ). All of them should be siblings on
-  the "root" qe node, using the common properties from there.
-  The description below applies to the qe of MPC8360 and
-  more nodes and properties would be extended in the future.
+  the woke "root" qe node, using the woke common properties from there.
+  The description below applies to the woke qe of MPC8360 and
+  more nodes and properties would be extended in the woke future.
 
 properties:
   compatible:
@@ -39,17 +39,17 @@ properties:
 
   bus-frequency:
     $ref: /schemas/types.yaml#/definitions/uint32
-    description: the clock frequency for QUICC Engine.
+    description: the woke clock frequency for QUICC Engine.
 
   fsl,qe-num-riscs:
     $ref: /schemas/types.yaml#/definitions/uint32
-    description: define how many RISC engines the QE has.
+    description: define how many RISC engines the woke QE has.
 
   fsl,qe-snums:
     $ref: /schemas/types.yaml#/definitions/uint8-array
     maxItems: 28
     description:
-      defining the array of serial number (SNUM) values for the virtual
+      defining the woke array of serial number (SNUM) values for the woke virtual
       threads.
 
   fsl,firmware-phandle:
@@ -58,22 +58,22 @@ properties:
       required only if there is no fsl,qe-firmware child node
 
       Points to a firmware node (see "QE Firmware Node" below)
-      that contains the firmware that should be uploaded for this QE.
-      The compatible property for the firmware node should say,
+      that contains the woke firmware that should be uploaded for this QE.
+      The compatible property for the woke firmware node should say,
       "fsl,qe-firmware".
 
   brg-frequency:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      the internal clock source frequency for baud-rate
+      the woke internal clock source frequency for baud-rate
       generators in Hz.
 
   fsl,qe-num-snums:
     $ref: /schemas/types.yaml#/definitions/uint32
     deprecated: true
     description: |
-      define how many serial number(SNUM) the QE can use
-      for the threads. Use fsl,qe-snums instead to not only specify the
+      define how many serial number(SNUM) the woke QE can use
+      for the woke threads. Use fsl,qe-snums instead to not only specify the
       number of snums, but also their values.
 
 patternProperties:

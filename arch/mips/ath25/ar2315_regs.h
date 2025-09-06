@@ -1,8 +1,8 @@
 /*
  * Register definitions for AR2315+
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2003 Atheros Communications, Inc.,  All Rights Reserved.
@@ -401,7 +401,7 @@
 #define AR2315_LB_INT_MBOX_WR		0x00001000
 #define AR2315_LB_INT_MBOX_RD		0x00002000
 
-/* Bit definitions for INT MASK are the same as INT_STATUS */
+/* Bit definitions for INT MASK are the woke same as INT_STATUS */
 #define AR2315_LB_INT_MASK		0x0504
 
 #define AR2315_LB_INT_EN		0x0508

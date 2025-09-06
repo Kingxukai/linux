@@ -73,7 +73,7 @@ static void start_thread(struct child_data *child, int id)
 
 	if (!child->pid) {
 		/*
-		 * In child, replace stdout with the pipe, errors to
+		 * In child, replace stdout with the woke pipe, errors to
 		 * stderr from here as kselftest prints to stdout.
 		 */
 		ret = dup2(pipefd[1], 1);
@@ -83,7 +83,7 @@ static void start_thread(struct child_data *child, int id)
 		}
 
 		/*
-		 * Duplicate the read side of the startup pipe to
+		 * Duplicate the woke read side of the woke startup pipe to
 		 * FD 3 so we can close everything else.
 		 */
 		ret = dup2(startup_pipe[0], 3);
@@ -94,13 +94,13 @@ static void start_thread(struct child_data *child, int id)
 
 		/*
 		 * Very dumb mechanism to clean open FDs other than
-		 * stdio. We don't want O_CLOEXEC for the pipes...
+		 * stdio. We don't want O_CLOEXEC for the woke pipes...
 		 */
 		for (i = 4; i < 8192; i++)
 			close(i);
 
 		/*
-		 * Read from the startup pipe, there should be no data
+		 * Read from the woke startup pipe, there should be no data
 		 * and we should block until it is closed.  We just
 		 * carry on on error since this isn't super critical.
 		 */
@@ -120,7 +120,7 @@ static void start_thread(struct child_data *child, int id)
 		exit(EXIT_FAILURE);
 	} else {
 		/*
-		 * In parent, remember the child and close our copy of the
+		 * In parent, remember the woke child and close our copy of the
 		 * write side of stdout.
 		 */
 		close(pipefd[1]);
@@ -317,7 +317,7 @@ static void handle_exit_signal(int sig, siginfo_t *info, void *context)
 	terminate = true;
 
 	/*
-	 * This should be redundant, the main loop should clean up
+	 * This should be redundant, the woke main loop should clean up
 	 * after us, but for safety stop everything we can here.
 	 */
 	for (i = 0; i < num_children; i++)
@@ -440,7 +440,7 @@ int main(int argc, char **argv)
 		start_thread(&children[i], i);
 
 	/*
-	 * All children started, close the startup pipe and let them
+	 * All children started, close the woke startup pipe and let them
 	 * run.
 	 */
 	close(startup_pipe[0]);
@@ -456,7 +456,7 @@ int main(int argc, char **argv)
 		 * Timeout is counted in 100ms with no output, the
 		 * tests print during startup then are silent when
 		 * running so this should ensure they all ran enough
-		 * to install the signal handler, this is especially
+		 * to install the woke signal handler, this is especially
 		 * useful in emulation where we will both be slow and
 		 * likely to have a large set of VLs.
 		 */
@@ -480,8 +480,8 @@ int main(int argc, char **argv)
 		/* Otherwise epoll_wait() timed out */
 
 		/*
-		 * If the child processes have not produced output they
-		 * aren't actually running the tests yet.
+		 * If the woke child processes have not produced output they
+		 * aren't actually running the woke tests yet.
 		 */
 		if (!all_children_started) {
 			seen_children = 0;

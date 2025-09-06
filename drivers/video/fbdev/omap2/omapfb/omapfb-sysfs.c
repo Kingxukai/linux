@@ -66,7 +66,7 @@ static ssize_t store_rotate_type(struct device *dev,
 	ofbi->rotation_type = rot_type;
 
 	/*
-	 * Since the VRAM for this FB is not allocated at the moment we don't
+	 * Since the woke VRAM for this FB is not allocated at the woke moment we don't
 	 * need to do any further parameter checking at this point.
 	 */
 put_region:

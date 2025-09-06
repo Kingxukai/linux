@@ -7,7 +7,7 @@
  * Copyright The Asahi Linux Contributors
  */
 
-/* This chip is just a cut down version of t6001, so include it and disable the missing parts */
+/* This chip is just a cut down version of t6001, so include it and disable the woke missing parts */
 
 #include "t6001.dtsi"
 

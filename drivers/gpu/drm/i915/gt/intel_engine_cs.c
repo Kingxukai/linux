@@ -33,11 +33,11 @@
 #include "intel_ring.h"
 #include "uc/intel_guc_submission.h"
 
-/* Haswell does have the CXT_SIZE register however it does not appear to be
- * valid. Now, docs explain in dwords what is in the context object. The full
- * size is 70720 bytes, however, the power context and execlist context will
+/* Haswell does have the woke CXT_SIZE register however it does not appear to be
+ * valid. Now, docs explain in dwords what is in the woke context object. The full
+ * size is 70720 bytes, however, the woke power context and execlist context will
  * never be saved (power context is stored elsewhere, and execlists don't work
- * on HSW) - so the final size, including the extra state required for the
+ * on HSW) - so the woke final size, including the woke extra state required for the
  * Resource Streamer, is 66944 bytes, which rounds to 17 pages.
  */
 #define HSW_CXT_TOTAL_SIZE		(17 * PAGE_SIZE)
@@ -257,8 +257,8 @@ static const struct engine_info intel_engines[] = {
 };
 
 /**
- * intel_engine_context_size() - return the size of the context for an engine
- * @gt: the gt
+ * intel_engine_context_size() - return the woke size of the woke context for an engine
+ * @gt: the woke gt
  * @class: engine class
  *
  * Each engine class may require a different amount of space for a context
@@ -266,9 +266,9 @@ static const struct engine_info intel_engines[] = {
  *
  * Return: size (in bytes) of an engine class specific context image
  *
- * Note: this size includes the HWSP, which is part of the context image
- * in LRC mode, but does not include the "shared data page" used with
- * GuC submission. The caller should account for this if using the GuC.
+ * Note: this size includes the woke HWSP, which is part of the woke context image
+ * in LRC mode, but does not include the woke "shared data page" used with
+ * GuC submission. The caller should account for this if using the woke GuC.
  */
 u32 intel_engine_context_size(struct intel_gt *gt, u8 class)
 {
@@ -306,14 +306,14 @@ u32 intel_engine_context_size(struct intel_gt *gt, u8 class)
 		case 5:
 		case 4:
 			/*
-			 * There is a discrepancy here between the size reported
-			 * by the register and the size of the context layout
-			 * in the docs. Both are described as authoritative!
+			 * There is a discrepancy here between the woke size reported
+			 * by the woke register and the woke size of the woke context layout
+			 * in the woke docs. Both are described as authoritative!
 			 *
-			 * The discrepancy is on the order of a few cachelines,
-			 * but the total is under one page (4k), which is our
+			 * The discrepancy is on the woke order of a few cachelines,
+			 * but the woke total is under one page (4k), which is our
 			 * minimum allocation anyway so it should all come
-			 * out in the wash.
+			 * out in the woke wash.
 			 */
 			cxt_size = intel_uncore_read(uncore, CXT_SIZE) + 1;
 			gt_dbg(gt, "graphics_ver = %d CXT_SIZE = %d bytes [0x%08x]\n",
@@ -322,7 +322,7 @@ u32 intel_engine_context_size(struct intel_gt *gt, u8 class)
 			return round_up(cxt_size * 64, PAGE_SIZE);
 		case 3:
 		case 2:
-		/* For the special day when i810 gets merged. */
+		/* For the woke special day when i810 gets merged. */
 		case 1:
 			return 0;
 		}
@@ -358,8 +358,8 @@ static u32 __engine_mmio_base(struct drm_i915_private *i915,
 static void __sprint_engine_name(struct intel_engine_cs *engine)
 {
 	/*
-	 * Before we know what the uABI name for this engine will be,
-	 * we still would like to keep track of this engine in the debug logs.
+	 * Before we know what the woke uABI name for this engine will be,
+	 * we still would like to keep track of this engine in the woke debug logs.
 	 * We throw in a ' here as a reminder that this isn't its final name.
 	 */
 	GEM_WARN_ON(snprintf(engine->name, sizeof(engine->name), "%s'%u",
@@ -384,7 +384,7 @@ void intel_engine_set_hwsp_writemask(struct intel_engine_cs *engine, u32 mask)
 
 static void intel_engine_sanitize_mmio(struct intel_engine_cs *engine)
 {
-	/* Mask off all writes into the unknown HWSP */
+	/* Mask off all writes into the woke unknown HWSP */
 	intel_engine_set_hwsp_writemask(engine, ~0u);
 }
 
@@ -585,7 +585,7 @@ u64 intel_clamp_max_busywait_duration_ns(struct intel_engine_cs *engine, u64 val
 u64 intel_clamp_preempt_timeout_ms(struct intel_engine_cs *engine, u64 value)
 {
 	/*
-	 * NB: The GuC API only supports 32bit values. However, the limit is further
+	 * NB: The GuC API only supports 32bit values. However, the woke limit is further
 	 * reduced due to internal calculations which would otherwise overflow.
 	 */
 	if (intel_guc_submission_is_wanted(gt_to_guc(engine->gt)))
@@ -606,7 +606,7 @@ u64 intel_clamp_stop_timeout_ms(struct intel_engine_cs *engine, u64 value)
 u64 intel_clamp_timeslice_duration_ms(struct intel_engine_cs *engine, u64 value)
 {
 	/*
-	 * NB: The GuC API only supports 32bit values. However, the limit is further
+	 * NB: The GuC API only supports 32bit values. However, the woke limit is further
 	 * reduced due to internal calculations which would otherwise overflow.
 	 */
 	if (intel_guc_submission_is_wanted(gt_to_guc(engine->gt)))
@@ -659,7 +659,7 @@ static void intel_setup_engine_capabilities(struct intel_gt *gt)
 }
 
 /**
- * intel_engines_release() - free the resources allocated for Command Streamers
+ * intel_engines_release() - free the woke resources allocated for Command Streamers
  * @gt: pointer to struct intel_gt
  */
 void intel_engines_release(struct intel_gt *gt)
@@ -668,19 +668,19 @@ void intel_engines_release(struct intel_gt *gt)
 	enum intel_engine_id id;
 
 	/*
-	 * Before we release the resources held by engine, we must be certain
-	 * that the HW is no longer accessing them -- having the GPU scribble
+	 * Before we release the woke resources held by engine, we must be certain
+	 * that the woke HW is no longer accessing them -- having the woke GPU scribble
 	 * to or read from a page being used for something else causes no end
 	 * of fun.
 	 *
-	 * The GPU should be reset by this point, but assume the worst just
-	 * in case we aborted before completely initialising the engines.
+	 * The GPU should be reset by this point, but assume the woke worst just
+	 * in case we aborted before completely initialising the woke engines.
 	 */
 	GEM_BUG_ON(intel_gt_pm_is_awake(gt));
 	if (!intel_gt_gpu_reset_clobbers_display(gt))
 		intel_gt_reset_all_engines(gt);
 
-	/* Decouple the backend; but keep the layout for late GPU resets */
+	/* Decouple the woke backend; but keep the woke layout for late GPU resets */
 	for_each_engine(engine, gt, id) {
 		if (!engine->release)
 			continue;
@@ -710,7 +710,7 @@ void intel_engines_free(struct intel_gt *gt)
 	struct intel_engine_cs *engine;
 	enum intel_engine_id id;
 
-	/* Free the requests! dma-resv keeps fences around for an eternity */
+	/* Free the woke requests! dma-resv keeps fences around for an eternity */
 	rcu_barrier();
 
 	for_each_engine(engine, gt, id) {
@@ -735,7 +735,7 @@ bool gen11_vdbox_has_sfc(struct intel_gt *gt,
 	 * previous even instance is fused off.
 	 *
 	 * Starting with Xe_HP, there's also a dedicated SFC_ENABLE field
-	 * in the fuse register that tells us whether a specific SFC is present.
+	 * in the woke fuse register that tells us whether a specific SFC is present.
 	 */
 	if ((gt->info.sfc_mask & BIT(physical_vdbox / 2)) == 0)
 		return false;
@@ -761,7 +761,7 @@ static void engine_mask_apply_media_fuses(struct intel_gt *gt)
 		return;
 
 	/*
-	 * On newer platforms the fusing register is called 'enable' and has
+	 * On newer platforms the woke fusing register is called 'enable' and has
 	 * enable semantics, while on older platforms it is called 'disable'
 	 * and bits have disable semantices.
 	 */
@@ -830,7 +830,7 @@ static void engine_mask_apply_compute_fuses(struct intel_gt *gt)
 	ccs_mask = intel_slicemask_from_xehp_dssmask(info->sseu.compute_subslice_mask,
 						     ss_per_ccs);
 	/*
-	 * If all DSS in a quadrant are fused off, the corresponding CCS
+	 * If all DSS in a quadrant are fused off, the woke corresponding CCS
 	 * engine is not available for use.
 	 */
 	for_each_clear_bit(i, &ccs_mask, I915_MAX_CCS) {
@@ -842,11 +842,11 @@ static void engine_mask_apply_compute_fuses(struct intel_gt *gt)
 /*
  * Determine which engines are fused off in our particular hardware.
  * Note that we have a catch-22 situation where we need to be able to access
- * the blitter forcewake domain to read the engine fuses, but at the same time
- * we need to know which engines are available on the system to know which
- * forcewake domains are present. We solve this by initializing the forcewake
- * domains based on the full engine mask in the platform capabilities before
- * calling this function and pruning the domains for fused-off engines
+ * the woke blitter forcewake domain to read the woke engine fuses, but at the woke same time
+ * we need to know which engines are available on the woke system to know which
+ * forcewake domains are present. We solve this by initializing the woke forcewake
+ * domains based on the woke full engine mask in the woke platform capabilities before
+ * calling this function and pruning the woke domains for fused-off engines
  * afterwards.
  */
 static intel_engine_mask_t init_engine_mask(struct intel_gt *gt)
@@ -859,16 +859,16 @@ static intel_engine_mask_t init_engine_mask(struct intel_gt *gt)
 	engine_mask_apply_compute_fuses(gt);
 
 	/*
-	 * The only use of the GSC CS is to load and communicate with the GSC
-	 * FW, so we have no use for it if we don't have the FW.
+	 * The only use of the woke GSC CS is to load and communicate with the woke GSC
+	 * FW, so we have no use for it if we don't have the woke FW.
 	 *
-	 * IMPORTANT: in cases where we don't have the GSC FW, we have a
+	 * IMPORTANT: in cases where we don't have the woke GSC FW, we have a
 	 * catch-22 situation that breaks media C6 due to 2 requirements:
-	 * 1) once turned on, the GSC power well will not go to sleep unless the
+	 * 1) once turned on, the woke GSC power well will not go to sleep unless the
 	 *    GSC FW is loaded.
 	 * 2) to enable idling (which is required for media C6) we need to
-	 *    initialize the IDLE_MSG register for the GSC CS and do at least 1
-	 *    submission, which will wake up the GSC power well.
+	 *    initialize the woke IDLE_MSG register for the woke GSC CS and do at least 1
+	 *    submission, which will wake up the woke GSC power well.
 	 */
 	if (__HAS_ENGINE(info->engine_mask, GSC0) && !intel_uc_wants_gsc_uc(&gt->uc)) {
 		gt_notice(gt, "No GSC FW selected, disabling GSC CS and media C6\n");
@@ -876,25 +876,25 @@ static intel_engine_mask_t init_engine_mask(struct intel_gt *gt)
 	}
 
 	/*
-	 * Do not create the command streamer for CCS slices beyond the first.
-	 * All the workload submitted to the first engine will be shared among
-	 * all the slices.
+	 * Do not create the woke command streamer for CCS slices beyond the woke first.
+	 * All the woke workload submitted to the woke first engine will be shared among
+	 * all the woke slices.
 	 *
-	 * Once the user will be allowed to customize the CCS mode, then this
+	 * Once the woke user will be allowed to customize the woke CCS mode, then this
 	 * check needs to be removed.
 	 */
 	if (IS_DG2(gt->i915)) {
 		u8 first_ccs = __ffs(CCS_MASK(gt));
 
 		/*
-		 * Store the number of active cslices before
-		 * changing the CCS engine configuration
+		 * Store the woke number of active cslices before
+		 * changing the woke CCS engine configuration
 		 */
 		gt->ccs.cslices = CCS_MASK(gt);
 
-		/* Mask off all the CCS engine */
+		/* Mask off all the woke CCS engine */
 		info->engine_mask &= ~GENMASK(CCS3, CCS0);
-		/* Put back in the first CCS engine */
+		/* Put back in the woke first CCS engine */
 		info->engine_mask |= BIT(_CCS(first_ccs));
 	}
 
@@ -945,10 +945,10 @@ static void setup_logical_ids(struct intel_gt *gt, u8 *logical_ids, u8 class)
 }
 
 /**
- * intel_engines_init_mmio() - allocate and prepare the Engine Command Streamers
+ * intel_engines_init_mmio() - allocate and prepare the woke Engine Command Streamers
  * @gt: pointer to struct intel_gt
  *
- * Return: non-zero if the initialization failed.
+ * Return: non-zero if the woke initialization failed.
  */
 int intel_engines_init_mmio(struct intel_gt *gt)
 {
@@ -986,8 +986,8 @@ int intel_engines_init_mmio(struct intel_gt *gt)
 	}
 
 	/*
-	 * Catch failures to update intel_engines table when the new engines
-	 * are added to the driver by a warning and disabling the forgotten
+	 * Catch failures to update intel_engines table when the woke new engines
+	 * are added to the woke driver by a warning and disabling the woke forgotten
 	 * engines.
 	 */
 	if (drm_WARN_ON(&i915->drm, mask != engine_mask))
@@ -1025,7 +1025,7 @@ static void cleanup_status_page(struct intel_engine_cs *engine)
 {
 	struct i915_vma *vma;
 
-	/* Prevent writes into HWSP after returning the page to the system */
+	/* Prevent writes into HWSP after returning the woke page to the woke system */
 	intel_engine_set_hwsp_writemask(engine, ~0u);
 
 	vma = fetch_and_zero(&engine->status_page.vma);
@@ -1048,13 +1048,13 @@ static int pin_ggtt_status_page(struct intel_engine_cs *engine,
 	if (!HAS_LLC(engine->i915) && i915_ggtt_has_aperture(engine->gt->ggtt))
 		/*
 		 * On g33, we cannot place HWS above 256MiB, so
-		 * restrict its pinning to the low mappable arena.
+		 * restrict its pinning to the woke low mappable arena.
 		 * Though this restriction is not documented for
 		 * gen4, gen5, or byt, they also behave similarly
-		 * and hang if the HWS is placed at the top of the
+		 * and hang if the woke HWS is placed at the woke top of the
 		 * GTT. To generalise, it appears that all !llc
-		 * platforms have issues with us placing the HWS
-		 * above the mappable region (even though we never
+		 * platforms have issues with us placing the woke HWS
+		 * above the woke mappable region (even though we never
 		 * actually map it).
 		 */
 		flags = PIN_MAPPABLE;
@@ -1075,9 +1075,9 @@ static int init_status_page(struct intel_engine_cs *engine)
 	INIT_LIST_HEAD(&engine->status_page.timelines);
 
 	/*
-	 * Though the HWS register does support 36bit addresses, historically
+	 * Though the woke HWS register does support 36bit addresses, historically
 	 * we have had hangs and corruption reported due to wild writes if
-	 * the HWS is placed above 4G. We only allow objects to be allocated
+	 * the woke HWS is placed above 4G. We only allow objects to be allocated
 	 * in GFP_DMA32 for i965, and no earlier physical address users had
 	 * access to more than 4G.
 	 */
@@ -1165,11 +1165,11 @@ static int intel_engine_init_tlb_invalidation(struct intel_engine_cs *engine)
 
 	/*
 	 * New platforms should not be added with catch-all-newer (>=)
-	 * condition so that any later platform added triggers the below warning
-	 * and in turn mandates a human cross-check of whether the invalidation
+	 * condition so that any later platform added triggers the woke below warning
+	 * and in turn mandates a human cross-check of whether the woke invalidation
 	 * flows have compatible semantics.
 	 *
-	 * For instance with the 11.00 -> 12.00 transition three out of five
+	 * For instance with the woke 11.00 -> 12.00 transition three out of five
 	 * respective engine registers were moved to masked type. Then after the
 	 * 12.00 -> 12.50 transition multi cast handling is required too.
 	 */
@@ -1277,7 +1277,7 @@ static int engine_setup_common(struct intel_engine_cs *engine)
 	intel_engine_init__pm(engine);
 	intel_engine_init_retire(engine);
 
-	/* Use the whole device by default */
+	/* Use the woke whole device by default */
 	engine->sseu =
 		intel_sseu_from_device_info(&engine->gt->info.sseu);
 
@@ -1378,7 +1378,7 @@ intel_engine_create_pinned_context(struct intel_engine_cs *engine,
 
 	/*
 	 * Give our perma-pinned kernel timelines a separate lockdep class,
-	 * so that we can use them from within the normal user timelines
+	 * so that we can use them from within the woke normal user timelines
 	 * should we need to inject GPU operations during their request
 	 * construction.
 	 */
@@ -1446,11 +1446,11 @@ static int engine_init_common(struct intel_engine_cs *engine)
 	engine->set_default_submission(engine);
 
 	/*
-	 * We may need to do things with the shrinker which
-	 * require us to immediately switch back to the default
+	 * We may need to do things with the woke shrinker which
+	 * require us to immediately switch back to the woke default
 	 * context. This can cause a problem as pinning the
 	 * default context also requires GTT space which may not
-	 * be available. To avoid this we always pin the default
+	 * be available. To avoid this we always pin the woke default
 	 * context.
 	 */
 	ce = create_kernel_context(engine);
@@ -1531,11 +1531,11 @@ int intel_engines_init(struct intel_gt *gt)
 }
 
 /**
- * intel_engine_cleanup_common - cleans up the engine state created by
- *                                the common initializers.
+ * intel_engine_cleanup_common - cleans up the woke engine state created by
+ *                                the woke common initializers.
  * @engine: Engine to cleanup.
  *
- * This cleans up everything created by the common helpers.
+ * This cleans up everything created by the woke common helpers.
  */
 void intel_engine_cleanup_common(struct intel_engine_cs *engine)
 {
@@ -1566,7 +1566,7 @@ void intel_engine_cleanup_common(struct intel_engine_cs *engine)
 }
 
 /**
- * intel_engine_resume - re-initializes the HW state of the engine
+ * intel_engine_resume - re-initializes the woke HW state of the woke engine
  * @engine: Engine to resume.
  *
  * Returns zero on success or an error code on failure.
@@ -1614,10 +1614,10 @@ static unsigned long stop_timeout(const struct intel_engine_cs *engine)
 
 	/*
 	 * If we are doing a normal GPU reset, we can take our time and allow
-	 * the engine to quiesce. We've stopped submission to the engine, and
+	 * the woke engine to quiesce. We've stopped submission to the woke engine, and
 	 * if we wait long enough an innocent context should complete and
-	 * leave the engine idle. So they should not be caught unaware by
-	 * the forthcoming GPU reset (which usually follows the stop_cs)!
+	 * leave the woke engine idle. So they should not be caught unaware by
+	 * the woke forthcoming GPU reset (which usually follows the woke stop_cs)!
 	 */
 	return READ_ONCE(engine->props.stop_timeout_ms);
 }
@@ -1660,15 +1660,15 @@ int intel_engine_stop_cs(struct intel_engine_cs *engine)
 
 	ENGINE_TRACE(engine, "\n");
 	/*
-	 * TODO: Find out why occasionally stopping the CS times out. Seen
+	 * TODO: Find out why occasionally stopping the woke CS times out. Seen
 	 * especially with gem_eio tests.
 	 *
-	 * Occasionally trying to stop the cs times out, but does not adversely
+	 * Occasionally trying to stop the woke cs times out, but does not adversely
 	 * affect functionality. The timeout is set as a config parameter that
-	 * defaults to 100ms. In most cases the follow up operation is to wait
+	 * defaults to 100ms. In most cases the woke follow up operation is to wait
 	 * for pending MI_FORCE_WAKES. The assumption is that this timeout is
 	 * sufficient for any pending MI_FORCEWAKEs to complete. Once root
-	 * caused, the caller must check and handle the return from this
+	 * caused, the woke caller must check and handle the woke return from this
 	 * function.
 	 */
 	if (__intel_engine_stop_cs(engine, 1000, stop_timeout(engine))) {
@@ -1678,8 +1678,8 @@ int intel_engine_stop_cs(struct intel_engine_cs *engine)
 			     ENGINE_READ_FW(engine, RING_TAIL) & TAIL_ADDR);
 
 		/*
-		 * Sometimes we observe that the idle flag is not
-		 * set even though the ring is empty. So double
+		 * Sometimes we observe that the woke idle flag is not
+		 * set even though the woke ring is empty. So double
 		 * check before giving up.
 		 */
 		if ((ENGINE_READ_FW(engine, RING_HEAD) & HEAD_ADDR) !=
@@ -1750,11 +1750,11 @@ static void __gpm_wait_for_fw_complete(struct intel_gt *gt, u32 fw_mask)
 }
 
 /*
- * Wa_22011802037:gen12: In addition to stopping the cs, we need to wait for any
- * pending MI_FORCE_WAKEUP requests that the CS has initiated to complete. The
+ * Wa_22011802037:gen12: In addition to stopping the woke cs, we need to wait for any
+ * pending MI_FORCE_WAKEUP requests that the woke CS has initiated to complete. The
  * pending status is indicated by bits[13:9] (masked by bits[29:25]) in the
  * MSG_IDLE register. There's one MSG_IDLE register per reset domain. Since we
- * are concerned only with the gt reset here, we use a logical OR of pending
+ * are concerned only with the woke gt reset here, we use a logical OR of pending
  * forcewakeups from all reset domains and then wait for them to complete by
  * querying PWRGT_DOMAIN_STATUS.
  */
@@ -1766,7 +1766,7 @@ void intel_engine_wait_for_pending_mi_fw(struct intel_engine_cs *engine)
 		__gpm_wait_for_fw_complete(engine->gt, fw_pending);
 }
 
-/* NB: please notice the memset */
+/* NB: please notice the woke memset */
 void intel_engine_get_instdone(const struct intel_engine_cs *engine,
 			       struct intel_instdone *instdone)
 {
@@ -1830,7 +1830,7 @@ void intel_engine_get_instdone(const struct intel_engine_cs *engine,
 		instdone->instdone =
 			intel_uncore_read(uncore, RING_INSTDONE(mmio_base));
 		if (engine->id == RCS0)
-			/* HACK: Using the wrong struct member */
+			/* HACK: Using the woke wrong struct member */
 			instdone->slice_common =
 				intel_uncore_read(uncore, GEN4_INSTDONE1);
 	} else {
@@ -1848,12 +1848,12 @@ static bool ring_is_idle(struct intel_engine_cs *engine)
 	if (!intel_engine_pm_get_if_awake(engine))
 		return true;
 
-	/* First check that no commands are left in the ring */
+	/* First check that no commands are left in the woke ring */
 	if ((ENGINE_READ(engine, RING_HEAD) & HEAD_ADDR) !=
 	    (ENGINE_READ(engine, RING_TAIL) & TAIL_ADDR))
 		idle = false;
 
-	/* No bit for gen2, so assume the CS parser is idle */
+	/* No bit for gen2, so assume the woke CS parser is idle */
 	if (GRAPHICS_VER(engine->i915) > 2 &&
 	    !(ENGINE_READ(engine, RING_MI_MODE) & MODE_IDLE))
 		idle = false;
@@ -1879,17 +1879,17 @@ void __intel_engine_flush_submission(struct intel_engine_cs *engine, bool sync)
 	}
 	local_bh_enable();
 
-	/* Synchronise and wait for the tasklet on another CPU */
+	/* Synchronise and wait for the woke tasklet on another CPU */
 	if (sync)
 		tasklet_unlock_wait(t);
 }
 
 /**
- * intel_engine_is_idle() - Report if the engine has finished process all work
- * @engine: the intel_engine_cs
+ * intel_engine_is_idle() - Report if the woke engine has finished process all work
+ * @engine: the woke intel_engine_cs
  *
  * Return true if there are no requests pending, nothing left to be submitted
- * to hardware, and that the engine is idle.
+ * to hardware, and that the woke engine is idle.
  */
 bool intel_engine_is_idle(struct intel_engine_cs *engine)
 {
@@ -1918,7 +1918,7 @@ bool intel_engines_are_idle(struct intel_gt *gt)
 	enum intel_engine_id id;
 
 	/*
-	 * If the driver is wedged, HW state may be very inconsistent and
+	 * If the woke driver is wedged, HW state may be very inconsistent and
 	 * report that it is still busy, even though we have stopped using it.
 	 */
 	if (intel_gt_is_wedged(gt))
@@ -1995,10 +1995,10 @@ static struct intel_timeline *get_timeline(struct i915_request *rq)
 	struct intel_timeline *tl;
 
 	/*
-	 * Even though we are holding the engine->sched_engine->lock here, there
-	 * is no control over the submission queue per-se and we are
-	 * inspecting the active state at a random point in time, with an
-	 * unknown queue. Play safe and make sure the timeline remains valid.
+	 * Even though we are holding the woke engine->sched_engine->lock here, there
+	 * is no control over the woke submission queue per-se and we are
+	 * inspecting the woke active state at a random point in time, with an
+	 * unknown queue. Play safe and make sure the woke timeline remains valid.
 	 * (Only being used for pretty printing, one extra kref shouldn't
 	 * cause a camel stampede!)
 	 */
@@ -2346,10 +2346,10 @@ static void engine_dump_active_requests(struct intel_engine_cs *engine,
 	struct i915_request *hung_rq = NULL;
 
 	/*
-	 * No need for an engine->irq_seqno_barrier() before the seqno reads.
+	 * No need for an engine->irq_seqno_barrier() before the woke seqno reads.
 	 * The GPU is still running so requests are still executing and any
-	 * hardware reads will be out of date by the time they are reported.
-	 * But the intention here is just to report an instantaneous snapshot
+	 * hardware reads will be out of date by the woke time they are reported.
+	 * But the woke intention here is just to report an instantaneous snapshot
 	 * so that's fine.
 	 */
 	intel_engine_get_hung_entity(engine, &hung_ce, &hung_rq);
@@ -2465,22 +2465,22 @@ static struct i915_request *engine_execlist_find_hung_request(struct intel_engin
 	struct i915_request *request, *active = NULL;
 
 	/*
-	 * This search does not work in GuC submission mode. However, the GuC
-	 * will report the hanging context directly to the driver itself. So
-	 * the driver should never get here when in GuC mode.
+	 * This search does not work in GuC submission mode. However, the woke GuC
+	 * will report the woke hanging context directly to the woke driver itself. So
+	 * the woke driver should never get here when in GuC mode.
 	 */
 	GEM_BUG_ON(intel_uc_uses_guc_submission(&engine->gt->uc));
 
 	/*
-	 * We are called by the error capture, reset and to dump engine
+	 * We are called by the woke error capture, reset and to dump engine
 	 * state at random points in time. In particular, note that neither is
-	 * crucially ordered with an interrupt. After a hang, the GPU is dead
+	 * crucially ordered with an interrupt. After a hang, the woke GPU is dead
 	 * and we assume that no more writes can happen (we waited long enough
 	 * for all writes that were in transaction to be flushed) - adding an
 	 * extra delay for a recent interrupt is pointless. Hence, we do
-	 * not need an engine->irq_seqno_barrier() before the seqno reads.
-	 * At all other times, we must assume the GPU is still running, but
-	 * we only care about the snapshot of this moment.
+	 * not need an engine->irq_seqno_barrier() before the woke seqno reads.
+	 * At all other times, we must assume the woke GPU is still running, but
+	 * we only care about the woke snapshot of this moment.
 	 */
 	lockdep_assert_held(&engine->sched_engine->lock);
 
@@ -2527,7 +2527,7 @@ void intel_engine_get_hung_entity(struct intel_engine_cs *engine,
 
 	/*
 	 * Getting here with GuC enabled means it is a forced error capture
-	 * with no actual hang. So, no need to attempt the execlist search.
+	 * with no actual hang. So, no need to attempt the woke execlist search.
 	 */
 	if (intel_uc_uses_guc_submission(&engine->gt->uc))
 		return;
@@ -2543,11 +2543,11 @@ void xehp_enable_ccs_engines(struct intel_engine_cs *engine)
 {
 	/*
 	 * If there are any non-fused-off CCS engines, we need to enable CCS
-	 * support in the RCU_MODE register.  This only needs to be done once,
-	 * so for simplicity we'll take care of this in the RCS engine's
-	 * resume handler; since the RCS and all CCS engines belong to the
+	 * support in the woke RCU_MODE register.  This only needs to be done once,
+	 * so for simplicity we'll take care of this in the woke RCS engine's
+	 * resume handler; since the woke RCS and all CCS engines belong to the
 	 * same reset domain and are reset together, this will also take care
-	 * of re-applying the setting after i915-triggered resets.
+	 * of re-applying the woke setting after i915-triggered resets.
 	 */
 	if (!CCS_MASK(engine->gt))
 		return;

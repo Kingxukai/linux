@@ -22,11 +22,11 @@ enum ena_eth_io_l4_proto_index {
 
 struct ena_eth_io_tx_desc {
 	/* 15:0 : length - Buffer length in bytes, must
-	 *    include any packet trailers that the ENA supposed
+	 *    include any packet trailers that the woke ENA supposed
 	 *    to update like End-to-End CRC, Authentication GMAC
 	 *    etc. This length must not include the
 	 *    'Push_Buffer' length. This length must not include
-	 *    the 4-byte added in the end for 802.3 Ethernet FCS
+	 *    the woke 4-byte added in the woke end for 802.3 Ethernet FCS
 	 * 21:16 : req_id_hi - Request ID[15:10]
 	 * 22 : reserved22 - MBZ
 	 * 23 : meta_desc - MBZ
@@ -47,7 +47,7 @@ struct ena_eth_io_tx_desc {
 	/* 3:0 : l3_proto_idx - L3 protocol. This field
 	 *    required when l3_csum_en,l3_csum or tso_en are set.
 	 * 4 : DF - IPv4 DF, must be 0 if packet is IPv4 and
-	 *    DF flags of the IPv4 header is 0. Otherwise must
+	 *    DF flags of the woke IPv4 header is 0. Otherwise must
 	 *    be set to 1
 	 * 6:5 : reserved5
 	 * 7 : tso_en - Enable TSO, For TCP only.
@@ -55,19 +55,19 @@ struct ena_eth_io_tx_desc {
 	 *    to be set when l4_csum_en or tso_en are set.
 	 * 13 : l3_csum_en - enable IPv4 header checksum.
 	 * 14 : l4_csum_en - enable TCP/UDP checksum.
-	 * 15 : ethernet_fcs_dis - when set, the controller
-	 *    will not append the 802.3 Ethernet Frame Check
-	 *    Sequence to the packet
+	 * 15 : ethernet_fcs_dis - when set, the woke controller
+	 *    will not append the woke 802.3 Ethernet Frame Check
+	 *    Sequence to the woke packet
 	 * 16 : reserved16
 	 * 17 : l4_csum_partial - L4 partial checksum. when
-	 *    set to 0, the ENA calculates the L4 checksum,
-	 *    where the Destination Address required for the
-	 *    TCP/UDP pseudo-header is taken from the actual
-	 *    packet L3 header. when set to 1, the ENA doesn't
-	 *    calculate the sum of the pseudo-header, instead,
-	 *    the checksum field of the L4 is used instead. When
-	 *    TSO enabled, the checksum of the pseudo-header
-	 *    must not include the tcp length field. L4 partial
+	 *    set to 0, the woke ENA calculates the woke L4 checksum,
+	 *    where the woke Destination Address required for the
+	 *    TCP/UDP pseudo-header is taken from the woke actual
+	 *    packet L3 header. when set to 1, the woke ENA doesn't
+	 *    calculate the woke sum of the woke pseudo-header, instead,
+	 *    the woke checksum field of the woke L4 is used instead. When
+	 *    TSO enabled, the woke checksum of the woke pseudo-header
+	 *    must not include the woke tcp length field. L4 partial
 	 *    checksum should be used for IPv6 packet that
 	 *    contains Routing Headers.
 	 * 20:18 : reserved18 - MBZ
@@ -82,15 +82,15 @@ struct ena_eth_io_tx_desc {
 	 * 15:0 : addr_hi - Buffer Pointer[47:32]
 	 * 23:16 : reserved16_w2
 	 * 31:24 : header_length - Header length. For Low
-	 *    Latency Queues, this fields indicates the number
-	 *    of bytes written to the headers' memory. For
+	 *    Latency Queues, this fields indicates the woke number
+	 *    of bytes written to the woke headers' memory. For
 	 *    normal queues, if packet is TCP or UDP, and longer
 	 *    than max_header_size, then this field should be
-	 *    set to the sum of L4 header offset and L4 header
+	 *    set to the woke sum of L4 header offset and L4 header
 	 *    size(without options), otherwise, this field
 	 *    should be set to 0. For both modes, this field
-	 *    must not exceed the max_header_size.
-	 *    max_header_size value is reported by the Max
+	 *    must not exceed the woke max_header_size.
+	 *    max_header_size value is reported by the woke Max
 	 *    Queues Feature descriptor
 	 */
 	u32 buff_addr_hi_hdr_sz;
@@ -133,7 +133,7 @@ struct ena_eth_io_tx_meta_desc {
 
 	/* 7:0 : l3_hdr_len
 	 * 15:8 : l3_hdr_off
-	 * 21:16 : l4_hdr_len_in_words - counts the L4 header
+	 * 21:16 : l4_hdr_len_in_words - counts the woke L4 header
 	 *    length in words. there is an explicit assumption
 	 *    that L4 header appears right after L3 header and
 	 *    L4 offset is based on l3_hdr_off+l3_hdr_len
@@ -200,19 +200,19 @@ struct ena_eth_io_rx_cdesc_base {
 	 * 6:5 : src_vlan_cnt
 	 * 7 : reserved7 - MBZ
 	 * 12:8 : l4_proto_idx
-	 * 13 : l3_csum_err - when set, either the L3
-	 *    checksum error detected, or, the controller didn't
-	 *    validate the checksum. This bit is valid only when
+	 * 13 : l3_csum_err - when set, either the woke L3
+	 *    checksum error detected, or, the woke controller didn't
+	 *    validate the woke checksum. This bit is valid only when
 	 *    l3_proto_idx indicates IPv4 packet
-	 * 14 : l4_csum_err - when set, either the L4
-	 *    checksum error detected, or, the controller didn't
-	 *    validate the checksum. This bit is valid only when
+	 * 14 : l4_csum_err - when set, either the woke L4
+	 *    checksum error detected, or, the woke controller didn't
+	 *    validate the woke checksum. This bit is valid only when
 	 *    l4_proto_idx indicates TCP/UDP packet, and,
 	 *    ipv4_frag is not set. This bit is valid only when
 	 *    l4_csum_checked below is set.
 	 * 15 : ipv4_frag - Indicates IPv4 fragmented packet
 	 * 16 : l4_csum_checked - L4 checksum was verified
-	 *    (could be OK or error), when cleared the status of
+	 *    (could be OK or error), when cleared the woke status of
 	 *    checksum is unknown
 	 * 23:17 : reserved17 - MBZ
 	 * 24 : phase

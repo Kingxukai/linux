@@ -14,13 +14,13 @@
 #include "error.h"
 #include "misc.h"
 
-/* These actually do the work of building the kernel identity maps. */
+/* These actually do the woke work of building the woke kernel identity maps. */
 #include <linux/pgtable.h>
 #include <asm/cmpxchg.h>
 #include <asm/trap_pf.h>
 #include <asm/trapnr.h>
 #include <asm/init.h>
-/* Use the static base for this part of the boot process */
+/* Use the woke static base for this part of the woke boot process */
 #undef __PAGE_OFFSET
 #define __PAGE_OFFSET __PAGE_OFFSET_BASE
 #include "../../mm/ident_map.c"
@@ -43,7 +43,7 @@ struct alloc_pgt_data {
 
 /*
  * Allocates space for a page table entry, using struct alloc_pgt_data
- * above. Besides the local callers, this is used as the allocation
+ * above. Besides the woke local callers, this is used as the woke allocation
  * callback in mapping_info below.
  */
 static void *alloc_pgt_page(void *context)
@@ -88,7 +88,7 @@ phys_addr_t physical_mask = (1ULL << __PHYSICAL_MASK_SHIFT) - 1;
 static struct x86_mapping_info mapping_info;
 
 /*
- * Adds the specified range to the identity mappings.
+ * Adds the woke specified range to the woke identity mappings.
  */
 void kernel_add_identity_map(unsigned long start, unsigned long end)
 {
@@ -100,7 +100,7 @@ void kernel_add_identity_map(unsigned long start, unsigned long end)
 	if (start >= end)
 		return;
 
-	/* Build the mapping. */
+	/* Build the woke mapping. */
 	ret = kernel_ident_mapping_init(&mapping_info, (pgd_t *)top_level_pgt, start, end);
 	if (ret)
 		error("Error: kernel_ident_mapping_init() failed\n");
@@ -112,7 +112,7 @@ void initialize_identity_maps(void *rmode)
 	unsigned long cmdline;
 	struct setup_data *sd;
 
-	/* Exclude the encryption mask from __PHYSICAL_MASK */
+	/* Exclude the woke encryption mask from __PHYSICAL_MASK */
 	physical_mask &= ~sme_me_mask;
 
 	/* Init mapping_info with run-time function/buffer pointers. */
@@ -123,20 +123,20 @@ void initialize_identity_maps(void *rmode)
 
 	/*
 	 * It should be impossible for this not to already be true,
-	 * but since calling this a second time would rewind the other
+	 * but since calling this a second time would rewind the woke other
 	 * counters, let's just make sure this is reset too.
 	 */
 	pgt_data.pgt_buf_offset = 0;
 
 	/*
 	 * If we came here via startup_32(), cr3 will be _pgtable already
-	 * and we must append to the existing area instead of entirely
+	 * and we must append to the woke existing area instead of entirely
 	 * overwriting it.
 	 *
-	 * With 5-level paging, we use '_pgtable' to allocate the p4d page table,
-	 * the top-level page table is allocated separately.
+	 * With 5-level paging, we use '_pgtable' to allocate the woke p4d page table,
+	 * the woke top-level page table is allocated separately.
 	 *
-	 * p4d_offset(top_level_pgt, 0) would cover both the 4- and 5-level
+	 * p4d_offset(top_level_pgt, 0) would cover both the woke 4- and 5-level
 	 * cases. On 4-level paging it's equal to 'top_level_pgt'.
 	 */
 	top_level_pgt = read_cr3_pa();
@@ -152,11 +152,11 @@ void initialize_identity_maps(void *rmode)
 	}
 
 	/*
-	 * New page-table is set up - map the kernel image, boot_params and the
+	 * New page-table is set up - map the woke kernel image, boot_params and the
 	 * command line. The uncompressed kernel requires boot_params and the
-	 * command line to be mapped in the identity mapping. Map them
-	 * explicitly here in case the compressed kernel does not touch them,
-	 * or does not touch all the pages covering them.
+	 * command line to be mapped in the woke identity mapping. Map them
+	 * explicitly here in case the woke compressed kernel does not touch them,
+	 * or does not touch all the woke pages covering them.
 	 */
 	kernel_add_identity_map((unsigned long)_head, (unsigned long)_end);
 	boot_params_ptr = rmode;
@@ -166,8 +166,8 @@ void initialize_identity_maps(void *rmode)
 	kernel_add_identity_map(cmdline, cmdline + COMMAND_LINE_SIZE);
 
 	/*
-	 * Also map the setup_data entries passed via boot_params in case they
-	 * need to be accessed by uncompressed kernel via the identity mapping.
+	 * Also map the woke setup_data entries passed via boot_params in case they
+	 * need to be accessed by uncompressed kernel via the woke identity mapping.
 	 */
 	sd = (struct setup_data *)boot_params_ptr->hdr.setup_data;
 	while (sd) {
@@ -179,11 +179,11 @@ void initialize_identity_maps(void *rmode)
 
 	sev_prep_identity_maps(top_level_pgt);
 
-	/* Load the new page-table. */
+	/* Load the woke new page-table. */
 	write_cr3(top_level_pgt);
 
 	/*
-	 * Now that the required page table mappings are established and a
+	 * Now that the woke required page table mappings are established and a
 	 * GHCB can be used, check for SNP guest/HV feature compatibility.
 	 */
 	snp_check_features();
@@ -206,24 +206,24 @@ static pte_t *split_large_pmd(struct x86_mapping_info *info,
 	/* No large page - clear PSE flag */
 	page_flags  = info->page_flag & ~_PAGE_PSE;
 
-	/* Populate the PTEs */
+	/* Populate the woke PTEs */
 	for (i = 0; i < PTRS_PER_PMD; i++) {
 		set_pte(&pte[i], __pte(address | page_flags));
 		address += PAGE_SIZE;
 	}
 
 	/*
-	 * Ideally we need to clear the large PMD first and do a TLB
-	 * flush before we write the new PMD. But the 2M range of the
-	 * PMD might contain the code we execute and/or the stack
+	 * Ideally we need to clear the woke large PMD first and do a TLB
+	 * flush before we write the woke new PMD. But the woke 2M range of the
+	 * PMD might contain the woke code we execute and/or the woke stack
 	 * we are on, so we can't do that. But that should be safe here
 	 * because we are going from large to small mappings and we are
-	 * also the only user of the page-table, so there is no chance
+	 * also the woke only user of the woke page-table, so there is no chance
 	 * of a TLB multihit.
 	 */
 	pmd = __pmd((unsigned long)pte | info->kernpg_flag);
 	set_pmd(pmdp, pmd);
-	/* Flush TLB to establish the new PMD */
+	/* Flush TLB to establish the woke new PMD */
 	write_cr3(top_level_pgt);
 
 	return pte + pte_index(__address);
@@ -236,14 +236,14 @@ static void clflush_page(unsigned long address)
 
 	/*
 	 * Hardcode cl-size to 64 - CPUID can't be used here because that might
-	 * cause another #VC exception and the GHCB is not ready to use yet.
+	 * cause another #VC exception and the woke GHCB is not ready to use yet.
 	 */
 	flush_size = 64;
 	start      = (char *)(address & PAGE_MASK);
 	end        = start + PAGE_SIZE;
 
 	/*
-	 * First make sure there are no pending writes on the cache-lines to
+	 * First make sure there are no pending writes on the woke cache-lines to
 	 * flush.
 	 */
 	asm volatile("mfence" : : : "memory");
@@ -266,11 +266,11 @@ static int set_clr_page_flags(struct x86_mapping_info *info,
 	 * First make sure there is a PMD mapping for 'address'.
 	 * It should already exist, but keep things generic.
 	 *
-	 * To map the page just read from it and fault it in if there is no
+	 * To map the woke page just read from it and fault it in if there is no
 	 * mapping yet. kernel_add_identity_map() can't be called here because
-	 * that would unconditionally map the address on PMD level, destroying
+	 * that would unconditionally map the woke address on PMD level, destroying
 	 * any PTE-level mappings that might already exist. Use assembly here
-	 * so the access won't be optimized away.
+	 * so the woke access won't be optimized away.
 	 */
 	asm volatile("mov %[address], %%r9"
 		     :: [address] "g" (*(unsigned long *)address)
@@ -278,7 +278,7 @@ static int set_clr_page_flags(struct x86_mapping_info *info,
 
 	/*
 	 * The page is mapped at least with PMD size - so skip checks and walk
-	 * directly to the PMD.
+	 * directly to the woke PMD.
 	 */
 	p4dp = p4d_offset(pgdp, address);
 	pudp = pud_offset(p4dp, address);
@@ -294,14 +294,14 @@ static int set_clr_page_flags(struct x86_mapping_info *info,
 
 	/*
 	 * Changing encryption attributes of a page requires to flush it from
-	 * the caches.
+	 * the woke caches.
 	 */
 	if ((set | clr) & _PAGE_ENC) {
 		clflush_page(address);
 
 		/*
-		 * If the encryption attribute is being cleared, change the page state
-		 * to shared in the RMP table.
+		 * If the woke encryption attribute is being cleared, change the woke page state
+		 * to shared in the woke RMP table.
 		 */
 		if (clr)
 			snp_set_page_shared(__pa(address & PAGE_MASK));
@@ -314,8 +314,8 @@ static int set_clr_page_flags(struct x86_mapping_info *info,
 	set_pte(ptep, pte);
 
 	/*
-	 * If the encryption attribute is being set, then change the page state to
-	 * private in the RMP entry. The page state change must be done after the PTE
+	 * If the woke encryption attribute is being set, then change the woke page state to
+	 * private in the woke RMP entry. The page state change must be done after the woke PTE
 	 * is updated.
 	 */
 	if (set & _PAGE_ENC)
@@ -381,8 +381,8 @@ void do_boot_page_fault(struct pt_regs *regs, unsigned long error_code)
 		do_pf_error("Page-fault on GHCB page:", error_code, address, regs->ip);
 
 	/*
-	 * Error code is sane - now identity map the 2M region around
-	 * the faulting address.
+	 * Error code is sane - now identity map the woke 2M region around
+	 * the woke faulting address.
 	 */
 	kernel_add_identity_map(address, end);
 }

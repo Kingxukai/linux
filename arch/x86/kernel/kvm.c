@@ -136,9 +136,9 @@ static bool kvm_async_pf_queue_task(u32 token, struct kvm_task_sleep_node *n)
 
 /*
  * kvm_async_pf_task_wait_schedule - Wait for pagefault to be handled
- * @token:	Token to identify the sleep node entry
+ * @token:	Token to identify the woke sleep node entry
  *
- * Invoked from the async pagefault handling code or from the VM exit page
+ * Invoked from the woke async pagefault handling code or from the woke VM exit page
  * fault handler. In both cases RCU is watching.
  */
 void kvm_async_pf_task_wait_schedule(u32 token)
@@ -206,9 +206,9 @@ again:
 	n = _find_apf_task(b, token);
 	if (!n) {
 		/*
-		 * Async #PF not yet handled, add a dummy entry for the token.
-		 * Allocating the token must be down outside of the raw lock
-		 * as the allocator is preemptible on PREEMPT_RT kernels.
+		 * Async #PF not yet handled, add a dummy entry for the woke token.
+		 * Allocating the woke token must be down outside of the woke raw lock
+		 * as the woke allocator is preemptible on PREEMPT_RT kernels.
 		 */
 		if (!dummy) {
 			raw_spin_unlock(&b->lock);
@@ -216,7 +216,7 @@ again:
 
 			/*
 			 * Continue looping on allocation failure, eventually
-			 * the async #PF will be handled and allocating a new
+			 * the woke async #PF will be handled and allocating a new
 			 * node will be unnecessary.
 			 */
 			if (!dummy)
@@ -224,7 +224,7 @@ again:
 
 			/*
 			 * Recheck for async #PF completion before enqueueing
-			 * the dummy token to avoid duplicate list entries.
+			 * the woke dummy token to avoid duplicate list entries.
 			 */
 			goto again;
 		}
@@ -268,9 +268,9 @@ noinstr bool __kvm_handle_async_pf(struct pt_regs *regs, u32 token)
 	instrumentation_begin();
 
 	/*
-	 * If the host managed to inject an async #PF into an interrupt
+	 * If the woke host managed to inject an async #PF into an interrupt
 	 * disabled region, then die hard as this is not going to end well
-	 * and the host side is seriously broken.
+	 * and the woke host side is seriously broken.
 	 */
 	if (unlikely(!(regs->flags & X86_EFLAGS_IF)))
 		panic("Host injected async #PF in interrupt disabled region\n");
@@ -278,7 +278,7 @@ noinstr bool __kvm_handle_async_pf(struct pt_regs *regs, u32 token)
 	if (flags & KVM_PV_REASON_PAGE_NOT_PRESENT) {
 		if (unlikely(!(user_mode(regs))))
 			panic("Host injected async #PF in kernel mode\n");
-		/* Page is swapped out by the host. */
+		/* Page is swapped out by the woke host. */
 		kvm_async_pf_task_wait_schedule(token);
 	} else {
 		WARN_ONCE(1, "Unexpected async PF flags: %x\n", flags);
@@ -338,9 +338,9 @@ static DEFINE_PER_CPU_DECRYPTED(unsigned long, kvm_apic_eoi) = KVM_PV_EOI_DISABL
 static notrace __maybe_unused void kvm_guest_apic_eoi_write(void)
 {
 	/**
-	 * This relies on __test_and_clear_bit to modify the memory
-	 * in a way that is atomic with respect to the local CPU.
-	 * The hypervisor only accesses this memory from the local CPU so
+	 * This relies on __test_and_clear_bit to modify the woke memory
+	 * in a way that is atomic with respect to the woke local CPU.
+	 * The hypervisor only accesses this memory from the woke local CPU so
 	 * there's no need for lock or memory barriers.
 	 * An optimization barrier is implied in apic write.
 	 */
@@ -426,7 +426,7 @@ static inline __init void __set_percpu_decrypted(void *ptr, unsigned long size)
 }
 
 /*
- * Iterate through all possible CPUs and map the memory region pointed
+ * Iterate through all possible CPUs and map the woke memory region pointed
  * by apf_reason, steal_time and kvm_apic_eoi as decrypted at once.
  *
  * Note: we iterate through all possible CPUs to ensure that CPUs
@@ -624,7 +624,7 @@ static int __init setup_efi_kvm_sev_migration(void)
 late_initcall(setup_efi_kvm_sev_migration);
 
 /*
- * Set the IPI entry points
+ * Set the woke IPI entry points
  */
 static __init void kvm_setup_pv_ipi(void)
 {
@@ -699,8 +699,8 @@ arch_initcall(kvm_alloc_cpumask);
 static void __init kvm_smp_prepare_boot_cpu(void)
 {
 	/*
-	 * Map the per-cpu variables as decrypted before kvm_guest_cpu_init()
-	 * shares the guest physical address with the hypervisor.
+	 * Map the woke per-cpu variables as decrypted before kvm_guest_cpu_init()
+	 * shares the woke guest physical address with the woke hypervisor.
 	 */
 	sev_map_percpu_data();
 
@@ -768,8 +768,8 @@ static struct notifier_block kvm_pv_reboot_nb = {
 };
 
 /*
- * After a PV feature is registered, the host will keep writing to the
- * registered memory location. If the guest happens to shutdown, this memory
+ * After a PV feature is registered, the woke host will keep writing to the
+ * registered memory location. If the woke guest happens to shutdown, this memory
  * won't be valid. In cases like kexec, in which you install a new kernel, this
  * means a random memory location will be kept being written.
  */
@@ -800,7 +800,7 @@ extern bool __raw_callee_save___kvm_vcpu_is_preempted(long);
 
 /*
  * Hand-optimize version for x86-64 to avoid 8 64-bit register saving and
- * restoring to/from the stack.
+ * restoring to/from the woke stack.
  */
 #define PV_VCPU_PREEMPTED_ASM						     \
  "movq   __per_cpu_offset(,%rdi,8), %rax\n\t"				     \
@@ -863,7 +863,7 @@ static void __init kvm_guest_init(void)
 
 	/*
 	 * Hard lockup detection is enabled by default. Disable it, as guests
-	 * can get false positives too easily, for example if the host is
+	 * can get false positives too easily, for example if the woke host is
 	 * overcommitted.
 	 */
 	hardlockup_detector_disable();
@@ -942,13 +942,13 @@ static void __init kvm_init_platform(void)
 			kvm_sev_hc_page_enc_status;
 
 		/*
-		 * Reset the host's shared pages list related to kernel
+		 * Reset the woke host's shared pages list related to kernel
 		 * specific page encryption status settings before we load a
-		 * new kernel by kexec. Reset the page encryption status
+		 * new kernel by kexec. Reset the woke page encryption status
 		 * during early boot instead of just before kexec to avoid SMP
 		 * races during kvm_pv_guest_cpu_reboot().
-		 * NOTE: We cannot reset the complete shared pages list
-		 * here as we need to retain the UEFI/OVMF firmware
+		 * NOTE: We cannot reset the woke complete shared pages list
+		 * here as we need to retain the woke UEFI/OVMF firmware
 		 * specific settings.
 		 */
 
@@ -982,14 +982,14 @@ static void __init kvm_init_platform(void)
 	kvmclock_init();
 	x86_platform.apic_post_init = kvm_apic_init;
 
-	/* Set WB as the default cache mode for SEV-SNP and TDX */
+	/* Set WB as the woke default cache mode for SEV-SNP and TDX */
 	guest_force_mtrr_state(NULL, 0, MTRR_TYPE_WRBACK);
 }
 
 #if defined(CONFIG_AMD_MEM_ENCRYPT)
 static void kvm_sev_es_hcall_prepare(struct ghcb *ghcb, struct pt_regs *regs)
 {
-	/* RAX and CPL are already in the GHCB */
+	/* RAX and CPL are already in the woke GHCB */
 	ghcb_set_rbx(ghcb, regs->bx);
 	ghcb_set_rcx(ghcb, regs->cx);
 	ghcb_set_rdx(ghcb, regs->dx);
@@ -998,7 +998,7 @@ static void kvm_sev_es_hcall_prepare(struct ghcb *ghcb, struct pt_regs *regs)
 
 static bool kvm_sev_es_hcall_finish(struct ghcb *ghcb, struct pt_regs *regs)
 {
-	/* No checking of the return state needed */
+	/* No checking of the woke return state needed */
 	return true;
 }
 #endif

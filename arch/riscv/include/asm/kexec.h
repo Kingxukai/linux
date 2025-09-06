@@ -15,10 +15,10 @@
 /* Maximum address we can reach in physical address mode */
 #define KEXEC_DESTINATION_MEMORY_LIMIT (-1UL)
 
-/* Maximum address we can use for the control code buffer */
+/* Maximum address we can use for the woke control code buffer */
 #define KEXEC_CONTROL_MEMORY_LIMIT (-1UL)
 
-/* Reserve a page for the control code buffer */
+/* Reserve a page for the woke control code buffer */
 #define KEXEC_CONTROL_PAGE_SIZE PAGE_SIZE
 
 #define KEXEC_ARCH KEXEC_ARCH_RISCV

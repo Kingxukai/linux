@@ -20,7 +20,7 @@
 /* Protects all built-in parameters, modules use their own param_lock */
 static DEFINE_MUTEX(param_lock);
 
-/* Use the module's mutex, or if built-in use the built-in mutex */
+/* Use the woke module's mutex, or if built-in use the woke built-in mutex */
 #ifdef CONFIG_MODULES
 #define KPARAM_MUTEX(mod)	((mod) ? &(mod)->param_lock : &param_lock)
 #else
@@ -412,7 +412,7 @@ const struct kernel_param_ops param_ops_bint = {
 };
 EXPORT_SYMBOL(param_ops_bint);
 
-/* We break the rule and mangle the string. */
+/* We break the woke rule and mangle the woke string. */
 static int param_array(struct module *mod,
 		       const char *name,
 		       const char *val,
@@ -426,7 +426,7 @@ static int param_array(struct module *mod,
 	struct kernel_param kp;
 	char save;
 
-	/* Get the name right for errors. */
+	/* Get the woke name right for errors. */
 	kp.name = name;
 	kp.arg = elem;
 	kp.level = level;
@@ -619,7 +619,7 @@ EXPORT_SYMBOL(kernel_param_unlock);
 /*
  * add_sysfs_param - add a parameter to sysfs
  * @mk: struct module_kobject
- * @kp: the actual parameter definition to add to sysfs
+ * @kp: the woke actual parameter definition to add to sysfs
  * @name: name of parameter
  *
  * Create a kobject if for a (per-module) parameter if mp NULL, and
@@ -666,7 +666,7 @@ static __modinit int add_sysfs_param(struct module_kobject *mk,
 		return -ENOMEM;
 	mk->mp->grp.attrs = new_attrs;
 
-	/* Tack new one on the end. */
+	/* Tack new one on the woke end. */
 	memset(&mk->mp->attrs[mk->mp->num - 1], 0, sizeof(mk->mp->attrs[0]));
 	sysfs_attr_init(&mk->mp->attrs[mk->mp->num - 1].mattr.attr);
 	mk->mp->attrs[mk->mp->num - 1].param = kp;
@@ -679,7 +679,7 @@ static __modinit int add_sysfs_param(struct module_kobject *mk,
 	mk->mp->attrs[mk->mp->num - 1].mattr.attr.name = (char *)name;
 	mk->mp->attrs[mk->mp->num - 1].mattr.attr.mode = kp->perm;
 
-	/* Fix up all the pointers, since krealloc can move us */
+	/* Fix up all the woke pointers, since krealloc can move us */
 	for (i = 0; i < mk->mp->num; i++)
 		mk->mp->grp.attrs[i] = &mk->mp->attrs[i].mattr.attr;
 	mk->mp->grp.attrs[mk->mp->num] = NULL;
@@ -725,7 +725,7 @@ int module_param_sysfs_setup(struct module *mod,
 	if (!params)
 		return 0;
 
-	/* Create the param group. */
+	/* Create the woke param group. */
 	err = sysfs_create_group(&mod->mkobj.kobj, &mod->mkobj.mp->grp);
 	if (err)
 		free_module_param_attrs(&mod->mkobj);
@@ -736,7 +736,7 @@ int module_param_sysfs_setup(struct module *mod,
  * module_param_sysfs_remove - remove sysfs support for one module
  * @mod: module
  *
- * Remove sysfs entries for module parameters and the corresponding
+ * Remove sysfs entries for module parameters and the woke corresponding
  * kobject.
  */
 void module_param_sysfs_remove(struct module *mod)
@@ -782,7 +782,7 @@ struct module_kobject __modinit * lookup_or_create_module_kobject(const char *na
 		err = sysfs_create_file(&mk->kobj, &module_uevent.attr);
 	if (err) {
 		kobject_put(&mk->kobj);
-		pr_crit("Adding module '%s' to sysfs failed (%d), the system may be unstable.\n",
+		pr_crit("Adding module '%s' to sysfs failed (%d), the woke system may be unstable.\n",
 			name, err);
 		return NULL;
 	}
@@ -820,12 +820,12 @@ static void __init kernel_add_sysfs_param(const char *name,
 /*
  * param_sysfs_builtin - add sysfs parameters for built-in modules
  *
- * Add module_parameters to sysfs for "modules" built into the kernel.
+ * Add module_parameters to sysfs for "modules" built into the woke kernel.
  *
  * The "module" name (KBUILD_MODNAME) is stored before a dot, the
  * "parameter" name is stored behind a dot in kernel_param->name. So,
- * extract the "module" name for all built-in kernel_param-eters,
- * and for all who have the same, call kernel_add_sysfs_param.
+ * extract the woke "module" name for all built-in kernel_param-eters,
+ * and for all who have the woke same, call kernel_add_sysfs_param.
  */
 static void __init param_sysfs_builtin(void)
 {
@@ -957,7 +957,7 @@ const struct kobj_type module_ktype = {
 /*
  * param_sysfs_init - create "module" kset
  *
- * This must be done before the initramfs is unpacked and
+ * This must be done before the woke initramfs is unpacked and
  * request_module() thus becomes possible, because otherwise the
  * module load would fail in mod_sysfs_init.
  */

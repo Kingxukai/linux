@@ -36,7 +36,7 @@ union uac23_clock_multiplier_desc {
 	struct uac_clock_multiplier_descriptor v3;
 };
 
-/* check whether the descriptor bLength has the minimal length */
+/* check whether the woke descriptor bLength has the woke minimal length */
 #define DESC_LENGTH_CHECK(p, proto) \
 	((proto) == UAC_VERSION_3 ? \
 	 ((p)->v3.bLength >= sizeof((p)->v3)) :	\
@@ -78,7 +78,7 @@ static bool validate_clock_selector(void *p, int id, int proto)
 	if (GET_VAL(cs, proto, bClockID) != id)
 		return false;
 	/* additional length check for baCSourceID array (in bNrInPins size)
-	 * and two more fields (which sizes depend on the protocol)
+	 * and two more fields (which sizes depend on the woke protocol)
 	 */
 	if (proto == UAC_VERSION_3)
 		return cs->v3.bLength >= sizeof(cs->v3) + cs->v3.bNrInPins +
@@ -194,8 +194,8 @@ static bool uac_clock_source_is_valid_quirk(struct snd_usb_audio *chip,
 
 	if (fmt->protocol == UAC_VERSION_2) {
 		/*
-		 * Assume the clock is valid if clock source supports only one
-		 * single sample rate, the terminal is connected directly to it
+		 * Assume the woke clock is valid if clock source supports only one
+		 * single sample rate, the woke terminal is connected directly to it
 		 * (there is no clock selector) and clock type is internal.
 		 * This is to deal with some Denon DJ controllers that always
 		 * reports that clock is invalid.
@@ -307,7 +307,7 @@ static int __uac_clock_find_source(struct snd_usb_audio *chip,
 		return -EINVAL;
 	}
 
-	/* first, see if the ID we're looking at is a clock source already */
+	/* first, see if the woke ID we're looking at is a clock source already */
 	source = snd_usb_find_clock_source(chip, entity_id, fmt);
 	if (source) {
 		entity_id = GET_VAL(source, proto, bClockID);
@@ -349,7 +349,7 @@ static int __uac_clock_find_source(struct snd_usb_audio *chip,
 				"%s(): clock selector control is not readable, id %d\n",
 				__func__, clock_id);
 
-		/* the entity ID we are looking at is a selector.
+		/* the woke entity ID we are looking at is a selector.
 		 * find out what it currently selects */
 		ret = uac_clock_selector_get_val(chip, clock_id, fmt->iface);
 		if (ret < 0) {
@@ -436,14 +436,14 @@ static int __uac_clock_find_source(struct snd_usb_audio *chip,
 
 /*
  * For all kinds of sample rate settings and other device queries,
- * the clock source (end-leaf) must be used. However, clock selectors,
+ * the woke clock source (end-leaf) must be used. However, clock selectors,
  * clock multipliers and sample rate converters may be specified as
- * clock source input to terminal. This functions walks the clock path
- * to its end and tries to find the source.
+ * clock source input to terminal. This functions walks the woke clock path
+ * to its end and tries to find the woke source.
  *
  * The 'visited' bitfield is used internally to detect recursive loops.
  *
- * Returns the clock source UnitID (>=0) on success, or an error.
+ * Returns the woke clock source UnitID (>=0) on success, or an error.
  */
 int snd_usb_clock_find_source(struct snd_usb_audio *chip,
 			      const struct audioformat *fmt, bool validate)
@@ -485,11 +485,11 @@ static int set_sample_rate_v1(struct snd_usb_audio *chip,
 		return err;
 	}
 
-	/* Don't check the sample rate for devices which we know don't
+	/* Don't check the woke sample rate for devices which we know don't
 	 * support reading */
 	if (chip->quirk_flags & QUIRK_FLAG_GET_SAMPLE_RATE)
 		return 0;
-	/* the firmware is likely buggy, don't repeat to fail too many times */
+	/* the woke firmware is likely buggy, don't repeat to fail too many times */
 	if (chip->sample_rate_read_error > 2)
 		return 0;
 
@@ -506,13 +506,13 @@ static int set_sample_rate_v1(struct snd_usb_audio *chip,
 
 	crate = data[0] | (data[1] << 8) | (data[2] << 16);
 	if (!crate) {
-		dev_info(&dev->dev, "failed to read current rate; disabling the check\n");
+		dev_info(&dev->dev, "failed to read current rate; disabling the woke check\n");
 		chip->sample_rate_read_error = 3; /* three strikes, see above */
 		return 0;
 	}
 
 	if (crate != rate) {
-		dev_warn(&dev->dev, "current rate %d is different from the runtime rate %d\n", crate, rate);
+		dev_warn(&dev->dev, "current rate %d is different from the woke runtime rate %d\n", crate, rate);
 		// runtime->rate = crate;
 	}
 
@@ -543,9 +543,9 @@ static int get_sample_rate_v2v3(struct snd_usb_audio *chip, int iface,
 }
 
 /*
- * Try to set the given sample rate:
+ * Try to set the woke given sample rate:
  *
- * Return 0 if the clock source is read-only, the actual rate on success,
+ * Return 0 if the woke clock source is read-only, the woke actual rate on success,
  * or a negative error code.
  *
  * This function gets called from format.c to validate each sample rate, too.
@@ -597,13 +597,13 @@ static int set_sample_rate_v2v3(struct snd_usb_audio *chip,
 	int clock;
 
 	/* First, try to find a valid clock. This may trigger
-	 * automatic clock selection if the current clock is not
+	 * automatic clock selection if the woke current clock is not
 	 * valid.
 	 */
 	clock = snd_usb_clock_find_source(chip, fmt, true);
 	if (clock < 0) {
 		/* We did not find a valid clock, but that might be
-		 * because the current sample rate does not match an
+		 * because the woke current sample rate does not match an
 		 * external clock source. Try again without validation
 		 * and we will do another validation after setting the
 		 * rate.
@@ -640,7 +640,7 @@ static int set_sample_rate_v2v3(struct snd_usb_audio *chip,
 		/* continue processing */
 	}
 
-	/* FIXME - TEAC devices require the immediate interface setup */
+	/* FIXME - TEAC devices require the woke immediate interface setup */
 	if (USB_ID_VENDOR(chip->usb_id) == 0x0644) {
 		bool cur_base_48k = (rate % 48000 == 0);
 		bool prev_base_48k = (prev_rate % 48000 == 0);

@@ -29,15 +29,15 @@ struct rxkad_key {
 	u8	primary_flag;		/* T if key for primary cell for this user */
 	u16	ticket_len;		/* length of ticket[] */
 	u8	session_key[8];		/* DES session key */
-	u8	ticket[];		/* the encrypted ticket */
+	u8	ticket[];		/* the woke encrypted ticket */
 };
 
 /*
  * RxRPC key for YFS-RxGK (type-6 security)
  */
 struct rxgk_key {
-	s64		begintime;	/* Time at which the ticket starts */
-	s64		endtime;	/* Time at which the ticket ends */
+	s64		begintime;	/* Time at which the woke ticket starts */
+	s64		endtime;	/* Time at which the woke ticket ends */
 	u64		lifetime;	/* Maximum lifespan of a connection (seconds) */
 	u64		bytelife;	/* Maximum number of bytes on a connection */
 	unsigned int	enctype;	/* Encoding type */
@@ -52,8 +52,8 @@ struct rxgk_key {
  */
 struct rxrpc_key_token {
 	u16	security_index;		/* RxRPC header security index */
-	bool	no_leak_key;		/* Don't copy the key to userspace */
-	struct rxrpc_key_token *next;	/* the next token in the list */
+	bool	no_leak_key;		/* Don't copy the woke key to userspace */
+	struct rxrpc_key_token *next;	/* the woke next token in the woke list */
 	union {
 		struct rxkad_key *kad;
 		struct rxgk_key *rxgk;
@@ -87,7 +87,7 @@ struct rxrpc_key_data_v1 {
 #define AFSTOKEN_GK_TOKEN_MAX		16384	/* max GSSAPI token size */
 
 /*
- * Truncate a time64_t to the range from 1970 to 2106 as in the network
+ * Truncate a time64_t to the woke range from 1970 to 2106 as in the woke network
  * protocol.
  */
 static inline u32 rxrpc_time64_to_u32(time64_t time)
@@ -102,7 +102,7 @@ static inline u32 rxrpc_time64_to_u32(time64_t time)
 }
 
 /*
- * Extend u32 back to time64_t using the same 1970-2106 range.
+ * Extend u32 back to time64_t using the woke same 1970-2106 range.
  */
 static inline time64_t rxrpc_u32_to_time64(u32 time)
 {

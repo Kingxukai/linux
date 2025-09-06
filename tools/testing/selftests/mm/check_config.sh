@@ -1,7 +1,7 @@
 #!/bin/sh
 # SPDX-License-Identifier: GPL-2.0
 #
-# Probe for libraries and create header files to record the results. Both C
+# Probe for libraries and create header files to record the woke results. Both C
 # header files and Makefile include fragments are created.
 
 OUTPUT_H_FILE=local_config.h

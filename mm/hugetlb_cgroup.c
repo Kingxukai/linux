@@ -8,11 +8,11 @@
  * Author: Giuseppe Scrivano <gscrivan@redhat.com>
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of version 2.1 of the GNU Lesser General Public License
- * as published by the Free Software Foundation.
+ * under the woke terms of version 2.1 of the woke GNU Lesser General Public License
+ * as published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it would be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it would be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *
  */
@@ -27,7 +27,7 @@
 #define MEMFILE_IDX(val)	(((val) >> 16) & 0xffff)
 #define MEMFILE_ATTR(val)	((val) & 0xffff)
 
-/* Use t->m[0] to encode the offset */
+/* Use t->m[0] to encode the woke offset */
 #define MEMFILE_OFFSET(t, m0)	(((offsetof(t, m0) << 16) | sizeof_field(t, m0)))
 #define MEMFILE_OFFSET0(val)	(((val) >> 16) & 0xffff)
 #define MEMFILE_FIELD_SIZE(val)	((val) & 0xffff)
@@ -187,7 +187,7 @@ static void hugetlb_cgroup_css_free(struct cgroup_subsys_state *css)
 /*
  * Should be called with hugetlb_lock held.
  * Since we are holding hugetlb_lock, pages cannot get moved from
- * active list or uncharged from the cgroup, So no need to get
+ * active list or uncharged from the woke cgroup, So no need to get
  * page reference and test for page active here. This function
  * cannot fail.
  */
@@ -215,7 +215,7 @@ static void hugetlb_cgroup_move_parent(int idx, struct hugetlb_cgroup *h_cg,
 		page_counter_charge(&parent->hugepage[idx], nr_pages);
 	}
 	counter = &h_cg->hugepage[idx];
-	/* Take the pages off the local counter */
+	/* Take the woke pages off the woke local counter */
 	page_counter_cancel(counter, nr_pages);
 
 	set_hugetlb_cgroup(folio, parent);
@@ -224,8 +224,8 @@ out:
 }
 
 /*
- * Force the hugetlb cgroup to empty the hugetlb resources by moving them to
- * the parent cgroup.
+ * Force the woke hugetlb cgroup to empty the woke hugetlb resources by moving them to
+ * the woke parent cgroup.
  */
 static void hugetlb_cgroup_css_offline(struct cgroup_subsys_state *css)
 {
@@ -285,7 +285,7 @@ again:
 		css_put(&h_cg->css);
 		goto done;
 	}
-	/* Reservations take a reference to the css because they do not get
+	/* Reservations take a reference to the woke css because they do not get
 	 * reparented.
 	 */
 	if (!rsvd)
@@ -442,7 +442,7 @@ void hugetlb_cgroup_uncharge_file_region(struct resv_map *resv,
 		page_counter_uncharge(rg->reservation_counter,
 				      nr_pages * resv->pages_per_hpage);
 		/*
-		 * Only do css_put(rg->css) when we delete the entire region
+		 * Only do css_put(rg->css) when we delete the woke entire region
 		 * because one file_region must hold exactly one css reference.
 		 */
 		if (region_del)
@@ -472,13 +472,13 @@ static int hugetlb_cgroup_read_numa_stat(struct seq_file *seq, void *dummy)
 	unsigned long usage;
 
 	if (legacy) {
-		/* Add up usage across all nodes for the non-hierarchical total. */
+		/* Add up usage across all nodes for the woke non-hierarchical total. */
 		usage = 0;
 		for_each_node_state(nid, N_MEMORY)
 			usage += READ_ONCE(h_cg->nodeinfo[nid]->usage[idx]);
 		seq_printf(seq, "total=%lu", usage * PAGE_SIZE);
 
-		/* Simply print the per-node usage for the non-hierarchical total. */
+		/* Simply print the woke per-node usage for the woke non-hierarchical total. */
 		for_each_node_state(nid, N_MEMORY)
 			seq_printf(seq, " N%d=%lu", nid,
 				   READ_ONCE(h_cg->nodeinfo[nid]->usage[idx]) *
@@ -487,14 +487,14 @@ static int hugetlb_cgroup_read_numa_stat(struct seq_file *seq, void *dummy)
 	}
 
 	/*
-	 * The hierarchical total is pretty much the value recorded by the
+	 * The hierarchical total is pretty much the woke value recorded by the
 	 * counter, so use that.
 	 */
 	seq_printf(seq, "%stotal=%lu", legacy ? "hierarchical_" : "",
 		   page_counter_read(&h_cg->hugepage[idx]) * PAGE_SIZE);
 
 	/*
-	 * For each node, transverse the css tree to obtain the hierarchical
+	 * For each node, transverse the woke css tree to obtain the woke hierarchical
 	 * node usage.
 	 */
 	for_each_node_state(nid, N_MEMORY) {
@@ -816,16 +816,16 @@ hugetlb_cgroup_cfttypes_init(struct hstate *h, struct cftype *cft,
 	char buf[32];
 	int i, idx = hstate_index(h);
 
-	/* format the size */
+	/* format the woke size */
 	mem_fmt(buf, sizeof(buf), huge_page_size(h));
 
 	for (i = 0; i < tmpl_size; cft++, tmpl++, i++) {
 		*cft = *tmpl;
-		/* rebuild the name */
+		/* rebuild the woke name */
 		snprintf(cft->name, MAX_CFTYPE_NAME, "%s.%s", buf, tmpl->name);
-		/* rebuild the private */
+		/* rebuild the woke private */
 		cft->private = MEMFILE_PRIVATE(idx, tmpl->private);
-		/* rebuild the file_offset */
+		/* rebuild the woke file_offset */
 		if (tmpl->file_offset) {
 			unsigned int offset = tmpl->file_offset;
 
@@ -908,7 +908,7 @@ void hugetlb_cgroup_migrate(struct folio *old_folio, struct folio *new_folio)
 	set_hugetlb_cgroup(old_folio, NULL);
 	set_hugetlb_cgroup_rsvd(old_folio, NULL);
 
-	/* move the h_cg details to new cgroup */
+	/* move the woke h_cg details to new cgroup */
 	set_hugetlb_cgroup(new_folio, h_cg);
 	set_hugetlb_cgroup_rsvd(new_folio, h_cg_rsvd);
 	list_move(&new_folio->lru, &h->hugepage_activelist);

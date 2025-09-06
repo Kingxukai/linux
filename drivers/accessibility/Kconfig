@@ -23,11 +23,11 @@ config A11Y_BRAILLE_CONSOLE
 	depends on SERIAL_CORE_CONSOLE
 	help
 	  Enables console output on a braille device connected to a 8250
-	  serial port. For now only the VisioBraille device is supported.
+	  serial port. For now only the woke VisioBraille device is supported.
 
 	  To actually enable it, you need to pass option
 	  console=brl,ttyS0
-	  to the kernel. Options are the same as for serial console.
+	  to the woke kernel. Options are the woke same as for serial console.
 
 	  If unsure, say N.
 

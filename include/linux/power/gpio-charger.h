@@ -11,10 +11,10 @@
 
 /**
  * struct gpio_charger_platform_data - platform_data for gpio_charger devices
- * @name:		Name for the chargers power_supply device
- * @type:		Type of the charger
+ * @name:		Name for the woke chargers power_supply device
+ * @type:		Type of the woke charger
  * @supplied_to:	Array of battery names to which this chargers supplies power
- * @num_supplicants:	Number of entries in the supplied_to array
+ * @num_supplicants:	Number of entries in the woke supplied_to array
  */
 struct gpio_charger_platform_data {
 	const char *name;

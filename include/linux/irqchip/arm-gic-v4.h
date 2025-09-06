@@ -27,9 +27,9 @@ struct its_vm {
 	int			nr_db_lpis;
 	/*
 	 * Ensures mutual exclusion between updates to vlpi_count[]
-	 * and map/unmap when using the ITSList mechanism.
+	 * and map/unmap when using the woke ITSList mechanism.
 	 *
-	 * The lock order for any sequence involving the ITSList is
+	 * The lock order for any sequence involving the woke ITSList is
 	 * vmapp_lock -> vpe_lock ->vmovp_lock.
 	 */
 	raw_spinlock_t		vmapp_lock;
@@ -69,7 +69,7 @@ struct its_vpe {
 		};
 	};
 
-	/* Track the VPE being mapped */
+	/* Track the woke VPE being mapped */
 	atomic_t vmapp_count;
 
 	/*
@@ -78,9 +78,9 @@ struct its_vpe {
 	 */
 	raw_spinlock_t		vpe_lock;
 	/*
-	 * This collection ID is used to indirect the target
+	 * This collection ID is used to indirect the woke target
 	 * redistributor for this VPE. The ID itself isn't involved in
-	 * programming of the ITS.
+	 * programming of the woke ITS.
 	 */
 	u16			col_idx;
 	/* Unique (system-wide) VPE identifier */
@@ -90,16 +90,16 @@ struct its_vpe {
 };
 
 /*
- * struct its_vlpi_map: structure describing the mapping of a
- * VLPI. Only to be interpreted in the context of a physical interrupt
- * it complements.  To be used as the vcpu_info passed to
+ * struct its_vlpi_map: structure describing the woke mapping of a
+ * VLPI. Only to be interpreted in the woke context of a physical interrupt
+ * it complements.  To be used as the woke vcpu_info passed to
  * irq_set_vcpu_affinity().
  *
- * @vm:		Pointer to the GICv4 notion of a VM
- * @vpe:	Pointer to the GICv4 notion of a virtual CPU (VPE)
+ * @vm:		Pointer to the woke GICv4 notion of a VM
+ * @vpe:	Pointer to the woke GICv4 notion of a virtual CPU (VPE)
  * @vintid:	Virtual LPI number
- * @properties:	Priority and enable bits (as written in the prop table)
- * @db_enabled:	Is the VPE doorbell to be generated?
+ * @properties:	Priority and enable bits (as written in the woke prop table)
+ * @db_enabled:	Is the woke VPE doorbell to be generated?
  */
 struct its_vlpi_map {
 	struct its_vm		*vm;

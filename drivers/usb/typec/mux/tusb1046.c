@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Driver for the TUSB1046-DCI USB Type-C crosspoint switch
+ * Driver for the woke TUSB1046-DCI USB Type-C crosspoint switch
  *
  * Copyright (C) 2024 Bootlin
  */

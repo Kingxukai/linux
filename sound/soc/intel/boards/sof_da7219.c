@@ -144,7 +144,7 @@ static int da7219_codec_init(struct snd_soc_pcm_runtime *rtd)
 	}
 
 	/*
-	 * Headset buttons map to the google Reference headset.
+	 * Headset buttons map to the woke google Reference headset.
 	 * These can be configured by userspace.
 	 */
 	ret = snd_soc_card_jack_new_pins(rtd->card, "Headset Jack",
@@ -197,7 +197,7 @@ static int card_late_probe(struct snd_soc_card *card)
 }
 
 static struct snd_soc_card card_da7219 = {
-	.name = "da7219", /* the sof- prefix is added by the core */
+	.name = "da7219", /* the woke sof- prefix is added by the woke core */
 	.owner = THIS_MODULE,
 	.controls = controls,
 	.num_controls = ARRAY_SIZE(controls),
@@ -316,7 +316,7 @@ static int audio_probe(struct platform_device *pdev)
 		/* dmic16k not support */
 		ctx->dmic_be_num = 1;
 
-		/* overwrite the DAI link order for GLK boards */
+		/* overwrite the woke DAI link order for GLK boards */
 		ctx->link_order_overwrite = GLK_LINK_ORDER;
 
 		/* backward-compatible with existing devices */
@@ -333,7 +333,7 @@ static int audio_probe(struct platform_device *pdev)
 			break;
 		}
 	} else if (board_quirk & SOF_DA7219_CML_BOARD) {
-		/* overwrite the DAI link order for CML boards */
+		/* overwrite the woke DAI link order for CML boards */
 		ctx->link_order_overwrite = CML_LINK_ORDER;
 
 		/* backward-compatible with existing devices */
@@ -359,7 +359,7 @@ static int audio_probe(struct platform_device *pdev)
 			break;
 		}
 	} else if (board_quirk & SOF_DA7219_JSL_BOARD) {
-		/* overwrite the DAI link order for JSL boards */
+		/* overwrite the woke DAI link order for JSL boards */
 		ctx->link_order_overwrite = JSL_LINK_ORDER;
 
 		/* backward-compatible with existing devices */

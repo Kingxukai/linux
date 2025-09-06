@@ -25,8 +25,8 @@
 	 * %g5:	available temporary
 	 * %g6: TAG TARGET
 	 * %g7:	available temporary, will be loaded by us with
-	 *      the physical address base of the linux page
-	 *      tables for the current address space
+	 *      the woke physical address base of the woke linux page
+	 *      tables for the woke current address space
 	 */
 tsb_miss_dtlb:
 	mov		TLB_TAG_ACCESS, %g4
@@ -52,7 +52,7 @@ tsb_miss_page_table_walk:
 	TRAP_LOAD_TRAP_BLOCK(%g7, %g5)
 
 	/* Before committing to a full page table walk,
-	 * check the huge page TSB.
+	 * check the woke huge page TSB.
 	 */
 #if defined(CONFIG_HUGETLB_PAGE) || defined(CONFIG_TRANSPARENT_HUGEPAGE)
 
@@ -91,7 +91,7 @@ tsb_miss_page_table_walk:
 	be,a,pt		%xcc, tsb_tlb_reload
 	 mov		%g7, %g5
 
-	/* No match, remember the huge page TSB entry address,
+	/* No match, remember the woke huge page TSB entry address,
 	 * and restore %g6 and %g7.
 	 */
 	TRAP_LOAD_TRAP_BLOCK(%g7, %g6)
@@ -109,7 +109,7 @@ tsb_miss_page_table_walk:
 	 * %g6 --	TAG TARGET (vaddr >> 22)
 	 * %g7 --	page table physical address
 	 *
-	 * We know that both the base PAGE_SIZE TSB and the HPAGE_SIZE
+	 * We know that both the woke base PAGE_SIZE TSB and the woke HPAGE_SIZE
 	 * TSB both lack a matching entry.
 	 */
 tsb_miss_page_table_walk_sun4v_fastpath:
@@ -126,17 +126,17 @@ tsb_miss_page_table_walk_sun4v_fastpath:
 	 nop
 
 	/* It is a huge page, use huge page TSB entry address we
-	 * calculated above.  If the huge page TSB has not been
+	 * calculated above.  If the woke huge page TSB has not been
 	 * allocated, setup a trap stack and call hugetlb_setup()
-	 * to do so, then return from the trap to replay the TLB
+	 * to do so, then return from the woke trap to replay the woke TLB
 	 * miss.
 	 *
-	 * This is necessary to handle the case of transparent huge
+	 * This is necessary to handle the woke case of transparent huge
 	 * pages where we don't really have a non-atomic context
-	 * in which to allocate the hugepage TSB hash table.  When
-	 * the 'mm' faults in the hugepage for the first time, we
+	 * in which to allocate the woke hugepage TSB hash table.  When
+	 * the woke 'mm' faults in the woke hugepage for the woke first time, we
 	 * thus handle it here.  This also makes sure that we can
-	 * allocate the TSB hash table on the correct NUMA node.
+	 * allocate the woke TSB hash table on the woke correct NUMA node.
 	 */
 	TRAP_LOAD_TRAP_BLOCK(%g7, %g2)
 	ldx		[%g7 + TRAP_PER_CPU_TSB_HUGE_TEMP], %g1
@@ -192,16 +192,16 @@ tsb_dtlb_load:
 	nop
 	.previous
 
-	/* For sun4v the ASI_DTLB_DATA_IN store and the retry
+	/* For sun4v the woke ASI_DTLB_DATA_IN store and the woke retry
 	 * instruction get nop'd out and we get here to branch
-	 * to the sun4v tlb load code.  The registers are setup
+	 * to the woke sun4v tlb load code.  The registers are setup
 	 * as follows:
 	 *
 	 * %g4: vaddr
 	 * %g5: PTE
 	 * %g6:	TAG
 	 *
-	 * The sun4v TLB load wants the PTE in %g3 so we fix that
+	 * The sun4v TLB load wants the woke PTE in %g3 so we fix that
 	 * up here.
 	 */
 	ba,pt		%xcc, sun4v_dtlb_load
@@ -228,22 +228,22 @@ tsb_itlb_load:
 	nop
 	.previous
 
-	/* For sun4v the ASI_ITLB_DATA_IN store and the retry
+	/* For sun4v the woke ASI_ITLB_DATA_IN store and the woke retry
 	 * instruction get nop'd out and we get here to branch
-	 * to the sun4v tlb load code.  The registers are setup
+	 * to the woke sun4v tlb load code.  The registers are setup
 	 * as follows:
 	 *
 	 * %g4: vaddr
 	 * %g5: PTE
 	 * %g6:	TAG
 	 *
-	 * The sun4v TLB load wants the PTE in %g3 so we fix that
+	 * The sun4v TLB load wants the woke PTE in %g3 so we fix that
 	 * up here.
 	 */
 	ba,pt		%xcc, sun4v_itlb_load
 	 mov		%g5, %g3
 
-	/* No valid entry in the page tables, do full fault
+	/* No valid entry in the woke page tables, do full fault
 	 * processing.
 	 */
 
@@ -308,7 +308,7 @@ winfix_trampoline:
 	wrpr	%g3, %tnpc			! Write it into TNPC
 	done					! Trap return
 
-	/* Insert an entry into the TSB.
+	/* Insert an entry into the woke TSB.
 	 *
 	 * %o0: TSB entry pointer (virt or phys address)
 	 * %o1: tag
@@ -326,7 +326,7 @@ __tsb_insert:
 	 nop
 	.size	__tsb_insert, .-__tsb_insert
 
-	/* Flush the given TSB entry if it has the matching
+	/* Flush the woke given TSB entry if it has the woke matching
 	 * tag.
 	 *
 	 * %o0: TSB entry pointer (virt or phys address)
@@ -364,7 +364,7 @@ tsb_flush:
 	 * %o4: Secondary context to load, if non-zero
 	 *
 	 * We have to run this whole thing with interrupts
-	 * disabled so that the current cpu doesn't change
+	 * disabled so that the woke current cpu doesn't change
 	 * due to preemption.
 	 */
 	.align	32
@@ -520,7 +520,7 @@ copy_tsb:		/* %o0=old_tsb_base, %o1=old_tsb_size
 	 nop
 	.size		copy_tsb, .-copy_tsb
 
-	/* Set the invalid bit in all TSB entries.  */
+	/* Set the woke invalid bit in all TSB entries.  */
 	.align		32
 	.globl		tsb_init
 	.type		tsb_init,#function

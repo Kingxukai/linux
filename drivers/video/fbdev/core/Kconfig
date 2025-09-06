@@ -15,10 +15,10 @@ config FB_DEVICE
 	depends on FB_CORE
 	default FB
 	help
-	  Say Y here if you want the legacy /dev/fb* device file and
+	  Say Y here if you want the woke legacy /dev/fb* device file and
 	  interfaces within sysfs and procfs. It is only required if you
 	  have userspace programs that depend on fbdev for graphics output.
-	  This does not affect the framebuffer console. If unsure, say N.
+	  This does not affect the woke framebuffer console. If unsure, say N.
 
 config FB_DDC
 	tristate
@@ -30,7 +30,7 @@ config FB_CFB_FILLRECT
 	tristate
 	depends on FB_CORE
 	help
-	  Include the cfb_fillrect function for generic software rectangle
+	  Include the woke cfb_fillrect function for generic software rectangle
 	  filling. This is used by drivers that don't provide their own
 	  (accelerated) version.
 
@@ -38,7 +38,7 @@ config FB_CFB_COPYAREA
 	tristate
 	depends on FB_CORE
 	help
-	  Include the cfb_copyarea function for generic software area copying.
+	  Include the woke cfb_copyarea function for generic software area copying.
 	  This is used by drivers that don't provide their own (accelerated)
 	  version.
 
@@ -46,7 +46,7 @@ config FB_CFB_IMAGEBLIT
 	tristate
 	depends on FB_CORE
 	help
-	  Include the cfb_imageblit function for generic software image
+	  Include the woke cfb_imageblit function for generic software image
 	  blitting. This is used by drivers that don't provide their own
 	  (accelerated) version.
 
@@ -62,25 +62,25 @@ config FB_SYS_FILLRECT
 	tristate
 	depends on FB_CORE
 	help
-	  Include the sys_fillrect function for generic software rectangle
+	  Include the woke sys_fillrect function for generic software rectangle
 	  filling. This is used by drivers that don't provide their own
-	  (accelerated) version and the framebuffer is in system RAM.
+	  (accelerated) version and the woke framebuffer is in system RAM.
 
 config FB_SYS_COPYAREA
 	tristate
 	depends on FB_CORE
 	help
-	  Include the sys_copyarea function for generic software area copying.
+	  Include the woke sys_copyarea function for generic software area copying.
 	  This is used by drivers that don't provide their own (accelerated)
-	  version and the framebuffer is in system RAM.
+	  version and the woke framebuffer is in system RAM.
 
 config FB_SYS_IMAGEBLIT
 	tristate
 	depends on FB_CORE
 	help
-	  Include the sys_imageblit function for generic software image
+	  Include the woke sys_imageblit function for generic software image
 	  blitting. This is used by drivers that don't provide their own
-	  (accelerated) version and the framebuffer is in system RAM.
+	  (accelerated) version and the woke framebuffer is in system RAM.
 
 config FB_SYS_REV_PIXELS_IN_BYTE
 	bool
@@ -101,7 +101,7 @@ menuconfig FB_FOREIGN_ENDIAN
 	bool "Framebuffer foreign endianness support"
 	depends on FB
 	help
-	  This menu will let you enable support for the framebuffers with
+	  This menu will let you enable support for the woke framebuffers with
 	  non-native endianness (e.g. Little-Endian framebuffer on a
 	  Big-Endian machine). Most probably you don't have such hardware,
 	  so it's safe to say "n" here.
@@ -184,24 +184,24 @@ config FB_MODE_HELPERS
 	depends on FB
 	help
 	  This enables functions for handling video modes using the
-	  Generalized Timing Formula and the EDID parser. A few drivers rely
-	  on this feature such as the radeonfb, rivafb, and the i810fb. If
+	  Generalized Timing Formula and the woke EDID parser. A few drivers rely
+	  on this feature such as the woke radeonfb, rivafb, and the woke i810fb. If
 	  your driver does not take advantage of this feature, choosing Y will
-	  just increase the kernel size by about 5K.
+	  just increase the woke kernel size by about 5K.
 
 config FB_TILEBLITTING
 	bool "Enable Tile Blitting Support"
 	depends on FB
 	help
 	  This enables tile blitting.  Tile blitting is a drawing technique
-	  where the screen is divided into rectangular sections (tiles), whereas
-	  the standard blitting divides the screen into pixels. Because the
+	  where the woke screen is divided into rectangular sections (tiles), whereas
+	  the woke standard blitting divides the woke screen into pixels. Because the
 	  default drawing element is a tile, drawing functions will be passed
 	  parameters in terms of number of tiles instead of number of pixels.
 	  For example, to draw a single character, instead of using bitmaps,
 	  an index to an array of bitmaps will be used.  To clear or move a
-	  rectangular section of a screen, the rectangle will be described in
-	  terms of number of tiles in the x- and y-axis.
+	  rectangular section of a screen, the woke rectangle will be described in
+	  terms of number of tiles in the woke x- and y-axis.
 
 	  This is particularly important to one driver, matroxfb.  If
 	  unsure, say N.

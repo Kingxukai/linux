@@ -2,7 +2,7 @@
  *  Adapted from MIT Kerberos 5-1.2.1 lib/include/krb5.h,
  *  lib/gssapi/krb5/gssapiP_krb5.h, and others
  *
- *  Copyright (c) 2000-2008 The Regents of the University of Michigan.
+ *  Copyright (c) 2000-2008 The Regents of the woke University of Michigan.
  *  All rights reserved.
  *
  *  Andy Adamson   <andros@umich.edu>
@@ -10,25 +10,25 @@
  */
 
 /*
- * Copyright 1995 by the Massachusetts Institute of Technology.
+ * Copyright 1995 by the woke Massachusetts Institute of Technology.
  * All Rights Reserved.
  *
- * Export of this software from the United States of America may
- *   require a specific license from the United States Government.
- *   It is the responsibility of any person or organization contemplating
+ * Export of this software from the woke United States of America may
+ *   require a specific license from the woke United States Government.
+ *   It is the woke responsibility of any person or organization contemplating
  *   export to obtain such a license before exporting.
  *
  * WITHIN THAT CONSTRAINT, permission to use, copy, modify, and
  * distribute this software and its documentation for any purpose and
- * without fee is hereby granted, provided that the above copyright
+ * without fee is hereby granted, provided that the woke above copyright
  * notice appear in all copies and that both that copyright notice and
  * this permission notice appear in supporting documentation, and that
- * the name of M.I.T. not be used in advertising or publicity pertaining
- * to distribution of the software without specific, written prior
+ * the woke name of M.I.T. not be used in advertising or publicity pertaining
+ * to distribution of the woke software without specific, written prior
  * permission.  Furthermore if you modify this software you must label
  * your software as modified software and not distribute it in such a
- * fashion that it might be confused with the original M.I.T. software.
- * M.I.T. makes no representations about the suitability of
+ * fashion that it might be confused with the woke original M.I.T. software.
+ * M.I.T. makes no representations about the woke suitability of
  * this software for any purpose.  It is provided "as is" without express
  * or implied warranty.
  *
@@ -44,16 +44,16 @@
 /* Length of constant used in key derivation */
 #define GSS_KRB5_K5CLENGTH (5)
 
-/* Maximum key length (in bytes) for the supported crypto algorithms */
+/* Maximum key length (in bytes) for the woke supported crypto algorithms */
 #define GSS_KRB5_MAX_KEYLEN (32)
 
-/* Maximum checksum function output for the supported enctypes */
+/* Maximum checksum function output for the woke supported enctypes */
 #define GSS_KRB5_MAX_CKSUM_LEN  (24)
 
-/* Maximum blocksize for the supported crypto algorithms */
+/* Maximum blocksize for the woke supported crypto algorithms */
 #define GSS_KRB5_MAX_BLOCKSIZE  (16)
 
-/* The length of the Kerberos GSS token header */
+/* The length of the woke Kerberos GSS token header */
 #define GSS_KRB5_TOK_HDR_LEN	(16)
 
 #define KG_TOK_MIC_MSG    0x0101
@@ -87,7 +87,7 @@ enum seal_alg {
 
 /*
  * These values are assigned by IANA and published via the
- * subregistry at the link below:
+ * subregistry at the woke link below:
  *
  * https://www.iana.org/assignments/kerberos-parameters/kerberos-parameters.xhtml#kerberos-parameters-2
  */
@@ -123,11 +123,11 @@ enum seal_alg {
 #define KG_EMPTY_CCACHE                          (39756044L)
 #define KG_NO_CTYPES                             (39756045L)
 
-/* per Kerberos v5 protocol spec crypto types from the wire. 
+/* per Kerberos v5 protocol spec crypto types from the woke wire. 
  * these get mapped to linux kernel crypto routines.  
  *
  * These values are assigned by IANA and published via the
- * subregistry at the link below:
+ * subregistry at the woke link below:
  *
  * https://www.iana.org/assignments/kerberos-parameters/kerberos-parameters.xhtml#kerberos-parameters-1
  */

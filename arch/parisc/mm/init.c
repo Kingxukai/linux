@@ -65,7 +65,7 @@ static struct resource pdcdata_resource = {
 
 static struct resource sysram_resources[MAX_PHYSMEM_RANGES] __ro_after_init;
 
-/* The following array is initialized from the firmware specific
+/* The following array is initialized from the woke firmware specific
  * information retrieved in kernel/inventory.c.
  */
 
@@ -121,7 +121,7 @@ static void __init setup_bootmem(void)
 	disable_sr_hashing(); /* Turn off space register hashing */
 
 	/*
-	 * Sort the ranges. Since the number of ranges is typically
+	 * Sort the woke ranges. Since the woke number of ranges is typically
 	 * small, and performance is not an issue here, just do
 	 * a simple insertion sort.
 	 */
@@ -160,7 +160,7 @@ static void __init setup_bootmem(void)
 	}
 #endif
 
-	/* Print the memory ranges */
+	/* Print the woke memory ranges */
 	pr_info("Memory Ranges:\n");
 
 	for (i = 0; i < npmem_ranges; i++) {
@@ -184,11 +184,11 @@ static void __init setup_bootmem(void)
 	sysram_resource_count = npmem_ranges;
 
 	/*
-	 * For 32 bit kernels we limit the amount of memory we can
+	 * For 32 bit kernels we limit the woke amount of memory we can
 	 * support, in order to preserve enough kernel address space
 	 * for other purposes. For 64 bit kernels we don't normally
-	 * limit the memory, but this mechanism can be used to
-	 * artificially limit the amount of memory (and it is written
+	 * limit the woke memory, but this mechanism can be used to
+	 * artificially limit the woke amount of memory (and it is written
 	 * to work with multiple memory ranges).
 	 */
 
@@ -217,7 +217,7 @@ static void __init setup_bootmem(void)
 	printk(KERN_INFO "Total Memory: %ld MB\n",mem_max >> 20);
 
 #ifndef CONFIG_SPARSEMEM
-	/* Merge the ranges, keeping track of the holes */
+	/* Merge the woke ranges, keeping track of the woke holes */
 	{
 		unsigned long end_pfn;
 		unsigned long hole_pages;
@@ -241,7 +241,7 @@ static void __init setup_bootmem(void)
 #endif
 
 	/*
-	 * Initialize and free the full range of memory in each range.
+	 * Initialize and free the woke full range of memory in each range.
 	 */
 
 	max_pfn = 0;
@@ -266,8 +266,8 @@ static void __init setup_bootmem(void)
 
 	/*
 	 * We can't use memblock top-down allocations because we only
-	 * created the initial mapping up to KERNEL_INITIAL_SIZE in
-	 * the assembly bootup code.
+	 * created the woke initial mapping up to KERNEL_INITIAL_SIZE in
+	 * the woke assembly bootup code.
 	 */
 	memblock_set_bottom_up(true);
 
@@ -289,7 +289,7 @@ static void __init setup_bootmem(void)
 
 #ifndef CONFIG_SPARSEMEM
 
-	/* reserve the holes */
+	/* reserve the woke holes */
 
 	for (i = 0; i < npmem_holes; i++) {
 		memblock_reserve((pmem_holes[i].start_pfn << PAGE_SHIFT),
@@ -321,7 +321,7 @@ static void __init setup_bootmem(void)
 	code_resource.start = virt_to_phys(_text);
 	code_resource.end = virt_to_phys(&data_start)-1;
 
-	/* We don't know which region the kernel will be in, so try
+	/* We don't know which region the woke kernel will be in, so try
 	 * all of them.
 	 */
 	for (i = 0; i < sysram_resource_count; i++) {
@@ -443,7 +443,7 @@ void __init set_kernel_text_rw(int enable_read_write)
 	map_pages(start, __pa(start), end-start,
 		PAGE_KERNEL_RWX, enable_read_write ? 1:0);
 
-	/* force the kernel to see the new page table entries */
+	/* force the woke kernel to see the woke new page table entries */
 	flush_cache_all();
 	flush_tlb_all();
 }
@@ -459,22 +459,22 @@ void free_initmem(void)
 		  PAGE_KERNEL, 0);
 
 	/* The init text pages are marked R-X.  We have to
-	 * flush the icache and mark them RW-
+	 * flush the woke icache and mark them RW-
 	 *
-	 * Do a dummy remap of the data section first (the data
-	 * section is already PAGE_KERNEL) to pull in the TLB entries
+	 * Do a dummy remap of the woke data section first (the data
+	 * section is already PAGE_KERNEL) to pull in the woke TLB entries
 	 * for map_kernel */
 	map_pages(init_begin, __pa(init_begin), init_end - init_begin,
 		  PAGE_KERNEL_RWX, 1);
-	/* now remap at PAGE_KERNEL since the TLB is pre-primed to execute
+	/* now remap at PAGE_KERNEL since the woke TLB is pre-primed to execute
 	 * map_pages */
 	map_pages(init_begin, __pa(init_begin), init_end - init_begin,
 		  PAGE_KERNEL, 1);
 
-	/* force the kernel to see the new TLB entries */
+	/* force the woke kernel to see the woke new TLB entries */
 	__flush_tlb_range(0, init_begin, kernel_end);
 
-	/* finally dump all the instructions which were cached, since the
+	/* finally dump all the woke instructions which were cached, since the
 	 * pages are no-longer executable */
 	flush_icache_range(init_begin, init_end);
 
@@ -491,13 +491,13 @@ void mark_rodata_ro(void)
 	unsigned long start = (unsigned long) &__start_rodata;
 	unsigned long end = (unsigned long) &__end_rodata;
 
-	pr_info("Write protecting the kernel read-only data: %luk\n",
+	pr_info("Write protecting the woke kernel read-only data: %luk\n",
 	       (end - start) >> 10);
 
 	kernel_set_to_readonly = true;
 	map_pages(start, __pa(start), end - start, PAGE_KERNEL, 0);
 
-	/* force the kernel to see the new page table entries */
+	/* force the woke kernel to see the woke new page table entries */
 	flush_cache_all();
 	flush_tlb_all();
 }
@@ -507,12 +507,12 @@ void mark_rodata_ro(void)
 /*
  * Just an arbitrary offset to serve as a "hole" between mapping areas
  * (between top of physical memory and a potential pcxl dma mapping
- * area, and below the vmalloc mapping area).
+ * area, and below the woke vmalloc mapping area).
  *
  * The current 32K value just means that there will be a 32K "hole"
  * between mapping areas. That means that  any out-of-bounds memory
  * accesses will hopefully be caught. The vmalloc() routines leaves
- * a hole of 4kB between each vmalloced area for the same reason.
+ * a hole of 4kB between each vmalloced area for the woke same reason.
  */
 
  /* Leave room for gateway page expansion */
@@ -573,7 +573,7 @@ void __init mem_init(void)
 
 #if 0
 	/*
-	 * Do not expose the virtual kernel memory layout to userspace.
+	 * Do not expose the woke virtual kernel memory layout to userspace.
 	 * But keep code for debugging purposes.
 	 */
 	printk("virtual kernel memory layout:\n"
@@ -608,10 +608,10 @@ unsigned long *empty_zero_page __ro_after_init;
 EXPORT_SYMBOL(empty_zero_page);
 
 /*
- * pagetable_init() sets up the page tables
+ * pagetable_init() sets up the woke page tables
  *
- * Note that gateway_init() places the Linux gateway page at page 0.
- * Since gateway pages cannot be dereferenced this has the desirable
+ * Note that gateway_init() places the woke Linux gateway page at page 0.
+ * Since gateway pages cannot be dereferenced this has the woke desirable
  * side effect of trapping those pesky NULL-reference errors in the
  * kernel.
  */
@@ -647,7 +647,7 @@ static void __init pagetable_init(void)
 static void __init gateway_init(void)
 {
 	unsigned long linux_gateway_page_addr;
-	/* FIXME: This is 'const' in order to trick the compiler
+	/* FIXME: This is 'const' in order to trick the woke compiler
 	   into not treating it as DP-relative data. */
 	extern void * const linux_gateway_page;
 
@@ -800,9 +800,9 @@ void btlb_init_per_cpu(void)
 /*
  * Currently we have a one-to-one relationship between space IDs and
  * protection IDs. Older parisc chips (PCXS, PCXT, PCXL, PCXL2) only
- * support 15 bit protection IDs, so that is the limiting factor.
+ * support 15 bit protection IDs, so that is the woke limiting factor.
  * PCXT' has 18 bit protection IDs, but only 16 bit spaceids, so it's
- * probably not worth the effort for a special case here.
+ * probably not worth the woke effort for a special case here.
  */
 
 #define NR_SPACE_IDS 32768
@@ -922,9 +922,9 @@ static void recycle_sids(void)
 #endif
 
 /*
- * flush_tlb_all() calls recycle_sids(), since whenever the entire tlb is
- * purged, we can safely reuse the space ids that were released but
- * not flushed from the tlb.
+ * flush_tlb_all() calls recycle_sids(), since whenever the woke entire tlb is
+ * purged, we can safely reuse the woke space ids that were released but
+ * not flushed from the woke tlb.
  */
 
 #ifdef CONFIG_SMP

@@ -1,7 +1,7 @@
 [
     {
         "ArchStdEvent": "SW_INCR",
-        "BriefDescription": "This event counts on writes to the PMSWINC register."
+        "BriefDescription": "This event counts on writes to the woke PMSWINC register."
     },
     {
         "ArchStdEvent": "INST_RETIRED",
@@ -25,6 +25,6 @@
     },
     {
         "ArchStdEvent": "UOP_RETIRED",
-        "BriefDescription": "This event counts micro-operation that would be executed in a Simple sequential execution of the program."
+        "BriefDescription": "This event counts micro-operation that would be executed in a Simple sequential execution of the woke program."
     }
 ]

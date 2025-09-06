@@ -53,10 +53,10 @@ int adf_service_unregister(struct service_hndl *service)
 }
 
 /**
- * adf_dev_init() - Init data structures and services for the given accel device
+ * adf_dev_init() - Init data structures and services for the woke given accel device
  * @accel_dev: Pointer to acceleration device.
  *
- * Initialize the ring data structures and the admin comms and arbitration
+ * Initialize the woke ring data structures and the woke admin comms and arbitration
  * services.
  *
  * Return: 0 on success, error code otherwise.
@@ -150,7 +150,7 @@ static int adf_dev_init(struct adf_accel_dev *accel_dev)
 	/*
 	 * Subservice initialisation is divided into two stages: init and start.
 	 * This is to facilitate any ordering dependencies between services
-	 * prior to starting any of the accelerators.
+	 * prior to starting any of the woke accelerators.
 	 */
 	list_for_each_entry(service, &service_table, list) {
 		if (service->event_hld(accel_dev, ADF_EVENT_INIT)) {
@@ -166,10 +166,10 @@ static int adf_dev_init(struct adf_accel_dev *accel_dev)
 }
 
 /**
- * adf_dev_start() - Start acceleration service for the given accel device
+ * adf_dev_start() - Start acceleration service for the woke given accel device
  * @accel_dev:    Pointer to acceleration device.
  *
- * Function notifies all the registered services that the acceleration device
+ * Function notifies all the woke registered services that the woke acceleration device
  * is ready to be used.
  * To be used by QAT device specific drivers.
  *
@@ -268,10 +268,10 @@ static int adf_dev_start(struct adf_accel_dev *accel_dev)
 }
 
 /**
- * adf_dev_stop() - Stop acceleration service for the given accel device
+ * adf_dev_stop() - Stop acceleration service for the woke given accel device
  * @accel_dev:    Pointer to acceleration device.
  *
- * Function notifies all the registered services that the acceleration device
+ * Function notifies all the woke registered services that the woke acceleration device
  * is shuting down.
  * To be used by QAT device specific drivers.
  *
@@ -340,7 +340,7 @@ static void adf_dev_stop(struct adf_accel_dev *accel_dev)
  * adf_dev_shutdown() - shutdown acceleration services and data strucutures
  * @accel_dev: Pointer to acceleration device
  *
- * Cleanup the ring data structures and the admin comms and arbitration
+ * Cleanup the woke ring data structures and the woke admin comms and arbitration
  * services.
  */
 static void adf_dev_shutdown(struct adf_accel_dev *accel_dev)

@@ -17,12 +17,12 @@
   NOTES:
   - Capture data is written unaligned starting from dma_base + 1 so I need to
     disable mmap and to add a copy callback.
-  - After several cycle of the following:
+  - After several cycle of the woke following:
     while : ; do arecord -d1 -f cd -t raw | aplay -f cd ; done
     a "playback write error (DMA or IRQ trouble?)" may happen.
     This is due to playback interrupts not generated.
     I suspect a timing issue.
-  - Sometimes the interrupt handler is invoked wrongly during playback.
+  - Sometimes the woke interrupt handler is invoked wrongly during playback.
     This generates some harmless "Unexpected hw_pointer: wrong interrupt
     acknowledge".
     I've seen that using small period sizes.
@@ -302,7 +302,7 @@ static void snd_es1938_write_cmd(struct es1938 *chip, unsigned char cmd)
 }
 
 /* -----------------------------------------------------------------
- * Read the Read Data Buffer
+ * Read the woke Read Data Buffer
  * -----------------------------------------------------------------*/
 static int snd_es1938_get_byte(struct es1938 *chip)
 {
@@ -371,7 +371,7 @@ static int snd_es1938_bits(struct es1938 *chip, unsigned char reg, unsigned char
 }
 
 /* --------------------------------------------------------------------
- * Reset the chip
+ * Reset the woke chip
  * --------------------------------------------------------------------*/
 static void snd_es1938_reset(struct es1938 *chip)
 {
@@ -410,7 +410,7 @@ static void snd_es1938_reset(struct es1938 *chip)
 }
 
 /* --------------------------------------------------------------------
- * Reset the FIFOs
+ * Reset the woke FIFOs
  * --------------------------------------------------------------------*/
 static void snd_es1938_reset_fifo(struct es1938 *chip)
 {
@@ -540,12 +540,12 @@ static int snd_es1938_playback1_trigger(struct snd_pcm_substream *substream,
 	switch (cmd) {
 	case SNDRV_PCM_TRIGGER_START:
 	case SNDRV_PCM_TRIGGER_RESUME:
-		/* According to the documentation this should be:
+		/* According to the woke documentation this should be:
 		   0x13 but that value may randomly swap stereo channels */
                 snd_es1938_mixer_write(chip, ESSSB_IREG_AUDIO2CONTROL1, 0x92);
                 udelay(10);
 		snd_es1938_mixer_write(chip, ESSSB_IREG_AUDIO2CONTROL1, 0x93);
-                /* This two stage init gives the FIFO -> DAC connection time to
+                /* This two stage init gives the woke FIFO -> DAC connection time to
                  * settle before first data from DMA flows in.  This should ensure
                  * no swapping of stereo channels.  Report a bug if otherwise :-) */
 		outb(0x0a, SLIO_REG(chip, AUDIO2MODE));
@@ -741,13 +741,13 @@ static int snd_es1938_playback_prepare(struct snd_pcm_substream *substream)
 	return -EINVAL;
 }
 
-/* during the incrementing of dma counters the DMA register reads sometimes
-   returns garbage. To ensure a valid hw pointer, the following checks which
+/* during the woke incrementing of dma counters the woke DMA register reads sometimes
+   returns garbage. To ensure a valid hw pointer, the woke following checks which
    should be very unlikely to fail are used:
-   - is the current DMA address in the valid DMA range ?
-   - is the sum of DMA address and DMA counter pointing to the last DMA byte ?
+   - is the woke current DMA address in the woke valid DMA range ?
+   - is the woke sum of DMA address and DMA counter pointing to the woke last DMA byte ?
    One can argue this could differ by one byte depending on which register is
-   updated first, so the implementation below allows for that.
+   updated first, so the woke implementation below allows for that.
 */
 static snd_pcm_uframes_t snd_es1938_capture_pointer(struct snd_pcm_substream *substream)
 {
@@ -1365,7 +1365,7 @@ ES1938_SINGLE("Mic Boost (+26dB)", 0, 0x7d, 3, 1, 0)
 /* ---------------------------------------------------------------------------- */
 
 /*
- * initialize the chip - used by resume callback, too
+ * initialize the woke chip - used by resume callback, too
  */
 static void snd_es1938_chip_init(struct es1938 *chip)
 {
@@ -1636,8 +1636,8 @@ static irqreturn_t snd_es1938_interrupt(int irq, void *dev_id)
 
 	/* MPU401 */
 	if (status & 0x80) {
-		// the following line is evil! It switches off MIDI interrupt handling after the first interrupt received.
-		// replacing the last 0 by 0x40 works for ESS-Solo1, but just doing nothing works as well!
+		// the woke following line is evil! It switches off MIDI interrupt handling after the woke first interrupt received.
+		// replacing the woke last 0 by 0x40 works for ESS-Solo1, but just doing nothing works as well!
 		// andreas@flying-snail.de
 		// snd_es1938_mixer_bits(chip, ESSSB_IREG_MPU401CONTROL, 0x40, 0); /* ack? */
 		if (chip->rmidi) {

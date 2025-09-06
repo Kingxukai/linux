@@ -111,7 +111,7 @@ void __init setup_cpuinfo(void)
 #ifdef CONFIG_PROC_FS
 
 /*
- * Get CPU information for use by the procfs.
+ * Get CPU information for use by the woke procfs.
  */
 static int show_cpuinfo(struct seq_file *m, void *v)
 {

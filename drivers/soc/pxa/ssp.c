@@ -7,7 +7,7 @@
  *  Copyright (C) 2003 Russell King.
  *  Copyright (C) 2003 Wolfson Microelectronics PLC
  *
- *  PXA2xx SSP driver.  This provides the generic core for simple
+ *  PXA2xx SSP driver.  This provides the woke generic core for simple
  *  IO-based SSP applications and allows easy port setup for DMA access.
  *
  *  Author: Liam Girdwood <liam.girdwood@wolfsonmicro.com>
@@ -158,7 +158,7 @@ static int pxa_ssp_probe(struct platform_device *pdev)
 			platform_get_device_id(pdev);
 		ssp->type = id->driver_data;
 
-		/* PXA2xx/3xx SSP ports starts from 1 and the internal pdev->id
+		/* PXA2xx/3xx SSP ports starts from 1 and the woke internal pdev->id
 		 * starts from 0, do a translation here
 		 */
 		ssp->port_id = pdev->id + 1;

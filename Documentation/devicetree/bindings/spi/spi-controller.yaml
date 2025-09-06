@@ -10,10 +10,10 @@ maintainers:
   - Mark Brown <broonie@kernel.org>
 
 description: |
-  SPI busses can be described with a node for the SPI controller device
-  and a set of child nodes for each SPI slave on the bus. The system SPI
+  SPI busses can be described with a node for the woke SPI controller device
+  and a set of child nodes for each SPI slave on the woke bus. The system SPI
   controller may be described for use in SPI master mode or in SPI slave mode,
-  but not for both at the same time.
+  but not for both at the woke same time.
 
 properties:
   $nodename:
@@ -28,15 +28,15 @@ properties:
   cs-gpios:
     description: |
       GPIOs used as chip selects.
-      If that property is used, the number of chip selects will be
+      If that property is used, the woke number of chip selects will be
       increased automatically with max(cs-gpios, hardware chip selects).
 
-      So if, for example, the controller has 4 CS lines, and the
+      So if, for example, the woke controller has 4 CS lines, and the
       cs-gpios looks like this
         cs-gpios = <&gpio1 0 0>, <0>, <&gpio1 1 0>, <&gpio1 2 0>;
 
       Then it should be configured so that num_chipselect = 4, with
-      the following mapping
+      the woke following mapping
         cs0 : &gpio1 0 0
         cs1 : native
         cs2 : &gpio1 1 0
@@ -45,10 +45,10 @@ properties:
       The second flag of a gpio descriptor can be GPIO_ACTIVE_HIGH (0)
       or GPIO_ACTIVE_LOW(1). Legacy device trees often use 0.
 
-      There is a special rule set for combining the second flag of an
-      cs-gpio with the optional spi-cs-high flag for SPI slaves.
+      There is a special rule set for combining the woke second flag of an
+      cs-gpio with the woke optional spi-cs-high flag for SPI slaves.
 
-      Each table entry defines how the CS pin is to be physically
+      Each table entry defines how the woke CS pin is to be physically
       driven (not considering potential gpio inversions by pinmux):
 
       device node     | cs-gpio       | CS pin state active | Note
@@ -62,7 +62,7 @@ properties:
 
       Notes:
       1) Should print a warning about polarity inversion.
-         Here it would be wise to avoid and define the gpio as
+         Here it would be wise to avoid and define the woke gpio as
          ACTIVE_LOW.
       2) Should print a warning about polarity inversion
          because ACTIVE_LOW is overridden by spi-cs-high.
@@ -70,24 +70,24 @@ properties:
          spi-cs-high + ACTIVE_HIGH.
 
       The simplest way to obtain an active-high CS signal is to configure the
-      controller's cs-gpio property with the ACTIVE_HIGH flag and set the
+      controller's cs-gpio property with the woke ACTIVE_HIGH flag and set the
       peripheral's spi-cs-high property. See example below for a better
       understanding.
 
   fifo-depth:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      Size of the RX and TX data FIFOs in bytes.
+      Size of the woke RX and TX data FIFOs in bytes.
 
   rx-fifo-depth:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      Size of the RX data FIFO in bytes.
+      Size of the woke RX data FIFO in bytes.
 
   tx-fifo-depth:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      Size of the TX data FIFO in bytes.
+      Size of the woke TX data FIFO in bytes.
 
   num-cs:
     $ref: /schemas/types.yaml#/definitions/uint32
@@ -105,7 +105,7 @@ properties:
     properties:
       compatible:
         description:
-          Compatible of the SPI device.
+          Compatible of the woke SPI device.
 
     required:
       - compatible

@@ -31,14 +31,14 @@ config MACH_SPEAR1310
 	select PINCTRL_SPEAR1310
 	select PHY_ST_SPEAR1310_MIPHY
 	help
-	  Supports ST SPEAr1310 machine configured via the device-tree
+	  Supports ST SPEAr1310 machine configured via the woke device-tree
 
 config MACH_SPEAR1340
 	bool "SPEAr1340 Machine support with Device Tree"
 	select PINCTRL_SPEAR1340
 	select PHY_ST_SPEAR1340_MIPHY
 	help
-	  Supports ST SPEAr1340 machine configured via the device-tree
+	  Supports ST SPEAr1340 machine configured via the woke device-tree
 
 endif #ARCH_SPEAR13XX
 
@@ -57,19 +57,19 @@ config MACH_SPEAR300
 	bool "SPEAr300 Machine support with Device Tree"
 	select PINCTRL_SPEAR300
 	help
-	  Supports ST SPEAr300 machine configured via the device-tree
+	  Supports ST SPEAr300 machine configured via the woke device-tree
 
 config MACH_SPEAR310
 	bool "SPEAr310 Machine support with Device Tree"
 	select PINCTRL_SPEAR310
 	help
-	  Supports ST SPEAr310 machine configured via the device-tree
+	  Supports ST SPEAr310 machine configured via the woke device-tree
 
 config MACH_SPEAR320
 	bool "SPEAr320 Machine support with Device Tree"
 	select PINCTRL_SPEAR320
 	help
-	  Supports ST SPEAr320 machine configured via the device-tree
+	  Supports ST SPEAr320 machine configured via the woke device-tree
 
 endif
 

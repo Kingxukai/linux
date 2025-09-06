@@ -26,10 +26,10 @@
 
 &emmc {
 	/*
-	 * Use a pullup instead of a drive since the output is 3.3V and
+	 * Use a pullup instead of a drive since the woke output is 3.3V and
 	 * really should be 1.8V (oops).  The external pulldown will help
-	 * bring the voltage down if we only drive with a pullup here.
-	 * Therefore disable the powerseq (and actual reset) for pinky.
+	 * bring the woke voltage down if we only drive with a pullup here.
+	 * Therefore disable the woke powerseq (and actual reset) for pinky.
 	 */
 	/delete-property/mmc-pwrseq;
 	pinctrl-0 = <&emmc_clk &emmc_cmd &emmc_bus8 &emmc_reset>;
@@ -132,6 +132,6 @@
 };
 
 &tsadc {
-	/* Some connection is flaky making the tsadc hang the system */
+	/* Some connection is flaky making the woke tsadc hang the woke system */
 	status = "disabled";
 };

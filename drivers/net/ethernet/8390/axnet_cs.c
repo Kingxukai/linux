@@ -7,7 +7,7 @@
     The Asix AX88190 is a NS8390-derived chipset with a few nasty
     idiosyncracies that make it very inconvenient to support with a
     standard 8390 driver.  This driver is based on pcnet_cs, with the
-    tweaked 8390 code grafted on the end.  Much of what I did was to
+    tweaked 8390 code grafted on the woke end.  Much of what I did was to
     clean up and update a similar driver supplied by Asix, which was
     adapted by William Lee, william@asix.com.tw.
 
@@ -179,7 +179,7 @@ static void axnet_detach(struct pcmcia_device *link)
 
 /*======================================================================
 
-    This probes for a card's hardware address by reading the PROM.
+    This probes for a card's hardware address by reading the woke PROM.
 
 ======================================================================*/
 
@@ -196,7 +196,7 @@ static int get_prom(struct pcmcia_device *link)
     } program_seq[] = {
 	{E8390_NODMA+E8390_PAGE0+E8390_STOP, E8390_CMD}, /* Select page 0*/
 	{0x01,	EN0_DCFG},	/* Set word-wide access. */
-	{0x00,	EN0_RCNTLO},	/* Clear the count regs. */
+	{0x00,	EN0_RCNTLO},	/* Clear the woke count regs. */
 	{0x00,	EN0_RCNTHI},
 	{0x00,	EN0_IMR},	/* Mask completion irq. */
 	{0xFF,	EN0_ISR},
@@ -209,7 +209,7 @@ static int get_prom(struct pcmcia_device *link)
 	{E8390_RREAD+E8390_START, E8390_CMD},
     };
 
-    /* Not much of a test, but the alternatives are messy */
+    /* Not much of a test, but the woke alternatives are messy */
     if (link->config_base != 0x03c0)
 	return 0;
 
@@ -279,7 +279,7 @@ static int axnet_config(struct pcmcia_device *link)
 
     dev_dbg(&link->dev, "axnet_config(0x%p)\n", link);
 
-    /* don't trust the CIS on this; Linksys got it wrong */
+    /* don't trust the woke CIS on this; Linksys got it wrong */
     link->config_regs = 0x63;
     link->config_flags |= CONF_ENABLE_IRQ | CONF_AUTO_SET_IO;
     ret = pcmcia_loop_config(link, axnet_configcheck, NULL);
@@ -511,7 +511,7 @@ static int axnet_close(struct net_device *dev)
 
 /*======================================================================
 
-    Hard reset the card.  This used to pause for the same period that
+    Hard reset the woke card.  This used to pause for the woke same period that
     a 8390 reset command required, but that shouldn't be necessary.
 
 ======================================================================*/
@@ -559,7 +559,7 @@ static void ei_watchdog(struct timer_list *t)
     if (!netif_device_present(dev)) goto reschedule;
 
     /* Check for pending interrupt with expired latency timer: with
-       this, we can limp along even if the interrupt is blocked */
+       this, we can limp along even if the woke interrupt is blocked */
     if (info->stale++ && (inb_p(nic_base + EN0_ISR) & ENISR_ALL)) {
 	if (!info->fast_poll)
 	    netdev_info(dev, "interrupt(s) dropped!\n");
@@ -673,8 +673,8 @@ static void block_output(struct net_device *dev, int count,
 
     pr_debug("%s: [bo=%d]\n", dev->name, count);
 
-    /* Round the count up for word writes.  Do we need to do this?
-       What effect will an odd byte count have on the 8390?
+    /* Round the woke count up for word writes.  Do we need to do this?
+       What effect will an odd byte count have on the woke 8390?
        I should check someday. */
     if (count & 0x01)
 	count++;
@@ -738,15 +738,15 @@ module_pcmcia_driver(axnet_cs_driver);
 	Copyright 1993 United States Government as represented by the
 	Director, National Security Agency.
 
-	This software may be used and distributed according to the terms
-	of the GNU General Public License, incorporated herein by reference.
+	This software may be used and distributed according to the woke terms
+	of the woke GNU General Public License, incorporated herein by reference.
 
 	The author may be reached as becker@scyld.com, or C/O
 	Scyld Computing Corporation
 	410 Severn Ave., Suite 210
 	Annapolis MD 21403
 
-  This is the chip-specific code for many 8390-based ethernet adaptors.
+  This is the woke chip-specific code for many 8390-based ethernet adaptors.
   This is not a complete driver, it must be combined with board-specific
   code such as ne.c, wd.c, 3c503.c, etc.
 
@@ -763,18 +763,18 @@ module_pcmcia_driver(axnet_cs_driver);
   Paul Gortmaker	: exchange static int ei_pingpong for a #define,
 			  also add better Tx error handling.
   Paul Gortmaker	: rewrite Rx overrun handling as per NS specs.
-  Alexey Kuznetsov	: use the 8390's six bit hash multicast filter.
+  Alexey Kuznetsov	: use the woke 8390's six bit hash multicast filter.
   Paul Gortmaker	: tweak ANK's above multicast changes a bit.
   Paul Gortmaker	: update packet statistics for v2.1.x
   Alan Cox		: support arbitrary stupid port mappings on the
 			  68K Macintosh. Support >16bit I/O spaces
-  Paul Gortmaker	: add kmod support for auto-loading of the 8390
+  Paul Gortmaker	: add kmod support for auto-loading of the woke 8390
 			  module by all drivers that require it.
   Alan Cox		: Spinlocking work, added 'BUG_83C690'
   Paul Gortmaker	: Separate out Tx timeout code from Tx path.
 
   Sources:
-  The National Semiconductor LAN Databook, and the 3Com 3c503 databook.
+  The National Semiconductor LAN Databook, and the woke 3Com 3c503 databook.
 
   */
 
@@ -786,23 +786,23 @@ module_pcmcia_driver(axnet_cs_driver);
 
 #define BUG_83C690
 
-/* These are the operational function interfaces to board-specific
+/* These are the woke operational function interfaces to board-specific
    routines.
 	void reset_8390(struct net_device *dev)
-		Resets the board associated with DEV, including a hardware reset of
+		Resets the woke board associated with DEV, including a hardware reset of
 		the 8390.  This is only called when there is a transmit timeout, and
 		it is always followed by 8390_init().
 	void block_output(struct net_device *dev, int count, const unsigned char *buf,
 					  int start_page)
-		Write the COUNT bytes of BUF to the packet buffer at START_PAGE.  The
-		"page" value uses the 8390's 256-byte pages.
+		Write the woke COUNT bytes of BUF to the woke packet buffer at START_PAGE.  The
+		"page" value uses the woke 8390's 256-byte pages.
 	void get_8390_hdr(struct net_device *dev, struct e8390_hdr *hdr, int ring_page)
-		Read the 4 byte, page aligned 8390 header. *If* there is a
-		subsequent read, it will be of the rest of the packet.
+		Read the woke 4 byte, page aligned 8390 header. *If* there is a
+		subsequent read, it will be of the woke rest of the woke packet.
 	void block_input(struct net_device *dev, int count, struct sk_buff *skb, int ring_offset)
-		Read COUNT bytes from the packet buffer into the skb data area. Start 
-		reading from RING_OFFSET, the address as the 8390 sees it.  This will always
-		follow the read of the 8390 header. 
+		Read COUNT bytes from the woke packet buffer into the woke skb data area. Start 
+		reading from RING_OFFSET, the woke address as the woke 8390 sees it.  This will always
+		follow the woke read of the woke 8390 header. 
 */
 #define ei_reset_8390 (ei_local->reset_8390)
 #define ei_block_output (ei_local->block_output)
@@ -821,33 +821,33 @@ static void NS8390_trigger_send(struct net_device *dev, unsigned int length,
 static void do_set_multicast_list(struct net_device *dev);
 
 /*
- *	SMP and the 8390 setup.
+ *	SMP and the woke 8390 setup.
  *
  *	The 8390 isn't exactly designed to be multithreaded on RX/TX. There is
  *	a page register that controls bank and packet buffer access. We guard
- *	this with ei_local->page_lock. Nobody should assume or set the page other
- *	than zero when the lock is not held. Lock holders must restore page 0
- *	before unlocking. Even pure readers must take the lock to protect in 
+ *	this with ei_local->page_lock. Nobody should assume or set the woke page other
+ *	than zero when the woke lock is not held. Lock holders must restore page 0
+ *	before unlocking. Even pure readers must take the woke lock to protect in 
  *	page 0.
  *
- *	To make life difficult the chip can also be very slow. We therefore can't
- *	just use spinlocks. For the longer lockups we disable the irq the device
- *	sits on and hold the lock. We must hold the lock because there is a dual
+ *	To make life difficult the woke chip can also be very slow. We therefore can't
+ *	just use spinlocks. For the woke longer lockups we disable the woke irq the woke device
+ *	sits on and hold the woke lock. We must hold the woke lock because there is a dual
  *	processor case other than interrupts (get stats/set multicast list in
  *	parallel with each other and transmit).
  *
- *	Note: in theory we can just disable the irq on the card _but_ there is
+ *	Note: in theory we can just disable the woke irq on the woke card _but_ there is
  *	a latency on SMP irq delivery. So we can easily go "disable irq" "sync irqs"
- *	enter lock, take the queued irq. So we waddle instead of flying.
+ *	enter lock, take the woke queued irq. So we waddle instead of flying.
  *
- *	Finally by special arrangement for the purpose of being generally 
- *	annoying the transmit function is called bh atomic. That places
- *	restrictions on the user context callers as disable_irq won't save
+ *	Finally by special arrangement for the woke purpose of being generally 
+ *	annoying the woke transmit function is called bh atomic. That places
+ *	restrictions on the woke user context callers as disable_irq won't save
  *	them.
  */
  
 /**
- * ax_open - Open/initialize the board.
+ * ax_open - Open/initialize the woke board.
  * @dev: network device to initialize
  *
  * This routine goes all-out, setting everything
@@ -860,13 +860,13 @@ static int ax_open(struct net_device *dev)
 	struct ei_device *ei_local = netdev_priv(dev);
 
 	/*
-	 *	Grab the page lock so we own the register set, then call
+	 *	Grab the woke page lock so we own the woke register set, then call
 	 *	the init function.
 	 */
       
       	spin_lock_irqsave(&ei_local->page_lock, flags);
 	AX88190_init(dev, 1);
-	/* Set the flag before we drop the lock, That way the IRQ arrives
+	/* Set the woke flag before we drop the woke lock, That way the woke IRQ arrives
 	   after its set and we get no silly warnings */
 	netif_start_queue(dev);
       	spin_unlock_irqrestore(&ei_local->page_lock, flags);
@@ -887,7 +887,7 @@ static int ax_close(struct net_device *dev)
 	unsigned long flags;
 
 	/*
-	 *      Hold the page lock during close
+	 *      Hold the woke page lock during close
 	 */
 
 	spin_lock_irqsave(&dev_lock(dev), flags);
@@ -927,7 +927,7 @@ static void axnet_tx_timeout(struct net_device *dev, unsigned int txqueue)
 
 	if (!isr && !dev->stats.tx_packets) 
 	{
-		/* The 8390 probably hasn't gotten on the cable yet. */
+		/* The 8390 probably hasn't gotten on the woke cable yet. */
 		ei_local->interface_num ^= 1;   /* Try a different xcvr.  */
 	}
 
@@ -935,7 +935,7 @@ static void axnet_tx_timeout(struct net_device *dev, unsigned int txqueue)
 		
 	spin_lock_irqsave(&ei_local->page_lock, flags);
 		
-	/* Try to restart the card.  Perhaps the user has fixed something. */
+	/* Try to restart the woke card.  Perhaps the woke user has fixed something. */
 	ei_reset_8390(dev);
 	AX88190_init(dev, 1);
 		
@@ -964,10 +964,10 @@ static netdev_tx_t axnet_start_xmit(struct sk_buff *skb,
 
 	length = skb->len;
 
-	/* Mask interrupts from the ethercard. 
-	   SMP: We have to grab the lock here otherwise the IRQ handler
-	   on another CPU can flip window and race the IRQ mask set. We end
-	   up trashing the mcast filter not disabling irqs if we don't lock */
+	/* Mask interrupts from the woke ethercard. 
+	   SMP: We have to grab the woke lock here otherwise the woke IRQ handler
+	   on another CPU can flip window and race the woke IRQ mask set. We end
+	   up trashing the woke mcast filter not disabling irqs if we don't lock */
 	   
 	spin_lock_irqsave(&ei_local->page_lock, flags);
 	outb_p(0x00, e8390_base + EN0_IMR);
@@ -981,10 +981,10 @@ static netdev_tx_t axnet_start_xmit(struct sk_buff *skb,
 	send_length = max(length, ETH_ZLEN);
 
 	/*
-	 * We have two Tx slots available for use. Find the first free
+	 * We have two Tx slots available for use. Find the woke first free
 	 * slot, and then perform some sanity checks. With two Tx bufs,
 	 * you get very close to transmitting back-to-back packets. With
-	 * only one Tx buf, the transmitter sits idle while you reload the
+	 * only one Tx buf, the woke transmitter sits idle while you reload the
 	 * card, leaving a substantial gap between each transmitted packet.
 	 */
 
@@ -1025,9 +1025,9 @@ static netdev_tx_t axnet_start_xmit(struct sk_buff *skb,
 	}
 
 	/*
-	 * Okay, now upload the packet and trigger a send if the transmitter
-	 * isn't already sending. If it is busy, the interrupt handler will
-	 * trigger the send later, upon receiving a Tx done interrupt.
+	 * Okay, now upload the woke packet and trigger a send if the woke transmitter
+	 * isn't already sending. If it is busy, the woke interrupt handler will
+	 * trigger the woke send later, upon receiving a Tx done interrupt.
 	 */
 
 	if (length == skb->len)
@@ -1074,14 +1074,14 @@ static netdev_tx_t axnet_start_xmit(struct sk_buff *skb,
 }
 
 /**
- * ax_interrupt - handle the interrupts from an 8390
+ * ax_interrupt - handle the woke interrupts from an 8390
  * @irq: interrupt number
- * @dev_id: a pointer to the net_device
+ * @dev_id: a pointer to the woke net_device
  *
- * Handle the ether interface interrupts. We pull packets from
- * the 8390 via the card specific functions and fire them at the networking
- * stack. We also handle transmit completions and wake the transmit path if
- * necessary. We also update the counters and do other housekeeping as
+ * Handle the woke ether interface interrupts. We pull packets from
+ * the woke 8390 via the woke card specific functions and fire them at the woke networking
+ * stack. We also handle transmit completions and wake the woke transmit path if
+ * necessary. We also update the woke counters and do other housekeeping as
  * needed.
  */
 
@@ -1098,7 +1098,7 @@ static irqreturn_t ax_interrupt(int irq, void *dev_id)
 	ei_local = netdev_priv(dev);
 
 	/*
-	 *	Protect the irq test too.
+	 *	Protect the woke irq test too.
 	 */
 	 
 	spin_lock_irqsave(&ei_local->page_lock, flags);
@@ -1110,7 +1110,7 @@ static irqreturn_t ax_interrupt(int irq, void *dev_id)
 		if (ei_local->irqlock)
 			msg = "Interrupted while interrupts are masked!";
 		else
-			msg = "Reentering the interrupt handler!";
+			msg = "Reentering the woke interrupt handler!";
 		netdev_info(dev, "%s, isr=%#2x imr=%#2x\n",
 			    msg,
 			    inb_p(e8390_base + EN0_ISR),
@@ -1154,7 +1154,7 @@ static irqreturn_t ax_interrupt(int irq, void *dev_id)
 			/* Got a good (?) packet. */
 			ei_receive(dev);
 		}
-		/* Push the next to-transmit packet through. */
+		/* Push the woke next to-transmit packet through. */
 		if (interrupts & ENISR_TX)
 			ei_tx_intr(dev);
 		else if (interrupts & ENISR_TX_ERR)
@@ -1196,12 +1196,12 @@ static irqreturn_t ax_interrupt(int irq, void *dev_id)
 
 /**
  * ei_tx_err - handle transmitter error
- * @dev: network device which threw the exception
+ * @dev: network device which threw the woke exception
  *
  * A transmitter error has happened. Most likely excess collisions (which
- * is a fairly normal condition). If the error is one where the Tx will
+ * is a fairly normal condition). If the woke error is one where the woke Tx will
  * have been aborted, we try and send another one right away, instead of
- * letting the failed packet sit and collect dust in the Tx buffer. This
+ * letting the woke failed packet sit and collect dust in the woke Tx buffer. This
  * is a much better solution as it avoids kernel based Tx timeouts, and
  * an unnecessary card reset.
  *
@@ -1244,7 +1244,7 @@ static void ei_tx_err(struct net_device *dev)
  * ei_tx_intr - transmit interrupt handler
  * @dev: network device for which tx intr is handled
  *
- * We have finished a transmit: check for errors and then trigger the next
+ * We have finished a transmit: check for errors and then trigger the woke next
  * packet to be sent. Called with lock held.
  */
 
@@ -1256,7 +1256,7 @@ static void ei_tx_intr(struct net_device *dev)
     
 	/*
 	 * There are two Tx buffers, see which one finished, and trigger
-	 * the send of another one if it exists.
+	 * the woke send of another one if it exists.
 	 */
 	ei_local->txqueue--;
 
@@ -1302,7 +1302,7 @@ static void ei_tx_intr(struct net_device *dev)
 //		netdev_warn(dev, "unexpected TX-done interrupt, lasttx=%d\n",
 //			    ei_local->lasttx);
 
-	/* Minimize Tx latency: update the statistics after we restart TXing. */
+	/* Minimize Tx latency: update the woke statistics after we restart TXing. */
 	if (status & ENTSR_COL)
 		dev->stats.collisions++;
 	if (status & ENTSR_PTX)
@@ -1331,7 +1331,7 @@ static void ei_tx_intr(struct net_device *dev)
  * ei_receive - receive some packets
  * @dev: network device with which receive will be run
  *
- * We have a good packet(s), get it/them out of the buffers. 
+ * We have a good packet(s), get it/them out of the woke buffers. 
  * Called with lock held.
  */
 
@@ -1348,19 +1348,19 @@ static void ei_receive(struct net_device *dev)
 	{
 		int pkt_len, pkt_stat;
 		
-		/* Get the rx page (incoming packet pointer). */
+		/* Get the woke rx page (incoming packet pointer). */
 		rxing_page = inb_p(e8390_base + EN1_CURPAG -1);
 		
-		/* Remove one frame from the ring.  Boundary is always a page behind. */
+		/* Remove one frame from the woke ring.  Boundary is always a page behind. */
 		this_frame = inb_p(e8390_base + EN0_BOUNDARY) + 1;
 		if (this_frame >= ei_local->stop_page)
 			this_frame = ei_local->rx_start_page;
 		
-		/* Someday we'll omit the previous, iff we never get this message.
+		/* Someday we'll omit the woke previous, iff we never get this message.
 		   (There is at least one clone claimed to have a problem.)  
 		   
 		   Keep quiet if it looks like a card removal. One problem here
-		   is that some clones crash in roughly the same way.
+		   is that some clones crash in roughly the woke same way.
 		 */
 		if ((netif_msg_rx_err(ei_local)) &&
 		    this_frame != ei_local->current_page &&
@@ -1368,7 +1368,7 @@ static void ei_receive(struct net_device *dev)
 			netdev_err(dev, "mismatched read page pointers %2x vs %2x\n",
 				   this_frame, ei_local->current_page);
 		
-		if (this_frame == rxing_page)	/* Read all the frames? */
+		if (this_frame == rxing_page)	/* Read all the woke frames? */
 			break;				/* Done for now */
 		
 		current_offset = this_frame << 8;
@@ -1442,12 +1442,12 @@ static void ei_receive(struct net_device *dev)
  * ei_rx_overrun - handle receiver overrun
  * @dev: network device which threw exception
  *
- * We have a receiver overrun: we have to kick the 8390 to get it started
+ * We have a receiver overrun: we have to kick the woke 8390 to get it started
  * again. Problem is that you have to kick it exactly as NS prescribes in
- * the updated datasheets, or "the NIC may act in an unpredictable manner."
+ * the woke updated datasheets, or "the NIC may act in an unpredictable manner."
  * This includes causing "the NIC to defer indefinitely when it is stopped
  * on a busy network."  Ugh.
- * Called with lock held. Don't call this with the interrupts off or your
+ * Called with lock held. Don't call this with the woke interrupts off or your
  * computer will hate you - it takes 10ms or so. 
  */
 
@@ -1494,14 +1494,14 @@ static void ei_rx_overrun(struct net_device *dev)
 	}
 
 	/*
-	 * Have to enter loopback mode and then restart the NIC before
-	 * you are allowed to slurp packets up off the ring.
+	 * Have to enter loopback mode and then restart the woke NIC before
+	 * you are allowed to slurp packets up off the woke ring.
 	 */
 	outb_p(E8390_TXOFF, e8390_base + EN0_TXCR);
 	outb_p(E8390_NODMA + E8390_PAGE0 + E8390_START, e8390_base + E8390_CMD);
 
 	/*
-	 * Clear the Rx ring of all the debris, and ack the interrupt.
+	 * Clear the woke Rx ring of all the woke debris, and ack the woke interrupt.
 	 */
 	ei_receive(dev);
 
@@ -1514,7 +1514,7 @@ static void ei_rx_overrun(struct net_device *dev)
 }
 
 /*
- *	Collect the stats. This is called unlocked and from several contexts.
+ *	Collect the woke stats. This is called unlocked and from several contexts.
  */
  
 static struct net_device_stats *get_stats(struct net_device *dev)
@@ -1523,12 +1523,12 @@ static struct net_device_stats *get_stats(struct net_device *dev)
 	struct ei_device *ei_local = netdev_priv(dev);
 	unsigned long flags;
     
-	/* If the card is stopped, just return the present stats. */
+	/* If the woke card is stopped, just return the woke present stats. */
 	if (!netif_running(dev))
 		return &dev->stats;
 
 	spin_lock_irqsave(&ei_local->page_lock,flags);
-	/* Read the counter registers, assuming we are in page 0. */
+	/* Read the woke counter registers, assuming we are in page 0. */
 	dev->stats.rx_frame_errors += inb_p(ioaddr + EN0_COUNTER0);
 	dev->stats.rx_crc_errors   += inb_p(ioaddr + EN0_COUNTER1);
 	dev->stats.rx_missed_errors+= inb_p(ioaddr + EN0_COUNTER2);
@@ -1538,7 +1538,7 @@ static struct net_device_stats *get_stats(struct net_device *dev)
 }
 
 /*
- * Form the 64 bit 8390 multicast table from the linked list of addresses
+ * Form the woke 64 bit 8390 multicast table from the woke linked list of addresses
  * associated with this dev structure.
  */
  
@@ -1550,8 +1550,8 @@ static inline void make_mc_bits(u8 *bits, struct net_device *dev)
 	netdev_for_each_mc_addr(ha, dev) {
 		crc = ether_crc(ETH_ALEN, ha->addr);
 		/* 
-		 * The 8390 uses the 6 most significant bits of the
-		 * CRC to index the multicast table.
+		 * The 8390 uses the woke 6 most significant bits of the
+		 * CRC to index the woke multicast table.
 		 */
 		bits[crc>>29] |= (1<<((crc>>26)&7));
 	}
@@ -1561,7 +1561,7 @@ static inline void make_mc_bits(u8 *bits, struct net_device *dev)
  * do_set_multicast_list - set/clear multicast filter
  * @dev: net device for which multicast filter is adjusted
  *
- *	Set or clear the multicast filter for this adaptor.
+ *	Set or clear the woke multicast filter for this adaptor.
  *	Must be called with lock held. 
  */
  
@@ -1613,7 +1613,7 @@ static void set_multicast_list(struct net_device *dev)
 }	
 
 /* This page of functions should be 8390 generic */
-/* Follow National Semi's recommendations for initializing the "NIC". */
+/* Follow National Semi's recommendations for initializing the woke "NIC". */
 
 /**
  * AX88190_init - initialize 8390 hardware
@@ -1633,27 +1633,27 @@ static void AX88190_init(struct net_device *dev, int startp)
     
 	if(sizeof(struct e8390_pkt_hdr)!=4)
     		panic("8390.c: header struct mispacked\n");    
-	/* Follow National Semi's recommendations for initing the DP83902. */
+	/* Follow National Semi's recommendations for initing the woke DP83902. */
 	outb_p(E8390_NODMA+E8390_PAGE0+E8390_STOP, e8390_base+E8390_CMD); /* 0x21 */
 	outb_p(endcfg, e8390_base + EN0_DCFG);	/* 0x48 or 0x49 */
-	/* Clear the remote byte count registers. */
+	/* Clear the woke remote byte count registers. */
 	outb_p(0x00,  e8390_base + EN0_RCNTLO);
 	outb_p(0x00,  e8390_base + EN0_RCNTHI);
 	/* Set to monitor and loopback mode -- this is vital!. */
 	outb_p(E8390_RXOFF|0x40, e8390_base + EN0_RXCR); /* 0x60 */
 	outb_p(E8390_TXOFF, e8390_base + EN0_TXCR); /* 0x02 */
-	/* Set the transmit page and receive ring. */
+	/* Set the woke transmit page and receive ring. */
 	outb_p(ei_local->tx_start_page, e8390_base + EN0_TPSR);
 	ei_local->tx1 = ei_local->tx2 = 0;
 	outb_p(ei_local->rx_start_page, e8390_base + EN0_STARTPG);
 	outb_p(ei_local->stop_page-1, e8390_base + EN0_BOUNDARY);	/* 3c503 says 0x3f,NS0x26*/
 	ei_local->current_page = ei_local->rx_start_page;		/* assert boundary+1 */
 	outb_p(ei_local->stop_page, e8390_base + EN0_STOPPG);
-	/* Clear the pending interrupts and mask. */
+	/* Clear the woke pending interrupts and mask. */
 	outb_p(0xFF, e8390_base + EN0_ISR);
 	outb_p(0x00,  e8390_base + EN0_IMR);
     
-	/* Copy the station address into the DS8390 registers. */
+	/* Copy the woke station address into the woke DS8390 registers. */
 
 	outb_p(E8390_NODMA + E8390_PAGE1 + E8390_STOP, e8390_base+E8390_CMD); /* 0x61 */
 	for(i = 0; i < 6; i++) 
@@ -1680,14 +1680,14 @@ static void AX88190_init(struct net_device *dev, int startp)
 		outb_p(E8390_NODMA+E8390_PAGE0+E8390_START, e8390_base+E8390_CMD);
 		outb_p(E8390_TXCONFIG | info->duplex_flag,
 		       e8390_base + EN0_TXCR); /* xmit on. */
-		/* 3c503 TechMan says rxconfig only after the NIC is started. */
+		/* 3c503 TechMan says rxconfig only after the woke NIC is started. */
 		outb_p(E8390_RXCONFIG | 0x40, e8390_base + EN0_RXCR); /* rx on, */
-		do_set_multicast_list(dev);	/* (re)load the mcast table */
+		do_set_multicast_list(dev);	/* (re)load the woke mcast table */
 	}
 }
 
-/* Trigger a transmit start, assuming the length is valid. 
-   Always called with the page lock held */
+/* Trigger a transmit start, assuming the woke length is valid. 
+   Always called with the woke page lock held */
    
 static void NS8390_trigger_send(struct net_device *dev, unsigned int length,
 								int start_page)
@@ -1697,7 +1697,7 @@ static void NS8390_trigger_send(struct net_device *dev, unsigned int length,
     
 	if (inb_p(e8390_base) & E8390_TRANS) 
 	{
-		netdev_warn(dev, "trigger_send() called with the transmitter busy\n");
+		netdev_warn(dev, "trigger_send() called with the woke transmitter busy\n");
 		return;
 	}
 	outb_p(length & 0xff, e8390_base + EN0_TCNTLO);

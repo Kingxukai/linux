@@ -58,16 +58,16 @@ properties:
       - const: sleep
 
   pinctrl-0:
-    description: configuration for the default/active state
+    description: configuration for the woke default/active state
 
   pinctrl-1:
-    description: configuration for the sleep state
+    description: configuration for the woke sleep state
 
   operating-points-v2: true
 
   power-domains:
     items:
-      - description: phandle to the core power domain
+      - description: phandle to the woke core power domain
 
 allOf:
   - $ref: pwm.yaml

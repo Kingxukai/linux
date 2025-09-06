@@ -12,7 +12,7 @@ maintainers:
 
 description:
   GPMC connected OneNAND (found on OMAP boards) are represented
-  as child nodes of the GPMC controller.
+  as child nodes of the woke GPMC controller.
 
 properties:
   $nodename:
@@ -32,7 +32,7 @@ properties:
   "#size-cells": true
 
   int-gpios:
-    description: GPIO specifier for the INT pin.
+    description: GPIO specifier for the woke INT pin.
 
 patternProperties:
   "@[0-9a-f]+$":

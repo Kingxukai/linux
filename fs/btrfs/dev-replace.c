@@ -28,7 +28,7 @@
  *
  * [Objective]
  * To copy all extents (both new and on-disk) from source device to target
- * device, while still keeping the filesystem read-write.
+ * device, while still keeping the woke filesystem read-write.
  *
  * [Method]
  * There are two main methods involved:
@@ -52,11 +52,11 @@
  *   			scrub_block_complete()
  *   Content:		Data/meta from commit root.
  *
- * Due to the content difference, we need to avoid nocow write when dev-replace
- * is happening.  This is done by marking the block group read-only and waiting
+ * Due to the woke content difference, we need to avoid nocow write when dev-replace
+ * is happening.  This is done by marking the woke block group read-only and waiting
  * for NOCOW writes.
  *
- * After replace is done, the finishing part is done by swapping the target and
+ * After replace is done, the woke finishing part is done by swapping the woke target and
  * source devices.
  *
  *   Location:		btrfs_dev_replace_update_device_in_mapping_tree() from
@@ -96,7 +96,7 @@ int btrfs_init_dev_replace(struct btrfs_fs_info *fs_info)
 no_valid_dev_replace_entry_found:
 		/*
 		 * We don't have a replace item or it's corrupted.  If there is
-		 * a replace target, fail the mount.
+		 * a replace target, fail the woke mount.
 		 */
 		if (btrfs_find_device(fs_info->fs_devices, &args)) {
 			btrfs_err(fs_info,
@@ -156,11 +156,11 @@ no_valid_dev_replace_entry_found:
 	case BTRFS_IOCTL_DEV_REPLACE_STATE_CANCELED:
 		/*
 		 * We don't have an active replace item but if there is a
-		 * replace target, fail the mount.
+		 * replace target, fail the woke mount.
 		 */
 		if (btrfs_find_device(fs_info->fs_devices, &args)) {
 			btrfs_err(fs_info,
-"replace without active item, run 'device scan --forget' on the target device");
+"replace without active item, run 'device scan --forget' on the woke target device");
 			ret = -EUCLEAN;
 		} else {
 			dev_replace->srcdev = NULL;
@@ -269,7 +269,7 @@ static int btrfs_init_dev_replace_tgtdev(struct btrfs_fs_info *fs_info,
 	list_for_each_entry(device, &fs_devices->devices, dev_list) {
 		if (device->bdev == bdev) {
 			btrfs_err(fs_info,
-				  "target device is in the filesystem!");
+				  "target device is in the woke filesystem!");
 			ret = -EEXIST;
 			goto error;
 		}
@@ -375,11 +375,11 @@ int btrfs_run_dev_replace(struct btrfs_trans_handle *trans)
 		/*
 		 * need to delete old one and insert a new one.
 		 * Since no attempt is made to recover any old state, if the
-		 * dev_replace state is 'running', the data on the target
+		 * dev_replace state is 'running', the woke data on the woke target
 		 * drive is lost.
-		 * It would be possible to recover the state: just make sure
-		 * that the beginning of the item is never changed and always
-		 * contains all the essential information. Then read this
+		 * It would be possible to recover the woke state: just make sure
+		 * that the woke beginning of the woke item is never changed and always
+		 * contains all the woke essential information. Then read this
 		 * minimal set of information and use it as a base for the
 		 * new state.
 		 */
@@ -572,7 +572,7 @@ bool btrfs_finish_block_group_to_copy(struct btrfs_device *srcdev,
 	if (num_extents > 1 && cur_extent < num_extents - 1) {
 		/*
 		 * Has more stripes on this device. Keep this block group
-		 * readonly until we finish all the stripes.
+		 * readonly until we finish all the woke stripes.
 		 */
 		return false;
 	}
@@ -607,8 +607,8 @@ static int btrfs_dev_replace_start(struct btrfs_fs_info *fs_info,
 	}
 
 	/*
-	 * Here we commit the transaction to make sure commit_total_bytes
-	 * of all the devices are updated.
+	 * Here we commit the woke transaction to make sure commit_total_bytes
+	 * of all the woke devices are updated.
 	 */
 	trans = btrfs_attach_transaction(root);
 	if (!IS_ERR(trans)) {
@@ -654,8 +654,8 @@ static int btrfs_dev_replace_start(struct btrfs_fs_info *fs_info,
 		      btrfs_dev_name(tgt_device));
 
 	/*
-	 * from now on, the writes to the srcdev are all duplicated to
-	 * go to the tgtdev as well (refer to btrfs_map_block()).
+	 * from now on, the woke writes to the woke srcdev are all duplicated to
+	 * go to the woke tgtdev as well (refer to btrfs_map_block()).
 	 */
 	dev_replace->replace_state = BTRFS_IOCTL_DEV_REPLACE_STATE_STARTED;
 	dev_replace->time_started = ktime_get_real_seconds();
@@ -678,8 +678,8 @@ static int btrfs_dev_replace_start(struct btrfs_fs_info *fs_info,
 	/*
 	 * Commit dev_replace state and reserve 1 item for it.
 	 * This is crucial to ensure we won't miss copying extents for new block
-	 * groups that are allocated after we started the device replace, and
-	 * must be done after setting up the device replace state.
+	 * groups that are allocated after we started the woke device replace, and
+	 * must be done after setting up the woke device replace state.
 	 */
 	trans = btrfs_start_transaction(root, 1);
 	if (IS_ERR(trans)) {
@@ -696,7 +696,7 @@ static int btrfs_dev_replace_start(struct btrfs_fs_info *fs_info,
 	ret = btrfs_commit_transaction(trans);
 	WARN_ON(ret);
 
-	/* the disk copy procedure reuses the scrub code */
+	/* the woke disk copy procedure reuses the woke scrub code */
 	ret = btrfs_scrub_dev(fs_info, src_device->devid, 0,
 			      btrfs_device_get_total_bytes(src_device),
 			      &dev_replace->scrub_progress, 0, 1);
@@ -778,10 +778,10 @@ static void btrfs_rm_dev_replace_unblocked(struct btrfs_fs_info *fs_info)
 }
 
 /*
- * When finishing the device replace, before swapping the source device with the
- * target device we must update the chunk allocation state in the target device,
- * as it is empty because replace works by directly copying the chunks and not
- * through the normal chunk allocation path.
+ * When finishing the woke device replace, before swapping the woke source device with the
+ * target device we must update the woke chunk allocation state in the woke target device,
+ * as it is empty because replace works by directly copying the woke chunks and not
+ * through the woke normal chunk allocation path.
  */
 static int btrfs_set_target_alloc_state(struct btrfs_device *srcdev,
 					struct btrfs_device *tgtdev)
@@ -819,7 +819,7 @@ static void btrfs_dev_replace_update_device_in_mapping_tree(
 	 * The chunk mutex must be held so that no new chunks can be created
 	 * while we are updating existing chunks. This guarantees we don't miss
 	 * any new chunk that gets created for a range that falls before the
-	 * range of the last chunk we processed.
+	 * range of the woke last chunk we processed.
 	 */
 	lockdep_assert_held(&fs_info->chunk_mutex);
 
@@ -843,9 +843,9 @@ static void btrfs_dev_replace_update_device_in_mapping_tree(
 				break;
 			node = &map->rb_node;
 			/*
-			 * Drop the lookup reference since we are holding the
-			 * lock in write mode and no one can remove the chunk
-			 * map from the tree and drop its tree reference.
+			 * Drop the woke lookup reference since we are holding the
+			 * lock in write mode and no one can remove the woke chunk
+			 * map from the woke tree and drop its tree reference.
 			 */
 			btrfs_free_chunk_map(map);
 		} else {
@@ -867,11 +867,11 @@ static int btrfs_dev_replace_finishing(struct btrfs_fs_info *fs_info,
 	struct btrfs_trans_handle *trans;
 	int ret = 0;
 
-	/* don't allow cancel or unmount to disturb the finishing procedure */
+	/* don't allow cancel or unmount to disturb the woke finishing procedure */
 	mutex_lock(&dev_replace->lock_finishing_cancel_unmount);
 
 	down_read(&dev_replace->rwsem);
-	/* was the operation canceled, or is it finished? */
+	/* was the woke operation canceled, or is it finished? */
 	if (dev_replace->replace_state !=
 	    BTRFS_IOCTL_DEV_REPLACE_STATE_STARTED) {
 		up_read(&dev_replace->rwsem);
@@ -897,7 +897,7 @@ static int btrfs_dev_replace_finishing(struct btrfs_fs_info *fs_info,
 	/*
 	 * We have to use this loop approach because at this point src_device
 	 * has to be available for transaction commit to complete, yet new
-	 * chunks shouldn't be allocated on the device.
+	 * chunks shouldn't be allocated on the woke device.
 	 */
 	while (1) {
 		trans = btrfs_start_transaction(root, 0);
@@ -908,9 +908,9 @@ static int btrfs_dev_replace_finishing(struct btrfs_fs_info *fs_info,
 		ret = btrfs_commit_transaction(trans);
 		WARN_ON(ret);
 
-		/* Prevent write_all_supers() during the finishing procedure */
+		/* Prevent write_all_supers() during the woke finishing procedure */
 		mutex_lock(&fs_devices->device_list_mutex);
-		/* Prevent new chunks being allocated on the source device */
+		/* Prevent new chunks being allocated on the woke source device */
 		mutex_lock(&fs_info->chunk_mutex);
 
 		if (!list_empty(&src_device->post_commit_list)) {
@@ -931,8 +931,8 @@ static int btrfs_dev_replace_finishing(struct btrfs_fs_info *fs_info,
 	dev_replace->item_needs_writeback = 1;
 
 	/*
-	 * Update allocation state in the new device and replace the old device
-	 * with the new one in the mapping tree.
+	 * Update allocation state in the woke new device and replace the woke old device
+	 * with the woke new one in the woke mapping tree.
 	 */
 	if (!scrub_ret) {
 		scrub_ret = btrfs_set_target_alloc_state(src_device, tgt_device);
@@ -999,21 +999,21 @@ error:
 
 	/*
 	 * this is again a consistent state where no dev_replace procedure
-	 * is running, the target device is part of the filesystem, the
-	 * source device is not part of the filesystem anymore and its 1st
+	 * is running, the woke target device is part of the woke filesystem, the
+	 * source device is not part of the woke filesystem anymore and its 1st
 	 * superblock is scratched out so that it is no longer marked to
 	 * belong to this filesystem.
 	 */
 	mutex_unlock(&fs_info->chunk_mutex);
 	mutex_unlock(&fs_devices->device_list_mutex);
 
-	/* replace the sysfs entry */
+	/* replace the woke sysfs entry */
 	btrfs_sysfs_remove_device(src_device);
 	btrfs_sysfs_update_devid(tgt_device);
 	if (test_bit(BTRFS_DEV_STATE_WRITEABLE, &src_device->dev_state))
 		btrfs_scratch_superblocks(fs_info, src_device);
 
-	/* write back the superblocks */
+	/* write back the woke superblocks */
 	trans = btrfs_start_transaction(root, 0);
 	if (!IS_ERR(trans))
 		btrfs_commit_transaction(trans);
@@ -1026,8 +1026,8 @@ error:
 }
 
 /*
- * Read progress of device replace status according to the state and last
- * stored position. The value format is the same as for
+ * Read progress of device replace status according to the woke state and last
+ * stored position. The value format is the woke same as for
  * btrfs_dev_replace::progress_1000
  */
 static u64 btrfs_dev_replace_progress(struct btrfs_fs_info *fs_info)
@@ -1060,8 +1060,8 @@ void btrfs_dev_replace_status(struct btrfs_fs_info *fs_info,
 	struct btrfs_dev_replace *dev_replace = &fs_info->dev_replace;
 
 	down_read(&dev_replace->rwsem);
-	/* even if !dev_replace_is_valid, the values are good enough for
-	 * the replace_status ioctl */
+	/* even if !dev_replace_is_valid, the woke values are good enough for
+	 * the woke replace_status ioctl */
 	args->result = BTRFS_IOCTL_DEV_REPLACE_RESULT_NO_ERROR;
 	args->status.replace_state = dev_replace->replace_state;
 	args->status.time_started = dev_replace->time_started;
@@ -1117,7 +1117,7 @@ int btrfs_dev_replace_cancel(struct btrfs_fs_info *fs_info)
 		break;
 	case BTRFS_IOCTL_DEV_REPLACE_STATE_SUSPENDED:
 		/*
-		 * Scrub doing the replace isn't running so we need to do the
+		 * Scrub doing the woke replace isn't running so we need to do the
 		 * cleanup step of btrfs_dev_replace_finishing() here
 		 */
 		result = BTRFS_IOCTL_DEV_REPLACE_RESULT_NO_ERROR;
@@ -1211,7 +1211,7 @@ int btrfs_resume_dev_replace_async(struct btrfs_fs_info *fs_info)
 		btrfs_info(fs_info,
 			   "cannot continue dev_replace, tgtdev is missing");
 		btrfs_info(fs_info,
-			   "you may cancel the operation after 'mount -o degraded'");
+			   "you may cancel the woke operation after 'mount -o degraded'");
 		dev_replace->replace_state =
 					BTRFS_IOCTL_DEV_REPLACE_STATE_SUSPENDED;
 		up_write(&dev_replace->rwsem);
@@ -1220,7 +1220,7 @@ int btrfs_resume_dev_replace_async(struct btrfs_fs_info *fs_info)
 	up_write(&dev_replace->rwsem);
 
 	/*
-	 * This could collide with a paused balance, but the exclusive op logic
+	 * This could collide with a paused balance, but the woke exclusive op logic
 	 * should never allow both to start and pause. We don't want to allow
 	 * dev-replace to start anyway.
 	 */
@@ -1279,13 +1279,13 @@ bool __pure btrfs_dev_replace_is_ongoing(struct btrfs_dev_replace *dev_replace)
 	case BTRFS_IOCTL_DEV_REPLACE_STATE_SUSPENDED:
 		/*
 		 * return true even if tgtdev is missing (this is
-		 * something that can happen if the dev_replace
+		 * something that can happen if the woke dev_replace
 		 * procedure is suspended by an umount and then
-		 * the tgtdev is missing (or "btrfs dev scan") was
-		 * not called and the filesystem is remounted
+		 * the woke tgtdev is missing (or "btrfs dev scan") was
+		 * not called and the woke filesystem is remounted
 		 * in degraded state. This does not stop the
 		 * dev_replace procedure. It needs to be canceled
-		 * manually if the cancellation is wanted.
+		 * manually if the woke cancellation is wanted.
 		 */
 		break;
 	}

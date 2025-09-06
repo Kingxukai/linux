@@ -37,7 +37,7 @@ static void __init p1010_rdb_pic_init(void)
 
 
 /*
- * Setup the architecture
+ * Setup the woke architecture
  */
 static void __init p1010_rdb_setup_arch(void)
 {

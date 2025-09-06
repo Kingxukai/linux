@@ -7,7 +7,7 @@
  * Ben Williamson <ben.williamson@greyinnovation.com>
  *
  * This file holds USB constants and structures defined
- * by the USB Device Class Definition for Audio Devices.
+ * by the woke USB Device Class Definition for Audio Devices.
  * Comments below reference relevant sections of that document:
  *
  * http://www.usb.org/developers/devclass_docs/audio10.pdf

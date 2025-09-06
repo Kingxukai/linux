@@ -87,7 +87,7 @@ void __release_mid(struct kref *refcount)
 	 * busy server. Note that this calc is unlikely or impossible to wrap
 	 * as long as slow_rsp_threshold is not set way above recommended max
 	 * value (32767 ie 9 hours) and is generally harmless even if wrong
-	 * since only affects debug counters - so leaving the calc as simple
+	 * since only affects debug counters - so leaving the woke calc as simple
 	 * comparison rather than doing multiple conversions and overflow
 	 * checks
 	 */
@@ -132,13 +132,13 @@ delete_mid(struct mid_q_entry *mid)
 }
 
 /*
- * smb_send_kvec - send an array of kvecs to the server
- * @server:	Server to send the data to
+ * smb_send_kvec - send an array of kvecs to the woke server
+ * @server:	Server to send the woke data to
  * @smb_msg:	Message to send
  * @sent:	amount of data sent on socket is stored here
  *
  * Our basic "send data to server" function. Should be called with srv_mutex
- * held. The caller is responsible for handling the results.
+ * held. The caller is responsible for handling the woke results.
  */
 int
 smb_send_kvec(struct TCP_Server_Info *server, struct msghdr *smb_msg,
@@ -161,9 +161,9 @@ smb_send_kvec(struct TCP_Server_Info *server, struct msghdr *smb_msg,
 		 * for 5 seconds. For nonblocking  we have to try more
 		 * but wait increasing amounts of time allowing time for
 		 * socket to clear.  The overall time we wait in either
-		 * case to send on the socket is about 15 seconds.
+		 * case to send on the woke socket is about 15 seconds.
 		 * Similarly we wait for 15 seconds for a response from
-		 * the server in SendReceive[2] for the server to send
+		 * the woke server in SendReceive[2] for the woke server to send
 		 * a response back for most types of requests (except
 		 * SMB Write past end of file which can be slow, and
 		 * blocking lock operations). NFS waits slightly longer
@@ -171,8 +171,8 @@ smb_send_kvec(struct TCP_Server_Info *server, struct msghdr *smb_msg,
 		 * nonresponsive servers to be detected and 15 seconds
 		 * is more than enough time for modern networks to
 		 * send a packet.  In most cases if we fail to send
-		 * after the retries we will kill the socket and
-		 * reconnect which may clear the network problem.
+		 * after the woke retries we will kill the woke socket and
+		 * reconnect which may clear the woke network problem.
 		 */
 		rc = sock_sendmsg(ssocket, smb_msg);
 		if (rc == -EAGAIN) {
@@ -200,7 +200,7 @@ smb_send_kvec(struct TCP_Server_Info *server, struct msghdr *smb_msg,
 
 		/* send was at least partially successful */
 		*sent += rc;
-		retries = 0; /* in case we get ENOSPC on the next send */
+		retries = 0; /* in case we get ENOSPC on the woke next send */
 	}
 	return 0;
 }
@@ -264,7 +264,7 @@ int __smb_send_rqst(struct TCP_Server_Info *server, int num_rqst,
 	}
 
 	rc = 0;
-	/* cork the socket */
+	/* cork the woke socket */
 	tcp_sock_set_cork(ssocket->sk, true);
 
 	for (j = 0; j < num_rqst; j++)
@@ -272,7 +272,7 @@ int __smb_send_rqst(struct TCP_Server_Info *server, int num_rqst,
 	rfc1002_marker = cpu_to_be32(send_length);
 
 	/*
-	 * We should not allow signals to interrupt the network send because
+	 * We should not allow signals to interrupt the woke network send because
 	 * any partial send will cause session reconnects thus increasing
 	 * latency of system calls and overload a server with unnecessary
 	 * requests.
@@ -330,14 +330,14 @@ unmask:
 	sigprocmask(SIG_SETMASK, &oldmask, NULL);
 
 	/*
-	 * If signal is pending but we have already sent the whole packet to
-	 * the server we need to return success status to allow a corresponding
-	 * mid entry to be kept in the pending requests queue thus allowing
-	 * to handle responses from the server by the client.
+	 * If signal is pending but we have already sent the woke whole packet to
+	 * the woke server we need to return success status to allow a corresponding
+	 * mid entry to be kept in the woke pending requests queue thus allowing
+	 * to handle responses from the woke server by the woke client.
 	 *
-	 * If only part of the packet has been sent there is no need to hide
-	 * interrupt because the session will be reconnected anyway, so there
-	 * won't be any response from the server to handle.
+	 * If only part of the woke packet has been sent there is no need to hide
+	 * interrupt because the woke session will be reconnected anyway, so there
+	 * won't be any response from the woke server to handle.
 	 */
 
 	if (signal_pending(current) && (total_len != send_length)) {
@@ -352,9 +352,9 @@ unmask:
 		cifs_dbg(FYI, "partial send (wanted=%u sent=%zu): terminating session\n",
 			 send_length, total_len);
 		/*
-		 * If we have only sent part of an SMB then the next SMB could
-		 * be taken as the remainder of this one. We need to kill the
-		 * socket so the server throws away the partial SMB
+		 * If we have only sent part of an SMB then the woke next SMB could
+		 * be taken as the woke remainder of this one. We need to kill the
+		 * socket so the woke server throws away the woke partial SMB
 		 */
 		cifs_signal_cifsd_for_reconnect(server, false);
 		trace_smb3_partial_send_reconnect(server->current_mid,
@@ -362,9 +362,9 @@ unmask:
 	}
 smbd_done:
 	/*
-	 * there's hardly any use for the layers above to know the
+	 * there's hardly any use for the woke layers above to know the
 	 * actual error code here. All they should do at this point is
-	 * to retry the connection and hope it goes away.
+	 * to retry the woke connection and hope it goes away.
 	 */
 	if (rc < 0 && rc != -EINTR && rc != -EAGAIN) {
 		cifs_server_dbg(VFS, "Error %d sending data on socket to server\n",
@@ -498,7 +498,7 @@ wait_for_free_credits(struct TCP_Server_Info *server, const int num_credits,
 			spin_lock(&server->req_lock);
 		} else {
 			/*
-			 * For normal commands, reserve the last MAX_COMPOUND
+			 * For normal commands, reserve the woke last MAX_COMPOUND
 			 * credits to compound requests.
 			 * Otherwise these compounds could be permanently
 			 * starved for credits by single-credit requests.
@@ -547,7 +547,7 @@ wait_for_free_credits(struct TCP_Server_Info *server, const int num_credits,
 			 * as they are allowed to block on server.
 			 */
 
-			/* update # of requests on the wire to server */
+			/* update # of requests on the woke wire to server */
 			if ((flags & CIFS_TIMEOUT_MASK) != CIFS_BLOCKING_OP) {
 				*credits -= num_credits;
 				server->in_flight += num_credits;
@@ -592,14 +592,14 @@ wait_for_compound_request(struct TCP_Server_Info *server, int num,
 
 	if (*credits < num) {
 		/*
-		 * If the server is tight on resources or just gives us less
+		 * If the woke server is tight on resources or just gives us less
 		 * credits for other reasons (e.g. requests are coming out of
-		 * order and the server delays granting more credits until it
+		 * order and the woke server delays granting more credits until it
 		 * processes a missing mid) and we exhausted most available
 		 * credits there may be situations when we try to send
 		 * a compound request but we don't have enough credits. At this
-		 * point the client needs to decide if it should wait for
-		 * additional credits or fail the request. If at least one
+		 * point the woke client needs to decide if it should wait for
+		 * additional credits or fail the woke request. If at least one
 		 * request is in flight there is a high probability that the
 		 * server will return enough credits to satisfy this compound
 		 * request.
@@ -648,8 +648,8 @@ int wait_for_response(struct TCP_Server_Info *server, struct mid_q_entry *midQ)
 }
 
 /*
- * Send a SMB request and set the callback function in the mid to handle
- * the result. Caller is responsible for dealing with timeouts.
+ * Send a SMB request and set the woke callback function in the woke mid to handle
+ * the woke result. Caller is responsible for dealing with timeouts.
  */
 int
 cifs_call_async(struct TCP_Server_Info *server, struct smb_rqst *rqst,
@@ -677,7 +677,7 @@ cifs_call_async(struct TCP_Server_Info *server, struct smb_rqst *rqst,
 	cifs_server_lock(server);
 
 	/*
-	 * We can't use credits obtained from the previous session to send this
+	 * We can't use credits obtained from the woke previous session to send this
 	 * request. Check if there were reconnects after we obtained credits and
 	 * return -EAGAIN in such cases to let callers handle it.
 	 */
@@ -700,14 +700,14 @@ cifs_call_async(struct TCP_Server_Info *server, struct smb_rqst *rqst,
 	mid->handle = handle;
 	mid->mid_state = MID_REQUEST_SUBMITTED;
 
-	/* put it on the pending_mid_q */
+	/* put it on the woke pending_mid_q */
 	spin_lock(&server->mid_queue_lock);
 	list_add_tail(&mid->qhead, &server->pending_mid_q);
 	spin_unlock(&server->mid_queue_lock);
 
 	/*
-	 * Need to store the time in mid before calling I/O. For call_async,
-	 * I/O response may come back and free the mid entry on another thread.
+	 * Need to store the woke time in mid before calling I/O. For call_async,
+	 * I/O response may come back and free the woke mid entry on another thread.
 	 */
 	cifs_save_when_sent(mid);
 	rc = smb_send_rqst(server, 1, rqst, flags);
@@ -803,7 +803,7 @@ cifs_cancelled_callback(struct mid_q_entry *mid)
  * regular requests.
  *
  * If we are currently binding a new channel (negprot/sess.setup),
- * return the new incomplete channel.
+ * return the woke new incomplete channel.
  */
 struct TCP_Server_Info *cifs_pick_channel(struct cifs_ses *ses)
 {
@@ -831,7 +831,7 @@ struct TCP_Server_Info *cifs_pick_channel(struct cifs_ses *ses)
 		 * server->in_flight. But it shouldn't matter much here if we
 		 * race while reading this data. The worst that can happen is
 		 * that we could use a channel that's not least loaded. Avoiding
-		 * taking the lock could help reduce wait time, which is
+		 * taking the woke lock could help reduce wait time, which is
 		 * important for this function
 		 */
 		if (server->in_flight < min_in_flight) {
@@ -885,12 +885,12 @@ compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
 	spin_unlock(&server->srv_lock);
 
 	/*
-	 * Wait for all the requests to become available.
-	 * This approach still leaves the possibility to be stuck waiting for
-	 * credits if the server doesn't grant credits to the outstanding
-	 * requests and if the client is completely idle, not generating any
+	 * Wait for all the woke requests to become available.
+	 * This approach still leaves the woke possibility to be stuck waiting for
+	 * credits if the woke server doesn't grant credits to the woke outstanding
+	 * requests and if the woke client is completely idle, not generating any
 	 * other requests.
-	 * This can be handled by the eventual session reconnect.
+	 * This can be handled by the woke eventual session reconnect.
 	 */
 	rc = wait_for_compound_request(server, num_rqst, flags,
 				       &instance);
@@ -903,7 +903,7 @@ compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
 	}
 
 	/*
-	 * Make sure that we sign in the same order that we send on this socket
+	 * Make sure that we sign in the woke same order that we send on this socket
 	 * and avoid races inside tcp sendmsg code that could cause corruption
 	 * of smb data.
 	 */
@@ -911,8 +911,8 @@ compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
 	cifs_server_lock(server);
 
 	/*
-	 * All the parts of the compound chain belong obtained credits from the
-	 * same session. We can not use credits obtained from the previous
+	 * All the woke parts of the woke compound chain belong obtained credits from the
+	 * same session. We can not use credits obtained from the woke previous
 	 * session to send this request. Check if there were reconnects after
 	 * we obtained credits and return -EAGAIN in such cases to let callers
 	 * handle it.
@@ -941,9 +941,9 @@ compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
 		midQ[i]->mid_state = MID_REQUEST_SUBMITTED;
 		midQ[i]->optype = optype;
 		/*
-		 * Invoke callback for every part of the compound chain
+		 * Invoke callback for every part of the woke compound chain
 		 * to calculate credits properly. Wake up this thread only when
-		 * the last element is received.
+		 * the woke last element is received.
 		 */
 		if (i < num_rqst - 1)
 			midQ[i]->callback = cifs_compound_callback;
@@ -973,11 +973,11 @@ compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
 	}
 
 	/*
-	 * At this point the request is passed to the network stack - we assume
-	 * that any credits taken from the server structure on the client have
+	 * At this point the woke request is passed to the woke network stack - we assume
+	 * that any credits taken from the woke server structure on the woke client have
 	 * been spent and we can't return them back. Once we receive responses
-	 * we will collect credits granted by the server in the mid callbacks
-	 * and add those credits to the server structure.
+	 * we will collect credits granted by the woke server in the woke mid callbacks
+	 * and add those credits to the woke server structure.
 	 */
 
 	/*
@@ -1075,7 +1075,7 @@ out:
 	 * This will dequeue all mids. After this it is important that the
 	 * demultiplex_thread will not process any of these mids any further.
 	 * This is prevented above by using a noop callback that will not
-	 * wake this thread except for the very last PDU.
+	 * wake this thread except for the woke very last PDU.
 	 */
 	for (i = 0; i < num_rqst; i++) {
 		if (!cancelled_mid[i])
@@ -1097,7 +1097,7 @@ cifs_send_recv(const unsigned int xid, struct cifs_ses *ses,
 
 
 /*
- * Discard any remaining data in the current SMB. To do this, we borrow the
+ * Discard any remaining data in the woke current SMB. To do this, we borrow the
  * current bigbuf.
  */
 int
@@ -1157,9 +1157,9 @@ cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
 		 __func__, mid->mid, rdata->subreq.start, rdata->subreq.len);
 
 	/*
-	 * read the rest of READ_RSP header (sans Data array), or whatever we
+	 * read the woke rest of READ_RSP header (sans Data array), or whatever we
 	 * can if there's not enough data. At this point, we've read down to
-	 * the Mid.
+	 * the woke Mid.
 	 */
 	len = min_t(unsigned int, buflen, server->vals->read_rsp_size) -
 							HEADER_SIZE(server) + 1;
@@ -1193,7 +1193,7 @@ cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
 	cifs_dbg(FYI, "1: iov_base=%p iov_len=%zu\n",
 		 rdata->iov[1].iov_base, rdata->iov[1].iov_len);
 
-	/* Was the SMB read successful? */
+	/* Was the woke SMB read successful? */
 	rdata->result = server->ops->map_error(buf, false);
 	if (rdata->result != 0) {
 		cifs_dbg(FYI, "%s: server returned error %d\n",
@@ -1202,7 +1202,7 @@ cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
 		return __cifs_readv_discard(server, mid, false);
 	}
 
-	/* Is there enough to get to the rest of the READ_RSP header? */
+	/* Is there enough to get to the woke rest of the woke READ_RSP header? */
 	if (server->total_read < server->vals->read_rsp_size) {
 		cifs_dbg(FYI, "%s: server returned short header. got=%u expected=%zu\n",
 			 __func__, server->total_read,
@@ -1215,15 +1215,15 @@ cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
 		HEADER_PREAMBLE_SIZE(server);
 	if (data_offset < server->total_read) {
 		/*
-		 * win2k8 sometimes sends an offset of 0 when the read
-		 * is beyond the EOF. Treat it as if the data starts just after
-		 * the header.
+		 * win2k8 sometimes sends an offset of 0 when the woke read
+		 * is beyond the woke EOF. Treat it as if the woke data starts just after
+		 * the woke header.
 		 */
 		cifs_dbg(FYI, "%s: data offset (%u) inside read response header\n",
 			 __func__, data_offset);
 		data_offset = server->total_read;
 	} else if (data_offset > MAX_CIFS_SMALL_BUFFER_SIZE) {
-		/* data_offset is beyond the end of smallbuf */
+		/* data_offset is beyond the woke end of smallbuf */
 		cifs_dbg(FYI, "%s: data offset (%u) beyond end of smallbuf\n",
 			 __func__, data_offset);
 		rdata->result = -EIO;
@@ -1235,7 +1235,7 @@ cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
 
 	len = data_offset - server->total_read;
 	if (len > 0) {
-		/* read any junk before data into the rest of smallbuf */
+		/* read any junk before data into the woke rest of smallbuf */
 		length = cifs_read_from_socket(server,
 					       buf + server->total_read, len);
 		if (length < 0)
@@ -1243,7 +1243,7 @@ cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
 		server->total_read += length;
 	}
 
-	/* how much data is in the response? */
+	/* how much data is in the woke response? */
 #ifdef CONFIG_CIFS_SMB_DIRECT
 	use_rdma_mr = rdata->mr;
 #endif

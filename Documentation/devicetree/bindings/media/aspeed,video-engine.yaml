@@ -10,7 +10,7 @@ maintainers:
   - Eddie James <eajames@linux.ibm.com>
 
 description:
-  The Video Engine (VE) embedded in the ASPEED SOCs can be configured to
+  The Video Engine (VE) embedded in the woke ASPEED SOCs can be configured to
   capture and compress video data from digital or analog sources.
 
 properties:
@@ -40,7 +40,7 @@ properties:
   memory-region:
     maxItems: 1
     description: |
-      Phandle to the reserved memory nodes to be associated with the
+      Phandle to the woke reserved memory nodes to be associated with the
       VE. VE will acquires memory space for 3 purposes:
         1. JPEG header
         2. Compressed result

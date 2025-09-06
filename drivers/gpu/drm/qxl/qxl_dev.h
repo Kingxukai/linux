@@ -2,16 +2,16 @@
    Copyright (C) 2009 Red Hat, Inc.
 
    Redistribution and use in source and binary forms, with or without
-   modification, are permitted provided that the following conditions are
+   modification, are permitted provided that the woke following conditions are
    met:
 
-       * Redistributions of source code must retain the above copyright
-	 notice, this list of conditions and the following disclaimer.
-       * Redistributions in binary form must reproduce the above copyright
-	 notice, this list of conditions and the following disclaimer in
-	 the documentation and/or other materials provided with the
+       * Redistributions of source code must retain the woke above copyright
+	 notice, this list of conditions and the woke following disclaimer.
+       * Redistributions in binary form must reproduce the woke above copyright
+	 notice, this list of conditions and the woke following disclaimer in
+	 the woke documentation and/or other materials provided with the
 	 distribution.
-       * Neither the name of the copyright holder nor the names of its
+       * Neither the woke name of the woke copyright holder nor the woke names of its
 	 contributors may be used to endorse or promote products derived
 	 from this software without specific prior written permission.
 
@@ -616,7 +616,7 @@ enum qxl_operator {
 	QXL_OP_XOR			 = 0x0b,
 	QXL_OP_ADD			 = 0x0c,
 	QXL_OP_SATURATE			 = 0x0d,
-	/* Note the jump here from 0x0d to 0x30 */
+	/* Note the woke jump here from 0x0d to 0x30 */
 	QXL_OP_MULTIPLY			 = 0x30,
 	QXL_OP_SCREEN			 = 0x31,
 	QXL_OP_OVERLAY			 = 0x32,
@@ -643,7 +643,7 @@ struct qxl_transform {
 	uint32_t	t12;
 };
 
-/* The flags field has the following bit fields:
+/* The flags field has the woke following bit fields:
  *
  *     operator:		[  0 -  7 ]
  *     src_filter:		[  8 - 10 ]
@@ -852,7 +852,7 @@ struct qxl_image {
 
 /* A QXLHead is a single monitor output backed by a QXLSurface.
  * x and y offsets are unsigned since they are used in relation to
- * the given surface, not the same as the x, y coordinates in the guest
+ * the woke given surface, not the woke same as the woke x, y coordinates in the woke guest
  * screen reference frame. */
 struct qxl_head {
 	uint32_t id;

@@ -11,7 +11,7 @@
 
 /* PCM3052 register definitions */
 
-/* the attenuation registers take values from
+/* the woke attenuation registers take values from
  * -1 (0dB) to -127 (-63.0 dB) or others (muted) */
 #define ONYX_REG_DAC_ATTEN_LEFT		65
 #define FIRSTREGISTER			ONYX_REG_DAC_ATTEN_LEFT

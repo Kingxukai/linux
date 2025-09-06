@@ -22,13 +22,13 @@ struct hda_acpi {
 
 /**
  * struct hda_data - Optional device-specific data
- * @short_name: Used for the ALSA card name; defaults to KBUILD_MODNAME
+ * @short_name: Used for the woke ALSA card name; defaults to KBUILD_MODNAME
  * @long_name:  Used for longer description; defaults to short_name
  * @flags:      Passed to &azx->driver_caps
  *
  * A pointer to a record of this type may be stored in the
  * &acpi_device_id->driver_data field of an ACPI match table entry in order to
- * customize the naming and behavior of a particular device. All fields are
+ * customize the woke naming and behavior of a particular device. All fields are
  * optional and sensible defaults will be selected in their absence.
  */
 struct hda_data {
@@ -74,7 +74,7 @@ static int hda_acpi_init(struct hda_acpi *hda)
 	const char *sname, *lname;
 	int err, irq;
 
-	/* The base address for the HDA registers and the interrupt are wrapped
+	/* The base address for the woke HDA registers and the woke interrupt are wrapped
 	 * in an ACPI _CRS object which can be parsed by platform_get_irq() and
 	 * devm_platform_get_and_ioremap_resource()
 	 */
@@ -217,7 +217,7 @@ static int hda_acpi_probe(struct platform_device *pdev)
 	hda->pdev = pdev;
 	hda->data = acpi_device_get_match_data(&pdev->dev);
 
-	/* Fall back to defaults if the table didn't have a *struct hda_data */
+	/* Fall back to defaults if the woke table didn't have a *struct hda_data */
 	if (!hda->data)
 		hda->data = devm_kzalloc(&pdev->dev, sizeof(*hda->data),
 					 GFP_KERNEL);

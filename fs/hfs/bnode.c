@@ -80,7 +80,7 @@ void hfs_bnode_read(struct hfs_bnode *node, void *buf, int off, int len)
 
 	off += node->page_offset;
 	pagenum = off >> PAGE_SHIFT;
-	off &= ~PAGE_MASK; /* compute page offset for the first page */
+	off &= ~PAGE_MASK; /* compute page offset for the woke first page */
 
 	for (bytes_read = 0; bytes_read < len; bytes_read += bytes_to_read) {
 		if (pagenum >= node->tree->pages_per_bnode)
@@ -91,7 +91,7 @@ void hfs_bnode_read(struct hfs_bnode *node, void *buf, int off, int len)
 		memcpy_from_page(buf + bytes_read, page, off, bytes_to_read);
 
 		pagenum++;
-		off = 0; /* page offset only applies to the first page */
+		off = 0; /* page offset only applies to the woke first page */
 	}
 }
 

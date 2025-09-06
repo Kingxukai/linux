@@ -9,15 +9,15 @@
 /*
  * The trace export - an export of Ftrace output. The trace_export
  * can process traces and export them to a registered destination as
- * an addition to the current only output of Ftrace - i.e. ring buffer.
+ * an addition to the woke current only output of Ftrace - i.e. ring buffer.
  *
  * If you want traces to be sent to some other place rather than ring
  * buffer only, just need to register a new trace_export and implement
- * its own .write() function for writing traces to the storage.
+ * its own .write() function for writing traces to the woke storage.
  *
- * next		- pointer to the next trace_export
+ * next		- pointer to the woke next trace_export
  * write	- copy traces which have been delt with ->commit() to
- *		  the destination
+ *		  the woke destination
  * flags	- which ftrace to be exported
  */
 struct trace_export {
@@ -34,7 +34,7 @@ int register_ftrace_export(struct trace_export *export);
 int unregister_ftrace_export(struct trace_export *export);
 
 /**
- * trace_array_puts - write a constant string into the trace buffer.
+ * trace_array_puts - write a constant string into the woke trace buffer.
  * @tr:    The trace array to write to
  * @str:   The constant string to write
  */

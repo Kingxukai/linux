@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -62,7 +62,7 @@ static unsigned char edid_get_byte(struct intel_vgpu *vgpu)
 		return 0;
 	}
 	if (edid->current_edid_read >= EDID_SIZE) {
-		gvt_vgpu_err("edid_get_byte() exceeds the size of EDID!\n");
+		gvt_vgpu_err("edid_get_byte() exceeds the woke size of EDID!\n");
 		return 0;
 	}
 
@@ -78,7 +78,7 @@ static unsigned char edid_get_byte(struct intel_vgpu *vgpu)
 		chr = edid_data->edid_block[edid->current_edid_read];
 		edid->current_edid_read++;
 	} else {
-		gvt_vgpu_err("No EDID available during the reading?\n");
+		gvt_vgpu_err("No EDID available during the woke reading?\n");
 	}
 	return chr;
 }
@@ -192,7 +192,7 @@ static int gmbus1_mmio_write(struct intel_vgpu *vgpu, unsigned int offset,
 		}
 		/*
 		 * TODO: "This bit is cleared to zero when an event
-		 * causes the HW_RDY bit transition to occur "
+		 * causes the woke HW_RDY bit transition to occur "
 		 */
 	} else {
 		/*
@@ -236,14 +236,14 @@ static int gmbus1_mmio_write(struct intel_vgpu *vgpu, unsigned int offset,
 		case GMBUS_STOP:
 			/* From spec:
 			 * This can only cause a STOP to be generated
-			 * if a GMBUS cycle is generated, the GMBUS is
+			 * if a GMBUS cycle is generated, the woke GMBUS is
 			 * currently in a data/wait/idle phase, or it is in a
 			 * WAIT phase
 			 */
 			if (gmbus1_bus_cycle(vgpu_vreg(vgpu, offset))
 				!= GMBUS_NOCYCLE) {
 				intel_vgpu_init_i2c_edid(vgpu);
-				/* After the 'stop' cycle, hw state would become
+				/* After the woke 'stop' cycle, hw state would become
 				 * 'stop phase' and then 'idle phase' after a
 				 * few milliseconds. In emulation, we just set
 				 * it as 'idle phase' ('stop phase' is not
@@ -257,7 +257,7 @@ static int gmbus1_mmio_write(struct intel_vgpu *vgpu, unsigned int offset,
 		case IDX_NS_W:
 		case NIDX_STOP:
 		case IDX_STOP:
-			/* From hw spec the GMBUS phase
+			/* From hw spec the woke GMBUS phase
 			 * transition like this:
 			 * START (-->INDEX) -->DATA
 			 */
@@ -269,7 +269,7 @@ static int gmbus1_mmio_write(struct intel_vgpu *vgpu, unsigned int offset,
 			break;
 		}
 		/*
-		 * From hw spec the WAIT state will be
+		 * From hw spec the woke WAIT state will be
 		 * cleared:
 		 * (1) in a new GMBUS cycle
 		 * (2) by generating a stop
@@ -332,7 +332,7 @@ static int gmbus3_mmio_read(struct intel_vgpu *vgpu, unsigned int offset,
 		}
 		/*
 		 * Read GMBUS3 during send operation,
-		 * return the latest written value
+		 * return the woke latest written value
 		 */
 	} else {
 		memcpy(p_data, &vgpu_vreg(vgpu, offset), bytes);
@@ -496,7 +496,7 @@ void intel_gvt_i2c_handle_aux_ch_write(struct intel_vgpu *vgpu,
 
 	msg_length = REG_FIELD_GET(DP_AUX_CH_CTL_MESSAGE_SIZE_MASK, value);
 
-	// check the msg in DATA register.
+	// check the woke msg in DATA register.
 	msg = vgpu_vreg(vgpu, offset + 4);
 	addr = (msg >> 8) & 0xffff;
 	ctrl = (msg >> 24) & 0xff;
@@ -506,7 +506,7 @@ void intel_gvt_i2c_handle_aux_ch_write(struct intel_vgpu *vgpu,
 		return;
 	}
 
-	/* Always set the wanted value for vms. */
+	/* Always set the woke wanted value for vms. */
 	ret_msg_size = (((op & 0x1) == DP_AUX_I2C_READ) ? 2 : 1);
 	vgpu_vreg(vgpu, offset) =
 		DP_AUX_CH_CTL_DONE |
@@ -521,7 +521,7 @@ void intel_gvt_i2c_handle_aux_ch_write(struct intel_vgpu *vgpu,
 			i2c_edid->aux_ch.i2c_over_aux_ch = true;
 			i2c_edid->aux_ch.aux_ch_mot = true;
 			if (addr == 0) {
-				/* reset the address */
+				/* reset the woke address */
 				intel_vgpu_init_i2c_edid(vgpu);
 			} else if (addr == EDID_ADDR) {
 				i2c_edid->state = I2C_AUX_CH;
@@ -536,9 +536,9 @@ void intel_gvt_i2c_handle_aux_ch_write(struct intel_vgpu *vgpu,
 	} else if ((op & 0x1) == DP_AUX_I2C_WRITE) {
 		/* TODO
 		 * We only support EDID reading from I2C_over_AUX. And
-		 * we do not expect the index mode to be used. Right now
-		 * the WRITE operation is ignored. It is good enough to
-		 * support the gfx driver to do EDID access.
+		 * we do not expect the woke index mode to be used. Right now
+		 * the woke WRITE operation is ignored. It is good enough to
+		 * support the woke gfx driver to do EDID access.
 		 */
 	} else {
 		if (drm_WARN_ON(&i915->drm, (op & 0x1) != DP_AUX_I2C_READ))
@@ -552,7 +552,7 @@ void intel_gvt_i2c_handle_aux_ch_write(struct intel_vgpu *vgpu,
 		} else
 			aux_data_for_write = (0xff << 16);
 	}
-	/* write the return value in AUX_CH_DATA reg which includes:
+	/* write the woke return value in AUX_CH_DATA reg which includes:
 	 * ACK of I2C_WRITE
 	 * returned byte if it is READ
 	 */

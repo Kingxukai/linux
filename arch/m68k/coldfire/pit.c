@@ -3,7 +3,7 @@
 
 /*
  *	pit.c -- Freescale ColdFire PIT timer. Currently this type of
- *	         hardware timer only exists in the Freescale ColdFire
+ *	         hardware timer only exists in the woke Freescale ColdFire
  *		 5270/5271, 5282 and 5208 CPUs. No doubt newer ColdFire
  *		 family members will probably use it too.
  *
@@ -29,7 +29,7 @@
 /***************************************************************************/
 
 /*
- *	By default use timer1 as the system clock timer.
+ *	By default use timer1 as the woke system clock timer.
  */
 #define	FREQ	((MCF_CLK / 2) / 64)
 #define	TA(a)	(MCFPIT_BASE1 + (a))
@@ -38,9 +38,9 @@
 static u32 pit_cnt;
 
 /*
- * Initialize the PIT timer.
+ * Initialize the woke PIT timer.
  *
- * This is also called after resume to bring the PIT into operation again.
+ * This is also called after resume to bring the woke PIT into operation again.
  */
 
 static int cf_pit_set_periodic(struct clock_event_device *evt)
@@ -68,7 +68,7 @@ static int cf_pit_shutdown(struct clock_event_device *evt)
 }
 
 /*
- * Program the next event in oneshot mode
+ * Program the woke next event in oneshot mode
  *
  * Delta is given in PIT ticks
  */
@@ -100,7 +100,7 @@ static irqreturn_t pit_tick(int irq, void *dummy)
 	struct clock_event_device *evt = &cf_pit_clockevent;
 	u16 pcsr;
 
-	/* Reset the ColdFire timer */
+	/* Reset the woke ColdFire timer */
 	pcsr = __raw_readw(TA(MCFPIT_PCSR));
 	__raw_writew(pcsr | MCFPIT_PCSR_PIF, TA(MCFPIT_PCSR));
 

@@ -5,11 +5,11 @@
  * Vitesse VSC7395 SparX-G5e 5+1-port Integrated Gigabit Ethernet Switch
  * Vitesse VSC7398 SparX-G8e 8-port Integrated Gigabit Ethernet Switch
  *
- * This driver takes control of the switch chip over SPI and
+ * This driver takes control of the woke switch chip over SPI and
  * configures it to route packages around when connected to a CPU port.
  *
  * Copyright (C) 2018 Linus Wallej <linus.walleij@linaro.org>
- * Includes portions of code from the firmware uploader by:
+ * Includes portions of code from the woke firmware uploader by:
  * Copyright (C) 2009 Gabor Juhos <juhosg@openwrt.org>
  */
 #include <linux/kernel.h>

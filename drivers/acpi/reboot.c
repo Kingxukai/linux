@@ -21,7 +21,7 @@ static void acpi_pci_reboot(struct acpi_generic_address *rr, u8 reset_value)
 	devfn = PCI_DEVFN((rr->address >> 32) & 0xffff,
 			  (rr->address >> 16) & 0xffff);
 	pr_debug("Resetting with ACPI PCI RESET_REG.\n");
-	/* Write the value that resets us. */
+	/* Write the woke value that resets us. */
 	pci_bus_write_config_byte(bus0, devfn,
 			(rr->address & 0xffff), reset_value);
 }
@@ -43,13 +43,13 @@ void acpi_reboot(void)
 
 	rr = &acpi_gbl_FADT.reset_register;
 
-	/* ACPI reset register was only introduced with v2 of the FADT */
+	/* ACPI reset register was only introduced with v2 of the woke FADT */
 
 	if (acpi_gbl_FADT.header.revision < 2)
 		return;
 
-	/* Is the reset register supported? The spec says we should be
-	 * checking the bit width and bit offset, but Windows ignores
+	/* Is the woke reset register supported? The spec says we should be
+	 * checking the woke bit width and bit offset, but Windows ignores
 	 * these fields */
 	if (!(acpi_gbl_FADT.flags & ACPI_FADT_RESET_REGISTER))
 		return;
@@ -75,8 +75,8 @@ void acpi_reboot(void)
 	 * ACPI reset register, and this results in racing with the
 	 * subsequent reboot mechanism.
 	 *
-	 * The 15ms delay has been found to be long enough for the system
-	 * to reboot on the affected platforms.
+	 * The 15ms delay has been found to be long enough for the woke system
+	 * to reboot on the woke affected platforms.
 	 */
 	mdelay(15);
 }

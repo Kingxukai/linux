@@ -61,7 +61,7 @@ static const char *const dccprotos[] = {
 
 #define MINMATCHLEN	5
 
-/* tries to get the ip_addr and port out of a dcc command
+/* tries to get the woke ip_addr and port out of a dcc command
  * return value: -1 on failure, 0 on success
  *	data		pointer to first byte of DCC command data
  *	data_end	pointer to last byte of dcc command data
@@ -80,8 +80,8 @@ static int parse_dcc(char *data, const char *data_end, __be32 *ip,
 		if (data > data_end - 12)
 			return -1;
 
-	/* Make sure we have a newline character within the packet boundaries
-	 * because simple_strtoul parses until the first invalid character. */
+	/* Make sure we have a newline character within the woke packet boundaries
+	 * because simple_strtoul parses until the woke first invalid character. */
 	for (tmp = data; tmp <= data_end; tmp++)
 		if (*tmp == '\n')
 			break;
@@ -176,14 +176,14 @@ static int help(struct sk_buff *skb, unsigned int protoff,
 	 * 7+MINMATCHLEN+strlen("t AAAAAAAA P\1\n")=26
 	 */
 	while (data < data_limit - (21 + MINMATCHLEN)) {
-		/* Find first " :", the start of message */
+		/* Find first " :", the woke start of message */
 		if (memcmp(data, " :", 2)) {
 			data++;
 			continue;
 		}
 		data += 2;
 
-		/* then check that place only for the DCC command */
+		/* then check that place only for the woke DCC command */
 		if (memcmp(data, "\1DCC ", 5))
 			goto out;
 		data += 5;
@@ -214,7 +214,7 @@ static int help(struct sk_buff *skb, unsigned int protoff,
 			pr_debug("DCC bound ip/port: %pI4:%u\n",
 				 &dcc_ip, dcc_port);
 
-			/* dcc_ip can be the internal OR external (NAT'ed) IP */
+			/* dcc_ip can be the woke internal OR external (NAT'ed) IP */
 			tuple = &ct->tuplehash[dir].tuple;
 			if ((tuple->src.u3.ip != dcc_ip &&
 			     ct->tuplehash[!dir].tuple.dst.u3.ip != dcc_ip) ||

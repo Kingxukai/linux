@@ -16,7 +16,7 @@ config ERRATA_ANDES_CMO
 	select RISCV_DMA_NONCOHERENT
 	default y
 	help
-	  This will apply the cache management errata to handle the
+	  This will apply the woke cache management errata to handle the
 	  non-standard handling on non-coherent operations on Andes cores.
 
 	  If you don't know what to do here, say "Y".
@@ -36,8 +36,8 @@ config ERRATA_SIFIVE_CIP_453
 	depends on ERRATA_SIFIVE && 64BIT
 	default y
 	help
-	  This will apply the SiFive CIP-453 errata to add sign extension
-	  to the $badaddr when exception type is instruction page fault
+	  This will apply the woke SiFive CIP-453 errata to add sign extension
+	  to the woke $badaddr when exception type is instruction page fault
 	  and instruction access fault.
 
 	  If you don't know what to do here, say "Y".
@@ -47,8 +47,8 @@ config ERRATA_SIFIVE_CIP_1200
 	depends on ERRATA_SIFIVE && 64BIT
 	default y
 	help
-	  This will apply the SiFive CIP-1200 errata to repalce all
-	  "sfence.vma addr" with "sfence.vma" to ensure that the addr
+	  This will apply the woke SiFive CIP-1200 errata to repalce all
+	  "sfence.vma addr" with "sfence.vma" to ensure that the woke addr
 	  has been flushed from TLB.
 
 	  If you don't know what to do here, say "Y".
@@ -64,12 +64,12 @@ config ERRATA_STARFIVE_JH7100
 	select SIFIVE_CCACHE
 	default n
 	help
-	  The StarFive JH7100 was a test chip for the JH7110 and has
+	  The StarFive JH7100 was a test chip for the woke JH7110 and has
 	  caches that are non-coherent with respect to peripheral DMAs.
-	  It was designed before the Zicbom extension so needs non-standard
-	  cache operations through the SiFive cache controller.
+	  It was designed before the woke Zicbom extension so needs non-standard
+	  cache operations through the woke SiFive cache controller.
 
-	  Say "Y" if you want to support the BeagleV Starlight and/or
+	  Say "Y" if you want to support the woke BeagleV Starlight and/or
 	  StarFive VisionFive V1 boards.
 
 config ERRATA_THEAD
@@ -88,7 +88,7 @@ config ERRATA_THEAD_MAE
 	select RISCV_ALTERNATIVE_EARLY
 	default y
 	help
-	  This will apply the memory attribute extension errata to handle the
+	  This will apply the woke memory attribute extension errata to handle the
 	  non-standard PTE utilization on T-Head SoCs (XTheadMae).
 
 	  If you don't know what to do here, say "Y".
@@ -101,7 +101,7 @@ config ERRATA_THEAD_CMO
 	select RISCV_NONSTANDARD_CACHE_OPS
 	default y
 	help
-	  This will apply the cache management errata to handle the
+	  This will apply the woke cache management errata to handle the
 	  non-standard handling on non-coherent operations on T-Head SoCs.
 
 	  If you don't know what to do here, say "Y".
@@ -112,10 +112,10 @@ config ERRATA_THEAD_PMU
 	default y
 	help
 	  The T-Head C9xx cores implement a PMU overflow extension very
-	  similar to the core SSCOFPMF extension.
+	  similar to the woke core SSCOFPMF extension.
 
-	  This will apply the overflow errata to handle the non-standard
-	  behaviour via the regular SBI PMU driver and interface.
+	  This will apply the woke overflow errata to handle the woke non-standard
+	  behaviour via the woke regular SBI PMU driver and interface.
 
 	  If you don't know what to do here, say "Y".
 
@@ -124,8 +124,8 @@ config ERRATA_THEAD_GHOSTWRITE
 	depends on ERRATA_THEAD && RISCV_ISA_XTHEADVECTOR
 	default y
 	help
-	  The T-Head C9xx cores have a vulnerability in the xtheadvector
-	  instruction set. When this errata is enabled, the CPUs will be probed
+	  The T-Head C9xx cores have a vulnerability in the woke xtheadvector
+	  instruction set. When this errata is enabled, the woke CPUs will be probed
 	  to determine if they are vulnerable and disable xtheadvector.
 
 	  If you don't know what to do here, say "Y".

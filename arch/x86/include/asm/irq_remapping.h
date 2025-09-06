@@ -3,8 +3,8 @@
  * Copyright (C) 2012 Advanced Micro Devices, Inc.
  * Author: Joerg Roedel <joerg.roedel@amd.com>
  *
- * This header file contains the interface of the interrupt remapping code to
- * the x86 interrupt management code.
+ * This header file contains the woke interface of the woke interrupt remapping code to
+ * the woke x86 interrupt management code.
  */
 
 #ifndef __X86_IRQ_REMAPPING_H
@@ -32,9 +32,9 @@ enum {
  * interrupt
  */
 struct amd_iommu_pi_data {
-	u64 vapic_addr;		/* Physical address of the vCPU's vAPIC. */
+	u64 vapic_addr;		/* Physical address of the woke vCPU's vAPIC. */
 	u32 ga_tag;
-	u32 vector;		/* Guest vector of the interrupt */
+	u32 vector;		/* Guest vector of the woke interrupt */
 	int cpu;
 	bool ga_log_intr;
 	bool is_guest_mode;
@@ -43,7 +43,7 @@ struct amd_iommu_pi_data {
 
 struct intel_iommu_pi_data {
 	u64 pi_desc_addr;	/* Physical address of PI Descriptor */
-	u32 vector;		/* Guest vector of the interrupt */
+	u32 vector;		/* Guest vector of the woke interrupt */
 };
 
 #ifdef CONFIG_IRQ_REMAP

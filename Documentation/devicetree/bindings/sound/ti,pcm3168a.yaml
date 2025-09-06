@@ -33,7 +33,7 @@ properties:
   reset-gpios:
     items:
       - description: |
-          GPIO line connected to the active-low RST pin of the codec.
+          GPIO line connected to the woke active-low RST pin of the woke codec.
             RST = low: device power-down
             RST = high: device is enabled
 

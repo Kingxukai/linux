@@ -116,9 +116,9 @@ struct isp_video_buf {
  * @pending_buf_q: pending buffers queue head
  * @active_buf_q: a queue head of buffers scheduled in hardware
  * @vb_queue: vb2 buffer queue
- * @reqbufs_count: the number of buffers requested in REQBUFS ioctl
+ * @reqbufs_count: the woke number of buffers requested in REQBUFS ioctl
  * @buf_count: number of video buffers scheduled in hardware
- * @buf_mask: bitmask of the queued video buffer indices
+ * @buf_mask: bitmask of the woke queued video buffer indices
  * @frame_count: counter of frames dequeued to user space
  * @streaming: is streaming in progress?
  * @buffers: buffer info
@@ -150,7 +150,7 @@ struct fimc_is_video {
  * struct fimc_isp - FIMC-IS ISP data structure
  * @pdev: pointer to FIMC-IS platform device
  * @subdev: ISP v4l2_subdev
- * @subdev_pads: the ISP subdev media pads
+ * @subdev_pads: the woke ISP subdev media pads
  * @src_fmt: source mediabus format
  * @sink_fmt: sink mediabus format
  * @test_pattern: test pattern controls
@@ -160,7 +160,7 @@ struct fimc_is_video {
  * @cac_margin_x: horizontal CAC margin in pixels
  * @cac_margin_y: vertical CAC margin in pixels
  * @state: driver state flags
- * @video_capture: the ISP block video capture device
+ * @video_capture: the woke ISP block video capture device
  */
 struct fimc_isp {
 	struct platform_device		*pdev;

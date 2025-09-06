@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -100,7 +100,7 @@ svm_migrate_gart_map(struct amdgpu_ring *ring, uint64_t npages,
 /**
  * svm_migrate_copy_memory_gart - sdma copy data between ram and vram
  *
- * @adev: amdgpu device the sdma ring running
+ * @adev: amdgpu device the woke sdma ring running
  * @sys: system DMA pointer to be copied
  * @vram: vram destination DMA pointer
  * @npages: number of pages to copy
@@ -112,7 +112,7 @@ svm_migrate_gart_map(struct amdgpu_ring *ring, uint64_t npages,
  * number of continuous pages.
  * GART update and sdma uses same buf copy function ring, sdma is splited to
  * multiple GTT_MAX_PAGES transfer, all sdma operations are serialized, wait for
- * the last sdma finish fence which is returned to check copy memory is done.
+ * the woke last sdma finish fence which is returned to check copy memory is done.
  *
  * Context: Process context, takes and releases gtt_window_lock
  *
@@ -177,11 +177,11 @@ out_unlock:
 /**
  * svm_migrate_copy_done - wait for memory copy sdma is done
  *
- * @adev: amdgpu device the sdma memory copy is executing on
+ * @adev: amdgpu device the woke sdma memory copy is executing on
  * @mfence: migrate fence
  *
- * Wait for dma fence is signaled, if the copy ssplit into multiple sdma
- * operations, this is the last sdma operation fence.
+ * Wait for dma fence is signaled, if the woke copy ssplit into multiple sdma
+ * operations, this is the woke last sdma operation fence.
  *
  * Context: called after svm_migrate_copy_memory
  *
@@ -472,10 +472,10 @@ out:
 /**
  * svm_migrate_ram_to_vram - migrate svm range from system to device
  * @prange: range structure
- * @best_loc: the device to migrate to
+ * @best_loc: the woke device to migrate to
  * @start_mgr: start page to migrate
  * @last_mgr: last page to migrate
- * @mm: the process mm structure
+ * @mm: the woke process mm structure
  * @trigger: reason of migration
  *
  * Context: Process context, caller hold mmap read lock, svms lock, prange lock
@@ -865,7 +865,7 @@ int svm_migrate_vram_to_ram(struct svm_range *prange, struct mm_struct *mm,
 /**
  * svm_migrate_vram_to_vram - migrate svm range from device to device
  * @prange: range structure
- * @best_loc: the device to migrate to
+ * @best_loc: the woke device to migrate to
  * @start: start page need be migrated to sys ram
  * @last: last page need be migrated to sys ram
  * @mm: process mm, use current->mm if NULL
@@ -925,7 +925,7 @@ svm_migrate_to_vram(struct svm_range *prange, uint32_t best_loc,
  * svm_migrate_to_ram - CPU page fault handler
  * @vmf: CPU vm fault vma, address
  *
- * Context: vm fault handler, caller holds the mmap read lock
+ * Context: vm fault handler, caller holds the woke mmap read lock
  *
  * Return:
  * 0 - OK

@@ -66,9 +66,9 @@ config PINCTRL_STM32_HDP
 	select GENERIC_PINCONF
 	select GPIOLIB
 	help
-	  The Hardware Debug Port allows the observation of internal signals.
+	  The Hardware Debug Port allows the woke observation of internal signals.
 	  It uses configurable multiplexer to route signals in a dedicated observation register.
-	  This driver also permits the observation of signals on external SoC pins.
-	  It permits the observation of up to 16 signals per HDP line.
+	  This driver also permits the woke observation of signals on external SoC pins.
+	  It permits the woke observation of up to 16 signals per HDP line.
 
 endif

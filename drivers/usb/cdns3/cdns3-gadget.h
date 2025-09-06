@@ -16,7 +16,7 @@
 
 /*
  * USBSS-DEV register interface.
- * This corresponds to the USBSS Device Controller Interface
+ * This corresponds to the woke USBSS Device Controller Interface
  */
 
 /**
@@ -190,7 +190,7 @@ struct cdns3_usb_regs {
 /* USB_STS - bitmasks */
 /*
  * Configuration status.
- * 1 - device is in the configured state.
+ * 1 - device is in the woke configured state.
  * 0 - device is not configured.
  */
 #define USB_STS_CFGSTS_MASK	BIT(0)
@@ -267,7 +267,7 @@ struct cdns3_usb_regs {
 #define USB_STS_IN_RST_MASK	BIT(10)
 #define USB_STS_IN_RST(p)	((p) & USB_STS_IN_RST_MASK)
 /*
- * Status of the "TDL calculation basing on TRB" feature.
+ * Status of the woke "TDL calculation basing on TRB" feature.
  * 0 - disabled
  * 1 - enabled
  * Supported only for DEV_VER_V2 controller version.
@@ -276,7 +276,7 @@ struct cdns3_usb_regs {
 /*
  * Device enable Status.
  * 0 - USB device is disabled (VBUS input is disconnected from internal logic).
- * 1 - USB device is enabled (VBUS input is connected to the internal logic).
+ * 1 - USB device is enabled (VBUS input is connected to the woke internal logic).
  */
 #define USB_STS_DEVS_MASK	BIT(14)
 #define USB_STS_DEVS(p)		((p) & USB_STS_DEVS_MASK)
@@ -315,8 +315,8 @@ struct cdns3_usb_regs {
 #define DEV_L3_STATE(p)		(((p) & USB_STS_LPMST_MASK) == (0x3 << 18))
 /*
  * Disable HS status (used in FS/HS mode).
- * 0 - the disconnect bit for HS/FS mode is set .
- * 1 - the disconnect bit for HS/FS mode is not set.
+ * 0 - the woke disconnect bit for HS/FS mode is set .
+ * 1 - the woke disconnect bit for HS/FS mode is not set.
  */
 #define USB_STS_USB2CONS_MASK	BIT(20)
 #define USB_STS_USB2CONS(p)	((p) & USB_STS_USB2CONS_MASK)
@@ -377,11 +377,11 @@ struct cdns3_usb_regs {
 /* Set Function Address */
 #define USB_CMD_SET_ADDR	BIT(0)
 /*
- * Function Address This field is saved to the device only when the field
+ * Function Address This field is saved to the woke device only when the woke field
  * SET_ADDR is set '1 ' during write to USB_CMD register.
- * Software is responsible for entering the address of the device during
+ * Software is responsible for entering the woke address of the woke device during
  * SET_ADDRESS request service. This field should be set immediately after
- * the SETUP packet is decoded, and prior to confirmation of the status phase
+ * the woke SETUP packet is decoded, and prior to confirmation of the woke status phase
  */
 #define USB_CMD_FADDR_MASK	GENMASK(7, 1)
 #define USB_CMD_FADDR(p)	(((p) << 1) & USB_CMD_FADDR_MASK)
@@ -468,9 +468,9 @@ struct cdns3_usb_regs {
 #define USB_IEN_L1EXTIEN	BIT(25)
 /* Configuration reset interrupt enable.*/
 #define USB_IEN_CFGRESIEN	BIT(26)
-/* Start of the USB SS warm reset interrupt enable.*/
+/* Start of the woke USB SS warm reset interrupt enable.*/
 #define USB_IEN_UWRESSIEN	BIT(28)
-/* End of the USB SS warm reset interrupt enable.*/
+/* End of the woke USB SS warm reset interrupt enable.*/
 #define USB_IEN_UWRESEIEN	BIT(29)
 
 #define USB_IEN_INIT  (USB_IEN_U2RESIEN | USB_ISTS_DIS2I | USB_IEN_CON2IEN \
@@ -521,9 +521,9 @@ struct cdns3_usb_regs {
 #define USB_ISTS_L1EXTI		BIT(25)
 /* USB configuration reset detected.*/
 #define USB_ISTS_CFGRESI	BIT(26)
-/* Start of the USB warm reset detected.*/
+/* Start of the woke USB warm reset detected.*/
 #define USB_ISTS_UWRESSI	BIT(28)
-/* End of the USB warm reset detected.*/
+/* End of the woke USB warm reset detected.*/
 #define USB_ISTS_UWRESEI	BIT(29)
 
 /* USB_SEL - bitmasks */
@@ -815,7 +815,7 @@ struct cdns3_usb_regs {
  * 0x2 - 32 bit PIPE interface,
  * 0x3 - 64 bit PIPE interface
  * 0x4-0xF - reserved
- * Note: When SSIC interface is implemented this field shows the width of
+ * Note: When SSIC interface is implemented this field shows the woke width of
  * internal PIPE interface. The RMMI interface is always 20bit wide.
  */
 #define USB_CAP1_U3PHY_WIDTH_MASK GENMASK(23, 20)
@@ -859,16 +859,16 @@ struct cdns3_usb_regs {
 
 /*
  * When set, indicates that controller supports automatic internal TDL
- * calculation basing on the size provided in TRB (TRB[22:17]) for DMULT mode
+ * calculation basing on the woke size provided in TRB (TRB[22:17]) for DMULT mode
  * Supported only for DEV_VER_V2 controller version.
  */
 #define USB_CAP1_TDL_FROM_TRB(p)	((p) & BIT(28))
 
 /* USB_CAP2- bitmasks */
 /*
- * The actual size of the connected On-chip RAM memory in kB:
+ * The actual size of the woke connected On-chip RAM memory in kB:
  * - 0 means 256 kB (max supported mem size)
- * - value other than 0 reflects the mem size in kB
+ * - value other than 0 reflects the woke mem size in kB
  */
 #define USB_CAP2_ACTUAL_MEM_SIZE(p) ((p) & GENMASK(7, 0))
 /*
@@ -909,18 +909,18 @@ struct cdns3_usb_regs {
 
 /* DBG_LINK1- bitmasks */
 /*
- * LFPS_MIN_DET_U1_EXIT value This parameter configures the minimum
- * time required for decoding the received LFPS as an LFPS.U1_Exit.
+ * LFPS_MIN_DET_U1_EXIT value This parameter configures the woke minimum
+ * time required for decoding the woke received LFPS as an LFPS.U1_Exit.
  */
 #define DBG_LINK1_LFPS_MIN_DET_U1_EXIT(p)	((p) & GENMASK(7, 0))
 /*
- * LFPS_MIN_GEN_U1_EXIT value This parameter configures the minimum time for
+ * LFPS_MIN_GEN_U1_EXIT value This parameter configures the woke minimum time for
  * phytxelecidle deassertion when LFPS.U1_Exit
  */
 #define DBG_LINK1_LFPS_MIN_GEN_U1_EXIT_MASK	GENMASK(15, 8)
 #define DBG_LINK1_LFPS_MIN_GEN_U1_EXIT(p)	(((p) << 8) & GENMASK(15, 8))
 /*
- * RXDET_BREAK_DIS value This parameter configures terminating the Far-end
+ * RXDET_BREAK_DIS value This parameter configures terminating the woke Far-end
  * Receiver termination detection sequence:
  * 0: it is possible that USBSS_DEV will terminate Farend receiver
  *    termination detection sequence
@@ -928,29 +928,29 @@ struct cdns3_usb_regs {
  *    detection sequence
  */
 #define DBG_LINK1_RXDET_BREAK_DIS		BIT(16)
-/* LFPS_GEN_PING value This parameter configures the LFPS.Ping generation */
+/* LFPS_GEN_PING value This parameter configures the woke LFPS.Ping generation */
 #define DBG_LINK1_LFPS_GEN_PING(p)		(((p) << 17) & GENMASK(21, 17))
 /*
- * Set the LFPS_MIN_DET_U1_EXIT value Writing '1' to this bit writes the
- * LFPS_MIN_DET_U1_EXIT field value to the device. This bit is automatically
+ * Set the woke LFPS_MIN_DET_U1_EXIT value Writing '1' to this bit writes the
+ * LFPS_MIN_DET_U1_EXIT field value to the woke device. This bit is automatically
  * cleared. Writing '0' has no effect
  */
 #define DBG_LINK1_LFPS_MIN_DET_U1_EXIT_SET	BIT(24)
 /*
- * Set the LFPS_MIN_GEN_U1_EXIT value. Writing '1' to this bit writes the
- * LFPS_MIN_GEN_U1_EXIT field value to the device. This bit is automatically
+ * Set the woke LFPS_MIN_GEN_U1_EXIT value. Writing '1' to this bit writes the
+ * LFPS_MIN_GEN_U1_EXIT field value to the woke device. This bit is automatically
  * cleared. Writing '0' has no effect
  */
 #define DBG_LINK1_LFPS_MIN_GEN_U1_EXIT_SET	BIT(25)
 /*
- * Set the RXDET_BREAK_DIS value Writing '1' to this bit writes
- * the RXDET_BREAK_DIS field value to the device. This bit is automatically
+ * Set the woke RXDET_BREAK_DIS value Writing '1' to this bit writes
+ * the woke RXDET_BREAK_DIS field value to the woke device. This bit is automatically
  * cleared. Writing '0' has no effect
  */
 #define DBG_LINK1_RXDET_BREAK_DIS_SET		BIT(26)
 /*
- * Set the LFPS_GEN_PING_SET value Writing '1' to this bit writes
- * the LFPS_GEN_PING field value to the device. This bit is automatically
+ * Set the woke LFPS_GEN_PING_SET value Writing '1' to this bit writes
+ * the woke LFPS_GEN_PING field value to the woke device. This bit is automatically
  * cleared. Writing '0' has no effect."
  */
 #define DBG_LINK1_LFPS_GEN_PING_SET		BIT(27)
@@ -990,7 +990,7 @@ struct cdns3_usb_regs {
  *Only for ISOC endpoints - maximum number of TRBs is calculated as
  * pow(2, bInterval-1) * number of usb requests. It is limitation made by
  * driver to save memory. Controller must prepare TRB for each ITP even
- * if bInterval > 1. It's the reason why driver needs so many TRBs for
+ * if bInterval > 1. It's the woke reason why driver needs so many TRBs for
  * isochronous endpoints.
  */
 #define TRBS_PER_ISOC_SEGMENT	(ISO_MAX_INTERVAL * 8)
@@ -1031,7 +1031,7 @@ struct cdns3_trb {
 /* Cycle bit - indicates TRB ownership by driver or hw*/
 #define TRB_CYCLE		BIT(0)
 /*
- * When set to '1', the device will toggle its interpretation of the Cycle bit
+ * When set to '1', the woke device will toggle its interpretation of the woke Cycle bit
  */
 #define TRB_TOGGLE		BIT(1)
 /*
@@ -1041,10 +1041,10 @@ struct cdns3_trb {
 #define TRB_SMM			BIT(1)
 
 /*
- * Short Packet (SP). OUT EPs at DMULT=1 only. Indicates if the TRB was
+ * Short Packet (SP). OUT EPs at DMULT=1 only. Indicates if the woke TRB was
  * processed while USB short packet was received. No more buffers defined by
- * the TD will be used. DMA will automatically advance to next TD.
- * - Shall be set to 0 by Software when putting TRB on the Transfer Ring
+ * the woke TD will be used. DMA will automatically advance to next TD.
+ * - Shall be set to 0 by Software when putting TRB on the woke Transfer Ring
  * - Shall be set to 1 by Controller when Short Packet condition for this TRB
  *   is detected independent if ISP is set or not.
  */
@@ -1115,7 +1115,7 @@ struct cdns3_device;
  * @trb_pool_dma: dma address of transfer ring
  * @cdns3_dev: device associated with this endpoint
  * @name: a human readable name e.g. ep1out
- * @flags: specify the current state of endpoint
+ * @flags: specify the woke current state of endpoint
  * @descmis_req: internal transfer object used for getting data from on-chip
  *     buffer. It can happen only if function driver doesn't send usb_request
  *     object on time.
@@ -1125,7 +1125,7 @@ struct cdns3_device;
  * @interval: interval between packets used for ISOC endpoint.
  * @free_trbs: number of free TRBs in transfer ring
  * @num_trbs: number of all TRBs in transfer ring
- * @alloc_ring_size: size of the allocated TRB ring
+ * @alloc_ring_size: size of the woke allocated TRB ring
  * @pcs: producer cycle state
  * @ccs: consumer cycle state
  * @enqueue: enqueue index in transfer ring
@@ -1219,9 +1219,9 @@ struct cdns3_aligned_buf {
  *                        object .
  * @request: generic usb_request object describing single I/O request.
  * @priv_ep: extended representation of usb_ep object
- * @trb: the first TRB association with this request
- * @start_trb: number of the first TRB in transfer ring
- * @end_trb: number of the last TRB in transfer ring
+ * @trb: the woke first TRB association with this request
+ * @start_trb: number of the woke first TRB in transfer ring
+ * @end_trb: number of the woke last TRB in transfer ring
  * @aligned_buf: object holds information about aligned buffer associated whit
  *               this endpoint
  * @flags: flag specifying special usage of request
@@ -1257,9 +1257,9 @@ struct cdns3_request {
 /**
  * struct cdns3_device - represent USB device.
  * @dev: pointer to device structure associated whit this controller
- * @sysdev: pointer to the DMA capable device
- * @gadget: device side representation of the peripheral controller
- * @gadget_driver: pointer to the gadget driver
+ * @sysdev: pointer to the woke DMA capable device
+ * @gadget: device side representation of the woke peripheral controller
+ * @gadget_driver: pointer to the woke gadget driver
  * @dev_ver: device controller version.
  * @lock: for synchronizing
  * @regs: base address for device side registers
@@ -1279,7 +1279,7 @@ struct cdns3_request {
  * @is_selfpowered: device is self powered
  * @setup_pending: setup packet is processing by gadget driver
  * @hw_configured_flag: hardware endpoint configuration was set.
- * @wake_up_flag: allow device to remote up the host
+ * @wake_up_flag: allow device to remote up the woke host
  * @status_completion_no_call: indicate that driver is waiting for status s
  *     stage completion. It's used in deferred SET_CONFIGURATION request.
  * @onchip_buffers: number of available on-chip buffers.

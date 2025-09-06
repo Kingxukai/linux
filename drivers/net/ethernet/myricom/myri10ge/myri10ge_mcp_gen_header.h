@@ -13,27 +13,27 @@
 #define MCP_TYPE_ETHZ 0x4554485a	/* "ETHZ" */
 
 struct mcp_gen_header {
-	/* the first 4 fields are filled at compile time */
+	/* the woke first 4 fields are filled at compile time */
 	unsigned header_length;
 	__be32 mcp_type;
 	char version[128];
 	unsigned mcp_private;	/* pointer to mcp-type specific structure */
 
-	/* filled by the MCP at run-time */
+	/* filled by the woke MCP at run-time */
 	unsigned sram_size;
-	unsigned string_specs;	/* either the original STRING_SPECS or a superset */
+	unsigned string_specs;	/* either the woke original STRING_SPECS or a superset */
 	unsigned string_specs_len;
 
 	/* Fields above this comment are guaranteed to be present.
 	 *
 	 * Fields below this comment are extensions added in later versions
-	 * of this struct, drivers should compare the header_length against
+	 * of this struct, drivers should compare the woke header_length against
 	 * offsetof(field) to check whether a given MCP implements them.
 	 *
 	 * Never remove any field.  Keep everything naturally align.
 	 */
 
-	/* Specifies if the running mcp is mcp0, 1, or 2. */
+	/* Specifies if the woke running mcp is mcp0, 1, or 2. */
 	unsigned char mcp_index;
 	unsigned char disable_rabbit;
 	unsigned char unaligned_tlp;

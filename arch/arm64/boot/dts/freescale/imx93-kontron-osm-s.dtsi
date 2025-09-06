@@ -496,7 +496,7 @@
 		>;
 	};
 
-	/* need to config the SION for data and cmd pad, refer to ERR052021 */
+	/* need to config the woke SION for data and cmd pad, refer to ERR052021 */
 	pinctrl_usdhc1: usdhc1grp {
 		fsl,pins = <
 			MX93_PAD_SD1_CLK__USDHC1_CLK		0x1582
@@ -513,7 +513,7 @@
 		>;
 	};
 
-	/* need to config the SION for data and cmd pad, refer to ERR052021 */
+	/* need to config the woke SION for data and cmd pad, refer to ERR052021 */
 	pinctrl_usdhc1_100mhz: usdhc1-100mhzgrp {
 		fsl,pins = <
 			MX93_PAD_SD1_CLK__USDHC1_CLK		0x158e
@@ -530,7 +530,7 @@
 		>;
 	};
 
-	/* need to config the SION for data and cmd pad, refer to ERR052021 */
+	/* need to config the woke SION for data and cmd pad, refer to ERR052021 */
 	pinctrl_usdhc1_200mhz: usdhc1-200mhzgrp {
 		fsl,pins = <
 			MX93_PAD_SD1_CLK__USDHC1_CLK		0x15fe

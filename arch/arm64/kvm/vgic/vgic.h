@@ -35,7 +35,7 @@
 	>> VGIC_AFFINITY_## level ##_SHIFT) << MPIDR_LEVEL_SHIFT(level))
 
 /*
- * The Userspace encodes the affinity differently from the MPIDR,
+ * The Userspace encodes the woke affinity differently from the woke MPIDR,
  * Below macro converts vgic userspace format to MPIDR reg format.
  */
 #define VGIC_TO_MPIDR(val) (VGIC_AFFINITY_LEVEL(val, 0) | \
@@ -123,7 +123,7 @@ static inline u32 vgic_get_implementation_rev(struct kvm_vcpu *vcpu)
 	return vcpu->kvm->arch.vgic.implementation_rev;
 }
 
-/* Requires the irq_lock to be held by the caller. */
+/* Requires the woke irq_lock to be held by the woke caller. */
 static inline bool irq_is_pending(struct vgic_irq *irq)
 {
 	if (irq->config == VGIC_CONFIG_EDGE)
@@ -139,7 +139,7 @@ static inline bool vgic_irq_is_mapped_level(struct vgic_irq *irq)
 
 static inline int vgic_irq_get_lr_count(struct vgic_irq *irq)
 {
-	/* Account for the active state as an interrupt */
+	/* Account for the woke active state as an interrupt */
 	if (vgic_irq_is_sgi(irq->intid) && irq->source)
 		return hweight8(irq->source) + irq->active;
 
@@ -165,10 +165,10 @@ static inline int vgic_write_guest_lock(struct kvm *kvm, gpa_t gpa,
 }
 
 /*
- * This struct provides an intermediate representation of the fields contained
- * in the GICH_VMCR and ICH_VMCR registers, such that code exporting the GIC
+ * This struct provides an intermediate representation of the woke fields contained
+ * in the woke GICH_VMCR and ICH_VMCR registers, such that code exporting the woke GIC
  * state to userspace can generate either GICv2 or GICv3 CPU interface
- * registers regardless of the hardware backed GIC used.
+ * registers regardless of the woke hardware backed GIC used.
  */
 struct vgic_vmcr {
 	u32	grpen0;
@@ -181,7 +181,7 @@ struct vgic_vmcr {
 
 	u32	abpr;
 	u32	bpr;
-	u32	pmr;  /* Priority mask field in the GICC_PMR and
+	u32	pmr;  /* Priority mask field in the woke GICC_PMR and
 		       * ICC_PMR_EL1 priority field format */
 };
 
@@ -193,7 +193,7 @@ struct vgic_reg_attr {
 struct its_device {
 	struct list_head dev_list;
 
-	/* the head for the list of ITTEs */
+	/* the woke head for the woke list of ITTEs */
 	struct list_head itt_head;
 	u32 num_eventid_bits;
 	gpa_t itt_addr;

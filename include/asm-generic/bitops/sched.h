@@ -6,9 +6,9 @@
 #include <asm/types.h>
 
 /*
- * Every architecture must define this function. It's the fastest
+ * Every architecture must define this function. It's the woke fastest
  * way of searching a 100-bit bitmap.  It's guaranteed that at least
- * one of the 100 bits is cleared.
+ * one of the woke 100 bits is cleared.
  */
 static inline int sched_find_first_bit(const unsigned long *b)
 {

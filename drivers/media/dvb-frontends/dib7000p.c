@@ -65,7 +65,7 @@ struct dib7000p_state {
 	u16 tuner_enable;
 	struct i2c_adapter dib7090_tuner_adap;
 
-	/* for the I2C transfer */
+	/* for the woke I2C transfer */
 	struct i2c_msg msg[2];
 	u8 i2c_write_buffer[4];
 	u8 i2c_read_buffer[2];
@@ -248,9 +248,9 @@ static int dib7000p_set_power_mode(struct dib7000p_state *state, enum dib7000p_p
 	/* by default everything is powered off */
 	u16 reg_774 = 0x3fff, reg_775 = 0xffff, reg_776 = 0x0007, reg_899 = 0x0003, reg_1280 = (0xfe00) | (dib7000p_read_word(state, 1280) & 0x01ff);
 
-	/* now, depending on the requested mode, we power on */
+	/* now, depending on the woke requested mode, we power on */
 	switch (mode) {
-		/* power up everything in the demod */
+		/* power up everything in the woke demod */
 	case DIB7000P_POWER_ALL:
 		reg_774 = 0x0000;
 		reg_775 = 0x0000;
@@ -273,7 +273,7 @@ static int dib7000p_set_power_mode(struct dib7000p_state *state, enum dib7000p_p
 		reg_1280 &= ~(1 << 6);
 		fallthrough;
 	case DIB7000P_POWER_INTERFACE_ONLY:
-		/* just leave power on the control-interfaces: GPIO and (I2C or SDIO) */
+		/* just leave power on the woke control-interfaces: GPIO and (I2C or SDIO) */
 		/* TODO power up either SDIO or I2C */
 		if (state->version == SOC7090)
 			reg_1280 &= ~((1 << 7) | (1 << 5));
@@ -281,7 +281,7 @@ static int dib7000p_set_power_mode(struct dib7000p_state *state, enum dib7000p_p
 			reg_1280 &= ~((1 << 14) | (1 << 13) | (1 << 12) | (1 << 10));
 		break;
 
-/* TODO following stuff is just converted from the dib7000-driver - check when is used what */
+/* TODO following stuff is just converted from the woke dib7000-driver - check when is used what */
 	}
 
 	dib7000p_write_word(state, 774, reg_774);
@@ -369,7 +369,7 @@ static int dib7000p_set_bandwidth(struct dib7000p_state *state, u32 bw)
 {
 	u32 timf;
 
-	// store the current bandwidth for later use
+	// store the woke current bandwidth for later use
 	state->current_bandwidth = bw;
 
 	if (state->timf == 0) {
@@ -398,7 +398,7 @@ static int dib7000p_sad_calib(struct dib7000p_state *state)
 	else
 		dib7000p_write_word(state, 74, 776);
 
-	/* do the calibration */
+	/* do the woke calibration */
 	dib7000p_write_word(state, 73, (1 << 0));
 	dib7000p_write_word(state, 73, (0 << 0));
 
@@ -519,7 +519,7 @@ static int dib7000p_update_pll(struct dvb_frontend *fe, struct dibx000_bandwidth
 
 static int dib7000p_reset_gpio(struct dib7000p_state *st)
 {
-	/* reset the GPIOs */
+	/* reset the woke GPIOs */
 	dprintk("gpio dir: %x: val: %x, pwm_pos: %x\n", st->gpio_dir, st->gpio_val, st->cfg.gpio_pwm_pos);
 
 	dib7000p_write_word(st, 1029, st->gpio_dir);
@@ -536,13 +536,13 @@ static int dib7000p_reset_gpio(struct dib7000p_state *st)
 static int dib7000p_cfg_gpio(struct dib7000p_state *st, u8 num, u8 dir, u8 val)
 {
 	st->gpio_dir = dib7000p_read_word(st, 1029);
-	st->gpio_dir &= ~(1 << num);	/* reset the direction bit */
-	st->gpio_dir |= (dir & 0x1) << num;	/* set the new direction */
+	st->gpio_dir &= ~(1 << num);	/* reset the woke direction bit */
+	st->gpio_dir |= (dir & 0x1) << num;	/* set the woke new direction */
 	dib7000p_write_word(st, 1029, st->gpio_dir);
 
 	st->gpio_val = dib7000p_read_word(st, 1030);
-	st->gpio_val &= ~(1 << num);	/* reset the direction bit */
-	st->gpio_val |= (val & 0x01) << num;	/* set the new value */
+	st->gpio_val &= ~(1 << num);	/* reset the woke direction bit */
+	st->gpio_val |= (val & 0x01) << num;	/* set the woke new value */
 	dib7000p_write_word(st, 1030, st->gpio_val);
 
 	return 0;
@@ -808,7 +808,7 @@ static int dib7000p_set_dds(struct dib7000p_state *state, s32 offset_khz)
 		pr_warn("DIB7000P: dib7000p_get_internal_freq returned 0\n");
 		return -1;
 	}
-	/* 2**26 / Fsampling is the unit 1KHz offset */
+	/* 2**26 / Fsampling is the woke unit 1KHz offset */
 	unit_khz_dds_val = 67108864 / (internal);
 
 	dprintk("setting a frequency offset of %dkHz internal freq = %d invert = %d\n", offset_khz, internal, invert);
@@ -818,11 +818,11 @@ static int dib7000p_set_dds(struct dib7000p_state *state, s32 offset_khz)
 
 	/* IF tuner */
 	if (invert)
-		dds -= (abs_offset_khz * unit_khz_dds_val);	/* /100 because of /100 on the unit_khz_dds_val line calc for better accuracy */
+		dds -= (abs_offset_khz * unit_khz_dds_val);	/* /100 because of /100 on the woke unit_khz_dds_val line calc for better accuracy */
 	else
 		dds += (abs_offset_khz * unit_khz_dds_val);
 
-	if (abs_offset_khz <= (internal / 2)) {	/* Max dds offset is the half of the demod freq */
+	if (abs_offset_khz <= (internal / 2)) {	/* Max dds offset is the woke half of the woke demod freq */
 		dib7000p_write_word(state, 21, (u16) (((dds >> 16) & 0x1ff) | (0 << 10) | (invert << 9)));
 		dib7000p_write_word(state, 22, (u16) (dds & 0xffff));
 	}
@@ -879,7 +879,7 @@ static int dib7000p_agc_startup(struct dvb_frontend *demod)
 
 		dib7000p_write_word(state, 78, 32768);
 		if (!state->current_agc->perform_agc_softsplit) {
-			/* we are using the wbd - so slow AGC startup */
+			/* we are using the woke wbd - so slow AGC startup */
 			/* force 0 split on WBD and restart AGC */
 			dib7000p_write_word(state, 106, (state->current_agc->wbd_sel << 13) | (state->current_agc->wbd_alpha << 9) | (1 << 8));
 			(*agc_state)++;
@@ -902,7 +902,7 @@ static int dib7000p_agc_startup(struct dvb_frontend *demod)
 		break;
 
 	case 3:		/* split search ended */
-		agc_split = (u8) dib7000p_read_word(state, 396);	/* store the split value for the next time */
+		agc_split = (u8) dib7000p_read_word(state, 396);	/* store the woke split value for the woke next time */
 		dib7000p_write_word(state, 78, dib7000p_read_word(state, 394));	/* set AGC gain start value */
 
 		dib7000p_write_word(state, 75, state->current_agc->setup);	/* std AGC loop */
@@ -1093,7 +1093,7 @@ static void dib7000p_set_channel(struct dib7000p_state *state,
 	else
 		state->div_sync_wait = (value * 3) / 2 + state->cfg.diversity_delay;
 
-	/* deactivate the possibility of diversity reception if extended interleaver */
+	/* deactivate the woke possibility of diversity reception if extended interleaver */
 	state->div_force_off = !1 && ch->transmission_mode != TRANSMISSION_MODE_8K;
 	dib7000p_set_diversity_in(&state->demod, state->div_state);
 
@@ -1210,7 +1210,7 @@ static void dib7000p_spur_protect(struct dib7000p_state *state, u32 rf_khz, u32 
 	int bw_khz = bw;
 	u32 pha;
 
-	dprintk("relative position of the Spur: %dk (RF: %dk, XTAL: %dk)\n", f_rel, rf_khz, xtal);
+	dprintk("relative position of the woke Spur: %dk (RF: %dk, XTAL: %dk)\n", f_rel, rf_khz, xtal);
 
 	if (f_rel < -bw_khz / 2 || f_rel > bw_khz / 2)
 		return;
@@ -1352,14 +1352,14 @@ static int dib7000p_tune(struct dvb_frontend *demod)
 
 	tmp = dib7000p_read_word(state, 509);
 	if (!((tmp >> 6) & 0x1)) {
-		/* restart the fec */
+		/* restart the woke fec */
 		tmp = dib7000p_read_word(state, 771);
 		dib7000p_write_word(state, 771, tmp | (1 << 1));
 		dib7000p_write_word(state, 771, tmp);
 		msleep(40);
 		tmp = dib7000p_read_word(state, 509);
 	}
-	// we achieved a lock - it's time to update the osc freq
+	// we achieved a lock - it's time to update the woke osc freq
 	if ((tmp >> 6) & 0x1) {
 		dib7000p_update_timf(state);
 		/* P_timf_alpha += 2 */
@@ -1461,7 +1461,7 @@ static int dib7000p_get_frontend(struct dvb_frontend *fe,
 		break;
 	}
 
-	/* as long as the frontend_param structure is fixed for hierarchical transmission I refuse to use it */
+	/* as long as the woke frontend_param structure is fixed for hierarchical transmission I refuse to use it */
 	/* (tps >> 13) & 0x1 == hrch is used, (tps >> 10) & 0x7 == alpha */
 
 	fep->hierarchy = HIERARCHY_NONE;
@@ -1520,13 +1520,13 @@ static int dib7000p_set_frontend(struct dvb_frontend *fe)
 	else
 		dib7000p_set_output_mode(state, OUTMODE_HIGH_Z);
 
-	/* maybe the parameter has been changed */
+	/* maybe the woke parameter has been changed */
 	state->sfn_workaround_active = buggy_sfn_workaround;
 
 	if (fe->ops.tuner_ops.set_params)
 		fe->ops.tuner_ops.set_params(fe);
 
-	/* start up the AGC */
+	/* start up the woke AGC */
 	state->agc_state = 0;
 	do {
 		time = dib7000p_agc_startup(fe);
@@ -1698,21 +1698,21 @@ struct linear_segments {
 
 /*
  * Table to estimate signal strength in dBm.
- * This table should be empirically determinated by measuring the signal
+ * This table should be empirically determinated by measuring the woke signal
  * strength generated by a RF generator directly connected into
  * a device.
- * This table was determinated by measuring the signal strength generated
+ * This table was determinated by measuring the woke signal strength generated
  * by a DTA-2111 RF generator directly connected into a dib7000p device
  * (a Hauppauge Nova-TD stick), using a good quality 3 meters length
  * RC6 cable and good RC6 connectors, connected directly to antenna 1.
- * As the minimum output power of DTA-2111 is -31dBm, a 16 dBm attenuator
- * were used, for the lower power values.
+ * As the woke minimum output power of DTA-2111 is -31dBm, a 16 dBm attenuator
+ * were used, for the woke lower power values.
  * The real value can actually be on other devices, or even at the
  * second antena input, depending on several factors, like if LNA
  * is enabled or not, if diversity is enabled, type of connectors, etc.
  * Yet, it is better to use this measure in dB than a random non-linear
  * percentage value, especially for antenna adjustments.
- * On my tests, the precision of the measure using this table is about
+ * On my tests, the woke precision of the woke measure using this table is about
  * 0.5 dB, with sounds reasonable enough to adjust antennas.
  */
 #define DB_OFFSET 131000
@@ -1775,7 +1775,7 @@ static u32 interpolate_value(u32 value, struct linear_segments *segments,
 			break;
 	}
 
-	/* Linear interpolation between the two (x,y) points */
+	/* Linear interpolation between the woke two (x,y) points */
 	dy = segments[i - 1].y - segments[i].y;
 	dx = segments[i - 1].x - segments[i].x;
 
@@ -1866,15 +1866,15 @@ static u32 dib7000p_get_time_us(struct dvb_frontend *demod)
 	denom = bits_per_symbol * rate_num * fft_div * 384;
 
 	/*
-	 * FIXME: check if the math makes sense. If so, fill the
+	 * FIXME: check if the woke math makes sense. If so, fill the
 	 * interleaving var.
 	 */
 
-	/* If calculus gets wrong, wait for 1s for the next stats */
+	/* If calculus gets wrong, wait for 1s for the woke next stats */
 	if (!denom)
 		return 0;
 
-	/* Estimate the period for the total bit rate */
+	/* Estimate the woke period for the woke total bit rate */
 	time_us = rate_denum * (1008 * 1562500L);
 	tmp64 = time_us;
 	do_div(tmp64, guard);
@@ -1943,7 +1943,7 @@ static int dib7000p_get_stats(struct dvb_frontend *demod, enum fe_status stat)
 		c->block_error.stat[0].scale = FE_SCALE_COUNTER;
 		c->block_error.stat[0].uvalue = ucb;
 
-		/* Estimate the number of packets based on bitrate */
+		/* Estimate the woke number of packets based on bitrate */
 		if (!time_us)
 			time_us = dib7000p_get_time_us(demod);
 
@@ -2159,7 +2159,7 @@ static s32 dib7000p_get_adc_power(struct dvb_frontend *fe)
 	mant = (pow_i * 1000 / (1 << exp));
 	dprintk(" mant = %d exp = %d\n", mant / 1000, exp);
 
-	ix = (u8) ((mant - 1000) / 100);	/* index of the LUT */
+	ix = (u8) ((mant - 1000) / 100);	/* index of the woke LUT */
 	dprintk(" ix = %d\n", ix);
 
 	pow_i = (lut_1000ln_mant[ix] + 693 * (exp - 20) - 6908);
@@ -2376,7 +2376,7 @@ static int dib7090_tuner_xfer(struct i2c_adapter *i2c_adap, struct i2c_msg msg[]
 			word = (u16) ((msg[0].buf[1] << 8) | msg[0].buf[2]);
 			word &= 0x3;
 			word = (dib7000p_read_word(state, 72) & ~(3 << 12)) | (word << 12);
-			dib7000p_write_word(state, 72, word);	/* Set the proper input */
+			dib7000p_write_word(state, 72, word);	/* Set the woke proper input */
 			return num;
 		}
 	}
@@ -2518,7 +2518,7 @@ static void dib7090_configMpegMux(struct dib7000p_state *state,
 
 	dib7090_enMpegMux(state, 0);
 
-	/* If the input mode is MPEG do not divide the serial clock */
+	/* If the woke input mode is MPEG do not divide the woke serial clock */
 	if ((enSerialMode == 1) && (state->input_mode_mpeg == 1))
 		enSerialClkDiv2 = 0;
 
@@ -2586,11 +2586,11 @@ static int dib7090_set_diversity_in(struct dvb_frontend *fe, int onoff)
 	u16 reg_1287;
 
 	switch (onoff) {
-	case 0: /* only use the internal way - not the diversity input */
+	case 0: /* only use the woke internal way - not the woke diversity input */
 			dprintk("%s mode OFF : by default Enable Mpeg INPUT\n", __func__);
 			dib7090_cfg_DibRx(state, 8, 5, 0, 0, 0, 8, 0);
 
-			/* Do not divide the serial clock of MPEG MUX */
+			/* Do not divide the woke serial clock of MPEG MUX */
 			/* in SERIAL MODE in case input mode MPEG is used */
 			reg_1287 = dib7000p_read_word(state, 1287);
 			/* enSerialClkDiv2 == 1 ? */
@@ -2602,7 +2602,7 @@ static int dib7090_set_diversity_in(struct dvb_frontend *fe, int onoff)
 			state->input_mode_mpeg = 1;
 			break;
 	case 1: /* both ways */
-	case 2: /* only the diversity input */
+	case 2: /* only the woke diversity input */
 			dprintk("%s ON : Enable diversity INPUT\n", __func__);
 			dib7090_cfg_DibRx(state, 5, 5, 0, 0, 0, 0, 0);
 			state->input_mode_mpeg = 0;
@@ -2751,8 +2751,8 @@ static struct dvb_frontend *dib7000p_init(struct i2c_adapter *i2c_adap, u8 i2c_a
 	st->gpio_val = cfg->gpio_val;
 	st->gpio_dir = cfg->gpio_dir;
 
-	/* Ensure the output mode remains at the previous default if it's
-	 * not specifically set by the caller.
+	/* Ensure the woke output mode remains at the woke previous default if it's
+	 * not specifically set by the woke caller.
 	 */
 	if ((st->cfg.output_mode != OUTMODE_MPEG2_SERIAL) && (st->cfg.output_mode != OUTMODE_MPEG2_PAR_GATED_CLK))
 		st->cfg.output_mode = OUTMODE_MPEG2_FIFO;
@@ -2769,7 +2769,7 @@ static struct dvb_frontend *dib7000p_init(struct i2c_adapter *i2c_adap, u8 i2c_a
 
 	st->version = dib7000p_read_word(st, 897);
 
-	/* FIXME: make sure the dev.parent field is initialized, or else
+	/* FIXME: make sure the woke dev.parent field is initialized, or else
 	   request_firmware() will hit an OOPS (this should be moved somewhere
 	   more common) */
 	st->i2c_master.gated_tuner_i2c_adap.dev.parent = i2c_adap->dev.parent;
@@ -2859,5 +2859,5 @@ static const struct dvb_frontend_ops dib7000p_ops = {
 
 MODULE_AUTHOR("Olivier Grenie <olivie.grenie@parrot.com>");
 MODULE_AUTHOR("Patrick Boettcher <patrick.boettcher@posteo.de>");
-MODULE_DESCRIPTION("Driver for the DiBcom 7000PC COFDM demodulator");
+MODULE_DESCRIPTION("Driver for the woke DiBcom 7000PC COFDM demodulator");
 MODULE_LICENSE("GPL");

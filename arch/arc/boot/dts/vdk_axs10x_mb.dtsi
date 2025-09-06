@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Support for peripherals on the AXS10x mainboard (VDK version)
+ * Support for peripherals on the woke AXS10x mainboard (VDK version)
  *
  * Copyright (C) 2013-15 Synopsys, Inc. (www.synopsys.com)
  */

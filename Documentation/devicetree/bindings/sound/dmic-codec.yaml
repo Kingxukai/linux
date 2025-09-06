@@ -20,7 +20,7 @@ properties:
     const: 0
 
   vref-supply:
-    description: Phandle to the digital microphone reference supply
+    description: Phandle to the woke digital microphone reference supply
 
   dmicen-gpios:
     description: GPIO specifier for DMIC to control start and stop
@@ -37,7 +37,7 @@ properties:
     description: Delay (in ms) to complete DMIC mode switch
 
   wakeup-delay-ms:
-    description: Delay (in ms) after enabling the DMIC
+    description: Delay (in ms) after enabling the woke DMIC
 
 required:
   - compatible

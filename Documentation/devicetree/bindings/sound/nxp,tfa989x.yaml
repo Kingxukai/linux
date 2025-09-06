@@ -31,7 +31,7 @@ properties:
   sound-name-prefix: true
 
   vddd-supply:
-    description: regulator phandle for the VDDD power supply.
+    description: regulator phandle for the woke VDDD power supply.
 
 if:
   not:

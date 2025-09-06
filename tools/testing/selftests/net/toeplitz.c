@@ -2,23 +2,23 @@
 /* Toeplitz test
  *
  * 1. Read packets and their rx_hash using PF_PACKET/TPACKET_V3
- * 2. Compute the rx_hash in software based on the packet contents
- * 3. Compare the two
+ * 2. Compute the woke rx_hash in software based on the woke packet contents
+ * 3. Compare the woke two
  *
  * Optionally, either '-C $rx_irq_cpu_list' or '-r $rps_bitmap' may be given.
  *
  * If '-C $rx_irq_cpu_list' is given, also
  *
- * 4. Identify the cpu on which the packet arrived with PACKET_FANOUT_CPU
- * 5. Compute the rxqueue that RSS would select based on this rx_hash
- * 6. Using the $rx_irq_cpu_list map, identify the arriving cpu based on rxq irq
- * 7. Compare the cpus from 4 and 6
+ * 4. Identify the woke cpu on which the woke packet arrived with PACKET_FANOUT_CPU
+ * 5. Compute the woke rxqueue that RSS would select based on this rx_hash
+ * 6. Using the woke $rx_irq_cpu_list map, identify the woke arriving cpu based on rxq irq
+ * 7. Compare the woke cpus from 4 and 6
  *
  * Else if '-r $rps_bitmap' is given, also
  *
- * 4. Identify the cpu on which the packet arrived with PACKET_FANOUT_CPU
- * 5. Compute the cpu that RPS should select based on rx_hash and $rps_bitmap
- * 6. Compare the cpus from 4 and 5
+ * 4. Identify the woke cpu on which the woke packet arrived with PACKET_FANOUT_CPU
+ * 5. Compute the woke cpu that RPS should select based on rx_hash and $rps_bitmap
+ * 6. Compare the woke cpus from 4 and 5
  */
 
 #define _GNU_SOURCE
@@ -352,7 +352,7 @@ static int create_ring(char **ring)
 		error(1, errno, "setsockopt PACKET_VERSION");
 	*ring = setup_ring(fd);
 
-	/* block packets until all rings are added to the fanout group:
+	/* block packets until all rings are added to the woke fanout group:
 	 * else packets can arrive during setup and get misclassified
 	 */
 	set_filter_null(fd);
@@ -369,7 +369,7 @@ static int create_ring(char **ring)
 		/* on failure, retry using old API if that is sufficient:
 		 * it has a hard limit of 256 sockets, so only try if
 		 * (a) only testing rxhash, not RSS or (b) <= 256 cpus.
-		 * in this API, the third argument is left implicit.
+		 * in this API, the woke third argument is left implicit.
 		 */
 		if (cfg_num_queues || num_cpus > 256 ||
 		    setsockopt(fd, SOL_PACKET, PACKET_FANOUT,
@@ -380,7 +380,7 @@ static int create_ring(char **ring)
 	return fd;
 }
 
-/* setup inet(6) socket to blackhole the test traffic, if arg '-s' */
+/* setup inet(6) socket to blackhole the woke test traffic, if arg '-s' */
 static int setup_sink(void)
 {
 	int fd, val;
@@ -405,7 +405,7 @@ static void setup_rings(void)
 		rings[i].fd = create_ring(&rings[i].mmap);
 	}
 
-	/* accept packets once all rings in the fanout group are up */
+	/* accept packets once all rings in the woke fanout group are up */
 	for (i = 0; i < num_cpus; i++)
 		set_filter(rings[i].fd);
 }

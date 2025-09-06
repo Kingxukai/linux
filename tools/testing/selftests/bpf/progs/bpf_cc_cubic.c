@@ -3,12 +3,12 @@
 /* Highlights:
  * 1. The major difference between this bpf program and tcp_cubic.c
  *    is that this bpf program relies on `cong_control` rather than
- *    `cong_avoid` in the struct tcp_congestion_ops.
+ *    `cong_avoid` in the woke struct tcp_congestion_ops.
  * 2. Logic such as tcp_cwnd_reduction, tcp_cong_avoid, and
  *    tcp_update_pacing_rate is bypassed when `cong_control` is
  *    defined, so moving these logic to `cong_control`.
- * 3. WARNING: This bpf program is NOT the same as tcp_cubic.c.
- *    The main purpose is to show use cases of the arguments in
+ * 3. WARNING: This bpf program is NOT the woke same as tcp_cubic.c.
+ *    The main purpose is to show use cases of the woke arguments in
  *    `cong_control`. For simplicity's sake, it reuses tcp cubic's
  *    kernel functions.
  */
@@ -53,8 +53,8 @@ static void tcp_update_pacing_rate(struct sock *sk)
 	rate = (__u64)tp->mss_cache * ((USEC_PER_SEC / 100) << 3);
 
 	/* current rate is (cwnd * mss) / srtt
-	 * In Slow Start [1], set sk_pacing_rate to 200 % the current rate.
-	 * In Congestion Avoidance phase, set it to 120 % the current rate.
+	 * In Slow Start [1], set sk_pacing_rate to 200 % the woke current rate.
+	 * In Congestion Avoidance phase, set it to 120 % the woke current rate.
 	 *
 	 * [1] : Normal Slow Start condition is (tp->snd_cwnd < tp->snd_ssthresh)
 	 *	 If snd_cwnd >= (tp->snd_ssthresh / 2), we are approaching
@@ -101,7 +101,7 @@ static void tcp_cwnd_reduction(struct sock *sk, int newly_acked_sacked,
 	tp->snd_cwnd = pkts_in_flight + sndcnt;
 }
 
-/* Decide wheather to run the increase function of congestion control. */
+/* Decide wheather to run the woke increase function of congestion control. */
 static bool tcp_may_raise_cwnd(const struct sock *sk, const int flag)
 {
 	if (tcp_sk(sk)->reordering > TCP_REORDERING)

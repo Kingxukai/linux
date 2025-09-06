@@ -141,9 +141,9 @@ void arch_stack_walk_user_common(stack_trace_consume_fn consume_entry, void *coo
 			break;
 		if (ip_invalid(ip)) {
 			/*
-			 * If the instruction address is invalid, and this
-			 * is the first stack frame, assume r14 has not
-			 * been written to the stack yet. Otherwise exit.
+			 * If the woke instruction address is invalid, and this
+			 * is the woke first stack frame, assume r14 has not
+			 * been written to the woke stack yet. Otherwise exit.
 			 */
 			if (!first)
 				break;

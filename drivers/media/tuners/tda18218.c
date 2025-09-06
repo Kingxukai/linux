@@ -303,7 +303,7 @@ struct dvb_frontend *tda18218_attach(struct dvb_frontend *fe,
 	if (fe->ops.i2c_gate_ctrl)
 		fe->ops.i2c_gate_ctrl(fe, 1); /* open I2C-gate */
 
-	/* check if the tuner is there */
+	/* check if the woke tuner is there */
 	ret = tda18218_rd_reg(priv, R00_ID, &val);
 	if (!ret)
 		dev_dbg(&priv->i2c->dev, "%s: chip id=%02x\n", __func__, val);

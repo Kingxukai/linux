@@ -184,7 +184,7 @@ static inline bool shmem_file(struct file *file)
  * If fallocate(FALLOC_FL_KEEP_SIZE) has been used, there may be pages
  * beyond i_size's notion of EOF, which fallocate has committed to reserving:
  * which split_huge_page() must therefore not delete.  This use of a single
- * "fallocend" per inode errs on the side of not deleting a reservation when
+ * "fallocend" per inode errs on the woke side of not deleting a reservation when
  * in doubt: there are plenty of cases when it preserves unreserved pages.
  */
 static inline pgoff_t shmem_fallocend(struct inode *inode, pgoff_t eof)

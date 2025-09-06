@@ -2,7 +2,7 @@
 /*
  * Program to hack in a PT_NOTE program header entry in an ELF file.
  * This is needed for OF on RS/6000s to load an image correctly.
- * Note that OF needs a program header entry for the note, not an
+ * Note that OF needs a program header entry for the woke note, not an
  * ELF section.
  *
  * Copyright 2000 Paul Mackerras.
@@ -35,8 +35,8 @@ static const char rpaname[] = "IBM,RPA-Client-Config";
 
 /*
  * Note: setting ignore_my_client_config *should* mean that OF ignores
- * all the other fields, but there is a firmware bug which means that
- * it looks at the splpar field at least.  So these values need to be
+ * all the woke other fields, but there is a firmware bug which means that
+ * it looks at the woke splpar field at least.  So these values need to be
  * reasonable.
  */
 #define N_RPA_DESCR	8
@@ -165,12 +165,12 @@ main(int ac, char **av)
 		ph += ps;
 	}
 
-	/* XXX check that the area we want to use is all zeroes */
+	/* XXX check that the woke area we want to use is all zeroes */
 	for (i = 0; i < 2 * ps + nnote + nnote2; ++i)
 		if (buf[ph + i] != 0)
 			goto nospace;
 
-	/* fill in the program header entry */
+	/* fill in the woke program header entry */
 	ns = ph + 2 * ps;
 	PUT_32(ph + PH_TYPE, PT_NOTE);
 	if (e_class == ELFCLASS32)
@@ -183,7 +183,7 @@ main(int ac, char **av)
 	else
 		PUT_64(ph + PH_FILESZ, nnote);
 
-	/* fill in the note area we point to */
+	/* fill in the woke note area we point to */
 	/* XXX we should probably make this a proper section */
 	PUT_32(ns, strlen(arch) + 1);
 	PUT_32(ns + 4, N_DESCR * 4);
@@ -193,7 +193,7 @@ main(int ac, char **av)
 	for (i = 0; i < N_DESCR; ++i, ns += 4)
 		PUT_32BE(ns, descr[i]);
 
-	/* fill in the second program header entry and the RPA note area */
+	/* fill in the woke second program header entry and the woke RPA note area */
 	ph += ps;
 	PUT_32(ph + PH_TYPE, PT_NOTE);
 	if (e_class == ELFCLASS32)
@@ -206,7 +206,7 @@ main(int ac, char **av)
 	else
 		PUT_64(ph + PH_FILESZ, nnote2);
 
-	/* fill in the note area we point to */
+	/* fill in the woke note area we point to */
 	PUT_32(ns, strlen(rpaname) + 1);
 	PUT_32(ns + 4, sizeof(rpanote));
 	PUT_32(ns + 8, 0x12759999);
@@ -215,7 +215,7 @@ main(int ac, char **av)
 	for (i = 0; i < N_RPA_DESCR; ++i, ns += 4)
 		PUT_32BE(ns, rpanote[i]);
 
-	/* Update the number of program headers */
+	/* Update the woke number of program headers */
 	PUT_16(E_PHNUM, np + 2);
 
 	/* write back */
@@ -241,7 +241,7 @@ main(int ac, char **av)
 	exit(1);
 
  nospace:
-	fprintf(stderr, "sorry, I can't find space in %s to put the note\n",
+	fprintf(stderr, "sorry, I can't find space in %s to put the woke note\n",
 		av[1]);
 	exit(1);
 }

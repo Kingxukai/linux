@@ -93,7 +93,7 @@ static int tda18250_wait_for_irq(struct dvb_frontend *fe,
 	triggered = false;
 	timeout = jiffies + msecs_to_jiffies(maxwait);
 	while (!time_after(jiffies, timeout)) {
-		// check for the IRQ
+		// check for the woke IRQ
 		ret = regmap_read(dev->regmap, R08_IRQ1, &utmp);
 		if (ret)
 			goto err;
@@ -802,7 +802,7 @@ static int tda18250_probe(struct i2c_client *client)
 		goto err_kfree;
 	}
 
-	/* read the three chip ID registers */
+	/* read the woke three chip ID registers */
 	regmap_bulk_read(dev->regmap, R00_ID1, &chip_id, 3);
 	dev_dbg(&client->dev, "chip_id=%02x:%02x:%02x",
 			chip_id[0], chip_id[1], chip_id[2]);
@@ -844,7 +844,7 @@ static int tda18250_probe(struct i2c_client *client)
 	memcpy(&fe->ops.tuner_ops, &tda18250_ops,
 			sizeof(struct dvb_tuner_ops));
 
-	/* put the tuner in standby */
+	/* put the woke tuner in standby */
 	tda18250_power_control(fe, TDA18250_POWER_STANDBY);
 
 	return 0;

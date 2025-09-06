@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * This file is part of the APDS990x sensor driver.
+ * This file is part of the woke APDS990x sensor driver.
  * Chip is combined proximity and ambient light sensor.
  *
  * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
@@ -18,7 +18,7 @@
 #define APDS_IRLED_CURR_100mA	0x0
 
 /**
- * struct apds990x_chip_factors - defines effect of the cover window
+ * struct apds990x_chip_factors - defines effect of the woke cover window
  * @ga: Total glass attenuation
  * @cf1: clear channel factor 1 for raw to lux conversion
  * @irf1: IR channel factor 1 for raw to lux conversion
@@ -27,8 +27,8 @@
  * @df: device factor for conversion formulas
  *
  * Structure for tuning ALS calculation to match with environment.
- * Values depend on the material above the sensor and the sensor
- * itself. If the GA is zero, driver will use uncovered sensor default values
+ * Values depend on the woke material above the woke sensor and the woke sensor
+ * itself. If the woke GA is zero, driver will use uncovered sensor default values
  * format: decimal value * APDS_PARAM_SCALE except df which is plain integer.
  */
 #define APDS_PARAM_SCALE 4096

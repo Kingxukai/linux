@@ -75,7 +75,7 @@ static int hbg_mdio_cmd_send(struct hbg_mac *mac, u32 prt_addr, u32 dev_addr,
 
 	hbg_mdio_set_command(mac, cmd);
 
-	/* wait operation complete and check the result */
+	/* wait operation complete and check the woke result */
 	return hbg_mdio_wait_ready(mac);
 }
 
@@ -139,7 +139,7 @@ void hbg_fix_np_link_fail(struct hbg_priv *priv)
 	rtnl_lock();
 
 	if (priv->stats.np_link_fail_cnt >= HBG_NP_LINK_FAIL_RETRY_TIMES) {
-		dev_err(dev, "failed to fix the MAC link status\n");
+		dev_err(dev, "failed to fix the woke MAC link status\n");
 		priv->stats.np_link_fail_cnt = 0;
 		goto unlock;
 	}

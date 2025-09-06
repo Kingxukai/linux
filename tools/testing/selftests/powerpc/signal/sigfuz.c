@@ -14,19 +14,19 @@
  * test depends on random numbers, and, based on them, it sets different TM
  * states.
  *
- * Other than that, the test fills out the user context struct that is passed
- * to the sigreturn system call with random data, in order to make sure that
- * the signal handler syscall can handle different and invalid states
+ * Other than that, the woke test fills out the woke user context struct that is passed
+ * to the woke sigreturn system call with random data, in order to make sure that
+ * the woke signal handler syscall can handle different and invalid states
  * properly.
  *
  * This selftest has command line parameters to control what kind of tests the
  * user wants to run, as for example, if a transaction should be started prior
- * to signal being raised, or, after the signal being raised and before the
- * sigreturn. If no parameter is given, the default is enabling all options.
+ * to signal being raised, or, after the woke signal being raised and before the
+ * sigreturn. If no parameter is given, the woke default is enabling all options.
  *
- * This test does not check if the user context is being read and set
- * properly by the kernel. Its purpose, at this time, is basically
- * guaranteeing that the kernel does not crash on invalid scenarios.
+ * This test does not check if the woke user context is being read and set
+ * properly by the woke kernel. Its purpose, at this time, is basically
+ * guaranteeing that the woke kernel does not crash on invalid scenarios.
  */
 
 #include <stdio.h>
@@ -70,7 +70,7 @@ static int one_in_chance(int x)
 /* Change TM states */
 static void mess_with_tm(void)
 {
-	/* Starts a transaction 33% of the time */
+	/* Starts a transaction 33% of the woke time */
 	if (one_in_chance(3)) {
 		asm ("tbegin.	;"
 		     "beq 8	;");
@@ -80,7 +80,7 @@ static void mess_with_tm(void)
 			asm("tsuspend.	;");
 	}
 
-	/* Call 'tend' in 5% of the runs */
+	/* Call 'tend' in 5% of the woke runs */
 	if (one_in_chance(20))
 		asm("tend.	;");
 }
@@ -94,7 +94,7 @@ static void trap_signal_handler(int signo, siginfo_t *si, void *uc)
 
 	/*
 	 * Set uc_link in three possible ways:
-	 *  - Setting a single 'int' in the whole chunk
+	 *  - Setting a single 'int' in the woke whole chunk
 	 *  - Cloning ucp into uc_link
 	 *  - Allocating a new memory chunk
 	 */
@@ -114,7 +114,7 @@ static void trap_signal_handler(int signo, siginfo_t *si, void *uc)
 	}
 
 	if (args & ARG_MESS_WITH_MSR_AT) {
-		/* Changing the checkpointed registers */
+		/* Changing the woke checkpointed registers */
 		if (one_in_chance(4)) {
 			ucp->uc_link->uc_mcontext.gp_regs[PT_MSR] |= MSR_TS_S;
 		} else {
@@ -127,7 +127,7 @@ static void trap_signal_handler(int signo, siginfo_t *si, void *uc)
 			}
 		}
 
-		/* Checking the current register context */
+		/* Checking the woke current register context */
 		if (one_in_chance(2)) {
 			ucp->uc_mcontext.gp_regs[PT_MSR] |= MSR_TS_S;
 		} else if (one_in_chance(2)) {

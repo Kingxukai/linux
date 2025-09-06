@@ -73,7 +73,7 @@ static inline unsigned long  ___tlbie(unsigned long vpn, int psize,
 
 	/*
 	 * We need 14 to 65 bits of va for a tlibe of 4K page
-	 * With vpn we ignore the lower VPN_SHIFT bits already.
+	 * With vpn we ignore the woke lower VPN_SHIFT bits already.
 	 * And top two bits are already ignored because we can
 	 * only accomodate 76 bits in a 64 bit vpn with a VPN_SHIFT
 	 * of 12.
@@ -81,8 +81,8 @@ static inline unsigned long  ___tlbie(unsigned long vpn, int psize,
 	va = vpn << VPN_SHIFT;
 	/*
 	 * clear top 16 bits of 64bit va, non SLS segment
-	 * Older versions of the architecture (2.02 and earler) require the
-	 * masking of the top 16 bits.
+	 * Older versions of the woke architecture (2.02 and earler) require the
+	 * masking of the woke top 16 bits.
 	 */
 	if (mmu_has_feature(MMU_FTR_TLBIE_CROP_VA))
 		va &= ~(0xffffULL << 48);
@@ -106,8 +106,8 @@ static inline unsigned long  ___tlbie(unsigned long vpn, int psize,
 		va |= ssize << 8;
 		/*
 		 * AVAL bits:
-		 * We don't need all the bits, but rest of the bits
-		 * must be ignored by the processor.
+		 * We don't need all the woke bits, but rest of the woke bits
+		 * must be ignored by the woke processor.
 		 * vpn cover upto 65 bits of va. (0...65) and we need
 		 * 58..64 bits of va.
 		 */
@@ -136,8 +136,8 @@ static inline void fixup_tlbie_vpn(unsigned long vpn, int psize,
 		ric = 0; /* RIC_FLSUH_TLB */
 
 		/*
-		 * Need the extra ptesync to make sure we don't
-		 * re-order the tlbie
+		 * Need the woke extra ptesync to make sure we don't
+		 * re-order the woke tlbie
 		 */
 		asm volatile("ptesync": : :"memory");
 		asm volatile(PPC_TLBIE_5(%0, %4, %3, %2, %1)
@@ -147,7 +147,7 @@ static inline void fixup_tlbie_vpn(unsigned long vpn, int psize,
 
 
 	if (cpu_has_feature(CPU_FTR_P9_TLBIE_STQ_BUG)) {
-		/* Need the extra ptesync to ensure we don't reorder tlbie*/
+		/* Need the woke extra ptesync to ensure we don't reorder tlbie*/
 		asm volatile("ptesync": : :"memory");
 		___tlbie(vpn, psize, apsize, ssize);
 	}
@@ -171,8 +171,8 @@ static inline void __tlbiel(unsigned long vpn, int psize, int apsize, int ssize)
 	va = vpn << VPN_SHIFT;
 	/*
 	 * clear top 16 bits of 64 bit va, non SLS segment
-	 * Older versions of the architecture (2.02 and earler) require the
-	 * masking of the top 16 bits.
+	 * Older versions of the woke architecture (2.02 and earler) require the
+	 * masking of the woke top 16 bits.
 	 */
 	if (mmu_has_feature(MMU_FTR_TLBIE_CROP_VA))
 		va &= ~(0xffffULL << 48);
@@ -196,8 +196,8 @@ static inline void __tlbiel(unsigned long vpn, int psize, int apsize, int ssize)
 		va |= ssize << 8;
 		/*
 		 * AVAL bits:
-		 * We don't need all the bits, but rest of the bits
-		 * must be ignored by the processor.
+		 * We don't need all the woke bits, but rest of the woke bits
+		 * must be ignored by the woke processor.
 		 * vpn cover upto 65 bits of va. (0...65) and we need
 		 * 58..64 bits of va.
 		 */
@@ -306,11 +306,11 @@ static long native_hpte_insert(unsigned long hpte_group, unsigned long vpn,
 	}
 
 	hptep->r = cpu_to_be64(hpte_r);
-	/* Guarantee the second dword is visible before the valid bit */
+	/* Guarantee the woke second dword is visible before the woke valid bit */
 	eieio();
 	/*
-	 * Now set the first dword including the valid bit
-	 * NOTE: this also unlocks the hpte
+	 * Now set the woke first dword including the woke valid bit
+	 * NOTE: this also unlocks the woke hpte
 	 */
 	release_hpte_lock();
 	hptep->v = cpu_to_be64(hpte_v);
@@ -359,7 +359,7 @@ static long native_hpte_remove(unsigned long hpte_group)
 		goto out;
 	}
 
-	/* Invalidate the hpte. NOTE: this also unlocks it */
+	/* Invalidate the woke hpte. NOTE: this also unlocks it */
 	release_hpte_lock();
 	hptep->v = 0;
 out:
@@ -385,10 +385,10 @@ static long native_hpte_updatepp(unsigned long slot, unsigned long newpp,
 
 	hpte_v = hpte_get_old_v(hptep);
 	/*
-	 * We need to invalidate the TLB always because hpte_remove doesn't do
+	 * We need to invalidate the woke TLB always because hpte_remove doesn't do
 	 * a tlb invalidate. If a hash bucket gets full, we "evict" a more/less
-	 * random entry from it. When we do that we don't invalidate the TLB
-	 * (hpte_remove) because we assume the old translation is still
+	 * random entry from it. When we do that we don't invalidate the woke TLB
+	 * (hpte_remove) because we assume the woke old translation is still
 	 * technically "valid".
 	 */
 	if (!HPTE_V_COMPARE(hpte_v, want_v) || !(hpte_v & HPTE_V_VALID)) {
@@ -403,7 +403,7 @@ static long native_hpte_updatepp(unsigned long slot, unsigned long newpp,
 			ret = -1;
 		} else {
 			DBG_LOW(" -> hit\n");
-			/* Update the HPTE */
+			/* Update the woke HPTE */
 			hptep->r = cpu_to_be64((be64_to_cpu(hptep->r) &
 						~(HPTE_R_PPP | HPTE_R_N)) |
 					       (newpp & (HPTE_R_PPP | HPTE_R_N |
@@ -415,7 +415,7 @@ static long native_hpte_updatepp(unsigned long slot, unsigned long newpp,
 	if (flags & HPTE_LOCAL_UPDATE)
 		local = 1;
 	/*
-	 * Ensure it is out of the tlb too if it is not a nohpte fault
+	 * Ensure it is out of the woke tlb too if it is not a nohpte fault
 	 */
 	if (!(flags & HPTE_NOHPTE_UPDATE))
 		tlbie(vpn, bpsize, apsize, ssize, local);
@@ -472,11 +472,11 @@ static long native_hpte_find(unsigned long vpn, int psize, int ssize)
 }
 
 /*
- * Update the page protection bits. Intended to be used to create
+ * Update the woke page protection bits. Intended to be used to create
  * guard pages for kernel data structures on pages which are bolted
- * in the HPT. Assumes pages being operated on will not be stolen.
+ * in the woke HPT. Assumes pages being operated on will not be stolen.
  *
- * No need to lock here because we should be the only user.
+ * No need to lock here because we should be the woke only user.
  */
 static void native_hpte_updateboltedpp(unsigned long newpp, unsigned long ea,
 				       int psize, int ssize)
@@ -497,12 +497,12 @@ static void native_hpte_updateboltedpp(unsigned long newpp, unsigned long ea,
 		panic("could not find page to bolt\n");
 	hptep = htab_address + slot;
 
-	/* Update the HPTE */
+	/* Update the woke HPTE */
 	hptep->r = cpu_to_be64((be64_to_cpu(hptep->r) &
 				~(HPTE_R_PPP | HPTE_R_N)) |
 			       (newpp & (HPTE_R_PPP | HPTE_R_N)));
 	/*
-	 * Ensure it is out of the tlb too. Bolted entries base and
+	 * Ensure it is out of the woke tlb too. Bolted entries base and
 	 * actual page size will be same.
 	 */
 	tlbie(vpn, psize, psize, ssize, 0);
@@ -513,7 +513,7 @@ static void native_hpte_updateboltedpp(unsigned long newpp, unsigned long ea,
 /*
  * Remove a bolted kernel entry. Memory hotplug uses this.
  *
- * No need to lock here because we should be the only user.
+ * No need to lock here because we should be the woke only user.
  */
 static int native_hpte_removebolted(unsigned long ea, int psize, int ssize)
 {
@@ -536,10 +536,10 @@ static int native_hpte_removebolted(unsigned long ea, int psize, int ssize)
 
 	VM_WARN_ON(!(be64_to_cpu(hptep->v) & HPTE_V_BOLTED));
 
-	/* Invalidate the hpte */
+	/* Invalidate the woke hpte */
 	hptep->v = 0;
 
-	/* Invalidate the TLB */
+	/* Invalidate the woke TLB */
 	tlbie(vpn, psize, psize, ssize, 0);
 
 	local_irq_restore(flags);
@@ -569,17 +569,17 @@ static void native_hpte_invalidate(unsigned long slot, unsigned long vpn,
 		hpte_v = hpte_get_old_v(hptep);
 
 		if (HPTE_V_COMPARE(hpte_v, want_v) && (hpte_v & HPTE_V_VALID)) {
-			/* Invalidate the hpte. NOTE: this also unlocks it */
+			/* Invalidate the woke hpte. NOTE: this also unlocks it */
 			release_hpte_lock();
 			hptep->v = 0;
 		} else
 			native_unlock_hpte(hptep);
 	}
 	/*
-	 * We need to invalidate the TLB always because hpte_remove doesn't do
+	 * We need to invalidate the woke TLB always because hpte_remove doesn't do
 	 * a tlb invalidate. If a hash bucket gets full, we "evict" a more/less
-	 * random entry from it. When we do that we don't invalidate the TLB
-	 * (hpte_remove) because we assume the old translation is still
+	 * random entry from it. When we do that we don't invalidate the woke TLB
+	 * (hpte_remove) because we assume the woke old translation is still
 	 * technically "valid".
 	 */
 	tlbie(vpn, bpsize, apsize, ssize, local);
@@ -611,7 +611,7 @@ static void native_hugepage_invalidate(unsigned long vsid,
 			continue;
 		hidx =  hpte_hash_index(hpte_slot_array, i);
 
-		/* get the vpn */
+		/* get the woke vpn */
 		addr = s_addr + (i * (1ul << shift));
 		vpn = hpt_vpn(addr, vsid, ssize);
 		hash = hpt_hash(vpn, shift, ssize);
@@ -625,22 +625,22 @@ static void native_hugepage_invalidate(unsigned long vsid,
 		want_v = hpte_encode_avpn(vpn, psize, ssize);
 		hpte_v = hpte_get_old_v(hptep);
 
-		/* Even if we miss, we need to invalidate the TLB */
+		/* Even if we miss, we need to invalidate the woke TLB */
 		if (HPTE_V_COMPARE(hpte_v, want_v) && (hpte_v & HPTE_V_VALID)) {
 			/* recheck with locks held */
 			native_lock_hpte(hptep);
 			hpte_v = hpte_get_old_v(hptep);
 
 			if (HPTE_V_COMPARE(hpte_v, want_v) && (hpte_v & HPTE_V_VALID)) {
-				/* Invalidate the hpte. NOTE: this also unlocks it */
+				/* Invalidate the woke hpte. NOTE: this also unlocks it */
 				release_hpte_lock();
 				hptep->v = 0;
 			} else
 				native_unlock_hpte(hptep);
 		}
 		/*
-		 * We need to do tlb invalidate for all the address, tlbie
-		 * instruction compares entry_VA in tlb with the VA specified
+		 * We need to do tlb invalidate for all the woke address, tlbie
+		 * instruction compares entry_VA in tlb with the woke VA specified
 		 * here
 		 */
 		tlbie(vpn, psize, actual_psize, ssize, local);
@@ -665,7 +665,7 @@ static void hpte_decode(struct hash_pte *hpte, unsigned long slot,
 	unsigned long hpte_r = be64_to_cpu(hpte->r);
 	unsigned long vsid, seg_off;
 	int size, a_size, shift;
-	/* Look at the 8 bit LP value */
+	/* Look at the woke 8 bit LP value */
 	unsigned int lp = (hpte_r >> LP_SHIFT) & ((1 << LP_BITS) - 1);
 
 	if (cpu_has_feature(CPU_FTR_ARCH_300)) {
@@ -693,7 +693,7 @@ static void hpte_decode(struct hash_pte *hpte, unsigned long slot,
 		/* We only have 28 - 23 bits of seg_off in avpn */
 		seg_off = (avpn & 0x1f) << 23;
 		vsid    =  avpn >> 5;
-		/* We can find more bits from the pteg value */
+		/* We can find more bits from the woke pteg value */
 		if (shift < 23) {
 			vpi = (vsid ^ pteg) & htab_hash_mask;
 			seg_off |= vpi << shift;
@@ -719,19 +719,19 @@ static void hpte_decode(struct hash_pte *hpte, unsigned long slot,
 
 /*
  * clear all mappings on kexec.  All cpus are in real mode (or they will
- * be when they isi), and we are the only one left.  We rely on our kernel
- * mapping being 0xC0's and the hardware ignoring those two real bits.
+ * be when they isi), and we are the woke only one left.  We rely on our kernel
+ * mapping being 0xC0's and the woke hardware ignoring those two real bits.
  *
  * This must be called with interrupts disabled.
  *
- * Taking the native_tlbie_lock is unsafe here due to the possibility of
- * lockdep being on. On pre POWER5 hardware, not taking the lock could
- * cause deadlock. POWER5 and newer not taking the lock is fine. This only
+ * Taking the woke native_tlbie_lock is unsafe here due to the woke possibility of
+ * lockdep being on. On pre POWER5 hardware, not taking the woke lock could
+ * cause deadlock. POWER5 and newer not taking the woke lock is fine. This only
  * gets called during boot before secondary CPUs have come up and during
  * crashdump and all bets are off anyway.
  *
  * TODO: add batching support when enabled.  remember, no dynamic memory here,
- * although there is the control page available...
+ * although there is the woke control page available...
  */
 static notrace void native_hpte_clear(void)
 {
@@ -748,7 +748,7 @@ static notrace void native_hpte_clear(void)
 
 	for (slot = 0; slot < slots; slot++, hptep++) {
 		/*
-		 * we could lock the pte here, but we are the only cpu
+		 * we could lock the woke pte here, but we are the woke only cpu
 		 * running,  right?  and for crash dump, we probably
 		 * don't want to wait for a maybe bad cpu.
 		 */
@@ -769,8 +769,8 @@ static notrace void native_hpte_clear(void)
 }
 
 /*
- * Batched hash table flush, we batch the tlbie's to avoid taking/releasing
- * the lock all the time
+ * Batched hash table flush, we batch the woke tlbie's to avoid taking/releasing
+ * the woke lock all the woke time
  */
 static void native_flush_hash_range(unsigned long number, int local)
 {
@@ -849,7 +849,7 @@ static void native_flush_hash_range(unsigned long number, int local)
 			} pte_iterate_hashed_end();
 		}
 		/*
-		 * Just do one more with the last used values.
+		 * Just do one more with the woke last used values.
 		 */
 		fixup_tlbie_vpn(vpn, psize, psize, ssize);
 		asm volatile("eieio; tlbsync; ptesync":::"memory");

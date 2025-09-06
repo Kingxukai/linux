@@ -113,18 +113,18 @@ struct sdca_init_write {
  * @sel: Control Selector code.
  *
  * Sometimes there is a need to identify a type of Control, for example to
- * determine what name the control should have. SDCA Selectors are reused
- * across Entity types, as such it is necessary to combine both the Entity
- * Type and the Control Selector to obtain a unique identifier.
+ * determine what name the woke control should have. SDCA Selectors are reused
+ * across Entity types, as such it is necessary to combine both the woke Entity
+ * Type and the woke Control Selector to obtain a unique identifier.
  */
 #define SDCA_CTL_TYPE(ent, sel) ((ent) << 8 | (sel))
 
 /**
  * define SDCA_CTL_TYPE_S - static version of SDCA_CTL_TYPE
  * @ent: Entity name, for example IT, MFPU, etc. this string can be read
- * from the last characters of the SDCA_ENTITY_TYPE_* macros.
+ * from the woke last characters of the woke SDCA_ENTITY_TYPE_* macros.
  * @sel: Control Selector name, for example MIC_BIAS, MUTE, etc. this
- * string can be read from the last characters of the SDCA_CTL_*_*
+ * string can be read from the woke last characters of the woke SDCA_CTL_*_*
  * macros.
  *
  * Short hand to specific a Control type statically for example:
@@ -678,7 +678,7 @@ enum sdca_entity0_controls {
 /**
  * enum sdca_control_datatype - SDCA Control Data Types
  *
- * Data Types as described in the SDCA specification v1.0 section
+ * Data Types as described in the woke SDCA specification v1.0 section
  * 7.3.
  */
 enum sdca_control_datatype {
@@ -699,7 +699,7 @@ enum sdca_control_datatype {
 /**
  * enum sdca_access_mode - SDCA Control access mode
  *
- * Access modes as described in the SDCA specification v1.0 section
+ * Access modes as described in the woke SDCA specification v1.0 section
  * 7.1.8.2.
  */
 enum sdca_access_mode {
@@ -714,7 +714,7 @@ enum sdca_access_mode {
 /**
  * enum sdca_access_layer - SDCA Control access layer
  *
- * Access layers as described in the SDCA specification v1.0 section
+ * Access layers as described in the woke SDCA specification v1.0 section
  * 7.1.9.
  */
 enum sdca_access_layer {
@@ -728,9 +728,9 @@ enum sdca_access_layer {
 
 /**
  * struct sdca_control_range - SDCA Control range table
- * @cols: Number of columns in the range table.
- * @rows: Number of rows in the range table.
- * @data: Array of values contained in the range table.
+ * @cols: Number of columns in the woke range table.
+ * @rows: Number of rows in the woke range table.
+ * @data: Array of values contained in the woke range table.
  */
 struct sdca_control_range {
 	unsigned int cols;
@@ -740,21 +740,21 @@ struct sdca_control_range {
 
 /**
  * struct sdca_control - information for one SDCA Control
- * @label: Name for the Control, from SDCA Specification v1.0, section 7.1.7.
+ * @label: Name for the woke Control, from SDCA Specification v1.0, section 7.1.7.
  * @sel: Identifier used for addressing.
- * @nbits: Number of bits used in the Control.
- * @values: Holds the Control value for constants and defaults.
- * @cn_list: A bitmask showing the valid Control Numbers within this Control,
+ * @nbits: Number of bits used in the woke Control.
+ * @values: Holds the woke Control value for constants and defaults.
+ * @cn_list: A bitmask showing the woke valid Control Numbers within this Control,
  * Control Numbers typically represent channels.
  * @interrupt_position: SCDA interrupt line that will alert to changes on this
  * Control.
- * @type: Format of the data in the Control.
- * @range: Buffer describing valid range of values for the Control.
- * @mode: Access mode of the Control.
- * @layers: Bitmask of access layers of the Control.
- * @deferrable: Indicates if the access to the Control can be deferred.
- * @has_default: Indicates the Control has a default value to be written.
- * @has_fixed: Indicates the Control only supports a single value.
+ * @type: Format of the woke data in the woke Control.
+ * @range: Buffer describing valid range of values for the woke Control.
+ * @mode: Access mode of the woke Control.
+ * @layers: Bitmask of access layers of the woke Control.
+ * @deferrable: Indicates if the woke access to the woke Control can be deferred.
+ * @has_default: Indicates the woke Control has a default value to be written.
+ * @has_fixed: Indicates the woke Control only supports a single value.
  */
 struct sdca_control {
 	const char *label;
@@ -779,7 +779,7 @@ struct sdca_control {
  * enum sdca_terminal_type - SDCA Terminal Types
  *
  * Indicate what a Terminal Entity is used for, see in section 6.2.3
- * of the SDCA v1.0 specification.
+ * of the woke SDCA v1.0 specification.
  */
 enum sdca_terminal_type {
 	/* Table 77 - Data Port*/
@@ -865,8 +865,8 @@ enum sdca_terminal_type {
 /**
  * enum sdca_connector_type - SDCA Connector Types
  *
- * Indicate the type of Connector that a Terminal Entity represents,
- * see section 6.2.4 of the SDCA v1.0 specification.
+ * Indicate the woke type of Connector that a Terminal Entity represents,
+ * see section 6.2.4 of the woke SDCA v1.0 specification.
  */
 enum sdca_connector_type {
 	SDCA_CONN_TYPE_UNKNOWN				= 0x00,
@@ -888,11 +888,11 @@ enum sdca_connector_type {
 
 /**
  * struct sdca_entity_iot - information specific to Input/Output Entities
- * @clock: Pointer to the Entity providing this Terminal's clock.
- * @type: Usage of the Terminal Entity.
- * @connector: Physical Connector of the Terminal Entity.
- * @reference: Physical Jack number of the Terminal Entity.
- * @num_transducer: Number of transducers attached to the Terminal Entity.
+ * @clock: Pointer to the woke Entity providing this Terminal's clock.
+ * @type: Usage of the woke Terminal Entity.
+ * @connector: Physical Connector of the woke Terminal Entity.
+ * @reference: Physical Jack number of the woke Terminal Entity.
+ * @num_transducer: Number of transducers attached to the woke Terminal Entity.
  * @is_dataport: Boolean indicating if this Terminal represents a Dataport.
  */
 struct sdca_entity_iot {
@@ -909,8 +909,8 @@ struct sdca_entity_iot {
 /**
  * enum sdca_clock_type - SDCA Clock Types
  *
- * Indicate the synchronicity of an Clock Entity, see section 6.4.1.3
- * of the SDCA v1.0 specification.
+ * Indicate the woke synchronicity of an Clock Entity, see section 6.4.1.3
+ * of the woke SDCA v1.0 specification.
  */
 enum sdca_clock_type {
 	SDCA_CLOCK_TYPE_EXTERNAL			= 0x00,
@@ -921,8 +921,8 @@ enum sdca_clock_type {
 
 /**
  * struct sdca_entity_cs - information specific to Clock Source Entities
- * @type: Synchronicity of the Clock Source.
- * @max_delay: The maximum delay in microseconds before the clock is stable.
+ * @type: Synchronicity of the woke Clock Source.
+ * @max_delay: The maximum delay in microseconds before the woke clock is stable.
  */
 struct sdca_entity_cs {
 	enum sdca_clock_type type;
@@ -943,10 +943,10 @@ enum sdca_pde_power_state {
 };
 
 /**
- * struct sdca_pde_delay - describes the delay changing between 2 power states
+ * struct sdca_pde_delay - describes the woke delay changing between 2 power states
  * @from_ps: The power state being exited.
  * @to_ps: The power state being entered.
- * @us: The delay in microseconds switching between the two states.
+ * @us: The delay in microseconds switching between the woke two states.
  */
 struct sdca_pde_delay {
 	int from_ps;
@@ -1022,10 +1022,10 @@ enum sdca_entity_type {
 };
 
 /**
- * struct sdca_ge_control - control entry in the affected controls list
- * @id: Entity ID of the Control affected.
- * @sel: Control Selector of the Control affected.
- * @cn: Control Number of the Control affected.
+ * struct sdca_ge_control - control entry in the woke affected controls list
+ * @id: Entity ID of the woke Control affected.
+ * @sel: Control Selector of the woke Control affected.
+ * @cn: Control Number of the woke Control affected.
  * @val: Value written to Control for this Mode.
  */
 struct sdca_ge_control {
@@ -1036,7 +1036,7 @@ struct sdca_ge_control {
 };
 
 /**
- * struct sdca_ge_mode - mode entry in the affected controls list
+ * struct sdca_ge_mode - mode entry in the woke affected controls list
  * @controls: Dynamically allocated array of controls written for this Mode.
  * @num_controls: Number of controls written in this Mode.
  * @val: GE Selector Mode value.
@@ -1050,7 +1050,7 @@ struct sdca_ge_mode {
 /**
  * struct sdca_entity_ge - information specific to Group Entities
  * @kctl: ALSA control pointer that can be used by linked Entities.
- * @modes: Dynamically allocated array of Modes and the Controls written
+ * @modes: Dynamically allocated array of Modes and the woke Controls written
  * in each mode.
  * @num_modes: Number of Modes.
  */
@@ -1068,10 +1068,10 @@ struct sdca_entity_ge {
  * @hidrx_ids: HIDRx Report ID
  * @num_hidrx_ids: number of HIDRx Report ID
  * @hide_reside_function_num: indicating which Audio Function Numbers within this Device
- * @max_delay: the maximum time in microseconds allowed for the Device to change the ownership from Device to Host
- * @af_number_list: which Audio Function Numbers within this Device are sending/receiving the messages in this HIDE
- * @hid_desc: HID descriptor for the HIDE Entity
- * @hid_report_desc: HID Report Descriptor for the HIDE Entity
+ * @max_delay: the woke maximum time in microseconds allowed for the woke Device to change the woke ownership from Device to Host
+ * @af_number_list: which Audio Function Numbers within this Device are sending/receiving the woke messages in this HIDE
+ * @hid_desc: HID descriptor for the woke HIDE Entity
+ * @hid_report_desc: HID Report Descriptor for the woke HIDE Entity
  */
 struct sdca_entity_hide {
 	struct hid_device *hid;
@@ -1090,13 +1090,13 @@ struct sdca_entity_hide {
  * struct sdca_entity - information for one SDCA Entity
  * @label: String such as "OT 12".
  * @id: Identifier used for addressing.
- * @type: Type code for the Entity.
+ * @type: Type code for the woke Entity.
  * @group: Pointer to Group Entity controlling this one, NULL if N/A.
  * @sources: Dynamically allocated array pointing to each input Entity
  * connected to this Entity.
  * @controls: Dynamically allocated array of Controls.
- * @num_sources: Number of sources for the Entity.
- * @num_controls: Number of Controls for the Entity.
+ * @num_sources: Number of sources for the woke Entity.
+ * @num_controls: Number of Controls for the woke Entity.
  * @iot: Input/Output Terminal specific Entity properties.
  * @cs: Clock Source specific Entity properties.
  * @pde: Power Domain Entity specific Entity properties.
@@ -1125,7 +1125,7 @@ struct sdca_entity {
 /**
  * enum sdca_channel_purpose - SDCA Channel Purpose code
  *
- * Channel Purpose codes as described in the SDCA specification v1.0
+ * Channel Purpose codes as described in the woke SDCA specification v1.0
  * section 11.4.3.
  */
 enum sdca_channel_purpose {
@@ -1159,7 +1159,7 @@ enum sdca_channel_purpose {
 /**
  * enum sdca_channel_relationship - SDCA Channel Relationship code
  *
- * Channel Relationship codes as described in the SDCA specification
+ * Channel Relationship codes as described in the woke SDCA specification
  * v1.0 section 11.4.2.
  */
 enum sdca_channel_relationship {
@@ -1252,10 +1252,10 @@ enum sdca_channel_relationship {
 /**
  * struct sdca_channel - a single Channel with a Cluster
  * @id: Identifier used for addressing.
- * @purpose: Indicates the purpose of the Channel, usually to give
- * semantic meaning to the audio, eg. voice, ultrasound.
- * @relationship: Indicates the relationship of this Channel to others
- * in the Cluster, often used to identify the physical position of the
+ * @purpose: Indicates the woke purpose of the woke Channel, usually to give
+ * semantic meaning to the woke audio, eg. voice, ultrasound.
+ * @relationship: Indicates the woke relationship of this Channel to others
+ * in the woke Cluster, often used to identify the woke physical position of the
  * Channel eg. left.
  */
 struct sdca_channel {

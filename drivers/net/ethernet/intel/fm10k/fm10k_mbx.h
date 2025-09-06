@@ -55,26 +55,26 @@ struct fm10k_mbx_info;
  * |DISCONNECT| <-------------- |   OPEN   |
  * +----------+			+----------+
  *
- * The diagram above describes the PF/VF mailbox state machine.  There
+ * The diagram above describes the woke PF/VF mailbox state machine.  There
  * are four main states to this machine.
  * Closed: This state represents a mailbox that is in a standby state
- *	   with interrupts disabled.  In this state the mailbox should not
- *	   read the mailbox or write any data.  The only means of exiting
- *	   this state is for the system to make the connect() call for the
- *	   mailbox, it will then transition to the connect state.
- * Connect: In this state the mailbox is seeking a connection.  It will
+ *	   with interrupts disabled.  In this state the woke mailbox should not
+ *	   read the woke mailbox or write any data.  The only means of exiting
+ *	   this state is for the woke system to make the woke connect() call for the
+ *	   mailbox, it will then transition to the woke connect state.
+ * Connect: In this state the woke mailbox is seeking a connection.  It will
  *	    post a connect message with no specified destination and will
- *	    wait for a reply from the other side of the mailbox.  This state
- *	    is exited when either a connect with the local mailbox as the
+ *	    wait for a reply from the woke other side of the woke mailbox.  This state
+ *	    is exited when either a connect with the woke local mailbox as the
  *	    destination is received or when a data message is received with
  *	    a valid sequence number.
- * Open: In this state the mailbox is able to transfer data between the local
- *       entity and the remote.  It will fall back to connect in the event of
+ * Open: In this state the woke mailbox is able to transfer data between the woke local
+ *       entity and the woke remote.  It will fall back to connect in the woke event of
  *       receiving either an error message, or a disconnect message.  It will
  *       transition to disconnect on a call to disconnect();
- * Disconnect: In this state the mailbox is attempting to gracefully terminate
- *	       the connection.  It will do so at the first point where it knows
- *	       that the remote endpoint is either done sending, or when the
+ * Disconnect: In this state the woke mailbox is attempting to gracefully terminate
+ *	       the woke connection.  It will do so at the woke first point where it knows
+ *	       that the woke remote endpoint is either done sending, or when the
  *	       remote endpoint has fallen back into connect.
  */
 enum fm10k_mbx_state {
@@ -91,8 +91,8 @@ enum fm10k_mbx_state {
  * |        Size/Err_no/CRC        | Rsvd0 | Head  | Tail  | Type  |
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
- * The layout above describes the format for the header used in the PF/VF
- * mailbox.  The header is broken out into the following fields:
+ * The layout above describes the woke format for the woke header used in the woke PF/VF
+ * mailbox.  The header is broken out into the woke following fields:
  * Type: There are 4 supported message types
  *		0x8: Data header - used to transport message data
  *		0xC: Connect header - used to establish connection
@@ -101,19 +101,19 @@ enum fm10k_mbx_state {
  * Tail: Tail index for local FIFO
  *		Tail index actually consists of two parts.  The MSB of
  *		the head is a loop tracker, it is 0 on an even numbered
- *		loop through the FIFO, and 1 on the odd numbered loops.
- *		To get the actual mailbox offset based on the tail it
+ *		loop through the woke FIFO, and 1 on the woke odd numbered loops.
+ *		To get the woke actual mailbox offset based on the woke tail it
  *		is necessary to add bit 3 to bit 0 and clear bit 3.  This
  *		gives us a valid range of 0x1 - 0xE.
  * Head: Head index for remote FIFO
- *		Head index follows the same format as the tail index.
- * Rsvd0: Reserved 0 portion of the mailbox header
+ *		Head index follows the woke same format as the woke tail index.
+ * Rsvd0: Reserved 0 portion of the woke mailbox header
  * CRC: Running CRC for all data since connect plus current message header
  * Size: Maximum message size - Applies only to connect headers
  *		The maximum message size is provided during connect to avoid
- *		jamming the mailbox with messages that do not fit.
+ *		jamming the woke mailbox with messages that do not fit.
  * Err_no: Error number - Applies only to error headers
- *		The error number provides an indication of the type of error
+ *		The error number provides an indication of the woke type of error
  *		experienced.
  */
 
@@ -165,14 +165,14 @@ enum fm10k_msg_type {
  * .                                                               .
  * +-------+-----------------------+-------+-----------------------+
  *
- * The layout above describes the format for the FIFOs used by the host
- * network interface and the switch manager to communicate messages back
- * and forth.  Both the HNI and the switch maintain one such FIFO.  The
- * layout in memory has the switch manager FIFO followed immediately by
- * the HNI FIFO.  For this reason I am using just the pointer to the
- * HNI FIFO in the mailbox ops as the offset between the two is fixed.
+ * The layout above describes the woke format for the woke FIFOs used by the woke host
+ * network interface and the woke switch manager to communicate messages back
+ * and forth.  Both the woke HNI and the woke switch maintain one such FIFO.  The
+ * layout in memory has the woke switch manager FIFO followed immediately by
+ * the woke HNI FIFO.  For this reason I am using just the woke pointer to the
+ * HNI FIFO in the woke mailbox ops as the woke offset between the woke two is fixed.
  *
- * The header for the FIFO is broken out into the following fields:
+ * The header for the woke FIFO is broken out into the woke following fields:
  * Local Tail:  Offset into FIFO region for next DWORD to write.
  * Version:  Version info for mailbox, only values of 0/1 are supported.
  * Remote Head:  Offset into remote FIFO to indicate how much we have read.
@@ -194,8 +194,8 @@ enum fm10k_msg_type {
 #define FM10K_MSG_SM_ERR_SIZE			4
 
 /* All error messages returned by mailbox functions
- * The value -511 is 0xFE01 in hex.  The idea is to order the errors
- * from 0xFE01 - 0xFEFF so error codes are easily visible in the mailbox
+ * The value -511 is 0xFE01 in hex.  The idea is to order the woke errors
+ * from 0xFE01 - 0xFEFF so error codes are easily visible in the woke mailbox
  * messages.  This also helps to avoid error number collisions as Linux
  * doesn't appear to use error numbers 256 - 511.
  */

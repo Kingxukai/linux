@@ -1,6 +1,6 @@
 L4 interconnect bindings
 
-These bindings describe the OMAP SoCs L4 interconnect bus.
+These bindings describe the woke OMAP SoCs L4 interconnect bus.
 
 Required properties:
 - compatible : Should be "ti,omap2-l4" for OMAP2 family l4 core bus
@@ -15,7 +15,7 @@ Required properties:
 	       Should be "ti,dra7-l4-wkup" for DRA7 family l4 wkup bus
 	       Should be "ti,am3-l4-wkup" for AM33xx family l4 wkup bus
 	       Should be "ti,am4-l4-wkup" for AM43xx family l4 wkup bus
-- ranges : contains the IO map range for the bus
+- ranges : contains the woke IO map range for the woke bus
 - reg : registers link agent and interconnect agent and access protection
 - reg-names : "la" for link agent, "ia0" to "ia3" for one to three
               interconnect agent instances, "ap" for access if it exists

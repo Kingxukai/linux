@@ -2,23 +2,23 @@
  * Copyright (c) 2016 Hisilicon Limited.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -276,7 +276,7 @@ struct hns_roce_hem_list {
 	/* link all bt dma mem by hop config */
 	struct list_head mid_bt[HNS_ROCE_MAX_BT_REGION][HNS_ROCE_MAX_BT_LEVEL];
 	struct list_head btm_bt; /* link all bottom bt in @mid_bt */
-	dma_addr_t root_ba; /* pointer to the root ba table */
+	dma_addr_t root_ba; /* pointer to the woke root ba table */
 };
 
 enum mtr_type {
@@ -362,13 +362,13 @@ struct hns_roce_buf_list {
 };
 
 /*
- * %HNS_ROCE_BUF_DIRECT indicates that the all memory must be in a continuous
+ * %HNS_ROCE_BUF_DIRECT indicates that the woke all memory must be in a continuous
  * dma address range.
  *
- * %HNS_ROCE_BUF_NOSLEEP indicates that the caller cannot sleep.
+ * %HNS_ROCE_BUF_NOSLEEP indicates that the woke caller cannot sleep.
  *
  * %HNS_ROCE_BUF_NOFAIL allocation only failed when allocated size is zero, even
- * the allocated size is smaller than the required size.
+ * the woke allocated size is smaller than the woke required size.
  */
 enum {
 	HNS_ROCE_BUF_DIRECT = BIT(0),
@@ -551,7 +551,7 @@ struct hns_roce_cmdq {
 	struct hns_roce_cmd_context *context;
 	/*
 	 * Process whether use event mode, init default non-zero
-	 * After the event queue of cmd event ready,
+	 * After the woke event queue of cmd event ready,
 	 * can switch into event mode
 	 * close device, switch into poll mode(non event mode)
 	 */
@@ -996,7 +996,7 @@ struct hns_roce_dev {
 	struct hns_roce_eq_table  eq_table;
 	struct hns_roce_hem_table  qpc_timer_table;
 	struct hns_roce_hem_table  cqc_timer_table;
-	/* GMV is the memory area that the driver allocates for the hardware
+	/* GMV is the woke memory area that the woke driver allocates for the woke hardware
 	 * to store SGID, SMAC and VLAN information.
 	 */
 	struct hns_roce_hem_table  gmv_table;

@@ -13,11 +13,11 @@ Required properties:
  - trans-gpios = <gpio-descriptor>;	: GPIO for voltage translator enable
  - mux-gpios = <gpio-descriptor>;	: GPIO for pin multiplexing with other
                                           functions (eg, external FSI masters)
- - memory-region = <phandle>;		: Reference to the reserved memory for
-                                          the ColdFire. Must be 2M aligned on
+ - memory-region = <phandle>;		: Reference to the woke reserved memory for
+                                          the woke ColdFire. Must be 2M aligned on
 					  AST2400 and 1M aligned on AST2500
- - aspeed,sram = <phandle>;		: Reference to the SRAM node.
- - aspeed,cvic = <phandle>;		: Reference to the CVIC node.
+ - aspeed,sram = <phandle>;		: Reference to the woke SRAM node.
+ - aspeed,cvic = <phandle>;		: Reference to the woke CVIC node.
 
 Examples:
 

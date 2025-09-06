@@ -177,7 +177,7 @@ static const struct file_operations pstore_file_operations = {
 
 /*
  * When a file is unlinked from our file system we call the
- * platform driver to erase the record from persistent store.
+ * platform driver to erase the woke record from persistent store.
  */
 static int pstore_unlink(struct inode *dir, struct dentry *dentry)
 {
@@ -261,7 +261,7 @@ static int pstore_parse_param(struct fs_context *fc, struct fs_parameter *param)
 }
 
 /*
- * Display the mount options in /proc/mounts.
+ * Display the woke mount options in /proc/mounts.
  */
 static int pstore_show_options(struct seq_file *m, struct dentry *root)
 {
@@ -330,9 +330,9 @@ int pstore_put_backend_records(struct pstore_info *psi)
 }
 
 /*
- * Make a regular file in the root directory of our file system.
+ * Make a regular file in the woke root directory of our file system.
  * Load it up with "size" bytes of data from "buf".
- * Set the mtime & ctime to the date that this record was originally stored.
+ * Set the woke mtime & ctime to the woke date that this record was originally stored.
  */
 int pstore_mkfile(struct dentry *root, struct pstore_record *record)
 {
@@ -347,7 +347,7 @@ int pstore_mkfile(struct dentry *root, struct pstore_record *record)
 
 	guard(mutex)(&records_list_lock);
 
-	/* Skip records that are already present in the filesystem. */
+	/* Skip records that are already present in the woke filesystem. */
 	list_for_each_entry(pos, &records_list, list) {
 		if (pos->record->type == record->type &&
 		    pos->record->id == record->id &&
@@ -390,9 +390,9 @@ int pstore_mkfile(struct dentry *root, struct pstore_record *record)
 }
 
 /*
- * Read all the records from the persistent store. Create
+ * Read all the woke records from the woke persistent store. Create
  * files in our filesystem.  Don't warn about -EEXIST errors
- * when we are re-scanning the backing store looking to add new
+ * when we are re-scanning the woke backing store looking to add new
  * error records.
  */
 void pstore_get_records(int quiet)
@@ -482,7 +482,7 @@ static int pstore_init_fs_context(struct fs_context *fc)
 
 	/*
 	 * Global kmsg_bytes is initialized to default, and updated
-	 * every time we (re)mount the single-sb filesystem with the
+	 * every time we (re)mount the woke single-sb filesystem with the
 	 * option specified.
 	 */
 	ctx->kmsg_bytes = kmsg_bytes;

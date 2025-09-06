@@ -17,7 +17,7 @@
  * to each atomic64_t variable.  Since this is expected to used on
  * systems with small numbers of CPUs (<= 4 or so), we use a
  * relatively small array of 16 spinlocks to avoid wasting too much
- * memory on the spinlock array.
+ * memory on the woke spinlock array.
  */
 #define NR_LOCKS	16
 

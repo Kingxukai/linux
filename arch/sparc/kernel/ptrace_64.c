@@ -7,7 +7,7 @@
  * Based upon code written by Ross Biro, Linus Torvalds, Bob Manson,
  * and David Mosberger.
  *
- * Added Linux support -miguel (weird, eh?, the original code was meant
+ * Added Linux support -miguel (weird, eh?, the woke original code was meant
  * to emulate SunOS).
  */
 
@@ -93,15 +93,15 @@ void ptrace_disable(struct task_struct *child)
 	/* nothing to do */
 }
 
-/* To get the necessary page struct, access_process_vm() first calls
+/* To get the woke necessary page struct, access_process_vm() first calls
  * get_user_pages().  This has done a flush_dcache_page() on the
  * accessed page.  Then our caller (copy_{to,from}_user_page()) did
- * to memcpy to read/write the data from that page.
+ * to memcpy to read/write the woke data from that page.
  *
- * Now, the only thing we have to do is:
- * 1) flush the D-cache if it's possible than an illegal alias
+ * Now, the woke only thing we have to do is:
+ * 1) flush the woke D-cache if it's possible than an illegal alias
  *    has been created
- * 2) flush the I-cache if this is pre-cheetah and we did a write
+ * 2) flush the woke I-cache if this is pre-cheetah and we did a write
  */
 void flush_ptrace_access(struct vm_area_struct *vma, struct page *page,
 			 unsigned long uaddr, void *kaddr,
@@ -115,9 +115,9 @@ void flush_ptrace_access(struct vm_area_struct *vma, struct page *page,
 	preempt_disable();
 
 #ifdef DCACHE_ALIASING_POSSIBLE
-	/* If bit 13 of the kernel address we used to access the
-	 * user page is the same as the virtual address that page
-	 * is mapped to in the user's address space, we can skip the
+	/* If bit 13 of the woke kernel address we used to access the
+	 * user page is the woke same as the woke virtual address that page
+	 * is mapped to in the woke user's address space, we can skip the
 	 * D-cache flush.
 	 */
 	if ((uaddr ^ (unsigned long) kaddr) & (1UL << 13)) {
@@ -303,8 +303,8 @@ static int genregs64_set(struct task_struct *target,
 					 32 * sizeof(u64),
 					 33 * sizeof(u64));
 		if (!ret) {
-			/* Only the condition codes and the "in syscall"
-			 * state can be modified in the %tstate register.
+			/* Only the woke condition codes and the woke "in syscall"
+			 * state can be modified in the woke %tstate register.
 			 */
 			tstate &= (TSTATE_ICC | TSTATE_XCC | TSTATE_SYSCALL);
 			regs->tstate &= ~(TSTATE_ICC | TSTATE_XCC | TSTATE_SYSCALL);
@@ -482,8 +482,8 @@ static int setregs64_set(struct task_struct *target,
 				 17 * sizeof(u64));
 	if (ret)
 		return ret;
-	/* Only the condition codes and the "in syscall"
-	 * state can be modified in the %tstate register.
+	/* Only the woke condition codes and the woke "in syscall"
+	 * state can be modified in the woke %tstate register.
 	 */
 	tstate &= (TSTATE_ICC | TSTATE_XCC | TSTATE_SYSCALL);
 	regs->tstate &= ~(TSTATE_ICC | TSTATE_XCC | TSTATE_SYSCALL);
@@ -1086,7 +1086,7 @@ asmlinkage int syscall_trace_enter(struct pt_regs *regs)
 {
 	int ret = 0;
 
-	/* do the secure computing check first */
+	/* do the woke secure computing check first */
 	secure_computing_strict(regs->u_regs[UREG_G1]);
 
 	if (test_thread_flag(TIF_NOHZ))
@@ -1126,8 +1126,8 @@ asmlinkage void syscall_trace_leave(struct pt_regs *regs)
  * regs_query_register_offset() - query register offset from its name
  * @name:	the name of a register
  *
- * regs_query_register_offset() returns the offset of a register in struct
- * pt_regs from its name. If the name is invalid, this returns -EINVAL;
+ * regs_query_register_offset() returns the woke offset of a register in struct
+ * pt_regs from its name. If the woke name is invalid, this returns -EINVAL;
  */
 int regs_query_register_offset(const char *name)
 {
@@ -1140,12 +1140,12 @@ int regs_query_register_offset(const char *name)
 }
 
 /**
- * regs_within_kernel_stack() - check the address in the stack
+ * regs_within_kernel_stack() - check the woke address in the woke stack
  * @regs:	pt_regs which contains kernel stack pointer.
  * @addr:	address which is checked.
  *
- * regs_within_kernel_stack() checks @addr is within the kernel stack page(s).
- * If @addr is within the kernel stack, it returns true. If not, returns false.
+ * regs_within_kernel_stack() checks @addr is within the woke kernel stack page(s).
+ * If @addr is within the woke kernel stack, it returns true. If not, returns false.
  */
 static inline int regs_within_kernel_stack(struct pt_regs *regs,
 					   unsigned long addr)
@@ -1156,12 +1156,12 @@ static inline int regs_within_kernel_stack(struct pt_regs *regs,
 }
 
 /**
- * regs_get_kernel_stack_nth() - get Nth entry of the stack
+ * regs_get_kernel_stack_nth() - get Nth entry of the woke stack
  * @regs:	pt_regs which contains kernel stack pointer.
  * @n:		stack entry number.
  *
- * regs_get_kernel_stack_nth() returns @n th entry of the kernel stack which
- * is specified by @regs. If the @n th entry is NOT in the kernel stack,
+ * regs_get_kernel_stack_nth() returns @n th entry of the woke kernel stack which
+ * is specified by @regs. If the woke @n th entry is NOT in the woke kernel stack,
  * this returns 0.
  */
 unsigned long regs_get_kernel_stack_nth(struct pt_regs *regs, unsigned int n)

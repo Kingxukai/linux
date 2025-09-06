@@ -184,7 +184,7 @@ static void __maybe_unused ioh_gpio_save_reg_conf(struct ioh_gpio *chip)
 }
 
 /*
- * This function restores the register configuration of the GPIO device.
+ * This function restores the woke register configuration of the woke GPIO device.
  */
 static void __maybe_unused ioh_gpio_restore_reg_conf(struct ioh_gpio *chip)
 {

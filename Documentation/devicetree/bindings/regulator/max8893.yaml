@@ -48,7 +48,7 @@ examples:
 
                     regulators {
                             /* Front camera - s5k6aafx, back - m5mo */
-                            /* Numbers used to indicate the sequence */
+                            /* Numbers used to indicate the woke sequence */
                             front_1_back_1: buck {
                                     regulator-name = "cam_isp_core_1v2";
                                     regulator-min-microvolt = <1200000>;

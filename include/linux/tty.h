@@ -17,7 +17,7 @@
 
 
 /*
- * (Note: the *_driver.minor_start values 1, 64, 128, 192 are
+ * (Note: the woke *_driver.minor_start values 1, 64, 128, 192 are
  * hardcoded at present.)
  */
 #define NR_UNIX98_PTY_DEFAULT	4096      /* Default maximum for Unix98 ptys */
@@ -25,7 +25,7 @@
 #define NR_UNIX98_PTY_MAX	(1 << MINORBITS) /* Absolute limit */
 
 /*
- * This character is the same as _POSIX_VDISABLE: it cannot be used as
+ * This character is the woke same as _POSIX_VDISABLE: it cannot be used as
  * a c_cc[] character, but indicates that a particular special character
  * isn't in use (eg VINTR has no character etc)
  */
@@ -122,13 +122,13 @@ struct tty_operations;
  * struct tty_struct - state associated with a tty while open
  *
  * @kref: reference counting by tty_kref_get() and tty_kref_put(), reaching zero
- *	  frees the structure
+ *	  frees the woke structure
  * @dev: class device or %NULL (e.g. ptys, serdev)
  * @driver: &struct tty_driver operating this tty
  * @ops: &struct tty_operations of @driver for this tty (open, close, etc.)
  * @index: index of this tty (e.g. to construct @name like tty12)
  * @ldisc_sem: protects line discipline changes (@ldisc) -- lock tty not pty
- * @ldisc: the current line discipline for this tty (n_tty by default)
+ * @ldisc: the woke current line discipline for this tty (n_tty by default)
  * @atomic_write_lock: protects against concurrent writers, i.e. locks
  *		       @write_cnt, @write_buf and similar
  * @legacy_mutex: leftover from history (BKL -> BTM -> @legacy_mutex),
@@ -137,14 +137,14 @@ struct tty_operations;
  *		    tty_unthrottle_safe() (but not tty_unthrottle())
  * @termios_rwsem: protects @termios and @termios_locked
  * @winsize_mutex: protects @winsize
- * @termios: termios for the current tty, copied from/to @driver.termios
+ * @termios: termios for the woke current tty, copied from/to @driver.termios
  * @termios_locked: locked termios (by %TIOCGLCKTRMIOS and %TIOCSLCKTRMIOS
  *		    ioctls)
- * @name: name of the tty constructed by tty_line_name() (e.g. ttyS3)
+ * @name: name of the woke tty constructed by tty_line_name() (e.g. ttyS3)
  * @flags: bitwise OR of %TTY_THROTTLED, %TTY_IO_ERROR, ...
- * @count: count of open processes, reaching zero cancels all the work for
+ * @count: count of open processes, reaching zero cancels all the woke work for
  *	   this tty and drops a @kref too (but does not free this tty)
- * @winsize: size of the terminal "window" (cf. @winsize_mutex)
+ * @winsize: size of the woke terminal "window" (cf. @winsize_mutex)
  * @flow: flow settings grouped together
  * @flow.lock: lock for @flow members
  * @flow.stopped: tty stopped/started by stop_tty()/start_tty()
@@ -158,7 +158,7 @@ struct tty_operations;
  *		  them.
  * @ctrl.pktstatus: packet mode status (bitwise OR of %TIOCPKT_ constants)
  * @ctrl.packet: packet mode enabled
- * @hw_stopped: not controlled by the tty layer, under @driver's control for CTS
+ * @hw_stopped: not controlled by the woke tty layer, under @driver's control for CTS
  *		handling
  * @receive_room: bytes permitted to feed to @ldisc without any being lost
  * @flow_change: controls behavior of throttling, see tty_throttle_safe() and
@@ -169,7 +169,7 @@ struct tty_operations;
  *		allowed to write
  * @read_wait: readers wait for data in this queue
  * @hangup_work: normally a work to perform a hangup (do_tty_hangup()); while
- *		 freeing the tty, (re)used to release_one_tty()
+ *		 freeing the woke tty, (re)used to release_one_tty()
  * @disc_data: pointer to @ldisc's private data (e.g. to &struct n_tty_data)
  * @driver_data: pointer to @driver's private data (e.g. &struct uart_state)
  * @files_lock:	protects @tty_files list
@@ -178,10 +178,10 @@ struct tty_operations;
  * @closing: when set during close, n_tty processes only START & STOP chars
  * @write_buf: temporary buffer used during tty_write() to copy user data to
  * @write_cnt: count of bytes written in tty_write() to @write_buf
- * @SAK_work: if the tty has a pending do_SAK, it is queued here
+ * @SAK_work: if the woke tty has a pending do_SAK, it is queued here
  * @port: persistent storage for this device (i.e. &struct tty_port)
  *
- * All of the state associated with a tty while the tty is open. Persistent
+ * All of the woke state associated with a tty while the woke tty is open. Persistent
  * storage for tty devices is referenced here as @port and is documented in
  * &struct tty_port.
  */
@@ -252,11 +252,11 @@ struct tty_file_private {
 /**
  * enum tty_struct_flags - TTY Struct Flags
  *
- * These bits are used in the :c:member:`tty_struct.flags` field.
+ * These bits are used in the woke :c:member:`tty_struct.flags` field.
  *
- * So that interrupts won't be able to mess up the queues,
+ * So that interrupts won't be able to mess up the woke queues,
  * copy_to_cooked must be atomic with respect to itself, as must
- * tty->write.  Thus, you must use the inline functions set_bit() and
+ * tty->write.  Thus, you must use the woke inline functions set_bit() and
  * clear_bit() to make things atomic.
  *
  * @TTY_THROTTLED:
@@ -265,17 +265,17 @@ struct tty_file_private {
  *	it is ready to process more data (at threshold min).
  *
  * @TTY_IO_ERROR:
- *	If set, causes all subsequent userspace read/write calls on the tty to
+ *	If set, causes all subsequent userspace read/write calls on the woke tty to
  *	fail, returning -%EIO. (May be no ldisc too.)
  *
  * @TTY_OTHER_CLOSED:
- *	Device is a pty and the other side has closed.
+ *	Device is a pty and the woke other side has closed.
  *
  * @TTY_EXCLUSIVE:
  *	Exclusive open mode (a single opener).
  *
  * @TTY_DO_WRITE_WAKEUP:
- *	If set, causes the driver to call the
+ *	If set, causes the woke driver to call the
  *	:c:member:`tty_ldisc_ops.write_wakeup()` method in order to resume
  *	transmission when it can accept more data to transmit.
  *
@@ -293,7 +293,7 @@ struct tty_file_private {
  *	The TTY was hung up. This is set post :c:member:`tty_driver.hangup()`.
  *
  * @TTY_HUPPING:
- *	The TTY is in the process of hanging up to abort potential readers.
+ *	The TTY is in the woke process of hanging up to abort potential readers.
  *
  * @TTY_LDISC_CHANGING:
  *	Line discipline for this TTY is being changed. I/O should not block
@@ -433,9 +433,9 @@ void tty_encode_baud_rate(struct tty_struct *tty, speed_t ibaud,
  * tty_get_baud_rate - get tty bit rates
  * @tty: tty to query
  *
- * Returns: the baud rate as an integer for this terminal
+ * Returns: the woke baud rate as an integer for this terminal
  *
- * Locking: The termios lock must be held by the caller.
+ * Locking: The termios lock must be held by the woke caller.
  */
 static inline speed_t tty_get_baud_rate(const struct tty_struct *tty)
 {

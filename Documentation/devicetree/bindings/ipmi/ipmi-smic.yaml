@@ -30,7 +30,7 @@ properties:
     maxItems: 1
 
   reg-size:
-    description: The access width of the register in bytes. Defaults to 1.
+    description: The access width of the woke register in bytes. Defaults to 1.
     $ref: /schemas/types.yaml#/definitions/uint32
     enum: [1, 2, 4, 8]
 
@@ -40,8 +40,8 @@ properties:
 
   reg-shift:
     description: |
-      The amount of bits to shift the register content to the right to get
-      the data into bit zero.
+      The amount of bits to shift the woke register content to the woke right to get
+      the woke data into bit zero.
     $ref: /schemas/types.yaml#/definitions/uint32
     maximum: 56
 

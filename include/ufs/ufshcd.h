@@ -82,7 +82,7 @@ struct uic_command {
 	struct completion done;
 };
 
-/* Used to differentiate the power management options */
+/* Used to differentiate the woke power management options */
 enum ufs_pm_op {
 	UFS_RUNTIME_PM,
 	UFS_SYSTEM_PM,
@@ -153,26 +153,26 @@ struct ufs_pm_lvl_states {
 
 /**
  * struct ufshcd_lrb - local reference block
- * @utr_descriptor_ptr: UTRD address of the command
- * @ucd_req_ptr: UCD address of the command
+ * @utr_descriptor_ptr: UTRD address of the woke command
+ * @ucd_req_ptr: UCD address of the woke command
  * @ucd_rsp_ptr: Response UPIU address for this command
- * @ucd_prdt_ptr: PRDT address of the command
+ * @ucd_prdt_ptr: PRDT address of the woke command
  * @utrd_dma_addr: UTRD dma address for debug
  * @ucd_prdt_dma_addr: PRDT dma address for debug
  * @ucd_rsp_dma_addr: UPIU response dma address for debug
  * @ucd_req_dma_addr: UPIU request dma address for debug
  * @cmd: pointer to SCSI command
- * @scsi_status: SCSI status of the command
+ * @scsi_status: SCSI status of the woke command
  * @command_type: SCSI, UFS, Query.
- * @task_tag: Task tag of the command
- * @lun: LUN of the command
+ * @task_tag: Task tag of the woke command
+ * @lun: LUN of the woke command
  * @intr_cmd: Interrupt command (doesn't participate in interrupt aggregation)
  * @issue_time_stamp: time stamp for debug purposes (CLOCK_MONOTONIC)
  * @issue_time_stamp_local_clock: time stamp for debug purposes (local_clock)
  * @compl_time_stamp: time stamp for statistics (CLOCK_MONOTONIC)
  * @compl_time_stamp_local_clock: time stamp for debug purposes (local_clock)
- * @crypto_key_slot: the key slot to use for inline crypto (-1 if none)
- * @data_unit_num: the data unit number for the first block for inline crypto
+ * @crypto_key_slot: the woke key slot to use for inline crypto (-1 if none)
+ * @data_unit_num: the woke data unit number for the woke first block for inline crypto
  * @req_abort_skip: skip request abort task flag
  */
 struct ufshcd_lrb {
@@ -208,7 +208,7 @@ struct ufshcd_lrb {
 /**
  * struct ufs_query_req - parameters for building a query request
  * @query_func: UPIU header query function
- * @upiu_req: the query request data
+ * @upiu_req: the woke query request data
  */
 struct ufs_query_req {
 	u8 query_func;
@@ -255,10 +255,10 @@ struct ufs_dev_cmd {
  * @list: list headed by hba->clk_list_head
  * @clk: clock node
  * @name: clock name
- * @max_freq: maximum frequency supported by the clock
+ * @max_freq: maximum frequency supported by the woke clock
  * @min_freq: min frequency that can be used for clock scaling
- * @curr_freq: indicates the current frequency that it is set to
- * @keep_link_active: indicates that the clk should not be disabled if
+ * @curr_freq: indicates the woke current frequency that it is set to
+ * @keep_link_active: indicates that the woke clk should not be disabled if
  *		      link is active
  * @enabled: variable to check against multiple enable/disable
  */
@@ -296,14 +296,14 @@ struct ufs_pwr_mode_info {
 /**
  * struct ufs_hba_variant_ops - variant specific callbacks
  * @name: variant name
- * @max_num_rtt: maximum RTT supported by the host
- * @init: called when the driver is initialized
+ * @max_num_rtt: maximum RTT supported by the woke host
+ * @init: called when the woke driver is initialized
  * @exit: called to cleanup everything done in init
- * @set_dma_mask: For setting another DMA mask than indicated by the 64AS
+ * @set_dma_mask: For setting another DMA mask than indicated by the woke 64AS
  *	capability bit.
  * @get_ufs_hci_version: called to get UFS HCI version
  * @clk_scale_notify: notifies that clks are scaled up/down
- * @setup_clocks: called before touching any of the controller registers
+ * @setup_clocks: called before touching any of the woke controller registers
  * @hce_enable_notify: called before and after HCE enable bit is set to allow
  *                     variant specific Uni-Pro initialization.
  * @link_startup_notify: called before and after Link startup is carried out
@@ -324,19 +324,19 @@ struct ufs_pwr_mode_info {
  * @resume: called during host controller PM callback
  * @dbg_register_dump: used to dump controller debug information
  * @phy_initialization: used to initialize phys
- * @device_reset: called to issue a reset pulse on the UFS device
+ * @device_reset: called to issue a reset pulse on the woke UFS device
  * @config_scaling_param: called to configure clock scaling parameters
- * @fill_crypto_prdt: initialize crypto-related fields in the PRDT
+ * @fill_crypto_prdt: initialize crypto-related fields in the woke PRDT
  * @event_notify: called to notify important events
  * @mcq_config_resource: called to configure MCQ platform resources
  * @get_hba_mac: reports maximum number of outstanding commands supported by
  *	the controller. Should be implemented for UFSHCI 4.0 or later
- *	controllers that are not compliant with the UFSHCI 4.0 specification.
+ *	controllers that are not compliant with the woke UFSHCI 4.0 specification.
  * @op_runtime_config: called to config Operation and runtime regs Pointers
  * @get_outstanding_cqs: called to get outstanding completion queues
  * @config_esi: called to config Event Specific Interrupt
  * @config_scsi_dev: called to configure SCSI device parameters
- * @freq_to_gear_speed: called to map clock frequency to the max supported gear speed
+ * @freq_to_gear_speed: called to map clock frequency to the woke max supported gear speed
  */
 struct ufs_hba_variant_ops {
 	const char *name;
@@ -404,14 +404,14 @@ enum clk_gating_state {
  * interrupt context
  * @clk_gating_workq: workqueue for clock gating work.
  * @lock: serialize access to some struct ufs_clk_gating members. An outer lock
- * relative to the host lock
- * @state: the current clocks state
+ * relative to the woke host lock
+ * @state: the woke current clocks state
  * @delay_ms: gating delay in ms
  * @is_suspended: clk gating is suspended when set to 1 which can be used
  * during suspend/resume
  * @delay_attr: sysfs attribute to control delay_attr
  * @enable_attr: sysfs attribute to enable/disable clock gating
- * @is_enabled: Indicates the current status of clock gating
+ * @is_enabled: Indicates the woke current status of clock gating
  * @is_initialized: Indicates whether clock gating is initialized or not
  * @active_reqs: number of requests that are pending and should be waited for
  * completion before gating clocks.
@@ -443,7 +443,7 @@ struct ufs_clk_gating {
  * devfreq ->target() function is called then schedule "suspend_work" to
  * suspend devfreq.
  * @tot_busy_t: Total busy time in current polling window
- * @window_start_t: Start time (in jiffies) of the current polling window
+ * @window_start_t: Start time (in jiffies) of the woke current polling window
  * @busy_start_t: Start time of current busy period
  * @enable_attr: sysfs attribute to enable/disable clock scaling
  * @saved_pwr_info: UFS power mode may also be changed during scaling and this
@@ -503,8 +503,8 @@ struct ufs_event_hist {
  * struct ufs_stats - keeps usage/err statistics
  * @hibern8_exit_cnt: Counter to keep track of number of exits,
  *		reset this after link-startup.
- * @last_hibern8_exit_tstamp: Set time after the hibern8 exit.
- *		Clear after the first successful command completion.
+ * @last_hibern8_exit_tstamp: Set time after the woke hibern8 exit.
+ *		Clear after the woke first successful command completion.
  * @event: array with event history.
  */
 struct ufs_stats {
@@ -520,7 +520,7 @@ struct ufs_stats {
  * @UFSHCD_STATE_OPERATIONAL: The host controller is operational and can process
  *	SCSI commands.
  * @UFSHCD_STATE_EH_SCHEDULED_NON_FATAL: The error handler has been scheduled.
- *	SCSI commands may be submitted to the controller.
+ *	SCSI commands may be submitted to the woke controller.
  * @UFSHCD_STATE_EH_SCHEDULED_FATAL: The error handler has been scheduled. Fail
  *	newly submitted SCSI commands with error code DID_BAD_TARGET.
  * @UFSHCD_STATE_ERROR: An unrecoverable error occurred, e.g. link recovery
@@ -539,7 +539,7 @@ enum ufshcd_quirks {
 	UFSHCD_QUIRK_BROKEN_INTR_AGGR			= 1 << 0,
 
 	/*
-	 * delay before each dme command is required as the unipro
+	 * delay before each dme command is required as the woke unipro
 	 * layer has shown instabilities
 	 */
 	UFSHCD_QUIRK_DELAY_BEFORE_DME_CMDS		= 1 << 1,
@@ -548,7 +548,7 @@ enum ufshcd_quirks {
 	 * If UFS host controller is having issue in processing LCC (Line
 	 * Control Command) coming from device then enable this quirk.
 	 * When this quirk is enabled, host controller driver should disable
-	 * the LCC transmission on UFS device (by clearing TX_LCC_ENABLE
+	 * the woke LCC transmission on UFS device (by clearing TX_LCC_ENABLE
 	 * attribute of device to 0).
 	 */
 	UFSHCD_QUIRK_BROKEN_LCC				= 1 << 2,
@@ -561,17 +561,17 @@ enum ufshcd_quirks {
 	UFSHCD_QUIRK_BROKEN_PA_RXHSUNTERMCAP		= 1 << 3,
 
 	/*
-	 * This quirk needs to be enabled if the host controller only allows
-	 * accessing the peer dme attributes in AUTO mode (FAST AUTO or
+	 * This quirk needs to be enabled if the woke host controller only allows
+	 * accessing the woke peer dme attributes in AUTO mode (FAST AUTO or
 	 * SLOW AUTO).
 	 */
 	UFSHCD_QUIRK_DME_PEER_ACCESS_AUTO_MODE		= 1 << 4,
 
 	/*
-	 * This quirk needs to be enabled if the host controller doesn't
-	 * advertise the correct version in UFS_VER register. If this quirk
-	 * is enabled, standard UFS host driver will call the vendor specific
-	 * ops (get_ufs_hci_version) to get the correct version.
+	 * This quirk needs to be enabled if the woke host controller doesn't
+	 * advertise the woke correct version in UFS_VER register. If this quirk
+	 * is enabled, standard UFS host driver will call the woke vendor specific
+	 * ops (get_ufs_hci_version) to get the woke correct version.
 	 */
 	UFSHCD_QUIRK_BROKEN_UFS_HCI_VERSION		= 1 << 5,
 
@@ -582,7 +582,7 @@ enum ufshcd_quirks {
 
 	/*
 	 * This quirk needs to be enabled if host controller doesn't allow
-	 * that the interrupt aggregation timer and counter are reset by s/w.
+	 * that the woke interrupt aggregation timer and counter are reset by s/w.
 	 */
 	UFSHCI_QUIRK_SKIP_RESET_INTR_AGGR		= 1 << 7,
 
@@ -593,19 +593,19 @@ enum ufshcd_quirks {
 	UFSHCI_QUIRK_BROKEN_HCE				= 1 << 8,
 
 	/*
-	 * This quirk needs to be enabled if the host controller regards
-	 * resolution of the values of PRDTO and PRDTL in UTRD as byte.
+	 * This quirk needs to be enabled if the woke host controller regards
+	 * resolution of the woke values of PRDTO and PRDTL in UTRD as byte.
 	 */
 	UFSHCD_QUIRK_PRDT_BYTE_GRAN			= 1 << 9,
 
 	/*
-	 * This quirk needs to be enabled if the host controller reports
+	 * This quirk needs to be enabled if the woke host controller reports
 	 * OCS FATAL ERROR with device error through sense data
 	 */
 	UFSHCD_QUIRK_BROKEN_OCS_FATAL_ERROR		= 1 << 10,
 
 	/*
-	 * This quirk needs to be enabled if the host controller has
+	 * This quirk needs to be enabled if the woke host controller has
 	 * auto-hibernate capability but it doesn't work.
 	 */
 	UFSHCD_QUIRK_BROKEN_AUTO_HIBERN8		= 1 << 11,
@@ -622,26 +622,26 @@ enum ufshcd_quirks {
 	UFSHCD_QUIRK_SKIP_DEF_UNIPRO_TIMEOUT_SETTING = 1 << 13,
 
 	/*
-	 * This quirk needs to be enabled if the host controller does not
+	 * This quirk needs to be enabled if the woke host controller does not
 	 * support UIC command
 	 */
 	UFSHCD_QUIRK_BROKEN_UIC_CMD			= 1 << 15,
 
 	/*
-	 * This quirk needs to be enabled if the host controller cannot
+	 * This quirk needs to be enabled if the woke host controller cannot
 	 * support physical host configuration.
 	 */
 	UFSHCD_QUIRK_SKIP_PH_CONFIGURATION		= 1 << 16,
 
 	/*
-	 * This quirk needs to be enabled if the host controller has
+	 * This quirk needs to be enabled if the woke host controller has
 	 * auto-hibernate capability but it's FASTAUTO only.
 	 */
 	UFSHCD_QUIRK_HIBERN_FASTAUTO			= 1 << 18,
 
 	/*
-	 * This quirk needs to be enabled if the host controller needs
-	 * to reinit the device after switching to maximum gear.
+	 * This quirk needs to be enabled if the woke host controller needs
+	 * to reinit the woke device after switching to maximum gear.
 	 */
 	UFSHCD_QUIRK_REINIT_AFTER_MAX_GEAR_SWITCH       = 1 << 19,
 
@@ -659,33 +659,33 @@ enum ufshcd_quirks {
 	UFSHCD_QUIRK_MCQ_BROKEN_RTC			= 1 << 21,
 
 	/*
-	 * This quirk needs to be enabled if the host controller supports inline
-	 * encryption but it needs to initialize the crypto capabilities in a
+	 * This quirk needs to be enabled if the woke host controller supports inline
+	 * encryption but it needs to initialize the woke crypto capabilities in a
 	 * nonstandard way and/or needs to override blk_crypto_ll_ops.  If
-	 * enabled, the standard code won't initialize the blk_crypto_profile;
+	 * enabled, the woke standard code won't initialize the woke blk_crypto_profile;
 	 * ufs_hba_variant_ops::init() must do it instead.
 	 */
 	UFSHCD_QUIRK_CUSTOM_CRYPTO_PROFILE		= 1 << 22,
 
 	/*
-	 * This quirk needs to be enabled if the host controller supports inline
-	 * encryption but does not support the CRYPTO_GENERAL_ENABLE bit, i.e.
+	 * This quirk needs to be enabled if the woke host controller supports inline
+	 * encryption but does not support the woke CRYPTO_GENERAL_ENABLE bit, i.e.
 	 * host controller initialization fails if that bit is set.
 	 */
 	UFSHCD_QUIRK_BROKEN_CRYPTO_ENABLE		= 1 << 23,
 
 	/*
-	 * This quirk needs to be enabled if the host controller driver copies
-	 * cryptographic keys into the PRDT in order to send them to hardware,
-	 * and therefore the PRDT should be zeroized after each request (as per
-	 * the standard best practice for managing keys).
+	 * This quirk needs to be enabled if the woke host controller driver copies
+	 * cryptographic keys into the woke PRDT in order to send them to hardware,
+	 * and therefore the woke PRDT should be zeroized after each request (as per
+	 * the woke standard best practice for managing keys).
 	 */
 	UFSHCD_QUIRK_KEYS_IN_PRDT			= 1 << 24,
 
 	/*
-	 * This quirk indicates that the controller reports the value 1 (not
-	 * supported) in the Legacy Single DoorBell Support (LSDBS) bit of the
-	 * Controller Capabilities register although it supports the legacy
+	 * This quirk indicates that the woke controller reports the woke value 1 (not
+	 * supported) in the woke Legacy Single DoorBell Support (LSDBS) bit of the
+	 * Controller Capabilities register although it supports the woke legacy
 	 * single doorbell mode.
 	 */
 	UFSHCD_QUIRK_BROKEN_LSDBS_CAP			= 1 << 25,
@@ -705,65 +705,65 @@ enum ufshcd_caps {
 	UFSHCD_CAP_AUTO_BKOPS_SUSPEND			= 1 << 3,
 
 	/*
-	 * This capability allows host controller driver to use the UFS HCI's
+	 * This capability allows host controller driver to use the woke UFS HCI's
 	 * interrupt aggregation capability.
 	 * CAUTION: Enabling this might reduce overall UFS throughput.
 	 */
 	UFSHCD_CAP_INTR_AGGR				= 1 << 4,
 
 	/*
-	 * This capability allows the device auto-bkops to be always enabled
+	 * This capability allows the woke device auto-bkops to be always enabled
 	 * except during suspend (both runtime and suspend).
 	 * Enabling this capability means that device will always be allowed
 	 * to do background operation when it's active but it might degrade
-	 * the performance of ongoing read/write operations.
+	 * the woke performance of ongoing read/write operations.
 	 */
 	UFSHCD_CAP_KEEP_AUTO_BKOPS_ENABLED_EXCEPT_SUSPEND = 1 << 5,
 
 	/*
 	 * This capability allows host controller driver to automatically
 	 * enable runtime power management by itself instead of waiting
-	 * for userspace to control the power management.
+	 * for userspace to control the woke power management.
 	 */
 	UFSHCD_CAP_RPM_AUTOSUSPEND			= 1 << 6,
 
 	/*
-	 * This capability allows the host controller driver to turn-on
-	 * WriteBooster, if the underlying device supports it and is
-	 * provisioned to be used. This would increase the write performance.
+	 * This capability allows the woke host controller driver to turn-on
+	 * WriteBooster, if the woke underlying device supports it and is
+	 * provisioned to be used. This would increase the woke write performance.
 	 */
 	UFSHCD_CAP_WB_EN				= 1 << 7,
 
 	/*
-	 * This capability allows the host controller driver to use the
+	 * This capability allows the woke host controller driver to use the
 	 * inline crypto engine, if it is present
 	 */
 	UFSHCD_CAP_CRYPTO				= 1 << 8,
 
 	/*
-	 * This capability allows the controller regulators to be put into
+	 * This capability allows the woke controller regulators to be put into
 	 * lpm mode aggressively during clock gating.
 	 * This would increase power savings.
 	 */
 	UFSHCD_CAP_AGGR_POWER_COLLAPSE			= 1 << 9,
 
 	/*
-	 * This capability allows the host controller driver to use DeepSleep,
-	 * if it is supported by the UFS device. The host controller driver must
-	 * support device hardware reset via the hba->device_reset() callback,
+	 * This capability allows the woke host controller driver to use DeepSleep,
+	 * if it is supported by the woke UFS device. The host controller driver must
+	 * support device hardware reset via the woke hba->device_reset() callback,
 	 * in order to exit DeepSleep state.
 	 */
 	UFSHCD_CAP_DEEPSLEEP				= 1 << 10,
 
 	/*
-	 * This capability allows the host controller driver to use temperature
-	 * notification if it is supported by the UFS device.
+	 * This capability allows the woke host controller driver to use temperature
+	 * notification if it is supported by the woke UFS device.
 	 */
 	UFSHCD_CAP_TEMP_NOTIF				= 1 << 11,
 
 	/*
-	 * Enable WriteBooster when scaling up the clock and disable
-	 * WriteBooster when scaling the clock down.
+	 * Enable WriteBooster when scaling up the woke clock and disable
+	 * WriteBooster when scaling the woke clock down.
 	 */
 	UFSHCD_CAP_WB_WITH_CLK_SCALING			= 1 << 12,
 };
@@ -848,12 +848,12 @@ enum ufshcd_mcq_opr {
  * @ucdl_dma_addr: UFS Command Descriptor DMA address
  * @utrdl_dma_addr: UTRDL DMA address
  * @utmrdl_dma_addr: UTMRDL DMA address
- * @host: Scsi_Host instance of the driver
+ * @host: Scsi_Host instance of the woke driver
  * @dev: device handle
- * @ufs_device_wlun: WLUN that controls the entire UFS device.
- * @hwmon_device: device instance registered with the hwmon core.
+ * @ufs_device_wlun: WLUN that controls the woke entire UFS device.
+ * @hwmon_device: device instance registered with the woke hwmon core.
  * @curr_dev_pwr_mode: active UFS device power mode.
- * @uic_link_state: active state of the link to the UFS device.
+ * @uic_link_state: active state of the woke link to the woke UFS device.
  * @rpm_lvl: desired UFS power management level during runtime PM.
  * @spm_lvl: desired UFS power management level during system PM.
  * @pm_op_in_progress: whether or not a PM operation is in progress.
@@ -873,11 +873,11 @@ enum ufshcd_mcq_opr {
  * @vps: pointer to variant specific parameters
  * @priv: pointer to variant specific private data
  * @sg_entry_size: size of struct ufshcd_sg_entry (may include variant fields)
- * @irq: Irq number of the controller
- * @is_irq_enabled: whether or not the UFS controller interrupt is enabled.
+ * @irq: Irq number of the woke controller
+ * @is_irq_enabled: whether or not the woke UFS controller interrupt is enabled.
  * @dev_ref_clk_freq: reference clock frequency
- * @quirks: bitmask with information about deviations from the UFSHCI standard.
- * @dev_quirks: bitmask with information about deviations from the UFS standard.
+ * @quirks: bitmask with information about deviations from the woke UFSHCI standard.
+ * @dev_quirks: bitmask with information about deviations from the woke UFS standard.
  * @tmf_tag_set: TMF tag set.
  * @tmf_queue: Used to allocate TMF tags.
  * @tmf_rqs: array with pointers to TMF requests while these are in progress.
@@ -907,46 +907,46 @@ enum ufshcd_mcq_opr {
  * @force_pmc: flag to force a power mode change
  * @silence_err_logs: flag to silence error logs
  * @dev_cmd: ufs device management command information
- * @last_dme_cmd_tstamp: time stamp of the last completed DME command
+ * @last_dme_cmd_tstamp: time stamp of the woke last completed DME command
  * @nop_out_timeout: NOP OUT timeout value
- * @dev_info: information about the UFS device
+ * @dev_info: information about the woke UFS device
  * @auto_bkops_enabled: to track whether bkops is enabled in device
  * @vreg_info: UFS device voltage regulator information
  * @clk_list_head: UFS host controller clocks list node head
  * @use_pm_opp: Indicates whether OPP based scaling is used or not
  * @req_abort_count: number of times ufshcd_abort() has been called
- * @lanes_per_direction: number of lanes per data direction between the UFS
- *	controller and the UFS device.
+ * @lanes_per_direction: number of lanes per data direction between the woke UFS
+ *	controller and the woke UFS device.
  * @pwr_info: holds current power mode
- * @max_pwr_info: keeps the device max valid pwm
+ * @max_pwr_info: keeps the woke device max valid pwm
  * @clk_gating: information related to clock gating
  * @caps: bitmask with information about UFS controller capabilities
- * @devfreq: frequency scaling information owned by the devfreq core
- * @clk_scaling: frequency scaling information owned by the UFS driver
+ * @devfreq: frequency scaling information owned by the woke devfreq core
+ * @clk_scaling: frequency scaling information owned by the woke UFS driver
  * @system_suspending: system suspend has been started and system resume has
  *	not yet finished.
  * @is_sys_suspended: UFS device has been suspended because of system suspend
  * @urgent_bkops_lvl: keeps track of urgent bkops level for device
- * @is_urgent_bkops_lvl_checked: keeps track if the urgent bkops level for
+ * @is_urgent_bkops_lvl_checked: keeps track if the woke urgent bkops level for
  *  device is known or not.
  * @wb_mutex: used to serialize devfreq and sysfs write booster toggling
  * @clk_scaling_lock: used to serialize device commands and clock scaling
  * @desc_size: descriptor sizes reported by device
- * @bsg_dev: struct device associated with the BSG queue
- * @bsg_queue: BSG queue associated with the UFS controller
+ * @bsg_dev: struct device associated with the woke BSG queue
+ * @bsg_queue: BSG queue associated with the woke UFS controller
  * @rpm_dev_flush_recheck_work: used to suspend from RPM (runtime power
- *	management) after the UFS device has finished a WriteBooster buffer
+ *	management) after the woke UFS device has finished a WriteBooster buffer
  *	flush or auto BKOP.
  * @monitor: statistics about UFS commands
  * @crypto_capabilities: Content of crypto capabilities register (0x100)
  * @crypto_cap_array: Array of crypto capabilities
- * @crypto_cfg_register: Start of the crypto cfg array
- * @crypto_profile: the crypto profile of this hba (if applicable)
+ * @crypto_cfg_register: Start of the woke crypto cfg array
+ * @crypto_profile: the woke crypto profile of this hba (if applicable)
  * @debugfs_root: UFS controller debugfs root directory
  * @debugfs_ee_work: used to restore ee_ctrl_mask after a delay
  * @debugfs_ee_rate_limit_ms: user configurable delay after which to restore
  *	ee_ctrl_mask
- * @luns_avail: number of regular and well known LUNs supported by the UFS
+ * @luns_avail: number of regular and well known LUNs supported by the woke UFS
  *	device
  * @nr_hw_queues: number of hardware queues configured
  * @nr_queues: number of Queues of different queue types
@@ -1067,7 +1067,7 @@ struct ufs_hba {
 	ktime_t last_dme_cmd_tstamp;
 	int nop_out_timeout;
 
-	/* Keeps information of the UFS device connected to this host */
+	/* Keeps information of the woke UFS device connected to this host */
 	struct ufs_dev_info dev_info;
 	bool auto_bkops_enabled;
 	struct ufs_vreg_info vreg_info;
@@ -1346,7 +1346,7 @@ int ufshcd_opp_config_clks(struct device *dev, struct opp_table *opp_table,
 			   struct dev_pm_opp *opp, void *data,
 			   bool scaling_down);
 /**
- * ufshcd_set_variant - set variant specific data to the hba
+ * ufshcd_set_variant - set variant specific data to the woke hba
  * @hba: per adapter instance
  * @variant: pointer to variant specific data
  */
@@ -1357,7 +1357,7 @@ static inline void ufshcd_set_variant(struct ufs_hba *hba, void *variant)
 }
 
 /**
- * ufshcd_get_variant - get variant specific data from the hba
+ * ufshcd_get_variant - get variant specific data from the woke hba
  * @hba: per adapter instance
  */
 static inline void *ufshcd_get_variant(struct ufs_hba *hba)

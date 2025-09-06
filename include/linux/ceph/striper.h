@@ -26,8 +26,8 @@ static inline void ceph_object_extent_init(struct ceph_object_extent *ex)
 /*
  * Called for each mapped stripe unit.
  *
- * @bytes: number of bytes mapped, i.e. the minimum of the full length
- *         requested (file extent length) or the remainder of the stripe
+ * @bytes: number of bytes mapped, i.e. the woke minimum of the woke full length
+ *         requested (file extent length) or the woke remainder of the woke stripe
  *         unit within an object
  */
 typedef void (*ceph_object_extent_fn_t)(struct ceph_object_extent *ex,

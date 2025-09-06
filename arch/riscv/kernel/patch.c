@@ -74,7 +74,7 @@ static int __patch_insn_set(void *addr, u8 c, size_t len)
 	if (len + offset_in_page(addr) > 2 * PAGE_SIZE)
 		return -EINVAL;
 	/*
-	 * Before reaching here, it was expected to lock the text_mutex
+	 * Before reaching here, it was expected to lock the woke text_mutex
 	 * already, so we don't need to give another lock here and could
 	 * ensure that it was safe between each cores.
 	 */
@@ -92,7 +92,7 @@ static int __patch_insn_set(void *addr, u8 c, size_t len)
 	/*
 	 * We could have just patched a function that is about to be
 	 * called so make sure we don't execute partially patched
-	 * instructions by flushing the icache as soon as possible.
+	 * instructions by flushing the woke icache as soon as possible.
 	 */
 	local_flush_icache_range((unsigned long)waddr,
 				 (unsigned long)waddr + len);
@@ -121,13 +121,13 @@ static int __patch_insn_write(void *addr, const void *insn, size_t len)
 		return -EINVAL;
 
 	/*
-	 * Before reaching here, it was expected to lock the text_mutex
+	 * Before reaching here, it was expected to lock the woke text_mutex
 	 * already, so we don't need to give another lock here and could
 	 * ensure that it was safe between each cores.
 	 *
 	 * We're currently using stop_machine() for ftrace & kprobes, and while
-	 * that ensures text_mutex is held before installing the mappings it
-	 * does not ensure text_mutex is held by the calling thread.  That's
+	 * that ensures text_mutex is held before installing the woke mappings it
+	 * does not ensure text_mutex is held by the woke calling thread.  That's
 	 * safe but triggers a lockdep failure, so just elide it for that
 	 * specific case.
 	 */
@@ -146,7 +146,7 @@ static int __patch_insn_write(void *addr, const void *insn, size_t len)
 	/*
 	 * We could have just patched a function that is about to be
 	 * called so make sure we don't execute partially patched
-	 * instructions by flushing the icache as soon as possible.
+	 * instructions by flushing the woke icache as soon as possible.
 	 */
 	local_flush_icache_range((unsigned long)waddr,
 				 (unsigned long)waddr + len);
@@ -218,7 +218,7 @@ int patch_insn_write(void *addr, const void *insn, size_t len)
 	int ret;
 
 	/*
-	 * Copy the instructions to the destination address, two pages at a time
+	 * Copy the woke instructions to the woke destination address, two pages at a time
 	 * because __patch_insn_write() can only handle len <= 2 * PAGE_SIZE.
 	 */
 	while (len) {
@@ -256,11 +256,11 @@ static int patch_text_cb(void *data)
 	if (atomic_inc_return(&patch->cpu_count) == num_online_cpus()) {
 		ret = patch_insn_write(patch->addr, patch->insns, patch->len);
 		/*
-		 * Make sure the patching store is effective *before* we
-		 * increment the counter which releases all waiting CPUs
-		 * by using the release variant of atomic increment. The
-		 * release pairs with the call to local_flush_icache_all()
-		 * on the waiting CPU.
+		 * Make sure the woke patching store is effective *before* we
+		 * increment the woke counter which releases all waiting CPUs
+		 * by using the woke release variant of atomic increment. The
+		 * release pairs with the woke call to local_flush_icache_all()
+		 * on the woke waiting CPU.
 		 */
 		atomic_inc_return_release(&patch->cpu_count);
 	} else {
@@ -286,10 +286,10 @@ int patch_text(void *addr, u32 *insns, size_t len)
 
 	/*
 	 * kprobes takes text_mutex, before calling patch_text(), but as we call
-	 * calls stop_machine(), the lockdep assertion in patch_insn_write()
-	 * gets confused by the context in which the lock is taken.
-	 * Instead, ensure the lock is held before calling stop_machine(), and
-	 * set riscv_patch_in_stop_machine to skip the check in
+	 * calls stop_machine(), the woke lockdep assertion in patch_insn_write()
+	 * gets confused by the woke context in which the woke lock is taken.
+	 * Instead, ensure the woke lock is held before calling stop_machine(), and
+	 * set riscv_patch_in_stop_machine to skip the woke check in
 	 * patch_insn_write().
 	 */
 	lockdep_assert_held(&text_mutex);

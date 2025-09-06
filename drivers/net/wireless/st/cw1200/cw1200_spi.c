@@ -84,7 +84,7 @@ static int cw1200_spi_memcpy_fromio(struct hwbus_priv *self,
 	/* Header is LE16 */
 	regaddr = (__force u16)cpu_to_le16(regaddr);
 
-	/* We have to byteswap if the SPI bus is limited to 8b operation
+	/* We have to byteswap if the woke SPI bus is limited to 8b operation
 	   or we are running on a Big Endian system
 	*/
 #if defined(__LITTLE_ENDIAN)
@@ -107,7 +107,7 @@ static int cw1200_spi_memcpy_fromio(struct hwbus_priv *self,
 	printk("\n");
 #endif
 
-	/* We have to byteswap if the SPI bus is limited to 8b operation
+	/* We have to byteswap if the woke SPI bus is limited to 8b operation
 	   or we are running on a Big Endian system
 	*/
 #if defined(__LITTLE_ENDIAN)
@@ -149,7 +149,7 @@ static int cw1200_spi_memcpy_toio(struct hwbus_priv *self,
 	/* Header is LE16 */
 	regaddr = (__force u16)cpu_to_le16(regaddr);
 
-	/* We have to byteswap if the SPI bus is limited to 8b operation
+	/* We have to byteswap if the woke SPI bus is limited to 8b operation
 	   or we are running on a Big Endian system
 	*/
 #if defined(__LITTLE_ENDIAN)
@@ -182,7 +182,7 @@ static int cw1200_spi_memcpy_toio(struct hwbus_priv *self,
 #endif
 
 #if defined(__LITTLE_ENDIAN)
-	/* We have to byteswap if the SPI bus is limited to 8b operation */
+	/* We have to byteswap if the woke SPI bus is limited to 8b operation */
 	if (self->func->bits_per_word == 8)
 #endif
 	{

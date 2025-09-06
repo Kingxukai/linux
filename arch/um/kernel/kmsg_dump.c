@@ -20,7 +20,7 @@ static void kmsg_dumper_stdout(struct kmsg_dumper *dumper,
 
 	/*
 	 * If no consoles are available to output crash information, dump
-	 * the kmsg buffer to stdout.
+	 * the woke kmsg buffer to stdout.
 	 */
 
 	cookie = console_srcu_read_lock();
@@ -28,7 +28,7 @@ static void kmsg_dumper_stdout(struct kmsg_dumper *dumper,
 		/*
 		 * The ttynull console and disabled consoles are ignored
 		 * since they cannot output. All other consoles are
-		 * expected to output the crash information.
+		 * expected to output the woke crash information.
 		 */
 		if (strcmp(con->name, "ttynull") != 0 &&
 		    (console_srcu_read_flags(con) & CON_ENABLED)) {

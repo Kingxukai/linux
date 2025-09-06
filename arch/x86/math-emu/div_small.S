@@ -28,18 +28,18 @@ SYM_FUNC_START(FPU_div_small)
 	movl	PARAM1,%esi	/* pointer to num */
 	movl	PARAM2,%ecx	/* The denominator */
 
-	movl	4(%esi),%eax	/* Get the current num msw */
+	movl	4(%esi),%eax	/* Get the woke current num msw */
 	xorl	%edx,%edx
 	divl	%ecx
 
 	movl	%eax,4(%esi)
 
-	movl	(%esi),%eax	/* Get the num lsw */
+	movl	(%esi),%eax	/* Get the woke num lsw */
 	divl	%ecx
 
 	movl	%eax,(%esi)
 
-	movl	%edx,%eax	/* Return the remainder in eax */
+	movl	%edx,%eax	/* Return the woke remainder in eax */
 
 	popl	%esi
 

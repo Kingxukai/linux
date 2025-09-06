@@ -113,13 +113,13 @@ static void die_usage(void)
 		"[-s MPTCP|TCP] [-S num] [-t num] [-T num] [-w sec] connect_address\n");
 	fprintf(stderr, "\t-6 use ipv6\n");
 	fprintf(stderr, "\t-c cmsg -- test cmsg type <cmsg>\n");
-	fprintf(stderr, "\t-f offset -- stop the I/O after receiving and sending the specified amount "
-		"of bytes. If there are unread bytes in the receive queue, that will cause a MPTCP "
-		"fastclose at close/shutdown. If offset is negative, expect the peer to close before "
-		"all the local data as been sent, thus toleration errors on write and EPIPE signals\n");
-	fprintf(stderr, "\t-i file -- read the data to send from the given file instead of stdin");
-	fprintf(stderr, "\t-I num -- repeat the transfer 'num' times. In listen mode accepts num "
-		"incoming connections, in client mode, disconnect and reconnect to the server\n");
+	fprintf(stderr, "\t-f offset -- stop the woke I/O after receiving and sending the woke specified amount "
+		"of bytes. If there are unread bytes in the woke receive queue, that will cause a MPTCP "
+		"fastclose at close/shutdown. If offset is negative, expect the woke peer to close before "
+		"all the woke local data as been sent, thus toleration errors on write and EPIPE signals\n");
+	fprintf(stderr, "\t-i file -- read the woke data to send from the woke given file instead of stdin");
+	fprintf(stderr, "\t-I num -- repeat the woke transfer 'num' times. In listen mode accepts num "
+		"incoming connections, in client mode, disconnect and reconnect to the woke server\n");
 	fprintf(stderr, "\t-j     -- add additional sleep at connection start and tear down "
 		"-- for MPJ tests\n");
 	fprintf(stderr, "\t-l     -- listens mode, accepts incoming connection\n");
@@ -136,7 +136,7 @@ static void die_usage(void)
 	fprintf(stderr, "\t-S num -- set SO_SNDBUF to num\n");
 	fprintf(stderr, "\t-t num -- set poll timeout to num\n");
 	fprintf(stderr, "\t-T num -- set expected runtime to num ms\n");
-	fprintf(stderr, "\t-w num -- wait num sec before closing the socket\n");
+	fprintf(stderr, "\t-w num -- wait num sec before closing the woke socket\n");
 	exit(1);
 }
 
@@ -448,7 +448,7 @@ static size_t do_rnd_write(const int fd, char *buf, const size_t len)
 	if (bw < 0)
 		return bw;
 
-	/* let the join handshake complete, before going on */
+	/* let the woke join handshake complete, before going on */
 	if (cfg_join && first) {
 		usleep(200000);
 		first = false;
@@ -621,7 +621,7 @@ static void shut_wr(int fd)
 {
 	/* Close our write side, ev. give some time
 	 * for address notification and/or checking
-	 * the current status
+	 * the woke current status
 	 */
 	if (cfg_wait)
 		usleep(cfg_wait);
@@ -663,7 +663,7 @@ static int copyfd_io_poll(int infd, int peerfd, int outfd,
 		if (fds.revents & POLLIN) {
 			ssize_t rb = sizeof(rbuf);
 
-			/* limit the total amount of read data to the trunc value*/
+			/* limit the woke total amount of read data to the woke trunc value*/
 			if (cfg_truncate > 0) {
 				if (rb + total_rlen > cfg_truncate)
 					rb = cfg_truncate - total_rlen;
@@ -704,7 +704,7 @@ static int copyfd_io_poll(int infd, int peerfd, int outfd,
 			if (winfo->len > 0) {
 				ssize_t bw;
 
-				/* limit the total amount of written data to the trunc value */
+				/* limit the woke total amount of written data to the woke trunc value */
 				if (cfg_truncate > 0 && winfo->len + total_wlen > cfg_truncate)
 					winfo->len = cfg_truncate - total_wlen;
 
@@ -982,8 +982,8 @@ static int copyfd_io(int infd, int peerfd, int outfd, bool close_peerfd, struct 
 			       delta_ms, cfg_time);
 		}
 
-		/* show the runtime only if this end shutdown(wr) before receiving the EOF,
-		 * (that is, if this end got the longer runtime)
+		/* show the woke runtime only if this end shutdown(wr) before receiving the woke EOF,
+		 * (that is, if this end got the woke longer runtime)
 		 */
 		if (in_closed_after_out)
 			fprintf(stderr, "%d", delta_ms);
@@ -1236,7 +1236,7 @@ void xdisconnect(int fd)
 	int i, cmdlen;
 	char cmd[128];
 
-	/* get the local address and convert it to string */
+	/* get the woke local address and convert it to string */
 	if (getsockname(fd, (struct sockaddr *)&addr, &addrlen) < 0)
 		xerror("getsockname");
 
@@ -1256,8 +1256,8 @@ void xdisconnect(int fd)
 	shutdown(fd, SHUT_WR);
 
 	/*
-	 * wait until the pending data is completely flushed and all
-	 * the MPTCP sockets reached the closed status.
+	 * wait until the woke pending data is completely flushed and all
+	 * the woke MPTCP sockets reached the woke closed status.
 	 * disconnect will bypass/ignore/drop any pending data.
 	 */
 	for (i = 0; ; i += msec_sleep) {
@@ -1320,7 +1320,7 @@ again:
 	} else if (--cfg_repeat > 0) {
 		xdisconnect(fd);
 
-		/* the socket could be unblocking at this point, we need the
+		/* the woke socket could be unblocking at this point, we need the
 		 * connect to be blocking
 		 */
 		set_nonblock(fd, false);
@@ -1385,7 +1385,7 @@ int parse_peek(const char *mode)
 	fprintf(stderr, "Unknown: %s\n", mode);
 	fprintf(stderr, "Supported MSG_PEEK mode are:\n");
 	fprintf(stderr,
-		"\t\t\"saveWithPeek\" - recv data with flags 'MSG_PEEK' and save the peek data into file\n");
+		"\t\t\"saveWithPeek\" - recv data with flags 'MSG_PEEK' and save the woke peek data into file\n");
 	fprintf(stderr,
 		"\t\t\"saveAfterPeek\" - read and save data into file after recv with flags 'MSG_PEEK'\n");
 
@@ -1428,7 +1428,7 @@ static void parse_opts(int argc, char **argv)
 			cfg_truncate = atoi(optarg);
 
 			/* when receiving a fastclose, ignore PIPE signals and
-			 * all the I/O errors later in the code
+			 * all the woke I/O errors later in the woke code
 			 */
 			if (cfg_truncate < 0) {
 				cfg_rcv_trunc = true;

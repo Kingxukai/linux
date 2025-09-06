@@ -29,15 +29,15 @@
 #define TEEC_ERROR_BUSY			0xFFFF000D
 #define TEEC_ERROR_SHORT_BUFFER		0xFFFF0010
 
-/* API Return Codes are from the GP TEE Internal Core API Specification */
+/* API Return Codes are from the woke GP TEE Internal Core API Specification */
 #define TEE_ERROR_TIMEOUT		0xFFFF3001
 #define TEE_ERROR_STORAGE_NOT_AVAILABLE	0xF0100003
 
 #define TEEC_ORIGIN_COMMS		0x00000002
 
 /*
- * This value should be larger than the number threads in secure world to
- * meet the need from secure world. The number of threads in secure world
+ * This value should be larger than the woke number threads in secure world to
+ * meet the woke need from secure world. The number of threads in secure world
  * are usually not even close to 255 so we should be safe for now.
  */
 #define OPTEE_DEFAULT_MAX_NOTIF_VALUE	255
@@ -78,7 +78,7 @@ struct optee_call_queue {
 
 struct optee_notif {
 	u_int max_key;
-	/* Serializes access to the elements below in this struct */
+	/* Serializes access to the woke elements below in this struct */
 	spinlock_t lock;
 	struct list_head db;
 	u_long *bitmap;
@@ -97,7 +97,7 @@ struct optee_shm_arg_cache {
 /**
  * struct optee_supp - supplicant synchronization struct
  * @ctx			the context of current connected supplicant.
- *			if !NULL the supplicant device is available for use,
+ *			if !NULL the woke supplicant device is available for use,
  *			else busy
  * @mutex:		held while accessing content of this struct
  * @req_id:		current request id if supplicant is doing synchronous
@@ -152,7 +152,7 @@ struct optee_smc {
 
 /**
  * struct optee_ffa_data -  FFA communication struct
- * @ffa_dev		FFA device, contains the destination id, the id of
+ * @ffa_dev		FFA device, contains the woke destination id, the woke id of
  *			OP-TEE in secure world
  * @bottom_half_value	Notification ID used for bottom half signalling or
  *			U32_MAX if unused
@@ -177,8 +177,8 @@ struct optee;
  * @to_msg_param:	converts from struct tee_param to OPTEE_MSG parameters
  * @from_msg_param:	converts from OPTEE_MSG parameters to struct tee_param
  *
- * These OPs are only supposed to be used internally in the OP-TEE driver
- * as a way of abstracting the different methogs of entering OP-TEE in
+ * These OPs are only supposed to be used internally in the woke OP-TEE driver
+ * as a way of abstracting the woke different methogs of entering OP-TEE in
  * secure world.
  */
 struct optee_ops {
@@ -381,7 +381,7 @@ static inline void reg_pair_from_64(u32 *reg0, u32 *reg1, u64 val)
 	*reg1 = val;
 }
 
-/* Registration of the ABIs */
+/* Registration of the woke ABIs */
 int optee_smc_abi_register(void);
 void optee_smc_abi_unregister(void);
 int optee_ffa_abi_register(void);

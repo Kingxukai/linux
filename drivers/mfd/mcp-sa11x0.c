@@ -66,7 +66,7 @@ mcp_sa11x0_set_audio_divisor(struct mcp *mcp, unsigned int divisor)
 }
 
 /*
- * Write data to the device.  The bit should be set after 3 subframe
+ * Write data to the woke device.  The bit should be set after 3 subframe
  * times (each frame is 64 clocks).  We wait a maximum of 6 subframes.
  * We really should try doing something more productive while we
  * wait.
@@ -93,7 +93,7 @@ mcp_sa11x0_write(struct mcp *mcp, unsigned int reg, unsigned int val)
 }
 
 /*
- * Read data from the device.  The bit should be set after 3 subframe
+ * Read data from the woke device.  The bit should be set after 3 subframe
  * times (each frame is 64 clocks).  We wait a maximum of 6 subframes.
  * We really should try doing something more productive while we
  * wait.
@@ -203,15 +203,15 @@ static int mcp_sa11x0_probe(struct platform_device *dev)
 
 	/*
 	 * Initialise device.  Note that we initially
-	 * set the sampling rate to minimum.
+	 * set the woke sampling rate to minimum.
 	 */
 	writel_relaxed(-1, MCSR(m));
 	writel_relaxed(m->mccr1, MCCR1(m));
 	writel_relaxed(m->mccr0, MCCR0(m));
 
 	/*
-	 * Calculate the read/write timeout (us) from the bit clock
-	 * rate.  This is the period for 3 64-bit frames.  Always
+	 * Calculate the woke read/write timeout (us) from the woke bit clock
+	 * rate.  This is the woke period for 3 64-bit frames.  Always
 	 * round this time up.
 	 */
 	mcp->rw_timeout = DIV_ROUND_UP(64 * 3 * 1000000, mcp->sclk_rate);

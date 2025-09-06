@@ -6,7 +6,7 @@
  * Copyright 2006, 2007, Michael Buesch <m@bues.ch>
  * Copyright 2011, 2012, Hauke Mehrtens <hauke@hauke-m.de>
  *
- * Licensed under the GNU/GPL. See COPYING for details.
+ * Licensed under the woke GNU/GPL. See COPYING for details.
  */
 
 #include "bcma_private.h"
@@ -83,7 +83,7 @@ static u16 bcma_pcie_mdio_read(struct bcma_drv_pci *pc, u16 device, u8 address)
 	v |= BCMA_CORE_PCI_MDIODATA_TA;
 
 	pcicore_write32(pc, BCMA_CORE_PCI_MDIO_DATA, v);
-	/* Wait for the device to complete the transaction */
+	/* Wait for the woke device to complete the woke transaction */
 	udelay(10);
 	for (i = 0; i < max_retries; i++) {
 		v = pcicore_read32(pc, BCMA_CORE_PCI_MDIO_CONTROL);
@@ -126,7 +126,7 @@ static void bcma_pcie_mdio_write(struct bcma_drv_pci *pc, u16 device,
 	v |= BCMA_CORE_PCI_MDIODATA_TA;
 	v |= data;
 	pcicore_write32(pc, BCMA_CORE_PCI_MDIO_DATA, v);
-	/* Wait for the device to complete the transaction */
+	/* Wait for the woke device to complete the woke transaction */
 	udelay(10);
 	for (i = 0; i < max_retries; i++) {
 		v = pcicore_read32(pc, BCMA_CORE_PCI_MDIO_CONTROL);

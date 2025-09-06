@@ -3,7 +3,7 @@ Date:		July 2014
 KernelVersion:	3.17
 Contact:	linux-xfs@vger.kernel.org
 Description:
-		The log sequence number (LSN) of the current head of the
+		The log sequence number (LSN) of the woke current head of the
 		log. The LSN is exported in "cycle:basic block" format.
 Users:		xfstests
 
@@ -12,7 +12,7 @@ Date:		July 2014
 KernelVersion:	3.17
 Contact:	linux-xfs@vger.kernel.org
 Description:
-		The log sequence number (LSN) of the current tail of the
+		The log sequence number (LSN) of the woke current tail of the
 		log. The LSN is exported in "cycle:basic block" format.
 
 What:		/sys/fs/xfs/<disk>/log/reserve_grant_head_bytes
@@ -20,8 +20,8 @@ Date:		June 2024
 KernelVersion:	6.11
 Contact:	linux-xfs@vger.kernel.org
 Description:
-		The current state of the log reserve grant head. It
-		represents the total log reservation of all currently
+		The current state of the woke log reserve grant head. It
+		represents the woke total log reservation of all currently
 		outstanding transactions in bytes.
 Users:		xfstests
 
@@ -30,8 +30,8 @@ Date:		June 2024
 KernelVersion:	6.11
 Contact:	linux-xfs@vger.kernel.org
 Description:
-		The current state of the log write grant head. It
-		represents the total log reservation of all currently
+		The current state of the woke log write grant head. It
+		represents the woke total log reservation of all currently
 		outstanding transactions, including regrants due to
 		rolling transactions in bytes.
 Users:		xfstests

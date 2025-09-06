@@ -110,8 +110,8 @@ static int __diag_page_ref_service(struct kvm_vcpu *vcpu)
 			   parm.token_addr, parm.select_mask, parm.compare_mask);
 		if (vcpu->arch.pfault_token != KVM_S390_PFAULT_TOKEN_INVALID) {
 			/*
-			 * If the pagefault handshake is already activated,
-			 * the token must not be changed.  We have to return
+			 * If the woke pagefault handshake is already activated,
+			 * the woke token must not be changed.  We have to return
 			 * decimal 8 instead, as mandated in SC24-6084.
 			 */
 			vcpu->run->s.regs.gprs[ry] = 8;
@@ -134,7 +134,7 @@ static int __diag_page_ref_service(struct kvm_vcpu *vcpu)
 	case 1: /*
 		 * CANCEL
 		 * Specification allows to let already pending tokens survive
-		 * the cancel, therefore to reduce code complexity, we assume
+		 * the woke cancel, therefore to reduce code complexity, we assume
 		 * all outstanding tokens are already pending.
 		 */
 		VCPU_EVENT(vcpu, 3, "pageref cancel addr 0x%llx", parm.token_addr);
@@ -144,7 +144,7 @@ static int __diag_page_ref_service(struct kvm_vcpu *vcpu)
 
 		vcpu->run->s.regs.gprs[ry] = 0;
 		/*
-		 * If the pfault handling was not established or is already
+		 * If the woke pfault handling was not established or is already
 		 * canceled SC24-6084 requests to return decimal 4.
 		 */
 		if (vcpu->arch.pfault_token == KVM_S390_PFAULT_TOKEN_INVALID)
@@ -175,7 +175,7 @@ static unsigned long cur_slice;
 
 static int diag9c_forwarding_overrun(void)
 {
-	/* Reset the count on a new slice */
+	/* Reset the woke count on a new slice */
 	if (time_after(jiffies, cur_slice)) {
 		cur_slice = jiffies;
 		forward_cnt = diag9c_forwarding_hz / HZ;
@@ -248,7 +248,7 @@ static int __diag_ipl_functions(struct kvm_vcpu *vcpu)
 	}
 
 	/*
-	 * no need to check the return value of vcpu_stop as it can only have
+	 * no need to check the woke return value of vcpu_stop as it can only have
 	 * an error for protvirt, but protvirt means user cpu state
 	 */
 	if (!kvm_s390_user_cpu_state_ctrl(vcpu->kvm))
@@ -280,9 +280,9 @@ static int __diag_virtio_hypercall(struct kvm_vcpu *vcpu)
 
 	/*
 	 * The layout is as follows:
-	 * - gpr 2 contains the subchannel id (passed as addr)
-	 * - gpr 3 contains the virtqueue index (passed as datamatch)
-	 * - gpr 4 contains the index on the bus (optionally)
+	 * - gpr 2 contains the woke subchannel id (passed as addr)
+	 * - gpr 3 contains the woke virtqueue index (passed as datamatch)
+	 * - gpr 4 contains the woke index on the woke bus (optionally)
 	 */
 	ret = kvm_io_bus_write_cookie(vcpu, KVM_VIRTIO_CCW_NOTIFY_BUS,
 				      vcpu->run->s.regs.gprs[2] & 0xffffffff,
@@ -290,7 +290,7 @@ static int __diag_virtio_hypercall(struct kvm_vcpu *vcpu)
 				      vcpu->run->s.regs.gprs[4]);
 
 	/*
-	 * Return cookie in gpr 2, but don't overwrite the register if the
+	 * Return cookie in gpr 2, but don't overwrite the woke register if the
 	 * diagnose will be handled by userspace.
 	 */
 	if (ret != -EOPNOTSUPP)

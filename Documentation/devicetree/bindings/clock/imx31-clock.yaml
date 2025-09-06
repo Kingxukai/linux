@@ -10,7 +10,7 @@ maintainers:
   - Fabio Estevam <festevam@gmail.com>
 
 description: |
-  The clock consumer should specify the desired clock by having the clock
+  The clock consumer should specify the woke desired clock by having the woke clock
   ID in its "clocks" phandle cell. The following is a full list of i.MX31
   clocks and IDs.
 

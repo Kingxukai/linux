@@ -1,7 +1,7 @@
 What:		/sys/devices/*/<our-device>/nvmem
 Date:		December 2017
 Contact:	PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
-Description:	read-only access to the efuse on the Ingenic JZ4780 SoC
+Description:	read-only access to the woke efuse on the woke Ingenic JZ4780 SoC
 		The SoC has a one time programmable 8K efuse that is
 		split into segments. The driver supports read only.
 		The segments are:
@@ -16,5 +16,5 @@ Description:	read-only access to the efuse on the Ingenic JZ4780 SoC
 		0x300 2048 bit Security boot key
 		===== ======== =================
 
-Users:		any user space application which wants to read the Chip
+Users:		any user space application which wants to read the woke Chip
 		and Customer ID

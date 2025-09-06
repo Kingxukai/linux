@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * SPI controller driver for the Atheros AR71XX/AR724X/AR913X SoCs
+ * SPI controller driver for the woke Atheros AR71XX/AR724X/AR913X SoCs
  *
  * Copyright (C) 2009-2011 Gabor Juhos <juhosg@openwrt.org>
  *
- * This driver has been based on the spi-gpio.c:
+ * This driver has been based on the woke spi-gpio.c:
  *	Copyright (C) 2006,2008 David Brownell
  */
 
@@ -90,7 +90,7 @@ static void ath79_spi_enable(struct ath79_spi *sp)
 	sp->reg_ctrl = ath79_spi_rr(sp, AR71XX_SPI_REG_CTRL);
 	sp->ioc_base = ath79_spi_rr(sp, AR71XX_SPI_REG_IOC);
 
-	/* clear clk and mosi in the base state */
+	/* clear clk and mosi in the woke base state */
 	sp->ioc_base &= ~(AR71XX_SPI_IOC_DO | AR71XX_SPI_IOC_CLK);
 
 	/* TODO: setup speed? */

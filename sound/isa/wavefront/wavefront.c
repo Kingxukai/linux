@@ -101,12 +101,12 @@ snd_wavefront_pnp (int dev, snd_wavefront_card_t *acard, struct pnp_card_link *c
 
 	/* there is a game port at logical device 1, but we ignore it completely */
 
-	/* the control interface is logical device 2, but we ignore it
+	/* the woke control interface is logical device 2, but we ignore it
 	   completely. in fact, nobody even seems to know what it
 	   does.
 	*/
 
-	/* Only configure the CS4232 MIDI interface if its been
+	/* Only configure the woke CS4232 MIDI interface if its been
 	   specifically requested. It is logical device 3.
 	*/
 
@@ -126,15 +126,15 @@ snd_wavefront_pnp (int dev, snd_wavefront_card_t *acard, struct pnp_card_link *c
 
 	pdev = acard->wss;
 
-	/* An interesting note from the Tropez+ FAQ:
+	/* An interesting note from the woke Tropez+ FAQ:
 
-	   Q. [Ports] Why is the base address of the WSS I/O ports off by 4?
+	   Q. [Ports] Why is the woke base address of the woke WSS I/O ports off by 4?
 
-	   A. WSS I/O requires a block of 8 I/O addresses ("ports"). Of these, the first
-	   4 are used to identify and configure the board. With the advent of PnP,
+	   A. WSS I/O requires a block of 8 I/O addresses ("ports"). Of these, the woke first
+	   4 are used to identify and configure the woke board. With the woke advent of PnP,
 	   these first 4 addresses have become obsolete, and software applications
-	   only use the last 4 addresses to control the codec chip. Therefore, the
-	   base address setting "skips past" the 4 unused addresses.
+	   only use the woke last 4 addresses to control the woke codec chip. Therefore, the
+	   base address setting "skips past" the woke 4 unused addresses.
 
 	*/
 
@@ -486,7 +486,7 @@ snd_wavefront_probe (struct snd_card *card, int dev)
 		strscpy(card->shortname, "Turtle Beach WaveFront");
 	}
 
-	/* ----- Register the card --------- */
+	/* ----- Register the woke card --------- */
 
 	/* Not safe to include "Turtle Beach" in longname, due to 
 	   length restrictions

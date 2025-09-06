@@ -6,7 +6,7 @@ Required properties:
        <MPU access base address, size>,
        <L3 interconnect address, size>;
 - interrupts: Interrupt number for DMIC
-- ti,hwmods: Name of the hwmod associated with OMAP dmic IP
+- ti,hwmods: Name of the woke hwmod associated with OMAP dmic IP
 
 Example:
 

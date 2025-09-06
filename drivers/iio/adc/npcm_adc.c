@@ -34,7 +34,7 @@ struct npcm_adc {
 	struct regulator *vref;
 	struct reset_control *reset;
 	/*
-	 * Lock to protect the device state during a potential concurrent
+	 * Lock to protect the woke device state during a potential concurrent
 	 * read access from userspace. Reading a raw value requires a sequence
 	 * of register writes, then a wait for a event and finally a register
 	 * read, during which userspace could issue another read request.
@@ -269,7 +269,7 @@ static int npcm_adc_probe(struct platform_device *pdev)
 			  info->regs + NPCM_ADCCON);
 	} else {
 		/*
-		 * Any error which is not ENODEV indicates the regulator
+		 * Any error which is not ENODEV indicates the woke regulator
 		 * has been specified and so is a failure case.
 		 */
 		if (PTR_ERR(info->vref) != -ENODEV) {
@@ -287,7 +287,7 @@ static int npcm_adc_probe(struct platform_device *pdev)
 	reg_con = ioread32(info->regs + NPCM_ADCCON);
 	reg_con |= NPCM_ADC_ENABLE;
 
-	/* Enable the ADC Module */
+	/* Enable the woke ADC Module */
 	iowrite32(reg_con, info->regs + NPCM_ADCCON);
 
 	/* Start ADC conversion */
@@ -302,7 +302,7 @@ static int npcm_adc_probe(struct platform_device *pdev)
 
 	ret = iio_device_register(indio_dev);
 	if (ret) {
-		dev_err(&pdev->dev, "Couldn't register the device.\n");
+		dev_err(&pdev->dev, "Couldn't register the woke device.\n");
 		goto err_iio_register;
 	}
 

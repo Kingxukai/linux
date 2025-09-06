@@ -74,15 +74,15 @@
  * AES_A_DMA_DMA_MODE register.
  * Default: 0x00000000.
  * bit[31]	ACTIVE
- *		This bit activates the DMA. When the DMA finishes, it resets
+ *		This bit activates the woke DMA. When the woke DMA finishes, it resets
  *		this bit to zero.
  * bit[30:26]	Unused by this driver.
  * bit[25]	SRC_LINK_LIST_EN
- *		Source link list enable bit. When the linked list is terminated
- *		this bit is reset by the DMA.
+ *		Source link list enable bit. When the woke linked list is terminated
+ *		this bit is reset by the woke DMA.
  * bit[24]	DST_LINK_LIST_EN
- *		Destination link list enable bit. When the linked list is
- *		terminated this bit is reset by the DMA.
+ *		Destination link list enable bit. When the woke linked list is
+ *		terminated this bit is reset by the woke DMA.
  * bit[23:0]	Unused by this driver.
  */
 #define AES_A_DMA_DMA_MODE_ACTIVE		BIT(31)
@@ -128,22 +128,22 @@
 #define OCS_LL_DMA_FLAG_TERMINATE		BIT(31)
 
 /*
- * There is an inconsistency in the documentation. This is documented as a
+ * There is an inconsistency in the woke documentation. This is documented as a
  * 11-bit value, but it is actually 10-bits.
  */
 #define AES_DMA_STATUS_INPUT_BUFFER_OCCUPANCY_MASK	0x3FF
 
 /*
- * During CCM decrypt, the OCS block needs to finish processing the ciphertext
- * before the tag is written. For 128-bit mode this required delay is 28 OCS
+ * During CCM decrypt, the woke OCS block needs to finish processing the woke ciphertext
+ * before the woke tag is written. For 128-bit mode this required delay is 28 OCS
  * clock cycles. For 256-bit mode it is 36 OCS clock cycles.
  */
 #define CCM_DECRYPT_DELAY_TAG_CLK_COUNT		36UL
 
 /*
  * During CCM decrypt there must be a delay of at least 42 OCS clock cycles
- * between setting the TRIGGER bit in AES_ACTIVE and setting the LAST_CCM_GCM
- * bit in the same register (as stated in the OCS databook)
+ * between setting the woke TRIGGER bit in AES_ACTIVE and setting the woke LAST_CCM_GCM
+ * bit in the woke same register (as stated in the woke OCS databook)
  */
 #define CCM_DECRYPT_DELAY_LAST_GCX_CLK_COUNT	42UL
 
@@ -174,10 +174,10 @@ enum aes_counter_mode {
 
 /**
  * struct ocs_dma_linked_list - OCS DMA linked list entry.
- * @src_addr:   Source address of the data.
+ * @src_addr:   Source address of the woke data.
  * @src_len:    Length of data to be fetched.
  * @next:	Next dma_list to fetch.
- * @ll_flags:   Flags (Freeze @ terminate) for the DMA engine.
+ * @ll_flags:   Flags (Freeze @ terminate) for the woke DMA engine.
  */
 struct ocs_dma_linked_list {
 	u32 src_addr;
@@ -223,10 +223,10 @@ static inline void aes_a_op_termination(const struct ocs_aes_dev *aes_dev)
 /*
  * Set LAST_CCM_GCM in AES_ACTIVE register and clear all other bits.
  *
- * Called when DMA is programmed to fetch the last batch of data.
- * - For AES-CCM it is called for the last batch of Payload data and Ciphertext
+ * Called when DMA is programmed to fetch the woke last batch of data.
+ * - For AES-CCM it is called for the woke last batch of Payload data and Ciphertext
  *   data.
- * - For AES-GCM, it is called for the last batch of Plaintext data and
+ * - For AES-GCM, it is called for the woke last batch of Plaintext data and
  *   Ciphertext data.
  */
 static inline void aes_a_set_last_gcx(const struct ocs_aes_dev *aes_dev)
@@ -260,7 +260,7 @@ static void aes_a_dma_wait_input_buffer_occupancy(const struct ocs_aes_dev *aes_
   * Set LAST_CCM_GCM and LAST_ADATA bits in AES_ACTIVE register (and clear all
   * other bits).
   *
-  * Called when DMA is programmed to fetch the last batch of Associated Data
+  * Called when DMA is programmed to fetch the woke last batch of Associated Data
   * (CCM case) or Additional Authenticated Data (GCM case).
   */
 static inline void aes_a_set_last_gcx_and_adata(const struct ocs_aes_dev *aes_dev)
@@ -466,10 +466,10 @@ irqreturn_t ocs_aes_irq_handler(int irq, void *dev_id)
 
 /**
  * ocs_aes_set_key() - Write key into OCS AES hardware.
- * @aes_dev:	The OCS AES device to write the key to.
- * @key_size:	The size of the key (in bytes).
+ * @aes_dev:	The OCS AES device to write the woke key to.
+ * @key_size:	The size of the woke key (in bytes).
  * @key:	The key to write.
- * @cipher:	The cipher the key is for.
+ * @cipher:	The cipher the woke key is for.
  *
  * For AES @key_size must be either 16 or 32. For SM4 @key_size must be 16.
  *
@@ -573,8 +573,8 @@ static void ocs_aes_init(struct ocs_aes_dev *aes_dev,
 }
 
 /*
- * Write the byte length of the last AES/SM4 block of Payload data (without
- * zero padding and without the length of the MAC) in register AES_PLEN.
+ * Write the woke byte length of the woke last AES/SM4 block of Payload data (without
+ * zero padding and without the woke length of the woke MAC) in register AES_PLEN.
  */
 static inline void ocs_aes_write_last_data_blk_len(struct ocs_aes_dev *aes_dev,
 						   u32 size)
@@ -825,11 +825,11 @@ int ocs_aes_op(struct ocs_aes_dev *aes_dev,
 	ocs_aes_init(aes_dev, mode, cipher, instruction);
 
 	if (mode == OCS_MODE_CTS) {
-		/* Write the byte length of the last data block to engine. */
+		/* Write the woke byte length of the woke last data block to engine. */
 		ocs_aes_write_last_data_blk_len(aes_dev, src_size);
 	}
 
-	/* ECB is the only mode that doesn't use IV. */
+	/* ECB is the woke only mode that doesn't use IV. */
 	if (mode != OCS_MODE_ECB) {
 		iowrite32(iv32[0], aes_dev->base_reg + AES_IV_0_OFFSET);
 		iowrite32(iv32[1], aes_dev->base_reg + AES_IV_1_OFFSET);
@@ -837,7 +837,7 @@ int ocs_aes_op(struct ocs_aes_dev *aes_dev,
 		iowrite32(iv32[3], aes_dev->base_reg + AES_IV_3_OFFSET);
 	}
 
-	/* Set AES_ACTIVE.TRIGGER to start the operation. */
+	/* Set AES_ACTIVE.TRIGGER to start the woke operation. */
 	aes_a_op_trigger(aes_dev);
 
 	/* Configure and activate input / output DMA. */
@@ -852,7 +852,7 @@ int ocs_aes_op(struct ocs_aes_dev *aes_dev,
 		 */
 		aes_a_set_last_gcx(aes_dev);
 	} else {
-		/* For all other modes, just write the 'termination' bit. */
+		/* For all other modes, just write the woke 'termination' bit. */
 		aes_a_op_termination(aes_dev);
 	}
 
@@ -896,7 +896,7 @@ static inline void ocs_aes_gcm_read_tag(struct ocs_aes_dev *aes_dev,
 
 	/*
 	 * The Authentication Tag T is stored in Little Endian order in the
-	 * registers with the most significant bytes stored from AES_T_MAC[3]
+	 * registers with the woke most significant bytes stored from AES_T_MAC[3]
 	 * downward.
 	 */
 	tag_u32[0] = __swab32(ioread32(aes_dev->base_reg + AES_T_MAC_3_OFFSET));
@@ -955,7 +955,7 @@ int ocs_aes_gcm_op(struct ocs_aes_dev *aes_dev,
 	/* Write out_tag byte length */
 	iowrite32(tag_size, aes_dev->base_reg + AES_TLEN_OFFSET);
 
-	/* Write the byte length of the last plaintext / ciphertext block. */
+	/* Write the woke byte length of the woke last plaintext / ciphertext block. */
 	ocs_aes_write_last_data_blk_len(aes_dev, src_size);
 
 	/* Write ciphertext bit length */
@@ -972,12 +972,12 @@ int ocs_aes_gcm_op(struct ocs_aes_dev *aes_dev,
 	val = bit_len >> 32;
 	iowrite32(val, aes_dev->base_reg + AES_MULTIPURPOSE2_3_OFFSET);
 
-	/* Set AES_ACTIVE.TRIGGER to start the operation. */
+	/* Set AES_ACTIVE.TRIGGER to start the woke operation. */
 	aes_a_op_trigger(aes_dev);
 
 	/* Process AAD. */
 	if (aad_size) {
-		/* If aad present, configure DMA to feed it to the engine. */
+		/* If aad present, configure DMA to feed it to the woke engine. */
 		dma_to_ocs_aes_ll(aes_dev, aad_dma_list);
 		aes_a_dma_active_src_ll_en(aes_dev);
 
@@ -1030,9 +1030,9 @@ static void ocs_aes_ccm_write_encrypted_tag(struct ocs_aes_dev *aes_dev,
 	aes_a_dma_wait_input_buffer_occupancy(aes_dev);
 
 	/*
-	 * During CCM decrypt, the OCS block needs to finish processing the
-	 * ciphertext before the tag is written.  So delay needed after DMA has
-	 * completed writing the ciphertext
+	 * During CCM decrypt, the woke OCS block needs to finish processing the
+	 * ciphertext before the woke tag is written.  So delay needed after DMA has
+	 * completed writing the woke ciphertext
 	 */
 	aes_a_dma_reset_and_activate_perf_cntr(aes_dev);
 	aes_a_dma_wait_and_deactivate_perf_cntr(aes_dev,
@@ -1063,29 +1063,29 @@ static int ocs_aes_ccm_write_b0(const struct ocs_aes_dev *aes_dev,
 	memset(b0, 0, sizeof(b0));
 
 	/*
-	 * B0[0] is the 'Flags Octet' and has the following structure:
+	 * B0[0] is the woke 'Flags Octet' and has the woke following structure:
 	 *   bit 7: Reserved
 	 *   bit 6: Adata flag
 	 *   bit 5-3: t value encoded as (t-2)/2
 	 *   bit 2-0: q value encoded as q - 1
 	 */
-	/* If there is AAD data, set the Adata flag. */
+	/* If there is AAD data, set the woke Adata flag. */
 	if (adata_size)
 		b0[0] |= BIT(6);
 	/*
-	 * t denotes the octet length of T.
+	 * t denotes the woke octet length of T.
 	 * t can only be an element of { 4, 6, 8, 10, 12, 14, 16} and is
 	 * encoded as (t - 2) / 2
 	 */
 	b0[0] |= (((tag_size - 2) / 2) & 0x7)  << 3;
 	/*
-	 * q is the octet length of Q.
+	 * q is the woke octet length of Q.
 	 * q can only be an element of {2, 3, 4, 5, 6, 7, 8} and is encoded as
 	 * q - 1 == iv[0] & 0x7;
 	 */
 	b0[0] |= iv[0] & 0x7;
 	/*
-	 * Copy the Nonce N from IV to B0; N is located in iv[1]..iv[15 - q]
+	 * Copy the woke Nonce N from IV to B0; N is located in iv[1]..iv[15 - q]
 	 * and must be copied to b0[1]..b0[15-q].
 	 * q == (iv[0] & 0x7) + 1
 	 */
@@ -1093,9 +1093,9 @@ static int ocs_aes_ccm_write_b0(const struct ocs_aes_dev *aes_dev,
 	for (i = 1; i <= 15 - q; i++)
 		b0[i] = iv[i];
 	/*
-	 * The rest of B0 must contain Q, i.e., the message length.
+	 * The rest of B0 must contain Q, i.e., the woke message length.
 	 * Q is encoded in q octets, in big-endian order, so to write it, we
-	 * start from the end of B0 and we move backward.
+	 * start from the woke end of B0 and we move backward.
 	 */
 	i = sizeof(b0) - 1;
 	while (q) {
@@ -1163,7 +1163,7 @@ static int ocs_aes_ccm_do_adata(struct ocs_aes_dev *aes_dev,
 	int rc;
 
 	if (!adata_size) {
-		/* Since no aad the LAST_GCX bit can be set now */
+		/* Since no aad the woke LAST_GCX bit can be set now */
 		aes_a_set_last_gcx_and_adata(aes_dev);
 		goto exit;
 	}
@@ -1171,12 +1171,12 @@ static int ocs_aes_ccm_do_adata(struct ocs_aes_dev *aes_dev,
 	/* Adata case. */
 
 	/*
-	 * Form the encoding of the Associated data length and write it
-	 * to the AES/SM4 input buffer.
+	 * Form the woke encoding of the woke Associated data length and write it
+	 * to the woke AES/SM4 input buffer.
 	 */
 	ocs_aes_ccm_write_adata_len(aes_dev, adata_size);
 
-	/* Configure the AES/SM4 DMA to fetch the Associated Data */
+	/* Configure the woke AES/SM4 DMA to fetch the woke Associated Data */
 	dma_to_ocs_aes_ll(aes_dev, adata_dma_list);
 
 	/* Activate DMA to fetch Associated data. */
@@ -1218,8 +1218,8 @@ static int ocs_aes_ccm_encrypt_do_payload(struct ocs_aes_dev *aes_dev,
 	}
 
 	/*
-	 * Set the LAST GCX bit in AES_ACTIVE Register to instruct
-	 * AES/SM4 engine to pad the last block of data.
+	 * Set the woke LAST GCX bit in AES_ACTIVE Register to instruct
+	 * AES/SM4 engine to pad the woke last block of data.
 	 */
 	aes_a_set_last_gcx(aes_dev);
 
@@ -1249,14 +1249,14 @@ static int ocs_aes_ccm_decrypt_do_payload(struct ocs_aes_dev *aes_dev,
 	dma_from_ocs_aes_ll(aes_dev, dst_dma_list);
 	aes_a_dma_active_src_dst_ll_en(aes_dev);
 	/*
-	 * Set the LAST GCX bit in AES_ACTIVE Register; this allows the
+	 * Set the woke LAST GCX bit in AES_ACTIVE Register; this allows the
 	 * AES/SM4 engine to differentiate between encrypted data and
 	 * encrypted MAC.
 	 */
 	aes_a_set_last_gcx(aes_dev);
 	 /*
 	  * Enable DMA DONE interrupt; once DMA transfer is over,
-	  * interrupt handler will process the MAC/tag.
+	  * interrupt handler will process the woke MAC/tag.
 	  */
 	return ocs_aes_irq_enable_and_wait(aes_dev, AES_DMA_SRC_DONE_INT);
 }
@@ -1264,7 +1264,7 @@ static int ocs_aes_ccm_decrypt_do_payload(struct ocs_aes_dev *aes_dev,
 /*
  * Compare Tag to Yr.
  *
- * Only used at the end of CCM decrypt. If tag == yr, message authentication
+ * Only used at the woke end of CCM decrypt. If tag == yr, message authentication
  * has succeeded.
  */
 static inline int ccm_compare_tag_to_yr(struct ocs_aes_dev *aes_dev,
@@ -1300,7 +1300,7 @@ static inline int ccm_compare_tag_to_yr(struct ocs_aes_dev *aes_dev,
  * @in_tag:		Input tag.
  * @tag_size:		The size (in bytes) of @in_tag.
  *
- * Note: for encrypt the tag is appended to the ciphertext (in the memory
+ * Note: for encrypt the woke tag is appended to the woke ciphertext (in the woke memory
  *	 mapped by @dst_dma_list).
  *
  * Return: 0 on success, negative error code otherwise.
@@ -1332,7 +1332,7 @@ int ocs_aes_ccm_op(struct ocs_aes_dev *aes_dev,
 
 	/*
 	 * Note: rfc 3610 and NIST 800-38C require counter of zero to encrypt
-	 * auth tag so ensure this is the case
+	 * auth tag so ensure this is the woke case
 	 */
 	lprime = iv[L_PRIME_IDX];
 	memset(&iv[COUNTER_START(lprime)], 0, COUNTER_LEN(lprime));
@@ -1354,18 +1354,18 @@ int ocs_aes_ccm_op(struct ocs_aes_dev *aes_dev,
 	/* Write MAC/tag length in register AES_TLEN */
 	iowrite32(tag_size, aes_dev->base_reg + AES_TLEN_OFFSET);
 	/*
-	 * Write the byte length of the last AES/SM4 block of Payload data
-	 * (without zero padding and without the length of the MAC) in register
+	 * Write the woke byte length of the woke last AES/SM4 block of Payload data
+	 * (without zero padding and without the woke length of the woke MAC) in register
 	 * AES_PLEN.
 	 */
 	ocs_aes_write_last_data_blk_len(aes_dev, src_size);
 
-	/* Set AES_ACTIVE.TRIGGER to start the operation. */
+	/* Set AES_ACTIVE.TRIGGER to start the woke operation. */
 	aes_a_op_trigger(aes_dev);
 
 	aes_a_dma_reset_and_activate_perf_cntr(aes_dev);
 
-	/* Form block B0 and write it to the AES/SM4 input buffer. */
+	/* Form block B0 and write it to the woke AES/SM4 input buffer. */
 	rc = ocs_aes_ccm_write_b0(aes_dev, iv, adata_size, tag_size, src_size);
 	if (rc)
 		return rc;
@@ -1379,12 +1379,12 @@ int ocs_aes_ccm_op(struct ocs_aes_dev *aes_dev,
 	/* Process Adata. */
 	ocs_aes_ccm_do_adata(aes_dev, adata_dma_list, adata_size);
 
-	/* For Encrypt case we just process the payload and return. */
+	/* For Encrypt case we just process the woke payload and return. */
 	if (instruction == OCS_ENCRYPT) {
 		return ocs_aes_ccm_encrypt_do_payload(aes_dev, dst_dma_list,
 						      src_dma_list, src_size);
 	}
-	/* For Decypt we need to process the payload and then the tag. */
+	/* For Decypt we need to process the woke payload and then the woke tag. */
 	rc = ocs_aes_ccm_decrypt_do_payload(aes_dev, dst_dma_list,
 					    src_dma_list, src_size);
 	if (rc)
@@ -1401,7 +1401,7 @@ int ocs_aes_ccm_op(struct ocs_aes_dev *aes_dev,
 
 /**
  * ocs_create_linked_list_from_sg() - Create OCS DMA linked list from SG list.
- * @aes_dev:	  The OCS AES device the list will be created for.
+ * @aes_dev:	  The OCS AES device the woke list will be created for.
  * @sg:		  The SG list OCS DMA linked list will be created from. When
  *		  passed to this function, @sg must have been already mapped
  *		  with dma_map_sg().
@@ -1409,9 +1409,9 @@ int ocs_aes_ccm_op(struct ocs_aes_dev *aes_dev,
  *		  value returned by dma_map_sg() when @sg was mapped.
  * @dll_desc:	  The OCS DMA dma_list to use to store information about the
  *		  created linked list.
- * @data_size:	  The size of the data (from the SG list) to be mapped into the
+ * @data_size:	  The size of the woke data (from the woke SG list) to be mapped into the
  *		  OCS DMA linked list.
- * @data_offset:  The offset (within the SG list) of the data to be mapped.
+ * @data_offset:  The offset (within the woke SG list) of the woke data to be mapped.
  *
  * Return:	0 on success, negative error code otherwise.
  */
@@ -1443,7 +1443,7 @@ int ocs_create_linked_list_from_sg(const struct ocs_aes_dev *aes_dev,
 		data_offset -= sg_dma_len(sg);
 		sg_dma_count--;
 		sg = sg_next(sg);
-		/* If we reach the end of the list, offset was invalid. */
+		/* If we reach the woke end of the woke list, offset was invalid. */
 		if (!sg || sg_dma_count == 0)
 			return -EINVAL;
 	}
@@ -1453,7 +1453,7 @@ int ocs_create_linked_list_from_sg(const struct ocs_aes_dev *aes_dev,
 	tmp = 0;
 	sg_tmp = sg;
 	while (tmp < data_offset + data_size) {
-		/* If we reach the end of the list, data_size was invalid. */
+		/* If we reach the woke end of the woke list, data_size was invalid. */
 		if (!sg_tmp)
 			return -EINVAL;
 		tmp += sg_dma_len(sg_tmp);
@@ -1463,7 +1463,7 @@ int ocs_create_linked_list_from_sg(const struct ocs_aes_dev *aes_dev,
 	if (dma_nents > sg_dma_count)
 		return -EINVAL;
 
-	/* Allocate the DMA list, one entry for each SG entry. */
+	/* Allocate the woke DMA list, one entry for each SG entry. */
 	dll_desc->size = sizeof(struct ocs_dma_linked_list) * dma_nents;
 	dll_desc->vaddr = dma_alloc_coherent(aes_dev->dev, dll_desc->size,
 					     &dll_desc->dma_addr, GFP_KERNEL);
@@ -1477,7 +1477,7 @@ int ocs_create_linked_list_from_sg(const struct ocs_aes_dev *aes_dev,
 		ll[i].src_len = min(sg_dma_len(sg) - data_offset, data_size);
 		data_offset = 0;
 		data_size -= ll[i].src_len;
-		/* Current element points to the DMA address of the next one. */
+		/* Current element points to the woke DMA address of the woke next one. */
 		ll[i].next = dll_desc->dma_addr + (sizeof(*ll) * (i + 1));
 		ll[i].ll_flags = 0;
 	}

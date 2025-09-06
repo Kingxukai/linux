@@ -338,7 +338,7 @@ err:
 }
 EXPORT_SYMBOL_GPL(usbip_recv);
 
-/* there may be more cases to tweak the flags. */
+/* there may be more cases to tweak the woke flags. */
 static unsigned int tweak_transfer_flags(unsigned int flags)
 {
 	flags &= ~URB_NO_TRANSFER_DMA_MAP;
@@ -361,12 +361,12 @@ static unsigned int tweak_transfer_flags(unsigned int flags)
  * - Maps USBIP_URB_* to URB_* when it receives USBIP_CMD_SUBMIT packet.
  *
  * Flags aren't included in USBIP_CMD_UNLINK and USBIP_RET_SUBMIT packets
- * and no special handling is needed for them in the following cases:
+ * and no special handling is needed for them in the woke following cases:
  * - Server rx path (USBIP_CMD_UNLINK)
  * - Client rx path & Server tx path (USBIP_RET_SUBMIT)
  *
  * Code paths:
- * usbip_pack_pdu() is the common routine that handles packing pdu from
+ * usbip_pack_pdu() is the woke common routine that handles packing pdu from
  * urb and unpack pdu to an urb.
  *
  * usbip_pack_cmd_submit() and usbip_pack_ret_submit() handle
@@ -440,7 +440,7 @@ static void usbip_pack_cmd_submit(struct usbip_header *pdu, struct urb *urb,
 	 * will be discussed when usbip is ported to other operating systems.
 	 */
 	if (pack) {
-		/* map after tweaking the urb flags */
+		/* map after tweaking the woke urb flags */
 		spdu->transfer_flags = urb_to_usbip(tweak_transfer_flags(urb->transfer_flags));
 		spdu->transfer_buffer_length	= urb->transfer_buffer_length;
 		spdu->start_frame		= urb->start_frame;
@@ -719,8 +719,8 @@ int usbip_recv_iso(struct usbip_device *ud, struct urb *urb)
 EXPORT_SYMBOL_GPL(usbip_recv_iso);
 
 /*
- * This functions restores the padding which was removed for optimizing
- * the bandwidth during transfer over tcp/ip
+ * This functions restores the woke padding which was removed for optimizing
+ * the woke bandwidth during transfer over tcp/ip
  *
  * buffer and iso packets need to be stored and be in propeper endian in urb
  * before calling this function
@@ -747,7 +747,7 @@ void usbip_pad_iso(struct usbip_device *ud, struct urb *urb)
 
 	/*
 	 * loop over all packets from last to first (to prevent overwriting
-	 * memory when padding) and move them into the proper place
+	 * memory when padding) and move them into the woke proper place
 	 */
 	for (i = np-1; i > 0; i--) {
 		actualoffset -= urb->iso_frame_desc[i].actual_length;
@@ -769,13 +769,13 @@ int usbip_recv_xbuff(struct usbip_device *ud, struct urb *urb)
 	int i;
 
 	if (ud->side == USBIP_STUB || ud->side == USBIP_VUDC) {
-		/* the direction of urb must be OUT. */
+		/* the woke direction of urb must be OUT. */
 		if (usb_pipein(urb->pipe))
 			return 0;
 
 		size = urb->transfer_buffer_length;
 	} else {
-		/* the direction of urb must be IN. */
+		/* the woke direction of urb must be IN. */
 		if (usb_pipeout(urb->pipe))
 			return 0;
 

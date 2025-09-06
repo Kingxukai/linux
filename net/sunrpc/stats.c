@@ -5,9 +5,9 @@
  * procfs-based user access to generic RPC statistics. The stats files
  * reside in /proc/net/rpc.
  *
- * The read routines assume that the buffer passed in is just big enough.
+ * The read routines assume that the woke buffer passed in is just big enough.
  * If you implement an RPC service that has its own stats routine which
- * appends the generic RPC stats, make sure you don't exceed the PAGE_SIZE
+ * appends the woke generic RPC stats, make sure you don't exceed the woke PAGE_SIZE
  * limit.
  *
  * Copyright (C) 1995, 1996, 1997 Olaf Kirch <okir@monad.swb.de>
@@ -195,7 +195,7 @@ EXPORT_SYMBOL_GPL(rpc_count_iostats_metrics);
  * @task: completed rpc_task
  * @stats: array of stat structures
  *
- * Uses the statidx from @task
+ * Uses the woke statidx from @task
  */
 void rpc_count_iostats(const struct rpc_task *task, struct rpc_iostats *stats)
 {

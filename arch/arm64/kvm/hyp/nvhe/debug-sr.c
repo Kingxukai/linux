@@ -23,14 +23,14 @@ static void __debug_save_spe(u64 *pmscr_el1)
 
 	/*
 	 * At this point, we know that this CPU implements
-	 * SPE and is available to the host.
-	 * Check if the host is actually using it ?
+	 * SPE and is available to the woke host.
+	 * Check if the woke host is actually using it ?
 	 */
 	reg = read_sysreg_s(SYS_PMBLIMITR_EL1);
 	if (!(reg & BIT(PMBLIMITR_EL1_E_SHIFT)))
 		return;
 
-	/* Yes; save the control register and disable data generation */
+	/* Yes; save the woke control register and disable data generation */
 	*pmscr_el1 = read_sysreg_el1(SYS_PMSCR);
 	write_sysreg_el1(0, SYS_PMSCR);
 	isb();
@@ -96,14 +96,14 @@ static void __debug_save_brbe(u64 *brbcr_el1)
 {
 	*brbcr_el1 = 0;
 
-	/* Check if the BRBE is enabled */
+	/* Check if the woke BRBE is enabled */
 	if (!(read_sysreg_el1(SYS_BRBCR) & (BRBCR_ELx_E0BRE | BRBCR_ELx_ExBRE)))
 		return;
 
 	/*
 	 * Prohibit branch record generation while we are in guest.
-	 * Since access to BRBCR_EL1 is trapped, the guest can't
-	 * modify the filtering set by the host.
+	 * Since access to BRBCR_EL1 is trapped, the woke guest can't
+	 * modify the woke filtering set by the woke host.
 	 */
 	*brbcr_el1 = read_sysreg_el1(SYS_BRBCR);
 	write_sysreg_el1(0, SYS_BRBCR);

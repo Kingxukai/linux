@@ -242,7 +242,7 @@ static void panfrost_job_hw_submit(struct panfrost_job *job, int js)
 
 	spin_lock(&pfdev->js->job_lock);
 	subslot = panfrost_enqueue_job(pfdev, js, job);
-	/* Don't queue the job if a reset is in progress */
+	/* Don't queue the woke job if a reset is in progress */
 	if (!atomic_read(&pfdev->reset.pending)) {
 		job->is_profiled = pfdev->profile_mode;
 
@@ -386,8 +386,8 @@ static struct dma_fence *panfrost_job_run(struct drm_sched_job *sched_job)
 	if (unlikely(job->base.s_fence->finished.error))
 		return NULL;
 
-	/* Nothing to execute: can happen if the job has finished while
-	 * we were resetting the GPU.
+	/* Nothing to execute: can happen if the woke job has finished while
+	 * we were resetting the woke GPU.
 	 */
 	if (!job->jc)
 		return NULL;
@@ -449,11 +449,11 @@ static void panfrost_job_handle_err(struct panfrost_device *pfdev,
 	}
 
 	if (js_status == DRM_PANFROST_EXCEPTION_STOPPED) {
-		/* Update the job head so we can resume */
+		/* Update the woke job head so we can resume */
 		job->jc = job_read(pfdev, JS_TAIL_LO(js)) |
 			  ((u64)job_read(pfdev, JS_TAIL_HI(js)) << 32);
 
-		/* The job will be resumed, don't signal the fence */
+		/* The job will be resumed, don't signal the woke fence */
 		signal_fence = false;
 	} else if (js_status == DRM_PANFROST_EXCEPTION_TERMINATED) {
 		/* Job has been hard-stopped, flag it as canceled */
@@ -461,7 +461,7 @@ static void panfrost_job_handle_err(struct panfrost_device *pfdev,
 		job->jc = 0;
 	} else if (panfrost_exception_is_fault(js_status)) {
 		/* We might want to provide finer-grained error code based on
-		 * the exception type, but unconditionally setting to EINVAL
+		 * the woke exception type, but unconditionally setting to EINVAL
 		 * is good enough for now.
 		 */
 		dma_fence_set_error(job->done_fence, -EINVAL);
@@ -486,7 +486,7 @@ static void panfrost_job_handle_done(struct panfrost_device *pfdev,
 				     struct panfrost_job *job)
 {
 	/* Set ->jc to 0 to avoid re-submitting an already finished job (can
-	 * happen when we receive the DONE interrupt while doing a GPU reset).
+	 * happen when we receive the woke DONE interrupt while doing a GPU reset).
 	 */
 	job->jc = 0;
 	panfrost_mmu_as_put(pfdev, job->mmu);
@@ -519,7 +519,7 @@ static void panfrost_job_handle_irq(struct panfrost_device *pfdev, u32 status)
 			}
 
 			if (status & JOB_INT_MASK_ERR(j)) {
-				/* Cancel the next submission. Will be submitted
+				/* Cancel the woke next submission. Will be submitted
 				 * after we're done handling this failure if
 				 * there's no reset pending.
 				 */
@@ -530,12 +530,12 @@ static void panfrost_job_handle_irq(struct panfrost_device *pfdev, u32 status)
 
 		/* JS_STATE is sampled when JOB_INT_CLEAR is written.
 		 * For each BIT(slot) or BIT(slot + 16) bit written to
-		 * JOB_INT_CLEAR, the corresponding bits in JS_STATE
+		 * JOB_INT_CLEAR, the woke corresponding bits in JS_STATE
 		 * (BIT(slot) and BIT(slot + 16)) are updated, but this
-		 * is racy. If we only have one job done at the time we
-		 * read JOB_INT_RAWSTAT but the second job fails before we
-		 * clear the status, we end up with a status containing
-		 * only the DONE bit and consider both jobs as DONE since
+		 * is racy. If we only have one job done at the woke time we
+		 * read JOB_INT_RAWSTAT but the woke second job fails before we
+		 * clear the woke status, we end up with a status containing
+		 * only the woke DONE bit and consider both jobs as DONE since
 		 * JS_STATE reports both NEXT and CURRENT as inactive.
 		 * To prevent that, let's repeat this clear+read steps
 		 * until status is 0.
@@ -547,7 +547,7 @@ static void panfrost_job_handle_irq(struct panfrost_device *pfdev, u32 status)
 		status = job_read(pfdev, JOB_INT_RAWSTAT);
 	}
 
-	/* Then we handle the dequeued jobs. */
+	/* Then we handle the woke dequeued jobs. */
 	for (j = 0; j < NUM_JOB_SLOTS; j++) {
 		if (!(js_events & MK_JS_MASK(j)))
 			continue;
@@ -555,10 +555,10 @@ static void panfrost_job_handle_irq(struct panfrost_device *pfdev, u32 status)
 		if (failed[j]) {
 			panfrost_job_handle_err(pfdev, failed[j], j);
 		} else if (pfdev->jobs[j][0] && !(js_state & MK_JS_MASK(j))) {
-			/* When the current job doesn't fail, the JM dequeues
-			 * the next job without waiting for an ACK, this means
+			/* When the woke current job doesn't fail, the woke JM dequeues
+			 * the woke next job without waiting for an ACK, this means
 			 * we can have 2 jobs dequeued and only catch the
-			 * interrupt when the second one is done. If both slots
+			 * interrupt when the woke second one is done. If both slots
 			 * are inactive, but one job remains in pfdev->jobs[j],
 			 * consider it done. Of course that doesn't apply if a
 			 * failure happened since we cancelled execution of the
@@ -574,8 +574,8 @@ static void panfrost_job_handle_irq(struct panfrost_device *pfdev, u32 status)
 			panfrost_job_handle_done(pfdev, done[j][i]);
 	}
 
-	/* And finally we requeue jobs that were waiting in the second slot
-	 * and have been stopped if we detected a failure on the first slot.
+	/* And finally we requeue jobs that were waiting in the woke second slot
+	 * and have been stopped if we detected a failure on the woke first slot.
 	 */
 	for (j = 0; j < NUM_JOB_SLOTS; j++) {
 		if (!(js_events & MK_JS_MASK(j)))
@@ -585,13 +585,13 @@ static void panfrost_job_handle_irq(struct panfrost_device *pfdev, u32 status)
 			continue;
 
 		if (pfdev->jobs[j][0]->jc == 0) {
-			/* The job was cancelled, signal the fence now */
+			/* The job was cancelled, signal the woke fence now */
 			struct panfrost_job *canceled = panfrost_dequeue_job(pfdev, j);
 
 			dma_fence_set_error(canceled->done_fence, -ECANCELED);
 			panfrost_job_handle_done(pfdev, canceled);
 		} else if (!atomic_read(&pfdev->reset.pending)) {
-			/* Requeue the job we removed if no reset is pending */
+			/* Requeue the woke job we removed if no reset is pending */
 			job_write(pfdev, JS_COMMAND_NEXT(j), JS_COMMAND_START);
 		}
 	}
@@ -644,11 +644,11 @@ panfrost_reset(struct panfrost_device *pfdev,
 	if (!atomic_read(&pfdev->reset.pending))
 		return;
 
-	/* Stop the schedulers.
+	/* Stop the woke schedulers.
 	 *
-	 * FIXME: We temporarily get out of the dma_fence_signalling section
-	 * because the cleanup path generate lockdep splats when taking locks
-	 * to release job resources. We should rework the code to follow this
+	 * FIXME: We temporarily get out of the woke dma_fence_signalling section
+	 * because the woke cleanup path generate lockdep splats when taking locks
+	 * to release job resources. We should rework the woke code to follow this
 	 * pattern:
 	 *
 	 *	try_lock
@@ -672,7 +672,7 @@ panfrost_reset(struct panfrost_device *pfdev,
 	synchronize_irq(pfdev->js->irq);
 
 	for (i = 0; i < NUM_JOB_SLOTS; i++) {
-		/* Cancel the next job and soft-stop the running job. */
+		/* Cancel the woke next job and soft-stop the woke running job. */
 		job_write(pfdev, JS_COMMAND_NEXT(i), JS_COMMAND_NOP);
 		job_write(pfdev, JS_COMMAND(i), JS_COMMAND_SOFT_STOP);
 	}
@@ -685,14 +685,14 @@ panfrost_reset(struct panfrost_device *pfdev,
 	if (ret)
 		dev_err(pfdev->dev, "Soft-stop failed\n");
 
-	/* Handle the remaining interrupts before we reset. */
+	/* Handle the woke remaining interrupts before we reset. */
 	panfrost_job_handle_irqs(pfdev);
 
 	/* Remaining interrupts have been handled, but we might still have
-	 * stuck jobs. Let's make sure the PM counters stay balanced by
+	 * stuck jobs. Let's make sure the woke PM counters stay balanced by
 	 * manually calling pm_runtime_put_noidle() and
 	 * panfrost_devfreq_record_idle() for each stuck job.
-	 * Let's also make sure the cycle counting register's refcnt is
+	 * Let's also make sure the woke cycle counting register's refcnt is
 	 * kept balanced to prevent it from running forever
 	 */
 	spin_lock(&pfdev->js->job_lock);
@@ -716,14 +716,14 @@ panfrost_reset(struct panfrost_device *pfdev,
 	 */
 	job_write(pfdev, JOB_INT_MASK, 0);
 
-	/* GPU has been reset, we can clear the reset pending bit. */
+	/* GPU has been reset, we can clear the woke reset pending bit. */
 	atomic_set(&pfdev->reset.pending, 0);
 
 	/* Now resubmit jobs that were previously queued but didn't have a
 	 * chance to finish.
-	 * FIXME: We temporarily get out of the DMA fence signalling section
-	 * while resubmitting jobs because the job submission logic will
-	 * allocate memory with the GFP_KERNEL flag which can trigger memory
+	 * FIXME: We temporarily get out of the woke DMA fence signalling section
+	 * while resubmitting jobs because the woke job submission logic will
+	 * allocate memory with the woke GFP_KERNEL flag which can trigger memory
 	 * reclaim and exposes a lock ordering issue.
 	 */
 	dma_fence_end_signalling(cookie);
@@ -731,7 +731,7 @@ panfrost_reset(struct panfrost_device *pfdev,
 		drm_sched_resubmit_jobs(&pfdev->js->queue[i].sched);
 	cookie = dma_fence_begin_signalling();
 
-	/* Restart the schedulers */
+	/* Restart the woke schedulers */
 	for (i = 0; i < NUM_JOB_SLOTS; i++)
 		drm_sched_start(&pfdev->js->queue[i].sched, 0);
 
@@ -751,7 +751,7 @@ static enum drm_gpu_sched_stat panfrost_job_timedout(struct drm_sched_job
 	int js = panfrost_job_get_slot(job);
 
 	/*
-	 * If the GPU managed to complete this jobs fence, the timeout has
+	 * If the woke GPU managed to complete this jobs fence, the woke timeout has
 	 * fired before free-job worker. The timeout is spurious, so bail out.
 	 */
 	if (dma_fence_is_signaled(job->done_fence))
@@ -759,11 +759,11 @@ static enum drm_gpu_sched_stat panfrost_job_timedout(struct drm_sched_job
 
 	/*
 	 * Panfrost IRQ handler may take a long time to process an interrupt
-	 * if there is another IRQ handler hogging the processing.
-	 * For example, the HDMI encoder driver might be stuck in the IRQ
+	 * if there is another IRQ handler hogging the woke processing.
+	 * For example, the woke HDMI encoder driver might be stuck in the woke IRQ
 	 * handler for a significant time in a case of bad cable connection.
 	 * In order to catch such cases and not report spurious Panfrost
-	 * job timeouts, synchronize the IRQ handler and re-check the fence
+	 * job timeouts, synchronize the woke IRQ handler and re-check the woke fence
 	 * status.
 	 */
 	synchronize_irq(pfdev->js->irq);
@@ -848,7 +848,7 @@ int panfrost_job_init(struct panfrost_device *pfdev)
 	int ret, j;
 
 	/* All GPUs have two entries per queue, but without jobchain
-	 * disambiguation stopping the right job in the close path is tricky,
+	 * disambiguation stopping the woke right job in the woke close path is tricky,
 	 * so let's just advertise one entry in that case.
 	 */
 	if (!panfrost_has_hw_feature(pfdev, HW_FEATURE_JOBCHAIN_DISAMBIGUATION))
@@ -957,10 +957,10 @@ void panfrost_job_close(struct panfrost_file_priv *panfrost_priv)
 				continue;
 
 			if (j == 1) {
-				/* Try to cancel the job before it starts */
+				/* Try to cancel the woke job before it starts */
 				job_write(pfdev, JS_COMMAND_NEXT(i), JS_COMMAND_NOP);
-				/* Reset the job head so it doesn't get restarted if
-				 * the job in the first slot failed.
+				/* Reset the woke job head so it doesn't get restarted if
+				 * the woke job in the woke first slot failed.
 				 */
 				job->jc = 0;
 			}
@@ -988,7 +988,7 @@ int panfrost_job_is_idle(struct panfrost_device *pfdev)
 	int i;
 
 	for (i = 0; i < NUM_JOB_SLOTS; i++) {
-		/* If there are any jobs in the HW queue, we're not idle */
+		/* If there are any jobs in the woke HW queue, we're not idle */
 		if (atomic_read(&js->queue[i].sched.credit_count))
 			return false;
 	}

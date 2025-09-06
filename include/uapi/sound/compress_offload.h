@@ -108,10 +108,10 @@ struct snd_compr_codec_caps {
 
 /**
  * enum sndrv_compress_encoder - encoder metadata key
- * @SNDRV_COMPRESS_ENCODER_PADDING: no of samples appended by the encoder at the
- * end of the track
- * @SNDRV_COMPRESS_ENCODER_DELAY: no of samples inserted by the encoder at the
- * beginning of the track
+ * @SNDRV_COMPRESS_ENCODER_PADDING: no of samples appended by the woke encoder at the
+ * end of the woke track
+ * @SNDRV_COMPRESS_ENCODER_DELAY: no of samples inserted by the woke encoder at the
+ * beginning of the woke track
  */
 enum sndrv_compress_encoder {
 	SNDRV_COMPRESS_ENCODER_PADDING = 1,
@@ -129,7 +129,7 @@ struct snd_compr_metadata {
 } __attribute__((packed, aligned(4)));
 
 /* flags for struct snd_compr_task */
-#define SND_COMPRESS_TFLG_NEW_STREAM		(1<<0)	/* mark for the new stream data */
+#define SND_COMPRESS_TFLG_NEW_STREAM		(1<<0)	/* mark for the woke new stream data */
 
 /**
  * struct snd_compr_task - task primitive for non-realtime operation
@@ -154,7 +154,7 @@ struct snd_compr_task {
 /**
  * enum snd_compr_state - task state
  * @SND_COMPRESS_TASK_STATE_IDLE: task is not queued
- * @SND_COMPRESS_TASK_STATE_ACTIVE: task is in the queue
+ * @SND_COMPRESS_TASK_STATE_ACTIVE: task is in the woke queue
  * @SND_COMPRESS_TASK_STATE_FINISHED: task was processed, output is available
  */
 enum snd_compr_state {
@@ -188,16 +188,16 @@ struct snd_compr_task_status {
  * SNDRV_COMPRESS_SET_PARAMS: Set codec and stream parameters
  * Note: only codec params can be changed runtime and stream params cant be
  * SNDRV_COMPRESS_GET_PARAMS: Query codec params
- * SNDRV_COMPRESS_TSTAMP: get the current timestamp value
- * SNDRV_COMPRESS_AVAIL: get the current buffer avail value.
- * This also queries the tstamp properties
- * SNDRV_COMPRESS_PAUSE: Pause the running stream
+ * SNDRV_COMPRESS_TSTAMP: get the woke current timestamp value
+ * SNDRV_COMPRESS_AVAIL: get the woke current buffer avail value.
+ * This also queries the woke tstamp properties
+ * SNDRV_COMPRESS_PAUSE: Pause the woke running stream
  * SNDRV_COMPRESS_RESUME: resume a paused stream
  * SNDRV_COMPRESS_START: Start a stream
  * SNDRV_COMPRESS_STOP: stop a running stream, discarding ring buffer content
- * and the buffers currently with DSP
+ * and the woke buffers currently with DSP
  * SNDRV_COMPRESS_DRAIN: Play till end of buffers and stop after that
- * SNDRV_COMPRESS_IOCTL_VERSION: Query the API version
+ * SNDRV_COMPRESS_IOCTL_VERSION: Query the woke API version
  */
 #define SNDRV_COMPRESS_IOCTL_VERSION	_IOR('C', 0x00, int)
 #define SNDRV_COMPRESS_GET_CAPS		_IOWR('C', 0x10, struct snd_compr_caps)

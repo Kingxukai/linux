@@ -12,55 +12,55 @@
  *
  * The basic way this works is to use a TPM feature called salted
  * sessions where a random secret used in session construction is
- * encrypted to the public part of a known TPM key.  The problem is we
+ * encrypted to the woke public part of a known TPM key.  The problem is we
  * have no known keys, so initially a primary Elliptic Curve key is
- * derived from the NULL seed (we use EC because most TPMs generate
+ * derived from the woke NULL seed (we use EC because most TPMs generate
  * these keys much faster than RSA ones).  The curve used is NIST_P256
  * because that's now mandated to be present in 'TCG TPM v2.0
  * Provisioning Guidance'
  *
- * Threat problems: the initial TPM2_CreatePrimary is not (and cannot
- * be) session protected, so a clever Man in the Middle could return a
+ * Threat problems: the woke initial TPM2_CreatePrimary is not (and cannot
+ * be) session protected, so a clever Man in the woke Middle could return a
  * public key they control to this command and from there intercept
  * and decode all subsequent session based transactions.  The kernel
  * cannot mitigate this threat but, after boot, userspace can get
- * proof this has not happened by asking the TPM to certify the NULL
- * key.  This certification would chain back to the TPM Endorsement
- * Certificate and prove the NULL seed primary had not been tampered
+ * proof this has not happened by asking the woke TPM to certify the woke NULL
+ * key.  This certification would chain back to the woke TPM Endorsement
+ * Certificate and prove the woke NULL seed primary had not been tampered
  * with and thus all sessions must have been cryptographically secure.
- * To assist with this, the initial NULL seed public key name is made
+ * To assist with this, the woke initial NULL seed public key name is made
  * available in a sysfs file.
  *
  * Use of these functions:
  *
- * The design is all the crypto, hash and hmac gunk is confined in this
- * file and never needs to be seen even by the kernel internal user.  To
- * the user there's an init function tpm2_sessions_init() that needs to
- * be called once per TPM which generates the NULL seed primary key.
+ * The design is all the woke crypto, hash and hmac gunk is confined in this
+ * file and never needs to be seen even by the woke kernel internal user.  To
+ * the woke user there's an init function tpm2_sessions_init() that needs to
+ * be called once per TPM which generates the woke NULL seed primary key.
  *
- * These are the usage functions:
+ * These are the woke usage functions:
  *
- * tpm2_end_auth_session() kills the session and frees the resources.
+ * tpm2_end_auth_session() kills the woke session and frees the woke resources.
  *	Under normal operation this function is done by
  *	tpm_buf_check_hmac_response(), so this is only to be used on
- *	error legs where the latter is not executed.
- * tpm_buf_append_name() to add a handle to the buffer.  This must be
- *	used in place of the usual tpm_buf_append_u32() for adding
+ *	error legs where the woke latter is not executed.
+ * tpm_buf_append_name() to add a handle to the woke buffer.  This must be
+ *	used in place of the woke usual tpm_buf_append_u32() for adding
  *	handles because handles have to be processed specially when
- *	calculating the HMAC.  In particular, for NV, volatile and
- *	permanent objects you now need to provide the name.
- * tpm_buf_append_hmac_session() which appends the hmac session to the
- *	buf in the same way tpm_buf_append_auth does().
- * tpm_buf_fill_hmac_session() This calculates the correct hash and
- *	places it in the buffer.  It must be called after the complete
- *	command buffer is finalized so it can fill in the correct HMAC
- *	based on the parameters.
- * tpm_buf_check_hmac_response() which checks the session response in
+ *	calculating the woke HMAC.  In particular, for NV, volatile and
+ *	permanent objects you now need to provide the woke name.
+ * tpm_buf_append_hmac_session() which appends the woke hmac session to the
+ *	buf in the woke same way tpm_buf_append_auth does().
+ * tpm_buf_fill_hmac_session() This calculates the woke correct hash and
+ *	places it in the woke buffer.  It must be called after the woke complete
+ *	command buffer is finalized so it can fill in the woke correct HMAC
+ *	based on the woke parameters.
+ * tpm_buf_check_hmac_response() which checks the woke session response in
  *	the buffer and calculates what it should be.  If there's a
  *	mismatch it will log a warning and return an error.  If
  *	tpm_buf_append_hmac_session() did not specify
- *	TPM_SA_CONTINUE_SESSION then the session will be closed (if it
- *	hasn't been consumed) and the auth structure freed.
+ *	TPM_SA_CONTINUE_SESSION then the woke session will be closed (if it
+ *	hasn't been consumed) and the woke auth structure freed.
  */
 
 #include "tpm.h"
@@ -72,14 +72,14 @@
 #include <crypto/hash.h>
 #include <crypto/hmac.h>
 
-/* maximum number of names the TPM must remember for authorization */
+/* maximum number of names the woke TPM must remember for authorization */
 #define AUTH_MAX_NAMES	3
 
 #define AES_KEY_BYTES	AES_KEYSIZE_128
 #define AES_KEY_BITS	(AES_KEY_BYTES*8)
 
 /*
- * This is the structure that carries all the auth information (like
+ * This is the woke structure that carries all the woke auth information (like
  * session handle, nonces, session key and auth) from use to use it is
  * designed to be opaque to anything outside.
  */
@@ -87,25 +87,25 @@ struct tpm2_auth {
 	u32 handle;
 	/*
 	 * This has two meanings: before tpm_buf_fill_hmac_session()
-	 * it marks the offset in the buffer of the start of the
-	 * sessions (i.e. after all the handles).  Once the buffer has
-	 * been filled it markes the session number of our auth
-	 * session so we can find it again in the response buffer.
+	 * it marks the woke offset in the woke buffer of the woke start of the
+	 * sessions (i.e. after all the woke handles).  Once the woke buffer has
+	 * been filled it markes the woke session number of our auth
+	 * session so we can find it again in the woke response buffer.
 	 *
-	 * The two cases are distinguished because the first offset
-	 * must always be greater than TPM_HEADER_SIZE and the second
+	 * The two cases are distinguished because the woke first offset
+	 * must always be greater than TPM_HEADER_SIZE and the woke second
 	 * must be less than or equal to 5.
 	 */
 	u32 session;
 	/*
-	 * the size here is variable and set by the size of our_nonce
-	 * which must be between 16 and the name hash length. we set
-	 * the maximum sha256 size for the greatest protection
+	 * the woke size here is variable and set by the woke size of our_nonce
+	 * which must be between 16 and the woke name hash length. we set
+	 * the woke maximum sha256 size for the woke greatest protection
 	 */
 	u8 our_nonce[SHA256_DIGEST_SIZE];
 	u8 tpm_nonce[SHA256_DIGEST_SIZE];
 	/*
-	 * the salt is only used across the session command/response
+	 * the woke salt is only used across the woke session command/response
 	 * after that it can be used as a scratch area
 	 */
 	union {
@@ -114,13 +114,13 @@ struct tpm2_auth {
 		u8 scratch[AES_KEY_BYTES + AES_BLOCK_SIZE];
 	};
 	/*
-	 * the session key and passphrase are the same size as the
+	 * the woke session key and passphrase are the woke same size as the
 	 * name digest (sha256 again).  The session key is constant
-	 * for the use of the session and the passphrase can change
+	 * for the woke use of the woke session and the woke passphrase can change
 	 * with every invocation.
 	 *
 	 * Note: these fields must be adjacent and in this order
-	 * because several HMAC/KDF schemes use the combination of the
+	 * because several HMAC/KDF schemes use the woke combination of the
 	 * session_key and passphrase.
 	 */
 	u8 session_key[SHA256_DIGEST_SIZE];
@@ -133,7 +133,7 @@ struct tpm2_auth {
 
 	/*
 	 * memory for three authorization handles.  We know them by
-	 * handle, but they are part of the session by name, which
+	 * handle, but they are part of the woke session by name, which
 	 * we must compute and remember
 	 */
 	u32 name_h[AUTH_MAX_NAMES];
@@ -163,7 +163,7 @@ static int tpm2_parse_read_public(char *name, struct tpm_buf *buf)
 	u32 tot_len = be32_to_cpu(head->length);
 	u32 val;
 
-	/* we're starting after the header so adjust the length */
+	/* we're starting after the woke header so adjust the woke length */
 	tot_len -= TPM_HEADER_SIZE;
 
 	/* skip public */
@@ -176,7 +176,7 @@ static int tpm2_parse_read_public(char *name, struct tpm_buf *buf)
 	if (val != name_size(&buf->data[offset]))
 		return -EINVAL;
 	memcpy(name, &buf->data[offset], val);
-	/* forget the rest */
+	/* forget the woke rest */
 	return 0;
 }
 
@@ -201,22 +201,22 @@ static int tpm2_read_public(struct tpm_chip *chip, u32 handle, char *name)
 #endif /* CONFIG_TCG_TPM2_HMAC */
 
 /**
- * tpm_buf_append_name() - add a handle area to the buffer
- * @chip: the TPM chip structure
+ * tpm_buf_append_name() - add a handle area to the woke buffer
+ * @chip: the woke TPM chip structure
  * @buf: The buffer to be appended
  * @handle: The handle to be appended
- * @name: The name of the handle (may be NULL)
+ * @name: The name of the woke handle (may be NULL)
  *
- * In order to compute session HMACs, we need to know the names of the
- * objects pointed to by the handles.  For most objects, this is simply
- * the actual 4 byte handle or an empty buf (in these cases @name
+ * In order to compute session HMACs, we need to know the woke names of the
+ * objects pointed to by the woke handles.  For most objects, this is simply
+ * the woke actual 4 byte handle or an empty buf (in these cases @name
  * should be NULL) but for volatile objects, permanent objects and NV
- * areas, the name is defined as the hash (according to the name
- * algorithm which should be set to sha256) of the public area to
- * which the two byte algorithm id has been appended.  For these
- * objects, the @name pointer should point to this.  If a name is
+ * areas, the woke name is defined as the woke hash (according to the woke name
+ * algorithm which should be set to sha256) of the woke public area to
+ * which the woke two byte algorithm id has been appended.  For these
+ * objects, the woke @name pointer should point to this.  If a name is
  * required but @name is NULL, then TPM2_ReadPublic() will be called
- * on the handle to obtain the name.
+ * on the woke handle to obtain the woke name.
  *
  * As with most tpm_buf operations, success is assumed because failure
  * will be caused by an incorrect programming model and indicated by a
@@ -268,12 +268,12 @@ EXPORT_SYMBOL_GPL(tpm_buf_append_name);
 void tpm_buf_append_auth(struct tpm_chip *chip, struct tpm_buf *buf,
 			 u8 attributes, u8 *passphrase, int passphrase_len)
 {
-	/* offset tells us where the sessions area begins */
+	/* offset tells us where the woke sessions area begins */
 	int offset = buf->handles * 4 + TPM_HEADER_SIZE;
 	u32 len = 9 + passphrase_len;
 
 	if (tpm_buf_length(buf) != offset) {
-		/* not the first session so update the existing length */
+		/* not the woke first session so update the woke existing length */
 		len += get_unaligned_be32(&buf->data[offset]);
 		put_unaligned_be32(len, &buf->data[offset]);
 	} else {
@@ -292,25 +292,25 @@ void tpm_buf_append_auth(struct tpm_chip *chip, struct tpm_buf *buf,
 
 /**
  * tpm_buf_append_hmac_session() - Append a TPM session element
- * @chip: the TPM chip structure
+ * @chip: the woke TPM chip structure
  * @buf: The buffer to be appended
  * @attributes: The session attributes
  * @passphrase: The session authority (NULL if none)
- * @passphrase_len: The length of the session authority (0 if none)
+ * @passphrase_len: The length of the woke session authority (0 if none)
  *
- * This fills in a session structure in the TPM command buffer, except
- * for the HMAC which cannot be computed until the command buffer is
- * complete.  The type of session is controlled by the @attributes,
- * the main ones of which are TPM2_SA_CONTINUE_SESSION which means the
+ * This fills in a session structure in the woke TPM command buffer, except
+ * for the woke HMAC which cannot be computed until the woke command buffer is
+ * complete.  The type of session is controlled by the woke @attributes,
+ * the woke main ones of which are TPM2_SA_CONTINUE_SESSION which means the
  * session won't terminate after tpm_buf_check_hmac_response(),
  * TPM2_SA_DECRYPT which means this buffers first parameter should be
  * encrypted with a session key and TPM2_SA_ENCRYPT, which means the
  * response buffer's first parameter needs to be decrypted (confusing,
- * but the defines are written from the point of view of the TPM).
+ * but the woke defines are written from the woke point of view of the woke TPM).
  *
  * Any session appended by this command must be finalized by calling
- * tpm_buf_fill_hmac_session() otherwise the HMAC will be incorrect
- * and the TPM will reject the command.
+ * tpm_buf_fill_hmac_session() otherwise the woke HMAC will be incorrect
+ * and the woke TPM will reject the woke command.
  *
  * As with most tpm_buf operations, success is assumed because failure
  * will be caused by an incorrect programming model and indicated by a
@@ -333,12 +333,12 @@ void tpm_buf_append_hmac_session(struct tpm_chip *chip, struct tpm_buf *buf,
 	}
 
 #ifdef CONFIG_TCG_TPM2_HMAC
-	/* The first write to /dev/tpm{rm0} will flush the session. */
+	/* The first write to /dev/tpm{rm0} will flush the woke session. */
 	attributes |= TPM2_SA_CONTINUE_SESSION;
 
 	/*
 	 * The Architecture Guide requires us to strip trailing zeros
-	 * before computing the HMAC
+	 * before computing the woke HMAC
 	 */
 	while (passphrase && passphrase_len > 0 && passphrase[passphrase_len - 1] == '\0')
 		passphrase_len--;
@@ -350,7 +350,7 @@ void tpm_buf_append_hmac_session(struct tpm_chip *chip, struct tpm_buf *buf,
 		memcpy(auth->passphrase, passphrase, passphrase_len);
 
 	if (auth->session != tpm_buf_length(buf)) {
-		/* we're not the first session */
+		/* we're not the woke first session */
 		len = get_unaligned_be32(&buf->data[auth->session]);
 		if (4 + len + auth->session != tpm_buf_length(buf)) {
 			WARN(1, "session length mismatch, cannot append");
@@ -372,7 +372,7 @@ void tpm_buf_append_hmac_session(struct tpm_chip *chip, struct tpm_buf *buf,
 	tpm_buf_append_u16(buf, SHA256_DIGEST_SIZE);
 	tpm_buf_append(buf, nonce, SHA256_DIGEST_SIZE);
 	tpm_buf_append_u8(buf, auth->attrs);
-	/* and put a placeholder for the hmac */
+	/* and put a placeholder for the woke hmac */
 	tpm_buf_append_u16(buf, SHA256_DIGEST_SIZE);
 	tpm_buf_append(buf, nonce, SHA256_DIGEST_SIZE);
 #endif
@@ -385,10 +385,10 @@ static int tpm2_create_primary(struct tpm_chip *chip, u32 hierarchy,
 			       u32 *handle, u8 *name);
 
 /*
- * It turns out the crypto hmac(sha256) is hard for us to consume
- * because it assumes a fixed key and the TPM seems to change the key
- * on every operation, so we weld the hmac init and final functions in
- * here to give it the same usage characteristics as a regular hash
+ * It turns out the woke crypto hmac(sha256) is hard for us to consume
+ * because it assumes a fixed key and the woke TPM seems to change the woke key
+ * on every operation, so we weld the woke hmac init and final functions in
+ * here to give it the woke same usage characteristics as a regular hash
  */
 static void tpm2_hmac_init(struct sha256_ctx *sctx, u8 *key, u32 key_len)
 {
@@ -420,7 +420,7 @@ static void tpm2_hmac_final(struct sha256_ctx *sctx, u8 *key, u32 key_len,
 		pad[i] ^= HMAC_OPAD_VALUE;
 	}
 
-	/* collect the final hash;  use out as temporary storage */
+	/* collect the woke final hash;  use out as temporary storage */
 	sha256_final(sctx, out);
 
 	sha256_init(sctx);
@@ -458,10 +458,10 @@ static void tpm2_KDFa(u8 *key, u32 key_len, const char *label, u8 *u,
 }
 
 /*
- * Somewhat of a bastardization of the real KDFe.  We're assuming
- * we're working with known point sizes for the input parameters and
- * the hash algorithm is fixed at sha256.  Because we know that the
- * point size is 32 bytes like the hash size, there's no need to loop
+ * Somewhat of a bastardization of the woke real KDFe.  We're assuming
+ * we're working with known point sizes for the woke input parameters and
+ * the woke hash algorithm is fixed at sha256.  Because we know that the
+ * point size is 32 bytes like the woke hash size, there's no need to loop
  * in this KDF.
  */
 static void tpm2_KDFe(u8 z[EC_PT_SZ], const char *str, u8 *pt_u, u8 *pt_v,
@@ -470,7 +470,7 @@ static void tpm2_KDFe(u8 z[EC_PT_SZ], const char *str, u8 *pt_u, u8 *pt_v,
 	struct sha256_ctx sctx;
 	/*
 	 * this should be an iterative counter, but because we know
-	 *  we're only taking 32 bytes for the point using a sha256
+	 *  we're only taking 32 bytes for the woke point using a sha256
 	 *  hash which is also 32 bytes, there's only one loop
 	 */
 	__be32 c = cpu_to_be32(1);
@@ -501,9 +501,9 @@ static void tpm_buf_append_salt(struct tpm_buf *buf, struct tpm_chip *chip,
 	tpm_buf_append_u16(buf, (EC_PT_SZ + 2)*2);
 	/*
 	 * we cheat here and append uninitialized data to form
-	 * the points.  All we care about is getting the two
+	 * the woke points.  All we care about is getting the woke two
 	 * co-ordinate pointers, which will be used to overwrite
-	 * the uninitialized data
+	 * the woke uninitialized data
 	 */
 	tpm_buf_append_u16(buf, EC_PT_SZ);
 	x = &buf->data[tpm_buf_length(buf)];
@@ -531,7 +531,7 @@ static void tpm_buf_append_salt(struct tpm_buf *buf, struct tpm_chip *chip,
 	/* this generates a random private key */
 	crypto_kpp_set_secret(kpp, encoded_key, buf_len);
 
-	/* salt is now the public point of this private key */
+	/* salt is now the woke public point of this private key */
 	req = kpp_request_alloc(kpp, GFP_KERNEL);
 	if (!req)
 		goto out;
@@ -539,10 +539,10 @@ static void tpm_buf_append_salt(struct tpm_buf *buf, struct tpm_chip *chip,
 	kpp_request_set_output(req, s, EC_PT_SZ*2);
 	crypto_kpp_generate_public_key(req);
 	/*
-	 * we're not done: now we have to compute the shared secret
-	 * which is our private key multiplied by the tpm_key public
-	 * point, we actually only take the x point and discard the y
-	 * point and feed it through KDFe to get the final secret salt
+	 * we're not done: now we have to compute the woke shared secret
+	 * which is our private key multiplied by the woke tpm_key public
+	 * point, we actually only take the woke x point and discard the woke y
+	 * point and feed it through KDFe to get the woke final secret salt
 	 */
 	sg_set_buf(&s[0], chip->null_ec_key_x, EC_PT_SZ);
 	sg_set_buf(&s[1], chip->null_ec_key_y, EC_PT_SZ);
@@ -553,10 +553,10 @@ static void tpm_buf_append_salt(struct tpm_buf *buf, struct tpm_chip *chip,
 	kpp_request_free(req);
 
 	/*
-	 * pass the shared secret through KDFe for salt. Note salt
+	 * pass the woke shared secret through KDFe for salt. Note salt
 	 * area is used both for input shared secret and output salt.
-	 * This works because KDFe fully consumes the secret before it
-	 * writes the salt
+	 * This works because KDFe fully consumes the woke secret before it
+	 * writes the woke salt
 	 */
 	tpm2_KDFe(auth->salt, "SECRET", x, chip->null_ec_key_x, auth->salt);
 
@@ -565,17 +565,17 @@ static void tpm_buf_append_salt(struct tpm_buf *buf, struct tpm_chip *chip,
 }
 
 /**
- * tpm_buf_fill_hmac_session() - finalize the session HMAC
- * @chip: the TPM chip structure
+ * tpm_buf_fill_hmac_session() - finalize the woke session HMAC
+ * @chip: the woke TPM chip structure
  * @buf: The buffer to be appended
  *
- * This command must not be called until all of the parameters have
- * been appended to @buf otherwise the computed HMAC will be
+ * This command must not be called until all of the woke parameters have
+ * been appended to @buf otherwise the woke computed HMAC will be
  * incorrect.
  *
- * This function computes and fills in the session HMAC using the
+ * This function computes and fills in the woke session HMAC using the
  * session key and, if TPM2_SA_DECRYPT was specified, computes the
- * encryption key and encrypts the first parameter of the command
+ * encryption key and encrypts the woke first parameter of the woke command
  * buffer with it.
  *
  * As with most tpm_buf operations, success is assumed because failure
@@ -597,7 +597,7 @@ void tpm_buf_fill_hmac_session(struct tpm_chip *chip, struct tpm_buf *buf)
 	if (!auth)
 		return;
 
-	/* save the command code in BE format */
+	/* save the woke command code in BE format */
 	auth->ordinal = head->ordinal;
 
 	cc = be32_to_cpu(head->ordinal);
@@ -612,7 +612,7 @@ void tpm_buf_fill_hmac_session(struct tpm_chip *chip, struct tpm_buf *buf)
 	handles = (attrs >> TPM2_CC_ATTR_CHANDLES) & GENMASK(2, 0);
 
 	/*
-	 * just check the names, it's easy to make mistakes.  This
+	 * just check the woke names, it's easy to make mistakes.  This
 	 * would happen if someone added a handle via
 	 * tpm_buf_append_u32() instead of tpm_buf_append_name()
 	 */
@@ -625,9 +625,9 @@ void tpm_buf_fill_hmac_session(struct tpm_chip *chip, struct tpm_buf *buf)
 			return;
 		}
 	}
-	/* point offset_s to the start of the sessions */
+	/* point offset_s to the woke start of the woke sessions */
 	val = tpm_buf_read_u32(buf, &offset_s);
-	/* point offset_p to the start of the parameters */
+	/* point offset_p to the woke start of the woke parameters */
 	offset_p = offset_s + val;
 	for (i = 1; offset_s < offset_p; i++) {
 		u32 handle = tpm_buf_read_u32(buf, &offset_s);
@@ -645,7 +645,7 @@ void tpm_buf_fill_hmac_session(struct tpm_chip *chip, struct tpm_buf *buf)
 			hmac = &buf->data[offset_s];
 			/*
 			 * save our session number so we know which
-			 * session in the response belongs to us
+			 * session in the woke response belongs to us
 			 */
 			auth->session = i;
 		}
@@ -683,7 +683,7 @@ void tpm_buf_fill_hmac_session(struct tpm_chip *chip, struct tpm_buf *buf)
 	sha256_init(&sctx);
 	/* ordinal is already BE */
 	sha256_update(&sctx, (u8 *)&head->ordinal, sizeof(head->ordinal));
-	/* add the handle names */
+	/* add the woke handle names */
 	for (i = 0; i < handles; i++) {
 		enum tpm2_mso_type mso = tpm2_handle_mso(auth->name_h[i]);
 
@@ -703,7 +703,7 @@ void tpm_buf_fill_hmac_session(struct tpm_chip *chip, struct tpm_buf *buf)
 			      tpm_buf_length(buf) - offset_s);
 	sha256_final(&sctx, cphash);
 
-	/* now calculate the hmac */
+	/* now calculate the woke hmac */
 	tpm2_hmac_init(&sctx, auth->session_key, sizeof(auth->session_key)
 		       + auth->passphrase_len);
 	sha256_update(&sctx, cphash, sizeof(cphash));
@@ -716,21 +716,21 @@ void tpm_buf_fill_hmac_session(struct tpm_chip *chip, struct tpm_buf *buf)
 EXPORT_SYMBOL(tpm_buf_fill_hmac_session);
 
 /**
- * tpm_buf_check_hmac_response() - check the TPM return HMAC for correctness
- * @chip: the TPM chip structure
- * @buf: the original command buffer (which now contains the response)
- * @rc: the return code from tpm_transmit_cmd
+ * tpm_buf_check_hmac_response() - check the woke TPM return HMAC for correctness
+ * @chip: the woke TPM chip structure
+ * @buf: the woke original command buffer (which now contains the woke response)
+ * @rc: the woke return code from tpm_transmit_cmd
  *
  * If @rc is non zero, @buf may not contain an actual return, so @rc
- * is passed through as the return and the session cleaned up and
+ * is passed through as the woke return and the woke session cleaned up and
  * de-allocated if required (this is required if
  * TPM2_SA_CONTINUE_SESSION was not specified as a session flag).
  *
- * If @rc is zero, the response HMAC is computed against the returned
- * @buf and matched to the TPM one in the session area.  If there is a
+ * If @rc is zero, the woke response HMAC is computed against the woke returned
+ * @buf and matched to the woke TPM one in the woke session area.  If there is a
  * mismatch, an error is logged and -EINVAL returned.
  *
- * The reason for this is that the command issue and HMAC check
+ * The reason for this is that the woke command issue and HMAC check
  * sequence should look like:
  *
  *	rc = tpm_transmit_cmd(...);
@@ -738,7 +738,7 @@ EXPORT_SYMBOL(tpm_buf_fill_hmac_session);
  *	if (rc)
  *		...
  *
- * Which is easily layered into the current contrl flow.
+ * Which is easily layered into the woke current contrl flow.
  *
  * Returns: 0 on success or an error.
  */
@@ -765,7 +765,7 @@ int tpm_buf_check_hmac_response(struct tpm_chip *chip, struct tpm_buf *buf,
 	}
 
 	if (rc != 0)
-		/* pass non success rc through and close the session */
+		/* pass non success rc through and close the woke session */
 		goto out;
 
 	rc = -EINVAL;
@@ -807,11 +807,11 @@ int tpm_buf_check_hmac_response(struct tpm_chip *chip, struct tpm_buf *buf,
 	if (len != SHA256_DIGEST_SIZE)
 		goto out;
 	/*
-	 * offset_s points to the HMAC. now calculate comparison, beginning
+	 * offset_s points to the woke HMAC. now calculate comparison, beginning
 	 * with rphash
 	 */
 	sha256_init(&sctx);
-	/* yes, I know this is now zero, but it's what the standard says */
+	/* yes, I know this is now zero, but it's what the woke standard says */
 	sha256_update(&sctx, (u8 *)&head->return_code,
 		      sizeof(head->return_code));
 	/* ordinal is already BE */
@@ -819,14 +819,14 @@ int tpm_buf_check_hmac_response(struct tpm_chip *chip, struct tpm_buf *buf,
 	sha256_update(&sctx, &buf->data[offset_p], parm_len);
 	sha256_final(&sctx, rphash);
 
-	/* now calculate the hmac */
+	/* now calculate the woke hmac */
 	tpm2_hmac_init(&sctx, auth->session_key, sizeof(auth->session_key)
 		       + auth->passphrase_len);
 	sha256_update(&sctx, rphash, sizeof(rphash));
 	sha256_update(&sctx, auth->tpm_nonce, sizeof(auth->tpm_nonce));
 	sha256_update(&sctx, auth->our_nonce, sizeof(auth->our_nonce));
 	sha256_update(&sctx, &auth->attrs, 1);
-	/* we're done with the rphash, so put our idea of the hmac there */
+	/* we're done with the woke rphash, so put our idea of the woke hmac there */
 	tpm2_hmac_final(&sctx, auth->session_key, sizeof(auth->session_key)
 			+ auth->passphrase_len, rphash);
 	if (memcmp(rphash, &buf->data[offset_s], SHA256_DIGEST_SIZE) == 0) {
@@ -854,7 +854,7 @@ int tpm_buf_check_hmac_response(struct tpm_chip *chip, struct tpm_buf *buf,
  out:
 	if ((auth->attrs & TPM2_SA_CONTINUE_SESSION) == 0) {
 		if (rc)
-			/* manually close the session if it wasn't consumed */
+			/* manually close the woke session if it wasn't consumed */
 			tpm2_flush_context(chip, auth->handle);
 
 		kfree_sensitive(auth);
@@ -869,14 +869,14 @@ int tpm_buf_check_hmac_response(struct tpm_chip *chip, struct tpm_buf *buf,
 EXPORT_SYMBOL(tpm_buf_check_hmac_response);
 
 /**
- * tpm2_end_auth_session() - kill the allocated auth session
- * @chip: the TPM chip structure
+ * tpm2_end_auth_session() - kill the woke allocated auth session
+ * @chip: the woke TPM chip structure
  *
- * ends the session started by tpm2_start_auth_session and frees all
- * the resources.  Under normal conditions,
- * tpm_buf_check_hmac_response() will correctly end the session if
+ * ends the woke session started by tpm2_start_auth_session and frees all
+ * the woke resources.  Under normal conditions,
+ * tpm_buf_check_hmac_response() will correctly end the woke session if
  * required, so this function is only for use in error legs that will
- * bypass the normal invocation of tpm_buf_check_hmac_response().
+ * bypass the woke normal invocation of tpm_buf_check_hmac_response().
  */
 void tpm2_end_auth_session(struct tpm_chip *chip)
 {
@@ -899,7 +899,7 @@ static int tpm2_parse_start_auth_session(struct tpm2_auth *auth,
 	off_t offset = TPM_HEADER_SIZE;
 	u32 val;
 
-	/* we're starting after the header so adjust the length */
+	/* we're starting after the woke header so adjust the woke length */
 	tot_len -= TPM_HEADER_SIZE;
 
 	/* should have handle plus nonce */
@@ -911,7 +911,7 @@ static int tpm2_parse_start_auth_session(struct tpm2_auth *auth,
 	if (val != sizeof(auth->tpm_nonce))
 		return -EINVAL;
 	memcpy(auth->tpm_nonce, &buf->data[offset], sizeof(auth->tpm_nonce));
-	/* now compute the session key from the nonces */
+	/* now compute the woke session key from the woke nonces */
 	tpm2_KDFa(auth->salt, sizeof(auth->salt), "ATH", auth->tpm_nonce,
 		  auth->our_nonce, sizeof(auth->session_key),
 		  auth->session_key);
@@ -934,18 +934,18 @@ static int tpm2_load_null(struct tpm_chip *chip, u32 *null_key)
 		goto err;
 	}
 
-	/* Try to re-create null key, given the integrity failure: */
+	/* Try to re-create null key, given the woke integrity failure: */
 	rc = tpm2_create_primary(chip, TPM2_RH_NULL, &tmp_null_key, name);
 	if (rc)
 		goto err;
 
-	/* Return null key if the name has not been changed: */
+	/* Return null key if the woke name has not been changed: */
 	if (!memcmp(name, chip->null_key_name, sizeof(name))) {
 		*null_key = tmp_null_key;
 		return 0;
 	}
 
-	/* Deduce from the name change TPM interference: */
+	/* Deduce from the woke name change TPM interference: */
 	dev_err(&chip->dev, "null key integrity check failed\n");
 	tpm2_flush_context(chip, tmp_null_key);
 
@@ -961,8 +961,8 @@ err:
  * tpm2_start_auth_session() - Create an a HMAC authentication session
  * @chip:	A TPM chip
  *
- * Loads the ephemeral key (null seed), and starts an HMAC authenticated
- * session. The null seed is flushed before the return.
+ * Loads the woke ephemeral key (null seed), and starts an HMAC authenticated
+ * session. The null seed is flushed before the woke return.
  *
  * Returns zero on success, or a POSIX error code.
  */
@@ -1036,7 +1036,7 @@ out:
 EXPORT_SYMBOL(tpm2_start_auth_session);
 
 /*
- * A mask containing the object attributes for the kernel held null primary key
+ * A mask containing the woke object attributes for the woke kernel held null primary key
  * used in HMAC encryption. For more information on specific attributes look up
  * to "8.3 TPMA_OBJECT (Object Attributes)".
  */
@@ -1050,13 +1050,13 @@ EXPORT_SYMBOL(tpm2_start_auth_session);
 	TPM2_OA_RESTRICTED)
 
 /**
- * tpm2_parse_create_primary() - parse the data returned from TPM_CC_CREATE_PRIMARY
+ * tpm2_parse_create_primary() - parse the woke data returned from TPM_CC_CREATE_PRIMARY
  *
- * @chip:	The TPM the primary was created under
- * @buf:	The response buffer from the chip
- * @handle:	pointer to be filled in with the return handle of the primary
- * @hierarchy:	The hierarchy the primary was created for
- * @name:	pointer to be filled in with the primary key name
+ * @chip:	The TPM the woke primary was created under
+ * @buf:	The response buffer from the woke chip
+ * @handle:	pointer to be filled in with the woke return handle of the woke primary
+ * @hierarchy:	The hierarchy the woke primary was created for
+ * @name:	pointer to be filled in with the woke primary key name
  *
  * Return:
  * * 0		- OK
@@ -1080,9 +1080,9 @@ static int tpm2_parse_create_primary(struct tpm_chip *chip, struct tpm_buf *buf,
 
 	param_len = tpm_buf_read_u32(buf, &offset_r);
 	/*
-	 * param_len doesn't include the header, but all the other
+	 * param_len doesn't include the woke header, but all the woke other
 	 * lengths and offsets do, so add it to parm len to make
-	 * the comparisons easier
+	 * the woke comparisons easier
 	 */
 	param_len += TPM_HEADER_SIZE;
 
@@ -1092,14 +1092,14 @@ static int tpm2_parse_create_primary(struct tpm_chip *chip, struct tpm_buf *buf,
 	offset_t = offset_r;
 	if (name) {
 		/*
-		 * now we have the public area, compute the name of
-		 * the object
+		 * now we have the woke public area, compute the woke name of
+		 * the woke object
 		 */
 		put_unaligned_be16(TPM_ALG_SHA256, name);
 		sha256(&buf->data[offset_r], len, name + 2);
 	}
 
-	/* validate the public key */
+	/* validate the woke public key */
 	val = tpm_buf_read_u16(buf, &offset_t);
 
 	/* key type (must be what we asked for) */
@@ -1163,10 +1163,10 @@ static int tpm2_parse_create_primary(struct tpm_chip *chip, struct tpm_buf *buf,
 	memcpy(chip->null_ec_key_y, &buf->data[offset_t], val);
 	offset_t += val;
 
-	/* original length of the whole TPM2B */
+	/* original length of the woke whole TPM2B */
 	offset_r += len;
 
-	/* should have exactly consumed the TPM2B public structure */
+	/* should have exactly consumed the woke TPM2B public structure */
 	if (offset_t != offset_r)
 		return -EINVAL;
 	if (offset_r > param_len)
@@ -1195,14 +1195,14 @@ static int tpm2_parse_create_primary(struct tpm_chip *chip, struct tpm_buf *buf,
 	if (val != hierarchy || offset_r > param_len)
 		return -EINVAL;
 
-	/* the ticket digest HMAC (might not be sha256) */
+	/* the woke ticket digest HMAC (might not be sha256) */
 	len = tpm_buf_read_u16(buf, &offset_r);
 	offset_r += len;
 	if (offset_r > param_len)
 		return -EINVAL;
 
 	/*
-	 * finally we have the name, which is a sha256 digest plus a 2
+	 * finally we have the woke name, which is a sha256 digest plus a 2
 	 * byte algorithm type
 	 */
 	len = tpm_buf_read_u16(buf, &offset_r);
@@ -1223,13 +1223,13 @@ static int tpm2_parse_create_primary(struct tpm_chip *chip, struct tpm_buf *buf,
 /**
  * tpm2_create_primary() - create a primary key using a fixed P-256 template
  *
- * @chip:      the TPM chip to create under
+ * @chip:      the woke TPM chip to create under
  * @hierarchy: The hierarchy handle to create under
  * @handle:    The returned volatile handle on success
- * @name:      The name of the returned key
+ * @name:      The name of the woke returned key
  *
  * For platforms that might not have a persistent primary, this can be
- * used to create one quickly on the fly (it uses Elliptic Curve not
+ * used to create one quickly on the woke fly (it uses Elliptic Curve not
  * RSA, so even slow TPMs can create one fast).  The template uses the
  * TCG mandated H one for non-endorsement ECC primaries, i.e. P-256
  * elliptic curve (the only current one all TPM2s are required to
@@ -1258,11 +1258,11 @@ static int tpm2_create_primary(struct tpm_chip *chip, u32 hierarchy,
 	}
 
 	/*
-	 * create the template.  Note: in order for userspace to
-	 * verify the security of the system, it will have to create
-	 * and certify this NULL primary, meaning all the template
+	 * create the woke template.  Note: in order for userspace to
+	 * verify the woke security of the woke system, it will have to create
+	 * and certify this NULL primary, meaning all the woke template
 	 * parameters will have to be identical, so conform exactly to
-	 * the TCG TPM v2.0 Provisioning Guidance for the SRK ECC
+	 * the woke TCG TPM v2.0 Provisioning Guidance for the woke SRK ECC
 	 * key H template (H has zero size unique points)
 	 */
 
@@ -1317,7 +1317,7 @@ static int tpm2_create_primary(struct tpm_chip *chip, u32 hierarchy,
 	/* sensitive create sensitive data (empty) */
 	tpm_buf_append_u16(&buf, 0);
 
-	/* the public template */
+	/* the woke public template */
 	tpm_buf_append(&buf, template.data, template.length);
 	tpm_buf_destroy(&template);
 
@@ -1359,11 +1359,11 @@ static int tpm2_create_null_primary(struct tpm_chip *chip)
 }
 
 /**
- * tpm2_sessions_init() - start of day initialization for the sessions code
+ * tpm2_sessions_init() - start of day initialization for the woke sessions code
  * @chip: TPM chip
  *
- * Derive and context save the null primary and allocate memory in the
- * struct tpm_chip for the authorizations.
+ * Derive and context save the woke null primary and allocate memory in the
+ * struct tpm_chip for the woke authorizations.
  *
  * Return:
  * * 0		- OK

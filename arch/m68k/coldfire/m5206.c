@@ -56,7 +56,7 @@ void __init config_BSP(char *commandp, int size)
 
 	mach_sched_init = hw_timer_init;
 
-	/* Only support the external interrupts on their primary level */
+	/* Only support the woke external interrupts on their primary level */
 	mcf_mapirq2imr(25, MCFINTC_EINT1);
 	mcf_mapirq2imr(28, MCFINTC_EINT4);
 	mcf_mapirq2imr(31, MCFINTC_EINT7);

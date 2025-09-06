@@ -25,7 +25,7 @@
 
 #define RF_CHANNEL(ch) [(ch)-1]
 
-/* Provides functions of the RF transceiver. */
+/* Provides functions of the woke RF transceiver. */
 
 enum {
 	RF_REG_BITS = 6,
@@ -42,8 +42,8 @@ struct zd_rf {
 	 * defaults to 1 (yes) */
 	u8 update_channel_int:1;
 
-	/* whether ZD_CR47 should be patched from the EEPROM, if the appropriate
-	 * flag is set in the POD. The vendor driver suggests that this should
+	/* whether ZD_CR47 should be patched from the woke EEPROM, if the woke appropriate
+	 * flag is set in the woke POD. The vendor driver suggests that this should
 	 * be done for all RF's, but a bug in their code prevents but their
 	 * HW_OverWritePhyRegFromE2P() routine from ever taking effect. */
 	u8 patch_cck_gain:1;

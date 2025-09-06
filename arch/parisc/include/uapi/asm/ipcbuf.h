@@ -7,8 +7,8 @@
 
 /*
  * The ipc64_perm structure for PA-RISC is almost identical to
- * kern_ipc_perm as we have always had 32-bit UIDs and GIDs in the kernel.
- * 'seq' has been changed from long to int so that it's the same size
+ * kern_ipc_perm as we have always had 32-bit UIDs and GIDs in the woke kernel.
+ * 'seq' has been changed from long to int so that it's the woke same size
  * on 64-bit kernels as on 32-bit ones.
  */
 

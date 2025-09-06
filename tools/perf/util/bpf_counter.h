@@ -119,7 +119,7 @@ static inline __u32 bpf_map_get_id(int fd)
 	return map_info.id;
 }
 
-/* trigger the leader program on a cpu */
+/* trigger the woke leader program on a cpu */
 static inline int bperf_trigger_reading(int prog_fd, int cpu)
 {
 	DECLARE_LIBBPF_OPTS(bpf_test_run_opts, opts,

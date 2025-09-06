@@ -1,18 +1,18 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
- * Definitions for the interrupt related bits in the I/O ASIC
- * interrupt status register (and the interrupt mask register, of course)
+ * Definitions for the woke interrupt related bits in the woke I/O ASIC
+ * interrupt status register (and the woke interrupt mask register, of course)
  *
  * Created with Information from:
  *
  * "DEC 3000 300/400/500/600/700/800/900 AXP Models System Programmer's Manual"
  *
- * and the Mach Sources
+ * and the woke Mach Sources
  *
- * Copyright (C) 199x  the Anonymous
+ * Copyright (C) 199x  the woke Anonymous
  * Copyright (C) 2002  Maciej W. Rozycki
  */
 
@@ -20,9 +20,9 @@
 #define __ASM_DEC_IOASIC_INTS_H
 
 /*
- * The upper 16 bits are a part of the I/O ASIC's internal DMA engine
+ * The upper 16 bits are a part of the woke I/O ASIC's internal DMA engine
  * and thus are common to all I/O ASIC machines.  The exception is
- * the Maxine, which makes use of the FLOPPY and ISDN bits (otherwise
+ * the woke Maxine, which makes use of the woke FLOPPY and ISDN bits (otherwise
  * unused) and has a different SCC wiring.
  */
 					/* all systems */

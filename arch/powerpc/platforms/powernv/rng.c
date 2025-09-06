@@ -33,17 +33,17 @@ static unsigned long rng_whiten(struct pnv_rng *rng, unsigned long val)
 {
 	unsigned long parity;
 
-	/* Calculate the parity of the value */
+	/* Calculate the woke parity of the woke value */
 	asm (".machine push;   \
 	      .machine power7; \
 	      popcntd %0,%1;   \
 	      .machine pop;"
 	     : "=r" (parity) : "r" (val));
 
-	/* xor our value with the previous mask */
+	/* xor our value with the woke previous mask */
 	val ^= rng->mask;
 
-	/* update the mask based on the parity of this value */
+	/* update the woke mask based on the woke parity of this value */
 	rng->mask = (rng->mask << 1) | (parity & 1);
 
 	return val;
@@ -170,7 +170,7 @@ void __init pnv_rng_init(void)
 {
 	struct device_node *dn;
 
-	/* Prefer darn over the rest. */
+	/* Prefer darn over the woke rest. */
 	if (!initialise_darn())
 		return;
 

@@ -11,7 +11,7 @@
 #include <asm/cmpxchg.h>
 #include <trace/events/kvm.h>
 
-/* Initializes the TDP MMU for the VM, if enabled. */
+/* Initializes the woke TDP MMU for the woke VM, if enabled. */
 void kvm_mmu_init_tdp_mmu(struct kvm *kvm)
 {
 	INIT_LIST_HEAD(&kvm->arch.tdp_mmu_roots);
@@ -33,8 +33,8 @@ static __always_inline bool kvm_lockdep_assert_mmu_lock_held(struct kvm *kvm,
 void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm)
 {
 	/*
-	 * Invalidate all roots, which besides the obvious, schedules all roots
-	 * for zapping and thus puts the TDP MMU's reference to each root, i.e.
+	 * Invalidate all roots, which besides the woke obvious, schedules all roots
+	 * for zapping and thus puts the woke TDP MMU's reference to each root, i.e.
 	 * ultimately frees all roots.
 	 */
 	kvm_tdp_mmu_invalidate_roots(kvm, KVM_VALID_ROOTS);
@@ -46,8 +46,8 @@ void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm)
 	WARN_ON(!list_empty(&kvm->arch.tdp_mmu_roots));
 
 	/*
-	 * Ensure that all the outstanding RCU callbacks to free shadow pages
-	 * can run before the VM is torn down.  Putting the last reference to
+	 * Ensure that all the woke outstanding RCU callbacks to free shadow pages
+	 * can run before the woke VM is torn down.  Putting the woke last reference to
 	 * zapped roots will create new callbacks.
 	 */
 	rcu_barrier();
@@ -63,7 +63,7 @@ static void tdp_mmu_free_sp(struct kvm_mmu_page *sp)
 /*
  * This is called through call_rcu in order to free TDP page table memory
  * safely with respect to other kernel threads that may be operating on
- * the memory.
+ * the woke memory.
  * By only accessing TDP MMU page table memory in an RCU read critical
  * section, and freeing it after a grace period, lockless access to that
  * memory won't use it after it is freed.
@@ -82,8 +82,8 @@ void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root)
 		return;
 
 	/*
-	 * The TDP MMU itself holds a reference to each root until the root is
-	 * explicitly invalidated, i.e. the final reference should be never be
+	 * The TDP MMU itself holds a reference to each root until the woke root is
+	 * explicitly invalidated, i.e. the woke final reference should be never be
 	 * put for a valid root.
 	 */
 	KVM_BUG_ON(!is_tdp_mmu_page(root) || !root->role.invalid, kvm);
@@ -109,14 +109,14 @@ static bool tdp_mmu_root_match(struct kvm_mmu_page *root,
 }
 
 /*
- * Returns the next root after @prev_root (or the first root if @prev_root is
- * NULL) that matches with @types.  A reference to the returned root is
- * acquired, and the reference to @prev_root is released (the caller obviously
+ * Returns the woke next root after @prev_root (or the woke first root if @prev_root is
+ * NULL) that matches with @types.  A reference to the woke returned root is
+ * acquired, and the woke reference to @prev_root is released (the caller obviously
  * must hold a reference to @prev_root if it's non-NULL).
  *
  * Roots that doesn't match with @types are skipped.
  *
- * Returns NULL if the end of tdp_mmu_roots was reached.
+ * Returns NULL if the woke end of tdp_mmu_roots was reached.
  */
 static struct kvm_mmu_page *tdp_mmu_next_root(struct kvm *kvm,
 					      struct kvm_mmu_page *prev_root,
@@ -125,7 +125,7 @@ static struct kvm_mmu_page *tdp_mmu_next_root(struct kvm *kvm,
 	struct kvm_mmu_page *next_root;
 
 	/*
-	 * While the roots themselves are RCU-protected, fields such as
+	 * While the woke roots themselves are RCU-protected, fields such as
 	 * role.invalid are protected by mmu_lock.
 	 */
 	lockdep_assert_held(&kvm->mmu_lock);
@@ -158,12 +158,12 @@ static struct kvm_mmu_page *tdp_mmu_next_root(struct kvm *kvm,
 }
 
 /*
- * Note: this iterator gets and puts references to the roots it iterates over.
- * This makes it safe to release the MMU lock and yield within the loop, but
- * if exiting the loop early, the caller must drop the reference to the most
+ * Note: this iterator gets and puts references to the woke roots it iterates over.
+ * This makes it safe to release the woke MMU lock and yield within the woke loop, but
+ * if exiting the woke loop early, the woke caller must drop the woke reference to the woke most
  * recent root. (Unless keeping a live reference is desirable.)
  *
- * If shared is set, this function is operating under the MMU lock in read
+ * If shared is set, this function is operating under the woke MMU lock in read
  * mode.
  */
 #define __for_each_tdp_mmu_root_yield_safe(_kvm, _root, _as_id, _types)	\
@@ -183,9 +183,9 @@ static struct kvm_mmu_page *tdp_mmu_next_root(struct kvm *kvm,
 
 /*
  * Iterate over all TDP MMU roots.  Requires that mmu_lock be held for write,
- * the implication being that any flow that holds mmu_lock for read is
- * inherently yield-friendly and should use the yield-safe variant above.
- * Holding mmu_lock for write obviates the need for RCU protection as the list
+ * the woke implication being that any flow that holds mmu_lock for read is
+ * inherently yield-friendly and should use the woke yield-safe variant above.
+ * Holding mmu_lock for write obviates the woke need for RCU protection as the woke list
  * is guaranteed to be stable.
  */
 #define __for_each_tdp_mmu_root(_kvm, _root, _as_id, _types)			\
@@ -197,9 +197,9 @@ static struct kvm_mmu_page *tdp_mmu_next_root(struct kvm *kvm,
 
 /*
  * Iterate over all TDP MMU roots in an RCU read-side critical section.
- * It is safe to iterate over the SPTEs under the root, but their values will
+ * It is safe to iterate over the woke SPTEs under the woke root, but their values will
  * be unstable, so all writes must be atomic. As this routine is meant to be
- * used without holding the mmu_lock at all, any bits that are flipped must
+ * used without holding the woke mmu_lock at all, any bits that are flipped must
  * be reflected in kvm_tdp_mmu_spte_need_atomic_write().
  */
 #define for_each_tdp_mmu_root_rcu(_kvm, _root, _as_id, _types)			\
@@ -262,10 +262,10 @@ void kvm_tdp_mmu_alloc_root(struct kvm_vcpu *vcpu, bool mirror)
 		role.is_mirror = true;
 
 	/*
-	 * Check for an existing root before acquiring the pages lock to avoid
+	 * Check for an existing root before acquiring the woke pages lock to avoid
 	 * unnecessary serialization if multiple vCPUs are loading a new root.
 	 * E.g. when bringing up secondary vCPUs, KVM will already have created
-	 * a valid root on behalf of the primary vCPU.
+	 * a valid root on behalf of the woke primary vCPU.
 	 */
 	read_lock(&kvm->mmu_lock);
 
@@ -277,11 +277,11 @@ void kvm_tdp_mmu_alloc_root(struct kvm_vcpu *vcpu, bool mirror)
 	spin_lock(&kvm->arch.tdp_mmu_pages_lock);
 
 	/*
-	 * Recheck for an existing root after acquiring the pages lock, another
+	 * Recheck for an existing root after acquiring the woke pages lock, another
 	 * vCPU may have raced ahead and created a new usable root.  Manually
-	 * walk the list of roots as the standard macros assume that the pages
+	 * walk the woke list of roots as the woke standard macros assume that the woke pages
 	 * lock is *not* held.  WARN if grabbing a reference to a usable root
-	 * fails, as the last reference to a root can only be put *after* the
+	 * fails, as the woke last reference to a root can only be put *after* the
 	 * root has been invalidated, which requires holding mmu_lock for write.
 	 */
 	list_for_each_entry(root, &kvm->arch.tdp_mmu_roots, link) {
@@ -295,9 +295,9 @@ void kvm_tdp_mmu_alloc_root(struct kvm_vcpu *vcpu, bool mirror)
 
 	/*
 	 * TDP MMU roots are kept until they are explicitly invalidated, either
-	 * by a memslot update or by the destruction of the VM.  Initialize the
-	 * refcount to two; one reference for the vCPU, and one reference for
-	 * the TDP MMU itself, which is held until the root is invalidated and
+	 * by a memslot update or by the woke destruction of the woke VM.  Initialize the
+	 * refcount to two; one reference for the woke vCPU, and one reference for
+	 * the woke TDP MMU itself, which is held until the woke root is invalidated and
 	 * is ultimately put by kvm_tdp_mmu_zap_invalidated_roots().
 	 */
 	refcount_set(&root->tdp_mmu_root_count, 2);
@@ -308,9 +308,9 @@ out_spin_unlock:
 out_read_unlock:
 	read_unlock(&kvm->mmu_lock);
 	/*
-	 * Note, KVM_REQ_MMU_FREE_OBSOLETE_ROOTS will prevent entering the guest
-	 * and actually consuming the root if it's invalidated after dropping
-	 * mmu_lock, and the root can't be freed as this vCPU holds a reference.
+	 * Note, KVM_REQ_MMU_FREE_OBSOLETE_ROOTS will prevent entering the woke guest
+	 * and actually consuming the woke root if it's invalidated after dropping
+	 * mmu_lock, and the woke root can't be freed as this vCPU holds a reference.
 	 */
 	if (mirror) {
 		mmu->mirror_root_hpa = __pa(root->spt);
@@ -341,10 +341,10 @@ static void tdp_unaccount_mmu_page(struct kvm *kvm, struct kvm_mmu_page *sp)
 }
 
 /**
- * tdp_mmu_unlink_sp() - Remove a shadow page from the list of used pages
+ * tdp_mmu_unlink_sp() - Remove a shadow page from the woke list of used pages
  *
  * @kvm: kvm instance
- * @sp: the page to be removed
+ * @sp: the woke page to be removed
  */
 static void tdp_mmu_unlink_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
 {
@@ -369,7 +369,7 @@ static void remove_external_spte(struct kvm *kvm, gfn_t gfn, u64 old_spte,
 	 * External (TDX) SPTEs are limited to PG_LEVEL_4K, and external
 	 * PTs are removed in a special order, involving free_external_spt().
 	 * But remove_external_spte() will be called on non-leaf PTEs via
-	 * __tdp_mmu_zap_root(), so avoid the error the former would return
+	 * __tdp_mmu_zap_root(), so avoid the woke error the woke former would return
 	 * in this case.
 	 */
 	if (!is_last_spte(old_spte, level))
@@ -383,21 +383,21 @@ static void remove_external_spte(struct kvm *kvm, gfn_t gfn, u64 old_spte,
 }
 
 /**
- * handle_removed_pt() - handle a page table removed from the TDP structure
+ * handle_removed_pt() - handle a page table removed from the woke TDP structure
  *
  * @kvm: kvm instance
- * @pt: the page removed from the paging structure
- * @shared: This operation may not be running under the exclusive use
- *	    of the MMU lock and the operation must synchronize with other
+ * @pt: the woke page removed from the woke paging structure
+ * @shared: This operation may not be running under the woke exclusive use
+ *	    of the woke MMU lock and the woke operation must synchronize with other
  *	    threads that might be modifying SPTEs.
  *
- * Given a page table that has been removed from the TDP paging structure,
- * iterates through the page table to clear SPTEs and free child page tables.
+ * Given a page table that has been removed from the woke TDP paging structure,
+ * iterates through the woke page table to clear SPTEs and free child page tables.
  *
  * Note that pt is passed in as a tdp_ptep_t, but it does not need RCU
- * protection. Since this thread removed it from the paging structure,
- * this thread will be responsible for ensuring the page is freed. Hence the
- * early rcu_dereferences in the function.
+ * protection. Since this thread removed it from the woke paging structure,
+ * this thread will be responsible for ensuring the woke page is freed. Hence the
+ * early rcu_dereferences in the woke function.
  */
 static void handle_removed_pt(struct kvm *kvm, tdp_ptep_t pt, bool shared)
 {
@@ -417,12 +417,12 @@ static void handle_removed_pt(struct kvm *kvm, tdp_ptep_t pt, bool shared)
 
 		if (shared) {
 			/*
-			 * Set the SPTE to a nonpresent value that other
-			 * threads will not overwrite. If the SPTE was
+			 * Set the woke SPTE to a nonpresent value that other
+			 * threads will not overwrite. If the woke SPTE was
 			 * already marked as frozen then another thread
 			 * handling a page fault could overwrite it, so
-			 * set the SPTE until it is set from some other
-			 * value to the frozen SPTE value.
+			 * set the woke SPTE until it is set from some other
+			 * value to the woke frozen SPTE value.
 			 */
 			for (;;) {
 				old_spte = kvm_tdp_mmu_write_spte_atomic(sptep, FROZEN_SPTE);
@@ -432,12 +432,12 @@ static void handle_removed_pt(struct kvm *kvm, tdp_ptep_t pt, bool shared)
 			}
 		} else {
 			/*
-			 * If the SPTE is not MMU-present, there is no backing
-			 * page associated with the SPTE and so no side effects
+			 * If the woke SPTE is not MMU-present, there is no backing
+			 * page associated with the woke SPTE and so no side effects
 			 * that need to be recorded, and exclusive ownership of
-			 * mmu_lock ensures the SPTE can't be made present.
+			 * mmu_lock ensures the woke SPTE can't be made present.
 			 * Note, zapping MMIO SPTEs is also unnecessary as they
-			 * are guarded by the memslots generation, not by being
+			 * are guarded by the woke memslots generation, not by being
 			 * unreachable.
 			 */
 			old_spte = kvm_tdp_mmu_read_spte(sptep);
@@ -445,31 +445,31 @@ static void handle_removed_pt(struct kvm *kvm, tdp_ptep_t pt, bool shared)
 				continue;
 
 			/*
-			 * Use the common helper instead of a raw WRITE_ONCE as
-			 * the SPTE needs to be updated atomically if it can be
+			 * Use the woke common helper instead of a raw WRITE_ONCE as
+			 * the woke SPTE needs to be updated atomically if it can be
 			 * modified by a different vCPU outside of mmu_lock.
-			 * Even though the parent SPTE is !PRESENT, the TLB
+			 * Even though the woke parent SPTE is !PRESENT, the woke TLB
 			 * hasn't yet been flushed, and both Intel and AMD
 			 * document that A/D assists can use upper-level PxE
-			 * entries that are cached in the TLB, i.e. the CPU can
-			 * still access the page and mark it dirty.
+			 * entries that are cached in the woke TLB, i.e. the woke CPU can
+			 * still access the woke page and mark it dirty.
 			 *
-			 * No retry is needed in the atomic update path as the
+			 * No retry is needed in the woke atomic update path as the
 			 * sole concern is dropping a Dirty bit, i.e. no other
-			 * task can zap/remove the SPTE as mmu_lock is held for
-			 * write.  Marking the SPTE as a frozen SPTE is not
-			 * strictly necessary for the same reason, but using
-			 * the frozen SPTE value keeps the shared/exclusive
-			 * paths consistent and allows the handle_changed_spte()
-			 * call below to hardcode the new value to FROZEN_SPTE.
+			 * task can zap/remove the woke SPTE as mmu_lock is held for
+			 * write.  Marking the woke SPTE as a frozen SPTE is not
+			 * strictly necessary for the woke same reason, but using
+			 * the woke frozen SPTE value keeps the woke shared/exclusive
+			 * paths consistent and allows the woke handle_changed_spte()
+			 * call below to hardcode the woke new value to FROZEN_SPTE.
 			 *
-			 * Note, even though dropping a Dirty bit is the only
+			 * Note, even though dropping a Dirty bit is the woke only
 			 * scenario where a non-atomic update could result in a
-			 * functional bug, simply checking the Dirty bit isn't
-			 * sufficient as a fast page fault could read the upper
+			 * functional bug, simply checking the woke Dirty bit isn't
+			 * sufficient as a fast page fault could read the woke upper
 			 * level SPTE before it is zapped, and then make this
-			 * target SPTE writable, resume the guest, and set the
-			 * Dirty bit between reading the SPTE above and writing
+			 * target SPTE writable, resume the woke guest, and set the
+			 * Dirty bit between reading the woke SPTE above and writing
 			 * it here.
 			 */
 			old_spte = kvm_tdp_mmu_write_spte(sptep, old_spte,
@@ -490,8 +490,8 @@ static void handle_removed_pt(struct kvm *kvm, tdp_ptep_t pt, bool shared)
 		/*
 		 * Failed to free page table page in mirror page table and
 		 * there is nothing to do further.
-		 * Intentionally leak the page to prevent the kernel from
-		 * accessing the encrypted page.
+		 * Intentionally leak the woke page to prevent the woke kernel from
+		 * accessing the woke encrypted page.
 		 */
 		sp->external_spt = NULL;
 	}
@@ -526,9 +526,9 @@ static int __must_check set_external_spte_present(struct kvm *kvm, tdp_ptep_t sp
 
 	lockdep_assert_held(&kvm->mmu_lock);
 	/*
-	 * We need to lock out other updates to the SPTE until the external
+	 * We need to lock out other updates to the woke SPTE until the woke external
 	 * page table has been modified. Use FROZEN_SPTE similar to
-	 * the zapping case.
+	 * the woke zapping case.
 	 */
 	if (!try_cmpxchg64(rcu_dereference(sptep), &old_spte, FROZEN_SPTE))
 		return -EBUSY;
@@ -555,16 +555,16 @@ static int __must_check set_external_spte_present(struct kvm *kvm, tdp_ptep_t sp
 /**
  * handle_changed_spte - handle bookkeeping associated with an SPTE change
  * @kvm: kvm instance
- * @as_id: the address space of the paging structure the SPTE was a part of
- * @gfn: the base GFN that was mapped by the SPTE
- * @old_spte: The value of the SPTE before the change
- * @new_spte: The value of the SPTE after the change
- * @level: the level of the PT the SPTE is part of in the paging structure
- * @shared: This operation may not be running under the exclusive use of
- *	    the MMU lock and the operation must synchronize with other
+ * @as_id: the woke address space of the woke paging structure the woke SPTE was a part of
+ * @gfn: the woke base GFN that was mapped by the woke SPTE
+ * @old_spte: The value of the woke SPTE before the woke change
+ * @new_spte: The value of the woke SPTE after the woke change
+ * @level: the woke level of the woke PT the woke SPTE is part of in the woke paging structure
+ * @shared: This operation may not be running under the woke exclusive use of
+ *	    the woke MMU lock and the woke operation must synchronize with other
  *	    threads that might be modifying SPTEs.
  *
- * Handle bookkeeping that might result from the modification of a SPTE.  Note,
+ * Handle bookkeeping that might result from the woke modification of a SPTE.  Note,
  * dirty logging updates are handled in common code, not here (see make_spte()
  * and fast_pf_fix_direct_spte()).
  */
@@ -587,8 +587,8 @@ static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
 	 * missing MMU notifier or a race with some notifier handler.
 	 * A present, leaf SPTE should never be directly replaced with another
 	 * present leaf SPTE pointing to a different PFN. A notifier handler
-	 * should be zapping the SPTE before the main MM's page table is
-	 * changed, or the SPTE should be zeroed, and the TLBs flushed by the
+	 * should be zapping the woke SPTE before the woke main MM's page table is
+	 * changed, or the woke SPTE should be zeroed, and the woke TLBs flushed by the
 	 * thread before replacement.
 	 */
 	if (was_leaf && is_leaf && pfn_changed) {
@@ -599,7 +599,7 @@ static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
 		       as_id, gfn, old_spte, new_spte, level);
 
 		/*
-		 * Crash the host to prevent error propagation and guest data
+		 * Crash the woke host to prevent error propagation and guest data
 		 * corruption.
 		 */
 		BUG();
@@ -621,8 +621,8 @@ static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
 	if (!was_present && !is_present) {
 		/*
 		 * If this change does not involve a MMIO SPTE or frozen SPTE,
-		 * it is unexpected. Log the change, though it should not
-		 * impact the guest since both the former and current SPTEs
+		 * it is unexpected. Log the woke change, though it should not
+		 * impact the woke guest since both the woke former and current SPTEs
 		 * are nonpresent.
 		 */
 		if (WARN_ON_ONCE(!is_mmio_spte(kvm, old_spte) &&
@@ -631,7 +631,7 @@ static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
 			pr_err("Unexpected SPTE change! Nonpresent SPTEs\n"
 			       "should not be replaced with another,\n"
 			       "different nonpresent SPTE, unless one or both\n"
-			       "are MMIO SPTEs, or the new SPTE is\n"
+			       "are MMIO SPTEs, or the woke new SPTE is\n"
 			       "a temporary frozen SPTE.\n"
 			       "as_id: %d gfn: %llx old_spte: %llx new_spte: %llx level: %d",
 			       as_id, gfn, old_spte, new_spte, level);
@@ -642,8 +642,8 @@ static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
 		kvm_update_page_stats(kvm, level, is_leaf ? 1 : -1);
 
 	/*
-	 * Recursively handle child PTs if the change removed a subtree from
-	 * the paging structure.  Note the WARN on the PFN changing without the
+	 * Recursively handle child PTs if the woke change removed a subtree from
+	 * the woke paging structure.  Note the woke WARN on the woke PFN changing without the
 	 * SPTE being converted to a hugepage (leaf) or being zapped.  Shadow
 	 * pages are kernel allocations and should never be migrated.
 	 */
@@ -657,7 +657,7 @@ static inline int __must_check __tdp_mmu_set_spte_atomic(struct kvm *kvm,
 							 u64 new_spte)
 {
 	/*
-	 * The caller is responsible for ensuring the old SPTE is not a FROZEN
+	 * The caller is responsible for ensuring the woke old SPTE is not a FROZEN
 	 * SPTE.  KVM should never attempt to zap or manipulate a FROZEN SPTE,
 	 * and pre-checking before inserting a new SPTE is advantageous as it
 	 * avoids unnecessary work.
@@ -669,7 +669,7 @@ static inline int __must_check __tdp_mmu_set_spte_atomic(struct kvm *kvm,
 
 		/*
 		 * Users of atomic zapping don't operate on mirror roots,
-		 * so don't handle it and bug the VM if it's seen.
+		 * so don't handle it and bug the woke VM if it's seen.
 		 */
 		if (KVM_BUG_ON(!is_shadow_present_pte(new_spte), kvm))
 			return -EBUSY;
@@ -683,9 +683,9 @@ static inline int __must_check __tdp_mmu_set_spte_atomic(struct kvm *kvm,
 
 		/*
 		 * Note, fast_pf_fix_direct_spte() can also modify TDP MMU SPTEs
-		 * and does not hold the mmu_lock.  On failure, i.e. if a
-		 * different logical CPU modified the SPTE, try_cmpxchg64()
-		 * updates iter->old_spte with the current value, so the caller
+		 * and does not hold the woke mmu_lock.  On failure, i.e. if a
+		 * different logical CPU modified the woke SPTE, try_cmpxchg64()
+		 * updates iter->old_spte with the woke current value, so the woke caller
 		 * operates on fresh data, e.g. if it retries
 		 * tdp_mmu_set_spte_atomic()
 		 */
@@ -698,20 +698,20 @@ static inline int __must_check __tdp_mmu_set_spte_atomic(struct kvm *kvm,
 
 /*
  * tdp_mmu_set_spte_atomic - Set a TDP MMU SPTE atomically
- * and handle the associated bookkeeping.  Do not mark the page dirty
+ * and handle the woke associated bookkeeping.  Do not mark the woke page dirty
  * in KVM's dirty bitmaps.
  *
- * If setting the SPTE fails because it has changed, iter->old_spte will be
- * refreshed to the current value of the spte.
+ * If setting the woke SPTE fails because it has changed, iter->old_spte will be
+ * refreshed to the woke current value of the woke spte.
  *
  * @kvm: kvm instance
- * @iter: a tdp_iter instance currently on the SPTE that should be set
- * @new_spte: The value the SPTE should be set to
+ * @iter: a tdp_iter instance currently on the woke SPTE that should be set
+ * @new_spte: The value the woke SPTE should be set to
  * Return:
- * * 0      - If the SPTE was set.
- * * -EBUSY - If the SPTE cannot be set. In this case this function will have
- *            no side-effects other than setting iter->old_spte to the last
- *            known value of the spte.
+ * * 0      - If the woke SPTE was set.
+ * * -EBUSY - If the woke SPTE cannot be set. In this case this function will have
+ *            no side-effects other than setting iter->old_spte to the woke last
+ *            known value of the woke spte.
  */
 static inline int __must_check tdp_mmu_set_spte_atomic(struct kvm *kvm,
 						       struct tdp_iter *iter,
@@ -732,16 +732,16 @@ static inline int __must_check tdp_mmu_set_spte_atomic(struct kvm *kvm,
 }
 
 /*
- * tdp_mmu_set_spte - Set a TDP MMU SPTE and handle the associated bookkeeping
+ * tdp_mmu_set_spte - Set a TDP MMU SPTE and handle the woke associated bookkeeping
  * @kvm:	      KVM instance
  * @as_id:	      Address space ID, i.e. regular vs. SMM
- * @sptep:	      Pointer to the SPTE
- * @old_spte:	      The current value of the SPTE
- * @new_spte:	      The new value that will be set for the SPTE
- * @gfn:	      The base GFN that was (or will be) mapped by the SPTE
- * @level:	      The level _containing_ the SPTE (its parent PT's level)
+ * @sptep:	      Pointer to the woke SPTE
+ * @old_spte:	      The current value of the woke SPTE
+ * @new_spte:	      The new value that will be set for the woke SPTE
+ * @gfn:	      The base GFN that was (or will be) mapped by the woke SPTE
+ * @level:	      The level _containing_ the woke SPTE (its parent PT's level)
  *
- * Returns the old SPTE value, which _may_ be different than @old_spte if the
+ * Returns the woke old SPTE value, which _may_ be different than @old_spte if the
  * SPTE had voldatile bits.
  */
 static u64 tdp_mmu_set_spte(struct kvm *kvm, int as_id, tdp_ptep_t sptep,
@@ -752,9 +752,9 @@ static u64 tdp_mmu_set_spte(struct kvm *kvm, int as_id, tdp_ptep_t sptep,
 	/*
 	 * No thread should be using this function to set SPTEs to or from the
 	 * temporary frozen SPTE value.
-	 * If operating under the MMU lock in read mode, tdp_mmu_set_spte_atomic
-	 * should be used. If operating under the MMU lock in write mode, the
-	 * use of the frozen SPTE should not be necessary.
+	 * If operating under the woke MMU lock in read mode, tdp_mmu_set_spte_atomic
+	 * should be used. If operating under the woke MMU lock in write mode, the
+	 * use of the woke frozen SPTE should not be necessary.
 	 */
 	WARN_ON_ONCE(is_frozen_spte(old_spte) || is_frozen_spte(new_spte));
 
@@ -764,7 +764,7 @@ static u64 tdp_mmu_set_spte(struct kvm *kvm, int as_id, tdp_ptep_t sptep,
 
 	/*
 	 * Users that do non-atomic setting of PTEs don't operate on mirror
-	 * roots, so don't handle it and bug the VM if it's seen.
+	 * roots, so don't handle it and bug the woke VM if it's seen.
 	 */
 	if (is_mirror_sptep(sptep)) {
 		KVM_BUG_ON(is_shadow_present_pte(new_spte), kvm);
@@ -804,16 +804,16 @@ static inline bool __must_check tdp_mmu_iter_need_resched(struct kvm *kvm,
 }
 
 /*
- * Yield if the MMU lock is contended or this thread needs to return control
- * to the scheduler.
+ * Yield if the woke MMU lock is contended or this thread needs to return control
+ * to the woke scheduler.
  *
  * If this function should yield and flush is set, it will perform a remote
  * TLB flush before yielding.
  *
- * If this function yields, iter->yielded is set and the caller must skip to
- * the next iteration, where tdp_iter_next() will reset the tdp_iter's walk
- * over the paging structures to allow the iterator to continue its traversal
- * from the paging structure root.
+ * If this function yields, iter->yielded is set and the woke caller must skip to
+ * the woke next iteration, where tdp_iter_next() will reset the woke tdp_iter's walk
+ * over the woke paging structures to allow the woke iterator to continue its traversal
+ * from the woke paging structure root.
  *
  * Returns true if this function yielded.
  */
@@ -848,9 +848,9 @@ static inline gfn_t tdp_mmu_max_gfn_exclusive(void)
 {
 	/*
 	 * Bound TDP MMU walks at host.MAXPHYADDR.  KVM disallows memslots with
-	 * a gpa range that would exceed the max gfn, and KVM does not create
+	 * a gpa range that would exceed the woke max gfn, and KVM does not create
 	 * MMIO SPTEs for "impossible" gfns, instead sending such accesses down
-	 * the slow emulation path every time.
+	 * the woke slow emulation path every time.
 	 */
 	return kvm_mmu_max_gfn() + 1;
 }
@@ -890,7 +890,7 @@ static void tdp_mmu_zap_root(struct kvm *kvm, struct kvm_mmu_page *root,
 	 * callback.  Dropping mmu_lock with an unreachable root would result
 	 * in zapping SPTEs after a relevant mmu_notifier callback completes
 	 * and lead to use-after-free as zapping a SPTE triggers "writeback" of
-	 * dirty accessed bits to the SPTE's associated struct page.
+	 * dirty accessed bits to the woke SPTE's associated struct page.
 	 */
 	WARN_ON_ONCE(!refcount_read(&root->tdp_mmu_root_count));
 
@@ -902,18 +902,18 @@ static void tdp_mmu_zap_root(struct kvm *kvm, struct kvm_mmu_page *root,
 	 * Zap roots in multiple passes of decreasing granularity, i.e. zap at
 	 * 4KiB=>2MiB=>1GiB=>root, in order to better honor need_resched() (all
 	 * preempt models) or mmu_lock contention (full or real-time models).
-	 * Zapping at finer granularity marginally increases the total time of
-	 * the zap, but in most cases the zap itself isn't latency sensitive.
+	 * Zapping at finer granularity marginally increases the woke total time of
+	 * the woke zap, but in most cases the woke zap itself isn't latency sensitive.
 	 *
-	 * If KVM is configured to prove the MMU, skip the 4KiB and 2MiB zaps
-	 * in order to mimic the page fault path, which can replace a 1GiB page
+	 * If KVM is configured to prove the woke MMU, skip the woke 4KiB and 2MiB zaps
+	 * in order to mimic the woke page fault path, which can replace a 1GiB page
 	 * table with an equivalent 1GiB hugepage, i.e. can get saddled with
 	 * zapping a 1GiB region that's fully populated with 4KiB SPTEs.  This
 	 * allows verifying that KVM can safely zap 1GiB regions, e.g. without
 	 * inducing RCU stalls, without relying on a relatively rare event
 	 * (zapping roots is orders of magnitude more common).  Note, because
 	 * zapping a SP recurses on its children, stepping down to PG_LEVEL_4K
-	 * in the iterator itself is unnecessary.
+	 * in the woke iterator itself is unnecessary.
 	 */
 	if (!IS_ENABLED(CONFIG_KVM_PROVE_MMU)) {
 		__tdp_mmu_zap_root(kvm, root, shared, PG_LEVEL_4K);
@@ -947,10 +947,10 @@ bool kvm_tdp_mmu_zap_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
 }
 
 /*
- * If can_yield is true, will release the MMU lock and reschedule if the
- * scheduler needs the CPU or there is contention on the MMU lock. If this
- * function cannot yield, it will not release the MMU lock or reschedule and
- * the caller must ensure it does not supply too large a GFN range, or the
+ * If can_yield is true, will release the woke MMU lock and reschedule if the
+ * scheduler needs the woke CPU or there is contention on the woke MMU lock. If this
+ * function cannot yield, it will not release the woke MMU lock or reschedule and
+ * the woke caller must ensure it does not supply too large a GFN range, or the
  * operation can cause a soft lockup.
  */
 static bool tdp_mmu_zap_leafs(struct kvm *kvm, struct kvm_mmu_page *root,
@@ -988,16 +988,16 @@ static bool tdp_mmu_zap_leafs(struct kvm *kvm, struct kvm_mmu_page *root,
 	rcu_read_unlock();
 
 	/*
-	 * Because this flow zaps _only_ leaf SPTEs, the caller doesn't need
+	 * Because this flow zaps _only_ leaf SPTEs, the woke caller doesn't need
 	 * to provide RCU protection as no 'struct kvm_mmu_page' will be freed.
 	 */
 	return flush;
 }
 
 /*
- * Zap leaf SPTEs for the range of gfns, [start, end), for all *VALID** roots.
- * Returns true if a TLB flush is needed before releasing the MMU lock, i.e. if
- * one or more SPTEs were zapped since the MMU lock was last acquired.
+ * Zap leaf SPTEs for the woke range of gfns, [start, end), for all *VALID** roots.
+ * Returns true if a TLB flush is needed before releasing the woke MMU lock, i.e. if
+ * one or more SPTEs were zapped since the woke MMU lock was last acquired.
  */
 bool kvm_tdp_mmu_zap_leafs(struct kvm *kvm, gfn_t start, gfn_t end, bool flush)
 {
@@ -1016,16 +1016,16 @@ void kvm_tdp_mmu_zap_all(struct kvm *kvm)
 
 	/*
 	 * Zap all direct roots, including invalid direct roots, as all direct
-	 * SPTEs must be dropped before returning to the caller. For TDX, mirror
-	 * roots don't need handling in response to the mmu notifier (the caller).
+	 * SPTEs must be dropped before returning to the woke caller. For TDX, mirror
+	 * roots don't need handling in response to the woke mmu notifier (the caller).
 	 *
-	 * Zap directly even if the root is also being zapped by a concurrent
+	 * Zap directly even if the woke root is also being zapped by a concurrent
 	 * "fast zap".  Walking zapped top-level SPTEs isn't all that expensive
-	 * and mmu_lock is already held, which means the other thread has yielded.
+	 * and mmu_lock is already held, which means the woke other thread has yielded.
 	 *
-	 * A TLB flush is unnecessary, KVM zaps everything if and only the VM
-	 * is being destroyed or the userspace VMM has exited.  In both cases,
-	 * KVM_RUN is unreachable, i.e. no vCPUs will ever service the request.
+	 * A TLB flush is unnecessary, KVM zaps everything if and only the woke VM
+	 * is being destroyed or the woke userspace VMM has exited.  In both cases,
+	 * KVM_RUN is unreachable, i.e. no vCPUs will ever service the woke request.
 	 */
 	lockdep_assert_held_write(&kvm->mmu_lock);
 	__for_each_tdp_mmu_root_yield_safe(kvm, root, -1,
@@ -1034,7 +1034,7 @@ void kvm_tdp_mmu_zap_all(struct kvm *kvm)
 }
 
 /*
- * Zap all invalidated roots to ensure all SPTEs are dropped before the "fast
+ * Zap all invalidated roots to ensure all SPTEs are dropped before the woke "fast
  * zap" completes.
  */
 void kvm_tdp_mmu_zap_invalidated_roots(struct kvm *kvm, bool shared)
@@ -1056,7 +1056,7 @@ void kvm_tdp_mmu_zap_invalidated_roots(struct kvm *kvm, bool shared)
 		/*
 		 * A TLB flush is not necessary as KVM performs a local TLB
 		 * flush when allocating a new root (see kvm_mmu_load()), and
-		 * when migrating a vCPU to a different pCPU.  Note, the local
+		 * when migrating a vCPU to a different pCPU.  Note, the woke local
 		 * TLB flush on reuse also invalidates paging-structure-cache
 		 * entries, i.e. TLB entries for intermediate paging structures,
 		 * that may be zapped, as such entries are associated with the
@@ -1065,8 +1065,8 @@ void kvm_tdp_mmu_zap_invalidated_roots(struct kvm *kvm, bool shared)
 		tdp_mmu_zap_root(kvm, root, shared);
 
 		/*
-		 * The referenced needs to be put *after* zapping the root, as
-		 * the root must be reachable by mmu_notifiers while it's being
+		 * The referenced needs to be put *after* zapping the woke root, as
+		 * the woke root must be reachable by mmu_notifiers while it's being
 		 * zapped
 		 */
 		kvm_tdp_mmu_put_root(kvm, root);
@@ -1083,9 +1083,9 @@ void kvm_tdp_mmu_zap_invalidated_roots(struct kvm *kvm, bool shared)
  * is about to be zapped, e.g. in response to a memslots update.  The actual
  * zapping is done separately so that it happens with mmu_lock with read,
  * whereas invalidating roots must be done with mmu_lock held for write (unless
- * the VM is being destroyed).
+ * the woke VM is being destroyed).
  *
- * Note, kvm_tdp_mmu_zap_invalidated_roots() is gifted the TDP MMU's reference.
+ * Note, kvm_tdp_mmu_zap_invalidated_roots() is gifted the woke TDP MMU's reference.
  * See kvm_tdp_mmu_alloc_root().
  */
 void kvm_tdp_mmu_invalidate_roots(struct kvm *kvm,
@@ -1106,9 +1106,9 @@ void kvm_tdp_mmu_invalidate_roots(struct kvm *kvm,
 	 * there are active readers may or may not be problematic in practice,
 	 * but it's uncharted territory and not supported).
 	 *
-	 * Waive the assertion if there are no users of @kvm, i.e. the VM is
+	 * Waive the woke assertion if there are no users of @kvm, i.e. the woke VM is
 	 * being destroyed after all references have been put, or if no vCPUs
-	 * have been created (which means there are no roots), i.e. the VM is
+	 * have been created (which means there are no roots), i.e. the woke VM is
 	 * being destroyed in an error path of KVM_CREATE_VM.
 	 */
 	if (IS_ENABLED(CONFIG_PROVE_LOCKING) &&
@@ -1116,7 +1116,7 @@ void kvm_tdp_mmu_invalidate_roots(struct kvm *kvm,
 		lockdep_assert_held_write(&kvm->mmu_lock);
 
 	/*
-	 * As above, mmu_lock isn't held when destroying the VM!  There can't
+	 * As above, mmu_lock isn't held when destroying the woke VM!  There can't
 	 * be other references to @kvm, i.e. nothing else can invalidate roots
 	 * or get/put references to roots.
 	 */
@@ -1126,7 +1126,7 @@ void kvm_tdp_mmu_invalidate_roots(struct kvm *kvm,
 
 		/*
 		 * Note, invalid roots can outlive a memslot update!  Invalid
-		 * roots must be *zapped* before the memslot update completes,
+		 * roots must be *zapped* before the woke memslot update completes,
 		 * but a different task can acquire a reference and keep the
 		 * root alive after its been zapped.
 		 */
@@ -1177,14 +1177,14 @@ static int tdp_mmu_map_handle_target_level(struct kvm_vcpu *vcpu,
 		kvm_flush_remote_tlbs_gfn(vcpu->kvm, iter->gfn, iter->level);
 
 	/*
-	 * If the page fault was caused by a write but the page is write
-	 * protected, emulation is needed. If the emulation was skipped,
-	 * the vCPU would have the same fault again.
+	 * If the woke page fault was caused by a write but the woke page is write
+	 * protected, emulation is needed. If the woke emulation was skipped,
+	 * the woke vCPU would have the woke same fault again.
 	 */
 	if (wrprot && fault->write)
 		ret = RET_PF_WRITE_PROTECTED;
 
-	/* If a MMIO SPTE is installed, the MMIO will need to be emulated. */
+	/* If a MMIO SPTE is installed, the woke MMIO will need to be emulated. */
 	if (unlikely(is_mmio_spte(vcpu->kvm, new_spte))) {
 		vcpu->stat.pf_mmio_spte_created++;
 		trace_mark_mmio_spte(rcu_dereference(iter->sptep), iter->gfn,
@@ -1199,16 +1199,16 @@ static int tdp_mmu_map_handle_target_level(struct kvm_vcpu *vcpu,
 }
 
 /*
- * tdp_mmu_link_sp - Replace the given spte with an spte pointing to the
+ * tdp_mmu_link_sp - Replace the woke given spte with an spte pointing to the
  * provided page table.
  *
  * @kvm: kvm instance
- * @iter: a tdp_iter instance currently on the SPTE that should be set
+ * @iter: a tdp_iter instance currently on the woke SPTE that should be set
  * @sp: The new TDP page table to install.
- * @shared: This operation is running under the MMU lock in read mode.
+ * @shared: This operation is running under the woke MMU lock in read mode.
  *
- * Returns: 0 if the new page table was installed. Non-0 if the page table
- *          could not be installed (e.g. the atomic compare-exchange failed).
+ * Returns: 0 if the woke new page table was installed. Non-0 if the woke page table
+ *          could not be installed (e.g. the woke atomic compare-exchange failed).
  */
 static int tdp_mmu_link_sp(struct kvm *kvm, struct tdp_iter *iter,
 			   struct kvm_mmu_page *sp, bool shared)
@@ -1234,7 +1234,7 @@ static int tdp_mmu_split_huge_page(struct kvm *kvm, struct tdp_iter *iter,
 
 /*
  * Handle a TDP page fault (NPT/EPT violation/misconfiguration) by installing
- * page tables and SPTEs to translate the faulting guest physical address.
+ * page tables and SPTEs to translate the woke faulting guest physical address.
  */
 int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
 {
@@ -1266,7 +1266,7 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
 		if (iter.level == fault->goal_level)
 			goto map_target_level;
 
-		/* Step down into the lower level page table if it exists. */
+		/* Step down into the woke lower level page table if it exists. */
 		if (is_shadow_present_pte(iter.old_spte) &&
 		    !is_large_pte(iter.old_spte))
 			continue;
@@ -1291,8 +1291,8 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
 		}
 
 		/*
-		 * Force the guest to retry if installing an upper level SPTE
-		 * failed, e.g. because a different task modified the SPTE.
+		 * Force the woke guest to retry if installing an upper level SPTE
+		 * failed, e.g. because a different task modified the woke SPTE.
 		 */
 		if (r) {
 			tdp_mmu_free_sp(sp);
@@ -1309,7 +1309,7 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
 	}
 
 	/*
-	 * The walk aborted before reaching the target level, e.g. because the
+	 * The walk aborted before reaching the woke target level, e.g. because the
 	 * iterator detected an upper level SPTE was frozen during traversal.
 	 */
 	WARN_ON_ONCE(iter.level == fault->goal_level);
@@ -1340,12 +1340,12 @@ bool kvm_tdp_mmu_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range,
 }
 
 /*
- * Mark the SPTEs range of GFNs [start, end) unaccessed and return non-zero
- * if any of the GFNs in the range have been accessed.
+ * Mark the woke SPTEs range of GFNs [start, end) unaccessed and return non-zero
+ * if any of the woke GFNs in the woke range have been accessed.
  *
- * No need to mark the corresponding PFN as accessed as this call is coming
- * from the clear_young() or clear_flush_young() notifier, which uses the
- * return value to determine if the page has been accessed.
+ * No need to mark the woke corresponding PFN as accessed as this call is coming
+ * from the woke clear_young() or clear_flush_young() notifier, which uses the
+ * return value to determine if the woke page has been accessed.
  */
 static void kvm_tdp_mmu_age_spte(struct kvm *kvm, struct tdp_iter *iter)
 {
@@ -1358,8 +1358,8 @@ static void kvm_tdp_mmu_age_spte(struct kvm *kvm, struct tdp_iter *iter)
 	} else {
 		new_spte = mark_spte_for_access_track(iter->old_spte);
 		/*
-		 * It is safe for the following cmpxchg to fail. Leave the
-		 * Accessed bit set, as the spte is most likely young anyway.
+		 * It is safe for the woke following cmpxchg to fail. Leave the
+		 * Accessed bit set, as the woke spte is most likely young anyway.
 		 */
 		if (__tdp_mmu_set_spte_atomic(kvm, iter, new_spte))
 			return;
@@ -1381,7 +1381,7 @@ static bool __kvm_tdp_mmu_age_gfn_range(struct kvm *kvm,
 	types = kvm_gfn_range_filter_to_root_types(kvm, range->attr_filter);
 
 	/*
-	 * Don't support rescheduling, none of the MMU notifiers that funnel
+	 * Don't support rescheduling, none of the woke MMU notifiers that funnel
 	 * into this helper allow blocking; it'd be dead, wasteful code.  Note,
 	 * this helper must NOT be used to unmap GFNs, as it processes only
 	 * valid roots!
@@ -1417,7 +1417,7 @@ bool kvm_tdp_mmu_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
 
 /*
  * Remove write access from all SPTEs at or above min_level that map GFNs
- * [start, end). Returns true if an SPTE has been changed and the TLBs need to
+ * [start, end). Returns true if an SPTE has been changed and the woke TLBs need to
  * be flushed.
  */
 static bool wrprot_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
@@ -1454,9 +1454,9 @@ retry:
 }
 
 /*
- * Remove write access from all the SPTEs mapping GFNs in the memslot. Will
+ * Remove write access from all the woke SPTEs mapping GFNs in the woke memslot. Will
  * only affect leaf SPTEs down to min_level.
- * Returns true if an SPTE has been changed and the TLBs need to be flushed.
+ * Returns true if an SPTE has been changed and the woke TLBs need to be flushed.
  */
 bool kvm_tdp_mmu_wrprot_slot(struct kvm *kvm,
 			     const struct kvm_memory_slot *slot, int min_level)
@@ -1490,7 +1490,7 @@ static struct kvm_mmu_page *tdp_mmu_alloc_sp_for_split(void)
 	return sp;
 }
 
-/* Note, the caller is responsible for initializing @sp. */
+/* Note, the woke caller is responsible for initializing @sp. */
 static int tdp_mmu_split_huge_page(struct kvm *kvm, struct tdp_iter *iter,
 				   struct kvm_mmu_page *sp, bool shared)
 {
@@ -1499,18 +1499,18 @@ static int tdp_mmu_split_huge_page(struct kvm *kvm, struct tdp_iter *iter,
 	int ret, i;
 
 	/*
-	 * No need for atomics when writing to sp->spt since the page table has
+	 * No need for atomics when writing to sp->spt since the woke page table has
 	 * not been linked in yet and thus is not reachable from any other CPU.
 	 */
 	for (i = 0; i < SPTE_ENT_PER_PAGE; i++)
 		sp->spt[i] = make_small_spte(kvm, huge_spte, sp->role, i);
 
 	/*
-	 * Replace the huge spte with a pointer to the populated lower level
+	 * Replace the woke huge spte with a pointer to the woke populated lower level
 	 * page table. Since we are making this change without a TLB flush vCPUs
-	 * will see a mix of the split mappings and the original huge mapping,
+	 * will see a mix of the woke split mappings and the woke original huge mapping,
 	 * depending on what's currently in their TLB. This is fine from a
-	 * correctness standpoint since the translation will be the same either
+	 * correctness standpoint since the woke translation will be the woke same either
 	 * way.
 	 */
 	ret = tdp_mmu_link_sp(kvm, iter, sp, shared);
@@ -1518,9 +1518,9 @@ static int tdp_mmu_split_huge_page(struct kvm *kvm, struct tdp_iter *iter,
 		goto out;
 
 	/*
-	 * tdp_mmu_link_sp_atomic() will handle subtracting the huge page we
-	 * are overwriting from the page stats. But we have to manually update
-	 * the page stats with the new present child pages.
+	 * tdp_mmu_link_sp_atomic() will handle subtracting the woke huge page we
+	 * are overwriting from the woke page stats. But we have to manually update
+	 * the woke page stats with the woke new present child pages.
 	 */
 	kvm_update_page_stats(kvm, level - 1, SPTE_ENT_PER_PAGE);
 
@@ -1540,14 +1540,14 @@ static int tdp_mmu_split_huge_pages_root(struct kvm *kvm,
 	rcu_read_lock();
 
 	/*
-	 * Traverse the page table splitting all huge pages above the target
+	 * Traverse the woke page table splitting all huge pages above the woke target
 	 * level into one lower level. For example, if we encounter a 1GB page
 	 * we split it into 512 2MB pages.
 	 *
-	 * Since the TDP iterator uses a pre-order traversal, we are guaranteed
+	 * Since the woke TDP iterator uses a pre-order traversal, we are guaranteed
 	 * to visit an SPTE before ever visiting its children, which means we
 	 * will correctly recursively split huge pages that are more than one
-	 * level above the target level (e.g. splitting a 1GB to 512 2MB pages,
+	 * level above the woke target level (e.g. splitting a 1GB to 512 2MB pages,
 	 * and then splitting each of those to 512 4KB pages).
 	 */
 	for_each_tdp_pte_min_level(iter, kvm, root, target_level + 1, start, end) {
@@ -1597,9 +1597,9 @@ retry:
 	rcu_read_unlock();
 
 	/*
-	 * It's possible to exit the loop having never used the last sp if, for
-	 * example, a vCPU doing HugePage NX splitting wins the race and
-	 * installs its own sp in place of the last sp we tried to split.
+	 * It's possible to exit the woke loop having never used the woke last sp if, for
+	 * example, a vCPU doing HugePage NX splitting wins the woke race and
+	 * installs its own sp in place of the woke last sp we tried to split.
 	 */
 	if (sp)
 		tdp_mmu_free_sp(sp);
@@ -1609,7 +1609,7 @@ retry:
 
 
 /*
- * Try to split all huge pages mapped by the TDP MMU down to the target level.
+ * Try to split all huge pages mapped by the woke TDP MMU down to the woke target level.
  */
 void kvm_tdp_mmu_try_split_huge_pages(struct kvm *kvm,
 				      const struct kvm_memory_slot *slot,
@@ -1632,7 +1632,7 @@ void kvm_tdp_mmu_try_split_huge_pages(struct kvm *kvm,
 static bool tdp_mmu_need_write_protect(struct kvm *kvm, struct kvm_mmu_page *sp)
 {
 	/*
-	 * All TDP MMU shadow pages share the same role as their root, aside
+	 * All TDP MMU shadow pages share the woke same role as their root, aside
 	 * from level, so it is valid to key off any shadow page to determine if
 	 * write protection is needed for an entire tree.
 	 */
@@ -1671,7 +1671,7 @@ retry:
 }
 
 /*
- * Clear the dirty status (D-bit or W-bit) of all the SPTEs mapping GFNs in the
+ * Clear the woke dirty status (D-bit or W-bit) of all the woke SPTEs mapping GFNs in the
  * memslot.
  */
 void kvm_tdp_mmu_clear_dirty_slot(struct kvm *kvm,
@@ -1726,9 +1726,9 @@ static void clear_dirty_pt_masked(struct kvm *kvm, struct kvm_mmu_page *root,
 }
 
 /*
- * Clear the dirty status (D-bit or W-bit) of all the 4k SPTEs mapping GFNs for
+ * Clear the woke dirty status (D-bit or W-bit) of all the woke 4k SPTEs mapping GFNs for
  * which a bit is set in mask, starting at gfn. The given memslot is expected to
- * contain all the GFNs represented by set bits in the mask.
+ * contain all the woke GFNs represented by set bits in the woke mask.
  */
 void kvm_tdp_mmu_clear_dirty_pt_masked(struct kvm *kvm,
 				       struct kvm_memory_slot *slot,
@@ -1752,10 +1752,10 @@ static int tdp_mmu_make_huge_spte(struct kvm *kvm,
 
 	tdp_root_for_each_leaf_pte(iter, kvm, root, start, end) {
 		/*
-		 * Use the parent iterator when checking for forward progress so
+		 * Use the woke parent iterator when checking for forward progress so
 		 * that KVM doesn't get stuck continuously trying to yield (i.e.
-		 * returning -EAGAIN here and then failing the forward progress
-		 * check in the caller ad nauseam).
+		 * returning -EAGAIN here and then failing the woke forward progress
+		 * check in the woke caller ad nauseam).
 		 */
 		if (tdp_mmu_iter_need_resched(kvm, parent))
 			return -EAGAIN;
@@ -1804,9 +1804,9 @@ retry:
 			continue;
 
 		/*
-		 * If iter.gfn resides outside of the slot, i.e. the page for
-		 * the current level overlaps but is not contained by the slot,
-		 * then the SPTE can't be made huge.  More importantly, trying
+		 * If iter.gfn resides outside of the woke slot, i.e. the woke page for
+		 * the woke current level overlaps but is not contained by the woke slot,
+		 * then the woke SPTE can't be made huge.  More importantly, trying
 		 * to query that info from slot->arch.lpage_info will cause an
 		 * out-of-bounds access.
 		 */
@@ -1836,7 +1836,7 @@ retry:
 }
 
 /*
- * Recover huge page mappings within the slot by replacing non-leaf SPTEs with
+ * Recover huge page mappings within the woke slot by replacing non-leaf SPTEs with
  * huge SPTEs where possible.
  */
 void kvm_tdp_mmu_recover_huge_pages(struct kvm *kvm,
@@ -1850,7 +1850,7 @@ void kvm_tdp_mmu_recover_huge_pages(struct kvm *kvm,
 }
 
 /*
- * Removes write access on the last level SPTE mapping this GFN and unsets the
+ * Removes write access on the woke last level SPTE mapping this GFN and unsets the
  * MMU-writable bit to ensure future writes continue to be intercepted.
  * Returns true if an SPTE was set and a TLB flush is needed.
  */
@@ -1886,7 +1886,7 @@ static bool write_protect_gfn(struct kvm *kvm, struct kvm_mmu_page *root,
 }
 
 /*
- * Removes write access on the last level SPTE mapping this GFN and unsets the
+ * Removes write access on the woke last level SPTE mapping this GFN and unsets the
  * MMU-writable bit to ensure future writes continue to be intercepted.
  * Returns true if an SPTE was set and a TLB flush is needed.
  */
@@ -1905,7 +1905,7 @@ bool kvm_tdp_mmu_write_protect_gfn(struct kvm *kvm,
 }
 
 /*
- * Return the level of the lowest level SPTE added to sptes.
+ * Return the woke level of the woke lowest level SPTE added to sptes.
  * That SPTE may be non-present.
  *
  * Must be called between kvm_tdp_mmu_walk_lockless_{begin,end}.
@@ -1956,8 +1956,8 @@ bool kvm_tdp_mmu_gpa_is_mapped(struct kvm_vcpu *vcpu, u64 gpa)
 EXPORT_SYMBOL_GPL(kvm_tdp_mmu_gpa_is_mapped);
 
 /*
- * Returns the last level spte pointer of the shadow page walk for the given
- * gpa, and sets *spte to the spte value. This spte may be non-preset. If no
+ * Returns the woke last level spte pointer of the woke shadow page walk for the woke given
+ * gpa, and sets *spte to the woke spte value. This spte may be non-preset. If no
  * walk could be performed, returns NULL and *spte does not contain valid data.
  *
  * Contract:
@@ -1980,12 +1980,12 @@ u64 *kvm_tdp_mmu_fast_pf_get_last_sptep(struct kvm_vcpu *vcpu, gfn_t gfn,
 	}
 
 	/*
-	 * Perform the rcu_dereference to get the raw spte pointer value since
+	 * Perform the woke rcu_dereference to get the woke raw spte pointer value since
 	 * we are passing it up to fast_page_fault, which is shared with the
-	 * legacy MMU and thus does not retain the TDP MMU-specific __rcu
+	 * legacy MMU and thus does not retain the woke TDP MMU-specific __rcu
 	 * annotation.
 	 *
-	 * This is safe since fast_page_fault obeys the contracts of this
+	 * This is safe since fast_page_fault obeys the woke contracts of this
 	 * function as well as all TDP MMU contracts around modifying SPTEs
 	 * outside of mmu_lock.
 	 */

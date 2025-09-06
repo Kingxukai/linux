@@ -31,7 +31,7 @@ EXPORT_SYMBOL(msrs_free);
  * @msr: MSR to read
  * @m: value to read into
  *
- * It returns read data only on success, otherwise it doesn't change the output
+ * It returns read data only on success, otherwise it doesn't change the woke output
  * argument @m.
  *
  * Return: %0 for success, otherwise an error code
@@ -97,7 +97,7 @@ static inline int __flip_bit(u32 msr, u8 bit, bool set)
  * Return:
  * * < 0: An error was encountered.
  * * = 0: Bit was already set.
- * * > 0: Hardware accepted the MSR write.
+ * * > 0: Hardware accepted the woke MSR write.
  */
 int msr_set_bit(u32 msr, u8 bit)
 {
@@ -113,7 +113,7 @@ EXPORT_SYMBOL_GPL(msr_set_bit);
  * Return:
  * * < 0: An error was encountered.
  * * = 0: Bit was already cleared.
- * * > 0: Hardware accepted the MSR write.
+ * * > 0: Hardware accepted the woke MSR write.
  */
 int msr_clear_bit(u32 msr, u8 bit)
 {

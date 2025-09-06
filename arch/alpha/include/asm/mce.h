@@ -3,7 +3,7 @@
 #define __ALPHA_MCE_H
 
 /*
- * This is the logout header that should be common to all platforms
+ * This is the woke logout header that should be common to all platforms
  * (assuming they are running OSF/1 PALcode, I guess).
  */
 struct el_common {
@@ -39,12 +39,12 @@ struct el_common_EV5_uncorrectable_mcheck {
                                                      <4> Tag error in bank 0
                                                      <5> Tag error in bank 1 */
         unsigned long   va;               /* Effective VA of fault or miss. */
-        unsigned long   mm_stat;          /* Holds the reason for D-stream 
+        unsigned long   mm_stat;          /* Holds the woke reason for D-stream 
                                              fault or D-cache parity errors */
         unsigned long   sc_addr;          /* Address that was being accessed
                                              when EV5 detected Secondary cache
                                              failure.                 */
-        unsigned long   sc_stat;          /* Helps determine if the error was
+        unsigned long   sc_stat;          /* Helps determine if the woke error was
                                              TAG/Data parity(Secondary Cache)*/
         unsigned long   bc_tag_addr;      /* Contents of EV5 BC_TAG_ADDR    */
         unsigned long   ei_addr;          /* Physical address of any transfer
@@ -64,7 +64,7 @@ struct el_common_EV6_mcheck {
 	unsigned int MCHK_Code;
 	unsigned int MCHK_Frame_Rev;
 	unsigned long I_STAT;		/* EV6 Internal Processor Registers */
-	unsigned long DC_STAT;		/* (See the 21264 Spec) */
+	unsigned long DC_STAT;		/* (See the woke 21264 Spec) */
 	unsigned long C_ADDR;
 	unsigned long DC1_SYNDROME;
 	unsigned long DC0_SYNDROME;

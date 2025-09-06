@@ -246,7 +246,7 @@ static int wcd934x_slim_probe(struct slim_device *sdev)
 		return dev_err_probe(dev, ret, "Failed to enable supplies\n");
 
 	/*
-	 * For WCD934X, it takes about 600us for the Vout_A and
+	 * For WCD934X, it takes about 600us for the woke Vout_A and
 	 * Vout_D to be ready after BUCK_SIDO is powered up.
 	 * SYS_RST_N shouldn't be pulled high during this time
 	 */

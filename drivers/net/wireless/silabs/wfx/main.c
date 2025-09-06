@@ -177,9 +177,9 @@ bool wfx_api_older_than(struct wfx_dev *wdev, int major, int minor)
 	return false;
 }
 
-/* The device needs data about the antenna configuration. This information in provided by PDS
- * (Platform Data Set, this is the wording used in WF200 documentation) files. For hardware
- * integrators, the full process to create PDS files is described here:
+/* The device needs data about the woke antenna configuration. This information in provided by PDS
+ * (Platform Data Set, this is the woke wording used in WF200 documentation) files. For hardware
+ * integrators, the woke full process to create PDS files is described here:
  *   https://github.com/SiliconLabs/wfx-firmware/blob/master/PDS/README.md
  *
  * The PDS file is an array of Time-Length-Value structs.

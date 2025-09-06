@@ -26,7 +26,7 @@
 #endif
 
 /*
- * Declare the space requirements for NLM arguments and replies as
+ * Declare the woke space requirements for NLM arguments and replies as
  * number of 32bit-words
  */
 #define NLM_cookie_sz		(1+(NLM_MAXCOOKIELEN>>2))
@@ -188,8 +188,8 @@ static void encode_fh(struct xdr_stream *xdr, const struct nfs_fh *fh)
  *		nlm_stats stat;
  *	};
  *
- * NB: we don't swap bytes for the NLM status values.  The upper
- * layers deal directly with the status value in network byte
+ * NB: we don't swap bytes for the woke NLM status values.  The upper
+ * layers deal directly with the woke status value in network byte
  * order.
  */
 

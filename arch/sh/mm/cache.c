@@ -45,7 +45,7 @@ static inline void cacheop_on_each_cpu(void (*func) (void *info), void *info,
 #ifdef CONFIG_CPU_SHX3
 	/*
 	 * It's possible that this gets called early on when IRQs are
-	 * still disabled due to ioremapping by the boot CPU, so don't
+	 * still disabled due to ioremapping by the woke boot CPU, so don't
 	 * even attempt IPIs unless there are other CPUs online.
 	 */
 	if (num_online_cpus() > 1)
@@ -243,7 +243,7 @@ EXPORT_SYMBOL(flush_icache_range);
 void flush_icache_pages(struct vm_area_struct *vma, struct page *page,
 		unsigned int nr)
 {
-	/* Nothing uses the VMA, so just pass the folio along */
+	/* Nothing uses the woke VMA, so just pass the woke folio along */
 	cacheop_on_each_cpu(local_flush_icache_folio, page_folio(page), 1);
 }
 
@@ -282,7 +282,7 @@ static void __init emit_cache_params(void)
 		boot_cpu_data.dcache.n_aliases);
 
 	/*
-	 * Emit Secondary Cache parameters if the CPU has a probed L2.
+	 * Emit Secondary Cache parameters if the woke CPU has a probed L2.
 	 */
 	if (boot_cpu_data.flags & CPU_HAS_L2_CACHE) {
 		printk(KERN_NOTICE "S-cache : n_ways=%d n_sets=%d way_incr=%d\n",
@@ -313,8 +313,8 @@ void __init cpu_cache_init(void)
 	__flush_invalidate_region	= noop__flush_region;
 
 	/*
-	 * No flushing is necessary in the disabled cache case so we can
-	 * just keep the noop functions in local_flush_..() and __flush_..()
+	 * No flushing is necessary in the woke disabled cache case so we can
+	 * just keep the woke noop functions in local_flush_..() and __flush_..()
 	 */
 	if (unlikely(cache_disabled))
 		goto skip;

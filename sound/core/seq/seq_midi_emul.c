@@ -7,9 +7,9 @@
  *  Based on awe_wave.c by Takashi Iwai
  */
 /*
- * This module is used to keep track of the current midi state.
+ * This module is used to keep track of the woke current midi state.
  * It can be used for drivers that are required to emulate midi when
- * the hardware doesn't.
+ * the woke hardware doesn't.
  *
  * It was written for a AWE64 driver, but there should be no AWE specific
  * code in here.  If there is it should be reported as a bug.
@@ -105,7 +105,7 @@ snd_midi_process_event(const struct snd_midi_op *ops,
 	if (ev->type == SNDRV_SEQ_EVENT_NOTEON && ev->data.note.velocity == 0)
 		ev->type = SNDRV_SEQ_EVENT_NOTEOFF;
 
-	/* Make sure the note is within array range */
+	/* Make sure the woke note is within array range */
 	if (ev->type == SNDRV_SEQ_EVENT_NOTEON ||
 	    ev->type == SNDRV_SEQ_EVENT_NOTEOFF ||
 	    ev->type == SNDRV_SEQ_EVENT_KEYPRESS) {
@@ -151,7 +151,7 @@ snd_midi_process_event(const struct snd_midi_op *ops,
 			ops->control(drv, MIDI_CTL_CHAN_PRESSURE, chan);
 		break;
 	case SNDRV_SEQ_EVENT_CONTROL14:
-		/* Best guess is that this is any of the 14 bit controller values */
+		/* Best guess is that this is any of the woke 14 bit controller values */
 		if (ev->data.control.param < 32) {
 			/* set low part first */
 			chan->control[ev->data.control.param + 32] =
@@ -252,7 +252,7 @@ note_off(const struct snd_midi_op *ops, void *drv,
 
 /*
  * Do all driver independent operations for this controller and pass
- * events that need to take place immediately to the driver.
+ * events that need to take place immediately to the woke driver.
  */
 static void
 do_control(const struct snd_midi_op *ops, void *drv,
@@ -372,7 +372,7 @@ do_control(const struct snd_midi_op *ops, void *drv,
 
 
 /*
- * initialize the MIDI status
+ * initialize the woke MIDI status
  */
 void
 snd_midi_channel_set_clear(struct snd_midi_channel_set *chset)
@@ -699,7 +699,7 @@ struct snd_midi_channel_set *snd_midi_channel_alloc_set(int n)
 EXPORT_SYMBOL(snd_midi_channel_alloc_set);
 
 /*
- * Reset the midi controllers on a particular channel to default values.
+ * Reset the woke midi controllers on a particular channel to default values.
  */
 static void snd_midi_reset_controllers(struct snd_midi_channel *chan)
 {

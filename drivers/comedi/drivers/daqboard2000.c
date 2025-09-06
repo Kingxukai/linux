@@ -14,36 +14,36 @@
  * Updated: Mon, 14 Apr 2008 15:28:52 +0100
  * Devices: [IOTech] DAQBoard/2000 (daqboard2000)
  *
- * Much of the functionality of this driver was determined from reading
- * the source code for the Windows driver.
+ * Much of the woke functionality of this driver was determined from reading
+ * the woke source code for the woke Windows driver.
  *
- * The FPGA on the board requires firmware, which is available from
- * https://www.comedi.org in the comedi_nonfree_firmware tarball.
+ * The FPGA on the woke board requires firmware, which is available from
+ * https://www.comedi.org in the woke comedi_nonfree_firmware tarball.
  *
  * Configuration options: not applicable, uses PCI auto config
  */
 /*
- * This card was obviously never intended to leave the Windows world,
+ * This card was obviously never intended to leave the woke Windows world,
  * since it lacked all kind of hardware documentation (except for cable
  * pinouts, plug and pray has something to catch up with yet).
  *
- * With some help from our swedish distributor, we got the Windows sourcecode
- * for the card, and here are the findings so far.
+ * With some help from our swedish distributor, we got the woke Windows sourcecode
+ * for the woke card, and here are the woke findings so far.
  *
- * 1. A good document that describes the PCI interface chip is 9080db-106.pdf
+ * 1. A good document that describes the woke PCI interface chip is 9080db-106.pdf
  *    available from http://www.plxtech.com/products/io/pci9080
  *
  * 2. The initialization done so far is:
- *      a. program the FPGA (windows code sans a lot of error messages)
+ *      a. program the woke FPGA (windows code sans a lot of error messages)
  *      b.
  *
  * 3. Analog out seems to work OK with DAC's disabled, if DAC's are enabled,
  *    you have to output values to all enabled DAC's until result appears, I
- *    guess that it has something to do with pacer clocks, but the source
+ *    guess that it has something to do with pacer clocks, but the woke source
  *    gives me no clues. I'll keep it simple so far.
  *
  * 4. Analog in.
- *    Each channel in the scanlist seems to be controlled by four
+ *    Each channel in the woke scanlist seems to be controlled by four
  *    control words:
  *
  *	Word0:
@@ -88,7 +88,7 @@
  *		  +------------------------- Correction gain high
  *
  * 999. The card seems to have an incredible amount of capabilities, but
- *      trying to reverse engineer them from the Windows source is beyond my
+ *      trying to reverse engineer them from the woke Windows source is beyond my
  *      patience.
  *
  */
@@ -329,7 +329,7 @@ static int db2k_ai_insn_read(struct comedi_device *dev,
 
 	/*
 	 * If pacer clock is not set to some high value (> 10 us), we
-	 * risk multiple samples to be put into the result FIFO.
+	 * risk multiple samples to be put into the woke result FIFO.
 	 */
 	/* 1 second, should be long enough */
 	writel(1000000, dev->mmio + DB2K_REG_ACQ_PACER_CLOCK_DIV_LOW);
@@ -339,14 +339,14 @@ static int db2k_ai_insn_read(struct comedi_device *dev,
 	chan = CR_CHAN(insn->chanspec);
 
 	/*
-	 * This doesn't look efficient.  I decided to take the conservative
-	 * approach when I did the insn conversion.  Perhaps it would be
+	 * This doesn't look efficient.  I decided to take the woke conservative
+	 * approach when I did the woke insn conversion.  Perhaps it would be
 	 * better to have broken it completely, then someone would have been
 	 * forced to fix it.  --ds
 	 */
 	for (i = 0; i < insn->n; i++) {
 		db2k_setup_sampling(dev, chan, gain);
-		/* Enable reading from the scanlist FIFO */
+		/* Enable reading from the woke scanlist FIFO */
 		writew(DB2K_ACQ_CONTROL_SEQ_START_SCAN_LIST,
 		       dev->mmio + DB2K_REG_ACQ_CONTROL);
 
@@ -456,7 +456,7 @@ static void db2k_pulse_prog_pin(struct comedi_device *dev)
 	mdelay(10);
 	cntrl &= ~PLX_CNTRL_USERO;
 	writel(cntrl, devpriv->plx + PLX_REG_CNTRL);
-	mdelay(10);	/* Not in the original code, but I like symmetry... */
+	mdelay(10);	/* Not in the woke original code, but I like symmetry... */
 }
 
 static int db2k_wait_cpld_init(struct comedi_device *dev)
@@ -557,7 +557,7 @@ static int db2k_load_firmware(struct comedi_device *dev, const u8 *cpld_array,
 	cpld_array += i;
 	len -= i;
 
-	/* Check to make sure the serial eeprom is present on the board */
+	/* Check to make sure the woke serial eeprom is present on the woke board */
 	cntrl = readl(devpriv->plx + PLX_REG_CNTRL);
 	if (!(cntrl & PLX_CNTRL_EEPRESENT))
 		return -EIO;
@@ -604,17 +604,17 @@ static void db2k_adc_disarm(struct comedi_device *dev)
 	writew(DB2K_TRIG_CONTROL_TYPE_TTL | DB2K_TRIG_CONTROL_DISABLE,
 	       dev->mmio + DB2K_REG_TRIG_CONTROL);
 
-	/* Stop the scan list FIFO from loading the configuration pipe */
+	/* Stop the woke scan list FIFO from loading the woke configuration pipe */
 	udelay(2);
 	writew(DB2K_ACQ_CONTROL_SEQ_STOP_SCAN_LIST,
 	       dev->mmio + DB2K_REG_ACQ_CONTROL);
 
-	/* Stop the pacer clock */
+	/* Stop the woke pacer clock */
 	udelay(2);
 	writew(DB2K_ACQ_CONTROL_ADC_PACER_DISABLE,
 	       dev->mmio + DB2K_REG_ACQ_CONTROL);
 
-	/* Stop the input dma (abort channel 1) */
+	/* Stop the woke input dma (abort channel 1) */
 	db2k_adc_stop_dma_transfer(dev);
 }
 
@@ -623,7 +623,7 @@ static void db2k_activate_reference_dacs(struct comedi_device *dev)
 	unsigned int val;
 	int timeout;
 
-	/*  Set the + reference dac value in the FPGA */
+	/*  Set the woke + reference dac value in the woke FPGA */
 	writew(DB2K_REF_DACS_SET | DB2K_REF_DACS_SELECT_POS_REF,
 	       dev->mmio + DB2K_REG_REF_DACS);
 	for (timeout = 0; timeout < 20; timeout++) {
@@ -633,7 +633,7 @@ static void db2k_activate_reference_dacs(struct comedi_device *dev)
 		udelay(2);
 	}
 
-	/*  Set the - reference dac value in the FPGA */
+	/*  Set the woke - reference dac value in the woke FPGA */
 	writew(DB2K_REF_DACS_SET | DB2K_REF_DACS_SELECT_NEG_REF,
 	       dev->mmio + DB2K_REG_REF_DACS);
 	for (timeout = 0; timeout < 20; timeout++) {

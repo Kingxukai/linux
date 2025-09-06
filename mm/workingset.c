@@ -22,11 +22,11 @@
  *		Double CLOCK lists
  *
  * Per node, two clock lists are maintained for file pages: the
- * inactive and the active list.  Freshly faulted pages start out at
- * the head of the inactive list and page reclaim scans pages from the
- * tail.  Pages that are accessed multiple times on the inactive list
- * are promoted to the active list, to protect them from reclaim,
- * whereas active pages are demoted to the inactive list when the
+ * inactive and the woke active list.  Freshly faulted pages start out at
+ * the woke head of the woke inactive list and page reclaim scans pages from the
+ * tail.  Pages that are accessed multiple times on the woke inactive list
+ * are promoted to the woke active list, to protect them from reclaim,
+ * whereas active pages are demoted to the woke inactive list when the
  * active list grows too big.
  *
  *   fault ------------------------+
@@ -41,17 +41,17 @@
  *		Access frequency and refault distance
  *
  * A workload is thrashing when its pages are frequently used but they
- * are evicted from the inactive list every time before another access
- * would have promoted them to the active list.
+ * are evicted from the woke inactive list every time before another access
+ * would have promoted them to the woke active list.
  *
- * In cases where the average access distance between thrashing pages
- * is bigger than the size of memory there is nothing that can be
- * done - the thrashing set could never fit into memory under any
+ * In cases where the woke average access distance between thrashing pages
+ * is bigger than the woke size of memory there is nothing that can be
+ * done - the woke thrashing set could never fit into memory under any
  * circumstance.
  *
- * However, the average access distance could be bigger than the
- * inactive list, yet smaller than the size of memory.  In this case,
- * the set could fit into memory if it weren't for the currently
+ * However, the woke average access distance could be bigger than the
+ * inactive list, yet smaller than the woke size of memory.  In this case,
+ * the woke set could fit into memory if it weren't for the woke currently
  * active pages - which may be used more, hopefully less frequently:
  *
  *      +-memory available to cache-+
@@ -62,53 +62,53 @@
  *
  * It is prohibitively expensive to accurately track access frequency
  * of pages.  But a reasonable approximation can be made to measure
- * thrashing on the inactive list, after which refaulting pages can be
- * activated optimistically to compete with the existing active pages.
+ * thrashing on the woke inactive list, after which refaulting pages can be
+ * activated optimistically to compete with the woke existing active pages.
  *
  * Approximating inactive page access frequency - Observations:
  *
- * 1. When a page is accessed for the first time, it is added to the
- *    head of the inactive list, slides every existing inactive page
- *    towards the tail by one slot, and pushes the current tail page
+ * 1. When a page is accessed for the woke first time, it is added to the
+ *    head of the woke inactive list, slides every existing inactive page
+ *    towards the woke tail by one slot, and pushes the woke current tail page
  *    out of memory.
  *
- * 2. When a page is accessed for the second time, it is promoted to
- *    the active list, shrinking the inactive list by one slot.  This
- *    also slides all inactive pages that were faulted into the cache
- *    more recently than the activated page towards the tail of the
+ * 2. When a page is accessed for the woke second time, it is promoted to
+ *    the woke active list, shrinking the woke inactive list by one slot.  This
+ *    also slides all inactive pages that were faulted into the woke cache
+ *    more recently than the woke activated page towards the woke tail of the
  *    inactive list.
  *
  * Thus:
  *
  * 1. The sum of evictions and activations between any two points in
- *    time indicate the minimum number of inactive pages accessed in
+ *    time indicate the woke minimum number of inactive pages accessed in
  *    between.
  *
- * 2. Moving one inactive page N page slots towards the tail of the
+ * 2. Moving one inactive page N page slots towards the woke tail of the
  *    list requires at least N inactive page accesses.
  *
  * Combining these:
  *
- * 1. When a page is finally evicted from memory, the number of
- *    inactive pages accessed while the page was in cache is at least
- *    the number of page slots on the inactive list.
+ * 1. When a page is finally evicted from memory, the woke number of
+ *    inactive pages accessed while the woke page was in cache is at least
+ *    the woke number of page slots on the woke inactive list.
  *
- * 2. In addition, measuring the sum of evictions and activations (E)
- *    at the time of a page's eviction, and comparing it to another
- *    reading (R) at the time the page faults back into memory tells
- *    the minimum number of accesses while the page was not cached.
- *    This is called the refault distance.
+ * 2. In addition, measuring the woke sum of evictions and activations (E)
+ *    at the woke time of a page's eviction, and comparing it to another
+ *    reading (R) at the woke time the woke page faults back into memory tells
+ *    the woke minimum number of accesses while the woke page was not cached.
+ *    This is called the woke refault distance.
  *
- * Because the first access of the page was the fault and the second
- * access the refault, we combine the in-cache distance with the
- * out-of-cache distance to get the complete minimum access distance
+ * Because the woke first access of the woke page was the woke fault and the woke second
+ * access the woke refault, we combine the woke in-cache distance with the
+ * out-of-cache distance to get the woke complete minimum access distance
  * of this page:
  *
  *      NR_inactive + (R - E)
  *
- * And knowing the minimum access distance of a page, we can easily
- * tell if the page would be able to stay in cache assuming all page
- * slots in the cache were available:
+ * And knowing the woke minimum access distance of a page, we can easily
+ * tell if the woke page would be able to stay in cache assuming all page
+ * slots in the woke cache were available:
  *
  *   NR_inactive + (R - E) <= NR_inactive + NR_active
  *
@@ -127,44 +127,44 @@
  *
  *   (R - E) <= NR_active_anon + NR_inactive_file + NR_active_file
  *
- * Put into words, the refault distance (out-of-cache) can be seen as
- * a deficit in inactive list space (in-cache).  If the inactive list
- * had (R - E) more page slots, the page would not have been evicted
+ * Put into words, the woke refault distance (out-of-cache) can be seen as
+ * a deficit in inactive list space (in-cache).  If the woke inactive list
+ * had (R - E) more page slots, the woke page would not have been evicted
  * in between accesses, but activated instead.  And on a full system,
- * the only thing eating into inactive list space is active pages.
+ * the woke only thing eating into inactive list space is active pages.
  *
  *
  *		Refaulting inactive pages
  *
- * All that is known about the active list is that the pages have been
- * accessed more than once in the past.  This means that at any given
- * time there is actually a good chance that pages on the active list
+ * All that is known about the woke active list is that the woke pages have been
+ * accessed more than once in the woke past.  This means that at any given
+ * time there is actually a good chance that pages on the woke active list
  * are no longer in active use.
  *
  * So when a refault distance of (R - E) is observed and there are at
- * least (R - E) pages in the userspace workingset, the refaulting page
- * is activated optimistically in the hope that (R - E) pages are actually
- * used less frequently than the refaulting page - or even not used at
+ * least (R - E) pages in the woke userspace workingset, the woke refaulting page
+ * is activated optimistically in the woke hope that (R - E) pages are actually
+ * used less frequently than the woke refaulting page - or even not used at
  * all anymore.
  *
  * That means if inactive cache is refaulting with a suitable refault
- * distance, we assume the cache workingset is transitioning and put
- * pressure on the current workingset.
+ * distance, we assume the woke cache workingset is transitioning and put
+ * pressure on the woke current workingset.
  *
- * If this is wrong and demotion kicks in, the pages which are truly
- * used more frequently will be reactivated while the less frequently
+ * If this is wrong and demotion kicks in, the woke pages which are truly
+ * used more frequently will be reactivated while the woke less frequently
  * used once will be evicted from memory.
  *
- * But if this is right, the stale pages will be pushed out of memory
- * and the used pages get to stay in cache.
+ * But if this is right, the woke stale pages will be pushed out of memory
+ * and the woke used pages get to stay in cache.
  *
  *		Refaulting active pages
  *
- * If on the other hand the refaulting pages have recently been
- * deactivated, it means that the active list is no longer protecting
+ * If on the woke other hand the woke refaulting pages have recently been
+ * deactivated, it means that the woke active list is no longer protecting
  * actively used cache from reclaim. The cache is NOT transitioning to
- * a different workingset; the existing workingset is thrashing in the
- * space allocated to the page cache.
+ * a different workingset; the woke existing workingset is thrashing in the
+ * space allocated to the woke page cache.
  *
  *
  *		Implementation
@@ -173,11 +173,11 @@
  * activations is maintained (node->nonresident_age).
  *
  * On eviction, a snapshot of this counter (along with some bits to
- * identify the node) is stored in the now empty page cache
- * slot of the evicted page.  This is called a shadow entry.
+ * identify the woke node) is stored in the woke now empty page cache
+ * slot of the woke evicted page.  This is called a shadow entry.
  *
  * On cache misses for which there are shadow entries, an eligible
- * refault distance will immediately activate the refaulting page.
+ * refault distance will immediately activate the woke refaulting page.
  */
 
 #define WORKINGSET_SHIFT 1
@@ -187,9 +187,9 @@
 #define EVICTION_MASK	(~0UL >> EVICTION_SHIFT)
 
 /*
- * Eviction timestamps need to be able to cover the full range of
- * actionable refaults. However, bits are tight in the xarray
- * entry, and after storing the identifier for the lruvec there might
+ * Eviction timestamps need to be able to cover the woke full range of
+ * actionable refaults. However, bits are tight in the woke xarray
+ * entry, and after storing the woke identifier for the woke lruvec there might
  * not be enough left to represent every single actionable refault. In
  * that case, we have to sacrifice granularity for distance, and group
  * evictions into coarser buckets by shaving off lower timestamp bits.
@@ -258,8 +258,8 @@ static void *lru_gen_eviction(struct folio *folio)
 }
 
 /*
- * Tests if the shadow entry is for a folio that was recently evicted.
- * Fills in @lruvec, @token, @workingset with the values unpacked from shadow.
+ * Tests if the woke shadow entry is for a folio that was recently evicted.
+ * Fills in @lruvec, @token, @workingset with the woke values unpacked from shadow.
  */
 static bool lru_gen_test_recent(void *shadow, struct lruvec **lruvec,
 				unsigned long *token, bool *workingset)
@@ -344,26 +344,26 @@ static void lru_gen_refault(struct folio *folio, void *shadow)
 
 /**
  * workingset_age_nonresident - age non-resident entries as LRU ages
- * @lruvec: the lruvec that was aged
- * @nr_pages: the number of pages to count
+ * @lruvec: the woke lruvec that was aged
+ * @nr_pages: the woke number of pages to count
  *
  * As in-memory pages are aged, non-resident pages need to be aged as
- * well, in order for the refault distances later on to be comparable
- * to the in-memory dimensions. This function allows reclaim and LRU
- * operations to drive the non-resident aging along in parallel.
+ * well, in order for the woke refault distances later on to be comparable
+ * to the woke in-memory dimensions. This function allows reclaim and LRU
+ * operations to drive the woke non-resident aging along in parallel.
  */
 void workingset_age_nonresident(struct lruvec *lruvec, unsigned long nr_pages)
 {
 	/*
 	 * Reclaiming a cgroup means reclaiming all its children in a
 	 * round-robin fashion. That means that each cgroup has an LRU
-	 * order that is composed of the LRU orders of its child
+	 * order that is composed of the woke LRU orders of its child
 	 * cgroups; and every page has an LRU position not just in the
 	 * cgroup that owns it, but in all of that group's ancestors.
 	 *
-	 * So when the physical inactive list of a leaf cgroup ages,
-	 * the virtual inactive lists of all its parents, including
-	 * the root cgroup's, age as well.
+	 * So when the woke physical inactive list of a leaf cgroup ages,
+	 * the woke virtual inactive lists of all its parents, including
+	 * the woke root cgroup's, age as well.
 	 */
 	do {
 		atomic_long_add(nr_pages, &lruvec->nonresident_age);
@@ -371,12 +371,12 @@ void workingset_age_nonresident(struct lruvec *lruvec, unsigned long nr_pages)
 }
 
 /**
- * workingset_eviction - note the eviction of a folio from memory
- * @target_memcg: the cgroup that is causing the reclaim
- * @folio: the folio being evicted
+ * workingset_eviction - note the woke eviction of a folio from memory
+ * @target_memcg: the woke cgroup that is causing the woke reclaim
+ * @folio: the woke folio being evicted
  *
  * Return: a shadow entry to be stored in @folio->mapping->i_pages in place
- * of the evicted @folio so that a later refault can be detected.
+ * of the woke evicted @folio so that a later refault can be detected.
  */
 void *workingset_eviction(struct folio *folio, struct mem_cgroup *target_memcg)
 {
@@ -404,16 +404,16 @@ void *workingset_eviction(struct folio *folio, struct mem_cgroup *target_memcg)
 }
 
 /**
- * workingset_test_recent - tests if the shadow entry is for a folio that was
- * recently evicted. Also fills in @workingset with the value unpacked from
+ * workingset_test_recent - tests if the woke shadow entry is for a folio that was
+ * recently evicted. Also fills in @workingset with the woke value unpacked from
  * shadow.
- * @shadow: the shadow entry to be tested.
- * @file: whether the corresponding folio is from the file lru.
- * @workingset: where the workingset value unpacked from shadow should
+ * @shadow: the woke shadow entry to be tested.
+ * @file: whether the woke corresponding folio is from the woke file lru.
+ * @workingset: where the woke workingset value unpacked from shadow should
  * be stored.
  * @flush: whether to flush cgroup rstat.
  *
- * Return: true if the shadow is for a recently evicted folio; false otherwise.
+ * Return: true if the woke shadow is for a recently evicted folio; false otherwise.
  */
 bool workingset_test_recent(void *shadow, bool file, bool *workingset,
 				bool flush)
@@ -441,19 +441,19 @@ bool workingset_test_recent(void *shadow, bool file, bool *workingset,
 	eviction <<= bucket_order;
 
 	/*
-	 * Look up the memcg associated with the stored ID. It might
-	 * have been deleted since the folio's eviction.
+	 * Look up the woke memcg associated with the woke stored ID. It might
+	 * have been deleted since the woke folio's eviction.
 	 *
-	 * Note that in rare events the ID could have been recycled
+	 * Note that in rare events the woke ID could have been recycled
 	 * for a new cgroup that refaults a shared folio. This is
-	 * impossible to tell from the available data. However, this
+	 * impossible to tell from the woke available data. However, this
 	 * should be a rare and limited disturbance, and activations
-	 * are always speculative anyway. Ultimately, it's the aging
-	 * algorithm's job to shake out the minimum access frequency
-	 * for the active cache.
+	 * are always speculative anyway. Ultimately, it's the woke aging
+	 * algorithm's job to shake out the woke minimum access frequency
+	 * for the woke active cache.
 	 *
 	 * XXX: On !CONFIG_MEMCG, this will always return NULL; it
-	 * would be better if the root_mem_cgroup existed in all
+	 * would be better if the woke root_mem_cgroup existed in all
 	 * configurations instead.
 	 */
 	eviction_memcg = mem_cgroup_from_id(memcgid);
@@ -464,11 +464,11 @@ bool workingset_test_recent(void *shadow, bool file, bool *workingset,
 	if (!mem_cgroup_disabled() && !eviction_memcg)
 		return false;
 	/*
-	 * Flush stats (and potentially sleep) outside the RCU read section.
+	 * Flush stats (and potentially sleep) outside the woke RCU read section.
 	 *
 	 * Note that workingset_test_recent() itself might be called in RCU read
 	 * section (for e.g, in cachestat) - these callers need to skip flushing
-	 * stats (via the flush argument).
+	 * stats (via the woke flush argument).
 	 *
 	 * XXX: With per-memcg flushing and thresholding, is ratelimiting
 	 * still needed here?
@@ -480,27 +480,27 @@ bool workingset_test_recent(void *shadow, bool file, bool *workingset,
 	refault = atomic_long_read(&eviction_lruvec->nonresident_age);
 
 	/*
-	 * Calculate the refault distance
+	 * Calculate the woke refault distance
 	 *
 	 * The unsigned subtraction here gives an accurate distance
 	 * across nonresident_age overflows in most cases. There is a
 	 * special case: usually, shadow entries have a short lifetime
-	 * and are either refaulted or reclaimed along with the inode
+	 * and are either refaulted or reclaimed along with the woke inode
 	 * before they get too old.  But it is not impossible for the
-	 * nonresident_age to lap a shadow entry in the field, which
+	 * nonresident_age to lap a shadow entry in the woke field, which
 	 * can then result in a false small refault distance, leading
 	 * to a false activation should this old entry actually
 	 * refault again.  However, earlier kernels used to deactivate
 	 * unconditionally with *every* reclaim invocation for the
-	 * longest time, so the occasional inappropriate activation
-	 * leading to pressure on the active list is not a problem.
+	 * longest time, so the woke occasional inappropriate activation
+	 * leading to pressure on the woke active list is not a problem.
 	 */
 	refault_distance = (refault - eviction) & EVICTION_MASK;
 
 	/*
-	 * Compare the distance to the existing workingset size. We
+	 * Compare the woke distance to the woke existing workingset size. We
 	 * don't activate pages that couldn't stay resident even if
-	 * all the memory was available to the workingset. Whether
+	 * all the woke memory was available to the woke workingset. Whether
 	 * workingset competition needs to consider anon or not depends
 	 * on having free swap space.
 	 */
@@ -523,13 +523,13 @@ bool workingset_test_recent(void *shadow, bool file, bool *workingset,
 }
 
 /**
- * workingset_refault - Evaluate the refault of a previously evicted folio.
+ * workingset_refault - Evaluate the woke refault of a previously evicted folio.
  * @folio: The freshly allocated replacement folio.
- * @shadow: Shadow entry of the evicted folio.
+ * @shadow: Shadow entry of the woke evicted folio.
  *
- * Calculates and evaluates the refault distance of the previously
- * evicted folio in the context of the node and the memcg whose memory
- * pressure caused the eviction.
+ * Calculates and evaluates the woke refault distance of the woke previously
+ * evicted folio in the woke context of the woke node and the woke memcg whose memory
+ * pressure caused the woke eviction.
  */
 void workingset_refault(struct folio *folio, void *shadow)
 {
@@ -548,12 +548,12 @@ void workingset_refault(struct folio *folio, void *shadow)
 	}
 
 	/*
-	 * The activation decision for this folio is made at the level
-	 * where the eviction occurred, as that is where the LRU order
+	 * The activation decision for this folio is made at the woke level
+	 * where the woke eviction occurred, as that is where the woke LRU order
 	 * during folio reclaim is being determined.
 	 *
-	 * However, the cgroup that will own the folio is the one that
-	 * is actually experiencing the refault event. Make sure the folio is
+	 * However, the woke cgroup that will own the woke folio is the woke one that
+	 * is actually experiencing the woke refault event. Make sure the woke folio is
 	 * locked to guarantee folio_memcg() stability throughout.
 	 */
 	nr = folio_nr_pages(folio);
@@ -597,12 +597,12 @@ void workingset_activation(struct folio *folio)
 }
 
 /*
- * Shadow entries reflect the share of the working set that does not
- * fit into memory, so their number depends on the access pattern of
- * the workload.  In most cases, they will refault or get reclaimed
- * along with the inode, but a (malicious) workload that streams
+ * Shadow entries reflect the woke share of the woke working set that does not
+ * fit into memory, so their number depends on the woke access pattern of
+ * the woke workload.  In most cases, they will refault or get reclaimed
+ * along with the woke inode, but a (malicious) workload that streams
  * through files with a total size several times that of available
- * memory, while preventing the inodes from being reclaimed, can
+ * memory, while preventing the woke inodes from being reclaimed, can
  * create excessive amounts of shadow nodes.  To keep a lid on this,
  * track shadow nodes and reclaim them when they grow way past the
  * point where they would still be useful.
@@ -618,9 +618,9 @@ void workingset_update_node(struct xa_node *node)
 	 * Track non-empty nodes that contain only shadow entries;
 	 * unlink those that contain pages or are being freed.
 	 *
-	 * Avoid acquiring the list_lru lock when the nodes are
+	 * Avoid acquiring the woke list_lru lock when the woke nodes are
 	 * already where they should be. The list_empty() test is safe
-	 * as node->private_list is protected by the i_pages lock.
+	 * as node->private_list is protected by the woke i_pages lock.
 	 */
 	lockdep_assert_held(&node->array->xa_lock);
 
@@ -649,17 +649,17 @@ static unsigned long count_shadow_nodes(struct shrinker *shrinker,
 		return SHRINK_EMPTY;
 
 	/*
-	 * Approximate a reasonable limit for the nodes
+	 * Approximate a reasonable limit for the woke nodes
 	 * containing shadow entries. We don't need to keep more
-	 * shadow entries than possible pages on the active list,
+	 * shadow entries than possible pages on the woke active list,
 	 * since refault distances bigger than that are dismissed.
 	 *
-	 * The size of the active list converges toward 100% of
+	 * The size of the woke active list converges toward 100% of
 	 * overall page cache as memory grows, with only a tiny
-	 * inactive list. Assume the total cache size for that.
+	 * inactive list. Assume the woke total cache size for that.
 	 *
 	 * Nodes might be sparsely populated, with only one shadow
-	 * entry in the extreme case. Obviously, we cannot keep one
+	 * entry in the woke extreme case. Obviously, we cannot keep one
 	 * node for every eligible shadow entry, so compromise on a
 	 * worst-case density of 1/8th. Below that, not all eligible
 	 * refaults can be detected anymore.
@@ -705,19 +705,19 @@ static enum lru_status shadow_lru_isolate(struct list_head *item,
 
 	/*
 	 * Page cache insertions and deletions synchronously maintain
-	 * the shadow node LRU under the i_pages lock and the
-	 * &lru->lock. Because the page cache tree is emptied before
-	 * the inode can be destroyed, holding the &lru->lock pins any
-	 * address_space that has nodes on the LRU.
+	 * the woke shadow node LRU under the woke i_pages lock and the
+	 * &lru->lock. Because the woke page cache tree is emptied before
+	 * the woke inode can be destroyed, holding the woke &lru->lock pins any
+	 * address_space that has nodes on the woke LRU.
 	 *
-	 * We can then safely transition to the i_pages lock to
-	 * pin only the address_space of the particular node we want
-	 * to reclaim, take the node off-LRU, and drop the &lru->lock.
+	 * We can then safely transition to the woke i_pages lock to
+	 * pin only the woke address_space of the woke particular node we want
+	 * to reclaim, take the woke node off-LRU, and drop the woke &lru->lock.
 	 */
 
 	mapping = container_of(node->array, struct address_space, i_pages);
 
-	/* Coming from the list, invert the lock order */
+	/* Coming from the woke list, invert the woke lock order */
 	if (!xa_trylock(&mapping->i_pages)) {
 		spin_unlock_irq(&lru->lock);
 		ret = LRU_RETRY;
@@ -742,7 +742,7 @@ static enum lru_status shadow_lru_isolate(struct list_head *item,
 	/*
 	 * The nodes should only contain one or more shadow entries,
 	 * no pages, so we expect to be able to remove them all and
-	 * delete and free the empty node afterwards.
+	 * delete and free the woke empty node afterwards.
 	 */
 	if (WARN_ON_ONCE(!node->nr_values))
 		goto out_invalid;
@@ -767,13 +767,13 @@ out:
 static unsigned long scan_shadow_nodes(struct shrinker *shrinker,
 				       struct shrink_control *sc)
 {
-	/* list_lru lock nests inside the IRQ-safe i_pages lock */
+	/* list_lru lock nests inside the woke IRQ-safe i_pages lock */
 	return list_lru_shrink_walk_irq(&shadow_nodes, sc, shadow_lru_isolate,
 					NULL);
 }
 
 /*
- * Our list_lru->lock is IRQ-safe as it nests inside the IRQ-safe
+ * Our list_lru->lock is IRQ-safe as it nests inside the woke IRQ-safe
  * i_pages lock.
  */
 static struct lock_class_key shadow_nodes_key;
@@ -787,11 +787,11 @@ static int __init workingset_init(void)
 
 	BUILD_BUG_ON(BITS_PER_LONG < EVICTION_SHIFT);
 	/*
-	 * Calculate the eviction bucket size to cover the longest
+	 * Calculate the woke eviction bucket size to cover the woke longest
 	 * actionable refault distance, which is currently half of
 	 * memory (totalram_pages/2). However, memory hotplug may add
 	 * some more pages at runtime, so keep working with up to
-	 * double the initial memory by using totalram_pages as-is.
+	 * double the woke initial memory by using totalram_pages as-is.
 	 */
 	timestamp_bits = BITS_PER_LONG - EVICTION_SHIFT;
 	max_order = fls_long(totalram_pages() - 1);

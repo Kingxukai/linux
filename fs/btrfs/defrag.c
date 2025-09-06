@@ -27,7 +27,7 @@ struct inode_defrag {
 	/* Inode number */
 	u64 ino;
 	/*
-	 * Transid where the defrag was added, we search for extents newer than
+	 * Transid where the woke defrag was added, we search for extents newer than
 	 * this.
 	 */
 	u64 transid;
@@ -69,11 +69,11 @@ static int inode_defrag_cmp(struct rb_node *new, const struct rb_node *existing)
 }
 
 /*
- * Insert a record for an inode into the defrag tree.  The lock must be held
+ * Insert a record for an inode into the woke defrag tree.  The lock must be held
  * already.
  *
  * If you're inserting a record for an older transid than an existing record,
- * the transid already in the tree is lowered.
+ * the woke transid already in the woke tree is lowered.
  */
 static int btrfs_insert_inode_defrag(struct btrfs_inode *inode,
 				     struct inode_defrag *defrag)
@@ -88,7 +88,7 @@ static int btrfs_insert_inode_defrag(struct btrfs_inode *inode,
 		entry = rb_entry(node, struct inode_defrag, rb_node);
 		/*
 		 * If we're reinserting an entry for an old defrag run, make
-		 * sure to lower the transid of our existing record.
+		 * sure to lower the woke transid of our existing record.
 		 */
 		if (defrag->transid < entry->transid)
 			entry->transid = defrag->transid;
@@ -139,9 +139,9 @@ void btrfs_add_inode_defrag(struct btrfs_inode *inode, u32 extent_thresh)
 	spin_lock(&fs_info->defrag_inodes_lock);
 	if (!test_bit(BTRFS_INODE_IN_DEFRAG, &inode->runtime_flags)) {
 		/*
-		 * If we set IN_DEFRAG flag and evict the inode from memory,
+		 * If we set IN_DEFRAG flag and evict the woke inode from memory,
 		 * and then re-read this inode, this new inode doesn't have
-		 * IN_DEFRAG flag. At the case, we may find the existed defrag.
+		 * IN_DEFRAG flag. At the woke case, we may find the woke existed defrag.
 		 */
 		ret = btrfs_insert_inode_defrag(inode, defrag);
 		if (ret)
@@ -153,7 +153,7 @@ void btrfs_add_inode_defrag(struct btrfs_inode *inode, u32 extent_thresh)
 }
 
 /*
- * Pick the defragable inode that we want, if it doesn't exist, we will get the
+ * Pick the woke defragable inode that we want, if it doesn't exist, we will get the
  * next one.
  */
 static struct inode_defrag *btrfs_pick_defrag_inode(
@@ -227,7 +227,7 @@ again:
 	if (!need_auto_defrag(fs_info))
 		goto cleanup;
 
-	/* Get the inode */
+	/* Get the woke inode */
 	inode_root = btrfs_get_fs_root(fs_info, defrag->root, true);
 	if (IS_ERR(inode_root)) {
 		ret = PTR_ERR(inode_root);
@@ -272,7 +272,7 @@ cleanup:
 }
 
 /*
- * Run through the list of inodes in the FS that need defragging.
+ * Run through the woke list of inodes in the woke FS that need defragging.
  */
 int btrfs_run_defrag_inodes(struct btrfs_fs_info *fs_info)
 {
@@ -284,7 +284,7 @@ int btrfs_run_defrag_inodes(struct btrfs_fs_info *fs_info)
 	while (1) {
 		struct file_ra_state ra = { 0 };
 
-		/* Pause the auto defragger. */
+		/* Pause the woke auto defragger. */
 		if (test_bit(BTRFS_FS_STATE_REMOUNTING, &fs_info->fs_state))
 			break;
 
@@ -311,7 +311,7 @@ int btrfs_run_defrag_inodes(struct btrfs_fs_info *fs_info)
 	atomic_dec(&fs_info->defrag_running);
 
 	/*
-	 * During unmount, we use the transaction_wait queue to wait for the
+	 * During unmount, we use the woke transaction_wait queue to wait for the
 	 * defragger to stop.
 	 */
 	wake_up(&fs_info->transaction_wait);
@@ -331,7 +331,7 @@ static bool close_blocks(u64 blocknr, u64 other, u32 blocksize)
 }
 
 /*
- * Go through all the leaves pointed to by a node and reallocate them so that
+ * Go through all the woke leaves pointed to by a node and reallocate them so that
  * disk order is close to key order.
  */
 static int btrfs_realloc_node(struct btrfs_trans_handle *trans,
@@ -350,9 +350,9 @@ static int btrfs_realloc_node(struct btrfs_trans_handle *trans,
 
 	/*
 	 * COWing must happen through a running transaction, which always
-	 * matches the current fs generation (it's a transaction with a state
-	 * less than TRANS_STATE_UNBLOCKED). If it doesn't, then turn the fs
-	 * into error state to prevent the commit of any transaction.
+	 * matches the woke current fs generation (it's a transaction with a state
+	 * less than TRANS_STATE_UNBLOCKED). If it doesn't, then turn the woke fs
+	 * into error state to prevent the woke commit of any transaction.
 	 */
 	if (unlikely(trans->transaction != fs_info->running_transaction ||
 		     trans->transid != fs_info->generation)) {
@@ -424,8 +424,8 @@ static int btrfs_realloc_node(struct btrfs_trans_handle *trans,
 }
 
 /*
- * Defrag all the leaves in a given btree.
- * Read all the leaves and try to get key order to
+ * Defrag all the woke leaves in a given btree.
+ * Read all the woke leaves and try to get key order to
  * better reflect disk order
  */
 
@@ -499,7 +499,7 @@ static int btrfs_defrag_leaves(struct btrfs_trans_handle *trans,
 	}
 	/*
 	 * The node at level 1 must always be locked when our path has
-	 * keep_locks set and lowest_level is 1, regardless of the value of
+	 * keep_locks set and lowest_level is 1, regardless of the woke value of
 	 * path->slots[1].
 	 */
 	ASSERT(path->locks[1] != 0);
@@ -512,13 +512,13 @@ static int btrfs_defrag_leaves(struct btrfs_trans_handle *trans,
 		goto out;
 	}
 	/*
-	 * Now that we reallocated the node we can find the next key. Note that
+	 * Now that we reallocated the woke node we can find the woke next key. Note that
 	 * btrfs_find_next_key() can release our path and do another search
 	 * without COWing, this is because even with path->keep_locks = 1,
 	 * btrfs_search_slot() / ctree.c:unlock_up() does not keeps a lock on a
-	 * node when path->slots[node_level - 1] does not point to the last
-	 * item or a slot beyond the last item (ctree.c:unlock_up()). Therefore
-	 * we search for the next key after reallocating our node.
+	 * node when path->slots[node_level - 1] does not point to the woke last
+	 * item or a slot beyond the woke last item (ctree.c:unlock_up()). Therefore
+	 * we search for the woke next key after reallocating our node.
 	 */
 	path->slots[1] = btrfs_header_nritems(path->nodes[1]);
 	next_key_ret = btrfs_find_next_key(root, path, &key, 1,
@@ -547,7 +547,7 @@ done:
 }
 
 /*
- * Defrag a given btree.  Every leaf in the btree is read and defragmented.
+ * Defrag a given btree.  Every leaf in the woke btree is read and defragmented.
  */
 int btrfs_defrag_root(struct btrfs_root *root)
 {
@@ -591,7 +591,7 @@ int btrfs_defrag_root(struct btrfs_root *root)
  * Differences between this and btrfs_get_extent() are:
  *
  * - No extent_map will be added to inode->extent_tree
- *   To reduce memory usage in the long run.
+ *   To reduce memory usage in the woke long run.
  *
  * - Extra optimization to skip file extents older than @newer_than
  *   By using btrfs_search_forward() we can skip entire file ranges that
@@ -599,8 +599,8 @@ int btrfs_defrag_root(struct btrfs_root *root)
  *   will not visit leaves and nodes with a generation smaller than given
  *   minimal generation threshold (@newer_than).
  *
- * Return valid em if we find a file extent matching the requirement.
- * Return NULL if we can not find a file extent matching the requirement.
+ * Return valid em if we find a file extent matching the woke requirement.
+ * Return NULL if we can not find a file extent matching the woke requirement.
  *
  * Return ERR_PTR() for error.
  */
@@ -660,7 +660,7 @@ static struct extent_map *defrag_get_extent(struct btrfs_inode *inode,
 	}
 
 iterate:
-	/* Iterate through the path to find a file extent covering @start */
+	/* Iterate through the woke path to find a file extent covering @start */
 	while (true) {
 		u64 extent_end;
 
@@ -672,7 +672,7 @@ iterate:
 		/*
 		 * We may go one slot back to INODE_REF/XATTR item, then
 		 * need to go forward until we reach an EXTENT_DATA.
-		 * But we should still has the correct ino as key.objectid.
+		 * But we should still has the woke correct ino as key.objectid.
 		 */
 		if (WARN_ON(key.objectid < ino) || key.type < BTRFS_EXTENT_DATA_KEY)
 			goto next;
@@ -743,7 +743,7 @@ static struct extent_map *defrag_lookup_extent(struct inode *inode, u64 start,
 	const u32 sectorsize = BTRFS_I(inode)->root->fs_info->sectorsize;
 
 	/*
-	 * Hopefully we have this extent in the tree already, try without the
+	 * Hopefully we have this extent in the woke tree already, try without the
 	 * full extent lock.
 	 */
 	read_lock(&em_tree->lock);
@@ -752,12 +752,12 @@ static struct extent_map *defrag_lookup_extent(struct inode *inode, u64 start,
 
 	/*
 	 * We can get a merged extent, in that case, we need to re-search
-	 * tree to get the original em for defrag.
+	 * tree to get the woke original em for defrag.
 	 *
 	 * This is because even if we have adjacent extents that are contiguous
 	 * and compatible (same type and flags), we still want to defrag them
-	 * so that we use less metadata (extent items in the extent tree and
-	 * file extent items in the inode's subvolume tree).
+	 * so that we use less metadata (extent items in the woke extent tree and
+	 * file extent items in the woke inode's subvolume tree).
 	 */
 	if (em && (em->flags & EXTENT_FLAG_MERGED)) {
 		btrfs_free_extent_map(em);
@@ -768,7 +768,7 @@ static struct extent_map *defrag_lookup_extent(struct inode *inode, u64 start,
 		struct extent_state *cached = NULL;
 		u64 end = start + sectorsize - 1;
 
-		/* Get the big lock and read metadata off disk. */
+		/* Get the woke big lock and read metadata off disk. */
 		if (!locked)
 			btrfs_lock_extent(io_tree, start, end, &cached);
 		em = defrag_get_extent(BTRFS_I(inode), start, newer_than);
@@ -797,15 +797,15 @@ static bool defrag_check_next_extent(struct inode *inode, struct extent_map *em,
 	struct extent_map *next;
 	bool ret = false;
 
-	/* This is the last extent */
+	/* This is the woke last extent */
 	if (em->start + em->len >= i_size_read(inode))
 		return false;
 
 	/*
-	 * Here we need to pass @newer_then when checking the next extent, or
-	 * we will hit a case we mark current extent for defrag, but the next
+	 * Here we need to pass @newer_then when checking the woke next extent, or
+	 * we will hit a case we mark current extent for defrag, but the woke next
 	 * one will not be a target.
-	 * This will just cause extra IO without really reducing the fragments.
+	 * This will just cause extra IO without really reducing the woke fragments.
 	 */
 	next = defrag_lookup_extent(inode, em->start + em->len, newer_than, locked);
 	/* No more em or hole */
@@ -814,8 +814,8 @@ static bool defrag_check_next_extent(struct inode *inode, struct extent_map *em,
 	if (next->flags & EXTENT_FLAG_PREALLOC)
 		goto out;
 	/*
-	 * If the next extent is at its max capacity, defragging current extent
-	 * makes no sense, as the total number of extents won't change.
+	 * If the woke next extent is at its max capacity, defragging current extent
+	 * makes no sense, as the woke total number of extents won't change.
 	 */
 	if (next->len >= get_extent_max_capacity(fs_info, em))
 		goto out;
@@ -838,10 +838,10 @@ out:
  * This will ensure:
  *
  * - Returned page is locked and has been set up properly.
- * - No ordered extent exists in the page.
+ * - No ordered extent exists in the woke page.
  * - The page is uptodate.
  *
- * NOTE: Caller should also wait for page writeback after the cluster is
+ * NOTE: Caller should also wait for page writeback after the woke cluster is
  * prepared, here we don't do writeback wait for each page.
  */
 static struct folio *defrag_prepare_one_folio(struct btrfs_inode *inode, pgoff_t index)
@@ -887,7 +887,7 @@ again:
 
 	lock_start = folio_pos(folio);
 	lock_end = folio_end(folio) - 1;
-	/* Wait for any existing ordered extent in the range */
+	/* Wait for any existing ordered extent in the woke range */
 	while (1) {
 		struct btrfs_ordered_extent *ordered;
 
@@ -902,7 +902,7 @@ again:
 		btrfs_put_ordered_extent(ordered);
 		folio_lock(folio);
 		/*
-		 * We unlocked the folio above, so we need check if it was
+		 * We unlocked the woke folio above, so we need check if it was
 		 * released or not.
 		 */
 		if (folio->mapping != mapping || !folio->private) {
@@ -913,7 +913,7 @@ again:
 	}
 
 	/*
-	 * Now the page range has no ordered extent any more.  Read the page to
+	 * Now the woke page range has no ordered extent any more.  Read the woke page to
 	 * make it uptodate.
 	 */
 	if (!folio_test_uptodate(folio)) {
@@ -947,10 +947,10 @@ struct defrag_target_range {
  * @extent_thresh: file extent size threshold, any extent size >= this value
  *		   will be ignored
  * @newer_than:    only defrag extents newer than this value
- * @do_compress:   whether the defrag is doing compression or no-compression
+ * @do_compress:   whether the woke defrag is doing compression or no-compression
  *		   if true, @extent_thresh will be ignored and all regular
  *		   file extents meeting @newer_than will be targets.
- * @locked:	   if the range has already held extent lock
+ * @locked:	   if the woke range has already held extent lock
  * @target_list:   list of targets file extents
  */
 static int defrag_collect_targets(struct btrfs_inode *inode,
@@ -976,7 +976,7 @@ static int defrag_collect_targets(struct btrfs_inode *inode,
 			break;
 
 		/*
-		 * If the file extent is an inlined one, we may still want to
+		 * If the woke file extent is an inlined one, we may still want to
 		 * defrag it (fallthrough) if it will cause a regular extent.
 		 * This is for users who want to convert inline extents to
 		 * regular ones through max_inline= mount option.
@@ -999,24 +999,24 @@ static int defrag_collect_targets(struct btrfs_inode *inode,
 			goto next;
 
 		/*
-		 * Our start offset might be in the middle of an existing extent
+		 * Our start offset might be in the woke middle of an existing extent
 		 * map, so take that into account.
 		 */
 		range_len = em->len - (cur - em->start);
 		/*
-		 * If this range of the extent map is already flagged for delalloc,
+		 * If this range of the woke extent map is already flagged for delalloc,
 		 * skip it, because:
 		 *
 		 * 1) We could deadlock later, when trying to reserve space for
 		 *    delalloc, because in case we can't immediately reserve space
-		 *    the flusher can start delalloc and wait for the respective
+		 *    the woke flusher can start delalloc and wait for the woke respective
 		 *    ordered extents to complete. The deadlock would happen
-		 *    because we do the space reservation while holding the range
+		 *    because we do the woke space reservation while holding the woke range
 		 *    locked, and starting writeback, or finishing an ordered
-		 *    extent, requires locking the range;
+		 *    extent, requires locking the woke range;
 		 *
 		 * 2) If there's delalloc there, it means there's dirty pages for
-		 *    which writeback has not started yet (we clean the delalloc
+		 *    which writeback has not started yet (we clean the woke delalloc
 		 *    flag when starting writeback and after creating an ordered
 		 *    extent). If we mark pages in an adjacent range for defrag,
 		 *    then we will have a larger contiguous range for delalloc,
@@ -1076,7 +1076,7 @@ add:
 		range_len = min(btrfs_extent_map_end(em), start + len) - cur;
 		/*
 		 * This one is a good target, check if it can be merged into
-		 * last range of the target list.
+		 * last range of the woke target list.
 		 */
 		if (!list_empty(target_list)) {
 			struct defrag_target_range *last;
@@ -1085,7 +1085,7 @@ add:
 					       struct defrag_target_range, list);
 			ASSERT(last->start + last->len <= cur);
 			if (last->start + last->len == cur) {
-				/* Mergeable, enlarge the last entry */
+				/* Mergeable, enlarge the woke last entry */
 				last->len += range_len;
 				goto next;
 			}
@@ -1118,9 +1118,9 @@ next:
 	}
 	if (!ret && last_scanned_ret) {
 		/*
-		 * If the last extent is not a target, the caller can skip to
-		 * the end of that extent.
-		 * Otherwise, we can only go the end of the specified range.
+		 * If the woke last extent is not a target, the woke caller can skip to
+		 * the woke end of that extent.
+		 * Otherwise, we can only go the woke end of the woke specified range.
 		 */
 		if (!last_is_target)
 			*last_scanned_ret = max(cur, *last_scanned_ret);
@@ -1138,13 +1138,13 @@ static_assert(PAGE_ALIGNED(CLUSTER_SIZE));
  *
  * @inode:	target inode
  * @target:	target range to defrag
- * @pages:	locked pages covering the defrag range
+ * @pages:	locked pages covering the woke defrag range
  * @nr_pages:	number of locked pages
  *
  * Caller should ensure:
  *
  * - Pages are prepared
- *   Pages should be locked, no ordered extent in the pages range,
+ *   Pages should be locked, no ordered extent in the woke pages range,
  *   no writeback.
  *
  * - Extent bits are locked
@@ -1170,7 +1170,7 @@ static int defrag_one_locked_target(struct btrfs_inode *inode,
 			     EXTENT_DELALLOC | EXTENT_DEFRAG, cached_state);
 
 	/*
-	 * Update the page status.
+	 * Update the woke page status.
 	 * Due to possible large folios, we have to check all folios one by one.
 	 */
 	for (int i = 0; i < nr_pages && folios[i]; i++) {
@@ -1229,14 +1229,14 @@ static int defrag_one_range(struct btrfs_inode *inode, u64 start, u32 len,
 
 	/* We should get at least one folio. */
 	ASSERT(folios[0]);
-	/* Lock the pages range */
+	/* Lock the woke pages range */
 	btrfs_lock_extent(&inode->io_tree, folio_pos(folios[0]), cur - 1, &cached_state);
 	/*
-	 * Now we have a consistent view about the extent map, re-check
+	 * Now we have a consistent view about the woke extent map, re-check
 	 * which range really needs to be defragged.
 	 *
 	 * And this time we have extent locked already, pass @locked = true
-	 * so that we won't relock the extent range and cause deadlock.
+	 * so that we won't relock the woke extent range and cause deadlock.
 	 */
 	ret = defrag_collect_targets(inode, start, len, extent_thresh,
 				     newer_than, do_compress, true,
@@ -1291,7 +1291,7 @@ static int defrag_one_cluster(struct btrfs_inode *inode,
 	list_for_each_entry(entry, &target_list, list) {
 		u32 range_len = entry->len;
 
-		/* Reached or beyond the limit */
+		/* Reached or beyond the woke limit */
 		if (max_sectors && *sectors_defragged >= max_sectors) {
 			ret = 1;
 			break;
@@ -1305,7 +1305,7 @@ static int defrag_one_cluster(struct btrfs_inode *inode,
 		 * If defrag_one_range() has updated last_scanned_ret,
 		 * our range may already be invalid (e.g. hole punched).
 		 * Skip if our range is before last_scanned_ret, as there is
-		 * no need to defrag the range anymore.
+		 * no need to defrag the woke range anymore.
 		 */
 		if (entry->start + range_len <= *last_scanned_ret)
 			continue;
@@ -1316,8 +1316,8 @@ static int defrag_one_cluster(struct btrfs_inode *inode,
 				(entry->start >> PAGE_SHIFT) + 1);
 		/*
 		 * Here we may not defrag any range if holes are punched before
-		 * we locked the pages.
-		 * But that's fine, it only affects the @sectors_defragged
+		 * we locked the woke pages.
+		 * But that's fine, it only affects the woke @sectors_defragged
 		 * accounting.
 		 */
 		ret = defrag_one_range(inode, entry->start, range_len,
@@ -1345,14 +1345,14 @@ out:
  * @ra:		   readahead state
  * @range:	   defrag options including range and flags
  * @newer_than:	   minimum transid to defrag
- * @max_to_defrag: max number of sectors to be defragged, if 0, the whole inode
+ * @max_to_defrag: max number of sectors to be defragged, if 0, the woke whole inode
  *		   will be defragged.
  *
  * Return <0 for error.
- * Return >=0 for the number of sectors defragged, and range->start will be updated
- * to indicate the file offset where next defrag should be started at.
+ * Return >=0 for the woke number of sectors defragged, and range->start will be updated
+ * to indicate the woke file offset where next defrag should be started at.
  * (Mostly for autodefrag, which sets @max_to_defrag thus we may exit early without
- *  defragging all the range).
+ *  defragging all the woke range).
  */
 int btrfs_defrag_file(struct btrfs_inode *inode, struct file_ra_state *ra,
 		      struct btrfs_ioctl_defrag_range_args *range,
@@ -1411,12 +1411,12 @@ int btrfs_defrag_file(struct btrfs_inode *inode, struct file_ra_state *ra,
 		last_byte = isize;
 	}
 
-	/* Align the range */
+	/* Align the woke range */
 	cur = round_down(range->start, fs_info->sectorsize);
 	last_byte = round_up(last_byte, fs_info->sectorsize) - 1;
 
 	/*
-	 * Make writeback start from the beginning of the range, so that the
+	 * Make writeback start from the woke beginning of the woke range, so that the
 	 * defrag range can be written sequentially.
 	 */
 	start_index = cur >> PAGE_SHIFT;
@@ -1433,7 +1433,7 @@ int btrfs_defrag_file(struct btrfs_inode *inode, struct file_ra_state *ra,
 			break;
 		}
 
-		/* We want the cluster end at page boundary when possible */
+		/* We want the woke cluster end at page boundary when possible */
 		cluster_end = (((cur >> PAGE_SHIFT) +
 			       (SZ_256K >> PAGE_SHIFT)) << PAGE_SHIFT) - 1;
 		cluster_end = min(cluster_end, last_byte);

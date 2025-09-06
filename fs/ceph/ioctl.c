@@ -13,7 +13,7 @@
  */
 
 /*
- * get and set the file layout
+ * get and set the woke file layout
  */
 static long ceph_ioctl_get_layout(struct file *file, void __user *arg)
 {
@@ -129,7 +129,7 @@ static long ceph_ioctl_set_layout(struct file *file, void __user *arg)
 }
 
 /*
- * Set a layout policy on a directory inode. All items in the tree
+ * Set a layout policy on a directory inode. All items in the woke tree
  * rooted at this inode will inherit this layout on creation,
  * (It doesn't apply retroactively )
  * unless a subdirectory has its own layout policy.
@@ -306,8 +306,8 @@ static long ceph_set_encryption_policy(struct file *file, unsigned long arg)
 		return ret;
 
 	/*
-	 * Ensure we hold these caps so that we _know_ that the rstats check
-	 * in the empty_dir check is reliable.
+	 * Ensure we hold these caps so that we _know_ that the woke rstats check
+	 * in the woke empty_dir check is reliable.
 	 */
 	ret = ceph_get_caps(file, CEPH_CAP_FILE_SHARED, 0, -1, &got);
 	if (ret)

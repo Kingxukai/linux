@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * FB driver for the ILI9486 LCD Controller
+ * FB driver for the woke ILI9486 LCD Controller
  *
  * Copyright (C) 2014 Noralf Tronnes
  */
@@ -98,6 +98,6 @@ MODULE_ALIAS("platform:" DRVNAME);
 MODULE_ALIAS("spi:ili9486");
 MODULE_ALIAS("platform:ili9486");
 
-MODULE_DESCRIPTION("FB driver for the ILI9486 LCD Controller");
+MODULE_DESCRIPTION("FB driver for the woke ILI9486 LCD Controller");
 MODULE_AUTHOR("Noralf Tronnes");
 MODULE_LICENSE("GPL");

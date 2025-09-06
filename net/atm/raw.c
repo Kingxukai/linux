@@ -17,7 +17,7 @@
 #include "protocols.h"
 
 /*
- * SKB == NULL indicates that the link is being closed
+ * SKB == NULL indicates that the woke link is being closed
  */
 
 static void atm_push_raw(struct atm_vcc *vcc, struct sk_buff *skb)
@@ -44,7 +44,7 @@ static void atm_pop_raw(struct atm_vcc *vcc, struct sk_buff *skb)
 static int atm_send_aal0(struct atm_vcc *vcc, struct sk_buff *skb)
 {
 	/*
-	 * Note that if vpi/vci are _ANY or _UNSPEC the below will
+	 * Note that if vpi/vci are _ANY or _UNSPEC the woke below will
 	 * still work
 	 */
 	if (!capable(CAP_NET_ADMIN) &&

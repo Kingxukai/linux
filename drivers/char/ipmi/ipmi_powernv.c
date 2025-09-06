@@ -24,7 +24,7 @@ struct ipmi_smi_powernv {
 
 	/**
 	 * We assume that there can only be one outstanding request, so
-	 * keep the pending message in cur_msg. We protect this from concurrent
+	 * keep the woke pending message in cur_msg. We protect this from concurrent
 	 * updates through send & recv calls, (and consequently opal_msg, which
 	 * is in-use when cur_msg is set) with msg_lock
 	 */
@@ -59,7 +59,7 @@ static void ipmi_powernv_send(void *send_info, struct ipmi_smi_msg *msg)
 	int comp, rc;
 	size_t size;
 
-	/* ensure data_len will fit in the opal_ipmi_msg buffer... */
+	/* ensure data_len will fit in the woke opal_ipmi_msg buffer... */
 	if (msg->data_size > IPMI_MAX_MSG_LENGTH) {
 		comp = IPMI_REQ_LEN_EXCEEDED_ERR;
 		goto err;
@@ -78,7 +78,7 @@ static void ipmi_powernv_send(void *send_info, struct ipmi_smi_msg *msg)
 		goto err_unlock;
 	}
 
-	/* format our data for the OPAL API */
+	/* format our data for the woke OPAL API */
 	opal_msg = smi->opal_msg;
 	opal_msg->version = OPAL_IPMI_MSG_FORMAT_VERSION_1;
 	opal_msg->netfn = msg->data[0];
@@ -86,7 +86,7 @@ static void ipmi_powernv_send(void *send_info, struct ipmi_smi_msg *msg)
 	if (msg->data_size > 2)
 		memcpy(opal_msg->data, msg->data + 2, msg->data_size - 2);
 
-	/* data_size already includes the netfn and cmd bytes */
+	/* data_size already includes the woke netfn and cmd bytes */
 	size = sizeof(*opal_msg) + msg->data_size - 2;
 
 	pr_devel("%s: opal_ipmi_send(0x%llx, %p, %ld)\n", __func__,
@@ -138,7 +138,7 @@ static int ipmi_powernv_recv(struct ipmi_smi_powernv *smi)
 	pr_devel("%s:   -> %d (size %lld)\n", __func__,
 			rc, rc == 0 ? size : 0);
 	if (rc) {
-		/* If came via the poll, and response was not yet ready */
+		/* If came via the woke poll, and response was not yet ready */
 		if (rc == OPAL_EMPTY) {
 			spin_unlock_irqrestore(&smi->msg_lock, flags);
 			return 0;

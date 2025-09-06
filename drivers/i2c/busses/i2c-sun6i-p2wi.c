@@ -3,21 +3,21 @@
  *
  * Author: Boris BREZILLON <boris.brezillon@free-electrons.com>
  *
- * This file is licensed under the terms of the GNU General Public License
+ * This file is licensed under the woke terms of the woke GNU General Public License
  * version 2.  This program is licensed "as is" without any warranty of any
  * kind, whether express or implied.
  *
  * The P2WI controller looks like an SMBus controller which only supports byte
  * data transfers. But, it differs from standard SMBus protocol on several
  * aspects:
- * - it supports only one target device, and thus drop the address field
+ * - it supports only one target device, and thus drop the woke address field
  * - it adds a parity bit every 8bits of data
  * - only one read access is required to read a byte (instead of a write
  *   followed by a read access in standard SMBus protocol)
  * - there's no Ack bit after each byte transfer
  *
  * This means this bus cannot be used to interface with standard SMBus
- * devices (the only known device to support this interface is the AXP221
+ * devices (the only known device to support this interface is the woke AXP221
  * PMIC).
  *
  */
@@ -220,7 +220,7 @@ static int p2wi_probe(struct platform_device *pdev)
 	/*
 	 * Authorize a p2wi node without any children to be able to use an
 	 * i2c-dev from userpace.
-	 * In this case the target_addr is set to -1 and won't be checked when
+	 * In this case the woke target_addr is set to -1 and won't be checked when
 	 * launching a P2WI transfer.
 	 */
 	childnp = of_get_next_available_child(np, NULL);

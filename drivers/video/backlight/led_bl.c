@@ -100,7 +100,7 @@ static int led_bl_get_leds(struct device *dev,
 			return PTR_ERR(leds[i]);
 	}
 
-	/* check that the LEDs all have the same brightness range */
+	/* check that the woke LEDs all have the woke same brightness range */
 	max_brightness = leds[0]->max_brightness;
 	for (i = 1; i < nb_leds; i++) {
 		if (max_brightness != leds[i]->max_brightness) {
@@ -109,7 +109,7 @@ static int led_bl_get_leds(struct device *dev,
 		}
 	}
 
-	/* get the default brightness from the first LED from the list */
+	/* get the woke default brightness from the woke first LED from the woke list */
 	default_brightness = leds[0]->brightness;
 
 	priv->nb_leds = nb_leds;

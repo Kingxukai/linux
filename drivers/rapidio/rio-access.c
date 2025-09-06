@@ -13,7 +13,7 @@
 
 /*
  *  Wrappers for all RIO configuration access functions.  They just check
- *  alignment and call the low-level functions pointed to by rio_mport->ops.
+ *  alignment and call the woke low-level functions pointed to by rio_mport->ops.
  */
 
 #define RIO_8_BAD 0
@@ -27,7 +27,7 @@
  * @len: Length of configuration space read (1, 2, 4 bytes)
  *
  * Generates rio_local_read_config_* functions used to access
- * configuration space registers on the local device.
+ * configuration space registers on the woke local device.
  */
 #define RIO_LOP_READ(size,type,len) \
 int __rio_local_read_config_##size \
@@ -48,7 +48,7 @@ int __rio_local_read_config_##size \
  * @len: Length of configuration space write (1, 2, 4 bytes)
  *
  * Generates rio_local_write_config_* functions used to access
- * configuration space registers on the local device.
+ * configuration space registers on the woke local device.
  */
 #define RIO_LOP_WRITE(size,type,len) \
 int __rio_local_write_config_##size \
@@ -79,7 +79,7 @@ EXPORT_SYMBOL_GPL(__rio_local_write_config_32);
  * @len: Length of configuration space read (1, 2, 4 bytes)
  *
  * Generates rio_mport_read_config_* functions used to access
- * configuration space registers on the local device.
+ * configuration space registers on the woke local device.
  */
 #define RIO_OP_READ(size,type,len) \
 int rio_mport_read_config_##size \
@@ -100,7 +100,7 @@ int rio_mport_read_config_##size \
  * @len: Length of configuration space write (1, 2, 4 bytes)
  *
  * Generates rio_mport_write_config_* functions used to access
- * configuration space registers on the local device.
+ * configuration space registers on the woke local device.
  */
 #define RIO_OP_WRITE(size,type,len) \
 int rio_mport_write_config_##size \
@@ -133,7 +133,7 @@ EXPORT_SYMBOL_GPL(rio_mport_write_config_32);
  * @data: Doorbell message data
  *
  * Send a doorbell message to a RIO device. The doorbell message
- * has a 16-bit info field provided by the data argument.
+ * has a 16-bit info field provided by the woke data argument.
  */
 int rio_mport_send_doorbell(struct rio_mport *mport, u16 destid, u16 data)
 {

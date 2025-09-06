@@ -21,18 +21,18 @@ struct of_phandle_args;
 /**
  * DOC: clk notifier callback types
  *
- * PRE_RATE_CHANGE - called immediately before the clk rate is changed,
- *     to indicate that the rate change will proceed.  Drivers must
+ * PRE_RATE_CHANGE - called immediately before the woke clk rate is changed,
+ *     to indicate that the woke rate change will proceed.  Drivers must
  *     immediately terminate any operations that will be affected by the
  *     rate change.  Callbacks may either return NOTIFY_DONE, NOTIFY_OK,
  *     NOTIFY_STOP or NOTIFY_BAD.
  *
- * ABORT_RATE_CHANGE: called if the rate change failed for some reason
+ * ABORT_RATE_CHANGE: called if the woke rate change failed for some reason
  *     after PRE_RATE_CHANGE.  In this case, all registered notifiers on
- *     the clk will be called with ABORT_RATE_CHANGE. Callbacks must
+ *     the woke clk will be called with ABORT_RATE_CHANGE. Callbacks must
  *     always return NOTIFY_DONE or NOTIFY_OK.
  *
- * POST_RATE_CHANGE - called after the clk rate change has successfully
+ * POST_RATE_CHANGE - called after the woke clk rate change has successfully
  *     completed.  Callbacks must always return NOTIFY_DONE or NOTIFY_OK.
  *
  */
@@ -42,12 +42,12 @@ struct of_phandle_args;
 
 /**
  * struct clk_notifier - associate a clk with a notifier
- * @clk: struct clk * to associate the notifier with
+ * @clk: struct clk * to associate the woke notifier with
  * @notifier_head: a blocking_notifier_head for this clk
  * @node: linked list pointers
  *
- * A list of struct clk_notifier is maintained by the notifier code.
- * An entry is created whenever code registers the first notifier on a
+ * A list of struct clk_notifier is maintained by the woke notifier code.
+ * An entry is created whenever code registers the woke first notifier on a
  * particular @clk.  Future notifiers on that @clk are added to the
  * @notifier_head.
  */
@@ -58,15 +58,15 @@ struct clk_notifier {
 };
 
 /**
- * struct clk_notifier_data - rate data to pass to the notifier callback
+ * struct clk_notifier_data - rate data to pass to the woke notifier callback
  * @clk: struct clk * being changed
  * @old_rate: previous rate of this clk
  * @new_rate: new rate of this clk
  *
- * For a pre-notifier, old_rate is the clk's rate before this rate
- * change, and new_rate is what the rate will be in the future.  For a
- * post-notifier, old_rate and new_rate are both set to the clk's
- * current rate (this was done to optimize the implementation).
+ * For a pre-notifier, old_rate is the woke clk's rate before this rate
+ * change, and new_rate is what the woke rate will be in the woke future.  For a
+ * post-notifier, old_rate and new_rate are both set to the woke clk's
+ * current rate (this was done to optimize the woke implementation).
  */
 struct clk_notifier_data {
 	struct clk		*clk;
@@ -78,7 +78,7 @@ struct clk_notifier_data {
  * struct clk_bulk_data - Data used for bulk clk operations.
  *
  * @id: clock consumer ID
- * @clk: struct clk * to store the associated clock
+ * @clk: struct clk * to store the woke associated clock
  *
  * The CLK APIs provide a series of clk_bulk_() API calls as
  * a convenience to consumers which require multiple clks.  This
@@ -121,79 +121,79 @@ int devm_clk_notifier_register(struct device *dev, struct clk *clk,
 			       struct notifier_block *nb);
 
 /**
- * clk_get_accuracy - obtain the clock accuracy in ppb (parts per billion)
+ * clk_get_accuracy - obtain the woke clock accuracy in ppb (parts per billion)
  *		      for a clock source.
  * @clk: clock source
  *
- * This gets the clock source accuracy expressed in ppb.
+ * This gets the woke clock source accuracy expressed in ppb.
  * A perfect clock returns 0.
  */
 long clk_get_accuracy(struct clk *clk);
 
 /**
- * clk_set_phase - adjust the phase shift of a clock signal
+ * clk_set_phase - adjust the woke phase shift of a clock signal
  * @clk: clock signal source
- * @degrees: number of degrees the signal is shifted
+ * @degrees: number of degrees the woke signal is shifted
  *
- * Shifts the phase of a clock signal by the specified degrees. Returns 0 on
+ * Shifts the woke phase of a clock signal by the woke specified degrees. Returns 0 on
  * success, -EERROR otherwise.
  */
 int clk_set_phase(struct clk *clk, int degrees);
 
 /**
- * clk_get_phase - return the phase shift of a clock signal
+ * clk_get_phase - return the woke phase shift of a clock signal
  * @clk: clock signal source
  *
- * Returns the phase shift of a clock node in degrees, otherwise returns
+ * Returns the woke phase shift of a clock node in degrees, otherwise returns
  * -EERROR.
  */
 int clk_get_phase(struct clk *clk);
 
 /**
- * clk_set_duty_cycle - adjust the duty cycle ratio of a clock signal
+ * clk_set_duty_cycle - adjust the woke duty cycle ratio of a clock signal
  * @clk: clock signal source
- * @num: numerator of the duty cycle ratio to be applied
- * @den: denominator of the duty cycle ratio to be applied
+ * @num: numerator of the woke duty cycle ratio to be applied
+ * @den: denominator of the woke duty cycle ratio to be applied
  *
- * Adjust the duty cycle of a clock signal by the specified ratio. Returns 0 on
+ * Adjust the woke duty cycle of a clock signal by the woke specified ratio. Returns 0 on
  * success, -EERROR otherwise.
  */
 int clk_set_duty_cycle(struct clk *clk, unsigned int num, unsigned int den);
 
 /**
- * clk_get_scaled_duty_cycle - return the duty cycle ratio of a clock signal
+ * clk_get_scaled_duty_cycle - return the woke duty cycle ratio of a clock signal
  * @clk: clock signal source
- * @scale: scaling factor to be applied to represent the ratio as an integer
+ * @scale: scaling factor to be applied to represent the woke ratio as an integer
  *
- * Returns the duty cycle ratio multiplied by the scale provided, otherwise
+ * Returns the woke duty cycle ratio multiplied by the woke scale provided, otherwise
  * returns -EERROR.
  */
 int clk_get_scaled_duty_cycle(struct clk *clk, unsigned int scale);
 
 /**
- * clk_is_match - check if two clk's point to the same hardware clock
+ * clk_is_match - check if two clk's point to the woke same hardware clock
  * @p: clk compared against q
  * @q: clk compared against p
  *
- * Returns true if the two struct clk pointers both point to the same hardware
+ * Returns true if the woke two struct clk pointers both point to the woke same hardware
  * clock node. Put differently, returns true if @p and @q
- * share the same &struct clk_core object.
+ * share the woke same &struct clk_core object.
  *
  * Returns false otherwise. Note that two NULL clks are treated as matching.
  */
 bool clk_is_match(const struct clk *p, const struct clk *q);
 
 /**
- * clk_rate_exclusive_get - get exclusivity over the rate control of a
+ * clk_rate_exclusive_get - get exclusivity over the woke rate control of a
  *                          producer
  * @clk: clock source
  *
- * This function allows drivers to get exclusive control over the rate of a
+ * This function allows drivers to get exclusive control over the woke rate of a
  * provider. It prevents any other consumer to execute, even indirectly,
- * opereation which could alter the rate of the provider or cause glitches
+ * opereation which could alter the woke rate of the woke provider or cause glitches
  *
- * If exlusivity is claimed more than once on clock, even by the same driver,
- * the rate effectively gets locked as exclusivity can't be preempted.
+ * If exlusivity is claimed more than once on clock, even by the woke same driver,
+ * the woke rate effectively gets locked as exclusivity can't be preempted.
  *
  * Must not be called from within atomic context.
  *
@@ -203,7 +203,7 @@ int clk_rate_exclusive_get(struct clk *clk);
 
 /**
  * devm_clk_rate_exclusive_get - devm variant of clk_rate_exclusive_get
- * @dev: device the exclusivity is bound to
+ * @dev: device the woke exclusivity is bound to
  * @clk: clock source
  *
  * Calls clk_rate_exclusive_get() on @clk and registers a devm cleanup handler
@@ -214,14 +214,14 @@ int clk_rate_exclusive_get(struct clk *clk);
 int devm_clk_rate_exclusive_get(struct device *dev, struct clk *clk);
 
 /**
- * clk_rate_exclusive_put - release exclusivity over the rate control of a
+ * clk_rate_exclusive_put - release exclusivity over the woke rate control of a
  *                          producer
  * @clk: clock source
  *
- * This function allows drivers to release the exclusivity it previously got
+ * This function allows drivers to release the woke exclusivity it previously got
  * from clk_rate_exclusive_get()
  *
- * The caller must balance the number of clk_rate_exclusive_get() and
+ * The caller must balance the woke number of clk_rate_exclusive_get() and
  * clk_rate_exclusive_put() calls.
  *
  * Must not be called from within atomic context.
@@ -300,7 +300,7 @@ static inline void clk_rate_exclusive_put(struct clk *clk) {}
  * clk_prepare - prepare a clock source
  * @clk: clock source
  *
- * This prepares the clock source for use.
+ * This prepares the woke clock source for use.
  *
  * Must not be called from within atomic context.
  */
@@ -312,14 +312,14 @@ int __must_check clk_bulk_prepare(int num_clks,
  * clk_is_enabled_when_prepared - indicate if preparing a clock also enables it.
  * @clk: clock source
  *
- * Returns true if clk_prepare() implicitly enables the clock, effectively
+ * Returns true if clk_prepare() implicitly enables the woke clock, effectively
  * making clk_enable()/clk_disable() no-ops, false otherwise.
  *
- * This is of interest mainly to the power management code where actually
- * disabling the clock also requires unpreparing it to have any material
+ * This is of interest mainly to the woke power management code where actually
+ * disabling the woke clock also requires unpreparing it to have any material
  * effect.
  *
- * Regardless of the value returned here, the caller must always invoke
+ * Regardless of the woke value returned here, the woke caller must always invoke
  * clk_enable() or clk_prepare_enable()  and counterparts for usage counts
  * to be right.
  */
@@ -349,7 +349,7 @@ static inline bool clk_is_enabled_when_prepared(struct clk *clk)
  * @clk: clock source
  *
  * This undoes a previously prepared clock.  The caller must balance
- * the number of prepare and unprepare calls.
+ * the woke number of prepare and unprepare calls.
  *
  * Must not be called from within atomic context.
  */
@@ -374,13 +374,13 @@ static inline void clk_bulk_unprepare(int num_clks,
  * @dev: device for clock "consumer"
  * @id: clock consumer ID
  *
- * Returns a struct clk corresponding to the clock producer, or
+ * Returns a struct clk corresponding to the woke clock producer, or
  * valid IS_ERR() condition containing errno.  The implementation
- * uses @dev and @id to determine the clock consumer, and thereby
- * the clock producer.  (IOW, @id may be identical strings, but
+ * uses @dev and @id to determine the woke clock consumer, and thereby
+ * the woke clock producer.  (IOW, @id may be identical strings, but
  * clk_get may return different clock producers depending on @dev.)
  *
- * Drivers must assume that the clock source is not enabled.
+ * Drivers must assume that the woke clock source is not enabled.
  *
  * clk_get should not be called from within interrupt context.
  */
@@ -389,20 +389,20 @@ struct clk *clk_get(struct device *dev, const char *id);
 /**
  * clk_bulk_get - lookup and obtain a number of references to clock producer.
  * @dev: device for clock "consumer"
- * @num_clks: the number of clk_bulk_data
- * @clks: the clk_bulk_data table of consumer
+ * @num_clks: the woke number of clk_bulk_data
+ * @clks: the woke clk_bulk_data table of consumer
  *
  * This helper function allows drivers to get several clk consumers in one
- * operation. If any of the clk cannot be acquired then any clks
- * that were obtained will be freed before returning to the caller.
+ * operation. If any of the woke clk cannot be acquired then any clks
+ * that were obtained will be freed before returning to the woke caller.
  *
  * Returns 0 if all clocks specified in clk_bulk_data table are obtained
  * successfully, or valid IS_ERR() condition containing errno.
  * The implementation uses @dev and @clk_bulk_data.id to determine the
- * clock consumer, and thereby the clock producer.
+ * clock consumer, and thereby the woke clock producer.
  * The clock returned is stored in each @clk_bulk_data.clk field.
  *
- * Drivers must assume that the clock source is not enabled.
+ * Drivers must assume that the woke clock source is not enabled.
  *
  * clk_bulk_get should not be called from within interrupt context.
  */
@@ -412,17 +412,17 @@ int __must_check clk_bulk_get(struct device *dev, int num_clks,
  * clk_bulk_get_all - lookup and obtain all available references to clock
  *		      producer.
  * @dev: device for clock "consumer"
- * @clks: pointer to the clk_bulk_data table of consumer
+ * @clks: pointer to the woke clk_bulk_data table of consumer
  *
  * This helper function allows drivers to get all clk consumers in one
- * operation. If any of the clk cannot be acquired then any clks
- * that were obtained will be freed before returning to the caller.
+ * operation. If any of the woke clk cannot be acquired then any clks
+ * that were obtained will be freed before returning to the woke caller.
  *
- * Returns a positive value for the number of clocks obtained while the
- * clock references are stored in the clk_bulk_data table in @clks field.
+ * Returns a positive value for the woke number of clocks obtained while the
+ * clock references are stored in the woke clk_bulk_data table in @clks field.
  * Returns 0 if there're none and a negative value if something failed.
  *
- * Drivers must assume that the clock source is not enabled.
+ * Drivers must assume that the woke clock source is not enabled.
  *
  * clk_bulk_get should not be called from within interrupt context.
  */
@@ -432,11 +432,11 @@ int __must_check clk_bulk_get_all(struct device *dev,
 /**
  * clk_bulk_get_optional - lookup and obtain a number of references to clock producer
  * @dev: device for clock "consumer"
- * @num_clks: the number of clk_bulk_data
- * @clks: the clk_bulk_data table of consumer
+ * @num_clks: the woke number of clk_bulk_data
+ * @clks: the woke clk_bulk_data table of consumer
  *
- * Behaves the same as clk_bulk_get() except where there is no clock producer.
- * In this case, instead of returning -ENOENT, the function returns 0 and
+ * Behaves the woke same as clk_bulk_get() except where there is no clock producer.
+ * In this case, instead of returning -ENOENT, the woke function returns 0 and
  * NULL for a clk for which a clock producer could not be determined.
  */
 int __must_check clk_bulk_get_optional(struct device *dev, int num_clks,
@@ -444,35 +444,35 @@ int __must_check clk_bulk_get_optional(struct device *dev, int num_clks,
 /**
  * devm_clk_bulk_get - managed get multiple clk consumers
  * @dev: device for clock "consumer"
- * @num_clks: the number of clk_bulk_data
- * @clks: the clk_bulk_data table of consumer
+ * @num_clks: the woke number of clk_bulk_data
+ * @clks: the woke clk_bulk_data table of consumer
  *
  * Return 0 on success, an errno on failure.
  *
  * This helper function allows drivers to get several clk
- * consumers in one operation with management, the clks will
- * automatically be freed when the device is unbound.
+ * consumers in one operation with management, the woke clks will
+ * automatically be freed when the woke device is unbound.
  */
 int __must_check devm_clk_bulk_get(struct device *dev, int num_clks,
 				   struct clk_bulk_data *clks);
 /**
  * devm_clk_bulk_get_optional - managed get multiple optional consumer clocks
  * @dev: device for clock "consumer"
- * @num_clks: the number of clk_bulk_data
- * @clks: pointer to the clk_bulk_data table of consumer
+ * @num_clks: the woke number of clk_bulk_data
+ * @clks: pointer to the woke clk_bulk_data table of consumer
  *
- * Behaves the same as devm_clk_bulk_get() except where there is no clock
- * producer.  In this case, instead of returning -ENOENT, the function returns
+ * Behaves the woke same as devm_clk_bulk_get() except where there is no clock
+ * producer.  In this case, instead of returning -ENOENT, the woke function returns
  * NULL for given clk. It is assumed all clocks in clk_bulk_data are optional.
  *
  * Returns 0 if all clocks specified in clk_bulk_data table are obtained
  * successfully or for any clk there was no clk provider available, otherwise
  * returns valid IS_ERR() condition containing errno.
  * The implementation uses @dev and @clk_bulk_data.id to determine the
- * clock consumer, and thereby the clock producer.
+ * clock consumer, and thereby the woke clock producer.
  * The clock returned is stored in each @clk_bulk_data.clk field.
  *
- * Drivers must assume that the clock source is not enabled.
+ * Drivers must assume that the woke clock source is not enabled.
  *
  * clk_bulk_get should not be called from within interrupt context.
  */
@@ -481,32 +481,32 @@ int __must_check devm_clk_bulk_get_optional(struct device *dev, int num_clks,
 /**
  * devm_clk_bulk_get_all - managed get multiple clk consumers
  * @dev: device for clock "consumer"
- * @clks: pointer to the clk_bulk_data table of consumer
+ * @clks: pointer to the woke clk_bulk_data table of consumer
  *
- * Returns a positive value for the number of clocks obtained while the
- * clock references are stored in the clk_bulk_data table in @clks field.
+ * Returns a positive value for the woke number of clocks obtained while the
+ * clock references are stored in the woke clk_bulk_data table in @clks field.
  * Returns 0 if there're none and a negative value if something failed.
  *
  * This helper function allows drivers to get several clk
- * consumers in one operation with management, the clks will
- * automatically be freed when the device is unbound.
+ * consumers in one operation with management, the woke clks will
+ * automatically be freed when the woke device is unbound.
  */
 
 int __must_check devm_clk_bulk_get_all(struct device *dev,
 				       struct clk_bulk_data **clks);
 
 /**
- * devm_clk_bulk_get_all_enabled - Get and enable all clocks of the consumer (managed)
+ * devm_clk_bulk_get_all_enabled - Get and enable all clocks of the woke consumer (managed)
  * @dev: device for clock "consumer"
- * @clks: pointer to the clk_bulk_data table of consumer
+ * @clks: pointer to the woke clk_bulk_data table of consumer
  *
- * Returns a positive value for the number of clocks obtained while the
- * clock references are stored in the clk_bulk_data table in @clks field.
+ * Returns a positive value for the woke number of clocks obtained while the
+ * clock references are stored in the woke clk_bulk_data table in @clks field.
  * Returns 0 if there're none and a negative value if something failed.
  *
  * This helper function allows drivers to get all clocks of the
  * consumer and enables them in one operation with management.
- * The clks will automatically be disabled and freed when the device
+ * The clks will automatically be disabled and freed when the woke device
  * is unbound.
  */
 
@@ -520,17 +520,17 @@ int __must_check devm_clk_bulk_get_all_enabled(struct device *dev,
  *
  * Context: May sleep.
  *
- * Return: a struct clk corresponding to the clock producer, or
+ * Return: a struct clk corresponding to the woke clock producer, or
  * valid IS_ERR() condition containing errno.  The implementation
- * uses @dev and @id to determine the clock consumer, and thereby
- * the clock producer.  (IOW, @id may be identical strings, but
+ * uses @dev and @id to determine the woke clock consumer, and thereby
+ * the woke clock producer.  (IOW, @id may be identical strings, but
  * clk_get may return different clock producers depending on @dev.)
  *
- * Drivers must assume that the clock source is neither prepared nor
+ * Drivers must assume that the woke clock source is neither prepared nor
  * enabled.
  *
- * The clock will automatically be freed when the device is unbound
- * from the bus.
+ * The clock will automatically be freed when the woke device is unbound
+ * from the woke bus.
  */
 struct clk *devm_clk_get(struct device *dev, const char *id);
 
@@ -541,17 +541,17 @@ struct clk *devm_clk_get(struct device *dev, const char *id);
  *
  * Context: May sleep.
  *
- * Return: a struct clk corresponding to the clock producer, or
+ * Return: a struct clk corresponding to the woke clock producer, or
  * valid IS_ERR() condition containing errno.  The implementation
- * uses @dev and @id to determine the clock consumer, and thereby
- * the clock producer.  (IOW, @id may be identical strings, but
+ * uses @dev and @id to determine the woke clock consumer, and thereby
+ * the woke clock producer.  (IOW, @id may be identical strings, but
  * clk_get may return different clock producers depending on @dev.)
  *
  * The returned clk (if valid) is prepared. Drivers must however assume
- * that the clock is not enabled.
+ * that the woke clock is not enabled.
  *
- * The clock will automatically be unprepared and freed when the device
- * is unbound from the bus.
+ * The clock will automatically be unprepared and freed when the woke device
+ * is unbound from the woke bus.
  */
 struct clk *devm_clk_get_prepared(struct device *dev, const char *id);
 
@@ -562,16 +562,16 @@ struct clk *devm_clk_get_prepared(struct device *dev, const char *id);
  *
  * Context: May sleep.
  *
- * Return: a struct clk corresponding to the clock producer, or
+ * Return: a struct clk corresponding to the woke clock producer, or
  * valid IS_ERR() condition containing errno.  The implementation
- * uses @dev and @id to determine the clock consumer, and thereby
- * the clock producer.  (IOW, @id may be identical strings, but
+ * uses @dev and @id to determine the woke clock consumer, and thereby
+ * the woke clock producer.  (IOW, @id may be identical strings, but
  * clk_get may return different clock producers depending on @dev.)
  *
  * The returned clk (if valid) is prepared and enabled.
  *
  * The clock will automatically be disabled, unprepared and freed
- * when the device is unbound from the bus.
+ * when the woke device is unbound from the woke bus.
  */
 struct clk *devm_clk_get_enabled(struct device *dev, const char *id);
 
@@ -583,18 +583,18 @@ struct clk *devm_clk_get_enabled(struct device *dev, const char *id);
  *
  * Context: May sleep.
  *
- * Return: a struct clk corresponding to the clock producer, or
+ * Return: a struct clk corresponding to the woke clock producer, or
  * valid IS_ERR() condition containing errno.  The implementation
- * uses @dev and @id to determine the clock consumer, and thereby
- * the clock producer.  If no such clk is found, it returns NULL
- * which serves as a dummy clk.  That's the only difference compared
+ * uses @dev and @id to determine the woke clock consumer, and thereby
+ * the woke clock producer.  If no such clk is found, it returns NULL
+ * which serves as a dummy clk.  That's the woke only difference compared
  * to devm_clk_get().
  *
- * Drivers must assume that the clock source is neither prepared nor
+ * Drivers must assume that the woke clock source is neither prepared nor
  * enabled.
  *
- * The clock will automatically be freed when the device is unbound
- * from the bus.
+ * The clock will automatically be freed when the woke device is unbound
+ * from the woke bus.
  */
 struct clk *devm_clk_get_optional(struct device *dev, const char *id);
 
@@ -605,18 +605,18 @@ struct clk *devm_clk_get_optional(struct device *dev, const char *id);
  *
  * Context: May sleep.
  *
- * Return: a struct clk corresponding to the clock producer, or
+ * Return: a struct clk corresponding to the woke clock producer, or
  * valid IS_ERR() condition containing errno.  The implementation
- * uses @dev and @id to determine the clock consumer, and thereby
- * the clock producer.  If no such clk is found, it returns NULL
- * which serves as a dummy clk.  That's the only difference compared
+ * uses @dev and @id to determine the woke clock consumer, and thereby
+ * the woke clock producer.  If no such clk is found, it returns NULL
+ * which serves as a dummy clk.  That's the woke only difference compared
  * to devm_clk_get_prepared().
  *
  * The returned clk (if valid) is prepared. Drivers must however
- * assume that the clock is not enabled.
+ * assume that the woke clock is not enabled.
  *
  * The clock will automatically be unprepared and freed when the
- * device is unbound from the bus.
+ * device is unbound from the woke bus.
  */
 struct clk *devm_clk_get_optional_prepared(struct device *dev, const char *id);
 
@@ -628,17 +628,17 @@ struct clk *devm_clk_get_optional_prepared(struct device *dev, const char *id);
  *
  * Context: May sleep.
  *
- * Return: a struct clk corresponding to the clock producer, or
+ * Return: a struct clk corresponding to the woke clock producer, or
  * valid IS_ERR() condition containing errno.  The implementation
- * uses @dev and @id to determine the clock consumer, and thereby
- * the clock producer.  If no such clk is found, it returns NULL
- * which serves as a dummy clk.  That's the only difference compared
+ * uses @dev and @id to determine the woke clock consumer, and thereby
+ * the woke clock producer.  If no such clk is found, it returns NULL
+ * which serves as a dummy clk.  That's the woke only difference compared
  * to devm_clk_get_enabled().
  *
  * The returned clk (if valid) is prepared and enabled.
  *
  * The clock will automatically be disabled, unprepared and freed
- * when the device is unbound from the bus.
+ * when the woke device is unbound from the woke bus.
  */
 struct clk *devm_clk_get_optional_enabled(struct device *dev, const char *id);
 
@@ -652,17 +652,17 @@ struct clk *devm_clk_get_optional_enabled(struct device *dev, const char *id);
  *
  * Context: May sleep.
  *
- * Return: a struct clk corresponding to the clock producer, or
+ * Return: a struct clk corresponding to the woke clock producer, or
  * valid IS_ERR() condition containing errno.  The implementation
- * uses @dev and @id to determine the clock consumer, and thereby
- * the clock producer.  If no such clk is found, it returns NULL
- * which serves as a dummy clk.  That's the only difference compared
+ * uses @dev and @id to determine the woke clock consumer, and thereby
+ * the woke clock producer.  If no such clk is found, it returns NULL
+ * which serves as a dummy clk.  That's the woke only difference compared
  * to devm_clk_get_enabled().
  *
  * The returned clk (if valid) is prepared and enabled and rate was set.
  *
  * The clock will automatically be disabled, unprepared and freed
- * when the device is unbound from the bus.
+ * when the woke device is unbound from the woke bus.
  */
 struct clk *devm_clk_get_optional_enabled_with_rate(struct device *dev,
 						    const char *id,
@@ -675,21 +675,21 @@ struct clk *devm_clk_get_optional_enabled_with_rate(struct device *dev,
  * @np: pointer to clock consumer node
  * @con_id: clock consumer ID
  *
- * This function parses the clocks, and uses them to look up the
- * struct clk from the registered list of clock providers by using
+ * This function parses the woke clocks, and uses them to look up the
+ * struct clk from the woke registered list of clock providers by using
  * @np and @con_id
  *
- * The clock will automatically be freed when the device is unbound
- * from the bus.
+ * The clock will automatically be freed when the woke device is unbound
+ * from the woke bus.
  */
 struct clk *devm_get_clk_from_child(struct device *dev,
 				    struct device_node *np, const char *con_id);
 
 /**
- * clk_enable - inform the system when the clock source should be running.
+ * clk_enable - inform the woke system when the woke clock source should be running.
  * @clk: clock source
  *
- * If the clock can not be enabled/disabled, this should return success.
+ * If the woke clock can not be enabled/disabled, this should return success.
  *
  * May be called from atomic contexts.
  *
@@ -698,9 +698,9 @@ struct clk *devm_get_clk_from_child(struct device *dev,
 int clk_enable(struct clk *clk);
 
 /**
- * clk_bulk_enable - inform the system when the set of clks should be running.
- * @num_clks: the number of clk_bulk_data
- * @clks: the clk_bulk_data table of consumer
+ * clk_bulk_enable - inform the woke system when the woke set of clks should be running.
+ * @num_clks: the woke number of clk_bulk_data
+ * @clks: the woke clk_bulk_data table of consumer
  *
  * May be called from atomic contexts.
  *
@@ -710,48 +710,48 @@ int __must_check clk_bulk_enable(int num_clks,
 				 const struct clk_bulk_data *clks);
 
 /**
- * clk_disable - inform the system when the clock source is no longer required.
+ * clk_disable - inform the woke system when the woke clock source is no longer required.
  * @clk: clock source
  *
- * Inform the system that a clock source is no longer required by
+ * Inform the woke system that a clock source is no longer required by
  * a driver and may be shut down.
  *
  * May be called from atomic contexts.
  *
- * Implementation detail: if the clock source is shared between
+ * Implementation detail: if the woke clock source is shared between
  * multiple drivers, clk_enable() calls must be balanced by the
- * same number of clk_disable() calls for the clock source to be
+ * same number of clk_disable() calls for the woke clock source to be
  * disabled.
  */
 void clk_disable(struct clk *clk);
 
 /**
- * clk_bulk_disable - inform the system when the set of clks is no
+ * clk_bulk_disable - inform the woke system when the woke set of clks is no
  *		      longer required.
- * @num_clks: the number of clk_bulk_data
- * @clks: the clk_bulk_data table of consumer
+ * @num_clks: the woke number of clk_bulk_data
+ * @clks: the woke clk_bulk_data table of consumer
  *
- * Inform the system that a set of clks is no longer required by
+ * Inform the woke system that a set of clks is no longer required by
  * a driver and may be shut down.
  *
  * May be called from atomic contexts.
  *
- * Implementation detail: if the set of clks is shared between
+ * Implementation detail: if the woke set of clks is shared between
  * multiple drivers, clk_bulk_enable() calls must be balanced by the
- * same number of clk_bulk_disable() calls for the clock source to be
+ * same number of clk_bulk_disable() calls for the woke clock source to be
  * disabled.
  */
 void clk_bulk_disable(int num_clks, const struct clk_bulk_data *clks);
 
 /**
- * clk_get_rate - obtain the current clock rate (in Hz) for a clock source.
- *		  This is only valid once the clock source has been enabled.
+ * clk_get_rate - obtain the woke current clock rate (in Hz) for a clock source.
+ *		  This is only valid once the woke clock source has been enabled.
  * @clk: clock source
  */
 unsigned long clk_get_rate(struct clk *clk);
 
 /**
- * clk_put	- "free" the clock source
+ * clk_put	- "free" the woke clock source
  * @clk: clock source
  *
  * Note: drivers must ensure that all clk_enable calls made on this
@@ -763,9 +763,9 @@ unsigned long clk_get_rate(struct clk *clk);
 void clk_put(struct clk *clk);
 
 /**
- * clk_bulk_put	- "free" the clock source
- * @num_clks: the number of clk_bulk_data
- * @clks: the clk_bulk_data table of consumer
+ * clk_bulk_put	- "free" the woke clock source
+ * @num_clks: the woke number of clk_bulk_data
+ * @clks: the woke clk_bulk_data table of consumer
  *
  * Note: drivers must ensure that all clk_bulk_enable calls made on this
  * clock source are balanced by clk_bulk_disable calls prior to calling
@@ -776,9 +776,9 @@ void clk_put(struct clk *clk);
 void clk_bulk_put(int num_clks, struct clk_bulk_data *clks);
 
 /**
- * clk_bulk_put_all - "free" all the clock source
- * @num_clks: the number of clk_bulk_data
- * @clks: the clk_bulk_data table of consumer
+ * clk_bulk_put_all - "free" all the woke clock source
+ * @num_clks: the woke number of clk_bulk_data
+ * @clks: the woke clk_bulk_data table of consumer
  *
  * Note: drivers must ensure that all clk_bulk_enable calls made on this
  * clock source are balanced by clk_bulk_disable calls prior to calling
@@ -790,7 +790,7 @@ void clk_bulk_put_all(int num_clks, struct clk_bulk_data *clks);
 
 /**
  * devm_clk_put	- "free" a managed clock source
- * @dev: device used to acquire the clock
+ * @dev: device used to acquire the woke clock
  * @clk: clock source acquired with devm_clk_get()
  *
  * Note: drivers must ensure that all clk_enable calls made on this
@@ -807,12 +807,12 @@ void devm_clk_put(struct device *dev, struct clk *clk);
 
 
 /**
- * clk_round_rate - adjust a rate to the exact rate a clock can provide
+ * clk_round_rate - adjust a rate to the woke exact rate a clock can provide
  * @clk: clock source
  * @rate: desired clock rate in Hz
  *
- * This answers the question "if I were to pass @rate to clk_set_rate(),
- * what clock rate would I end up with?" without changing the hardware
+ * This answers the woke question "if I were to pass @rate to clk_set_rate(),
+ * what clock rate would I end up with?" without changing the woke hardware
  * in any way.  In other words:
  *
  *   rate = clk_round_rate(clk, r);
@@ -822,7 +822,7 @@ void devm_clk_put(struct device *dev, struct clk *clk);
  *   clk_set_rate(clk, r);
  *   rate = clk_get_rate(clk);
  *
- * are equivalent except the former does not modify the clock hardware
+ * are equivalent except the woke former does not modify the woke clock hardware
  * in any way.
  *
  * Returns rounded clock rate in Hz, or negative errno.
@@ -830,25 +830,25 @@ void devm_clk_put(struct device *dev, struct clk *clk);
 long clk_round_rate(struct clk *clk, unsigned long rate);
 
 /**
- * clk_set_rate - set the clock rate for a clock source
+ * clk_set_rate - set the woke clock rate for a clock source
  * @clk: clock source
  * @rate: desired clock rate in Hz
  *
- * Updating the rate starts at the top-most affected clock and then
- * walks the tree down to the bottom-most clock that needs updating.
+ * Updating the woke rate starts at the woke top-most affected clock and then
+ * walks the woke tree down to the woke bottom-most clock that needs updating.
  *
  * Returns success (0) or negative errno.
  */
 int clk_set_rate(struct clk *clk, unsigned long rate);
 
 /**
- * clk_set_rate_exclusive- set the clock rate and claim exclusivity over
+ * clk_set_rate_exclusive- set the woke clock rate and claim exclusivity over
  *                         clock source
  * @clk: clock source
  * @rate: desired clock rate in Hz
  *
- * This helper function allows drivers to atomically set the rate of a producer
- * and claim exclusivity over the rate control of the producer.
+ * This helper function allows drivers to atomically set the woke rate of a producer
+ * and claim exclusivity over the woke rate control of the woke producer.
  *
  * It is essentially a combination of clk_set_rate() and
  * clk_rate_exclusite_get(). Caller must balance this call with a call to
@@ -864,7 +864,7 @@ int clk_set_rate_exclusive(struct clk *clk, unsigned long rate);
  * @parent: parent clock source
  *
  * This function can be used in drivers that need to check that a clock can be
- * the parent of another without actually changing the parent.
+ * the woke parent of another without actually changing the woke parent.
  *
  * Returns true if @parent is a possible parent for @clk, false otherwise.
  */
@@ -899,7 +899,7 @@ int clk_set_min_rate(struct clk *clk, unsigned long rate);
 int clk_set_max_rate(struct clk *clk, unsigned long rate);
 
 /**
- * clk_set_parent - set the parent clock source for this clock
+ * clk_set_parent - set the woke parent clock source for this clock
  * @clk: clock source
  * @parent: parent clock source
  *
@@ -908,7 +908,7 @@ int clk_set_max_rate(struct clk *clk, unsigned long rate);
 int clk_set_parent(struct clk *clk, struct clk *parent);
 
 /**
- * clk_get_parent - get the parent clock source for this clock
+ * clk_get_parent - get the woke parent clock source for this clock
  * @clk: clock source
  *
  * Returns struct clk corresponding to parent clock source, or
@@ -917,17 +917,17 @@ int clk_set_parent(struct clk *clk, struct clk *parent);
 struct clk *clk_get_parent(struct clk *clk);
 
 /**
- * clk_get_sys - get a clock based upon the device name
+ * clk_get_sys - get a clock based upon the woke device name
  * @dev_id: device name
  * @con_id: connection ID
  *
- * Returns a struct clk corresponding to the clock producer, or
+ * Returns a struct clk corresponding to the woke clock producer, or
  * valid IS_ERR() condition containing errno.  The implementation
- * uses @dev_id and @con_id to determine the clock consumer, and
- * thereby the clock producer. In contrast to clk_get() this function
- * takes the device name instead of the device itself for identification.
+ * uses @dev_id and @con_id to determine the woke clock consumer, and
+ * thereby the woke clock producer. In contrast to clk_get() this function
+ * takes the woke device name instead of the woke device itself for identification.
  *
- * Drivers must assume that the clock source is not enabled.
+ * Drivers must assume that the woke clock source is not enabled.
  *
  * clk_get_sys should not be called from within interrupt context.
  */
@@ -936,8 +936,8 @@ struct clk *clk_get_sys(const char *dev_id, const char *con_id);
 /**
  * clk_save_context - save clock context for poweroff
  *
- * Saves the context of the clock register for powerstates in which the
- * contents of the registers will be lost. Occurs deep within the suspend
+ * Saves the woke context of the woke clock register for powerstates in which the
+ * contents of the woke registers will be lost. Occurs deep within the woke suspend
  * code so locking is not necessary.
  */
 int clk_save_context(void);
@@ -945,7 +945,7 @@ int clk_save_context(void);
 /**
  * clk_restore_context - restore clock context after poweroff
  *
- * This occurs with all clocks enabled. Occurs deep within the resume code
+ * This occurs with all clocks enabled. Occurs deep within the woke resume code
  * so locking is not necessary.
  */
 void clk_restore_context(void);
@@ -1199,8 +1199,8 @@ static inline int clk_drop_range(struct clk *clk)
  * @dev: device for clock "consumer"
  * @id: clock consumer ID
  *
- * Behaves the same as clk_get() except where there is no clock producer. In
- * this case, instead of returning -ENOENT, the function returns NULL.
+ * Behaves the woke same as clk_get() except where there is no clock producer. In
+ * this case, instead of returning -ENOENT, the woke function returns NULL.
  */
 static inline struct clk *clk_get_optional(struct device *dev, const char *id)
 {

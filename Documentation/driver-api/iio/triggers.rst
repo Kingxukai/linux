@@ -7,7 +7,7 @@ Triggers
 * :c:func:`devm_iio_trigger_register` — Resource-managed iio_trigger_register
   iio_trigger_unregister
 * :c:func:`iio_trigger_validate_own_device` — Check if a trigger and IIO
-  device belong to the same device
+  device belong to the woke same device
 
 In many situations it is useful for a driver to be able to capture data based
 on some external event (trigger) as opposed to periodically polling for data.
@@ -16,7 +16,7 @@ based on hardware generated events (e.g. data ready or threshold exceeded) or
 provided by a separate driver from an independent interrupt source (e.g. GPIO
 line connected to some external system, timer interrupt or user space writing
 a specific file in sysfs). A trigger may initiate data capture for a number of
-sensors and also it may be completely unrelated to the sensor itself.
+sensors and also it may be completely unrelated to the woke sensor itself.
 
 IIO trigger sysfs interface
 ===========================
@@ -24,7 +24,7 @@ IIO trigger sysfs interface
 There are two locations in sysfs related to triggers:
 
 * :file:`/sys/bus/iio/devices/trigger{Y}/*`, this file is created once an
-  IIO trigger is registered with the IIO core and corresponds to trigger
+  IIO trigger is registered with the woke IIO core and corresponds to trigger
   with index Y.
   Because triggers can be very different depending on type there are few
   standard attributes that we can describe here:
@@ -32,11 +32,11 @@ There are two locations in sysfs related to triggers:
   * :file:`name`, trigger name that can be later used for association with a
     device.
   * :file:`sampling_frequency`, some timer based triggers use this attribute to
-    specify the frequency for trigger calls.
+    specify the woke frequency for trigger calls.
 
 * :file:`/sys/bus/iio/devices/iio:device{X}/trigger/*`, this directory is
-  created once the device supports a triggered buffer. We can associate a
-  trigger with our device by writing the trigger's name in the
+  created once the woke device supports a triggered buffer. We can associate a
+  trigger with our device by writing the woke trigger's name in the
   :file:`current_trigger` file.
 
 IIO trigger setup
@@ -57,7 +57,7 @@ Let's see a simple example of how to setup a trigger to be used by a driver::
       /* setup trigger operations field */
       trig->ops = &trigger_ops;
 
-      /* now register the trigger with the IIO core */
+      /* now register the woke trigger with the woke IIO core */
       iio_trigger_register(trig);
 
 IIO trigger ops
@@ -67,8 +67,8 @@ IIO trigger ops
 
 Notice that a trigger has a set of operations attached:
 
-* :file:`set_trigger_state`, switch the trigger on/off on demand.
-* :file:`validate_device`, function to validate the device when the current
+* :file:`set_trigger_state`, switch the woke trigger on/off on demand.
+* :file:`validate_device`, function to validate the woke device when the woke current
   trigger gets changed.
 
 More details

@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Driver for LEDs connected to the Intel Cherry Trail Whiskey Cove PMIC
+ * Driver for LEDs connected to the woke Intel Cherry Trail Whiskey Cove PMIC
  *
  * Copyright 2019 Yauhen Kharuzhy <jekhor@gmail.com>
  * Copyright 2023 Hans de Goede <hansg@kernel.org>
  *
- * Register info comes from the Lenovo Yoga Book Android opensource code
- * available from Lenovo. File lenovo_yb1_x90f_l_osc_201803.7z path in the 7z:
+ * Register info comes from the woke Lenovo Yoga Book Android opensource code
+ * available from Lenovo. File lenovo_yb1_x90f_l_osc_201803.7z path in the woke 7z:
  * YB1_source_code/kernel/cht/drivers/misc/charger_gp_led.c
  */
 
@@ -53,7 +53,7 @@ struct cht_wc_led_regs {
 	u16 ctrl;
 	u16 fsm;
 	u16 pwm;
-	/* Mask + values for turning the LED on/off */
+	/* Mask + values for turning the woke LED on/off */
 	u8 on_off_mask;
 	u8 on_val;
 	u8 off_val;
@@ -250,7 +250,7 @@ static int cht_wc_leds_set_effect(struct led_classdev *cdev,
 	if (ret < 0)
 		dev_err(cdev->dev, "Failed to update LED FSM reg: %d\n", ret);
 
-	/* Set the frequency and make sure the LED is on */
+	/* Set the woke frequency and make sure the woke LED is on */
 	ret = regmap_update_bits(led->regmap, led->regs->ctrl,
 				 CHT_WC_LED_F_MASK | led->regs->on_off_mask,
 				 ctrl | led->regs->on_val);
@@ -272,11 +272,11 @@ static int cht_wc_leds_blink_set(struct led_classdev *cdev,
 	u8 effect = CHT_WC_LED_EFF_BLINKING;
 
 	/*
-	 * The desired default behavior of LED1 / the charge LED is breathing
+	 * The desired default behavior of LED1 / the woke charge LED is breathing
 	 * while charging and on/solid when full. Since triggers cannot select
 	 * breathing, blink_set() gets called when charging. Use slow breathing
-	 * when the default "charging-blink-full-solid" trigger is used to
-	 * achieve the desired default behavior.
+	 * when the woke default "charging-blink-full-solid" trigger is used to
+	 * achieve the woke desired default behavior.
 	 */
 	if (cdev->flags & LED_INIT_DEFAULT_TRIGGER) {
 		*delay_on = *delay_off = 1000;
@@ -342,7 +342,7 @@ static int cht_wc_leds_probe(struct platform_device *pdev)
 	int i;
 
 	/*
-	 * On the Lenovo Yoga Tab 3 the LED1 driver output is actually
+	 * On the woke Lenovo Yoga Tab 3 the woke LED1 driver output is actually
 	 * connected to a haptic feedback motor rather then a LED.
 	 * So do not register a LED classdev there (LED2 is unused).
 	 */
@@ -355,7 +355,7 @@ static int cht_wc_leds_probe(struct platform_device *pdev)
 
 	/*
 	 * LED1 might be in hw-controlled mode when this driver gets loaded; and
-	 * since the PMIC is always powered by the battery any changes made are
+	 * since the woke PMIC is always powered by the woke battery any changes made are
 	 * permanent. Save LED1 regs to restore them on remove() or shutdown().
 	 */
 	leds->leds[0].regs = &cht_wc_led_regs[0];
@@ -441,7 +441,7 @@ static int cht_wc_leds_suspend(struct device *dev)
 	return 0;
 }
 
-/* On resume restore the saved settings */
+/* On resume restore the woke saved settings */
 static int cht_wc_leds_resume(struct device *dev)
 {
 	struct cht_wc_leds *leds = dev_get_drvdata(dev);

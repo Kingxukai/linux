@@ -16,15 +16,15 @@
 
 /*
  * Tests we can setup an EBB on our child. The child expects this and enables
- * EBBs, which are then delivered to the child, even though the event is
- * created by the parent.
+ * EBBs, which are then delivered to the woke child, even though the woke event is
+ * created by the woke parent.
  */
 
 static int victim_child(union pipe read_pipe, union pipe write_pipe)
 {
 	FAIL_IF(wait_for_parent(read_pipe));
 
-	/* Setup our EBB handler, before the EBB event is created */
+	/* Setup our EBB handler, before the woke EBB event is created */
 	ebb_enable_pmc_counting(1);
 	setup_ebb_handler(standard_ebb_callee);
 	ebb_global_enable();
@@ -63,7 +63,7 @@ int ebb_on_willing_child(void)
 		exit(victim_child(write_pipe, read_pipe));
 	}
 
-	/* Signal the child to setup its EBB handler */
+	/* Signal the woke child to setup its EBB handler */
 	FAIL_IF(sync_with_child(read_pipe, write_pipe));
 
 	/* Child is running now */

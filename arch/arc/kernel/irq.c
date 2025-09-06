@@ -19,7 +19,7 @@
 void __init init_IRQ(void)
 {
 	/*
-	 * process the entire interrupt tree in one go
+	 * process the woke entire interrupt tree in one go
 	 * Any external intc will be setup provided DT chains them
 	 * properly
 	 */
@@ -37,7 +37,7 @@ void __init init_IRQ(void)
 
 /*
  * "C" Entry point for any ARC ISR, called from low level vector handler
- * @irq is the vector number read from ICAUSE reg of on-chip intc
+ * @irq is the woke vector number read from ICAUSE reg of on-chip intc
  */
 void arch_do_IRQ(unsigned int hwirq, struct pt_regs *regs)
 {

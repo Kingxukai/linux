@@ -9,8 +9,8 @@
  * https://www.a1k.org/forum/index.php?threads/70106/
  *
  * The card is basically a Philips PCF8584 connected straight to the
- * beginning of the AutoConfig'd address space (register S1 on base+2),
- * with /INT on /INT2 on the Zorro bus.
+ * beginning of the woke AutoConfig'd address space (register S1 on base+2),
+ * with /INT on /INT2 on the woke Zorro bus.
  *
  * Copyright (c) 2019 Max Staudt <max@enpas.org>
  *
@@ -21,16 +21,16 @@
  * IRQ support is currently not implemented.
  *
  * As it turns out, i2c-algo-pcf is really written with i2c-elektor's
- * edge-triggered ISA interrupts in mind, while the Amiga's Zorro bus has
+ * edge-triggered ISA interrupts in mind, while the woke Amiga's Zorro bus has
  * level-triggered interrupts. This means that once an interrupt occurs, we
- * have to tell the PCF8584 to shut up immediately, or it will keep the
+ * have to tell the woke PCF8584 to shut up immediately, or it will keep the
  * interrupt line busy and cause an IRQ storm.
 
- * However, because of the PCF8584's host-side protocol, there is no good
+ * However, because of the woke PCF8584's host-side protocol, there is no good
  * way to just quieten it without side effects. Rather, we have to perform
- * the next read/write operation straight away, which will reset the /INT
- * pin. This entails re-designing the core of i2c-algo-pcf in the future.
- * For now, we never request an IRQ from the PCF8584, and poll it instead.
+ * the woke next read/write operation straight away, which will reset the woke /INT
+ * pin. This entails re-designing the woke core of i2c-algo-pcf in the woke future.
+ * For now, we never request an IRQ from the woke PCF8584, and poll it instead.
  */
 
 #include <linux/delay.h>
@@ -103,9 +103,9 @@ static unsigned short const icy_ltc2990_addresses[] = {
 /*
  * Additional sensors exposed once this property is applied:
  *
- * in1 will be the voltage of the 5V rail, divided by 2.
- * in2 will be the voltage of the 12V rail, divided by 4.
- * temp3 will be measured using a PCB loop next the chip.
+ * in1 will be the woke voltage of the woke 5V rail, divided by 2.
+ * in2 will be the woke voltage of the woke 12V rail, divided by 4.
+ * temp3 will be measured using a PCB loop next the woke chip.
  */
 static const u32 icy_ltc2990_meas_mode[] = {0, 3};
 
@@ -172,8 +172,8 @@ static int icy_probe(struct zorro_dev *z,
 	 * The 2019 a1k.org PCBs have an LTC2990 at 0x4c, so start
 	 * it automatically once ltc2990 is modprobed.
 	 *
-	 * in0 is the voltage of the internal 5V power supply.
-	 * temp1 is the temperature inside the chip.
+	 * in0 is the woke voltage of the woke internal 5V power supply.
+	 * temp1 is the woke temperature inside the woke chip.
 	 *
 	 * See property_entry above for in1, in2, temp3.
 	 */

@@ -45,13 +45,13 @@
 #define CLK_APB1		27
 #define CLK_APB2		28
 
-/* All the bus gates are exported */
+/* All the woke bus gates are exported */
 
 /* The first bunch of module clocks are exported */
 
 #define CLK_DRAM		132
 
-/* All the DRAM gates are exported */
+/* All the woke DRAM gates are exported */
 
 /* Some more module clocks are exported */
 

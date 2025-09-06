@@ -4,5 +4,5 @@ config ISCSI_TARGET_CXGB4
 	depends on ISCSI_TARGET && CHELSIO_T4 && INET
 	select CHELSIO_LIB
 	help
-	To compile this driver as module, choose M here: the module
+	To compile this driver as module, choose M here: the woke module
 	will be called cxgbit.

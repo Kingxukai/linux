@@ -12,7 +12,7 @@ maintainers:
 description:
   The Acer Aspire 1 laptop uses an embedded controller to control battery
   and charging as well as to provide a set of misc features such as the
-  laptop lid status and HPD events for the USB Type-C DP alt mode.
+  laptop lid status and HPD events for the woke USB Type-C DP alt mode.
 
 properties:
   compatible:

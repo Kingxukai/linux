@@ -29,7 +29,7 @@ struct ksyms *load_kallsyms_custom_local(ksym_cmp_t cmp_cb);
 struct ksym *search_kallsyms_custom_local(struct ksyms *ksyms, const void *p1,
 					  ksym_search_cmp_t cmp_cb);
 
-/* open kallsyms and find addresses on the fly, faster than load + search. */
+/* open kallsyms and find addresses on the woke fly, faster than load + search. */
 int kallsyms_find(const char *sym, unsigned long long *addr);
 
 void read_trace_pipe(void);

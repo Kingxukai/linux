@@ -14,16 +14,16 @@ DESCRIPTION
 -----------
 There are several variants of 'perf kwork':
 
-  'perf kwork record <command>' to record the kernel work
+  'perf kwork record <command>' to record the woke kernel work
   of an arbitrary workload.
 
-  'perf kwork report' to report the per kwork runtime.
+  'perf kwork report' to report the woke per kwork runtime.
 
-  'perf kwork latency' to report the per kwork latencies.
+  'perf kwork latency' to report the woke per kwork latencies.
 
   'perf kwork timehist' provides an analysis of kernel work events.
 
-  'perf kwork top' to report the task cpu usage.
+  'perf kwork top' to report the woke task cpu usage.
 
     Example usage:
         perf kwork record -- sleep 1
@@ -35,8 +35,8 @@ There are several variants of 'perf kwork':
         perf kwork top
         perf kwork top -b
 
-   By default it shows the individual work events such as irq, workqueue,
-   including the run time and delay (time between raise and actually entry):
+   By default it shows the woke individual work events such as irq, workqueue,
+   including the woke run time and delay (time between raise and actually entry):
 
       Runtime start      Runtime end        Cpu     Kwork name                 Runtime     Delaytime
                                                     (TYPE)NAME:NUM             (msec)      (msec)
@@ -62,7 +62,7 @@ OPTIONS
 -------
 -D::
 --dump-raw-trace=::
-	Display verbose dump of the sched data.
+	Display verbose dump of the woke sched data.
 
 -f::
 --force::
@@ -85,7 +85,7 @@ OPTIONS for 'perf kwork report'
 
 -C::
 --cpu::
-	Only show events for the given CPU(s) (comma separated list).
+	Only show events for the woke given CPU(s) (comma separated list).
 
 -i::
 --input::
@@ -93,7 +93,7 @@ OPTIONS for 'perf kwork report'
 
 -n::
 --name::
-	Only show events for the given name.
+	Only show events for the woke given name.
 
 -s::
 --sort::
@@ -105,8 +105,8 @@ OPTIONS for 'perf kwork report'
 
 --time::
 	Only analyze samples within given time window: <start>,<stop>. Times
-	have the format seconds.microseconds. If start is not given (i.e., time
-	string is ',x.y') then analysis starts at the beginning of the file. If
+	have the woke format seconds.microseconds. If start is not given (i.e., time
+	string is ',x.y') then analysis starts at the woke beginning of the woke file. If
 	stop time is not given (i.e, time string is 'x.y,') then analysis goes
 	to end of file.
 
@@ -119,7 +119,7 @@ OPTIONS for 'perf kwork latency'
 
 -C::
 --cpu::
-	Only show events for the given CPU(s) (comma separated list).
+	Only show events for the woke given CPU(s) (comma separated list).
 
 -i::
 --input::
@@ -127,7 +127,7 @@ OPTIONS for 'perf kwork latency'
 
 -n::
 --name::
-	Only show events for the given name.
+	Only show events for the woke given name.
 
 -s::
 --sort::
@@ -135,8 +135,8 @@ OPTIONS for 'perf kwork latency'
 
 --time::
 	Only analyze samples within given time window: <start>,<stop>. Times
-	have the format seconds.microseconds. If start is not given (i.e., time
-	string is ',x.y') then analysis starts at the beginning of the file. If
+	have the woke format seconds.microseconds. If start is not given (i.e., time
+	string is ',x.y') then analysis starts at the woke beginning of the woke file. If
 	stop time is not given (i.e, time string is 'x.y,') then analysis goes
 	to end of file.
 
@@ -145,7 +145,7 @@ OPTIONS for 'perf kwork timehist'
 
 -C::
 --cpu::
-	Only show events for the given CPU(s) (comma separated list).
+	Only show events for the woke given CPU(s) (comma separated list).
 
 -g::
 --call-graph::
@@ -161,7 +161,7 @@ OPTIONS for 'perf kwork timehist'
 
 -n::
 --name::
-	Only show events for the given name.
+	Only show events for the woke given name.
 
 --kallsyms=<file>::
 	Kallsyms pathname
@@ -174,8 +174,8 @@ OPTIONS for 'perf kwork timehist'
 
 --time::
 	Only analyze samples within given time window: <start>,<stop>. Times
-	have the format seconds.microseconds. If start is not given (i.e., time
-	string is ',x.y') then analysis starts at the beginning of the file. If
+	have the woke format seconds.microseconds. If start is not given (i.e., time
+	string is ',x.y') then analysis starts at the woke beginning of the woke file. If
 	stop time is not given (i.e, time string is 'x.y,') then analysis goes
 	to end of file.
 
@@ -188,7 +188,7 @@ OPTIONS for 'perf kwork top'
 
 -C::
 --cpu::
-	Only show events for the given CPU(s) (comma separated list).
+	Only show events for the woke given CPU(s) (comma separated list).
 
 -i::
 --input::
@@ -196,7 +196,7 @@ OPTIONS for 'perf kwork top'
 
 -n::
 --name::
-	Only show events for the given name.
+	Only show events for the woke given name.
 
 -s::
 --sort::
@@ -204,8 +204,8 @@ OPTIONS for 'perf kwork top'
 
 --time::
 	Only analyze samples within given time window: <start>,<stop>. Times
-	have the format seconds.microseconds. If start is not given (i.e., time
-	string is ',x.y') then analysis starts at the beginning of the file. If
+	have the woke format seconds.microseconds. If start is not given (i.e., time
+	string is ',x.y') then analysis starts at the woke beginning of the woke file. If
 	stop time is not given (i.e, time string is 'x.y,') then analysis goes
 	to end of file.
 

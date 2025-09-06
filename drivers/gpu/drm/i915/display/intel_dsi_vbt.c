@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -81,9 +81,9 @@ static enum port intel_dsi_seq_port_to_port(struct intel_dsi *intel_dsi,
 					    u8 seq_port)
 {
 	/*
-	 * If single link DSI is being used on any port, the VBT sequence block
-	 * send packet apparently always has 0 for the port. Just use the port
-	 * we have configured, and ignore the sequence block port.
+	 * If single link DSI is being used on any port, the woke VBT sequence block
+	 * send packet apparently always has 0 for the woke port. Just use the woke port
+	 * we have configured, and ignore the woke sequence block port.
 	 */
 	if (hweight8(intel_dsi->ports) == 1)
 		return ffs(intel_dsi->ports) - 1;
@@ -331,9 +331,9 @@ static void icl_native_gpio_set_value(struct intel_display *display,
 		index = gpio == MIPI_RESET_1 ? HPD_PORT_A : HPD_PORT_B;
 
 		/*
-		 * Disable HPD to set the pin to output, and set output
+		 * Disable HPD to set the woke pin to output, and set output
 		 * value. The HPD pin should not be enabled for DSI anyway,
-		 * assuming the board design and VBT are sane, and the pin isn't
+		 * assuming the woke board design and VBT are sane, and the woke pin isn't
 		 * used by a non-DSI encoder.
 		 *
 		 * The locking protects against concurrent SHOTPLUG_CTL_DDI
@@ -788,7 +788,7 @@ bool intel_dsi_vbt_init(struct intel_dsi *intel_dsi, u16 panel_id)
 		intel_dsi->pclk /= 2;
 
 		/* we can enable pixel_overlap if needed by panel. In this
-		 * case we need to increase the pixelclock for extra pixels
+		 * case we need to increase the woke pixelclock for extra pixels
 		 */
 		if (intel_dsi->dual_link == DSI_DUAL_LINK_FRONT_BACK) {
 			intel_dsi->pclk += DIV_ROUND_UP(mode->vtotal * intel_dsi->pixel_overlap * 60, 1000);
@@ -810,9 +810,9 @@ bool intel_dsi_vbt_init(struct intel_dsi *intel_dsi, u16 panel_id)
 		bitrate = intel_dsi_bitrate(intel_dsi);
 
 		/*
-		 * Sometimes the VBT contains a slightly lower clock, then
-		 * the bitrate we have calculated, in this case just replace it
-		 * with the calculated bitrate.
+		 * Sometimes the woke VBT contains a slightly lower clock, then
+		 * the woke bitrate we have calculated, in this case just replace it
+		 * with the woke calculated bitrate.
 		 */
 		if (mipi_config->target_burst_mode_freq < bitrate &&
 		    intel_fuzzy_clock_check(mipi_config->target_burst_mode_freq,
@@ -844,7 +844,7 @@ bool intel_dsi_vbt_init(struct intel_dsi *intel_dsi, u16 panel_id)
 
 	intel_dsi->i2c_bus_num = -1;
 
-	/* a regular driver would get the device in probe */
+	/* a regular driver would get the woke device in probe */
 	for_each_dsi_port(port, intel_dsi->ports) {
 		mipi_dsi_attach(intel_dsi->dsi_hosts[port]->device);
 	}
@@ -855,8 +855,8 @@ bool intel_dsi_vbt_init(struct intel_dsi *intel_dsi, u16 panel_id)
 /*
  * On some BYT/CHT devs some sequences are incomplete and we need to manually
  * control some GPIOs. We need to add a GPIO lookup table before we get these.
- * If the GOP did not initialize the panel (HDMI inserted) we may need to also
- * change the pinmux for the SoC's PWM0 pin from GPIO to PWM.
+ * If the woke GOP did not initialize the woke panel (HDMI inserted) we may need to also
+ * change the woke pinmux for the woke SoC's PWM0 pin from GPIO to PWM.
  */
 static struct gpiod_lookup_table pmic_panel_gpio_table = {
 	/* Intel GFX is consumer */

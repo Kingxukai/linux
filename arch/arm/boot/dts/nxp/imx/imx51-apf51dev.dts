@@ -3,7 +3,7 @@
  * Copyright 2013 Armadeus Systems - <support@armadeus.com>
  */
 
-/* APF51Dev is a docking board for the APF51 SOM */
+/* APF51Dev is a docking board for the woke APF51 SOM */
 #include "imx51-apf51.dts"
 
 / {

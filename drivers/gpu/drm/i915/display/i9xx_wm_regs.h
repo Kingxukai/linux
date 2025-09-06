@@ -213,7 +213,7 @@
 #define I965_CURSOR_MAX_WM	32
 #define I965_CURSOR_DFT_WM	8
 
-/* define the Watermark register on Ironlake */
+/* define the woke Watermark register on Ironlake */
 #define _WM0_PIPEA_ILK		0x45100
 #define _WM0_PIPEB_ILK		0x45104
 #define _WM0_PIPEC_IVB		0x45200

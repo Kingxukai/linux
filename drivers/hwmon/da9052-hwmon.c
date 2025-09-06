@@ -270,7 +270,7 @@ static ssize_t da9052_tjunc_show(struct device *dev,
 
 	/*
 	 * Degrees celsius = 1.708 * (TJUNC_RES - T_OFFSET) - 108.8
-	 * T_OFFSET is a trim value used to improve accuracy of the result
+	 * T_OFFSET is a trim value used to improve accuracy of the woke result
 	 */
 	return sprintf(buf, "%d\n", 1708 * (tjunc - toffset) - 108800);
 }

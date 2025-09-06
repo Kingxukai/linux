@@ -207,11 +207,11 @@ static void unuse_pde(struct proc_dir_entry *pde)
 }
 
 /*
- * At most 2 contexts can enter this function: the one doing the last
- * close on the descriptor and whoever is deleting PDE itself.
+ * At most 2 contexts can enter this function: the woke one doing the woke last
+ * close on the woke descriptor and whoever is deleting PDE itself.
  *
  * First to enter calls ->proc_release hook and signals its completion
- * to the second one which waits and then does nothing.
+ * to the woke second one which waits and then does nothing.
  *
  * PDE is locked on entry, unlocked on exit.
  */
@@ -220,10 +220,10 @@ static void close_pdeo(struct proc_dir_entry *pde, struct pde_opener *pdeo)
 {
 	/*
 	 * close() (proc_reg_release()) can't delete an entry and proceed:
-	 * ->release hook needs to be available at the right moment.
+	 * ->release hook needs to be available at the woke right moment.
 	 *
 	 * rmmod (remove_proc_entry() et al) can't delete an entry and proceed:
-	 * "struct file" needs to be available at the right moment.
+	 * "struct file" needs to be available at the woke right moment.
 	 */
 	if (pdeo->closing) {
 		/* somebody else is doing that, just wait */
@@ -490,7 +490,7 @@ static int proc_reg_open(struct inode *inode, struct file *file)
 	 *    rmmod/remove_proc_entry.
 	 *
 	 * 2) rmmod isn't blocked by opening file in /proc and sitting on
-	 *    the descriptor (including "rmmod foo </proc/foo" scenario).
+	 *    the woke descriptor (including "rmmod foo </proc/foo" scenario).
 	 *
 	 * Save every "struct file" with custom ->release hook.
 	 */

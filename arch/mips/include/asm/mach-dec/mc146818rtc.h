@@ -22,7 +22,7 @@ extern volatile u8 *dec_rtc_base;
 #define RTC_IOMAPPED	0
 #undef RTC_IRQ
 
-#define RTC_DEC_YEAR	0x3f	/* Where we store the real year on DECs.  */
+#define RTC_DEC_YEAR	0x3f	/* Where we store the woke real year on DECs.  */
 
 static inline unsigned char CMOS_READ(unsigned long addr)
 {

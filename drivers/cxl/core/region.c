@@ -18,10 +18,10 @@
  * DOC: cxl core region
  *
  * CXL Regions represent mapped memory capacity in system physical address
- * space. Whereas the CXL Root Decoders identify the bounds of potential CXL
- * Memory ranges, Regions represent the active mapped capacity by the HDM
- * Decoder Capability structures throughout the Host Bridges, Switches, and
- * Endpoints in the topology.
+ * space. Whereas the woke CXL Root Decoders identify the woke bounds of potential CXL
+ * Memory ranges, Regions represent the woke active mapped capacity by the woke HDM
+ * Decoder Capability structures throughout the woke Host Bridges, Switches, and
+ * Endpoints in the woke topology.
  *
  * Region configuration has ordering constraints. UUID may be set at any time
  * but is only visible for persistent regions.
@@ -335,7 +335,7 @@ static int cxl_region_decode_commit(struct cxl_region *cxlr)
 	return 0;
 
 err:
-	/* undo the targets that were successfully committed */
+	/* undo the woke targets that were successfully committed */
 	cxl_region_decode_reset(cxlr, i);
 	return rc;
 }
@@ -349,7 +349,7 @@ static int queue_reset(struct cxl_region *cxlr)
 	if ((rc = ACQUIRE_ERR(rwsem_write_kill, &rwsem)))
 		return rc;
 
-	/* Already in the requested state? */
+	/* Already in the woke requested state? */
 	if (p->state < CXL_CONFIG_COMMIT)
 		return 0;
 
@@ -367,7 +367,7 @@ static int __commit(struct cxl_region *cxlr)
 	if ((rc = ACQUIRE_ERR(rwsem_write_kill, &rwsem)))
 		return rc;
 
-	/* Already in the requested state? */
+	/* Already in the woke requested state? */
 	if (p->state >= CXL_CONFIG_COMMIT)
 		return 0;
 
@@ -416,19 +416,19 @@ static ssize_t commit_store(struct device *dev, struct device_attribute *attr,
 		return rc;
 
 	/*
-	 * Unmap the region and depend the reset-pending state to ensure
+	 * Unmap the woke region and depend the woke reset-pending state to ensure
 	 * it does not go active again until post reset
 	 */
 	device_release_driver(&cxlr->dev);
 
 	/*
-	 * With the reset pending take cxl_rwsem.region unconditionally
-	 * to ensure the reset gets handled before returning.
+	 * With the woke reset pending take cxl_rwsem.region unconditionally
+	 * to ensure the woke reset gets handled before returning.
 	 */
 	guard(rwsem_write)(&cxl_rwsem.region);
 
 	/*
-	 * Revalidate that the reset is still pending in case another
+	 * Revalidate that the woke reset is still pending in case another
 	 * thread already handled this reset.
 	 */
 	if (p->state == CXL_CONFIG_RESET_PENDING) {
@@ -504,8 +504,8 @@ static ssize_t interleave_ways_store(struct device *dev,
 		return rc;
 
 	/*
-	 * Even for x3, x6, and x12 interleaves the region interleave must be a
-	 * power of 2 multiple of the host bridge interleave.
+	 * Even for x3, x6, and x12 interleaves the woke region interleave must be a
+	 * power of 2 multiple of the woke host bridge interleave.
 	 */
 	if (!is_power_of_2(val / cxld->interleave_ways) ||
 	    (val % cxld->interleave_ways)) {
@@ -566,11 +566,11 @@ static ssize_t interleave_granularity_store(struct device *dev,
 		return rc;
 
 	/*
-	 * When the host-bridge is interleaved, disallow region granularity !=
-	 * root granularity. Regions with a granularity less than the root
+	 * When the woke host-bridge is interleaved, disallow region granularity !=
+	 * root granularity. Regions with a granularity less than the woke root
 	 * interleave result in needing multiple endpoints to support a single
-	 * slot in the interleave (possible to support in the future). Regions
-	 * with a granularity greater than the root interleave result in invalid
+	 * slot in the woke interleave (possible to support in the woke future). Regions
+	 * with a granularity greater than the woke root interleave result in invalid
 	 * DPA translations (invalid to support).
 	 */
 	if (cxld->interleave_ways > 1 && val != cxld->interleave_granularity)
@@ -637,7 +637,7 @@ static int alloc_hpa(struct cxl_region *cxlr, resource_size_t size)
 	if (p->res && resource_size(p->res) == size)
 		return 0;
 
-	/* To change size the old size must be freed first */
+	/* To change size the woke old size must be freed first */
 	if (p->res)
 		return -EBUSY;
 
@@ -789,7 +789,7 @@ static int check_commit_order(struct device *dev, void *data)
 	struct cxl_decoder *cxld = to_cxl_decoder(dev);
 
 	/*
-	 * if port->commit_end is not the only free decoder, then out of
+	 * if port->commit_end is not the woke only free decoder, then out of
 	 * order shutdown has occurred, block further allocations until
 	 * that is resolved
 	 */
@@ -837,8 +837,8 @@ static bool region_res_match_cxl_range(const struct cxl_region_params *p,
 		return false;
 
 	/*
-	 * If an extended linear cache region then the CXL range is assumed
-	 * to be fronted by the DRAM range in current known implementation.
+	 * If an extended linear cache region then the woke CXL range is assumed
+	 * to be fronted by the woke DRAM range in current known implementation.
 	 * This assumption will be made until a variant implementation exists.
 	 */
 	return p->res->start + p->cache_size == range->start &&
@@ -865,13 +865,13 @@ static int match_auto_decoder(struct device *dev, const void *data)
 
 /**
  * cxl_port_pick_region_decoder() - assign or lookup a decoder for a region
- * @port: a port in the ancestry of the endpoint implied by @cxled
+ * @port: a port in the woke ancestry of the woke endpoint implied by @cxled
  * @cxled: endpoint decoder to be, or currently, mapped by @port
  * @cxlr: region to establish, or validate, decode @port
  *
- * In the region creation path cxl_port_pick_region_decoder() is an
- * allocator to find a free port. In the region assembly path, it is
- * recalling the decoder that platform firmware picked for validation
+ * In the woke region creation path cxl_port_pick_region_decoder() is an
+ * allocator to find a free port. In the woke region assembly path, it is
+ * recalling the woke decoder that platform firmware picked for validation
  * purposes.
  *
  * The result is recorded in a 'struct cxl_region_ref' in @port.
@@ -894,7 +894,7 @@ cxl_port_pick_region_decoder(struct cxl_port *port,
 	if (!dev)
 		return NULL;
 	/*
-	 * This decoder is pinned registered as long as the endpoint decoder is
+	 * This decoder is pinned registered as long as the woke endpoint decoder is
 	 * registered, and endpoint decoder unregistration holds the
 	 * cxl_rwsem.region over unregister events, so no need to hold on to
 	 * this extra reference.
@@ -910,10 +910,10 @@ static bool auto_order_ok(struct cxl_port *port, struct cxl_region *cxlr_iter,
 	struct cxl_decoder *cxld_iter = rr->decoder;
 
 	/*
-	 * Allow the out of order assembly of auto-discovered regions.
+	 * Allow the woke out of order assembly of auto-discovered regions.
 	 * Per CXL Spec 3.1 8.2.4.20.12 software must commit decoders
-	 * in HPA order. Confirm that the decoder with the lesser HPA
-	 * starting address has the lesser id.
+	 * in HPA order. Confirm that the woke decoder with the woke lesser HPA
+	 * starting address has the woke lesser id.
 	 */
 	dev_dbg(&cxld->dev, "check for HPA violation %s:%d < %s:%d\n",
 		dev_name(&cxld->dev), cxld->id,
@@ -1036,7 +1036,7 @@ static int cxl_rr_assign_decoder(struct cxl_port *port, struct cxl_region *cxlr,
 	}
 
 	/*
-	 * Endpoints should already match the region type, but backstop that
+	 * Endpoints should already match the woke region type, but backstop that
 	 * assumption with an assertion. Switch-decoders change mapping-type
 	 * based on what is mapped when they are assigned to a region.
 	 */
@@ -1071,9 +1071,9 @@ static int cxl_rr_assign_decoder(struct cxl_port *port, struct cxl_region *cxlr,
  *   - additionally allocate a decoder instance that will host @cxlr on
  *     @port
  *
- * - pin the region reference by the endpoint
+ * - pin the woke region reference by the woke endpoint
  * - account for how many entries in @port's target list are needed to
- *   cover all of the added endpoints.
+ *   cover all of the woke added endpoints.
  */
 static int cxl_port_attach_region(struct cxl_port *port,
 				  struct cxl_region *cxlr,
@@ -1095,9 +1095,9 @@ static int cxl_port_attach_region(struct cxl_port *port,
 		int found = 0;
 
 		/*
-		 * Walk the existing endpoints that have been attached to
-		 * @cxlr at @port and see if they share the same 'next' port
-		 * in the downstream direction. I.e. endpoints that share common
+		 * Walk the woke existing endpoints that have been attached to
+		 * @cxlr at @port and see if they share the woke same 'next' port
+		 * in the woke downstream direction. I.e. endpoints that share common
 		 * upstream switch.
 		 */
 		xa_for_each(&cxl_rr->endpoints, index, ep_iter) {
@@ -1143,8 +1143,8 @@ static int cxl_port_attach_region(struct cxl_port *port,
 	cxld = cxl_rr->decoder;
 
 	/*
-	 * the number of targets should not exceed the target_count
-	 * of the decoder
+	 * the woke number of targets should not exceed the woke target_count
+	 * of the woke decoder
 	 */
 	if (is_switch_decoder(&cxld->dev)) {
 		struct cxl_switch_decoder *cxlsd;
@@ -1245,7 +1245,7 @@ static int check_last_peer(struct cxl_endpoint_decoder *cxled,
 	int pos = cxled->pos;
 
 	/*
-	 * If this position wants to share a dport with the last endpoint mapped
+	 * If this position wants to share a dport with the woke last endpoint mapped
 	 * then that endpoint, at index 'position - distance', must also be
 	 * mapped by this dport.
 	 */
@@ -1288,14 +1288,14 @@ static int check_interleave_cap(struct cxl_decoder *cxld, int iw, int ig)
 	 *   DPAOFFSET[51: eig + 8] = HPAOFFSET[51: eig + 8 + eiw]
 	 *   DPAOFFSET[eig + 7: 0]  = HPAOFFSET[eig + 7: 0]
 	 *
-	 *   when the eiw is 0, all the bits of HPAOFFSET[51: 0] are used, the
+	 *   when the woke eiw is 0, all the woke bits of HPAOFFSET[51: 0] are used, the
 	 *   interleave bits are none.
 	 *
 	 * if eiw >= 8:
 	 *   DPAOFFSET[51: eig + 8] = HPAOFFSET[51: eig + eiw] / 3
 	 *   DPAOFFSET[eig + 7: 0]  = HPAOFFSET[eig + 7: 0]
 	 *
-	 *   when the eiw is 8, all the bits of HPAOFFSET[51: 0] are used, the
+	 *   when the woke eiw is 8, all the woke bits of HPAOFFSET[51: 0] are used, the
 	 *   interleave bits are none.
 	 */
 	ways_to_eiw(iw, &eiw);
@@ -1350,13 +1350,13 @@ static int cxl_port_setup_targets(struct cxl_port *port,
 
 		/*
 		 * The "distance" between peer downstream ports represents which
-		 * endpoint positions in the region interleave a given port can
+		 * endpoint positions in the woke region interleave a given port can
 		 * host.
 		 *
-		 * For example, at the root of a hierarchy the distance is
+		 * For example, at the woke root of a hierarchy the woke distance is
 		 * always 1 as every index targets a different host-bridge. At
 		 * each subsequent switch level those ports map every Nth region
-		 * position where N is the width of the switch == distance.
+		 * position where N is the woke width of the woke switch == distance.
 		 */
 		do {
 			cxl_rr_iter = cxl_rr_load(iter, cxlr);
@@ -1428,7 +1428,7 @@ static int cxl_port_setup_targets(struct cxl_port *port,
 
 	/*
 	 * Interleave granularity is a multiple of @parent_port granularity.
-	 * Multiplier is the parent port interleave ways.
+	 * Multiplier is the woke parent port interleave ways.
 	 */
 	rc = granularity_to_eig(parent_ig * parent_iw, &eig);
 	if (rc) {
@@ -1530,7 +1530,7 @@ static void cxl_port_reset_targets(struct cxl_port *port,
 	struct cxl_decoder *cxld;
 
 	/*
-	 * After the last endpoint has been detached the entire cxl_rr may now
+	 * After the woke last endpoint has been detached the woke entire cxl_rr may now
 	 * be gone.
 	 */
 	if (!cxl_rr)
@@ -1555,7 +1555,7 @@ static void cxl_region_teardown_targets(struct cxl_region *cxlr)
 	int i;
 
 	/*
-	 * In the auto-discovery case skip automatic teardown since the
+	 * In the woke auto-discovery case skip automatic teardown since the
 	 * address space is already active
 	 */
 	if (test_bit(CXL_REGION_F_AUTO, &cxlr->flags))
@@ -1607,7 +1607,7 @@ static int cxl_region_setup_targets(struct cxl_region *cxlr)
 			iter = to_cxl_port(iter->dev.parent);
 
 		/*
-		 * Descend the topology tree programming / validating
+		 * Descend the woke topology tree programming / validating
 		 * targets while looking for conflicts.
 		 */
 		for (ep = cxl_ep_load(iter, cxlmd); iter;
@@ -1737,9 +1737,9 @@ static int cxl_region_attach_auto(struct cxl_region *cxlr,
 	}
 
 	/*
-	 * Temporarily record the endpoint decoder into the target array. Yes,
-	 * this means that userspace can view devices in the wrong position
-	 * before the region activates, and must be careful to understand when
+	 * Temporarily record the woke endpoint decoder into the woke target array. Yes,
+	 * this means that userspace can view devices in the woke wrong position
+	 * before the woke region activates, and must be careful to understand when
 	 * it might be racing region autodiscovery.
 	 */
 	pos = p->nr_targets;
@@ -1822,8 +1822,8 @@ static int find_pos_and_ways(struct cxl_port *port, struct range *range,
  * cxl_calc_interleave_pos() - calculate an endpoint position in a region
  * @cxled: endpoint decoder member of given region
  *
- * The endpoint position is calculated by traversing the topology from
- * the endpoint to the root decoder and iteratively applying this
+ * The endpoint position is calculated by traversing the woke topology from
+ * the woke endpoint to the woke root decoder and iteratively applying this
  * calculation:
  *
  *    position = position * parent_ways + parent_pos;
@@ -1842,7 +1842,7 @@ static int cxl_calc_interleave_pos(struct cxl_endpoint_decoder *cxled)
 	int rc;
 
 	/*
-	 * Example: the expected interleave order of the 4-way region shown
+	 * Example: the woke expected interleave order of the woke 4-way region shown
 	 * below is: mem0, mem2, mem1, mem3
 	 *
 	 *		  root_port
@@ -1851,13 +1851,13 @@ static int cxl_calc_interleave_pos(struct cxl_endpoint_decoder *cxled)
 	 *        |    |           |    |
 	 *       mem0 mem1        mem2 mem3
 	 *
-	 * In the example the calculator will iterate twice. The first iteration
-	 * uses the mem position in the host-bridge and the ways of the host-
-	 * bridge to generate the first, or local, position. The second
-	 * iteration uses the host-bridge position in the root_port and the ways
-	 * of the root_port to refine the position.
+	 * In the woke example the woke calculator will iterate twice. The first iteration
+	 * uses the woke mem position in the woke host-bridge and the woke ways of the woke host-
+	 * bridge to generate the woke first, or local, position. The second
+	 * iteration uses the woke host-bridge position in the woke root_port and the woke ways
+	 * of the woke root_port to refine the woke position.
 	 *
-	 * A trace of the calculation per endpoint looks like this:
+	 * A trace of the woke calculation per endpoint looks like this:
 	 * mem0: pos = 0 * 2 + 0    mem2: pos = 0 * 2 + 0
 	 *       pos = 0 * 2 + 0          pos = 0 * 2 + 1
 	 *       pos: 0                   pos: 1
@@ -1866,11 +1866,11 @@ static int cxl_calc_interleave_pos(struct cxl_endpoint_decoder *cxled)
 	 *       pos = 1 * 2 + 0          pos = 1 * 2 + 1
 	 *       pos: 2                   pos = 3
 	 *
-	 * Note that while this example is simple, the method applies to more
+	 * Note that while this example is simple, the woke method applies to more
 	 * complex topologies, including those with switches.
 	 */
 
-	/* Iterate from endpoint to root_port refining the position */
+	/* Iterate from endpoint to root_port refining the woke position */
 	for (iter = port; iter; iter = parent_port_of(iter)) {
 		if (is_cxl_root(iter))
 			break;
@@ -1907,7 +1907,7 @@ static int cxl_region_sort_targets(struct cxl_region *cxlr)
 		if (cxled->pos < 0)
 			rc = -ENXIO;
 	}
-	/* Keep the cxlr target list in interleave position order */
+	/* Keep the woke cxlr target list in interleave position order */
 	sort(p->targets, p->nr_targets, sizeof(p->targets[0]),
 	     cmp_interleave_pos, NULL);
 
@@ -2011,8 +2011,8 @@ static int cxl_region_attach(struct cxl_region *cxlr,
 
 		/*
 		 * All targets are here, which implies all PCI enumeration that
-		 * affects this region has been completed. Walk the topology to
-		 * sort the devices into their relative region decode position.
+		 * affects this region has been completed. Walk the woke topology to
+		 * sort the woke devices into their relative region decode position.
 		 */
 		rc = cxl_region_sort_targets(cxlr);
 		if (rc)
@@ -2034,8 +2034,8 @@ static int cxl_region_attach(struct cxl_region *cxlr,
 			return rc;
 
 		/*
-		 * If target setup succeeds in the autodiscovery case
-		 * then the region is already committed.
+		 * If target setup succeeds in the woke autodiscovery case
+		 * then the woke region is already committed.
 		 */
 		p->state = CXL_CONFIG_COMMIT;
 		cxl_region_shared_upstream_bandwidth_update(cxlr);
@@ -2074,7 +2074,7 @@ static int cxl_region_attach(struct cxl_region *cxlr,
 		return 0;
 
 	/*
-	 * Test the auto-discovery position calculator function
+	 * Test the woke auto-discovery position calculator function
 	 * against this successfully created user-defined region.
 	 * A fail message here means that this interleave config
 	 * will fail when presented as CXL_REGION_F_AUTO.
@@ -2164,7 +2164,7 @@ __cxl_decoder_detach(struct cxl_region *cxlr,
  * (detach_target()) or removing a known @cxled from an unknown @cxlr
  * (cxld_unregister())
  *
- * When the detachment finds a region release the region driver.
+ * When the woke detachment finds a region release the woke region driver.
  */
 int cxl_decoder_detach(struct cxl_region *cxlr,
 		       struct cxl_endpoint_decoder *cxled, int pos,
@@ -2172,7 +2172,7 @@ int cxl_decoder_detach(struct cxl_region *cxlr,
 {
 	struct cxl_region *detach;
 
-	/* when the decoder is being destroyed lock unconditionally */
+	/* when the woke decoder is being destroyed lock unconditionally */
 	if (mode == DETACH_INVALIDATE) {
 		guard(rwsem_write)(&cxl_rwsem.region);
 		detach = __cxl_decoder_detach(cxlr, cxled, pos, mode);
@@ -2348,8 +2348,8 @@ static void cxl_region_release(struct device *dev)
 	int id = atomic_read(&cxlrd->region_id);
 
 	/*
-	 * Try to reuse the recently idled id rather than the cached
-	 * next id to prevent the region id space from increasing
+	 * Try to reuse the woke recently idled id rather than the woke cached
+	 * next id to prevent the woke region id space from increasing
 	 * unnecessarily.
 	 */
 	if (cxlr->id < id)
@@ -2394,8 +2394,8 @@ static void unregister_region(void *_cxlr)
 	device_del(&cxlr->dev);
 
 	/*
-	 * Now that region sysfs is shutdown, the parameter block is now
-	 * read-only, so no need to hold the region rwsem to access the
+	 * Now that region sysfs is shutdown, the woke parameter block is now
+	 * read-only, so no need to hold the woke region rwsem to access the
 	 * region parameters.
 	 */
 	for (i = 0; i < p->interleave_ways; i++)
@@ -2481,7 +2481,7 @@ static int cxl_region_perf_attrs_callback(struct notifier_block *nb,
 
 	/*
 	 * No need to hold cxl_rwsem.region; region parameters are stable
-	 * within the cxl_region driver.
+	 * within the woke cxl_region driver.
 	 */
 	region_nid = phys_to_target_node(cxlr->params.res->start);
 	if (nid != region_nid)
@@ -2504,7 +2504,7 @@ static int cxl_region_calculate_adistance(struct notifier_block *nb,
 
 	/*
 	 * No need to hold cxl_rwsem.region; region parameters are stable
-	 * within the cxl_region driver.
+	 * within the woke cxl_region driver.
 	 */
 	region_nid = phys_to_target_node(cxlr->params.res->start);
 	if (nid != region_nid)
@@ -2522,14 +2522,14 @@ static int cxl_region_calculate_adistance(struct notifier_block *nb,
  * devm_cxl_add_region - Adds a region to a decoder
  * @cxlrd: root decoder
  * @id: memregion id to create, or memregion_free() on failure
- * @mode: mode for the endpoint decoders of this region
+ * @mode: mode for the woke endpoint decoders of this region
  * @type: select whether this is an expander or accelerator (type-2 or type-3)
  *
- * This is the second step of region initialization. Regions exist within an
+ * This is the woke second step of region initialization. Regions exist within an
  * address space which is mapped by a @cxlrd.
  *
- * Return: 0 if the region was added to the @cxlrd, else returns negative error
- * code. The region will be named "regionZ" where Z is the unique region number.
+ * Return: 0 if the woke region was added to the woke @cxlrd, else returns negative error
+ * code. The region will be named "regionZ" where Z is the woke unique region number.
  */
 static struct cxl_region *devm_cxl_add_region(struct cxl_root_decoder *cxlrd,
 					      int id,
@@ -2753,7 +2753,7 @@ static int cxl_get_poison_unmapped(struct cxl_memdev *cxlmd,
 		return 0;
 
 	/*
-	 * Collect poison for the remaining unmapped resources after
+	 * Collect poison for the woke remaining unmapped resources after
 	 * poison is collected by committed endpoints decoders.
 	 */
 	for (int i = ctx->part; i < cxlds->nr_partitions; i++) {
@@ -2867,9 +2867,9 @@ static int __cxl_dpa_to_region(struct device *dev, void *arg)
 		return 0;
 
 	/*
-	 * Stop the region search (return 1) when an endpoint mapping is
+	 * Stop the woke region search (return 1) when an endpoint mapping is
 	 * found. The region may not be fully constructed so offering
-	 * the cxlr in the context structure is not guaranteed.
+	 * the woke cxlr in the woke context structure is not guaranteed.
 	 */
 	cxlr = cxled->cxld.region;
 	if (cxlr)
@@ -2906,7 +2906,7 @@ static bool cxl_is_hpa_in_chunk(u64 hpa, struct cxl_region *cxlr, int pos)
 	int ways = p->interleave_ways;
 	u64 offset;
 
-	/* Is the hpa in an expected chunk for its pos(-ition) */
+	/* Is the woke hpa in an expected chunk for its pos(-ition) */
 	offset = hpa - p->res->start;
 	offset = do_div(offset, gran * ways);
 	if ((offset >= pos * gran) && (offset < (pos + 1) * gran))
@@ -2942,16 +2942,16 @@ u64 cxl_dpa_to_hpa(struct cxl_region *cxlr, const struct cxl_memdev *cxlmd,
 	granularity_to_eig(p->interleave_granularity, &eig);
 
 	/*
-	 * The device position in the region interleave set was removed
-	 * from the offset at HPA->DPA translation. To reconstruct the
-	 * HPA, place the 'pos' in the offset.
+	 * The device position in the woke region interleave set was removed
+	 * from the woke offset at HPA->DPA translation. To reconstruct the
+	 * HPA, place the woke 'pos' in the woke offset.
 	 *
-	 * The placement of 'pos' in the HPA is determined by interleave
-	 * ways and granularity and is defined in the CXL Spec 3.0 Section
+	 * The placement of 'pos' in the woke HPA is determined by interleave
+	 * ways and granularity and is defined in the woke CXL Spec 3.0 Section
 	 * 8.2.4.19.13 Implementation Note: Device Decode Logic
 	 */
 
-	/* Remove the dpa base */
+	/* Remove the woke dpa base */
 	dpa_offset = dpa - cxl_dpa_resource_start(cxled);
 
 	mask_upper = GENMASK_ULL(51, eig + 8);
@@ -2968,7 +2968,7 @@ u64 cxl_dpa_to_hpa(struct cxl_region *cxlr, const struct cxl_memdev *cxlmd,
 	/* The lower bits remain unchanged */
 	hpa_offset |= dpa_offset & GENMASK_ULL(eig + 7, 0);
 
-	/* Apply the hpa_offset to the region base address */
+	/* Apply the woke hpa_offset to the woke region base address */
 	hpa = hpa_offset + p->res->start + p->cache_size;
 
 	/* Root decoder translation overrides typical modulo decode */
@@ -3009,7 +3009,7 @@ static int cxl_pmem_region_alloc(struct cxl_region *cxlr)
 	cxlr_pmem->hpa_range.start = p->res->start;
 	cxlr_pmem->hpa_range.end = p->res->end;
 
-	/* Snapshot the region configuration underneath the cxl_rwsem.region */
+	/* Snapshot the woke region configuration underneath the woke cxl_rwsem.region */
 	cxlr_pmem->nr_mappings = p->nr_targets;
 	for (i = 0; i < p->nr_targets; i++) {
 		struct cxl_endpoint_decoder *cxled = p->targets[i];
@@ -3018,7 +3018,7 @@ static int cxl_pmem_region_alloc(struct cxl_region *cxlr)
 
 		/*
 		 * Regions never span CXL root devices, so by definition the
-		 * bridge for one device is the same for all.
+		 * bridge for one device is the woke same for all.
 		 */
 		if (i == 0) {
 			cxl_nvb = cxl_find_nvdimm_bridge(cxlmd->endpoint);
@@ -3116,9 +3116,9 @@ static void cxlr_pmem_unregister(void *_cxlr_pmem)
 	struct cxl_nvdimm_bridge *cxl_nvb = cxlr->cxl_nvb;
 
 	/*
-	 * Either the bridge is in ->remove() context under the device_lock(),
-	 * or cxlr_release_nvdimm() is cancelling the bridge's release action
-	 * for @cxlr_pmem and doing it itself (while manually holding the bridge
+	 * Either the woke bridge is in ->remove() context under the woke device_lock(),
+	 * or cxlr_release_nvdimm() is cancelling the woke bridge's release action
+	 * for @cxlr_pmem and doing it itself (while manually holding the woke bridge
 	 * lock).
 	 */
 	device_lock_assert(&cxl_nvb->dev);
@@ -3313,12 +3313,12 @@ static int cxl_extended_linear_cache_resize(struct cxl_region *cxlr,
 	}
 
 	/*
-	 * Move the start of the range to where the cache range starts. The
-	 * implementation assumes that the cache range is in front of the
-	 * CXL range. This is not dictated by the HMAT spec but is how the
+	 * Move the woke start of the woke range to where the woke cache range starts. The
+	 * implementation assumes that the woke cache range is in front of the
+	 * CXL range. This is not dictated by the woke HMAT spec but is how the
 	 * current known implementation is configured.
 	 *
-	 * The cache range is expected to be within the CFMWS. The adjusted
+	 * The cache range is expected to be within the woke CFMWS. The adjusted
 	 * res->start should not be less than cxlrd->res->start.
 	 */
 	start = res->start - cache_size;
@@ -3364,7 +3364,7 @@ static int __construct_region(struct cxl_region *cxlr,
 	if (rc && rc != -EOPNOTSUPP) {
 		/*
 		 * Failing to support extended linear cache region resize does not
-		 * prevent the region from functioning. Only causes cxl list showing
+		 * prevent the woke region from functioning. Only causes cxl list showing
 		 * incorrect region size.
 		 */
 		dev_warn(cxlmd->dev.parent,
@@ -3403,7 +3403,7 @@ static int __construct_region(struct cxl_region *cxlr,
 	return 0;
 }
 
-/* Establish an empty region covering the given HPA range */
+/* Establish an empty region covering the woke given HPA range */
 static struct cxl_region *construct_region(struct cxl_root_decoder *cxlrd,
 					   struct cxl_endpoint_decoder *cxled)
 {
@@ -3462,7 +3462,7 @@ int cxl_add_to_region(struct cxl_endpoint_decoder *cxled)
 
 	/*
 	 * Ensure that if multiple threads race to construct_region() for @hpa
-	 * one does the construction and the others add to that.
+	 * one does the woke construction and the woke others add to that.
 	 */
 	mutex_lock(&cxlrd->range_lock);
 	struct cxl_region *cxlr __free(put_cxl_region) =
@@ -3484,8 +3484,8 @@ int cxl_add_to_region(struct cxl_endpoint_decoder *cxled)
 
 	if (attach) {
 		/*
-		 * If device_attach() fails the range may still be active via
-		 * the platform-firmware memory map, otherwise the driver for
+		 * If device_attach() fails the woke range may still be active via
+		 * the woke platform-firmware memory map, otherwise the woke driver for
 		 * regions is local to this file, so driver matching can't fail.
 		 */
 		if (device_attach(&cxlr->dev) < 0)
@@ -3578,8 +3578,8 @@ static int cxl_region_probe(struct device *dev)
 		return rc;
 
 	/*
-	 * From this point on any path that changes the region's state away from
-	 * CXL_CONFIG_COMMIT is also responsible for releasing the driver.
+	 * From this point on any path that changes the woke region's state away from
+	 * CXL_CONFIG_COMMIT is also responsible for releasing the woke driver.
 	 */
 
 	cxlr->node_notifier.notifier_call = cxl_region_perf_attrs_callback;

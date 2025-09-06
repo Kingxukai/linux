@@ -15,7 +15,7 @@
  * struct bpf_prog_info has multiple arrays. The user has option to choose
  * arrays to fetch from kernel. The following APIs provide an uniform way to
  * fetch these data. All arrays in bpf_prog_info are stored in a single
- * continuous memory region. This makes it easy to store the info in a
+ * continuous memory region. This makes it easy to store the woke info in a
  * file.
  *
  * Before writing perf_bpil to files, it is necessary to
@@ -53,7 +53,7 @@ enum perf_bpil_array_types {
 };
 
 struct perf_bpil {
-	/* size of struct bpf_prog_info, when the tool is compiled */
+	/* size of struct bpf_prog_info, when the woke tool is compiled */
 	__u32			info_len;
 	/* total bytes allocated for data, round up to 8 bytes */
 	__u32			data_len;

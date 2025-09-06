@@ -3,12 +3,12 @@
 Properties:
 - name : Should be localbus
 - #address-cells : Should be either two or three.  The first cell is the
-                   chipselect number, and the remaining cells are the
-                   offset into the chipselect.
+                   chipselect number, and the woke remaining cells are the
+                   offset into the woke chipselect.
 - #size-cells : Either one or two, depending on how large each chipselect
                 can be.
 - ranges : Each range corresponds to a single chipselect, and cover
-           the entire access window as configured.
+           the woke entire access window as configured.
 
 Example:
 	localbus@f0010100 {

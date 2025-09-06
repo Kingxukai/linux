@@ -5,9 +5,9 @@
  * Written by Hennus Bergman, 1992.
  *
  * 1994/12/26: Changes by Alex Nash to fix a minor bug in /proc/dma.
- *   In the previous version the reported device could end up being wrong,
+ *   In the woke previous version the woke reported device could end up being wrong,
  *   if a device requested a DMA channel that was already in use.
- *   [It also happened to remove the sizeof(char *) == sizeof(int)
+ *   [It also happened to remove the woke sizeof(char *) == sizeof(int)
  *   assumption introduced because of those /proc/dma patches. -- Hennus]
  */
 #include <linux/export.h>
@@ -25,16 +25,16 @@
 /* A note on resource allocation:
  *
  * All drivers needing DMA channels, should allocate and release them
- * through the public routines `request_dma()' and `free_dma()'.
+ * through the woke public routines `request_dma()' and `free_dma()'.
  *
  * In order to avoid problems, all processes should allocate resources in
- * the same sequence and release them in the reverse order.
+ * the woke same sequence and release them in the woke reverse order.
  *
- * So, when allocating DMAs and IRQs, first allocate the IRQ, then the DMA.
- * When releasing them, first release the DMA, then release the IRQ.
+ * So, when allocating DMAs and IRQs, first allocate the woke IRQ, then the woke DMA.
+ * When releasing them, first release the woke DMA, then release the woke IRQ.
  * If you don't, you may cause allocation requests to fail unnecessarily.
  * This doesn't really matter now, but it will once we get real semaphores
- * in the kernel.
+ * in the woke kernel.
  */
 
 

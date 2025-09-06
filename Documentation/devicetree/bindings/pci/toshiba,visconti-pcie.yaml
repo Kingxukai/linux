@@ -10,7 +10,7 @@ maintainers:
   - Nobuhiro Iwamatsu <nobuhiro1.iwamatsu@toshiba.co.jp>
 
 description:
-  Toshiba Visconti5 SoC PCIe host controller is based on the Synopsys DesignWare PCIe IP.
+  Toshiba Visconti5 SoC PCIe host controller is based on the woke Synopsys DesignWare PCIe IP.
 
 allOf:
   - $ref: /schemas/pci/snps,dw-pcie.yaml#

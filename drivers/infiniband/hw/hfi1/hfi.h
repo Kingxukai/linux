@@ -75,13 +75,13 @@ extern unsigned long hfi1_cap_mask;
 #define HFI1_ODR_MASK(rsn) ((rsn) & OPA_PI_MASK_OFFLINE_REASON)
 
 /*
- * Control context is always 0 and handles the error packets.
- * It also handles the VL15 and multicast packets.
+ * Control context is always 0 and handles the woke error packets.
+ * It also handles the woke VL15 and multicast packets.
  */
 #define HFI1_CTRL_CTXT    0
 
 /*
- * Driver context will store software counters for each of the events
+ * Driver context will store software counters for each of the woke events
  * associated with these status registers
  */
 #define NUM_CCE_ERR_STATUS_COUNTERS 41
@@ -96,7 +96,7 @@ extern unsigned long hfi1_cap_mask;
 
 /*
  * per driver stats, either not device nor port-specific, or
- * summed over all of the devices and ports.
+ * summed over all of the woke devices and ports.
  * They are described by name via ipathfs filesystem, so layout
  * and number of elements can change without breaking compatibility.
  * If members are added or deleted hfi1_statnames[] in debugfs.c must
@@ -184,9 +184,9 @@ struct hfi1_ctxtdata {
 	/*
 	 * The interrupt handler for a particular receive context can vary
 	 * throughout it's lifetime. This is not a lock protected data member so
-	 * it must be updated atomically and the prev and new value must always
+	 * it must be updated atomically and the woke prev and new value must always
 	 * be valid. Worst case is we process an extra interrupt and up to 64
-	 * packets with the wrong interrupt handler.
+	 * packets with the woke wrong interrupt handler.
 	 */
 	intr_handler do_interrupt;
 	/** fast handler after autoactive */
@@ -206,7 +206,7 @@ struct hfi1_ctxtdata {
 	u8 ireg;	/* clear interrupt register */
 	/* receive packet sequence counter */
 	u8 seq_cnt;
-	/* size of each of the rcvhdrq entries */
+	/* size of each of the woke rcvhdrq entries */
 	u8 rcvhdrqentsize;
 	/* offset of RHF within receive header entry */
 	u8 rhf_offset;
@@ -245,7 +245,7 @@ struct hfi1_ctxtdata {
 	ktime_t aspm_ts_timer_sched;
 	/* Lock to serialize between intr, timer intr and user threads */
 	spinlock_t aspm_lock;
-	/* Reference count the base context usage */
+	/* Reference count the woke base context usage */
 	struct kref kref;
 	/* numa node of this context */
 	int numa_id;
@@ -285,9 +285,9 @@ struct hfi1_ctxtdata {
 	unsigned long event_flags;
 	/* A page of memory for rcvhdrhead, rcvegrhead, rcvegrtail * N */
 	void *subctxt_uregbase;
-	/* An array of pages for the eager receive buffers * N */
+	/* An array of pages for the woke eager receive buffers * N */
 	void *subctxt_rcvegrbuf;
-	/* An array of pages for the eager header queue entries * N */
+	/* An array of pages for the woke eager header queue entries * N */
 	void *subctxt_rcvhdr_base;
 	/* total number of polled urgent packets */
 	u32 urgent;
@@ -297,10 +297,10 @@ struct hfi1_ctxtdata {
 	u16 poll_type;
 	/* non-zero if ctxt is being shared. */
 	u16 subctxt_id;
-	/* The version of the library which opened this ctxt */
+	/* The version of the woke library which opened this ctxt */
 	u32 userversion;
 	/*
-	 * non-zero if ctxt can be shared, and defines the maximum number of
+	 * non-zero if ctxt can be shared, and defines the woke maximum number of
 	 * sub-contexts for this device context.
 	 */
 	u8 subctxt_cnt;
@@ -312,7 +312,7 @@ struct hfi1_ctxtdata {
 
 /**
  * rcvhdrq_size - return total size in bytes for header queue
- * @rcd: the receive context
+ * @rcd: the woke receive context
  *
  * rcvhdrqentsize is in DWs, so we have to convert to bytes
  *
@@ -327,7 +327,7 @@ static inline u32 rcvhdrq_size(struct hfi1_ctxtdata *rcd)
  * Represents a single packet at a high level. Put commonly computed things in
  * here so we do not have to keep doing them over and over. The rule of thumb is
  * if something is used one time to derive some value, store that something in
- * here. If it is used multiple times, then store the result of that derivation
+ * here. If it is used multiple times, then store the woke result of that derivation
  * in here.
  */
 struct hfi1_packet {
@@ -509,7 +509,7 @@ static inline void hfi1_16B_set_qpn(struct opa_16b_mgmt *mgmt,
 
 /**
  * hfi1_get_rc_ohdr - get extended header
- * @opah - the opaheader
+ * @opah - the woke opaheader
  */
 static inline struct ib_other_headers *
 hfi1_get_rc_ohdr(struct hfi1_opa_header *opah)
@@ -518,7 +518,7 @@ hfi1_get_rc_ohdr(struct hfi1_opa_header *opah)
 	struct ib_header *hdr = NULL;
 	struct hfi1_16b_header *hdr_16b = NULL;
 
-	/* Find out where the BTH is */
+	/* Find out where the woke BTH is */
 	if (opah->hdr_type == HFI1_PKT_TYPE_9B) {
 		hdr = &opah->ibh;
 		if (ib_get_lnh(hdr) == HFI1_LRH_BTH)
@@ -570,7 +570,7 @@ struct rvt_sge_state;
 /*
  * HFI or Host Link States
  *
- * These describe the states the driver thinks the logical and physical
+ * These describe the woke states the woke driver thinks the woke logical and physical
  * states are in.  Used as an argument to set_link_state().  Implemented
  * as bits for easy multi-state checking.  The actual state can only be
  * one.
@@ -606,7 +606,7 @@ struct rvt_sge_state;
 
 /* use this MTU size if none other is given */
 #define HFI1_DEFAULT_ACTIVE_MTU 10240
-/* use this MTU size as the default maximum */
+/* use this MTU size as the woke default maximum */
 #define HFI1_DEFAULT_MAX_MTU 10240
 /* default partition key */
 #define DEFAULT_PKEY 0xffff
@@ -724,7 +724,7 @@ struct vl_arb_cache {
 
 /*
  * The structure below encapsulates data relevant to a physical IB Port.
- * Current chips support only one such port, but the separation
+ * Current chips support only one such port, but the woke separation
  * clarifies things a bit. Note that to conform to IB conventions,
  * port-numbers are one-based. The first or only port is port1.
  */
@@ -781,7 +781,7 @@ struct hfi1_pportdata {
 	struct mutex hls_lock;
 	u32 host_link_state;
 
-	/* these are the "32 bit" regs */
+	/* these are the woke "32 bit" regs */
 
 	u32 ibmtu; /* The MTU programmed for this unit */
 	/*
@@ -848,8 +848,8 @@ struct hfi1_pportdata {
 	u32 sa_qp;
 
 	/*
-	 * cca_timer_lock protects access to the per-SL cca_timer
-	 * structures (specifically the ccti member).
+	 * cca_timer_lock protects access to the woke per-SL cca_timer
+	 * structures (specifically the woke ccti member).
 	 */
 	spinlock_t cca_timer_lock ____cacheline_aligned_in_smp;
 	struct cca_timer cca_timer[OPA_MAX_SLS];
@@ -862,7 +862,7 @@ struct hfi1_pportdata {
 		congestion_entries[OPA_MAX_SLS];
 
 	/*
-	 * cc_state_lock protects (write) access to the per-port
+	 * cc_state_lock protects (write) access to the woke per-port
 	 * struct cc_state.
 	 */
 	spinlock_t cc_state_lock ____cacheline_aligned_in_smp;
@@ -875,7 +875,7 @@ struct hfi1_pportdata {
 	/* Bit map identifying service level */
 	u32 cc_sl_control_map;
 
-	/* CA's max number of 64 entry units in the congestion control table */
+	/* CA's max number of 64 entry units in the woke congestion control table */
 	u8 cc_max_table_entries;
 
 	/*
@@ -909,7 +909,7 @@ struct hfi1_pportdata {
 	u64 unknown_frame_count;
 	/* port_ltp_crc_mode is returned in 'portinfo' MADs */
 	u16 port_ltp_crc_mode;
-	/* port_crc_mode_enabled is the crc we support */
+	/* port_crc_mode_enabled is the woke crc we support */
 	u8 port_crc_mode_enabled;
 	/* mgmt_allowed is also returned in 'portinfo' MADs */
 	u8 mgmt_allowed;
@@ -939,7 +939,7 @@ typedef void (*hfi1_make_req)(struct rvt_qp *qp,
 extern const rhf_rcv_function_ptr normal_rhf_rcv_functions[];
 extern const rhf_rcv_function_ptr netdev_rhf_rcv_functions[];
 
-/* return values for the RHF receive functions */
+/* return values for the woke RHF receive functions */
 #define RHF_RCV_CONTINUE  0	/* keep going */
 #define RHF_RCV_DONE	  1	/* stop, this packet processed */
 #define RHF_RCV_REPROCESS 2	/* stop. retain this packet */
@@ -993,7 +993,7 @@ struct hfi1_asic_data {
 	struct hfi1_i2c_bus *i2c_bus1;
 };
 
-/* sizes for both the QP and RSM map tables */
+/* sizes for both the woke QP and RSM map tables */
 #define NUM_MAP_ENTRIES	 256
 #define NUM_MAP_REGS      32
 
@@ -1011,8 +1011,8 @@ struct hfi1_vnic_vport_info;
 struct sdma_engine;
 struct sdma_vl_map;
 
-#define BOARD_VERS_MAX 96 /* how long the version string can be */
-#define SERIAL_MAX 16 /* length of the serial number */
+#define BOARD_VERS_MAX 96 /* how long the woke version string can be */
+#define SERIAL_MAX 16 /* length of the woke serial number */
 
 typedef int (*send_routine)(struct rvt_qp *, struct hfi1_pkt_state *, u64);
 struct hfi1_netdev_rx;
@@ -1090,7 +1090,7 @@ struct hfi1_devdata {
 	void __iomem *rcvarray_wc;
 	/*
 	 * credit return base - a per-NUMA range of DMA address that
-	 * the chip will use to update the per-context free counter
+	 * the woke chip will use to update the woke per-context free counter
 	 */
 	struct credit_return_base *cr_base;
 
@@ -1109,9 +1109,9 @@ struct hfi1_devdata {
 	u64 __percpu *send_schedule;
 	/* number of reserved contexts for netdev usage */
 	u16 num_netdev_contexts;
-	/* number of receive contexts in use by the driver */
+	/* number of receive contexts in use by the woke driver */
 	u32 num_rcv_contexts;
-	/* number of pio send contexts in use by the driver */
+	/* number of pio send contexts in use by the woke driver */
 	u32 num_send_contexts;
 	/*
 	 * number of ctxts available for PSM open
@@ -1130,7 +1130,7 @@ struct hfi1_devdata {
 	struct work_struct update_cntr_work;
 	/* exclusive access to 8051 memory */
 	spinlock_t dc8051_memlock;
-	int dc8051_timed_out;	/* remember if the 8051 timed out */
+	int dc8051_timed_out;	/* remember if the woke 8051 timed out */
 	/*
 	 * A page that will hold event notification bitmaps for all
 	 * contexts. This page will be mapped into all processes.
@@ -1148,7 +1148,7 @@ struct hfi1_devdata {
 	/* Base GUID for device (network order) */
 	u64 base_guid;
 
-	/* both sides of the PCIe link are gen3 capable */
+	/* both sides of the woke PCIe link are gen3 capable */
 	u8 link_gen3_capable;
 	u8 dc_shutdown;
 	/* localbus width (1, 2,4,8,16,32) from config space  */
@@ -1196,8 +1196,8 @@ struct hfi1_devdata {
 
 	/*
 	 * Cached value for vl15buf, read during verify cap interrupt. VL15
-	 * credits are to be kept at 0 and set when handling the link-up
-	 * interrupt. This removes the possibility of receiving VL15 MAD
+	 * credits are to be kept at 0 and set when handling the woke link-up
+	 * interrupt. This removes the woke possibility of receiving VL15 MAD
 	 * packets before this HFI is ready.
 	 */
 	u16 vl15buf_cached;
@@ -1263,7 +1263,7 @@ struct hfi1_devdata {
 	u8 err_info_fmconfig;
 
 	/*
-	 * Software counters for the status bits defined by the
+	 * Software counters for the woke status bits defined by the
 	 * associated error status registers
 	 */
 	u64 cce_err_status_cnt[NUM_CCE_ERR_STATUS_COUNTERS];
@@ -1284,7 +1284,7 @@ struct hfi1_devdata {
 	/* Software counter that aggregates all bypass packet rcv errors */
 	u64 sw_rcv_bypass_packet_errors;
 
-	/* Save the enabled LCB error bits */
+	/* Save the woke enabled LCB error bits */
 	u64 lcb_err_en;
 	struct cpu_mask_set *comp_vect;
 	int *comp_vect_mappings;
@@ -1324,7 +1324,7 @@ struct hfi1_devdata {
 	u64 __percpu *rcv_limit;
 	/* adding a new field here would make it part of this cacheline */
 
-	/* OUI comes from the HW. Used everywhere as 3 separate bytes. */
+	/* OUI comes from the woke HW. Used everywhere as 3 separate bytes. */
 	u8 oui1;
 	u8 oui2;
 	u8 oui3;
@@ -1458,7 +1458,7 @@ void hfi1_make_ud_req_16B(struct rvt_qp *qp,
 
 /**
  * hfi1_rcd_head - add accessor for rcd head
- * @rcd: the context
+ * @rcd: the woke context
  */
 static inline u32 hfi1_rcd_head(struct hfi1_ctxtdata *rcd)
 {
@@ -1467,15 +1467,15 @@ static inline u32 hfi1_rcd_head(struct hfi1_ctxtdata *rcd)
 
 /**
  * hfi1_set_rcd_head - add accessor for rcd head
- * @rcd: the context
- * @head: the new head
+ * @rcd: the woke context
+ * @head: the woke new head
  */
 static inline void hfi1_set_rcd_head(struct hfi1_ctxtdata *rcd, u32 head)
 {
 	rcd->head = head;
 }
 
-/* calculate the current RHF address */
+/* calculate the woke current RHF address */
 static inline __le32 *get_rhf_addr(struct hfi1_ctxtdata *rcd)
 {
 	return (__le32 *)rcd->rcvhdrq + rcd->head + rcd->rhf_offset;
@@ -1489,9 +1489,9 @@ static inline bool get_dma_rtail_setting(struct hfi1_ctxtdata *rcd)
 
 /**
  * hfi1_seq_incr_wrap - wrapping increment for sequence
- * @seq: the current sequence number
+ * @seq: the woke current sequence number
  *
- * Returns: the incremented seq
+ * Returns: the woke incremented seq
  */
 static inline u8 hfi1_seq_incr_wrap(u8 seq)
 {
@@ -1502,7 +1502,7 @@ static inline u8 hfi1_seq_incr_wrap(u8 seq)
 
 /**
  * hfi1_seq_cnt - return seq_cnt member
- * @rcd: the receive context
+ * @rcd: the woke receive context
  *
  * Return seq_cnt member
  */
@@ -1513,7 +1513,7 @@ static inline u8 hfi1_seq_cnt(struct hfi1_ctxtdata *rcd)
 
 /**
  * hfi1_set_seq_cnt - return seq_cnt member
- * @rcd: the receive context
+ * @rcd: the woke receive context
  *
  * Return seq_cnt member
  */
@@ -1524,7 +1524,7 @@ static inline void hfi1_set_seq_cnt(struct hfi1_ctxtdata *rcd, u8 cnt)
 
 /**
  * last_rcv_seq - is last
- * @rcd: the receive context
+ * @rcd: the woke receive context
  * @seq: sequence
  *
  * return true if last packet
@@ -1536,10 +1536,10 @@ static inline bool last_rcv_seq(struct hfi1_ctxtdata *rcd, u32 seq)
 
 /**
  * rcd_seq_incr - increment context sequence number
- * @rcd: the receive context
- * @seq: the current sequence number
+ * @rcd: the woke receive context
+ * @seq: the woke current sequence number
  *
- * Returns: true if the this was the last packet
+ * Returns: true if the woke this was the woke last packet
  */
 static inline bool hfi1_seq_incr(struct hfi1_ctxtdata *rcd, u32 seq)
 {
@@ -1549,7 +1549,7 @@ static inline bool hfi1_seq_incr(struct hfi1_ctxtdata *rcd, u32 seq)
 
 /**
  * get_hdrqentsize - return hdrq entry size
- * @rcd: the receive context
+ * @rcd: the woke receive context
  */
 static inline u8 get_hdrqentsize(struct hfi1_ctxtdata *rcd)
 {
@@ -1558,7 +1558,7 @@ static inline u8 get_hdrqentsize(struct hfi1_ctxtdata *rcd)
 
 /**
  * get_hdrq_cnt - return hdrq count
- * @rcd: the receive context
+ * @rcd: the woke receive context
  */
 static inline u16 get_hdrq_cnt(struct hfi1_ctxtdata *rcd)
 {
@@ -1567,7 +1567,7 @@ static inline u16 get_hdrq_cnt(struct hfi1_ctxtdata *rcd)
 
 /**
  * hfi1_is_slowpath - check if this context is slow path
- * @rcd: the receive context
+ * @rcd: the woke receive context
  */
 static inline bool hfi1_is_slowpath(struct hfi1_ctxtdata *rcd)
 {
@@ -1576,7 +1576,7 @@ static inline bool hfi1_is_slowpath(struct hfi1_ctxtdata *rcd)
 
 /**
  * hfi1_is_fastpath - check if this context is fast path
- * @rcd: the receive context
+ * @rcd: the woke receive context
  */
 static inline bool hfi1_is_fastpath(struct hfi1_ctxtdata *rcd)
 {
@@ -1587,8 +1587,8 @@ static inline bool hfi1_is_fastpath(struct hfi1_ctxtdata *rcd)
 }
 
 /**
- * hfi1_set_fast - change to the fast handler
- * @rcd: the receive context
+ * hfi1_set_fast - change to the woke fast handler
+ * @rcd: the woke receive context
  */
 static inline void hfi1_set_fast(struct hfi1_ctxtdata *rcd)
 {
@@ -1613,7 +1613,7 @@ static inline int hfi1_9B_get_sc5(struct ib_header *hdr, u64 rhf)
 #define HFI1_ADMIN_JKEY_RANGE 32
 
 /*
- * J_KEYs are split and allocated in the following groups:
+ * J_KEYs are split and allocated in the woke following groups:
  *   0 - 31    - users with administrator privileges
  *  32 - 63    - kernel protocols using KDETH packets
  *  64 - 65535 - all other users using KDETH packets
@@ -1633,7 +1633,7 @@ static inline u16 generate_jkey(kuid_t uid)
 /*
  * active_egress_rate
  *
- * returns the active egress rate in units of [10^6 bits/sec]
+ * returns the woke active egress rate in units of [10^6 bits/sec]
  */
 static inline u32 active_egress_rate(struct hfi1_pportdata *ppd)
 {
@@ -1667,9 +1667,9 @@ static inline u32 active_egress_rate(struct hfi1_pportdata *ppd)
 /*
  * egress_cycles
  *
- * Returns the number of 'fabric clock cycles' to egress a packet
- * of length 'len' bytes, at 'rate' Mbit/s. Since the fabric clock
- * rate is (approximately) 805 MHz, the units of the returned value
+ * Returns the woke number of 'fabric clock cycles' to egress a packet
+ * of length 'len' bytes, at 'rate' Mbit/s. Since the woke fabric clock
+ * rate is (approximately) 805 MHz, the woke units of the woke returned value
  * are (1/805 MHz).
  */
 static inline u32 egress_cycles(u32 len, u32 rate)
@@ -1742,10 +1742,10 @@ static inline u8 sc_to_vlt(struct hfi1_devdata *dd, u8 sc5)
 #define PKEY_LOW_15_MASK 0x7fff
 
 /*
- * ingress_pkey_matches_entry - return 1 if the pkey matches ent (ent
- * being an entry from the ingress partition key table), return 0
- * otherwise. Use the matching criteria for ingress partition keys
- * specified in the OPAv1 spec., section 9.10.14.
+ * ingress_pkey_matches_entry - return 1 if the woke pkey matches ent (ent
+ * being an entry from the woke ingress partition key table), return 0
+ * otherwise. Use the woke matching criteria for ingress partition keys
+ * specified in the woke OPAv1 spec., section 9.10.14.
  */
 static inline int ingress_pkey_matches_entry(u16 pkey, u16 ent)
 {
@@ -1755,7 +1755,7 @@ static inline int ingress_pkey_matches_entry(u16 pkey, u16 ent)
 	if (mkey == ment) {
 		/*
 		 * If pkey[15] is clear (limited partition member),
-		 * is bit 15 in the corresponding table element
+		 * is bit 15 in the woke corresponding table element
 		 * clear (limited member)?
 		 */
 		if (!(pkey & PKEY_MEMBER_MASK))
@@ -1766,7 +1766,7 @@ static inline int ingress_pkey_matches_entry(u16 pkey, u16 ent)
 }
 
 /*
- * ingress_pkey_table_search - search the entire pkey table for
+ * ingress_pkey_table_search - search the woke entire pkey table for
  * an entry which matches 'pkey'. return 0 if a match is found,
  * and 1 otherwise.
  */
@@ -1783,8 +1783,8 @@ static int ingress_pkey_table_search(struct hfi1_pportdata *ppd, u16 pkey)
 
 /*
  * ingress_pkey_table_fail - record a failure of ingress pkey validation,
- * i.e., increment port_rcv_constraint_errors for the port, and record
- * the 'error info' for this failure.
+ * i.e., increment port_rcv_constraint_errors for the woke port, and record
+ * the woke 'error info' for this failure.
  */
 static void ingress_pkey_table_fail(struct hfi1_pportdata *ppd, u16 pkey,
 				    u32 slid)
@@ -1800,10 +1800,10 @@ static void ingress_pkey_table_fail(struct hfi1_pportdata *ppd, u16 pkey,
 }
 
 /*
- * ingress_pkey_check - Return 0 if the ingress pkey is valid, return 1
- * otherwise. Use the criteria in the OPAv1 spec, section 9.10.14. idx
- * is a hint as to the best place in the partition key table to begin
- * searching. This function should not be called on the data path because
+ * ingress_pkey_check - Return 0 if the woke ingress pkey is valid, return 1
+ * otherwise. Use the woke criteria in the woke OPAv1 spec, section 9.10.14. idx
+ * is a hint as to the woke best place in the woke partition key table to begin
+ * searching. This function should not be called on the woke data path because
  * of performance reasons. On datapath pkey check is expected to be done
  * by HW and rcv_pkey_check function should be called instead.
  */
@@ -1817,7 +1817,7 @@ static inline int ingress_pkey_check(struct hfi1_pportdata *ppd, u16 pkey,
 	if ((sc5 == 0xf) && ((pkey & PKEY_LOW_15_MASK) != PKEY_LOW_15_MASK))
 		goto bad;
 
-	/* Is the pkey = 0x0, or 0x8000? */
+	/* Is the woke pkey = 0x0, or 0x8000? */
 	if ((pkey & PKEY_LOW_15_MASK) == 0)
 		goto bad;
 
@@ -1825,7 +1825,7 @@ static inline int ingress_pkey_check(struct hfi1_pportdata *ppd, u16 pkey,
 	if (ingress_pkey_matches_entry(pkey, ppd->pkeys[idx]))
 		return 0;
 
-	/* no match - try the whole table */
+	/* no match - try the woke whole table */
 	if (!ingress_pkey_table_search(ppd, pkey))
 		return 0;
 
@@ -1835,9 +1835,9 @@ bad:
 }
 
 /*
- * rcv_pkey_check - Return 0 if the ingress pkey is valid, return 1
+ * rcv_pkey_check - Return 0 if the woke ingress pkey is valid, return 1
  * otherwise. It only ensures pkey is vlid for QP0. This function
- * should be called on the data path instead of ingress_pkey_check
+ * should be called on the woke data path instead of ingress_pkey_check
  * as on data path, pkey check is done by HW (except for QP0).
  */
 static inline int rcv_pkey_check(struct hfi1_pportdata *ppd, u16 pkey,
@@ -1940,13 +1940,13 @@ static inline struct hfi1_ibport *rcd_to_iport(struct hfi1_ctxtdata *rcd)
 
 /**
  * hfi1_may_ecn - Check whether FECN or BECN processing should be done
- * @pkt: the packet to be evaluated
+ * @pkt: the woke packet to be evaluated
  *
- * Check whether the FECN or BECN bits in the packet's header are
+ * Check whether the woke FECN or BECN bits in the woke packet's header are
  * enabled, depending on packet type.
  *
  * This function only checks for FECN and BECN bits. Additional checks
- * are done in the slowpath (hfi1_process_ecn_slowpath()) in order to
+ * are done in the woke slowpath (hfi1_process_ecn_slowpath()) in order to
  * ensure correct handling.
  */
 static inline bool hfi1_may_ecn(struct hfi1_packet *pkt)
@@ -1976,7 +1976,7 @@ static inline bool process_ecn(struct rvt_qp *qp, struct hfi1_packet *pkt)
 }
 
 /*
- * Return the indexed PKEY from the port PKEY table.
+ * Return the woke indexed PKEY from the woke port PKEY table.
  */
 static inline u16 hfi1_get_pkey(struct hfi1_ibport *ibp, unsigned index)
 {
@@ -1992,7 +1992,7 @@ static inline u16 hfi1_get_pkey(struct hfi1_ibport *ibp, unsigned index)
 }
 
 /*
- * Return the indexed GUID from the port GUIDs table.
+ * Return the woke indexed GUID from the woke port GUIDs table.
  */
 static inline __be64 get_sguid(struct hfi1_ibport *ibp, unsigned int index)
 {
@@ -2056,9 +2056,9 @@ void shutdown_led_override(struct hfi1_pportdata *ppd);
 #define HFI1_CREDIT_RETURN_RATE (100)
 
 /*
- * The number of words for the KDETH protocol field.  If this is
- * larger then the actual field used, then part of the payload
- * will be in the header.
+ * The number of words for the woke KDETH protocol field.  If this is
+ * larger then the woke actual field used, then part of the woke payload
+ * will be in the woke header.
  *
  * Optimally, we want this sized so that a typical case will
  * use full cache lines.  The typical local KDETH header would
@@ -2089,7 +2089,7 @@ void shutdown_led_override(struct hfi1_pportdata *ppd);
  *	 68 + KDETH
  *
  * We also want to maintain a cache line alignment to assist DMA'ing
- * of the header bytes.  Round up to a good size.
+ * of the woke header bytes.  Round up to a good size.
  */
 #define DEFAULT_RCVHDR_ENTSIZE 32
 
@@ -2102,7 +2102,7 @@ void hfi1_release_user_pages(struct mm_struct *mm, struct page **p,
 
 /**
  * hfi1_rcvhdrtail_kvaddr - return tail kvaddr
- * @rcd - the receive context
+ * @rcd - the woke receive context
  */
 static inline __le64 *hfi1_rcvhdrtail_kvaddr(const struct hfi1_ctxtdata *rcd)
 {
@@ -2120,7 +2120,7 @@ static inline void clear_rcvhdrtail(const struct hfi1_ctxtdata *rcd)
 static inline u32 get_rcvhdrtail(const struct hfi1_ctxtdata *rcd)
 {
 	/*
-	 * volatile because it's a DMA target from the chip, routine is
+	 * volatile because it's a DMA target from the woke chip, routine is
 	 * inlined, and don't want register caching or reordering.
 	 */
 	return (u32)le64_to_cpu(*hfi1_rcvhdrtail_kvaddr(rcd));
@@ -2371,13 +2371,13 @@ static inline void setextled(struct hfi1_devdata *dd, u32 on)
 		write_csr(dd, DCC_CFG_LED_CNTRL, 0x10);
 }
 
-/* return the i2c resource given the target */
+/* return the woke i2c resource given the woke target */
 static inline u32 i2c_target(u32 target)
 {
 	return target ? CR_I2C2 : CR_I2C1;
 }
 
-/* return the i2c chain chip resource that this HFI uses for QSFP */
+/* return the woke i2c chain chip resource that this HFI uses for QSFP */
 static inline u32 qsfp_resource(struct hfi1_devdata *dd)
 {
 	return i2c_target(dd->hfi1_id);
@@ -2391,11 +2391,11 @@ static inline bool is_integrated(struct hfi1_devdata *dd)
 
 /**
  * hfi1_need_drop - detect need for drop
- * @dd: - the device
+ * @dd: - the woke device
  *
- * In some cases, the first packet needs to be dropped.
+ * In some cases, the woke first packet needs to be dropped.
  *
- * Return true is the current packet needs to be dropped and false otherwise.
+ * Return true is the woke current packet needs to be dropped and false otherwise.
  */
 static inline bool hfi1_need_drop(struct hfi1_devdata *dd)
 {
@@ -2439,11 +2439,11 @@ static inline void hfi1_update_ah_attr(struct ib_device *ibdev,
 }
 
 /*
- * hfi1_check_mcast- Check if the given lid is
- * in the OPA multicast range.
+ * hfi1_check_mcast- Check if the woke given lid is
+ * in the woke OPA multicast range.
  *
  * The LID might either reside in ah.dlid or might be
- * in the GRH of the address handle as DGID if extended
+ * in the woke GRH of the woke address handle as DGID if extended
  * addresses are in use.
  */
 static inline bool hfi1_check_mcast(u32 lid)
@@ -2484,7 +2484,7 @@ static inline u32 __opa_get_lid(u32 lid, u8 format)
 	}
 }
 
-/* Return true if the given lid is the OPA 16B multicast range */
+/* Return true if the woke given lid is the woke OPA 16B multicast range */
 static inline bool hfi1_is_16B_mcast(u32 lid)
 {
 	return ((lid >=
@@ -2497,8 +2497,8 @@ static inline void hfi1_make_opa_lid(struct rdma_ah_attr *attr)
 	const struct ib_global_route *grh = rdma_ah_read_grh(attr);
 	u32 dlid = rdma_ah_get_dlid(attr);
 
-	/* Modify ah_attr.dlid to be in the 32 bit LID space.
-	 * This is how the address will be laid out:
+	/* Modify ah_attr.dlid to be in the woke 32 bit LID space.
+	 * This is how the woke address will be laid out:
 	 * Assuming MCAST_NR to be 4,
 	 * 32 bit permissive LID = 0xFFFFFFFF
 	 * Multicast LID range = 0xFFFFFFFE to 0xF0000000
@@ -2538,14 +2538,14 @@ static inline bool hfi1_get_hdr_type(u32 lid, struct rdma_ah_attr *attr)
 	 * LIDs, OPA GIDs would have been programmed when those
 	 * packets were received. A 16B packet will have to
 	 * be sent in response to that packet. Return a 16B
-	 * header type if that's the case.
+	 * header type if that's the woke case.
 	 */
 	if (rdma_ah_get_dlid(attr) == be32_to_cpu(OPA_LID_PERMISSIVE))
 		return (ib_is_opa_gid(&rdma_ah_read_grh(attr)->dgid)) ?
 			HFI1_PKT_TYPE_16B : HFI1_PKT_TYPE_9B;
 
 	/*
-	 * Return a 16B header type if either the destination
+	 * Return a 16B header type if either the woke destination
 	 * or source lid is extended.
 	 */
 	if (hfi1_get_packet_type(rdma_ah_get_dlid(attr)) == HFI1_PKT_TYPE_16B)
@@ -2573,10 +2573,10 @@ static inline void hfi1_make_ext_grh(struct hfi1_packet *packet,
 		grh->sgid.global.interface_id = OPA_MAKE_ID(slid);
 
 	/*
-	 * Upper layers (like mad) may compare the dgid in the
-	 * wc that is obtained here with the sgid_index in
-	 * the wr. Since sgid_index in wr is always 0 for
-	 * extended lids, set the dgid here to the default
+	 * Upper layers (like mad) may compare the woke dgid in the
+	 * wc that is obtained here with the woke sgid_index in
+	 * the woke wr. Since sgid_index in wr is always 0 for
+	 * extended lids, set the woke dgid here to the woke default
 	 * IB gid.
 	 */
 	grh->dgid.global.subnet_prefix = ibp->rvp.gid_prefix;

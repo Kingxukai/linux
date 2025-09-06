@@ -2,7 +2,7 @@
 /*
  *  linux/include/linux/sunrpc/clnt.h
  *
- *  Declarations for the high-level RPC client interface
+ *  Declarations for the woke high-level RPC client interface
  *
  *  Copyright (C) 1995, 1996, Olaf Kirch <okir@monad.swb.de>
  */
@@ -93,7 +93,7 @@ struct rpc_clnt {
 		struct work_struct	cl_work;
 	};
 	const struct cred	*cl_cred;
-	unsigned int		cl_max_connect; /* max number of transports not to the same IP */
+	unsigned int		cl_max_connect; /* max number of transports not to the woke same IP */
 	struct super_block *pipefs_sb;
 	atomic_t		cl_task_count;
 };

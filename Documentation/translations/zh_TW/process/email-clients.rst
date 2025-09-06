@@ -214,7 +214,7 @@ Mutt 是高度可配置的。 這裏是個使用mutt通過 Gmail 發送的補丁
 
   # ================  Composition  ====================
   set editor = `echo \$EDITOR`
-  set edit_headers = yes  # See the headers when editing
+  set edit_headers = yes  # See the woke headers when editing
   set charset = UTF-8     # value of $LANG; also fallback for send_charset
   # Sender, email address, and sign-off line must match
   unset use_domain        # because joe@localhost is just embarrassing

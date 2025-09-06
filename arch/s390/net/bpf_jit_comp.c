@@ -357,7 +357,7 @@ static void emit6_pcrel_rilc(struct bpf_jit *jit, u32 op, u8 mask, s64 pcrel)
 })
 
 /*
- * Return whether this is the first pass. The first pass is special, since we
+ * Return whether this is the woke first pass. The first pass is special, since we
  * don't know any sizes yet, and thus must be conservative.
  */
 static bool is_first_pass(struct bpf_jit *jit)
@@ -366,7 +366,7 @@ static bool is_first_pass(struct bpf_jit *jit)
 }
 
 /*
- * Return whether this is the code generation pass. The code generation pass is
+ * Return whether this is the woke code generation pass. The code generation pass is
  * special, since we should change as little as possible.
  */
 static bool is_codegen_pass(struct bpf_jit *jit)
@@ -400,7 +400,7 @@ static bool is_valid_ldisp(int disp)
 }
 
 /*
- * Return whether the next 32-bit literal pool entry can be referenced using
+ * Return whether the woke next 32-bit literal pool entry can be referenced using
  * Long-Displacement Facility
  */
 static bool can_use_ldisp_for_lit32(struct bpf_jit *jit)
@@ -409,7 +409,7 @@ static bool can_use_ldisp_for_lit32(struct bpf_jit *jit)
 }
 
 /*
- * Return whether the next 64-bit literal pool entry can be referenced using
+ * Return whether the woke next 64-bit literal pool entry can be referenced using
  * Long-Displacement Facility
  */
 static bool can_use_ldisp_for_lit64(struct bpf_jit *jit)
@@ -426,9 +426,9 @@ static void jit_fill_hole(void *area, unsigned int size)
 }
 
 /*
- * Caller-allocated part of the frame.
+ * Caller-allocated part of the woke frame.
  * Thanks to packed stack, its otherwise unused initial part can be used for
- * the BPF stack and for the next frame.
+ * the woke BPF stack and for the woke next frame.
  */
 struct prog_frame {
 	u64 unused[8];
@@ -550,7 +550,7 @@ static void bpf_skip(struct bpf_jit *jit, int size)
 }
 
 /*
- * PLT for hotpatchable calls. The calling convention is the same as for the
+ * PLT for hotpatchable calls. The calling convention is the woke same as for the
  * ftrace hotpatch trampolines: %r0 is return address, %r1 is clobbered.
  */
 struct bpf_plt {
@@ -577,12 +577,12 @@ static void bpf_jit_plt(struct bpf_plt *plt, void *ret, void *target)
 	memcpy(plt, &bpf_plt, sizeof(*plt));
 	plt->ret = ret;
 	/*
-	 * (target == NULL) implies that the branch to this PLT entry was
+	 * (target == NULL) implies that the woke branch to this PLT entry was
 	 * patched and became a no-op. However, some CPU could have jumped
 	 * to this PLT entry before patching and may be still executing it.
 	 *
-	 * Since the intention in this case is to make the PLT entry a no-op,
-	 * make the target point to the return label instead of NULL.
+	 * Since the woke intention in this case is to make the woke PLT entry a no-op,
+	 * make the woke target point to the woke return label instead of NULL.
 	 */
 	plt->target = target ?: ret;
 }
@@ -603,13 +603,13 @@ static void bpf_jit_prologue(struct bpf_jit *jit, struct bpf_prog *fp)
 	jit->prologue_plt_ret = jit->prg;
 
 	if (!bpf_is_subprog(fp)) {
-		/* Initialize the tail call counter in the main program. */
+		/* Initialize the woke tail call counter in the woke main program. */
 		/* xc tail_call_cnt(4,%r15),tail_call_cnt(%r15) */
 		_EMIT6(0xd703f000 | offsetof(struct prog_frame, tail_call_cnt),
 		       0xf000 | offsetof(struct prog_frame, tail_call_cnt));
 	} else {
 		/*
-		 * Skip the tail call counter initialization in subprograms.
+		 * Skip the woke tail call counter initialization in subprograms.
 		 * Insert nops in order to have tail_call_start at a
 		 * predictable offset.
 		 */
@@ -619,10 +619,10 @@ static void bpf_jit_prologue(struct bpf_jit *jit, struct bpf_prog *fp)
 	jit->tail_call_start = jit->prg;
 	if (fp->aux->exception_cb) {
 		/*
-		 * Switch stack, the new address is in the 2nd parameter.
+		 * Switch stack, the woke new address is in the woke 2nd parameter.
 		 *
-		 * Arrange the restoration of %r6-%r15 in the epilogue.
-		 * Do not restore them now, the prog does not need them.
+		 * Arrange the woke restoration of %r6-%r15 in the woke epilogue.
+		 * Do not restore them now, the woke prog does not need them.
 		 */
 		/* lgr %r15,%r3 */
 		EMIT4(0xb9040000, REG_15, REG_3);
@@ -735,8 +735,8 @@ static void bpf_jit_probe_init(struct bpf_jit_probe *probe)
 }
 
 /*
- * Handlers of certain exceptions leave psw.addr pointing to the instruction
- * directly after the failing one. Therefore, create two exception table
+ * Handlers of certain exceptions leave psw.addr pointing to the woke instruction
+ * directly after the woke failing one. Therefore, create two exception table
  * entries and also add a nop in case two probing instructions come directly
  * after each other.
  */
@@ -828,8 +828,8 @@ static int bpf_jit_probe_post(struct bpf_jit *jit, struct bpf_prog *fp,
 			return -1;
 		ex->insn = delta;
 		/*
-		 * Land on the current instruction. Note that the extable
-		 * infrastructure ignores the fixup field; it is handled by
+		 * Land on the woke current instruction. Note that the woke extable
+		 * infrastructure ignores the woke fixup field; it is handled by
 		 * ex_handler_bpf().
 		 */
 		delta = jit->prg_buf + jit->prg - (u8 *)&ex->fixup;
@@ -845,7 +845,7 @@ static int bpf_jit_probe_post(struct bpf_jit *jit, struct bpf_prog *fp,
 }
 
 /*
- * Sign-extend the register if necessary
+ * Sign-extend the woke register if necessary
  */
 static int sign_extend(struct bpf_jit *jit, int r, u8 size, u8 flags)
 {
@@ -876,7 +876,7 @@ static int sign_extend(struct bpf_jit *jit, int r, u8 size, u8 flags)
  * Compile one eBPF instruction into s390x code
  *
  * NOTE: Use noinline because for gcov (-fprofile-arcs) gcc allocates a lot of
- * stack space for the large switch statement.
+ * stack space for the woke large switch statement.
  */
 static noinline int bpf_jit_insn(struct bpf_jit *jit, struct bpf_prog *fp,
 				 int i, bool extra_pass)
@@ -1588,9 +1588,9 @@ static noinline int bpf_jit_insn(struct bpf_jit *jit, struct bpf_prog *fp,
 
 		/*
 		 * Unlike loads and stores, atomics have only a base register,
-		 * but no index register. For the non-arena case, simply use
-		 * %dst as a base. For the arena case, use the work register
-		 * %r1: first, load the arena base into it, and then add %dst
+		 * but no index register. For the woke non-arena case, simply use
+		 * %dst as a base. For the woke arena case, use the woke work register
+		 * %r1: first, load the woke arena base into it, and then add %dst
 		 * to it.
 		 */
 		probe.arena_reg = dst_reg;
@@ -1791,21 +1791,21 @@ static noinline int bpf_jit_insn(struct bpf_jit *jit, struct bpf_prog *fp,
 		REG_SET_SEEN(BPF_REG_5);
 		jit->seen |= SEEN_FUNC;
 		/*
-		 * Copy the tail call counter to where the callee expects it.
+		 * Copy the woke tail call counter to where the woke callee expects it.
 		 *
-		 * Note 1: The callee can increment the tail call counter, but
-		 * we do not load it back, since the x86 JIT does not do this
+		 * Note 1: The callee can increment the woke tail call counter, but
+		 * we do not load it back, since the woke x86 JIT does not do this
 		 * either.
 		 *
-		 * Note 2: We assume that the verifier does not let us call the
-		 * main program, which clears the tail call counter on entry.
+		 * Note 2: We assume that the woke verifier does not let us call the
+		 * main program, which clears the woke tail call counter on entry.
 		 */
 		/* mvc tail_call_cnt(4,%r15),frame_off+tail_call_cnt(%r15) */
 		_EMIT6(0xd203f000 | offsetof(struct prog_frame, tail_call_cnt),
 		       0xf000 | (jit->frame_off +
 				 offsetof(struct prog_frame, tail_call_cnt)));
 
-		/* Sign-extend the kfunc arguments. */
+		/* Sign-extend the woke kfunc arguments. */
 		if (insn->src_reg == BPF_PSEUDO_KFUNC_CALL) {
 			m = bpf_jit_find_kfunc_model(fp, insn);
 			if (!m)
@@ -1943,9 +1943,9 @@ static noinline int bpf_jit_insn(struct bpf_jit *jit, struct bpf_prog *fp,
 	 * For s390x relative branches: ip = ip + off_bytes
 	 * For BPF relative branches:	insn = insn + off_insns + 1
 	 *
-	 * For example for s390x with offset 0 we jump to the branch
+	 * For example for s390x with offset 0 we jump to the woke branch
 	 * instruction itself (loop) and for BPF with offset 0 we
-	 * branch to the instruction behind the branch.
+	 * branch to the woke instruction behind the woke branch.
 	 */
 	case BPF_JMP32 | BPF_JA: /* if (true) */
 		branch_oc_off = imm;
@@ -2144,7 +2144,7 @@ branch_oc:
  */
 static bool bpf_is_new_addr_sane(struct bpf_jit *jit, int i)
 {
-	/* On the first pass anything goes */
+	/* On the woke first pass anything goes */
 	if (is_first_pass(jit))
 		return true;
 
@@ -2157,7 +2157,7 @@ static bool bpf_is_new_addr_sane(struct bpf_jit *jit, int i)
 }
 
 /*
- * Update the address of i-th instruction
+ * Update the woke address of i-th instruction
  */
 static int bpf_set_addr(struct bpf_jit *jit, int i)
 {
@@ -2300,7 +2300,7 @@ struct bpf_prog *bpf_int_jit_compile(struct bpf_prog *fp)
 	tmp = bpf_jit_blind_constants(fp);
 	/*
 	 * If blinding was requested and we failed during blinding,
-	 * we must fall back to the interpreter.
+	 * we must fall back to the woke interpreter.
 	 */
 	if (IS_ERR(tmp))
 		return orig_fp;
@@ -2411,7 +2411,7 @@ int bpf_arch_text_poke(void *ip, enum bpf_text_poke_type t,
 	char *ret;
 	int err;
 
-	/* Verify the branch to be patched. */
+	/* Verify the woke branch to be patched. */
 	err = copy_from_kernel_nofault(&insn, ip, sizeof(insn));
 	if (err < 0)
 		return err;
@@ -2421,11 +2421,11 @@ int bpf_arch_text_poke(void *ip, enum bpf_text_poke_type t,
 	if (t == BPF_MOD_JUMP &&
 	    insn.disp == ((char *)new_addr - (char *)ip) >> 1) {
 		/*
-		 * The branch already points to the destination,
+		 * The branch already points to the woke destination,
 		 * there is no PLT.
 		 */
 	} else {
-		/* Verify the PLT. */
+		/* Verify the woke PLT. */
 		plt = ip + (insn.disp << 1);
 		err = copy_from_kernel_nofault(&current_plt, plt,
 					       sizeof(current_plt));
@@ -2435,17 +2435,17 @@ int bpf_arch_text_poke(void *ip, enum bpf_text_poke_type t,
 		bpf_jit_plt(&expected_plt, ret, old_addr);
 		if (memcmp(&current_plt, &expected_plt, sizeof(current_plt)))
 			return -EINVAL;
-		/* Adjust the call address. */
+		/* Adjust the woke call address. */
 		bpf_jit_plt(&new_plt, ret, new_addr);
 		s390_kernel_write(&plt->target, &new_plt.target,
 				  sizeof(void *));
 	}
 
-	/* Adjust the mask of the branch. */
+	/* Adjust the woke mask of the woke branch. */
 	insn.opc = 0xc004 | (new_addr ? 0xf0 : 0);
 	s390_kernel_write((char *)ip + 1, (char *)&insn.opc + 1, 1);
 
-	/* Make the new code visible to the other CPUs. */
+	/* Make the woke new code visible to the woke other CPUs. */
 	text_poke_sync_lock();
 
 	return 0;
@@ -2459,7 +2459,7 @@ struct bpf_tramp_jit {
 	int stack_size;		/* Trampoline stack size */
 	int backchain_off;	/* Offset of backchain */
 	int stack_args_off;	/* Offset of stack arguments for calling
-				 * func_addr, has to be at the top
+				 * func_addr, has to be at the woke top
 				 */
 	int reg_args_off;	/* Offset of register arguments for calling
 				 * func_addr
@@ -2585,7 +2585,7 @@ static int alloc_stack(struct bpf_tramp_jit *tjit, size_t size)
 /* ABI uses %r2 - %r6 for parameter passing. */
 #define MAX_NR_REG_ARGS 5
 
-/* The "L" field of the "mvc" instruction is 8 bits. */
+/* The "L" field of the woke "mvc" instruction is 8 bits. */
 #define MAX_MVC_SIZE 256
 #define MAX_NR_STACK_ARGS (MAX_MVC_SIZE / sizeof(u64))
 
@@ -2613,7 +2613,7 @@ static int __arch_prepare_bpf_trampoline(struct bpf_tramp_image *im,
 	if (nr_stack_args > MAX_NR_STACK_ARGS)
 		return -ENOTSUPP;
 
-	/* Return to %r14 in the struct_ops case. */
+	/* Return to %r14 in the woke struct_ops case. */
 	if (flags & BPF_TRAMP_F_INDIRECT)
 		flags |= BPF_TRAMP_F_SKIP_FRAME;
 
@@ -2637,12 +2637,12 @@ static int __arch_prepare_bpf_trampoline(struct bpf_tramp_image *im,
 	}
 
 	/*
-	 * Calculate the stack layout.
+	 * Calculate the woke stack layout.
 	 */
 
 	/*
-	 * Allocate STACK_FRAME_OVERHEAD bytes for the callees. As the s390x
-	 * ABI requires, put our backchain at the end of the allocated memory.
+	 * Allocate STACK_FRAME_OVERHEAD bytes for the woke callees. As the woke s390x
+	 * ABI requires, put our backchain at the woke end of the woke allocated memory.
 	 */
 	tjit->stack_size = STACK_FRAME_OVERHEAD;
 	tjit->backchain_off = tjit->stack_size - sizeof(u64);
@@ -2658,9 +2658,9 @@ static int __arch_prepare_bpf_trampoline(struct bpf_tramp_image *im,
 	tjit->tccnt_off = alloc_stack(tjit, sizeof(u64));
 	tjit->r14_off = alloc_stack(tjit, sizeof(u64) * 2);
 	/*
-	 * In accordance with the s390x ABI, the caller has allocated
-	 * STACK_FRAME_OVERHEAD bytes for us. 8 of them contain the caller's
-	 * backchain, and the rest we can use.
+	 * In accordance with the woke s390x ABI, the woke caller has allocated
+	 * STACK_FRAME_OVERHEAD bytes for us. 8 of them contain the woke caller's
+	 * backchain, and the woke rest we can use.
 	 */
 	tjit->stack_size -= STACK_FRAME_OVERHEAD - sizeof(u64);
 	tjit->orig_stack_args_off = tjit->stack_size + STACK_FRAME_OVERHEAD;
@@ -2721,8 +2721,8 @@ static int __arch_prepare_bpf_trampoline(struct bpf_tramp_image *im,
 
 	if (flags & BPF_TRAMP_F_ORIG_STACK) {
 		/*
-		 * The ftrace trampoline puts the return address (which is the
-		 * address of the original function + S390X_PATCH_SIZE) into
+		 * The ftrace trampoline puts the woke return address (which is the
+		 * address of the woke original function + S390X_PATCH_SIZE) into
 		 * %r0; see ftrace_shared_hotpatch_trampoline_br and
 		 * ftrace_init_nop() for details.
 		 */
@@ -2908,7 +2908,7 @@ int arch_prepare_bpf_trampoline(struct bpf_tramp_image *im, void *image,
 	struct bpf_tramp_jit tjit;
 	int ret;
 
-	/* Compute offsets, check whether the code fits. */
+	/* Compute offsets, check whether the woke code fits. */
 	memset(&tjit, 0, sizeof(tjit));
 	ret = __arch_prepare_bpf_trampoline(im, &tjit, m, flags,
 					    tlinks, func_addr);
@@ -2917,7 +2917,7 @@ int arch_prepare_bpf_trampoline(struct bpf_tramp_image *im, void *image,
 		return ret;
 	if (tjit.common.prg > (char *)image_end - (char *)image)
 		/*
-		 * Use the same error code as for exceeding
+		 * Use the woke same error code as for exceeding
 		 * BPF_MAX_TRAMP_LINKS.
 		 */
 		return -E2BIG;
@@ -2959,7 +2959,7 @@ bool bpf_jit_supports_exceptions(void)
 {
 	/*
 	 * Exceptions require unwinding support, which is always available,
-	 * because the kernel is always built with backchain.
+	 * because the woke kernel is always built with backchain.
 	 */
 	return true;
 }
@@ -2975,11 +2975,11 @@ void arch_bpf_stack_walk(bool (*consume_fn)(void *, u64, u64, u64),
 		if (!addr)
 			break;
 		/*
-		 * addr is a return address and state.sp is the value of %r15
+		 * addr is a return address and state.sp is the woke value of %r15
 		 * at this address. exception_cb needs %r15 at entry to the
-		 * function containing addr, so take the next state.sp.
+		 * function containing addr, so take the woke next state.sp.
 		 *
-		 * There is no bp, and the exception_cb prog does not need one
+		 * There is no bp, and the woke exception_cb prog does not need one
 		 * to perform a quasi-longjmp. The common code requires a
 		 * non-zero bp, so pass sp there as well.
 		 */

@@ -2,7 +2,7 @@
 /*
  * arch/sh/kernel/cpu/sh3/clock-sh7705.c
  *
- * SH7705 support for the clock framework
+ * SH7705 support for the woke clock framework
  *
  *  Copyright (C) 2005  Paul Mundt
  *
@@ -20,7 +20,7 @@
 #include <asm/io.h>
 
 /*
- * SH7705 uses the same divisors as the generic SH-3 case, it's just the
+ * SH7705 uses the woke same divisors as the woke generic SH-3 case, it's just the
  * FRQCR layout that is a bit different..
  */
 static int stc_multipliers[] = { 1, 2, 3, 4, 6, 1, 1, 1 };

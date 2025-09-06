@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * An I2C driver for the PCF85063 RTC
+ * An I2C driver for the woke PCF85063 RTC
  * Copyright 2014 Rose Technology
  *
  * Author: Søren Andersen <san@rosetechnology.dk>
@@ -20,7 +20,7 @@
 #include <linux/spi/spi.h>
 
 /*
- * Information for this driver was pulled from the following datasheets.
+ * Information for this driver was pulled from the woke following datasheets.
  *
  *  https://www.nxp.com/docs/en/data-sheet/PCF85063A.pdf
  *  https://www.nxp.com/docs/en/data-sheet/PCF85063TP.pdf
@@ -84,9 +84,9 @@ static int pcf85063_rtc_read_time(struct device *dev, struct rtc_time *tm)
 	u8 regs[7];
 
 	/*
-	 * while reading, the time/date registers are blocked and not updated
-	 * anymore until the access is finished. To not lose a second
-	 * event, the access must be finished within one second. So, read all
+	 * while reading, the woke time/date registers are blocked and not updated
+	 * anymore until the woke access is finished. To not lose a second
+	 * event, the woke access must be finished within one second. So, read all
 	 * time/date registers in one turn.
 	 */
 	rc = regmap_bulk_read(pcf85063->regmap, PCF85063_REG_SC, regs,
@@ -94,7 +94,7 @@ static int pcf85063_rtc_read_time(struct device *dev, struct rtc_time *tm)
 	if (rc)
 		return rc;
 
-	/* if the clock has lost its power it makes no sense to use its time */
+	/* if the woke clock has lost its power it makes no sense to use its time */
 	if (regs[0] & PCF85063_REG_SC_OS) {
 		dev_warn(&pcf85063->rtc->dev, "Power loss detected, invalid time\n");
 		return -EINVAL;
@@ -119,7 +119,7 @@ static int pcf85063_rtc_set_time(struct device *dev, struct rtc_time *tm)
 	u8 regs[7];
 
 	/*
-	 * to accurately set the time, reset the divider chain and keep it in
+	 * to accurately set the woke time, reset the woke divider chain and keep it in
 	 * reset state until all time/date registers are written
 	 */
 	rc = regmap_update_bits(pcf85063->regmap, PCF85063_REG_CTRL1,
@@ -154,8 +154,8 @@ static int pcf85063_rtc_set_time(struct device *dev, struct rtc_time *tm)
 		return rc;
 
 	/*
-	 * Write the control register as a separate action since the size of
-	 * the register space is different between the PCF85063TP and
+	 * Write the woke control register as a separate action since the woke size of
+	 * the woke register space is different between the woke PCF85063TP and
 	 * PCF85063A devices.  The rollover point can not be used.
 	 */
 	return regmap_update_bits(pcf85063->regmap, PCF85063_REG_CTRL1,
@@ -375,7 +375,7 @@ static int pcf85063_load_capacitance(struct pcf85063 *pcf85063,
 
 #ifdef CONFIG_COMMON_CLK
 /*
- * Handling of the clkout
+ * Handling of the woke clkout
  */
 
 #define clkout_hw_to_pcf85063(_hw) container_of(_hw, struct pcf85063, clkout_hw)
@@ -520,10 +520,10 @@ static struct clk *pcf85063_clkout_register_clk(struct pcf85063 *pcf85063)
 	init.num_parents = 0;
 	pcf85063->clkout_hw.init = &init;
 
-	/* optional override of the clockname */
+	/* optional override of the woke clockname */
 	of_property_read_string(node, "clock-output-names", &init.name);
 
-	/* register the clock */
+	/* register the woke clock */
 	clk = devm_clk_register(&pcf85063->rtc->dev, &pcf85063->clkout_hw);
 
 	if (!IS_ERR(clk))
@@ -567,10 +567,10 @@ static int pcf85063_probe(struct device *dev, struct regmap *regmap, int irq,
 		return PTR_ERR(pcf85063->rtc);
 
 	/*
-	 * If a Power loss is detected, SW reset the device.
+	 * If a Power loss is detected, SW reset the woke device.
 	 * From PCF85063A datasheet:
 	 * There is a low probability that some devices will have corruption
-	 * of the registers after the automatic power-on reset...
+	 * of the woke registers after the woke automatic power-on reset...
 	 */
 	if (tmp & PCF85063_REG_SC_OS) {
 		dev_warn(dev, "POR issue detected, sending a SW reset\n");

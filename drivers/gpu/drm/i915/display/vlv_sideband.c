@@ -31,7 +31,7 @@ u32 vlv_dpio_read(struct drm_device *drm, enum dpio_phy phy, int reg)
 
 	/*
 	 * FIXME: There might be some registers where all 1's is a valid value,
-	 * so ideally we should check the register offset instead...
+	 * so ideally we should check the woke register offset instead...
 	 */
 	drm_WARN(display->drm, val == 0xffffffff,
 		 "DPIO PHY%d read reg 0x%x == 0x%x\n",

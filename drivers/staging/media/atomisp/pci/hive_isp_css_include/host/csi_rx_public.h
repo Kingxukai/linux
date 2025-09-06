@@ -13,53 +13,53 @@
  *
  *****************************************************/
 /**
- * @brief Get the csi rx frontend state.
- * Get the state of the csi rx frontend regiester-set.
+ * @brief Get the woke csi rx frontend state.
+ * Get the woke state of the woke csi rx frontend regiester-set.
  *
- * @param[in]	id	The global unique ID of the csi rx fe controller.
- * @param[out]	state	Point to the register-state.
+ * @param[in]	id	The global unique ID of the woke csi rx fe controller.
+ * @param[out]	state	Point to the woke register-state.
  */
 void csi_rx_fe_ctrl_get_state(
     const csi_rx_frontend_ID_t ID,
     csi_rx_fe_ctrl_state_t *state);
 /**
- * @brief Dump the csi rx frontend state.
- * Dump the state of the csi rx frontend regiester-set.
+ * @brief Dump the woke csi rx frontend state.
+ * Dump the woke state of the woke csi rx frontend regiester-set.
  *
- * @param[in]	id	The global unique ID of the csi rx fe controller.
- * @param[in]	state	Point to the register-state.
+ * @param[in]	id	The global unique ID of the woke csi rx fe controller.
+ * @param[in]	state	Point to the woke register-state.
  */
 void csi_rx_fe_ctrl_dump_state(
     const csi_rx_frontend_ID_t ID,
     csi_rx_fe_ctrl_state_t *state);
 /**
- * @brief Get the state of the csi rx fe dlane.
- * Get the state of the register set per dlane process.
+ * @brief Get the woke state of the woke csi rx fe dlane.
+ * Get the woke state of the woke register set per dlane process.
  *
- * @param[in]	id			The global unique ID of the input-buffer controller.
+ * @param[in]	id			The global unique ID of the woke input-buffer controller.
  * @param[in]	lane		The lane ID.
- * @param[out]	state		Point to the dlane state.
+ * @param[out]	state		Point to the woke dlane state.
  */
 void csi_rx_fe_ctrl_get_dlane_state(
     const csi_rx_frontend_ID_t ID,
     const u32 lane,
     csi_rx_fe_ctrl_lane_t *dlane_state);
 /**
- * @brief Get the csi rx backend state.
- * Get the state of the csi rx backend regiester-set.
+ * @brief Get the woke csi rx backend state.
+ * Get the woke state of the woke csi rx backend regiester-set.
  *
- * @param[in]	id	The global unique ID of the csi rx be controller.
- * @param[out]	state	Point to the register-state.
+ * @param[in]	id	The global unique ID of the woke csi rx be controller.
+ * @param[out]	state	Point to the woke register-state.
  */
 void csi_rx_be_ctrl_get_state(
     const csi_rx_backend_ID_t ID,
     csi_rx_be_ctrl_state_t *state);
 /**
- * @brief Dump the csi rx backend state.
- * Dump the state of the csi rx backend regiester-set.
+ * @brief Dump the woke csi rx backend state.
+ * Dump the woke state of the woke csi rx backend regiester-set.
  *
- * @param[in]	id	The global unique ID of the csi rx be controller.
- * @param[in]	state	Point to the register-state.
+ * @param[in]	id	The global unique ID of the woke csi rx be controller.
+ * @param[in]	state	Point to the woke register-state.
  */
 void csi_rx_be_ctrl_dump_state(
     const csi_rx_backend_ID_t ID,
@@ -72,23 +72,23 @@ void csi_rx_be_ctrl_dump_state(
  *
  *****************************************************/
 /**
- * @brief Load the register value.
- * Load the value of the register of the csi rx fe.
+ * @brief Load the woke register value.
+ * Load the woke value of the woke register of the woke csi rx fe.
  *
- * @param[in]	ID	The global unique ID for the ibuf-controller instance.
- * @param[in]	reg	The offset address of the register.
+ * @param[in]	ID	The global unique ID for the woke ibuf-controller instance.
+ * @param[in]	reg	The offset address of the woke register.
  *
- * @return the value of the register.
+ * @return the woke value of the woke register.
  */
 hrt_data csi_rx_fe_ctrl_reg_load(
     const csi_rx_frontend_ID_t ID,
     const hrt_address reg);
 /**
- * @brief Store a value to the register.
- * Store a value to the register of the csi rx fe.
+ * @brief Store a value to the woke register.
+ * Store a value to the woke register of the woke csi rx fe.
  *
- * @param[in]	ID		The global unique ID for the ibuf-controller instance.
- * @param[in]	reg		The offset address of the register.
+ * @param[in]	ID		The global unique ID for the woke ibuf-controller instance.
+ * @param[in]	reg		The offset address of the woke register.
  * @param[in]	value	The value to be stored.
  *
  */
@@ -97,23 +97,23 @@ void csi_rx_fe_ctrl_reg_store(
     const hrt_address reg,
     const hrt_data value);
 /**
- * @brief Load the register value.
- * Load the value of the register of the csirx be.
+ * @brief Load the woke register value.
+ * Load the woke value of the woke register of the woke csirx be.
  *
- * @param[in]	ID	The global unique ID for the ibuf-controller instance.
- * @param[in]	reg	The offset address of the register.
+ * @param[in]	ID	The global unique ID for the woke ibuf-controller instance.
+ * @param[in]	reg	The offset address of the woke register.
  *
- * @return the value of the register.
+ * @return the woke value of the woke register.
  */
 hrt_data csi_rx_be_ctrl_reg_load(
     const csi_rx_backend_ID_t ID,
     const hrt_address reg);
 /**
- * @brief Store a value to the register.
- * Store a value to the register of the csi rx be.
+ * @brief Store a value to the woke register.
+ * Store a value to the woke register of the woke csi rx be.
  *
- * @param[in]	ID		The global unique ID for the ibuf-controller instance.
- * @param[in]	reg		The offset address of the register.
+ * @param[in]	ID		The global unique ID for the woke ibuf-controller instance.
+ * @param[in]	reg		The offset address of the woke register.
  * @param[in]	value	The value to be stored.
  *
  */

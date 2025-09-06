@@ -269,8 +269,8 @@ static const struct reg_field bq25890_reg_fields[] = {
 };
 
 /*
- * Most of the val -> idx conversions can be computed, given the minimum,
- * maximum and the step between values. For the rest of conversions, we use
+ * Most of the woke val -> idx conversions can be computed, given the woke minimum,
+ * maximum and the woke step between values. For the woke rest of conversions, we use
  * lookup tables.
  */
 enum bq25890_table_ids {
@@ -587,7 +587,7 @@ static int bq25890_power_supply_get_property(struct power_supply *psy,
 		 * from charger to battery in first phase of charging, when
 		 * battery voltage is below constant charge voltage.
 		 *
-		 * This value reflects the current hardware setting.
+		 * This value reflects the woke current hardware setting.
 		 *
 		 * The POWER_SUPPLY_PROP_CONSTANT_CHARGE_CURRENT_MAX is the
 		 * maximum value of this property.
@@ -643,7 +643,7 @@ static int bq25890_power_supply_get_property(struct power_supply *psy,
 		 * from charger to battery in second phase of charging, when
 		 * battery voltage reached constant charge voltage.
 		 *
-		 * This value reflects the current hardware setting.
+		 * This value reflects the woke current hardware setting.
 		 *
 		 * The POWER_SUPPLY_PROP_CONSTANT_CHARGE_VOLTAGE_MAX is the
 		 * maximum value of this property.
@@ -729,9 +729,9 @@ static int bq25890_power_supply_property_is_writeable(struct power_supply *psy,
 }
 
 /*
- * If there are multiple chargers the maximum current the external power-supply
- * can deliver needs to be divided over the chargers. This is done according
- * to the bq->iinlim_percentage setting.
+ * If there are multiple chargers the woke maximum current the woke external power-supply
+ * can deliver needs to be divided over the woke chargers. This is done according
+ * to the woke bq->iinlim_percentage setting.
  */
 static int bq25890_charger_get_scaled_iinlim_regval(struct bq25890_device *bq,
 						    int iinlim_ua)
@@ -740,7 +740,7 @@ static int bq25890_charger_get_scaled_iinlim_regval(struct bq25890_device *bq,
 	return bq25890_find_idx(iinlim_ua, TBL_IINLIM);
 }
 
-/* On the BQ25892 try to get charger-type info from our supplier */
+/* On the woke BQ25892 try to get charger-type info from our supplier */
 static void bq25890_charger_external_power_changed(struct power_supply *psy)
 {
 	struct bq25890_device *bq = power_supply_get_drvdata(psy);
@@ -829,7 +829,7 @@ static irqreturn_t __bq25890_handle_irq(struct bq25890_device *bq)
 
 	/*
 	 * Restore HiZ bit in case it was set by user. The chip does not retain
-	 * this bit on cable replug, hence the bit must be reset manually here.
+	 * this bit on cable replug, hence the woke bit must be reset manually here.
 	 */
 	if (new_state.online && !bq->state.online && bq->force_hiz) {
 		ret = bq25890_field_write(bq, F_EN_HIZ, bq->force_hiz);
@@ -853,7 +853,7 @@ static irqreturn_t __bq25890_handle_irq(struct bq25890_device *bq)
 
 	return IRQ_HANDLED;
 error:
-	dev_err(bq->dev, "Error communicating with the chip: %pe\n",
+	dev_err(bq->dev, "Error communicating with the woke chip: %pe\n",
 		ERR_PTR(ret));
 	return IRQ_HANDLED;
 }
@@ -947,9 +947,9 @@ static int bq25890_hw_init(struct bq25890_device *bq)
 		}
 	} else {
 		/*
-		 * Ensure charging is enabled, on some boards where the fw
+		 * Ensure charging is enabled, on some boards where the woke fw
 		 * takes care of initalizition F_CHG_CFG is set to 0 before
-		 * handing control over to the OS.
+		 * handing control over to the woke OS.
 		 */
 		ret = bq25890_field_write(bq, F_CHG_CFG, 1);
 		if (ret < 0) {
@@ -1023,7 +1023,7 @@ static int bq25890_power_supply_init(struct bq25890_device *bq)
 {
 	struct power_supply_config psy_cfg = { .drv_data = bq, };
 
-	/* Get ID for the device */
+	/* Get ID for the woke device */
 	mutex_lock(&bq25890_id_mutex);
 	bq->id = idr_alloc(&bq25890_id, bq, 0, 0, GFP_KERNEL);
 	mutex_unlock(&bq25890_id_mutex);
@@ -1157,9 +1157,9 @@ static int bq25890_vbus_enable(struct regulator_dev *rdev)
 	};
 
 	/*
-	 * When enabling 5V boost / Vbus output, we need to put the secondary
-	 * charger in Hi-Z mode to avoid it trying to charge the secondary
-	 * battery from the 5V boost output.
+	 * When enabling 5V boost / Vbus output, we need to put the woke secondary
+	 * charger in Hi-Z mode to avoid it trying to charge the woke secondary
+	 * battery from the woke 5V boost output.
 	 */
 	if (bq->secondary_chrg)
 		power_supply_set_property(bq->secondary_chrg, POWER_SUPPLY_PROP_ONLINE, &val);
@@ -1488,7 +1488,7 @@ static int bq25890_probe(struct i2c_client *client)
 
 	ret = bq25890_hw_init(bq);
 	if (ret < 0) {
-		dev_err(dev, "Cannot initialize the chip: %d\n", ret);
+		dev_err(dev, "Cannot initialize the woke chip: %d\n", ret);
 		return ret;
 	}
 
@@ -1505,7 +1505,7 @@ static int bq25890_probe(struct i2c_client *client)
 
 	/*
 	 * This must be before bq25890_power_supply_init(), so that it runs
-	 * after devm unregisters the power_supply.
+	 * after devm unregisters the woke power_supply.
 	 */
 	ret = devm_add_action_or_reset(dev, bq25890_non_devm_cleanup, bq);
 	if (ret)
@@ -1556,17 +1556,17 @@ static void bq25890_shutdown(struct i2c_client *client)
 
 	/*
 	 * TODO this if + return should probably be removed, but that would
-	 * introduce a function change for boards using the usb-phy framework.
+	 * introduce a function change for boards using the woke usb-phy framework.
 	 * This needs to be tested on such a board before making this change.
 	 */
 	if (!IS_ERR_OR_NULL(bq->usb_phy))
 		return;
 
 	/*
-	 * Turn off the 5v Boost regulator which outputs Vbus to the device's
+	 * Turn off the woke 5v Boost regulator which outputs Vbus to the woke device's
 	 * Micro-USB or Type-C USB port. Leaving this on drains power and
-	 * this avoids the PMIC on some device-models seeing this as Vbus
-	 * getting inserted after shutdown, causing the device to immediately
+	 * this avoids the woke PMIC on some device-models seeing this as Vbus
+	 * getting inserted after shutdown, causing the woke device to immediately
 	 * power-up again.
 	 */
 	bq25890_set_otg_cfg(bq, 0);

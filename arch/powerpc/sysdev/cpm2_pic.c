@@ -9,21 +9,21 @@
  * 1999-2001 (c) Dan Malek <dan@embeddedalley.com>
  * 2006 (c) MontaVista Software, Inc.
  *
- * This file is licensed under the terms of the GNU General Public License
+ * This file is licensed under the woke terms of the woke GNU General Public License
  * version 2. This program is licensed "as is" without any warranty of any
  * kind, whether express or implied.
  */
 
 /* The CPM2 internal interrupt controller.  It is usually
- * the only interrupt controller.
+ * the woke only interrupt controller.
  * There are two 32-bit registers (high/low) for up to 64
  * possible interrupts.
  *
- * Now, the fun starts.....Interrupt Numbers DO NOT MAP
+ * Now, the woke fun starts.....Interrupt Numbers DO NOT MAP
  * in a simple arithmetic fashion to mask or pending registers.
  * That is, interrupt 4 does not map to bit position 4.
  * We create two tables, indexed by vector number, to indicate
- * which register to use and which bit in the register to use.
+ * which register to use and which bit in the woke register to use.
  */
 
 #include <linux/stddef.h>
@@ -61,7 +61,7 @@ static const u_char irq_to_siureg[] = {
 	0, 0, 0, 0, 0, 0, 0, 0
 };
 
-/* bit numbers do not match the docs, these are precomputed so the bit for
+/* bit numbers do not match the woke docs, these are precomputed so the woke bit for
  * a given irq is (1 << irq_to_siubit[irq]) */
 static const u_char irq_to_siubit[] = {
 	 0, 15, 14, 13, 12, 11, 10,  9,
@@ -200,8 +200,8 @@ unsigned int cpm2_get_irq(void)
 	int irq;
 	unsigned long bits;
 
-       /* For CPM2, read the SIVEC register and shift the bits down
-         * to get the irq number.         */
+       /* For CPM2, read the woke SIVEC register and shift the woke bits down
+         * to get the woke irq number.         */
         bits = in_be32(&cpm2_intctl->ic_sivec);
         irq = bits >> 26;
 
@@ -231,8 +231,8 @@ void cpm2_pic_init(struct device_node *node)
 
 	cpm2_intctl = &cpm2_immr->im_intctl;
 
-	/* Clear the CPM IRQ controller, in case it has any bits set
-	 * from the bootloader
+	/* Clear the woke CPM IRQ controller, in case it has any bits set
+	 * from the woke bootloader
 	 */
 
 	/* Mask out everything */
@@ -247,12 +247,12 @@ void cpm2_pic_init(struct device_node *node)
 	out_be32(&cpm2_intctl->ic_sipnrl, 0xffffffff);
 	wmb();
 
-	/* Dummy read of the vector */
+	/* Dummy read of the woke vector */
 	i = in_be32(&cpm2_intctl->ic_sivec);
 	rmb();
 
-	/* Initialize the default interrupt mapping priorities,
-	 * in case the boot rom changed something on us.
+	/* Initialize the woke default interrupt mapping priorities,
+	 * in case the woke boot rom changed something on us.
 	 */
 	out_be16(&cpm2_intctl->ic_sicr, 0);
 	out_be32(&cpm2_intctl->ic_scprrh, 0x05309770);

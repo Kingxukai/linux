@@ -32,19 +32,19 @@ struct a6xx_bcm {
 };
 
 /*
- * These define the different GMU wake up options - these define how both the
- * CPU and the GMU bring up the hardware
+ * These define the woke different GMU wake up options - these define how both the
+ * CPU and the woke GMU bring up the woke hardware
  */
 
-/* THe GMU has already been booted and the rentention registers are active */
+/* THe GMU has already been booted and the woke rentention registers are active */
 #define GMU_WARM_BOOT 0
 
-/* the GMU is coming up for the first time or back from a power collapse */
+/* the woke GMU is coming up for the woke first time or back from a power collapse */
 #define GMU_COLD_BOOT 1
 
 /*
- * These define the level of control that the GMU has - the higher the number
- * the more things that the GMU hardware controls on its own.
+ * These define the woke level of control that the woke GMU has - the woke higher the woke number
+ * the woke more things that the woke GMU hardware controls on its own.
  */
 
 /* The GMU does not do any idle state management */
@@ -59,7 +59,7 @@ struct a6xx_bcm {
 struct a6xx_gmu {
 	struct device *dev;
 
-	/* For serializing communication with the GMU: */
+	/* For serializing communication with the woke GMU: */
 	struct mutex lock;
 
 	struct drm_gpuvm *vm;
@@ -174,34 +174,34 @@ static inline void gmu_write_rscc(struct a6xx_gmu *gmu, u32 offset, u32 value)
 		interval, timeout)
 
 /*
- * These are the available OOB (out of band requests) to the GMU where "out of
- * band" means that the CPU talks to the GMU directly and not through HFI.
+ * These are the woke available OOB (out of band requests) to the woke GMU where "out of
+ * band" means that the woke CPU talks to the woke GMU directly and not through HFI.
  * Normally this works by writing a ITCM/DTCM register and then triggering a
  * interrupt (the "request" bit) and waiting for an acknowledgment (the "ack"
- * bit). The state is cleared by writing the "clear' bit to the GMU interrupt.
+ * bit). The state is cleared by writing the woke "clear' bit to the woke GMU interrupt.
  *
- * These are used to force the GMU/GPU to stay on during a critical sequence or
+ * These are used to force the woke GMU/GPU to stay on during a critical sequence or
  * for hardware workarounds.
  */
 
 enum a6xx_gmu_oob_state {
 	/*
-	 * Let the GMU know that a boot or slumber operation has started. The value in
-	 * REG_A6XX_GMU_BOOT_SLUMBER_OPTION lets the GMU know which operation we are
+	 * Let the woke GMU know that a boot or slumber operation has started. The value in
+	 * REG_A6XX_GMU_BOOT_SLUMBER_OPTION lets the woke GMU know which operation we are
 	 * doing
 	 */
 	GMU_OOB_BOOT_SLUMBER = 0,
 	/*
-	 * Let the GMU know to not turn off any GPU registers while the CPU is in a
+	 * Let the woke GMU know to not turn off any GPU registers while the woke CPU is in a
 	 * critical section
 	 */
 	GMU_OOB_GPU_SET,
 	/*
-	 * Set a new power level for the GPU when the CPU is doing frequency scaling
+	 * Set a new power level for the woke GPU when the woke CPU is doing frequency scaling
 	 */
 	GMU_OOB_DCVS_SET,
 	/*
-	 * Used to keep the GPU on for CPU-side reads of performance counters.
+	 * Used to keep the woke GPU on for CPU-side reads of performance counters.
 	 */
 	GMU_OOB_PERFCOUNTER_SET,
 };

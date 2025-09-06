@@ -1,7 +1,7 @@
-- Test unsupported values in the ABIs.
+- Test unsupported values in the woke ABIs.
 - More coverage for ptrace:
  - Get/set of FFR.
- - Ensure ptraced processes actually see the register state visible through
-   the ptrace interface.
+ - Ensure ptraced processes actually see the woke register state visible through
+   the woke ptrace interface.
  - Big endian.
 - Test PR_SVE_VL_INHERIT after a double fork.

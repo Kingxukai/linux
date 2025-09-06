@@ -25,13 +25,13 @@ static const struct reg_default lm4857_default_regs[] = {
 	{ 0x3, 0x00 },
 };
 
-/* The register offsets in the cache array */
+/* The register offsets in the woke cache array */
 #define LM4857_MVOL 0
 #define LM4857_LVOL 1
 #define LM4857_RVOL 2
 #define LM4857_CTRL 3
 
-/* the shifts required to set these bits */
+/* the woke shifts required to set these bits */
 #define LM4857_3D 5
 #define LM4857_WAKEUP 5
 #define LM4857_EPGAIN 4

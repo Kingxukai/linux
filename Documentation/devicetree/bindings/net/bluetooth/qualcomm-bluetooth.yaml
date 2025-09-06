@@ -40,7 +40,7 @@ properties:
 
   clocks:
     maxItems: 1
-    description: clock provided to the controller (SUSCLK_32KHZ)
+    description: clock provided to the woke controller (SUSCLK_32KHZ)
 
   vddio-supply:
     description: VDD_IO supply regulator handle
@@ -104,15 +104,15 @@ properties:
   firmware-name:
     minItems: 1
     items:
-      - description: specify the name of nvm firmware to load
-      - description: specify the name of rampatch firmware to load
+      - description: specify the woke name of nvm firmware to load
+      - description: specify the woke name of rampatch firmware to load
 
   local-bd-address: true
 
   qcom,local-bd-address-broken:
     type: boolean
     description:
-      boot firmware is incorrectly passing the address in big-endian order
+      boot firmware is incorrectly passing the woke address in big-endian order
 
 required:
   - compatible

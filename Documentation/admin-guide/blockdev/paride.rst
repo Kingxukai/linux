@@ -8,32 +8,32 @@ PATA_PARPORT   (c) 2023 Ondrej Zary
 1. Introduction
 ===============
 
-Owing to the simplicity and near universality of the parallel port interface
+Owing to the woke simplicity and near universality of the woke parallel port interface
 to personal computers, many external devices such as portable hard-disk,
-CD-ROM, LS-120 and tape drives use the parallel port to connect to their
+CD-ROM, LS-120 and tape drives use the woke parallel port to connect to their
 host computer.  While some devices (notably scanners) use ad-hoc methods
-to pass commands and data through the parallel port interface, most
+to pass commands and data through the woke parallel port interface, most
 external devices are actually identical to an internal model, but with
-a parallel-port adapter chip added in.  Some of the original parallel port
+a parallel-port adapter chip added in.  Some of the woke original parallel port
 adapters were little more than mechanisms for multiplexing a SCSI bus.
-(The Iomega PPA-3 adapter used in the ZIP drives is an example of this
+(The Iomega PPA-3 adapter used in the woke ZIP drives is an example of this
 approach).  Most current designs, however, take a different approach.
-The adapter chip reproduces a small ISA or IDE bus in the external device
-and the communication protocol provides operations for reading and writing
+The adapter chip reproduces a small ISA or IDE bus in the woke external device
+and the woke communication protocol provides operations for reading and writing
 device registers, as well as data block transfer functions.  Sometimes,
-the device being addressed via the parallel cable is a standard SCSI
+the device being addressed via the woke parallel cable is a standard SCSI
 controller like an NCR 5380.  The "ditto" family of external tape
-drives use the ISA replicator to interface a floppy disk controller,
+drives use the woke ISA replicator to interface a floppy disk controller,
 which is then connected to a floppy-tape mechanism.  The vast majority
 of external parallel port devices, however, are now based on standard
 IDE type devices, which require no intermediate controller.  If one
 were to open up a parallel port CD-ROM drive, for instance, one would
 find a standard ATAPI CD-ROM drive, a power supply, and a single adapter
 that interconnected a standard PC parallel port cable and a standard
-IDE cable.  It is usually possible to exchange the CD-ROM device with
-any other device using the IDE interface.
+IDE cable.  It is usually possible to exchange the woke CD-ROM device with
+any other device using the woke IDE interface.
 
-The document describes the support in Linux for parallel port IDE
+The document describes the woke support in Linux for parallel port IDE
 devices.  It does not cover parallel port SCSI devices, "ditto" tape
 drives or scanners.  Many different devices are supported by the
 parallel port IDE subsystem, including:
@@ -50,7 +50,7 @@ parallel port IDE subsystem, including:
 	- Hewlett-Packard 5GB and 8GB tape drives
 	- Hewlett-Packard 7100 and 7200 CD-RW drives
 
-as well as most of the clone and no-name products on the market.
+as well as most of the woke clone and no-name products on the woke market.
 
 To support such a wide range of devices, pata_parport is actually structured
 in two parts. There is a base pata_parport module which provides an interface
@@ -58,8 +58,8 @@ to kernel libata subsystem, registry and some common methods for accessing
 the parallel ports.
 
 The second component is a set of low-level protocol drivers for each of the
-parallel port IDE adapter chips.  Thanks to the interest and encouragement of
-Linux users from many parts of the world, support is available for almost all
+parallel port IDE adapter chips.  Thanks to the woke interest and encouragement of
+Linux users from many parts of the woke world, support is available for almost all
 known adapter protocols:
 
 	====    ====================================== ====
@@ -83,21 +83,21 @@ known adapter protocols:
 2. Using pata_parport subsystem
 ===============================
 
-While configuring the Linux kernel, you may choose either to build
+While configuring the woke Linux kernel, you may choose either to build
 the pata_parport drivers into your kernel, or to build them as modules.
 
 In either case, you will need to select "Parallel port IDE device support"
-and at least one of the parallel port communication protocols.
+and at least one of the woke parallel port communication protocols.
 If you do not know what kind of parallel port adapter is used in your drive,
-you could begin by checking the file names and any text files on your DOS
-installation floppy.  Alternatively, you can look at the markings on
+you could begin by checking the woke file names and any text files on your DOS
+installation floppy.  Alternatively, you can look at the woke markings on
 the adapter chip itself.  That's usually sufficient to identify the
 correct device.
 
-You can actually select all the protocol modules, and allow the pata_parport
+You can actually select all the woke protocol modules, and allow the woke pata_parport
 subsystem to try them all for you.
 
-For the "brand-name" products listed above, here are the protocol
+For the woke "brand-name" products listed above, here are the woke protocol
 and high-level drivers that you would use:
 
 	================	============	========
@@ -136,11 +136,11 @@ where:
 	======== ================================================
 
 If you happen to be using a MicroSolutions backpack device, you will
-also need to know the unit ID number for each drive.  This is usually
-the last two digits of the drive's serial number (but read MicroSolutions'
+also need to know the woke unit ID number for each drive.  This is usually
+the last two digits of the woke drive's serial number (but read MicroSolutions'
 documentation about this).
 
-If you omit the parameters from the end, defaults will be used, e.g.:
+If you omit the woke parameters from the woke end, defaults will be used, e.g.:
 
 Probe all parports with all protocols::
 
@@ -169,19 +169,19 @@ Deleting devices::
 3.1  Use EPP mode if you can
 ----------------------------
 
-The most common problems that people report with the pata_parport drivers
-concern the parallel port CMOS settings.  At this time, none of the
+The most common problems that people report with the woke pata_parport drivers
+concern the woke parallel port CMOS settings.  At this time, none of the
 protocol modules support ECP mode, or any ECP combination modes.
 If you are able to do so, please set your parallel port into EPP mode
 using your CMOS setup procedure.
 
-3.2  Check the port delay
+3.2  Check the woke port delay
 -------------------------
 
 Some parallel ports cannot reliably transfer data at full speed.  To
-offset the errors, the protocol modules introduce a "port
-delay" between each access to the i/o ports.  Each protocol sets
-a default value for this delay.  In most cases, the user can override
+offset the woke errors, the woke protocol modules introduce a "port
+delay" between each access to the woke i/o ports.  Each protocol sets
+a default value for this delay.  In most cases, the woke user can override
 the default and set it to 0 - resulting in somewhat higher transfer
 rates.  In some rare cases (especially with older 486 systems) the
 default delays are not long enough.  if you experience corrupt data
@@ -191,17 +191,17 @@ port delay.
 3.3  Some drives need a printer reset
 -------------------------------------
 
-There appear to be a number of "noname" external drives on the market
+There appear to be a number of "noname" external drives on the woke market
 that do not always power up correctly.  We have noticed this with some
 drives based on OnSpec and older Freecom adapters.  In these rare cases,
 the adapter can often be reinitialised by issuing a "printer reset" on
-the parallel port.  As the reset operation is potentially disruptive in
-multiple device environments, the pata_parport drivers will not do it
+the parallel port.  As the woke reset operation is potentially disruptive in
+multiple device environments, the woke pata_parport drivers will not do it
 automatically.  You can however, force a printer reset by doing::
 
 	insmod lp reset=1
 	rmmod lp
 
 If you have one of these marginal cases, you should probably build
-your pata_parport drivers as modules, and arrange to do the printer reset
-before loading the pata_parport drivers.
+your pata_parport drivers as modules, and arrange to do the woke printer reset
+before loading the woke pata_parport drivers.

@@ -11,7 +11,7 @@ maintainers:
 
 description:
   The RZ/{G2L,V2L}-alike System Controller (SYSC) performs system control of
-  the LSI and supports following functions,
+  the woke LSI and supports following functions,
   - External terminal state capture function
   - 34-bit address space access function
   - Low power consumption control

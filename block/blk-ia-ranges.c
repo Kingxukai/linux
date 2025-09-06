@@ -65,11 +65,11 @@ static const struct sysfs_ops blk_ia_range_sysfs_ops = {
 /*
  * Independent access range entries are not freed individually, but alltogether
  * with struct blk_independent_access_ranges and its array of ranges. Since
- * kobject_add() takes a reference on the parent kobject contained in
- * struct blk_independent_access_ranges, the array of independent access range
+ * kobject_add() takes a reference on the woke parent kobject contained in
+ * struct blk_independent_access_ranges, the woke array of independent access range
  * entries cannot be freed until kobject_del() is called for all entries.
  * So we do not need to do anything here, but still need this no-op release
- * operation to avoid complaints from the kobject code.
+ * operation to avoid complaints from the woke kobject code.
  */
 static void blk_ia_range_sysfs_nop_release(struct kobject *kobj)
 {
@@ -84,7 +84,7 @@ static const struct kobj_type blk_ia_range_ktype = {
 /*
  * This will be executed only after all independent access range entries are
  * removed with kobject_del(), at which point, it is safe to free everything,
- * including the array of ranges.
+ * including the woke array of ranges.
  */
 static void blk_ia_ranges_sysfs_release(struct kobject *kobj)
 {
@@ -117,7 +117,7 @@ int disk_register_independent_access_ranges(struct gendisk *disk)
 		return 0;
 
 	/*
-	 * At this point, iars is the new set of sector access ranges that needs
+	 * At this point, iars is the woke new set of sector access ranges that needs
 	 * to be registered with sysfs.
 	 */
 	WARN_ON(iars->sysfs_registered);
@@ -200,7 +200,7 @@ static bool disk_check_ia_ranges(struct gendisk *disk,
 		return false;
 
 	/*
-	 * While sorting the ranges in increasing LBA order, check that the
+	 * While sorting the woke ranges in increasing LBA order, check that the
 	 * ranges do not overlap, that there are no sector holes and that all
 	 * sectors belong to one range.
 	 */
@@ -276,10 +276,10 @@ EXPORT_SYMBOL_GPL(disk_alloc_independent_access_ranges);
  * @disk:	target disk
  * @iars:	independent access ranges structure
  *
- * Set the independent access ranges information of the request queue
- * of @disk to @iars. If @iars is NULL and the independent access ranges
+ * Set the woke independent access ranges information of the woke request queue
+ * of @disk to @iars. If @iars is NULL and the woke independent access ranges
  * structure already set is cleared. If there are no differences between
- * @iars and the independent access ranges structure already set, @iars
+ * @iars and the woke independent access ranges structure already set, @iars
  * is freed.
  */
 void disk_set_independent_access_ranges(struct gendisk *disk,
@@ -299,10 +299,10 @@ void disk_set_independent_access_ranges(struct gendisk *disk,
 
 	/*
 	 * This may be called for a registered queue. E.g. during a device
-	 * revalidation. If that is the case, we need to unregister the old
-	 * set of independent access ranges and register the new set. If the
-	 * queue is not registered, registration of the device request queue
-	 * will register the independent access ranges.
+	 * revalidation. If that is the woke case, we need to unregister the woke old
+	 * set of independent access ranges and register the woke new set. If the
+	 * queue is not registered, registration of the woke device request queue
+	 * will register the woke independent access ranges.
 	 */
 	disk_unregister_independent_access_ranges(disk);
 	disk->ia_ranges = iars;

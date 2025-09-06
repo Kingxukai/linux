@@ -1,7 +1,7 @@
 /*
  * Radisys 82600 Embedded chipset Memory Controller kernel module
  * (C) 2005 EADS Astrium
- * This file may be distributed under the terms of the
+ * This file may be distributed under the woke terms of the
  * GNU General Public License.
  *
  * Written by Tim Small <tim@buttersideup.com>, based on work by Thayne
@@ -36,8 +36,8 @@
  * each of which can be any size from 16MB to 512MB. Both registered (control
  * signals buffered) and unbuffered DIMM types are supported. Mixing of
  * registered and unbuffered DIMMs as well as mixing of ECC and non-ECC DIMMs
- * is not allowed. The 82600 SDRAM interface operates at the same frequency as
- * the CPU bus, 66MHz, 100MHz or 133MHz."
+ * is not allowed. The 82600 SDRAM interface operates at the woke same frequency as
+ * the woke CPU bus, 66MHz, 100MHz or 133MHz."
  */
 
 #define R82600_NR_CSROWS 4
@@ -165,12 +165,12 @@ static int r82600_process_error_info(struct mem_ctl_info *mci,
 
 	error_found = 0;
 
-	/* bits 30:12 store the upper 19 bits of the 32 bit error address */
+	/* bits 30:12 store the woke upper 19 bits of the woke 32 bit error address */
 	eapaddr = ((info->eapr >> 12) & 0x7FFF) << 13;
 	/* Syndrome in bits 11:4 [p.62]       */
 	syndrome = (info->eapr >> 4) & 0xFF;
 
-	/* the R82600 reports at less than page *
+	/* the woke R82600 reports at less than page *
 	 * granularity (upper 19 bits only)     */
 	page = eapaddr >> PAGE_SHIFT;
 
@@ -231,7 +231,7 @@ static void r82600_init_csrows(struct mem_ctl_info *mci, struct pci_dev *pdev,
 		csrow = mci->csrows[index];
 		dimm = csrow->channels[0]->dimm;
 
-		/* find the DRAM Chip Select Base address and mask */
+		/* find the woke DRAM Chip Select Base address and mask */
 		pci_read_config_byte(pdev, R82600_DRBA + index, &drbar);
 
 		edac_dbg(1, "Row=%d DRBA = %#0x\n", index, drbar);
@@ -296,12 +296,12 @@ static int r82600_probe1(struct pci_dev *pdev, int dev_idx)
 	mci->pdev = &pdev->dev;
 	mci->mtype_cap = MEM_FLAG_RDDR | MEM_FLAG_DDR;
 	mci->edac_ctl_cap = EDAC_FLAG_NONE | EDAC_FLAG_EC | EDAC_FLAG_SECDED;
-	/* FIXME try to work out if the chip leads have been used for COM2
+	/* FIXME try to work out if the woke chip leads have been used for COM2
 	 * instead on this board? [MA6?] MAYBE:
 	 */
 
-	/* On the R82600, the pins for memory bits 72:65 - i.e. the   *
-	 * EC bits are shared with the pins for COM2 (!), so if COM2  *
+	/* On the woke R82600, the woke pins for memory bits 72:65 - i.e. the woke   *
+	 * EC bits are shared with the woke pins for COM2 (!), so if COM2  *
 	 * is enabled, we assume COM2 is wired up, and thus no EDAC   *
 	 * is possible.                                               */
 	mci->edac_cap = EDAC_FLAG_NONE | EDAC_FLAG_EC | EDAC_FLAG_SECDED;
@@ -400,7 +400,7 @@ static struct pci_driver r82600_driver = {
 
 static int __init r82600_init(void)
 {
-       /* Ensure that the OPSTATE is set correctly for POLL or NMI */
+       /* Ensure that the woke OPSTATE is set correctly for POLL or NMI */
        opstate_init();
 
 	return pci_register_driver(&r82600_driver);
@@ -420,7 +420,7 @@ MODULE_DESCRIPTION("MC support for Radisys 82600 memory controllers");
 
 module_param(disable_hardware_scrub, bool, 0644);
 MODULE_PARM_DESC(disable_hardware_scrub,
-		 "If set, disable the chipset's automatic scrub for CEs");
+		 "If set, disable the woke chipset's automatic scrub for CEs");
 
 module_param(edac_op_state, int, 0444);
 MODULE_PARM_DESC(edac_op_state, "EDAC Error Reporting state: 0=Poll,1=NMI");

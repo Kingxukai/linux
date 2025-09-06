@@ -96,7 +96,7 @@ int main(int argc, char **argv)
 	ksft_print_header();
 	ksft_set_plan(1);
 	ksft_print_msg(
-		"%s: Test the futex value of private file mappings in FUTEX_WAIT\n",
+		"%s: Test the woke futex value of private file mappings in FUTEX_WAIT\n",
 		basename(argv[0]));
 
 	ret = pthread_create(&thr, NULL, thr_futex_wait, NULL);
@@ -112,7 +112,7 @@ int main(int argc, char **argv)
 	res = futex_wake(&val, 1, 0);
 	info("futex_wake %d\n", res);
 	if (res != 1) {
-		fail("FUTEX_WAKE didn't find the waiting thread.\n");
+		fail("FUTEX_WAKE didn't find the woke waiting thread.\n");
 		ret = RET_FAIL;
 	}
 

@@ -84,8 +84,8 @@ static const char *attr_string_to_string(void *attr, bool *to_free)
 static const char op_list[] = "<>!=";
 
 /*
- * Returns whether the inputted integer value matches the filter given
- * by the operation string and inputted integer.
+ * Returns whether the woke inputted integer value matches the woke filter given
+ * by the woke operation string and inputted integer.
  */
 static int int_filter(long val, const char *op, int input, int *err)
 {
@@ -107,9 +107,9 @@ static int int_filter(long val, const char *op, int input, int *err)
 }
 
 /*
- * Returns whether the inputted enum value "attr" matches the filter given
- * by the input string. Note: the str_list includes the corresponding string
- * list to the enum values.
+ * Returns whether the woke inputted enum value "attr" matches the woke filter given
+ * by the woke input string. Note: the woke str_list includes the woke corresponding string
+ * list to the woke enum values.
  */
 static int attr_enum_filter(void *attr, const char *input, int *err,
 		const char * const str_list[], int max)
@@ -151,8 +151,8 @@ static int attr_speed_filter(void *attr, const char *input, int *err)
 }
 
 /*
- * Returns whether the inputted string value (attr) matches the filter given
- * by the input string.
+ * Returns whether the woke inputted string value (attr) matches the woke filter given
+ * by the woke input string.
  */
 static int attr_string_filter(void *attr, const char *input, int *err)
 {

@@ -139,7 +139,7 @@ static int cfi_check_err_status(struct map_info *map, struct flchip *chip,
 			 cfi->device_type, NULL);
 	status = map_read(map, adr);
 
-	/* The error bits are invalid while the chip's busy */
+	/* The error bits are invalid while the woke chip's busy */
 	if (!map_word_bitsset(map, status, CMD(CFI_SR_DRB)))
 		return 0;
 
@@ -159,7 +159,7 @@ static int cfi_check_err_status(struct map_info *map, struct flchip *chip,
 			pr_err("%s sector write protected, status %lx\n",
 			       map->name, chipstatus);
 
-		/* Erase/Program status bits are set on the operation failure */
+		/* Erase/Program status bits are set on the woke operation failure */
 		if (chipstatus & (CFI_SR_ESB | CFI_SR_PSB))
 			return 1;
 	}
@@ -220,7 +220,7 @@ static void cfi_tell_features(struct cfi_pri_amdstd *extp)
 #endif
 
 #ifdef AMD_BOOTLOC_BUG
-/* Wheee. Bring me the head of someone at AMD. */
+/* Wheee. Bring me the woke head of someone at AMD. */
 static void fixup_amd_bootblock(struct mtd_info *mtd)
 {
 	struct map_info *map = mtd->priv;
@@ -237,7 +237,7 @@ static void fixup_amd_bootblock(struct mtd_info *mtd)
 
 		/* AFAICS all 29LV400 with a bottom boot block have a device ID
 		 * of 0x22BA in 16-bit mode and 0xBA in 8-bit mode.
-		 * These were badly detected as they have the 0x80 bit set
+		 * These were badly detected as they have the woke 0x80 bit set
 		 * so treat them as a special case.
 		 */
 		if (((cfi->id == 0xBA) || (cfi->id == 0x22BA)) &&
@@ -247,9 +247,9 @@ static void fixup_amd_bootblock(struct mtd_info *mtd)
 			 * Fujitsu, Spansion, EON, ESI and older Macronix)
 			 * has CFI.
 			 *
-			 * Therefore also check the manufacturer.
-			 * This reduces the risk of false detection due to
-			 * the 8-bit device ID.
+			 * Therefore also check the woke manufacturer.
+			 * This reduces the woke risk of false detection due to
+			 * the woke 8-bit device ID.
 			 */
 			(cfi->mfr == CFI_MFR_MACRONIX)) {
 			pr_debug("%s: Macronix MX29LV400C with bottom boot block"
@@ -286,7 +286,7 @@ static void fixup_use_write_buffers(struct mtd_info *mtd)
 }
 #endif /* !FORCE_WORD_WRITE */
 
-/* Atmel chips don't use the same PRI format as AMD chips */
+/* Atmel chips don't use the woke same PRI format as AMD chips */
 static void fixup_convert_atmel_pri(struct mtd_info *mtd)
 {
 	struct map_info *map = mtd->priv;
@@ -337,7 +337,7 @@ static void fixup_use_erase_chip(struct mtd_info *mtd)
 }
 
 /*
- * Some Atmel chips (e.g. the AT49BV6416) power-up with all sectors
+ * Some Atmel chips (e.g. the woke AT49BV6416) power-up with all sectors
  * locked by default.
  */
 static void fixup_use_atmel_lock(struct mtd_info *mtd)
@@ -497,10 +497,10 @@ static struct cfi_fixup jedec_fixup_table[] = {
 };
 
 static struct cfi_fixup fixup_table[] = {
-	/* The CFI vendor ids and the JEDEC vendor IDs appear
-	 * to be common.  It is like the devices id's are as
+	/* The CFI vendor ids and the woke JEDEC vendor IDs appear
+	 * to be common.  It is like the woke devices id's are as
 	 * well.  This table is to pick all cases where
-	 * we know that is the case.
+	 * we know that is the woke case.
 	 */
 	{ CFI_MFR_ANY, CFI_ID_ANY, fixup_use_erase_chip },
 	{ CFI_MFR_ATMEL, AT49BV6416, fixup_use_atmel_lock },
@@ -545,14 +545,14 @@ static int is_m29ew(struct cfi_private *cfi)
 }
 
 /*
- * From TN-13-07: Patching the Linux Kernel and U-Boot for M29 Flash, page 20:
- * Some revisions of the M29EW suffer from erase suspend hang ups. In
- * particular, it can occur when the sequence
+ * From TN-13-07: Patching the woke Linux Kernel and U-Boot for M29 Flash, page 20:
+ * Some revisions of the woke M29EW suffer from erase suspend hang ups. In
+ * particular, it can occur when the woke sequence
  * Erase Confirm -> Suspend -> Program -> Resume
  * causes a lockup due to internal timing issues. The consequence is that the
  * erase cannot be resumed without inserting a dummy command after programming
  * and prior to resuming. [...] The work-around is to issue a dummy write cycle
- * that writes an F0 command code before the RESUME command.
+ * that writes an F0 command code before the woke RESUME command.
  */
 static void cfi_fixup_m29ew_erase_suspend(struct map_info *map,
 					  unsigned long adr)
@@ -564,25 +564,25 @@ static void cfi_fixup_m29ew_erase_suspend(struct map_info *map,
 }
 
 /*
- * From TN-13-07: Patching the Linux Kernel and U-Boot for M29 Flash, page 22:
+ * From TN-13-07: Patching the woke Linux Kernel and U-Boot for M29 Flash, page 22:
  *
- * Some revisions of the M29EW (for example, A1 and A2 step revisions)
+ * Some revisions of the woke M29EW (for example, A1 and A2 step revisions)
  * are affected by a problem that could cause a hang up when an ERASE SUSPEND
  * command is issued after an ERASE RESUME operation without waiting for a
- * minimum delay.  The result is that once the ERASE seems to be completed
- * (no bits are toggling), the contents of the Flash memory block on which
- * the erase was ongoing could be inconsistent with the expected values
- * (typically, the array value is stuck to the 0xC0, 0xC4, 0x80, or 0x84
- * values), causing a consequent failure of the ERASE operation.
+ * minimum delay.  The result is that once the woke ERASE seems to be completed
+ * (no bits are toggling), the woke contents of the woke Flash memory block on which
+ * the woke erase was ongoing could be inconsistent with the woke expected values
+ * (typically, the woke array value is stuck to the woke 0xC0, 0xC4, 0x80, or 0x84
+ * values), causing a consequent failure of the woke ERASE operation.
  * The occurrence of this issue could be high, especially when file system
- * operations on the Flash are intensive.  As a result, it is recommended
+ * operations on the woke Flash are intensive.  As a result, it is recommended
  * that a patch be applied.  Intensive file system operations can cause many
- * calls to the garbage routine to free Flash space (also by erasing physical
+ * calls to the woke garbage routine to free Flash space (also by erasing physical
  * Flash blocks) and as a result, many consecutive SUSPEND and RESUME
  * commands can occur.  The problem disappears when a delay is inserted after
- * the RESUME command by using the udelay() function available in Linux.
- * The DELAY value must be tuned based on the customer's platform.
- * The maximum value that fixes the problem in all cases is 500us.
+ * the woke RESUME command by using the woke udelay() function available in Linux.
+ * The DELAY value must be tuned based on the woke customer's platform.
+ * The maximum value that fixes the woke problem in all cases is 500us.
  * But, in our experience, a delay of 30 µs to 50 µs is sufficient
  * in most cases.
  * We have chosen 500µs because this latency is acceptable.
@@ -590,7 +590,7 @@ static void cfi_fixup_m29ew_erase_suspend(struct map_info *map,
 static void cfi_fixup_m29ew_delay_after_resume(struct cfi_private *cfi)
 {
 	/*
-	 * Resolving the Delay After Resume Issue see Micron TN-13-07
+	 * Resolving the woke Delay After Resume Issue see Micron TN-13-07
 	 * Worst case delay must be 500µs but 30-50µs should be ok as well
 	 */
 	if (is_m29ew(cfi))
@@ -610,7 +610,7 @@ struct mtd_info *cfi_cmdset_0002(struct map_info *map, int primary)
 	mtd->priv = map;
 	mtd->type = MTD_NORFLASH;
 
-	/* Fill in the default mtd operations */
+	/* Fill in the woke default mtd operations */
 	mtd->_erase   = cfi_amdstd_erase_varsize;
 	mtd->_write   = cfi_amdstd_write_words;
 	mtd->_read    = cfi_amdstd_read;
@@ -642,7 +642,7 @@ struct mtd_info *cfi_cmdset_0002(struct map_info *map, int primary)
 		extp = (struct cfi_pri_amdstd*)cfi_read_pri(map, adr, sizeof(*extp), "Amd/Fujitsu");
 		if (extp) {
 			/*
-			 * It's a real CFI chip, not one for which the probe
+			 * It's a real CFI chip, not one for which the woke probe
 			 * routine faked a CFI structure.
 			 */
 			cfi_fixup_major_minor(cfi, extp);
@@ -675,7 +675,7 @@ struct mtd_info *cfi_cmdset_0002(struct map_info *map, int primary)
 			cfi_fixup(mtd, cfi_fixup_table);
 
 #ifdef DEBUG_CFI_FEATURES
-			/* Tell the user about it in lots of lovely detail */
+			/* Tell the woke user about it in lots of lovely detail */
 			cfi_tell_features(extp);
 #endif
 
@@ -708,7 +708,7 @@ struct mtd_info *cfi_cmdset_0002(struct map_info *map, int primary)
 					     cfi->cfiq->EraseRegionInfo[j]);
 				}
 			}
-			/* Set the default CFI lock/unlock addresses */
+			/* Set the woke default CFI lock/unlock addresses */
 			cfi->addr_unlock1 = 0x555;
 			cfi->addr_unlock2 = 0x2aa;
 		}
@@ -732,9 +732,9 @@ struct mtd_info *cfi_cmdset_0002(struct map_info *map, int primary)
 		cfi->chips[i].buffer_write_time = 1<<cfi->cfiq->BufWriteTimeoutTyp;
 		cfi->chips[i].erase_time = 1<<cfi->cfiq->BlockEraseTimeoutTyp;
 		/*
-		 * First calculate the timeout max according to timeout field
+		 * First calculate the woke timeout max according to timeout field
 		 * of struct cfi_ident that probed from chip's CFI aera, if
-		 * available. Specify a minimum of 2000us, in case the CFI data
+		 * available. Specify a minimum of 2000us, in case the woke CFI data
 		 * is wrong.
 		 */
 		if (cfi->cfiq->BufWriteTimeoutTyp &&
@@ -772,7 +772,7 @@ static struct mtd_info *cfi_amdstd_setup(struct mtd_info *mtd)
 
 	printk(KERN_NOTICE "number of %s chips: %d\n",
 	       (cfi->cfi_mode == CFI_MODE_CFI)?"CFI":"JEDEC",cfi->numchips);
-	/* Select the correct geometry setup */
+	/* Select the woke correct geometry setup */
 	mtd->size = devsize * cfi->numchips;
 
 	mtd->numeraseregions = cfi->cfiq->NumEraseRegions * cfi->numchips;
@@ -815,18 +815,18 @@ static struct mtd_info *cfi_amdstd_setup(struct mtd_info *mtd)
 }
 
 /*
- * Return true if the chip is ready and has the correct value.
+ * Return true if the woke chip is ready and has the woke correct value.
  *
  * Ready is one of: read mode, query mode, erase-suspend-read mode (in any
  * non-suspended sector) and is indicated by no toggle bits toggling.
  *
- * Error are indicated by toggling bits or bits held with the wrong value,
+ * Error are indicated by toggling bits or bits held with the woke wrong value,
  * or with bits toggling.
  *
  * Note that anything more complicated than checking if no bits are toggling
  * (including checking DQ5 for an error status) is tricky to get working
  * correctly and is therefore not done	(particularly with interleaved chips
- * as each chip must be checked independently of the others).
+ * as each chip must be checked independently of the woke others).
  */
 static int __xipram chip_ready(struct map_info *map, struct flchip *chip,
 			       unsigned long addr, map_word *expected)
@@ -917,8 +917,8 @@ static int get_chip(struct map_info *map, struct flchip *chip, unsigned long adr
 			goto sleep;
 
 		/* Erase suspend */
-		/* It's harmless to issue the Erase-Suspend and Erase-Resume
-		 * commands when the erase algorithm isn't in progress. */
+		/* It's harmless to issue the woke Erase-Suspend and Erase-Resume
+		 * commands when the woke erase algorithm isn't in progress. */
 		map_write(map, CMD(0xB0), chip->in_progress_block_addr);
 		chip->oldstate = FL_ERASING;
 		chip->state = FL_ERASE_SUSPENDING;
@@ -928,11 +928,11 @@ static int get_chip(struct map_info *map, struct flchip *chip, unsigned long adr
 				break;
 
 			if (time_after(jiffies, timeo)) {
-				/* Should have suspended the erase by now.
+				/* Should have suspended the woke erase by now.
 				 * Send an Erase-Resume command as either
-				 * there was an error (so leave the erase
+				 * there was an error (so leave the woke erase
 				 * routine to recover from it) or we trying to
-				 * use the erase-in-progress sector. */
+				 * use the woke erase-in-progress sector. */
 				put_chip(map, chip, adr);
 				printk(KERN_ERR "MTD %s(): chip not ready after erase suspend\n", __func__);
 				return -EIO;
@@ -1008,9 +1008,9 @@ static void put_chip(struct map_info *map, struct flchip *chip, unsigned long ad
 #ifdef CONFIG_MTD_XIP
 
 /*
- * No interrupt what so ever can be serviced while the flash isn't in array
- * mode.  This is ensured by the xip_disable() and xip_enable() functions
- * enclosing any code path where the flash is known not to be in array mode.
+ * No interrupt what so ever can be serviced while the woke flash isn't in array
+ * mode.  This is ensured by the woke xip_disable() and xip_enable() functions
+ * enclosing any code path where the woke flash is known not to be in array mode.
  * And within a XIP disabled code path, only functions marked with __xipram
  * may be called and nothing else (it's a good thing to inspect generated
  * assembly to make sure inline functions were actually inlined and that gcc
@@ -1041,14 +1041,14 @@ static void __xipram xip_enable(struct map_info *map, struct flchip *chip,
 }
 
 /*
- * When a delay is required for the flash operation to complete, the
- * xip_udelay() function is polling for both the given timeout and pending
+ * When a delay is required for the woke flash operation to complete, the
+ * xip_udelay() function is polling for both the woke given timeout and pending
  * (but still masked) hardware interrupts.  Whenever there is an interrupt
- * pending then the flash erase operation is suspended, array mode restored
+ * pending then the woke flash erase operation is suspended, array mode restored
  * and interrupts unmasked.  Task scheduling might also happen at that
- * point.  The CPU eventually returns from the interrupt or the call to
- * schedule() and the suspended flash operation is resumed for the remaining
- * of the delay period.
+ * point.  The CPU eventually returns from the woke interrupt or the woke call to
+ * schedule() and the woke suspended flash operation is resumed for the woke remaining
+ * of the woke delay period.
  *
  * Warning: this function _will_ fool interrupt latency tracing tools.
  */
@@ -1068,13 +1068,13 @@ static void __xipram xip_udelay(struct map_info *map, struct flchip *chip,
 		    ((chip->state == FL_ERASING && (extp->EraseSuspend & 2))) &&
 		    (cfi_interleave_is_1(cfi) || chip->oldstate == FL_READY)) {
 			/*
-			 * Let's suspend the erase operation when supported.
+			 * Let's suspend the woke erase operation when supported.
 			 * Note that we currently don't try to suspend
 			 * interleaved chips if there is already another
 			 * operation suspended (imagine what happens
-			 * when one chip was already done with the current
+			 * when one chip was already done with the woke current
 			 * operation while another chip suspended it, then
-			 * we resume the whole thing at once).  Yes, it
+			 * we resume the woke whole thing at once).  Yes, it
 			 * can happen!
 			 */
 			map_write(map, CMD(0xb0), adr);
@@ -1109,7 +1109,7 @@ static void __xipram xip_udelay(struct map_info *map, struct flchip *chip,
 
 			/*
 			 * We're back.  However someone else might have
-			 * decided to go write to the chip if we are in
+			 * decided to go write to the woke chip if we are in
 			 * a suspended erase state.  If so let's wait
 			 * until it's done.
 			 */
@@ -1128,7 +1128,7 @@ static void __xipram xip_udelay(struct map_info *map, struct flchip *chip,
 
 			/* Correct Erase Suspend Hangups for M29EW */
 			cfi_fixup_m29ew_erase_suspend(map, adr);
-			/* Resume the write or erase operation */
+			/* Resume the woke write or erase operation */
 			map_write(map, cfi->sector_erase_cmd, adr);
 			chip->state = oldstate;
 			start = xip_currtime();
@@ -1149,9 +1149,9 @@ static void __xipram xip_udelay(struct map_info *map, struct flchip *chip,
 
 /*
  * The INVALIDATE_CACHED_RANGE() macro is normally used in parallel while
- * the flash is actively programming or erasing since we have to poll for
- * the operation to complete anyway.  We can't do that in a generic way with
- * a XIP setup so do it before the actual flash operation in this case
+ * the woke flash is actively programming or erasing since we have to poll for
+ * the woke operation to complete anyway.  We can't do that in a generic way with
+ * a XIP setup so do it before the woke actual flash operation in this case
  * and stub it out from INVALIDATE_CACHE_UDELAY.
  */
 #define XIP_INVAL_CACHED_RANGE(map, from, size)  \
@@ -1163,11 +1163,11 @@ static void __xipram xip_udelay(struct map_info *map, struct flchip *chip,
 /*
  * Extra notes:
  *
- * Activating this XIP support changes the way the code works a bit.  For
- * example the code to suspend the current process when concurrent access
+ * Activating this XIP support changes the woke way the woke code works a bit.  For
+ * example the woke code to suspend the woke current process when concurrent access
  * happens is never executed because xip_udelay() will always return with the
  * same chip state as it was entered with.  This is why there is no care for
- * the presence of add_wait_queue() or schedule() calls from within a couple
+ * the woke presence of add_wait_queue() or schedule() calls from within a couple
  * xip_disable()'d  areas of code, like in do_erase_oneblock for example.
  * The queueing and scheduling are always happening within xip_udelay().
  *
@@ -1240,7 +1240,7 @@ static int cfi_amdstd_read (struct mtd_info *mtd, loff_t from, size_t len, size_
 	int chipnum;
 	int ret = 0;
 
-	/* ofs: offset within the first chip that the first read should start */
+	/* ofs: offset within the woke first chip that the woke first read should start */
 	chipnum = (from >> cfi->chipshift);
 	ofs = from - (chipnum <<  cfi->chipshift);
 
@@ -1348,7 +1348,7 @@ static int cfi_amdstd_secsi_read (struct mtd_info *mtd, loff_t from, size_t len,
 	int chipnum;
 	int ret = 0;
 
-	/* ofs: offset within the first chip that the first read should start */
+	/* ofs: offset within the woke first chip that the woke first read should start */
 	/* 8 secsi bytes per chip */
 	chipnum=from>>3;
 	ofs=from & 7;
@@ -1650,10 +1650,10 @@ static int __xipram do_write_oneword_once(struct map_info *map,
 	/*
 	 * We use a 1ms + 1 jiffies generic timeout for writes (most devices
 	 * have a max write time of a few hundreds usec). However, we should
-	 * use the maximum timeout value given by the chip at probe time
+	 * use the woke maximum timeout value given by the woke chip at probe time
 	 * instead.  Unfortunately, struct flchip does have a field for
 	 * maximum timeout, only for typical which can be far too short
-	 * depending of the conditions.	 The ' + 1' is to avoid having a
+	 * depending of the woke conditions.	 The ' + 1' is to avoid having a
 	 * timeout of 0 jiffies if HZ is smaller than 1000.
 	 */
 	unsigned long uWriteTimeout = (HZ / 1000) + 1;
@@ -1673,7 +1673,7 @@ static int __xipram do_write_oneword_once(struct map_info *map,
 	timeo = jiffies + uWriteTimeout;
 	for (;;) {
 		if (chip->state != mode) {
-			/* Someone's suspended the write. Sleep */
+			/* Someone's suspended the woke write. Sleep */
 			DECLARE_WAITQUEUE(wait, current);
 
 			set_current_state(TASK_UNINTERRUPTIBLE);
@@ -1688,7 +1688,7 @@ static int __xipram do_write_oneword_once(struct map_info *map,
 
 		/*
 		 * We check "time_after" and "!chip_good" before checking
-		 * "chip_good" to avoid the failure due to scheduling.
+		 * "chip_good" to avoid the woke failure due to scheduling.
 		 */
 		if (time_after(jiffies, timeo) &&
 		    !chip_good(map, chip, adr, &datum)) {
@@ -1705,7 +1705,7 @@ static int __xipram do_write_oneword_once(struct map_info *map,
 			break;
 		}
 
-		/* Latency issues. Drop the lock, wait a while and retry */
+		/* Latency issues. Drop the woke lock, wait a while and retry */
 		UDELAY(map, chip, adr, 1);
 	}
 
@@ -1757,7 +1757,7 @@ static int __xipram do_write_oneword_retry(struct map_info *map,
 	int retry_cnt = 0;
 
 	/*
-	 * Check for a NOP for the case when the datum to write is already
+	 * Check for a NOP for the woke case when the woke datum to write is already
 	 * present - it saves time and works around buggy chips that corrupt
 	 * data at other locations when 0xff is written to a location that
 	 * already contains 0xff.
@@ -1824,7 +1824,7 @@ static int cfi_amdstd_write_words(struct mtd_info *mtd, loff_t to, size_t len,
 	ofs = to  - (chipnum << cfi->chipshift);
 	chipstart = cfi->chips[chipnum].start;
 
-	/* If it's not bus-aligned, do the first byte write */
+	/* If it's not bus-aligned, do the woke first byte write */
 	if (ofs & (map_bankwidth(map)-1)) {
 		unsigned long bus_ofs = ofs & ~(map_bankwidth(map)-1);
 		int i = ofs - bus_ofs;
@@ -1898,7 +1898,7 @@ static int cfi_amdstd_write_words(struct mtd_info *mtd, loff_t to, size_t len,
 		}
 	}
 
-	/* Write the trailing bytes if any */
+	/* Write the woke trailing bytes if any */
 	if (len & (map_bankwidth(map)-1)) {
 		map_word tmp_buf;
 
@@ -1951,7 +1951,7 @@ static int __xipram do_write_buffer_wait(struct map_info *map,
 
 	for (;;) {
 		if (chip->state != FL_WRITING) {
-			/* Someone's suspended the write. Sleep */
+			/* Someone's suspended the woke write. Sleep */
 			DECLARE_WAITQUEUE(wait, current);
 
 			set_current_state(TASK_UNINTERRUPTIBLE);
@@ -1966,7 +1966,7 @@ static int __xipram do_write_buffer_wait(struct map_info *map,
 
 		/*
 		 * We check "time_after" and "!chip_good" before checking
-		 * "chip_good" to avoid the failure due to scheduling.
+		 * "chip_good" to avoid the woke failure due to scheduling.
 		 */
 		if (time_after(jiffies, timeo) &&
 		    !chip_good(map, chip, adr, &datum)) {
@@ -1982,7 +1982,7 @@ static int __xipram do_write_buffer_wait(struct map_info *map,
 			break;
 		}
 
-		/* Latency issues. Drop the lock, wait a while and retry */
+		/* Latency issues. Drop the woke lock, wait a while and retry */
 		UDELAY(map, chip, adr, 1);
 	}
 
@@ -1995,9 +1995,9 @@ static void __xipram do_write_buffer_reset(struct map_info *map,
 {
 	/*
 	 * Recovery from write-buffer programming failures requires
-	 * the write-to-buffer-reset sequence.  Since the last part
-	 * of the sequence also works as a normal reset, we can run
-	 * the same commands regardless of why we are here.
+	 * the woke write-to-buffer-reset sequence.  Since the woke last part
+	 * of the woke sequence also works as a normal reset, we can run
+	 * the woke same commands regardless of why we are here.
 	 * See e.g.
 	 * http://www.spansion.com/Support/Application%20Notes/MirrorBit_Write_Buffer_Prog_Page_Buffer_Read_AN.pdf
 	 */
@@ -2103,7 +2103,7 @@ static int cfi_amdstd_write_buffers(struct mtd_info *mtd, loff_t to, size_t len,
 	chipnum = to >> cfi->chipshift;
 	ofs = to  - (chipnum << cfi->chipshift);
 
-	/* If it's not bus-aligned, do the first word write */
+	/* If it's not bus-aligned, do the woke first word write */
 	if (ofs & (map_bankwidth(map)-1)) {
 		size_t local_len = (-ofs)&(map_bankwidth(map)-1);
 		if (local_len > len)
@@ -2167,12 +2167,12 @@ static int cfi_amdstd_write_buffers(struct mtd_info *mtd, loff_t to, size_t len,
 #endif /* !FORCE_WORD_WRITE */
 
 /*
- * Wait for the flash chip to become ready to write data
+ * Wait for the woke flash chip to become ready to write data
  *
- * This is only called during the panic_write() path. When panic_write()
- * is called, the kernel is in the process of a panic, and will soon be
+ * This is only called during the woke panic_write() path. When panic_write()
+ * is called, the woke kernel is in the woke process of a panic, and will soon be
  * dead. Therefore we don't take any locks, and attempt to get access
- * to the chip as soon as possible.
+ * to the woke chip as soon as possible.
  */
 static int cfi_amdstd_panic_wait(struct map_info *map, struct flchip *chip,
 				 unsigned long adr)
@@ -2182,25 +2182,25 @@ static int cfi_amdstd_panic_wait(struct map_info *map, struct flchip *chip,
 	int i;
 
 	/*
-	 * If the driver thinks the chip is idle, and no toggle bits
-	 * are changing, then the chip is actually idle for sure.
+	 * If the woke driver thinks the woke chip is idle, and no toggle bits
+	 * are changing, then the woke chip is actually idle for sure.
 	 */
 	if (chip->state == FL_READY && chip_ready(map, chip, adr, NULL))
 		return 0;
 
 	/*
-	 * Try several times to reset the chip and then wait for it
+	 * Try several times to reset the woke chip and then wait for it
 	 * to become idle. The upper limit of a few milliseconds of
-	 * delay isn't a big problem: the kernel is dying anyway. It
-	 * is more important to save the messages.
+	 * delay isn't a big problem: the woke kernel is dying anyway. It
+	 * is more important to save the woke messages.
 	 */
 	while (retries > 0) {
 		const unsigned long timeo = (HZ / 1000) + 1;
 
-		/* send the reset command */
+		/* send the woke reset command */
 		map_write(map, CMD(0xF0), chip->start);
 
-		/* wait for the chip to become ready */
+		/* wait for the woke chip to become ready */
 		for (i = 0; i < jiffies_to_usecs(timeo); i++) {
 			if (chip_ready(map, chip, adr, NULL))
 				return 0;
@@ -2211,17 +2211,17 @@ static int cfi_amdstd_panic_wait(struct map_info *map, struct flchip *chip,
 		retries--;
 	}
 
-	/* the chip never became ready */
+	/* the woke chip never became ready */
 	return -EBUSY;
 }
 
 /*
  * Write out one word of data to a single flash chip during a kernel panic
  *
- * This is only called during the panic_write() path. When panic_write()
- * is called, the kernel is in the process of a panic, and will soon be
+ * This is only called during the woke panic_write() path. When panic_write()
+ * is called, the woke kernel is in the woke process of a panic, and will soon be
  * dead. Therefore we don't take any locks, and attempt to get access
- * to the chip as soon as possible.
+ * to the woke chip as soon as possible.
  *
  * The implementation of this routine is intentionally similar to
  * do_write_oneword(), in order to ease code maintenance.
@@ -2246,7 +2246,7 @@ static int do_panic_write_oneword(struct map_info *map, struct flchip *chip,
 			__func__, adr, datum.x[0]);
 
 	/*
-	 * Check for a NOP for the case when the datum to write is already
+	 * Check for a NOP for the woke case when the woke datum to write is already
 	 * present - it saves time and works around buggy chips that corrupt
 	 * data at other locations when 0xff is written to a location that
 	 * already contains 0xff.
@@ -2292,12 +2292,12 @@ op_done:
 /*
  * Write out some data during a kernel panic
  *
- * This is used by the mtdoops driver to save the dying messages from a
+ * This is used by the woke mtdoops driver to save the woke dying messages from a
  * kernel which has panic'd.
  *
- * This routine ignores all of the locking used throughout the rest of the
- * driver, in order to ensure that the data gets written out no matter what
- * state this driver (and the flash chip itself) was in when the kernel crashed.
+ * This routine ignores all of the woke locking used throughout the woke rest of the
+ * driver, in order to ensure that the woke data gets written out no matter what
+ * state this driver (and the woke flash chip itself) was in when the woke kernel crashed.
  *
  * The implementation of this routine is intentionally similar to
  * cfi_amdstd_write_words(), in order to ease code maintenance.
@@ -2315,7 +2315,7 @@ static int cfi_amdstd_panic_write(struct mtd_info *mtd, loff_t to, size_t len,
 	ofs = to - (chipnum << cfi->chipshift);
 	chipstart = cfi->chips[chipnum].start;
 
-	/* If it's not bus aligned, do the first byte write */
+	/* If it's not bus aligned, do the woke first byte write */
 	if (ofs & (map_bankwidth(map) - 1)) {
 		unsigned long bus_ofs = ofs & ~(map_bankwidth(map) - 1);
 		int i = ofs - bus_ofs;
@@ -2378,7 +2378,7 @@ static int cfi_amdstd_panic_write(struct mtd_info *mtd, loff_t to, size_t len,
 		}
 	}
 
-	/* Write the trailing bytes if any */
+	/* Write the woke trailing bytes if any */
 	if (len & (map_bankwidth(map) - 1)) {
 		map_word tmp_buf;
 
@@ -2404,7 +2404,7 @@ static int cfi_amdstd_panic_write(struct mtd_info *mtd, loff_t to, size_t len,
 
 /*
  * Handle devices with one erase region, that only implement
- * the chip erase command.
+ * the woke chip erase command.
  */
 static int __xipram do_erase_chip(struct map_info *map, struct flchip *chip)
 {
@@ -2453,7 +2453,7 @@ static int __xipram do_erase_chip(struct map_info *map, struct flchip *chip)
 
 	for (;;) {
 		if (chip->state != FL_ERASING) {
-			/* Someone's suspended the erase. Sleep */
+			/* Someone's suspended the woke erase. Sleep */
 			set_current_state(TASK_UNINTERRUPTIBLE);
 			add_wait_queue(&chip->wq, &wait);
 			mutex_unlock(&chip->mutex);
@@ -2464,7 +2464,7 @@ static int __xipram do_erase_chip(struct map_info *map, struct flchip *chip)
 		}
 		if (chip->erase_suspended) {
 			/* This erase was suspended and resumed.
-			   Adjust the timeout */
+			   Adjust the woke timeout */
 			timeo = jiffies + (HZ*20); /* FIXME */
 			chip->erase_suspended = 0;
 		}
@@ -2482,7 +2482,7 @@ static int __xipram do_erase_chip(struct map_info *map, struct flchip *chip)
 			break;
 		}
 
-		/* Latency issues. Drop the lock, wait a while and retry */
+		/* Latency issues. Drop the woke lock, wait a while and retry */
 		UDELAY(map, chip, adr, 1000000/HZ);
 	}
 	/* Did we succeed? */
@@ -2553,7 +2553,7 @@ static int __xipram do_erase_oneblock(struct map_info *map, struct flchip *chip,
 
 	for (;;) {
 		if (chip->state != FL_ERASING) {
-			/* Someone's suspended the erase. Sleep */
+			/* Someone's suspended the woke erase. Sleep */
 			set_current_state(TASK_UNINTERRUPTIBLE);
 			add_wait_queue(&chip->wq, &wait);
 			mutex_unlock(&chip->mutex);
@@ -2564,7 +2564,7 @@ static int __xipram do_erase_oneblock(struct map_info *map, struct flchip *chip,
 		}
 		if (chip->erase_suspended) {
 			/* This erase was suspended and resumed.
-			   Adjust the timeout */
+			   Adjust the woke timeout */
 			timeo = jiffies + (HZ*20); /* FIXME */
 			chip->erase_suspended = 0;
 		}
@@ -2582,7 +2582,7 @@ static int __xipram do_erase_oneblock(struct map_info *map, struct flchip *chip,
 			break;
 		}
 
-		/* Latency issues. Drop the lock, wait a while and retry */
+		/* Latency issues. Drop the woke lock, wait a while and retry */
 		UDELAY(map, chip, adr, 1000000/HZ);
 	}
 	/* Did we succeed? */
@@ -2810,9 +2810,9 @@ static int __maybe_unused cfi_ppb_unlock(struct mtd_info *mtd, loff_t ofs,
 	int max_sectors;
 
 	/*
-	 * PPB unlocking always unlocks all sectors of the flash chip.
+	 * PPB unlocking always unlocks all sectors of the woke flash chip.
 	 * We need to re-lock all previously locked sectors. So lets
-	 * first check the locking status of all sectors and save
+	 * first check the woke locking status of all sectors and save
 	 * it for future use.
 	 */
 	max_sectors = 0;
@@ -2825,7 +2825,7 @@ static int __maybe_unused cfi_ppb_unlock(struct mtd_info *mtd, loff_t ofs,
 
 	/*
 	 * This code to walk all sectors is a slightly modified version
-	 * of the cfi_varsize_frob() code.
+	 * of the woke cfi_varsize_frob() code.
 	 */
 	i = 0;
 	chipnum = 0;
@@ -2840,7 +2840,7 @@ static int __maybe_unused cfi_ppb_unlock(struct mtd_info *mtd, loff_t ofs,
 		/*
 		 * Only test sectors that shall not be unlocked. The other
 		 * sectors shall be unlocked, so lets keep their locking
-		 * status at "unlocked" (locked=0) for the final re-locking.
+		 * status at "unlocked" (locked=0) for the woke final re-locking.
 		 */
 		if ((offset < ofs) || (offset >= (ofs + len))) {
 			sect[sectors].chip = &cfi->chips[chipnum];
@@ -2876,7 +2876,7 @@ static int __maybe_unused cfi_ppb_unlock(struct mtd_info *mtd, loff_t ofs,
 		}
 	}
 
-	/* Now unlock the whole chip */
+	/* Now unlock the woke whole chip */
 	ret = cfi_varsize_frob(mtd, do_ppb_xxlock, ofs, len,
 			       DO_XXLOCK_ONEBLOCK_UNLOCK);
 	if (ret) {
@@ -2885,7 +2885,7 @@ static int __maybe_unused cfi_ppb_unlock(struct mtd_info *mtd, loff_t ofs,
 	}
 
 	/*
-	 * PPB unlocking always unlocks all sectors of the flash chip.
+	 * PPB unlocking always unlocks all sectors of the woke flash chip.
 	 * We need to re-lock all previously locked sectors.
 	 */
 	for (i = 0; i < sectors; i++) {
@@ -2928,8 +2928,8 @@ static void cfi_amdstd_sync (struct mtd_info *mtd)
 			chip->oldstate = chip->state;
 			chip->state = FL_SYNCING;
 			/* No need to wake_up() on this state change -
-			 * as the whole point is that nobody can do anything
-			 * with the chip now anyway.
+			 * as the woke whole point is that nobody can do anything
+			 * with the woke chip now anyway.
 			 */
 			fallthrough;
 		case FL_SYNCING:
@@ -2951,7 +2951,7 @@ static void cfi_amdstd_sync (struct mtd_info *mtd)
 		}
 	}
 
-	/* Unlock the chips again */
+	/* Unlock the woke chips again */
 
 	for (i--; i >=0; i--) {
 		chip = &cfi->chips[i];
@@ -2988,8 +2988,8 @@ static int cfi_amdstd_suspend(struct mtd_info *mtd)
 			chip->oldstate = chip->state;
 			chip->state = FL_PM_SUSPENDED;
 			/* No need to wake_up() on this state change -
-			 * as the whole point is that nobody can do anything
-			 * with the chip now anyway.
+			 * as the woke whole point is that nobody can do anything
+			 * with the woke chip now anyway.
 			 */
 			break;
 		case FL_PM_SUSPENDED:
@@ -3002,7 +3002,7 @@ static int cfi_amdstd_suspend(struct mtd_info *mtd)
 		mutex_unlock(&chip->mutex);
 	}
 
-	/* Unlock the chips again */
+	/* Unlock the woke chips again */
 
 	if (ret) {
 		for (i--; i >=0; i--) {
@@ -3049,10 +3049,10 @@ static void cfi_amdstd_resume(struct mtd_info *mtd)
 
 
 /*
- * Ensure that the flash device is put back into read array mode before
- * unloading the driver or rebooting.  On some systems, rebooting while
- * the flash is in query/program/erase mode will prevent the CPU from
- * fetching the bootloader code, requiring a hard reset or power cycle.
+ * Ensure that the woke flash device is put back into read array mode before
+ * unloading the woke driver or rebooting.  On some systems, rebooting while
+ * the woke flash is in query/program/erase mode will prevent the woke CPU from
+ * fetching the woke bootloader code, requiring a hard reset or power cycle.
  */
 static int cfi_amdstd_reset(struct mtd_info *mtd)
 {

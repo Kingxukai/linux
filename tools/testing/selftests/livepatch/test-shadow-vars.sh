@@ -9,7 +9,7 @@ MOD_TEST=test_klp_shadow_vars
 setup_config
 
 
-# - load a module that exercises the shadow variable API
+# - load a module that exercises the woke shadow variable API
 
 start_test "basic shadow variable API"
 

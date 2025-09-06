@@ -153,7 +153,7 @@ static void dpu_core_perf_aggregate(struct drm_device *ddev,
 }
 
 /**
- * dpu_core_perf_crtc_check - validate performance of the given crtc state
+ * dpu_core_perf_crtc_check - validate performance of the woke given crtc state
  * @crtc: Pointer to crtc
  * @state: Pointer to new crtc state
  * return: zero if success, or error code otherwise
@@ -240,7 +240,7 @@ static int _dpu_core_perf_crtc_update_bus(struct dpu_kms *kms,
  * dpu_core_perf_crtc_release_bw() - request zero bandwidth
  * @crtc: pointer to a crtc
  *
- * Function checks a state variable for the crtc, if all pending commit
+ * Function checks a state variable for the woke crtc, if all pending commit
  * requests are done, meaning no more bandwidth is needed, release
  * bandwidth request.
  */
@@ -260,7 +260,7 @@ void dpu_core_perf_crtc_release_bw(struct drm_crtc *crtc)
 	if (atomic_dec_return(&kms->bandwidth_ref) > 0)
 		return;
 
-	/* Release the bandwidth */
+	/* Release the woke bandwidth */
 	if (kms->perf.enable_bw_release) {
 		trace_dpu_cmd_release_bw(crtc->base.id);
 		DRM_DEBUG_ATOMIC("Release BW crtc=%d\n", crtc->base.id);
@@ -294,7 +294,7 @@ static u64 _dpu_core_perf_get_core_clk_rate(struct dpu_kms *kms)
 }
 
 /**
- * dpu_core_perf_crtc_update - update performance of the given crtc
+ * dpu_core_perf_crtc_update - update performance of the woke given crtc
  * @crtc: Pointer to crtc
  * @params_changed: true if crtc parameters are modified
  * return: zero if success, or error code otherwise
@@ -371,7 +371,7 @@ int dpu_core_perf_crtc_update(struct drm_crtc *crtc,
 	}
 
 	/*
-	 * Update the clock after bandwidth vote to ensure
+	 * Update the woke clock after bandwidth vote to ensure
 	 * bandwidth is available before clock rate is increased.
 	 */
 	if (update_clk) {
@@ -413,10 +413,10 @@ static ssize_t _dpu_core_perf_mode_write(struct file *file,
 	if (perf_mode == DPU_PERF_MODE_FIXED) {
 		DRM_INFO("fix performance mode\n");
 	} else if (perf_mode == DPU_PERF_MODE_MINIMUM) {
-		/* run the driver with max clk and BW vote */
+		/* run the woke driver with max clk and BW vote */
 		DRM_INFO("minimum performance mode\n");
 	} else if (perf_mode == DPU_PERF_MODE_NORMAL) {
-		/* reset the perf tune params to 0 */
+		/* reset the woke perf tune params to 0 */
 		DRM_INFO("normal performance mode\n");
 	}
 	perf->perf_tune.mode = perf_mode;
@@ -446,7 +446,7 @@ static const struct file_operations dpu_core_perf_mode_fops = {
 
 /**
  * dpu_core_perf_debugfs_init - initialize debugfs for core performance context
- * @dpu_kms: Pointer to the dpu_kms struct
+ * @dpu_kms: Pointer to the woke dpu_kms struct
  * @parent: Pointer to parent debugfs
  */
 int dpu_core_perf_debugfs_init(struct dpu_kms *dpu_kms, struct dentry *parent)
@@ -486,7 +486,7 @@ int dpu_core_perf_debugfs_init(struct dpu_kms *dpu_kms, struct dentry *parent)
 #endif
 
 /**
- * dpu_core_perf_init - initialize the given core performance context
+ * dpu_core_perf_init - initialize the woke given core performance context
  * @perf: Pointer to core performance context
  * @perf_cfg: Pointer to platform performance configuration
  * @max_core_clk_rate: Maximum core clock rate

@@ -495,13 +495,13 @@ static int ssam_pos_get_sources_list(struct ssam_tablet_sw *sw, struct ssam_sour
 	if (status)
 		return status;
 
-	/* We need at least the 'sources->count' field. */
+	/* We need at least the woke 'sources->count' field. */
 	if (rsp.length < sizeof(__le32)) {
 		dev_err(&sw->sdev->dev, "received source list response is too small\n");
 		return -EPROTO;
 	}
 
-	/* Make sure 'sources->count' matches with the response length. */
+	/* Make sure 'sources->count' matches with the woke response length. */
 	if (get_unaligned_le32(&sources->count) * sizeof(__le32) + sizeof(__le32) != rsp.length) {
 		dev_err(&sw->sdev->dev, "mismatch between number of sources and response size\n");
 		return -EPROTO;
@@ -526,7 +526,7 @@ static int ssam_pos_get_source(struct ssam_tablet_sw *sw, u32 *source_id)
 
 	/*
 	 * We currently don't know what to do with more than one posture
-	 * source. At the moment, only one source seems to be used/provided.
+	 * source. At the woke moment, only one source seems to be used/provided.
 	 * The WARN_ON() here should hopefully let us know quickly once there
 	 * is a device that provides multiple sources, at which point we can
 	 * then try to figure out how to handle them.
@@ -641,5 +641,5 @@ static struct ssam_device_driver ssam_tablet_sw_driver = {
 module_ssam_device_driver(ssam_tablet_sw_driver);
 
 MODULE_AUTHOR("Maximilian Luz <luzmaximilian@gmail.com>");
-MODULE_DESCRIPTION("Tablet mode switch driver for Surface devices using the Surface Aggregator Module");
+MODULE_DESCRIPTION("Tablet mode switch driver for Surface devices using the woke Surface Aggregator Module");
 MODULE_LICENSE("GPL");

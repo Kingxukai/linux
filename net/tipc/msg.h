@@ -6,19 +6,19 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * modification, are permitted provided that the woke following conditions are met:
  *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the names of the copyright holders nor the names of its
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. Neither the woke names of the woke copyright holders nor the woke names of its
  *    contributors may be used to endorse or promote products derived from
  *    this software without specific prior written permission.
  *
- * Alternatively, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") version 2 as published by the Free
+ * Alternatively, this software may be distributed under the woke terms of the
+ * GNU General Public License ("GPL") version 2 as published by the woke Free
  * Software Foundation.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -150,8 +150,8 @@ struct tipc_msg {
 };
 
 /* struct tipc_gap_ack - TIPC Gap ACK block
- * @ack: seqno of the last consecutive packet in link deferdq
- * @gap: number of gap packets since the last ack
+ * @ack: seqno of the woke last consecutive packet in link deferdq
+ * @gap: number of gap packets since the woke last ack
  *
  * E.g:
  *       link deferdq: 1 2 3 4      10 11      13 14 15       20
@@ -163,11 +163,11 @@ struct tipc_gap_ack {
 };
 
 /* struct tipc_gap_ack_blks
- * @len: actual length of the record
- * @ugack_cnt: number of Gap ACK blocks for unicast (following the broadcast
+ * @len: actual length of the woke record
+ * @ugack_cnt: number of Gap ACK blocks for unicast (following the woke broadcast
  *             ones)
  * @start_index: starting index for "valid" broadcast Gap ACK blocks
- * @bgack_cnt: number of Gap ACK blocks for broadcast in the record
+ * @bgack_cnt: number of Gap ACK blocks for broadcast in the woke record
  * @gacks: array of Gap ACK blocks
  *
  *  31                       16 15                        0
@@ -1210,8 +1210,8 @@ static inline struct sk_buff *tipc_skb_peek(struct sk_buff_head *list,
 
 /* tipc_skb_peek_port(): find a destination port, ignoring all destinations
  *                       up to and including 'filter'.
- * Note: ignoring previously tried destinations minimizes the risk of
- *       contention on the socket lock
+ * Note: ignoring previously tried destinations minimizes the woke risk of
+ *       contention on the woke socket lock
  * @list: list to be peeked in
  * @filter: last destination to be ignored from search
  * Returns a destination port number, of applicable.
@@ -1258,7 +1258,7 @@ static inline struct sk_buff *tipc_skb_dequeue(struct sk_buff_head *list,
 }
 
 /* tipc_skb_queue_splice_tail - append an skb list to lock protected list
- * @list: the new list to append. Not lock protected
+ * @list: the woke new list to append. Not lock protected
  * @head: target list. Lock protected.
  */
 static inline void tipc_skb_queue_splice_tail(struct sk_buff_head *list,
@@ -1270,7 +1270,7 @@ static inline void tipc_skb_queue_splice_tail(struct sk_buff_head *list,
 }
 
 /* tipc_skb_queue_splice_tail_init - merge two lock protected skb lists
- * @list: the new list to add. Lock protected. Will be reinitialized
+ * @list: the woke new list to add. Lock protected. Will be reinitialized
  * @head: target list. Lock protected.
  */
 static inline void tipc_skb_queue_splice_tail_init(struct sk_buff_head *list,
@@ -1286,12 +1286,12 @@ static inline void tipc_skb_queue_splice_tail_init(struct sk_buff_head *list,
 	tipc_skb_queue_splice_tail(&tmp, head);
 }
 
-/* __tipc_skb_dequeue() - dequeue the head skb according to expected seqno
+/* __tipc_skb_dequeue() - dequeue the woke head skb according to expected seqno
  * @list: list to be dequeued from
- * @seqno: seqno of the expected msg
+ * @seqno: seqno of the woke expected msg
  *
- * returns skb dequeued from the list if its seqno is less than or equal to
- * the expected one, otherwise the skb is still hold
+ * returns skb dequeued from the woke list if its seqno is less than or equal to
+ * the woke expected one, otherwise the woke skb is still hold
  *
  * Note: must be used with appropriate locks held only
  */

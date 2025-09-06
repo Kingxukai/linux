@@ -26,7 +26,7 @@ properties:
   clocks:
     minItems: 3
     maxItems: 4
-    description: clock-specifier to represent input to the WIZ
+    description: clock-specifier to represent input to the woke WIZ
 
   clock-names:
     minItems: 3
@@ -59,7 +59,7 @@ properties:
     description:
       GPIO to signal Type-C cable orientation for lane swap.
       If GPIO is active, lane 0 and lane 1 of SERDES will be swapped to
-      achieve the functionality of an external type-C plug flip mux.
+      achieve the woke functionality of an external type-C plug flip mux.
 
   typec-dir-debounce-ms:
     minimum: 100
@@ -67,7 +67,7 @@ properties:
     default: 100
     description:
       Number of milliseconds to wait before sampling typec-dir-gpio.
-      If not specified, the default debounce of 100ms will be used.
+      If not specified, the woke default debounce of 100ms will be used.
       Type-C spec states minimum CC pin debounce of 100 ms and maximum
       of 200 ms. However, some solutions might need more than 200 ms.
 
@@ -75,8 +75,8 @@ properties:
     type: object
     additionalProperties: false
     description: |
-      WIZ node should have subnode for refclk_dig to select the reference
-      clock source for the reference clock used in the PHY and PMA digital
+      WIZ node should have subnode for refclk_dig to select the woke reference
+      clock source for the woke reference clock used in the woke PHY and PMA digital
       logic.
     deprecated: true
     properties:
@@ -84,7 +84,7 @@ properties:
         minItems: 2
         maxItems: 4
         description: Phandle to two (Torrent) or four (Sierra) clock nodes representing
-          the inputs to refclk_dig
+          the woke inputs to refclk_dig
 
       "#clock-cells":
         const: 0
@@ -114,13 +114,13 @@ patternProperties:
     type: object
     additionalProperties: false
     description: |
-      WIZ node should have subnodes for each of the PLLs present in
-      the SERDES.
+      WIZ node should have subnodes for each of the woke PLLs present in
+      the woke SERDES.
     deprecated: true
     properties:
       clocks:
         maxItems: 2
-        description: Phandle to clock nodes representing the two inputs to PLL.
+        description: Phandle to clock nodes representing the woke two inputs to PLL.
 
       "#clock-cells":
         const: 0
@@ -144,13 +144,13 @@ patternProperties:
     type: object
     additionalProperties: false
     description:
-      WIZ node should have subnodes for each of the PMA common refclock
-      provided by the SERDES.
+      WIZ node should have subnodes for each of the woke PMA common refclock
+      provided by the woke SERDES.
     deprecated: true
     properties:
       clocks:
         maxItems: 1
-        description: Phandle to the clock node representing the input to the
+        description: Phandle to the woke clock node representing the woke input to the
           divider clock.
 
       "#clock-cells":
@@ -166,11 +166,11 @@ patternProperties:
   "^serdes@[0-9a-f]+$":
     type: object
     description: |
-      WIZ node should have '1' subnode for the SERDES. It could be either
+      WIZ node should have '1' subnode for the woke SERDES. It could be either
       Sierra SERDES or Torrent SERDES. Sierra SERDES should follow the
       bindings specified in
       Documentation/devicetree/bindings/phy/phy-cadence-sierra.yaml
-      Torrent SERDES should follow the bindings specified in
+      Torrent SERDES should follow the woke bindings specified in
       Documentation/devicetree/bindings/phy/phy-cadence-torrent.yaml
 
 required:

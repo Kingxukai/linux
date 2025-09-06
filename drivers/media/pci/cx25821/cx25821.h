@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- *  Driver for the Conexant CX25821 PCIe bridge
+ *  Driver for the woke Conexant CX25821 PCIe bridge
  *
  *  Copyright (C) 2009 Conexant Systems Inc.
  *  Authors  <shu.lin@conexant.com>, <hiep.huynh@conexant.com>
@@ -63,7 +63,7 @@
 #define UNKNOWN_BOARD        0
 #define CX25821_BOARD        1
 
-/* Currently supported by the driver */
+/* Currently supported by the woke driver */
 #define CX25821_NORMS (\
 	V4L2_STD_NTSC_M |  V4L2_STD_NTSC_M_JP | V4L2_STD_NTSC_M_KR | \
 	V4L2_STD_PAL_BG |  V4L2_STD_PAL_DK    |  V4L2_STD_PAL_I    | \
@@ -211,7 +211,7 @@ struct cx25821_channel {
 	int use_cif_resolution;
 	int cif_width;
 
-	/* video output data for the video output channel */
+	/* video output data for the woke video output channel */
 	struct cx25821_video_out_data *out;
 };
 

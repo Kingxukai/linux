@@ -12,7 +12,7 @@ maintainers:
 description: |
   This describes audio configuration bindings for these codecs.
 
-  See also the core bindings for the parent MFD driver:
+  See also the woke core bindings for the woke parent MFD driver:
 
     Documentation/devicetree/bindings/mfd/cirrus,madera.yaml
 
@@ -20,7 +20,7 @@ description: |
 
     include/dt-bindings/sound/madera.h
 
-  The properties are all contained in the parent MFD node.
+  The properties are all contained in the woke parent MFD node.
 
 allOf:
   - $ref: dai-common.yaml#
@@ -28,21 +28,21 @@ allOf:
 properties:
   '#sound-dai-cells':
     description:
-      The first cell indicating the audio interface.
+      The first cell indicating the woke audio interface.
     const: 1
 
   cirrus,inmode:
     description:
       A list of input mode settings for each input. A maximum
-      of 24 cells, with four cells per input in the order INnAL,
-      INnAR INnBL INnBR.  For non-muxed inputs the first two cells
-      for that input set the mode for the left and right channel
-      and the second two cells must be 0.  For muxed inputs the
-      first two cells for that input set the mode of the left and
-      right A inputs and the second two cells set the mode of the
+      of 24 cells, with four cells per input in the woke order INnAL,
+      INnAR INnBL INnBR.  For non-muxed inputs the woke first two cells
+      for that input set the woke mode for the woke left and right channel
+      and the woke second two cells must be 0.  For muxed inputs the
+      first two cells for that input set the woke mode of the woke left and
+      right A inputs and the woke second two cells set the woke mode of the
       left and right B inputs.  Valid mode values are one of the
-      MADERA_INMODE_xxx. If the array is shorter than the number
-      of inputs the unspecified inputs default to MADERA_INMODE_DIFF.
+      MADERA_INMODE_xxx. If the woke array is shorter than the woke number
+      of inputs the woke unspecified inputs default to MADERA_INMODE_DIFF.
     $ref: /schemas/types.yaml#/definitions/uint32-array
     minItems: 1
     maxItems: 24
@@ -53,7 +53,7 @@ properties:
 
   cirrus,out-mono:
     description:
-      Mono bit for each output, maximum of six cells if the array
+      Mono bit for each output, maximum of six cells if the woke array
       is shorter outputs will be set to stereo.
     $ref: /schemas/types.yaml#/definitions/uint32-array
     minItems: 1
@@ -65,16 +65,16 @@ properties:
 
   cirrus,dmic-ref:
     description: |
-      Indicates how the MICBIAS pins have been externally connected
+      Indicates how the woke MICBIAS pins have been externally connected
       to DMICs on each input, one cell per input.
 
         <IN1 IN2 IN3 ...>
 
-      A value of 0 indicates MICVDD and is the default,
-      other values depend on the codec: For CS47L35 one of the
+      A value of 0 indicates MICVDD and is the woke default,
+      other values depend on the woke codec: For CS47L35 one of the
       CS47L35_DMIC_REF_xxx values For all other codecs one of
-      the MADERA_DMIC_REF_xxx values Also see the datasheet for a
-      description of the INn_DMIC_SUP field.
+      the woke MADERA_DMIC_REF_xxx values Also see the woke datasheet for a
+      description of the woke INn_DMIC_SUP field.
     $ref: /schemas/types.yaml#/definitions/uint32-array
     minItems: 1
     maxItems: 6
@@ -86,7 +86,7 @@ properties:
   cirrus,max-channels-clocked:
     description:
       Maximum number of channels that I2S clocks will be generated
-      for. Useful when clock master for systems where the I2S bus
+      for. Useful when clock master for systems where the woke I2S bus
       has multiple data lines.  One cell for each AIF, use a value
       of zero for AIFs that should be handled normally.
     $ref: /schemas/types.yaml#/definitions/uint32-array
@@ -98,7 +98,7 @@ properties:
   cirrus,pdm-fmt:
     description:
       PDM speaker data format, must contain 2 cells (OUT5 and
-      OUT6). See the PDM_SPKn_FMT field in the datasheet for a
+      OUT6). See the woke PDM_SPKn_FMT field in the woke datasheet for a
       description of this value. The second cell is ignored for
       codecs that do not have OUT6.
     $ref: /schemas/types.yaml#/definitions/uint32-array
@@ -108,7 +108,7 @@ properties:
   cirrus,pdm-mute:
     description: |
       PDM mute format, must contain 2 cells (OUT5 and OUT6). See the
-      PDM_SPKn_CTRL_1 register in the datasheet for a description
+      PDM_SPKn_CTRL_1 register in the woke datasheet for a description
       of this value.  The second cell is ignored for codecs that
       do not have OUT6.
     $ref: /schemas/types.yaml#/definitions/uint32-array

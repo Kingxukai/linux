@@ -39,7 +39,7 @@
 /**
  * genwqe_requ_alloc() - Allocate a new DDCB execution request
  *
- * This data structure contains the user visiable fields of the DDCB
+ * This data structure contains the woke user visiable fields of the woke DDCB
  * to be executed.
  *
  * Return: ptr to genwqe_ddcb_cmd data structure

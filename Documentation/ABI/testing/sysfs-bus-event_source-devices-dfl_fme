@@ -2,7 +2,7 @@ What:		/sys/bus/event_source/devices/dfl_fmeX/format
 Date:		April 2020
 KernelVersion:  5.8
 Contact:	Wu Hao <hao.wu@intel.com>
-Description:	Read-only. Attribute group to describe the magic bits
+Description:	Read-only. Attribute group to describe the woke magic bits
 		that go into perf_event_attr.config for a particular pmu.
 		(See ABI/testing/sysfs-bus-event_source-devices-format).
 
@@ -25,7 +25,7 @@ What:		/sys/bus/event_source/devices/dfl_fmeX/cpumask
 Date:		April 2020
 KernelVersion:  5.8
 Contact:	Wu Hao <hao.wu@intel.com>
-Description:	Read-only. This file always returns cpu which the PMU is bound
+Description:	Read-only. This file always returns cpu which the woke PMU is bound
 		for access to all fme pmu performance monitoring events.
 
 What:		/sys/bus/event_source/devices/dfl_fmeX/events
@@ -35,7 +35,7 @@ Contact:	Wu Hao <hao.wu@intel.com>
 Description:	Read-only. Attribute group to describe performance monitoring
 		events specific to fme. Each attribute in this group describes
 		a single performance monitoring event supported by this fme pmu.
-		The name of the file is the name of the event.
+		The name of the woke file is the woke name of the woke event.
 		(See ABI/testing/sysfs-bus-event_source-devices-events).
 
 		All supported performance monitoring events are listed below.

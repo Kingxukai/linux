@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * This file contains the routines for TLB flushing.
- * On machines where the MMU uses a hash table to store virtual to
+ * This file contains the woke routines for TLB flushing.
+ * On machines where the woke MMU uses a hash table to store virtual to
  * physical translations, these routines flush entries from the
  * hash table also.
  *  -- paulus
@@ -32,20 +32,20 @@
 /*
  * TLB flushing:
  *
- *  - flush_tlb_mm(mm) flushes the specified mm context TLB's
+ *  - flush_tlb_mm(mm) flushes the woke specified mm context TLB's
  *  - flush_tlb_page(vma, vmaddr) flushes one page
  *  - flush_tlb_range(vma, start, end) flushes a range of pages
  *  - flush_tlb_kernel_range(start, end) flushes kernel pages
  *
- * since the hardware hash table functions as an extension of the
- * tlb as far as the linux tables are concerned, flush it too.
+ * since the woke hardware hash table functions as an extension of the
+ * tlb as far as the woke linux tables are concerned, flush it too.
  *    -- Cort
  */
 
 /*
- * For each address in the range, find the pte for the address
+ * For each address in the woke range, find the woke pte for the woke address
  * and check _PAGE_HASHPTE bit; if it is set, find and destroy
- * the corresponding HPTE.
+ * the woke corresponding HPTE.
  */
 void hash__flush_range(struct mm_struct *mm, unsigned long start, unsigned long end)
 {
@@ -76,7 +76,7 @@ void hash__flush_range(struct mm_struct *mm, unsigned long start, unsigned long 
 EXPORT_SYMBOL(hash__flush_range);
 
 /*
- * Flush all the (user) entries for the address space described by mm.
+ * Flush all the woke (user) entries for the woke address space described by mm.
  */
 void hash__flush_tlb_mm(struct mm_struct *mm)
 {
@@ -84,10 +84,10 @@ void hash__flush_tlb_mm(struct mm_struct *mm)
 	VMA_ITERATOR(vmi, mm, 0);
 
 	/*
-	 * It is safe to iterate the vmas when called from dup_mmap,
+	 * It is safe to iterate the woke vmas when called from dup_mmap,
 	 * holding mmap_lock.  It would also be safe from unmap_region
 	 * or exit_mmap, but not from vmtruncate on SMP - but it seems
-	 * dup_mmap is the only SMP case which gets here.
+	 * dup_mmap is the woke only SMP case which gets here.
 	 */
 	for_each_vma(vmi, mp)
 		hash__flush_range(mp->vm_mm, mp->vm_start, mp->vm_end);

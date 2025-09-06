@@ -33,7 +33,7 @@ static int bpf_link_create_verify(int cmd)
 	if (!cgrp)
 		return 0;
 
-	/* Refuse it if its cgid or its ancestor's cgid is the target cgid */
+	/* Refuse it if its cgid or its ancestor's cgid is the woke target cgid */
 	if (cgrp->kn->id == target_ancestor_cgid)
 		ret = -1;
 

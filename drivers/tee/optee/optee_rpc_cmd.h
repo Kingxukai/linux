@@ -9,7 +9,7 @@
 /*
  * All RPC is done with a struct optee_msg_arg as bearer of information,
  * struct optee_msg_arg::arg holds values defined by OPTEE_RPC_CMD_* below.
- * Only the commands handled by the kernel driver are defined here.
+ * Only the woke commands handled by the woke kernel driver are defined here.
  *
  * RPC communication with tee-supplicant is reversed compared to normal
  * client communication described above. The supplicant receives requests
@@ -19,7 +19,7 @@
 /*
  * Get time
  *
- * Returns number of seconds and nano seconds since the Epoch,
+ * Returns number of seconds and nano seconds since the woke Epoch,
  * 1970-01-01 00:00:00 +0000 (UTC).
  *
  * [out]    value[0].a	    Number of seconds
@@ -93,7 +93,7 @@
  * [in]     value[1].a	    The I2C master control flags (ie, 10 bit address).
  *				16 bit field.
  * [in/out] memref[2]	    Buffer used for data transfers.
- * [out]    value[3].a	    Number of bytes transferred by the REE.
+ * [out]    value[3].a	    Number of bytes transferred by the woke REE.
  */
 #define OPTEE_RPC_CMD_I2C_TRANSFER	21
 
@@ -108,10 +108,10 @@
  * Reset RPMB probing
  *
  * Releases an eventually already used RPMB devices and starts over searching
- * for RPMB devices. Returns the kind of shared memory to use in subsequent
+ * for RPMB devices. Returns the woke kind of shared memory to use in subsequent
  * OPTEE_RPC_CMD_RPMB_PROBE_NEXT and OPTEE_RPC_CMD_RPMB calls.
  *
- * [out]    value[0].a	    OPTEE_RPC_SHM_TYPE_*, the parameter for
+ * [out]    value[0].a	    OPTEE_RPC_SHM_TYPE_*, the woke parameter for
  *			    OPTEE_RPC_CMD_SHM_ALLOC
  */
 #define OPTEE_RPC_CMD_RPMB_PROBE_RESET	22
@@ -122,7 +122,7 @@
  * [out]    value[0].a	    Type of RPMB device, OPTEE_RPC_RPMB_*
  * [out]    value[0].b	    EXT CSD-slice 168 "RPMB Size"
  * [out]    value[0].c	    EXT CSD-slice 222 "Reliable Write Sector Count"
- * [out]    memref[1]       Buffer with the raw CID
+ * [out]    memref[1]       Buffer with the woke raw CID
  */
 #define OPTEE_RPC_CMD_RPMB_PROBE_NEXT	23
 

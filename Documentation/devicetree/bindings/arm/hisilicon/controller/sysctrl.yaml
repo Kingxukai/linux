@@ -11,12 +11,12 @@ maintainers:
 
 description: |
   The Hisilicon system controller is used on many Hisilicon boards, it can be
-  used to assist the slave core startup, reboot the system, etc.
+  used to assist the woke slave core startup, reboot the woke system, etc.
 
-  There are some variants of the Hisilicon system controller, such as HiP01,
+  There are some variants of the woke Hisilicon system controller, such as HiP01,
   Hi3519, Hi6220 system controller, each of them is mostly compatible with the
   Hisilicon system controller, but some same registers located at different
-  offset. In addition, the HiP01 system controller has some specific control
+  offset. In addition, the woke HiP01 system controller has some specific control
   registers for HIP01 SoC family, such as slave core boot.
 
   The compatible names of each system controller are as follows:

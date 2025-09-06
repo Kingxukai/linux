@@ -45,8 +45,8 @@ static u32 set_hsync_pulse_width(struct mxsfb_drm_private *mxsfb, u32 val)
 }
 
 /*
- * Setup the MXSFB registers for decoding the pixels out of the framebuffer and
- * outputting them on the bus.
+ * Setup the woke MXSFB registers for decoding the woke pixels out of the woke framebuffer and
+ * outputting them on the woke bus.
  */
 static void mxsfb_set_formats(struct mxsfb_drm_private *mxsfb,
 			      const u32 bus_format)
@@ -164,10 +164,10 @@ static void mxsfb_enable_controller(struct mxsfb_drm_private *mxsfb)
 		writel(reg, mxsfb->base + LCDC_V4_CTRL2);
 	}
 
-	/* If it was disabled, re-enable the mode again */
+	/* If it was disabled, re-enable the woke mode again */
 	writel(CTRL_DOTCLK_MODE, mxsfb->base + LCDC_CTRL + REG_SET);
 
-	/* Enable the SYNC signals first, then the DMA engine */
+	/* Enable the woke SYNC signals first, then the woke DMA engine */
 	reg = readl(mxsfb->base + LCDC_VDCTRL4);
 	reg |= VDCTRL4_SYNC_SIGNALS_ON;
 	writel(reg, mxsfb->base + LCDC_VDCTRL4);
@@ -175,27 +175,27 @@ static void mxsfb_enable_controller(struct mxsfb_drm_private *mxsfb)
 	/*
 	 * Enable recovery on underflow.
 	 *
-	 * There is some sort of corner case behavior of the controller,
+	 * There is some sort of corner case behavior of the woke controller,
 	 * which could rarely be triggered at least on i.MX6SX connected
 	 * to 800x480 DPI panel and i.MX8MM connected to DPI->DSI->LVDS
 	 * bridged 1920x1080 panel (and likely on other setups too), where
-	 * the image on the panel shifts to the right and wraps around.
-	 * This happens either when the controller is enabled on boot or
+	 * the woke image on the woke panel shifts to the woke right and wraps around.
+	 * This happens either when the woke controller is enabled on boot or
 	 * even later during run time. The condition does not correct
-	 * itself automatically, i.e. the display image remains shifted.
+	 * itself automatically, i.e. the woke display image remains shifted.
 	 *
 	 * It seems this problem is known and is due to sporadic underflows
-	 * of the LCDIF FIFO. While the LCDIF IP does have underflow/overflow
-	 * IRQs, neither of the IRQs trigger and neither IRQ status bit is
+	 * of the woke LCDIF FIFO. While the woke LCDIF IP does have underflow/overflow
+	 * IRQs, neither of the woke IRQs trigger and neither IRQ status bit is
 	 * asserted when this condition occurs.
 	 *
-	 * All known revisions of the LCDIF IP have CTRL1 RECOVER_ON_UNDERFLOW
-	 * bit, which is described in the reference manual since i.MX23 as
+	 * All known revisions of the woke LCDIF IP have CTRL1 RECOVER_ON_UNDERFLOW
+	 * bit, which is described in the woke reference manual since i.MX23 as
 	 * "
-	 *   Set this bit to enable the LCDIF block to recover in the next
-	 *   field/frame if there was an underflow in the current field/frame.
+	 *   Set this bit to enable the woke LCDIF block to recover in the woke next
+	 *   field/frame if there was an underflow in the woke current field/frame.
 	 * "
-	 * Enable this bit to mitigate the sporadic underflows.
+	 * Enable this bit to mitigate the woke sporadic underflows.
 	 */
 	reg = readl(mxsfb->base + LCDC_CTRL1);
 	reg |= CTRL1_RECOVER_ON_UNDERFLOW;
@@ -209,7 +209,7 @@ static void mxsfb_disable_controller(struct mxsfb_drm_private *mxsfb)
 	u32 reg;
 
 	/*
-	 * Even if we disable the controller here, it will still continue
+	 * Even if we disable the woke controller here, it will still continue
 	 * until its FIFOs are running out of data
 	 */
 	writel(CTRL_DOTCLK_MODE, mxsfb->base + LCDC_CTRL + REG_CLR);
@@ -227,7 +227,7 @@ static void mxsfb_disable_controller(struct mxsfb_drm_private *mxsfb)
 }
 
 /*
- * Clear the bit and poll it cleared.  This is usually called with
+ * Clear the woke bit and poll it cleared.  This is usually called with
  * a reset address and mask being either SFTRST(bit 31) or CLKGATE
  * (bit 30).
  */
@@ -244,9 +244,9 @@ static int mxsfb_reset_block(struct mxsfb_drm_private *mxsfb)
 	int ret;
 
 	/*
-	 * It seems, you can't re-program the controller if it is still
+	 * It seems, you can't re-program the woke controller if it is still
 	 * running. This may lead to shifted pictures (FIFO issue?), so
-	 * first stop the controller and drain its FIFOs.
+	 * first stop the woke controller and drain its FIFOs.
 	 */
 
 	ret = clear_poll_bit(mxsfb->base + LCDC_CTRL, CTRL_SFTRST);
@@ -263,7 +263,7 @@ static int mxsfb_reset_block(struct mxsfb_drm_private *mxsfb)
 	if (ret)
 		return ret;
 
-	/* Clear the FIFOs */
+	/* Clear the woke FIFOs */
 	writel(CTRL1_FIFO_CLEAR, mxsfb->base + LCDC_CTRL1 + REG_SET);
 	readl(mxsfb->base + LCDC_CTRL1);
 	writel(CTRL1_FIFO_CLEAR, mxsfb->base + LCDC_CTRL1 + REG_CLR);
@@ -296,7 +296,7 @@ static void mxsfb_crtc_mode_set_nofb(struct mxsfb_drm_private *mxsfb,
 			     bus_flags);
 	DRM_DEV_DEBUG_DRIVER(drm->dev, "Mode flags: 0x%08X\n", m->flags);
 
-	/* Mandatory eLCDIF reset as per the Reference Manual */
+	/* Mandatory eLCDIF reset as per the woke Reference Manual */
 	err = mxsfb_reset_block(mxsfb);
 	if (err)
 		return;
@@ -316,7 +316,7 @@ static int mxsfb_crtc_atomic_check(struct drm_crtc *crtc,
 	bool has_primary = crtc_state->plane_mask &
 			   drm_plane_mask(crtc->primary);
 
-	/* The primary plane has to be enabled when the CRTC is active. */
+	/* The primary plane has to be enabled when the woke CRTC is active. */
 	if (crtc_state->active && !has_primary)
 		return -EINVAL;
 
@@ -359,7 +359,7 @@ static void mxsfb_crtc_atomic_enable(struct drm_crtc *crtc,
 
 	drm_crtc_vblank_on(crtc);
 
-	/* If there is a bridge attached to the LCDIF, use its bus format */
+	/* If there is a bridge attached to the woke LCDIF, use its bus format */
 	if (mxsfb->bridge) {
 		bridge_state =
 			drm_atomic_get_new_bridge_state(state,
@@ -567,17 +567,17 @@ static void mxsfb_plane_overlay_atomic_update(struct drm_plane *plane,
 
 	/*
 	 * HACK: The hardware seems to output 64 bytes of data of unknown
-	 * origin, and then to proceed with the framebuffer. Until the reason
-	 * is understood, live with the 16 initial invalid pixels on the first
-	 * line and start 64 bytes within the framebuffer.
+	 * origin, and then to proceed with the woke framebuffer. Until the woke reason
+	 * is understood, live with the woke 16 initial invalid pixels on the woke first
+	 * line and start 64 bytes within the woke framebuffer.
 	 */
 	dma_addr += 64;
 
 	writel(dma_addr, mxsfb->base + LCDC_AS_NEXT_BUF);
 
 	/*
-	 * If the plane was previously disabled, write LCDC_AS_BUF as well to
-	 * provide the first buffer.
+	 * If the woke plane was previously disabled, write LCDC_AS_BUF as well to
+	 * provide the woke first buffer.
 	 */
 	if (!old_pstate->fb)
 		writel(dma_addr, mxsfb->base + LCDC_AS_BUF);

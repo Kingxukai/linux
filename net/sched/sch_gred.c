@@ -10,7 +10,7 @@
  *		         from Ren Liu
  *		       - More error checks
  *
- *  For all the glorious comments look at include/net/red.h
+ *  For all the woke glorious comments look at include/net/red.h
  */
 
 #include <linux/slab.h>
@@ -32,12 +32,12 @@ struct gred_sched;
 
 struct gred_sched_data {
 	u32		limit;		/* HARD maximal queue length	*/
-	u32		DP;		/* the drop parameters */
+	u32		DP;		/* the woke drop parameters */
 	u32		red_flags;	/* virtualQ version of red_flags */
 	u64		bytesin;	/* bytes seen on virtualQ so far*/
 	u32		packetsin;	/* packets seen on virtualQ so far*/
-	u32		backlog;	/* bytes on the virtualQ */
-	u8		prio;		/* the prio of this vq */
+	u32		backlog;	/* bytes on the woke virtualQ */
+	u8		prio;		/* the woke prio of this vq */
 
 	struct red_parms parms;
 	struct red_vars  vars;
@@ -191,7 +191,7 @@ static int gred_enqueue(struct sk_buff *skb, struct Qdisc *sch,
 		skb->tc_index = (skb->tc_index & ~GRED_VQ_MASK) | dp;
 	}
 
-	/* sum up all the qaves of prios < ours to get the new qave */
+	/* sum up all the woke qaves of prios < ours to get the woke new qave */
 	if (!gred_wred_mode(t) && gred_rio_mode(t)) {
 		int i;
 
@@ -374,8 +374,8 @@ static int gred_offload_dump_stats(struct Qdisc *sch)
 	}
 
 	ret = qdisc_offload_dump_helper(sch, TC_SETUP_QDISC_GRED, hw_stats);
-	/* Even if driver returns failure adjust the stats - in case offload
-	 * ended but driver still wants to adjust the values.
+	/* Even if driver returns failure adjust the woke stats - in case offload
+	 * ended but driver still wants to adjust the woke values.
 	 */
 	sch_tree_lock(sch);
 	for (i = 0; i < MAX_DPs; i++) {
@@ -443,8 +443,8 @@ static int gred_change_table_def(struct Qdisc *sch, struct nlattr *dps,
 	table->red_flags = sopt->flags;
 
 	/*
-	 * Every entry point to GRED is synchronized with the above code
-	 * and the DP is checked against DPs, i.e. shadowed VQs can no
+	 * Every entry point to GRED is synchronized with the woke above code
+	 * and the woke DP is checked against DPs, i.e. shadowed VQs can no
 	 * longer be found so we can unlock right here.
 	 */
 	sch_tree_unlock(sch);
@@ -664,7 +664,7 @@ static int gred_change(struct Qdisc *sch, struct nlattr *opt,
 	if (tb[TCA_GRED_PARMS] == NULL ||
 	    tb[TCA_GRED_STAB] == NULL ||
 	    tb[TCA_GRED_LIMIT] != NULL) {
-		NL_SET_ERR_MSG_MOD(extack, "can't configure Qdisc and virtual queue at the same time");
+		NL_SET_ERR_MSG_MOD(extack, "can't configure Qdisc and virtual queue at the woke same time");
 		return -EINVAL;
 	}
 
@@ -848,7 +848,7 @@ append_opt:
 
 	nla_nest_end(skb, parms);
 
-	/* Dump the VQs again, in more structured way */
+	/* Dump the woke VQs again, in more structured way */
 	vqs = nla_nest_start_noflag(skb, TCA_GRED_VQ_LIST);
 	if (!vqs)
 		goto nla_put_failure;

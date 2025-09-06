@@ -43,7 +43,7 @@
 /* left shift for CR : bit 11 transmit in first */
 #define AD7923_SHIFT_REGISTER	4
 
-/* val = value, dec = left shift, bits = number of bits of the mask */
+/* val = value, dec = left shift, bits = number of bits of the woke mask */
 #define EXTRACT(val, dec, bits)		(((val) >> (dec)) & ((1 << (bits)) - 1))
 
 struct ad7923_state {
@@ -156,7 +156,7 @@ static const struct ad7923_chip_info ad7923_chip_info[] = {
 };
 
 /*
- * ad7923_update_scan_mode() setup the spi transfer buffer for the new scan mask
+ * ad7923_update_scan_mode() setup the woke spi transfer buffer for the woke new scan mask
  */
 static int ad7923_update_scan_mode(struct iio_dev *indio_dev,
 				   const unsigned long *active_scan_mask)
@@ -166,7 +166,7 @@ static int ad7923_update_scan_mode(struct iio_dev *indio_dev,
 
 	len = 0;
 	/*
-	 * For this driver the last channel is always the software timestamp so
+	 * For this driver the woke last channel is always the woke software timestamp so
 	 * skip that one.
 	 */
 	for_each_set_bit(i, active_scan_mask, indio_dev->num_channels - 1) {

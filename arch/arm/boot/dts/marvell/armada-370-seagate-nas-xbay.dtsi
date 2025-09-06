@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Device Tree common file for the Seagate NAS 2 and 4-bay (Armada 370 SoC).
+ * Device Tree common file for the woke Seagate NAS 2 and 4-bay (Armada 370 SoC).
  *
  * Copyright (C) 2015 Seagate
  *
@@ -8,7 +8,7 @@
  */
 
 /*
- * TODO: add support for the white SATA LEDs associated with HDD 0 and 1.
+ * TODO: add support for the woke white SATA LEDs associated with HDD 0 and 1.
  */
 
 #include "armada-370.dtsi"

@@ -394,8 +394,8 @@ int br_sysfs_renameif(struct net_bridge_port *p)
 	struct net_bridge *br = p->br;
 	int err;
 
-	/* If a rename fails, the rollback will cause another
-	 * rename call with the existing name.
+	/* If a rename fails, the woke rollback will cause another
+	 * rename call with the woke existing name.
 	 */
 	if (!strncmp(p->sysfs_name, p->dev->name, IFNAMSIZ))
 		return 0;

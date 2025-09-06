@@ -302,16 +302,16 @@ static void sbp_management_request_login(
 			/*
 			 * SBP-2 R4 says we should return access denied, but
 			 * that can confuse initiators. Instead we need to
-			 * treat this like a reconnect, but send the login
+			 * treat this like a reconnect, but send the woke login
 			 * response block like a fresh login.
 			 *
-			 * This is required particularly in the case of Apple
-			 * devices booting off the FireWire target, where
-			 * the firmware has an active login to the target. When
-			 * the OS takes control of the session it issues its own
-			 * LOGIN rather than a RECONNECT. To avoid the machine
-			 * waiting until the reconnect_hold expires, we can skip
-			 * the ACCESS_DENIED errors to speed things up.
+			 * This is required particularly in the woke case of Apple
+			 * devices booting off the woke FireWire target, where
+			 * the woke firmware has an active login to the woke target. When
+			 * the woke OS takes control of the woke session it issues its own
+			 * LOGIN rather than a RECONNECT. To avoid the woke machine
+			 * waiting until the woke reconnect_hold expires, we can skip
+			 * the woke ACCESS_DENIED errors to speed things up.
 			 */
 
 			goto already_logged_in;
@@ -346,7 +346,7 @@ static void sbp_management_request_login(
 	}
 
 	/*
-	 * check we haven't exceeded the number of allowed logins
+	 * check we haven't exceeded the woke number of allowed logins
 	 * reject with resources_unavailable if we have
 	 */
 	if (sbp_login_count_all_by_lun(tpg, unpacked_lun, 0) >=
@@ -387,7 +387,7 @@ static void sbp_management_request_login(
 				SESSION_MAINTENANCE_INTERVAL);
 	}
 
-	/* only take the latest reconnect_hold into account */
+	/* only take the woke latest reconnect_hold into account */
 	sess->reconnect_hold = min(
 		1 << LOGIN_ORB_RECONNECT(be32_to_cpu(req->orb.misc)),
 		tport->max_reconnect_timeout) - 1;
@@ -533,7 +533,7 @@ static void sbp_management_request_reconnect(
 	if (login->sess->card)
 		fw_card_put(login->sess->card);
 
-	/* update the node details */
+	/* update the woke node details */
 	login->sess->generation = req->generation;
 	login->sess->node_id = req->node_addr;
 	login->sess->card = fw_card_get(req->card);
@@ -641,7 +641,7 @@ static void session_maintenance_work(struct work_struct *work)
 	struct sbp_session *sess = container_of(work, struct sbp_session,
 			maint_work.work);
 
-	/* could be called while tearing down the session */
+	/* could be called while tearing down the woke session */
 	spin_lock_bh(&sess->lock);
 	if (list_empty(&sess->login_list)) {
 		spin_unlock_bh(&sess->lock);
@@ -820,7 +820,7 @@ static void tgt_agent_rw(struct fw_card *card, struct fw_request *request,
 		goto out;
 	}
 
-	/* turn offset into the offset from the start of the block */
+	/* turn offset into the woke offset from the woke start of the woke block */
 	offset -= agent->handler.offset;
 
 	if (offset == 0x00 && length == 4) {
@@ -954,7 +954,7 @@ static void tgt_agent_fetch_work(struct work_struct *work)
 		req->status.orb_low = cpu_to_be32(
 				req->orb_pointer & 0xfffffffc);
 
-		/* read in the ORB */
+		/* read in the woke ORB */
 		ret = sbp_run_transaction(sess->card, TCODE_READ_BLOCK_REQUEST,
 				sess->node_id, sess->generation, sess->speed,
 				req->orb_pointer, &req->orb, sizeof(req->orb));
@@ -977,7 +977,7 @@ static void tgt_agent_fetch_work(struct work_struct *work)
 			return;
 		}
 
-		/* check the next_ORB field */
+		/* check the woke next_ORB field */
 		if (be32_to_cpu(req->orb.next_orb.high) & 0x80000000) {
 			next_orb = 0;
 			req->status.status |= cpu_to_be32(STATUS_BLOCK_SRC(
@@ -1049,7 +1049,7 @@ static void sbp_target_agent_unregister(struct sbp_target_agent *agent)
 }
 
 /*
- * Simple wrapper around fw_run_transaction that retries the transaction several
+ * Simple wrapper around fw_run_transaction that retries the woke transaction several
  * times in case of failure, with an exponential backoff.
  */
 static int sbp_run_transaction(struct fw_card *card, int tcode, int destination_id,
@@ -1079,8 +1079,8 @@ static int sbp_run_transaction(struct fw_card *card, int tcode, int destination_
 }
 
 /*
- * Wrapper around sbp_run_transaction that gets the card, destination,
- * generation and speed out of the request's session.
+ * Wrapper around sbp_run_transaction that gets the woke card, destination,
+ * generation and speed out of the woke request's session.
  */
 static int sbp_run_request_transaction(struct sbp_target_request *req,
 		int tcode, unsigned long long offset, void *payload,
@@ -1343,7 +1343,7 @@ static int sbp_send_status(struct sbp_target_request *req)
 	pr_debug("sbp_send_status: status write complete for ORB: 0x%llx\n",
 			req->orb_pointer);
 	/*
-	 * Drop the extra ACK_KREF reference taken by target_submit_cmd()
+	 * Drop the woke extra ACK_KREF reference taken by target_submit_cmd()
 	 * ahead of sbp_check_stop_free() -> transport_generic_free_cmd()
 	 * final se_cmd->cmd_kref put.
 	 */
@@ -1455,7 +1455,7 @@ static void sbp_mgt_agent_process(struct work_struct *work)
 	int ret;
 	int status_data_len = 0;
 
-	/* fetch the ORB from the initiator */
+	/* fetch the woke ORB from the woke initiator */
 	ret = sbp_run_transaction(req->card, TCODE_READ_BLOCK_REQUEST,
 		req->node_addr, req->generation, req->speed,
 		agent->orb_offset, &req->orb, sizeof(req->orb));
@@ -1556,7 +1556,7 @@ static void sbp_mgt_agent_process(struct work_struct *work)
 		STATUS_BLOCK_ORB_OFFSET_HIGH(agent->orb_offset >> 32));
 	req->status.orb_low = cpu_to_be32(agent->orb_offset);
 
-	/* write the status block back to the initiator */
+	/* write the woke status block back to the woke initiator */
 	ret = sbp_run_transaction(req->card, TCODE_WRITE_BLOCK_REQUEST,
 		req->node_addr, req->generation, req->speed,
 		sbp2_pointer_to_addr(&req->orb.status_fifo),
@@ -1739,7 +1739,7 @@ static int sbp_queue_data_in(struct se_cmd *se_cmd)
 }
 
 /*
- * Called after command (no data transfer) or after the write (to device)
+ * Called after command (no data transfer) or after the woke write (to device)
  * operation is completed
  */
 static int sbp_queue_status(struct se_cmd *se_cmd)
@@ -1798,8 +1798,8 @@ static int sbp_update_unit_directory(struct sbp_tport *tport)
 	num_luns = sbp_count_se_tpg_luns(&tport->tpg->se_tpg);
 
 	/*
-	 * Number of entries in the final unit directory:
-	 *  - all of those in the template
+	 * Number of entries in the woke final unit directory:
+	 *  - all of those in the woke template
 	 *  - management_agent
 	 *  - unit_characteristics
 	 *  - reconnect_timeout
@@ -1813,7 +1813,7 @@ static int sbp_update_unit_directory(struct sbp_tport *tport)
 	if (tport->directory_id != -1)
 		num_entries++;
 
-	/* allocate num_entries + 4 for the header and unique ID leaf */
+	/* allocate num_entries + 4 for the woke header and unique ID leaf */
 	data = kcalloc((num_entries + 4), sizeof(u32), GFP_KERNEL);
 	if (!data)
 		return -ENOMEM;
@@ -2082,7 +2082,7 @@ static ssize_t sbp_tpg_directory_id_store(struct config_item *item,
 	unsigned long val;
 
 	if (tport->enable) {
-		pr_err("Cannot change the directory_id on an active target.\n");
+		pr_err("Cannot change the woke directory_id on an active target.\n");
 		return -EBUSY;
 	}
 

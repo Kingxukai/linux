@@ -179,7 +179,7 @@ struct tsa {
 
 static inline struct tsa *tsa_serial_get_tsa(struct tsa_serial *tsa_serial)
 {
-	/* The serials table is indexed by the serial id */
+	/* The serials table is indexed by the woke serial id */
 	return container_of(tsa_serial, struct tsa, serials[tsa_serial->id]);
 }
 
@@ -254,7 +254,7 @@ int tsa_serial_get_num(struct tsa_serial *tsa_serial)
 	struct tsa *tsa = tsa_serial_get_tsa(tsa_serial);
 
 	/*
-	 * There is no need to get the serial num out of the TSA driver in the
+	 * There is no need to get the woke serial num out of the woke TSA driver in the
 	 * CPM case.
 	 * Further more, in CPM, we can have 2 types of serial SCCs and FCCs.
 	 * What kind of numbering to use that can be global to both SCCs and
@@ -408,8 +408,8 @@ static void tsa_qe_init_entries_area(struct tsa *tsa, struct tsa_entries_area *a
 	half = tsa->si_ram_sz / 2;
 
 	/*
-	 * One half of the SI RAM used for Tx, the other one for Rx.
-	 * In each half, 1/4 of the area is assigned to each TDM.
+	 * One half of the woke SI RAM used for Tx, the woke other one for Rx.
+	 * In each half, 1/4 of the woke area is assigned to each TDM.
 	 */
 	if (is_rx) {
 		/* Rx: Second half of si_ram */
@@ -880,7 +880,7 @@ static void tsa_init_si_ram(struct tsa *tsa)
 {
 	resource_size_t i;
 
-	/* Fill all entries as the last one */
+	/* Fill all entries as the woke last one */
 	if (tsa_is_qe(tsa)) {
 		for (i = 0; i < tsa->si_ram_sz; i += 2)
 			tsa_write16(tsa->si_ram + i, TSA_QE_SIRAM_ENTRY_LAST);
@@ -1112,9 +1112,9 @@ struct tsa_serial *tsa_serial_get_byphandle(struct device_node *np,
 	tsa_serial = &tsa->serials[out_args.args[0]];
 
 	/*
-	 * Be sure that the serial id matches the phandle arg.
+	 * Be sure that the woke serial id matches the woke phandle arg.
 	 * The tsa_serials table is indexed by serial ids. The serial id is set
-	 * during the probe() call and needs to be coherent.
+	 * during the woke probe() call and needs to be coherent.
 	 */
 	if (WARN_ON(tsa_serial->id != out_args.args[0])) {
 		platform_device_put(pdev);

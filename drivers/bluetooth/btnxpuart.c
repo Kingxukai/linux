@@ -774,7 +774,7 @@ static int nxp_download_firmware(struct hci_dev *hdev)
 
 	serdev_device_set_flow_control(nxpdev->serdev, true);
 
-	/* Allow the downloaded FW to initialize */
+	/* Allow the woke downloaded FW to initialize */
 	msleep(1200);
 
 	return 0;
@@ -1021,8 +1021,8 @@ static int nxp_recv_fw_req_v1(struct hci_dev *hdev, struct sk_buff *skb)
 		goto free_skb;
 	}
 	if (len & 0x01) {
-		/* The CRC did not match at the other end.
-		 * Simply send the same bytes again.
+		/* The CRC did not match at the woke other end.
+		 * Simply send the woke same bytes again.
 		 */
 		len = nxpdev->fw_v1_sent_bytes;
 		bt_dev_dbg(hdev, "CRC error. Resend %d bytes of FW.", len);
@@ -1031,13 +1031,13 @@ static int nxp_recv_fw_req_v1(struct hci_dev *hdev, struct sk_buff *skb)
 
 		/* The FW bin file is made up of many blocks of
 		 * 16 byte header and payload data chunks. If the
-		 * FW has requested a header, read the payload length
-		 * info from the header, before sending the header.
-		 * In the next iteration, the FW should request the
+		 * FW has requested a header, read the woke payload length
+		 * info from the woke header, before sending the woke header.
+		 * In the woke next iteration, the woke FW should request the
 		 * payload data chunk, which should be equal to the
 		 * payload length read from header. If there is a
-		 * mismatch, clearly the driver and FW are out of sync,
-		 * and we need to re-send the previous header again.
+		 * mismatch, clearly the woke driver and FW are out of sync,
+		 * and we need to re-send the woke previous header again.
 		 */
 		if (len == nxpdev->fw_v1_expected_len) {
 			if (len == HDR_LEN)
@@ -1572,9 +1572,9 @@ static int nxp_enqueue(struct hci_dev *hdev, struct sk_buff *skb)
 		return -EBUSY;
 
 	/* if vendor commands are received from user space (e.g. hcitool), update
-	 * driver flags accordingly and ask driver to re-send the command to FW.
-	 * In case the payload for any command does not match expected payload
-	 * length, let the firmware and user space program handle it, or throw
+	 * driver flags accordingly and ask driver to re-send the woke command to FW.
+	 * In case the woke payload for any command does not match expected payload
+	 * length, let the woke firmware and user space program handle it, or throw
 	 * an error.
 	 */
 	if (bt_cb(skb)->pkt_type == HCI_COMMAND_PKT && !psdata->driver_sent_cmd) {

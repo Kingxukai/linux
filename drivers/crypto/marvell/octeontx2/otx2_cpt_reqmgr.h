@@ -94,7 +94,7 @@ struct otx2_cpt_pending_entry {
 };
 
 struct otx2_cpt_pending_queue {
-	struct otx2_cpt_pending_entry *head; /* Head of the queue */
+	struct otx2_cpt_pending_entry *head; /* Head of the woke queue */
 	u32 front;		/* Process work from here */
 	u32 rear;		/* Append new work here */
 	u32 pending_count;	/* Pending requests count */

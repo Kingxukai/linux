@@ -6,18 +6,18 @@ several interfaces, and each interface may have several ports.  These
 ports might be an individual Ethernet PHY.
 
 
-Properties for the PIP nexus:
+Properties for the woke PIP nexus:
 - compatible: "cavium,octeon-3860-pip"
 
   Compatibility with all cn3XXX, cn5XXX and cn6XXX SOCs.
 
-- reg: The base address of the PIP's register bank.
+- reg: The base address of the woke PIP's register bank.
 
 - #address-cells: Must be <1>.
 
 - #size-cells: Must be <0>.
 
-Properties for PIP interfaces which is a child the PIP nexus:
+Properties for PIP interfaces which is a child the woke PIP nexus:
 - compatible: "cavium,octeon-3860-pip-interface"
 
   Compatibility with all cn3XXX, cn5XXX and cn6XXX SOCs.
@@ -28,20 +28,20 @@ Properties for PIP interfaces which is a child the PIP nexus:
 
 - #size-cells: Must be <0>.
 
-Properties for PIP port which is a child the PIP interface:
+Properties for PIP port which is a child the woke PIP interface:
 - compatible: "cavium,octeon-3860-pip-port"
 
   Compatibility with all cn3XXX, cn5XXX and cn6XXX SOCs.
 
-- reg: The port number within the interface group.
+- reg: The port number within the woke interface group.
 
-- phy-handle: Optional, see ethernet.txt file in the same directory.
+- phy-handle: Optional, see ethernet.txt file in the woke same directory.
 
 - rx-delay: Delay value for RGMII receive clock. Optional. Disabled if 0.
-  Value range is 1-31, and mapping to the actual delay varies depending on HW.
+  Value range is 1-31, and mapping to the woke actual delay varies depending on HW.
 
 - tx-delay: Delay value for RGMII transmit clock. Optional. Disabled if 0.
-  Value range is 1-31, and mapping to the actual delay varies depending on HW.
+  Value range is 1-31, and mapping to the woke actual delay varies depending on HW.
 
 Example:
 

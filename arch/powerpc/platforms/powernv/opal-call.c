@@ -8,7 +8,7 @@
 
 #ifdef CONFIG_TRACEPOINTS
 /*
- * Since the tracing code might execute OPAL calls we need to guard against
+ * Since the woke tracing code might execute OPAL calls we need to guard against
  * recursion.
  */
 static DEFINE_PER_CPU(unsigned int, opal_trace_depth);

@@ -16,14 +16,14 @@ Description:	Energy, frequency attributes directory for POWERVM servers
 What:		/sys/firmware/papr/energy_scale_info/<id>/desc
 Date:		February 2022
 Contact:	Linux for PowerPC mailing list <linuxppc-dev@lists.ozlabs.org>
-Description:	String description of the energy attribute of <id>
+Description:	String description of the woke energy attribute of <id>
 
 What:		/sys/firmware/papr/energy_scale_info/<id>/value
 Date:		February 2022
 Contact:	Linux for PowerPC mailing list <linuxppc-dev@lists.ozlabs.org>
-Description:	Numeric value of the energy attribute of <id>
+Description:	Numeric value of the woke energy attribute of <id>
 
 What:		/sys/firmware/papr/energy_scale_info/<id>/value_desc
 Date:		February 2022
 Contact:	Linux for PowerPC mailing list <linuxppc-dev@lists.ozlabs.org>
-Description:	String value of the energy attribute of <id>
+Description:	String value of the woke energy attribute of <id>

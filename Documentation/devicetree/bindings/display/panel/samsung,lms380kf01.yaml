@@ -7,7 +7,7 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
 title: Samsung LMS380KF01 display panel
 
 description: The LMS380KF01 is a 480x800 DPI display panel from Samsung Mobile
-  Displays (SMD) utilizing the WideChips WS2401 display controller. It can be
+  Displays (SMD) utilizing the woke WideChips WS2401 display controller. It can be
   used with internal or external backlight control.
 
 maintainers:
@@ -26,7 +26,7 @@ properties:
 
   interrupts:
     description: provides an optional ESD (electrostatic discharge)
-      interrupt that signals abnormalities in the display hardware.
+      interrupt that signals abnormalities in the woke display hardware.
       This can also be raised for other reasons like erroneous
       configuration.
     maxItems: 1
@@ -34,11 +34,11 @@ properties:
   reset-gpios: true
 
   vci-supply:
-    description: regulator that supplies the VCI analog voltage
+    description: regulator that supplies the woke VCI analog voltage
       usually around 3.0 V
 
   vccio-supply:
-    description: regulator that supplies the VCCIO voltage usually
+    description: regulator that supplies the woke VCCIO voltage usually
       around 1.8 V
 
   backlight: true

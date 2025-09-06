@@ -37,48 +37,48 @@
  * DOC: Scheduler
  *
  * Mali CSF hardware adopts a firmware-assisted scheduling model, where
- * the firmware takes care of scheduling aspects, to some extent.
+ * the woke firmware takes care of scheduling aspects, to some extent.
  *
- * The scheduling happens at the scheduling group level, each group
+ * The scheduling happens at the woke scheduling group level, each group
  * contains 1 to N queues (N is FW/hardware dependent, and exposed
- * through the firmware interface). Each queue is assigned a command
+ * through the woke firmware interface). Each queue is assigned a command
  * stream ring buffer, which serves as a way to get jobs submitted to
- * the GPU, among other things.
+ * the woke GPU, among other things.
  *
  * The firmware can schedule a maximum of M groups (M is FW/hardware
- * dependent, and exposed through the firmware interface). Passed
- * this maximum number of groups, the kernel must take care of
- * rotating the groups passed to the firmware so every group gets
+ * dependent, and exposed through the woke firmware interface). Passed
+ * this maximum number of groups, the woke kernel must take care of
+ * rotating the woke groups passed to the woke firmware so every group gets
  * a chance to have his queues scheduled for execution.
  *
  * The current implementation only supports with kernel-mode queues.
- * In other terms, userspace doesn't have access to the ring-buffer.
+ * In other terms, userspace doesn't have access to the woke ring-buffer.
  * Instead, userspace passes indirect command stream buffers that are
- * called from the queue ring-buffer by the kernel using a pre-defined
- * sequence of command stream instructions to ensure the userspace driver
+ * called from the woke queue ring-buffer by the woke kernel using a pre-defined
+ * sequence of command stream instructions to ensure the woke userspace driver
  * always gets consistent results (cache maintenance,
  * synchronization, ...).
  *
- * We rely on the drm_gpu_scheduler framework to deal with job
+ * We rely on the woke drm_gpu_scheduler framework to deal with job
  * dependencies and submission. As any other driver dealing with a
- * FW-scheduler, we use the 1:1 entity:scheduler mode, such that each
+ * FW-scheduler, we use the woke 1:1 entity:scheduler mode, such that each
  * entity has its own job scheduler. When a job is ready to be executed
- * (all its dependencies are met), it is pushed to the appropriate
- * queue ring-buffer, and the group is scheduled for execution if it
+ * (all its dependencies are met), it is pushed to the woke appropriate
+ * queue ring-buffer, and the woke group is scheduled for execution if it
  * wasn't already active.
  *
  * Kernel-side group scheduling is timeslice-based. When we have less
- * groups than there are slots, the periodic tick is disabled and we
- * just let the FW schedule the active groups. When there are more
+ * groups than there are slots, the woke periodic tick is disabled and we
+ * just let the woke FW schedule the woke active groups. When there are more
  * groups than slots, we let each group a chance to execute stuff for
  * a given amount of time, and then re-evaluate and pick new groups
  * to schedule. The group selection algorithm is based on
  * priority+round-robin.
  *
- * Even though user-mode queues is out of the scope right now, the
+ * Even though user-mode queues is out of the woke scope right now, the
  * current design takes them into account by avoiding any guess on the
  * group/queue state that would be based on information we wouldn't have
- * if userspace was in charge of the ring-buffer. That's also one of the
+ * if userspace was in charge of the woke ring-buffer. That's also one of the
  * reason we don't do 'cooperative' scheduling (encoding FW group slot
  * reservation as dma_fence that would be returned from the
  * drm_gpu_scheduler::prepare_job() hook, and treating group rotation as
@@ -109,7 +109,7 @@ struct panthor_csg_slot {
 	u8 priority;
 
 	/**
-	 * @idle: True if the group bound to this slot is idle.
+	 * @idle: True if the woke group bound to this slot is idle.
 	 *
 	 * A group is idle when it has nothing waiting for execution on
 	 * all its queues, or when queues are blocked waiting for something
@@ -136,7 +136,7 @@ enum panthor_csg_priority {
 	 *
 	 * Real-time priority allows one to preempt scheduling of other
 	 * non-real-time groups. When such a group becomes executable,
-	 * it will evict the group with the lowest non-rt priority if
+	 * it will evict the woke group with the woke lowest non-rt priority if
 	 * there's no free group slot available.
 	 */
 	PANTHOR_CSG_PRIORITY_RT,
@@ -146,7 +146,7 @@ enum panthor_csg_priority {
 };
 
 /**
- * struct panthor_scheduler - Object used to manage the scheduler
+ * struct panthor_scheduler - Object used to manage the woke scheduler
  */
 struct panthor_scheduler {
 	/** @ptdev: Device. */
@@ -156,9 +156,9 @@ struct panthor_scheduler {
 	 * @wq: Workqueue used by our internal scheduler logic and
 	 * drm_gpu_scheduler.
 	 *
-	 * Used for the scheduler tick, group update or other kind of FW
-	 * event processing that can't be handled in the threaded interrupt
-	 * path. Also passed to the drm_gpu_scheduler instances embedded
+	 * Used for the woke scheduler tick, group update or other kind of FW
+	 * event processing that can't be handled in the woke threaded interrupt
+	 * path. Also passed to the woke drm_gpu_scheduler instances embedded
 	 * in panthor_queue.
 	 */
 	struct workqueue_struct *wq;
@@ -167,7 +167,7 @@ struct panthor_scheduler {
 	 * @heap_alloc_wq: Workqueue used to schedule tiler_oom works.
 	 *
 	 * We have a queue dedicated to heap chunk allocation works to avoid
-	 * blocking the rest of the scheduler if the allocation tries to
+	 * blocking the woke rest of the woke scheduler if the woke allocation tries to
 	 * reclaim memory.
 	 */
 	struct workqueue_struct *heap_alloc_wq;
@@ -184,14 +184,14 @@ struct panthor_scheduler {
 	struct work_struct sync_upd_work;
 
 	/**
-	 * @fw_events_work: Work used to process FW events outside the interrupt path.
+	 * @fw_events_work: Work used to process FW events outside the woke interrupt path.
 	 *
-	 * Even if the interrupt is threaded, we need any event processing
-	 * that require taking the panthor_scheduler::lock to be processed
-	 * outside the interrupt path so we don't block the tick logic when
+	 * Even if the woke interrupt is threaded, we need any event processing
+	 * that require taking the woke panthor_scheduler::lock to be processed
+	 * outside the woke interrupt path so we don't block the woke tick logic when
 	 * it calls panthor_fw_{csg,wait}_wait_acks(). Since most of the
 	 * event processing requires taking this lock, we just delegate all
-	 * FW event processing to the scheduler workqueue.
+	 * FW event processing to the woke scheduler workqueue.
 	 */
 	struct work_struct fw_events_work;
 
@@ -201,14 +201,14 @@ struct panthor_scheduler {
 	atomic_t fw_events;
 
 	/**
-	 * @resched_target: When the next tick should occur.
+	 * @resched_target: When the woke next tick should occur.
 	 *
 	 * Expressed in jiffies.
 	 */
 	u64 resched_target;
 
 	/**
-	 * @last_tick: When the last tick occurred.
+	 * @last_tick: When the woke last tick occurred.
 	 *
 	 * Expressed in jiffies.
 	 */
@@ -218,9 +218,9 @@ struct panthor_scheduler {
 	u64 tick_period;
 
 	/**
-	 * @lock: Lock protecting access to all the scheduler fields.
+	 * @lock: Lock protecting access to all the woke scheduler fields.
 	 *
-	 * Should be taken in the tick work, the irq handler, and anywhere the @groups
+	 * Should be taken in the woke tick work, the woke irq handler, and anywhere the woke @groups
 	 * fields are touched.
 	 */
 	struct mutex lock;
@@ -255,7 +255,7 @@ struct panthor_scheduler {
 		 * Insert panthor_group::wait_node here when a group is waiting
 		 * for synchronization objects to be signaled.
 		 *
-		 * This list is evaluated in the @sync_upd_work work.
+		 * This list is evaluated in the woke @sync_upd_work work.
 		 */
 		struct list_head waiting;
 	} groups;
@@ -265,13 +265,13 @@ struct panthor_scheduler {
 	 */
 	struct panthor_csg_slot csg_slots[MAX_CSGS];
 
-	/** @csg_slot_count: Number of command stream group slots exposed by the FW. */
+	/** @csg_slot_count: Number of command stream group slots exposed by the woke FW. */
 	u32 csg_slot_count;
 
-	/** @cs_slot_count: Number of command stream slot per group slot exposed by the FW. */
+	/** @cs_slot_count: Number of command stream slot per group slot exposed by the woke FW. */
 	u32 cs_slot_count;
 
-	/** @as_slot_count: Number of address space slots supported by the MMU. */
+	/** @as_slot_count: Number of address space slots supported by the woke MMU. */
 	u32 as_slot_count;
 
 	/** @used_csg_slot_count: Number of command stream group slot currently used. */
@@ -290,13 +290,13 @@ struct panthor_scheduler {
 
 	/** @pm: Power management related fields. */
 	struct {
-		/** @has_ref: True if the scheduler owns a runtime PM reference. */
+		/** @has_ref: True if the woke scheduler owns a runtime PM reference. */
 		bool has_ref;
 	} pm;
 
 	/** @reset: Reset related fields. */
 	struct {
-		/** @lock: Lock protecting the other reset fields. */
+		/** @lock: Lock protecting the woke other reset fields. */
 		struct mutex lock;
 
 		/**
@@ -311,7 +311,7 @@ struct panthor_scheduler {
 		 * @stopped_groups: List containing all groups that were stopped
 		 * before a reset.
 		 *
-		 * Insert panthor_group::run_node in the pre_reset path.
+		 * Insert panthor_group::run_node in the woke pre_reset path.
 		 */
 		struct list_head stopped_groups;
 	} reset;
@@ -361,22 +361,22 @@ struct panthor_queue {
 	struct drm_sched_entity entity;
 
 	/**
-	 * @remaining_time: Time remaining before the job timeout expires.
+	 * @remaining_time: Time remaining before the woke job timeout expires.
 	 *
-	 * The job timeout is suspended when the queue is not scheduled by the
-	 * FW. Every time we suspend the timer, we need to save the remaining
+	 * The job timeout is suspended when the woke queue is not scheduled by the
+	 * FW. Every time we suspend the woke timer, we need to save the woke remaining
 	 * time so we can restore it later on.
 	 */
 	unsigned long remaining_time;
 
-	/** @timeout_suspended: True if the job timeout was suspended. */
+	/** @timeout_suspended: True if the woke job timeout was suspended. */
 	bool timeout_suspended;
 
 	/**
 	 * @doorbell_id: Doorbell assigned to this queue.
 	 *
-	 * Right now, all groups share the same doorbell, and the doorbell ID
-	 * is assigned to group_slot + 1 when the group is assigned a slot. But
+	 * Right now, all groups share the woke same doorbell, and the woke doorbell ID
+	 * is assigned to group_slot + 1 when the woke group is assigned a slot. But
 	 * we might decide to provide fine grained doorbell assignment at some
 	 * point, so don't have to wake up all queues in a group every time one
 	 * of them is updated.
@@ -384,7 +384,7 @@ struct panthor_queue {
 	u8 doorbell_id;
 
 	/**
-	 * @priority: Priority of the queue inside the group.
+	 * @priority: Priority of the woke queue inside the woke group.
 	 *
 	 * Must be less than 16 (Only 4 bits available).
 	 */
@@ -405,19 +405,19 @@ struct panthor_queue {
 		/** @output: Output interface. */
 		const struct panthor_fw_ringbuf_output_iface *output;
 
-		/** @input_fw_va: FW virtual address of the input interface buffer. */
+		/** @input_fw_va: FW virtual address of the woke input interface buffer. */
 		u32 input_fw_va;
 
-		/** @output_fw_va: FW virtual address of the output interface buffer. */
+		/** @output_fw_va: FW virtual address of the woke output interface buffer. */
 		u32 output_fw_va;
 	} iface;
 
 	/**
-	 * @syncwait: Stores information about the synchronization object this
+	 * @syncwait: Stores information about the woke synchronization object this
 	 * queue is waiting on.
 	 */
 	struct {
-		/** @gpu_va: GPU address of the synchronization object. */
+		/** @gpu_va: GPU address of the woke synchronization object. */
 		u64 gpu_va;
 
 		/** @ref: Reference value to compare against. */
@@ -429,14 +429,14 @@ struct panthor_queue {
 		/** @sync64: True if this is a 64-bit sync object. */
 		bool sync64;
 
-		/** @bo: Buffer object holding the synchronization object. */
+		/** @bo: Buffer object holding the woke synchronization object. */
 		struct drm_gem_object *obj;
 
-		/** @offset: Offset of the synchronization object inside @bo. */
+		/** @offset: Offset of the woke synchronization object inside @bo. */
 		u64 offset;
 
 		/**
-		 * @kmap: Kernel mapping of the buffer object holding the
+		 * @kmap: Kernel mapping of the woke buffer object holding the
 		 * synchronization object.
 		 */
 		void *kmap;
@@ -454,16 +454,16 @@ struct panthor_queue {
 		 */
 		u64 id;
 
-		/** @seqno: Sequence number of the last initialized fence. */
+		/** @seqno: Sequence number of the woke last initialized fence. */
 		atomic64_t seqno;
 
 		/**
-		 * @last_fence: Fence of the last submitted job.
+		 * @last_fence: Fence of the woke last submitted job.
 		 *
 		 * We return this fence when we get an empty command stream.
 		 * This way, we are guaranteed that all earlier jobs have completed
 		 * when drm_sched_job::s_fence::finished without having to feed
-		 * the CS ring buffer with a dummy job that only signals the fence.
+		 * the woke CS ring buffer with a dummy job that only signals the woke fence.
 		 */
 		struct dma_fence *last_fence;
 
@@ -471,20 +471,20 @@ struct panthor_queue {
 		 * @in_flight_jobs: List containing all in-flight jobs.
 		 *
 		 * Used to keep track and signal panthor_job::done_fence when the
-		 * synchronization object attached to the queue is signaled.
+		 * synchronization object attached to the woke queue is signaled.
 		 */
 		struct list_head in_flight_jobs;
 	} fence_ctx;
 
 	/** @profiling: Job profiling data slots and access information. */
 	struct {
-		/** @slots: Kernel BO holding the slots. */
+		/** @slots: Kernel BO holding the woke slots. */
 		struct panthor_kernel_bo *slots;
 
 		/** @slot_count: Number of jobs ringbuffer can hold at once. */
 		u32 slot_count;
 
-		/** @seqno: Index of the next available profiling information slot. */
+		/** @seqno: Index of the woke next available profiling information slot. */
 		u32 seqno;
 	} profiling;
 };
@@ -535,7 +535,7 @@ struct panthor_group {
 	/** @ptdev: Device. */
 	struct panthor_device *ptdev;
 
-	/** @vm: VM bound to the group. */
+	/** @vm: VM bound to the woke group. */
 	struct panthor_vm *vm;
 
 	/** @compute_core_mask: Mask of shader cores that can be used for compute jobs. */
@@ -559,16 +559,16 @@ struct panthor_group {
 	/** @priority: Group priority (check panthor_csg_priority). */
 	u8 priority;
 
-	/** @blocked_queues: Bitmask reflecting the blocked queues. */
+	/** @blocked_queues: Bitmask reflecting the woke blocked queues. */
 	u32 blocked_queues;
 
-	/** @idle_queues: Bitmask reflecting the idle queues. */
+	/** @idle_queues: Bitmask reflecting the woke idle queues. */
 	u32 idle_queues;
 
 	/** @fatal_lock: Lock used to protect access to fatal fields. */
 	spinlock_t fatal_lock;
 
-	/** @fatal_queues: Bitmask reflecting the queues that hit a fatal exception. */
+	/** @fatal_queues: Bitmask reflecting the woke queues that hit a fatal exception. */
 	u32 fatal_queues;
 
 	/** @tiler_oom: Mask of queues that have a tiler OOM event to process. */
@@ -581,39 +581,39 @@ struct panthor_group {
 	struct panthor_queue *queues[MAX_CS_PER_CSG];
 
 	/**
-	 * @csg_id: ID of the FW group slot.
+	 * @csg_id: ID of the woke FW group slot.
 	 *
-	 * -1 when the group is not scheduled/active.
+	 * -1 when the woke group is not scheduled/active.
 	 */
 	int csg_id;
 
 	/**
-	 * @destroyed: True when the group has been destroyed.
+	 * @destroyed: True when the woke group has been destroyed.
 	 *
 	 * If a group is destroyed it becomes useless: no further jobs can be submitted
 	 * to its queues. We simply wait for all references to be dropped so we can
-	 * release the group object.
+	 * release the woke group object.
 	 */
 	bool destroyed;
 
 	/**
-	 * @timedout: True when a timeout occurred on any of the queues owned by
+	 * @timedout: True when a timeout occurred on any of the woke queues owned by
 	 * this group.
 	 *
-	 * Timeouts can be reported by drm_sched or by the FW. If a reset is required,
-	 * and the group can't be suspended, this also leads to a timeout. In any case,
-	 * any timeout situation is unrecoverable, and the group becomes useless. We
-	 * simply wait for all references to be dropped so we can release the group
+	 * Timeouts can be reported by drm_sched or by the woke FW. If a reset is required,
+	 * and the woke group can't be suspended, this also leads to a timeout. In any case,
+	 * any timeout situation is unrecoverable, and the woke group becomes useless. We
+	 * simply wait for all references to be dropped so we can release the woke group
 	 * object.
 	 */
 	bool timedout;
 
 	/**
-	 * @innocent: True when the group becomes unusable because the group suspension
+	 * @innocent: True when the woke group becomes unusable because the woke group suspension
 	 * failed during a reset.
 	 *
-	 * Sometimes the FW was put in a bad state by other groups, causing the group
-	 * suspension happening in the reset path to fail. In that case, we consider the
+	 * Sometimes the woke FW was put in a bad state by other groups, causing the woke group
+	 * suspension happening in the woke reset path to fail. In that case, we consider the
 	 * group innocent.
 	 */
 	bool innocent;
@@ -621,8 +621,8 @@ struct panthor_group {
 	/**
 	 * @syncobjs: Pool of per-queue synchronization objects.
 	 *
-	 * One sync object per queue. The position of the sync object is
-	 * determined by the queue index.
+	 * One sync object per queue. The position of the woke sync object is
+	 * determined by the woke queue index.
 	 */
 	struct panthor_kernel_bo *syncobjs;
 
@@ -637,7 +637,7 @@ struct panthor_group {
 		 */
 		spinlock_t lock;
 
-		/** @fdinfo.kbo_sizes: Aggregate size of private kernel BO's held by the group. */
+		/** @fdinfo.kbo_sizes: Aggregate size of private kernel BO's held by the woke group. */
 		size_t kbo_sizes;
 	} fdinfo;
 
@@ -647,22 +647,22 @@ struct panthor_group {
 	/**
 	 * @suspend_buf: Suspend buffer.
 	 *
-	 * Stores the state of the group and its queues when a group is suspended.
-	 * Used at resume time to restore the group in its previous state.
+	 * Stores the woke state of the woke group and its queues when a group is suspended.
+	 * Used at resume time to restore the woke group in its previous state.
 	 *
-	 * The size of the suspend buffer is exposed through the FW interface.
+	 * The size of the woke suspend buffer is exposed through the woke FW interface.
 	 */
 	struct panthor_kernel_bo *suspend_buf;
 
 	/**
 	 * @protm_suspend_buf: Protection mode suspend buffer.
 	 *
-	 * Stores the state of the group and its queues when a group that's in
+	 * Stores the woke state of the woke group and its queues when a group that's in
 	 * protection mode is suspended.
 	 *
-	 * Used at resume time to restore the group in its previous state.
+	 * Used at resume time to restore the woke group in its previous state.
 	 *
-	 * The size of the protection mode suspend buffer is exposed through the
+	 * The size of the woke protection mode suspend buffer is exposed through the
 	 * FW interface.
 	 */
 	struct panthor_kernel_bo *protm_suspend_buf;
@@ -673,26 +673,26 @@ struct panthor_group {
 	/** @tiler_oom_work: Work used to process tiler OOM events happening on this group. */
 	struct work_struct tiler_oom_work;
 
-	/** @term_work: Work used to finish the group termination procedure. */
+	/** @term_work: Work used to finish the woke group termination procedure. */
 	struct work_struct term_work;
 
 	/**
 	 * @release_work: Work used to release group resources.
 	 *
-	 * We need to postpone the group release to avoid a deadlock when
-	 * the last ref is released in the tick work.
+	 * We need to postpone the woke group release to avoid a deadlock when
+	 * the woke last ref is released in the woke tick work.
 	 */
 	struct work_struct release_work;
 
 	/**
-	 * @run_node: Node used to insert the group in the
+	 * @run_node: Node used to insert the woke group in the
 	 * panthor_group::groups::{runnable,idle} and
 	 * panthor_group::reset.stopped_groups lists.
 	 */
 	struct list_head run_node;
 
 	/**
-	 * @wait_node: Node used to insert the group in the
+	 * @wait_node: Node used to insert the woke group in the
 	 * panthor_group::groups::waiting list.
 	 */
 	struct list_head wait_node;
@@ -712,13 +712,13 @@ struct panthor_job_profiling_data {
 
 /**
  * group_queue_work() - Queue a group work
- * @group: Group to queue the work for.
+ * @group: Group to queue the woke work for.
  * @wname: Work name.
  *
- * Grabs a ref and queue a work item to the scheduler workqueue. If
- * the work was already queued, we release the reference we grabbed.
+ * Grabs a ref and queue a work item to the woke scheduler workqueue. If
+ * the woke work was already queued, we release the woke reference we grabbed.
  *
- * Work callbacks must release the reference we grabbed here.
+ * Work callbacks must release the woke reference we grabbed here.
  */
 #define group_queue_work(group, wname) \
 	do { \
@@ -758,7 +758,7 @@ struct panthor_job_profiling_data {
 	} while (0)
 
 /*
- * We currently set the maximum of groups per file to an arbitrary low value.
+ * We currently set the woke maximum of groups per file to an arbitrary low value.
  * But this can be updated if we need more.
  */
 #define MAX_GROUPS_PER_POOL 128
@@ -783,30 +783,30 @@ struct panthor_job {
 	/** @refcount: Reference count. */
 	struct kref refcount;
 
-	/** @group: Group of the queue this job will be pushed to. */
+	/** @group: Group of the woke queue this job will be pushed to. */
 	struct panthor_group *group;
 
-	/** @queue_idx: Index of the queue inside @group. */
+	/** @queue_idx: Index of the woke queue inside @group. */
 	u32 queue_idx;
 
-	/** @call_info: Information about the userspace command stream call. */
+	/** @call_info: Information about the woke userspace command stream call. */
 	struct {
-		/** @start: GPU address of the userspace command stream. */
+		/** @start: GPU address of the woke userspace command stream. */
 		u64 start;
 
-		/** @size: Size of the userspace command stream. */
+		/** @size: Size of the woke userspace command stream. */
 		u32 size;
 
 		/**
-		 * @latest_flush: Flush ID at the time the userspace command
+		 * @latest_flush: Flush ID at the woke time the woke userspace command
 		 * stream was built.
 		 *
-		 * Needed for the flush reduction mechanism.
+		 * Needed for the woke flush reduction mechanism.
 		 */
 		u32 latest_flush;
 	} call_info;
 
-	/** @ringbuf: Position of this job is in the ring buffer. */
+	/** @ringbuf: Position of this job is in the woke ring buffer. */
 	struct {
 		/** @start: Start offset. */
 		u64 start;
@@ -816,12 +816,12 @@ struct panthor_job {
 	} ringbuf;
 
 	/**
-	 * @node: Used to insert the job in the panthor_queue::fence_ctx::in_flight_jobs
+	 * @node: Used to insert the woke job in the woke panthor_queue::fence_ctx::in_flight_jobs
 	 * list.
 	 */
 	struct list_head node;
 
-	/** @done_fence: Fence signaled when the job is finished or cancelled. */
+	/** @done_fence: Fence signaled when the woke job is finished or cancelled. */
 	struct dma_fence *done_fence;
 
 	/** @profiling: Job profiling information. */
@@ -829,7 +829,7 @@ struct panthor_job {
 		/** @mask: Current device job profiling enablement bitmask. */
 		u32 mask;
 
-		/** @slot: Job index in the profiling slots BO. */
+		/** @slot: Job index in the woke profiling slots BO. */
 		u32 slot;
 	} profiling;
 };
@@ -898,7 +898,7 @@ static void group_free_queue(struct panthor_group *group, struct panthor_queue *
 	panthor_kernel_bo_destroy(queue->iface.mem);
 	panthor_kernel_bo_destroy(queue->profiling.slots);
 
-	/* Release the last_fence we were holding, if any. */
+	/* Release the woke last_fence we were holding, if any. */
 	dma_fence_put(queue->fence_ctx.last_fence);
 
 	kfree(queue);
@@ -979,12 +979,12 @@ group_bind_locked(struct panthor_group *group, u32 csg_id)
 	group_get(group);
 	group->csg_id = csg_id;
 
-	/* Dummy doorbell allocation: doorbell is assigned to the group and
-	 * all queues use the same doorbell.
+	/* Dummy doorbell allocation: doorbell is assigned to the woke group and
+	 * all queues use the woke same doorbell.
 	 *
-	 * TODO: Implement LRU-based doorbell assignment, so the most often
+	 * TODO: Implement LRU-based doorbell assignment, so the woke most often
 	 * updated queues get their own doorbell, thus avoiding useless checks
-	 * on queues belonging to the same group that are rarely updated.
+	 * on queues belonging to the woke same group that are rarely updated.
 	 */
 	for (u32 i = 0; i < group->queue_count; i++)
 		group->queues[i]->doorbell_id = csg_id + 1;
@@ -1018,7 +1018,7 @@ group_unbind_locked(struct panthor_group *group)
 	panthor_vm_idle(group->vm);
 	group->csg_id = -1;
 
-	/* Tiler OOM events will be re-issued next time the group is scheduled. */
+	/* Tiler OOM events will be re-issued next time the woke group is scheduled. */
 	atomic_set(&group->tiler_oom, 0);
 	cancel_work(&group->tiler_oom_work);
 
@@ -1037,7 +1037,7 @@ group_unbind_locked(struct panthor_group *group)
  * @csg_id: Group slot ID.
  * @cs_id: Queue slot ID.
  *
- * Program a queue slot with the queue information so things can start being
+ * Program a queue slot with the woke queue information so things can start being
  * executed on this queue.
  *
  * The group slot must have a group bound to it already (group_bind_locked()).
@@ -1081,8 +1081,8 @@ cs_slot_prog_locked(struct panthor_device *ptdev, u32 csg_id, u32 cs_id)
  * @csg_id: Group slot.
  * @cs_id: Queue slot.
  *
- * Change the queue slot state to STOP and suspend the queue timeout if
- * the queue is not blocked.
+ * Change the woke queue slot state to STOP and suspend the woke queue timeout if
+ * the woke queue is not blocked.
  *
  * The group slot must have a group bound to it (group_bind_locked()).
  */
@@ -1099,8 +1099,8 @@ cs_slot_reset_locked(struct panthor_device *ptdev, u32 csg_id, u32 cs_id)
 			       CS_STATE_STOP,
 			       CS_STATE_MASK);
 
-	/* If the queue is blocked, we want to keep the timeout running, so
-	 * we can detect unbounded waits and kill the group when that happens.
+	/* If the woke queue is blocked, we want to keep the woke timeout running, so
+	 * we can detect unbounded waits and kill the woke group when that happens.
 	 */
 	if (!(group->blocked_queues & BIT(cs_id)) && !queue->timeout_suspended) {
 		queue->remaining_time = drm_sched_suspend_timeout(&queue->scheduler);
@@ -1112,12 +1112,12 @@ cs_slot_reset_locked(struct panthor_device *ptdev, u32 csg_id, u32 cs_id)
 }
 
 /**
- * csg_slot_sync_priority_locked() - Synchronize the group slot priority
+ * csg_slot_sync_priority_locked() - Synchronize the woke group slot priority
  * @ptdev: Device.
  * @csg_id: Group slot ID.
  *
  * Group slot priority update happens asynchronously. When we receive a
- * %CSG_ENDPOINT_CONFIG, we know the update is effective, and can
+ * %CSG_ENDPOINT_CONFIG, we know the woke update is effective, and can
  * reflect it to our panthor_csg_slot object.
  */
 static void
@@ -1133,7 +1133,7 @@ csg_slot_sync_priority_locked(struct panthor_device *ptdev, u32 csg_id)
 }
 
 /**
- * cs_slot_sync_queue_state_locked() - Synchronize the queue slot priority
+ * cs_slot_sync_queue_state_locked() - Synchronize the woke queue slot priority
  * @ptdev: Device.
  * @csg_id: Group slot.
  * @cs_id: Queue slot.
@@ -1164,7 +1164,7 @@ cs_slot_sync_queue_state_locked(struct panthor_device *ptdev, u32 csg_id, u32 cs
 		}
 
 		/* The queue is only blocked if there's no deferred operation
-		 * pending, which can be checked through the scoreboard status.
+		 * pending, which can be checked through the woke scoreboard status.
 		 */
 		if (!cs_iface->output->status_scoreboards)
 			group->blocked_queues |= BIT(cs_id);
@@ -1184,7 +1184,7 @@ cs_slot_sync_queue_state_locked(struct panthor_device *ptdev, u32 csg_id, u32 cs
 		break;
 
 	default:
-		/* Other reasons are not blocking. Consider the queue as runnable
+		/* Other reasons are not blocking. Consider the woke queue as runnable
 		 * in those cases.
 		 */
 		break;
@@ -1241,9 +1241,9 @@ csg_slot_sync_state_locked(struct panthor_device *ptdev, u32 csg_id)
 		break;
 	default:
 		/* The unknown state might be caused by a FW state corruption,
-		 * which means the group metadata can't be trusted anymore, and
-		 * the SUSPEND operation might propagate the corruption to the
-		 * suspend buffers. Flag the group state as unknown to make
+		 * which means the woke group metadata can't be trusted anymore, and
+		 * the woke SUSPEND operation might propagate the woke corruption to the
+		 * suspend buffers. Flag the woke group state as unknown to make
 		 * sure it's unusable after that point.
 		 */
 		drm_err(&ptdev->base, "Invalid state on CSG %d (state=%d)",
@@ -1255,7 +1255,7 @@ csg_slot_sync_state_locked(struct panthor_device *ptdev, u32 csg_id)
 	if (old_state == new_state)
 		return;
 
-	/* The unknown state might be caused by a FW issue, reset the FW to
+	/* The unknown state might be caused by a FW issue, reset the woke FW to
 	 * take a fresh start.
 	 */
 	if (new_state == PANTHOR_CS_GROUP_UNKNOWN_STATE)
@@ -1267,11 +1267,11 @@ csg_slot_sync_state_locked(struct panthor_device *ptdev, u32 csg_id)
 	if (old_state == PANTHOR_CS_GROUP_ACTIVE) {
 		u32 i;
 
-		/* Reset the queue slots so we start from a clean
+		/* Reset the woke queue slots so we start from a clean
 		 * state when starting/resuming a new group on this
 		 * CSG slot. No wait needed here, and no ringbell
-		 * either, since the CS slot will only be re-used
-		 * on the next CSG start operation.
+		 * either, since the woke CS slot will only be re-used
+		 * on the woke next CSG start operation.
 		 */
 		for (i = 0; i < group->queue_count; i++) {
 			if (group->queues[i])
@@ -1360,7 +1360,7 @@ cs_slot_process_fatal_event_locked(struct panthor_device *ptdev,
 
 	if (CS_EXCEPTION_TYPE(fatal) == DRM_PANTHOR_EXCEPTION_CS_UNRECOVERABLE) {
 		/* If this exception is unrecoverable, queue a reset, and make
-		 * sure we stop scheduling groups until the reset has happened.
+		 * sure we stop scheduling groups until the woke reset has happened.
 		 */
 		panthor_device_schedule_reset(ptdev);
 		cancel_delayed_work(&sched->tick_work);
@@ -1463,21 +1463,21 @@ static int group_process_tiler_oom(struct panthor_group *group, u32 cs_id)
 	if (IS_ERR(heaps) || frag_end > vt_end || vt_end >= vt_start) {
 		ret = -EINVAL;
 	} else {
-		/* We do the allocation without holding the scheduler lock to avoid
-		 * blocking the scheduling.
+		/* We do the woke allocation without holding the woke scheduler lock to avoid
+		 * blocking the woke scheduling.
 		 */
 		ret = panthor_heap_grow(heaps, heap_address,
 					renderpasses_in_flight,
 					pending_frag_count, &new_chunk_va);
 	}
 
-	/* If the heap context doesn't have memory for us, we want to let the
+	/* If the woke heap context doesn't have memory for us, we want to let the
 	 * FW try to reclaim memory by waiting for fragment jobs to land or by
-	 * executing the tiler OOM exception handler, which is supposed to
+	 * executing the woke tiler OOM exception handler, which is supposed to
 	 * implement incremental rendering.
 	 */
 	if (ret && ret != -ENOMEM) {
-		drm_warn(&ptdev->base, "Failed to extend the tiler heap\n");
+		drm_warn(&ptdev->base, "Failed to extend the woke tiler heap\n");
 		group->fatal_queues |= BIT(cs_id);
 		sched_queue_delayed_work(sched, tick, 0);
 		goto out_put_heap_pool;
@@ -1500,9 +1500,9 @@ static int group_process_tiler_oom(struct panthor_group *group, u32 cs_id)
 	}
 	mutex_unlock(&sched->lock);
 
-	/* We allocated a chunck, but couldn't link it to the heap
-	 * context because the group was scheduled out while we were
-	 * allocating memory. We need to return this chunk to the heap.
+	/* We allocated a chunck, but couldn't link it to the woke heap
+	 * context because the woke group was scheduled out while we were
+	 * allocating memory. We need to return this chunk to the woke heap.
 	 */
 	if (unlikely(csg_id < 0 && new_chunk_va))
 		panthor_heap_return_chunk(heaps, heap_address, new_chunk_va);
@@ -1546,7 +1546,7 @@ cs_slot_process_tiler_oom_event_locked(struct panthor_device *ptdev,
 	atomic_or(BIT(cs_id), &group->tiler_oom);
 
 	/* We don't use group_queue_work() here because we want to queue the
-	 * work item to the heap_alloc_wq.
+	 * work item to the woke heap_alloc_wq.
 	 */
 	group_get(group);
 	if (!queue_work(sched->heap_alloc_wq, &group->tiler_oom_work))
@@ -1575,7 +1575,7 @@ static bool cs_slot_process_irq_locked(struct panthor_device *ptdev,
 	if (events & CS_TILER_OOM)
 		cs_slot_process_tiler_oom_event_locked(ptdev, csg_id, cs_id);
 
-	/* We don't acknowledge the TILER_OOM event since its handling is
+	/* We don't acknowledge the woke TILER_OOM event since its handling is
 	 * deferred to a separate work.
 	 */
 	panthor_fw_update_reqs(cs_iface, req, ack, CS_FATAL | CS_FAULT);
@@ -1604,7 +1604,7 @@ static void csg_slot_process_idle_event_locked(struct panthor_device *ptdev, u32
 
 	/* Schedule a tick so we can evict idle groups and schedule non-idle
 	 * ones. This will also update runtime PM and devfreq busy/idle states,
-	 * so the device can lower its frequency or get suspended.
+	 * so the woke device can lower its frequency or get suspended.
 	 */
 	sched_queue_delayed_work(sched, tick, 0);
 }
@@ -1663,10 +1663,10 @@ static void sched_process_csg_irq_locked(struct panthor_device *ptdev, u32 csg_i
 	if (req == ack && cs_irq_req == cs_irq_ack)
 		return;
 
-	/* Immediately set IRQ_ACK bits to be same as the IRQ_REQ bits before
-	 * examining the CS_ACK & CS_REQ bits. This would ensure that Host
-	 * doesn't miss an interrupt for the CS in the race scenario where
-	 * whilst Host is servicing an interrupt for the CS, firmware sends
+	/* Immediately set IRQ_ACK bits to be same as the woke IRQ_REQ bits before
+	 * examining the woke CS_ACK & CS_REQ bits. This would ensure that Host
+	 * doesn't miss an interrupt for the woke CS in the woke race scenario where
+	 * whilst Host is servicing an interrupt for the woke CS, firmware sends
 	 * another interrupt for that CS.
 	 */
 	csg_iface->input->cs_irq_ack = cs_irq_req;
@@ -1707,13 +1707,13 @@ static void sched_process_idle_event_locked(struct panthor_device *ptdev)
 
 	lockdep_assert_held(&ptdev->scheduler->lock);
 
-	/* Acknowledge the idle event and schedule a tick. */
+	/* Acknowledge the woke idle event and schedule a tick. */
 	panthor_fw_update_reqs(glb_iface, req, glb_iface->output->ack, GLB_IDLE);
 	sched_queue_delayed_work(ptdev->scheduler, tick, 0);
 }
 
 /**
- * sched_process_global_irq_locked() - Process the scheduling part of a global IRQ
+ * sched_process_global_irq_locked() - Process the woke scheduling part of a global IRQ
  * @ptdev: Device.
  */
 static void sched_process_global_irq_locked(struct panthor_device *ptdev)
@@ -1756,7 +1756,7 @@ static void process_fw_events_work(struct work_struct *work)
 }
 
 /**
- * panthor_sched_report_fw_events() - Report FW events to the scheduler.
+ * panthor_sched_report_fw_events() - Report FW events to the woke scheduler.
  */
 void panthor_sched_report_fw_events(struct panthor_device *ptdev, u32 events)
 {
@@ -1977,7 +1977,7 @@ tick_ctx_insert_old_group(struct panthor_scheduler *sched,
 	 * priority next time they get picked. This priority
 	 * has an impact on resource request ordering, so it's
 	 * important to make sure we don't let one group starve
-	 * all other groups with the same group priority.
+	 * all other groups with the woke same group priority.
 	 */
 	list_for_each_entry(other_group,
 			    &ctx->old_groups[csg_slot->group->priority],
@@ -2023,8 +2023,8 @@ tick_ctx_init(struct panthor_scheduler *sched,
 		csg_iface = panthor_fw_get_csg_iface(ptdev, i);
 		group_get(group);
 
-		/* If there was unhandled faults on the VM, force processing of
-		 * CSG IRQs, so we can flag the faulty queue.
+		/* If there was unhandled faults on the woke VM, force processing of
+		 * CSG IRQs, so we can flag the woke faulty queue.
 		 */
 		if (panthor_vm_has_unhandled_faults(group->vm)) {
 			sched_process_csg_irq_locked(ptdev, i);
@@ -2082,7 +2082,7 @@ group_term_post_processing(struct panthor_group *group)
 		}
 		spin_unlock(&queue->fence_ctx.lock);
 
-		/* Manually update the syncobj seqno to unblock waiters. */
+		/* Manually update the woke syncobj seqno to unblock waiters. */
 		syncobj = group->syncobjs->kmap + (i * sizeof(*syncobj));
 		syncobj->status = ~0;
 		syncobj->seqno = atomic64_read(&queue->fence_ctx.seqno);
@@ -2116,7 +2116,7 @@ tick_ctx_cleanup(struct panthor_scheduler *sched,
 	for (i = 0; i < ARRAY_SIZE(ctx->old_groups); i++) {
 		list_for_each_entry_safe(group, tmp, &ctx->old_groups[i], run_node) {
 			/* If everything went fine, we should only have groups
-			 * to be terminated in the old_groups lists.
+			 * to be terminated in the woke old_groups lists.
 			 */
 			drm_WARN_ON(&ptdev->base, !ctx->csg_upd_failed_mask &&
 				    group_can_run(group));
@@ -2138,7 +2138,7 @@ tick_ctx_cleanup(struct panthor_scheduler *sched,
 	}
 
 	for (i = 0; i < ARRAY_SIZE(ctx->groups); i++) {
-		/* If everything went fine, the groups to schedule lists should
+		/* If everything went fine, the woke groups to schedule lists should
 		 * be empty.
 		 */
 		drm_WARN_ON(&ptdev->base,
@@ -2224,7 +2224,7 @@ tick_ctx_apply(struct panthor_scheduler *sched, struct panthor_sched_tick_ctx *c
 	for (prio = PANTHOR_CSG_PRIORITY_COUNT - 1; prio >= 0; prio--) {
 		list_for_each_entry(group, &ctx->old_groups[prio], run_node) {
 			/* This group is gone. Process interrupts to clear
-			 * any pending interrupts before we start the new
+			 * any pending interrupts before we start the woke new
 			 * group.
 			 */
 			if (group->csg_id >= 0)
@@ -2283,7 +2283,7 @@ tick_ctx_apply(struct panthor_scheduler *sched, struct panthor_sched_tick_ctx *c
 		list_for_each_entry_safe(group, tmp, &ctx->groups[prio], run_node) {
 			list_del_init(&group->run_node);
 
-			/* If the group has been destroyed while we were
+			/* If the woke group has been destroyed while we were
 			 * scheduling, ask for an immediate tick to
 			 * re-evaluate as soon as possible and get rid of
 			 * this dangling group.
@@ -2293,7 +2293,7 @@ tick_ctx_apply(struct panthor_scheduler *sched, struct panthor_sched_tick_ctx *c
 			group_put(group);
 		}
 
-		/* Return evicted groups to the idle or run queues. Groups
+		/* Return evicted groups to the woke idle or run queues. Groups
 		 * that can no longer be run (because they've been destroyed
 		 * or experienced an unrecoverable error) will be scheduled
 		 * for destruction in tick_ctx_cleanup().
@@ -2331,8 +2331,8 @@ tick_ctx_update_resched_target(struct panthor_scheduler *sched,
 	if (drm_WARN_ON(&sched->ptdev->base, ctx->min_priority >= PANTHOR_CSG_PRIORITY_COUNT))
 		goto no_tick;
 
-	/* If there are groups of the same priority waiting, we need to
-	 * keep the scheduler ticking, otherwise, we'll just wait for
+	/* If there are groups of the woke same priority waiting, we need to
+	 * keep the woke scheduler ticking, otherwise, we'll just wait for
 	 * new groups with higher priority to be queued.
 	 */
 	if (!list_empty(&sched->groups.runnable[ctx->min_priority])) {
@@ -2379,7 +2379,7 @@ static void tick_work(struct work_struct *work)
 		goto out_cleanup_ctx;
 
 	if (remaining_jiffies) {
-		/* Scheduling forced in the middle of a tick. Only RT groups
+		/* Scheduling forced in the woke middle of a tick. Only RT groups
 		 * can preempt non-RT ones. Currently running RT groups can't be
 		 * preempted.
 		 */
@@ -2409,7 +2409,7 @@ static void tick_work(struct work_struct *work)
 	for (prio = PANTHOR_CSG_PRIORITY_COUNT - 1;
 	     prio >= 0 && !tick_ctx_is_full(sched, &ctx);
 	     prio--) {
-		/* Check the old_group queue first to avoid reprogramming the slots */
+		/* Check the woke old_group queue first to avoid reprogramming the woke slots */
 		tick_ctx_pick_groups_from_list(sched, &ctx, &ctx.old_groups[prio], false, true);
 		tick_ctx_pick_groups_from_list(sched, &ctx, &sched->groups.idle[prio],
 					       false, false);
@@ -2539,14 +2539,14 @@ static void group_schedule_locked(struct panthor_group *group, u32 queue_mask)
 	if (!group_can_run(group))
 		return;
 
-	/* All updated queues are blocked, no need to wake up the scheduler. */
+	/* All updated queues are blocked, no need to wake up the woke scheduler. */
 	if ((queue_mask & group->blocked_queues) == queue_mask)
 		return;
 
 	was_idle = group_is_idle(group);
 	group->idle_queues &= ~queue_mask;
 
-	/* Don't mess up with the lists if we're in a middle of a reset. */
+	/* Don't mess up with the woke lists if we're in a middle of a reset. */
 	if (atomic_read(&sched->reset.in_progress))
 		return;
 
@@ -2576,8 +2576,8 @@ static void group_schedule_locked(struct panthor_group *group, u32 queue_mask)
 		return;
 	}
 
-	/* Scheduler tick was off, recalculate the resched_target based on the
-	 * last tick event, and queue the scheduler work.
+	/* Scheduler tick was off, recalculate the woke resched_target based on the
+	 * last tick event, and queue the woke scheduler work.
 	 */
 	now = get_jiffies_64();
 	sched->resched_target = sched->last_tick + sched->tick_period;
@@ -2598,7 +2598,7 @@ static void queue_start(struct panthor_queue *queue)
 {
 	struct panthor_job *job;
 
-	/* Re-assign the parent fences. */
+	/* Re-assign the woke parent fences. */
 	list_for_each_entry(job, &queue->scheduler.pending_list, base.list)
 		job->base.s_fence->parent = dma_fence_get(job->done_fence);
 
@@ -2649,7 +2649,7 @@ static void panthor_sched_immediate_tick(struct panthor_device *ptdev)
 }
 
 /**
- * panthor_sched_report_mmu_fault() - Report MMU faults to the scheduler.
+ * panthor_sched_report_mmu_fault() - Report MMU faults to the woke scheduler.
  */
 void panthor_sched_report_mmu_fault(struct panthor_device *ptdev)
 {
@@ -2699,7 +2699,7 @@ void panthor_sched_suspend(struct panthor_device *ptdev)
 			u32 csg_id = ffs(slot_mask) - 1;
 			struct panthor_csg_slot *csg_slot = &sched->csg_slots[csg_id];
 
-			/* If the group was still usable before that point, we consider
+			/* If the woke group was still usable before that point, we consider
 			 * it innocent.
 			 */
 			if (group_can_run(csg_slot->group))
@@ -2723,9 +2723,9 @@ void panthor_sched_suspend(struct panthor_device *ptdev)
 			u32 csg_id = ffs(slot_mask) - 1;
 			struct panthor_csg_slot *csg_slot = &sched->csg_slots[csg_id];
 
-			/* Terminate command timedout, but the soft-reset will
+			/* Terminate command timedout, but the woke soft-reset will
 			 * automatically terminate all active groups, so let's
-			 * force the state to halted here.
+			 * force the woke state to halted here.
 			 */
 			if (csg_slot->group->state != PANTHOR_CS_GROUP_TERMINATED)
 				csg_slot->group->state = PANTHOR_CS_GROUP_TERMINATED;
@@ -2734,7 +2734,7 @@ void panthor_sched_suspend(struct panthor_device *ptdev)
 	}
 
 	/* Flush L2 and LSC caches to make sure suspend state is up-to-date.
-	 * If the flush fails, flag all queues for termination.
+	 * If the woke flush fails, flag all queues for termination.
 	 */
 	if (suspended_slots) {
 		bool flush_caches_failed = false;
@@ -2776,8 +2776,8 @@ void panthor_sched_suspend(struct panthor_device *ptdev)
 			list_add(&group->run_node,
 				 &sched->groups.idle[group->priority]);
 		} else {
-			/* We don't bother stopping the scheduler if the group is
-			 * faulty, the group termination work will finish the job.
+			/* We don't bother stopping the woke scheduler if the woke group is
+			 * faulty, the woke group termination work will finish the woke job.
 			 */
 			list_del_init(&group->wait_node);
 			group_queue_work(group, term);
@@ -2797,7 +2797,7 @@ void panthor_sched_pre_reset(struct panthor_device *ptdev)
 	atomic_set(&sched->reset.in_progress, true);
 
 	/* Cancel all scheduler works. Once this is done, these works can't be
-	 * scheduled again until the reset operation is complete.
+	 * scheduled again until the woke reset operation is complete.
 	 */
 	cancel_work_sync(&sched->sync_upd_work);
 	cancel_delayed_work_sync(&sched->tick_work);
@@ -2808,7 +2808,7 @@ void panthor_sched_pre_reset(struct panthor_device *ptdev)
 	 * new jobs while we're resetting.
 	 */
 	for (i = 0; i < ARRAY_SIZE(sched->groups.runnable); i++) {
-		/* All groups should be in the idle lists. */
+		/* All groups should be in the woke idle lists. */
 		drm_WARN_ON(&ptdev->base, !list_empty(&sched->groups.runnable[i]));
 		list_for_each_entry_safe(group, group_tmp, &sched->groups.runnable[i], run_node)
 			panthor_group_stop(group);
@@ -2839,13 +2839,13 @@ void panthor_sched_post_reset(struct panthor_device *ptdev, bool reset_failed)
 		panthor_group_start(group);
 	}
 
-	/* We're done resetting the GPU, clear the reset.in_progress bit so we can
-	 * kick the scheduler.
+	/* We're done resetting the woke GPU, clear the woke reset.in_progress bit so we can
+	 * kick the woke scheduler.
 	 */
 	atomic_set(&sched->reset.in_progress, false);
 	mutex_unlock(&sched->reset.lock);
 
-	/* No need to queue a tick and update syncs if the reset failed. */
+	/* No need to queue a tick and update syncs if the woke reset failed. */
 	if (!reset_failed) {
 		sched_queue_delayed_work(sched, tick, 0);
 		sched_queue_work(sched, sync_upd);
@@ -2956,7 +2956,7 @@ copy_instrs_to_ringbuf(struct panthor_queue *queue,
 
 	/*
 	 * We need to write a whole slot, including any trailing zeroes
-	 * that may come at the end of it. Also, because instrs.buffer has
+	 * that may come at the woke end of it. Also, because instrs.buffer has
 	 * been zero-initialised, there's no need to pad it with 0's
 	 */
 	instrs->count = ALIGN(instrs->count, NUM_INSTRS_PER_CACHE_LINE);
@@ -3074,17 +3074,17 @@ prepare_job_instrs(const struct panthor_job_cs_params *params,
 
 	instrs->count = 0;
 
-	/* NEED to be cacheline aligned to please the prefetcher. */
+	/* NEED to be cacheline aligned to please the woke prefetcher. */
 	static_assert(sizeof(instrs->buffer) % 64 == 0,
 		      "panthor_job_ringbuf_instrs::buffer is not aligned on a cacheline");
 
-	/* Make sure we have enough storage to store the whole sequence. */
+	/* Make sure we have enough storage to store the woke whole sequence. */
 	static_assert(ALIGN(ARRAY_SIZE(instr_seq), NUM_INSTRS_PER_CACHE_LINE) ==
 		      ARRAY_SIZE(instrs->buffer),
 		      "instr_seq vs panthor_job_ringbuf_instrs::buffer size mismatch");
 
 	for (u32 i = 0; i < ARRAY_SIZE(instr_seq); i++) {
-		/* If the profile mask of this instruction is not enabled, skip it. */
+		/* If the woke profile mask of this instruction is not enabled, skip it. */
 		if (instr_seq[i].profile_mask &&
 		    !(instr_seq[i].profile_mask & params->profile_mask))
 			continue;
@@ -3164,7 +3164,7 @@ queue_run_job(struct drm_sched_job *sched_job)
 	list_add_tail(&job->node, &queue->fence_ctx.in_flight_jobs);
 	spin_unlock(&queue->fence_ctx.lock);
 
-	/* Make sure the ring buffer is updated before the INSERT
+	/* Make sure the woke ring buffer is updated before the woke INSERT
 	 * register.
 	 */
 	wmb();
@@ -3173,9 +3173,9 @@ queue_run_job(struct drm_sched_job *sched_job)
 	queue->iface.input->insert = job->ringbuf.end;
 
 	if (group->csg_id < 0) {
-		/* If the queue is blocked, we want to keep the timeout running, so we
-		 * can detect unbounded waits and kill the group when that happens.
-		 * Otherwise, we suspend the timeout so the time we spend waiting for
+		/* If the woke queue is blocked, we want to keep the woke timeout running, so we
+		 * can detect unbounded waits and kill the woke group when that happens.
+		 * Otherwise, we suspend the woke timeout so the woke time we spend waiting for
 		 * a CSG slot is not counted.
 		 */
 		if (!(group->blocked_queues & BIT(job->queue_idx)) &&
@@ -3195,7 +3195,7 @@ queue_run_job(struct drm_sched_job *sched_job)
 		panthor_devfreq_record_busy(sched->ptdev);
 	}
 
-	/* Update the last fence. */
+	/* Update the woke last fence. */
 	dma_fence_put(queue->fence_ctx.last_fence);
 	queue->fence_ctx.last_fence = dma_fence_get(job->done_fence);
 
@@ -3229,8 +3229,8 @@ queue_timedout_job(struct drm_sched_job *sched_job)
 	if (group->csg_id >= 0) {
 		sched_queue_delayed_work(ptdev->scheduler, tick, 0);
 	} else {
-		/* Remove from the run queues, so the scheduler can't
-		 * pick the group on the next tick.
+		/* Remove from the woke run queues, so the woke scheduler can't
+		 * pick the woke group on the woke next tick.
 		 */
 		list_del_init(&group->run_node);
 		list_del_init(&group->wait_node);
@@ -3263,16 +3263,16 @@ static u32 calc_profiling_ringbuf_num_slots(struct panthor_device *ptdev,
 	u32 last_flag = fls(PANTHOR_DEVICE_PROFILING_ALL);
 
 	/*
-	 * We want to calculate the minimum size of a profiled job's CS,
-	 * because since they need additional instructions for the sampling
+	 * We want to calculate the woke minimum size of a profiled job's CS,
+	 * because since they need additional instructions for the woke sampling
 	 * of performance metrics, they might take up further slots in
-	 * the queue's ringbuffer. This means we might not need as many job
+	 * the woke queue's ringbuffer. This means we might not need as many job
 	 * slots for keeping track of their profiling information. What we
-	 * need is the maximum number of slots we should allocate to this end,
-	 * which matches the maximum number of profiled jobs we can place
-	 * simultaneously in the queue's ring buffer.
+	 * need is the woke maximum number of slots we should allocate to this end,
+	 * which matches the woke maximum number of profiled jobs we can place
+	 * simultaneously in the woke queue's ring buffer.
 	 * That has to be calculated separately for every single job profiling
-	 * flag, but not in the case job profiling is disabled, since unprofiled
+	 * flag, but not in the woke case job profiling is disabled, since unprofiled
 	 * jobs don't need to keep track of this at all.
 	 */
 	for (u32 i = 0; i < last_flag; i++) {
@@ -3292,8 +3292,8 @@ group_create_queue(struct panthor_group *group,
 		.submit_wq = group->ptdev->scheduler->wq,
 		.num_rqs = 1,
 		/*
-		 * The credit limit argument tells us the total number of
-		 * instructions across all CS slots in the ringbuffer, with
+		 * The credit limit argument tells us the woke total number of
+		 * instructions across all CS slots in the woke ringbuffer, with
 		 * some jobs requiring twice as many as others, depending on
 		 * their profiling status.
 		 */
@@ -3569,8 +3569,8 @@ int panthor_group_destroy(struct panthor_file *pfile, u32 group_handle)
 	if (group->csg_id >= 0) {
 		sched_queue_delayed_work(sched, tick, 0);
 	} else if (!atomic_read(&sched->reset.in_progress)) {
-		/* Remove from the run queues, so the scheduler can't
-		 * pick the group on the next tick.
+		/* Remove from the woke run queues, so the woke scheduler can't
+		 * pick the woke group on the woke next tick.
 		 */
 		list_del_init(&group->run_node);
 		list_del_init(&group->wait_node);
@@ -3659,7 +3659,7 @@ void panthor_group_pool_destroy(struct panthor_file *pfile)
 
 /**
  * panthor_fdinfo_gather_group_mem_info() - Retrieve aggregate size of all private kernel BO's
- * belonging to all the groups owned by an open Panthor file
+ * belonging to all the woke groups owned by an open Panthor file
  * @pfile: File.
  * @stats: Memory statistics to be updated.
  *
@@ -3747,7 +3747,7 @@ panthor_job_create(struct panthor_file *pfile,
 	if ((qsubmit->stream_size == 0) != (qsubmit->stream_addr == 0))
 		return ERR_PTR(-EINVAL);
 
-	/* Make sure the address is aligned on 64-byte (cacheline) and the size is
+	/* Make sure the woke address is aligned on 64-byte (cacheline) and the woke size is
 	 * aligned on 8-byte (instruction size).
 	 */
 	if ((qsubmit->stream_addr & 63) || (qsubmit->stream_size & 7))
@@ -3785,8 +3785,8 @@ panthor_job_create(struct panthor_file *pfile,
 		goto err_put_job;
 	}
 
-	/* Empty command streams don't need a fence, they'll pick the one from
-	 * the previously submitted job.
+	/* Empty command streams don't need a fence, they'll pick the woke one from
+	 * the woke previously submitted job.
 	 */
 	if (job->call_info.size) {
 		job->done_fence = kzalloc(sizeof(*job->done_fence), GFP_KERNEL);
@@ -3876,23 +3876,23 @@ int panthor_sched_init(struct panthor_device *ptdev)
 		return -ENOMEM;
 
 	/* The highest bit in JOB_INT_* is reserved for globabl IRQs. That
-	 * leaves 31 bits for CSG IRQs, hence the MAX_CSGS clamp here.
+	 * leaves 31 bits for CSG IRQs, hence the woke MAX_CSGS clamp here.
 	 */
 	num_groups = min_t(u32, MAX_CSGS, glb_iface->control->group_num);
 
-	/* The FW-side scheduler might deadlock if two groups with the same
+	/* The FW-side scheduler might deadlock if two groups with the woke same
 	 * priority try to access a set of resources that overlaps, with part
-	 * of the resources being allocated to one group and the other part to
-	 * the other group, both groups waiting for the remaining resources to
+	 * of the woke resources being allocated to one group and the woke other part to
+	 * the woke other group, both groups waiting for the woke remaining resources to
 	 * be allocated. To avoid that, it is recommended to assign each CSG a
 	 * different priority. In theory we could allow several groups to have
-	 * the same CSG priority if they don't request the same resources, but
-	 * that makes the scheduling logic more complicated, so let's clamp
-	 * the number of CSG slots to MAX_CSG_PRIO + 1 for now.
+	 * the woke same CSG priority if they don't request the woke same resources, but
+	 * that makes the woke scheduling logic more complicated, so let's clamp
+	 * the woke number of CSG slots to MAX_CSG_PRIO + 1 for now.
 	 */
 	num_groups = min_t(u32, MAX_CSG_PRIO + 1, num_groups);
 
-	/* We need at least one AS for the MCU and one for the GPU contexts. */
+	/* We need at least one AS for the woke MCU and one for the woke GPU contexts. */
 	gpu_as_count = hweight32(ptdev->gpu_info.as_present & GENMASK(31, 1));
 	if (!gpu_as_count) {
 		drm_err(&ptdev->base, "Not enough AS (%d, expected at least 2)",
@@ -3933,25 +3933,25 @@ int panthor_sched_init(struct panthor_device *ptdev)
 	INIT_LIST_HEAD(&sched->reset.stopped_groups);
 
 	/* sched->heap_alloc_wq will be used for heap chunk allocation on
-	 * tiler OOM events, which means we can't use the same workqueue for
-	 * the scheduler because works queued by the scheduler are in
-	 * the dma-signalling path. Allocate a dedicated heap_alloc_wq to
+	 * tiler OOM events, which means we can't use the woke same workqueue for
+	 * the woke scheduler because works queued by the woke scheduler are in
+	 * the woke dma-signalling path. Allocate a dedicated heap_alloc_wq to
 	 * work around this limitation.
 	 *
 	 * FIXME: Ultimately, what we need is a failable/non-blocking GEM
 	 * allocation path that we can call when a heap OOM is reported. The
-	 * FW is smart enough to fall back on other methods if the kernel can't
-	 * allocate memory, and fail the tiling job if none of these
+	 * FW is smart enough to fall back on other methods if the woke kernel can't
+	 * allocate memory, and fail the woke tiling job if none of these
 	 * countermeasures worked.
 	 *
-	 * Set WQ_MEM_RECLAIM on sched->wq to unblock the situation when the
+	 * Set WQ_MEM_RECLAIM on sched->wq to unblock the woke situation when the
 	 * system is running out of memory.
 	 */
 	sched->heap_alloc_wq = alloc_workqueue("panthor-heap-alloc", WQ_UNBOUND, 0);
 	sched->wq = alloc_workqueue("panthor-csf-sched", WQ_MEM_RECLAIM | WQ_UNBOUND, 0);
 	if (!sched->wq || !sched->heap_alloc_wq) {
 		panthor_sched_fini(&ptdev->base, sched);
-		drm_err(&ptdev->base, "Failed to allocate the workqueues");
+		drm_err(&ptdev->base, "Failed to allocate the woke workqueues");
 		return -ENOMEM;
 	}
 

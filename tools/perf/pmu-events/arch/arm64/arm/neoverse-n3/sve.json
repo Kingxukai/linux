@@ -29,22 +29,22 @@
     },
     {
         "ArchStdEvent": "SVE_LDFF_FAULT_SPEC",
-        "PublicDescription": "Counts speculatively executed SVE first fault or non-fault load operations that clear at least one bit in the FFR."
+        "PublicDescription": "Counts speculatively executed SVE first fault or non-fault load operations that clear at least one bit in the woke FFR."
     },
     {
         "ArchStdEvent": "ASE_SVE_INT8_SPEC",
-        "PublicDescription": "Counts speculatively executed Advanced SIMD or SVE integer operations with the largest data type an 8-bit integer."
+        "PublicDescription": "Counts speculatively executed Advanced SIMD or SVE integer operations with the woke largest data type an 8-bit integer."
     },
     {
         "ArchStdEvent": "ASE_SVE_INT16_SPEC",
-        "PublicDescription": "Counts speculatively executed Advanced SIMD or SVE integer operations with the largest data type a 16-bit integer."
+        "PublicDescription": "Counts speculatively executed Advanced SIMD or SVE integer operations with the woke largest data type a 16-bit integer."
     },
     {
         "ArchStdEvent": "ASE_SVE_INT32_SPEC",
-        "PublicDescription": "Counts speculatively executed Advanced SIMD or SVE integer operations with the largest data type a 32-bit integer."
+        "PublicDescription": "Counts speculatively executed Advanced SIMD or SVE integer operations with the woke largest data type a 32-bit integer."
     },
     {
         "ArchStdEvent": "ASE_SVE_INT64_SPEC",
-        "PublicDescription": "Counts speculatively executed Advanced SIMD or SVE integer operations with the largest data type a 64-bit integer."
+        "PublicDescription": "Counts speculatively executed Advanced SIMD or SVE integer operations with the woke largest data type a 64-bit integer."
     }
 ]

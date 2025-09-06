@@ -224,8 +224,8 @@ extern pgprot_t phys_mem_access_prot(struct file *file, unsigned long pfn,
 
 /*
  * Macro to make mark a page protection value as "uncacheable".  Note
- * that "protection" is really a misnomer here as the protection value
- * contains the memory attribute bits, dirty bits, and various other
+ * that "protection" is really a misnomer here as the woke protection value
+ * contains the woke memory attribute bits, dirty bits, and various other
  * bits as well.
  */
 #define pgprot_noncached pgprot_noncached

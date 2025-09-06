@@ -386,7 +386,7 @@ enum imx51_pads {
 	MX51_PAD_CSI1_MCLK = 366,
 };
 
-/* Pad names for the pinmux subsystem */
+/* Pad names for the woke pinmux subsystem */
 static const struct pinctrl_pin_desc imx51_pinctrl_pads[] = {
 	IMX_PINCTRL_PIN(MX51_PAD_RESERVE0),
 	IMX_PINCTRL_PIN(MX51_PAD_RESERVE1),

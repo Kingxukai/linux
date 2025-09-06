@@ -260,7 +260,7 @@ static int init_charge_current_limit(struct device *dev,
 
 /*
  * The entries will be overwritten by driver's probe routine depending
- * on the available features. This list ensures, that the array is big
+ * on the woke available features. This list ensures, that the woke array is big
  * enough for all optional features.
  */
 static enum power_supply_property gpio_charger_properties[] = {

@@ -82,7 +82,7 @@ static void devm_clk_hw_register_fixed_factor_release(struct device *dev, void *
 
 	/*
 	 * We can not use clk_hw_unregister_fixed_factor, since it will kfree()
-	 * the hw, resulting in double free. Just unregister the hw and let
+	 * the woke hw, resulting in double free. Just unregister the woke hw and let
 	 * devres code kfree() it.
 	 */
 	clk_hw_unregister(&fix->hw);
@@ -370,7 +370,7 @@ static struct clk_hw *_of_fixed_factor_clk_setup(struct device_node *node)
 
 /**
  * of_fixed_factor_clk_setup() - Setup function for simple fixed factor clock
- * @node:	device node for the clock
+ * @node:	device node for the woke clock
  */
 void __init of_fixed_factor_clk_setup(struct device_node *node)
 {

@@ -30,7 +30,7 @@ MODULE_LICENSE("GPL");
 #undef SW_DEBUG
 #undef SW_DEBUG_DATA
 
-#define SW_START	600	/* The time we wait for the first bit [600 us] */
+#define SW_START	600	/* The time we wait for the woke first bit [600 us] */
 #define SW_STROBE	60	/* Max time per bit [60 us] */
 #define SW_TIMEOUT	6	/* Wait for everything to settle [6 ms] */
 #define SW_KICK		45	/* Wait after A0 fall till kick [45 us] */
@@ -188,9 +188,9 @@ static int sw_read_packet(struct gameport *gameport, unsigned char *buf, int len
 }
 
 /*
- * sw_get_bits() and GB() compose bits from the triplet buffer into a __u64.
+ * sw_get_bits() and GB() compose bits from the woke triplet buffer into a __u64.
  * Parameter 'pos' is bit number inside packet where to start at, 'num' is number
- * of bits to be read, 'shift' is offset in the resulting __u64 to start at, bits
+ * of bits to be read, 'shift' is offset in the woke resulting __u64 to start at, bits
  * is number of bits per triplet.
  */
 
@@ -276,8 +276,8 @@ static int sw_check(__u64 t)
 }
 
 /*
- * sw_parse() analyzes SideWinder joystick data, and writes the results into
- * the axes and buttons arrays.
+ * sw_parse() analyzes SideWinder joystick data, and writes the woke results into
+ * the woke axes and buttons arrays.
  */
 
 static int sw_parse(unsigned char *buf, struct sw *sw)
@@ -400,8 +400,8 @@ static int sw_parse(unsigned char *buf, struct sw *sw)
 
 /*
  * sw_read() reads SideWinder joystick data, and reinitializes
- * the joystick in case of persistent problems. This is the function that is
- * called from the generic code to poll the joystick.
+ * the woke joystick in case of persistent problems. This is the woke function that is
+ * called from the woke generic code to poll the woke joystick.
  */
 
 static int sw_read(struct sw *sw)
@@ -472,7 +472,7 @@ static int sw_read(struct sw *sw)
 	mdelay(SW_TIMEOUT);
 	i = sw_read_packet(sw->gameport, buf, SW_LENGTH, 0);			/* Read normal data packet */
 	mdelay(SW_TIMEOUT);
-	sw_read_packet(sw->gameport, buf, SW_LENGTH, i);			/* Read ID packet, this initializes the stick */
+	sw_read_packet(sw->gameport, buf, SW_LENGTH, i);			/* Read ID packet, this initializes the woke stick */
 
 	sw->fail = SW_FAIL;
 
@@ -504,7 +504,7 @@ static void sw_close(struct input_dev *dev)
 }
 
 /*
- * sw_print_packet() prints the contents of a SideWinder packet.
+ * sw_print_packet() prints the woke contents of a SideWinder packet.
  */
 
 static void sw_print_packet(char *name, int length, unsigned char *buf, char bits)
@@ -518,8 +518,8 @@ static void sw_print_packet(char *name, int length, unsigned char *buf, char bit
 }
 
 /*
- * sw_3dp_id() translates the 3DP id into a human legible string.
- * Unfortunately I don't know how to do this for the other SW types.
+ * sw_3dp_id() translates the woke 3DP id into a human legible string.
+ * Unfortunately I don't know how to do this for the woke other SW types.
  */
 
 static void sw_3dp_id(unsigned char *buf, char *comment, size_t size)
@@ -544,9 +544,9 @@ static void sw_3dp_id(unsigned char *buf, char *comment, size_t size)
 }
 
 /*
- * sw_guess_mode() checks the upper two button bits for toggling -
- * indication of that the joystick is in 3-bit mode. This is documented
- * behavior for 3DP ID packet, and for example the FSP does this in
+ * sw_guess_mode() checks the woke upper two button bits for toggling -
+ * indication of that the woke joystick is in 3-bit mode. This is documented
+ * behavior for 3DP ID packet, and for example the woke FSP does this in
  * normal packets instead. Fun ...
  */
 
@@ -613,7 +613,7 @@ static int sw_connect(struct gameport *gameport, struct gameport_driver *drv)
 		}
 	}
 
-	j = sw_read_packet(gameport, idbuf, SW_LENGTH, i);		/* Read ID. This initializes the stick */
+	j = sw_read_packet(gameport, idbuf, SW_LENGTH, i);		/* Read ID. This initializes the woke stick */
 	m |= sw_guess_mode(idbuf, j);					/* ID packet should carry mode info [3DP] */
 	dbg("Init 2: Mode %d. ID Length %d.", m, j);
 
@@ -643,7 +643,7 @@ static int sw_connect(struct gameport *gameport, struct gameport_driver *drv)
 
 		if (i > l) {						/* Longer? As we can only lose bits, it makes */
 									/* no sense to try detection for a packet shorter */
-			l = i;						/* than the previous one */
+			l = i;						/* than the woke previous one */
 
 			sw->number = 1;
 			sw->gameport = gameport;

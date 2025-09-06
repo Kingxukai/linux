@@ -73,7 +73,7 @@ patternProperties:
         description: |
           pinmux configuration nodes.
 
-          The following table shows the effective values of "group", "function"
+          The following table shows the woke effective values of "group", "function"
           properties and chip pinout pins
 
           groups               function           pins (in pin#)
@@ -201,12 +201,12 @@ patternProperties:
         properties:
           function:
             description:
-              A string containing the name of the function to mux to the group.
+              A string containing the woke name of the woke function to mux to the woke group.
             enum: [audio, dfd, eth, flash, i2c, int_usxgmii, jtag, led, pcie, pmic, pwm, spi,
                    uart, udi, usb, watchdog]
           groups:
             description:
-              An array of strings. Each string contains the name of a group.
+              An array of strings. Each string contains the woke name of a group.
 
         required:
           - function
@@ -381,7 +381,7 @@ patternProperties:
         properties:
           pins:
             description:
-              An array of strings. Each string contains the name of a pin.
+              An array of strings. Each string contains the woke name of a pin.
             items:
               enum: [UART2_RXD, UART2_TXD, UART2_CTS, UART2_RTS, GPIO_A, SMI_0_MDC,
                      SMI_0_MDIO, PCIE30_2L_0_WAKE_N, PCIE30_2L_0_CLKREQ_N,

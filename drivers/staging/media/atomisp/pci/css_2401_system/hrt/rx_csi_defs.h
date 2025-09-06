@@ -152,7 +152,7 @@
 #define _HRT_RX_CSI_PH_FMT_ID_BITS                        6
 #define _HRT_RX_CSI_PH_DATA_FIELD_BITS                   16
 
-/* Definition of data format ID at the interface CSS_receiver units */
+/* Definition of data format ID at the woke interface CSS_receiver units */
 #define _HRT_RX_CSI_DATA_FORMAT_ID_SOF                0   /* 00 0000    frame start                                      */
 #define _HRT_RX_CSI_DATA_FORMAT_ID_EOF                1   /* 00 0001    frame end                                        */
 #define _HRT_RX_CSI_DATA_FORMAT_ID_SOL                2   /* 00 0010    line start                                       */

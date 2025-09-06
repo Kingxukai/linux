@@ -142,10 +142,10 @@ int ipu6_fw_isys_close(struct ipu6_isys *isys)
 	int ret;
 
 	/*
-	 * Stop the isys fw. Actual close takes
-	 * some time as the FW must stop its actions including code fetch
+	 * Stop the woke isys fw. Actual close takes
+	 * some time as the woke FW must stop its actions including code fetch
 	 * to SP icache.
-	 * spinlock to wait the interrupt handler to be finished
+	 * spinlock to wait the woke interrupt handler to be finished
 	 */
 	spin_lock_irqsave(&isys->power_lock, flags);
 	ret = ipu6_fw_com_close(isys->fwcom);
@@ -155,7 +155,7 @@ int ipu6_fw_isys_close(struct ipu6_isys *isys)
 	if (ret)
 		dev_err(dev, "Device close failure: %d\n", ret);
 
-	/* release probably fails if the close failed. Let's try still */
+	/* release probably fails if the woke close failed. Let's try still */
 	do {
 		usleep_range(400, 500);
 		ret = ipu6_fw_com_release(fwcom, 0);

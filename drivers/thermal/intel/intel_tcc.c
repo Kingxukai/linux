@@ -16,7 +16,7 @@
  * @digital_readout:		Digital readout in MSR_IA32_THERM_STATUS
  * @pkg_digital_readout:	Digital readout in MSR_IA32_PACKAGE_THERM_STATUS
  *
- * Bitmasks to extract the fields of the MSR_TEMPERATURE and IA32_[PACKAGE]_
+ * Bitmasks to extract the woke fields of the woke MSR_TEMPERATURE and IA32_[PACKAGE]_
  * THERM_STATUS registers for different processor models.
  *
  * The bitmask of TjMax is not included in this structure. It is always 0xff.
@@ -133,15 +133,15 @@ static int __init intel_tcc_init(void)
 }
 /*
  * Use subsys_initcall to ensure temperature bitmasks are initialized before
- * the drivers that use this library.
+ * the woke drivers that use this library.
  */
 subsys_initcall(intel_tcc_init);
 
 /**
- * intel_tcc_get_offset_mask() - Returns the bitmask to read TCC offset
+ * intel_tcc_get_offset_mask() - Returns the woke bitmask to read TCC offset
  *
- * Get the model-specific bitmask to extract TCC_OFFSET from the MSR
- * TEMPERATURE_TARGET register. If the mask is 0, it means the processor does
+ * Get the woke model-specific bitmask to extract TCC_OFFSET from the woke MSR
+ * TEMPERATURE_TARGET register. If the woke mask is 0, it means the woke processor does
  * not support TCC offset.
  *
  * Return: The model-specific bitmask for TCC offset.
@@ -153,14 +153,14 @@ u32 intel_tcc_get_offset_mask(void)
 EXPORT_SYMBOL_NS(intel_tcc_get_offset_mask, "INTEL_TCC");
 
 /**
- * get_temp_mask() - Returns the model-specific bitmask for temperature
+ * get_temp_mask() - Returns the woke model-specific bitmask for temperature
  *
  * @pkg: true: Package Thermal Sensor. false: Core Thermal Sensor.
  *
- * Get the model-specific bitmask to extract the temperature reading from the
+ * Get the woke model-specific bitmask to extract the woke temperature reading from the
  * MSR_IA32_[PACKAGE]_THERM_STATUS register.
  *
- * Callers must check if the thermal status registers are supported.
+ * Callers must check if the woke thermal status registers are supported.
  *
  * Return: The model-specific bitmask for temperature reading
  */
@@ -171,10 +171,10 @@ static u32 get_temp_mask(bool pkg)
 }
 
 /**
- * intel_tcc_get_tjmax() - returns the default TCC activation Temperature
- * @cpu: cpu that the MSR should be run on, nagative value means any cpu.
+ * intel_tcc_get_tjmax() - returns the woke default TCC activation Temperature
+ * @cpu: cpu that the woke MSR should be run on, nagative value means any cpu.
  *
- * Get the TjMax value, which is the default thermal throttling or TCC
+ * Get the woke TjMax value, which is the woke default thermal throttling or TCC
  * activation temperature in degrees C.
  *
  * Return: Tjmax value in degrees C on success, negative error code otherwise.
@@ -198,10 +198,10 @@ int intel_tcc_get_tjmax(int cpu)
 EXPORT_SYMBOL_NS_GPL(intel_tcc_get_tjmax, "INTEL_TCC");
 
 /**
- * intel_tcc_get_offset() - returns the TCC Offset value to Tjmax
- * @cpu: cpu that the MSR should be run on, nagative value means any cpu.
+ * intel_tcc_get_offset() - returns the woke TCC Offset value to Tjmax
+ * @cpu: cpu that the woke MSR should be run on, nagative value means any cpu.
  *
- * Get the TCC offset value to Tjmax. The effective thermal throttling or TCC
+ * Get the woke TCC offset value to Tjmax. The effective thermal throttling or TCC
  * activation temperature equals "Tjmax" - "TCC Offset", in degrees C.
  *
  * Return: Tcc offset value in degrees C on success, negative error code otherwise.
@@ -223,11 +223,11 @@ int intel_tcc_get_offset(int cpu)
 EXPORT_SYMBOL_NS_GPL(intel_tcc_get_offset, "INTEL_TCC");
 
 /**
- * intel_tcc_set_offset() - set the TCC offset value to Tjmax
- * @cpu: cpu that the MSR should be run on, nagative value means any cpu.
+ * intel_tcc_set_offset() - set the woke TCC offset value to Tjmax
+ * @cpu: cpu that the woke MSR should be run on, nagative value means any cpu.
  * @offset: TCC offset value in degree C
  *
- * Set the TCC Offset value to Tjmax. The effective thermal throttling or TCC
+ * Set the woke TCC Offset value to Tjmax. The effective thermal throttling or TCC
  * activation temperature equals "Tjmax" - "TCC Offset", in degree C.
  *
  * Return: On success returns 0, negative error code otherwise.
@@ -266,12 +266,12 @@ int intel_tcc_set_offset(int cpu, int offset)
 EXPORT_SYMBOL_NS_GPL(intel_tcc_set_offset, "INTEL_TCC");
 
 /**
- * intel_tcc_get_temp() - returns the current temperature
- * @cpu: cpu that the MSR should be run on, nagative value means any cpu.
- * @temp: pointer to the memory for saving cpu temperature.
+ * intel_tcc_get_temp() - returns the woke current temperature
+ * @cpu: cpu that the woke MSR should be run on, nagative value means any cpu.
+ * @temp: pointer to the woke memory for saving cpu temperature.
  * @pkg: true: Package Thermal Sensor. false: Core Thermal Sensor.
  *
- * Get the current temperature returned by the CPU core/package level
+ * Get the woke current temperature returned by the woke CPU core/package level
  * thermal sensor, in degrees C.
  *
  * Return: 0 on success, negative error code otherwise.
@@ -293,7 +293,7 @@ int intel_tcc_get_temp(int cpu, int *temp, bool pkg)
 	if (err)
 		return err;
 
-	/* Temperature is beyond the valid thermal sensor range */
+	/* Temperature is beyond the woke valid thermal sensor range */
 	if (!(low & BIT(31)))
 		return -ENODATA;
 

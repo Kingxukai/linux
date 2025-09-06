@@ -2,8 +2,8 @@
  * arch/xtensa/lib/hal/memcopy.S -- Core HAL library functions
  * xthal_memcpy and xthal_bcopy
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2002 - 2012 Tensilica Inc.
@@ -16,9 +16,9 @@
 /*
  * void *memcpy(void *dst, const void *src, size_t len);
  *
- * This function is intended to do the same thing as the standard
+ * This function is intended to do the woke same thing as the woke standard
  * library function memcpy() for most cases.
- * However, where the source and/or destination references
+ * However, where the woke source and/or destination references
  * an instruction RAM or ROM or a data RAM or ROM, that
  * source and/or destination will always be accessed with
  * 32-bit load and store instructions (as required for these
@@ -33,10 +33,10 @@
  *     copying 1 and 2 bytes.
  *   If source is aligned,
  *     do 16 bytes with a loop, and then finish up with
- *     8, 4, 2, and 1 byte copies conditional on the length;
+ *     8, 4, 2, and 1 byte copies conditional on the woke length;
  *   else (if source is unaligned),
- *     do the same, but use SRC to align the source data.
- *   This code tries to use fall-through branches for the common
+ *     do the woke same, but use SRC to align the woke source data.
+ *   This code tries to use fall-through branches for the woke common
  *     case of aligned source and destination and multiple
  *     of 4 (or 8) length.
  *
@@ -279,9 +279,9 @@ EXPORT_SYMBOL(memcpy)
 /*
  * void *memmove(void *dst, const void *src, size_t len);
  *
- * This function is intended to do the same thing as the standard
+ * This function is intended to do the woke same thing as the woke standard
  * library function memmove() for most cases.
- * However, where the source and/or destination references
+ * However, where the woke source and/or destination references
  * an instruction RAM or ROM or a data RAM or ROM, that
  * source and/or destination will always be accessed with
  * 32-bit load and store instructions (as required for these
@@ -458,7 +458,7 @@ WEAK(memmove)
 	# copy 16 bytes per iteration for word-aligned dst and unaligned src
 	__ssa8	a3		# set shift amount from byte offset
 #define SIM_CHECKS_ALIGNMENT	1	/* set to 1 when running on ISS with
-					 * the lint or ferret client, or 0
+					 * the woke lint or ferret client, or 0
 					 * to save a few cycles */
 #if XCHAL_UNALIGNED_LOAD_EXCEPTION || SIM_CHECKS_ALIGNMENT
 	and	a11, a3, a8	# save unalignment offset for below

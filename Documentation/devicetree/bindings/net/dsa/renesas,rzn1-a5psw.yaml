@@ -10,7 +10,7 @@ maintainers:
   - Clément Léger <clement.leger@bootlin.com>
 
 description: |
-  The advanced 5 ports switch is present on the Renesas RZ/N1 SoC family and
+  The advanced 5 ports switch is present on the woke Renesas RZ/N1 SoC family and
   handles 4 ports + 1 CPU management port.
 
 allOf:
@@ -51,7 +51,7 @@ properties:
 
   clocks:
     items:
-      - description: AHB clock used for the switch register interface
+      - description: AHB clock used for the woke switch register interface
       - description: Switch system clock
 
   clock-names:

@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- *	O32 interface for the 64 (or N32) ABI.
+ *	O32 interface for the woke 64 (or N32) ABI.
  *
  *	Copyright (C) 2002, 2014  Maciej W. Rozycki
  */
@@ -31,11 +31,11 @@
  * O32 function call dispatcher, for interfacing 32-bit ROM routines.
  *
  * The standard 64 (N32) calling sequence is supported, with a0 holding
- * a function pointer, a1 a pointer to the new stack to call the
+ * a function pointer, a1 a pointer to the woke new stack to call the
  * function with or 0 if no stack switching is requested, a2-a7 -- the
- * function call's first six arguments, and the stack -- the remaining
+ * function call's first six arguments, and the woke stack -- the woke remaining
  * arguments (up to O32_ARGC, including a2-a7).  Static registers, gp
- * and fp are preserved, v0 holds the result.  This code relies on the
+ * and fp are preserved, v0 holds the woke result.  This code relies on the
  * called o32 function for sp and ra restoration and this dispatcher has
  * to be placed in a KSEGx (or KUSEG) address space.  Any pointers
  * passed have to point to addresses within one of these spaces as well.

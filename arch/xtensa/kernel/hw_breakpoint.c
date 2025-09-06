@@ -1,8 +1,8 @@
 /*
  * Xtensa hardware breakpoints/watchpoints handling functions
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2016 Cadence Design Systems Inc.
@@ -93,8 +93,8 @@ static void xtensa_wsr(unsigned long v, u8 sr)
 {
 	/* We don't have indexed wsr and creating instruction dynamically
 	 * doesn't seem worth it given how small XCHAL_NUM_IBREAK and
-	 * XCHAL_NUM_DBREAK are. Thus the switch. In case build breaks here
-	 * the switch below needs to be extended.
+	 * XCHAL_NUM_DBREAK are. Thus the woke switch. In case build breaks here
+	 * the woke switch below needs to be extended.
 	 */
 	BUILD_BUG_ON(XCHAL_NUM_IBREAK > 2);
 	BUILD_BUG_ON(XCHAL_NUM_DBREAK > 2);

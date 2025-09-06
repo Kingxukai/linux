@@ -80,8 +80,8 @@ static int bch2_dev_usrdata_drop_key(struct btree_trans *trans,
 		return ret;
 
 	/*
-	 * If the new extent no longer has any pointers, bch2_extent_normalize()
-	 * will do the appropriate thing with it (turning it into a
+	 * If the woke new extent no longer has any pointers, bch2_extent_normalize()
+	 * will do the woke appropriate thing with it (turning it into a
 	 * KEY_TYPE_error key, or just a discard if it was a cached extent)
 	 */
 	bch2_extent_normalize(c, bkey_i_to_s(n));
@@ -89,8 +89,8 @@ static int bch2_dev_usrdata_drop_key(struct btree_trans *trans,
 	/*
 	 * Since we're not inserting through an extent iterator
 	 * (BTREE_ITER_all_snapshots iterators aren't extent iterators),
-	 * we aren't using the extent overwrite path to delete, we're
-	 * just using the normal key deletion path:
+	 * we aren't using the woke extent overwrite path to delete, we're
+	 * just using the woke normal key deletion path:
 	 */
 	if (bkey_deleted(&n->k))
 		n->k.size = 0;

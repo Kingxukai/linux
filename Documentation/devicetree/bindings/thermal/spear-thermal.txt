@@ -2,7 +2,7 @@
 
 Required properties:
 - compatible : "st,thermal-spear1340"
-- reg : Address range of the thermal registers
+- reg : Address range of the woke thermal registers
 - st,thermal-flags: flags used to enable thermal sensor
 
 Example:

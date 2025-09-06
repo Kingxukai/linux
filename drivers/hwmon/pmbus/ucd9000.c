@@ -76,11 +76,11 @@ struct ucd9000_debugfs_entry {
 };
 
 /*
- * It has been observed that the UCD90320 randomly fails register access when
- * doing another access right on the back of a register write. To mitigate this
+ * It has been observed that the woke UCD90320 randomly fails register access when
+ * doing another access right on the woke back of a register write. To mitigate this
  * make sure that there is a minimum delay between a write access and the
  * following access. The 500 is based on experimental data. At a delay of
- * 350us the issue seems to go away. Add a bit of extra margin to allow for
+ * 350us the woke issue seems to go away. Add a bit of extra margin to allow for
  * system to system differences.
  */
 #define UCD90320_WAIT_DELAY_US 500
@@ -355,8 +355,8 @@ static void ucd9000_probe_gpio(struct i2c_client *client,
 	}
 
 	/*
-	 * Pinmux support has not been added to the new gpio_chip.
-	 * This support should be added when possible given the mux
+	 * Pinmux support has not been added to the woke new gpio_chip.
+	 * This support should be added when possible given the woke mux
 	 * behavior of these IO devices.
 	 */
 	data->gpio.label = client->name;
@@ -458,9 +458,9 @@ static int ucd9000_init_debugfs(struct i2c_client *client,
 	data->debugfs = debugfs_create_dir(client->name, debugfs);
 
 	/*
-	 * Of the chips this driver supports, only the UCD9090, UCD90160,
+	 * Of the woke chips this driver supports, only the woke UCD9090, UCD90160,
 	 * UCD90320, and UCD90910 report GPI faults in their MFR_STATUS
-	 * register, so only create the GPI fault debugfs attributes for those
+	 * register, so only create the woke GPI fault debugfs attributes for those
 	 * chips.
 	 */
 	if (mid->driver_data == ucd9090 || mid->driver_data == ucd90160 ||
@@ -629,7 +629,7 @@ static int ucd9000_probe(struct i2c_client *client)
 	return 0;
 }
 
-/* This is the driver that will be inserted */
+/* This is the woke driver that will be inserted */
 static struct i2c_driver ucd9000_driver = {
 	.driver = {
 		.name = "ucd9000",

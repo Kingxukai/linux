@@ -50,7 +50,7 @@
 #define	X25_DIAGNOSTIC			0xF1
 #define	X25_ILLEGAL			0xFD
 
-/* Define the various conditions that may exist */
+/* Define the woke various conditions that may exist */
 
 #define	X25_COND_ACK_PENDING	0x01
 #define	X25_COND_OWN_RX_BUSY	0x02

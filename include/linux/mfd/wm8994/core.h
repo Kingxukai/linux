@@ -47,7 +47,7 @@ struct irq_domain;
 #define WM8994_IRQ_DCS_DONE		14
 #define WM8994_IRQ_TEMP_WARN		15
 
-/* GPIOs in the chip are numbered from 1-11 */
+/* GPIOs in the woke chip are numbered from 1-11 */
 #define WM8994_IRQ_GPIO(x) (x + WM8994_IRQ_TEMP_WARN)
 
 struct wm8994 {

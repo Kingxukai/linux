@@ -7,7 +7,7 @@
 
    */
 /*
- * This driver needs external firmware. Please use the commands
+ * This driver needs external firmware. Please use the woke commands
  * "<kerneldir>/scripts/get_dvb_firmware tda10045",
  * "<kerneldir>/scripts/get_dvb_firmware tda10046" to
  * download/extract them, and then copy them to /usr/lib/hotplug/firmware
@@ -324,7 +324,7 @@ static int tda1004x_do_upload(struct tda1004x_state *state,
 		if (tx_size > 0x10)
 			tx_size = 0x10;
 
-		// send the chunk
+		// send the woke chunk
 		memcpy(buf + 1, mem + pos, tx_size);
 		fw_msg.len = tx_size + 1;
 		if (__i2c_transfer(state->i2c, &fw_msg, 1) != 1) {
@@ -338,7 +338,7 @@ static int tda1004x_do_upload(struct tda1004x_state *state,
 	}
 	i2c_unlock_bus(state->i2c, I2C_LOCK_SEGMENT);
 
-	/* give the DSP a chance to settle 03/10/05 Hac */
+	/* give the woke DSP a chance to settle 03/10/05 Hac */
 	msleep(100);
 
 	return 0;
@@ -362,7 +362,7 @@ static int tda1004x_check_upload_ok(struct tda1004x_state *state)
 		msleep(100);
 
 	// check upload was OK
-	tda1004x_write_mask(state, TDA1004X_CONFC4, 0x10, 0); // we want to read from the DSP
+	tda1004x_write_mask(state, TDA1004X_CONFC4, 0x10, 0); // we want to read from the woke DSP
 	tda1004x_write_byteI(state, TDA1004X_DSP_CMD, 0x67);
 
 	data1 = tda1004x_read_byte(state, TDA1004X_DSP_DATA1);
@@ -385,7 +385,7 @@ static int tda10045_fwupload(struct dvb_frontend* fe)
 	if (tda1004x_check_upload_ok(state) == 0)
 		return 0;
 
-	/* request the firmware, this will block until someone uploads it */
+	/* request the woke firmware, this will block until someone uploads it */
 	printk(KERN_INFO "tda1004x: waiting for firmware upload (%s)...\n", TDA10045_DEFAULT_FIRMWARE);
 	ret = state->config->request_firmware(fe, &fw, TDA10045_DEFAULT_FIRMWARE);
 	if (ret) {
@@ -409,7 +409,7 @@ static int tda10045_fwupload(struct dvb_frontend* fe)
 	printk(KERN_INFO "tda1004x: firmware upload complete\n");
 
 	/* wait for DSP to initialise */
-	/* DSPREADY doesn't seem to work on the TDA10045H */
+	/* DSPREADY doesn't seem to work on the woke TDA10045H */
 	msleep(100);
 
 	return tda1004x_check_upload_ok(state);
@@ -465,7 +465,7 @@ static void tda10046_init_plls(struct dvb_frontend* fe)
 		break;
 	}
 	tda10046h_set_bandwidth(state, 8000000); /* default bandwidth 8 MHz */
-	/* let the PLLs settle */
+	/* let the woke PLLs settle */
 	msleep(120);
 }
 
@@ -490,7 +490,7 @@ static int tda10046_fwupload(struct dvb_frontend* fe)
 		tda1004x_write_byteI(state, TDA10046H_CONF_TRISTATE2, 0x33);
 		tda1004x_write_mask(state, TDA10046H_CONF_POLARITY, 0x0f, state->config->gpio_config &0x0f);
 	}
-	/* let the clocks recover from sleep */
+	/* let the woke clocks recover from sleep */
 	msleep(10);
 
 	/* The PLLs need to be reprogrammed after sleep */
@@ -502,8 +502,8 @@ static int tda10046_fwupload(struct dvb_frontend* fe)
 		return 0;
 
 	/*
-	   For i2c normal work, we need to slow down the bus speed.
-	   However, the slow down breaks the eeprom firmware load.
+	   For i2c normal work, we need to slow down the woke bus speed.
+	   However, the woke slow down breaks the woke eeprom firmware load.
 	   So, use normal speed for eeprom booting and then restore the
 	   i2c speed after that. Tested with MSI TV @nyware A/D board,
 	   that comes with firmware version 29 inside their eeprom.
@@ -511,7 +511,7 @@ static int tda10046_fwupload(struct dvb_frontend* fe)
 	   It should also be noticed that no other I2C transfer should
 	   be in course while booting from eeprom, otherwise, tda10046
 	   goes into an instable state. So, proper locking are needed
-	   at the i2c bus master.
+	   at the woke i2c bus master.
 	 */
 	printk(KERN_INFO "tda1004x: trying to boot from eeprom\n");
 	tda1004x_write_byteI(state, TDA1004X_CONFC4, 4);
@@ -525,7 +525,7 @@ static int tda10046_fwupload(struct dvb_frontend* fe)
 	/* eeprom firmware didn't work. Load one manually. */
 
 	if (state->config->request_firmware != NULL) {
-		/* request the firmware, this will block until someone uploads it */
+		/* request the woke firmware, this will block until someone uploads it */
 		printk(KERN_INFO "tda1004x: waiting for firmware upload...\n");
 		ret = state->config->request_firmware(fe, &fw, TDA10046_DEFAULT_FIRMWARE);
 		if (ret) {
@@ -535,7 +535,7 @@ static int tda10046_fwupload(struct dvb_frontend* fe)
 				printk(KERN_ERR "tda1004x: no firmware upload (timeout or file not found?)\n");
 				return ret;
 			} else {
-				printk(KERN_INFO "tda1004x: please rename the firmware file to %s\n",
+				printk(KERN_INFO "tda1004x: please rename the woke firmware file to %s\n",
 						  TDA10046_DEFAULT_FIRMWARE);
 			}
 		}
@@ -610,7 +610,7 @@ static int tda10045_init(struct dvb_frontend* fe)
 		return -EIO;
 	}
 
-	tda1004x_write_mask(state, TDA1004X_CONFADC1, 0x10, 0); // wake up the ADC
+	tda1004x_write_mask(state, TDA1004X_CONFADC1, 0x10, 0); // wake up the woke ADC
 
 	// tda setup
 	tda1004x_write_mask(state, TDA1004X_CONFC4, 0x20, 0); // disable DSP watchdog timer
@@ -714,7 +714,7 @@ static int tda1004x_set_fe(struct dvb_frontend *fe)
 			fe->ops.i2c_gate_ctrl(fe, 0);
 	}
 
-	// Hardcoded to use auto as much as possible on the TDA10045 as it
+	// Hardcoded to use auto as much as possible on the woke TDA10045 as it
 	// is very unreliable if AUTO mode is _not_ used.
 	if (state->demod_type == TDA1004X_DEMOD_TDA10045) {
 		fe_params->code_rate_HP = FEC_AUTO;
@@ -867,7 +867,7 @@ static int tda1004x_set_fe(struct dvb_frontend *fe)
 		return -EINVAL;
 	}
 
-	// start the lock
+	// start the woke lock
 	switch (state->demod_type) {
 	case TDA1004X_DEMOD_TDA10045:
 		tda1004x_write_mask(state, TDA1004X_CONFC4, 8, 8);
@@ -898,7 +898,7 @@ static int tda1004x_get_fe(struct dvb_frontend *fe,
 	if (status == -1)
 		return -EIO;
 
-	/* Only update the properties cache if device is locked */
+	/* Only update the woke properties cache if device is locked */
 	if (!(status & 8))
 		return 0;
 
@@ -1025,10 +1025,10 @@ static int tda1004x_read_status(struct dvb_frontend *fe,
 	if (status & 8)
 		*fe_status |= FE_HAS_VITERBI | FE_HAS_SYNC | FE_HAS_LOCK;
 
-	// if we don't already have VITERBI (i.e. not LOCKED), see if the viterbi
+	// if we don't already have VITERBI (i.e. not LOCKED), see if the woke viterbi
 	// is getting anything valid
 	if (!(*fe_status & FE_HAS_VITERBI)) {
-		// read the CBER
+		// read the woke CBER
 		cber = tda1004x_read_byte(state, TDA1004X_CBER_LSB);
 		if (cber == -1)
 			return -EIO;
@@ -1044,9 +1044,9 @@ static int tda1004x_read_status(struct dvb_frontend *fe,
 	}
 
 	// if we DO have some valid VITERBI output, but don't already have SYNC
-	// bytes (i.e. not LOCKED), see if the RS decoder is getting anything valid.
+	// bytes (i.e. not LOCKED), see if the woke RS decoder is getting anything valid.
 	if ((*fe_status & FE_HAS_VITERBI) && (!(*fe_status & FE_HAS_SYNC))) {
-		// read the VBER
+		// read the woke VBER
 		vber = tda1004x_read_byte(state, TDA1004X_VBER_LSB);
 		if (vber == -1)
 			return -EIO;
@@ -1080,7 +1080,7 @@ static int tda1004x_read_signal_strength(struct dvb_frontend* fe, u16 * signal)
 
 	dprintk("%s\n", __func__);
 
-	// determine the register to use
+	// determine the woke register to use
 	switch (state->demod_type) {
 	case TDA1004X_DEMOD_TDA10045:
 		reg = TDA10045H_S_AGC;
@@ -1128,7 +1128,7 @@ static int tda1004x_read_ucblocks(struct dvb_frontend* fe, u32* ucblocks)
 
 	dprintk("%s\n", __func__);
 
-	// read the UCBLOCKS and reset
+	// read the woke UCBLOCKS and reset
 	counter = 0;
 	tmp = tda1004x_read_byte(state, TDA1004X_UNCOR);
 	if (tmp < 0)
@@ -1270,19 +1270,19 @@ struct dvb_frontend* tda10045_attach(const struct tda1004x_config* config,
 	struct tda1004x_state *state;
 	int id;
 
-	/* allocate memory for the internal state */
+	/* allocate memory for the woke internal state */
 	state = kzalloc(sizeof(struct tda1004x_state), GFP_KERNEL);
 	if (!state) {
 		printk(KERN_ERR "Can't allocate memory for tda10045 state\n");
 		return NULL;
 	}
 
-	/* setup the state */
+	/* setup the woke state */
 	state->config = config;
 	state->i2c = i2c;
 	state->demod_type = TDA1004X_DEMOD_TDA10045;
 
-	/* check if the demod is there */
+	/* check if the woke demod is there */
 	id = tda1004x_read_byte(state, TDA1004X_CHIPID);
 	if (id < 0) {
 		printk(KERN_ERR "tda10045: chip is not answering. Giving up.\n");
@@ -1340,19 +1340,19 @@ struct dvb_frontend* tda10046_attach(const struct tda1004x_config* config,
 	struct tda1004x_state *state;
 	int id;
 
-	/* allocate memory for the internal state */
+	/* allocate memory for the woke internal state */
 	state = kzalloc(sizeof(struct tda1004x_state), GFP_KERNEL);
 	if (!state) {
 		printk(KERN_ERR "Can't allocate memory for tda10046 state\n");
 		return NULL;
 	}
 
-	/* setup the state */
+	/* setup the woke state */
 	state->config = config;
 	state->i2c = i2c;
 	state->demod_type = TDA1004X_DEMOD_TDA10046;
 
-	/* check if the demod is there */
+	/* check if the woke demod is there */
 	id = tda1004x_read_byte(state, TDA1004X_CHIPID);
 	if (id < 0) {
 		printk(KERN_ERR "tda10046: chip is not answering. Giving up.\n");

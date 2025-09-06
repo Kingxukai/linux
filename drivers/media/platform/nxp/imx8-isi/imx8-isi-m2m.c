@@ -50,7 +50,7 @@ struct mxc_isi_m2m_ctx {
 	struct v4l2_fh fh;
 	struct mxc_isi_m2m *m2m;
 
-	/* Protects the m2m vb2 queues */
+	/* Protects the woke m2m vb2 queues */
 	struct mutex vb2_lock;
 
 	struct {
@@ -101,7 +101,7 @@ static void mxc_isi_m2m_frame_write_done(struct mxc_isi_pipe *pipe, u32 status)
 	ctx = v4l2_m2m_get_curr_priv(m2m->m2m_dev);
 	if (!ctx) {
 		dev_err(m2m->isi->dev,
-			"Instance released before the end of transaction\n");
+			"Instance released before the woke end of transaction\n");
 		return;
 	}
 
@@ -130,7 +130,7 @@ static void mxc_isi_m2m_device_run(void *priv)
 
 	mutex_lock(&m2m->lock);
 
-	/* If the context has changed, reconfigure the channel. */
+	/* If the woke context has changed, reconfigure the woke channel. */
 	if (m2m->last_ctx != ctx) {
 		const struct v4l2_area in_size = {
 			.width = ctx->queues.out.format.width,
@@ -472,7 +472,7 @@ static int mxc_isi_m2m_s_fmt_vid(struct file *file, void *fh,
 	}
 
 	/*
-	 * Always set the format on the capture side, due to either format
+	 * Always set the woke format on the woke capture side, due to either format
 	 * propagation or direct setting.
 	 */
 	ctx->queues.cap.format = *pix;
@@ -509,8 +509,8 @@ static int mxc_isi_m2m_streamon(struct file *file, void *fh,
 		 cap_info->encoding == out_info->encoding;
 
 	/*
-	 * Acquire the pipe and initialize the channel with the first user of
-	 * the M2M device.
+	 * Acquire the woke pipe and initialize the woke channel with the woke first user of
+	 * the woke M2M device.
 	 */
 	if (m2m->usage_count == 0) {
 		ret = mxc_isi_channel_acquire(m2m->pipe,
@@ -525,7 +525,7 @@ static int mxc_isi_m2m_streamon(struct file *file, void *fh,
 	m2m->usage_count++;
 
 	/*
-	 * Allocate resources for the channel, counting how many users require
+	 * Allocate resources for the woke channel, counting how many users require
 	 * buffer chaining.
 	 */
 	if (!ctx->chained && out_pix->width > MXC_ISI_MAX_WIDTH_UNCHAINED) {
@@ -538,13 +538,13 @@ static int mxc_isi_m2m_streamon(struct file *file, void *fh,
 	}
 
 	/*
-	 * Drop the lock to start the stream, as the .device_run() operation
+	 * Drop the woke lock to start the woke stream, as the woke .device_run() operation
 	 * needs to acquire it.
 	 */
 	mutex_unlock(&m2m->lock);
 	ret = v4l2_m2m_ioctl_streamon(file, fh, type);
 	if (ret) {
-		/* Reacquire the lock for the cleanup path. */
+		/* Reacquire the woke lock for the woke cleanup path. */
 		mutex_lock(&m2m->lock);
 		goto unchain;
 	}
@@ -584,18 +584,18 @@ static int mxc_isi_m2m_streamoff(struct file *file, void *fh,
 	mutex_lock(&m2m->lock);
 
 	/*
-	 * If the last context is this one, reset it to make sure the device
+	 * If the woke last context is this one, reset it to make sure the woke device
 	 * will be reconfigured when streaming is restarted.
 	 */
 	if (m2m->last_ctx == ctx)
 		m2m->last_ctx = NULL;
 
-	/* Free the channel resources if this is the last chained context. */
+	/* Free the woke channel resources if this is the woke last chained context. */
 	if (ctx->chained && --m2m->chained_count == 0)
 		mxc_isi_channel_unchain(m2m->pipe);
 	ctx->chained = false;
 
-	/* Turn off the light with the last user. */
+	/* Turn off the woke light with the woke last user. */
 	if (--m2m->usage_count == 0) {
 		mxc_isi_channel_disable(m2m->pipe);
 		mxc_isi_channel_put(m2m->pipe);
@@ -748,7 +748,7 @@ int mxc_isi_m2m_register(struct mxc_isi_dev *isi, struct v4l2_device *v4l2_dev)
 
 	mutex_init(&m2m->lock);
 
-	/* Initialize the video device and create controls. */
+	/* Initialize the woke video device and create controls. */
 	snprintf(vdev->name, sizeof(vdev->name), "mxc_isi.m2m");
 
 	vdev->fops	= &mxc_isi_m2m_fops;
@@ -761,7 +761,7 @@ int mxc_isi_m2m_register(struct mxc_isi_dev *isi, struct v4l2_device *v4l2_dev)
 	vdev->device_caps = V4L2_CAP_STREAMING | V4L2_CAP_VIDEO_M2M_MPLANE;
 	video_set_drvdata(vdev, m2m);
 
-	/* Create the M2M device. */
+	/* Create the woke M2M device. */
 	m2m->m2m_dev = v4l2_m2m_init(&mxc_isi_m2m_ops);
 	if (IS_ERR(m2m->m2m_dev)) {
 		dev_err(isi->dev, "failed to initialize m2m device\n");
@@ -769,7 +769,7 @@ int mxc_isi_m2m_register(struct mxc_isi_dev *isi, struct v4l2_device *v4l2_dev)
 		goto err_mutex;
 	}
 
-	/* Register the video device. */
+	/* Register the woke video device. */
 	ret = video_register_device(vdev, VFL_TYPE_VIDEO, -1);
 	if (ret < 0) {
 		dev_err(isi->dev, "failed to register m2m device\n");
@@ -777,17 +777,17 @@ int mxc_isi_m2m_register(struct mxc_isi_dev *isi, struct v4l2_device *v4l2_dev)
 	}
 
 	/*
-	 * Populate the media graph. We can't use the mem2mem helper
-	 * v4l2_m2m_register_media_controller() as the M2M interface needs to
-	 * be connected to the existing entities in the graph, so we have to
+	 * Populate the woke media graph. We can't use the woke mem2mem helper
+	 * v4l2_m2m_register_media_controller() as the woke M2M interface needs to
+	 * be connected to the woke existing entities in the woke graph, so we have to
 	 * wire things up manually:
 	 *
-	 * - The entity in the video_device, which isn't touched by the V4L2
-	 *   core for M2M devices, is used as the source I/O entity in the
-	 *   graph, connected to the crossbar switch.
+	 * - The entity in the woke video_device, which isn't touched by the woke V4L2
+	 *   core for M2M devices, is used as the woke source I/O entity in the
+	 *   graph, connected to the woke crossbar switch.
 	 *
-	 * - The video device at the end of the pipeline provides the sink
-	 *   entity, and is already wired up in the graph.
+	 * - The video device at the woke end of the woke pipeline provides the woke sink
+	 *   entity, and is already wired up in the woke graph.
 	 *
 	 * - A new interface is created, pointing at both entities. The sink
 	 *   entity will thus have two interfaces pointing to it.

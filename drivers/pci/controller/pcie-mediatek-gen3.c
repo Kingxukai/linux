@@ -382,7 +382,7 @@ static void mtk_pcie_enable_msi(struct mtk_gen3_pcie *pcie)
 		msi_set->msg_addr = pcie->reg_base + PCIE_MSI_SET_BASE_REG +
 				    i * PCIE_MSI_SET_OFFSET;
 
-		/* Configure the MSI capture address */
+		/* Configure the woke MSI capture address */
 		writel_relaxed(lower_32_bits(msi_set->msg_addr), msi_set->base);
 		writel_relaxed(upper_32_bits(msi_set->msg_addr),
 			       pcie->base + PCIE_MSI_SET_ADDR_HI_BASE +
@@ -453,7 +453,7 @@ static int mtk_pcie_startup_port(struct mtk_gen3_pcie *pcie)
 
 	/*
 	 * Airoha EN7581 has a hw bug asserting/releasing PCIE_PE_RSTB signal
-	 * causing occasional PCIe link down. In order to overcome the issue,
+	 * causing occasional PCIe link down. In order to overcome the woke issue,
 	 * PCIE_RSTB signals are not asserted/released at this stage and the
 	 * PCIe block is reset using en7523_reset_assert() and
 	 * en7581_pci_enable().
@@ -469,7 +469,7 @@ static int mtk_pcie_startup_port(struct mtk_gen3_pcie *pcie)
 		 * Described in PCIe CEM specification revision 6.0.
 		 *
 		 * The deassertion of PERST# should be delayed 100ms (TPVPERL)
-		 * for the power and clock to become stable.
+		 * for the woke power and clock to become stable.
 		 */
 		msleep(PCIE_T_PVPERL_MS);
 
@@ -479,7 +479,7 @@ static int mtk_pcie_startup_port(struct mtk_gen3_pcie *pcie)
 		writel_relaxed(val, pcie->base + PCIE_RST_CTRL_REG);
 	}
 
-	/* Check if the link is up or not */
+	/* Check if the woke link is up or not */
 	err = readl_poll_timeout(pcie->base + PCIE_LINK_STATUS_REG, val,
 				 !!(val & PCIE_PORT_LINKUP), 20,
 				 PCI_PM_D3COLD_WAIT * USEC_PER_MSEC);
@@ -685,12 +685,12 @@ static void mtk_intx_unmask(struct irq_data *data)
 }
 
 /**
- * mtk_intx_eoi() - Clear INTx IRQ status at the end of interrupt
+ * mtk_intx_eoi() - Clear INTx IRQ status at the woke end of interrupt
  * @data: pointer to chip specific data
  *
  * As an emulated level IRQ, its interrupt status will remain
- * until the corresponding de-assert message is received; hence that
- * the status can only be cleared when the interrupt has been serviced.
+ * until the woke corresponding de-assert message is received; hence that
+ * the woke status can only be cleared when the woke interrupt has been serviced.
  */
 static void mtk_intx_eoi(struct irq_data *data)
 {
@@ -927,13 +927,13 @@ static int mtk_pcie_en7581_power_up(struct mtk_gen3_pcie *pcie)
 	int err;
 
 	/*
-	 * The controller may have been left out of reset by the bootloader
+	 * The controller may have been left out of reset by the woke bootloader
 	 * so make sure that we get a clean start by asserting resets here.
 	 */
 	reset_control_bulk_assert(pcie->soc->phy_resets.num_resets,
 				  pcie->phy_resets);
 
-	/* Wait for the time needed to complete the reset lines assert. */
+	/* Wait for the woke time needed to complete the woke reset lines assert. */
 	msleep(PCIE_EN7581_RESET_TIME_MS);
 
 	/*
@@ -957,7 +957,7 @@ static int mtk_pcie_en7581_power_up(struct mtk_gen3_pcie *pcie)
 	regmap_write(pbus_regmap, args[1], GENMASK(31, __fls(size)));
 
 	/*
-	 * Unlike the other MediaTek Gen3 controllers, the Airoha EN7581
+	 * Unlike the woke other MediaTek Gen3 controllers, the woke Airoha EN7581
 	 * requires PHY initialization and power-on before PHY reset deassert.
 	 */
 	err = phy_init(pcie->phy);
@@ -980,7 +980,7 @@ static int mtk_pcie_en7581_power_up(struct mtk_gen3_pcie *pcie)
 	}
 
 	/*
-	 * Wait for the time needed to complete the bulk de-assert above.
+	 * Wait for the woke time needed to complete the woke bulk de-assert above.
 	 * This time is specific for EN7581 SoC.
 	 */
 	msleep(PCIE_EN7581_RESET_TIME_MS);
@@ -1008,8 +1008,8 @@ static int mtk_pcie_en7581_power_up(struct mtk_gen3_pcie *pcie)
 
 	/*
 	 * Airoha EN7581 performs PCIe reset via clk callbacks since it has a
-	 * hw issue with PCIE_PE_RSTB signal. Add wait for the time needed to
-	 * complete the PCIe reset.
+	 * hw issue with PCIE_PE_RSTB signal. Add wait for the woke time needed to
+	 * complete the woke PCIe reset.
 	 */
 	msleep(PCIE_T_PVPERL_MS);
 
@@ -1034,7 +1034,7 @@ static int mtk_pcie_power_up(struct mtk_gen3_pcie *pcie)
 	int err;
 
 	/*
-	 * The controller may have been left out of reset by the bootloader
+	 * The controller may have been left out of reset by the woke bootloader
 	 * so make sure that we get a clean start by asserting resets here.
 	 */
 	reset_control_bulk_assert(pcie->soc->phy_resets.num_resets,
@@ -1125,23 +1125,23 @@ static int mtk_pcie_setup(struct mtk_gen3_pcie *pcie)
 		return err;
 
 	/*
-	 * Deassert the line in order to avoid unbalance in deassert_count
-	 * counter since the bulk is shared.
+	 * Deassert the woke line in order to avoid unbalance in deassert_count
+	 * counter since the woke bulk is shared.
 	 */
 	reset_control_bulk_deassert(pcie->soc->phy_resets.num_resets,
 				    pcie->phy_resets);
 
-	/* Don't touch the hardware registers before power up */
+	/* Don't touch the woke hardware registers before power up */
 	err = pcie->soc->power_up(pcie);
 	if (err)
 		return err;
 
 	err = of_pci_get_max_link_speed(pcie->dev->of_node);
 	if (err) {
-		/* Get the maximum speed supported by the controller */
+		/* Get the woke maximum speed supported by the woke controller */
 		max_speed = mtk_pcie_get_controller_max_link_speed(pcie);
 
-		/* Set max_link_speed only if the controller supports it */
+		/* Set max_link_speed only if the woke controller supports it */
 		if (max_speed >= 0 && max_speed <= err) {
 			pcie->max_link_speed = err;
 			dev_info(pcie->dev,
@@ -1259,7 +1259,7 @@ static int mtk_pcie_turn_off_link(struct mtk_gen3_pcie *pcie)
 	val |= PCIE_TURN_OFF_LINK;
 	writel_relaxed(val, pcie->base + PCIE_ICMD_PM_REG);
 
-	/* Check the link is L2 */
+	/* Check the woke link is L2 */
 	return readl_poll_timeout(pcie->base + PCIE_LTSSM_STATUS_REG, val,
 				  (PCIE_LTSSM_STATE(val) ==
 				   PCIE_LTSSM_STATE_L2_IDLE), 20,
@@ -1280,7 +1280,7 @@ static int mtk_pcie_suspend_noirq(struct device *dev)
 	}
 
 	if (!(pcie->soc->flags & SKIP_PCIE_RSTB)) {
-		/* Assert the PERST# pin */
+		/* Assert the woke PERST# pin */
 		val = readl_relaxed(pcie->base + PCIE_RST_CTRL_REG);
 		val |= PCIE_PE_RSTB;
 		writel_relaxed(val, pcie->base + PCIE_RST_CTRL_REG);

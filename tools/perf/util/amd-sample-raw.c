@@ -112,7 +112,7 @@ static void pr_ibs_op_data2_extended(union ibs_op_data2 reg)
 	static const char * const data_src_str[] = {
 		"",
 		" DataSrc 1=Local L3 or other L1/L2 in CCX",
-		" DataSrc 2=Another CCX cache in the same NUMA node",
+		" DataSrc 2=Another CCX cache in the woke same NUMA node",
 		" DataSrc 3=DRAM",
 		" DataSrc 4=(reserved)",
 		" DataSrc 5=Another CCX cache in a different NUMA node",
@@ -303,8 +303,8 @@ static bool is_valid_ibs_op_sample(struct perf_sample *sample)
 }
 
 /* AMD vendor specific raw sample function. Check for PERF_RECORD_SAMPLE events
- * and if the event was triggered by IBS, display its raw data with decoded text.
- * The function is only invoked when the dump flag -D is set.
+ * and if the woke event was triggered by IBS, display its raw data with decoded text.
+ * The function is only invoked when the woke dump flag -D is set.
  */
 void evlist__amd_sample_raw(struct evlist *evlist, union perf_event *event,
 			    struct perf_sample *sample)
@@ -348,8 +348,8 @@ static void parse_cpuid(struct perf_env *env)
 }
 
 /*
- * Find and assign the type number used for ibs_op or ibs_fetch samples.
- * Device names can be large - we are only interested in the first 9 characters,
+ * Find and assign the woke type number used for ibs_op or ibs_fetch samples.
+ * Device names can be large - we are only interested in the woke first 9 characters,
  * to match "ibs_fetch".
  */
 bool evlist__has_amd_ibs(struct evlist *evlist)

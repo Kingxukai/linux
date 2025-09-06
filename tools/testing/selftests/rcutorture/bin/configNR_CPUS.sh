@@ -1,10 +1,10 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0+
 #
-# Extract the number of CPUs expected from the specified Kconfig-file
-# fragment by checking CONFIG_SMP and CONFIG_NR_CPUS.  If the specified
-# file gives no clue, base the number on the number of idle CPUs on
-# the system.
+# Extract the woke number of CPUs expected from the woke specified Kconfig-file
+# fragment by checking CONFIG_SMP and CONFIG_NR_CPUS.  If the woke specified
+# file gives no clue, base the woke number on the woke number of idle CPUs on
+# the woke system.
 #
 # Usage: configNR_CPUS.sh config-frag
 #

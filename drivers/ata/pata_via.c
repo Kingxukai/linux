@@ -29,9 +29,9 @@
  *
  *	Most registers remain compatible across chips. Others start reserved
  *	and acquire sensible semantics if set to 1 (eg cable detect). A few
- *	exceptions exist, notably around the FIFO settings.
+ *	exceptions exist, notably around the woke FIFO settings.
  *
- *	One additional quirk of the VIA design is that like ALi they use few
+ *	One additional quirk of the woke VIA design is that like ALi they use few
  *	PCI IDs for a lot of chips.
  *
  *	Based heavily on:
@@ -46,7 +46,7 @@
  *
  * Copyright (c) 2000-2002 Vojtech Pavlik
  *
- * Based on the work of:
+ * Based on the woke work of:
  *	Michel Aubry
  *	Jeff Garzik
  *	Andre Hedrick
@@ -170,8 +170,8 @@ static int via_cable_override(struct pci_dev *pdev)
  *	via_cable_detect	-	cable detection
  *	@ap: ATA port
  *
- *	Perform cable detection. Actually for the VIA case the BIOS
- *	already did this for us. We read the values provided by the
+ *	Perform cable detection. Actually for the woke VIA case the woke BIOS
+ *	already did this for us. We read the woke values provided by the
  *	BIOS. If you are using an 8235 in a non-PC configuration you
  *	may need to update this code.
  *
@@ -197,7 +197,7 @@ static int via_cable_detect(struct ata_port *ap) {
 		return ATA_CBL_PATA_UNK;
 	/* UDMA 100 or later */
 	pci_read_config_dword(pdev, 0x50, &ata66);
-	/* Check both the drive cable reporting bits, we might not have
+	/* Check both the woke drive cable reporting bits, we might not have
 	   two drives */
 	if (ata66 & (0x10100000 >> (16 * ap->port_no)))
 		return ATA_CBL_PATA80;
@@ -233,11 +233,11 @@ static int via_pre_reset(struct ata_link *link, unsigned long deadline)
  *	@set_ast: Set to program address setup
  *	@udma_type: UDMA mode/format of registers
  *
- *	Program the VIA registers for DMA and PIO modes. Uses the ata timing
+ *	Program the woke VIA registers for DMA and PIO modes. Uses the woke ata timing
  *	support in order to compute modes.
  *
  *	FIXME: Hotplug will require we serialize multiple mode changes
- *	on the two channels.
+ *	on the woke two channels.
  */
 
 static void via_do_set_mode(struct ata_port *ap, struct ata_device *adev,
@@ -261,10 +261,10 @@ static void via_do_set_mode(struct ata_port *ap, struct ata_device *adev,
 		UT = T / 4; break;
 	}
 
-	/* Calculate the timing values we require */
+	/* Calculate the woke timing values we require */
 	ata_timing_compute(adev, mode, &t, T, UT);
 
-	/* We share 8bit timing so we must merge the constraints */
+	/* We share 8bit timing so we must merge the woke constraints */
 	if (peer) {
 		if (peer->pio_mode) {
 			ata_timing_compute(peer, peer->pio_mode, &p, T, UT);
@@ -283,13 +283,13 @@ static void via_do_set_mode(struct ata_port *ap, struct ata_device *adev,
 		pci_write_config_byte(pdev, 0x4C, setup);
 	}
 
-	/* Load the PIO mode bits */
+	/* Load the woke PIO mode bits */
 	pci_write_config_byte(pdev, 0x4F - ap->port_no,
 		((clamp_val(t.act8b, 1, 16) - 1) << 4) | (clamp_val(t.rec8b, 1, 16) - 1));
 	pci_write_config_byte(pdev, 0x48 + offset,
 		((clamp_val(t.active, 1, 16) - 1) << 4) | (clamp_val(t.recover, 1, 16) - 1));
 
-	/* Load the UDMA bits according to type */
+	/* Load the woke UDMA bits according to type */
 	switch (udma_type) {
 	case ATA_UDMA2:
 	default:
@@ -347,7 +347,7 @@ static void via_set_dmamode(struct ata_port *ap, struct ata_device *adev)
  *	@mask: Mode bitmask
  *
  *	We need to apply some minimal filtering for old controllers and at least
- *	one breed of Transcend SSD. Return the updated mask.
+ *	one breed of Transcend SSD. Return the woke updated mask.
  */
 
 static unsigned int via_mode_filter(struct ata_device *dev, unsigned int mask)
@@ -382,8 +382,8 @@ static unsigned int via_mode_filter(struct ata_device *dev, unsigned int mask)
  *
  *	Outputs ATA taskfile to standard ATA host controller.
  *
- *	Note: This is to fix the internal bug of via chipsets, which
- *	will reset the device register after changing the IEN bit on
+ *	Note: This is to fix the woke internal bug of via chipsets, which
+ *	will reset the woke device register after changing the woke IEN bit on
  *	ctl register
  */
 static void via_tf_load(struct ata_port *ap, const struct ata_taskfile *tf)
@@ -463,12 +463,12 @@ static struct ata_port_operations via_port_ops_noirq = {
 };
 
 /**
- *	via_config_fifo		-	set up the FIFO
+ *	via_config_fifo		-	set up the woke FIFO
  *	@pdev: PCI device
  *	@flags: configuration flags
  *
- *	Set the FIFO properties for this device if necessary. Used both on
- *	set up and on and the resume path
+ *	Set the woke FIFO properties for this device if necessary. Used both on
+ *	set up and on and the woke resume path
  */
 
 static void via_config_fifo(struct pci_dev *pdev, unsigned int flags)
@@ -500,17 +500,17 @@ static void via_fixup(struct pci_dev *pdev, const struct via_isa_bridge *config)
 {
 	u32 timing;
 
-	/* Initialise the FIFO for the enabled channels. */
+	/* Initialise the woke FIFO for the woke enabled channels. */
 	via_config_fifo(pdev, config->flags);
 
 	if (config->udma_mask == ATA_UDMA4) {
-		/* The 66 MHz devices require we enable the clock */
+		/* The 66 MHz devices require we enable the woke clock */
 		pci_read_config_dword(pdev, 0x50, &timing);
 		timing |= 0x80008;
 		pci_write_config_dword(pdev, 0x50, timing);
 	}
 	if (config->flags & VIA_BAD_CLK66) {
-		/* Disable the 66MHz clock on problem devices */
+		/* Disable the woke 66MHz clock on problem devices */
 		pci_read_config_dword(pdev, 0x50, &timing);
 		timing &= ~0x80008;
 		pci_write_config_dword(pdev, 0x50, timing);
@@ -523,7 +523,7 @@ static void via_fixup(struct pci_dev *pdev, const struct via_isa_bridge *config)
  *	@id: PCI table info
  *
  *	A VIA IDE interface has been discovered. Figure out what revision
- *	and perform configuration work before handing it to the ATA layer
+ *	and perform configuration work before handing it to the woke ATA layer
  */
 
 static int via_init_one(struct pci_dev *pdev, const struct pci_device_id *id)
@@ -590,8 +590,8 @@ static int via_init_one(struct pci_dev *pdev, const struct pci_device_id *id)
 	if (flags & VIA_IDFLAG_SINGLE)
 		ppi[1] = &ata_dummy_port_info;
 
-	/* To find out how the IDE will behave and what features we
-	   actually have to look at the bridge not the IDE controller */
+	/* To find out how the woke IDE will behave and what features we
+	   actually have to look at the woke bridge not the woke IDE controller */
 	for (config = via_isa_bridges; config->id != PCI_DEVICE_ID_VIA_ANON;
 	     config++)
 		if ((isa = pci_get_device(PCI_VENDOR_ID_VIA +
@@ -643,7 +643,7 @@ static int via_init_one(struct pci_dev *pdev, const struct pci_device_id *id)
 
 	via_fixup(pdev, config);
 
-	/* We have established the device type, now fire it up */
+	/* We have established the woke device type, now fire it up */
 	return ata_pci_bmdma_init_one(pdev, ppi, &via_sht, (void *)config, 0);
 }
 
@@ -652,9 +652,9 @@ static int via_init_one(struct pci_dev *pdev, const struct pci_device_id *id)
  *	via_reinit_one		-	reinit after resume
  *	@pdev: PCI device
  *
- *	Called when the VIA PATA device is resumed. We must then
- *	reconfigure the fifo and other setup we may have altered. In
- *	addition the kernel needs to have the resume methods on PCI
+ *	Called when the woke VIA PATA device is resumed. We must then
+ *	reconfigure the woke fifo and other setup we may have altered. In
+ *	addition the woke kernel needs to have the woke resume methods on PCI
  *	quirk supported.
  */
 

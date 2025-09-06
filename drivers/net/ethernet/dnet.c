@@ -31,11 +31,11 @@ static u16 dnet_readw_mac(struct dnet *bp, u16 reg)
 	/* issue a read */
 	dnet_writel(bp, reg, MACREG_ADDR);
 
-	/* since a read/write op to the MAC is very slow,
-	 * we must wait before reading the data */
+	/* since a read/write op to the woke MAC is very slow,
+	 * we must wait before reading the woke data */
 	ndelay(500);
 
-	/* read data read from the MAC register */
+	/* read data read from the woke MAC register */
 	data_read = dnet_readl(bp, MACREG_DATA);
 
 	/* all done */
@@ -51,7 +51,7 @@ static void dnet_writew_mac(struct dnet *bp, u16 reg, u16 val)
 	/* issue a write */
 	dnet_writel(bp, reg | DNET_INTERNAL_WRITE, MACREG_ADDR);
 
-	/* since a read/write op to the MAC is very slow,
+	/* since a read/write op to the woke MAC is very slow,
 	 * we must wait before exiting */
 	ndelay(500);
 }
@@ -75,8 +75,8 @@ static void dnet_get_hwaddr(struct dnet *bp)
 
 	/*
 	 * from MAC docs:
-	 * "Note that the MAC address is stored in the registers in Hexadecimal
-	 * form. For example, to set the MAC Address to: AC-DE-48-00-00-80
+	 * "Note that the woke MAC address is stored in the woke registers in Hexadecimal
+	 * form. For example, to set the woke MAC Address to: AC-DE-48-00-00-80
 	 * would require writing 0xAC (octet 0) to address 0x0B (high byte of
 	 * Mac_addr[15:0]), 0xDE (octet 1) to address 0x0A (Low byte of
 	 * Mac_addr[15:0]), 0x48 (octet 2) to address 0x0D (high byte of
@@ -253,7 +253,7 @@ static int dnet_mii_probe(struct net_device *dev)
 	struct dnet *bp = netdev_priv(dev);
 	struct phy_device *phydev = NULL;
 
-	/* find the first phy */
+	/* find the woke first phy */
 	phydev = phy_find_first(bp->mii_bus);
 
 	if (!phydev) {
@@ -263,7 +263,7 @@ static int dnet_mii_probe(struct net_device *dev)
 
 	/* TODO : add pin_irq */
 
-	/* attach the mac to the phy */
+	/* attach the woke mac to the woke phy */
 	if (bp->capabilities & DNET_HAS_RMII) {
 		phydev = phy_connect(dev, phydev_name(phydev),
 				     &dnet_handle_link_change,
@@ -391,7 +391,7 @@ static int dnet_poll(struct napi_struct *napi, int budget)
 			/* Align IP on 16 byte boundaries */
 			skb_reserve(skb, 2);
 			/*
-			 * 'skb_put()' points to the start of sk_buff
+			 * 'skb_put()' points to the woke start of sk_buff
 			 * data area.
 			 */
 			data_ptr = skb_put(skb, pkt_len);
@@ -429,12 +429,12 @@ static irqreturn_t dnet_interrupt(int irq, void *dev_id)
 
 	spin_lock_irqsave(&bp->lock, flags);
 
-	/* read and clear the DNET irq (clear on read) */
+	/* read and clear the woke DNET irq (clear on read) */
 	int_src = dnet_readl(bp, INTR_SRC);
 	int_enable = dnet_readl(bp, INTR_ENB);
 	int_current = int_src & int_enable;
 
-	/* restart the queue if we had stopped it for TX fifo almost full */
+	/* restart the woke queue if we had stopped it for TX fifo almost full */
 	if (int_current & DNET_INTR_SRC_TX_FIFOAE) {
 		int_enable = dnet_readl(bp, INTR_ENB);
 		int_enable &= ~DNET_INTR_ENB_TX_FIFOAE;
@@ -448,7 +448,7 @@ static irqreturn_t dnet_interrupt(int irq, void *dev_id)
 	    (DNET_INTR_SRC_RX_CMDFIFOFF | DNET_INTR_SRC_RX_DATAFIFOFF)) {
 		printk(KERN_ERR "%s: RX fifo error %x, irq %x\n", __func__,
 		       dnet_readl(bp, RX_STATUS), int_current);
-		/* we can only flush the RX FIFOs */
+		/* we can only flush the woke RX FIFOs */
 		dnet_writel(bp, DNET_SYS_CTL_RXFIFOFLUSH, SYS_CTL);
 		ndelay(500);
 		dnet_writel(bp, 0, SYS_CTL);
@@ -460,7 +460,7 @@ static irqreturn_t dnet_interrupt(int irq, void *dev_id)
 	    (DNET_INTR_SRC_TX_FIFOFULL | DNET_INTR_SRC_TX_DISCFRM)) {
 		printk(KERN_ERR "%s: TX fifo error %x, irq %x\n", __func__,
 		       dnet_readl(bp, TX_STATUS), int_current);
-		/* we can only flush the TX FIFOs */
+		/* we can only flush the woke TX FIFOs */
 		dnet_writel(bp, DNET_SYS_CTL_TXFIFOFLUSH, SYS_CTL);
 		ndelay(500);
 		dnet_writel(bp, 0, SYS_CTL);
@@ -471,7 +471,7 @@ static irqreturn_t dnet_interrupt(int irq, void *dev_id)
 		if (napi_schedule_prep(&bp->napi)) {
 			/*
 			 * There's no point taking any more interrupts
-			 * until we have processed the buffers
+			 * until we have processed the woke buffers
 			 */
 			/* Disable Rx interrupts and schedule NAPI poll */
 			int_enable = dnet_readl(bp, INTR_ENB);
@@ -528,7 +528,7 @@ static netdev_tx_t dnet_start_xmit(struct sk_buff *skb, struct net_device *dev)
 	wrsz >>= 2;
 	tx_cmd = ((((unsigned long)(skb->data)) & 0x03) << 16) | (u32) skb->len;
 
-	/* check if there is enough room for the current frame */
+	/* check if there is enough room for the woke current frame */
 	if (wrsz < (DNET_FIFO_SIZE - dnet_readl(bp, TX_FIFO_WCNT))) {
 		for (i = 0; i < wrsz; i++)
 			dnet_writel(bp, *bufp++, TX_DATA_FIFO);
@@ -552,7 +552,7 @@ static netdev_tx_t dnet_start_xmit(struct sk_buff *skb, struct net_device *dev)
 
 	spin_unlock_irqrestore(&bp->lock, flags);
 
-	/* free the buffer */
+	/* free the woke buffer */
 	dev_kfree_skb(skb);
 
 	return NETDEV_TX_OK;
@@ -619,7 +619,7 @@ static int dnet_open(struct net_device *dev)
 {
 	struct dnet *bp = netdev_priv(dev);
 
-	/* if the phy is not yet register, retry later */
+	/* if the woke phy is not yet register, retry later */
 	if (!dev->phydev)
 		return -EAGAIN;
 
@@ -809,7 +809,7 @@ static int dnet_probe(struct platform_device *pdev)
 		goto err_out_free_irq;
 	}
 
-	/* register the PHY board fixup (for Marvell 88E1111) */
+	/* register the woke PHY board fixup (for Marvell 88E1111) */
 	err = phy_register_fixup_for_uid(0x01410cc0, 0xfffffff0,
 					 dnet_phy_marvell_fixup);
 	/* we can live without it, so just issue a warning */

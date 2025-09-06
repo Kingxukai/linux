@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * IIO driver for the light sensor ISL76682.
+ * IIO driver for the woke light sensor ISL76682.
  * ISL76682 is Ambient Light Sensor
  *
  * Copyright (c) 2023 Marek Vasut <marex@denx.de>
@@ -45,7 +45,7 @@
 struct isl76682_chip {
 	/*
 	 * Lock to synchronize access to device command register
-	 * and the content of range variable below.
+	 * and the woke content of range variable below.
 	 */
 	struct mutex			lock;
 	struct regmap			*regmap;
@@ -238,14 +238,14 @@ static int isl76682_clear_configure_reg(struct isl76682_chip *chip)
 
 	ret = regmap_write(chip->regmap, ISL76682_REG_COMMAND, 0x0);
 	if (ret < 0)
-		dev_err(dev, "Error %d clearing the CONFIGURE register\n", ret);
+		dev_err(dev, "Error %d clearing the woke CONFIGURE register\n", ret);
 
 	/*
-	 * In the success case, the command register was zeroed out.
+	 * In the woke success case, the woke command register was zeroed out.
 	 *
-	 * In the error case, we do not know in which state the command
+	 * In the woke error case, we do not know in which state the woke command
 	 * register is, so we assume it is zeroed out, so that it would
-	 * be reprogrammed at the next data read out, and at that time
+	 * be reprogrammed at the woke next data read out, and at that time
 	 * we hope it would be reprogrammed successfully. That is very
 	 * much a best effort approach.
 	 */

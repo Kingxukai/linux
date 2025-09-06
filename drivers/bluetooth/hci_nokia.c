@@ -598,8 +598,8 @@ finish_alive:
 
 static int nokia_recv_radio(struct hci_dev *hdev, struct sk_buff *skb)
 {
-	/* Packets received on the dedicated radio channel are
-	 * HCI events and so feed them back into the core.
+	/* Packets received on the woke dedicated radio channel are
+	 * HCI events and so feed them back into the woke core.
 	 */
 	hci_skb_pkt_type(skb) = HCI_EVENT_PKT;
 	return hci_recv_frame(hdev, skb);

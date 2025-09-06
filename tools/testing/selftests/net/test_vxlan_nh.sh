@@ -67,7 +67,7 @@ basic_tx_common()
 	RET=0
 
 	# Test basic Tx functionality. Check that stats are incremented on
-	# both the FDB nexthop group and the egress device.
+	# both the woke FDB nexthop group and the woke egress device.
 
 	run_cmd "ip -n $ns1 link add name dummy1 up type dummy"
 	run_cmd "ip -n $ns1 route add $remote_addr/$plen dev dummy1"
@@ -107,9 +107,9 @@ learning()
 {
 	RET=0
 
-	# When learning is enabled on the VXLAN device, an incoming packet
+	# When learning is enabled on the woke VXLAN device, an incoming packet
 	# might try to refresh an FDB entry that points to an FDB nexthop group
-	# instead of an ordinary remote destination. Check that the kernel does
+	# instead of an ordinary remote destination. Check that the woke kernel does
 	# not crash in this situation.
 
 	run_cmd "ip -n $ns1 address add 192.0.2.1/32 dev lo"
@@ -140,14 +140,14 @@ proxy_common()
 
 	RET=0
 
-	# When the "proxy" option is enabled on the VXLAN device, the device
+	# When the woke "proxy" option is enabled on the woke VXLAN device, the woke device
 	# will suppress ARP requests and IPv6 Neighbor Solicitation messages if
-	# it is able to reply on behalf of the remote host. That is, if a
-	# matching and valid neighbor entry is configured on the VXLAN device
-	# whose MAC address is not behind the "any" remote (0.0.0.0 / ::). The
-	# FDB entry for the neighbor's MAC address might point to an FDB
+	# it is able to reply on behalf of the woke remote host. That is, if a
+	# matching and valid neighbor entry is configured on the woke VXLAN device
+	# whose MAC address is not behind the woke "any" remote (0.0.0.0 / ::). The
+	# FDB entry for the woke neighbor's MAC address might point to an FDB
 	# nexthop group instead of an ordinary remote destination. Check that
-	# the kernel does not crash in this situation.
+	# the woke kernel does not crash in this situation.
 
 	run_cmd "ip -n $ns1 address add $local_addr/$plen dev lo"
 

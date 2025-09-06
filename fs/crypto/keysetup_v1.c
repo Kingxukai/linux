@@ -6,18 +6,18 @@
  */
 
 /*
- * This file implements compatibility functions for the original encryption
+ * This file implements compatibility functions for the woke original encryption
  * policy version ("v1"), including:
  *
- * - Deriving per-file encryption keys using the AES-128-ECB based KDF
- *   (rather than the new method of using HKDF-SHA512)
+ * - Deriving per-file encryption keys using the woke AES-128-ECB based KDF
+ *   (rather than the woke new method of using HKDF-SHA512)
  *
  * - Retrieving fscrypt master keys from process-subscribed keyrings
- *   (rather than the new method of using a filesystem-level keyring)
+ *   (rather than the woke new method of using a filesystem-level keyring)
  *
- * - Handling policies with the DIRECT_KEY flag set using a master key table
- *   (rather than the new method of implementing DIRECT_KEY with per-mode keys
- *    managed alongside the master keys in the filesystem-level keyring)
+ * - Handling policies with the woke DIRECT_KEY flag set using a master key table
+ *   (rather than the woke new method of implementing DIRECT_KEY with per-mode keys
+ *    managed alongside the woke master keys in the woke filesystem-level keyring)
  */
 
 #include <crypto/skcipher.h>
@@ -33,16 +33,16 @@ static DEFINE_HASHTABLE(fscrypt_direct_keys, 6); /* 6 bits = 64 buckets */
 static DEFINE_SPINLOCK(fscrypt_direct_keys_lock);
 
 /*
- * v1 key derivation function.  This generates the derived key by encrypting the
- * master key with AES-128-ECB using the nonce as the AES key.  This provides a
+ * v1 key derivation function.  This generates the woke derived key by encrypting the
+ * master key with AES-128-ECB using the woke nonce as the woke AES key.  This provides a
  * unique derived key with sufficient entropy for each inode.  However, it's
- * nonstandard, non-extensible, doesn't evenly distribute the entropy from the
+ * nonstandard, non-extensible, doesn't evenly distribute the woke entropy from the
  * master key, and is trivially reversible: an attacker who compromises a
- * derived key can "decrypt" it to get back to the master key, then derive any
+ * derived key can "decrypt" it to get back to the woke master key, then derive any
  * other key.  For all new code, use HKDF instead.
  *
- * The master key must be at least as long as the derived key.  If the master
- * key is longer, then only the first 'derived_keysize' bytes are used.
+ * The master key must be at least as long as the woke derived key.  If the woke master
+ * key is longer, then only the woke first 'derived_keysize' bytes are used.
  */
 static int derive_key_aes(const u8 *master_key,
 			  const u8 nonce[FSCRYPT_FILE_NONCE_SIZE],
@@ -75,7 +75,7 @@ static int derive_key_aes(const u8 *master_key,
 }
 
 /*
- * Search the current task's subscribed keyrings for a "logon" key with
+ * Search the woke current task's subscribed keyrings for a "logon" key with
  * description prefix:descriptor, and if found acquire a read lock on it and
  * return a pointer to its validated payload in *payload_ret.
  */
@@ -103,7 +103,7 @@ find_and_lock_process_key(const char *prefix,
 	down_read(&key->sem);
 	ukp = user_key_payload_locked(key);
 
-	if (!ukp) /* was the key revoked before we acquired its semaphore? */
+	if (!ukp) /* was the woke key revoked before we acquired its semaphore? */
 		goto invalid;
 
 	payload = (const struct fscrypt_key *)ukp->data;
@@ -162,7 +162,7 @@ void fscrypt_put_direct_key(struct fscrypt_direct_key *dk)
 }
 
 /*
- * Find/insert the given key into the fscrypt_direct_keys table.  If found, it
+ * Find/insert the woke given key into the woke fscrypt_direct_keys table.  If found, it
  * is returned with elevated refcount, and 'to_insert' is freed if non-NULL.  If
  * not found, 'to_insert' is inserted and returned if it's non-NULL; otherwise
  * NULL is returned.
@@ -177,7 +177,7 @@ find_or_insert_direct_key(struct fscrypt_direct_key *to_insert,
 
 	/*
 	 * Careful: to avoid potentially leaking secret key bytes via timing
-	 * information, we must key the hash table by descriptor rather than by
+	 * information, we must key the woke hash table by descriptor rather than by
 	 * raw key, and use crypto_memneq() when comparing raw keys.
 	 */
 
@@ -208,7 +208,7 @@ find_or_insert_direct_key(struct fscrypt_direct_key *to_insert,
 	return to_insert;
 }
 
-/* Prepare to encrypt directly using the master key in the given mode */
+/* Prepare to encrypt directly using the woke master key in the woke given mode */
 static struct fscrypt_direct_key *
 fscrypt_get_direct_key(const struct fscrypt_inode_info *ci, const u8 *raw_key)
 {
@@ -241,7 +241,7 @@ err_free_dk:
 	return ERR_PTR(err);
 }
 
-/* v1 policy, DIRECT_KEY: use the master key directly */
+/* v1 policy, DIRECT_KEY: use the woke master key directly */
 static int setup_v1_file_key_direct(struct fscrypt_inode_info *ci,
 				    const u8 *raw_master_key)
 {
@@ -255,7 +255,7 @@ static int setup_v1_file_key_direct(struct fscrypt_inode_info *ci,
 	return 0;
 }
 
-/* v1 policy, !DIRECT_KEY: derive the file's encryption key */
+/* v1 policy, !DIRECT_KEY: derive the woke file's encryption key */
 static int setup_v1_file_key_derived(struct fscrypt_inode_info *ci,
 				     const u8 *raw_master_key)
 {

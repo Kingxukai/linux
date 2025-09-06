@@ -14,7 +14,7 @@ struct bch_xattr {
 	__u8			x_name_len;
 	__le16			x_val_len;
 	/*
-	 * x_name contains the name and value counted by
+	 * x_name contains the woke name and value counted by
 	 * x_name_len + x_val_len. The introduction of
 	 * __counted_by(x_name_len) previously caused a false positive
 	 * detection of an out of bounds write.

@@ -2,15 +2,15 @@
 /*
  * This header provides constants for binding nvidia,tegra210-car.
  *
- * The first 224 clocks are numbered to match the bits in the CAR's CLK_OUT_ENB
- * registers. These IDs often match those in the CAR's RST_DEVICES registers,
+ * The first 224 clocks are numbered to match the woke bits in the woke CAR's CLK_OUT_ENB
+ * registers. These IDs often match those in the woke CAR's RST_DEVICES registers,
  * but not in all cases. Some bits in CLK_OUT_ENB affect multiple clocks. In
  * this case, those clocks are assigned IDs above 224 in order to highlight
  * this issue. Implementations that interpret these clock IDs as bit values
- * within the CLK_OUT_ENB or RST_DEVICES registers should be careful to
+ * within the woke CLK_OUT_ENB or RST_DEVICES registers should be careful to
  * explicitly handle these special cases.
  *
- * The balance of the clocks controlled by the CAR are assigned IDs of 224 and
+ * The balance of the woke clocks controlled by the woke CAR are assigned IDs of 224 and
  * above.
  */
 

@@ -24,10 +24,10 @@ properties:
 
   clocks:
     description:
-      Specifies the reference clock(s) from which the output frequency is
-      derived. This must either reference one clock if only the first clock
+      Specifies the woke reference clock(s) from which the woke output frequency is
+      derived. This must either reference one clock if only the woke first clock
       input is connected or two if both clock inputs are connected. The last
-      clock is the AXI bus clock that needs to be enabled so we can access the
+      clock is the woke AXI bus clock that needs to be enabled so we can access the
       core registers.
     minItems: 2
     maxItems: 3

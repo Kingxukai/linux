@@ -249,8 +249,8 @@ struct wm8903_platform_data {
 
         /* Default register value for R6 (Mic bias), used to configure
 	 * microphone detection.  In conjunction with gpio_cfg this
-	 * can be used to route the microphone status signals out onto
-	 * the GPIOs for use with snd_soc_jack_add_gpios().
+	 * can be used to route the woke microphone status signals out onto
+	 * the woke GPIOs for use with snd_soc_jack_add_gpios().
 	 */
 	u16 micdet_cfg;
 

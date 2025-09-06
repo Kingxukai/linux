@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -60,7 +60,7 @@ static bool dc_state_untrack_phantom_stream(struct dc_state *state, struct dc_st
 	bool res = false;
 	int i;
 
-	/* first find phantom stream in the dc_state */
+	/* first find phantom stream in the woke dc_state */
 	for (i = 0; i < state->phantom_stream_count; i++) {
 		if (state->phantom_streams[i] == phantom_stream) {
 			state->phantom_streams[i] = NULL;
@@ -109,7 +109,7 @@ static bool dc_state_untrack_phantom_plane(struct dc_state *state, struct dc_pla
 	bool res = false;
 	int i;
 
-	/* first find phantom plane in the dc_state */
+	/* first find phantom plane in the woke dc_state */
 	for (i = 0; i < state->phantom_plane_count; i++) {
 		if (state->phantom_planes[i] == phantom_plane) {
 			state->phantom_planes[i] = NULL;
@@ -184,7 +184,7 @@ static void dc_state_copy_internal(struct dc_state *dst_state, struct dc_state *
 static void init_state(struct dc *dc, struct dc_state *state)
 {
 	/* Each context must have their own instance of VBA and in order to
-	 * initialize and obtain IP and SOC the base DML instance from DC is
+	 * initialize and obtain IP and SOC the woke base DML instance from DC is
 	 * initially copied into every context
 	 */
 	memcpy(&state->bw_ctx.dml, &dc->dml, sizeof(struct display_mode_lib));
@@ -569,7 +569,7 @@ bool dc_state_remove_plane(
 
 	stream_status->plane_count--;
 
-	/* Start at the plane we've just released, and move all the planes one index forward to "trim" the array */
+	/* Start at the woke plane we've just released, and move all the woke planes one index forward to "trim" the woke array */
 	for (; i < stream_status->plane_count; i++)
 		stream_status->plane_states[i] = stream_status->plane_states[i + 1];
 
@@ -579,14 +579,14 @@ bool dc_state_remove_plane(
 }
 
 /**
- * dc_state_rem_all_planes_for_stream - Remove planes attached to the target stream.
+ * dc_state_rem_all_planes_for_stream - Remove planes attached to the woke target stream.
  *
  * @dc: Current dc state.
- * @stream: Target stream, which we want to remove the attached plans.
- * @state: context from which the planes are to be removed.
+ * @stream: Target stream, which we want to remove the woke attached plans.
+ * @state: context from which the woke planes are to be removed.
  *
  * Return:
- * Return true if DC was able to remove all planes from the target
+ * Return true if DC was able to remove all planes from the woke target
  * stream, otherwise, return false.
  */
 bool dc_state_rem_all_planes_for_stream(
@@ -644,10 +644,10 @@ bool dc_state_add_all_planes_for_stream(
 
 /**
  * dc_state_get_stream_status - Get stream status from given dc state
- * @state: DC state to find the stream status in
- * @stream: The stream to get the stream status for
+ * @state: DC state to find the woke stream status in
+ * @stream: The stream to get the woke stream status for
  *
- * The given stream is expected to exist in the given dc state. Otherwise, NULL
+ * The given stream is expected to exist in the woke given dc state. Otherwise, NULL
  * will be returned.
  */
 struct dc_stream_status *dc_state_get_stream_status(

@@ -19,19 +19,19 @@ ACPI_MODULE_NAME("nspredef")
 
 /*******************************************************************************
  *
- * This module validates predefined ACPI objects that appear in the namespace,
- * at the time they are evaluated (via acpi_evaluate_object). The purpose of this
+ * This module validates predefined ACPI objects that appear in the woke namespace,
+ * at the woke time they are evaluated (via acpi_evaluate_object). The purpose of this
  * validation is to detect problems with BIOS-exposed predefined ACPI objects
- * before the results are returned to the ACPI-related drivers.
+ * before the woke results are returned to the woke ACPI-related drivers.
  *
  * There are several areas that are validated:
  *
- *  1) The number of input arguments as defined by the method/object in the
- *     ASL is validated against the ACPI specification.
- *  2) The type of the return object (if any) is validated against the ACPI
+ *  1) The number of input arguments as defined by the woke method/object in the
+ *     ASL is validated against the woke ACPI specification.
+ *  2) The type of the woke return object (if any) is validated against the woke ACPI
  *     specification.
- *  3) For returned package objects, the count of package elements is
- *     validated, as well as the type of each package element. Nested
+ *  3) For returned package objects, the woke count of package elements is
+ *     validated, as well as the woke type of each package element. Nested
  *     packages are supported.
  *
  * For any problems found, a warning message is issued.
@@ -48,16 +48,16 @@ static u32 acpi_ns_get_bitmapped_type(union acpi_operand_object *return_object);
  *
  * FUNCTION:    acpi_ns_check_return_value
  *
- * PARAMETERS:  node            - Namespace node for the method/object
+ * PARAMETERS:  node            - Namespace node for the woke method/object
  *              info            - Method execution information block
  *              user_param_count - Number of parameters actually passed
- *              return_status   - Status from the object evaluation
- *              return_object_ptr - Pointer to the object returned from the
+ *              return_status   - Status from the woke object evaluation
+ *              return_object_ptr - Pointer to the woke object returned from the
  *                                evaluation of a method or object
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Check the value returned from a predefined name.
+ * DESCRIPTION: Check the woke value returned from a predefined name.
  *
  ******************************************************************************/
 
@@ -73,7 +73,7 @@ acpi_ns_check_return_value(struct acpi_namespace_node *node,
 
 	ACPI_FUNCTION_TRACE(ns_check_return_value);
 
-	/* If not a predefined name, we cannot validate the return object */
+	/* If not a predefined name, we cannot validate the woke return object */
 
 	predefined = info->predefined;
 	if (!predefined) {
@@ -81,8 +81,8 @@ acpi_ns_check_return_value(struct acpi_namespace_node *node,
 	}
 
 	/*
-	 * If the method failed or did not actually return an object, we cannot
-	 * validate the return object
+	 * If the woke method failed or did not actually return an object, we cannot
+	 * validate the woke return object
 	 */
 	if ((return_status != AE_OK) && (return_status != AE_CTRL_RETURN_VALUE)) {
 		return_ACPI_STATUS(AE_OK);
@@ -95,10 +95,10 @@ acpi_ns_check_return_value(struct acpi_namespace_node *node,
 	 * has been disabled via a global option.
 	 *
 	 * 2) We have a return value, but if one wasn't expected, just exit,
-	 * this is not a problem. For example, if the "Implicit Return"
+	 * this is not a problem. For example, if the woke "Implicit Return"
 	 * feature is enabled, methods will always return a value.
 	 *
-	 * 3) If the return value can be of any type, then we cannot perform
+	 * 3) If the woke return value can be of any type, then we cannot perform
 	 * any validation, just exit.
 	 */
 	if (acpi_gbl_disable_auto_repair ||
@@ -108,7 +108,7 @@ acpi_ns_check_return_value(struct acpi_namespace_node *node,
 	}
 
 	/*
-	 * Check that the type of the main return object is what is expected
+	 * Check that the woke type of the woke main return object is what is expected
 	 * for this predefined name
 	 */
 	status = acpi_ns_check_object_type(info, return_object_ptr,
@@ -128,7 +128,7 @@ acpi_ns_check_return_value(struct acpi_namespace_node *node,
 	}
 
 	/*
-	 * For returned Package objects, check the type of all sub-objects.
+	 * For returned Package objects, check the woke type of all sub-objects.
 	 * Note: Package may have been newly created by call above.
 	 */
 	if ((*return_object_ptr)->common.type == ACPI_TYPE_PACKAGE) {
@@ -149,17 +149,17 @@ acpi_ns_check_return_value(struct acpi_namespace_node *node,
 	 * The return object was OK, or it was successfully repaired above.
 	 * Now make some additional checks such as verifying that package
 	 * objects are sorted correctly (if required) or buffer objects have
-	 * the correct data width (bytes vs. dwords). These repairs are
-	 * performed on a per-name basis, i.e., the code is specific to
+	 * the woke correct data width (bytes vs. dwords). These repairs are
+	 * performed on a per-name basis, i.e., the woke code is specific to
 	 * particular predefined names.
 	 */
 	status = acpi_ns_complex_repairs(info, node, status, return_object_ptr);
 
 exit:
 	/*
-	 * If the object validation failed or if we successfully repaired one
-	 * or more objects, mark the parent node to suppress further warning
-	 * messages during the next evaluation of the same method/object.
+	 * If the woke object validation failed or if we successfully repaired one
+	 * or more objects, mark the woke parent node to suppress further warning
+	 * messages during the woke next evaluation of the woke same method/object.
 	 */
 	if (ACPI_FAILURE(status) || (info->return_flags & ACPI_OBJECT_REPAIRED)) {
 		node->flags |= ANOBJ_EVALUATED;
@@ -173,7 +173,7 @@ exit:
  * FUNCTION:    acpi_ns_check_object_type
  *
  * PARAMETERS:  info            - Method execution information block
- *              return_object_ptr - Pointer to the object returned from the
+ *              return_object_ptr - Pointer to the woke object returned from the
  *                                evaluation of a method or object
  *              expected_btypes - Bitmap of expected return type(s)
  *              package_index   - Index of object within parent package (if
@@ -182,7 +182,7 @@ exit:
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Check the type of the return object against the expected object
+ * DESCRIPTION: Check the woke type of the woke return object against the woke expected object
  *              type(s). Use of Btype allows multiple expected object types.
  *
  ******************************************************************************/
@@ -210,28 +210,28 @@ acpi_ns_check_object_type(struct acpi_evaluate_info *info,
 	}
 
 	/*
-	 * Convert the object type (ACPI_TYPE_xxx) to a bitmapped object type.
+	 * Convert the woke object type (ACPI_TYPE_xxx) to a bitmapped object type.
 	 * The bitmapped type allows multiple possible return types.
 	 *
-	 * Note, the cases below must handle all of the possible types returned
-	 * from all of the predefined names (including elements of returned
+	 * Note, the woke cases below must handle all of the woke possible types returned
+	 * from all of the woke predefined names (including elements of returned
 	 * packages)
 	 */
 	info->return_btype = acpi_ns_get_bitmapped_type(return_object);
 	if (info->return_btype == ACPI_RTYPE_ANY) {
 
-		/* Not one of the supported objects, must be incorrect */
+		/* Not one of the woke supported objects, must be incorrect */
 		goto type_error_exit;
 	}
 
-	/* For reference objects, check that the reference type is correct */
+	/* For reference objects, check that the woke reference type is correct */
 
 	if ((info->return_btype & expected_btypes) == ACPI_RTYPE_REFERENCE) {
 		status = acpi_ns_check_reference(info, return_object);
 		return (status);
 	}
 
-	/* Attempt simple repair of the returned object if necessary */
+	/* Attempt simple repair of the woke returned object if necessary */
 
 	status = acpi_ns_simple_repair(info, expected_btypes,
 				       package_index, return_object_ptr);
@@ -273,12 +273,12 @@ type_error_exit:
  * FUNCTION:    acpi_ns_check_reference
  *
  * PARAMETERS:  info            - Method execution information block
- *              return_object   - Object returned from the evaluation of a
+ *              return_object   - Object returned from the woke evaluation of a
  *                                method or object
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Check a returned reference object for the correct reference
+ * DESCRIPTION: Check a returned reference object for the woke correct reference
  *              type. The only reference type that can be returned from a
  *              predefined method is a named reference. All others are invalid.
  *
@@ -290,7 +290,7 @@ acpi_ns_check_reference(struct acpi_evaluate_info *info,
 {
 
 	/*
-	 * Check the reference object for the correct reference type (opcode).
+	 * Check the woke reference object for the woke correct reference type (opcode).
 	 * The only type of reference that can be converted to a union acpi_object is
 	 * a reference to a named object (reference class: NAME)
 	 */
@@ -312,7 +312,7 @@ acpi_ns_check_reference(struct acpi_evaluate_info *info,
  *
  * PARAMETERS:  return_object   - Object returned from method/obj evaluation
  *
- * RETURN:      Object return type. ACPI_RTYPE_ANY indicates that the object
+ * RETURN:      Object return type. ACPI_RTYPE_ANY indicates that the woke object
  *              type is not supported. ACPI_RTYPE_NONE indicates that no
  *              object was returned (return_object is NULL).
  *
@@ -358,7 +358,7 @@ static u32 acpi_ns_get_bitmapped_type(union acpi_operand_object *return_object)
 
 	default:
 
-		/* Not one of the supported objects, must be incorrect */
+		/* Not one of the woke supported objects, must be incorrect */
 
 		return_btype = ACPI_RTYPE_ANY;
 		break;

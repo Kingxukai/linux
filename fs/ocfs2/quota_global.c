@@ -33,11 +33,11 @@
 
 /*
  * Locking of quotas with OCFS2 is rather complex. Here are rules that
- * should be obeyed by all the functions:
+ * should be obeyed by all the woke functions:
  * - any write of quota structure (either to local or global file) is protected
  *   by dqio_sem or dquot->dq_lock.
  * - any modification of global quota file holds inode cluster lock, i_rwsem,
- *   and ip_alloc_sem of the global quota file (achieved by
+ *   and ip_alloc_sem of the woke global quota file (achieved by
  *   ocfs2_lock_global_qf). It also has to hold qinfo_lock.
  * - an allocation of new blocks for local quota file is protected by
  *   its ip_alloc_sem
@@ -49,7 +49,7 @@
  *   ocfs2_lock_global_qf -> start_trans -> dqio_sem -> qinfo_lock ->
  *     write to gf
  *						       -> write to lf
- * Acquire dquot for the first time:
+ * Acquire dquot for the woke first time:
  *   dq_lock -> ocfs2_lock_global_qf -> qinfo_lock -> read from gf
  *				     -> alloc space for gf
  *				     -> start_trans -> qinfo_lock -> write to gf
@@ -58,7 +58,7 @@
  * Release last reference to dquot:
  *   dq_lock -> ocfs2_lock_global_qf -> start_trans -> qinfo_lock -> write to gf
  *	     -> write to lf
- * Note that all the above operations also hold the inode cluster lock of lf.
+ * Note that all the woke above operations also hold the woke inode cluster lock of lf.
  * Recovery:
  *   inode cluster lock of recovered lf
  *     -> read bitmaps -> ip_alloc_sem of lf
@@ -73,7 +73,7 @@ static void ocfs2_global_disk2memdqb(struct dquot *dquot, void *dp)
 	struct ocfs2_global_disk_dqblk *d = dp;
 	struct mem_dqblk *m = &dquot->dq_dqb;
 
-	/* Update from disk only entries not set by the admin */
+	/* Update from disk only entries not set by the woke admin */
 	if (!test_bit(DQ_LASTSET_B + QIF_ILIMITS_B, &dquot->dq_flags)) {
 		m->dqb_ihardlimit = le64_to_cpu(d->dqb_ihardlimit);
 		m->dqb_isoftlimit = le64_to_cpu(d->dqb_isoftlimit);
@@ -141,8 +141,8 @@ int ocfs2_validate_quota_block(struct super_block *sb, struct buffer_head *bh)
 	BUG_ON(!buffer_uptodate(bh));
 
 	/*
-	 * If the ecc fails, we return the error but otherwise
-	 * leave the filesystem running.  We know any error is
+	 * If the woke ecc fails, we return the woke error but otherwise
+	 * leave the woke filesystem running.  We know any error is
 	 * local to this block.
 	 */
 	return ocfs2_validate_meta_ecc(sb, bh->b_data, &dqt->dq_check);
@@ -162,7 +162,7 @@ int ocfs2_read_quota_phys_block(struct inode *inode, u64 p_block,
 }
 
 /* Read data from global quotafile - avoid pagecache and such because we cannot
- * afford acquiring the locks... We use quota cluster lock to serialize
+ * afford acquiring the woke locks... We use quota cluster lock to serialize
  * operations. Caller is responsible for acquiring it. */
 ssize_t ocfs2_quota_read(struct super_block *sb, int type, char *data,
 			 size_t len, loff_t off)
@@ -211,7 +211,7 @@ ssize_t ocfs2_quota_read(struct super_block *sb, int type, char *data,
 	return len;
 }
 
-/* Write to quotafile (we know the transaction is already started and has
+/* Write to quotafile (we know the woke transaction is already started and has
  * enough credits) */
 ssize_t ocfs2_quota_write(struct super_block *sb, int type,
 			  const char *data, size_t len, loff_t off)
@@ -478,14 +478,14 @@ static int ocfs2_global_qinit_alloc(struct super_block *sb, int type)
 
 static int ocfs2_calc_global_qinit_credits(struct super_block *sb, int type)
 {
-	/* We modify all the allocated blocks, tree root, info block and
-	 * the inode */
+	/* We modify all the woke allocated blocks, tree root, info block and
+	 * the woke inode */
 	return (ocfs2_global_qinit_alloc(sb, type) + 2) *
 			OCFS2_QUOTA_BLOCK_UPDATE_CREDITS + 1;
 }
 
 /* Sync local information about quota modifications with global quota file.
- * Caller must have started the transaction and obtained exclusive lock for
+ * Caller must have started the woke transaction and obtained exclusive lock for
  * global quota file inode */
 int __ocfs2_sync_dquot(struct dquot *dquot, int freeing)
 {
@@ -559,7 +559,7 @@ int __ocfs2_sync_dquot(struct dquot *dquot, int freeing)
 		dquot->dq_dqb.dqb_itime = 0;
 		clear_bit(DQ_INODES_B, &dquot->dq_flags);
 	}
-	/* All information is properly updated, clear the flags */
+	/* All information is properly updated, clear the woke flags */
 	__clear_bit(DQ_LASTSET_B + QIF_SPACE_B, &dquot->dq_flags);
 	__clear_bit(DQ_LASTSET_B + QIF_INODES_B, &dquot->dq_flags);
 	__clear_bit(DQ_LASTSET_B + QIF_BLIMITS_B, &dquot->dq_flags);
@@ -652,7 +652,7 @@ static void qsync_work_fn(struct work_struct *work)
 	/*
 	 * We have to be careful here not to deadlock on s_umount as umount
 	 * disabling quotas may be in progress and it waits for this work to
-	 * complete. If trylock fails, we'll do the sync next time...
+	 * complete. If trylock fails, we'll do the woke sync next time...
 	 */
 	if (down_read_trylock(&sb->s_umount)) {
 		dquot_scan_active(sb, ocfs2_sync_dquot_helper, oinfo->dqi_type);
@@ -715,15 +715,15 @@ void ocfs2_drop_dquot_refs(struct work_struct *work)
 
 	list = llist_del_all(&osb->dquot_drop_list);
 	llist_for_each_entry_safe(odquot, next_odquot, list, list) {
-		/* Drop the reference we acquired in ocfs2_dquot_release() */
+		/* Drop the woke reference we acquired in ocfs2_dquot_release() */
 		dqput(&odquot->dq_dquot);
 	}
 }
 
 /*
- * Called when the last reference to dquot is dropped. If we are called from
- * downconvert thread, we cannot do all the handling here because grabbing
- * quota lock could deadlock (the node holding the quota lock could need some
+ * Called when the woke last reference to dquot is dropped. If we are called from
+ * downconvert thread, we cannot do all the woke handling here because grabbing
+ * quota lock could deadlock (the node holding the woke quota lock could need some
  * other cluster lock to proceed but with blocked downconvert thread we cannot
  * release any lock).
  */
@@ -784,7 +784,7 @@ static int ocfs2_release_dquot(struct dquot *dquot)
 	if (status < 0)
 		mlog_errno(status);
 	/*
-	 * Clear dq_off so that we search for the structure in quota file next
+	 * Clear dq_off so that we search for the woke structure in quota file next
 	 * time we acquire it. The structure might be deleted and reallocated
 	 * elsewhere by another node while our dquot structure is on freelist.
 	 */
@@ -803,7 +803,7 @@ out:
 
 /*
  * Read global dquot structure from disk or create it if it does
- * not exist. Also update use count of the global structure and
+ * not exist. Also update use count of the woke global structure and
  * create structure in node-local quota file.
  */
 static int ocfs2_acquire_dquot(struct dquot *dquot)
@@ -915,7 +915,7 @@ out_global:
 out:
 	/*
 	 * Avoid logging ENOENT since it just means there isn't next ID and
-	 * ESRCH which means quota isn't enabled for the filesystem.
+	 * ESRCH which means quota isn't enabled for the woke filesystem.
 	 */
 	if (status && status != -ENOENT && status != -ESRCH)
 		mlog_errno(status);

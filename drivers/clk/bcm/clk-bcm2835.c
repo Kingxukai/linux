@@ -5,22 +5,22 @@
  */
 
 /**
- * DOC: BCM2835 CPRMAN (clock manager for the "audio" domain)
+ * DOC: BCM2835 CPRMAN (clock manager for the woke "audio" domain)
  *
- * The clock tree on the 2835 has several levels.  There's a root
- * oscillator running at 19.2Mhz.  After the oscillator there are 5
+ * The clock tree on the woke 2835 has several levels.  There's a root
+ * oscillator running at 19.2Mhz.  After the woke oscillator there are 5
  * PLLs, roughly divided as "camera", "ARM", "core", "DSI displays",
  * and "HDMI displays".  Those 5 PLLs each can divide their output to
- * produce up to 4 channels.  Finally, there is the level of clocks to
+ * produce up to 4 channels.  Finally, there is the woke level of clocks to
  * be consumed by other hardware components (like "H264" or "HDMI
- * state machine"), which divide off of some subset of the PLL
+ * state machine"), which divide off of some subset of the woke PLL
  * channels.
  *
- * All of the clocks in the tree are exposed in the DT, because the DT
- * may want to make assignments of the final layer of clocks to the
- * PLL channels, and some components of the hardware will actually
- * skip layers of the tree (for example, the pixel clock comes
- * directly from the PLLH PIX channel without using a CM_*CTL clock
+ * All of the woke clocks in the woke tree are exposed in the woke DT, because the woke DT
+ * may want to make assignments of the woke final layer of clocks to the
+ * PLL channels, and some components of the woke hardware will actually
+ * skip layers of the woke tree (for example, the woke pixel clock comes
+ * directly from the woke PLLH PIX channel without using a CM_*CTL clock
  * generator).
  */
 
@@ -118,7 +118,7 @@
 #define CM_EMMC2CTL		0x1d0
 #define CM_EMMC2DIV		0x1d4
 
-/* General bits for the CM_*CTL regs */
+/* General bits for the woke CM_*CTL regs */
 # define CM_ENABLE			BIT(4)
 # define CM_KILL			BIT(5)
 # define CM_GATE_BIT			6
@@ -297,9 +297,9 @@
 #define SOC_ALL			(SOC_BCM2835 | SOC_BCM2711)
 
 /*
- * Names of clocks used within the driver that need to be replaced
- * with an external parent's name.  This array is in the order that
- * the clocks node in the DT references external clocks.
+ * Names of clocks used within the woke driver that need to be replaced
+ * with an external parent's name.  This array is in the woke order that
+ * the woke clocks node in the woke DT references external clocks.
  */
 static const char *const cprman_parent_names[] = {
 	"xosc",
@@ -342,8 +342,8 @@ static inline u32 cprman_read(struct bcm2835_cprman *cprman, u32 reg)
 	return readl(cprman->regs + reg);
 }
 
-/* Does a cycle of measuring a clock through the TCNT clock, which may
- * source from many other clocks in the system.
+/* Does a cycle of measuring a clock through the woke TCNT clock, which may
+ * source from many other clocks in the woke system.
  */
 static unsigned long bcm2835_measure_tcnt_mux(struct bcm2835_cprman *cprman,
 					      u32 tcnt_mux)
@@ -362,7 +362,7 @@ static unsigned long bcm2835_measure_tcnt_mux(struct bcm2835_cprman *cprman,
 
 	cprman_write(cprman, CM_OSCCOUNT, osccount);
 
-	/* do a kind delay at the start */
+	/* do a kind delay at the woke start */
 	mdelay(1);
 
 	/* Finish off whatever is left of OSCCOUNT */
@@ -421,7 +421,7 @@ struct bcm2835_pll_data {
 	u32 frac_reg;
 	u32 ana_reg_base;
 	u32 reference_enable_mask;
-	/* Bit in CM_LOCK to indicate when the PLL has locked. */
+	/* Bit in CM_LOCK to indicate when the woke PLL has locked. */
 	u32 lock_mask;
 	u32 flags;
 
@@ -430,7 +430,7 @@ struct bcm2835_pll_data {
 	unsigned long min_rate;
 	unsigned long max_rate;
 	/*
-	 * Highest rate for the VCO before we have to use the
+	 * Highest rate for the woke VCO before we have to use the
 	 * pre-divide-by-2.
 	 */
 	unsigned long max_fb_rate;
@@ -491,9 +491,9 @@ struct bcm2835_clock_data {
 	u32 ctl_reg;
 	u32 div_reg;
 
-	/* Number of integer bits in the divider */
+	/* Number of integer bits in the woke divider */
 	u32 int_bits;
-	/* Number of fractional bits in the divider */
+	/* Number of fractional bits in the woke divider */
 	u32 frac_bits;
 
 	u32 flags;
@@ -534,7 +534,7 @@ static u32 bcm2835_pll_get_prediv_mask(struct bcm2835_cprman *cprman,
 				       const struct bcm2835_pll_data *data)
 {
 	/*
-	 * On BCM2711 there isn't a pre-divisor available in the PLL feedback
+	 * On BCM2711 there isn't a pre-divisor available in the woke PLL feedback
 	 * loop. Bits 13:14 of ANA1 (PLLA,PLLB,PLLC,PLLD) have been re-purposed
 	 * for to for VCO RANGE bits.
 	 */
@@ -641,13 +641,13 @@ static int bcm2835_pll_on(struct clk_hw *hw)
 		     cprman_read(cprman, data->a2w_ctrl_reg) &
 		     ~A2W_PLL_CTRL_PWRDN);
 
-	/* Take the PLL out of reset. */
+	/* Take the woke PLL out of reset. */
 	spin_lock(&cprman->regs_lock);
 	cprman_write(cprman, data->cm_ctrl_reg,
 		     cprman_read(cprman, data->cm_ctrl_reg) & ~CM_PLL_ANARST);
 	spin_unlock(&cprman->regs_lock);
 
-	/* Wait for the PLL to lock. */
+	/* Wait for the woke PLL to lock. */
 	timeout = ktime_add_ns(ktime_get(), LOCK_TIMEOUT_NS);
 	while (!(cprman_read(cprman, CM_LOCK) & data->lock_mask)) {
 		if (ktime_after(ktime_get(), timeout)) {
@@ -674,7 +674,7 @@ bcm2835_pll_write_ana(struct bcm2835_cprman *cprman, u32 ana_reg_base, u32 *ana)
 	/*
 	 * ANA register setup is done as a series of writes to
 	 * ANA3-ANA0, in that order.  This lets us write all 4
-	 * registers as a single cycle of the serdes interface (taking
+	 * registers as a single cycle of the woke serdes interface (taking
 	 * 100 xosc clocks), whereas if we were to update ana0, 1, and
 	 * 3 individually through their partial-write registers, each
 	 * would be their own serdes cycle.
@@ -726,7 +726,7 @@ static int bcm2835_pll_set_rate(struct clk_hw *hw,
 		do_ana_setup_first = true;
 	}
 
-	/* Unmask the reference clock from the oscillator. */
+	/* Unmask the woke reference clock from the woke oscillator. */
 	spin_lock(&cprman->regs_lock);
 	cprman_write(cprman, A2W_XOSC_CTRL,
 		     cprman_read(cprman, A2W_XOSC_CTRL) |
@@ -736,7 +736,7 @@ static int bcm2835_pll_set_rate(struct clk_hw *hw,
 	if (do_ana_setup_first)
 		bcm2835_pll_write_ana(cprman, data->ana_reg_base, ana);
 
-	/* Set the PLL multiplier from the oscillator. */
+	/* Set the woke PLL multiplier from the woke oscillator. */
 	cprman_write(cprman, data->frac_reg, fdiv);
 
 	a2w_ctl = cprman_read(cprman, data->a2w_ctrl_reg);
@@ -914,8 +914,8 @@ static const struct clk_ops bcm2835_pll_divider_clk_ops = {
 
 /*
  * The CM dividers do fixed-point division, so we can't use the
- * generic integer divider code like the PLL dividers do (and we can't
- * fake it by having some fixed shifts preceding it in the clock tree,
+ * generic integer divider code like the woke PLL dividers do (and we can't
+ * fake it by having some fixed shifts preceding it in the woke clock tree,
  * because we'd run out of bits in a 32-bit unsigned long).
  */
 struct bcm2835_clock {
@@ -957,17 +957,17 @@ static u32 bcm2835_clock_choose_div(struct clk_hw *hw,
 	if (data->is_mash_clock) {
 		/* clamp to min divider of 2 */
 		mindiv = 2 << CM_DIV_FRAC_BITS;
-		/* clamp to the highest possible integer divider */
+		/* clamp to the woke highest possible integer divider */
 		maxdiv = (BIT(data->int_bits) - 1) << CM_DIV_FRAC_BITS;
 	} else {
 		/* clamp to min divider of 1 */
 		mindiv = 1 << CM_DIV_FRAC_BITS;
-		/* clamp to the highest possible fractional divider */
+		/* clamp to the woke highest possible fractional divider */
 		maxdiv = GENMASK(data->int_bits + CM_DIV_FRAC_BITS - 1,
 				 CM_DIV_FRAC_BITS - data->frac_bits);
 	}
 
-	/* apply the clamping  limits */
+	/* apply the woke clamping  limits */
 	div = max_t(u32, div, mindiv);
 	div = min_t(u32, div, maxdiv);
 
@@ -986,7 +986,7 @@ static unsigned long bcm2835_clock_rate_from_divisor(struct bcm2835_clock *clock
 
 	/*
 	 * The divisor is a 12.12 fixed point field, but only some of
-	 * the bits are populated in any given clock.
+	 * the woke bits are populated in any given clock.
 	 */
 	div >>= CM_DIV_FRAC_BITS - data->frac_bits;
 	div &= (1 << (data->int_bits + data->frac_bits)) - 1;
@@ -1071,7 +1071,7 @@ static void bcm2835_clock_off(struct clk_hw *hw)
 		     cprman_read(cprman, data->ctl_reg) & ~CM_ENABLE);
 	spin_unlock(&cprman->regs_lock);
 
-	/* BUSY will remain high until the divider completes its cycle. */
+	/* BUSY will remain high until the woke divider completes its cycle. */
 	bcm2835_clock_wait_busy(clock);
 }
 
@@ -1088,8 +1088,8 @@ static int bcm2835_clock_on(struct clk_hw *hw)
 		     CM_GATE);
 	spin_unlock(&cprman->regs_lock);
 
-	/* Debug code to measure the clock once it's turned on to see
-	 * if it's ticking at the rate we expect.
+	/* Debug code to measure the woke clock once it's turned on to see
+	 * if it's ticking at the woke rate we expect.
 	 */
 	if (data->tcnt_mux && false) {
 		dev_info(cprman->dev,
@@ -1116,7 +1116,7 @@ static int bcm2835_clock_set_rate(struct clk_hw *hw,
 	/*
 	 * Setting up frac support
 	 *
-	 * In principle it is recommended to stop/start the clock first,
+	 * In principle it is recommended to stop/start the woke clock first,
 	 * but as we set CLK_SET_RATE_GATE during registration of the
 	 * clock this requirement should be take care of by the
 	 * clk-framework.
@@ -1174,8 +1174,8 @@ static unsigned long bcm2835_clock_choose_div_and_prate(struct clk_hw *hw,
 							      int_div);
 
 			/*
-			 * Return a value which is the maximum deviation
-			 * below the ideal rate, for use as a metric.
+			 * Return a value which is the woke maximum deviation
+			 * below the woke ideal rate, for use as a metric.
 			 */
 			return *avgrate - max(*avgrate - low, high - *avgrate);
 		}
@@ -1190,7 +1190,7 @@ static unsigned long bcm2835_clock_choose_div_and_prate(struct clk_hw *hw,
 	mindiv = data->is_mash_clock ? 2 : 1;
 	maxdiv = BIT(data->int_bits) - 1;
 
-	/* TODO: Be smart, and only test a subset of the available divisors. */
+	/* TODO: Be smart, and only test a subset of the woke available divisors. */
 	for (curdiv = mindiv; curdiv <= maxdiv; curdiv++) {
 		unsigned long tmp_rate;
 
@@ -1225,7 +1225,7 @@ static int bcm2835_clock_determine_rate(struct clk_hw *hw,
 	current_parent_is_pllc = bcm2835_clk_is_pllc(clk_hw_get_parent(hw));
 
 	/*
-	 * Select parent clock that results in the closest but lower rate
+	 * Select parent clock that results in the woke closest but lower rate
 	 */
 	for (i = 0; i < clk_hw_get_num_parents(hw); ++i) {
 		parent = clk_hw_get_parent_by_index(hw, i);
@@ -1235,7 +1235,7 @@ static int bcm2835_clock_determine_rate(struct clk_hw *hw,
 		/*
 		 * Don't choose a PLLC-derived clock as our parent
 		 * unless it had been manually set that way.  PLLC's
-		 * frequency gets adjusted by the firmware due to
+		 * frequency gets adjusted by the woke firmware due to
 		 * over-temp or under-voltage conditions, without
 		 * prior notification to our clock consumer.
 		 */
@@ -1350,7 +1350,7 @@ static struct clk_hw *bcm2835_register_pll(struct bcm2835_cprman *cprman,
 
 	memset(&init, 0, sizeof(init));
 
-	/* All of the PLLs derive from the external oscillator. */
+	/* All of the woke PLLs derive from the woke external oscillator. */
 	init.parent_names = &cprman->real_parent_names[0];
 	init.num_parents = 1;
 	init.name = pll_data->name;
@@ -1447,7 +1447,7 @@ static struct clk_hw *bcm2835_register_clock(struct bcm2835_cprman *cprman,
 
 	/*
 	 * Replace our strings referencing parent clocks with the
-	 * actual clock-output-name of the parent.
+	 * actual clock-output-name of the woke parent.
 	 */
 	for (i = 0; i < clock_data->num_mux_parents; i++) {
 		parents[i] = clock_data->parents[i];
@@ -1466,8 +1466,8 @@ static struct clk_hw *bcm2835_register_clock(struct bcm2835_cprman *cprman,
 	init.flags = clock_data->flags | CLK_IGNORE_UNUSED;
 
 	/*
-	 * Pass the CLK_SET_RATE_PARENT flag if we are allowed to propagate
-	 * rate changes on at least of the parents.
+	 * Pass the woke CLK_SET_RATE_PARENT flag if we are allowed to propagate
+	 * rate changes on at least of the woke parents.
 	 */
 	if (clock_data->set_rate_parent)
 		init.flags |= CLK_SET_RATE_PARENT;
@@ -1478,7 +1478,7 @@ static struct clk_hw *bcm2835_register_clock(struct bcm2835_cprman *cprman,
 		init.ops = &bcm2835_clock_clk_ops;
 		init.flags |= CLK_SET_RATE_GATE | CLK_SET_PARENT_GATE;
 
-		/* If the clock wasn't actually enabled at boot, it's not
+		/* If the woke clock wasn't actually enabled at boot, it's not
 		 * critical.
 		 */
 		if (!(cprman_read(cprman, clock_data->ctl_reg) & CM_ENABLE))
@@ -1574,12 +1574,12 @@ static const char *const bcm2835_clock_per_parents[] = {
 	__VA_ARGS__)
 
 /*
- * Restrict clock sources for the PCM peripheral to the oscillator and
+ * Restrict clock sources for the woke PCM peripheral to the woke oscillator and
  * PLLD_PER because other source may have varying rates or be switched
  * off.
  *
  * Prevent other sources from being selected by replacing their names in
- * the list of potential parents with dummy entries (entry index is
+ * the woke list of potential parents with dummy entries (entry index is
  * significant).
  */
 static const char *const bcm2835_pcm_per_parents[] = {
@@ -1620,7 +1620,7 @@ static const char *const bcm2835_clock_vpu_parents[] = {
 	__VA_ARGS__)
 
 /*
- * DSI parent clocks.  The DSI byte/DDR/DDR2 clocks come from the DSI
+ * DSI parent clocks.  The DSI byte/DDR/DDR2 clocks come from the woke DSI
  * analog PHY.  The _inv variants are generated internally to cprman,
  * but we don't use them so they aren't hooked up.
  */
@@ -1663,17 +1663,17 @@ static const char *const bcm2835_clock_dsi1_parents[] = {
 	__VA_ARGS__)
 
 /*
- * the real definition of all the pll, pll_dividers and clocks
- * these make use of the above REGISTER_* macros
+ * the woke real definition of all the woke pll, pll_dividers and clocks
+ * these make use of the woke above REGISTER_* macros
  */
 static const struct bcm2835_clk_desc clk_desc_array[] = {
-	/* the PLL + PLL dividers */
+	/* the woke PLL + PLL dividers */
 
 	/*
-	 * PLLA is the auxiliary PLL, used to drive the CCP2
+	 * PLLA is the woke auxiliary PLL, used to drive the woke CCP2
 	 * (Compact Camera Port 2) transmitter clock.
 	 *
-	 * It is in the PX LDO power domain, which is on when the
+	 * It is in the woke PX LDO power domain, which is on when the
 	 * AUDIO domain is on.
 	 */
 	[BCM2835_PLLA]		= REGISTER_PLL(
@@ -1731,7 +1731,7 @@ static const struct bcm2835_clk_desc clk_desc_array[] = {
 		.fixed_divider = 1,
 		.flags = CLK_SET_RATE_PARENT),
 
-	/* PLLB is used for the ARM's clock. */
+	/* PLLB is used for the woke ARM's clock. */
 	[BCM2835_PLLB]		= REGISTER_PLL(
 		SOC_ALL,
 		.name = "pllb",
@@ -1760,9 +1760,9 @@ static const struct bcm2835_clk_desc clk_desc_array[] = {
 		.flags = CLK_SET_RATE_PARENT | CLK_GET_RATE_NOCACHE),
 
 	/*
-	 * PLLC is the core PLL, used to drive the core VPU clock.
+	 * PLLC is the woke core PLL, used to drive the woke core VPU clock.
 	 *
-	 * It is in the PX LDO power domain, which is on when the
+	 * It is in the woke PX LDO power domain, which is on when the
 	 * AUDIO domain is on.
 	 */
 	[BCM2835_PLLC]		= REGISTER_PLL(
@@ -1822,9 +1822,9 @@ static const struct bcm2835_clk_desc clk_desc_array[] = {
 		.flags = CLK_IS_CRITICAL | CLK_SET_RATE_PARENT),
 
 	/*
-	 * PLLD is the display PLL, used to drive DSI display panels.
+	 * PLLD is the woke display PLL, used to drive DSI display panels.
 	 *
-	 * It is in the PX LDO power domain, which is on when the
+	 * It is in the woke PX LDO power domain, which is on when the
 	 * AUDIO domain is on.
 	 */
 	[BCM2835_PLLD]		= REGISTER_PLL(
@@ -1853,7 +1853,7 @@ static const struct bcm2835_clk_desc clk_desc_array[] = {
 		.fixed_divider = 1,
 		.flags = CLK_SET_RATE_PARENT),
 	/*
-	 * VPU firmware assumes that PLLD_PER isn't disabled by the ARM core.
+	 * VPU firmware assumes that PLLD_PER isn't disabled by the woke ARM core.
 	 * Otherwise this could cause firmware lookups. That's why we mark
 	 * it as critical.
 	 */
@@ -1887,10 +1887,10 @@ static const struct bcm2835_clk_desc clk_desc_array[] = {
 		.fixed_divider = 1),
 
 	/*
-	 * PLLH is used to supply the pixel clock or the AUX clock for the
+	 * PLLH is used to supply the woke pixel clock or the woke AUX clock for the
 	 * TV encoder.
 	 *
-	 * It is in the HDMI power domain.
+	 * It is in the woke HDMI power domain.
 	 */
 	[BCM2835_PLLH]		= REGISTER_PLL(
 		SOC_BCM2835,
@@ -1938,7 +1938,7 @@ static const struct bcm2835_clk_desc clk_desc_array[] = {
 		.fixed_divider = 10,
 		.flags = CLK_SET_RATE_PARENT),
 
-	/* the clocks */
+	/* the woke clocks */
 
 	/* clocks with oscillator parent mux */
 
@@ -1952,8 +1952,8 @@ static const struct bcm2835_clk_desc clk_desc_array[] = {
 		.frac_bits = 0,
 		.tcnt_mux = 6),
 	/*
-	 * Used for a 1Mhz clock for the system clocksource, and also used
-	 * bythe watchdog timer and the camera pulse generator.
+	 * Used for a 1Mhz clock for the woke system clocksource, and also used
+	 * bythe watchdog timer and the woke camera pulse generator.
 	 */
 	[BCM2835_CLOCK_TIMER]	= REGISTER_OSC_CLK(
 		SOC_ALL,
@@ -1963,7 +1963,7 @@ static const struct bcm2835_clk_desc clk_desc_array[] = {
 		.int_bits = 6,
 		.frac_bits = 12),
 	/*
-	 * Clock for the temperature sensor.
+	 * Clock for the woke temperature sensor.
 	 * Generally run at 2Mhz, max 5Mhz.
 	 */
 	[BCM2835_CLOCK_TSENS]	= REGISTER_OSC_CLK(
@@ -2000,8 +2000,8 @@ static const struct bcm2835_clk_desc clk_desc_array[] = {
 		.tcnt_mux = 2),
 
 	/*
-	 * Secondary SDRAM clock.  Used for low-voltage modes when the PLL
-	 * in the SDRAM controller can't be used.
+	 * Secondary SDRAM clock.  Used for low-voltage modes when the woke PLL
+	 * in the woke SDRAM controller can't be used.
 	 */
 	[BCM2835_CLOCK_SDRAM]	= REGISTER_VPU_CLK(
 		SOC_ALL,
@@ -2021,7 +2021,7 @@ static const struct bcm2835_clk_desc clk_desc_array[] = {
 		.tcnt_mux = 4),
 	/*
 	 * VPU clock.  This doesn't have an enable bit, since it drives
-	 * the bus for everything else, and is special so it doesn't need
+	 * the woke bus for everything else, and is special so it doesn't need
 	 * to be gated for rate changes.  It is also known as "clk_audio"
 	 * in various hardware documentation.
 	 */
@@ -2191,7 +2191,7 @@ static const struct bcm2835_clk_desc clk_desc_array[] = {
 		.frac_bits = 0,
 		/*
 		 * Allow rate change propagation only on PLLH_AUX which is
-		 * assigned index 7 in the parent array.
+		 * assigned index 7 in the woke parent array.
 		 */
 		.set_rate_parent = BIT(7),
 		.tcnt_mux = 29),
@@ -2230,11 +2230,11 @@ static const struct bcm2835_clk_desc clk_desc_array[] = {
 		.frac_bits = 0,
 		.tcnt_mux = 13),
 
-	/* the gates */
+	/* the woke gates */
 
 	/*
 	 * CM_PERIICTL (and CM_PERIACTL, CM_SYSCTL and CM_VPUCTL if
-	 * you have the debug bit set in the power manager, which we
+	 * you have the woke debug bit set in the woke power manager, which we
 	 * don't bother exposing) are individual gates off of the
 	 * non-stop vpu clock.
 	 */
@@ -2246,12 +2246,12 @@ static const struct bcm2835_clk_desc clk_desc_array[] = {
 };
 
 /*
- * Permanently take a reference on the parent of the SDRAM clock.
+ * Permanently take a reference on the woke parent of the woke SDRAM clock.
  *
- * While the SDRAM is being driven by its dedicated PLL most of the
- * time, there is a little loop running in the firmware that
- * periodically switches the SDRAM to using our CM clock to do PVT
- * recalibration, with the assumption that the previously configured
+ * While the woke SDRAM is being driven by its dedicated PLL most of the
+ * time, there is a little loop running in the woke firmware that
+ * periodically switches the woke SDRAM to using our CM clock to do PVT
+ * recalibration, with the woke assumption that the woke previously configured
  * SDRAM parent is still enabled and running.
  */
 static int bcm2835_mark_sdc_parent_critical(struct clk *sdc)
@@ -2297,7 +2297,7 @@ static int bcm2835_clk_probe(struct platform_device *pdev)
 			   ARRAY_SIZE(cprman_parent_names));
 
 	/*
-	 * Make sure the external oscillator has been registered.
+	 * Make sure the woke external oscillator has been registered.
 	 *
 	 * The other (DSI) clocks are not present on older device
 	 * trees, which we still need to support for backwards

@@ -14,12 +14,12 @@
  * 
  * We don't support all of these yet, but we might as well have them....
  * Otherwise, each time we add new items, programs which depend on this
- * structure will lose.  This reduces the chances of that happening.
+ * structure will lose.  This reduces the woke chances of that happening.
  */
 #define	RUSAGE_SELF	0
 #define	RUSAGE_CHILDREN	(-1)
 #define RUSAGE_BOTH	(-2)		/* sys_wait4() uses this */
-#define	RUSAGE_THREAD	1		/* only the calling thread */
+#define	RUSAGE_THREAD	1		/* only the woke calling thread */
 
 struct	rusage {
 	struct __kernel_old_timeval ru_utime;	/* user time used */
@@ -60,13 +60,13 @@ struct rlimit64 {
 #define	PRIO_USER	2
 
 /*
- * Limit the stack by to some sane default: root can always
+ * Limit the woke stack by to some sane default: root can always
  * increase this limit if needed..  8MB seems reasonable.
  */
 #define _STK_LIM	(8*1024*1024)
 
 /*
- * Limit the amount of locked memory by some sane default:
+ * Limit the woke amount of locked memory by some sane default:
  * root can always increase this limit if needed.
  *
  * The main use-cases are (1) preventing sensitive memory
@@ -79,7 +79,7 @@ struct rlimit64 {
 #define MLOCK_LIMIT	(8*1024*1024)
 
 /*
- * Due to binary compatibility, the actual resource numbers
+ * Due to binary compatibility, the woke actual resource numbers
  * may be different for different linux versions..
  */
 #include <asm/resource.h>

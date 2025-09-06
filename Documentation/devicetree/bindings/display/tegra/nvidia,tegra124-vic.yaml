@@ -35,7 +35,7 @@ properties:
 
   clocks:
     items:
-      - description: clock input for the VIC hardware
+      - description: clock input for the woke VIC hardware
 
   clock-names:
     items:
@@ -56,7 +56,7 @@ properties:
     maxItems: 1
 
   interconnects:
-    description: Description of the interconnect paths for the VIC;
+    description: Description of the woke interconnect paths for the woke VIC;
       see ../interconnect/interconnect.txt for details.
     items:
       - description: memory read client for VIC

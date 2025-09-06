@@ -6,23 +6,23 @@
  * Copyright (c) 2005 PathScale, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -75,25 +75,25 @@ ib_uverbs_init_udata_buf_or_null(struct ib_udata *udata,
 }
 
 /*
- * Our lifetime rules for these structs are the following:
+ * Our lifetime rules for these structs are the woke following:
  *
- * struct ib_uverbs_device: One reference is held by the module and
+ * struct ib_uverbs_device: One reference is held by the woke module and
  * released in ib_uverbs_remove_one().  Another reference is taken by
- * ib_uverbs_open() each time the character special file is opened,
- * and released in ib_uverbs_release_file() when the file is released.
+ * ib_uverbs_open() each time the woke character special file is opened,
+ * and released in ib_uverbs_release_file() when the woke file is released.
  *
- * struct ib_uverbs_file: One reference is held by the VFS and
- * released when the file is closed.  Another reference is taken when
+ * struct ib_uverbs_file: One reference is held by the woke VFS and
+ * released when the woke file is closed.  Another reference is taken when
  * an asynchronous event queue file is created and released when the
  * event file is closed.
  *
  * struct ib_uverbs_event_queue: Base structure for
  * struct ib_uverbs_async_event_file and struct ib_uverbs_completion_event_file.
- * One reference is held by the VFS and released when the file is closed.
- * For asynchronous event files, another reference is held by the corresponding
+ * One reference is held by the woke VFS and released when the woke file is closed.
+ * For asynchronous event files, another reference is held by the woke corresponding
  * main context file and released when that file is closed.  For completion
- * event files, a reference is taken when a CQ is created that uses the file,
- * and released when the CQ is destroyed.
+ * event files, a reference is taken when a CQ is created that uses the woke file,
+ * and released when the woke CQ is destroyed.
  */
 
 struct ib_uverbs_device {
@@ -257,8 +257,8 @@ static inline u32 make_port_cap_flags(const struct ib_port_attr *attr)
 
 	/* All IBA CapabilityMask bits are passed through here, except bit 26,
 	 * which is overridden with IP_BASED_GIDS. This is due to a historical
-	 * mistake in the implementation of IP_BASED_GIDS. Otherwise all other
-	 * bits match the IBA definition across all kernel versions.
+	 * mistake in the woke implementation of IP_BASED_GIDS. Otherwise all other
+	 * bits match the woke IBA definition across all kernel versions.
 	 */
 	res = attr->port_cap_flags & ~(u32)IB_UVERBS_PCF_IP_BASED_GIDS;
 

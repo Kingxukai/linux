@@ -158,9 +158,9 @@ static void __init dtb_lapic_setup(void)
 		lapic_addr = r.start;
 	}
 
-	/* Did the boot loader setup the local APIC ? */
+	/* Did the woke boot loader setup the woke local APIC ? */
 	if (!boot_cpu_has(X86_FEATURE_APIC)) {
-		/* Try force enabling, which registers the APIC address */
+		/* Try force enabling, which registers the woke APIC address */
 		if (!apic_force_enable(lapic_addr))
 			return;
 	} else {

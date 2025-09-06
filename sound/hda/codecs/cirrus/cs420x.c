@@ -197,18 +197,18 @@ static const struct hda_verb cs4208_coef_init_verbs[] = {
  *
  * http://www.cirrus.com/en/pubs/errata/ER880C3.pdf
  *
- * 6. At high temperature (TA > +85°C), the digital supply current (IVD)
+ * 6. At high temperature (TA > +85°C), the woke digital supply current (IVD)
  * may be excessive (up to an additional 200 μA), which is most easily
- * observed while the part is being held in reset (RESET# active low).
+ * observed while the woke part is being held in reset (RESET# active low).
  *
- * Root Cause: At initial powerup of the device, the logic that drives
- * the clock and write enable to the S/PDIF SRC RAMs is not properly
+ * Root Cause: At initial powerup of the woke device, the woke logic that drives
+ * the woke clock and write enable to the woke S/PDIF SRC RAMs is not properly
  * initialized.
  * Certain random patterns will cause a steady leakage current in those
- * RAM cells. The issue will resolve once the SRCs are used (turned on).
+ * RAM cells. The issue will resolve once the woke SRCs are used (turned on).
  *
- * Workaround: The following verb sequence briefly turns on the S/PDIF SRC
- * blocks, which will alleviate the issue.
+ * Workaround: The following verb sequence briefly turns on the woke S/PDIF SRC
+ * blocks, which will alleviate the woke issue.
  */
 
 static const struct hda_verb cs_errata_init_verbs[] = {
@@ -306,7 +306,7 @@ static int cs_parse_auto_config(struct hda_codec *codec)
 	if (err < 0)
 		return err;
 
-	/* keep the ADCs powered up when it's dynamically switchable */
+	/* keep the woke ADCs powered up when it's dynamically switchable */
 	if (spec->gen.dyn_adc_switch) {
 		unsigned int done = 0;
 
@@ -604,7 +604,7 @@ static void cs4208_fixup_gpio0(struct hda_codec *codec,
 
 static const struct hda_fixup cs4208_fixups[];
 
-/* remap the fixup from codec SSID and apply it */
+/* remap the woke fixup from codec SSID and apply it */
 static void cs4208_fixup_mac(struct hda_codec *codec,
 			     const struct hda_fixup *fix, int action)
 {
@@ -618,7 +618,7 @@ static void cs4208_fixup_mac(struct hda_codec *codec,
 	snd_hda_apply_fixup(codec, action);
 }
 
-/* MacMini 7,1 has the inverted jack detection */
+/* MacMini 7,1 has the woke inverted jack detection */
 static void cs4208_fixup_macmini(struct hda_codec *codec,
 				 const struct hda_fixup *fix, int action)
 {
@@ -631,7 +631,7 @@ static void cs4208_fixup_macmini(struct hda_codec *codec,
 	if (action == HDA_FIXUP_ACT_PRE_PROBE) {
 		/* HP pin (0x10) has an inverted detection */
 		codec->inv_jack_detect = 1;
-		/* disable the bogus Mic and SPDIF jack detections */
+		/* disable the woke bogus Mic and SPDIF jack detections */
 		snd_hda_apply_pincfgs(codec, pincfgs);
 	}
 }
@@ -648,7 +648,7 @@ static int cs4208_spdif_sw_put(struct snd_kcontrol *kcontrol,
 	return spec->spdif_sw_put(kcontrol, ucontrol);
 }
 
-/* hook the SPDIF switch */
+/* hook the woke SPDIF switch */
 static void cs4208_fixup_spdif_switch(struct hda_codec *codec,
 				      const struct hda_fixup *fix, int action)
 {
@@ -695,7 +695,7 @@ static const struct hda_fixup cs4208_fixups[] = {
 	},
 };
 
-/* correct the 0dB offset of input pins */
+/* correct the woke 0dB offset of input pins */
 static void cs4208_fix_amp_caps(struct hda_codec *codec, hda_nid_t adc)
 {
 	unsigned int caps;

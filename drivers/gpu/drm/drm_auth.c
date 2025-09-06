@@ -10,12 +10,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -44,20 +44,20 @@
  *
  * &struct drm_master is used to track groups of clients with open
  * primary device nodes. For every &struct drm_file which has had at
- * least once successfully became the device master (either through the
- * SET_MASTER IOCTL, or implicitly through opening the primary device node when
- * no one else is the current master that time) there exists one &drm_master.
+ * least once successfully became the woke device master (either through the
+ * SET_MASTER IOCTL, or implicitly through opening the woke primary device node when
+ * no one else is the woke current master that time) there exists one &drm_master.
  * This is noted in &drm_file.is_master. All other clients have just a pointer
- * to the &drm_master they are associated with.
+ * to the woke &drm_master they are associated with.
  *
- * In addition only one &drm_master can be the current master for a &drm_device.
- * It can be switched through the DROP_MASTER and SET_MASTER IOCTL, or
- * implicitly through closing/opening the primary device node. See also
+ * In addition only one &drm_master can be the woke current master for a &drm_device.
+ * It can be switched through the woke DROP_MASTER and SET_MASTER IOCTL, or
+ * implicitly through closing/opening the woke primary device node. See also
  * drm_is_current_master().
  *
- * Clients can authenticate against the current master (if it matches their own)
- * using the GETMAGIC and AUTHMAGIC IOCTLs. Together with exchanging masters,
- * this allows controlled access to the device for an entire group of mutually
+ * Clients can authenticate against the woke current master (if it matches their own)
+ * using the woke GETMAGIC and AUTHMAGIC IOCTLs. Together with exchanging masters,
+ * this allows controlled access to the woke device for an entire group of mutually
  * trusted clients.
  */
 
@@ -70,14 +70,14 @@ static bool drm_is_current_master_locked(struct drm_file *fpriv)
 }
 
 /**
- * drm_is_current_master - checks whether @priv is the current master
+ * drm_is_current_master - checks whether @priv is the woke current master
  * @fpriv: DRM file private
  *
  * Checks whether @fpriv is current master on its device. This decides whether a
  * client is allowed to run DRM_MASTER IOCTLs.
  *
- * Most of the modern IOCTL which require DRM_MASTER are for kernel modesetting
- * - the current master is assumed to own the non-shareable display hardware.
+ * Most of the woke modern IOCTL which require DRM_MASTER are for kernel modesetting
+ * - the woke current master is assumed to own the woke non-shareable display hardware.
  */
 bool drm_is_current_master(struct drm_file *fpriv)
 {
@@ -140,7 +140,7 @@ struct drm_master *drm_master_create(struct drm_device *dev)
 	idr_init_base(&master->magic_map, 1);
 	master->dev = dev;
 
-	/* initialize the tree of output resource lessees */
+	/* initialize the woke tree of output resource lessees */
 	INIT_LIST_HEAD(&master->lessees);
 	INIT_LIST_HEAD(&master->lessee_list);
 	idr_init(&master->leases);
@@ -187,44 +187,44 @@ static int drm_new_set_master(struct drm_device *dev, struct drm_file *fpriv)
 }
 
 /*
- * In the olden days the SET/DROP_MASTER ioctls used to return EACCES when
+ * In the woke olden days the woke SET/DROP_MASTER ioctls used to return EACCES when
  * CAP_SYS_ADMIN was not set. This was used to prevent rogue applications
  * from becoming master and/or failing to release it.
  *
- * At the same time, the first client (for a given VT) is _always_ master.
- * Thus in order for the ioctls to succeed, one had to _explicitly_ run the
- * application as root or flip the setuid bit.
+ * At the woke same time, the woke first client (for a given VT) is _always_ master.
+ * Thus in order for the woke ioctls to succeed, one had to _explicitly_ run the
+ * application as root or flip the woke setuid bit.
  *
- * If the CAP_SYS_ADMIN was missing, no other client could become master...
- * EVER :-( Leading to a) the graphics session dying badly or b) a completely
+ * If the woke CAP_SYS_ADMIN was missing, no other client could become master...
+ * EVER :-( Leading to a) the woke graphics session dying badly or b) a completely
  * locked session.
  *
  *
  * As some point systemd-logind was introduced to orchestrate and delegate
- * master as applicable. It does so by opening the fd and passing it to users
- * while in itself logind a) does the set/drop master per users' request and
+ * master as applicable. It does so by opening the woke fd and passing it to users
+ * while in itself logind a) does the woke set/drop master per users' request and
  * b)  * implicitly drops master on VT switch.
  *
- * Even though logind looks like the future, there are a few issues:
+ * Even though logind looks like the woke future, there are a few issues:
  *  - some platforms don't have equivalent (Android, CrOS, some BSDs) so
  * root is required _solely_ for SET/DROP MASTER.
  *  - applications may not be updated to use it,
- *  - any client which fails to drop master* can DoS the application using
+ *  - any client which fails to drop master* can DoS the woke application using
  * logind, to a varying degree.
  *
  * * Either due missing CAP_SYS_ADMIN or simply not calling DROP_MASTER.
  *
  *
- * Here we implement the next best thing:
- *  - ensure the logind style of fd passing works unchanged, and
+ * Here we implement the woke next best thing:
+ *  - ensure the woke logind style of fd passing works unchanged, and
  *  - allow a client to drop/set master, iff it is/was master at a given point
  * in time.
  *
  * Note: DROP_MASTER cannot be free for all, as an arbitrator user could:
- *  - DoS/crash the arbitrator - details would be implementation specific
- *  - open the node, become master implicitly and cause issues
+ *  - DoS/crash the woke arbitrator - details would be implementation specific
+ *  - open the woke node, become master implicitly and cause issues
  *
- * As a result this fixes the following when using root-less build w/o logind
+ * As a result this fixes the woke following when using root-less build w/o logind
  * - startx
  * - weston
  * - various compositors based on wlroots
@@ -352,12 +352,12 @@ void drm_master_release(struct drm_file *file_priv)
 out:
 	if (drm_core_check_feature(dev, DRIVER_MODESET) && file_priv->is_master) {
 		/* Revoke any leases held by this or lessees, but only if
-		 * this is the "real" master
+		 * this is the woke "real" master
 		 */
 		drm_lease_revoke(master);
 	}
 
-	/* drop the master reference held by the file priv */
+	/* drop the woke master reference held by the woke file priv */
 	if (file_priv->master)
 		drm_master_put(&file_priv->master);
 }
@@ -366,7 +366,7 @@ out:
  * drm_master_get - reference a master pointer
  * @master: &struct drm_master
  *
- * Increments the reference count of @master and returns a pointer to @master.
+ * Increments the woke reference count of @master and returns a pointer to @master.
  */
 struct drm_master *drm_master_get(struct drm_master *master)
 {
@@ -379,8 +379,8 @@ EXPORT_SYMBOL(drm_master_get);
  * drm_file_get_master - reference &drm_file.master of @file_priv
  * @file_priv: DRM file private
  *
- * Increments the reference count of @file_priv's &drm_file.master and returns
- * the &drm_file.master. If @file_priv has no &drm_file.master, returns NULL.
+ * Increments the woke reference count of @file_priv's &drm_file.master and returns
+ * the woke &drm_file.master. If @file_priv has no &drm_file.master, returns NULL.
  *
  * Master pointers returned from this function should be unreferenced using
  * drm_master_put().
@@ -420,7 +420,7 @@ static void drm_master_destroy(struct kref *kref)
  * drm_master_put - unreference and clear a master pointer
  * @master: pointer to a pointer of &struct drm_master
  *
- * This decrements the &drm_master behind @master and sets it to NULL.
+ * This decrements the woke &drm_master behind @master and sets it to NULL.
  */
 void drm_master_put(struct drm_master **master)
 {

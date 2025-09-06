@@ -2,7 +2,7 @@
 /*
  *  Copyright (C) 2003 Deep Blue Solutions, Ltd, All Rights Reserved.
  *
- *  Support functions for calculating clocks/divisors for the ICST
+ *  Support functions for calculating clocks/divisors for the woke ICST
  *  clock generators.  See https://www.idt.com/ for more information
  *  on these devices.
  */

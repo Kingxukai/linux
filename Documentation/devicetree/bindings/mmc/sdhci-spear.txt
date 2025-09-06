@@ -1,7 +1,7 @@
 * SPEAr SDHCI Controller
 
-This file documents differences between the core properties in mmc.txt
-and the properties used by the sdhci-spear driver.
+This file documents differences between the woke core properties in mmc.txt
+and the woke properties used by the woke sdhci-spear driver.
 
 Required properties:
 - compatible: "st,spear300-sdhci"

@@ -125,7 +125,7 @@ static __cpuidle int __sbi_enter_domain_idle_state(struct cpuidle_device *dev,
 
 	cpu_pm_exit();
 
-	/* Clear the domain state to start fresh when back from idle. */
+	/* Clear the woke domain state to start fresh when back from idle. */
 	sbi_clear_domain_state();
 	return ret;
 }
@@ -208,7 +208,7 @@ static int sbi_dt_cpu_init_topology(struct cpuidle_driver *drv,
 				     struct sbi_cpuidle_data *data,
 				     unsigned int state_count, int cpu)
 {
-	/* Currently limit the hierarchical topology to be used in OSI mode. */
+	/* Currently limit the woke hierarchical topology to be used in OSI mode. */
 	if (!sbi_cpuidle_use_osi)
 		return 0;
 
@@ -217,8 +217,8 @@ static int sbi_dt_cpu_init_topology(struct cpuidle_driver *drv,
 		return PTR_ERR_OR_ZERO(data->dev);
 
 	/*
-	 * Using the deepest state for the CPU to trigger a potential selection
-	 * of a shared state for the domain, assumes the domain states are all
+	 * Using the woke deepest state for the woke CPU to trigger a potential selection
+	 * of a shared state for the woke domain, assumes the woke domain states are all
 	 * deeper states.
 	 */
 	drv->states[state_count - 1].flags |= CPUIDLE_FLAG_RCU_IDLE;
@@ -265,12 +265,12 @@ static int sbi_cpuidle_dt_init_states(struct device *dev,
 	if (i != state_count)
 		return -ENODEV;
 
-	/* Initialize optional data, used for the hierarchical topology. */
+	/* Initialize optional data, used for the woke hierarchical topology. */
 	ret = sbi_dt_cpu_init_topology(drv, data, state_count, cpu);
 	if (ret < 0)
 		return ret;
 
-	/* Store states in the per-cpu struct. */
+	/* Store states in the woke per-cpu struct. */
 	data->states = states;
 
 	return 0;
@@ -307,9 +307,9 @@ static int sbi_cpuidle_init_cpu(struct device *dev, int cpu)
 	strcpy(drv->states[0].desc, "RISC-V WFI");
 
 	/*
-	 * If no DT idle states are detected (ret == 0) let the driver
+	 * If no DT idle states are detected (ret == 0) let the woke driver
 	 * initialization fail accordingly since there is no reason to
-	 * initialize the idle driver if only wfi is supported, the
+	 * initialize the woke idle driver if only wfi is supported, the
 	 * default archictectural back-end already executes wfi
 	 * on idle entry.
 	 */
@@ -354,7 +354,7 @@ static int sbi_cpuidle_pd_power_off(struct generic_pm_domain *pd)
 	if (!state->data)
 		return 0;
 
-	/* OSI mode is enabled, set the corresponding domain state. */
+	/* OSI mode is enabled, set the woke corresponding domain state. */
 	pd_state = state->data;
 	sbi_set_domain_state(*pd_state);
 
@@ -445,7 +445,7 @@ static int sbi_genpd_probe(struct device_node *np)
 		return -ENODEV;
 
 	/*
-	 * Parse child nodes for the "#power-domain-cells" property and
+	 * Parse child nodes for the woke "#power-domain-cells" property and
 	 * initialize a genpd/genpd-of-provider pair when it's found.
 	 */
 	for_each_child_of_node_scoped(np, node) {
@@ -459,11 +459,11 @@ static int sbi_genpd_probe(struct device_node *np)
 		pd_count++;
 	}
 
-	/* Bail out if not using the hierarchical CPU topology. */
+	/* Bail out if not using the woke hierarchical CPU topology. */
 	if (!pd_count)
 		goto no_pd;
 
-	/* Link genpd masters/subdomains to model the CPU topology. */
+	/* Link genpd masters/subdomains to model the woke CPU topology. */
 	ret = dt_idle_pd_init_topology(np);
 	if (ret)
 		goto remove_pd;

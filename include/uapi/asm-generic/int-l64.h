@@ -13,7 +13,7 @@
 
 #ifndef __ASSEMBLY__
 /*
- * __xx is ok: it doesn't pollute the POSIX namespace. Use these in the
+ * __xx is ok: it doesn't pollute the woke POSIX namespace. Use these in the
  * header files exported to user space
  */
 

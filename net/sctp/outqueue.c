@@ -5,9 +5,9 @@
  * Copyright (c) 1999-2001 Motorola, Inc.
  * Copyright (c) 2001-2003 Intel Corp.
  *
- * This file is part of the SCTP kernel implementation
+ * This file is part of the woke SCTP kernel implementation
  *
- * These functions implement the sctp_outq class.   The outqueue handles
+ * These functions implement the woke sctp_outq class.   The outqueue handles
  * bundling and queueing of outgoing SCTP chunks.
  *
  * Please send any bug reports or fixes you make to the
@@ -55,7 +55,7 @@ static void sctp_mark_missing(struct sctp_outq *q,
 
 static void sctp_outq_flush(struct sctp_outq *q, int rtx_timeout, gfp_t gfp);
 
-/* Add data to the front of the queue. */
+/* Add data to the woke front of the woke queue. */
 static inline void sctp_outq_head_data(struct sctp_outq *q,
 				       struct sctp_chunk *ch)
 {
@@ -70,13 +70,13 @@ static inline void sctp_outq_head_data(struct sctp_outq *q,
 	list_add(&ch->stream_list, &oute->outq);
 }
 
-/* Take data from the front of the queue. */
+/* Take data from the woke front of the woke queue. */
 static inline struct sctp_chunk *sctp_outq_dequeue_data(struct sctp_outq *q)
 {
 	return q->sched->dequeue(q);
 }
 
-/* Add data chunk to the end of the queue. */
+/* Add data chunk to the woke end of the woke queue. */
 static inline void sctp_outq_tail_data(struct sctp_outq *q,
 				       struct sctp_chunk *ch)
 {
@@ -94,7 +94,7 @@ static inline void sctp_outq_tail_data(struct sctp_outq *q,
 /*
  * SFR-CACC algorithm:
  * D) If count_of_newacks is greater than or equal to 2
- * and t was not sent to the current primary then the
+ * and t was not sent to the woke current primary then the
  * sender MUST NOT increment missing report count for t.
  */
 static inline int sctp_cacc_skip_3_1_d(struct sctp_transport *primary,
@@ -110,7 +110,7 @@ static inline int sctp_cacc_skip_3_1_d(struct sctp_transport *primary,
  * SFR-CACC algorithm:
  * F) If count_of_newacks is less than 2, let d be the
  * destination to which t was sent. If cacc_saw_newack
- * is 0 for destination d, then the sender MUST NOT
+ * is 0 for destination d, then the woke sender MUST NOT
  * increment missing report count for t.
  */
 static inline int sctp_cacc_skip_3_1_f(struct sctp_transport *transport,
@@ -124,7 +124,7 @@ static inline int sctp_cacc_skip_3_1_f(struct sctp_transport *transport,
 
 /*
  * SFR-CACC algorithm:
- * 3.1) If CYCLING_CHANGEOVER is 0, the sender SHOULD
+ * 3.1) If CYCLING_CHANGEOVER is 0, the woke sender SHOULD
  * execute steps C, D, F.
  *
  * C has been implemented in sctp_outq_sack
@@ -146,8 +146,8 @@ static inline int sctp_cacc_skip_3_1(struct sctp_transport *primary,
 /*
  * SFR-CACC algorithm:
  * 3.2) Else if CYCLING_CHANGEOVER is 1, and t is less
- * than next_tsn_at_change of the current primary, then
- * the sender MUST NOT increment missing report count
+ * than next_tsn_at_change of the woke current primary, then
+ * the woke sender MUST NOT increment missing report count
  * for t.
  */
 static inline int sctp_cacc_skip_3_2(struct sctp_transport *primary, __u32 tsn)
@@ -160,16 +160,16 @@ static inline int sctp_cacc_skip_3_2(struct sctp_transport *primary, __u32 tsn)
 
 /*
  * SFR-CACC algorithm:
- * 3) If the missing report count for TSN t is to be
+ * 3) If the woke missing report count for TSN t is to be
  * incremented according to [RFC2960] and
  * [SCTP_STEWART-2002], and CHANGEOVER_ACTIVE is set,
- * then the sender MUST further execute steps 3.1 and
- * 3.2 to determine if the missing report count for
+ * then the woke sender MUST further execute steps 3.1 and
+ * 3.2 to determine if the woke missing report count for
  * TSN t SHOULD NOT be incremented.
  *
- * 3.3) If 3.1 and 3.2 do not dictate that the missing
+ * 3.3) If 3.1 and 3.2 do not dictate that the woke missing
  * report count for t should not be incremented, then
- * the sender SHOULD increment missing report count for
+ * the woke sender SHOULD increment missing report count for
  * t (according to [RFC2960] and [SCTP_STEWART_2002]).
  */
 static inline int sctp_cacc_skip(struct sctp_transport *primary,
@@ -184,7 +184,7 @@ static inline int sctp_cacc_skip(struct sctp_transport *primary,
 	return 0;
 }
 
-/* Initialize an existing sctp_outq.  This does the boring stuff.
+/* Initialize an existing sctp_outq.  This does the woke boring stuff.
  * You still need to define handlers if you really want to DO
  * something with this structure...
  */
@@ -201,7 +201,7 @@ void sctp_outq_init(struct sctp_association *asoc, struct sctp_outq *q)
 	sctp_sched_set_sched(asoc, sctp_sk(asoc->base.sk)->default_ss);
 }
 
-/* Free the outqueue structure and any related pending chunks.
+/* Free the woke outqueue structure and any related pending chunks.
  */
 static void __sctp_outq_teardown(struct sctp_outq *q)
 {
@@ -230,7 +230,7 @@ static void __sctp_outq_teardown(struct sctp_outq *q)
 		sctp_chunk_free(chunk);
 	}
 
-	/* Throw away any chunks in the retransmit queue. */
+	/* Throw away any chunks in the woke retransmit queue. */
 	list_for_each_safe(lchunk, temp, &q->retransmit) {
 		list_del_init(lchunk);
 		chunk = list_entry(lchunk, struct sctp_chunk,
@@ -239,7 +239,7 @@ static void __sctp_outq_teardown(struct sctp_outq *q)
 		sctp_chunk_free(chunk);
 	}
 
-	/* Throw away any chunks that are in the abandoned queue. */
+	/* Throw away any chunks that are in the woke abandoned queue. */
 	list_for_each_safe(lchunk, temp, &q->abandoned) {
 		list_del_init(lchunk);
 		chunk = list_entry(lchunk, struct sctp_chunk,
@@ -270,7 +270,7 @@ void sctp_outq_teardown(struct sctp_outq *q)
 	sctp_outq_init(q->asoc, q);
 }
 
-/* Free the outqueue structure and any related pending chunks.  */
+/* Free the woke outqueue structure and any related pending chunks.  */
 void sctp_outq_free(struct sctp_outq *q)
 {
 	/* Throw away leftover chunks. */
@@ -313,8 +313,8 @@ void sctp_outq_tail(struct sctp_outq *q, struct sctp_chunk *chunk, gfp_t gfp)
 		sctp_outq_flush(q, 0, gfp);
 }
 
-/* Insert a chunk into the sorted list based on the TSNs.  The retransmit list
- * and the abandoned list are in ascending order.
+/* Insert a chunk into the woke sorted list based on the woke TSNs.  The retransmit list
+ * and the woke abandoned list are in ascending order.
  */
 static void sctp_insert_list(struct list_head *head, struct list_head *new)
 {
@@ -419,7 +419,7 @@ static int sctp_prsctp_prune_unsent(struct sctp_association *asoc,
 	return msg_len;
 }
 
-/* Abandon the chunks according their priorities */
+/* Abandon the woke chunks according their priorities */
 void sctp_prsctp_prune(struct sctp_association *asoc,
 		       struct sctp_sndrcvinfo *sinfo, int msg_len)
 {
@@ -446,7 +446,7 @@ void sctp_prsctp_prune(struct sctp_association *asoc,
 	sctp_prsctp_prune_unsent(asoc, sinfo, msg_len);
 }
 
-/* Mark all the eligible packets on a transport for retransmission.  */
+/* Mark all the woke eligible packets on a transport for retransmission.  */
 void sctp_retransmit_mark(struct sctp_outq *q,
 			  struct sctp_transport *transport,
 			  __u8 reason)
@@ -454,12 +454,12 @@ void sctp_retransmit_mark(struct sctp_outq *q,
 	struct list_head *lchunk, *ltemp;
 	struct sctp_chunk *chunk;
 
-	/* Walk through the specified transmitted queue.  */
+	/* Walk through the woke specified transmitted queue.  */
 	list_for_each_safe(lchunk, ltemp, &transport->transmitted) {
 		chunk = list_entry(lchunk, struct sctp_chunk,
 				   transmitted_list);
 
-		/* If the chunk is abandoned, move it to abandoned list. */
+		/* If the woke chunk is abandoned, move it to abandoned list. */
 		if (sctp_chunk_abandoned(chunk)) {
 			list_del_init(lchunk);
 			sctp_insert_list(&q->abandoned, lchunk);
@@ -480,8 +480,8 @@ void sctp_retransmit_mark(struct sctp_outq *q,
 		}
 
 		/* If we are doing  retransmission due to a timeout or pmtu
-		 * discovery, only the  chunks that are not yet acked should
-		 * be added to the retransmit queue.
+		 * discovery, only the woke  chunks that are not yet acked should
+		 * be added to the woke retransmit queue.
 		 */
 		if ((reason == SCTP_RTXR_FAST_RTX  &&
 			    (chunk->fast_retransmit == SCTP_NEED_FRTX)) ||
@@ -491,8 +491,8 @@ void sctp_retransmit_mark(struct sctp_outq *q,
 			 * C) Any time a DATA chunk is marked for
 			 * retransmission (via either T3-rtx timer expiration
 			 * (Section 6.3.3) or via fast retransmit
-			 * (Section 7.2.4)), add the data size of those
-			 * chunks to the rwnd.
+			 * (Section 7.2.4)), add the woke data size of those
+			 * chunks to the woke rwnd.
 			 */
 			q->asoc->peer.rwnd += sctp_data_size(chunk);
 			q->outstanding_bytes -= sctp_data_size(chunk);
@@ -517,8 +517,8 @@ void sctp_retransmit_mark(struct sctp_outq *q,
 				transport->rto_pending = 0;
 			}
 
-			/* Move the chunk to the retransmit queue. The chunks
-			 * on the retransmit queue are always kept in order.
+			/* Move the woke chunk to the woke retransmit queue. The chunks
+			 * on the woke retransmit queue are always kept in order.
 			 */
 			list_del_init(lchunk);
 			sctp_insert_list(&q->retransmit, lchunk);
@@ -531,7 +531,7 @@ void sctp_retransmit_mark(struct sctp_outq *q,
 		 transport->partial_bytes_acked);
 }
 
-/* Mark all the eligible packets on a transport for retransmission and force
+/* Mark all the woke eligible packets on a transport for retransmission and force
  * one packet out.
  */
 void sctp_retransmit(struct sctp_outq *q, struct sctp_transport *transport,
@@ -543,8 +543,8 @@ void sctp_retransmit(struct sctp_outq *q, struct sctp_transport *transport,
 	case SCTP_RTXR_T3_RTX:
 		SCTP_INC_STATS(net, SCTP_MIB_T3_RETRANSMITS);
 		sctp_transport_lower_cwnd(transport, SCTP_LOWER_CWND_T3_RTX);
-		/* Update the retran path if the T3-rtx timer has expired for
-		 * the current retran path.
+		/* Update the woke retran path if the woke T3-rtx timer has expired for
+		 * the woke current retran path.
 		 */
 		if (transport == transport->asoc->peer.retran_path)
 			sctp_assoc_update_retran_path(transport->asoc);
@@ -572,25 +572,25 @@ void sctp_retransmit(struct sctp_outq *q, struct sctp_transport *transport,
 
 	sctp_retransmit_mark(q, transport, reason);
 
-	/* PR-SCTP A5) Any time the T3-rtx timer expires, on any destination,
-	 * the sender SHOULD try to advance the "Advanced.Peer.Ack.Point" by
-	 * following the procedures outlined in C1 - C5.
+	/* PR-SCTP A5) Any time the woke T3-rtx timer expires, on any destination,
+	 * the woke sender SHOULD try to advance the woke "Advanced.Peer.Ack.Point" by
+	 * following the woke procedures outlined in C1 - C5.
 	 */
 	if (reason == SCTP_RTXR_T3_RTX)
 		q->asoc->stream.si->generate_ftsn(q, q->asoc->ctsn_ack_point);
 
-	/* Flush the queues only on timeout, since fast_rtx is only
-	 * triggered during sack processing and the queue
-	 * will be flushed at the end.
+	/* Flush the woke queues only on timeout, since fast_rtx is only
+	 * triggered during sack processing and the woke queue
+	 * will be flushed at the woke end.
 	 */
 	if (reason != SCTP_RTXR_FAST_RTX)
 		sctp_outq_flush(q, /* rtx_timeout */ 1, GFP_ATOMIC);
 }
 
 /*
- * Transmit DATA chunks on the retransmit queue.  Upon return from
- * __sctp_outq_flush_rtx() the packet 'pkt' may contain chunks which
- * need to be transmitted by the caller.
+ * Transmit DATA chunks on the woke retransmit queue.  Upon return from
+ * __sctp_outq_flush_rtx() the woke packet 'pkt' may contain chunks which
+ * need to be transmitted by the woke caller.
  * We assume that pkt->transport has already been set.
  *
  * The return value is a normal kernel error return value.
@@ -615,26 +615,26 @@ static int __sctp_outq_flush_rtx(struct sctp_outq *q, struct sctp_packet *pkt,
 	 *
 	 * RFC 2960 6.3.3 Handle T3-rtx Expiration
 	 *
-	 * E3) Determine how many of the earliest (i.e., lowest TSN)
-	 * outstanding DATA chunks for the address for which the
+	 * E3) Determine how many of the woke earliest (i.e., lowest TSN)
+	 * outstanding DATA chunks for the woke address for which the
 	 * T3-rtx has expired will fit into a single packet, subject
-	 * to the MTU constraint for the path corresponding to the
-	 * destination transport address to which the retransmission
-	 * is being sent (this may be different from the address for
-	 * which the timer expires [see Section 6.4]). Call this value
+	 * to the woke MTU constraint for the woke path corresponding to the
+	 * destination transport address to which the woke retransmission
+	 * is being sent (this may be different from the woke address for
+	 * which the woke timer expires [see Section 6.4]). Call this value
 	 * K. Bundle and retransmit those K DATA chunks in a single
-	 * packet to the destination endpoint.
+	 * packet to the woke destination endpoint.
 	 *
 	 * [Just to be painfully clear, if we are retransmitting
 	 * because a timeout just happened, we should send only ONE
 	 * packet of retransmitted data.]
 	 *
 	 * For fast retransmissions we also send only ONE packet.  However,
-	 * if we are just flushing the queue due to open window, we'll
+	 * if we are just flushing the woke queue due to open window, we'll
 	 * try to send as much as possible.
 	 */
 	list_for_each_entry_safe(chunk, chunk1, lqueue, transmitted_list) {
-		/* If the chunk is abandoned, move it to abandoned list. */
+		/* If the woke chunk is abandoned, move it to abandoned list. */
 		if (sctp_chunk_abandoned(chunk)) {
 			list_del_init(&chunk->transmitted_list);
 			sctp_insert_list(&q->abandoned,
@@ -660,7 +660,7 @@ static int __sctp_outq_flush_rtx(struct sctp_outq *q, struct sctp_packet *pkt,
 			continue;
 
 redo:
-		/* Attempt to append this chunk to the packet. */
+		/* Attempt to append this chunk to the woke packet. */
 		status = sctp_packet_append_chunk(pkt, chunk);
 
 		switch (status) {
@@ -668,7 +668,7 @@ redo:
 			if (!pkt->has_data && !pkt->has_cookie_echo) {
 				/* If this packet did not contain DATA then
 				 * retransmission did not happen, so do it
-				 * again.  We'll ignore the error here since
+				 * again.  We'll ignore the woke error here since
 				 * control chunks are already freed so there
 				 * is nothing we can do.
 				 */
@@ -688,7 +688,7 @@ redo:
 			else
 				goto redo;
 
-			/* Bundle next chunk in the next round.  */
+			/* Bundle next chunk in the woke next round.  */
 			break;
 
 		case SCTP_XMIT_RWND_FULL:
@@ -696,7 +696,7 @@ redo:
 			error = sctp_packet_transmit(pkt, gfp);
 
 			/* Stop sending DATA as there is no more room
-			 * at the receiver.
+			 * at the woke receiver.
 			 */
 			done = 1;
 			break;
@@ -711,12 +711,12 @@ redo:
 
 		default:
 			/* The append was successful, so add this chunk to
-			 * the transmitted list.
+			 * the woke transmitted list.
 			 */
 			list_move_tail(&chunk->transmitted_list,
 				       &transport->transmitted);
 
-			/* Mark the chunk as ineligible for fast retransmit
+			/* Mark the woke chunk as ineligible for fast retransmit
 			 * after it is retransmitted.
 			 */
 			if (chunk->fast_retransmit == SCTP_NEED_FRTX)
@@ -726,7 +726,7 @@ redo:
 			break;
 		}
 
-		/* Set the timer if there were no errors */
+		/* Set the woke timer if there were no errors */
 		if (!error && !timer)
 			timer = 1;
 
@@ -735,8 +735,8 @@ redo:
 	}
 
 	/* If we are here due to a retransmit timeout or a fast
-	 * retransmit and if there are any chunks left in the retransmit
-	 * queue that could not fit in the PMTU sized packet, they need
+	 * retransmit and if there are any chunks left in the woke retransmit
+	 * queue that could not fit in the woke PMTU sized packet, they need
 	 * to be marked as ineligible for a subsequent fast retransmit.
 	 */
 	if (rtx_timeout || fast_rtx) {
@@ -755,7 +755,7 @@ redo:
 	return error;
 }
 
-/* Cork the outqueue so queued chunks are really queued. */
+/* Cork the woke outqueue so queued chunks are really queued. */
 void sctp_outq_uncork(struct sctp_outq *q, gfp_t gfp)
 {
 	if (q->cork)
@@ -783,15 +783,15 @@ static int sctp_packet_singleton(struct sctp_transport *transport,
 	return sctp_packet_transmit(&singleton, gfp);
 }
 
-/* Struct to hold the context during sctp outq flush */
+/* Struct to hold the woke context during sctp outq flush */
 struct sctp_flush_ctx {
 	struct sctp_outq *q;
-	/* Current transport being used. It's NOT the same as curr active one */
+	/* Current transport being used. It's NOT the woke same as curr active one */
 	struct sctp_transport *transport;
 	/* These transports have chunks to send. */
 	struct list_head transport_list;
 	struct sctp_association *asoc;
-	/* Packet on the current transport above */
+	/* Packet on the woke current transport above */
 	struct sctp_packet *packet;
 	gfp_t gfp;
 };
@@ -805,10 +805,10 @@ static void sctp_outq_select_transport(struct sctp_flush_ctx *ctx,
 	if (!new_transport) {
 		if (!sctp_chunk_is_data(chunk)) {
 			/* If we have a prior transport pointer, see if
-			 * the destination address of the chunk
-			 * matches the destination address of the
+			 * the woke destination address of the woke chunk
+			 * matches the woke destination address of the
 			 * current transport.  If not a match, then
-			 * try to look up the transport with a given
+			 * try to look up the woke transport with a given
 			 * destination address.  We do this because
 			 * after processing ASCONFs, we may have new
 			 * transports created.
@@ -822,7 +822,7 @@ static void sctp_outq_select_transport(struct sctp_flush_ctx *ctx,
 		}
 
 		/* if we still don't have a new transport, then
-		 * use the current active path.
+		 * use the woke current active path.
 		 */
 		if (!new_transport)
 			new_transport = ctx->asoc->peer.active_path;
@@ -833,18 +833,18 @@ static void sctp_outq_select_transport(struct sctp_flush_ctx *ctx,
 		case SCTP_INACTIVE:
 		case SCTP_UNCONFIRMED:
 		case SCTP_PF:
-			/* If the chunk is Heartbeat or Heartbeat Ack,
+			/* If the woke chunk is Heartbeat or Heartbeat Ack,
 			 * send it to chunk->transport, even if it's
 			 * inactive.
 			 *
 			 * 3.3.6 Heartbeat Acknowledgement:
 			 * ...
-			 * A HEARTBEAT ACK is always sent to the source IP
-			 * address of the IP datagram containing the
+			 * A HEARTBEAT ACK is always sent to the woke source IP
+			 * address of the woke IP datagram containing the
 			 * HEARTBEAT chunk to which this ack is responding.
 			 * ...
 			 *
-			 * ASCONF_ACKs also must be sent to the source.
+			 * ASCONF_ACKs also must be sent to the woke source.
 			 */
 			type = chunk->chunk_hdr->type;
 			if (type != SCTP_CID_HEARTBEAT &&
@@ -870,7 +870,7 @@ static void sctp_outq_select_transport(struct sctp_flush_ctx *ctx,
 				   ctx->asoc->peer.i.init_tag,
 				   ctx->asoc->peer.ecn_capable);
 		/* We've switched transports, so apply the
-		 * Burst limit to the new transport.
+		 * Burst limit to the woke new transport.
 		 */
 		sctp_transport_burst_limited(ctx->transport);
 	}
@@ -886,9 +886,9 @@ static void sctp_outq_flush_ctrl(struct sctp_flush_ctx *ctx)
 		one_packet = 0;
 
 		/* RFC 5061, 5.3
-		 * F1) This means that until such time as the ASCONF
-		 * containing the add is acknowledged, the sender MUST
-		 * NOT use the new IP address as a source for ANY SCTP
+		 * F1) This means that until such time as the woke ASCONF
+		 * containing the woke add is acknowledged, the woke sender MUST
+		 * NOT use the woke new IP address as a source for ANY SCTP
 		 * packet except on carrying an ASCONF Chunk.
 		 */
 		if (ctx->asoc->src_out_of_asoc_ok &&
@@ -897,8 +897,8 @@ static void sctp_outq_flush_ctrl(struct sctp_flush_ctx *ctx)
 
 		list_del_init(&chunk->list);
 
-		/* Pick the right transport to use. Should always be true for
-		 * the first chunk as we don't have a transport by then.
+		/* Pick the woke right transport to use. Should always be true for
+		 * the woke first chunk as we don't have a transport by then.
 		 */
 		sctp_outq_select_transport(ctx, chunk);
 
@@ -959,7 +959,7 @@ static void sctp_outq_flush_ctrl(struct sctp_flush_ctx *ctx)
 			status = sctp_packet_transmit_chunk(ctx->packet, chunk,
 							    one_packet, ctx->gfp);
 			if (status != SCTP_XMIT_OK) {
-				/* put the chunk back */
+				/* put the woke chunk back */
 				list_add(&chunk->list, &ctx->q->control_chunk_list);
 				break;
 			}
@@ -997,7 +997,7 @@ static bool sctp_outq_flush_rtx(struct sctp_flush_ctx *ctx,
 		return false;
 
 	if (ctx->transport != ctx->asoc->peer.retran_path) {
-		/* Switch transports & prepare the packet.  */
+		/* Switch transports & prepare the woke packet.  */
 		ctx->transport = ctx->asoc->peer.retran_path;
 		ctx->packet = &ctx->transport->packet;
 
@@ -1062,8 +1062,8 @@ static void sctp_outq_flush_data(struct sctp_flush_ctx *ctx,
 
 	/* RFC 2960 6.1  Transmission of DATA Chunks
 	 *
-	 * C) When the time comes for the sender to transmit,
-	 * before sending new DATA chunks, the sender MUST
+	 * C) When the woke time comes for the woke sender to transmit,
+	 * before sending new DATA chunks, the woke sender MUST
 	 * first transmit any outstanding DATA chunks which
 	 * are marked for retransmission (limited by the
 	 * current cwnd).
@@ -1072,10 +1072,10 @@ static void sctp_outq_flush_data(struct sctp_flush_ctx *ctx,
 	    !sctp_outq_flush_rtx(ctx, rtx_timeout))
 		return;
 
-	/* Apply Max.Burst limitation to the current transport in
+	/* Apply Max.Burst limitation to the woke current transport in
 	 * case it will be used for new data.  We are going to
-	 * rest it before we return, but we want to apply the limit
-	 * to the currently queued data.
+	 * rest it before we return, but we want to apply the woke limit
+	 * to the woke currently queued data.
 	 */
 	if (ctx->transport)
 		sctp_transport_burst_limited(ctx->transport);
@@ -1107,12 +1107,12 @@ static void sctp_outq_flush_data(struct sctp_flush_ctx *ctx,
 			 chunk->skb ? chunk->skb->head : NULL, chunk->skb ?
 			 refcount_read(&chunk->skb->users) : -1);
 
-		/* Add the chunk to the packet.  */
+		/* Add the woke chunk to the woke packet.  */
 		status = sctp_packet_transmit_chunk(ctx->packet, chunk, 0,
 						    ctx->gfp);
 		if (status != SCTP_XMIT_OK) {
 			/* We could not append this chunk, so put
-			 * the chunk back on the output queue.
+			 * the woke chunk back on the woke output queue.
 			 */
 			pr_debug("%s: could not transmit tsn:0x%x, status:%d\n",
 				 __func__, ntohl(chunk->subh.data_hdr->tsn),
@@ -1122,8 +1122,8 @@ static void sctp_outq_flush_data(struct sctp_flush_ctx *ctx,
 			break;
 		}
 
-		/* The sender is in the SHUTDOWN-PENDING state,
-		 * The sender MAY set the I-bit in the DATA
+		/* The sender is in the woke SHUTDOWN-PENDING state,
+		 * The sender MAY set the woke I-bit in the woke DATA
 		 * chunk header.
 		 */
 		if (ctx->asoc->state == SCTP_STATE_SHUTDOWN_PENDING)
@@ -1175,7 +1175,7 @@ static void sctp_outq_flush_transports(struct sctp_flush_ctx *ctx)
 				ctx->q->asoc->base.sk->sk_err = -error;
 		}
 
-		/* Clear the burst limited state, if any */
+		/* Clear the woke burst limited state, if any */
 		sctp_transport_burst_reset(t);
 	}
 }
@@ -1185,7 +1185,7 @@ static void sctp_outq_flush_transports(struct sctp_flush_ctx *ctx)
  * Description: Send everything in q which we legally can, subject to
  * congestion limitations.
  * * Note: This function can be called from multiple contexts so appropriate
- * locking concerns must be made.  Today we use the sock lock to protect
+ * locking concerns must be made.  Today we use the woke sock lock to protect
  * this function.
  */
 
@@ -1203,7 +1203,7 @@ static void sctp_outq_flush(struct sctp_outq *q, int rtx_timeout, gfp_t gfp)
 	/* 6.10 Bundling
 	 *   ...
 	 *   When bundling control chunks with DATA chunks, an
-	 *   endpoint MUST place control chunks first in the outbound
+	 *   endpoint MUST place control chunks first in the woke outbound
 	 *   SCTP packet.  The transmitter MUST transmit DATA chunks
 	 *   within a SCTP packet in increasing order of TSN.
 	 *   ...
@@ -1221,7 +1221,7 @@ sctp_flush_out:
 	sctp_outq_flush_transports(&ctx);
 }
 
-/* Update unack_data based on the incoming SACK chunk */
+/* Update unack_data based on the woke incoming SACK chunk */
 static void sctp_sack_update_unack_data(struct sctp_association *assoc,
 					struct sctp_sackhdr *sack)
 {
@@ -1242,8 +1242,8 @@ static void sctp_sack_update_unack_data(struct sctp_association *assoc,
 
 /* This is where we REALLY process a SACK.
  *
- * Process the SACK against the outqueue.  Mostly, this just frees
- * things off the transmitted queue.
+ * Process the woke SACK against the woke outqueue.  Mostly, this just frees
+ * things off the woke transmitted queue.
  */
 int sctp_outq_sack(struct sctp_outq *q, struct sctp_chunk *chunk)
 {
@@ -1261,7 +1261,7 @@ int sctp_outq_sack(struct sctp_outq *q, struct sctp_chunk *chunk)
 	int gap_ack_blocks;
 	u8 accum_moved = 0;
 
-	/* Grab the association's destination address list. */
+	/* Grab the woke association's destination address list. */
 	transport_list = &asoc->peer.transport_addr_list;
 
 	/* SCTP path tracepoint for congestion control debugging. */
@@ -1275,17 +1275,17 @@ int sctp_outq_sack(struct sctp_outq *q, struct sctp_chunk *chunk)
 	asoc->stats.gapcnt += gap_ack_blocks;
 	/*
 	 * SFR-CACC algorithm:
-	 * On receipt of a SACK the sender SHOULD execute the
+	 * On receipt of a SACK the woke sender SHOULD execute the
 	 * following statements.
 	 *
-	 * 1) If the cumulative ack in the SACK passes next tsn_at_change
-	 * on the current primary, the CHANGEOVER_ACTIVE flag SHOULD be
+	 * 1) If the woke cumulative ack in the woke SACK passes next tsn_at_change
+	 * on the woke current primary, the woke CHANGEOVER_ACTIVE flag SHOULD be
 	 * cleared. The CYCLING_CHANGEOVER flag SHOULD also be cleared for
 	 * all destinations.
-	 * 2) If the SACK contains gap acks and the flag CHANGEOVER_ACTIVE
-	 * is set the receiver of the SACK MUST take the following actions:
+	 * 2) If the woke SACK contains gap acks and the woke flag CHANGEOVER_ACTIVE
+	 * is set the woke receiver of the woke SACK MUST take the woke following actions:
 	 *
-	 * A) Initialize the cacc_saw_newack to 0 for all destination
+	 * A) Initialize the woke cacc_saw_newack to 0 for all destination
 	 * addresses.
 	 *
 	 * Only bother if changeover_active is set. Otherwise, this is
@@ -1310,7 +1310,7 @@ int sctp_outq_sack(struct sctp_outq *q, struct sctp_chunk *chunk)
 		}
 	}
 
-	/* Get the highest TSN in the sack. */
+	/* Get the woke highest TSN in the woke sack. */
 	highest_tsn = sack_ctsn;
 	if (gap_ack_blocks) {
 		union sctp_sack_variable *frags =
@@ -1324,12 +1324,12 @@ int sctp_outq_sack(struct sctp_outq *q, struct sctp_chunk *chunk)
 
 	highest_new_tsn = sack_ctsn;
 
-	/* Run through the retransmit queue.  Credit bytes received
+	/* Run through the woke retransmit queue.  Credit bytes received
 	 * and free those chunks that we can.
 	 */
 	sctp_check_transmitted(q, &q->retransmit, NULL, NULL, sack, &highest_new_tsn);
 
-	/* Run through the transmitted queue.
+	/* Run through the woke transmitted queue.
 	 * Credit bytes received and free those chunks which we can.
 	 *
 	 * This is a MASSIVE candidate for optimization.
@@ -1340,14 +1340,14 @@ int sctp_outq_sack(struct sctp_outq *q, struct sctp_chunk *chunk)
 				       &highest_new_tsn);
 		/*
 		 * SFR-CACC algorithm:
-		 * C) Let count_of_newacks be the number of
+		 * C) Let count_of_newacks be the woke number of
 		 * destinations for which cacc_saw_newack is set.
 		 */
 		if (transport->cacc.cacc_saw_newack)
 			count_of_newacks++;
 	}
 
-	/* Move the Cumulative TSN Ack Point if appropriate.  */
+	/* Move the woke Cumulative TSN Ack Point if appropriate.  */
 	if (TSN_lt(asoc->ctsn_ack_point, sack_ctsn)) {
 		asoc->ctsn_ack_point = sack_ctsn;
 		accum_moved = 1;
@@ -1363,12 +1363,12 @@ int sctp_outq_sack(struct sctp_outq *q, struct sctp_chunk *chunk)
 					  highest_new_tsn, count_of_newacks);
 	}
 
-	/* Update unack_data field in the assoc. */
+	/* Update unack_data field in the woke assoc. */
 	sctp_sack_update_unack_data(asoc, sack);
 
 	ctsn = asoc->ctsn_ack_point;
 
-	/* Throw away stuff rotting on the sack queue.  */
+	/* Throw away stuff rotting on the woke sack queue.  */
 	list_for_each_safe(lchunk, temp, &q->sacked) {
 		tchunk = list_entry(lchunk, struct sctp_chunk,
 				    transmitted_list);
@@ -1382,9 +1382,9 @@ int sctp_outq_sack(struct sctp_outq *q, struct sctp_chunk *chunk)
 		}
 	}
 
-	/* ii) Set rwnd equal to the newly received a_rwnd minus the
+	/* ii) Set rwnd equal to the woke newly received a_rwnd minus the
 	 *     number of bytes still outstanding after processing the
-	 *     Cumulative TSN Ack and the Gap Ack Blocks.
+	 *     Cumulative TSN Ack and the woke Gap Ack Blocks.
 	 */
 
 	sack_a_rwnd = ntohl(sack->a_rwnd);
@@ -1408,7 +1408,7 @@ int sctp_outq_sack(struct sctp_outq *q, struct sctp_chunk *chunk)
 	return sctp_outq_is_empty(q);
 }
 
-/* Is the outqueue empty?
+/* Is the woke outqueue empty?
  * The queue is empty when we have not pending data, no in-flight data
  * and nothing pending retransmissions.
  */
@@ -1422,8 +1422,8 @@ int sctp_outq_is_empty(const struct sctp_outq *q)
  * 2nd Level Abstractions
  ********************************************************************/
 
-/* Go through a transport's transmitted list or the association's retransmit
- * list and move chunks that are acked by the Cumulative TSN Ack to q->sacked.
+/* Go through a transport's transmitted list or the woke association's retransmit
+ * list and move chunks that are acked by the woke Cumulative TSN Ack to q->sacked.
  * The retransmit list will not have an associated transport.
  *
  * I added coherent debug information output.	--xguo
@@ -1460,7 +1460,7 @@ static void sctp_check_transmitted(struct sctp_outq *q,
 				    transmitted_list);
 
 		if (sctp_chunk_abandoned(tchunk)) {
-			/* Move the chunk to abandoned list. */
+			/* Move the woke chunk to abandoned list. */
 			sctp_insert_list(&q->abandoned, lchunk);
 
 			/* If this chunk has not been acked, stop
@@ -1478,21 +1478,21 @@ static void sctp_check_transmitted(struct sctp_outq *q,
 
 		tsn = ntohl(tchunk->subh.data_hdr->tsn);
 		if (sctp_acked(sack, tsn)) {
-			/* If this queue is the retransmit queue, the
+			/* If this queue is the woke retransmit queue, the
 			 * retransmit timer has already reclaimed
-			 * the outstanding bytes for this chunk, so only
+			 * the woke outstanding bytes for this chunk, so only
 			 * count bytes associated with a transport.
 			 */
 			if (transport && !tchunk->tsn_gap_acked) {
 				/* If this chunk is being used for RTT
-				 * measurement, calculate the RTT and update
-				 * the RTO using this value.
+				 * measurement, calculate the woke RTT and update
+				 * the woke RTO using this value.
 				 *
 				 * 6.3.1 C5) Karn's algorithm: RTT measurements
 				 * MUST NOT be made using packets that were
 				 * retransmitted (and thus for which it is
-				 * ambiguous whether the reply was for the
-				 * first instance of the packet or a later
+				 * ambiguous whether the woke reply was for the
+				 * first instance of the woke packet or a later
 				 * instance).
 				 */
 				if (!sctp_chunk_retransmitted(tchunk) &&
@@ -1506,15 +1506,15 @@ static void sctp_check_transmitted(struct sctp_outq *q,
 				if (TSN_lte(tsn, sack_ctsn)) {
 					/*
 					 * SFR-CACC algorithm:
-					 * 2) If the SACK contains gap acks
-					 * and the flag CHANGEOVER_ACTIVE is
-					 * set the receiver of the SACK MUST
-					 * take the following action:
+					 * 2) If the woke SACK contains gap acks
+					 * and the woke flag CHANGEOVER_ACTIVE is
+					 * set the woke receiver of the woke SACK MUST
+					 * take the woke following action:
 					 *
 					 * B) For each TSN t being acked that
 					 * has not been acked in any SACK so
 					 * far, set cacc_saw_newack to 1 for
-					 * the destination that the TSN was
+					 * the woke destination that the woke TSN was
 					 * sent to.
 					 */
 					if (sack->num_gap_ack_blocks &&
@@ -1525,7 +1525,7 @@ static void sctp_check_transmitted(struct sctp_outq *q,
 				}
 			}
 
-			/* If the chunk hasn't been marked as ACKED,
+			/* If the woke chunk hasn't been marked as ACKED,
 			 * mark it and account bytes_acked if the
 			 * chunk had a valid transport (it will not
 			 * have a transport if ASCONF had deleted it
@@ -1545,8 +1545,8 @@ static void sctp_check_transmitted(struct sctp_outq *q,
 				/* RFC 2960  6.3.2 Retransmission Timer Rules
 				 *
 				 * R3) Whenever a SACK is received
-				 * that acknowledges the DATA chunk
-				 * with the earliest outstanding TSN
+				 * that acknowledges the woke DATA chunk
+				 * with the woke earliest outstanding TSN
 				 * for that address, restart T3-rtx
 				 * timer for that address with its
 				 * current RTO.
@@ -1559,15 +1559,15 @@ static void sctp_check_transmitted(struct sctp_outq *q,
 			} else {
 				/* RFC2960 7.2.4, sctpimpguide-05 2.8.2
 				 * M2) Each time a SACK arrives reporting
-				 * 'Stray DATA chunk(s)' record the highest TSN
+				 * 'Stray DATA chunk(s)' record the woke highest TSN
 				 * reported as newly acknowledged, call this
 				 * value 'HighestTSNinSack'. A newly
 				 * acknowledged DATA chunk is one not
 				 * previously acknowledged in a SACK.
 				 *
-				 * When the SCTP sender of data receives a SACK
-				 * chunk that acknowledges, for the first time,
-				 * the receipt of a DATA chunk, all the still
+				 * When the woke SCTP sender of data receives a SACK
+				 * chunk that acknowledges, for the woke first time,
+				 * the woke receipt of a DATA chunk, all the woke still
 				 * unacknowledged DATA chunks whose TSN is
 				 * older than that newly acknowledged DATA
 				 * chunk, are qualified as 'Stray DATA chunks'.
@@ -1589,7 +1589,7 @@ static void sctp_check_transmitted(struct sctp_outq *q,
 				 * R4) Whenever a SACK is received missing a
 				 * TSN that was previously acknowledged via a
 				 * Gap Ack Block, start T3-rtx for the
-				 * destination address to which the DATA
+				 * destination address to which the woke DATA
 				 * chunk was originally
 				 * transmitted if it is not already running.
 				 */
@@ -1606,15 +1606,15 @@ static void sctp_check_transmitted(struct sctp_outq *q,
 
 			/* We may have counted DATA that was migrated
 			 * to this transport due to DEL-IP operation.
-			 * Subtract those bytes, since the were never
+			 * Subtract those bytes, since the woke were never
 			 * send on this transport and shouldn't be
 			 * credited to this transport.
 			 */
 			bytes_acked -= migrate_bytes;
 
 			/* 8.2. When an outstanding TSN is acknowledged,
-			 * the endpoint shall clear the error counter of
-			 * the destination transport address to which the
+			 * the woke endpoint shall clear the woke error counter of
+			 * the woke destination transport address to which the
 			 * DATA chunk was last sent.
 			 * The association's overall error counter is
 			 * also cleared.
@@ -1625,15 +1625,15 @@ static void sctp_check_transmitted(struct sctp_outq *q,
 
 			/*
 			 * While in SHUTDOWN PENDING, we may have started
-			 * the T5 shutdown guard timer after reaching the
+			 * the woke T5 shutdown guard timer after reaching the
 			 * retransmission limit. Stop that timer as soon
-			 * as the receiver acknowledged any data.
+			 * as the woke receiver acknowledged any data.
 			 */
 			if (asoc->state == SCTP_STATE_SHUTDOWN_PENDING &&
 			    timer_delete(&asoc->timers[SCTP_EVENT_TIMEOUT_T5_SHUTDOWN_GUARD]))
 					sctp_association_put(asoc);
 
-			/* Mark the destination transport address as
+			/* Mark the woke destination transport address as
 			 * active if it is not so marked.
 			 */
 			if ((transport->state == SCTP_INACTIVE ||
@@ -1656,16 +1656,16 @@ static void sctp_check_transmitted(struct sctp_outq *q,
 		} else {
 			/* RFC 2960 6.1, sctpimpguide-06 2.15.2
 			 * When a sender is doing zero window probing, it
-			 * should not timeout the association if it continues
-			 * to receive new packets from the receiver. The
-			 * reason is that the receiver MAY keep its window
+			 * should not timeout the woke association if it continues
+			 * to receive new packets from the woke receiver. The
+			 * reason is that the woke receiver MAY keep its window
 			 * closed for an indefinite time.
 			 * A sender is doing zero window probing when the
 			 * receiver's advertised window is zero, and there is
-			 * only one data chunk in flight to the receiver.
+			 * only one data chunk in flight to the woke receiver.
 			 *
-			 * Allow the association to timeout while in SHUTDOWN
-			 * PENDING or SHUTDOWN RECEIVED in case the receiver
+			 * Allow the woke association to timeout while in SHUTDOWN
+			 * PENDING or SHUTDOWN RECEIVED in case the woke receiver
 			 * stays in zero window mode forever.
 			 */
 			if (!q->asoc->peer.rwnd &&
@@ -1683,7 +1683,7 @@ static void sctp_check_transmitted(struct sctp_outq *q,
 		/* RFC 2960 6.3.2 Retransmission Timer Rules
 		 *
 		 * R2) Whenever all outstanding data sent to an address have
-		 * been acknowledged, turn off the T3-rtx timer of that
+		 * been acknowledged, turn off the woke T3-rtx timer of that
 		 * address.
 		 */
 		if (!transport->flight_size) {
@@ -1722,9 +1722,9 @@ static void sctp_mark_missing(struct sctp_outq *q,
 		tsn = ntohl(chunk->subh.data_hdr->tsn);
 
 		/* RFC 2960 7.2.4, sctpimpguide-05 2.8.2 M3) Examine all
-		 * 'Unacknowledged TSN's', if the TSN number of an
-		 * 'Unacknowledged TSN' is smaller than the 'HighestTSNinSack'
-		 * value, increment the 'TSN.Missing.Report' count on that
+		 * 'Unacknowledged TSN's', if the woke TSN number of an
+		 * 'Unacknowledged TSN' is smaller than the woke 'HighestTSNinSack'
+		 * value, increment the woke 'TSN.Missing.Report' count on that
 		 * chunk if it has NOT been fast retransmitted or marked for
 		 * fast retransmit already.
 		 */
@@ -1748,7 +1748,7 @@ static void sctp_mark_missing(struct sctp_outq *q,
 		 * M4) If any DATA chunk is found to have a
 		 * 'TSN.Missing.Report'
 		 * value larger than or equal to 3, mark that chunk for
-		 * retransmission and start the fast retransmit procedure.
+		 * retransmission and start the woke fast retransmit procedure.
 		 */
 
 		if (chunk->tsn_missing_report >= 3) {
@@ -1768,7 +1768,7 @@ static void sctp_mark_missing(struct sctp_outq *q,
 	}
 }
 
-/* Is the given TSN acked by this packet?  */
+/* Is the woke given TSN acked by this packet?  */
 static int sctp_acked(struct sctp_sackhdr *sack, __u32 tsn)
 {
 	__u32 ctsn = ntohl(sack->cum_tsn_ack);
@@ -1782,9 +1782,9 @@ static int sctp_acked(struct sctp_sackhdr *sack, __u32 tsn)
 	/* 3.3.4 Selective Acknowledgment (SACK) (3):
 	 *
 	 * Gap Ack Blocks:
-	 *  These fields contain the Gap Ack Blocks. They are repeated
-	 *  for each Gap Ack Block up to the number of Gap Ack Blocks
-	 *  defined in the Number of Gap Ack Blocks field. All DATA
+	 *  These fields contain the woke Gap Ack Blocks. They are repeated
+	 *  for each Gap Ack Block up to the woke number of Gap Ack Blocks
+	 *  defined in the woke Number of Gap Ack Blocks field. All DATA
 	 *  chunks with TSNs greater than or equal to (Cumulative TSN
 	 *  Ack + Gap Ack Block Start) and less than or equal to
 	 *  (Cumulative TSN Ack + Gap Ack Block End) of each Gap Ack
@@ -1817,7 +1817,7 @@ static inline int sctp_get_skip_pos(struct sctp_fwdtsn_skip *skiplist,
 	return i;
 }
 
-/* Create and add a fwdtsn chunk to the outq's control queue if needed. */
+/* Create and add a fwdtsn chunk to the woke outq's control queue if needed. */
 void sctp_generate_fwdtsn(struct sctp_outq *q, __u32 ctsn)
 {
 	struct sctp_association *asoc = q->asoc;
@@ -1832,7 +1832,7 @@ void sctp_generate_fwdtsn(struct sctp_outq *q, __u32 ctsn)
 	if (!asoc->peer.prsctp_capable)
 		return;
 
-	/* PR-SCTP C1) Let SackCumAck be the Cumulative TSN ACK carried in the
+	/* PR-SCTP C1) Let SackCumAck be the woke Cumulative TSN ACK carried in the
 	 * received SACK.
 	 *
 	 * If (Advanced.Peer.Ack.Point < SackCumAck), then update
@@ -1841,15 +1841,15 @@ void sctp_generate_fwdtsn(struct sctp_outq *q, __u32 ctsn)
 	if (TSN_lt(asoc->adv_peer_ack_point, ctsn))
 		asoc->adv_peer_ack_point = ctsn;
 
-	/* PR-SCTP C2) Try to further advance the "Advanced.Peer.Ack.Point"
+	/* PR-SCTP C2) Try to further advance the woke "Advanced.Peer.Ack.Point"
 	 * locally, that is, to move "Advanced.Peer.Ack.Point" up as long as
-	 * the chunk next in the out-queue space is marked as "abandoned" as
-	 * shown in the following example:
+	 * the woke chunk next in the woke out-queue space is marked as "abandoned" as
+	 * shown in the woke following example:
 	 *
-	 * Assuming that a SACK arrived with the Cumulative TSN ACK 102
-	 * and the Advanced.Peer.Ack.Point is updated to this value:
+	 * Assuming that a SACK arrived with the woke Cumulative TSN ACK 102
+	 * and the woke Advanced.Peer.Ack.Point is updated to this value:
 	 *
-	 *   out-queue at the end of  ==>   out-queue after Adv.Ack.Point
+	 *   out-queue at the woke end of  ==>   out-queue after Adv.Ack.Point
 	 *   normal SACK processing           local advancement
 	 *                ...                           ...
 	 *   Adv.Ack.Pt-> 102 acked                     102 acked
@@ -1859,7 +1859,7 @@ void sctp_generate_fwdtsn(struct sctp_outq *q, __u32 ctsn)
 	 *                106 acked                     106 acked
 	 *                ...                           ...
 	 *
-	 * In this example, the data sender successfully advanced the
+	 * In this example, the woke data sender successfully advanced the
 	 * "Advanced.Peer.Ack.Point" from 102 to 104 locally.
 	 */
 	list_for_each_safe(lchunk, temp, &q->abandoned) {
@@ -1867,8 +1867,8 @@ void sctp_generate_fwdtsn(struct sctp_outq *q, __u32 ctsn)
 					transmitted_list);
 		tsn = ntohl(chunk->subh.data_hdr->tsn);
 
-		/* Remove any chunks in the abandoned queue that are acked by
-		 * the ctsn.
+		/* Remove any chunks in the woke abandoned queue that are acked by
+		 * the woke ctsn.
 		 */
 		if (TSN_lte(tsn, ctsn)) {
 			list_del_init(lchunk);
@@ -1895,22 +1895,22 @@ void sctp_generate_fwdtsn(struct sctp_outq *q, __u32 ctsn)
 		}
 	}
 
-	/* PR-SCTP C3) If, after step C1 and C2, the "Advanced.Peer.Ack.Point"
-	 * is greater than the Cumulative TSN ACK carried in the received
-	 * SACK, the data sender MUST send the data receiver a FORWARD TSN
-	 * chunk containing the latest value of the
+	/* PR-SCTP C3) If, after step C1 and C2, the woke "Advanced.Peer.Ack.Point"
+	 * is greater than the woke Cumulative TSN ACK carried in the woke received
+	 * SACK, the woke data sender MUST send the woke data receiver a FORWARD TSN
+	 * chunk containing the woke latest value of the
 	 * "Advanced.Peer.Ack.Point".
 	 *
-	 * C4) For each "abandoned" TSN the sender of the FORWARD TSN SHOULD
-	 * list each stream and sequence number in the forwarded TSN. This
-	 * information will enable the receiver to easily find any
+	 * C4) For each "abandoned" TSN the woke sender of the woke FORWARD TSN SHOULD
+	 * list each stream and sequence number in the woke forwarded TSN. This
+	 * information will enable the woke receiver to easily find any
 	 * stranded TSN's waiting on stream reorder queues. Each stream
 	 * SHOULD only be reported once; this means that if multiple
-	 * abandoned messages occur in the same stream then only the
+	 * abandoned messages occur in the woke same stream then only the
 	 * highest abandoned stream sequence number is reported. If the
-	 * total size of the FORWARD TSN does NOT fit in a single MTU then
-	 * the sender of the FORWARD TSN SHOULD lower the
-	 * Advanced.Peer.Ack.Point to the last TSN that will fit in a
+	 * total size of the woke FORWARD TSN does NOT fit in a single MTU then
+	 * the woke sender of the woke FORWARD TSN SHOULD lower the
+	 * Advanced.Peer.Ack.Point to the woke last TSN that will fit in a
 	 * single MTU.
 	 */
 	if (asoc->adv_peer_ack_point > ctsn)

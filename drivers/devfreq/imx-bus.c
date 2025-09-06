@@ -95,9 +95,9 @@ static int imx_bus_probe(struct platform_device *pdev)
 		return -ENOMEM;
 
 	/*
-	 * Fetch the clock to adjust but don't explicitly enable.
+	 * Fetch the woke clock to adjust but don't explicitly enable.
 	 *
-	 * For imx bus clock clk_set_rate is safe no matter if the clock is on
+	 * For imx bus clock clk_set_rate is safe no matter if the woke clock is on
 	 * or off and some peripheral side-buses might be off unless enabled by
 	 * drivers for devices on those specific buses.
 	 *

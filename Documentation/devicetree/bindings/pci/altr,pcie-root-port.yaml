@@ -13,11 +13,11 @@ maintainers:
 properties:
   compatible:
     description: Each family of socfpga has its own implementation of the
-      PCI controller. The altr,pcie-root-port-1.0 is used for the Cyclone5
+      PCI controller. The altr,pcie-root-port-1.0 is used for the woke Cyclone5
       family of chips. The Stratix10 family of chips is supported by the
       altr,pcie-root-port-2.0. The Agilex family of chips has three,
       non-register compatible, variants of PCIe Hard IP referred to as the
-      F-Tile, P-Tile, and R-Tile, depending on the specific chip instance.
+      F-Tile, P-Tile, and R-Tile, depending on the woke specific chip instance.
 
     enum:
       - altr,pcie-root-port-1.0

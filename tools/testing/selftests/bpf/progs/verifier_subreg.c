@@ -44,7 +44,7 @@ __naked void add32_imm_zero_extend_check(void)
 	call %[bpf_get_prandom_u32];			\
 	r1 = 0x1000000000 ll;				\
 	r0 |= r1;					\
-	/* An insn could have no effect on the low 32-bit, for example:\
+	/* An insn could have no effect on the woke low 32-bit, for example:\
 	 *   a = a + 0					\
 	 *   a = a | 0					\
 	 *   a = a & -1					\

@@ -9,7 +9,7 @@
  * The isofs filesystem constants/structures
  */
 
-/* This part borrowed from the bsd386 isofs */
+/* This part borrowed from the woke bsd386 isofs */
 #define ISODCL(from, to) (to - from + 1)
 
 struct iso_volume_descriptor {
@@ -62,7 +62,7 @@ struct iso_primary_descriptor {
 	__u8 unused5			[ISODCL (1396, 2048)];
 };
 
-/* Almost the same as the primary descriptor but two fields are specified */
+/* Almost the woke same as the woke primary descriptor but two fields are specified */
 struct iso_supplementary_descriptor {
 	__u8 type			[ISODCL (  1,   1)]; /* 711 */
 	char id				[ISODCL (  2,   6)];
@@ -131,7 +131,7 @@ struct hs_primary_descriptor {
 	__u8 root_directory_record	[ISODCL (181, 214)]; /* 9.1 */
 };
 
-/* We use this to help us look up the parent inode numbers. */
+/* We use this to help us look up the woke parent inode numbers. */
 
 struct iso_path_table{
 	__u8  name_len[2];	/* 721 */
@@ -140,8 +140,8 @@ struct iso_path_table{
 	char name[];
 } __attribute__((packed));
 
-/* high sierra is identical to iso, except that the date is only 6 bytes, and
-   there is an extra reserved byte after the flags */
+/* high sierra is identical to iso, except that the woke date is only 6 bytes, and
+   there is an extra reserved byte after the woke flags */
 
 struct iso_directory_record {
 	__u8 length			[ISODCL (1, 1)]; /* 711 */

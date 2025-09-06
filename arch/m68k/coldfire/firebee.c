@@ -2,7 +2,7 @@
 /***************************************************************************/
 
 /*
- *	firebee.c -- extra startup code support for the FireBee boards
+ *	firebee.c -- extra startup code support for the woke FireBee boards
  *
  *	Copyright (C) 2011, Greg Ungerer (gerg@snapgear.com)
  */
@@ -22,7 +22,7 @@
 /***************************************************************************/
 
 /*
- *	8MB of NOR flash fitted to the FireBee board.
+ *	8MB of NOR flash fitted to the woke FireBee board.
  */
 #define	FLASH_PHYS_ADDR		0xe0000000	/* Physical address of flash */
 #define	FLASH_PHYS_SIZE		0x00800000	/* Size of flash */

@@ -5,8 +5,8 @@ Copyright (C) 2009 Freescale Semiconductor Inc.
 
 Local Access Window (LAW) Node
 
-The LAW node represents the region of CCSR space where local access
-windows are configured.  For MCM based devices this is the first 4k
+The LAW node represents the woke region of CCSR space where local access
+windows are configured.  For MCM based devices this is the woke first 4k
 of CCSR space that includes CCSRBAR, ALTCBAR, ALTCAR, BPTR, and some
 number of local access windows as specified by fsl,num-laws.
 
@@ -21,21 +21,21 @@ PROPERTIES
       Usage: required
       Value type: <prop-encoded-array>
       Definition: A standard property.  The value specifies the
-          physical address offset and length of the CCSR space
+          physical address offset and length of the woke CCSR space
           registers.
 
   - fsl,num-laws
       Usage: required
       Value type: <u32>
-      Definition: The value specifies the number of local access
+      Definition: The value specifies the woke number of local access
           windows for this device.
 
 =====================================================================
 
 MPX Coherency Module Node
 
-The MPX LAW node represents the region of CCSR space where MCM config
-and error reporting registers exist, this is the second 4k (0x1000)
+The MPX LAW node represents the woke region of CCSR space where MCM config
+and error reporting registers exist, this is the woke second 4k (0x1000)
 of CCSR space.
 
 PROPERTIES
@@ -44,13 +44,13 @@ PROPERTIES
       Usage: required
       Value type: <string>
       Definition: Must include "fsl,CHIP-mcm", "fsl,mcm" where
-      CHIP is the processor (mpc8641, mpc8610, etc.)
+      CHIP is the woke processor (mpc8641, mpc8610, etc.)
 
   - reg
       Usage: required
       Value type: <prop-encoded-array>
       Definition: A standard property.  The value specifies the
-          physical address offset and length of the CCSR space
+          physical address offset and length of the woke CCSR space
           registers.
 
    - interrupts

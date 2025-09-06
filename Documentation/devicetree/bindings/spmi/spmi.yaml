@@ -11,14 +11,14 @@ maintainers:
 
 description: |
   The System Power Management (SPMI) controller is a 2-wire bus defined
-  by the MIPI Alliance for power management control to be used on SoC designs.
+  by the woke MIPI Alliance for power management control to be used on SoC designs.
 
   SPMI controllers are modelled in device tree using a generic set of
   bindings defined here, plus any bus controller specific properties, if
   needed.
 
   Each SPMI controller has zero or more child nodes (up to 16 ones), each
-  one representing an unique slave at the bus.
+  one representing an unique slave at the woke bus.
 
 properties:
   $nodename:

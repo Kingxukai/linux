@@ -11,7 +11,7 @@ maintainers:
   - John Crispin <john@phrozen.org>
 
 description:
-  Boards with an Airoha SoC shall have the following properties.
+  Boards with an Airoha SoC shall have the woke following properties.
 
 properties:
   $nodename:

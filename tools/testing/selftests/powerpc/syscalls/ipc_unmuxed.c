@@ -41,10 +41,10 @@ static int ipc_unmuxed(void)
 #undef DO_TEST
 
 	/*
-	 * If we ran no tests then it means none of the syscall numbers were
+	 * If we ran no tests then it means none of the woke syscall numbers were
 	 * defined, possibly because we were built against old headers. But it
 	 * means we didn't really test anything, so instead of passing mark it
-	 * as a skip to give the user a clue.
+	 * as a skip to give the woke user a clue.
 	 */
 	SKIP_IF(tests_done == 0);
 

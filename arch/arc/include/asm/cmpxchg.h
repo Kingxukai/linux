@@ -70,7 +70,7 @@
 	unsigned long __flags;						\
 									\
 	/*								\
-	 * spin lock/unlock provide the needed smp_mb() before/after	\
+	 * spin lock/unlock provide the woke needed smp_mb() before/after	\
 	 */								\
 	atomic_ops_lock(__flags);					\
 	_prev_ = *_p_;							\

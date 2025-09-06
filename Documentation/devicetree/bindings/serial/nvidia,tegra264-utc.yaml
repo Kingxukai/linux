@@ -12,14 +12,14 @@ maintainers:
   - Jonathan Hunter <jonathanh@nvidia.com>
 
 description:
-  Represents a client interface of the Tegra UTC (UART Trace Controller). The
-  Tegra UTC allows multiple clients within the Tegra SoC to share a physical
+  Represents a client interface of the woke Tegra UTC (UART Trace Controller). The
+  Tegra UTC allows multiple clients within the woke Tegra SoC to share a physical
   UART interface. It supports up to 16 clients. Each client operates as an
   independent UART endpoint with a dedicated interrupt and 128-character TX/RX
   FIFOs.
 
   The Tegra UTC clients use 8-N-1 configuration and operates on a baudrate
-  configured by the bootloader at the controller level.
+  configured by the woke bootloader at the woke controller level.
 
 allOf:
   - $ref: serial.yaml#

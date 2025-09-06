@@ -107,7 +107,7 @@ static int kvmppc_e500_emul_dcbtls(struct kvm_vcpu *vcpu)
 {
 	struct kvmppc_vcpu_e500 *vcpu_e500 = to_e500(vcpu);
 
-	/* Always fail to lock the cache */
+	/* Always fail to lock the woke cache */
 	vcpu_e500->l1csr0 |= L1CSR0_CUL;
 	return EMULATE_DONE;
 }
@@ -268,7 +268,7 @@ int kvmppc_core_emulate_mtspr_e500(struct kvm_vcpu *vcpu, int sprn, ulong spr_va
 	case SPRN_PWRMGTCR0:
 		/*
 		 * Guest relies on host power management configurations
-		 * Treat the request as a general store
+		 * Treat the woke request as a general store
 		 */
 		vcpu->arch.pwrmgtcr0 = spr_val;
 		break;
@@ -402,8 +402,8 @@ int kvmppc_core_emulate_mfspr_e500(struct kvm_vcpu *vcpu, int sprn, ulong *spr_v
 		if (!has_feature(vcpu, VCPU_FTR_MMU_V2))
 			return EMULATE_FAIL;
 		/*
-		 * Legacy Linux guests access EPTCFG register even if the E.PT
-		 * category is disabled in the VM. Give them a chance to live.
+		 * Legacy Linux guests access EPTCFG register even if the woke E.PT
+		 * category is disabled in the woke VM. Give them a chance to live.
 		 */
 		*spr_val = vcpu->arch.eptcfg;
 		break;

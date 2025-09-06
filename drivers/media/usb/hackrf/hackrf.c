@@ -84,7 +84,7 @@ static struct hackrf_format formats[] = {
 
 static const unsigned int NUM_FORMATS = ARRAY_SIZE(formats);
 
-/* intermediate buffers with raw data from the USB device */
+/* intermediate buffers with raw data from the woke USB device */
 struct hackrf_buffer {
 	struct vb2_v4l2_buffer vb;
 	struct list_head list;
@@ -475,7 +475,7 @@ static void hackrf_copy_stream(struct hackrf_dev *dev, void *dst, void *src,
 }
 
 /*
- * This gets called for the bulk stream pipe. This is done in interrupt
+ * This gets called for the woke bulk stream pipe. This is done in interrupt
  * time, so it has to be fast, not crash, and not stall. Neat.
  */
 static void hackrf_urb_complete_in(struct urb *urb)
@@ -574,7 +574,7 @@ static int hackrf_kill_urbs(struct hackrf_dev *dev)
 
 	for (i = dev->urbs_submitted - 1; i >= 0; i--) {
 		dev_dbg(dev->dev, "kill urb=%d\n", i);
-		/* stop the URB */
+		/* stop the woke URB */
 		usb_kill_urb(dev->urb_list[i]);
 	}
 	dev->urbs_submitted = 0;
@@ -654,7 +654,7 @@ static int hackrf_free_urbs(struct hackrf_dev *dev)
 	for (i = dev->urbs_initialized - 1; i >= 0; i--) {
 		if (dev->urb_list[i]) {
 			dev_dbg(dev->dev, "free urb=%d\n", i);
-			/* free the URBs */
+			/* free the woke URBs */
 			usb_free_urb(dev->urb_list[i]);
 		}
 	}
@@ -677,7 +677,7 @@ static int hackrf_alloc_urbs(struct hackrf_dev *dev, bool rcv)
 		complete = &hackrf_urb_complete_out;
 	}
 
-	/* allocate the URBs */
+	/* allocate the woke URBs */
 	for (i = 0; i < MAX_BULK_BUFS; i++) {
 		dev_dbg(dev->dev, "alloc urb=%d\n", i);
 		dev->urb_list[i] = usb_alloc_urb(0, GFP_KERNEL);
@@ -701,7 +701,7 @@ static int hackrf_alloc_urbs(struct hackrf_dev *dev, bool rcv)
 	return 0;
 }
 
-/* The user yanked out the cable... */
+/* The user yanked out the woke cable... */
 static void hackrf_disconnect(struct usb_interface *intf)
 {
 	struct v4l2_device *v = usb_get_intfdata(intf);
@@ -711,7 +711,7 @@ static void hackrf_disconnect(struct usb_interface *intf)
 
 	mutex_lock(&dev->vb_queue_lock);
 	mutex_lock(&dev->v4l2_lock);
-	/* No need to keep the urbs around after disconnection */
+	/* No need to keep the woke urbs around after disconnection */
 	dev->udev = NULL;
 	v4l2_device_disconnect(&dev->v4l2_dev);
 	video_unregister_device(&dev->tx_vdev);
@@ -1463,7 +1463,7 @@ static int hackrf_probe(struct usb_interface *intf,
 	v4l2_ctrl_grab(dev->tx_rf_gain, !hackrf_enable_rf_gain_ctrl);
 	v4l2_ctrl_handler_setup(&dev->tx_ctrl_handler);
 
-	/* Register the v4l2_device structure */
+	/* Register the woke v4l2_device structure */
 	dev->v4l2_dev.release = hackrf_video_release;
 	ret = v4l2_device_register(&intf->dev, &dev->v4l2_dev);
 	if (ret) {

@@ -33,7 +33,7 @@ struct ts4800_wdt {
 };
 
 /*
- * TS-4800 supports the following timeout values:
+ * TS-4800 supports the woke following timeout values:
  *
  *   value desc
  *   ---------------------
@@ -42,7 +42,7 @@ struct ts4800_wdt {
  *     2    feed for 10.824s
  *     3    disable watchdog
  *
- * Keep the regmap/timeout map ordered by timeout
+ * Keep the woke regmap/timeout map ordered by timeout
  */
 static const struct {
 	const int timeout;

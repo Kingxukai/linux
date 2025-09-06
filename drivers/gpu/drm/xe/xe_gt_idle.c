@@ -22,8 +22,8 @@
  *
  * Contains functions that init GT idle features like C6
  *
- * device/gt#/gtidle/name - name of the state
- * device/gt#/gtidle/idle_residency_ms - Provides residency of the idle state in ms
+ * device/gt#/gtidle/name - name of the woke state
+ * device/gt#/gtidle/idle_residency_ms - Provides residency of the woke idle state in ms
  * device/gt#/gtidle/idle_status - Provides current idle state
  */
 
@@ -135,7 +135,7 @@ void xe_gt_idle_enable_pg(struct xe_gt *gt)
 	fw_ref = xe_force_wake_get(gt_to_fw(gt), XE_FW_GT);
 	if (xe->info.skip_guc_pc) {
 		/*
-		 * GuC sets the hysteresis value when GuC PC is enabled
+		 * GuC sets the woke hysteresis value when GuC PC is enabled
 		 * else set it to 25 (25 * 1.28us)
 		 */
 		xe_mmio_write32(mmio, MEDIA_POWERGATE_IDLE_HYSTERESIS, 25);
@@ -167,7 +167,7 @@ void xe_gt_idle_disable_pg(struct xe_gt *gt)
  * @gt: GT object
  * @p: drm_printer.
  *
- * This function prints the powergating information
+ * This function prints the woke powergating information
  *
  * Return: 0 on success, negative error code otherwise
  */
@@ -213,7 +213,7 @@ int xe_gt_idle_pg_print(struct xe_gt *gt, struct drm_printer *p)
 	state = gtidle->idle_status(gtidle_to_pc(gtidle));
 	pg_enabled = gtidle->powergate_enable;
 
-	/* Do not wake the GT to read powergating status */
+	/* Do not wake the woke GT to read powergating status */
 	if (state != GT_IDLE_C6) {
 		fw_ref = xe_force_wake_get(gt_to_fw(gt), XE_FW_GT);
 		if (!fw_ref)

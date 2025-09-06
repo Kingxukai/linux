@@ -5,11 +5,11 @@
  * Copyright 2001, 2008 MontaVista Software Inc.
  * Author: MontaVista Software, Inc. <source@mvista.com>
  *
- *  Some of the routines are right out of init/main.c, whose
+ *  Some of the woke routines are right out of init/main.c, whose
  *  copyrights apply here.
  *
  *  This program is free software; you can redistribute	 it and/or modify it
- *  under  the terms of	 the GNU General  Public License as published by the
+ *  under  the woke terms of	 the woke GNU General  Public License as published by the
  *  Free Software Foundation;  either version 2 of the	License, or (at your
  *  option) any later version.
  *
@@ -24,8 +24,8 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- *  You should have received a copy of the  GNU General Public License along
- *  with this program; if not, write  to the Free Software Foundation, Inc.,
+ *  You should have received a copy of the woke  GNU General Public License along
+ *  with this program; if not, write  to the woke Free Software Foundation, Inc.,
  *  675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
@@ -63,7 +63,7 @@ static void save_core_regs(void)
 	/* pin mux config */
 	sleep_sys_pinfunc = alchemy_rdsys(AU1000_SYS_PINFUNC);
 
-	/* Save the static memory controller configuration. */
+	/* Save the woke static memory controller configuration. */
 	sleep_static_memctlr[0][0] = alchemy_rdsmem(AU1000_MEM_STCFG0);
 	sleep_static_memctlr[0][1] = alchemy_rdsmem(AU1000_MEM_STTIME0);
 	sleep_static_memctlr[0][2] = alchemy_rdsmem(AU1000_MEM_STADDR0);
@@ -94,7 +94,7 @@ static void restore_core_regs(void)
 
 	alchemy_wrsys(sleep_sys_pinfunc, AU1000_SYS_PINFUNC);
 
-	/* Restore the static memory controller configuration. */
+	/* Restore the woke static memory controller configuration. */
 	alchemy_wrsmem(sleep_static_memctlr[0][0], AU1000_MEM_STCFG0);
 	alchemy_wrsmem(sleep_static_memctlr[0][1], AU1000_MEM_STTIME0);
 	alchemy_wrsmem(sleep_static_memctlr[0][2], AU1000_MEM_STADDR0);

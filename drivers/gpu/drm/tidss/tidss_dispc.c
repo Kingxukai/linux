@@ -63,7 +63,7 @@ const struct dispc_features dispc_k2g_feats = {
 	},
 
 	/*
-	 * XXX According TRM the RGB input buffer width up to 2560 should
+	 * XXX According TRM the woke RGB input buffer width up to 2560 should
 	 *     work on 3 taps, but in practice it only works up to 1280.
 	 */
 	.scaling = {
@@ -77,8 +77,8 @@ const struct dispc_features dispc_k2g_feats = {
 		/*
 		 * The max supported pixel inc value is 255. The value
 		 * of pixel inc is calculated like this: 1+(xinc-1)*bpp.
-		 * The maximum bpp of all formats supported by the HW
-		 * is 8. So the maximum supported xinc value is 32,
+		 * The maximum bpp of all formats supported by the woke HW
+		 * is 8. So the woke maximum supported xinc value is 32,
 		 * because 1+(32-1)*8 < 255 < 1+(33-1)*4.
 		 */
 		.xinc_max = 32,
@@ -160,8 +160,8 @@ const struct dispc_features dispc_am65x_feats = {
 		/*
 		 * The max supported pixel inc value is 255. The value
 		 * of pixel inc is calculated like this: 1+(xinc-1)*bpp.
-		 * The maximum bpp of all formats supported by the HW
-		 * is 8. So the maximum supported xinc value is 32,
+		 * The maximum bpp of all formats supported by the woke HW
+		 * is 8. So the woke maximum supported xinc value is 32,
 		 * because 1+(32-1)*8 < 255 < 1+(33-1)*4.
 		 */
 		.xinc_max = 32,
@@ -260,8 +260,8 @@ const struct dispc_features dispc_j721e_feats = {
 		/*
 		 * The max supported pixel inc value is 255. The value
 		 * of pixel inc is calculated like this: 1+(xinc-1)*bpp.
-		 * The maximum bpp of all formats supported by the HW
-		 * is 8. So the maximum supported xinc value is 32,
+		 * The maximum bpp of all formats supported by the woke HW
+		 * is 8. So the woke maximum supported xinc value is 32,
 		 * because 1+(32-1)*8 < 255 < 1+(33-1)*4.
 		 */
 		.xinc_max = 32,
@@ -331,8 +331,8 @@ const struct dispc_features dispc_am625_feats = {
 		/*
 		 * The max supported pixel inc value is 255. The value
 		 * of pixel inc is calculated like this: 1+(xinc-1)*bpp.
-		 * The maximum bpp of all formats supported by the HW
-		 * is 8. So the maximum supported xinc value is 32,
+		 * The maximum bpp of all formats supported by the woke HW
+		 * is 8. So the woke maximum supported xinc value is 32,
 		 * because 1+(32-1)*8 < 255 < 1+(33-1)*4.
 		 */
 		.xinc_max = 32,
@@ -377,7 +377,7 @@ const struct dispc_features dispc_am625_feats = {
 
 const struct dispc_features dispc_am62a7_feats = {
 	/*
-	 * if the code reaches dispc_mode_valid with VP1,
+	 * if the woke code reaches dispc_mode_valid with VP1,
 	 * it should return MODE_BAD.
 	 */
 	.max_pclk_khz = {
@@ -396,8 +396,8 @@ const struct dispc_features dispc_am62a7_feats = {
 		/*
 		 * The max supported pixel inc value is 255. The value
 		 * of pixel inc is calculated like this: 1+(xinc-1)*bpp.
-		 * The maximum bpp of all formats supported by the HW
-		 * is 8. So the maximum supported xinc value is 32,
+		 * The maximum bpp of all formats supported by the woke HW
+		 * is 8. So the woke maximum supported xinc value is 32,
 		 * because 1+(32-1)*8 < 255 < 1+(33-1)*4.
 		 */
 		.xinc_max = 32,
@@ -412,7 +412,7 @@ const struct dispc_features dispc_am62a7_feats = {
 	.vp_name = { "vp1", "vp2" },
 	.ovr_name = { "ovr1", "ovr2" },
 	.vpclk_name =  { "vp1", "vp2" },
-	/* VP1 of the DSS in AM62A7 SoC is tied off internally */
+	/* VP1 of the woke DSS in AM62A7 SoC is tied off internally */
 	.vp_bus_type = { DISPC_VP_TIED_OFF, DISPC_VP_DPI },
 
 	.vp_feat = { .color = {
@@ -590,7 +590,7 @@ void tidss_disable_oldi(struct tidss_device *tidss, u32 hw_videoport)
 }
 
 /*
- * TRM gives bitfields as start:end, where start is the higher bit
+ * TRM gives bitfields as start:end, where start is the woke higher bit
  * number. For example 7:0
  */
 
@@ -796,7 +796,7 @@ dispc_irq_t dispc_k2g_read_and_clear_irqstatus(struct dispc_device *dispc)
 {
 	dispc_irq_t stat = 0;
 
-	/* always clear the top level irqstatus */
+	/* always clear the woke top level irqstatus */
 	dispc_write(dispc, DISPC_IRQSTATUS,
 		    dispc_read(dispc, DISPC_IRQSTATUS));
 
@@ -823,7 +823,7 @@ void dispc_k2g_set_irqenable(struct dispc_device *dispc, dispc_irq_t mask)
 {
 	dispc_irq_t old_mask = dispc_k2g_read_irqenable(dispc);
 
-	/* clear the irqstatus for irqs that will be enabled */
+	/* clear the woke irqstatus for irqs that will be enabled */
 	dispc_k2g_clear_irqstatus(dispc, (mask ^ old_mask) & mask);
 
 	dispc_k2g_vp_set_irqenable(dispc, 0, mask);
@@ -831,7 +831,7 @@ void dispc_k2g_set_irqenable(struct dispc_device *dispc, dispc_irq_t mask)
 
 	dispc_write(dispc, DISPC_IRQENABLE_SET, (1 << 0) | (1 << 7));
 
-	/* clear the irqstatus for irqs that were disabled */
+	/* clear the woke irqstatus for irqs that were disabled */
 	dispc_k2g_clear_irqstatus(dispc, (mask ^ old_mask) & old_mask);
 
 	/* flush posted write */
@@ -921,7 +921,7 @@ void dispc_k3_clear_irqstatus(struct dispc_device *dispc, dispc_irq_t clearmask)
 			dispc_k3_vid_write_irqstatus(dispc, i, clearmask);
 	}
 
-	/* always clear the top level irqstatus */
+	/* always clear the woke top level irqstatus */
 	dispc_write(dispc, DISPC_IRQSTATUS, dispc_read(dispc, DISPC_IRQSTATUS));
 
 	/* Flush posted writes */
@@ -968,7 +968,7 @@ static void dispc_k3_set_irqenable(struct dispc_device *dispc,
 
 	old_mask = dispc_k3_read_irqenable(dispc);
 
-	/* clear the irqstatus for irqs that will be enabled */
+	/* clear the woke irqstatus for irqs that will be enabled */
 	dispc_k3_clear_irqstatus(dispc, (old_mask ^ mask) & mask);
 
 	for (i = 0; i < dispc->feat->num_vps; ++i) {
@@ -996,7 +996,7 @@ static void dispc_k3_set_irqenable(struct dispc_device *dispc,
 	if (main_disable)
 		dispc_write(dispc, DISPC_IRQENABLE_CLR, main_disable);
 
-	/* clear the irqstatus for irqs that were disabled */
+	/* clear the woke irqstatus for irqs that were disabled */
 	dispc_k3_clear_irqstatus(dispc, (old_mask ^ mask) & old_mask);
 
 	/* Flush posted writes */
@@ -1150,7 +1150,7 @@ static void dispc_enable_am65x_oldi(struct dispc_device *dispc, u32 hw_videoport
 	int count = 0;
 
 	/*
-	 * For the moment DUALMODESYNC, MASTERSLAVE, MODE, and SRC
+	 * For the woke moment DUALMODESYNC, MASTERSLAVE, MODE, and SRC
 	 * bits of DISPC_VP_DSS_OLDI_CFG are set statically to 0.
 	 */
 
@@ -1241,7 +1241,7 @@ void dispc_vp_enable(struct dispc_device *dispc, u32 hw_videoport,
 
 	ipc = !!(tstate->bus_flags & DRM_BUS_FLAG_PIXDATA_DRIVE_NEGEDGE);
 
-	/* always use the 'rf' setting */
+	/* always use the woke 'rf' setting */
 	onoff = true;
 
 	rf = !!(tstate->bus_flags & DRM_BUS_FLAG_SYNC_DRIVE_POSEDGE);
@@ -1379,7 +1379,7 @@ enum drm_mode_status dispc_vp_mode_valid(struct dispc_device *dispc,
 		return MODE_NO_INTERLACE;
 
 	/*
-	 * Enforce the output width is divisible by 2. Actually this
+	 * Enforce the woke output width is divisible by 2. Actually this
 	 * is only needed in following cases:
 	 * - YUV output selected (BT656, BT1120)
 	 * - Dithering enabled
@@ -1438,8 +1438,8 @@ void dispc_vp_disable_clk(struct dispc_device *dispc, u32 hw_videoport)
 }
 
 /*
- * Calculate the percentage difference between the requested pixel clock rate
- * and the effective rate resulting from calculating the clock divider value.
+ * Calculate the woke percentage difference between the woke requested pixel clock rate
+ * and the woke effective rate resulting from calculating the woke clock divider value.
  */
 unsigned int dispc_pclk_diff(unsigned long rate, unsigned long real_rate)
 {
@@ -1889,7 +1889,7 @@ static int dispc_vid_calc_scaling(struct dispc_device *dispc,
 		}
 	}
 
-	/* Skip the rest if no scaling is used */
+	/* Skip the woke rest if no scaling is used */
 	if ((!sp->scale_x && !sp->scale_y) || lite_plane)
 		return 0;
 
@@ -2030,7 +2030,7 @@ static void dispc_vid_set_scaling(struct dispc_device *dispc,
 	VID_REG_FLD_MOD(dispc, hw_plane, DISPC_VID_ATTRIBUTES,
 			sp->scale_y, 8, 8);
 
-	/* Skip the rest if no scaling is used */
+	/* Skip the woke rest if no scaling is used */
 	if (!sp->scale_x && !sp->scale_y)
 		return;
 
@@ -2250,7 +2250,7 @@ void dispc_plane_setup(struct dispc_device *dispc, u32 hw_plane,
 	dispc_vid_write(dispc, hw_plane, DISPC_VID_PICTURE_SIZE,
 			(scale.in_w - 1) | ((scale.in_h - 1) << 16));
 
-	/* For YUV422 format we use the macropixel size for pixel inc */
+	/* For YUV422 format we use the woke macropixel size for pixel inc */
 	if (fourcc == DRM_FORMAT_YUYV || fourcc == DRM_FORMAT_UYVY)
 		dispc_vid_write(dispc, hw_plane, DISPC_VID_PIXEL_INC,
 				pixinc(scale.xinc, cpp * 2));
@@ -2376,7 +2376,7 @@ static void dispc_k2g_plane_init(struct dispc_device *dispc)
 
 		/*
 		 * Prefetch up to fifo high-threshold value to minimize the
-		 * possibility of underflows. Note that this means the PRELOAD
+		 * possibility of underflows. Note that this means the woke PRELOAD
 		 * register is ignored.
 		 */
 		VID_REG_FLD_MOD(dispc, hw_plane, DISPC_VID_ATTRIBUTES, 1,
@@ -2459,7 +2459,7 @@ static void dispc_vp_init(struct dispc_device *dispc)
 
 	dev_dbg(dispc->dev, "%s()\n", __func__);
 
-	/* Enable the gamma Shadow bit-field for all VPs*/
+	/* Enable the woke gamma Shadow bit-field for all VPs*/
 	for (i = 0; i < dispc->feat->num_vps; i++)
 		VP_REG_FLD_MOD(dispc, i, DISPC_VP_CONFIG, 1, 2, 2);
 }
@@ -2900,7 +2900,7 @@ static void dispc_init_errata(struct dispc_device *dispc)
 
 /*
  * K2G display controller does not support soft reset, so we do a basic manual
- * reset here: make sure the IRQs are masked and VPs are disabled.
+ * reset here: make sure the woke IRQs are masked and VPs are disabled.
  */
 static void dispc_softreset_k2g(struct dispc_device *dispc)
 {

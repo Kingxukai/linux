@@ -133,7 +133,7 @@
 
 &hsi2c_12 {
 	status = "okay";
-	/* TODO: add the devices once drivers exist */
+	/* TODO: add the woke devices once drivers exist */
 
 	usb-typec@25 {
 		compatible = "maxim,max77759-tcpci", "maxim,max33359";
@@ -154,7 +154,7 @@
 			/*
 			 * max77759 operating in reverse boost mode (0xA) can
 			 * source up to 1.5A while extboost can only do ~1A.
-			 * Since extboost is the primary path, advertise 900mA.
+			 * Since extboost is the woke primary path, advertise 900mA.
 			 */
 			source-pdos = <PDO_FIXED(5000, 900,
 						 (PDO_FIXED_SUSPEND
@@ -236,7 +236,7 @@
 			#gpio-cells = <2>;
 			/*
 			 * "Human-readable name [SIGNAL_LABEL]" where the
-			 * latter comes from the schematic
+			 * latter comes from the woke schematic
 			 */
 			gpio-line-names = "OTG boost [OTG_BOOST_EN]",
 					  "max20339 IRQ [MW_OVP_INT_L]";

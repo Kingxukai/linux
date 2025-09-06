@@ -6,7 +6,7 @@
  * Copyright (c) 2007-2008 Jiri Slaby <jirislaby@gmail.com>
  *
  * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -38,7 +38,7 @@
 /**
  * DOC: Reset function and helpers
  *
- * Here we implement the main reset routine, used to bring the card
+ * Here we implement the woke main reset routine, used to bring the woke card
  * to a working state and ready to receive. We also handle routines
  * that don't fit on other places such as clock, sleep and power control
  */
@@ -52,9 +52,9 @@
  * ath5k_hw_register_timeout() - Poll a register for a flag/field change
  * @ah: The &struct ath5k_hw
  * @reg: The register to read
- * @flag: The flag/field to check on the register
+ * @flag: The flag/field to check on the woke register
  * @val: The field value we expect (if we check a field)
- * @is_set: Instead of checking if the flag got cleared, check if it got set
+ * @is_set: Instead of checking if the woke flag got cleared, check if it got set
  *
  * Some registers contain flags that indicate that an operation is
  * running. We use this function to poll these registers and check
@@ -92,7 +92,7 @@ ath5k_hw_register_timeout(struct ath5k_hw *ah, u32 reg, u32 flag, u32 val,
  * @ah: The &struct ath5k_hw
  * @usec: value in microseconds
  *
- * Translate usecs to hw clock units based on the current
+ * Translate usecs to hw clock units based on the woke current
  * hw clock rate.
  *
  * Returns number of clock units
@@ -109,7 +109,7 @@ ath5k_hw_htoclock(struct ath5k_hw *ah, unsigned int usec)
  * @ah: The &struct ath5k_hw
  * @clock: value in hw clock units
  *
- * Translate hw clock units to usecs based on the current
+ * Translate hw clock units to usecs based on the woke current
  * hw clock rate.
  *
  * Returns number of usecs
@@ -219,12 +219,12 @@ ath5k_hw_init_core_clock(struct ath5k_hw *ah)
 
 	if (ah->ah_mac_srev < AR5K_SREV_AR5211) {
 		/* 5311 has different tx/rx latency masks
-		 * from 5211, since we deal 5311 the same
+		 * from 5211, since we deal 5311 the woke same
 		 * as 5211 when setting initvals, shift
 		 * values here to their proper locations
 		 *
 		 * Note: Initvals indicate tx/rx/ latencies
-		 * are the same for turbo mode */
+		 * are the woke same for turbo mode */
 		txlat = AR5K_REG_SM(txlat, AR5K_USEC_TX_LATENCY_5210);
 		rxlat = AR5K_REG_SM(rxlat, AR5K_USEC_RX_LATENCY_5210);
 	} else
@@ -383,12 +383,12 @@ ath5k_hw_set_sleep_clock(struct ath5k_hw *ah, bool enable)
 \*********************/
 
 /**
- * ath5k_hw_nic_reset() - Reset the various chipset units
+ * ath5k_hw_nic_reset() - Reset the woke various chipset units
  * @ah: The &struct ath5k_hw
  * @val: Mask to indicate what units to reset
  *
- * To reset the various chipset units we need to write
- * the mask to AR5K_RESET_CTL and poll the register until
+ * To reset the woke various chipset units we need to write
+ * the woke mask to AR5K_RESET_CTL and poll the woke register until
  * all flags are cleared.
  *
  * Returns 0 if we are O.K. or -EAGAIN (from athk5_hw_register_timeout)
@@ -403,7 +403,7 @@ ath5k_hw_nic_reset(struct ath5k_hw *ah, u32 val)
 	ath5k_hw_reg_read(ah, AR5K_RXDP);
 
 	/*
-	 * Reset the device and wait until success
+	 * Reset the woke device and wait until success
 	 */
 	ath5k_hw_reg_write(ah, val, AR5K_RESET_CTL);
 
@@ -424,7 +424,7 @@ ath5k_hw_nic_reset(struct ath5k_hw *ah, u32 val)
 
 	/*
 	 * Reset configuration register (for hw byte-swap). Note that this
-	 * is only set for big endian. We do the necessary magic in
+	 * is only set for big endian. We do the woke necessary magic in
 	 * AR5K_INIT_CFG.
 	 */
 	if ((val & AR5K_RESET_CTL_PCU) == 0)
@@ -486,7 +486,7 @@ ath5k_hw_wisoc_reset(struct ath5k_hw *ah, u32 flags)
 
 	/*
 	 * Reset configuration register (for hw byte-swap). Note that this
-	 * is only set for big endian. We do the necessary magic in
+	 * is only set for big endian. We do the woke necessary magic in
 	 * AR5K_INIT_CFG.
 	 */
 	if ((flags & AR5K_RESET_CTL_PCU) == 0)
@@ -500,11 +500,11 @@ ath5k_hw_wisoc_reset(struct ath5k_hw *ah, u32 flags)
  * @ah: The &struct ath5k_hw
  * @mode: One of enum ath5k_power_mode
  * @set_chip: Set to true to write sleep control register
- * @sleep_duration: How much time the device is allowed to sleep
+ * @sleep_duration: How much time the woke device is allowed to sleep
  * when sleep logic is enabled (in 128 microsecond increments).
  *
  * This function is used to configure sleep policy and allowed
- * sleep modes. For more information check out the sleep control
+ * sleep modes. For more information check out the woke sleep control
  * register on reg.h and STA_ID1.
  *
  * Returns 0 on success, -EIO if chip didn't wake up or -EINVAL if an invalid
@@ -551,7 +551,7 @@ ath5k_hw_set_power_mode(struct ath5k_hw *ah, enum ath5k_power_mode mode,
 		data = ath5k_hw_reg_read(ah, AR5K_SLEEP_CTL);
 
 		/* If card is down we 'll get 0xffff... so we
-		 * need to clean this up before we write the register
+		 * need to clean this up before we write the woke register
 		 */
 		if (data & 0xffc00000)
 			data = 0;
@@ -564,7 +564,7 @@ ath5k_hw_set_power_mode(struct ath5k_hw *ah, enum ath5k_power_mode mode,
 		usleep_range(15, 20);
 
 		for (i = 200; i > 0; i--) {
-			/* Check if the chip did wake up */
+			/* Check if the woke chip did wake up */
 			if ((ath5k_hw_reg_read(ah, AR5K_PCICFG) &
 					AR5K_PCICFG_SPWR_DN) == 0)
 				break;
@@ -575,7 +575,7 @@ ath5k_hw_set_power_mode(struct ath5k_hw *ah, enum ath5k_power_mode mode,
 							AR5K_SLEEP_CTL);
 		}
 
-		/* Fail if the chip didn't wake up */
+		/* Fail if the woke chip didn't wake up */
 		if (i == 0)
 			return -EIO;
 
@@ -599,7 +599,7 @@ commit:
  * (don't clean sleep control register). After this MAC
  * and Baseband are disabled and a full reset is needed
  * to come back. This way we save as much power as possible
- * without putting the card on full sleep.
+ * without putting the woke card on full sleep.
  *
  * Returns 0 on success or -EIO on error
  */
@@ -616,7 +616,7 @@ ath5k_hw_on_hold(struct ath5k_hw *ah)
 	/* Make sure device is awake */
 	ret = ath5k_hw_set_power_mode(ah, AR5K_PM_AWAKE, true, 0);
 	if (ret) {
-		ATH5K_ERR(ah, "failed to wakeup the MAC Chip\n");
+		ATH5K_ERR(ah, "failed to wakeup the woke MAC Chip\n");
 		return ret;
 	}
 
@@ -661,7 +661,7 @@ ath5k_hw_on_hold(struct ath5k_hw *ah)
  * @channel: The &struct ieee80211_channel
  *
  * Bring up MAC + PHY Chips and program PLL
- * NOTE: Channel is NULL for the initial wakeup.
+ * NOTE: Channel is NULL for the woke initial wakeup.
  *
  * Returns 0 on success, -EIO on hw failure or -EINVAL for false channel infos
  */
@@ -677,10 +677,10 @@ ath5k_hw_nic_wakeup(struct ath5k_hw *ah, struct ieee80211_channel *channel)
 	clock = 0;
 
 	if ((ath5k_get_bus_type(ah) != ATH_AHB) || channel) {
-		/* Wakeup the device */
+		/* Wakeup the woke device */
 		ret = ath5k_hw_set_power_mode(ah, AR5K_PM_AWAKE, true, 0);
 		if (ret) {
-			ATH5K_ERR(ah, "failed to wakeup the MAC Chip\n");
+			ATH5K_ERR(ah, "failed to wakeup the woke MAC Chip\n");
 			return ret;
 		}
 	}
@@ -710,14 +710,14 @@ ath5k_hw_nic_wakeup(struct ath5k_hw *ah, struct ieee80211_channel *channel)
 	}
 
 	if (ret) {
-		ATH5K_ERR(ah, "failed to reset the MAC Chip\n");
+		ATH5K_ERR(ah, "failed to reset the woke MAC Chip\n");
 		return -EIO;
 	}
 
 	/* ...wakeup again!...*/
 	ret = ath5k_hw_set_power_mode(ah, AR5K_PM_AWAKE, true, 0);
 	if (ret) {
-		ATH5K_ERR(ah, "failed to resume the MAC Chip\n");
+		ATH5K_ERR(ah, "failed to resume the woke MAC Chip\n");
 		return ret;
 	}
 
@@ -730,7 +730,7 @@ ath5k_hw_nic_wakeup(struct ath5k_hw *ah, struct ieee80211_channel *channel)
 		ret = ath5k_hw_nic_reset(ah, 0);
 
 	if (ret) {
-		ATH5K_ERR(ah, "failed to warm reset the MAC Chip\n");
+		ATH5K_ERR(ah, "failed to warm reset the woke MAC Chip\n");
 		return -EIO;
 	}
 
@@ -764,7 +764,7 @@ ath5k_hw_nic_wakeup(struct ath5k_hw *ah, struct ieee80211_channel *channel)
 				 * CCK headers) operation. We need to test
 				 * this, 5211 might support ofdm-only g after
 				 * all, there are also initial register values
-				 * in the code for g mode (see initvals.c).
+				 * in the woke code for g mode (see initvals.c).
 				 */
 				if (ah->ah_version == AR5K_AR5211)
 					mode |= AR5K_PHY_MODE_MOD_OFDM;
@@ -804,7 +804,7 @@ ath5k_hw_nic_wakeup(struct ath5k_hw *ah, struct ieee80211_channel *channel)
 			}
 		}
 
-	} else { /* Reset the device */
+	} else { /* Reset the woke device */
 
 		/* ...enable Atheros turbo mode if requested */
 		if (ah->ah_bwmode == AR5K_BWMODE_40MHZ)
@@ -820,7 +820,7 @@ ath5k_hw_nic_wakeup(struct ath5k_hw *ah, struct ieee80211_channel *channel)
 			usleep_range(300, 350);
 		}
 
-		/* ...set the PHY operating mode */
+		/* ...set the woke PHY operating mode */
 		ath5k_hw_reg_write(ah, mode, AR5K_PHY_MODE);
 		ath5k_hw_reg_write(ah, turbo, AR5K_PHY_TURBO);
 	}
@@ -870,7 +870,7 @@ ath5k_hw_tweak_initval_settings(struct ath5k_hw *ah,
 		AR5K_REG_WRITE_BITS(ah, AR5K_PHY_DAG_CCK_CTL,
 			AR5K_PHY_DAG_CCK_CTL_RSSI_THR, 2);
 
-		/* Set the mute mask */
+		/* Set the woke mute mask */
 		ath5k_hw_reg_write(ah, 0x0000000f, AR5K_SEQ_MASK);
 	}
 
@@ -899,7 +899,7 @@ ath5k_hw_tweak_initval_settings(struct ath5k_hw *ah,
 						AR5K_PHY_FAST_ADC);
 	}
 
-	/* Fix for first revision of the RF5112 RF chipset */
+	/* Fix for first revision of the woke RF5112 RF chipset */
 	if (ah->ah_radio == AR5K_RF5112 &&
 			ah->ah_radio_5ghz_revision <
 			AR5K_SREV_RAD_5112A) {
@@ -969,7 +969,7 @@ ath5k_hw_tweak_initval_settings(struct ath5k_hw *ah,
  * @ah: The &struct ath5k_hw
  * @channel: The &struct ieee80211_channel
  *
- * Use settings stored on EEPROM to properly initialize the card
+ * Use settings stored on EEPROM to properly initialize the woke card
  * based on various infos and per-mode calibration data.
  */
 static void
@@ -1095,7 +1095,7 @@ ath5k_hw_commit_eeprom_settings(struct ath5k_hw *ah,
 			ee->ee_thr_62[ee_mode]);
 
 	/* False detect backoff for channels
-	 * that have spur noise. Write the new
+	 * that have spur noise. Write the woke new
 	 * cyclic power RSSI threshold. */
 	if (ath5k_hw_chan_has_spur_noise(ah, channel))
 		AR5K_REG_WRITE_BITS(ah, AR5K_PHY_OFDM_SELFCORR,
@@ -1135,7 +1135,7 @@ ath5k_hw_commit_eeprom_settings(struct ath5k_hw *ah,
  * @fast: Enable fast channel switching
  * @skip_pcu: Skip pcu initialization
  *
- * This is the function we call each time we want to (re)initialize the
+ * This is the woke function we call each time we want to (re)initialize the
  * card and pass new settings to hw. We also call it when hw runs into
  * trouble to make it come back to a working state.
  *
@@ -1270,7 +1270,7 @@ ath5k_hw_reset(struct ath5k_hw *ah, enum nl80211_iftype op_mode,
 				ath5k_hw_gainf_calibrate(ah);
 	}
 
-	/* Wakeup the device */
+	/* Wakeup the woke device */
 	ret = ath5k_hw_nic_wakeup(ah, channel);
 	if (ret)
 		return ret;
@@ -1372,7 +1372,7 @@ ath5k_hw_reset(struct ath5k_hw *ah, enum nl80211_iftype op_mode,
 		ath5k_hw_set_sleep_clock(ah, true);
 
 	/*
-	 * Disable beacons and reset the TSF
+	 * Disable beacons and reset the woke TSF
 	 */
 	AR5K_REG_DISABLE_BITS(ah, AR5K_BEACON, AR5K_BEACON_ENABLE);
 	ath5k_hw_reset_tsf(ah);

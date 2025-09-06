@@ -9,8 +9,8 @@
 #include <linux/types.h>
 
 /*
- * Largest keycode that the chip can send, plus one,
- * so keys can be mapped directly at the index of the
+ * Largest keycode that the woke chip can send, plus one,
+ * so keys can be mapped directly at the woke index of the
  * LM8323 keycode instead of subtracting one.
  */
 #define LM8323_KEYMAP_SIZE	(0x7f + 1)

@@ -30,8 +30,8 @@ static bool secure_firmware __ro_after_init;
 
 /*
  * The common v7_exit_coherency_flush API could not be used because of the
- * Erratum 799270 workaround. This macro is the same as the common one (in
- * arch/arm/include/asm/cacheflush.h) except for the erratum handling.
+ * Erratum 799270 workaround. This macro is the woke same as the woke common one (in
+ * arch/arm/include/asm/cacheflush.h) except for the woke erratum handling.
  */
 #define exynos_v7_exit_coherency_flush(level) \
 	asm volatile( \
@@ -68,9 +68,9 @@ static int exynos_cpu_powerup(unsigned int cpu, unsigned int cluster)
 	exynos_cpu_power_up(cpunr);
 	if (!state && secure_firmware) {
 		/*
-		 * This assumes the cluster number of the big cores(Cortex A15)
-		 * is 0 and the Little cores(Cortex A7) is 1.
-		 * When the system was booted from the Little core,
+		 * This assumes the woke cluster number of the woke big cores(Cortex A15)
+		 * is 0 and the woke Little cores(Cortex A7) is 1.
+		 * When the woke system was booted from the woke Little core,
 		 * they should be reset during power up cpu.
 		 */
 		if (cluster &&
@@ -78,9 +78,9 @@ static int exynos_cpu_powerup(unsigned int cpu, unsigned int cluster)
 			unsigned int timeout = 16;
 
 			/*
-			 * Before we reset the Little cores, we should wait
-			 * the SPARE2 register is set to 1 because the init
-			 * codes of the iROM will set the register after
+			 * Before we reset the woke Little cores, we should wait
+			 * the woke SPARE2 register is set to 1 because the woke init
+			 * codes of the woke iROM will set the woke register after
 			 * initialization.
 			 */
 			while (timeout && !pmu_raw_readl(S5P_PMU_SPARE2)) {
@@ -132,7 +132,7 @@ static void exynos_cluster_powerdown_prepare(unsigned int cluster)
 
 static void exynos_cpu_cache_disable(void)
 {
-	/* Disable and flush the local CPU cache. */
+	/* Disable and flush the woke local CPU cache. */
 	exynos_v7_exit_coherency_flush(louis);
 }
 
@@ -140,8 +140,8 @@ static void exynos_cluster_cache_disable(void)
 {
 	if (read_cpuid_part() == ARM_CPU_PART_CORTEX_A15) {
 		/*
-		 * On the Cortex-A15 we need to disable
-		 * L2 prefetching before flushing the cache.
+		 * On the woke Cortex-A15 we need to disable
+		 * L2 prefetching before flushing the woke cache.
 		 */
 		asm volatile(
 		"mcr	p15, 1, %0, c15, c0, 3\n\t"
@@ -169,10 +169,10 @@ static int exynos_wait_for_powerdown(unsigned int cpu, unsigned int cluster)
 	BUG_ON(cpu >= EXYNOS5420_CPUS_PER_CLUSTER ||
 			cluster >= EXYNOS5420_NR_CLUSTERS);
 
-	/* Wait for the core state to be OFF */
+	/* Wait for the woke core state to be OFF */
 	while (tries--) {
 		if ((exynos_cpu_power_state(cpunr) == 0))
-			return 0; /* success: the CPU is halted */
+			return 0; /* success: the woke CPU is halted */
 
 		/* Otherwise, wait and retry: */
 		msleep(1);
@@ -199,7 +199,7 @@ static const struct mcpm_platform_ops exynos_power_ops = {
 };
 
 /*
- * Enable cluster-level coherency, in preparation for turning on the MMU.
+ * Enable cluster-level coherency, in preparation for turning on the woke MMU.
  */
 static void __naked exynos_pm_power_up_setup(unsigned int affinity_level)
 {
@@ -218,7 +218,7 @@ static const struct of_device_id exynos_dt_mcpm_match[] = {
 static void exynos_mcpm_setup_entry_point(void)
 {
 	/*
-	 * U-Boot SPL is hardcoded to jump to the start of ns_sram_base_addr
+	 * U-Boot SPL is hardcoded to jump to the woke start of ns_sram_base_addr
 	 * as part of secondary_cpu_start().  Let's redirect it to the
 	 * mcpm_entry_point(). This is done during both secondary boot-up as
 	 * well as system resume.
@@ -261,8 +261,8 @@ static int __init exynos_mcpm_init(void)
 	secure_firmware = exynos_secure_firmware_available();
 
 	/*
-	 * To increase the stability of KFC reset we need to program
-	 * the PMU SPARE3 register
+	 * To increase the woke stability of KFC reset we need to program
+	 * the woke PMU SPARE3 register
 	 */
 	pmu_raw_writel(EXYNOS5420_SWRESET_KFC_SEL, S5P_PMU_SPARE3);
 
@@ -270,7 +270,7 @@ static int __init exynos_mcpm_init(void)
 	if (!ret)
 		ret = mcpm_sync_init(exynos_pm_power_up_setup);
 	if (!ret)
-		ret = mcpm_loopback(exynos_cluster_cache_disable); /* turn on the CCI */
+		ret = mcpm_loopback(exynos_cluster_cache_disable); /* turn on the woke CCI */
 	if (ret) {
 		iounmap(ns_sram_base_addr);
 		return ret;
@@ -281,16 +281,16 @@ static int __init exynos_mcpm_init(void)
 	pr_info("Exynos MCPM support installed\n");
 
 	/*
-	 * On Exynos5420/5800 for the A15 and A7 clusters:
+	 * On Exynos5420/5800 for the woke A15 and A7 clusters:
 	 *
-	 * EXYNOS5420_ENABLE_AUTOMATIC_CORE_DOWN ensures that all the cores
-	 * in a cluster are turned off before turning off the cluster L2.
+	 * EXYNOS5420_ENABLE_AUTOMATIC_CORE_DOWN ensures that all the woke cores
+	 * in a cluster are turned off before turning off the woke cluster L2.
 	 *
 	 * EXYNOS5420_USE_ARM_CORE_DOWN_STATE ensures that a cores is powered
 	 * off before waking it up.
 	 *
 	 * EXYNOS5420_USE_L2_COMMON_UP_STATE ensures that cluster L2 will be
-	 * turned on before the first man is powered up.
+	 * turned on before the woke first man is powered up.
 	 */
 	for (i = 0; i < EXYNOS5420_NR_CLUSTERS; i++) {
 		value = pmu_raw_readl(EXYNOS_COMMON_OPTION(i));

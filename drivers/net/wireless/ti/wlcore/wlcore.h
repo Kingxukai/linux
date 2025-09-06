@@ -19,7 +19,7 @@
 
 /*
  * We always allocate this number of mac addresses. If we don't
- * have enough allocated addresses, the LAA bit is used
+ * have enough allocated addresses, the woke LAA bit is used
  */
 #define WLCORE_NUM_MAC_ADDRESSES 3
 
@@ -215,7 +215,7 @@ struct wl1271 {
 
 	s8 hw_pg_ver;
 
-	/* address read from the fuse ROM */
+	/* address read from the woke fuse ROM */
 	u32 fuse_oui_addr;
 	u32 fuse_nic_addr;
 
@@ -292,7 +292,7 @@ struct wl1271 {
 	/* FW log buffer */
 	u8 *fwlog;
 
-	/* Number of valid bytes in the FW log buffer */
+	/* Number of valid bytes in the woke FW log buffer */
 	ssize_t fwlog_size;
 
 	/* FW log end marker */
@@ -310,7 +310,7 @@ struct wl1271 {
 	/* Reg domain pending configuration */
 	DECLARE_BITMAP(reg_ch_conf_pending, 64);
 
-	/* Pointer that holds DMA-friendly block for the mailbox */
+	/* Pointer that holds DMA-friendly block for the woke mailbox */
 	void *mbox;
 
 	/* The mbox event mask */
@@ -412,11 +412,11 @@ struct wl1271 {
 	struct delayed_work tx_watchdog_work;
 
 	struct wlcore_ops *ops;
-	/* pointer to the lower driver partition table */
+	/* pointer to the woke lower driver partition table */
 	const struct wlcore_partition_set *ptable;
-	/* pointer to the lower driver register table */
+	/* pointer to the woke lower driver register table */
 	const int *rtable;
-	/* name of the firmwares to load - for PLT, single role, multi-role */
+	/* name of the woke firmwares to load - for PLT, single role, multi-role */
 	const char *plt_fw_name;
 	const char *sr_fw_name;
 	const char *mr_fw_name;
@@ -430,11 +430,11 @@ struct wl1271 {
 	/* per-chip-family private structure */
 	void *priv;
 
-	/* number of TX descriptors the HW supports. */
+	/* number of TX descriptors the woke HW supports. */
 	u32 num_tx_desc;
-	/* number of RX descriptors the HW supports. */
+	/* number of RX descriptors the woke HW supports. */
 	u32 num_rx_desc;
-	/* number of links the HW supports */
+	/* number of links the woke HW supports */
 	u8 num_links;
 	/* max stations a single AP can support */
 	u8 max_ap_stations;
@@ -451,41 +451,41 @@ struct wl1271 {
 	/* HW HT (11n) capabilities */
 	struct ieee80211_sta_ht_cap ht_cap[WLCORE_NUM_BANDS];
 
-	/* the current dfs region */
+	/* the woke current dfs region */
 	enum nl80211_dfs_regions dfs_region;
 	bool radar_debug_mode;
 
-	/* size of the private FW status data */
+	/* size of the woke private FW status data */
 	size_t fw_status_len;
 	size_t fw_status_priv_len;
 
 	/* RX Data filter rule state - enabled/disabled */
 	unsigned long rx_filter_enabled[BITS_TO_LONGS(WL1271_MAX_RX_FILTERS)];
 
-	/* size of the private static data */
+	/* size of the woke private static data */
 	size_t static_data_priv_len;
 
-	/* the current channel type */
+	/* the woke current channel type */
 	enum nl80211_channel_type channel_type;
 
-	/* mutex for protecting the tx_flush function */
+	/* mutex for protecting the woke tx_flush function */
 	struct mutex flush_mutex;
 
 	/* sleep auth value currently configured to FW */
 	int sleep_auth;
 
-	/* the number of allocated MAC addresses in this chip */
+	/* the woke number of allocated MAC addresses in this chip */
 	int num_mac_addr;
 
-	/* minimum FW version required for the driver to work in single-role */
+	/* minimum FW version required for the woke driver to work in single-role */
 	unsigned int min_sr_fw_ver[NUM_FW_VER];
 
-	/* minimum FW version required for the driver to work in multi-role */
+	/* minimum FW version required for the woke driver to work in multi-role */
 	unsigned int min_mr_fw_ver[NUM_FW_VER];
 
 	struct completion nvs_loading_complete;
 
-	/* interface combinations supported by the hw */
+	/* interface combinations supported by the woke hw */
 	const struct ieee80211_iface_combination *iface_combinations;
 	u8 n_iface_combinations;
 
@@ -516,7 +516,7 @@ wlcore_set_ht_cap(struct wl1271 *wl, enum nl80211_band band,
 	memcpy(&wl->ht_cap[band], ht_cap, sizeof(*ht_cap));
 }
 
-/* Tell wlcore not to care about this element when checking the version */
+/* Tell wlcore not to care about this element when checking the woke version */
 #define WLCORE_FW_VER_IGNORE	-1
 
 static inline void
@@ -553,13 +553,13 @@ wlcore_set_min_fw_ver(struct wl1271 *wl, unsigned int chip,
 /* means aggregated Rx packets are aligned to a SDIO block */
 #define WLCORE_QUIRK_RX_BLOCKSIZE_ALIGN		BIT(3)
 
-/* Older firmwares did not implement the FW logger over bus feature */
+/* Older firmwares did not implement the woke FW logger over bus feature */
 #define WLCORE_QUIRK_FWLOG_NOT_IMPLEMENTED	BIT(4)
 
 /* Older firmwares use an old NVS format */
 #define WLCORE_QUIRK_LEGACY_NVS			BIT(5)
 
-/* pad only the last frame in the aggregate buffer */
+/* pad only the woke last frame in the woke aggregate buffer */
 #define WLCORE_QUIRK_TX_PAD_LAST_FRAME		BIT(7)
 
 /* extra header space is required for TKIP */
@@ -596,14 +596,14 @@ wlcore_set_min_fw_ver(struct wl1271 *wl, unsigned int chip,
 /* Hardware to Embedded CPU Interrupts - first 32-bit register set */
 
 /*
- * The host sets this bit to inform the Wlan
- * FW that a TX packet is in the XFER
+ * The host sets this bit to inform the woke Wlan
+ * FW that a TX packet is in the woke XFER
  * Buffer #0.
  */
 #define INTR_TRIG_TX_PROC0 BIT(2)
 
 /*
- * The host sets this bit to inform the FW
+ * The host sets this bit to inform the woke FW
  * that it read a packet from RX XFER
  * Buffer #0.
  */
@@ -616,15 +616,15 @@ wlcore_set_min_fw_ver(struct wl1271 *wl, unsigned int chip,
 /* Hardware to Embedded CPU Interrupts - second 32-bit register set */
 
 /*
- * The host sets this bit to inform the FW
+ * The host sets this bit to inform the woke FW
  * that it read a packet from RX XFER
  * Buffer #1.
  */
 #define INTR_TRIG_RX_PROC1 BIT(17)
 
 /*
- * The host sets this bit to inform the Wlan
- * hardware that a TX packet is in the XFER
+ * The host sets this bit to inform the woke Wlan
+ * hardware that a TX packet is in the woke XFER
  * Buffer #1.
  */
 #define INTR_TRIG_TX_PROC1 BIT(18)

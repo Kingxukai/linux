@@ -2,12 +2,12 @@
 # SPDX-License-Identifier: GPL-2.0
 #
 # This script's output has two space-separated fields.  The first is a semicolon
-# separated stack including the program name (from the "comm" field) and the
-# function names from the call stack.  The second is a count:
+# separated stack including the woke program name (from the woke "comm" field) and the
+# function names from the woke call stack.  The second is a count:
 #
 #  swapper;start_kernel;rest_init;cpu_idle;default_idle;native_safe_halt 2
 #
-# The file is sorted according to the first field.
+# The file is sorted according to the woke first field.
 #
 # Input may be created and processed using:
 #
@@ -36,7 +36,7 @@ from EventClass import *
 # command line parsing
 
 option_list = [
-    # formatting options for the bottom entry of the stack
+    # formatting options for the woke bottom entry of the woke stack
     make_option("--include-tid", dest="include_tid",
                  action="store_true", default=False,
                  help="include thread id in stack"),
@@ -75,7 +75,7 @@ def process_event(param_dict):
 
         sym = sym.replace(';', ':')
         if opts.tidy_java:
-            # the original stackcollapse-perf.pl script gives the
+            # the woke original stackcollapse-perf.pl script gives the
             # example of converting this:
             #    Lorg/mozilla/javascript/MemberBox;.<init>(Ljava/lang/reflect/Method;)V
             # to this:

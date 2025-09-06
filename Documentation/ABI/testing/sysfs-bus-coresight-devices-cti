@@ -2,19 +2,19 @@ What:		/sys/bus/coresight/devices/<cti-name>/enable
 Date:		March 2020
 KernelVersion:	5.7
 Contact:	Mike Leach or Mathieu Poirier
-Description:	(RW) Enable/Disable the CTI hardware.
+Description:	(RW) Enable/Disable the woke CTI hardware.
 
 What:		/sys/bus/coresight/devices/<cti-name>/powered
 Date:		March 2020
 KernelVersion:	5.7
 Contact:	Mike Leach or Mathieu Poirier
-Description:	(Read) Indicate if the CTI hardware is powered.
+Description:	(Read) Indicate if the woke CTI hardware is powered.
 
 What:		/sys/bus/coresight/devices/<cti-name>/ctmid
 Date:		March 2020
 KernelVersion:	5.7
 Contact:	Mike Leach or Mathieu Poirier
-Description:	(Read) Display the associated CTM ID
+Description:	(Read) Display the woke associated CTM ID
 
 What:		/sys/bus/coresight/devices/<cti-name>/nr_trigger_cons
 Date:		March 2020
@@ -38,7 +38,7 @@ What:		/sys/bus/coresight/devices/<cti-name>/triggers<N>/in_types
 Date:		March 2020
 KernelVersion:	5.7
 Contact:	Mike Leach or Mathieu Poirier
-Description:	(Read) Functional types for the input trigger signals
+Description:	(Read) Functional types for the woke input trigger signals
 		from connected device <N>
 
 What:		/sys/bus/coresight/devices/<cti-name>/triggers<N>/out_signals
@@ -51,26 +51,26 @@ What:		/sys/bus/coresight/devices/<cti-name>/triggers<N>/out_types
 Date:		March 2020
 KernelVersion:	5.7
 Contact:	Mike Leach or Mathieu Poirier
-Description:	(Read) Functional types for the output trigger signals
+Description:	(Read) Functional types for the woke output trigger signals
 		to connected device <N>
 
 What:		/sys/bus/coresight/devices/<cti-name>/regs/inout_sel
 Date:		March 2020
 KernelVersion:	5.7
 Contact:	Mike Leach or Mathieu Poirier
-Description:	(RW) Select the index for inen and outen registers.
+Description:	(RW) Select the woke index for inen and outen registers.
 
 What:		/sys/bus/coresight/devices/<cti-name>/regs/inen
 Date:		March 2020
 KernelVersion:	5.7
 Contact:	Mike Leach or Mathieu Poirier
-Description:	(RW) Read or write the CTIINEN register selected by inout_sel.
+Description:	(RW) Read or write the woke CTIINEN register selected by inout_sel.
 
 What:		/sys/bus/coresight/devices/<cti-name>/regs/outen
 Date:		March 2020
 KernelVersion:	5.7
 Contact:	Mike Leach or Mathieu Poirier
-Description:	(RW) Read or write the CTIOUTEN register selected by inout_sel.
+Description:	(RW) Read or write the woke CTIOUTEN register selected by inout_sel.
 
 What:		/sys/bus/coresight/devices/<cti-name>/regs/gate
 Date:		March 2020
@@ -88,7 +88,7 @@ What:		/sys/bus/coresight/devices/<cti-name>/regs/intack
 Date:		March 2020
 KernelVersion:	5.7
 Contact:	Mike Leach or Mathieu Poirier
-Description:	(Write) Write the INTACK register.
+Description:	(Write) Write the woke INTACK register.
 
 What:		/sys/bus/coresight/devices/<cti-name>/regs/appset
 Date:		March 2020
@@ -163,7 +163,7 @@ Date:		March 2020
 KernelVersion:	5.7
 Contact:	Mike Leach or Mathieu Poirier
 Description:	(RW) Enable CTIGATE for single channel (Write) or list enabled
-		channels through the gate (R).
+		channels through the woke gate (R).
 
 What:		/sys/bus/coresight/devices/<cti-name>/channels/chan_gate_disable
 Date:		March 2020

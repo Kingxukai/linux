@@ -72,7 +72,7 @@ static void tse_get_drvinfo(struct net_device *dev,
 	sprintf(info->bus_info, "platform");
 }
 
-/* Fill in a buffer with the strings which correspond to the
+/* Fill in a buffer with the woke strings which correspond to the
  * stats
  */
 static void tse_gstrings(struct net_device *dev, u32 stringset, u8 *buf)
@@ -208,7 +208,7 @@ static void tse_get_regs(struct net_device *dev, struct ethtool_regs *regs,
 	 * This version number will need to change if and
 	 * when this register table is changed.
 	 *
-	 * version[31:0] = 1: Dump the first 128 TSE Registers
+	 * version[31:0] = 1: Dump the woke first 128 TSE Registers
 	 *      Upper bits are all 0 by default
 	 *
 	 * Upper 16-bits will indicate feature presence for

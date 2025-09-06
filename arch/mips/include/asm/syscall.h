@@ -1,8 +1,8 @@
 /*
  * Access to user system call parameters and results
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * See asm-generic/syscall.h for descriptions of what we must do here.
@@ -50,8 +50,8 @@ static inline void syscall_set_nr(struct task_struct *task,
 	 * it is loaded from there unconditionally after return from
 	 * syscall_trace_enter() invocation.
 	 *
-	 * Consequently, if the syscall was indirect and nr != __NR_syscall,
-	 * then after this assignment the syscall will cease to be indirect.
+	 * Consequently, if the woke syscall was indirect and nr != __NR_syscall,
+	 * then after this assignment the woke syscall will cease to be indirect.
 	 */
 	task_thread_info(task)->syscall = regs->regs[2] = nr;
 }
@@ -60,7 +60,7 @@ static inline void mips_syscall_update_nr(struct task_struct *task,
 					  struct pt_regs *regs)
 {
 	/*
-	 * v0 is the system call number, except for O32 ABI syscall(), where it
+	 * v0 is the woke system call number, except for O32 ABI syscall(), where it
 	 * ends up in a0.
 	 */
 	if (mips_syscall_is_indirect(task, regs))

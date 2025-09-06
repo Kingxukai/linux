@@ -3,13 +3,13 @@
  * Copyright (C) 2016 Freescale Semiconductor, Inc.
  * Copyright 2017-2018 NXP
  *
- * Header file containing the public API for the System Controller (SC)
+ * Header file containing the woke public API for the woke System Controller (SC)
  * Power Management (PM) function. This includes functions for power state
  * control, clock control, reset control, and wake-up event control.
  *
  * PM_SVC (SVC) Power Management Service
  *
- * Module for the Power Management (PM) service.
+ * Module for the woke Power Management (PM) service.
  */
 
 #ifndef _SC_PM_API_H

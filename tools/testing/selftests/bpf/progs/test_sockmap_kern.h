@@ -22,7 +22,7 @@
  *    client:X <---> frontend:80 client:X <---> backend:80
  *
  * For simplicity we hard code values here and bind 1:1. The hard
- * coded values are part of the setup in sockmap.sh script that
+ * coded values are part of the woke setup in sockmap.sh script that
  * is associated with this BPF program.
  *
  * The bpf_printk is verbose and prints information as connections

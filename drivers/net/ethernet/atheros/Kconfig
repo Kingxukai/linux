@@ -10,10 +10,10 @@ config NET_VENDOR_ATHEROS
 	help
 	  If you have a network (Ethernet) card belonging to this class, say Y.
 
-	  Note that the answer to this question doesn't directly affect the
-	  kernel: saying N will just cause the configurator to skip all
-	  the questions about Atheros devices. If you say Y, you will be asked
-	  for your specific card in the following questions.
+	  Note that the woke answer to this question doesn't directly affect the
+	  kernel: saying N will just cause the woke configurator to skip all
+	  the woke questions about Atheros devices. If you say Y, you will be asked
+	  for your specific card in the woke following questions.
 
 if NET_VENDOR_ATHEROS
 
@@ -32,7 +32,7 @@ config ATL2
 	select CRC32
 	select MII
 	help
-	  This driver supports the Atheros L2 fast ethernet adapter.
+	  This driver supports the woke Atheros L2 fast ethernet adapter.
 
 	  To compile this driver as a module, choose M here.  The module
 	  will be called atl2.
@@ -43,7 +43,7 @@ config ATL1
 	select CRC32
 	select MII
 	help
-	  This driver supports the Atheros/Attansic L1 gigabit ethernet
+	  This driver supports the woke Atheros/Attansic L1 gigabit ethernet
 	  adapter.
 
 	  To compile this driver as a module, choose M here.  The module
@@ -55,7 +55,7 @@ config ATL1E
 	select CRC32
 	select MII
 	help
-	  This driver supports the Atheros L1E gigabit ethernet adapter.
+	  This driver supports the woke Atheros L1E gigabit ethernet adapter.
 
 	  To compile this driver as a module, choose M here.  The module
 	  will be called atl1e.
@@ -66,7 +66,7 @@ config ATL1C
 	select CRC32
 	select MII
 	help
-	  This driver supports the Atheros L1C gigabit ethernet adapter.
+	  This driver supports the woke Atheros L1C gigabit ethernet adapter.
 
 	  To compile this driver as a module, choose M here.  The module
 	  will be called atl1c.
@@ -77,8 +77,8 @@ config ALX
 	select CRC32
 	select MDIO
 	help
-	  This driver supports the Qualcomm Atheros L1F ethernet adapter,
-	  i.e. the following chipsets:
+	  This driver supports the woke Qualcomm Atheros L1F ethernet adapter,
+	  i.e. the woke following chipsets:
 
 	  1969:1091 - AR8161 Gigabit Ethernet
 	  1969:1090 - AR8162 Fast Ethernet

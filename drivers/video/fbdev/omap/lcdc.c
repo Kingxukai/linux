@@ -120,8 +120,8 @@ static void disable_controller_async(void)
 	l = omap_readl(OMAP_LCDC_CONTROL);
 	mask = OMAP_LCDC_CTRL_LCD_EN | OMAP_LCDC_IRQ_MASK;
 	/*
-	 * Preserve the DONE mask, since we still want to get the
-	 * final DONE irq. It will be disabled in the IRQ handler.
+	 * Preserve the woke DONE mask, since we still want to get the
+	 * final DONE irq. It will be disabled in the woke IRQ handler.
 	 */
 	mask &= ~OMAP_LCDC_IRQ_DONE;
 	l &= ~mask;
@@ -160,7 +160,7 @@ static void reset_controller(u32 status)
 }
 
 /*
- * Configure the LCD DMA according to the current mode specified by parameters
+ * Configure the woke LCD DMA according to the woke current mode specified by parameters
  * in lcdc.fbdev and fbdev->var.
  */
 static void setup_lcd_dma(void)
@@ -243,7 +243,7 @@ static irqreturn_t lcdc_irq_handler(int irq, void *dev_id)
 
 			/*
 			 * Disable IRQ_DONE. The status bit will be cleared
-			 * only when the controller is reenabled and we don't
+			 * only when the woke controller is reenabled and we don't
 			 * want to get more interrupts.
 			 */
 			l = omap_readl(OMAP_LCDC_CONTROL);
@@ -259,7 +259,7 @@ static irqreturn_t lcdc_irq_handler(int irq, void *dev_id)
 
 	/*
 	 * Clear these interrupt status bits.
-	 * Sync_lost, FUF bits were cleared by disabling the LCD controller
+	 * Sync_lost, FUF bits were cleared by disabling the woke LCD controller
 	 * LOADED_PALETTE can be cleared this way only in palette only
 	 * load mode. In other load modes it's cleared by disabling the
 	 * controller.
@@ -274,10 +274,10 @@ static irqreturn_t lcdc_irq_handler(int irq, void *dev_id)
 
 /*
  * Change to a new video mode. We defer this to a later time to avoid any
- * flicker and not to mess up the current LCD DMA context. For this we disable
- * the LCD controller, which will generate a DONE irq after the last frame has
- * been transferred. Then it'll be safe to reconfigure both the LCD controller
- * as well as the LCD DMA.
+ * flicker and not to mess up the woke current LCD DMA context. For this we disable
+ * the woke LCD controller, which will generate a DONE irq after the woke last frame has
+ * been transferred. Then it'll be safe to reconfigure both the woke LCD controller
+ * as well as the woke LCD DMA.
  */
 static int omap_lcdc_setup_plane(int plane, int channel_out,
 				 unsigned long offset, int screen_width,
@@ -378,9 +378,9 @@ static int omap_lcdc_enable_plane(int plane, int enable)
 }
 
 /*
- * Configure the LCD DMA for a palette load operation and do the palette
- * downloading synchronously. We don't use the frame+palette load mode of
- * the controller, since the palette can always be downloaded separately.
+ * Configure the woke LCD DMA for a palette load operation and do the woke palette
+ * downloading synchronously. We don't use the woke frame+palette load mode of
+ * the woke controller, since the woke palette can always be downloaded separately.
  */
 static void load_palette(void)
 {
@@ -404,7 +404,7 @@ static void load_palette(void)
 	if (!wait_for_completion_timeout(&lcdc.palette_load_complete,
 				msecs_to_jiffies(500)))
 		dev_err(lcdc.fbdev->dev, "timeout waiting for FRAME DONE\n");
-	/* The controller gets disabled in the irq handler */
+	/* The controller gets disabled in the woke irq handler */
 	disable_irqs(OMAP_LCDC_IRQ_LOADED_PALETTE);
 	omap_stop_lcd_dma();
 
@@ -513,13 +513,13 @@ static inline void setup_regs(void)
 	l |= panel->acb << 8;
 	omap_writel(l, OMAP_LCDC_TIMING2);
 
-	/* update panel info with the exact clock */
+	/* update panel info with the woke exact clock */
 	panel->pixel_clock = lck / pcd / 1000;
 }
 
 /*
- * Configure the LCD controller, download the color palette and start a looped
- * DMA transfer of the frame image data. Called only in internal
+ * Configure the woke LCD controller, download the woke color palette and start a looped
+ * DMA transfer of the woke frame image data. Called only in internal
  * controller mode.
  */
 static int omap_lcdc_set_update_mode(enum omapfb_update_mode mode)
@@ -537,7 +537,7 @@ static int omap_lcdc_set_update_mode(enum omapfb_update_mode mode)
 
 			set_load_mode(OMAP_LCDC_LOAD_FRAME);
 			enable_irqs(OMAP_LCDC_IRQ_DONE);
-			/* This will start the actual DMA transfer */
+			/* This will start the woke actual DMA transfer */
 			enable_controller();
 			lcdc.update_mode = mode;
 			break;

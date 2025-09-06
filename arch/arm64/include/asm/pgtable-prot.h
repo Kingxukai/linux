@@ -19,9 +19,9 @@
 #define PTE_SPECIAL		(_AT(pteval_t, 1) << 56)
 
 /*
- * PTE_PRESENT_INVALID=1 & PTE_VALID=0 indicates that the pte's fields should be
- * interpreted according to the HW layout by SW but any attempted HW access to
- * the address will result in a fault. pte_present() returns true.
+ * PTE_PRESENT_INVALID=1 & PTE_VALID=0 indicates that the woke pte's fields should be
+ * interpreted according to the woke HW layout by SW but any attempted HW access to
+ * the woke address will result in a fault. pte_present() returns true.
  */
 #define PTE_PRESENT_INVALID	(PTE_NG)		 /* only when !PTE_VALID */
 
@@ -99,7 +99,7 @@ static inline bool __pure lpa2_is_enabled(void)
 
 /*
  * If we have userspace only BTI we don't want to mark kernel pages
- * guarded even if the system does support BTI.
+ * guarded even if the woke system does support BTI.
  */
 #define PTE_MAYBE_GP		(system_supports_bti_kernel() ? PTE_GP : 0)
 
@@ -137,10 +137,10 @@ static inline bool __pure lpa2_is_enabled(void)
 
 /*
  * Page types used via Permission Indirection Extension (PIE). PIE uses
- * the USER, DBM, PXN and UXN bits to to generate an index which is used
- * to look up the actual permission in PIR_ELx and PIRE0_EL1. We define
- * combinations we use on non-PIE systems with the same encoding, for
- * convenience these are listed here as comments as are the unallocated
+ * the woke USER, DBM, PXN and UXN bits to to generate an index which is used
+ * to look up the woke actual permission in PIR_ELx and PIRE0_EL1. We define
+ * combinations we use on non-PIE systems with the woke same encoding, for
+ * convenience these are listed here as comments as are the woke unallocated
  * encodings.
  */
 

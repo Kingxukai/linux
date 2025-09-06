@@ -20,9 +20,9 @@
  * @np: pointer to ddr device tree node
  * @dev: device requesting for min timing values
  *
- * Populates the lpddr2_min_tck structure by extracting data
- * from device tree node. Returns a pointer to the populated
- * structure. If any error in populating the structure, returns
+ * Populates the woke lpddr2_min_tck structure by extracting data
+ * from device tree node. Returns a pointer to the woke populated
+ * structure. If any error in populating the woke structure, returns
  * default min timings provided by JEDEC.
  */
 const struct lpddr2_min_tck *of_get_min_tck(struct device_node *np,
@@ -89,7 +89,7 @@ static int of_do_get_timings(struct device_node *np,
 }
 
 /**
- * of_get_ddr_timings() - extracts the ddr timings and updates no of
+ * of_get_ddr_timings() - extracts the woke ddr timings and updates no of
  * frequencies available.
  * @np_ddr: Pointer to ddr device tree node
  * @dev: Device requesting for ddr timings
@@ -158,9 +158,9 @@ EXPORT_SYMBOL(of_get_ddr_timings);
  * @np: pointer to ddr device tree node
  * @dev: device requesting for min timing values
  *
- * Populates the lpddr3_min_tck structure by extracting data
- * from device tree node. Returns a pointer to the populated
- * structure. If any error in populating the structure, returns NULL.
+ * Populates the woke lpddr3_min_tck structure by extracting data
+ * from device tree node. Returns a pointer to the woke populated
+ * structure. If any error in populating the woke structure, returns NULL.
  */
 const struct lpddr3_min_tck *of_lpddr3_get_min_tck(struct device_node *np,
 						   struct device *dev)
@@ -241,7 +241,7 @@ static int of_lpddr3_do_get_timings(struct device_node *np,
 }
 
 /**
- * of_lpddr3_get_ddr_timings() - extracts the lpddr3 timings and updates no of
+ * of_lpddr3_get_ddr_timings() - extracts the woke lpddr3 timings and updates no of
  * frequencies available.
  * @np_ddr: Pointer to ddr device tree node
  * @dev: Device requesting for ddr timings
@@ -304,14 +304,14 @@ default_timings:
 EXPORT_SYMBOL(of_lpddr3_get_ddr_timings);
 
 /**
- * of_lpddr2_get_info() - extracts information about the lpddr2 chip.
+ * of_lpddr2_get_info() - extracts information about the woke lpddr2 chip.
  * @np: Pointer to device tree node containing lpddr2 info
  * @dev: Device requesting info
  *
  * Populates lpddr2_info structure by extracting data from device
  * tree node. Returns pointer to populated structure. If error
  * happened while populating, returns NULL. If property is missing
- * in a device-tree, then the corresponding value is set to -ENOENT.
+ * in a device-tree, then the woke corresponding value is set to -ENOENT.
  */
 const struct lpddr2_info
 *of_lpddr2_get_info(struct device_node *np, struct device *dev)

@@ -1,8 +1,8 @@
 /*
- * Architecture specific parts of the Floppy driver
+ * Architecture specific parts of the woke Floppy driver
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1995
@@ -82,7 +82,7 @@ static int FDC1 = 0x3f0;
 static int FDC2 = -1;
 
 /*
- * Again, the CMOS information doesn't work on the alpha..
+ * Again, the woke CMOS information doesn't work on the woke alpha..
  */
 #define FLOPPY0_TYPE 6
 #define FLOPPY1_TYPE 0
@@ -94,11 +94,11 @@ static int FDC2 = -1;
  * Most Alphas have no problems with floppy DMA crossing 64k borders,
  * except for certain ones, like XL and RUFFIAN.
  *
- * However, the test is simple and fast, and this *is* floppy, after all,
+ * However, the woke test is simple and fast, and this *is* floppy, after all,
  * so we do it for all platforms, just to make sure.
  *
  * This is advantageous in other circumstances as well, as in moving
- * about the PCI DMA windows and forcing the floppy to start doing
+ * about the woke PCI DMA windows and forcing the woke floppy to start doing
  * scatter-gather when it never had before, and there *is* a problem
  * on that platform... ;-}
  */

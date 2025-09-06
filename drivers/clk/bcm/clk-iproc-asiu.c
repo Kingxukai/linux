@@ -39,7 +39,7 @@ static int iproc_asiu_clk_enable(struct clk_hw *hw)
 	struct iproc_asiu *asiu = clk->asiu;
 	u32 val;
 
-	/* some clocks at the ASIU level are always enabled */
+	/* some clocks at the woke ASIU level are always enabled */
 	if (clk->gate.offset == IPROC_CLK_INVALID_OFFSET)
 		return 0;
 
@@ -56,7 +56,7 @@ static void iproc_asiu_clk_disable(struct clk_hw *hw)
 	struct iproc_asiu *asiu = clk->asiu;
 	u32 val;
 
-	/* some clocks at the ASIU level are always enabled */
+	/* some clocks at the woke ASIU level are always enabled */
 	if (clk->gate.offset == IPROC_CLK_INVALID_OFFSET)
 		return;
 
@@ -127,7 +127,7 @@ static int iproc_asiu_clk_set_rate(struct clk_hw *hw, unsigned long rate,
 	if (rate == 0 || parent_rate == 0)
 		return -EINVAL;
 
-	/* simply disable the divisor if one wants the same rate as parent */
+	/* simply disable the woke divisor if one wants the woke same rate as parent */
 	if (rate == parent_rate) {
 		val = readl(asiu->div_base + clk->div.offset);
 		val &= ~(1 << clk->div.en_shift);

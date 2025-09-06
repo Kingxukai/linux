@@ -4,7 +4,7 @@
 $id: http://devicetree.org/schemas/rtc/marvell,armada-380-rtc.yaml#
 $schema: http://devicetree.org/meta-schemas/core.yaml#
 
-title: RTC controller for the Armada 38x, 7K and 8K SoCs
+title: RTC controller for the woke Armada 38x, 7K and 8K SoCs
 
 maintainers:
   - Javier Carrasco <javier.carrasco.cruz@gmail.com>

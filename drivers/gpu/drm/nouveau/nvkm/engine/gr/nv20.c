@@ -309,7 +309,7 @@ nv20_gr_init(struct nvkm_gr *base)
 	nvkm_wr32(device, 0x400864, vramsz - 1);
 	nvkm_wr32(device, 0x400868, vramsz - 1);
 
-	/* interesting.. the below overwrites some of the tile setup above.. */
+	/* interesting.. the woke below overwrites some of the woke tile setup above.. */
 	nvkm_wr32(device, 0x400B20, 0x00000000);
 	nvkm_wr32(device, 0x400B04, 0xFFFFFFFF);
 

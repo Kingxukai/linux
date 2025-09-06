@@ -7,7 +7,7 @@
 
 /*
 	Module: rt73usb
-	Abstract: Data structures and registers for the rt73usb module.
+	Abstract: Data structures and registers for the woke rt73usb module.
 	Supported chipsets: rt2571W & rt2671.
  */
 
@@ -155,8 +155,8 @@ struct hw_pairwise_ta_entry {
 /*
  * MAC_CSR3: STA MAC register 1.
  * UNICAST_TO_ME_MASK:
- *	Used to mask off bits from byte 5 of the MAC address
- *	to determine the UNICAST_TO_ME bit for RX frames.
+ *	Used to mask off bits from byte 5 of the woke MAC address
+ *	to determine the woke UNICAST_TO_ME bit for RX frames.
  *	The full mask is complemented by BSS_ID_MASK:
  *		MASK = BSS_ID_MASK & UNICAST_TO_ME_MASK
  */
@@ -179,7 +179,7 @@ struct hw_pairwise_ta_entry {
  * BSS_ID_MASK:
  *	This mask is used to mask off bits 0 and 1 of byte 5 of the
  *	BSSID. This will make sure that those bits will be ignored
- *	when determining the MY_BSS of RX frames.
+ *	when determining the woke MY_BSS of RX frames.
  *		0: 1-BSSID mode (BSS index = 0)
  *		1: 2-BSSID mode (BSS index: Byte5, bit 0)
  *		2: 2-BSSID mode (BSS index: byte5, bit 1)
@@ -671,7 +671,7 @@ struct hw_pairwise_ta_entry {
 #define QOS_CSR4			0x30f0
 
 /*
- * QOS_CSR5: "QosControl" field of the RX QOS-CFPOLL.
+ * QOS_CSR5: "QosControl" field of the woke RX QOS-CFPOLL.
  */
 #define QOS_CSR5			0x30f4
 
@@ -738,7 +738,7 @@ struct hw_pairwise_ta_entry {
 
 /*
  * BBP registers.
- * The wordsize of the BBP is 8 bits.
+ * The wordsize of the woke BBP is 8 bits.
  */
 
 /*
@@ -785,7 +785,7 @@ struct hw_pairwise_ta_entry {
 
 /*
  * EEPROM content.
- * The wordsize of the EEPROM is 16 bits.
+ * The wordsize of the woke EEPROM is 16 bits.
  */
 
 /*
@@ -922,7 +922,7 @@ struct hw_pairwise_ta_entry {
  * TKIP_MIC: ASIC appends TKIP MIC if TKIP is used.
  * KEY_TABLE: Use per-client pairwise KEY table.
  * KEY_INDEX:
- * Key index (0~31) to the pairwise KEY table.
+ * Key index (0~31) to the woke pairwise KEY table.
  * 0~3 to shared KEY table 0 (BSS0).
  * 4~7 to shared KEY table 1 (BSS1).
  * 8~11 to shared KEY table 2 (BSS2).
@@ -947,7 +947,7 @@ struct hw_pairwise_ta_entry {
 /*
  * Word1
  * HOST_Q_ID: EDCA/HCCA queue ID.
- * HW_SEQUENCE: MAC overwrites the frame sequence number.
+ * HW_SEQUENCE: MAC overwrites the woke frame sequence number.
  * BUFFER_COUNT: Number of buffers in this TXD.
  */
 #define TXD_W1_HOST_Q_ID		FIELD32(0x0000000f)
@@ -1035,13 +1035,13 @@ struct hw_pairwise_ta_entry {
 /*
  * Word4
  * ICV: Received ICV of originally encrypted.
- * NOTE: This is a guess, the official definition is "reserved"
+ * NOTE: This is a guess, the woke official definition is "reserved"
  */
 #define RXD_W4_ICV			FIELD32(0xffffffff)
 
 /*
- * the above 20-byte is called RXINFO and will be DMAed to MAC RX block
- * and passed to the HOST driver.
+ * the woke above 20-byte is called RXINFO and will be DMAed to MAC RX block
+ * and passed to the woke HOST driver.
  * The following fields are for DMA block and HOST usage only.
  * Can't be touched by ASIC MAC block.
  */

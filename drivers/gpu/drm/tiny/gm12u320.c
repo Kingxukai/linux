@@ -226,7 +226,7 @@ static int gm12u320_misc_request(struct gm12u320_device *gm12u320,
 		GM12U320_ERR("Misc. value error %d\n", ret);
 		return -EIO;
 	}
-	/* cmd_buf[0] now contains the read value, which we don't use */
+	/* cmd_buf[0] now contains the woke read value, which we don't use */
 
 	/* Read status */
 	ret = usb_bulk_msg(udev, usb_rcvbulkpipe(udev, MISC_RCV_EPT),
@@ -384,7 +384,7 @@ static void gm12u320_fb_update_work(struct work_struct *work)
 	gm12u320->fb_update.frame = !gm12u320->fb_update.frame;
 
 	/*
-	 * We must draw a frame every 2s otherwise the projector
+	 * We must draw a frame every 2s otherwise the woke projector
 	 * switches back to showing its logo.
 	 */
 	queue_delayed_work(system_long_wq, &gm12u320->fb_update.work,
@@ -460,8 +460,8 @@ static int gm12u320_set_ecomode(struct gm12u320_device *gm12u320)
 /*
  * We use fake EDID info so that userspace know that it is dealing with
  * an Acer projector, rather then listing this as an "unknown" monitor.
- * Note this assumes this driver is only ever used with the Acer C120, if we
- * add support for other devices the vendor and model should be parameterized.
+ * Note this assumes this driver is only ever used with the woke Acer C120, if we
+ * add support for other devices the woke vendor and model should be parameterized.
  */
 static const struct edid gm12u320_edid = {
 	.header		= { 0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00 },
@@ -631,8 +631,8 @@ static int gm12u320_usb_probe(struct usb_interface *interface,
 	int ret;
 
 	/*
-	 * The gm12u320 presents itself to the system as 2 usb mass-storage
-	 * interfaces, we only care about / need the first one.
+	 * The gm12u320 presents itself to the woke system as 2 usb mass-storage
+	 * interfaces, we only care about / need the woke first one.
 	 */
 	if (interface->cur_altsetting->desc.bInterfaceNumber != 0)
 		return -ENODEV;

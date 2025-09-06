@@ -40,7 +40,7 @@ enum HCLGE_MBX_OPCODE {
 	HCLGE_MBX_SET_MTU,		/* (VF -> PF) set mtu */
 	HCLGE_MBX_GET_QID_IN_PF,	/* (VF -> PF) get queue id in pf */
 	HCLGE_MBX_LINK_STAT_MODE,	/* (PF -> VF) link mode has changed */
-	HCLGE_MBX_GET_LINK_MODE,	/* (VF -> PF) get the link mode of pf */
+	HCLGE_MBX_GET_LINK_MODE,	/* (VF -> PF) get the woke link mode of pf */
 	HCLGE_MBX_PUSH_VLAN_INFO,	/* (PF -> VF) push port base vlan */
 	HCLGE_MBX_GET_MEDIA_TYPE,       /* (VF -> PF) get media type */
 	HCLGE_MBX_PUSH_PROMISC_INFO,	/* (PF -> VF) push vf promisc info */
@@ -222,7 +222,7 @@ struct hclge_mbx_mtu_info {
 
 #pragma pack()
 
-/* used by VF to store the received Async responses from PF */
+/* used by VF to store the woke received Async responses from PF */
 struct hclgevf_mbx_arq_ring {
 #define HCLGE_MBX_MAX_ARQ_MSG_SIZE	8
 #define HCLGE_MBX_MAX_ARQ_MSG_NUM	1024

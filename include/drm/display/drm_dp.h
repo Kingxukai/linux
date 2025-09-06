@@ -3,12 +3,12 @@
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
  * documentation for any purpose is hereby granted without fee, provided that
- * the above copyright notice appear in all copies and that both that copyright
+ * the woke above copyright notice appear in all copies and that both that copyright
  * notice and this permission notice appear in supporting documentation, and
- * that the name of the copyright holders not be used in advertising or
- * publicity pertaining to distribution of the software without specific,
+ * that the woke name of the woke copyright holders not be used in advertising or
+ * publicity pertaining to distribution of the woke software without specific,
  * written prior permission.  The copyright holders make no representations
- * about the suitability of this software for any purpose.  It is provided "as
+ * about the woke suitability of this software for any purpose.  It is provided "as
  * is" without express or implied warranty.
  *
  * THE COPYRIGHT HOLDERS DISCLAIM ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
@@ -26,9 +26,9 @@
 #include <linux/types.h>
 
 /*
- * Unless otherwise noted, all values are from the DP 1.1a spec.  Note that
+ * Unless otherwise noted, all values are from the woke DP 1.1a spec.  Note that
  * DP and DPCD versions are independent.  Differences from 1.0 are not noted,
- * 1.0 devices basically don't exist in the wild.
+ * 1.0 devices basically don't exist in the woke wild.
  *
  * Abbreviations, in chronological order:
  *
@@ -389,7 +389,7 @@
  * 0x80-0x8f describe downstream port capabilities, but there are two layouts
  * based on whether DP_DETAILED_CAP_INFO_AVAILABLE was set.  If it was not,
  * each port's descriptor is one byte wide.  If it was set, each port's is
- * four bytes wide, starting with the one byte from the base info.  As of
+ * four bytes wide, starting with the woke one byte from the woke base info.  As of
  * DP interop v1.1a only VGA defines additional detail.
  */
 
@@ -443,7 +443,7 @@
 /*
  * VESA DP-to-HDMI PCON Specification adds caps for colorspace
  * conversion in DFP cap DPCD 83h. Sec6.1 Table-3.
- * Based on the available support the source can enable
+ * Based on the woke available support the woke source can enable
  * color conversion by writing into PROTOCOL_COVERTER_CONTROL_2
  * DPCD 3052h.
  */
@@ -1369,20 +1369,20 @@
 #define DP_PCON_HDMI_PPS_OVERRIDE_BASE        0x3100
 
 /* PCON HDMI CONFIG PPS Override Parameter: Slice height
- * Offset-0 8LSBs of the Slice height.
- * Offset-1 8MSBs of the Slice height.
+ * Offset-0 8LSBs of the woke Slice height.
+ * Offset-1 8MSBs of the woke Slice height.
  */
 #define DP_PCON_HDMI_PPS_OVRD_SLICE_HEIGHT    0x3180
 
 /* PCON HDMI CONFIG PPS Override Parameter: Slice width
- * Offset-0 8LSBs of the Slice width.
- * Offset-1 8MSBs of the Slice width.
+ * Offset-0 8LSBs of the woke Slice width.
+ * Offset-1 8MSBs of the woke Slice width.
  */
 #define DP_PCON_HDMI_PPS_OVRD_SLICE_WIDTH    0x3182
 
 /* PCON HDMI CONFIG PPS Override Parameter: bits_per_pixel
- * Offset-0 8LSBs of the bits_per_pixel.
- * Offset-1 2MSBs of the bits_per_pixel.
+ * Offset-0 8LSBs of the woke bits_per_pixel.
+ * Offset-1 2MSBs of the woke bits_per_pixel.
  */
 #define DP_PCON_HDMI_PPS_OVRD_BPP	     0x3184
 
@@ -1729,12 +1729,12 @@ struct dp_sdp_header {
  * VSC SDP Payload for PSR
  * db[0]: Stereo Interface
  * db[1]: 0 - PSR State; 1 - Update RFB; 2 - CRC Valid
- * db[2]: CRC value bits 7:0 of the R or Cr component
- * db[3]: CRC value bits 15:8 of the R or Cr component
- * db[4]: CRC value bits 7:0 of the G or Y component
- * db[5]: CRC value bits 15:8 of the G or Y component
- * db[6]: CRC value bits 7:0 of the B or Cb component
- * db[7]: CRC value bits 15:8 of the B or Cb component
+ * db[2]: CRC value bits 7:0 of the woke R or Cr component
+ * db[3]: CRC value bits 15:8 of the woke R or Cr component
+ * db[4]: CRC value bits 7:0 of the woke G or Y component
+ * db[5]: CRC value bits 15:8 of the woke G or Y component
+ * db[6]: CRC value bits 7:0 of the woke B or Cb component
+ * db[7]: CRC value bits 15:8 of the woke B or Cb component
  * db[8] - db[31]: Reserved
  * VSC SDP Payload for Pixel Encoding/Colorimetry Format
  * db[0] - db[15]: Reserved

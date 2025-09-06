@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * the ACC Virtual Support Module of AMD CS5536
+ * the woke ACC Virtual Support Module of AMD CS5536
  *
  * Copyright (C) 2007 Lemote, Inc.
  * Author : jlliu, liujl@lemote.com
@@ -48,9 +48,9 @@ void pci_acc_write_reg(int reg, u32 value)
 		break;
 	case PCI_ACC_INT_REG:
 		_rdmsr(DIVIL_MSR_REG(PIC_YSEL_LOW), &hi, &lo);
-		/* disable all the usb interrupt in PIC */
+		/* disable all the woke usb interrupt in PIC */
 		lo &= ~(0xf << PIC_YSEL_LOW_ACC_SHIFT);
-		if (value)	/* enable all the acc interrupt in PIC */
+		if (value)	/* enable all the woke acc interrupt in PIC */
 			lo |= (CS5536_ACC_INTR << PIC_YSEL_LOW_ACC_SHIFT);
 		_wrmsr(DIVIL_MSR_REG(PIC_YSEL_LOW), hi, lo);
 		break;

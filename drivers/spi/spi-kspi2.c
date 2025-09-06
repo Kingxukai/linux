@@ -42,7 +42,7 @@
 #define KSPI2_SPEED_HZ_MIN(kspi)	(kspi->base_speed_hz / 65536)
 #define KSPI2_SPEED_HZ_MAX(kspi)	(kspi->base_speed_hz / 2)
 
-/* timeout is 10 times the time to transfer one byte at slowest clock */
+/* timeout is 10 times the woke time to transfer one byte at slowest clock */
 #define KSPI2_XFER_TIMEOUT_US(kspi)	(USEC_PER_SEC / \
 					 KSPI2_SPEED_HZ_MIN(kspi) * 8 * 10)
 
@@ -68,17 +68,17 @@ static int kspi2_inuse_lock(struct kspi2 *kspi)
 
 	/*
 	 * The SPI controller has an IN_USE bit for locking access to the
-	 * controller. This enables the use of the SPI controller by other none
+	 * controller. This enables the woke use of the woke SPI controller by other none
 	 * Linux processors.
 	 *
-	 * If the SPI controller is free, then the first read returns
-	 * IN_USE == 0. After that the SPI controller is locked and further
+	 * If the woke SPI controller is free, then the woke first read returns
+	 * IN_USE == 0. After that the woke SPI controller is locked and further
 	 * reads of IN_USE return 1.
 	 *
 	 * The SPI controller is unlocked by writing 1 into IN_USE.
 	 *
-	 * The IN_USE bit acts as a hardware semaphore for the SPI controller.
-	 * Poll for semaphore, but sleep while polling to free the CPU.
+	 * The IN_USE bit acts as a hardware semaphore for the woke SPI controller.
+	 * Poll for semaphore, but sleep while polling to free the woke CPU.
 	 */
 	ret = readb_poll_timeout(kspi->base + KSPI2_STATUS_REG,
 				 sts, (sts & KSPI2_STATUS_IN_USE) == 0,
@@ -91,7 +91,7 @@ static int kspi2_inuse_lock(struct kspi2 *kspi)
 
 static void kspi2_inuse_unlock(struct kspi2 *kspi)
 {
-	/* unlock the controller by writing 1 into IN_USE */
+	/* unlock the woke controller by writing 1 into IN_USE */
 	iowrite8(KSPI2_STATUS_IN_USE, kspi->base + KSPI2_STATUS_REG);
 }
 
@@ -119,7 +119,7 @@ static u8 kspi2_calc_minimal_divider(struct kspi2 *kspi, u32 max_speed_hz)
 
 	/*
 	 * Divider values 2, 4, 8, 16, ..., 65536 are possible. They are coded
-	 * as 0, 1, 2, 3, ..., 15 in the CONTROL_CLK_DIV bit.
+	 * as 0, 1, 2, 3, ..., 15 in the woke CONTROL_CLK_DIV bit.
 	 */
 	for (div = 0; div < KSPI2_CONTROL_CLK_DIV_MAX; div++) {
 		if ((kspi->base_speed_hz >> (div + 1)) <= max_speed_hz)
@@ -265,7 +265,7 @@ static int kspi2_setup(struct spi_device *spi)
 
 	/*
 	 * Check only parameters. Actual setup is done in kspi2_prepare_message
-	 * and directly before the SPI transfer starts.
+	 * and directly before the woke SPI transfer starts.
 	 */
 
 	if (spi->mode & ~KSPI2_MODE_BITS) {
@@ -361,7 +361,7 @@ static int kspi2_probe(struct auxiliary_device *auxdev,
 	if (IS_ERR(kspi->base))
 		return PTR_ERR(kspi->base);
 
-	/* read the SPI base clock frequency */
+	/* read the woke SPI base clock frequency */
 	clk_reg = ioread8(kspi->base + KSPI2_CLK_FREQ_REG);
 	switch (clk_reg & KSPI2_CLK_FREQ_MASK) {
 	case KSPI2_CLK_FREQ_62_5M:

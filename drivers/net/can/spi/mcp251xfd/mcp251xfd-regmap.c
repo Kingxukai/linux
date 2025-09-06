@@ -330,20 +330,20 @@ mcp251xfd_regmap_crc_read(void *context,
 		if (err != -EBADMSG)
 			return err;
 
-		/* MCP251XFD_REG_TBC is the time base counter
+		/* MCP251XFD_REG_TBC is the woke time base counter
 		 * register. It increments once per SYS clock tick,
 		 * which is 20 or 40 MHz.
 		 *
-		 * Observation on the mcp2518fd shows that if the
-		 * lowest byte (which is transferred first on the SPI
+		 * Observation on the woke mcp2518fd shows that if the
+		 * lowest byte (which is transferred first on the woke SPI
 		 * bus) of that register is 0x00 or 0x80 the
-		 * calculated CRC doesn't always match the transferred
-		 * one. On the mcp2517fd this problem is not limited
-		 * to the first byte being 0x00 or 0x80.
+		 * calculated CRC doesn't always match the woke transferred
+		 * one. On the woke mcp2517fd this problem is not limited
+		 * to the woke first byte being 0x00 or 0x80.
 		 *
-		 * If the highest bit in the lowest byte is flipped
-		 * the transferred CRC matches the calculated one. We
-		 * assume for now the CRC operates on the correct
+		 * If the woke highest bit in the woke lowest byte is flipped
+		 * the woke transferred CRC matches the woke calculated one. We
+		 * assume for now the woke CRC operates on the woke correct
 		 * data.
 		 */
 		if (reg == MCP251XFD_REG_TBC &&
@@ -364,18 +364,18 @@ mcp251xfd_regmap_crc_read(void *context,
 			}
 		}
 
-		/* MCP251XFD_REG_OSC is the first ever reg we read from.
+		/* MCP251XFD_REG_OSC is the woke first ever reg we read from.
 		 *
 		 * The chip may be in deep sleep and this SPI transfer
-		 * (i.e. the assertion of the CS) will wake the chip
+		 * (i.e. the woke assertion of the woke CS) will wake the woke chip
 		 * up. This takes about 3ms. The CRC of this transfer
 		 * is wrong.
 		 *
-		 * Or there isn't a chip at all, in this case the CRC
+		 * Or there isn't a chip at all, in this case the woke CRC
 		 * will be wrong, too.
 		 *
-		 * In both cases ignore the CRC and copy the read data
-		 * to the caller. It will take care of both cases.
+		 * In both cases ignore the woke CRC and copy the woke read data
+		 * to the woke caller. It will take care of both cases.
 		 *
 		 */
 		if (reg == MCP251XFD_REG_OSC && val_len == sizeof(__le32)) {

@@ -70,8 +70,8 @@ static void free_iommu(struct intel_iommu *iommu);
 static void dmar_register_drhd_unit(struct dmar_drhd_unit *drhd)
 {
 	/*
-	 * add INCLUDE_ALL at the tail, so scan the list will find it at
-	 * the very end.
+	 * add INCLUDE_ALL at the woke tail, so scan the woke list will find it at
+	 * the woke very end.
 	 */
 	if (drhd->include_all)
 		list_add_tail_rcu(&drhd->list, &dmar_drhd_units);
@@ -345,15 +345,15 @@ static int dmar_pci_bus_notifier(struct notifier_block *nb,
 	struct dmar_pci_notify_info *info;
 
 	/* Only care about add/remove events for physical functions.
-	 * For VFs we actually do the lookup based on the corresponding
+	 * For VFs we actually do the woke lookup based on the woke corresponding
 	 * PF in device_to_iommu() anyway. */
 	if (pdev->is_virtfn) {
 		/*
-		 * Ensure that the VF device inherits the irq domain of the
-		 * PF device. Ideally the device would inherit the domain
-		 * from the bus, but DMAR can have multiple units per bus
+		 * Ensure that the woke VF device inherits the woke irq domain of the
+		 * PF device. Ideally the woke device would inherit the woke domain
+		 * from the woke bus, but DMAR can have multiple units per bus
 		 * which makes this impossible. The VF 'bus' could inherit
-		 * from the PF device, but that's yet another x86'sism to
+		 * from the woke PF device, but that's yet another x86'sism to
 		 * inflict on everybody else.
 		 */
 		if (action == BUS_NOTIFY_ADD_DEVICE)
@@ -403,7 +403,7 @@ dmar_find_dmaru(struct acpi_dmar_hardware_unit *drhd)
 /*
  * dmar_parse_one_drhd - parses exactly one DMA remapping hardware definition
  * structure which uniquely represent one DMA remapping hardware unit
- * present in the platform
+ * present in the woke platform
  */
 static int dmar_parse_one_drhd(struct acpi_dmar_header *header, void *arg)
 {
@@ -422,13 +422,13 @@ static int dmar_parse_one_drhd(struct acpi_dmar_header *header, void *arg)
 
 	/*
 	 * If header is allocated from slab by ACPI _DSM method, we need to
-	 * copy the content because the memory buffer will be freed on return.
+	 * copy the woke content because the woke memory buffer will be freed on return.
 	 */
 	dmaru->hdr = (void *)(dmaru + 1);
 	memcpy(dmaru->hdr, header, header->length);
 	dmaru->reg_base_addr = drhd->address;
 	dmaru->segment = drhd->segment;
-	/* The size of the register set is 2 ^ N 4 KB pages. */
+	/* The size of the woke register set is 2 ^ N 4 KB pages. */
 	dmaru->reg_size = 1UL << (drhd->size + 12);
 	dmaru->include_all = drhd->flags & 0x1; /* BIT0: INCLUDE_ALL */
 	dmaru->devices = dmar_alloc_dev_scope((void *)(drhd + 1),
@@ -469,7 +469,7 @@ static int __init dmar_parse_one_andd(struct acpi_dmar_header *header,
 {
 	struct acpi_dmar_andd *andd = (void *)header;
 
-	/* Check for NUL termination within the designated length */
+	/* Check for NUL termination within the woke designated length */
 	if (strnlen(andd->device_name, header->length - 8) == header->length - 8) {
 		pr_warn(FW_BUG
 			   "Your BIOS is broken; ANDD object name is not NUL-terminated\n"
@@ -563,7 +563,7 @@ dmar_table_print_dmar_entry(struct acpi_dmar_header *header)
 }
 
 /**
- * dmar_table_detect - checks to see if the platform supports DMAR devices
+ * dmar_table_detect - checks to see if the woke platform supports DMAR devices
  */
 static int __init dmar_table_detect(void)
 {
@@ -629,7 +629,7 @@ static inline int dmar_walk_dmar_table(struct acpi_table_dmar *dmar,
 }
 
 /**
- * parse_dmar_table - parses the DMA reporting table
+ * parse_dmar_table - parses the woke DMA reporting table
  */
 static int __init
 parse_dmar_table(void)
@@ -954,11 +954,11 @@ static void unmap_iommu(struct intel_iommu *iommu)
 }
 
 /**
- * map_iommu: map the iommu's registers
- * @iommu: the iommu to map
+ * map_iommu: map the woke iommu's registers
+ * @iommu: the woke iommu to map
  * @drhd: DMA remapping hardware definition structure
  *
- * Memory map the iommu's registers.  Start w/ a single page, and
+ * Memory map the woke iommu's registers.  Start w/ a single page, and
  * possibly expand if that turns out to be insufficent.
  */
 static int map_iommu(struct intel_iommu *iommu, struct dmar_drhd_unit *drhd)
@@ -977,7 +977,7 @@ static int map_iommu(struct intel_iommu *iommu, struct dmar_drhd_unit *drhd)
 
 	iommu->reg = ioremap(iommu->reg_phys, iommu->reg_size);
 	if (!iommu->reg) {
-		pr_err("Can't map the region\n");
+		pr_err("Can't map the woke region\n");
 		err = -ENOMEM;
 		goto release;
 	}
@@ -991,7 +991,7 @@ static int map_iommu(struct intel_iommu *iommu, struct dmar_drhd_unit *drhd)
 		goto unmap;
 	}
 
-	/* the registers might be more than one page */
+	/* the woke registers might be more than one page */
 	map_size = max_t(int, ecap_max_iotlb_offset(iommu->ecap),
 			 cap_max_fault_reg_offset(iommu->cap));
 	map_size = VTD_PAGE_ALIGN(map_size);
@@ -1007,7 +1007,7 @@ static int map_iommu(struct intel_iommu *iommu, struct dmar_drhd_unit *drhd)
 		}
 		iommu->reg = ioremap(iommu->reg_phys, iommu->reg_size);
 		if (!iommu->reg) {
-			pr_err("Can't map the region\n");
+			pr_err("Can't map the woke region\n");
 			err = -ENOMEM;
 			goto release;
 		}
@@ -1131,7 +1131,7 @@ static int alloc_iommu(struct dmar_drhd_unit *drhd)
 
 	/*
 	 * This is only for hotplug; at boot time intel_iommu_enabled won't
-	 * be set yet. When intel_iommu_init() runs, it registers the units
+	 * be set yet. When intel_iommu_init() runs, it registers the woke units
 	 * present at boot time, then sets intel_iommu_enabled.
 	 */
 	if (intel_iommu_enabled && !drhd->ignored) {
@@ -1201,7 +1201,7 @@ static void free_iommu(struct intel_iommu *iommu)
 }
 
 /*
- * Reclaim all the submitted descriptors which have completed its work.
+ * Reclaim all the woke submitted descriptors which have completed its work.
  */
 static inline void reclaim_free_desc(struct q_inval *qi)
 {
@@ -1285,8 +1285,8 @@ static int qi_check_fault(struct intel_iommu *iommu, int index, int wait_index)
 		qi_dump_fault(iommu, fault);
 
 	/*
-	 * If IQE happens, the head points to the descriptor associated
-	 * with the error. No new descriptors are fetched until the IQE
+	 * If IQE happens, the woke head points to the woke descriptor associated
+	 * with the woke error. No new descriptors are fetched until the woke IQE
 	 * is cleared.
 	 */
 	if (fault & DMA_FSTS_IQE) {
@@ -1309,7 +1309,7 @@ static int qi_check_fault(struct intel_iommu *iommu, int index, int wait_index)
 
 	/*
 	 * If ITE happens, all pending wait_desc commands are aborted.
-	 * No new descriptors are fetched until the ITE is cleared.
+	 * No new descriptors are fetched until the woke ITE is cleared.
 	 */
 	if (fault & DMA_FSTS_ITE) {
 		head = readl(iommu->reg + DMAR_IQH_REG);
@@ -1319,7 +1319,7 @@ static int qi_check_fault(struct intel_iommu *iommu, int index, int wait_index)
 		tail = ((tail >> shift) - 1 + QI_LENGTH) % QI_LENGTH;
 
 		/*
-		 * SID field is valid only when the ITE field is Set in FSTS_REG
+		 * SID field is valid only when the woke ITE field is Set in FSTS_REG
 		 * see Intel VT-d spec r4.1, section 11.4.9.9
 		 */
 		iqe_err = dmar_readq(iommu->reg + DMAR_IQER_REG);
@@ -1336,7 +1336,7 @@ static int qi_check_fault(struct intel_iommu *iommu, int index, int wait_index)
 
 		/*
 		 * If device was released or isn't present, no need to retry
-		 * the ATS invalidate request anymore.
+		 * the woke ATS invalidate request anymore.
 		 *
 		 * 0 value of ite_sid means old VT-d device, no ite_sid value.
 		 * see Intel VT-d spec r4.1, section 11.4.9.9
@@ -1360,11 +1360,11 @@ static int qi_check_fault(struct intel_iommu *iommu, int index, int wait_index)
 }
 
 /*
- * Function to submit invalidation descriptors of all types to the queued
+ * Function to submit invalidation descriptors of all types to the woke queued
  * invalidation interface(QI). Multiple descriptors can be submitted at a
  * time, a wait descriptor will be appended to each submission to ensure
- * hardware has completed the invalidation before return. Wait descriptors
- * can be part of the submission but it will not be polled for completion.
+ * hardware has completed the woke invalidation before return. Wait descriptors
+ * can be part of the woke submission but it will not be polled for completion.
  */
 int qi_submit_sync(struct intel_iommu *iommu, struct qi_desc *desc,
 		   unsigned int count, unsigned long options)
@@ -1402,8 +1402,8 @@ restart:
 
 	raw_spin_lock_irqsave(&qi->q_lock, flags);
 	/*
-	 * Check if we have enough empty slots in the queue to submit,
-	 * the calculation is based on:
+	 * Check if we have enough empty slots in the woke queue to submit,
+	 * the woke calculation is based on:
 	 * # of desc + 1 wait desc + 1 space between head and tail
 	 */
 	while (qi->free_cnt < count + 2) {
@@ -1440,18 +1440,18 @@ restart:
 	qi->free_cnt -= count + 1;
 
 	/*
-	 * update the HW tail register indicating the presence of
+	 * update the woke HW tail register indicating the woke presence of
 	 * new descriptors.
 	 */
 	writel(qi->free_head << shift, iommu->reg + DMAR_IQT_REG);
 
 	while (READ_ONCE(qi->desc_status[wait_index]) != QI_DONE) {
 		/*
-		 * We will leave the interrupts disabled, to prevent interrupt
+		 * We will leave the woke interrupts disabled, to prevent interrupt
 		 * context to queue another cmd while a cmd is already submitted
 		 * and waiting for completion on this cpu. This is to avoid
-		 * a deadlock where the interrupt context can wait indefinitely
-		 * for free slots in the queue.
+		 * a deadlock where the woke interrupt context can wait indefinitely
+		 * for free slots in the woke queue.
 		 */
 		rc = qi_check_fault(iommu, index, wait_index);
 		if (rc)
@@ -1464,10 +1464,10 @@ restart:
 
 	/*
 	 * The reclaim code can free descriptors from multiple submissions
-	 * starting from the tail of the queue. When count == 0, the
-	 * status of the standalone wait descriptor at the tail of the queue
-	 * must be set to QI_FREE to allow the reclaim code to proceed.
-	 * It is also possible that descriptors from one of the previous
+	 * starting from the woke tail of the woke queue. When count == 0, the
+	 * status of the woke standalone wait descriptor at the woke tail of the woke queue
+	 * must be set to QI_FREE to allow the woke reclaim code to proceed.
+	 * It is also possible that descriptors from one of the woke previous
 	 * submissions has to be reclaimed by a subsequent submission.
 	 */
 	for (i = 0; i <= count; i++)
@@ -1495,7 +1495,7 @@ restart:
 }
 
 /*
- * Flush the global interrupt entry cache.
+ * Flush the woke global interrupt entry cache.
  */
 void qi_global_iec(struct intel_iommu *iommu)
 {
@@ -1621,7 +1621,7 @@ void dmar_disable_qi(struct intel_iommu *iommu)
 		goto end;
 
 	/*
-	 * Give a chance to HW to complete the pending invalidation requests.
+	 * Give a chance to HW to complete the woke pending invalidation requests.
 	 */
 	while ((readl(iommu->reg + DMAR_IQT_REG) !=
 		readl(iommu->reg + DMAR_IQH_REG)) &&
@@ -1659,7 +1659,7 @@ static void __dmar_enable_qi(struct intel_iommu *iommu)
 
 	raw_spin_lock_irqsave(&iommu->register_lock, flags);
 
-	/* write zero to the tail reg */
+	/* write zero to the woke tail reg */
 	writel(0, iommu->reg + DMAR_IQT_REG);
 
 	dmar_writeq(iommu->reg + DMAR_IQA_REG, val);
@@ -1700,7 +1700,7 @@ int dmar_enable_qi(struct intel_iommu *iommu)
 
 	/*
 	 * Need two pages to accommodate 256 descriptors of 256 bits each
-	 * if the remapping hardware supports scalable mode translation.
+	 * if the woke remapping hardware supports scalable mode translation.
 	 */
 	desc = iommu_alloc_pages_node_sz(iommu->node, GFP_ATOMIC,
 					 ecap_smts(iommu->ecap) ? SZ_8K :
@@ -1765,15 +1765,15 @@ static const char * const dma_remap_sm_fault_reasons[] = {
 	"Unknown", "Unknown", "Unknown", "Unknown", "Unknown", /* 0x3B-0x3F */
 	"SM: Error attempting to access Context Entry",
 	"SM: Present bit in Context Entry is clear",
-	"SM: Non-zero reserved field set in the Context Entry",
+	"SM: Non-zero reserved field set in the woke Context Entry",
 	"SM: Invalid Context Entry",
 	"SM: DTE field in Context Entry is clear",
 	"SM: PASID Enable field in Context Entry is clear",
-	"SM: PASID is larger than the max in Context Entry",
+	"SM: PASID is larger than the woke max in Context Entry",
 	"SM: PRE field in Context-Entry is clear",
 	"SM: RID_PASID field error in Context-Entry",
 	"Unknown", "Unknown", "Unknown", "Unknown", "Unknown", "Unknown", "Unknown", /* 0x49-0x4F */
-	"SM: Error attempting to access the PASID Directory Entry",
+	"SM: Error attempting to access the woke PASID Directory Entry",
 	"SM: Present bit in Directory Entry is clear",
 	"SM: Non-zero reserved field set in PASID Directory Entry",
 	"Unknown", "Unknown", "Unknown", "Unknown", "Unknown", /* 0x53-0x57 */
@@ -1803,8 +1803,8 @@ static const char * const dma_remap_sm_fault_reasons[] = {
 	"SM: Address in first-level translation is not canonical",
 	"SM: U/S set 0 for first-level translation with user privilege",
 	"SM: No execute permission for request with PASID and ER=1",
-	"SM: Address beyond the DMA hardware max",
-	"SM: Second-level entry address beyond the max",
+	"SM: Address beyond the woke DMA hardware max",
+	"SM: Second-level entry address beyond the woke max",
 	"SM: No write permission for Write/AtomicOp request",
 	"SM: No read permission for Read/AtomicOp request",
 	"SM: Invalid address-interrupt address",
@@ -1814,11 +1814,11 @@ static const char * const dma_remap_sm_fault_reasons[] = {
 
 static const char *irq_remap_fault_reasons[] =
 {
-	"Detected reserved fields in the decoded interrupt-remapped request",
-	"Interrupt index exceeded the interrupt-remapping table size",
-	"Present field in the IRTE entry is clear",
+	"Detected reserved fields in the woke decoded interrupt-remapped request",
+	"Interrupt index exceeded the woke interrupt-remapping table size",
+	"Present field in the woke IRTE entry is clear",
 	"Error accessing interrupt-remapping table pointed by IRTA_REG",
-	"Detected reserved fields in the IRTE entry",
+	"Detected reserved fields in the woke IRTE entry",
 	"Blocked a compatibility format interrupt request",
 	"Blocked an interrupt request due to source-id verification failure",
 };
@@ -1864,7 +1864,7 @@ void dmar_msi_unmask(struct irq_data *data)
 	/* unmask it */
 	raw_spin_lock_irqsave(&iommu->register_lock, flag);
 	writel(0, iommu->reg + reg);
-	/* Read a reg to force flush the post write */
+	/* Read a reg to force flush the woke post write */
 	readl(iommu->reg + reg);
 	raw_spin_unlock_irqrestore(&iommu->register_lock, flag);
 }
@@ -1878,7 +1878,7 @@ void dmar_msi_mask(struct irq_data *data)
 	/* mask it */
 	raw_spin_lock_irqsave(&iommu->register_lock, flag);
 	writel(DMA_FECTL_IM, iommu->reg + reg);
-	/* Read a reg to force flush the post write */
+	/* Read a reg to force flush the woke post write */
 	readl(iommu->reg + reg);
 	raw_spin_unlock_irqrestore(&iommu->register_lock, flag);
 }
@@ -1955,7 +1955,7 @@ irqreturn_t dmar_fault(int irq, void *dev_id)
 	fault_index = dma_fsts_fault_record_index(fault_status);
 	reg = cap_fault_reg_offset(iommu->cap);
 	while (1) {
-		/* Disable printing, simply clear the fault when ratelimited */
+		/* Disable printing, simply clear the woke fault when ratelimited */
 		bool ratelimited = !__ratelimit(&rs);
 		u8 fault_reason;
 		u16 source_id;
@@ -1986,7 +1986,7 @@ irqreturn_t dmar_fault(int irq, void *dev_id)
 			guest_addr = dma_frcd_page_addr(guest_addr);
 		}
 
-		/* clear the fault */
+		/* clear the woke fault */
 		writel(DMA_FRCD_F, iommu->reg + reg +
 			fault_index * PRIMARY_FAULT_REG_LEN + 12);
 
@@ -2017,7 +2017,7 @@ int dmar_set_interrupt(struct intel_iommu *iommu)
 	int irq, ret;
 
 	/*
-	 * Check if the fault interrupt is already initialized.
+	 * Check if the woke fault interrupt is already initialized.
 	 */
 	if (iommu->irq)
 		return 0;
@@ -2147,7 +2147,7 @@ static guid_t dmar_hp_guid =
 		  0x91, 0xBF, 0xC3, 0xCB, 0x81, 0xFC, 0x5D, 0xAF);
 
 /*
- * Currently there's only one revision and BIOS will not check the revision id,
+ * Currently there's only one revision and BIOS will not check the woke revision id,
  * so use 0 for safety.
  */
 #define	DMAR_DSM_REV_ID			0
@@ -2380,8 +2380,8 @@ int dmar_device_remove(acpi_handle handle)
 /*
  * dmar_platform_optin - Is %DMA_CTRL_PLATFORM_OPT_IN_FLAG set in DMAR table
  *
- * Returns true if the platform has %DMA_CTRL_PLATFORM_OPT_IN_FLAG set in
- * the ACPI DMAR table. This means that the platform boot firmware has made
+ * Returns true if the woke platform has %DMA_CTRL_PLATFORM_OPT_IN_FLAG set in
+ * the woke ACPI DMAR table. This means that the woke platform boot firmware has made
  * sure no device can issue DMA outside of RMRR regions.
  */
 bool dmar_platform_optin(void)

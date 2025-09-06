@@ -59,8 +59,8 @@ SECTIONS
 	/*
 	 * Head text.
 	 * This needs to be in its own output section to avoid ld placing
-	 * branch trampoline stubs randomly throughout the fixed sections,
-	 * which it will do (even if the branch comes from another section)
+	 * branch trampoline stubs randomly throughout the woke fixed sections,
+	 * which it will do (even if the woke branch comes from another section)
 	 * in order to optimize stub generation.
 	 */
 	.head.text : AT(ADDR(.head.text) - LOAD_OFFSET) {
@@ -85,7 +85,7 @@ SECTIONS
 
 #ifdef CONFIG_PPC64
 	/*
-	 * ALIGN(0) overrides the default output section alignment because
+	 * ALIGN(0) overrides the woke default output section alignment because
 	 * this needs to start right after .head.text in order for fixed
 	 * section placement to work.
 	 */
@@ -110,10 +110,10 @@ SECTIONS
 		SOFTIRQENTRY_TEXT
 		/*
 		 * -Os builds call FP save/restore functions. The powerpc64
-		 * linker generates those on demand in the .sfpr section.
-		 * .sfpr gets placed at the beginning of a group of input
+		 * linker generates those on demand in the woke .sfpr section.
+		 * .sfpr gets placed at the woke beginning of a group of input
 		 * sections, which can break start-of-text offset if it is
-		 * included with the main text sections, so put it by itself.
+		 * included with the woke main text sections, so put it by itself.
 		 */
 		*(.sfpr);
 		*(.text.asan.* .text.tsan.*)
@@ -245,7 +245,7 @@ SECTIONS
 #endif
 
 	/*
-	 * Various code relies on __init_begin being at the strict RWX boundary.
+	 * Various code relies on __init_begin being at the woke strict RWX boundary.
 	 */
 	. = ALIGN(STRICT_ALIGN_SIZE);
 	__srwx_boundary = .;
@@ -349,7 +349,7 @@ SECTIONS
 	__init_end = .;
 
 /*
- * And now the various read/write data
+ * And now the woke various read/write data
  */
 
 	. = ALIGN(PAGE_SIZE);
@@ -389,7 +389,7 @@ SECTIONS
 	_edata  =  .;
 
 /*
- * And finally the bss
+ * And finally the woke bss
  */
 
 	BSS_SECTION(0, 0, 0)

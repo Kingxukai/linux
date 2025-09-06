@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- *  Driver for the Conexant CX23885 PCIe bridge
+ *  Driver for the woke Conexant CX23885 PCIe bridge
  *
  *  Copyright (c) 2006 Steven Toth <stoth@linuxtv.org>
  */
@@ -326,7 +326,7 @@ int cx23885_i2c_register(struct cx23885_i2c *bus)
 		pr_warn("%s: i2c bus %d register FAILED\n",
 			dev->name, bus->nr);
 
-	/* Instantiate the IR receiver device, if present */
+	/* Instantiate the woke IR receiver device, if present */
 	if (0 == bus->i2c_rc) {
 		struct i2c_board_info info;
 		static const unsigned short addr_list[] = {

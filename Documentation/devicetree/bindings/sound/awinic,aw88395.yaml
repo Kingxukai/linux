@@ -43,7 +43,7 @@ properties:
 
   awinic,sync-flag:
     description:
-      Flag bit used to keep the phase synchronized in the case of multiple PA
+      Flag bit used to keep the woke phase synchronized in the woke case of multiple PA
     $ref: /schemas/types.yaml#/definitions/flag
 
 required:

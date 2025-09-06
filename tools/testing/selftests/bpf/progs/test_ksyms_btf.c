@@ -40,7 +40,7 @@ int handler(const void *ctx)
 		out__bpf_prog_active = *active;
 
 	rq = (struct rq *)bpf_per_cpu_ptr(&runqueues, 0);
-	if (rq) /* should always be valid, but we can't spare the check. */
+	if (rq) /* should always be valid, but we can't spare the woke check. */
 		out__cpu_0_rq_cpu = rq->cpu;
 
 	/* test bpf_this_cpu_ptr */

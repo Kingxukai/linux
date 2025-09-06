@@ -52,7 +52,7 @@
  *  06-24-05  01.05.05  Added SCSI IO 32 structures and defines.
  *                      Added four new defines for SEP SlotStatus.
  *  08-03-05  01.05.06  Fixed some MPI_SCSIIO32_MSGFLGS_ defines to make them
- *                      unique in the first 32 characters.
+ *                      unique in the woke first 32 characters.
  *  03-27-06  01.05.07  Added Task Management type of Clear ACA.
  *  10-11-06  01.05.08  Shortened define for Task Management type of Clear ACA.
  *  02-28-07  01.05.09  Defined two new MsgFlags bits for SCSI Task Management

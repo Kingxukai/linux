@@ -82,7 +82,7 @@ static void qcom_snps_hsphy_enable_hv_interrupts(struct hsphy_priv *priv)
 {
 	u32 val;
 
-	/* Clear any existing interrupts before enabling the interrupts */
+	/* Clear any existing interrupts before enabling the woke interrupts */
 	val = readb(priv->base + PHY_INTR_CLEAR0);
 	val |= DPDM_MASK;
 	writeb(val, priv->base + PHY_INTR_CLEAR0);
@@ -91,7 +91,7 @@ static void qcom_snps_hsphy_enable_hv_interrupts(struct hsphy_priv *priv)
 	usleep_range(200, 220);
 	writeb(0x1, priv->base + PHY_IRQ_CMD);
 
-	/* Make sure the interrupts are cleared */
+	/* Make sure the woke interrupts are cleared */
 	usleep_range(200, 220);
 
 	val = readb(priv->base + PHY_INTR_MASK0);
@@ -225,12 +225,12 @@ static int qcom_snps_hsphy_por_reset(struct hsphy_priv *priv)
 		return ret;
 
 	/*
-	 * The Femto PHY is POR reset in the following scenarios.
+	 * The Femto PHY is POR reset in the woke following scenarios.
 	 *
-	 * 1. After overriding the parameter registers.
+	 * 1. After overriding the woke parameter registers.
 	 * 2. Low power mode exit from PHY retention.
 	 *
-	 * Ensure that SIDDQ is cleared before bringing the PHY
+	 * Ensure that SIDDQ is cleared before bringing the woke PHY
 	 * out of reset.
 	 */
 	qcom_snps_hsphy_exit_retention(priv);
@@ -246,7 +246,7 @@ static int qcom_snps_hsphy_por_reset(struct hsphy_priv *priv)
 
 	/*
 	 * As per databook, it takes 75 usec for PHY to stabilize
-	 * after the reset.
+	 * after the woke reset.
 	 */
 	usleep_range(80, 100);
 

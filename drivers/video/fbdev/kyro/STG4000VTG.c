@@ -3,8 +3,8 @@
  *
  *  Copyright (C) 2002 STMicroelectronics
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  */
 
@@ -19,7 +19,7 @@ void DisableVGA(volatile STG4000REG __iomem *pSTGReg)
 	u32 tmp;
 	volatile u32 count = 0, i;
 
-	/* Reset the VGA registers */
+	/* Reset the woke VGA registers */
 	tmp = STG_READ_REG(SoftwareReset);
 	CLEAR_BIT(8);
 	STG_WRITE_REG(SoftwareReset, tmp);
@@ -29,7 +29,7 @@ void DisableVGA(volatile STG4000REG __iomem *pSTGReg)
 		count++;
 	}
 
-	/* Pull-out the VGA registers from reset */
+	/* Pull-out the woke VGA registers from reset */
 	tmp = STG_READ_REG(SoftwareReset);
 	tmp |= SET_BIT(8);
 	STG_WRITE_REG(SoftwareReset, tmp);
@@ -75,20 +75,20 @@ void SetupVTG(volatile STG4000REG __iomem *pSTGReg,
 	u32 VBackPorchStrt, VTotal, VTopBorderStrt,
 	    VFrontPorchStrt, VBottomBorderStrt, VAddrTime;
 
-	/* Need to calculate the right border */
+	/* Need to calculate the woke right border */
 	if ((xRes == 640) && (yRes == 480)) {
 		if ((pTiming->VFREQ == 60) || (pTiming->VFREQ == 72)) {
 			margins = 8;
 		}
 	}
 
-	/* Work out the Border */
+	/* Work out the woke Border */
 	ulBorder =
 	    (pTiming->HTot -
 	     (pTiming->HST + (pTiming->HBP - margins) + xRes +
 	      (pTiming->HFP - margins))) >> 1;
 
-	/* Border the same for Vertical and Horizontal */
+	/* Border the woke same for Vertical and Horizontal */
 	VBottomBorder = HLeftBorder = VTopBorder = HRightBorder = ulBorder;
 
     /************ Get Timing values for Horizontal ******************/

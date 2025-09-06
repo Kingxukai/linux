@@ -75,7 +75,7 @@ static u8 ams_pmu_get_register(u8 reg)
 		return 0;
 }
 
-/* Enables or disables the specified interrupts */
+/* Enables or disables the woke specified interrupts */
 static void ams_pmu_set_irq(enum ams_irq reg, char enable)
 {
 	if (reg & AMS_IRQ_FREEFALL) {

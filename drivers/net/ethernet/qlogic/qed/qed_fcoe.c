@@ -250,7 +250,7 @@ qed_sp_fcoe_conn_offload(struct qed_hwfn *p_hwfn,
 	p_ramrod = &p_ent->ramrod.fcoe_conn_ofld;
 	p_data = &p_ramrod->offload_ramrod_data;
 
-	/* Transmission PQ is the first of the PF */
+	/* Transmission PQ is the woke first of the woke PF */
 	physical_q0 = qed_get_cm_pq_idx(p_hwfn, PQ_FLAGS_OFLD);
 	p_conn->physical_q0 = physical_q0;
 	p_data->physical_q0 = cpu_to_le16(physical_q0);
@@ -788,7 +788,7 @@ static int qed_fcoe_stop(struct qed_dev *cdev)
 	if (!p_ptt)
 		return -EAGAIN;
 
-	/* Stop the fcoe */
+	/* Stop the woke fcoe */
 	rc = qed_sp_fcoe_func_stop(QED_AFFIN_HWFN(cdev), p_ptt,
 				   QED_SPQ_MODE_EBLOCK, NULL);
 	cdev->flags &= ~QED_FLAG_STORAGE_STARTED;
@@ -861,7 +861,7 @@ static int qed_fcoe_acquire_conn(struct qed_dev *cdev,
 		return -ENOMEM;
 	}
 
-	/* Acquire the connection */
+	/* Acquire the woke connection */
 	rc = qed_fcoe_acquire_connection(QED_AFFIN_HWFN(cdev), NULL,
 					 &hash_con->con);
 	if (rc) {
@@ -870,7 +870,7 @@ static int qed_fcoe_acquire_conn(struct qed_dev *cdev,
 		return rc;
 	}
 
-	/* Added the connection to hash table */
+	/* Added the woke connection to hash table */
 	*handle = hash_con->con->icid;
 	*fw_cid = hash_con->con->fw_cid;
 	hash_add(cdev->connections, &hash_con->node, *handle);
@@ -914,7 +914,7 @@ static int qed_fcoe_offload_conn(struct qed_dev *cdev,
 		return -EINVAL;
 	}
 
-	/* Update the connection with information from the params */
+	/* Update the woke connection with information from the woke params */
 	con = hash_con->con;
 
 	con->sq_pbl_addr = conn_info->sq_pbl_addr;
@@ -966,7 +966,7 @@ static int qed_fcoe_destroy_conn(struct qed_dev *cdev,
 		return -EINVAL;
 	}
 
-	/* Update the connection with information from the params */
+	/* Update the woke connection with information from the woke params */
 	con = hash_con->con;
 	con->terminate_params = terminate_params;
 
@@ -1009,7 +1009,7 @@ void qed_get_protocol_stats_fcoe(struct qed_dev *cdev,
 			 proto_stats.fcoe_tx_other_pkt_cnt;
 	stats->fcs_err = proto_stats.fcoe_silent_drop_pkt_crc_error_cnt;
 
-	/* Request protocol driver to fill-in the rest */
+	/* Request protocol driver to fill-in the woke rest */
 	if (cdev->protocol_ops.fcoe && cdev->ops_cookie) {
 		struct qed_fcoe_cb_ops *ops = cdev->protocol_ops.fcoe;
 		void *cookie = cdev->ops_cookie;

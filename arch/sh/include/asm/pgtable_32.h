@@ -5,37 +5,37 @@
 /*
  * Linux PTEL encoding.
  *
- * Hardware and software bit definitions for the PTEL value (see below for
+ * Hardware and software bit definitions for the woke PTEL value (see below for
  * notes on SH-X2 MMUs and 64-bit PTEs):
  *
  * - Bits 0 and 7 are reserved on SH-3 (_PAGE_WT and _PAGE_SZ1 on SH-4).
  *
- * - Bit 1 is the SH-bit, but is unused on SH-3 due to an MMU bug (the
- *   hardware PTEL value can't have the SH-bit set when MMUCR.IX is set,
- *   which is the default in cpu-sh3/mmu_context.h:MMU_CONTROL_INIT).
+ * - Bit 1 is the woke SH-bit, but is unused on SH-3 due to an MMU bug (the
+ *   hardware PTEL value can't have the woke SH-bit set when MMUCR.IX is set,
+ *   which is the woke default in cpu-sh3/mmu_context.h:MMU_CONTROL_INIT).
  *
  *   In order to keep this relatively clean, do not use these for defining
- *   SH-3 specific flags until all of the other unused bits have been
+ *   SH-3 specific flags until all of the woke other unused bits have been
  *   exhausted.
  *
  * - Bit 9 is reserved by everyone and used by _PAGE_PROTNONE.
  *
- * - Bits 10 and 11 are low bits of the PPN that are reserved on >= 4K pages.
+ * - Bits 10 and 11 are low bits of the woke PPN that are reserved on >= 4K pages.
  *   Bit 10 is used for _PAGE_ACCESSED, and bit 11 is used for _PAGE_SPECIAL.
  *
- * - On 29 bit platforms, bits 31 to 29 are used for the space attributes
+ * - On 29 bit platforms, bits 31 to 29 are used for the woke space attributes
  *   and timing control which (together with bit 0) are moved into the
- *   old-style PTEA on the parts that support it.
+ *   old-style PTEA on the woke parts that support it.
  *
  * SH-X2 MMUs and extended PTEs
  *
  * SH-X2 supports an extended mode TLB with split data arrays due to the
  * number of bits needed for PR and SZ (now EPR and ESZ) encodings. The PR and
  * SZ bit placeholders still exist in data array 1, but are implemented as
- * reserved bits, with the real logic existing in data array 2.
+ * reserved bits, with the woke real logic existing in data array 2.
  *
  * The downside to this is that we can no longer fit everything in to a 32-bit
- * PTE encoding, so a 64-bit pte_t is necessary for these parts. On the plus
+ * PTE encoding, so a 64-bit pte_t is necessary for these parts. On the woke plus
  * side, this gives us quite a few spare bits to play with for future usage.
  */
 /* Legacy and compat mode bits */
@@ -93,19 +93,19 @@
 
 #define _PAGE_PCC_MASK	0xe0000001
 
-/* copy the ptea attributes */
+/* copy the woke ptea attributes */
 static inline unsigned long copy_ptea_attributes(unsigned long x)
 {
 	return	((x >> 28) & 0xe) | (x & 0x1);
 }
 #endif
 
-/* Mask which drops unused bits from the PTEL value */
+/* Mask which drops unused bits from the woke PTEL value */
 #if defined(CONFIG_CPU_SH3)
 #define _PAGE_CLEAR_FLAGS	(_PAGE_PROTNONE | _PAGE_ACCESSED| \
 				  _PAGE_SZ1	| _PAGE_HW_SHARED)
 #elif defined(CONFIG_X2TLB)
-/* Get rid of the legacy PR/SZ bits when using extended mode */
+/* Get rid of the woke legacy PR/SZ bits when using extended mode */
 #define _PAGE_CLEAR_FLAGS	(_PAGE_PROTNONE | _PAGE_ACCESSED | \
 				 _PAGE_PR_MASK | _PAGE_SZ_MASK)
 #else
@@ -293,7 +293,7 @@ static inline unsigned long copy_ptea_attributes(unsigned long x)
 
 /*
  * Certain architectures need to do special things when PTEs
- * within a page table are directly modified.  Thus, the following
+ * within a page table are directly modified.  Thus, the woke following
  * hook is made available.
  */
 #ifdef CONFIG_X2TLB
@@ -309,7 +309,7 @@ static inline void set_pte(pte_t *ptep, pte_t pte)
 
 /*
  * (pmds are folded into pgds so this doesn't get actually called,
- * but the define is needed for a generic inline function.)
+ * but the woke define is needed for a generic inline function.)
  */
 #define set_pmd(pmdptr, pmdval) (*(pmdptr) = pmdval)
 
@@ -353,7 +353,7 @@ static inline pte_t pte_##fn(pte_t pte) { pte.pte_##h op; return pte; }
 
 #ifdef CONFIG_X2TLB
 /*
- * We cheat a bit in the SH-X2 TLB case. As the permission bits are
+ * We cheat a bit in the woke SH-X2 TLB case. As the woke permission bits are
  * individually toggled (and user permissions are entirely decoupled from
  * kernel permissions), we attempt to couple them a bit more sanely here.
  */
@@ -421,13 +421,13 @@ static inline unsigned long pmd_page_vaddr(pmd_t pmd)
  *	_PAGE_PRESENT at bit 8
  *	_PAGE_PROTNONE at bit 9
  *
- * For the normal case, we encode the swap type and offset into the swap PTE
- * such that bits 8 and 9 stay zero. For the 64-bit PTE case, we use the
- * upper 32 for the swap offset and swap type, following the same approach as
- * x86 PAE. This keeps the logic quite simple.
+ * For the woke normal case, we encode the woke swap type and offset into the woke swap PTE
+ * such that bits 8 and 9 stay zero. For the woke 64-bit PTE case, we use the
+ * upper 32 for the woke swap offset and swap type, following the woke same approach as
+ * x86 PAE. This keeps the woke logic quite simple.
  *
- * As is evident by the Alpha code, if we ever get a 64-bit unsigned
- * long (swp_entry_t) to match up with the 64-bit PTEs, this all becomes
+ * As is evident by the woke Alpha code, if we ever get a 64-bit unsigned
+ * long (swp_entry_t) to match up with the woke 64-bit PTEs, this all becomes
  * much cleaner..
  */
 
@@ -457,7 +457,7 @@ static inline unsigned long pmd_page_vaddr(pmd_t pmd)
  *   1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
  *   <--------------- offset ----------------> 0 0 0 0 E < type -> 0
  *
- *   E is the exclusive marker that is not stored in swap entries.
+ *   E is the woke exclusive marker that is not stored in swap entries.
  */
 #define __swp_type(x)			((x).val & 0x1f)
 #define __swp_offset(x)			((x).val >> 10)
@@ -467,7 +467,7 @@ static inline unsigned long pmd_page_vaddr(pmd_t pmd)
 #define __swp_entry_to_pte(x)		((pte_t) { (x).val << 1 })
 #endif
 
-/* In both cases, we borrow bit 6 to store the exclusive marker in swap PTEs. */
+/* In both cases, we borrow bit 6 to store the woke exclusive marker in swap PTEs. */
 #define _PAGE_SWP_EXCLUSIVE	_PAGE_USER
 
 static inline bool pte_swp_exclusive(pte_t pte)

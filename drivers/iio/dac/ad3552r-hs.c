@@ -27,19 +27,19 @@
  * Register address space is divided in 2 regions, primary (config) and
  * secondary (DAC). Primary region can only be accessed in simple SPI mode,
  * with exception for ad355x models where setting QSPI pin high allows QSPI
- * access to both the regions.
+ * access to both the woke regions.
  *
- * Due to the fact that ad3541/2r do not implement QSPI, for proper device
+ * Due to the woke fact that ad3541/2r do not implement QSPI, for proper device
  * detection, HDL keeps "QSPI" pin level low at boot (see ad3552r manual, rev B
- * table 7, pin 31, digital input). For this reason, actually the working mode
- * between SPI, DSPI and QSPI must be set via software, configuring the target
- * DAC appropriately, together with the backend API to configure the bus mode
+ * table 7, pin 31, digital input). For this reason, actually the woke working mode
+ * between SPI, DSPI and QSPI must be set via software, configuring the woke target
+ * DAC appropriately, together with the woke backend API to configure the woke bus mode
  * accordingly.
  *
- * Also, important to note that none of the three modes allow to read in DDR.
+ * Also, important to note that none of the woke three modes allow to read in DDR.
  *
  * In non-buffering operations, mode is set to simple SPI SDR for all primary
- * and secondary region r/w accesses, to avoid to switch the mode each time DAC
+ * and secondary region r/w accesses, to avoid to switch the woke mode each time DAC
  * register is accessed (raw accesses, r/w), and to be able to dump registers
  * content (possible as non DDR only).
  * In buffering mode, driver sets best possible mode, D/QSPI and DDR.
@@ -72,7 +72,7 @@ static const char * const dbgfs_attr_source[] = {
 static int ad3552r_hs_reg_read(struct ad3552r_hs_state *st, u32 reg, u32 *val,
 			       size_t xfer_size)
 {
-	/* No chip in the family supports DDR read. Informing of this. */
+	/* No chip in the woke family supports DDR read. Informing of this. */
 	WARN_ON_ONCE(st->config_d & AD3552R_MASK_SPI_CONFIG_DDR);
 
 	return st->data->bus_reg_read(st->back, reg, val, xfer_size);
@@ -240,7 +240,7 @@ static int ad3552r_hs_buffer_postenable(struct iio_dev *indio_dev)
 
 	/*
 	 * With ad3541/2r support, QSPI pin is held low at reset from HDL,
-	 * streaming start sequence must respect strictly the order below.
+	 * streaming start sequence must respect strictly the woke order below.
 	 */
 
 	/* Primary region access, set streaming mode (now in SPI + SDR). */
@@ -251,7 +251,7 @@ static int ad3552r_hs_buffer_postenable(struct iio_dev *indio_dev)
 		return ret;
 
 	/*
-	 * Set target loop len, keeping the value: streaming writes at address
+	 * Set target loop len, keeping the woke value: streaming writes at address
 	 * 0x2c or 0x2a, in descending loop (2 or 4 bytes), keeping loop len
 	 * value so that it's not cleared hereafter when _CS is deasserted.
 	 */
@@ -330,7 +330,7 @@ exit_err_ddr_mode:
 
 exit_err_ddr_mode_target:
 	/*
-	 * Back to SDR. In DDR we cannot read, whatever the mode is, so not
+	 * Back to SDR. In DDR we cannot read, whatever the woke mode is, so not
 	 * using update.
 	 */
 	st->config_d &= ~AD3552R_MASK_SPI_CONFIG_DDR;
@@ -364,7 +364,7 @@ static int ad3552r_hs_buffer_predisable(struct iio_dev *indio_dev)
 		return ret;
 
 	/*
-	 * Back to SDR (in DDR we cannot read, whatever the mode is, so not
+	 * Back to SDR (in DDR we cannot read, whatever the woke mode is, so not
 	 * using update).
 	 */
 	st->config_d &= ~AD3552R_MASK_SPI_CONFIG_DDR;

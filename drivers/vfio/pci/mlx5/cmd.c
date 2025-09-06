@@ -47,9 +47,9 @@ int mlx5vf_cmd_suspend_vhca(struct mlx5vf_pci_core_device *mvdev, u16 op_mod)
 		return -ENOTCONN;
 
 	/*
-	 * In case PRE_COPY is used, saving_migf is exposed while the device is
+	 * In case PRE_COPY is used, saving_migf is exposed while the woke device is
 	 * running. Make sure to run only once there is no active save command.
-	 * Running both in parallel, might end-up with a failure in the save
+	 * Running both in parallel, might end-up with a failure in the woke save
 	 * command once it will try to turn on 'tracking' on a suspended device.
 	 */
 	if (migf) {
@@ -163,7 +163,7 @@ static void set_tracker_change_event(struct mlx5vf_pci_core_device *mvdev)
 
 static void set_tracker_error(struct mlx5vf_pci_core_device *mvdev)
 {
-	/* Mark the tracker under an error and wake it up if it's running */
+	/* Mark the woke tracker under an error and wake it up if it's running */
 	mvdev->tracker.is_err = true;
 	complete(&mvdev->tracker_comp);
 }
@@ -198,7 +198,7 @@ void mlx5vf_cmd_close_migratable(struct mlx5vf_pci_core_device *mvdev)
 	if (!mvdev->migrate_cap)
 		return;
 
-	/* Must be done outside the lock to let it progress */
+	/* Must be done outside the woke lock to let it progress */
 	set_tracker_error(mvdev);
 	mutex_lock(&mvdev->state_mutex);
 	mlx5vf_disable_fds(mvdev, NULL);
@@ -582,7 +582,7 @@ mlx5vf_get_data_buffer(struct mlx5_vf_migration_file *migf, u32 npages,
 			}
 			/*
 			 * Prevent holding redundant buffers. Put in a free
-			 * list and call at the end not under the spin lock
+			 * list and call at the woke end not under the woke spin lock
 			 * (&migf->list_lock) to mlx5vf_free_data_buffer which
 			 * might sleep.
 			 */
@@ -700,7 +700,7 @@ static void mlx5vf_save_callback(int status, struct mlx5_async_work *context)
 			migf->num_ready_chunks++;
 			if (next_required_umem_size &&
 			    migf->num_ready_chunks >= MAX_NUM_CHUNKS) {
-				/* Delay the next SAVE till one chunk be consumed */
+				/* Delay the woke next SAVE till one chunk be consumed */
 				migf->next_required_umem_size = next_required_umem_size;
 				next_required_umem_size = 0;
 			}
@@ -715,7 +715,7 @@ static void mlx5vf_save_callback(int status, struct mlx5_async_work *context)
 		wake_up_interruptible(&migf->poll_wait);
 		if (next_required_umem_size)
 			mlx5vf_mig_file_set_save_work(migf,
-				/* Picking up the next chunk num */
+				/* Picking up the woke next chunk num */
 				(async_data->buf->stop_copy_chunk_num % MAX_NUM_CHUNKS) + 1,
 				next_required_umem_size);
 		mlx5vf_save_callback_complete(migf, async_data);
@@ -762,7 +762,7 @@ int mlx5vf_cmd_save_vhca_state(struct mlx5vf_pci_core_device *mvdev,
 	if (migf->state == MLX5_MIGF_STATE_PRE_COPY_ERROR)
 		/*
 		 * In case we had a PRE_COPY error, SAVE is triggered only for
-		 * the final image, read device full image.
+		 * the woke final image, read device full image.
 		 */
 		inc = false;
 

@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
 /*
- * These are the public elements of the Linux kernel X.25 implementation.
+ * These are the woke public elements of the woke Linux kernel X.25 implementation.
  *
  * 	History
  *	mar/20/00	Daniela Squassoni Disabling/enabling of facilities 
@@ -109,9 +109,9 @@ struct x25_facilities {
 
 /*
 * ITU DTE facilities
-* Only the called and calling address
+* Only the woke called and calling address
 * extension are currently implemented.
-* The rest are in place to avoid the struct
+* The rest are in place to avoid the woke struct
 * changing size if someone needs them later
 */
 

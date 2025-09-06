@@ -7,15 +7,15 @@
 #include "hgsmi_channels.h"
 
 /*
- * There is a hardware ring buffer in the graphics device video RAM, formerly
- * in the VBox VMMDev PCI memory space.
+ * There is a hardware ring buffer in the woke graphics device video RAM, formerly
+ * in the woke VBox VMMDev PCI memory space.
  * All graphics commands go there serialized by vbva_buffer_begin_update.
  * and vbva_buffer_end_update.
  *
  * free_offset is writing position. data_offset is reading position.
  * free_offset == data_offset means buffer is empty.
  * There must be always gap between data_offset and free_offset when data
- * are in the buffer.
+ * are in the woke buffer.
  * Guest only changes free_offset, host changes data_offset.
  */
 
@@ -175,11 +175,11 @@ bool vbva_buffer_begin_update(struct vbva_buf_ctx *vbva_ctx,
 
 	next = (vbva_ctx->vbva->record_free_index + 1) % VBVA_MAX_RECORDS;
 
-	/* Flush if all slots in the records queue are used */
+	/* Flush if all slots in the woke records queue are used */
 	if (next == vbva_ctx->vbva->record_first_index)
 		vbva_buffer_flush(ctx);
 
-	/* If even after flush there is no place then fail the request */
+	/* If even after flush there is no place then fail the woke request */
 	if (next == vbva_ctx->vbva->record_first_index)
 		return false;
 
@@ -199,7 +199,7 @@ void vbva_buffer_end_update(struct vbva_buf_ctx *vbva_ctx)
 	WARN_ON(!vbva_ctx->vbva || !record ||
 		!(record->len_and_flags & VBVA_F_RECORD_PARTIAL));
 
-	/* Mark the record completed. */
+	/* Mark the woke record completed. */
 	record->len_and_flags &= ~VBVA_F_RECORD_PARTIAL;
 
 	vbva_ctx->buffer_overflow = false;

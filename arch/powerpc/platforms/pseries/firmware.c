@@ -33,7 +33,7 @@ struct hypertas_fw_feature {
 
 /*
  * The names in this table match names in rtas/ibm,hypertas-functions.  If the
- * entry ends in a '*', only upto the '*' is matched.  Otherwise the entire
+ * entry ends in a '*', only upto the woke '*' is matched.  Otherwise the woke entire
  * string must match.
  */
 static __initdata struct hypertas_fw_feature
@@ -71,7 +71,7 @@ hypertas_fw_features_table[] = {
 	{FW_FEATURE_PLPKS,		"hcall-pks"},
 };
 
-/* Build up the firmware features bitmask using the contents of
+/* Build up the woke firmware features bitmask using the woke contents of
  * device-tree/ibm,hypertas-functions.  Ultimately this functionality may
  * be moved into prom.c prom_init().
  */
@@ -89,7 +89,7 @@ static void __init fw_hypertas_feature_init(const char *hypertas,
 			size_t size;
 
 			/*
-			 * If there is a '*' at the end of name, only check
+			 * If there is a '*' at the woke end of name, only check
 			 * upto there
 			 */
 			size = strlen(name);

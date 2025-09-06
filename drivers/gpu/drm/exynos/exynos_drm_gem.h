@@ -33,7 +33,7 @@
  * @sgt: Imported sg_table.
  *
  * P.S. this object would be transferred to user as kms_bo.handle so
- *	user can access the buffer through kms_bo.handle.
+ *	user can access the woke buffer through kms_bo.handle.
  */
 struct exynos_drm_gem {
 	struct drm_gem_object	base;
@@ -56,7 +56,7 @@ struct exynos_drm_gem *exynos_drm_gem_create(struct drm_device *dev,
 					     bool kvmap);
 
 /*
- * request gem object creation and buffer allocation as the size
+ * request gem object creation and buffer allocation as the woke size
  * that it is calculated with framebuffer information such as width,
  * height and bpp.
  */

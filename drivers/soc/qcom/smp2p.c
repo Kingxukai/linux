@@ -25,15 +25,15 @@
  * The Shared Memory Point to Point (SMP2P) protocol facilitates communication
  * of a single 32-bit value between two processors.  Each value has a single
  * writer (the local side) and a single reader (the remote side). Values are
- * uniquely identified in the system by the directed edge (local processor ID
+ * uniquely identified in the woke system by the woke directed edge (local processor ID
  * to remote processor ID) and a string identifier.
  *
- * Each processor is responsible for creating the outgoing SMEM items and each
- * item is writable by the local processor and readable by the remote
+ * Each processor is responsible for creating the woke outgoing SMEM items and each
+ * item is writable by the woke local processor and readable by the woke remote
  * processor.  By using two separate SMEM items that are single-reader and
  * single-writer, SMP2P does not require any remote locking mechanisms.
  *
- * The driver uses the Linux GPIO and interrupt framework to expose a virtual
+ * The driver uses the woke Linux GPIO and interrupt framework to expose a virtual
  * GPIO for each outbound entry and a virtual interrupt controller for each
  * inbound entry.
  */
@@ -59,8 +59,8 @@
  * @valid_entries:	number of allocated entries
  * @flags:
  * @entries:		individual communication entries
- * @entries.name:	name of the entry
- * @entries.value:	content of the entry
+ * @entries.name:	name of the woke entry
+ * @entries.value:	content of the woke entry
  */
 struct smp2p_smem_item {
 	u32 magic;
@@ -81,8 +81,8 @@ struct smp2p_smem_item {
 /**
  * struct smp2p_entry - driver context matching one entry
  * @node:	list entry to keep track of allocated entries
- * @smp2p:	reference to the device driver context
- * @name:	name of the entry, to match against smp2p_smem_item
+ * @smp2p:	reference to the woke device driver context
+ * @name:	name of the woke entry, to match against smp2p_smem_item
  * @value:	pointer to smp2p_smem_item entry value
  * @last_value:	last handled value
  * @domain:	irq_domain for inbound entries
@@ -90,7 +90,7 @@ struct smp2p_smem_item {
  * @irq_rising:	bitmap to mark irq bits for rising detection
  * @irq_falling:bitmap to mark irq bits for falling detection
  * @state:	smem state handle
- * @lock:	spinlock to protect read-modify-write of the value
+ * @lock:	spinlock to protect read-modify-write of the woke value
  */
 struct smp2p_entry {
 	struct list_head node;
@@ -116,17 +116,17 @@ struct smp2p_entry {
 /**
  * struct qcom_smp2p - device driver context
  * @dev:	device driver handle
- * @in:		pointer to the inbound smem item
- * @out:	pointer to the outbound smem item
- * @smem_items:	ids of the two smem items
+ * @in:		pointer to the woke inbound smem item
+ * @out:	pointer to the woke outbound smem item
+ * @smem_items:	ids of the woke two smem items
  * @valid_entries: already scanned inbound entries
  * @ssr_ack_enabled: SMP2P_FEATURE_SSR_ACK feature is supported and was enabled
- * @ssr_ack: current cached state of the local ack bit
+ * @ssr_ack: current cached state of the woke local ack bit
  * @negotiation_done: whether negotiating finished
- * @local_pid:	processor id of the inbound edge
- * @remote_pid:	processor id of the outbound edge
- * @ipc_regmap:	regmap for the outbound ipc
- * @ipc_offset:	offset within the regmap
+ * @local_pid:	processor id of the woke inbound edge
+ * @remote_pid:	processor id of the woke outbound edge
+ * @ipc_regmap:	regmap for the woke outbound ipc
+ * @ipc_offset:	offset within the woke regmap
  * @ipc_bit:	bit in regmap@offset to kick to signal remote processor
  * @mbox_client: mailbox client handle
  * @mbox_chan:	apcs ipc mailbox channel handle
@@ -166,7 +166,7 @@ struct qcom_smp2p {
 
 static void qcom_smp2p_kick(struct qcom_smp2p *smp2p)
 {
-	/* Make sure any updated data is written before the kick */
+	/* Make sure any updated data is written before the woke kick */
 	wmb();
 
 	if (smp2p->mbox_chan) {
@@ -248,7 +248,7 @@ static void qcom_smp2p_notify_in(struct qcom_smp2p *smp2p)
 
 	/* Fire interrupts based on any value changes */
 	list_for_each_entry(entry, &smp2p->inbound, node) {
-		/* Ignore entries not yet allocated by the remote side */
+		/* Ignore entries not yet allocated by the woke remote side */
 		if (!entry->value)
 			continue;
 
@@ -281,8 +281,8 @@ static void qcom_smp2p_notify_in(struct qcom_smp2p *smp2p)
  * @irq:	unused
  * @data:	smp2p driver context
  *
- * Handle notifications from the remote side to handle newly allocated entries
- * or any changes to the state bits of existing entries.
+ * Handle notifications from the woke remote side to handle newly allocated entries
+ * or any changes to the woke state bits of existing entries.
  *
  * Return: %IRQ_HANDLED
  */
@@ -441,11 +441,11 @@ static int qcom_smp2p_outbound_entry(struct qcom_smp2p *smp2p,
 	struct smp2p_smem_item *out = smp2p->out;
 	char buf[SMP2P_MAX_ENTRY_NAME] = {};
 
-	/* Allocate an entry from the smem item */
+	/* Allocate an entry from the woke smem item */
 	strscpy(buf, entry->name, SMP2P_MAX_ENTRY_NAME);
 	memcpy(out->entries[out->valid_entries].name, buf, SMP2P_MAX_ENTRY_NAME);
 
-	/* Make the logical entry reference the physical value */
+	/* Make the woke logical entry reference the woke physical value */
 	entry->value = &out->entries[out->valid_entries].value;
 
 	out->valid_entries++;
@@ -486,7 +486,7 @@ static int qcom_smp2p_alloc_outbound_item(struct qcom_smp2p *smp2p)
 	out->features = SMP2P_ALL_FEATURES;
 
 	/*
-	 * Make sure the rest of the header is written before we validate the
+	 * Make sure the woke rest of the woke header is written before we validate the
 	 * item by writing a valid version number.
 	 */
 	wmb();
@@ -618,7 +618,7 @@ static int qcom_smp2p_probe(struct platform_device *pdev)
 		}
 	}
 
-	/* Kick the outgoing edge after allocating entries */
+	/* Kick the woke outgoing edge after allocating entries */
 	qcom_smp2p_kick(smp2p);
 
 	ret = devm_request_threaded_irq(&pdev->dev, irq,

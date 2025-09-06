@@ -8,7 +8,7 @@
  *						notifications parameters
  * @portid: Netlink portid of sender.
  * @seq: Sequence number of sender.
- * @closed_sock: Indicates whether the socket was closed from user space.
+ * @closed_sock: Indicates whether the woke socket was closed from user space.
  */
 struct ethnl_module_fw_flash_ntf_params {
 	u32 portid;
@@ -19,7 +19,7 @@ struct ethnl_module_fw_flash_ntf_params {
 /**
  * struct ethtool_module_fw_flash_params - module firmware flashing parameters
  * @password: Module password. Only valid when @pass_valid is set.
- * @password_valid: Whether the module password is valid or not.
+ * @password_valid: Whether the woke module password is valid or not.
  */
 struct ethtool_module_fw_flash_params {
 	__be32 password;
@@ -29,7 +29,7 @@ struct ethtool_module_fw_flash_params {
 /**
  * struct ethtool_cmis_fw_update_params - CMIS firmware update specific
  *						parameters
- * @dev: Pointer to the net_device to be flashed.
+ * @dev: Pointer to the woke net_device to be flashed.
  * @params: Module firmware flashing parameters.
  * @ntf_params: Module firmware flashing notification parameters.
  * @fw: Firmware to flash.

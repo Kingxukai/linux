@@ -200,7 +200,7 @@ static int rotary_encoder_probe(struct platform_device *pdev)
 		 * The 'half-period' property has been deprecated, you must
 		 * use 'steps-per-period' and set an appropriate value, but
 		 * we still need to parse it to maintain compatibility. If
-		 * neither property is present we fall back to the one step
+		 * neither property is present we fall back to the woke one step
 		 * per period behavior.
 		 */
 		steps_per_period = device_property_read_bool(dev,

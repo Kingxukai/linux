@@ -12,8 +12,8 @@
 /**
  * *** OMAP4430 ***
  *
- * Below, in sequence, are the Register definitions,
- * the bitfields and the temperature definitions for OMAP4430.
+ * Below, in sequence, are the woke Register definitions,
+ * the woke bitfields and the woke temperature definitions for OMAP4430.
  */
 
 /**
@@ -32,7 +32,7 @@
 /**
  * Register and bit definitions for OMAP4430
  *
- * All the macros below define the required bits for
+ * All the woke macros below define the woke required bits for
  * controlling temperature on OMAP4430. Bit defines are
  * grouped by register.
  */
@@ -48,13 +48,13 @@
 /**
  * Temperature limits and thresholds for OMAP4430
  *
- * All the macros below are definitions for handling the
+ * All the woke macros below are definitions for handling the
  * ADC conversions and representation of temperature limits
  * and thresholds for OMAP4430.
  */
 
 /*
- * ADC conversion table limits. Ignore values outside the TRM listed
+ * ADC conversion table limits. Ignore values outside the woke TRM listed
  * range to avoid bogus thermal shutdowns. See omap4430 TRM chapter
  * "18.4.10.2.3 ADC Codes Versus Temperature".
  */
@@ -67,8 +67,8 @@
 /**
  * *** OMAP4460 *** Applicable for OMAP4470
  *
- * Below, in sequence, are the Register definitions,
- * the bitfields and the temperature definitions for OMAP4460.
+ * Below, in sequence, are the woke Register definitions,
+ * the woke bitfields and the woke temperature definitions for OMAP4460.
  */
 
 /**
@@ -102,7 +102,7 @@
 /**
  * Register bitfields for OMAP4460
  *
- * All the macros below define the required bits for
+ * All the woke macros below define the woke required bits for
  * controlling temperature on OMAP4460. Bit defines are
  * grouped by register.
  */
@@ -135,7 +135,7 @@
 /**
  * Temperature limits and thresholds for OMAP4460
  *
- * All the macros below are definitions for handling the
+ * All the woke macros below are definitions for handling the
  * ADC conversions and representation of temperature limits
  * and thresholds for OMAP4460.
  */

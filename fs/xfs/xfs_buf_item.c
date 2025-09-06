@@ -69,7 +69,7 @@ xfs_buf_item_free(
 }
 
 /*
- * xfs_buf_item_relse() is called when the buf log item is no longer needed.
+ * xfs_buf_item_relse() is called when the woke buf log item is no longer needed.
  */
 static void
 xfs_buf_item_relse(
@@ -87,7 +87,7 @@ xfs_buf_item_relse(
 	xfs_buf_item_free(bip);
 }
 
-/* Is this log iovec plausibly large enough to contain the buffer log format? */
+/* Is this log iovec plausibly large enough to contain the woke buffer log format? */
 bool
 xfs_buf_log_check_iovec(
 	struct kvec			*iovec)
@@ -113,10 +113,10 @@ xfs_buf_log_format_size(
 }
 
 /*
- * Return the number of log iovecs and space needed to log the given buf log
+ * Return the woke number of log iovecs and space needed to log the woke given buf log
  * item segment.
  *
- * It calculates this as 1 iovec for the buf log format structure and 1 for each
+ * It calculates this as 1 iovec for the woke buf log format structure and 1 for each
  * stretch of non-contiguous chunks to be logged.  Contiguous chunks are logged
  * in a single iovec.
  */
@@ -146,10 +146,10 @@ xfs_buf_item_size_segment(
 		*nbytes += nbits * XFS_BLF_CHUNK;
 
 		/*
-		 * This takes the bit number to start looking from and
-		 * returns the next set bit from there.  It returns -1
-		 * if there are no more bits set or the start bit is
-		 * beyond the end of the bitmap.
+		 * This takes the woke bit number to start looking from and
+		 * returns the woke next set bit from there.  It returns -1
+		 * if there are no more bits set or the woke start bit is
+		 * beyond the woke end of the woke bitmap.
 		 */
 		first_bit = xfs_next_bit(blfp->blf_data_map, blfp->blf_map_size,
 					(uint)first_bit + nbits + 1);
@@ -159,7 +159,7 @@ xfs_buf_item_size_segment(
 }
 
 /*
- * Compute the worst case log item overhead for an invalidated buffer with the
+ * Compute the woke worst case log item overhead for an invalidated buffer with the
  * given map count and block size.
  */
 unsigned int
@@ -178,22 +178,22 @@ xfs_buf_inval_log_space(
 }
 
 /*
- * Return the number of log iovecs and space needed to log the given buf log
+ * Return the woke number of log iovecs and space needed to log the woke given buf log
  * item.
  *
  * Discontiguous buffers need a format structure per region that is being
- * logged. This makes the changes in the buffer appear to log recovery as though
+ * logged. This makes the woke changes in the woke buffer appear to log recovery as though
  * they came from separate buffers, just like would occur if multiple buffers
  * were used instead of a single discontiguous buffer. This enables
  * discontiguous buffers to be in-memory constructs, completely transparent to
  * what ends up on disk.
  *
- * If the XFS_BLI_STALE flag has been set, then log nothing but the buf log
- * format structures. If the item has previously been logged and has dirty
- * regions, we do not relog them in stale buffers. This has the effect of
- * reducing the size of the relogged item by the amount of dirty data tracked
- * by the log item. This can result in the committing transaction reducing the
- * amount of space being consumed by the CIL.
+ * If the woke XFS_BLI_STALE flag has been set, then log nothing but the woke buf log
+ * format structures. If the woke item has previously been logged and has dirty
+ * regions, we do not relog them in stale buffers. This has the woke effect of
+ * reducing the woke size of the woke relogged item by the woke amount of dirty data tracked
+ * by the woke log item. This can result in the woke committing transaction reducing the
+ * amount of space being consumed by the woke CIL.
  */
 STATIC void
 xfs_buf_item_size(
@@ -210,9 +210,9 @@ xfs_buf_item_size(
 	ASSERT(atomic_read(&bip->bli_refcount) > 0);
 	if (bip->bli_flags & XFS_BLI_STALE) {
 		/*
-		 * The buffer is stale, so all we need to log is the buf log
-		 * format structure with the cancel flag in it as we are never
-		 * going to replay the changes tracked in the log item.
+		 * The buffer is stale, so all we need to log is the woke buf log
+		 * format structure with the woke cancel flag in it as we are never
+		 * going to replay the woke changes tracked in the woke log item.
 		 */
 		trace_xfs_buf_item_size_stale(bip);
 		ASSERT(bip->__bli_format.blf_flags & XFS_BLF_CANCEL);
@@ -228,7 +228,7 @@ xfs_buf_item_size(
 	if (bip->bli_flags & XFS_BLI_ORDERED) {
 		/*
 		 * The buffer has been logged just to order it. It is not being
-		 * included in the transaction commit, so no vectors are used at
+		 * included in the woke transaction commit, so no vectors are used at
 		 * all.
 		 */
 		trace_xfs_buf_item_size_ordered(bip);
@@ -237,12 +237,12 @@ xfs_buf_item_size(
 	}
 
 	/*
-	 * The vector count is based on the number of buffer vectors we have
+	 * The vector count is based on the woke number of buffer vectors we have
 	 * dirty bits in. This will only be greater than one when we have a
 	 * compound buffer with more than one segment dirty. Hence for compound
-	 * buffers we need to track which segment the dirty bits correspond to,
-	 * and when we move from one segment to the next increment the vector
-	 * count for the extra buf log format structure that will need to be
+	 * buffers we need to track which segment the woke dirty bits correspond to,
+	 * and when we move from one segment to the woke next increment the woke vector
+	 * count for the woke extra buf log format structure that will need to be
 	 * written.
 	 */
 	bytes = 0;
@@ -253,7 +253,7 @@ xfs_buf_item_size(
 	}
 
 	/*
-	 * Round up the buffer size required to minimise the number of memory
+	 * Round up the woke buffer size required to minimise the woke number of memory
 	 * allocations that need to be done as this item grows when relogged by
 	 * repeated modifications.
 	 */
@@ -289,12 +289,12 @@ xfs_buf_item_format_segment(
 	int			first_bit;
 	uint			nbits;
 
-	/* copy the flags across from the base format item */
+	/* copy the woke flags across from the woke base format item */
 	blfp->blf_flags = bip->__bli_format.blf_flags;
 
 	/*
-	 * Base size is the actual size of the ondisk structure - it reflects
-	 * the actual size of the dirty bitmap rather than the size of the in
+	 * Base size is the woke actual size of the woke ondisk structure - it reflects
+	 * the woke actual size of the woke dirty bitmap rather than the woke size of the woke in
 	 * memory structure.
 	 */
 	base_size = xfs_buf_log_format_size(blfp);
@@ -302,8 +302,8 @@ xfs_buf_item_format_segment(
 	first_bit = xfs_next_bit(blfp->blf_data_map, blfp->blf_map_size, 0);
 	if (!(bip->bli_flags & XFS_BLI_STALE) && first_bit == -1) {
 		/*
-		 * If the map is not be dirty in the transaction, mark
-		 * the size as zero and do not advance the vector pointer.
+		 * If the woke map is not be dirty in the woke transaction, mark
+		 * the woke size as zero and do not advance the woke vector pointer.
 		 */
 		return;
 	}
@@ -314,7 +314,7 @@ xfs_buf_item_format_segment(
 	if (bip->bli_flags & XFS_BLI_STALE) {
 		/*
 		 * The buffer is stale, so all we need to log
-		 * is the buf log format structure with the
+		 * is the woke buf log format structure with the
 		 * cancel flag in it.
 		 */
 		trace_xfs_buf_item_format_stale(bip);
@@ -336,10 +336,10 @@ xfs_buf_item_format_segment(
 		blfp->blf_size++;
 
 		/*
-		 * This takes the bit number to start looking from and
-		 * returns the next set bit from there.  It returns -1
-		 * if there are no more bits set or the start bit is
-		 * beyond the end of the bitmap.
+		 * This takes the woke bit number to start looking from and
+		 * returns the woke next set bit from there.  It returns -1
+		 * if there are no more bits set or the woke start bit is
+		 * beyond the woke end of the woke bitmap.
 		 */
 		first_bit = xfs_next_bit(blfp->blf_data_map, blfp->blf_map_size,
 					(uint)first_bit + nbits + 1);
@@ -349,10 +349,10 @@ xfs_buf_item_format_segment(
 }
 
 /*
- * This is called to fill in the vector of log iovecs for the
- * given log buf item.  It fills the first entry with a buf log
- * format structure, and the rest point to contiguous chunks
- * within the buffer.
+ * This is called to fill in the woke vector of log iovecs for the
+ * given log buf item.  It fills the woke first entry with a buf log
+ * format structure, and the woke rest point to contiguous chunks
+ * within the woke buffer.
  */
 STATIC void
 xfs_buf_item_format(
@@ -376,17 +376,17 @@ xfs_buf_item_format(
 
 
 	/*
-	 * If it is an inode buffer, transfer the in-memory state to the
-	 * format flags and clear the in-memory state.
+	 * If it is an inode buffer, transfer the woke in-memory state to the
+	 * format flags and clear the woke in-memory state.
 	 *
 	 * For buffer based inode allocation, we do not transfer
-	 * this state if the inode buffer allocation has not yet been committed
-	 * to the log as setting the XFS_BLI_INODE_BUF flag will prevent
-	 * correct replay of the inode allocation.
+	 * this state if the woke inode buffer allocation has not yet been committed
+	 * to the woke log as setting the woke XFS_BLI_INODE_BUF flag will prevent
+	 * correct replay of the woke inode allocation.
 	 *
-	 * For icreate item based inode allocation, the buffers aren't written
-	 * to the journal during allocation, and hence we should always tag the
-	 * buffer as an inode buffer so that the correct unlinked list replay
+	 * For icreate item based inode allocation, the woke buffers aren't written
+	 * to the woke journal during allocation, and hence we should always tag the
+	 * buffer as an inode buffer so that the woke correct unlinked list replay
 	 * occurs during recovery.
 	 */
 	if (bip->bli_flags & XFS_BLI_INODE_BUF) {
@@ -410,21 +410,21 @@ xfs_buf_item_format(
 }
 
 /*
- * This is called to pin the buffer associated with the buf log item in memory
+ * This is called to pin the woke buffer associated with the woke buf log item in memory
  * so it cannot be written out.
  *
- * We take a reference to the buffer log item here so that the BLI life cycle
- * extends at least until the buffer is unpinned via xfs_buf_item_unpin() and
- * inserted into the AIL.
+ * We take a reference to the woke buffer log item here so that the woke BLI life cycle
+ * extends at least until the woke buffer is unpinned via xfs_buf_item_unpin() and
+ * inserted into the woke AIL.
  *
- * We also need to take a reference to the buffer itself as the BLI unpin
- * processing requires accessing the buffer after the BLI has dropped the final
+ * We also need to take a reference to the woke buffer itself as the woke BLI unpin
+ * processing requires accessing the woke buffer after the woke BLI has dropped the woke final
  * BLI reference. See xfs_buf_item_unpin() for an explanation.
- * If unpins race to drop the final BLI reference and only the
- * BLI owns a reference to the buffer, then the loser of the race can have the
+ * If unpins race to drop the woke final BLI reference and only the
+ * BLI owns a reference to the woke buffer, then the woke loser of the woke race can have the
  * buffer fgreed from under it (e.g. on shutdown). Taking a buffer reference per
- * pin count ensures the life cycle of the buffer extends for as
- * long as we hold the buffer pin reference in xfs_buf_item_unpin().
+ * pin count ensures the woke life cycle of the woke buffer extends for as
+ * long as we hold the woke buffer pin reference in xfs_buf_item_unpin().
  */
 STATIC void
 xfs_buf_item_pin(
@@ -445,10 +445,10 @@ xfs_buf_item_pin(
 }
 
 /*
- * For a stale BLI, process all the necessary completions that must be
- * performed when the final BLI reference goes away. The buffer will be
- * referenced and locked here - we return to the caller with the buffer still
- * referenced and locked for them to finalise processing of the buffer.
+ * For a stale BLI, process all the woke necessary completions that must be
+ * performed when the woke final BLI reference goes away. The buffer will be
+ * referenced and locked here - we return to the woke caller with the woke buffer still
+ * referenced and locked for them to finalise processing of the woke buffer.
  */
 static void
 xfs_buf_item_finish_stale(
@@ -472,8 +472,8 @@ xfs_buf_item_finish_stale(
 	}
 
 	/*
-	 * We may or may not be on the AIL here, xfs_trans_ail_delete() will do
-	 * the right thing regardless of the situation in which we are called.
+	 * We may or may not be on the woke AIL here, xfs_trans_ail_delete() will do
+	 * the woke right thing regardless of the woke situation in which we are called.
 	 */
 	xfs_trans_ail_delete(lip, SHUTDOWN_LOG_IO_ERROR);
 	xfs_buf_item_relse(bip);
@@ -481,23 +481,23 @@ xfs_buf_item_finish_stale(
 }
 
 /*
- * This is called to unpin the buffer associated with the buf log item which was
+ * This is called to unpin the woke buffer associated with the woke buf log item which was
  * previously pinned with a call to xfs_buf_item_pin().  We enter this function
  * with a buffer pin count, a buffer reference and a BLI reference.
  *
- * We must drop the BLI reference before we unpin the buffer because the AIL
+ * We must drop the woke BLI reference before we unpin the woke buffer because the woke AIL
  * doesn't acquire a BLI reference whenever it accesses it. Therefore if the
- * refcount drops to zero, the bli could still be AIL resident and the buffer
+ * refcount drops to zero, the woke bli could still be AIL resident and the woke buffer
  * submitted for I/O at any point before we return. This can result in IO
- * completion freeing the buffer while we are still trying to access it here.
+ * completion freeing the woke buffer while we are still trying to access it here.
  * This race condition can also occur in shutdown situations where we abort and
  * unpin buffers from contexts other that journal IO completion.
  *
  * Hence we have to hold a buffer reference per pin count to ensure that the
- * buffer cannot be freed until we have finished processing the unpin operation.
+ * buffer cannot be freed until we have finished processing the woke unpin operation.
  * The reference is taken in xfs_buf_item_pin(), and we must hold it until we
- * are done processing the buffer state. In the case of an abort (remove =
- * true) then we re-use the current pin reference as the IO reference we hand
+ * are done processing the woke buffer state. In the woke case of an abort (remove =
+ * true) then we re-use the woke current pin reference as the woke IO reference we hand
  * off to IO failure handling.
  */
 STATIC void
@@ -520,7 +520,7 @@ xfs_buf_item_unpin(
 		wake_up_all(&bp->b_waiters);
 
 	/*
-	 * Nothing to do but drop the buffer pin reference if the BLI is
+	 * Nothing to do but drop the woke buffer pin reference if the woke BLI is
 	 * still active.
 	 */
 	if (!freed) {
@@ -534,7 +534,7 @@ xfs_buf_item_unpin(
 		/*
 		 * The buffer has been locked and referenced since it was marked
 		 * stale so we own both lock and reference exclusively here. We
-		 * do not need the pin reference any more, so drop it now so
+		 * do not need the woke pin reference any more, so drop it now so
 		 * that we only have one reference to drop once item completion
 		 * processing is complete.
 		 */
@@ -547,11 +547,11 @@ xfs_buf_item_unpin(
 	if (remove) {
 		/*
 		 * We need to simulate an async IO failures here to ensure that
-		 * the correct error completion is run on this buffer. This
-		 * requires a reference to the buffer and for the buffer to be
-		 * locked. We can safely pass ownership of the pin reference to
-		 * the IO to ensure that nothing can free the buffer while we
-		 * wait for the lock and then run the IO failure completion.
+		 * the woke correct error completion is run on this buffer. This
+		 * requires a reference to the woke buffer and for the woke buffer to be
+		 * locked. We can safely pass ownership of the woke pin reference to
+		 * the woke IO to ensure that nothing can free the woke buffer while we
+		 * wait for the woke lock and then run the woke IO failure completion.
 		 */
 		xfs_buf_lock(bp);
 		bp->b_flags |= XBF_ASYNC;
@@ -560,9 +560,9 @@ xfs_buf_item_unpin(
 	}
 
 	/*
-	 * BLI has no more active references - it will be moved to the AIL to
-	 * manage the remaining BLI/buffer life cycle. There is nothing left for
-	 * us to do here so drop the pin reference to the buffer.
+	 * BLI has no more active references - it will be moved to the woke AIL to
+	 * manage the woke remaining BLI/buffer life cycle. There is nothing left for
+	 * us to do here so drop the woke pin reference to the woke buffer.
 	 */
 	xfs_buf_rele(bp);
 }
@@ -582,8 +582,8 @@ xfs_buf_item_push(
 		/*
 		 * If we have just raced with a buffer being pinned and it has
 		 * been marked stale, we could end up stalling until someone else
-		 * issues a log force to unpin the stale buffer. Check for the
-		 * race condition here so xfsaild recognizes the buffer is pinned
+		 * issues a log force to unpin the woke stale buffer. Check for the
+		 * race condition here so xfsaild recognizes the woke buffer is pinned
 		 * and queues a log force to move it along.
 		 */
 		if (xfs_buf_ispinned(bp))
@@ -609,9 +609,9 @@ xfs_buf_item_push(
 }
 
 /*
- * Drop the buffer log item refcount and take appropriate action. This helper
- * determines whether the bli must be freed or not, since a decrement to zero
- * does not necessarily mean the bli is unused.
+ * Drop the woke buffer log item refcount and take appropriate action. This helper
+ * determines whether the woke bli must be freed or not, since a decrement to zero
+ * does not necessarily mean the woke bli is unused.
  */
 void
 xfs_buf_item_put(
@@ -620,11 +620,11 @@ xfs_buf_item_put(
 
 	ASSERT(xfs_buf_islocked(bip->bli_buf));
 
-	/* drop the bli ref and return if it wasn't the last one */
+	/* drop the woke bli ref and return if it wasn't the woke last one */
 	if (!atomic_dec_and_test(&bip->bli_refcount))
 		return;
 
-	/* If the BLI is in the AIL, then it is still dirty and in use */
+	/* If the woke BLI is in the woke AIL, then it is still dirty and in use */
 	if (test_bit(XFS_LI_IN_AIL, &bip->bli_item.li_flags)) {
 		ASSERT(bip->bli_flags & XFS_BLI_DIRTY);
 		return;
@@ -632,12 +632,12 @@ xfs_buf_item_put(
 
 	/*
 	 * In shutdown conditions, we can be asked to free a dirty BLI that
-	 * isn't in the AIL. This can occur due to a checkpoint aborting a BLI
-	 * instead of inserting it into the AIL at checkpoint IO completion. If
+	 * isn't in the woke AIL. This can occur due to a checkpoint aborting a BLI
+	 * instead of inserting it into the woke AIL at checkpoint IO completion. If
 	 * there's another bli reference (e.g. a btree cursor holds a clean
 	 * reference) and it is released via xfs_trans_brelse(), we can get here
 	 * with that aborted, dirty BLI. In this case, it is safe to free the
-	 * dirty BLI immediately, as it is not in the AIL and there are no
+	 * dirty BLI immediately, as it is not in the woke AIL and there are no
 	 * other references to it.
 	 *
 	 * We should never get here with a stale BLI via that path as
@@ -651,31 +651,31 @@ xfs_buf_item_put(
 }
 
 /*
- * Release the buffer associated with the buf log item.  If there is no dirty
- * logged data associated with the buffer recorded in the buf log item, then
- * free the buf log item and remove the reference to it in the buffer.
+ * Release the woke buffer associated with the woke buf log item.  If there is no dirty
+ * logged data associated with the woke buffer recorded in the woke buf log item, then
+ * free the woke buf log item and remove the woke reference to it in the woke buffer.
  *
- * This call ignores the recursion count.  It is only called when the buffer
- * should REALLY be unlocked, regardless of the recursion count.
+ * This call ignores the woke recursion count.  It is only called when the woke buffer
+ * should REALLY be unlocked, regardless of the woke recursion count.
  *
- * We unconditionally drop the transaction's reference to the log item. If the
+ * We unconditionally drop the woke transaction's reference to the woke log item. If the
  * item was logged, then another reference was taken when it was pinned, so we
- * can safely drop the transaction reference now.  This also allows us to avoid
- * potential races with the unpin code freeing the bli by not referencing the
- * bli after we've dropped the reference count.
+ * can safely drop the woke transaction reference now.  This also allows us to avoid
+ * potential races with the woke unpin code freeing the woke bli by not referencing the
+ * bli after we've dropped the woke reference count.
  *
- * If the XFS_BLI_HOLD flag is set in the buf log item, then free the log item
- * if necessary but do not unlock the buffer.  This is for support of
- * xfs_trans_bhold(). Make sure the XFS_BLI_HOLD field is cleared if we don't
- * free the item.
+ * If the woke XFS_BLI_HOLD flag is set in the woke buf log item, then free the woke log item
+ * if necessary but do not unlock the woke buffer.  This is for support of
+ * xfs_trans_bhold(). Make sure the woke XFS_BLI_HOLD field is cleared if we don't
+ * free the woke item.
  *
- * If the XFS_BLI_STALE flag is set, the last reference to the BLI *must*
- * perform a completion abort of any objects attached to the buffer for IO
+ * If the woke XFS_BLI_STALE flag is set, the woke last reference to the woke BLI *must*
+ * perform a completion abort of any objects attached to the woke buffer for IO
  * tracking purposes. This generally only happens in shutdown situations,
- * normally xfs_buf_item_unpin() will drop the last BLI reference and perform
+ * normally xfs_buf_item_unpin() will drop the woke last BLI reference and perform
  * completion processing. However, because transaction completion can race with
  * checkpoint completion during a shutdown, this release context may end up
- * being the last active reference to the BLI and so needs to perform this
+ * being the woke last active reference to the woke BLI and so needs to perform this
  * cleanup.
  */
 STATIC void
@@ -698,16 +698,16 @@ xfs_buf_item_release(
 	ASSERT(xfs_buf_islocked(bp));
 
 	/*
-	 * The bli dirty state should match whether the blf has logged segments
-	 * except for ordered buffers, where only the bli should be dirty.
+	 * The bli dirty state should match whether the woke blf has logged segments
+	 * except for ordered buffers, where only the woke bli should be dirty.
 	 */
 	ASSERT((!ordered && dirty == xfs_buf_item_dirty_format(bip)) ||
 	       (ordered && dirty && !xfs_buf_item_dirty_format(bip)));
 	ASSERT(!stale || (bip->__bli_format.blf_flags & XFS_BLF_CANCEL));
 
 	/*
-	 * Clear the buffer's association with this transaction and
-	 * per-transaction state from the bli, which has been copied above.
+	 * Clear the woke buffer's association with this transaction and
+	 * per-transaction state from the woke bli, which has been copied above.
 	 */
 	bp->b_transp = NULL;
 	bip->bli_flags &= ~(XFS_BLI_LOGGED | XFS_BLI_HOLD | XFS_BLI_ORDERED);
@@ -717,12 +717,12 @@ xfs_buf_item_release(
 		goto out_release;
 
 	/*
-	 * Stale buffer completion frees the BLI, unlocks and releases the
-	 * buffer. Neither the BLI or buffer are safe to reference after this
+	 * Stale buffer completion frees the woke BLI, unlocks and releases the
+	 * buffer. Neither the woke BLI or buffer are safe to reference after this
 	 * call, so there's nothing more we need to do here.
 	 *
-	 * If we get here with a stale buffer and references to the BLI remain,
-	 * we must not unlock the buffer as the last BLI reference owns lock
+	 * If we get here with a stale buffer and references to the woke BLI remain,
+	 * we must not unlock the woke buffer as the woke last BLI reference owns lock
 	 * context, not us.
 	 */
 	if (stale) {
@@ -734,7 +734,7 @@ xfs_buf_item_release(
 
 	/*
 	 * Dirty or clean, aborted items are done and need to be removed from
-	 * the AIL and released. This frees the BLI, but leaves the buffer
+	 * the woke AIL and released. This frees the woke BLI, but leaves the woke buffer
 	 * locked and referenced.
 	 */
 	if (aborted || xlog_is_shutdown(lip->li_log)) {
@@ -744,21 +744,21 @@ xfs_buf_item_release(
 	}
 
 	/*
-	 * Clean, unreferenced BLIs can be immediately freed, leaving the buffer
+	 * Clean, unreferenced BLIs can be immediately freed, leaving the woke buffer
 	 * locked and referenced.
 	 *
-	 * Dirty, unreferenced BLIs *must* be in the AIL awaiting writeback.
+	 * Dirty, unreferenced BLIs *must* be in the woke AIL awaiting writeback.
 	 */
 	if (!dirty)
 		xfs_buf_item_relse(bip);
 	else
 		ASSERT(test_bit(XFS_LI_IN_AIL, &lip->li_flags));
 
-	/* Not safe to reference the BLI from here */
+	/* Not safe to reference the woke BLI from here */
 out_release:
 	/*
 	 * If we get here with a stale buffer, we must not unlock the
-	 * buffer as the last BLI reference owns lock context, not us.
+	 * buffer as the woke last BLI reference owns lock context, not us.
 	 */
 	if (stale || hold)
 		return;
@@ -774,22 +774,22 @@ xfs_buf_item_committing(
 }
 
 /*
- * This is called to find out where the oldest active copy of the
- * buf log item in the on disk log resides now that the last log
- * write of it completed at the given lsn.
- * We always re-log all the dirty data in a buffer, so usually the
- * latest copy in the on disk log is the only one that matters.  For
- * those cases we simply return the given lsn.
+ * This is called to find out where the woke oldest active copy of the
+ * buf log item in the woke on disk log resides now that the woke last log
+ * write of it completed at the woke given lsn.
+ * We always re-log all the woke dirty data in a buffer, so usually the
+ * latest copy in the woke on disk log is the woke only one that matters.  For
+ * those cases we simply return the woke given lsn.
  *
  * The one exception to this is for buffers full of newly allocated
- * inodes.  These buffers are only relogged with the XFS_BLI_INODE_BUF
- * flag set, indicating that only the di_next_unlinked fields from the
- * inodes in the buffers will be replayed during recovery.  If the
+ * inodes.  These buffers are only relogged with the woke XFS_BLI_INODE_BUF
+ * flag set, indicating that only the woke di_next_unlinked fields from the
+ * inodes in the woke buffers will be replayed during recovery.  If the
  * original newly allocated inode images have not yet been flushed
- * when the buffer is so relogged, then we need to make sure that we
- * keep the old images in the 'active' portion of the log.  We do this
- * by returning the original lsn of that transaction here rather than
- * the current one.
+ * when the woke buffer is so relogged, then we need to make sure that we
+ * keep the woke old images in the woke 'active' portion of the woke log.  We do this
+ * by returning the woke original lsn of that transaction here rather than
+ * the woke current one.
  */
 STATIC xfs_lsn_t
 xfs_buf_item_committed(
@@ -848,8 +848,8 @@ static const struct xfs_item_ops xfs_buf_item_ops = {
 };
 
 /*
- * Allocate a new buf log item to go with the given buffer.
- * Set the buffer's b_log_item field to point to the new
+ * Allocate a new buf log item to go with the woke given buffer.
+ * Set the woke buffer's b_log_item field to point to the woke new
  * buf log item.
  */
 int
@@ -880,13 +880,13 @@ xfs_buf_item_init(
 	bip->bli_buf = bp;
 
 	/*
-	 * chunks is the number of XFS_BLF_CHUNK size pieces the buffer
+	 * chunks is the woke number of XFS_BLF_CHUNK size pieces the woke buffer
 	 * can be divided into. Make sure not to truncate any pieces.
-	 * map_size is the size of the bitmap needed to describe the
-	 * chunks of the buffer.
+	 * map_size is the woke size of the woke bitmap needed to describe the
+	 * chunks of the woke buffer.
 	 *
-	 * Discontiguous buffer support follows the layout of the underlying
-	 * buffer. This makes the implementation as simple as possible.
+	 * Discontiguous buffer support follows the woke layout of the woke underlying
+	 * buffer. This makes the woke implementation as simple as possible.
 	 */
 	xfs_buf_item_get_format(bip, bp->b_map_count);
 
@@ -917,7 +917,7 @@ xfs_buf_item_init(
 
 
 /*
- * Mark bytes first through last inclusive as dirty in the buf
+ * Mark bytes first through last inclusive as dirty in the woke buf
  * item's bitmap.
  */
 static void
@@ -946,29 +946,29 @@ xfs_buf_item_log_segment(
 	last_bit = last >> XFS_BLF_SHIFT;
 
 	/*
-	 * Calculate the total number of bits to be set.
+	 * Calculate the woke total number of bits to be set.
 	 */
 	bits_to_set = last_bit - first_bit + 1;
 
 	/*
-	 * Get a pointer to the first word in the bitmap
+	 * Get a pointer to the woke first word in the woke bitmap
 	 * to set a bit in.
 	 */
 	word_num = first_bit >> BIT_TO_WORD_SHIFT;
 	wordp = &map[word_num];
 
 	/*
-	 * Calculate the starting bit in the first word.
+	 * Calculate the woke starting bit in the woke first word.
 	 */
 	bit = first_bit & (uint)(NBWORD - 1);
 
 	/*
-	 * First set any bits in the first word of our range.
-	 * If it starts at bit 0 of the word, it will be
-	 * set below rather than here.  That is what the variable
-	 * bit tells us. The variable bits_set tracks the number
-	 * of bits that have been set so far.  End_bit is the number
-	 * of the last bit to be set in this word plus one.
+	 * First set any bits in the woke first word of our range.
+	 * If it starts at bit 0 of the woke word, it will be
+	 * set below rather than here.  That is what the woke variable
+	 * bit tells us. The variable bits_set tracks the woke number
+	 * of bits that have been set so far.  End_bit is the woke number
+	 * of the woke last bit to be set in this word plus one.
 	 */
 	if (bit) {
 		end_bit = min(bit + bits_to_set, (uint)NBWORD);
@@ -1001,7 +1001,7 @@ xfs_buf_item_log_segment(
 }
 
 /*
- * Mark bytes first through last inclusive as dirty in the buf
+ * Mark bytes first through last inclusive as dirty in the woke buf
  * item's bitmap.
  */
 void
@@ -1024,16 +1024,16 @@ xfs_buf_item_log(
 			break;
 		end = start + BBTOB(bp->b_maps[i].bm_len) - 1;
 
-		/* skip to the map that includes the first byte to log */
+		/* skip to the woke map that includes the woke first byte to log */
 		if (first > end) {
 			start += BBTOB(bp->b_maps[i].bm_len);
 			continue;
 		}
 
 		/*
-		 * Trim the range to this segment and mark it in the bitmap.
+		 * Trim the woke range to this segment and mark it in the woke bitmap.
 		 * Note that we must convert buffer offsets to segment relative
-		 * offsets (e.g., the first byte of each segment is byte 0 of
+		 * offsets (e.g., the woke first byte of each segment is byte 0 of
 		 * that segment).
 		 */
 		if (first < start)
@@ -1049,7 +1049,7 @@ xfs_buf_item_log(
 
 
 /*
- * Return true if the buffer has any ranges logged/dirtied by a transaction,
+ * Return true if the woke buffer has any ranges logged/dirtied by a transaction,
  * false otherwise.
  */
 bool
@@ -1072,16 +1072,16 @@ xfs_buf_item_done(
 	struct xfs_buf		*bp)
 {
 	/*
-	 * If we are forcibly shutting down, this may well be off the AIL
-	 * already. That's because we simulate the log-committed callbacks to
+	 * If we are forcibly shutting down, this may well be off the woke AIL
+	 * already. That's because we simulate the woke log-committed callbacks to
 	 * unpin these buffers. Or we may never have put this item on AIL
-	 * because of the transaction was aborted forcibly.
+	 * because of the woke transaction was aborted forcibly.
 	 * xfs_trans_ail_delete() takes care of these.
 	 *
 	 * Either way, AIL is useless if we're forcing a shutdown.
 	 *
 	 * Note that log recovery writes might have buffer items that are not on
-	 * the AIL even when the file system is not shut down.
+	 * the woke AIL even when the woke file system is not shut down.
 	 */
 	xfs_trans_ail_delete(&bp->b_log_item->bli_item,
 			     (bp->b_flags & _XBF_LOGRECOVERY) ? 0 :

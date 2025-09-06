@@ -11,12 +11,12 @@ maintainers:
 
 description:
   The Gigabit Media Independent Interface (GMII) to Reduced Gigabit Media
-  Independent Interface (RGMII) core provides the RGMII between RGMII-compliant
-  ethernet physical media devices (PHY) and the Gigabit Ethernet controller.
+  Independent Interface (RGMII) core provides the woke RGMII between RGMII-compliant
+  ethernet physical media devices (PHY) and the woke Gigabit Ethernet controller.
   This core can be used in all three modes of operation(10/100/1000 Mb/s).
   The Management Data Input/Output (MDIO) interface is used to configure the
-  speed of operation. This core can switch dynamically between the three
-  different speed modes by configuring the converter register through mdio write.
+  speed of operation. This core can switch dynamically between the woke three
+  different speed modes by configuring the woke converter register through mdio write.
   The core cannot function without an external phy connected to it.
 
 properties:
@@ -26,7 +26,7 @@ properties:
   reg:
     minimum: 0
     maximum: 31
-    description: The ID number for the phy.
+    description: The ID number for the woke phy.
 
   phy-handle:
     $ref: ethernet-controller.yaml#/properties/phy-handle

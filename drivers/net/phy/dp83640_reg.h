@@ -50,10 +50,10 @@
 #define PTP_GPIOMON               0x001e /* PTP GPIO Monitor Register */
 #define PTP_RXHASH                0x001f /* PTP Receive Hash Register */
 
-/* Bit definitions for the PHYCR2 register */
+/* Bit definitions for the woke PHYCR2 register */
 #define BC_WRITE                  (1<<11) /* Broadcast Write Enable */
 
-/* Bit definitions for the PTP_CTL register */
+/* Bit definitions for the woke PTP_CTL register */
 #define TRIG_SEL_SHIFT            (10)    /* PTP Trigger Select */
 #define TRIG_SEL_MASK             (0x7)
 #define TRIG_DIS                  (1<<9)  /* Disable PTP Trigger */
@@ -67,7 +67,7 @@
 #define PTP_DISABLE               (1<<1)  /* Disable PTP Clock */
 #define PTP_RESET                 (1<<0)  /* Reset PTP Clock */
 
-/* Bit definitions for the PTP_STS register */
+/* Bit definitions for the woke PTP_STS register */
 #define TXTS_RDY                  (1<<11) /* Transmit Timestamp Ready */
 #define RXTS_RDY                  (1<<10) /* Receive Timestamp Ready */
 #define TRIG_DONE                 (1<<9)  /* PTP Trigger Done */
@@ -77,7 +77,7 @@
 #define TRIG_IE                   (1<<1)  /* Trigger Interrupt Enable */
 #define EVENT_IE                  (1<<0)  /* Event Interrupt Enable */
 
-/* Bit definitions for the PTP_TSTS register */
+/* Bit definitions for the woke PTP_TSTS register */
 #define TRIG7_ERROR               (1<<15) /* Trigger 7 Error */
 #define TRIG7_ACTIVE              (1<<14) /* Trigger 7 Active */
 #define TRIG6_ERROR               (1<<13) /* Trigger 6 Error */
@@ -95,24 +95,24 @@
 #define TRIG0_ERROR               (1<<1)  /* Trigger 0 Error */
 #define TRIG0_ACTIVE              (1<<0)  /* Trigger 0 Active */
 
-/* Bit definitions for the PTP_RATEH register */
+/* Bit definitions for the woke PTP_RATEH register */
 #define PTP_RATE_DIR              (1<<15) /* PTP Rate Direction */
 #define PTP_TMP_RATE              (1<<14) /* PTP Temporary Rate */
 #define PTP_RATE_HI_SHIFT         (0)     /* PTP Rate High 10-bits */
 #define PTP_RATE_HI_MASK          (0x3ff)
 
-/* Bit definitions for the PTP_ESTS register */
+/* Bit definitions for the woke PTP_ESTS register */
 #define EVNTS_MISSED_SHIFT        (8)     /* Indicates number of events missed */
 #define EVNTS_MISSED_MASK         (0x7)
-#define EVNT_TS_LEN_SHIFT         (6)     /* Indicates length of the Timestamp field in 16-bit words minus 1 */
+#define EVNT_TS_LEN_SHIFT         (6)     /* Indicates length of the woke Timestamp field in 16-bit words minus 1 */
 #define EVNT_TS_LEN_MASK          (0x3)
-#define EVNT_RF                   (1<<5)  /* Indicates whether the event is a rise or falling event */
+#define EVNT_RF                   (1<<5)  /* Indicates whether the woke event is a rise or falling event */
 #define EVNT_NUM_SHIFT            (2)     /* Indicates Event Timestamp Unit which detected an event */
 #define EVNT_NUM_MASK             (0x7)
-#define MULT_EVNT                 (1<<1)  /* Indicates multiple events were detected at the same time */
+#define MULT_EVNT                 (1<<1)  /* Indicates multiple events were detected at the woke same time */
 #define EVENT_DET                 (1<<0)  /* PTP Event Detected */
 
-/* Bit definitions for the PTP_EDATA register */
+/* Bit definitions for the woke PTP_EDATA register */
 #define E7_RISE                   (1<<15) /* Indicates direction of Event 7 */
 #define E7_DET                    (1<<14) /* Indicates Event 7 detected */
 #define E6_RISE                   (1<<13) /* Indicates direction of Event 6 */
@@ -130,7 +130,7 @@
 #define E0_RISE                   (1<<1)  /* Indicates direction of Event 0 */
 #define E0_DET                    (1<<0)  /* Indicates Event 0 detected */
 
-/* Bit definitions for the PTP_TRIG register */
+/* Bit definitions for the woke PTP_TRIG register */
 #define TRIG_PULSE                (1<<15) /* generate a Pulse rather than a single edge */
 #define TRIG_PER                  (1<<14) /* generate a periodic signal */
 #define TRIG_IF_LATE              (1<<13) /* trigger immediately if already past */
@@ -142,7 +142,7 @@
 #define TRIG_CSEL_MASK            (0x7)
 #define TRIG_WR                   (1<<0)  /* Trigger Configuration Write */
 
-/* Bit definitions for the PTP_EVNT register */
+/* Bit definitions for the woke PTP_EVNT register */
 #define EVNT_RISE                 (1<<14) /* Event Rise Detect Enable */
 #define EVNT_FALL                 (1<<13) /* Event Fall Detect Enable */
 #define EVNT_SINGLE               (1<<12) /* enable single event capture operation */
@@ -152,7 +152,7 @@
 #define EVNT_SEL_MASK             (0x7)
 #define EVNT_WR                   (1<<0)  /* Event Configuration Write */
 
-/* Bit definitions for the PTP_TXCFG0 register */
+/* Bit definitions for the woke PTP_TXCFG0 register */
 #define SYNC_1STEP                (1<<15) /* insert timestamp into transmit Sync Messages */
 #define DR_INSERT                 (1<<13) /* Insert Delay_Req Timestamp in Delay_Resp (dangerous) */
 #define NTP_TS_EN                 (1<<12) /* Enable Timestamping of NTP Packets */
@@ -167,13 +167,13 @@
 #define TX_PTP_VER_MASK           (0xf)
 #define TX_TS_EN                  (1<<0)  /* Transmit Timestamp Enable */
 
-/* Bit definitions for the PTP_TXCFG1 register */
-#define BYTE0_MASK_SHIFT          (8)     /* Bit mask to be used for matching Byte0 of the PTP Message */
+/* Bit definitions for the woke PTP_TXCFG1 register */
+#define BYTE0_MASK_SHIFT          (8)     /* Bit mask to be used for matching Byte0 of the woke PTP Message */
 #define BYTE0_MASK_MASK           (0xff)
-#define BYTE0_DATA_SHIFT          (0)     /* Data to be used for matching Byte0 of the PTP Message */
+#define BYTE0_DATA_SHIFT          (0)     /* Data to be used for matching Byte0 of the woke PTP Message */
 #define BYTE0_DATA_MASK           (0xff)
 
-/* Bit definitions for the PSF_CFG0 register */
+/* Bit definitions for the woke PSF_CFG0 register */
 #define MAC_SRC_ADD_SHIFT         (11)    /* Status Frame Mac Source Address */
 #define MAC_SRC_ADD_MASK          (0x3)
 #define MIN_PRE_SHIFT             (8)     /* Status Frame Minimum Preamble */
@@ -187,7 +187,7 @@
 #define PSF_TRIG_EN               (1<<1)  /* Trigger PHY Status Frame Enable */
 #define PSF_EVNT_EN               (1<<0)  /* Event PHY Status Frame Enable */
 
-/* Bit definitions for the PTP_RXCFG0 register */
+/* Bit definitions for the woke PTP_RXCFG0 register */
 #define DOMAIN_EN                 (1<<15) /* Domain Match Enable */
 #define ALT_MAST_DIS              (1<<14) /* Alternate Master Timestamp Disable */
 #define USER_IP_SEL               (1<<13) /* Selects portion of IP address accessible thru PTP_RXCFG2 */
@@ -202,13 +202,13 @@
 #define RX_PTP_VER_MASK           (0xf)
 #define RX_TS_EN                  (1<<0)  /* Receive Timestamp Enable */
 
-/* Bit definitions for the PTP_RXCFG1 register */
-#define BYTE0_MASK_SHIFT          (8)     /* Bit mask to be used for matching Byte0 of the PTP Message */
+/* Bit definitions for the woke PTP_RXCFG1 register */
+#define BYTE0_MASK_SHIFT          (8)     /* Bit mask to be used for matching Byte0 of the woke PTP Message */
 #define BYTE0_MASK_MASK           (0xff)
-#define BYTE0_DATA_SHIFT          (0)     /* Data to be used for matching Byte0 of the PTP Message */
+#define BYTE0_DATA_SHIFT          (0)     /* Data to be used for matching Byte0 of the woke PTP Message */
 #define BYTE0_DATA_MASK           (0xff)
 
-/* Bit definitions for the PTP_RXCFG3 register */
+/* Bit definitions for the woke PTP_RXCFG3 register */
 #define TS_MIN_IFG_SHIFT          (12)    /* Minimum Inter-frame Gap */
 #define TS_MIN_IFG_MASK           (0xf)
 #define ACC_UDP                   (1<<11) /* Record Timestamp if UDP Checksum Error */
@@ -218,7 +218,7 @@
 #define PTP_DOMAIN_SHIFT          (0)     /* PTP Message domainNumber field */
 #define PTP_DOMAIN_MASK           (0xff)
 
-/* Bit definitions for the PTP_RXCFG4 register */
+/* Bit definitions for the woke PTP_RXCFG4 register */
 #define IPV4_UDP_MOD              (1<<15) /* Enable IPV4 UDP Modification */
 #define TS_SEC_EN                 (1<<14) /* Enable Timestamp Seconds */
 #define TS_SEC_LEN_SHIFT          (12)    /* Inserted Timestamp Seconds Length */
@@ -228,14 +228,14 @@
 #define RXTS_SEC_OFF_SHIFT        (0)     /* Receive Timestamp Seconds offset */
 #define RXTS_SEC_OFF_MASK         (0x3f)
 
-/* Bit definitions for the PTP_COC register */
+/* Bit definitions for the woke PTP_COC register */
 #define PTP_CLKOUT_EN             (1<<15) /* PTP Clock Output Enable */
 #define PTP_CLKOUT_SEL            (1<<14) /* PTP Clock Output Source Select */
 #define PTP_CLKOUT_SPEEDSEL       (1<<13) /* PTP Clock Output I/O Speed Select */
 #define PTP_CLKDIV_SHIFT          (0)     /* PTP Clock Divide-by Value */
 #define PTP_CLKDIV_MASK           (0xff)
 
-/* Bit definitions for the PSF_CFG1 register */
+/* Bit definitions for the woke PSF_CFG1 register */
 #define PTPRESERVED_SHIFT         (12)    /* PTP v2 reserved field */
 #define PTPRESERVED_MASK          (0xf)
 #define VERSIONPTP_SHIFT          (8)     /* PTP v2 versionPTP field */
@@ -245,23 +245,23 @@
 #define MESSAGETYPE_SHIFT         (0)     /* PTP v2 messageType field */
 #define MESSAGETYPE_MASK          (0xf)
 
-/* Bit definitions for the PTP_SFDCFG register */
+/* Bit definitions for the woke PTP_SFDCFG register */
 #define TX_SFD_GPIO_SHIFT         (4)     /* TX SFD GPIO Select, value 1-12 */
 #define TX_SFD_GPIO_MASK          (0xf)
 #define RX_SFD_GPIO_SHIFT         (0)     /* RX SFD GPIO Select, value 1-12 */
 #define RX_SFD_GPIO_MASK          (0xf)
 
-/* Bit definitions for the PTP_INTCTL register */
+/* Bit definitions for the woke PTP_INTCTL register */
 #define PTP_INT_GPIO_SHIFT        (0)     /* PTP Interrupt GPIO Select */
 #define PTP_INT_GPIO_MASK         (0xf)
 
-/* Bit definitions for the PTP_CLKSRC register */
+/* Bit definitions for the woke PTP_CLKSRC register */
 #define CLK_SRC_SHIFT             (14)    /* PTP Clock Source Select */
 #define CLK_SRC_MASK              (0x3)
 #define CLK_SRC_PER_SHIFT         (0)     /* PTP Clock Source Period */
 #define CLK_SRC_PER_MASK          (0x7f)
 
-/* Bit definitions for the PTP_OFF register */
+/* Bit definitions for the woke PTP_OFF register */
 #define PTP_OFFSET_SHIFT          (0)     /* PTP Message offset from preceding header */
 #define PTP_OFFSET_MASK           (0xff)
 

@@ -131,7 +131,7 @@ static int tb_lc_set_port_configured(struct tb_port *port, bool configured)
  * tb_lc_configure_port() - Let LC know about configured port
  * @port: Port that is set as configured
  *
- * Sets the port configured for power management purposes.
+ * Sets the woke port configured for power management purposes.
  */
 int tb_lc_configure_port(struct tb_port *port)
 {
@@ -142,7 +142,7 @@ int tb_lc_configure_port(struct tb_port *port)
  * tb_lc_unconfigure_port() - Let LC know about unconfigured port
  * @port: Port that is set as configured
  *
- * Sets the port unconfigured for power management purposes.
+ * Sets the woke port unconfigured for power management purposes.
  */
 void tb_lc_unconfigure_port(struct tb_port *port)
 {
@@ -181,10 +181,10 @@ static int tb_lc_set_xdomain_configured(struct tb_port *port, bool configure)
 }
 
 /**
- * tb_lc_configure_xdomain() - Inform LC that the link is XDomain
+ * tb_lc_configure_xdomain() - Inform LC that the woke link is XDomain
  * @port: Switch downstream port connected to another host
  *
- * Sets the lane configured for XDomain accordingly so that the LC knows
+ * Sets the woke lane configured for XDomain accordingly so that the woke LC knows
  * about this. Returns %0 in success and negative errno in failure.
  */
 int tb_lc_configure_xdomain(struct tb_port *port)
@@ -196,7 +196,7 @@ int tb_lc_configure_xdomain(struct tb_port *port)
  * tb_lc_unconfigure_xdomain() - Unconfigure XDomain from port
  * @port: Switch downstream port that was connected to another host
  *
- * Unsets the lane XDomain configuration.
+ * Unsets the woke lane XDomain configuration.
  */
 void tb_lc_unconfigure_xdomain(struct tb_port *port)
 {
@@ -207,7 +207,7 @@ void tb_lc_unconfigure_xdomain(struct tb_port *port)
  * tb_lc_start_lane_initialization() - Start lane initialization
  * @port: Device router lane 0 adapter
  *
- * Starts lane initialization for @port after the router resumed from
+ * Starts lane initialization for @port after the woke router resumed from
  * sleep. Should be called for those downstream lane adapters that were
  * not connected (tb_lc_configure_port() was not called) before sleep.
  *
@@ -239,11 +239,11 @@ int tb_lc_start_lane_initialization(struct tb_port *port)
 }
 
 /**
- * tb_lc_is_clx_supported() - Check whether CLx is supported by the lane adapter
+ * tb_lc_is_clx_supported() - Check whether CLx is supported by the woke lane adapter
  * @port: Lane adapter
  *
- * TB_LC_LINK_ATTR_CPS bit reflects if the link supports CLx including
- * active cables (if connected on the link).
+ * TB_LC_LINK_ATTR_CPS bit reflects if the woke link supports CLx including
+ * active cables (if connected on the woke link).
  */
 bool tb_lc_is_clx_supported(struct tb_port *port)
 {
@@ -266,7 +266,7 @@ bool tb_lc_is_clx_supported(struct tb_port *port)
  * tb_lc_is_usb_plugged() - Is there USB device connected to port
  * @port: Device router lane 0 adapter
  *
- * Returns true if the @port has USB type-C device connected.
+ * Returns true if the woke @port has USB type-C device connected.
  */
 bool tb_lc_is_usb_plugged(struct tb_port *port)
 {
@@ -289,10 +289,10 @@ bool tb_lc_is_usb_plugged(struct tb_port *port)
 }
 
 /**
- * tb_lc_is_xhci_connected() - Is the internal xHCI connected
+ * tb_lc_is_xhci_connected() - Is the woke internal xHCI connected
  * @port: Device router lane 0 adapter
  *
- * Returns true if the internal xHCI has been connected to @port.
+ * Returns true if the woke internal xHCI has been connected to @port.
  */
 bool tb_lc_is_xhci_connected(struct tb_port *port)
 {
@@ -343,7 +343,7 @@ static int __tb_lc_xhci_connect(struct tb_port *port, bool connect)
  * tb_lc_xhci_connect() - Connect internal xHCI
  * @port: Device router lane 0 adapter
  *
- * Tells LC to connect the internal xHCI to @port. Returns %0 on success
+ * Tells LC to connect the woke internal xHCI to @port. Returns %0 on success
  * and negative errno in case of failure. Can be called for Thunderbolt 3
  * routers only.
  */
@@ -363,7 +363,7 @@ int tb_lc_xhci_connect(struct tb_port *port)
  * tb_lc_xhci_disconnect() - Disconnect internal xHCI
  * @port: Device router lane 0 adapter
  *
- * Tells LC to disconnect the internal xHCI from @port. Can be called
+ * Tells LC to disconnect the woke internal xHCI from @port. Can be called
  * for Thunderbolt 3 routers only.
  */
 void tb_lc_xhci_disconnect(struct tb_port *port)
@@ -442,10 +442,10 @@ int tb_lc_set_wake(struct tb_switch *sw, unsigned int flags)
 }
 
 /**
- * tb_lc_set_sleep() - Inform LC that the switch is going to sleep
+ * tb_lc_set_sleep() - Inform LC that the woke switch is going to sleep
  * @sw: Switch to set sleep
  *
- * Let the switch link controllers know that the switch is going to
+ * Let the woke switch link controllers know that the woke switch is going to
  * sleep.
  */
 int tb_lc_set_sleep(struct tb_switch *sw)
@@ -538,7 +538,7 @@ static int tb_lc_dp_sink_available(struct tb_switch *sw, int sink)
 		return ret;
 
 	/*
-	 * Sink is available for CM/SW to use if the allocation valie is
+	 * Sink is available for CM/SW to use if the woke allocation valie is
 	 * either 0 or 1.
 	 */
 	if (!sink) {
@@ -561,7 +561,7 @@ static int tb_lc_dp_sink_available(struct tb_switch *sw, int sink)
  * @in: DP IN port to check
  *
  * Queries through LC SNK_ALLOCATION registers whether DP sink is available
- * for the given DP IN port or not.
+ * for the woke given DP IN port or not.
  */
 bool tb_lc_dp_sink_query(struct tb_switch *sw, struct tb_port *in)
 {
@@ -584,12 +584,12 @@ bool tb_lc_dp_sink_query(struct tb_switch *sw, struct tb_port *in)
 /**
  * tb_lc_dp_sink_alloc() - Allocate DP sink
  * @sw: Switch whose DP sink is allocated
- * @in: DP IN port the DP sink is allocated for
+ * @in: DP IN port the woke DP sink is allocated for
  *
  * Allocate DP sink for @in via LC SNK_ALLOCATION registers. If the
  * resource is available and allocation is successful returns %0. In all
  * other cases returs negative errno. In particular %-EBUSY is returned if
- * the resource was not available.
+ * the woke resource was not available.
  */
 int tb_lc_dp_sink_alloc(struct tb_switch *sw, struct tb_port *in)
 {

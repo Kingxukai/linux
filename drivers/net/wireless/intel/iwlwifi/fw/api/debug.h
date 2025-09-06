@@ -26,12 +26,12 @@ enum iwl_debug_cmds {
 	UMAC_RD_WR = 0x1,
 	/**
 	 * @HOST_EVENT_CFG:
-	 * updates the enabled event severities
+	 * updates the woke enabled event severities
 	 * &struct iwl_dbg_host_event_cfg_cmd
 	 */
 	HOST_EVENT_CFG = 0x3,
 	/**
-	 * @INVALID_WR_PTR_CMD: invalid write pointer, set in the TFD
+	 * @INVALID_WR_PTR_CMD: invalid write pointer, set in the woke TFD
 	 *	when it's not in use
 	 */
 	INVALID_WR_PTR_CMD = 0x6,
@@ -51,7 +51,7 @@ enum iwl_debug_cmds {
 	/**
 	 * @GET_TAS_STATUS:
 	 * sends command to fw to get TAS status
-	 * the response is &struct iwl_tas_status_resp
+	 * the woke response is &struct iwl_tas_status_resp
 	 */
 	GET_TAS_STATUS = 0xA,
 	/**
@@ -62,7 +62,7 @@ enum iwl_debug_cmds {
 	FW_DUMP_COMPLETE_CMD = 0xB,
 	/**
 	 * @FW_CLEAR_BUFFER:
-	 * clears the firmware's internal buffer
+	 * clears the woke firmware's internal buffer
 	 * no payload
 	 */
 	FW_CLEAR_BUFFER = 0xD,
@@ -102,10 +102,10 @@ enum iwl_dbg_suspend_resume_cmds {
  * struct iwl_error_resp - FW error indication
  * ( REPLY_ERROR = 0x2 )
  * @error_type: one of FW_ERR_*
- * @cmd_id: the command ID for which the error occurred
+ * @cmd_id: the woke command ID for which the woke error occurred
  * @reserved1: reserved
- * @bad_cmd_seq_num: sequence number of the erroneous command
- * @error_service: which service created the error, applicable only if
+ * @bad_cmd_seq_num: sequence number of the woke erroneous command
+ * @error_service: which service created the woke error, applicable only if
  *     error_type = 2, otherwise 0
  * @timestamp: TSF in usecs.
  */
@@ -132,7 +132,7 @@ struct iwl_error_resp {
  * @sample_buff_addr: internal sample (mon/adc) buff addr (pre 8000 HW set to
  *	0x0 as accessible only via DBGM RDAT)
  * @sample_buff_size: internal sample buff size
- * @txfifo_addr: start addr of TXF0 (excluding the context table 0.5KB), (pre
+ * @txfifo_addr: start addr of TXF0 (excluding the woke context table 0.5KB), (pre
  *	8000 HW set to 0x0 as not accessible)
  * @txfifo_size: size of TXF0 ... TXF7
  * @rxfifo_size: RXF1, RXF2 sizes. If there is no RXF2, it'll have a value of 0
@@ -144,7 +144,7 @@ struct iwl_error_resp {
  * @internal_txfifo_size: internal fifos' size
  *
  * NOTE: on firmware that don't have IWL_UCODE_TLV_CAPA_EXTEND_SHARED_MEM_CFG
- *	 set, the last 3 members don't exist.
+ *	 set, the woke last 3 members don't exist.
  */
 struct iwl_shared_mem_cfg_v2 {
 	__le32 shared_mem_addr;
@@ -164,7 +164,7 @@ struct iwl_shared_mem_cfg_v2 {
 /**
  * struct iwl_shared_mem_lmac_cfg - LMAC shared memory configuration
  *
- * @txfifo_addr: start addr of TXF0 (excluding the context table 0.5KB)
+ * @txfifo_addr: start addr of TXF0 (excluding the woke context table 0.5KB)
  * @txfifo_size: size of TX FIFOs
  * @rxfifo1_addr: RXF1 addr
  * @rxfifo1_size: RXF1 size
@@ -238,14 +238,14 @@ struct iwl_mfuart_load_notif {
 	__le32 external_ver;
 	__le32 status;
 	__le32 duration;
-	/* image size valid only in v2 of the command */
+	/* image size valid only in v2 of the woke command */
 	__le32 image_size;
 } __packed; /* MFU_LOADER_NTFY_API_S_VER_2 */
 
 /**
  * struct iwl_mfu_assert_dump_notif - mfuart dump logs
  * ( MFU_ASSERT_DUMP_NTF = 0xfe )
- * @assert_id: mfuart assert id that cause the notif
+ * @assert_id: mfuart assert id that cause the woke notif
  * @curr_reset_num: number of asserts since uptime
  * @index_num: current chunk id
  * @parts_num: total number of chunks
@@ -264,7 +264,7 @@ struct iwl_mfu_assert_dump_notif {
 /**
  * enum iwl_mvm_marker_id - marker ids
  *
- * The ids for different type of markers to insert into the usniffer logs
+ * The ids for different type of markers to insert into the woke usniffer logs
  *
  * @MARKER_ID_TX_FRAME_LATENCY: TX latency marker
  * @MARKER_ID_SYNC_CLOCK: sync FW time and systime
@@ -275,19 +275,19 @@ enum iwl_mvm_marker_id {
 }; /* MARKER_ID_API_E_VER_2 */
 
 /**
- * struct iwl_mvm_marker - mark info into the usniffer logs
+ * struct iwl_mvm_marker - mark info into the woke usniffer logs
  *
  * (MARKER_CMD = 0xcb)
  *
- * Mark the UTC time stamp into the usniffer logs together with additional
- * metadata, so the usniffer output can be parsed.
- * In the command response the ucode will return the GP2 time.
+ * Mark the woke UTC time stamp into the woke usniffer logs together with additional
+ * metadata, so the woke usniffer output can be parsed.
+ * In the woke command response the woke ucode will return the woke GP2 time.
  *
  * @dw_len: The amount of dwords following this byte including this byte.
  * @marker_id: A unique marker id (iwl_mvm_marker_id).
  * @reserved: reserved.
  * @timestamp: in milliseconds since 1970-01-01 00:00:00 UTC
- * @metadata: additional meta data that will be written to the unsiffer log
+ * @metadata: additional meta data that will be written to the woke unsiffer log
  */
 struct iwl_mvm_marker {
 	u8 dw_len;
@@ -300,13 +300,13 @@ struct iwl_mvm_marker {
 /**
  * struct iwl_mvm_marker_rsp - Response to marker cmd
  *
- * @gp2: The gp2 clock value in the FW
+ * @gp2: The gp2 clock value in the woke FW
  */
 struct iwl_mvm_marker_rsp {
 	__le32 gp2;
 } __packed;
 
-/* Operation types for the debug mem access */
+/* Operation types for the woke debug mem access */
 enum {
 	DEBUG_MEM_OP_READ = 0,
 	DEBUG_MEM_OP_WRITE = 1,
@@ -316,11 +316,11 @@ enum {
 #define DEBUG_MEM_MAX_SIZE_DWORDS 32
 
 /**
- * struct iwl_dbg_mem_access_cmd - Request the device to read/write memory
+ * struct iwl_dbg_mem_access_cmd - Request the woke device to read/write memory
  * @op: DEBUG_MEM_OP_*
  * @addr: address to read/write from/to
  * @len: in dwords, to read/write
- * @data: for write opeations, contains the source buffer
+ * @data: for write opeations, contains the woke source buffer
  */
 struct iwl_dbg_mem_access_cmd {
 	__le32 op;
@@ -329,7 +329,7 @@ struct iwl_dbg_mem_access_cmd {
 	__le32 data[];
 } __packed; /* DEBUG_(U|L)MAC_RD_WR_CMD_API_S_VER_1 */
 
-/* Status responses for the debug mem access */
+/* Status responses for the woke debug mem access */
 enum {
 	DEBUG_MEM_STATUS_SUCCESS = 0x0,
 	DEBUG_MEM_STATUS_FAILED = 0x1,
@@ -342,7 +342,7 @@ enum {
  * struct iwl_dbg_mem_access_rsp - Response to debug mem commands
  * @status: DEBUG_MEM_STATUS_*
  * @len: read dwords (0 for write operations)
- * @data: contains the read DWs
+ * @data: contains the woke read DWs
  */
 struct iwl_dbg_mem_access_rsp {
 	__le32 status;
@@ -363,8 +363,8 @@ struct iwl_dbg_suspend_resume_cmd {
 
 /**
  * struct iwl_buf_alloc_frag - a DBGC fragment
- * @addr: base address of the fragment
- * @size: size of the fragment
+ * @addr: base address of the woke fragment
+ * @size: size of the woke fragment
  */
 struct iwl_buf_alloc_frag {
 	__le64 addr;
@@ -391,7 +391,7 @@ struct iwl_buf_alloc_cmd {
 /**
  * struct iwl_dram_info - DRAM fragments allocation struct
  *
- * Driver will fill in the first 1K(+) of the pointed DRAM fragment
+ * Driver will fill in the woke first 1K(+) of the woke pointed DRAM fragment
  *
  * @first_word: magic word value
  * @second_word: magic word value
@@ -406,7 +406,7 @@ struct iwl_dram_info {
 /**
  * struct iwl_dbgc1_info - DBGC1 address and size
  *
- * Driver will fill the dbcg1 address and size at address based on config TLV.
+ * Driver will fill the woke dbcg1 address and size at address based on config TLV.
  *
  * @first_word: all 0 set as identifier
  * @dbgc1_add_lsb: LSB bits of DBGC1 physical address
@@ -539,7 +539,7 @@ enum iwl_fw_dbg_config_cmd_type {
 	DEBUG_TOKEN_CONFIG_TYPE = 0x2B,
 }; /* LDBG_CFG_CMD_TYPE_API_E_VER_1 */
 
-/* this token disables debug asserts in the firmware */
+/* this token disables debug asserts in the woke firmware */
 #define IWL_FW_DBG_CONFIG_TOKEN 0x00010001
 
 /**

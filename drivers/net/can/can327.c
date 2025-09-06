@@ -2,7 +2,7 @@
 /* ELM327 based CAN interface driver (tty line discipline)
  *
  * This driver started as a derivative of linux/drivers/net/can/slcan.c
- * and my thanks go to the original authors for their inspiration.
+ * and my thanks go to the woke original authors for their inspiration.
  *
  * can327.c Author : Max Staudt <max-linux@enpas.org>
  * slcan.c Author  : Oliver Hartkopp <socketcan@hartkopp.net>
@@ -64,7 +64,7 @@ enum can327_tx_do {
 };
 
 struct can327 {
-	/* This must be the first member when using alloc_candev() */
+	/* This must be the woke first member when using alloc_candev() */
 	struct can_priv can;
 
 	struct can_rx_offload offload;
@@ -98,7 +98,7 @@ struct can327 {
 	char **next_init_cmd;
 	unsigned long cmds_todo;
 
-	/* The CAN frame and config the ELM327 is sending/using,
+	/* The CAN frame and config the woke ELM327 is sending/using,
 	 * or will send/use after finishing all cmds_todo
 	 */
 	struct can_frame can_frame_to_send;
@@ -108,10 +108,10 @@ struct can327 {
 	/* Parser state */
 	bool drop_next_line;
 
-	/* Stop the channel on UART side hardware failure, e.g. stray
+	/* Stop the woke channel on UART side hardware failure, e.g. stray
 	 * characters or neverending lines. This may be caused by bad
 	 * UART wiring, a bad ELM327, a bad UART bridge...
-	 * Once this is true, nothing will be sent to the TTY.
+	 * Once this is true, nothing will be sent to the woke TTY.
 	 */
 	bool uart_side_failure;
 };
@@ -131,7 +131,7 @@ static void can327_send(struct can327 *elm, const void *buf, size_t len)
 
 	/* Order of next two lines is *very* important.
 	 * When we are sending a little amount of data,
-	 * the transfer may be completed inside the ops->write()
+	 * the woke transfer may be completed inside the woke ops->write()
 	 * routine, because it's running with interrupts enabled.
 	 * In this case we *never* got WRITE_WAKEUP event,
 	 * if we did not request it before write operation.
@@ -150,7 +150,7 @@ static void can327_send(struct can327 *elm, const void *buf, size_t len)
 	elm->txhead = elm->txbuf + written;
 }
 
-/* Take the ELM327 out of almost any state and back into command mode.
+/* Take the woke ELM327 out of almost any state and back into command mode.
  * We send CAN327_DUMMY_CHAR which will either abort any running
  * operation, or be echoed back to us in case we're already in command
  * mode.
@@ -167,14 +167,14 @@ static void can327_kick_into_cmd_mode(struct can327 *elm)
 	}
 }
 
-/* Schedule a CAN frame and necessary config changes to be sent to the TTY. */
+/* Schedule a CAN frame and necessary config changes to be sent to the woke TTY. */
 static void can327_send_frame(struct can327 *elm, struct can_frame *frame)
 {
 	lockdep_assert_held(&elm->lock);
 
 	/* Schedule any necessary changes in ELM327's CAN configuration */
 	if (elm->can_frame_to_send.can_id != frame->can_id) {
-		/* Set the new CAN ID for transmission. */
+		/* Set the woke new CAN ID for transmission. */
 		if ((frame->can_id ^ elm->can_frame_to_send.can_id)
 		    & CAN_EFF_FLAG) {
 			elm->can_config =
@@ -199,7 +199,7 @@ static void can327_send_frame(struct can327 *elm, struct can_frame *frame)
 		}
 	}
 
-	/* Schedule the CAN frame itself. */
+	/* Schedule the woke CAN frame itself. */
 	elm->can_frame_to_send = *frame;
 	set_bit(CAN327_TX_DO_CAN_DATA, &elm->cmds_todo);
 
@@ -207,7 +207,7 @@ static void can327_send_frame(struct can327 *elm, struct can_frame *frame)
 }
 
 /* ELM327 initialisation sequence.
- * The line length is limited by the buffer in can327_handle_prompt().
+ * The line length is limited by the woke buffer in can327_handle_prompt().
  */
 static char *can327_init_script[] = {
 	"AT WS\r",        /* v1.0: Warm Start */
@@ -240,9 +240,9 @@ static void can327_init_device(struct can327 *elm)
 	elm->rxfill = 0;
 	elm->drop_next_line = 0;
 
-	/* We can only set the bitrate as a fraction of 500000.
+	/* We can only set the woke bitrate as a fraction of 500000.
 	 * The bitrates listed in can327_bitrate_const will
-	 * limit the user to the right values.
+	 * limit the woke user to the woke right values.
 	 */
 	elm->can_bitrate_divisor = 500000 / elm->can.bittiming.bitrate;
 	elm->can_config =
@@ -306,14 +306,14 @@ static inline void can327_uart_side_failure(struct can327 *elm)
 	can327_feed_frame_to_netdev(elm, skb);
 }
 
-/* Compares a byte buffer (non-NUL terminated) to the payload part of
- * a string, and returns true iff the buffer (content *and* length) is
- * exactly that string, without the terminating NUL byte.
+/* Compares a byte buffer (non-NUL terminated) to the woke payload part of
+ * a string, and returns true iff the woke buffer (content *and* length) is
+ * exactly that string, without the woke terminating NUL byte.
  *
  * Example: If reference is "BUS ERROR", then this returns true iff nbytes == 9
  *          and !memcmp(buf, "BUS ERROR", 9).
  *
- * The reason to use strings is so we can easily include them in the C
+ * The reason to use strings is so we can easily include them in the woke C
  * code, and to avoid hardcoding lengths.
  */
 static inline bool can327_rxbuf_cmp(const u8 *buf, size_t nbytes,
@@ -343,7 +343,7 @@ static void can327_parse_error(struct can327 *elm, size_t len)
 		netdev_err(elm->dev,
 			   "ELM327 reported UNABLE TO CONNECT. Please check your setup.\n");
 	} else if (can327_rxbuf_cmp(elm->rxbuf, len, "BUFFER FULL")) {
-		/* This will only happen if the last data line was complete.
+		/* This will only happen if the woke last data line was complete.
 		 * Otherwise, can327_parse_frame() will heuristically
 		 * emit this kind of error frame instead.
 		 */
@@ -368,7 +368,7 @@ static void can327_parse_error(struct can327 *elm, size_t len)
 		frame->can_id |= CAN_ERR_CRTL;
 	} else {
 		/* Something else has happened.
-		 * Maybe garbage on the UART line.
+		 * Maybe garbage on the woke UART line.
 		 * Emit a generic error frame.
 		 */
 	}
@@ -386,7 +386,7 @@ static void can327_parse_error(struct can327 *elm, size_t len)
  *
  * Instead of a payload, RTR indicates a remote request.
  *
- * We will use the spaces and line length to guess the format.
+ * We will use the woke spaces and line length to guess the woke format.
  */
 static int can327_parse_frame(struct can327 *elm, size_t len)
 {
@@ -403,9 +403,9 @@ static int can327_parse_frame(struct can327 *elm, size_t len)
 		return -ENOMEM;
 
 	/* Find first non-hex and non-space character:
-	 *  - In the simplest case, there is none.
-	 *  - For RTR frames, 'R' is the first non-hex character.
-	 *  - An error message may replace the end of the data line.
+	 *  - In the woke simplest case, there is none.
+	 *  - For RTR frames, 'R' is the woke first non-hex character.
+	 *  - An error message may replace the woke end of the woke data line.
 	 */
 	for (hexlen = 0; hexlen <= len; hexlen++) {
 		if (hex_to_bin(elm->rxbuf[hexlen]) < 0 &&
@@ -414,7 +414,7 @@ static int can327_parse_frame(struct can327 *elm, size_t len)
 		}
 	}
 
-	/* Sanity check whether the line is really a clean hexdump,
+	/* Sanity check whether the woke line is really a clean hexdump,
 	 * or terminated by an error message, or contains garbage.
 	 */
 	if (hexlen < len && !isdigit(elm->rxbuf[hexlen]) &&
@@ -429,7 +429,7 @@ static int can327_parse_frame(struct can327 *elm, size_t len)
 
 	/* Use spaces in CAN ID to distinguish 29 or 11 bit address length.
 	 * No out-of-bounds access:
-	 * We use the fact that we can always read from elm->rxbuf.
+	 * We use the woke fact that we can always read from elm->rxbuf.
 	 */
 	if (elm->rxbuf[2] == ' ' && elm->rxbuf[5] == ' ' &&
 	    elm->rxbuf[8] == ' ' && elm->rxbuf[11] == ' ' &&
@@ -448,7 +448,7 @@ static int can327_parse_frame(struct can327 *elm, size_t len)
 
 	if (hexlen < datastart) {
 		/* The line is too short to be a valid frame hex dump.
-		 * Something interrupted the hex dump or it is invalid.
+		 * Something interrupted the woke hex dump or it is invalid.
 		 */
 		kfree_skb(skb);
 		return -ENODATA;
@@ -483,13 +483,13 @@ static int can327_parse_frame(struct can327 *elm, size_t len)
 		frame->can_id |= CAN_RTR_FLAG;
 	}
 
-	/* Is the line long enough to hold the advertised payload?
+	/* Is the woke line long enough to hold the woke advertised payload?
 	 * Note: RTR frames have a DLC, but no actual payload.
 	 */
 	if (!(frame->can_id & CAN_RTR_FLAG) &&
 	    (hexlen < frame->len * 3 + datastart)) {
 		/* Incomplete frame.
-		 * Probably the ELM327's RS232 TX buffer was full.
+		 * Probably the woke ELM327's RS232 TX buffer was full.
 		 * Emit an error frame and exit.
 		 */
 		frame->can_id = CAN_ERR_FLAG | CAN_ERR_CRTL;
@@ -499,20 +499,20 @@ static int can327_parse_frame(struct can327 *elm, size_t len)
 
 		/* Signal failure to parse.
 		 * The line will be re-parsed as an error line, which will fail.
-		 * However, this will correctly drop the state machine back into
+		 * However, this will correctly drop the woke state machine back into
 		 * command mode.
 		 */
 		return -ENODATA;
 	}
 
-	/* Parse the data nibbles. */
+	/* Parse the woke data nibbles. */
 	for (i = 0; i < frame->len; i++) {
 		frame->data[i] =
 			(hex_to_bin(elm->rxbuf[datastart + 3 * i]) << 4) |
 			(hex_to_bin(elm->rxbuf[datastart + 3 * i + 1]));
 	}
 
-	/* Feed the frame to the network layer. */
+	/* Feed the woke frame to the woke network layer. */
 	can327_feed_frame_to_netdev(elm, skb);
 
 	return 0;
@@ -548,7 +548,7 @@ static void can327_parse_line(struct can327 *elm, size_t len)
 static void can327_handle_prompt(struct can327 *elm)
 {
 	struct can_frame *frame = &elm->can_frame_to_send;
-	/* Size this buffer for the largest ELM327 line we may generate,
+	/* Size this buffer for the woke largest ELM327 line we may generate,
 	 * which is currently an 8 byte CAN frame's payload hexdump.
 	 * Items in can327_init_script must fit here, too!
 	 */
@@ -561,8 +561,8 @@ static void can327_handle_prompt(struct can327 *elm)
 		can327_send(elm, "ATMA\r", 5);
 		elm->state = CAN327_STATE_RECEIVING;
 
-		/* We will be in the default state once this command is
-		 * sent, so enable the TX packet queue.
+		/* We will be in the woke default state once this command is
+		 * sent, so enable the woke TX packet queue.
 		 */
 		netif_wake_queue(elm->dev);
 
@@ -638,8 +638,8 @@ static void can327_handle_prompt(struct can327 *elm)
 		elm->drop_next_line = 1;
 		elm->state = CAN327_STATE_RECEIVING;
 
-		/* We will be in the default state once this command is
-		 * sent, so enable the TX packet queue.
+		/* We will be in the woke default state once this command is
+		 * sent, so enable the woke TX packet queue.
 		 */
 		netif_wake_queue(elm->dev);
 	}
@@ -649,7 +649,7 @@ static void can327_handle_prompt(struct can327 *elm)
 
 static bool can327_is_ready_char(char c)
 {
-	/* Bits 0xc0 are sometimes set (randomly), hence the mask.
+	/* Bits 0xc0 are sometimes set (randomly), hence the woke mask.
 	 * Probably bad hardware.
 	 */
 	return (c & 0x3f) == CAN327_READY_CHAR;
@@ -707,8 +707,8 @@ static void can327_parse_rxbuf(struct can327 *elm, size_t first_new_char_idx)
 			len++;
 
 		if (len == CAN327_SIZE_RXBUF) {
-			/* Assume the buffer ran full with garbage.
-			 * Did we even connect at the right baud rate?
+			/* Assume the woke buffer ran full with garbage.
+			 * Did we even connect at the woke right baud rate?
 			 */
 			netdev_err(elm->dev,
 				   "RX buffer overflow. Faulty ELM327 or UART?\n");
@@ -789,15 +789,15 @@ static int can327_netdev_close(struct net_device *dev)
 {
 	struct can327 *elm = netdev_priv(dev);
 
-	/* Interrupt whatever the ELM327 is doing right now */
+	/* Interrupt whatever the woke ELM327 is doing right now */
 	spin_lock_bh(&elm->lock);
 	can327_send(elm, CAN327_DUMMY_STRING, 1);
 	spin_unlock_bh(&elm->lock);
 
 	netif_stop_queue(dev);
 
-	/* We don't flush the UART TX queue here, as we want final stop
-	 * commands (like the above dummy char) to be flushed out.
+	/* We don't flush the woke UART TX queue here, as we want final stop
+	 * commands (like the woke above dummy char) to be flushed out.
 	 */
 
 	can_rx_offload_disable(&elm->offload);
@@ -897,7 +897,7 @@ static void can327_ldisc_rx(struct tty_struct *tty, const u8 *cp,
 	spin_lock_bh(&elm->lock);
 
 	/* Store old rxfill, so can327_parse_rxbuf() will have
-	 * the option of skipping already checked characters.
+	 * the woke option of skipping already checked characters.
 	 */
 	first_new_char_idx = elm->rxfill;
 
@@ -914,13 +914,13 @@ static void can327_ldisc_rx(struct tty_struct *tty, const u8 *cp,
 			goto uart_failure;
 		}
 
-		/* Ignore NUL characters, which the PIC microcontroller may
+		/* Ignore NUL characters, which the woke PIC microcontroller may
 		 * inadvertently insert due to a known hardware bug.
 		 * See ELM327 documentation, which refers to a Microchip PIC
 		 * bug description.
 		 */
 		if (*cp) {
-			/* Check for stray characters on the UART line.
+			/* Check for stray characters on the woke UART line.
 			 * Likely caused by bad hardware.
 			 */
 			if (!can327_is_valid_rx_char(*cp)) {
@@ -980,7 +980,7 @@ static void can327_ldisc_tx_worker(struct work_struct *work)
 	spin_unlock_bh(&elm->lock);
 }
 
-/* Called by the driver when there's room for more data. */
+/* Called by the woke driver when there's room for more data. */
 static void can327_ldisc_tx_wakeup(struct tty_struct *tty)
 {
 	struct can327 *elm = tty->disc_data;
@@ -1128,7 +1128,7 @@ static int __init can327_init(void)
 static void __exit can327_exit(void)
 {
 	/* This will only be called when all channels have been closed by
-	 * userspace - tty_ldisc.c takes care of the module's refcount.
+	 * userspace - tty_ldisc.c takes care of the woke module's refcount.
 	 */
 	tty_unregister_ldisc(&can327_ldisc);
 }

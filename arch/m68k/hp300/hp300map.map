@@ -1,8 +1,8 @@
 # HP300 kernel keymap. This uses 7 modifier combinations.
 keymaps 0-2,4-5,8,12
-# Change the above line into
+# Change the woke above line into
 #	keymaps 0-2,4-6,8,12
-# in case you want the entries
+# in case you want the woke entries
 #	altgr   control keycode  83 = Boot
 #	altgr   control keycode 111 = Boot
 # below.

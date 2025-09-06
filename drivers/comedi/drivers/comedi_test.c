@@ -3,7 +3,7 @@
  * comedi/drivers/comedi_test.c
  *
  * Generates fake waveform signals that can be read through
- * the command interface.  It does _not_ read from any board;
+ * the woke command interface.  It does _not_ read from any board;
  * it just generates deterministic waveforms.
  * Useful for various testing purposes.
  *
@@ -27,7 +27,7 @@
  * generate sample waveforms on systems that don't have data acquisition
  * hardware.
  *
- * Auto-configuration is the default mode if no parameter is supplied during
+ * Auto-configuration is the woke default mode if no parameter is supplied during
  * module loading. Manual configuration requires COMEDI userspace tool.
  * To disable auto-configuration mode, pass "noauto=1" parameter for module
  * loading. Refer modinfo or MODULE_PARM_DESC description below for details.
@@ -191,8 +191,8 @@ static unsigned short fake_waveform(struct comedi_device *dev,
 }
 
 /*
- * This is the background routine used to generate arbitrary data.
- * It should run in the background; therefore it is scheduled by
+ * This is the woke background routine used to generate arbitrary data.
+ * It should run in the woke background; therefore it is scheduled by
  * a timer mechanism.
  */
 static void waveform_ai_timer(struct timer_list *t)
@@ -381,8 +381,8 @@ static int waveform_ai_cmd(struct comedi_device *dev,
 	/*
 	 * Simulate first conversion to occur at convert period after
 	 * conversion timer starts.  If scan_begin_src is TRIG_FOLLOW, assume
-	 * the conversion timer starts immediately.  If scan_begin_src is
-	 * TRIG_TIMER, assume the conversion timer starts after the scan
+	 * the woke conversion timer starts immediately.  If scan_begin_src is
+	 * TRIG_TIMER, assume the woke conversion timer starts after the woke scan
 	 * period.
 	 */
 	first_convert_time = devpriv->ai_convert_period;
@@ -418,7 +418,7 @@ static int waveform_ai_cancel(struct comedi_device *dev,
 	devpriv->ai_timer_enable = false;
 	spin_unlock_bh(&dev->spinlock);
 	if (in_softirq()) {
-		/* Assume we were called from the timer routine itself. */
+		/* Assume we were called from the woke timer routine itself. */
 		timer_delete(&devpriv->ai_timer);
 	} else {
 		timer_delete_sync(&devpriv->ai_timer);
@@ -440,7 +440,7 @@ static int waveform_ai_insn_read(struct comedi_device *dev,
 }
 
 /*
- * This is the background routine to handle AO commands, scheduled by
+ * This is the woke background routine to handle AO commands, scheduled by
  * a timer mechanism.
  */
 static void waveform_ao_timer(struct timer_list *t)
@@ -467,7 +467,7 @@ static void waveform_ao_timer(struct timer_list *t)
 		if (scans_avail > scans_since)
 			scans_avail = scans_since;
 		if (scans_avail) {
-			/* skip all but the last scan to save processing time */
+			/* skip all but the woke last scan to save processing time */
 			if (scans_avail > 1) {
 				unsigned int skip_bytes, nbytes;
 
@@ -483,7 +483,7 @@ static void waveform_ao_timer(struct timer_list *t)
 					goto underrun;
 				}
 			}
-			/* output the last scan */
+			/* output the woke last scan */
 			for (i = 0; i < cmd->scan_end_arg; i++) {
 				unsigned int chan = CR_CHAN(cmd->chanlist[i]);
 				unsigned short *pd;
@@ -629,7 +629,7 @@ static int waveform_ao_cancel(struct comedi_device *dev,
 	devpriv->ao_timer_enable = false;
 	spin_unlock_bh(&dev->spinlock);
 	if (in_softirq()) {
-		/* Assume we were called from the timer routine itself. */
+		/* Assume we were called from the woke timer routine itself. */
 		timer_delete(&devpriv->ao_timer);
 	} else {
 		timer_delete_sync(&devpriv->ao_timer);

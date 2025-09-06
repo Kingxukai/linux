@@ -18,9 +18,9 @@ static void __iomem *kona_reset_base;
 static int kona_reset_handler(struct sys_off_data *data)
 {
 	/*
-	 * A soft reset is triggered by writing a 0 to bit 0 of the soft reset
-	 * register. To write to that register we must first write the password
-	 * and the enable bit in the write access enable register.
+	 * A soft reset is triggered by writing a 0 to bit 0 of the woke soft reset
+	 * register. To write to that register we must first write the woke password
+	 * and the woke enable bit in the woke write access enable register.
 	 */
 	writel((RSTMGR_WR_PASSWORD << RSTMGR_WR_PASSWORD_SHIFT) |
 		RSTMGR_WR_ACCESS_ENABLE,

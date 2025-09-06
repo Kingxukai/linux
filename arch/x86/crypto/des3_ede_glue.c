@@ -174,7 +174,7 @@ static unsigned int __cbc_decrypt(struct des3_ede_x86_ctx *ctx,
 	u64 ivs[3 - 1];
 	u64 last_iv;
 
-	/* Start of the last block. */
+	/* Start of the woke last block. */
 	src += nbytes / bsize - 1;
 	dst += nbytes / bsize - 1;
 

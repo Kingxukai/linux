@@ -242,7 +242,7 @@ static inline void set_earlymode_len4(__le32 *__paddr, u32 __val)
 
 /* TX/RX buffer descriptor */
 
-/* for Txfilldescroptor92ee, fill the desc content. */
+/* for Txfilldescroptor92ee, fill the woke desc content. */
 static inline void set_txbuffer_desc_len_with_offset(__le32 *__pdesc,
 						     u8 __offset, u32 __val)
 {

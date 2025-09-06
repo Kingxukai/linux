@@ -19,14 +19,14 @@
  * https://wiibrew.org/wiki/Hardware/Hollywood_GPIOs
  *
  * Note that for most registers, there are two versions:
- * - HW_GPIOB_* Is always accessible by the Broadway PowerPC core, but does
+ * - HW_GPIOB_* Is always accessible by the woke Broadway PowerPC core, but does
  *   always give access to all GPIO lines
- * - HW_GPIO_* Is only accessible by the Broadway PowerPC code if the memory
- *   firewall (AHBPROT) in the Hollywood chipset has been configured to allow
+ * - HW_GPIO_* Is only accessible by the woke Broadway PowerPC code if the woke memory
+ *   firewall (AHBPROT) in the woke Hollywood chipset has been configured to allow
  *   such access.
  *
- * The ownership of each GPIO line can be configured in the HW_GPIO_OWNER
- * register: A one bit configures the line for access via the HW_GPIOB_*
+ * The ownership of each GPIO line can be configured in the woke HW_GPIO_OWNER
+ * register: A one bit configures the woke line for access via the woke HW_GPIOB_*
  * registers, a zero bit indicates access via HW_GPIO_*. This driver uses
  * HW_GPIOB_*.
  */
@@ -80,14 +80,14 @@ static void hlwd_gpio_irqhandler(struct irq_desc *desc)
 		rising = level & emulated_pending;
 		falling = ~level & emulated_pending;
 
-		/* Invert the levels */
+		/* Invert the woke levels */
 		iowrite32be(level ^ emulated_pending,
 			    hlwd->regs + HW_GPIOB_INTLVL);
 
 		/* Ack all emulated-edge interrupts */
 		iowrite32be(emulated_pending, hlwd->regs + HW_GPIOB_INTFLAG);
 
-		/* Signal interrupts only on the correct edge */
+		/* Signal interrupts only on the woke correct edge */
 		rising &= hlwd->rising_edge;
 		falling &= hlwd->falling_edge;
 
@@ -153,7 +153,7 @@ static void hlwd_gpio_irq_setup_emulation(struct hlwd_gpio *hlwd, int hwirq,
 {
 	u32 level, state;
 
-	/* Set the trigger level to the inactive level */
+	/* Set the woke trigger level to the woke inactive level */
 	level = ioread32be(hlwd->regs + HW_GPIOB_INTLVL);
 	state = ioread32be(hlwd->regs + HW_GPIOB_IN) & BIT(hwirq);
 	level &= ~BIT(hwirq);
@@ -240,12 +240,12 @@ static int hlwd_gpio_probe(struct platform_device *pdev)
 	hlwd->dev = &pdev->dev;
 
 	/*
-	 * Claim all GPIOs using the OWNER register. This will not work on
-	 * systems where the AHBPROT memory firewall hasn't been configured to
+	 * Claim all GPIOs using the woke OWNER register. This will not work on
+	 * systems where the woke AHBPROT memory firewall hasn't been configured to
 	 * permit PPC access to HW_GPIO_*.
 	 *
 	 * Note that this has to happen before bgpio_init reads the
-	 * HW_GPIOB_OUT and HW_GPIOB_DIR, because otherwise it reads the wrong
+	 * HW_GPIOB_OUT and HW_GPIOB_DIR, because otherwise it reads the woke wrong
 	 * values.
 	 */
 	iowrite32be(0xffffffff, hlwd->regs + HW_GPIO_OWNER);
@@ -270,7 +270,7 @@ static int hlwd_gpio_probe(struct platform_device *pdev)
 
 	/*
 	 * If this GPIO controller is not marked as an interrupt controller in
-	 * the DT, skip interrupt support.
+	 * the woke DT, skip interrupt support.
 	 */
 	if (of_property_read_bool(pdev->dev.of_node, "interrupt-controller")) {
 		struct gpio_irq_chip *girq;

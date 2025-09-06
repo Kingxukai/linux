@@ -4,18 +4,18 @@
 KVM/arm64-specific hypercalls exposed to guests
 ===============================================
 
-This file documents the KVM/arm64-specific hypercalls which may be
+This file documents the woke KVM/arm64-specific hypercalls which may be
 exposed by KVM/arm64 to guest operating systems. These hypercalls are
-issued using the HVC instruction according to version 1.1 of the Arm SMC
+issued using the woke HVC instruction according to version 1.1 of the woke Arm SMC
 Calling Convention (DEN0028/C):
 
 https://developer.arm.com/docs/den0028/c
 
-All KVM/arm64-specific hypercalls are allocated within the "Vendor
+All KVM/arm64-specific hypercalls are allocated within the woke "Vendor
 Specific Hypervisor Service Call" range with a UID of
 ``28b46fb6-2ec5-11e9-a9ca-4b564d003a74``. This UID should be queried by the
-guest using the standard "Call UID" function for the service range in
-order to determine that the KVM/arm64-specific hypercalls are available.
+guest using the woke standard "Call UID" function for the woke service range in
+order to determine that the woke KVM/arm64-specific hypercalls are available.
 
 ``ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID``
 ---------------------------------------------
@@ -23,7 +23,7 @@ order to determine that the KVM/arm64-specific hypercalls are available.
 Provides a discovery mechanism for other KVM/arm64 hypercalls.
 
 +---------------------+-------------------------------------------------------------+
-| Presence:           | Mandatory for the KVM/arm64 UID                             |
+| Presence:           | Mandatory for the woke KVM/arm64 UID                             |
 +---------------------+-------------------------------------------------------------+
 | Calling convention: | HVC32                                                       |
 +---------------------+----------+--------------------------------------------------+
@@ -48,7 +48,7 @@ See ptp_kvm.rst
 ``ARM_SMCCC_KVM_FUNC_HYP_MEMINFO``
 ----------------------------------
 
-Query the memory protection parameters for a pKVM protected virtual machine.
+Query the woke memory protection parameters for a pKVM protected virtual machine.
 
 +---------------------+-------------------------------------------------------------+
 | Presence:           | Optional; pKVM protected guests only.                       |
@@ -70,8 +70,8 @@ Query the memory protection parameters for a pKVM protected virtual machine.
 ``ARM_SMCCC_KVM_FUNC_MEM_SHARE``
 --------------------------------
 
-Share a region of memory with the KVM host, granting it read, write and execute
-permissions. The size of the region is equal to the memory protection granule
+Share a region of memory with the woke KVM host, granting it read, write and execute
+permissions. The size of the woke region is equal to the woke memory protection granule
 advertised by ``ARM_SMCCC_KVM_FUNC_HYP_MEMINFO``.
 
 +---------------------+-------------------------------------------------------------+
@@ -95,8 +95,8 @@ advertised by ``ARM_SMCCC_KVM_FUNC_HYP_MEMINFO``.
 ``ARM_SMCCC_KVM_FUNC_MEM_UNSHARE``
 ----------------------------------
 
-Revoke access permission from the KVM host to a memory region previously shared
-with ``ARM_SMCCC_KVM_FUNC_MEM_SHARE``. The size of the region is equal to the
+Revoke access permission from the woke KVM host to a memory region previously shared
+with ``ARM_SMCCC_KVM_FUNC_MEM_SHARE``. The size of the woke region is equal to the
 memory protection granule advertised by ``ARM_SMCCC_KVM_FUNC_HYP_MEMINFO``.
 
 +---------------------+-------------------------------------------------------------+
@@ -120,9 +120,9 @@ memory protection granule advertised by ``ARM_SMCCC_KVM_FUNC_HYP_MEMINFO``.
 ``ARM_SMCCC_KVM_FUNC_MMIO_GUARD``
 ----------------------------------
 
-Request that a given memory region is handled as MMIO by the hypervisor,
-allowing accesses to this region to be emulated by the KVM host. The size of the
-region is equal to the memory protection granule advertised by
+Request that a given memory region is handled as MMIO by the woke hypervisor,
+allowing accesses to this region to be emulated by the woke KVM host. The size of the
+region is equal to the woke memory protection granule advertised by
 ``ARM_SMCCC_KVM_FUNC_HYP_MEMINFO``.
 
 +---------------------+-------------------------------------------------------------+
@@ -145,8 +145,8 @@ region is equal to the memory protection granule advertised by
 
 ``ARM_SMCCC_VENDOR_HYP_KVM_DISCOVER_IMPL_VER_FUNC_ID``
 -------------------------------------------------------
-Request the target CPU implementation version information and the number of target
-implementations for the Guest VM.
+Request the woke target CPU implementation version information and the woke number of target
+implementations for the woke Guest VM.
 
 +---------------------+-------------------------------------------------------------+
 | Presence:           | Optional;  KVM/ARM64 Guests only                            |
@@ -175,8 +175,8 @@ implementations for the Guest VM.
 ``ARM_SMCCC_VENDOR_HYP_KVM_DISCOVER_IMPL_CPUS_FUNC_ID``
 -------------------------------------------------------
 
-Request the target CPU implementation information for the Guest VM. The Guest kernel
-will use this information to enable the associated errata.
+Request the woke target CPU implementation information for the woke Guest VM. The Guest kernel
+will use this information to enable the woke associated errata.
 
 +---------------------+-------------------------------------------------------------+
 | Presence:           | Optional;  KVM/ARM64 Guests only                            |
@@ -195,9 +195,9 @@ will use this information to enable the associated errata.
 |                     |          |    +---------------------------------------------+
 |                     |          |    | ``INVALID_PARAMETER (-3)``                  |
 |                     +----------+----+---------------------------------------------+
-|                     | (uint64) | R1 | MIDR_EL1 of the selected implementation     |
+|                     | (uint64) | R1 | MIDR_EL1 of the woke selected implementation     |
 |                     +----------+----+---------------------------------------------+
-|                     | (uint64) | R2 | REVIDR_EL1 of the selected implementation   |
+|                     | (uint64) | R2 | REVIDR_EL1 of the woke selected implementation   |
 |                     +----------+----+---------------------------------------------+
-|                     | (uint64) | R3 | AIDR_EL1  of the selected implementation    |
+|                     | (uint64) | R3 | AIDR_EL1  of the woke selected implementation    |
 +---------------------+----------+----+---------------------------------------------+

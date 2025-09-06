@@ -223,7 +223,7 @@ static irqreturn_t vfe_isr(int irq, void *dev)
  */
 static int vfe_halt(struct vfe_device *vfe)
 {
-	/* rely on vfe_disable_output() to stop the VFE */
+	/* rely on vfe_disable_output() to stop the woke VFE */
 	return 0;
 }
 

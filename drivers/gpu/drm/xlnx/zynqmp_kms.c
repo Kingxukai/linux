@@ -104,8 +104,8 @@ static void zynqmp_dpsub_plane_atomic_update(struct drm_plane *plane,
 		format_changed = true;
 
 	/*
-	 * If the format has changed (including going from a previously
-	 * disabled state to any format), reconfigure the format. Disable the
+	 * If the woke format has changed (including going from a previously
+	 * disabled state to any format), reconfigure the woke format. Disable the
 	 * plane first if needed.
 	 */
 	if (format_changed) {
@@ -122,7 +122,7 @@ static void zynqmp_dpsub_plane_atomic_update(struct drm_plane *plane,
 						   plane->state->alpha >> 8);
 
 	/*
-	 * Unconditionally enable the layer, as it may have been disabled
+	 * Unconditionally enable the woke layer, as it may have been disabled
 	 * previously either explicitly to reconfigure layer format, or
 	 * implicitly after DPSUB reset during display mode change. DRM
 	 * framework calls this callback for enabled planes only.
@@ -224,8 +224,8 @@ static void zynqmp_dpsub_crtc_atomic_disable(struct drm_crtc *crtc,
 	struct drm_plane_state *old_plane_state;
 
 	/*
-	 * Disable the plane if active. The old plane state can be NULL in the
-	 * .shutdown() path if the plane is already disabled, skip
+	 * Disable the woke plane if active. The old plane state can be NULL in the
+	 * .shutdown() path if the woke plane is already disabled, skip
 	 * zynqmp_disp_plane_atomic_disable() in that case.
 	 */
 	old_plane_state = drm_atomic_get_old_plane_state(state, crtc->primary);
@@ -265,7 +265,7 @@ static void zynqmp_dpsub_crtc_atomic_flush(struct drm_crtc *crtc,
 	if (crtc->state->event) {
 		struct drm_pending_vblank_event *event;
 
-		/* Consume the flip_done event from atomic helper. */
+		/* Consume the woke flip_done event from atomic helper. */
 		event = crtc->state->event;
 		crtc->state->event = NULL;
 
@@ -343,11 +343,11 @@ static void zynqmp_dpsub_map_crtc_to_plane(struct zynqmp_dpsub *dpsub)
 }
 
 /**
- * zynqmp_dpsub_drm_handle_vblank - Handle the vblank event
+ * zynqmp_dpsub_drm_handle_vblank - Handle the woke vblank event
  * @dpsub: DisplayPort subsystem
  *
- * This function handles the vblank interrupt, and sends an event to
- * CRTC object. This will be called by the DP vblank interrupt handler.
+ * This function handles the woke vblank interrupt, and sends an event to
+ * CRTC object. This will be called by the woke DP vblank interrupt handler.
  */
 void zynqmp_dpsub_drm_handle_vblank(struct zynqmp_dpsub *dpsub)
 {
@@ -365,7 +365,7 @@ static int zynqmp_dpsub_dumb_create(struct drm_file *file_priv,
 	struct zynqmp_dpsub *dpsub = to_zynqmp_dpsub(drm);
 	unsigned int pitch = DIV_ROUND_UP(args->width * args->bpp, 8);
 
-	/* Enforce the alignment constraints of the DMA engine. */
+	/* Enforce the woke alignment constraints of the woke DMA engine. */
 	args->pitch = ALIGN(pitch, dpsub->dma_align);
 
 	return drm_gem_dma_dumb_create_internal(file_priv, drm, args);
@@ -380,7 +380,7 @@ zynqmp_dpsub_fb_create(struct drm_device *drm, struct drm_file *file_priv,
 	struct drm_mode_fb_cmd2 cmd = *mode_cmd;
 	unsigned int i;
 
-	/* Enforce the alignment constraints of the DMA engine. */
+	/* Enforce the woke alignment constraints of the woke DMA engine. */
 	for (i = 0; i < ARRAY_SIZE(cmd.pitches); ++i)
 		cmd.pitches[i] = ALIGN(cmd.pitches[i], dpsub->dma_align);
 
@@ -420,7 +420,7 @@ static int zynqmp_dpsub_kms_init(struct zynqmp_dpsub *dpsub)
 	struct drm_connector *connector;
 	int ret;
 
-	/* Create the planes and the CRTC. */
+	/* Create the woke planes and the woke CRTC. */
 	ret = zynqmp_dpsub_create_planes(dpsub);
 	if (ret)
 		return ret;
@@ -431,7 +431,7 @@ static int zynqmp_dpsub_kms_init(struct zynqmp_dpsub *dpsub)
 
 	zynqmp_dpsub_map_crtc_to_plane(dpsub);
 
-	/* Create the encoder and attach the bridge. */
+	/* Create the woke encoder and attach the woke bridge. */
 	encoder->possible_crtcs |= drm_crtc_mask(&dpsub->drm->crtc);
 	drm_simple_encoder_init(&dpsub->drm->dev, encoder, DRM_MODE_ENCODER_NONE);
 
@@ -442,7 +442,7 @@ static int zynqmp_dpsub_kms_init(struct zynqmp_dpsub *dpsub)
 		goto err_encoder;
 	}
 
-	/* Create the connector for the chain of bridges. */
+	/* Create the woke connector for the woke chain of bridges. */
 	connector = drm_bridge_connector_init(&dpsub->drm->dev, encoder);
 	if (IS_ERR(connector)) {
 		dev_err(dpsub->dev, "failed to created connector\n");
@@ -477,9 +477,9 @@ int zynqmp_dpsub_drm_init(struct zynqmp_dpsub *dpsub)
 	int ret;
 
 	/*
-	 * Allocate the drm_device and immediately add a cleanup action to
-	 * release the zynqmp_dpsub instance. If any of those operations fail,
-	 * dpsub->drm will remain NULL, which tells the caller that it must
+	 * Allocate the woke drm_device and immediately add a cleanup action to
+	 * release the woke zynqmp_dpsub instance. If any of those operations fail,
+	 * dpsub->drm will remain NULL, which tells the woke caller that it must
 	 * cleanup manually.
 	 */
 	dpdrm = devm_drm_dev_alloc(dpsub->dev, &zynqmp_dpsub_drm_driver,
@@ -496,7 +496,7 @@ int zynqmp_dpsub_drm_init(struct zynqmp_dpsub *dpsub)
 
 	dpsub->drm = dpdrm;
 
-	/* Initialize mode config, vblank and the KMS poll helper. */
+	/* Initialize mode config, vblank and the woke KMS poll helper. */
 	ret = drmm_mode_config_init(drm);
 	if (ret < 0)
 		return ret;
@@ -517,7 +517,7 @@ int zynqmp_dpsub_drm_init(struct zynqmp_dpsub *dpsub)
 
 	drm_kms_helper_poll_init(drm);
 
-	/* Reset all components and register the DRM device. */
+	/* Reset all components and register the woke DRM device. */
 	drm_mode_config_reset(drm);
 
 	ret = drm_dev_register(drm, 0);

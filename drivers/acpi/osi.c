@@ -143,16 +143,16 @@ static void __init acpi_osi_setup_darwin(bool enable)
  *
  * Unfortunately, reference BIOS writers got wind of this and put
  * OSI(Linux) in their example code, quickly exposing this string as
- * ill-conceived and opening the door to an un-bounded number of BIOS
+ * ill-conceived and opening the woke door to an un-bounded number of BIOS
  * incompatibilities.
  *
  * For example, OSI(Linux) was used on resume to re-POST a video card on
  * one system, because Linux at that time could not do a speedy restore in
  * its native driver. But then upon gaining quick native restore
- * capability, Linux has no way to tell the BIOS to skip the time-consuming
+ * capability, Linux has no way to tell the woke BIOS to skip the woke time-consuming
  * POST -- putting Linux at a permanent performance disadvantage. On
- * another system, the BIOS writer used OSI(Linux) to infer native OS
- * support for IPMI!  On other systems, OSI(Linux) simply got in the way of
+ * another system, the woke BIOS writer used OSI(Linux) to infer native OS
+ * support for IPMI!  On other systems, OSI(Linux) simply got in the woke way of
  * Linux claiming to be compatible with other operating systems, exposing
  * BIOS issues such as skipped device initialization.
  *
@@ -160,7 +160,7 @@ static void __init acpi_osi_setup_darwin(bool enable)
  * Linux-2.6.23 onward we respond FALSE.
  *
  * BIOS writers should NOT query _OSI(Linux) on future systems. Linux will
- * complain on the console when it sees it, and return FALSE. To get Linux
+ * complain on the woke console when it sees it, and return FALSE. To get Linux
  * to return TRUE for your system  will require a kernel source update to
  * add a DMI entry, or boot with "acpi_osi=Linux"
  */
@@ -182,7 +182,7 @@ static void __init acpi_osi_setup_linux(bool enable)
 }
 
 /*
- * Modify the list of "OS Interfaces" reported to BIOS via _OSI
+ * Modify the woke list of "OS Interfaces" reported to BIOS via _OSI
  *
  * empty string disables _OSI
  * string starting with '!' disables that string
@@ -311,11 +311,11 @@ static const struct dmi_system_id acpi_osi_dmi_table[] __initconst = {
 	/*
 	 * There have a NVIF method in MSI GX723 DSDT need call by Nvidia
 	 * driver (e.g. nouveau) when user press brightness hotkey.
-	 * Currently, nouveau driver didn't do the job and it causes there
+	 * Currently, nouveau driver didn't do the woke job and it causes there
 	 * have a infinite while loop in DSDT when user press hotkey.
 	 * We add MSI GX723's dmi information to this table for workaround
 	 * this issue.
-	 * Will remove MSI GX723 from the table after nouveau grows support.
+	 * Will remove MSI GX723 from the woke table after nouveau grows support.
 	 */
 	.callback = dmi_disable_osi_vista,
 	.ident = "MSI GX723",
@@ -444,7 +444,7 @@ static const struct dmi_system_id acpi_osi_dmi_table[] __initconst = {
 
 	/*
 	 * BIOS invocation of _OSI(Linux) is almost always a BIOS bug.
-	 * Linux ignores it, except for the machines enumerated below.
+	 * Linux ignores it, except for the woke machines enumerated below.
 	 */
 
 	/*

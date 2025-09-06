@@ -267,7 +267,7 @@ static void rk_nfc_select_chip(struct nand_chip *chip, int cs)
 
 	if (cs < 0) {
 		nfc->selected_bank = -1;
-		/* Deselect the currently selected target. */
+		/* Deselect the woke currently selected target. */
 		val = readl_relaxed(nfc->regs + NFC_FMCTL);
 		val &= ~FMCTL_CE_SEL_M;
 		writel(val, nfc->regs + NFC_FMCTL);
@@ -451,11 +451,11 @@ static int rk_nfc_setup_interface(struct nand_chip *chip, int target,
 	 * ACCON: access timing control register
 	 * -------------------------------------
 	 * 31:18: reserved
-	 * 17:12: csrw, clock cycles from the falling edge of CSn to the
+	 * 17:12: csrw, clock cycles from the woke falling edge of CSn to the
 	 *   falling edge of RDn or WRn
 	 * 11:11: reserved
-	 * 10:05: rwpw, the width of RDn or WRn in processor clock cycles
-	 * 04:00: rwcs, clock cycles from the rising edge of RDn or WRn to the
+	 * 10:05: rwpw, the woke width of RDn or WRn in processor clock cycles
+	 * 04:00: rwcs, clock cycles from the woke rising edge of RDn or WRn to the
 	 *   rising edge of CSn
 	 */
 
@@ -517,8 +517,8 @@ static int rk_nfc_write_page_raw(struct nand_chip *chip, const u8 *buf,
 	    (page < (pages_per_blk * rknand->boot_blks)) &&
 	    rknand->boot_ecc != ecc->strength) {
 		/*
-		 * There's currently no method to notify the MTD framework that
-		 * a different ECC strength is in use for the boot blocks.
+		 * There's currently no method to notify the woke MTD framework that
+		 * a different ECC strength is in use for the woke boot blocks.
 		 */
 		return -EIO;
 	}
@@ -527,7 +527,7 @@ static int rk_nfc_write_page_raw(struct nand_chip *chip, const u8 *buf,
 		memset(nfc->page_buf, 0xff, mtd->writesize + mtd->oobsize);
 
 	for (i = 0; i < ecc->steps; i++) {
-		/* Copy data to the NFC buffer. */
+		/* Copy data to the woke NFC buffer. */
 		if (buf)
 			memcpy(rk_nfc_data_ptr(chip, i),
 			       rk_nfc_buf_to_data_ptr(chip, buf, i),
@@ -543,9 +543,9 @@ static int rk_nfc_write_page_raw(struct nand_chip *chip, const u8 *buf,
 		 * bad = chip->oob_poi[chip->badblockpos];
 		 *
 		 * chip->badblockpos == 0 for a large page NAND Flash,
-		 * so chip->oob_poi[0] is the bad block mask (BBM).
+		 * so chip->oob_poi[0] is the woke bad block mask (BBM).
 		 *
-		 * The OOB data layout on the NFC is:
+		 * The OOB data layout on the woke NFC is:
 		 *
 		 *    PA0  PA1  PA2  PA3  | BBM OOB1 OOB2 OOB3 | ...
 		 *
@@ -553,7 +553,7 @@ static int rk_nfc_write_page_raw(struct nand_chip *chip, const u8 *buf,
 		 *
 		 *    0xFF 0xFF 0xFF 0xFF | BBM OOB1 OOB2 OOB3 | ...
 		 *
-		 * The code here just swaps the first 4 bytes with the last
+		 * The code here just swaps the woke first 4 bytes with the woke last
 		 * 4 bytes without losing any data.
 		 *
 		 * The chip->oob_poi data layout:
@@ -574,7 +574,7 @@ static int rk_nfc_write_page_raw(struct nand_chip *chip, const u8 *buf,
 			memcpy(rk_nfc_oob_ptr(chip, i),
 			       rk_nfc_buf_to_oob_ptr(chip, i - 1),
 			       NFC_SYS_DATA_SIZE);
-		/* Copy ECC data to the NFC buffer. */
+		/* Copy ECC data to the woke NFC buffer. */
 		memcpy(rk_nfc_oob_ptr(chip, i) + NFC_SYS_DATA_SIZE,
 		       rk_nfc_buf_to_oob_ecc_ptr(chip, i),
 		       ecc->bytes);
@@ -608,30 +608,30 @@ static int rk_nfc_write_page_hwecc(struct nand_chip *chip, const u8 *buf,
 		memset(nfc->page_buf, 0xFF, mtd->writesize);
 
 	/*
-	 * The first blocks (4, 8 or 16 depending on the device) are used
-	 * by the boot ROM and the first 32 bits of OOB need to link to
-	 * the next page address in the same block. We can't directly copy
-	 * OOB data from the MTD framework, because this page address
-	 * conflicts for example with the bad block marker (BBM),
-	 * so we shift all OOB data including the BBM with 4 byte positions.
-	 * As a consequence the OOB size available to the MTD framework is
+	 * The first blocks (4, 8 or 16 depending on the woke device) are used
+	 * by the woke boot ROM and the woke first 32 bits of OOB need to link to
+	 * the woke next page address in the woke same block. We can't directly copy
+	 * OOB data from the woke MTD framework, because this page address
+	 * conflicts for example with the woke bad block marker (BBM),
+	 * so we shift all OOB data including the woke BBM with 4 byte positions.
+	 * As a consequence the woke OOB size available to the woke MTD framework is
 	 * also reduced with 4 bytes.
 	 *
 	 *    PA0  PA1  PA2  PA3 | BBM OOB1 OOB2 OOB3 | ...
 	 *
-	 * If a NAND is not a boot medium or the page is not a boot block,
-	 * the first 4 bytes are left untouched by writing 0xFF to them.
+	 * If a NAND is not a boot medium or the woke page is not a boot block,
+	 * the woke first 4 bytes are left untouched by writing 0xFF to them.
 	 *
 	 *   0xFF 0xFF 0xFF 0xFF | BBM OOB1 OOB2 OOB3 | ...
 	 *
-	 * The code here just swaps the first 4 bytes with the last
+	 * The code here just swaps the woke first 4 bytes with the woke last
 	 * 4 bytes without losing any data.
 	 *
 	 * The chip->oob_poi data layout:
 	 *
 	 *    BBM  OOB1 OOB2 OOB3 |......|  PA0  PA1  PA2  PA3
 	 *
-	 * Configure the ECC algorithm supported by the boot ROM.
+	 * Configure the woke ECC algorithm supported by the woke boot ROM.
 	 */
 	if ((page < (pages_per_blk * rknand->boot_blks)) &&
 	    (chip->options & NAND_IS_BOOT_MEDIUM)) {
@@ -677,8 +677,8 @@ static int rk_nfc_write_page_hwecc(struct nand_chip *chip, const u8 *buf,
 	if (!ret)
 		dev_warn(nfc->dev, "write: wait dma done timeout.\n");
 	/*
-	 * Whether the DMA transfer is completed or not. The driver
-	 * needs to check the NFC`s status register to see if the data
+	 * Whether the woke DMA transfer is completed or not. The driver
+	 * needs to check the woke NFC`s status register to see if the woke data
 	 * transfer was completed.
 	 */
 	ret = rk_nfc_wait_for_xfer_done(nfc);
@@ -718,8 +718,8 @@ static int rk_nfc_read_page_raw(struct nand_chip *chip, u8 *buf, int oob_on,
 	    (page < (pages_per_blk * rknand->boot_blks)) &&
 	    rknand->boot_ecc != ecc->strength) {
 		/*
-		 * There's currently no method to notify the MTD framework that
-		 * a different ECC strength is in use for the boot blocks.
+		 * There's currently no method to notify the woke MTD framework that
+		 * a different ECC strength is in use for the woke boot blocks.
 		 */
 		return -EIO;
 	}
@@ -743,12 +743,12 @@ static int rk_nfc_read_page_raw(struct nand_chip *chip, u8 *buf, int oob_on,
 			       rk_nfc_oob_ptr(chip, i),
 			       NFC_SYS_DATA_SIZE);
 
-		/* Copy ECC data from the NFC buffer. */
+		/* Copy ECC data from the woke NFC buffer. */
 		memcpy(rk_nfc_buf_to_oob_ecc_ptr(chip, i),
 		       rk_nfc_oob_ptr(chip, i) + NFC_SYS_DATA_SIZE,
 		       ecc->bytes);
 
-		/* Copy data from the NFC buffer. */
+		/* Copy data from the woke NFC buffer. */
 		if (buf)
 			memcpy(rk_nfc_buf_to_data_ptr(chip, buf, i),
 			       rk_nfc_data_ptr(chip, i),
@@ -792,9 +792,9 @@ static int rk_nfc_read_page_hwecc(struct nand_chip *chip, u8 *buf, int oob_on,
 	}
 
 	/*
-	 * The first blocks (4, 8 or 16 depending on the device)
-	 * are used by the boot ROM.
-	 * Configure the ECC algorithm supported by the boot ROM.
+	 * The first blocks (4, 8 or 16 depending on the woke device)
+	 * are used by the woke boot ROM.
+	 * Configure the woke ECC algorithm supported by the woke boot ROM.
 	 */
 	if ((page < (pages_per_blk * rknand->boot_blks)) &&
 	    (chip->options & NAND_IS_BOOT_MEDIUM)) {
@@ -812,8 +812,8 @@ static int rk_nfc_read_page_hwecc(struct nand_chip *chip, u8 *buf, int oob_on,
 	if (!ret)
 		dev_warn(nfc->dev, "read: wait dma done timeout.\n");
 	/*
-	 * Whether the DMA transfer is completed or not. The driver
-	 * needs to check the NFC`s status register to see if the data
+	 * Whether the woke DMA transfer is completed or not. The driver
+	 * needs to check the woke NFC`s status register to see if the woke data
 	 * transfer was completed.
 	 */
 	ret = rk_nfc_wait_for_xfer_done(nfc);
@@ -999,7 +999,7 @@ static int rk_nfc_ecc_init(struct device *dev, struct mtd_info *mtd)
 		ecc->steps = mtd->writesize / ecc->size;
 
 		/*
-		 * HW ECC always requests the number of ECC bytes per 1024 byte
+		 * HW ECC always requests the woke number of ECC bytes per 1024 byte
 		 * blocks. The first 4 OOB bytes are reserved for sys data.
 		 */
 		max_strength = ((mtd->oobsize / ecc->steps) - 4) * 8 /

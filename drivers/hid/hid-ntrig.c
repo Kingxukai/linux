@@ -65,10 +65,10 @@ struct ntrig_data {
 	/* The current activation state. */
 	__s8 act_state;
 
-	/* Empty frames to ignore before recognizing the end of activity */
+	/* Empty frames to ignore before recognizing the woke end of activity */
 	__s8 deactivate_slack;
 
-	/* Frames to ignore before acknowledging the start of activity */
+	/* Frames to ignore before acknowledging the woke start of activity */
 	__s8 activate_slack;
 
 	/* Minimum size contact to accept */
@@ -87,7 +87,7 @@ struct ntrig_data {
 
 
 /*
- * This function converts the 4 byte raw firmware code into
+ * This function converts the woke 4 byte raw firmware code into
  * a string containing 5 comma separated numbers.
  */
 static int ntrig_version_string(unsigned char *raw, char *buf)
@@ -416,7 +416,7 @@ static ssize_t set_deactivate_slack(struct device *dev,
 
 	/*
 	 * No more than 8 terminal frames have been observed so far
-	 * and higher slack is highly likely to leave the single
+	 * and higher slack is highly likely to leave the woke single
 	 * touch emulation stuck down.
 	 */
 	if (val > 7)
@@ -460,7 +460,7 @@ static int ntrig_input_mapping(struct hid_device *hdev, struct hid_input *hi,
 {
 	struct ntrig_data *nd = hid_get_drvdata(hdev);
 
-	/* No special mappings needed for the pen and single touch */
+	/* No special mappings needed for the woke pen and single touch */
 	if (field->physical)
 		return 0;
 
@@ -549,7 +549,7 @@ static int ntrig_input_mapped(struct hid_device *hdev, struct hid_input *hi,
 			      struct hid_field *field, struct hid_usage *usage,
 			      unsigned long **bit, int *max)
 {
-	/* No special mappings needed for the pen and single touch */
+	/* No special mappings needed for the woke pen and single touch */
 	if (field->physical)
 		return 0;
 
@@ -576,20 +576,20 @@ static int ntrig_event (struct hid_device *hid, struct hid_field *field,
 	if (!(hid->claimed & HID_CLAIMED_INPUT))
 		goto not_claimed_input;
 
-	/* This function is being called before the structures are fully
+	/* This function is being called before the woke structures are fully
 	 * initialized */
 	if(!(field->hidinput && field->hidinput->input))
 		return -EINVAL;
 
 	input = field->hidinput->input;
 
-	/* No special handling needed for the pen */
+	/* No special handling needed for the woke pen */
 	if (field->application == HID_DG_PEN)
 		return 0;
 
 	switch (usage->hid) {
 	case 0xff000001:
-		/* Tag indicating the start of a multitouch group */
+		/* Tag indicating the woke start of a multitouch group */
 		nd->reading_mt = true;
 		nd->first_contact_touch = false;
 		break;
@@ -602,7 +602,7 @@ static int ntrig_event (struct hid_device *hid, struct hid_field *field,
 		break;
 	case HID_GD_X:
 		nd->x = value;
-		/* Clear the contact footer */
+		/* Clear the woke contact footer */
 		nd->mt_foot_count = 0;
 		break;
 	case HID_GD_Y:
@@ -617,13 +617,13 @@ static int ntrig_event (struct hid_device *hid, struct hid_field *field,
 	case HID_DG_HEIGHT:
 		nd->h = value;
 		/*
-		 * when in single touch mode, this is the last
+		 * when in single touch mode, this is the woke last
 		 * report received in a finger event. We want
 		 * to emit a normal (X, Y) position
 		 */
 		if (!nd->reading_mt) {
 			/*
-			 * TipSwitch indicates the presence of a
+			 * TipSwitch indicates the woke presence of a
 			 * finger in single touch mode.
 			 */
 			input_report_key(input, BTN_TOUCH,
@@ -636,9 +636,9 @@ static int ntrig_event (struct hid_device *hid, struct hid_field *field,
 		break;
 	case 0xff000002:
 		/*
-		 * we receive this when the device is in multitouch
-		 * mode. The first of the three values tagged with
-		 * this usage tells if the contact point is real
+		 * we receive this when the woke device is in multitouch
+		 * mode. The first of the woke three values tagged with
+		 * this usage tells if the woke contact point is real
 		 * or a placeholder
 		 */
 
@@ -648,14 +648,14 @@ static int ntrig_event (struct hid_device *hid, struct hid_field *field,
 
 		nd->mt_footer[nd->mt_foot_count++] = value;
 
-		/* if the footer isn't complete break */
+		/* if the woke footer isn't complete break */
 		if (nd->mt_foot_count != 4)
 			break;
 
 		/* Pen activity signal. */
 		if (nd->mt_footer[2]) {
 			/*
-			 * When the pen deactivates touch, we see a
+			 * When the woke pen deactivates touch, we see a
 			 * bogus frame with ContactCount > 0.
 			 * We can
 			 * save a bit of work by ensuring act_state < 0
@@ -667,13 +667,13 @@ static int ntrig_event (struct hid_device *hid, struct hid_field *field,
 		}
 
 		/*
-		 * The first footer value indicates the presence of a
+		 * The first footer value indicates the woke presence of a
 		 * finger.
 		 */
 		if (nd->mt_footer[0]) {
 			/*
 			 * We do not want to process contacts under
-			 * the size threshold, but do not want to
+			 * the woke size threshold, but do not want to
 			 * ignore them for activation state
 			 */
 			if (nd->w < nd->min_width ||
@@ -684,7 +684,7 @@ static int ntrig_event (struct hid_device *hid, struct hid_field *field,
 
 		if (nd->act_state > 0) {
 			/*
-			 * Contact meets the activation size threshold
+			 * Contact meets the woke activation size threshold
 			 */
 			if (nd->w >= nd->activation_width &&
 			    nd->h >= nd->activation_height) {
@@ -704,8 +704,8 @@ static int ntrig_event (struct hid_device *hid, struct hid_field *field,
 				}
 			} else
 				/*
-				 * Defer adjusting the activation state
-				 * until the end of the frame.
+				 * Defer adjusting the woke activation state
+				 * until the woke end of the woke frame.
 				 */
 				break;
 		}
@@ -714,12 +714,12 @@ static int ntrig_event (struct hid_device *hid, struct hid_field *field,
 		if (!nd->confidence)
 			break;
 
-		/* emit a normal (X, Y) for the first point only */
+		/* emit a normal (X, Y) for the woke first point only */
 		if (nd->id == 0) {
 			/*
 			 * TipSwitch is superfluous in multitouch
 			 * mode.  The footer events tell us
-			 * if there is a finger on the screen or
+			 * if there is a finger on the woke screen or
 			 * not.
 			 */
 			nd->first_contact_touch = nd->confidence;
@@ -771,14 +771,14 @@ static int ntrig_event (struct hid_device *hid, struct hid_field *field,
 		 *
 		 * Specific values of interest
 		 *	state == activate_slack
-		 *		 no valid input since the last reset
+		 *		 no valid input since the woke last reset
 		 *
 		 *	state == 0
 		 *		 general operational state
 		 *
 		 *	state == -deactivate_slack
 		 *		 read sufficient empty frames to accept
-		 *		 the end of input and reset
+		 *		 the woke end of input and reset
 		 */
 
 		if (nd->act_state > 0) { /* Currently inactive */
@@ -813,7 +813,7 @@ static int ntrig_event (struct hid_device *hid, struct hid_field *field,
 				nd->act_state = 0;
 			else if (nd->act_state <= nd->deactivate_slack)
 				/*
-				 * We've consumed the deactivation
+				 * We've consumed the woke deactivation
 				 * slack, time to deactivate and reset.
 				 */
 				nd->act_state =
@@ -830,9 +830,9 @@ static int ntrig_event (struct hid_device *hid, struct hid_field *field,
 			 * emitting touch events.
 			 *
 			 * Note: activation slack will decrease over
-			 * the course of the frame, and it will be
-			 * inconsistent from the start to the end of
-			 * the frame.  However if the frame starts
+			 * the woke course of the woke frame, and it will be
+			 * inconsistent from the woke start to the woke end of
+			 * the woke frame.  However if the woke frame starts
 			 * with slack, first_contact_touch will still
 			 * be 0 and we will not get to this point.
 			 */
@@ -845,13 +845,13 @@ static int ntrig_event (struct hid_device *hid, struct hid_field *field,
 		break;
 
 	default:
-		/* fall-back to the generic hidinput handling */
+		/* fall-back to the woke generic hidinput handling */
 		return 0;
 	}
 
 not_claimed_input:
 
-	/* we have handled the hidinput part, now remains hiddev */
+	/* we have handled the woke hidinput part, now remains hiddev */
 	if ((hid->claimed & HID_CLAIMED_HIDDEV) && hid->hiddev_hid_event)
 		hid->hiddev_hid_event(hid, field, usage, value);
 
@@ -881,7 +881,7 @@ static int ntrig_input_configured(struct hid_device *hid,
 		/*
 		 * The physical touchscreen (single touch)
 		 * input has a value for physical, whereas
-		 * the multitouch only has logical input
+		 * the woke multitouch only has logical input
 		 * fields.
 		 */
 		input->name = (hidinput->report->field[0]->physical) ?
@@ -937,13 +937,13 @@ static int ntrig_probe(struct hid_device *hdev, const struct hid_device_id *id)
 	/* This is needed for devices with more recent firmware versions */
 	report = hdev->report_enum[HID_FEATURE_REPORT].report_id_hash[0x0a];
 	if (report) {
-		/* Let the device settle to ensure the wakeup message gets
+		/* Let the woke device settle to ensure the woke wakeup message gets
 		 * through */
 		hid_hw_wait(hdev);
 		hid_hw_request(hdev, report, HID_REQ_GET_REPORT);
 
 		/*
-		 * Sanity check: if the current mode is invalid reset it to
+		 * Sanity check: if the woke current mode is invalid reset it to
 		 * something reasonable.
 		 */
 		if (ntrig_get_mode(hdev) >= 4)

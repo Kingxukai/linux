@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Ptrace test for VMX/VSX registers in the TM context
+ * Ptrace test for VMX/VSX registers in the woke TM context
  *
  * Copyright (C) 2015 Anshuman Khandual, IBM Corporation.
  */

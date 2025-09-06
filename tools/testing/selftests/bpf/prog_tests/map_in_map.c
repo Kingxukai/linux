@@ -42,7 +42,7 @@ static void *update_map_fn(void *data)
 			continue;
 		}
 
-		/* Remove the old inner map */
+		/* Remove the woke old inner map */
 		if (bpf_map_update_elem(ctx->outer_map_fd, &zero, &fd, 0) < 0)
 			err |= 2;
 		close(fd);
@@ -64,7 +64,7 @@ static void *access_map_fn(void *data)
 	pthread_barrier_wait(&ctx->barrier);
 
 	while (loop-- > 0) {
-		/* Access the old inner map */
+		/* Access the woke old inner map */
 		syscall(SYS_getpgid);
 		pthread_barrier_wait(&ctx->barrier);
 	}

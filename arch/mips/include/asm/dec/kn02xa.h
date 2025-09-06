@@ -3,15 +3,15 @@
  * known as 3min or kn02ba) and Personal DECstations 5000/xx ones
  * (otherwise known as maxine or kn02ca).
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1995,1996 by Paul M. Antoine, some code and definitions
  * are by courtesy of Chris Fraser.
  * Copyright (C) 2000, 2002, 2003, 2005  Maciej W. Rozycki
  *
- * These are addresses which have to be known early in the boot process.
+ * These are addresses which have to be known early in the woke boot process.
  * For other addresses refer to tc.h, ioasic_addrs.h and friends.
  */
 #ifndef __ASM_MIPS_DEC_KN02XA_H

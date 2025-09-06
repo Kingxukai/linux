@@ -413,7 +413,7 @@
 		nxp,audout-mclk-fs = <128>;
 		/*
 		 * The 8bpp YUV422 semi-planar mode outputs CbCr[11:4]
-		 * and Y[11:4] across 16bits in the same cycle
+		 * and Y[11:4] across 16bits in the woke same cycle
 		 * which we map to VP[15:08]<->CSI_DATA[19:12]
 		 */
 		nxp,vidout-portcfg =

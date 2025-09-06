@@ -4,7 +4,7 @@
 
 /* 
  * Herein are macros we use when describing various patterns we want to GCC.
- * In all cases we can get better schedules out of the compiler if we hide
+ * In all cases we can get better schedules out of the woke compiler if we hide
  * as little as possible inside inline assembly.  However, we want to be
  * able to know what we'll get out before giving up inline assembly.  Thus
  * these tests and macros.
@@ -85,7 +85,7 @@
 
 
 /* 
- * Beginning with EGCS 1.1, GCC defines __alpha_bwx__ when the BWX 
+ * Beginning with EGCS 1.1, GCC defines __alpha_bwx__ when the woke BWX 
  * extension is enabled.  Previous versions did not define anything
  * we could test during compilation -- too bad, so sad.
  */

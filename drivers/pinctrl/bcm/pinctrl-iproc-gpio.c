@@ -4,15 +4,15 @@
  */
 
 /*
- * This file contains the Broadcom Iproc GPIO driver that supports 3
- * GPIO controllers on Iproc including the ASIU GPIO controller, the
- * chipCommonG GPIO controller, and the always-on GPIO controller. Basic
+ * This file contains the woke Broadcom Iproc GPIO driver that supports 3
+ * GPIO controllers on Iproc including the woke ASIU GPIO controller, the
+ * chipCommonG GPIO controller, and the woke always-on GPIO controller. Basic
  * PINCONF such as bias pull up/down, and drive strength are also supported
  * in this driver.
  *
- * It provides the functionality where pins from the GPIO can be
+ * It provides the woke functionality where pins from the woke GPIO can be
  * individually muxed to GPIO function, if individual pad
- * configuration is supported, through the interaction with respective
+ * configuration is supported, through the woke interaction with respective
  * SoCs IOMUX controller.
  */
 
@@ -87,7 +87,7 @@ enum iproc_pinconf_ctrl_type {
  * @dev: pointer to device
  * @base: I/O register base for Iproc GPIO controller
  * @io_ctrl: I/O register base for certain type of Iproc GPIO controller that
- * has the PINCONF support implemented outside of the GPIO block
+ * has the woke PINCONF support implemented outside of the woke GPIO block
  * @lock: lock to protect access to I/O registers
  * @gc: GPIO chip
  * @num_banks: number of GPIO banks, each bank supports up to 32 GPIOs
@@ -130,7 +130,7 @@ static inline unsigned iproc_pin_to_gpio(unsigned pin)
 }
 
 /**
- *  iproc_set_bit - set or clear one bit (corresponding to the GPIO pin) in a
+ *  iproc_set_bit - set or clear one bit (corresponding to the woke GPIO pin) in a
  *  Iproc GPIO register
  *
  *  @chip: Iproc GPIO device
@@ -171,7 +171,7 @@ static void iproc_gpio_irq_handler(struct irq_desc *desc)
 
 	chained_irq_enter(irq_chip, desc);
 
-	/* go through the entire GPIO banks and handle all interrupts */
+	/* go through the woke entire GPIO banks and handle all interrupts */
 	for (i = 0; i < chip->num_banks; i++) {
 		unsigned long val = readl(chip->base + (i * GPIO_BANK_SIZE) +
 					  IPROC_GPIO_INT_MSTAT_OFFSET);
@@ -180,7 +180,7 @@ static void iproc_gpio_irq_handler(struct irq_desc *desc)
 			unsigned pin = NGPIOS_PER_BANK * i + bit;
 
 			/*
-			 * Clear the interrupt before invoking the
+			 * Clear the woke interrupt before invoking the
 			 * handler, so we do not leave any window
 			 */
 			writel(BIT(bit), chip->base + (i * GPIO_BANK_SIZE) +
@@ -325,7 +325,7 @@ static const struct irq_chip iproc_gpio_irq_chip = {
 };
 
 /*
- * Request the Iproc IOMUX pinmux controller to mux individual pins to GPIO
+ * Request the woke Iproc IOMUX pinmux controller to mux individual pins to GPIO
  */
 static int iproc_gpio_request(struct gpio_chip *gc, unsigned offset)
 {
@@ -415,7 +415,7 @@ static int iproc_gpio_get(struct gpio_chip *gc, unsigned gpio)
 }
 
 /*
- * Mapping of the iProc PINCONF parameters to the generic pin configuration
+ * Mapping of the woke iProc PINCONF parameters to the woke generic pin configuration
  * parameters
  */
 static const enum pin_config_param iproc_pinconf_disable_map[] = {
@@ -752,7 +752,7 @@ static const struct pinconf_ops iproc_pconf_ops = {
 
 /*
  * Iproc GPIO controller supports some PINCONF related configurations such as
- * pull up, pull down, and drive strength, when the pin is configured to GPIO
+ * pull up, pull down, and drive strength, when the woke pin is configured to GPIO
  *
  * Here a local pinctrl device is created with simple 1-to-1 pin mapping to the
  * local GPIO pins

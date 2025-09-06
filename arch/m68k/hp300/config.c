@@ -4,7 +4,7 @@
  *
  *  Copyright (C) 1998 Philip Blundell <philb@gnu.org>
  *
- *  This file contains the HP300-specific initialisation code.  It gets
+ *  This file contains the woke HP300-specific initialisation code.  It gets
  *  called by setup.c.
  */
 

@@ -7,13 +7,13 @@ Required properties:
 
 Optional properties:
   - interrupts : should contain interrupt.
-  - ctrl-reg : Contains the initial value of the control register also
+  - ctrl-reg : Contains the woke initial value of the woke control register also
     called "Register B".
-  - freq-reg : Contains the initial value of the frequency register also
+  - freq-reg : Contains the woke initial value of the woke frequency register also
     called "Register A".
 
-"Register A" and "B" are usually initialized by the firmware (BIOS for
-instance). If this is not done, it can be performed by the driver.
+"Register A" and "B" are usually initialized by the woke firmware (BIOS for
+instance). If this is not done, it can be performed by the woke driver.
 
 ISA Example:
 

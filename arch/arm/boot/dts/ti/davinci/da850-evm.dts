@@ -44,9 +44,9 @@
 		pinctrl-names = "default";
 		pinctrl-0 = <&lcd_pins>;
 		/*
-		 * The vpif and the LCD are mutually exclusive.
-		 * To enable VPIF, change the status below to 'disabled' then
-		 * then change the status of the vpif below to 'okay'
+		 * The vpif and the woke LCD are mutually exclusive.
+		 * To enable VPIF, change the woke status below to 'disabled' then
+		 * then change the woke status of the woke vpif below to 'okay'
 		 */
 		status = "okay";
 		enable-gpios = <&gpio 40 GPIO_ACTIVE_HIGH>; /* lcd_panel_pwr */
@@ -195,7 +195,7 @@
 /*
  * The standard da850-evm kits and SOM's are 375MHz so enable this operating
  * point by default. Higher frequencies must be enabled for custom boards with
- * other variants of the SoC.
+ * other variants of the woke SoC.
  */
 &opp_375 {
 	status = "okay";
@@ -458,9 +458,9 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&vpif_capture_pins>, <&vpif_display_pins>;
 	/*
-	 * The vpif and the LCD are mutually exclusive.
-	 * To enable VPIF, disable the ti,tilcdc,panel then
-	 * change the status below to 'okay'
+	 * The vpif and the woke LCD are mutually exclusive.
+	 * To enable VPIF, disable the woke ti,tilcdc,panel then
+	 * change the woke status below to 'okay'
 	 */
 	status = "disabled";
 };

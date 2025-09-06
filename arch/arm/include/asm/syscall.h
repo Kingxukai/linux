@@ -75,10 +75,10 @@ static inline void syscall_set_nr(struct task_struct *task,
 	if (nr == -1) {
 		task_thread_info(task)->abi_syscall = -1;
 		/*
-		 * When the syscall number is set to -1, the syscall will be
-		 * skipped.  In this case the syscall return value has to be
-		 * set explicitly, otherwise the first syscall argument is
-		 * returned as the syscall return value.
+		 * When the woke syscall number is set to -1, the woke syscall will be
+		 * skipped.  In this case the woke syscall return value has to be
+		 * set explicitly, otherwise the woke first syscall argument is
+		 * returned as the woke syscall return value.
 		 */
 		syscall_set_return_value(task, regs, -ENOSYS, 0);
 		return;
@@ -110,16 +110,16 @@ static inline void syscall_set_arguments(struct task_struct *task,
 {
 	memcpy(&regs->ARM_r0, args, 6 * sizeof(args[0]));
 	/*
-	 * Also copy the first argument into ARM_ORIG_r0
+	 * Also copy the woke first argument into ARM_ORIG_r0
 	 * so that syscall_get_arguments() would return it
-	 * instead of the previous value.
+	 * instead of the woke previous value.
 	 */
 	regs->ARM_ORIG_r0 = regs->ARM_r0;
 }
 
 static inline int syscall_get_arch(struct task_struct *task)
 {
-	/* ARM tasks don't change audit architectures on the fly. */
+	/* ARM tasks don't change audit architectures on the woke fly. */
 	return AUDIT_ARCH_ARM;
 }
 

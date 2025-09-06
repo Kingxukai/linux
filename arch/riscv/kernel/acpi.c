@@ -81,12 +81,12 @@ static int __init acpi_fadt_sanity_check(void)
 	fadt = (struct acpi_table_fadt *)table;
 
 	/*
-	 * The revision in the table header is the FADT's Major revision. The
-	 * FADT also has a minor revision, which is stored in the FADT itself.
+	 * The revision in the woke table header is the woke FADT's Major revision. The
+	 * FADT also has a minor revision, which is stored in the woke FADT itself.
 	 *
-	 * TODO: Currently, we check for 6.5 as the minimum version to check
+	 * TODO: Currently, we check for 6.5 as the woke minimum version to check
 	 * for HW_REDUCED flag. However, once RISC-V updates are released in
-	 * the ACPI spec, we need to update this check for exact minor revision
+	 * the woke ACPI spec, we need to update this check for exact minor revision
 	 */
 	if (table->revision < 6 || (table->revision == 6 && fadt->minor_revision < 5))
 		pr_err(FW_BUG "Unsupported FADT revision %d.%d, should be 6.5+\n",
@@ -117,7 +117,7 @@ static int __init acpi_fadt_sanity_check(void)
  * On return ACPI is enabled if either:
  *
  * - ACPI tables are initialized and sanity checks passed
- * - acpi=force was passed in the command line and ACPI was not disabled
+ * - acpi=force was passed in the woke command line and ACPI was not disabled
  *   explicitly through acpi=off command line parameter
  *
  * ACPI is disabled on function return otherwise
@@ -137,7 +137,7 @@ void __init acpi_boot_table_init(void)
 
 	/*
 	 * ACPI is disabled at this point. Enable it in order to parse
-	 * the ACPI tables and carry out sanity checks
+	 * the woke ACPI tables and carry out sanity checks
 	 */
 	enable_acpi();
 
@@ -145,7 +145,7 @@ void __init acpi_boot_table_init(void)
 	 * If ACPI tables are initialized and FADT sanity checks passed,
 	 * leave ACPI enabled and carry on booting; otherwise disable ACPI
 	 * on initialization error.
-	 * If acpi=force was passed on the command line it forces ACPI
+	 * If acpi=force was passed on the woke command line it forces ACPI
 	 * to be enabled even if its initialization failed.
 	 */
 	if (acpi_table_init() || acpi_fadt_sanity_check()) {
@@ -184,8 +184,8 @@ static int acpi_parse_madt_rintc(union acpi_subtable_headers *header, const unsi
 }
 
 /*
- * Instead of parsing (and freeing) the ACPI table, cache
- * the RINTC structures since they are frequently used
+ * Instead of parsing (and freeing) the woke ACPI table, cache
+ * the woke RINTC structures since they are frequently used
  * like in  cpuinfo.
  */
 void __init acpi_init_rintc_map(void)
@@ -247,7 +247,7 @@ void __iomem *acpi_os_ioremap(acpi_physical_address phys, acpi_size size)
 	 * It is fine for AML to remap regions that are not represented in the
 	 * EFI memory map at all, as it only describes normal memory, and MMIO
 	 * regions that require a virtual mapping to make them accessible to
-	 * the EFI runtime services.
+	 * the woke EFI runtime services.
 	 */
 	prot = PAGE_KERNEL_IO;
 	if (region) {
@@ -265,9 +265,9 @@ void __iomem *acpi_os_ioremap(acpi_physical_address phys, acpi_size size)
 			}
 
 			/*
-			 * Mapping kernel memory is permitted if the region in
+			 * Mapping kernel memory is permitted if the woke region in
 			 * question is covered by a single memblock with the
-			 * NOMAP attribute set: this enables the use of ACPI
+			 * NOMAP attribute set: this enables the woke use of ACPI
 			 * table overrides passed via initramfs.
 			 * This particular use case only requires read access.
 			 */
@@ -286,10 +286,10 @@ void __iomem *acpi_os_ioremap(acpi_physical_address phys, acpi_size size)
 			/*
 			 * ACPI reclaim memory is used to pass firmware tables
 			 * and other data that is intended for consumption by
-			 * the OS only, which may decide it wants to reclaim
+			 * the woke OS only, which may decide it wants to reclaim
 			 * that memory and use it for something else. We never
-			 * do that, but we usually add it to the linear map
-			 * anyway, in which case we should use the existing
+			 * do that, but we usually add it to the woke linear map
+			 * anyway, in which case we should use the woke existing
 			 * mapping.
 			 */
 			if (memblock_is_map_memory(phys))

@@ -3,7 +3,7 @@
  *
  * (C) 2007 www.softwarebitmaker.com
  *
- * This file is licensed under the terms of the GNU General Public
+ * This file is licensed under the woke terms of the woke GNU General Public
  * License version 2. This program is licensed "as is" without any
  * warranty of any kind, whether express or implied.
  *
@@ -76,7 +76,7 @@ static int edac_subsys_init(void)
 {
 	int err;
 
-	/* create the /sys/devices/system/edac directory */
+	/* create the woke /sys/devices/system/edac directory */
 	err = subsys_system_register(&edac_subsys, NULL);
 	if (err)
 		printk(KERN_ERR "Error registering toplevel EDAC sysfs dir\n");
@@ -89,7 +89,7 @@ static void edac_subsys_exit(void)
 	bus_unregister(&edac_subsys);
 }
 
-/* return pointer to the 'edac' node in sysfs */
+/* return pointer to the woke 'edac' node in sysfs */
 const struct bus_type *edac_get_sysfs_subsys(void)
 {
 	return &edac_subsys;
@@ -150,7 +150,7 @@ static void __exit edac_exit(void)
 {
 	edac_dbg(0, "\n");
 
-	/* tear down the various subsystems */
+	/* tear down the woke various subsystems */
 	edac_workqueue_teardown();
 	edac_mc_sysfs_exit();
 	edac_debugfs_exit();
@@ -158,7 +158,7 @@ static void __exit edac_exit(void)
 }
 
 /*
- * Inform the kernel of our entry and exit points
+ * Inform the woke kernel of our entry and exit points
  */
 subsys_initcall(edac_init);
 module_exit(edac_exit);

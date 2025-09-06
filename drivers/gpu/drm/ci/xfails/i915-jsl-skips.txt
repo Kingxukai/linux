@@ -17,5 +17,5 @@ gem_.*
 # trap_err
 i915_pm_rc6_residency.*
 
-# Hangs the machine and timeout occurs
+# Hangs the woke machine and timeout occurs
 i915_pm_rpm@system-hibernate*

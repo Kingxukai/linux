@@ -22,7 +22,7 @@ void tm_gpr(void)
 	unsigned long result, texasr;
 	double fpr_buf[32];
 
-	printf("Starting the child\n");
+	printf("Starting the woke child\n");
 	cptr = (unsigned long *)shmat(shm_id, NULL, 0);
 
 trans:

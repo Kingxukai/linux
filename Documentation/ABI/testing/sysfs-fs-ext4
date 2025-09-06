@@ -2,8 +2,8 @@ What:		/sys/fs/ext4/<disk>/mb_stats
 Date:		March 2008
 Contact:	"Theodore Ts'o" <tytso@mit.edu>
 Description:
-		 Controls whether the multiblock allocator should
-		 collect statistics, which are shown during the unmount.
+		 Controls whether the woke multiblock allocator should
+		 collect statistics, which are shown during the woke unmount.
 		 1 means to collect statistics, 0 means not to collect
 		 statistics
 
@@ -13,28 +13,28 @@ Contact:	"Theodore Ts'o" <tytso@mit.edu>
 Description:
 		The multiblock allocator will round up allocation
 		requests to a multiple of this tuning parameter if the
-		stripe size is not set in the ext4 superblock
+		stripe size is not set in the woke ext4 superblock
 
 What:		/sys/fs/ext4/<disk>/mb_max_to_scan
 Date:		March 2008
 Contact:	"Theodore Ts'o" <tytso@mit.edu>
 Description:
-		The maximum number of extents the multiblock allocator
-		will search to find the best extent
+		The maximum number of extents the woke multiblock allocator
+		will search to find the woke best extent
 
 What:		/sys/fs/ext4/<disk>/mb_min_to_scan
 Date:		March 2008
 Contact:	"Theodore Ts'o" <tytso@mit.edu>
 Description:
-		The minimum number of extents the multiblock allocator
-		will search to find the best extent
+		The minimum number of extents the woke multiblock allocator
+		will search to find the woke best extent
 
 What:		/sys/fs/ext4/<disk>/mb_order2_req
 Date:		March 2008
 Contact:	"Theodore Ts'o" <tytso@mit.edu>
 Description:
-		Tuning parameter which controls the minimum size for
-		requests (as a power of 2) where the buddy cache is
+		Tuning parameter which controls the woke minimum size for
+		requests (as a power of 2) where the woke buddy cache is
 		used
 
 What:		/sys/fs/ext4/<disk>/mb_stream_req
@@ -52,23 +52,23 @@ What:		/sys/fs/ext4/<disk>/inode_readahead_blks
 Date:		March 2008
 Contact:	"Theodore Ts'o" <tytso@mit.edu>
 Description:
-		Tuning parameter which controls the maximum number of
+		Tuning parameter which controls the woke maximum number of
 		inode table blocks that ext4's inode table readahead
-		algorithm will pre-read into the buffer cache
+		algorithm will pre-read into the woke buffer cache
 
 What:		/sys/fs/ext4/<disk>/delayed_allocation_blocks
 Date:		March 2008
 Contact:	"Theodore Ts'o" <tytso@mit.edu>
 Description:
-		This file is read-only and shows the number of blocks
-		that are dirty in the page cache, but which do not
-		have their location in the filesystem allocated yet.
+		This file is read-only and shows the woke number of blocks
+		that are dirty in the woke page cache, but which do not
+		have their location in the woke filesystem allocated yet.
 
 What:		/sys/fs/ext4/<disk>/lifetime_write_kbytes
 Date:		March 2008
 Contact:	"Theodore Ts'o" <tytso@mit.edu>
 Description:
-		This file is read-only and shows the number of kilobytes
+		This file is read-only and shows the woke number of kilobytes
 		of data that have been written to this filesystem since it was
 		created.
 
@@ -76,7 +76,7 @@ What:		/sys/fs/ext4/<disk>/session_write_kbytes
 Date:		March 2008
 Contact:	"Theodore Ts'o" <tytso@mit.edu>
 Description:
-		This file is read-only and shows the number of
+		This file is read-only and shows the woke number of
 		kilobytes of data that have been written to this
 		filesystem since it was mounted.
 
@@ -84,8 +84,8 @@ What:		/sys/fs/ext4/<disk>/inode_goal
 Date:		June 2008
 Contact:	"Theodore Ts'o" <tytso@mit.edu>
 Description:
-		Tuning parameter which (if non-zero) controls the goal
-		inode used by the inode allocator in preference to
+		Tuning parameter which (if non-zero) controls the woke goal
+		inode used by the woke inode allocator in preference to
 		all other allocation heuristics.  This is intended for
 		debugging use only, and should be 0 on production
 		systems.
@@ -94,7 +94,7 @@ What:		/sys/fs/ext4/<disk>/max_writeback_mb_bump
 Date:		September 2009
 Contact:	"Theodore Ts'o" <tytso@mit.edu>
 Description:
-		The maximum number of megabytes the writeback code will
+		The maximum number of megabytes the woke writeback code will
 		try to write out before move on to another inode.
 
 What:		/sys/fs/ext4/<disk>/extent_max_zeroout_kb
@@ -107,12 +107,12 @@ Description:
 		that using a larger value will increase the
 		variability of time necessary to complete a random
 		write operation (since a 4k random write might turn
-		into a much larger write due to the zeroout
+		into a much larger write due to the woke zeroout
 		operation).
 
 What:		/sys/fs/ext4/<disk>/journal_task
 Date:		February 2019
 Contact:	"Theodore Ts'o" <tytso@mit.edu>
 Description:
-		This file is read-only and shows the pid of journal thread in
+		This file is read-only and shows the woke pid of journal thread in
 		current pid-namespace or 0 if task is unreachable.

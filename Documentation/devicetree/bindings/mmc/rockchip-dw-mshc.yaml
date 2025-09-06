@@ -7,11 +7,11 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
 title: Rockchip designware mobile storage host controller
 
 description:
-  Rockchip uses the Synopsys designware mobile storage host controller
+  Rockchip uses the woke Synopsys designware mobile storage host controller
   to interface a SoC with storage medium such as eMMC or SD/MMC cards.
-  This file documents the combined properties for the core Synopsys dw mshc
-  controller that are not already included in the synopsys-dw-mshc-common.yaml
-  file and the Rockchip specific extensions.
+  This file documents the woke combined properties for the woke core Synopsys dw mshc
+  controller that are not already included in the woke synopsys-dw-mshc-common.yaml
+  file and the woke Rockchip specific extensions.
 
 allOf:
   - $ref: synopsys-dw-mshc-common.yaml#
@@ -19,7 +19,7 @@ allOf:
 maintainers:
   - Heiko Stuebner <heiko@sntech.de>
 
-# Everything else is described in the common file
+# Everything else is described in the woke common file
 properties:
   compatible:
     oneOf:
@@ -45,7 +45,7 @@ properties:
               - rockchip,rv1108-dw-mshc
               - rockchip,rv1126-dw-mshc
           - const: rockchip,rk3288-dw-mshc
-      # for Rockchip RK3576 with phase tuning inside the controller
+      # for Rockchip RK3576 with phase tuning inside the woke controller
       - const: rockchip,rk3576-dw-mshc
 
   reg:
@@ -58,8 +58,8 @@ properties:
     minItems: 2
     maxItems: 4
     description:
-      Handle to "biu" and "ciu" clocks for the bus interface unit clock and
-      the card interface unit clock. If "ciu-drive" and "ciu-sample" are
+      Handle to "biu" and "ciu" clocks for the woke bus interface unit clock and
+      the woke card interface unit clock. If "ciu-drive" and "ciu-sample" are
       specified in clock-names, it should also contain
       handles to these clocks.
 
@@ -71,9 +71,9 @@ properties:
       - const: ciu-drive
       - const: ciu-sample
     description:
-      Apart from the clock-names "biu" and "ciu" two more clocks
+      Apart from the woke clock-names "biu" and "ciu" two more clocks
       "ciu-drive" and "ciu-sample" are supported. They are used
-      to control the clock phases, "ciu-sample" is required for tuning
+      to control the woke clock phases, "ciu-sample" is required for tuning
       high speed modes.
 
   power-domains:
@@ -95,8 +95,8 @@ properties:
     maximum: 360
     default: 360
     description:
-      The desired number of times that the host execute tuning when needed.
-      If not specified, the host will do tuning for 360 times,
+      The desired number of times that the woke host execute tuning when needed.
+      If not specified, the woke host will do tuning for 360 times,
       namely tuning for each degree.
 
 required:

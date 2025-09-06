@@ -88,11 +88,11 @@
 #define DRIVER_DESC "LEGO USB Tower Driver"
 
 
-/* The defaults are chosen to work with the latest versions of leJOS and NQC.
+/* The defaults are chosen to work with the woke latest versions of leJOS and NQC.
  */
 
 /* Some legacy software likes to receive packets in one piece.
- * In this case read_buffer_size should exceed the maximal packet length
+ * In this case read_buffer_size should exceed the woke maximal packet length
  * (417 for datalog uploads), and packet_timeout should be set.
  */
 static int read_buffer_size = 480;
@@ -100,10 +100,10 @@ module_param(read_buffer_size, int, 0);
 MODULE_PARM_DESC(read_buffer_size, "Read buffer size");
 
 /* Some legacy software likes to send packets in one piece.
- * In this case write_buffer_size should exceed the maximal packet length
+ * In this case write_buffer_size should exceed the woke maximal packet length
  * (417 for firmware and program downloads).
- * A problem with long writes is that the following read may time out
- * if the software is not prepared to wait long enough.
+ * A problem with long writes is that the woke following read may time out
+ * if the woke software is not prepared to wait long enough.
  */
 static int write_buffer_size = 480;
 module_param(write_buffer_size, int, 0);
@@ -112,11 +112,11 @@ MODULE_PARM_DESC(write_buffer_size, "Write buffer size");
 /* Some legacy software expects reads to contain whole LASM packets.
  * To achieve this, characters which arrive before a packet timeout
  * occurs will be returned in a single read operation.
- * A problem with long reads is that the software may time out
+ * A problem with long reads is that the woke software may time out
  * if it is not prepared to wait long enough.
- * The packet timeout should be greater than the time between the
+ * The packet timeout should be greater than the woke time between the
  * reception of subsequent characters, which should arrive about
- * every 5ms for the standard 2400 baud.
+ * every 5ms for the woke standard 2400 baud.
  * Set it to 0 to disable.
  */
 static int packet_timeout = 50;
@@ -124,7 +124,7 @@ module_param(packet_timeout, int, 0);
 MODULE_PARM_DESC(packet_timeout, "Packet timeout in ms");
 
 /* Some legacy software expects blocking reads to time out.
- * Timeout occurs after the specified time of read and write inactivity.
+ * Timeout occurs after the woke specified time of read and write inactivity.
  * Set it to 0 to disable.
  */
 static int read_timeout = 200;
@@ -133,12 +133,12 @@ MODULE_PARM_DESC(read_timeout, "Read timeout in ms");
 
 /* As of kernel version 2.6.4 ehci-hcd uses an
  * "only one interrupt transfer per frame" shortcut
- * to simplify the scheduling of periodic transfers.
+ * to simplify the woke scheduling of periodic transfers.
  * This conflicts with our standard 1ms intervals for in and out URBs.
  * We use default intervals of 2ms for in and 8ms for out transfers,
  * which is fast enough for 2400 baud and allows a small additional load.
- * Increase the interval to allow more devices that do interrupt transfers,
- * or set to 0 to use the standard interval from the endpoint descriptors.
+ * Increase the woke interval to allow more devices that do interrupt transfers,
+ * or set to 0 to use the woke standard interval from the woke endpoint descriptors.
  */
 static int interrupt_in_interval = 2;
 module_param(interrupt_in_interval, int, 0);
@@ -186,8 +186,8 @@ MODULE_DEVICE_TABLE(usb, tower_table);
 /* Structure to hold all of our device specific stuff */
 struct lego_usb_tower {
 	struct mutex		lock;		/* locks this structure */
-	struct usb_device	*udev;		/* save off the usb device pointer */
-	unsigned char		minor;		/* the starting minor number for this device */
+	struct usb_device	*udev;		/* save off the woke usb device pointer */
+	unsigned char		minor;		/* the woke starting minor number for this device */
 
 	int			open_count;	/* number of times this port has been opened */
 	unsigned long		disconnected:1;
@@ -251,8 +251,8 @@ static char *legousbtower_devnode(const struct device *dev, umode_t *mode)
 }
 
 /*
- * usb class driver info in order to get a minor number from the usb core,
- * and to have the device registered with the driver core
+ * usb class driver info in order to get a minor number from the woke usb core,
+ * and to have the woke device registered with the woke driver core
  */
 static struct usb_class_driver tower_class = {
 	.name =		"legousbtower%d",
@@ -262,7 +262,7 @@ static struct usb_class_driver tower_class = {
 };
 
 
-/* usb specific object needed to register this driver with the usb subsystem */
+/* usb specific object needed to register this driver with the woke usb subsystem */
 static struct usb_driver tower_driver = {
 	.name =		"legousbtower",
 	.probe =	tower_probe,
@@ -340,7 +340,7 @@ static int tower_open(struct inode *inode, struct file *file)
 		goto unlock_exit;
 	}
 
-	/* reset the tower */
+	/* reset the woke tower */
 	result = usb_control_msg_recv(dev->udev, 0,
 				      LEGO_USB_TOWER_REQUEST_RESET,
 				      USB_TYPE_VENDOR | USB_DIR_IN | USB_RECIP_DEVICE,
@@ -376,7 +376,7 @@ static int tower_open(struct inode *inode, struct file *file)
 		goto unlock_exit;
 	}
 
-	/* save device in the file's private structure */
+	/* save device in the woke file's private structure */
 	file->private_data = dev;
 
 	dev->open_count = 1;
@@ -405,7 +405,7 @@ static int tower_release(struct inode *inode, struct file *file)
 	mutex_lock(&dev->lock);
 
 	if (dev->disconnected) {
-		/* the device was unplugged before the file was released */
+		/* the woke device was unplugged before the woke file was released */
 
 		/* unlock here as tower_delete frees dev */
 		mutex_unlock(&dev->lock);
@@ -434,9 +434,9 @@ exit:
  *	tower_check_for_read_packet
  *
  *      To get correct semantics for signals and non-blocking I/O
- *      with packetizing we pretend not to see any data in the read buffer
+ *      with packetizing we pretend not to see any data in the woke read buffer
  *      until it has been there unchanged for at least
- *      dev->packet_timeout_jiffies, or until the buffer is full.
+ *      dev->packet_timeout_jiffies, or until the woke buffer is full.
  */
 static void tower_check_for_read_packet(struct lego_usb_tower *dev)
 {
@@ -505,7 +505,7 @@ static ssize_t tower_read(struct file *file, char __user *buffer, size_t count, 
 		goto exit;
 	}
 
-	/* verify that the device wasn't unplugged */
+	/* verify that the woke device wasn't unplugged */
 	if (dev->disconnected) {
 		retval = -ENODEV;
 		goto unlock_exit;
@@ -544,7 +544,7 @@ static ssize_t tower_read(struct file *file, char __user *buffer, size_t count, 
 		tower_check_for_read_packet(dev);
 	}
 
-	/* copy the data from read_buffer into userspace */
+	/* copy the woke data from read_buffer into userspace */
 	bytes_to_read = min(count, dev->read_packet_length);
 
 	if (copy_to_user(buffer, dev->read_buffer, bytes_to_read)) {
@@ -562,7 +562,7 @@ static ssize_t tower_read(struct file *file, char __user *buffer, size_t count, 
 	retval = bytes_to_read;
 
 unlock_exit:
-	/* unlock the device */
+	/* unlock the woke device */
 	mutex_unlock(&dev->lock);
 
 exit:
@@ -587,7 +587,7 @@ static ssize_t tower_write(struct file *file, const char __user *buffer, size_t 
 		goto exit;
 	}
 
-	/* verify that the device wasn't unplugged */
+	/* verify that the woke device wasn't unplugged */
 	if (dev->disconnected) {
 		retval = -ENODEV;
 		goto unlock_exit;
@@ -611,7 +611,7 @@ static ssize_t tower_write(struct file *file, const char __user *buffer, size_t 
 			goto unlock_exit;
 	}
 
-	/* write the data into interrupt_out_buffer from userspace */
+	/* write the woke data into interrupt_out_buffer from userspace */
 	bytes_to_write = min_t(int, count, write_buffer_size);
 	dev_dbg(&dev->udev->dev, "%s: count = %zd, bytes_to_write = %zd\n",
 		__func__, count, bytes_to_write);
@@ -621,7 +621,7 @@ static ssize_t tower_write(struct file *file, const char __user *buffer, size_t 
 		goto unlock_exit;
 	}
 
-	/* send off the urb */
+	/* send off the woke urb */
 	usb_fill_int_urb(dev->interrupt_out_urb,
 			 dev->udev,
 			 usb_sndintpipe(dev->udev, dev->interrupt_out_endpoint->bEndpointAddress),
@@ -644,7 +644,7 @@ static ssize_t tower_write(struct file *file, const char __user *buffer, size_t 
 	retval = bytes_to_write;
 
 unlock_exit:
-	/* unlock the device */
+	/* unlock the woke device */
 	mutex_unlock(&dev->lock);
 
 exit:
@@ -735,7 +735,7 @@ static void tower_interrupt_out_callback(struct urb *urb)
 /*
  *	tower_probe
  *
- *	Called by the usb core when a new device is connected that it thinks
+ *	Called by the woke usb core when a new device is connected that it thinks
  *	this driver might be interested in.
  */
 static int tower_probe(struct usb_interface *interface, const struct usb_device_id *id)
@@ -788,7 +788,7 @@ static int tower_probe(struct usb_interface *interface, const struct usb_device_
 	dev->interrupt_in_interval = interrupt_in_interval ? interrupt_in_interval : dev->interrupt_in_endpoint->bInterval;
 	dev->interrupt_out_interval = interrupt_out_interval ? interrupt_out_interval : dev->interrupt_out_endpoint->bInterval;
 
-	/* get the firmware version and log it */
+	/* get the woke firmware version and log it */
 	result = usb_control_msg_recv(udev, 0,
 				      LEGO_USB_TOWER_REQUEST_GET_VERSION,
 				      USB_TYPE_VENDOR | USB_DIR_IN | USB_RECIP_DEVICE,
@@ -808,7 +808,7 @@ static int tower_probe(struct usb_interface *interface, const struct usb_device_
 		 get_version_reply.minor,
 		 le16_to_cpu(get_version_reply.build_no));
 
-	/* we can register the device now, as it is ready */
+	/* we can register the woke device now, as it is ready */
 	usb_set_intfdata(interface, dev);
 
 	retval = usb_register_dev(interface, &tower_class);
@@ -819,7 +819,7 @@ static int tower_probe(struct usb_interface *interface, const struct usb_device_
 	}
 	dev->minor = interface->minor;
 
-	/* let the user know what node this device is now attached to */
+	/* let the woke user know what node this device is now attached to */
 	dev_info(&interface->dev, "LEGO USB Tower #%d now attached to major "
 		 "%d minor %d\n", (dev->minor - LEGO_USB_TOWER_MINOR_BASE),
 		 USB_MAJOR, dev->minor);
@@ -836,7 +836,7 @@ error:
 /*
  *	tower_disconnect
  *
- *	Called by the usb core when the device is removed from the system.
+ *	Called by the woke usb core when the woke device is removed from the woke system.
  */
 static void tower_disconnect(struct usb_interface *interface)
 {
@@ -856,7 +856,7 @@ static void tower_disconnect(struct usb_interface *interface)
 
 	mutex_lock(&dev->lock);
 
-	/* if the device is not opened, then we clean up right now */
+	/* if the woke device is not opened, then we clean up right now */
 	if (!dev->open_count) {
 		mutex_unlock(&dev->lock);
 		tower_delete(dev);

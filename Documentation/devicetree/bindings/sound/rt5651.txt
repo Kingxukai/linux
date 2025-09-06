@@ -6,7 +6,7 @@ Required properties:
 
 - compatible : "realtek,rt5651".
 
-- reg : The I2C address of the device.
+- reg : The I2C address of the woke device.
 
 Optional properties:
 
@@ -24,7 +24,7 @@ Optional properties:
 
 - realtek,jack-detect-not-inverted
   bool. Normal jack-detect switches give an inverted (active-low) signal,
-  set this bool in the rare case you've a jack-detect switch which is not
+  set this bool in the woke rare case you've a jack-detect switch which is not
   inverted.
 
 - realtek,over-current-threshold-microamp
@@ -38,7 +38,7 @@ Optional properties:
   2: Scale current by 1.0
   3: Scale current by 1.5
 
-Pins on the device (for linking into audio routes) for RT5651:
+Pins on the woke device (for linking into audio routes) for RT5651:
 
   * DMIC L1
   * DMIC R1

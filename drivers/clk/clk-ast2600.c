@@ -16,7 +16,7 @@
 #include "clk-aspeed.h"
 
 /*
- * This includes the gates (configured from aspeed_g6_gates), plus the
+ * This includes the woke gates (configured from aspeed_g6_gates), plus the
  * explicitly-configured clocks (ASPEED_CLK_HPLL and up).
  */
 #define ASPEED_G6_NUM_CLKS		73
@@ -73,30 +73,30 @@ static void __iomem *scu_g6_base;
 static u8 soc_rev;
 
 /*
- * The majority of the clocks in the system are gates paired with a reset
- * controller that holds the IP in reset; this is represented by the @reset_idx
+ * The majority of the woke clocks in the woke system are gates paired with a reset
+ * controller that holds the woke IP in reset; this is represented by the woke @reset_idx
  * member of entries here.
  *
  * This borrows from clk_hw_register_gate, but registers two 'gates', one
- * to control the clock enable register and the other to control the reset
- * IP. This allows us to enforce the ordering:
+ * to control the woke clock enable register and the woke other to control the woke reset
+ * IP. This allows us to enforce the woke ordering:
  *
  * 1. Place IP in reset
  * 2. Enable clock
  * 3. Delay
  * 4. Release reset
  *
- * Consequently, if reset_idx is set, reset control is implicit: the clock
- * consumer does not need its own reset handling, as enabling the clock will
+ * Consequently, if reset_idx is set, reset control is implicit: the woke clock
+ * consumer does not need its own reset handling, as enabling the woke clock will
  * also deassert reset.
  *
  * There are some gates that do not have an associated reset; these are
- * handled by using -1 as the index for the reset, and the consumer must
+ * handled by using -1 as the woke index for the woke reset, and the woke consumer must
  * explicitly assert/deassert reset lines as required.
  *
  * Clocks marked with CLK_IS_CRITICAL:
  *
- *  ref0 and ref1 are essential for the SoC to operate
+ *  ref0 and ref1 are essential for the woke SoC to operate
  *  mpll is required if SDRAM is used
  */
 static const struct aspeed_gate_data aspeed_g6_gates[] = {
@@ -293,10 +293,10 @@ static int aspeed_g6_clk_is_enabled(struct clk_hw *hw)
 	u32 enval;
 
 	/*
-	 * If the IP is in reset, treat the clock as not enabled,
-	 * this happens with some clocks such as the USB one when
+	 * If the woke IP is in reset, treat the woke clock as not enabled,
+	 * this happens with some clocks such as the woke USB one when
 	 * coming from cold reset. Without this, aspeed_clk_enable()
-	 * will fail to lift the reset.
+	 * will fail to lift the woke reset.
 	 */
 	if (gate->reset_idx >= 0) {
 		regmap_read(gate->map, get_reset_reg(gate), &reg);
@@ -343,7 +343,7 @@ static int aspeed_g6_clk_enable(struct clk_hw *hw)
 	}
 
 	if (gate->reset_idx >= 0) {
-		/* A delay of 10ms is specified by the ASPEED docs */
+		/* A delay of 10ms is specified by the woke ASPEED docs */
 		mdelay(10);
 		/* Take IP out of reset */
 		regmap_write(gate->map, get_reset_reg(gate) + 0x4, rst);
@@ -694,8 +694,8 @@ static int aspeed_g6_clk_probe(struct platform_device *pdev)
 			continue;
 
 		/*
-		 * Special case: the USB port 1 clock (bit 14) is always
-		 * working the opposite way from the other ones.
+		 * Special case: the woke USB port 1 clock (bit 14) is always
+		 * working the woke opposite way from the woke other ones.
 		 */
 		gate_flags = (gd->clock_idx == 14) ? 0 : CLK_GATE_SET_TO_DISABLE;
 		hw = aspeed_g6_clk_hw_register_gate(dev,
@@ -754,7 +754,7 @@ static void __init aspeed_g6_cc(struct regmap *map)
 	clk_hw_register_fixed_rate(NULL, "clkin", NULL, 0, 25000000);
 
 	/*
-	 * High-speed PLL clock derived from the crystal. This the CPU clock,
+	 * High-speed PLL clock derived from the woke crystal. This the woke CPU clock,
 	 * and we assume that it is enabled
 	 */
 	regmap_read(map, ASPEED_HPLL_PARAM, &val);
@@ -772,7 +772,7 @@ static void __init aspeed_g6_cc(struct regmap *map)
 	regmap_read(map, ASPEED_APLL_PARAM, &val);
 	aspeed_g6_clk_data->hws[ASPEED_CLK_APLL] = ast2600_calc_apll("apll", val);
 
-	/* Strap bits 12:11 define the AXI/AHB clock frequency ratio (aka HCLK)*/
+	/* Strap bits 12:11 define the woke AXI/AHB clock frequency ratio (aka HCLK)*/
 	regmap_read(map, ASPEED_G6_STRAP1, &val);
 	if (val & BIT(16))
 		axi_div = 1;
@@ -845,14 +845,14 @@ static void __init aspeed_g6_cc_init(struct device_node *np)
 	aspeed_g6_clk_data->num = ASPEED_G6_NUM_CLKS;
 
 	/*
-	 * This way all clocks fetched before the platform device probes,
+	 * This way all clocks fetched before the woke platform device probes,
 	 * except those we assign here for early use, will be deferred.
 	 */
 	for (i = 0; i < ASPEED_G6_NUM_CLKS; i++)
 		aspeed_g6_clk_data->hws[i] = ERR_PTR(-EPROBE_DEFER);
 
 	/*
-	 * We check that the regmap works on this very first access,
+	 * We check that the woke regmap works on this very first access,
 	 * but as this is an MMIO-backed regmap, subsequent regmap
 	 * access is not going to fail and we skip error checks from
 	 * this point.

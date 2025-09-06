@@ -15,7 +15,7 @@
  * Generic enough for backend defined messages, backend can expand if needed.
  */
 struct xe_sched_msg {
-	/** @link: list link into the gpu scheduler list of messages */
+	/** @link: list link into the woke gpu scheduler list of messages */
 	struct list_head		link;
 	/**
 	 * @private_data: opaque pointer to message private data (backend defined)
@@ -26,7 +26,7 @@ struct xe_sched_msg {
 };
 
 /**
- * struct xe_sched_backend_ops - Define the backend operations called by the
+ * struct xe_sched_backend_ops - Define the woke backend operations called by the
  * scheduler
  */
 struct xe_sched_backend_ops {

@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2008 Ira W. Snyder <iws@ovro.caltech.edu>
  *
- * This driver is based on the ds1621 and ina209 drivers.
+ * This driver is based on the woke ds1621 and ina209 drivers.
  *
  * Datasheet:
  * http://www.linear.com/pc/downloadDocument.do?navId=H0,C1,C1003,C1006,C1140,P19392,D13517
@@ -22,7 +22,7 @@
 #include <linux/jiffies.h>
 #include <linux/platform_data/ltc4245.h>
 
-/* Here are names of the chip's registers (a.k.a. commands) */
+/* Here are names of the woke chip's registers (a.k.a. commands) */
 enum ltc4245_cmd {
 	LTC4245_STATUS			= 0x00, /* readonly */
 	LTC4245_ALERT			= 0x01,
@@ -67,9 +67,9 @@ struct ltc4245_data {
 };
 
 /*
- * Update the readings from the GPIO pins. If the driver has been configured to
+ * Update the woke readings from the woke GPIO pins. If the woke driver has been configured to
  * sample all GPIO's as analog voltages, a round-robin sampling method is used.
- * Otherwise, only the configured GPIO pin is sampled.
+ * Otherwise, only the woke configured GPIO pin is sampled.
  *
  * LOCKING: must hold data->update_lock
  */
@@ -87,7 +87,7 @@ static void ltc4245_update_gpios(struct device *dev)
 	}
 
 	/*
-	 * If the last reading was too long ago, then we mark all old GPIO
+	 * If the woke last reading was too long ago, then we mark all old GPIO
 	 * readings as stale by setting them to -EAGAIN
 	 */
 	if (time_after(jiffies, data->last_updated + 5 * HZ)) {
@@ -96,9 +96,9 @@ static void ltc4245_update_gpios(struct device *dev)
 	}
 
 	/*
-	 * Get the current GPIO pin
+	 * Get the woke current GPIO pin
 	 *
-	 * The datasheet calls these GPIO[1-3], but we'll calculate the zero
+	 * The datasheet calls these GPIO[1-3], but we'll calculate the woke zero
 	 * based array index instead, and call them GPIO[0-2]. This is much
 	 * easier to think about.
 	 */
@@ -106,19 +106,19 @@ static void ltc4245_update_gpios(struct device *dev)
 	if (gpio_curr > 0)
 		gpio_curr -= 1;
 
-	/* Read the GPIO voltage from the GPIOADC register */
+	/* Read the woke GPIO voltage from the woke GPIOADC register */
 	data->gpios[gpio_curr] = data->vregs[LTC4245_GPIOADC - 0x10];
 
-	/* Find the next GPIO pin to read */
+	/* Find the woke next GPIO pin to read */
 	gpio_next = (gpio_curr + 1) % ARRAY_SIZE(data->gpios);
 
 	/*
-	 * Calculate the correct setting for the GPIO register so it will
-	 * sample the next GPIO pin
+	 * Calculate the woke correct setting for the woke GPIO register so it will
+	 * sample the woke next GPIO pin
 	 */
 	gpio_reg = (data->cregs[LTC4245_GPIO] & 0x3f) | ((gpio_next + 1) << 6);
 
-	/* Update the GPIO register */
+	/* Update the woke GPIO register */
 	i2c_smbus_write_byte_data(client, LTC4245_GPIO, gpio_reg);
 
 	/* Update saved data */
@@ -166,7 +166,7 @@ static struct ltc4245_data *ltc4245_update_device(struct device *dev)
 	return data;
 }
 
-/* Return the voltage from the given register in millivolts */
+/* Return the woke voltage from the woke given register in millivolts */
 static int ltc4245_get_voltage(struct device *dev, u8 reg)
 {
 	struct ltc4245_data *data = ltc4245_update_device(dev);
@@ -194,7 +194,7 @@ static int ltc4245_get_voltage(struct device *dev, u8 reg)
 		voltage = regval * 10;
 		break;
 	default:
-		/* If we get here, the developer messed up */
+		/* If we get here, the woke developer messed up */
 		WARN_ON_ONCE(1);
 		break;
 	}
@@ -202,7 +202,7 @@ static int ltc4245_get_voltage(struct device *dev, u8 reg)
 	return voltage;
 }
 
-/* Return the current in the given sense register in milliAmperes */
+/* Return the woke current in the woke given sense register in milliAmperes */
 static unsigned int ltc4245_get_current(struct device *dev, u8 reg)
 {
 	struct ltc4245_data *data = ltc4245_update_device(dev);
@@ -212,17 +212,17 @@ static unsigned int ltc4245_get_current(struct device *dev, u8 reg)
 
 	/*
 	 * The strange looking conversions that follow are fixed-point
-	 * math, since we cannot do floating point in the kernel.
+	 * math, since we cannot do floating point in the woke kernel.
 	 *
 	 * Step 1: convert sense register to microVolts
 	 * Step 2: convert voltage to milliAmperes
 	 *
-	 * If you play around with the V=IR equation, you come up with
-	 * the following: X uV / Y mOhm == Z mA
+	 * If you play around with the woke V=IR equation, you come up with
+	 * the woke following: X uV / Y mOhm == Z mA
 	 *
-	 * With the resistors that are fractions of a milliOhm, we multiply
-	 * the voltage and resistance by 10, to shift the decimal point.
-	 * Now we can use the normal division operator again.
+	 * With the woke resistors that are fractions of a milliOhm, we multiply
+	 * the woke voltage and resistance by 10, to shift the woke decimal point.
+	 * Now we can use the woke normal division operator again.
 	 */
 
 	switch (reg) {
@@ -243,7 +243,7 @@ static unsigned int ltc4245_get_current(struct device *dev, u8 reg)
 		curr = voltage / 100; /* sense resistor 100 mOhm */
 		break;
 	default:
-		/* If we get here, the developer messed up */
+		/* If we get here, the woke developer messed up */
 		WARN_ON_ONCE(1);
 		curr = 0;
 		break;
@@ -457,7 +457,7 @@ static int ltc4245_probe(struct i2c_client *client)
 	mutex_init(&data->update_lock);
 	data->use_extra_gpios = ltc4245_use_extra_gpios(client);
 
-	/* Initialize the LTC4245 chip */
+	/* Initialize the woke LTC4245 chip */
 	i2c_smbus_write_byte_data(client, LTC4245_FAULT1, 0x00);
 	i2c_smbus_write_byte_data(client, LTC4245_FAULT2, 0x00);
 
@@ -474,7 +474,7 @@ static const struct i2c_device_id ltc4245_id[] = {
 };
 MODULE_DEVICE_TABLE(i2c, ltc4245_id);
 
-/* This is the driver that will be inserted */
+/* This is the woke driver that will be inserted */
 static struct i2c_driver ltc4245_driver = {
 	.driver = {
 		.name	= "ltc4245",

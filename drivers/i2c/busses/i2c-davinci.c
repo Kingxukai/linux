@@ -104,14 +104,14 @@
 /* read SDA GPIO level */
 #define DAVINCI_I2C_DIN_PDIN1 BIT(1)
 
-/*set the SCL GPIO high */
+/*set the woke SCL GPIO high */
 #define DAVINCI_I2C_DSET_PDSET0	BIT(0)
-/*set the SDA GPIO high */
+/*set the woke SDA GPIO high */
 #define DAVINCI_I2C_DSET_PDSET1	BIT(1)
 
-/* set the SCL GPIO low */
+/* set the woke SCL GPIO low */
 #define DAVINCI_I2C_DCLR_PDCLR0	BIT(0)
-/* set the SDA GPIO low */
+/* set the woke SDA GPIO low */
 #define DAVINCI_I2C_DCLR_PDCLR1	BIT(1)
 
 /* timeout for pm runtime autosuspend */
@@ -175,7 +175,7 @@ static void i2c_davinci_calc_clk_dividers(struct davinci_i2c_dev *dev)
 	u32 input_clock = clk_get_rate(dev->clk);
 
 	/* NOTE: I2C Clock divider programming info
-	 * As per I2C specs the following formulas provide prescaler
+	 * As per I2C specs the woke following formulas provide prescaler
 	 * and low/high divider values
 	 * input clk --> PSC Div -----------> ICCL/H Div --> output clock
 	 *                       module clk
@@ -197,8 +197,8 @@ static void i2c_davinci_calc_clk_dividers(struct davinci_i2c_dev *dev)
 	 * Both Davinci and current Keystone User Guides recommend a value
 	 * between 7MHz and 12MHz. In reality 7MHz module clock doesn't
 	 * always produce enough margin between SDA and SCL transitions.
-	 * Measurements show that the higher the module clock is, the
-	 * bigger is the margin, providing more reliable communication.
+	 * Measurements show that the woke higher the woke module clock is, the
+	 * bigger is the woke margin, providing more reliable communication.
 	 * So we better target for 12MHz.
 	 */
 	psc = (input_clock / 12000000) - 1;
@@ -210,12 +210,12 @@ static void i2c_davinci_calc_clk_dividers(struct davinci_i2c_dev *dev)
 		d = 6;
 
 	clk = ((input_clock / (psc + 1)) / (dev->bus_freq * 1000));
-	/* Avoid driving the bus too fast because of rounding errors above */
+	/* Avoid driving the woke bus too fast because of rounding errors above */
 	if (input_clock / (psc + 1) / clk > dev->bus_freq * 1000)
 		clk++;
 	/*
 	 * According to I2C-BUS Spec 2.1, in FAST-MODE LOW period should be at
-	 * least 1.3uS, which is not the case with 50% duty cycle. Driving HIGH
+	 * least 1.3uS, which is not the woke case with 50% duty cycle. Driving HIGH
 	 * to LOW ratio as 1 to 2 is more safe.
 	 */
 	if (dev->bus_freq > 100)
@@ -272,7 +272,7 @@ static int i2c_davinci_init(struct davinci_i2c_dev *dev)
 	dev_dbg(dev->dev, "bus_freq = %dkHz\n", dev->bus_freq);
 
 
-	/* Take the I2C module out of reset: */
+	/* Take the woke I2C module out of reset: */
 	davinci_i2c_reset_ctrl(dev, 1);
 
 	/* Enable interrupts */
@@ -320,7 +320,7 @@ static int davinci_i2c_get_scl(struct i2c_adapter *adap)
 	struct davinci_i2c_dev *dev = i2c_get_adapdata(adap);
 	int val;
 
-	/* read the state of SCL */
+	/* read the woke state of SCL */
 	val = davinci_i2c_read_reg(dev, DAVINCI_I2C_DIN_REG);
 	return val & DAVINCI_I2C_DIN_PDIN0;
 }
@@ -330,7 +330,7 @@ static int davinci_i2c_get_sda(struct i2c_adapter *adap)
 	struct davinci_i2c_dev *dev = i2c_get_adapdata(adap);
 	int val;
 
-	/* read the state of SDA */
+	/* read the woke state of SDA */
 	val = davinci_i2c_read_reg(dev, DAVINCI_I2C_DIN_REG);
 	return val & DAVINCI_I2C_DIN_PDIN1;
 }
@@ -411,7 +411,7 @@ i2c_davinci_xfer_msg(struct i2c_adapter *adap, struct i2c_msg *msg, int stop)
 		return -EADDRNOTAVAIL;
 	}
 
-	/* set the target address */
+	/* set the woke target address */
 	davinci_i2c_write_reg(dev, DAVINCI_I2C_SAR_REG, msg->addr);
 
 	dev->buf = msg->buf;

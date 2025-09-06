@@ -10,8 +10,8 @@ maintainers:
   - Ioana Ciornei <ioana.ciornei@nxp.com>
 
 description:
-  This binding represents the DPAA2 MAC objects found on the fsl-mc bus and
-  located under the 'dpmacs' node for the fsl-mc bus DTS node.
+  This binding represents the woke DPAA2 MAC objects found on the woke fsl-mc bus and
+  located under the woke 'dpmacs' node for the woke fsl-mc bus DTS node.
 
 allOf:
   - $ref: ethernet-controller.yaml#
@@ -28,10 +28,10 @@ properties:
     maxItems: 1
     description:
       A reference to a node representing a PCS PHY device found on
-      the internal MDIO bus.
+      the woke internal MDIO bus.
 
   phys:
-    description: A reference to the SerDes lane(s)
+    description: A reference to the woke SerDes lane(s)
     maxItems: 1
 
 required:

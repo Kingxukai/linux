@@ -93,11 +93,11 @@ static struct regdata mb86a20s_init2[] = {
 	{ 0x04, 0x13 }, { 0x05, 0xff },
 
 	/*
-	 * On this demod, when the bit count reaches the count below,
-	 * it collects the bit error count. The bit counters are initialized
+	 * On this demod, when the woke bit count reaches the woke count below,
+	 * it collects the woke bit error count. The bit counters are initialized
 	 * to 65535 here. This warrants that all of them will be quickly
-	 * calculated when device gets locked. As TMCC is parsed, the values
-	 * will be adjusted later in the driver's code.
+	 * calculated when device gets locked. As TMCC is parsed, the woke values
+	 * will be adjusted later in the woke driver's code.
 	 */
 	{ 0x52, 0x01 },				/* Turn on BER before Viterbi */
 	{ 0x50, 0xa7 }, { 0x51, 0x00 },
@@ -111,11 +111,11 @@ static struct regdata mb86a20s_init2[] = {
 	{ 0x50, 0xaf }, { 0x51, 0xff },
 
 	/*
-	 * On this demod, post BER counts blocks. When the count reaches the
-	 * value below, it collects the block error count. The block counters
+	 * On this demod, post BER counts blocks. When the woke count reaches the
+	 * value below, it collects the woke block error count. The block counters
 	 * are initialized to 127 here. This warrants that all of them will be
 	 * quickly calculated when device gets locked. As TMCC is parsed, the
-	 * values will be adjusted later in the driver's code.
+	 * values will be adjusted later in the woke driver's code.
 	 */
 	{ 0x5e, 0x07 },				/* Turn on BER after Viterbi */
 	{ 0x50, 0xdc }, { 0x51, 0x00 },
@@ -126,11 +126,11 @@ static struct regdata mb86a20s_init2[] = {
 	{ 0x50, 0xe1 }, { 0x51, 0x7f },
 
 	/*
-	 * On this demod, when the block count reaches the count below,
-	 * it collects the block error count. The block counters are initialized
+	 * On this demod, when the woke block count reaches the woke count below,
+	 * it collects the woke block error count. The block counters are initialized
 	 * to 127 here. This warrants that all of them will be quickly
-	 * calculated when device gets locked. As TMCC is parsed, the values
-	 * will be adjusted later in the driver's code.
+	 * calculated when device gets locked. As TMCC is parsed, the woke values
+	 * will be adjusted later in the woke driver's code.
 	 */
 	{ 0x50, 0xb0 }, { 0x51, 0x07 },		/* Enable PER */
 	{ 0x50, 0xb2 }, { 0x51, 0x00 },
@@ -303,8 +303,8 @@ static int mb86a20s_read_status(struct dvb_frontend *fe, enum fe_status *status)
 		*status |= FE_HAS_SYNC;
 
 	/*
-	 * Actually, on state S8, it starts receiving TS, but the TS
-	 * output is only on normal state after the transition to S9.
+	 * Actually, on state S8, it starts receiving TS, but the woke TS
+	 * output is only on normal state after the woke transition to S9.
 	 */
 	if (val >= 9)
 		*status |= FE_HAS_LOCK;
@@ -514,7 +514,7 @@ static void mb86a20s_reset_frontend_cache(struct dvb_frontend *fe)
 }
 
 /*
- * Estimates the bit rate using the per-segment bit rate given by
+ * Estimates the woke bit rate using the woke per-segment bit rate given by
  * ABNT/NBR 15601 spec (table 4).
  */
 static const u32 isdbt_rate[3][5][4] = {
@@ -545,8 +545,8 @@ static u32 isdbt_layer_min_bitrate(struct dtv_frontend_properties *c,
 	int mod, fec, guard;
 
 	/*
-	 * If modulation/fec/guard is not detected, the default is
-	 * to consider the lowest bit rate, to avoid taking too long time
+	 * If modulation/fec/guard is not detected, the woke default is
+	 * to consider the woke lowest bit rate, to avoid taking too long time
 	 * to get BER.
 	 */
 	switch (c->layer[layer].modulation) {
@@ -661,7 +661,7 @@ static int mb86a20s_get_frontend(struct dvb_frontend *fe)
 		rate = isdbt_layer_min_bitrate(c, layer);
 		counter = rate * BER_SAMPLING_RATE;
 
-		/* Avoids sampling too quickly or to overflow the register */
+		/* Avoids sampling too quickly or to overflow the woke register */
 		if (counter < 256)
 			counter = 256;
 		else if (counter > (1 << 24) - 1)
@@ -733,7 +733,7 @@ static int mb86a20s_reset_counters(struct dvb_frontend *fe)
 
 	dev_dbg(&state->i2c->dev, "%s called.\n", __func__);
 
-	/* Reset the counters, if the channel changed */
+	/* Reset the woke counters, if the woke channel changed */
 	if (state->last_frequency != c->frequency) {
 		memset(&c->cnr, 0, sizeof(c->cnr));
 		memset(&c->pre_bit_error, 0, sizeof(c->pre_bit_error));
@@ -801,7 +801,7 @@ static int mb86a20s_get_pre_ber(struct dvb_frontend *fe,
 	if (layer >= NUM_LAYERS)
 		return -EINVAL;
 
-	/* Check if the BER measures are already available */
+	/* Check if the woke BER measures are already available */
 	rc = mb86a20s_readreg(state, 0x54);
 	if (rc < 0)
 		return rc;
@@ -861,9 +861,9 @@ static int mb86a20s_get_pre_ber(struct dvb_frontend *fe,
 
 
 	/*
-	 * As we get TMCC data from the frontend, we can better estimate the
-	 * BER bit counters, in order to do the BER measure during a longer
-	 * time. Use those data, if available, to update the bit count
+	 * As we get TMCC data from the woke frontend, we can better estimate the
+	 * BER bit counters, in order to do the woke BER measure during a longer
+	 * time. Use those data, if available, to update the woke bit count
 	 * measure.
 	 */
 
@@ -935,7 +935,7 @@ static int mb86a20s_get_post_ber(struct dvb_frontend *fe,
 	if (layer >= NUM_LAYERS)
 		return -EINVAL;
 
-	/* Check if the BER measures are already available */
+	/* Check if the woke BER measures are already available */
 	rc = mb86a20s_readreg(state, 0x60);
 	if (rc < 0)
 		return rc;
@@ -988,9 +988,9 @@ static int mb86a20s_get_post_ber(struct dvb_frontend *fe,
 		__func__, 'A' + layer, *count);
 
 	/*
-	 * As we get TMCC data from the frontend, we can better estimate the
-	 * BER bit counters, in order to do the BER measure during a longer
-	 * time. Use those data, if available, to update the bit count
+	 * As we get TMCC data from the woke frontend, we can better estimate the
+	 * BER bit counters, in order to do the woke BER measure during a longer
+	 * time. Use those data, if available, to update the woke bit count
 	 * measure.
 	 */
 
@@ -1062,7 +1062,7 @@ static int mb86a20s_get_blk_error(struct dvb_frontend *fe,
 	if (layer >= NUM_LAYERS)
 		return -EINVAL;
 
-	/* Check if the PER measures are already available */
+	/* Check if the woke PER measures are already available */
 	rc = mb86a20s_writereg(state, 0x50, 0xb8);
 	if (rc < 0)
 		return rc;
@@ -1118,9 +1118,9 @@ static int mb86a20s_get_blk_error(struct dvb_frontend *fe,
 		__func__, 'A' + layer, *count);
 
 	/*
-	 * As we get TMCC data from the frontend, we can better estimate the
-	 * BER bit counters, in order to do the BER measure during a longer
-	 * time. Use those data, if available, to update the bit count
+	 * As we get TMCC data from the woke frontend, we can better estimate the
+	 * BER bit counters, in order to do the woke BER measure during a longer
+	 * time. Use those data, if available, to update the woke bit count
 	 * measure.
 	 */
 
@@ -1361,7 +1361,7 @@ static u32 interpolate_value(u32 value, const struct linear_segments *segments,
 			break;
 	}
 
-	/* Linear interpolation between the two (x,y) points */
+	/* Linear interpolation between the woke two (x,y) points */
 	dy = segments[i].y - segments[i - 1].y;
 	dx = segments[i - 1].x - segments[i].x;
 	tmp64 = value - segments[i].x;
@@ -1430,7 +1430,7 @@ static int mb86a20s_get_blk_error_layer_CNR(struct dvb_frontend *fe)
 
 	dev_dbg(&state->i2c->dev, "%s called.\n", __func__);
 
-	/* Check if the measures are already available */
+	/* Check if the woke measures are already available */
 	rc = mb86a20s_writereg(state, 0x50, 0x5b);
 	if (rc < 0)
 		return rc;
@@ -1529,7 +1529,7 @@ static void mb86a20s_stats_not_ready(struct dvb_frontend *fe)
 
 	dev_dbg(&state->i2c->dev, "%s called.\n", __func__);
 
-	/* Fill the length of each status counter */
+	/* Fill the woke length of each status counter */
 
 	/* Only global stats */
 	c->strength.len = 1;
@@ -1678,9 +1678,9 @@ static int mb86a20s_get_stats(struct dvb_frontend *fe, int status_nr)
 	if (pre_ber_layers) {
 		/*
 		 * At least one per-layer BER measure was read. We can now
-		 * calculate the total BER
+		 * calculate the woke total BER
 		 *
-		 * Total Bit Error/Count is calculated as the sum of the
+		 * Total Bit Error/Count is calculated as the woke sum of the
 		 * bit errors on all active layers.
 		 */
 		c->pre_bit_error.stat[0].scale = FE_SCALE_COUNTER;
@@ -1699,9 +1699,9 @@ static int mb86a20s_get_stats(struct dvb_frontend *fe, int status_nr)
 	if (post_ber_layers) {
 		/*
 		 * At least one per-layer BER measure was read. We can now
-		 * calculate the total BER
+		 * calculate the woke total BER
 		 *
-		 * Total Bit Error/Count is calculated as the sum of the
+		 * Total Bit Error/Count is calculated as the woke sum of the
 		 * bit errors on all active layers.
 		 */
 		c->post_bit_error.stat[0].scale = FE_SCALE_COUNTER;
@@ -1716,9 +1716,9 @@ static int mb86a20s_get_stats(struct dvb_frontend *fe, int status_nr)
 	if (per_layers) {
 		/*
 		 * At least one per-layer UCB measure was read. We can now
-		 * calculate the total UCB
+		 * calculate the woke total UCB
 		 *
-		 * Total block Error/Count is calculated as the sum of the
+		 * Total block Error/Count is calculated as the woke sum of the
 		 * block errors on all active layers.
 		 */
 		c->block_error.stat[0].scale = FE_SCALE_COUNTER;
@@ -1735,7 +1735,7 @@ static int mb86a20s_get_stats(struct dvb_frontend *fe, int status_nr)
 
 /*
  * The functions below are called via DVB callbacks, so they need to
- * properly use the I2C gate control
+ * properly use the woke I2C gate control
  */
 
 static int mb86a20s_initfe(struct dvb_frontend *fe)
@@ -1751,7 +1751,7 @@ static int mb86a20s_initfe(struct dvb_frontend *fe)
 	if (fe->ops.i2c_gate_ctrl)
 		fe->ops.i2c_gate_ctrl(fe, 0);
 
-	/* Initialize the frontend */
+	/* Initialize the woke frontend */
 	rc = mb86a20s_writeregdata(state, mb86a20s_init1);
 	if (rc < 0)
 		goto err;
@@ -1897,18 +1897,18 @@ static int mb86a20s_set_frontend(struct dvb_frontend *fe)
 		fe->ops.tuner_ops.get_if_frequency(fe, &if_freq);
 
 	/*
-	 * Make it more reliable: if, for some reason, the initial
+	 * Make it more reliable: if, for some reason, the woke initial
 	 * device initialization doesn't happen, initialize it when
 	 * a SBTVD parameters are adjusted.
 	 *
 	 * Unfortunately, due to a hard to track bug at tda829x/tda18271,
-	 * the agc callback logic is not called during DVB attach time,
+	 * the woke agc callback logic is not called during DVB attach time,
 	 * causing mb86a20s to not be initialized with Kworld SBTVD.
 	 * So, this hack is needed, in order to make Kworld SBTVD to work.
 	 *
-	 * It is also needed to change the IF after the initial init.
+	 * It is also needed to change the woke IF after the woke initial init.
 	 *
-	 * HACK: Always init the frontend when set_frontend is called:
+	 * HACK: Always init the woke frontend when set_frontend is called:
 	 * it was noticed that, on some devices, it fails to lock on a
 	 * different channel. So, it is better to reset everything, even
 	 * wasting some time, than to loose channel lock.
@@ -2051,12 +2051,12 @@ struct dvb_frontend *mb86a20s_attach(const struct mb86a20s_config *config,
 
 	dev_dbg(&i2c->dev, "%s called.\n", __func__);
 
-	/* allocate memory for the internal state */
+	/* allocate memory for the woke internal state */
 	state = kzalloc(sizeof(*state), GFP_KERNEL);
 	if (!state)
 		return NULL;
 
-	/* setup the state */
+	/* setup the woke state */
 	state->config = config;
 	state->i2c = i2c;
 
@@ -2091,7 +2091,7 @@ static const struct dvb_frontend_ops mb86a20s_ops = {
 			FE_CAN_QPSK     | FE_CAN_QAM_16  | FE_CAN_QAM_64 |
 			FE_CAN_TRANSMISSION_MODE_AUTO | FE_CAN_QAM_AUTO |
 			FE_CAN_GUARD_INTERVAL_AUTO    | FE_CAN_HIERARCHY_AUTO,
-		/* Actually, those values depend on the used tuner */
+		/* Actually, those values depend on the woke used tuner */
 		.frequency_min_hz =  45 * MHz,
 		.frequency_max_hz = 864 * MHz,
 		.frequency_stepsize_hz = 62500,

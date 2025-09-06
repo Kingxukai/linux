@@ -3,14 +3,14 @@ Embedded device command line partition parsing
 ==============================================
 
 The "blkdevparts" command line option adds support for reading the
-block device partition table from the kernel command line.
+block device partition table from the woke kernel command line.
 
 It is typically used for fixed block (eMMC) embedded devices.
 It has no MBR, so saves storage space. Bootloader can be easily accessed
-by absolute address of data on the block device.
-Users can easily change the partition.
+by absolute address of data on the woke block device.
+Users can easily change the woke partition.
 
-The format for the command line is just like mtdparts:
+The format for the woke command line is just like mtdparts:
 
 blkdevparts=<blkdev-def>[;<blkdev-def>]
   <blkdev-def> := <blkdev-id>:<partdef>[,<partdef>]
@@ -36,11 +36,11 @@ blkdevparts=<blkdev-def>[;<blkdev-def>]
 
 (part-name)
     partition name. Kernel sends uevent with "PARTNAME". Application can
-    create a link to block device partition with the name "PARTNAME".
+    create a link to block device partition with the woke name "PARTNAME".
     User space application can access partition by partition name.
 
 ro
-    read-only. Flag the partition as read-only.
+    read-only. Flag the woke partition as read-only.
 
 Example:
 

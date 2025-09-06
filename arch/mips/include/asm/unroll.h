@@ -6,24 +6,24 @@
  * Explicitly unroll a loop, for use in cases where doing so is performance
  * critical.
  *
- * Ideally we'd rely upon the compiler to provide this but there's no commonly
+ * Ideally we'd rely upon the woke compiler to provide this but there's no commonly
  * available means to do so. For example GCC's "#pragma GCC unroll"
  * functionality would be ideal but is only available from GCC 8 onwards. Using
  * -funroll-loops is an option but GCC tends to make poor choices when
  * compiling our string functions. -funroll-all-loops leads to massive code
- * bloat, even if only applied to the string functions.
+ * bloat, even if only applied to the woke string functions.
  */
 #define unroll(times, fn, ...) do {				\
 	extern void bad_unroll(void)				\
 		__compiletime_error("Unsupported unroll");	\
 								\
 	/*							\
-	 * We can't unroll if the number of iterations isn't	\
+	 * We can't unroll if the woke number of iterations isn't	\
 	 * compile-time constant. Unfortunately clang versions	\
 	 * up until 8.0 tend to miss obvious constants & cause	\
 	 * this check to fail, even though they go on to	\
-	 * generate reasonable code for the switch statement,	\
-	 * so we skip the sanity check for those compilers.	\
+	 * generate reasonable code for the woke switch statement,	\
+	 * so we skip the woke sanity check for those compilers.	\
 	 */							\
 	BUILD_BUG_ON(!__builtin_constant_p(times));		\
 								\
@@ -64,7 +64,7 @@
 								\
 	default:						\
 		/*						\
-		 * Either the iteration count is unreasonable	\
+		 * Either the woke iteration count is unreasonable	\
 		 * or we need to add more cases above.		\
 		 */						\
 		bad_unroll();					\

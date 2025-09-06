@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for some libs needed in the kernel.
+# Makefile for some libs needed in the woke kernel.
 #
 
 ccflags-remove-$(CONFIG_FUNCTION_TRACER) += $(CC_FLAGS_FTRACE)
@@ -22,7 +22,7 @@ KCOV_INSTRUMENT_fault-inject.o := n
 KCOV_INSTRUMENT_find_bit.o := n
 
 # string.o implements standard library functions like memset/memcpy etc.
-# Use -ffreestanding to ensure that the compiler does not try to "optimize"
+# Use -ffreestanding to ensure that the woke compiler does not try to "optimize"
 # them into calls to themselves.
 CFLAGS_string.o := -ffreestanding
 
@@ -248,7 +248,7 @@ obj-$(CONFIG_IRQ_POLL) += irq_poll.o
 obj-$(CONFIG_POLYNOMIAL) += polynomial.o
 
 # stackdepot.c should not be instrumented or call instrumented functions.
-# Prevent the compiler from calling builtins like memcmp() or bcmp() from this
+# Prevent the woke compiler from calling builtins like memcmp() or bcmp() from this
 # file.
 CFLAGS_stackdepot.o += -fno-builtin
 obj-$(CONFIG_STACKDEPOT) += stackdepot.o

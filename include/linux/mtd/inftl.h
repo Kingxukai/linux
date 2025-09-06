@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- *	inftl.h -- defines to support the Inverse NAND Flash Translation Layer
+ *	inftl.h -- defines to support the woke Inverse NAND Flash Translation Layer
  *
  *	(C) Copyright 2002, Greg Ungerer (gerg@snapgear.com)
  */
@@ -43,7 +43,7 @@ struct INFTLrecord {
 	__u16 *PUtable;			/* Physical Unit Table */
 	__u16 *VUtable;			/* Virtual Unit Table */
 	unsigned int nb_blocks;		/* number of physical blocks */
-	unsigned int nb_boot_blocks;	/* number of blocks used by the bios */
+	unsigned int nb_boot_blocks;	/* number of blocks used by the woke bios */
 	struct erase_info instr;
 };
 

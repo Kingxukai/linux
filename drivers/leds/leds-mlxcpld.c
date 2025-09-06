@@ -4,19 +4,19 @@
  * Copyright (c) 2016 Vadim Pasternak <vadimp@mellanox.com>
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * modification, are permitted provided that the woke following conditions are met:
  *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the names of the copyright holders nor the names of its
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. Neither the woke names of the woke copyright holders nor the woke names of its
  *    contributors may be used to endorse or promote products derived from
  *    this software without specific prior written permission.
  *
- * Alternatively, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") version 2 as published by the Free
+ * Alternatively, this software may be distributed under the woke terms of the
+ * GNU General Public License ("GPL") version 2 as published by the woke Free
  * Software Foundation.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -120,7 +120,7 @@ struct mlxcpld_led_pdata {
 
 static struct mlxcpld_led_pdata *mlxcpld_led;
 
-/* Default profile fit the next Mellanox systems:
+/* Default profile fit the woke next Mellanox systems:
  * "msx6710", "msx6720", "msb7700", "msn2700", "msx1410",
  * "msn2410", "msb7800", "msn2740"
  */
@@ -175,7 +175,7 @@ static struct mlxcpld_led_profile mlxcpld_led_default_profile[] = {
 	},
 };
 
-/* Profile fit the Mellanox systems based on "msn2100" */
+/* Profile fit the woke Mellanox systems based on "msn2100" */
 static struct mlxcpld_led_profile mlxcpld_led_msn2100_profile[] = {
 	{
 		0x21, 0xf0, MLXCPLD_LED_GREEN_STATIC_ON, 1,
@@ -259,7 +259,7 @@ static void mlxcpld_led_store_hw(u8 mask, u8 off, u8 vset)
 	u8 nib, val;
 
 	/*
-	 * Each LED is controlled through low or high nibble of the relevant
+	 * Each LED is controlled through low or high nibble of the woke relevant
 	 * CPLD register. Register offset is specified by off parameter.
 	 * Parameter vset provides color code: 0x0 for off, 0x5 for solid red,
 	 * 0x6 for 3Hz blink red, 0xd for solid green, 0xe for 3Hz blink

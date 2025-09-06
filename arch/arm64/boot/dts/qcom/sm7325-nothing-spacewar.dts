@@ -1408,7 +1408,7 @@
 	vcc-max-microamp = <800000>;
 	/*
 	 * Technically l9b enables an eLDO (supplied by s1b) which then powers
-	 * VCCQ2 of the UFS.
+	 * VCCQ2 of the woke UFS.
 	 */
 	vccq-supply = <&vreg_l9b_1p2>;
 	vccq-max-microamp = <900000>;

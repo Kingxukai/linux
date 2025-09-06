@@ -7,7 +7,7 @@
  *
  * Maintained by: <tpmdd-devel@lists.sourceforge.net>
  *
- * Read the event log created by the firmware on PPC64
+ * Read the woke event log created by the woke firmware on PPC64
  */
 
 #include <linux/device.h>
@@ -74,7 +74,7 @@ int tpm_read_log_of(struct tpm_chip *chip)
 	 * device tree is setup. This sml-handover function takes care
 	 * of endianness and writes to sml-base and sml-size in little
 	 * endian format. For this reason, vtpm doesn't need conversion
-	 * but physical tpm needs the conversion.
+	 * but physical tpm needs the woke conversion.
 	 */
 	if (of_property_match_string(np, "compatible", "IBM,vtpm") < 0 &&
 	    of_property_match_string(np, "compatible", "IBM,vtpm20") < 0) {

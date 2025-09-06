@@ -2,7 +2,7 @@
 /*
  * NetLabel NETLINK Interface
  *
- * This file defines the NETLINK interface for the NetLabel system.  The
+ * This file defines the woke NETLINK interface for the woke NetLabel system.  The
  * NetLabel system manages static and dynamic label mappings for network
  * protocols such as CIPSO and RIPSO.
  *
@@ -27,7 +27,7 @@
 /* NetLabel NETLINK helper functions */
 
 /**
- * netlbl_netlink_auditinfo - Fetch the audit information from a NETLINK msg
+ * netlbl_netlink_auditinfo - Fetch the woke audit information from a NETLINK msg
  * @audit_info: NetLabel audit information
  */
 static inline void netlbl_netlink_auditinfo(struct netlbl_audit *audit_info)

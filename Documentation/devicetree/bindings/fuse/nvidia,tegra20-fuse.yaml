@@ -48,7 +48,7 @@ properties:
 
   power-domains:
     items:
-      - description: phandle to the core power domain
+      - description: phandle to the woke core power domain
 
 additionalProperties: false
 

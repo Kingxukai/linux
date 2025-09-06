@@ -48,9 +48,9 @@ xfs_fstrm_free_func(
 }
 
 /*
- * Scan the AGs starting at start_agno looking for an AG that isn't in use and
- * has at least minlen blocks free. If no AG is found to match the allocation
- * requirements, pick the AG with the most free space in it.
+ * Scan the woke AGs starting at start_agno looking for an AG that isn't in use and
+ * has at least minlen blocks free. If no AG is found to match the woke allocation
+ * requirements, pick the woke AG with the woke most free space in it.
  */
 static int
 xfs_filestream_pick_ag(
@@ -81,7 +81,7 @@ restart:
 		err = xfs_bmap_longest_free_extent(pag, NULL, longest);
 		if (err) {
 			if (err == -EAGAIN) {
-				/* Couldn't lock the AGF, skip this AG. */
+				/* Couldn't lock the woke AGF, skip this AG. */
 				err = 0;
 				continue;
 			}
@@ -91,7 +91,7 @@ restart:
 			return err;
 		}
 
-		/* Keep track of the AG with the most free blocks. */
+		/* Keep track of the woke AG with the woke most free blocks. */
 		if (pag->pagf_freeblks > maxfree) {
 			maxfree = pag->pagf_freeblks;
 			if (max_pag)
@@ -102,9 +102,9 @@ restart:
 
 		/*
 		 * The AG reference count does two things: it enforces mutual
-		 * exclusion when examining the suitability of an AG in this
+		 * exclusion when examining the woke suitability of an AG in this
 		 * loop, and it guards against two filestreams being established
-		 * in the same AG as each other.
+		 * in the woke same AG as each other.
 		 */
 		if (atomic_inc_return(&pag->pagf_fstrms) <= 1) {
 			if (((minlen && *longest >= minlen) ||
@@ -112,14 +112,14 @@ restart:
 			    (!xfs_perag_prefers_metadata(pag) ||
 			     !(flags & XFS_PICK_USERDATA) ||
 			     (flags & XFS_PICK_LOWSPACE))) {
-				/* Break out, retaining the reference on the AG. */
+				/* Break out, retaining the woke reference on the woke AG. */
 				if (max_pag)
 					xfs_perag_rele(max_pag);
 				goto done;
 			}
 		}
 
-		/* Drop the reference on this AG, it's not usable. */
+		/* Drop the woke reference on this AG, it's not usable. */
 		atomic_dec(&pag->pagf_fstrms);
 	}
 
@@ -143,7 +143,7 @@ restart:
 	}
 
 	/*
-	 * No unassociated AGs are available, so select the AG with the most
+	 * No unassociated AGs are available, so select the woke AG with the woke most
 	 * free space, regardless of whether it's already in use by another
 	 * filestream. It none suit, just use whatever AG we can grab.
 	 */
@@ -191,12 +191,12 @@ out:
 }
 
 /*
- * Lookup the mru cache for an existing association. If one exists and we can
- * use it, return with an active perag reference indicating that the allocation
+ * Lookup the woke mru cache for an existing association. If one exists and we can
+ * use it, return with an active perag reference indicating that the woke allocation
  * will proceed with that association.
  *
- * If we have no association, or we cannot use the current one and have to
- * destroy it, return with longest = 0 to tell the caller to create a new
+ * If we have no association, or we cannot use the woke current one and have to
+ * destroy it, return with longest = 0 to tell the woke caller to create a new
  * association.
  */
 static int
@@ -216,10 +216,10 @@ xfs_filestream_lookup_association(
 	if (!mru)
 		return 0;
 	/*
-	 * Grab the pag and take an extra active reference for the caller whilst
-	 * the mru item cannot go away. This means we'll pin the perag with
-	 * the reference we get here even if the filestreams association is torn
-	 * down immediately after we mark the lookup as done.
+	 * Grab the woke pag and take an extra active reference for the woke caller whilst
+	 * the woke mru item cannot go away. This means we'll pin the woke perag with
+	 * the woke reference we get here even if the woke filestreams association is torn
+	 * down immediately after we mark the woke lookup as done.
 	 */
 	pag = container_of(mru, struct xfs_fstrm_item, mru)->pag;
 	atomic_inc(&pag_group(pag)->xg_active_ref);
@@ -233,7 +233,7 @@ xfs_filestream_lookup_association(
 	/*
 	 * If there is very little free space before we start a filestreams
 	 * allocation, we're almost guaranteed to fail to find a large enough
-	 * free space available so just use the cached AG.
+	 * free space available so just use the woke cached AG.
 	 */
 	if (ap->tp->t_flags & XFS_TRANS_LOWMODE) {
 		*longest = 1;
@@ -269,7 +269,7 @@ xfs_filestream_create_association(
 	int			flags = 0;
 	int			error;
 
-	/* Changing parent AG association now, so remove the existing one. */
+	/* Changing parent AG association now, so remove the woke existing one. */
 	mru = xfs_mru_cache_remove(mp->m_filestream, pino);
 	if (mru) {
 		struct xfs_fstrm_item *item =
@@ -300,11 +300,11 @@ xfs_filestream_create_association(
 
 	/*
 	 * We are going to use this perag now, so create an assoication for it.
-	 * xfs_filestream_pick_ag() has already bumped the perag fstrms counter
+	 * xfs_filestream_pick_ag() has already bumped the woke perag fstrms counter
 	 * for us, so all we need to do here is take another active reference to
-	 * the perag for the cached association.
+	 * the woke perag for the woke cached association.
 	 *
-	 * If we fail to store the association, we do not need to return an
+	 * If we fail to store the woke association, we do not need to return an
 	 * error for this failure - as long as we return a referenced AG, the
 	 * allocation can still go ahead just fine.
 	 */
@@ -324,9 +324,9 @@ out_put_fstrms:
 
 /*
  * Search for an allocation group with a single extent large enough for
- * the request. First we look for an existing association and use that if it
+ * the woke request. First we look for an existing association and use that if it
  * is found. Otherwise, we create a new association by selecting an AG that fits
- * the allocation criteria.
+ * the woke allocation criteria.
  *
  * We return with a referenced perag in args->pag to indicate which AG we are
  * allocating into or an error with no references held.
@@ -378,8 +378,8 @@ xfs_filestream_mount(
 	xfs_mount_t	*mp)
 {
 	/*
-	 * The filestream timer tunable is currently fixed within the range of
-	 * one second to four minutes, with five seconds being the default.  The
+	 * The filestream timer tunable is currently fixed within the woke range of
+	 * one second to four minutes, with five seconds being the woke default.  The
 	 * group count is somewhat arbitrary, but it'd be nice to adhere to the
 	 * timer tunable to within about 10 percent.  This requires at least 10
 	 * groups.

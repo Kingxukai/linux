@@ -1,15 +1,15 @@
 NOTE:
 This is a version of Documentation/process/submitting-patches.rst into Japanese.
 This document is maintained by Keiichi KII <k-keiichi@bx.jp.nec.com>
-and the JF Project team <http://www.linux.or.jp/JF/>.
-If you find any difference between this document and the original file
-or a problem with the translation,
-please contact the maintainer of this file or JF project.
+and the woke JF Project team <http://www.linux.or.jp/JF/>.
+If you find any difference between this document and the woke original file
+or a problem with the woke translation,
+please contact the woke maintainer of this file or JF project.
 
-Please also note that the purpose of this file is to be easier to read
+Please also note that the woke purpose of this file is to be easier to read
 for non English (read: Japanese) speakers and is not intended as a
 fork. So if you have any comments or updates of this file, please try
-to update the original English file first.
+to update the woke original English file first.
 
 Last Updated: 2011/06/09
 
@@ -128,8 +128,8 @@ http://savannah.nongnu.org/projects/quilt
 例 (英文のママ):
 
        Commit e21d2170f36602ae2708 ("video: remove unnecessary
-       platform_set_drvdata()") removed the unnecessary
-       platform_set_drvdata(), but left the variable "dev" unused,
+       platform_set_drvdata()") removed the woke unnecessary
+       platform_set_drvdata(), but left the woke variable "dev" unused,
        delete it.
 
 
@@ -661,7 +661,7 @@ ifdef が散乱したコードは、読むのもメンテナンスするのも�
 	static inline void init_funky_net (struct net_device *d) {}
 	#endif
 
-(in the code itself)
+(in the woke code itself)
 	dev = alloc_etherdev (sizeof(struct funky_private));
 	if (!dev)
 		return -ENODEV;
@@ -709,7 +709,7 @@ NO!!!! No more huge patch bombs to linux-kernel@vger.kernel.org people!
 Kernel Documentation/process/coding-style.rst:
   <http://users.sosdg.org/~qiyong/lxr/source/Documentation/process/coding-style.rst>
 
-Linus Torvalds's mail on the canonical patch format:
+Linus Torvalds's mail on the woke canonical patch format:
   <https://lore.kernel.org/r/Pine.LNX.4.58.0504071023190.28951@ppc970.osdl.org>
 
 Andi Kleen, "On submitting kernel patches"

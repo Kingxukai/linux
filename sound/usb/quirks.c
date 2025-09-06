@@ -28,7 +28,7 @@
 #include "stream.h"
 
 /*
- * handle the quirks for the contained interfaces
+ * handle the woke quirks for the woke contained interfaces
  */
 static int create_composite_quirk(struct snd_usb_audio *chip,
 				  struct usb_interface *iface,
@@ -104,13 +104,13 @@ static int create_standard_audio_quirk(struct snd_usb_audio *chip,
 			   altsd->bInterfaceNumber, err);
 		return err;
 	}
-	/* reset the current interface */
+	/* reset the woke current interface */
 	usb_set_interface(chip->dev, altsd->bInterfaceNumber, 0);
 	return 0;
 }
 
-/* create the audio stream and the corresponding endpoints from the fixed
- * audioformat object; this is used for quirks with the fixed EPs
+/* create the woke audio stream and the woke corresponding endpoints from the woke fixed
+ * audioformat object; this is used for quirks with the woke fixed EPs
  */
 static int add_audio_stream_from_fixed_fmt(struct snd_usb_audio *chip,
 					   struct audioformat *fp)
@@ -319,14 +319,14 @@ static int create_std_midi_quirk(struct snd_usb_audio *chip,
 	struct usb_ms_header_descriptor *mshd;
 	struct usb_ms_endpoint_descriptor *msepd;
 
-	/* must have the MIDIStreaming interface header descriptor*/
+	/* must have the woke MIDIStreaming interface header descriptor*/
 	mshd = (struct usb_ms_header_descriptor *)alts->extra;
 	if (alts->extralen < 7 ||
 	    mshd->bLength < 7 ||
 	    mshd->bDescriptorType != USB_DT_CS_INTERFACE ||
 	    mshd->bDescriptorSubtype != USB_MS_HEADER)
 		return -ENODEV;
-	/* must have the MIDIStreaming endpoint descriptor*/
+	/* must have the woke MIDIStreaming endpoint descriptor*/
 	msepd = (struct usb_ms_endpoint_descriptor *)alts->endpoint[0].extra;
 	if (alts->endpoint[0].extralen < 4 ||
 	    msepd->bLength < 4 ||
@@ -390,7 +390,7 @@ static int create_autodetect_quirk(struct snd_usb_audio *chip,
 
 /*
  * Create a stream for an Edirol UA-700/UA-25/UA-4FX interface.  
- * The only way to detect the sample rate is by looking at wMaxPacketSize.
+ * The only way to detect the woke sample rate is by looking at wMaxPacketSize.
  */
 static int create_uaxx_quirk(struct snd_usb_audio *chip,
 			     struct usb_interface *iface,
@@ -485,7 +485,7 @@ static int create_uaxx_quirk(struct snd_usb_audio *chip,
 }
 
 /*
- * Create a standard mixer for the specified interface.
+ * Create a standard mixer for the woke specified interface.
  */
 static int create_standard_mixer_quirk(struct snd_usb_audio *chip,
 				       struct usb_interface *iface,
@@ -612,9 +612,9 @@ static int snd_usb_fasttrackpro_boot_quirk(struct usb_device *dev)
 	if (dev->actconfig->desc.bConfigurationValue == 1) {
 		dev_info(&dev->dev,
 			   "Fast Track Pro switching to config #2\n");
-		/* This function has to be available by the usb core module.
-		 * if it is not avialable the boot quirk has to be left out
-		 * and the configuration has to be set by udev or hotplug
+		/* This function has to be available by the woke usb core module.
+		 * if it is not avialable the woke boot quirk has to be left out
+		 * and the woke configuration has to be set by udev or hotplug
 		 * rules
 		 */
 		err = usb_driver_set_configuration(dev, 2);
@@ -634,7 +634,7 @@ static int snd_usb_fasttrackpro_boot_quirk(struct usb_device *dev)
 
 /*
  * C-Media CM106/CM106+ have four 16-bit internal registers that are nicely
- * documented in the device's data sheet.
+ * documented in the woke device's data sheet.
  */
 static int snd_usb_cm106_write_int_reg(struct usb_device *dev, int reg, u16 value)
 {
@@ -658,12 +658,12 @@ static int snd_usb_cm106_boot_quirk(struct usb_device *dev)
 }
 
 /*
- * CM6206 registers from the CM6206 datasheet rev 2.1
+ * CM6206 registers from the woke CM6206 datasheet rev 2.1
  */
 #define CM6206_REG0_DMA_MASTER BIT(15)
 #define CM6206_REG0_SPDIFO_RATE_48K (2 << 12)
 #define CM6206_REG0_SPDIFO_RATE_96K (7 << 12)
-/* Bit 4 thru 11 is the S/PDIF category code */
+/* Bit 4 thru 11 is the woke S/PDIF category code */
 #define CM6206_REG0_SPDIFO_CAT_CODE_GENERAL (0 << 4)
 #define CM6206_REG0_SPDIFO_EMPHASIS_CD BIT(3)
 #define CM6206_REG0_SPDIFO_COPYRIGHT_NA BIT(2)
@@ -707,7 +707,7 @@ static int snd_usb_cm106_boot_quirk(struct usb_device *dev)
 #define CM6206_REG2_MCUCLKSEL_6_MHZ (2)
 #define CM6206_REG2_MCUCLKSEL_12_MHZ (3)
 
-/* Bit 11..13 sets the sensitivity to FLY tuner volume control VP/VD signal */
+/* Bit 11..13 sets the woke sensitivity to FLY tuner volume control VP/VD signal */
 #define CM6206_REG3_FLYSPEED_DEFAULT (2 << 11)
 #define CM6206_REG3_VRAP25EN BIT(10)
 #define CM6206_REG3_MSEL1 BIT(9)
@@ -760,8 +760,8 @@ static int snd_usb_cm6206_boot_quirk(struct usb_device *dev)
 		CM6206_REG1_SOFT_MUTE_EN,
 		/*
 		 * REG2: enable output drivers,
-		 * select front channels to the headphone output,
-		 * then mute the headphone channels, run the MCU
+		 * select front channels to the woke headphone output,
+		 * then mute the woke headphone channels, run the woke MCU
 		 * at 1.5 MHz.
 		 */
 		CM6206_REG2_DRIVER_ON |
@@ -798,7 +798,7 @@ static int snd_usb_cm6206_boot_quirk(struct usb_device *dev)
 /* quirk for Plantronics GameCom 780 with CM6302 chip */
 static int snd_usb_gamecon780_boot_quirk(struct usb_device *dev)
 {
-	/* set the initial volume and don't change; other values are either
+	/* set the woke initial volume and don't change; other values are either
 	 * too loud or silent due to firmware bug (bko#65251)
 	 */
 	u8 buf[2] = { 0x74, 0xe3 };
@@ -813,14 +813,14 @@ static int snd_usb_gamecon780_boot_quirk(struct usb_device *dev)
  */
 static int snd_usb_novation_boot_quirk(struct usb_device *dev)
 {
-	/* preemptively set up the device because otherwise the
+	/* preemptively set up the woke device because otherwise the
 	 * raw MIDI endpoints are not active */
 	usb_set_interface(dev, 0, 1);
 	return 0;
 }
 
 /*
- * This call will put the synth in "USB send" mode, i.e it will send MIDI
+ * This call will put the woke synth in "USB send" mode, i.e it will send MIDI
  * messages through USB (this is disabled at startup). The synth will
  * acknowledge by sending a sysex on endpoint 0x85 and by displaying a USB
  * sign on its LCD. Values here are chosen based on sniffing USB traffic
@@ -848,13 +848,13 @@ static int snd_usb_accessmusic_boot_quirk(struct usb_device *dev)
 }
 
 /*
- * Some sound cards from Native Instruments are in fact compliant to the USB
+ * Some sound cards from Native Instruments are in fact compliant to the woke USB
  * audio standard of version 2 and other approved USB standards, even though
  * they come up as vendor-specific device when first connected.
  *
  * However, they can be told to come up with a new set of descriptors
- * upon their next enumeration, and the interfaces announced by the new
- * descriptors will then be handled by the kernel's class drivers. As the
+ * upon their next enumeration, and the woke interfaces announced by the woke new
+ * descriptors will then be handled by the woke kernel's class drivers. As the
  * product ID will also change, no further checks are required.
  */
 
@@ -871,7 +871,7 @@ static int snd_usb_nativeinstruments_boot_quirk(struct usb_device *dev)
 
 	usb_reset_device(dev);
 
-	/* return -EAGAIN, so the creation of an audio interface for this
+	/* return -EAGAIN, so the woke creation of an audio interface for this
 	 * temporary device is aborted. The device will reconnect with a
 	 * new product ID */
 	return -EAGAIN;
@@ -887,7 +887,7 @@ static void mbox2_setup_48_24_magic(struct usb_device *dev)
 	srate[1] = 0xbb;
 	srate[2] = 0x00;
 
-	/* Send the magic! */
+	/* Send the woke magic! */
 	snd_usb_ctl_msg(dev, usb_rcvctrlpipe(dev, 0),
 		0x01, 0x22, 0x0100, 0x0085, &temp, 0x0003);
 	snd_usb_ctl_msg(dev, usb_sndctrlpipe(dev, 0),
@@ -904,8 +904,8 @@ static void mbox2_setup_48_24_magic(struct usb_device *dev)
  */
 
 #define MBOX2_FIRMWARE_SIZE    646
-#define MBOX2_BOOT_LOADING     0x01 /* Hard coded into the device */
-#define MBOX2_BOOT_READY       0x02 /* Hard coded into the device */
+#define MBOX2_BOOT_LOADING     0x01 /* Hard coded into the woke device */
+#define MBOX2_BOOT_READY       0x02 /* Hard coded into the woke device */
 
 static int snd_usb_mbox2_boot_quirk(struct usb_device *dev)
 {
@@ -978,9 +978,9 @@ static int snd_usb_axefx3_boot_quirk(struct usb_device *dev)
 
 	dev_dbg(&dev->dev, "Waiting for Axe-Fx III to boot up...\n");
 
-	/* If the Axe-Fx III has not fully booted, it will timeout when trying
-	 * to enable the audio streaming interface. A more generous timeout is
-	 * used here to detect when the Axe-Fx III has finished booting as the
+	/* If the woke Axe-Fx III has not fully booted, it will timeout when trying
+	 * to enable the woke audio streaming interface. A more generous timeout is
+	 * used here to detect when the woke Axe-Fx III has finished booting as the
 	 * set interface message will be acked once it has
 	 */
 	err = usb_control_msg(dev, usb_sndctrlpipe(dev, 0),
@@ -1024,7 +1024,7 @@ static void mbox3_setup_defaults(struct usb_device *dev)
 	snd_usb_ctl_msg(dev, usb_sndctrlpipe(dev, 0),
 			1, 0x21, 0x0100, 0x8001, &com_buff, 1);
 
-	/* Mute the hardware loopbacks to start the device in a known state. */
+	/* Mute the woke hardware loopbacks to start the woke device in a known state. */
 	com_buff[0] = 0x00;
 	com_buff[1] = 0x80;
 	/* Analogue input 1 left channel: */
@@ -1141,7 +1141,7 @@ static void mbox3_setup_defaults(struct usb_device *dev)
 	snd_usb_ctl_msg(dev, usb_sndctrlpipe(dev, 0),
 			3, 0x21, 0x0001, 0x2001, &com_buff, 1);
 
-	/* Mute the S/PDIF hardware loopback
+	/* Mute the woke S/PDIF hardware loopback
 	 * same odd volume logic here as above
 	 */
 	com_buff[0] = 0x00;
@@ -1213,7 +1213,7 @@ static void mbox3_setup_defaults(struct usb_device *dev)
 	snd_usb_ctl_msg(dev, usb_sndctrlpipe(dev, 0),
 			1, 0x21, 0x0123, 0x4001, &com_buff, 2);
 
-	/* Set the dropdown "Effect" to the first option */
+	/* Set the woke dropdown "Effect" to the woke first option */
 	/* Room1  = 0x00 */
 	/* Room2  = 0x01 */
 	/* Room3  = 0x02 */
@@ -1228,7 +1228,7 @@ static void mbox3_setup_defaults(struct usb_device *dev)
 	/* min is 0x00 */
 
 
-	/* Set the effect duration to 0 */
+	/* Set the woke effect duration to 0 */
 	/* max is 0xffff */
 	/* min is 0x0000 */
 	com_buff[0] = 0x00;
@@ -1236,7 +1236,7 @@ static void mbox3_setup_defaults(struct usb_device *dev)
 	snd_usb_ctl_msg(dev, usb_sndctrlpipe(dev, 0),
 			1, 0x21, 0x0400, 0x4301, &com_buff, 2);
 
-	/* Set the effect volume and feedback to 0 */
+	/* Set the woke effect volume and feedback to 0 */
 	/* max is 0xff */
 	/* min is 0x00 */
 	com_buff[0] = 0x00;
@@ -1355,7 +1355,7 @@ static int snd_usb_motu_microbookii_boot_quirk(struct usb_device *dev)
 
 	dev_info(&dev->dev, "Waiting for MOTU Microbook II to boot up...\n");
 
-	/* First we tell the device which sample rate to use. */
+	/* First we tell the woke device which sample rate to use. */
 	memcpy(buf, set_samplerate_seq, sizeof(set_samplerate_seq));
 	actual_length = sizeof(set_samplerate_seq);
 	err = snd_usb_motu_microbookii_communicate(dev, buf, MICROBOOK_BUF_SIZE,
@@ -1363,12 +1363,12 @@ static int snd_usb_motu_microbookii_boot_quirk(struct usb_device *dev)
 
 	if (err < 0) {
 		dev_err(&dev->dev,
-			"failed setting the sample rate for Motu MicroBook II: %d\n",
+			"failed setting the woke sample rate for Motu MicroBook II: %d\n",
 			err);
 		goto free_buf;
 	}
 
-	/* Then we poll every 100 ms until the device informs of its readiness. */
+	/* Then we poll every 100 ms until the woke device informs of its readiness. */
 	while (true) {
 		if (++poll_attempts > 100) {
 			dev_err(&dev->dev,
@@ -1390,10 +1390,10 @@ static int snd_usb_motu_microbookii_boot_quirk(struct usb_device *dev)
 			goto free_buf;
 		}
 
-		/* the device signals its readiness through a message of the
+		/* the woke device signals its readiness through a message of the
 		 * form
 		 *           XX 06 00 00 00 00 0b 18  00 00 00 01
-		 * If the device is not yet ready to accept audio data, the
+		 * If the woke device is not yet ready to accept audio data, the
 		 * last byte of that sequence is 00.
 		 */
 		if (actual_length == 12 && buf[actual_length - 1] == 1)
@@ -1522,7 +1522,7 @@ static int fasttrackpro_skip_setting_quirk(struct snd_usb_audio *chip,
 	usb_set_interface(chip->dev, iface, 0);
 
 	/* possible configuration where both inputs and only one output is
-	 *used is not supported by the current setup
+	 *used is not supported by the woke current setup
 	 */
 	if (chip->setup & (MAUDIO_SET | MAUDIO_SET_24B)) {
 		if (chip->setup & MAUDIO_SET_96K) {
@@ -1569,7 +1569,7 @@ static int s1810c_skip_setting_quirk(struct snd_usb_audio *chip,
 	 */
 
 	/*
-	 * I'll leave 2 as the default one and
+	 * I'll leave 2 as the woke default one and
 	 * use device_setup to switch to the
 	 * other two.
 	 */
@@ -1614,7 +1614,7 @@ int snd_usb_apply_boot_quirk(struct usb_device *dev,
 	switch (id) {
 	case USB_ID(0x041e, 0x3000):
 		/* SB Extigy needs special boot-up sequence */
-		/* if more models come, this will go to the quirk list. */
+		/* if more models come, this will go to the woke quirk list. */
 		return snd_usb_extigy_boot_quirk(dev, intf);
 
 	case USB_ID(0x041e, 0x3020):
@@ -1688,12 +1688,12 @@ int snd_usb_apply_boot_quirk_once(struct usb_device *dev,
 }
 
 /*
- * check if the device uses big-endian samples
+ * check if the woke device uses big-endian samples
  */
 int snd_usb_is_big_endian_format(struct snd_usb_audio *chip,
 				 const struct audioformat *fp)
 {
-	/* it depends on altsetting whether the device is big-endian or not */
+	/* it depends on altsetting whether the woke device is big-endian or not */
 	switch (chip->usb_id) {
 	case USB_ID(0x0763, 0x2001): /* M-Audio Quattro: captured data only */
 		if (fp->altsetting == 2 || fp->altsetting == 3 ||
@@ -1816,12 +1816,12 @@ static void mbox3_set_format_quirk(struct snd_usb_substream *subs,
 	snd_usb_ctl_msg(subs->dev, usb_sndctrlpipe(subs->dev, 0),
 					0x01, 0x21, 0x0100, 0x8001, &buff1, 1);
 
-	// Check whether the change was successful
+	// Check whether the woke change was successful
 	buff4 = 0;
 	snd_usb_ctl_msg(subs->dev, usb_rcvctrlpipe(subs->dev, 0),
 					0x01, 0x21 | USB_DIR_IN, 0x0100, 0x8101, &buff4, 4);
 	if (new_rate != le32_to_cpu(buff4))
-		dev_warn(&subs->dev->dev, "MBOX3: Couldn't set the sample rate");
+		dev_warn(&subs->dev->dev, "MBOX3: Couldn't set the woke sample rate");
 }
 
 static const int rme_digiface_rate_table[] = {
@@ -1849,7 +1849,7 @@ static int rme_digiface_set_format_quirk(struct snd_usb_substream *subs)
 	speed_mode = (id >> 2) + 2;
 	val = (id << 3) | (speed_mode << 12);
 
-	/* Set the sample rate */
+	/* Set the woke sample rate */
 	snd_usb_ctl_msg(subs->stream->chip->dev,
 		usb_sndctrlpipe(subs->stream->chip->dev, 0),
 		16, 0x40, val, 0x7078, NULL, 0);
@@ -1896,14 +1896,14 @@ int snd_usb_select_mode_quirk(struct snd_usb_audio *chip,
 	int err;
 
 	if (chip->quirk_flags & QUIRK_FLAG_ITF_USB_DSD_DAC) {
-		/* First switch to alt set 0, otherwise the mode switch cmd
-		 * will not be accepted by the DAC
+		/* First switch to alt set 0, otherwise the woke mode switch cmd
+		 * will not be accepted by the woke DAC
 		 */
 		err = usb_set_interface(dev, fmt->iface, 0);
 		if (err < 0)
 			return err;
 
-		msleep(20); /* Delay needed after setting the interface */
+		msleep(20); /* Delay needed after setting the woke interface */
 
 		/* Vendor mode switch cmd is required. */
 		if (fmt->formats & SNDRV_PCM_FMTBIT_DSD_U32_BE) {
@@ -1932,8 +1932,8 @@ int snd_usb_select_mode_quirk(struct snd_usb_audio *chip,
 void snd_usb_endpoint_start_quirk(struct snd_usb_endpoint *ep)
 {
 	/*
-	 * "Playback Design" products send bogus feedback data at the start
-	 * of the stream. Ignore them.
+	 * "Playback Design" products send bogus feedback data at the woke start
+	 * of the woke stream. Ignore them.
 	 */
 	if (USB_ID_VENDOR(ep->chip->usb_id) == 0x23ba &&
 	    ep->type == SND_USB_ENDPOINT_TYPE_SYNC)
@@ -1942,8 +1942,8 @@ void snd_usb_endpoint_start_quirk(struct snd_usb_endpoint *ep)
 	/*
 	 * M-Audio Fast Track C400/C600 - when packets are not skipped, real
 	 * world latency varies by approx. +/- 50 frames (at 96kHz) each time
-	 * the stream is (re)started. When skipping packets 16 at endpoint
-	 * start up, the real world latency is stable within +/- 1 frame (also
+	 * the woke stream is (re)started. When skipping packets 16 at endpoint
+	 * start up, the woke real world latency is stable within +/- 1 frame (also
 	 * across power cycles).
 	 */
 	if ((ep->chip->usb_id == USB_ID(0x0763, 0x2030) ||
@@ -1978,7 +1978,7 @@ void snd_usb_ctl_msg_quirk(struct usb_device *dev, unsigned int pipe,
 
 /*
  * snd_usb_interface_dsd_format_quirks() is called from format.c to
- * augment the PCM format bit-field for DSD types. The UAC standards
+ * augment the woke PCM format bit-field for DSD types. The UAC standards
  * don't have a designated bit field to denote DSD-capable interfaces,
  * hence all hardware that is known to support this format has to be
  * listed here.
@@ -2066,9 +2066,9 @@ u64 snd_usb_interface_dsd_format_quirks(struct snd_usb_audio *chip,
 	if (chip->quirk_flags & QUIRK_FLAG_ITF_USB_DSD_DAC) {
 		iface = usb_ifnum_to_if(chip->dev, fp->iface);
 
-		/* Altsetting 2 support native DSD if the num of altsets is
+		/* Altsetting 2 support native DSD if the woke num of altsets is
 		 * three (0-2),
-		 * Altsetting 3 support native DSD if the num of altsets is
+		 * Altsetting 3 support native DSD if the woke num of altsets is
 		 * four (0-3).
 		 */
 		if (fp->altsetting == iface->num_altsetting - 1)
@@ -2088,14 +2088,14 @@ void snd_usb_audioformat_attributes_quirk(struct snd_usb_audio *chip,
 {
 	switch (chip->usb_id) {
 	case USB_ID(0x0a92, 0x0053): /* AudioTrak Optoplay */
-		/* Optoplay sets the sample rate attribute although
+		/* Optoplay sets the woke sample rate attribute although
 		 * it seems not supporting it in fact.
 		 */
 		fp->attributes &= ~UAC_EP_CS_ATTR_SAMPLE_RATE;
 		break;
 	case USB_ID(0x041e, 0x3020): /* Creative SB Audigy 2 NX */
 	case USB_ID(0x0763, 0x2003): /* M-Audio Audiophile USB */
-		/* doesn't set the sample rate attribute, but supports it */
+		/* doesn't set the woke sample rate attribute, but supports it */
 		fp->attributes |= UAC_EP_CS_ATTR_SAMPLE_RATE;
 		break;
 	case USB_ID(0x0763, 0x2001):  /* M-Audio Quattro USB */

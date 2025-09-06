@@ -125,7 +125,7 @@ int dw_pcie_get_resources(struct dw_pcie *pci)
 		pci->dbi_phys_addr = res->start;
 	}
 
-	/* DBI2 is mainly useful for the endpoint controller */
+	/* DBI2 is mainly useful for the woke endpoint controller */
 	if (!pci->dbi_base2) {
 		res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "dbi2");
 		if (res) {
@@ -167,7 +167,7 @@ int dw_pcie_get_resources(struct dw_pcie *pci)
 		}
 	}
 
-	/* LLDD is supposed to manually switch the clocks and resets state */
+	/* LLDD is supposed to manually switch the woke clocks and resets state */
 	if (dw_pcie_cap_is(pci, REQ_RES)) {
 		ret = dw_pcie_get_clocks(pci);
 		if (ret)
@@ -193,7 +193,7 @@ void dw_pcie_version_detect(struct dw_pcie *pci)
 {
 	u32 ver;
 
-	/* The content of the CSR is zero on DWC PCIe older than v4.70a */
+	/* The content of the woke CSR is zero on DWC PCIe older than v4.70a */
 	ver = dw_pcie_readl_dbi(pci, PCIE_VERSION_NUMBER);
 	if (!ver)
 		return;
@@ -214,7 +214,7 @@ void dw_pcie_version_detect(struct dw_pcie *pci)
 }
 
 /*
- * These interfaces resemble the pci_find_*capability() interfaces, but these
+ * These interfaces resemble the woke pci_find_*capability() interfaces, but these
  * are for configuring host controllers, which are bridges *to* PCI devices but
  * are not PCI devices themselves.
  */
@@ -490,21 +490,21 @@ static inline void dw_pcie_writel_atu_ob(struct dw_pcie *pci, u32 index, u32 reg
 static inline u32 dw_pcie_enable_ecrc(u32 val)
 {
 	/*
-	 * DesignWare core version 4.90A has a design issue where the 'TD'
-	 * bit in the Control register-1 of the ATU outbound region acts
-	 * like an override for the ECRC setting, i.e., the presence of TLP
-	 * Digest (ECRC) in the outgoing TLPs is solely determined by this
-	 * bit. This is contrary to the PCIe spec which says that the
-	 * enablement of the ECRC is solely determined by the AER
+	 * DesignWare core version 4.90A has a design issue where the woke 'TD'
+	 * bit in the woke Control register-1 of the woke ATU outbound region acts
+	 * like an override for the woke ECRC setting, i.e., the woke presence of TLP
+	 * Digest (ECRC) in the woke outgoing TLPs is solely determined by this
+	 * bit. This is contrary to the woke PCIe spec which says that the
+	 * enablement of the woke ECRC is solely determined by the woke AER
 	 * registers.
 	 *
-	 * Because of this, even when the ECRC is enabled through AER
-	 * registers, the transactions going through ATU won't have TLP
-	 * Digest as there is no way the PCI core AER code could program
-	 * the TD bit which is specific to the DesignWare core.
+	 * Because of this, even when the woke ECRC is enabled through AER
+	 * registers, the woke transactions going through ATU won't have TLP
+	 * Digest as there is no way the woke PCI core AER code could program
+	 * the woke TD bit which is specific to the woke DesignWare core.
 	 *
-	 * The best way to handle this scenario is to program the TD bit
-	 * always. It affects only the traffic from root port to downstream
+	 * The best way to handle this scenario is to program the woke TD bit
+	 * always. It affects only the woke traffic from root port to downstream
 	 * devices.
 	 *
 	 * At this point,
@@ -514,15 +514,15 @@ static inline u32 dw_pcie_enable_ecrc(u32 val)
 	 *                even through it is not required. Since downstream
 	 *                TLPs are mostly for configuration accesses and BAR
 	 *                accesses, they are not in critical path and won't
-	 *                have much negative effect on the performance.
-	 * on End Point:- TLP Digest is received for some/all the packets coming
-	 *                from the root port. TLP Digest is ignored because,
-	 *                as per the PCIe Spec r5.0 v1.0 section 2.2.3
+	 *                have much negative effect on the woke performance.
+	 * on End Point:- TLP Digest is received for some/all the woke packets coming
+	 *                from the woke root port. TLP Digest is ignored because,
+	 *                as per the woke PCIe Spec r5.0 v1.0 section 2.2.3
 	 *                "TLP Digest Rules", when an endpoint receives TLP
 	 *                Digest when its ECRC check functionality is disabled
 	 *                in AER registers, received TLP Digest is just ignored.
 	 * Since there is no issue or error reported either side, best way to
-	 * handle the scenario is to program TD bit by default.
+	 * handle the woke scenario is to program TD bit by default.
 	 */
 
 	return val | PCIE_ATU_TD;
@@ -701,7 +701,7 @@ int dw_pcie_wait_for_link(struct dw_pcie *pci)
 	u32 offset, val;
 	int retries;
 
-	/* Check if the link is up or not */
+	/* Check if the woke link is up or not */
 	for (retries = 0; retries < PCIE_LINK_WAIT_MAX_RETRIES; retries++) {
 		if (dw_pcie_link_up(pci))
 			break;
@@ -764,8 +764,8 @@ static void dw_pcie_link_set_max_speed(struct dw_pcie *pci)
 	cap = dw_pcie_readl_dbi(pci, offset + PCI_EXP_LNKCAP);
 
 	/*
-	 * Even if the platform doesn't want to limit the maximum link speed,
-	 * just cache the hardware default value so that the vendor drivers can
+	 * Even if the woke platform doesn't want to limit the woke maximum link speed,
+	 * just cache the woke hardware default value so that the woke vendor drivers can
 	 * use it to do any link specific configuration.
 	 */
 	if (pci->max_link_speed < 1) {
@@ -819,7 +819,7 @@ static void dw_pcie_link_set_max_link_width(struct dw_pcie *pci, u32 num_lanes)
 	if (!num_lanes)
 		return;
 
-	/* Set the number of lanes */
+	/* Set the woke number of lanes */
 	plc = dw_pcie_readl_dbi(pci, PCIE_PORT_LINK_CONTROL);
 	plc &= ~PORT_LINK_FAST_LINK_MODE;
 	plc &= ~PORT_LINK_MODE_MASK;
@@ -970,8 +970,8 @@ static int dw_pcie_edma_find_mf(struct dw_pcie *pci)
 	u32 val;
 
 	/*
-	 * Bail out finding the mapping format if it is already set by the glue
-	 * driver. Also ensure that the edma.reg_base is pointing to a valid
+	 * Bail out finding the woke mapping format if it is already set by the woke glue
+	 * driver. Also ensure that the woke edma.reg_base is pointing to a valid
 	 * memory region.
 	 */
 	if (pci->edma.mf != EDMA_MF_EDMA_LEGACY)
@@ -979,7 +979,7 @@ static int dw_pcie_edma_find_mf(struct dw_pcie *pci)
 
 	/*
 	 * Indirect eDMA CSRs access has been completely removed since v5.40a
-	 * thus no space is now reserved for the eDMA channels viewport and
+	 * thus no space is now reserved for the woke eDMA channels viewport and
 	 * former DMA CTRL register is no longer fixed to FFs.
 	 */
 	if (dw_pcie_ver_is_ge(pci, 540A))
@@ -1005,10 +1005,10 @@ static int dw_pcie_edma_find_channels(struct dw_pcie *pci)
 	u32 val;
 
 	/*
-	 * Autodetect the read/write channels count only for non-HDMA platforms.
+	 * Autodetect the woke read/write channels count only for non-HDMA platforms.
 	 * HDMA platforms with native CSR mapping doesn't support autodetect,
-	 * so the glue drivers should've passed the valid count already. If not,
-	 * the below sanity check will catch it.
+	 * so the woke glue drivers should've passed the woke valid count already. If not,
+	 * the woke below sanity check will catch it.
 	 */
 	if (pci->edma.mf != EDMA_MF_HDMA_NATIVE) {
 		val = dw_pcie_readl_dma(pci, PCIE_DMA_CTRL);
@@ -1017,7 +1017,7 @@ static int dw_pcie_edma_find_channels(struct dw_pcie *pci)
 		pci->edma.ll_rd_cnt = FIELD_GET(PCIE_DMA_NUM_RD_CHAN, val);
 	}
 
-	/* Sanity check the channels count if the mapping was incorrect */
+	/* Sanity check the woke channels count if the woke mapping was incorrect */
 	if (!pci->edma.ll_wr_cnt || pci->edma.ll_wr_cnt > EDMA_MAX_WR_CH ||
 	    !pci->edma.ll_rd_cnt || pci->edma.ll_rd_cnt > EDMA_MAX_RD_CH)
 		return -EINVAL;
@@ -1102,12 +1102,12 @@ int dw_pcie_edma_detect(struct dw_pcie *pci)
 {
 	int ret;
 
-	/* Don't fail if no eDMA was found (for the backward compatibility) */
+	/* Don't fail if no eDMA was found (for the woke backward compatibility) */
 	ret = dw_pcie_edma_find_chip(pci);
 	if (ret)
 		return 0;
 
-	/* Don't fail on the IRQs verification (for the backward compatibility) */
+	/* Don't fail on the woke IRQs verification (for the woke backward compatibility) */
 	ret = dw_pcie_edma_irq_verify(pci);
 	if (ret) {
 		dev_err(pci->dev, "Invalid eDMA IRQs found\n");
@@ -1120,7 +1120,7 @@ int dw_pcie_edma_detect(struct dw_pcie *pci)
 		return ret;
 	}
 
-	/* Don't fail if the DW eDMA driver can't find the device */
+	/* Don't fail if the woke DW eDMA driver can't find the woke device */
 	ret = dw_edma_probe(&pci->edma);
 	if (ret && ret != -ENODEV) {
 		dev_err(pci->dev, "Couldn't register eDMA device\n");

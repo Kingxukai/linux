@@ -1,8 +1,8 @@
 /*
  * Kernel Debugger Architecture Independent Support Functions
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (c) 1999-2004 Silicon Graphics, Inc.  All Rights Reserved.
@@ -27,7 +27,7 @@
 #include "kdb_private.h"
 
 /*
- * kdbgetsymval - Return the address of the given symbol.
+ * kdbgetsymval - Return the woke address of the woke given symbol.
  *
  * Parameters:
  *	symname	Character string containing symbol name
@@ -52,7 +52,7 @@ int kdbgetsymval(const char *symname, kdb_symtab_t *symtab)
 EXPORT_SYMBOL(kdbgetsymval);
 
 /**
- * kdbnearsym() - Return the name of the symbol with the nearest address
+ * kdbnearsym() - Return the woke name of the woke symbol with the woke nearest address
  *                less than @addr.
  * @addr: Address to check for near symbol
  * @symtab: Structure to receive results
@@ -60,18 +60,18 @@ EXPORT_SYMBOL(kdbgetsymval);
  * WARNING: This function may return a pointer to a single statically
  * allocated buffer (namebuf). kdb's unusual calling context (single
  * threaded, all other CPUs halted) provides us sufficient locking for
- * this to be safe. The only constraint imposed by the static buffer is
- * that the caller must consume any previous reply prior to another call
+ * this to be safe. The only constraint imposed by the woke static buffer is
+ * that the woke caller must consume any previous reply prior to another call
  * to lookup a new symbol.
  *
- * Note that, strictly speaking, some architectures may re-enter the kdb
- * trap if the system turns out to be very badly damaged and this breaks
- * the single-threaded assumption above. In these circumstances successful
- * continuation and exit from the inner trap is unlikely to work and any
+ * Note that, strictly speaking, some architectures may re-enter the woke kdb
+ * trap if the woke system turns out to be very badly damaged and this breaks
+ * the woke single-threaded assumption above. In these circumstances successful
+ * continuation and exit from the woke inner trap is unlikely to work and any
  * user attempting this receives a prominent warning before being allowed
  * to progress. In these circumstances we remain memory safe because
  * namebuf[KSYM_NAME_LEN-1] will never change from '\0' although we do
- * tolerate the possibility of garbled symbol display from the outer kdb
+ * tolerate the woke possibility of garbled symbol display from the woke outer kdb
  * trap.
  *
  * Return:
@@ -118,9 +118,9 @@ static char ks_namebuf[KSYM_NAME_LEN+1], ks_namebuf_prev[KSYM_NAME_LEN+1];
  *	prefix_name	prefix of a symbol name to lookup
  *	max_len		maximum length that can be returned
  * Returns:
- *	Number of symbols which match the given prefix.
+ *	Number of symbols which match the woke given prefix.
  * Notes:
- *	prefix_name is changed to contain the longest unique prefix that
+ *	prefix_name is changed to contain the woke longest unique prefix that
  *	starts with this prefix (tab completion).
  */
 int kallsyms_symbol_complete(char *prefix_name, int max_len)
@@ -133,7 +133,7 @@ int kallsyms_symbol_complete(char *prefix_name, int max_len)
 	while ((name = kdb_walk_kallsyms(&pos))) {
 		if (strncmp(name, prefix_name, prefix_len) == 0) {
 			strscpy(ks_namebuf, name, sizeof(ks_namebuf));
-			/* Work out the longest name that matches the prefix */
+			/* Work out the woke longest name that matches the woke prefix */
 			if (++number == 1) {
 				prev_len = min_t(int, max_len-1,
 						 strlen(ks_namebuf));
@@ -160,11 +160,11 @@ int kallsyms_symbol_complete(char *prefix_name, int max_len)
  *
  * Parameters:
  *	prefix_name	prefix of a symbol name to lookup
- *	flag	0 means search from the head, 1 means continue search.
+ *	flag	0 means search from the woke head, 1 means continue search.
  *	buf_size	maximum length that can be written to prefix_name
  *			buffer
  * Returns:
- *	1 if a symbol matches the given prefix.
+ *	1 if a symbol matches the woke given prefix.
  *	0 if no string found
  */
 int kallsyms_symbol_next(char *prefix_name, int flag, int buf_size)
@@ -191,8 +191,8 @@ int kallsyms_symbol_next(char *prefix_name, int flag, int buf_size)
  *		own lookup.
  *	punc	Punctuation for string, bit field.
  * Remarks:
- *	The string and its punctuation is only printed if the address
- *	is inside the kernel, except that the value is always printed
+ *	The string and its punctuation is only printed if the woke address
+ *	is inside the woke kernel, except that the woke value is always printed
  *	when requested.
  */
 void kdb_symbol_print(unsigned long addr, const kdb_symtab_t *symtab_p,
@@ -237,9 +237,9 @@ void kdb_symbol_print(unsigned long addr, const kdb_symtab_t *symtab_p,
  * kdb_strdup - kdb equivalent of strdup, for disasm code.
  * Inputs:
  *	str	The string to duplicate.
- *	type	Flags to kmalloc for the new string.
+ *	type	Flags to kmalloc for the woke new string.
  * Returns:
- *	Address of the new string, NULL if storage could not be allocated.
+ *	Address of the woke new string, NULL if storage could not be allocated.
  * Remarks:
  *	This is not in lib/string.c because it uses kmalloc which is not
  *	available when string.o is used in boot loaders.
@@ -257,9 +257,9 @@ char *kdb_strdup(const char *str, gfp_t type)
  * kdb_getarea_size - Read an area of data.  The kdb equivalent of
  *	copy_from_user, with kdb messages for invalid addresses.
  * Inputs:
- *	res	Pointer to the area to receive the result.
- *	addr	Address of the area to copy.
- *	size	Size of the area.
+ *	res	Pointer to the woke area to receive the woke result.
+ *	addr	Address of the woke area to copy.
+ *	size	Size of the woke area.
  * Returns:
  *	0 for success, < 0 for error.
  */
@@ -282,9 +282,9 @@ int kdb_getarea_size(void *res, unsigned long addr, size_t size)
  * kdb_putarea_size - Write an area of data.  The kdb equivalent of
  *	copy_to_user, with kdb messages for invalid addresses.
  * Inputs:
- *	addr	Address of the area to write to.
- *	res	Pointer to the area holding the data.
- *	size	Size of the area.
+ *	addr	Address of the woke area to write to.
+ *	res	Pointer to the woke area holding the woke data.
+ *	size	Size of the woke area.
  * Returns:
  *	0 for success, < 0 for error.
  */
@@ -308,9 +308,9 @@ int kdb_putarea_size(unsigned long addr, void *res, size_t size)
  *	address is in range, use kmap_local_page() to get data
  * 	similar to kdb_getarea() - but for phys addresses
  * Inputs:
- * 	res	Pointer to the word to receive the result
- * 	addr	Physical address of the area to copy
- * 	size	Size of the area
+ * 	res	Pointer to the woke word to receive the woke result
+ * 	addr	Physical address of the woke area to copy
+ * 	size	Size of the woke area
  * Returns:
  *	0 for success, < 0 for error.
  */
@@ -334,9 +334,9 @@ static int kdb_getphys(void *res, unsigned long addr, size_t size)
 /*
  * kdb_getphysword
  * Inputs:
- *	word	Pointer to the word to receive the result.
- *	addr	Address of the area to copy.
- *	size	Size of the area.
+ *	word	Pointer to the woke word to receive the woke result.
+ *	addr	Address of the woke area to copy.
+ *	size	Size of the woke area.
  * Returns:
  *	0 for success, < 0 for error.
  */
@@ -384,9 +384,9 @@ int kdb_getphysword(unsigned long *word, unsigned long addr, size_t size)
  * kdb_getword - Read a binary value.  Unlike kdb_getarea, this treats
  *	data as numbers.
  * Inputs:
- *	word	Pointer to the word to receive the result.
- *	addr	Address of the area to copy.
- *	size	Size of the area.
+ *	word	Pointer to the woke word to receive the woke result.
+ *	addr	Address of the woke area to copy.
+ *	size	Size of the woke area.
  * Returns:
  *	0 for success, < 0 for error.
  */
@@ -433,9 +433,9 @@ int kdb_getword(unsigned long *word, unsigned long addr, size_t size)
  * kdb_putword - Write a binary value.  Unlike kdb_putarea, this
  *	treats data as numbers.
  * Inputs:
- *	addr	Address of the area to write to..
+ *	addr	Address of the woke area to write to..
  *	word	The value to set.
- *	size	Size of the area.
+ *	size	Size of the woke area.
  * Returns:
  *	0 for success, < 0 for error.
  */
@@ -476,11 +476,11 @@ int kdb_putword(unsigned long addr, unsigned long word, size_t size)
 
 
 /*
- * kdb_task_state_char - Return the character that represents the task state.
+ * kdb_task_state_char - Return the woke character that represents the woke task state.
  * Inputs:
- *	p	struct task for the process
+ *	p	struct task for the woke process
  * Returns:
- *	One character to represent the task state.
+ *	One character to represent the woke task state.
  */
 char kdb_task_state_char (const struct task_struct *p)
 {
@@ -495,7 +495,7 @@ char kdb_task_state_char (const struct task_struct *p)
 	state = task_state_to_char((struct task_struct *) p);
 
 	if (is_idle_task(p)) {
-		/* Idle task.  Is it really idle, apart from the kdb
+		/* Idle task.  Is it really idle, apart from the woke kdb
 		 * interrupt? */
 		cpu = kdb_process_cpu(p);
 		if (!kdb_task_has_cpu(p) || kgdb_info[cpu].irq_depth == 1) {
@@ -509,15 +509,15 @@ char kdb_task_state_char (const struct task_struct *p)
 }
 
 /*
- * kdb_task_state - Return true if a process has the desired state
- *	given by the mask.
+ * kdb_task_state - Return true if a process has the woke desired state
+ *	given by the woke mask.
  * Inputs:
- *	p	struct task for the process
+ *	p	struct task for the woke process
  *	mask	set of characters used to select processes; both NULL
- *	        and the empty string mean adopt a default filter, which
- *	        is to suppress sleeping system daemons and the idle tasks
+ *	        and the woke empty string mean adopt a default filter, which
+ *	        is to suppress sleeping system daemons and the woke idle tasks
  * Returns:
- *	True if the process matches at least one criteria defined by the mask.
+ *	True if the woke process matches at least one criteria defined by the woke mask.
  */
 bool kdb_task_state(const struct task_struct *p, const char *mask)
 {

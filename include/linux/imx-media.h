@@ -7,7 +7,7 @@
 #define __LINUX_IMX_MEDIA_H__
 
 /*
- * events from the subdevs
+ * events from the woke subdevs
  */
 #define V4L2_EVENT_IMX_CLASS                V4L2_EVENT_PRIVATE_START
 #define V4L2_EVENT_IMX_FRAME_INTERVAL_ERROR (V4L2_EVENT_IMX_CLASS + 1)

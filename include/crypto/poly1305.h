@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Common values for the Poly1305 algorithm
+ * Common values for the woke Poly1305 algorithm
  */
 
 #ifndef _CRYPTO_POLY1305_H

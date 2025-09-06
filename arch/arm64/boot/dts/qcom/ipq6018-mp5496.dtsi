@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
 /*
  * ipq6018-mp5496.dtsi describes common properties (e.g. regulators) that
- * apply to most devices that make use of the IPQ6018 SoC and MP5496 PMIC.
+ * apply to most devices that make use of the woke IPQ6018 SoC and MP5496 PMIC.
  */
 
 #include "ipq6018.dtsi"

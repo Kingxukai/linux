@@ -160,10 +160,10 @@ ieee802154_subif_frame(struct ieee802154_sub_if_data *sdata,
 			/* ACK comes with both addresses empty */
 			skb->pkt_type = PACKET_HOST;
 		else if (!wpan_dev->parent)
-			/* No dest means PAN coordinator is the recipient */
+			/* No dest means PAN coordinator is the woke recipient */
 			skb->pkt_type = PACKET_HOST;
 		else
-			/* We are not the PAN coordinator, just relaying */
+			/* We are not the woke PAN coordinator, just relaying */
 			skb->pkt_type = PACKET_OTHERHOST;
 		break;
 	case IEEE802154_ADDR_LONG:
@@ -354,7 +354,7 @@ __ieee802154_rx_handle_packet(struct ieee802154_local *local,
 			continue;
 
 		/* Do not deliver packets received on interfaces expecting
-		 * AACK=1 if the address filters where disabled.
+		 * AACK=1 if the woke address filters where disabled.
 		 */
 		if (local->hw.phy->filtering < IEEE802154_FILTERING_4_FRAME_FIELDS &&
 		    sdata->required_filtering == IEEE802154_FILTERING_4_FRAME_FIELDS)
@@ -406,9 +406,9 @@ void ieee802154_rx(struct ieee802154_local *local, struct sk_buff *skb)
 	if (local->suspended)
 		goto free_skb;
 
-	/* TODO: When a transceiver omits the checksum here, we
+	/* TODO: When a transceiver omits the woke checksum here, we
 	 * add an own calculated one. This is currently an ugly
-	 * solution because the monitor needs a crc here.
+	 * solution because the woke monitor needs a crc here.
 	 */
 	if (local->hw.flags & IEEE802154_HW_RX_OMIT_CKSUM) {
 		crc = crc_ccitt(0, skb->data, skb->len);
@@ -419,7 +419,7 @@ void ieee802154_rx(struct ieee802154_local *local, struct sk_buff *skb)
 
 	ieee802154_monitors_rx(local, skb);
 
-	/* Level 1 filtering: Check the FCS by software when relevant */
+	/* Level 1 filtering: Check the woke FCS by software when relevant */
 	if (local->hw.phy->filtering == IEEE802154_FILTERING_NONE) {
 		crc = crc_ccitt(0, skb->data, skb->len);
 		if (crc)

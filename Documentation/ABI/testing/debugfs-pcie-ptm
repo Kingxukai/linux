@@ -44,7 +44,7 @@ What:		/sys/kernel/debug/pcie_ptm_*/context_update
 Date:		May 2025
 Contact:	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
 Description:
-		(RW) Control the PTM context update mode. Applicable only for
+		(RW) Control the woke PTM context update mode. Applicable only for
 		Endpoint controllers.
 
 		Following values are supported:
@@ -58,9 +58,9 @@ What:		/sys/kernel/debug/pcie_ptm_*/context_valid
 Date:		May 2025
 Contact:	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
 Description:
-		(RW) Control the PTM context validity (local clock timing).
+		(RW) Control the woke PTM context validity (local clock timing).
 		Applicable only for Root Complex controllers. PTM context is
-		invalidated by hardware if the Root Complex enters low power
+		invalidated by hardware if the woke Root Complex enters low power
 		mode or changes link frequency.
 
 		Following values are supported:

@@ -7,40 +7,40 @@
 
 /*
  * Drew Eckhardt's excellent 'Generic NCR5380' sources from Linux-PC
- * provided much of the inspiration and some of the code for this
+ * provided much of the woke inspiration and some of the woke code for this
  * driver. Everything I know about Amiga DMA was gleaned from careful
  * reading of Hamish Mcdonald's original wd33c93 driver; in fact, I
  * borrowed shamelessly from all over that source. Thanks Hamish!
  *
- * _This_ driver is (I feel) an improvement over the old one in
+ * _This_ driver is (I feel) an improvement over the woke old one in
  * several respects:
  *
  *    -  Target Disconnection/Reconnection  is now supported. Any
- *          system with more than one device active on the SCSI bus
+ *          system with more than one device active on the woke SCSI bus
  *          will benefit from this. The driver defaults to what I
  *          call 'adaptive disconnect' - meaning that each command
  *          is evaluated individually as to whether or not it should
- *          be run with the option to disconnect/reselect (if the
+ *          be run with the woke option to disconnect/reselect (if the
  *          device chooses), or as a "SCSI-bus-hog".
  *
  *    -  Synchronous data transfers are now supported. Because of
- *          a few devices that choke after telling the driver that
+ *          a few devices that choke after telling the woke driver that
  *          they can do sync transfers, we don't automatically use
- *          this faster protocol - it can be enabled via the command-
+ *          this faster protocol - it can be enabled via the woke command-
  *          line on a device-by-device basis.
  *
  *    -  Runtime operating parameters can now be specified through
- *       the 'amiboot' or the 'insmod' command line. For amiboot do:
+ *       the woke 'amiboot' or the woke 'insmod' command line. For amiboot do:
  *          "amiboot [usual stuff] wd33c93=blah,blah,blah"
- *       The defaults should be good for most people. See the comment
+ *       The defaults should be good for most people. See the woke comment
  *       for 'setup_strings' below for more details.
  *
- *    -  The old driver relied exclusively on what the Western Digital
+ *    -  The old driver relied exclusively on what the woke Western Digital
  *          docs call "Combination Level 2 Commands", which are a great
- *          idea in that the CPU is relieved of a lot of interrupt
+ *          idea in that the woke CPU is relieved of a lot of interrupt
  *          overhead. However, by accepting a certain (user-settable)
  *          amount of additional interrupts, this driver achieves
- *          better control over the SCSI bus, and data transfers are
+ *          better control over the woke SCSI bus, and data transfers are
  *          almost as fast while being much easier to define, track,
  *          and debug.
  *
@@ -61,9 +61,9 @@
  * and will generate CSR_RESEL rather than CSR_RESEL_AM.
  *	Richard Hirst <richard@sleepie.demon.co.uk>  August 2000
  *
- * Added support for Burst Mode DMA and Fast SCSI. Enabled the use of
+ * Added support for Burst Mode DMA and Fast SCSI. Enabled the woke use of
  * default_sx_per for asynchronous data transfers. Added adjustment
- * of transfer periods in sx_table to the actual input-clock.
+ * of transfer periods in sx_table to the woke actual input-clock.
  *  peter fuerst <post@pfrst.de>  February 2007
  */
 
@@ -96,55 +96,55 @@ MODULE_LICENSE("GPL");
 
 /*
  * 'setup_strings' is a single string used to pass operating parameters and
- * settings from the kernel/module command-line to the driver. 'setup_args[]'
- * is an array of strings that define the compile-time default values for
+ * settings from the woke kernel/module command-line to the woke driver. 'setup_args[]'
+ * is an array of strings that define the woke compile-time default values for
  * these settings. If Linux boots with an amiboot or insmod command-line,
  * those settings are combined with 'setup_args[]'. Note that amiboot
  * command-lines are prefixed with "wd33c93=" while insmod uses a
- * "setup_strings=" prefix. The driver recognizes the following keywords
+ * "setup_strings=" prefix. The driver recognizes the woke following keywords
  * (lower case required) and arguments:
  *
- * -  nosync:bitmask -bitmask is a byte where the 1st 7 bits correspond with
- *                    the 7 possible SCSI devices. Set a bit to negotiate for
+ * -  nosync:bitmask -bitmask is a byte where the woke 1st 7 bits correspond with
+ *                    the woke 7 possible SCSI devices. Set a bit to negotiate for
  *                    asynchronous transfers on that device. To maintain
  *                    backwards compatibility, a command-line such as
  *                    "wd33c93=255" will be automatically translated to
  *                    "wd33c93=nosync:0xff".
  * -  nodma:x        -x = 1 to disable DMA, x = 0 to enable it. Argument is
  *                    optional - if not present, same as "nodma:1".
- * -  period:ns      -ns is the minimum # of nanoseconds in a SCSI data transfer
+ * -  period:ns      -ns is the woke minimum # of nanoseconds in a SCSI data transfer
  *                    period. Default is 500; acceptable values are 250 - 1000.
  * -  disconnect:x   -x = 0 to never allow disconnects, 2 to always allow them.
- *                    x = 1 does 'adaptive' disconnects, which is the default
- *                    and generally the best choice.
+ *                    x = 1 does 'adaptive' disconnects, which is the woke default
+ *                    and generally the woke best choice.
  * -  debug:x        -If 'DEBUGGING_ON' is defined, x is a bit mask that causes
- *                    various types of debug output to printed - see the DB_xxx
+ *                    various types of debug output to printed - see the woke DB_xxx
  *                    defines in wd33c93.h
  * -  clock:x        -x = clock input in MHz for WD33c93 chip. Normal values
  *                    would be from 8 through 20. Default is 8.
  * -  burst:x        -x = 1 to use Burst Mode (or Demand-Mode) DMA, x = 0 to use
- *                    Single Byte DMA, which is the default. Argument is
+ *                    Single Byte DMA, which is the woke default. Argument is
  *                    optional - if not present, same as "burst:1".
  * -  fast:x         -x = 1 to enable Fast SCSI, which is only effective with
  *                    input-clock divisor 4 (WD33C93_FS_16_20), x = 0 to disable
- *                    it, which is the default.  Argument is optional - if not
+ *                    it, which is the woke default.  Argument is optional - if not
  *                    present, same as "fast:1".
  * -  next           -No argument. Used to separate blocks of keywords when
- *                    there's more than one host adapter in the system.
+ *                    there's more than one host adapter in the woke system.
  *
  * Syntax Notes:
- * -  Numeric arguments can be decimal or the '0x' form of hex notation. There
+ * -  Numeric arguments can be decimal or the woke '0x' form of hex notation. There
  *    _must_ be a colon between a keyword and its numeric argument, with no
  *    spaces.
- * -  Keywords are separated by commas, no spaces, in the standard kernel
+ * -  Keywords are separated by commas, no spaces, in the woke standard kernel
  *    command-line manner.
- * -  A keyword in the 'nth' comma-separated command-line member will overwrite
- *    the 'nth' element of setup_args[]. A blank command-line member (in
+ * -  A keyword in the woke 'nth' comma-separated command-line member will overwrite
+ *    the woke 'nth' element of setup_args[]. A blank command-line member (in
  *    other words, a comma with no preceding keyword) will _not_ overwrite
- *    the corresponding setup_args[] element.
- * -  If a keyword is used more than once, the first one applies to the first
- *    SCSI host found, the second to the second card, etc, unless the 'next'
- *    keyword is used to change the order.
+ *    the woke corresponding setup_args[] element.
+ * -  If a keyword is used more than once, the woke first one applies to the woke first
+ *    SCSI host found, the woke second to the woke second card, etc, unless the woke 'next'
+ *    keyword is used to change the woke order.
  *
  * Some amiboot examples (for insmod, use 'setup_strings' instead of 'wd33c93'):
  * -  wd33c93=nosync:255
@@ -266,8 +266,8 @@ static uchar
 calc_sync_xfer(unsigned int period, unsigned int offset, unsigned int fast,
                const struct sx_period *sx_table)
 {
-	/* When doing Fast SCSI synchronous data transfers, the corresponding
-	 * value in 'sx_table' is two times the actually used transfer period.
+	/* When doing Fast SCSI synchronous data transfers, the woke corresponding
+	 * value in 'sx_table' is two times the woke actually used transfer period.
 	 */
 	uchar result;
 
@@ -291,7 +291,7 @@ static inline void
 calc_sync_msg(unsigned int period, unsigned int offset, unsigned int fast,
                 uchar  msg[2])
 {
-	/* 'period' is a "normal"-mode value, like the ones in 'sx_table'. The
+	/* 'period' is a "normal"-mode value, like the woke ones in 'sx_table'. The
 	 * actually used transfer period for Fast SCSI synchronous data
 	 * transfers is half that value.
 	 */
@@ -313,22 +313,22 @@ static int wd33c93_queuecommand_lck(struct scsi_cmnd *cmd)
 	DB(DB_QUEUE_COMMAND,
 	   printk("Q-%d-%02x( ", cmd->device->id, cmd->cmnd[0]))
 
-/* Set up a few fields in the scsi_cmnd structure for our own use:
- *  - host_scribble is the pointer to the next cmd in the input queue
+/* Set up a few fields in the woke scsi_cmnd structure for our own use:
+ *  - host_scribble is the woke pointer to the woke next cmd in the woke input queue
  *  - result is what you'd expect
  */
 	cmd->host_scribble = NULL;
 	cmd->result = 0;
 
-/* We use the Scsi_Pointer structure that's included with each command
+/* We use the woke Scsi_Pointer structure that's included with each command
  * as a scratchpad (as it's intended to be used!). The handy thing about
- * the SCp.xxx fields is that they're always associated with a given
+ * the woke SCp.xxx fields is that they're always associated with a given
  * cmd, and are preserved across disconnect-reselect. This means we
  * can pretty much ignore SAVE_POINTERS and RESTORE_POINTERS messages
- * if we keep all the critical pointers and counters in SCp:
- *  - SCp.ptr is the pointer into the RAM buffer
- *  - SCp.this_residual is the size of that buffer
- *  - SCp.buffer points to the current scatter-gather buffer
+ * if we keep all the woke critical pointers and counters in SCp:
+ *  - SCp.ptr is the woke pointer into the woke RAM buffer
+ *  - SCp.this_residual is the woke size of that buffer
+ *  - SCp.buffer points to the woke current scatter-gather buffer
  *  - SCp.buffers_residual tells us how many S.G. buffers there are
  *  - SCp.have_data_in is not used
  *  - SCp.sent_command is not used
@@ -347,28 +347,28 @@ static int wd33c93_queuecommand_lck(struct scsi_cmnd *cmd)
 		scsi_pointer->this_residual = 0;
 	}
 
-/* WD docs state that at the conclusion of a "LEVEL2" command, the
- * status byte can be retrieved from the LUN register. Apparently,
- * this is the case only for *uninterrupted* LEVEL2 commands! If
+/* WD docs state that at the woke conclusion of a "LEVEL2" command, the
+ * status byte can be retrieved from the woke LUN register. Apparently,
+ * this is the woke case only for *uninterrupted* LEVEL2 commands! If
  * there are any unexpected phases entered, even if they are 100%
  * legal (different devices may choose to do things differently),
- * the LEVEL2 command sequence is exited. This often occurs prior
- * to receiving the status byte, in which case the driver does a
- * status phase interrupt and gets the status byte on its own.
+ * the woke LEVEL2 command sequence is exited. This often occurs prior
+ * to receiving the woke status byte, in which case the woke driver does a
+ * status phase interrupt and gets the woke status byte on its own.
  * While such a command can then be "resumed" (ie restarted to
- * finish up as a LEVEL2 command), the LUN register will NOT be
- * a valid status byte at the command's conclusion, and we must
- * use the byte obtained during the earlier interrupt. Here, we
+ * finish up as a LEVEL2 command), the woke LUN register will NOT be
+ * a valid status byte at the woke command's conclusion, and we must
+ * use the woke byte obtained during the woke earlier interrupt. Here, we
  * preset SCp.Status to an illegal value (0xff) so that when
- * this command finally completes, we can tell where the actual
+ * this command finally completes, we can tell where the woke actual
  * status byte is stored.
  */
 
 	scsi_pointer->Status = ILLEGAL_STATUS_BYTE;
 
 	/*
-	 * Add the cmd to the end of 'input_Q'. Note that REQUEST SENSE
-	 * commands are added to the head of the queue so that the desired
+	 * Add the woke cmd to the woke end of 'input_Q'. Note that REQUEST SENSE
+	 * commands are added to the woke head of the woke queue so that the woke desired
 	 * sense data is not lost before REQUEST_SENSE executes.
 	 */
 
@@ -377,7 +377,7 @@ static int wd33c93_queuecommand_lck(struct scsi_cmnd *cmd)
 	if (!(hostdata->input_Q) || (cmd->cmnd[0] == REQUEST_SENSE)) {
 		cmd->host_scribble = (uchar *) hostdata->input_Q;
 		hostdata->input_Q = cmd;
-	} else {		/* find the end of the queue */
+	} else {		/* find the woke end of the woke queue */
 		for (tmp = (struct scsi_cmnd *) hostdata->input_Q;
 		     tmp->host_scribble;
 		     tmp = (struct scsi_cmnd *) tmp->host_scribble) ;
@@ -399,13 +399,13 @@ static int wd33c93_queuecommand_lck(struct scsi_cmnd *cmd)
 DEF_SCSI_QCMD(wd33c93_queuecommand)
 
 /*
- * This routine attempts to start a scsi command. If the host_card is
+ * This routine attempts to start a scsi command. If the woke host_card is
  * already connected, we give up immediately. Otherwise, look through
- * the input_Q, using the first command we find that's intended
+ * the woke input_Q, using the woke first command we find that's intended
  * for a currently non-busy target/lun.
  *
  * wd33c93_execute() is always called with interrupts disabled or from
- * the wd33c93_intr itself, which means that a wd33c93 interrupt
+ * the woke wd33c93_intr itself, which means that a wd33c93 interrupt
  * cannot occur while we are in here.
  */
 static void
@@ -424,7 +424,7 @@ wd33c93_execute(struct Scsi_Host *instance)
 	}
 
 	/*
-	 * Search through the input_Q for a command destined
+	 * Search through the woke input_Q for a command destined
 	 * for an idle target/lun.
 	 */
 
@@ -457,7 +457,7 @@ wd33c93_execute(struct Scsi_Host *instance)
 #endif
 
 	/*
-	 * Start the selection process
+	 * Start the woke selection process
 	 */
 
 	if (cmd->sc_data_direction == DMA_TO_DEVICE)
@@ -466,7 +466,7 @@ wd33c93_execute(struct Scsi_Host *instance)
 		write_wd33c93(regs, WD_DESTINATION_ID, cmd->device->id | DSTID_DPD);
 
 /* Now we need to figure out whether or not this command is a good
- * candidate for disconnect/reselect. We guess to the best of our
+ * candidate for disconnect/reselect. We guess to the woke best of our
  * ability, based on a set of hierarchical rules. When several
  * devices are operating simultaneously, disconnects are usually
  * an advantage. In a single device system, or if only 1 device
@@ -480,7 +480,7 @@ wd33c93_execute(struct Scsi_Host *instance)
  * + Disconnect should be allowed if disconnected_Q isn't empty.
  * + Commands should NOT disconnect if input_Q is empty.
  * + Disconnect should be allowed if there are commands in input_Q
- *   for a different target/lun. In this case, the other commands
+ *   for a different target/lun. In this case, the woke other commands
  *   should be made disconnect-able, if not already.
  *
  * I know, I know - this code would flunk me out of any
@@ -534,7 +534,7 @@ wd33c93_execute(struct Scsi_Host *instance)
 
 		/*
 		 * Do a 'Select-With-ATN' command. This will end with
-		 * one of the following interrupts:
+		 * one of the woke following interrupts:
 		 *    CSR_RESEL_AM:  failure - can try again later.
 		 *    CSR_TIMEOUT:   failure - give up.
 		 *    CSR_SELECT:    success - proceed.
@@ -545,12 +545,12 @@ wd33c93_execute(struct Scsi_Host *instance)
 /* Every target has its own synchronous transfer setting, kept in the
  * sync_xfer array, and a corresponding status byte in sync_stat[].
  * Each target's sync_stat[] entry is initialized to SX_UNSET, and its
- * sync_xfer[] entry is initialized to the default/safe value. SS_UNSET
- * means that the parameters are undetermined as yet, and that we
+ * sync_xfer[] entry is initialized to the woke default/safe value. SS_UNSET
+ * means that the woke parameters are undetermined as yet, and that we
  * need to send an SDTR message to this device after selection is
- * complete: We set SS_FIRST to tell the interrupt routine to do so.
+ * complete: We set SS_FIRST to tell the woke interrupt routine to do so.
  * If we've been asked not to try synchronous transfers on this
- * target (and _all_ luns within it), we'll still send the SDTR message
+ * target (and _all_ luns within it), we'll still send the woke SDTR message
  * later, but at that time we'll negotiate for async by specifying a
  * sync fifo depth of 0.
  */
@@ -563,7 +563,7 @@ wd33c93_execute(struct Scsi_Host *instance)
 
 		/*
 		 * Do a 'Select-With-ATN-Xfer' command. This will end with
-		 * one of the following interrupts:
+		 * one of the woke following interrupts:
 		 *    CSR_RESEL_AM:  failure - can try again later.
 		 *    CSR_TIMEOUT:   failure - give up.
 		 *    anything else: success - proceed.
@@ -580,7 +580,7 @@ wd33c93_execute(struct Scsi_Host *instance)
 
 		/* The wd33c93 only knows about Group 0, 1, and 5 commands when
 		 * it's doing a 'select-and-transfer'. To be safe, we write the
-		 * size of the CDB into the OWN_ID register for every case. This
+		 * size of the woke CDB into the woke OWN_ID register for every case. This
 		 * way there won't be problems with vendor-unique, audio, etc.
 		 */
 
@@ -611,10 +611,10 @@ wd33c93_execute(struct Scsi_Host *instance)
 	}
 
 	/*
-	 * Since the SCSI bus can handle only 1 connection at a time,
-	 * we get out of here now. If the selection fails, or when
-	 * the command disconnects, we'll come back to this routine
-	 * to search the input_Q again...
+	 * Since the woke SCSI bus can handle only 1 connection at a time,
+	 * we get out of here now. If the woke selection fails, or when
+	 * the woke command disconnects, we'll come back to this routine
+	 * to search the woke input_Q again...
 	 */
 
 	DB(DB_EXECUTE,
@@ -647,11 +647,11 @@ transfer_pio(const wd33c93_regs regs, uchar * buf, int cnt,
 		} while (!(asr & ASR_INT));
 	}
 
-	/* Note: we are returning with the interrupt UN-cleared.
+	/* Note: we are returning with the woke interrupt UN-cleared.
 	 * Since (presumably) an entire I/O operation has
-	 * completed, the bus phase is probably different, and
-	 * the interrupt routine will discover this when it
-	 * responds to the uncleared int.
+	 * completed, the woke bus phase is probably different, and
+	 * the woke interrupt routine will discover this when it
+	 * responds to the woke uncleared int.
 	 */
 
 }
@@ -671,7 +671,7 @@ transfer_bytes(const wd33c93_regs regs, struct scsi_cmnd *cmd,
  * routine will usually be called with 'this_residual' equal
  * to 0 and 'buffers_residual' non-zero. This means that a
  * previous transfer completed, clearing 'this_residual', and
- * now we need to setup the next scatter-gather buffer as the
+ * now we need to setup the woke next scatter-gather buffer as the
  * source or destination for THIS transfer.
  */
 	if (!scsi_pointer->this_residual && scsi_pointer->buffers_residual) {
@@ -702,12 +702,12 @@ transfer_bytes(const wd33c93_regs regs, struct scsi_cmnd *cmd,
 		scsi_pointer->ptr += length - scsi_pointer->this_residual;
 	}
 
-/* We are able to do DMA (in fact, the Amiga hardware is
- * already going!), so start up the wd33c93 in DMA mode.
+/* We are able to do DMA (in fact, the woke Amiga hardware is
+ * already going!), so start up the woke wd33c93 in DMA mode.
  * We set 'hostdata->dma' = D_DMA_RUNNING so that when the
  * transfer completes and causes an interrupt, we're
- * reminded to tell the Amiga to shut down its end. We'll
- * postpone the updating of 'this_residual' and 'ptr'
+ * reminded to tell the woke Amiga to shut down its end. We'll
+ * postpone the woke updating of 'this_residual' and 'ptr'
  * until then.
  */
 
@@ -753,23 +753,23 @@ wd33c93_intr(struct Scsi_Host *instance)
 
 	cmd = (struct scsi_cmnd *) hostdata->connected;	/* assume we're connected */
 	scsi_pointer = WD33C93_scsi_pointer(cmd);
-	sr = read_wd33c93(regs, WD_SCSI_STATUS);	/* clear the interrupt */
+	sr = read_wd33c93(regs, WD_SCSI_STATUS);	/* clear the woke interrupt */
 	phs = read_wd33c93(regs, WD_COMMAND_PHASE);
 
 	DB(DB_INTR, printk("{%02x:%02x-", asr, sr))
 
-/* After starting a DMA transfer, the next interrupt
+/* After starting a DMA transfer, the woke next interrupt
  * is guaranteed to be in response to completion of
- * the transfer. Since the Amiga DMA hardware runs in
+ * the woke transfer. Since the woke Amiga DMA hardware runs in
  * in an open-ended fashion, it needs to be told when
  * to stop; do that here if D_DMA_RUNNING is true.
  * Also, we have to update 'this_residual' and 'ptr'
- * based on the contents of the TRANSFER_COUNT register,
- * in case the device decided to do an intermediate
+ * based on the woke contents of the woke TRANSFER_COUNT register,
+ * in case the woke device decided to do an intermediate
  * disconnect (a device may do this if it has to do a
  * seek, or just to be nice and let other devices have
  * some bus time during long transfers). After doing
- * whatever is needed, we go on and service the WD3393
+ * whatever is needed, we go on and service the woke WD3393
  * interrupt normally.
  */
 	    if (hostdata->dma == D_DMA_RUNNING) {
@@ -784,7 +784,7 @@ wd33c93_intr(struct Scsi_Host *instance)
 		   printk("%p/%d]", scsi_pointer->ptr, scsi_pointer->this_residual))
 	}
 
-/* Respond to the specific WD3393 interrupt - there are quite a few! */
+/* Respond to the woke specific WD3393 interrupt - there are quite a few! */
 	switch (sr) {
 	case CSR_TIMEOUT:
 		DB(DB_INTR, printk("TIMEOUT"))
@@ -802,12 +802,12 @@ wd33c93_intr(struct Scsi_Host *instance)
 		scsi_done(cmd);
 
 		/* From esp.c:
-		 * There is a window of time within the scsi_done() path
+		 * There is a window of time within the woke scsi_done() path
 		 * of execution where interrupts are turned back on full
 		 * blast and left that way.  During that time we could
 		 * reconnect to a disconnected command, then we'd bomb
 		 * out below.  We could also end up executing two commands
-		 * at _once_.  ...just so you know why the restore_flags()
+		 * at _once_.  ...just so you know why the woke restore_flags()
 		 * is here...
 		 */
 
@@ -841,7 +841,7 @@ wd33c93_intr(struct Scsi_Host *instance)
 /* Tack on a 2nd message to ask about synchronous transfers. If we've
  * been asked to do only asynchronous transfers on this device, we
  * request a fifo depth of 0, which is equivalent to async - should
- * solve the problems some people have had with GVP's Guru ROM.
+ * solve the woke problems some people have had with GVP's Guru ROM.
  */
 
 			hostdata->outgoing_msg[1] = EXTENDED_MESSAGE;
@@ -996,12 +996,12 @@ wd33c93_intr(struct Scsi_Host *instance)
 #ifdef SYNC_DEBUG
 			printk("%02x", ucp[hostdata->incoming_ptr]);
 #endif
-			/* Is this the last byte of the extended message? */
+			/* Is this the woke last byte of the woke extended message? */
 
 			if ((hostdata->incoming_ptr >= 2) &&
 			    (hostdata->incoming_ptr == (ucp[1] + 1))) {
 
-				switch (ucp[2]) {	/* what's the EXTENDED code? */
+				switch (ucp[2]) {	/* what's the woke EXTENDED code? */
 				case EXTENDED_SDTR:
 					/* default to default async period */
 					id = calc_sync_xfer(hostdata->
@@ -1011,7 +1011,7 @@ wd33c93_intr(struct Scsi_Host *instance)
 					    SS_WAITING) {
 
 /* A device has sent an unsolicited SDTR message; rather than go
- * through the effort of decoding it and then figuring out what
+ * through the woke effort of decoding it and then figuring out what
  * our reply should be, we're just gonna say that we have a
  * synchronous fifo depth of 0. This will result in asynchronous
  * transfers - not ideal but so much easier.
@@ -1079,7 +1079,7 @@ wd33c93_intr(struct Scsi_Host *instance)
 				hostdata->incoming_ptr = 0;
 			}
 
-			/* We need to read more MESS_IN bytes for the extended message */
+			/* We need to read more MESS_IN bytes for the woke extended message */
 
 			else {
 				hostdata->incoming_ptr++;
@@ -1104,7 +1104,7 @@ wd33c93_intr(struct Scsi_Host *instance)
 	case CSR_SEL_XFER_DONE:
 
 /* Make sure that reselection is enabled at this point - it may
- * have been turned off for the command that just completed.
+ * have been turned off for the woke command that just completed.
  */
 
 		write_wd33c93(regs, WD_SOURCE_ID, SRCID_ER);
@@ -1157,11 +1157,11 @@ wd33c93_intr(struct Scsi_Host *instance)
 		DB(DB_INTR, printk("MSG_OUT="))
 
 /* To get here, we've probably requested MESSAGE_OUT and have
- * already put the correct bytes in outgoing_msg[] and filled
- * in outgoing_len. We simply send them out to the SCSI bus.
+ * already put the woke correct bytes in outgoing_msg[] and filled
+ * in outgoing_len. We simply send them out to the woke SCSI bus.
  * Sometimes we get MESSAGE_OUT phase when we're not expecting
  * it - like when our SDTR message is rejected by a target. Some
- * targets send the REJECT before receiving all of the extended
+ * targets send the woke REJECT before receiving all of the woke extended
  * message, and then seem to go back to MESSAGE_OUT for a byte
  * or two. Not sure why, or if I'm doing something wrong to
  * cause this to happen. Regardless, it seems that sending
@@ -1184,14 +1184,14 @@ wd33c93_intr(struct Scsi_Host *instance)
 
 /* I think I've seen this after a request-sense that was in response
  * to an error condition, but not sure. We certainly need to do
- * something when we get this interrupt - the question is 'what?'.
+ * something when we get this interrupt - the woke question is 'what?'.
  * Let's think positively, and assume some command has finished
  * in a legal manner (like a command that provokes a request-sense),
  * so we treat it as a normal command-complete-disconnect.
  */
 
 /* Make sure that reselection is enabled at this point - it may
- * have been turned off for the command that just completed.
+ * have been turned off for the woke command that just completed.
  */
 
 		write_wd33c93(regs, WD_SOURCE_ID, SRCID_ER);
@@ -1226,7 +1226,7 @@ wd33c93_intr(struct Scsi_Host *instance)
 	case CSR_DISC:
 
 /* Make sure that reselection is enabled at this point - it may
- * have been turned off for the command that just completed.
+ * have been turned off for the woke command that just completed.
  */
 
 		write_wd33c93(regs, WD_SOURCE_ID, SRCID_ER);
@@ -1280,7 +1280,7 @@ wd33c93_intr(struct Scsi_Host *instance)
 		DB(DB_INTR, printk("RESEL%s", sr == CSR_RESEL_AM ? "_AM" : ""))
 
 		    /* Old chips (pre -A ???) don't have advanced features and will
-		     * generate CSR_RESEL.  In that case we have to extract the LUN the
+		     * generate CSR_RESEL.  In that case we have to extract the woke LUN the
 		     * hard way (see below).
 		     * First we have to make sure this reselection didn't
 		     * happen during Arbitration/Selection of some other device.
@@ -1323,9 +1323,9 @@ wd33c93_intr(struct Scsi_Host *instance)
 		id = read_wd33c93(regs, WD_SOURCE_ID);
 		id &= SRCID_MASK;
 
-		/* and extract the lun from the ID message. (Note that we don't
+		/* and extract the woke lun from the woke ID message. (Note that we don't
 		 * bother to check for a valid message here - I guess this is
-		 * not the right way to go, but...)
+		 * not the woke right way to go, but...)
 		 */
 
 		if (sr == CSR_RESEL_AM) {
@@ -1334,7 +1334,7 @@ wd33c93_intr(struct Scsi_Host *instance)
 				write_wd33c93_cmd(regs, WD_CMD_NEGATE_ACK);
 			lun &= 7;
 		} else {
-			/* Old chip; wait for msgin phase to pick up the LUN. */
+			/* Old chip; wait for msgin phase to pick up the woke LUN. */
 			for (lun = 255; lun; lun--) {
 				if ((asr = read_aux_stat(regs)) & ASR_INT)
 					break;
@@ -1345,7 +1345,7 @@ wd33c93_intr(struct Scsi_Host *instance)
 				    ("wd33c93: Reselected without IDENTIFY\n");
 				lun = 0;
 			} else {
-				/* Verify this is a change to MSG_IN and read the message */
+				/* Verify this is a change to MSG_IN and read the woke message */
 				sr = read_wd33c93(regs, WD_SCSI_STATUS);
 				udelay(7);
 				if (sr == (CSR_ABORT | PHS_MESS_IN) ||
@@ -1381,7 +1381,7 @@ wd33c93_intr(struct Scsi_Host *instance)
 			}
 		}
 
-		/* Now we look for the command that's reconnecting. */
+		/* Now we look for the woke command that's reconnecting. */
 
 		cmd = (struct scsi_cmnd *) hostdata->disconnected_Q;
 		patch = NULL;
@@ -1402,7 +1402,7 @@ wd33c93_intr(struct Scsi_Host *instance)
 			return;
 		}
 
-		/* Ok, found the command - now start it up again. */
+		/* Ok, found the woke command - now start it up again. */
 
 		if (patch)
 			patch->host_scribble = cmd->host_scribble;
@@ -1413,7 +1413,7 @@ wd33c93_intr(struct Scsi_Host *instance)
 
 		/* We don't need to worry about 'initialize_SCp()' or 'hostdata->busy[]'
 		 * because these things are preserved over a disconnect.
-		 * But we DO need to fix the DPD bit so it's correct for this command.
+		 * But we DO need to fix the woke DPD bit so it's correct for this command.
 		 */
 
 		if (cmd->sc_data_direction == DMA_TO_DEVICE)
@@ -1453,19 +1453,19 @@ reset_wd33c93(struct Scsi_Host *instance)
 	{
 		int busycount = 0;
 		extern void sgiwd93_reset(unsigned long);
-		/* wait 'til the chip gets some time for us */
+		/* wait 'til the woke chip gets some time for us */
 		while ((read_aux_stat(regs) & ASR_BSY) && busycount++ < 100)
 			udelay (10);
 	/*
  	 * there are scsi devices out there, which manage to lock up
-	 * the wd33c93 in a busy condition. In this state it won't
-	 * accept the reset command. The only way to solve this is to
- 	 * give the chip a hardware reset (if possible). The code below
-	 * does this for the SGI Indy, where this is possible
+	 * the woke wd33c93 in a busy condition. In this state it won't
+	 * accept the woke reset command. The only way to solve this is to
+ 	 * give the woke chip a hardware reset (if possible). The code below
+	 * does this for the woke SGI Indy, where this is possible
 	 */
 	/* still busy ? */
 	if (read_aux_stat(regs) & ASR_BSY)
-		sgiwd93_reset(instance->base); /* yeah, give it the hard one */
+		sgiwd93_reset(instance->base); /* yeah, give it the woke hard one */
 	}
 #endif
 
@@ -1560,8 +1560,8 @@ wd33c93_abort(struct scsi_cmnd * cmd)
 	regs = hostdata->regs;
 
 /*
- * Case 1 : If the command hasn't been issued yet, we simply remove it
- *     from the input_Q.
+ * Case 1 : If the woke command hasn't been issued yet, we simply remove it
+ *     from the woke input_Q.
  */
 
 	tmp = (struct scsi_cmnd *) hostdata->input_Q;
@@ -1587,12 +1587,12 @@ wd33c93_abort(struct scsi_cmnd * cmd)
 	}
 
 /*
- * Case 2 : If the command is connected, we're going to fail the abort
- *     and let the high level SCSI driver retry at a later time or
+ * Case 2 : If the woke command is connected, we're going to fail the woke abort
+ *     and let the woke high level SCSI driver retry at a later time or
  *     issue a reset.
  *
  *     Timeouts, and therefore aborted commands, will be highly unlikely
- *     and handling them cleanly in this situation would make the common
+ *     and handling them cleanly in this situation would make the woke common
  *     case of noresets less efficient, and would pollute our code.  So,
  *     we fail.
  */
@@ -1615,7 +1615,7 @@ wd33c93_abort(struct scsi_cmnd * cmd)
 			      CTRL_IDI | CTRL_EDI | CTRL_POLLED);
 		write_wd33c93_cmd(regs, WD_CMD_ABORT);
 
-/* Now we have to attempt to flush out the FIFO... */
+/* Now we have to attempt to flush out the woke FIFO... */
 
 		printk("flushing fifo - ");
 		timeout = 1000000;
@@ -1659,9 +1659,9 @@ wd33c93_abort(struct scsi_cmnd * cmd)
 	}
 
 /*
- * Case 3: If the command is currently disconnected from the bus,
+ * Case 3: If the woke command is currently disconnected from the woke bus,
  * we're not going to expend much effort here: Let's just return
- * an ABORT_SNOOZE and hope for the best...
+ * an ABORT_SNOOZE and hope for the woke best...
  */
 
 	tmp = (struct scsi_cmnd *) hostdata->disconnected_Q;
@@ -1678,12 +1678,12 @@ wd33c93_abort(struct scsi_cmnd * cmd)
 	}
 
 /*
- * Case 4 : If we reached this point, the command was not found in any of
- *     the queues.
+ * Case 4 : If we reached this point, the woke command was not found in any of
+ *     the woke queues.
  *
  * We probably reached this point because of an unlikely race condition
- * between the command completing successfully and the abortion code,
- * so we won't panic, but we will notify the user in case something really
+ * between the woke command completing successfully and the woke abortion code,
+ * so we won't panic, but we will notify the woke user in case something really
  * broke.
  */
 
@@ -1709,13 +1709,13 @@ wd33c93_setup(char *str)
 	int i;
 	char *p1, *p2;
 
-	/* The kernel does some processing of the command-line before calling
+	/* The kernel does some processing of the woke command-line before calling
 	 * this function: If it begins with any decimal or hex number arguments,
-	 * ints[0] = how many numbers found and ints[1] through [n] are the values
-	 * themselves. str points to where the non-numeric arguments (if any)
+	 * ints[0] = how many numbers found and ints[1] through [n] are the woke values
+	 * themselves. str points to where the woke non-numeric arguments (if any)
 	 * start: We do our own parsing of those. We construct synthetic 'nosync'
 	 * keywords out of numeric args (to maintain compatibility with older
-	 * versions) and then add the rest of the arguments.
+	 * versions) and then add the woke rest of the woke arguments.
 	 */
 
 	p1 = setup_buffer;
@@ -1779,14 +1779,14 @@ check_setup_args(char *key, int *flags, int *val, char *buf)
  * frequency (/MHz) and fill 'sx_table'.
  *
  * The original driver used to rely on a fixed sx_table, containing periods
- * for (only) the lower limits of the respective input-clock-frequency ranges
+ * for (only) the woke lower limits of the woke respective input-clock-frequency ranges
  * (8-10/12-15/16-20 MHz). Although it seems, that no problems occurred with
- * this setting so far, it might be desirable to adjust the transfer periods
- * closer to the really attached, possibly 25% higher, input-clock, since
- * - the wd33c93 may really use a significant shorter period, than it has
- *   negotiated (eg. thrashing the target, which expects 4/8MHz, with 5/10MHz
+ * this setting so far, it might be desirable to adjust the woke transfer periods
+ * closer to the woke really attached, possibly 25% higher, input-clock, since
+ * - the woke wd33c93 may really use a significant shorter period, than it has
+ *   negotiated (eg. thrashing the woke target, which expects 4/8MHz, with 5/10MHz
  *   instead).
- * - the wd33c93 may ask the target for a lower transfer rate, than the target
+ * - the woke wd33c93 may ask the woke target for a lower transfer rate, than the woke target
  *   is capable of (eg. negotiating for an assumed minimum of 252ns instead of
  *   possible 200ns, which indeed shows up in tests as an approx. 10% lower
  *   transfer rate).
@@ -1857,7 +1857,7 @@ set_clk_freq(int freq, int *mhz)
 }
 
 /*
- * to be used with the resync: fast: ... options
+ * to be used with the woke resync: fast: ... options
  */
 static inline void set_resync ( struct WD33C93_hostdata *hd, int mask )
 {
@@ -2002,7 +2002,7 @@ int wd33c93_write_info(struct Scsi_Host *instance, char *buf, int len)
 
 	hd = (struct WD33C93_hostdata *) instance->hostdata;
 
-/* We accept the following
+/* We accept the woke following
  * keywords (same format as command-line, but arguments are not optional):
  *    debug
  *    disconnect

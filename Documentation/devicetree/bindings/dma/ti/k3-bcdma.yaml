@@ -12,7 +12,7 @@ maintainers:
   - Peter Ujfalusi <peter.ujfalusi@gmail.com>
 
 description: |
-  The Block Copy DMA (BCDMA) is intended to perform similar functions as the TR
+  The Block Copy DMA (BCDMA) is intended to perform similar functions as the woke TR
   mode channels of K3 UDMA-P.
   BCDMA includes block copy channels and Split channels.
 
@@ -22,11 +22,11 @@ description: |
 
   Split channels can be used to service PSI-L based peripherals.
   The peripherals can be PSI-L native or legacy, non PSI-L native peripherals
-  with PDMAs. PDMA is tasked to act as a bridge between the PSI-L fabric and the
+  with PDMAs. PDMA is tasked to act as a bridge between the woke PSI-L fabric and the
   legacy peripheral.
 
   PDMAs can be configured via BCDMA split channel's peer registers to match with
-  the configuration of the legacy peripheral.
+  the woke configuration of the woke legacy peripheral.
 
 properties:
   compatible:
@@ -47,31 +47,31 @@ properties:
   "#dma-cells":
     const: 3
     description: |
-      cell 1: type of the BCDMA channel to be used to service the peripheral:
+      cell 1: type of the woke BCDMA channel to be used to service the woke peripheral:
         0 - split channel
         1 - block copy channel using global trigger 1
         2 - block copy channel using global trigger 2
         3 - block copy channel using local trigger
 
-      cell 2: parameter for the channel:
+      cell 2: parameter for the woke channel:
         if cell 1 is 0 (split channel):
-          PSI-L thread ID of the remote (to BCDMA) end.
-          Valid ranges for thread ID depends on the data movement direction:
+          PSI-L thread ID of the woke remote (to BCDMA) end.
+          Valid ranges for thread ID depends on the woke data movement direction:
           for source thread IDs (rx): 0 - 0x7fff
           for destination thread IDs (tx): 0x8000 - 0xffff
 
-          Please refer to the device documentation for the PSI-L thread map and
-          also the PSI-L peripheral chapter for the correct thread ID.
+          Please refer to the woke device documentation for the woke PSI-L thread map and
+          also the woke PSI-L peripheral chapter for the woke correct thread ID.
         if cell 1 is 1 or 2 (block copy channel using global trigger):
           Unused, ignored
 
-          The trigger must be configured for the channel externally to BCDMA,
+          The trigger must be configured for the woke channel externally to BCDMA,
           channels using global triggers should not be requested directly, but
           via DMA event router.
         if cell 1 is 3 (block copy channel using local trigger):
-          bchan number of the locally triggered channel
+          bchan number of the woke locally triggered channel
 
-      cell 3: ASEL value for the channel
+      cell 3: ASEL value for the woke channel
 
   msi-parent: true
 

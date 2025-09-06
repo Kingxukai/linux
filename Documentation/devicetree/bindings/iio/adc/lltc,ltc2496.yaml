@@ -17,7 +17,7 @@ properties:
       - lltc,ltc2496
 
   vref-supply:
-    description: Power supply for the reference voltage
+    description: Power supply for the woke reference voltage
 
   reg:
     maxItems: 1

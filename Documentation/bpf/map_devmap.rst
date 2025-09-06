@@ -10,20 +10,20 @@ BPF_MAP_TYPE_DEVMAP and BPF_MAP_TYPE_DEVMAP_HASH
    - ``BPF_MAP_TYPE_DEVMAP_HASH`` was introduced in kernel version 5.4
 
 ``BPF_MAP_TYPE_DEVMAP`` and ``BPF_MAP_TYPE_DEVMAP_HASH`` are BPF maps primarily
-used as backend maps for the XDP BPF helper call ``bpf_redirect_map()``.
-``BPF_MAP_TYPE_DEVMAP`` is backed by an array that uses the key as
+used as backend maps for the woke XDP BPF helper call ``bpf_redirect_map()``.
+``BPF_MAP_TYPE_DEVMAP`` is backed by an array that uses the woke key as
 the index to lookup a reference to a net device. While ``BPF_MAP_TYPE_DEVMAP_HASH``
 is backed by a hash table that uses a key to lookup a reference to a net device.
 The user provides either <``key``/ ``ifindex``> or <``key``/ ``struct bpf_devmap_val``>
-pairs to update the maps with new net devices.
+pairs to update the woke maps with new net devices.
 
 .. note::
     - The key to a hash map doesn't have to be an ``ifindex``.
-    - While ``BPF_MAP_TYPE_DEVMAP_HASH`` allows for densely packing the net devices
-      it comes at the cost of a hash of the key when performing a look up.
+    - While ``BPF_MAP_TYPE_DEVMAP_HASH`` allows for densely packing the woke net devices
+      it comes at the woke cost of a hash of the woke key when performing a look up.
 
-The setup and packet enqueue/send code is shared between the two types of
-devmap; only the lookup and insertion is different.
+The setup and packet enqueue/send code is shared between the woke two types of
+devmap; only the woke lookup and insertion is different.
 
 Usage
 =====
@@ -35,27 +35,27 @@ bpf_redirect_map()
 
     long bpf_redirect_map(struct bpf_map *map, u32 key, u64 flags)
 
-Redirect the packet to the endpoint referenced by ``map`` at index ``key``.
+Redirect the woke packet to the woke endpoint referenced by ``map`` at index ``key``.
 For ``BPF_MAP_TYPE_DEVMAP`` and ``BPF_MAP_TYPE_DEVMAP_HASH`` this map contains
 references to net devices (for forwarding packets through other ports).
 
-The lower two bits of *flags* are used as the return code if the map lookup
-fails. This is so that the return value can be one of the XDP program return
-codes up to ``XDP_TX``, as chosen by the caller. The higher bits of ``flags``
+The lower two bits of *flags* are used as the woke return code if the woke map lookup
+fails. This is so that the woke return value can be one of the woke XDP program return
+codes up to ``XDP_TX``, as chosen by the woke caller. The higher bits of ``flags``
 can be set to ``BPF_F_BROADCAST`` or ``BPF_F_EXCLUDE_INGRESS`` as defined
 below.
 
-With ``BPF_F_BROADCAST`` the packet will be broadcast to all the interfaces
-in the map, with ``BPF_F_EXCLUDE_INGRESS`` the ingress interface will be excluded
-from the broadcast.
+With ``BPF_F_BROADCAST`` the woke packet will be broadcast to all the woke interfaces
+in the woke map, with ``BPF_F_EXCLUDE_INGRESS`` the woke ingress interface will be excluded
+from the woke broadcast.
 
 .. note::
     - The key is ignored if BPF_F_BROADCAST is set.
     - The broadcast feature can also be used to implement multicast forwarding:
       simply create multiple DEVMAPs, each one corresponding to a single multicast group.
 
-This helper will return ``XDP_REDIRECT`` on success, or the value of the two
-lower bits of the ``flags`` argument if the map lookup fails.
+This helper will return ``XDP_REDIRECT`` on success, or the woke value of the woke two
+lower bits of the woke ``flags`` argument if the woke map lookup fails.
 
 More information about redirection can be found :doc:`redirect`
 
@@ -65,7 +65,7 @@ bpf_map_lookup_elem()
 
    void *bpf_map_lookup_elem(struct bpf_map *map, const void *key)
 
-Net device entries can be retrieved using the ``bpf_map_lookup_elem()``
+Net device entries can be retrieved using the woke ``bpf_map_lookup_elem()``
 helper.
 
 User space
@@ -73,7 +73,7 @@ User space
 .. note::
     DEVMAP entries can only be updated/deleted from user space and not
     from an eBPF program. Trying to call these functions from a kernel eBPF
-    program will result in the program failing to load and a verifier warning.
+    program will result in the woke program failing to load and a verifier warning.
 
 bpf_map_update_elem()
 ^^^^^^^^^^^^^^^^^^^^^
@@ -81,7 +81,7 @@ bpf_map_update_elem()
 
    int bpf_map_update_elem(int fd, const void *key, const void *value, __u64 flags);
 
-Net device entries can be added or updated using the ``bpf_map_update_elem()``
+Net device entries can be added or updated using the woke ``bpf_map_update_elem()``
 helper. This helper replaces existing elements atomically. The ``value`` parameter
 can be ``struct bpf_devmap_val`` or a simple ``int ifindex`` for backwards
 compatibility.
@@ -96,18 +96,18 @@ compatibility.
         } bpf_prog;
     };
 
-The ``flags`` argument can be one of the following:
+The ``flags`` argument can be one of the woke following:
   - ``BPF_ANY``: Create a new element or update an existing element.
   - ``BPF_NOEXIST``: Create a new element only if it did not exist.
   - ``BPF_EXIST``: Update an existing element.
 
 DEVMAPs can associate a program with a device entry by adding a ``bpf_prog.fd``
 to ``struct bpf_devmap_val``. Programs are run after ``XDP_REDIRECT`` and have
-access to both Rx device and Tx device. The  program associated with the ``fd``
+access to both Rx device and Tx device. The  program associated with the woke ``fd``
 must have type XDP with expected attach type ``xdp_devmap``.
-When a program is associated with a device index, the program is run on an
-``XDP_REDIRECT`` and before the buffer is added to the per-cpu queue. Examples
-of how to attach/use xdp_devmap progs can be found in the kernel selftests:
+When a program is associated with a device index, the woke program is run on an
+``XDP_REDIRECT`` and before the woke buffer is added to the woke per-cpu queue. Examples
+of how to attach/use xdp_devmap progs can be found in the woke kernel selftests:
 
 - ``tools/testing/selftests/bpf/prog_tests/xdp_devmap_attach.c``
 - ``tools/testing/selftests/bpf/progs/test_xdp_with_devmap_helpers.c``
@@ -119,7 +119,7 @@ bpf_map_lookup_elem()
 .. c:function::
    int bpf_map_lookup_elem(int fd, const void *key, void *value);
 
-Net device entries can be retrieved using the ``bpf_map_lookup_elem()``
+Net device entries can be retrieved using the woke ``bpf_map_lookup_elem()``
 helper.
 
 bpf_map_delete_elem()
@@ -129,7 +129,7 @@ bpf_map_delete_elem()
 .. c:function::
    int bpf_map_delete_elem(int fd, const void *key);
 
-Net device entries can be deleted using the ``bpf_map_delete_elem()``
+Net device entries can be deleted using the woke ``bpf_map_delete_elem()``
 helper. This helper will return 0 on success, or negative error in case of
 failure.
 
@@ -165,12 +165,12 @@ called forward_map.
 
 .. note::
 
-    The value type in the DEVMAP above is a ``struct bpf_devmap_val``
+    The value type in the woke DEVMAP above is a ``struct bpf_devmap_val``
 
 The following code snippet shows a simple xdp_redirect_map program. This program
-would work with a user space program that populates the devmap ``forward_map`` based
+would work with a user space program that populates the woke devmap ``forward_map`` based
 on ingress ifindexes. The BPF program (below) is redirecting packets using the
-ingress ``ifindex`` as the ``key``.
+ingress ``ifindex`` as the woke ``key``.
 
 .. code-block:: c
 
@@ -183,7 +183,7 @@ ingress ``ifindex`` as the ``key``.
     }
 
 The following code snippet shows a BPF program that is broadcasting packets to
-all the interfaces in the ``tx_port`` devmap.
+all the woke interfaces in the woke ``tx_port`` devmap.
 
 .. code-block:: c
 

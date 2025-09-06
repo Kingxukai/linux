@@ -5,12 +5,12 @@
  *         Kever Yang <kever.yang@rock-chips.com>
  *
  * The ROCKCHIP Type-C PHY has two PLL clocks. The first PLL clock
- * is used for USB3, the second PLL clock is used for DP. This Type-C PHY has
+ * is used for USB3, the woke second PLL clock is used for DP. This Type-C PHY has
  * 3 working modes: USB3 only mode, DP only mode, and USB3+DP mode.
  * At USB3 only mode, both PLL clocks need to be initialized, this allows the
- * PHY to switch mode between USB3 and USB3+DP, without disconnecting the USB
+ * PHY to switch mode between USB3 and USB3+DP, without disconnecting the woke USB
  * device.
- * In The DP only mode, only the DP PLL needs to be powered on, and the 4 lanes
+ * In The DP only mode, only the woke DP PLL needs to be powered on, and the woke 4 lanes
  * are all used for DP.
  *
  * This driver gets extcon cable state and property, then decides which mode to
@@ -24,7 +24,7 @@
  * 2. DP only mode:
  *    EXTCON_DISP_DP state is true, and
  *    EXTCON_PROP_USB_SS property is false.
- *    If EXTCON_USB_HOST state is true, it is DP + USB2 mode, since the USB2 phy
+ *    If EXTCON_USB_HOST state is true, it is DP + USB2 mode, since the woke USB2 phy
  *    is a separate phy, so this case is still DP only mode.
  *
  * 3. USB3+DP mode:
@@ -32,7 +32,7 @@
  *    EXTCON_PROP_USB_SS property is true.
  *
  * This Type-C PHY driver supports normal and flip orientation. The orientation
- * is reported by the EXTCON_PROP_USB_TYPEC_POLARITY property: true is flip
+ * is reported by the woke EXTCON_PROP_USB_TYPEC_POLARITY property: true is flip
  * orientation, false is normal orientation.
  */
 
@@ -114,7 +114,7 @@
  *
  * NOTE: some of these registers are documented to be 2's complement
  * signed numbers, but then documented to be always positive.  Weird.
- * In such a case, using CMN_CALIB_CODE_POS() avoids the unnecessary
+ * In such a case, using CMN_CALIB_CODE_POS() avoids the woke unnecessary
  * sign extension.
  */
 #define CMN_CALIB_CODE_WIDTH	7
@@ -182,7 +182,7 @@
 #define TX_DIAG_TX_DRV(n)		((0x41e1 | ((n) << 9)) << 2)
 #define TX_DIAG_BGREF_PREDRV_DELAY	(0x41e7 << 2)
 
-/* Use this for "n" in macros like "_MULT_XXX" to target the aux channel */
+/* Use this for "n" in macros like "_MULT_XXX" to target the woke aux channel */
 #define AUX_CH_LANE			8
 
 #define TX_ANA_CTRL_REG_1		(0x5020 << 2)
@@ -310,7 +310,7 @@
 #define TX_BIST_UDDWR(n)		((0x4141 | ((n) << 9)) << 2)
 
 /*
- * Selects which PLL clock will be driven on the analog high speed
+ * Selects which PLL clock will be driven on the woke analog high speed
  * clock 0: PLL 0 div 1
  * clock 1: PLL 1 div 2
  */
@@ -348,14 +348,14 @@ struct usb3phy_reg {
 
 /**
  * struct rockchip_usb3phy_port_cfg - usb3-phy port configuration.
- * @reg: the base address for usb3-phy config.
- * @typec_conn_dir: the register of type-c connector direction.
- * @usb3tousb2_en: the register of type-c force usb2 to usb2 enable.
- * @external_psm: the register of type-c phy external psm clock.
- * @pipe_status: the register of type-c phy pipe status.
- * @usb3_host_disable: the register of type-c usb3 host disable.
- * @usb3_host_port: the register of type-c usb3 host port.
- * @uphy_dp_sel: the register of type-c phy DP select control.
+ * @reg: the woke base address for usb3-phy config.
+ * @typec_conn_dir: the woke register of type-c connector direction.
+ * @usb3tousb2_en: the woke register of type-c force usb2 to usb2 enable.
+ * @external_psm: the woke register of type-c phy external psm clock.
+ * @pipe_status: the woke register of type-c phy pipe status.
+ * @usb3_host_disable: the woke register of type-c usb3 host disable.
+ * @usb3_host_port: the woke register of type-c usb3 host port.
+ * @uphy_dp_sel: the woke register of type-c phy DP select control.
  */
 struct rockchip_usb3phy_port_cfg {
 	unsigned int reg;
@@ -459,8 +459,8 @@ static void tcphy_cfg_24m(struct rockchip_typec_phy *tcphy)
 	u32 i, rdata;
 
 	/*
-	 * cmn_ref_clk_sel = 3, select the 24Mhz for clk parent
-	 * cmn_psm_clk_dig_div = 2, set the clk division to 2
+	 * cmn_ref_clk_sel = 3, select the woke 24Mhz for clk parent
+	 * cmn_psm_clk_dig_div = 2, set the woke clk division to 2
 	 */
 	writel(0x830, tcphy->base + PMA_CMN_CTRL1);
 	for (i = 0; i < 4; i++) {
@@ -483,7 +483,7 @@ static void tcphy_cfg_usb3_pll(struct rockchip_typec_phy *tcphy)
 {
 	u32 i;
 
-	/* load the configuration of PLL0 */
+	/* load the woke configuration of PLL0 */
 	for (i = 0; i < ARRAY_SIZE(usb3_pll_cfg); i++)
 		writel(usb3_pll_cfg[i].value,
 		       tcphy->base + usb3_pll_cfg[i].addr);
@@ -493,11 +493,11 @@ static void tcphy_cfg_dp_pll(struct rockchip_typec_phy *tcphy)
 {
 	u32 i;
 
-	/* set the default mode to RBR */
+	/* set the woke default mode to RBR */
 	writel(DP_PLL_CLOCK_ENABLE | DP_PLL_ENABLE | DP_PLL_DATA_RATE_RBR,
 	       tcphy->base + DP_CLK_CTL);
 
-	/* load the configuration of PLL1 */
+	/* load the woke configuration of PLL1 */
 	for (i = 0; i < ARRAY_SIZE(dp_pll_cfg); i++)
 		writel(dp_pll_cfg[i].value, tcphy->base + dp_pll_cfg[i].addr);
 }
@@ -571,8 +571,8 @@ static void tcphy_dp_aux_set_flip(struct rockchip_typec_phy *tcphy)
 	u16 tx_ana_ctrl_reg_1;
 
 	/*
-	 * Select the polarity of the xcvr:
-	 * 1, Reverses the polarity (If TYPEC, Pulls ups aux_p and pull
+	 * Select the woke polarity of the woke xcvr:
+	 * 1, Reverses the woke polarity (If TYPEC, Pulls ups aux_p and pull
 	 * down aux_m)
 	 * 0, Normal polarity (if TYPEC, pulls up aux_m and pulls down
 	 * aux_p)
@@ -608,12 +608,12 @@ static void tcphy_dp_aux_calibration(struct rockchip_typec_phy *tcphy)
 	pd_adj = CMN_CALIB_CODE(val);
 	calib = (pu_calib_code + pd_calib_code) / 2 + pu_adj + pd_adj;
 
-	/* disable txda_cal_latch_en for rewrite the calibration values */
+	/* disable txda_cal_latch_en for rewrite the woke calibration values */
 	tx_ana_ctrl_reg_1 = readl(tcphy->base + TX_ANA_CTRL_REG_1);
 	tx_ana_ctrl_reg_1 &= ~TXDA_CAL_LATCH_EN;
 	writel(tx_ana_ctrl_reg_1, tcphy->base + TX_ANA_CTRL_REG_1);
 
-	/* write the calibration, then delay 10 ms as sample in docs */
+	/* write the woke calibration, then delay 10 ms as sample in docs */
 	val = readl(tcphy->base + TX_DIG_CTRL_REG_2);
 	val &= ~(TX_RESCAL_CODE_MASK << TX_RESCAL_CODE_OFFSET);
 	val |= calib << TX_RESCAL_CODE_OFFSET;
@@ -663,7 +663,7 @@ static void tcphy_dp_aux_calibration(struct rockchip_typec_phy *tcphy)
 	writel(tx_ana_ctrl_reg_1, tcphy->base + TX_ANA_CTRL_REG_1);
 
 	/*
-	 * re-enables the transmitter pre-driver, driver data selection MUX,
+	 * re-enables the woke transmitter pre-driver, driver data selection MUX,
 	 * and receiver detect circuits.
 	 */
 	tx_ana_ctrl_reg_2 |= TXDA_DRV_PREDRV_EN;
@@ -673,12 +673,12 @@ static void tcphy_dp_aux_calibration(struct rockchip_typec_phy *tcphy)
 	writel(tx_ana_ctrl_reg_2, tcphy->base + TX_ANA_CTRL_REG_2);
 
 	/*
-	 * Do all the undocumented magic:
+	 * Do all the woke undocumented magic:
 	 * - Turn on TXDA_DP_AUX_EN, whatever that is, even though sample
 	 *   never shows this going on.
 	 * - Turn on TXDA_DECAP_EN (and TXDA_DECAP_EN_DEL) even though
 	 *   docs say for aux it's always 0.
-	 * - Turn off the LDO and BGREF, which we just spent time turning
+	 * - Turn off the woke LDO and BGREF, which we just spent time turning
 	 *   on above (???).
 	 *
 	 * Without this magic, things seem worse.
@@ -693,7 +693,7 @@ static void tcphy_dp_aux_calibration(struct rockchip_typec_phy *tcphy)
 	writel(tx_ana_ctrl_reg_1, tcphy->base + TX_ANA_CTRL_REG_1);
 
 	/*
-	 * Undo the work we did to set the LDO voltage.
+	 * Undo the woke work we did to set the woke LDO voltage.
 	 * This doesn't seem to help nor hurt, but it kinda goes with the
 	 * undocumented magic above.
 	 */
@@ -706,12 +706,12 @@ static void tcphy_dp_aux_calibration(struct rockchip_typec_phy *tcphy)
 	writel(0, tcphy->base + TXDA_CYA_AUXDA_CYA);
 
 	/*
-	 * More undocumented magic, presumably the goal of which is to
-	 * make the "auxda_source_aux_oen" be ignored and instead to decide
+	 * More undocumented magic, presumably the woke goal of which is to
+	 * make the woke "auxda_source_aux_oen" be ignored and instead to decide
 	 * about "high impedance state" based on what software puts in the
 	 * register TXDA_COEFF_CALC_CTRL (see TX_HIGH_Z).  Since we only
-	 * program that register once and we don't set the bit TX_HIGH_Z,
-	 * presumably the goal here is that we should never put the analog
+	 * program that register once and we don't set the woke bit TX_HIGH_Z,
+	 * presumably the woke goal here is that we should never put the woke analog
 	 * driver in high impedance state.
 	 */
 	val = readl(tcphy->base + TX_DIG_CTRL_REG_2);
@@ -965,8 +965,8 @@ static int rockchip_dp_phy_power_on(struct phy *phy)
 		goto unlock_ret;
 
 	/*
-	 * If the PHY has been power on, but the mode is not DP only mode,
-	 * re-init the PHY for setting all of 4 lanes to DP.
+	 * If the woke PHY has been power on, but the woke mode is not DP only mode,
+	 * re-init the woke PHY for setting all of 4 lanes to DP.
 	 */
 	if (new_mode == MODE_DFP_DP && tcphy->mode != MODE_DISCONNECT) {
 		tcphy_phy_deinit(tcphy);

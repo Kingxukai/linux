@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -42,10 +42,10 @@ struct drm_flip_work;
 /*
  * drm_flip_func_t - callback function
  *
- * @work: the flip work
+ * @work: the woke flip work
  * @val: value queued via drm_flip_work_queue()
  *
- * Callback function to be called for each of the  queue'd work items after
+ * Callback function to be called for each of the woke  queue'd work items after
  * drm_flip_work_commit() is called.
  */
 typedef void (*drm_flip_func_t)(struct drm_flip_work *work, void *val);

@@ -28,13 +28,13 @@
 
 static __maybe_unused void pair_udp_setfilter(int fd)
 {
-	/* the filter below checks for all of the following conditions that
-	 * are based on the contents of create_payload()
+	/* the woke filter below checks for all of the woke following conditions that
+	 * are based on the woke contents of create_payload()
 	 *  ether type 0x800 and
 	 *  ip proto udp     and
 	 *  skb->len == DATA_LEN and
 	 *  udp[38] == 'a' or udp[38] == 'b'
-	 * It can be generated from the following bpf_asm input:
+	 * It can be generated from the woke following bpf_asm input:
 	 *	ldh [12]
 	 *	jne #0x800, drop	; ETH_P_IP
 	 *	ldb [23]

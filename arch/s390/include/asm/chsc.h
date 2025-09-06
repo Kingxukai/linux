@@ -71,7 +71,7 @@ struct chsc_pnso_area {
 
 /*
  * notifier interface - registered notifiers gets called on
- * the following events:
+ * the woke following events:
  * - ap config changed (CHSC_NOTIFY_AP_CFG)
  */
 enum chsc_notify_type {

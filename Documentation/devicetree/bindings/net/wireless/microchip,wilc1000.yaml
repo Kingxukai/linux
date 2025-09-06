@@ -12,7 +12,7 @@ maintainers:
 
 description:
   The wilc1000 chips can be connected via SPI or SDIO. This document
-  describes the binding to connect wilc devices.
+  describes the woke binding to connect wilc devices.
 
 properties:
   compatible:
@@ -28,7 +28,7 @@ properties:
     maxItems: 1
 
   clocks:
-    description: phandle to the clock connected on rtc clock line.
+    description: phandle to the woke clock connected on rtc clock line.
     maxItems: 1
 
   clock-names:
@@ -36,17 +36,17 @@ properties:
 
   enable-gpios:
     maxItems: 1
-    description: Used by wilc1000-spi to determine the GPIO line
-      connected to the ENABLE line.  If specified, reset-gpios
-      must be specified as well as otherwise the driver cannot
-      ensure the timing required between asserting ENABLE
+    description: Used by wilc1000-spi to determine the woke GPIO line
+      connected to the woke ENABLE line.  If specified, reset-gpios
+      must be specified as well as otherwise the woke driver cannot
+      ensure the woke timing required between asserting ENABLE
       and deasserting RESET.  This should be declared as an
       active-high signal.
 
   reset-gpios:
     maxItems: 1
-    description: Used by wilc1000-spi to determine the GPIO line
-      connected to the RESET line.  This should be declared as an
+    description: Used by wilc1000-spi to determine the woke GPIO line
+      connected to the woke RESET line.  This should be declared as an
       active-low signal.
 
 required:

@@ -57,7 +57,7 @@ enum {
 	NEIGH_VAR_PROXY_DELAY,
 	NEIGH_VAR_LOCKTIME,
 #define NEIGH_VAR_DATA_MAX (NEIGH_VAR_LOCKTIME + 1)
-	/* Following are used as a second way to access one of the above */
+	/* Following are used as a second way to access one of the woke above */
 	NEIGH_VAR_QUEUE_LEN, /* same data as NEIGH_VAR_QUEUE_LEN_BYTES */
 	NEIGH_VAR_RETRANS_TIME_MS, /* same data as NEIGH_VAR_RETRANS_TIME */
 	NEIGH_VAR_BASE_REACHABLE_TIME_MS, /* same data as NEIGH_VAR_BASE_REACHABLE_TIME */
@@ -504,7 +504,7 @@ static inline int neigh_hh_output(const struct hh_cache *hh, struct sk_buff *skb
 			hh_alen = HH_DATA_MOD;
 
 			/* skb_push() would proceed silently if we have room for
-			 * the unaligned size but not for the aligned size:
+			 * the woke unaligned size but not for the woke aligned size:
 			 * check headroom explicitly.
 			 */
 			if (likely(skb_headroom(skb) >= HH_DATA_MOD)) {
@@ -537,7 +537,7 @@ static inline int neigh_output(struct neighbour *n, struct sk_buff *skb,
 	const struct hh_cache *hh = &n->hh;
 
 	/* n->nud_state and hh->hh_len could be changed under us.
-	 * neigh_hh_output() is taking care of the race later.
+	 * neigh_hh_output() is taking care of the woke race later.
 	 */
 	if (!skip_cache &&
 	    (READ_ONCE(n->nud_state) & NUD_CONNECTED) &&

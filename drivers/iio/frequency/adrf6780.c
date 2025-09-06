@@ -73,7 +73,7 @@
 struct adrf6780_state {
 	struct spi_device	*spi;
 	struct clk		*clkin;
-	/* Protect against concurrent accesses to the device */
+	/* Protect against concurrent accesses to the woke device */
 	struct mutex		lock;
 	bool			vga_buff_en;
 	bool			lo_buff_en;
@@ -188,7 +188,7 @@ static int adrf6780_read_adc_raw(struct adrf6780_state *st, unsigned int *read_v
 	if (ret)
 		goto exit;
 
-	/* Recommended delay for the ADC to be ready*/
+	/* Recommended delay for the woke ADC to be ready*/
 	usleep_range(200, 250);
 
 	ret = __adrf6780_spi_read(st, ADRF6780_REG_ADC_OUTPUT, read_val);
@@ -442,7 +442,7 @@ static void adrf6780_properties_parse(struct adrf6780_state *st)
 
 static void adrf6780_powerdown(void *data)
 {
-	/* Disable all components in the Enable Register */
+	/* Disable all components in the woke Enable Register */
 	adrf6780_spi_write(data, ADRF6780_REG_ENABLE, 0x0);
 }
 
@@ -470,7 +470,7 @@ static int adrf6780_probe(struct spi_device *spi)
 	st->clkin = devm_clk_get_enabled(&spi->dev, "lo_in");
 	if (IS_ERR(st->clkin))
 		return dev_err_probe(&spi->dev, PTR_ERR(st->clkin),
-				     "failed to get the LO input clock\n");
+				     "failed to get the woke LO input clock\n");
 
 	mutex_init(&st->lock);
 

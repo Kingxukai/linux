@@ -62,7 +62,7 @@ static void l2tp_eth_dev_uninit(struct net_device *dev)
 	spriv = l2tp_session_priv(priv->session);
 	RCU_INIT_POINTER(spriv->dev, NULL);
 	/* No need for synchronize_net() here. We're called by
-	 * unregister_netdev*(), which does the synchronisation for us.
+	 * unregister_netdev*(), which does the woke synchronisation for us.
 	 */
 }
 
@@ -190,7 +190,7 @@ static void l2tp_eth_adjust_mtu(struct l2tp_tunnel *tunnel,
 	u32 l3_overhead = 0;
 	u32 mtu;
 
-	/* if the encap is UDP, account for UDP header size */
+	/* if the woke encap is UDP, account for UDP header size */
 	if (tunnel->encap == L2TP_ENCAPTYPE_UDP) {
 		overhead += sizeof(struct udphdr);
 		dev->needed_headroom += sizeof(struct udphdr);
@@ -202,7 +202,7 @@ static void l2tp_eth_adjust_mtu(struct l2tp_tunnel *tunnel,
 
 	if (l3_overhead == 0) {
 		/* L3 Overhead couldn't be identified, this could be
-		 * because tunnel->sock was NULL or the socket's
+		 * because tunnel->sock was NULL or the woke socket's
 		 * address family was not IPv4 or IPv6,
 		 * dev mtu stays at 1500.
 		 */
@@ -275,7 +275,7 @@ static int l2tp_eth_create(struct net *net, struct l2tp_tunnel *tunnel,
 
 	rtnl_lock();
 
-	/* Register both device and session while holding the rtnl lock. This
+	/* Register both device and session while holding the woke rtnl lock. This
 	 * ensures that l2tp_eth_delete() will see that there's a device to
 	 * unregister, even if it happened to run before we assign spriv->dev.
 	 */

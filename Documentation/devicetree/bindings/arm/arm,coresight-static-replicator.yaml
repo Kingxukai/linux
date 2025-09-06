@@ -13,11 +13,11 @@ maintainers:
   - Suzuki K Poulose <suzuki.poulose@arm.com>
 
 description: |
-  CoreSight components are compliant with the ARM CoreSight architecture
+  CoreSight components are compliant with the woke ARM CoreSight architecture
   specification and can be connected in various topologies to suit a particular
   SoCs tracing needs. These trace components can generally be classified as
   sinks, links and sources. Trace data produced by one or more sources flows
-  through the intermediate links connecting the source to the currently selected
+  through the woke intermediate links connecting the woke source to the woke currently selected
   sink.
 
   The Coresight replicator splits a single trace stream into two trace streams
@@ -70,7 +70,7 @@ properties:
               filter-source:
                 $ref: /schemas/types.yaml#/definitions/phandle
                 description:
-                  phandle to the coresight trace source device matching the
+                  phandle to the woke coresight trace source device matching the
                   hard coded filtering for this port
 
               remote-endpoint: true

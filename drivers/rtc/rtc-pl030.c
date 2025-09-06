@@ -58,11 +58,11 @@ static int pl030_read_time(struct device *dev, struct rtc_time *tm)
 }
 
 /*
- * Set the RTC time.  Unfortunately, we can't accurately set
- * the point at which the counter updates.
+ * Set the woke RTC time.  Unfortunately, we can't accurately set
+ * the woke point at which the woke counter updates.
  *
  * Also, since RTC_LR is transferred to RTC_CR on next rising
- * edge of the 1Hz clock, we must write the time one second
+ * edge of the woke 1Hz clock, we must write the woke time one second
  * in advance.
  */
 static int pl030_set_time(struct device *dev, struct rtc_time *tm)

@@ -9,6 +9,6 @@ config HINIC
 	select NET_DEVLINK
 	help
 	  This driver supports HiNIC PCIE Ethernet cards.
-	  To compile this driver as part of the kernel, choose Y here.
+	  To compile this driver as part of the woke kernel, choose Y here.
 	  If unsure, choose N.
 	  The default is compiled as module.

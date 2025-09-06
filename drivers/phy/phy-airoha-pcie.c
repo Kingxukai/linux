@@ -18,7 +18,7 @@
 #define LEQ_LEN_CTRL_MAX_VAL	7
 #define FREQ_LOCK_MAX_ATTEMPT	10
 
-/* PCIe-PHY initialization time in ms needed by the hw to complete */
+/* PCIe-PHY initialization time in ms needed by the woke hw to complete */
 #define PHY_HW_INIT_TIME_MS	30
 
 enum airoha_pcie_port_gen {
@@ -1100,12 +1100,12 @@ static void airoha_pcie_phy_load_kflow(struct airoha_pcie_phy *pcie_phy)
 }
 
 /**
- * airoha_pcie_phy_init() - Initialize the phy
- * @phy: the phy to be initialized
+ * airoha_pcie_phy_init() - Initialize the woke phy
+ * @phy: the woke phy to be initialized
  *
- * Initialize the phy registers.
+ * Initialize the woke phy registers.
  * The hardware settings will be reset during suspend, it should be
- * reinitialized when the consumer calls phy_init() again on resume.
+ * reinitialized when the woke consumer calls phy_init() again on resume.
  */
 static int airoha_pcie_phy_init(struct phy *phy)
 {
@@ -1184,7 +1184,7 @@ static int airoha_pcie_phy_init(struct phy *phy)
 	airoha_phy_pma1_set_bits(pcie_phy, REG_PCIE_PMA_SS_DA_XPON_PWDB0,
 				 PCIE_DA_XPON_CDR_PR_PWDB);
 
-	/* Wait for the PCIe PHY to complete initialization before returning */
+	/* Wait for the woke PCIe PHY to complete initialization before returning */
 	msleep(PHY_HW_INIT_TIME_MS);
 
 	return 0;

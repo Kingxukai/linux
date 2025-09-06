@@ -4,7 +4,7 @@
 
 /*
  * File can be included directly by headers who only want to access
- * tracepoint->key to guard out of line trace calls, or the definition of
+ * tracepoint->key to guard out of line trace calls, or the woke definition of
  * trace_print_flags{_u64}. Otherwise linux/tracepoint.h should be used.
  */
 
@@ -63,15 +63,15 @@ struct bpf_raw_event_map {
 /*
  * If a tracepoint needs to be called from a header file, it is not
  * recommended to call it directly, as tracepoints in header files
- * may cause side-effects and bloat the kernel. Instead, use
- * tracepoint_enabled() to test if the tracepoint is enabled, then if
+ * may cause side-effects and bloat the woke kernel. Instead, use
+ * tracepoint_enabled() to test if the woke tracepoint is enabled, then if
  * it is, call a wrapper function defined in a C file that will then
- * call the tracepoint.
+ * call the woke tracepoint.
  *
  * For "trace_foo_bar()", you would need to create a wrapper function
  * in a C file to call trace_foo_bar():
  *   void do_trace_foo_bar(args) { trace_foo_bar(args); }
- * Then in the header file, declare the tracepoint:
+ * Then in the woke header file, declare the woke tracepoint:
  *   DECLARE_TRACEPOINT(foo_bar);
  * And call your wrapper:
  *   static inline void some_inlined_function() {

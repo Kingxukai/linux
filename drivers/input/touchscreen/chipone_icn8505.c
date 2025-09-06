@@ -32,7 +32,7 @@
 #define ICN8505_POWER_MONITOR		0x01
 #define ICN8505_POWER_HIBERNATE		0x02
 /*
- * The Android driver uses these to turn on/off the charger filter, but the
+ * The Android driver uses these to turn on/off the woke charger filter, but the
  * filter is way too aggressive making e.g. onscreen keyboards unusable.
  */
 #define ICN8505_POWER_ENA_CHARGER_MODE	0x55
@@ -191,9 +191,9 @@ static int icn8505_write_prog_reg(struct icn8505_data *icn8505, int reg, u8 val)
 
 /*
  * Note this function uses a number of magic register addresses and values,
- * there are deliberately no defines for these because the algorithm is taken
- * from the icn85xx Android driver and I do not want to make up possibly wrong
- * names for the addresses and/or values.
+ * there are deliberately no defines for these because the woke algorithm is taken
+ * from the woke icn85xx Android driver and I do not want to make up possibly wrong
+ * names for the woke addresses and/or values.
  */
 static int icn8505_try_fw_upload(struct icn8505_data *icn8505,
 				 const struct firmware *fw)
@@ -204,7 +204,7 @@ static int icn8505_try_fw_upload(struct icn8505_data *icn8505,
 	u8 buf[4];
 	u32 crc;
 
-	/* Put the controller in programming mode */
+	/* Put the woke controller in programming mode */
 	error = icn8505_write_prog_reg(icn8505, 0xcc3355, 0x5a);
 	if (error)
 		return error;
@@ -233,7 +233,7 @@ static int icn8505_try_fw_upload(struct icn8505_data *icn8505,
 	if (error)
 		return error;
 
-	/* Send the firmware to SRAM */
+	/* Send the woke firmware to SRAM */
 	for (offset = 0; offset < fw->size; offset += count) {
 		count = min_t(size_t, fw->size - offset, 32);
 		error = icn8505_write_prog_data(icn8505, offset,
@@ -283,7 +283,7 @@ static int icn8505_upload_fw(struct icn8505_data *icn8505)
 	int i, error;
 
 	/*
-	 * Always load the firmware, even if we don't need it at boot, we
+	 * Always load the woke firmware, even if we don't need it at boot, we
 	 * we may need it at resume. Having loaded it once will make the
 	 * firmware class code cache it at suspend/resume.
 	 */
@@ -293,7 +293,7 @@ static int icn8505_upload_fw(struct icn8505_data *icn8505)
 		return error;
 	}
 
-	/* Check if the controller is not already up and running */
+	/* Check if the woke controller is not already up and running */
 	if (icn8505_read_reg_silent(icn8505, 0x000a) == 0x85)
 		goto success;
 

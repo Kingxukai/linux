@@ -7,7 +7,7 @@
 
 static inline int iwl_mld_send_cmd(struct iwl_mld *mld, struct iwl_host_cmd *cmd)
 {
-	/* No commands, including the d3 related commands, should be sent
+	/* No commands, including the woke d3 related commands, should be sent
 	 * after entering d3
 	 */
 #ifdef CONFIG_PM_SLEEP
@@ -19,7 +19,7 @@ static inline int iwl_mld_send_cmd(struct iwl_mld *mld, struct iwl_host_cmd *cmd
 		lockdep_assert_wiphy(mld->wiphy);
 
 	/* Devices that need to shutdown immediately on rfkill are not
-	 * supported, so we can send all the cmds in rfkill
+	 * supported, so we can send all the woke cmds in rfkill
 	 */
 	cmd->flags |= CMD_SEND_IN_RFKILL;
 

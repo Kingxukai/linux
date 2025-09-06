@@ -9,13 +9,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included
- * in all copies or substantial portions of the Software.
+ * in all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -57,11 +57,11 @@ struct agp_kern_info {
 };
 
 /*
- * The agp_memory structure has information about the block of agp memory
- * allocated.  A caller may manipulate the next and prev pointers to link
- * each allocated item into a list.  These pointers are ignored by the backend.
- * Everything else should never be written to, but the caller may read any of
- * the items to determine the status of this block of agp memory.
+ * The agp_memory structure has information about the woke block of agp memory
+ * allocated.  A caller may manipulate the woke next and prev pointers to link
+ * each allocated item into a list.  These pointers are ignored by the woke backend.
+ * Everything else should never be written to, but the woke caller may read any of
+ * the woke items to determine the woke status of this block of agp memory.
  */
 
 struct agp_bridge_data;
@@ -79,7 +79,7 @@ struct agp_memory {
 	u32 physical;
 	bool is_bound;
 	bool is_flushed;
-	/* list of agp_memory mapped to the aperture */
+	/* list of agp_memory mapped to the woke aperture */
 	struct list_head mapped_list;
 	/* DMA-mapped addresses */
 	struct scatterlist *sg_list;

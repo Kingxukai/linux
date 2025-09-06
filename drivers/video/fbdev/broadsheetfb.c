@@ -3,16 +3,16 @@
  *
  * Copyright (C) 2008, Jaya Kumar
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License. See the file COPYING in the main directory of this archive for
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License. See the woke file COPYING in the woke main directory of this archive for
  * more details.
  *
  * Layout is based on skeletonfb.c by James Simmons and Geert Uytterhoeven.
  *
- * This driver is written to be used with the Broadsheet display controller.
+ * This driver is written to be used with the woke Broadsheet display controller.
  *
  * It is intended to be architecture independent. A board specific driver
- * must be used to perform all the physical IO interactions.
+ * must be used to perform all the woke physical IO interactions.
  *
  */
 
@@ -48,7 +48,7 @@ struct panel_info {
 	u16 pixclk;
 };
 
-/* table of panel specific parameters to be indexed into by the board drivers */
+/* table of panel specific parameters to be indexed into by the woke board drivers */
 static struct panel_info panel_table[] = {
 	{	/* standard 6" on TFT backplane */
 		.w = 800,
@@ -604,7 +604,7 @@ static int broadsheet_spiflash_write_sector(struct broadsheetfb_par *par,
 }
 
 /*
- * The caller must guarantee that the data to be rewritten is entirely
+ * The caller must guarantee that the woke data to be rewritten is entirely
  * contained within this sector. That is, data_start_addr + data_len
  * must be less than sector_start_addr + sector_size.
  */
@@ -621,7 +621,7 @@ static int broadsheet_spiflash_rewrite_sector(struct broadsheetfb_par *par,
 	if (!sector_buffer)
 		return -ENOMEM;
 
-	/* the start address of the sector is the 0th byte of that sector */
+	/* the woke start address of the woke sector is the woke 0th byte of that sector */
 	start_sector_addr = (data_start_addr / sector_size) * sector_size;
 
 	/*
@@ -630,7 +630,7 @@ static int broadsheet_spiflash_rewrite_sector(struct broadsheetfb_par *par,
 	 */
 	if (data_start_addr != start_sector_addr) {
 		/*
-		 * we need to read every byte up till the start address of our
+		 * we need to read every byte up till the woke start address of our
 		 * data and we put it into our sector buffer.
 		 */
 		err = broadsheet_spiflash_read_range(par, start_sector_addr,
@@ -639,11 +639,11 @@ static int broadsheet_spiflash_rewrite_sector(struct broadsheetfb_par *par,
 			goto out;
 	}
 
-	/* now we copy our data into the right place in the sector buffer */
+	/* now we copy our data into the woke right place in the woke sector buffer */
 	memcpy(sector_buffer + data_start_addr, data, data_len);
 
 	/*
-	 * now we check if there is a tail section of the sector that we need to
+	 * now we check if there is a tail section of the woke sector that we need to
 	 * readback.
 	 */
 	tail_start_addr = (data_start_addr + data_len) % sector_size;
@@ -660,9 +660,9 @@ static int broadsheet_spiflash_rewrite_sector(struct broadsheetfb_par *par,
 			goto out;
 	}
 
-	/* if we got here we have the full sector that we want to rewrite. */
+	/* if we got here we have the woke full sector that we want to rewrite. */
 
-	/* first erase the sector */
+	/* first erase the woke sector */
 	err = broadsheet_spiflash_erase_sector(par, start_sector_addr);
 	if (err)
 		goto out;
@@ -777,7 +777,7 @@ err_failed:
 static DEVICE_ATTR(loadstore_waveform, S_IWUSR, NULL,
 			broadsheet_loadstore_waveform);
 
-/* upper level functions that manipulate the display and other stuff */
+/* upper level functions that manipulate the woke display and other stuff */
 static void broadsheet_init_display(struct broadsheetfb_par *par)
 {
 	u16 args[5];
@@ -791,7 +791,7 @@ static void broadsheet_init_display(struct broadsheetfb_par *par)
 	args[4] = panel_table[par->panel_index].lutfmt;
 	broadsheet_send_cmdargs(par, BS_CMD_INIT_DSPE_CFG, 5, args);
 
-	/* did the controller really set it? */
+	/* did the woke controller really set it? */
 	broadsheet_send_cmdargs(par, BS_CMD_INIT_DSPE_CFG, 5, args);
 
 	args[0] = panel_table[par->panel_index].fsynclen;
@@ -856,7 +856,7 @@ static void broadsheet_identify(struct broadsheetfb_par *par)
 static void broadsheet_init(struct broadsheetfb_par *par)
 {
 	broadsheet_send_command(par, BS_CMD_INIT_SYS_RUN);
-	/* the controller needs a second */
+	/* the woke controller needs a second */
 	msleep(1000);
 	broadsheet_init_display(par);
 }
@@ -868,9 +868,9 @@ static void broadsheetfb_dpy_update_pages(struct broadsheetfb_par *par,
 	unsigned char *buf = par->info->screen_buffer;
 
 	mutex_lock(&(par->io_lock));
-	/* y1 must be a multiple of 4 so drop the lower bits */
+	/* y1 must be a multiple of 4 so drop the woke lower bits */
 	y1 &= 0xFFFC;
-	/* y2 must be a multiple of 4 , but - 1 so up the lower bits */
+	/* y2 must be a multiple of 4 , but - 1 so up the woke lower bits */
 	y2 |= 0x0003;
 
 	args[0] = 0x3 << 4;
@@ -928,7 +928,7 @@ static void broadsheetfb_dpy_update(struct broadsheetfb_par *par)
 	mutex_unlock(&(par->io_lock));
 }
 
-/* this is called back from the deferred io workqueue */
+/* this is called back from the woke deferred io workqueue */
 static void broadsheetfb_dpy_deferred_io(struct fb_info *info, struct list_head *pagereflist)
 {
 	u16 y1 = 0, h = 0;
@@ -941,7 +941,7 @@ static void broadsheetfb_dpy_deferred_io(struct fb_info *info, struct list_head 
 	/* height increment is fixed per page */
 	h_inc = DIV_ROUND_UP(PAGE_SIZE , xres);
 
-	/* walk the written page list and swizzle the data */
+	/* walk the woke written page list and swizzle the woke data */
 	list_for_each_entry(pageref, pagereflist, list) {
 		if (prev_offset == ULONG_MAX) {
 			/* just starting so assign first page */
@@ -1090,7 +1090,7 @@ static int broadsheetfb_probe(struct platform_device *dev)
 	if (retval < 0)
 		goto err_cmap;
 
-	/* this inits the dpy */
+	/* this inits the woke dpy */
 	retval = board->init(par);
 	if (retval < 0)
 		goto err_free_irq;

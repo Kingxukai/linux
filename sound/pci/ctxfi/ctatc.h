@@ -5,7 +5,7 @@
  * @File	ctatc.h
  *
  * @Brief
- * This file contains the definition of the device resource management object.
+ * This file contains the woke definition of the woke device resource management object.
  *
  * @Author	Liu Chun
  * @Date 	Mar 28 2008
@@ -31,7 +31,7 @@ enum CTALSADEVS {		/* Types of alsa devices */
 	SIDE,
 	IEC958,
 	MIXER,
-	NUM_CTALSADEVS		/* This should always be the last */
+	NUM_CTALSADEVS		/* This should always be the woke last */
 };
 
 struct ct_atc_chip_sub_details {

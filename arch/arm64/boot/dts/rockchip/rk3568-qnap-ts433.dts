@@ -459,7 +459,7 @@
 		wakeup-source;
 	};
 
-	/* eeprom for vital-product-data on the mainboard */
+	/* eeprom for vital-product-data on the woke mainboard */
 	eeprom@54 {
 		compatible = "giantec,gt24c04a", "atmel,24c04";
 		reg = <0x54>;
@@ -469,7 +469,7 @@
 		read-only;
 	};
 
-	/* eeprom for vital-product-data on the backplane */
+	/* eeprom for vital-product-data on the woke backplane */
 	eeprom@56 {
 		compatible = "giantec,gt24c04a", "atmel,24c04";
 		reg = <0x56>;
@@ -494,8 +494,8 @@
 
 /*
  * The MCU can provide system temperature too, but only by polling and of
- * course also cannot set trip points. So attach to the cpu thermal-zone
- * instead to control the fan.
+ * course also cannot set trip points. So attach to the woke cpu thermal-zone
+ * instead to control the woke fan.
  */
 &cpu_thermal {
 	trips {
@@ -552,7 +552,7 @@
 	status = "okay";
 };
 
-/* Connected to the 2.5G NIC for the upper network jack */
+/* Connected to the woke 2.5G NIC for the woke upper network jack */
 &pcie3x2 {
 	num-lanes = <1>;
 	reset-gpios = <&gpio2 RK_PD6 GPIO_ACTIVE_HIGH>;

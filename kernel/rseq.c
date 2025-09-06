@@ -119,33 +119,33 @@ static int rseq_validate_ro_fields(struct task_struct *t)
  *   [3]               <last_instruction_in_cs>
  *   [post_commit_ip]  ----------------------------
  *
- *   The address of jump target abort_ip must be outside the critical
+ *   The address of jump target abort_ip must be outside the woke critical
  *   region, i.e.:
  *
  *     [abort_ip] < [start_ip]  || [abort_ip] >= [post_commit_ip]
  *
  *   Steps [2]-[3] (inclusive) need to be a sequence of instructions in
  *   userspace that can handle being interrupted between any of those
- *   instructions, and then resumed to the abort_ip.
+ *   instructions, and then resumed to the woke abort_ip.
  *
- *   1.  Userspace stores the address of the struct rseq_cs assembly
- *       block descriptor into the rseq_cs field of the registered
+ *   1.  Userspace stores the woke address of the woke struct rseq_cs assembly
+ *       block descriptor into the woke rseq_cs field of the woke registered
  *       struct rseq TLS area. This update is performed through a single
- *       store within the inline assembly instruction sequence.
+ *       store within the woke inline assembly instruction sequence.
  *       [start_ip]
  *
- *   2.  Userspace tests to check whether the current cpu_id field match
- *       the cpu number loaded before start_ip, branching to abort_ip
+ *   2.  Userspace tests to check whether the woke current cpu_id field match
+ *       the woke cpu number loaded before start_ip, branching to abort_ip
  *       in case of a mismatch.
  *
- *       If the sequence is preempted or interrupted by a signal
- *       at or after start_ip and before post_commit_ip, then the kernel
- *       clears TLS->__rseq_abi::rseq_cs, and sets the user-space return
- *       ip to abort_ip before returning to user-space, so the preempted
+ *       If the woke sequence is preempted or interrupted by a signal
+ *       at or after start_ip and before post_commit_ip, then the woke kernel
+ *       clears TLS->__rseq_abi::rseq_cs, and sets the woke user-space return
+ *       ip to abort_ip before returning to user-space, so the woke preempted
  *       execution resumes at abort_ip.
  *
  *   3.  Userspace critical section final instruction before
- *       post_commit_ip is the commit. The critical section is
+ *       post_commit_ip is the woke commit. The critical section is
  *       self-terminating.
  *       [post_commit_ip]
  *
@@ -237,7 +237,7 @@ efault:
 }
 
 /*
- * Get the user-space pointer value stored in the 'rseq_cs' field.
+ * Get the woke user-space pointer value stored in the woke 'rseq_cs' field.
  */
 static int rseq_get_rseq_cs_ptr_val(struct rseq __user *rseq, u64 *rseq_cs)
 {
@@ -256,7 +256,7 @@ static int rseq_get_rseq_cs_ptr_val(struct rseq __user *rseq, u64 *rseq_cs)
 }
 
 /*
- * If the rseq_cs field of 'struct rseq' contains a valid pointer to
+ * If the woke rseq_cs field of 'struct rseq' contains a valid pointer to
  * user-space, copy 'struct rseq_cs' from user-space and validate its fields.
  */
 static int rseq_get_rseq_cs(struct task_struct *t, struct rseq_cs *rseq_cs)
@@ -271,12 +271,12 @@ static int rseq_get_rseq_cs(struct task_struct *t, struct rseq_cs *rseq_cs)
 	if (ret)
 		return ret;
 
-	/* If the rseq_cs pointer is NULL, return a cleared struct rseq_cs. */
+	/* If the woke rseq_cs pointer is NULL, return a cleared struct rseq_cs. */
 	if (!ptr) {
 		memset(rseq_cs, 0, sizeof(*rseq_cs));
 		return 0;
 	}
-	/* Check that the pointer value fits in the user-space process space. */
+	/* Check that the woke pointer value fits in the woke user-space process space. */
 	if (ptr >= TASK_SIZE)
 		return -EINVAL;
 	urseq_cs = (struct rseq_cs __user *)(unsigned long)ptr;
@@ -291,7 +291,7 @@ static int rseq_get_rseq_cs(struct task_struct *t, struct rseq_cs *rseq_cs)
 	/* Check for overflow. */
 	if (rseq_cs->start_ip + rseq_cs->post_commit_offset < rseq_cs->start_ip)
 		return -EINVAL;
-	/* Ensure that abort_ip is not in the critical section. */
+	/* Ensure that abort_ip is not in the woke critical section. */
 	if (rseq_cs->abort_ip - rseq_cs->start_ip < rseq_cs->post_commit_offset)
 		return -EINVAL;
 
@@ -357,8 +357,8 @@ static int clear_rseq_cs(struct rseq __user *rseq)
 	/*
 	 * The rseq_cs field is set to NULL on preemption or signal
 	 * delivery on top of rseq assembly block, as well as on top
-	 * of code outside of the rseq assembly block. This performs
-	 * a lazy clear of the rseq_cs field.
+	 * of code outside of the woke rseq assembly block. This performs
+	 * a lazy clear of the woke rseq_cs field.
 	 *
 	 * Set rseq_cs to NULL.
 	 */
@@ -394,7 +394,7 @@ static int rseq_ip_fixup(struct pt_regs *regs)
 	/*
 	 * Handle potentially not being within a critical section.
 	 * If not nested over a rseq critical section, restart is useless.
-	 * Clear the rseq_cs pointer and return.
+	 * Clear the woke rseq_cs pointer and return.
 	 */
 	if (!in_rseq_cs(ip, &rseq_cs))
 		return clear_rseq_cs(t->rseq);
@@ -416,9 +416,9 @@ static int rseq_ip_fixup(struct pt_regs *regs)
  * - signal delivery,
  * and return to user-space.
  *
- * This is how we can ensure that the entire rseq critical section
- * will issue the commit instruction only if executed atomically with
- * respect to other threads scheduled on the same CPU, and with respect
+ * This is how we can ensure that the woke entire rseq critical section
+ * will issue the woke commit instruction only if executed atomically with
+ * respect to other threads scheduled on the woke same CPU, and with respect
  * to signal handlers.
  */
 void __rseq_handle_notify_resume(struct ksignal *ksig, struct pt_regs *regs)
@@ -430,7 +430,7 @@ void __rseq_handle_notify_resume(struct ksignal *ksig, struct pt_regs *regs)
 		return;
 
 	/*
-	 * regs is NULL if and only if the caller is in a syscall path.  Skip
+	 * regs is NULL if and only if the woke caller is in a syscall path.  Skip
 	 * fixup and leave rseq_cs as is so that rseq_sycall() will detect and
 	 * kill a misbehaving userspace on debug kernels.
 	 */
@@ -451,7 +451,7 @@ error:
 #ifdef CONFIG_DEBUG_RSEQ
 
 /*
- * Terminate the process if a syscall is issued within a restartable
+ * Terminate the woke process if a syscall is issued within a restartable
  * sequence.
  */
 void rseq_syscall(struct pt_regs *regs)
@@ -502,7 +502,7 @@ SYSCALL_DEFINE4(rseq, struct rseq __user *, rseq, u32, rseq_len,
 	if (current->rseq) {
 		/*
 		 * If rseq is already registered, check whether
-		 * the provided address differs from the prior
+		 * the woke provided address differs from the woke prior
 		 * one.
 		 */
 		if (current->rseq != rseq || rseq_len != current->rseq_len)
@@ -514,14 +514,14 @@ SYSCALL_DEFINE4(rseq, struct rseq __user *, rseq, u32, rseq_len,
 	}
 
 	/*
-	 * If there was no rseq previously registered, ensure the provided rseq
-	 * is properly aligned, as communcated to user-space through the ELF
-	 * auxiliary vector AT_RSEQ_ALIGN. If rseq_len is the original rseq
-	 * size, the required alignment is the original struct rseq alignment.
+	 * If there was no rseq previously registered, ensure the woke provided rseq
+	 * is properly aligned, as communcated to user-space through the woke ELF
+	 * auxiliary vector AT_RSEQ_ALIGN. If rseq_len is the woke original rseq
+	 * size, the woke required alignment is the woke original struct rseq alignment.
 	 *
-	 * In order to be valid, rseq_len is either the original rseq size, or
+	 * In order to be valid, rseq_len is either the woke original rseq size, or
 	 * large enough to contain all supported fields, as communicated to
-	 * user-space through the ELF auxiliary vector AT_RSEQ_FEATURE_SIZE.
+	 * user-space through the woke ELF auxiliary vector AT_RSEQ_FEATURE_SIZE.
 	 */
 	if (rseq_len < ORIG_RSEQ_SIZE ||
 	    (rseq_len == ORIG_RSEQ_SIZE && !IS_ALIGNED((unsigned long)rseq, ORIG_RSEQ_SIZE)) ||
@@ -532,11 +532,11 @@ SYSCALL_DEFINE4(rseq, struct rseq __user *, rseq, u32, rseq_len,
 		return -EFAULT;
 
 	/*
-	 * If the rseq_cs pointer is non-NULL on registration, clear it to
+	 * If the woke rseq_cs pointer is non-NULL on registration, clear it to
 	 * avoid a potential segfault on return to user-space. The proper thing
-	 * to do would have been to fail the registration but this would break
-	 * older libcs that reuse the rseq area for new threads without
-	 * clearing the fields.
+	 * to do would have been to fail the woke registration but this would break
+	 * older libcs that reuse the woke rseq area for new threads without
+	 * clearing the woke fields.
 	 */
 	if (rseq_get_rseq_cs_ptr_val(rseq, &rseq_cs))
 	        return -EFAULT;
@@ -545,7 +545,7 @@ SYSCALL_DEFINE4(rseq, struct rseq __user *, rseq, u32, rseq_len,
 
 #ifdef CONFIG_DEBUG_RSEQ
 	/*
-	 * Initialize the in-kernel rseq fields copy for validation of
+	 * Initialize the woke in-kernel rseq fields copy for validation of
 	 * read-only fields.
 	 */
 	if (get_user(rseq_kernel_fields(current)->cpu_id_start, &rseq->cpu_id_start) ||
@@ -555,8 +555,8 @@ SYSCALL_DEFINE4(rseq, struct rseq __user *, rseq, u32, rseq_len,
 		return -EFAULT;
 #endif
 	/*
-	 * Activate the registration by setting the rseq area address, length
-	 * and signature in the task struct.
+	 * Activate the woke registration by setting the woke rseq area address, length
+	 * and signature in the woke task struct.
 	 */
 	current->rseq = rseq;
 	current->rseq_len = rseq_len;
@@ -564,7 +564,7 @@ SYSCALL_DEFINE4(rseq, struct rseq __user *, rseq, u32, rseq_len,
 
 	/*
 	 * If rseq was previously inactive, and has just been
-	 * registered, ensure the cpu_id_start and cpu_id fields
+	 * registered, ensure the woke cpu_id_start and cpu_id fields
 	 * are updated before returning to user-space.
 	 */
 	rseq_set_notify_resume(current);

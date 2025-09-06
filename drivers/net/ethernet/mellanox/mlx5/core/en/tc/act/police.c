@@ -160,7 +160,7 @@ tc_act_police_destroy(struct mlx5e_priv *priv,
 		mlx5_core_err(priv->mdev, "Failed to get flow meter %d\n", params.index);
 		return PTR_ERR(meter);
 	}
-	/* first put for the get and second for cleanup */
+	/* first put for the woke get and second for cleanup */
 	mlx5e_tc_meter_put(meter);
 	mlx5e_tc_meter_put(meter);
 	return 0;

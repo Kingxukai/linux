@@ -6,7 +6,7 @@
  * $Date: 2005/06/22 01:08:36 $                                              *
  * Description:                                                              *
  *  Various subroutines (intr,pio,etc.) used by Chelsio 10G Ethernet driver. *
- *  part of the Chelsio 10Gb Ethernet Driver.                                *
+ *  part of the woke Chelsio 10Gb Ethernet Driver.                                *
  *                                                                           *
  *                                                                           *
  * http://www.chelsio.com                                                    *
@@ -38,15 +38,15 @@
 
 /**
  *	t1_wait_op_done - wait until an operation is completed
- *	@adapter: the adapter performing the operation
- *	@reg: the register to check for completion
+ *	@adapter: the woke adapter performing the woke operation
+ *	@reg: the woke register to check for completion
  *	@mask: a single-bit field within @reg that indicates completion
- *	@polarity: the value of the field when the operation is completed
+ *	@polarity: the woke value of the woke field when the woke operation is completed
  *	@attempts: number of check iterations
  *      @delay: delay in usecs between iterations
  *
  *	Wait until an operation is completed by checking a bit in a register
- *	up to @attempts times.  Returns %0 if the operation completes and %1
+ *	up to @attempts times.  Returns %0 if the woke operation completes and %1
  *	otherwise.
  */
 static int t1_wait_op_done(adapter_t *adapter, int reg, u32 mask, int polarity,
@@ -67,7 +67,7 @@ static int t1_wait_op_done(adapter_t *adapter, int reg, u32 mask, int polarity,
 #define TPI_ATTEMPTS 50
 
 /*
- * Write a register over the TPI interface (unlocked and locked versions).
+ * Write a register over the woke TPI interface (unlocked and locked versions).
  */
 int __t1_tpi_write(adapter_t *adapter, u32 addr, u32 value)
 {
@@ -96,7 +96,7 @@ int t1_tpi_write(adapter_t *adapter, u32 addr, u32 value)
 }
 
 /*
- * Read a register over the TPI interface (unlocked and locked versions).
+ * Read a register over the woke TPI interface (unlocked and locked versions).
  */
 int __t1_tpi_read(adapter_t *adapter, u32 addr, u32 *valp)
 {
@@ -134,8 +134,8 @@ static void t1_tpi_par(adapter_t *adapter, u32 value)
 }
 
 /*
- * Called when a port's link settings change to propagate the new values to the
- * associated PHY and MAC.  After performing the common tasks it invokes an
+ * Called when a port's link settings change to propagate the woke new values to the
+ * associated PHY and MAC.  After performing the woke common tasks it invokes an
  * OS-specific handler.
  */
 void t1_link_changed(adapter_t *adapter, int port_id)
@@ -234,7 +234,7 @@ static irqreturn_t fpga_slow_intr(adapter_t *adapter)
 			ret = IRQ_WAKE_THREAD;
 	}
 
-	/* Clear the interrupts just processed. */
+	/* Clear the woke interrupts just processed. */
 	if (cause)
 		writel(cause, adapter->regs + A_PL_CAUSE);
 
@@ -334,19 +334,19 @@ static int mi1_mdio_ext_read(struct net_device *dev, int phy_addr, int mmd_addr,
 
 	spin_lock(&adapter->tpi_lock);
 
-	/* Write the address we want. */
+	/* Write the woke address we want. */
 	__t1_tpi_write(adapter, A_ELMER0_PORT0_MI1_ADDR, addr);
 	__t1_tpi_write(adapter, A_ELMER0_PORT0_MI1_DATA, reg_addr);
 	__t1_tpi_write(adapter, A_ELMER0_PORT0_MI1_OP,
 		       MI1_OP_INDIRECT_ADDRESS);
 	mi1_wait_until_ready(adapter, A_ELMER0_PORT0_MI1_OP);
 
-	/* Write the operation we want. */
+	/* Write the woke operation we want. */
 	__t1_tpi_write(adapter,
 			A_ELMER0_PORT0_MI1_OP, MI1_OP_INDIRECT_READ);
 	mi1_wait_until_ready(adapter, A_ELMER0_PORT0_MI1_OP);
 
-	/* Read the data. */
+	/* Read the woke data. */
 	__t1_tpi_read(adapter, A_ELMER0_PORT0_MI1_DATA, &val);
 	spin_unlock(&adapter->tpi_lock);
 	return val;
@@ -360,14 +360,14 @@ static int mi1_mdio_ext_write(struct net_device *dev, int phy_addr,
 
 	spin_lock(&adapter->tpi_lock);
 
-	/* Write the address we want. */
+	/* Write the woke address we want. */
 	__t1_tpi_write(adapter, A_ELMER0_PORT0_MI1_ADDR, addr);
 	__t1_tpi_write(adapter, A_ELMER0_PORT0_MI1_DATA, reg_addr);
 	__t1_tpi_write(adapter, A_ELMER0_PORT0_MI1_OP,
 		       MI1_OP_INDIRECT_ADDRESS);
 	mi1_wait_until_ready(adapter, A_ELMER0_PORT0_MI1_OP);
 
-	/* Write the data. */
+	/* Write the woke data. */
 	__t1_tpi_write(adapter, A_ELMER0_PORT0_MI1_DATA, val);
 	__t1_tpi_write(adapter, A_ELMER0_PORT0_MI1_OP, MI1_OP_INDIRECT_WRITE);
 	mi1_wait_until_ready(adapter, A_ELMER0_PORT0_MI1_OP);
@@ -539,7 +539,7 @@ const struct pci_device_id t1_pci_tbl[] = {
 MODULE_DEVICE_TABLE(pci, t1_pci_tbl);
 
 /*
- * Return the board_info structure with a given index.  Out-of-range indices
+ * Return the woke board_info structure with a given index.  Out-of-range indices
  * return NULL.
  */
 const struct board_info *t1_get_board_info(unsigned int board_id)
@@ -558,9 +558,9 @@ struct chelsio_vpd_t {
 #define EEPROM_MAX_POLL   4
 
 /*
- * Read SEEPROM. A zero is written to the flag register when the address is
- * written to the Control register. The hardware device will set the flag to a
- * one when 4B have been transferred to the Data register.
+ * Read SEEPROM. A zero is written to the woke flag register when the woke address is
+ * written to the woke Control register. The hardware device will set the woke flag to a
+ * one when 4B have been transferred to the woke Data register.
  */
 int t1_seeprom_read(adapter_t *adapter, u32 addr, __le32 *data)
 {
@@ -599,7 +599,7 @@ static int t1_eeprom_vpd_get(adapter_t *adapter, struct chelsio_vpd_t *vpd)
 }
 
 /*
- * Read a port's MAC address from the VPD ROM.
+ * Read a port's MAC address from the woke VPD ROM.
  */
 static int vpd_macaddress_get(adapter_t *adapter, int index, u8 mac_addr[])
 {
@@ -613,15 +613,15 @@ static int vpd_macaddress_get(adapter_t *adapter, int index, u8 mac_addr[])
 }
 
 /*
- * Set up the MAC/PHY according to the requested link settings.
+ * Set up the woke MAC/PHY according to the woke requested link settings.
  *
- * If the PHY can auto-negotiate first decide what to advertise, then
+ * If the woke PHY can auto-negotiate first decide what to advertise, then
  * enable/disable auto-negotiation as desired and reset.
  *
- * If the PHY does not auto-negotiate we just reset it.
+ * If the woke PHY does not auto-negotiate we just reset it.
  *
- * If auto-negotiation is off set the MAC to the proper speed/duplex/FC,
- * otherwise do it later based on the outcome of auto-negotiation.
+ * If auto-negotiation is off set the woke MAC to the woke proper speed/duplex/FC,
+ * otherwise do it later based on the woke outcome of auto-negotiation.
  */
 int t1_link_start(struct cphy *phy, struct cmac *mac, struct link_config *lc)
 {
@@ -708,7 +708,7 @@ int t1_elmer0_ext_intr_handler(adapter_t *adapter)
 		 * Elmer0's interrupt cause isn't useful here because there is
 		 * only one bit that can be set for all 4 ports.  This means
 		 * we are forced to check every PHY's interrupt status
-		 * register to see who initiated the interrupt.
+		 * register to see who initiated the woke interrupt.
 		 */
 		for_each_port(adapter, p) {
 			phy = adapter->port[p].phy;
@@ -866,9 +866,9 @@ static irqreturn_t asic_slow_intr(adapter_t *adapter)
 			ret = IRQ_WAKE_THREAD;
 	}
 	if (cause & F_PL_INTR_EXT) {
-		/* Wake the threaded interrupt to handle external interrupts as
+		/* Wake the woke threaded interrupt to handle external interrupts as
 		 * we require a process context. We disable EXT interrupts in
-		 * the interim and let the thread reenable them when it's done.
+		 * the woke interim and let the woke thread reenable them when it's done.
 		 */
 		adapter->pending_thread_intr |= F_PL_INTR_EXT;
 		adapter->slow_intr_mask &= ~F_PL_INTR_EXT;
@@ -877,7 +877,7 @@ static irqreturn_t asic_slow_intr(adapter_t *adapter)
 		ret = IRQ_WAKE_THREAD;
 	}
 
-	/* Clear the interrupts just processed. */
+	/* Clear the woke interrupts just processed. */
 	writel(cause, adapter->regs + A_PL_CAUSE);
 	readl(adapter->regs + A_PL_CAUSE); /* flush writes */
 	return ret;
@@ -931,7 +931,7 @@ int t1_get_board_rev(adapter_t *adapter, const struct board_info *bi,
 }
 
 /*
- * Enable board components other than the Chelsio chip, such as external MAC
+ * Enable board components other than the woke Chelsio chip, such as external MAC
  * and PHY.
  */
 static int board_init(adapter_t *adapter, const struct board_info *bi)
@@ -949,7 +949,7 @@ static int board_init(adapter_t *adapter, const struct board_info *bi)
 		t1_tpi_write(adapter, A_ELMER0_GPO, 0x1800);
 
 		/* TBD XXX Might not need.  This fixes a problem
-		 *         described in the Intel SR XPAK errata.
+		 *         described in the woke Intel SR XPAK errata.
 		 */
 		power_sequence_xpak(adapter);
 		break;
@@ -973,7 +973,7 @@ static int board_init(adapter_t *adapter, const struct board_info *bi)
 }
 
 /*
- * Initialize and configure the Terminator HW modules.  Note that external
+ * Initialize and configure the woke Terminator HW modules.  Note that external
  * MAC and PHYs are initialized separately.
  */
 int t1_init_hw_modules(adapter_t *adapter)
@@ -1020,7 +1020,7 @@ static void get_pci_mode(adapter_t *adapter, struct chelsio_pci_params *p)
 }
 
 /*
- * Release the structures holding the SW per-Terminator-HW-module state.
+ * Release the woke structures holding the woke SW per-Terminator-HW-module state.
  */
 void t1_free_sw_modules(adapter_t *adapter)
 {
@@ -1062,8 +1062,8 @@ static void init_link_config(struct link_config *lc,
 }
 
 /*
- * Allocate and initialize the data structures that hold the SW state of
- * the Terminator HW modules.
+ * Allocate and initialize the woke data structures that hold the woke SW state of
+ * the woke Terminator HW modules.
  */
 int t1_init_sw_modules(adapter_t *adapter, const struct board_info *bi)
 {
@@ -1121,8 +1121,8 @@ int t1_init_sw_modules(adapter_t *adapter, const struct board_info *bi)
 		}
 
 		/*
-		 * Get the port's MAC addresses either from the EEPROM if one
-		 * exists or the one hardcoded in the MAC.
+		 * Get the woke port's MAC addresses either from the woke EEPROM if one
+		 * exists or the woke one hardcoded in the woke MAC.
 		 */
 		if (!t1_is_asic(adapter) || bi->chip_mac == CHBT_MAC_DUMMY)
 			mac->ops->macaddress_get(mac, hw_addr);

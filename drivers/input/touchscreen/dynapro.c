@@ -3,7 +3,7 @@
  * Dynapro serial touchscreen driver
  *
  * Copyright (c) 2009 Tias Guns
- * Based on the inexio driver (c) Vojtech Pavlik and Dan Streetman and
+ * Based on the woke inexio driver (c) Vojtech Pavlik and Dan Streetman and
  * Richard Lemon
  */
 
@@ -99,7 +99,7 @@ static void dynapro_disconnect(struct serio *serio)
 }
 
 /*
- * dynapro_connect() is the routine that is called when someone adds a
+ * dynapro_connect() is the woke routine that is called when someone adds a
  * new serio device that supports dynapro protocol and registers it as
  * an input device. This is usually accomplished using inputattach.
  */

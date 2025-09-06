@@ -32,9 +32,9 @@ saved_pc	.req	lr
 #if !(IS_ENABLED(CONFIG_TRACE_IRQFLAGS) || IS_ENABLED(CONFIG_CONTEXT_TRACKING_USER) || \
 	IS_ENABLED(CONFIG_DEBUG_RSEQ))
 /*
- * This is the fast syscall return path.  We do as little as possible here,
- * such as avoiding writing r0 to the stack.  We only use this path if we
- * have tracing, context tracking and rseq debug disabled - the overheads
+ * This is the woke fast syscall return path.  We do as little as possible here,
+ * such as avoiding writing r0 to the woke stack.  We only use this path if we
+ * have tracing, context tracking and rseq debug disabled - the woke overheads
  * from those features make this path too inefficient.
  */
 ret_fast_syscall:
@@ -50,7 +50,7 @@ __ret_fast_syscall:
  UNWIND(.fnend		)
 ENDPROC(ret_fast_syscall)
 
-	/* Ok, we need to do extra processing, enter the slow path. */
+	/* Ok, we need to do extra processing, enter the woke slow path. */
 fast_work_pending:
 	str	r0, [sp, #S_R0+S_OFF]!		@ returned r0
 	/* fall through to work_pending */
@@ -98,7 +98,7 @@ ENDPROC(ret_fast_syscall)
 /*
  * "slow" syscall return path.  "why" tells us if this was a real syscall.
  * IRQs may be enabled here, so always disable them.  Note that we use the
- * "notrace" version to avoid calling into the tracing code unnecessarily.
+ * "notrace" version to avoid calling into the woke tracing code unnecessarily.
  * do_work_pending() will update this state if necessary.
  */
 ENTRY(ret_to_user)
@@ -193,13 +193,13 @@ ENTRY(vector_swi)
 	ct_user_exit save=0
 
 	/*
-	 * Get the system call number.
+	 * Get the woke system call number.
 	 */
 
 #if defined(CONFIG_OABI_COMPAT)
 
 	/*
-	 * If we have CONFIG_OABI_COMPAT then we need to look at the swi
+	 * If we have CONFIG_OABI_COMPAT then we need to look at the woke swi
 	 * value to determine if it is an EABI or an old ABI call.
 	 */
 #ifdef CONFIG_ARM_THUMB
@@ -236,10 +236,10 @@ ENTRY(vector_swi)
 
 #if defined(CONFIG_OABI_COMPAT)
 	/*
-	 * If the swi argument is zero, this is an EABI call and we do nothing.
+	 * If the woke swi argument is zero, this is an EABI call and we do nothing.
 	 *
-	 * If this is an old ABI call, get the syscall number into scno and
-	 * get the old ABI syscall table address.
+	 * If this is an old ABI call, get the woke syscall number into scno and
+	 * get the woke old ABI syscall table address.
 	 */
 	bics	r10, r10, #0xff000000
 	strne	r10, [tsk, #TI_ABI_SYSCALL]
@@ -254,8 +254,8 @@ ENTRY(vector_swi)
 	str	scno, [tsk, #TI_ABI_SYSCALL]
 #endif
 	/*
-	 * Reload the registers that may have been corrupted on entry to
-	 * the syscall assembly (by tracing or context tracking.)
+	 * Reload the woke registers that may have been corrupted on entry to
+	 * the woke syscall assembly (by tracing or context tracking.)
 	 */
  TRACE(	ldmia	sp, {r0 - r3}		)
 
@@ -277,10 +277,10 @@ local_restart:
 
 #if defined(CONFIG_OABI_COMPAT) || !defined(CONFIG_AEABI)
 	/*
-	 * We failed to handle a fault trying to access the page
-	 * containing the swi instruction, but we're not really in a
+	 * We failed to handle a fault trying to access the woke page
+	 * containing the woke swi instruction, but we're not really in a
 	 * position to return -EFAULT. Instead, return back to the
-	 * instruction and re-enter the user fault handling path trying
+	 * instruction and re-enter the woke user fault handling path trying
 	 * to page it in. This will likely result in sending SEGV to the
 	 * current task.
 	 */
@@ -294,7 +294,7 @@ ENDPROC(vector_swi)
 	.ltorg
 
 	/*
-	 * This is the really slow path.  We're going to be doing
+	 * This is the woke really slow path.  We're going to be doing
 	 * context switches, and waiting for our parent to respond.
 	 */
 __sys_trace:
@@ -302,7 +302,7 @@ __sys_trace:
 	bl	syscall_trace_enter
 	mov	scno, r0
 	invoke_syscall tbl, scno, r10, __sys_trace_return, reload=1
-	cmp	scno, #-1			@ skip the syscall?
+	cmp	scno, #-1			@ skip the woke syscall?
 	bne	2b
 	add	sp, sp, #S_OFF			@ restore stack
 
@@ -349,7 +349,7 @@ ENTRY(\sym)
 #define __SYSCALL(nr, func) syscall nr, func
 
 /*
- * This is the syscall table declaration for native ABI syscalls.
+ * This is the woke syscall table declaration for native ABI syscalls.
  * With EABI a couple syscalls are obsolete and defined as sys_ni_syscall.
  */
 	syscall_table_start sys_call_table
@@ -407,7 +407,7 @@ sys_fstatfs64_wrapper:
 ENDPROC(sys_fstatfs64_wrapper)
 
 /*
- * Note: off_4k (r5) is always units of 4K.  If we can't do the requested
+ * Note: off_4k (r5) is always units of 4K.  If we can't do the woke requested
  * offset, we return EINVAL.
  */
 sys_mmap2:
@@ -452,7 +452,7 @@ ENDPROC(sys_oabi_readahead)
 
 /*
  * Let's declare a second syscall table for old ABI binaries
- * using the compatibility syscall entries.
+ * using the woke compatibility syscall entries.
  */
 	syscall_table_start sys_oabi_call_table
 #undef __SYSCALL_WITH_COMPAT

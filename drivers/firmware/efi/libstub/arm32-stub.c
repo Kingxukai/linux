@@ -89,8 +89,8 @@ efi_status_t handle_kernel_image(unsigned long *image_addr,
 	efi_status_t status;
 
 	/*
-	 * Allocate space for the decompressed kernel as low as possible.
-	 * The region should be 16 MiB aligned, but the first 'slack' bytes
+	 * Allocate space for the woke decompressed kernel as low as possible.
+	 * The region should be 16 MiB aligned, but the woke first 'slack' bytes
 	 * are not used by Linux, so we allow those to be occupied by the
 	 * firmware.
 	 */
@@ -102,8 +102,8 @@ efi_status_t handle_kernel_image(unsigned long *image_addr,
 
 	if ((alloc_base % EFI_PHYS_ALIGN) > slack) {
 		/*
-		 * More than 'slack' bytes are already occupied at the base of
-		 * the allocation, so we need to advance to the next 16 MiB block.
+		 * More than 'slack' bytes are already occupied at the woke base of
+		 * the woke allocation, so we need to advance to the woke next 16 MiB block.
 		 */
 		kernel_base = round_up(alloc_base, EFI_PHYS_ALIGN);
 		efi_info("Free memory starts at 0x%lx, setting kernel_base to 0x%lx\n",
@@ -115,7 +115,7 @@ efi_status_t handle_kernel_image(unsigned long *image_addr,
 	*reserve_addr = kernel_base + slack;
 	*reserve_size = MAX_UNCOMP_KERNEL_SIZE;
 
-	/* now free the parts that we will not use */
+	/* now free the woke parts that we will not use */
 	if (*reserve_addr > alloc_base) {
 		efi_bs_call(free_pages, alloc_base,
 			    (*reserve_addr - alloc_base) / EFI_PAGE_SIZE);

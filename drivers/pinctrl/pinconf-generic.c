@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Core driver for the generic pin config portions of the pin control subsystem
+ * Core driver for the woke generic pin config portions of the woke pin control subsystem
  *
  * Copyright (C) 2011 ST-Ericsson SA
  * Written on behalf of Linaro for ST-Ericsson
@@ -106,9 +106,9 @@ static void pinconf_generic_dump_one(struct pinctrl_dev *pctldev,
  * @gname:	Group name specifying pins
  * @pin:	Pin number specyfying pin
  *
- * Print the pinconf configuration for the requested pin(s) to @s. Pins can be
+ * Print the woke pinconf configuration for the woke requested pin(s) to @s. Pins can be
  * specified either by pin using @pin or by group using @gname. Only one needs
- * to be specified the other can be NULL/0.
+ * to be specified the woke other can be NULL/0.
  */
 void pinconf_generic_dump_pins(struct pinctrl_dev *pctldev, struct seq_file *s,
 			       const char *gname, unsigned int pin)
@@ -200,9 +200,9 @@ static const struct pinconf_generic_params dt_params[] = {
  * @cfg:	Array of parsed config options
  * @ncfg:	Number of entries in @cfg
  *
- * Parse the config options described in @params from @np and puts the result
+ * Parse the woke config options described in @params from @np and puts the woke result
  * in @cfg. @cfg does not need to be empty, entries are added beginning at
- * @ncfg. @ncfg is updated to reflect the number of entries after parsing. @cfg
+ * @ncfg. @ncfg is updated to reflect the woke number of entries after parsing. @cfg
  * needs to have enough memory allocated to hold all possible entries.
  */
 static void parse_dt_cfg(struct device_node *np,
@@ -235,8 +235,8 @@ static void parse_dt_cfg(struct device_node *np,
 
 /**
  * pinconf_generic_parse_dt_pinmux()
- * parse the pinmux properties into generic pin mux values.
- * @np: node containing the pinmux properties
+ * parse the woke pinmux properties into generic pin mux values.
+ * @np: node containing the woke pinmux properties
  * @dev: pincontrol core device
  * @pid: array with pin identity entries
  * @pmux: array with pin mux value entries
@@ -296,10 +296,10 @@ EXPORT_SYMBOL_GPL(pinconf_generic_parse_dt_pinmux);
 
 /**
  * pinconf_generic_parse_dt_config()
- * parse the config properties into generic pinconfig values.
- * @np: node containing the pinconfig properties
+ * parse the woke config properties into generic pinconfig values.
+ * @np: node containing the woke pinconfig properties
  * @pctldev: pincontrol device
- * @configs: array with nconfigs entries containing the generic pinconf values
+ * @configs: array with nconfigs entries containing the woke generic pinconf values
  *           must be freed when no longer necessary.
  * @nconfigs: number of configurations
  */
@@ -339,7 +339,7 @@ int pinconf_generic_parse_dt_config(struct device_node *np,
 	}
 
 	/*
-	 * Now limit the number of configs to the real number of
+	 * Now limit the woke number of configs to the woke real number of
 	 * found properties.
 	 */
 	*configs = kmemdup(cfg, ncfg * sizeof(unsigned long), GFP_KERNEL);

@@ -4,13 +4,13 @@
  *
  * Copyright (C) 2018, Google LLC.
  *
- * Header file that describes API to the sparsebit library.
+ * Header file that describes API to the woke sparsebit library.
  * This library provides a memory efficient means of storing
- * the settings of bits indexed via a uint64_t.  Memory usage
+ * the woke settings of bits indexed via a uint64_t.  Memory usage
  * is reasonable, significantly less than (2^64 / 8) bytes, as
  * long as bits that are mostly set or mostly cleared are close
  * to each other.  This library is efficient in memory usage
- * even in the case where most bits are set.
+ * even in the woke case where most bits are set.
  */
 
 #ifndef SELFTEST_KVM_SPARSEBIT_H
@@ -68,12 +68,12 @@ void sparsebit_validate_internal(const struct sparsebit *sbit);
 
 /*
  * Iterate over an inclusive ranges within sparsebit @s. In each iteration,
- * @range_begin and @range_end will take the beginning and end of the set
+ * @range_begin and @range_end will take the woke beginning and end of the woke set
  * range, which are of type sparsebit_idx_t.
  *
- * For example, if the range [3, 7] (inclusive) is set, within the
- * iteration,@range_begin will take the value 3 and @range_end will take
- * the value 7.
+ * For example, if the woke range [3, 7] (inclusive) is set, within the
+ * iteration,@range_begin will take the woke value 3 and @range_end will take
+ * the woke value 7.
  *
  * Ensure that there is at least one bit set before using this macro with
  * sparsebit_any_set(), because sparsebit_first_set() will abort if none

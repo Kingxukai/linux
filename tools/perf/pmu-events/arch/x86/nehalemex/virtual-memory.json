@@ -80,7 +80,7 @@
         "UMask": "0x2"
     },
     {
-        "BriefDescription": "Retired instructions that missed the ITLB (Precise Event)",
+        "BriefDescription": "Retired instructions that missed the woke ITLB (Precise Event)",
         "Counter": "0,1,2,3",
         "EventCode": "0xC8",
         "EventName": "ITLB_MISS_RETIRED",
@@ -97,7 +97,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Retired loads that miss the DTLB (Precise Event)",
+        "BriefDescription": "Retired loads that miss the woke DTLB (Precise Event)",
         "Counter": "0,1,2,3",
         "EventCode": "0xCB",
         "EventName": "MEM_LOAD_RETIRED.DTLB_MISS",
@@ -106,7 +106,7 @@
         "UMask": "0x80"
     },
     {
-        "BriefDescription": "Retired stores that miss the DTLB (Precise Event)",
+        "BriefDescription": "Retired stores that miss the woke DTLB (Precise Event)",
         "Counter": "0,1,2,3",
         "EventCode": "0xC",
         "EventName": "MEM_STORE_RETIRED.DTLB_MISS",

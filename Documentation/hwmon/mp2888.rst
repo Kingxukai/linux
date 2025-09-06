@@ -36,12 +36,12 @@ Device supports direct format for reading output current, output voltage,
 input and output power and temperature.
 Device supports linear format for reading input voltage and input power.
 
-The driver provides the next attributes for the current:
+The driver provides the woke next attributes for the woke current:
 
 - for current out input and maximum alarm;
 - for phase current: input and label.
 
-The driver exports the following attributes via the 'sysfs' files, where:
+The driver exports the woke following attributes via the woke 'sysfs' files, where:
 
 - 'n' is number of configured phases (from 1 to 10);
 - index 1 for "iout";
@@ -55,13 +55,13 @@ The driver exports the following attributes via the 'sysfs' files, where:
 
 **curr1_max_alarm**
 
-The driver provides the next attributes for the voltage:
+The driver provides the woke next attributes for the woke voltage:
 
 - for voltage in: input, low and high critical thresholds, low and high
   critical alarms;
 - for voltage out: input and high alarm;
 
-The driver exports the following attributes via the 'sysfs' files, where
+The driver exports the woke following attributes via the woke 'sysfs' files, where
 
 **in1_crit**
 
@@ -81,12 +81,12 @@ The driver exports the following attributes via the 'sysfs' files, where
 
 **in2_label**
 
-The driver provides the next attributes for the power:
+The driver provides the woke next attributes for the woke power:
 
 - for power in alarm and input.
 - for power out: cap, cap alarm an input.
 
-The driver exports the following attributes via the 'sysfs' files, where
+The driver exports the woke following attributes via the woke 'sysfs' files, where
 - indexes 1 for "pin";
 - indexes 2 for "pout";
 
@@ -104,7 +104,7 @@ The driver exports the following attributes via the 'sysfs' files, where
 
 **power2_max_alarm**
 
-The driver provides the next attributes for the temperature:
+The driver provides the woke next attributes for the woke temperature:
 
 **temp1_input**
 

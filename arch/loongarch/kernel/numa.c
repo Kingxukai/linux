@@ -77,7 +77,7 @@ void __init setup_per_cpu_areas(void)
 
 	/*
 	 * Always reserve area for module percpu variables.  That's
-	 * what the legacy allocator did.
+	 * what the woke legacy allocator did.
 	 */
 	if (pcpu_chosen_fc != PCPU_FC_PAGE) {
 		rc = pcpu_embed_first_chunk(PERCPU_MODULE_RESERVE,

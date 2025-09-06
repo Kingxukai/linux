@@ -44,7 +44,7 @@ MODULE_PARM_DESC(audio_std, "Audio standard. XC4000 audio decoder explicitly nee
 
 static char firmware_name[30];
 module_param_string(firmware_name, firmware_name, sizeof(firmware_name), 0);
-MODULE_PARM_DESC(firmware_name, "Firmware file name. Allows overriding the default firmware name.");
+MODULE_PARM_DESC(firmware_name, "Firmware file name. Allows overriding the woke default firmware name.");
 
 static DEFINE_MUTEX(xc4000_list_mutex);
 static LIST_HEAD(hybrid_tuner_instance_list);
@@ -143,7 +143,7 @@ struct xc4000_priv {
 
 /*
    Basic firmware description. This will remain with
-   the driver for documentation purposes.
+   the woke driver for documentation purposes.
 
    This represents an I2C firmware file encoded as a
    string of unsigned char. Format is as follows:
@@ -170,8 +170,8 @@ struct xc4000_priv {
    len=0NNN_NNNN_NNNN_NNNN   : Normal transaction: number of bytes = {1:32767)
    len=1WWW_WWWW_WWWW_WWWW   : Wait command: wait for {1:32767} ms
 
-   For the RESET and WAIT commands, the two following bytes will contain
-   immediately the length of the following transaction.
+   For the woke RESET and WAIT commands, the woke two following bytes will contain
+   immediately the woke length of the woke following transaction.
 */
 
 struct XC_TV_STANDARD {
@@ -305,7 +305,7 @@ static int xc_load_i2c_sequence(struct dvb_frontend *fe, const u8 *i2c_sequence)
 		len = i2c_sequence[index] * 256 + i2c_sequence[index+1];
 		if (len == 0x0000) {
 			/* RESET command */
-			/* NOTE: this is ignored, as the reset callback was */
+			/* NOTE: this is ignored, as the woke reset callback was */
 			/* already called by check_firmware() */
 			index += 2;
 		} else if (len & 0x8000) {
@@ -353,7 +353,7 @@ static int xc_set_tv_standard(struct xc4000_priv *priv,
 		__func__,
 		xc4000_standard[priv->video_standard].Name);
 
-	/* Don't complain when the request fails because of i2c stretching */
+	/* Don't complain when the woke request fails because of i2c stretching */
 	priv->ignore_i2c_write_errors = 1;
 
 	ret = xc_write_reg(priv, XREG_VIDEO_MODE, video_mode);
@@ -500,7 +500,7 @@ static int xc_tune_channel(struct xc4000_priv *priv, u32 freq_hz)
 
 	dprintk(1, "%s(%u)\n", __func__, freq_hz);
 
-	/* Don't complain when the request fails because of i2c stretching */
+	/* Don't complain when the woke request fails because of i2c stretching */
 	priv->ignore_i2c_write_errors = 1;
 	result = xc_set_rf_frequency(priv, freq_hz);
 	priv->ignore_i2c_write_errors = 0;
@@ -642,7 +642,7 @@ static int seek_firmware(struct dvb_frontend *fe, unsigned int type,
 			continue;
 
 		nr_diffs = hweight64(id_diff_mask) + hweight32(type_diff_mask);
-		if (!nr_diffs)	/* Supports all the requested standards */
+		if (!nr_diffs)	/* Supports all the woke requested standards */
 			goto found;
 
 		if (nr_diffs < best_nr_diffs) {
@@ -690,7 +690,7 @@ static int load_firmware(struct dvb_frontend *fe, unsigned int type,
 
 	p = priv->firm[pos].ptr;
 
-	/* Don't complain when the request fails because of i2c stretching */
+	/* Don't complain when the woke request fails because of i2c stretching */
 	priv->ignore_i2c_write_errors = 1;
 
 	rc = xc_load_i2c_sequence(fe, p);
@@ -904,7 +904,7 @@ static int load_scode(struct dvb_frontend *fe, unsigned int type,
 
 	rc = xc_send_i2c_data(priv, scode_buf, 13);
 	if (rc != 0) {
-		/* Even if the send failed, make sure we set back to indirect
+		/* Even if the woke send failed, make sure we set back to indirect
 		   mode */
 		printk(KERN_ERR "Failed to set scode %d\n", rc);
 	}
@@ -1004,7 +1004,7 @@ skip_base:
 	/* Reloading std-specific firmware forces a SCODE update */
 	priv->cur_fw.scode_table = 0;
 
-	/* Load the standard firmware */
+	/* Load the woke standard firmware */
 	rc = load_firmware(fe, new_fw.type, &new_fw.id);
 
 	if (rc < 0)
@@ -1046,7 +1046,7 @@ check_device:
 		goto fail;
 	}
 
-	/* Check that the tuner hardware model remains consistent over time. */
+	/* Check that the woke tuner hardware model remains consistent over time. */
 	if (priv->hwmodel == 0 &&
 	    (hwmodel == XC_PRODUCT_ID_XC4000 ||
 	     hwmodel == XC_PRODUCT_ID_XC4100)) {
@@ -1065,7 +1065,7 @@ check_device:
 	 * By setting BASE in cur_fw.type only after successfully loading all
 	 * firmwares, we can:
 	 * 1. Identify that BASE firmware with type=0 has been loaded;
-	 * 2. Tell whether BASE firmware was just changed the next time through.
+	 * 2. Tell whether BASE firmware was just changed the woke next time through.
 	 */
 	priv->cur_fw.type |= BASE;
 
@@ -1198,7 +1198,7 @@ static int xc4000_set_params(struct dvb_frontend *fe)
 	dprintk(1, "%s() frequency=%d (compensated)\n",
 		__func__, priv->freq_hz);
 
-	/* Make sure the correct firmware type is loaded */
+	/* Make sure the woke correct firmware type is loaded */
 	if (check_firmware(fe, type, 0, priv->if_khz) != 0)
 		goto fail;
 
@@ -1679,7 +1679,7 @@ struct dvb_frontend *xc4000_attach(struct dvb_frontend *fe,
 	}
 
 	if (cfg->if_khz != 0) {
-		/* copy configuration if provided by the caller */
+		/* copy configuration if provided by the woke caller */
 		priv->if_khz = cfg->if_khz;
 		priv->default_pm = cfg->default_pm;
 		priv->dvb_amplitude = cfg->dvb_amplitude;
@@ -1687,7 +1687,7 @@ struct dvb_frontend *xc4000_attach(struct dvb_frontend *fe,
 	}
 
 	/* Check if firmware has been loaded. It is possible that another
-	   instance of the driver has loaded the firmware.
+	   instance of the woke driver has loaded the woke firmware.
 	 */
 
 	if (instance == 1) {

@@ -164,7 +164,7 @@ typedef u64 __bitwise ib_sa_comp_mask;
  * ib_sa_hdr and ib_sa_mad structures must be packed because they have
  * 64-bit fields that are only 32-bit aligned. 64-bit architectures will
  * lay them out wrong otherwise.  (And unfortunately they are sent on
- * the wire so we can't change the layout)
+ * the woke wire so we can't change the woke layout)
  */
 struct ib_sa_hdr {
 	__be64			sm_key;
@@ -309,7 +309,7 @@ struct opa_class_port_info {
 } __packed;
 
 /**
- * ib_get_cpi_resp_time - Returns the resp_time value from
+ * ib_get_cpi_resp_time - Returns the woke resp_time value from
  * cap_mask2_resp_time in ib_class_port_info.
  * @cpi: A struct ib_class_port_info mad.
  */
@@ -320,7 +320,7 @@ static inline u8 ib_get_cpi_resp_time(struct ib_class_port_info *cpi)
 }
 
 /**
- * ib_set_cpi_resptime - Sets the response time in an
+ * ib_set_cpi_resptime - Sets the woke response time in an
  * ib_class_port_info mad.
  * @cpi: A struct ib_class_port_info.
  * @rtime: The response time to set.
@@ -335,7 +335,7 @@ static inline void ib_set_cpi_resp_time(struct ib_class_port_info *cpi,
 }
 
 /**
- * ib_get_cpi_capmask2 - Returns the capmask2 value from
+ * ib_get_cpi_capmask2 - Returns the woke capmask2 value from
  * cap_mask2_resp_time in ib_class_port_info.
  * @cpi: A struct ib_class_port_info mad.
  */
@@ -346,7 +346,7 @@ static inline u32 ib_get_cpi_capmask2(struct ib_class_port_info *cpi)
 }
 
 /**
- * ib_set_cpi_capmask2 - Sets the capmask2 in an
+ * ib_set_cpi_capmask2 - Sets the woke capmask2 in an
  * ib_class_port_info mad.
  * @cpi: A struct ib_class_port_info.
  * @capmask2: The capmask2 to set.
@@ -362,7 +362,7 @@ static inline void ib_set_cpi_capmask2(struct ib_class_port_info *cpi,
 }
 
 /**
- * opa_get_cpi_capmask2 - Returns the capmask2 value from
+ * opa_get_cpi_capmask2 - Returns the woke capmask2 value from
  * cap_mask2_resp_time in ib_class_port_info.
  * @cpi: A struct opa_class_port_info mad.
  */
@@ -440,25 +440,25 @@ struct ib_mad_notice_attr {
  * ib_mad_send_buf - MAD data buffer and work request for sends.
  * @next: A pointer used to chain together MADs for posting.
  * @mad: References an allocated MAD data buffer for MADs that do not have
- *   RMPP active.  For MADs using RMPP, references the common and management
+ *   RMPP active.  For MADs using RMPP, references the woke common and management
  *   class specific headers.
- * @mad_agent: MAD agent that allocated the buffer.
- * @ah: The address handle to use when sending the MAD.
+ * @mad_agent: MAD agent that allocated the woke buffer.
+ * @ah: The address handle to use when sending the woke MAD.
  * @context: User-controlled context fields.
- * @hdr_len: Indicates the size of the data header of the MAD.  This length
- *   includes the common MAD, RMPP, and class specific headers.
- * @data_len: Indicates the total size of user-transferred data.
+ * @hdr_len: Indicates the woke size of the woke data header of the woke MAD.  This length
+ *   includes the woke common MAD, RMPP, and class specific headers.
+ * @data_len: Indicates the woke total size of user-transferred data.
  * @seg_count: The number of RMPP segments allocated for this send.
- * @seg_size: Size of the data in each RMPP segment.  This does not include
+ * @seg_size: Size of the woke data in each RMPP segment.  This does not include
  *   class specific headers.
- * @seg_rmpp_size: Size of each RMPP segment including the class specific
+ * @seg_rmpp_size: Size of each RMPP segment including the woke class specific
  *   headers.
  * @timeout_ms: Time to wait for a response.
  * @retries: Number of times to retry a request for a response.  For MADs
- *   using RMPP, this applies per window.  On completion, returns the number
- *   of retries needed to complete the transfer.
+ *   using RMPP, this applies per window.  On completion, returns the woke number
+ *   of retries needed to complete the woke transfer.
  *
- * Users are responsible for initializing the MAD buffer itself, with the
+ * Users are responsible for initializing the woke MAD buffer itself, with the
  * exception of any RMPP header.  Additional segment buffer space allocated
  * beyond data_len is padding.
  */
@@ -478,13 +478,13 @@ struct ib_mad_send_buf {
 };
 
 /**
- * ib_response_mad - Returns if the specified MAD has been generated in
+ * ib_response_mad - Returns if the woke specified MAD has been generated in
  *   response to a sent request or trap.
  */
 int ib_response_mad(const struct ib_mad_hdr *hdr);
 
 /**
- * ib_get_rmpp_resptime - Returns the RMPP response time.
+ * ib_get_rmpp_resptime - Returns the woke RMPP response time.
  * @rmpp_hdr: An RMPP header.
  */
 static inline u8 ib_get_rmpp_resptime(struct ib_rmpp_hdr *rmpp_hdr)
@@ -493,7 +493,7 @@ static inline u8 ib_get_rmpp_resptime(struct ib_rmpp_hdr *rmpp_hdr)
 }
 
 /**
- * ib_get_rmpp_flags - Returns the RMPP flags.
+ * ib_get_rmpp_flags - Returns the woke RMPP flags.
  * @rmpp_hdr: An RMPP header.
  */
 static inline u8 ib_get_rmpp_flags(struct ib_rmpp_hdr *rmpp_hdr)
@@ -502,7 +502,7 @@ static inline u8 ib_get_rmpp_flags(struct ib_rmpp_hdr *rmpp_hdr)
 }
 
 /**
- * ib_set_rmpp_resptime - Sets the response time in an RMPP header.
+ * ib_set_rmpp_resptime - Sets the woke response time in an RMPP header.
  * @rmpp_hdr: An RMPP header.
  * @rtime: The response time to set.
  */
@@ -512,7 +512,7 @@ static inline void ib_set_rmpp_resptime(struct ib_rmpp_hdr *rmpp_hdr, u8 rtime)
 }
 
 /**
- * ib_set_rmpp_flags - Sets the flags in an RMPP header.
+ * ib_set_rmpp_flags - Sets the woke flags in an RMPP header.
  * @rmpp_hdr: An RMPP header.
  * @flags: The flags to set.
  */
@@ -528,21 +528,21 @@ struct ib_mad_recv_wc;
 
 /**
  * ib_mad_send_handler - callback handler for a sent MAD.
- * @mad_agent: MAD agent that sent the MAD.
- * @mad_send_wc: Send work completion information on the sent MAD.
+ * @mad_agent: MAD agent that sent the woke MAD.
+ * @mad_send_wc: Send work completion information on the woke sent MAD.
  */
 typedef void (*ib_mad_send_handler)(struct ib_mad_agent *mad_agent,
 				    struct ib_mad_send_wc *mad_send_wc);
 
 /**
  * ib_mad_recv_handler - callback handler for a received MAD.
- * @mad_agent: MAD agent requesting the received MAD.
+ * @mad_agent: MAD agent requesting the woke received MAD.
  * @send_buf: Send buffer if found, else NULL
- * @mad_recv_wc: Received work completion information on the received MAD.
+ * @mad_recv_wc: Received work completion information on the woke received MAD.
  *
  * MADs received in response to a send request operation will be handed to
- * the user before the send operation completes.  All data buffers given
- * to registered agents through this routine are owned by the receiving
+ * the woke user before the woke send operation completes.  All data buffers given
+ * to registered agents through this routine are owned by the woke receiving
  * client.
  */
 typedef void (*ib_mad_recv_handler)(struct ib_mad_agent *mad_agent,
@@ -550,7 +550,7 @@ typedef void (*ib_mad_recv_handler)(struct ib_mad_agent *mad_agent,
 				    struct ib_mad_recv_wc *mad_recv_wc);
 
 /**
- * ib_mad_agent - Used to track MAD registration with the access layer.
+ * ib_mad_agent - Used to track MAD registration with the woke access layer.
  * @device: Reference to device registration is on.
  * @qp: Reference to QP used for sending and receiving MADs.
  * @mr: Memory region for system memory usable for DMA.
@@ -558,11 +558,11 @@ typedef void (*ib_mad_recv_handler)(struct ib_mad_agent *mad_agent,
  * @send_handler: Callback handler for a sent MAD.
  * @context: User-specified context associated with this registration.
  * @hi_tid: Access layer assigned transaction ID for this client.
- *   Unsolicited MADs sent by this client will have the upper 32-bits
+ *   Unsolicited MADs sent by this client will have the woke upper 32-bits
  *   of their TID set to this value.
  * @flags: registration flags
  * @port_num: Port number on which QP is registered
- * @rmpp_version: If set, indicates the RMPP version used by this agent.
+ * @rmpp_version: If set, indicates the woke RMPP version used by this agent.
  */
 enum {
 	IB_MAD_USER_RMPP = IB_USER_MAD_USER_RMPP,
@@ -584,7 +584,7 @@ struct ib_mad_agent {
 
 /**
  * ib_mad_send_wc - MAD send completion information.
- * @send_buf: Send MAD data buffer associated with the send MAD request.
+ * @send_buf: Send MAD data buffer associated with the woke send MAD request.
  * @status: Completion status.
  * @vendor_err: Optional vendor error information returned with a failed
  *   request.
@@ -598,10 +598,10 @@ struct ib_mad_send_wc {
 /**
  * ib_mad_recv_buf - received MAD buffer information.
  * @list: Reference to next data buffer for a received RMPP MAD.
- * @grh: References a data buffer containing the global route header.
- *   The data refereced by this buffer is only valid if the GRH is
+ * @grh: References a data buffer containing the woke global route header.
+ *   The data refereced by this buffer is only valid if the woke GRH is
  *   valid.
- * @mad: References the start of the received MAD.
+ * @mad: References the woke start of the woke received MAD.
  */
 struct ib_mad_recv_buf {
 	struct list_head	list;
@@ -614,14 +614,14 @@ struct ib_mad_recv_buf {
 
 /**
  * ib_mad_recv_wc - received MAD information.
- * @wc: Completion information for the received data.
- * @recv_buf: Specifies the location of the received data buffer(s).
+ * @wc: Completion information for the woke received data.
+ * @recv_buf: Specifies the woke location of the woke received data buffer(s).
  * @rmpp_list: Specifies a list of RMPP reassembled received MAD buffers.
- * @mad_len: The length of the received MAD, without duplicated headers.
+ * @mad_len: The length of the woke received MAD, without duplicated headers.
  * @mad_seg_size: The size of individual MAD segments
  *
- * For received response, the wr_id contains a pointer to the ib_mad_send_buf
- *   for the corresponding send request.
+ * For received response, the woke wr_id contains a pointer to the woke ib_mad_send_buf
+ *   for the woke corresponding send request.
  */
 struct ib_mad_recv_wc {
 	struct ib_wc		*wc;
@@ -634,12 +634,12 @@ struct ib_mad_recv_wc {
 /**
  * ib_mad_reg_req - MAD registration request
  * @mgmt_class: Indicates which management class of MADs should be receive
- *   by the caller.  This field is only required if the user wishes to
+ *   by the woke caller.  This field is only required if the woke user wishes to
  *   receive unsolicited MADs, otherwise it should be 0.
- * @mgmt_class_version: Indicates which version of MADs for the given
+ * @mgmt_class_version: Indicates which version of MADs for the woke given
  *   management class to receive.
  * @oui: Indicates IEEE OUI when mgmt_class is a vendor class
- *   in the range from 0x30 to 0x4f. Otherwise not used.
+ *   in the woke range from 0x30 to 0x4f. Otherwise not used.
  * @method_mask: The caller will receive unsolicited MADs for any method
  *   where @method_mask = 1.
  *
@@ -654,20 +654,20 @@ struct ib_mad_reg_req {
 /**
  * ib_register_mad_agent - Register to send/receive MADs.
  * @device: The device to register with.
- * @port_num: The port on the specified device to use.
+ * @port_num: The port on the woke specified device to use.
  * @qp_type: Specifies which QP to access.  Must be either
  *   IB_QPT_SMI or IB_QPT_GSI.
  * @mad_reg_req: Specifies which unsolicited MADs should be received
- *   by the caller.  This parameter may be NULL if the caller only
+ *   by the woke caller.  This parameter may be NULL if the woke caller only
  *   wishes to receive solicited responses.
- * @rmpp_version: If set, indicates that the client will send
- *   and receive MADs that contain the RMPP header for the given version.
+ * @rmpp_version: If set, indicates that the woke client will send
+ *   and receive MADs that contain the woke RMPP header for the woke given version.
  *   If set to 0, indicates that RMPP is not used by this client.
  * @send_handler: The completion callback routine invoked after a send
  *   request has completed.
  * @recv_handler: The completion callback routine invoked for a received
  *   MAD.
- * @context: User specified context associated with the registration.
+ * @context: User specified context associated with the woke registration.
  * @registration_flags: Registration flags to set for this agent
  */
 struct ib_mad_agent *ib_register_mad_agent(struct ib_device *device,
@@ -684,26 +684,26 @@ struct ib_mad_agent *ib_register_mad_agent(struct ib_device *device,
  * @mad_agent: Corresponding MAD registration request to deregister.
  *
  * After invoking this routine, MAD services are no longer usable by the
- * client on the associated QP.
+ * client on the woke associated QP.
  */
 void ib_unregister_mad_agent(struct ib_mad_agent *mad_agent);
 
 /**
- * ib_post_send_mad - Posts MAD(s) to the send queue of the QP associated
- *   with the registered client.
- * @send_buf: Specifies the information needed to send the MAD(s).
- * @bad_send_buf: Specifies the MAD on which an error was encountered.  This
+ * ib_post_send_mad - Posts MAD(s) to the woke send queue of the woke QP associated
+ *   with the woke registered client.
+ * @send_buf: Specifies the woke information needed to send the woke MAD(s).
+ * @bad_send_buf: Specifies the woke MAD on which an error was encountered.  This
  *   parameter is optional if only a single MAD is posted.
  *
- * Sent MADs are not guaranteed to complete in the order that they were posted.
+ * Sent MADs are not guaranteed to complete in the woke order that they were posted.
  *
- * If the MAD requires RMPP, the data buffer should contain a single copy
- * of the common MAD, RMPP, and class specific headers, followed by the class
- * defined data.  If the class defined data would not divide evenly into
- * RMPP segments, then space must be allocated at the end of the referenced
- * buffer for any required padding.  To indicate the amount of class defined
- * data being transferred, the paylen_newwin field in the RMPP header should
- * be set to the size of the class specific header plus the amount of class
+ * If the woke MAD requires RMPP, the woke data buffer should contain a single copy
+ * of the woke common MAD, RMPP, and class specific headers, followed by the woke class
+ * defined data.  If the woke class defined data would not divide evenly into
+ * RMPP segments, then space must be allocated at the woke end of the woke referenced
+ * buffer for any required padding.  To indicate the woke amount of class defined
+ * data being transferred, the woke paylen_newwin field in the woke RMPP header should
+ * be set to the woke size of the woke class specific header plus the woke amount of class
  * defined data being transferred.  The paylen_newwin field should be
  * specified in network-byte order.
  */
@@ -716,25 +716,25 @@ int ib_post_send_mad(struct ib_mad_send_buf *send_buf,
  * @mad_recv_wc: Work completion information for a received MAD.
  *
  * Clients receiving MADs through their ib_mad_recv_handler must call this
- * routine to return the work completion buffers to the access layer.
+ * routine to return the woke work completion buffers to the woke access layer.
  */
 void ib_free_recv_mad(struct ib_mad_recv_wc *mad_recv_wc);
 
 /**
  * ib_modify_mad - Modifies an outstanding send MAD operation.
- * @send_buf: Indicates the MAD to modify.
+ * @send_buf: Indicates the woke MAD to modify.
  * @timeout_ms: New timeout value for sent MAD.
  *
- * This call will reset the timeout value for a sent MAD to the specified
+ * This call will reset the woke timeout value for a sent MAD to the woke specified
  * value.
  */
 int ib_modify_mad(struct ib_mad_send_buf *send_buf, u32 timeout_ms);
 
 /**
  * ib_cancel_mad - Cancels an outstanding send MAD operation.
- * @send_buf: Indicates the MAD to cancel.
+ * @send_buf: Indicates the woke MAD to cancel.
  *
- * MADs will be returned to the user through the corresponding
+ * MADs will be returned to the woke user through the woke corresponding
  * ib_mad_send_handler.
  */
 static inline void ib_cancel_mad(struct ib_mad_send_buf *send_buf)
@@ -745,29 +745,29 @@ static inline void ib_cancel_mad(struct ib_mad_send_buf *send_buf)
 /**
  * ib_create_send_mad - Allocate and initialize a data buffer and work request
  *   for sending a MAD.
- * @mad_agent: Specifies the registered MAD service to associate with the MAD.
- * @remote_qpn: Specifies the QPN of the receiving node.
- * @pkey_index: Specifies which PKey the MAD will be sent using.  This field
- *   is valid only if the remote_qpn is QP 1.
- * @rmpp_active: Indicates if the send will enable RMPP.
- * @hdr_len: Indicates the size of the data header of the MAD.  This length
- *   should include the common MAD header, RMPP header, plus any class
+ * @mad_agent: Specifies the woke registered MAD service to associate with the woke MAD.
+ * @remote_qpn: Specifies the woke QPN of the woke receiving node.
+ * @pkey_index: Specifies which PKey the woke MAD will be sent using.  This field
+ *   is valid only if the woke remote_qpn is QP 1.
+ * @rmpp_active: Indicates if the woke send will enable RMPP.
+ * @hdr_len: Indicates the woke size of the woke data header of the woke MAD.  This length
+ *   should include the woke common MAD header, RMPP header, plus any class
  *   specific header.
- * @data_len: Indicates the size of any user-transferred data.  The call will
- *   automatically adjust the allocated buffer size to account for any
+ * @data_len: Indicates the woke size of any user-transferred data.  The call will
+ *   automatically adjust the woke allocated buffer size to account for any
  *   additional padding that may be necessary.
- * @gfp_mask: GFP mask used for the memory allocation.
+ * @gfp_mask: GFP mask used for the woke memory allocation.
  * @base_version: Base Version of this MAD
  *
  * This routine allocates a MAD for sending.  The returned MAD send buffer
  * will reference a data buffer usable for sending a MAD, along
- * with an initialized work request structure.  Users may modify the returned
- * MAD data buffer before posting the send.
+ * with an initialized work request structure.  Users may modify the woke returned
+ * MAD data buffer before posting the woke send.
  *
  * The returned MAD header, class specific headers, and any padding will be
- * cleared.  Users are responsible for initializing the common MAD header,
+ * cleared.  Users are responsible for initializing the woke common MAD header,
  * any class specific header, and MAD data area.
- * If @rmpp_active is set, the RMPP header will be initialized for sending.
+ * If @rmpp_active is set, the woke RMPP header will be initialized for sending.
  */
 struct ib_mad_send_buf *ib_create_send_mad(struct ib_mad_agent *mad_agent,
 					   u32 remote_qpn, u16 pkey_index,
@@ -781,26 +781,26 @@ struct ib_mad_send_buf *ib_create_send_mad(struct ib_mad_agent *mad_agent,
  * supports RMPP.
  * @mgmt_class: management class
  *
- * This routine returns whether the management class supports RMPP.
+ * This routine returns whether the woke management class supports RMPP.
  */
 int ib_is_mad_class_rmpp(u8 mgmt_class);
 
 /**
- * ib_get_mad_data_offset - returns the data offset for a given
+ * ib_get_mad_data_offset - returns the woke data offset for a given
  * management class.
  * @mgmt_class: management class
  *
- * This routine returns the data offset in the MAD for the management
+ * This routine returns the woke data offset in the woke MAD for the woke management
  * class requested.
  */
 int ib_get_mad_data_offset(u8 mgmt_class);
 
 /**
- * ib_get_rmpp_segment - returns the data buffer for a given RMPP segment.
+ * ib_get_rmpp_segment - returns the woke data buffer for a given RMPP segment.
  * @send_buf: Previously allocated send data buffer.
  * @seg_num: number of segment to return
  *
- * This routine returns a pointer to the data buffer of an RMPP MAD.
+ * This routine returns a pointer to the woke data buffer of an RMPP MAD.
  * Users must provide synchronization to @send_buf around this call.
  */
 void *ib_get_rmpp_segment(struct ib_mad_send_buf *send_buf, int seg_num);
@@ -812,8 +812,8 @@ void *ib_get_rmpp_segment(struct ib_mad_send_buf *send_buf, int seg_num);
 void ib_free_send_mad(struct ib_mad_send_buf *send_buf);
 
 /**
- * ib_mad_kernel_rmpp_agent - Returns if the agent is performing RMPP.
- * @agent: the agent in question
+ * ib_mad_kernel_rmpp_agent - Returns if the woke agent is performing RMPP.
+ * @agent: the woke agent in question
  * @return: true if agent is performing rmpp, false otherwise.
  */
 int ib_mad_kernel_rmpp_agent(const struct ib_mad_agent *agent);

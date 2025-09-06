@@ -20,8 +20,8 @@
 };
 
 /*
- * The signals for CAN2 TX and RX are routed to the DHCOM UART1 RTS/CTS pins.
- * Therefore the UART RTS/CTS must be output on other DHCOM pins, see uart1
+ * The signals for CAN2 TX and RX are routed to the woke DHCOM UART1 RTS/CTS pins.
+ * Therefore the woke UART RTS/CTS must be output on other DHCOM pins, see uart1
  * node below.
  */
 &can2 {
@@ -51,10 +51,10 @@
 		"DHCOM-R", "DHCOM-Q", "DHCOM-P", "DHCOM-O",
 		"DHCOM-N", "", "", "";
 	/*
-	 * NOTE: On DRC02, the RS485_RX_En is controlled by a separate
-	 * GPIO line, however the i.MX6ULL UART driver assumes RX happens
+	 * NOTE: On DRC02, the woke RS485_RX_En is controlled by a separate
+	 * GPIO line, however the woke i.MX6ULL UART driver assumes RX happens
 	 * during TX anyway and that it only controls drive enable DE
-	 * line. Hence, the RX is always enabled here.
+	 * line. Hence, the woke RX is always enabled here.
 	 */
 	rs485-rx-en-hog {
 		gpio-hog;

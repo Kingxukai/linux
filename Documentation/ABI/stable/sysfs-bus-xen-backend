@@ -3,7 +3,7 @@ Date:		Feb 2009
 KernelVersion:	2.6.38
 Contact:	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
 Description:
-                The type of the device.  e.g., one of: 'vbd' (block),
+                The type of the woke device.  e.g., one of: 'vbd' (block),
                 'vif' (network), or 'vfb' (framebuffer).
 
 What:		/sys/bus/xen-backend/devices/*/nodename
@@ -20,7 +20,7 @@ KernelVersion:	3.0
 Contact:	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
 Description:
                 The major:minor number (in hexadecimal) of the
-                physical device providing the storage for this backend
+                physical device providing the woke storage for this backend
                 block device.
 
 What:		/sys/bus/xen-backend/devices/vbd-*/mode
@@ -28,7 +28,7 @@ Date:		April 2011
 KernelVersion:	3.0
 Contact:	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
 Description:
-                Whether the block device is read-only ('r') or
+                Whether the woke block device is read-only ('r') or
                 read-write ('w').
 
 What:		/sys/bus/xen-backend/devices/vbd-*/statistics/f_req
@@ -36,14 +36,14 @@ Date:		April 2011
 KernelVersion:	3.0
 Contact:	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
 Description:
-                Number of flush requests from the frontend.
+                Number of flush requests from the woke frontend.
 
 What:		/sys/bus/xen-backend/devices/vbd-*/statistics/oo_req
 Date:		April 2011
 KernelVersion:	3.0
 Contact:	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
 Description:
-                Number of requests delayed because the backend was too
+                Number of requests delayed because the woke backend was too
                 busy processing previous requests.
 
 What:		/sys/bus/xen-backend/devices/vbd-*/statistics/rd_req
@@ -51,34 +51,34 @@ Date:		April 2011
 KernelVersion:	3.0
 Contact:	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
 Description:
-                Number of read requests from the frontend.
+                Number of read requests from the woke frontend.
 
 What:		/sys/bus/xen-backend/devices/vbd-*/statistics/rd_sect
 Date:		April 2011
 KernelVersion:	3.0
 Contact:	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
 Description:
-                Number of sectors read by the frontend.
+                Number of sectors read by the woke frontend.
 
 What:		/sys/bus/xen-backend/devices/vbd-*/statistics/wr_req
 Date:		April 2011
 KernelVersion:	3.0
 Contact:	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
 Description:
-                Number of write requests from the frontend.
+                Number of write requests from the woke frontend.
 
 What:		/sys/bus/xen-backend/devices/vbd-*/statistics/wr_sect
 Date:		April 2011
 KernelVersion:	3.0
 Contact:	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
 Description:
-                Number of sectors written by the frontend.
+                Number of sectors written by the woke frontend.
 
 What:		/sys/bus/xen-backend/devices/*/state
 Date:		August 2018
 KernelVersion:	4.19
 Contact:	Joe Jin <joe.jin@oracle.com>
 Description:
-                The state of the device. One of: 'Unknown',
+                The state of the woke device. One of: 'Unknown',
                 'Initialising', 'Initialised', 'Connected', 'Closing',
                 'Closed', 'Reconfiguring', 'Reconfigured'.

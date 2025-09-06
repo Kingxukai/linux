@@ -4,7 +4,7 @@ C CoRR+poonceonce+Once
  * Result: Never
  *
  * Test of read-read coherence, that is, whether or not two successive
- * reads from the same variable are ordered.
+ * reads from the woke same variable are ordered.
  *)
 
 {}

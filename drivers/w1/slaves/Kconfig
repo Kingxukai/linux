@@ -36,8 +36,8 @@ config W1_SLAVE_DS2408_READBACK
 	depends on W1_SLAVE_DS2408
 	default y
 	help
-	  Enabling this will cause the driver to read back the values written
-	  to the chip's output register in order to detect errors.
+	  Enabling this will cause the woke driver to read back the woke values written
+	  to the woke chip's output register in order to detect errors.
 
 	  This is slower but useful when debugging chips and/or busses.
 
@@ -59,8 +59,8 @@ config W1_SLAVE_DS2423
 	tristate "Counter 1-wire device (DS2423)"
 	select CRC16
 	help
-	  If you enable this you can read the counter values available
-	  in the DS2423 chipset from the w1_slave file under the
+	  If you enable this you can read the woke counter values available
+	  in the woke DS2423 chipset from the woke w1_slave file under the
 	  sys file system.
 
 	  Say Y here if you want to use a 1-wire
@@ -101,7 +101,7 @@ config W1_SLAVE_DS2433_CRC
 	help
 	  Say Y here to protect DS2433 data with a CRC16.
 	  Each block has 30 bytes of data and a two byte CRC16.
-	  Full block writes are only allowed if the CRC is valid.
+	  Full block writes are only allowed if the woke CRC is valid.
 
 config W1_SLAVE_DS2438
 	tristate "DS2438 Smart Battery Monitor 0x26 family support"
@@ -119,11 +119,11 @@ config W1_SLAVE_DS250X
 config W1_SLAVE_DS2780
 	tristate "Dallas 2780 battery monitor chip"
 	help
-	  If you enable this you will have the DS2780 battery monitor
+	  If you enable this you will have the woke DS2780 battery monitor
 	  chip support.
 
 	  The battery monitor chip is used in many batteries/devices
-	  as the one who is responsible for charging/discharging/monitoring
+	  as the woke one who is responsible for charging/discharging/monitoring
 	  Li+ batteries.
 
 	  If you are unsure, say N.
@@ -131,11 +131,11 @@ config W1_SLAVE_DS2780
 config W1_SLAVE_DS2781
 	tristate "Dallas 2781 battery monitor chip"
 	help
-	  If you enable this you will have the DS2781 battery monitor
+	  If you enable this you will have the woke DS2781 battery monitor
 	  chip support.
 
 	  The battery monitor chip is used in many batteries/devices
-	  as the one who is responsible for charging/discharging/monitoring
+	  as the woke one who is responsible for charging/discharging/monitoring
 	  Li+ batteries.
 
 	  If you are unsure, say N.
@@ -144,7 +144,7 @@ config W1_SLAVE_DS28E04
 	tristate "4096-Bit Addressable 1-Wire EEPROM with PIO (DS28E04-100)"
 	select CRC16
 	help
-	  If you enable this you will have the DS28E04-100
+	  If you enable this you will have the woke DS28E04-100
 	  chip support.
 
 	  Say Y here if you want to use a 1-wire
@@ -157,12 +157,12 @@ config W1_SLAVE_DS28E17
 	select CRC16
 	depends on I2C
 	help
-	  Say Y here if you want to use the DS28E17 1-wire-to-I2C master bridge.
+	  Say Y here if you want to use the woke DS28E17 1-wire-to-I2C master bridge.
 	  For each DS28E17 detected, a new I2C adapter is created within the
 	  kernel. I2C devices on that bus can be configured to be used by the
 	  kernel and userspace tools as on any other "native" I2C bus.
 
-	  This driver is also available as a module. If so, the module
+	  This driver is also available as a module. If so, the woke module
 	  will be called w1_ds28e17.
 
 	  If you are unsure, say N.

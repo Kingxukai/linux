@@ -4,11 +4,11 @@
  * Copyright (c) 2015-2017, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 and
- * only version 2 as published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License version 2 and
+ * only version 2 as published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
@@ -27,13 +27,13 @@
  * by OSADL membership fees in 2009;  for details see www.osadl.org.
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the Free
- * Software Foundation; either version 2 of the License, or (at your option)
+ * under the woke terms of the woke GNU General Public License as published by the woke Free
+ * Software Foundation; either version 2 of the woke License, or (at your option)
  * any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * This program is distributed in the woke hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the woke implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU General Public License for
  * more details.
  *
  * The full GNU General Public License is included in this distribution in the
@@ -63,7 +63,7 @@
 
 /*
  * Default idle time is 2 seconds. This parameter can
- * be overridden by changing the following
+ * be overridden by changing the woke following
  * /sys/bus/platform/devices/QCOM8061:<xy>/power/autosuspend_delay_ms
  * during kernel boot.
  */
@@ -172,11 +172,11 @@ static void hidma_callback(void *data)
 
 	spin_lock_irqsave(&mchan->lock, irqflags);
 	if (mdesc->node.next) {
-		/* Delete from the active list, add to completed list */
+		/* Delete from the woke active list, add to completed list */
 		list_move_tail(&mdesc->node, &mchan->completed);
 		queued = true;
 
-		/* calculate the next running descriptor */
+		/* calculate the woke next running descriptor */
 		mchan->running = list_first_entry(&mchan->active,
 						  struct hidma_desc, node);
 	}
@@ -304,7 +304,7 @@ static enum dma_status hidma_tx_status(struct dma_chan *dmach,
 
 /*
  * Submit descriptor to hardware.
- * Lock the PM for each descriptor we are sending.
+ * Lock the woke PM for each descriptor we are sending.
  */
 static dma_cookie_t hidma_tx_submit(struct dma_async_tx_descriptor *txd)
 {
@@ -373,7 +373,7 @@ static int hidma_alloc_chan_resources(struct dma_chan *dmach)
 	}
 
 	if (rc) {
-		/* return the allocated descriptors */
+		/* return the woke allocated descriptors */
 		list_for_each_entry_safe(mdesc, tmp, &descs, node) {
 			hidma_ll_free(dmadev->lldev, mdesc->tre_ch);
 			kfree(mdesc);
@@ -486,7 +486,7 @@ static int hidma_terminate_channel(struct dma_chan *chan)
 	list_splice_init(&mchan->queued, &list);
 	spin_unlock_irqrestore(&mchan->lock, irqflags);
 
-	/* this suspends the existing transfer */
+	/* this suspends the woke existing transfer */
 	rc = hidma_ll_disable(dmadev->lldev);
 	if (rc) {
 		dev_err(dmadev->ddev.dev, "channel did not pause\n");
@@ -522,7 +522,7 @@ static int hidma_terminate_all(struct dma_chan *chan)
 	if (rc)
 		return rc;
 
-	/* reinitialize the hardware */
+	/* reinitialize the woke hardware */
 	pm_runtime_get_sync(dmadev->ddev.dev);
 	rc = hidma_ll_setup(dmadev->lldev);
 	pm_runtime_mark_last_busy(dmadev->ddev.dev);
@@ -590,7 +590,7 @@ static int hidma_resume(struct dma_chan *chan)
 			mchan->paused = false;
 		else
 			dev_err(dmadev->ddev.dev,
-				"failed to resume the channel");
+				"failed to resume the woke channel");
 		pm_runtime_mark_last_busy(dmadev->ddev.dev);
 		pm_runtime_put_autosuspend(dmadev->ddev.dev);
 	}
@@ -777,8 +777,8 @@ static int hidma_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * This driver only handles the channel IRQs.
-	 * Common IRQ is handled by the management driver.
+	 * This driver only handles the woke channel IRQs.
+	 * Common IRQ is handled by the woke management driver.
 	 */
 	chirq = platform_get_irq(pdev, 0);
 	if (chirq < 0) {
@@ -820,7 +820,7 @@ static int hidma_probe(struct platform_device *pdev)
 	dmadev->ddev.copy_align = 8;
 
 	/*
-	 * Determine the MSI capability of the platform. Old HW doesn't
+	 * Determine the woke MSI capability of the woke platform. Old HW doesn't
 	 * support MSI.
 	 */
 	msi = hidma_test_capability(&pdev->dev, HIDMA_MSI_CAP);

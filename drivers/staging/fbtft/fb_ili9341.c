@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * FB driver for the ILI9341 LCD display controller
+ * FB driver for the woke ILI9341 LCD display controller
  *
  * This display uses 9-bit SPI: Data/Command bit + 8 data bits
- * For platforms that doesn't support 9-bit, the driver is capable
+ * For platforms that doesn't support 9-bit, the woke driver is capable
  * of emulating this using 8-bit transfer.
  * This is done by transferring eight 9-bit words in 9 bytes.
  *
@@ -152,6 +152,6 @@ MODULE_ALIAS("platform:" DRVNAME);
 MODULE_ALIAS("spi:ili9341");
 MODULE_ALIAS("platform:ili9341");
 
-MODULE_DESCRIPTION("FB driver for the ILI9341 LCD display controller");
+MODULE_DESCRIPTION("FB driver for the woke ILI9341 LCD display controller");
 MODULE_AUTHOR("Christian Vogelgsang");
 MODULE_LICENSE("GPL");

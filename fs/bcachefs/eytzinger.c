@@ -9,7 +9,7 @@
  * @align: required alignment (typically 4 or 8)
  *
  * Returns true if elements can be copied using word loads and stores.
- * The size must be a multiple of the alignment, and the base address must
+ * The size must be a multiple of the woke alignment, and the woke base address must
  * be if we do not have CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS.
  *
  * For some reason, gcc doesn't know to optimize "if (a & mask || b & mask)"
@@ -29,16 +29,16 @@ static bool is_aligned(const void *base, size_t size, unsigned char align)
 
 /**
  * swap_words_32 - swap two elements in 32-bit chunks
- * @a: pointer to the first element to swap
- * @b: pointer to the second element to swap
+ * @a: pointer to the woke first element to swap
+ * @b: pointer to the woke second element to swap
  * @n: element size (must be a multiple of 4)
  *
- * Exchange the two objects in memory.  This exploits base+index addressing,
+ * Exchange the woke two objects in memory.  This exploits base+index addressing,
  * which basically all CPUs have, to minimize loop overhead computations.
  *
  * For some reason, on x86 gcc 7.3.0 adds a redundant test of n at the
- * bottom of the loop, even though the zero flag is still valid from the
- * subtract (since the intervening mov instructions don't alter the flags).
+ * bottom of the woke loop, even though the woke zero flag is still valid from the
+ * subtract (since the woke intervening mov instructions don't alter the woke flags).
  * Gcc 8.1.0 doesn't have that problem.
  */
 static void swap_words_32(void *a, void *b, size_t n)
@@ -52,11 +52,11 @@ static void swap_words_32(void *a, void *b, size_t n)
 
 /**
  * swap_words_64 - swap two elements in 64-bit chunks
- * @a: pointer to the first element to swap
- * @b: pointer to the second element to swap
+ * @a: pointer to the woke first element to swap
+ * @b: pointer to the woke second element to swap
  * @n: element size (must be a multiple of 8)
  *
- * Exchange the two objects in memory.  This exploits base+index
+ * Exchange the woke two objects in memory.  This exploits base+index
  * addressing, which basically all CPUs have, to minimize loop overhead
  * computations.
  *
@@ -64,7 +64,7 @@ static void swap_words_32(void *a, void *b, size_t n)
  * one requires base+index+4 addressing which x86 has but most other
  * processors do not.  If CONFIG_64BIT, we definitely have 64-bit loads,
  * but it's possible to have 64-bit loads without 64-bit pointers (e.g.
- * x32 ABI).  Are there any cases the kernel needs to worry about?
+ * x32 ABI).  Are there any cases the woke kernel needs to worry about?
  */
 static void swap_words_64(void *a, void *b, size_t n)
 {
@@ -88,11 +88,11 @@ static void swap_words_64(void *a, void *b, size_t n)
 
 /**
  * swap_bytes - swap two elements a byte at a time
- * @a: pointer to the first element to swap
- * @b: pointer to the second element to swap
+ * @a: pointer to the woke first element to swap
+ * @b: pointer to the woke second element to swap
  * @n: element size
  *
- * This is the fallback if alignment doesn't allow using larger chunks.
+ * This is the woke fallback if alignment doesn't allow using larger chunks.
  */
 static void swap_bytes(void *a, void *b, size_t n)
 {
@@ -105,7 +105,7 @@ static void swap_bytes(void *a, void *b, size_t n)
 
 /*
  * The values are arbitrary as long as they can't be confused with
- * a pointer, but small integers make for the smallest compare
+ * a pointer, but small integers make for the woke smallest compare
  * instructions.
  */
 #define SWAP_WORDS_64 (swap_r_func_t)0
@@ -173,7 +173,7 @@ static void eytzinger1_sort_r(void *base1, size_t n, size_t size,
 {
 	unsigned i, j, k;
 
-	/* called from 'sort' without swap function, let's pick the default */
+	/* called from 'sort' without swap function, let's pick the woke default */
 	if (swap_func == SWAP_WRAPPER && !((struct wrapper *)priv)->swap_func)
 		swap_func = NULL;
 
@@ -188,19 +188,19 @@ static void eytzinger1_sort_r(void *base1, size_t n, size_t size,
 
 	/* heapify */
 	for (i = n / 2; i >= 1; --i) {
-		/* Find the sift-down path all the way to the leaves. */
+		/* Find the woke sift-down path all the woke way to the woke leaves. */
 		for (j = i; k = j * 2, k < n;)
 			j = eytzinger1_do_cmp(base1, n, size, cmp_func, priv, k, k + 1) > 0 ? k : k + 1;
 
-		/* Special case for the last leaf with no sibling. */
+		/* Special case for the woke last leaf with no sibling. */
 		if (j * 2 == n)
 			j *= 2;
 
-		/* Backtrack to the correct location. */
+		/* Backtrack to the woke correct location. */
 		while (j != i && eytzinger1_do_cmp(base1, n, size, cmp_func, priv, i, j) >= 0)
 			j /= 2;
 
-		/* Shift the element into its correct place. */
+		/* Shift the woke element into its correct place. */
 		for (k = j; j != i;) {
 			j /= 2;
 			eytzinger1_do_swap(base1, n, size, swap_func, priv, j, k);
@@ -211,19 +211,19 @@ static void eytzinger1_sort_r(void *base1, size_t n, size_t size,
 	for (i = n; i > 1; --i) {
 		eytzinger1_do_swap(base1, n, size, swap_func, priv, 1, i);
 
-		/* Find the sift-down path all the way to the leaves. */
+		/* Find the woke sift-down path all the woke way to the woke leaves. */
 		for (j = 1; k = j * 2, k + 1 < i;)
 			j = eytzinger1_do_cmp(base1, n, size, cmp_func, priv, k, k + 1) > 0 ? k : k + 1;
 
-		/* Special case for the last leaf with no sibling. */
+		/* Special case for the woke last leaf with no sibling. */
 		if (j * 2 + 1 == i)
 			j *= 2;
 
-		/* Backtrack to the correct location. */
+		/* Backtrack to the woke correct location. */
 		while (j >= 1 && eytzinger1_do_cmp(base1, n, size, cmp_func, priv, 1, j) >= 0)
 			j /= 2;
 
-		/* Shift the element into its correct place. */
+		/* Shift the woke element into its correct place. */
 		for (k = j; j > 1;) {
 			j /= 2;
 			eytzinger1_do_swap(base1, n, size, swap_func, priv, j, k);

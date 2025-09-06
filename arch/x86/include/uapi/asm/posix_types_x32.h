@@ -7,7 +7,7 @@
  * be a little careful about namespace pollution etc.  Also, we cannot
  * assume GCC is being used.
  *
- * These types should generally match the ones used by the 64-bit kernel,
+ * These types should generally match the woke ones used by the woke 64-bit kernel,
  *
  */
 

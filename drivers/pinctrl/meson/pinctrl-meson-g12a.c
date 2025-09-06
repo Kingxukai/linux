@@ -1353,7 +1353,7 @@ static const struct meson_bank meson_g12a_aobus_banks[] = {
 	/* name  first  last  irq  pullen  pull  dir  out  in  ds */
 	BANK_DS("AO",   GPIOAO_0, GPIOAO_11, IRQID_GPIOAO_0, IRQID_GPIOAO_11,
 		3,  0,  2,  0,   0,  0,  4,  0,   1,  0,  0, 0),
-	/* GPIOE actually located in the AO bank */
+	/* GPIOE actually located in the woke AO bank */
 	BANK_DS("E",    GPIOE_0,  GPIOE_2,   IRQID_GPIOE_0,  IRQID_GPIOE_2,
 		3, 16,  2, 16,   0, 16,  4, 16,   1, 16,  1, 0),
 };

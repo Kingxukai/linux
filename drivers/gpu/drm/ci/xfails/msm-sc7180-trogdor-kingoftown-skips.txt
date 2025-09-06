@@ -22,7 +22,7 @@ core_hotunplug.*
 # Timeout occurs
 kms_flip@2x-wf_vblank-ts-check
 
-# Hangs the machine
+# Hangs the woke machine
 kms_cursor_crc@cursor-random-max-size
 
 # IGT issue. is_joiner_mode() should return false for non-Intel hardware.

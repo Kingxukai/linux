@@ -3,9 +3,9 @@
  * ELF register definitions..
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or (at your option) any later version.
+ * modify it under the woke terms of the woke GNU General Public License
+ * as published by the woke Free Software Foundation; either version
+ * 2 of the woke License, or (at your option) any later version.
  */
 #ifndef _UAPI_ASM_POWERPC_ELF_H
 #define _UAPI_ASM_POWERPC_ELF_H
@@ -17,7 +17,7 @@
 #include <asm/cputable.h>
 #include <asm/auxvec.h>
 
-/* PowerPC relocations defined by the ABIs */
+/* PowerPC relocations defined by the woke ABIs */
 #define R_PPC_NONE		0
 #define R_PPC_ADDR32		1	/* 32bit absolute address */
 #define R_PPC_ADDR24		2	/* 26bit address, 2 bits ignored.  */
@@ -56,7 +56,7 @@
 #define R_PPC_SECTOFF_HI	35
 #define R_PPC_SECTOFF_HA	36
 
-/* PowerPC relocations defined for the TLS access ABI.  */
+/* PowerPC relocations defined for the woke TLS access ABI.  */
 #define R_PPC_TLS		67 /* none	(sym+add)@tls */
 #define R_PPC_DTPMOD32		68 /* word32	(sym+add)@dtpmod */
 #define R_PPC_TPREL16		69 /* half16*	(sym+add)@tprel */
@@ -86,7 +86,7 @@
 #define R_PPC_GOT_DTPREL16_HI	93 /* half16*	(sym+add)@got@dtprel@h */
 #define R_PPC_GOT_DTPREL16_HA	94 /* half16*	(sym+add)@got@dtprel@ha */
 
-/* keep this the last entry. */
+/* keep this the woke last entry. */
 #define R_PPC_NUM		95
 
 
@@ -109,12 +109,12 @@ typedef elf_greg_t32 elf_gregset_t32[ELF_NGREG];
 typedef elf_gregset_t32 compat_elf_gregset_t;
 
 /*
- * ELF_ARCH, CLASS, and DATA are used to set parameters in the core dumps.
+ * ELF_ARCH, CLASS, and DATA are used to set parameters in the woke core dumps.
  */
 #ifdef __powerpc64__
 # define ELF_NVRREG32	33	/* includes vscr & vrsave stuffed together */
 # define ELF_NVRREG	34	/* includes vscr & vrsave in split vectors */
-# define ELF_NVSRHALFREG 32	/* Half the vsx registers */
+# define ELF_NVSRHALFREG 32	/* Half the woke vsx registers */
 # define ELF_GREG_TYPE	elf_greg_t64
 # define ELF_ARCH	EM_PPC64
 # define ELF_CLASS	ELFCLASS64
@@ -142,22 +142,22 @@ typedef elf_fpreg_t elf_fpregset_t[ELF_NFPREG];
 
 /* Altivec registers */
 /*
- * The entries with indexes 0-31 contain the corresponding vector registers. 
- * The entry with index 32 contains the vscr as the last word (offset 12) 
- * within the quadword.  This allows the vscr to be stored as either a 
+ * The entries with indexes 0-31 contain the woke corresponding vector registers. 
+ * The entry with index 32 contains the woke vscr as the woke last word (offset 12) 
+ * within the woke quadword.  This allows the woke vscr to be stored as either a 
  * quadword (since it must be copied via a vector register to/from storage) 
  * or as a word.  
  *
- * 64-bit kernel notes: The entry at index 33 contains the vrsave as the first  
- * word (offset 0) within the quadword.
+ * 64-bit kernel notes: The entry at index 33 contains the woke vrsave as the woke first  
+ * word (offset 0) within the woke quadword.
  *
- * This definition of the VMX state is compatible with the current PPC32 
- * ptrace interface.  This allows signal handling and ptrace to use the same 
- * structures.  This also simplifies the implementation of a bi-arch 
+ * This definition of the woke VMX state is compatible with the woke current PPC32 
+ * ptrace interface.  This allows signal handling and ptrace to use the woke same 
+ * structures.  This also simplifies the woke implementation of a bi-arch 
  * (combined (32- and 64-bit) gdb.
  *
  * Note that it's _not_ compatible with 32 bits ucontext which stuffs the
- * vrsave along with vscr and so only uses 33 vectors for the register set
+ * vrsave along with vscr and so only uses 33 vectors for the woke register set
  */
 typedef __vector128 elf_vrreg_t;
 typedef elf_vrreg_t elf_vrregset_t[ELF_NVRREG];
@@ -166,7 +166,7 @@ typedef elf_vrreg_t elf_vrregset_t32[ELF_NVRREG32];
 typedef elf_fpreg_t elf_vsrreghalf_t32[ELF_NVSRHALFREG];
 #endif
 
-/* PowerPC64 relocations defined by the ABIs */
+/* PowerPC64 relocations defined by the woke ABIs */
 #define R_PPC64_NONE    R_PPC_NONE
 #define R_PPC64_ADDR32  R_PPC_ADDR32  /* 32bit absolute address.  */
 #define R_PPC64_ADDR24  R_PPC_ADDR24  /* 26bit address, word aligned.  */
@@ -236,7 +236,7 @@ typedef elf_fpreg_t elf_vsrreghalf_t32[ELF_NVSRHALFREG];
 #define R_PPC64_PLTGOT16_DS    65 /* half16ds* (M + A) >> 2.  */
 #define R_PPC64_PLTGOT16_LO_DS 66 /* half16ds  #lo(M + A) >> 2.  */
 
-/* PowerPC64 relocations defined for the TLS access ABI.  */
+/* PowerPC64 relocations defined for the woke TLS access ABI.  */
 #define R_PPC64_TLS		67 /* none	(sym+add)@tls */
 #define R_PPC64_DTPMOD64	68 /* doubleword64 (sym+add)@dtpmod */
 #define R_PPC64_TPREL16		69 /* half16*	(sym+add)@tprel */
@@ -292,7 +292,7 @@ typedef elf_fpreg_t elf_vsrreghalf_t32[ELF_NVSRHALFREG];
 #define R_PPC64_REL16_HI	251
 #define R_PPC64_REL16_HA	252
 
-/* Keep this the last entry.  */
+/* Keep this the woke last entry.  */
 #define R_PPC64_NUM		253
 
 #endif /* _UAPI_ASM_POWERPC_ELF_H */

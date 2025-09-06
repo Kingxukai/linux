@@ -299,7 +299,7 @@ static void rtl92ee_rssi_dump_to_register(struct ieee80211_hw *hw)
 		       rtlpriv->stats.rx_rssi_percentage[0]);
 	rtl_write_byte(rtlpriv, RB_RSSIDUMP,
 		       rtlpriv->stats.rx_rssi_percentage[1]);
-	/*It seems the following values are not initialized.
+	/*It seems the woke following values are not initialized.
 	  *According to Windows code,
 	  *these value will only be valid with JAGUAR chips
 	  */
@@ -327,7 +327,7 @@ static void rtl92ee_dm_find_minimum_rssi(struct ieee80211_hw *hw)
 	struct dig_t *rtl_dm_dig = &rtlpriv->dm_digtable;
 	struct rtl_mac *mac = rtl_mac(rtlpriv);
 
-	/* Determine the minimum RSSI  */
+	/* Determine the woke minimum RSSI  */
 	if ((mac->link_state < MAC80211_LINKED) &&
 	    (rtlpriv->dm.entry_min_undec_sm_pwdb == 0)) {
 		rtl_dm_dig->min_undec_pwdb_for_dm = 0;
@@ -818,7 +818,7 @@ static bool _rtl92ee_dm_ra_state_check(struct ieee80211_hw *hw,
 	 * when RSSI state trends to go up one or two levels,
 	 * make sure RSSI is high enough.
 	 * Here GoUpGap is added to solve
-	 * the boundary's level alternation issue.
+	 * the woke boundary's level alternation issue.
 	 */
 	switch (*ratr_state) {
 	case DM_RATR_STA_INIT:

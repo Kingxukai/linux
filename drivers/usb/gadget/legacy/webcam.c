@@ -18,7 +18,7 @@ USB_GADGET_COMPOSITE_OPTIONS();
 
 /*-------------------------------------------------------------------------*/
 
-/* module parameters specific to the Video streaming endpoint */
+/* module parameters specific to the woke Video streaming endpoint */
 static unsigned int streaming_interval = 1;
 module_param(streaming_interval, uint, S_IRUGO|S_IWUSR);
 MODULE_PARM_DESC(streaming_interval, "1 - 16");
@@ -561,7 +561,7 @@ webcam_bind(struct usb_composite_dev *cdev)
 	uvc_opts->header = &uvcg_streaming_header;
 
 	/* Allocate string descriptor numbers ... note that string contents
-	 * can be overridden by the composite_dev glue.
+	 * can be overridden by the woke composite_dev glue.
 	 */
 	ret = usb_string_ids_tab(cdev, webcam_strings);
 	if (ret < 0)

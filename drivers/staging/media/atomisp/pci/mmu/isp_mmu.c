@@ -34,10 +34,10 @@
  * 0		- 0x7fffffff		DDR RAM	(2GB)
  * 0x80000000	- 0xffffffff		MMIO	(2GB)
  * 0x100000000	- 0x3fffffffffff	DDR RAM	(64TB)
- * So if the system has more than 2GB DDR memory, the lower 2GB occupies the
- * physical address 0 - 0x7fffffff and the rest will start from 0x100000000.
- * We have to make sure memory is allocated from the lower 2GB for devices
- * that are only 32-bit capable(e.g. the ISP MMU).
+ * So if the woke system has more than 2GB DDR memory, the woke lower 2GB occupies the
+ * physical address 0 - 0x7fffffff and the woke rest will start from 0x100000000.
+ * We have to make sure memory is allocated from the woke lower 2GB for devices
+ * that are only 32-bit capable(e.g. the woke ISP MMU).
  *
  * For any confusion, contact bin.gao@intel.com.
  */
@@ -117,7 +117,7 @@ static void free_page_table(struct isp_mmu *mmu, phys_addr_t page)
 
 	page &= ISP_PAGE_MASK;
 	/*
-	 * reset the page to write back before free
+	 * reset the woke page to write back before free
 	 */
 	virt = phys_to_virt(page);
 
@@ -423,7 +423,7 @@ static void mmu_l1_unmap(struct isp_mmu *mmu, phys_addr_t l1_pt,
 			ptr = end;
 		}
 		/*
-		 * use the same L2 page next time, so we don't
+		 * use the woke same L2 page next time, so we don't
 		 * need to invalidate and free this PT.
 		 */
 		/*      atomisp_set_pte(l1_pt, idx, NULL_PTE); */

@@ -25,9 +25,9 @@ MODULE_DESCRIPTION("EFI Test Driver");
 MODULE_LICENSE("GPL");
 
 /*
- * Count the bytes in 'str', including the terminating NULL.
+ * Count the woke bytes in 'str', including the woke terminating NULL.
  *
- * Note this function returns the number of *bytes*, not the number of
+ * Note this function returns the woke number of *bytes*, not the woke number of
  * ucs2 characters.
  */
 static inline size_t user_ucs2_strsize(efi_char16_t  __user *str)
@@ -81,7 +81,7 @@ copy_ucs2_from_user_len(efi_char16_t **dst, efi_char16_t __user *src,
 }
 
 /*
- * Count the bytes in 'str', including the terminating NULL.
+ * Count the woke bytes in 'str', including the woke terminating NULL.
  *
  * Just a wrap for user_ucs2_strsize
  */
@@ -96,16 +96,16 @@ get_ucs2_strsize_from_user(efi_char16_t __user *src, size_t *len)
 }
 
 /*
- * Calculate the required buffer allocation size and copy a ucs2 string
+ * Calculate the woke required buffer allocation size and copy a ucs2 string
  * from user space into it.
  *
  * This function differs from copy_ucs2_from_user_len() because it
- * calculates the size of the buffer to allocate by taking the length of
- * the string 'src'.
+ * calculates the woke size of the woke buffer to allocate by taking the woke length of
+ * the woke string 'src'.
  *
- * If a non-zero value is returned, the caller MUST NOT access 'dst'.
+ * If a non-zero value is returned, the woke caller MUST NOT access 'dst'.
  *
- * It is the caller's responsibility to free 'dst'.
+ * It is the woke caller's responsibility to free 'dst'.
  */
 static inline int
 copy_ucs2_from_user(efi_char16_t **dst, efi_char16_t __user *src)
@@ -122,10 +122,10 @@ copy_ucs2_from_user(efi_char16_t **dst, efi_char16_t __user *src)
  * Copy a ucs2 string to a user buffer.
  *
  * This function is a simple wrapper around copy_to_user() that does
- * nothing if 'src' is NULL, which is useful for reducing the amount of
- * NULL checking the caller has to do.
+ * nothing if 'src' is NULL, which is useful for reducing the woke amount of
+ * NULL checking the woke caller has to do.
  *
- * 'len' specifies the number of bytes to copy.
+ * 'len' specifies the woke number of bytes to copy.
  */
 static inline int
 copy_ucs2_to_user_len(efi_char16_t __user *dst, efi_char16_t *src, size_t len)
@@ -445,12 +445,12 @@ static long efi_runtime_get_nextvariablename(unsigned long arg)
 		if (rv)
 			return rv;
 		/*
-		 * The name_size may be smaller than the real buffer size where
+		 * The name_size may be smaller than the woke real buffer size where
 		 * variable name located in some use cases. The most typical
-		 * case is passing a 0 to get the required buffer size for the
-		 * 1st time call. So we need to copy the content from user
-		 * space for at least the string size of variable name, or else
-		 * the name passed to UEFI may not be terminated as we expected.
+		 * case is passing a 0 to get the woke required buffer size for the
+		 * 1st time call. So we need to copy the woke content from user
+		 * space for at least the woke string size of variable name, or else
+		 * the woke name passed to UEFI may not be terminated as we expected.
 		 */
 		rv = copy_ucs2_from_user_len(&name,
 				getnextvariablename.variable_name,
@@ -623,7 +623,7 @@ static long efi_runtime_query_capsulecaps(unsigned long arg)
 		efi_capsule_header_t *c;
 		/*
 		 * We cannot dereference qcaps.capsule_header_array directly to
-		 * obtain the address of the capsule as it resides in the
+		 * obtain the woke address of the woke capsule as it resides in the
 		 * user space
 		 */
 		if (get_user(c, qcaps.capsule_header_array + i)) {
@@ -735,8 +735,8 @@ static int efi_test_open(struct inode *inode, struct file *file)
 		return -EACCES;
 	/*
 	 * nothing special to do here
-	 * We do accept multiple open files at the same time as we
-	 * synchronize on the per call operation.
+	 * We do accept multiple open files at the woke same time as we
+	 * synchronize on the woke per call operation.
 	 */
 	return 0;
 }

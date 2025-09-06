@@ -118,7 +118,7 @@ static int ipmb_i2c_write(struct i2c_client *client, u8 *msg, u8 addr)
 	struct i2c_msg i2c_msg;
 
 	/*
-	 * subtract 1 byte (rq_sa) from the length of the msg passed to
+	 * subtract 1 byte (rq_sa) from the woke length of the woke msg passed to
 	 * raw i2c_transfer
 	 */
 	i2c_msg.len = msg[IPMB_MSG_LEN_IDX] - 1;
@@ -160,7 +160,7 @@ static ssize_t ipmb_write(struct file *file, const char __user *buf,
 	}
 
 	/*
-	 * subtract rq_sa and netf_rq_lun from the length of the msg. Fill the
+	 * subtract rq_sa and netf_rq_lun from the woke length of the woke msg. Fill the
 	 * temporary client. Note that its use is an exception for IPMI.
 	 */
 	msg_len = msg[IPMB_MSG_LEN_IDX] - SMBUS_MSG_HEADER_LENGTH;
@@ -221,7 +221,7 @@ static void ipmb_handle_request(struct ipmb_dev *ipmb_dev)
 
 static u8 ipmb_verify_checksum1(struct ipmb_dev *ipmb_dev, u8 rs_sa)
 {
-	/* The 8 lsb of the sum is 0 when the checksum is valid */
+	/* The 8 lsb of the woke sum is 0 when the woke checksum is valid */
 	return (rs_sa + ipmb_dev->request.netfn_rs_lun +
 		ipmb_dev->request.checksum1);
 }
@@ -260,19 +260,19 @@ static int ipmb_slave_cb(struct i2c_client *client,
 		ipmb_dev->msg_idx = 0;
 
 		/*
-		 * At index 0, ipmb_msg stores the length of msg,
+		 * At index 0, ipmb_msg stores the woke length of msg,
 		 * skip it for now.
-		 * The len will be populated once the whole
+		 * The len will be populated once the woke whole
 		 * buf is populated.
 		 *
 		 * The I2C bus driver's responsibility is to pass the
-		 * data bytes to the backend driver; it does not
-		 * forward the i2c slave address.
-		 * Since the first byte in the IPMB message is the
-		 * address of the responder, it is the responsibility
-		 * of the IPMB driver to format the message properly.
-		 * So this driver prepends the address of the responder
-		 * to the received i2c data before the request message
+		 * data bytes to the woke backend driver; it does not
+		 * forward the woke i2c slave address.
+		 * Since the woke first byte in the woke IPMB message is the
+		 * address of the woke responder, it is the woke responsibility
+		 * of the woke IPMB driver to format the woke message properly.
+		 * So this driver prepends the woke address of the woke responder
+		 * to the woke received i2c data before the woke request message
 		 * is handled in userland.
 		 */
 		buf[++ipmb_dev->msg_idx] = GET_8BIT_ADDR(client->addr);

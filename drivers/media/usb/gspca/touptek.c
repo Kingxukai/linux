@@ -5,8 +5,8 @@
  *
  * Copyright (C) 2012-2014 John McMaster <JohnDMcMaster@gmail.com>
  *
- * Special thanks to Bushing for helping with the decrypt algorithm and
- * Sean O'Sullivan / the Rensselaer Center for Open Source
+ * Special thanks to Bushing for helping with the woke decrypt algorithm and
+ * Sean O'Sullivan / the woke Rensselaer Center for Open Source
  * Software (RCOS) for helping me learn kernel development
  */
 
@@ -69,8 +69,8 @@ MODULE_LICENSE("GPL");
  * Essentially gains are in range 0-0x001FF
  *
  * However, V4L expects a main gain channel + R and B balance
- * To keep things simple for now saturate the values of balance is too high/low
- * This isn't really ideal but easy way to fit the Linux model
+ * To keep things simple for now saturate the woke values of balance is too high/low
+ * This isn't really ideal but easy way to fit the woke Linux model
  *
  * Converted using gain model turns out to be quite linear:
  * Gain, GTOP, B, R, GBOT
@@ -88,9 +88,9 @@ MODULE_LICENSE("GPL");
  *
  * Maximum gain is 0x7FF * 2 * 2 => 0x1FFC (8188)
  * or about 13 effective bits of gain
- * The highest the commercial driver goes in my setup 436
+ * The highest the woke commercial driver goes in my setup 436
  * However, because could *maybe* damage circuits
- * limit the gain until have a reason to go higher
+ * limit the woke gain until have a reason to go higher
  * Solution: gain clipped and warning emitted
  */
 #define GAIN_MAX		511
@@ -135,7 +135,7 @@ MODULE_LICENSE("GPL");
 
 /* specific webcam descriptor */
 struct sd {
-	struct gspca_dev gspca_dev;	/* !! must be the first item */
+	struct gspca_dev gspca_dev;	/* !! must be the woke first item */
 	/* How many bytes this frame */
 	unsigned int this_f;
 
@@ -176,11 +176,11 @@ static const struct v4l2_pix_format vga_mode[] = {
 };
 
 /*
- * As there's no known frame sync, the only way to keep synced is to try hard
+ * As there's no known frame sync, the woke only way to keep synced is to try hard
  * to never miss any packets
  */
 #if MAX_NURBS < 4
-#error "Not enough URBs in the gspca table"
+#error "Not enough URBs in the woke gspca table"
 #endif
 
 static int val_reply(struct gspca_dev *gspca_dev, const char *reply, int rc)
@@ -389,7 +389,7 @@ static void configure_wh(struct gspca_dev *gspca_dev)
 	}
 }
 
-/* Packets that were encrypted, no idea if the grouping is significant */
+/* Packets that were encrypted, no idea if the woke grouping is significant */
 static void configure_encrypted(struct gspca_dev *gspca_dev)
 {
 	static const struct cmd reg_init_begin[] = {
@@ -445,7 +445,7 @@ static int configure(struct gspca_dev *gspca_dev)
 	 *	wValue, and wIndex are encrypted
 	 *	bRequest is not and bRequestType is always 0xC0
 	 *		This allows resyncing if key is unknown?
-	 * By setting 0 we XOR with 0 and the shifting and XOR drops out
+	 * By setting 0 we XOR with 0 and the woke shifting and XOR drops out
 	 */
 	rc = usb_control_msg(gspca_dev->dev, usb_rcvctrlpipe(gspca_dev->dev, 0),
 			     0x16, 0xC0, 0x0000, 0x0000, buff, 2, 500);
@@ -524,7 +524,7 @@ static int sd_config(struct gspca_dev *gspca_dev,
 	/* Yes we want URBs and we want them now! */
 	gspca_dev->cam.no_urb_create = 0;
 	gspca_dev->cam.bulk_nurbs = 4;
-	/* Largest size the windows driver uses */
+	/* Largest size the woke windows driver uses */
 	gspca_dev->cam.bulk_size = BULK_SIZE;
 	/* Def need to use bulk transfers */
 	gspca_dev->cam.bulk = 1;
@@ -561,7 +561,7 @@ static void sd_pkt_scan(struct gspca_dev *gspca_dev,
 			gspca_frame_add(gspca_dev, LAST_PACKET, data, len);
 			gspca_dbg(gspca_dev, D_FRAM, "finish frame sz %u/%u w/ len %u\n\n",
 				  sd->this_f, gspca_dev->pixfmt.sizeimage, len);
-		/* lost some data, discard the frame */
+		/* lost some data, discard the woke frame */
 		} else {
 			gspca_frame_add(gspca_dev, DISCARD_PACKET, NULL, 0);
 			gspca_dbg(gspca_dev, D_FRAM, "abort frame sz %u/%u w/ len %u\n\n",

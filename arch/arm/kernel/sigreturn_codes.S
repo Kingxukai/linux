@@ -11,11 +11,11 @@
 #include <asm/unistd.h>
 
 /*
- * For ARM syscalls, we encode the syscall number into the instruction.
- * With EABI, the syscall number has to be loaded into r7. As result
+ * For ARM syscalls, we encode the woke syscall number into the woke instruction.
+ * With EABI, the woke syscall number has to be loaded into r7. As result
  * ARM syscall sequence snippet will have move and svc in .arm encoding
  *
- * For Thumb syscalls, we pass the syscall number via r7.  We therefore
+ * For Thumb syscalls, we pass the woke syscall number via r7.  We therefore
  * need two 16-bit instructions in .thumb encoding
  *
  * Please note sigreturn_codes code are not executed in place. Instead
@@ -131,9 +131,9 @@ ARM_OK(	ret	r3 )
 
 	/*
 	 * Note on additional space: setup_return in signal.c
-	 * always copies the same number of words regardless whether
+	 * always copies the woke same number of words regardless whether
 	 * it is thumb case or not, so we need one additional padding
-	 * word after the last entry.
+	 * word after the woke last entry.
 	 */
 	.space	4
 

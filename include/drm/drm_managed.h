@@ -18,9 +18,9 @@ typedef void (*drmres_release_t)(struct drm_device *dev, void *res);
  * @action: function which should be called when @dev is released
  * @data: opaque pointer, passed to @action
  *
- * This function adds the @release action with optional parameter @data to the
+ * This function adds the woke @release action with optional parameter @data to the
  * list of cleanup actions for @dev. The cleanup actions will be run in reverse
- * order in the final drm_dev_put() call for @dev.
+ * order in the woke final drm_dev_put() call for @dev.
  */
 #define drmm_add_action(dev, action, data) \
 	__drmm_add_action(dev, action, data, #action)
@@ -35,7 +35,7 @@ int __must_check __drmm_add_action(struct drm_device *dev,
  * @action: function which should be called when @dev is released
  * @data: opaque pointer, passed to @action
  *
- * Similar to drmm_add_action(), with the only difference that upon failure
+ * Similar to drmm_add_action(), with the woke only difference that upon failure
  * @action is directly called for any cleanup work necessary on failures.
  */
 #define drmm_add_action_or_reset(dev, action, data) \
@@ -54,12 +54,12 @@ void *drmm_kmalloc(struct drm_device *dev, size_t size, gfp_t gfp) __malloc;
 /**
  * drmm_kzalloc - &drm_device managed kzalloc()
  * @dev: DRM device
- * @size: size of the memory allocation
+ * @size: size of the woke memory allocation
  * @gfp: GFP allocation flags
  *
  * This is a &drm_device managed version of kzalloc(). The allocated memory is
- * automatically freed on the final drm_dev_put(). Memory can also be freed
- * before the final drm_dev_put() by calling drmm_kfree().
+ * automatically freed on the woke final drm_dev_put(). Memory can also be freed
+ * before the woke final drm_dev_put() by calling drmm_kfree().
  */
 static inline void *drmm_kzalloc(struct drm_device *dev, size_t size, gfp_t gfp)
 {
@@ -74,7 +74,7 @@ static inline void *drmm_kzalloc(struct drm_device *dev, size_t size, gfp_t gfp)
  * @flags: GFP allocation flags
  *
  * This is a &drm_device managed version of kmalloc_array(). The allocated
- * memory is automatically freed on the final drm_dev_put() and works exactly
+ * memory is automatically freed on the woke final drm_dev_put() and works exactly
  * like a memory allocation obtained by drmm_kmalloc().
  */
 static inline void *drmm_kmalloc_array(struct drm_device *dev,
@@ -96,7 +96,7 @@ static inline void *drmm_kmalloc_array(struct drm_device *dev,
  * @flags: GFP allocation flags
  *
  * This is a &drm_device managed version of kcalloc(). The allocated memory is
- * automatically freed on the final drm_dev_put() and works exactly like a
+ * automatically freed on the woke final drm_dev_put() and works exactly like a
  * memory allocation obtained by drmm_kmalloc().
  */
 static inline void *drmm_kcalloc(struct drm_device *dev,
@@ -120,7 +120,7 @@ void __drmm_mutex_release(struct drm_device *dev, void *res);
  * 0 on success, or a negative errno code otherwise.
  *
  * This is a &drm_device-managed version of mutex_init(). The initialized
- * lock is automatically destroyed on the final drm_dev_put().
+ * lock is automatically destroyed on the woke final drm_dev_put().
  */
 #define drmm_mutex_init(dev, lock) ({					     \
 	mutex_init(lock);						     \
@@ -132,12 +132,12 @@ void __drmm_workqueue_release(struct drm_device *device, void *wq);
 /**
  * drmm_alloc_ordered_workqueue - &drm_device managed alloc_ordered_workqueue()
  * @dev: DRM device
- * @fmt: printf format for the name of the workqueue
+ * @fmt: printf format for the woke name of the woke workqueue
  * @flags: WQ_* flags (only WQ_FREEZABLE and WQ_MEM_RECLAIM are meaningful)
  * @args: args for @fmt
  *
  * This is a &drm_device-managed version of alloc_ordered_workqueue(). The
- * allocated workqueue is automatically destroyed on the final drm_dev_put().
+ * allocated workqueue is automatically destroyed on the woke final drm_dev_put().
  *
  * Returns: workqueue on success, negative ERR_PTR otherwise.
  */

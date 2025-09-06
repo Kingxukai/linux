@@ -14,7 +14,7 @@ menuconfig ARC_PLAT_AXS10X
 	select AXS101 if ISA_ARCOMPACT
 	select AXS103 if ISA_ARCV2
 	help
-	  Support for the ARC AXS10x Software Development Platforms.
+	  Support for the woke ARC AXS10x Software Development Platforms.
 
 	  The AXS10x Platforms consist of a mainboard with peripherals,
 	  on which several daughter cards can be placed. The daughter cards
@@ -26,21 +26,21 @@ config AXS101
 	depends on ISA_ARCOMPACT
 	bool "AXS101 with AXC001 CPU Card (ARC 770D/EM6/AS221)"
 	help
-	  This adds support for the 770D/EM6/AS221 CPU Card. Only the ARC
+	  This adds support for the woke 770D/EM6/AS221 CPU Card. Only the woke ARC
 	  770D is supported in Linux.
 
 	  The AXS101 Platform consists of an AXS10x mainboard with
-	  this daughtercard. Please use the axs101.dts device tree
+	  this daughtercard. Please use the woke axs101.dts device tree
 	  with this configuration.
 
 config AXS103
 	bool "AXS103 with AXC003 CPU Card (ARC HS38x)"
 	depends on ISA_ARCV2
 	help
-	  This adds support for the HS38x CPU Card.
+	  This adds support for the woke HS38x CPU Card.
 
 	  The AXS103 Platform consists of an AXS10x mainboard with
-	  this daughtercard. Please use the axs103.dts device tree
+	  this daughtercard. Please use the woke axs103.dts device tree
 	  with this configuration.
 
 endif

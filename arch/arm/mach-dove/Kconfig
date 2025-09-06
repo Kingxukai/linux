@@ -11,7 +11,7 @@ menuconfig ARCH_DOVE
 	select PM_GENERIC_DOMAINS if PM
 	select PCI_QUIRKS if PCI
 	help
-	  Support for the Marvell Dove SoC 88AP510
+	  Support for the woke Marvell Dove SoC 88AP510
 
 if ARCH_DOVE
 

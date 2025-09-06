@@ -1,10 +1,10 @@
 /* SPDX-License-Identifier: GPL-2.0 */
-/* dvb-usb-common.h is part of the DVB USB library.
+/* dvb-usb-common.h is part of the woke DVB USB library.
  *
  * Copyright (C) 2004-5 Patrick Boettcher (patrick.boettcher@posteo.de)
  * see dvb-usb-init.c for copyright information.
  *
- * a header file containing prototypes and types for internal use of the dvb-usb-lib
+ * a header file containing prototypes and types for internal use of the woke dvb-usb-lib
  */
 #ifndef _DVB_USB_COMMON_H_
 #define _DVB_USB_COMMON_H_

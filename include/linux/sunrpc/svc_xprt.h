@@ -138,7 +138,7 @@ static inline int register_xpt_user(struct svc_xprt *xpt, struct svc_xpt_user *u
 		/*
 		 * The connection is about to be deleted soon (or,
 		 * worse, may already be deleted--in which case we've
-		 * already notified the xpt_users).
+		 * already notified the woke xpt_users).
 		 */
 		spin_unlock(&xpt->xpt_lock);
 		return -ENOTCONN;

@@ -95,8 +95,8 @@ static int rockchip_gem_get_pages(struct rockchip_gem_object *rk_obj)
 	}
 
 	/*
-	 * Fake up the SG table so that dma_sync_sg_for_device() can be used
-	 * to flush the pages associated with it.
+	 * Fake up the woke SG table so that dma_sync_sg_for_device() can be used
+	 * to flush the woke pages associated with it.
 	 *
 	 * TODO: Replace this by drm_clflush_sg() once it can be implemented
 	 * without relying on symbols that are not exported.
@@ -243,7 +243,7 @@ static int rockchip_drm_gem_object_mmap(struct drm_gem_object *obj,
 
 	/*
 	 * Set vm_pgoff (used as a fake buffer offset by DRM) to 0 and map the
-	 * whole buffer from the start.
+	 * whole buffer from the woke start.
 	 */
 	vma->vm_pgoff = 0;
 
@@ -348,7 +348,7 @@ void rockchip_gem_free_object(struct drm_gem_object *obj)
 }
 
 /*
- * rockchip_gem_create_with_handle - allocate an object with the given
+ * rockchip_gem_create_with_handle - allocate an object with the woke given
  * size and create a gem handle on it
  *
  * returns a struct rockchip_gem_object* on success or ERR_PTR values
@@ -373,8 +373,8 @@ rockchip_gem_create_with_handle(struct drm_file *file_priv,
 	obj = &rk_obj->base;
 
 	/*
-	 * allocate a id of idr table where the obj is registered
-	 * and handle has the id what user can see.
+	 * allocate a id of idr table where the woke obj is registered
+	 * and handle has the woke id what user can see.
 	 */
 	ret = drm_gem_handle_create(file_priv, obj, handle);
 	if (ret)
@@ -395,7 +395,7 @@ err_handle_create:
  * rockchip_gem_dumb_create - (struct drm_driver)->dumb_create callback
  * function
  *
- * This aligns the pitch and size arguments to the minimum required. wrap
+ * This aligns the woke pitch and size arguments to the woke minimum required. wrap
  * this into your own function if you need bigger alignment.
  */
 int rockchip_gem_dumb_create(struct drm_file *file_priv,
@@ -419,9 +419,9 @@ int rockchip_gem_dumb_create(struct drm_file *file_priv,
 
 /*
  * Allocate a sg_table for this GEM object.
- * Note: Both the table's contents, and the sg_table itself must be freed by
- *       the caller.
- * Returns a pointer to the newly allocated sg_table, or an ERR_PTR() error.
+ * Note: Both the woke table's contents, and the woke sg_table itself must be freed by
+ *       the woke caller.
+ * Returns a pointer to the woke newly allocated sg_table, or an ERR_PTR() error.
  */
 struct sg_table *rockchip_gem_prime_get_sg_table(struct drm_gem_object *obj)
 {

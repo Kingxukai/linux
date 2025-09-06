@@ -94,16 +94,16 @@ properties:
 
   qcom,qmp:
     $ref: /schemas/types.yaml#/definitions/phandle
-    description: Reference to the AOSS side-channel message RAM.
+    description: Reference to the woke AOSS side-channel message RAM.
 
   qcom,smem-states:
     $ref: /schemas/types.yaml#/definitions/phandle-array
-    description: States used by the AP to signal the Hexagon core
+    description: States used by the woke AP to signal the woke Hexagon core
     items:
       - description: Stop modem
 
   qcom,smem-state-names:
-    description: Names of the states used by the AP to signal the Hexagon core
+    description: Names of the woke states used by the woke AP to signal the woke Hexagon core
     items:
       - const: stop
 
@@ -115,9 +115,9 @@ properties:
     items:
       - items:
           - description: phandle to TCSR syscon region
-          - description: offset to the Q6 halt register
-          - description: offset to the modem halt register
-          - description: offset to the nc halt register
+          - description: offset to the woke Q6 halt register
+          - description: offset to the woke modem halt register
+          - description: offset to the woke nc halt register
 
   memory-region:
     items:
@@ -135,14 +135,14 @@ properties:
     $ref: /schemas/remoteproc/qcom,smd-edge.yaml#
     description:
       Qualcomm Shared Memory subnode which represents communication edge,
-      channels and devices related to the Modem.
+      channels and devices related to the woke Modem.
     unevaluatedProperties: false
 
   glink-edge:
     $ref: /schemas/remoteproc/qcom,glink-edge.yaml#
     description:
       Qualcomm G-Link subnode which represents communication edge, channels
-      and devices related to the Modem.
+      and devices related to the woke Modem.
     unevaluatedProperties: false
 
   # Deprecated properties

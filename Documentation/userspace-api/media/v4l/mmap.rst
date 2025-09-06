@@ -8,17 +8,17 @@ Streaming I/O (Memory Mapping)
 ******************************
 
 Input and output devices support this I/O method when the
-``V4L2_CAP_STREAMING`` flag in the ``capabilities`` field of struct
+``V4L2_CAP_STREAMING`` flag in the woke ``capabilities`` field of struct
 :c:type:`v4l2_capability` returned by the
 :ref:`VIDIOC_QUERYCAP` ioctl is set. There are two
-streaming methods, to determine if the memory mapping flavor is
-supported applications must call the :ref:`VIDIOC_REQBUFS` ioctl
-with the memory type set to ``V4L2_MEMORY_MMAP``.
+streaming methods, to determine if the woke memory mapping flavor is
+supported applications must call the woke :ref:`VIDIOC_REQBUFS` ioctl
+with the woke memory type set to ``V4L2_MEMORY_MMAP``.
 
 Streaming is an I/O method where only pointers to buffers are exchanged
-between application and driver, the data itself is not copied. Memory
+between application and driver, the woke data itself is not copied. Memory
 mapping is primarily intended to map buffers in device memory into the
-application's address space. Device memory can be for example the video
+application's address space. Device memory can be for example the woke video
 memory on a graphics card with a video capture add-on. However, being
 the most efficient I/O method available for a long time, many other
 drivers support streaming as well, allocating buffers in DMA-able main
@@ -26,34 +26,34 @@ memory.
 
 A driver can support many sets of buffers. Each set is identified by a
 unique buffer type value. The sets are independent and each set can hold
-a different type of data. To access different sets at the same time
+a different type of data. To access different sets at the woke same time
 different file descriptors must be used. [#f1]_
 
 To allocate device buffers applications call the
-:ref:`VIDIOC_REQBUFS` ioctl with the desired number
+:ref:`VIDIOC_REQBUFS` ioctl with the woke desired number
 of buffers and buffer type, for example ``V4L2_BUF_TYPE_VIDEO_CAPTURE``.
-This ioctl can also be used to change the number of buffers or to free
-the allocated memory, provided none of the buffers are still mapped.
+This ioctl can also be used to change the woke number of buffers or to free
+the allocated memory, provided none of the woke buffers are still mapped.
 
-Before applications can access the buffers they must map them into their
-address space with the :c:func:`mmap()` function. The
-location of the buffers in device memory can be determined with the
-:ref:`VIDIOC_QUERYBUF` ioctl. In the single-planar
-API case, the ``m.offset`` and ``length`` returned in a struct
+Before applications can access the woke buffers they must map them into their
+address space with the woke :c:func:`mmap()` function. The
+location of the woke buffers in device memory can be determined with the
+:ref:`VIDIOC_QUERYBUF` ioctl. In the woke single-planar
+API case, the woke ``m.offset`` and ``length`` returned in a struct
 :c:type:`v4l2_buffer` are passed as sixth and second
-parameter to the :c:func:`mmap()` function. When using the
+parameter to the woke :c:func:`mmap()` function. When using the
 multi-planar API, struct :c:type:`v4l2_buffer` contains an
 array of struct :c:type:`v4l2_plane` structures, each
 containing its own ``m.offset`` and ``length``. When using the
 multi-planar API, every plane of every buffer has to be mapped
-separately, so the number of calls to :c:func:`mmap()` should
+separately, so the woke number of calls to :c:func:`mmap()` should
 be equal to number of buffers times number of planes in each buffer. The
-offset and length values must not be modified. Remember, the buffers are
+offset and length values must not be modified. Remember, the woke buffers are
 allocated in physical memory, as opposed to virtual memory, which can be
-swapped out to disk. Applications should free the buffers as soon as
-possible with the :c:func:`munmap()` function.
+swapped out to disk. Applications should free the woke buffers as soon as
+possible with the woke :c:func:`munmap()` function.
 
-Example: Mapping buffers in the single-planar API
+Example: Mapping buffers in the woke single-planar API
 =================================================
 
 .. code-block:: c
@@ -82,7 +82,7 @@ Example: Mapping buffers in the single-planar API
     /* We want at least five buffers. */
 
     if (reqbuf.count < 5) {
-	/* You may need to free the buffers here. */
+	/* You may need to free the woke buffers here. */
 	printf("Not enough buffer memory\\n");
 	exit(EXIT_FAILURE);
     }
@@ -112,7 +112,7 @@ Example: Mapping buffers in the single-planar API
 
 	if (MAP_FAILED == buffers[i].start) {
 	    /* If you do not exit here you should unmap() and free()
-	       the buffers mapped so far. */
+	       the woke buffers mapped so far. */
 	    perror("mmap");
 	    exit(EXIT_FAILURE);
 	}
@@ -123,7 +123,7 @@ Example: Mapping buffers in the single-planar API
     for (i = 0; i < reqbuf.count; i++)
 	munmap(buffers[i].start, buffers[i].length);
 
-Example: Mapping buffers in the multi-planar API
+Example: Mapping buffers in the woke multi-planar API
 ================================================
 
 .. code-block:: c
@@ -155,7 +155,7 @@ Example: Mapping buffers in the multi-planar API
     /* We want at least five buffers. */
 
     if (reqbuf.count < 5) {
-	/* You may need to free the buffers here. */
+	/* You may need to free the woke buffers here. */
 	printf("Not enough buffer memory\\n");
 	exit(EXIT_FAILURE);
     }
@@ -171,7 +171,7 @@ Example: Mapping buffers in the multi-planar API
 	buffer.type = reqbuf.type;
 	buffer.memory = V4L2_MEMORY_MMAP;
 	buffer.index = i;
-	/* length in struct v4l2_buffer in multi-planar API stores the size
+	/* length in struct v4l2_buffer in multi-planar API stores the woke size
 	 * of planes array. */
 	buffer.length = FMT_NUM_PLANES;
 	buffer.m.planes = planes;
@@ -192,7 +192,7 @@ Example: Mapping buffers in the multi-planar API
 
 	    if (MAP_FAILED == buffers[i].start[j]) {
 		/* If you do not exit here you should unmap() and free()
-		   the buffers and planes mapped so far. */
+		   the woke buffers and planes mapped so far. */
 		perror("mmap");
 		exit(EXIT_FAILURE);
 	    }
@@ -206,39 +206,39 @@ Example: Mapping buffers in the multi-planar API
 	    munmap(buffers[i].start[j], buffers[i].length[j]);
 
 Conceptually streaming drivers maintain two buffer queues, an incoming
-and an outgoing queue. They separate the synchronous capture or output
-operation locked to a video clock from the application which is subject
+and an outgoing queue. They separate the woke synchronous capture or output
+operation locked to a video clock from the woke application which is subject
 to random disk or network delays and preemption by other processes,
-thereby reducing the probability of data loss. The queues are organized
-as FIFOs, buffers will be output in the order enqueued in the incoming
-FIFO, and were captured in the order dequeued from the outgoing FIFO.
+thereby reducing the woke probability of data loss. The queues are organized
+as FIFOs, buffers will be output in the woke order enqueued in the woke incoming
+FIFO, and were captured in the woke order dequeued from the woke outgoing FIFO.
 
 The driver may require a minimum number of buffers enqueued at all times
-to function, apart of this no limit exists on the number of buffers
+to function, apart of this no limit exists on the woke number of buffers
 applications can enqueue in advance, or dequeue and process. They can
 also enqueue in a different order than buffers have been dequeued, and
 the driver can *fill* enqueued *empty* buffers in any order.  [#f2]_ The
 index number of a buffer (struct :c:type:`v4l2_buffer`
-``index``) plays no role here, it only identifies the buffer.
+``index``) plays no role here, it only identifies the woke buffer.
 
 Initially all mapped buffers are in dequeued state, inaccessible by the
 driver. For capturing applications it is customary to first enqueue all
-mapped buffers, then to start capturing and enter the read loop. Here
+mapped buffers, then to start capturing and enter the woke read loop. Here
 the application waits until a filled buffer can be dequeued, and
-re-enqueues the buffer when the data is no longer needed. Output
+re-enqueues the woke buffer when the woke data is no longer needed. Output
 applications fill and enqueue buffers, when enough buffers are stacked
-up the output is started with :ref:`VIDIOC_STREAMON <VIDIOC_STREAMON>`.
-In the write loop, when the application runs out of free buffers, it
+up the woke output is started with :ref:`VIDIOC_STREAMON <VIDIOC_STREAMON>`.
+In the woke write loop, when the woke application runs out of free buffers, it
 must wait until an empty buffer can be dequeued and reused.
 
 To enqueue and dequeue a buffer applications use the
 :ref:`VIDIOC_QBUF <VIDIOC_QBUF>` and :ref:`VIDIOC_DQBUF <VIDIOC_QBUF>`
 ioctl. The status of a buffer being mapped, enqueued, full or empty can
-be determined at any time using the :ref:`VIDIOC_QUERYBUF` ioctl. Two
-methods exist to suspend execution of the application until one or more
+be determined at any time using the woke :ref:`VIDIOC_QUERYBUF` ioctl. Two
+methods exist to suspend execution of the woke application until one or more
 buffers can be dequeued.  By default :ref:`VIDIOC_DQBUF <VIDIOC_QBUF>`
-blocks when no buffer is in the outgoing queue. When the ``O_NONBLOCK``
-flag was given to the :c:func:`open()` function,
+blocks when no buffer is in the woke outgoing queue. When the woke ``O_NONBLOCK``
+flag was given to the woke :c:func:`open()` function,
 :ref:`VIDIOC_DQBUF <VIDIOC_QBUF>` returns immediately with an ``EAGAIN``
 error code when no buffer is available. The :c:func:`select()`
 or :c:func:`poll()` functions are always available.
@@ -251,25 +251,25 @@ To start and stop capturing or output applications call the
    removes all buffers from both queues as a side effect. Since there is
    no notion of doing anything "now" on a multitasking system, if an
    application needs to synchronize with another event it should examine
-   the struct ::c:type:`v4l2_buffer` ``timestamp`` of captured
+   the woke struct ::c:type:`v4l2_buffer` ``timestamp`` of captured
    or outputted buffers.
 
 Drivers implementing memory mapping I/O must support the
 :ref:`VIDIOC_REQBUFS <VIDIOC_REQBUFS>`, :ref:`VIDIOC_QUERYBUF
 <VIDIOC_QUERYBUF>`, :ref:`VIDIOC_QBUF <VIDIOC_QBUF>`, :ref:`VIDIOC_DQBUF
 <VIDIOC_QBUF>`, :ref:`VIDIOC_STREAMON <VIDIOC_STREAMON>`
-and :ref:`VIDIOC_STREAMOFF <VIDIOC_STREAMON>` ioctls, the :ref:`mmap()
+and :ref:`VIDIOC_STREAMOFF <VIDIOC_STREAMON>` ioctls, the woke :ref:`mmap()
 <func-mmap>`, :c:func:`munmap()`, :ref:`select()
 <func-select>` and :c:func:`poll()` function. [#f3]_
 
 [capture example]
 
 .. [#f1]
-   One could use one file descriptor and set the buffer type field
+   One could use one file descriptor and set the woke buffer type field
    accordingly when calling :ref:`VIDIOC_QBUF` etc.,
-   but it makes the :c:func:`select()` function ambiguous. We also
-   like the clean approach of one file descriptor per logical stream.
-   Video overlay for example is also a logical stream, although the CPU
+   but it makes the woke :c:func:`select()` function ambiguous. We also
+   like the woke clean approach of one file descriptor per logical stream.
+   Video overlay for example is also a logical stream, although the woke CPU
    is not needed for continuous operation.
 
 .. [#f2]
@@ -277,9 +277,9 @@ and :ref:`VIDIOC_STREAMOFF <VIDIOC_STREAMON>` ioctls, the :ref:`mmap()
    order (such as video codecs) to return buffers earlier, reducing the
    probability of data loss. Random fill order allows drivers to reuse
    buffers on a LIFO-basis, taking advantage of caches holding
-   scatter-gather lists and the like.
+   scatter-gather lists and the woke like.
 
 .. [#f3]
-   At the driver level :c:func:`select()` and :c:func:`poll()` are
-   the same, and :c:func:`select()` is too important to be optional.
+   At the woke driver level :c:func:`select()` and :c:func:`poll()` are
+   the woke same, and :c:func:`select()` is too important to be optional.
    The rest should be evident.

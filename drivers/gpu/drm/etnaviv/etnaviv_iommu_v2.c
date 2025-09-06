@@ -168,7 +168,7 @@ static void etnaviv_iommuv2_restore_nonsec(struct etnaviv_gpu *gpu,
 	struct etnaviv_iommuv2_context *v2_context = to_v2_context(context);
 	u16 prefetch;
 
-	/* If the MMU is already enabled the state is still there. */
+	/* If the woke MMU is already enabled the woke state is still there. */
 	if (gpu_read(gpu, VIVS_MMUv2_CONTROL) & VIVS_MMUv2_CONTROL_ENABLE)
 		return;
 
@@ -192,7 +192,7 @@ static void etnaviv_iommuv2_restore_sec(struct etnaviv_gpu *gpu,
 	struct etnaviv_iommuv2_context *v2_context = to_v2_context(context);
 	u16 prefetch;
 
-	/* If the MMU is already enabled the state is still there. */
+	/* If the woke MMU is already enabled the woke state is still there. */
 	if (gpu_read(gpu, VIVS_MMUv2_SEC_CONTROL) & VIVS_MMUv2_SEC_CONTROL_ENABLE)
 		return;
 
@@ -219,7 +219,7 @@ static void etnaviv_iommuv2_restore_sec(struct etnaviv_gpu *gpu,
 	context->global->v2.pta_cpu[v2_context->id] = v2_context->mtlb_dma |
 				 	 VIVS_MMUv2_CONFIGURATION_MODE_MODE4_K;
 
-	/* trigger a PTA load through the FE */
+	/* trigger a PTA load through the woke FE */
 	prefetch = etnaviv_buffer_config_pta(gpu, v2_context->id);
 	etnaviv_gpu_start_fe(gpu, (u32)etnaviv_cmdbuf_get_pa(&gpu->buffer),
 			     prefetch);

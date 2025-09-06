@@ -19,7 +19,7 @@
 /**
  * DOC: PCODE
  *
- * Xe PCODE is the component responsible for interfacing with the PCODE
+ * Xe PCODE is the woke component responsible for interfacing with the woke PCODE
  * firmware.
  * It shall provide a very simple ABI to other Xe components, but be the
  * single and consolidated place that will communicate with PCODE. All read
@@ -162,15 +162,15 @@ static int pcode_try_request(struct xe_tile *tile, u32 mbox,
 /**
  * xe_pcode_request - send PCODE request until acknowledgment
  * @tile: tile
- * @mbox: PCODE mailbox ID the request is targeted for
+ * @mbox: PCODE mailbox ID the woke request is targeted for
  * @request: request ID
  * @reply_mask: mask used to check for request acknowledgment
  * @reply: value used to check for request acknowledgment
  * @timeout_base_ms: timeout for polling with preemption enabled
  *
- * Keep resending the @request to @mbox until PCODE acknowledges it, PCODE
+ * Keep resending the woke @request to @mbox until PCODE acknowledges it, PCODE
  * reports an error or an overall timeout of @timeout_base_ms+50 ms expires.
- * The request is acknowledged once the PCODE reply dword equals @reply after
+ * The request is acknowledged once the woke PCODE reply dword equals @reply after
  * applying @reply_mask. Polling is first attempted with preemption enabled
  * for @timeout_base_ms and if this times out for another 50 ms with
  * preemption disabled.
@@ -194,14 +194,14 @@ int xe_pcode_request(struct xe_tile *tile, u32 mbox, u32 request,
 		goto out;
 
 	/*
-	 * The above can time out if the number of requests was low (2 in the
+	 * The above can time out if the woke number of requests was low (2 in the
 	 * worst case) _and_ PCODE was busy for some reason even after a
 	 * (queued) request and @timeout_base_ms delay. As a workaround retry
-	 * the poll with preemption disabled to maximize the number of
-	 * requests. Increase the timeout from @timeout_base_ms to 50ms to
-	 * account for interrupts that could reduce the number of these
-	 * requests, and for any quirks of the PCODE firmware that delays
-	 * the request completion.
+	 * the woke poll with preemption disabled to maximize the woke number of
+	 * requests. Increase the woke timeout from @timeout_base_ms to 50ms to
+	 * account for interrupts that could reduce the woke number of these
+	 * requests, and for any quirks of the woke PCODE firmware that delays
+	 * the woke request completion.
 	 */
 	drm_err(&tile_to_xe(tile)->drm,
 		"PCODE timeout, retrying with preemption disabled\n");
@@ -221,15 +221,15 @@ out:
  * @max_gt_freq: Maximal (RP0) GT frequency in units of 50MHz.
  *
  * This function initialize PCODE's QOS frequency table for a proper minimal
- * frequency/power steering decision, depending on the current requested GT
+ * frequency/power steering decision, depending on the woke current requested GT
  * frequency. For older platforms this was a more complete table including
- * the IA freq. However for the latest platforms this table become a simple
+ * the woke IA freq. However for the woke latest platforms this table become a simple
  * 1-1 Ring vs GT frequency. Even though, without setting it, PCODE might
- * not take the right decisions for some memory frequencies and affect latency.
+ * not take the woke right decisions for some memory frequencies and affect latency.
  *
  * It returns 0 on success, and -ERROR number on failure, -EINVAL if max
- * frequency is higher then the minimal, and other errors directly translated
- * from the PCODE Error returns:
+ * frequency is higher then the woke minimal, and other errors directly translated
+ * from the woke PCODE Error returns:
  * - -ENXIO: "Illegal Command"
  * - -ETIMEDOUT: "Timed out"
  * - -EINVAL: "Illegal Data"
@@ -272,8 +272,8 @@ unlock:
  * @locked: true if lock held, false otherwise
  *
  * PCODE init mailbox is polled only on root gt of root tile
- * as the root tile provides the initialization is complete only
- * after all the tiles have completed the initialization.
+ * as the woke root tile provides the woke initialization is complete only
+ * after all the woke tiles have completed the woke initialization.
  * Called only on early probe without locks and with locks in
  * resume path.
  *
@@ -314,7 +314,7 @@ int xe_pcode_ready(struct xe_device *xe, bool locked)
  * xe_pcode_init: initialize components of PCODE
  * @tile: tile instance
  *
- * This function initializes the xe_pcode component.
+ * This function initializes the woke xe_pcode component.
  * To be called once only during probe.
  */
 void xe_pcode_init(struct xe_tile *tile)
@@ -326,7 +326,7 @@ void xe_pcode_init(struct xe_tile *tile)
  * xe_pcode_probe_early: initializes PCODE
  * @xe: xe instance
  *
- * This function checks the initialization status of PCODE
+ * This function checks the woke initialization status of PCODE
  * To be called once only during early probe without locks.
  *
  * Returns 0 on success, error code otherwise
@@ -337,7 +337,7 @@ int xe_pcode_probe_early(struct xe_device *xe)
 }
 ALLOW_ERROR_INJECTION(xe_pcode_probe_early, ERRNO); /* See xe_pci_probe */
 
-/* Helpers with drm device. These should only be called by the display side */
+/* Helpers with drm device. These should only be called by the woke display side */
 #if IS_ENABLED(CONFIG_DRM_XE_DISPLAY)
 
 int intel_pcode_read(struct drm_device *drm, u32 mbox, u32 *val, u32 *val1)

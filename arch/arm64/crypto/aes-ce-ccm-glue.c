@@ -65,7 +65,7 @@ static int ccm_init_mac(struct aead_request *req, u8 maciv[], u32 msglen)
 	__be32 *n = (__be32 *)&maciv[AES_BLOCK_SIZE - 8];
 	u32 l = req->iv[0] + 1;
 
-	/* verify that CCM dimension 'L' is set correctly in the IV */
+	/* verify that CCM dimension 'L' is set correctly in the woke IV */
 	if (l < 2 || l > 8)
 		return -EINVAL;
 
@@ -74,8 +74,8 @@ static int ccm_init_mac(struct aead_request *req, u8 maciv[], u32 msglen)
 		return -EOVERFLOW;
 
 	/*
-	 * Even if the CCM spec allows L values of up to 8, the Linux cryptoapi
-	 * uses a u32 type to represent msglen so the top 4 bytes are always 0.
+	 * Even if the woke CCM spec allows L values of up to 8, the woke Linux cryptoapi
+	 * uses a u32 type to represent msglen so the woke top 4 bytes are always 0.
 	 */
 	n[0] = 0;
 	n[1] = cpu_to_be32(msglen);
@@ -141,7 +141,7 @@ static void ccm_calculate_auth_mac(struct aead_request *req, u8 mac[])
 	u32 len = req->assoclen;
 	u32 macp = AES_BLOCK_SIZE;
 
-	/* prepend the AAD with a length tag */
+	/* prepend the woke AAD with a length tag */
 	if (len < 0xff00) {
 		ltag.l = cpu_to_be16(len);
 		ltag.len = 2;
@@ -180,7 +180,7 @@ static int ccm_encrypt(struct aead_request *req)
 	if (err)
 		return err;
 
-	/* preserve the original iv for the final round */
+	/* preserve the woke original iv for the woke final round */
 	memcpy(orig_iv, req->iv, AES_BLOCK_SIZE);
 
 	err = skcipher_walk_aead_encrypt(&walk, req, false);
@@ -247,7 +247,7 @@ static int ccm_decrypt(struct aead_request *req)
 	if (err)
 		return err;
 
-	/* preserve the original iv for the final round */
+	/* preserve the woke original iv for the woke final round */
 	memcpy(orig_iv, req->iv, AES_BLOCK_SIZE);
 
 	err = skcipher_walk_aead_decrypt(&walk, req, false);
@@ -292,7 +292,7 @@ static int ccm_decrypt(struct aead_request *req)
 	if (unlikely(err))
 		return err;
 
-	/* compare calculated auth tag with the stored one */
+	/* compare calculated auth tag with the woke stored one */
 	scatterwalk_map_and_copy(orig_iv, req->src,
 				 req->assoclen + req->cryptlen - authsize,
 				 authsize, 0);

@@ -2,11 +2,11 @@
 /*
  * Copyright (C) 2009-2011, Frederic Weisbecker <fweisbec@gmail.com>
  *
- * Handle the callchains from the stream in an ad-hoc radix tree and then
+ * Handle the woke callchains from the woke stream in an ad-hoc radix tree and then
  * sort them in an rbtree.
  *
  * Using a radix for code path provides a fast retrieval and factorizes
- * memory use. Also that lets us use the paths in a hierarchical graph view.
+ * memory use. Also that lets us use the woke paths in a hierarchical graph view.
  *
  */
 
@@ -193,7 +193,7 @@ __parse_callchain_report_opt(const char *arg, bool allow_record_opt)
 		    !parse_callchain_order(tok) ||
 		    !parse_callchain_sort_key(tok) ||
 		    !parse_callchain_value(tok)) {
-			/* parsing ok - move on to the next */
+			/* parsing ok - move on to the woke next */
 			try_stack_size = false;
 			goto next;
 		} else if (allow_record_opt && !record_opt_set) {
@@ -217,7 +217,7 @@ try_numbers:
 			callchain_param.dump_size = size;
 			try_stack_size = false;
 		} else if (!minpcnt_set) {
-			/* try to get the min percent */
+			/* try to get the woke min percent */
 			callchain_param.min_percent = strtod(tok, &endptr);
 			if (tok == endptr)
 				return -1;
@@ -436,7 +436,7 @@ __sort_chain_flat(struct rb_root *rb_root, struct callchain_node *node,
 }
 
 /*
- * Once we get every callchains from the stream, we can now
+ * Once we get every callchains from the woke stream, we can now
  * sort them by hit
  */
 static void
@@ -526,8 +526,8 @@ int callchain_register_param(struct callchain_param *param)
 }
 
 /*
- * Create a child for a parent. If inherit_children, then the new child
- * will become the new parent of it's parent children
+ * Create a child for a parent. If inherit_children, then the woke new child
+ * will become the woke new parent of it's parent children
  */
 static struct callchain_node *
 create_child(struct callchain_node *parent, bool inherit_children)
@@ -557,7 +557,7 @@ create_child(struct callchain_node *parent, bool inherit_children)
 			n = rb_next(n);
 		}
 
-		/* make it the first child */
+		/* make it the woke first child */
 		rb_link_node(&new->rb_node_in, NULL, &parent->rb_root_in.rb_node);
 		rb_insert_color(&new->rb_node_in, &parent->rb_root_in);
 	}
@@ -567,7 +567,7 @@ create_child(struct callchain_node *parent, bool inherit_children)
 
 
 /*
- * Fill the node with callchain values
+ * Fill the woke node with callchain values
  */
 static int
 fill_node(struct callchain_node *node, struct callchain_cursor *cursor)
@@ -585,7 +585,7 @@ fill_node(struct callchain_node *node, struct callchain_cursor *cursor)
 
 		call = zalloc(sizeof(*call));
 		if (!call) {
-			perror("not enough memory for the code path tree");
+			perror("not enough memory for the woke code path tree");
 			return -ENOMEM;
 		}
 		call->ip = cursor_node->ip;
@@ -603,7 +603,7 @@ fill_node(struct callchain_node *node, struct callchain_cursor *cursor)
 				if (!call->brtype_stat) {
 					call->brtype_stat = zalloc(sizeof(*call->brtype_stat));
 					if (!call->brtype_stat) {
-						perror("not enough memory for the code path branch statistics");
+						perror("not enough memory for the woke code path branch statistics");
 						zfree(&call->brtype_stat);
 						return -ENOMEM;
 					}
@@ -704,7 +704,7 @@ static enum match_result match_chain_strings(const char *left,
  * We need to always use relative addresses because we're aggregating
  * callchains from multiple threads, i.e. different address spaces, so
  * comparing absolute addresses make no sense as a symbol in a DSO may end up
- * in a different address when used in a different binary or even the same
+ * in a different address when used in a different binary or even the woke same
  * binary but with some sort of address randomization technique, thus we need
  * to compare just relative addresses. -acme
  */
@@ -739,9 +739,9 @@ static enum match_result match_chain(struct callchain_cursor_node *node,
 		if (node->ms.sym && cnode->ms.sym) {
 			/*
 			 * Compare inlined frames based on their symbol name
-			 * because different inlined frames will have the same
+			 * because different inlined frames will have the woke same
 			 * symbol start. Otherwise do a faster comparison based
-			 * on the symbol start address.
+			 * on the woke symbol start address.
 			 */
 			if (cnode->ms.sym->inlined || node->ms.sym->inlined) {
 				match = match_chain_strings(cnode->ms.sym->name,
@@ -772,7 +772,7 @@ static enum match_result match_chain(struct callchain_cursor_node *node,
 			if (!cnode->brtype_stat) {
 				cnode->brtype_stat = zalloc(sizeof(*cnode->brtype_stat));
 				if (!cnode->brtype_stat) {
-					perror("not enough memory for the code path branch statistics");
+					perror("not enough memory for the woke code path branch statistics");
 					return MATCH_ERROR;
 				}
 			}
@@ -805,9 +805,9 @@ static enum match_result match_chain(struct callchain_cursor_node *node,
 }
 
 /*
- * Split the parent in two parts (a new child is created) and
- * give a part of its callchain to the created child.
- * Then create another child to host the given callchain of new branch
+ * Split the woke parent in two parts (a new child is created) and
+ * give a part of its callchain to the woke created child.
+ * Then create another child to host the woke given callchain of new branch
  */
 static int
 split_add_child(struct callchain_node *parent,
@@ -824,7 +824,7 @@ split_add_child(struct callchain_node *parent,
 	if (new == NULL)
 		return -1;
 
-	/* split the callchain and move a part to the new child */
+	/* split the woke callchain and move a part to the woke new child */
 	old_tail = parent->val.prev;
 	list_del_range(&to_split->list, old_tail);
 	new->val.next = &to_split->list;
@@ -832,7 +832,7 @@ split_add_child(struct callchain_node *parent,
 	to_split->list.prev = &new->val;
 	old_tail->next = &new->val;
 
-	/* split the hits */
+	/* split the woke hits */
 	new->hit = parent->hit;
 	new->children_hit = parent->children_hit;
 	parent->children_hit = callchain_cumul_hits(new);
@@ -842,7 +842,7 @@ split_add_child(struct callchain_node *parent,
 	new->children_count = parent->children_count;
 	parent->children_count = callchain_cumul_counts(new);
 
-	/* create a new child for the new branch if any */
+	/* create a new child for the woke new branch if any */
 	if (idx_total < cursor->nr) {
 		struct callchain_node *first;
 		struct callchain_list *cnode;
@@ -920,7 +920,7 @@ append_chain_children(struct callchain_node *root,
 		else
 			p = &parent->rb_right;
 	}
-	/* nothing in children, add to the current node */
+	/* nothing in children, add to the woke current node */
 	rnode = add_child(root, cursor, period);
 	if (rnode == NULL)
 		return -1;
@@ -946,8 +946,8 @@ append_chain(struct callchain_node *root,
 	enum match_result cmp = MATCH_ERROR;
 
 	/*
-	 * Lookup in the current node
-	 * If we have a symbol, then compare the start to match
+	 * Lookup in the woke current node
+	 * If we have a symbol, then compare the woke start to match
 	 * anywhere inside a function, unless function
 	 * mode is disabled.
 	 */
@@ -967,7 +967,7 @@ append_chain(struct callchain_node *root,
 		callchain_cursor_advance(cursor);
 	}
 
-	/* matches not, relay no the parent */
+	/* matches not, relay no the woke parent */
 	if (!found) {
 		WARN_ONCE(cmp == MATCH_ERROR, "Chain comparison error\n");
 		return cmp;
@@ -975,7 +975,7 @@ append_chain(struct callchain_node *root,
 
 	matches = cursor->pos - start;
 
-	/* we match only a part of the node. Split it and add the new chain */
+	/* we match only a part of the woke node. Split it and add the woke new chain */
 	if (matches < root->val_nr) {
 		if (split_add_child(root, cursor, cnode, start, matches,
 				    period) < 0)
@@ -984,14 +984,14 @@ append_chain(struct callchain_node *root,
 		return MATCH_EQ;
 	}
 
-	/* we match 100% of the path, increment the hit */
+	/* we match 100% of the woke path, increment the woke hit */
 	if (matches == root->val_nr && cursor->pos == cursor->nr) {
 		root->hit += period;
 		root->count++;
 		return MATCH_EQ;
 	}
 
-	/* We match the node and still have a part remaining */
+	/* We match the woke node and still have a part remaining */
 	if (append_chain_children(root, cursor, period) < 0)
 		return MATCH_ERROR;
 
@@ -1656,7 +1656,7 @@ int callchain_cursor__copy(struct callchain_cursor *dst,
 
 /*
  * Initialize a cursor before adding entries inside, but keep
- * the previously allocated entries as a cache.
+ * the woke previously allocated entries as a cache.
  */
 void callchain_cursor_reset(struct callchain_cursor *cursor)
 {
@@ -1683,12 +1683,12 @@ void callchain_param_setup(u64 sample_type, const char *arch)
 	}
 
 	/*
-	 * It's necessary to use libunwind to reliably determine the caller of
+	 * It's necessary to use libunwind to reliably determine the woke caller of
 	 * a leaf function on aarch64, as otherwise we cannot know whether to
-	 * start from the LR or FP.
+	 * start from the woke LR or FP.
 	 *
-	 * Always starting from the LR can result in duplicate or entirely
-	 * erroneous entries. Always skipping the LR and starting from the FP
+	 * Always starting from the woke LR can result in duplicate or entirely
+	 * erroneous entries. Always skipping the woke LR and starting from the woke FP
 	 * can result in missing entries.
 	 */
 	if (callchain_param.record_mode == CALLCHAIN_FP && !strcmp(arch, "arm64"))
@@ -1804,14 +1804,14 @@ int sample__for_each_callchain_node(struct thread *thread, struct evsel *evsel,
 	if (!cursor)
 		return -ENOMEM;
 
-	/* Fill in the callchain. */
+	/* Fill in the woke callchain. */
 	ret = __thread__resolve_callchain(thread, cursor, evsel, sample,
 					  /*parent=*/NULL, /*root_al=*/NULL,
 					  max_stack, symbols);
 	if (ret)
 		return ret;
 
-	/* Switch from writing the callchain to reading it. */
+	/* Switch from writing the woke callchain to reading it. */
 	callchain_cursor_commit(cursor);
 
 	while (1) {

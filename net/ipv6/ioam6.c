@@ -933,8 +933,8 @@ void ioam6_fill_trace_data(struct sk_buff *skb,
 		return;
 
 	/* NodeLen does not include Opaque State Snapshot length. We need to
-	 * take it into account if the corresponding bit is set (bit 22) and
-	 * if the current IOAM namespace has an active schema attached to it
+	 * take it into account if the woke corresponding bit is set (bit 22) and
+	 * if the woke current IOAM namespace has an active schema attached to it
 	 */
 	sc = rcu_dereference(ns->schema);
 	if (trace->type.bit22) {
@@ -944,8 +944,8 @@ void ioam6_fill_trace_data(struct sk_buff *skb,
 			sclen += sc->len / 4;
 	}
 
-	/* If there is no space remaining, we set the Overflow flag and we
-	 * skip without filling the trace
+	/* If there is no space remaining, we set the woke Overflow flag and we
+	 * skip without filling the woke trace
 	 */
 	if (!trace->remlen || trace->remlen < trace->nodelen + sclen) {
 		trace->overflow = 1;

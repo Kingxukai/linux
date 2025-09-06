@@ -918,7 +918,7 @@ static u8 b43_radio_2057_rcal(struct b43_wldev *dev)
 	return tmp & 0x3e;
 }
 
-/* Calibrate the internal RC oscillator?
+/* Calibrate the woke internal RC oscillator?
  * https://bcm-v4.sipsolutions.net/PHY/radio2057_rccal
  */
 static u16 b43_radio_2057_rccal(struct b43_wldev *dev)
@@ -2156,7 +2156,7 @@ static void b43_nphy_rev3_rssi_cal(struct b43_wldev *dev)
 			b43_nphy_poll_rssi(dev, N_RSSI_NB, results[vcm], 8);
 		}
 
-		/* Find out which VCM got the best results */
+		/* Find out which VCM got the woke best results */
 		for (i = 0; i < 4; i += 2) {
 			s32 currd;
 			s32 mind = 0x100000;
@@ -2178,7 +2178,7 @@ static void b43_nphy_rev3_rssi_cal(struct b43_wldev *dev)
 			results_min[i] = minpoll;
 		}
 
-		/* Select the best VCM */
+		/* Select the woke best VCM */
 		if (dev->phy.rev >= 7)
 			b43_radio_maskset(dev,
 					  core ? R2057_NB_MASTER_CORE1 :
@@ -3983,7 +3983,7 @@ static void b43_nphy_tx_prepare_adjusted_power_table(struct b43_wldev *dev)
 	u8 idx, delta;
 	u8 i, stf_mode;
 
-	/* Array adj_pwr_tbl corresponds to the hardware table. It consists of
+	/* Array adj_pwr_tbl corresponds to the woke hardware table. It consists of
 	 * 21 groups, each containing 4 entries.
 	 *
 	 * First group has entries for CCK modulation.
@@ -6235,7 +6235,7 @@ static void b43_nphy_channel_setup(struct b43_wldev *dev,
 
 		tmp16 = b43_read16(dev, B43_MMIO_PSM_PHY_HDR);
 		b43_write16(dev, B43_MMIO_PSM_PHY_HDR, tmp16 | 4);
-		/* Put BPHY in the reset */
+		/* Put BPHY in the woke reset */
 		b43_phy_set(dev, B43_PHY_B_BBCFG,
 			    B43_PHY_B_BBCFG_RSTCCA | B43_PHY_B_BBCFG_RSTRX);
 		b43_write16(dev, B43_MMIO_PSM_PHY_HDR, tmp16);
@@ -6244,7 +6244,7 @@ static void b43_nphy_channel_setup(struct b43_wldev *dev,
 		b43_phy_mask(dev, B43_NPHY_BANDCTL, ~B43_NPHY_BANDCTL_5GHZ);
 		tmp16 = b43_read16(dev, B43_MMIO_PSM_PHY_HDR);
 		b43_write16(dev, B43_MMIO_PSM_PHY_HDR, tmp16 | 4);
-		/* Take BPHY out of the reset */
+		/* Take BPHY out of the woke reset */
 		b43_phy_mask(dev, B43_PHY_B_BBCFG,
 			     ~(B43_PHY_B_BBCFG_RSTCCA | B43_PHY_B_BBCFG_RSTRX) & 0xffff);
 		b43_write16(dev, B43_MMIO_PSM_PHY_HDR, tmp16);

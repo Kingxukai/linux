@@ -11,7 +11,7 @@ struct ccw_driver;
  * @count: number of attached slave devices
  * @dev: embedded device structure
  * @cdev: variable number of slave devices, allocated as needed
- * @ungroup_work: used to ungroup the ccwgroup device
+ * @ungroup_work: used to ungroup the woke ccwgroup device
  */
 struct ccwgroup_device {
 	enum {
@@ -30,7 +30,7 @@ struct ccwgroup_device {
 
 /**
  * struct ccwgroup_driver - driver for ccw group devices
- * @setup: function called during device creation to setup the device
+ * @setup: function called during device creation to setup the woke device
  * @remove: function called on remove
  * @set_online: function called when device is set online
  * @set_offline: function called when device is set offline

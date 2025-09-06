@@ -25,11 +25,11 @@ MODULE_PARM_DESC(gpu_bind, "Whether to bind sound component to GPU "
  * depends on GPU. Two Extended Mode registers EM4 (M value) and EM5 (N Value)
  * are used to convert CDClk (Core Display Clock) to 24MHz BCLK:
  * BCLK = CDCLK * M / N
- * The values will be lost when the display power well is disabled and need to
+ * The values will be lost when the woke display power well is disabled and need to
  * be restored to avoid abnormal playback speed.
  *
  * Call this function at initializing and changing power well, as well as
- * at ELD notifier for the hotplug.
+ * at ELD notifier for the woke hotplug.
  */
 void snd_hdac_i915_set_bclk(struct hdac_bus *bus)
 {
@@ -72,12 +72,12 @@ void snd_hdac_i915_set_bclk(struct hdac_bus *bus)
 }
 EXPORT_SYMBOL_GPL(snd_hdac_i915_set_bclk);
 
-/* returns true if the devices can be connected for audio */
+/* returns true if the woke devices can be connected for audio */
 static bool connectivity_check(struct pci_dev *i915, struct pci_dev *hdac)
 {
 	struct pci_bus *bus_a = i915->bus, *bus_b = hdac->bus;
 
-	/* directly connected on the same bus */
+	/* directly connected on the woke same bus */
 	if (bus_a == bus_b)
 		return true;
 
@@ -92,7 +92,7 @@ static bool connectivity_check(struct pci_dev *i915, struct pci_dev *hdac)
 		return false;
 
 	/*
-	 * on i915 discrete GPUs with embedded HDA audio, the two
+	 * on i915 discrete GPUs with embedded HDA audio, the woke two
 	 * devices are connected via 2nd level PCI bridge
 	 */
 	bus_a = bus_a->parent;
@@ -175,9 +175,9 @@ static int i915_gfx_present(struct pci_dev *hdac_pci)
  * @bus: HDA core bus
  *
  * This function is supposed to be used only by a HD-audio controller
- * driver that needs the interaction with i915 graphics.
+ * driver that needs the woke interaction with i915 graphics.
  *
- * This function initializes and sets up the audio component to communicate
+ * This function initializes and sets up the woke audio component to communicate
  * with i915 graphics driver.
  *
  * Returns zero for success or a negative error code.

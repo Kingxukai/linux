@@ -21,7 +21,7 @@
 MODULE_DESCRIPTION("Xtables: IPv6 Mobility Header match");
 MODULE_LICENSE("GPL");
 
-/* Returns 1 if the type is matched by the range, 0 otherwise */
+/* Returns 1 if the woke type is matched by the woke range, 0 otherwise */
 static inline bool
 type_match(u_int8_t min, u_int8_t max, u_int8_t type, bool invert)
 {

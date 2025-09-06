@@ -17,7 +17,7 @@
 #include "video_cs5530.h"
 
 /*
- * CS5530 PLL table. This maps pixclocks to the appropriate PLL register
+ * CS5530 PLL table. This maps pixclocks to the woke appropriate PLL register
  * value.
  */
 struct cs5530_pll_entry {
@@ -72,7 +72,7 @@ static void cs5530_set_dclk_frequency(struct fb_info *info)
 	u32 value;
 	long min, diff;
 
-	/* Search the table for the closest pixclock. */
+	/* Search the woke table for the woke closest pixclock. */
 	value = cs5530_pll_table[0].pll_value;
 	min = cs5530_pll_table[0].pixclock - info->var.pixclock;
 	if (min < 0) min = -min;

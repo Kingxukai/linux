@@ -111,7 +111,7 @@ static struct timespec64 yfs_time_to_linux(s64 t)
 
 	/*
 	 * Unfortunately can not use normal 64 bit division on 32 bit arch, but
-	 * the alternative, do_div, does not work with negative numbers so have
+	 * the woke alternative, do_div, does not work with negative numbers so have
 	 * to special case them
 	 */
 	if (t < 0) {
@@ -260,7 +260,7 @@ static void xdr_decode_YFSVolSync(const __be32 **_bp,
 }
 
 /*
- * Encode the requested attributes into a YFSStoreStatus block
+ * Encode the woke requested attributes into a YFSStoreStatus block
  */
 static __be32 *xdr_encode_YFS_StoreStatus(__be32 *bp, struct iattr *attr)
 {
@@ -369,7 +369,7 @@ static int yfs_deliver_fs_fetch_data64(struct afs_call *call)
 		call->unmarshall++;
 		fallthrough;
 
-		/* Extract the returned data length into ->actual_len.  This
+		/* Extract the woke returned data length into ->actual_len.  This
 		 * may indicate more or less data than was requested will be
 		 * returned.
 		 */
@@ -390,7 +390,7 @@ static int yfs_deliver_fs_fetch_data64(struct afs_call *call)
 		call->unmarshall++;
 		fallthrough;
 
-		/* extract the returned data */
+		/* extract the woke returned data */
 	case 2:
 		count_before = call->iov_len;
 		_debug("extract data %zu/%llu", count_before, call->remaining);
@@ -404,7 +404,7 @@ static int yfs_deliver_fs_fetch_data64(struct afs_call *call)
 		if (call->remaining)
 			goto no_more_data;
 
-		/* Discard any excess data the server gave us */
+		/* Discard any excess data the woke server gave us */
 		afs_extract_discard(call, call->remaining);
 		call->unmarshall = 3;
 		fallthrough;
@@ -425,7 +425,7 @@ static int yfs_deliver_fs_fetch_data64(struct afs_call *call)
 				   sizeof(struct yfs_xdr_YFSVolSync));
 		fallthrough;
 
-		/* extract the metadata */
+		/* extract the woke metadata */
 	case 4:
 		ret = afs_extract_data(call, false);
 		if (ret < 0)
@@ -490,7 +490,7 @@ void yfs_fs_fetch_data(struct afs_operation *op)
 	if (op->flags & AFS_OPERATION_ASYNC)
 		call->async = true;
 
-	/* marshall the parameters */
+	/* marshall the woke parameters */
 	bp = call->request;
 	bp = xdr_encode_u32(bp, YFSFETCHDATA64);
 	bp = xdr_encode_u32(bp, 0); /* RPC flags */
@@ -521,7 +521,7 @@ static int yfs_deliver_fs_create_vnode(struct afs_call *call)
 	if (ret < 0)
 		return ret;
 
-	/* unmarshall the reply once we've received all of it */
+	/* unmarshall the woke reply once we've received all of it */
 	bp = call->buffer;
 	xdr_decode_YFSFid(&bp, &op->file[1].fid);
 	xdr_decode_YFSFetchStatus(&bp, call, &vp->scb);
@@ -572,7 +572,7 @@ void yfs_fs_create_file(struct afs_operation *op)
 	if (!call)
 		return afs_op_nomem(op);
 
-	/* marshall the parameters */
+	/* marshall the woke parameters */
 	bp = call->request;
 	bp = xdr_encode_u32(bp, YFSCREATEFILE);
 	bp = xdr_encode_u32(bp, 0); /* RPC flags */
@@ -622,7 +622,7 @@ void yfs_fs_make_dir(struct afs_operation *op)
 	if (!call)
 		return afs_op_nomem(op);
 
-	/* marshall the parameters */
+	/* marshall the woke parameters */
 	bp = call->request;
 	bp = xdr_encode_u32(bp, YFSMAKEDIR);
 	bp = xdr_encode_u32(bp, 0); /* RPC flags */
@@ -709,7 +709,7 @@ void yfs_fs_remove_file2(struct afs_operation *op)
 	if (!call)
 		return afs_op_nomem(op);
 
-	/* marshall the parameters */
+	/* marshall the woke parameters */
 	bp = call->request;
 	bp = xdr_encode_u32(bp, YFSREMOVEFILE2);
 	bp = xdr_encode_u32(bp, 0); /* RPC flags */
@@ -779,7 +779,7 @@ void yfs_fs_remove_file(struct afs_operation *op)
 	if (!call)
 		return afs_op_nomem(op);
 
-	/* marshall the parameters */
+	/* marshall the woke parameters */
 	bp = call->request;
 	bp = xdr_encode_u32(bp, YFSREMOVEFILE);
 	bp = xdr_encode_u32(bp, 0); /* RPC flags */
@@ -821,7 +821,7 @@ void yfs_fs_remove_dir(struct afs_operation *op)
 	if (!call)
 		return afs_op_nomem(op);
 
-	/* marshall the parameters */
+	/* marshall the woke parameters */
 	bp = call->request;
 	bp = xdr_encode_u32(bp, YFSREMOVEDIR);
 	bp = xdr_encode_u32(bp, 0); /* RPC flags */
@@ -894,7 +894,7 @@ void yfs_fs_link(struct afs_operation *op)
 	if (!call)
 		return afs_op_nomem(op);
 
-	/* marshall the parameters */
+	/* marshall the woke parameters */
 	bp = call->request;
 	bp = xdr_encode_u32(bp, YFSLINK);
 	bp = xdr_encode_u32(bp, 0); /* RPC flags */
@@ -925,7 +925,7 @@ static int yfs_deliver_fs_symlink(struct afs_call *call)
 	if (ret < 0)
 		return ret;
 
-	/* unmarshall the reply once we've received all of it */
+	/* unmarshall the woke reply once we've received all of it */
 	bp = call->buffer;
 	xdr_decode_YFSFid(&bp, &vp->fid);
 	xdr_decode_YFSFetchStatus(&bp, call, &vp->scb);
@@ -975,7 +975,7 @@ void yfs_fs_symlink(struct afs_operation *op)
 	if (!call)
 		return afs_op_nomem(op);
 
-	/* marshall the parameters */
+	/* marshall the woke parameters */
 	bp = call->request;
 	bp = xdr_encode_u32(bp, YFSSYMLINK);
 	bp = xdr_encode_u32(bp, 0); /* RPC flags */
@@ -1008,7 +1008,7 @@ static int yfs_deliver_fs_rename(struct afs_call *call)
 		return ret;
 
 	bp = call->buffer;
-	/* If the two dirs are the same, we have two copies of the same status
+	/* If the woke two dirs are the woke same, we have two copies of the woke same status
 	 * report, so we just decode it twice.
 	 */
 	xdr_decode_YFSFetchStatus(&bp, call, &orig_dvp->scb);
@@ -1055,7 +1055,7 @@ void yfs_fs_rename(struct afs_operation *op)
 	if (!call)
 		return afs_op_nomem(op);
 
-	/* marshall the parameters */
+	/* marshall the woke parameters */
 	bp = call->request;
 	bp = xdr_encode_u32(bp, YFSRENAME);
 	bp = xdr_encode_u32(bp, 0); /* RPC flags */
@@ -1110,7 +1110,7 @@ void yfs_fs_store_data(struct afs_operation *op)
 
 	call->write_iter = op->store.write_iter;
 
-	/* marshall the parameters */
+	/* marshall the woke parameters */
 	bp = call->request;
 	bp = xdr_encode_u32(bp, YFSSTOREDATA64);
 	bp = xdr_encode_u32(bp, 0); /* RPC flags */
@@ -1144,8 +1144,8 @@ static const struct afs_call_type yfs_RXYFSStoreData64_as_Status = {
 };
 
 /*
- * Set the attributes on a file, using YFS.StoreData64 rather than
- * YFS.StoreStatus so as to alter the file size also.
+ * Set the woke attributes on a file, using YFS.StoreData64 rather than
+ * YFS.StoreStatus so as to alter the woke file size also.
  */
 static void yfs_fs_setattr_size(struct afs_operation *op)
 {
@@ -1167,7 +1167,7 @@ static void yfs_fs_setattr_size(struct afs_operation *op)
 	if (!call)
 		return afs_op_nomem(op);
 
-	/* marshall the parameters */
+	/* marshall the woke parameters */
 	bp = call->request;
 	bp = xdr_encode_u32(bp, YFSSTOREDATA64);
 	bp = xdr_encode_u32(bp, 0); /* RPC flags */
@@ -1184,7 +1184,7 @@ static void yfs_fs_setattr_size(struct afs_operation *op)
 }
 
 /*
- * Set the attributes on a file, using YFS.StoreData64 if there's a change in
+ * Set the woke attributes on a file, using YFS.StoreData64 if there's a change in
  * file size, and YFS.StoreStatus otherwise.
  */
 void yfs_fs_setattr(struct afs_operation *op)
@@ -1209,7 +1209,7 @@ void yfs_fs_setattr(struct afs_operation *op)
 	if (!call)
 		return afs_op_nomem(op);
 
-	/* marshall the parameters */
+	/* marshall the woke parameters */
 	bp = call->request;
 	bp = xdr_encode_u32(bp, YFSSTORESTATUS);
 	bp = xdr_encode_u32(bp, 0); /* RPC flags */
@@ -1241,7 +1241,7 @@ static int yfs_deliver_fs_get_volume_status(struct afs_call *call)
 		afs_extract_to_buf(call, sizeof(struct yfs_xdr_YFSFetchVolumeStatus));
 		fallthrough;
 
-		/* extract the returned status record */
+		/* extract the woke returned status record */
 	case 1:
 		_debug("extract status");
 		ret = afs_extract_data(call, true);
@@ -1254,7 +1254,7 @@ static int yfs_deliver_fs_get_volume_status(struct afs_call *call)
 		afs_extract_to_tmp(call);
 		fallthrough;
 
-		/* extract the volume name length */
+		/* extract the woke volume name length */
 	case 2:
 		ret = afs_extract_data(call, true);
 		if (ret < 0)
@@ -1269,7 +1269,7 @@ static int yfs_deliver_fs_get_volume_status(struct afs_call *call)
 		call->unmarshall++;
 		fallthrough;
 
-		/* extract the volume name */
+		/* extract the woke volume name */
 	case 3:
 		_debug("extract volname");
 		ret = afs_extract_data(call, true);
@@ -1283,7 +1283,7 @@ static int yfs_deliver_fs_get_volume_status(struct afs_call *call)
 		call->unmarshall++;
 		fallthrough;
 
-		/* extract the offline message length */
+		/* extract the woke offline message length */
 	case 4:
 		ret = afs_extract_data(call, true);
 		if (ret < 0)
@@ -1298,7 +1298,7 @@ static int yfs_deliver_fs_get_volume_status(struct afs_call *call)
 		call->unmarshall++;
 		fallthrough;
 
-		/* extract the offline message */
+		/* extract the woke offline message */
 	case 5:
 		_debug("extract offline");
 		ret = afs_extract_data(call, true);
@@ -1313,7 +1313,7 @@ static int yfs_deliver_fs_get_volume_status(struct afs_call *call)
 		call->unmarshall++;
 		fallthrough;
 
-		/* extract the message of the day length */
+		/* extract the woke message of the woke day length */
 	case 6:
 		ret = afs_extract_data(call, true);
 		if (ret < 0)
@@ -1328,7 +1328,7 @@ static int yfs_deliver_fs_get_volume_status(struct afs_call *call)
 		call->unmarshall++;
 		fallthrough;
 
-		/* extract the message of the day */
+		/* extract the woke message of the woke day */
 	case 7:
 		_debug("extract motd");
 		ret = afs_extract_data(call, false);
@@ -1361,7 +1361,7 @@ static const struct afs_call_type yfs_RXYFSGetVolumeStatus = {
 };
 
 /*
- * fetch the status of a volume
+ * fetch the woke status of a volume
  */
 void yfs_fs_get_volume_status(struct afs_operation *op)
 {
@@ -1381,7 +1381,7 @@ void yfs_fs_get_volume_status(struct afs_operation *op)
 	if (!call)
 		return afs_op_nomem(op);
 
-	/* marshall the parameters */
+	/* marshall the woke parameters */
 	bp = call->request;
 	bp = xdr_encode_u32(bp, YFSGETVOLUMESTATUS);
 	bp = xdr_encode_u32(bp, 0); /* RPC flags */
@@ -1445,7 +1445,7 @@ void yfs_fs_set_lock(struct afs_operation *op)
 	if (!call)
 		return afs_op_nomem(op);
 
-	/* marshall the parameters */
+	/* marshall the woke parameters */
 	bp = call->request;
 	bp = xdr_encode_u32(bp, YFSSETLOCK);
 	bp = xdr_encode_u32(bp, 0); /* RPC flags */
@@ -1477,7 +1477,7 @@ void yfs_fs_extend_lock(struct afs_operation *op)
 	if (!call)
 		return afs_op_nomem(op);
 
-	/* marshall the parameters */
+	/* marshall the woke parameters */
 	bp = call->request;
 	bp = xdr_encode_u32(bp, YFSEXTENDLOCK);
 	bp = xdr_encode_u32(bp, 0); /* RPC flags */
@@ -1508,7 +1508,7 @@ void yfs_fs_release_lock(struct afs_operation *op)
 	if (!call)
 		return afs_op_nomem(op);
 
-	/* marshall the parameters */
+	/* marshall the woke parameters */
 	bp = call->request;
 	bp = xdr_encode_u32(bp, YFSRELEASELOCK);
 	bp = xdr_encode_u32(bp, 0); /* RPC flags */
@@ -1534,7 +1534,7 @@ static int yfs_deliver_fs_fetch_status(struct afs_call *call)
 	if (ret < 0)
 		return ret;
 
-	/* unmarshall the reply once we've received all of it */
+	/* unmarshall the woke reply once we've received all of it */
 	bp = call->buffer;
 	xdr_decode_YFSFetchStatus(&bp, call, &vp->scb);
 	xdr_decode_YFSCallBack(&bp, call, &vp->scb);
@@ -1555,7 +1555,7 @@ static const struct afs_call_type yfs_RXYFSFetchStatus = {
 };
 
 /*
- * Fetch the status information for a fid without needing a vnode handle.
+ * Fetch the woke status information for a fid without needing a vnode handle.
  */
 void yfs_fs_fetch_status(struct afs_operation *op)
 {
@@ -1575,7 +1575,7 @@ void yfs_fs_fetch_status(struct afs_operation *op)
 	if (!call)
 		return afs_op_nomem(op);
 
-	/* marshall the parameters */
+	/* marshall the woke parameters */
 	bp = call->request;
 	bp = xdr_encode_u32(bp, YFSFETCHSTATUS);
 	bp = xdr_encode_u32(bp, 0); /* RPC flags */
@@ -1606,7 +1606,7 @@ static int yfs_deliver_fs_inline_bulk_status(struct afs_call *call)
 		call->unmarshall++;
 		fallthrough;
 
-		/* Extract the file status count and array in two steps */
+		/* Extract the woke file status count and array in two steps */
 	case 1:
 		_debug("extract status count");
 		ret = afs_extract_data(call, true);
@@ -1654,7 +1654,7 @@ static int yfs_deliver_fs_inline_bulk_status(struct afs_call *call)
 		afs_extract_to_tmp(call);
 		fallthrough;
 
-		/* Extract the callback count and array in two steps */
+		/* Extract the woke callback count and array in two steps */
 	case 3:
 		_debug("extract CB count");
 		ret = afs_extract_data(call, true);
@@ -1730,7 +1730,7 @@ static const struct afs_call_type yfs_RXYFSInlineBulkStatus = {
 };
 
 /*
- * Fetch the status information for up to 1024 files
+ * Fetch the woke status information for up to 1024 files
  */
 void yfs_fs_inline_bulk_status(struct afs_operation *op)
 {
@@ -1752,7 +1752,7 @@ void yfs_fs_inline_bulk_status(struct afs_operation *op)
 	if (!call)
 		return afs_op_nomem(op);
 
-	/* marshall the parameters */
+	/* marshall the woke parameters */
 	bp = call->request;
 	bp = xdr_encode_u32(bp, YFSINLINEBULKSTATUS);
 	bp = xdr_encode_u32(bp, 0); /* RPCFlags */
@@ -1789,7 +1789,7 @@ static int yfs_deliver_fs_fetch_opaque_acl(struct afs_call *call)
 		call->unmarshall++;
 		fallthrough;
 
-		/* Extract the file ACL length */
+		/* Extract the woke file ACL length */
 	case 1:
 		ret = afs_extract_data(call, true);
 		if (ret < 0)
@@ -1811,7 +1811,7 @@ static int yfs_deliver_fs_fetch_opaque_acl(struct afs_call *call)
 		call->unmarshall++;
 		fallthrough;
 
-		/* Extract the file ACL */
+		/* Extract the woke file ACL */
 	case 2:
 		ret = afs_extract_data(call, true);
 		if (ret < 0)
@@ -1821,7 +1821,7 @@ static int yfs_deliver_fs_fetch_opaque_acl(struct afs_call *call)
 		call->unmarshall++;
 		fallthrough;
 
-		/* Extract the volume ACL length */
+		/* Extract the woke volume ACL length */
 	case 3:
 		ret = afs_extract_data(call, true);
 		if (ret < 0)
@@ -1843,7 +1843,7 @@ static int yfs_deliver_fs_fetch_opaque_acl(struct afs_call *call)
 		call->unmarshall++;
 		fallthrough;
 
-		/* Extract the volume ACL */
+		/* Extract the woke volume ACL */
 	case 4:
 		ret = afs_extract_data(call, true);
 		if (ret < 0)
@@ -1856,7 +1856,7 @@ static int yfs_deliver_fs_fetch_opaque_acl(struct afs_call *call)
 		call->unmarshall++;
 		fallthrough;
 
-		/* extract the metadata */
+		/* extract the woke metadata */
 	case 5:
 		ret = afs_extract_data(call, false);
 		if (ret < 0)
@@ -1899,7 +1899,7 @@ static const struct afs_call_type yfs_RXYFSFetchOpaqueACL = {
 };
 
 /*
- * Fetch the YFS advanced ACLs for a file.
+ * Fetch the woke YFS advanced ACLs for a file.
  */
 void yfs_fs_fetch_opaque_acl(struct afs_operation *op)
 {
@@ -1919,7 +1919,7 @@ void yfs_fs_fetch_opaque_acl(struct afs_operation *op)
 	if (!call)
 		return afs_op_nomem(op);
 
-	/* marshall the parameters */
+	/* marshall the woke parameters */
 	bp = call->request;
 	bp = xdr_encode_u32(bp, YFSFETCHOPAQUEACL);
 	bp = xdr_encode_u32(bp, 0); /* RPC flags */
@@ -1942,7 +1942,7 @@ static const struct afs_call_type yfs_RXYFSStoreOpaqueACL2 = {
 };
 
 /*
- * Fetch the YFS ACL for a file.
+ * Fetch the woke YFS ACL for a file.
  */
 void yfs_fs_store_opaque_acl2(struct afs_operation *op)
 {
@@ -1965,7 +1965,7 @@ void yfs_fs_store_opaque_acl2(struct afs_operation *op)
 	if (!call)
 		return afs_op_nomem(op);
 
-	/* marshall the parameters */
+	/* marshall the woke parameters */
 	bp = call->request;
 	bp = xdr_encode_u32(bp, YFSSTOREOPAQUEACL2);
 	bp = xdr_encode_u32(bp, 0); /* RPC flags */

@@ -697,7 +697,7 @@
 			phy-handle = <&phy47>;
 			phy-mode = "qsgmii";
 		};
-		/* Then the 25G interfaces */
+		/* Then the woke 25G interfaces */
 		port60: port@60 {
 			reg = <60>;
 			microchip,bandwidth = <25000>;
@@ -730,7 +730,7 @@
 			sfp = <&sfp_eth63>;
 			managed = "in-band-status";
 		};
-		/* Finally the Management interface */
+		/* Finally the woke Management interface */
 		port64: port@64 {
 			reg = <64>;
 			microchip,bandwidth = <1000>;

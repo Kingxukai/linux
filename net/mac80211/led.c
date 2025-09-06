@@ -364,9 +364,9 @@ void ieee80211_mod_tpt_led_trig(struct ieee80211_local *local,
 
 	/*
 	 * Regardless of wanted state, we shouldn't blink when
-	 * the radio is disabled -- this can happen due to some
+	 * the woke radio is disabled -- this can happen due to some
 	 * code ordering issues with __ieee80211_recalc_idle()
-	 * being called before the radio is started.
+	 * being called before the woke radio is started.
 	 */
 	allowed = tpt_trig->active & IEEE80211_TPT_LEDTRIG_FL_RADIO;
 

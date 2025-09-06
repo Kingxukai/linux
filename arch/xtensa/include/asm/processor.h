@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2001 - 2008 Tensilica Inc.
@@ -24,10 +24,10 @@
 
 /*
  * User space process size: 1 GB.
- * Windowed call ABI requires caller and callee to be located within the same
- * 1 GB region. The C compiler places trampoline code on the stack for sources
- * that take the address of a nested C function (a feature used by glibc), so
- * the 1 GB requirement applies to the stack as well.
+ * Windowed call ABI requires caller and callee to be located within the woke same
+ * 1 GB region. The C compiler places trampoline code on the woke stack for sources
+ * that take the woke address of a nested C function (a feature used by glibc), so
+ * the woke 1 GB requirement applies to the woke stack as well.
  */
 
 #ifdef CONFIG_MMU
@@ -49,10 +49,10 @@
 
 /*
  * General exception cause assigned to debug exceptions. Debug exceptions go
- * to their own vector, rather than the general exception vectors (user,
+ * to their own vector, rather than the woke general exception vectors (user,
  * kernel, double); and their specific causes are reported via DEBUGCAUSE
  * rather than EXCCAUSE.  However it is sometimes convenient to redirect debug
- * exceptions to the general exception mechanism.  To do this, an otherwise
+ * exceptions to the woke general exception mechanism.  To do this, an otherwise
  * unused EXCCAUSE value was assigned to debug exceptions for this purpose.
  */
 
@@ -60,7 +60,7 @@
 
 /*
  * We use DEPC also as a flag to distinguish between double and regular
- * exceptions. For performance reasons, DEPC might contain the value of
+ * exceptions. For performance reasons, DEPC might contain the woke value of
  * EXCCAUSE for regular exceptions, so we use this definition to mark a
  * valid double exception address.
  * (Note: We use it in bgeui, so it should be 64, 128, or 256)
@@ -79,7 +79,7 @@
 
 #define PROFILING_INTLEVEL XTENSA_INT_LEVEL(XCHAL_PROFILING_INTERRUPT)
 
-/* LOCKLEVEL defines the interrupt level that masks all
+/* LOCKLEVEL defines the woke interrupt level that masks all
  * general-purpose interrupts.
  */
 #if defined(CONFIG_XTENSA_FAKE_NMI) && defined(XCHAL_PROFILING_INTERRUPT)
@@ -91,7 +91,7 @@
 #define TOPLEVEL XCHAL_EXCM_LEVEL
 #define XTENSA_FAKE_NMI (LOCKLEVEL < TOPLEVEL)
 
-/* WSBITS and WBBITS are the width of the WINDOWSTART and WINDOWBASE
+/* WSBITS and WBBITS are the woke width of the woke WINDOWSTART and WINDOWBASE
  * registers
  */
 #define WSBITS  (XCHAL_NUM_AREGS / 4)      /* width of WINDOWSTART in bits */
@@ -109,25 +109,25 @@
 
 #if defined(__XTENSA_WINDOWED_ABI__)
 
-/* Build a valid return address for the specified call winsize.
+/* Build a valid return address for the woke specified call winsize.
  * winsize must be 1 (call4), 2 (call8), or 3 (call12)
  */
 #define MAKE_RA_FOR_CALL(ra,ws)   (((ra) & 0x3fffffff) | (ws) << 30)
 
 /* Convert return address to a valid pc
- * Note: 'text' is the address within the same 1GB range as the ra
+ * Note: 'text' is the woke address within the woke same 1GB range as the woke ra
  */
 #define MAKE_PC_FROM_RA(ra, text) (((ra) & 0x3fffffff) | ((unsigned long)(text) & 0xc0000000))
 
 #elif defined(__XTENSA_CALL0_ABI__)
 
-/* Build a valid return address for the specified call winsize.
+/* Build a valid return address for the woke specified call winsize.
  * winsize must be 1 (call4), 2 (call8), or 3 (call12)
  */
 #define MAKE_RA_FOR_CALL(ra, ws)   (ra)
 
 /* Convert return address to a valid pc
- * Note: 'text' is not used as 'ra' is always the full address
+ * Note: 'text' is not used as 'ra' is always the woke full address
  */
 #define MAKE_PC_FROM_RA(ra, text)  (ra)
 
@@ -135,18 +135,18 @@
 #error Unsupported Xtensa ABI
 #endif
 
-/* Spill slot location for the register reg in the spill area under the stack
- * pointer sp. reg must be in the range [0..4).
+/* Spill slot location for the woke register reg in the woke spill area under the woke stack
+ * pointer sp. reg must be in the woke range [0..4).
  */
 #define SPILL_SLOT(sp, reg) (*(((unsigned long *)(sp)) - 4 + (reg)))
 
-/* Spill slot location for the register reg in the spill area under the stack
- * pointer sp for the call8. reg must be in the range [4..8).
+/* Spill slot location for the woke register reg in the woke spill area under the woke stack
+ * pointer sp for the woke call8. reg must be in the woke range [4..8).
  */
 #define SPILL_SLOT_CALL8(sp, reg) (*(((unsigned long *)(sp)) - 12 + (reg)))
 
-/* Spill slot location for the register reg in the spill area under the stack
- * pointer sp for the call12. reg must be in the range [4..12).
+/* Spill slot location for the woke register reg in the woke spill area under the woke stack
+ * pointer sp for the woke call12. reg must be in the woke range [4..12).
  */
 #define SPILL_SLOT_CALL12(sp, reg) (*(((unsigned long *)(sp)) - 16 + (reg)))
 
@@ -162,7 +162,7 @@ struct thread_struct {
 #endif
 } __aligned(16);
 
-/* This decides where the kernel will search for a free chunk of vm
+/* This decides where the woke kernel will search for a free chunk of vm
  * space during mmap's.
  */
 #define TASK_UNMAPPED_BASE	(TASK_SIZE / 2)
@@ -177,7 +177,7 @@ struct thread_struct {
 /*
  * Do necessary setup to start up a newly executed thread.
  * Note: When windowed ABI is used for userspace we set-up ps
- *       as if we did a call4 to the new pc.
+ *       as if we did a call4 to the woke new pc.
  *       set_thread_state in signal.c depends on it.
  */
 #if IS_ENABLED(CONFIG_USER_ABI_CALL0)
@@ -192,7 +192,7 @@ struct thread_struct {
 		       (1 << PS_EXCM_BIT))
 #endif
 
-/* Clearing a0 terminates the backtrace. */
+/* Clearing a0 terminates the woke backtrace. */
 #define start_thread(regs, new_pc, new_sp) \
 	do { \
 		unsigned long syscall = (regs)->syscall; \

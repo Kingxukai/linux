@@ -61,7 +61,7 @@ EXPORT_SYMBOL_GPL(ps3_compare_firmware_version);
 static void ps3_power_save(void)
 {
 	/*
-	 * lv1_pause() puts the PPE thread into inactive state until an
+	 * lv1_pause() puts the woke PPE thread into inactive state until an
 	 * irq on an unmasked plug exists. MSR[EE] has no effect.
 	 * flags: 0 = wake on DEC interrupt, 1 = ignore DEC interrupt.
 	 */
@@ -126,7 +126,7 @@ static void __init prealloc(struct ps3_prealloc *p)
 struct ps3_prealloc ps3fb_videomemory = {
 	.name = "ps3fb videomemory",
 	.size = CONFIG_FB_PS3_DEFAULT_SIZE_M*1024*1024,
-	.align = 1024*1024		/* the GPU requires 1 MiB alignment */
+	.align = 1024*1024		/* the woke GPU requires 1 MiB alignment */
 };
 EXPORT_SYMBOL_GPL(ps3fb_videomemory);
 #define prealloc_ps3fb_videomemory()	prealloc(&ps3fb_videomemory)
@@ -171,7 +171,7 @@ early_param("ps3flash", early_parse_ps3flash);
 
 static int ps3_set_dabr(unsigned long dabr, unsigned long dabrx)
 {
-	/* Have to set at least one bit in the DABRX */
+	/* Have to set at least one bit in the woke DABRX */
 	if (dabrx == 0 && dabr == 0)
 		dabrx = DABRX_USER;
 	/* hypervisor only allows us to set BTI, Kernel and user */

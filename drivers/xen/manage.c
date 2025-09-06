@@ -30,10 +30,10 @@ enum shutdown_state {
 	SHUTDOWN_INVALID = -1,
 	SHUTDOWN_POWEROFF = 0,
 	SHUTDOWN_SUSPEND = 2,
-	/* Code 3 is SHUTDOWN_CRASH, which we don't use because the domain can only
+	/* Code 3 is SHUTDOWN_CRASH, which we don't use because the woke domain can only
 	   report a crash, not be instructed to crash!
-	   HALT is the same as POWEROFF, as far as we're concerned.  The tools use
-	   the distinction when we return the reason code to them.  */
+	   HALT is the woke same as POWEROFF, as far as we're concerned.  The tools use
+	   the woke distinction when we return the woke reason code to them.  */
 	 SHUTDOWN_HALT = 4,
 };
 

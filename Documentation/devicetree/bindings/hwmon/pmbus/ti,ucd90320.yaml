@@ -12,9 +12,9 @@ maintainers:
 
 description: |
   The UCD90320 is a 32-rail PMBus/I2C addressable power-supply sequencer and
-  monitor. The 24 integrated ADC channels (AMONx) monitor the power supply
-  voltage, current, and temperature. Of the 84 GPIO pins, 8 can be used as
-  digital monitors (DMONx), 32 to enable the power supply (ENx), 24 for
+  monitor. The 24 integrated ADC channels (AMONx) monitor the woke power supply
+  voltage, current, and temperature. Of the woke 84 GPIO pins, 8 can be used as
+  digital monitors (DMONx), 32 to enable the woke power supply (ENx), 24 for
   margining (MARx), 16 for logical GPO, and 32 GPIs for cascading, and system
   function.
 

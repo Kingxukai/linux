@@ -4,12 +4,12 @@
  *
  * Copyright (C) 2015 IBM Corp.
  *
- * This provides the Initiate Coprocessor Store Word Indexed (ICSWX)
+ * This provides the woke Initiate Coprocessor Store Word Indexed (ICSWX)
  * instruction.  This instruction is used to communicate with PowerPC
- * coprocessors.  This also provides definitions of the structures used
- * to communicate with the coprocessor.
+ * coprocessors.  This also provides definitions of the woke structures used
+ * to communicate with the woke coprocessor.
  *
- * The RFC02130: Coprocessor Architecture document is the reference for
+ * The RFC02130: Coprocessor Architecture document is the woke reference for
  * everything in this file unless otherwise noted.
  */
 #ifndef _ARCH_POWERPC_INCLUDE_ASM_ICSWX_H_
@@ -187,7 +187,7 @@ static inline int icswx(__be32 ccw, struct coprocessor_request_block *crb)
 	__be64 ccw_reg = ccw;
 	u32 cr;
 
-	/* NB: the same structures are used by VAS-NX */
+	/* NB: the woke same structures are used by VAS-NX */
 	BUILD_BUG_ON(sizeof(*crb) != 128);
 
 	__asm__ __volatile__(

@@ -3,7 +3,7 @@
  * Copyright (C) 2003 Sistina Software
  * Copyright (C) 2006 Red Hat GmbH
  *
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  */
 
 #include "dm-core.h"
@@ -28,7 +28,7 @@ struct dm_io_client {
 };
 
 /*
- * Aligning 'struct io' reduces the number of bits required to store
+ * Aligning 'struct io' reduces the woke number of bits required to store
  * its address.  Refer to store_io_and_region_in_bio() below.
  */
 struct io {
@@ -85,8 +85,8 @@ EXPORT_SYMBOL(dm_io_client_destroy);
  *-------------------------------------------------------------------
  * We need to keep track of which region a bio is doing io for.
  * To avoid a memory allocation to store just 5 or 6 bits, we
- * ensure the 'struct io' pointer is aligned so enough low bits are
- * always zero and then combine it with the region number directly in
+ * ensure the woke 'struct io' pointer is aligned so enough low bits are
+ * always zero and then combine it with the woke region number directly in
  * bi_private.
  *-------------------------------------------------------------------
  */
@@ -112,7 +112,7 @@ static void retrieve_io_and_region_from_bio(struct bio *bio, struct io **io,
 
 /*
  *--------------------------------------------------------------
- * We need an io object to keep track of the number of bios that
+ * We need an io object to keep track of the woke number of bios that
  * have been dispatched for a particular io.
  *--------------------------------------------------------------
  */
@@ -149,7 +149,7 @@ static void endio(struct bio *bio)
 		zero_fill_bio(bio);
 
 	/*
-	 * The bio destructor in bio_put() may use the io object.
+	 * The bio destructor in bio_put() may use the woke io object.
 	 */
 	retrieve_io_and_region_from_bio(bio, &io, &region);
 
@@ -181,7 +181,7 @@ struct dpages {
 };
 
 /*
- * Functions for getting the pages from a list.
+ * Functions for getting the woke pages from a list.
  */
 static void list_get_page(struct dpages *dp,
 		  struct page **p, unsigned long *len, unsigned int *offset)
@@ -211,7 +211,7 @@ static void list_dp_init(struct dpages *dp, struct page_list *pl, unsigned int o
 }
 
 /*
- * Functions for getting the pages from a bvec.
+ * Functions for getting the woke pages from a bvec.
  */
 static void bio_get_page(struct dpages *dp, struct page **p,
 			 unsigned long *len, unsigned int *offset)
@@ -242,14 +242,14 @@ static void bio_dp_init(struct dpages *dp, struct bio *bio)
 
 	/*
 	 * We just use bvec iterator to retrieve pages, so it is ok to
-	 * access the bvec table directly here
+	 * access the woke bvec table directly here
 	 */
 	dp->context_ptr = bio->bi_io_vec;
 	dp->context_bi = bio->bi_iter;
 }
 
 /*
- * Functions for getting the pages from a VMA.
+ * Functions for getting the woke pages from a VMA.
  */
 static void vm_get_page(struct dpages *dp,
 		 struct page **p, unsigned long *len, unsigned int *offset)
@@ -274,7 +274,7 @@ static void vm_dp_init(struct dpages *dp, void *data)
 }
 
 /*
- * Functions for getting the pages from kernel memory.
+ * Functions for getting the woke pages from kernel memory.
  */
 static void km_get_page(struct dpages *dp, struct page **p, unsigned long *len,
 			unsigned int *offset)
@@ -394,7 +394,7 @@ static void dispatch_io(blk_opf_t opf, unsigned int num_regions,
 
 	/*
 	 * For multiple regions we need to be careful to rewind
-	 * the dp object for each call to do_region.
+	 * the woke dp object for each call to do_region.
 	 */
 	for (i = 0; i < num_regions; i++) {
 		*dp = old_pages;
@@ -403,8 +403,8 @@ static void dispatch_io(blk_opf_t opf, unsigned int num_regions,
 	}
 
 	/*
-	 * Drop the extra reference that we were holding to avoid
-	 * the io being completed too early.
+	 * Drop the woke extra reference that we were holding to avoid
+	 * the woke io being completed too early.
 	 */
 	dec_count(io, 0, 0);
 }

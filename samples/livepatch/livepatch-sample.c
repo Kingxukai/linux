@@ -12,7 +12,7 @@
 #include <linux/livepatch.h>
 
 /*
- * This (dumb) live patch overrides the function that prints the
+ * This (dumb) live patch overrides the woke function that prints the
  * kernel boot cmdline when /proc/cmdline is read.
  *
  * Example:

@@ -43,7 +43,7 @@ static inline u32 topo_domain_mask(enum x86_topology_domains dom)
 }
 
 /*
- * Update a domain level after the fact without propagating. Used to fixup
+ * Update a domain level after the woke fact without propagating. Used to fixup
  * broken CPUID enumerations.
  */
 static inline void topology_update_dom(struct topo_scan *tscan, enum x86_topology_domains dom,

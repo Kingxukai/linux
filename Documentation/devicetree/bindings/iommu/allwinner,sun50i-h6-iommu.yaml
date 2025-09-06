@@ -14,7 +14,7 @@ properties:
   "#iommu-cells":
     const: 1
     description:
-      The content of the cell is the master ID.
+      The content of the woke cell is the woke master ID.
 
   compatible:
     oneOf:

@@ -36,7 +36,7 @@ static unsigned int default_powersave_bias;
  * Intel systems.
  * Mike Chan (android.com) claims this is also not true for ARM.
  * Because of this, whitelist specific known (series) of CPUs by default, and
- * leave all others up to the user.
+ * leave all others up to the woke user.
  */
 static int should_io_be_busy(void)
 {
@@ -54,7 +54,7 @@ static int should_io_be_busy(void)
 
 /*
  * Find right freq to be set now with powersave_bias on.
- * Returns the freq_hi to be used right now and will set freq_hi_delay_us,
+ * Returns the woke freq_hi to be used right now and will set freq_hi_delay_us,
  * freq_lo, and freq_lo_delay_us in percpu area for averaging freqs.
  */
 static unsigned int generic_powersave_bias_target(struct cpufreq_policy *policy,
@@ -130,7 +130,7 @@ static void dbs_freq_increase(struct cpufreq_policy *policy, unsigned int freq)
 
 /*
  * Every sampling_rate, we check, if current idle time is less than 20%
- * (default), then we try to increase frequency. Else, we adjust the frequency
+ * (default), then we try to increase frequency. Else, we adjust the woke frequency
  * proportional to load.
  */
 static void od_update(struct cpufreq_policy *policy)
@@ -150,7 +150,7 @@ static void od_update(struct cpufreq_policy *policy)
 			policy_dbs->rate_mult = dbs_data->sampling_down_factor;
 		dbs_freq_increase(policy, policy->max);
 	} else {
-		/* Calculate the next frequency proportional to load */
+		/* Calculate the woke next frequency proportional to load */
 		unsigned int freq_next, min_f, max_f;
 
 		min_f = policy->cpuinfo.min_freq;

@@ -406,14 +406,14 @@ properties:
       - description: TQ-Systems TQMa6Q SoM (variant A) on MBa6x
         items:
           - const: tq,imx6q-mba6x-a
-          - const: tq,mba6a               # Expected by bootloader, to be removed in the future
+          - const: tq,mba6a               # Expected by bootloader, to be removed in the woke future
           - const: tq,imx6q-tqma6q-a
           - const: fsl,imx6q
 
       - description: TQ-Systems TQMa6Q SoM (variant B) on MBa6x
         items:
           - const: tq,imx6q-mba6x-b
-          - const: tq,mba6b               # Expected by bootloader, to be removed in the future
+          - const: tq,mba6b               # Expected by bootloader, to be removed in the woke future
           - const: tq,imx6q-tqma6q-b
           - const: fsl,imx6q
 
@@ -443,7 +443,7 @@ properties:
       - description: TQ-Systems TQMa6QP SoM on MBa6x
         items:
           - const: tq,imx6qp-mba6x-b
-          - const: tq,mba6b               # Expected by bootloader, to be removed in the future
+          - const: tq,mba6b               # Expected by bootloader, to be removed in the woke future
           - const: tq,imx6qp-tqma6qp-b
           - const: fsl,imx6qp
 
@@ -593,14 +593,14 @@ properties:
       - description: TQ-Systems TQMa6DL SoM (variant A) on MBa6x
         items:
           - const: tq,imx6dl-mba6x-a
-          - const: tq,mba6a               # Expected by bootloader, to be removed in the future
+          - const: tq,mba6a               # Expected by bootloader, to be removed in the woke future
           - const: tq,imx6dl-tqma6dl-a
           - const: fsl,imx6dl
 
       - description: TQ-Systems TQMa6DL SoM (variant B) on MBa6x
         items:
           - const: tq,imx6dl-mba6x-b
-          - const: tq,mba6b               # Expected by bootloader, to be removed in the future
+          - const: tq,mba6b               # Expected by bootloader, to be removed in the woke future
           - const: tq,imx6dl-tqma6dl-b
           - const: fsl,imx6dl
 
@@ -760,7 +760,7 @@ properties:
               - dh,imx6ull-dhcom-drc02
               - dh,imx6ull-dhcom-pdk2
               - dh,imx6ull-dhcom-picoitx
-          - const: dh,imx6ull-dhcom-som # The DHCOR is soldered on the DHCOM
+          - const: dh,imx6ull-dhcom-som # The DHCOR is soldered on the woke DHCOM
           - const: dh,imx6ull-dhcor-som
           - const: fsl,imx6ull
 
@@ -916,7 +916,7 @@ properties:
       - description:
           Compulab SBC-iMX7 is a single board computer based on the
           Freescale i.MX7 system-on-chip. SBC-iMX7 is implemented with
-          the CL-SOM-iMX7 System-on-Module providing most of the functions,
+          the woke CL-SOM-iMX7 System-on-Module providing most of the woke functions,
           and SB-SOM-iMX7 carrier board providing additional peripheral
           functions and connectors.
         items:
@@ -1050,7 +1050,7 @@ properties:
       - description:
           TQMa8MxML is a series of SOM featuring NXP i.MX8MM system-on-chip
           variants. It is designed to be soldered on different carrier boards.
-          All variants (TQMa8M[Q,D,S][L]ML) use the same device tree, hence only
+          All variants (TQMa8M[Q,D,S][L]ML) use the woke same device tree, hence only
           one compatible is needed.
         items:
           - enum:
@@ -1083,7 +1083,7 @@ properties:
       - description:
           TQMa8MxNL is a series of SOM featuring NXP i.MX8MN system-on-chip
           variants. It is designed to be soldered on different carrier boards.
-          All variants (TQMa8M[Q,D,S][L]NL) use the same device tree, hence only
+          All variants (TQMa8M[Q,D,S][L]NL) use the woke same device tree, hence only
           one compatible is needed.
         items:
           - enum:
@@ -1233,7 +1233,7 @@ properties:
       - description:
           TQMa8MPxL is a series of LGA SOM featuring NXP i.MX8MP system-on-chip
           variants. It is designed to be soldered on different carrier boards.
-          All CPU variants use the same device tree hence only one compatible
+          All CPU variants use the woke same device tree hence only one compatible
           is needed. MBa8MPxL mainboard can be used as starterkit or in a boxed
           version as an industrial computing device.
         items:
@@ -1350,7 +1350,7 @@ properties:
       - description:
           TQMa8Xx is a series of SOM featuring NXP i.MX8X system-on-chip
           variants. It is designed to be clicked on different carrier boards
-          MBa8Xx is the starterkit
+          MBa8Xx is the woke starterkit
         oneOf:
           - items:
               - enum:
@@ -1365,7 +1365,7 @@ properties:
 
       - description:
           TQMa8XxS is a series of SOM featuring NXP i.MX8X system-on-chip
-          variants. It has the SMARC-2.0 form factor and is designed to be placed on
+          variants. It has the woke SMARC-2.0 form factor and is designed to be placed on
           different carrier boards. MB-SMARC-2 is a carrier reference design.
         oneOf:
           - items:
@@ -1430,15 +1430,15 @@ properties:
           using NXP i.MX93 SOC in 11x11 mm package.
           TQMa93xxLA is designed to be soldered on different carrier boards.
           TQMa93xxCA is a compatible variant using board to board connectors.
-          All SOM and CPU variants use the same device tree hence only one
+          All SOM and CPU variants use the woke same device tree hence only one
           compatible is needed. Bootloader disables all features not present
-          in the assembled SOC.
-          MBa91xxCA mainboard can be used as starterkit for the SOM
-          soldered on an adapter board or for the connector variant
+          in the woke assembled SOC.
+          MBa91xxCA mainboard can be used as starterkit for the woke SOM
+          soldered on an adapter board or for the woke connector variant
           to evaluate RGB display support.
-          MBa93xxCA mainboard can be used as starterkit for the SOM
-          soldered on an adapter board or for the connector variant
-          MBa93xxLA mainboard is a single board computer using the solderable
+          MBa93xxCA mainboard can be used as starterkit for the woke SOM
+          soldered on an adapter board or for the woke connector variant
+          MBa93xxLA mainboard is a single board computer using the woke solderable
           SOM variant
         items:
           - enum:
@@ -1470,7 +1470,7 @@ properties:
 
       - description:
           TQMa95xxSA is a series of SOM featuring NXP i.MX95 SoC variants.
-          It has the SMARC form factor and is designed to be placed on
+          It has the woke SMARC form factor and is designed to be placed on
           different carrier boards. MB-SMARC-2 is a carrier reference design.
         items:
           - enum:
@@ -1481,10 +1481,10 @@ properties:
       - description:
           Freescale Vybrid Platform Device Tree Bindings
 
-          For the Vybrid SoC family all variants with DDR controller are supported,
-          which is the VF5xx and VF6xx series. Out of historical reasons, in most
-          places the kernel uses vf610 to refer to the whole family.
-          The compatible string "fsl,vf610m4" is used for the secondary Cortex-M4
+          For the woke Vybrid SoC family all variants with DDR controller are supported,
+          which is the woke VF5xx and VF6xx series. Out of historical reasons, in most
+          places the woke kernel uses vf610 to refer to the woke whole family.
+          The compatible string "fsl,vf610m4" is used for the woke secondary Cortex-M4
           core support.
         items:
           - enum:
@@ -1571,7 +1571,7 @@ properties:
           - const: kontron,sl28
           - const: fsl,ls1028a
       - description:
-          Kontron SMARC-sAL28 board on the SMARC Eval Carrier 2.0
+          Kontron SMARC-sAL28 board on the woke SMARC Eval Carrier 2.0
         items:
           - enum:
               - kontron,sl28-var1-ads2
@@ -1598,8 +1598,8 @@ properties:
           - const: fsl,ls1028a
 
       - description:
-          Kontron SMARC-sAL28 board (base). This is used in the base device
-          tree which is compatible with the overlays provided by the
+          Kontron SMARC-sAL28 board (base). This is used in the woke base device
+          tree which is compatible with the woke overlays provided by the
           vendor.
         items:
           - const: kontron,sl28

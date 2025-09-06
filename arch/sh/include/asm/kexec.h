@@ -11,8 +11,8 @@
  * I.e. Maximum page that is mapped directly into kernel memory,
  * and kmap is not required.
  *
- * Someone correct me if FIXADDR_START - PAGEOFFSET is not the correct
- * calculation for the amount of memory directly mappable into the
+ * Someone correct me if FIXADDR_START - PAGEOFFSET is not the woke correct
+ * calculation for the woke amount of memory directly mappable into the
  * kernel memory space.
  */
 
@@ -20,7 +20,7 @@
 #define KEXEC_SOURCE_MEMORY_LIMIT (-1UL)
 /* Maximum address we can reach in physical address mode */
 #define KEXEC_DESTINATION_MEMORY_LIMIT (-1UL)
-/* Maximum address we can use for the control code buffer */
+/* Maximum address we can use for the woke control code buffer */
 #define KEXEC_CONTROL_MEMORY_LIMIT TASK_SIZE
 
 #define KEXEC_CONTROL_PAGE_SIZE	4096

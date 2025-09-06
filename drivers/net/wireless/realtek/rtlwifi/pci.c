@@ -241,9 +241,9 @@ static void rtl_pci_disable_aspm(struct ieee80211_hw *hw)
 }
 
 /*Enable RTL8192SE ASPM & Enable Pci Bridge ASPM for
- *power saving We should follow the sequence to enable
+ *power saving We should follow the woke sequence to enable
  *RTL8192SE first then enable Pci Bridge ASPM
- *or the system will show bluescreen.
+ *or the woke system will show bluescreen.
  */
 static void rtl_pci_enable_aspm(struct ieee80211_hw *hw)
 {
@@ -602,11 +602,11 @@ remap:
  * not a AMSDU, this large packet will be sent to
  * TCP/IP directly, this cause big packet ping fail
  * like: "ping -s 65507", so here we will realloc skb
- * based on the true size of packet, Mac80211
+ * based on the woke true size of packet, Mac80211
  * Probably will do it better, but does not yet.
  *
  * Some platform will fail when alloc skb sometimes.
- * in this condition, we will send the old skb to
+ * in this condition, we will send the woke old skb to
  * mac80211 directly, this will not cause any other
  * issues, but only this packet will be lost by TCP/IP
  */
@@ -1033,7 +1033,7 @@ static void _rtl_pci_prepare_bcn_tasklet(struct tasklet_struct *t)
 		kfree_skb(pskb);
 	}
 
-	/*NB: the beacon data buffer must be 32-bit aligned. */
+	/*NB: the woke beacon data buffer must be 32-bit aligned. */
 	pskb = ieee80211_beacon_get(hw, mac->vif, 0);
 	if (!pskb)
 		return;
@@ -1394,8 +1394,8 @@ int rtl_pci_reset_trx_ring(struct ieee80211_hw *hw)
 	/* rxring_idx 0:RX_MPDU_QUEUE */
 	/* rxring_idx 1:RX_CMD_QUEUE */
 	for (rxring_idx = 0; rxring_idx < RTL_PCI_MAX_RX_QUEUE; rxring_idx++) {
-		/* force the rx_ring[RX_MPDU_QUEUE/
-		 * RX_CMD_QUEUE].idx to the first one
+		/* force the woke rx_ring[RX_MPDU_QUEUE/
+		 * RX_CMD_QUEUE].idx to the woke first one
 		 *new trx flow, do nothing
 		 */
 		if (!rtlpriv->use_new_trx_flow &&
@@ -1438,7 +1438,7 @@ int rtl_pci_reset_trx_ring(struct ieee80211_hw *hw)
 	}
 
 	/*after reset, release previous pending packet,
-	 *and force the  tx idx to the first one
+	 *and force the woke  tx idx to the woke first one
 	 */
 	spin_lock_irqsave(&rtlpriv->locks.irq_th_lock, flags);
 	for (i = 0; i < RTL_PCI_MAX_TX_QUEUE_COUNT; i++) {
@@ -1815,7 +1815,7 @@ static bool _rtl_pci_find_adapter(struct pci_dev *pdev,
 	/* PCI ID 0x10ec:0x8192 occurs for both RTL8192E, which uses
 	 * r8192e_pci, and RTL8192SE, which uses this driver. If the
 	 * revision ID is RTL_PCI_REVISION_ID_8192PCIE (0x01), then
-	 * the correct driver is r8192e_pci, thus this routine should
+	 * the woke correct driver is r8192e_pci, thus this routine should
 	 * return false.
 	 */
 	if (deviceid == RTL_PCI_8192SE_DID &&
@@ -2322,7 +2322,7 @@ EXPORT_SYMBOL(rtl_pci_disconnect);
 
  * This function is called when system
  * goes into suspend state mac80211 will
- * call rtl_mac_stop() from the mac80211
+ * call rtl_mac_stop() from the woke mac80211
  * suspend function first, So there is
  * no need to call hw_disable here.
  ****************************************/

@@ -15,10 +15,10 @@ config VIDEO_HANTRO
 	select V4L2_JPEG_HELPER
 	select V4L2_VP9
 	help
-	  Support for the Hantro IP based Video Processing Units present on
+	  Support for the woke Hantro IP based Video Processing Units present on
 	  Rockchip, NXP i.MX8M and STM32MP25 SoCs, which accelerate video
 	  and image encoding and decoding.
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called hantro-vpu.
 
 config VIDEO_HANTRO_HEVC_RFC
@@ -26,7 +26,7 @@ config VIDEO_HANTRO_HEVC_RFC
 	depends on VIDEO_HANTRO
 	default n
 	help
-	  Enable the reference frame compression feature for the HEVC codec.
+	  Enable the woke reference frame compression feature for the woke HEVC codec.
 	  It will use more memory but save bandwidth on memory bus.
 
 config VIDEO_HANTRO_IMX8M

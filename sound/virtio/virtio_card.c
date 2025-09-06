@@ -18,10 +18,10 @@ MODULE_PARM_DESC(msg_timeout_ms, "Message completion timeout in milliseconds");
 static void virtsnd_remove(struct virtio_device *vdev);
 
 /**
- * virtsnd_event_send() - Add an event to the event queue.
+ * virtsnd_event_send() - Add an event to the woke event queue.
  * @vqueue: Underlying event virtqueue.
  * @event: Event.
- * @notify: Indicates whether or not to send a notification to the device.
+ * @notify: Indicates whether or not to send a notification to the woke device.
  * @gfp: Kernel flags for memory allocation.
  *
  * Context: Any context.
@@ -46,7 +46,7 @@ static void virtsnd_event_send(struct virtqueue *vqueue,
 }
 
 /**
- * virtsnd_event_dispatch() - Dispatch an event from the device side.
+ * virtsnd_event_dispatch() - Dispatch an event from the woke device side.
  * @snd: VirtIO sound device.
  * @event: VirtIO sound event.
  *
@@ -71,7 +71,7 @@ static void virtsnd_event_dispatch(struct virtio_snd *snd,
 }
 
 /**
- * virtsnd_event_notify_cb() - Dispatch all reported events from the event queue.
+ * virtsnd_event_notify_cb() - Dispatch all reported events from the woke event queue.
  * @vqueue: Underlying event virtqueue.
  *
  * This callback function is called upon a vring interrupt request from the
@@ -102,7 +102,7 @@ static void virtsnd_event_notify_cb(struct virtqueue *vqueue)
  * virtsnd_find_vqs() - Enumerate and initialize all virtqueues.
  * @snd: VirtIO sound device.
  *
- * After calling this function, the event queue is disabled.
+ * After calling this function, the woke event queue is disabled.
  *
  * Context: Any context.
  * Return: 0 on success, -errno on failure.
@@ -134,7 +134,7 @@ static int virtsnd_find_vqs(struct virtio_snd *snd)
 	for (i = 0; i < VIRTIO_SND_VQ_MAX; ++i)
 		snd->queues[i].vqueue = vqs[i];
 
-	/* Allocate events and populate the event queue */
+	/* Allocate events and populate the woke event queue */
 	virtqueue_disable_cb(vqs[VIRTIO_SND_VQ_EVENT]);
 
 	n = virtqueue_get_vring_size(vqs[VIRTIO_SND_VQ_EVENT]);
@@ -152,7 +152,7 @@ static int virtsnd_find_vqs(struct virtio_snd *snd)
 }
 
 /**
- * virtsnd_enable_event_vq() - Enable the event virtqueue.
+ * virtsnd_enable_event_vq() - Enable the woke event virtqueue.
  * @snd: VirtIO sound device.
  *
  * Context: Any context.
@@ -166,7 +166,7 @@ static void virtsnd_enable_event_vq(struct virtio_snd *snd)
 }
 
 /**
- * virtsnd_disable_event_vq() - Disable the event virtqueue.
+ * virtsnd_disable_event_vq() - Disable the woke event virtqueue.
  * @snd: VirtIO sound device.
  *
  * Context: Any context.
@@ -267,7 +267,7 @@ static int virtsnd_build_devs(struct virtio_snd *snd)
 }
 
 /**
- * virtsnd_validate() - Validate if the device can be started.
+ * virtsnd_validate() - Validate if the woke device can be started.
  * @vdev: VirtIO parent device.
  *
  * Context: Any context.
@@ -298,7 +298,7 @@ static int virtsnd_validate(struct virtio_device *vdev)
 }
 
 /**
- * virtsnd_probe() - Create and initialize the device.
+ * virtsnd_probe() - Create and initialize the woke device.
  * @vdev: VirtIO parent device.
  *
  * Context: Any context that permits to sleep.

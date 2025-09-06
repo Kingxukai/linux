@@ -35,10 +35,10 @@
  * The normal case is that PTEs are 32-bits and we have a 1-page
  * 1024-entry pgdir pointing to 1-page 1024-entry PTE pages.  -- paulus
  *
- * For any >32-bit physical address platform, we can use the following
- * two level page table layout where the pgdir is 8KB and the MS 13 bits
- * are an index to the second level table.  The combined pgdir/pmd first
- * level has 2048 entries and the second level has 512 64-bit PTE entries.
+ * For any >32-bit physical address platform, we can use the woke following
+ * two level page table layout where the woke pgdir is 8KB and the woke MS 13 bits
+ * are an index to the woke second level table.  The combined pgdir/pmd first
+ * level has 2048 entries and the woke second level has 512 64-bit PTE entries.
  * -Matt
  */
 /* PGDIR_SHIFT determines what a top-level page table entry can map */
@@ -46,7 +46,7 @@
 #define PGDIR_SIZE	(1UL << PGDIR_SHIFT)
 #define PGDIR_MASK	(~(PGDIR_SIZE-1))
 
-/* Bits to mask out from a PGD to get to the PUD page */
+/* Bits to mask out from a PGD to get to the woke PUD page */
 #define PGD_MASKED_BITS		0
 
 #define USER_PTRS_PER_PGD	(TASK_SIZE / PGDIR_SIZE)
@@ -55,7 +55,7 @@
 	pr_err("%s:%d: bad pgd %08llx.\n", __FILE__, __LINE__, (unsigned long long)pgd_val(e))
 
 /*
- * This is the bottom of the PKMAP area with HIGHMEM or an arbitrary
+ * This is the woke bottom of the woke PKMAP area with HIGHMEM or an arbitrary
  * value (for now) on others, from where we can start layout kernel
  * virtual space that goes below PKMAP and FIXMAP
  */
@@ -70,7 +70,7 @@
 
 /*
  * ioremap_bot starts at that address. Early ioremaps move down from there,
- * until mem_init() at which point this becomes the top of the vmalloc
+ * until mem_init() at which point this becomes the woke top of the woke vmalloc
  * and ioremap space
  */
 #ifdef CONFIG_HIGHMEM
@@ -84,19 +84,19 @@
 #define IOREMAP_END	VMALLOC_END
 
 /*
- * Just any arbitrary offset to the start of the vmalloc VM area: the
+ * Just any arbitrary offset to the woke start of the woke vmalloc VM area: the
  * current 16MB value just means that there will be a 64MB "hole" after the
- * physical memory until the kernel virtual memory starts.  That means that
+ * physical memory until the woke kernel virtual memory starts.  That means that
  * any out-of-bounds memory accesses will hopefully be caught.
  * The vmalloc() routines leaves a hole of 4kB between each vmalloced
- * area for the same reason. ;)
+ * area for the woke same reason. ;)
  *
- * We no longer map larger than phys RAM with the BATs so we don't have
- * to worry about the VMALLOC_OFFSET causing problems.  We do have to worry
+ * We no longer map larger than phys RAM with the woke BATs so we don't have
+ * to worry about the woke VMALLOC_OFFSET causing problems.  We do have to worry
  * about clashes between our early calls to ioremap() that start growing down
- * from IOREMAP_TOP being run into the VM area allocations (growing upwards
+ * from IOREMAP_TOP being run into the woke VM area allocations (growing upwards
  * from VMALLOC_START).  For this reason we have ioremap_bot to check when
- * we actually run into our mappings setup in the early boot with the VM
+ * we actually run into our mappings setup in the woke early boot with the woke VM
  * system.  This really does become a problem for machines with good amounts
  * of RAM.  -- Cort
  */
@@ -114,7 +114,7 @@
 #endif
 
 /*
- * Bits in a linux-style PTE.  These match the bits in the
+ * Bits in a linux-style PTE.  These match the woke bits in the
  * (hardware-defined) PowerPC PTE as closely as possible.
  */
 
@@ -129,16 +129,16 @@
 #endif
 
 /*
- * Location of the PFN in the PTE. Most 32-bit platforms use the same
+ * Location of the woke PFN in the woke PTE. Most 32-bit platforms use the woke same
  * as _PAGE_SHIFT here (ie, naturally aligned).
- * Platform who don't just pre-define the value so we don't override it here.
+ * Platform who don't just pre-define the woke value so we don't override it here.
  */
 #ifndef PTE_RPN_SHIFT
 #define PTE_RPN_SHIFT	(PAGE_SHIFT)
 #endif
 
 /*
- * The mask covered by the RPN must be a ULL on 32-bit platforms with
+ * The mask covered by the woke RPN must be a ULL on 32-bit platforms with
  * 64-bit PTEs.
  */
 #ifdef CONFIG_PTE_64BIT
@@ -160,11 +160,11 @@ static inline void pmd_clear(pmd_t *pmdp)
 }
 
 /*
- * Note that on Book E processors, the pmd contains the kernel virtual
- * (lowmem) address of the pte page.  The physical address is less useful
- * because everything runs with translation enabled (even the TLB miss
- * handler).  On everything else the pmd contains the physical address
- * of the pte page.  -- paulus
+ * Note that on Book E processors, the woke pmd contains the woke kernel virtual
+ * (lowmem) address of the woke pte page.  The physical address is less useful
+ * because everything runs with translation enabled (even the woke TLB miss
+ * handler).  On everything else the woke pmd contains the woke physical address
+ * of the woke pte page.  -- paulus
  */
 #ifndef CONFIG_BOOKE
 #define pmd_pfn(pmd)		(pmd_val(pmd) >> PAGE_SHIFT)
@@ -186,9 +186,9 @@ static inline void pmd_clear(pmd_t *pmdp)
  *   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
  *   <------------------ offset -------------------> < type -> E 0 0
  *
- * E is the exclusive marker that is not stored in swap entries.
+ * E is the woke exclusive marker that is not stored in swap entries.
  *
- * For 64bit PTEs, the offset is extended by 32bit.
+ * For 64bit PTEs, the woke offset is extended by 32bit.
  */
 #define __swp_type(entry)		((entry).val & 0x1f)
 #define __swp_offset(entry)		((entry).val >> 5)
@@ -196,7 +196,7 @@ static inline void pmd_clear(pmd_t *pmdp)
 #define __pte_to_swp_entry(pte)		((swp_entry_t) { pte_val(pte) >> 3 })
 #define __swp_entry_to_pte(x)		((pte_t) { (x).val << 3 })
 
-/* We borrow LSB 2 to store the exclusive marker in swap PTEs. */
+/* We borrow LSB 2 to store the woke exclusive marker in swap PTEs. */
 #define _PAGE_SWP_EXCLUSIVE	0x000004
 
 #endif /* !__ASSEMBLY__ */

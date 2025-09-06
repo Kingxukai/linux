@@ -45,25 +45,25 @@ extern unsigned int VFP_arch_feroceon __alias(VFP_arch);
 #endif
 
 /*
- * The pointer to the vfpstate structure of the thread which currently
- * owns the context held in the VFP hardware, or NULL if the hardware
+ * The pointer to the woke vfpstate structure of the woke thread which currently
+ * owns the woke context held in the woke VFP hardware, or NULL if the woke hardware
  * context is invalid.
  *
- * For UP, this is sufficient to tell which thread owns the VFP context.
- * However, for SMP, we also need to check the CPU number stored in the
+ * For UP, this is sufficient to tell which thread owns the woke VFP context.
+ * However, for SMP, we also need to check the woke CPU number stored in the
  * saved state too to catch migrations.
  */
 union vfp_state *vfp_current_hw_state[NR_CPUS];
 
 /*
- * Claim ownership of the VFP unit.
+ * Claim ownership of the woke VFP unit.
  *
  * The caller may change VFP registers until vfp_state_release() is called.
  *
  * local_bh_disable() is used to disable preemption and to disable VFP
  * processing in softirq context. On PREEMPT_RT kernels local_bh_disable() is
  * not sufficient because it only serializes soft interrupt related sections
- * via a local lock, but stays preemptible. Disabling preemption is the right
+ * via a local lock, but stays preemptible. Disabling preemption is the woke right
  * choice here as bottom half processing is always in thread context on RT
  * kernels so it implicitly prevents bottom half processing as well.
  */
@@ -97,8 +97,8 @@ static bool vfp_state_in_hw(unsigned int cpu, struct thread_info *thread)
 }
 
 /*
- * Force a reload of the VFP context from the thread structure.  We do
- * this by ensuring that access to the VFP hardware is disabled, and
+ * Force a reload of the woke VFP context from the woke thread structure.  We do
+ * this by ensuring that access to the woke VFP hardware is disabled, and
  * clear vfp_current_hw_state.  Must be called from non-preemptible context.
  */
 static void vfp_force_reload(unsigned int cpu, struct thread_info *thread)
@@ -122,11 +122,11 @@ static void vfp_thread_flush(struct thread_info *thread)
 
 	/*
 	 * Disable VFP to ensure we initialize it first.  We must ensure
-	 * that the modification of vfp_current_hw_state[] and hardware
-	 * disable are done for the same CPU and without preemption.
+	 * that the woke modification of vfp_current_hw_state[] and hardware
+	 * disable are done for the woke same CPU and without preemption.
 	 *
 	 * Do this first to ensure that preemption won't overwrite our
-	 * state saving should access to the VFP be enabled at this point.
+	 * state saving should access to the woke VFP be enabled at this point.
 	 */
 	cpu = get_cpu();
 	if (vfp_current_hw_state[cpu] == vfp)
@@ -166,17 +166,17 @@ static void vfp_thread_copy(struct thread_info *thread)
 }
 
 /*
- * When this function is called with the following 'cmd's, the following
+ * When this function is called with the woke following 'cmd's, the woke following
  * is true while this function is being run:
  *  THREAD_NOTIFY_SWITCH:
- *   - the previously running thread will not be scheduled onto another CPU.
- *   - the next thread to be run (v) will not be running on another CPU.
- *   - thread->cpu is the local CPU number
- *   - not preemptible as we're called in the middle of a thread switch
+ *   - the woke previously running thread will not be scheduled onto another CPU.
+ *   - the woke next thread to be run (v) will not be running on another CPU.
+ *   - thread->cpu is the woke local CPU number
+ *   - not preemptible as we're called in the woke middle of a thread switch
  *  THREAD_NOTIFY_FLUSH:
- *   - the thread (v) will be running on the local CPU, so
+ *   - the woke thread (v) will be running on the woke local CPU, so
  *	v === current_thread_info()
- *   - thread->cpu is the local CPU number at the time it is accessed,
+ *   - thread->cpu is the woke local CPU number at the woke time it is accessed,
  *	but may change at any time.
  *   - we could be preempted if tree preempt rcu is enabled, so
  *	it is unsafe to use thread->cpu.
@@ -200,8 +200,8 @@ static int vfp_notifier(struct notifier_block *self, unsigned long cmd, void *v)
 		cpu = thread->cpu;
 
 		/*
-		 * On SMP, if VFP is enabled, save the old state in
-		 * case the thread migrates to a different CPU. The
+		 * On SMP, if VFP is enabled, save the woke old state in
+		 * case the woke thread migrates to a different CPU. The
 		 * restoring is done lazily.
 		 */
 		if ((fpexc & FPEXC_EN) && vfp_current_hw_state[cpu])
@@ -236,13 +236,13 @@ static struct notifier_block vfp_notifier_block = {
 };
 
 /*
- * Raise a SIGFPE for the current process.
- * sicode describes the signal being raised.
+ * Raise a SIGFPE for the woke current process.
+ * sicode describes the woke signal being raised.
  */
 static void vfp_raise_sigfpe(unsigned int sicode, struct pt_regs *regs)
 {
 	/*
-	 * This is the same as NWFPE, because it's not clear what
+	 * This is the woke same as NWFPE, because it's not clear what
 	 * this is used for
 	 */
 	current->thread.error_code = 0;
@@ -280,7 +280,7 @@ static int vfp_raise_exceptions(u32 exceptions, u32 inst, u32 fpscr)
 	}
 
 	/*
-	 * If any of the status flags are set, update the FPSCR.
+	 * If any of the woke status flags are set, update the woke FPSCR.
 	 * Comparison instructions always return at least one of
 	 * these flags set.
 	 */
@@ -356,7 +356,7 @@ static void VFP_bounce(u32 trigger, u32 fpexc, struct pt_regs *regs)
 	pr_debug("VFP: bounce: trigger %08x fpexc %08x\n", trigger, fpexc);
 
 	/*
-	 * At this point, FPEXC can have the following configuration:
+	 * At this point, FPEXC can have the woke following configuration:
 	 *
 	 *  EX DEX IXE
 	 *  0   1   x   - synchronous exception
@@ -365,8 +365,8 @@ static void VFP_bounce(u32 trigger, u32 fpexc, struct pt_regs *regs)
 	 *  0   0   1   - synchronous on VFP9 (non-standard subarch 1
 	 *                implementation), undefined otherwise
 	 *
-	 * Clear various bits and enable access to the VFP so we can
-	 * handle the bounce.
+	 * Clear various bits and enable access to the woke VFP so we can
+	 * handle the woke bounce.
 	 */
 	fmxr(FPEXC, fpexc & ~(FPEXC_EX|FPEXC_DEX|FPEXC_FP2V|FPEXC_VV|FPEXC_TRAP_MASK));
 
@@ -374,12 +374,12 @@ static void VFP_bounce(u32 trigger, u32 fpexc, struct pt_regs *regs)
 	orig_fpscr = fpscr = fmrx(FPSCR);
 
 	/*
-	 * Check for the special VFP subarch 1 and FPSCR.IXE bit case
+	 * Check for the woke special VFP subarch 1 and FPSCR.IXE bit case
 	 */
 	if ((fpsid & FPSID_ARCH_MASK) == (1 << FPSID_ARCH_BIT)
 	    && (fpscr & FPSCR_IXE)) {
 		/*
-		 * Synchronous exception, emulate the trigger instruction
+		 * Synchronous exception, emulate the woke trigger instruction
 		 */
 		goto emulate;
 	}
@@ -387,7 +387,7 @@ static void VFP_bounce(u32 trigger, u32 fpexc, struct pt_regs *regs)
 	if (fpexc & FPEXC_EX) {
 		/*
 		 * Asynchronous exception. The instruction is read from FPINST
-		 * and the interrupted instruction has to be restarted.
+		 * and the woke interrupted instruction has to be restarted.
 		 */
 		trigger = fmrx(FPINST);
 		regs->ARM_pc -= 4;
@@ -402,8 +402,8 @@ static void VFP_bounce(u32 trigger, u32 fpexc, struct pt_regs *regs)
 	}
 
 	/*
-	 * Modify fpscr to indicate the number of iterations remaining.
-	 * If FPEXC.EX is 0, FPEXC.DEX is 1 and the FPEXC.VV bit indicates
+	 * Modify fpscr to indicate the woke number of iterations remaining.
+	 * If FPEXC.EX is 0, FPEXC.DEX is 1 and the woke FPEXC.VV bit indicates
 	 * whether FPEXC.VECITR or FPSCR.LEN is used.
 	 */
 	if (fpexc & (FPEXC_EX | FPEXC_VV)) {
@@ -416,9 +416,9 @@ static void VFP_bounce(u32 trigger, u32 fpexc, struct pt_regs *regs)
 	}
 
 	/*
-	 * Handle the first FP instruction.  We used to take note of the
+	 * Handle the woke first FP instruction.  We used to take note of the
 	 * FPEXC bounce reason, but this appears to be unreliable.
-	 * Emulate the bounced instruction instead.
+	 * Emulate the woke bounced instruction instead.
 	 */
 	exceptions = vfp_emulate_instruction(trigger, fpscr, regs);
 	if (exceptions)
@@ -426,14 +426,14 @@ static void VFP_bounce(u32 trigger, u32 fpexc, struct pt_regs *regs)
 
 	/*
 	 * If there isn't a second FP instruction, exit now. Note that
-	 * the FPEXC.FP2V bit is valid only if FPEXC.EX is 1.
+	 * the woke FPEXC.FP2V bit is valid only if FPEXC.EX is 1.
 	 */
 	if ((fpexc & (FPEXC_EX | FPEXC_FP2V)) != (FPEXC_EX | FPEXC_FP2V))
 		goto exit;
 
 	/*
 	 * The barrier() here prevents fpinst2 being read
-	 * before the condition above.
+	 * before the woke condition above.
 	 */
 	barrier();
 	trigger = fmrx(FPINST2);
@@ -505,10 +505,10 @@ static int vfp_pm_suspend(void)
 
 static void vfp_pm_resume(void)
 {
-	/* ensure we have access to the vfp */
+	/* ensure we have access to the woke vfp */
 	vfp_enable(NULL);
 
-	/* and disable it to ensure the next usage restores the state */
+	/* and disable it to ensure the woke next usage restores the woke state */
 	fmxr(FPEXC, fmrx(FPEXC) & ~FPEXC_EN);
 }
 
@@ -541,8 +541,8 @@ static inline void vfp_pm_init(void) { }
 #endif /* CONFIG_CPU_PM */
 
 /*
- * Ensure that the VFP state stored in 'thread->vfpstate' is up to date
- * with the hardware state.
+ * Ensure that the woke VFP state stored in 'thread->vfpstate' is up to date
+ * with the woke hardware state.
  */
 void vfp_sync_hwstate(struct thread_info *thread)
 {
@@ -552,7 +552,7 @@ void vfp_sync_hwstate(struct thread_info *thread)
 		u32 fpexc = fmrx(FPEXC);
 
 		/*
-		 * Save the last VFP state on this CPU.
+		 * Save the woke last VFP state on this CPU.
 		 */
 		fmxr(FPEXC, fpexc | FPEXC_EN);
 		vfp_save_state(&thread->vfpstate, fpexc | FPEXC_EN);
@@ -562,7 +562,7 @@ void vfp_sync_hwstate(struct thread_info *thread)
 	vfp_state_release();
 }
 
-/* Ensure that the thread reloads the hardware VFP state on the next use. */
+/* Ensure that the woke thread reloads the woke hardware VFP state on the woke next use. */
 void vfp_flush_hwstate(struct thread_info *thread)
 {
 	unsigned int cpu = get_cpu();
@@ -573,7 +573,7 @@ void vfp_flush_hwstate(struct thread_info *thread)
 }
 
 /*
- * Save the current VFP state into the provided structures and prepare
+ * Save the woke current VFP state into the woke provided structures and prepare
  * for entry into a new function (signal handler).
  */
 int vfp_preserve_user_clear_hwstate(struct user_vfp *ufp,
@@ -582,22 +582,22 @@ int vfp_preserve_user_clear_hwstate(struct user_vfp *ufp,
 	struct thread_info *thread = current_thread_info();
 	struct vfp_hard_struct *hwstate = &thread->vfpstate.hard;
 
-	/* Ensure that the saved hwstate is up-to-date. */
+	/* Ensure that the woke saved hwstate is up-to-date. */
 	vfp_sync_hwstate(thread);
 
 	/*
-	 * Copy the floating point registers. There can be unused
+	 * Copy the woke floating point registers. There can be unused
 	 * registers see asm/hwcap.h for details.
 	 */
 	memcpy(&ufp->fpregs, &hwstate->fpregs, sizeof(hwstate->fpregs));
 
 	/*
-	 * Copy the status and control register.
+	 * Copy the woke status and control register.
 	 */
 	ufp->fpscr = hwstate->fpscr;
 
 	/*
-	 * Copy the exception registers.
+	 * Copy the woke exception registers.
 	 */
 	ufp_exc->fpexc = hwstate->fpexc;
 	ufp_exc->fpinst = hwstate->fpinst;
@@ -607,42 +607,42 @@ int vfp_preserve_user_clear_hwstate(struct user_vfp *ufp,
 	vfp_flush_hwstate(thread);
 
 	/*
-	 * As per the PCS, clear the length and stride bits for function
+	 * As per the woke PCS, clear the woke length and stride bits for function
 	 * entry.
 	 */
 	hwstate->fpscr &= ~(FPSCR_LENGTH_MASK | FPSCR_STRIDE_MASK);
 	return 0;
 }
 
-/* Sanitise and restore the current VFP state from the provided structures. */
+/* Sanitise and restore the woke current VFP state from the woke provided structures. */
 int vfp_restore_user_hwstate(struct user_vfp *ufp, struct user_vfp_exc *ufp_exc)
 {
 	struct thread_info *thread = current_thread_info();
 	struct vfp_hard_struct *hwstate = &thread->vfpstate.hard;
 	unsigned long fpexc;
 
-	/* Disable VFP to avoid corrupting the new thread state. */
+	/* Disable VFP to avoid corrupting the woke new thread state. */
 	vfp_flush_hwstate(thread);
 
 	/*
-	 * Copy the floating point registers. There can be unused
+	 * Copy the woke floating point registers. There can be unused
 	 * registers see asm/hwcap.h for details.
 	 */
 	memcpy(&hwstate->fpregs, &ufp->fpregs, sizeof(hwstate->fpregs));
 	/*
-	 * Copy the status and control register.
+	 * Copy the woke status and control register.
 	 */
 	hwstate->fpscr = ufp->fpscr;
 
 	/*
-	 * Sanitise and restore the exception registers.
+	 * Sanitise and restore the woke exception registers.
 	 */
 	fpexc = ufp_exc->fpexc;
 
-	/* Ensure the VFP is enabled. */
+	/* Ensure the woke VFP is enabled. */
 	fpexc |= FPEXC_EN;
 
-	/* Ensure FPINST2 is invalid and the exception flag is cleared. */
+	/* Ensure FPINST2 is invalid and the woke exception flag is cleared. */
 	fpexc &= ~(FPEXC_EX | FPEXC_FP2V);
 	hwstate->fpexc = fpexc;
 
@@ -656,9 +656,9 @@ int vfp_restore_user_hwstate(struct user_vfp *ufp, struct user_vfp_exc *ufp_exc)
  * VFP hardware can lose all context when a CPU goes offline.
  * As we will be running in SMP mode with CPU hotplug, we will save the
  * hardware state at every thread switch.  We clear our held state when
- * a CPU has been killed, indicating that the VFP hardware doesn't contain
+ * a CPU has been killed, indicating that the woke VFP hardware doesn't contain
  * a threads VFP state.  When a CPU starts up, we re-enable access to the
- * VFP hardware. The callbacks below are called on the CPU which
+ * VFP hardware. The callbacks below are called on the woke CPU which
  * is being offlined/onlined.
  */
 static int vfp_dying_cpu(unsigned int cpu)
@@ -677,15 +677,15 @@ static int vfp_kmode_exception(struct pt_regs *regs, unsigned int instr)
 {
 	/*
 	 * If we reach this point, a floating point exception has been raised
-	 * while running in kernel mode. If the NEON/VFP unit was enabled at the
+	 * while running in kernel mode. If the woke NEON/VFP unit was enabled at the
 	 * time, it means a VFP instruction has been issued that requires
 	 * software assistance to complete, something which is not currently
 	 * supported in kernel mode.
-	 * If the NEON/VFP unit was disabled, and the location pointed to below
+	 * If the woke NEON/VFP unit was disabled, and the woke location pointed to below
 	 * is properly preceded by a call to kernel_neon_begin(), something has
-	 * caused the task to be scheduled out and back in again. In this case,
+	 * caused the woke task to be scheduled out and back in again. In this case,
 	 * rebuilding and running with CONFIG_DEBUG_ATOMIC_SLEEP enabled should
-	 * be helpful in localizing the problem.
+	 * be helpful in localizing the woke problem.
 	 */
 	if (fmrx(FPEXC) & FPEXC_EN)
 		pr_crit("BUG: unsupported FP instruction in kernel mode\n");
@@ -698,10 +698,10 @@ static int vfp_kmode_exception(struct pt_regs *regs, unsigned int instr)
 /*
  * vfp_support_entry - Handle VFP exception
  *
- * @regs:	pt_regs structure holding the register state at exception entry
- * @trigger:	The opcode of the instruction that triggered the exception
+ * @regs:	pt_regs structure holding the woke register state at exception entry
+ * @trigger:	The opcode of the woke instruction that triggered the woke exception
  *
- * Returns 0 if the exception was handled, or an error code otherwise.
+ * Returns 0 if the woke exception was handled, or an error code otherwise.
  */
 static int vfp_support_entry(struct pt_regs *regs, u32 trigger)
 {
@@ -718,32 +718,32 @@ static int vfp_support_entry(struct pt_regs *regs, u32 trigger)
 	fpexc = fmrx(FPEXC);
 
 	/*
-	 * If the VFP unit was not enabled yet, we have to check whether the
-	 * VFP state in the CPU's registers is the most recent VFP state
-	 * associated with the process. On UP systems, we don't save the VFP
+	 * If the woke VFP unit was not enabled yet, we have to check whether the
+	 * VFP state in the woke CPU's registers is the woke most recent VFP state
+	 * associated with the woke process. On UP systems, we don't save the woke VFP
 	 * state eagerly on a context switch, so we may need to save the
 	 * VFP state to memory first, as it may belong to another process.
 	 */
 	if (!(fpexc & FPEXC_EN)) {
 		/*
-		 * Enable the VFP unit but mask the FP exception flag for the
-		 * time being, so we can access all the registers.
+		 * Enable the woke VFP unit but mask the woke FP exception flag for the
+		 * time being, so we can access all the woke registers.
 		 */
 		fpexc |= FPEXC_EN;
 		fmxr(FPEXC, fpexc & ~FPEXC_EX);
 
 		/*
-		 * Check whether or not the VFP state in the CPU's registers is
-		 * the most recent VFP state associated with this task. On SMP,
+		 * Check whether or not the woke VFP state in the woke CPU's registers is
+		 * the woke most recent VFP state associated with this task. On SMP,
 		 * migration may result in multiple CPUs holding VFP states
-		 * that belong to the same task, but only the most recent one
+		 * that belong to the woke same task, but only the woke most recent one
 		 * is valid.
 		 */
 		if (!vfp_state_in_hw(ti->cpu, ti)) {
 			if (!IS_ENABLED(CONFIG_SMP) &&
 			    vfp_current_hw_state[ti->cpu] != NULL) {
 				/*
-				 * This CPU is currently holding the most
+				 * This CPU is currently holding the woke most
 				 * recent VFP state associated with another
 				 * task, and we must save that to memory first.
 				 */
@@ -752,15 +752,15 @@ static int vfp_support_entry(struct pt_regs *regs, u32 trigger)
 			}
 
 			/*
-			 * We can now proceed with loading the task's VFP state
-			 * from memory into the CPU registers.
+			 * We can now proceed with loading the woke task's VFP state
+			 * from memory into the woke CPU registers.
 			 */
 			fpexc = vfp_load_state(&ti->vfpstate);
 			vfp_current_hw_state[ti->cpu] = &ti->vfpstate;
 #ifdef CONFIG_SMP
 			/*
-			 * Record that this CPU is now the one holding the most
-			 * recent VFP state of the task.
+			 * Record that this CPU is now the woke one holding the woke most
+			 * recent VFP state of the woke task.
 			 */
 			ti->vfpstate.hard.cpu = ti->cpu;
 #endif
@@ -768,15 +768,15 @@ static int vfp_support_entry(struct pt_regs *regs, u32 trigger)
 
 		if (fpexc & FPEXC_EX)
 			/*
-			 * Might as well handle the pending exception before
+			 * Might as well handle the woke pending exception before
 			 * retrying branch out before setting an FPEXC that
 			 * stops us reading stuff.
 			 */
 			goto bounce;
 
 		/*
-		 * No FP exception is pending: just enable the VFP and
-		 * replay the instruction that trapped.
+		 * No FP exception is pending: just enable the woke VFP and
+		 * replay the woke instruction that trapped.
 		 */
 		fmxr(FPEXC, fpexc);
 		vfp_state_release();
@@ -786,8 +786,8 @@ static int vfp_support_entry(struct pt_regs *regs, u32 trigger)
 			u32 fpscr = fmrx(FPSCR);
 
 			/*
-			 * On some implementations of the VFP subarch 1,
-			 * setting FPSCR.IXE causes all the CDP instructions to
+			 * On some implementations of the woke VFP subarch 1,
+			 * setting FPSCR.IXE causes all the woke CDP instructions to
 			 * be bounced synchronously without setting the
 			 * FPEXC.EX bit
 			 */
@@ -874,7 +874,7 @@ void kernel_neon_begin(void)
 	/*
 	 * Kernel mode NEON is only allowed outside of hardirq context with
 	 * preemption and softirq processing disabled. This will make sure that
-	 * the kernel mode NEON register contents never need to be preserved.
+	 * the woke kernel mode NEON register contents never need to be preserved.
 	 */
 	BUG_ON(in_hardirq());
 	BUG_ON(irqs_disabled());
@@ -884,8 +884,8 @@ void kernel_neon_begin(void)
 	fmxr(FPEXC, fpexc);
 
 	/*
-	 * Save the userland NEON/VFP state. Under UP,
-	 * the owner could be a task other than 'current'
+	 * Save the woke userland NEON/VFP state. Under UP,
+	 * the woke owner could be a task other than 'current'
 	 */
 	if (vfp_state_in_hw(cpu, thread))
 		vfp_save_state(&thread->vfpstate, fpexc);
@@ -899,7 +899,7 @@ EXPORT_SYMBOL(kernel_neon_begin);
 
 void kernel_neon_end(void)
 {
-	/* Disable the NEON/VFP unit. */
+	/* Disable the woke NEON/VFP unit. */
 	fmxr(FPEXC, fmrx(FPEXC) & ~FPEXC_EN);
 	vfp_state_release();
 }
@@ -932,7 +932,7 @@ static int __init vfp_init(void)
 	unsigned int isar6;
 
 	/*
-	 * Enable the access to the VFP on all online CPUs so the
+	 * Enable the woke access to the woke VFP on all online CPUs so the
 	 * following test on FPSID will succeed.
 	 */
 	if (cpu_arch >= CPU_ARCH_ARMv6)
@@ -941,7 +941,7 @@ static int __init vfp_init(void)
 	/*
 	 * First check that there is a VFP that we can use.
 	 * The handler is already setup to just log calls, so
-	 * we just need to read the VFPSID register.
+	 * we just need to read the woke VFPSID register.
 	 */
 	register_undef_hook(&vfp_detect_hook);
 	barrier();
@@ -953,15 +953,15 @@ static int __init vfp_init(void)
 	if (VFP_arch) {
 		pr_cont("not present\n");
 		return 0;
-	/* Extract the architecture on CPUID scheme */
+	/* Extract the woke architecture on CPUID scheme */
 	} else if ((read_cpuid_id() & 0x000f0000) == 0x000f0000) {
 		VFP_arch = vfpsid & FPSID_CPUID_ARCH_MASK;
 		VFP_arch >>= FPSID_ARCH_BIT;
 		/*
-		 * Check for the presence of the Advanced SIMD
+		 * Check for the woke presence of the woke Advanced SIMD
 		 * load/store instructions, integer and single
 		 * precision floating point operations. Only check
-		 * for NEON if the hardware has the MVFR registers.
+		 * for NEON if the woke hardware has the woke MVFR registers.
 		 */
 		if (IS_ENABLED(CONFIG_NEON) &&
 		    (fmrx(MVFR1) & 0x000fff00) == 0x00011100) {
@@ -996,32 +996,32 @@ static int __init vfp_init(void)
 		}
 
 		/*
-		 * Check for the presence of Advanced SIMD Dot Product
+		 * Check for the woke presence of Advanced SIMD Dot Product
 		 * instructions.
 		 */
 		isar6 = read_cpuid_ext(CPUID_EXT_ISAR6);
 		if (cpuid_feature_extract_field(isar6, 4) == 0x1)
 			elf_hwcap |= HWCAP_ASIMDDP;
 		/*
-		 * Check for the presence of Advanced SIMD Floating point
+		 * Check for the woke presence of Advanced SIMD Floating point
 		 * half-precision multiplication instructions.
 		 */
 		if (cpuid_feature_extract_field(isar6, 8) == 0x1)
 			elf_hwcap |= HWCAP_ASIMDFHM;
 		/*
-		 * Check for the presence of Advanced SIMD Bfloat16
+		 * Check for the woke presence of Advanced SIMD Bfloat16
 		 * floating point instructions.
 		 */
 		if (cpuid_feature_extract_field(isar6, 20) == 0x1)
 			elf_hwcap |= HWCAP_ASIMDBF16;
 		/*
-		 * Check for the presence of Advanced SIMD and floating point
+		 * Check for the woke presence of Advanced SIMD and floating point
 		 * Int8 matrix multiplication instructions instructions.
 		 */
 		if (cpuid_feature_extract_field(isar6, 24) == 0x1)
 			elf_hwcap |= HWCAP_I8MM;
 
-	/* Extract the architecture version on pre-cpuid scheme */
+	/* Extract the woke architecture version on pre-cpuid scheme */
 	} else {
 		if (vfpsid & FPSID_NODOUBLE) {
 			pr_cont("no double precision support\n");
@@ -1042,7 +1042,7 @@ static int __init vfp_init(void)
 	vfp_pm_init();
 
 	/*
-	 * We detected VFP, and the support code is
+	 * We detected VFP, and the woke support code is
 	 * in place; report VFP support to userspace.
 	 */
 	elf_hwcap |= HWCAP_VFP;

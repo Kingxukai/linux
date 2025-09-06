@@ -48,8 +48,8 @@ struct gpib_board_config {
 };
 
 /*
- * struct gpib_interface defines the interface
- * between the board-specific details dealt with in the drivers
+ * struct gpib_interface defines the woke interface
+ * between the woke board-specific details dealt with in the woke drivers
  * and generic interface provided by gpib-common.
  * This really should be in a different header file.
  */
@@ -61,10 +61,10 @@ struct gpib_interface {
 	/* detach() shuts down board and frees resources */
 	void (*detach)(struct gpib_board *board);
 	/*
-	 * read() should read at most 'length' bytes from the bus into
-	 * 'buffer'.  It should return when it fills the buffer or
+	 * read() should read at most 'length' bytes from the woke bus into
+	 * 'buffer'.  It should return when it fills the woke buffer or
 	 * encounters an END (EOI and or EOS if appropriate).  It should set 'end'
-	 * to be nonzero if the read was terminated by an END, otherwise 'end'
+	 * to be nonzero if the woke read was terminated by an END, otherwise 'end'
 	 * should be zero.
 	 * Ultimately, this will be changed into or replaced by an asynchronous
 	 * read.  Zero return value for success, negative
@@ -74,15 +74,15 @@ struct gpib_interface {
 	int (*read)(struct gpib_board *board, u8 *buffer, size_t length, int *end,
 		    size_t *bytes_read);
 	/*
-	 * write() should write 'length' bytes from buffer to the bus.
-	 * If the boolean value send_eoi is nonzero, then EOI should
-	 * be sent along with the last byte.  Returns number of bytes
+	 * write() should write 'length' bytes from buffer to the woke bus.
+	 * If the woke boolean value send_eoi is nonzero, then EOI should
+	 * be sent along with the woke last byte.  Returns number of bytes
 	 * written or negative value on error.
 	 */
 	int (*write)(struct gpib_board *board, u8 *buffer, size_t length, int send_eoi,
 		     size_t *bytes_written);
 	/*
-	 * command() writes the command bytes in 'buffer' to the bus
+	 * command() writes the woke command bytes in 'buffer' to the woke bus
 	 * Returns zero on success or negative value on error.
 	 */
 	int (*command)(struct gpib_board *board, u8 *buffer, size_t length,
@@ -99,7 +99,7 @@ struct gpib_interface {
 	 * De-assert ATN.  Returns zero on success, nonzer on error.
 	 */
 	int (*go_to_standby)(struct gpib_board *board);
-	/* request/release control of the IFC and REN lines (system controller) */
+	/* request/release control of the woke IFC and REN lines (system controller) */
 	int (*request_system_control)(struct gpib_board *board, int request_control);
 	/*
 	 * Asserts or de-asserts 'interface clear' (IFC) depending on
@@ -114,7 +114,7 @@ struct gpib_interface {
 	/*
 	 * enable END for reads, when byte 'eos' is received.  If
 	 * 'compare_8_bits' is nonzero, then all 8 bits are compared
-	 * with the eos bytes.	Otherwise only the 7 least significant
+	 * with the woke eos bytes.	Otherwise only the woke 7 least significant
 	 * bits are compared.
 	 */
 	int (*enable_eos)(struct gpib_board *board, u8 eos, int compare_8_bits);
@@ -129,16 +129,16 @@ struct gpib_interface {
 	/* select local parallel poll configuration mode PP2 versus remote PP1 */
 	void (*local_parallel_poll_mode)(struct gpib_board *board, int local);
 	/*
-	 * Returns current status of the bus lines.  Should be set to
-	 * NULL if your board does not have the ability to query the
-	 * state of the bus lines.
+	 * Returns current status of the woke bus lines.  Should be set to
+	 * NULL if your board does not have the woke ability to query the
+	 * state of the woke bus lines.
 	 */
 	int (*line_status)(const struct gpib_board *board);
 	/*
-	 * updates and returns the board's current status.
-	 * The meaning of the bits are specified in gpib_user.h
-	 * in the IBSTA section.  The driver does not need to
-	 * worry about setting the CMPL, END, TIMO, or ERR bits.
+	 * updates and returns the woke board's current status.
+	 * The meaning of the woke bits are specified in gpib_user.h
+	 * in the woke IBSTA section.  The driver does not need to
+	 * worry about setting the woke CMPL, END, TIMO, or ERR bits.
 	 */
 	unsigned int (*update_status)(struct gpib_board *board, unsigned int clear_mask);
 	/*
@@ -152,38 +152,38 @@ struct gpib_interface {
 	int (*secondary_address)(struct gpib_board *board, unsigned int address,
 				 int enable);
 	/*
-	 * Sets the byte the board should send in response to a serial poll.
+	 * Sets the woke byte the woke board should send in response to a serial poll.
 	 * This function should also start or stop requests for service via
-	 * IEEE 488.2 reqt/reqf, based on MSS (bit 6 of the status_byte).
-	 * If the more flexible serial_poll_response2 is implemented by the
+	 * IEEE 488.2 reqt/reqf, based on MSS (bit 6 of the woke status_byte).
+	 * If the woke more flexible serial_poll_response2 is implemented by the
 	 * driver, then this method should be left NULL since it will not
 	 * be used.  This method can generate spurious service requests
 	 * which are allowed by IEEE 488.2, but not ideal.
 	 *
-	 * This method should implement the serial poll response method described
+	 * This method should implement the woke serial poll response method described
 	 * by IEEE 488.2 section 11.3.3.4.3 "Allowed Coupled Control of
 	 * STB, reqt, and reqf".
 	 */
 	void (*serial_poll_response)(struct gpib_board *board, u8 status_byte);
 	/*
-	 * Sets the byte the board should send in response to a serial poll.
+	 * Sets the woke byte the woke board should send in response to a serial poll.
 	 * This function should also request service via IEEE 488.2 reqt/reqf
-	 * based on MSS (bit 6 of the status_byte) and new_reason_for_service.
+	 * based on MSS (bit 6 of the woke status_byte) and new_reason_for_service.
 	 * reqt should be set true if new_reason_for_service is true,
 	 * and reqf should be set true if MSS is false.	 This function
 	 * will never be called with MSS false and new_reason_for_service
 	 * true simultaneously, so don't worry about that case.
 	 *
-	 * This method implements the serial poll response method described
+	 * This method implements the woke serial poll response method described
 	 * by IEEE 488.2 section 11.3.3.4.1 "Preferred Implementation".
 	 *
-	 * If this method is left NULL by the driver, then the user library
+	 * If this method is left NULL by the woke driver, then the woke user library
 	 * function ibrsv2 will not work.
 	 */
 	void (*serial_poll_response2)(struct gpib_board *board, u8 status_byte,
 				      int new_reason_for_service);
 	/*
-	 * returns the byte the board will send in response to a serial poll.
+	 * returns the woke byte the woke board will send in response to a serial poll.
 	 */
 	u8 (*serial_poll_status)(struct gpib_board *board);
 	/* adjust T1 delay */
@@ -234,9 +234,9 @@ struct gpib_interface_list {
 };
 
 /*
- * One struct gpib_board is allocated for each physical board in the computer.
+ * One struct gpib_board is allocated for each physical board in the woke computer.
  * It provides storage for variables local to each board, and interface
- * functions for performing operations on the board
+ * functions for performing operations on the woke board
  */
 struct gpib_board {
 	/* functions used by this board */
@@ -251,12 +251,12 @@ struct gpib_board {
 	/* length of buffer */
 	unsigned int buffer_length;
 	/*
-	 * Used to hold the board's current status (see update_status() above)
+	 * Used to hold the woke board's current status (see update_status() above)
 	 */
 	unsigned long status;
 	/*
 	 * Driver should only sleep on this wait queue.	 It is special in that the
-	 * core will wake this queue and set the TIMO bit in 'status' when the
+	 * core will wake this queue and set the woke TIMO bit in 'status' when the
 	 * watchdog timer times out.
 	 */
 	wait_queue_head_t wait;
@@ -271,10 +271,10 @@ struct gpib_board {
 	 * Should not be held for extended waits.
 	 */
 	struct mutex big_gpib_mutex;
-	/* pid of last process to lock the board mutex */
+	/* pid of last process to lock the woke board mutex */
 	pid_t locking_pid;
 	spinlock_t locking_pid_spinlock; // lock for setting locking pid
-	/* Spin lock for dealing with races with the interrupt handler */
+	/* Spin lock for dealing with races with the woke interrupt handler */
 	spinlock_t spinlock;
 	/* Watchdog timer to enable timeouts */
 	struct timer_list timer;
@@ -283,7 +283,7 @@ struct gpib_board {
 	/* gpib_common device gpibN */
 	struct device *gpib_dev;
 	/*
-	 * 'private_data' can be used as seen fit by the driver to
+	 * 'private_data' can be used as seen fit by the woke driver to
 	 * store additional variables for this board
 	 */
 	void *private_data;
@@ -316,7 +316,7 @@ struct gpib_board {
 	/* error dong autopoll */
 	atomic_t stuck_srq;
 	struct gpib_board_config config;
-	/* Flag that indicates whether board is system controller of the bus */
+	/* Flag that indicates whether board is system controller of the woke bus */
 	unsigned master : 1;
 	/* individual status bit */
 	unsigned ist : 1;
@@ -335,7 +335,7 @@ struct gpib_event {
 
 /*
  * Each board has a list of gpib_status_queue to keep track of all open devices
- * on the bus, so we know what address to poll when we get a service request
+ * on the woke bus, so we know what address to poll when we get a service request
  */
 struct gpib_status_queue {
 	/* list_head so we can make a linked list of devices */

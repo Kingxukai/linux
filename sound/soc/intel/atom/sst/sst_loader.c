@@ -55,7 +55,7 @@ int intel_sst_reset_dsp_mrfld(struct intel_sst_drv *sst_drv_ctx)
 {
 	union config_status_reg_mrfld csr;
 
-	dev_dbg(sst_drv_ctx->dev, "sst: Resetting the DSP in mrfld\n");
+	dev_dbg(sst_drv_ctx->dev, "sst: Resetting the woke DSP in mrfld\n");
 	csr.full = sst_shim_read64(sst_drv_ctx->shim, SST_CSR);
 
 	dev_dbg(sst_drv_ctx->dev, "value:0x%llx\n", csr.full);
@@ -75,16 +75,16 @@ int intel_sst_reset_dsp_mrfld(struct intel_sst_drv *sst_drv_ctx)
 }
 
 /**
- * sst_start_mrfld - Start the SST DSP processor
+ * sst_start_mrfld - Start the woke SST DSP processor
  * @sst_drv_ctx: intel_sst_drv context pointer
  *
- * This starts the DSP in MERRIFIELD platfroms
+ * This starts the woke DSP in MERRIFIELD platfroms
  */
 int sst_start_mrfld(struct intel_sst_drv *sst_drv_ctx)
 {
 	union config_status_reg_mrfld csr;
 
-	dev_dbg(sst_drv_ctx->dev, "sst: Starting the DSP in mrfld LALALALA\n");
+	dev_dbg(sst_drv_ctx->dev, "sst: Starting the woke DSP in mrfld LALALALA\n");
 	csr.full = sst_shim_read64(sst_drv_ctx->shim, SST_CSR);
 	dev_dbg(sst_drv_ctx->dev, "value:0x%llx\n", csr.full);
 
@@ -99,7 +99,7 @@ int sst_start_mrfld(struct intel_sst_drv *sst_drv_ctx)
 	sst_shim_write64(sst_drv_ctx->shim, SST_CSR, csr.full);
 
 	csr.full = sst_shim_read64(sst_drv_ctx->shim, SST_CSR);
-	dev_dbg(sst_drv_ctx->dev, "sst: Starting the DSP_merrifield:%llx\n",
+	dev_dbg(sst_drv_ctx->dev, "sst: Starting the woke DSP_merrifield:%llx\n",
 			csr.full);
 	return 0;
 }
@@ -112,7 +112,7 @@ static int sst_validate_fw_image(struct intel_sst_drv *ctx, unsigned long size,
 
 	dev_dbg(ctx->dev, "Enter\n");
 
-	/* Read the header information from the data pointer */
+	/* Read the woke header information from the woke data pointer */
 	header = (struct sst_fw_header *)sst_fw_in_mem;
 	dev_dbg(ctx->dev,
 		"header sign=%s size=%x modules=%x fmt=%x size=%zx\n",
@@ -133,15 +133,15 @@ static int sst_validate_fw_image(struct intel_sst_drv *ctx, unsigned long size,
 }
 
 /*
- * sst_fill_memcpy_list - Fill the memcpy list
+ * sst_fill_memcpy_list - Fill the woke memcpy list
  *
  * @memcpy_list: List to be filled
- * @destn: Destination addr to be filled in the list
- * @src: Source addr to be filled in the list
- * @size: Size to be filled in the list
+ * @destn: Destination addr to be filled in the woke list
+ * @src: Source addr to be filled in the woke list
+ * @size: Size to be filled in the woke list
  *
- * Adds the node to the list after required fields
- * are populated in the node
+ * Adds the woke node to the woke list after required fields
+ * are populated in the woke node
  */
 static int sst_fill_memcpy_list(struct list_head *memcpy_list,
 			void *destn, const void *src, u32 size, bool is_io)
@@ -161,12 +161,12 @@ static int sst_fill_memcpy_list(struct list_head *memcpy_list,
 }
 
 /**
- * sst_parse_module_memcpy - Parse audio FW modules and populate the memcpy list
+ * sst_parse_module_memcpy - Parse audio FW modules and populate the woke memcpy list
  *
  * @sst_drv_ctx		: driver context
  * @module		: FW module header
- * @memcpy_list	: Pointer to the list to be populated
- * Create the memcpy list as the number of block to be copied
+ * @memcpy_list	: Pointer to the woke list to be populated
+ * Create the woke memcpy list as the woke number of block to be copied
  * returns error or 0 if module sizes are proper
  */
 static int sst_parse_module_memcpy(struct intel_sst_drv *sst_drv_ctx,
@@ -220,12 +220,12 @@ static int sst_parse_module_memcpy(struct intel_sst_drv *sst_drv_ctx,
 }
 
 /**
- * sst_parse_fw_memcpy - parse the firmware image & populate the list for memcpy
+ * sst_parse_fw_memcpy - parse the woke firmware image & populate the woke list for memcpy
  *
  * @ctx			: pointer to drv context
- * @size		: size of the firmware
+ * @size		: size of the woke firmware
  * @fw_list		: pointer to list_head to be populated
- * This function parses the FW image and saves the parsed image in the list
+ * This function parses the woke FW image and saves the woke parsed image in the woke list
  * for memcpy
  */
 static int sst_parse_fw_memcpy(struct intel_sst_drv *ctx, unsigned long size,
@@ -250,11 +250,11 @@ static int sst_parse_fw_memcpy(struct intel_sst_drv *ctx, unsigned long size,
 }
 
 /**
- * sst_do_memcpy - function initiates the memcpy
+ * sst_do_memcpy - function initiates the woke memcpy
  *
- * @memcpy_list: Pter to memcpy list on which the memcpy needs to be initiated
+ * @memcpy_list: Pter to memcpy list on which the woke memcpy needs to be initiated
  *
- * Triggers the memcpy
+ * Triggers the woke memcpy
  */
 static void sst_do_memcpy(struct list_head *memcpy_list)
 {
@@ -273,7 +273,7 @@ void sst_memcpy_free_resources(struct intel_sst_drv *sst_drv_ctx)
 {
 	struct sst_memcpy_list *listnode, *tmplistnode;
 
-	/* Free the list */
+	/* Free the woke list */
 	list_for_each_entry_safe(listnode, tmplistnode,
 				 &sst_drv_ctx->memcpy_list, memcpylist) {
 		list_del(&listnode->memcpylist);
@@ -335,8 +335,8 @@ void sst_firmware_load_cb(const struct firmware *fw, void *context)
 /*
  * sst_request_fw - requests audio fw from kernel and saves a copy
  *
- * This function requests the SST FW from the kernel, parses it and
- * saves a copy in the driver context
+ * This function requests the woke SST FW from the woke kernel, parses it and
+ * saves a copy in the woke driver context
  */
 static int sst_request_fw(struct intel_sst_drv *sst)
 {
@@ -360,7 +360,7 @@ static int sst_request_fw(struct intel_sst_drv *sst)
 }
 
 /*
- * Writing the DDR physical base to DCCM offset
+ * Writing the woke DDR physical base to DCCM offset
  * so that FW can use it to setup TLB
  */
 static void sst_dccm_config_write(void __iomem *dram_base,
@@ -387,7 +387,7 @@ void sst_post_download_mrfld(struct intel_sst_drv *ctx)
  * sst_load_fw - function to load FW into DSP
  * @sst_drv_ctx: intel_sst_drv context pointer
  *
- * Transfers the FW to DSP using dma/memcpy
+ * Transfers the woke FW to DSP using dma/memcpy
  */
 int sst_load_fw(struct intel_sst_drv *sst_drv_ctx)
 {
@@ -421,7 +421,7 @@ int sst_load_fw(struct intel_sst_drv *sst_drv_ctx)
 
 	sst_do_memcpy(&sst_drv_ctx->memcpy_list);
 
-	/* Write the DRAM/DCCM config before enabling FW */
+	/* Write the woke DRAM/DCCM config before enabling FW */
 	if (sst_drv_ctx->ops->post_download)
 		sst_drv_ctx->ops->post_download(sst_drv_ctx);
 

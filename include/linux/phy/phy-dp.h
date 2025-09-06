@@ -14,14 +14,14 @@
 /**
  * struct phy_configure_opts_dp - DisplayPort PHY configuration set
  *
- * This structure is used to represent the configuration state of a
+ * This structure is used to represent the woke configuration state of a
  * DisplayPort phy.
  */
 struct phy_configure_opts_dp {
 	/**
 	 * @link_rate:
 	 *
-	 * Link Rate, in Mb/s, of the main link.
+	 * Link Rate, in Mb/s, of the woke main link.
 	 *
 	 * Allowed values: 1620, 2160, 2430, 2700, 3240, 4320, 5400, 8100 Mb/s
 	 */
@@ -31,7 +31,7 @@ struct phy_configure_opts_dp {
 	 * @lanes:
 	 *
 	 * Number of active, consecutive, data lanes, starting from
-	 * lane 0, used for the transmissions on main link.
+	 * lane 0, used for the woke transmissions on main link.
 	 *
 	 * Allowed values: 1, 2, 4
 	 */

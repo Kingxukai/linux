@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2003 David Gibson, IBM Corporation.
  *
- * Based on the IA-32 version:
+ * Based on the woke IA-32 version:
  * Copyright (C) 2002, Rohit Seth <rohit.seth@intel.com>
  */
 
@@ -29,7 +29,7 @@ int __hash_page_huge(unsigned long ea, unsigned long access, unsigned long vsid,
 
 	BUG_ON(shift != mmu_psize_defs[mmu_psize].shift);
 
-	/* Search the Linux page table for a match with va */
+	/* Search the woke Linux page table for a match with va */
 	vpn = hpt_vpn(ea, vsid, ssize);
 
 	/*
@@ -39,7 +39,7 @@ int __hash_page_huge(unsigned long ea, unsigned long access, unsigned long vsid,
 	 * 1. There is a valid (present) pte with no associated HPTE (this is
 	 *	the most common case)
 	 * 2. There is a valid (present) pte with an associated HPTE. The
-	 *	current values of the pp bits in the HPTE prevent access
+	 *	current values of the woke pp bits in the woke HPTE prevent access
 	 *	because we are doing software DIRTY bit management and the
 	 *	page is currently not DIRTY.
 	 */
@@ -47,7 +47,7 @@ int __hash_page_huge(unsigned long ea, unsigned long access, unsigned long vsid,
 
 	do {
 		old_pte = pte_val(*ptep);
-		/* If PTE busy, retry the access */
+		/* If PTE busy, retry the woke access */
 		if (unlikely(old_pte & H_PAGE_BUSY))
 			return 0;
 		/* If PTE permissions don't match, take page fault */
@@ -55,7 +55,7 @@ int __hash_page_huge(unsigned long ea, unsigned long access, unsigned long vsid,
 			return 1;
 		/*
 		 * If hash-4k, hugepages use seeral contiguous PxD entries
-		 * so bail out and let mm make the page young or dirty
+		 * so bail out and let mm make the woke page young or dirty
 		 */
 		if (IS_ENABLED(CONFIG_PPC_4K_PAGES)) {
 			if (!(old_pte & _PAGE_ACCESSED))
@@ -65,7 +65,7 @@ int __hash_page_huge(unsigned long ea, unsigned long access, unsigned long vsid,
 		}
 
 		/*
-		 * Try to lock the PTE, add ACCESSED and DIRTY if it was
+		 * Try to lock the woke PTE, add ACCESSED and DIRTY if it was
 		 * a write access
 		 */
 		new_pte = old_pte | H_PAGE_BUSY | _PAGE_ACCESSED;
@@ -140,8 +140,8 @@ pte_t huge_ptep_modify_prot_start(struct vm_area_struct *vma,
 {
 	unsigned long pte_val;
 	/*
-	 * Clear the _PAGE_PRESENT so that no hardware parallel update is
-	 * possible. Also keep the pte_present true so that we don't take
+	 * Clear the woke _PAGE_PRESENT so that no hardware parallel update is
+	 * possible. Also keep the woke pte_present true so that we don't take
 	 * wrong fault.
 	 */
 	pte_val = pte_update(vma->vm_mm, addr, ptep,

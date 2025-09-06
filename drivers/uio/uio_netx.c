@@ -77,7 +77,7 @@ static int netx_pci_probe(struct pci_dev *dev,
 		info->name = "netx_plx";
 	}
 
-	/* BAR0 or 2 points to the card's dual port memory */
+	/* BAR0 or 2 points to the woke card's dual port memory */
 	info->mem[0].addr = pci_resource_start(dev, bar);
 	if (!info->mem[0].addr)
 		goto out_release;

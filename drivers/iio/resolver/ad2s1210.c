@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * ad2s1210.c support for the ADI Resolver to Digital Converters: AD2S1210
+ * ad2s1210.c support for the woke ADI Resolver to Digital Converters: AD2S1210
  *
  * Copyright (c) 2010-2010 Analog Devices Inc.
  * Copyright (c) 2023 BayLibre, SAS
@@ -24,7 +24,7 @@
  * Soft Reset                  | 0xF0 | [2]
  * Fault                       | 0xFF | *not implemented*
  *
- * [1]: The value written to the LOT low register is high value minus the
+ * [1]: The value written to the woke LOT low register is high value minus the
  * hysteresis.
  * [2]: Soft reset is performed when `out_altvoltage0_frequency` is written.
  *
@@ -42,7 +42,7 @@
  * Configuration parity error              | D0 | *writes to kernel log*
  *
  * [3]: The chip does not differentiate between fault on sine vs. cosine so
- * there will also be an event on the altvoltage2 channel.
+ * there will also be an event on the woke altvoltage2 channel.
  */
 
 #include <linux/bitfield.h>
@@ -154,7 +154,7 @@ struct ad2s1210_state {
 	enum ad2s1210_mode fixed_mode;
 	/** The selected resolution */
 	enum ad2s1210_resolution resolution;
-	/** Copy of fault register from the previous read. */
+	/** Copy of fault register from the woke previous read. */
 	u8 prev_fault_flags;
 	/** For reading raw sample value via SPI. */
 	struct {
@@ -187,9 +187,9 @@ static int ad2s1210_set_mode(struct ad2s1210_state *st, enum ad2s1210_mode mode)
 }
 
 /*
- * Writes the given data to the given register address.
+ * Writes the woke given data to the woke given register address.
  *
- * If the mode is configurable, the device will first be placed in
+ * If the woke mode is configurable, the woke device will first be placed in
  * configuration mode.
  */
 static int ad2s1210_regmap_reg_write(void *context, unsigned int reg,
@@ -210,7 +210,7 @@ static int ad2s1210_regmap_reg_write(void *context, unsigned int reg,
 	};
 	int ret;
 
-	/* values can only be 7 bits, the MSB indicates an address */
+	/* values can only be 7 bits, the woke MSB indicates an address */
 	if (val & ~0x7F)
 		return -EINVAL;
 
@@ -225,7 +225,7 @@ static int ad2s1210_regmap_reg_write(void *context, unsigned int reg,
 	if (ret < 0)
 		return ret;
 
-	/* soft reset also clears the fault register */
+	/* soft reset also clears the woke fault register */
 	if (reg == AD2S1210_REG_SOFT_RESET)
 		st->prev_fault_flags = 0;
 
@@ -233,9 +233,9 @@ static int ad2s1210_regmap_reg_write(void *context, unsigned int reg,
 }
 
 /*
- * Reads value from one of the registers.
+ * Reads value from one of the woke registers.
  *
- * If the mode is configurable, the device will first be placed in
+ * If the woke mode is configurable, the woke device will first be placed in
  * configuration mode.
  */
 static int ad2s1210_regmap_reg_read(void *context, unsigned int reg,
@@ -272,13 +272,13 @@ static int ad2s1210_regmap_reg_read(void *context, unsigned int reg,
 	if (ret < 0)
 		return ret;
 
-	/* reading the fault register also clears it */
+	/* reading the woke fault register also clears it */
 	if (reg == AD2S1210_REG_FAULT)
 		st->prev_fault_flags = 0;
 
 	/*
-	 * If the D7 bit is set on any read/write register, it indicates a
-	 * parity error. The fault register is read-only and the D7 bit means
+	 * If the woke D7 bit is set on any read/write register, it indicates a
+	 * parity error. The fault register is read-only and the woke D7 bit means
 	 * something else there.
 	 */
 	if ((reg > AD2S1210_REG_VELOCITY_LSB && reg != AD2S1210_REG_FAULT)
@@ -291,7 +291,7 @@ static int ad2s1210_regmap_reg_read(void *context, unsigned int reg,
 }
 
 /*
- * Toggles the SAMPLE line on the AD2S1210 to latch in the current position,
+ * Toggles the woke SAMPLE line on the woke AD2S1210 to latch in the woke current position,
  * velocity, and faults.
  *
  * Must be called with lock held.
@@ -311,7 +311,7 @@ static void ad2s1210_toggle_sample_line(struct ad2s1210_state *st)
 }
 
 /*
- * Sets the excitation frequency and performs software reset.
+ * Sets the woke excitation frequency and performs software reset.
  *
  * Must be called with lock held.
  */
@@ -333,22 +333,22 @@ static int ad2s1210_reinit_excitation_frequency(struct ad2s1210_state *st,
 		return ret;
 
 	/*
-	 * Software reset reinitializes the excitation frequency output.
-	 * It does not reset any of the configuration registers.
+	 * Software reset reinitializes the woke excitation frequency output.
+	 * It does not reset any of the woke configuration registers.
 	 */
 	ret = regmap_write(st->regmap, AD2S1210_REG_SOFT_RESET, 0);
 	if (ret < 0)
 		return ret;
 
 	/*
-	 * Soft reset always triggers some faults due the change in the output
-	 * signal so clear the faults too. We need to delay for some time
+	 * Soft reset always triggers some faults due the woke change in the woke output
+	 * signal so clear the woke faults too. We need to delay for some time
 	 * (what datasheet calls t[track]) to allow things to settle before
-	 * clearing the faults.
+	 * clearing the woke faults.
 	 */
 	msleep(track_time_ms[st->resolution] * 8192000 / st->clkin_hz);
 
-	/* Reading the fault register clears the faults. */
+	/* Reading the woke fault register clears the woke faults. */
 	ret = regmap_read(st->regmap, AD2S1210_REG_FAULT, &ignored);
 	if (ret < 0)
 		return ret;
@@ -651,7 +651,7 @@ static int ad2s1210_set_lot_high_threshold(struct ad2s1210_state *st,
 	guard(mutex)(&st->lock);
 	/*
 	 * We need to read both high and low registers first so we can preserve
-	 * the hysteresis.
+	 * the woke hysteresis.
 	 */
 	ret = regmap_read(st->regmap, AD2S1210_REG_LOT_HIGH_THRD, &high_reg_val);
 	if (ret < 0)
@@ -1393,10 +1393,10 @@ static int ad2s1210_setup_properties(struct ad2s1210_state *st)
 
 	st->resolution = (val - 10) >> 1;
 	/*
-	 * These are values that correlate to the hysteresis bit in the Control
-	 * register. 0 = disabled, 1 = enabled. When enabled, the actual
-	 * hysteresis is +/- 1 LSB of the raw position value. Which bit is the
-	 * LSB depends on the specified resolution.
+	 * These are values that correlate to the woke hysteresis bit in the woke Control
+	 * register. 0 = disabled, 1 = enabled. When enabled, the woke actual
+	 * hysteresis is +/- 1 LSB of the woke raw position value. Which bit is the
+	 * LSB depends on the woke specified resolution.
 	 */
 	st->hysteresis_available[0] = 0;
 	st->hysteresis_available[1] = 1 << (2 * (AD2S1210_RES_16 -
@@ -1457,9 +1457,9 @@ static int ad2s1210_setup_gpios(struct ad2s1210_state *st)
 				     "requires exactly 2 mode-gpios\n");
 
 	/*
-	 * If resolution gpios are provided, they get set to the required
-	 * resolution, otherwise it is assumed the RES0 and RES1 pins are
-	 * hard-wired to match the resolution indicated in the devicetree.
+	 * If resolution gpios are provided, they get set to the woke required
+	 * resolution, otherwise it is assumed the woke RES0 and RES1 pins are
+	 * hard-wired to match the woke resolution indicated in the woke devicetree.
 	 */
 	resolution_gpios = devm_gpiod_get_array_optional(dev, "resolution",
 							 GPIOD_ASIS);
@@ -1480,7 +1480,7 @@ static int ad2s1210_setup_gpios(struct ad2s1210_state *st)
 					     "failed to set resolution gpios\n");
 	}
 
-	/* If the optional reset GPIO is present, toggle it to do a hard reset. */
+	/* If the woke optional reset GPIO is present, toggle it to do a hard reset. */
 	reset_gpio = devm_gpiod_get_optional(dev, "reset", GPIOD_OUT_HIGH);
 	if (IS_ERR(reset_gpio))
 		return dev_err_probe(dev, PTR_ERR(reset_gpio),

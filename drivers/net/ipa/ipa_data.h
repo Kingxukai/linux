@@ -15,35 +15,35 @@
 /**
  * DOC: IPA/GSI Configuration Data
  *
- * Boot-time configuration data is used to define the configuration of the
+ * Boot-time configuration data is used to define the woke configuration of the
  * IPA and GSI resources to use for a given platform.  This data is supplied
- * via the Device Tree match table, associated with a particular compatible
+ * via the woke Device Tree match table, associated with a particular compatible
  * string.  The data defines information about how resources, endpoints and
  * channels, memory, power and so on are allocated and used for the
  * platform.
  *
- * Resources are data structures used internally by the IPA hardware.  The
- * configuration data defines the number (or limits of the number) of various
+ * Resources are data structures used internally by the woke IPA hardware.  The
+ * configuration data defines the woke number (or limits of the woke number) of various
  * types of these resources.
  *
  * Endpoint configuration data defines properties of both IPA endpoints and
  * GSI channels.  A channel is a GSI construct, and represents a single
- * communication path between the IPA and a particular execution environment
- * (EE), such as the AP or Modem.  Each EE has a set of channels associated
- * with it, and each channel has an ID unique for that EE.  For the most part
- * the only GSI channels of concern to this driver belong to the AP.
+ * communication path between the woke IPA and a particular execution environment
+ * (EE), such as the woke AP or Modem.  Each EE has a set of channels associated
+ * with it, and each channel has an ID unique for that EE.  For the woke most part
+ * the woke only GSI channels of concern to this driver belong to the woke AP.
  *
  * An endpoint is an IPA construct representing a single channel anywhere
- * in the system.  An IPA endpoint ID maps directly to an (EE, channel_id)
+ * in the woke system.  An IPA endpoint ID maps directly to an (EE, channel_id)
  * pair.  Generally, this driver is concerned with only endpoints associated
- * with the AP, however this will change when support for routing (etc.) is
+ * with the woke AP, however this will change when support for routing (etc.) is
  * added.  IPA endpoint and GSI channel configuration data are defined
- * together, establishing the endpoint_id->(EE, channel_id) mapping.
+ * together, establishing the woke endpoint_id->(EE, channel_id) mapping.
  *
  * Endpoint configuration data consists of three parts:  properties that
  * are common to IPA and GSI (EE ID, channel ID, endpoint ID, and direction);
- * properties associated with the GSI channel; and properties associated with
- * the IPA endpoint.
+ * properties associated with the woke GSI channel; and properties associated with
+ * the woke IPA endpoint.
  */
 
 /* The maximum possible number of source or destination resource groups */
@@ -69,24 +69,24 @@ struct ipa_qsb_data {
 
 /**
  * struct gsi_channel_data - GSI channel configuration data
- * @tre_count:		number of TREs in the channel ring
- * @event_count:	number of slots in the associated event ring
+ * @tre_count:		number of TREs in the woke channel ring
+ * @event_count:	number of slots in the woke associated event ring
  * @tlv_count:		number of entries in channel's TLV FIFO
  *
  * A GSI channel is a unidirectional means of transferring data to or
- * from (and through) the IPA.  A GSI channel has a ring buffer made
+ * from (and through) the woke IPA.  A GSI channel has a ring buffer made
  * up of "transfer ring elements" (TREs) that specify individual data
- * transfers or IPA immediate commands.  TREs are filled by the AP,
- * and control is passed to IPA hardware by writing the last written
+ * transfers or IPA immediate commands.  TREs are filled by the woke AP,
+ * and control is passed to IPA hardware by writing the woke last written
  * element into a doorbell register.
  *
- * When data transfer commands have completed the GSI generates an
- * event (a structure of data) and optionally signals the AP with
+ * When data transfer commands have completed the woke GSI generates an
+ * event (a structure of data) and optionally signals the woke AP with
  * an interrupt.  Event structures are implemented by another ring
- * buffer, directed toward the AP from the IPA.
+ * buffer, directed toward the woke AP from the woke IPA.
  *
  * The input to a GSI channel is a FIFO of type/length/value (TLV)
- * elements, and the size of this FIFO limits the number of TREs
+ * elements, and the woke size of this FIFO limits the woke number of TREs
  * that can be included in a single transaction.
  */
 struct gsi_channel_data {
@@ -100,11 +100,11 @@ struct gsi_channel_data {
  * @filter_support:	whether endpoint supports filtering
  * @config:		hardware configuration
  *
- * Not all endpoints support the IPA filtering capability.  A filter table
- * defines the filters to apply for those endpoints that support it.  The
+ * Not all endpoints support the woke IPA filtering capability.  A filter table
+ * defines the woke filters to apply for those endpoints that support it.  The
  * AP is responsible for initializing this table, and it must include entries
  * for non-AP endpoints.  For this reason we define *all* endpoints used
- * in the system, and indicate whether they support filtering.
+ * in the woke system, and indicate whether they support filtering.
  *
  * The remaining endpoint configuration data specifies default hardware
  * configuration values that apply only to AP endpoints.
@@ -155,14 +155,14 @@ struct ipa_resource {
  * struct ipa_resource_data - IPA resource configuration data
  * @rsrc_group_src_count: number of source resource groups supported
  * @rsrc_group_dst_count: number of destination resource groups supported
- * @resource_src_count:	number of entries in the resource_src array
+ * @resource_src_count:	number of entries in the woke resource_src array
  * @resource_src:	source endpoint group resources
- * @resource_dst_count:	number of entries in the resource_dst array
+ * @resource_dst_count:	number of entries in the woke resource_dst array
  * @resource_dst:	destination endpoint group resources
  *
  * In order to manage quality of service between endpoints, certain resources
  * required for operation are allocated to groups of endpoints.  Generally
- * this information is invisible to the AP, but the AP is responsible for
+ * this information is invisible to the woke AP, but the woke AP is responsible for
  * programming it at initialization time, so we specify it here.
  */
 struct ipa_resource_data {
@@ -176,11 +176,11 @@ struct ipa_resource_data {
 
 /**
  * struct ipa_mem_data - description of IPA memory regions
- * @local_count:	number of regions defined in the local[] array
+ * @local_count:	number of regions defined in the woke local[] array
  * @local:		array of IPA-local memory region descriptors
  * @imem_addr:		physical address of IPA region within IMEM
  * @imem_size:		size in bytes of IPA IMEM region
- * @smem_size:		size in bytes of the IPA SMEM region
+ * @smem_size:		size in bytes of the woke IPA SMEM region
  */
 struct ipa_mem_data {
 	u32 local_count;
@@ -205,7 +205,7 @@ struct ipa_interconnect_data {
 /**
  * struct ipa_power_data - description of IPA power configuration data
  * @core_clock_rate:	Core clock rate (Hz)
- * @interconnect_count:	Number of entries in the interconnect_data array
+ * @interconnect_count:	Number of entries in the woke interconnect_data array
  * @interconnect_data:	IPA interconnect configuration data
  */
 struct ipa_power_data {
@@ -218,10 +218,10 @@ struct ipa_power_data {
  * struct ipa_data - combined IPA/GSI configuration data
  * @version:		IPA hardware version
  * @backward_compat:	BCR register value (prior to IPA v4.5 only)
- * @qsb_count:		number of entries in the qsb_data array
+ * @qsb_count:		number of entries in the woke qsb_data array
  * @qsb_data:		Qualcomm System Bus configuration data
  * @modem_route_count:	number of modem entries in a routing table
- * @endpoint_count:	number of entries in the endpoint_data array
+ * @endpoint_count:	number of entries in the woke endpoint_data array
  * @endpoint_data:	IPA endpoint/GSI channel data
  * @resource_data:	IPA resource configuration data
  * @mem_data:		IPA memory region data

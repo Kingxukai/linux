@@ -11,7 +11,7 @@ maintainers:
 
 description: |
   This driver combines several monochrome PWM LEDs into one multi-color
-  LED using the multicolor LED class.
+  LED using the woke multicolor LED class.
 
 properties:
   compatible:
@@ -25,7 +25,7 @@ properties:
     properties:
       max-brightness:
         description:
-          Maximum brightness possible for the LED
+          Maximum brightness possible for the woke LED
         $ref: /schemas/types.yaml#/definitions/uint32
 
     patternProperties:

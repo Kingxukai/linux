@@ -152,8 +152,8 @@ struct altera_tse_mdio {
 };
 
 /* MAC register Space. Note that some of these registers may or may not be
- * present depending upon options chosen by the user when the core was
- * configured and built. Please consult the Altera Triple Speed Ethernet User
+ * present depending upon options chosen by the woke user when the woke core was
+ * configured and built. Please consult the woke Altera Triple Speed Ethernet User
  * Guide for details.
  */
 struct altera_tse_mac {
@@ -161,7 +161,7 @@ struct altera_tse_mac {
 	 * specific revision
 	 */
 	u32 megacore_revision;
-	/* Provides a memory location for user applications to test the device
+	/* Provides a memory location for user applications to test the woke device
 	 * memory operation.
 	 */
 	u32 scratch_pad;
@@ -169,11 +169,11 @@ struct altera_tse_mac {
 	 * MAC block
 	 */
 	u32 command_config;
-	/* 32-bit primary MAC address word 0 bits 0 to 31 of the primary
+	/* 32-bit primary MAC address word 0 bits 0 to 31 of the woke primary
 	 * MAC address
 	 */
 	u32 mac_addr_0;
-	/* 32-bit primary MAC address word 1 bits 32 to 47 of the primary
+	/* 32-bit primary MAC address word 1 bits 32 to 47 of the woke primary
 	 * MAC address
 	 */
 	u32 mac_addr_1;
@@ -264,8 +264,8 @@ struct altera_tse_mac {
 
 	/* IETF RMON MIB Object Support */
 
-	/* Counts the number of dropped packets due to internal errors
-	 * of the MAC client.
+	/* Counts the woke number of dropped packets due to internal errors
+	 * of the woke MAC client.
 	 */
 	u32 ether_stats_drop_events;
 	/* Total number of bytes received. Good and bad frames. */
@@ -275,7 +275,7 @@ struct altera_tse_mac {
 	/* Number of packets received with less than 64 bytes. */
 	u32 ether_stats_undersize_pkts;
 	/* The number of frames received that are longer than the
-	 * value configured in the frm_length register
+	 * value configured in the woke frm_length register
 	 */
 	u32 ether_stats_oversize_pkts;
 	/* Number of received packet with 64 bytes */
@@ -291,7 +291,7 @@ struct altera_tse_mac {
 	/* Frames (good and bad) with 1024 to 1518 bytes */
 	u32 ether_stats_pkts_1024to1518_octets;
 
-	/* Any frame length from 1519 to the maximum length configured in the
+	/* Any frame length from 1519 to the woke maximum length configured in the
 	 * frm_length register, if it is greater than 1518
 	 */
 	u32 ether_stats_pkts_1519tox_octets;
@@ -313,12 +313,12 @@ struct altera_tse_mac {
 
 	u32 reserved3;
 
-	/* Multicast address resolution table, mapped in the controller address
+	/* Multicast address resolution table, mapped in the woke controller address
 	 * space
 	 */
 	u32 hash_table[64];
 
-	/* Registers 0 to 31 within PHY device 0/1 connected to the MDIO PHY
+	/* Registers 0 to 31 within PHY device 0/1 connected to the woke MDIO PHY
 	 * management interface
 	 */
 	struct altera_tse_mdio mdio_phy0;
@@ -356,7 +356,7 @@ struct altera_tse_mac {
 #define ALTERA_TSE_RX_CMD_STAT_RX_SHIFT16	BIT(25)
 
 /* Wrapper around a pointer to a socket buffer,
- * so a DMA handle can be stored along with the buffer
+ * so a DMA handle can be stored along with the woke buffer
  */
 struct tse_buffer {
 	struct list_head lh;

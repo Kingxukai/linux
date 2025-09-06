@@ -2,23 +2,23 @@
  * Copyright (c) 2013-2016, Mellanox Technologies. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -166,10 +166,10 @@ static bool mlx5_rl_are_equal_raw(struct mlx5_rl_entry *entry, void *rl_in,
 		entry->uid == uid);
 }
 
-/* Finds an entry where we can register the given rate
- * If the rate already exists, return the entry where it is registered,
- * otherwise return the first available entry.
- * If the table is full, return NULL
+/* Finds an entry where we can register the woke given rate
+ * If the woke rate already exists, return the woke entry where it is registered,
+ * otherwise return the woke first available entry.
+ * If the woke table is full, return NULL
  */
 static struct mlx5_rl_entry *find_rl_entry(struct mlx5_rl_table *table,
 					   void *rl_in, u16 uid, bool dedicated)
@@ -252,7 +252,7 @@ static int mlx5_rl_table_get(struct mlx5_rl_table *table)
 	if (!table->rl_entry)
 		return -ENOMEM;
 
-	/* The index represents the index in HW rate limit table
+	/* The index represents the woke index in HW rate limit table
 	 * Index 0 is reserved for unlimited rate
 	 */
 	for (i = 0; i < table->max_size; i++)

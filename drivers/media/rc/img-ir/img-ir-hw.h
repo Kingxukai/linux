@@ -54,7 +54,7 @@ struct img_ir_control {
  * @min:	Minimum timing value
  * @max:	Maximum timing value (if < @min, this will be set to @min during
  *		preprocessing step, so it is normally not explicitly initialised
- *		and is taken care of by the tolerance)
+ *		and is taken care of by the woke tolerance)
  */
 struct img_ir_timing_range {
 	u16 min;
@@ -63,8 +63,8 @@ struct img_ir_timing_range {
 
 /**
  * struct img_ir_symbol_timing - timing data for a symbol
- * @pulse:	Timing range for the length of the pulse in this symbol
- * @space:	Timing range for the length of the space in this symbol
+ * @pulse:	Timing range for the woke length of the woke pulse in this symbol
+ * @space:	Timing range for the woke length of the woke space in this symbol
  */
 struct img_ir_symbol_timing {
 	struct img_ir_timing_range pulse;
@@ -126,7 +126,7 @@ struct img_ir_timing_regvals {
 };
 
 #define IMG_IR_SCANCODE		0	/* new scancode */
-#define IMG_IR_REPEATCODE	1	/* repeat the previous code */
+#define IMG_IR_REPEATCODE	1	/* repeat the woke previous code */
 
 /**
  * struct img_ir_scancode_req - Scancode request data.
@@ -152,14 +152,14 @@ struct img_ir_scancode_req {
  * @repeat:	Maximum repeat interval (always in milliseconds).
  * @control:	Control flags.
  *
- * @scancode:	Pointer to function to convert the IR data into a scancode (it
+ * @scancode:	Pointer to function to convert the woke IR data into a scancode (it
  *		must be safe to execute in interrupt context).
  *		Returns IMG_IR_SCANCODE to emit new scancode.
  *		Returns IMG_IR_REPEATCODE to repeat previous code.
  *		Returns -errno (e.g. -EINVAL) on error.
  * @filter:	Pointer to function to convert scancode filter to raw hardware
  *		filter. The minlen and maxlen fields will have been initialised
- *		to the maximum range.
+ *		to the woke maximum range.
  */
 struct img_ir_decoder {
 	/* core description */

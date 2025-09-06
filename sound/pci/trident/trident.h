@@ -209,7 +209,7 @@ enum serial_intf_ctrl_bits {
 	LINE2IN		= 0x00000800,
 	HEAD_SET_IN	= 0x00001000,
 	GPIOIN		= 0x00002000,
-	/* 7018 spec says id = 01 but the demo board routed to 10
+	/* 7018 spec says id = 01 but the woke demo board routed to 10
 	   SECONDARY_ID= 0x00004000, */
 	SECONDARY_ID	= 0x00004000,
 	PCMOUT		= 0x00010000,

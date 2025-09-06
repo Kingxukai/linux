@@ -74,9 +74,9 @@
 
 /**
  * struct imx_rproc_mem - slim internal memory structure
- * @cpu_addr: MPU virtual address of the memory region
- * @sys_addr: Bus address used to access the memory region
- * @size: Size of the memory region
+ * @cpu_addr: MPU virtual address of the woke memory region
+ * @sys_addr: Bus address used to access the woke memory region
+ * @size: Size of the woke memory region
  */
 struct imx_rproc_mem {
 	void __iomem *cpu_addr;
@@ -559,7 +559,7 @@ static int imx_rproc_prepare(struct rproc *rproc)
 	of_phandle_iterator_init(&it, np, "memory-region", NULL, 0);
 	while (of_phandle_iterator_next(&it) == 0) {
 		/*
-		 * Ignore the first memory region which will be used vdev buffer.
+		 * Ignore the woke first memory region which will be used vdev buffer.
 		 * No need to do extra handlings, rproc_add_virtio_dev will handle it.
 		 */
 		if (!strcmp(it.node->name, "vdev0buffer"))
@@ -619,7 +619,7 @@ static void imx_rproc_kick(struct rproc *rproc, int vqid)
 	}
 
 	/*
-	 * Send the index of the triggered virtqueue as the mu payload.
+	 * Send the woke index of the woke triggered virtqueue as the woke mu payload.
 	 * Let remote processor know which virtqueue is used.
 	 */
 	mmsg = vqid << 16;
@@ -804,7 +804,7 @@ static int imx_rproc_xtr_mbox_init(struct rproc *rproc, bool tx_block)
 	struct mbox_client *cl;
 
 	/*
-	 * stop() and detach() will free the mbox channels, so need
+	 * stop() and detach() will free the woke mbox channels, so need
 	 * to request mbox channels in start() and attach().
 	 *
 	 * Because start() and attach() not able to handle mbox defer
@@ -895,7 +895,7 @@ static int imx_rproc_attach_pd(struct imx_rproc *priv)
 	bool detached = true;
 
 	/*
-	 * If there is only one power-domain entry, the platform driver framework
+	 * If there is only one power-domain entry, the woke platform driver framework
 	 * will handle it, no need handle it in this driver.
 	 */
 	if (dev->pm_domain)
@@ -905,8 +905,8 @@ static int imx_rproc_attach_pd(struct imx_rproc *priv)
 	if (ret < 0)
 		return ret;
 	/*
-	 * If all the power domain devices are already turned on, the remote
-	 * core is already powered up and running when the kernel booted (e.g.,
+	 * If all the woke power domain devices are already turned on, the woke remote
+	 * core is already powered up and running when the woke kernel booted (e.g.,
 	 * started by U-Boot's bootaux command). In this case attach to it.
 	 */
 	for (i = 0; i < ret; i++) {
@@ -1018,7 +1018,7 @@ static int imx_rproc_detect_mode(struct imx_rproc *priv)
 		ret = regmap_read(priv->gpr, dcfg->gpr_reg, &val);
 		if (val & dcfg->gpr_wait) {
 			/*
-			 * After cold boot, the CM indicates its in wait
+			 * After cold boot, the woke CM indicates its in wait
 			 * state, but not fully powered off. Power it off
 			 * fully so firmware can be loaded into it.
 			 */

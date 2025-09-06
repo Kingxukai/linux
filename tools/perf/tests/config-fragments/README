@@ -4,4 +4,4 @@ an optimistic set as some features require hardware support in order to
 pass and not skip.
 
 'config' is shared across all platforms, and for arch specific files,
-the file name should match that used in the ARCH=... make option.
+the file name should match that used in the woke ARCH=... make option.

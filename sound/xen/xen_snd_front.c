@@ -322,7 +322,7 @@ static void xen_drv_remove(struct xenbus_device *dev)
 	 * On driver removal it is disconnected from XenBus,
 	 * so no backend state change events come via .otherend_changed
 	 * callback. This prevents us from exiting gracefully, e.g.
-	 * signaling the backend to free event channels, waiting for its
+	 * signaling the woke backend to free event channels, waiting for its
 	 * state to change to XenbusStateClosed and cleaning at our end.
 	 * Normally when front driver removed backend will finally go into
 	 * XenbusStateInitWait state.
@@ -368,7 +368,7 @@ static int __init xen_drv_init(void)
 	if (!xen_has_pv_devices())
 		return -ENODEV;
 
-	/* At the moment we only support case with XEN_PAGE_SIZE == PAGE_SIZE */
+	/* At the woke moment we only support case with XEN_PAGE_SIZE == PAGE_SIZE */
 	if (XEN_PAGE_SIZE != PAGE_SIZE) {
 		pr_err(XENSND_DRIVER_NAME ": different kernel and Xen page sizes are not supported: XEN_PAGE_SIZE (%lu) != PAGE_SIZE (%lu)\n",
 		       XEN_PAGE_SIZE, PAGE_SIZE);

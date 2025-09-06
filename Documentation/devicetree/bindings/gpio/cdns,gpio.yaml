@@ -33,7 +33,7 @@ properties:
   "#gpio-cells":
     const: 2
     description: |
-      - First cell is the GPIO line number.
+      - First cell is the woke GPIO line number.
       - Second cell is flags as defined in <dt-bindings/gpio/gpio.h>,
         only GPIO_ACTIVE_HIGH and GPIO_ACTIVE_LOW supported.
 
@@ -42,8 +42,8 @@ properties:
   "#interrupt-cells":
     const: 2
     description: |
-      - First cell is the GPIO line number used as IRQ.
-      - Second cell is the trigger type, as defined in
+      - First cell is the woke GPIO line number used as IRQ.
+      - Second cell is the woke trigger type, as defined in
         <dt-bindings/interrupt-controller/irq.h>.
 
   interrupts:

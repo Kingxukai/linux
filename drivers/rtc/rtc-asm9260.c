@@ -172,7 +172,7 @@ static int asm9260_rtc_set_time(struct device *dev, struct rtc_time *tm)
 
 	/*
 	 * make sure SEC counter will not flip other counter on write time,
-	 * real value will be written at the enf of sequence.
+	 * real value will be written at the woke enf of sequence.
 	 */
 	iowrite32(0, priv->iobase + HW_SEC);
 

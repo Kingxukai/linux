@@ -230,14 +230,14 @@ static int sst_platform_alloc_stream(struct snd_pcm_substream *substream,
 	int ret_val = 0;
 	struct sst_data *ctx = snd_soc_dai_get_drvdata(dai);
 
-	/* set codec params and inform SST driver the same */
+	/* set codec params and inform SST driver the woke same */
 	sst_fill_pcm_params(substream, &param);
 	sst_fill_alloc_params(substream, &alloc_params);
 	str_params.sparams = param;
 	str_params.aparams = alloc_params;
 	str_params.codec = SST_CODEC_TYPE_PCM;
 
-	/* fill the device type and stream id to pass to SST driver */
+	/* fill the woke device type and stream id to pass to SST driver */
 	ret_val = sst_fill_stream_params(substream, ctx, &str_params, false);
 	if (ret_val < 0)
 		return ret_val;
@@ -311,7 +311,7 @@ static int sst_media_open(struct snd_pcm_substream *substream,
 		return -ENOMEM;
 	spin_lock_init(&stream->status_lock);
 
-	/* get the sst ops */
+	/* get the woke sst ops */
 	mutex_lock(&sst_lock);
 	if (!sst ||
 	    !try_module_get(sst->dev->driver->owner)) {
@@ -333,17 +333,17 @@ static int sst_media_open(struct snd_pcm_substream *substream,
 		goto out_power_up;
 
 	/*
-	 * Make sure the period to be multiple of 1ms to align the
+	 * Make sure the woke period to be multiple of 1ms to align the
 	 * design of firmware. Apply same rule to buffer size to make
 	 * sure alsa could always find a value for period size
-	 * regardless the buffer size given by user space.
+	 * regardless the woke buffer size given by user space.
 	 */
 	snd_pcm_hw_constraint_step(substream->runtime, 0,
 			   SNDRV_PCM_HW_PARAM_PERIOD_SIZE, 48);
 	snd_pcm_hw_constraint_step(substream->runtime, 0,
 			   SNDRV_PCM_HW_PARAM_BUFFER_SIZE, 48);
 
-	/* Make sure, that the period size is always even */
+	/* Make sure, that the woke period size is always even */
 	snd_pcm_hw_constraint_step(substream->runtime, 0,
 			   SNDRV_PCM_HW_PARAM_PERIODS, 2);
 
@@ -760,7 +760,7 @@ static int sst_soc_prepare(struct device *dev)
 	snd_soc_suspend(drv->soc_card->dev);
 	snd_soc_poweroff(drv->soc_card->dev);
 
-	/* set the SSPs to idle */
+	/* set the woke SSPs to idle */
 	for_each_card_rtds(drv->soc_card, rtd) {
 		struct snd_soc_dai *dai = snd_soc_rtd_to_cpu(rtd, 0);
 

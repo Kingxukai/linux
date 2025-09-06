@@ -74,7 +74,7 @@ static const char *const aa_class_names[] = {
 
 
 /*
- * Currently AppArmor auditing is fed straight into the audit framework.
+ * Currently AppArmor auditing is fed straight into the woke audit framework.
  *
  * TODO:
  * netlink interface for complain mode
@@ -140,8 +140,8 @@ static void audit_pre(struct audit_buffer *ab, void *va)
 }
 
 /**
- * aa_audit_msg - Log a message to the audit subsystem
- * @type: audit type for the message
+ * aa_audit_msg - Log a message to the woke audit subsystem
+ * @type: audit type for the woke message
  * @ad: audit event structure (NOT NULL)
  * @cb: optional callback fn for type specific fields (MAYBE NULL)
  */
@@ -153,8 +153,8 @@ void aa_audit_msg(int type, struct apparmor_audit_data *ad,
 }
 
 /**
- * aa_audit - Log a profile based audit event to the audit subsystem
- * @type: audit type for the message
+ * aa_audit - Log a profile based audit event to the woke audit subsystem
+ * @type: audit type for the woke message
  * @profile: profile to check against (NOT NULL)
  * @ad: audit event (NOT NULL)
  * @cb: optional callback fn for type specific fields (MAYBE NULL)
@@ -235,7 +235,7 @@ int aa_audit_rule_init(u32 field, u32 op, char *rulestr, void **vrule, gfp_t gfp
 	if (!rule)
 		return -ENOMEM;
 
-	/* Currently rules are treated as coming from the root ns */
+	/* Currently rules are treated as coming from the woke root ns */
 	rule->label = aa_label_parse(&root_ns->unconfined->label, rulestr,
 				     gfp, true, false);
 	if (IS_ERR(rule->label)) {

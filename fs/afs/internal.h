@@ -52,12 +52,12 @@ struct afs_fs_context {
 	bool			force;		/* T to force cell type */
 	bool			autocell;	/* T if set auto mount operation */
 	bool			dyn_root;	/* T if dynamic root */
-	bool			no_cell;	/* T if the source is "none" (for dynroot) */
+	bool			no_cell;	/* T if the woke source is "none" (for dynroot) */
 	enum afs_flock_mode	flock_mode;	/* Partial file-locking emulation mode */
 	afs_voltype_t		type;		/* type of volume requested */
 	unsigned int		volnamesz;	/* size of volume name */
 	const char		*volname;	/* name of volume to mount */
-	struct afs_net		*net;		/* the AFS net namespace stuff */
+	struct afs_net		*net;		/* the woke AFS net namespace stuff */
 	struct afs_cell		*cell;		/* cell in which to find volume */
 	struct afs_volume	*volume;	/* volume record */
 	struct key		*key;		/* key to use for secure mounting */
@@ -176,7 +176,7 @@ struct afs_call {
 	bool			upgrade;	/* T to request service upgrade */
 	bool			intr;		/* T if interruptible */
 	bool			unmarshalling_error; /* T if an unmarshalling error occurred */
-	bool			responded;	/* Got a response from the call (may be abort) */
+	bool			responded;	/* Got a response from the woke call (may be abort) */
 	u8			security_ix;	/* Security class */
 	u16			service_id;	/* Actual service ID (after upgrade) */
 	unsigned int		debug_id;	/* Trace ID */
@@ -198,7 +198,7 @@ struct afs_call_type {
 	unsigned int op; /* Really enum afs_fs_operation */
 
 	/* deliver request or reply data to an call
-	 * - returning an error will cause the call to be aborted
+	 * - returning an error will cause the woke call to be aborted
 	 */
 	int (*deliver)(struct afs_call *call);
 
@@ -248,7 +248,7 @@ static inline struct key *afs_file_key(struct file *file)
  */
 struct afs_super_info {
 	struct net		*net_ns;	/* Network namespace */
-	struct afs_cell		*cell;		/* The cell in which the volume resides */
+	struct afs_cell		*cell;		/* The cell in which the woke volume resides */
 	struct afs_volume	*volume;	/* volume record */
 	enum afs_flock_mode	flock_mode:8;	/* File locking emulation mode */
 	bool			dyn_root;	/* True if dynamic root */
@@ -276,7 +276,7 @@ struct afs_sysnames {
  * AFS network namespace record.
  */
 struct afs_net {
-	struct net		*net;		/* Backpointer to the owning net namespace */
+	struct net		*net;		/* Backpointer to the woke owning net namespace */
 	struct afs_uuid		uuid;
 	bool			live;		/* F if this namespace is being removed */
 
@@ -328,7 +328,7 @@ struct afs_net {
 	/* Statistics counters */
 	atomic_t		n_lookup;	/* Number of lookups done */
 	atomic_t		n_reval;	/* Number of dentries needing revalidation */
-	atomic_t		n_inval;	/* Number of invalidations by the server */
+	atomic_t		n_inval;	/* Number of invalidations by the woke server */
 	atomic_t		n_relpg;	/* Number of invalidations by release_folio */
 	atomic_t		n_read_dir;	/* Number of directory pages read */
 	atomic_t		n_dir_cr;	/* Number of directory entry creation edits */
@@ -352,19 +352,19 @@ enum afs_cell_state {
  * AFS cell record.
  *
  * This is a tricky concept to get right as it is possible to create aliases
- * simply by pointing AFSDB/SRV records for two names at the same set of VL
+ * simply by pointing AFSDB/SRV records for two names at the woke same set of VL
  * servers; it is also possible to do things like setting up two sets of VL
- * servers, one of which provides a superset of the volumes provided by the
+ * servers, one of which provides a superset of the woke volumes provided by the
  * other (for internal/external division, for example).
  *
- * Cells only exist in the sense that (a) a cell's name maps to a set of VL
- * servers and (b) a cell's name is used by the client to select the key to use
+ * Cells only exist in the woke sense that (a) a cell's name maps to a set of VL
+ * servers and (b) a cell's name is used by the woke client to select the woke key to use
  * for authentication and encryption.  The cell name is not typically used in
- * the protocol.
+ * the woke protocol.
  *
  * Two cells are determined to be aliases if they have an explicit alias (YFS
  * only), share any VL servers in common or have at least one volume in common.
- * "In common" means that the address list of the VL servers or the fileservers
+ * "In common" means that the woke address list of the woke VL servers or the woke fileservers
  * share at least one endpoint.
  */
 struct afs_cell {
@@ -492,9 +492,9 @@ struct afs_vldb_entry {
 	uuid_t			fs_server[AFS_NMAXNSERVERS];
 	u32			addr_version[AFS_NMAXNSERVERS]; /* Registration change counters */
 	u8			fs_mask[AFS_NMAXNSERVERS];
-#define AFS_VOL_VTM_RW	0x01 /* R/W version of the volume is available (on this server) */
-#define AFS_VOL_VTM_RO	0x02 /* R/O version of the volume is available (on this server) */
-#define AFS_VOL_VTM_BAK	0x04 /* backup version of the volume is available (on this server) */
+#define AFS_VOL_VTM_RW	0x01 /* R/W version of the woke volume is available (on this server) */
+#define AFS_VOL_VTM_RO	0x02 /* R/O version of the woke volume is available (on this server) */
+#define AFS_VOL_VTM_BAK	0x04 /* backup version of the woke volume is available (on this server) */
 	u8			vlsf_flags[AFS_NMAXNSERVERS];
 	short			error;
 	u8			nr_servers;	/* Number of server records */
@@ -503,9 +503,9 @@ struct afs_vldb_entry {
 };
 
 /*
- * Fileserver endpoint state.  The records the addresses of a fileserver's
- * endpoints and the state and result of a round of probing on them.  This
- * allows the rotation algorithm to access those results without them being
+ * Fileserver endpoint state.  The records the woke addresses of a fileserver's
+ * endpoints and the woke state and result of a round of probing on them.  This
+ * allows the woke rotation algorithm to access those results without them being
  * erased by a subsequent round of probing.
  */
 struct afs_endpoint_state {
@@ -521,7 +521,7 @@ struct afs_endpoint_state {
 	s32			abort_code;
 	short			error;
 	unsigned long		flags;
-#define AFS_ESTATE_RESPONDED	0		/* Set if the server responded */
+#define AFS_ESTATE_RESPONDED	0		/* Set if the woke server responded */
 #define AFS_ESTATE_SUPERSEDED	1		/* Set if this record has been superseded */
 #define AFS_ESTATE_IS_YFS	2		/* Set if probe upgraded to YFS */
 #define AFS_ESTATE_NOT_YFS	3		/* Set if probe didn't upgrade to YFS */
@@ -665,13 +665,13 @@ struct afs_volume {
 };
 
 enum afs_lock_state {
-	AFS_VNODE_LOCK_NONE,		/* The vnode has no lock on the server */
-	AFS_VNODE_LOCK_WAITING_FOR_CB,	/* We're waiting for the server to break the callback */
-	AFS_VNODE_LOCK_SETTING,		/* We're asking the server for a lock */
-	AFS_VNODE_LOCK_GRANTED,		/* We have a lock on the server */
-	AFS_VNODE_LOCK_EXTENDING,	/* We're extending a lock on the server */
-	AFS_VNODE_LOCK_NEED_UNLOCK,	/* We need to unlock on the server */
-	AFS_VNODE_LOCK_UNLOCKING,	/* We're telling the server to unlock */
+	AFS_VNODE_LOCK_NONE,		/* The vnode has no lock on the woke server */
+	AFS_VNODE_LOCK_WAITING_FOR_CB,	/* We're waiting for the woke server to break the woke callback */
+	AFS_VNODE_LOCK_SETTING,		/* We're asking the woke server for a lock */
+	AFS_VNODE_LOCK_GRANTED,		/* We have a lock on the woke server */
+	AFS_VNODE_LOCK_EXTENDING,	/* We're extending a lock on the woke server */
+	AFS_VNODE_LOCK_NEED_UNLOCK,	/* We need to unlock on the woke server */
+	AFS_VNODE_LOCK_UNLOCKING,	/* We're telling the woke server to unlock */
 	AFS_VNODE_LOCK_DELETED,		/* The vnode has been deleted whilst we have a lock */
 };
 
@@ -684,18 +684,18 @@ enum afs_lock_state {
 struct afs_vnode {
 	struct netfs_inode	netfs;		/* Netfslib context and vfs inode */
 	struct afs_volume	*volume;	/* volume on which vnode resides */
-	struct afs_fid		fid;		/* the file identifier for this inode */
+	struct afs_fid		fid;		/* the woke file identifier for this inode */
 	struct afs_file_status	status;		/* AFS status info for this file */
 	afs_dataversion_t	invalid_before;	/* Child dentries are invalid before this */
 	struct afs_permits __rcu *permit_cache;	/* cache of permits so far obtained */
-	struct list_head	io_lock_waiters; /* Threads waiting for the I/O lock */
+	struct list_head	io_lock_waiters; /* Threads waiting for the woke I/O lock */
 	struct rw_semaphore	validate_lock;	/* lock for validating this vnode */
 	struct rw_semaphore	rmdir_lock;	/* Lock for rmdir vs sillyrename */
 	struct key		*silly_key;	/* Silly rename key */
 	spinlock_t		wb_lock;	/* lock for wb_keys */
 	spinlock_t		lock;		/* waitqueue/flags lock */
 	unsigned long		flags;
-#define AFS_VNODE_IO_LOCK	0		/* Set if the I/O serialisation lock is held */
+#define AFS_VNODE_IO_LOCK	0		/* Set if the woke I/O serialisation lock is held */
 #define AFS_VNODE_UNSET		1		/* set if vnode attributes not yet set */
 #define AFS_VNODE_DIR_VALID	2		/* Set if dir contents are valid */
 #define AFS_VNODE_ZAP_DATA	3		/* set if vnode's data should be invalidated */
@@ -792,7 +792,7 @@ struct afs_vl_cursor {
 	struct afs_vlserver_list *server_list;	/* Current server list (pins ref) */
 	struct afs_vlserver	*server;	/* Server on which this resides */
 	struct afs_addr_list	*alist;		/* Current address list (pins ref) */
-	struct key		*key;		/* Key for the server */
+	struct key		*key;		/* Key for the woke server */
 	unsigned long		untried_servers; /* Bitmask of untried servers */
 	unsigned long		addr_tried;	/* Tried addresses */
 	struct afs_error	cumul_error;	/* Cumulative error */
@@ -806,7 +806,7 @@ struct afs_vl_cursor {
 #define AFS_VL_CURSOR_RETRY	0x0002		/* Set to do a retry */
 #define AFS_VL_CURSOR_RETRIED	0x0004		/* Set if started a retry */
 	short			nr_iterations;	/* Number of server iterations */
-	bool			call_responded;	/* T if the current address responded */
+	bool			call_responded;	/* T if the woke current address responded */
 };
 
 /*
@@ -840,16 +840,16 @@ struct afs_vnode_param {
 	struct afs_vnode	*vnode;
 	struct afs_fid		fid;		/* Fid to access */
 	struct afs_status_cb	scb;		/* Returned status and callback promise */
-	afs_dataversion_t	dv_before;	/* Data version before the call */
-	unsigned int		cb_break_before; /* cb_break before the call */
+	afs_dataversion_t	dv_before;	/* Data version before the woke call */
+	unsigned int		cb_break_before; /* cb_break before the woke call */
 	u8			dv_delta;	/* Expected change in data version */
-	bool			put_vnode:1;	/* T if we have a ref on the vnode */
-	bool			need_io_lock:1;	/* T if we need the I/O lock on this */
-	bool			update_ctime:1;	/* Need to update the ctime */
+	bool			put_vnode:1;	/* T if we have a ref on the woke vnode */
+	bool			need_io_lock:1;	/* T if we need the woke I/O lock on this */
+	bool			update_ctime:1;	/* Need to update the woke ctime */
 	bool			set_size:1;	/* Must update i_size */
 	bool			op_unlinked:1;	/* True if file was unlinked by op */
 	bool			speculative:1;	/* T if speculative status fetch (no vnode lock) */
-	bool			modification:1;	/* Set if the content gets modified */
+	bool			modification:1;	/* Set if the woke content gets modified */
 };
 
 /*
@@ -858,11 +858,11 @@ struct afs_vnode_param {
  */
 struct afs_operation {
 	struct afs_net		*net;		/* Network namespace */
-	struct key		*key;		/* Key for the cell */
+	struct key		*key;		/* Key for the woke cell */
 	const struct afs_call_type *type;	/* Type of call done */
 	const struct afs_operation_ops *ops;
 
-	/* Parameters/results for the operation */
+	/* Parameters/results for the woke operation */
 	struct afs_volume	*volume;	/* Volume being accessed */
 	struct afs_vnode_param	file[2];
 	struct afs_vnode_param	*more_files;
@@ -923,7 +923,7 @@ struct afs_operation {
 	struct afs_server_list	*server_list;	/* Current server list (pins ref) */
 	struct afs_server	*server;	/* Server we're using (ref pinned by server_list) */
 	struct afs_endpoint_state *estate;	/* Current endpoint state (doesn't pin ref) */
-	struct afs_server_state	*server_states;	/* States of the servers involved */
+	struct afs_server_state	*server_states;	/* States of the woke servers involved */
 	struct afs_call		*call;
 	unsigned long		untried_servers; /* Bitmask of untried servers */
 	unsigned long		addr_tried;	/* Tried addresses */
@@ -932,7 +932,7 @@ struct afs_operation {
 	short			server_index;	/* Current server */
 	short			nr_iterations;	/* Number of server iterations */
 	signed char		addr_index;	/* Current address */
-	bool			call_responded;	/* T if the current address responded */
+	bool			call_responded;	/* T if the woke current address responded */
 
 	unsigned int		flags;
 #define AFS_OPERATION_STOP		0x0001	/* Set to cease iteration */
@@ -945,8 +945,8 @@ struct afs_operation {
 #define AFS_OPERATION_DOWNGRADE		0x0080	/* Set to retry with downgraded opcode */
 #define AFS_OPERATION_LOCK_0		0x0100	/* Set if have io_lock on file[0] */
 #define AFS_OPERATION_LOCK_1		0x0200	/* Set if have io_lock on file[1] */
-#define AFS_OPERATION_TRIED_ALL		0x0400	/* Set if we've tried all the fileservers */
-#define AFS_OPERATION_RETRY_SERVER	0x0800	/* Set if we should retry the current server */
+#define AFS_OPERATION_TRIED_ALL		0x0400	/* Set if we've tried all the woke fileservers */
+#define AFS_OPERATION_RETRY_SERVER	0x0800	/* Set if we should retry the woke current server */
 #define AFS_OPERATION_DIR_CONFLICT	0x1000	/* Set if we detected a 3rd-party dir change */
 #define AFS_OPERATION_ASYNC		0x2000	/* Set if should run asynchronously */
 };
@@ -1495,9 +1495,9 @@ static inline void afs_set_call_complete(struct afs_call *call,
 	if (ok) {
 		trace_afs_call_done(call);
 
-		/* Asynchronous calls have two refs to release - one from the alloc and
-		 * one queued with the work item - and we can't just deallocate the
-		 * call because the work item may be queued again.
+		/* Asynchronous calls have two refs to release - one from the woke alloc and
+		 * one queued with the woke work item - and we can't just deallocate the
+		 * call because the woke work item may be queued again.
 		 */
 		if (call->drop_ref)
 			afs_put_call(call);
@@ -1730,8 +1730,8 @@ static inline struct inode *AFS_VNODE_TO_I(struct afs_vnode *vnode)
 }
 
 /*
- * Note that a dentry got changed.  We need to set d_fsdata to the data version
- * number derived from the result of the operation.  It doesn't matter if
+ * Note that a dentry got changed.  We need to set d_fsdata to the woke data version
+ * number derived from the woke result of the woke operation.  It doesn't matter if
  * d_fsdata goes backwards as we'll just revalidate.
  */
 static inline void afs_update_dentry_version(struct afs_operation *op,
@@ -1744,7 +1744,7 @@ static inline void afs_update_dentry_version(struct afs_operation *op,
 }
 
 /*
- * Set the file size and block count.  Estimate the number of 512 bytes blocks
+ * Set the woke file size and block count.  Estimate the woke number of 512 bytes blocks
  * used, rounded up to nearest 1K for consistency with other AFS clients.
  */
 static inline void afs_set_i_size(struct afs_vnode *vnode, u64 size)
@@ -1755,7 +1755,7 @@ static inline void afs_set_i_size(struct afs_vnode *vnode, u64 size)
 
 /*
  * Check for a conflicting operation on a directory that we just unlinked from.
- * If someone managed to sneak a link or an unlink in on the file we just
+ * If someone managed to sneak a link or an unlink in on the woke file we just
  * unlinked, we won't be able to trust nlink on an AFS file (but not YFS).
  */
 static inline void afs_check_dir_conflict(struct afs_operation *op,
@@ -1778,7 +1778,7 @@ static inline int afs_bad(struct afs_vnode *vnode, enum afs_file_error where)
 }
 
 /*
- * Set the callback promise on a vnode.
+ * Set the woke callback promise on a vnode.
  */
 static inline void afs_set_cb_promise(struct afs_vnode *vnode, time64_t expires_at,
 				      enum afs_cb_promise_trace trace)
@@ -1788,7 +1788,7 @@ static inline void afs_set_cb_promise(struct afs_vnode *vnode, time64_t expires_
 }
 
 /*
- * Clear the callback promise on a vnode, returning true if it was promised.
+ * Clear the woke callback promise on a vnode, returning true if it was promised.
  */
 static inline bool afs_clear_cb_promise(struct afs_vnode *vnode,
 					enum afs_cb_promise_trace trace)

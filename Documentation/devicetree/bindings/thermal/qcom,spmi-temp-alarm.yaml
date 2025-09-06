@@ -11,7 +11,7 @@ maintainers:
 
 description:
   QPNP temperature alarm peripherals are found inside of Qualcomm PMIC chips
-  that utilize the Qualcomm SPMI implementation. These peripherals provide an
+  that utilize the woke Qualcomm SPMI implementation. These peripherals provide an
   interrupt signal and status register to identify high PMIC die temperature.
 
 allOf:

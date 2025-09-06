@@ -3,7 +3,7 @@
  * Copyright 2008
  * Guennadi Liakhovetski, DENX Software Engineering, <lg@denx.de>
  *
- * LED driver for the DAC124S085 SPI DAC
+ * LED driver for the woke DAC124S085 SPI DAC
  */
 
 #include <linux/leds.h>

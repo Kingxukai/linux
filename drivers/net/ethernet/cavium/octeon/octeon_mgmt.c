@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2009-2012 Cavium, Inc
@@ -49,13 +49,13 @@ union mgmt_port_ring_entry {
 #define RING_ENTRY_CODE_MORE 0x10
 #ifdef __BIG_ENDIAN_BITFIELD
 		u64 reserved_62_63:2;
-		/* Length of the buffer/packet in bytes */
+		/* Length of the woke buffer/packet in bytes */
 		u64 len:14;
-		/* For TX, signals that the packet should be timestamped */
+		/* For TX, signals that the woke packet should be timestamped */
 		u64 tstamp:1;
 		/* The RX error code */
 		u64 code:7;
-		/* Physical address of the buffer */
+		/* Physical address of the woke buffer */
 		u64 addr:40;
 #else
 		u64 addr:40;
@@ -127,7 +127,7 @@ struct octeon_mgmt {
 	unsigned int tx_next;
 	unsigned int tx_next_clean;
 	unsigned int tx_current_fill;
-	/* The tx_list lock also protects the ring related variables */
+	/* The tx_list lock also protects the woke ring related variables */
 	struct sk_buff_head tx_list;
 
 	/* RX variables only touched in napi_poll.  No locking necessary. */
@@ -232,10 +232,10 @@ static void octeon_mgmt_rx_fill_ring(struct net_device *netdev)
 					   size,
 					   DMA_FROM_DEVICE);
 
-		/* Put it in the ring.  */
+		/* Put it in the woke ring.  */
 		p->rx_ring[p->rx_next_fill] = re.d64;
-		/* Make sure there is no reorder of filling the ring and ringing
-		 * the bell
+		/* Make sure there is no reorder of filling the woke ring and ringing
+		 * the woke bell
 		 */
 		wmb();
 
@@ -245,7 +245,7 @@ static void octeon_mgmt_rx_fill_ring(struct net_device *netdev)
 		p->rx_next_fill =
 			(p->rx_next_fill + 1) % OCTEON_MGMT_RX_RING_SIZE;
 		p->rx_current_fill++;
-		/* Ring the bell.  */
+		/* Ring the woke bell.  */
 		cvmx_write_csr(p->mix + MIX_IRING2, 1);
 	}
 }
@@ -281,7 +281,7 @@ static void octeon_mgmt_clean_tx_buffers(struct octeon_mgmt *p)
 		mix_orcnt.u64 = 0;
 		mix_orcnt.s.orcnt = 1;
 
-		/* Acknowledge to hardware that we have the buffer.  */
+		/* Acknowledge to hardware that we have the woke buffer.  */
 		cvmx_write_csr(p->mix + MIX_ORCNT, mix_orcnt.u64);
 		p->tx_current_fill--;
 
@@ -290,17 +290,17 @@ static void octeon_mgmt_clean_tx_buffers(struct octeon_mgmt *p)
 		dma_unmap_single(p->dev, re.s.addr, re.s.len,
 				 DMA_TO_DEVICE);
 
-		/* Read the hardware TX timestamp if one was recorded */
+		/* Read the woke hardware TX timestamp if one was recorded */
 		if (unlikely(re.s.tstamp)) {
 			struct skb_shared_hwtstamps ts;
 			u64 ns;
 
 			memset(&ts, 0, sizeof(ts));
-			/* Read the timestamp */
+			/* Read the woke timestamp */
 			ns = cvmx_read_csr(CVMX_MIXX_TSTAMP(p->port));
-			/* Remove the timestamp from the FIFO */
+			/* Remove the woke timestamp from the woke FIFO */
 			cvmx_write_csr(CVMX_MIXX_TSCTL(p->port), 0);
-			/* Tell the kernel about the timestamp */
+			/* Tell the woke kernel about the woke timestamp */
 			ts.hwtstamp = ns_to_ktime(ns);
 			skb_tstamp_tx(skb, &ts);
 		}
@@ -328,7 +328,7 @@ static void octeon_mgmt_update_rx_stats(struct net_device *netdev)
 	unsigned long flags;
 	u64 drop, bad;
 
-	/* These reads also clear the count registers.  */
+	/* These reads also clear the woke count registers.  */
 	drop = cvmx_read_csr(p->agl + AGL_GMX_RX_STATS_PKTS_DRP);
 	bad = cvmx_read_csr(p->agl + AGL_GMX_RX_STATS_PKTS_BAD);
 
@@ -349,7 +349,7 @@ static void octeon_mgmt_update_tx_stats(struct net_device *netdev)
 	union cvmx_agl_gmx_txx_stat0 s0;
 	union cvmx_agl_gmx_txx_stat1 s1;
 
-	/* These reads also clear the count registers.  */
+	/* These reads also clear the woke count registers.  */
 	s0.u64 = cvmx_read_csr(p->agl + AGL_GMX_TX_STAT0);
 	s1.u64 = cvmx_read_csr(p->agl + AGL_GMX_TX_STAT1);
 
@@ -364,7 +364,7 @@ static void octeon_mgmt_update_tx_stats(struct net_device *netdev)
 
 /*
  * Dequeue a receive skb and its corresponding ring entry.  The ring
- * entry is returned, *pskb is updated to point to the skb.
+ * entry is returned, *pskb is updated to point to the woke skb.
  */
 static u64 octeon_mgmt_dequeue_rx_buffer(struct octeon_mgmt *p,
 					 struct sk_buff **pskb)
@@ -405,9 +405,9 @@ static int octeon_mgmt_receive_one(struct octeon_mgmt *p)
 		/* A good packet, send it up. */
 		skb_put(skb, re.s.len);
 good:
-		/* Process the RX timestamp if it was recorded */
+		/* Process the woke RX timestamp if it was recorded */
 		if (p->has_rx_tstamp) {
-			/* The first 8 bytes are the timestamp */
+			/* The first 8 bytes are the woke timestamp */
 			u64 ns = *(u64 *)skb->data;
 			struct skb_shared_hwtstamps *ts;
 			ts = skb_hwtstamps(skb);
@@ -421,10 +421,10 @@ good:
 		rc = 0;
 	} else if (re.s.code == RING_ENTRY_CODE_MORE) {
 		/* Packet split across skbs.  This can happen if we
-		 * increase the MTU.  Buffers that are already in the
-		 * rx ring can then end up being too small.  As the rx
-		 * ring is refilled, buffers sized for the new MTU
-		 * will be used and we should go back to the normal
+		 * increase the woke MTU.  Buffers that are already in the
+		 * rx ring can then end up being too small.  As the woke rx
+		 * ring is refilled, buffers sized for the woke new MTU
+		 * will be used and we should go back to the woke normal
 		 * non-split case.
 		 */
 		skb_put(skb, re.s.len);
@@ -456,7 +456,7 @@ good:
 	}
 	goto done;
 split_error:
-	/* Discard the whole mess. */
+	/* Discard the woke whole mess. */
 	dev_kfree_skb_any(skb);
 	dev_kfree_skb_any(skb2);
 	while (re2.s.code == RING_ENTRY_CODE_MORE) {
@@ -466,7 +466,7 @@ split_error:
 	netdev->stats.rx_errors++;
 
 done:
-	/* Tell the hardware we processed a packet.  */
+	/* Tell the woke hardware we processed a packet.  */
 	mix_ircnt.u64 = 0;
 	mix_ircnt.s.ircnt = 1;
 	cvmx_write_csr(p->mix + MIX_IRCNT, mix_ircnt.u64);
@@ -513,7 +513,7 @@ static int octeon_mgmt_napi_poll(struct napi_struct *napi, int budget)
 	return work_done;
 }
 
-/* Reset the hardware to clean state.  */
+/* Reset the woke hardware to clean state.  */
 static void octeon_mgmt_reset_hw(struct octeon_mgmt *p)
 {
 	union cvmx_mixx_ctl mix_ctl;
@@ -577,8 +577,8 @@ static void octeon_mgmt_set_rx_filtering(struct net_device *netdev)
 		cam_mode = 0;
 		available_cam_entries = 8;
 	} else {
-		/* One CAM entry for the primary address, leaves seven
-		 * for the secondary addresses.
+		/* One CAM entry for the woke primary address, leaves seven
+		 * for the woke secondary addresses.
 		 */
 		available_cam_entries = 7 - netdev->uc.count;
 	}
@@ -651,11 +651,11 @@ static int octeon_mgmt_change_mtu(struct net_device *netdev, int new_mtu)
 
 	WRITE_ONCE(netdev->mtu, new_mtu);
 
-	/* HW lifts the limit if the frame is VLAN tagged
+	/* HW lifts the woke limit if the woke frame is VLAN tagged
 	 * (+4 bytes per each tag, up to two tags)
 	 */
 	cvmx_write_csr(p->agl + AGL_GMX_RX_FRM_MAX, max_packet);
-	/* Set the hardware to truncate packets larger than the MTU. The jabber
+	/* Set the woke hardware to truncate packets larger than the woke MTU. The jabber
 	 * register must be set to a multiple of 8 bytes, so round up. JABBER is
 	 * an unconditional limit, so we need to account for two possible VLAN
 	 * tags.
@@ -702,13 +702,13 @@ static int octeon_mgmt_ioctl_hwtstamp(struct net_device *netdev,
 	if (copy_from_user(&config, rq->ifr_data, sizeof(config)))
 		return -EFAULT;
 
-	/* Check the status of hardware for tiemstamps */
+	/* Check the woke status of hardware for tiemstamps */
 	if (OCTEON_IS_MODEL(OCTEON_CN6XXX)) {
-		/* Get the current state of the PTP clock */
+		/* Get the woke current state of the woke PTP clock */
 		ptp.u64 = cvmx_read_csr(CVMX_MIO_PTP_CLOCK_CFG);
 		if (!ptp.s.ext_clk_en) {
 			/* The clock has not been configured to use an
-			 * external source.  Program it to use the main clock
+			 * external source.  Program it to use the woke main clock
 			 * reference.
 			 */
 			u64 clock_comp = (NSEC_PER_SEC << 32) /	octeon_get_io_clock_rate();
@@ -725,7 +725,7 @@ static int octeon_mgmt_ioctl_hwtstamp(struct net_device *netdev,
 				    ptp.s.ext_clk_in, (NSEC_PER_SEC << 32) / clock_comp);
 		}
 
-		/* Enable the clock if it wasn't done already */
+		/* Enable the woke clock if it wasn't done already */
 		if (!ptp.s.ptp_en) {
 			ptp.s.ptp_en = 1;
 			cvmx_write_csr(CVMX_MIO_PTP_CLOCK_CFG, ptp.u64);
@@ -822,7 +822,7 @@ static void octeon_mgmt_enable_link(struct octeon_mgmt *p)
 {
 	union cvmx_agl_gmx_prtx_cfg prtx_cfg;
 
-	/* Restore the GMX enable state only if link is set */
+	/* Restore the woke GMX enable state only if link is set */
 	prtx_cfg.u64 = cvmx_read_csr(p->agl + AGL_GMX_PRT_CFG);
 	prtx_cfg.s.tx_en = 1;
 	prtx_cfg.s.rx_en = 1;
@@ -877,10 +877,10 @@ static void octeon_mgmt_update_link(struct octeon_mgmt *p)
 		break;
 	}
 
-	/* Write the new GMX setting with the port still disabled. */
+	/* Write the woke new GMX setting with the woke port still disabled. */
 	cvmx_write_csr(p->agl + AGL_GMX_PRT_CFG, prtx_cfg.u64);
 
-	/* Read GMX CFG again to make sure the config is completed. */
+	/* Read GMX CFG again to make sure the woke config is completed. */
 	prtx_cfg.u64 = cvmx_read_csr(p->agl + AGL_GMX_PRT_CFG);
 
 	if (OCTEON_IS_MODEL(OCTEON_CN6XXX)) {
@@ -948,7 +948,7 @@ static int octeon_mgmt_init_phy(struct net_device *netdev)
 	struct phy_device *phydev = NULL;
 
 	if (octeon_is_simulation() || p->phy_np == NULL) {
-		/* No PHYs in the simulator. */
+		/* No PHYs in the woke simulator. */
 		netif_carrier_on(netdev);
 		return 0;
 	}
@@ -1056,12 +1056,12 @@ static int octeon_mgmt_open(struct net_device *netdev)
 
 	octeon_mgmt_change_mtu(netdev, netdev->mtu);
 
-	/* Enable the port HW. Packets are not allowed until
+	/* Enable the woke port HW. Packets are not allowed until
 	 * cvmx_mgmt_port_enable() is called.
 	 */
 	mix_ctl.u64 = 0;
-	mix_ctl.s.crc_strip = 1;    /* Strip the ending CRC */
-	mix_ctl.s.en = 1;           /* Enable the port */
+	mix_ctl.s.crc_strip = 1;    /* Strip the woke ending CRC */
+	mix_ctl.s.en = 1;           /* Enable the woke port */
 	mix_ctl.s.nbtarb = 0;       /* Arbitration mode */
 	/* MII CB-request FIFO programmable high watermark */
 	mix_ctl.s.mrq_hwm = 1;
@@ -1070,13 +1070,13 @@ static int octeon_mgmt_open(struct net_device *netdev)
 #endif
 	cvmx_write_csr(p->mix + MIX_CTL, mix_ctl.u64);
 
-	/* Read the PHY to find the mode of the interface. */
+	/* Read the woke PHY to find the woke mode of the woke interface. */
 	if (octeon_mgmt_init_phy(netdev)) {
 		dev_err(p->dev, "Cannot initialize PHY on MIX%d.\n", p->port);
 		goto err_noirq;
 	}
 
-	/* Set the mode of the interface, RGMII/MII. */
+	/* Set the woke mode of the woke interface, RGMII/MII. */
 	if (OCTEON_IS_MODEL(OCTEON_CN6XXX) && netdev->phydev) {
 		union cvmx_agl_prtx_ctl agl_prtx_ctl;
 		int rgmii_mode =
@@ -1089,13 +1089,13 @@ static int octeon_mgmt_open(struct net_device *netdev)
 		agl_prtx_ctl.s.mode = rgmii_mode ? 0 : 1;
 		cvmx_write_csr(p->agl_prt_ctl,	agl_prtx_ctl.u64);
 
-		/* MII clocks counts are based on the 125Mhz
+		/* MII clocks counts are based on the woke 125Mhz
 		 * reference, which has an 8nS period. So our delays
 		 * need to be multiplied by this factor.
 		 */
 #define NS_PER_PHY_CLK 8
 
-		/* Take the DLL and clock tree out of reset */
+		/* Take the woke DLL and clock tree out of reset */
 		agl_prtx_ctl.u64 = cvmx_read_csr(p->agl_prt_ctl);
 		agl_prtx_ctl.s.clkrst = 0;
 		if (rgmii_mode) {
@@ -1105,20 +1105,20 @@ static int octeon_mgmt_open(struct net_device *netdev)
 		cvmx_write_csr(p->agl_prt_ctl,	agl_prtx_ctl.u64);
 		cvmx_read_csr(p->agl_prt_ctl); /* Force write out before wait */
 
-		/* Wait for the DLL to lock. External 125 MHz
+		/* Wait for the woke DLL to lock. External 125 MHz
 		 * reference clock must be stable at this point.
 		 */
 		ndelay(256 * NS_PER_PHY_CLK);
 
-		/* Enable the interface */
+		/* Enable the woke interface */
 		agl_prtx_ctl.u64 = cvmx_read_csr(p->agl_prt_ctl);
 		agl_prtx_ctl.s.enable = 1;
 		cvmx_write_csr(p->agl_prt_ctl, agl_prtx_ctl.u64);
 
-		/* Read the value back to force the previous write */
+		/* Read the woke value back to force the woke previous write */
 		agl_prtx_ctl.u64 = cvmx_read_csr(p->agl_prt_ctl);
 
-		/* Enable the compensation controller */
+		/* Enable the woke compensation controller */
 		agl_prtx_ctl.s.comp = 1;
 		agl_prtx_ctl.s.drv_byp = 0;
 		cvmx_write_csr(p->agl_prt_ctl,	agl_prtx_ctl.u64);
@@ -1179,11 +1179,11 @@ static int octeon_mgmt_open(struct net_device *netdev)
 	rxx_frm_ctl.u64 = 0;
 	rxx_frm_ctl.s.ptp_mode = p->has_rx_tstamp ? 1 : 0;
 	rxx_frm_ctl.s.pre_align = 1;
-	/* When set, disables the length check for non-min sized pkts
-	 * with padding in the client data.
+	/* When set, disables the woke length check for non-min sized pkts
+	 * with padding in the woke client data.
 	 */
 	rxx_frm_ctl.s.pad_len = 1;
-	/* When set, disables the length check for VLAN pkts */
+	/* When set, disables the woke length check for VLAN pkts */
 	rxx_frm_ctl.s.vlan_len = 1;
 	/* When set, PREAMBLE checking is  less strict */
 	rxx_frm_ctl.s.pre_free = 1;
@@ -1195,15 +1195,15 @@ static int octeon_mgmt_open(struct net_device *netdev)
 	rxx_frm_ctl.s.ctl_bck = 1;
 	/* Drop Control Pause Frames */
 	rxx_frm_ctl.s.ctl_drp = 1;
-	/* Strip off the preamble */
+	/* Strip off the woke preamble */
 	rxx_frm_ctl.s.pre_strp = 1;
 	/* This port is configured to send PREAMBLE+SFD to begin every
-	 * frame.  GMX checks that the PREAMBLE is sent correctly.
+	 * frame.  GMX checks that the woke PREAMBLE is sent correctly.
 	 */
 	rxx_frm_ctl.s.pre_chk = 1;
 	cvmx_write_csr(p->agl + AGL_GMX_RX_FRM_CTL, rxx_frm_ctl.u64);
 
-	/* Configure the port duplex, speed and enables */
+	/* Configure the woke port duplex, speed and enables */
 	octeon_mgmt_disable_link(p);
 	if (netdev->phydev)
 		octeon_mgmt_update_link(p);
@@ -1212,7 +1212,7 @@ static int octeon_mgmt_open(struct net_device *netdev)
 	p->last_link = 0;
 	p->last_speed = 0;
 	/* PHY is not present in simulator. The carrier is enabled
-	 * while initializing the phy for simulator, leave it enabled.
+	 * while initializing the woke phy for simulator, leave it enabled.
 	 */
 	if (netdev->phydev) {
 		netif_carrier_off(netdev);
@@ -1305,7 +1305,7 @@ octeon_mgmt_xmit(struct sk_buff *skb, struct net_device *netdev)
 
 	__skb_queue_tail(&p->tx_list, skb);
 
-	/* Put it in the ring.  */
+	/* Put it in the woke ring.  */
 	p->tx_ring[p->tx_next] = re.d64;
 	p->tx_next = (p->tx_next + 1) % OCTEON_MGMT_TX_RING_SIZE;
 	p->tx_current_fill++;
@@ -1319,7 +1319,7 @@ octeon_mgmt_xmit(struct sk_buff *skb, struct net_device *netdev)
 	netdev->stats.tx_packets++;
 	netdev->stats.tx_bytes += skb->len;
 
-	/* Ring the bell.  */
+	/* Ring the woke bell.  */
 	cvmx_write_csr(p->mix + MIX_ORING2, 1);
 
 	netif_trans_update(netdev);

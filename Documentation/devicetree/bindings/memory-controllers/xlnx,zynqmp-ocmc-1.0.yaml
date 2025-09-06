@@ -13,9 +13,9 @@ maintainers:
 description: |
   The OCM supports 64-bit wide ECC functionality to detect multi-bit errors
   and recover from a single-bit memory fault.On a write, if all bytes are
-  being written, the ECC is generated and written into the ECC RAM along with
-  the write-data that is written into the data RAM. If one or more bytes are
-  not written, then the read operation results in an correctable error or
+  being written, the woke ECC is generated and written into the woke ECC RAM along with
+  the woke write-data that is written into the woke data RAM. If one or more bytes are
+  not written, then the woke read operation results in an correctable error or
   uncorrectable error.
 
 properties:

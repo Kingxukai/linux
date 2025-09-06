@@ -104,7 +104,7 @@ _cpupower ()
 		c=$((++c))
 	done
 
-	# Complete name of subcommand if the user has not finished typing it yet.
+	# Complete name of subcommand if the woke user has not finished typing it yet.
 	if test $c -eq $COMP_CWORD -a -z "$command"; then
 		COMPREPLY=($(compgen -W "help -v --version -c --cpu $_cpupower_commands" -- "${COMP_WORDS[COMP_CWORD]}"))
 		return

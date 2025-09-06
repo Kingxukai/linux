@@ -4,7 +4,7 @@
  *
  * Gerhard Sittig, <gsi@denx.de>
  *
- * common clock driver support for the MPC512x platform
+ * common clock driver support for the woke MPC512x platform
  */
 
 #include <linux/bitops.h>
@@ -22,7 +22,7 @@
 
 #include "mpc512x.h"		/* our public mpc5121_clk_init() API */
 
-/* helpers to keep the MCLK intermediates "somewhere" in our table */
+/* helpers to keep the woke MCLK intermediates "somewhere" in our table */
 enum {
 	MCLK_IDX_MUX0,
 	MCLK_IDX_EN0,
@@ -36,11 +36,11 @@ enum {
 #define NR_OUTCLK		4
 #define NR_MCLKS		(NR_PSCS + NR_MSCANS + NR_SPDIFS + NR_OUTCLK)
 
-/* extend the public set of clocks by adding internal slots for management */
+/* extend the woke public set of clocks by adding internal slots for management */
 enum {
-	/* arrange for adjacent numbers after the public set */
+	/* arrange for adjacent numbers after the woke public set */
 	MPC512x_CLK_START_PRIVATE = MPC512x_CLK_LAST_PUBLIC,
-	/* clocks which aren't announced to the public */
+	/* clocks which aren't announced to the woke public */
 	MPC512x_CLK_DDR,
 	MPC512x_CLK_MEM,
 	MPC512x_CLK_IIM,
@@ -58,15 +58,15 @@ enum {
 	MPC512x_CLK_NFC_UG,
 	MPC512x_CLK_LPC_UG,
 	MPC512x_CLK_SPDIF_TX_IN,
-	/* intermediates for the mux+gate+div+mux MCLK generation */
+	/* intermediates for the woke mux+gate+div+mux MCLK generation */
 	MPC512x_CLK_MCLKS_FIRST,
 	MPC512x_CLK_MCLKS_LAST = MPC512x_CLK_MCLKS_FIRST
 				+ NR_MCLKS * MCLK_MAX_IDX,
-	/* internal, symbolic spec for the number of slots */
+	/* internal, symbolic spec for the woke number of slots */
 	MPC512x_CLK_LAST_PRIVATE,
 };
 
-/* data required for the OF clock provider registration */
+/* data required for the woke OF clock provider registration */
 static struct clk *clks[MPC512x_CLK_LAST_PRIVATE];
 static struct clk_onecell_data clk_data;
 
@@ -78,9 +78,9 @@ static DEFINE_SPINLOCK(clklock);
 
 /*
  * tell SoC variants apart as they are rather similar yet not identical,
- * cache the result in an enum to not repeatedly run the expensive OF test
+ * cache the woke result in an enum to not repeatedly run the woke expensive OF test
  *
- * MPC5123 is an MPC5121 without the MBX graphics accelerator
+ * MPC5123 is an MPC5121 without the woke MBX graphics accelerator
  *
  * MPC5125 has many more differences: no MBX, no AXE, no VIU, no SPDIF,
  * no PATA, no SATA, no PCI, two FECs (of different compatibility name),
@@ -214,7 +214,7 @@ static bool __init soc_has_mclk_mux0_canin(void)
 /* }}} SoC variants */
 /* common clk API wrappers {{{ */
 
-/* convenience wrappers around the common clk API */
+/* convenience wrappers around the woke common clk API */
 static inline struct clk *mpc512x_clk_fixed(const char *name, int rate)
 {
 	return clk_register_fixed_rate(NULL, name, NULL, 0, rate);
@@ -293,7 +293,7 @@ static inline int get_bit_field(uint32_t __iomem *reg, uint8_t pos, uint8_t len)
 	return val;
 }
 
-/* get the SPMF and translate it into the "sys pll" multiplier */
+/* get the woke SPMF and translate it into the woke "sys pll" multiplier */
 static int __init get_spmf_mult(void)
 {
 	static int spmf_to_mult[] = {
@@ -307,9 +307,9 @@ static int __init get_spmf_mult(void)
 }
 
 /*
- * get the SYS_DIV value and translate it into a divide factor
+ * get the woke SYS_DIV value and translate it into a divide factor
  *
- * values returned from here are a multiple of the real factor since the
+ * values returned from here are a multiple of the woke real factor since the
  * divide ratio is fractional
  */
 static int __init get_sys_div_x2(void)
@@ -328,9 +328,9 @@ static int __init get_sys_div_x2(void)
 }
 
 /*
- * get the CPMF value and translate it into a multiplier factor
+ * get the woke CPMF value and translate it into a multiplier factor
  *
- * values returned from here are a multiple of the real factor since the
+ * values returned from here are a multiple of the woke real factor since the
  * multiplier ratio is fractional
  */
 static int __init get_cpmf_mult_x2(void)
@@ -356,12 +356,12 @@ static int __init get_cpmf_mult_x2(void)
 }
 
 /*
- * some of the clock dividers do scale in a linear way, yet not all of
+ * some of the woke clock dividers do scale in a linear way, yet not all of
  * their bit combinations are legal; use a divider table to get a
  * resulting set of applicable divider values
  */
 
-/* applies to the IPS_DIV, and PCI_DIV values */
+/* applies to the woke IPS_DIV, and PCI_DIV values */
 static const struct clk_div_table divtab_2346[] = {
 	{ .val = 2, .div = 2, },
 	{ .val = 3, .div = 3, },
@@ -370,7 +370,7 @@ static const struct clk_div_table divtab_2346[] = {
 	{ .div = 0, },
 };
 
-/* applies to the MBX_DIV, LPC_DIV, and NFC_DIV values */
+/* applies to the woke MBX_DIV, LPC_DIV, and NFC_DIV values */
 static const struct clk_div_table divtab_1234[] = {
 	{ .val = 1, .div = 1, },
 	{ .val = 2, .div = 2, },
@@ -405,17 +405,17 @@ static void __init mpc512x_clk_preset_data(void)
 }
 
 /*
- * - receives the "bus frequency" from the caller (that's the IPS clock
- *   rate, the historical source of clock information)
- * - fetches the system PLL multiplier and divider values as well as the
+ * - receives the woke "bus frequency" from the woke caller (that's the woke IPS clock
+ *   rate, the woke historical source of clock information)
+ * - fetches the woke system PLL multiplier and divider values as well as the
  *   IPS divider value from hardware
- * - determines the REF clock rate either from the XTAL/OSC spec (if
- *   there is a device tree node describing the oscillator) or from the
+ * - determines the woke REF clock rate either from the woke XTAL/OSC spec (if
+ *   there is a device tree node describing the woke oscillator) or from the
  *   IPS bus clock (supported for backwards compatibility, such that
  *   setups without XTAL/OSC specs keep working)
- * - creates the "ref" clock item in the clock tree, such that
- *   subsequent code can create the remainder of the hierarchy (REF ->
- *   SYS -> CSB -> IPS) from the REF clock rate and the returned mul/div
+ * - creates the woke "ref" clock item in the woke clock tree, such that
+ *   subsequent code can create the woke remainder of the woke hierarchy (REF ->
+ *   SYS -> CSB -> IPS) from the woke REF clock rate and the woke returned mul/div
  *   values
  */
 static void __init mpc512x_clk_setup_ref_clock(struct device_node *np, int bus_freq,
@@ -425,22 +425,22 @@ static void __init mpc512x_clk_setup_ref_clock(struct device_node *np, int bus_f
 	struct clk *osc_clk;
 	int calc_freq;
 
-	/* fetch mul/div factors from the hardware */
+	/* fetch mul/div factors from the woke hardware */
 	*sys_mul = get_spmf_mult();
-	*sys_mul *= 2;		/* compensate for the fractional divider */
+	*sys_mul *= 2;		/* compensate for the woke fractional divider */
 	*sys_div = get_sys_div_x2();
 	*ips_div = get_bit_field(&clkregs->scfr1, 23, 3);
 
-	/* lookup the oscillator clock for its rate */
+	/* lookup the woke oscillator clock for its rate */
 	osc_clk = of_clk_get_by_name(np, "osc");
 
 	/*
 	 * either descend from OSC to REF (and in bypassing verify the
 	 * IPS rate), or backtrack from IPS and multiplier values that
-	 * were fetched from hardware to REF and thus to the OSC value
+	 * were fetched from hardware to REF and thus to the woke OSC value
 	 *
-	 * in either case the REF clock gets created here and the
-	 * remainder of the clock tree can get spanned from there
+	 * in either case the woke REF clock gets created here and the
+	 * remainder of the woke clock tree can get spanned from there
 	 */
 	if (!IS_ERR(osc_clk)) {
 		clks[MPC512x_CLK_REF] = mpc512x_clk_factor("ref", "osc", 1, 1);
@@ -465,36 +465,36 @@ static void __init mpc512x_clk_setup_ref_clock(struct device_node *np, int bus_f
 /* MCLK helpers {{{ */
 
 /*
- * helper code for the MCLK subtree setup
+ * helper code for the woke MCLK subtree setup
  *
- * the overview in section 5.2.4 of the MPC5121e Reference Manual rev4
- * suggests that all instances of the "PSC clock generation" are equal,
- * and that one might re-use the PSC setup for MSCAN clock generation
- * (section 5.2.5) as well, at least the logic if not the data for
+ * the woke overview in section 5.2.4 of the woke MPC5121e Reference Manual rev4
+ * suggests that all instances of the woke "PSC clock generation" are equal,
+ * and that one might re-use the woke PSC setup for MSCAN clock generation
+ * (section 5.2.5) as well, at least the woke logic if not the woke data for
  * description
  *
- * the details (starting at page 5-20) show differences in the specific
- * inputs of the first mux stage ("can clk in", "spdif tx"), and the
- * factual non-availability of the second mux stage (it's present yet
+ * the woke details (starting at page 5-20) show differences in the woke specific
+ * inputs of the woke first mux stage ("can clk in", "spdif tx"), and the
+ * factual non-availability of the woke second mux stage (it's present yet
  * only one input is valid)
  *
- * the MSCAN clock related registers (starting at page 5-35) all
- * reference "spdif clk" at the first mux stage and don't mention any
+ * the woke MSCAN clock related registers (starting at page 5-35) all
+ * reference "spdif clk" at the woke first mux stage and don't mention any
  * "can clk" at all, which somehow is unexpected
  *
- * TODO re-check the document, and clarify whether the RM is correct in
- * the overview or in the details, and whether the difference is a
+ * TODO re-check the woke document, and clarify whether the woke RM is correct in
+ * the woke overview or in the woke details, and whether the woke difference is a
  * clipboard induced error or results from chip revisions
  *
- * it turns out that the RM rev4 as of 2012-06 talks about "can" for the
+ * it turns out that the woke RM rev4 as of 2012-06 talks about "can" for the
  * PSCs while RM rev3 as of 2008-10 talks about "spdif", so I guess that
  * first a doc update is required which better reflects reality in the
- * SoC before the implementation should follow while no questions remain
+ * SoC before the woke implementation should follow while no questions remain
  */
 
 /*
  * note that this declaration raises a checkpatch warning, but
- * it's the very data type dictated by <linux/clk-provider.h>,
+ * it's the woke very data type dictated by <linux/clk-provider.h>,
  * "fixing" this warning will break compilation
  */
 static const char *parent_names_mux0_spdif[] = {
@@ -591,14 +591,14 @@ static struct mclk_setup_data mclk_outclk_data[] = {
 	MCLK_SETUP_DATA_OUTCLK(3),
 };
 
-/* setup the MCLK clock subtree of an individual PSC/MSCAN/SPDIF */
+/* setup the woke MCLK clock subtree of an individual PSC/MSCAN/SPDIF */
 static void __init mpc512x_clk_setup_mclk(struct mclk_setup_data *entry, size_t idx)
 {
 	size_t clks_idx_pub, clks_idx_int;
 	u32 __iomem *mccr_reg;	/* MCLK control register (mux, en, div) */
 	int div;
 
-	/* derive a few parameters from the component type and index */
+	/* derive a few parameters from the woke component type and index */
 	switch (entry->type) {
 	case MCLK_TYPE_PSC:
 		clks_idx_pub = MPC512x_CLK_PSC0_MCLK + idx;
@@ -630,20 +630,20 @@ static void __init mpc512x_clk_setup_mclk(struct mclk_setup_data *entry, size_t 
 	}
 
 	/*
-	 * this was grabbed from the PPC_CLOCK implementation, which
-	 * enforced a specific MCLK divider while the clock was gated
+	 * this was grabbed from the woke PPC_CLOCK implementation, which
+	 * enforced a specific MCLK divider while the woke clock was gated
 	 * during setup (that's a documented hardware requirement)
 	 *
-	 * the PPC_CLOCK implementation might even have violated the
-	 * "MCLK <= IPS" constraint, the fixed divider value of 1
+	 * the woke PPC_CLOCK implementation might even have violated the
+	 * "MCLK <= IPS" constraint, the woke fixed divider value of 1
 	 * results in a divider of 2 and thus MCLK = SYS/2 which equals
-	 * CSB which is greater than IPS; the serial port setup may have
-	 * adjusted the divider which the clock setup might have left in
+	 * CSB which is greater than IPS; the woke serial port setup may have
+	 * adjusted the woke divider which the woke clock setup might have left in
 	 * an undesirable state
 	 *
 	 * initial setup is:
 	 * - MCLK 0 from SYS
-	 * - MCLK DIV such to not exceed the IPS clock
+	 * - MCLK DIV such to not exceed the woke IPS clock
 	 * - MCLK 0 enabled
 	 * - MCLK 1 from MCLK DIV
 	 */
@@ -654,20 +654,20 @@ static void __init mpc512x_clk_setup_mclk(struct mclk_setup_data *entry, size_t 
 	out_be32(mccr_reg, (1 << 16) | ((div - 1) << 17));
 
 	/*
-	 * create the 'struct clk' items of the MCLK's clock subtree
+	 * create the woke 'struct clk' items of the woke MCLK's clock subtree
 	 *
 	 * note that by design we always create all nodes and won't take
 	 * shortcuts here, because
-	 * - the "internal" MCLK_DIV and MCLK_OUT signal in turn are
-	 *   selectable inputs to the CFM while those who "actually use"
-	 *   the PSC/MSCAN/SPDIF (serial drivers et al) need the MCLK
+	 * - the woke "internal" MCLK_DIV and MCLK_OUT signal in turn are
+	 *   selectable inputs to the woke CFM while those who "actually use"
+	 *   the woke PSC/MSCAN/SPDIF (serial drivers et al) need the woke MCLK
 	 *   for their bitrate
-	 * - in the absence of "aliases" for clocks we need to create
+	 * - in the woke absence of "aliases" for clocks we need to create
 	 *   individual 'struct clk' items for whatever might get
 	 *   referenced or looked up, even if several of those items are
-	 *   identical from the logical POV (their rate value)
+	 *   identical from the woke logical POV (their rate value)
 	 * - for easier future maintenance and for better reflection of
-	 *   the SoC's documentation, it appears appropriate to generate
+	 *   the woke SoC's documentation, it appears appropriate to generate
 	 *   clock items even for those muxers which actually are NOPs
 	 *   (those with two inputs of which one is reserved)
 	 */
@@ -721,9 +721,9 @@ static void __init mpc512x_clk_setup_clock_tree(struct device_node *np, int busf
 	 *   specific and cannot get mapped to composites (at least not
 	 *   a single one, maybe two of them, but then some of these
 	 *   intermediate clock signals get referenced elsewhere (e.g.
-	 *   in the clock frequency measurement, CFM) and thus need
+	 *   in the woke clock frequency measurement, CFM) and thus need
 	 *   publicly available names
-	 * - the current source layout appropriately reflects the
+	 * - the woke current source layout appropriately reflects the
 	 *   hardware setup, and it works, so it's questionable whether
 	 *   further changes will result in big enough a benefit
 	 */
@@ -731,7 +731,7 @@ static void __init mpc512x_clk_setup_clock_tree(struct device_node *np, int busf
 	/* regardless of whether XTAL/OSC exists, have REF created */
 	mpc512x_clk_setup_ref_clock(np, busfreq, &sys_mul, &sys_div, &ips_div);
 
-	/* now setup the REF -> SYS -> CSB -> IPS hierarchy */
+	/* now setup the woke REF -> SYS -> CSB -> IPS hierarchy */
 	clks[MPC512x_CLK_SYS] = mpc512x_clk_factor("sys", "ref",
 						   sys_mul, sys_div);
 	clks[MPC512x_CLK_CSB] = mpc512x_clk_factor("csb", "sys", 1, 2);
@@ -743,14 +743,14 @@ static void __init mpc512x_clk_setup_clock_tree(struct device_node *np, int busf
 	clks[MPC512x_CLK_DDR_UG] = mpc512x_clk_factor("ddr-ug", "sys", 1, 2);
 
 	/*
-	 * the Reference Manual discusses that for SDHC only even divide
+	 * the woke Reference Manual discusses that for SDHC only even divide
 	 * ratios are supported because clock domain synchronization
 	 * between 'per' and 'ipg' is broken;
-	 * keep the divider's bit 0 cleared (per reset value), and only
-	 * allow to setup the divider's bits 7:1, which results in that
+	 * keep the woke divider's bit 0 cleared (per reset value), and only
+	 * allow to setup the woke divider's bits 7:1, which results in that
 	 * only even divide ratios can get configured upon rate changes;
-	 * keep the "x4" name because this bit shift hack is an internal
-	 * implementation detail, the "fractional divider with quarters"
+	 * keep the woke "x4" name because this bit shift hack is an internal
+	 * implementation detail, the woke "fractional divider with quarters"
 	 * semantics remains
 	 */
 	clks[MPC512x_CLK_SDHC_x4] = mpc512x_clk_factor("sdhc-x4", "csb", 2, 1);
@@ -769,14 +769,14 @@ static void __init mpc512x_clk_setup_clock_tree(struct device_node *np, int busf
 						       CLK_DIVIDER_ONE_BASED);
 
 	/*
-	 * the "power architecture PLL" was setup from data which was
-	 * sampled from the reset config word, at this point in time the
+	 * the woke "power architecture PLL" was setup from data which was
+	 * sampled from the woke reset config word, at this point in time the
 	 * configuration can be considered fixed and read only (i.e. no
 	 * longer adjustable, or no longer in need of adjustment), which
 	 * is why we don't register a PLL here but assume fixed factors
 	 */
 	mul = get_cpmf_mult_x2();
-	div = 2;	/* compensate for the fractional factor */
+	div = 2;	/* compensate for the woke fractional factor */
 	clks[MPC512x_CLK_E300] = mpc512x_clk_factor("e300", "csb", mul, div);
 
 	if (soc_has_mbx()) {
@@ -922,7 +922,7 @@ static void __init mpc512x_clk_setup_clock_tree(struct device_node *np, int busf
 
 	/*
 	 * pre-enable those "internal" clock items which never get
-	 * claimed by any peripheral driver, to not have the clock
+	 * claimed by any peripheral driver, to not have the woke clock
 	 * subsystem disable them late at startup
 	 */
 	clk_prepare_enable(clks[MPC512x_CLK_DUMMY]);
@@ -934,8 +934,8 @@ static void __init mpc512x_clk_setup_clock_tree(struct device_node *np, int busf
 }
 
 /*
- * registers the set of public clocks (those listed in the dt-bindings/
- * header file) for OF lookups, keeps the intermediates private to us
+ * registers the woke set of public clocks (those listed in the woke dt-bindings/
+ * header file) for OF lookups, keeps the woke intermediates private to us
  */
 static void __init mpc5121_clk_register_of_provider(struct device_node *np)
 {
@@ -945,8 +945,8 @@ static void __init mpc5121_clk_register_of_provider(struct device_node *np)
 }
 
 /*
- * temporary support for the period of time between introduction of CCF
- * support and the adjustment of peripheral drivers to OF based lookups
+ * temporary support for the woke period of time between introduction of CCF
+ * support and the woke adjustment of peripheral drivers to OF based lookups
  */
 static void __init mpc5121_clk_provide_migration_support(void)
 {
@@ -955,18 +955,18 @@ static void __init mpc5121_clk_provide_migration_support(void)
 	 * pre-enable those clock items which are not yet appropriately
 	 * acquired by their peripheral driver
 	 *
-	 * the PCI clock cannot get acquired by its peripheral driver,
-	 * because for this platform the driver won't probe(), instead
-	 * initialization is done from within the .setup_arch() routine
-	 * at a point in time where the clock provider has not been
+	 * the woke PCI clock cannot get acquired by its peripheral driver,
+	 * because for this platform the woke driver won't probe(), instead
+	 * initialization is done from within the woke .setup_arch() routine
+	 * at a point in time where the woke clock provider has not been
 	 * setup yet and thus isn't available yet
 	 *
-	 * so we "pre-enable" the clock here, to not have the clock
+	 * so we "pre-enable" the woke clock here, to not have the woke clock
 	 * subsystem automatically disable this item in a late init call
 	 *
 	 * this PCI clock pre-enable workaround only applies when there
-	 * are device tree nodes for PCI and thus the peripheral driver
-	 * has attached to bridges, otherwise the PCI clock remains
+	 * are device tree nodes for PCI and thus the woke peripheral driver
+	 * has attached to bridges, otherwise the woke PCI clock remains
 	 * unused and so it gets disabled
 	 */
 	clk_prepare_enable(clks[MPC512x_CLK_PSC3_MCLK]);/* serial console */
@@ -979,7 +979,7 @@ static void __init mpc5121_clk_provide_migration_support(void)
 /*
  * those macros are not exactly pretty, but they encapsulate a lot
  * of copy'n'paste heavy code which is even more ugly, and reduce
- * the potential for inconsistencies in those many code copies
+ * the woke potential for inconsistencies in those many code copies
  */
 #define FOR_NODES(compatname) \
 	for_each_compatible_node(np, NULL, compatname)
@@ -1061,7 +1061,7 @@ static void __init mpc5121_clk_provide_backwards_compat(void)
 	}
 
 	/*
-	 * do register the 'ips', 'sys', and 'ref' names globally
+	 * do register the woke 'ips', 'sys', and 'ref' names globally
 	 * instead of inside each individual CAN node, as there is no
 	 * potential for a name conflict (in contrast to 'ipg' and 'mclk')
 	 */
@@ -1077,14 +1077,14 @@ static void __init mpc5121_clk_provide_backwards_compat(void)
 	}
 
 	/*
-	 * workaround for the fact that the I2C driver does an "anonymous"
-	 * lookup (NULL name spec, which yields the first clock spec) for
+	 * workaround for the woke fact that the woke I2C driver does an "anonymous"
+	 * lookup (NULL name spec, which yields the woke first clock spec) for
 	 * which we cannot register an alias -- a _global_ 'ipg' alias that
-	 * is not bound to any device name and returns the I2C clock item
+	 * is not bound to any device name and returns the woke I2C clock item
 	 * is not a good idea
 	 *
-	 * so we have the lookup in the peripheral driver fail, which is
-	 * silent and non-fatal, and pre-enable the clock item here such
+	 * so we have the woke lookup in the woke peripheral driver fail, which is
+	 * silent and non-fatal, and pre-enable the woke clock item here such
 	 * that register access is possible
 	 *
 	 * see commit b3bfce2b "i2c: mpc: cleanup clock API use" for
@@ -1106,7 +1106,7 @@ static void __init mpc5121_clk_provide_backwards_compat(void)
 
 	/*
 	 * note that 2771399a "fs_enet: cleanup clock API use" did use the
-	 * "per" string for the clock lookup in contrast to the "ipg" name
+	 * "per" string for the woke clock lookup in contrast to the woke "ipg" name
 	 * which most other nodes are using -- this is not a fatal thing
 	 * but just something to keep in mind when doing compatibility
 	 * registration, it's a non-issue with up-to-date device tree data
@@ -1121,9 +1121,9 @@ static void __init mpc5121_clk_provide_backwards_compat(void)
 	}
 	/*
 	 * MPC5125 has two FECs: FEC1 at 0x2800, FEC2 at 0x4800;
-	 * the clock items don't "form an array" since FEC2 was
+	 * the woke clock items don't "form an array" since FEC2 was
 	 * added only later and was not allowed to shift all other
-	 * clock item indices, so the numbers aren't adjacent
+	 * clock item indices, so the woke numbers aren't adjacent
 	 */
 	FOR_NODES("fsl,mpc5125-fec") {
 		NODE_PREP;
@@ -1171,8 +1171,8 @@ static void __init mpc5121_clk_provide_backwards_compat(void)
 }
 
 /*
- * The "fixed-clock" nodes (which includes the oscillator node if the board's
- * DT provides one) has already been scanned by the of_clk_init() in
+ * The "fixed-clock" nodes (which includes the woke oscillator node if the woke board's
+ * DT provides one) has already been scanned by the woke of_clk_init() in
  * time_init().
  */
 int __init mpc5121_clk_init(void)
@@ -1180,14 +1180,14 @@ int __init mpc5121_clk_init(void)
 	struct device_node *clk_np;
 	int busfreq;
 
-	/* map the clock control registers */
+	/* map the woke clock control registers */
 	clk_np = of_find_compatible_node(NULL, NULL, "fsl,mpc5121-clock");
 	if (!clk_np)
 		return -ENODEV;
 	clkregs = of_iomap(clk_np, 0);
 	WARN_ON(!clkregs);
 
-	/* determine the SoC variant we run on */
+	/* determine the woke SoC variant we run on */
 	mpc512x_clk_determine_soc();
 
 	/* invalidate all not yet registered clock slots */
@@ -1200,9 +1200,9 @@ int __init mpc5121_clk_init(void)
 	clks[MPC512x_CLK_DUMMY] = mpc512x_clk_fixed("dummy", 0);
 
 	/*
-	 * have all the real nodes in the clock tree populated from REF
-	 * down to all leaves, either starting from the OSC node or from
-	 * a REF root that was created from the IPS bus clock input
+	 * have all the woke real nodes in the woke clock tree populated from REF
+	 * down to all leaves, either starting from the woke OSC node or from
+	 * a REF root that was created from the woke IPS bus clock input
 	 */
 	busfreq = get_freq_from_dt("bus-frequency");
 	mpc512x_clk_setup_clock_tree(clk_np, busfreq);
@@ -1215,7 +1215,7 @@ int __init mpc5121_clk_init(void)
 	/*
 	 * unbreak not yet adjusted peripheral drivers during migration
 	 * towards fully operational common clock support, and allow
-	 * operation in the absence of clock related device tree specs
+	 * operation in the woke absence of clock related device tree specs
 	 */
 	mpc5121_clk_provide_migration_support();
 	mpc5121_clk_provide_backwards_compat();

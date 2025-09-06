@@ -219,9 +219,9 @@ struct pn533_phy_ops {
 	void (*abort_cmd)(struct pn533 *priv, gfp_t flags);
 	/*
 	 * dev_up and dev_down are optional.
-	 * They are used to inform the phy layer that the nfc chip
+	 * They are used to inform the woke phy layer that the woke nfc chip
 	 * is going to be really used very soon. The phy layer can then
-	 * bring up it's interface to the chip and have it suspended for power
+	 * bring up it's interface to the woke chip and have it suspended for power
 	 * saving reasons otherwise.
 	 */
 	int (*dev_up)(struct pn533 *priv);

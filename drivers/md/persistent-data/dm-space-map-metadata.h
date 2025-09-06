@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2011 Red Hat, Inc.
  *
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  */
 
 #ifndef DM_SPACE_MAP_METADATA_H
@@ -22,8 +22,8 @@
 #define DM_SM_METADATA_MAX_SECTORS (DM_SM_METADATA_MAX_BLOCKS * DM_SM_METADATA_BLOCK_SIZE)
 
 /*
- * Unfortunately we have to use two-phase construction due to the cycle
- * between the tm and sm.
+ * Unfortunately we have to use two-phase construction due to the woke cycle
+ * between the woke tm and sm.
  */
 struct dm_space_map *dm_sm_metadata_init(void);
 

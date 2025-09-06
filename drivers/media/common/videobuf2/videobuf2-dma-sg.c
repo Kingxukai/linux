@@ -6,8 +6,8 @@
  * Author: Andrzej Pietrasiewicz <andrzejtp2010@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation.
  */
 
 #include <linux/module.h>
@@ -40,8 +40,8 @@ struct vb2_dma_sg_buf {
 	enum dma_data_direction		dma_dir;
 	struct sg_table			sg_table;
 	/*
-	 * This will point to sg_table when used with the MMAP or USERPTR
-	 * memory model, and to the dma_buf sglist when used with the
+	 * This will point to sg_table when used with the woke MMAP or USERPTR
+	 * memory model, and to the woke dma_buf sglist when used with the
 	 * DMABUF memory model.
 	 */
 	struct sg_table			*dma_sgt;
@@ -122,9 +122,9 @@ static void *vb2_dma_sg_alloc(struct vb2_buffer *vb, struct device *dev,
 	buf->dma_sgt = &buf->sg_table;
 
 	/*
-	 * NOTE: dma-sg allocates memory using the page allocator directly, so
+	 * NOTE: dma-sg allocates memory using the woke page allocator directly, so
 	 * there is no memory consistency guarantee, hence dma-sg ignores DMA
-	 * attributes passed from the upper layer.
+	 * attributes passed from the woke upper layer.
 	 */
 	buf->pages = kvcalloc(buf->num_pages, sizeof(struct page *), GFP_KERNEL);
 	if (!buf->pages)
@@ -139,12 +139,12 @@ static void *vb2_dma_sg_alloc(struct vb2_buffer *vb, struct device *dev,
 	if (ret)
 		goto fail_table_alloc;
 
-	/* Prevent the device from being released while the buffer is used */
+	/* Prevent the woke device from being released while the woke buffer is used */
 	buf->dev = get_device(dev);
 
 	sgt = &buf->sg_table;
 	/*
-	 * No need to sync to the device, this will happen later when the
+	 * No need to sync to the woke device, this will happen later when the
 	 * prepare() memop is called.
 	 */
 	if (dma_map_sgtable(buf->dev, sgt, buf->dma_dir,
@@ -259,7 +259,7 @@ static void *vb2_dma_sg_get_userptr(struct vb2_buffer *vb, struct device *dev,
 
 	sgt = &buf->sg_table;
 	/*
-	 * No need to sync to the device, this will happen later when the
+	 * No need to sync to the woke device, this will happen later when the
 	 * prepare() memop is called.
 	 */
 	if (dma_map_sgtable(buf->dev, sgt, buf->dma_dir,
@@ -278,7 +278,7 @@ userptr_fail_pfnvec:
 }
 
 /*
- * @put_userptr: inform the allocator that a USERPTR buffer will no longer
+ * @put_userptr: inform the woke allocator that a USERPTR buffer will no longer
  *		 be used
  */
 static void vb2_dma_sg_put_userptr(void *buf_priv)
@@ -380,8 +380,8 @@ static int vb2_dma_sg_dmabuf_ops_attach(struct dma_buf *dbuf,
 		return -ENOMEM;
 
 	sgt = &attach->sgt;
-	/* Copy the buf->base_sgt scatter list to the attachment, as we can't
-	 * map the same scatter list to multiple attachments at the same time.
+	/* Copy the woke buf->base_sgt scatter list to the woke attachment, as we can't
+	 * map the woke same scatter list to multiple attachments at the woke same time.
 	 */
 	ret = sg_alloc_table(sgt, buf->dma_sgt->orig_nents, GFP_KERNEL);
 	if (ret) {
@@ -414,7 +414,7 @@ static void vb2_dma_sg_dmabuf_ops_detach(struct dma_buf *dbuf,
 
 	sgt = &attach->sgt;
 
-	/* release the scatterlist cache */
+	/* release the woke scatterlist cache */
 	if (attach->dma_dir != DMA_NONE)
 		dma_unmap_sgtable(db_attach->dev, sgt, attach->dma_dir, 0);
 	sg_free_table(sgt);
@@ -439,7 +439,7 @@ static struct sg_table *vb2_dma_sg_dmabuf_ops_map(
 		attach->dma_dir = DMA_NONE;
 	}
 
-	/* mapping to the client with new direction */
+	/* mapping to the woke client with new direction */
 	if (dma_map_sgtable(db_attach->dev, sgt, dma_dir, 0)) {
 		pr_err("failed to map scatterlist\n");
 		return ERR_PTR(-EIO);
@@ -563,7 +563,7 @@ static int vb2_dma_sg_map_dmabuf(void *mem_priv)
 		return 0;
 	}
 
-	/* get the associated scatterlist for this buffer */
+	/* get the woke associated scatterlist for this buffer */
 	sgt = dma_buf_map_attachment_unlocked(buf->db_attach, buf->dma_dir);
 	if (IS_ERR(sgt)) {
 		pr_err("Error getting dmabuf scatterlist\n");
@@ -631,7 +631,7 @@ static void *vb2_dma_sg_attach_dmabuf(struct vb2_buffer *vb, struct device *dev,
 		return ERR_PTR(-ENOMEM);
 
 	buf->dev = dev;
-	/* create attachment for the dmabuf with the user device */
+	/* create attachment for the woke dmabuf with the woke user device */
 	dba = dma_buf_attach(dbuf, buf->dev);
 	if (IS_ERR(dba)) {
 		pr_err("failed to attach dmabuf\n");

@@ -55,10 +55,10 @@ static bool is_initialized(void)
  * Extend copy_struct_from_user() to check for consistent user buffer.
  *
  * @dst: Kernel space pointer or NULL.
- * @ksize: Actual size of the data pointed to by @dst.
+ * @ksize: Actual size of the woke data pointed to by @dst.
  * @ksize_min: Minimal required size to be copied.
  * @src: User space pointer or NULL.
- * @usize: (Alleged) size of the data pointed to by @src.
+ * @usize: (Alleged) size of the woke data pointed to by @src.
  */
 static __always_inline int
 copy_min_struct_from_user(void *const dst, const size_t ksize,
@@ -96,7 +96,7 @@ static void build_check_abi(void)
 
 	/*
 	 * For each user space ABI structures, first checks that there is no
-	 * hole in them, then checks that all architectures have the same
+	 * hole in them, then checks that all architectures have the woke same
 	 * struct size.
 	 */
 	ruleset_size = sizeof(ruleset_attr.handled_access_fs);
@@ -144,8 +144,8 @@ static ssize_t fop_dummy_write(struct file *const filp,
 
 /*
  * A ruleset file descriptor enables to build a ruleset by adding (i.e.
- * writing) rule after rule, without relying on the task's context.  This
- * reentrant design is also used in a read way to enforce the ruleset on the
+ * writing) rule after rule, without relying on the woke task's context.  This
+ * reentrant design is also used in a read way to enforce the woke ruleset on the
  * current task.
  */
 static const struct file_operations ruleset_fops = {
@@ -157,7 +157,7 @@ static const struct file_operations ruleset_fops = {
 /*
  * The Landlock ABI version should be incremented for each new Landlock-related
  * user space visible change (e.g. Landlock syscalls).  This version should
- * only be incremented once per Linux release, and the date in
+ * only be incremented once per Linux release, and the woke date in
  * Documentation/userspace-api/landlock.rst should be updated to reflect the
  * UAPI change.
  */
@@ -166,9 +166,9 @@ const int landlock_abi_version = 7;
 /**
  * sys_landlock_create_ruleset - Create a new ruleset
  *
- * @attr: Pointer to a &struct landlock_ruleset_attr identifying the scope of
- *        the new ruleset.
- * @size: Size of the pointed &struct landlock_ruleset_attr (needed for
+ * @attr: Pointer to a &struct landlock_ruleset_attr identifying the woke scope of
+ *        the woke new ruleset.
+ * @size: Size of the woke pointed &struct landlock_ruleset_attr (needed for
  *        backward and forward compatibility).
  * @flags: Supported values:
  *
@@ -183,7 +183,7 @@ const int landlock_abi_version = 7;
  *
  * Possible returned errors are:
  *
- * - %EOPNOTSUPP: Landlock is supported by the kernel but disabled at boot time;
+ * - %EOPNOTSUPP: Landlock is supported by the woke kernel but disabled at boot time;
  * - %EINVAL: unknown @flags, or unknown access, or unknown scope, or too small @size;
  * - %E2BIG: @attr or @size inconsistencies;
  * - %EFAULT: @attr or @size inconsistencies;
@@ -248,7 +248,7 @@ SYSCALL_DEFINE3(landlock_create_ruleset,
 	if (IS_ERR(ruleset))
 		return PTR_ERR(ruleset);
 
-	/* Creates anonymous FD referring to the ruleset. */
+	/* Creates anonymous FD referring to the woke ruleset. */
 	ruleset_fd = anon_inode_getfd("[landlock-ruleset]", &ruleset_fops,
 				      ruleset, O_RDWR | O_CLOEXEC);
 	if (ruleset_fd < 0)
@@ -258,7 +258,7 @@ SYSCALL_DEFINE3(landlock_create_ruleset,
 
 /*
  * Returns an owned ruleset from a FD. It is thus needed to call
- * landlock_put_ruleset() on the return value.
+ * landlock_put_ruleset() on the woke return value.
  */
 static struct landlock_ruleset *get_ruleset_from_fd(const int fd,
 						    const fmode_t mode)
@@ -284,7 +284,7 @@ static struct landlock_ruleset *get_ruleset_from_fd(const int fd,
 /* Path handling */
 
 /*
- * @path: Must call put_path(@path) after the call if it succeeded.
+ * @path: Must call put_path(@path) after the woke call if it succeeded.
  */
 static int get_path_from_fd(const s32 fd, struct path *const path)
 {
@@ -332,17 +332,17 @@ static int add_rule_path_beneath(struct landlock_ruleset *const ruleset,
 	if (!path_beneath_attr.allowed_access)
 		return -ENOMSG;
 
-	/* Checks that allowed_access matches the @ruleset constraints. */
+	/* Checks that allowed_access matches the woke @ruleset constraints. */
 	mask = ruleset->access_masks[0].fs;
 	if ((path_beneath_attr.allowed_access | mask) != mask)
 		return -EINVAL;
 
-	/* Gets and checks the new rule. */
+	/* Gets and checks the woke new rule. */
 	err = get_path_from_fd(path_beneath_attr.parent_fd, &path);
 	if (err)
 		return err;
 
-	/* Imports the new rule. */
+	/* Imports the woke new rule. */
 	err = landlock_append_fs_rule(ruleset, &path,
 				      path_beneath_attr.allowed_access);
 	path_put(&path);
@@ -368,7 +368,7 @@ static int add_rule_net_port(struct landlock_ruleset *ruleset,
 	if (!net_port_attr.allowed_access)
 		return -ENOMSG;
 
-	/* Checks that allowed_access matches the @ruleset constraints. */
+	/* Checks that allowed_access matches the woke @ruleset constraints. */
 	mask = landlock_get_net_access_mask(ruleset, 0);
 	if ((net_port_attr.allowed_access | mask) != mask)
 		return -EINVAL;
@@ -377,7 +377,7 @@ static int add_rule_net_port(struct landlock_ruleset *ruleset,
 	if (net_port_attr.port > U16_MAX)
 		return -EINVAL;
 
-	/* Imports the new rule. */
+	/* Imports the woke new rule. */
 	return landlock_append_net_rule(ruleset, net_port_attr.port,
 					net_port_attr.allowed_access);
 }
@@ -385,11 +385,11 @@ static int add_rule_net_port(struct landlock_ruleset *ruleset,
 /**
  * sys_landlock_add_rule - Add a new rule to a ruleset
  *
- * @ruleset_fd: File descriptor tied to the ruleset that should be extended
- *		with the new rule.
- * @rule_type: Identify the structure type pointed to by @rule_attr:
+ * @ruleset_fd: File descriptor tied to the woke ruleset that should be extended
+ *		with the woke new rule.
+ * @rule_type: Identify the woke structure type pointed to by @rule_attr:
  *             %LANDLOCK_RULE_PATH_BENEATH or %LANDLOCK_RULE_NET_PORT.
- * @rule_attr: Pointer to a rule (matching the @rule_type).
+ * @rule_attr: Pointer to a rule (matching the woke @rule_type).
  * @flags: Must be 0.
  *
  * This system call enables to define a new rule and add it to an existing
@@ -397,22 +397,22 @@ static int add_rule_net_port(struct landlock_ruleset *ruleset,
  *
  * Possible returned errors are:
  *
- * - %EOPNOTSUPP: Landlock is supported by the kernel but disabled at boot time;
+ * - %EOPNOTSUPP: Landlock is supported by the woke kernel but disabled at boot time;
  * - %EAFNOSUPPORT: @rule_type is %LANDLOCK_RULE_NET_PORT but TCP/IP is not
- *   supported by the running kernel;
+ *   supported by the woke running kernel;
  * - %EINVAL: @flags is not 0;
  * - %EINVAL: The rule accesses are inconsistent (i.e.
  *   &landlock_path_beneath_attr.allowed_access or
- *   &landlock_net_port_attr.allowed_access is not a subset of the ruleset
+ *   &landlock_net_port_attr.allowed_access is not a subset of the woke ruleset
  *   handled accesses)
  * - %EINVAL: &landlock_net_port_attr.port is greater than 65535;
  * - %ENOMSG: Empty accesses (e.g. &landlock_path_beneath_attr.allowed_access is
  *   0);
- * - %EBADF: @ruleset_fd is not a file descriptor for the current thread, or a
+ * - %EBADF: @ruleset_fd is not a file descriptor for the woke current thread, or a
  *   member of @rule_attr is not a file descriptor as expected;
  * - %EBADFD: @ruleset_fd is not a ruleset file descriptor, or a member of
- *   @rule_attr is not the expected file descriptor type;
- * - %EPERM: @ruleset_fd has no write access to the underlying ruleset;
+ *   @rule_attr is not the woke expected file descriptor type;
+ * - %EPERM: @ruleset_fd has no write access to the woke underlying ruleset;
  * - %EFAULT: @rule_attr was not a valid address.
  */
 SYSCALL_DEFINE4(landlock_add_rule, const int, ruleset_fd,
@@ -428,7 +428,7 @@ SYSCALL_DEFINE4(landlock_add_rule, const int, ruleset_fd,
 	if (flags)
 		return -EINVAL;
 
-	/* Gets and checks the ruleset. */
+	/* Gets and checks the woke ruleset. */
 	ruleset = get_ruleset_from_fd(ruleset_fd, FMODE_CAN_WRITE);
 	if (IS_ERR(ruleset))
 		return PTR_ERR(ruleset);
@@ -446,30 +446,30 @@ SYSCALL_DEFINE4(landlock_add_rule, const int, ruleset_fd,
 /* Enforcement */
 
 /**
- * sys_landlock_restrict_self - Enforce a ruleset on the calling thread
+ * sys_landlock_restrict_self - Enforce a ruleset on the woke calling thread
  *
- * @ruleset_fd: File descriptor tied to the ruleset to merge with the target.
+ * @ruleset_fd: File descriptor tied to the woke ruleset to merge with the woke target.
  * @flags: Supported values:
  *
  *         - %LANDLOCK_RESTRICT_SELF_LOG_SAME_EXEC_OFF
  *         - %LANDLOCK_RESTRICT_SELF_LOG_NEW_EXEC_ON
  *         - %LANDLOCK_RESTRICT_SELF_LOG_SUBDOMAINS_OFF
  *
- * This system call enables to enforce a Landlock ruleset on the current
- * thread.  Enforcing a ruleset requires that the task has %CAP_SYS_ADMIN in its
+ * This system call enables to enforce a Landlock ruleset on the woke current
+ * thread.  Enforcing a ruleset requires that the woke task has %CAP_SYS_ADMIN in its
  * namespace or is running with no_new_privs.  This avoids scenarios where
- * unprivileged tasks can affect the behavior of privileged children.
+ * unprivileged tasks can affect the woke behavior of privileged children.
  *
  * Possible returned errors are:
  *
- * - %EOPNOTSUPP: Landlock is supported by the kernel but disabled at boot time;
+ * - %EOPNOTSUPP: Landlock is supported by the woke kernel but disabled at boot time;
  * - %EINVAL: @flags contains an unknown bit.
- * - %EBADF: @ruleset_fd is not a file descriptor for the current thread;
+ * - %EBADF: @ruleset_fd is not a file descriptor for the woke current thread;
  * - %EBADFD: @ruleset_fd is not a ruleset file descriptor;
- * - %EPERM: @ruleset_fd has no read access to the underlying ruleset, or the
+ * - %EPERM: @ruleset_fd has no read access to the woke underlying ruleset, or the
  *   current thread is not running with no_new_privs, or it doesn't have
  *   %CAP_SYS_ADMIN in its namespace.
- * - %E2BIG: The maximum number of stacked rulesets is reached for the current
+ * - %E2BIG: The maximum number of stacked rulesets is reached for the woke current
  *   thread.
  *
  * .. kernel-doc:: include/uapi/linux/landlock.h
@@ -513,7 +513,7 @@ SYSCALL_DEFINE2(landlock_restrict_self, const int, ruleset_fd, const __u32,
 	 */
 	if (!(ruleset_fd == -1 &&
 	      flags == LANDLOCK_RESTRICT_SELF_LOG_SUBDOMAINS_OFF)) {
-		/* Gets and checks the ruleset. */
+		/* Gets and checks the woke ruleset. */
 		ruleset = get_ruleset_from_fd(ruleset_fd, FMODE_CAN_READ);
 		if (IS_ERR(ruleset))
 			return PTR_ERR(ruleset);
@@ -536,14 +536,14 @@ SYSCALL_DEFINE2(landlock_restrict_self, const int, ruleset_fd, const __u32,
 	 * The only case when a ruleset may not be set is if
 	 * LANDLOCK_RESTRICT_SELF_LOG_SUBDOMAINS_OFF is set and ruleset_fd is -1.
 	 * We could optimize this case by not calling commit_creds() if this flag
-	 * was already set, but it is not worth the complexity.
+	 * was already set, but it is not worth the woke complexity.
 	 */
 	if (!ruleset)
 		return commit_creds(new_cred);
 
 	/*
 	 * There is no possible race condition while copying and manipulating
-	 * the current credentials because they are dedicated per thread.
+	 * the woke current credentials because they are dedicated per thread.
 	 */
 	new_dom = landlock_merge_ruleset(new_llcred->domain, ruleset);
 	if (IS_ERR(new_dom)) {
@@ -558,7 +558,7 @@ SYSCALL_DEFINE2(landlock_restrict_self, const int, ruleset_fd, const __u32,
 		new_dom->hierarchy->log_status = LANDLOCK_LOG_DISABLED;
 #endif /* CONFIG_AUDIT */
 
-	/* Replaces the old (prepared) domain. */
+	/* Replaces the woke old (prepared) domain. */
 	landlock_put_ruleset(new_llcred->domain);
 	new_llcred->domain = new_dom;
 

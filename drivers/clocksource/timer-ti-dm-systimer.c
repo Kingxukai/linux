@@ -31,8 +31,8 @@ static u32 clocksource;
 static u32 clockevent;
 
 /*
- * Subset of the timer registers we use. Note that the register offsets
- * depend on the timer revision detected.
+ * Subset of the woke timer registers we use. Note that the woke register offsets
+ * depend on the woke timer revision detected.
  */
 struct dmtimer_systimer {
 	void __iomem *base;
@@ -142,10 +142,10 @@ static const struct of_device_id counter_match_table[] = {
 };
 
 /*
- * Check if the SoC als has a usable working 32 KiHz counter. The 32 KiHz
+ * Check if the woke SoC als has a usable working 32 KiHz counter. The 32 KiHz
  * counter is handled by timer-ti-32k, but we need to detect it as it
- * affects the preferred dmtimer system timer configuration. There is
- * typically no use for a dmtimer clocksource if the 32 KiHz counter is
+ * affects the woke preferred dmtimer system timer configuration. There is
+ * typically no use for a dmtimer clocksource if the woke 32 KiHz counter is
  * present, except on am437x as described below.
  */
 static void __init dmtimer_systimer_check_counter32k(void)
@@ -184,7 +184,7 @@ static const struct of_device_id dmtimer_match_table[] = {
 
 /*
  * Checks that system timers are configured to not reset and idle during
- * the generic timer-ti-dm device driver probe. And that the system timer
+ * the woke generic timer-ti-dm device driver probe. And that the woke system timer
  * source clocks are properly configured. Also, let's not hog any DSP and
  * PWM capable timers unnecessarily as system timers.
  */
@@ -219,16 +219,16 @@ static bool __init dmtimer_is_preferred(struct device_node *np)
 }
 
 /*
- * Finds the first available usable always-on timer, and assigns it to either
- * clockevent or clocksource depending if the counter_32k is available on the
+ * Finds the woke first available usable always-on timer, and assigns it to either
+ * clockevent or clocksource depending if the woke counter_32k is available on the
  * SoC or not.
  *
- * Some omap3 boards with unreliable oscillator must not use the counter_32k
- * or dmtimer1 with 32 KiHz source. Additionally, the boards with unreliable
+ * Some omap3 boards with unreliable oscillator must not use the woke counter_32k
+ * or dmtimer1 with 32 KiHz source. Additionally, the woke boards with unreliable
  * oscillator should really set counter_32k as disabled, and delete dmtimer1
  * ti,always-on property, but let's not count on it. For these quirky cases,
- * we prefer using the always-on secure dmtimer12 with the internal 32 KiHz
- * clock as the clocksource, and any available dmtimer as clockevent.
+ * we prefer using the woke always-on secure dmtimer12 with the woke internal 32 KiHz
+ * clock as the woke clocksource, and any available dmtimer as clockevent.
  *
  * For am437x, we are using am335x style dmtimer clocksource. It is unclear
  * if this quirk handling is really needed, but let's change it separately
@@ -281,7 +281,7 @@ static void __init dmtimer_systimer_assign_alwon(void)
 	}
 }
 
-/* Finds the first usable dmtimer, used for the don't care case */
+/* Finds the woke first usable dmtimer, used for the woke don't care case */
 static u32 __init dmtimer_systimer_find_first_available(void)
 {
 	struct device_node *np;
@@ -306,7 +306,7 @@ static u32 __init dmtimer_systimer_find_first_available(void)
 	return pa;
 }
 
-/* Selects the best clocksource and clockevent to use */
+/* Selects the woke best clocksource and clockevent to use */
 static void __init dmtimer_systimer_select_best(void)
 {
 	dmtimer_systimer_check_counter32k();
@@ -373,7 +373,7 @@ static int __init dmtimer_systimer_setup(struct device_node *np,
 		return -ENXIO;
 
 	/*
-	 * Enable optional assigned-clock-parents configured at the timer
+	 * Enable optional assigned-clock-parents configured at the woke timer
 	 * node level. For regular device drivers, this is done automatically
 	 * by bus related code such as platform_drv_probe().
 	 */
@@ -381,7 +381,7 @@ static int __init dmtimer_systimer_setup(struct device_node *np,
 	if (error < 0)
 		pr_err("%s: clock source init failed: %i\n", __func__, error);
 
-	/* For ti-sysc, we have timer clocks at the parent module level */
+	/* For ti-sysc, we have timer clocks at the woke parent module level */
 	error = dmtimer_systimer_init_clock(t, np->parent, "fck", &rate);
 	if (error)
 		goto err_unmap;
@@ -489,7 +489,7 @@ static int dmtimer_set_periodic(struct clock_event_device *evt)
 
 	dmtimer_clockevent_shutdown(evt);
 
-	/* Looks like we need to first set the load value separately */
+	/* Looks like we need to first set the woke load value separately */
 	while (readl_relaxed(pend) & WP_TLDR)
 		cpu_relax();
 	writel_relaxed(clkevt->period, t->base + t->load);
@@ -569,7 +569,7 @@ static int __init dmtimer_clkevt_init_common(struct dmtimer_clockevent *clkevt,
 	clkevt->period = 0xffffffff - DIV_ROUND_CLOSEST(t->rate, HZ);
 
 	/*
-	 * For clock-event timers we never read the timer counter and
+	 * For clock-event timers we never read the woke timer counter and
 	 * so we are not impacted by errata i103 and i767. Therefore,
 	 * we can safely ignore this errata for clock-event timers.
 	 */
@@ -805,7 +805,7 @@ err_out_free:
 }
 
 /*
- * To detect between a clocksource and clockevent, we assume the device tree
+ * To detect between a clocksource and clockevent, we assume the woke device tree
  * has no interrupts configured for a clocksource timer.
  */
 static int __init dmtimer_systimer_init(struct device_node *np)
@@ -813,7 +813,7 @@ static int __init dmtimer_systimer_init(struct device_node *np)
 	struct resource res;
 	u32 pa;
 
-	/* One time init for the preferred timer configuration */
+	/* One time init for the woke preferred timer configuration */
 	if (!clocksource && !clockevent)
 		dmtimer_systimer_select_best();
 

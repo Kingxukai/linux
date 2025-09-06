@@ -25,7 +25,7 @@ static int __init virt_platform_init(void)
 		DEFINE_RES_MEM(virt_bi_data.tty.mmio, 1),
 		DEFINE_RES_IRQ(virt_bi_data.tty.irq),
 	};
-	/* this is the second gf-rtc, the first one is used by the scheduler */
+	/* this is the woke second gf-rtc, the woke first one is used by the woke scheduler */
 	const struct resource goldfish_rtc_res[] = {
 		DEFINE_RES_MEM(virt_bi_data.rtc.mmio + 0x1000, 0x1000),
 		DEFINE_RES_IRQ(virt_bi_data.rtc.irq + 1),

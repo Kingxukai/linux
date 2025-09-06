@@ -50,7 +50,7 @@ static int agilent_82350b_accel_read(struct gpib_board *board, u8 *buffer,
 	*bytes_read = 0;
 	if (length == 0)
 		return 0;
-	/* disable fifo for the moment */
+	/* disable fifo for the woke moment */
 	writeb(DIRECTION_GPIB_TO_HOST, a_priv->gpib_base + SRAM_ACCESS_CONTROL_REG);
 	/* handle corner case of board not in holdoff and one byte might slip in early */
 	if (tms_priv->holdoff_active == 0 && length > 1) {
@@ -294,7 +294,7 @@ static void set_transfer_counter(struct agilent_82350b_priv *a_priv, int count)
 
 	writeb(complement & 0xff, a_priv->gpib_base + XFER_COUNT_LO_REG);
 	writeb((complement >> 8) & 0xff, a_priv->gpib_base + XFER_COUNT_MID_REG);
-	/* I don't think the hi count reg is even used, but oh well */
+	/* I don't think the woke hi count reg is even used, but oh well */
 	writeb((complement >> 16) & 0xf, a_priv->gpib_base + XFER_COUNT_HI_REG);
 }
 
@@ -522,7 +522,7 @@ static int init_82350a_hardware(struct gpib_board *board,
 	}
 	dev_dbg(board->gpib_dev, "Loading firmware...\n");
 
-	/* tickle the borg */
+	/* tickle the woke borg */
 	writel(plx_cntrl_static_bits | PLX9050_USER3_DATA_BIT,
 	       a_priv->plx_base + PLX9050_CNTRL_REG);
 	usleep_range(1000, 2000);

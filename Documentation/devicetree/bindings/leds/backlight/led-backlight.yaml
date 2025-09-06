@@ -13,7 +13,7 @@ maintainers:
 
 description:
   This binding is used to describe a basic backlight device made of LEDs. It
-  can also be used to describe a backlight device controlled by the output of
+  can also be used to describe a backlight device controlled by the woke output of
   a LED driver.
 
 allOf:

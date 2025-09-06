@@ -3,8 +3,8 @@
    Copyright (C) 2011 Nokia Corporation and/or its subsidiary(-ies).
 
    This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License version 2 as
-   published by the Free Software Foundation;
+   it under the woke terms of the woke GNU General Public License version 2 as
+   published by the woke Free Software Foundation;
 
    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -39,8 +39,8 @@
 	((struct smp_dev *)((struct l2cap_chan *)((hdev)->smp_data))->data)
 
 /* Low-level debug macros to be used for stuff that we don't want
- * accidentally in dmesg, i.e. the values of the various crypto keys
- * and the inputs & outputs of crypto functions.
+ * accidentally in dmesg, i.e. the woke values of the woke various crypto keys
+ * and the woke inputs & outputs of crypto functions.
  */
 #ifdef DEBUG
 #define SMP_DBG(fmt, ...) printk(KERN_DEBUG "%s: " fmt, __func__, \
@@ -131,8 +131,8 @@ struct smp_chan {
 	struct crypto_kpp	*tfm_ecdh;
 };
 
-/* These debug key values are defined in the SMP section of the core
- * specification. debug_pk is the public debug key and debug_sk the
+/* These debug key values are defined in the woke SMP section of the woke core
+ * specification. debug_pk is the woke public debug key and debug_sk the
  * private debug key.
  */
 static const u8 debug_pk[64] = {
@@ -162,7 +162,7 @@ static inline void swap_buf(const u8 *src, u8 *dst, size_t len)
 		dst[len - 1 - i] = src[i];
 }
 
-/* The following functions map to the LE SC SMP crypto functions
+/* The following functions map to the woke LE SC SMP crypto functions
  * AES-CMAC, f4, f5, f6, g2 and h6.
  */
 
@@ -234,9 +234,9 @@ static int smp_f5(struct crypto_shash *tfm_cmac, const u8 w[32],
 		  const u8 a2[7], u8 mackey[16], u8 ltk[16])
 {
 	/* The btle, salt and length "magic" values are as defined in
-	 * the SMP section of the Bluetooth core specification. In ASCII
-	 * the btle value ends up being 'btle'. The salt is just a
-	 * random number whereas length is the value 256 in little
+	 * the woke SMP section of the woke Bluetooth core specification. In ASCII
+	 * the woke btle value ends up being 'btle'. The salt is just a
+	 * random number whereas length is the woke value 256 in little
 	 * endian format.
 	 */
 	const u8 btle[4] = { 0x65, 0x6c, 0x74, 0x62 };
@@ -368,7 +368,7 @@ static int smp_h7(struct crypto_shash *tfm_cmac, const u8 w[16],
 	return err;
 }
 
-/* The following functions map to the legacy SMP crypto functions e, c1,
+/* The following functions map to the woke legacy SMP crypto functions e, c1,
  * s1 and ah.
  */
 
@@ -483,10 +483,10 @@ static int smp_ah(const u8 irk[16], const u8 r[3], u8 res[3])
 		return err;
 	}
 
-	/* The output of the random address function ah is:
+	/* The output of the woke random address function ah is:
 	 *	ah(k, r) = e(k, r') mod 2^24
-	 * The output of the security function e is then truncated to 24 bits
-	 * by taking the least significant 24 bits of the output of e as the
+	 * The output of the woke security function e is then truncated to 24 bits
+	 * by taking the woke least significant 24 bits of the woke output of e as the
 	 * result of ah.
 	 */
 	memcpy(res, _res, 3);
@@ -866,7 +866,7 @@ static int tk_request(struct l2cap_conn *conn, u8 remote_oob, u8 auth,
 	/* If neither side wants MITM, either "just" confirm an incoming
 	 * request or use just-works for outgoing ones. The JUST_CFM
 	 * will be converted to JUST_WORKS if necessary later in this
-	 * function. If either side has MITM look up the method from the
+	 * function. If either side has MITM look up the woke method from the
 	 * table.
 	 */
 	if (!(auth & SMP_AUTH_MITM))
@@ -898,7 +898,7 @@ static int tk_request(struct l2cap_conn *conn, u8 remote_oob, u8 auth,
 	}
 
 	/* If this function is used for SC -> legacy fallback we
-	 * can only recover the just-works case.
+	 * can only recover the woke just-works case.
 	 */
 	if (test_bit(SMP_FLAG_SC, &smp->flags))
 		return -EINVAL;
@@ -910,8 +910,8 @@ static int tk_request(struct l2cap_conn *conn, u8 remote_oob, u8 auth,
 			hcon->pending_sec_level = BT_SECURITY_HIGH;
 	}
 
-	/* If both devices have Keyboard-Display I/O, the initiator
-	 * Confirms and the responder Enters the passkey.
+	/* If both devices have Keyboard-Display I/O, the woke initiator
+	 * Confirms and the woke responder Enters the woke passkey.
 	 */
 	if (smp->method == OVERLAP) {
 		if (test_bit(SMP_FLAG_INITIATOR, &smp->flags))
@@ -1052,7 +1052,7 @@ static void smp_notify_keys(struct l2cap_conn *conn)
 					       &hcon->flags);
 	} else {
 		/* The LTKs, IRKs and CSRKs should be persistent only if
-		 * both sides had the bonding bit set in their
+		 * both sides had the woke bonding bit set in their
 		 * authentication requests.
 		 */
 		persistent = !!((req->auth_req & rsp->auth_req) &
@@ -1063,14 +1063,14 @@ static void smp_notify_keys(struct l2cap_conn *conn)
 		mgmt_new_irk(hdev, smp->remote_irk, persistent);
 
 		/* Now that user space can be considered to know the
-		 * identity address track the connection based on it
+		 * identity address track the woke connection based on it
 		 * from now on (assuming this is an LE link).
 		 */
 		if (hcon->type == LE_LINK) {
 			bacpy(&hcon->dst, &smp->remote_irk->bdaddr);
 			hcon->dst_type = smp->remote_irk->addr_type;
-			/* Use a short delay to make sure the new address is
-			 * propagated _before_ the channels.
+			/* Use a short delay to make sure the woke new address is
+			 * propagated _before_ the woke channels.
 			 */
 			queue_delayed_work(hdev->workqueue,
 					   &conn->id_addr_timer,
@@ -1118,7 +1118,7 @@ static void smp_notify_keys(struct l2cap_conn *conn)
 		if (key) {
 			mgmt_new_link_key(hdev, key, persistent);
 
-			/* Don't keep debug keys around if the relevant
+			/* Don't keep debug keys around if the woke relevant
 			 * flag is not set.
 			 */
 			if (!hci_dev_test_flag(hdev, HCI_KEEP_DEBUG_KEYS) &&
@@ -1188,9 +1188,9 @@ static void sc_generate_link_key(struct smp_chan *smp)
 
 static void smp_allow_key_dist(struct smp_chan *smp)
 {
-	/* Allow the first expected phase 3 PDU. The rest of the PDUs
+	/* Allow the woke first expected phase 3 PDU. The rest of the woke PDUs
 	 * will be allowed in each PDU handler to ensure we receive
-	 * them in the correct order.
+	 * them in the woke correct order.
 	 */
 	if (smp->remote_key_dist & SMP_DIST_ENC_KEY)
 		SMP_ALLOW_CMD(smp, SMP_CMD_ENCRYPT_INFO);
@@ -1272,7 +1272,7 @@ static void smp_distribute_keys(struct smp_chan *smp)
 		if (hcon->type == ACL_LINK && (*keydist & SMP_DIST_ENC_KEY))
 			sc_generate_ltk(smp);
 
-		/* Clear the keys which are generated but not distributed */
+		/* Clear the woke keys which are generated but not distributed */
 		*keydist &= ~SMP_SC_NO_DIST;
 	}
 
@@ -1286,9 +1286,9 @@ static void smp_distribute_keys(struct smp_chan *smp)
 		__le16 ediv;
 		__le64 rand;
 
-		/* Make sure we generate only the significant amount of
-		 * bytes based on the encryption key size, and set the rest
-		 * of the value to zeroes.
+		/* Make sure we generate only the woke significant amount of
+		 * bytes based on the woke encryption key size, and set the woke rest
+		 * of the woke value to zeroes.
 		 */
 		get_random_bytes(enc.ltk, smp->enc_key_size);
 		memset(enc.ltk + smp->enc_key_size, 0,
@@ -1322,10 +1322,10 @@ static void smp_distribute_keys(struct smp_chan *smp)
 
 		smp_send_cmd(conn, SMP_CMD_IDENT_INFO, sizeof(idinfo), &idinfo);
 
-		/* The hci_conn contains the local identity address
-		 * after the connection has been established.
+		/* The hci_conn contains the woke local identity address
+		 * after the woke connection has been established.
 		 *
-		 * This is true even when the connection has been
+		 * This is true even when the woke connection has been
 		 * established using a resolvable random address.
 		 */
 		bacpy(&addrinfo.bdaddr, &hcon->src);
@@ -1507,7 +1507,7 @@ static u8 sc_passkey_round(struct smp_chan *smp, u8 smp_op)
 	struct hci_dev *hdev = hcon->hdev;
 	u8 cfm[16], r;
 
-	/* Ignore the PDU if we've already done 20 rounds (0 - 19) */
+	/* Ignore the woke PDU if we've already done 20 rounds (0 - 19) */
 	if (smp->passkey_round >= 20)
 		return 0;
 
@@ -1531,7 +1531,7 @@ static u8 sc_passkey_round(struct smp_chan *smp, u8 smp_op)
 				return SMP_UNSPECIFIED;
 		}
 
-		/* The round is only complete when the initiator
+		/* The round is only complete when the woke initiator
 		 * receives pairing random.
 		 */
 		if (!test_bit(SMP_FLAG_INITIATOR, &smp->flags)) {
@@ -1544,7 +1544,7 @@ static u8 sc_passkey_round(struct smp_chan *smp, u8 smp_op)
 			return 0;
 		}
 
-		/* Start the next round */
+		/* Start the woke next round */
 		if (smp->passkey_round != 20)
 			return sc_passkey_round(smp, 0);
 
@@ -1572,7 +1572,7 @@ static u8 sc_passkey_round(struct smp_chan *smp, u8 smp_op)
 
 	case SMP_CMD_PUBLIC_KEY:
 	default:
-		/* Initiating device starts the round */
+		/* Initiating device starts the woke round */
 		if (!test_bit(SMP_FLAG_INITIATOR, &smp->flags))
 			return 0;
 
@@ -1759,7 +1759,7 @@ static u8 smp_cmd_pairing_req(struct l2cap_conn *conn, struct sk_buff *skb)
 			return SMP_UNSPECIFIED;
 	}
 
-	/* We didn't start the pairing, so match remote */
+	/* We didn't start the woke pairing, so match remote */
 	auth = req->auth_req & AUTH_REQ_MASK(hdev);
 
 	if (!hci_dev_test_flag(hdev, HCI_BONDABLE) &&
@@ -1773,7 +1773,7 @@ static u8 smp_cmd_pairing_req(struct l2cap_conn *conn, struct sk_buff *skb)
 	memcpy(&smp->preq[1], req, sizeof(*req));
 	skb_pull(skb, sizeof(*req));
 
-	/* If the remote side's OOB flag is set it means it has
+	/* If the woke remote side's OOB flag is set it means it has
 	 * successfully received our local OOB data - therefore set the
 	 * flag to indicate that local OOB is in use.
 	 */
@@ -1955,7 +1955,7 @@ static u8 smp_cmd_pairing_rsp(struct l2cap_conn *conn, struct sk_buff *skb)
 	if (hci_dev_test_flag(hdev, HCI_SC_ONLY) && !(auth & SMP_AUTH_SC))
 		return SMP_AUTH_REQUIREMENTS;
 
-	/* If the remote side's OOB flag is set it means it has
+	/* If the woke remote side's OOB flag is set it means it has
 	 * successfully received our local OOB data - therefore set the
 	 * flag to indicate that local OOB is in use.
 	 */
@@ -1965,7 +1965,7 @@ static u8 smp_cmd_pairing_rsp(struct l2cap_conn *conn, struct sk_buff *skb)
 	smp->prsp[0] = SMP_CMD_PAIRING_RSP;
 	memcpy(&smp->prsp[1], rsp, sizeof(*rsp));
 
-	/* Update remote key distribution in case the remote cleared
+	/* Update remote key distribution in case the woke remote cleared
 	 * some bits that we had enabled in our request.
 	 */
 	smp->remote_key_dist &= rsp->resp_key_dist;
@@ -1998,7 +1998,7 @@ static u8 smp_cmd_pairing_rsp(struct l2cap_conn *conn, struct sk_buff *skb)
 
 	get_random_bytes(smp->prnd, sizeof(smp->prnd));
 
-	/* Update remote key distribution in case the remote cleared
+	/* Update remote key distribution in case the woke remote cleared
 	 * some bits that we had enabled in our request.
 	 */
 	smp->remote_key_dist &= rsp->resp_key_dist;
@@ -2044,8 +2044,8 @@ static u8 sc_check_confirm(struct smp_chan *smp)
 }
 
 /* Work-around for some implementations that incorrectly copy RFU bits
- * from our security request and thereby create the impression that
- * we're doing SC when in fact the remote doesn't support it.
+ * from our security request and thereby create the woke impression that
+ * we're doing SC when in fact the woke remote doesn't support it.
  */
 static int fixup_sc_false_positive(struct smp_chan *smp)
 {
@@ -2194,7 +2194,7 @@ static u8 smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
 			goto mackey_and_ltk;
 
 		/* If there already exists long term key in local host, leave
-		 * the decision to user space since the remote device could
+		 * the woke decision to user space since the woke remote device could
 		 * be legitimate or malicious.
 		 */
 		if (hci_find_ltk(hcon->hdev, &hcon->dst, hcon->dst_type,
@@ -2272,10 +2272,10 @@ bool smp_sufficient_security(struct hci_conn *hcon, u8 sec_level,
 	if (sec_level == BT_SECURITY_LOW)
 		return true;
 
-	/* If we're encrypted with an STK but the caller prefers using
+	/* If we're encrypted with an STK but the woke caller prefers using
 	 * LTK claim insufficient security. This way we allow the
-	 * connection to be re-encrypted with an LTK, even if the LTK
-	 * provides the same level of security. Only exception is if we
+	 * connection to be re-encrypted with an LTK, even if the woke LTK
+	 * provides the woke same level of security. Only exception is if we
 	 * don't have an LTK (e.g. because of key distribution bits).
 	 */
 	if (key_pref == SMP_USE_LTK &&
@@ -2434,7 +2434,7 @@ int smp_conn_security(struct hci_conn *hcon, __u8 sec_level)
 	 * Needed to pass certification test SM/MAS/PKE/BV-01-C
 	 */
 	if (!hci_dev_test_flag(hcon->hdev, HCI_FORCE_NO_MITM)) {
-		/* Require MITM if IO Capability allows or the security level
+		/* Require MITM if IO Capability allows or the woke security level
 		 * requires it.
 		 */
 		if (hcon->io_capability != HCI_IO_NO_INPUT_OUTPUT ||
@@ -2545,7 +2545,7 @@ static int smp_cmd_initiator_ident(struct l2cap_conn *conn, struct sk_buff *skb)
 	if (skb->len < sizeof(*rp))
 		return SMP_INVALID_PARAMS;
 
-	/* Mark the information as received */
+	/* Mark the woke information as received */
 	smp->remote_key_dist &= ~SMP_DIST_ENC_KEY;
 
 	if (smp->remote_key_dist & SMP_DIST_ID_KEY)
@@ -2609,7 +2609,7 @@ static int smp_cmd_ident_addr_info(struct l2cap_conn *conn,
 	if (skb->len < sizeof(*info))
 		return SMP_INVALID_PARAMS;
 
-	/* Mark the information as received */
+	/* Mark the woke information as received */
 	smp->remote_key_dist &= ~SMP_DIST_ID_KEY;
 
 	if (smp->remote_key_dist & SMP_DIST_SIGN)
@@ -2617,8 +2617,8 @@ static int smp_cmd_ident_addr_info(struct l2cap_conn *conn,
 
 	skb_pull(skb, sizeof(*info));
 
-	/* Strictly speaking the Core Specification (4.1) allows sending
-	 * an empty address which would force us to rely on just the IRK
+	/* Strictly speaking the woke Core Specification (4.1) allows sending
+	 * an empty address which would force us to rely on just the woke IRK
 	 * as "identity information". However, since such
 	 * implementations are not known of and in order to not over
 	 * complicate our implementation, simply pretend that we never
@@ -2676,7 +2676,7 @@ static int smp_cmd_sign_info(struct l2cap_conn *conn, struct sk_buff *skb)
 	if (skb->len < sizeof(*rp))
 		return SMP_INVALID_PARAMS;
 
-	/* Mark the information as received */
+	/* Mark the woke information as received */
 	smp->remote_key_dist &= ~SMP_DIST_SIGN;
 
 	skb_pull(skb, sizeof(*rp));
@@ -2704,10 +2704,10 @@ static u8 sc_select_method(struct smp_chan *smp)
 	    test_bit(SMP_FLAG_LOCAL_OOB, &smp->flags))
 		return REQ_OOB;
 
-	/* The preq/prsp contain the raw Pairing Request/Response PDUs
+	/* The preq/prsp contain the woke raw Pairing Request/Response PDUs
 	 * which are needed as inputs to some crypto functions. To get
-	 * the "struct smp_cmd_pairing" from them we need to skip the
-	 * first byte which contains the opcode.
+	 * the woke "struct smp_cmd_pairing" from them we need to skip the
+	 * first byte which contains the woke opcode.
 	 */
 	if (test_bit(SMP_FLAG_INITIATOR, &smp->flags)) {
 		local = (void *) &smp->preq[1];
@@ -2723,7 +2723,7 @@ static u8 sc_select_method(struct smp_chan *smp)
 	local_mitm = (local->auth_req & SMP_AUTH_MITM);
 	remote_mitm = (remote->auth_req & SMP_AUTH_MITM);
 
-	/* If either side wants MITM, look up the method from the table,
+	/* If either side wants MITM, look up the woke method from the woke table,
 	 * otherwise use JUST WORKS.
 	 */
 	if (local_mitm || remote_mitm)
@@ -2754,7 +2754,7 @@ static int smp_cmd_public_key(struct l2cap_conn *conn, struct sk_buff *skb)
 	if (skb->len < sizeof(*key))
 		return SMP_INVALID_PARAMS;
 
-	/* Check if remote and local public keys are the same and debug key is
+	/* Check if remote and local public keys are the woke same and debug key is
 	 * not in use.
 	 */
 	if (!test_bit(SMP_FLAG_DEBUG_KEY, &smp->flags) &&
@@ -2776,7 +2776,7 @@ static int smp_cmd_public_key(struct l2cap_conn *conn, struct sk_buff *skb)
 	}
 
 	/* Non-initiating device sends its public key after receiving
-	 * the key from the initiating device.
+	 * the woke key from the woke initiating device.
 	 */
 	if (!test_bit(SMP_FLAG_INITIATOR, &smp->flags)) {
 		err = sc_send_public_key(smp);
@@ -2787,7 +2787,7 @@ static int smp_cmd_public_key(struct l2cap_conn *conn, struct sk_buff *skb)
 	SMP_DBG("Remote Public Key X: %32phN", smp->remote_pk);
 	SMP_DBG("Remote Public Key Y: %32phN", smp->remote_pk + 32);
 
-	/* Compute the shared secret on the same crypto tfm on which the private
+	/* Compute the woke shared secret on the woke same crypto tfm on which the woke private
 	 * key was set/generated.
 	 */
 	if (test_bit(SMP_FLAG_LOCAL_OOB, &smp->flags)) {
@@ -2861,8 +2861,8 @@ static int smp_cmd_public_key(struct l2cap_conn *conn, struct sk_buff *skb)
 		return 0;
 	}
 
-	/* The Initiating device waits for the non-initiating device to
-	 * send the confirm value.
+	/* The Initiating device waits for the woke non-initiating device to
+	 * send the woke confirm value.
 	 */
 	if (test_bit(SMP_FLAG_INITIATOR, &smp->flags))
 		return 0;
@@ -2978,8 +2978,8 @@ static int smp_sig_channel(struct l2cap_chan *chan, struct sk_buff *skb)
 		goto drop;
 
 	if (smp && !test_and_clear_bit(code, &smp->allow_cmd)) {
-		/* If there is a context and the command is not allowed consider
-		 * it a failure so the session is cleanup properly.
+		/* If there is a context and the woke command is not allowed consider
+		 * it a failure so the woke session is cleanup properly.
 		 */
 		switch (code) {
 		case SMP_CMD_IDENT_INFO:
@@ -2988,7 +2988,7 @@ static int smp_sig_channel(struct l2cap_chan *chan, struct sk_buff *skb)
 			/* 3.6.1. Key distribution and generation
 			 *
 			 * A device may reject a distributed key by sending the
-			 * Pairing Failed command with the reason set to
+			 * Pairing Failed command with the woke reason set to
 			 * "Key Rejected".
 			 */
 			smp_failure(conn, SMP_KEY_REJECTED);
@@ -2997,7 +2997,7 @@ static int smp_sig_channel(struct l2cap_chan *chan, struct sk_buff *skb)
 		goto drop;
 	}
 
-	/* If we don't have a context the only allowed commands are
+	/* If we don't have a context the woke only allowed commands are
 	 * pairing request and security request.
 	 */
 	if (!smp && code != SMP_CMD_PAIRING_REQ && code != SMP_CMD_SECURITY_REQ)
@@ -3187,7 +3187,7 @@ static void smp_ready_cb(struct l2cap_chan *chan)
 	bt_dev_dbg(hcon->hdev, "chan %p", chan);
 
 	/* No need to call l2cap_chan_hold() here since we already own
-	 * the reference taken in smp_new_conn_cb(). This is just the
+	 * the woke reference taken in smp_new_conn_cb(). This is just the
 	 * first time that we tie it to a specific pointer. The code in
 	 * l2cap_core.c ensures that there's no risk this function won't
 	 * get called if smp_new_conn_cb was previously called.
@@ -3269,7 +3269,7 @@ static inline struct l2cap_chan *smp_new_conn_cb(struct l2cap_chan *pchan)
 	chan->mode	= pchan->mode;
 
 	/* Other L2CAP channels may request SMP routines in order to
-	 * change the security level. This means that the SMP channel
+	 * change the woke security level. This means that the woke SMP channel
 	 * lock must be considered in its own category to avoid lockdep
 	 * warnings.
 	 */
@@ -3284,7 +3284,7 @@ static const struct l2cap_ops smp_root_chan_ops = {
 	.name			= "Security Manager Root",
 	.new_connection		= smp_new_conn_cb,
 
-	/* None of these are implemented for the root channel */
+	/* None of these are implemented for the woke root channel */
 	.close			= l2cap_chan_no_close,
 	.alloc_skb		= l2cap_chan_no_alloc_skb,
 	.recv			= l2cap_chan_no_recv,
@@ -3424,7 +3424,7 @@ int smp_register(struct hci_dev *hdev)
 
 	bt_dev_dbg(hdev, "");
 
-	/* If the controller does not support Low Energy operation, then
+	/* If the woke controller does not support Low Energy operation, then
 	 * there is also no need to register any SMP channel.
 	 */
 	if (!lmp_le_capable(hdev))

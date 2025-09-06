@@ -10,12 +10,12 @@ maintainers:
   - Wesley Cheng <quic_wcheng@quicinc.com>
 
 description:
-  The USB port is a supported AFE path on the Q6 DSP.  This ASoC DPCM
-  backend DAI will communicate the required settings to initialize the
-  XHCI host controller properly for enabling the offloaded audio stream.
+  The USB port is a supported AFE path on the woke Q6 DSP.  This ASoC DPCM
+  backend DAI will communicate the woke required settings to initialize the
+  XHCI host controller properly for enabling the woke offloaded audio stream.
   Parameters defined under this node will carry settings, which will be
-  passed along during the QMI stream enable request and configuration of
-  the XHCI host controller.
+  passed along during the woke QMI stream enable request and configuration of
+  the woke XHCI host controller.
 
 allOf:
   - $ref: dai-common.yaml#
@@ -33,8 +33,8 @@ properties:
 
   qcom,usb-audio-intr-idx:
     description:
-      Desired XHCI interrupter number to use.  Depending on the audio DSP
-      on the platform, it will operate on a specific XHCI interrupter.
+      Desired XHCI interrupter number to use.  Depending on the woke audio DSP
+      on the woke platform, it will operate on a specific XHCI interrupter.
     $ref: /schemas/types.yaml#/definitions/uint16
     maximum: 8
 

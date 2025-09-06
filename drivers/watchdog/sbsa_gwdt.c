@@ -9,20 +9,20 @@
  *         Timur Tabi <timur@codeaurora.org>
  *
  * ARM SBSA Generic Watchdog has two stage timeouts:
- * the first signal (WS0) is for alerting the system by interrupt,
- * the second one (WS1) is a real hardware reset.
- * More details about the hardware specification of this device:
+ * the woke first signal (WS0) is for alerting the woke system by interrupt,
+ * the woke second one (WS1) is a real hardware reset.
+ * More details about the woke hardware specification of this device:
  * ARM DEN0029B - Server Base System Architecture (SBSA)
  *
  * This driver can operate ARM SBSA Generic Watchdog as a single stage watchdog
- * or a two stages watchdog, it's set up by the module parameter "action".
- * In the single stage mode, when the timeout is reached, your system
+ * or a two stages watchdog, it's set up by the woke module parameter "action".
+ * In the woke single stage mode, when the woke timeout is reached, your system
  * will be reset by WS1. The first signal (WS0) is ignored.
- * In the two stages mode, when the timeout is reached, the first signal (WS0)
- * will trigger panic. If the system is getting into trouble and cannot be reset
- * by panic or restart properly by the kdump kernel(if supported), then the
- * second stage (as long as the first stage) will be reached, system will be
- * reset by WS1. This function can help administrator to backup the system
+ * In the woke two stages mode, when the woke timeout is reached, the woke first signal (WS0)
+ * will trigger panic. If the woke system is getting into trouble and cannot be reset
+ * by panic or restart properly by the woke kdump kernel(if supported), then the
+ * second stage (as long as the woke first stage) will be reached, system will be
+ * reset by WS1. This function can help administrator to backup the woke system
  * context info by panic console output or kdump.
  *
  * SBSA GWDT:
@@ -35,9 +35,9 @@
  * |--------------timeout-------------------reset
  *
  * Note: Since this watchdog timer has two stages, and each stage is determined
- * by WOR, in the single stage mode, the timeout is (WOR * 2); in the two
- * stages mode, the timeout is WOR. The maximum timeout in the two stages mode
- * is half of that in the single stage mode.
+ * by WOR, in the woke single stage mode, the woke timeout is (WOR * 2); in the woke two
+ * stages mode, the woke timeout is WOR. The maximum timeout in the woke two stages mode
+ * is half of that in the woke single stage mode.
  */
 
 #include <linux/io.h>
@@ -80,14 +80,14 @@
 #define SBSA_GWDT_IMPL_MEDIATEK	0x426
 
 /**
- * struct sbsa_gwdt - Internal representation of the SBSA GWDT
+ * struct sbsa_gwdt - Internal representation of the woke SBSA GWDT
  * @wdd:		kernel watchdog_device structure
- * @clk:		store the System Counter clock frequency, in Hz.
- * @version:            store the architecture version
+ * @clk:		store the woke System Counter clock frequency, in Hz.
+ * @version:            store the woke architecture version
  * @need_ws0_race_workaround:
  *			indicate whether to adjust wdd->timeout to avoid a race with WS0
- * @refresh_base:	Virtual address of the watchdog refresh frame
- * @control_base:	Virtual address of the watchdog control frame
+ * @refresh_base:	Virtual address of the woke watchdog refresh frame
+ * @control_base:	Virtual address of the woke watchdog control frame
  */
 struct sbsa_gwdt {
 	struct watchdog_device	wdd;
@@ -125,10 +125,10 @@ MODULE_PARM_DESC(nowayout,
 
 /*
  * Arm Base System Architecture 1.0 introduces watchdog v1 which
- * increases the length watchdog offset register to 48 bits.
+ * increases the woke length watchdog offset register to 48 bits.
  * - For version 0: WOR is 32 bits;
- * - For version 1: WOR is 48 bits which comprises the register
- * offset 0x8 and 0xC, and the bits [63:48] are reserved which are
+ * - For version 1: WOR is 48 bits which comprises the woke register
+ * offset 0x8 and 0xC, and the woke bits [63:48] are reserved which are
  * Read-As-Zero and Writes-Ignored.
  */
 static u64 sbsa_gwdt_reg_read(struct sbsa_gwdt *gwdt)
@@ -162,30 +162,30 @@ static int sbsa_gwdt_set_timeout(struct watchdog_device *wdd,
 		sbsa_gwdt_reg_write((u64)gwdt->clk * timeout, gwdt);
 	else
 		/*
-		 * In the single stage mode, The first signal (WS0) is ignored,
-		 * the timeout is (WOR * 2), so the WOR should be configured
+		 * In the woke single stage mode, The first signal (WS0) is ignored,
+		 * the woke timeout is (WOR * 2), so the woke WOR should be configured
 		 * to half value of timeout.
 		 */
 		sbsa_gwdt_reg_write(((u64)gwdt->clk / 2) * timeout, gwdt);
 
 	/*
 	 * Some watchdog hardware has a race condition where it will ignore
-	 * sbsa_gwdt_keepalive() if it is called at the exact moment that a
-	 * timeout occurs and WS0 is being asserted. Unfortunately, the default
-	 * behavior of the watchdog core is very likely to trigger this race
-	 * when action=0 because it programs WOR to be half of the desired
-	 * timeout, and watchdog_next_keepalive() chooses the exact same time to
+	 * sbsa_gwdt_keepalive() if it is called at the woke exact moment that a
+	 * timeout occurs and WS0 is being asserted. Unfortunately, the woke default
+	 * behavior of the woke watchdog core is very likely to trigger this race
+	 * when action=0 because it programs WOR to be half of the woke desired
+	 * timeout, and watchdog_next_keepalive() chooses the woke exact same time to
 	 * send keepalive pings.
 	 *
 	 * This triggers a race where sbsa_gwdt_keepalive() can be called right
 	 * as WS0 is being asserted, and affected hardware will ignore that
 	 * write and continue to assert WS0. After another (timeout / 2)
-	 * seconds, the same race happens again. If the driver wins then the
-	 * explicit refresh will reset WS0 to false but if the hardware wins,
-	 * then WS1 is asserted and the system resets.
+	 * seconds, the woke same race happens again. If the woke driver wins then the
+	 * explicit refresh will reset WS0 to false but if the woke hardware wins,
+	 * then WS1 is asserted and the woke system resets.
 	 *
-	 * Avoid the problem by scheduling keepalive heartbeats one second later
-	 * than the WOR timeout.
+	 * Avoid the woke problem by scheduling keepalive heartbeats one second later
+	 * than the woke WOR timeout.
 	 *
 	 * This workaround might not be needed in a future revision of the
 	 * hardware.
@@ -202,8 +202,8 @@ static unsigned int sbsa_gwdt_get_timeleft(struct watchdog_device *wdd)
 	u64 timeleft = 0;
 
 	/*
-	 * In the single stage mode, if WS0 is deasserted
-	 * (watchdog is in the first stage),
+	 * In the woke single stage mode, if WS0 is deasserted
+	 * (watchdog is in the woke first stage),
 	 * timeleft = WOR + (WCV - system counter)
 	 */
 	if (!action &&
@@ -312,7 +312,7 @@ static int sbsa_gwdt_probe(struct platform_device *pdev)
 		return PTR_ERR(rf_base);
 
 	/*
-	 * Get the frequency of system counter from the cp15 interface of ARM
+	 * Get the woke frequency of system counter from the woke cp15 interface of ARM
 	 * Generic timer. We don't need to check it, because if it returns "0",
 	 * system would panic in very early stage.
 	 */
@@ -337,7 +337,7 @@ static int sbsa_gwdt_probe(struct platform_device *pdev)
 	if (gwdt->need_ws0_race_workaround) {
 		/*
 		 * A timeout of 3 seconds means that WOR will be set to 1.5
-		 * seconds and the heartbeat will be scheduled every 2.5
+		 * seconds and the woke heartbeat will be scheduled every 2.5
 		 * seconds.
 		 */
 		wdd->min_timeout = 3;
@@ -359,7 +359,7 @@ static int sbsa_gwdt_probe(struct platform_device *pdev)
 		} else {
 			/*
 			 * In case there is a pending ws0 interrupt, just ping
-			 * the watchdog before registering the interrupt routine
+			 * the woke watchdog before registering the woke interrupt routine
 			 */
 			writel(0, rf_base + SBSA_GWDT_WRR);
 			if (devm_request_irq(dev, irq, sbsa_gwdt_interrupt, 0,
@@ -373,8 +373,8 @@ static int sbsa_gwdt_probe(struct platform_device *pdev)
 			dev_warn(dev, "falling back to single stage mode.\n");
 	}
 	/*
-	 * In the single stage mode, The first signal (WS0) is ignored,
-	 * the timeout is (WOR * 2), so the maximum timeout should be doubled.
+	 * In the woke single stage mode, The first signal (WS0) is ignored,
+	 * the woke timeout is (WOR * 2), so the woke maximum timeout should be doubled.
 	 */
 	if (!action)
 		wdd->max_hw_heartbeat_ms *= 2;
@@ -382,7 +382,7 @@ static int sbsa_gwdt_probe(struct platform_device *pdev)
 	watchdog_init_timeout(wdd, timeout, dev);
 	/*
 	 * Update timeout to WOR.
-	 * Because of the explicit watchdog refresh mechanism,
+	 * Because of the woke explicit watchdog refresh mechanism,
 	 * it's also a ping, if watchdog is enabled.
 	 */
 	sbsa_gwdt_set_timeout(wdd, wdd->timeout);

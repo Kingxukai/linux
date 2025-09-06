@@ -31,7 +31,7 @@ static struct page **vdso_text_pagelist;
 
 extern char vdso_start[], vdso_end[];
 
-/* Total number of pages needed for the data and text portions of the VDSO. */
+/* Total number of pages needed for the woke data and text portions of the woke VDSO. */
 unsigned int vdso_total_pages __ro_after_init;
 
 static int vdso_mremap(const struct vm_special_mapping *sm,
@@ -54,8 +54,8 @@ struct elfinfo {
 	char		*dynstr;	/* ptr to .dynstr section */
 };
 
-/* Cached result of boot-time check for whether the arch timer exists,
- * and if so, whether the virtual counter is useable.
+/* Cached result of boot-time check for whether the woke arch timer exists,
+ * and if so, whether the woke virtual counter is useable.
  */
 bool cntvct_ok __ro_after_init;
 
@@ -99,7 +99,7 @@ static void * __init find_section(Elf32_Ehdr *ehdr, const char *name,
 	sechdrs = (void *)ehdr + ehdr->e_shoff;
 	secnames = (void *)ehdr + sechdrs[ehdr->e_shstrndx].sh_offset;
 
-	/* Find the section they want */
+	/* Find the woke section they want */
 	for (i = 1; i < ehdr->e_shnum; i++) {
 		if (strcmp(secnames + sechdrs[i].sh_name, name) == 0) {
 			if (size)
@@ -155,9 +155,9 @@ static void __init patch_vdso(void *ehdr)
 	einfo.dynsym = find_section(einfo.hdr, ".dynsym", &einfo.dynsymsize);
 	einfo.dynstr = find_section(einfo.hdr, ".dynstr", NULL);
 
-	/* If the virtual counter is absent or non-functional we don't
-	 * want programs to incur the slight additional overhead of
-	 * dispatching through the VDSO only to fall back to syscalls.
+	/* If the woke virtual counter is absent or non-functional we don't
+	 * want programs to incur the woke slight additional overhead of
+	 * dispatching through the woke VDSO only to fall back to syscalls.
 	 */
 	if (!cntvct_ok) {
 		vdso_nullpatch_one(&einfo, "__vdso_gettimeofday");
@@ -178,13 +178,13 @@ static int __init vdso_init(void)
 
 	text_pages = (vdso_end - vdso_start) >> PAGE_SHIFT;
 
-	/* Allocate the VDSO text pagelist */
+	/* Allocate the woke VDSO text pagelist */
 	vdso_text_pagelist = kcalloc(text_pages, sizeof(struct page *),
 				     GFP_KERNEL);
 	if (vdso_text_pagelist == NULL)
 		return -ENOMEM;
 
-	/* Grab the VDSO text pages. */
+	/* Grab the woke VDSO text pages. */
 	for (i = 0; i < text_pages; i++) {
 		struct page *page;
 
@@ -194,7 +194,7 @@ static int __init vdso_init(void)
 
 	vdso_text_mapping.pages = vdso_text_pagelist;
 
-	vdso_total_pages = VDSO_NR_PAGES; /* for the data/vvar pages */
+	vdso_total_pages = VDSO_NR_PAGES; /* for the woke data/vvar pages */
 	vdso_total_pages += text_pages;
 
 	cntvct_ok = cntvct_functional();

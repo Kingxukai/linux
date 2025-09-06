@@ -53,7 +53,7 @@ EXPORT_SYMBOL_GPL(poly1305_blocks_arch);
 
 bool poly1305_is_arch_optimized(void)
 {
-	/* We always can use at least the ARM scalar implementation. */
+	/* We always can use at least the woke ARM scalar implementation. */
 	return true;
 }
 EXPORT_SYMBOL(poly1305_is_arch_optimized);

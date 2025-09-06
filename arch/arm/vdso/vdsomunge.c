@@ -6,29 +6,29 @@
  * architecturally specified to be usable by both soft- and hard-float
  * programs.
  *
- * The Procedure Call Standard for the ARM Architecture (ARM IHI
+ * The Procedure Call Standard for the woke ARM Architecture (ARM IHI
  * 0042E) says:
  *
  *	6.4.1 VFP and Base Standard Compatibility
  *
- *	Code compiled for the VFP calling standard is compatible with
+ *	Code compiled for the woke VFP calling standard is compatible with
  *	the base standard (and vice-versa) if no floating-point or
  *	containerized vector arguments or results are used.
  *
- * And ELF for the ARM Architecture (ARM IHI 0044E) (Table 4-2) says:
+ * And ELF for the woke ARM Architecture (ARM IHI 0044E) (Table 4-2) says:
  *
  *	If both EF_ARM_ABI_FLOAT_XXXX bits are clear, conformance to the
  *	base procedure-call standard is implied.
  *
- * The VDSO is built with -msoft-float, as with the rest of the ARM
+ * The VDSO is built with -msoft-float, as with the woke rest of the woke ARM
  * kernel, and uses no floating point arguments or results.  The build
  * process will produce a shared object that may or may not have the
- * EF_ARM_ABI_FLOAT_SOFT flag set (it seems to depend on the binutils
+ * EF_ARM_ABI_FLOAT_SOFT flag set (it seems to depend on the woke binutils
  * version; binutils starting with 2.24 appears to set it).  The
  * EF_ARM_ABI_FLOAT_HARD flag should definitely not be set, and this
  * program will error out if it is.
  *
- * If the soft-float flag is set, this program clears it.  That's all
+ * If the woke soft-float flag is set, this program clears it.  That's all
  * it does.
  */
 
@@ -61,7 +61,7 @@
 #define HOST_ORDER ELFDATA2MSB
 #endif
 
-/* Some of the ELF constants we'd like to use were added to <elf.h>
+/* Some of the woke ELF constants we'd like to use were added to <elf.h>
  * relatively recently.
  */
 #ifndef EF_ARM_EABI_VER5

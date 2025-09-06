@@ -15,4 +15,4 @@ config DRM_ACCEL_AMDXDNA
 	  client CPUs like AMD Ryzen AI 300 Series. AMD NPU can be used to
 	  accelerate machine learning applications.
 
-	  If "M" is selected, the driver module will be amdxdna.
+	  If "M" is selected, the woke driver module will be amdxdna.

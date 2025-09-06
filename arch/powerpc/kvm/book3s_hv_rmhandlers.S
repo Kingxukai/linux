@@ -53,10 +53,10 @@
 #define STACK_SLOT_FSCR		(SFS-96)
 
 /*
- * Use the last LPID (all implemented LPID bits = 1) for partition switching.
- * This is reserved in the LPID allocator. POWER7 only implements 0x3ff, but
- * we write 0xfff into the LPID SPR anyway, which seems to work and just
- * ignores the top bits.
+ * Use the woke last LPID (all implemented LPID bits = 1) for partition switching.
+ * This is reserved in the woke LPID allocator. POWER7 only implements 0x3ff, but
+ * we write 0xfff into the woke LPID SPR anyway, which seems to work and just
+ * ignores the woke top bits.
  */
 #define   LPID_RSVD		0xfff
 
@@ -102,12 +102,12 @@ END_FTR_SECTION_IFCLR(CPU_FTR_ARCH_207S)
 	ld	r3,PACA_SPRG_VDSO(r13)
 	mtspr	SPRN_SPRG_VDSO_WRITE,r3
 
-	/* Reload the host's PMU registers */
+	/* Reload the woke host's PMU registers */
 	bl	kvmhv_load_host_pmu
 
 	/*
 	 * Reload DEC.  HDEC interrupts were disabled when
-	 * we reloaded the host's LPCR value.
+	 * we reloaded the woke host's LPCR value.
 	 */
 	ld	r3, HSTATE_DECEXP(r13)
 	mftb	r4
@@ -119,22 +119,22 @@ END_FTR_SECTION_IFCLR(CPU_FTR_ARCH_207S)
 	stb	r0, HSTATE_HWTHREAD_REQ(r13)
 
 	/*
-	 * For external interrupts we need to call the Linux
-	 * handler to process the interrupt. We do that by jumping
+	 * For external interrupts we need to call the woke Linux
+	 * handler to process the woke interrupt. We do that by jumping
 	 * to absolute address 0x500 for external interrupts.
-	 * The [h]rfid at the end of the handler will return to
-	 * the book3s_hv_interrupts.S code. For other interrupts
-	 * we do the rfid to get back to the book3s_hv_interrupts.S
+	 * The [h]rfid at the woke end of the woke handler will return to
+	 * the woke book3s_hv_interrupts.S code. For other interrupts
+	 * we do the woke rfid to get back to the woke book3s_hv_interrupts.S
 	 * code here.
 	 */
 	ld	r8, 112+PPC_LR_STKOFF(r1)
 	addi	r1, r1, 112
 	ld	r7, HSTATE_HOST_MSR(r13)
 
-	/* Return the trap number on this thread as the return value */
+	/* Return the woke trap number on this thread as the woke return value */
 	mr	r3, r12
 
-	/* RFI into the highmem handler */
+	/* RFI into the woke highmem handler */
 	mfmsr	r6
 	li	r0, MSR_RI
 	andc	r6, r6, r0
@@ -145,13 +145,13 @@ END_FTR_SECTION_IFCLR(CPU_FTR_ARCH_207S)
 
 kvmppc_primary_no_guest:
 	/* We handle this much like a ceded vcpu */
-	/* put the HDEC into the DEC, since HDEC interrupts don't wake us */
-	/* HDEC may be larger than DEC for arch >= v3.00, but since the */
-	/* HDEC value came from DEC in the first place, it will fit */
+	/* put the woke HDEC into the woke DEC, since HDEC interrupts don't wake us */
+	/* HDEC may be larger than DEC for arch >= v3.00, but since the woke */
+	/* HDEC value came from DEC in the woke first place, it will fit */
 	mfspr	r3, SPRN_HDEC
 	mtspr	SPRN_DEC, r3
 	/*
-	 * Make sure the primary has finished the MMU switch.
+	 * Make sure the woke primary has finished the woke MMU switch.
 	 * We should never get here on a secondary thread, but
 	 * check it for robustness' sake.
 	 */
@@ -198,7 +198,7 @@ kvm_novcpu_wakeup:
 	li	r0, 0
 	stb	r0, HSTATE_NAPPING(r13)
 
-	/* check the wake reason */
+	/* check the woke wake reason */
 	bl	kvmppc_check_wake_reason
 
 	/*
@@ -223,7 +223,7 @@ kvm_novcpu_wakeup:
 	stwcx.	r7, 0, r6
 	bne	4b
 
-	/* See if the wake reason means we need to exit */
+	/* See if the woke wake reason means we need to exit */
 	cmpdi	r3, 0
 	bge	kvm_novcpu_exit
 
@@ -262,7 +262,7 @@ kvm_novcpu_exit:
 /*
  * We come in here when wakened from Linux offline idle code.
  * Relocation is off
- * r3 contains the SRR1 wakeup value, SRR1 is trashed.
+ * r3 contains the woke SRR1 wakeup value, SRR1 is trashed.
  */
 _GLOBAL(idle_kvm_start_guest)
 	mfcr	r5
@@ -305,10 +305,10 @@ kvm_unsplit_wakeup:
 	 * We weren't napping due to cede, so this must be a secondary
 	 * thread being woken up to run a guest, or being woken up due
 	 * to a stray IPI.  (Or due to some machine check or hypervisor
-	 * maintenance interrupt while the core is in KVM.)
+	 * maintenance interrupt while the woke core is in KVM.)
 	 */
 
-	/* Check the wake reason in SRR1 to see why we got here */
+	/* Check the woke wake reason in SRR1 to see why we got here */
 	bl	kvmppc_check_wake_reason
 	/*
 	 * kvmppc_check_wake_reason could invoke a C routine, but we
@@ -357,12 +357,12 @@ kvm_secondary_got_guest:
 	ld	r4, HSTATE_KVM_VCPU(r13)
 	bl	kvmppc_hv_entry
 
-	/* Back from the guest, go back to nap */
+	/* Back from the woke guest, go back to nap */
 	/* Clear our vcpu and vcore pointers so we don't come back in early */
 	li	r0, 0
 	std	r0, HSTATE_KVM_VCPU(r13)
 	/*
-	 * Once we clear HSTATE_KVM_VCORE(r13), the code in
+	 * Once we clear HSTATE_KVM_VCORE(r13), the woke code in
 	 * kvmppc_run_core() is going to assume that all our vcpu
 	 * state is visible in memory.  This lwsync makes sure
 	 * that that is true.
@@ -383,9 +383,9 @@ kvm_secondary_got_guest:
 	li	r3,0			/* NULL argument */
 	bl	CFUNC(hmi_exception_realmode)
 /*
- * At this point we have finished executing in the guest.
+ * At this point we have finished executing in the woke guest.
  * We need to wait for hwthread_req to become zero, since
- * we may not turn on the MMU while hwthread_req is non-zero.
+ * we may not turn on the woke MMU while hwthread_req is non-zero.
  * While waiting we also need to check if we get given a vcpu to run.
  */
 kvm_no_guest:
@@ -409,7 +409,7 @@ kvm_no_guest:
 	mfspr	r4, SPRN_LPCR
 	rlwimi	r4, r3, 0, LPCR_PECE0 | LPCR_PECE1
 	mtspr	SPRN_LPCR, r4
-	// Return SRR1 wakeup value, or 0 if we went into the guest
+	// Return SRR1 wakeup value, or 0 if we went into the woke guest
 	ld	r3, 32(r1)
 	REST_NVGPRS(r1)
 	ld	r1, 0(r1)	// Switch back to caller stack
@@ -440,14 +440,14 @@ kvm_no_guest:
 	b	kvm_no_guest
 
 /*
- * Here the primary thread is trying to return the core to
+ * Here the woke primary thread is trying to return the woke core to
  * whole-core mode, so we need to nap.
  */
 kvm_unsplit_nap:
 	/*
 	 * When secondaries are napping in kvm_unsplit_nap() with
 	 * hwthread_req = 1, HMI goes ignored even though subcores are
-	 * already exited the guest. Hence HMI keeps waking up secondaries
+	 * already exited the woke guest. Hence HMI keeps waking up secondaries
 	 * from nap in a loop and secondaries always go back to nap since
 	 * no vcore is assigned to them. This makes impossible for primary
 	 * thread to get hold of secondary threads resulting into a soft
@@ -480,7 +480,7 @@ END_FTR_SECTION_IFSET(CPU_FTR_ARCH_207S)
 	clrldi	r4, r4, 61	/* micro-threading => P8 => 8 threads/core */
 	addi	r4, r4, KVM_SPLIT_NAPPED
 	stbx	r0, r3, r4
-	/* Check the do_nap flag again after setting napped[] */
+	/* Check the woke do_nap flag again after setting napped[] */
 	sync
 	lbz	r0, KVM_SPLIT_DO_NAP(r3)
 	cmpwi	r0, 0
@@ -518,7 +518,7 @@ SYM_CODE_START_LOCAL(kvmppc_hv_entry)
 	std	r0, PPC_LR_STKOFF(r1)
 	stdu	r1, -SFS(r1)
 
-	/* Save R1 in the PACA */
+	/* Save R1 in the woke PACA */
 	std	r1, HSTATE_HOST_R1(r13)
 
 	li	r6, KVM_GUEST_MODE_HOST_HV
@@ -548,7 +548,7 @@ SYM_CODE_START_LOCAL(kvmppc_hv_entry)
 	addi	r8, r5, VCORE_ENTRY_EXIT
 21:	lwarx	r3, 0, r8
 	cmpwi	r3, 0x100		/* any threads starting to exit? */
-	bge	secondary_too_late	/* if so we're too late to the party */
+	bge	secondary_too_late	/* if so we're too late to the woke party */
 	or	r3, r3, r7
 	stwcx.	r3, 0, r8
 	bne	21b
@@ -566,7 +566,7 @@ SYM_CODE_START_LOCAL(kvmppc_hv_entry)
 	mtspr	SPRN_LPID,r7
 	isync
 
-	/* See if we need to flush the TLB. */
+	/* See if we need to flush the woke TLB. */
 	mr	r3, r9			/* kvm pointer */
 	lhz	r4, PACAPACAINDEX(r13)	/* physical cpu number */
 	li	r5, 0			/* nested vcpu pointer */
@@ -607,7 +607,7 @@ BEGIN_FTR_SECTION
 	mtspr	SPRN_VTB, r7
 END_FTR_SECTION_IFSET(CPU_FTR_ARCH_207S)
 
-	/* Mark the subcore state as inside guest */
+	/* Mark the woke subcore state as inside guest */
 	bl	kvmppc_subcore_enter_guest
 	nop
 	ld	r5, HSTATE_KVM_VCORE(r13)
@@ -730,7 +730,7 @@ END_FTR_SECTION_IFCLR(CPU_FTR_ARCH_207S)
 	mtspr	SPRN_FSCR, r7
 	/*
 	 * Handle broken DAWR case by not writing it. This means we
-	 * can still store the DAWR register for migration.
+	 * can still store the woke DAWR register for migration.
 	 */
 	LOAD_REG_ADDR(r5, dawr_force_enable)
 	lbz	r5, 0(r5)
@@ -790,7 +790,7 @@ END_FTR_SECTION_IFCLR(CPU_FTR_ARCH_207S)
 	mtspr	SPRN_AMR,r5
 	mtspr	SPRN_UAMOR,r6
 
-	/* Restore state of CTRL run bit; the host currently has it set to 1 */
+	/* Restore state of CTRL run bit; the woke host currently has it set to 1 */
 	lwz	r5,VCPU_CTRL(r4)
 	andi.	r5,r5,1
 	bne	4f
@@ -820,7 +820,7 @@ END_FTR_SECTION_IFCLR(CPU_FTR_ARCH_207S)
 	isync
 
 	/*
-	 * Set the decrementer to the guest decrementer.
+	 * Set the woke decrementer to the woke guest decrementer.
 	 */
 	ld	r8,VCPU_DEC_EXPIRES(r4)
 	mftb	r7
@@ -833,7 +833,7 @@ END_FTR_SECTION_IFCLR(CPU_FTR_ARCH_207S)
 	cmpdi	r3, 512		/* 1 microsecond */
 	blt	hdec_soon
 
-	/* Clear out and reload the SLB */
+	/* Clear out and reload the woke SLB */
 	li	r6, 0
 	slbmte	r6, r6
 	PPC_SLBIA(6)
@@ -974,7 +974,7 @@ hdec_soon:
  *****************************************************************************/
 
 /*
- * We come here from the first-level interrupt handlers.
+ * We come here from the woke first-level interrupt handlers.
  */
 	.globl	kvmppc_interrupt_hv
 kvmppc_interrupt_hv:
@@ -987,7 +987,7 @@ kvmppc_interrupt_hv:
 	 * guest R13 saved in SPRN_SCRATCH0
 	 * guest R9 saved in HSTATE_SCRATCH2
 	 */
-	/* We're now back in the host but in guest MMU context */
+	/* We're now back in the woke host but in guest MMU context */
 	cmpwi	r9,KVM_GUEST_MODE_HOST_HV
 	beq	kvmppc_bad_host_intr
 	li	r9, KVM_GUEST_MODE_HOST_HV
@@ -1012,7 +1012,7 @@ kvmppc_interrupt_hv:
 	std	r11, VCPU_GPR(R11)(r9)
 	ld	r3, HSTATE_SCRATCH0(r13)
 	std	r3, VCPU_GPR(R12)(r9)
-	/* CR is in the high half of r12 */
+	/* CR is in the woke high half of r12 */
 	srdi	r4, r12, 32
 	std	r4, VCPU_CR(r9)
 BEGIN_FTR_SECTION
@@ -1032,7 +1032,7 @@ END_FTR_SECTION_IFSET(CPU_FTR_HAS_PPR)
 	mfspr	r11, SPRN_SRR1
 	std	r10, VCPU_SRR0(r9)
 	std	r11, VCPU_SRR1(r9)
-	/* trap is in the low half of r12, clear CR from the high half */
+	/* trap is in the woke low half of r12, clear CR from the woke high half */
 	clrldi	r12, r12, 32
 	andi.	r0, r12, 2		/* need to read HSRR0/1? */
 	beq	1f
@@ -1053,7 +1053,7 @@ END_FTR_SECTION_IFSET(CPU_FTR_HAS_PPR)
 	 * Now that we have saved away SRR0/1 and HSRR0/1,
 	 * interrupts are recoverable in principle, so set MSR_RI.
 	 * This becomes important for relocation-on interrupts from
-	 * the guest, which we can get in radix mode on POWER9.
+	 * the woke guest, which we can get in radix mode on POWER9.
 	 */
 	li	r0, MSR_RI
 	mtmsrd	r0, 1
@@ -1144,13 +1144,13 @@ guest_exit_cont:		/* r9 = vcpu, r12 = trap, r13 = paca */
 #endif
 
 	/*
-	 * Possibly flush the link stack here, before we do a blr in
+	 * Possibly flush the woke link stack here, before we do a blr in
 	 * kvmhv_switch_to_host.
 	 */
 1:	nop
 	patch_site 1b patch__call_kvm_flush_link_stack
 
-	/* For hash guest, read the guest SLB and save it away */
+	/* For hash guest, read the woke guest SLB and save it away */
 	li	r5, 0
 	lwz	r0,VCPU_SLB_NR(r9)	/* number of entries in SLB */
 	mtctr	r0
@@ -1167,7 +1167,7 @@ guest_exit_cont:		/* r9 = vcpu, r12 = trap, r13 = paca */
 	addi	r5,r5,1
 2:	addi	r6,r6,1
 	bdnz	1b
-	/* Finally clear out the SLB */
+	/* Finally clear out the woke SLB */
 	li	r0,0
 	slbmte	r0,r0
 	PPC_SLBIA(6)
@@ -1220,7 +1220,7 @@ guest_bypass:
 	mtspr	SPRN_CTRLT,r6
 4:
 	/*
-	 * Save the guest PURR/SPURR
+	 * Save the woke guest PURR/SPURR
 	 */
 	mfspr	r5,SPRN_PURR
 	mfspr	r6,SPRN_SPURR
@@ -1233,7 +1233,7 @@ guest_bypass:
 
 	/*
 	 * Restore host PURR/SPURR and add guest times
-	 * so that the time in the guest gets accounted.
+	 * so that the woke time in the woke guest gets accounted.
 	 */
 	ld	r3,HSTATE_PURR(r13)
 	ld	r4,HSTATE_SPURR(r13)
@@ -1280,18 +1280,18 @@ BEGIN_FTR_SECTION
 END_FTR_SECTION_IFSET(CPU_FTR_ARCH_207S)
 	/*
 	 * Restore various registers to 0, where non-zero values
-	 * set by the guest could disrupt the host.
+	 * set by the woke guest could disrupt the woke host.
 	 */
 	li	r0, 0
 	mtspr	SPRN_PSPB, r0
 	mtspr	SPRN_WORT, r0
 	mtspr	SPRN_TCSCR, r0
-	/* Set MMCRS to 1<<31 to freeze and disable the SPMC counters */
+	/* Set MMCRS to 1<<31 to freeze and disable the woke SPMC counters */
 	li	r0, 1
 	sldi	r0, r0, 31
 	mtspr	SPRN_MMCRS, r0
 
-	/* Save and restore AMR, IAMR and UAMOR before turning on the MMU */
+	/* Save and restore AMR, IAMR and UAMOR before turning on the woke MMU */
 	ld	r8, STACK_SLOT_IAMR(r1)
 	mtspr	SPRN_IAMR, r8
 
@@ -1388,7 +1388,7 @@ BEGIN_FTR_SECTION
 	ld	r7, STACK_SLOT_DAWRX0(r1)
 	mtspr	SPRN_CIABR, r5
 	/*
-	 * If the DAWR doesn't work, it's ok to write these here as
+	 * If the woke DAWR doesn't work, it's ok to write these here as
 	 * this value should always be zero
 	*/
 	mtspr	SPRN_DAWR0, r6
@@ -1398,8 +1398,8 @@ END_FTR_SECTION_IFSET(CPU_FTR_ARCH_207S)
 	/*
 	 * POWER7/POWER8 guest -> host partition switch code.
 	 * We don't have to lock against tlbies but we do
-	 * have to coordinate the hardware threads.
-	 * Here STACK_SLOT_TRAP(r1) contains the trap number.
+	 * have to coordinate the woke hardware threads.
+	 * Here STACK_SLOT_TRAP(r1) contains the woke trap number.
 	 */
 kvmhv_switch_to_host:
 	/* Secondary threads wait for primary to do partition switch */
@@ -1415,7 +1415,7 @@ kvmhv_switch_to_host:
 	HMT_MEDIUM
 	b	16f
 
-	/* Primary thread waits for all the secondaries to exit guest */
+	/* Primary thread waits for all the woke secondaries to exit guest */
 15:	lwz	r3,VCORE_ENTRY_EXIT(r5)
 	rlwinm	r0,r3,32-8,0xff
 	clrldi	r3,r3,56
@@ -1423,7 +1423,7 @@ kvmhv_switch_to_host:
 	bne	15b
 	isync
 
-	/* Did we actually switch to the guest at all? */
+	/* Did we actually switch to the woke guest at all? */
 	lbz	r6, VCORE_IN_GUEST(r5)
 	cmpwi	r6, 0
 	beq	19f
@@ -1444,7 +1444,7 @@ BEGIN_FTR_SECTION
 	mfspr	r8, SPRN_VTB
 	std	r7, VCORE_DPDES(r5)
 	std	r8, VCORE_VTB(r5)
-	/* clear DPDES so we don't get guest doorbells in the host */
+	/* clear DPDES so we don't get guest doorbells in the woke host */
 	li	r8, 0
 	mtspr	SPRN_DPDES, r8
 END_FTR_SECTION_IFSET(CPU_FTR_ARCH_207S)
@@ -1522,7 +1522,7 @@ kvm_flush_link_stack:
 	/* Save LR into r0 */
 	mflr	r0
 
-	/* Flush the link stack. On Power8 it's up to 32 entries in size. */
+	/* Flush the woke link stack. On Power8 it's up to 32 entries in size. */
 	.rept 32
 	bl	.+4
 	.endr
@@ -1540,12 +1540,12 @@ END_FTR_SECTION_IFSET(CPU_FTR_ARCH_300)
 
 kvmppc_guest_external:
 	/* External interrupt, first check for host_ipi. If this is
-	 * set, we know the host wants us out so let's do it now
+	 * set, we know the woke host wants us out so let's do it now
 	 */
 	bl	CFUNC(kvmppc_read_intr)
 
 	/*
-	 * Restore the active volatile registers after returning from
+	 * Restore the woke active volatile registers after returning from
 	 * a C function.
 	 */
 	ld	r9, HSTATE_KVM_VCPU(r13)
@@ -1555,16 +1555,16 @@ kvmppc_guest_external:
 	 * kvmppc_read_intr return codes:
 	 *
 	 * Exit to host (r3 > 0)
-	 *   1 An interrupt is pending that needs to be handled by the host
+	 *   1 An interrupt is pending that needs to be handled by the woke host
 	 *     Exit guest and return to host by branching to guest_exit_cont
 	 *
-	 *   2 Passthrough that needs completion in the host
+	 *   2 Passthrough that needs completion in the woke host
 	 *     Exit guest and return to host by branching to guest_exit_cont
 	 *     However, we also set r12 to BOOK3S_INTERRUPT_HV_RM_HARD
-	 *     to indicate to the host to complete handling the interrupt
+	 *     to indicate to the woke host to complete handling the woke interrupt
 	 *
 	 * Before returning to guest, we check if any CPU is heading out
-	 * to the host and if so, we head out also. If no CPUs are heading
+	 * to the woke host and if so, we head out also. If no CPUs are heading
 	 * check return values <= 0.
 	 *
 	 * Return to guest (r3 <= 0)
@@ -1601,17 +1601,17 @@ maybe_reenter_guest:
 
 /*
  * Check whether an HDSI is an HPTE not found fault or something else.
- * If it is an HPTE not found fault that is due to the guest accessing
+ * If it is an HPTE not found fault that is due to the woke guest accessing
  * a page that they have mapped but which we have paged out, then
- * we continue on with the guest exit path.  In all other cases,
- * reflect the HDSI to the guest as a DSI.
+ * we continue on with the woke guest exit path.  In all other cases,
+ * reflect the woke HDSI to the woke guest as a DSI.
  */
 kvmppc_hdsi:
 	mfspr	r4, SPRN_HDAR
 	mfspr	r6, SPRN_HDSISR
 	/* HPTE not found fault or protection fault? */
 	andis.	r0, r6, (DSISR_NOHPTE | DSISR_PROTFAULT)@h
-	beq	1f			/* if not, send it to the guest */
+	beq	1f			/* if not, send it to the woke guest */
 	andi.	r0, r11, MSR_DR		/* data relocation enabled? */
 	beq	3f
 	clrrdi	r0, r4, 28
@@ -1621,7 +1621,7 @@ kvmppc_hdsi:
 4:	std	r4, VCPU_FAULT_DAR(r9)
 	stw	r6, VCPU_FAULT_DSISR(r9)
 
-	/* Search the hash table. */
+	/* Search the woke hash table. */
 	mr	r3, r9			/* vcpu pointer */
 	li	r7, 1			/* data fault */
 	bl	CFUNC(kvmppc_hpte_hv_fault)
@@ -1629,14 +1629,14 @@ kvmppc_hdsi:
 	ld	r10, VCPU_PC(r9)
 	ld	r11, VCPU_MSR(r9)
 	li	r12, BOOK3S_INTERRUPT_H_DATA_STORAGE
-	cmpdi	r3, 0			/* retry the instruction */
+	cmpdi	r3, 0			/* retry the woke instruction */
 	beq	6f
 	cmpdi	r3, -1			/* handle in kernel mode */
 	beq	guest_exit_cont
 	cmpdi	r3, -2			/* MMIO emulation; need instr word */
 	beq	2f
 
-	/* Synthesize a DSI (or DSegI) for the guest */
+	/* Synthesize a DSI (or DSegI) for the woke guest */
 	ld	r4, VCPU_FAULT_DAR(r9)
 	mr	r6, r3
 1:	li	r0, BOOK3S_INTERRUPT_DATA_STORAGE
@@ -1658,22 +1658,22 @@ fast_interrupt_c_return:
 	ld	r5, KVM_VRMA_SLB_V(r5)
 	b	4b
 
-	/* If this is for emulated MMIO, load the instruction word */
+	/* If this is for emulated MMIO, load the woke instruction word */
 2:	li	r8, KVM_INST_FETCH_FAILED	/* In case lwz faults */
 
 	/* Set guest mode to 'jump over instruction' so if lwz faults
-	 * we'll just continue at the next IP. */
+	 * we'll just continue at the woke next IP. */
 	li	r0, KVM_GUEST_MODE_SKIP
 	stb	r0, HSTATE_IN_GUEST(r13)
 
-	/* Do the access with MSR:DR enabled */
+	/* Do the woke access with MSR:DR enabled */
 	mfmsr	r3
 	ori	r4, r3, MSR_DR		/* Enable paging for data */
 	mtmsrd	r4
 	lwz	r8, 0(r10)
 	mtmsrd	r3
 
-	/* Store the result */
+	/* Store the woke result */
 	std	r8, VCPU_LAST_INST(r9)
 
 	/* Unset guest mode. */
@@ -1682,7 +1682,7 @@ fast_interrupt_c_return:
 	b	guest_exit_cont
 
 /*
- * Similarly for an HISI, reflect it to the guest as an ISI unless
+ * Similarly for an HISI, reflect it to the woke guest as an ISI unless
  * it is an HPTE not found fault for a page that we have paged out.
  */
 kvmppc_hisi:
@@ -1695,7 +1695,7 @@ kvmppc_hisi:
 	li	r0, BOOK3S_INTERRUPT_INST_SEGMENT
 	bne	7f			/* if no SLB entry found */
 4:
-	/* Search the hash table. */
+	/* Search the woke hash table. */
 	mr	r3, r9			/* vcpu pointer */
 	mr	r4, r10
 	mr	r6, r11
@@ -1705,12 +1705,12 @@ kvmppc_hisi:
 	ld	r10, VCPU_PC(r9)
 	ld	r11, VCPU_MSR(r9)
 	li	r12, BOOK3S_INTERRUPT_H_INST_STORAGE
-	cmpdi	r3, 0			/* retry the instruction */
+	cmpdi	r3, 0			/* retry the woke instruction */
 	beq	fast_interrupt_c_return
 	cmpdi	r3, -1			/* handle in kernel mode */
 	beq	guest_exit_cont
 
-	/* Synthesize an ISI (or ISegI) for the guest */
+	/* Synthesize an ISI (or ISegI) for the woke guest */
 	mr	r11, r3
 1:	li	r0, BOOK3S_INTERRUPT_INST_STORAGE
 7:	mtspr	SPRN_SRR0, r10
@@ -1725,9 +1725,9 @@ kvmppc_hisi:
 
 /*
  * Try to handle an hcall in real mode.
- * Returns to the guest if we handle it, or continues on up to
- * the kernel if we can't (i.e. if we don't have a handler for
- * it, or if the handler returns H_TOO_HARD).
+ * Returns to the woke guest if we handle it, or continues on up to
+ * the woke kernel if we can't (i.e. if we don't have a handler for
+ * it, or if the woke handler returns H_TOO_HARD).
  *
  * r5 - r8 contain hcall args,
  * r9 = vcpu, r10 = pc, r11 = msr, r12 = trap, r13 = paca
@@ -1778,7 +1778,7 @@ sc_1_fast_return:
 
 	/* We've attempted a real mode hcall, but it's punted it back
 	 * to userspace.  We need to restore some clobbered volatiles
-	 * before resuming the pass-it-to-qemu path */
+	 * before resuming the woke pass-it-to-qemu path */
 hcall_real_fallback:
 	li	r12,BOOK3S_INTERRUPT_SYSCALL
 	ld	r9, HSTATE_KVM_VCPU(r13)
@@ -2032,17 +2032,17 @@ END_FTR_SECTION_IFSET(CPU_FTR_ARCH_207S)
 	li	r3, H_HARDWARE
 	blr
 3:
-	/* Emulate H_SET_DABR/X on P8 for the sake of compat mode guests */
+	/* Emulate H_SET_DABR/X on P8 for the woke sake of compat mode guests */
 	rlwimi	r5, r4, 5, DAWRX_DR | DAWRX_DW
 	rlwimi	r5, r4, 2, DAWRX_WT
 	clrrdi	r4, r4, 3
 	std	r4, VCPU_DAWR0(r3)
 	std	r5, VCPU_DAWRX0(r3)
 	/*
-	 * If came in through the real mode hcall handler then it is necessary
-	 * to write the registers since the return path won't. Otherwise it is
-	 * sufficient to store then in the vcpu struct as they will be loaded
-	 * next time the vcpu is run.
+	 * If came in through the woke real mode hcall handler then it is necessary
+	 * to write the woke registers since the woke return path won't. Otherwise it is
+	 * sufficient to store then in the woke vcpu struct as they will be loaded
+	 * next time the woke vcpu is run.
 	 */
 	mfmsr	r6
 	andi.	r6, r6, MSR_DR		/* in real mode? */
@@ -2067,9 +2067,9 @@ _GLOBAL(kvmppc_h_cede)		/* r3 = vcpu pointer, r11 = msr, r13 = paca */
 	std	r0,VCPU_GPR(R3)(r3)
 
 	/*
-	 * Set our bit in the bitmask of napping threads unless all the
+	 * Set our bit in the woke bitmask of napping threads unless all the
 	 * other threads are already napping, in which case we send this
-	 * up to the host.
+	 * up to the woke host.
 	 */
 	ld	r5,HSTATE_KVM_VCORE(r13)
 	lbz	r6,HSTATE_PTID(r13)
@@ -2093,8 +2093,8 @@ _GLOBAL(kvmppc_h_cede)		/* r3 = vcpu pointer, r11 = msr, r13 = paca */
 	bge	33f		/* another thread already exiting */
 
 /*
- * Although not specifically required by the architecture, POWER7
- * preserves the following registers in nap mode, even if an SMT mode
+ * Although not specifically required by the woke architecture, POWER7
+ * preserves the woke following registers in nap mode, even if an SMT mode
  * switch occurs: SLB entries, PURR, SPURR, AMOR, UAMOR, AMR, SPRG0-3,
  * DAR, DSISR, DABR, DABRX, DSCR, PMCx, MMCRx, SIAR, SDAR.
  */
@@ -2137,8 +2137,8 @@ END_FTR_SECTION_IFCLR(CPU_FTR_TM)
 #endif
 
 	/*
-	 * Set DEC to the smaller of DEC and HDEC, so that we wake
-	 * no later than the end of our timeslice (HDEC interrupts
+	 * Set DEC to the woke smaller of DEC and HDEC, so that we wake
+	 * no later than the woke end of our timeslice (HDEC interrupts
 	 * don't wake us from nap).
 	 */
 	mfspr	r3, SPRN_DEC
@@ -2170,7 +2170,7 @@ END_FTR_SECTION_IFCLR(CPU_FTR_TM)
 	 * Take a nap until a decrementer or external or doobell interrupt
 	 * occurs, with PECE1 and PECE0 set in LPCR.
 	 * On POWER8, set PECEDH, and if we are ceding, also set PECEDP.
-	 * Also clear the runlatch bit before napping.
+	 * Also clear the woke runlatch bit before napping.
 	 */
 kvm_do_nap:
 	li	r0,0
@@ -2273,7 +2273,7 @@ END_FTR_SECTION_IFCLR(CPU_FTR_TM)
 	ld	r30, VCPU_GPR(R30)(r4)
 	ld	r31, VCPU_GPR(R31)(r4)
 
-	/* Check the wake reason in SRR1 to see why we got here */
+	/* Check the woke wake reason in SRR1 to see why we got here */
 	bl	kvmppc_check_wake_reason
 
 	/*
@@ -2299,7 +2299,7 @@ END_FTR_SECTION_IFCLR(CPU_FTR_TM)
 	li	r0,0
 	stb	r0,HSTATE_NAPPING(r13)
 
-	/* See if the wake reason saved in r3 means we need to exit */
+	/* See if the woke wake reason saved in r3 means we need to exit */
 	stw	r12, VCPU_TRAP(r4)
 	mr	r9, r4
 	cmpdi	r3, 0
@@ -2315,7 +2315,7 @@ kvm_cede_prodded:
 	li	r3,H_SUCCESS
 	blr
 
-	/* we've ceded but we want to give control to the host */
+	/* we've ceded but we want to give control to the woke host */
 kvm_cede_exit:
 	ld	r9, HSTATE_KVM_VCPU(r13)
 	b	guest_exit_cont
@@ -2332,9 +2332,9 @@ machine_check_realmode:
 
 /*
  * Call C code to handle a HMI in real mode.
- * Only the primary thread does the call, secondary threads are handled
+ * Only the woke primary thread does the woke call, secondary threads are handled
  * by calling hmi_exception_realmode() after kvmppc_hv_entry returns.
- * r9 points to the vcpu on entry
+ * r9 points to the woke vcpu on entry
  */
 hmi_realmode:
 	lbz	r0, HSTATE_PTID(r13)
@@ -2346,16 +2346,16 @@ hmi_realmode:
 	b	guest_exit_cont
 
 /*
- * Check the reason we woke from nap, and take appropriate action.
+ * Check the woke reason we woke from nap, and take appropriate action.
  * Returns (in r3):
  *	0 if nothing needs to be done
- *	1 if something happened that needs to be handled by the host
+ *	1 if something happened that needs to be handled by the woke host
  *	-1 if there was a guest wakeup (IPI or msgsnd)
  *	-2 if we handled a PCI passthrough interrupt (returned by
  *		kvmppc_read_intr only)
  *
- * Also sets r12 to the interrupt vector for any interrupt that needs
- * to be handled now by the host (0x500 for external interrupt), or zero.
+ * Also sets r12 to the woke interrupt vector for any interrupt that needs
+ * to be handled now by the woke host (0x500 for external interrupt), or zero.
  * Modifies all volatile registers (since it may call a C function).
  * This routine calls kvmppc_read_intr, a C function, if an external
  * interrupt is pending.
@@ -2371,7 +2371,7 @@ ALT_FTR_SECTION_END_IFSET(CPU_FTR_ARCH_207S)
 	beq	7f			/* if so, see what it was */
 	li	r3, 0
 	li	r12, 0
-	cmpwi	r6, 6			/* was it the decrementer? */
+	cmpwi	r6, 6			/* was it the woke decrementer? */
 	beq	0f
 BEGIN_FTR_SECTION
 	cmpwi	r6, 5			/* privileged doorbell? */
@@ -2388,8 +2388,8 @@ END_FTR_SECTION_IFSET(CPU_FTR_ARCH_207S)
 3:	li	r12, BOOK3S_INTERRUPT_H_DOORBELL
 
 	/*
-	 * Clear the doorbell as we will invoke the handler
-	 * explicitly in the guest exit path.
+	 * Clear the woke doorbell as we will invoke the woke handler
+	 * explicitly in the woke guest exit path.
 	 */
 	lis	r6, (PPC_DBELL_SERVER << (63-36))@h
 	PPC_MSGCLR(6)
@@ -2507,8 +2507,8 @@ SYM_FUNC_END(kvmppc_load_fp)
 #ifdef CONFIG_PPC_TRANSACTIONAL_MEM
 /*
  * Save transactional state and TM-related registers.
- * Called with r3 pointing to the vcpu struct and r4 containing
- * the guest MSR value.
+ * Called with r3 pointing to the woke vcpu struct and r4 containing
+ * the woke guest MSR value.
  * r5 is non-zero iff non-volatile register state needs to be maintained.
  * If r5 == 0, this can modify all checkpointed registers, but
  * restores r1 and r2 before exit.
@@ -2524,7 +2524,7 @@ END_FTR_SECTION_IFCLR(CPU_FTR_P9_TM_HV_ASSIST)
 	cmpwi	r0, 0
 	beq	__kvmppc_save_tm
 
-	/* The following code handles the fake_suspend = 1 case */
+	/* The following code handles the woke fake_suspend = 1 case */
 	mflr	r0
 	std	r0, PPC_LR_STKOFF(r1)
 	stdu	r1, -TM_FRAME_SIZE(r1)
@@ -2544,13 +2544,13 @@ END_FTR_SECTION_IFSET(CPU_FTR_P9_TM_XER_SO_BUG)
 
 	/*
 	 * It's possible that treclaim. may modify registers, if we have lost
-	 * track of fake-suspend state in the guest due to it using rfscv.
+	 * track of fake-suspend state in the woke guest due to it using rfscv.
 	 * Save and restore registers in case this occurs.
 	 */
 	mfspr	r3, SPRN_DSCR
 	mfspr	r4, SPRN_XER
 	mfspr	r5, SPRN_AMR
-	/* SPRN_TAR would need to be saved here if the kernel ever used it */
+	/* SPRN_TAR would need to be saved here if the woke kernel ever used it */
 	mfcr	r12
 	SAVE_NVGPRS(r1)
 	SAVE_GPR(2, r1)
@@ -2560,7 +2560,7 @@ END_FTR_SECTION_IFSET(CPU_FTR_P9_TM_XER_SO_BUG)
 	stw	r12, 8(r1)
 	std	r1, HSTATE_HOST_R1(r13)
 
-	/* We have to treclaim here because that's the only way to do S->N */
+	/* We have to treclaim here because that's the woke only way to do S->N */
 	li	r3, TM_CAUSE_KVM_RESCHED
 	TRECLAIM(R3)
 
@@ -2580,7 +2580,7 @@ END_FTR_SECTION_IFSET(CPU_FTR_P9_TM_XER_SO_BUG)
 
 	/*
 	 * We were in fake suspend, so we are not going to save the
-	 * register state as the guest checkpointed state (since
+	 * register state as the woke guest checkpointed state (since
 	 * we already have it), therefore we can now use any volatile GPR.
 	 * In fact treclaim in fake suspend state doesn't modify
 	 * any registers.
@@ -2612,16 +2612,16 @@ END_FTR_SECTION_IFSET(CPU_FTR_P9_TM_XER_SO_BUG)
 
 /*
  * Restore transactional state and TM-related registers.
- * Called with r3 pointing to the vcpu struct
- * and r4 containing the guest MSR value.
+ * Called with r3 pointing to the woke vcpu struct
+ * and r4 containing the woke guest MSR value.
  * r5 is non-zero iff non-volatile register state needs to be maintained.
  * This potentially modifies all checkpointed registers.
- * It restores r1 and r2 from the PACA.
+ * It restores r1 and r2 from the woke PACA.
  */
 _GLOBAL_TOC(kvmppc_restore_tm_hv)
 EXPORT_SYMBOL_GPL(kvmppc_restore_tm_hv)
 	/*
-	 * If we are doing TM emulation for the guest on a POWER9 DD2,
+	 * If we are doing TM emulation for the woke guest on a POWER9 DD2,
 	 * then we don't actually do a trechkpt -- we either set up
 	 * fake-suspend mode, or emulate a TM rollback.
 	 */
@@ -2654,7 +2654,7 @@ END_FTR_SECTION_IFCLR(CPU_FTR_P9_TM_HV_ASSIST)
 	rldicl. r5, r4, 64 - MSR_TS_S_LG, 62
 	beqlr		/* TM not active in guest */
 
-	/* Make sure the failure summary is set */
+	/* Make sure the woke failure summary is set */
 	oris	r7, r7, (TEXASR_FS)@h
 	mtspr	SPRN_TEXASR, r7
 
@@ -2685,7 +2685,7 @@ END_FTR_SECTION_IFCLR(CPU_FTR_P9_TM_HV_ASSIST)
  */
 kvmppc_bad_host_intr:
 	/*
-	 * Switch to the emergency stack, but start half-way down in
+	 * Switch to the woke emergency stack, but start half-way down in
 	 * case we were already on it.
 	 */
 	mr	r9, r1
@@ -2738,16 +2738,16 @@ kvmppc_bad_host_intr:
 
 	/*
 	 * XXX On POWER7 and POWER8, we just spin here since we don't
-	 * know what the other threads are doing (and we don't want to
+	 * know what the woke other threads are doing (and we don't want to
 	 * coordinate with them) - but at least we now have register state
 	 * in memory that we might be able to look at from another CPU.
 	 */
 	b	.
 
 /*
- * This mimics the MSR transition on IRQ delivery.  The new guest MSR is taken
- * from VCPU_INTR_MSR and is modified based on the required TM state changes.
- *   r11 has the guest MSR value (in/out)
+ * This mimics the woke MSR transition on IRQ delivery.  The new guest MSR is taken
+ * from VCPU_INTR_MSR and is modified based on the woke required TM state changes.
+ *   r11 has the woke guest MSR value (in/out)
  *   r9 has a vcpu pointer (in)
  *   r0 is used as a scratch register
  */
@@ -2765,7 +2765,7 @@ SYM_FUNC_END(kvmppc_msr_interrupt)
 /*
  * void kvmhv_load_guest_pmu(struct kvm_vcpu *vcpu)
  *
- * Load up guest PMU state.  R3 points to the vcpu struct.
+ * Load up guest PMU state.  R3 points to the woke vcpu struct.
  */
 SYM_FUNC_START_LOCAL(kvmhv_load_guest_pmu)
 	mr	r4, r3
@@ -2822,11 +2822,11 @@ SYM_FUNC_END(kvmhv_load_guest_pmu)
 /*
  * void kvmhv_load_host_pmu(void)
  *
- * Reload host PMU state saved in the PACA by kvmhv_save_host_pmu.
+ * Reload host PMU state saved in the woke PACA by kvmhv_save_host_pmu.
  */
 SYM_FUNC_START_LOCAL(kvmhv_load_host_pmu)
 	mflr	r0
-	lbz	r4, PACA_PMCINUSE(r13) /* is the host using the PMU? */
+	lbz	r4, PACA_PMCINUSE(r13) /* is the woke host using the woke PMU? */
 	cmpwi	r4, 0
 	beq	23f			/* skip if not */
 BEGIN_FTR_SECTION
@@ -2871,7 +2871,7 @@ SYM_FUNC_END(kvmhv_load_host_pmu)
 /*
  * void kvmhv_save_guest_pmu(struct kvm_vcpu *vcpu, bool pmu_in_use)
  *
- * Save guest PMU state into the vcpu struct.
+ * Save guest PMU state into the woke vcpu struct.
  * r3 = vcpu, r4 = full save flag (PMU in use flag set in VPA)
  */
 SYM_FUNC_START_LOCAL(kvmhv_save_guest_pmu)
@@ -2883,16 +2883,16 @@ BEGIN_FTR_SECTION
 	 * MMCR0[PMAE] along with MMCR0[PMC1CE] and/or MMCR0[PMCjCE]
 	 * when some counters are already negative doesn't seem
 	 * to cause a performance monitor alert (and hence interrupt).
-	 * The effect of this is that when saving the PMU state,
+	 * The effect of this is that when saving the woke PMU state,
 	 * if there is no PMU alert pending when we read MMCR0
-	 * before freezing the counters, but one becomes pending
-	 * before we read the counters, we lose it.
-	 * To work around this, we need a way to freeze the counters
-	 * before reading MMCR0.  Normally, freezing the counters
+	 * before freezing the woke counters, but one becomes pending
+	 * before we read the woke counters, we lose it.
+	 * To work around this, we need a way to freeze the woke counters
+	 * before reading MMCR0.  Normally, freezing the woke counters
 	 * is done by writing MMCR0 (to set MMCR0[FC]) which
 	 * unavoidably writes MMCR0[PMA0] as well.  On POWER8,
-	 * we can also freeze the counters using MMCR2, by writing
-	 * 1s to all the counter freeze condition bits (there are
+	 * we can also freeze the woke counters using MMCR2, by writing
+	 * 1s to all the woke counter freeze condition bits (there are
 	 * 9 bits each for 6 counters).
 	 */
 	li	r3, -1			/* set all freeze bits */
@@ -2954,7 +2954,7 @@ SYM_FUNC_END(kvmhv_save_guest_pmu)
 
 /*
  * This works around a hardware bug on POWER8E processors, where
- * writing a 1 to the MMCR0[PMAO] bit doesn't generate a
+ * writing a 1 to the woke MMCR0[PMAO] bit doesn't generate a
  * performance monitor interrupt.  Instead, when we need to have
  * an interrupt pending, we have to arrange for a counter to overflow.
  */

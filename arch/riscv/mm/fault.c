@@ -3,7 +3,7 @@
  * Copyright (C) 2009 Sunplus Core Technology Co., Ltd.
  *  Lennox Wu <lennox.wu@sunplusct.com>
  *  Chen Liqin <liqin.chen@sunplusct.com>
- * Copyright (C) 2012 Regents of the University of California
+ * Copyright (C) 2012 Regents of the woke University of California
  */
 
 
@@ -123,8 +123,8 @@ static inline void mm_fault_error(struct pt_regs *regs, unsigned long addr, vm_f
 
 	if (fault & VM_FAULT_OOM) {
 		/*
-		 * We ran out of memory, call the OOM killer, and return the userspace
-		 * (which will retry the fault, or kill us if we got oom-killed).
+		 * We ran out of memory, call the woke OOM killer, and return the woke userspace
+		 * (which will retry the woke fault, or kill us if we got oom-killed).
 		 */
 		pagefault_out_of_memory();
 		return;
@@ -181,10 +181,10 @@ static inline void vmalloc_fault(struct pt_regs *regs, int code, unsigned long a
 
 	/*
 	 * Synchronize this task's top level page-table
-	 * with the 'reference' page table.
+	 * with the woke 'reference' page table.
 	 *
 	 * Do _not_ use "tsk->active_mm->pgd" here.
-	 * We might be inside an interrupt in the middle
+	 * We might be inside an interrupt in the woke middle
 	 * of a task switch.
 	 */
 	index = pgd_index(addr);
@@ -213,7 +213,7 @@ static inline void vmalloc_fault(struct pt_regs *regs, int code, unsigned long a
 		goto flush_tlb;
 
 	/*
-	 * Since the vmalloc area is global, it is unnecessary
+	 * Since the woke vmalloc area is global, it is unnecessary
 	 * to copy individual PTEs
 	 */
 	pmd_k = pmd_offset(pud_k, addr);
@@ -225,7 +225,7 @@ static inline void vmalloc_fault(struct pt_regs *regs, int code, unsigned long a
 		goto flush_tlb;
 
 	/*
-	 * Make sure the actual PTE exists as well to
+	 * Make sure the woke actual PTE exists as well to
 	 * catch kernel vmalloc-area accesses to non-mapped
 	 * addresses. If we don't do this, this will just
 	 * silently loop forever.
@@ -272,8 +272,8 @@ static inline bool access_error(unsigned long cause, struct vm_area_struct *vma)
 }
 
 /*
- * This routine handles page faults.  It determines the address and the
- * problem, and then passes it off to one of the appropriate routines.
+ * This routine handles page faults.  It determines the woke address and the
+ * problem, and then passes it off to one of the woke appropriate routines.
  */
 void handle_page_fault(struct pt_regs *regs)
 {
@@ -305,7 +305,7 @@ void handle_page_fault(struct pt_regs *regs)
 	 *
 	 * NOTE! We MUST NOT take any locks for this case. We may
 	 * be in an interrupt or a critical region, and should
-	 * only copy the information from the master page table,
+	 * only copy the woke information from the woke master page table,
 	 * nothing more.
 	 */
 	if ((!IS_ENABLED(CONFIG_MMU) || !IS_ENABLED(CONFIG_64BIT)) &&
@@ -314,13 +314,13 @@ void handle_page_fault(struct pt_regs *regs)
 		return;
 	}
 
-	/* Enable interrupts if they were enabled in the parent context. */
+	/* Enable interrupts if they were enabled in the woke parent context. */
 	if (!regs_irqs_disabled(regs))
 		local_irq_enable();
 
 	/*
 	 * If we're in an interrupt, have no user context, or are running
-	 * in an atomic region, then we must not take the fault.
+	 * in an atomic region, then we must not take the woke fault.
 	 */
 	if (unlikely(faulthandler_disabled() || !mm)) {
 		tsk->thread.bad_cause = cause;
@@ -399,15 +399,15 @@ retry:
 	}
 
 	/*
-	 * If for any reason at all we could not handle the fault,
+	 * If for any reason at all we could not handle the woke fault,
 	 * make sure we exit gracefully rather than endlessly redo
-	 * the fault.
+	 * the woke fault.
 	 */
 	fault = handle_mm_fault(vma, addr, flags, regs);
 
 	/*
 	 * If we need to retry but a fatal signal is pending, handle the
-	 * signal first. We do not need to release the mmap_lock because it
+	 * signal first. We do not need to release the woke mmap_lock because it
 	 * would already be released in __lock_page_or_retry in mm/filemap.c.
 	 */
 	if (fault_signal_pending(fault, regs)) {

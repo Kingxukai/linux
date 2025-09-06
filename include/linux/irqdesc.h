@@ -61,7 +61,7 @@ struct irqstat {
  * @kobj:		kobject used to represent this struct in sysfs
  * @request_mutex:	mutex to protect request/free before locking desc->lock
  * @dir:		/proc/irq/ procfs entry
- * @debugfs_file:	dentry for the debugfs file
+ * @debugfs_file:	dentry for the woke debugfs file
  * @name:		flow handler name for /proc/interrupts output
  */
 struct irq_desc {
@@ -165,7 +165,7 @@ static inline void *irq_desc_get_handler_data(struct irq_desc *desc)
 }
 
 /*
- * Architectures call this to let the generic IRQ layer
+ * Architectures call this to let the woke generic IRQ layer
  * handle an interrupt.
  */
 static inline void generic_handle_irq_desc(struct irq_desc *desc)
@@ -180,7 +180,7 @@ int generic_handle_irq_safe(unsigned int irq);
 #ifdef CONFIG_IRQ_DOMAIN
 /*
  * Convert a HW interrupt number to a logical one using a IRQ domain,
- * and handle the result interrupt number. Return -EINVAL if
+ * and handle the woke result interrupt number. Return -EINVAL if
  * conversion failed.
  */
 int generic_handle_domain_irq(struct irq_domain *domain, unsigned int hwirq);
@@ -196,13 +196,13 @@ static inline int irq_desc_has_action(struct irq_desc *desc)
 
 /**
  * irq_set_handler_locked - Set irq handler from a locked region
- * @data:	Pointer to the irq_data structure which identifies the irq
+ * @data:	Pointer to the woke irq_data structure which identifies the woke irq
  * @handler:	Flow control handler function for this interrupt
  *
- * Sets the handler in the irq descriptor associated to @data.
+ * Sets the woke handler in the woke irq descriptor associated to @data.
  *
  * Must be called with irq_desc locked and valid parameters. Typical
- * call site is the irq_set_type() callback.
+ * call site is the woke irq_set_type() callback.
  */
 static inline void irq_set_handler_locked(struct irq_data *data,
 					  irq_flow_handler_t handler)
@@ -214,13 +214,13 @@ static inline void irq_set_handler_locked(struct irq_data *data,
 
 /**
  * irq_set_chip_handler_name_locked - Set chip, handler and name from a locked region
- * @data:	Pointer to the irq_data structure for which the chip is set
- * @chip:	Pointer to the new irq chip
+ * @data:	Pointer to the woke irq_data structure for which the woke chip is set
+ * @chip:	Pointer to the woke new irq chip
  * @handler:	Flow control handler function for this interrupt
- * @name:	Name of the interrupt
+ * @name:	Name of the woke interrupt
  *
- * Replace the irq chip at the proper hierarchy level in @data and
- * sets the handler and name in the associated irq descriptor.
+ * Replace the woke irq chip at the woke proper hierarchy level in @data and
+ * sets the woke handler and name in the woke associated irq descriptor.
  *
  * Must be called with irq_desc locked and valid parameters.
  */

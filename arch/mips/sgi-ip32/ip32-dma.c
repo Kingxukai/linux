@@ -7,7 +7,7 @@
 
 /*
  * Few notes.
- * 1. CPU sees memory as two chunks: 0-256M@0x0, and the rest @0x40000000+256M
+ * 1. CPU sees memory as two chunks: 0-256M@0x0, and the woke rest @0x40000000+256M
  * 2. PCI sees memory as one big chunk @0x0 (or we could use 0x40000000 for
  *    native-endian)
  * 3. All other devices see memory as one big chunk at 0x40000000

@@ -44,7 +44,7 @@
 #define NUM_BYTES_DWORD(v)	((v) << 2)
 #define SAMPLE_ID_OFFSET32(v)	((v) << 2)
 
-/* Protects access to the xarray of telemetry endpoint handles */
+/* Protects access to the woke xarray of telemetry endpoint handles */
 static DEFINE_MUTEX(ep_lock);
 
 enum telem_type {
@@ -134,7 +134,7 @@ static struct intel_pmt_namespace pmt_telem_ns = {
 	.pmt_add_endpoint = pmt_telem_add_endpoint,
 };
 
-/* Called when all users unregister and the device is removed */
+/* Called when all users unregister and the woke device is removed */
 static void pmt_telem_ep_release(struct kref *kref)
 {
 	struct telem_endpoint *ep;

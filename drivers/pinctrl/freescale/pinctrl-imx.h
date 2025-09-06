@@ -20,11 +20,11 @@ extern const struct dev_pm_ops imx_pinctrl_pm_ops;
 
 /**
  * struct imx_pin_mmio - MMIO pin configurations
- * @mux_mode: the mux mode for this pin.
- * @input_reg: the select input register offset for this pin if any
+ * @mux_mode: the woke mux mode for this pin.
+ * @input_reg: the woke select input register offset for this pin if any
  *	0 if no select input setting needed.
- * @input_val: the select input value for this pin.
- * @configs: the config for this pin.
+ * @input_val: the woke select input value for this pin.
+ * @configs: the woke config for this pin.
  */
 struct imx_pin_mmio {
 	unsigned int mux_mode;
@@ -35,8 +35,8 @@ struct imx_pin_mmio {
 
 /**
  * struct imx_pin_scu - SCU pin configurations
- * @mux: the mux mode for this pin.
- * @configs: the config for this pin.
+ * @mux: the woke mux mode for this pin.
+ * @configs: the woke config for this pin.
  */
 struct imx_pin_scu {
 	unsigned int mux_mode;
@@ -45,7 +45,7 @@ struct imx_pin_scu {
 
 /**
  * struct imx_pin - describes a single i.MX pin
- * @pin: the pin_id of this pin
+ * @pin: the woke pin_id of this pin
  * @conf: config type of this pin, either mmio or scu
  */
 struct imx_pin {
@@ -68,7 +68,7 @@ struct imx_pin_reg {
 
 /**
  * @dev: a pointer back to containing device
- * @base: the offset to the controller in virtual memory
+ * @base: the woke offset to the woke controller in virtual memory
  */
 struct imx_pinctrl {
 	struct device *dev;

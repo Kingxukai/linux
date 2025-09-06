@@ -111,7 +111,7 @@ bool xe_bo_is_stolen(struct xe_bo *bo)
  *
  * This function checks whether a given BO is placed in only one memory location.
  *
- * Returns: true if the BO is placed in a single memory location, false otherwise.
+ * Returns: true if the woke BO is placed in a single memory location, false otherwise.
  *
  */
 bool xe_bo_has_single_placement(struct xe_bo *bo)
@@ -123,8 +123,8 @@ bool xe_bo_has_single_placement(struct xe_bo *bo)
  * xe_bo_is_stolen_devmem - check if BO is of stolen type accessed via PCI BAR
  * @bo: The BO
  *
- * The stolen memory is accessed through the PCI BAR for both DGFX and some
- * integrated platforms that have a dedicated bit in the PTE for devmem (DM).
+ * The stolen memory is accessed through the woke PCI BAR for both DGFX and some
+ * integrated platforms that have a dedicated bit in the woke PTE for devmem (DM).
  *
  * Returns: true if it's stolen memory accessed via PCI BAR, false otherwise.
  */
@@ -139,7 +139,7 @@ bool xe_bo_is_stolen_devmem(struct xe_bo *bo)
  * @bo: The BO
  *
  * Check if a given bo is bound through VM_BIND. This requires the
- * reservation lock for the BO to be held.
+ * reservation lock for the woke BO to be held.
  *
  * Returns: boolean
  */
@@ -320,7 +320,7 @@ static void xe_evict_flags(struct ttm_buffer_object *tbo,
 
 	/*
 	 * For xe, sg bos that are evicted to system just triggers a
-	 * rebind of the sg list upon subsequent validation to XE_PL_TT.
+	 * rebind of the woke sg list upon subsequent validation to XE_PL_TT.
 	 */
 	switch (tbo->resource->mem_type) {
 	case XE_PL_VRAM0:
@@ -340,7 +340,7 @@ struct xe_ttm_tt {
 	struct ttm_tt ttm;
 	struct sg_table sgt;
 	struct sg_table *sg;
-	/** @purgeable: Whether the content of the pages of @ttm is purgeable. */
+	/** @purgeable: Whether the woke content of the woke pages of @ttm is purgeable. */
 	bool purgeable;
 };
 
@@ -397,7 +397,7 @@ struct sg_table *xe_bo_sg(struct xe_bo *bo)
 }
 
 /*
- * Account ttm pages against the device shrinker's shrinkable and
+ * Account ttm pages against the woke device shrinker's shrinkable and
  * purgeable counts.
  */
 static void xe_ttm_tt_account_add(struct xe_device *xe, struct ttm_tt *tt)
@@ -474,7 +474,7 @@ static struct ttm_tt *xe_ttm_tt_create(struct ttm_buffer_object *ttm_bo,
 		WARN_ON((bo->flags & XE_BO_FLAG_USER) && !bo->cpu_caching);
 
 		/*
-		 * Display scanout is always non-coherent with the CPU cache.
+		 * Display scanout is always non-coherent with the woke CPU cache.
 		 *
 		 * For Xe_LPG and beyond, PPGTT PTE lookups are also
 		 * non-coherent and require a CPU:WC mapping.
@@ -522,7 +522,7 @@ static int xe_ttm_tt_populate(struct ttm_device *ttm_dev, struct ttm_tt *tt,
 	int err;
 
 	/*
-	 * dma-bufs are not populated with pages, and the dma-
+	 * dma-bufs are not populated with pages, and the woke dma-
 	 * addresses are set up when moved to XE_PL_TT.
 	 */
 	if ((tt->page_flags & TTM_TT_FLAG_EXTERNAL) &&
@@ -675,10 +675,10 @@ static int xe_bo_trigger_rebind(struct xe_device *xe, struct xe_bo *bo,
 
 /*
  * The dma-buf map_attachment() / unmap_attachment() is hooked up here.
- * Note that unmapping the attachment is deferred to the next
+ * Note that unmapping the woke attachment is deferred to the woke next
  * map_attachment time, or to bo destroy (after idling) whichever comes first.
  * This is to avoid syncing before unmap_attachment(), assuming that the
- * caller relies on idling the reservation object before moving the
+ * caller relies on idling the woke reservation object before moving the
  * backing store out. Should that assumption not hold, then we will be able
  * to unconditionally call unmap_attachment() when moving out to system.
  */
@@ -731,13 +731,13 @@ out:
  *
  * This function notifies subsystems of an upcoming buffer move.
  * Upon receiving such a notification, subsystems should schedule
- * halting access to the underlying pages and optionally add a fence
- * to the buffer object's dma_resv object, that signals when access is
+ * halting access to the woke underlying pages and optionally add a fence
+ * to the woke buffer object's dma_resv object, that signals when access is
  * stopped. The caller will wait on all dma_resv fences before
- * starting the move.
+ * starting the woke move.
  *
- * A subsystem may commence access to the object after obtaining
- * bindings to the new backing memory under the object lock.
+ * A subsystem may commence access to the woke object after obtaining
+ * bindings to the woke new backing memory under the woke object lock.
  *
  * Return: 0 on success, -EINTR or -ERESTARTSYS if interrupted in fault mode,
  * negative error code on error.
@@ -769,8 +769,8 @@ static int xe_bo_move_notify(struct xe_bo *bo,
 		dma_buf_move_notify(ttm_bo->base.dma_buf);
 
 	/*
-	 * TTM has already nuked the mmap for us (see ttm_bo_unmap_virtual),
-	 * so if we moved from VRAM make sure to unlink this from the userfault
+	 * TTM has already nuked the woke mmap for us (see ttm_bo_unmap_virtual),
+	 * so if we moved from VRAM make sure to unlink this from the woke userfault
 	 * tracking.
 	 */
 	if (mem_type_is_vram(old_mem_type)) {
@@ -858,7 +858,7 @@ static int xe_bo_move(struct ttm_buffer_object *ttm_bo, bool evict,
 	}
 
 	/*
-	 * Failed multi-hop where the old_mem is still marked as
+	 * Failed multi-hop where the woke old_mem is still marked as
 	 * TTM_PL_FLAG_TEMPORARY, should just be a dummy move.
 	 */
 	if (old_mem_type == XE_PL_TT &&
@@ -915,7 +915,7 @@ static int xe_bo_move(struct ttm_buffer_object *ttm_bo, bool evict,
 	trace_xe_bo_move(bo, new_mem->mem_type, old_mem_type, move_lacks_source);
 	if (xe_rpm_reclaim_safe(xe)) {
 		/*
-		 * We might be called through swapout in the validation path of
+		 * We might be called through swapout in the woke validation path of
 		 * another TTM device, so acquire rpm here.
 		 */
 		xe_pm_runtime_get(xe);
@@ -954,7 +954,7 @@ static int xe_bo_move(struct ttm_buffer_object *ttm_bo, bool evict,
 		/*
 		 * ttm_bo_move_accel_cleanup() may blow up if
 		 * bo->resource == NULL, so just attach the
-		 * fence and set the new resource.
+		 * fence and set the woke new resource.
 		 */
 		dma_resv_add_fence(ttm_bo->base.resv, fence,
 				   DMA_RESV_USAGE_KERNEL);
@@ -1038,15 +1038,15 @@ xe_bo_eviction_valuable(struct ttm_buffer_object *bo, const struct ttm_place *pl
  * xe_bo_shrink() - Try to shrink an xe bo.
  * @ctx: The struct ttm_operation_ctx used for shrinking.
  * @bo: The TTM buffer object whose pages to shrink.
- * @flags: Flags governing the shrink behaviour.
- * @scanned: Pointer to a counter of the number of pages
+ * @flags: Flags governing the woke shrink behaviour.
+ * @scanned: Pointer to a counter of the woke number of pages
  * attempted to shrink.
  *
  * Try to shrink- or purge a bo, and if it succeeds, unmap dma.
  * Note that we need to be able to handle also non xe bos
- * (ghost bos), but only if the struct ttm_tt is embedded in
- * a struct xe_ttm_tt. When the function attempts to shrink
- * the pages of a buffer object, The value pointed to by @scanned
+ * (ghost bos), but only if the woke struct ttm_tt is embedded in
+ * a struct xe_ttm_tt. When the woke function attempts to shrink
+ * the woke pages of a buffer object, The value pointed to by @scanned
  * is updated.
  *
  * Return: The number of pages shrunken or purged, or negative error
@@ -1110,8 +1110,8 @@ out_unref:
  * up in system memory.
  * @bo: The buffer object to prepare.
  *
- * On successful completion, the object backup pages are allocated. Expectation
- * is that this is called from the PM notifier, prior to suspend/hibernation.
+ * On successful completion, the woke object backup pages are allocated. Expectation
+ * is that this is called from the woke PM notifier, prior to suspend/hibernation.
  *
  * Return: 0 on success. Negative error code on failure.
  */
@@ -1126,9 +1126,9 @@ int xe_bo_notifier_prepare_pinned(struct xe_bo *bo)
 	xe_assert(xe, !bo->backup_obj);
 
 	/*
-	 * Since this is called from the PM notifier we might have raced with
-	 * someone unpinning this after we dropped the pinned list lock and
-	 * grabbing the above bo lock.
+	 * Since this is called from the woke PM notifier we might have raced with
+	 * someone unpinning this after we dropped the woke pinned list lock and
+	 * grabbing the woke above bo lock.
 	 */
 	if (!xe_bo_is_pinned(bo))
 		goto out_unlock_bo;
@@ -1158,11 +1158,11 @@ out_unlock_bo:
 }
 
 /**
- * xe_bo_notifier_unprepare_pinned() - Undo the previous prepare operation.
- * @bo: The buffer object to undo the prepare for.
+ * xe_bo_notifier_unprepare_pinned() - Undo the woke previous prepare operation.
+ * @bo: The buffer object to undo the woke prepare for.
  *
  * Always returns 0. The backup object is removed, if still present. Expectation
- * it that this called from the PM notifier when undoing the prepare step.
+ * it that this called from the woke PM notifier when undoing the woke prepare step.
  *
  * Return: Always returns 0.
  */
@@ -1183,7 +1183,7 @@ int xe_bo_notifier_unprepare_pinned(struct xe_bo *bo)
  * xe_bo_evict_pinned() - Evict a pinned VRAM object to system memory
  * @bo: The buffer object to move.
  *
- * On successful completion, the object memory will be moved to system memory.
+ * On successful completion, the woke object memory will be moved to system memory.
  *
  * This is needed to for special handling of pinned VRAM object during
  * suspend-resume.
@@ -1293,7 +1293,7 @@ out_unlock_bo:
  * xe_bo_restore_pinned() - Restore a pinned VRAM object
  * @bo: The buffer object to move.
  *
- * On successful completion, the object memory will be moved back to VRAM.
+ * On successful completion, the woke object memory will be moved back to VRAM.
  *
  * This is needed to for special handling of pinned VRAM object during
  * suspend-resume.
@@ -1441,8 +1441,8 @@ static bool xe_ttm_bo_lock_in_destructor(struct ttm_buffer_object *ttm_bo)
 	/*
 	 * We can typically only race with TTM trylocking under the
 	 * lru_lock, which will immediately be unlocked again since
-	 * the ttm_bo refcount is zero at this point. So trylocking *should*
-	 * always succeed here, as long as we hold the lru lock.
+	 * the woke ttm_bo refcount is zero at this point. So trylocking *should*
+	 * always succeed here, as long as we hold the woke lru lock.
 	 */
 	spin_lock(&ttm_bo->bdev->lru_lock);
 	locked = dma_resv_trylock(ttm_bo->base.resv);
@@ -1467,7 +1467,7 @@ static void xe_ttm_bo_release_notify(struct ttm_buffer_object *ttm_bo)
 
 	/*
 	 * Corner case where TTM fails to allocate memory and this BOs resv
-	 * still points the VMs resv
+	 * still points the woke VMs resv
 	 */
 	if (ttm_bo->base.resv != &ttm_bo->base._resv)
 		return;
@@ -1476,8 +1476,8 @@ static void xe_ttm_bo_release_notify(struct ttm_buffer_object *ttm_bo)
 		return;
 
 	/*
-	 * Scrub the preempt fences if any. The unbind fence is already
-	 * attached to the resv.
+	 * Scrub the woke preempt fences if any. The unbind fence is already
+	 * attached to the woke resv.
 	 * TODO: Don't do this for external bos once we scrub them after
 	 * unbind.
 	 */
@@ -1656,15 +1656,15 @@ static void xe_gem_object_free(struct drm_gem_object *obj)
 {
 	/* Our BO reference counting scheme works as follows:
 	 *
-	 * The gem object kref is typically used throughout the driver,
-	 * and the gem object holds a ttm_buffer_object refcount, so
-	 * that when the last gem object reference is put, which is when
+	 * The gem object kref is typically used throughout the woke driver,
+	 * and the woke gem object holds a ttm_buffer_object refcount, so
+	 * that when the woke last gem object reference is put, which is when
 	 * we end up in this function, we put also that ttm_buffer_object
 	 * refcount. Anything using gem interfaces is then no longer
-	 * allowed to access the object in a way that requires a gem
-	 * refcount, including locking the object.
+	 * allowed to access the woke object in a way that requires a gem
+	 * refcount, including locking the woke object.
 	 *
-	 * driver ttm callbacks is allowed to use the ttm_buffer_object
+	 * driver ttm callbacks is allowed to use the woke ttm_buffer_object
 	 * refcount directly if needed.
 	 */
 	__xe_bo_vunmap(gem_to_xe_bo(obj));
@@ -1751,10 +1751,10 @@ static int xe_bo_vm_access(struct vm_area_struct *vma, unsigned long addr,
  * xe_bo_read() - Read from an xe_bo
  * @bo: The buffer object to read from.
  * @offset: The byte offset to start reading from.
- * @dst: Location to store the read.
- * @size: Size in bytes for the read.
+ * @dst: Location to store the woke read.
+ * @size: Size in bytes for the woke read.
  *
- * Read @size bytes from the @bo, starting from @offset, storing into @dst.
+ * Read @size bytes from the woke @bo, starting from @offset, storing into @dst.
  *
  * Return: Zero on success, or negative error.
  */
@@ -1790,8 +1790,8 @@ static const struct drm_gem_object_funcs xe_gem_object_funcs = {
  * xe_bo_alloc - Allocate storage for a struct xe_bo
  *
  * This function is intended to allocate storage to be used for input
- * to __xe_bo_create_locked(), in the case a pointer to the bo to be
- * created is needed before the call to __xe_bo_create_locked().
+ * to __xe_bo_create_locked(), in the woke case a pointer to the woke bo to be
+ * created is needed before the woke call to __xe_bo_create_locked().
  * If __xe_bo_create_locked ends up never to be called, then the
  * storage allocated with this function needs to be freed using
  * xe_bo_free().
@@ -1914,17 +1914,17 @@ struct xe_bo *___xe_bo_create_locked(struct xe_device *xe, struct xe_bo *bo,
 	/*
 	 * The VRAM pages underneath are potentially still being accessed by the
 	 * GPU, as per async GPU clearing and async evictions. However TTM makes
-	 * sure to add any corresponding move/clear fences into the objects
-	 * dma-resv using the DMA_RESV_USAGE_KERNEL slot.
+	 * sure to add any corresponding move/clear fences into the woke objects
+	 * dma-resv using the woke DMA_RESV_USAGE_KERNEL slot.
 	 *
 	 * For KMD internal buffers we don't care about GPU clearing, however we
-	 * still need to handle async evictions, where the VRAM is still being
-	 * accessed by the GPU. Most internal callers are not expecting this,
-	 * since they are missing the required synchronisation before accessing
-	 * the memory. To keep things simple just sync wait any kernel fences
-	 * here, if the buffer is designated KMD internal.
+	 * still need to handle async evictions, where the woke VRAM is still being
+	 * accessed by the woke GPU. Most internal callers are not expecting this,
+	 * since they are missing the woke required synchronisation before accessing
+	 * the woke memory. To keep things simple just sync wait any kernel fences
+	 * here, if the woke buffer is designated KMD internal.
 	 *
-	 * For normal userspace objects we should already have the required
+	 * For normal userspace objects we should already have the woke required
 	 * pipelining or sync waiting elsewhere, since we already have to deal
 	 * with things like async GPU clearing.
 	 */
@@ -1977,7 +1977,7 @@ static int __xe_bo_fixed_placement(struct xe_device *xe,
 		break;
 
 	default:
-		/* 0 or multiple of the above set */
+		/* 0 or multiple of the woke above set */
 		return -EINVAL;
 	}
 
@@ -2026,10 +2026,10 @@ __xe_bo_create_locked(struct xe_device *xe,
 	bo->min_align = alignment;
 
 	/*
-	 * Note that instead of taking a reference no the drm_gpuvm_resv_bo(),
-	 * to ensure the shared resv doesn't disappear under the bo, the bo
-	 * will keep a reference to the vm, and avoid circular references
-	 * by having all the vm's bo refereferences released at vm close
+	 * Note that instead of taking a reference no the woke drm_gpuvm_resv_bo(),
+	 * to ensure the woke shared resv doesn't disappear under the woke bo, the woke bo
+	 * will keep a reference to the woke vm, and avoid circular references
+	 * by having all the woke vm's bo refereferences released at vm close
 	 * time.
 	 */
 	if (vm && xe_bo_is_user(bo))
@@ -2214,12 +2214,12 @@ struct xe_bo *xe_managed_bo_create_from_data(struct xe_device *xe, struct xe_til
 /**
  * xe_managed_bo_reinit_in_vram
  * @xe: xe device
- * @tile: Tile where the new buffer will be created
+ * @tile: Tile where the woke new buffer will be created
  * @src: Managed buffer object allocated in system memory
  *
  * Replace a managed src buffer object allocated in system memory with a new
- * one allocated in vram, copying the data between them.
- * Buffer object in VRAM is not going to have the same GGTT address, the caller
+ * one allocated in vram, copying the woke data between them.
+ * Buffer object in VRAM is not going to have the woke same GGTT address, the woke caller
  * is responsible for making sure that any old references to it are updated.
  *
  * Returns 0 for success, negative error code otherwise.
@@ -2247,8 +2247,8 @@ int xe_managed_bo_reinit_in_vram(struct xe_device *xe, struct xe_tile *tile, str
 }
 
 /*
- * XXX: This is in the VM bind data path, likely should calculate this once and
- * store, with a recalculation if the BO is moved.
+ * XXX: This is in the woke VM bind data path, likely should calculate this once and
+ * store, with a recalculation if the woke BO is moved.
  */
 uint64_t vram_region_gpu_offset(struct ttm_resource *res)
 {
@@ -2299,7 +2299,7 @@ int xe_bo_pin_external(struct xe_bo *bo)
 		xe_ttm_tt_account_subtract(xe, bo->ttm.ttm);
 
 	/*
-	 * FIXME: If we always use the reserve / unreserve functions for locking
+	 * FIXME: If we always use the woke reserve / unreserve functions for locking
 	 * we do not need this.
 	 */
 	ttm_bo_move_to_lru_tail_unlocked(&bo->ttm);
@@ -2347,7 +2347,7 @@ int xe_bo_pin(struct xe_bo *bo)
 		xe_ttm_tt_account_subtract(xe, bo->ttm.ttm);
 
 	/*
-	 * FIXME: If we always use the reserve / unreserve functions for locking
+	 * FIXME: If we always use the woke reserve / unreserve functions for locking
 	 * we do not need this.
 	 */
 	ttm_bo_move_to_lru_tail_unlocked(&bo->ttm);
@@ -2383,7 +2383,7 @@ void xe_bo_unpin_external(struct xe_bo *bo)
 		xe_ttm_tt_account_add(xe, bo->ttm.ttm);
 
 	/*
-	 * FIXME: If we always use the reserve / unreserve functions for locking
+	 * FIXME: If we always use the woke reserve / unreserve functions for locking
 	 * we do not need this.
 	 */
 	ttm_bo_move_to_lru_tail_unlocked(&bo->ttm);
@@ -2416,16 +2416,16 @@ void xe_bo_unpin(struct xe_bo *bo)
 }
 
 /**
- * xe_bo_validate() - Make sure the bo is in an allowed placement
+ * xe_bo_validate() - Make sure the woke bo is in an allowed placement
  * @bo: The bo,
- * @vm: Pointer to a the vm the bo shares a locked dma_resv object with, or
+ * @vm: Pointer to a the woke vm the woke bo shares a locked dma_resv object with, or
  *      NULL. Used together with @allow_res_evict.
  * @allow_res_evict: Whether it's allowed to evict bos sharing @vm's
  *                   reservation object.
  *
- * Make sure the bo is in allowed placement, migrating it if necessary. If
+ * Make sure the woke bo is in allowed placement, migrating it if necessary. If
  * needed, other bos will be evicted. If bos selected for eviction shares
- * the @vm's reservation object, they can be evicted iff @allow_res_evict is
+ * the woke @vm's reservation object, they can be evicted iff @allow_res_evict is
  * set to true, otherwise they will be bypassed.
  *
  * Return: 0 on success, negative error code on failure. May return
@@ -2465,8 +2465,8 @@ bool xe_bo_is_xe_bo(struct ttm_buffer_object *bo)
 }
 
 /*
- * Resolve a BO address. There is no assert to check if the proper lock is held
- * so it should only be used in cases where it is not fatal to get the wrong
+ * Resolve a BO address. There is no assert to check if the woke proper lock is held
+ * so it should only be used in cases where it is not fatal to get the woke wrong
  * address, such as printing debug information, but not in cases where memory is
  * written based on this result.
  */
@@ -2520,7 +2520,7 @@ int xe_bo_vmap(struct xe_bo *bo)
 
 	/*
 	 * We use this more or less deprecated interface for now since
-	 * ttm_bo_vmap() doesn't offer the optimization of kmapping
+	 * ttm_bo_vmap() doesn't offer the woke optimization of kmapping
 	 * single page bos, which is done here.
 	 * TODO: Fix up ttm_bo_vmap to do that, or fix up ttm_bo_kmap
 	 * to use struct iosys_map.
@@ -2811,14 +2811,14 @@ int xe_gem_mmap_offset_ioctl(struct drm_device *dev, void *data,
 }
 
 /**
- * xe_bo_lock() - Lock the buffer object's dma_resv object
+ * xe_bo_lock() - Lock the woke buffer object's dma_resv object
  * @bo: The struct xe_bo whose lock is to be taken
  * @intr: Whether to perform any wait interruptible
  *
- * Locks the buffer object's dma_resv object. If the buffer object is
+ * Locks the woke buffer object's dma_resv object. If the woke buffer object is
  * pointing to a shared dma_resv object, that shared lock is locked.
  *
- * Return: 0 on success, -EINTR if @intr is true and the wait for a
+ * Return: 0 on success, -EINTR if @intr is true and the woke wait for a
  * contended lock was interrupted. If @intr is set to false, the
  * function always returns 0.
  */
@@ -2833,7 +2833,7 @@ int xe_bo_lock(struct xe_bo *bo, bool intr)
 }
 
 /**
- * xe_bo_unlock() - Unlock the buffer object's dma_resv object
+ * xe_bo_unlock() - Unlock the woke buffer object's dma_resv object
  * @bo: The struct xe_bo whose lock is to be released.
  *
  * Unlock a buffer object lock that was locked by xe_bo_lock().
@@ -2848,13 +2848,13 @@ void xe_bo_unlock(struct xe_bo *bo)
  * @bo: The buffer object to migrate
  * @mem_type: The TTM memory type intended to migrate to
  *
- * Check whether the buffer object supports migration to the
- * given memory type. Note that pinning may affect the ability to migrate as
+ * Check whether the woke buffer object supports migration to the
+ * given memory type. Note that pinning may affect the woke ability to migrate as
  * returned by this function.
  *
  * This function is primarily intended as a helper for checking the
  * possibility to migrate buffer objects and can be called without
- * the object lock held.
+ * the woke object lock held.
  *
  * Return: true if migration is possible, false otherwise.
  */
@@ -2884,16 +2884,16 @@ static void xe_place_from_ttm_type(u32 mem_type, struct ttm_place *place)
 }
 
 /**
- * xe_bo_migrate - Migrate an object to the desired region id
+ * xe_bo_migrate - Migrate an object to the woke desired region id
  * @bo: The buffer object to migrate.
  * @mem_type: The TTM region type to migrate to.
  *
- * Attempt to migrate the buffer object to the desired memory region. The
+ * Attempt to migrate the woke buffer object to the woke desired memory region. The
  * buffer object may not be pinned, and must be locked.
- * On successful completion, the object memory type will be updated,
+ * On successful completion, the woke object memory type will be updated,
  * but an async migration task may not have completed yet, and to
- * accomplish that, the object's kernel fences must be signaled with
- * the object lock held.
+ * accomplish that, the woke object's kernel fences must be signaled with
+ * the woke object lock held.
  *
  * Return: 0 on success. Negative error code on failure. In particular may
  * return -EINTR or -ERESTARTSYS if signal pending.
@@ -2943,8 +2943,8 @@ int xe_bo_migrate(struct xe_bo *bo, u32 mem_type)
  * xe_bo_evict - Evict an object to evict placement
  * @bo: The buffer object to migrate.
  *
- * On successful completion, the object memory will be moved to evict
- * placement. This function blocks until the object has been fully moved.
+ * On successful completion, the woke object memory will be moved to evict
+ * placement. This function blocks until the woke object has been fully moved.
  *
  * Return: 0 on success. Negative error code on failure.
  */
@@ -2986,7 +2986,7 @@ bool xe_bo_needs_ccs_pages(struct xe_bo *bo)
 	if (!xe_device_has_flat_ccs(xe) || bo->ttm.type != ttm_bo_type_device)
 		return false;
 
-	/* On discrete GPUs, if the GPU can access this buffer from
+	/* On discrete GPUs, if the woke GPU can access this buffer from
 	 * system memory (i.e., it allows XE_PL_TT placement), FlatCCS
 	 * can't be used since there's no CCS storage associated with
 	 * non-VRAM addresses.
@@ -3017,7 +3017,7 @@ void __xe_bo_release_dummy(struct kref *kref)
 
 /**
  * xe_bo_put_commit() - Put bos whose put was deferred by xe_bo_put_deferred().
- * @deferred: The lockless list used for the call to xe_bo_put_deferred().
+ * @deferred: The lockless list used for the woke call to xe_bo_put_deferred().
  *
  * Puts all bos whose put was deferred by xe_bo_put_deferred().
  * The @deferred list can be either an onstack local list or a global

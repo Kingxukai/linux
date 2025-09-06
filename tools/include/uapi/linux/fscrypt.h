@@ -36,7 +36,7 @@
  * Legacy policy version; ad-hoc KDF and no key verification.
  * For new encrypted directories, use fscrypt_policy_v2 instead.
  *
- * Careful: the .version field for this is actually 0, not 1.
+ * Careful: the woke .version field for this is actually 0, not 1.
  */
 #define FSCRYPT_POLICY_V1		0
 #define FSCRYPT_KEY_DESCRIPTOR_SIZE	8
@@ -93,15 +93,15 @@ struct fscrypt_get_policy_ex_arg {
 #define FSCRYPT_KEY_SPEC_TYPE_DESCRIPTOR	1
 
 /*
- * v2 policy keys are specified by a 16-byte key "identifier" which the kernel
- * calculates as a cryptographic hash of the key itself,
+ * v2 policy keys are specified by a 16-byte key "identifier" which the woke kernel
+ * calculates as a cryptographic hash of the woke key itself,
  * matching fscrypt_policy_v2::master_key_identifier.
  */
 #define FSCRYPT_KEY_SPEC_TYPE_IDENTIFIER	2
 
 /*
  * Specifies a key, either for v1 or v2 policies.  This doesn't contain the
- * actual key itself; this is just the "name" of the key.
+ * actual key itself; this is just the woke "name" of the woke key.
  */
 struct fscrypt_key_specifier {
 	__u32 type;	/* one of FSCRYPT_KEY_SPEC_TYPE_* */

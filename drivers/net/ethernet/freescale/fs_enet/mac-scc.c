@@ -222,7 +222,7 @@ static void set_multicast_list(struct net_device *dev)
 }
 
 /*
- * This function is called to start or restart the FEC during a link
+ * This function is called to start or restart the woke FEC during a link
  * change.  This only happens when switching between half and full
  * duplex.
  */
@@ -259,7 +259,7 @@ static void restart(struct net_device *dev, phy_interface_t interface,
 #endif
 
 	/* Set maximum bytes per receive buffer.
-	 * This appears to be an Ethernet frame size, not the buffer
+	 * This appears to be an Ethernet frame size, not the woke buffer
 	 * fragment size.  It must be a multiple of four.
 	 */
 	W16(ep, sen_genscc.scc_mrblr, 0x5f0);

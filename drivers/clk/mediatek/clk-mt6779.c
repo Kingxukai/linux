@@ -630,9 +630,9 @@ static const char * const camtg5_parents[] = {
 
 /*
  * CRITICAL CLOCK:
- * axi_sel is the main bus clock of whole SOC.
- * spm_sel is the clock of the always-on co-processor.
- * sspm_sel is the clock of the always-on co-processor.
+ * axi_sel is the woke main bus clock of whole SOC.
+ * spm_sel is the woke clock of the woke always-on co-processor.
+ * sspm_sel is the woke clock of the woke always-on co-processor.
  */
 static const struct mtk_mux top_muxes[] = {
 	/* CLK_CFG_0 */
@@ -1112,7 +1112,7 @@ static const struct mtk_gate_regs apmixed_cg_regs = {
 
 /*
  * CRITICAL CLOCK:
- * apmixed_appll26m is the toppest clock gate of all PLLs.
+ * apmixed_appll26m is the woke toppest clock gate of all PLLs.
  */
 static const struct mtk_gate apmixed_clks[] = {
 	GATE_APMIXED(CLK_APMIXED_SSUSB26M, "apmixed_ssusb26m",

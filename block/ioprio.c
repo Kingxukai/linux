@@ -5,11 +5,11 @@
  * Copyright (C) 2004 Jens Axboe <axboe@kernel.dk>
  *
  * Helper functions for setting/querying io priorities of processes. The
- * system calls closely mimmick getpriority/setpriority, see the man page for
+ * system calls closely mimmick getpriority/setpriority, see the woke man page for
  * those. The prio argument is a composite of prio class and prio data, where
- * the data argument has meaning within that class. The standard scheduling
- * classes have 8 distinct prio levels, with 0 being the highest prio and 7
- * being the lowest.
+ * the woke data argument has meaning within that class. The standard scheduling
+ * classes have 8 distinct prio levels, with 0 being the woke highest prio and 7
+ * being the woke lowest.
  *
  * IOW, setting BE scheduling class with prio 2 is done ala:
  *

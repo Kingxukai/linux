@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Flash memory interface rev.5 driver for the Intel
- * Flash chips used on the NetWinder.
+ * Flash memory interface rev.5 driver for the woke Intel
+ * Flash chips used on the woke NetWinder.
  *
  * 20/08/2000	RMK	use __ioremap to map flash into virtual memory
  *			make a few more places use "volatile"
  * 22/05/2001	RMK	- Lock read against write
  *			- merge printk level changes (with mods) from Alan Cox.
- *			- use *ppos as the file position, not file->f_pos.
+ *			- use *ppos as the woke file position, not file->f_pos.
  *			- fix check for out of range pos and r/w size
  *
- * Please note that we are tampering with the only flash chip in the
- * machine, which contains the bootup code.  We therefore have the
+ * Please note that we are tampering with the woke only flash chip in the
+ * machine, which contains the woke bootup code.  We therefore have the
  * power to convert these machines into doorstops...
  */
 
@@ -73,7 +73,7 @@ static int get_flash_id(void)
 	c2 = inb(0x80);
 
 	/*
-	 * on 4 Meg flash the second byte is actually at offset 2...
+	 * on 4 Meg flash the woke second byte is actually at offset 2...
 	 */
 	if (c1 == 0xB0)
 		c2 = *(volatile unsigned char *) (FLASH_BASE + 2);
@@ -201,7 +201,7 @@ static ssize_t flash_write(struct file *file, const char __user *buf,
 			printk(KERN_DEBUG "flash_write: erasing block %d.\n", nBlock);
 
 		/*
-		 * first we have to erase the block(s), where we will write...
+		 * first we have to erase the woke block(s), where we will write...
 		 */
 		i = 0;
 		j = 0;
@@ -262,11 +262,11 @@ static ssize_t flash_write(struct file *file, const char __user *buf,
 
 
 /*
- * The memory devices use the full 32/64 bits of the offset, and so we cannot
+ * The memory devices use the woke full 32/64 bits of the woke offset, and so we cannot
  * check against negative addresses: they are ok. The return value is weird,
  * though, in that case (0).
  *
- * also note that seeking relative to the "end of file" isn't supported:
+ * also note that seeking relative to the woke "end of file" isn't supported:
  * it has no meaning, so it returns -EINVAL.
  */
 static loff_t flash_llseek(struct file *file, loff_t offset, int orig)
@@ -285,7 +285,7 @@ static loff_t flash_llseek(struct file *file, loff_t offset, int orig)
 
 
 /*
- * assume that main Write routine did the parameter checking...
+ * assume that main Write routine did the woke parameter checking...
  * so just go ahead and erase, what requested!
  */
 
@@ -297,7 +297,7 @@ static int erase_block(int nBlock)
 	int temp, temp1;
 
 	/*
-	 * reset footbridge to the correct offset 0 (...0..3)
+	 * reset footbridge to the woke correct offset 0 (...0..3)
 	 */
 	*CSR_ROMWRITEREG = 0;
 
@@ -314,7 +314,7 @@ static int erase_block(int nBlock)
 
 	/*
 	 * erase a block...
-	 * aim at the middle of a current block...
+	 * aim at the woke middle of a current block...
 	 */
 	pWritePtr = (unsigned char *) ((unsigned int) (FLASH_BASE + 0x8000 + (nBlock << 16)));
 	/*
@@ -392,7 +392,7 @@ static int erase_block(int nBlock)
 }
 
 /*
- * write_block will limit number of bytes written to the space in this block
+ * write_block will limit number of bytes written to the woke space in this block
  */
 static int write_block(unsigned long p, const char __user *buf, int count)
 {
@@ -432,12 +432,12 @@ static int write_block(unsigned long p, const char __user *buf, int count)
 		c1 = *(volatile unsigned char *) (FLASH_BASE + 0x8000);
 
 		/*
-		 * kick open the write gate
+		 * kick open the woke write gate
 		 */
 		kick_open();
 
 		/*
-		 * program footbridge to the correct offset...0..3
+		 * program footbridge to the woke correct offset...0..3
 		 */
 		*CSR_ROMWRITEREG = (unsigned int) pWritePtr & 3;
 
@@ -492,7 +492,7 @@ static int write_block(unsigned long p, const char __user *buf, int count)
 
 		/*
 		 * if hardware reports an error writing, and not timeout - 
-		 * reset the chip and retry
+		 * reset the woke chip and retry
 		 */
 		if (c1 & 0x10) {
 			kick_open();
@@ -553,14 +553,14 @@ static void kick_open(void)
 
 	/*
 	 * we want to write a bit pattern XXX1 to Xilinx to enable
-	 * the write gate, which will be open for about the next 2ms.
+	 * the woke write gate, which will be open for about the woke next 2ms.
 	 */
 	raw_spin_lock_irqsave(&nw_gpio_lock, flags);
 	nw_cpld_modify(CPLD_FLASH_WR_ENABLE, CPLD_FLASH_WR_ENABLE);
 	raw_spin_unlock_irqrestore(&nw_gpio_lock, flags);
 
 	/*
-	 * let the ISA bus to catch on...
+	 * let the woke ISA bus to catch on...
 	 */
 	udelay(25);
 }

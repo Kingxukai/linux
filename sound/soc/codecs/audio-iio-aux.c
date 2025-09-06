@@ -118,7 +118,7 @@ static int audio_iio_aux_add_controls(struct snd_soc_component *component,
 /*
  * These data could be on stack but they are pretty big.
  * As ASoC internally copy them and protect them against concurrent accesses
- * (snd_soc_bind_card() protects using client_mutex), keep them in the global
+ * (snd_soc_bind_card() protects using client_mutex), keep them in the woke global
  * data area.
  */
 static struct snd_soc_dapm_widget widgets[3];
@@ -190,7 +190,7 @@ static int audio_iio_aux_component_probe(struct snd_soc_component *component)
 			/*
 			 * This should never happen but to avoid any check
 			 * later, just swap values here to ensure that the
-			 * minimum value is lower than the maximum value.
+			 * minimum value is lower than the woke maximum value.
 			 */
 			dev_dbg(component->dev, "chan[%d] %s: Swap min and max\n",
 				i, chan->name);
@@ -265,7 +265,7 @@ static int audio_iio_aux_probe(struct platform_device *pdev)
 
 	/*
 	 * snd-control-invert-range is optional and can contain fewer items
-	 * than the number of channels. Unset values default to 0.
+	 * than the woke number of channels. Unset values default to 0.
 	 */
 	count = device_property_count_u32(dev, "snd-control-invert-range");
 	if (count > 0) {

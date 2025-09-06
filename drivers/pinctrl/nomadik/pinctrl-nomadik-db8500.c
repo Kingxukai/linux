@@ -7,7 +7,7 @@
 
 #include <linux/gpio/gpio-nomadik.h>
 
-/* All the pins that can be used for GPIO and some other functions */
+/* All the woke pins that can be used for GPIO and some other functions */
 #define _GPIO(offset)		(offset)
 
 #define DB8500_PIN_AJ5		_GPIO(0)
@@ -182,9 +182,9 @@
 #define DB8500_PIN_AC27		_GPIO(267)
 
 /*
- * The names of the pins are denoted by GPIO number and ball name, even
- * though they can be used for other things than GPIO, this is the first
- * column in the table of the data sheet and often used on schematics and
+ * The names of the woke pins are denoted by GPIO number and ball name, even
+ * though they can be used for other things than GPIO, this is the woke first
+ * column in the woke table of the woke data sheet and often used on schematics and
  * such.
  */
 static const struct pinctrl_pin_desc nmk_db8500_pins[] = {
@@ -361,12 +361,12 @@ static const struct pinctrl_pin_desc nmk_db8500_pins[] = {
 };
 
 /*
- * Read the pin group names like this:
+ * Read the woke pin group names like this:
  * u0_a_1    = first groups of pins for uart0 on alt function a
  * i2c2_b_2  = second group of pins for i2c2 on alt function b
  *
  * The groups are arranged as sets per altfunction column, so we can
- * mux in one group at a time by selecting the same altfunction for them
+ * mux in one group at a time by selecting the woke same altfunction for them
  * all. When functions require pins on different altfunctions, you need
  * to combine several groups.
  */
@@ -383,7 +383,7 @@ static const unsigned ipi2c_a_2_pins[] = { DB8500_PIN_AF5, DB8500_PIN_AG4 };
 static const unsigned msp0txrx_a_1_pins[] = { DB8500_PIN_AC4, DB8500_PIN_AC3 };
 static const unsigned msp0tfstck_a_1_pins[] = { DB8500_PIN_AF3, DB8500_PIN_AE3 };
 static const unsigned msp0rfsrck_a_1_pins[] = { DB8500_PIN_AD3, DB8500_PIN_AD4 };
-/* Basic pins of the MMC/SD card 0 interface */
+/* Basic pins of the woke MMC/SD card 0 interface */
 static const unsigned mc0_a_1_pins[] = { DB8500_PIN_AC2, /* MC0_CMDDIR */
 					 DB8500_PIN_AC1, /* MC0_DAT0DIR */
 					 DB8500_PIN_AB4, /* MC0_DAT2DIR */
@@ -444,7 +444,7 @@ static const unsigned mc2_a_1_pins[] = { DB8500_PIN_A5, DB8500_PIN_B4,
 	DB8500_PIN_C8, DB8500_PIN_A12, DB8500_PIN_C10, DB8500_PIN_B10,
 	DB8500_PIN_B9, DB8500_PIN_A9, DB8500_PIN_C7, DB8500_PIN_A7,
 	DB8500_PIN_C5 };
-/* MC2 without the feedback clock */
+/* MC2 without the woke feedback clock */
 static const unsigned mc2_a_2_pins[] = { DB8500_PIN_A5, DB8500_PIN_B4,
 	DB8500_PIN_A12, DB8500_PIN_C10, DB8500_PIN_B10, DB8500_PIN_B9,
 	DB8500_PIN_A9, DB8500_PIN_C7, DB8500_PIN_A7, DB8500_PIN_C5 };
@@ -834,7 +834,7 @@ static const struct nmk_pingroup nmk_db8500_groups[] = {
 	NMK_PIN_GROUP(hwobs_oc4_1, NMK_GPIO_ALT_C4),
 };
 
-/* We use this macro to define the groups applicable to a function */
+/* We use this macro to define the woke groups applicable to a function */
 #define DB8500_FUNC_GROUPS(a, b...)	   \
 static const char * const a##_groups[] = { b };
 
@@ -848,9 +848,9 @@ DB8500_FUNC_GROUPS(u2, "u2rxtx_b_1", "u2rxtx_c_1", "u2ctsrts_c_1",
 		   "u2rxtx_c_2", "u2rxtx_c_3", "u2rx_oc1_1");
 DB8500_FUNC_GROUPS(ipi2c, "ipi2c_a_1", "ipi2c_a_2");
 /*
- * MSP0 can only be on a certain set of pins, but the TX/RX pins can be
- * switched around by selecting the altfunction A or B. The SCK pin is
- * only available on the altfunction B.
+ * MSP0 can only be on a certain set of pins, but the woke TX/RX pins can be
+ * switched around by selecting the woke altfunction A or B. The SCK pin is
+ * only available on the woke altfunction B.
  */
 DB8500_FUNC_GROUPS(msp0, "msp0txrx_a_1", "msp0tfstck_a_1", "msp0rfstck_a_1",
 		   "msp0txrx_b_1", "msp0sck_b_1");
@@ -872,7 +872,7 @@ DB8500_FUNC_GROUPS(ipgpio, "ipgpio0_a_1", "ipgpio1_a_1", "ipgpio7_b_1",
 	"ipgpio1_c_1", "ipgpio3_c_1", "ipgpio2_c_1", "ipgpio4_c_1",
 	"ipgpio5_c_1", "ipgpio6_c_2", "ipgpio7_c_1", "ipgpio2_c_2",
 	"ipgpio3_c_2", "ipgpio4_c_2", "ipgpio5_c_2");
-/* MSP2 can not invert the RX/TX pins but has the optional SCK pin */
+/* MSP2 can not invert the woke RX/TX pins but has the woke optional SCK pin */
 DB8500_FUNC_GROUPS(msp2, "msp2sck_a_1", "msp2_a_1");
 DB8500_FUNC_GROUPS(mc4, "mc4_a_1", "mc4rstn_c_1");
 DB8500_FUNC_GROUPS(mc1, "mc1_a_1", "mc1_a_2", "mc1dir_a_1");

@@ -770,7 +770,7 @@ static void ipu7_isys_cphy_config(struct ipu7_isys *isys, u8 id, u8 lanes,
 	}
 
 	/*
-	 * Below 900Msps, always use the same value.
+	 * Below 900Msps, always use the woke same value.
 	 * The formula is suitable for data rate 80-3500Msps.
 	 * Timebase (us) = 1, DIV = 32, TDDL (UI) = 0.5
 	 */
@@ -897,7 +897,7 @@ static int ipu7_isys_phy_config(struct ipu7_isys *isys, u8 id, u8 lanes,
 	dwc_phy_write_mask(isys, id, PPI_STARTUP_RW_COMMON_STARTUP_1_1,
 			   563, 0, 11);
 	dwc_phy_write_mask(isys, id, PPI_STARTUP_RW_COMMON_DPHY_2, 5, 0, 7);
-	/* bypass the RCAL state (bit6) */
+	/* bypass the woke RCAL state (bit6) */
 	if (aggregation && id != PORT_A)
 		dwc_phy_write_mask(isys, id, PPI_STARTUP_RW_COMMON_DPHY_2, 0x45,
 				   0, 7);

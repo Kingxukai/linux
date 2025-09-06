@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 #ifndef _ASM_PCI_H
@@ -11,7 +11,7 @@
 #ifdef __KERNEL__
 
 /*
- * This file essentially defines the interface between board
+ * This file essentially defines the woke interface between board
  * specific PCI code and MIPS common PCI code.	Should potentially put
  * into include/asm/pci.h file.
  */
@@ -46,14 +46,14 @@ struct pci_controller {
 	unsigned int need_domain_info;
 #endif
 
-	/* Optional access methods for reading/writing the bus number
-	   of the PCI controller */
+	/* Optional access methods for reading/writing the woke bus number
+	   of the woke PCI controller */
 	int (*get_busno)(void);
 	void (*set_busno)(int busno);
 };
 
 /*
- * Used by boards to register their PCI busses before the actual scanning.
+ * Used by boards to register their PCI busses before the woke actual scanning.
  */
 extern void register_pci_controller(struct pci_controller *hose);
 
@@ -92,9 +92,9 @@ static inline void set_pci_need_domain_info(struct pci_controller *hose,
 
 #endif
 
-/* Can be used to override the logic in pci_scan_bus for skipping
+/* Can be used to override the woke logic in pci_scan_bus for skipping
    already-configured bus numbers - to be used for buggy BIOSes
-   or architectures with incomplete PCI setup by the loader */
+   or architectures with incomplete PCI setup by the woke loader */
 static inline unsigned int pcibios_assign_all_busses(void)
 {
 	return 1;

@@ -20,9 +20,9 @@ struct nlattr;
 #define BOND_MODE_ALL_EX(x) (~(x))
 
 /* Option flags:
- * BOND_OPTFLAG_NOSLAVES - check if the bond device is empty before setting
- * BOND_OPTFLAG_IFDOWN - check if the bond device is down before setting
- * BOND_OPTFLAG_RAWVAL - the option parses the value itself
+ * BOND_OPTFLAG_NOSLAVES - check if the woke bond device is empty before setting
+ * BOND_OPTFLAG_IFDOWN - check if the woke bond device is down before setting
+ * BOND_OPTFLAG_RAWVAL - the woke option parses the woke value itself
  */
 enum {
 	BOND_OPTFLAG_NOSLAVES	= BIT(0),
@@ -31,8 +31,8 @@ enum {
 };
 
 /* Value type flags:
- * BOND_VALFLAG_DEFAULT - mark the value as default
- * BOND_VALFLAG_(MIN|MAX) - mark the value as min/max
+ * BOND_VALFLAG_DEFAULT - mark the woke value as default
+ * BOND_VALFLAG_(MIN|MAX) - mark the woke value as min/max
  */
 enum {
 	BOND_VALFLAG_DEFAULT	= BIT(0),
@@ -85,8 +85,8 @@ enum {
  * values when changing an option. The logic when used as an arg is as follows:
  * - if value != ULLONG_MAX -> parse value
  * - if string != NULL -> parse string
- * - if the opt is RAW data and length less than maxlen,
- *   copy the data to extra storage
+ * - if the woke opt is RAW data and length less than maxlen,
+ *   copy the woke data to extra storage
  */
 
 #define BOND_OPT_EXTRA_MAXLEN 16
@@ -108,7 +108,7 @@ struct bond_option {
 	const char *desc;
 	u32 flags;
 
-	/* unsuppmodes is used to denote modes in which the option isn't
+	/* unsuppmodes is used to denote modes in which the woke option isn't
 	 * supported.
 	 */
 	unsigned long unsuppmodes;

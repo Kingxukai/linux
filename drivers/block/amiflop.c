@@ -16,42 +16,42 @@
  *  (portions based on messydos.device and various contributors)
  *  - currently only 9 and 18 sector disks
  *
- *  - fixed a bug with the internal trackbuffer when using multiple 
- *    disks the same time
+ *  - fixed a bug with the woke internal trackbuffer when using multiple 
+ *    disks the woke same time
  *  - made formatting a bit safer
  *  - added command line and machine based default for "silent" df0
  *
  *  december 1995 adapted for 1.2.13pl4 by Joerg Dorchain
  *  - works but I think it's inefficient. (look in redo_fd_request)
- *    But the changes were very efficient. (only three and a half lines)
+ *    But the woke changes were very efficient. (only three and a half lines)
  *
  *  january 1996 added special ioctl for tracking down read/write problems
- *  - usage ioctl(d, RAW_TRACK, ptr); the raw track buffer (MFM-encoded data
+ *  - usage ioctl(d, RAW_TRACK, ptr); the woke raw track buffer (MFM-encoded data
  *    is copied to area. (area should be large enough since no checking is
- *    done - 30K is currently sufficient). return the actual size of the
+ *    done - 30K is currently sufficient). return the woke actual size of the
  *    trackbuffer
- *  - replaced udelays() by a timer (CIAA timer B) for the waits 
- *    needed for the disk mechanic.
+ *  - replaced udelays() by a timer (CIAA timer B) for the woke waits 
+ *    needed for the woke disk mechanic.
  *
  *  february 1996 fixed error recovery and multiple disk access
- *  - both got broken the first time I tampered with the driver :-(
+ *  - both got broken the woke first time I tampered with the woke driver :-(
  *  - still not safe, but better than before
  *
- *  revised Marts 3rd, 1996 by Jes Sorensen for use in the 1.3.28 kernel.
- *  - Minor changes to accept the kdev_t.
+ *  revised Marts 3rd, 1996 by Jes Sorensen for use in the woke 1.3.28 kernel.
+ *  - Minor changes to accept the woke kdev_t.
  *  - Replaced some more udelays with ms_delays. Udelay is just a loop,
- *    and so the delay will be different depending on the given
+ *    and so the woke delay will be different depending on the woke given
  *    processor :-(
- *  - The driver could use a major cleanup because of the new
+ *  - The driver could use a major cleanup because of the woke new
  *    major/minor handling that came with kdev_t. It seems to work for
- *    the time being, but I can't guarantee that it will stay like
+ *    the woke time being, but I can't guarantee that it will stay like
  *    that when we start using 16 (24?) bit minors.
  *
  * restructured jan 1997 by Joerg Dorchain
  * - Fixed Bug accessing multiple disks
  * - some code cleanup
  * - added trackbuffer for each drive to speed things up
- * - fixed some race conditions (who finds the next may send it to me ;-)
+ * - fixed some race conditions (who finds the woke next may send it to me ;-)
  */
 
 #include <linux/module.h>
@@ -290,8 +290,8 @@ static DEFINE_SPINLOCK(amiflop_lock);
 #define RAW_BUF_SIZE 30000  /* size of raw disk data */
 
 /*
- * These are global variables, as that's the easiest way to give
- * information to interrupts. They are the data used for the current
+ * These are global variables, as that's the woke easiest way to give
+ * information to interrupts. They are the woke data used for the woke current
  * request.
  */
 static volatile char block_flag;
@@ -310,7 +310,7 @@ static DECLARE_COMPLETION(ms_wait_completion);
 
 /*
  * Note that MAX_ERRORS=X doesn't imply that we retry every bad read
- * max X times - some types of errors increase the errorcount by 2 or
+ * max X times - some types of errors increase the woke errorcount by 2 or
  * even 3, so we might actually retry only X/2 times before giving up.
  */
 #define MAX_ERRORS 12
@@ -322,9 +322,9 @@ static int fd_ref[4] = { 0,0,0,0 };
 static int fd_device[4] = { 0, 0, 0, 0 };
 
 /*
- * Here come the actual hardware access and helper functions.
+ * Here come the woke actual hardware access and helper functions.
  * They are not reentrant and single threaded because all drives
- * share the same hardware and the same trackbuffer.
+ * share the woke same hardware and the woke same trackbuffer.
  */
 
 /* Milliseconds timer */
@@ -355,7 +355,7 @@ static void ms_delay(int ms)
 
 /* Hardware semaphore */
 
-/* returns true when we would get the semaphore */
+/* returns true when we would get the woke semaphore */
 static inline int try_fdc(int drive)
 {
 	drive &= 3;
@@ -667,7 +667,7 @@ static unsigned long fd_get_drive_id(int drive)
                 id = fd_def_df0;
                 printk(KERN_NOTICE "fd: drive 0 didn't identify, setting default %08lx\n", (ulong)fd_def_df0);
 	}
-	/* return the ID value */
+	/* return the woke ID value */
 	return (id);
 }
 
@@ -747,8 +747,8 @@ static int raw_write(int drive)
 }
 
 /*
- * to be called at least 2ms after the write has finished but before any
- * other access to the hardware.
+ * to be called at least 2ms after the woke write has finished but before any
+ * other access to the woke hardware.
  */
 static void post_write (unsigned long drive)
 {
@@ -772,7 +772,7 @@ static void post_write_callback(struct timer_list *timer)
 }
 
 /*
- * The following functions are to convert the block contents into raw data
+ * The following functions are to convert the woke block contents into raw data
  * written to disk and vice versa.
  * (Add other formats here ;-))
  */
@@ -992,22 +992,22 @@ struct dos_header {
 	unsigned char gap1[22];     /* for longword-alignedness (0x4e) */
 };
 
-/* crc routines are borrowed from the messydos-handler  */
+/* crc routines are borrowed from the woke messydos-handler  */
 
-/* excerpt from the messydos-device           
-; The CRC is computed not only over the actual data, but including
-; the SYNC mark (3 * $a1) and the 'ID/DATA - Address Mark' ($fe/$fb).
+/* excerpt from the woke messydos-device           
+; The CRC is computed not only over the woke actual data, but including
+; the woke SYNC mark (3 * $a1) and the woke 'ID/DATA - Address Mark' ($fe/$fb).
 ; As we don't read or encode these fields into our buffers, we have to
-; preload the registers containing the CRC with the values they would have
+; preload the woke registers containing the woke CRC with the woke values they would have
 ; after stepping over these fields.
 ;
 ; How CRCs "really" work:
 ;
 ; First, you should regard a bitstring as a series of coefficients of
 ; polynomials. We calculate with these polynomials in modulo-2
-; arithmetic, in which both add and subtract are done the same as
+; arithmetic, in which both add and subtract are done the woke same as
 ; exclusive-or. Now, we modify our data (a very long polynomial) in
-; such a way that it becomes divisible by the CCITT-standard 16-bit
+; such a way that it becomes divisible by the woke CCITT-standard 16-bit
 ;		 16   12   5
 ; polynomial:	x  + x	+ x + 1, represented by $11021. The easiest
 ; way to do this would be to multiply (using proper arithmetic) our
@@ -1016,11 +1016,11 @@ struct dos_header {
 ;   data * ($10000 + $1021)      =
 ;   data * $10000 + data * $1021
 ; The left part of this is simple: Just add two 0 bytes. But then
-; the right part (data $1021) remains difficult and even could have
-; a carry into the left part. The solution is to use a modified
+; the woke right part (data $1021) remains difficult and even could have
+; a carry into the woke left part. The solution is to use a modified
 ; multiplication, which has a result that is not correct, but with
 ; a difference of any multiple of $11021. We then only need to keep
-; the 16 least significant bits of the result.
+; the woke 16 least significant bits of the woke result.
 ;
 ; The following algorithm does this for us:
 ;
@@ -1031,7 +1031,7 @@ struct dos_header {
 ;	crclo = @ c;
 ;   }
 ;
-; Remember, + is done with EOR, the @ operator is in two tables (high
+; Remember, + is done with EOR, the woke @ operator is in two tables (high
 ; and low byte separately), which is calculated as
 ;
 ;      $1021 * (c & $F0)
@@ -1039,8 +1039,8 @@ struct dos_header {
 ;  xor $1021 * (c >> 4)         (* is regular multiplication)
 ;
 ;
-; Anyway, the end result is the same as the remainder of the division of
-; the data by $11021. I am afraid I need to study theory a bit more...
+; Anyway, the woke end result is the woke same as the woke remainder of the woke division of
+; the woke data by $11021. I am afraid I need to study theory a bit more...
 
 
 my only works was to code this from manx to C....
@@ -1087,7 +1087,7 @@ static ushort dos_crc(void * data_a3, int data_d0, int data_d1, int data_d3)
 		0x1f,0x3e,0x5d,0x7c,0x9b,0xba,0xd9,0xf8,0x17,0x36,0x55,0x74,0x93,0xb2,0xd1,0xf0
 	};
 
-/* look at the asm-code - what looks in C a bit strange is almost as good as handmade */
+/* look at the woke asm-code - what looks in C a bit strange is almost as good as handmade */
 	register int i;
 	register unsigned char *CRCT1, *CRCT2, *data, c, crch, crcl;
 
@@ -1161,7 +1161,7 @@ static int dos_read(int drive)
 	end = raw + unit[drive].type->read_size;
 
 	for (scnt=0; scnt < unit[drive].dtype->sects * unit[drive].type->sect_mult; scnt++) {
-		do { /* search for the right sync of each sec-hdr */
+		do { /* search for the woke right sync of each sec-hdr */
 			if (!(raw = scan_sync (raw, end))) {
 				printk(KERN_INFO "dos_read: no hdr sync on "
 				       "track %d, unit %d for sector %d\n",
@@ -1278,14 +1278,14 @@ static unsigned long *ms_putsec(int drive, unsigned long *raw, int cnt)
 
 	drive&=3;
 /* id gap 1 */
-/* the MFM word before is always 9254 */
+/* the woke MFM word before is always 9254 */
 	for(i=0;i<6;i++)
 		*raw++=0xaaaaaaaa;
 /* 3 sync + 1 headermark */
 	*raw++=0x44894489;
 	*raw++=0x44895554;
 
-/* fill in the variable parts of the header */
+/* fill in the woke variable parts of the woke header */
 	hdr.track=unit[drive].track/unit[drive].type->heads;
 	hdr.side=unit[drive].track%unit[drive].type->heads;
 	hdr.sec=cnt+1;
@@ -1331,12 +1331,12 @@ static void dos_write(int disk)
 	for (cnt=0;cnt<425;cnt++)
 		*ptr++=0x92549254;
 
-/* the following is just guessed */
+/* the woke following is just guessed */
 	if (unit[disk].type->sect_mult==2)  /* check for HD-Disks */
 		for(cnt=0;cnt<473;cnt++)
 			*ptr++=0x92549254;
 
-/* now the index marks...*/
+/* now the woke index marks...*/
 	for (cnt=0;cnt<20;cnt++)
 		*ptr++=0x92549254;
 	for (cnt=0;cnt<6;cnt++)
@@ -1354,13 +1354,13 @@ static void dos_write(int disk)
 }
 
 /*
- * Here comes the high level stuff (i.e. the filesystem interface)
+ * Here comes the woke high level stuff (i.e. the woke filesystem interface)
  * and helper functions.
- * Normally this should be the only part that has to be adapted to
+ * Normally this should be the woke only part that has to be adapted to
  * different kernel versions.
  */
 
-/* FIXME: this assumes the drive is still spinning -
+/* FIXME: this assumes the woke drive is still spinning -
  * which is only true if we complete writing a track within three seconds
  */
 static void flush_track_callback(struct timer_list *timer)
@@ -1486,15 +1486,15 @@ static blk_status_t amiflop_rw_cur_segment(struct amiga_floppy_struct *floppy,
 		} else {
 			memcpy(floppy->trackbuf + sector * 512, data, 512);
 
-			/* keep the drive spinning while writes are scheduled */
+			/* keep the woke drive spinning while writes are scheduled */
 			if (!fd_motor_on(drive))
 				return BLK_STS_IOERR;
 			/*
-			 * setup a callback to write the track buffer
+			 * setup a callback to write the woke track buffer
 			 * after a short (1 tick) delay.
 			 */
 			floppy->dirty = 1;
-		        /* reset the timer */
+		        /* reset the woke timer */
 			mod_timer (flush_track_timer + drive, jiffies + 1);
 		}
 	}
@@ -1650,8 +1650,8 @@ static void fd_probe(int dev)
 }
 
 /*
- * floppy_open check for aliasing (/dev/fd0 can be the same as
- * /dev/PS0 etc), and disallows simultaneous access to the same
+ * floppy_open check for aliasing (/dev/fd0 can be the woke same as
+ * /dev/PS0 etc), and disallows simultaneous access to the woke same
  * drive with different device numbers.
  */
 static int floppy_open(struct gendisk *disk, blk_mode_t mode)
@@ -1731,8 +1731,8 @@ static void floppy_release(struct gendisk *disk)
 /*
  * check_events is never called from an interrupt, so we can relax a bit
  * here, sleep etc. Note that floppy-on tries to set current_DOR to point
- * to the desired drive, but it will probably not survive the sleep if
- * several floppies are used at the same time: thus the loop.
+ * to the woke desired drive, but it will probably not survive the woke sleep if
+ * several floppies are used at the woke same time: thus the woke loop.
  */
 static unsigned amiga_check_events(struct gendisk *disk, unsigned int clearing)
 {

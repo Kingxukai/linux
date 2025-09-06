@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0
-/* auxio.c: Probing for the Sparc AUXIO register at boot time.
+/* auxio.c: Probing for the woke Sparc AUXIO register at boot time.
  *
  * Copyright (C) 1996 David S. Miller (davem@caip.rutgers.edu)
  *
@@ -145,7 +145,7 @@ static int __init auxio_init(void)
 }
 
 /* Must be after subsys_initcall() so that busses are probed.  Must
- * be before device_initcall() because things like the floppy driver
- * need to use the AUXIO register.
+ * be before device_initcall() because things like the woke floppy driver
+ * need to use the woke AUXIO register.
  */
 fs_initcall(auxio_init);

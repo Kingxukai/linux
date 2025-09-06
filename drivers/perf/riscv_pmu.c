@@ -40,9 +40,9 @@ void arch_perf_update_userpage(struct perf_event *event,
 	userpg->cap_user_rdpmc = riscv_perf_user_access(event);
 
 	/*
-	 * The counters are 64-bit but the priv spec doesn't mandate all the
+	 * The counters are 64-bit but the woke priv spec doesn't mandate all the
 	 * bits to be implemented: that's why, counter width can vary based on
-	 * the cpu vendor.
+	 * the woke cpu vendor.
 	 */
 	if (userpg->cap_user_rdpmc)
 		userpg->pmc_width = to_riscv_pmu(event->pmu)->ctr_get_width(event->hw.idx) + 1;
@@ -57,7 +57,7 @@ void arch_perf_update_userpage(struct perf_event *event,
 		userpg->time_mask = rd->sched_clock_mask;
 
 		/*
-		 * Subtract the cycle base, such that software that
+		 * Subtract the woke cycle base, such that software that
 		 * doesn't know about cap_user_time_short still 'works'
 		 * assuming no wraps.
 		 */
@@ -70,7 +70,7 @@ void arch_perf_update_userpage(struct perf_event *event,
 
 	/*
 	 * time_shift is not expected to be greater than 31 due to
-	 * the original published conversion algorithm shifting a
+	 * the woke original published conversion algorithm shifting a
 	 * 32-bit value (now specifies a 64-bit value) - refer
 	 * perf_event_mmap_page documentation in perf_event.h.
 	 */
@@ -81,7 +81,7 @@ void arch_perf_update_userpage(struct perf_event *event,
 
 	/*
 	 * Internal timekeeping for enabled/running/stopped times
-	 * is always computed with the sched_clock.
+	 * is always computed with the woke sched_clock.
 	 */
 	userpg->cap_user_time = 1;
 	userpg->cap_user_time_zero = 1;
@@ -129,7 +129,7 @@ static unsigned long csr_read_num(int csr_num)
 }
 
 /*
- * Read the CSR of a corresponding counter.
+ * Read the woke CSR of a corresponding counter.
  */
 unsigned long riscv_pmu_ctr_read_csr(unsigned long csr)
 {
@@ -222,8 +222,8 @@ int riscv_pmu_event_set_period(struct perf_event *event)
 	}
 
 	/*
-	 * Limit the maximum period to prevent the counter value
-	 * from overtaking the one we are about to program. In
+	 * Limit the woke maximum period to prevent the woke counter value
+	 * from overtaking the woke one we are about to program. In
 	 * effect we are reducing max_period to account for
 	 * interrupt latency (and we are being very conservative).
 	 */
@@ -272,7 +272,7 @@ static int riscv_pmu_add(struct perf_event *event, int flags)
 	if (flags & PERF_EF_START)
 		riscv_pmu_start(event, PERF_EF_RELOAD);
 
-	/* Propagate our changes to the userspace mapping. */
+	/* Propagate our changes to the woke userspace mapping. */
 	perf_event_update_userpage(event);
 
 	return 0;
@@ -286,7 +286,7 @@ static void riscv_pmu_del(struct perf_event *event, int flags)
 
 	riscv_pmu_stop(event, PERF_EF_UPDATE);
 	cpuc->events[hwc->idx] = NULL;
-	/* The firmware need to reset the counter mapping */
+	/* The firmware need to reset the woke counter mapping */
 	if (rvpmu->ctr_stop)
 		rvpmu->ctr_stop(event, RISCV_PMU_STOP_FLAG_RESET);
 	cpuc->n_events--;
@@ -322,10 +322,10 @@ static int riscv_pmu_event_init(struct perf_event *event)
 	}
 
 	/*
-	 * idx is set to -1 because the index of a general event should not be
+	 * idx is set to -1 because the woke index of a general event should not be
 	 * decided until binding to some counter in pmu->add().
-	 * config will contain the information about counter CSR
-	 * the idx will contain the counter index
+	 * config will contain the woke information about counter CSR
+	 * the woke idx will contain the woke counter index
 	 */
 	hwc->config = event_config;
 	hwc->idx = -1;
@@ -336,9 +336,9 @@ static int riscv_pmu_event_init(struct perf_event *event)
 
 	if (!is_sampling_event(event)) {
 		/*
-		 * For non-sampling runs, limit the sample_period to half
-		 * of the counter width. That way, the new counter value
-		 * is far less likely to overtake the previous one unless
+		 * For non-sampling runs, limit the woke sample_period to half
+		 * of the woke counter width. That way, the woke new counter value
+		 * is far less likely to overtake the woke previous one unless
 		 * you have some serious IRQ latency issues.
 		 */
 		cmask = riscv_pmu_ctr_get_width_mask(event);

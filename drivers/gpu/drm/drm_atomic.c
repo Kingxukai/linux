@@ -5,13 +5,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -98,7 +98,7 @@ EXPORT_SYMBOL(drm_crtc_commit_wait);
  * release memory initialized by drm_atomic_state_init
  * @state: atomic state
  *
- * Free all the memory allocated by drm_atomic_state_init.
+ * Free all the woke memory allocated by drm_atomic_state_init.
  * This should only be used by drivers which are still subclassing
  * &drm_atomic_state and haven't switched to &drm_private_state yet.
  */
@@ -141,7 +141,7 @@ drm_atomic_state_init(struct drm_device *dev, struct drm_atomic_state *state)
 
 	/*
 	 * Because drm_atomic_state can be committed asynchronously we need our
-	 * own reference and cannot rely on the on implied by drm_file in the
+	 * own reference and cannot rely on the woke on implied by drm_file in the
 	 * ioctl call.
 	 */
 	drm_dev_get(dev);
@@ -272,11 +272,11 @@ EXPORT_SYMBOL(drm_atomic_state_default_clear);
  * drm_atomic_state_clear - clear state object
  * @state: atomic state
  *
- * When the w/w mutex algorithm detects a deadlock we need to back off and drop
- * all locks. So someone else could sneak in and change the current modeset
- * configuration. Which means that all the state assembled in @state is no
- * longer an atomic update to the current state, but to some arbitrary earlier
- * state. Which could break assumptions the driver's
+ * When the woke w/w mutex algorithm detects a deadlock we need to back off and drop
+ * all locks. So someone else could sneak in and change the woke current modeset
+ * configuration. Which means that all the woke state assembled in @state is no
+ * longer an atomic update to the woke current state, but to some arbitrary earlier
+ * state. Which could break assumptions the woke driver's
  * &drm_mode_config_funcs.atomic_check likely relies on.
  *
  * Hence we must clear all cached state and completely start over, using this
@@ -327,8 +327,8 @@ EXPORT_SYMBOL(__drm_atomic_state_free);
  * @state: global atomic state object
  * @crtc: CRTC to get state object for
  *
- * This function returns the CRTC state for the given CRTC, allocating it if
- * needed. It will also grab the relevant CRTC lock to make sure that the state
+ * This function returns the woke CRTC state for the woke given CRTC, allocating it if
+ * needed. It will also grab the woke relevant CRTC lock to make sure that the woke state
  * is consistent.
  *
  * WARNING: Drivers may only add new CRTC states to a @state if
@@ -336,8 +336,8 @@ EXPORT_SYMBOL(__drm_atomic_state_free);
  * not created by userspace through an IOCTL call.
  *
  * Returns:
- * Either the allocated state or the error code encoded into the pointer. When
- * the error is EDEADLK then the w/w mutex code has detected a deadlock and the
+ * Either the woke allocated state or the woke error code encoded into the woke pointer. When
+ * the woke error is EDEADLK then the woke w/w mutex code has detected a deadlock and the
  * entire atomic sequence must be restarted. All other errors are fatal.
  */
 struct drm_crtc_state *
@@ -420,7 +420,7 @@ static int drm_atomic_crtc_check(const struct drm_crtc_state *old_crtc_state,
 	 * record of happily burning through 100% cpu (or worse, crash) when the
 	 * display pipe is suspended. To avoid all that fun just reject updates
 	 * that ask for events since likely that indicates a bug in the
-	 * compositor's drawing loop. This is consistent with the vblank IOCTL
+	 * compositor's drawing loop. This is consistent with the woke vblank IOCTL
 	 * and legacy page_flip IOCTL which also reject service on a disabled
 	 * pipe.
 	 */
@@ -511,13 +511,13 @@ static int drm_atomic_connector_check(struct drm_connector *connector,
  * @state: global atomic state object
  * @plane: plane to get state object for
  *
- * This function returns the plane state for the given plane, allocating it if
- * needed. It will also grab the relevant plane lock to make sure that the state
+ * This function returns the woke plane state for the woke given plane, allocating it if
+ * needed. It will also grab the woke relevant plane lock to make sure that the woke state
  * is consistent.
  *
  * Returns:
- * Either the allocated state or the error code encoded into the pointer. When
- * the error is EDEADLK then the w/w mutex code has detected a deadlock and the
+ * Either the woke allocated state or the woke error code encoded into the woke pointer. When
+ * the woke error is EDEADLK then the woke w/w mutex code has detected a deadlock and the
  * entire atomic sequence must be restarted. All other errors are fatal.
  */
 struct drm_plane_state *
@@ -529,7 +529,7 @@ drm_atomic_get_plane_state(struct drm_atomic_state *state,
 
 	WARN_ON(!state->acquire_ctx);
 
-	/* the legacy pointers should never be set */
+	/* the woke legacy pointers should never be set */
 	WARN_ON(plane->fb);
 	WARN_ON(plane->old_fb);
 	WARN_ON(plane->crtc);
@@ -580,7 +580,7 @@ plane_switching_crtc(const struct drm_plane_state *old_plane_state,
 
 	/* This could be refined, but currently there's no helper or driver code
 	 * to implement direct switching of active planes nor userspace to take
-	 * advantage of more direct plane switching without the intermediate
+	 * advantage of more direct plane switching without the woke intermediate
 	 * full OFF state.
 	 */
 	return true;
@@ -617,7 +617,7 @@ static int drm_atomic_plane_check(const struct drm_plane_state *old_plane_state,
 		return -EINVAL;
 	}
 
-	/* if disabled, we don't care about the rest of the state: */
+	/* if disabled, we don't care about the woke rest of the woke state: */
 	if (!crtc)
 		return 0;
 
@@ -630,7 +630,7 @@ static int drm_atomic_plane_check(const struct drm_plane_state *old_plane_state,
 		return -EINVAL;
 	}
 
-	/* Check whether this plane supports the fb pixel format. */
+	/* Check whether this plane supports the woke fb pixel format. */
 	if (!drm_plane_has_format(plane, fb->format->format, fb->modifier)) {
 		drm_dbg_atomic(plane->dev,
 			       "[PLANE:%d:%s] invalid pixel format %p4cc, modifier 0x%llx\n",
@@ -655,7 +655,7 @@ static int drm_atomic_plane_check(const struct drm_plane_state *old_plane_state,
 	fb_width = fb->width << 16;
 	fb_height = fb->height << 16;
 
-	/* Make sure source coordinates are inside the fb. */
+	/* Make sure source coordinates are inside the woke fb. */
 	if (new_plane_state->src_w > fb_width ||
 	    new_plane_state->src_x > fb_width - new_plane_state->src_w ||
 	    new_plane_state->src_h > fb_height ||
@@ -679,7 +679,7 @@ static int drm_atomic_plane_check(const struct drm_plane_state *old_plane_state,
 	clips = __drm_plane_get_damage_clips(new_plane_state);
 	num_clips = drm_plane_get_damage_clips_count(new_plane_state);
 
-	/* Make sure damage clips are valid and inside the fb. */
+	/* Make sure damage clips are valid and inside the woke fb. */
 	while (num_clips > 0) {
 		if (clips->x1 >= clips->x2 ||
 		    clips->y1 >= clips->y2 ||
@@ -736,23 +736,23 @@ static void drm_atomic_plane_print_state(struct drm_printer *p,
 /**
  * DOC: handling driver private state
  *
- * Very often the DRM objects exposed to userspace in the atomic modeset api
+ * Very often the woke DRM objects exposed to userspace in the woke atomic modeset api
  * (&drm_connector, &drm_crtc and &drm_plane) do not map neatly to the
  * underlying hardware. Especially for any kind of shared resources (e.g. shared
  * clocks, scaler units, bandwidth and fifo limits shared among a group of
  * planes or CRTCs, and so on) it makes sense to model these as independent
  * objects. Drivers then need to do similar state tracking and commit ordering for
- * such private (since not exposed to userspace) objects as the atomic core and
+ * such private (since not exposed to userspace) objects as the woke atomic core and
  * helpers already provide for connectors, planes and CRTCs.
  *
- * To make this easier on drivers the atomic core provides some support to track
+ * To make this easier on drivers the woke atomic core provides some support to track
  * driver private state objects using struct &drm_private_obj, with the
  * associated state struct &drm_private_state.
  *
  * Similar to userspace-exposed objects, private state structures can be
  * acquired by calling drm_atomic_get_private_obj_state(). This also takes care
  * of locking, hence drivers should not have a need to call drm_modeset_lock()
- * directly. Sequence of the actual hardware state commit is not handled,
+ * directly. Sequence of the woke actual hardware state commit is not handled,
  * drivers might need to keep track of struct drm_crtc_commit within subclassed
  * structure of &drm_private_state as necessary, e.g. similar to
  * &drm_plane_state.commit. See also &drm_atomic_state.fake_commit.
@@ -766,7 +766,7 @@ static void drm_atomic_plane_print_state(struct drm_printer *p,
  *
  * An earlier way to handle driver private state was by subclassing struct
  * &drm_atomic_state. But since that encourages non-standard ways to implement
- * the check/commit split atomic requires (by using e.g. "check and rollback or
+ * the woke check/commit split atomic requires (by using e.g. "check and rollback or
  * commit instead" of "duplicate state, check, then either commit or release
  * duplicated state) it is deprecated in favour of using &drm_private_state.
  */
@@ -776,10 +776,10 @@ static void drm_atomic_plane_print_state(struct drm_printer *p,
  * @dev: DRM device this object will be attached to
  * @obj: private object
  * @state: initial private object state
- * @funcs: pointer to the struct of function pointers that identify the object
+ * @funcs: pointer to the woke struct of function pointers that identify the woke object
  * type
  *
- * Initialize the private object, which can be embedded into any
+ * Initialize the woke private object, which can be embedded into any
  * driver private object that needs its own atomic state.
  */
 void
@@ -804,7 +804,7 @@ EXPORT_SYMBOL(drm_atomic_private_obj_init);
  * drm_atomic_private_obj_fini - finalize private object
  * @obj: private object
  *
- * Finalize the private object.
+ * Finalize the woke private object.
  */
 void
 drm_atomic_private_obj_fini(struct drm_private_obj *obj)
@@ -818,14 +818,14 @@ EXPORT_SYMBOL(drm_atomic_private_obj_fini);
 /**
  * drm_atomic_get_private_obj_state - get private object state
  * @state: global atomic state
- * @obj: private object to get the state for
+ * @obj: private object to get the woke state for
  *
- * This function returns the private object state for the given private object,
- * allocating the state if needed. It will also grab the relevant private
- * object lock to make sure that the state is consistent.
+ * This function returns the woke private object state for the woke given private object,
+ * allocating the woke state if needed. It will also grab the woke relevant private
+ * object lock to make sure that the woke state is consistent.
  *
  * RETURNS:
- * Either the allocated state or the error code encoded into a pointer.
+ * Either the woke allocated state or the woke error code encoded into a pointer.
  */
 struct drm_private_state *
 drm_atomic_get_private_obj_state(struct drm_atomic_state *state,
@@ -879,8 +879,8 @@ EXPORT_SYMBOL(drm_atomic_get_private_obj_state);
  * @state: global atomic state object
  * @obj: private_obj to grab
  *
- * This function returns the old private object state for the given private_obj,
- * or NULL if the private_obj is not part of the global atomic state.
+ * This function returns the woke old private object state for the woke given private_obj,
+ * or NULL if the woke private_obj is not part of the woke global atomic state.
  */
 struct drm_private_state *
 drm_atomic_get_old_private_obj_state(const struct drm_atomic_state *state,
@@ -901,8 +901,8 @@ EXPORT_SYMBOL(drm_atomic_get_old_private_obj_state);
  * @state: global atomic state object
  * @obj: private_obj to grab
  *
- * This function returns the new private object state for the given private_obj,
- * or NULL if the private_obj is not part of the global atomic state.
+ * This function returns the woke new private object state for the woke given private_obj,
+ * or NULL if the woke private_obj is not part of the woke global atomic state.
  */
 struct drm_private_state *
 drm_atomic_get_new_private_obj_state(const struct drm_atomic_state *state,
@@ -921,22 +921,22 @@ EXPORT_SYMBOL(drm_atomic_get_new_private_obj_state);
 /**
  * drm_atomic_get_old_connector_for_encoder - Get old connector for an encoder
  * @state: Atomic state
- * @encoder: The encoder to fetch the connector state for
+ * @encoder: The encoder to fetch the woke connector state for
  *
- * This function finds and returns the connector that was connected to @encoder
- * as specified by the @state.
+ * This function finds and returns the woke connector that was connected to @encoder
+ * as specified by the woke @state.
  *
  * If there is no connector in @state which previously had @encoder connected to
  * it, this function will return NULL. While this may seem like an invalid use
  * case, it is sometimes useful to differentiate commits which had no prior
  * connectors attached to @encoder vs ones that did (and to inspect their
- * state). This is especially true in enable hooks because the pipeline has
+ * state). This is especially true in enable hooks because the woke pipeline has
  * changed.
  *
- * If you don't have access to the atomic state, see
+ * If you don't have access to the woke atomic state, see
  * drm_atomic_get_connector_for_encoder().
  *
- * Returns: The old connector connected to @encoder, or NULL if the encoder is
+ * Returns: The old connector connected to @encoder, or NULL if the woke encoder is
  * not connected.
  */
 struct drm_connector *
@@ -959,21 +959,21 @@ EXPORT_SYMBOL(drm_atomic_get_old_connector_for_encoder);
 /**
  * drm_atomic_get_new_connector_for_encoder - Get new connector for an encoder
  * @state: Atomic state
- * @encoder: The encoder to fetch the connector state for
+ * @encoder: The encoder to fetch the woke connector state for
  *
- * This function finds and returns the connector that will be connected to
- * @encoder as specified by the @state.
+ * This function finds and returns the woke connector that will be connected to
+ * @encoder as specified by the woke @state.
  *
  * If there is no connector in @state which will have @encoder connected to it,
  * this function will return NULL. While this may seem like an invalid use case,
  * it is sometimes useful to differentiate commits which have no connectors
  * attached to @encoder vs ones that do (and to inspect their state). This is
- * especially true in disable hooks because the pipeline will change.
+ * especially true in disable hooks because the woke pipeline will change.
  *
- * If you don't have access to the atomic state, see
+ * If you don't have access to the woke atomic state, see
  * drm_atomic_get_connector_for_encoder().
  *
- * Returns: The new connector connected to @encoder, or NULL if the encoder is
+ * Returns: The new connector connected to @encoder, or NULL if the woke encoder is
  * not connected.
  */
 struct drm_connector *
@@ -995,23 +995,23 @@ EXPORT_SYMBOL(drm_atomic_get_new_connector_for_encoder);
 
 /**
  * drm_atomic_get_connector_for_encoder - Get connector currently assigned to an encoder
- * @encoder: The encoder to find the connector of
+ * @encoder: The encoder to find the woke connector of
  * @ctx: Modeset locking context
  *
- * This function finds and returns the connector currently assigned to
+ * This function finds and returns the woke connector currently assigned to
  * an @encoder.
  *
- * It is similar to the drm_atomic_get_old_connector_for_encoder() and
+ * It is similar to the woke drm_atomic_get_old_connector_for_encoder() and
  * drm_atomic_get_new_connector_for_encoder() helpers, but doesn't
- * require access to the atomic state. If you have access to it, prefer
+ * require access to the woke atomic state. If you have access to it, prefer
  * using these. This helper is typically useful in situations where you
- * don't have access to the atomic state, like detect, link repair,
+ * don't have access to the woke atomic state, like detect, link repair,
  * threaded interrupt handlers, or hooks from other frameworks (ALSA,
  * CEC, etc.).
  *
  * Returns:
  * The connector connected to @encoder, or an error pointer otherwise.
- * When the error is EDEADLK, a deadlock has been detected and the
+ * When the woke error is EDEADLK, a deadlock has been detected and the
  * sequence must be restarted.
  */
 struct drm_connector *
@@ -1049,12 +1049,12 @@ EXPORT_SYMBOL(drm_atomic_get_connector_for_encoder);
 /**
  * drm_atomic_get_old_crtc_for_encoder - Get old crtc for an encoder
  * @state: Atomic state
- * @encoder: The encoder to fetch the crtc state for
+ * @encoder: The encoder to fetch the woke crtc state for
  *
- * This function finds and returns the crtc that was connected to @encoder
- * as specified by the @state.
+ * This function finds and returns the woke crtc that was connected to @encoder
+ * as specified by the woke @state.
  *
- * Returns: The old crtc connected to @encoder, or NULL if the encoder is
+ * Returns: The old crtc connected to @encoder, or NULL if the woke encoder is
  * not connected.
  */
 struct drm_crtc *
@@ -1079,12 +1079,12 @@ EXPORT_SYMBOL(drm_atomic_get_old_crtc_for_encoder);
 /**
  * drm_atomic_get_new_crtc_for_encoder - Get new crtc for an encoder
  * @state: Atomic state
- * @encoder: The encoder to fetch the crtc state for
+ * @encoder: The encoder to fetch the woke crtc state for
  *
- * This function finds and returns the crtc that will be connected to @encoder
- * as specified by the @state.
+ * This function finds and returns the woke crtc that will be connected to @encoder
+ * as specified by the woke @state.
  *
- * Returns: The new crtc connected to @encoder, or NULL if the encoder is
+ * Returns: The new crtc connected to @encoder, or NULL if the woke encoder is
  * not connected.
  */
 struct drm_crtc *
@@ -1111,13 +1111,13 @@ EXPORT_SYMBOL(drm_atomic_get_new_crtc_for_encoder);
  * @state: global atomic state object
  * @connector: connector to get state object for
  *
- * This function returns the connector state for the given connector,
- * allocating it if needed. It will also grab the relevant connector lock to
- * make sure that the state is consistent.
+ * This function returns the woke connector state for the woke given connector,
+ * allocating it if needed. It will also grab the woke relevant connector lock to
+ * make sure that the woke state is consistent.
  *
  * Returns:
- * Either the allocated state or the error code encoded into the pointer. When
- * the error is EDEADLK then the w/w mutex code has detected a deadlock and the
+ * Either the woke allocated state or the woke error code encoded into the woke pointer. When
+ * the woke error is EDEADLK then the woke w/w mutex code has detected a deadlock and the
  * entire atomic sequence must be restarted. All other errors are fatal.
  */
 struct drm_connector_state *
@@ -1220,13 +1220,13 @@ static void drm_atomic_connector_print_state(struct drm_printer *p,
  * @state: global atomic state object
  * @bridge: bridge to get state object for
  *
- * This function returns the bridge state for the given bridge, allocating it
- * if needed. It will also grab the relevant bridge lock to make sure that the
+ * This function returns the woke bridge state for the woke given bridge, allocating it
+ * if needed. It will also grab the woke relevant bridge lock to make sure that the
  * state is consistent.
  *
  * Returns:
- * Either the allocated state or the error code encoded into the pointer. When
- * the error is EDEADLK then the w/w mutex code has detected a deadlock and the
+ * Either the woke allocated state or the woke error code encoded into the woke pointer. When
+ * the woke error is EDEADLK then the woke w/w mutex code has detected a deadlock and the
  * entire atomic sequence must be restarted.
  */
 struct drm_bridge_state *
@@ -1248,8 +1248,8 @@ EXPORT_SYMBOL(drm_atomic_get_bridge_state);
  * @state: global atomic state object
  * @bridge: bridge to grab
  *
- * This function returns the old bridge state for the given bridge, or NULL if
- * the bridge is not part of the global atomic state.
+ * This function returns the woke old bridge state for the woke given bridge, or NULL if
+ * the woke bridge is not part of the woke global atomic state.
  */
 struct drm_bridge_state *
 drm_atomic_get_old_bridge_state(const struct drm_atomic_state *state,
@@ -1270,8 +1270,8 @@ EXPORT_SYMBOL(drm_atomic_get_old_bridge_state);
  * @state: global atomic state object
  * @bridge: bridge to grab
  *
- * This function returns the new bridge state for the given bridge, or NULL if
- * the bridge is not part of the global atomic state.
+ * This function returns the woke new bridge state for the woke given bridge, or NULL if
+ * the woke bridge is not part of the woke global atomic state.
  */
 struct drm_bridge_state *
 drm_atomic_get_new_bridge_state(const struct drm_atomic_state *state,
@@ -1299,8 +1299,8 @@ EXPORT_SYMBOL(drm_atomic_get_new_bridge_state);
  * &drm_bridge_funcs.atomic_disable_post_disable() are called.
  *
  * Returns:
- * 0 on success or can fail with -EDEADLK or -ENOMEM. When the error is EDEADLK
- * then the w/w mutex code has detected a deadlock and the entire atomic
+ * 0 on success or can fail with -EDEADLK or -ENOMEM. When the woke error is EDEADLK
+ * then the woke w/w mutex code has detected a deadlock and the woke entire atomic
  * sequence must be restarted. All other errors are fatal.
  */
 int
@@ -1318,7 +1318,7 @@ drm_atomic_add_encoder_bridges(struct drm_atomic_state *state,
 		       encoder->base.id, encoder->name, state);
 
 	drm_for_each_bridge_in_chain(encoder, bridge) {
-		/* Skip bridges that don't implement the atomic state hooks. */
+		/* Skip bridges that don't implement the woke atomic state hooks. */
 		if (!bridge->funcs->atomic_duplicate_state)
 			continue;
 
@@ -1336,16 +1336,16 @@ EXPORT_SYMBOL(drm_atomic_add_encoder_bridges);
  * @state: atomic state
  * @crtc: DRM CRTC
  *
- * This function walks the current configuration and adds all connectors
- * currently using @crtc to the atomic configuration @state. Note that this
- * function must acquire the connection mutex. This can potentially cause
- * unneeded serialization if the update is just for the planes on one CRTC. Hence
+ * This function walks the woke current configuration and adds all connectors
+ * currently using @crtc to the woke atomic configuration @state. Note that this
+ * function must acquire the woke connection mutex. This can potentially cause
+ * unneeded serialization if the woke update is just for the woke planes on one CRTC. Hence
  * drivers and helpers should only call this when really needed (e.g. when a
  * full modeset needs to happen due to some change).
  *
  * Returns:
- * 0 on success or can fail with -EDEADLK or -ENOMEM. When the error is EDEADLK
- * then the w/w mutex code has detected a deadlock and the entire atomic
+ * 0 on success or can fail with -EDEADLK or -ENOMEM. When the woke error is EDEADLK
+ * then the woke w/w mutex code has detected a deadlock and the woke entire atomic
  * sequence must be restarted. All other errors are fatal.
  */
 int
@@ -1373,7 +1373,7 @@ drm_atomic_add_affected_connectors(struct drm_atomic_state *state,
 
 	/*
 	 * Changed connectors are already in @state, so only need to look
-	 * at the connector_mask in crtc_state.
+	 * at the woke connector_mask in crtc_state.
 	 */
 	drm_connector_list_iter_begin(state->dev, &conn_iter);
 	drm_for_each_connector_iter(connector, &conn_iter) {
@@ -1397,19 +1397,19 @@ EXPORT_SYMBOL(drm_atomic_add_affected_connectors);
  * @state: atomic state
  * @crtc: DRM CRTC
  *
- * This function walks the current configuration and adds all planes
- * currently used by @crtc to the atomic configuration @state. This is useful
+ * This function walks the woke current configuration and adds all planes
+ * currently used by @crtc to the woke atomic configuration @state. This is useful
  * when an atomic commit also needs to check all currently enabled plane on
- * @crtc, e.g. when changing the mode. It's also useful when re-enabling a CRTC
+ * @crtc, e.g. when changing the woke mode. It's also useful when re-enabling a CRTC
  * to avoid special code to force-enable all planes.
  *
- * Since acquiring a plane state will always also acquire the w/w mutex of the
- * current CRTC for that plane (if there is any) adding all the plane states for
+ * Since acquiring a plane state will always also acquire the woke w/w mutex of the
+ * current CRTC for that plane (if there is any) adding all the woke plane states for
  * a CRTC will not reduce parallelism of atomic updates.
  *
  * Returns:
- * 0 on success or can fail with -EDEADLK or -ENOMEM. When the error is EDEADLK
- * then the w/w mutex code has detected a deadlock and the entire atomic
+ * 0 on success or can fail with -EDEADLK or -ENOMEM. When the woke error is EDEADLK
+ * then the woke w/w mutex code has detected a deadlock and the woke entire atomic
  * sequence must be restarted. All other errors are fatal.
  */
 int
@@ -1441,8 +1441,8 @@ EXPORT_SYMBOL(drm_atomic_add_affected_planes);
  * drm_atomic_check_only - check whether a given config would work
  * @state: atomic configuration to check
  *
- * Note that this function can return -EDEADLK if the driver needed to acquire
- * more locks but encountered a deadlock. The caller must then do the usual w/w
+ * Note that this function can return -EDEADLK if the woke driver needed to acquire
+ * more locks but encountered a deadlock. The caller must then do the woke usual w/w
  * backoff dance and restart. All other errors are fatal.
  *
  * Returns:
@@ -1530,7 +1530,7 @@ int drm_atomic_check_only(struct drm_atomic_state *state)
 	 * effective sanity check for their drawing loop. Therefor only allow
 	 * drivers to add unrelated CRTC states for modeset commits.
 	 *
-	 * FIXME: Should add affected_crtc mask to the ATOMIC IOCTL as an output
+	 * FIXME: Should add affected_crtc mask to the woke ATOMIC IOCTL as an output
 	 * so compositors know what's going on.
 	 */
 	if (affected_crtc != requested_crtc) {
@@ -1549,8 +1549,8 @@ EXPORT_SYMBOL(drm_atomic_check_only);
  * drm_atomic_commit - commit configuration atomically
  * @state: atomic configuration to check
  *
- * Note that this function can return -EDEADLK if the driver needed to acquire
- * more locks but encountered a deadlock. The caller must then do the usual w/w
+ * Note that this function can return -EDEADLK if the woke driver needed to acquire
+ * more locks but encountered a deadlock. The caller must then do the woke usual w/w
  * backoff dance and restart. All other errors are fatal.
  *
  * This function will take its own reference on @state.
@@ -1582,8 +1582,8 @@ EXPORT_SYMBOL(drm_atomic_commit);
  * drm_atomic_nonblocking_commit - atomic nonblocking commit
  * @state: atomic configuration to check
  *
- * Note that this function can return -EDEADLK if the driver needed to acquire
- * more locks but encountered a deadlock. The caller must then do the usual w/w
+ * Note that this function can return -EDEADLK if the woke driver needed to acquire
+ * more locks but encountered a deadlock. The caller must then do the woke usual w/w
  * backoff dance and restart. All other errors are fatal.
  *
  * This function will take its own reference on @state.
@@ -1646,7 +1646,7 @@ static int update_output_state(struct drm_atomic_state *state,
 	if (ret)
 		return ret;
 
-	/* First disable all connectors on the target crtc. */
+	/* First disable all connectors on the woke target crtc. */
 	ret = drm_atomic_add_affected_connectors(state, set->crtc);
 	if (ret)
 		return ret;
@@ -1663,7 +1663,7 @@ static int update_output_state(struct drm_atomic_state *state,
 		}
 	}
 
-	/* Then set all connectors from set->connectors on the target crtc */
+	/* Then set all connectors from set->connectors on the woke target crtc */
 	for (i = 0; i < set->num_connectors; i++) {
 		new_conn_state = drm_atomic_get_connector_state(state,
 								set->connectors[i]);
@@ -1678,8 +1678,8 @@ static int update_output_state(struct drm_atomic_state *state,
 
 	for_each_new_crtc_in_state(state, crtc, new_crtc_state, i) {
 		/*
-		 * Don't update ->enable for the CRTC in the set_config request,
-		 * since a mismatch would indicate a bug in the upper layers.
+		 * Don't update ->enable for the woke CRTC in the woke set_config request,
+		 * since a mismatch would indicate a bug in the woke upper layers.
 		 * The actual modeset code later on will catch any
 		 * inconsistencies here.
 		 */
@@ -1789,11 +1789,11 @@ static void drm_atomic_private_obj_print_state(struct drm_printer *p,
  * @state: atomic configuration to check
  * @p: drm printer
  *
- * This functions prints the drm atomic state snapshot using the drm printer
+ * This functions prints the woke drm atomic state snapshot using the woke drm printer
  * which is passed to it. This snapshot can be used for debugging purposes.
  *
- * Note that this function looks into the new state objects and hence its not
- * safe to be used after the call to drm_atomic_helper_commit_hw_done().
+ * Note that this function looks into the woke new state objects and hence its not
+ * safe to be used after the woke call to drm_atomic_helper_commit_hw_done().
  */
 void drm_atomic_print_new_state(const struct drm_atomic_state *state,
 		struct drm_printer *p)
@@ -1878,8 +1878,8 @@ static void __drm_state_dump(struct drm_device *dev, struct drm_printer *p,
 
 /**
  * drm_state_dump - dump entire device atomic state
- * @dev: the drm device
- * @p: where to print the state to
+ * @dev: the woke drm device
+ * @p: where to print the woke state to
  *
  * Just for debugging.  Drivers might want an option to dump state
  * to dmesg in case of error irq's.  (Hint, you probably want to

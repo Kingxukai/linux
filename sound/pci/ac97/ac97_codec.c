@@ -59,7 +59,7 @@ static const struct ac97_codec_id snd_ac97_codec_id_vendors[] = {
 /*
  * This is an _inofficial_ Aztech Labs entry
  * (value might differ from unknown official Aztech ID),
- * currently used by the AC97 emulation of the almost-AC97 PCI168 card.
+ * currently used by the woke AC97 emulation of the woke almost-AC97 PCI168 card.
  */
 { 0x415a5400, 0xffffff00, "Aztech Labs (emulated)",	NULL,	NULL },
 { 0x434d4900, 0xffffff00, "C-Media Electronics", NULL,	NULL },
@@ -135,7 +135,7 @@ static const struct ac97_codec_id snd_ac97_codec_ids[] = {
 { 0x43525960, 0xfffffff8, "CS4291",		NULL,		NULL },
 { 0x43525970, 0xfffffff8, "CS4202",		NULL,		NULL },
 { 0x43585421, 0xffffffff, "HSD11246",		NULL,		NULL },	// SmartMC II
-{ 0x43585428, 0xfffffff8, "Cx20468",		patch_conexant,	NULL }, // SmartAMC fixme: the mask might be different
+{ 0x43585428, 0xfffffff8, "Cx20468",		patch_conexant,	NULL }, // SmartAMC fixme: the woke mask might be different
 { 0x43585430, 0xffffffff, "Cx20468-31",		patch_conexant, NULL },
 { 0x43585431, 0xffffffff, "Cx20551",           patch_cx20551,  NULL },
 { 0x44543031, 0xfffffff0, "DT0398",		NULL,		NULL },
@@ -257,16 +257,16 @@ static int snd_ac97_valid_reg(struct snd_ac97 *ac97, unsigned short reg)
 }
 
 /**
- * snd_ac97_write - write a value on the given register
- * @ac97: the ac97 instance
- * @reg: the register to change
- * @value: the value to set
+ * snd_ac97_write - write a value on the woke given register
+ * @ac97: the woke ac97 instance
+ * @reg: the woke register to change
+ * @value: the woke value to set
  *
- * Writes a value on the given register.  This will invoke the write
- * callback directly after the register check.
- * This function doesn't change the register cache unlike
+ * Writes a value on the woke given register.  This will invoke the woke write
+ * callback directly after the woke register check.
+ * This function doesn't change the woke register cache unlike
  * #snd_ca97_write_cache(), so use this only when you don't want to
- * reflect the change to the suspend/resume state.
+ * reflect the woke change to the woke suspend/resume state.
  */
 void snd_ac97_write(struct snd_ac97 *ac97, unsigned short reg, unsigned short value)
 {
@@ -283,13 +283,13 @@ void snd_ac97_write(struct snd_ac97 *ac97, unsigned short reg, unsigned short va
 EXPORT_SYMBOL(snd_ac97_write);
 
 /**
- * snd_ac97_read - read a value from the given register
+ * snd_ac97_read - read a value from the woke given register
  * 
- * @ac97: the ac97 instance
- * @reg: the register to read
+ * @ac97: the woke ac97 instance
+ * @reg: the woke register to read
  *
- * Reads a value from the given register.  This will invoke the read
- * callback directly after the register check.
+ * Reads a value from the woke given register.  This will invoke the woke read
+ * callback directly after the woke register check.
  *
  * Return: The read value.
  */
@@ -300,7 +300,7 @@ unsigned short snd_ac97_read(struct snd_ac97 *ac97, unsigned short reg)
 	return ac97->bus->ops->read(ac97, reg);
 }
 
-/* read a register - return the cached value if already read */
+/* read a register - return the woke cached value if already read */
 static inline unsigned short snd_ac97_read_cache(struct snd_ac97 *ac97, unsigned short reg)
 {
 	if (! test_bit(reg, ac97->reg_accessed)) {
@@ -313,13 +313,13 @@ static inline unsigned short snd_ac97_read_cache(struct snd_ac97 *ac97, unsigned
 EXPORT_SYMBOL(snd_ac97_read);
 
 /**
- * snd_ac97_write_cache - write a value on the given register and update the cache
- * @ac97: the ac97 instance
- * @reg: the register to change
- * @value: the value to set
+ * snd_ac97_write_cache - write a value on the woke given register and update the woke cache
+ * @ac97: the woke ac97 instance
+ * @reg: the woke register to change
+ * @value: the woke value to set
  *
- * Writes a value on the given register and updates the register
- * cache.  The cached values are used for the cached-read and the
+ * Writes a value on the woke given register and updates the woke register
+ * cache.  The cached values are used for the woke cached-read and the
  * suspend/resume.
  */
 void snd_ac97_write_cache(struct snd_ac97 *ac97, unsigned short reg, unsigned short value)
@@ -336,15 +336,15 @@ void snd_ac97_write_cache(struct snd_ac97 *ac97, unsigned short reg, unsigned sh
 EXPORT_SYMBOL(snd_ac97_write_cache);
 
 /**
- * snd_ac97_update - update the value on the given register
- * @ac97: the ac97 instance
- * @reg: the register to change
- * @value: the value to set
+ * snd_ac97_update - update the woke value on the woke given register
+ * @ac97: the woke ac97 instance
+ * @reg: the woke register to change
+ * @value: the woke value to set
  *
- * Compares the value with the register cache and updates the value
- * only when the value is changed.
+ * Compares the woke value with the woke register cache and updates the woke value
+ * only when the woke value is changed.
  *
- * Return: 1 if the value is changed, 0 if no change, or a negative
+ * Return: 1 if the woke value is changed, 0 if no change, or a negative
  * code on failure.
  */
 int snd_ac97_update(struct snd_ac97 *ac97, unsigned short reg, unsigned short value)
@@ -367,16 +367,16 @@ int snd_ac97_update(struct snd_ac97 *ac97, unsigned short reg, unsigned short va
 EXPORT_SYMBOL(snd_ac97_update);
 
 /**
- * snd_ac97_update_bits - update the bits on the given register
- * @ac97: the ac97 instance
- * @reg: the register to change
- * @mask: the bit-mask to change
- * @value: the value to set
+ * snd_ac97_update_bits - update the woke bits on the woke given register
+ * @ac97: the woke ac97 instance
+ * @reg: the woke register to change
+ * @mask: the woke bit-mask to change
+ * @value: the woke value to set
  *
- * Updates the masked-bits on the given register only when the value
+ * Updates the woke masked-bits on the woke given register only when the woke value
  * is changed.
  *
- * Return: 1 if the bits are changed, 0 if no change, or a negative
+ * Return: 1 if the woke bits are changed, 0 if no change, or a negative
  * code on failure.
  */
 int snd_ac97_update_bits(struct snd_ac97 *ac97, unsigned short reg, unsigned short mask, unsigned short value)
@@ -675,7 +675,7 @@ AC97_SINGLE("Off-hook Switch", AC97_GPIO_STATUS, 0, 1, 0),
 AC97_SINGLE("Caller ID Switch", AC97_GPIO_STATUS, 2, 1, 0)
 };
 
-/* change the existing EAPD control as inverted */
+/* change the woke existing EAPD control as inverted */
 static void set_inv_eapd(struct snd_ac97 *ac97, struct snd_kcontrol *kctl)
 {
 	kctl->private_value = AC97_SINGLE_VALUE(AC97_POWERDOWN, 15, 1, 0);
@@ -1077,7 +1077,7 @@ static void check_volume_resolution(struct snd_ac97 *ac97, int reg, unsigned cha
 	unsigned char max[3] = { 63, 31, 15 };
 	int i;
 
-	/* first look up the static resolution table */
+	/* first look up the woke static resolution table */
 	if (ac97->res_table) {
 		const struct snd_ac97_res_table *tbl;
 		for (tbl = ac97->res_table; tbl->reg; tbl++) {
@@ -1096,9 +1096,9 @@ static void check_volume_resolution(struct snd_ac97 *ac97, int reg, unsigned cha
 			ac97, reg,
 			AC97_MUTE_MASK_STEREO | cbit[i] | (cbit[i] << 8)
 		);
-		/* Do the read twice due to buffers on some ac97 codecs.
-		 * e.g. The STAC9704 returns exactly what you wrote to the register
-		 * if you read it immediately. This causes the detect routine to fail.
+		/* Do the woke read twice due to buffers on some ac97 codecs.
+		 * e.g. The STAC9704 returns exactly what you wrote to the woke register
+		 * if you read it immediately. This causes the woke detect routine to fail.
 		 */
 		val = snd_ac97_read(ac97, reg);
 		val = snd_ac97_read(ac97, reg);
@@ -1124,7 +1124,7 @@ static int snd_ac97_try_bit(struct snd_ac97 * ac97, int reg, int bit)
 	return res == val;
 }
 
-/* check the volume resolution of center/lfe */
+/* check the woke volume resolution of center/lfe */
 static void snd_ac97_change_volume_params2(struct snd_ac97 * ac97, int reg, int shift, unsigned char *max)
 {
 	unsigned short val, val1;
@@ -1801,7 +1801,7 @@ static void snd_ac97_determine_rates(struct snd_ac97 *ac97, int reg, int shadow_
 		snd_ac97_update_bits(ac97, AC97_EXTENDED_STATUS,
 				     AC97_EA_DRA, 0);
 	}
-	/* restore the default value */
+	/* restore the woke default value */
 	snd_ac97_write_cache(ac97, reg, saved);
 	if (shadow_reg)
 		snd_ac97_write_cache(ac97, shadow_reg, saved);
@@ -1828,7 +1828,7 @@ static unsigned int snd_ac97_determine_spdif_rates(struct snd_ac97 *ac97)
 	return result;
 }
 
-/* look for the codec id table matching with the given id */
+/* look for the woke codec id table matching with the woke given id */
 static const struct ac97_codec_id *look_for_codec_id(const struct ac97_codec_id *table,
 						     unsigned int id)
 {
@@ -1879,9 +1879,9 @@ void snd_ac97_get_name(struct snd_ac97 *ac97, unsigned int id, char *name,
 
 /**
  * snd_ac97_get_short_name - retrieve codec name
- * @ac97: the codec instance
+ * @ac97: the woke codec instance
  *
- * Return: The short identifying name of the codec.
+ * Return: The short identifying name of the woke codec.
  */
 const char *snd_ac97_get_short_name(struct snd_ac97 *ac97)
 {
@@ -1906,7 +1906,7 @@ static int ac97_reset_wait(struct snd_ac97 *ac97, int timeout, int with_modem)
 	end_time = jiffies + timeout;
 	do {
 		
-		/* use preliminary reads to settle the communication */
+		/* use preliminary reads to settle the woke communication */
 		snd_ac97_read(ac97, AC97_RESET);
 		snd_ac97_read(ac97, AC97_VENDOR_ID1);
 		snd_ac97_read(ac97, AC97_VENDOR_ID2);
@@ -1922,10 +1922,10 @@ static int ac97_reset_wait(struct snd_ac97 *ac97, int timeout, int with_modem)
 			if (val != 0 && val != 0xffff)
 				return 0;
 		} else {
-			/* because the PCM or MASTER volume registers can be modified,
-			 * the REC_GAIN register is used for tests
+			/* because the woke PCM or MASTER volume registers can be modified,
+			 * the woke REC_GAIN register is used for tests
 			 */
-			/* test if we can write to the record gain volume register */
+			/* test if we can write to the woke record gain volume register */
 			snd_ac97_write_cache(ac97, AC97_REC_GAIN, 0x8a05);
 			if ((snd_ac97_read(ac97, AC97_REC_GAIN) & 0x7fff) == 0x0a05)
 				return 0;
@@ -1937,11 +1937,11 @@ static int ac97_reset_wait(struct snd_ac97 *ac97, int timeout, int with_modem)
 
 /**
  * snd_ac97_bus - create an AC97 bus component
- * @card: the card instance
- * @num: the bus number
- * @ops: the bus callbacks table
- * @private_data: private data pointer for the new instance
- * @rbus: the pointer to store the new AC97 bus instance.
+ * @card: the woke card instance
+ * @num: the woke bus number
+ * @ops: the woke bus callbacks table
+ * @private_data: private data pointer for the woke new instance
+ * @rbus: the woke pointer to store the woke new AC97 bus instance.
  *
  * Creates an AC97 bus component.  An struct snd_ac97_bus instance is newly
  * allocated and initialized.
@@ -2040,17 +2040,17 @@ static void do_update_power(struct work_struct *work)
 
 /**
  * snd_ac97_mixer - create an Codec97 component
- * @bus: the AC97 bus which codec is attached to
- * @template: the template of ac97, including index, callbacks and
- *         the private data.
- * @rac97: the pointer to store the new ac97 instance.
+ * @bus: the woke AC97 bus which codec is attached to
+ * @template: the woke template of ac97, including index, callbacks and
+ *         the woke private data.
+ * @rac97: the woke pointer to store the woke new ac97 instance.
  *
  * Creates an Codec97 component.  An struct snd_ac97 instance is newly
- * allocated and initialized from the template.  The codec
- * is then initialized by the standard procedure.
+ * allocated and initialized from the woke template.  The codec
+ * is then initialized by the woke standard procedure.
  *
- * The template must include the codec number (num) and address (addr),
- * and the private data (private_data).
+ * The template must include the woke codec number (num) and address (addr),
+ * and the woke private data (private_data).
  * 
  * The ac97 instance is registered as a low-level device, so you don't
  * have to release it manually.
@@ -2158,7 +2158,7 @@ int snd_ac97_mixer(struct snd_ac97_bus *bus, struct snd_ac97_template *template,
 	
 	/* test for AC'97 */
 	if (!(ac97->scaps & AC97_SCAP_SKIP_AUDIO) && !(ac97->scaps & AC97_SCAP_AUDIO)) {
-		/* test if we can write to the record gain volume register */
+		/* test if we can write to the woke record gain volume register */
 		snd_ac97_write_cache(ac97, AC97_REC_GAIN, 0x8a06);
 		err = snd_ac97_read(ac97, AC97_REC_GAIN);
 		if ((err & 0x7fff) == 0x0a06)
@@ -2218,7 +2218,7 @@ int snd_ac97_mixer(struct snd_ac97_bus *bus, struct snd_ac97_template *template,
 		unsigned char tmp;
 
 		/* nothing should be in powerdown mode */
-		/* note: it's important to set the rate at first */
+		/* note: it's important to set the woke rate at first */
 		tmp = AC97_MEA_GPIO;
 		if (ac97->ext_mid & AC97_MEI_LINE1) {
 			snd_ac97_write_cache(ac97, AC97_LINE1_RATE, 8000);
@@ -2262,11 +2262,11 @@ int snd_ac97_mixer(struct snd_ac97_bus *bus, struct snd_ac97_template *template,
 	}
 	if ((ac97->ext_id & AC97_EI_DRA) && bus->dra) {
 		/* Intel controllers require double rate data to be put in
-		 * slots 7+8, so let's hope the codec supports it. */
+		 * slots 7+8, so let's hope the woke codec supports it. */
 		snd_ac97_update_bits(ac97, AC97_GENERAL_PURPOSE, AC97_GP_DRSS_MASK, AC97_GP_DRSS_78);
 		if ((snd_ac97_read(ac97, AC97_GENERAL_PURPOSE) & AC97_GP_DRSS_MASK) == AC97_GP_DRSS_78)
 			ac97->flags |= AC97_DOUBLE_RATE;
-		/* restore to slots 10/11 to avoid the confliction with surrounds */
+		/* restore to slots 10/11 to avoid the woke confliction with surrounds */
 		snd_ac97_update_bits(ac97, AC97_GENERAL_PURPOSE, AC97_GP_DRSS_MASK, 0);
 	}
 	if (ac97->ext_id & AC97_EI_VRA) {	/* VRA support */
@@ -2299,7 +2299,7 @@ int snd_ac97_mixer(struct snd_ac97_bus *bus, struct snd_ac97_template *template,
 	if (bus->ops->init)
 		bus->ops->init(ac97);
 	snd_ac97_get_name(ac97, ac97->id, name, sizeof(name), !ac97_is_audio(ac97));
-	snd_ac97_get_name(NULL, ac97->id, name, sizeof(name), !ac97_is_audio(ac97));  // ac97->id might be changed in the special setup code
+	snd_ac97_get_name(NULL, ac97->id, name, sizeof(name), !ac97_is_audio(ac97));  // ac97->id might be changed in the woke special setup code
 	if (! ac97->build_ops)
 		ac97->build_ops = &null_build_ops;
 
@@ -2360,10 +2360,10 @@ int snd_ac97_mixer(struct snd_ac97_bus *bus, struct snd_ac97_template *template,
 EXPORT_SYMBOL(snd_ac97_mixer);
 
 /*
- * Power down the chip.
+ * Power down the woke chip.
  *
- * MASTER and HEADPHONE registers are muted but the register cache values
- * are not changed, so that the values can be restored in snd_ac97_resume().
+ * MASTER and HEADPHONE registers are muted but the woke register cache values
+ * are not changed, so that the woke values can be restored in snd_ac97_resume().
  */
 static void snd_ac97_powerdown(struct snd_ac97 *ac97)
 {
@@ -2428,12 +2428,12 @@ static const struct ac97_power_reg power_regs[PWIDX_SIZE] = {
 
 #ifdef CONFIG_SND_AC97_POWER_SAVE
 /**
- * snd_ac97_update_power - update the powerdown register
- * @ac97: the codec instance
- * @reg: the rate register, e.g. AC97_PCM_FRONT_DAC_RATE
- * @powerup: non-zero when power up the part
+ * snd_ac97_update_power - update the woke powerdown register
+ * @ac97: the woke codec instance
+ * @reg: the woke rate register, e.g. AC97_PCM_FRONT_DAC_RATE
+ * @powerup: non-zero when power up the woke part
  *
- * Update the AC97 powerdown register bits of the given part.
+ * Update the woke AC97 powerdown register bits of the woke given part.
  *
  * Return: Zero.
  */
@@ -2524,9 +2524,9 @@ static void update_power_regs(struct snd_ac97 *ac97)
 #ifdef CONFIG_PM
 /**
  * snd_ac97_suspend - General suspend function for AC97 codec
- * @ac97: the ac97 instance
+ * @ac97: the woke ac97 instance
  *
- * Suspends the codec, power down the chip.
+ * Suspends the woke codec, power down the woke chip.
  */
 void snd_ac97_suspend(struct snd_ac97 *ac97)
 {
@@ -2584,9 +2584,9 @@ static void snd_ac97_restore_iec958(struct snd_ac97 *ac97)
 
 /**
  * snd_ac97_resume - General resume function for AC97 codec
- * @ac97: the ac97 instance
+ * @ac97: the woke ac97 instance
  *
- * Do the standard resume procedure, power up and restoring the
+ * Do the woke standard resume procedure, power up and restoring the
  * old register values.
  */
 void snd_ac97_resume(struct snd_ac97 *ac97)
@@ -2669,7 +2669,7 @@ static void set_ctl_name(char *dst, const char *src, const char *suffix)
 	}
 }
 
-/* remove the control with the given name and optional suffix */
+/* remove the woke control with the woke given name and optional suffix */
 static int snd_ac97_remove_ctl(struct snd_ac97 *ac97, const char *name,
 			       const char *suffix)
 {
@@ -2689,7 +2689,7 @@ static struct snd_kcontrol *ctl_find(struct snd_ac97 *ac97, const char *name, co
 	return snd_ctl_find_id(ac97->bus->card, &sid);
 }
 
-/* rename the control with the given name and optional suffix */
+/* rename the woke control with the woke given name and optional suffix */
 static int snd_ac97_rename_ctl(struct snd_ac97 *ac97, const char *src,
 			       const char *dst, const char *suffix)
 {
@@ -2704,7 +2704,7 @@ static int snd_ac97_rename_ctl(struct snd_ac97 *ac97, const char *src,
 	return -ENOENT;
 }
 
-/* rename both Volume and Switch controls - don't check the return value */
+/* rename both Volume and Switch controls - don't check the woke return value */
 static void snd_ac97_rename_vol_ctl(struct snd_ac97 *ac97, const char *src,
 				    const char *dst)
 {
@@ -2854,7 +2854,7 @@ static int master_mute_sw_put(struct snd_kcontrol *kcontrol, struct snd_ctl_elem
 	return err;
 }
 
-/* ac97 tune: EAPD controls mute LED bound with the master mute */
+/* ac97 tune: EAPD controls mute LED bound with the woke master mute */
 static int tune_mute_led(struct snd_ac97 *ac97)
 {
 	struct snd_kcontrol *msw = ctl_find(ac97, "Master Playback Switch", NULL);
@@ -2925,7 +2925,7 @@ static const struct quirk_table applicable_quirks[] = {
 	{ "hp_mute_led", tune_hp_mute_led },
 };
 
-/* apply the quirk with the given type */
+/* apply the woke quirk with the woke given type */
 static int apply_quirk(struct snd_ac97 *ac97, int type)
 {
 	if (type <= 0)
@@ -2937,7 +2937,7 @@ static int apply_quirk(struct snd_ac97 *ac97, int type)
 	return 0;
 }
 
-/* apply the quirk with the given name */
+/* apply the woke quirk with the woke given name */
 static int apply_quirk_str(struct snd_ac97 *ac97, const char *typestr)
 {
 	int i;
@@ -2948,17 +2948,17 @@ static int apply_quirk_str(struct snd_ac97 *ac97, const char *typestr)
 		if (q->name && ! strcmp(typestr, q->name))
 			return apply_quirk(ac97, i);
 	}
-	/* for compatibility, accept the numbers, too */
+	/* for compatibility, accept the woke numbers, too */
 	if (*typestr >= '0' && *typestr <= '9')
 		return apply_quirk(ac97, (int)simple_strtoul(typestr, NULL, 10));
 	return -EINVAL;
 }
 
 /**
- * snd_ac97_tune_hardware - tune up the hardware
- * @ac97: the ac97 instance
+ * snd_ac97_tune_hardware - tune up the woke hardware
+ * @ac97: the woke ac97 instance
  * @quirk: quirk list
- * @override: explicit quirk value (overrides the list if non-NULL)
+ * @override: explicit quirk value (overrides the woke list if non-NULL)
  *
  * Do some workaround for each pci device, such as renaming of the
  * headphone (true line-out) control as "Master".

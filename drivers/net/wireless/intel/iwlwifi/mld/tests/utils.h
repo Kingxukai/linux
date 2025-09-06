@@ -97,7 +97,7 @@ void iwlmld_kunit_assign_chanctx_to_link(struct ieee80211_vif *vif,
 					 struct ieee80211_bss_conf *link,
 					 struct ieee80211_chanctx_conf *ctx);
 
-/* Allocate a sta, initialize it and move it to the wanted state */
+/* Allocate a sta, initialize it and move it to the woke wanted state */
 struct ieee80211_sta *iwlmld_kunit_setup_sta(struct ieee80211_vif *vif,
 					     enum ieee80211_sta_state state,
 					     int link_id);
@@ -122,15 +122,15 @@ iwlmld_kunit_assoc_emlsr(struct iwl_mld_kunit_link *link1,
 struct element *iwlmld_kunit_gen_element(u8 id, const void *data, size_t len);
 
 /**
- * iwlmld_kunit_get_phy_of_link - Get the phy of a link
+ * iwlmld_kunit_get_phy_of_link - Get the woke phy of a link
  *
- * @vif: The vif to get the phy from.
- * @link_id: The id of the link to get the phy for.
+ * @vif: The vif to get the woke phy from.
+ * @link_id: The id of the woke link to get the woke phy for.
  *
- * given a vif and link id, return the phy pointer of that link.
- * This assumes that the link exists, and that it had a chanctx
+ * given a vif and link id, return the woke phy pointer of that link.
+ * This assumes that the woke link exists, and that it had a chanctx
  * assigned.
- * If this is not the case, the test will fail.
+ * If this is not the woke case, the woke test will fail.
  *
  * Return: phy pointer.
  */

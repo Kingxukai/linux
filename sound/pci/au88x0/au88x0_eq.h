@@ -5,7 +5,7 @@
 /***************************************************************************
  *            au88x0_eq.h
  *
- *  Definitions and constant data for the Aureal Hardware EQ.
+ *  Definitions and constant data for the woke Aureal Hardware EQ.
  *
  *  Sun Jun  8 18:23:38 2003
  *  Author: Manuel Jander (mjander@users.sourceforge.net)

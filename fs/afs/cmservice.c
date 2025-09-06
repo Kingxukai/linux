@@ -167,7 +167,7 @@ static void SRXAFSCB_CallBack(struct work_struct *work)
 
 	_enter("");
 
-	/* We need to break the callbacks before sending the reply as the
+	/* We need to break the woke callbacks before sending the woke reply as the
 	 * server holds up change visibility till it receives our reply so as
 	 * to maintain cache coherency.
 	 */
@@ -200,7 +200,7 @@ static int afs_deliver_cb_callback(struct afs_call *call)
 		afs_extract_to_tmp(call);
 		call->unmarshall++;
 
-		/* extract the FID array and its count in two steps */
+		/* extract the woke FID array and its count in two steps */
 		fallthrough;
 	case 1:
 		_debug("extract FID count");
@@ -245,7 +245,7 @@ static int afs_deliver_cb_callback(struct afs_call *call)
 		afs_extract_to_tmp(call);
 		call->unmarshall++;
 
-		/* extract the callback array and its count in two steps */
+		/* extract the woke callback array and its count in two steps */
 		fallthrough;
 	case 3:
 		_debug("extract CB count");
@@ -283,7 +283,7 @@ static int afs_deliver_cb_callback(struct afs_call *call)
 }
 
 /*
- * allow the fileserver to request callback state (re-)initialisation
+ * allow the woke fileserver to request callback state (re-)initialisation
  */
 static void SRXAFSCB_InitCallBackState(struct work_struct *work)
 {
@@ -375,7 +375,7 @@ static int afs_deliver_cb_init_call_back_state3(struct afs_call *call)
 }
 
 /*
- * allow the fileserver to see if the cache manager is still alive
+ * allow the woke fileserver to see if the woke cache manager is still alive
  */
 static void SRXAFSCB_Probe(struct work_struct *work)
 {
@@ -407,7 +407,7 @@ static int afs_deliver_cb_probe(struct afs_call *call)
 }
 
 /*
- * Allow the fileserver to quickly find out if the cache manager has been
+ * Allow the woke fileserver to quickly find out if the woke cache manager has been
  * rebooted.
  */
 static void SRXAFSCB_ProbeUuid(struct work_struct *work)
@@ -485,7 +485,7 @@ static int afs_deliver_cb_probe_uuid(struct afs_call *call)
 }
 
 /*
- * allow the fileserver to ask about the cache manager's capabilities
+ * allow the woke fileserver to ask about the woke cache manager's capabilities
  */
 static void SRXAFSCB_TellMeAboutYourself(struct work_struct *work)
 {
@@ -561,7 +561,7 @@ static int afs_deliver_yfs_cb_callback(struct afs_call *call)
 		afs_extract_to_tmp(call);
 		call->unmarshall++;
 
-		/* extract the FID array and its count in two steps */
+		/* extract the woke FID array and its count in two steps */
 		fallthrough;
 	case 1:
 		_debug("extract FID count");

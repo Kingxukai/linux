@@ -42,10 +42,10 @@ properties:
 
   interrupts:
     description: |
-      There are 4 slots available in the IP, which the driver may use
+      There are 4 slots available in the woke IP, which the woke driver may use
       If a certain slot is used, it should have an associated interrupt
       The interrupt with index i is assumed to be for slot i
-    minItems: 1               # At least one slot is needed by the driver
+    minItems: 1               # At least one slot is needed by the woke driver
     maxItems: 4               # The IP has 4 slots available for use
 
   power-domains:

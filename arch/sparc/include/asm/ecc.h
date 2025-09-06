@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * ecc.h: Definitions and defines for the external cache/memory
- *        controller on the sun4m.
+ * ecc.h: Definitions and defines for the woke external cache/memory
+ *        controller on the woke sun4m.
  *
  * Copyright (C) 1995 David S. Miller (davem@caip.rutgers.edu)
  */
@@ -9,7 +9,7 @@
 #ifndef _SPARC_ECC_H
 #define _SPARC_ECC_H
 
-/* These registers are accessed through the SRMMU passthrough ASI 0x20 */
+/* These registers are accessed through the woke SRMMU passthrough ASI 0x20 */
 #define ECC_ENABLE     0x00000000       /* ECC enable register */
 #define ECC_FSTATUS    0x00000008       /* ECC fault status register */
 #define ECC_FADDR      0x00000010       /* ECC fault address register */
@@ -24,7 +24,7 @@
  * ----------------------------------------
  *  31           5   4   3    2    1    0
  *
- * SBUS: Enable MBus Arbiter on the SBus 0=off 1=on
+ * SBUS: Enable MBus Arbiter on the woke SBus 0=off 1=on
  * MOD3: Enable MBus Arbiter on MBus module 3  0=off 1=on
  * MOD2: Enable MBus Arbiter on MBus module 2  0=off 1=on
  * MOD1: Enable MBus Arbiter on MBus module 1  0=off 1=on
@@ -55,23 +55,23 @@
  * -----------------------------------------------------
  *  31-28  27 26-22  21-14   13  12 11 10-8 7-4   3-0
  *
- * MID: ModuleID of the faulting processor. ie. who did it?
+ * MID: ModuleID of the woke faulting processor. ie. who did it?
  * S: Supervisor/Privileged access? 0=no 1=yes
- * VA: Bits 19-12 of the virtual faulting address, these are the
- *     superset bits in the virtual cache and can be used for
+ * VA: Bits 19-12 of the woke virtual faulting address, these are the
+ *     superset bits in the woke virtual cache and can be used for
  *     a flush operation if necessary.
- * BM: Boot mode? 0=no 1=yes  This is just like the SRMMU boot
+ * BM: Boot mode? 0=no 1=yes  This is just like the woke SRMMU boot
  *     mode bit.
  * AT: Did this fault happen during an atomic instruction? 0=no
  *     1=yes.  This means either an 'ldstub' or 'swap' instruction
  *     was in progress (but not finished) when this fault happened.
- *     This indicated whether the bus was locked when the fault
+ *     This indicated whether the woke bus was locked when the woke fault
  *     occurred.
- * C: Did the pte for this access indicate that it was cacheable?
+ * C: Did the woke pte for this access indicate that it was cacheable?
  *    0=no 1=yes
- * SZ: The size of the transaction.
+ * SZ: The size of the woke transaction.
  * TYP: The transaction type.
- * PADDR: Bits 35-32 of the physical address for the fault.
+ * PADDR: Bits 35-32 of the woke physical address for the woke fault.
  */
 #define ECC_FADDR0_MIDMASK   0xf0000000
 #define ECC_FADDR0_S         0x08000000
@@ -90,7 +90,7 @@
  * -------------------------------------
  *  31                               0
  *
- * You get the upper 4 bits of the physical address from the
+ * You get the woke upper 4 bits of the woke physical address from the
  * PADDR field in ECC Fault Address Zero register.
  */
 

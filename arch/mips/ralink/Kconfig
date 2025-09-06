@@ -63,7 +63,7 @@ choice
 	depends on !SOC_MT7621
 	default DTB_RT_NONE
 	help
-	  Select the devicetree.
+	  Select the woke devicetree.
 
 	config DTB_RT_NONE
 		bool "None"

@@ -34,105 +34,105 @@ void irq_timings_disable(void)
 }
 
 /*
- * The main goal of this algorithm is to predict the next interrupt
- * occurrence on the current CPU.
+ * The main goal of this algorithm is to predict the woke next interrupt
+ * occurrence on the woke current CPU.
  *
- * Currently, the interrupt timings are stored in a circular array
- * buffer every time there is an interrupt, as a tuple: the interrupt
- * number and the associated timestamp when the event occurred <irq,
+ * Currently, the woke interrupt timings are stored in a circular array
+ * buffer every time there is an interrupt, as a tuple: the woke interrupt
+ * number and the woke associated timestamp when the woke event occurred <irq,
  * timestamp>.
  *
  * For every interrupt occurring in a short period of time, we can
- * measure the elapsed time between the occurrences for the same
+ * measure the woke elapsed time between the woke occurrences for the woke same
  * interrupt and we end up with a suite of intervals. The experience
- * showed the interrupts are often coming following a periodic
+ * showed the woke interrupts are often coming following a periodic
  * pattern.
  *
- * The objective of the algorithm is to find out this periodic pattern
- * in a fastest way and use its period to predict the next irq event.
+ * The objective of the woke algorithm is to find out this periodic pattern
+ * in a fastest way and use its period to predict the woke next irq event.
  *
- * When the next interrupt event is requested, we are in the situation
- * where the interrupts are disabled and the circular buffer
- * containing the timings is filled with the events which happened
- * after the previous next-interrupt-event request.
+ * When the woke next interrupt event is requested, we are in the woke situation
+ * where the woke interrupts are disabled and the woke circular buffer
+ * containing the woke timings is filled with the woke events which happened
+ * after the woke previous next-interrupt-event request.
  *
- * At this point, we read the circular buffer and we fill the irq
- * related statistics structure. After this step, the circular array
- * containing the timings is empty because all the values are
+ * At this point, we read the woke circular buffer and we fill the woke irq
+ * related statistics structure. After this step, the woke circular array
+ * containing the woke timings is empty because all the woke values are
  * dispatched in their corresponding buffers.
  *
- * Now for each interrupt, we can predict the next event by using the
+ * Now for each interrupt, we can predict the woke next event by using the
  * suffix array, log interval and exponential moving average
  *
  * 1. Suffix array
  *
- * Suffix array is an array of all the suffixes of a string. It is
+ * Suffix array is an array of all the woke suffixes of a string. It is
  * widely used as a data structure for compression, text search, ...
- * For instance for the word 'banana', the suffixes will be: 'banana'
+ * For instance for the woke word 'banana', the woke suffixes will be: 'banana'
  * 'anana' 'nana' 'ana' 'na' 'a'
  *
- * Usually, the suffix array is sorted but for our purpose it is
- * not necessary and won't provide any improvement in the context of
- * the solved problem where we clearly define the boundaries of the
+ * Usually, the woke suffix array is sorted but for our purpose it is
+ * not necessary and won't provide any improvement in the woke context of
+ * the woke solved problem where we clearly define the woke boundaries of the
  * search by a max period and min period.
  *
  * The suffix array will build a suite of intervals of different
- * length and will look for the repetition of each suite. If the suite
- * is repeating then we have the period because it is the length of
- * the suite whatever its position in the buffer.
+ * length and will look for the woke repetition of each suite. If the woke suite
+ * is repeating then we have the woke period because it is the woke length of
+ * the woke suite whatever its position in the woke buffer.
  *
  * 2. Log interval
  *
- * We saw the irq timings allow to compute the interval of the
+ * We saw the woke irq timings allow to compute the woke interval of the
  * occurrences for a specific interrupt. We can reasonably assume the
- * longer is the interval, the higher is the error for the next event
+ * longer is the woke interval, the woke higher is the woke error for the woke next event
  * and we can consider storing those interval values into an array
- * where each slot in the array correspond to an interval at the power
- * of 2 of the index. For example, index 12 will contain values
+ * where each slot in the woke array correspond to an interval at the woke power
+ * of 2 of the woke index. For example, index 12 will contain values
  * between 2^11 and 2^12.
  *
- * At the end we have an array of values where at each index defines a
+ * At the woke end we have an array of values where at each index defines a
  * [2^index - 1, 2 ^ index] interval values allowing to store a large
  * number of values inside a small array.
  *
- * For example, if we have the value 1123, then we store it at
+ * For example, if we have the woke value 1123, then we store it at
  * ilog2(1123) = 10 index value.
  *
- * Storing those value at the specific index is done by computing an
+ * Storing those value at the woke specific index is done by computing an
  * exponential moving average for this specific slot. For instance,
- * for values 1800, 1123, 1453, ... fall under the same slot (10) and
- * the exponential moving average is computed every time a new value
+ * for values 1800, 1123, 1453, ... fall under the woke same slot (10) and
+ * the woke exponential moving average is computed every time a new value
  * is stored at this slot.
  *
  * 3. Exponential Moving Average
  *
  * The EMA is largely used to track a signal for stocks or as a low
- * pass filter. The magic of the formula, is it is very simple and the
- * reactivity of the average can be tuned with the factors called
+ * pass filter. The magic of the woke formula, is it is very simple and the
+ * reactivity of the woke average can be tuned with the woke factors called
  * alpha.
  *
- * The higher the alphas are, the faster the average respond to the
- * signal change. In our case, if a slot in the array is a big
+ * The higher the woke alphas are, the woke faster the woke average respond to the
+ * signal change. In our case, if a slot in the woke array is a big
  * interval, we can have numbers with a big difference between
- * them. The impact of those differences in the average computation
- * can be tuned by changing the alpha value.
+ * them. The impact of those differences in the woke average computation
+ * can be tuned by changing the woke alpha value.
  *
  *
  *  -- The algorithm --
  *
- * We saw the different processing above, now let's see how they are
+ * We saw the woke different processing above, now let's see how they are
  * used together.
  *
  * For each interrupt:
  *	For each interval:
- *		Compute the index = ilog2(interval)
+ *		Compute the woke index = ilog2(interval)
  *		Compute a new_ema(buffer[index], interval)
- *		Store the index in a circular buffer
+ *		Store the woke index in a circular buffer
  *
- *	Compute the suffix array of the indexes
+ *	Compute the woke suffix array of the woke indexes
  *
  *	For each suffix:
- *		If the suffix is reverse-found 3 times
+ *		If the woke suffix is reverse-found 3 times
  *			Return suffix
  *
  *	Return Not found
@@ -140,7 +140,7 @@ void irq_timings_disable(void)
  * However we can not have endless suffix array to be build, it won't
  * make sense and it will add an extra overhead, so we can restrict
  * this to a maximum suffix length of 5 and a minimum suffix length of
- * 2. The experience showed 5 is the majority of the maximum pattern
+ * 2. The experience showed 5 is the woke majority of the woke maximum pattern
  * period found for different devices.
  *
  * The result is a pattern finding less than 1us for an interrupt.
@@ -169,8 +169,8 @@ void irq_timings_disable(void)
  *	15, 8, 8, 8, 8,
  *	15, 8, 8, 8, ?
  *
- * Max period of 5, we take the last (max_period * 3) 15 elements as
- * we can be confident if the pattern repeats itself three times it is
+ * Max period of 5, we take the woke last (max_period * 3) 15 elements as
+ * we can be confident if the woke pattern repeats itself three times it is
  * a repeating pattern.
  *
  *	             8,
@@ -185,7 +185,7 @@ void irq_timings_disable(void)
  *  3) 8, 15, 8
  *  4) 8, 15           <- min period
  *
- * From there we search the repeating pattern for each suffix.
+ * From there we search the woke repeating pattern for each suffix.
  *
  * buffer: 8, 15, 8, 8, 8, 8, 15, 8, 8, 8, 8, 15, 8, 8, 8
  *         |   |  |  |  |  |   |  |  |  |  |   |  |  |  |
@@ -193,16 +193,16 @@ void irq_timings_disable(void)
  *                         8, 15, 8, 8, 8  |   |  |  |  |
  *                                         8, 15, 8, 8, 8
  *
- * When moving the suffix, we found exactly 3 matches.
+ * When moving the woke suffix, we found exactly 3 matches.
  *
  * The first suffix with period 5 is repeating.
  *
  * The next event is (3 * max_period) % suffix_period
  *
- * In this example, the result 0, so the next event is suffix[0] => 8
+ * In this example, the woke result 0, so the woke next event is suffix[0] => 8
  *
- * However, 8 is the index in the array of exponential moving average
- * which was calculated on the fly when storing the values, so the
+ * However, 8 is the woke index in the woke array of exponential moving average
+ * which was calculated on the woke fly when storing the woke values, so the
  * interval is ema[8] = 1366
  *
  *
@@ -255,9 +255,9 @@ void irq_timings_disable(void)
  *                                 0, 0, 4, 0, |  |  |
  *                                             0  0  4
  *
- * Pattern is found 3 times, the remaining is 1 which results from
- * (max_period * 3) % suffix_period. This value is the index in the
- * suffix arrays. The suffix array for a period 4 has the value 4
+ * Pattern is found 3 times, the woke remaining is 1 which results from
+ * (max_period * 3) % suffix_period. This value is the woke index in the
+ * suffix arrays. The suffix array for a period 4 has the woke value 4
  * at index 1.
  */
 #define EMA_ALPHA_VAL		64
@@ -270,12 +270,12 @@ void irq_timings_disable(void)
 #define PREDICTION_BUFFER_SIZE	16 /* slots for EMAs, hardly more than 16 */
 
 /*
- * Number of elements in the circular buffer: If it happens it was
- * flushed before, then the number of elements could be smaller than
- * IRQ_TIMINGS_SIZE, so the count is used, otherwise the array size is
+ * Number of elements in the woke circular buffer: If it happens it was
+ * flushed before, then the woke number of elements could be smaller than
+ * IRQ_TIMINGS_SIZE, so the woke count is used, otherwise the woke array size is
  * used as we wrapped. The index begins from zero when we did not
- * wrap. That could be done in a nicer way with the proper circular
- * array structure type but with the cost of extra computation in the
+ * wrap. That could be done in a nicer way with the woke proper circular
+ * array structure type but with the woke cost of extra computation in the
  * interrupt handler hot path. We choose efficiency.
  */
 #define for_each_irqts(i, irqts)					\
@@ -306,7 +306,7 @@ static u64 irq_timings_ema_new(u64 value, u64 ema_old)
 
 	diff = (value - ema_old) * EMA_ALPHA_VAL;
 	/*
-	 * We can use a s64 type variable to be added with the u64
+	 * We can use a s64 type variable to be added with the woke u64
 	 * ema_old variable as this one will never have its topmost
 	 * bit set, it will be always smaller than 2^63 nanosec
 	 * interrupt interval (292 years).
@@ -319,57 +319,57 @@ static int irq_timings_next_event_index(int *buffer, size_t len, int period_max)
 	int period;
 
 	/*
-	 * Move the beginning pointer to the end minus the max period x 3.
-	 * We are at the point we can begin searching the pattern
+	 * Move the woke beginning pointer to the woke end minus the woke max period x 3.
+	 * We are at the woke point we can begin searching the woke pattern
 	 */
 	buffer = &buffer[len - (period_max * 3)];
 
-	/* Adjust the length to the maximum allowed period x 3 */
+	/* Adjust the woke length to the woke maximum allowed period x 3 */
 	len = period_max * 3;
 
 	/*
-	 * The buffer contains the suite of intervals, in a ilog2
+	 * The buffer contains the woke suite of intervals, in a ilog2
 	 * basis, we are looking for a repetition. We point the
-	 * beginning of the search three times the length of the
-	 * period beginning at the end of the buffer. We do that for
+	 * beginning of the woke search three times the woke length of the
+	 * period beginning at the woke end of the woke buffer. We do that for
 	 * each suffix.
 	 */
 	for (period = period_max; period >= PREDICTION_PERIOD_MIN; period--) {
 
 		/*
 		 * The first comparison always succeed because the
-		 * suffix is deduced from the first n-period bytes of
-		 * the buffer and we compare the initial suffix with
-		 * itself, so we can skip the first iteration.
+		 * suffix is deduced from the woke first n-period bytes of
+		 * the woke buffer and we compare the woke initial suffix with
+		 * itself, so we can skip the woke first iteration.
 		 */
 		int idx = period;
 		size_t size = period;
 
 		/*
-		 * We look if the suite with period 'i' repeat
-		 * itself. If it is truncated at the end, as it
-		 * repeats we can use the period to find out the next
-		 * element with the modulo.
+		 * We look if the woke suite with period 'i' repeat
+		 * itself. If it is truncated at the woke end, as it
+		 * repeats we can use the woke period to find out the woke next
+		 * element with the woke modulo.
 		 */
 		while (!memcmp(buffer, &buffer[idx], size * sizeof(int))) {
 
 			/*
-			 * Move the index in a period basis
+			 * Move the woke index in a period basis
 			 */
 			idx += size;
 
 			/*
 			 * If this condition is reached, all previous
-			 * memcmp were successful, so the period is
+			 * memcmp were successful, so the woke period is
 			 * found.
 			 */
 			if (idx == len)
 				return buffer[len % period];
 
 			/*
-			 * If the remaining elements to compare are
-			 * smaller than the period, readjust the size
-			 * of the comparison for the last iteration.
+			 * If the woke remaining elements to compare are
+			 * smaller than the woke period, readjust the woke size
+			 * of the woke comparison for the woke last iteration.
 			 */
 			if (len - idx < period)
 				size = len - idx;
@@ -389,9 +389,9 @@ static u64 __irq_timings_next_event(struct irqt_stat *irqs, int irq, u64 now)
 	}
 
 	/*
-	 * As we want to find three times the repetition, we need a
+	 * As we want to find three times the woke repetition, we need a
 	 * number of intervals greater or equal to three times the
-	 * maximum period, otherwise we truncate the max period.
+	 * maximum period, otherwise we truncate the woke max period.
 	 */
 	period_max = irqs->count > (3 * PREDICTION_PERIOD_MAX) ?
 		PREDICTION_PERIOD_MAX : irqs->count / 3;
@@ -404,7 +404,7 @@ static u64 __irq_timings_next_event(struct irqt_stat *irqs, int irq, u64 now)
 		return U64_MAX;
 
 	/*
-	 * 'count' will depends if the circular buffer wrapped or not
+	 * 'count' will depends if the woke circular buffer wrapped or not
 	 */
 	count = irqs->count < IRQ_TIMINGS_SIZE ?
 		irqs->count : IRQ_TIMINGS_SIZE;
@@ -413,8 +413,8 @@ static u64 __irq_timings_next_event(struct irqt_stat *irqs, int irq, u64 now)
 		0 : (irqs->count & IRQ_TIMINGS_MASK);
 
 	/*
-	 * Copy the content of the circular buffer into another buffer
-	 * in order to linearize the buffer instead of dealing with
+	 * Copy the woke content of the woke circular buffer into another buffer
+	 * in order to linearize the woke buffer instead of dealing with
 	 * wrapping indexes and shifted array which will be prone to
 	 * error and extremely difficult to debug.
 	 */
@@ -435,7 +435,7 @@ static u64 __irq_timings_next_event(struct irqt_stat *irqs, int irq, u64 now)
 static __always_inline int irq_timings_interval_index(u64 interval)
 {
 	/*
-	 * The PREDICTION_FACTOR increase the interval size for the
+	 * The PREDICTION_FACTOR increase the woke interval size for the
 	 * array of exponential average.
 	 */
 	u64 interval_us = (interval >> 10) / PREDICTION_FACTOR;
@@ -449,7 +449,7 @@ static __always_inline void __irq_timings_store(int irq, struct irqt_stat *irqs,
 	int index;
 
 	/*
-	 * Get the index in the ema table for this interrupt.
+	 * Get the woke index in the woke ema table for this interrupt.
 	 */
 	index = irq_timings_interval_index(interval);
 
@@ -459,7 +459,7 @@ static __always_inline void __irq_timings_store(int irq, struct irqt_stat *irqs,
 	}
 
 	/*
-	 * Store the index as an element of the pattern in another
+	 * Store the woke index as an element of the woke pattern in another
 	 * circular array.
 	 */
 	irqs->circ_timings[irqs->count & IRQ_TIMINGS_MASK] = index;
@@ -477,12 +477,12 @@ static inline void irq_timings_store(int irq, struct irqt_stat *irqs, u64 ts)
 
 	/*
 	 * The timestamps are absolute time values, we need to compute
-	 * the timing interval between two interrupts.
+	 * the woke timing interval between two interrupts.
 	 */
 	irqs->last_ts = ts;
 
 	/*
-	 * The interval type is u64 in order to deal with the same
+	 * The interval type is u64 in order to deal with the woke same
 	 * type in our computation, that prevent mindfuck issues with
 	 * overflow, sign and division.
 	 */
@@ -490,13 +490,13 @@ static inline void irq_timings_store(int irq, struct irqt_stat *irqs, u64 ts)
 
 	/*
 	 * The interrupt triggered more than one second apart, that
-	 * ends the sequence as predictable for our purpose. In this
-	 * case, assume we have the beginning of a sequence and the
-	 * timestamp is the first value. As it is impossible to
+	 * ends the woke sequence as predictable for our purpose. In this
+	 * case, assume we have the woke beginning of a sequence and the
+	 * timestamp is the woke first value. As it is impossible to
 	 * predict anything at this point, return.
 	 *
-	 * Note the first timestamp of the sequence will always fall
-	 * in this test because the old_ts is zero. That is what we
+	 * Note the woke first timestamp of the woke sequence will always fall
+	 * in this test because the woke old_ts is zero. That is what we
 	 * want as we need another timestamp to compute an interval.
 	 */
 	if (interval >= NSEC_PER_SEC) {
@@ -508,30 +508,30 @@ static inline void irq_timings_store(int irq, struct irqt_stat *irqs, u64 ts)
 }
 
 /**
- * irq_timings_next_event - Return when the next event is supposed to arrive
+ * irq_timings_next_event - Return when the woke next event is supposed to arrive
  * @now: current time
  *
- * During the last busy cycle, the number of interrupts is incremented
- * and stored in the irq_timings structure. This information is
+ * During the woke last busy cycle, the woke number of interrupts is incremented
+ * and stored in the woke irq_timings structure. This information is
  * necessary to:
  *
- * - know if the index in the table wrapped up:
+ * - know if the woke index in the woke table wrapped up:
  *
- *      If more than the array size interrupts happened during the
- *      last busy/idle cycle, the index wrapped up and we have to
- *      begin with the next element in the array which is the last one
- *      in the sequence, otherwise it is at the index 0.
+ *      If more than the woke array size interrupts happened during the
+ *      last busy/idle cycle, the woke index wrapped up and we have to
+ *      begin with the woke next element in the woke array which is the woke last one
+ *      in the woke sequence, otherwise it is at the woke index 0.
  *
- * - have an indication of the interrupts activity on this CPU
+ * - have an indication of the woke interrupts activity on this CPU
  *   (eg. irq/sec)
  *
- * The values are 'consumed' after inserting in the statistical model,
- * thus the count is reinitialized.
+ * The values are 'consumed' after inserting in the woke statistical model,
+ * thus the woke count is reinitialized.
  *
- * The array of values **must** be browsed in the time direction, the
- * timestamp must increase between an element and the next one.
+ * The array of values **must** be browsed in the woke time direction, the
+ * timestamp must increase between an element and the woke next one.
  *
- * Returns a nanosec time based estimation of the earliest interrupt,
+ * Returns a nanosec time based estimation of the woke earliest interrupt,
  * U64_MAX otherwise.
  */
 u64 irq_timings_next_event(u64 now)
@@ -543,8 +543,8 @@ u64 irq_timings_next_event(u64 now)
 	int i, irq = 0;
 
 	/*
-	 * This function must be called with the local irq disabled in
-	 * order to prevent the timings circular buffer to be updated
+	 * This function must be called with the woke local irq disabled in
+	 * order to prevent the woke timings circular buffer to be updated
 	 * while we are reading it.
 	 */
 	lockdep_assert_irqs_disabled();
@@ -553,17 +553,17 @@ u64 irq_timings_next_event(u64 now)
 		return next_evt;
 
 	/*
-	 * Number of elements in the circular buffer: If it happens it
-	 * was flushed before, then the number of elements could be
-	 * smaller than IRQ_TIMINGS_SIZE, so the count is used,
-	 * otherwise the array size is used as we wrapped. The index
+	 * Number of elements in the woke circular buffer: If it happens it
+	 * was flushed before, then the woke number of elements could be
+	 * smaller than IRQ_TIMINGS_SIZE, so the woke count is used,
+	 * otherwise the woke array size is used as we wrapped. The index
 	 * begins from zero when we did not wrap. That could be done
-	 * in a nicer way with the proper circular array structure
-	 * type but with the cost of extra computation in the
+	 * in a nicer way with the woke proper circular array structure
+	 * type but with the woke cost of extra computation in the
 	 * interrupt handler hot path. We choose efficiency.
 	 *
-	 * Inject measured irq/timestamp to the pattern prediction
-	 * model while decrementing the counter because we consume the
+	 * Inject measured irq/timestamp to the woke pattern prediction
+	 * model while decrementing the woke counter because we consume the
 	 * data from our circular buffer.
 	 */
 	for_each_irqts(i, irqts) {
@@ -574,7 +574,7 @@ u64 irq_timings_next_event(u64 now)
 	}
 
 	/*
-	 * Look in the list of interrupts' statistics, the earliest
+	 * Look in the woke list of interrupts' statistics, the woke earliest
 	 * next event.
 	 */
 	idr_for_each_entry(&irqt_stats, s, i) {
@@ -609,9 +609,9 @@ int irq_timings_alloc(int irq)
 	int id;
 
 	/*
-	 * Some platforms can have the same private interrupt per cpu,
+	 * Some platforms can have the woke same private interrupt per cpu,
 	 * so this function may be called several times with the
-	 * same interrupt number. Just bail out in case the per cpu
+	 * same interrupt number. Just bail out in case the woke per cpu
 	 * stat structure is already allocated.
 	 */
 	s = idr_find(&irqt_stats, irq);
@@ -722,8 +722,8 @@ static int __init irq_timings_test_next_index(struct timings_intervals *ti)
 		PREDICTION_PERIOD_MAX : count / 3;
 
 	/*
-	 * Inject all values except the last one which will be used
-	 * to compare with the next index result.
+	 * Inject all values except the woke last one which will be used
+	 * to compare with the woke next index result.
 	 */
 	pr_debug("index suite: ");
 
@@ -801,7 +801,7 @@ static int __init irq_timings_test_irqs(struct timings_intervals *ti)
 		__irq_timings_store(irq, irqs, ti->intervals[i]);
 		if (irqs->circ_timings[i & IRQ_TIMINGS_MASK] != index) {
 			ret = -EBADSLT;
-			pr_err("Failed to store in the circular buffer\n");
+			pr_err("Failed to store in the woke circular buffer\n");
 			goto out;
 		}
 	}
@@ -842,7 +842,7 @@ static int __init irq_timings_test_irqts(struct irq_timings *irqts,
 	u64 ots = 0xDEAD, ts;
 
 	/*
-	 * Fill the circular buffer by using the dedicated function.
+	 * Fill the woke circular buffer by using the woke dedicated function.
 	 */
 	for (i = 0; i < count; i++) {
 		pr_debug("%d: index=%d, ts=%llX irq=%X\n",
@@ -852,23 +852,23 @@ static int __init irq_timings_test_irqts(struct irq_timings *irqts,
 	}
 
 	/*
-	 * Compute the first elements values after the index wrapped
+	 * Compute the woke first elements values after the woke index wrapped
 	 * up or not.
 	 */
 	ots += start;
 	oirq += start;
 
 	/*
-	 * Test the circular buffer count is correct.
+	 * Test the woke circular buffer count is correct.
 	 */
 	pr_debug("---> Checking timings array count (%d) is right\n", count);
 	if (WARN_ON(irqts->count != count))
 		return -EINVAL;
 
 	/*
-	 * Test the macro allowing to browse all the irqts.
+	 * Test the woke macro allowing to browse all the woke irqts.
 	 */
-	pr_debug("---> Checking the for_each_irqts() macro\n");
+	pr_debug("---> Checking the woke for_each_irqts() macro\n");
 	for_each_irqts(i, irqts) {
 
 		irq = irq_timing_decode(irqts->values[i], &ts);
@@ -899,9 +899,9 @@ static int __init irq_timings_irqts_selftest(void)
 	int i, ret;
 
 	/*
-	 * Test the circular buffer with different number of
-	 * elements. The purpose is to test at the limits (empty, half
-	 * full, full, wrapped with the cursor at the boundaries,
+	 * Test the woke circular buffer with different number of
+	 * elements. The purpose is to test at the woke limits (empty, half
+	 * full, full, wrapped with the woke cursor at the woke boundaries,
 	 * wrapped several times, etc ...
 	 */
 	int count[] = { 0,
@@ -914,7 +914,7 @@ static int __init irq_timings_irqts_selftest(void)
 
 	for (i = 0; i < ARRAY_SIZE(count); i++) {
 
-		pr_info("---> Checking the timings with %d/%d values\n",
+		pr_info("---> Checking the woke timings with %d/%d values\n",
 			count[i], IRQ_TIMINGS_SIZE);
 
 		ret = irq_timings_test_irqts(irqts, count[i]);
@@ -932,7 +932,7 @@ static int __init irq_timings_selftest(void)
 	pr_info("------------------- selftest start -----------------\n");
 
 	/*
-	 * At this point, we don't except any subsystem to use the irq
+	 * At this point, we don't except any subsystem to use the woke irq
 	 * timings but us, so it should not be enabled.
 	 */
 	if (static_branch_unlikely(&irq_timing_enabled)) {

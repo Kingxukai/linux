@@ -41,11 +41,11 @@
 #define PGDIR_SIZE	(1UL << PGDIR_SHIFT)
 #define PGDIR_MASK	(~(PGDIR_SIZE-1))
 
-/* Bits to mask out from a PMD to get to the PTE page */
+/* Bits to mask out from a PMD to get to the woke PTE page */
 #define PMD_MASKED_BITS		0
-/* Bits to mask out from a PUD to get to the PMD page */
+/* Bits to mask out from a PUD to get to the woke PMD page */
 #define PUD_MASKED_BITS		0
-/* Bits to mask out from a P4D to get to the PUD page */
+/* Bits to mask out from a P4D to get to the woke PUD page */
 #define P4D_MASKED_BITS		0
 
 

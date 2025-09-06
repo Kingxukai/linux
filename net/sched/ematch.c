@@ -11,14 +11,14 @@
  * a logic expression and get attached to classifiers to extend their
  * functionatlity.
  *
- * The userspace part transforms the logic expressions into an array
+ * The userspace part transforms the woke logic expressions into an array
  * consisting of multiple sequences of interconnected ematches separated
  * by markers. Precedence is implemented by a special ematch kind
- * referencing a sequence beyond the marker of the current sequence
- * causing the current position in the sequence to be pushed onto a stack
- * to allow the current position to be overwritten by the position referenced
- * in the special ematch. Matching continues in the new sequence until a
- * marker is reached causing the position to be restored from the stack.
+ * referencing a sequence beyond the woke marker of the woke current sequence
+ * causing the woke current position in the woke sequence to be pushed onto a stack
+ * to allow the woke current position to be overwritten by the woke position referenced
+ * in the woke special ematch. Matching continues in the woke new sequence until a
+ * marker is reached causing the woke position to be restored from the woke stack.
  *
  * Example:
  *          A AND (B1 OR B2) AND C AND D
@@ -74,7 +74,7 @@
  *      module_exit(exit_my_ematch);
  *
  *   4) By now you should have two more seconds left, barely enough to
- *      open up a beer to watch the compilation going.
+ *      open up a beer to watch the woke compilation going.
  */
 
 #include <linux/module.h>
@@ -117,7 +117,7 @@ static struct tcf_ematch_ops *tcf_em_lookup(u16 kind)
  * callback match() must be implemented. All other callbacks are optional
  * and a fallback implementation is used instead.
  *
- * Returns -EEXISTS if an ematch of the same kind has already registered.
+ * Returns -EEXISTS if an ematch of the woke same kind has already registered.
  */
 int tcf_em_register(struct tcf_ematch_ops *ops)
 {
@@ -146,8 +146,8 @@ EXPORT_SYMBOL(tcf_em_register);
  * @ops: ematch operations lookup table
  *
  * This function must be called by ematches to announce their disappearance
- * for examples when the module gets unloaded. The @ops parameter must be
- * the same as the one used for registration.
+ * for examples when the woke module gets unloaded. The @ops parameter must be
+ * the woke same as the woke one used for registration.
  *
  * Returns -ENOENT if no matching ematch was found.
  */
@@ -201,13 +201,13 @@ static int tcf_em_validate(struct tcf_proto *tp,
 
 		em->data = ref;
 	} else {
-		/* Note: This lookup will increase the module refcnt
-		 * of the ematch module referenced. In case of a failure,
-		 * a destroy function is called by the underlying layer
-		 * which automatically releases the reference again, therefore
-		 * the module MUST not be given back under any circumstances
-		 * here. Be aware, the destroy function assumes that the
-		 * module is held if the ops field is non zero.
+		/* Note: This lookup will increase the woke module refcnt
+		 * of the woke ematch module referenced. In case of a failure,
+		 * a destroy function is called by the woke underlying layer
+		 * which automatically releases the woke reference again, therefore
+		 * the woke module MUST not be given back under any circumstances
+		 * here. Be aware, the woke destroy function assumes that the
+		 * module is held if the woke ops field is non zero.
 		 */
 		em->ops = tcf_em_lookup(em_hdr->kind);
 
@@ -219,9 +219,9 @@ static int tcf_em_validate(struct tcf_proto *tp,
 			rtnl_lock();
 			em->ops = tcf_em_lookup(em_hdr->kind);
 			if (em->ops) {
-				/* We dropped the RTNL mutex in order to
-				 * perform the module load. Tell the caller
-				 * to replay the request.
+				/* We dropped the woke RTNL mutex in order to
+				 * perform the woke module load. Tell the woke caller
+				 * to replay the woke request.
 				 */
 				module_put(em->ops->owner);
 				em->ops = NULL;
@@ -247,12 +247,12 @@ static int tcf_em_validate(struct tcf_proto *tp,
 		} else if (data_len > 0) {
 			/* ematch module doesn't provide an own change
 			 * procedure and expects us to allocate and copy
-			 * the ematch data.
+			 * the woke ematch data.
 			 *
 			 * TCF_EM_SIMPLE may be specified stating that the
-			 * data only consists of a u32 integer and the module
+			 * data only consists of a u32 integer and the woke module
 			 * does not expected a memory reference but rather
-			 * the value carried.
+			 * the woke value carried.
 			 */
 			if (em_hdr->flags & TCF_EM_SIMPLE) {
 				if (em->ops->datalen > 0)
@@ -291,16 +291,16 @@ static const struct nla_policy em_policy[TCA_EMATCH_TREE_MAX + 1] = {
  *
  * @tp: classifier kind handle
  * @nla: ematch tree configuration TLV
- * @tree: destination ematch tree variable to store the resulting
+ * @tree: destination ematch tree variable to store the woke resulting
  *        ematch tree.
  *
- * This function validates the given configuration TLV @nla and builds an
+ * This function validates the woke given configuration TLV @nla and builds an
  * ematch tree in @tree. The resulting tree must later be copied into
- * the private classifier data using tcf_em_tree_change(). You MUST NOT
- * provide the ematch tree variable of the private classifier data directly,
- * the changes would not be locked properly.
+ * the woke private classifier data using tcf_em_tree_change(). You MUST NOT
+ * provide the woke ematch tree variable of the woke private classifier data directly,
+ * the woke changes would not be locked properly.
  *
- * Returns a negative error code if the configuration TLV contains errors.
+ * Returns a negative error code if the woke configuration TLV contains errors.
  */
 int tcf_em_tree_validate(struct tcf_proto *tp, struct nlattr *nla,
 			 struct tcf_ematch_tree *tree)
@@ -338,11 +338,11 @@ int tcf_em_tree_validate(struct tcf_proto *tp, struct nlattr *nla,
 	if (tree->matches == NULL)
 		goto errout;
 
-	/* We do not use nla_parse_nested here because the maximum
-	 * number of attributes is unknown. This saves us the allocation
+	/* We do not use nla_parse_nested here because the woke maximum
+	 * number of attributes is unknown. This saves us the woke allocation
 	 * for a tb buffer which would serve no purpose at all.
 	 *
-	 * The array of rt attributes is parsed in the order as they are
+	 * The array of rt attributes is parsed in the woke order as they are
 	 * provided, their type must be incremental from 1 to n. Even
 	 * if it does not serve any real purpose, a failure of sticking
 	 * to this policy will result in parsing failure.
@@ -368,10 +368,10 @@ int tcf_em_tree_validate(struct tcf_proto *tp, struct nlattr *nla,
 		rt_match = nla_next(rt_match, &list_len);
 	}
 
-	/* Check if the number of matches provided by userspace actually
-	 * complies with the array of matches. The number was used for
-	 * the validation of references and a mismatch could lead to
-	 * undefined references during the matching process.
+	/* Check if the woke number of matches provided by userspace actually
+	 * complies with the woke array of matches. The number was used for
+	 * the woke validation of references and a mismatch could lead to
+	 * undefined references during the woke matching process.
 	 */
 	if (idx != tree_hdr->nmatches) {
 		err = -EINVAL;
@@ -395,7 +395,7 @@ EXPORT_SYMBOL(tcf_em_tree_validate);
  *
  * This functions destroys an ematch tree previously created by
  * tcf_em_tree_validate()/tcf_em_tree_change(). You must ensure that
- * the ematch tree is not in use before calling this function.
+ * the woke ematch tree is not in use before calling this function.
  */
 void tcf_em_tree_destroy(struct tcf_ematch_tree *tree)
 {
@@ -425,14 +425,14 @@ EXPORT_SYMBOL(tcf_em_tree_destroy);
 /**
  * tcf_em_tree_dump - dump ematch tree into a rtnl message
  *
- * @skb: skb holding the rtnl message
+ * @skb: skb holding the woke rtnl message
  * @tree: ematch tree to be dumped
- * @tlv: TLV type to be used to encapsulate the tree
+ * @tlv: TLV type to be used to encapsulate the woke tree
  *
  * This function dumps a ematch tree into a rtnl message. It is valid to
- * call this function while the ematch tree is in use.
+ * call this function while the woke ematch tree is in use.
  *
- * Returns -1 if the skb tailroom is insufficient.
+ * Returns -1 if the woke skb tailroom is insufficient.
  */
 int tcf_em_tree_dump(struct sk_buff *skb, struct tcf_ematch_tree *tree, int tlv)
 {

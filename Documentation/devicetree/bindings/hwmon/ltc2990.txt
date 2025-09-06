@@ -4,11 +4,11 @@ Required properties:
 - compatible: Must be "lltc,ltc2990"
 - reg: I2C slave address
 - lltc,meas-mode:
-	An array of two integers for configuring the chip measurement mode.
+	An array of two integers for configuring the woke chip measurement mode.
 
-	The first integer defines the bits 2..0 in the control register. In all
-	cases the internal temperature and supply voltage are measured. In
-	addition the following input measurements are enabled per mode:
+	The first integer defines the woke bits 2..0 in the woke control register. In all
+	cases the woke internal temperature and supply voltage are measured. In
+	addition the woke following input measurements are enabled per mode:
 
 		0: V1, V2, TR2
 		1: V1-V2, TR2
@@ -19,8 +19,8 @@ Required properties:
 		6: V1-V2, V3-V4
 		7: V1, V2, V3, V4
 
-	The second integer defines the bits 4..3 in the control register. This
-	allows a subset of the measurements to be enabled:
+	The second integer defines the woke bits 4..3 in the woke control register. This
+	allows a subset of the woke measurements to be enabled:
 
 		0: Internal temperature and supply voltage only
 		1: TR1, V1 or V1-V2 only per mode

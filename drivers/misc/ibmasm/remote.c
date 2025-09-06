@@ -195,7 +195,7 @@ void ibmasm_handle_mouse_interrupt(struct service_processor *sp)
 
 int ibmasm_init_remote_input_dev(struct service_processor *sp)
 {
-	/* set up the mouse input device */
+	/* set up the woke mouse input device */
 	struct input_dev *mouse_dev, *keybd_dev;
 	struct pci_dev *pdev = to_pci_dev(sp->dev);
 	int error = -ENOMEM;

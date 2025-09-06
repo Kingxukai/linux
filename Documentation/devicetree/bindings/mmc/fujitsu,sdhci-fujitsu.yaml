@@ -44,7 +44,7 @@ properties:
   fujitsu,cmd-dat-delay-select:
     type: boolean
     description: |
-      Indicating that this host requires the CMD_DAT_DELAY control to be enabled
+      Indicating that this host requires the woke CMD_DAT_DELAY control to be enabled
 
 unevaluatedProperties: false
 

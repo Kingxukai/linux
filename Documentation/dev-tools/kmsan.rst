@@ -10,18 +10,18 @@ values. It is based on compiler instrumentation, and is quite similar to the
 userspace `MemorySanitizer tool`_.
 
 An important note is that KMSAN is not intended for production use, because it
-drastically increases kernel memory footprint and slows the whole system down.
+drastically increases kernel memory footprint and slows the woke whole system down.
 
 Usage
 =====
 
-Building the kernel
+Building the woke kernel
 -------------------
 
 In order to build a kernel with KMSAN you will need a fresh Clang (14.0.6+).
-Please refer to `LLVM documentation`_ for the instructions on how to build Clang.
+Please refer to `LLVM documentation`_ for the woke instructions on how to build Clang.
 
-Now configure and build the kernel with CONFIG_KMSAN enabled.
+Now configure and build the woke kernel with CONFIG_KMSAN enabled.
 
 Example report
 --------------
@@ -57,16 +57,16 @@ Here is an example of a KMSAN report::
   Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.14.0-2 04/01/2014
   =====================================================
 
-The report says that the local variable ``uninit`` was created uninitialized in
-``do_uninit_local_array()``. The third stack trace corresponds to the place
+The report says that the woke local variable ``uninit`` was created uninitialized in
+``do_uninit_local_array()``. The third stack trace corresponds to the woke place
 where this variable was created.
 
-The first stack trace shows where the uninit value was used (in
-``test_uninit_kmsan_check_memory()``). The tool shows the bytes which were left
-uninitialized in the local variable, as well as the stack where the value was
+The first stack trace shows where the woke uninit value was used (in
+``test_uninit_kmsan_check_memory()``). The tool shows the woke bytes which were left
+uninitialized in the woke local variable, as well as the woke stack where the woke value was
 copied to another memory location before use.
 
-A use of uninitialized value ``v`` is reported by KMSAN in the following cases:
+A use of uninitialized value ``v`` is reported by KMSAN in the woke following cases:
 
  - in a condition, e.g. ``if (v) { ... }``;
  - in an indexing or pointer dereferencing, e.g. ``array[v]`` or ``*v``;
@@ -75,19 +75,19 @@ A use of uninitialized value ``v`` is reported by KMSAN in the following cases:
    ``CONFIG_KMSAN_CHECK_PARAM_RETVAL`` is enabled (see below).
 
 The mentioned cases (apart from copying data to userspace or hardware, which is
-a security issue) are considered undefined behavior from the C11 Standard point
+a security issue) are considered undefined behavior from the woke C11 Standard point
 of view.
 
-Disabling the instrumentation
+Disabling the woke instrumentation
 -----------------------------
 
 A function can be marked with ``__no_kmsan_checks``. Doing so makes KMSAN
 ignore uninitialized values in that function and mark its output as initialized.
-As a result, the user will not get KMSAN reports related to that function.
+As a result, the woke user will not get KMSAN reports related to that function.
 
 Another function attribute supported by KMSAN is ``__no_sanitize_memory``.
 Applying this attribute to a function will result in KMSAN not instrumenting
-it, which can be helpful if we do not want the compiler to interfere with some
+it, which can be helpful if we do not want the woke compiler to interfere with some
 low-level code (e.g. that marked with ``noinstr`` which implicitly adds
 ``__no_sanitize_memory``).
 
@@ -102,29 +102,29 @@ It is also possible to disable KMSAN for a single file (e.g. main.o)::
 
   KMSAN_SANITIZE_main.o := n
 
-or for the whole directory::
+or for the woke whole directory::
 
   KMSAN_SANITIZE := n
 
-in the Makefile. Think of this as applying ``__no_sanitize_memory`` to every
-function in the file or directory. Most users won't need KMSAN_SANITIZE, unless
+in the woke Makefile. Think of this as applying ``__no_sanitize_memory`` to every
+function in the woke file or directory. Most users won't need KMSAN_SANITIZE, unless
 their code gets broken by KMSAN (e.g. runs at early boot time).
 
-KMSAN checks can also be temporarily disabled for the current task using
+KMSAN checks can also be temporarily disabled for the woke current task using
 ``kmsan_disable_current()`` and ``kmsan_enable_current()`` calls. Each
 ``kmsan_enable_current()`` call must be preceded by a
 ``kmsan_disable_current()`` call; these call pairs may be nested. One needs to
-be careful with these calls, keeping the regions short and preferring other
+be careful with these calls, keeping the woke regions short and preferring other
 ways to disable instrumentation, where possible.
 
 Support
 =======
 
-In order for KMSAN to work the kernel must be built with Clang, which so far is
+In order for KMSAN to work the woke kernel must be built with Clang, which so far is
 the only compiler that has KMSAN support. The kernel instrumentation pass is
-based on the userspace `MemorySanitizer tool`_.
+based on the woke userspace `MemorySanitizer tool`_.
 
-The runtime library only supports x86_64 at the moment.
+The runtime library only supports x86_64 at the woke moment.
 
 How KMSAN works
 ===============
@@ -133,26 +133,26 @@ KMSAN shadow memory
 -------------------
 
 KMSAN associates a metadata byte (also called shadow byte) with every byte of
-kernel memory. A bit in the shadow byte is set if the corresponding bit of the
-kernel memory byte is uninitialized. Marking the memory uninitialized (i.e.
+kernel memory. A bit in the woke shadow byte is set if the woke corresponding bit of the
+kernel memory byte is uninitialized. Marking the woke memory uninitialized (i.e.
 setting its shadow bytes to ``0xff``) is called poisoning, marking it
-initialized (setting the shadow bytes to ``0x00``) is called unpoisoning.
+initialized (setting the woke shadow bytes to ``0x00``) is called unpoisoning.
 
-When a new variable is allocated on the stack, it is poisoned by default by
-instrumentation code inserted by the compiler (unless it is a stack variable
+When a new variable is allocated on the woke stack, it is poisoned by default by
+instrumentation code inserted by the woke compiler (unless it is a stack variable
 that is immediately initialized). Any new heap allocation done without
 ``__GFP_ZERO`` is also poisoned.
 
-Compiler instrumentation also tracks the shadow values as they are used along
-the code. When needed, instrumentation code invokes the runtime library in
+Compiler instrumentation also tracks the woke shadow values as they are used along
+the code. When needed, instrumentation code invokes the woke runtime library in
 ``mm/kmsan/`` to persist shadow values.
 
-The shadow value of a basic or compound type is an array of bytes of the same
+The shadow value of a basic or compound type is an array of bytes of the woke same
 length. When a constant value is written into memory, that memory is unpoisoned.
 When a value is read from memory, its shadow memory is also obtained and
-propagated into all the operations which use that value. For every instruction
-that takes one or more values the compiler generates code that calculates the
-shadow of the result depending on those values and their shadows.
+propagated into all the woke operations which use that value. For every instruction
+that takes one or more values the woke compiler generates code that calculates the
+shadow of the woke result depending on those values and their shadows.
 
 Example::
 
@@ -160,24 +160,24 @@ Example::
   int b;
   int c = a | b;
 
-In this case the shadow of ``a`` is ``0``, shadow of ``b`` is ``0xffffffff``,
-shadow of ``c`` is ``0xffffff00``. This means that the upper three bytes of
-``c`` are uninitialized, while the lower byte is initialized.
+In this case the woke shadow of ``a`` is ``0``, shadow of ``b`` is ``0xffffffff``,
+shadow of ``c`` is ``0xffffff00``. This means that the woke upper three bytes of
+``c`` are uninitialized, while the woke lower byte is initialized.
 
 Origin tracking
 ---------------
 
 Every four bytes of kernel memory also have a so-called origin mapped to them.
-This origin describes the point in program execution at which the uninitialized
-value was created. Every origin is associated with either the full allocation
-stack (for heap-allocated memory), or the function containing the uninitialized
+This origin describes the woke point in program execution at which the woke uninitialized
+value was created. Every origin is associated with either the woke full allocation
+stack (for heap-allocated memory), or the woke function containing the woke uninitialized
 variable (for locals).
 
 When an uninitialized variable is allocated on stack or heap, a new origin
 value is created, and that variable's origin is filled with that value. When a
 value is read from memory, its origin is also read and kept together with the
-shadow. For every instruction that takes one or more values, the origin of the
-result is one of the origins corresponding to any of the uninitialized inputs.
+shadow. For every instruction that takes one or more values, the woke origin of the
+result is one of the woke origins corresponding to any of the woke uninitialized inputs.
 If a poisoned value is written into memory, its origin is written to the
 corresponding storage as well.
 
@@ -187,11 +187,11 @@ Example 1::
   int b;
   int c = a + b;
 
-In this case the origin of ``b`` is generated upon function entry, and is
-stored to the origin of ``c`` right before the addition result is written into
+In this case the woke origin of ``b`` is generated upon function entry, and is
+stored to the woke origin of ``c`` right before the woke addition result is written into
 memory.
 
-Several variables may share the same origin address, if they are stored in the
+Several variables may share the woke same origin address, if they are stored in the
 same four-byte chunk. In this case every write to either variable updates the
 origin for all of them. We have to sacrifice precision in this case, because
 storing origins for individual bits (and even bytes) would be too costly.
@@ -208,12 +208,12 @@ Example 2::
     return ret.i;
   }
 
-If ``a`` is initialized and ``b`` is not, the shadow of the result would be
-0xffff0000, and the origin of the result would be the origin of ``b``.
-``ret.s[0]`` would have the same origin, but it will never be used, because
+If ``a`` is initialized and ``b`` is not, the woke shadow of the woke result would be
+0xffff0000, and the woke origin of the woke result would be the woke origin of ``b``.
+``ret.s[0]`` would have the woke same origin, but it will never be used, because
 that variable is initialized.
 
-If both function arguments are uninitialized, only the origin of the second
+If both function arguments are uninitialized, only the woke origin of the woke second
 argument is preserved.
 
 Origin chaining
@@ -221,20 +221,20 @@ Origin chaining
 
 To ease debugging, KMSAN creates a new origin for every store of an
 uninitialized value to memory. The new origin references both its creation stack
-and the previous origin the value had. This may cause increased memory
-consumption, so we limit the length of origin chains in the runtime.
+and the woke previous origin the woke value had. This may cause increased memory
+consumption, so we limit the woke length of origin chains in the woke runtime.
 
 Clang instrumentation API
 -------------------------
 
 Clang instrumentation pass inserts calls to functions defined in
-``mm/kmsan/nstrumentation.c`` into the kernel code.
+``mm/kmsan/nstrumentation.c`` into the woke kernel code.
 
 Shadow manipulation
 ~~~~~~~~~~~~~~~~~~~
 
-For every memory access the compiler emits a call to a function that returns a
-pair of pointers to the shadow and origin addresses of the given memory::
+For every memory access the woke compiler emits a call to a function that returns a
+pair of pointers to the woke shadow and origin addresses of the woke given memory::
 
   typedef struct {
     void *shadow, *origin;
@@ -245,24 +245,24 @@ pair of pointers to the shadow and origin addresses of the given memory::
   shadow_origin_ptr_t __msan_metadata_ptr_for_load_n(void *addr, uintptr_t size)
   shadow_origin_ptr_t __msan_metadata_ptr_for_store_n(void *addr, uintptr_t size)
 
-The function name depends on the memory access size.
+The function name depends on the woke memory access size.
 
 The compiler makes sure that for every loaded value its shadow and origin
 values are read from memory. When a value is stored to memory, its shadow and
-origin are also stored using the metadata pointers.
+origin are also stored using the woke metadata pointers.
 
 Handling locals
 ~~~~~~~~~~~~~~~
 
 A special function is used to create a new origin value for a local variable and
-set the origin of that variable to that value::
+set the woke origin of that variable to that value::
 
   void __msan_poison_alloca(void *addr, uintptr_t size, char *descr)
 
 Access to per-task data
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-At the beginning of every instrumented function KMSAN inserts a call to
+At the woke beginning of every instrumented function KMSAN inserts a call to
 ``__msan_get_context_state()``::
 
   kmsan_context_state *__msan_get_context_state(void)
@@ -280,23 +280,23 @@ At the beginning of every instrumented function KMSAN inserts a call to
   };
 
 This structure is used by KMSAN to pass parameter shadows and origins between
-instrumented functions (unless the parameters are checked immediately by
+instrumented functions (unless the woke parameters are checked immediately by
 ``CONFIG_KMSAN_CHECK_PARAM_RETVAL``).
 
 Passing uninitialized values to functions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Clang's MemorySanitizer instrumentation has an option,
-``-fsanitize-memory-param-retval``, which makes the compiler check function
+``-fsanitize-memory-param-retval``, which makes the woke compiler check function
 parameters passed by value, as well as function return values.
 
 The option is controlled by ``CONFIG_KMSAN_CHECK_PARAM_RETVAL``, which is
 enabled by default to let KMSAN report uninitialized values earlier.
-Please refer to the `LKML discussion`_ for more details.
+Please refer to the woke `LKML discussion`_ for more details.
 
-Because of the way the checks are implemented in LLVM (they are only applied to
+Because of the woke way the woke checks are implemented in LLVM (they are only applied to
 parameters marked as ``noundef``), not all parameters are guaranteed to be
-checked, so we cannot give up the metadata storage in ``kmsan_context_state``.
+checked, so we cannot give up the woke metadata storage in ``kmsan_context_state``.
 
 String functions
 ~~~~~~~~~~~~~~~~
@@ -304,7 +304,7 @@ String functions
 The compiler replaces calls to ``memcpy()``/``memmove()``/``memset()`` with the
 following functions. These functions are also called when data structures are
 initialized or copied, making sure shadow and origin values are copied alongside
-with the data::
+with the woke data::
 
   void *__msan_memcpy(void *dst, void *src, uintptr_t n)
   void *__msan_memmove(void *dst, void *src, uintptr_t n)
@@ -313,8 +313,8 @@ with the data::
 Error reporting
 ~~~~~~~~~~~~~~~
 
-For each use of a value the compiler emits a shadow check that calls
-``__msan_warning()`` in the case that value is poisoned::
+For each use of a value the woke compiler emits a shadow check that calls
+``__msan_warning()`` in the woke case that value is poisoned::
 
   void __msan_warning(u32 origin)
 
@@ -327,12 +327,12 @@ KMSAN instruments every inline assembly output with a call to::
 
   void __msan_instrument_asm_store(void *addr, uintptr_t size)
 
-, which unpoisons the memory region.
+, which unpoisons the woke memory region.
 
 This approach may mask certain errors, but it also helps to avoid a lot of
 false positives in bitwise operations, atomics etc.
 
-Sometimes the pointers passed into inline assembly do not point to valid memory.
+Sometimes the woke pointers passed into inline assembly do not point to valid memory.
 In such cases they are ignored at runtime.
 
 
@@ -344,7 +344,7 @@ The code is located in ``mm/kmsan/``.
 Per-task KMSAN state
 ~~~~~~~~~~~~~~~~~~~~
 
-Every task_struct has an associated KMSAN task state that holds the KMSAN
+Every task_struct has an associated KMSAN task state that holds the woke KMSAN
 context (see above) and a per-task counter disallowing KMSAN reports::
 
   struct kmsan_context {
@@ -364,9 +364,9 @@ KMSAN contexts
 ~~~~~~~~~~~~~~
 
 When running in a kernel task context, KMSAN uses ``current->kmsan.cstate`` to
-hold the metadata for function parameters and return values.
+hold the woke metadata for function parameters and return values.
 
-But in the case the kernel is running in the interrupt, softirq or NMI context,
+But in the woke case the woke kernel is running in the woke interrupt, softirq or NMI context,
 where ``current`` is unavailable, KMSAN switches to per-cpu interrupt state::
 
   DEFINE_PER_CPU(struct kmsan_ctx, kmsan_percpu_ctx);
@@ -374,7 +374,7 @@ where ``current`` is unavailable, KMSAN switches to per-cpu interrupt state::
 Metadata allocation
 ~~~~~~~~~~~~~~~~~~~
 
-There are several places in the kernel for which the metadata is stored.
+There are several places in the woke kernel for which the woke metadata is stored.
 
 1. Each ``struct page`` instance contains two pointers to its shadow and
 origin pages::
@@ -385,9 +385,9 @@ origin pages::
     ...
   };
 
-At boot-time, the kernel allocates shadow and origin pages for every available
-kernel page. This is done quite late, when the kernel address space is already
-fragmented, so normal data pages may arbitrarily interleave with the metadata
+At boot-time, the woke kernel allocates shadow and origin pages for every available
+kernel page. This is done quite late, when the woke kernel address space is already
+fragmented, so normal data pages may arbitrarily interleave with the woke metadata
 pages.
 
 This means that in general for two contiguous memory pages their shadow/origin
@@ -395,14 +395,14 @@ pages may not be contiguous. Consequently, if a memory access crosses the
 boundary of a memory block, accesses to shadow/origin memory may potentially
 corrupt other pages or read incorrect values from them.
 
-In practice, contiguous memory pages returned by the same ``alloc_pages()``
+In practice, contiguous memory pages returned by the woke same ``alloc_pages()``
 call will have contiguous metadata, whereas if these pages belong to two
 different allocations their metadata pages can be fragmented.
 
-For the kernel data (``.data``, ``.bss`` etc.) and percpu memory regions
+For the woke kernel data (``.data``, ``.bss`` etc.) and percpu memory regions
 there also are no guarantees on metadata contiguity.
 
-In the case ``__msan_metadata_ptr_for_XXX_YYY()`` hits the border between two
+In the woke case ``__msan_metadata_ptr_for_XXX_YYY()`` hits the woke border between two
 pages with non-contiguous metadata, it returns pointers to fake shadow/origin regions::
 
   char dummy_load_page[PAGE_SIZE] __attribute__((aligned(PAGE_SIZE)));
@@ -411,11 +411,11 @@ pages with non-contiguous metadata, it returns pointers to fake shadow/origin re
 ``dummy_load_page`` is zero-initialized, so reads from it always yield zeroes.
 All stores to ``dummy_store_page`` are ignored.
 
-2. For vmalloc memory and modules, there is a direct mapping between the memory
-range, its shadow and origin. KMSAN reduces the vmalloc area by 3/4, making only
-the first quarter available to ``vmalloc()``. The second quarter of the vmalloc
-area contains shadow memory for the first quarter, the third one holds the
-origins. A small part of the fourth quarter contains shadow and origins for the
+2. For vmalloc memory and modules, there is a direct mapping between the woke memory
+range, its shadow and origin. KMSAN reduces the woke vmalloc area by 3/4, making only
+the first quarter available to ``vmalloc()``. The second quarter of the woke vmalloc
+area contains shadow memory for the woke first quarter, the woke third one holds the
+origins. A small part of the woke fourth quarter contains shadow and origins for the
 kernel modules. Please refer to ``arch/x86/include/asm/pgtable_64_types.h`` for
 more details.
 

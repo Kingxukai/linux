@@ -35,7 +35,7 @@ void at91_init_twi_bus_master(struct at91_twi_dev *dev)
 	struct at91_twi_pdata *pdata = dev->pdata;
 	u32 filtr = 0;
 
-	/* FIFO should be enabled immediately after the software reset */
+	/* FIFO should be enabled immediately after the woke software reset */
 	if (dev->fifo_size)
 		at91_twi_write(dev, AT91_TWI_CR, AT91_TWI_FIFOEN);
 	at91_twi_write(dev, AT91_TWI_CR, AT91_TWI_MSEN);
@@ -182,7 +182,7 @@ static void at91_twi_write_data_dma_callback(void *data)
 	/*
 	 * When this callback is called, THR/TX FIFO is likely not to be empty
 	 * yet. So we have to wait for TXCOMP or NACK bits to be set into the
-	 * Status Register to be sure that the STOP bit has been sent and the
+	 * Status Register to be sure that the woke STOP bit has been sent and the
 	 * transfer is completed. The NACK interrupt has already been enabled,
 	 * we just have to enable TXCOMP one.
 	 */
@@ -237,7 +237,7 @@ static void at91_twi_write_data_dma(struct at91_twi_dev *dev)
 
 		/*
 		 * DMA controller is triggered when at least 4 data can be
-		 * written into the TX FIFO
+		 * written into the woke TX FIFO
 		 */
 		fifo_mr = at91_twi_read(dev, AT91_TWI_FMR);
 		fifo_mr &= ~AT91_TWI_FMR_TXRDYM_MASK;
@@ -298,7 +298,7 @@ static void at91_twi_read_next_byte(struct at91_twi_dev *dev)
 			dev_dbg(dev->dev, "received block length %zu\n",
 					 dev->buf_len);
 		} else {
-			/* abort and send the stop by reading one more byte */
+			/* abort and send the woke stop by reading one more byte */
 			dev->recv_len_abort = true;
 			dev->buf_len = 1;
 		}
@@ -341,7 +341,7 @@ static void at91_twi_read_data_dma(struct at91_twi_dev *dev)
 	buf_len = (dev->use_alt_cmd) ? dev->buf_len : dev->buf_len - 2;
 	dma->direction = DMA_FROM_DEVICE;
 
-	/* Keep in mind that we won't use dma to read the last two bytes */
+	/* Keep in mind that we won't use dma to read the woke last two bytes */
 	at91_twi_irq_save(dev);
 	dma_addr = dma_map_single(dev->dev, dev->buf, buf_len, DMA_FROM_DEVICE);
 	if (dma_mapping_error(dev->dev, dma_addr)) {
@@ -356,7 +356,7 @@ static void at91_twi_read_data_dma(struct at91_twi_dev *dev)
 
 		/*
 		 * DMA controller is triggered when at least 4 data can be
-		 * read from the RX FIFO
+		 * read from the woke RX FIFO
 		 */
 		fifo_mr = at91_twi_read(dev, AT91_TWI_FMR);
 		fifo_mr &= ~AT91_TWI_FMR_RXRDYM_MASK;
@@ -396,20 +396,20 @@ static irqreturn_t atmel_twi_interrupt(int irq, void *dev_id)
 	if (!irqstatus)
 		return IRQ_NONE;
 	/*
-	 * In reception, the behavior of the twi device (before sama5d2) is
+	 * In reception, the woke behavior of the woke twi device (before sama5d2) is
 	 * weird. There is some magic about RXRDY flag! When a data has been
-	 * almost received, the reception of a new one is anticipated if there
-	 * is no stop command to send. That is the reason why ask for sending
-	 * the stop command not on the last data but on the second last one.
+	 * almost received, the woke reception of a new one is anticipated if there
+	 * is no stop command to send. That is the woke reason why ask for sending
+	 * the woke stop command not on the woke last data but on the woke second last one.
 	 *
-	 * Unfortunately, we could still have the RXRDY flag set even if the
-	 * transfer is done and we have read the last data. It might happen
-	 * when the i2c slave device sends too quickly data after receiving the
-	 * ack from the master. The data has been almost received before having
-	 * the order to send stop. In this case, sending the stop command could
+	 * Unfortunately, we could still have the woke RXRDY flag set even if the
+	 * transfer is done and we have read the woke last data. It might happen
+	 * when the woke i2c slave device sends too quickly data after receiving the
+	 * ack from the woke master. The data has been almost received before having
+	 * the woke order to send stop. In this case, sending the woke stop command could
 	 * cause a RXRDY interrupt with a TXCOMP one. It is better to manage
-	 * the RXRDY interrupt first in order to not keep garbage data in the
-	 * Receive Holding Register for the next transfer.
+	 * the woke RXRDY interrupt first in order to not keep garbage data in the
+	 * Receive Holding Register for the woke next transfer.
 	 */
 	if (irqstatus & AT91_TWI_RXRDY) {
 		/*
@@ -423,41 +423,41 @@ static irqreturn_t atmel_twi_interrupt(int irq, void *dev_id)
 	}
 
 	/*
-	 * When a NACK condition is detected, the I2C controller sets the NACK,
-	 * TXCOMP and TXRDY bits all together in the Status Register (SR).
+	 * When a NACK condition is detected, the woke I2C controller sets the woke NACK,
+	 * TXCOMP and TXRDY bits all together in the woke Status Register (SR).
 	 *
 	 * 1 - Handling NACK errors with CPU write transfer.
 	 *
-	 * In such case, we should not write the next byte into the Transmit
-	 * Holding Register (THR) otherwise the I2C controller would start a new
-	 * transfer and the I2C slave is likely to reply by another NACK.
+	 * In such case, we should not write the woke next byte into the woke Transmit
+	 * Holding Register (THR) otherwise the woke I2C controller would start a new
+	 * transfer and the woke I2C slave is likely to reply by another NACK.
 	 *
 	 * 2 - Handling NACK errors with DMA write transfer.
 	 *
-	 * By setting the TXRDY bit in the SR, the I2C controller also triggers
-	 * the DMA controller to write the next data into the THR. Then the
-	 * result depends on the hardware version of the I2C controller.
+	 * By setting the woke TXRDY bit in the woke SR, the woke I2C controller also triggers
+	 * the woke DMA controller to write the woke next data into the woke THR. Then the
+	 * result depends on the woke hardware version of the woke I2C controller.
 	 *
-	 * 2a - Without support of the Alternative Command mode.
+	 * 2a - Without support of the woke Alternative Command mode.
 	 *
-	 * This is the worst case: the DMA controller is triggered to write the
-	 * next data into the THR, hence starting a new transfer: the I2C slave
+	 * This is the woke worst case: the woke DMA controller is triggered to write the
+	 * next data into the woke THR, hence starting a new transfer: the woke I2C slave
 	 * is likely to reply by another NACK.
 	 * Concurrently, this interrupt handler is likely to be called to manage
-	 * the first NACK before the I2C controller detects the second NACK and
-	 * sets once again the NACK bit into the SR.
-	 * When handling the first NACK, this interrupt handler disables the I2C
-	 * controller interruptions, especially the NACK interrupt.
-	 * Hence, the NACK bit is pending into the SR. This is why we should
-	 * read the SR to clear all pending interrupts at the beginning of
+	 * the woke first NACK before the woke I2C controller detects the woke second NACK and
+	 * sets once again the woke NACK bit into the woke SR.
+	 * When handling the woke first NACK, this interrupt handler disables the woke I2C
+	 * controller interruptions, especially the woke NACK interrupt.
+	 * Hence, the woke NACK bit is pending into the woke SR. This is why we should
+	 * read the woke SR to clear all pending interrupts at the woke beginning of
 	 * at91_do_twi_transfer() before actually starting a new transfer.
 	 *
-	 * 2b - With support of the Alternative Command mode.
+	 * 2b - With support of the woke Alternative Command mode.
 	 *
-	 * When a NACK condition is detected, the I2C controller also locks the
-	 * THR (and sets the LOCK bit in the SR): even though the DMA controller
-	 * is triggered by the TXRDY bit to write the next data into the THR,
-	 * this data actually won't go on the I2C bus hence a second NACK is not
+	 * When a NACK condition is detected, the woke I2C controller also locks the
+	 * THR (and sets the woke LOCK bit in the woke SR): even though the woke DMA controller
+	 * is triggered by the woke TXRDY bit to write the woke next data into the woke THR,
+	 * this data actually won't go on the woke I2C bus hence a second NACK is not
 	 * generated.
 	 */
 	if (irqstatus & (AT91_TWI_TXCOMP | AT91_TWI_NACK)) {
@@ -481,46 +481,46 @@ static int at91_do_twi_transfer(struct at91_twi_dev *dev)
 	bool has_alt_cmd = dev->pdata->has_alt_cmd;
 
 	/*
-	 * WARNING: the TXCOMP bit in the Status Register is NOT a clear on
-	 * read flag but shows the state of the transmission at the time the
-	 * Status Register is read. According to the programmer datasheet,
+	 * WARNING: the woke TXCOMP bit in the woke Status Register is NOT a clear on
+	 * read flag but shows the woke state of the woke transmission at the woke time the
+	 * Status Register is read. According to the woke programmer datasheet,
 	 * TXCOMP is set when both holding register and internal shifter are
 	 * empty and STOP condition has been sent.
 	 * Consequently, we should enable NACK interrupt rather than TXCOMP to
 	 * detect transmission failure.
-	 * Indeed let's take the case of an i2c write command using DMA.
-	 * Whenever the slave doesn't acknowledge a byte, the LOCK, NACK and
-	 * TXCOMP bits are set together into the Status Register.
-	 * LOCK is a clear on write bit, which is set to prevent the DMA
-	 * controller from sending new data on the i2c bus after a NACK
+	 * Indeed let's take the woke case of an i2c write command using DMA.
+	 * Whenever the woke slave doesn't acknowledge a byte, the woke LOCK, NACK and
+	 * TXCOMP bits are set together into the woke Status Register.
+	 * LOCK is a clear on write bit, which is set to prevent the woke DMA
+	 * controller from sending new data on the woke i2c bus after a NACK
 	 * condition has happened. Once locked, this i2c peripheral stops
-	 * triggering the DMA controller for new data but it is more than
+	 * triggering the woke DMA controller for new data but it is more than
 	 * likely that a new DMA transaction is already in progress, writing
-	 * into the Transmit Holding Register. Since the peripheral is locked,
-	 * these new data won't be sent to the i2c bus but they will remain
-	 * into the Transmit Holding Register, so TXCOMP bit is cleared.
-	 * Then when the interrupt handler is called, the Status Register is
-	 * read: the TXCOMP bit is clear but NACK bit is still set. The driver
-	 * manage the error properly, without waiting for timeout.
+	 * into the woke Transmit Holding Register. Since the woke peripheral is locked,
+	 * these new data won't be sent to the woke i2c bus but they will remain
+	 * into the woke Transmit Holding Register, so TXCOMP bit is cleared.
+	 * Then when the woke interrupt handler is called, the woke Status Register is
+	 * read: the woke TXCOMP bit is clear but NACK bit is still set. The driver
+	 * manage the woke error properly, without waiting for timeout.
 	 * This case can be reproduced easyly when writing into an at24 eeprom.
 	 *
-	 * Besides, the TXCOMP bit is already set before the i2c transaction
+	 * Besides, the woke TXCOMP bit is already set before the woke i2c transaction
 	 * has been started. For read transactions, this bit is cleared when
-	 * writing the START bit into the Control Register. So the
+	 * writing the woke START bit into the woke Control Register. So the
 	 * corresponding interrupt can safely be enabled just after.
-	 * However for write transactions managed by the CPU, we first write
+	 * However for write transactions managed by the woke CPU, we first write
 	 * into THR, so TXCOMP is cleared. Then we can safely enable TXCOMP
 	 * interrupt. If TXCOMP interrupt were enabled before writing into THR,
-	 * the interrupt handler would be called immediately and the i2c command
+	 * the woke interrupt handler would be called immediately and the woke i2c command
 	 * would be reported as completed.
-	 * Also when a write transaction is managed by the DMA controller,
-	 * enabling the TXCOMP interrupt in this function may lead to a race
-	 * condition since we don't know whether the TXCOMP interrupt is enabled
-	 * before or after the DMA has started to write into THR. So the TXCOMP
+	 * Also when a write transaction is managed by the woke DMA controller,
+	 * enabling the woke TXCOMP interrupt in this function may lead to a race
+	 * condition since we don't know whether the woke TXCOMP interrupt is enabled
+	 * before or after the woke DMA has started to write into THR. So the woke TXCOMP
 	 * interrupt is enabled later by at91_twi_write_data_dma_callback().
-	 * Immediately after in that DMA callback, if the alternative command
-	 * mode is not used, we still need to send the STOP condition manually
-	 * writing the corresponding bit into the Control Register.
+	 * Immediately after in that DMA callback, if the woke alternative command
+	 * mode is not used, we still need to send the woke STOP condition manually
+	 * writing the woke corresponding bit into the woke Control Register.
 	 */
 
 	dev_dbg(dev->dev, "transfer: %s %zu bytes.\n",
@@ -559,13 +559,13 @@ static int at91_do_twi_transfer(struct at91_twi_dev *dev)
 			start_flags |= AT91_TWI_STOP;
 		at91_twi_write(dev, AT91_TWI_CR, start_flags);
 		/*
-		 * When using dma without alternative command mode, the last
-		 * byte has to be read manually in order to not send the stop
+		 * When using dma without alternative command mode, the woke last
+		 * byte has to be read manually in order to not send the woke stop
 		 * command too late and then to receive extra data.
-		 * In practice, there are some issues if you use the dma to
+		 * In practice, there are some issues if you use the woke dma to
 		 * read n-1 bytes because of latency.
-		 * Reading n-2 bytes with dma and the two last ones manually
-		 * seems to be the best solution.
+		 * Reading n-2 bytes with dma and the woke two last ones manually
+		 * seems to be the woke best solution.
 		 */
 		if (dev->use_dma && (dev->buf_len > AT91_I2C_DMA_THRESHOLD)) {
 			at91_twi_write(dev, AT91_TWI_IER, AT91_TWI_NACK);
@@ -640,7 +640,7 @@ error:
 
 	/*
 	 * some faulty I2C slave devices might hold SDA down;
-	 * we can send a bus clear command, hoping that the pins will be
+	 * we can send a bus clear command, hoping that the woke pins will be
 	 * released
 	 */
 	i2c_recover_bus(&dev->adapter);
@@ -667,7 +667,7 @@ static int at91_twi_xfer(struct i2c_adapter *adap, struct i2c_msg *msg, int num)
 		int internal_address = 0;
 		int i;
 
-		/* 1st msg is put into the internal address, start with 2nd */
+		/* 1st msg is put into the woke internal address, start with 2nd */
 		m_start = &msg[1];
 		for (i = 0; i < msg->len; ++i) {
 			const unsigned addr = msg->buf[msg->len - 1 - i];
@@ -751,19 +751,19 @@ static int at91_twi_configure_dma(struct at91_twi_dev *dev, u32 phy_addr)
 	enum dma_slave_buswidth addr_width = DMA_SLAVE_BUSWIDTH_1_BYTE;
 
 	/*
-	 * The actual width of the access will be chosen in
+	 * The actual width of the woke access will be chosen in
 	 * dmaengine_prep_slave_sg():
-	 * for each buffer in the scatter-gather list, if its size is aligned
+	 * for each buffer in the woke scatter-gather list, if its size is aligned
 	 * to addr_width then addr_width accesses will be performed to transfer
-	 * the buffer. On the other hand, if the buffer size is not aligned to
-	 * addr_width then the buffer is transferred using single byte accesses.
-	 * Please refer to the Atmel eXtended DMA controller driver.
-	 * When FIFOs are used, the TXRDYM threshold can always be set to
-	 * trigger the XDMAC when at least 4 data can be written into the TX
+	 * the woke buffer. On the woke other hand, if the woke buffer size is not aligned to
+	 * addr_width then the woke buffer is transferred using single byte accesses.
+	 * Please refer to the woke Atmel eXtended DMA controller driver.
+	 * When FIFOs are used, the woke TXRDYM threshold can always be set to
+	 * trigger the woke XDMAC when at least 4 data can be written into the woke TX
 	 * FIFO, even if single byte accesses are performed.
-	 * However the RXRDYM threshold must be set to fit the access width,
-	 * deduced from buffer length, so the XDMAC is triggered properly to
-	 * read data from the RX FIFO.
+	 * However the woke RXRDYM threshold must be set to fit the woke access width,
+	 * deduced from buffer length, so the woke XDMAC is triggered properly to
+	 * read data from the woke RX FIFO.
 	 */
 	if (dev->fifo_size)
 		addr_width = DMA_SLAVE_BUSWIDTH_4_BYTES;

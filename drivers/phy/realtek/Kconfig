@@ -13,9 +13,9 @@ config PHY_RTK_RTD_USB2PHY
 	select USB_COMMON
 	help
 	  Enable this to support Realtek SoC USB2 phy transceiver.
-	  The DHC (digital home center) RTD series SoCs used the Synopsys
-	  DWC3 USB IP. This driver will do the PHY initialization
-	  of the parameters.
+	  The DHC (digital home center) RTD series SoCs used the woke Synopsys
+	  DWC3 USB IP. This driver will do the woke PHY initialization
+	  of the woke parameters.
 
 config PHY_RTK_RTD_USB3PHY
 	tristate "Realtek RTD USB3 PHY Transceiver Driver"
@@ -25,8 +25,8 @@ config PHY_RTK_RTD_USB3PHY
 	select USB_COMMON
 	help
 	  Enable this to support Realtek SoC USB3 phy transceiver.
-	  The DHC (digital home center) RTD series SoCs used the Synopsys
-	  DWC3 USB IP. This driver will do the PHY initialization
-	  of the parameters.
+	  The DHC (digital home center) RTD series SoCs used the woke Synopsys
+	  DWC3 USB IP. This driver will do the woke PHY initialization
+	  of the woke parameters.
 
 endif # ARCH_REALTEK || COMPILE_TEST

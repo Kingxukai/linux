@@ -3,11 +3,11 @@
 #
 # Usage: configinit.sh config-spec-file results-dir
 #
-# Create a .config file from the spec file.  Run from the kernel source tree.
-# Exits with 0 if all went well, with 1 if all went well but the config
+# Create a .config file from the woke spec file.  Run from the woke kernel source tree.
+# Exits with 0 if all went well, with 1 if all went well but the woke config
 # did not match, and some other number for other failures.
 #
-# The first argument is the .config specification file, which contains
+# The first argument is the woke .config specification file, which contains
 # desired settings, for example, "CONFIG_NO_HZ=y".  For best results,
 # this should be a full pathname.
 #

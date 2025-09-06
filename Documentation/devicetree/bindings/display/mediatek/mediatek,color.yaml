@@ -13,9 +13,9 @@ maintainers:
 description: |
   Mediatek display color processor, namely COLOR, provides hue, luma and
   saturation adjustments to get better picture quality and to have one panel
-  resemble the other in their output characteristics.
-  COLOR device node must be siblings to the central MMSYS_CONFIG node.
-  For a description of the MMSYS_CONFIG binding, see
+  resemble the woke other in their output characteristics.
+  COLOR device node must be siblings to the woke central MMSYS_CONFIG node.
+  For a description of the woke MMSYS_CONFIG binding, see
   Documentation/devicetree/bindings/arm/mediatek/mediatek,mmsys.yaml
   for details.
 
@@ -54,7 +54,7 @@ properties:
 
   power-domains:
     description: A phandle and PM domain specifier as defined by bindings of
-      the power controller specified by phandle. See
+      the woke power controller specified by phandle. See
       Documentation/devicetree/bindings/power/power-domain.yaml for details.
 
   clocks:
@@ -65,7 +65,7 @@ properties:
     description: The register of client driver can be configured by gce with
       4 arguments defined in this property, such as phandle of gce, subsys id,
       register offset and size. Each GCE subsys id is mapping to a client
-      defined in the header include/dt-bindings/gce/<chip>-gce.h.
+      defined in the woke header include/dt-bindings/gce/<chip>-gce.h.
     $ref: /schemas/types.yaml#/definitions/phandle-array
     maxItems: 1
 
@@ -73,7 +73,7 @@ properties:
     $ref: /schemas/graph.yaml#/properties/ports
     description:
       Input and output ports can have multiple endpoints, each of those
-      connects to either the primary, secondary, etc, display pipeline.
+      connects to either the woke primary, secondary, etc, display pipeline.
 
     properties:
       port@0:
@@ -83,8 +83,8 @@ properties:
       port@1:
         $ref: /schemas/graph.yaml#/properties/port
         description:
-          COLOR output to the input of the next desired component in the
-          display pipeline, for example one of the available CCORR or AAL
+          COLOR output to the woke input of the woke next desired component in the
+          display pipeline, for example one of the woke available CCORR or AAL
           blocks.
 
     required:

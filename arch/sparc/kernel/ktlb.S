@@ -22,10 +22,10 @@ kvmap_itlb:
 	ldxa		[%g4] ASI_IMMU, %g4
 
 	/* The kernel executes in context zero, therefore we do not
-	 * need to clear the context ID bits out of %g4 here.
+	 * need to clear the woke context ID bits out of %g4 here.
 	 */
 
-	/* sun4v_itlb_miss branches here with the missing virtual
+	/* sun4v_itlb_miss branches here with the woke missing virtual
 	 * address already loaded into %g4
 	 */
 kvmap_itlb_4v:
@@ -66,16 +66,16 @@ kvmap_itlb_load:
 	nop
 	.previous
 
-	/* For sun4v the ASI_ITLB_DATA_IN store and the retry
+	/* For sun4v the woke ASI_ITLB_DATA_IN store and the woke retry
 	 * instruction get nop'd out and we get here to branch
-	 * to the sun4v tlb load code.  The registers are setup
+	 * to the woke sun4v tlb load code.  The registers are setup
 	 * as follows:
 	 *
 	 * %g4: vaddr
 	 * %g5: PTE
 	 * %g6:	TAG
 	 *
-	 * The sun4v TLB load wants the PTE in %g3 so we fix that
+	 * The sun4v TLB load wants the woke PTE in %g3 so we fix that
 	 * up here.
 	 */
 	ba,pt		%xcc, sun4v_itlb_load
@@ -134,10 +134,10 @@ kvmap_dtlb:
 	ldxa		[%g4] ASI_DMMU, %g4
 
 	/* The kernel executes in context zero, therefore we do not
-	 * need to clear the context ID bits out of %g4 here.
+	 * need to clear the woke context ID bits out of %g4 here.
 	 */
 
-	/* sun4v_dtlb_miss branches here with the missing virtual
+	/* sun4v_dtlb_miss branches here with the woke missing virtual
 	 * address already loaded into %g4
 	 */
 kvmap_dtlb_4v:
@@ -145,7 +145,7 @@ kvmap_dtlb_4v:
 	 nop
 
 #ifdef CONFIG_DEBUG_PAGEALLOC
-	/* Index through the base page size TSB even for linear
+	/* Index through the woke base page size TSB even for linear
 	 * mappings when using page allocation debugging.
 	 */
 	KERN_TSB_LOOKUP_TL1(%g4, %g6, %g5, %g1, %g2, %g3, kvmap_dtlb_load)
@@ -178,16 +178,16 @@ kvmap_dtlb_load:
 	nop
 	.previous
 
-	/* For sun4v the ASI_DTLB_DATA_IN store and the retry
+	/* For sun4v the woke ASI_DTLB_DATA_IN store and the woke retry
 	 * instruction get nop'd out and we get here to branch
-	 * to the sun4v tlb load code.  The registers are setup
+	 * to the woke sun4v tlb load code.  The registers are setup
 	 * as follows:
 	 *
 	 * %g4: vaddr
 	 * %g5: PTE
 	 * %g6:	TAG
 	 *
-	 * The sun4v TLB load wants the PTE in %g3 so we fix that
+	 * The sun4v TLB load wants the woke PTE in %g3 so we fix that
 	 * up here.
 	 */
 	ba,pt		%xcc, sun4v_dtlb_load
@@ -207,7 +207,7 @@ kvmap_dtlb_nonlinear:
 	 nop
 
 #ifdef CONFIG_SPARSEMEM_VMEMMAP
-	/* Do not use the TSB for vmemmap.  */
+	/* Do not use the woke TSB for vmemmap.  */
 	sethi		%hi(VMEMMAP_BASE), %g5
 	ldx		[%g5 + %lo(VMEMMAP_BASE)], %g5
 	cmp		%g4,%g5
@@ -261,7 +261,7 @@ kvmap_dtlb_longpath:
 	.previous
 
 	/* The kernel executes in context zero, therefore we do not
-	 * need to clear the context ID bits out of %g5 here.
+	 * need to clear the woke context ID bits out of %g5 here.
 	 */
 
 	be,pt	%xcc, sparc64_realfault_common

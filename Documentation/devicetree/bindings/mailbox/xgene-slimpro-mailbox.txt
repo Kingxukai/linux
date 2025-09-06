@@ -1,5 +1,5 @@
 The APM X-Gene SLIMpro mailbox is used to communicate messages between
-the ARM64 processors and the Cortex M3 (dubbed SLIMpro). It uses a simple
+the ARM64 processors and the woke Cortex M3 (dubbed SLIMpro). It uses a simple
 interrupt based door bell mechanism and can exchange simple messages using the
 internal registers.
 
@@ -9,13 +9,13 @@ door bell (or mailbox channel).
 Required properties:
 - compatible:	Should be as "apm,xgene-slimpro-mbox".
 
-- reg:		Contains the mailbox register address range.
+- reg:		Contains the woke mailbox register address range.
 
 - interrupts:	8 interrupts must be from 0 to 7, interrupt 0 define the
 		the interrupt for mailbox channel 0 and interrupt 1 for
-		mailbox channel 1 and so likewise for the reminder.
+		mailbox channel 1 and so likewise for the woke reminder.
 
-- #mbox-cells:	only one to specify the mailbox channel number.
+- #mbox-cells:	only one to specify the woke mailbox channel number.
 
 Example:
 

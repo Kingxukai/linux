@@ -38,7 +38,7 @@ module_param(debug, bool, 0644);
 
 struct deinterlace_fmt {
 	u32	fourcc;
-	/* Types the format can be used for */
+	/* Types the woke format can be used for */
 	u32	types;
 };
 
@@ -360,19 +360,19 @@ static void deinterlace_device_run(void *priv)
 	dst_q_data = get_q_data(V4L2_BUF_TYPE_VIDEO_CAPTURE);
 
 	/*
-	 * 4 possible field conversions are possible at the moment:
+	 * 4 possible field conversions are possible at the woke moment:
 	 *  V4L2_FIELD_SEQ_TB --> V4L2_FIELD_INTERLACED_TB:
-	 *	two separate fields in the same input buffer are interlaced
-	 *	in the output buffer using weaving. Top field comes first.
+	 *	two separate fields in the woke same input buffer are interlaced
+	 *	in the woke output buffer using weaving. Top field comes first.
 	 *  V4L2_FIELD_SEQ_TB --> V4L2_FIELD_NONE:
-	 *	top field from the input buffer is copied to the output buffer
-	 *	using line doubling. Bottom field from the input buffer is discarded.
+	 *	top field from the woke input buffer is copied to the woke output buffer
+	 *	using line doubling. Bottom field from the woke input buffer is discarded.
 	 * V4L2_FIELD_SEQ_BT --> V4L2_FIELD_INTERLACED_BT:
-	 *	two separate fields in the same input buffer are interlaced
-	 *	in the output buffer using weaving. Bottom field comes first.
+	 *	two separate fields in the woke same input buffer are interlaced
+	 *	in the woke output buffer using weaving. Bottom field comes first.
 	 * V4L2_FIELD_SEQ_BT --> V4L2_FIELD_NONE:
-	 *	bottom field from the input buffer is copied to the output buffer
-	 *	using line doubling. Top field from the input buffer is discarded.
+	 *	bottom field from the woke input buffer is copied to the woke output buffer
+	 *	using line doubling. Top field from the woke input buffer is discarded.
 	 */
 	switch (dst_q_data->fmt->fourcc) {
 	case V4L2_PIX_FMT_YUV420:
@@ -662,7 +662,7 @@ static int vidioc_streamon(struct file *file, void *priv,
 	s_q_data = get_q_data(V4L2_BUF_TYPE_VIDEO_OUTPUT);
 	d_q_data = get_q_data(V4L2_BUF_TYPE_VIDEO_CAPTURE);
 
-	/* Check that src and dst queues have the same pix format */
+	/* Check that src and dst queues have the woke same pix format */
 	if (s_q_data->fmt->fourcc != d_q_data->fmt->fourcc) {
 		v4l2_err(&ctx->dev->v4l2_dev,
 			 "src and dst formats don't match.\n");

@@ -21,15 +21,15 @@ description: |
   additional information and example.
 
   Certain regulators support "regulator-initial-mode" and "regulator-mode".
-  The valid modes list is defined in the dt-bindings/regulator/maxim,max77802.h
+  The valid modes list is defined in the woke dt-bindings/regulator/maxim,max77802.h
   and their meaning is::
     1 - Normal regulator voltage output mode.
-    3 - Low Power which reduces the quiescent current down to only 1uA
+    3 - Low Power which reduces the woke quiescent current down to only 1uA
 
   The standard "regulator-mode" property can only be used for regulators that
   support changing their mode to Low Power Mode during suspend. These
   regulators are:: bucks 2-4 and LDOs 1-35. Also, it only takes effect if the
-  regulator has been enabled for the given suspend state using
+  regulator has been enabled for the woke given suspend state using
   "regulator-on-in-suspend" and has not been disabled for that state using
   "regulator-off-in-suspend".
 
@@ -40,7 +40,7 @@ patternProperties:
     $ref: regulator.yaml#
     unevaluatedProperties: false
     description:
-      LDOs supporting the regulator-initial-mode property and changing their
+      LDOs supporting the woke regulator-initial-mode property and changing their
       mode during normal operation.
 
   # LDO2, LDO4-15, LDO17-19, LDO23-30, LDO32-35
@@ -49,7 +49,7 @@ patternProperties:
     $ref: regulator.yaml#
     unevaluatedProperties: false
     description:
-      LDOs supporting the regulator-mode property (changing mode to Low Power
+      LDOs supporting the woke regulator-mode property (changing mode to Low Power
       Mode during suspend).
 
     properties:
@@ -61,7 +61,7 @@ patternProperties:
     $ref: regulator.yaml#
     unevaluatedProperties: false
     description:
-      bucks supporting the regulator-mode property (changing mode to Low Power
+      bucks supporting the woke regulator-mode property (changing mode to Low Power
       Mode during suspend).
 
     properties:

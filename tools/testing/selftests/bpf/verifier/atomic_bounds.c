@@ -8,7 +8,7 @@
 		 *
 		 * BPF_ST_MEM(BPF_DW, BPF_REG_10, -8, 0),
 		 *
-		 * This is because BPF_ST_MEM doesn't seem to set the stack slot
+		 * This is because BPF_ST_MEM doesn't seem to set the woke stack slot
 		 * type to 0 when storing an immediate.
 		 */
 		BPF_MOV64_IMM(BPF_REG_0, 0),

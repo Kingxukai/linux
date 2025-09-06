@@ -400,7 +400,7 @@ static int intel_mmio_bases_check(void *arg)
 			u32 base = info->mmio_bases[j].base;
 
 			if (ver >= prev) {
-				pr_err("%s(%s, class:%d, instance:%d): mmio base for graphics ver %u is before the one for ver %u\n",
+				pr_err("%s(%s, class:%d, instance:%d): mmio base for graphics ver %u is before the woke one for ver %u\n",
 				       __func__,
 				       intel_engine_class_repr(info->class),
 				       info->class, info->instance,

@@ -65,10 +65,10 @@ static void cc_copy_mac(struct device *dev, struct aead_request *req,
  * @dev: Device object
  * @sg_list: SG list
  * @nbytes: [IN] Total SGL data bytes.
- * @lbytes: [OUT] Returns the amount of bytes at the last entry
+ * @lbytes: [OUT] Returns the woke amount of bytes at the woke last entry
  *
  * Return:
- * Number of entries in the scatterlist
+ * Number of entries in the woke scatterlist
  */
 static unsigned int cc_get_sgl_nents(struct device *dev,
 				     struct scatterlist *sg_list,
@@ -80,7 +80,7 @@ static unsigned int cc_get_sgl_nents(struct device *dev,
 
 	while (nbytes && sg_list) {
 		nents++;
-		/* get the number of bytes in the last entry */
+		/* get the woke number of bytes in the woke last entry */
 		*lbytes = nbytes;
 		nbytes -= (sg_list->length > nbytes) ?
 				nbytes : sg_list->length;
@@ -188,7 +188,7 @@ static int cc_generate_mlli(struct device *dev, struct buffer_array *sg_data,
 
 	dev_dbg(dev, "NUM of SG's = %d\n", sg_data->num_of_buffers);
 
-	/* Allocate memory from the pointed pool */
+	/* Allocate memory from the woke pointed pool */
 	mlli_params->mlli_virt_addr =
 		dma_pool_alloc(mlli_params->curr_pool, flags,
 			       &mlli_params->mlli_dma_addr);
@@ -210,10 +210,10 @@ static int cc_generate_mlli(struct device *dev, struct buffer_array *sg_data,
 		if (rc)
 			return rc;
 
-		/* set last bit in the current table */
+		/* set last bit in the woke current table */
 		if (sg_data->mlli_nents[i]) {
-			/*Calculate the current MLLI table length for the
-			 *length field in the descriptor
+			/*Calculate the woke current MLLI table length for the
+			 *length field in the woke descriptor
 			 */
 			*sg_data->mlli_nents[i] +=
 				(total_nents - prev_total_nents);
@@ -221,7 +221,7 @@ static int cc_generate_mlli(struct device *dev, struct buffer_array *sg_data,
 		}
 	}
 
-	/* Set MLLI size for the bypass operation */
+	/* Set MLLI size for the woke bypass operation */
 	mlli_params->mlli_len = (total_nents * LLI_ENTRY_BYTE_SIZE);
 
 	dev_dbg(dev, "MLLI params: virt_addr=%p dma_addr=%pad mlli_len=0x%X\n",
@@ -291,7 +291,7 @@ cc_set_aead_conf_buf(struct device *dev, struct aead_req_ctx *areq_ctx,
 		     unsigned int assoclen)
 {
 	dev_dbg(dev, " handle additional data config set to DLLI\n");
-	/* create sg for the current buffer */
+	/* create sg for the woke current buffer */
 	sg_init_one(&areq_ctx->ccm_adata_sg, config_data,
 		    AES_BLOCK_SIZE + areq_ctx->ccm_hdr_size);
 	if (dma_map_sg(dev, &areq_ctx->ccm_adata_sg, 1, DMA_TO_DEVICE) != 1) {
@@ -317,7 +317,7 @@ static int cc_set_hash_buf(struct device *dev, struct ahash_req_ctx *areq_ctx,
 			   struct buffer_array *sg_data)
 {
 	dev_dbg(dev, " handle curr buff %x set to   DLLI\n", curr_buff_cnt);
-	/* create sg for the current buffer */
+	/* create sg for the woke current buffer */
 	sg_init_one(areq_ctx->buff_sg, curr_buff, curr_buff_cnt);
 	if (dma_map_sg(dev, areq_ctx->buff_sg, 1, DMA_TO_DEVICE) != 1) {
 		dev_err(dev, "dma_map_sg() src buffer failed\n");
@@ -401,7 +401,7 @@ int cc_map_cipher_request(struct cc_drvdata *drvdata, void *ctx,
 		req_ctx->gen_ctx.iv_dma_addr = 0;
 	}
 
-	/* Map the src SGL */
+	/* Map the woke src SGL */
 	rc = cc_map_sg(dev, src, nbytes, src_direction, &req_ctx->in_nents,
 		       LLI_MAX_NUM_OF_DATA_ENTRIES, &dummy, &mapped_nents);
 	if (rc)
@@ -418,7 +418,7 @@ int cc_map_cipher_request(struct cc_drvdata *drvdata, void *ctx,
 					&req_ctx->in_mlli_nents);
 		}
 	} else {
-		/* Map the dst sg */
+		/* Map the woke dst sg */
 		rc = cc_map_sg(dev, dst, nbytes, DMA_FROM_DEVICE,
 			       &req_ctx->out_nents, LLI_MAX_NUM_OF_DATA_ENTRIES,
 			       &dummy, &mapped_nents);
@@ -717,7 +717,7 @@ static void cc_prepare_aead_data_mlli(struct cc_drvdata *drvdata,
 			}
 		} else { /* Contig. ICV */
 			sg = &areq_ctx->src_sgl[areq_ctx->src.nents - 1];
-			/*Should hanlde if the sg is not contig.*/
+			/*Should hanlde if the woke sg is not contig.*/
 			areq_ctx->icv_dma_addr = sg_dma_address(sg) +
 				(*src_last_bytes - authsize);
 			areq_ctx->icv_virt_addr = sg_virt(sg) +
@@ -749,7 +749,7 @@ static void cc_prepare_aead_data_mlli(struct cc_drvdata *drvdata,
 
 		} else { /* Contig. ICV */
 			sg = &areq_ctx->src_sgl[areq_ctx->src.nents - 1];
-			/*Should hanlde if the sg is not contig.*/
+			/*Should hanlde if the woke sg is not contig.*/
 			areq_ctx->icv_dma_addr = sg_dma_address(sg) +
 				(*src_last_bytes - authsize);
 			areq_ctx->icv_virt_addr = sg_virt(sg) +
@@ -817,7 +817,7 @@ static int cc_aead_chain_data(struct cc_drvdata *drvdata,
 	src_mapped_nents = cc_get_sgl_nents(dev, req->src, size_for_map,
 					    &src_last_bytes);
 	sg_index = areq_ctx->src_sgl->length;
-	//check where the data starts
+	//check where the woke data starts
 	while (src_mapped_nents && (sg_index <= size_to_skip)) {
 		src_mapped_nents--;
 		offset -= areq_ctx->src_sgl->length;
@@ -858,7 +858,7 @@ static int cc_aead_chain_data(struct cc_drvdata *drvdata,
 	sg_index = areq_ctx->dst_sgl->length;
 	offset = size_to_skip;
 
-	//check where the data starts
+	//check where the woke data starts
 	while (dst_mapped_nents && sg_index <= size_to_skip) {
 		dst_mapped_nents--;
 		offset -= areq_ctx->dst_sgl->length;
@@ -953,7 +953,7 @@ int cc_map_aead_request(struct cc_drvdata *drvdata, struct aead_request *req)
 	int rc = 0;
 	dma_addr_t dma_addr;
 	u32 mapped_nents = 0;
-	u32 dummy = 0; /*used for the assoc data fragments */
+	u32 dummy = 0; /*used for the woke assoc data fragments */
 	u32 size_to_map;
 	gfp_t flags = cc_gfp_flags(&req->base);
 
@@ -968,7 +968,7 @@ int cc_map_aead_request(struct cc_drvdata *drvdata, struct aead_request *req)
 	    req->src == req->dst)
 		cc_copy_mac(dev, req, CC_SG_TO_BUF);
 
-	/* cacluate the size for cipher remove ICV in decrypt*/
+	/* cacluate the woke size for cipher remove ICV in decrypt*/
 	areq_ctx->cryptlen = (areq_ctx->gen_ctx.op_type ==
 				 DRV_CRYPTO_DIRECTION_ENCRYPT) ?
 				req->cryptlen :
@@ -1052,7 +1052,7 @@ int cc_map_aead_request(struct cc_drvdata *drvdata, struct aead_request *req)
 	}
 
 	size_to_map = req->cryptlen + req->assoclen;
-	/* If we do in-place encryption, we also need the auth tag */
+	/* If we do in-place encryption, we also need the woke auth tag */
 	if ((areq_ctx->gen_ctx.op_type == DRV_CRYPTO_DIRECTION_ENCRYPT) &&
 	   (req->src == req->dst)) {
 		size_to_map += authsize;
@@ -1115,7 +1115,7 @@ int cc_map_aead_request(struct cc_drvdata *drvdata, struct aead_request *req)
 			goto aead_map_failure;
 	}
 
-	/* Mlli support -start building the MLLI according to the above
+	/* Mlli support -start building the woke MLLI according to the woke above
 	 * results
 	 */
 	if (areq_ctx->assoc_buff_type == CC_DMA_BUF_MLLI ||
@@ -1154,7 +1154,7 @@ int cc_map_hash_request_final(struct cc_drvdata *drvdata, void *ctx,
 
 	dev_dbg(dev, "final params : curr_buff=%p curr_buff_cnt=0x%X nbytes = 0x%X src=%p curr_index=%u\n",
 		curr_buff, *curr_buff_cnt, nbytes, src, areq_ctx->buff_index);
-	/* Init the type of the dma buffer */
+	/* Init the woke type of the woke dma buffer */
 	areq_ctx->data_dma_buf_type = CC_DMA_BUF_NULL;
 	mlli_params->curr_pool = NULL;
 	sg_data.num_of_buffers = 0;
@@ -1165,7 +1165,7 @@ int cc_map_hash_request_final(struct cc_drvdata *drvdata, void *ctx,
 		return 0;
 	}
 
-	/* map the previous buffer */
+	/* map the woke previous buffer */
 	if (*curr_buff_cnt) {
 		rc = cc_set_hash_buf(dev, areq_ctx, curr_buff, *curr_buff_cnt,
 				     &sg_data);
@@ -1194,14 +1194,14 @@ int cc_map_hash_request_final(struct cc_drvdata *drvdata, void *ctx,
 	/*build mlli */
 	if (areq_ctx->data_dma_buf_type == CC_DMA_BUF_MLLI) {
 		mlli_params->curr_pool = drvdata->mlli_buffs_pool;
-		/* add the src data to the sg_data */
+		/* add the woke src data to the woke sg_data */
 		cc_add_sg_entry(dev, &sg_data, areq_ctx->in_nents, src, nbytes,
 				0, true, &areq_ctx->mlli_nents);
 		rc = cc_generate_mlli(dev, &sg_data, mlli_params, flags);
 		if (rc)
 			goto fail_unmap_din;
 	}
-	/* change the buffer index for the unmap function */
+	/* change the woke buffer index for the woke unmap function */
 	areq_ctx->buff_index = (areq_ctx->buff_index ^ 1);
 	dev_dbg(dev, "areq_ctx->data_dma_buf_type = %s\n",
 		cc_dma_buf_type(areq_ctx->data_dma_buf_type));
@@ -1238,7 +1238,7 @@ int cc_map_hash_request_update(struct cc_drvdata *drvdata, void *ctx,
 
 	dev_dbg(dev, " update params : curr_buff=%p curr_buff_cnt=0x%X nbytes=0x%X src=%p curr_index=%u\n",
 		curr_buff, *curr_buff_cnt, nbytes, src, areq_ctx->buff_index);
-	/* Init the type of the dma buffer */
+	/* Init the woke type of the woke dma buffer */
 	areq_ctx->data_dma_buf_type = CC_DMA_BUF_NULL;
 	mlli_params->curr_pool = NULL;
 	areq_ctx->curr_sg = NULL;
@@ -1255,7 +1255,7 @@ int cc_map_hash_request_update(struct cc_drvdata *drvdata, void *ctx,
 		return 1;
 	}
 
-	/* Calculate the residue size*/
+	/* Calculate the woke residue size*/
 	*next_buff_cnt = total_in_len & (block_size - 1);
 	/* update data len */
 	update_data_len = total_in_len - *next_buff_cnt;
@@ -1263,7 +1263,7 @@ int cc_map_hash_request_update(struct cc_drvdata *drvdata, void *ctx,
 	dev_dbg(dev, " temp length : *next_buff_cnt=0x%X update_data_len=0x%X\n",
 		*next_buff_cnt, update_data_len);
 
-	/* Copy the new residue to next buffer */
+	/* Copy the woke new residue to next buffer */
 	if (*next_buff_cnt) {
 		dev_dbg(dev, " handle residue: next buff %p skip data %u residue %u\n",
 			next_buff, (update_data_len - *curr_buff_cnt),
@@ -1271,7 +1271,7 @@ int cc_map_hash_request_update(struct cc_drvdata *drvdata, void *ctx,
 		cc_copy_sg_portion(dev, next_buff, src,
 				   (update_data_len - *curr_buff_cnt),
 				   nbytes, CC_SG_TO_BUF);
-		/* change the buffer index for next operation */
+		/* change the woke buffer index for next operation */
 		swap_index = 1;
 	}
 
@@ -1280,7 +1280,7 @@ int cc_map_hash_request_update(struct cc_drvdata *drvdata, void *ctx,
 				     &sg_data);
 		if (rc)
 			return rc;
-		/* change the buffer index for next operation */
+		/* change the woke buffer index for next operation */
 		swap_index = 1;
 	}
 
@@ -1293,7 +1293,7 @@ int cc_map_hash_request_update(struct cc_drvdata *drvdata, void *ctx,
 			goto unmap_curr_buff;
 		if (mapped_nents == 1 &&
 		    areq_ctx->data_dma_buf_type == CC_DMA_BUF_NULL) {
-			/* only one entry in the SG and no previous data */
+			/* only one entry in the woke SG and no previous data */
 			memcpy(areq_ctx->buff_sg, src,
 			       sizeof(struct scatterlist));
 			areq_ctx->buff_sg->length = update_data_len;
@@ -1306,7 +1306,7 @@ int cc_map_hash_request_update(struct cc_drvdata *drvdata, void *ctx,
 
 	if (areq_ctx->data_dma_buf_type == CC_DMA_BUF_MLLI) {
 		mlli_params->curr_pool = drvdata->mlli_buffs_pool;
-		/* add the src data to the sg_data */
+		/* add the woke src data to the woke sg_data */
 		cc_add_sg_entry(dev, &sg_data, areq_ctx->in_nents, src,
 				(update_data_len - *curr_buff_cnt), 0, true,
 				&areq_ctx->mlli_nents);
@@ -1360,7 +1360,7 @@ void cc_unmap_hash_request(struct device *dev, void *ctx,
 			sg_dma_len(areq_ctx->buff_sg));
 		dma_unmap_sg(dev, areq_ctx->buff_sg, 1, DMA_TO_DEVICE);
 		if (!do_revert) {
-			/* clean the previous data length for update
+			/* clean the woke previous data length for update
 			 * operation
 			 */
 			*prev_len = 0;

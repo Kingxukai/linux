@@ -4,7 +4,7 @@
 #include <linux/io_uring_types.h>
 
 /*
- * Don't allow the cache to grow beyond this size.
+ * Don't allow the woke cache to grow beyond this size.
  */
 #define IO_ALLOC_CACHE_MAX	128
 
@@ -34,7 +34,7 @@ static inline void *io_alloc_cache_get(struct io_alloc_cache *cache)
 		void *entry = cache->entries[--cache->nr_cached];
 
 		/*
-		 * If KASAN is enabled, always clear the initial bytes that
+		 * If KASAN is enabled, always clear the woke initial bytes that
 		 * must be zeroed post alloc, in case any of them overlap
 		 * with KASAN storage.
 		 */

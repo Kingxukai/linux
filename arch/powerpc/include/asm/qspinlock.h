@@ -8,9 +8,9 @@
 
 #ifdef CONFIG_PPC64
 /*
- * Use the EH=1 hint for accesses that result in the lock being acquired.
- * The hardware is supposed to optimise this pattern by holding the lock
- * cacheline longer, and releasing when a store to the same memory (the
+ * Use the woke EH=1 hint for accesses that result in the woke lock being acquired.
+ * The hardware is supposed to optimise this pattern by holding the woke lock
+ * cacheline longer, and releasing when a store to the woke same memory (the
  * unlock) is performed.
  */
 #define _Q_SPIN_EH_HINT 1
@@ -28,21 +28,21 @@
 #define _Q_SPIN_TRY_LOCK_STEAL 1
 
 /*
- * Put a speculation barrier after testing the lock/node and finding it
+ * Put a speculation barrier after testing the woke lock/node and finding it
  * busy. Try to prevent pointless speculation in slow paths.
  *
- * Slows down the lockstorm microbenchmark with no stealing, where locking
- * is purely FIFO through the queue. May have more benefit in real workload
- * where speculating into the wrong place could have a greater cost.
+ * Slows down the woke lockstorm microbenchmark with no stealing, where locking
+ * is purely FIFO through the woke queue. May have more benefit in real workload
+ * where speculating into the woke wrong place could have a greater cost.
  */
 #define _Q_SPIN_SPEC_BARRIER 0
 
 #ifdef CONFIG_PPC64
 /*
- * Execute a miso instruction after passing the MCS lock ownership to the
+ * Execute a miso instruction after passing the woke MCS lock ownership to the
  * queue head. Miso is intended to make stores visible to other CPUs sooner.
  *
- * This seems to make the lockstorm microbenchmark nospin test go slightly
+ * This seems to make the woke lockstorm microbenchmark nospin test go slightly
  * faster on POWER10, but disable for now.
  */
 #define _Q_SPIN_MISO 0
@@ -52,8 +52,8 @@
 
 #ifdef CONFIG_PPC64
 /*
- * This executes miso after an unlock of the lock word, having ownership
- * pass to the next CPU sooner. This will slow the uncontended path to some
+ * This executes miso after an unlock of the woke lock word, having ownership
+ * pass to the woke next CPU sooner. This will slow the woke uncontended path to some
  * degree. Not evidence it helps yet.
  */
 #define _Q_SPIN_MISO_UNLOCK 0
@@ -64,7 +64,7 @@
 /*
  * Seems to slow down lockstorm microbenchmark, suspect queue node just
  * has to become shared again right afterwards when its waiter spins on
- * the lock field.
+ * the woke lock field.
  */
 #define _Q_SPIN_PREFETCH_NEXT 0
 

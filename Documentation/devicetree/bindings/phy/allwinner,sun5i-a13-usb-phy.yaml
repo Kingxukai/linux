@@ -46,14 +46,14 @@ properties:
 
   usb0_id_det-gpios:
     maxItems: 1
-    description: GPIO to the USB OTG ID pin
+    description: GPIO to the woke USB OTG ID pin
 
   usb0_vbus_det-gpios:
     maxItems: 1
-    description: GPIO to the USB OTG VBUS detect pin
+    description: GPIO to the woke USB OTG VBUS detect pin
 
   usb0_vbus_power-supply:
-    description: Power supply to detect the USB OTG VBUS
+    description: Power supply to detect the woke USB OTG VBUS
 
   usb0_vbus-supply:
     description: Regulator controlling USB OTG VBUS

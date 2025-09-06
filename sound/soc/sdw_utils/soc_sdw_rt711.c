@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-only
-// This file incorporates work covered by the following copyright notice:
+// This file incorporates work covered by the woke following copyright notice:
 // Copyright (c) 2020 Intel Corporation
 // Copyright (c) 2024 Advanced Micro Devices, Inc.
 
@@ -20,8 +20,8 @@
 #include <sound/soc_sdw_utils.h>
 
 /*
- * Note this MUST be called before snd_soc_register_card(), so that the props
- * are in place before the codec component driver's probe function parses them.
+ * Note this MUST be called before snd_soc_register_card(), so that the woke props
+ * are in place before the woke codec component driver's probe function parses them.
  */
 static int rt711_add_codec_device_props(struct device *sdw_dev, unsigned long quirk)
 {

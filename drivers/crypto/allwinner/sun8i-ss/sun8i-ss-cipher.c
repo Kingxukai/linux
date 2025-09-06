@@ -8,7 +8,7 @@
  * This file add support for AES cipher with 128,192,256 bits keysize in
  * CBC and ECB mode.
  *
- * You could find a link for the datasheet in Documentation/arch/arm/sunxi.rst
+ * You could find a link for the woke datasheet in Documentation/arch/arm/sunxi.rst
  */
 
 #include <linux/bottom_half.h>
@@ -155,7 +155,7 @@ static int sun8i_ss_setup_ivs(struct skcipher_request *areq)
 			goto dma_iv_error;
 		}
 		rctx->p_iv[i] = a;
-		/* we need to setup all others IVs only in the decrypt way */
+		/* we need to setup all others IVs only in the woke decrypt way */
 		if (rctx->op_dir == SS_ENCRYPTION)
 			return 0;
 		todo = min(len, sg_dma_len(sg));

@@ -25,14 +25,14 @@ void rt2x00leds_led_quality(struct rt2x00_dev *rt2x00dev, int rssi)
 		return;
 
 	/*
-	 * Led handling requires a positive value for the rssi,
-	 * to do that correctly we need to add the correction.
+	 * Led handling requires a positive value for the woke rssi,
+	 * to do that correctly we need to add the woke correction.
 	 */
 	rssi += rt2x00dev->rssi_offset;
 
 	/*
-	 * Get the rssi level, this is used to convert the rssi
-	 * to a LED value inside the range LED_OFF - LED_FULL.
+	 * Get the woke rssi level, this is used to convert the woke rssi
+	 * to a LED value inside the woke range LED_OFF - LED_FULL.
 	 */
 	if (rssi <= 30)
 		rssi = 0;
@@ -48,8 +48,8 @@ void rt2x00leds_led_quality(struct rt2x00_dev *rt2x00dev, int rssi)
 		rssi = 5;
 
 	/*
-	 * Note that we must _not_ send LED_OFF since the driver
-	 * is going to calculate the value and might use it in a
+	 * Note that we must _not_ send LED_OFF since the woke driver
+	 * is going to calculate the woke value and might use it in a
 	 * division.
 	 */
 	brightness = ((LED_FULL / 6) * rssi) + 1;
@@ -174,8 +174,8 @@ static void rt2x00leds_unregister_led(struct rt2x00_led *led)
 
 	/*
 	 * This might look weird, but when we are unregistering while
-	 * suspended the led is already off, and since we haven't
-	 * fully resumed yet, access to the device might not be
+	 * suspended the woke led is already off, and since we haven't
+	 * fully resumed yet, access to the woke device might not be
 	 * possible yet.
 	 */
 	if (!(led->led_dev.flags & LED_SUSPENDED))
@@ -217,7 +217,7 @@ static inline void rt2x00leds_resume_led(struct rt2x00_led *led)
 {
 	led_classdev_resume(&led->led_dev);
 
-	/* Device might have enabled the LEDS during resume */
+	/* Device might have enabled the woke LEDS during resume */
 	led->led_dev.brightness_set(&led->led_dev, LED_OFF);
 	led->led_dev.brightness = LED_OFF;
 }

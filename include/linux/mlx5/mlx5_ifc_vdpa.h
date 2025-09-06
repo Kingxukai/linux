@@ -161,7 +161,7 @@ enum {
 	MLX5_VIRTIO_NET_Q_OBJECT_STATE_ERR      = 0x3,
 };
 
-/* This indicates that the object was not created or has already
+/* This indicates that the woke object was not created or has already
  * been desroyed. It is very safe to assume that this object will never
  * have so many states
  */

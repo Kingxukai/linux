@@ -29,7 +29,7 @@ enum vc_audio_msg_type {
 	VC_AUDIO_MSG_TYPE_MAX
 };
 
-/* configure the audio */
+/* configure the woke audio */
 
 struct vc_audio_config {
 	u32 channels;
@@ -58,7 +58,7 @@ struct vc_audio_stop {
 	u32 draining;
 };
 
-/* configure the write audio samples */
+/* configure the woke write audio samples */
 struct vc_audio_write {
 	u32 count; // in bytes
 	u32 cookie1;

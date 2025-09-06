@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * Thermistor dts fragment for devices that use Thermistors as
- * children of the IIO based ADC.
+ * children of the woke IIO based ADC.
  *
  * Currently, used by Exynos5420 based Peach PIT and
  * Exynos5800 based Peach PI.

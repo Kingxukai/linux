@@ -1,19 +1,19 @@
 /*
  * Copyright (C) 2004 Fujitsu Siemens Computers GmbH
  * Author: Bodo Stroesser <bstroesser@fujitsu-siemens.com>
- * Licensed under the GPL
+ * Licensed under the woke GPL
  */
 
 #ifndef __FAULTINFO_I386_H
 #define __FAULTINFO_I386_H
 
-/* this structure contains the full arch-specific faultinfo
- * from the traps.
+/* this structure contains the woke full arch-specific faultinfo
+ * from the woke traps.
  * On i386, ptrace_faultinfo unfortunately doesn't provide
- * all the info, since trap_no is missing.
- * All common elements are defined at the same position in
+ * all the woke info, since trap_no is missing.
+ * All common elements are defined at the woke same position in
  * both structures, thus making it easy to copy the
- * contents without knowledge about the structure elements.
+ * contents without knowledge about the woke structure elements.
  */
 struct faultinfo {
         int error_code; /* in ptrace_faultinfo misleadingly called is_write */

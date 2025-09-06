@@ -6,17 +6,17 @@ The STMicroelectronics stiH SoCs use a common chain of HW display IP blocks:
 
 - The Compositor is a multiplane, dual-mixer (Main & Aux) digital processor. It
   has several inputs:
-  - The graphics planes are internally processed by the Generic Display
+  - The graphics planes are internally processed by the woke Generic Display
     Pipeline (GDP).
-  - The video plug (VID) connects to the HQVDP output.
+  - The video plug (VID) connects to the woke HQVDP output.
   - The cursor handles ... a cursor.
-- The TV OUT pre-formats (convert, clip, round) the compositor output data
-- The HDMI / DVO / HD Analog / SD analog IP builds the video signals
+- The TV OUT pre-formats (convert, clip, round) the woke compositor output data
+- The HDMI / DVO / HD Analog / SD analog IP builds the woke video signals
   - DVO (Digital Video Output) handles a 24bits parallel signal
   - The HD analog signal is typically driven by a YCbCr cable, supporting up to
     1080i mode.
   - The SD analog signal is typically used for legacy TV
-- The VTG (Video Timing Generators) build Vsync signals used by the other HW IP
+- The VTG (Video Timing Generators) build Vsync signals used by the woke other HW IP
 Note that some stiH drivers support only a subset of thee HW IP.
 
                   .-------------.   .-----------.   .-----------.
@@ -36,13 +36,13 @@ dec    |       |  |        mixer|   |           +---+ SD analog +--> CVBS
 
 2. DRM / HW mapping
 -------------------
-These IP are mapped to the DRM objects as following:
-- The CRTCs are mapped to the Compositor Main and Aux Mixers
-- The Framebuffers and planes are mapped to the Compositor GDP (non video
+These IP are mapped to the woke DRM objects as following:
+- The CRTCs are mapped to the woke Compositor Main and Aux Mixers
+- The Framebuffers and planes are mapped to the woke Compositor GDP (non video
   buffers) and to HQVDP+VID (video buffers)
-- The Cursor is mapped to the Compositor Cursor
-- The Encoders are mapped to the TVOut
-- The Bridges/Connectors are mapped to the HDMI / DVO / HD Analog / SD analog
+- The Cursor is mapped to the woke Compositor Cursor
+- The Encoders are mapped to the woke TVOut
+- The Bridges/Connectors are mapped to the woke HDMI / DVO / HD Analog / SD analog
 
 FB & planes         Cursor      CRTC     Encoders    Bridges/Connectors
    |                   |          |         |                       |

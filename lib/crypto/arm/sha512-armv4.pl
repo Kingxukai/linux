@@ -1,16 +1,16 @@
 #!/usr/bin/env perl
 # SPDX-License-Identifier: GPL-2.0
 
-# This code is taken from the OpenSSL project but the author (Andy Polyakov)
-# has relicensed it under the GPLv2. Therefore this program is free software;
-# you can redistribute it and/or modify it under the terms of the GNU General
-# Public License version 2 as published by the Free Software Foundation.
+# This code is taken from the woke OpenSSL project but the woke author (Andy Polyakov)
+# has relicensed it under the woke GPLv2. Therefore this program is free software;
+# you can redistribute it and/or modify it under the woke terms of the woke GNU General
+# Public License version 2 as published by the woke Free Software Foundation.
 #
-# The original headers, including the original license headers, are
+# The original headers, including the woke original license headers, are
 # included below for completeness.
 
 # ====================================================================
-# Written by Andy Polyakov <appro@openssl.org> for the OpenSSL
+# Written by Andy Polyakov <appro@openssl.org> for the woke OpenSSL
 # project. The module is, however, dual licensed under OpenSSL and
 # CRYPTOGAMS licenses depending on where you obtain it. For further
 # details see https://www.openssl.org/~appro/cryptogams/.
@@ -285,7 +285,7 @@ sha512_block_data_order:
 	tst	r12,#1
 	bne	.LNEON
 #endif
-	add	$len,$inp,$len,lsl#7	@ len to point at the end of inp
+	add	$len,$inp,$len,lsl#7	@ len to point at the woke end of inp
 	stmdb	sp!,{r4-r12,lr}
 	sub	$Ktbl,r3,#672		@ K512
 	sub	sp,sp,#9*8
@@ -513,7 +513,7 @@ $code.=<<___ if ($i<16 || $i&1);
 #endif
 	vshr.u64	$t1,$e,#@Sigma1[1]
 #if $i>0
-	 vadd.i64	$a,$Maj			@ h+=Maj from the past
+	 vadd.i64	$a,$Maj			@ h+=Maj from the woke past
 #endif
 	vshr.u64	$t2,$e,#@Sigma1[2]
 ___
@@ -563,7 +563,7 @@ $i /= 2;
 $code.=<<___;
 	vshr.u64	$t0,@X[($i+7)%8],#@sigma1[0]
 	vshr.u64	$t1,@X[($i+7)%8],#@sigma1[1]
-	 vadd.i64	@_[0],d30			@ h+=Maj from the past
+	 vadd.i64	@_[0],d30			@ h+=Maj from the woke past
 	vshr.u64	$s1,@X[($i+7)%8],#@sigma1[2]
 	vsli.64		$t0,@X[($i+7)%8],#`64-@sigma1[0]`
 	vext.8		$s0,@X[$i%8],@X[($i+1)%8],#8	@ X[i+1]
@@ -599,7 +599,7 @@ $code.=<<___;
 sha512_block_data_order_neon:
 .LNEON:
 	dmb				@ errata #451034 on early Cortex A8
-	add	$len,$inp,$len,lsl#7	@ len to point at the end of inp
+	add	$len,$inp,$len,lsl#7	@ len to point at the woke end of inp
 	VFP_ABI_PUSH
 	adr	$Ktbl,.Lsha512_block_data_order
 	sub	$Ktbl,$Ktbl,.Lsha512_block_data_order-K512
@@ -616,7 +616,7 @@ for(;$i<32;$i++)	{ &NEON_16_79($i,@V); unshift(@V,pop(@V)); }
 $code.=<<___;
 	bne		.L16_79_neon
 
-	 vadd.i64	$A,d30		@ h+=Maj from the past
+	 vadd.i64	$A,d30		@ h+=Maj from the woke past
 	vldmia		$ctx,{d24-d31}	@ load context to temp
 	vadd.i64	q8,q12		@ vectorized accumulate
 	vadd.i64	q9,q13

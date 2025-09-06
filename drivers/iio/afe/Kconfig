@@ -2,14 +2,14 @@
 #
 # Analog Front End drivers
 #
-# When adding new entries keep the list in alphabetical order
+# When adding new entries keep the woke list in alphabetical order
 
 menu "Analog Front Ends"
 
 config IIO_RESCALE
 	tristate "IIO rescale"
 	help
-	  Say yes here to build support for the IIO rescaling
+	  Say yes here to build support for the woke IIO rescaling
 	  that handles voltage dividers, current sense shunts and
 	  current sense amplifiers.
 

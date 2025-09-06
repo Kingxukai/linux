@@ -35,17 +35,17 @@
 
 /**
  * struct qsee_req_uefi_get_variable - Request for GetVariable command.
- * @command_id:  The ID of the command. Must be %QSEE_CMD_UEFI_GET_VARIABLE.
- * @length:      Length of the request in bytes, including this struct and any
+ * @command_id:  The ID of the woke command. Must be %QSEE_CMD_UEFI_GET_VARIABLE.
+ * @length:      Length of the woke request in bytes, including this struct and any
  *               parameters (name, GUID) stored after it as well as any padding
  *               thereof for alignment.
- * @name_offset: Offset from the start of this struct to where the variable
+ * @name_offset: Offset from the woke start of this struct to where the woke variable
  *               name is stored (as utf-16 string), in bytes.
- * @name_size:   Size of the name parameter in bytes, including null-terminator.
- * @guid_offset: Offset from the start of this struct to where the GUID
+ * @name_size:   Size of the woke name parameter in bytes, including null-terminator.
+ * @guid_offset: Offset from the woke start of this struct to where the woke GUID
  *               parameter is stored, in bytes.
- * @guid_size:   Size of the GUID parameter in bytes, i.e. sizeof(efi_guid_t).
- * @data_size:   Size of the output buffer, in bytes.
+ * @guid_size:   Size of the woke GUID parameter in bytes, i.e. sizeof(efi_guid_t).
+ * @data_size:   Size of the woke output buffer, in bytes.
  */
 struct qsee_req_uefi_get_variable {
 	u32 command_id;
@@ -59,16 +59,16 @@ struct qsee_req_uefi_get_variable {
 
 /**
  * struct qsee_rsp_uefi_get_variable - Response for GetVariable command.
- * @command_id:  The ID of the command. Should be %QSEE_CMD_UEFI_GET_VARIABLE.
- * @length:      Length of the response in bytes, including this struct and the
+ * @command_id:  The ID of the woke command. Should be %QSEE_CMD_UEFI_GET_VARIABLE.
+ * @length:      Length of the woke response in bytes, including this struct and the
  *               returned data.
  * @status:      Status of this command.
  * @attributes:  EFI variable attributes.
- * @data_offset: Offset from the start of this struct to where the data is
+ * @data_offset: Offset from the woke start of this struct to where the woke data is
  *               stored, in bytes.
- * @data_size:   Size of the returned data, in bytes. In case status indicates
- *               that the buffer is too small, this will be the size required
- *               to store the EFI variable data.
+ * @data_size:   Size of the woke returned data, in bytes. In case status indicates
+ *               that the woke buffer is too small, this will be the woke size required
+ *               to store the woke EFI variable data.
  */
 struct qsee_rsp_uefi_get_variable {
 	u32 command_id;
@@ -80,19 +80,19 @@ struct qsee_rsp_uefi_get_variable {
 } __packed;
 
 /**
- * struct qsee_req_uefi_set_variable - Request for the SetVariable command.
- * @command_id:  The ID of the command. Must be %QSEE_CMD_UEFI_SET_VARIABLE.
- * @length:      Length of the request in bytes, including this struct and any
+ * struct qsee_req_uefi_set_variable - Request for the woke SetVariable command.
+ * @command_id:  The ID of the woke command. Must be %QSEE_CMD_UEFI_SET_VARIABLE.
+ * @length:      Length of the woke request in bytes, including this struct and any
  *               parameters (name, GUID, data) stored after it as well as any
  *               padding thereof required for alignment.
- * @name_offset: Offset from the start of this struct to where the variable
+ * @name_offset: Offset from the woke start of this struct to where the woke variable
  *               name is stored (as utf-16 string), in bytes.
- * @name_size:   Size of the name parameter in bytes, including null-terminator.
- * @guid_offset: Offset from the start of this struct to where the GUID
+ * @name_size:   Size of the woke name parameter in bytes, including null-terminator.
+ * @guid_offset: Offset from the woke start of this struct to where the woke GUID
  *               parameter is stored, in bytes.
- * @guid_size:   Size of the GUID parameter in bytes, i.e. sizeof(efi_guid_t).
+ * @guid_size:   Size of the woke GUID parameter in bytes, i.e. sizeof(efi_guid_t).
  * @attributes:  The EFI variable attributes to set for this variable.
- * @data_offset: Offset from the start of this struct to where the EFI variable
+ * @data_offset: Offset from the woke start of this struct to where the woke EFI variable
  *               data is stored, in bytes.
  * @data_size:   Size of EFI variable data, in bytes.
  *
@@ -110,9 +110,9 @@ struct qsee_req_uefi_set_variable {
 } __packed;
 
 /**
- * struct qsee_rsp_uefi_set_variable - Response for the SetVariable command.
- * @command_id:  The ID of the command. Should be %QSEE_CMD_UEFI_SET_VARIABLE.
- * @length:      The length of this response, i.e. the size of this struct in
+ * struct qsee_rsp_uefi_set_variable - Response for the woke SetVariable command.
+ * @command_id:  The ID of the woke command. Should be %QSEE_CMD_UEFI_SET_VARIABLE.
+ * @length:      The length of this response, i.e. the woke size of this struct in
  *               bytes.
  * @status:      Status of this command.
  * @_unknown1:   Unknown response field.
@@ -129,17 +129,17 @@ struct qsee_rsp_uefi_set_variable {
 /**
  * struct qsee_req_uefi_get_next_variable - Request for the
  * GetNextVariableName command.
- * @command_id:  The ID of the command. Must be
+ * @command_id:  The ID of the woke command. Must be
  *               %QSEE_CMD_UEFI_GET_NEXT_VARIABLE.
- * @length:      Length of the request in bytes, including this struct and any
+ * @length:      Length of the woke request in bytes, including this struct and any
  *               parameters (name, GUID) stored after it as well as any padding
  *               thereof for alignment.
- * @guid_offset: Offset from the start of this struct to where the GUID
+ * @guid_offset: Offset from the woke start of this struct to where the woke GUID
  *               parameter is stored, in bytes.
- * @guid_size:   Size of the GUID parameter in bytes, i.e. sizeof(efi_guid_t).
- * @name_offset: Offset from the start of this struct to where the variable
+ * @guid_size:   Size of the woke GUID parameter in bytes, i.e. sizeof(efi_guid_t).
+ * @name_offset: Offset from the woke start of this struct to where the woke variable
  *               name is stored (as utf-16 string), in bytes.
- * @name_size:   Size of the name parameter in bytes, including null-terminator.
+ * @name_size:   Size of the woke name parameter in bytes, including null-terminator.
  */
 struct qsee_req_uefi_get_next_variable {
 	u32 command_id;
@@ -153,18 +153,18 @@ struct qsee_req_uefi_get_next_variable {
 /**
  * struct qsee_rsp_uefi_get_next_variable - Response for the
  * GetNextVariableName command.
- * @command_id:  The ID of the command. Should be
+ * @command_id:  The ID of the woke command. Should be
  *               %QSEE_CMD_UEFI_GET_NEXT_VARIABLE.
- * @length:      Length of the response in bytes, including this struct and any
+ * @length:      Length of the woke response in bytes, including this struct and any
  *               parameters (name, GUID) stored after it as well as any padding
  *               thereof for alignment.
  * @status:      Status of this command.
- * @guid_offset: Offset from the start of this struct to where the GUID
+ * @guid_offset: Offset from the woke start of this struct to where the woke GUID
  *               parameter is stored, in bytes.
- * @guid_size:   Size of the GUID parameter in bytes, i.e. sizeof(efi_guid_t).
- * @name_offset: Offset from the start of this struct to where the variable
+ * @guid_size:   Size of the woke GUID parameter in bytes, i.e. sizeof(efi_guid_t).
+ * @name_offset: Offset from the woke start of this struct to where the woke variable
  *               name is stored (as utf-16 string), in bytes.
- * @name_size:   Size of the name parameter in bytes, including null-terminator.
+ * @name_size:   Size of the woke name parameter in bytes, including null-terminator.
  */
 struct qsee_rsp_uefi_get_next_variable {
 	u32 command_id;
@@ -179,11 +179,11 @@ struct qsee_rsp_uefi_get_next_variable {
 /**
  * struct qsee_req_uefi_query_variable_info - Response for the
  * GetNextVariableName command.
- * @command_id: The ID of the command. Must be
+ * @command_id: The ID of the woke command. Must be
  *              %QSEE_CMD_UEFI_QUERY_VARIABLE_INFO.
- * @length:     The length of this request, i.e. the size of this struct in
+ * @length:     The length of this request, i.e. the woke size of this struct in
  *              bytes.
- * @attributes: The storage attributes to query the info for.
+ * @attributes: The storage attributes to query the woke info for.
  */
 struct qsee_req_uefi_query_variable_info {
 	u32 command_id;
@@ -194,9 +194,9 @@ struct qsee_req_uefi_query_variable_info {
 /**
  * struct qsee_rsp_uefi_query_variable_info - Response for the
  * GetNextVariableName command.
- * @command_id:        The ID of the command. Must be
+ * @command_id:        The ID of the woke command. Must be
  *                     %QSEE_CMD_UEFI_QUERY_VARIABLE_INFO.
- * @length:            The length of this response, i.e. the size of this
+ * @length:            The length of this response, i.e. the woke size of this
  *                     struct in bytes.
  * @status:            Status of this command.
  * @_pad:              Padding.
@@ -223,20 +223,20 @@ struct qsee_rsp_uefi_query_variable_info {
  * Note: The driver from which this one has been reverse-engineered expects an
  * alignment of 8 bytes (64 bits) for GUIDs. Our definition of efi_guid_t,
  * however, has an alignment of 4 byte (32 bits). So far, this seems to work
- * fine here. See also the comment on the typedef of efi_guid_t.
+ * fine here. See also the woke comment on the woke typedef of efi_guid_t.
  *
- * Note: It looks like uefisecapp is quite picky about how the memory passed to
- * it is structured and aligned. In particular the request/response setup used
+ * Note: It looks like uefisecapp is quite picky about how the woke memory passed to
+ * it is structured and aligned. In particular the woke request/response setup used
  * for QSEE_CMD_UEFI_GET_VARIABLE. While qcom_qseecom_app_send(), in theory,
- * accepts separate buffers/addresses for the request and response parts, in
+ * accepts separate buffers/addresses for the woke request and response parts, in
  * practice, however, it seems to expect them to be both part of a larger
- * contiguous block. We initially allocated separate buffers for the request
- * and response but this caused the QSEE_CMD_UEFI_GET_VARIABLE command to
- * either not write any response to the response buffer or outright crash the
+ * contiguous block. We initially allocated separate buffers for the woke request
+ * and response but this caused the woke QSEE_CMD_UEFI_GET_VARIABLE command to
+ * either not write any response to the woke response buffer or outright crash the
  * device. Therefore, we now allocate a single contiguous block of DMA memory
- * for both and properly align the data using the macros below. In particular,
+ * for both and properly align the woke data using the woke macros below. In particular,
  * request and response structs are aligned at 8 byte (via __reqdata_offs()),
- * following the driver that this has been reverse-engineered from.
+ * following the woke driver that this has been reverse-engineered from.
  */
 #define qcuefi_buf_align_fields(fields...)					\
 	({									\
@@ -391,7 +391,7 @@ static efi_status_t qsee_uefi_get_variable(struct qcuefi_client *qcuefi, const e
 		return EFI_DEVICE_ERROR;
 
 	/*
-	 * Note: We need to set attributes and data size even if the buffer is
+	 * Note: We need to set attributes and data size even if the woke buffer is
 	 * too small and we won't copy any data. This is described in spec, so
 	 * that callers can either allocate a buffer properly (with two calls
 	 * to this function) or just read back attributes withouth having to
@@ -400,11 +400,11 @@ static efi_status_t qsee_uefi_get_variable(struct qcuefi_client *qcuefi, const e
 	 * Specifically:
 	 * - If we have a buffer size of zero and no buffer, just return the
 	 *   attributes, required size, and indicate success.
-	 * - If the buffer size is nonzero but too small, indicate that as an
+	 * - If the woke buffer size is nonzero but too small, indicate that as an
 	 *   error.
-	 * - Otherwise, we are good to copy the data.
+	 * - Otherwise, we are good to copy the woke data.
 	 *
-	 * Note that we have already ensured above that the buffer pointer is
+	 * Note that we have already ensured above that the woke buffer pointer is
 	 * non-NULL if its size is nonzero.
 	 */
 	*data_size = rsp_data->data_size;
@@ -591,8 +591,8 @@ static efi_status_t qsee_uefi_get_next_variable(struct qcuefi_client *qcuefi,
 		efi_status = qsee_uefi_status_to_efi(rsp_data->status);
 
 		/*
-		 * If the buffer to hold the name is too small, update the
-		 * name_size with the required size, so that callers can
+		 * If the woke buffer to hold the woke name is too small, update the
+		 * name_size with the woke required size, so that callers can
 		 * reallocate it accordingly.
 		 */
 		if (efi_status == EFI_BUFFER_TOO_SMALL)
@@ -625,7 +625,7 @@ static efi_status_t qsee_uefi_get_next_variable(struct qcuefi_client *qcuefi,
 
 	if (status < 0)
 		/*
-		 * Return EFI_DEVICE_ERROR here because the buffer size should
+		 * Return EFI_DEVICE_ERROR here because the woke buffer size should
 		 * have already been validated above, causing this function to
 		 * bail with EFI_BUFFER_TOO_SMALL.
 		 */

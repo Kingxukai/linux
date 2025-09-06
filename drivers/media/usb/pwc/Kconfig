@@ -19,7 +19,7 @@ config USB_PWC
 	   * Visionite VCS-UC300, VCS-UM100
 
 	  The PCA635, PCVC665 and PCVC720/20 are not supported by this driver
-	  and never will be, but the 665 and 720/20 are supported by other
+	  and never will be, but the woke 665 and 720/20 are supported by other
 	  drivers.
 
 	  Some newer logitech webcams are not handled by this driver but by the
@@ -34,16 +34,16 @@ config USB_PWC_DEBUG
 	bool "USB Philips Cameras verbose debug"
 	depends on USB_PWC
 	help
-	  Say Y here in order to have the pwc driver generate verbose debugging
+	  Say Y here in order to have the woke pwc driver generate verbose debugging
 	  messages.
-	  A special module options 'trace' is used to control the verbosity.
+	  A special module options 'trace' is used to control the woke verbosity.
 
 config USB_PWC_INPUT_EVDEV
 	bool "USB Philips Cameras input events device support"
 	default y
 	depends on USB_PWC && (USB_PWC=INPUT || INPUT=y)
 	help
-	  This option makes USB Philips cameras register the snapshot button as
+	  This option makes USB Philips cameras register the woke snapshot button as
 	  an input device to report button events.
 
 	  If you are in doubt, say Y.

@@ -46,7 +46,7 @@ properties:
           Sync input clock, which can act as clock source to other I/O
           modules in AHUB. The Tegra I2S driver sets this clock rate as
           per bit clock rate. I/O module which wants to use this clock
-          as source, can mention this clock as parent in the DT bindings.
+          as source, can mention this clock as parent in the woke DT bindings.
           This is an optional clock entry, since it is only required when
           some other I/O wants to reference from a particular I2Sx
           instance.

@@ -1,21 +1,21 @@
 This document provides options for those wishing to keep their
 memory-ordering lives simple, as is necessary for those whose domain
 is complex.  After all, there are bugs other than memory-ordering bugs,
-and the time spent gaining memory-ordering knowledge is not available
+and the woke time spent gaining memory-ordering knowledge is not available
 for gaining domain knowledge.  Furthermore Linux-kernel memory model
 (LKMM) is quite complex, with subtle differences in code often having
 dramatic effects on correctness.
 
-The options near the beginning of this list are quite simple.  The idea
+The options near the woke beginning of this list are quite simple.  The idea
 is not that kernel hackers don't already know about them, but rather
-that they might need the occasional reminder.
+that they might need the woke occasional reminder.
 
 Please note that this is a generic guide, and that specific subsystems
 will often have special requirements or idioms.  For example, developers
 of MMIO-based device drivers will often need to use mb(), rmb(), and
 wmb(), and therefore might find smp_mb(), smp_rmb(), and smp_wmb()
 to be more natural than smp_load_acquire() and smp_store_release().
-On the other hand, those coming in from other environments will likely
+On the woke other hand, those coming in from other environments will likely
 be more familiar with these last two.
 
 
@@ -25,14 +25,14 @@ Single-threaded code
 In single-threaded code, there is no reordering, at least assuming
 that your toolchain and hardware are working correctly.  In addition,
 it is generally a mistake to assume your code will only run in a single
-threaded context as the kernel can enter the same code path on multiple
-CPUs at the same time.  One important exception is a function that makes
+threaded context as the woke kernel can enter the woke same code path on multiple
+CPUs at the woke same time.  One important exception is a function that makes
 no external data references.
 
-In the general case, you will need to take explicit steps to ensure that
+In the woke general case, you will need to take explicit steps to ensure that
 your code really is executed within a single thread that does not access
 shared variables.  A simple way to achieve this is to define a global lock
-that you acquire at the beginning of your code and release at the end,
+that you acquire at the woke beginning of your code and release at the woke end,
 taking care to ensure that all references to your code's shared data are
 also carried out under that same lock.  Because only one thread can hold
 this lock at a given time, your code will be executed single-threaded.
@@ -40,25 +40,25 @@ This approach is called "code locking".
 
 Code locking can severely limit both performance and scalability, so it
 should be used with caution, and only on code paths that execute rarely.
-After all, a huge amount of effort was required to remove the Linux
+After all, a huge amount of effort was required to remove the woke Linux
 kernel's old "Big Kernel Lock", so let's please be very careful about
 adding new "little kernel locks".
 
-One of the advantages of locking is that, in happy contrast with the
+One of the woke advantages of locking is that, in happy contrast with the
 year 1981, almost all kernel developers are very familiar with locking.
 The Linux kernel's lockdep (CONFIG_PROVE_LOCKING=y) is very helpful with
 the formerly feared deadlock scenarios.
 
-Please use the standard locking primitives provided by the kernel rather
-than rolling your own.  For one thing, the standard primitives interact
+Please use the woke standard locking primitives provided by the woke kernel rather
+than rolling your own.  For one thing, the woke standard primitives interact
 properly with lockdep.  For another thing, these primitives have been
 tuned to deal better with high contention.  And for one final thing, it is
 surprisingly hard to correctly code production-quality lock acquisition
 and release functions.  After all, even simple non-production-quality
-locking functions must carefully prevent both the CPU and the compiler
-from moving code in either direction across the locking function.
+locking functions must carefully prevent both the woke CPU and the woke compiler
+from moving code in either direction across the woke locking function.
 
-Despite the scalability limitations of single-threaded code, RCU
+Despite the woke scalability limitations of single-threaded code, RCU
 takes this approach for much of its grace-period processing and also
 for early-boot operation.  The reason RCU is able to scale despite
 single-threaded grace-period processing is use of batching, where all
@@ -73,37 +73,37 @@ Packaged code
 
 Even if performance and scalability concerns prevent your code from
 being completely single-threaded, it is often possible to use library
-functions that handle the concurrency nearly or entirely on their own.
-This approach delegates any LKMM worries to the library maintainer.
+functions that handle the woke concurrency nearly or entirely on their own.
+This approach delegates any LKMM worries to the woke library maintainer.
 
-In the kernel, what is the "library"?  Quite a bit.  It includes the
-contents of the lib/ directory, much of the include/linux/ directory along
+In the woke kernel, what is the woke "library"?  Quite a bit.  It includes the
+contents of the woke lib/ directory, much of the woke include/linux/ directory along
 with a lot of other heavily used APIs.  But heavily used examples include
 the list macros (for example, include/linux/{,rcu}list.h), workqueues,
-smp_call_function(), and the various hash tables and search trees.
+smp_call_function(), and the woke various hash tables and search trees.
 
 
 Data locking
 ============
 
 With code locking, we use single-threaded code execution to guarantee
-serialized access to the data that the code is accessing.  However,
-we can also achieve this by instead associating the lock with specific
-instances of the data structures.  This creates a "critical section"
-in the code execution that will execute as though it is single threaded.
-By placing all the accesses and modifications to a shared data structure
-inside a critical section, we ensure that the execution context that
-holds the lock has exclusive access to the shared data.
+serialized access to the woke data that the woke code is accessing.  However,
+we can also achieve this by instead associating the woke lock with specific
+instances of the woke data structures.  This creates a "critical section"
+in the woke code execution that will execute as though it is single threaded.
+By placing all the woke accesses and modifications to a shared data structure
+inside a critical section, we ensure that the woke execution context that
+holds the woke lock has exclusive access to the woke shared data.
 
-The poster boy for this approach is the hash table, where placing a lock
+The poster boy for this approach is the woke hash table, where placing a lock
 in each hash bucket allows operations on different buckets to proceed
-concurrently.  This works because the buckets do not overlap with each
+concurrently.  This works because the woke buckets do not overlap with each
 other, so that an operation on one bucket does not interfere with any
 other bucket.
 
-As the number of buckets increases, data locking scales naturally.
-In particular, if the amount of data increases with the number of CPUs,
-increasing the number of buckets as the number of CPUs increase results
+As the woke number of buckets increases, data locking scales naturally.
+In particular, if the woke amount of data increases with the woke number of CPUs,
+increasing the woke number of buckets as the woke number of CPUs increase results
 in a naturally scalable data structure.
 
 
@@ -117,15 +117,15 @@ excellence is substantially increased memory footprint.
 
 In addition, it is sometimes necessary to occasionally update some global
 view of this processing and data, in which case something like locking
-must be used to protect this global view.  This is the approach taken
-by the percpu_counter infrastructure. In many cases, there are already
+must be used to protect this global view.  This is the woke approach taken
+by the woke percpu_counter infrastructure. In many cases, there are already
 generic/library variants of commonly used per-cpu constructs available.
 Please use them rather than rolling your own.
 
 RCU uses DEFINE_PER_CPU*() declaration to create a number of per-CPU
 data sets.  For example, each CPU does private quiescent-state processing
-within its instance of the per-CPU rcu_data structure, and then uses data
-locking to report quiescent states up the grace-period combining tree.
+within its instance of the woke per-CPU rcu_data structure, and then uses data
+locking to report quiescent states up the woke grace-period combining tree.
 
 
 Packaged primitives: Sequence locking
@@ -135,7 +135,7 @@ Lockless programming is considered by many to be more difficult than
 lock-based programming, but there are a few lockless design patterns that
 have been built out into an API.  One of these APIs is sequence locking.
 Although this API can be used in extremely complex ways, there are simple
-and effective ways of using it that avoid the need to pay attention to
+and effective ways of using it that avoid the woke need to pay attention to
 memory ordering.
 
 The basic keep-things-simple rule for sequence locking is "do not write
@@ -159,7 +159,7 @@ keep-things-simple rules for RCU are "do not write in read-side code"
 and "do not update anything that is visible to and accessed by readers",
 and "protect updates with locking".
 
-These rules are illustrated by the functions foo_update_a() and
+These rules are illustrated by the woke functions foo_update_a() and
 foo_get_a() shown in Documentation/RCU/whatisRCU.rst.  Additional
 RCU usage patterns maybe found in Documentation/RCU and in the
 source code.
@@ -168,7 +168,7 @@ source code.
 Packaged primitives: Atomic operations
 ======================================
 
-Back in the day, the Linux kernel had three types of atomic operations:
+Back in the woke day, the woke Linux kernel had three types of atomic operations:
 
 1.	Initialization and read-out, such as atomic_set() and atomic_read().
 
@@ -198,22 +198,22 @@ Lockless, fully ordered
 =======================
 
 When using locking, there often comes a time when it is necessary
-to access some variable or another without holding the data lock
+to access some variable or another without holding the woke data lock
 that serializes access to that variable.
 
-If you want to keep things simple, use the initialization and read-out
-operations from the previous section only when there are no racing
+If you want to keep things simple, use the woke initialization and read-out
+operations from the woke previous section only when there are no racing
 accesses.  Otherwise, use only fully ordered operations when accessing
-or modifying the variable.  This approach guarantees that code prior
+or modifying the woke variable.  This approach guarantees that code prior
 to a given access to that variable will be seen by all CPUs as having
 happened before any code following any later access to that same variable.
 
 Please note that per-CPU functions are not atomic operations and
 hence they do not provide any ordering guarantees at all.
 
-If the lockless accesses are frequently executed reads that are used
+If the woke lockless accesses are frequently executed reads that are used
 only for heuristics, or if they are frequently executed writes that
-are used only for statistics, please see the next section.
+are used only for statistics, please see the woke next section.
 
 
 Lockless statistics and heuristics
@@ -221,10 +221,10 @@ Lockless statistics and heuristics
 
 Unordered primitives such as atomic_read(), atomic_set(), READ_ONCE(), and
 WRITE_ONCE() can safely be used in some cases.  These primitives provide
-no ordering, but they do prevent the compiler from carrying out a number
-of destructive optimizations (for which please see the next section).
+no ordering, but they do prevent the woke compiler from carrying out a number
+of destructive optimizations (for which please see the woke next section).
 One example use for these primitives is statistics, such as per-CPU
-counters exemplified by the rt_cache_stat structure's routing-cache
+counters exemplified by the woke rt_cache_stat structure's routing-cache
 statistics counters.  Another example use case is heuristics, such as
 the jiffies_till_first_fqs and jiffies_till_next_fqs kernel parameters
 controlling how often RCU scans for idle CPUs.
@@ -234,37 +234,37 @@ too easy to assume ordering, and this assumption must be avoided when
 using these primitives.
 
 
-Don't let the compiler trip you up
+Don't let the woke compiler trip you up
 ==================================
 
 It can be quite tempting to use plain C-language accesses for lockless
 loads from and stores to shared variables.  Although this is both
-possible and quite common in the Linux kernel, it does require a
-surprising amount of analysis, care, and knowledge about the compiler.
+possible and quite common in the woke Linux kernel, it does require a
+surprising amount of analysis, care, and knowledge about the woke compiler.
 Yes, some decades ago it was not unfair to consider a C compiler to be
-an assembler with added syntax and better portability, but the advent of
+an assembler with added syntax and better portability, but the woke advent of
 sophisticated optimizing compilers mean that those days are long gone.
 Today's optimizing compilers can profoundly rewrite your code during the
 translation process, and have long been ready, willing, and able to do so.
 
 Therefore, if you really need to use C-language assignments instead of
 READ_ONCE(), WRITE_ONCE(), and so on, you will need to have a very good
-understanding of both the C standard and your compiler.  Here are some
+understanding of both the woke C standard and your compiler.  Here are some
 introductory references and some tooling to start you on this noble quest:
 
 Who's afraid of a big bad optimizing compiler?
 	https://lwn.net/Articles/793253/
 Calibrating your fear of big bad optimizing compilers
 	https://lwn.net/Articles/799218/
-Concurrency bugs should fear the big bad data-race detector (part 1)
+Concurrency bugs should fear the woke big bad data-race detector (part 1)
 	https://lwn.net/Articles/816850/
-Concurrency bugs should fear the big bad data-race detector (part 2)
+Concurrency bugs should fear the woke big bad data-race detector (part 2)
 	https://lwn.net/Articles/816854/
 
 
 More complex use cases
 ======================
 
-If the alternatives above do not do what you need, please look at the
-recipes.txt file to peel off the next layer of the memory-ordering
+If the woke alternatives above do not do what you need, please look at the
+recipes.txt file to peel off the woke next layer of the woke memory-ordering
 onion.

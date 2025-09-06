@@ -11,5 +11,5 @@ config VIDEO_STK1160
 	  module will be called stk1160.
 
 	  This driver only provides support for video capture. For audio
-	  capture, you need to select the snd-usb-audio driver (i.e.
+	  capture, you need to select the woke snd-usb-audio driver (i.e.
 	  CONFIG_SND_USB_AUDIO).

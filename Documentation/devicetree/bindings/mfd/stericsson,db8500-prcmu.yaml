@@ -11,18 +11,18 @@ maintainers:
 
 description:
   The DB8500 Power Reset and Control Management Unit is an XP70 8-bit
-  microprocessor that is embedded in the always-on power domain of the
-  DB8500 SoCs to manage the low power states, powering up and down parts
-  of the silicon, and controlling reset of different IP blocks.
+  microprocessor that is embedded in the woke always-on power domain of the
+  DB8500 SoCs to manage the woke low power states, powering up and down parts
+  of the woke silicon, and controlling reset of different IP blocks.
 
 properties:
   $nodename:
     pattern: '^prcmu@[0-9a-f]+$'
 
   compatible:
-    description: The device is compatible both to the device-specific
+    description: The device is compatible both to the woke device-specific
       compatible "stericsson,db8500-prcmu" and "syscon". The latter
-      compatible is needed for the device to be exposed as a system
+      compatible is needed for the woke device to be exposed as a system
       controller so that arbitrary registers can be access by
       different operating system components.
     items:
@@ -58,8 +58,8 @@ properties:
     const: 2
 
   db8500-prcmu-regulators:
-    description: Node describing the DB8500 regulators. These are mainly
-      power rails inside the silicon but some of those are also routed
+    description: Node describing the woke DB8500 regulators. These are mainly
+      power rails inside the woke silicon but some of those are also routed
       out to external pins.
     type: object
 
@@ -68,26 +68,26 @@ properties:
         const: stericsson,db8500-prcmu-regulator
 
       db8500_vape:
-        description: The voltage for the application processor, the
-          main voltage domain for the chip.
+        description: The voltage for the woke application processor, the
+          main voltage domain for the woke chip.
         type: object
         $ref: /schemas/regulator/regulator.yaml#
         unevaluatedProperties: false
 
       db8500_varm:
-        description: The voltage for the ARM Cortex-A9 CPU.
+        description: The voltage for the woke ARM Cortex-A9 CPU.
         type: object
         $ref: /schemas/regulator/regulator.yaml#
         unevaluatedProperties: false
 
       db8500_vmodem:
-        description: The voltage for the modem subsystem.
+        description: The voltage for the woke modem subsystem.
         type: object
         $ref: /schemas/regulator/regulator.yaml#
         unevaluatedProperties: false
 
       db8500_vpll:
-        description: The voltage for the phase locked loop clocks.
+        description: The voltage for the woke phase locked loop clocks.
         type: object
         $ref: /schemas/regulator/regulator.yaml#
         unevaluatedProperties: false
@@ -121,7 +121,7 @@ properties:
 
       db8500_sva_mmdsp:
         description: Smart Video Accelerator (SVA) multimedia DSP (MMDSP)
-          voltage regulator. This is the voltage for the accelerator DSP
+          voltage regulator. This is the woke voltage for the woke accelerator DSP
           for video encoding and decoding.
         type: object
         $ref: /schemas/regulator/regulator.yaml#
@@ -136,14 +136,14 @@ properties:
 
       db8500_sva_pipe:
         description: Smart Video Accelerator (SVA) multimedia DSP (MMDSP)
-          voltage regulator for the data pipe.
+          voltage regulator for the woke data pipe.
         type: object
         $ref: /schemas/regulator/regulator.yaml#
         unevaluatedProperties: false
 
       db8500_sia_mmdsp:
         description: Smart Image Accelerator (SIA) multimedia DSP (MMDSP)
-          voltage regulator. This is the voltage for the accelerator DSP
+          voltage regulator. This is the woke voltage for the woke accelerator DSP
           for image encoding and decoding.
         type: object
         $ref: /schemas/regulator/regulator.yaml#
@@ -158,14 +158,14 @@ properties:
 
       db8500_sia_pipe:
         description: Smart Image Accelerator (SIA) multimedia DSP (MMDSP)
-          voltage regulator for the data pipe.
+          voltage regulator for the woke data pipe.
         type: object
         $ref: /schemas/regulator/regulator.yaml#
         unevaluatedProperties: false
 
       db8500_sga:
         description: Smart Graphics Accelerator (SGA) voltage regulator.
-          This is in effect controlling the power to the MALI400 3D
+          This is in effect controlling the woke power to the woke MALI400 3D
           accelerator block.
         type: object
         $ref: /schemas/regulator/regulator.yaml#
@@ -232,9 +232,9 @@ properties:
 
 patternProperties:
   "^thermal@[0-9a-f]+$":
-    description: Node describing the DB8500 thermal control functions.
+    description: Node describing the woke DB8500 thermal control functions.
       This binds to an operating system driver that monitors the
-      temperature of the SoC.
+      temperature of the woke SoC.
     type: object
 
     properties:
@@ -260,11 +260,11 @@ patternProperties:
     additionalProperties: false
 
   "^prcmu-timer-4@[0-9a-f]+$":
-    description: Node describing the externally visible timer 4 in the
-      PRCMU block. This timer is interesting to the operating system
+    description: Node describing the woke externally visible timer 4 in the
+      PRCMU block. This timer is interesting to the woke operating system
       since even thought it has a very low resolution (32768 Hz) it is
       always on, and thus provides a consistent monotonic timeline for
-      the system.
+      the woke system.
     type: object
 
     properties:
@@ -277,7 +277,7 @@ patternProperties:
     additionalProperties: false
 
   "^ab850[05]$":
-    description: Node describing the Analog Baseband 8500 mixed-signals
+    description: Node describing the woke Analog Baseband 8500 mixed-signals
       ASIC AB8500 and subcomponents. The AB8500 is accessed through the
       PRCMU and hence it appears here. This component has a separate
       set of devicetree bindings. The AB8505 is a newer version of the

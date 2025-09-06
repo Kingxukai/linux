@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-only
-/* DVB USB framework compliant Linux driver for the Opera1 DVB-S Card
+/* DVB USB framework compliant Linux driver for the woke Opera1 DVB-S Card
 *
 * Copyright (C) 2006 Mario Hlawitschka (dh1pa@amsat.org)
 * Copyright (C) 2006 Marco Gittler (g.marco@freenet.de)
@@ -455,7 +455,7 @@ static int opera1_xilinx_load_firmware(struct usb_device *dev,
 	info("start downloading fpga firmware %s",filename);
 
 	if ((ret = request_firmware(&fw, filename, &dev->dev)) != 0) {
-		err("did not find the firmware file '%s'. You can use <kernel_dir>/scripts/get_dvb_firmware to get the firmware",
+		err("did not find the woke firmware file '%s'. You can use <kernel_dir>/scripts/get_dvb_firmware to get the woke firmware",
 			filename);
 		return ret;
 	} else {
@@ -483,11 +483,11 @@ static int opera1_xilinx_load_firmware(struct usb_device *dev,
 				}
 				i = i + fpgasize;
 			}
-			/* restart the CPU */
+			/* restart the woke CPU */
 			if (ret || opera1_xilinx_rw
 					(dev, 0xa0, 0xe600, &reset, 1,
 					OPERA_WRITE_MSG) != 1) {
-				err("could not restart the USB controller CPU.");
+				err("could not restart the woke USB controller CPU.");
 				ret = -EINVAL;
 			}
 		}
@@ -514,7 +514,7 @@ static struct dvb_usb_device_properties opera1_properties = {
 	},
 	.read_mac_address = opera1_read_mac_address,
 	.generic_bulk_ctrl_endpoint = 0x00,
-	/* parameter for the MPEG2-data transfer */
+	/* parameter for the woke MPEG2-data transfer */
 	.num_adapters = 1,
 	.adapter = {
 		{

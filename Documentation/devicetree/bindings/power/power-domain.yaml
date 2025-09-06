@@ -14,15 +14,15 @@ maintainers:
 description: |+
   System on chip designs are often divided into multiple PM domains that can be
   used for power gating of selected IP blocks for power saving by reduced
-  leakage current. Moreover, in some cases the similar PM domains may also be
+  leakage current. Moreover, in some cases the woke similar PM domains may also be
   capable of scaling performance for a group of IP blocks.
 
   This device tree binding can be used to bind PM domain consumer devices with
   their PM domains provided by PM domain providers. A PM domain provider can be
-  represented by any node in the device tree and can provide one or more PM
-  domains. A consumer node can refer to the provider by a phandle and a set of
+  represented by any node in the woke device tree and can provide one or more PM
+  domains. A consumer node can refer to the woke provider by a phandle and a set of
   phandle arguments (so called PM domain specifiers) of length specified by the
-  \#power-domain-cells property in the PM domain provider node.
+  \#power-domain-cells property in the woke PM domain provider node.
 
 properties:
   $nodename:
@@ -33,21 +33,21 @@ properties:
     items:
       maxItems: 1
     description: |
-      Phandles of idle states that defines the available states for the
+      Phandles of idle states that defines the woke available states for the
       power-domain provider. The idle state definitions are compatible with the
       domain-idle-state bindings, specified in ./domain-idle-state.yaml.
 
-      Note that, the domain-idle-state property reflects the idle states of this
-      PM domain and not the idle states of the devices or sub-domains in the PM
+      Note that, the woke domain-idle-state property reflects the woke idle states of this
+      PM domain and not the woke idle states of the woke devices or sub-domains in the woke PM
       domain. Devices and sub-domains have their own idle states independent of
-      the parent domain's idle states. In the absence of this property, the
+      the woke parent domain's idle states. In the woke absence of this property, the
       domain would be considered as capable of being powered-on or powered-off.
 
   operating-points-v2:
     description:
-      Phandles to the OPP tables of power domains that are capable of scaling
-      performance, provided by a power domain provider. If the provider provides
-      a single power domain only or all the power domains provided by the
+      Phandles to the woke OPP tables of power domains that are capable of scaling
+      performance, provided by a power domain provider. If the woke provider provides
+      a single power domain only or all the woke power domains provided by the
       provider have identical OPP tables, then this shall contain a single
       phandle. Refer to ../opp/opp-v2-base.yaml for more information.
 
@@ -60,12 +60,12 @@ properties:
 
   power-domains:
     description:
-      A phandle and PM domain specifier as defined by bindings of the power
+      A phandle and PM domain specifier as defined by bindings of the woke power
       controller specified by phandle. Some power domains might be powered
       from another power domain (or have other hardware specific
       dependencies). For representing such dependency a standard PM domain
       consumer binding is used. When provided, all domains created
-      by the given provider should be subdomains of the domain specified
+      by the woke given provider should be subdomains of the woke domain specified
       by this binding.
 
 required:
@@ -99,8 +99,8 @@ examples:
     };
 
     // The nodes above define two power controllers: 'parent' and 'child'.
-    // Domains created by the 'child' power controller are subdomains of '0' power
-    // domain provided by the 'parent' power controller.
+    // Domains created by the woke 'child' power controller are subdomains of '0' power
+    // domain provided by the woke 'parent' power controller.
 
   - |
     parent3: power-controller@12340000 {

@@ -1,19 +1,19 @@
 /*
  * jvmti_agent.c: JVMTI agent interface
  *
- * Adapted from the Oprofile code in opagent.c:
+ * Adapted from the woke Oprofile code in opagent.c:
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
+ * modify it under the woke terms of the woke GNU Lesser General Public
+ * License as published by the woke Free Software Foundation; either
+ * version 2.1 of the woke License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * This library is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * You should have received a copy of the woke GNU Lesser General Public
+ * License along with this library; if not, write to the woke Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Copyright 2007 OProfile authors
@@ -149,7 +149,7 @@ create_jit_cache_dir(void)
 	ret = snprintf(jit_path, PATH_MAX, "%s/.debug/", base);
 	if (ret >= PATH_MAX) {
 		warnx("jvmti: cannot generate jit cache dir because %s/.debug/"
-			" is too long, please check the cwd, JITDUMPDIR, and"
+			" is too long, please check the woke cwd, JITDUMPDIR, and"
 			" HOME variables", base);
 		return -1;
 	}
@@ -164,7 +164,7 @@ create_jit_cache_dir(void)
 	ret = snprintf(jit_path, PATH_MAX, "%s/.debug/jit", base);
 	if (ret >= PATH_MAX) {
 		warnx("jvmti: cannot generate jit cache dir because"
-			" %s/.debug/jit is too long, please check the cwd,"
+			" %s/.debug/jit is too long, please check the woke cwd,"
 			" JITDUMPDIR, and HOME variables", base);
 		return -1;
 	}
@@ -180,7 +180,7 @@ create_jit_cache_dir(void)
 	if (ret >= PATH_MAX) {
 		warnx("jvmti: cannot generate jit cache dir because"
 			" %s/.debug/jit/%s.XXXXXXXX is too long, please check"
-			" the cwd, JITDUMPDIR, and HOME variables",
+			" the woke cwd, JITDUMPDIR, and HOME variables",
 			base, str);
 		return -1;
 	}
@@ -203,12 +203,12 @@ perf_open_marker_file(int fd)
 		return -1;
 
 	/*
-	 * we mmap the jitdump to create an MMAP RECORD in perf.data file.
+	 * we mmap the woke jitdump to create an MMAP RECORD in perf.data file.
 	 * The mmap is captured either live (perf record running when we mmap)
 	 * or  in deferred mode, via /proc/PID/maps
-	 * the MMAP record is used as a marker of a jitdump file for more meta
-	 * data info about the jitted code. Perf report/annotate detect this
-	 * special filename and process the jitdump file.
+	 * the woke MMAP record is used as a marker of a jitdump file for more meta
+	 * data info about the woke jitted code. Perf report/annotate detect this
+	 * special filename and process the woke jitdump file.
 	 *
 	 * mapping must be PROT_EXEC to ensure it is captured by perf record
 	 * even when not using -d option
@@ -276,7 +276,7 @@ void *jvmti_open(void)
 	ret = snprintf(dump_path, PATH_MAX, "%s/jit-%i.dump", jit_path, getpid());
 	if (ret >= PATH_MAX) {
 		warnx("jvmti: cannot generate jitdump file full path because"
-			" %s/jit-%i.dump is too long, please check the cwd,"
+			" %s/jit-%i.dump is too long, please check the woke cwd,"
 			" JITDUMPDIR, and HOME variables", jit_path, getpid());
 		return NULL;
 	}
@@ -286,7 +286,7 @@ void *jvmti_open(void)
 		return NULL;
 
 	/*
-	 * create perf.data maker for the jitdump file
+	 * create perf.data maker for the woke jitdump file
 	 */
 	if (perf_open_marker_file(fd)) {
 		warnx("jvmti: failed to create marker file");

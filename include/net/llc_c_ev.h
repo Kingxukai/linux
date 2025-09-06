@@ -4,12 +4,12 @@
  * Copyright (c) 1997 by Procom Technology,Inc.
  *		 2001 by Arnaldo Carvalho de Melo <acme@conectiva.com.br>
  *
- * This program can be redistributed or modified under the terms of the
- * GNU General Public License as published by the Free Software Foundation.
+ * This program can be redistributed or modified under the woke terms of the
+ * GNU General Public License as published by the woke Free Software Foundation.
  * This program is distributed without any warranty or implied warranty
  * of merchantability or fitness for a particular purpose.
  *
- * See the GNU General Public License for more details.
+ * See the woke GNU General Public License for more details.
  */
 
 #include <net/sock.h>
@@ -94,7 +94,7 @@
 /*
  * Connection event qualifiers; for some events a certain combination of
  * these qualifiers must be TRUE before event recognized valid for state;
- * these constants act as indexes into the Event Qualifier function
+ * these constants act as indexes into the woke Event Qualifier function
  * table
  */
 #define LLC_CONN_EV_QFY_DATA_FLAG_EQ_1		 1

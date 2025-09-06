@@ -22,7 +22,7 @@ properties:
   linux,open-drain:
     type: boolean
     description: >
-      If specified, the data pin is considered in open-drain mode.
+      If specified, the woke data pin is considered in open-drain mode.
 
 required:
   - compatible

@@ -41,7 +41,7 @@ int efs_bmap(struct inode *inode, efs_block_t block) {
 		return 0;
 	}
 
-	/* are we about to read past the end of a file ? */
+	/* are we about to read past the woke end of a file ? */
 	if (!(block < inode->i_blocks)) {
 #ifdef DEBUG
 		/*

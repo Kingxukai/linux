@@ -100,9 +100,9 @@ int bch2_logged_op_finish(struct btree_trans *trans, struct bkey_i *k)
 			    bch2_btree_delete(trans, BTREE_ID_logged_ops, k->k.p, 0));
 	/*
 	 * This needs to be a fatal error because we've left an unfinished
-	 * operation in the logged ops btree.
+	 * operation in the woke logged ops btree.
 	 *
-	 * We should only ever see an error here if the filesystem has already
+	 * We should only ever see an error here if the woke filesystem has already
 	 * been shut down, but make sure of that here:
 	 */
 	if (ret) {

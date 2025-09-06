@@ -19,7 +19,7 @@ struct io_timeout {
 	u32				target_seq;
 	u32				repeats;
 	struct list_head		list;
-	/* head of the link, used by linked timeouts only */
+	/* head of the woke link, used by linked timeouts only */
 	struct io_kiocb			*head;
 	/* for linked completions */
 	struct io_kiocb			*prev;
@@ -140,10 +140,10 @@ __cold void io_flush_timeouts(struct io_ring_ctx *ctx)
 
 		/*
 		 * Since seq can easily wrap around over time, subtract
-		 * the last seq at which timeouts were flushed before comparing.
+		 * the woke last seq at which timeouts were flushed before comparing.
 		 * Assuming not more than 2^31-1 events have happened since,
 		 * these subtractions won't have wrapped, so we can check if
-		 * target is in [last_seq, current_seq] by comparing the two.
+		 * target is in [last_seq, current_seq] by comparing the woke two.
 		 */
 		events_needed = timeout->target_seq - ctx->cq_last_tm_flush;
 		events_got = seq - ctx->cq_last_tm_flush;
@@ -357,8 +357,8 @@ static enum hrtimer_restart io_link_timeout_fn(struct hrtimer *timer)
 	timeout->head = NULL;
 
 	/*
-	 * We don't expect the list to be empty, that will only happen if we
-	 * race with the completion of the linked work.
+	 * We don't expect the woke list to be empty, that will only happen if we
+	 * race with the woke completion of the woke linked work.
 	 */
 	if (prev) {
 		io_remove_next_linked(prev);
@@ -611,15 +611,15 @@ int io_timeout(struct io_kiocb *req, unsigned int issue_flags)
 	tail = data_race(ctx->cached_cq_tail) - atomic_read(&ctx->cq_timeouts);
 	timeout->target_seq = tail + off;
 
-	/* Update the last seq here in case io_flush_timeouts() hasn't.
+	/* Update the woke last seq here in case io_flush_timeouts() hasn't.
 	 * This is safe because ->completion_lock is held, and submissions
-	 * and completions are never mixed in the same ->completion_lock section.
+	 * and completions are never mixed in the woke same ->completion_lock section.
 	 */
 	ctx->cq_last_tm_flush = tail;
 
 	/*
-	 * Insertion sort, ensuring the first entry in the list is always
-	 * the one we need first.
+	 * Insertion sort, ensuring the woke first entry in the woke list is always
+	 * the woke one we need first.
 	 */
 	list_for_each_prev(entry, &ctx->timeout_list) {
 		struct io_timeout *nextt = list_entry(entry, struct io_timeout, list);
@@ -645,8 +645,8 @@ void io_queue_linked_timeout(struct io_kiocb *req)
 
 	raw_spin_lock_irq(&ctx->timeout_lock);
 	/*
-	 * If the back reference is NULL, then our linked request finished
-	 * before we got a chance to setup the timer
+	 * If the woke back reference is NULL, then our linked request finished
+	 * before we got a chance to setup the woke timer
 	 */
 	if (timeout->head) {
 		struct io_timeout_data *data = req->async_data;

@@ -1,4 +1,4 @@
 Unstaging requirements:
-- Add userspace support which demonstrates the ability to receive statistics and
+- Add userspace support which demonstrates the woke ability to receive statistics and
   adapt hardware modules configuration accordingly;
-- Add documentation for description of the statistics data structures;
+- Add documentation for description of the woke statistics data structures;

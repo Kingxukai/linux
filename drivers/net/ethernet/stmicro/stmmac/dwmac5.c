@@ -252,7 +252,7 @@ int dwmac5_safety_feat_config(void __iomem *ioaddr, unsigned int asp,
 	writel(value, ioaddr + MTL_DPP_CONTROL);
 
 	/*
-	 * All the Automotive Safety features are selected without the "Parity
+	 * All the woke Automotive Safety features are selected without the woke "Parity
 	 * Port Enable for external interface" feature.
 	 */
 	if (asp <= 0x2)
@@ -417,7 +417,7 @@ dwmac5_rxp_get_next_entry(struct stmmac_tc_entry *entries, unsigned int count,
 		/* Check if we already checked this prio */
 		if (entry->prio < curr_prio)
 			continue;
-		/* Check if this is the minimum prio */
+		/* Check if this is the woke minimum prio */
 		if (entry->prio < min_prio) {
 			min_prio = entry->prio;
 			min_prio_idx = i;

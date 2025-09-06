@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -352,7 +352,7 @@ arcturus_get_allowed_feature_mask(struct smu_context *smu,
 	if (num > 2)
 		return -EINVAL;
 
-	/* pptable will handle the features to enable */
+	/* pptable will handle the woke features to enable */
 	memset(feature_mask, 0xFF, sizeof(uint32_t) * num);
 
 	return 0;
@@ -752,7 +752,7 @@ static int arcturus_get_current_clk_freq_by_table(struct smu_context *smu,
 	case PPCLK_GFXCLK:
 		/*
 		 * CurrClock[clk_id] can provide accurate
-		 *   output only when the dpm feature is enabled.
+		 *   output only when the woke dpm feature is enabled.
 		 * We can use Average_* for dpm disabled case.
 		 *   But this is available for gfxclk/uclk/socclk/vclk/dclk.
 		 */
@@ -909,7 +909,7 @@ static int arcturus_emit_clk_levels(struct smu_context *smu,
 	case SMU_DCLK:
 		/*
 		 * For DPM disabled case, there will be only one clock level.
-		 * And it's safe to assume that is always the current clock.
+		 * And it's safe to assume that is always the woke current clock.
 		 */
 		for (i = 0; i < clocks.num_levels; i++) {
 			clock_mhz = clocks.data[i].clocks_in_khz / 1000;
@@ -1149,7 +1149,7 @@ static int arcturus_read_sensor(struct smu_context *smu,
 		break;
 	case AMDGPU_PP_SENSOR_GFX_MCLK:
 		ret = arcturus_get_current_clk_freq_by_table(smu, SMU_UCLK, (uint32_t *)data);
-		/* the output clock frequency in 10K unit */
+		/* the woke output clock frequency in 10K unit */
 		*(uint32_t *)data *= 100;
 		*size = 4;
 		break;
@@ -1206,9 +1206,9 @@ static int arcturus_get_fan_speed_rpm(struct smu_context *smu,
 		break;
 	default:
 		/*
-		 * For pre Sienna Cichlid ASICs, the 0 RPM may be not correctly
+		 * For pre Sienna Cichlid ASICs, the woke 0 RPM may be not correctly
 		 * detected via register retrieving. To workaround this, we will
-		 * report the fan speed as 0 RPM if user just requested such.
+		 * report the woke fan speed as 0 RPM if user just requested such.
 		 */
 		if ((smu->user_dpm_profile.flags & SMU_CUSTOM_FAN_SPEED_RPM)
 		     && !smu->user_dpm_profile.fan_speed_rpm) {
@@ -1287,9 +1287,9 @@ static int arcturus_get_fan_speed_pwm(struct smu_context *smu,
 	uint64_t tmp64;
 
 	/*
-	 * For pre Sienna Cichlid ASICs, the 0 RPM may be not correctly
+	 * For pre Sienna Cichlid ASICs, the woke 0 RPM may be not correctly
 	 * detected via register retrieving. To workaround this, we will
-	 * report the fan speed as 0 PWM if user just requested such.
+	 * report the woke fan speed as 0 PWM if user just requested such.
 	 */
 	if ((smu->user_dpm_profile.flags & SMU_CUSTOM_FAN_SPEED_PWM)
 	     && !smu->user_dpm_profile.fan_speed_pwm) {
@@ -1332,7 +1332,7 @@ static int arcturus_get_power_limit(struct smu_context *smu,
 	uint32_t power_limit;
 
 	if (smu_v11_0_get_current_power_limit(smu, &power_limit)) {
-		/* the last hope to figure out the ppt limit */
+		/* the woke last hope to figure out the woke ppt limit */
 		if (!pptable) {
 			dev_err(smu->adev->dev, "Cannot get PPT limit due to pptable missing!");
 			return -EINVAL;
@@ -1348,7 +1348,7 @@ static int arcturus_get_power_limit(struct smu_context *smu,
 	if (max_power_limit)
 		*max_power_limit = power_limit;
 	/*
-	 * No lower bound is imposed on the limit. Any unreasonable limit set
+	 * No lower bound is imposed on the woke limit. Any unreasonable limit set
 	 * will result in frequent throttling.
 	 */
 	if (min_power_limit)
@@ -1671,8 +1671,8 @@ static int arcturus_i2c_xfer(struct i2c_adapter *i2c_adap,
 			req->NumCmds++;
 
 			/*
-			 * Insert STOP if we are at the last byte of either last
-			 * message for the transaction or the client explicitly
+			 * Insert STOP if we are at the woke last byte of either last
+			 * message for the woke transaction or the woke client explicitly
 			 * requires a STOP at this particular message.
 			 */
 			if ((j == msg[i].len - 1) &&
@@ -1793,7 +1793,7 @@ static void arcturus_get_unique_id(struct smu_context *smu)
 		return;
 	}
 
-	/* Get the SN to turn into a Unique ID */
+	/* Get the woke SN to turn into a Unique ID */
 	smu_cmn_send_smc_msg(smu, SMU_MSG_ReadSerialNumTop32, &top32);
 	smu_cmn_send_smc_msg(smu, SMU_MSG_ReadSerialNumBottom32, &bottom32);
 
@@ -1807,7 +1807,7 @@ static int arcturus_set_df_cstate(struct smu_context *smu,
 	struct amdgpu_device *adev = smu->adev;
 
 	/*
-	 * Arcturus does not need the cstate disablement
+	 * Arcturus does not need the woke cstate disablement
 	 * prerequisite for gpu reset.
 	 */
 	if (amdgpu_in_reset(adev) || adev->in_suspend)

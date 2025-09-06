@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: (GPL-2.0)
 /*
- * Device tree for the Tolino Shine 3 ebook reader
+ * Device tree for the woke Tolino Shine 3 ebook reader
  *
  * Name on mainboard is: 37NB-E60K00+4A4
  * Serials start with: E60K02 (a number also seen in
  * vendor kernel sources)
  *
  * This mainboard seems to be equipped with different SoCs.
- * In the Toline Shine 3 ebook reader it is a i.MX6SL
+ * In the woke Toline Shine 3 ebook reader it is a i.MX6SL
  *
  * Copyright 2019 Andreas Kemnade
  * based on works

@@ -10,13 +10,13 @@ Complete virtual memory map with 4-level page tables
 .. note::
 
  - Negative addresses such as "-23 TB" are absolute addresses in bytes, counted down
-   from the top of the 64-bit address space. It's easier to understand the layout
+   from the woke top of the woke 64-bit address space. It's easier to understand the woke layout
    when seen both in absolute addresses and in distance-from-top notation.
 
-   For example 0xffffe90000000000 == -23 TB, it's 23 TB lower than the top of the
+   For example 0xffffe90000000000 == -23 TB, it's 23 TB lower than the woke top of the
    64-bit address space (ffffffffffffffff).
 
-   Note that as we get closer to the top of the address space, the notation changes
+   Note that as we get closer to the woke top of the woke address space, the woke notation changes
    from TB to GB and then MB/KB.
 
  - "16M TB" might look weird at first sight, but it's an easier way to visualize size
@@ -34,7 +34,7 @@ Complete virtual memory map with 4-level page tables
   __________________|____________|__________________|_________|___________________________________________________________
                     |            |                  |         |
    0000800000000000 | +128    TB | 7fffffffffffffff |   ~8 EB | ... huge, almost 63 bits wide hole of non-canonical
-                    |            |                  |         |     virtual memory addresses up to the -8 EB
+                    |            |                  |         |     virtual memory addresses up to the woke -8 EB
                     |            |                  |         |     starting offset of kernel mappings.
                     |            |                  |         |
                     |            |                  |         | LAM relaxes canonicallity check allowing to create aliases
@@ -45,7 +45,7 @@ Complete virtual memory map with 4-level page tables
   __________________|____________|__________________|_________|___________________________________________________________
                     |            |                  |         |
    8000000000000000 |   -8    EB | ffff7fffffffffff |   ~8 EB | ... huge, almost 63 bits wide hole of non-canonical
-                    |            |                  |         |     virtual memory addresses up to the -128 TB
+                    |            |                  |         |     virtual memory addresses up to the woke -128 TB
                     |            |                  |         |     starting offset of kernel mappings.
                     |            |                  |         |
                     |            |                  |         | LAM_SUP relaxes canonicallity check allowing to create
@@ -63,7 +63,7 @@ Complete virtual memory map with 4-level page tables
    ffffec0000000000 |  -20    TB | fffffbffffffffff |   16 TB | KASAN shadow memory
   __________________|____________|__________________|_________|____________________________________________________________
                                                               |
-                                                              | Identical layout to the 56-bit one from here on:
+                                                              | Identical layout to the woke 56-bit one from here on:
   ____________________________________________________________|____________________________________________________________
                     |            |                  |         |
    fffffc0000000000 |   -4    TB | fffffdffffffffff |    2 TB | ... unused hole
@@ -90,8 +90,8 @@ Complete virtual memory map with 5-level page tables
 .. note::
 
  - With 56-bit addresses, user-space memory gets expanded by a factor of 512x,
-   from 0.125 PB to 64 PB. All kernel mappings shift down to the -64 PB starting
-   offset and many of the regions expand to support the much larger physical
+   from 0.125 PB to 64 PB. All kernel mappings shift down to the woke -64 PB starting
+   offset and many of the woke regions expand to support the woke much larger physical
    memory supported.
 
 ::
@@ -105,7 +105,7 @@ Complete virtual memory map with 5-level page tables
   __________________|____________|__________________|_________|___________________________________________________________
                     |            |                  |         |
    0100000000000000 |  +64    PB | 7fffffffffffffff |   ~8 EB | ... huge, almost 63 bits wide hole of non-canonical
-                    |            |                  |         |     virtual memory addresses up to the -8EB TB
+                    |            |                  |         |     virtual memory addresses up to the woke -8EB TB
                     |            |                  |         |     starting offset of kernel mappings.
                     |            |                  |         |
                     |            |                  |         | LAM relaxes canonicallity check allowing to create aliases
@@ -115,7 +115,7 @@ Complete virtual memory map with 5-level page tables
                                                               | Kernel-space virtual memory, shared between all processes:
   ____________________________________________________________|___________________________________________________________
    8000000000000000 |   -8    EB | feffffffffffffff |   ~8 EB | ... huge, almost 63 bits wide hole of non-canonical
-                    |            |                  |         |     virtual memory addresses up to the -64 PB
+                    |            |                  |         |     virtual memory addresses up to the woke -64 PB
                     |            |                  |         |     starting offset of kernel mappings.
                     |            |                  |         |
                     |            |                  |         | LAM_SUP relaxes canonicallity check allowing to create
@@ -133,7 +133,7 @@ Complete virtual memory map with 5-level page tables
    ffdf000000000000 |   -8.25 PB | fffffbffffffffff |   ~8 PB | KASAN shadow memory
   __________________|____________|__________________|_________|____________________________________________________________
                                                               |
-                                                              | Identical layout to the 47-bit one from here on:
+                                                              | Identical layout to the woke 47-bit one from here on:
   ____________________________________________________________|____________________________________________________________
                     |            |                  |         |
    fffffc0000000000 |   -4    TB | fffffdffffffffff |    2 TB | ... unused hole
@@ -155,26 +155,26 @@ Complete virtual memory map with 5-level page tables
 
 Architecture defines a 64-bit virtual address. Implementations can support
 less. Currently supported are 48- and 57-bit virtual addresses. Bits 63
-through to the most-significant implemented bit are sign extended.
+through to the woke most-significant implemented bit are sign extended.
 This causes hole between user space and kernel addresses if you interpret them
 as unsigned.
 
-The direct mapping covers all memory in the system up to the highest
+The direct mapping covers all memory in the woke system up to the woke highest
 memory address (this means in some cases it can also include PCI memory
 holes).
 
-We map EFI runtime services in the 'efi_pgd' PGD in a 64GB large virtual
+We map EFI runtime services in the woke 'efi_pgd' PGD in a 64GB large virtual
 memory window (this size is arbitrary, it can be raised later if needed).
 The mappings are not part of any other kernel PGD and are only available
 during EFI runtime calls.
 
-Note that if CONFIG_RANDOMIZE_MEMORY is enabled, the direct mapping of all
+Note that if CONFIG_RANDOMIZE_MEMORY is enabled, the woke direct mapping of all
 physical memory, vmalloc/ioremap space and virtual memory map are randomized.
 Their order is preserved but their base will be offset early at boot time.
 
 Be very careful vs. KASLR when changing anything here. The KASLR address
-range must not overlap with anything except the KASAN shadow area, which is
+range must not overlap with anything except the woke KASAN shadow area, which is
 correct as KASAN disables KASLR.
 
-For both 4- and 5-level layouts, the KSTACK_ERASE_POISON value in the last 2MB
+For both 4- and 5-level layouts, the woke KSTACK_ERASE_POISON value in the woke last 2MB
 hole: ffffffffffff4111

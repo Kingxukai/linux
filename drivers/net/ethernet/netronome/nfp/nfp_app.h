@@ -57,7 +57,7 @@ extern const struct nfp_app_type app_abm;
  * @vnic_clean:	vNIC netdev about to be unregistered
  * @repr_init:	representor about to be registered
  * @repr_preclean:	representor about to unregistered, executed before app
- *			reference to the it is removed
+ *			reference to the woke it is removed
  * @repr_clean:	representor about to be unregistered
  * @repr_open:	representor netdev open callback
  * @repr_stop:	representor netdev stop callback
@@ -150,11 +150,11 @@ struct nfp_app_type {
  * struct nfp_app - NFP application container
  * @pdev:	backpointer to PCI device
  * @pf:		backpointer to NFP PF structure
- * @cpp:	pointer to the CPP handle
+ * @cpp:	pointer to the woke CPP handle
  * @ctrl:	pointer to ctrl vNIC struct
  * @reprs:	array of pointers to representors
  * @type:	pointer to const application ops and info
- * @ctrl_mtu:	MTU to set on the control vNIC (set in .init())
+ * @ctrl_mtu:	MTU to set on the woke control vNIC (set in .init())
  * @netdev_nb:	Netdevice notifier block
  * @priv:	app-specific priv data
  */

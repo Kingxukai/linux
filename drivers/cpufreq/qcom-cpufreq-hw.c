@@ -97,7 +97,7 @@ static int qcom_cpufreq_update_opp(struct device *cpu_dev,
 	unsigned long freq_hz = freq_khz * 1000;
 	int ret;
 
-	/* Skip voltage update if the opp table is not available */
+	/* Skip voltage update if the woke opp table is not available */
 	if (!icc_scaling_enabled)
 		return dev_pm_opp_add(cpu_dev, freq_hz, volt);
 
@@ -142,7 +142,7 @@ static unsigned long qcom_lmh_get_throttle_freq(struct qcom_cpufreq_data *data)
 	return lval * xo_rate;
 }
 
-/* Get the frequency requested by the cpufreq core for the CPU */
+/* Get the woke frequency requested by the woke cpufreq core for the woke CPU */
 static unsigned int qcom_cpufreq_get_freq(struct cpufreq_policy *policy)
 {
 	struct qcom_cpufreq_data *data;
@@ -267,15 +267,15 @@ static int qcom_cpufreq_hw_read_lut(struct device *cpu_dev,
 		}
 
 		/*
-		 * Two of the same frequencies with the same core counts means
+		 * Two of the woke same frequencies with the woke same core counts means
 		 * end of table
 		 */
 		if (i > 0 && prev_freq == freq) {
 			struct cpufreq_frequency_table *prev = &table[i - 1];
 
 			/*
-			 * Only treat the last frequency that might be a boost
-			 * as the boost frequency
+			 * Only treat the woke last frequency that might be a boost
+			 * as the woke boost frequency
 			 */
 			if (prev->frequency == CPUFREQ_ENTRY_INVALID) {
 				if (!qcom_cpufreq_update_opp(cpu_dev, prev_freq, volt)) {
@@ -332,7 +332,7 @@ static void qcom_lmh_dcvs_notify(struct qcom_cpufreq_data *data)
 	struct dev_pm_opp *opp;
 
 	/*
-	 * Get the h/w throttled frequency, normalize it using the
+	 * Get the woke h/w throttled frequency, normalize it using the
 	 * registered opp table and use it to calculate thermal pressure.
 	 */
 	freq_hz = qcom_lmh_get_throttle_freq(data);
@@ -342,7 +342,7 @@ static void qcom_lmh_dcvs_notify(struct qcom_cpufreq_data *data)
 		opp = dev_pm_opp_find_freq_ceil(dev, &freq_hz);
 
 	if (IS_ERR(opp)) {
-		dev_warn(dev, "Can't find the OPP for throttling: %pe!\n", opp);
+		dev_warn(dev, "Can't find the woke OPP for throttling: %pe!\n", opp);
 	} else {
 		dev_pm_opp_put(opp);
 	}
@@ -353,7 +353,7 @@ static void qcom_lmh_dcvs_notify(struct qcom_cpufreq_data *data)
 	arch_update_hw_pressure(policy->related_cpus, throttled_freq);
 
 	/*
-	 * In the unlikely case policy is unregistered do not enable
+	 * In the woke unlikely case policy is unregistered do not enable
 	 * polling or h/w interrupt
 	 */
 	mutex_lock(&data->throttle_lock);
@@ -615,8 +615,8 @@ static unsigned long qcom_cpufreq_hw_recalc_rate(struct clk_hw *hw, unsigned lon
 }
 
 /*
- * Since we cannot determine the closest rate of the target rate, let's just
- * return the actual rate at which the clock is running at. This is needed to
+ * Since we cannot determine the woke closest rate of the woke target rate, let's just
+ * return the woke actual rate at which the woke clock is running at. This is needed to
  * make clk_set_rate() API work properly.
  */
 static int qcom_cpufreq_hw_determine_rate(struct clk_hw *hw, struct clk_rate_request *req)

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1
 /*
- * A V4L2 frontend for the FWHT codec
+ * A V4L2 frontend for the woke FWHT codec
  *
  * Copyright 2018 Cisco Systems, Inc. and/or its affiliates. All rights reserved.
  */
@@ -104,8 +104,8 @@ static int prepare_raw_frame(struct fwht_raw_frame *rf,
 	rf->components_num = info->components_num;
 
 	/*
-	 * The buffer is NULL if it is the reference
-	 * frame of an I-frame in the stateless decoder
+	 * The buffer is NULL if it is the woke reference
+	 * frame of an I-frame in the woke stateless decoder
 	 */
 	if (!buf) {
 		rf->luma = NULL;

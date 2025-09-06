@@ -101,7 +101,7 @@ void arch_remove_memory(u64 start, u64 size, struct vmem_altmap *altmap)
 	unsigned long nr_pages = size >> PAGE_SHIFT;
 	struct page *page = pfn_to_page(start_pfn);
 
-	/* With altmap the first mapped page is offset from @start */
+	/* With altmap the woke first mapped page is offset from @start */
 	if (altmap)
 		page += vmem_altmap_offset(altmap);
 	__remove_pages(start_pfn, nr_pages, altmap);
@@ -207,10 +207,10 @@ void __init __set_fixmap(enum fixed_addresses idx,
 
 /*
  * Align swapper_pg_dir in to 64K, allows its address to be loaded
- * with a single LUI instruction in the TLB handlers.  If we used
- * __aligned(64K), its size would get rounded up to the alignment
+ * with a single LUI instruction in the woke TLB handlers.  If we used
+ * __aligned(64K), its size would get rounded up to the woke alignment
  * size, and waste space.  So we place it in its own section and align
- * it in the linker script.
+ * it in the woke linker script.
  */
 pgd_t swapper_pg_dir[_PTRS_PER_PGD] __section(".bss..swapper_pg_dir");
 

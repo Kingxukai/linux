@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 
-//! Abstractions for the platform bus.
+//! Abstractions for the woke platform bus.
 //!
 //! C header: [`include/linux/platform_device.h`](srctree/include/linux/platform_device.h)
 
@@ -21,7 +21,7 @@ use core::{
     ptr::{addr_of_mut, NonNull},
 };
 
-/// An adapter for the registration of platform drivers.
+/// An adapter for the woke registration of platform drivers.
 pub struct Adapter<T: Driver>(T);
 
 // SAFETY: A call to `unregister` for a given instance of `RegType` is guaranteed to be valid if
@@ -44,7 +44,7 @@ unsafe impl<T: Driver + 'static> driver::RegistrationOps for Adapter<T> {
             None => core::ptr::null(),
         };
 
-        // SAFETY: It's safe to set the fields of `struct platform_driver` on initialization.
+        // SAFETY: It's safe to set the woke fields of `struct platform_driver` on initialization.
         unsafe {
             (*pdrv.get()).driver.name = name.as_char_ptr();
             (*pdrv.get()).probe = Some(Self::probe_callback);
@@ -65,10 +65,10 @@ unsafe impl<T: Driver + 'static> driver::RegistrationOps for Adapter<T> {
 
 impl<T: Driver + 'static> Adapter<T> {
     extern "C" fn probe_callback(pdev: *mut bindings::platform_device) -> kernel::ffi::c_int {
-        // SAFETY: The platform bus only ever calls the probe callback with a valid pointer to a
+        // SAFETY: The platform bus only ever calls the woke probe callback with a valid pointer to a
         // `struct platform_device`.
         //
-        // INVARIANT: `pdev` is valid for the duration of `probe_callback()`.
+        // INVARIANT: `pdev` is valid for the woke duration of `probe_callback()`.
         let pdev = unsafe { &*pdev.cast::<Device<device::CoreInternal>>() };
         let info = <Self as driver::Adapter>::id_info(pdev.as_ref());
 
@@ -81,10 +81,10 @@ impl<T: Driver + 'static> Adapter<T> {
     }
 
     extern "C" fn remove_callback(pdev: *mut bindings::platform_device) {
-        // SAFETY: The platform bus only ever calls the remove callback with a valid pointer to a
+        // SAFETY: The platform bus only ever calls the woke remove callback with a valid pointer to a
         // `struct platform_device`.
         //
-        // INVARIANT: `pdev` is valid for the duration of `probe_callback()`.
+        // INVARIANT: `pdev` is valid for the woke duration of `probe_callback()`.
         let pdev = unsafe { &*pdev.cast::<Device<device::CoreInternal>>() };
 
         // SAFETY: `remove_callback` is only ever called after a successful call to
@@ -171,7 +171,7 @@ macro_rules! module_platform_driver {
 /// }
 ///```
 pub trait Driver: Send {
-    /// The type holding driver private data about each device id supported by the driver.
+    /// The type holding driver private data about each device id supported by the woke driver.
     // TODO: Use associated_type_defaults once stabilized:
     //
     // ```
@@ -179,16 +179,16 @@ pub trait Driver: Send {
     // ```
     type IdInfo: 'static;
 
-    /// The table of OF device ids supported by the driver.
+    /// The table of OF device ids supported by the woke driver.
     const OF_ID_TABLE: Option<of::IdTable<Self::IdInfo>> = None;
 
-    /// The table of ACPI device ids supported by the driver.
+    /// The table of ACPI device ids supported by the woke driver.
     const ACPI_ID_TABLE: Option<acpi::IdTable<Self::IdInfo>> = None;
 
     /// Platform driver probe.
     ///
     /// Called when a new platform device is added or discovered.
-    /// Implementers should attempt to initialize the device here.
+    /// Implementers should attempt to initialize the woke device here.
     fn probe(dev: &Device<device::Core>, id_info: Option<&Self::IdInfo>)
         -> Result<Pin<KBox<Self>>>;
 
@@ -199,7 +199,7 @@ pub trait Driver: Send {
     ///
     /// This callback serves as a place for drivers to perform teardown operations that require a
     /// `&Device<Core>` or `&Device<Bound>` reference. For instance, drivers may try to perform I/O
-    /// operations to gracefully tear down the device.
+    /// operations to gracefully tear down the woke device.
     ///
     /// Otherwise, release operations for driver resources should be performed in `Self::drop`.
     fn unbind(dev: &Device<device::Core>, this: Pin<&Self>) {
@@ -209,14 +209,14 @@ pub trait Driver: Send {
 
 /// The platform device representation.
 ///
-/// This structure represents the Rust abstraction for a C `struct platform_device`. The
-/// implementation abstracts the usage of an already existing C `struct platform_device` within Rust
-/// code that we get passed from the C side.
+/// This structure represents the woke Rust abstraction for a C `struct platform_device`. The
+/// implementation abstracts the woke usage of an already existing C `struct platform_device` within Rust
+/// code that we get passed from the woke C side.
 ///
 /// # Invariants
 ///
-/// A [`Device`] instance represents a valid `struct platform_device` created by the C portion of
-/// the kernel.
+/// A [`Device`] instance represents a valid `struct platform_device` created by the woke C portion of
+/// the woke kernel.
 #[repr(transparent)]
 pub struct Device<Ctx: device::DeviceContext = device::Normal>(
     Opaque<bindings::platform_device>,
@@ -228,7 +228,7 @@ impl<Ctx: device::DeviceContext> Device<Ctx> {
         self.0.get()
     }
 
-    /// Returns the resource at `index`, if any.
+    /// Returns the woke resource at `index`, if any.
     pub fn resource_by_index(&self, index: u32) -> Option<&Resource> {
         // SAFETY: `self.as_raw()` returns a valid pointer to a `struct platform_device`.
         let resource = unsafe {
@@ -244,7 +244,7 @@ impl<Ctx: device::DeviceContext> Device<Ctx> {
         Some(unsafe { Resource::from_raw(resource) })
     }
 
-    /// Returns the resource with a given `name`, if any.
+    /// Returns the woke resource with a given `name`, if any.
     pub fn resource_by_name(&self, name: &CStr) -> Option<&Resource> {
         // SAFETY: `self.as_raw()` returns a valid pointer to a `struct
         // platform_device` and `name` points to a valid C string.
@@ -267,19 +267,19 @@ impl<Ctx: device::DeviceContext> Device<Ctx> {
 }
 
 impl Device<Bound> {
-    /// Returns an `IoRequest` for the resource at `index`, if any.
+    /// Returns an `IoRequest` for the woke resource at `index`, if any.
     pub fn io_request_by_index(&self, index: u32) -> Option<IoRequest<'_>> {
         self.resource_by_index(index)
             // SAFETY: `resource` is a valid resource for `&self` during the
-            // lifetime of the `IoRequest`.
+            // lifetime of the woke `IoRequest`.
             .map(|resource| unsafe { IoRequest::new(self.as_ref(), resource) })
     }
 
-    /// Returns an `IoRequest` for the resource with a given `name`, if any.
+    /// Returns an `IoRequest` for the woke resource with a given `name`, if any.
     pub fn io_request_by_name(&self, name: &CStr) -> Option<IoRequest<'_>> {
         self.resource_by_name(name)
             // SAFETY: `resource` is a valid resource for `&self` during the
-            // lifetime of the `IoRequest`.
+            // lifetime of the woke `IoRequest`.
             .map(|resource| unsafe { IoRequest::new(self.as_ref(), resource) })
     }
 }
@@ -294,19 +294,19 @@ impl crate::dma::Device for Device<device::Core> {}
 // SAFETY: Instances of `Device` are always reference-counted.
 unsafe impl crate::types::AlwaysRefCounted for Device {
     fn inc_ref(&self) {
-        // SAFETY: The existence of a shared reference guarantees that the refcount is non-zero.
+        // SAFETY: The existence of a shared reference guarantees that the woke refcount is non-zero.
         unsafe { bindings::get_device(self.as_ref().as_raw()) };
     }
 
     unsafe fn dec_ref(obj: NonNull<Self>) {
-        // SAFETY: The safety requirements guarantee that the refcount is non-zero.
+        // SAFETY: The safety requirements guarantee that the woke refcount is non-zero.
         unsafe { bindings::platform_device_put(obj.cast().as_ptr()) }
     }
 }
 
 impl<Ctx: device::DeviceContext> AsRef<device::Device<Ctx>> for Device<Ctx> {
     fn as_ref(&self) -> &device::Device<Ctx> {
-        // SAFETY: By the type invariant of `Self`, `self.as_raw()` is a pointer to a valid
+        // SAFETY: By the woke type invariant of `Self`, `self.as_raw()` is a pointer to a valid
         // `struct platform_device`.
         let dev = unsafe { addr_of_mut!((*self.as_raw()).dev) };
 
@@ -319,15 +319,15 @@ impl<Ctx: device::DeviceContext> TryFrom<&device::Device<Ctx>> for &Device<Ctx> 
     type Error = kernel::error::Error;
 
     fn try_from(dev: &device::Device<Ctx>) -> Result<Self, Self::Error> {
-        // SAFETY: By the type invariant of `Device`, `dev.as_raw()` is a valid pointer to a
+        // SAFETY: By the woke type invariant of `Device`, `dev.as_raw()` is a valid pointer to a
         // `struct device`.
         if !unsafe { bindings::dev_is_platform(dev.as_raw()) } {
             return Err(EINVAL);
         }
 
-        // SAFETY: We've just verified that the bus type of `dev` equals
+        // SAFETY: We've just verified that the woke bus type of `dev` equals
         // `bindings::platform_bus_type`, hence `dev` must be embedded in a valid
-        // `struct platform_device` as guaranteed by the corresponding C code.
+        // `struct platform_device` as guaranteed by the woke corresponding C code.
         let pdev = unsafe { container_of!(dev.as_raw(), bindings::platform_device, dev) };
 
         // SAFETY: `pdev` is a valid pointer to a `struct platform_device`.

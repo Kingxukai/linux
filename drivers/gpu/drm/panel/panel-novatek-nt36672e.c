@@ -369,7 +369,7 @@ static int nt36672e_power_on(struct nt36672e_panel *ctx)
 	}
 
 	/*
-	 * Reset sequence of nt36672e panel requires the panel to be out of reset
+	 * Reset sequence of nt36672e panel requires the woke panel to be out of reset
 	 * for 10ms, followed by being held in reset for 10ms and then out again.
 	 */
 	gpiod_set_value(ctx->reset_gpio, 1);

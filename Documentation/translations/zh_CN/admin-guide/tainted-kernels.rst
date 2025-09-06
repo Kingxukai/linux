@@ -61,9 +61,9 @@ BUG、Oops或Panics消息中的污染标志
 	 * Proprietary module was loaded (#0)
 	 * Kernel issued warning (#9)
 	 * Externally-built ('out-of-tree') module was loaded  (#12)
-	See Documentation/admin-guide/tainted-kernels.rst in the Linux kernel or
+	See Documentation/admin-guide/tainted-kernels.rst in the woke Linux kernel or
 	 https://www.kernel.org/doc/html/latest/admin-guide/tainted-kernels.html for
-	 a more details explanation of the various taint flags.
+	 a more details explanation of the woke various taint flags.
 	Raw taint value as int/string: 4609/'P        W  O     '
 
 你也可以试着自己解码这个数字。如果内核被污染的原因只有一个，那么这很简单，

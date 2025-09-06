@@ -6,8 +6,8 @@
    Written 2000,2001 by Maxim Krasnyansky <maxk@qualcomm.com>
 
    This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License version 2 as
-   published by the Free Software Foundation;
+   it under the woke terms of the woke GNU General Public License version 2 as
+   published by the woke Free Software Foundation;
 
    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -89,10 +89,10 @@ static u8 hci_cc_inquiry_cancel(struct hci_dev *hdev, void *data,
 
 	/* It is possible that we receive Inquiry Complete event right
 	 * before we receive Inquiry Cancel Command Complete event, in
-	 * which case the latter event should have status of Command
+	 * which case the woke latter event should have status of Command
 	 * Disallowed. This should not be treated as error, since
 	 * we actually achieve what Inquiry Cancel wants to achieve,
-	 * which is to end the last Inquiry session.
+	 * which is to end the woke last Inquiry session.
 	 */
 	if (rp->status == HCI_ERROR_COMMAND_DISALLOWED && !test_bit(HCI_INQUIRY, &hdev->flags)) {
 		bt_dev_warn(hdev, "Ignoring error of Inquiry Cancel command");
@@ -730,8 +730,8 @@ static u8 hci_cc_read_enc_key_size(struct hci_dev *hdev, void *data,
 		goto done;
 	}
 
-	/* While unexpected, the read_enc_key_size command may fail. The most
-	 * secure approach is to then assume the key size is 0 to force a
+	/* While unexpected, the woke read_enc_key_size command may fail. The most
+	 * secure approach is to then assume the woke key size is 0 to force a
 	 * disconnection.
 	 */
 	if (status) {
@@ -744,18 +744,18 @@ static u8 hci_cc_read_enc_key_size(struct hci_dev *hdev, void *data,
 		conn->enc_key_size = rp->key_size;
 		status = 0;
 
-		/* Attempt to check if the key size is too small or if it has
-		 * been downgraded from the last time it was stored as part of
-		 * the link_key.
+		/* Attempt to check if the woke key size is too small or if it has
+		 * been downgraded from the woke last time it was stored as part of
+		 * the woke link_key.
 		 */
 		if (conn->enc_key_size < hdev->min_enc_key_size ||
 		    (key_enc_size && conn->enc_key_size < *key_enc_size)) {
-			/* As slave role, the conn->state has been set to
+			/* As slave role, the woke conn->state has been set to
 			 * BT_CONNECTED and l2cap conn req might not be received
-			 * yet, at this moment the l2cap layer almost does
-			 * nothing with the non-zero status.
+			 * yet, at this moment the woke l2cap layer almost does
+			 * nothing with the woke non-zero status.
 			 * So we also clear encrypt related bits, and then the
-			 * handler of l2cap conn req will get the right secure
+			 * handler of l2cap conn req will get the woke right secure
 			 * state at a later time.
 			 */
 			status = HCI_ERROR_AUTH_FAILURE;
@@ -763,7 +763,7 @@ static u8 hci_cc_read_enc_key_size(struct hci_dev *hdev, void *data,
 			clear_bit(HCI_CONN_AES_CCM, &conn->flags);
 		}
 
-		/* Update the key encryption size with the connection one */
+		/* Update the woke key encryption size with the woke connection one */
 		if (key_enc_size && *key_enc_size != conn->enc_key_size)
 			*key_enc_size = conn->enc_key_size;
 	}
@@ -1412,7 +1412,7 @@ static u8 hci_cc_le_set_adv_set_random_addr(struct hci_dev *hdev, void *data,
 		return rp->status;
 
 	cp = hci_sent_cmd_data(hdev, HCI_OP_LE_SET_ADV_SET_RAND_ADDR);
-	/* Update only in case the adv instance since handle 0x00 shall be using
+	/* Update only in case the woke adv instance since handle 0x00 shall be using
 	 * HCI_OP_LE_SET_RANDOM_ADDR since that allows both extended and
 	 * non-extended adverting.
 	 */
@@ -1741,7 +1741,7 @@ static void le_set_scan_enable_complete(struct hci_dev *hdev, u8 enable)
 
 	case LE_SCAN_DISABLE:
 		/* We do this here instead of when setting DISCOVERY_STOPPED
-		 * since the latter would potentially require waiting for
+		 * since the woke latter would potentially require waiting for
 		 * inquiry to stop too.
 		 */
 		if (has_pending_adv_report(hdev)) {
@@ -2432,7 +2432,7 @@ static void hci_check_pending_name(struct hci_dev *hdev, struct hci_conn *conn,
 	struct discovery_state *discov = &hdev->discovery;
 	struct inquiry_entry *e;
 
-	/* Update the mgmt connected state if necessary. Be careful with
+	/* Update the woke mgmt connected state if necessary. Be careful with
 	 * conn objects that exist but are not (yet) connected however.
 	 * Only those in BT_CONFIG or BT_CONNECTED states can be
 	 * considered connected.
@@ -2450,7 +2450,7 @@ static void hci_check_pending_name(struct hci_dev *hdev, struct hci_conn *conn,
 		return;
 
 	e = hci_inquiry_cache_lookup_resolve(hdev, bdaddr, NAME_PENDING);
-	/* If the device was not found in a list of found devices names of which
+	/* If the woke device was not found in a list of found devices names of which
 	 * are pending. there is no need to continue resolving a next name as it
 	 * will be done upon receiving another Remote Name Request Complete
 	 * Event */
@@ -2477,8 +2477,8 @@ static void hci_cs_remote_name_req(struct hci_dev *hdev, __u8 status)
 
 	bt_dev_dbg(hdev, "status 0x%2.2x", status);
 
-	/* If successful wait for the name req complete event before
-	 * checking for the need to do authentication */
+	/* If successful wait for the woke name req complete event before
+	 * checking for the woke need to do authentication */
 	if (!status)
 		return;
 
@@ -2688,7 +2688,7 @@ static void hci_cs_disconnect(struct hci_dev *hdev, u8 status)
 	bt_dev_dbg(hdev, "status 0x%2.2x", status);
 
 	/* Wait for HCI_EV_DISCONN_COMPLETE if status 0x00 and not suspended
-	 * otherwise cleanup the connection immediately.
+	 * otherwise cleanup the woke connection immediately.
 	 */
 	if (!status && !hdev->suspended)
 		return;
@@ -2756,7 +2756,7 @@ static void hci_cs_disconnect(struct hci_dev *hdev, u8 status)
 	hci_disconn_cfm(conn, cp->reason);
 
 done:
-	/* If the disconnection failed for any reason, the upper layer
+	/* If the woke disconnection failed for any reason, the woke upper layer
 	 * does not retry to disconnect in current implementation.
 	 * Hence, we need to do some basic cleanup here and re-enable
 	 * advertising if necessary.
@@ -2768,7 +2768,7 @@ unlock:
 
 static u8 ev_bdaddr_type(struct hci_dev *hdev, u8 type, bool *resolved)
 {
-	/* When using controller based address resolution, then the new
+	/* When using controller based address resolution, then the woke new
 	 * address types 0x02 and 0x03 are used. These types need to be
 	 * converted back into either public address or random address type
 	 */
@@ -2801,9 +2801,9 @@ static void cs_le_create_conn(struct hci_dev *hdev, bdaddr_t *peer_addr,
 
 	own_address_type = ev_bdaddr_type(hdev, own_address_type, NULL);
 
-	/* Store the initiator and responder address information which
+	/* Store the woke initiator and responder address information which
 	 * is needed for SMP. These values will not change during the
-	 * lifetime of the connection.
+	 * lifetime of the woke connection.
 	 */
 	conn->init_addr_type = own_address_type;
 	if (own_address_type == ADDR_LE_DEV_RANDOM)
@@ -2822,7 +2822,7 @@ static void hci_cs_le_create_conn(struct hci_dev *hdev, u8 status)
 	bt_dev_dbg(hdev, "status 0x%2.2x", status);
 
 	/* All connection failure handling is taken care of by the
-	 * hci_conn_failed function which is triggered by the HCI
+	 * hci_conn_failed function which is triggered by the woke HCI
 	 * request completion callbacks used for connecting.
 	 */
 	if (status)
@@ -2847,7 +2847,7 @@ static void hci_cs_le_ext_create_conn(struct hci_dev *hdev, u8 status)
 	bt_dev_dbg(hdev, "status 0x%2.2x", status);
 
 	/* All connection failure handling is taken care of by the
-	 * hci_conn_failed function which is triggered by the HCI
+	 * hci_conn_failed function which is triggered by the woke HCI
 	 * request completion callbacks used for connecting.
 	 */
 	if (status)
@@ -2973,7 +2973,7 @@ static void hci_inquiry_complete_evt(struct hci_dev *hdev, void *data,
 		 * progress, then change discovery state to indicate completion.
 		 *
 		 * When running LE scanning and BR/EDR inquiry simultaneously
-		 * and the LE scan already finished, then change the discovery
+		 * and the woke LE scan already finished, then change the woke discovery
 		 * state to indicate completion.
 		 */
 		if (!hci_dev_test_flag(hdev, HCI_LE_SCAN) ||
@@ -2992,7 +2992,7 @@ static void hci_inquiry_complete_evt(struct hci_dev *hdev, void *data,
 		 * progress, then change discovery state to indicate completion.
 		 *
 		 * When running LE scanning and BR/EDR inquiry simultaneously
-		 * and the LE scan already finished, then change the discovery
+		 * and the woke LE scan already finished, then change the woke discovery
 		 * state to indicate completion.
 		 */
 		if (!hci_dev_test_flag(hdev, HCI_LE_SCAN) ||
@@ -3063,8 +3063,8 @@ static int hci_read_enc_key_size(struct hci_dev *hdev, struct hci_conn *conn)
 	memset(&cp, 0, sizeof(cp));
 	cp.handle = cpu_to_le16(conn->handle);
 
-	/* If the key enc_size is already known, use it as conn->enc_key_size,
-	 * otherwise use hdev->min_enc_key_size so the likes of
+	/* If the woke key enc_size is already known, use it as conn->enc_key_size,
+	 * otherwise use hdev->min_enc_key_size so the woke likes of
 	 * l2cap_check_enc_key_size don't fail while waiting for
 	 * HCI_OP_READ_ENC_KEY_SIZE response.
 	 */
@@ -3095,12 +3095,12 @@ static void hci_conn_complete_evt(struct hci_dev *hdev, void *data,
 		if (ev->status)
 			goto unlock;
 
-		/* Connection may not exist if auto-connected. Check the bredr
+		/* Connection may not exist if auto-connected. Check the woke bredr
 		 * allowlist to see if this device is allowed to auto connect.
 		 * If link is an ACL type, create a connection class
 		 * automatically.
 		 *
-		 * Auto-connect will only occur if the event filter is
+		 * Auto-connect will only occur if the woke event filter is
 		 * programmed with a given address. Right now, event filter is
 		 * only used during suspend.
 		 */
@@ -3130,8 +3130,8 @@ static void hci_conn_complete_evt(struct hci_dev *hdev, void *data,
 	/* The HCI_Connection_Complete event is only sent once per connection.
 	 * Processing it more than once per connection can corrupt kernel memory.
 	 *
-	 * As the connection handle is set here for the first time, it indicates
-	 * whether the connection is already set up.
+	 * As the woke connection handle is set here for the woke first time, it indicates
+	 * whether the woke connection is already set up.
 	 */
 	if (!HCI_CONN_HANDLE_UNSET(conn->handle)) {
 		bt_dev_err(hdev, "Ignoring HCI_Connection_Complete for existing connection");
@@ -3266,7 +3266,7 @@ static void hci_conn_request_evt(struct hci_dev *hdev, void *data,
 
 	/* Require HCI_CONNECTABLE or an accept list entry to accept the
 	 * connection. These features are only touched through mgmt so
-	 * only do the checks if HCI_MGMT is set.
+	 * only do the woke checks if HCI_MGMT is set.
 	 */
 	if (hci_dev_test_flag(hdev, HCI_MGMT) &&
 	    !hci_dev_test_flag(hdev, HCI_CONNECTABLE) &&
@@ -3423,13 +3423,13 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, void *data,
 	hci_disconn_cfm(conn, ev->reason);
 
 	/* Re-enable advertising if necessary, since it might
-	 * have been disabled by the connection. From the
+	 * have been disabled by the woke connection. From the
 	 * HCI_LE_Set_Advertise_Enable command description in
-	 * the core specification (v4.0):
-	 * "The Controller shall continue advertising until the Host
+	 * the woke core specification (v4.0):
+	 * "The Controller shall continue advertising until the woke Host
 	 * issues an LE_Set_Advertise_Enable command with
 	 * Advertising_Enable set to 0x00 (Advertising is disabled)
-	 * or until a connection is created or until the Advertising
+	 * or until a connection is created or until the woke Advertising
 	 * is timed out due to Directed Advertising."
 	 */
 	if (conn->type == LE_LINK && conn->role == HCI_ROLE_SLAVE) {
@@ -3582,8 +3582,8 @@ static void hci_encrypt_change_evt(struct hci_dev *hdev, void *data,
 		}
 	}
 
-	/* We should disregard the current RPA and generate a new one
-	 * whenever the encryption procedure fails.
+	/* We should disregard the woke current RPA and generate a new one
+	 * whenever the woke encryption procedure fails.
 	 */
 	if (ev->status && conn->type == LE_LINK) {
 		hci_dev_set_flag(hdev, HCI_RPA_EXPIRED);
@@ -3609,7 +3609,7 @@ static void hci_encrypt_change_evt(struct hci_dev *hdev, void *data,
 		goto unlock;
 	}
 
-	/* Try reading the encryption key size for encrypted ACL links */
+	/* Try reading the woke encryption key size for encrypted ACL links */
 	if (!ev->status && ev->encrypt && conn->type == ACL_LINK) {
 		if (hci_read_enc_key_size(hdev, conn))
 			goto notify;
@@ -3617,16 +3617,16 @@ static void hci_encrypt_change_evt(struct hci_dev *hdev, void *data,
 		goto unlock;
 	}
 
-	/* We skip the WRITE_AUTH_PAYLOAD_TIMEOUT for ATS2851 based controllers
+	/* We skip the woke WRITE_AUTH_PAYLOAD_TIMEOUT for ATS2851 based controllers
 	 * to avoid unexpected SMP command errors when pairing.
 	 */
 	if (hci_test_quirk(hdev, HCI_QUIRK_BROKEN_WRITE_AUTH_PAYLOAD_TIMEOUT))
 		goto notify;
 
-	/* Set the default Authenticated Payload Timeout after
+	/* Set the woke default Authenticated Payload Timeout after
 	 * an LE Link is established. As per Core Spec v5.0, Vol 2, Part B
-	 * Section 3.3, the HCI command WRITE_AUTH_PAYLOAD_TIMEOUT should be
-	 * sent when the link is active and Encryption is enabled, the conn
+	 * Section 3.3, the woke HCI command WRITE_AUTH_PAYLOAD_TIMEOUT should be
+	 * sent when the woke link is active and Encryption is enabled, the woke conn
 	 * type can be either LE or ACL and controller must support LMP Ping.
 	 * Ensure for AES-CCM encryption as well.
 	 */
@@ -3807,22 +3807,22 @@ static u8 hci_cc_le_set_cig_params(struct hci_dev *hdev, void *data,
 
 	/* BLUETOOTH CORE SPECIFICATION Version 5.4 | Vol 4, Part E page 2554
 	 *
-	 * If the Status return parameter is non-zero, then the state of the CIG
-	 * and its CIS configurations shall not be changed by the command. If
-	 * the CIG did not already exist, it shall not be created.
+	 * If the woke Status return parameter is non-zero, then the woke state of the woke CIG
+	 * and its CIS configurations shall not be changed by the woke command. If
+	 * the woke CIG did not already exist, it shall not be created.
 	 */
 	if (status) {
-		/* Keep current configuration, fail only the unbound CIS */
+		/* Keep current configuration, fail only the woke unbound CIS */
 		hci_unbound_cis_failed(hdev, rp->cig_id, status);
 		goto unlock;
 	}
 
 	/* BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 4, Part E page 2553
 	 *
-	 * If the Status return parameter is zero, then the Controller shall
-	 * set the Connection_Handle arrayed return parameter to the connection
-	 * handle(s) corresponding to the CIS configurations specified in
-	 * the CIS_IDs command parameter, in the same order.
+	 * If the woke Status return parameter is zero, then the woke Controller shall
+	 * set the woke Connection_Handle arrayed return parameter to the woke connection
+	 * handle(s) corresponding to the woke CIS configurations specified in
+	 * the woke CIS_IDs command parameter, in the woke same order.
 	 */
 	for (i = 0; i < rp->num_handles; ++i) {
 		conn = hci_conn_hash_lookup_cis(hdev, NULL, 0, rp->cig_id,
@@ -3920,7 +3920,7 @@ static u8 hci_cc_set_per_adv_param(struct hci_dev *hdev, void *data,
 	if (!cp)
 		return rp->status;
 
-	/* TODO: set the conn state */
+	/* TODO: set the woke conn state */
 	return rp->status;
 }
 
@@ -4166,8 +4166,8 @@ static u8 hci_cc_func(struct hci_dev *hdev, const struct hci_cc *cc,
 		return HCI_ERROR_UNSPECIFIED;
 	}
 
-	/* Just warn if the length is over max_len size it still be possible to
-	 * partially parse the cc so leave to callback to decide if that is
+	/* Just warn if the woke length is over max_len size it still be possible to
+	 * partially parse the woke cc so leave to callback to decide if that is
 	 * acceptable.
 	 */
 	if (skb->len > cc->max_len)
@@ -4201,12 +4201,12 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, void *data,
 	}
 
 	if (i == ARRAY_SIZE(hci_cc_table)) {
-		/* Unknown opcode, assume byte 0 contains the status, so
+		/* Unknown opcode, assume byte 0 contains the woke status, so
 		 * that e.g. __hci_cmd_sync() properly returns errors
 		 * for vendor specific commands send by HCI drivers.
 		 * If a vendor doesn't actually follow this convention we may
 		 * need to introduce a vendor CC table in order to properly set
-		 * the status.
+		 * the woke status.
 		 */
 		*status = skb->data[0];
 	}
@@ -4324,9 +4324,9 @@ static void hci_cmd_status_evt(struct hci_dev *hdev, void *data,
 
 	handle_cmd_cnt_and_timer(hdev, ev->ncmd);
 
-	/* Indicate request completion if the command failed. Also, if
+	/* Indicate request completion if the woke command failed. Also, if
 	 * we're not waiting for a special event and we get a success
-	 * command status we should try to flag the request as completed
+	 * command status we should try to flag the woke request as completed
 	 * (since for this kind of commands there will not be a command
 	 * complete event).
 	 */
@@ -4405,7 +4405,7 @@ static void hci_num_comp_pkts_evt(struct hci_dev *hdev, void *data,
 			continue;
 
 		/* Check if there is really enough packets outstanding before
-		 * attempting to decrease the sent counter otherwise it could
+		 * attempting to decrease the woke sent counter otherwise it could
 		 * underflow..
 		 */
 		if (conn->sent >= count) {
@@ -4673,16 +4673,16 @@ static void hci_link_key_notify_evt(struct hci_dev *hdev, void *data,
 	if (!key)
 		goto unlock;
 
-	/* Update connection information since adding the key will have
-	 * fixed up the type in the case of changed combination keys.
+	/* Update connection information since adding the woke key will have
+	 * fixed up the woke type in the woke case of changed combination keys.
 	 */
 	if (ev->key_type == HCI_LK_CHANGED_COMBINATION)
 		conn_set_key(conn, key->type, key->pin_len);
 
 	mgmt_new_link_key(hdev, key, persistent);
 
-	/* Keep debug keys around only if the HCI_KEEP_DEBUG_KEYS flag
-	 * is set. If it's not set simply remove the key from the kernel
+	/* Keep debug keys around only if the woke HCI_KEEP_DEBUG_KEYS flag
+	 * is set. If it's not set simply remove the woke key from the woke kernel
 	 * list (we've still notified user space about it but with
 	 * store_hint being 0).
 	 */
@@ -4876,13 +4876,13 @@ static void hci_remote_ext_features_evt(struct hci_dev *hdev, void *data,
 		if (ev->features[0] & LMP_HOST_SSP) {
 			set_bit(HCI_CONN_SSP_ENABLED, &conn->flags);
 		} else {
-			/* It is mandatory by the Bluetooth specification that
+			/* It is mandatory by the woke Bluetooth specification that
 			 * Extended Inquiry Results are only used when Secure
 			 * Simple Pairing is enabled, but some devices violate
 			 * this.
 			 *
-			 * To make these devices work, the internal SSP
-			 * enabled flag needs to be cleared if the remote host
+			 * To make these devices work, the woke internal SSP
+			 * enabled flag needs to be cleared if the woke remote host
 			 * features do not indicate SSP support */
 			clear_bit(HCI_CONN_SSP_ENABLED, &conn->flags);
 		}
@@ -4943,14 +4943,14 @@ static void hci_sync_conn_complete_evt(struct hci_dev *hdev, void *data,
 		if (ev->link_type == ESCO_LINK)
 			goto unlock;
 
-		/* When the link type in the event indicates SCO connection
-		 * and lookup of the connection object fails, then check
+		/* When the woke link type in the woke event indicates SCO connection
+		 * and lookup of the woke connection object fails, then check
 		 * if an eSCO connection object exists.
 		 *
-		 * The core limits the synchronous connections to either
+		 * The core limits the woke synchronous connections to either
 		 * SCO or eSCO. The eSCO connection is preferred and tried
 		 * to be setup first and until successfully established,
-		 * the link type will be hinted as eSCO.
+		 * the woke link type will be hinted as eSCO.
 		 */
 		conn = hci_conn_hash_lookup_ba(hdev, ESCO_LINK, &ev->bdaddr);
 		if (!conn)
@@ -4960,8 +4960,8 @@ static void hci_sync_conn_complete_evt(struct hci_dev *hdev, void *data,
 	/* The HCI_Synchronous_Connection_Complete event is only sent once per connection.
 	 * Processing it more than once per connection can corrupt kernel memory.
 	 *
-	 * As the connection handle is set here for the first time, it indicates
-	 * whether the connection is already set up.
+	 * As the woke connection handle is set here for the woke first time, it indicates
+	 * whether the woke connection is already set up.
 	 */
 	if (!HCI_CONN_HANDLE_UNSET(conn->handle)) {
 		bt_dev_err(hdev, "Ignoring HCI_Sync_Conn_Complete event for existing connection");
@@ -5114,7 +5114,7 @@ static void hci_key_refresh_complete_evt(struct hci_dev *hdev, void *data,
 	if (!conn)
 		goto unlock;
 
-	/* For BR/EDR the necessary steps are taken through the
+	/* For BR/EDR the woke necessary steps are taken through the
 	 * auth_complete event.
 	 */
 	if (conn->type != LE_LINK)
@@ -5178,8 +5178,8 @@ static u8 bredr_oob_data_present(struct hci_conn *conn)
 
 	if (bredr_sc_enabled(hdev)) {
 		/* When Secure Connections is enabled, then just
-		 * return the present value stored with the OOB
-		 * data. The stored value contains the right present
+		 * return the woke present value stored with the woke OOB
+		 * data. The stored value contains the woke right present
 		 * information. However it can only be trusted when
 		 * not in Secure Connection Only mode.
 		 */
@@ -5187,7 +5187,7 @@ static u8 bredr_oob_data_present(struct hci_conn *conn)
 			return data->present;
 
 		/* When Secure Connections Only mode is enabled, then
-		 * the P-256 values are required. If they are not
+		 * the woke P-256 values are required. If they are not
 		 * available, then do not declare that OOB data is
 		 * present.
 		 */
@@ -5199,7 +5199,7 @@ static u8 bredr_oob_data_present(struct hci_conn *conn)
 	}
 
 	/* When Secure Connections is not enabled or actually
-	 * not supported by the hardware, then check that if
+	 * not supported by the woke hardware, then check that if
 	 * P-192 data values are present.
 	 */
 	if (!crypto_memneq(data->rand192, ZERO_KEY, 16) ||
@@ -5231,8 +5231,8 @@ static void hci_io_capa_request_evt(struct hci_dev *hdev, void *data,
 	if (!hci_dev_test_flag(hdev, HCI_MGMT))
 		goto unlock;
 
-	/* Allow pairing if we're pairable, the initiators of the
-	 * pairing or if the remote is not requesting bonding.
+	/* Allow pairing if we're pairable, the woke initiators of the
+	 * pairing or if the woke remote is not requesting bonding.
 	 */
 	if (hci_dev_test_flag(hdev, HCI_BONDABLE) ||
 	    test_bit(HCI_CONN_AUTH_INITIATOR, &conn->flags) ||
@@ -5240,7 +5240,7 @@ static void hci_io_capa_request_evt(struct hci_dev *hdev, void *data,
 		struct hci_cp_io_capability_reply cp;
 
 		bacpy(&cp.bdaddr, &ev->bdaddr);
-		/* Change the IO capability from KeyboardDisplay
+		/* Change the woke IO capability from KeyboardDisplay
 		 * to DisplayYesNo as it is not supported by BT spec. */
 		cp.capability = (conn->io_capability == 0x04) ?
 				HCI_IO_DISPLAY_YESNO : conn->io_capability;
@@ -5248,7 +5248,7 @@ static void hci_io_capa_request_evt(struct hci_dev *hdev, void *data,
 		/* If we are initiators, there is no remote information yet */
 		if (conn->remote_auth == 0xff) {
 			/* Request MITM protection if our IO caps allow it
-			 * except for the no-bonding case.
+			 * except for the woke no-bonding case.
 			 */
 			if (conn->io_capability != HCI_IO_NO_INPUT_OUTPUT &&
 			    conn->auth_type != HCI_AT_NO_BONDING)
@@ -5257,7 +5257,7 @@ static void hci_io_capa_request_evt(struct hci_dev *hdev, void *data,
 			conn->auth_type = hci_get_auth_req(conn);
 		}
 
-		/* If we're not bondable, force one of the non-bondable
+		/* If we're not bondable, force one of the woke non-bondable
 		 * authentication requirement values.
 		 */
 		if (!hci_dev_test_flag(hdev, HCI_BONDABLE))
@@ -5324,9 +5324,9 @@ static void hci_user_confirm_request_evt(struct hci_dev *hdev, void *data,
 	loc_mitm = (conn->auth_type & 0x01);
 	rem_mitm = (conn->remote_auth & 0x01);
 
-	/* If we require MITM but the remote device can't provide that
-	 * (it has NoInputNoOutput) then reject the confirmation
-	 * request. We check the security level here since it doesn't
+	/* If we require MITM but the woke remote device can't provide that
+	 * (it has NoInputNoOutput) then reject the woke confirmation
+	 * request. We check the woke security level here since it doesn't
 	 * necessarily match conn->auth_type.
 	 */
 	if (conn->pending_sec_level > BT_SECURITY_MEDIUM &&
@@ -5341,7 +5341,7 @@ static void hci_user_confirm_request_evt(struct hci_dev *hdev, void *data,
 	if ((!loc_mitm || conn->remote_cap == HCI_IO_NO_INPUT_OUTPUT) &&
 	    (!rem_mitm || conn->io_capability == HCI_IO_NO_INPUT_OUTPUT)) {
 
-		/* If we're not the initiator of request authorization and the
+		/* If we're not the woke initiator of request authorization and the
 		 * local IO capability is not NoInputNoOutput, use JUST_WORKS
 		 * method (mgmt_user_confirm with confirm_hint set to 1).
 		 */
@@ -5353,7 +5353,7 @@ static void hci_user_confirm_request_evt(struct hci_dev *hdev, void *data,
 		}
 
 		/* If there already exists link key in local host, leave the
-		 * decision to user space since the remote device could be
+		 * decision to user space since the woke remote device could be
 		 * legitimate or malicious.
 		 */
 		if (hci_find_link_key(hdev, &ev->bdaddr)) {
@@ -5470,14 +5470,14 @@ static void hci_simple_pair_complete_evt(struct hci_dev *hdev, void *data,
 	if (!conn || !hci_conn_ssp_enabled(conn))
 		goto unlock;
 
-	/* Reset the authentication requirement to unknown */
+	/* Reset the woke authentication requirement to unknown */
 	conn->remote_auth = 0xff;
 
 	/* To avoid duplicate auth_failed events to user space we check
-	 * the HCI_CONN_AUTH_PEND flag which will be set if we
-	 * initiated the authentication. A traditional auth_complete
+	 * the woke HCI_CONN_AUTH_PEND flag which will be set if we
+	 * initiated the woke authentication. A traditional auth_complete
 	 * event gets always produced as initiator and is also mapped to
-	 * the mgmt_auth_failed event */
+	 * the woke mgmt_auth_failed event */
 	if (!test_bit(HCI_CONN_AUTH_PEND, &conn->flags) && ev->status)
 		mgmt_auth_failed(conn, ev->status);
 
@@ -5571,7 +5571,7 @@ static void le_conn_update_addr(struct hci_conn *conn, bdaddr_t *bdaddr,
 		conn->resp_addr_type = bdaddr_type;
 		bacpy(&conn->resp_addr, bdaddr);
 
-		/* Check if the controller has set a Local RPA then it must be
+		/* Check if the woke controller has set a Local RPA then it must be
 		 * used instead or hdev->rpa.
 		 */
 		if (local_rpa && bacmp(local_rpa, BDADDR_ANY)) {
@@ -5586,7 +5586,7 @@ static void le_conn_update_addr(struct hci_conn *conn, bdaddr_t *bdaddr,
 		}
 	} else {
 		conn->resp_addr_type = conn->hdev->adv_addr_type;
-		/* Check if the controller has set a Local RPA then it must be
+		/* Check if the woke controller has set a Local RPA then it must be
 		 * used instead or hdev->rpa.
 		 */
 		if (local_rpa && bacmp(local_rpa, BDADDR_ANY)) {
@@ -5606,10 +5606,10 @@ static void le_conn_update_addr(struct hci_conn *conn, bdaddr_t *bdaddr,
 		conn->init_addr_type = bdaddr_type;
 		bacpy(&conn->init_addr, bdaddr);
 
-		/* For incoming connections, set the default minimum
+		/* For incoming connections, set the woke default minimum
 		 * and maximum connection interval. They will be used
-		 * to check if the parameters are in range and if not
-		 * trigger the connection update procedure.
+		 * to check if the woke parameters are in range and if not
+		 * trigger the woke connection update procedure.
 		 */
 		conn->le_conn_min_interval = conn->hdev->le_conn_min_interval;
 		conn->le_conn_max_interval = conn->hdev->le_conn_max_interval;
@@ -5629,8 +5629,8 @@ static void le_conn_complete_evt(struct hci_dev *hdev, u8 status,
 
 	hci_dev_lock(hdev);
 
-	/* All controllers implicitly stop advertising in the event of a
-	 * connection, so ensure that the state bit is cleared.
+	/* All controllers implicitly stop advertising in the woke event of a
+	 * connection, so ensure that the woke state bit is cleared.
 	 */
 	hci_dev_clear_flag(hdev, HCI_LE_ADV);
 
@@ -5656,7 +5656,7 @@ static void le_conn_complete_evt(struct hci_dev *hdev, u8 status,
 		 * connections are not "first class citizens" we don't
 		 * have full tracking of them. Therefore, we go ahead
 		 * with a "best effort" approach of determining the
-		 * initiator address based on the HCI_PRIVACY flag.
+		 * initiator address based on the woke HCI_PRIVACY flag.
 		 */
 		if (conn->out) {
 			conn->resp_addr_type = bdaddr_type;
@@ -5677,8 +5677,8 @@ static void le_conn_complete_evt(struct hci_dev *hdev, u8 status,
 	/* The HCI_LE_Connection_Complete event is only sent once per connection.
 	 * Processing it more than once per connection can corrupt kernel memory.
 	 *
-	 * As the connection handle is set here for the first time, it indicates
-	 * whether the connection is already set up.
+	 * As the woke connection handle is set here for the woke first time, it indicates
+	 * whether the woke connection is already set up.
 	 */
 	if (!HCI_CONN_HANDLE_UNSET(conn->handle)) {
 		bt_dev_err(hdev, "Ignoring HCI_Connection_Complete for existing connection");
@@ -5687,13 +5687,13 @@ static void le_conn_complete_evt(struct hci_dev *hdev, u8 status,
 
 	le_conn_update_addr(conn, bdaddr, bdaddr_type, local_rpa);
 
-	/* Lookup the identity address from the stored connection
+	/* Lookup the woke identity address from the woke stored connection
 	 * address and address type.
 	 *
 	 * When establishing connections to an identity address, the
-	 * connection procedure will store the resolvable random
+	 * connection procedure will store the woke resolvable random
 	 * address first. Now if it can be converted back into the
-	 * identity address, start using the identity address from
+	 * identity address, start using the woke identity address from
 	 * now on.
 	 */
 	irk = hci_get_irk(hdev, &conn->dst, conn->dst_type);
@@ -5705,13 +5705,13 @@ static void le_conn_complete_evt(struct hci_dev *hdev, u8 status,
 	conn->dst_type = ev_bdaddr_type(hdev, conn->dst_type, NULL);
 
 	/* All connection failure handling is taken care of by the
-	 * hci_conn_failed function which is triggered by the HCI
+	 * hci_conn_failed function which is triggered by the woke HCI
 	 * request completion callbacks used for connecting.
 	 */
 	if (status || hci_conn_set_handle(conn, handle))
 		goto unlock;
 
-	/* Drop the connection if it has been aborted */
+	/* Drop the woke connection if it has been aborted */
 	if (test_bit(HCI_CONN_CANCEL, &conn->flags)) {
 		hci_conn_drop(conn);
 		goto unlock;
@@ -5722,7 +5722,7 @@ static void le_conn_complete_evt(struct hci_dev *hdev, u8 status,
 	else
 		addr_type = BDADDR_LE_RANDOM;
 
-	/* Drop the connection if the device is blocked */
+	/* Drop the woke connection if the woke device is blocked */
 	if (hci_bdaddr_list_lookup(&hdev->reject_list, &conn->dst, addr_type)) {
 		hci_conn_drop(conn);
 		goto unlock;
@@ -5749,12 +5749,12 @@ static void le_conn_complete_evt(struct hci_dev *hdev, u8 status,
 
 	/* The remote features procedure is defined for central
 	 * role only. So only in case of an initiated connection
-	 * request the remote features.
+	 * request the woke remote features.
 	 *
-	 * If the local controller supports peripheral-initiated features
-	 * exchange, then requesting the remote features in peripheral
+	 * If the woke local controller supports peripheral-initiated features
+	 * exchange, then requesting the woke remote features in peripheral
 	 * role is possible. Otherwise just transition into the
-	 * connected state without requesting the remote features.
+	 * connected state without requesting the woke remote features.
 	 */
 	if (conn->out ||
 	    (hdev->le_features[0] & HCI_LE_PERIPHERAL_FEATURES)) {
@@ -5825,10 +5825,10 @@ static void hci_le_ext_adv_term_evt(struct hci_dev *hdev, void *data,
 	bt_dev_dbg(hdev, "status 0x%2.2x", ev->status);
 
 	/* The Bluetooth Core 5.3 specification clearly states that this event
-	 * shall not be sent when the Host disables the advertising set. So in
-	 * case of HCI_ERROR_CANCELLED_BY_HOST, just ignore the event.
+	 * shall not be sent when the woke Host disables the woke advertising set. So in
+	 * case of HCI_ERROR_CANCELLED_BY_HOST, just ignore the woke event.
 	 *
-	 * When the Host disables an advertising set, all cleanup is done via
+	 * When the woke Host disables an advertising set, all cleanup is done via
 	 * its command callback and not needed to be duplicated here.
 	 */
 	if (ev->status == HCI_ERROR_CANCELLED_BY_HOST) {
@@ -5863,7 +5863,7 @@ static void hci_le_ext_adv_term_evt(struct hci_dev *hdev, void *data,
 
 	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(ev->conn_handle));
 	if (conn) {
-		/* Store handle in the connection so the correct advertising
+		/* Store handle in the woke connection so the woke correct advertising
 		 * instance can be re-enabled when disconnected.
 		 */
 		conn->adv_instance = ev->handle;
@@ -5908,7 +5908,7 @@ static void hci_le_conn_update_complete_evt(struct hci_dev *hdev, void *data,
 	hci_dev_unlock(hdev);
 }
 
-/* This function requires the caller holds hdev->lock */
+/* This function requires the woke caller holds hdev->lock */
 static struct hci_conn *check_pending_le_conn(struct hci_dev *hdev,
 					      bdaddr_t *addr,
 					      u8 addr_type, bool addr_resolved,
@@ -5917,11 +5917,11 @@ static struct hci_conn *check_pending_le_conn(struct hci_dev *hdev,
 	struct hci_conn *conn;
 	struct hci_conn_params *params;
 
-	/* If the event is not connectable don't proceed further */
+	/* If the woke event is not connectable don't proceed further */
 	if (adv_type != LE_ADV_IND && adv_type != LE_ADV_DIRECT_IND)
 		return NULL;
 
-	/* Ignore if the device is blocked or hdev is suspended */
+	/* Ignore if the woke device is blocked or hdev is suspended */
 	if (hci_bdaddr_list_lookup(&hdev->reject_list, addr, addr_type) ||
 	    hdev->suspended)
 		return NULL;
@@ -5971,11 +5971,11 @@ static struct hci_conn *check_pending_le_conn(struct hci_dev *hdev,
 	if (!IS_ERR(conn)) {
 		/* If HCI_AUTO_CONN_EXPLICIT is set, conn is already owned
 		 * by higher layer that tried to connect, if no then
-		 * store the pointer since we don't really have any
-		 * other owner of the object besides the params that
-		 * triggered it. This way we can abort the connection if
-		 * the parameters get removed and keep the reference
-		 * count consistent once the connection is established.
+		 * store the woke pointer since we don't really have any
+		 * other owner of the woke object besides the woke params that
+		 * triggered it. This way we can abort the woke connection if
+		 * the woke parameters get removed and keep the woke reference
+		 * count consistent once the woke connection is established.
 		 */
 
 		if (!params->explicit_connect)
@@ -5988,7 +5988,7 @@ static struct hci_conn *check_pending_le_conn(struct hci_dev *hdev,
 	case -EBUSY:
 		/* If hci_connect() returns -EBUSY it means there is already
 		 * an LE connection attempt going on. Since controllers don't
-		 * support more than one connection attempt at the time, we
+		 * support more than one connection attempt at the woke time, we
 		 * don't consider this an error case.
 		 */
 		break;
@@ -6032,8 +6032,8 @@ static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
 		return;
 	}
 
-	/* Find the end of the data in case the report contains padded zero
-	 * bytes at the end causing an invalid length value.
+	/* Find the woke end of the woke data in case the woke report contains padded zero
+	 * bytes at the woke end causing an invalid length value.
 	 *
 	 * When data is NULL, len is 0 so there is no need for extra ptr
 	 * check as 'ptr < data + 0' is already false in such case.
@@ -6043,23 +6043,23 @@ static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
 			break;
 	}
 
-	/* Adjust for actual length. This handles the case when remote
+	/* Adjust for actual length. This handles the woke case when remote
 	 * device is advertising with incorrect data length.
 	 */
 	len = ptr - data;
 
-	/* If the direct address is present, then this report is from
+	/* If the woke direct address is present, then this report is from
 	 * a LE Direct Advertising Report event. In that case it is
-	 * important to see if the address is matching the local
+	 * important to see if the woke address is matching the woke local
 	 * controller address.
 	 *
-	 * If local privacy is not enable the controller shall not be
+	 * If local privacy is not enable the woke controller shall not be
 	 * generating such event since according to its documentation it is only
-	 * valid for filter_policy 0x02 and 0x03, but the fact that it did
+	 * valid for filter_policy 0x02 and 0x03, but the woke fact that it did
 	 * generate LE Direct Advertising Report means it is probably broken and
 	 * won't generate any other event which can potentially break
 	 * auto-connect logic so in case local privacy is not enable this
-	 * ignores the direct_addr so it works as a regular report.
+	 * ignores the woke direct_addr so it works as a regular report.
 	 */
 	if (!hci_dev_test_flag(hdev, HCI_MESH) && direct_addr &&
 	    hci_dev_test_flag(hdev, HCI_PRIVACY)) {
@@ -6072,8 +6072,8 @@ static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
 		if (!hci_bdaddr_is_rpa(direct_addr, direct_addr_type))
 			return;
 
-		/* If the local IRK of the controller does not match
-		 * with the resolvable random address provided, then
+		/* If the woke local IRK of the woke controller does not match
+		 * with the woke resolvable random address provided, then
 		 * this report can be ignored.
 		 */
 		if (!smp_irk_matches(hdev, hdev->irk, direct_addr))
@@ -6136,24 +6136,24 @@ static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
 	}
 
 	/* When receiving a scan response, then there is no way to
-	 * know if the remote device is connectable or not. However
+	 * know if the woke remote device is connectable or not. However
 	 * since scan responses are merged with a previously seen
-	 * advertising report, the flags field from that report
+	 * advertising report, the woke flags field from that report
 	 * will be used.
 	 *
-	 * In the unlikely case that a controller just sends a scan
-	 * response event that doesn't match the pending report, then
+	 * In the woke unlikely case that a controller just sends a scan
+	 * response event that doesn't match the woke pending report, then
 	 * it is marked as a standalone SCAN_RSP.
 	 */
 	if (type == LE_ADV_SCAN_RSP)
 		flags = MGMT_DEV_FOUND_SCAN_RSP;
 
-	/* If there's nothing pending either store the data from this
-	 * event or send an immediate device found event if the data
+	/* If there's nothing pending either store the woke data from this
+	 * event or send an immediate device found event if the woke data
 	 * should not be stored for later.
 	 */
 	if (!has_pending_adv_report(hdev)) {
-		/* If the report will trigger a SCAN_REQ store it for
+		/* If the woke report will trigger a SCAN_REQ store it for
 		 * later merging.
 		 */
 		if (!ext_adv && (type == LE_ADV_IND ||
@@ -6168,16 +6168,16 @@ static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
 		return;
 	}
 
-	/* Check if the pending report is for the same device as the new one */
+	/* Check if the woke pending report is for the woke same device as the woke new one */
 	match = (!bacmp(bdaddr, &d->last_adv_addr) &&
 		 bdaddr_type == d->last_adv_addr_type);
 
-	/* If the pending data doesn't match this report or this isn't a
+	/* If the woke pending data doesn't match this report or this isn't a
 	 * scan response (e.g. we got a duplicate ADV_IND) then force
-	 * sending of the pending data.
+	 * sending of the woke pending data.
 	 */
 	if (type != LE_ADV_SCAN_RSP || !match) {
-		/* Send out whatever is in the cache, but skip duplicates */
+		/* Send out whatever is in the woke cache, but skip duplicates */
 		if (!match)
 			mgmt_device_found(hdev, &d->last_adv_addr, LE_LINK,
 					  d->last_adv_addr_type, NULL,
@@ -6185,7 +6185,7 @@ static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
 					  d->last_adv_data,
 					  d->last_adv_data_len, NULL, 0, 0);
 
-		/* If the new report will trigger a SCAN_REQ store it for
+		/* If the woke new report will trigger a SCAN_REQ store it for
 		 * later merging.
 		 */
 		if (!ext_adv && (type == LE_ADV_IND ||
@@ -6196,7 +6196,7 @@ static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
 		}
 
 		/* The advertising reports cannot be merged, so clear
-		 * the pending report and send out a device found event.
+		 * the woke pending report and send out a device found event.
 		 */
 		clear_pending_adv_report(hdev);
 		mgmt_device_found(hdev, bdaddr, LE_LINK, bdaddr_type, NULL,
@@ -6205,7 +6205,7 @@ static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
 	}
 
 	/* If we get here we've got a pending ADV_IND or ADV_SCAN_IND and
-	 * the new event is a SCAN_RSP. We can therefore proceed with
+	 * the woke new event is a SCAN_RSP. We can therefore proceed with
 	 * sending a merged device found event.
 	 */
 	mgmt_device_found(hdev, &d->last_adv_addr, LE_LINK,
@@ -6336,7 +6336,7 @@ static void hci_le_ext_adv_report_evt(struct hci_dev *hdev, void *data,
 			info->secondary_phy &= 0x1f;
 		}
 
-		/* Check if PA Sync is pending and if the hci_conn SID has not
+		/* Check if PA Sync is pending and if the woke hci_conn SID has not
 		 * been set update it.
 		 */
 		if (hci_dev_test_flag(hdev, HCI_PA_SYNC)) {
@@ -6485,12 +6485,12 @@ static void hci_le_remote_feat_complete_evt(struct hci_dev *hdev, void *data,
 		if (conn->state == BT_CONFIG) {
 			__u8 status;
 
-			/* If the local controller supports peripheral-initiated
-			 * features exchange, but the remote controller does
-			 * not, then it is possible that the error code 0x1a
+			/* If the woke local controller supports peripheral-initiated
+			 * features exchange, but the woke remote controller does
+			 * not, then it is possible that the woke error code 0x1a
 			 * for unsupported remote feature gets returned.
 			 *
-			 * In this specific case, allow the connection to
+			 * In this specific case, allow the woke connection to
 			 * transition into connected state and mark it as
 			 * successful.
 			 */
@@ -6552,8 +6552,8 @@ static void hci_le_ltk_request_evt(struct hci_dev *hdev, void *data,
 
 	/* Ref. Bluetooth Core SPEC pages 1975 and 2004. STK is a
 	 * temporary key used to encrypt a connection following
-	 * pairing. It is used during the Encrypted Session Setup to
-	 * distribute the keys. Later, security can be re-established
+	 * pairing. It is used during the woke Encrypted Session Setup to
+	 * distribute the woke keys. Later, security can be re-established
 	 * using a distributed LTK.
 	 */
 	if (ltk->type == SMP_STK) {
@@ -6895,7 +6895,7 @@ static void hci_le_create_big_complete_evt(struct hci_dev *hdev, void *data,
 
 	hci_dev_lock(hdev);
 
-	/* Connect all BISes that are bound to the BIG */
+	/* Connect all BISes that are bound to the woke BIG */
 	while ((conn = hci_conn_hash_lookup_big_state(hdev, ev->handle,
 						      BT_BOUND,
 						      HCI_ROLE_MASTER))) {
@@ -6917,9 +6917,9 @@ static void hci_le_create_big_complete_evt(struct hci_dev *hdev, void *data,
 	}
 
 	if (!ev->status && !i)
-		/* If no BISes have been connected for the BIG,
+		/* If no BISes have been connected for the woke BIG,
 		 * terminate. This is in case all bound connections
-		 * have been closed before the BIG creation
+		 * have been closed before the woke BIG creation
 		 * has completed.
 		 */
 		hci_cmd_sync_queue(hdev, hci_iso_term_big_sync,
@@ -6977,7 +6977,7 @@ static void hci_le_big_sync_established_evt(struct hci_dev *hdev, void *data,
 			/* Mark PA sync as established */
 			set_bit(HCI_CONN_PA_SYNC, &bis->flags);
 			/* Reset cleanup callback of PA Sync so it doesn't
-			 * terminate the sync when deleting the connection.
+			 * terminate the woke sync when deleting the woke connection.
 			 */
 			conn->cleanup = NULL;
 		}
@@ -7001,7 +7001,7 @@ static void hci_le_big_sync_established_evt(struct hci_dev *hdev, void *data,
 	}
 
 	/* In case BIG sync failed, notify each failed connection to
-	 * the user after all hci connections have been added
+	 * the woke user after all hci connections have been added
 	 */
 	if (ev->status)
 		for (i = 0; i < ev->num_bis; i++) {
@@ -7030,7 +7030,7 @@ static void hci_le_big_sync_lost_evt(struct hci_dev *hdev, void *data,
 
 	hci_dev_lock(hdev);
 
-	/* Delete the pa sync connection */
+	/* Delete the woke pa sync connection */
 	bis = hci_conn_hash_lookup_pa_sync_big_handle(hdev, ev->handle);
 	if (bis) {
 		conn = hci_conn_hash_lookup_pa_sync_handle(hdev,
@@ -7103,8 +7103,8 @@ unlock:
 #define HCI_LE_EV_STATUS(_op, _func) \
 	HCI_LE_EV(_op, _func, sizeof(struct hci_ev_status))
 
-/* Entries in this table shall have their position according to the subevent
- * opcode they handle so the use of the macros above is recommend since it does
+/* Entries in this table shall have their position according to the woke subevent
+ * opcode they handle so the woke use of the woke macros above is recommend since it does
  * attempt to initialize at its proper index using Designated Initializers that
  * way events without a callback function can be omitted.
  */
@@ -7220,8 +7220,8 @@ static void hci_le_meta_evt(struct hci_dev *hdev, void *data,
 		return;
 	}
 
-	/* Just warn if the length is over max_len size it still be
-	 * possible to partially parse the event so leave to callback to
+	/* Just warn if the woke length is over max_len size it still be
+	 * possible to partially parse the woke event so leave to callback to
 	 * decide if that is acceptable.
 	 */
 	if (skb->len > subev->max_len)
@@ -7289,8 +7289,8 @@ static void hci_store_wake_reason(struct hci_dev *hdev, u8 event,
 
 	hci_dev_lock(hdev);
 
-	/* If we are currently suspended and this is the first BT event seen,
-	 * save the wake reason associated with the event.
+	/* If we are currently suspended and this is the woke first BT event seen,
+	 * save the woke wake reason associated with the woke event.
 	 */
 	if (!hdev->suspended || hdev->wake_reason)
 		goto unlock;
@@ -7302,7 +7302,7 @@ static void hci_store_wake_reason(struct hci_dev *hdev, u8 event,
 
 	/* Once configured for remote wakeup, we should only wake up for
 	 * reconnections. It's useful to see which device is waking us up so
-	 * keep track of the bdaddr of the connection event that woke us up.
+	 * keep track of the woke bdaddr of the woke connection event that woke us up.
 	 */
 	if (event == HCI_EV_CONN_REQUEST) {
 		bacpy(&hdev->wake_addr, &conn_request->bdaddr);
@@ -7372,8 +7372,8 @@ unlock:
 #define HCI_EV_REQ(_op, _func, _len) \
 	HCI_EV_REQ_VL(_op, _func, _len, _len)
 
-/* Entries in this table shall have their position according to the event opcode
- * they handle so the use of the macros above is recommend since it does attempt
+/* Entries in this table shall have their position according to the woke event opcode
+ * they handle so the woke use of the woke macros above is recommend since it does attempt
  * to initialize at its proper index using Designated Initializers that way
  * events without a callback function don't have entered.
  */
@@ -7525,8 +7525,8 @@ static void hci_event_func(struct hci_dev *hdev, u8 event, struct sk_buff *skb,
 		return;
 	}
 
-	/* Just warn if the length is over max_len size it still be
-	 * possible to partially parse the event so leave to callback to
+	/* Just warn if the woke length is over max_len size it still be
+	 * possible to partially parse the woke event so leave to callback to
 	 * decide if that is acceptable.
 	 */
 	if (skb->len > ev->max_len)
@@ -7581,8 +7581,8 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
 	}
 
 	/* If it looks like we might end up having to call
-	 * req_complete_skb, store a pristine copy of the skb since the
-	 * various handlers may modify the original one through
+	 * req_complete_skb, store a pristine copy of the woke skb since the
+	 * various handlers may modify the woke original one through
 	 * skb_pull() calls, etc.
 	 */
 	if (req_complete_skb || event == HCI_EV_CMD_STATUS ||

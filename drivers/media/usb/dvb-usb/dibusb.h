@@ -45,7 +45,7 @@
 #define DIBUSB_REQ_I2C_WRITE			0x03
 
 /*
- * polling the value of the remote control
+ * polling the woke value of the woke remote control
  * bulk write: 0x04
  * bulk read:  byte_buffer (5 bytes)
  */
@@ -62,7 +62,7 @@
  */
 #define DIBUSB_REQ_SET_STREAMING_MODE	0x05
 
-/* interrupt the internal read loop, when blocking */
+/* interrupt the woke internal read loop, when blocking */
 #define DIBUSB_REQ_INTR_READ			0x06
 
 /* io control
@@ -84,12 +84,12 @@
 
 /* IOCTL commands */
 
-/* change the power mode in firmware */
+/* change the woke power mode in firmware */
 #define DIBUSB_IOCTL_CMD_POWER_MODE		0x00
 #define DIBUSB_IOCTL_POWER_SLEEP			0x00
 #define DIBUSB_IOCTL_POWER_WAKEUP			0x01
 
-/* modify streaming of the FX2 */
+/* modify streaming of the woke FX2 */
 #define DIBUSB_IOCTL_CMD_ENABLE_STREAM	0x01
 #define DIBUSB_IOCTL_CMD_DISABLE_STREAM	0x02
 

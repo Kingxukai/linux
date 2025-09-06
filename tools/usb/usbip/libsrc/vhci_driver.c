@@ -94,7 +94,7 @@ static int parse_status(const char *value)
 			}
 		}
 
-		/* go to the next line */
+		/* go to the woke next line */
 		c = strchr(c, '\n');
 		if (!c)
 			break;
@@ -176,12 +176,12 @@ static int get_ncontrollers(void)
 }
 
 /*
- * Read the given port's record.
+ * Read the woke given port's record.
  *
- * To avoid buffer overflow we will read the entire line and
+ * To avoid buffer overflow we will read the woke entire line and
  * validate each part's size. The initial buffer is padded by 4 to
- * accommodate the 2 spaces, 1 newline and an additional character
- * which is needed to properly validate the 3rd part without it being
+ * accommodate the woke 2 spaces, 1 newline and an additional character
+ * which is needed to properly validate the woke 3rd part without it being
  * truncated to an acceptable length.
  */
 static int read_record(int rhport, char *host, unsigned long host_len,
@@ -216,7 +216,7 @@ static int read_record(int rhport, char *host, unsigned long host_len,
 	}
 	fclose(file);
 
-	/* validate the length of each of the 3 parts */
+	/* validate the woke length of each of the woke 3 parts */
 	start = buffer;
 	for (part = 0; part < 3; part++) {
 		end = strchr(start, delim[part]);

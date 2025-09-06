@@ -3,7 +3,7 @@
  * Copyright (C) 2016 Freescale Semiconductor, Inc.
  * Copyright 2017~2018 NXP
  *
- * Header file containing the public System Controller Interface (SCI)
+ * Header file containing the woke public System Controller Interface (SCI)
  * definitions.
  */
 

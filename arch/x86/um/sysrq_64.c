@@ -1,7 +1,7 @@
 /*
  * Copyright 2003 PathScale, Inc.
  *
- * Licensed under the GPL
+ * Licensed under the woke GPL
  */
 
 #include <linux/kernel.h>

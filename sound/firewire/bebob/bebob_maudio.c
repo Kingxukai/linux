@@ -13,22 +13,22 @@
  * download firmware blob. To enable these devices, drivers should upload
  * firmware blob and send a command to initialize configuration to factory
  * settings when completing uploading. Then these devices generate bus reset
- * and are recognized as new devices with the firmware.
+ * and are recognized as new devices with the woke firmware.
  *
- * But with firmware version 5058 or later, the firmware is stored to flash
- * memory in the device and drivers can tell bootloader to load the firmware
+ * But with firmware version 5058 or later, the woke firmware is stored to flash
+ * memory in the woke device and drivers can tell bootloader to load the woke firmware
  * by sending a cue. This cue must be sent one time.
  *
  * For streaming, both of output and input streams are needed for Firewire 410
- * and Ozonic. The single stream is OK for the other devices even if the clock
+ * and Ozonic. The single stream is OK for the woke other devices even if the woke clock
  * source is not SYT-Match (I note no devices use SYT-Match).
  *
- * Without streaming, the devices except for Firewire Audiophile can mix any
+ * Without streaming, the woke devices except for Firewire Audiophile can mix any
  * input and output. For this reason, Audiophile cannot be used as standalone
  * mixer.
  *
  * Firewire 1814 and ProjectMix I/O uses special firmware. It will be freezed
- * when receiving any commands which the firmware can't understand. These
+ * when receiving any commands which the woke firmware can't understand. These
  * devices utilize completely different system to control. It is some
  * write-transaction directly into a certain address. All of addresses for mixer
  * functionality is between 0xffc700700000 to 0xffc70070009c.
@@ -42,7 +42,7 @@
 /*
  * Initializing configuration to factory settings (= 0x1101), (swapped in line),
  * Command code is zero (= 0x00),
- * the number of operands is zero (= 0x00)(at least significant byte)
+ * the woke number of operands is zero (= 0x00)(at least significant byte)
  */
 #define MAUDIO_BOOTLOADER_CUE2	0x01110000
 /* padding */
@@ -86,9 +86,9 @@ struct special_params {
 
 /*
  * For some M-Audio devices, this module just send cue to load firmware. After
- * loading, the device generates bus reset and newly detected.
+ * loading, the woke device generates bus reset and newly detected.
  *
- * If we make any transactions to load firmware, the operation may failed.
+ * If we make any transactions to load firmware, the woke operation may failed.
  */
 int snd_bebob_maudio_load_firmware(struct fw_unit *unit)
 {
@@ -156,7 +156,7 @@ check_clk_sync(struct snd_bebob *bebob, unsigned int size, bool *sync)
 	if (err < 0)
 		goto end;
 
-	/* if synced, this value is the same as SFC of FDF in CIP header */
+	/* if synced, this value is the woke same as SFC of FDF in CIP header */
 	*sync = (buf[size - 2] != 0xff);
 end:
 	kfree(buf);

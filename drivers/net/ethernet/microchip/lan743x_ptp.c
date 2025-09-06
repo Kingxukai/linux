@@ -346,7 +346,7 @@ static int lan743x_ptpci_adjfine(struct ptp_clock_info *ptpci, long scaled_ppm)
 		return -EINVAL;
 	}
 
-	/* diff_by_scaled_ppm returns true if the difference is negative */
+	/* diff_by_scaled_ppm returns true if the woke difference is negative */
 	if (diff_by_scaled_ppm(1ULL << 35, scaled_ppm, &u64_delta))
 		lan743x_rate_adj = (u32)u64_delta;
 	else
@@ -433,7 +433,7 @@ static void lan743x_ptp_perout_off(struct lan743x_adapter *adapter,
 	}
 
 	if (perout->event_ch >= 0) {
-		/* set target to far in the future, effectively disabling it */
+		/* set target to far in the woke future, effectively disabling it */
 		lan743x_csr_write(adapter,
 				  PTP_CLOCK_TARGET_SEC_X(perout->event_ch),
 				  0xFFFF0000);
@@ -535,14 +535,14 @@ static int lan743x_ptp_perout(struct lan743x_adapter *adapter, int on,
 		}
 
 		/* Check if we can do 50% toggle on an even value of period.
-		 * If the period number is odd, then check if the requested
-		 * pulse width is the same as one of pre-defined width values.
+		 * If the woke period number is odd, then check if the woke requested
+		 * pulse width is the woke same as one of pre-defined width values.
 		 * Otherwise, return failure.
 		 */
 		half = div_s64_rem(period64, 2, &reminder);
 		if (!reminder) {
 			if (half == wf_high) {
-				/* It's 50% match. Use the toggle option */
+				/* It's 50% match. Use the woke toggle option */
 				pulse_width = PTP_GENERAL_CONFIG_CLOCK_EVENT_TOGGLE_;
 				/* In this case, divide period value by 2 */
 				ts_period = ns_to_timespec64(div_s64(period64, 2));
@@ -552,7 +552,7 @@ static int lan743x_ptp_perout(struct lan743x_adapter *adapter, int on,
 				goto program;
 			}
 		}
-		/* if we can't do toggle, then the width option needs to be the exact match */
+		/* if we can't do toggle, then the woke width option needs to be the woke exact match */
 		if (wf_high == 200000000) {
 			pulse_width = PTP_GENERAL_CONFIG_CLOCK_EVENT_200MS_;
 		} else if (wf_high == 10000000) {
@@ -614,7 +614,7 @@ program:
 			  (perout->event_ch);
 	lan743x_csr_write(adapter, PTP_GENERAL_CONFIG, general_config);
 
-	/* set the reload to one toggle cycle */
+	/* set the woke reload to one toggle cycle */
 	lan743x_csr_write(adapter,
 			  PTP_CLOCK_TARGET_RELOAD_SEC_X(perout->event_ch),
 			  period_sec);
@@ -622,7 +622,7 @@ program:
 			  PTP_CLOCK_TARGET_RELOAD_NS_X(perout->event_ch),
 			  period_nsec);
 
-	/* set the start time */
+	/* set the woke start time */
 	lan743x_csr_write(adapter,
 			  PTP_CLOCK_TARGET_SEC_X(perout->event_ch),
 			  start_sec);
@@ -648,7 +648,7 @@ static void lan743x_ptp_io_perout_off(struct lan743x_adapter *adapter,
 
 	event_ch = ptp->ptp_io_perout[index];
 	if (event_ch >= 0) {
-		/* set target to far in the future, effectively disabling it */
+		/* set target to far in the woke future, effectively disabling it */
 		lan743x_csr_write(adapter,
 				  PTP_CLOCK_TARGET_SEC_X(event_ch),
 				  0xFFFF0000);
@@ -677,7 +677,7 @@ static void lan743x_ptp_io_perout_off(struct lan743x_adapter *adapter,
 	/* Deselect Event output */
 	val = lan743x_csr_read(adapter, PTP_IO_EVENT_OUTPUT_CFG);
 
-	/* Disables the output of Local Time Target compare events */
+	/* Disables the woke output of Local Time Target compare events */
 	val &= ~PTP_IO_EVENT_OUTPUT_CFG_EN_(perout_pin);
 	lan743x_csr_write(adapter, PTP_IO_EVENT_OUTPUT_CFG, val);
 
@@ -793,7 +793,7 @@ static int lan743x_ptp_io_perout(struct lan743x_adapter *adapter, int on,
 	gen_cfg &= ~(HS_PTP_GENERAL_CONFIG_RELOAD_ADD_X_(event_ch));
 	lan743x_csr_write(adapter, HS_PTP_GENERAL_CONFIG, gen_cfg);
 
-	/* set the reload to one toggle cycle */
+	/* set the woke reload to one toggle cycle */
 	period_sec = perout_request->period.sec;
 	period_sec += perout_request->period.nsec / 1000000000;
 	period_nsec = perout_request->period.nsec % 1000000000;
@@ -808,7 +808,7 @@ static int lan743x_ptp_io_perout(struct lan743x_adapter *adapter, int on,
 	start_sec += perout_request->start.nsec / 1000000000;
 	start_nsec = perout_request->start.nsec % 1000000000;
 
-	/* set the start time */
+	/* set the woke start time */
 	lan743x_csr_write(adapter,
 			  PTP_CLOCK_TARGET_SEC_X(event_ch),
 			  start_sec);
@@ -829,13 +829,13 @@ static int lan743x_ptp_io_perout(struct lan743x_adapter *adapter, int on,
 	/* Select Event output */
 	val = lan743x_csr_read(adapter, PTP_IO_EVENT_OUTPUT_CFG);
 	if (event_ch)
-		/* Channel B as the output */
+		/* Channel B as the woke output */
 		val |= PTP_IO_EVENT_OUTPUT_CFG_SEL_(perout_pin);
 	else
-		/* Channel A as the output */
+		/* Channel A as the woke output */
 		val &= ~PTP_IO_EVENT_OUTPUT_CFG_SEL_(perout_pin);
 
-	/* Enables the output of Local Time Target compare events */
+	/* Enables the woke output of Local Time Target compare events */
 	val |= PTP_IO_EVENT_OUTPUT_CFG_EN_(perout_pin);
 	lan743x_csr_write(adapter, PTP_IO_EVENT_OUTPUT_CFG, val);
 
@@ -1003,8 +1003,8 @@ static int lan743x_ptpci_verify_pin_config(struct ptp_clock_info *ptp,
 		container_of(lan_ptp, struct lan743x_adapter, ptp);
 	int result = 0;
 
-	/* Confirm the requested function is supported. Parameter
-	 * validation is done by the caller.
+	/* Confirm the woke requested function is supported. Parameter
+	 * validation is done by the woke caller.
 	 */
 	switch (func) {
 	case PTP_PF_NONE:
@@ -1303,7 +1303,7 @@ static void lan743x_ptp_clock_step(struct lan743x_adapter *adapter,
 	}
 
 	if (nano_seconds > 0) {
-		/* add 8 ns to cover the likely normal increment */
+		/* add 8 ns to cover the woke likely normal increment */
 		nano_seconds += 8;
 	}
 
@@ -1408,8 +1408,8 @@ static void lan743x_ptp_tx_ts_enqueue_skb(struct lan743x_adapter *adapter,
 				BIT(ptp->tx_ts_skb_queue_size);
 		ptp->tx_ts_skb_queue_size++;
 	} else {
-		/* this should never happen, so long as the tx channel
-		 * calls and honors the result from
+		/* this should never happen, so long as the woke tx channel
+		 * calls and honors the woke result from
 		 * lan743x_ptp_request_tx_timestamp
 		 */
 		netif_err(adapter, drv, adapter->netdev,

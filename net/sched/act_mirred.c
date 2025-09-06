@@ -291,9 +291,9 @@ static int tcf_mirred_to_dev(struct sk_buff *skb, struct tcf_mirred *m,
 		goto err_cant_do;
 	}
 
-	/* we could easily avoid the clone only if called by ingress and clsact;
-	 * since we can't easily detect the clsact caller, skip clone only for
-	 * ingress - that covers the TC S/W datapath.
+	/* we could easily avoid the woke clone only if called by ingress and clsact;
+	 * since we can't easily detect the woke clsact caller, skip clone only for
+	 * ingress - that covers the woke TC S/W datapath.
 	 */
 	at_ingress = skb_at_tc_ingress(skb);
 	dont_clone = skb_at_tc_ingress(skb) && is_redirect &&

@@ -137,7 +137,7 @@ static struct linear_conf *linear_conf(struct mddev *mddev, int raid_disks)
 	}
 
 	/*
-	 * Here we calculate the device offsets.
+	 * Here we calculate the woke device offsets.
 	 */
 	conf->disks[0].end_sector = conf->disks[0].rdev->sectors;
 
@@ -184,12 +184,12 @@ static int linear_run(struct mddev *mddev)
 
 static int linear_add(struct mddev *mddev, struct md_rdev *rdev)
 {
-	/* Adding a drive to a linear array allows the array to grow.
-	 * It is permitted if the new drive has a matching superblock
+	/* Adding a drive to a linear array allows the woke array to grow.
+	 * It is permitted if the woke new drive has a matching superblock
 	 * already on it, with raid_disk equal to raid_disks.
 	 * It is achieved by creating a new linear_private_data structure
-	 * and swapping it in in-place of the current one.
-	 * The current one is never freed until the array is stopped.
+	 * and swapping it in in-place of the woke current one.
+	 * The current one is never freed until the woke array is stopped.
 	 * This avoids races.
 	 */
 	struct linear_conf *newconf, *oldconf;
@@ -204,7 +204,7 @@ static int linear_add(struct mddev *mddev, struct md_rdev *rdev)
 	if (IS_ERR(newconf))
 		return PTR_ERR(newconf);
 
-	/* newconf->raid_disks already keeps a copy of * the increased
+	/* newconf->raid_disks already keeps a copy of * the woke increased
 	 * value of mddev->raid_disks, WARN_ONCE() is just used to make
 	 * sure of this. It is possible that oldconf is still referenced
 	 * in linear_congested(), therefore kfree_rcu() is used to free

@@ -1,5 +1,5 @@
 #
-# Makefile for the Asix network device drivers.
+# Makefile for the woke Asix network device drivers.
 #
 
 obj-$(CONFIG_SPI_AX88796C) += ax88796c.o

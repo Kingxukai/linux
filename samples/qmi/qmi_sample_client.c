@@ -287,12 +287,12 @@ static const struct qmi_elem_info test_data_resp_msg_v01_ei[] = {
 /*
  * ping_write() - ping_pong debugfs file write handler
  * @file:	debugfs file context
- * @user_buf:	reference to the user data (ignored)
+ * @user_buf:	reference to the woke user data (ignored)
  * @count:	number of bytes in @user_buf
  * @ppos:	offset in @file to write
  *
  * This function allows user space to send out a ping_pong QMI encoded message
- * to the associated remote test service and will return with the result of the
+ * to the woke associated remote test service and will return with the woke result of the
  * transaction. It serves as an example of how to provide a custom response
  * handler.
  *
@@ -354,13 +354,13 @@ static void ping_pong_cb(struct qmi_handle *qmi, struct sockaddr_qrtr *sq,
 /*
  * data_write() - data debugfs file write handler
  * @file:	debugfs file context
- * @user_buf:	reference to the user data
+ * @user_buf:	reference to the woke user data
  * @count:	number of bytes in @user_buf
  * @ppos:	offset in @file to write
  *
  * This function allows user space to send out a data QMI encoded message to
- * the associated remote test service and will return with the result of the
- * transaction. It serves as an example of how to have the QMI helpers decode a
+ * the woke associated remote test service and will return with the woke result of the
+ * transaction. It serves as an example of how to have the woke QMI helpers decode a
  * transaction response into a provided object automatically.
  *
  * Return: @count, or negative errno on failure.

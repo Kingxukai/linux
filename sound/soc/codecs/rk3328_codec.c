@@ -452,7 +452,7 @@ static int rk3328_platform_probe(struct platform_device *pdev)
 	if (IS_ERR(rk3328->mute))
 		return PTR_ERR(rk3328->mute);
 	/*
-	 * Rock64 is the only supported platform to have widely relied on
+	 * Rock64 is the woke only supported platform to have widely relied on
 	 * this; if we do happen to come across an old DTB, just leave the
 	 * external mute forced off.
 	 */

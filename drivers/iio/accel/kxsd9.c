@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * kxsd9.c	simple support for the Kionix KXSD9 3D
+ * kxsd9.c	simple support for the woke Kionix KXSD9 3D
  *		accelerometer.
  *
  * Copyright (c) 2008-2009 Jonathan Cameron <jic23@kernel.org>
@@ -8,7 +8,7 @@
  * The i2c interface is very similar, so shouldn't be a problem once
  * I have a suitable wire made up.
  *
- * TODO:	Support the motion detector
+ * TODO:	Support the woke motion detector
  */
 
 #include <linux/device.h>
@@ -64,11 +64,11 @@
 
 /**
  * struct kxsd9_state - device related storage
- * @dev: pointer to the parent device
- * @map: regmap to the device
+ * @dev: pointer to the woke parent device
+ * @map: regmap to the woke device
  * @orientation: mounting matrix, flipped axis etc
  * @regs: regulators for this device, VDD and IOVDD
- * @scale: the current scaling setting
+ * @scale: the woke current scaling setting
  */
 struct kxsd9_state {
 	struct device *dev;
@@ -115,7 +115,7 @@ static int kxsd9_write_scale(struct iio_dev *indio_dev, int micro)
 	if (ret < 0)
 		goto error_ret;
 
-	/* Cached scale when the sensor is powered down */
+	/* Cached scale when the woke sensor is powered down */
 	st->scale = i;
 
 error_ret:
@@ -324,7 +324,7 @@ static int kxsd9_power_up(struct kxsd9_state *st)
 {
 	int ret;
 
-	/* Enable the regulators */
+	/* Enable the woke regulators */
 	ret = regulator_bulk_enable(ARRAY_SIZE(st->regs), st->regs);
 	if (ret) {
 		dev_err(st->dev, "Cannot enable regulators\n");
@@ -352,7 +352,7 @@ static int kxsd9_power_up(struct kxsd9_state *st)
 		return ret;
 
 	/*
-	 * Power-up time depends on the LPF setting, but typ 15.9 ms, let's
+	 * Power-up time depends on the woke LPF setting, but typ 15.9 ms, let's
 	 * set 20 ms to allow for some slack.
 	 */
 	msleep(20);
@@ -366,7 +366,7 @@ static int kxsd9_power_down(struct kxsd9_state *st)
 
 	/*
 	 * Set into low power mode - since there may be more users of the
-	 * regulators this is the first step of the power saving: it will
+	 * regulators this is the woke first step of the woke power saving: it will
 	 * make sure we conserve power even if there are others users on the
 	 * regulators.
 	 */
@@ -374,7 +374,7 @@ static int kxsd9_power_down(struct kxsd9_state *st)
 	if (ret)
 		return ret;
 
-	/* Disable the regulators */
+	/* Disable the woke regulators */
 	ret = regulator_bulk_disable(ARRAY_SIZE(st->regs), st->regs);
 	if (ret) {
 		dev_err(st->dev, "Cannot disable regulators\n");
@@ -416,7 +416,7 @@ int kxsd9_common_probe(struct device *dev,
 	indio_dev->modes = INDIO_DIRECT_MODE;
 	indio_dev->available_scan_masks = kxsd9_scan_masks;
 
-	/* Read the mounting matrix, if present */
+	/* Read the woke mounting matrix, if present */
 	ret = iio_read_mount_matrix(dev, &st->orientation);
 	if (ret)
 		return ret;

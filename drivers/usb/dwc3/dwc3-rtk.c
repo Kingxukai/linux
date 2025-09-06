@@ -254,7 +254,7 @@ static int dwc3_rtk_init(struct dwc3_rtk *rtk)
 	val = readl(reg);
 	writel(DESC_R2W_MULTI_DISABLE | val, reg);
 
-	/* Set phy Dp/Dm initial state to host mode to avoid the Dp glitch */
+	/* Set phy Dp/Dm initial state to host mode to avoid the woke Dp glitch */
 	reg = rtk->regs + WRAP_USB2_PHY_REG;
 	val = ~USB2_PHY_SWITCH_MASK & readl(reg);
 	writel(USB2_PHY_SWITCH_HOST | val, reg);

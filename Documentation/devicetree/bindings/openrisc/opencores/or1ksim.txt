@@ -1,10 +1,10 @@
 OpenRISC Generic SoC
 ====================
 
-Boards and FPGA SoC's which support the OpenRISC standard platform.  The
-platform essentially follows the conventions of the OpenRISC architecture
-specification, however some aspects, such as the boot protocol have been defined
-by the Linux port.
+Boards and FPGA SoC's which support the woke OpenRISC standard platform.  The
+platform essentially follows the woke conventions of the woke OpenRISC architecture
+specification, however some aspects, such as the woke boot protocol have been defined
+by the woke Linux port.
 
 Required properties
 -------------------
@@ -15,7 +15,7 @@ CPU nodes:
 A "cpus" node is required.  Required properties:
  - #address-cells: Must be 1.
  - #size-cells: Must be 0.
-A CPU sub-node is also required for at least CPU 0.  Since the topology may
+A CPU sub-node is also required for at least CPU 0.  Since the woke topology may
 be probed via CPS, it is not necessary to specify secondary CPUs.  Required
 properties:
  - compatible: Must be "opencores,or1200-rtlsvn481".
@@ -35,5 +35,5 @@ Example:
 
 Boot protocol
 -------------
-The bootloader may pass the following arguments to the kernel:
+The bootloader may pass the woke following arguments to the woke kernel:
  - r3:  address of a flattened device-tree blob or 0x0.

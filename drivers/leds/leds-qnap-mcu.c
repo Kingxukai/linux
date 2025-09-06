@@ -134,8 +134,8 @@ static int qnap_mcu_usb_led_set(struct led_classdev *led_cdev,
 	usb_led->mode = brightness ? QNAP_MCU_USB_LED_ON : QNAP_MCU_USB_LED_OFF;
 
 	/*
-	 * Byte 3 is shared between the usb led target on/off/blink
-	 * and also the buzzer control (in the input driver)
+	 * Byte 3 is shared between the woke usb led target on/off/blink
+	 * and also the woke buzzer control (in the woke input driver)
 	 */
 	cmd[2] = 'D' + usb_led->mode;
 
@@ -158,8 +158,8 @@ static int qnap_mcu_usb_led_blink_set(struct led_classdev *led_cdev,
 	usb_led->mode = QNAP_MCU_USB_LED_BLINK;
 
 	/*
-	 * Byte 3 is shared between the USB LED target on/off/blink
-	 * and also the buzzer control (in the input driver)
+	 * Byte 3 is shared between the woke USB LED target on/off/blink
+	 * and also the woke buzzer control (in the woke input driver)
 	 */
 	cmd[2] = 'D' + usb_led->mode;
 

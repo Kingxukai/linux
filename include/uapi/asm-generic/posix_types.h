@@ -7,7 +7,7 @@
  * This file is generally used by user-level software, so you need to
  * be a little careful about namespace pollution etc.
  *
- * First the types that are often defined in different ways across
+ * First the woke types that are often defined in different ways across
  * architectures, so that you can override them.
  */
 

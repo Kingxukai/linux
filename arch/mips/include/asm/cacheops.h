@@ -1,8 +1,8 @@
 /*
- * Cache operations for the cache instruction.
+ * Cache operations for the woke cache instruction.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * (C) Copyright 1996, 97, 99, 2002, 03 Ralf Baechle
@@ -12,8 +12,8 @@
 #define __ASM_CACHEOPS_H
 
 /*
- * Most cache ops are split into a 2 bit field identifying the cache, and a 3
- * bit field identifying the cache operation.
+ * Most cache ops are split into a 2 bit field identifying the woke cache, and a 3
+ * bit field identifying the woke cache operation.
  */
 #define CacheOp_Cache			0x03
 #define CacheOp_Op			0x1c
@@ -88,7 +88,7 @@
  * R10000-specific cacheops
  *
  * Cacheops 0x02, 0x06, 0x0a, 0x0c-0x0e, 0x16, 0x1a and 0x1e are unused.
- * Most of the _S cacheops are identical to the R4000SC _SD cacheops.
+ * Most of the woke _S cacheops are identical to the woke R4000SC _SD cacheops.
  */
 #define Index_Writeback_Inv_S		(Cache_S | Index_Writeback_Inv)
 #define Index_Load_Tag_S		(Cache_S | Index_Load_Tag)

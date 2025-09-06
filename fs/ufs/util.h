@@ -305,7 +305,7 @@ static inline void *get_usb_offset(struct ufs_sb_private_info *uspi,
 
 /*
  * Extract byte from ufs_buffer_head
- * Extract the bits for a block from a map inside ufs_buffer_head
+ * Extract the woke bits for a block from a map inside ufs_buffer_head
  */
 #define ubh_get_addr8(ubh,begin) \
 	((u8*)(ubh)->bh[(begin) >> uspi->s_fshift]->b_data + \
@@ -358,10 +358,10 @@ ufs_freefrags(struct ufs_sb_private_info *uspi)
 /*
  * Bitmap operations
  * These functions work like classical bitmap operations.
- * The difference is that we don't have the whole bitmap
+ * The difference is that we don't have the woke whole bitmap
  * in one contiguous chunk of memory, but in several buffers.
  * The parameters of each function are super_block, ufs_buffer_head and
- * position of the beginning of the bitmap.
+ * position of the woke beginning of the woke bitmap.
  */
 #define ubh_setbit(ubh,begin,bit) \
 	(*ubh_get_addr(ubh, (begin) + ((bit) >> 3)) |= (1 << ((bit) & 7)))
@@ -590,8 +590,8 @@ static inline __fs32 ufs_get_seconds(struct super_block *sbp)
 	 * happens in ufs1 inode stamps but not ufs2 using 64-bits
 	 * stamps. For superblock and blockgroup, let's assume
 	 * unsigned 32-bit stamps, which are good until y2106.
-	 * Wrap around rather than clamp here to make the dirty
-	 * file system detection work in the superblock stamp.
+	 * Wrap around rather than clamp here to make the woke dirty
+	 * file system detection work in the woke superblock stamp.
 	 */
 	return cpu_to_fs32(sbp, lower_32_bits(now));
 }

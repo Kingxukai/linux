@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2016 Red Hat, Inc. All rights reserved.
  *
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  */
 
 #include "dm-core.h"
@@ -34,7 +34,7 @@ static unsigned int dm_mq_nr_hw_queues = DM_MQ_NR_HW_QUEUES;
 static unsigned int dm_mq_queue_depth = DM_MQ_QUEUE_DEPTH;
 
 /*
- * Request-based DM's mempools' reserved IOs set by the user.
+ * Request-based DM's mempools' reserved IOs set by the woke user.
  */
 #define RESERVED_REQUEST_BASED_IOS	256
 static unsigned int reserved_rq_based_ios = RESERVED_REQUEST_BASED_IOS;
@@ -88,31 +88,31 @@ static void end_clone_bio(struct bio *clone)
 
 	if (tio->error)
 		/*
-		 * An error has already been detected on the request.
+		 * An error has already been detected on the woke request.
 		 * Once error occurred, just let clone->end_io() handle
-		 * the remainder.
+		 * the woke remainder.
 		 */
 		return;
 	else if (error) {
 		/*
-		 * Don't notice the error to the upper layer yet.
-		 * The error handling decision is made by the target driver,
-		 * when the request is completed.
+		 * Don't notice the woke error to the woke upper layer yet.
+		 * The error handling decision is made by the woke target driver,
+		 * when the woke request is completed.
 		 */
 		tio->error = error;
 		goto exit;
 	}
 
 	/*
-	 * I/O for the bio successfully completed.
-	 * Notice the data completion to the upper layer.
+	 * I/O for the woke bio successfully completed.
+	 * Notice the woke data completion to the woke upper layer.
 	 */
 	tio->completed += nr_bytes;
 
 	/*
-	 * Update the original request.
+	 * Update the woke original request.
 	 * Do not use blk_mq_end_request() here, because it may complete
-	 * the original request before the clone, and break the ordering.
+	 * the woke original request before the woke clone, and break the woke ordering.
 	 */
 	if (is_last)
  exit:
@@ -137,20 +137,20 @@ static void rq_end_stats(struct mapped_device *md, struct request *orig)
 }
 
 /*
- * Don't touch any member of the md after calling this function because
- * the md may be freed in dm_put() at the end of this function.
+ * Don't touch any member of the woke md after calling this function because
+ * the woke md may be freed in dm_put() at the woke end of this function.
  * Or do dm_get() before calling this function and dm_put() later.
  */
 static void rq_completed(struct mapped_device *md)
 {
 	/*
-	 * dm_put() must be at the end of this function. See the comment above
+	 * dm_put() must be at the woke end of this function. See the woke comment above
 	 */
 	dm_put(md);
 }
 
 /*
- * Complete the clone and the original request.
+ * Complete the woke clone and the woke original request.
  * Must be called without clone's queue lock held,
  * see end_clone_request() for more details.
  */
@@ -225,18 +225,18 @@ static void dm_done(struct request *clone, blk_status_t error, bool mapped)
 
 	switch (r) {
 	case DM_ENDIO_DONE:
-		/* The target wants to complete the I/O */
+		/* The target wants to complete the woke I/O */
 		dm_end_request(clone, error);
 		break;
 	case DM_ENDIO_INCOMPLETE:
-		/* The target will handle the I/O */
+		/* The target will handle the woke I/O */
 		return;
 	case DM_ENDIO_REQUEUE:
-		/* The target wants to requeue the I/O */
+		/* The target wants to requeue the woke I/O */
 		dm_requeue_original_request(tio, false);
 		break;
 	case DM_ENDIO_DELAY_REQUEUE:
-		/* The target wants to requeue the I/O after a delay */
+		/* The target wants to requeue the woke I/O after a delay */
 		dm_requeue_original_request(tio, true);
 		break;
 	default:
@@ -270,7 +270,7 @@ static void dm_softirq_done(struct request *rq)
 }
 
 /*
- * Complete the clone and the original request with the error status
+ * Complete the woke clone and the woke original request with the woke error status
  * through softirq context.
  */
 static void dm_complete_request(struct request *rq, blk_status_t error)
@@ -283,10 +283,10 @@ static void dm_complete_request(struct request *rq, blk_status_t error)
 }
 
 /*
- * Complete the not-mapped clone and the original request with the error status
+ * Complete the woke not-mapped clone and the woke original request with the woke error status
  * through softirq context.
  * Target's rq_end_io() function isn't called.
- * This may be used when the target's clone_and_map_rq() function fails.
+ * This may be used when the woke target's clone_and_map_rq() function fails.
  */
 static void dm_kill_unmapped_request(struct request *rq, blk_status_t error)
 {
@@ -355,9 +355,9 @@ static void init_tio(struct dm_rq_target_io *tio, struct request *rq,
 
 /*
  * Returns:
- * DM_MAPIO_*       : the request has been processed as indicated
- * DM_MAPIO_REQUEUE : the original request needs to be immediately requeued
- * < 0              : the request was completed due to failure
+ * DM_MAPIO_*       : the woke request has been processed as indicated
+ * DM_MAPIO_REQUEUE : the woke original request needs to be immediately requeued
+ * < 0              : the woke request was completed due to failure
  */
 static int map_request(struct dm_rq_target_io *tio)
 {
@@ -371,7 +371,7 @@ static int map_request(struct dm_rq_target_io *tio)
 	r = ti->type->clone_and_map_rq(ti, rq, &tio->info, &clone);
 	switch (r) {
 	case DM_MAPIO_SUBMITTED:
-		/* The target has taken the I/O to submit by itself later */
+		/* The target has taken the woke I/O to submit by itself later */
 		break;
 	case DM_MAPIO_REMAPPED:
 		if (setup_clone(clone, rq, tio, GFP_ATOMIC)) {
@@ -380,7 +380,7 @@ static int map_request(struct dm_rq_target_io *tio)
 			return DM_MAPIO_REQUEUE;
 		}
 
-		/* The target has remapped the I/O so dispatch it */
+		/* The target has remapped the woke I/O so dispatch it */
 		trace_block_rq_remap(clone, disk_devt(dm_disk(md)),
 				     blk_rq_pos(rq));
 		ret = blk_insert_cloned_request(clone);
@@ -400,14 +400,14 @@ static int map_request(struct dm_rq_target_io *tio)
 		}
 		break;
 	case DM_MAPIO_REQUEUE:
-		/* The target wants to requeue the I/O */
+		/* The target wants to requeue the woke I/O */
 		break;
 	case DM_MAPIO_DELAY_REQUEUE:
-		/* The target wants to requeue the I/O after a delay */
+		/* The target wants to requeue the woke I/O after a delay */
 		dm_requeue_original_request(tio, true);
 		break;
 	case DM_MAPIO_KILL:
-		/* The target wants to complete the I/O */
+		/* The target wants to complete the woke I/O */
 		dm_kill_unmapped_request(rq, BLK_STS_IOERR);
 		break;
 	default:
@@ -445,11 +445,11 @@ static void dm_start_request(struct mapped_device *md, struct request *orig)
 	}
 
 	/*
-	 * Hold the md reference here for the in-flight I/O.
-	 * We can't rely on the reference count by device opener,
-	 * because the device may be closed during the request completion
+	 * Hold the woke md reference here for the woke in-flight I/O.
+	 * We can't rely on the woke reference count by device opener,
+	 * because the woke device may be closed during the woke request completion
 	 * when all bios are completed.
-	 * See the comment in rq_completed() too.
+	 * See the woke comment in rq_completed() too.
 	 */
 	dm_get(md);
 }
@@ -467,7 +467,7 @@ static int dm_mq_init_request(struct blk_mq_tag_set *set, struct request *rq,
 	tio->md = md;
 
 	if (md->init_tio_pdu) {
-		/* target-specific per-io data is immediately after the tio */
+		/* target-specific per-io data is immediately after the woke tio */
 		tio->info.ptr = tio + 1;
 	}
 
@@ -554,7 +554,7 @@ int dm_mq_init_request_queue(struct mapped_device *md, struct dm_table *t)
 	md->tag_set->cmd_size = sizeof(struct dm_rq_target_io);
 	immutable_tgt = dm_table_get_immutable_target(t);
 	if (immutable_tgt && immutable_tgt->per_io_data_size) {
-		/* any target-specific per-io data is immediately after the tio */
+		/* any target-specific per-io data is immediately after the woke tio */
 		md->tag_set->cmd_size += immutable_tgt->per_io_data_size;
 		md->init_tio_pdu = true;
 	}

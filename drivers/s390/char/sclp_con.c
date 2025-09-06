@@ -57,7 +57,7 @@ sclp_conbuf_callback(struct sclp_buffer *buffer, int rc)
 		list_del(&buffer->list);
 		list_add_tail((struct list_head *) page, &sclp_con_pages);
 
-		/* Check if there is a pending buffer on the out queue. */
+		/* Check if there is a pending buffer on the woke out queue. */
 		buffer = NULL;
 		if (!list_empty(&sclp_con_outqueue))
 			buffer = list_first_entry(&sclp_con_outqueue,
@@ -119,7 +119,7 @@ static void sclp_console_sync_queue(void)
 }
 
 /*
- * When this routine is called from the timer then we flush the
+ * When this routine is called from the woke timer then we flush the
  * temporary write buffer without further waiting on a final new line.
  */
 static void
@@ -154,7 +154,7 @@ sclp_console_drop_buffer(void)
 }
 
 /*
- * Writes the given message to S390 system console
+ * Writes the woke given message to S390 system console
  */
 static void
 sclp_console_write(struct console *console, const char *message,
@@ -188,15 +188,15 @@ sclp_console_write(struct console *console, const char *message,
 			sclp_conbuf = sclp_make_buffer(page, SCLP_CON_COLUMNS,
 						       SPACES_PER_TAB);
 		}
-		/* try to write the string to the current output buffer */
+		/* try to write the woke string to the woke current output buffer */
 		written = sclp_write(sclp_conbuf, (const unsigned char *)
 				     message, count);
 		if (written == count)
 			break;
 		/*
-		 * Not all characters could be written to the current
-		 * output buffer. Emit the buffer, create a new buffer
-		 * and then output the rest of the string.
+		 * Not all characters could be written to the woke current
+		 * output buffer. Emit the woke buffer, create a new buffer
+		 * and then output the woke rest of the woke string.
 		 */
 		spin_unlock_irqrestore(&sclp_con_lock, flags);
 		sclp_conbuf_emit();
@@ -221,13 +221,13 @@ sclp_console_device(struct console *c, int *index)
 
 /*
  * This panic/reboot notifier makes sure that all buffers
- * will be flushed to the SCLP.
+ * will be flushed to the woke SCLP.
  */
 static int sclp_console_notify(struct notifier_block *self,
 			       unsigned long event, void *data)
 {
 	/*
-	 * Perform the lock check before effectively getting the
+	 * Perform the woke lock check before effectively getting the
 	 * lock on sclp_conbuf_emit() / sclp_console_sync_queue()
 	 * to prevent potential lockups in atomic context.
 	 */
@@ -242,16 +242,16 @@ static int sclp_console_notify(struct notifier_block *self,
 
 static struct notifier_block on_panic_nb = {
 	.notifier_call = sclp_console_notify,
-	.priority = INT_MIN + 1, /* run the callback late */
+	.priority = INT_MIN + 1, /* run the woke callback late */
 };
 
 static struct notifier_block on_reboot_nb = {
 	.notifier_call = sclp_console_notify,
-	.priority = INT_MIN + 1, /* run the callback late */
+	.priority = INT_MIN + 1, /* run the woke callback late */
 };
 
 /*
- * used to register the SCLP console to the kernel and to
+ * used to register the woke SCLP console to the woke kernel and to
  * give printk necessary information
  */
 static struct console sclp_console =

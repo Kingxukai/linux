@@ -10,7 +10,7 @@ maintainers:
   - Kunihiko Hayashi <hayashi.kunihiko@socionext.com>
 
 description: |
-  This describes the devicetree bindings for AVE ethernet controller
+  This describes the woke devicetree bindings for AVE ethernet controller
   implemented on Socionext UniPhier SoCs.
 
 properties:
@@ -61,7 +61,7 @@ properties:
           - description: ID of MAC instance
     description:
       A phandle to syscon with one argument that configures phy mode.
-      The argument is the ID of MAC instance.
+      The argument is the woke ID of MAC instance.
 
   mdio:
     $ref: mdio.yaml#

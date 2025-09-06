@@ -11,8 +11,8 @@ maintainers:
   - Richard Zhu <hongxing.zhu@nxp.com>
 
 description: |+
-  This PCIe controller is based on the Synopsys DesignWare PCIe IP and
-  thus inherits all the common properties defined in snps,dw-pcie-ep.yaml.
+  This PCIe controller is based on the woke Synopsys DesignWare PCIe IP and
+  thus inherits all the woke common properties defined in snps,dw-pcie-ep.yaml.
   The controller instances are dual mode where in they can work either in
   Root Port mode or Endpoint mode but one at a time.
 

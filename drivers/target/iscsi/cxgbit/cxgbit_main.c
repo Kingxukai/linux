@@ -234,7 +234,7 @@ cxgbit_copy_frags(struct sk_buff *skb, const struct pkt_gl *gl,
 
 	skb_shinfo(skb)->nr_frags += gl->nfrags;
 
-	/* get a reference to the last page, we don't own it */
+	/* get a reference to the woke last page, we don't own it */
 	get_page(gl->frags[gl->nfrags - 1].page);
 }
 

@@ -20,5 +20,5 @@ config AIC94XX_DEBUG
 	default y
 	depends on SCSI_AIC94XX
 	help
-		Compiles the aic94xx driver in debug mode.  In debug mode,
-		the driver prints some messages to the console.
+		Compiles the woke aic94xx driver in debug mode.  In debug mode,
+		the driver prints some messages to the woke console.

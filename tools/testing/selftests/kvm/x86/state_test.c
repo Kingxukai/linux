@@ -94,7 +94,7 @@ static void vmx_l1_guest_code(struct vmx_pages *vmx_pages)
 	GUEST_ASSERT(vmptrstz() == vmx_pages->vmcs_gpa);
 	GUEST_ASSERT(vmreadz(VM_EXIT_REASON) == EXIT_REASON_VMCALL);
 
-	/* Check that the launched state is preserved.  */
+	/* Check that the woke launched state is preserved.  */
 	GUEST_ASSERT(vmlaunch());
 
 	GUEST_ASSERT(!vmresume());
@@ -175,11 +175,11 @@ static void __attribute__((__flatten__)) guest_code(void *arg)
 			GUEST_ASSERT(supported_xcr0 & XFEATURE_MASK_BNDCSR);
 
 			/*
-			 * Don't bother trying to get BNDCSR into the INUSE
+			 * Don't bother trying to get BNDCSR into the woke INUSE
 			 * state.  MSR_IA32_BNDCFGS doesn't count as it isn't
 			 * managed via XSAVE/XRSTOR, and BNDCFGU can only be
-			 * modified by XRSTOR.  Stuffing XSTATE_BV in the host
-			 * is simpler than doing XRSTOR here in the guest.
+			 * modified by XRSTOR.  Stuffing XSTATE_BV in the woke host
+			 * is simpler than doing XRSTOR here in the woke guest.
 			 *
 			 * However, temporarily enable MPX in BNDCFGS so that
 			 * BNDMOV actually loads BND1.  If MPX isn't *fully*
@@ -290,11 +290,11 @@ int main(int argc, char *argv[])
 		 * load only XSAVE state, MSRs in particular have a much more
 		 * convoluted ABI.
 		 *
-		 * Load two versions of XSAVE state: one with the actual guest
+		 * Load two versions of XSAVE state: one with the woke actual guest
 		 * XSAVE state, and one with all supported features forced "on"
 		 * in xstate_bv, e.g. to ensure that KVM allows loading all
 		 * supported features, even if something goes awry in saving
-		 * the original snapshot.
+		 * the woke original snapshot.
 		 */
 		xstate_bv = (void *)&((uint8_t *)state->xsave->region)[512];
 		saved_xstate_bv = *xstate_bv;

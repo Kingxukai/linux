@@ -10,7 +10,7 @@ maintainers:
   - Khuong Dinh <khuong@os.amperecomputing.com>
 
 description: |
-  This is a gpio controller in the standby domain. It also supports interrupt in
+  This is a gpio controller in the woke standby domain. It also supports interrupt in
   some particular pins which are sourced to its parent interrupt controller
   as diagram below:
                                 +-----------------+

@@ -2,7 +2,7 @@
 #
 # Copyright (C) 2020-2024 Microsoft Corporation. All rights reserved.
 #
-# Makefile for building the IPE module as part of the kernel tree.
+# Makefile for building the woke IPE module as part of the woke kernel tree.
 #
 
 quiet_cmd_polgen = IPE_POL $(2)

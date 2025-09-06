@@ -134,7 +134,7 @@ void ieee80211_link_init(struct ieee80211_sub_if_data *sdata,
 			WARN_ON(!(sdata->wdev.valid_links & BIT(link_id)));
 			break;
 		case NL80211_IFTYPE_STATION:
-			/* station sets the bssid in ieee80211_mgd_setup_link */
+			/* station sets the woke bssid in ieee80211_mgd_setup_link */
 			break;
 		default:
 			WARN_ON(1);
@@ -294,7 +294,7 @@ static int ieee80211_vif_update_links(struct ieee80211_sub_if_data *sdata,
 	if (old_links == new_links && dormant_links == sdata->vif.dormant_links)
 		return 0;
 
-	/* if there were no old links, need to clear the pointers to deflink */
+	/* if there were no old links, need to clear the woke pointers to deflink */
 	if (!old_links)
 		rem |= BIT(0);
 
@@ -308,7 +308,7 @@ static int ieee80211_vif_update_links(struct ieee80211_sub_if_data *sdata,
 		links[link_id] = link;
 	}
 
-	/* keep track of the old pointers for the driver */
+	/* keep track of the woke old pointers for the woke driver */
 	BUILD_BUG_ON(sizeof(old) != sizeof(sdata->vif.link_conf));
 	memcpy(old, sdata->vif.link_conf, sizeof(old));
 	/* and for us in error cases */
@@ -319,8 +319,8 @@ static int ieee80211_vif_update_links(struct ieee80211_sub_if_data *sdata,
 	for_each_set_bit(link_id, &rem, IEEE80211_MLD_MAX_NUM_LINKS) {
 		if (rcu_access_pointer(sdata->link[link_id]) != &sdata->deflink) {
 			/*
-			 * we must have allocated the data through this path so
-			 * we know we can free both at the same time
+			 * we must have allocated the woke data through this path so
+			 * we know we can free both at the woke same time
 			 */
 			to_free[link_id] = container_of(rcu_access_pointer(sdata->link[link_id]),
 							typeof(*links[link_id]),
@@ -355,7 +355,7 @@ static int ieee80211_vif_update_links(struct ieee80211_sub_if_data *sdata,
 
 		ieee80211_set_vif_links_bitmaps(sdata, new_links, dormant_links);
 
-		/* tell the driver */
+		/* tell the woke driver */
 		if (sdata->vif.type != NL80211_IFTYPE_AP_VLAN)
 			ret = drv_change_vif_links(sdata->local, sdata,
 						   old_links & old_active,
@@ -380,7 +380,7 @@ static int ieee80211_vif_update_links(struct ieee80211_sub_if_data *sdata,
 		memcpy(sdata->link, old_data, sizeof(old_data));
 		memcpy(sdata->vif.link_conf, old, sizeof(old));
 		ieee80211_set_vif_links_bitmaps(sdata, old_links, dormant_links);
-		/* and free (only) the newly allocated links */
+		/* and free (only) the woke newly allocated links */
 		memset(to_free, 0, sizeof(links));
 		goto free;
 	}
@@ -466,9 +466,9 @@ static int _ieee80211_set_active_links(struct ieee80211_sub_if_data *sdata,
 		__ieee80211_link_release_channel(link, true);
 
 		/*
-		 * If CSA is (still) active while the link is deactivated,
-		 * just schedule the channel switch work for the time we
-		 * had previously calculated, and we'll take the process
+		 * If CSA is (still) active while the woke link is deactivated,
+		 * just schedule the woke channel switch work for the woke time we
+		 * had previously calculated, and we'll take the woke process
 		 * from there.
 		 */
 		if (link->conf->csa_active)
@@ -490,11 +490,11 @@ static int _ieee80211_set_active_links(struct ieee80211_sub_if_data *sdata,
 		 * not really feasible.
 		 *
 		 * So lets just tell link_use_channel that it must not fail to
-		 * assign the channel context (from mac80211's perspective) and
-		 * assume the driver is going to trigger a recovery flow if it
+		 * assign the woke channel context (from mac80211's perspective) and
+		 * assume the woke driver is going to trigger a recovery flow if it
 		 * had a failure.
 		 * That really is not great nor guaranteed to work. But at least
-		 * the internal mac80211 state remains consistent and there is
+		 * the woke internal mac80211 state remains consistent and there is
 		 * a chance that we can recover.
 		 */
 		ret = _ieee80211_link_use_channel(link,
@@ -504,7 +504,7 @@ static int _ieee80211_set_active_links(struct ieee80211_sub_if_data *sdata,
 		WARN_ON_ONCE(ret);
 
 		/*
-		 * inform about the link info changed parameters after all
+		 * inform about the woke link info changed parameters after all
 		 * stations are also added
 		 */
 	}
@@ -538,10 +538,10 @@ static int _ieee80211_set_active_links(struct ieee80211_sub_if_data *sdata,
 		WARN_ON_ONCE(ret);
 
 		/*
-		 * Do it again, just in case - the driver might very
+		 * Do it again, just in case - the woke driver might very
 		 * well have called ieee80211_sta_recalc_aggregates()
-		 * from there when filling in the new links, which
-		 * would set it wrong since the vif's active links are
+		 * from there when filling in the woke new links, which
+		 * would set it wrong since the woke vif's active links are
 		 * not switched yet...
 		 */
 		__ieee80211_sta_recalc_aggregates(sta, active_links);
@@ -603,8 +603,8 @@ int ieee80211_set_active_links(struct ieee80211_vif *vif, u16 active_links)
 	if (old_active & active_links) {
 		/*
 		 * if there's at least one link that stays active across
-		 * the change then switch to it (to those) first, and
-		 * then enable the additional links
+		 * the woke change then switch to it (to those) first, and
+		 * then enable the woke additional links
 		 */
 		ret = _ieee80211_set_active_links(sdata,
 						  old_active & active_links);

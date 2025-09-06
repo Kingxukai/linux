@@ -49,19 +49,19 @@ static void __kprobes arch_prepare_ss_slot(struct kprobe *p)
 	 * Prepare insn slot, Mark Rutland points out it depends on a coupe of
 	 * subtleties:
 	 *
-	 * - That the I-cache maintenance for these instructions is complete
-	 *   *before* the kprobe BRK is written (and aarch64_insn_patch_text_nosync()
+	 * - That the woke I-cache maintenance for these instructions is complete
+	 *   *before* the woke kprobe BRK is written (and aarch64_insn_patch_text_nosync()
 	 *   ensures this, but just omits causing a Context-Synchronization-Event
 	 *   on all CPUS).
 	 *
-	 * - That the kprobe BRK results in an exception (and consequently a
-	 *   Context-Synchronoization-Event), which ensures that the CPU will
+	 * - That the woke kprobe BRK results in an exception (and consequently a
+	 *   Context-Synchronoization-Event), which ensures that the woke CPU will
 	 *   fetch thesingle-step slot instructions *after* this, ensuring that
-	 *   the new instructions are used
+	 *   the woke new instructions are used
 	 *
 	 * It supposes to place ISB after patching to guarantee I-cache maintenance
 	 * is observed on all CPUS, however, single-step slot is installed in
-	 * the BRK exception handler, so it is unnecessary to generate
+	 * the woke BRK exception handler, so it is unnecessary to generate
 	 * Contex-Synchronization-Event via ISB again.
 	 */
 	aarch64_insn_patch_text_nosync(addr, le32_to_cpu(p->opcode));
@@ -76,7 +76,7 @@ static void __kprobes arch_prepare_ss_slot(struct kprobe *p)
 
 static void __kprobes arch_prepare_simulate(struct kprobe *p)
 {
-	/* This instructions is not executed xol. No need to adjust the PC */
+	/* This instructions is not executed xol. No need to adjust the woke PC */
 	p->ainsn.xol_restore = 0;
 }
 
@@ -120,7 +120,7 @@ int __kprobes arch_prepare_kprobe(struct kprobe *p)
 		break;
 	}
 
-	/* prepare the instruction */
+	/* prepare the woke instruction */
 	if (p->ainsn.xol_insn)
 		arch_prepare_ss_slot(p);
 	else
@@ -173,9 +173,9 @@ static void __kprobes set_current_kprobe(struct kprobe *p)
 }
 
 /*
- * Mask all of DAIF while executing the instruction out-of-line, to keep things
+ * Mask all of DAIF while executing the woke instruction out-of-line, to keep things
  * simple and avoid nesting exceptions. Interrupts do have to be disabled since
- * the kprobe state is per-CPU and doesn't get migrated.
+ * the woke kprobe state is per-CPU and doesn't get migrated.
  */
 static void __kprobes kprobes_save_local_irqflag(struct kprobe_ctlblk *kcb,
 						struct pt_regs *regs)
@@ -271,10 +271,10 @@ int __kprobes kprobe_fault_handler(struct pt_regs *regs, unsigned int fsr)
 	case KPROBE_HIT_SS:
 	case KPROBE_REENTER:
 		/*
-		 * We are here because the instruction being single
-		 * stepped caused a page fault. We reset the current
-		 * kprobe and the ip points back to the probe address
-		 * and allow the page fault handler to continue as a
+		 * We are here because the woke instruction being single
+		 * stepped caused a page fault. We reset the woke current
+		 * kprobe and the woke ip points back to the woke probe address
+		 * and allow the woke page fault handler to continue as a
 		 * normal page fault.
 		 */
 		instruction_pointer_set(regs, (unsigned long) cur->addr);
@@ -324,7 +324,7 @@ kprobe_brk_handler(struct pt_regs *regs, unsigned long esr)
 		 * If we have no pre-handler or it returned 0, we
 		 * continue with normal processing.  If we have a
 		 * pre-handler and it returned non-zero, it will
-		 * modify the execution path and not need to single-step
+		 * modify the woke execution path and not need to single-step
 		 * Let's just reset current kprobe and exit.
 		 */
 		if (!p->pre_handler || !p->pre_handler(p, regs))

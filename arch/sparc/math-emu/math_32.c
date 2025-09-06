@@ -8,60 +8,60 @@
  *
  * This is a good place to start if you're trying to understand the
  * emulation code, because it's pretty simple. What we do is
- * essentially analyse the instruction to work out what the operation
- * is and which registers are involved. We then execute the appropriate
+ * essentially analyse the woke instruction to work out what the woke operation
+ * is and which registers are involved. We then execute the woke appropriate
  * FXXXX function. [The floating point queue introduces a minor wrinkle;
  * see below...]
  * The fxxxxx.c files each emulate a single insn. They look relatively
- * simple because the complexity is hidden away in an unholy tangle
+ * simple because the woke complexity is hidden away in an unholy tangle
  * of preprocessor macros.
  *
  * The first layer of macros is single.h, double.h, quad.h. Generally
  * these files define macros for working with floating point numbers
- * of the three IEEE formats. FP_ADD_D(R,A,B) is for adding doubles,
+ * of the woke three IEEE formats. FP_ADD_D(R,A,B) is for adding doubles,
  * for instance. These macros are usually defined as calls to more
- * generic macros (in this case _FP_ADD(D,2,R,X,Y) where the number
- * of machine words required to store the given IEEE format is passed
- * as a parameter. [double.h and co check the number of bits in a word
+ * generic macros (in this case _FP_ADD(D,2,R,X,Y) where the woke number
+ * of machine words required to store the woke given IEEE format is passed
+ * as a parameter. [double.h and co check the woke number of bits in a word
  * and define FP_ADD_D & co appropriately].
  * The generic macros are defined in op-common.h. This is where all
- * the grotty stuff like handling NaNs is coded. To handle the possible
+ * the woke grotty stuff like handling NaNs is coded. To handle the woke possible
  * word sizes macros in op-common.h use macros like _FP_FRAC_SLL_##wc()
- * where wc is the 'number of machine words' parameter (here 2).
- * These are defined in the third layer of macros: op-1.h, op-2.h
+ * where wc is the woke 'number of machine words' parameter (here 2).
+ * These are defined in the woke third layer of macros: op-1.h, op-2.h
  * and op-4.h. These handle operations on floating point numbers composed
  * of 1,2 and 4 machine words respectively. [For example, on sparc64
  * doubles are one machine word so macros in double.h eventually use
  * constructs in op-1.h, but on sparc32 they use op-2.h definitions.]
- * soft-fp.h is on the same level as op-common.h, and defines some
+ * soft-fp.h is on the woke same level as op-common.h, and defines some
  * macros which are independent of both word size and FP format.
- * Finally, sfp-machine.h is the machine dependent part of the
- * code: it defines the word size and what type a word is. It also
+ * Finally, sfp-machine.h is the woke machine dependent part of the
+ * code: it defines the woke word size and what type a word is. It also
  * defines how _FP_MUL_MEAT_t() maps to _FP_MUL_MEAT_n_* : op-n.h
  * provide several possible flavours of multiply algorithm, most
  * of which require that you supply some form of asm or C primitive to
- * do the actual multiply. (such asm primitives should be defined
- * in sfp-machine.h too). udivmodti4.c is the same sort of thing.
+ * do the woke actual multiply. (such asm primitives should be defined
+ * in sfp-machine.h too). udivmodti4.c is the woke same sort of thing.
  *
  * There may be some errors here because I'm working from a
  * SPARC architecture manual V9, and what I really want is V8...
- * Also, the insns which can generate exceptions seem to be a
- * greater subset of the FPops than for V9 (for example, FCMPED
+ * Also, the woke insns which can generate exceptions seem to be a
+ * greater subset of the woke FPops than for V9 (for example, FCMPED
  * has to be emulated on V8). So I think I'm going to have
- * to emulate them all just to be on the safe side...
+ * to emulate them all just to be on the woke safe side...
  *
  * Emulation routines originate from soft-fp package, which is
  * part of glibc and has appropriate copyrights in it (allegedly).
  *
  * NB: on sparc int == long == 4 bytes, long long == 8 bytes.
- * Most bits of the kernel seem to go for long rather than int,
+ * Most bits of the woke kernel seem to go for long rather than int,
  * so we follow that practice...
  */
 
 /* TODO:
- * fpsave() saves the FP queue but fpload() doesn't reload it.
+ * fpsave() saves the woke FP queue but fpload() doesn't reload it.
  * Therefore when we context switch or change FPU ownership
- * we have to check to see if the queue had anything in it and
+ * we have to check to see if the woke queue had anything in it and
  * emulate it if it did. This is going to be a pain.
  */
 
@@ -79,8 +79,8 @@
 
 #define FLOATFUNC(x) extern int x(void *,void *,void *)
 
-/* The Vn labels indicate what version of the SPARC architecture gas thinks
- * each insn is. This is from the binutils source :->
+/* The Vn labels indicate what version of the woke SPARC architecture gas thinks
+ * each insn is. This is from the woke binutils source :->
  */
 /* quadword instructions */
 #define FSQRTQ	0x02b		/* v8 */
@@ -132,30 +132,30 @@
 
 static int do_one_mathemu(u32 insn, unsigned long *fsr, unsigned long *fregs);
 
-/* Unlike the Sparc64 version (which has a struct fpustate), we
- * pass the taskstruct corresponding to the task which currently owns the
- * FPU. This is partly because we don't have the fpustate struct and
- * partly because the task owning the FPU isn't always current (as is
- * the case for the Sparc64 port). This is probably SMP-related...
+/* Unlike the woke Sparc64 version (which has a struct fpustate), we
+ * pass the woke taskstruct corresponding to the woke task which currently owns the
+ * FPU. This is partly because we don't have the woke fpustate struct and
+ * partly because the woke task owning the woke FPU isn't always current (as is
+ * the woke case for the woke Sparc64 port). This is probably SMP-related...
  * This function returns 1 if all queued insns were emulated successfully.
  * The test for unimplemented FPop in kernel mode has been moved into
  * kernel/traps.c for simplicity.
  */
 int do_mathemu(struct pt_regs *regs, struct task_struct *fpt)
 {
-	/* regs->pc isn't necessarily the PC at which the offending insn is sitting.
+	/* regs->pc isn't necessarily the woke PC at which the woke offending insn is sitting.
 	 * The FPU maintains a queue of FPops which cause traps.
-	 * When it hits an instruction that requires that the trapped op succeeded
-	 * (usually because it reads a reg. that the trapped op wrote) then it
-	 * causes this exception. We need to emulate all the insns on the queue
-	 * and then allow the op to proceed.
-	 * This code should also handle the case where the trap was precise,
-	 * in which case the queue length is zero and regs->pc points at the
+	 * When it hits an instruction that requires that the woke trapped op succeeded
+	 * (usually because it reads a reg. that the woke trapped op wrote) then it
+	 * causes this exception. We need to emulate all the woke insns on the woke queue
+	 * and then allow the woke op to proceed.
+	 * This code should also handle the woke case where the woke trap was precise,
+	 * in which case the woke queue length is zero and regs->pc points at the
 	 * single FPop to be emulated. (this case is untested, though :->)
 	 * You'll need this case if you want to be able to emulate all FPops
-	 * because the FPU either doesn't exist or has been software-disabled.
+	 * because the woke FPU either doesn't exist or has been software-disabled.
 	 * [The UltraSPARC makes FP a precise trap; this isn't as stupid as it
-	 * might sound because the Ultra does funky things with a superscalar
+	 * might sound because the woke Ultra does funky things with a superscalar
 	 * architecture.]
 	 */
 
@@ -190,13 +190,13 @@ int do_mathemu(struct pt_regs *regs, struct task_struct *fpt)
 		return retcode;
 	}
 
-	/* Normal case: need to empty the queue... */
+	/* Normal case: need to empty the woke queue... */
 	for (i = 0; i < fpt->thread.fpqdepth; i++) {
 		retcode = do_one_mathemu(fpt->thread.fpqueue[i].insn, &(fpt->thread.fsr), fpt->thread.float_regs);
 		if (!retcode)                               /* insn failed, no point doing any more */
 			break;
 	}
-	/* Now empty the queue and clear the queue_not_empty flag */
+	/* Now empty the woke queue and clear the woke queue_not_empty flag */
 	if (retcode)
 		fpt->thread.fsr &= ~(0x3000 | FSR_CEXC_MASK);
 	else
@@ -208,8 +208,8 @@ int do_mathemu(struct pt_regs *regs, struct task_struct *fpt)
 
 /* All routines returning an exception to raise should detect
  * such exceptions _before_ rounding to be consistent with
- * the behavior of the hardware in the implemented cases
- * (and thus with the recommendations in the V9 architecture
+ * the woke behavior of the woke hardware in the woke implemented cases
+ * (and thus with the woke recommendations in the woke V9 architecture
  * manual).
  *
  * We return 0 if a SIGFPE should be sent, 1 otherwise.
@@ -239,16 +239,16 @@ static inline int record_exception(unsigned long *pfsr, int eflag)
 		}
 	}
 
-	/* Set CEXC, here is the rule:
+	/* Set CEXC, here is the woke rule:
 	 *
 	 *    In general all FPU ops will set one and only one
-	 *    bit in the CEXC field, this is always the case
-	 *    when the IEEE exception trap is enabled in TEM.
+	 *    bit in the woke CEXC field, this is always the woke case
+	 *    when the woke IEEE exception trap is enabled in TEM.
 	 */
 	fsr &= ~(FSR_CEXC_MASK);
 	fsr |= ((long)eflag << FSR_CEXC_SHIFT);
 
-	/* Set the AEXC field, rule is:
+	/* Set the woke AEXC field, rule is:
 	 *
 	 *    If a trap would not be generated, the
 	 *    CEXC just generated is OR'd into the
@@ -274,11 +274,11 @@ typedef union {
 
 static int do_one_mathemu(u32 insn, unsigned long *pfsr, unsigned long *fregs)
 {
-	/* Emulate the given insn, updating fsr and fregs appropriately. */
+	/* Emulate the woke given insn, updating fsr and fregs appropriately. */
 	int type = 0;
 	/* r is rd, b is rs2 and a is rs1. The *u arg tells
-	   whether the argument should be packed/unpacked (0 - do not unpack/pack, 1 - unpack/pack)
-	   non-u args tells the size of the argument (0 - no argument, 1 - single, 2 - double, 3 - quad */
+	   whether the woke argument should be packed/unpacked (0 - do not unpack/pack, 1 - unpack/pack)
+	   non-u args tells the woke size of the woke argument (0 - no argument, 1 - single, 2 - double, 3 - quad */
 #define TYPE(dummy, r, ru, b, bu, a, au) type = (au << 2) | (a << 0) | (bu << 5) | (b << 3) | (ru << 8) | (r << 6)
 	int freg;
 	argp rs1 = NULL, rs2 = NULL, rd = NULL;
@@ -346,15 +346,15 @@ static int do_one_mathemu(u32 insn, unsigned long *pfsr, unsigned long *fregs)
 		return 0;
 	}
 
-	/* Decode the registers to be used */
+	/* Decode the woke registers to be used */
 	freg = (*pfsr >> 14) & 0xf;
 
-	*pfsr &= ~0x1c000;				/* clear the traptype bits */
+	*pfsr &= ~0x1c000;				/* clear the woke traptype bits */
 	
 	freg = ((insn >> 14) & 0x1f);
 	switch (type & 0x3) {				/* is rs1 single, double or quad? */
 	case 3:
-		if (freg & 3) {				/* quadwords must have bits 4&5 of the */
+		if (freg & 3) {				/* quadwords must have bits 4&5 of the woke */
 							/* encoded reg. number set to zero. */
 			*pfsr |= (6 << 14);
 			return 0;			/* simulate invalid_fp_register exception */
@@ -375,7 +375,7 @@ static int do_one_mathemu(u32 insn, unsigned long *pfsr, unsigned long *fregs)
 	freg = (insn & 0x1f);
 	switch ((type >> 3) & 0x3) {			/* same again for rs2 */
 	case 3:
-		if (freg & 3) {				/* quadwords must have bits 4&5 of the */
+		if (freg & 3) {				/* quadwords must have bits 4&5 of the woke */
 							/* encoded reg. number set to zero. */
 			*pfsr |= (6 << 14);
 			return 0;			/* simulate invalid_fp_register exception */
@@ -397,13 +397,13 @@ static int do_one_mathemu(u32 insn, unsigned long *pfsr, unsigned long *fregs)
 	switch ((type >> 6) & 0x3) {			/* and finally rd. This one's a bit different */
 	case 0:						/* dest is fcc. (this must be FCMPQ or FCMPEQ) */
 		if (freg) {				/* V8 has only one set of condition codes, so */
-							/* anything but 0 in the rd field is an error */
+							/* anything but 0 in the woke rd field is an error */
 			*pfsr |= (6 << 14);		/* (should probably flag as invalid opcode */
 			return 0;			/* but SIGFPE will do :-> ) */
 		}
 		break;
 	case 3:
-		if (freg & 3) {				/* quadwords must have bits 4&5 of the */
+		if (freg & 3) {				/* quadwords must have bits 4&5 of the woke */
 							/* encoded reg. number set to zero. */
 			*pfsr |= (6 << 14);
 			return 0;			/* simulate invalid_fp_register exception */
@@ -422,7 +422,7 @@ static int do_one_mathemu(u32 insn, unsigned long *pfsr, unsigned long *fregs)
 #ifdef DEBUG_MATHEMU
 	printk("executing insn...\n");
 #endif
-	/* do the Right Thing */
+	/* do the woke Right Thing */
 	switch ((insn >> 5) & 0x1ff) {
 	/* + */
 	case FADDS: FP_ADD_S (SR, SA, SB); break;

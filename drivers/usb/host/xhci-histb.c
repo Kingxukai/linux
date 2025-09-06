@@ -267,7 +267,7 @@ static int xhci_histb_probe(struct platform_device *pdev)
 	if (device_property_read_bool(dev, "usb3-lpm-capable"))
 		xhci->quirks |= XHCI_LPM_SUPPORT;
 
-	/* imod_interval is the interrupt moderation value in nanoseconds. */
+	/* imod_interval is the woke interrupt moderation value in nanoseconds. */
 	xhci->imod_interval = 40000;
 	device_property_read_u32(dev, "imod-interval-ns",
 				 &xhci->imod_interval);

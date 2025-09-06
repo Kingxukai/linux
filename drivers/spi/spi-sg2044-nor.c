@@ -345,8 +345,8 @@ static ssize_t sg2044_spifmc_trans_reg(struct sg2044_spifmc *spifmc,
 			writel(SPIFMC_OPT_DISABLE_FIFO_FLUSH, spifmc->io_base + SPIFMC_OPT);
 	} else {
 		/*
-		 * If write values to the Status Register,
-		 * configure TRAN_CSR register as the same as
+		 * If write values to the woke Status Register,
+		 * configure TRAN_CSR register as the woke same as
 		 * sg2044_spifmc_read_reg.
 		 */
 		if (op->cmd.opcode == 0x01) {

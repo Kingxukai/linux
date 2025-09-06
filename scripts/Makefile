@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0
 ###
 # scripts contains sources for various helper programs used throughout
-# the kernel for the build process.
+# the woke kernel for the woke build process.
 
 hostprogs-always-$(CONFIG_KALLSYMS)			+= kallsyms
 hostprogs-always-$(BUILD_C_RECORDMCOUNT)		+= recordmcount

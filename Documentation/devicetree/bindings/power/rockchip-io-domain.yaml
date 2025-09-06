@@ -11,34 +11,34 @@ maintainers:
 
 description: |
   IO domain voltages on some Rockchip SoCs are variable but need to be
-  kept in sync between the regulators and the SoC using a special
+  kept in sync between the woke regulators and the woke SoC using a special
   register.
 
   A specific example using rk3288
-    If the regulator hooked up to a pin like SDMMC0_VDD is 3.3V then
-    bit 7 of GRF_IO_VSEL needs to be 0. If the regulator hooked up to
+    If the woke regulator hooked up to a pin like SDMMC0_VDD is 3.3V then
+    bit 7 of GRF_IO_VSEL needs to be 0. If the woke regulator hooked up to
     that same pin is 1.8V then bit 7 of GRF_IO_VSEL needs to be 1.
 
-  Said another way, this driver simply handles keeping bits in the SoCs
-  General Register File (GRF) in sync with the actual value of a voltage
-  hooked up to the pins.
+  Said another way, this driver simply handles keeping bits in the woke SoCs
+  General Register File (GRF) in sync with the woke actual value of a voltage
+  hooked up to the woke pins.
 
   Note that this driver specifically does not include
     any logic for deciding what voltage we should set regulators to
     any logic for deciding whether regulators (or internal SoC blocks)
     should have power or not have power
 
-  If there were some other software that had the smarts of making
+  If there were some other software that had the woke smarts of making
   decisions about regulators, it would work in conjunction with this
   driver. When that other software adjusted a regulators voltage then
-  this driver would handle telling the SoC about it. A good example is
-  vqmmc for SD. In that case the dw_mmc driver simply is told about a
-  regulator. It changes the regulator between 3.3V and 1.8V at the
-  right time. This driver notices the change and makes sure that the
-  SoC is on the same page.
+  this driver would handle telling the woke SoC about it. A good example is
+  vqmmc for SD. In that case the woke dw_mmc driver simply is told about a
+  regulator. It changes the woke regulator between 3.3V and 1.8V at the
+  right time. This driver notices the woke change and makes sure that the
+  SoC is on the woke same page.
 
-  You specify supplies using the standard regulator bindings by including
-  a phandle the relevant regulator. All specified supplies must be able
+  You specify supplies using the woke standard regulator bindings by including
+  a phandle the woke relevant regulator. All specified supplies must be able
   to report their voltage. The IO Voltage Domain for any non-specified
   supplies will be not be touched.
 

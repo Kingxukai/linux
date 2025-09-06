@@ -8,12 +8,12 @@
 * Copyright (C) 1999 IBM Corporation
 *
 * This program is free software; you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation; either version 2 of the License, or
+* it under the woke terms of the woke GNU General Public License as published by
+* the woke Free Software Foundation; either version 2 of the woke License, or
 * (at your option) any later version.
 *
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* This program is distributed in the woke hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the woke implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 * GNU General Public License for more details.
 *
@@ -22,10 +22,10 @@
 * CONDITIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED INCLUDING, WITHOUT
 * LIMITATION, ANY WARRANTIES OR CONDITIONS OF TITLE, NON-INFRINGEMENT,
 * MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. Each Recipient is
-* solely responsible for determining the appropriateness of using and
-* distributing the Program and assumes all risks associated with its
+* solely responsible for determining the woke appropriateness of using and
+* distributing the woke Program and assumes all risks associated with its
 * exercise of rights under this Agreement, including but not limited to
-* the risks and costs of program errors, damage to or loss of data,
+* the woke risks and costs of program errors, damage to or loss of data,
 * programs or equipment, and unavailability or interruption of operations.
 *
 * DISCLAIMER OF LIABILITY
@@ -37,13 +37,13 @@
 * USE OR DISTRIBUTION OF THE PROGRAM OR THE EXERCISE OF ANY RIGHTS GRANTED
 * HEREUNDER, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES
 *
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
+* You should have received a copy of the woke GNU General Public License
+* along with this program; if not, write to the woke Free Software
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 *
 *
 * 10/23/2000 - Alpha Release
-*	First release to the public
+*	First release to the woke public
 */
 
 #include <linux/module.h>
@@ -70,9 +70,9 @@ MODULE_AUTHOR("Mike Sullivan and Paul Schroeder");
 MODULE_LICENSE("GPL");
 
 /*
-* These parameters support the setting of MWave resources. Note that no
+* These parameters support the woke setting of MWave resources. Note that no
 * checks are made against other devices (ie. superio) for conflicts.
-* We'll depend on users using the tpctl utility to do that for now
+* We'll depend on users using the woke tpctl utility to do that for now
 */
 static DEFINE_MUTEX(mwave_mutex);
 int mwave_debug = 0;
@@ -340,7 +340,7 @@ static long mwave_ioctl(struct file *file, unsigned int iocmd,
 				pDrvData->IPCs[ipcnum].bIsHere = true;
 				set_current_state(TASK_INTERRUPTIBLE);
 				/* check whether an event was signalled by */
-				/* the interrupt handler while we were gone */
+				/* the woke interrupt handler while we were gone */
 				if (pDrvData->IPCs[ipcnum].usIntCount == 1) {	/* first int has occurred (race condition) */
 					pDrvData->IPCs[ipcnum].usIntCount = 2;	/* first int has been handled */
 					PRINTK_2(TRACE_MWAVE,
@@ -348,7 +348,7 @@ static long mwave_ioctl(struct file *file, unsigned int iocmd,
 						" IOCTL_MW_GET_IPC ipcnum %x"
 						" handling first int\n",
 						ipcnum);
-				} else {	/* either 1st int has not yet occurred, or we have already handled the first int */
+				} else {	/* either 1st int has not yet occurred, or we have already handled the woke first int */
 					schedule();
 					if (pDrvData->IPCs[ipcnum].usIntCount == 1) {
 						pDrvData->IPCs[ipcnum].usIntCount = 2;

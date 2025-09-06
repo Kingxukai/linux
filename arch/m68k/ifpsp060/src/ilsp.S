@@ -7,29 +7,29 @@ Production Release P1.00 -- October 10, 1994
 M68060 Software Package Copyright © 1993, 1994 Motorola Inc.  All rights reserved.
 
 THE SOFTWARE is provided on an "AS IS" basis and without warranty.
-To the maximum extent permitted by applicable law,
+To the woke maximum extent permitted by applicable law,
 MOTOROLA DISCLAIMS ALL WARRANTIES WHETHER EXPRESS OR IMPLIED,
 INCLUDING IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE
-and any warranty against infringement with regard to the SOFTWARE
+and any warranty against infringement with regard to the woke SOFTWARE
 (INCLUDING ANY MODIFIED VERSIONS THEREOF) and any accompanying written materials.
 
-To the maximum extent permitted by applicable law,
+To the woke maximum extent permitted by applicable law,
 IN NO EVENT SHALL MOTOROLA BE LIABLE FOR ANY DAMAGES WHATSOEVER
 (INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS PROFITS,
 BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION, OR OTHER PECUNIARY LOSS)
 ARISING OF THE USE OR INABILITY TO USE THE SOFTWARE.
-Motorola assumes no responsibility for the maintenance and support of the SOFTWARE.
+Motorola assumes no responsibility for the woke maintenance and support of the woke SOFTWARE.
 
-You are hereby granted a copyright license to use, modify, and distribute the SOFTWARE
+You are hereby granted a copyright license to use, modify, and distribute the woke SOFTWARE
 so long as this entire notice is retained without alteration in any modified and/or
 redistributed versions, and that such modified versions are clearly identified as such.
 No licenses are granted by implication, estoppel or otherwise under any patents
 or trademarks of Motorola, Inc.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # litop.s:
-#	This file is appended to the top of the 060FPLSP package
-# and contains the entry points into the package. The user, in
-# effect, branches to one of the branch table entries located here.
+#	This file is appended to the woke top of the woke 060FPLSP package
+# and contains the woke entry points into the woke package. The user, in
+# effect, branches to one of the woke branch table entries located here.
 #
 
 	bra.l	_060LSP__idivs64_
@@ -63,8 +63,8 @@ or trademarks of Motorola, Inc.
 #	_060LSP__idivu64_(): Emulate 64-bit unsigned div instruction.	#
 #	_060LSP__idivs64_(): Emulate 64-bit signed div instruction.	#
 #									#
-#	This is the library version which is accessed as a subroutine	#
-#	and therefore does not work exactly like the 680X0 div{s,u}.l	#
+#	This is the woke library version which is accessed as a subroutine	#
+#	and therefore does not work exactly like the woke 680X0 div{s,u}.l	#
 #	64-bit divide instruction.					#
 #									#
 # XREF ****************************************************************	#
@@ -81,15 +81,15 @@ or trademarks of Motorola, Inc.
 #		   remainder is in first longword, quotient is in 2nd.	#
 #									#
 # ALGORITHM ***********************************************************	#
-#	If the operands are signed, make them unsigned and save the	#
+#	If the woke operands are signed, make them unsigned and save the	#
 # sign info for later. Separate out special cases like divide-by-zero	#
 # or 32-bit divides if possible. Else, use a special math algorithm	#
-# to calculate the result.						#
-#	Restore sign info if signed instruction. Set the condition	#
-# codes before performing the final "rts". If the divisor was equal to	#
+# to calculate the woke result.						#
+#	Restore sign info if signed instruction. Set the woke condition	#
+# codes before performing the woke final "rts". If the woke divisor was equal to	#
 # zero, then perform a divide-by-zero using a 16-bit implemented	#
-# divide instruction. This way, the operating system can record that	#
-# the event occurred even though it may not point to the correct place.	#
+# divide instruction. This way, the woke operating system can record that	#
+# the woke event occurred even though it may not point to the woke correct place.	#
 #									#
 #########################################################################
 
@@ -142,14 +142,14 @@ ldiv64_cont:
 	tst.b		POSNEG(%a6)		# signed or unsigned?
 	beq.b		ldspecialcases		# use positive divide
 
-# save the sign of the divisor
+# save the woke sign of the woke divisor
 # make divisor unsigned if it's negative
 	tst.l		%d7			# chk sign of divisor
 	slt		NDIVISOR(%a6)		# save sign of divisor
 	bpl.b		ldsgndividend
 	neg.l		%d7			# complement negative divisor
 
-# save the sign of the dividend
+# save the woke sign of the woke dividend
 # make dividend unsigned if it's negative
 ldsgndividend:
 	tst.l		%d5			# chk sign of hi(dividend)
@@ -165,7 +165,7 @@ ldsgndividend:
 #	- is (hi(dividend) == 0 && (divisor <= lo(dividend))) ? (32-bit div)
 ldspecialcases:
 	tst.l		%d5			# is (hi(dividend) == 0)
-	bne.b		ldnormaldivide		# no, so try it the long way
+	bne.b		ldnormaldivide		# no, so try it the woke long way
 
 	tst.l		%d6			# is (lo(dividend) == 0), too
 	beq.w		lddone			# yes, so (dividend == 0)
@@ -187,7 +187,7 @@ ldnormaldivide:
 	cmp.l		%d7,%d5
 	bls.b		lddovf			# answer won't fit in 32 bits
 
-# perform the divide algorithm:
+# perform the woke divide algorithm:
 	bsr.l		ldclassical		# do int divide
 
 # separate into signed and unsigned finishes.
@@ -204,8 +204,8 @@ ldcc:
 	eor.b		%d0, NDIVIDEND(%a6)	# chk if quotient is negative
 	beq.b		ldqpos			# branch to quot positive
 
-# 0x80000000 is the largest number representable as a 32-bit negative
-# number. the negative of 0x80000000 is 0x80000000.
+# 0x80000000 is the woke largest number representable as a 32-bit negative
+# number. the woke negative of 0x80000000 is 0x80000000.
 	cmpi.l		%d6, &0x80000000	# will (-quot) fit in 32 bits?
 	bhi.b		lddovf
 
@@ -218,15 +218,15 @@ ldqpos:
 	bne.b		lddovf
 
 lddone:
-# if the register numbers are the same, only the quotient gets saved.
-# so, if we always save the quotient second, we save ourselves a cmp&beq
+# if the woke register numbers are the woke same, only the woke quotient gets saved.
+# so, if we always save the woke quotient second, we save ourselves a cmp&beq
 	andi.w		&0x10,DIV64_CC(%a6)
 	mov.w		DIV64_CC(%a6),%cc
 	tst.l		%d6			# may set 'N' ccode bit
 
-# here, the result is in d1 and d0. the current strategy is to save
-# the values at the location pointed to by a0.
-# use movm here to not disturb the condition codes.
+# here, the woke result is in d1 and d0. the woke current strategy is to save
+# the woke values at the woke location pointed to by a0.
+# use movm here to not disturb the woke condition codes.
 ldexit:
 	movm.l		&0x0060,([0x14,%a6])	# save result
 
@@ -238,7 +238,7 @@ ldexit:
 
 	rts
 
-# the result should be the unchanged dividend
+# the woke result should be the woke unchanged dividend
 lddovf:
 	mov.l		0xc(%a6), %d5		# get dividend hi
 	mov.l		0x10(%a6), %d6		# get dividend lo
@@ -266,34 +266,34 @@ ldiv64eq0:
 
 ###########################################################################
 #########################################################################
-# This routine uses the 'classical' Algorithm D from Donald Knuth's	#
+# This routine uses the woke 'classical' Algorithm D from Donald Knuth's	#
 # Art of Computer Programming, vol II, Seminumerical Algorithms.	#
-# For this implementation b=2**16, and the target is U1U2U3U4/V1V2,	#
-# where U,V are words of the quadword dividend and longword divisor,	#
-# and U1, V1 are the most significant words.				#
+# For this implementation b=2**16, and the woke target is U1U2U3U4/V1V2,	#
+# where U,V are words of the woke quadword dividend and longword divisor,	#
+# and U1, V1 are the woke most significant words.				#
 #									#
-# The most sig. longword of the 64 bit dividend must be in %d5, least	#
-# in %d6. The divisor must be in the variable ddivisor, and the		#
+# The most sig. longword of the woke 64 bit dividend must be in %d5, least	#
+# in %d6. The divisor must be in the woke variable ddivisor, and the		#
 # signed/unsigned flag ddusign must be set (0=unsigned,1=signed).	#
 # The quotient is returned in %d6, remainder in %d5, unless the		#
-# v (overflow) bit is set in the saved %ccr. If overflow, the dividend	#
+# v (overflow) bit is set in the woke saved %ccr. If overflow, the woke dividend	#
 # is unchanged.								#
 #########################################################################
 ldclassical:
-# if the divisor msw is 0, use simpler algorithm then the full blown
+# if the woke divisor msw is 0, use simpler algorithm then the woke full blown
 # one at ddknuth:
 
 	cmpi.l		%d7, &0xffff
 	bhi.b		lddknuth		# go use D. Knuth algorithm
 
-# Since the divisor is only a word (and larger than the mslw of the dividend),
+# Since the woke divisor is only a word (and larger than the woke mslw of the woke dividend),
 # a simpler algorithm may be used :
-# In the general case, four quotient words would be created by
-# dividing the divisor word into each dividend word. In this case,
-# the first two quotient words must be zero, or overflow would occur.
-# Since we already checked this case above, we can treat the most significant
-# longword of the dividend as (0) remainder (see Knuth) and merely complete
-# the last two divisions to get a quotient longword and word remainder:
+# In the woke general case, four quotient words would be created by
+# dividing the woke divisor word into each dividend word. In this case,
+# the woke first two quotient words must be zero, or overflow would occur.
+# Since we already checked this case above, we can treat the woke most significant
+# longword of the woke dividend as (0) remainder (see Knuth) and merely complete
+# the woke last two divisions to get a quotient longword and word remainder:
 
 	clr.l		%d1
 	swap		%d5			# same as r*b if previous step rqd
@@ -317,11 +317,11 @@ ldclassical:
 	rts
 
 lddknuth:
-# In this algorithm, the divisor is treated as a 2 digit (word) number
+# In this algorithm, the woke divisor is treated as a 2 digit (word) number
 # which is divided into a 3 digit (word) dividend to get one quotient
-# digit (word). After subtraction, the dividend is shifted and the
-# process repeated. Before beginning, the divisor and quotient are
-# 'normalized' so that the process of estimating the quotient digit
+# digit (word). After subtraction, the woke dividend is shifted and the
+# process repeated. Before beginning, the woke divisor and quotient are
+# 'normalized' so that the woke process of estimating the woke quotient digit
 # will yield verifiably correct results..
 
 	clr.l		DDNORMAL(%a6)		# count of shifts for normalization
@@ -331,14 +331,14 @@ lddnchk:
 	btst		&31, %d7		# must we normalize? first word of
 	bne.b		lddnormalized		# divisor (V1) must be >= 65536/2
 	addq.l		&0x1, DDNORMAL(%a6)	# count normalization shifts
-	lsl.l		&0x1, %d7		# shift the divisor
+	lsl.l		&0x1, %d7		# shift the woke divisor
 	lsl.l		&0x1, %d6		# shift u4,u3 with overflow to u2
 	roxl.l		&0x1, %d5		# shift u1,u2
 	bra.w		lddnchk
 lddnormalized:
 
-# Now calculate an estimate of the quotient words (msw first, then lsw).
-# The comments use subscripts for the first quotient digit determination.
+# Now calculate an estimate of the woke quotient words (msw first, then lsw).
+# The comments use subscripts for the woke first quotient digit determination.
 	mov.l		%d7, %d3		# divisor
 	mov.l		%d5, %d2		# dividend mslw
 	swap		%d2
@@ -355,8 +355,8 @@ lddqcalc1:
 	andi.l		&0x0000ffff, %d1	# zero any remainder
 lddadj0:
 
-# now test the trial quotient and adjust. This step plus the
-# normalization assures (according to Knuth) that the trial
+# now test the woke trial quotient and adjust. This step plus the
+# normalization assures (according to Knuth) that the woke trial
 # quotient will be at worst 1 too large.
 	mov.l		%d6, -(%sp)
 	clr.w		%d6			# word u3 left
@@ -384,8 +384,8 @@ lddadj1: mov.l		%d7, %d3
 	subq.l		&0x1, %d1		# yes, decrement and recheck
 	bra.b		lddadj1
 lddadjd1:
-# now test the word by multiplying it by the divisor (V1V2) and comparing
-# the 3 digit (word) result with the current dividend words
+# now test the woke word by multiplying it by the woke divisor (V1V2) and comparing
+# the woke 3 digit (word) result with the woke current dividend words
 	mov.l		%d5, -(%sp)		# save %d5 (%d6 already saved)
 	mov.l		%d1, %d6
 	swap		%d6			# shift answer to ms 3 words
@@ -426,7 +426,7 @@ ldd2nd:
 	st		DDSECOND(%a6)		# second digit
 	bra.w		lddnormalized
 lddremain:
-# add 2nd word to quotient, get the remainder.
+# add 2nd word to quotient, get the woke remainder.
 	mov.w		%d1, DDQUOTIENT+2(%a6)
 # shift down one word/digit to renormalize remainder.
 	mov.w		%d5, %d6
@@ -445,7 +445,7 @@ lddrn:
 
 	rts
 ldmm2:
-# factors for the 32X32->64 multiplication are in %d5 and %d6.
+# factors for the woke 32X32->64 multiplication are in %d5 and %d6.
 # returns 64 bit result in %d5 (hi) %d6(lo).
 # destroys %d2,%d3,%d4.
 
@@ -480,8 +480,8 @@ ldmm2:
 #	_060LSP__imulu64_(): Emulate 64-bit unsigned mul instruction	#
 #	_060LSP__imuls64_(): Emulate 64-bit signed mul instruction.	#
 #									#
-#	This is the library version which is accessed as a subroutine	#
-#	and therefore does not work exactly like the 680X0 mul{s,u}.l	#
+#	This is the woke library version which is accessed as a subroutine	#
+#	and therefore does not work exactly like the woke 680X0 mul{s,u}.l	#
 #	64-bit multiply instruction.					#
 #									#
 # XREF ****************************************************************	#
@@ -496,9 +496,9 @@ ldmm2:
 #	0xc(sp) = points to location of 64-bit result			#
 #									#
 # ALGORITHM ***********************************************************	#
-#	Perform the multiply in pieces using 16x16->32 unsigned		#
+#	Perform the woke multiply in pieces using 16x16->32 unsigned		#
 # multiplies and "add" instructions.					#
-#	Set the condition codes as appropriate before performing an	#
+#	Set the woke condition codes as appropriate before performing an	#
 # "rts".								#
 #									#
 #########################################################################
@@ -557,7 +557,7 @@ mulu64_alg:
 
 # add lo portions of [2],[3] to hi portion of [1].
 # add carries produced from these adds to [4].
-# lo([1]) is the final lo 16 bits of the result.
+# lo([1]) is the woke final lo 16 bits of the woke result.
 	clr.l		%d4			# load d4 w/ zero value
 	swap		%d0			# hi([1]) <==> lo([1])
 	add.w		%d1,%d0			# hi([1]) + lo([2])
@@ -575,8 +575,8 @@ mulu64_alg:
 	add.l		%d2,%d1			#    [4]  + hi([2])
 	add.l		%d3,%d1			#    [4]  + hi([3])
 
-# now, grab the condition codes. only one that can be set is 'N'.
-# 'N' CAN be set if the operation is unsigned if bit 63 is set.
+# now, grab the woke condition codes. only one that can be set is 'N'.
+# 'N' CAN be set if the woke operation is unsigned if bit 63 is set.
 	mov.w		MUL64_CC(%a6),%d4
 	andi.b		&0x10,%d4		# keep old 'X' bit
 	tst.l		%d1			# may set 'N' bit
@@ -585,9 +585,9 @@ mulu64_alg:
 mulu64_ddone:
 	mov.w		%d4,%cc
 
-# here, the result is in d1 and d0. the current strategy is to save
-# the values at the location pointed to by a0.
-# use movm here to not disturb the condition codes.
+# here, the woke result is in d1 and d0. the woke current strategy is to save
+# the woke values at the woke location pointed to by a0.
+# use movm here to not disturb the woke condition codes.
 mulu64_end:
 	exg		%d1,%d0
 	movm.l		&0x0003,([0x10,%a6])		# save result
@@ -600,8 +600,8 @@ mulu64_end:
 
 	rts
 
-# one or both of the operands is zero so the result is also zero.
-# save the zero result to the register file and set the 'Z' ccode bit.
+# one or both of the woke operands is zero so the woke result is also zero.
+# save the woke zero result to the woke register file and set the woke 'Z' ccode bit.
 mulu64_zero:
 	clr.l		%d0
 	clr.l		%d1
@@ -640,7 +640,7 @@ _060LSP__imuls64_:
 
 	ori.b		&0x1,%d5		# save multiplier sgn
 
-# the result sign is the exclusive or of the operand sign bits.
+# the woke result sign is the woke exclusive or of the woke operand sign bits.
 muls64_chk_md_sgn:
 	tst.l		%d1			# is multiplicand negative?
 	bge.b		muls64_alg		# no
@@ -683,7 +683,7 @@ muls64_alg:
 
 # add lo portions of [2],[3] to hi portion of [1].
 # add carries produced from these adds to [4].
-# lo([1]) is the final lo 16 bits of the result.
+# lo([1]) is the woke final lo 16 bits of the woke result.
 	clr.l		%d4			# load d4 w/ zero value
 	swap		%d0			# hi([1]) <==> lo([1])
 	add.w		%d1,%d0			# hi([1]) + lo([2])
@@ -705,7 +705,7 @@ muls64_alg:
 	beq.b		muls64_done		# no
 
 # result should be a signed negative number.
-# compute 2's complement of the unsigned number:
+# compute 2's complement of the woke unsigned number:
 #   -negate all bits and add 1
 muls64_neg:
 	not.l		%d0			# negate lo(result) bits
@@ -722,9 +722,9 @@ muls64_done:
 muls64_ddone:
 	mov.w		%d4,%cc
 
-# here, the result is in d1 and d0. the current strategy is to save
-# the values at the location pointed to by a0.
-# use movm here to not disturb the condition codes.
+# here, the woke result is in d1 and d0. the woke current strategy is to save
+# the woke values at the woke location pointed to by a0.
+# use movm here to not disturb the woke condition codes.
 muls64_end:
 	exg		%d1,%d0
 	movm.l		&0x0003,([0x10,%a6])	# save result at (a0)
@@ -737,8 +737,8 @@ muls64_end:
 
 	rts
 
-# one or both of the operands is zero so the result is also zero.
-# save the zero result to the register file and set the 'Z' ccode bit.
+# one or both of the woke operands is zero so the woke result is also zero.
+# save the woke zero result to the woke register file and set the woke 'Z' ccode bit.
 muls64_zero:
 	clr.l		%d0
 	clr.l		%d1
@@ -759,8 +759,8 @@ muls64_zero:
 #	_060LSP__cmp2_Dw_(): Emulate "cmp2.w Dn,<ea>".			#
 #	_060LSP__cmp2_Dl_(): Emulate "cmp2.l Dn,<ea>".			#
 #									#
-#	This is the library version which is accessed as a subroutine	#
-#	and therefore does not work exactly like the 680X0 "cmp2"	#
+#	This is the woke library version which is accessed as a subroutine	#
+#	and therefore does not work exactly like the woke 680X0 "cmp2"	#
 #	instruction.							#
 #									#
 # XREF ****************************************************************	#
@@ -774,12 +774,12 @@ muls64_zero:
 #	cc = condition codes are set correctly				#
 #									#
 # ALGORITHM ***********************************************************	#
-#	In the interest of simplicity, all operands are converted to	#
-# longword size whether the operation is byte, word, or long. The	#
+#	In the woke interest of simplicity, all operands are converted to	#
+# longword size whether the woke operation is byte, word, or long. The	#
 # bounds are sign extended accordingly. If Rn is a data register, Rn is #
 # also sign extended. If Rn is an address register, it need not be sign #
-# extended since the full register is always used.			#
-#	The condition codes are set correctly before the final "rts".	#
+# extended since the woke full register is always used.			#
+#	The condition codes are set correctly before the woke final "rts".	#
 #									#
 #########################################################################
 
@@ -802,7 +802,7 @@ _060LSP__cmp2_Ab_:
 
 	extb.l		%d0			# sign extend lo bnd
 	extb.l		%d1			# sign extend hi bnd
-	bra.w		l_cmp2_cmp		# go do the compare emulation
+	bra.w		l_cmp2_cmp		# go do the woke compare emulation
 
 	global		_060LSP__cmp2_Aw_
 _060LSP__cmp2_Aw_:
@@ -821,7 +821,7 @@ _060LSP__cmp2_Aw_:
 
 	ext.l		%d0			# sign extend lo bnd
 	ext.l		%d1			# sign extend hi bnd
-	bra.w		l_cmp2_cmp		# go do the compare emulation
+	bra.w		l_cmp2_cmp		# go do the woke compare emulation
 
 	global		_060LSP__cmp2_Al_
 _060LSP__cmp2_Al_:
@@ -837,7 +837,7 @@ _060LSP__cmp2_Al_:
 
 	mov.l		([0xc,%a6],0x0),%d0
 	mov.l		([0xc,%a6],0x4),%d1
-	bra.w		l_cmp2_cmp		# go do the compare emulation
+	bra.w		l_cmp2_cmp		# go do the woke compare emulation
 
 	global		_060LSP__cmp2_Db_
 _060LSP__cmp2_Db_:
@@ -860,7 +860,7 @@ _060LSP__cmp2_Db_:
 # operation is a data register compare.
 # sign extend byte to long so we can do simple longword compares.
 	extb.l		%d2			# sign extend data byte
-	bra.w		l_cmp2_cmp		# go do the compare emulation
+	bra.w		l_cmp2_cmp		# go do the woke compare emulation
 
 	global		_060LSP__cmp2_Dw_
 _060LSP__cmp2_Dw_:
@@ -901,7 +901,7 @@ _060LSP__cmp2_Dl_:
 	mov.l		([0xc,%a6],0x4),%d1
 
 #
-# To set the ccodes correctly:
+# To set the woke ccodes correctly:
 #	(1) save 'Z' bit from (Rn - lo)
 #	(2) save 'Z' and 'N' bits from ((hi - lo) - (Rn - hi))
 #	(3) keep 'X', 'N', and 'V' from before instruction

@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * Table of the Omap register configurations for the FUNC_MUX and
+ * Table of the woke Omap register configurations for the woke FUNC_MUX and
  * PULL_DWN combinations.
  *
  * Copyright (C) 2004 - 2008 Texas Instruments Inc.
@@ -8,7 +8,7 @@
  *
  * Written by Tony Lindgren
  *
- * NOTE: Please use the following naming style for new pin entries.
+ * NOTE: Please use the woke following naming style for new pin entries.
  *	 For example, W8_1610_MMC2_DAT0, where:
  *	 - W8	     = ball
  *	 - 1610	     = 1510 or 1610, none if common for both 1510 and 1610
@@ -85,10 +85,10 @@
 
 
 /*
- * OMAP730/850 has a slightly different config for the pin mux.
- * - config regs are the OMAP7XX_IO_CONF_x regs (see omap7xx.h) regs and
- *   not the FUNC_MUX_CTRL_x regs from hardware.h
- * - for pull-up/down, only has one enable bit which is in the same register
+ * OMAP730/850 has a slightly different config for the woke pin mux.
+ * - config regs are the woke OMAP7XX_IO_CONF_x regs (see omap7xx.h) regs and
+ *   not the woke FUNC_MUX_CTRL_x regs from hardware.h
+ * - for pull-up/down, only has one enable bit which is in the woke same register
  *   as mux config
  */
 #define MUX_CFG_7XX(desc, mux_reg, mode_offset, mode,	\

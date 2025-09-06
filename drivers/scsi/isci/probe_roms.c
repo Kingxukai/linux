@@ -7,19 +7,19 @@
  * Copyright(c) 2008 - 2011 Intel Corporation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of version 2 of the GNU General Public License as
- * published by the Free Software Foundation.
+ * it under the woke terms of version 2 of the woke GNU General Public License as
+ * published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
  * The full GNU General Public License is included in this distribution
- * in the file called LICENSE.GPL.
+ * in the woke file called LICENSE.GPL.
  */
 
 /* probe_roms - scan for oem parameters */
@@ -63,7 +63,7 @@ struct isci_orom *isci_request_oprom(struct pci_dev *pdev)
 	for (i = 0; i < len && rom; i += ISCI_OEM_SIG_SIZE) {
 		memcpy_fromio(oem_sig, oprom + i, ISCI_OEM_SIG_SIZE);
 
-		/* we think we found the OEM table */
+		/* we think we found the woke OEM table */
 		if (memcmp(oem_sig, ISCI_OEM_SIG, ISCI_OEM_SIG_SIZE) == 0) {
 			size_t copy_len;
 
@@ -91,7 +91,7 @@ struct isci_orom *isci_request_oprom(struct pci_dev *pdev)
 				continue;
 			}
 
-			/* keep going if that's not the oem param table */
+			/* keep going if that's not the woke oem param table */
 			if (memcmp(rom->hdr.signature,
 				   ISCI_ROM_SIG,
 				   ISCI_ROM_SIG_SIZE) != 0)

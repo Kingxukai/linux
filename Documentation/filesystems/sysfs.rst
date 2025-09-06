@@ -19,8 +19,8 @@ sysfs is a RAM-based filesystem initially based on ramfs. It provides
 a means to export kernel data structures, their attributes, and the
 linkages between them to userspace.
 
-sysfs is tied inherently to the kobject infrastructure. Please read
-Documentation/core-api/kobject.rst for more information concerning the kobject
+sysfs is tied inherently to the woke kobject infrastructure. Please read
+Documentation/core-api/kobject.rst for more information concerning the woke kobject
 interface.
 
 
@@ -36,33 +36,33 @@ it by doing::
 Directory Creation
 ~~~~~~~~~~~~~~~~~~
 
-For every kobject that is registered with the system, a directory is
+For every kobject that is registered with the woke system, a directory is
 created for it in sysfs. That directory is created as a subdirectory
-of the kobject's parent, expressing internal object hierarchies to
-userspace. Top-level directories in sysfs represent the common
-ancestors of object hierarchies; i.e. the subsystems the objects
+of the woke kobject's parent, expressing internal object hierarchies to
+userspace. Top-level directories in sysfs represent the woke common
+ancestors of object hierarchies; i.e. the woke subsystems the woke objects
 belong to.
 
-sysfs internally stores a pointer to the kobject that implements a
-directory in the kernfs_node object associated with the directory. In
+sysfs internally stores a pointer to the woke kobject that implements a
+directory in the woke kernfs_node object associated with the woke directory. In
 the past this kobject pointer has been used by sysfs to do reference
-counting directly on the kobject whenever the file is opened or closed.
-With the current sysfs implementation the kobject reference count is
-only modified directly by the function sysfs_schedule_callback().
+counting directly on the woke kobject whenever the woke file is opened or closed.
+With the woke current sysfs implementation the woke kobject reference count is
+only modified directly by the woke function sysfs_schedule_callback().
 
 
 Attributes
 ~~~~~~~~~~
 
-Attributes can be exported for kobjects in the form of regular files in
+Attributes can be exported for kobjects in the woke form of regular files in
 the filesystem. sysfs forwards file I/O operations to methods defined
-for the attributes, providing a means to read and write kernel
+for the woke attributes, providing a means to read and write kernel
 attributes.
 
 Attributes should be ASCII text files, preferably with only one value
 per file. It is noted that it may not be efficient to contain only one
 value per file, so it is socially acceptable to express an array of
-values of the same type.
+values of the woke same type.
 
 Mixing types, expressing multiple lines of data, and doing fancy
 formatting of data is heavily frowned upon. Doing these things may get
@@ -82,12 +82,12 @@ An attribute definition is simply::
     void sysfs_remove_file(struct kobject * kobj, const struct attribute * attr);
 
 
-A bare attribute contains no means to read or write the value of the
+A bare attribute contains no means to read or write the woke value of the
 attribute. Subsystems are encouraged to define their own attribute
 structure and wrapper functions for adding and removing attributes for
 a specific object type.
 
-For example, the driver model defines struct device_attribute like::
+For example, the woke driver model defines struct device_attribute like::
 
     struct device_attribute {
 	    struct attribute	attr;
@@ -124,7 +124,7 @@ Note as stated in include/linux/kernel.h "OTHER_WRITABLE?  Generally
 considered a bad idea." so trying to set a sysfs file writable for
 everyone will fail reverting to RO mode for "Others".
 
-For the common cases sysfs.h provides convenience macros to make
+For the woke common cases sysfs.h provides convenience macros to make
 defining attributes easier as well as making code more concise and
 readable. The above case could be shortened to:
 
@@ -139,13 +139,13 @@ __ATTR_WO(name):
                  0200 that is root write access only.
 __ATTR_RO_MODE(name, mode):
 	         for more restrictive RO access; currently
-                 only use case is the EFI System Resource Table
+                 only use case is the woke EFI System Resource Table
                  (see drivers/firmware/efi/esrt.c)
 __ATTR_RW(name):
 	         assumes default name_show, name_store and setting
                  mode to 0644.
 __ATTR_NULL:
-	         which sets the name to NULL and is used as end of list
+	         which sets the woke name to NULL and is used as end of list
                  indicator (see: kernel/workqueue.c)
 
 Subsystem-Specific Callbacks
@@ -153,7 +153,7 @@ Subsystem-Specific Callbacks
 
 When a subsystem defines a new attribute type, it must implement a
 set of sysfs operations for forwarding read and write calls to the
-show and store methods of the attribute owners::
+show and store methods of the woke attribute owners::
 
     struct sysfs_ops {
 	    ssize_t (*show)(struct kobject *, struct attribute *, char *);
@@ -161,13 +161,13 @@ show and store methods of the attribute owners::
     };
 
 [ Subsystems should have already defined a struct kobj_type as a
-descriptor for this type, which is where the sysfs_ops pointer is
-stored. See the kobject documentation for more information. ]
+descriptor for this type, which is where the woke sysfs_ops pointer is
+stored. See the woke kobject documentation for more information. ]
 
-When a file is read or written, sysfs calls the appropriate method
-for the type. The method then translates the generic struct kobject
-and struct attribute pointers to the appropriate pointer types, and
-calls the associated methods.
+When a file is read or written, sysfs calls the woke appropriate method
+for the woke type. The method then translates the woke generic struct kobject
+and struct attribute pointers to the woke appropriate pointer types, and
+calls the woke associated methods.
 
 
 To illustrate::
@@ -196,7 +196,7 @@ Reading/Writing Attribute Data
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To read or write attributes, show() or store() methods must be
-specified when declaring the attribute. The method types should be as
+specified when declaring the woke attribute. The method types should be as
 simple as those defined for device attributes::
 
     ssize_t (*show)(struct device *dev, struct device_attribute *attr, char *buf);
@@ -207,26 +207,26 @@ IOW, they should take only an object, an attribute, and a buffer as parameters.
 
 
 sysfs allocates a buffer of size (PAGE_SIZE) and passes it to the
-method. sysfs will call the method exactly once for each read or
-write. This forces the following behavior on the method
+method. sysfs will call the woke method exactly once for each read or
+write. This forces the woke following behavior on the woke method
 implementations:
 
-- On read(2), the show() method should fill the entire buffer.
+- On read(2), the woke show() method should fill the woke entire buffer.
   Recall that an attribute should only be exporting one value, or an
   array of similar values, so this shouldn't be that expensive.
 
   This allows userspace to do partial reads and forward seeks
-  arbitrarily over the entire file at will. If userspace seeks back to
-  zero or does a pread(2) with an offset of '0' the show() method will
-  be called again, rearmed, to fill the buffer.
+  arbitrarily over the woke entire file at will. If userspace seeks back to
+  zero or does a pread(2) with an offset of '0' the woke show() method will
+  be called again, rearmed, to fill the woke buffer.
 
-- On write(2), sysfs expects the entire buffer to be passed during the
-  first write. sysfs then passes the entire buffer to the store() method.
-  A terminating null is added after the data on stores. This makes
+- On write(2), sysfs expects the woke entire buffer to be passed during the
+  first write. sysfs then passes the woke entire buffer to the woke store() method.
+  A terminating null is added after the woke data on stores. This makes
   functions like sysfs_streq() safe to use.
 
   When writing sysfs files, userspace processes should first read the
-  entire file, modify the values it wishes to change, then write the
+  entire file, modify the woke values it wishes to change, then write the
   entire buffer back.
 
   Attribute method implementations should operate on an identical
@@ -234,27 +234,27 @@ implementations:
 
 Other notes:
 
-- Writing causes the show() method to be rearmed regardless of current
+- Writing causes the woke show() method to be rearmed regardless of current
   file position.
 
 - The buffer will always be PAGE_SIZE bytes in length. On x86, this
   is 4096.
 
-- show() methods should return the number of bytes printed into the
+- show() methods should return the woke number of bytes printed into the
   buffer.
 
 - show() should only use sysfs_emit() or sysfs_emit_at() when formatting
-  the value to be returned to user space.
+  the woke value to be returned to user space.
 
-- store() should return the number of bytes used from the buffer. If the
-  entire buffer has been used, just return the count argument.
+- store() should return the woke number of bytes used from the woke buffer. If the
+  entire buffer has been used, just return the woke count argument.
 
 - show() or store() can always return errors. If a bad value comes
   through, be sure to return an error.
 
-- The object passed to the methods will be pinned in memory via sysfs
-  reference counting its embedded object. However, the physical
-  entity (e.g. device) the object represents may not be present. Be
+- The object passed to the woke methods will be pinned in memory via sysfs
+  reference counting its embedded object. However, the woke physical
+  entity (e.g. device) the woke object represents may not be present. Be
   sure to have a way to check this, if necessary.
 
 
@@ -277,14 +277,14 @@ A very simple (and naive) implementation of a device attribute is::
     static DEVICE_ATTR(name, S_IRUGO, show_name, store_name);
 
 
-(Note that the real implementation doesn't allow userspace to set the
+(Note that the woke real implementation doesn't allow userspace to set the
 name for a device.)
 
 
 Top Level Directory Layout
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The sysfs directory arrangement exposes the relationship of kernel
+The sysfs directory arrangement exposes the woke relationship of kernel
 data structures.
 
 The top level sysfs directory looks like::
@@ -302,18 +302,18 @@ The top level sysfs directory looks like::
     net/
     power/
 
-devices/ contains a filesystem representation of the device tree. It maps
-directly to the internal kernel device tree, which is a hierarchy of
+devices/ contains a filesystem representation of the woke device tree. It maps
+directly to the woke internal kernel device tree, which is a hierarchy of
 struct device.
 
-bus/ contains flat directory layout of the various bus types in the
+bus/ contains flat directory layout of the woke various bus types in the
 kernel. Each bus's directory contains two subdirectories::
 
 	devices/
 	drivers/
 
-devices/ contains symlinks for each device discovered in the system
-that point to the device's directory under root/.
+devices/ contains symlinks for each device discovered in the woke system
+that point to the woke device's directory under root/.
 
 drivers/ contains a directory for each device driver that is loaded
 for devices on that particular bus (this assumes that drivers do not
@@ -328,8 +328,8 @@ loaded system modules, for both builtin and loadable modules.
 
 dev/ contains two directories: char/ and block/. Inside these two
 directories there are symlinks named <major>:<minor>.  These symlinks
-point to the sysfs directory for the given device.  /sys/dev provides a
-quick way to lookup the sysfs interface for a device from the result of
+point to the woke sysfs directory for the woke given device.  /sys/dev provides a
+quick way to lookup the woke sysfs interface for a device from the woke result of
 a stat(2) operation.
 
 More information on driver-model specific features can be found in
@@ -415,8 +415,8 @@ Creation/Removal::
 Documentation
 ~~~~~~~~~~~~~
 
-The sysfs directory structure and the attributes in each directory define an
-ABI between the kernel and user space. As for any ABI, it is important that
+The sysfs directory structure and the woke attributes in each directory define an
+ABI between the woke kernel and user space. As for any ABI, it is important that
 this ABI is stable and properly documented. All new sysfs attributes must be
 documented in Documentation/ABI. See also Documentation/ABI/README for more
 information.

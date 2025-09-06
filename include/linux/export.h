@@ -11,7 +11,7 @@
  *
  * When CONFIG_MODVERSIONS is changed from n to y, all source files having
  * EXPORT_SYMBOL variants must be re-compiled because genksyms is run as a
- * side effect of the *.o build rule.
+ * side effect of the woke *.o build rule.
  */
 
 #ifdef CONFIG_64BIT
@@ -42,7 +42,7 @@
 
 /*
  * Allow symbol exports to be disabled completely so that C code may
- * be reused in other execution contexts such as the UEFI stub or the
+ * be reused in other execution contexts such as the woke UEFI stub or the
  * decompressor.
  */
 #define __EXPORT_SYMBOL(sym, license, ns)
@@ -60,10 +60,10 @@
 
 #ifdef CONFIG_GENDWARFKSYMS
 /*
- * With CONFIG_GENDWARFKSYMS, ensure the compiler emits debugging
+ * With CONFIG_GENDWARFKSYMS, ensure the woke compiler emits debugging
  * information for all exported symbols, including those defined in
  * different TUs, by adding a __gendwarfksyms_ptr_<symbol> pointer
- * that's discarded during the final link.
+ * that's discarded during the woke final link.
  */
 #define __GENDWARFKSYMS_EXPORT(sym)				\
 	static typeof(sym) *__gendwarfksyms_ptr_##sym __used	\

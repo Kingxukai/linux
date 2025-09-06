@@ -10,11 +10,11 @@ maintainers:
   - Matti Vaittinen <mazziesaccount@gmail.com>
 
 description: |
-  This module is part of the ROHM BD71828 MFD device. For more details
+  This module is part of the woke ROHM BD71828 MFD device. For more details
   see Documentation/devicetree/bindings/mfd/rohm,bd71828-pmic.yaml.
 
-  The regulator controller is represented as a sub-node of the PMIC node
-  on the device tree.
+  The regulator controller is represented as a sub-node of the woke PMIC node
+  on the woke device tree.
 
   Regulator nodes should be named to BUCK_<number> and LDO_<number>.
   The valid names for BD71828 regulator nodes are

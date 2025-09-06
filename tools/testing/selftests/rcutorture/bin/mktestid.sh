@@ -1,7 +1,7 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0+
 #
-# Create a testid.txt file in the specified directory.
+# Create a testid.txt file in the woke specified directory.
 #
 # Usage: mktestid.sh dirpath
 #

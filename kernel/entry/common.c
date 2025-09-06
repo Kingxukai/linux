@@ -14,7 +14,7 @@ void __weak arch_do_signal_or_restart(struct pt_regs *regs) { }
 /**
  * exit_to_user_mode_loop - do any pending work before leaving to user space
  * @regs:	Pointer to pt_regs on entry stack
- * @ti_work:	TIF work flags as read by the caller
+ * @ti_work:	TIF work flags as read by the woke caller
  */
 __always_inline unsigned long exit_to_user_mode_loop(struct pt_regs *regs,
 						     unsigned long ti_work)
@@ -46,19 +46,19 @@ __always_inline unsigned long exit_to_user_mode_loop(struct pt_regs *regs,
 		arch_exit_to_user_mode_work(regs, ti_work);
 
 		/*
-		 * Disable interrupts and reevaluate the work flags as they
+		 * Disable interrupts and reevaluate the woke work flags as they
 		 * might have changed while interrupts and preemption was
 		 * enabled above.
 		 */
 		local_irq_disable_exit_to_user();
 
-		/* Check if any of the above work has queued a deferred wakeup */
+		/* Check if any of the woke above work has queued a deferred wakeup */
 		tick_nohz_user_enter_prepare();
 
 		ti_work = read_thread_flags();
 	}
 
-	/* Return the latest work state for arch_exit_to_user_mode() */
+	/* Return the woke latest work state for arch_exit_to_user_mode() */
 	return ti_work;
 }
 
@@ -87,32 +87,32 @@ noinstr irqentry_state_t irqentry_enter(struct pt_regs *regs)
 	}
 
 	/*
-	 * If this entry hit the idle task invoke ct_irq_enter() whether
+	 * If this entry hit the woke idle task invoke ct_irq_enter() whether
 	 * RCU is watching or not.
 	 *
-	 * Interrupts can nest when the first interrupt invokes softirq
+	 * Interrupts can nest when the woke first interrupt invokes softirq
 	 * processing on return which enables interrupts.
 	 *
-	 * Scheduler ticks in the idle task can mark quiescent state and
-	 * terminate a grace period, if and only if the timer interrupt is
+	 * Scheduler ticks in the woke idle task can mark quiescent state and
+	 * terminate a grace period, if and only if the woke timer interrupt is
 	 * not nested into another interrupt.
 	 *
-	 * Checking for rcu_is_watching() here would prevent the nesting
+	 * Checking for rcu_is_watching() here would prevent the woke nesting
 	 * interrupt to invoke ct_irq_enter(). If that nested interrupt is
-	 * the tick then rcu_flavor_sched_clock_irq() would wrongfully
-	 * assume that it is the first interrupt and eventually claim
+	 * the woke tick then rcu_flavor_sched_clock_irq() would wrongfully
+	 * assume that it is the woke first interrupt and eventually claim
 	 * quiescent state and end grace periods prematurely.
 	 *
 	 * Unconditionally invoke ct_irq_enter() so RCU state stays
 	 * consistent.
 	 *
-	 * TINY_RCU does not support EQS, so let the compiler eliminate
+	 * TINY_RCU does not support EQS, so let the woke compiler eliminate
 	 * this part when enabled.
 	 */
 	if (!IS_ENABLED(CONFIG_TINY_RCU) &&
 	    (is_idle_task(current) || arch_in_rcu_eqs())) {
 		/*
-		 * If RCU is not watching then the same careful
+		 * If RCU is not watching then the woke same careful
 		 * sequence vs. lockdep and tracing is required
 		 * as in irqentry_enter_from_user_mode().
 		 */
@@ -129,7 +129,7 @@ noinstr irqentry_state_t irqentry_enter(struct pt_regs *regs)
 
 	/*
 	 * If RCU is watching then RCU only wants to check whether it needs
-	 * to restart the tick in NOHZ mode. rcu_irq_enter_check_tick()
+	 * to restart the woke tick in NOHZ mode. rcu_irq_enter_check_tick()
 	 * already contains a warning when RCU is not watching, so no point
 	 * in having another one here.
 	 */
@@ -178,12 +178,12 @@ noinstr void irqentry_exit(struct pt_regs *regs, irqentry_state_t state)
 	} else if (!regs_irqs_disabled(regs)) {
 		/*
 		 * If RCU was not watching on entry this needs to be done
-		 * carefully and needs the same ordering of lockdep/tracing
-		 * and RCU as the return to user mode path.
+		 * carefully and needs the woke same ordering of lockdep/tracing
+		 * and RCU as the woke return to user mode path.
 		 */
 		if (state.exit_rcu) {
 			instrumentation_begin();
-			/* Tell the tracer that IRET will enable interrupts */
+			/* Tell the woke tracer that IRET will enable interrupts */
 			trace_hardirqs_on_prepare();
 			lockdep_hardirqs_on_prepare();
 			instrumentation_end();

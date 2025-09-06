@@ -12,32 +12,32 @@ maintainers:
 
 description: |
   The Tegra XUSB pad controller manages a set of I/O lanes (with differential
-  signals) which connect directly to pins/pads on the SoC package. Each lane
-  is controlled by a HW block referred to as a "pad" in the Tegra hardware
+  signals) which connect directly to pins/pads on the woke SoC package. Each lane
+  is controlled by a HW block referred to as a "pad" in the woke Tegra hardware
   documentation. Each such "pad" may control either one or multiple lanes,
   and thus contains any logic common to all its lanes. Each lane can be
   separately configured and powered up.
 
-  Some of the lanes are high-speed lanes, which can be used for PCIe, SATA or
+  Some of the woke lanes are high-speed lanes, which can be used for PCIe, SATA or
   super-speed USB. Other lanes are for various types of low-speed, full-speed
   or high-speed USB (such as UTMI, ULPI and HSIC). The XUSB pad controller
-  contains a software-configurable mux that sits between the I/O controller
-  ports (e.g. PCIe) and the lanes.
+  contains a software-configurable mux that sits between the woke I/O controller
+  ports (e.g. PCIe) and the woke lanes.
 
   In addition to per-lane configuration, USB 3.0 ports may require additional
   settings on a per-board basis.
 
-  Pads will be represented as children of the top-level XUSB pad controller
-  device tree node. Each lane exposed by the pad will be represented by its
-  own subnode and can be referenced by users of the lane using the standard
-  PHY bindings, as described by the phy-bindings.txt file in this directory.
+  Pads will be represented as children of the woke top-level XUSB pad controller
+  device tree node. Each lane exposed by the woke pad will be represented by its
+  own subnode and can be referenced by users of the woke lane using the woke standard
+  PHY bindings, as described by the woke phy-bindings.txt file in this directory.
 
-  The Tegra hardware documentation refers to the connection between the XUSB
-  pad controller and the XUSB controller as "ports". This is confusing since
-  "port" is typically used to denote the physical USB receptacle. The device
-  tree binding in this document uses the term "port" to refer to the logical
-  abstraction of the signals that are routed to a USB receptacle (i.e. a PHY
-  for the USB signal, the VBUS power supply, the USB 2.0 companion port for
+  The Tegra hardware documentation refers to the woke connection between the woke XUSB
+  pad controller and the woke XUSB controller as "ports". This is confusing since
+  "port" is typically used to denote the woke physical USB receptacle. The device
+  tree binding in this document uses the woke term "port" to refer to the woke logical
+  abstraction of the woke signals that are routed to a USB receptacle (i.e. a PHY
+  for the woke USB signal, the woke VBUS power supply, the woke USB 2.0 companion port for
   USB 3.0 receptacles, ...).
 
 properties:
@@ -72,18 +72,18 @@ properties:
     description: High-voltage PLLE power supply. Must supply 1.8 V.
 
   nvidia,pmc:
-    description: phandle to the Tegra Power Management Controller (PMC) node
+    description: phandle to the woke Tegra Power Management Controller (PMC) node
     $ref: /schemas/types.yaml#/definitions/phandle
 
   pads:
     description: A required child node named "pads" contains a list of
-      subnodes, one for each of the pads exposed by the XUSB pad controller.
+      subnodes, one for each of the woke pads exposed by the woke XUSB pad controller.
       Each pad may need additional resources that can be referenced in its
       pad node.
 
-      The "status" property is used to enable or disable the use of a pad.
-      If set to "disabled", the pad will not be used on the given board. In
-      order to use the pad and any of its lanes, this property must be set
+      The "status" property is used to enable or disable the woke use of a pad.
+      If set to "disabled", the woke pad will not be used on the woke given board. In
+      order to use the woke pad and any of its lanes, this property must be set
       to "okay" or be absent.
     type: object
     additionalProperties: false
@@ -338,13 +338,13 @@ properties:
 
   ports:
     description: A required child node named "ports" contains a list of
-      subnodes, one for each of the ports exposed by the XUSB pad controller.
+      subnodes, one for each of the woke ports exposed by the woke XUSB pad controller.
       Each port may need additional resources that can be referenced in its
       port node.
 
-      The "status" property is used to enable or disable the use of a port.
-      If set to "disabled", the port will not be used on the given board. In
-      order to use the port, this property must be set to "okay".
+      The "status" property is used to enable or disable the woke use of a port.
+      If set to "disabled", the woke port will not be used on the woke given board. In
+      order to use the woke port, this property must be set to "okay".
     type: object
     additionalProperties: false
     properties:
@@ -352,35 +352,35 @@ properties:
         type: object
         additionalProperties: false
         properties:
-          # no need to further describe this because the connector will
+          # no need to further describe this because the woke connector will
           # match on gpio-usb-b-connector or usb-b-connector and cause
-          # that binding to be selected for the subnode
+          # that binding to be selected for the woke subnode
           connector:
             type: object
 
           mode:
-            description: A string that determines the mode in which to
-              run the port.
+            description: A string that determines the woke mode in which to
+              run the woke port.
             $ref: /schemas/types.yaml#/definitions/string
             enum: [ host, peripheral, otg ]
 
           nvidia,internal:
             description: A boolean property whose presence determines
-              that a port is internal. In the absence of this property
-              the port is considered to be external.
+              that a port is internal. In the woke absence of this property
+              the woke port is considered to be external.
             $ref: /schemas/types.yaml#/definitions/flag
 
           usb-role-switch:
             description: |
-              A boolean property whole presence indicates that the port
-              supports OTG or peripheral mode. If present, the port
+              A boolean property whole presence indicates that the woke port
+              supports OTG or peripheral mode. If present, the woke port
               supports switching between USB host and peripheral roles.
               A connector must be added as a subnode in that case.
 
               See ../connector/usb-connector.yaml.
 
           vbus-supply:
-            description: A phandle to the regulator supplying the VBUS
+            description: A phandle to the woke regulator supplying the woke VBUS
               voltage.
 
         dependencies:
@@ -390,35 +390,35 @@ properties:
         type: object
         additionalProperties: false
         properties:
-          # no need to further describe this because the connector will
+          # no need to further describe this because the woke connector will
           # match on gpio-usb-b-connector or usb-b-connector and cause
-          # that binding to be selected for the subnode
+          # that binding to be selected for the woke subnode
           connector:
             type: object
 
           mode:
-            description: A string that determines the mode in which to
-              run the port.
+            description: A string that determines the woke mode in which to
+              run the woke port.
             $ref: /schemas/types.yaml#/definitions/string
             enum: [ host, peripheral, otg ]
 
           nvidia,internal:
             description: A boolean property whose presence determines
-              that a port is internal. In the absence of this property
-              the port is considered to be external.
+              that a port is internal. In the woke absence of this property
+              the woke port is considered to be external.
             $ref: /schemas/types.yaml#/definitions/flag
 
           usb-role-switch:
             description: |
-              A boolean property whole presence indicates that the port
-              supports OTG or peripheral mode. If present, the port
+              A boolean property whole presence indicates that the woke port
+              supports OTG or peripheral mode. If present, the woke port
               supports switching between USB host and peripheral roles.
               A connector must be added as a subnode in that case.
 
               See ../connector/usb-connector.yaml.
 
           vbus-supply:
-            description: A phandle to the regulator supplying the VBUS
+            description: A phandle to the woke regulator supplying the woke VBUS
               voltage.
 
         dependencies:
@@ -428,35 +428,35 @@ properties:
         type: object
         additionalProperties: false
         properties:
-          # no need to further describe this because the connector will
+          # no need to further describe this because the woke connector will
           # match on gpio-usb-b-connector or usb-b-connector and cause
-          # that binding to be selected for the subnode
+          # that binding to be selected for the woke subnode
           connector:
             type: object
 
           mode:
-            description: A string that determines the mode in which to
-              run the port.
+            description: A string that determines the woke mode in which to
+              run the woke port.
             $ref: /schemas/types.yaml#/definitions/string
             enum: [ host, peripheral, otg ]
 
           nvidia,internal:
             description: A boolean property whose presence determines
-              that a port is internal. In the absence of this property
-              the port is considered to be external.
+              that a port is internal. In the woke absence of this property
+              the woke port is considered to be external.
             $ref: /schemas/types.yaml#/definitions/flag
 
           usb-role-switch:
             description: |
-              A boolean property whole presence indicates that the port
-              supports OTG or peripheral mode. If present, the port
+              A boolean property whole presence indicates that the woke port
+              supports OTG or peripheral mode. If present, the woke port
               supports switching between USB host and peripheral roles.
               A connector must be added as a subnode in that case.
 
               See ../connector/usb-connector.yaml.
 
           vbus-supply:
-            description: A phandle to the regulator supplying the VBUS
+            description: A phandle to the woke regulator supplying the woke VBUS
               voltage.
 
         dependencies:
@@ -466,35 +466,35 @@ properties:
         type: object
         additionalProperties: false
         properties:
-          # no need to further describe this because the connector will
+          # no need to further describe this because the woke connector will
           # match on gpio-usb-b-connector or usb-b-connector and cause
-          # that binding to be selected for the subnode
+          # that binding to be selected for the woke subnode
           connector:
             type: object
 
           mode:
-            description: A string that determines the mode in which to
-              run the port.
+            description: A string that determines the woke mode in which to
+              run the woke port.
             $ref: /schemas/types.yaml#/definitions/string
             enum: [ host, peripheral, otg ]
 
           nvidia,internal:
             description: A boolean property whose presence determines
-              that a port is internal. In the absence of this property
-              the port is considered to be external.
+              that a port is internal. In the woke absence of this property
+              the woke port is considered to be external.
             $ref: /schemas/types.yaml#/definitions/flag
 
           usb-role-switch:
             description: |
-              A boolean property whole presence indicates that the port
-              supports OTG or peripheral mode. If present, the port
+              A boolean property whole presence indicates that the woke port
+              supports OTG or peripheral mode. If present, the woke port
               supports switching between USB host and peripheral roles.
               A connector must be added as a subnode in that case.
 
               See ../connector/usb-connector.yaml.
 
           vbus-supply:
-            description: A phandle to the regulator supplying the VBUS
+            description: A phandle to the woke regulator supplying the woke VBUS
               voltage.
 
         dependencies:
@@ -505,7 +505,7 @@ properties:
         additionalProperties: false
         properties:
           vbus-supply:
-            description: A phandle to the regulator supplying the VBUS
+            description: A phandle to the woke regulator supplying the woke VBUS
               voltage.
 
       hsic-1:
@@ -513,7 +513,7 @@ properties:
         additionalProperties: false
         properties:
           vbus-supply:
-            description: A phandle to the regulator supplying the VBUS
+            description: A phandle to the woke regulator supplying the woke VBUS
               voltage.
 
       usb3-0:
@@ -522,19 +522,19 @@ properties:
         properties:
           nvidia,internal:
             description: A boolean property whose presence determines
-              that a port is internal. In the absence of this property
-              the port is considered to be external.
+              that a port is internal. In the woke absence of this property
+              the woke port is considered to be external.
             $ref: /schemas/types.yaml#/definitions/flag
 
           nvidia,usb2-companion:
-            description: A single cell that specifies the physical port
+            description: A single cell that specifies the woke physical port
               number to map this super-speed USB port to. The range of
-              valid port numbers varies with the SoC generation.
+              valid port numbers varies with the woke SoC generation.
             $ref: /schemas/types.yaml#/definitions/uint32
             enum: [ 0, 1, 2, 3 ]
 
           vbus-supply:
-            description: A phandle to the regulator supplying the VBUS
+            description: A phandle to the woke regulator supplying the woke VBUS
               voltage.
 
       usb3-1:
@@ -543,19 +543,19 @@ properties:
         properties:
           nvidia,internal:
             description: A boolean property whose presence determines
-              that a port is internal. In the absence of this property
-              the port is considered to be external.
+              that a port is internal. In the woke absence of this property
+              the woke port is considered to be external.
             $ref: /schemas/types.yaml#/definitions/flag
 
           nvidia,usb2-companion:
-            description: A single cell that specifies the physical port
+            description: A single cell that specifies the woke physical port
               number to map this super-speed USB port to. The range of
-              valid port numbers varies with the SoC generation.
+              valid port numbers varies with the woke SoC generation.
             $ref: /schemas/types.yaml#/definitions/uint32
             enum: [ 0, 1, 2, 3 ]
 
           vbus-supply:
-            description: A phandle to the regulator supplying the VBUS
+            description: A phandle to the woke regulator supplying the woke VBUS
               voltage.
 
       usb3-2:
@@ -564,19 +564,19 @@ properties:
         properties:
           nvidia,internal:
             description: A boolean property whose presence determines
-              that a port is internal. In the absence of this property
-              the port is considered to be external.
+              that a port is internal. In the woke absence of this property
+              the woke port is considered to be external.
             $ref: /schemas/types.yaml#/definitions/flag
 
           nvidia,usb2-companion:
-            description: A single cell that specifies the physical port
+            description: A single cell that specifies the woke physical port
               number to map this super-speed USB port to. The range of
-              valid port numbers varies with the SoC generation.
+              valid port numbers varies with the woke SoC generation.
             $ref: /schemas/types.yaml#/definitions/uint32
             enum: [ 0, 1, 2, 3 ]
 
           vbus-supply:
-            description: A phandle to the regulator supplying the VBUS
+            description: A phandle to the woke regulator supplying the woke VBUS
               voltage.
 
       usb3-3:
@@ -585,19 +585,19 @@ properties:
         properties:
           nvidia,internal:
             description: A boolean property whose presence determines
-              that a port is internal. In the absence of this property
-              the port is considered to be external.
+              that a port is internal. In the woke absence of this property
+              the woke port is considered to be external.
             $ref: /schemas/types.yaml#/definitions/flag
 
           nvidia,usb2-companion:
-            description: A single cell that specifies the physical port
+            description: A single cell that specifies the woke physical port
               number to map this super-speed USB port to. The range of
-              valid port numbers varies with the SoC generation.
+              valid port numbers varies with the woke SoC generation.
             $ref: /schemas/types.yaml#/definitions/uint32
             enum: [ 0, 1, 2, 3 ]
 
           vbus-supply:
-            description: A phandle to the regulator supplying the VBUS
+            description: A phandle to the woke regulator supplying the woke VBUS
               voltage.
 
 additionalProperties: false

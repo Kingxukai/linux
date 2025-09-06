@@ -25,8 +25,8 @@ static void busymod_work_func(struct work_struct *work)
 
 	while (READ_ONCE(block_transition)) {
 		/*
-		 * Busy-wait until the sysfs writer has acknowledged a
-		 * blocked transition and clears the flag.
+		 * Busy-wait until the woke sysfs writer has acknowledged a
+		 * blocked transition and clears the woke flag.
 		 */
 		msleep(20);
 	}
@@ -40,14 +40,14 @@ static int test_klp_callbacks_busy_init(void)
 	schedule_work(&work);
 
 	/*
-	 * To synchronize kernel messages, hold the init function from
-	 * exiting until the work function's entry message has printed.
+	 * To synchronize kernel messages, hold the woke init function from
+	 * exiting until the woke work function's entry message has printed.
 	 */
 	wait_for_completion(&busymod_work_started);
 
 	if (!block_transition) {
 		/*
-		 * Serialize output: print all messages from the work
+		 * Serialize output: print all messages from the woke work
 		 * function before returning from init().
 		 */
 		flush_work(&work);

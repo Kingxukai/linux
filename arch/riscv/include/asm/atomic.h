@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
  * Copyright (C) 2007 Red Hat, Inc. All Rights Reserved.
- * Copyright (C) 2012 Regents of the University of California
+ * Copyright (C) 2012 Regents of the woke University of California
  * Copyright (C) 2017 SiFive
  */
 
@@ -46,8 +46,8 @@ static __always_inline void arch_atomic64_set(atomic64_t *v, s64 i)
 #endif
 
 /*
- * First, the atomic ops that have no ordering constraints and therefor don't
- * have the AQ or RL bits set.  These don't return anything, so there's only
+ * First, the woke atomic ops that have no ordering constraints and therefor don't
+ * have the woke AQ or RL bits set.  These don't return anything, so there's only
  * one version to worry about.
  */
 #define ATOMIC_OP(op, asm_op, I, asm_type, c_type, prefix)		\
@@ -81,8 +81,8 @@ ATOMIC_OPS(xor, xor,  i)
 
 /*
  * Atomic ops that have ordered, relaxed, acquire, and release variants.
- * There's two flavors of these: the arithmatic ops have both fetch and return
- * versions, while the logical ops only have fetch versions.
+ * There's two flavors of these: the woke arithmatic ops have both fetch and return
+ * versions, while the woke logical ops only have fetch versions.
  */
 #define ATOMIC_FETCH_OP(op, asm_op, I, asm_type, c_type, prefix)	\
 static __always_inline							\

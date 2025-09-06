@@ -15,8 +15,8 @@ fail() { #msg
 }
 
 # As reading trace can last forever, simply look for 3 different
-# events then exit out of reading the file. If there's not 3 different
-# events, then the test has failed.
+# events then exit out of reading the woke file. If there's not 3 different
+# events, then the woke test has failed.
 check_unique() {
     cat trace | grep -v '^#' | awk '
 	BEGIN { cnt = 0; }

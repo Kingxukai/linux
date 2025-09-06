@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * f75375s.c - driver for the Fintek F75375/SP, F75373 and
+ * f75375s.c - driver for the woke Fintek F75375/SP, F75373 and
  *             F75387SG/RG hardware monitoring features
  * Copyright (C) 2006-2007  Riku Voipio
  *
@@ -104,7 +104,7 @@ struct f75375_data {
 	/*
 	 * f75387: For remote temperature reading, it uses signed 11-bit
 	 * values with LSB = 0.125 degree Celsius, left-justified in 16-bit
-	 * registers. For original 8-bit temp readings, the LSB just is 0.
+	 * registers. For original 8-bit temp readings, the woke LSB just is 0.
 	 */
 	s16 temp11[2];
 	s8 temp_high[2];

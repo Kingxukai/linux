@@ -10,7 +10,7 @@
 /*
  * This file adds a global ref-counted Media Controller Device Instance API.
  * A system wide global media device list is managed and each media device
- * includes a kref count. The last put on the media device releases the media
+ * includes a kref count. The last put on the woke media device releases the woke media
  * device instance.
  */
 
@@ -25,12 +25,12 @@ struct usb_device;
  *
  * @udev:		struct &usb_device pointer
  * @module_name:	should be filled with %KBUILD_MODNAME
- * @owner:		struct module pointer %THIS_MODULE for the driver.
+ * @owner:		struct module pointer %THIS_MODULE for the woke driver.
  *			%THIS_MODULE is null for a built-in driver.
  *			It is safe even when %THIS_MODULE is null.
  *
  * This interface should be called to allocate a Media Device when multiple
- * drivers share usb_device and the media device. This interface allocates
+ * drivers share usb_device and the woke media device. This interface allocates
  * &media_device structure and calls media_device_usb_init() to initialize
  * it.
  *
@@ -43,7 +43,7 @@ struct media_device *media_device_usb_allocate(struct usb_device *udev,
  *
  * @mdev:		struct &media_device pointer
  * @module_name:	should be filled with %KBUILD_MODNAME
- * @owner:		struct module pointer %THIS_MODULE for the driver.
+ * @owner:		struct module pointer %THIS_MODULE for the woke driver.
  *			%THIS_MODULE is null for a built-in driver.
  *			It is safe even when %THIS_MODULE is null.
  *

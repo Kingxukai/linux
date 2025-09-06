@@ -3,15 +3,15 @@
  * Copyright (C) 2004, 2007-2010, 2011-2012 Synopsys, Inc. (www.synopsys.com)
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License version 2 as
+ * published by the woke Free Software Foundation.
  */
 
 /******** no-legacy-syscalls-ABI *******/
 
 /*
  * Non-typical guard macro to enable inclusion twice in ARCH sys.c
- * That is how the Generic syscall wrapper generator works
+ * That is how the woke Generic syscall wrapper generator works
  */
 #if !defined(_UAPI_ASM_ARC_UNISTD_H) || defined(__SYSCALL)
 #define _UAPI_ASM_ARC_UNISTD_H

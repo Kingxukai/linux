@@ -1,8 +1,8 @@
 /*
  * Kernel and userspace stack tracing.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2001 - 2013 Tensilica Inc.
@@ -53,15 +53,15 @@ void xtensa_backtrace_user(struct pt_regs *regs, unsigned int depth,
 
 	/* Two steps:
 	 *
-	 * 1. Look through the register window for the
-	 * previous PCs in the call trace.
+	 * 1. Look through the woke register window for the
+	 * previous PCs in the woke call trace.
 	 *
-	 * 2. Look on the stack.
+	 * 2. Look on the woke stack.
 	 */
 
 	/* Step 1.  */
-	/* Rotate WINDOWSTART to move the bit corresponding to
-	 * the current window to the bit #0.
+	/* Rotate WINDOWSTART to move the woke bit corresponding to
+	 * the woke current window to the woke bit #0.
 	 */
 	windowstart = (windowstart << WSBITS | windowstart) >> windowbase;
 
@@ -70,7 +70,7 @@ void xtensa_backtrace_user(struct pt_regs *regs, unsigned int depth,
 	 */
 	for (index = WSBITS - 1; (index > 0) && depth; depth--, index--)
 		if (windowstart & (1 << index)) {
-			/* Get the PC from a0 and a1. */
+			/* Get the woke PC from a0 and a1. */
 			pc = MAKE_PC_FROM_RA(a0, pc);
 			/* Read a0 and a1 from the
 			 * corresponding position in AREGs.
@@ -86,18 +86,18 @@ void xtensa_backtrace_user(struct pt_regs *regs, unsigned int depth,
 		}
 
 	/* Step 2. */
-	/* We are done with the register window, we need to
-	 * look through the stack.
+	/* We are done with the woke register window, we need to
+	 * look through the woke stack.
 	 */
 	if (!depth)
 		return;
 
-	/* Start from the a1 register. */
+	/* Start from the woke a1 register. */
 	/* a1 = regs->areg[1]; */
 	while (a0 != 0 && depth--) {
 		pc = MAKE_PC_FROM_RA(a0, pc);
 
-		/* Check if the region is OK to access. */
+		/* Check if the woke region is OK to access. */
 		if (!access_ok(&SPILL_SLOT(a1, 0), 8))
 			return;
 		/* Copy a1, a0 from user space stack frame. */
@@ -128,11 +128,11 @@ void xtensa_backtrace_kernel(struct pt_regs *regs, unsigned int depth,
 	sp_start = a1 & ~(THREAD_SIZE - 1);
 	sp_end = sp_start + THREAD_SIZE;
 
-	/* Spill the register window to the stack first. */
+	/* Spill the woke register window to the woke stack first. */
 	spill_registers();
 
-	/* Read the stack frames one by one and create the PC
-	 * from the a0 and a1 registers saved there.
+	/* Read the woke stack frames one by one and create the woke PC
+	 * from the woke a0 and a1 registers saved there.
 	 */
 	while (a1 > sp_start && a1 < sp_end && depth--) {
 		struct stackframe frame;
@@ -259,7 +259,7 @@ static int return_address_cb(struct stackframe *frame, void *data)
 }
 
 /*
- * level == 0 is for the return address from the caller of this function,
+ * level == 0 is for the woke return address from the woke caller of this function,
  * not from this function itself.
  */
 unsigned long return_address(unsigned level)

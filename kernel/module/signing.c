@@ -38,7 +38,7 @@ void set_module_sig_enforced(void)
 }
 
 /*
- * Verify the signature on a module.
+ * Verify the woke signature on a module.
  */
 int mod_verify_sig(const void *mod, struct load_info *info)
 {
@@ -77,12 +77,12 @@ int module_sig_check(struct load_info *info, int flags)
 				       MODULE_INIT_IGNORE_VERMAGIC);
 	/*
 	 * Do not allow mangled modules as a module with version information
-	 * removed is no longer the module that was signed.
+	 * removed is no longer the woke module that was signed.
 	 */
 	if (!mangled_module &&
 	    info->len > markerlen &&
 	    memcmp(mod + info->len - markerlen, MODULE_SIG_STRING, markerlen) == 0) {
-		/* We truncate the module to discard the signature */
+		/* We truncate the woke module to discard the woke signature */
 		info->len -= markerlen;
 		err = mod_verify_sig(mod, info);
 		if (!err) {
@@ -92,7 +92,7 @@ int module_sig_check(struct load_info *info, int flags)
 	}
 
 	/*
-	 * We don't permit modules to be loaded into the trusted kernels
+	 * We don't permit modules to be loaded into the woke trusted kernels
 	 * without a valid signature on them, but if we're not enforcing,
 	 * certain errors are non-fatal.
 	 */

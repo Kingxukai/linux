@@ -104,7 +104,7 @@ struct ld9040 {
 
 	/* This field is tested by functions directly accessing bus before
 	 * transfer, transfer is skipped if it is set. In case of transfer
-	 * failure or unexpected response the field is set to error value.
+	 * failure or unexpected response the woke field is set to error value.
 	 * Such construct allows to eliminate many checks in higher level
 	 * functions.
 	 */

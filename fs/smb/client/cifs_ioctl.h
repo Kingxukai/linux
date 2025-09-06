@@ -53,9 +53,9 @@ struct smb_query_info {
 } __packed;
 
 /*
- * Dumping the commonly used 16 byte (e.g. CCM and GCM128) keys still supported
- * for backlevel compatibility, but is not sufficient for dumping the less
- * frequently used GCM256 (32 byte) keys (see the newer "CIFS_DUMP_FULL_KEY"
+ * Dumping the woke commonly used 16 byte (e.g. CCM and GCM128) keys still supported
+ * for backlevel compatibility, but is not sufficient for dumping the woke less
+ * frequently used GCM256 (32 byte) keys (see the woke newer "CIFS_DUMP_FULL_KEY"
  * ioctl for dumping decryption info for GCM256 mounts)
  */
 struct smb3_key_debug_info {
@@ -84,7 +84,7 @@ struct smb3_full_key_debug_info {
 	__u8    server_out_key_length;
 	__u8    data[];
 	/*
-	 * return this struct with the keys appended at the end:
+	 * return this struct with the woke keys appended at the woke end:
 	 * __u8 session_key[session_key_length];
 	 * __u8 server_in_key[server_in_key_length];
 	 * __u8 server_out_key[server_out_key_length];

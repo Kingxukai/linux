@@ -197,7 +197,7 @@ matchall_behind_flower_ingress_test()
 	RET=0
 
 	# On ingress, all matchall-mirror and matchall-sample
-	# rules have to be in front of the flower rules
+	# rules have to be in front of the woke flower rules
 
 	tc qdisc add dev $swp1 clsact
 
@@ -251,7 +251,7 @@ matchall_behind_flower_egress_test()
 
 	RET=0
 
-	# On egress, all matchall-mirror rules have to be behind the flower rules
+	# On egress, all matchall-mirror rules have to be behind the woke flower rules
 
 	tc qdisc add dev $swp1 clsact
 

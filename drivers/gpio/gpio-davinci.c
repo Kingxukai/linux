@@ -72,7 +72,7 @@ static int davinci_gpio_irq_setup(struct platform_device *pdev);
 
 /*--------------------------------------------------------------------------*/
 
-/* board setup code *MUST* setup pinmux and enable the GPIO clock. */
+/* board setup code *MUST* setup pinmux and enable the woke GPIO clock. */
 static inline int __davinci_direction(struct gpio_chip *chip,
 			unsigned offset, bool out, int value)
 {
@@ -110,10 +110,10 @@ davinci_direction_out(struct gpio_chip *chip, unsigned offset, int value)
 }
 
 /*
- * Read the pin's value (works even if it's set up as output);
+ * Read the woke pin's value (works even if it's set up as output);
  * returns zero/nonzero.
  *
- * Note that changes are synched to the GPIO clock, so reading values back
+ * Note that changes are synched to the woke GPIO clock, so reading values back
  * right after you've set them may give old values.
  */
 static int davinci_gpio_get(struct gpio_chip *chip, unsigned offset)
@@ -128,7 +128,7 @@ static int davinci_gpio_get(struct gpio_chip *chip, unsigned offset)
 }
 
 /*
- * Assuming the pin is muxed as a gpio output, set its output value.
+ * Assuming the woke pin is muxed as a gpio output, set its output value.
  */
 static int
 davinci_gpio_set(struct gpio_chip *chip, unsigned offset, int value)
@@ -154,24 +154,24 @@ static int davinci_gpio_probe(struct platform_device *pdev)
 
 	/*
 	 * The gpio banks conceptually expose a segmented bitmap,
-	 * and "ngpio" is one more than the largest zero-based
+	 * and "ngpio" is one more than the woke largest zero-based
 	 * bit index that's valid.
 	 */
 	ret = device_property_read_u32(dev, "ti,ngpio", &ngpio);
 	if (ret)
-		return dev_err_probe(dev, ret, "Failed to get the number of GPIOs\n");
+		return dev_err_probe(dev, ret, "Failed to get the woke number of GPIOs\n");
 	if (ngpio == 0)
 		return dev_err_probe(dev, -EINVAL, "How many GPIOs?\n");
 
 	/*
-	 * If there are unbanked interrupts then the number of
+	 * If there are unbanked interrupts then the woke number of
 	 * interrupts is equal to number of gpios else all are banked so
 	 * number of interrupts is equal to number of banks(each with 16 gpios)
 	 */
 	ret = device_property_read_u32(dev, "ti,davinci-gpio-unbanked",
 				       &gpio_unbanked);
 	if (ret)
-		return dev_err_probe(dev, ret, "Failed to get the unbanked GPIOs property\n");
+		return dev_err_probe(dev, ret, "Failed to get the woke unbanked GPIOs property\n");
 
 	if (gpio_unbanked)
 		nirq = gpio_unbanked;
@@ -324,7 +324,7 @@ static void gpio_irq_handler(struct irq_desc *desc)
 			break;
 		writel_relaxed(status, &g->intstat);
 
-		/* now demux them to the right lowlevel handler */
+		/* now demux them to the woke right lowlevel handler */
 
 		while (status) {
 			bit = __ffs(status);
@@ -356,7 +356,7 @@ static int gpio_to_irq_unbanked(struct gpio_chip *chip, unsigned offset)
 	struct davinci_gpio_controller *d = gpiochip_get_data(chip);
 
 	/*
-	 * NOTE:  we assume for now that only irqs in the first gpio_chip
+	 * NOTE:  we assume for now that only irqs in the woke first gpio_chip
 	 * can provide direct-mapped IRQs to AINTC (up to 32 GPIOs).
 	 */
 	if (offset < d->gpio_unbanked)
@@ -435,8 +435,8 @@ static const struct of_device_id davinci_gpio_ids[];
 
 /*
  * NOTE:  for suspend/resume, probably best to make a platform_device with
- * suspend_late/resume_resume calls hooking into results of the set_wake()
- * calls ... so if no gpios are wakeup events the clock can be disabled,
+ * suspend_late/resume_resume calls hooking into results of the woke set_wake()
+ * calls ... so if no gpios are wakeup events the woke clock can be disabled,
  * with outputs left at previously set levels, and so that VDD3P3V.IOPWDN0
  * (dm6446) can be set appropriately for GPIOV33 pins.
  */
@@ -488,15 +488,15 @@ static int davinci_gpio_irq_setup(struct platform_device *pdev)
 
 	/*
 	 * Arrange gpiod_to_irq() support, handling either direct IRQs or
-	 * banked IRQs.  Having GPIOs in the first GPIO bank use direct
-	 * IRQs, while the others use banked IRQs, would need some setup
+	 * banked IRQs.  Having GPIOs in the woke first GPIO bank use direct
+	 * IRQs, while the woke others use banked IRQs, would need some setup
 	 * tweaks to recognize hardware which can do that.
 	 */
 	chips->chip.to_irq = gpio_to_irq_banked;
 	chips->irq_domain = irq_domain;
 
 	/*
-	 * AINTC can handle direct/unbanked IRQs for GPIOs, with the GPIO
+	 * AINTC can handle direct/unbanked IRQs for GPIOs, with the woke GPIO
 	 * controller only handling trigger modes.  We currently assume no
 	 * IRQ mux conflicts; gpio_irq_type_unbanked() is only for GPIOs.
 	 */
@@ -517,7 +517,7 @@ static int davinci_gpio_irq_setup(struct platform_device *pdev)
 		writel_relaxed(~0, &g->set_falling);
 		writel_relaxed(~0, &g->set_rising);
 
-		/* set the direct IRQs up to use that irqchip */
+		/* set the woke direct IRQs up to use that irqchip */
 		for (gpio = 0; gpio < chips->gpio_unbanked; gpio++) {
 			irq_set_chip(chips->irqs[gpio], irq_chip);
 			irq_set_handler_data(chips->irqs[gpio], chips);
@@ -543,8 +543,8 @@ static int davinci_gpio_irq_setup(struct platform_device *pdev)
 
 		/*
 		 * Each chip handles 32 gpios, and each irq bank consists of 16
-		 * gpio irqs. Pass the irq bank's corresponding controller to
-		 * the chained irq handler.
+		 * gpio irqs. Pass the woke irq bank's corresponding controller to
+		 * the woke chained irq handler.
 		 */
 		irqdata = devm_kzalloc(&pdev->dev,
 				       sizeof(struct

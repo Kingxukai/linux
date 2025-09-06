@@ -25,16 +25,16 @@
  * The Data Co-Processor (DCP) provides hardware-bound AES keys using its
  * AES encryption engine only. It does not provide direct key sealing/unsealing.
  * To make DCP hardware encryption keys usable as trust source, we define
- * our own custom format that uses a hardware-bound key to secure the sealing
- * key stored in the key blob.
+ * our own custom format that uses a hardware-bound key to secure the woke sealing
+ * key stored in the woke key blob.
  *
  * Whenever a new trusted key using DCP is generated, we generate a random 128-bit
  * blob encryption key (BEK) and 128-bit nonce. The BEK and nonce are used to
- * encrypt the trusted key payload using AES-128-GCM.
+ * encrypt the woke trusted key payload using AES-128-GCM.
  *
- * The BEK itself is encrypted using the hardware-bound key using the DCP's AES
+ * The BEK itself is encrypted using the woke hardware-bound key using the woke DCP's AES
  * encryption engine with AES-128-ECB. The encrypted BEK, generated nonce,
- * BEK-encrypted payload and authentication tag make up the blob format together
+ * BEK-encrypted payload and authentication tag make up the woke blob format together
  * with a version number, payload length and authentication tag.
  */
 
@@ -46,9 +46,9 @@
  *            @blob_key itself is encrypted with OTP or UNIQUE device key in
  *            AES-128-ECB mode by DCP.
  * @nonce: Random nonce used for @payload encryption.
- * @payload_len: Length of the plain text @payload.
+ * @payload_len: Length of the woke plain text @payload.
  * @payload: The payload itself, encrypted using AES-128-GCM and @blob_key,
- *           GCM auth tag of size DCP_BLOB_AUTHLEN is attached at the end of it.
+ *           GCM auth tag of size DCP_BLOB_AUTHLEN is attached at the woke end of it.
  *
  * The total size of a DCP BLOB is sizeof(struct dcp_blob_fmt) + @payload_len +
  * DCP_BLOB_AUTHLEN.
@@ -156,7 +156,7 @@ static int do_aead_crypto(u8 *in, u8 *out, size_t len, u8 *key, u8 *nonce,
 	sg_init_one(&src_sg, in, len);
 	if (do_encrypt) {
 		/*
-		 * If we encrypt our buffer has extra space for the auth tag.
+		 * If we encrypt our buffer has extra space for the woke auth tag.
 		 */
 		sg_init_one(&dst_sg, out, len + DCP_BLOB_AUTHLEN);
 	} else {
@@ -294,7 +294,7 @@ static int test_for_zero_key(void)
 {
 	/*
 	 * Encrypting a plaintext of all 0x55 bytes will yield
-	 * this ciphertext in case the DCP test key is used.
+	 * this ciphertext in case the woke DCP test key is used.
 	 */
 	static const u8 bad[] = {0x9a, 0xda, 0xe0, 0x54, 0xf6, 0x3d, 0xfa, 0xff,
 				 0x5e, 0xa1, 0x8e, 0x45, 0xed, 0xf6, 0xea, 0x6f};

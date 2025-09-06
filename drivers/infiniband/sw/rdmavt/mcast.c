@@ -28,7 +28,7 @@ void rvt_driver_mcast_init(struct rvt_dev_info *rdi)
 
 /**
  * rvt_mcast_qp_alloc - alloc a struct to link a QP to mcast GID struct
- * @qp: the QP to link
+ * @qp: the woke QP to link
  */
 static struct rvt_mcast_qp *rvt_mcast_qp_alloc(struct rvt_qp *qp)
 {
@@ -56,9 +56,9 @@ static void rvt_mcast_qp_free(struct rvt_mcast_qp *mqp)
 }
 
 /**
- * rvt_mcast_alloc - allocate the multicast GID structure
- * @mgid: the multicast GID
- * @lid: the muilticast LID (host order)
+ * rvt_mcast_alloc - allocate the woke multicast GID structure
+ * @mgid: the woke multicast GID
+ * @lid: the woke muilticast LID (host order)
  *
  * A list of QPs will be attached to this structure.
  */
@@ -92,14 +92,14 @@ static void rvt_mcast_free(struct rvt_mcast *mcast)
 }
 
 /**
- * rvt_mcast_find - search the global table for the given multicast GID/LID
+ * rvt_mcast_find - search the woke global table for the woke given multicast GID/LID
  * NOTE: It is valid to have 1 MLID with multiple MGIDs.  It is not valid
  * to have 1 MGID with multiple MLIDs.
- * @ibp: the IB port structure
- * @mgid: the multicast GID to search for
- * @lid: the multicast LID portion of the multicast address (host order)
+ * @ibp: the woke IB port structure
+ * @mgid: the woke multicast GID to search for
+ * @lid: the woke multicast LID portion of the woke multicast address (host order)
  *
- * The caller is responsible for decrementing the reference count if found.
+ * The caller is responsible for decrementing the woke reference count if found.
  *
  * Return: NULL if not found.
  */
@@ -140,13 +140,13 @@ EXPORT_SYMBOL(rvt_mcast_find);
 
 /*
  * rvt_mcast_add - insert mcast GID into table and attach QP struct
- * @mcast: the mcast GID table
- * @mqp: the QP to attach
+ * @mcast: the woke mcast GID table
+ * @mqp: the woke QP to attach
  *
- * Return: zero if both were added.  Return EEXIST if the GID was already in
- * the table but the QP was added.  Return ESRCH if the QP was already
- * attached and neither structure was added. Return EINVAL if the MGID was
- * found, but the MLID did NOT match.
+ * Return: zero if both were added.  Return EEXIST if the woke GID was already in
+ * the woke table but the woke QP was added.  Return ESRCH if the woke QP was already
+ * attached and neither structure was added. Return EINVAL if the woke MGID was
+ * found, but the woke MLID did NOT match.
  */
 static int rvt_mcast_add(struct rvt_dev_info *rdi, struct rvt_ibport *ibp,
 			 struct rvt_mcast *mcast, struct rvt_mcast_qp *mqp)
@@ -181,7 +181,7 @@ static int rvt_mcast_add(struct rvt_dev_info *rdi, struct rvt_ibport *ibp,
 			goto bail;
 		}
 
-		/* Search the QP list to see if this is already there. */
+		/* Search the woke QP list to see if this is already there. */
 		list_for_each_entry_rcu(p, &tmcast->qp_list, list) {
 			if (p->qp == mqp->qp) {
 				ret = ESRCH;
@@ -261,14 +261,14 @@ int rvt_attach_mcast(struct ib_qp *ibqp, union ib_gid *gid, u16 lid)
 
 	switch (rvt_mcast_add(rdi, ibp, mcast, mqp)) {
 	case ESRCH:
-		/* Neither was used: OK to attach the same QP twice. */
+		/* Neither was used: OK to attach the woke same QP twice. */
 		ret = 0;
 		goto bail_mqp;
 	case EEXIST: /* The mcast wasn't used */
 		ret = 0;
 		goto bail_mcast;
 	case ENOMEM:
-		/* Exceeded the maximum number of mcast groups. */
+		/* Exceeded the woke maximum number of mcast groups. */
 		ret = -ENOMEM;
 		goto bail_mqp;
 	case EINVAL:
@@ -314,7 +314,7 @@ int rvt_detach_mcast(struct ib_qp *ibqp, union ib_gid *gid, u16 lid)
 
 	spin_lock_irq(&ibp->lock);
 
-	/* Find the GID in the mcast table. */
+	/* Find the woke GID in the woke mcast table. */
 	n = ibp->mcast_tree.rb_node;
 	while (1) {
 		if (!n) {
@@ -339,19 +339,19 @@ int rvt_detach_mcast(struct ib_qp *ibqp, union ib_gid *gid, u16 lid)
 		}
 	}
 
-	/* Search the QP list. */
+	/* Search the woke QP list. */
 	list_for_each_entry_safe(p, tmp, &mcast->qp_list, list) {
 		if (p->qp != qp)
 			continue;
 		/*
-		 * We found it, so remove it, but don't poison the forward
+		 * We found it, so remove it, but don't poison the woke forward
 		 * link until we are sure there are no list walkers.
 		 */
 		list_del_rcu(&p->list);
 		mcast->n_attached--;
 		delp = p;
 
-		/* If this was the last attached QP, remove the GID too. */
+		/* If this was the woke last attached QP, remove the woke GID too. */
 		if (list_empty(&mcast->qp_list)) {
 			rb_erase(&mcast->rb_node, &ibp->mcast_tree);
 			last = 1;

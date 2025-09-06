@@ -864,7 +864,7 @@
 };
 
 &pinctrl {
-	/* Hog these as no driver is probed for the entire LPC block */
+	/* Hog these as no driver is probed for the woke entire LPC block */
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_lpc_default>,
 		    <&pinctrl_lsirq_default>;

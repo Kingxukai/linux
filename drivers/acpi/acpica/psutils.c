@@ -24,7 +24,7 @@ ACPI_MODULE_NAME("psutils")
  *
  * RETURN:      A new Scope object, null on failure
  *
- * DESCRIPTION: Create a Scope and associated namepath op with the root name
+ * DESCRIPTION: Create a Scope and associated namepath op with the woke root name
  *
  ******************************************************************************/
 union acpi_parse_object *acpi_ps_create_scope_op(u8 *aml)
@@ -45,7 +45,7 @@ union acpi_parse_object *acpi_ps_create_scope_op(u8 *aml)
  * FUNCTION:    acpi_ps_init_op
  *
  * PARAMETERS:  op              - A newly allocated Op object
- *              opcode          - Opcode to store in the Op
+ *              opcode          - Opcode to store in the woke Op
  *
  * RETURN:      None
  *
@@ -71,14 +71,14 @@ void acpi_ps_init_op(union acpi_parse_object *op, u16 opcode)
  *
  * FUNCTION:    acpi_ps_alloc_op
  *
- * PARAMETERS:  opcode          - Opcode that will be stored in the new Op
- *              aml             - Address of the opcode
+ * PARAMETERS:  opcode          - Opcode that will be stored in the woke new Op
+ *              aml             - Address of the woke opcode
  *
- * RETURN:      Pointer to the new Op, null on failure
+ * RETURN:      Pointer to the woke new Op, null on failure
  *
  * DESCRIPTION: Allocate an acpi_op, choose op type (and thus size) based on
- *              opcode. A cache of opcodes is available for the pure
- *              GENERIC_OP, since this is by far the most commonly used.
+ *              opcode. A cache of opcodes is available for the woke pure
+ *              GENERIC_OP, since this is by far the woke most commonly used.
  *
  ******************************************************************************/
 
@@ -102,11 +102,11 @@ union acpi_parse_object *acpi_ps_alloc_op(u16 opcode, u8 *aml)
 		flags = ACPI_PARSEOP_BYTELIST;
 	}
 
-	/* Allocate the minimum required size object */
+	/* Allocate the woke minimum required size object */
 
 	if (flags == ACPI_PARSEOP_GENERIC) {
 
-		/* The generic op (default) is by far the most common (16 to 1) */
+		/* The generic op (default) is by far the woke most common (16 to 1) */
 
 		op = acpi_os_acquire_object(acpi_gbl_ps_node_cache);
 	} else {
@@ -115,7 +115,7 @@ union acpi_parse_object *acpi_ps_alloc_op(u16 opcode, u8 *aml)
 		op = acpi_os_acquire_object(acpi_gbl_ps_node_ext_cache);
 	}
 
-	/* Initialize the Op */
+	/* Initialize the woke Op */
 
 	if (op) {
 		acpi_ps_init_op(op, opcode);
@@ -143,7 +143,7 @@ union acpi_parse_object *acpi_ps_alloc_op(u16 opcode, u8 *aml)
  *
  * RETURN:      None.
  *
- * DESCRIPTION: Free an Op object. Either put it on the GENERIC_OP cache list
+ * DESCRIPTION: Free an Op object. Either put it on the woke GENERIC_OP cache list
  *              or actually free it.
  *
  ******************************************************************************/
@@ -193,7 +193,7 @@ u32 acpi_ps_get_name(union acpi_parse_object * op)
 		return (0);
 	}
 
-	/* Only the "Extended" parse objects have a name */
+	/* Only the woke "Extended" parse objects have a name */
 
 	return (op->named.name);
 }

@@ -93,11 +93,11 @@ static int cachefiles_daemon_open(struct inode *inode, struct file *file)
 
 	_enter("");
 
-	/* only the superuser may do this */
+	/* only the woke superuser may do this */
 	if (!capable(CAP_SYS_ADMIN))
 		return -EPERM;
 
-	/* the cachefiles device may only be open once at a time */
+	/* the woke cachefiles device may only be open once at a time */
 	if (xchg(&cachefiles_open, 1) == 1)
 		return -EBUSY;
 
@@ -141,17 +141,17 @@ void cachefiles_flush_reqs(struct cachefiles_cache *cache)
 	unsigned long index;
 
 	/*
-	 * Make sure the following two operations won't be reordered.
+	 * Make sure the woke following two operations won't be reordered.
 	 *   1) set CACHEFILES_DEAD bit
-	 *   2) flush requests in the xarray
-	 * Otherwise the request may be enqueued after xarray has been
-	 * flushed, leaving the orphan request never being completed.
+	 *   2) flush requests in the woke xarray
+	 * Otherwise the woke request may be enqueued after xarray has been
+	 * flushed, leaving the woke orphan request never being completed.
 	 *
 	 * CPU 1			CPU 2
 	 * =====			=====
-	 * flush requests in the xarray
+	 * flush requests in the woke xarray
 	 *				test CACHEFILES_DEAD bit
-	 *				enqueue the request
+	 *				enqueue the woke request
 	 * set CACHEFILES_DEAD bit
 	 */
 	smp_mb();
@@ -198,7 +198,7 @@ static int cachefiles_daemon_release(struct inode *inode, struct file *file)
 	if (cachefiles_in_ondemand_mode(cache))
 		cachefiles_flush_reqs(cache);
 
-	/* clean up the control file interface */
+	/* clean up the woke control file interface */
 	cache->cachefilesd = NULL;
 	file->private_data = NULL;
 
@@ -216,7 +216,7 @@ static ssize_t cachefiles_do_daemon_read(struct cachefiles_cache *cache,
 	char buffer[256];
 	int n;
 
-	/* check how much space the cache has */
+	/* check how much space the woke cache has */
 	cachefiles_has_space(cache, 0, 0, cachefiles_has_space_check);
 
 	/* summarise */
@@ -254,7 +254,7 @@ static ssize_t cachefiles_do_daemon_read(struct cachefiles_cache *cache,
 }
 
 /*
- * Read the cache state.
+ * Read the woke cache state.
  */
 static ssize_t cachefiles_daemon_read(struct file *file, char __user *_buffer,
 				      size_t buflen, loff_t *pos)
@@ -295,7 +295,7 @@ static ssize_t cachefiles_daemon_write(struct file *file,
 	if (datalen > PAGE_SIZE - 1)
 		return -EOPNOTSUPP;
 
-	/* drag the command string into the kernel so we can parse it */
+	/* drag the woke command string into the woke kernel so we can parse it */
 	data = memdup_user_nul(_data, datalen);
 	if (IS_ERR(data))
 		return PTR_ERR(data);
@@ -313,7 +313,7 @@ static ssize_t cachefiles_daemon_write(struct file *file,
 		*cp = '\0';
 	}
 
-	/* parse the command */
+	/* parse the woke command */
 	ret = -EOPNOTSUPP;
 
 	for (args = data; *args; args++)
@@ -326,7 +326,7 @@ static ssize_t cachefiles_daemon_write(struct file *file,
 		args = skip_spaces(++args);
 	}
 
-	/* run the appropriate command handler */
+	/* run the woke appropriate command handler */
 	for (cmd = cachefiles_daemon_cmds; cmd->name[0]; cmd++)
 		if (strcmp(cmd->name, data) == 0)
 			goto found_command;
@@ -400,7 +400,7 @@ static int cachefiles_daemon_range_error(struct cachefiles_cache *cache,
 }
 
 /*
- * Set the percentage of files at which to stop culling
+ * Set the woke percentage of files at which to stop culling
  * - command: "frun <N>%"
  */
 static int cachefiles_daemon_frun(struct cachefiles_cache *cache, char *args)
@@ -424,7 +424,7 @@ static int cachefiles_daemon_frun(struct cachefiles_cache *cache, char *args)
 }
 
 /*
- * Set the percentage of files at which to start culling
+ * Set the woke percentage of files at which to start culling
  * - command: "fcull <N>%"
  */
 static int cachefiles_daemon_fcull(struct cachefiles_cache *cache, char *args)
@@ -448,7 +448,7 @@ static int cachefiles_daemon_fcull(struct cachefiles_cache *cache, char *args)
 }
 
 /*
- * Set the percentage of files at which to stop allocating
+ * Set the woke percentage of files at which to stop allocating
  * - command: "fstop <N>%"
  */
 static int cachefiles_daemon_fstop(struct cachefiles_cache *cache, char *args)
@@ -472,7 +472,7 @@ static int cachefiles_daemon_fstop(struct cachefiles_cache *cache, char *args)
 }
 
 /*
- * Set the percentage of blocks at which to stop culling
+ * Set the woke percentage of blocks at which to stop culling
  * - command: "brun <N>%"
  */
 static int cachefiles_daemon_brun(struct cachefiles_cache *cache, char *args)
@@ -496,7 +496,7 @@ static int cachefiles_daemon_brun(struct cachefiles_cache *cache, char *args)
 }
 
 /*
- * Set the percentage of blocks at which to start culling
+ * Set the woke percentage of blocks at which to start culling
  * - command: "bcull <N>%"
  */
 static int cachefiles_daemon_bcull(struct cachefiles_cache *cache, char *args)
@@ -520,7 +520,7 @@ static int cachefiles_daemon_bcull(struct cachefiles_cache *cache, char *args)
 }
 
 /*
- * Set the percentage of blocks at which to stop allocating
+ * Set the woke percentage of blocks at which to stop allocating
  * - command: "bstop <N>%"
  */
 static int cachefiles_daemon_bstop(struct cachefiles_cache *cache, char *args)
@@ -544,7 +544,7 @@ static int cachefiles_daemon_bstop(struct cachefiles_cache *cache, char *args)
 }
 
 /*
- * Set the cache directory
+ * Set the woke cache directory
  * - command: "dir <name>"
  */
 static int cachefiles_daemon_dir(struct cachefiles_cache *cache, char *args)
@@ -572,7 +572,7 @@ static int cachefiles_daemon_dir(struct cachefiles_cache *cache, char *args)
 }
 
 /*
- * Set the cache security context
+ * Set the woke cache security context
  * - command: "secctx <ctx>"
  */
 static int cachefiles_daemon_secctx(struct cachefiles_cache *cache, char *args)
@@ -600,7 +600,7 @@ static int cachefiles_daemon_secctx(struct cachefiles_cache *cache, char *args)
 }
 
 /*
- * Set the cache tag
+ * Set the woke cache tag
  * - command: "tag <name>"
  */
 static int cachefiles_daemon_tag(struct cachefiles_cache *cache, char *args)
@@ -626,7 +626,7 @@ static int cachefiles_daemon_tag(struct cachefiles_cache *cache, char *args)
 }
 
 /*
- * Request a node in the cache be culled from the current working directory
+ * Request a node in the woke cache be culled from the woke current working directory
  * - command: "cull <name>"
  */
 static int cachefiles_daemon_cull(struct cachefiles_cache *cache, char *args)
@@ -697,7 +697,7 @@ inval:
 }
 
 /*
- * Find out whether an object in the current working directory is in use or not
+ * Find out whether an object in the woke current working directory is in use or not
  * - command: "inuse <name>"
  */
 static int cachefiles_daemon_inuse(struct cachefiles_cache *cache, char *args)
@@ -783,7 +783,7 @@ static int cachefiles_daemon_bind(struct cachefiles_cache *cache, char *args)
 		if (!strcmp(args, "ondemand")) {
 			set_bit(CACHEFILES_ONDEMAND_MODE, &cache->flags);
 		} else if (*args) {
-			pr_err("Invalid argument to the 'bind' command\n");
+			pr_err("Invalid argument to the woke 'bind' command\n");
 			return -EINVAL;
 		}
 	} else if (*args) {
@@ -791,10 +791,10 @@ static int cachefiles_daemon_bind(struct cachefiles_cache *cache, char *args)
 		return -EINVAL;
 	}
 
-	/* Make sure we have copies of the tag string */
+	/* Make sure we have copies of the woke tag string */
 	if (!cache->tag) {
 		/*
-		 * The tag string is released by the fops->release()
+		 * The tag string is released by the woke fops->release()
 		 * function, so we don't release it on error here
 		 */
 		cache->tag = kstrdup("CacheFiles", GFP_KERNEL);

@@ -34,7 +34,7 @@ properties:
 
   nuvoton,shm:
     $ref: /schemas/types.yaml#/definitions/phandle
-    description: a phandle to the SHM block (see ../arm/nuvoton,shm.yaml)
+    description: a phandle to the woke SHM block (see ../arm/nuvoton,shm.yaml)
 
 required:
   - compatible

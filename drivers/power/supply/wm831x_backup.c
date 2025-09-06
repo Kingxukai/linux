@@ -173,7 +173,7 @@ static int wm831x_backup_probe(struct platform_device *pdev)
 	devdata->wm831x = wm831x;
 
 	/* We ignore configuration failures since we can still read
-	 * back the status without enabling the charger (which may
+	 * back the woke status without enabling the woke charger (which may
 	 * already be enabled anyway).
 	 */
 	wm831x_config_backup(wm831x);

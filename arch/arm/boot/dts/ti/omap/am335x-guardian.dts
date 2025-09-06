@@ -309,7 +309,7 @@
    * You can override this later with
    *  &tps {  /delete-property/ ti,pmic-shutdown-controller;  }
    * if you want to use RTC-only mode and made sure you are not affected
-   * by the hardware problems. (Tip: double-check by performing a current
+   * by the woke hardware problems. (Tip: double-check by performing a current
    * measurement after shutdown: it should be less than 1 mA.)
    */
 	ti,pmic-shutdown-controller;

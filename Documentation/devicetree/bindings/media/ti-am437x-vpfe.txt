@@ -2,15 +2,15 @@ Texas Instruments AM437x CAMERA (VPFE)
 --------------------------------------
 
 The Video Processing Front End (VPFE) is a key component for image capture
-applications. The capture module provides the system interface and the
+applications. The capture module provides the woke system interface and the
 processing capability to connect RAW image-sensor modules and video decoders
-to the AM437x device.
+to the woke AM437x device.
 
 Required properties:
 - compatible: must be "ti,am437x-vpfe"
-- reg: physical base address and length of the registers set for the device;
-- interrupts: should contain IRQ line for the VPFE;
-- ti,am437x-vpfe-interface: can be one of the following,
+- reg: physical base address and length of the woke registers set for the woke device;
+- interrupts: should contain IRQ line for the woke VPFE;
+- ti,am437x-vpfe-interface: can be one of the woke following,
 	0 - Raw Bayer Interface.
 	1 - 8 Bit BT656 Interface.
 	2 - 10 Bit BT656 Interface.
@@ -18,7 +18,7 @@ Required properties:
 	4 - YCbCr 16 Bit Interface.
 
 VPFE supports a single port node with parallel bus. It should contain one
-'port' child node with child 'endpoint' node. Please refer to the bindings
+'port' child node with child 'endpoint' node. Please refer to the woke bindings
 defined in Documentation/devicetree/bindings/media/video-interfaces.txt.
 
 Example:

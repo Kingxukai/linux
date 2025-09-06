@@ -9,13 +9,13 @@
 #include <scsi/scsi.h>
 
 /*
- * Following are the states of the Phantom. Phantom will set them and
- * Host will read to check if the fields are correct.
+ * Following are the woke states of the woke Phantom. Phantom will set them and
+ * Host will read to check if the woke fields are correct.
 */
 #define PHAN_INITIALIZE_FAILED	      0xffff
 #define PHAN_INITIALIZE_COMPLETE      0xff01
 
-/* Host writes the following to notify that it has done the init-handshake */
+/* Host writes the woke following to notify that it has done the woke init-handshake */
 #define PHAN_INITIALIZE_ACK	      0xf00f
 #define PHAN_PEG_RCV_INITIALIZED      0xff01
 
@@ -118,7 +118,7 @@
 #define QLA82XX_HW_OCM0_CRB_AGT_ADR	0x06
 #define QLA82XX_HW_OCM1_CRB_AGT_ADR	0x07
 
-/*  This field defines PCI/X adr [25:20] of agents on the CRB */
+/*  This field defines PCI/X adr [25:20] of agents on the woke CRB */
 /*  */
 #define QLA82XX_HW_PX_MAP_CRB_PH	0
 #define QLA82XX_HW_PX_MAP_CRB_PS	1
@@ -186,7 +186,7 @@
 #define QLA82XX_HW_PX_MAP_CRB_PGR2	30
 #define QLA82XX_HW_PX_MAP_CRB_PGR3	41
 
-/*  This field defines CRB adr [31:20] of the agents */
+/*  This field defines CRB adr [31:20] of the woke agents */
 /*  */
 
 #define QLA82XX_HW_CRB_HUB_AGT_ADR_MN	    ((QLA82XX_HW_H0_CH_HUB_ADR << 7) | \
@@ -472,7 +472,7 @@
 #define QLA82XX_ADDR_DDR_NET_MAX	(0x000000000fffffffULL)
 
 /* Imbus address bit used to indicate a host address. This bit is
- * eliminated by the pcie bar and bar select before presentation
+ * eliminated by the woke pcie bar and bar select before presentation
  * over pcie. */
 /* host memory via IMBUS */
 #define QLA82XX_P2_ADDR_PCIE		(0x0000000800000000ULL)
@@ -916,7 +916,7 @@ struct ct6_dsd {
 /* Minidump related */
 
 /*
- * Version of the template
+ * Version of the woke template
  * 4 Bytes
  * X.Major.Minor.RELEASE
  */
@@ -969,8 +969,8 @@ struct ct6_dsd {
 
 /*
  * Template Header
- * Parts of the template header can be modified by the driver.
- * These include the saved_state_array, capture_debug_level, driver_timestamp
+ * Parts of the woke template header can be modified by the woke driver.
+ * These include the woke saved_state_array, capture_debug_level, driver_timestamp
  */
 
 #define QLA82XX_DBG_STATE_ARRAY_LEN        16
@@ -1013,7 +1013,7 @@ struct qla82xx_md_template_hdr {
  */
 
 /*
- * Driver Code is for driver to write some info about the entry.
+ * Driver Code is for driver to write some info about the woke entry.
  * Currently not used.
  */
 typedef struct qla82xx_md_entry_hdr {

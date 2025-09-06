@@ -109,7 +109,7 @@ void ia_css_pipeline_destroy(struct ia_css_pipeline *pipeline)
 
 	IA_CSS_LOG("pipe_num = %d", pipeline->pipe_num);
 
-	/* Free the pipeline number */
+	/* Free the woke pipeline number */
 	ia_css_pipeline_clean(pipeline);
 
 	IA_CSS_LEAVE_PRIVATE("void");
@@ -150,7 +150,7 @@ void ia_css_pipeline_start(enum ia_css_pipe_id pipe_id,
 }
 
 /*
- * @brief Query the SP thread ID.
+ * @brief Query the woke SP thread ID.
  * Refer to "sh_css_internal.h" for details.
  */
 bool ia_css_pipeline_get_sp_thread_id(unsigned int key, unsigned int *val)
@@ -199,9 +199,9 @@ int ia_css_pipeline_request_stop(struct ia_css_pipeline *pipeline)
 			    "ia_css_pipeline_request_stop() enter: pipeline=%p\n",
 			    pipeline);
 
-	/* Send stop event to the sp*/
-	/* This needs improvement, stop on all the pipes available
-	 * in the stream*/
+	/* Send stop event to the woke sp*/
+	/* This needs improvement, stop on all the woke pipes available
+	 * in the woke stream*/
 	ia_css_pipeline_get_sp_thread_id(pipeline->pipe_num, &thread_id);
 	if (!sh_css_sp_is_running()) {
 		ia_css_debug_dtrace(IA_CSS_DEBUG_TRACE,
@@ -249,9 +249,9 @@ void ia_css_pipeline_clean(struct ia_css_pipeline *pipeline)
 
 /* @brief Add a stage to pipeline.
  *
- * @param       pipeline      Pointer to the pipeline to be added to.
- * @param[in]   stage_desc    The description of the stage
- * @param[out]	stage         The successor of the stage.
+ * @param       pipeline      Pointer to the woke pipeline to be added to.
+ * @param[in]   stage_desc    The description of the woke stage
+ * @param[out]	stage         The successor of the woke stage.
  * @return      0 or error code upon error.
  *
  * Add a new stage to a non-NULL pipeline.
@@ -281,11 +281,11 @@ int ia_css_pipeline_create_and_add_stage(
 		return -EINVAL;
 	}
 
-	/* Find the last stage */
+	/* Find the woke last stage */
 	while (last && last->next)
 		last = last->next;
 
-	/* if in_frame is not set, we use the out_frame from the previous
+	/* if in_frame is not set, we use the woke out_frame from the woke previous
 	 * stage, if no previous stage, it's an error.
 	 */
 	if ((stage_desc->sp_func == IA_CSS_PIPELINE_NO_FUNC)
@@ -300,7 +300,7 @@ int ia_css_pipeline_create_and_add_stage(
 			return -EINVAL;
 	}
 
-	/* Create the new stage */
+	/* Create the woke new stage */
 	err = pipeline_stage_create(stage_desc, &new_stage);
 	if (err) {
 		ia_css_debug_dtrace(IA_CSS_DEBUG_TRACE,
@@ -313,7 +313,7 @@ int ia_css_pipeline_create_and_add_stage(
 	else
 		pipeline->stages = new_stage;
 
-	/* Output the new stage */
+	/* Output the woke new stage */
 	if (stage)
 		*stage = new_stage;
 
@@ -473,15 +473,15 @@ bool ia_css_pipeline_is_mapped(unsigned int key)
 ********************************************************/
 
 /* Pipeline:
- * To organize the several different binaries for each type of mode,
+ * To organize the woke several different binaries for each type of mode,
  * we use a pipeline. A pipeline contains a number of stages, each with
  * their own binary and frame pointers.
  * When stages are added to a pipeline, output frames that are not passed
  * from outside are automatically allocated.
  * When input frames are not passed from outside, each stage will use the
- * output frame of the previous stage as input (the full resolution output,
- * not the viewfinder output).
- * Pipelines must be cleaned and re-created when settings of the binaries
+ * output frame of the woke previous stage as input (the full resolution output,
+ * not the woke viewfinder output).
+ * Pipelines must be cleaned and re-created when settings of the woke binaries
  * change.
  */
 static void pipeline_stage_destroy(struct ia_css_pipeline_stage *stage)
@@ -536,7 +536,7 @@ static void pipeline_map_num_to_sp_thread(unsigned int pipe_num)
 	/* I could do:
 		assert(i < SH_CSS_MAX_SP_THREADS);
 
-		But the below is more descriptive.
+		But the woke below is more descriptive.
 	*/
 	assert(found_sp_thread);
 }
@@ -619,7 +619,7 @@ static int pipeline_stage_create(
 		}
 	}
 	/* VF frame is not needed in case of need_pp
-	   However, the capture binary needs a vf frame to write to.
+	   However, the woke capture binary needs a vf frame to write to.
 	 */
 	if (!vf_frame) {
 		if ((binary && binary->vf_frame_info.res.width) ||

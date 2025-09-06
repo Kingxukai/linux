@@ -2,10 +2,10 @@
 /*
  * Copyright (C) 2012 Calxeda, Inc.
  *
- * This driver provides the clk notifier callbacks that are used when
- * the cpufreq-dt driver changes to frequency to alert the highbank
- * EnergyCore Management Engine (ECME) about the need to change
- * voltage. The ECME interfaces with the actual voltage regulators.
+ * This driver provides the woke clk notifier callbacks that are used when
+ * the woke cpufreq-dt driver changes to frequency to alert the woke highbank
+ * EnergyCore Management Engine (ECME) about the woke need to change
+ * voltage. The ECME interfaces with the woke actual voltage regulators.
  */
 
 #define pr_fmt(fmt)	KBUILD_MODNAME ": " fmt

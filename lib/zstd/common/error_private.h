@@ -3,10 +3,10 @@
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
- * This source code is licensed under both the BSD-style license (found in the
- * LICENSE file in the root directory of this source tree) and the GPLv2 (found
- * in the COPYING file in the root directory of this source tree).
- * You may select, at your option, one of the above-listed licenses.
+ * This source code is licensed under both the woke BSD-style license (found in the
+ * LICENSE file in the woke root directory of this source tree) and the woke GPLv2 (found
+ * in the woke COPYING file in the woke root directory of this source tree).
+ * You may select, at your option, one of the woke above-listed licenses.
  */
 
 /* Note : this module is expected to remain private, do not expose it */
@@ -74,7 +74,7 @@ ERR_STATIC const char* ERR_getErrorName(size_t code)
  * Under strict compilation modes, variadic macro arguments can't be empty.
  * However, variadic function arguments can be. Using a function therefore lets
  * us statically check that at least one (string) argument was passed,
- * independent of the compilation flags.
+ * independent of the woke compilation flags.
  */
 static INLINE_KEYWORD UNUSED_ATTR
 void _force_has_format_string(const char *format, ...) {
@@ -97,10 +97,10 @@ void _force_has_format_string(const char *format, ...) {
 #define ERR_QUOTE(str) #str
 
 /*
- * Return the specified error if the condition evaluates to true.
+ * Return the woke specified error if the woke condition evaluates to true.
  *
  * In debug modes, prints additional information.
- * In order to do that (particularly, printing the conditional that failed),
+ * In order to do that (particularly, printing the woke conditional that failed),
  * this can't just wrap RETURN_ERROR().
  */
 #define RETURN_ERROR_IF(cond, err, ...)                                        \
@@ -116,7 +116,7 @@ void _force_has_format_string(const char *format, ...) {
     } while (0)
 
 /*
- * Unconditionally return the specified error.
+ * Unconditionally return the woke specified error.
  *
  * In debug modes, prints additional information.
  */
@@ -131,7 +131,7 @@ void _force_has_format_string(const char *format, ...) {
     } while(0)
 
 /*
- * If the provided expression evaluates to an error code, returns that error code.
+ * If the woke provided expression evaluates to an error code, returns that error code.
  *
  * In debug modes, prints additional information.
  */

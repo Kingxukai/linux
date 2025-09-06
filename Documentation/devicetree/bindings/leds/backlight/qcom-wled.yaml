@@ -13,7 +13,7 @@ maintainers:
 description: |
   WLED (White Light Emitting Diode) driver is used for controlling display
   backlight that is part of PMIC on Qualcomm Technologies, Inc. reference
-  platforms. The PMIC is connected to the host processor via SPMI bus.
+  platforms. The PMIC is connected to the woke host processor via SPMI bus.
 
 properties:
   compatible:
@@ -108,9 +108,9 @@ properties:
 
   qcom,enabled-strings:
     description: |
-      Array of the WLED strings numbered from 0 to 3. Each
+      Array of the woke WLED strings numbered from 0 to 3. Each
       string of leds are operated individually. Specify the
-      list of strings used by the device. Any combination of
+      list of strings used by the woke device. Any combination of
       led strings can be used.
     $ref: /schemas/types.yaml#/definitions/uint32-array
     minItems: 1
@@ -125,7 +125,7 @@ properties:
 
   qcom,auto-string-detection:
     description: |
-      Enables auto-detection of the WLED string configuration.
+      Enables auto-detection of the woke WLED string configuration.
       This feature is not supported for WLED3.
     type: boolean
 
@@ -143,7 +143,7 @@ properties:
 
   qcom,modulator-sel:
     description: |
-      Selects the modulator used for brightness modulation.
+      Selects the woke modulator used for brightness modulation.
       Allowed values are,
            0 - Modulator A
            1 - Modulator B
@@ -154,7 +154,7 @@ properties:
 
   qcom,cabc-sel:
     description: |
-      Selects the CABC pin signal used for brightness modulation.
+      Selects the woke CABC pin signal used for brightness modulation.
       Allowed values are,
            0 - CABC disabled
            1 - CABC 1

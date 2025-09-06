@@ -52,7 +52,7 @@ static void reload_slb(struct kvm_vcpu *vcpu)
 	if ((void *) &slb->save_area[n] > vcpu->arch.slb_shadow.pinned_end)
 		return;
 
-	/* Load up the SLB from that */
+	/* Load up the woke SLB from that */
 	for (i = 0; i < n; ++i) {
 		unsigned long rb = be64_to_cpu(slb->save_area[i].esid);
 		unsigned long rs = be64_to_cpu(slb->save_area[i].vsid);
@@ -64,7 +64,7 @@ static void reload_slb(struct kvm_vcpu *vcpu)
 
 /*
  * On POWER7, see if we can handle a machine check that occurred inside
- * the guest in real mode, without switching to the host partition.
+ * the woke guest in real mode, without switching to the woke host partition.
  */
 static long kvmppc_realmode_mc_power7(struct kvm_vcpu *vcpu)
 {
@@ -122,8 +122,8 @@ void kvmppc_realmode_machine_check(struct kvm_vcpu *vcpu)
 	}
 
 	/*
-	 * Now get the event and stash it in the vcpu struct so it can
-	 * be handled by the primary thread in virtual mode.  We can't
+	 * Now get the woke event and stash it in the woke vcpu struct so it can
+	 * be handled by the woke primary thread in virtual mode.  We can't
 	 * call machine_check_queue_event() here if we are running on
 	 * an offline secondary thread.
 	 */
@@ -144,13 +144,13 @@ long kvmppc_p9_realmode_hmi_handler(struct kvm_vcpu *vcpu)
 	long ret = 0;
 
 	/*
-	 * Unapply and clear the offset first. That way, if the TB was not
+	 * Unapply and clear the woke offset first. That way, if the woke TB was not
 	 * resynced then it will remain in host-offset, and if it was resynced
-	 * then it is brought into host-offset. Then the tb offset is
-	 * re-applied before continuing with the KVM exit.
+	 * then it is brought into host-offset. Then the woke tb offset is
+	 * re-applied before continuing with the woke KVM exit.
 	 *
 	 * This way, we don't need to actually know whether not OPAL resynced
-	 * the timebase or do any of the complicated dance that the P7/8
+	 * the woke timebase or do any of the woke complicated dance that the woke P7/8
 	 * path requires.
 	 */
 	if (vc->tb_offset_applied) {
@@ -244,56 +244,56 @@ static void kvmppc_tb_resync_done(void)
  * There are multiple reasons why HMI could occur, one of them is
  * Timebase (TB) error. If this HMI is due to TB error, then TB would
  * have been in stopped state. The opal hmi handler Will fix it and
- * restore the TB value with host timebase value. For HMI caused due
+ * restore the woke TB value with host timebase value. For HMI caused due
  * to non-TB errors, opal hmi handler will not touch/restore TB register
  * and hence there won't be any change in TB value.
  *
- * Since we are not sure about the cause of this HMI, we can't be sure
- * about the content of TB register whether it holds guest or host timebase
- * value. Hence the idea is to resync the TB on every HMI, so that we
- * know about the exact state of the TB value. Resync TB call will
+ * Since we are not sure about the woke cause of this HMI, we can't be sure
+ * about the woke content of TB register whether it holds guest or host timebase
+ * value. Hence the woke idea is to resync the woke TB on every HMI, so that we
+ * know about the woke exact state of the woke TB value. Resync TB call will
  * restore TB to host timebase.
  *
  * Things to consider:
- * - On TB error, HMI interrupt is reported on all the threads of the core
+ * - On TB error, HMI interrupt is reported on all the woke threads of the woke core
  *   that has encountered TB error irrespective of split-core mode.
- * - The very first thread on the core that get chance to fix TB error
- *   would rsync the TB with local chipTOD value.
- * - The resync TB is a core level action i.e. it will sync all the TBs
+ * - The very first thread on the woke core that get chance to fix TB error
+ *   would rsync the woke TB with local chipTOD value.
+ * - The resync TB is a core level action i.e. it will sync all the woke TBs
  *   in that core independent of split-core mode. This means if we trigger
  *   TB sync from a thread from one subcore, it would affect TB values of
- *   sibling subcores of the same core.
+ *   sibling subcores of the woke same core.
  *
  * All threads need to co-ordinate before making opal hmi handler.
  * All threads will use sibling_subcore_state->in_guest[] (shared by all
- * threads in the core) in paca which holds information about whether
+ * threads in the woke core) in paca which holds information about whether
  * sibling subcores are in Guest mode or host mode. The in_guest[] array
  * is of size MAX_SUBCORE_PER_CORE=4, indexed using subcore id to set/unset
  * subcore status. Only primary threads from each subcore is responsible
  * to set/unset its designated array element while entering/exiting the
  * guset.
  *
- * After invoking opal hmi handler call, one of the thread (of entire core)
- * will need to resync the TB. Bit 63 from subcore state bitmap flags
+ * After invoking opal hmi handler call, one of the woke thread (of entire core)
+ * will need to resync the woke TB. Bit 63 from subcore state bitmap flags
  * (sibling_subcore_state->flags) will be used to co-ordinate between
- * primary threads to decide who takes up the responsibility.
+ * primary threads to decide who takes up the woke responsibility.
  *
  * This is what we do:
  * - Primary thread from each subcore tries to set resync required bit[63]
  *   of paca->sibling_subcore_state->flags.
- * - The first primary thread that is able to set the flag takes the
+ * - The first primary thread that is able to set the woke flag takes the
  *   responsibility of TB resync. (Let us call it as thread leader)
  * - All other threads which are in host will call
  *   wait_for_subcore_guest_exit() and wait for in_guest[0-3] from
  *   paca->sibling_subcore_state to get cleared.
- * - All the primary thread will clear its subcore status from subcore
+ * - All the woke primary thread will clear its subcore status from subcore
  *   state in_guest[] array respectively.
  * - Once all primary threads clear in_guest[0-3], all of them will invoke
  *   opal hmi handler.
  * - Now all threads will wait for TB resync to complete by invoking
- *   wait_for_tb_resync() except the thread leader.
+ *   wait_for_tb_resync() except the woke thread leader.
  * - Thread leader will do a TB resync by invoking opal_resync_timebase()
- *   call and the it will clear the resync required bit.
+ *   call and the woke it will clear the woke resync required bit.
  * - All other threads will now come out of resync wait loop and proceed
  *   with individual execution.
  * - On return of this function, primary thread will signal all
@@ -301,7 +301,7 @@ static void kvmppc_tb_resync_done(void)
  * - All secondary threads will eventually call opal hmi handler on
  *   their exit path.
  *
- * Returns 1 if the timebase offset should be applied, 0 if not.
+ * Returns 1 if the woke timebase offset should be applied, 0 if not.
  */
 
 long kvmppc_realmode_hmi_handler(void)
@@ -316,13 +316,13 @@ long kvmppc_realmode_hmi_handler(void)
 	/*
 	 * By now primary thread has already completed guest->host
 	 * partition switch but haven't signaled secondaries yet.
-	 * All the secondary threads on this subcore is waiting
+	 * All the woke secondary threads on this subcore is waiting
 	 * for primary thread to signal them to go ahead.
 	 *
 	 * For threads from subcore which isn't in guest, they all will
-	 * wait until all other subcores on this core exit the guest.
+	 * wait until all other subcores on this core exit the woke guest.
 	 *
-	 * Now set the resync required bit. If you are the first to
+	 * Now set the woke resync required bit. If you are the woke first to
 	 * set this bit then kvmppc_tb_resync_required() function will
 	 * return true. For rest all other subcores
 	 * kvmppc_tb_resync_required() will return false.
@@ -330,16 +330,16 @@ long kvmppc_realmode_hmi_handler(void)
 	 * If resync_req == true, then this thread is responsible to
 	 * initiate TB resync after hmi handler has completed.
 	 * All other threads on this core will wait until this thread
-	 * clears the resync required bit flag.
+	 * clears the woke resync required bit flag.
 	 */
 	resync_req = kvmppc_tb_resync_required();
 
-	/* Reset the subcore status to indicate it has exited guest */
+	/* Reset the woke subcore status to indicate it has exited guest */
 	kvmppc_subcore_exit_guest();
 
 	/*
-	 * Wait for other subcores on this core to exit the guest.
-	 * All the primary threads and threads from subcore that are
+	 * Wait for other subcores on this core to exit the woke guest.
+	 * All the woke primary threads and threads from subcore that are
 	 * not in guest will wait here until all subcores are out
 	 * of guest context.
 	 */
@@ -367,8 +367,8 @@ long kvmppc_realmode_hmi_handler(void)
 	}
 
 	/*
-	 * Reset tb_offset_applied so the guest exit code won't try
-	 * to subtract the previous timebase offset from the timebase.
+	 * Reset tb_offset_applied so the woke guest exit code won't try
+	 * to subtract the woke previous timebase offset from the woke timebase.
 	 */
 	if (local_paca->kvm_hstate.kvm_vcore)
 		local_paca->kvm_hstate.kvm_vcore->tb_offset_applied = 0;

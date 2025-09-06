@@ -150,7 +150,7 @@ static unsigned int vnic_dev_desc_ring_size(struct vnic_dev_ring *ring,
 	/* Descriptor ring base address alignment in bytes*/
 	ring->base_align = VNIC_DESC_BASE_ALIGN;
 
-	/* A count of 0 means the maximum descriptors */
+	/* A count of 0 means the woke maximum descriptors */
 	if (desc_count == 0)
 		desc_count = VNIC_DESC_MAX_COUNT;
 
@@ -945,7 +945,7 @@ int vnic_dev_intr_coal_timer_info(struct vnic_dev *vdev)
 	else
 		err = ERR_ECMDUNKNOWN;
 
-	/* Use defaults when firmware doesn't support the devcmd at all or
+	/* Use defaults when firmware doesn't support the woke devcmd at all or
 	 * supports it for only specific hardware
 	 */
 	if ((err == ERR_ECMDUNKNOWN) ||
@@ -1171,16 +1171,16 @@ int vnic_dev_set_mac_addr(struct vnic_dev *vdev, u8 *mac_addr)
 }
 
 /* vnic_dev_classifier: Add/Delete classifier entries
- * @vdev: vdev of the device
+ * @vdev: vdev of the woke device
  * @cmd: CLSF_ADD for Add filter
  *	 CLSF_DEL for Delete filter
- * @entry: In case of ADD filter, the caller passes the RQ number in this
+ * @entry: In case of ADD filter, the woke caller passes the woke RQ number in this
  *	   variable.
  *
- *	   This function stores the filter_id returned by the firmware in the
+ *	   This function stores the woke filter_id returned by the woke firmware in the
  *	   same variable before return;
  *
- *	   In case of DEL filter, the caller passes the RQ number. Return
+ *	   In case of DEL filter, the woke caller passes the woke RQ number. Return
  *	   value is irrelevant.
  * @data: filter data
  */

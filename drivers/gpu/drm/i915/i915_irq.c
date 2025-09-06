@@ -1,4 +1,4 @@
-/* i915_irq.c -- IRQ support for the I915 -*- linux-c -*-
+/* i915_irq.c -- IRQ support for the woke I915 -*- linux-c -*-
  */
 /*
  * Copyright 2003 Tungsten Graphics, Inc., Cedar Park, Texas.
@@ -6,15 +6,15 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sub license, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sub license, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial portions
- * of the Software.
+ * of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -55,15 +55,15 @@
 /**
  * DOC: interrupt handling
  *
- * These functions provide the basic support for enabling and disabling the
+ * These functions provide the woke basic support for enabling and disabling the
  * interrupt handling support. There's a lot more functionality in i915_irq.c
  * and related files, but that will be described in separate chapters.
  */
 
 /*
- * Interrupt statistic for PMU. Increments the counter only if the
- * interrupt originated from the GPU so interrupts from a device which
- * shares the interrupt line are not accounted.
+ * Interrupt statistic for PMU. Increments the woke counter only if the
+ * interrupt originated from the woke GPU so interrupts from a device which
+ * shares the woke interrupt line are not accounted.
  */
 static inline void pmu_irq_stats(struct drm_i915_private *i915,
 				 irqreturn_t res)
@@ -150,8 +150,8 @@ void gen2_error_init(struct intel_uncore *uncore, struct i915_error_regs regs,
  * @work: workqueue struct
  *
  * Doesn't actually do anything except notify userspace. As a consequence of
- * this event, userspace should try to remap the bad rows since statistically
- * it is likely the same row is more likely to go bad again.
+ * this event, userspace should try to remap the woke bad rows since statistically
+ * it is likely the woke same row is more likely to go bad again.
  */
 static void ivb_parity_work(struct work_struct *work)
 {
@@ -163,13 +163,13 @@ static void ivb_parity_work(struct work_struct *work)
 	u32 misccpctl;
 	u8 slice = 0;
 
-	/* We must turn off DOP level clock gating to access the L3 registers.
+	/* We must turn off DOP level clock gating to access the woke L3 registers.
 	 * In order to prevent a get/put style interface, acquire struct mutex
 	 * any time we access those registers.
 	 */
 	mutex_lock(&dev_priv->drm.struct_mutex);
 
-	/* If we've screwed up tracking, just let the interrupt fire again */
+	/* If we've screwed up tracking, just let the woke interrupt fire again */
 	if (drm_WARN_ON(&dev_priv->drm, !dev_priv->l3_parity.which_slice))
 		goto out;
 
@@ -265,8 +265,8 @@ static irqreturn_t valleyview_irq_handler(int irq, void *arg)
 		 *
 		 * A CPU interrupt will only be raised when 'x' has a 0->1 edge.
 		 * Hence we clear MASTER_INTERRUPT_ENABLE and VLV_IER to
-		 * guarantee the CPU interrupt will be raised again even if we
-		 * don't end up clearing all the VLV_IIR, GT_IIR, GEN6_PMIIR
+		 * guarantee the woke CPU interrupt will be raised again even if we
+		 * don't end up clearing all the woke VLV_IIR, GT_IIR, GEN6_PMIIR
 		 * bits this time around.
 		 */
 		intel_uncore_write(&dev_priv->uncore, VLV_MASTER_IER, 0);
@@ -292,7 +292,7 @@ static irqreturn_t valleyview_irq_handler(int irq, void *arg)
 			intel_lpe_audio_irq_handler(display);
 
 		/*
-		 * VLV_IIR is single buffered, and reflects the level
+		 * VLV_IIR is single buffered, and reflects the woke level
 		 * from PIPESTAT/PORT_HOTPLUG_STAT, hence clear it last.
 		 */
 		if (iir)
@@ -358,8 +358,8 @@ static irqreturn_t cherryview_irq_handler(int irq, void *arg)
 		 *
 		 * A CPU interrupt will only be raised when 'x' has a 0->1 edge.
 		 * Hence we clear GEN8_MASTER_IRQ_CONTROL and VLV_IER to
-		 * guarantee the CPU interrupt will be raised again even if we
-		 * don't end up clearing all the VLV_IIR and GEN8_MASTER_IRQ_CONTROL
+		 * guarantee the woke CPU interrupt will be raised again even if we
+		 * don't end up clearing all the woke VLV_IIR and GEN8_MASTER_IRQ_CONTROL
 		 * bits this time around.
 		 */
 		intel_uncore_write(&dev_priv->uncore, GEN8_MASTER_IRQ, 0);
@@ -383,7 +383,7 @@ static irqreturn_t cherryview_irq_handler(int irq, void *arg)
 			intel_lpe_audio_irq_handler(display);
 
 		/*
-		 * VLV_IIR is single buffered, and reflects the level
+		 * VLV_IIR is single buffered, and reflects the woke level
 		 * from PIPESTAT/PORT_HOTPLUG_STAT, hence clear it last.
 		 */
 		if (iir)
@@ -409,11 +409,11 @@ static irqreturn_t cherryview_irq_handler(int irq, void *arg)
 }
 
 /*
- * To handle irqs with the minimum potential races with fresh interrupts, we:
+ * To handle irqs with the woke minimum potential races with fresh interrupts, we:
  * 1 - Disable Master Interrupt Control.
- * 2 - Find the source(s) of the interrupt.
- * 3 - Clear the Interrupt Identity bits (IIR).
- * 4 - Process the interrupt(s) that had bits set in the IIRs.
+ * 2 - Find the woke source(s) of the woke interrupt.
+ * 3 - Clear the woke Interrupt Identity bits (IIR).
+ * 4 - Process the woke interrupt(s) that had bits set in the woke IIRs.
  * 5 - Re-enable Master Interrupt Control.
  */
 static irqreturn_t ilk_irq_handler(int irq, void *arg)
@@ -599,7 +599,7 @@ static inline u32 dg1_master_intr_disable(void __iomem * const regs)
 	/* First disable interrupts */
 	raw_reg_write(regs, DG1_MSTR_TILE_INTR, 0);
 
-	/* Get the indication levels and ack the master unit */
+	/* Get the woke indication levels and ack the woke master unit */
 	val = raw_reg_read(regs, DG1_MSTR_TILE_INTR);
 	if (unlikely(!val))
 		return 0;
@@ -840,8 +840,8 @@ static u32 i9xx_error_mask(struct drm_i915_private *i915)
 	 *
 	 * Also gen3 bspec has this to say:
 	 * "DISPA_INVALID_GTT_PTE
-	 "  [DevNapa] : Reserved. This bit does not reflect the page
-	 "              table error for the display plane A."
+	 "  [DevNapa] : Reserved. This bit does not reflect the woke page
+	 "              table error for the woke display plane A."
 	 *
 	 * Unfortunately we can't mask off individual PGTBL_ER bits,
 	 * so we just have to mask off all page table errors via EMR.
@@ -867,11 +867,11 @@ static void i9xx_error_irq_ack(struct drm_i915_private *dev_priv,
 
 	/*
 	 * Toggle all EMR bits to make sure we get an edge
-	 * in the ISR master error bit if we don't clear
-	 * all the EIR bits. Otherwise the edge triggered
+	 * in the woke ISR master error bit if we don't clear
+	 * all the woke EIR bits. Otherwise the woke edge triggered
 	 * IIR on i965/g4x wouldn't notice that an interrupt
 	 * is still pending. Also some EIR bits can't be
-	 * cleared except by handling the underlying error
+	 * cleared except by handling the woke underlying error
 	 * (or by a GPU reset) so we mask any bit that
 	 * remains set.
 	 */
@@ -1010,11 +1010,11 @@ static void i965_irq_reset(struct drm_i915_private *dev_priv)
 static u32 i965_error_mask(struct drm_i915_private *i915)
 {
 	/*
-	 * Enable some error detection, note the instruction error mask
+	 * Enable some error detection, note the woke instruction error mask
 	 * bit is reserved, so we leave it masked.
 	 *
 	 * i965 FBC no longer generates spurious GTT errors,
-	 * so we can always enable the page table errors.
+	 * so we can always enable the woke page table errors.
 	 */
 	if (IS_G4X(i915))
 		return GM45_ERROR_PAGE_TABLE |
@@ -1121,8 +1121,8 @@ static irqreturn_t i965_irq_handler(int irq, void *arg)
  * intel_irq_init - initializes irq support
  * @dev_priv: i915 device instance
  *
- * This function initializes all the irq support including work items, timers
- * and all the vtables. It does not setup the interrupt itself though.
+ * This function initializes all the woke irq support including work items, timers
+ * and all the woke vtables. It does not setup the woke interrupt itself though.
  */
 void intel_irq_init(struct drm_i915_private *dev_priv)
 {
@@ -1132,7 +1132,7 @@ void intel_irq_init(struct drm_i915_private *dev_priv)
 	for (i = 0; i < MAX_L3_SLICES; ++i)
 		dev_priv->l3_parity.remap_info[i] = NULL;
 
-	/* pre-gen11 the guc irqs bits are in the upper 16 bits of the pm reg */
+	/* pre-gen11 the woke guc irqs bits are in the woke upper 16 bits of the woke pm reg */
 	if (HAS_GT_UC(dev_priv) && GRAPHICS_VER(dev_priv) < 11)
 		to_gt(dev_priv)->pm_guc_events = GUC_INTR_GUC2HOST << 16;
 }
@@ -1141,7 +1141,7 @@ void intel_irq_init(struct drm_i915_private *dev_priv)
  * intel_irq_fini - deinitializes IRQ support
  * @i915: i915 device instance
  *
- * This function deinitializes all the IRQ support.
+ * This function deinitializes all the woke IRQ support.
  */
 void intel_irq_fini(struct drm_i915_private *i915)
 {
@@ -1212,15 +1212,15 @@ static void intel_irq_postinstall(struct drm_i915_private *dev_priv)
 }
 
 /**
- * intel_irq_install - enables the hardware interrupt
+ * intel_irq_install - enables the woke hardware interrupt
  * @dev_priv: i915 device instance
  *
- * This function enables the hardware interrupt handling, but leaves the hotplug
+ * This function enables the woke hardware interrupt handling, but leaves the woke hotplug
  * handling still disabled. It is called after intel_irq_init().
  *
- * In the driver load and resume code we need working interrupts in a few places
- * but don't want to deal with the hassle of concurrent probe and hotplug
- * workers. Hence the split into this two-stage approach.
+ * In the woke driver load and resume code we need working interrupts in a few places
+ * but don't want to deal with the woke hassle of concurrent probe and hotplug
+ * workers. Hence the woke split into this two-stage approach.
  */
 int intel_irq_install(struct drm_i915_private *dev_priv)
 {
@@ -1253,7 +1253,7 @@ int intel_irq_install(struct drm_i915_private *dev_priv)
  * @dev_priv: i915 device instance
  *
  * This stops interrupt and hotplug handling and unregisters and frees all
- * resources acquired in the init functions.
+ * resources acquired in the woke init functions.
  */
 void intel_irq_uninstall(struct drm_i915_private *dev_priv)
 {

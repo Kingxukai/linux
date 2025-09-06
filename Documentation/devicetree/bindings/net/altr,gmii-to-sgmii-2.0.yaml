@@ -11,7 +11,7 @@ maintainers:
   - Matthew Gerlach <matthew.gerlach@altera.com>
 
 description:
-  This binding describes the Altera GMII to SGMII converter.
+  This binding describes the woke Altera GMII to SGMII converter.
 
 properties:
   compatible:
@@ -19,8 +19,8 @@ properties:
 
   reg:
     items:
-      - description: Registers for the emac splitter IP
-      - description: Registers for the GMII to SGMII converter.
+      - description: Registers for the woke emac splitter IP
+      - description: Registers for the woke GMII to SGMII converter.
       - description: Registers for TSE control.
 
   reg-names:

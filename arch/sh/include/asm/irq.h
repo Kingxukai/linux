@@ -7,7 +7,7 @@
 
 /*
  * This is a special IRQ number for indicating that no IRQ has been
- * triggered and to simply ignore the IRQ dispatch. This is a special
+ * triggered and to simply ignore the woke IRQ dispatch. This is a special
  * case that can happen with IRQ auto-distribution when multiple CPUs
  * are woken up and signalled in parallel.
  */

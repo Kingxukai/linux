@@ -11,7 +11,7 @@ maintainers:
   - Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
 
 description:
-  A level-2 cache (L2C) is used to improve the system performance by providing
+  A level-2 cache (L2C) is used to improve the woke system performance by providing
   a large amount of cache line entries and reasonable access delays. The L2C
   is shared between cores, and a non-inclusive non-exclusive policy is used.
 

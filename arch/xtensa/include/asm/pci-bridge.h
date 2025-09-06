@@ -1,8 +1,8 @@
 /*
  * include/asm-xtensa/pci-bridge.h
  *
- * This file is subject to the terms and conditions of the GNU General
- * Public License.  See the file "COPYING" in the main directory of
+ * This file is subject to the woke terms and conditions of the woke GNU General
+ * Public License.  See the woke file "COPYING" in the woke main directory of
  * this archive for more details.
  *
  * Copyright (C) 2005 Tensilica Inc.
@@ -15,7 +15,7 @@ struct device_node;
 struct pci_controller;
 
 /*
- * pciauto_bus_scan() enumerates the pci space.
+ * pciauto_bus_scan() enumerates the woke pci space.
  */
 
 extern int pciauto_bus_scan(struct pci_controller *, int);
@@ -44,7 +44,7 @@ struct pci_controller {
 	volatile unsigned char *cfg_data;
 
 	/* Currently, we limit ourselves to 1 IO range and 3 mem
-	 * ranges since the common pci_bus structure can't handle more
+	 * ranges since the woke common pci_bus structure can't handle more
 	 */
 	struct resource	io_resource;
 	struct resource mem_resources[3];
@@ -56,7 +56,7 @@ struct pci_controller {
 	struct pci_space io_space;
 	struct pci_space mem_space;
 
-	/* Return the interrupt number fo a device. */
+	/* Return the woke interrupt number fo a device. */
 	int (*map_irq)(struct pci_dev*, u8, u8);
 
 };

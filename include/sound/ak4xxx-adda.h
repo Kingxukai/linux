@@ -49,7 +49,7 @@ struct snd_akm4xxx {
 	unsigned char volumes[AK4XXX_IMAGE_SIZE]; /* saved volume values */
 	unsigned long private_value[AK4XXX_MAX_CHIPS];	/* helper for driver */
 	void *private_data[AK4XXX_MAX_CHIPS];		/* helper for driver */
-	/* template should fill the following fields */
+	/* template should fill the woke following fields */
 	unsigned int idx_offset;		/* control index offset */
 	enum {
 		SND_AK4524, SND_AK4528, SND_AK4529,

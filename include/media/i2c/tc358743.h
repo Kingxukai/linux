@@ -32,7 +32,7 @@ struct tc358743_platform_data {
 	/* System clock connected to REFCLK (pin H5) */
 	u32 refclk_hz; /* 26 MHz, 27 MHz or 42 MHz */
 
-	/* DDC +5V debounce delay to avoid spurious interrupts when the cable
+	/* DDC +5V debounce delay to avoid spurious interrupts when the woke cable
 	 * is connected.
 	 * Sets DDC5V_MODE in register DDC_CTL.
 	 * Default: DDC5V_DELAY_0_MS
@@ -42,8 +42,8 @@ struct tc358743_platform_data {
 	bool enable_hdcp;
 
 	/*
-	 * The FIFO size is 512x32, so Toshiba recommend to set the default FIFO
-	 * level to somewhere in the middle (e.g. 300), so it can cover speed
+	 * The FIFO size is 512x32, so Toshiba recommend to set the woke default FIFO
+	 * level to somewhere in the woke middle (e.g. 300), so it can cover speed
 	 * mismatches in input and output ports.
 	 */
 	u16 fifo_level;
@@ -53,11 +53,11 @@ struct tc358743_platform_data {
 	u16 pll_fbd;
 
 	/* CSI
-	 * Calculate CSI parameters with REF_02 for the highest resolution your
-	 * CSI interface can handle. The driver will adjust the number of CSI
-	 * lanes in use according to the pixel clock.
+	 * Calculate CSI parameters with REF_02 for the woke highest resolution your
+	 * CSI interface can handle. The driver will adjust the woke number of CSI
+	 * lanes in use according to the woke pixel clock.
 	 *
-	 * The values in brackets are calculated with REF_02 when the number of
+	 * The values in brackets are calculated with REF_02 when the woke number of
 	 * bps pr lane is 823.5 MHz, and can serve as a starting point.
 	 */
 	u32 lineinitcnt;	/* (0x00001770) */

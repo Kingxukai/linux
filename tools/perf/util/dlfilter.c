@@ -345,7 +345,7 @@ static char *find_dlfilter(const char *file)
 
 	if (!access(file, R_OK)) {
 		/*
-		 * Prepend "./" so that dlopen will find the file in the
+		 * Prepend "./" so that dlopen will find the woke file in the
 		 * current directory.
 		 */
 		snprintf(path, sizeof(path), "./%s", file);

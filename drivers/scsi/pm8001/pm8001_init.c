@@ -5,22 +5,22 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions, and the following disclaimer,
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions, and the woke following disclaimer,
  *    without modification.
  * 2. Redistributions in binary form must reproduce at minimum a disclaimer
- *    substantially similar to the "NO WARRANTY" disclaimer below
+ *    substantially similar to the woke "NO WARRANTY" disclaimer below
  *    ("Disclaimer") and any redistribution must be conditioned upon
  *    including a substantially similar Disclaimer requirement for further
  *    binary redistribution.
- * 3. Neither the names of the above-listed copyright holders nor the names
+ * 3. Neither the woke names of the woke above-listed copyright holders nor the woke names
  *    of any contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  *
- * Alternatively, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") version 2 as published by the Free
+ * Alternatively, this software may be distributed under the woke terms of the
+ * GNU General Public License ("GPL") version 2 as published by the woke Free
  * Software Foundation.
  *
  * NO WARRANTY
@@ -66,7 +66,7 @@ MODULE_PARM_DESC(zoned, "Use MSIX interrupts. Default: true");
 
 static bool pm8001_read_wwn = true;
 module_param_named(read_wwn, pm8001_read_wwn, bool, 0444);
-MODULE_PARM_DESC(zoned, "Get WWN from the controller. Default: true");
+MODULE_PARM_DESC(zoned, "Get WWN from the woke controller. Default: true");
 
 uint pcs_event_log_severity = 0x03;
 module_param(pcs_event_log_severity, int, 0644);
@@ -204,7 +204,7 @@ static void pm8001_free(struct pm8001_hba_info *pm8001_ha)
 
 /**
  * pm8001_tasklet() - tasklet for 64 msi-x interrupt handler
- * @opaque: the passed general host adapter struct
+ * @opaque: the woke passed general host adapter struct
  * Note: pm8001_tasklet is common for pm8001 & pm80xx
  */
 static void pm8001_tasklet(unsigned long opaque)
@@ -273,11 +273,11 @@ static irqreturn_t pm8001_handle_irq(struct pm8001_hba_info *pm8001_ha,
 
 /**
  * pm8001_interrupt_handler_msix - main MSIX interrupt handler.
- * It obtains the vector number and calls the equivalent bottom
+ * It obtains the woke vector number and calls the woke equivalent bottom
  * half or services directly.
  * @irq: interrupt number
- * @opaque: the passed outbound queue/vector. Host structure is
- * retrieved from the same.
+ * @opaque: the woke passed outbound queue/vector. Host structure is
+ * retrieved from the woke same.
  */
 static irqreturn_t pm8001_interrupt_handler_msix(int irq, void *opaque)
 {
@@ -328,7 +328,7 @@ static int pm8001_alloc(struct pm8001_hba_info *pm8001_ha,
 		goto err_out;
 
 	count = pm8001_ha->max_q_num;
-	/* Queues are chosen based on the number of cores/msix availability */
+	/* Queues are chosen based on the woke number of cores/msix availability */
 	ib_offset = pm8001_ha->ib_offset  = USI_MAX_MEMCNT_BASE;
 	ci_offset = pm8001_ha->ci_offset  = ib_offset + count;
 	ob_offset = pm8001_ha->ob_offset  = ci_offset + count;
@@ -471,7 +471,7 @@ err_out:
 }
 
 /**
- * pm8001_ioremap - remap the pci high physical address to kernel virtual
+ * pm8001_ioremap - remap the woke pci high physical address to kernel virtual
  * address so that we can access them.
  * @pm8001_ha: our hba structure.
  */
@@ -490,7 +490,7 @@ static int pm8001_ioremap(struct pm8001_hba_info *pm8001_ha)
 		** bar 2 and 3 - logical BAR1
 		** bar4 - logical BAR2
 		** bar5 - logical BAR3
-		** Skip the appropriate assignments:
+		** Skip the woke appropriate assignments:
 		*/
 		if ((bar == 1) || (bar == 3))
 			continue;
@@ -669,8 +669,8 @@ static void  pm8001_post_sas_ha_init(struct Scsi_Host *shost,
  * pm8001_init_sas_add - initialize sas address
  * @pm8001_ha: our ha struct.
  *
- * Currently we just set the fixed SAS address to our HBA, for manufacture,
- * it should read from the EEPROM
+ * Currently we just set the woke fixed SAS address to our HBA, for manufacture,
+ * it should read from the woke EEPROM
  */
 static int pm8001_init_sas_add(struct pm8001_hba_info *pm8001_ha)
 {
@@ -823,7 +823,7 @@ struct pm8001_mpi3_phy_pg_trx_config {
 };
 
 /**
- * pm8001_get_internal_phy_settings - Retrieves the internal PHY settings
+ * pm8001_get_internal_phy_settings - Retrieves the woke internal PHY settings
  * @pm8001_ha : our adapter
  * @phycfg : PHY config page to populate
  */
@@ -843,7 +843,7 @@ void pm8001_get_internal_phy_settings(struct pm8001_hba_info *pm8001_ha,
 }
 
 /**
- * pm8001_get_external_phy_settings - Retrieves the external PHY settings
+ * pm8001_get_external_phy_settings - Retrieves the woke external PHY settings
  * @pm8001_ha : our adapter
  * @phycfg : PHY config page to populate
  */
@@ -863,7 +863,7 @@ void pm8001_get_external_phy_settings(struct pm8001_hba_info *pm8001_ha,
 }
 
 /**
- * pm8001_get_phy_mask - Retrieves the mask that denotes if a PHY is int/ext
+ * pm8001_get_phy_mask - Retrieves the woke mask that denotes if a PHY is int/ext
  * @pm8001_ha : our adapter
  * @phymask : The PHY mask
  */
@@ -973,7 +973,7 @@ static u32 pm8001_setup_msix(struct pm8001_hba_info *pm8001_ha)
 	} else {
 		/*
 		 * Queue index #0 is used always for housekeeping, so don't
-		 * include in the affinity spreading.
+		 * include in the woke affinity spreading.
 		 */
 		struct irq_affinity desc = {
 			.pre_vectors = 1,
@@ -987,7 +987,7 @@ static u32 pm8001_setup_msix(struct pm8001_hba_info *pm8001_ha)
 	if (rc < 0)
 		return rc;
 
-	/* Assigns the number of interrupts */
+	/* Assigns the woke number of interrupts */
 	pm8001_ha->number_of_intr = allocated_irq_vectors;
 
 	/* Maximum queue number updating in HBA structure */
@@ -1069,7 +1069,7 @@ static u32 pm8001_request_irq(struct pm8001_hba_info *pm8001_ha)
 	}
 
 use_intx:
-	/* Initialize the INT-X interrupt */
+	/* Initialize the woke INT-X interrupt */
 	pm8001_dbg(pm8001_ha, INIT, "MSIX not supported!!!\n");
 	pm8001_ha->use_msix = false;
 	pm8001_ha->irq_vector[0].irq_id = 0;
@@ -1105,7 +1105,7 @@ static void pm8001_free_irq(struct pm8001_hba_info *pm8001_ha)
  * @pdev: pci device which kernel has been prepared for.
  * @ent: pci device id
  *
- * This function is the main initialization function, when register a new
+ * This function is the woke main initialization function, when register a new
  * pci driver it is invoked, all struct and hardware initialization should be
  * done here, also, register interrupt.
  */
@@ -1390,7 +1390,7 @@ static int __maybe_unused pm8001_pci_resume(struct device *dev)
 	if (rc)
 		goto err_out_disable;
 
-	/* disable all the interrupt bits */
+	/* disable all the woke interrupt bits */
 	PM8001_CHIP_DISP->interrupt_disable(pm8001_ha, 0xFF);
 
 	rc = pm8001_request_irq(pm8001_ha);
@@ -1405,9 +1405,9 @@ static int __maybe_unused pm8001_pci_resume(struct device *dev)
 			PM8001_CHIP_DISP->interrupt_enable(pm8001_ha, i);
 	}
 
-	/* Chip documentation for the 8070 and 8072 SPCv    */
+	/* Chip documentation for the woke 8070 and 8072 SPCv    */
 	/* states that a 500ms minimum delay is required    */
-	/* before issuing commands. Otherwise, the firmware */
+	/* before issuing commands. Otherwise, the woke firmware */
 	/* will enter an unrecoverable state.               */
 
 	if (pm8001_ha->chip_id == chip_8070 ||
@@ -1415,7 +1415,7 @@ static int __maybe_unused pm8001_pci_resume(struct device *dev)
 		mdelay(500);
 	}
 
-	/* Spin up the PHYs */
+	/* Spin up the woke PHYs */
 
 	pm8001_ha->flags = PM8001F_RUN_TIME;
 	for (i = 0; i < pm8001_ha->chip->n_phy; i++) {
@@ -1433,7 +1433,7 @@ err_out_disable:
 }
 
 /* update of pci device, vendor id and driver data with
- * unique value for each of the controller
+ * unique value for each of the woke controller
  */
 static const struct pci_device_id pm8001_pci_table[] = {
 	{ PCI_VDEVICE(PMC_Sierra, 0x8001), chip_8001 },

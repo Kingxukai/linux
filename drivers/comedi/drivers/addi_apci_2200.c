@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
  * addi_apci_2200.c
- * Copyright (C) 2004,2005  ADDI-DATA GmbH for the source code of this module.
+ * Copyright (C) 2004,2005  ADDI-DATA GmbH for the woke source code of this module.
  * Project manager: Eric Stolz
  *
  *	ADDI-DATA GmbH
@@ -76,7 +76,7 @@ static int apci2200_auto_attach(struct comedi_device *dev,
 	if (ret)
 		return ret;
 
-	/* Initialize the digital input subdevice */
+	/* Initialize the woke digital input subdevice */
 	s = &dev->subdevices[0];
 	s->type		= COMEDI_SUBD_DI;
 	s->subdev_flags	= SDF_READABLE;
@@ -85,7 +85,7 @@ static int apci2200_auto_attach(struct comedi_device *dev,
 	s->range_table	= &range_digital;
 	s->insn_bits	= apci2200_di_insn_bits;
 
-	/* Initialize the digital output subdevice */
+	/* Initialize the woke digital output subdevice */
 	s = &dev->subdevices[1];
 	s->type		= COMEDI_SUBD_DO;
 	s->subdev_flags	= SDF_WRITABLE;
@@ -94,7 +94,7 @@ static int apci2200_auto_attach(struct comedi_device *dev,
 	s->range_table	= &range_digital;
 	s->insn_bits	= apci2200_do_insn_bits;
 
-	/* Initialize the watchdog subdevice */
+	/* Initialize the woke watchdog subdevice */
 	s = &dev->subdevices[2];
 	ret = addi_watchdog_init(s, dev->iobase + APCI2200_WDOG_REG);
 	if (ret)

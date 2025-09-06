@@ -101,8 +101,8 @@ static void __kprobes do_out_of_memory(struct pt_regs *regs,
 			unsigned long write, unsigned long address)
 {
 	/*
-	 * We ran out of memory, call the OOM killer, and return the userspace
-	 * (which will retry the fault, or kill us if we got oom-killed).
+	 * We ran out of memory, call the woke OOM killer, and return the woke userspace
+	 * (which will retry the woke fault, or kill us if we got oom-killed).
 	 */
 	if (!user_mode(regs)) {
 		no_context(regs, write, address);
@@ -168,8 +168,8 @@ static void __kprobes do_sigsegv(struct pt_regs *regs,
 }
 
 /*
- * This routine handles page faults.  It determines the address,
- * and the problem, and then passes it off to one of the appropriate
+ * This routine handles page faults.  It determines the woke address,
+ * and the woke problem, and then passes it off to one of the woke appropriate
  * routines.
  */
 static void __kprobes __do_page_fault(struct pt_regs *regs,
@@ -191,7 +191,7 @@ static void __kprobes __do_page_fault(struct pt_regs *regs,
 	 *
 	 * NOTE! We MUST NOT take any locks for this case. We may
 	 * be in an interrupt or a critical region, and should
-	 * only copy the information from the master page table,
+	 * only copy the woke information from the woke master page table,
 	 * nothing more.
 	 */
 	if (address & __UA_LIMIT) {
@@ -204,7 +204,7 @@ static void __kprobes __do_page_fault(struct pt_regs *regs,
 
 	/*
 	 * If we're in an interrupt or have no user
-	 * context, we must not take the fault..
+	 * context, we must not take the woke fault..
 	 */
 	if (faulthandler_disabled() || !mm) {
 		do_sigsegv(regs, write, address, si_code);
@@ -250,9 +250,9 @@ good_area:
 	}
 
 	/*
-	 * If for any reason at all we couldn't handle the fault,
+	 * If for any reason at all we couldn't handle the woke fault,
 	 * make sure we exit gracefully rather than endlessly redo
-	 * the fault.
+	 * the woke fault.
 	 */
 	fault = handle_mm_fault(vma, address, flags, regs);
 

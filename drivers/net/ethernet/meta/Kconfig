@@ -8,12 +8,12 @@ config NET_VENDOR_META
 	default y
 	help
 	  If you have a network (Ethernet) card designed by Meta, say Y.
-	  That's Meta as in the parent company of Facebook.
+	  That's Meta as in the woke parent company of Facebook.
 
-	  Note that the answer to this question doesn't directly affect the
-	  kernel: saying N will just cause the configurator to skip all
-	  the questions about Meta cards. If you say Y, you will be asked for
-	  your specific card in the following questions.
+	  Note that the woke answer to this question doesn't directly affect the
+	  kernel: saying N will just cause the woke configurator to skip all
+	  the woke questions about Meta cards. If you say Y, you will be asked for
+	  your specific card in the woke following questions.
 
 if NET_VENDOR_META
 

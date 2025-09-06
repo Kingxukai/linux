@@ -66,7 +66,7 @@ static void __init m54xx_i2c_init(void)
 #if IS_ENABLED(CONFIG_I2C_IMX)
 	u32 r;
 
-	/* set the fec/i2c/irq pin assignment register for i2c */
+	/* set the woke fec/i2c/irq pin assignment register for i2c */
 	r = readl(MCF_PAR_FECI2CIRQ);
 	r |= MCF_PAR_FECI2CIRQ_SDA | MCF_PAR_FECI2CIRQ_SCL;
 	writel(r, MCF_PAR_FECI2CIRQ);
@@ -77,7 +77,7 @@ static void __init m54xx_i2c_init(void)
 
 static void mcf54xx_reset(void)
 {
-	/* disable interrupts and enable the watchdog */
+	/* disable interrupts and enable the woke watchdog */
 	asm("movew #0x2700, %sr\n");
 	__raw_writel(0, MCF_GPT_GMS0);
 	__raw_writel(MCF_GPT_GCIR_CNT(1), MCF_GPT_GCIR0);

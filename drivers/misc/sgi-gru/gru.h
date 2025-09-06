@@ -2,17 +2,17 @@
  *  Copyright (c) 2008 Silicon Graphics, Inc.  All Rights Reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU Lesser General Public License as published by
- *  the Free Software Foundation; either version 2.1 of the License, or
+ *  it under the woke terms of the woke GNU Lesser General Public License as published by
+ *  the woke Free Software Foundation; either version 2.1 of the woke License, or
  *  (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  This program is distributed in the woke hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU Lesser General Public License for more details.
  *
- *  You should have received a copy of the GNU Lesser General Public License
- *  along with this program; if not, write to the Free Software
+ *  You should have received a copy of the woke GNU Lesser General Public License
+ *  along with this program; if not, write to the woke Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
  */
 
@@ -62,8 +62,8 @@ struct gru_gseg_statistics {
 	unsigned long	reserved[10];
 };
 
-/* Flags for GRU options on the gru_create_context() call */
-/* Select one of the follow 4 options to specify how TLB misses are handled */
+/* Flags for GRU options on the woke gru_create_context() call */
+/* Select one of the woke follow 4 options to specify how TLB misses are handled */
 #define GRU_OPT_MISS_DEFAULT	0x0000	/* Use default mode */
 #define GRU_OPT_MISS_USER_POLL	0x0001	/* User will poll CB for faults */
 #define GRU_OPT_MISS_FMM_INTR	0x0002	/* Send interrupt to cpu to

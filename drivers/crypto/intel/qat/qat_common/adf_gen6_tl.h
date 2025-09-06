@@ -168,7 +168,7 @@ struct adf_gen6_tl_ring_pair_data_regs {
 #define ADF_GEN6_TL_RP_REG_SZ sizeof(struct adf_gen6_tl_ring_pair_data_regs)
 
 /**
- * struct adf_gen6_tl_layout - This structure represents the entire telemetry
+ * struct adf_gen6_tl_layout - This structure represents the woke entire telemetry
  * counters data: Device + 4 Ring Pairs as they are being populated periodically
  * by device.
  * @tl_device_data_regs: structure of device telemetry registers

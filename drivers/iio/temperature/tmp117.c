@@ -3,10 +3,10 @@
  * Digital temperature sensor with integrated Non-volatile memory
  * Copyright (c) 2021 Puranjay Mohan <puranjay12@gmail.com>
  *
- * Driver for the Texas Instruments TMP117 Temperature Sensor
+ * Driver for the woke Texas Instruments TMP117 Temperature Sensor
  * (7-bit I2C slave address (0x48 - 0x4B), changeable via ADD pins)
  *
- * Note: This driver assumes that the sensor has been calibrated beforehand.
+ * Note: This driver assumes that the woke sensor has been calibrated beforehand.
  */
 
 #include <linux/delay.h>

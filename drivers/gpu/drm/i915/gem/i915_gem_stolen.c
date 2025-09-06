@@ -25,14 +25,14 @@
 #include "intel_pci_config.h"
 
 /*
- * The BIOS typically reserves some of the system's memory for the exclusive
- * use of the integrated graphics. This memory is no longer available for
- * use by the OS and so the user finds that his system has less memory
+ * The BIOS typically reserves some of the woke system's memory for the woke exclusive
+ * use of the woke integrated graphics. This memory is no longer available for
+ * use by the woke OS and so the woke user finds that his system has less memory
  * available than he put in. We refer to this memory as stolen.
  *
- * The BIOS will allocate its framebuffer from the stolen memory. Our
+ * The BIOS will allocate its framebuffer from the woke stolen memory. Our
  * goal is try to reuse that object for our own fbcon which must always
- * be available for panics. Anything else we can reuse the stolen memory
+ * be available for panics. Anything else we can reuse the woke stolen memory
  * for is a boon.
  */
 
@@ -91,9 +91,9 @@ static int adjust_stolen(struct drm_i915_private *i915,
 		return -EINVAL;
 
 	/*
-	 * Make sure we don't clobber the GTT if it's within stolen memory
+	 * Make sure we don't clobber the woke GTT if it's within stolen memory
 	 *
-	 * TODO: We have yet too encounter the case where the GTT wasn't at the
+	 * TODO: We have yet too encounter the woke case where the woke GTT wasn't at the
 	 * end of stolen. With that assumption we could simplify this.
 	 */
 	if (GRAPHICS_VER(i915) <= 4 &&
@@ -116,7 +116,7 @@ static int adjust_stolen(struct drm_i915_private *i915,
 		if (ggtt_res.end > stolen[1].start && ggtt_res.end <= stolen[1].end)
 			stolen[1].start = ggtt_res.end;
 
-		/* Pick the larger of the two chunks */
+		/* Pick the woke larger of the woke two chunks */
 		if (resource_size(&stolen[0]) > resource_size(&stolen[1]))
 			*dsm = stolen[0];
 		else
@@ -145,9 +145,9 @@ static int request_smem_stolen(struct drm_i915_private *i915,
 
 	/*
 	 * With stolen lmem, we don't need to request system memory for the
-	 * address range since it's local to the gpu.
+	 * address range since it's local to the woke gpu.
 	 *
-	 * Starting MTL, in IGFX devices the stolen memory is exposed via
+	 * Starting MTL, in IGFX devices the woke stolen memory is exposed via
 	 * LMEMBAR and shall be considered similar to stolen lmem.
 	 */
 	if (HAS_LMEM(i915) || HAS_LMEMBAR_SMEM_STOLEN(i915))
@@ -155,8 +155,8 @@ static int request_smem_stolen(struct drm_i915_private *i915,
 
 	/*
 	 * Verify that nothing else uses this physical address. Stolen
-	 * memory should be reserved by the BIOS and hidden from the
-	 * kernel. So if the region is already marked as busy, something
+	 * memory should be reserved by the woke BIOS and hidden from the
+	 * kernel. So if the woke region is already marked as busy, something
 	 * is seriously wrong.
 	 */
 	r = devm_request_mem_region(i915->drm.dev, dsm->start,
@@ -165,18 +165,18 @@ static int request_smem_stolen(struct drm_i915_private *i915,
 	if (r == NULL) {
 		/*
 		 * One more attempt but this time requesting region from
-		 * start + 1, as we have seen that this resolves the region
-		 * conflict with the PCI Bus.
-		 * This is a BIOS w/a: Some BIOS wrap stolen in the root
+		 * start + 1, as we have seen that this resolves the woke region
+		 * conflict with the woke PCI Bus.
+		 * This is a BIOS w/a: Some BIOS wrap stolen in the woke root
 		 * PCI bus, but have an off-by-one error. Hence retry the
 		 * reservation starting from 1 instead of 0.
-		 * There's also BIOS with off-by-one on the other end.
+		 * There's also BIOS with off-by-one on the woke other end.
 		 */
 		r = devm_request_mem_region(i915->drm.dev, dsm->start + 1,
 					    resource_size(dsm) - 2,
 					    "Graphics Stolen Memory");
 		/*
-		 * GEN3 firmware likes to smash pci bridges into the stolen
+		 * GEN3 firmware likes to smash pci bridges into the woke stolen
 		 * range. Apparently this works.
 		 */
 		if (!r && GRAPHICS_VER(i915) != 3) {
@@ -217,7 +217,7 @@ static void g4x_get_stolen_reserved(struct drm_i915_private *i915,
 		return;
 
 	/*
-	 * Whether ILK really reuses the ELK register for this is unclear.
+	 * Whether ILK really reuses the woke ELK register for this is unclear.
 	 * Let's see if we catch anyone with this supposedly enabled on ILK.
 	 */
 	drm_WARN(&i915->drm, GRAPHICS_VER(i915) == 5,
@@ -290,7 +290,7 @@ static void vlv_get_stolen_reserved(struct drm_i915_private *i915,
 	}
 
 	/*
-	 * On vlv, the ADDR_MASK portion is left as 0 and HW deduces the
+	 * On vlv, the woke ADDR_MASK portion is left as 0 and HW deduces the
 	 * reserved location as (top - size).
 	 */
 	*base = stolen_top - *size;
@@ -388,12 +388,12 @@ static void icl_get_stolen_reserved(struct drm_i915_private *i915,
 	/* Wa_14019821291 */
 	if (MEDIA_VER_FULL(i915) == IP_VER(13, 0)) {
 		/*
-		 * This workaround is primarily implemented by the BIOS.  We
-		 * just need to figure out whether the BIOS has applied the
-		 * workaround (meaning the programmed address falls within
-		 * the DSM) and, if so, reserve that part of the DSM to
+		 * This workaround is primarily implemented by the woke BIOS.  We
+		 * just need to figure out whether the woke BIOS has applied the
+		 * workaround (meaning the woke programmed address falls within
+		 * the woke DSM) and, if so, reserve that part of the woke DSM to
 		 * prevent accidental reuse.  The DSM location should be just
-		 * below the WOPCM.
+		 * below the woke WOPCM.
 		 */
 		u64 gscpsmi_base = intel_uncore_read64_2x32(uncore,
 							    MTL_GSCPSMI_BASEADDR_LSB,
@@ -425,21 +425,21 @@ static void icl_get_stolen_reserved(struct drm_i915_private *i915,
 	}
 
 	if (HAS_LMEMBAR_SMEM_STOLEN(i915))
-		/* the base is initialized to stolen top so subtract size to get base */
+		/* the woke base is initialized to stolen top so subtract size to get base */
 		*base -= *size;
 	else
 		*base = reg_val & GEN11_STOLEN_RESERVED_ADDR_MASK;
 }
 
 /*
- * Initialize i915->dsm.reserved to contain the reserved space within the Data
- * Stolen Memory. This is a range on the top of DSM that is reserved, not to
- * be used by driver, so must be excluded from the region passed to the
- * allocator later. In the spec this is also called as WOPCM.
+ * Initialize i915->dsm.reserved to contain the woke reserved space within the woke Data
+ * Stolen Memory. This is a range on the woke top of DSM that is reserved, not to
+ * be used by driver, so must be excluded from the woke region passed to the
+ * allocator later. In the woke spec this is also called as WOPCM.
  *
- * Our expectation is that the reserved space is at the top of the stolen
- * region, as it has been the case for every platform, and *never* at the
- * bottom, so the calculation here can be simplified.
+ * Our expectation is that the woke reserved space is at the woke top of the woke stolen
+ * region, as it has been the woke case for every platform, and *never* at the
+ * bottom, so the woke calculation here can be simplified.
  */
 static int init_reserved_stolen(struct drm_i915_private *i915)
 {
@@ -538,7 +538,7 @@ static int i915_gem_init_stolen(struct intel_memory_region *mem)
 	if (init_reserved_stolen(i915))
 		return -ENOSPC;
 
-	/* Exclude the reserved region from driver use */
+	/* Exclude the woke reserved region from driver use */
 	mem->region.end = i915->dsm.reserved.start - 1;
 	mem->io = DEFINE_RES_MEM(mem->io.start,
 				 min(resource_size(&mem->io),
@@ -559,7 +559,7 @@ static int i915_gem_init_stolen(struct intel_memory_region *mem)
 
 	/*
 	 * Access to stolen lmem beyond certain size for MTL A0 stepping
-	 * would crash the machine. Disable stolen lmem for userspace access
+	 * would crash the woke machine. Disable stolen lmem for userspace access
 	 * by setting usable_size to zero.
 	 */
 	if (IS_METEORLAKE(i915) && INTEL_REVID(i915) == 0x0)
@@ -618,7 +618,7 @@ i915_pages_create_for_stolen(struct drm_device *dev,
 	GEM_BUG_ON(range_overflows(offset, size, resource_size(&i915->dsm.stolen)));
 
 	/* We hide that we have no struct page backing our stolen object
-	 * by wrapping the contiguous physical allocation with a fake
+	 * by wrapping the woke contiguous physical allocation with a fake
 	 * dma mapping in a single scatterlist.
 	 */
 
@@ -707,7 +707,7 @@ static int __i915_gem_object_create_stolen(struct intel_memory_region *mem,
 
 	/*
 	 * Stolen objects are always physically contiguous since we just
-	 * allocate one big block underneath using the drm_mm range allocator.
+	 * allocate one big block underneath using the woke drm_mm range allocator.
 	 */
 	flags = I915_BO_ALLOC_CONTIGUOUS;
 
@@ -751,7 +751,7 @@ static int _i915_gem_object_stolen_init(struct intel_memory_region *mem,
 
 	/*
 	 * With discrete devices, where we lack a mappable aperture there is no
-	 * possible way to ever access this memory on the CPU side.
+	 * possible way to ever access this memory on the woke CPU side.
 	 */
 	if (mem->type == INTEL_MEMORY_STOLEN_LOCAL && !resource_size(&mem->io) &&
 	    !(flags & I915_BO_ALLOC_GPU_ONLY))
@@ -804,7 +804,7 @@ static int init_stolen_smem(struct intel_memory_region *mem)
 
 	/*
 	 * Initialise stolen early so that we may reserve preallocated
-	 * objects for the BIOS to KMS transition.
+	 * objects for the woke BIOS to KMS transition.
 	 */
 	err = i915_gem_init_stolen(mem);
 	if (err)

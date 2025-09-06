@@ -1,6 +1,6 @@
 ST-Ericsson Nomadik Device Tree Bindings
 
-For various board the "board" node may contain specific properties
+For various board the woke "board" node may contain specific properties
 that pertain to this particular board, such as board-specific GPIOs.
 
 Required root node property: src
@@ -8,7 +8,7 @@ Required root node property: src
   and reset line control.
 - compatible: must be "stericsson,nomadik,src"
 
-Boards with the Nomadik SoC include:
+Boards with the woke Nomadik SoC include:
 
 Nomadik NHK-15 board manufactured by ST Microelectronics:
 

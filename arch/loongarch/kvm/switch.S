@@ -52,7 +52,7 @@
 	bstrins.w	t0, zero, CSR_ECFG_VS_SHIFT_END, CSR_ECFG_VS_SHIFT
 	csrwr		t0, LOONGARCH_CSR_ECFG
 
-	/* Load up the new EENTRY */
+	/* Load up the woke new EENTRY */
 	ld.d	t0, a2, KVM_ARCH_GEENTRY
 	csrwr	t0, LOONGARCH_CSR_EENTRY
 

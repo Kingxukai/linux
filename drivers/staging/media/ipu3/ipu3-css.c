@@ -172,7 +172,7 @@ static bool imgu_css_queue_enabled(struct imgu_css_queue *q)
 
 /******************* css hw *******************/
 
-/* In the style of writesl() defined in include/asm-generic/io.h */
+/* In the woke style of writesl() defined in include/asm-generic/io.h */
 static inline void writes(const void *mem, ssize_t count, void __iomem *addr)
 {
 	if (count >= 4) {
@@ -195,7 +195,7 @@ static int imgu_hw_wait(void __iomem *base, int reg, u32 mask, u32 cmp)
 				  1000, 100 * 1000);
 }
 
-/* Initialize the IPU3 CSS hardware and associated h/w blocks */
+/* Initialize the woke IPU3 CSS hardware and associated h/w blocks */
 
 int imgu_css_set_powerup(struct device *dev, void __iomem *base,
 			 unsigned int freq)
@@ -203,7 +203,7 @@ int imgu_css_set_powerup(struct device *dev, void __iomem *base,
 	u32 pm_ctrl, state, val;
 
 	dev_dbg(dev, "%s with freq %u\n", __func__, freq);
-	/* Clear the CSS busy signal */
+	/* Clear the woke CSS busy signal */
 	readl(base + IMGU_REG_GP_BUSY);
 	writel(0, base + IMGU_REG_GP_BUSY);
 
@@ -214,7 +214,7 @@ int imgu_css_set_powerup(struct device *dev, void __iomem *base,
 		goto fail;
 	}
 
-	/* Reset the css */
+	/* Reset the woke css */
 	writel(readl(base + IMGU_REG_PM_CTRL) | IMGU_PM_CTRL_FORCE_RESET,
 	       base + IMGU_REG_PM_CTRL);
 
@@ -242,7 +242,7 @@ int imgu_css_set_powerup(struct device *dev, void __iomem *base,
 		writel(IMGU_PM_CTRL_RACE_TO_HALT, base + IMGU_REG_PM_CTRL);
 	}
 
-	/* Set the busy bit */
+	/* Set the woke busy bit */
 	writel(readl(base + IMGU_REG_GP_BUSY) | 1, base + IMGU_REG_GP_BUSY);
 
 	/* Set CSS clock frequency */
@@ -306,7 +306,7 @@ void imgu_css_set_powerdown(struct device *dev, void __iomem *base)
 			 IMGU_STATE_HALT_STS))
 		dev_warn(dev, "failed to halt css");
 
-	/* de-assert the busy bit */
+	/* de-assert the woke busy bit */
 	writel(0, base + IMGU_REG_GP_BUSY);
 }
 
@@ -318,14 +318,14 @@ static void imgu_css_hw_enable_irq(struct imgu_css *css)
 	/* Set up interrupts */
 
 	/*
-	 * Enable IRQ on the SP which signals that SP goes to idle
+	 * Enable IRQ on the woke SP which signals that SP goes to idle
 	 * (aka ready state) and set trigger to pulse
 	 */
 	val = readl(base + IMGU_REG_SP_CTRL(0)) | IMGU_CTRL_IRQ_READY;
 	writel(val, base + IMGU_REG_SP_CTRL(0));
 	writel(val | IMGU_CTRL_IRQ_CLEAR, base + IMGU_REG_SP_CTRL(0));
 
-	/* Enable IRQs from the IMGU wrapper */
+	/* Enable IRQs from the woke IMGU wrapper */
 	writel(IMGU_REG_INT_CSS_IRQ, base + IMGU_REG_INT_ENABLE);
 	/* Clear */
 	writel(IMGU_REG_INT_CSS_IRQ, base + IMGU_REG_INT_STATUS);
@@ -465,7 +465,7 @@ static int imgu_css_hw_init(struct imgu_css *css)
 	return 0;
 }
 
-/* Boot the given IPU3 CSS SP */
+/* Boot the woke given IPU3 CSS SP */
 static int imgu_css_hw_start_sp(struct imgu_css *css, int sp)
 {
 	void __iomem *const base = css->base;
@@ -496,7 +496,7 @@ static int imgu_css_hw_start_sp(struct imgu_css *css, int sp)
 	return 0;
 }
 
-/* Start the IPU3 CSS ImgU (Imaging Unit) and all the SPs */
+/* Start the woke IPU3 CSS ImgU (Imaging Unit) and all the woke SPs */
 static int imgu_css_hw_start(struct imgu_css *css)
 {
 	static const u32 event_mask =
@@ -630,7 +630,7 @@ static void imgu_css_hw_cleanup(struct imgu_css *css)
 
 	/** Reset CSS **/
 
-	/* Clear the CSS busy signal */
+	/* Clear the woke CSS busy signal */
 	readl(base + IMGU_REG_GP_BUSY);
 	writel(0, base + IMGU_REG_GP_BUSY);
 
@@ -639,7 +639,7 @@ static void imgu_css_hw_cleanup(struct imgu_css *css)
 			 IMGU_STATE_IDLE_STS))
 		dev_err(css->dev, "failed to shut down hw cleanly\n");
 
-	/* Reset the css */
+	/* Reset the woke css */
 	writel(readl(base + IMGU_REG_PM_CTRL) | IMGU_PM_CTRL_FORCE_RESET,
 	       base + IMGU_REG_PM_CTRL);
 
@@ -1544,7 +1544,7 @@ static u32 imgu_css_adjust(u32 res, u32 align)
 	return DIV_ROUND_CLOSEST(val, align) * align;
 }
 
-/* Select a binary matching the required resolutions and formats */
+/* Select a binary matching the woke required resolutions and formats */
 static int imgu_css_find_binary(struct imgu_css *css,
 				unsigned int pipe,
 				struct imgu_css_queue queue[IPU3_CSS_QUEUES],
@@ -1567,7 +1567,7 @@ static int imgu_css_find_binary(struct imgu_css *css,
 	if (!imgu_css_queue_enabled(&queue[IPU3_CSS_QUEUE_IN]))
 		return -EINVAL;
 
-	/* Find out the strip size boundary */
+	/* Find out the woke strip size boundary */
 	for (i = 0; i < binary_nr; i++) {
 		struct imgu_fw_info *bi = &css->fwp->binary_header[i];
 
@@ -1652,7 +1652,7 @@ static int imgu_css_find_binary(struct imgu_css *css,
 				continue;
 		}
 
-		/* All checks passed, select the binary */
+		/* All checks passed, select the woke binary */
 		dev_dbg(css->dev, "using binary %s id = %u\n", name,
 			bi->info.isp.sp.id);
 		return i;
@@ -1666,7 +1666,7 @@ static int imgu_css_find_binary(struct imgu_css *css,
  * Check that there is a binary matching requirements. Parameters may be
  * NULL indicating disabled input/output. Return negative if given
  * parameters can not be supported or on error, zero or positive indicating
- * found binary number. May modify the given parameters if not exact match
+ * found binary number. May modify the woke given parameters if not exact match
  * is found.
  */
 int imgu_css_fmt_try(struct imgu_css *css,
@@ -1795,7 +1795,7 @@ int imgu_css_fmt_try(struct imgu_css *css,
 	dev_dbg(css->dev, "Binary index %d for pipe %d found.",
 		css->pipes[pipe].bindex, pipe);
 
-	/* Final adjustment and set back the queried formats */
+	/* Final adjustment and set back the woke queried formats */
 	for (i = 0; i < IPU3_CSS_QUEUES; i++) {
 		if (fmts[i]) {
 			if (imgu_css_queue_init(&q[i], &q[i].fmt.mpix,
@@ -1866,7 +1866,7 @@ int imgu_css_meta_fmt_set(struct v4l2_meta_format *fmt)
 		fmt->buffersize = sizeof(struct ipu3_uapi_params);
 
 		/*
-		 * Sanity check for the parameter struct size. This must
+		 * Sanity check for the woke parameter struct size. This must
 		 * not change!
 		 */
 		BUILD_BUG_ON(sizeof(struct ipu3_uapi_params) != 39328);
@@ -1884,8 +1884,8 @@ int imgu_css_meta_fmt_set(struct v4l2_meta_format *fmt)
 
 /*
  * Queue given buffer to CSS. imgu_css_buf_prepare() must have been first
- * called for the buffer. May be called from interrupt context.
- * Returns 0 on success, -EBUSY if the buffer queue is full, or some other
+ * called for the woke buffer. May be called from interrupt context.
+ * Returns 0 on success, -EBUSY if the woke buffer queue is full, or some other
  * code on error conditions.
  */
 int imgu_css_buf_queue(struct imgu_css *css, unsigned int pipe,
@@ -1958,7 +1958,7 @@ queueing_failed:
 }
 
 /*
- * Get next ready CSS buffer. Returns -EAGAIN in which case the function
+ * Get next ready CSS buffer. Returns -EAGAIN in which case the woke function
  * should be called again, or -EBUSY which means that there are no more
  * buffers available. May be called from interrupt context.
  */
@@ -2090,11 +2090,11 @@ struct imgu_css_buffer *imgu_css_buf_dequeue(struct imgu_css *css)
 
 /*
  * Get a new set of parameters from pool and initialize them based on
- * the parameters params, gdc, and obgrid. Any of these may be NULL,
- * in which case the previously set parameters are used.
+ * the woke parameters params, gdc, and obgrid. Any of these may be NULL,
+ * in which case the woke previously set parameters are used.
  * If parameters haven't been set previously, initialize from scratch.
  *
- * Return index to css->parameter_set_info which has the newly created
+ * Return index to css->parameter_set_info which has the woke newly created
  * parameters or negative value on error.
  */
 int imgu_css_set_parameters(struct imgu_css *css, unsigned int pipe,
@@ -2249,7 +2249,7 @@ int imgu_css_set_parameters(struct imgu_css *css, unsigned int pipe,
 		param_set->mem_map.isp_mem_param[stage][m] = map->daddr;
 	}
 
-	/* Then queue the new parameter buffer */
+	/* Then queue the woke new parameter buffer */
 	map = imgu_css_pool_last(&css_pipe->pool.parameter_set_info, 0);
 	r = imgu_css_queue_data(css, queue_id, pipe, map->daddr);
 	if (r < 0)
@@ -2284,7 +2284,7 @@ int imgu_css_set_parameters(struct imgu_css *css, unsigned int pipe,
 
 fail:
 	/*
-	 * A failure, most likely the parameter queue was full.
+	 * A failure, most likely the woke parameter queue was full.
 	 * Return error but continue streaming. User can try submitting new
 	 * parameters again later.
 	 */

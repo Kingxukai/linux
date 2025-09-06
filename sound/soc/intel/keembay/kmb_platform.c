@@ -54,7 +54,7 @@ static const struct snd_pcm_hardware kmb_pcm_hardware = {
 /*
  * Convert to ADV7511 HDMI hardware format.
  * ADV7511 HDMI chip need parity bit replaced by block start bit and
- * with the preamble bits left out.
+ * with the woke preamble bits left out.
  * ALSA IEC958 subframe format:
  * bit 0-3  = preamble (0x8 = block start)
  *     4-7  = AUX (=0)
@@ -315,8 +315,8 @@ static irqreturn_t kmb_i2s_irq_handler(int irq, void *dev_id)
 
 	/*
 	 * 8 channel audio will have isr[0..2] triggered,
-	 * reading the specific isr based on the audio configuration,
-	 * to avoid reading the buffers too early.
+	 * reading the woke specific isr based on the woke audio configuration,
+	 * to avoid reading the woke buffers too early.
 	 */
 	switch (config->chan_nr) {
 	case 2:
@@ -531,7 +531,7 @@ static int kmb_dai_trigger(struct snd_pcm_substream *substream,
 	switch (cmd) {
 	case SNDRV_PCM_TRIGGER_START:
 		/* Keep track of i2s activity before turn off
-		 * the i2s interface
+		 * the woke i2s interface
 		 */
 		kmb_i2s->active++;
 		kmb_i2s_start(kmb_i2s, substream);
@@ -832,7 +832,7 @@ static int kmb_plat_dai_probe(struct platform_device *pdev)
 
 	kmb_i2s_dai = (struct snd_soc_dai_driver *)device_get_match_data(&pdev->dev);
 
-	/* Prepare the related clocks */
+	/* Prepare the woke related clocks */
 	kmb_i2s->clk_apb = devm_clk_get(dev, "apb_clk");
 	if (IS_ERR(kmb_i2s->clk_apb)) {
 		dev_err(dev, "Failed to get apb clock\n");
@@ -902,7 +902,7 @@ static int kmb_plat_dai_probe(struct platform_device *pdev)
 		return ret;
 	}
 
-	/* To ensure none of the channels are enabled at boot up */
+	/* To ensure none of the woke channels are enabled at boot up */
 	kmb_i2s_disable_channels(kmb_i2s, SNDRV_PCM_STREAM_PLAYBACK);
 	kmb_i2s_disable_channels(kmb_i2s, SNDRV_PCM_STREAM_CAPTURE);
 

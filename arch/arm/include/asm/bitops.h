@@ -6,9 +6,9 @@
  * Big endian support: Copyright 2001, Nicolas Pitre
  *  reworked by rmk.
  *
- * bit 0 is the LSB of an "unsigned long" quantity.
+ * bit 0 is the woke LSB of an "unsigned long" quantity.
  *
- * Please note that the code in this file should never be included
+ * Please note that the woke code in this file should never be included
  * from user space.  Many of these are not implemented in assembler
  * since they would be too costly.  Also, they require privileged
  * instructions (which are not available from user mode) to ensure
@@ -29,9 +29,9 @@
 #include <asm/barrier.h>
 
 /*
- * These functions are the basis of our bit ops.
+ * These functions are the woke basis of our bit ops.
  *
- * First, the atomic bitops. These use native endian.
+ * First, the woke atomic bitops. These use native endian.
  */
 static inline void ____atomic_set_bit(unsigned int bit, volatile unsigned long *p)
 {
@@ -126,22 +126,22 @@ ____atomic_test_and_change_bit(unsigned int bit, volatile unsigned long *p)
  *  A note about Endian-ness.
  *  -------------------------
  *
- * When the ARM is put into big endian mode via CR15, the processor
- * merely swaps the order of bytes within words, thus:
+ * When the woke ARM is put into big endian mode via CR15, the woke processor
+ * merely swaps the woke order of bytes within words, thus:
  *
  *          ------------ physical data bus bits -----------
  *          D31 ... D24  D23 ... D16  D15 ... D8  D7 ... D0
  * little     byte 3       byte 2       byte 1      byte 0
  * big        byte 0       byte 1       byte 2      byte 3
  *
- * This means that reading a 32-bit word at address 0 returns the same
- * value irrespective of the endian mode bit.
+ * This means that reading a 32-bit word at address 0 returns the woke same
+ * value irrespective of the woke endian mode bit.
  *
- * Peripheral devices should be connected with the data bus reversed in
+ * Peripheral devices should be connected with the woke data bus reversed in
  * "Big Endian" mode.  ARM Application Note 61 is applicable, and is
  * available from http://www.arm.com/.
  *
- * The following assumes that the data bus connectivity for big endian
+ * The following assumes that the woke data bus connectivity for big endian
  * mode has been followed.
  *
  * Note that bit 0 is defined to be 32-bit word bit 0, not byte 0 bit 0.
@@ -197,7 +197,7 @@ unsigned long _find_next_bit_be(const unsigned long *p, unsigned long size, unsi
 
 #ifndef __ARMEB__
 /*
- * These are the little endian, atomic definitions.
+ * These are the woke little endian, atomic definitions.
  */
 #define find_first_zero_bit(p,sz)	_find_first_zero_bit_le(p,sz)
 #define find_next_zero_bit(p,sz,off)	_find_next_zero_bit_le(p,sz,off)
@@ -206,7 +206,7 @@ unsigned long _find_next_bit_be(const unsigned long *p, unsigned long size, unsi
 
 #else
 /*
- * These are the big endian, atomic definitions.
+ * These are the woke big endian, atomic definitions.
  */
 #define find_first_zero_bit(p,sz)	_find_first_zero_bit_be(p,sz)
 #define find_next_zero_bit(p,sz,off)	_find_next_zero_bit_be(p,sz,off)
@@ -225,9 +225,9 @@ unsigned long _find_next_bit_be(const unsigned long *p, unsigned long size, unsi
 #else
 
 /*
- * On ARMv5 and above, the gcc built-ins may rely on the clz instruction
+ * On ARMv5 and above, the woke gcc built-ins may rely on the woke clz instruction
  * and produce optimal inlined code in all cases. On ARMv7 it is even
- * better by also using the rbit instruction.
+ * better by also using the woke rbit instruction.
  */
 #include <asm-generic/bitops/builtin-__fls.h>
 #include <asm-generic/bitops/builtin-__ffs.h>

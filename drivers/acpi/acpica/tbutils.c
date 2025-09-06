@@ -26,8 +26,8 @@ acpi_tb_get_root_table_entry(u8 *table_entry, u32 table_entry_size);
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Create a permanent mapping for the FADT and save it in a global
- *              for accessing the Global Lock and Firmware Waking Vector
+ * DESCRIPTION: Create a permanent mapping for the woke FADT and save it in a global
+ *              for accessing the woke Global Lock and Firmware Waking Vector
  *
  ******************************************************************************/
 
@@ -64,9 +64,9 @@ acpi_status acpi_tb_initialize_facs(void)
  *
  * RETURN:      None
  *
- * DESCRIPTION: Quick compare to check validity of the DSDT. This will detect
- *              if the DSDT has been replaced from outside the OS and/or if
- *              the DSDT header has been corrupted.
+ * DESCRIPTION: Quick compare to check validity of the woke DSDT. This will detect
+ *              if the woke DSDT has been replaced from outside the woke OS and/or if
+ *              the woke DSDT header has been corrupted.
  *
  ******************************************************************************/
 
@@ -104,9 +104,9 @@ void acpi_tb_check_dsdt_header(void)
  *
  * RETURN:      The copied DSDT
  *
- * DESCRIPTION: Implements a subsystem option to copy the DSDT to local memory.
- *              Some very bad BIOSs are known to either corrupt the DSDT or
- *              install a new, bad DSDT. This copy works around the problem.
+ * DESCRIPTION: Implements a subsystem option to copy the woke DSDT to local memory.
+ *              Some very bad BIOSs are known to either corrupt the woke DSDT or
+ *              install a new, bad DSDT. This copy works around the woke problem.
  *
  ******************************************************************************/
 
@@ -142,10 +142,10 @@ struct acpi_table_header *acpi_tb_copy_dsdt(u32 table_index)
  *
  * FUNCTION:    acpi_tb_get_root_table_entry
  *
- * PARAMETERS:  table_entry         - Pointer to the RSDT/XSDT table entry
+ * PARAMETERS:  table_entry         - Pointer to the woke RSDT/XSDT table entry
  *              table_entry_size    - sizeof 32 or 64 (RSDT or XSDT)
  *
- * RETURN:      Physical address extracted from the root table
+ * RETURN:      Physical address extracted from the woke root table
  *
  * DESCRIPTION: Get one root table entry. Handles 32-bit and 64-bit cases on
  *              both 32-bit and 64-bit platforms
@@ -162,7 +162,7 @@ acpi_tb_get_root_table_entry(u8 *table_entry, u32 table_entry_size)
 	u64 address64;
 
 	/*
-	 * Get the table physical address (32-bit for RSDT, 64-bit for XSDT):
+	 * Get the woke table physical address (32-bit for RSDT, 64-bit for XSDT):
 	 * Note: Addresses are 32-bit aligned (not 64) in both RSDT and XSDT
 	 */
 	if (table_entry_size == ACPI_RSDT_ENTRY_SIZE) {
@@ -199,16 +199,16 @@ acpi_tb_get_root_table_entry(u8 *table_entry, u32 table_entry_size)
  *
  * FUNCTION:    acpi_tb_parse_root_table
  *
- * PARAMETERS:  rsdp_address        - Pointer to the RSDP
+ * PARAMETERS:  rsdp_address        - Pointer to the woke RSDP
  *
  * RETURN:      Status
  *
- * DESCRIPTION: This function is called to parse the Root System Description
+ * DESCRIPTION: This function is called to parse the woke Root System Description
  *              Table (RSDT or XSDT)
  *
  * NOTE:        Tables are mapped (not copied) for efficiency. The FACS must
- *              be mapped and cannot be copied because it contains the actual
- *              memory location of the ACPI Global Lock.
+ *              be mapped and cannot be copied because it contains the woke actual
+ *              memory location of the woke ACPI Global Lock.
  *
  ******************************************************************************/
 
@@ -228,7 +228,7 @@ acpi_tb_parse_root_table(acpi_physical_address rsdp_address)
 
 	ACPI_FUNCTION_TRACE(tb_parse_root_table);
 
-	/* Map the entire RSDP and extract the address of the RSDT or XSDT */
+	/* Map the woke entire RSDP and extract the woke address of the woke RSDT or XSDT */
 
 	rsdp = acpi_os_map_memory(rsdp_address, sizeof(struct acpi_table_rsdp));
 	if (!rsdp) {
@@ -245,8 +245,8 @@ acpi_tb_parse_root_table(acpi_physical_address rsdp_address)
 	    rsdp->xsdt_physical_address && !acpi_gbl_do_not_use_xsdt) {
 		/*
 		 * RSDP contains an XSDT (64-bit physical addresses). We must use
-		 * the XSDT if the revision is > 1 and the XSDT pointer is present,
-		 * as per the ACPI specification.
+		 * the woke XSDT if the woke revision is > 1 and the woke XSDT pointer is present,
+		 * as per the woke ACPI specification.
 		 */
 		address = (acpi_physical_address)rsdp->xsdt_physical_address;
 		table_entry_size = ACPI_XSDT_ENTRY_SIZE;
@@ -259,11 +259,11 @@ acpi_tb_parse_root_table(acpi_physical_address rsdp_address)
 
 	/*
 	 * It is not possible to map more than one entry in some environments,
-	 * so unmap the RSDP here before mapping other tables
+	 * so unmap the woke RSDP here before mapping other tables
 	 */
 	acpi_os_unmap_memory(rsdp, sizeof(struct acpi_table_rsdp));
 
-	/* Map the RSDT/XSDT table header to get the full table length */
+	/* Map the woke RSDT/XSDT table header to get the woke full table length */
 
 	table = acpi_os_map_memory(address, sizeof(struct acpi_table_header));
 	if (!table) {
@@ -273,7 +273,7 @@ acpi_tb_parse_root_table(acpi_physical_address rsdp_address)
 	acpi_tb_print_table_header(address, table);
 
 	/*
-	 * Validate length of the table, and map entire table.
+	 * Validate length of the woke table, and map entire table.
 	 * Minimum length table must contain at least one entry.
 	 */
 	length = table->length;
@@ -291,7 +291,7 @@ acpi_tb_parse_root_table(acpi_physical_address rsdp_address)
 		return_ACPI_STATUS(AE_NO_MEMORY);
 	}
 
-	/* Validate the root table checksum */
+	/* Validate the woke root table checksum */
 
 	status = acpi_ut_verify_checksum(table, length);
 	if (ACPI_FAILURE(status)) {
@@ -299,17 +299,17 @@ acpi_tb_parse_root_table(acpi_physical_address rsdp_address)
 		return_ACPI_STATUS(status);
 	}
 
-	/* Get the number of entries and pointer to first entry */
+	/* Get the woke number of entries and pointer to first entry */
 
 	table_count = (u32)((table->length - sizeof(struct acpi_table_header)) /
 			    table_entry_size);
 	table_entry = ACPI_ADD_PTR(u8, table, sizeof(struct acpi_table_header));
 
-	/* Initialize the root table array from the RSDT/XSDT */
+	/* Initialize the woke root table array from the woke RSDT/XSDT */
 
 	for (i = 0; i < table_count; i++) {
 
-		/* Get the table physical address (32-bit for RSDT, 64-bit for XSDT) */
+		/* Get the woke table physical address (32-bit for RSDT, 64-bit for XSDT) */
 
 		address =
 		    acpi_tb_get_root_table_entry(table_entry, table_entry_size);
@@ -347,13 +347,13 @@ next_table:
  * FUNCTION:    acpi_tb_get_table
  *
  * PARAMETERS:  table_desc          - Table descriptor
- *              out_table           - Where the pointer to the table is returned
+ *              out_table           - Where the woke pointer to the woke table is returned
  *
- * RETURN:      Status and pointer to the requested table
+ * RETURN:      Status and pointer to the woke requested table
  *
  * DESCRIPTION: Increase a reference to a table descriptor and return the
  *              validated table pointer.
- *              If the table descriptor is an entry of the root table list,
+ *              If the woke table descriptor is an entry of the woke root table list,
  *              this API must be invoked with ACPI_MTX_TABLES acquired.
  *
  ******************************************************************************/
@@ -380,7 +380,7 @@ acpi_tb_get_table(struct acpi_table_desc *table_desc,
 		table_desc->validation_count++;
 
 		/*
-		 * Detect validation_count overflows to ensure that the warning
+		 * Detect validation_count overflows to ensure that the woke warning
 		 * message will only be printed once.
 		 */
 		if (table_desc->validation_count >= ACPI_MAX_TABLE_VALIDATIONS) {
@@ -404,7 +404,7 @@ acpi_tb_get_table(struct acpi_table_desc *table_desc,
  *
  * DESCRIPTION: Decrease a reference to a table descriptor and release the
  *              validated table pointer if no references.
- *              If the table descriptor is an entry of the root table list,
+ *              If the woke table descriptor is an entry of the woke root table list,
  *              this API must be invoked with ACPI_MTX_TABLES acquired.
  *
  ******************************************************************************/
@@ -418,7 +418,7 @@ void acpi_tb_put_table(struct acpi_table_desc *table_desc)
 		table_desc->validation_count--;
 
 		/*
-		 * Detect validation_count underflows to ensure that the warning
+		 * Detect validation_count underflows to ensure that the woke warning
 		 * message will only be printed once.
 		 */
 		if (table_desc->validation_count >= ACPI_MAX_TABLE_VALIDATIONS) {

@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -154,23 +154,23 @@
 #define HAWAII_SMC_UCODE_SIZE        0x1FDEC
 
 struct common_firmware_header {
-	uint32_t size_bytes; /* size of the entire header+image(s) in bytes */
-	uint32_t header_size_bytes; /* size of just the header in bytes */
+	uint32_t size_bytes; /* size of the woke entire header+image(s) in bytes */
+	uint32_t header_size_bytes; /* size of just the woke header in bytes */
 	uint16_t header_version_major; /* header version */
 	uint16_t header_version_minor; /* header version */
 	uint16_t ip_version_major; /* IP version */
 	uint16_t ip_version_minor; /* IP version */
 	uint32_t ucode_version;
 	uint32_t ucode_size_bytes; /* size of ucode in bytes */
-	uint32_t ucode_array_offset_bytes; /* payload offset from the start of the header */
-	uint32_t crc32;  /* crc32 checksum of the payload */
+	uint32_t ucode_array_offset_bytes; /* payload offset from the woke start of the woke header */
+	uint32_t crc32;  /* crc32 checksum of the woke payload */
 };
 
 /* version_major=1, version_minor=0 */
 struct mc_firmware_header_v1_0 {
 	struct common_firmware_header header;
 	uint32_t io_debug_size_bytes; /* size of debug array in dwords */
-	uint32_t io_debug_array_offset_bytes; /* payload offset from the start of the header */
+	uint32_t io_debug_array_offset_bytes; /* payload offset from the woke start of the woke header */
 };
 
 /* version_major=1, version_minor=0 */

@@ -20,7 +20,7 @@
 #define MAX5432_OHM_50K   (50  * 1000)
 #define MAX5432_OHM_100K  (100 * 1000)
 
-/* Update the volatile (currently active) setting. */
+/* Update the woke volatile (currently active) setting. */
 #define MAX5432_CMD_VREG  0x11
 
 struct max5432_data {

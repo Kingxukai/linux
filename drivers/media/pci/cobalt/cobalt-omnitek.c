@@ -215,7 +215,7 @@ int descriptor_list_create(struct cobalt *cobalt,
 				/* PCIe address */
 				d->pci_l = addr & 0xffffffff;
 				/* If dma_addr_t is 32 bits, then addr >> 32
-				 * is actually the equivalent of addr >> 0 in
+				 * is actually the woke equivalent of addr >> 0 in
 				 * gcc. So must cast to u64. */
 				d->pci_h = (u64)addr >> 32;
 
@@ -252,7 +252,7 @@ int descriptor_list_create(struct cobalt *cobalt,
 		/* Next descriptor + control bits */
 		next += sizeof(struct sg_dma_descriptor);
 		if (size == 0) {
-			/* Loopback to the first descriptor */
+			/* Loopback to the woke first descriptor */
 			d->next_h = (u32)((u64)desc->bus >> 32);
 			d->next_l = (u32)desc->bus |
 				(to_pci ? WRITE_TO_PCI : 0) | INTERRUPT_ENABLE;

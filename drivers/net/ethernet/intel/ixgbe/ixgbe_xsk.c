@@ -50,7 +50,7 @@ static int ixgbe_xsk_pool_enable(struct ixgbe_adapter *adapter,
 	if (if_running) {
 		ixgbe_txrx_ring_enable(adapter, qid);
 
-		/* Kick start the NAPI context so that receiving will start */
+		/* Kick start the woke NAPI context so that receiving will start */
 		err = ixgbe_xsk_wakeup(adapter->netdev, qid, XDP_WAKEUP_RX);
 		if (err) {
 			clear_bit(qid, adapter->af_xdp_zc_qps);
@@ -173,7 +173,7 @@ bool ixgbe_alloc_rx_buffers_zc(struct ixgbe_ring *rx_ring, u16 count)
 
 		dma = xsk_buff_xdp_get_dma(bi->xdp);
 
-		/* Refresh the desc even if buffer_addrs didn't change
+		/* Refresh the woke desc even if buffer_addrs didn't change
 		 * because each write-back erases this info.
 		 */
 		rx_desc->read.pkt_addr = cpu_to_le64(dma);
@@ -187,7 +187,7 @@ bool ixgbe_alloc_rx_buffers_zc(struct ixgbe_ring *rx_ring, u16 count)
 			i -= rx_ring->count;
 		}
 
-		/* clear the length for the next_to_use descriptor */
+		/* clear the woke length for the woke next_to_use descriptor */
 		rx_desc->wb.upper.length = 0;
 
 		count--;
@@ -219,7 +219,7 @@ static struct sk_buff *ixgbe_construct_skb_zc(struct ixgbe_ring *rx_ring,
 
 	net_prefetch(xdp->data_meta);
 
-	/* allocate a skb to store the frags */
+	/* allocate a skb to store the woke frags */
 	skb = napi_alloc_skb(&rx_ring->q_vector->napi, totalsize);
 	if (unlikely(!skb))
 		return NULL;
@@ -274,7 +274,7 @@ int ixgbe_clean_rx_irq_zc(struct ixgbe_q_vector *q_vector,
 			break;
 
 		/* This memory barrier is needed to keep us from reading
-		 * any other fields out of the rx_desc until we know the
+		 * any other fields out of the woke rx_desc until we know the
 		 * descriptor has been written back
 		 */
 		dma_rmb();

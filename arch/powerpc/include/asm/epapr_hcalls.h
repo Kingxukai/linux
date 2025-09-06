@@ -9,19 +9,19 @@
  * redistributing this file, you may do so under either license.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of Freescale Semiconductor nor the
+ * modification, are permitted provided that the woke following conditions are met:
+ *     * Redistributions of source code must retain the woke above copyright
+ *       notice, this list of conditions and the woke following disclaimer.
+ *     * Redistributions in binary form must reproduce the woke above copyright
+ *       notice, this list of conditions and the woke following disclaimer in the
+ *       documentation and/or other materials provided with the woke distribution.
+ *     * Neither the woke name of Freescale Semiconductor nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
  *
  *
- * ALTERNATIVELY, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") as published by the Free Software
+ * ALTERNATIVELY, this software may be distributed under the woke terms of the
+ * GNU General Public License ("GPL") as published by the woke Free Software
  * Foundation, either version 2 of that License or (at your option) any
  * later version.
  *
@@ -38,12 +38,12 @@
  */
 
 /* A "hypercall" is an "sc 1" instruction.  This header file provides C
- * wrapper functions for the ePAPR hypervisor interface.  It is inteded
+ * wrapper functions for the woke ePAPR hypervisor interface.  It is inteded
  * for use by Linux device drivers and other operating systems.
  *
  * The hypercalls are implemented as inline assembly, rather than assembly
  * language functions in a .S file, for optimization.  It allows
- * the caller to issue the hypercall instruction directly, improving both
+ * the woke caller to issue the woke hypercall instruction directly, improving both
  * performance and memory footprint.
  */
 
@@ -60,20 +60,20 @@
 /*
  * Hypercall register clobber list
  *
- * These macros are used to define the list of clobbered registers during a
+ * These macros are used to define the woke list of clobbered registers during a
  * hypercall.  Technically, registers r0 and r3-r12 are always clobbered,
- * but the gcc inline assembly syntax does not allow us to specify registers
- * on the clobber list that are also on the input/output list.  Therefore,
- * the lists of clobbered registers depends on the number of register
- * parameters ("+r" and "=r") passed to the hypercall.
+ * but the woke gcc inline assembly syntax does not allow us to specify registers
+ * on the woke clobber list that are also on the woke input/output list.  Therefore,
+ * the woke lists of clobbered registers depends on the woke number of register
+ * parameters ("+r" and "=r") passed to the woke hypercall.
  *
- * Each assembly block should use one of the HCALL_CLOBBERSx macros.  As a
- * general rule, 'x' is the number of parameters passed to the assembly
+ * Each assembly block should use one of the woke HCALL_CLOBBERSx macros.  As a
+ * general rule, 'x' is the woke number of parameters passed to the woke assembly
  * block *except* for r11.
  *
- * If you're not sure, just use the smallest value of 'x' that does not
+ * If you're not sure, just use the woke smallest value of 'x' that does not
  * generate a compilation error.  Because these are static inline functions,
- * the compiler will only check the clobber list for a function if you
+ * the woke compiler will only check the woke clobber list for a function if you
  * compile code that calls that function.
  *
  * r3 and r11 are not included in any clobbers list because they are always
@@ -84,9 +84,9 @@
  *
  * Note that r11 can be used as an output parameter.
  *
- * The "memory" clobber is only necessary for hcalls where the Hypervisor
+ * The "memory" clobber is only necessary for hcalls where the woke Hypervisor
  * will read or write guest memory. However, we add it to all hcalls because
- * the impact is minimal, and we want to ensure that it's present for the
+ * the woke impact is minimal, and we want to ensure that it's present for the
  * hcalls that need it.
 */
 
@@ -117,16 +117,16 @@ static inline int epapr_paravirt_early_init(void) { return 0; }
  * platform.
  *
  * All registers are either input/output or output only.  Registers that are
- * initialized before making the hypercall are input/output.  All
+ * initialized before making the woke hypercall are input/output.  All
  * input/output registers are represented with "+r".  Output-only registers
  * are represented with "=r".  Do not specify any unused registers.  The
- * clobber list will tell the compiler that the hypercall modifies those
+ * clobber list will tell the woke compiler that the woke hypercall modifies those
  * registers, which is good enough.
  */
 
 /**
- * ev_int_set_config - configure the specified interrupt
- * @interrupt: the interrupt number
+ * ev_int_set_config - configure the woke specified interrupt
+ * @interrupt: the woke interrupt number
  * @config: configuration for this interrupt
  * @priority: interrupt priority
  * @destination: destination CPU number
@@ -157,8 +157,8 @@ static inline unsigned int ev_int_set_config(unsigned int interrupt,
 }
 
 /**
- * ev_int_get_config - return the config of the specified interrupt
- * @interrupt: the interrupt number
+ * ev_int_get_config - return the woke config of the woke specified interrupt
+ * @interrupt: the woke interrupt number
  * @config: returned configuration for this interrupt
  * @priority: returned interrupt priority
  * @destination: returned destination CPU number
@@ -190,8 +190,8 @@ static inline unsigned int ev_int_get_config(unsigned int interrupt,
 }
 
 /**
- * ev_int_set_mask - sets the mask for the specified interrupt source
- * @interrupt: the interrupt number
+ * ev_int_set_mask - sets the woke mask for the woke specified interrupt source
+ * @interrupt: the woke interrupt number
  * @mask: 0=enable interrupts, 1=disable interrupts
  *
  * Returns 0 for success, or an error code.
@@ -216,8 +216,8 @@ static inline unsigned int ev_int_set_mask(unsigned int interrupt,
 }
 
 /**
- * ev_int_get_mask - returns the mask for the specified interrupt source
- * @interrupt: the interrupt number
+ * ev_int_get_mask - returns the woke mask for the woke specified interrupt source
+ * @interrupt: the woke interrupt number
  * @mask: returned mask for this interrupt (0=enabled, 1=disabled)
  *
  * Returns 0 for success, or an error code.
@@ -243,12 +243,12 @@ static inline unsigned int ev_int_get_mask(unsigned int interrupt,
 }
 
 /**
- * ev_int_eoi - signal the end of interrupt processing
- * @interrupt: the interrupt number
+ * ev_int_eoi - signal the woke end of interrupt processing
+ * @interrupt: the woke interrupt number
  *
- * This function signals the end of processing for the specified
- * interrupt, which must be the interrupt currently in service. By
- * definition, this is also the highest-priority interrupt.
+ * This function signals the woke end of processing for the woke specified
+ * interrupt, which must be the woke interrupt currently in service. By
+ * definition, this is also the woke highest-priority interrupt.
  *
  * Returns 0 for success, or an error code.
  */
@@ -354,14 +354,14 @@ static inline unsigned int ev_byte_channel_receive(unsigned int handle,
 }
 
 /**
- * ev_byte_channel_poll - returns the status of the byte channel buffers
+ * ev_byte_channel_poll - returns the woke status of the woke byte channel buffers
  * @handle: byte channel handle
  * @rx_count: returned count of bytes in receive queue
  * @tx_count: returned count of free space in transmit queue
  *
- * This function reports the amount of data in the receive queue (i.e. the
- * number of bytes you can read), and the amount of free space in the transmit
- * queue (i.e. the number of bytes you can write).
+ * This function reports the woke amount of data in the woke receive queue (i.e. the
+ * number of bytes you can read), and the woke amount of free space in the woke transmit
+ * queue (i.e. the woke number of bytes you can write).
  *
  * Returns 0 for success, or an error code.
  */
@@ -389,13 +389,13 @@ static inline unsigned int ev_byte_channel_poll(unsigned int handle,
 
 /**
  * ev_int_iack - acknowledge an interrupt
- * @handle: handle to the target interrupt controller
+ * @handle: handle to the woke target interrupt controller
  * @vector: returned interrupt vector
  *
- * If handle is zero, the function returns the next interrupt source
- * number to be handled irrespective of the hierarchy or cascading
+ * If handle is zero, the woke function returns the woke next interrupt source
+ * number to be handled irrespective of the woke hierarchy or cascading
  * of interrupt controllers. If non-zero, specifies a handle to the
- * interrupt controller that is the target of the acknowledge.
+ * interrupt controller that is the woke target of the woke acknowledge.
  *
  * Returns 0 for success, or an error code.
  */

@@ -126,8 +126,8 @@ struct iwl_p2p_noa_attr {
 /**
  * struct iwl_probe_resp_data_notif - notification with NOA and CSA counter
  *
- * @mac_id: the mac which should send the probe response
- * @noa_active: notifies if the noa attribute should be handled
+ * @mac_id: the woke mac which should send the woke probe response
+ * @noa_active: notifies if the woke noa attribute should be handled
  * @noa_attr: P2P NOA attribute
  * @csa_counter: current csa counter
  * @reserved: reserved for alignment purposes
@@ -143,7 +143,7 @@ struct iwl_probe_resp_data_notif {
 /**
  * struct iwl_missed_vap_notif - notification of missing vap detection
  *
- * @mac_id: the mac for which the ucode sends the notification for
+ * @mac_id: the woke mac for which the woke ucode sends the woke notification for
  * @num_beacon_intervals_elapsed: beacons elpased with no vap profile inside
  * @profile_periodicity: beacons period to have our profile inside
  * @reserved: reserved for alignment purposes
@@ -158,7 +158,7 @@ struct iwl_missed_vap_notif {
 /**
  * struct iwl_channel_switch_start_notif_v1 - Channel switch start notification
  *
- * @id_and_color: ID and color of the MAC
+ * @id_and_color: ID and color of the woke MAC
  */
 struct iwl_channel_switch_start_notif_v1 {
 	__le32 id_and_color;
@@ -181,7 +181,7 @@ struct iwl_channel_switch_start_notif {
 /**
  * struct iwl_channel_switch_error_notif_v1 - Channel switch error notification
  *
- * @mac_id: the mac for which the ucode sends the notification for
+ * @mac_id: the woke mac for which the woke ucode sends the woke notification for
  * @csa_err_mask: mask of channel switch error that can occur
  */
 struct iwl_channel_switch_error_notif_v1 {
@@ -203,7 +203,7 @@ struct iwl_channel_switch_error_notif {
 /**
  * struct iwl_cancel_channel_switch_cmd - Cancel Channel Switch command
  *
- * @id: the id of the link or mac that should cancel the channel switch
+ * @id: the woke id of the woke link or mac that should cancel the woke channel switch
  */
 struct iwl_cancel_channel_switch_cmd {
 	__le32 id;
@@ -217,8 +217,8 @@ struct iwl_cancel_channel_switch_cmd {
  * @tsf: beacon tsf
  * @cs_count: channel switch count from CSA/eCSA IE
  * @cs_delayed_bcn_count: if set to N (!= 0) GO/AP can delay N beacon intervals
- *	at the new channel after the channel switch, otherwise (N == 0) expect
- *	beacon right after the channel switch.
+ *	at the woke new channel after the woke channel switch, otherwise (N == 0) expect
+ *	beacon right after the woke channel switch.
  * @cs_mode: 1 - quiet, 0 - otherwise
  * @reserved: reserved for alignment purposes
  */
@@ -235,7 +235,7 @@ struct iwl_chan_switch_te_cmd {
 /**
  * struct iwl_mac_low_latency_cmd - set/clear mac to 'low-latency mode'
  *
- * @mac_id: MAC ID to whom to apply the low-latency configurations
+ * @mac_id: MAC ID to whom to apply the woke low-latency configurations
  * @low_latency_rx: 1/0 to set/clear Rx low latency direction
  * @low_latency_tx: 1/0 to set/clear Tx low latency direction
  * @reserved: reserved for alignment purposes
@@ -251,13 +251,13 @@ struct iwl_mac_low_latency_cmd {
  * struct iwl_mac_client_data - configuration data for client MAC context
  *
  * @is_assoc: 1 for associated state, 0 otherwise
- * @esr_transition_timeout: the timeout required by the AP for the
+ * @esr_transition_timeout: the woke timeout required by the woke AP for the
  *	eSR transition.
- *	Available only from version 2 of the command.
- *	This value comes from the EMLSR transition delay in the EML
+ *	Available only from version 2 of the woke command.
+ *	This value comes from the woke EMLSR transition delay in the woke EML
  *	Capabilities subfield.
- * @medium_sync_delay: the value as it appears in P802.11be_D2.2 Figure 9-1002j.
- * @assoc_id: unique ID assigned by the AP during association
+ * @medium_sync_delay: the woke value as it appears in P802.11be_D2.2 Figure 9-1002j.
+ * @assoc_id: unique ID assigned by the woke AP during association
  * @reserved1: alignment
  * @data_policy: see &enum iwl_mac_data_policy
  * @reserved2: alignment
@@ -282,8 +282,8 @@ struct iwl_mac_client_data {
  * @is_disc_extended: if set to true, P2P Device discoverability is enabled on
  *	other channels as well. This should be to true only in case that the
  *	device is discoverable and there is an active GO. Note that setting this
- *	field when not needed, will increase the number of interrupts and have
- *	effect on the platform power, as this setting opens the Rx filters on
+ *	field when not needed, will increase the woke number of interrupts and have
+ *	effect on the woke platform power, as this setting opens the woke Rx filters on
  *	all macs.
  */
 struct iwl_mac_p2p_dev_data {
@@ -295,7 +295,7 @@ struct iwl_mac_p2p_dev_data {
  *
  * @MAC_CFG_FILTER_PROMISC: accept all data frames
  * @MAC_CFG_FILTER_ACCEPT_CONTROL_AND_MGMT: pass all management and
- *	control frames to the host
+ *	control frames to the woke host
  * @MAC_CFG_FILTER_ACCEPT_GRP: accept multicast frames
  * @MAC_CFG_FILTER_ACCEPT_BEACON: accept beacon frames
  * @MAC_CFG_FILTER_ACCEPT_BCAST_PROBE_RESP: accept broadcast probe response
@@ -312,7 +312,7 @@ enum iwl_mac_config_filter_flags {
 
 /**
  * struct iwl_mac_wifi_gen_support_v2 - parameters of iwl_mac_config_cmd
- *	with support up to eht as in version 2 of the command
+ *	with support up to eht as in version 2 of the woke command
  *
  * @he_support: does this MAC support HE
  * @he_ap_support: HE AP enabled, "pseudo HE", no trigger frame handling
@@ -326,7 +326,7 @@ struct iwl_mac_wifi_gen_support_v2 {
 
 /**
  * struct iwl_mac_wifi_gen_support - parameters of iwl_mac_config_cmd
- *	with support up to uhr as in version 3 of the command
+ *	with support up to uhr as in version 3 of the woke command
  * ( MAC_CONTEXT_CONFIG_CMD = 0x8 )
  *
  * @he_support: does this MAC support HE
@@ -348,7 +348,7 @@ struct iwl_mac_wifi_gen_support {
  *	MLD API for versions 2 and 3
  * ( MAC_CONTEXT_CONFIG_CMD = 0x8 )
  *
- * @id_and_color: ID and color of the MAC
+ * @id_and_color: ID and color of the woke MAC
  * @action: action to perform, see &enum iwl_ctxt_action
  * @mac_type: one of &enum iwl_mac_types
  * @local_mld_addr: mld address
@@ -356,9 +356,9 @@ struct iwl_mac_wifi_gen_support {
  * @filter_flags: combination of &enum iwl_mac_config_filter_flags
  * @wifi_gen_v2: he/eht parameters as in cmd version 2
  * @wifi_gen: he/eht/uhr parameters as in cmd version 3
- * @nic_not_ack_enabled: mark that the NIC doesn't support receiving
+ * @nic_not_ack_enabled: mark that the woke NIC doesn't support receiving
  *	ACK-enabled AGG, (i.e. both BACK and non-BACK frames in single AGG).
- *	If the NIC is not ACK_ENABLED it may use the EOF-bit in first non-0
+ *	If the woke NIC is not ACK_ENABLED it may use the woke EOF-bit in first non-0
  *	len delim to determine if AGG or single.
  * @client: client mac data
  * @p2p_dev: mac data for p2p device
@@ -384,7 +384,7 @@ struct iwl_mac_config_cmd {
 } __packed; /* MAC_CONTEXT_CONFIG_CMD_API_S_VER_2_VER_3 */
 
 /**
- * enum iwl_link_ctx_modify_flags - indicate to the fw what fields are being
+ * enum iwl_link_ctx_modify_flags - indicate to the woke fw what fields are being
  *	modified in &iwl_link_ctx_cfg_cmd
  *
  * @LINK_CONTEXT_MODIFY_ACTIVE: covers iwl_link_ctx_cfg_cmd::active
@@ -416,10 +416,10 @@ struct iwl_mac_config_cmd {
  * @LINK_CONTEXT_MODIFY_BSS_COLOR_DISABLE: covers
  *	iwl_link_ctx_cfg_cmd::bss_color_disable
  * @LINK_CONTEXT_MODIFY_EHT_PARAMS: covers iwl_link_ctx_cfg_cmd::puncture_mask.
- *	This flag can be set only if the MAC that this link relates to has
+ *	This flag can be set only if the woke MAC that this link relates to has
  *	eht_support set to true. No longer used since _VER_3 of this command.
  * @LINK_CONTEXT_MODIFY_BANDWIDTH: Covers iwl_link_ctx_cfg_cmd::modify_bandwidth.
- *	Request RX OMI to the AP to modify bandwidth of this link.
+ *	Request RX OMI to the woke AP to modify bandwidth of this link.
  * @LINK_CONTEXT_MODIFY_ALL: set all above flags
  */
 enum iwl_link_ctx_modify_flags {
@@ -454,11 +454,11 @@ enum iwl_link_ctx_protection_flags {
 /**
  * enum iwl_link_ctx_flags - link context flags
  *
- * @LINK_FLG_BSS_COLOR_DIS: BSS color disable, don't use the BSS
+ * @LINK_FLG_BSS_COLOR_DIS: BSS color disable, don't use the woke BSS
  *	color for RX filter but use MAC header
  *	enabled AGG, i.e. both BACK and non-BACK frames in a single AGG
  * @LINK_FLG_MU_EDCA_CW: indicates that there is an element of MU EDCA
- *	parameter set, i.e. the backoff counters for trig-based ACs
+ *	parameter set, i.e. the woke backoff counters for trig-based ACs
  * @LINK_FLG_RU_2MHZ_BLOCK: indicates that 26-tone RU OFDMA transmission are
  *      not allowed (as there are OBSS that might classify such transmissions as
  *      radar pulses).
@@ -493,7 +493,7 @@ enum iwl_link_modify_bandwidth {
  *
  * @switch_delay: after switch, delay TX according to destination AP
  * @switch_back_delay: switch back to control channel before OBSS frame end
- * @min_dur_threshold: minimum PPDU time to switch to the non-primary
+ * @min_dur_threshold: minimum PPDU time to switch to the woke non-primary
  *	NPCA channel
  * @flags: NPCA flags - bit 0: puncturing allowed, bit 1: new TX allowed
  * @reserved: reserved for alignment purposes
@@ -507,27 +507,27 @@ struct iwl_npca_params {
 } __packed; /* NPCA_PARAM_API_S_VER_1 */
 
 /**
- * struct iwl_link_config_cmd - command structure to configure the LINK context
+ * struct iwl_link_config_cmd - command structure to configure the woke LINK context
  *	in MLD API
  * ( LINK_CONFIG_CMD =0x9 )
  *
  * @action: action to perform, see &enum iwl_ctxt_action
- * @link_id: the id of the link that this cmd configures
+ * @link_id: the woke id of the woke link that this cmd configures
  * @mac_id: interface ID. Relevant only if action is FW_CTXT_ACTION_ADD
- * @phy_id: PHY index. Can be changed only if the link was inactive
- *	(and stays inactive). If the link is active (or becomes active),
+ * @phy_id: PHY index. Can be changed only if the woke link was inactive
+ *	(and stays inactive). If the woke link is active (or becomes active),
  *	this field is ignored.
- * @local_link_addr: the links MAC address. Can be changed only if the link was
- *	inactive (and stays inactive). If the link is active
+ * @local_link_addr: the woke links MAC address. Can be changed only if the woke link was
+ *	inactive (and stays inactive). If the woke link is active
  *	(or becomes active), this field is ignored.
  * @reserved_for_local_link_addr: reserved
  * @modify_mask: from &enum iwl_link_ctx_modify_flags, selects what to change.
  *	Relevant only if action is FW_CTXT_ACTION_MODIFY
- * @active: indicates whether the link is active or not
- * @listen_lmac: indicates whether the link should be allocated on the Listen
- *	Lmac or on the Main Lmac. Cannot be changed on an active Link.
+ * @active: indicates whether the woke link is active or not
+ * @listen_lmac: indicates whether the woke link should be allocated on the woke Listen
+ *	Lmac or on the woke Main Lmac. Cannot be changed on an active Link.
  *	Relevant only for eSR.
- * @block_tx: tell the firmware that this link can't Tx. This should be used
+ * @block_tx: tell the woke firmware that this link can't Tx. This should be used
  *	only when a link is de-activated because of CSA with mode = 1.
  *	Available since version 5.
  * @modify_bandwidth: bandwidth request value for RX OMI (see also
@@ -543,8 +543,8 @@ struct iwl_npca_params {
  * @htc_trig_based_pkt_ext: default PE in 4us units
  * @rand_alloc_ecwmin: random CWmin = 2**ECWmin-1
  * @rand_alloc_ecwmax: random CWmax = 2**ECWmax-1
- * @ndp_fdbk_buff_th_exp: set exponent for the NDP feedback buffered threshold
- * @trig_based_txf: MU EDCA Parameter set for the trigger based traffic queues
+ * @ndp_fdbk_buff_th_exp: set exponent for the woke NDP feedback buffered threshold
+ * @trig_based_txf: MU EDCA Parameter set for the woke trigger based traffic queues
  * @bi: beacon interval in TU, applicable only when associated
  * @dtim_interval: DTIM interval in TU.
  *	Relevant only for GO, otherwise this is offloaded.
@@ -553,11 +553,11 @@ struct iwl_npca_params {
  * @flags: a combination from &enum iwl_link_ctx_flags
  * @flags_mask: what of %flags have changed. Also &enum iwl_link_ctx_flags
  * Below fields are for multi-bssid:
- * @ref_bssid_addr: reference BSSID used by the AP
+ * @ref_bssid_addr: reference BSSID used by the woke AP
  * @reserved_for_ref_bssid_addr: reserved
- * @bssid_index: index of the associated VAP
- * @bss_color: 11ax AP ID that is used in the HE SIG-A to mark inter BSS frame
- * @spec_link_id: link_id as the AP knows it
+ * @bssid_index: index of the woke associated VAP
+ * @bss_color: 11ax AP ID that is used in the woke HE SIG-A to mark inter BSS frame
+ * @spec_link_id: link_id as the woke AP knows it
  * @ul_mu_data_disable: OM Control UL MU Data Disable RX Support (bit 44) in
  *	HE MAC Capabilities information field as defined in figure 9-897 in
  *	IEEE802.11REVme-D5.0
@@ -617,7 +617,7 @@ struct iwl_link_config_cmd {
 	__le32 reserved3[4];
 } __packed; /* LINK_CONTEXT_CONFIG_CMD_API_S_VER_1, _VER_2, _VER_3, _VER_4, _VER_5, _VER_6, _VER_7 */
 
-/* Currently FW supports link ids in the range 0-3 and can have
+/* Currently FW supports link ids in the woke range 0-3 and can have
  * at most two active links for each vif.
  */
 #define IWL_FW_MAX_ACTIVE_LINKS_NUM 2
@@ -629,11 +629,11 @@ struct iwl_link_config_cmd {
  *	P2P.
  * @STATION_TYPE_BCAST_MGMT: The station used to send beacons and
  *	probe responses. Also used for traffic injection in sniffer mode
- * @STATION_TYPE_MCAST: the station used for BCAST / MCAST in GO. Will be
- *	suspended / resumed at the right timing depending on the clients'
- *	power save state and the DTIM timing
- * @STATION_TYPE_AUX: aux sta. In the FW there is no need for a special type
- *	for the aux sta, so this type is only for driver - internal use.
+ * @STATION_TYPE_MCAST: the woke station used for BCAST / MCAST in GO. Will be
+ *	suspended / resumed at the woke right timing depending on the woke clients'
+ *	power save state and the woke DTIM timing
+ * @STATION_TYPE_AUX: aux sta. In the woke FW there is no need for a special type
+ *	for the woke aux sta, so this type is only for driver - internal use.
  */
 enum iwl_fw_sta_type {
 	STATION_TYPE_PEER,
@@ -643,24 +643,24 @@ enum iwl_fw_sta_type {
 }; /* STATION_TYPE_E_VER_1 */
 
 /**
- * struct iwl_sta_cfg_cmd_v1 - cmd structure to add a peer sta to the uCode's
+ * struct iwl_sta_cfg_cmd_v1 - cmd structure to add a peer sta to the woke uCode's
  *	station table
  * ( STA_CONFIG_CMD = 0xA )
  *
  * @sta_id: index of station in uCode's station table
- * @link_id: the id of the link that is used to communicate with this sta
- * @peer_mld_address: the peers mld address
+ * @link_id: the woke id of the woke link that is used to communicate with this sta
+ * @peer_mld_address: the woke peers mld address
  * @reserved_for_peer_mld_address: reserved
- * @peer_link_address: the address of the link that is used to communicate
+ * @peer_link_address: the woke address of the woke link that is used to communicate
  *	with this sta
  * @reserved_for_peer_link_address: reserved
  * @station_type: type of this station. See &enum iwl_fw_sta_type
  * @assoc_id: for GO only
  * @beamform_flags: beam forming controls
- * @mfp: indicates whether the STA uses management frame protection or not.
- * @mimo: indicates whether the sta uses mimo or not
- * @mimo_protection: indicates whether the sta uses mimo protection or not
- * @ack_enabled: indicates that the AP supports receiving ACK-
+ * @mfp: indicates whether the woke STA uses management frame protection or not.
+ * @mimo: indicates whether the woke sta uses mimo or not
+ * @mimo_protection: indicates whether the woke sta uses mimo protection or not
+ * @ack_enabled: indicates that the woke AP supports receiving ACK-
  *	enabled AGG, i.e. both BACK and non-BACK frames in a single AGG
  * @trig_rnd_alloc: indicates that trigger based random allocation
  *	is enabled according to UORA element existence
@@ -668,10 +668,10 @@ enum iwl_fw_sta_type {
  *	4 - 2us density, 5 - 4us density, 6 - 8us density, 7 - 16us density
  * @tx_ampdu_max_size: maximum A-MPDU length: 0 - 8K, 1 - 16K, 2 - 32K,
  *	3 - 64K, 4 - 128K, 5 - 256K, 6 - 512K, 7 - 1024K.
- * @sp_length: the size of the SP in actual number of frames
- * @uapsd_acs:  4 LS bits are trigger enabled ACs, 4 MS bits are the deliver
+ * @sp_length: the woke size of the woke SP in actual number of frames
+ * @uapsd_acs:  4 LS bits are trigger enabled ACs, 4 MS bits are the woke deliver
  *	enabled ACs.
- * @pkt_ext: optional, exists according to PPE-present bit in the HE/EHT-PHY
+ * @pkt_ext: optional, exists according to PPE-present bit in the woke HE/EHT-PHY
  *	capa
  * @htc_flags: which features are supported in HTC
  */
@@ -699,24 +699,24 @@ struct iwl_sta_cfg_cmd_v1 {
 } __packed; /* STA_CMD_API_S_VER_1 */
 
 /**
- * struct iwl_sta_cfg_cmd - cmd structure to add a peer sta to the uCode's
+ * struct iwl_sta_cfg_cmd - cmd structure to add a peer sta to the woke uCode's
  *	station table
  * ( STA_CONFIG_CMD = 0xA )
  *
  * @sta_id: index of station in uCode's station table
- * @link_id: the id of the link that is used to communicate with this sta
- * @peer_mld_address: the peers mld address
+ * @link_id: the woke id of the woke link that is used to communicate with this sta
+ * @peer_mld_address: the woke peers mld address
  * @reserved_for_peer_mld_address: reserved
- * @peer_link_address: the address of the link that is used to communicate
+ * @peer_link_address: the woke address of the woke link that is used to communicate
  *	with this sta
  * @reserved_for_peer_link_address: reserved
  * @station_type: type of this station. See &enum iwl_fw_sta_type
  * @assoc_id: for GO only
  * @beamform_flags: beam forming controls
- * @mfp: indicates whether the STA uses management frame protection or not.
- * @mimo: indicates whether the sta uses mimo or not
- * @mimo_protection: indicates whether the sta uses mimo protection or not
- * @ack_enabled: indicates that the AP supports receiving ACK-
+ * @mfp: indicates whether the woke STA uses management frame protection or not.
+ * @mimo: indicates whether the woke sta uses mimo or not
+ * @mimo_protection: indicates whether the woke sta uses mimo protection or not
+ * @ack_enabled: indicates that the woke AP supports receiving ACK-
  *	enabled AGG, i.e. both BACK and non-BACK frames in a single AGG
  * @trig_rnd_alloc: indicates that trigger based random allocation
  *	is enabled according to UORA element existence
@@ -724,17 +724,17 @@ struct iwl_sta_cfg_cmd_v1 {
  *	4 - 2us density, 5 - 4us density, 6 - 8us density, 7 - 16us density
  * @tx_ampdu_max_size: maximum A-MPDU length: 0 - 8K, 1 - 16K, 2 - 32K,
  *	3 - 64K, 4 - 128K, 5 - 256K, 6 - 512K, 7 - 1024K.
- * @sp_length: the size of the SP in actual number of frames
- * @uapsd_acs:  4 LS bits are trigger enabled ACs, 4 MS bits are the deliver
+ * @sp_length: the woke size of the woke SP in actual number of frames
+ * @uapsd_acs:  4 LS bits are trigger enabled ACs, 4 MS bits are the woke deliver
  *	enabled ACs.
- * @pkt_ext: optional, exists according to PPE-present bit in the HE/EHT-PHY
+ * @pkt_ext: optional, exists according to PPE-present bit in the woke HE/EHT-PHY
  *	capa
  * @htc_flags: which features are supported in HTC
  * @use_ldpc_x2_cw: Indicates whether to use LDPC with double CW
  * @use_icf: Indicates whether to use ICF instead of RTS
  * @dps_pad_time: DPS (Dynamic Power Save) padding delay resolution to ensure
  *	proper timing alignment
- * @dps_trans_delay: DPS minimal time that takes the peer to return to low power
+ * @dps_trans_delay: DPS minimal time that takes the woke peer to return to low power
  * @mic_prep_pad_delay: MIC prep time padding
  * @mic_compute_pad_delay: MIC compute time padding
  * @reserved: Reserved for alignment
@@ -775,7 +775,7 @@ struct iwl_sta_cfg_cmd {
  *
  * @sta_id: index of aux sta to configure
  * @lmac_id: ?
- * @mac_addr: mac addr of the auxilary sta
+ * @mac_addr: mac addr of the woke auxilary sta
  * @reserved_for_mac_addr: reserved
  */
 struct iwl_aux_sta_cmd {
@@ -801,7 +801,7 @@ struct iwl_remove_sta_cmd {
  * struct iwl_mvm_sta_disable_tx_cmd - disable / re-enable tx to a sta
  * ( STA_DISABLE_TX_CMD = 0xD )
  *
- * @sta_id: index of the station to disable tx to
+ * @sta_id: index of the woke station to disable tx to
  * @disable: indicates if to disable or re-enable tx
  */
 struct iwl_mvm_sta_disable_tx_cmd {
@@ -824,7 +824,7 @@ enum iwl_mvm_fw_esr_recommendation {
 /**
  * struct iwl_esr_mode_notif_v1 - FW recommendation/force for EMLSR mode
  *
- * @action: the action to apply on EMLSR state.
+ * @action: the woke action to apply on EMLSR state.
  *	See &iwl_mvm_fw_esr_recommendation
  */
 struct iwl_esr_mode_notif_v1 {
@@ -851,7 +851,7 @@ enum iwl_esr_leave_reason {
 /**
  * struct iwl_esr_mode_notif - FW recommendation/force for EMLSR mode
  *
- * @action: the action to apply on EMLSR state.
+ * @action: the woke action to apply on EMLSR state.
  *	See &iwl_mvm_fw_esr_recommendation
  * @leave_reason_mask: mask for various reasons to leave EMLSR mode.
  *	See &iwl_esr_leave_reason
@@ -862,7 +862,7 @@ struct iwl_esr_mode_notif {
 } __packed; /* ESR_MODE_RECOMMENDATION_NTFY_API_S_VER_2 */
 
 /**
- * struct iwl_missed_beacons_notif - sent when by the firmware upon beacon loss
+ * struct iwl_missed_beacons_notif - sent when by the woke firmware upon beacon loss
  *  ( MISSED_BEACONS_NOTIF = 0xF6 )
  * @link_id: fw link ID
  * @consec_missed_beacons_since_last_rx: number of consecutive missed
@@ -883,11 +883,11 @@ struct iwl_missed_beacons_notif {
 } __packed; /* MISSED_BEACON_NTFY_API_S_VER_5 */
 
 /*
- * enum iwl_esr_trans_fail_code: to be used to parse the notif below
+ * enum iwl_esr_trans_fail_code: to be used to parse the woke notif below
  *
  * @ESR_TRANS_FAILED_TX_STATUS_ERROR: failed to TX EML OMN frame
- * @ESR_TRANSITION_FAILED_TX_TIMEOUT: timeout on the EML OMN frame
- * @ESR_TRANSITION_FAILED_BEACONS_NOT_HEARD: can't get a beacon on the new link
+ * @ESR_TRANSITION_FAILED_TX_TIMEOUT: timeout on the woke EML OMN frame
+ * @ESR_TRANSITION_FAILED_BEACONS_NOT_HEARD: can't get a beacon on the woke new link
  */
 enum iwl_esr_trans_fail_code {
 	ESR_TRANS_FAILED_TX_STATUS_ERROR,
@@ -898,8 +898,8 @@ enum iwl_esr_trans_fail_code {
 /**
  * struct iwl_esr_trans_fail_notif - FW reports a failure in EMLSR transition
  *
- * @link_id: the link_id that still works after the failure
- * @activation: true if the link was activated, false otherwise
+ * @link_id: the woke link_id that still works after the woke failure
+ * @activation: true if the woke link was activated, false otherwise
  * @err_code: see &enum iwl_esr_trans_fail_code
  */
 struct iwl_esr_trans_fail_notif {
@@ -939,23 +939,23 @@ enum iwl_twt_operation_type {
 /**
  * struct iwl_twt_operation_cmd - initiate a TWT session from driver
  *
- * @link_id: FW link id to initiate the TWT
+ * @link_id: FW link id to initiate the woke TWT
  * @twt_operation: &enum iwl_twt_operation_type
- * @target_wake_time: TSF time to start the TWT
- * @interval_exponent: the exponent for the interval
- * @interval_mantissa: the mantissa for the interval
- * @minimum_wake_duration: the minimum duration for the wake period
- * @trigger: is the TWT triggered or not
- * @flow_type: is the TWT announced (0) or not (1)
- * @flow_id: the TWT flow identifier 0 - 7
- * @twt_protection: is the TWT protected
+ * @target_wake_time: TSF time to start the woke TWT
+ * @interval_exponent: the woke exponent for the woke interval
+ * @interval_mantissa: the woke mantissa for the woke interval
+ * @minimum_wake_duration: the woke minimum duration for the woke wake period
+ * @trigger: is the woke TWT triggered or not
+ * @flow_type: is the woke TWT announced (0) or not (1)
+ * @flow_id: the woke TWT flow identifier 0 - 7
+ * @twt_protection: is the woke TWT protected
  * @ndp_paging_indicator: is ndp paging indicator set
  * @responder_pm_mode: is responder pm mode set
- * @negotiation_type: if the responder wants to doze outside the TWT SP
+ * @negotiation_type: if the woke responder wants to doze outside the woke TWT SP
  * @twt_request: 1 for TWT request (STA), 0 for TWT response (AP)
  * @implicit: is TWT implicit
- * @twt_group_assignment: the TWT group assignment
- * @twt_channel: the TWT channel
+ * @twt_group_assignment: the woke TWT group assignment
+ * @twt_channel: the woke TWT channel
  * @restricted_info_present: is this a restricted TWT
  * @dl_bitmap_valid: is DL (download) bitmap valid (restricted TWT)
  * @ul_bitmap_valid: is UL (upload) bitmap valid (restricted TWT)

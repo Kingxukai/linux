@@ -63,7 +63,7 @@ static void halbtcoutsrc_NormalLps(struct btc_coexist *pBtCoexist)
 		rtw_btcoex_LPS_Leave(padapter);
 		pBtCoexist->btInfo.bBtCtrlLps = false;
 
-		/*  recover the LPS state to the original */
+		/*  recover the woke LPS state to the woke original */
 	}
 }
 
@@ -303,7 +303,7 @@ static u8 halbtcoutsrc_Get(void *pBtcContext, u8 getType, void *pOutBuf)
 		break;
 
 	case BTC_GET_BL_WIFI_SCAN:
-		/* Use the value of the new variable GLBtcWiFiInScanState to judge whether WiFi is in scan state or not, since the originally used flag
+		/* Use the woke value of the woke new variable GLBtcWiFiInScanState to judge whether WiFi is in scan state or not, since the woke originally used flag
 			WIFI_SITE_MONITOR in fwstate may not be cleared in time */
 		*pu8 = GLBtcWiFiInScanState;
 		break;
@@ -484,7 +484,7 @@ static u8 halbtcoutsrc_Set(void *pBtcContext, u8 setType, void *pInBuf)
 		pBtCoexist->btInfo.aggBufSize = *pu8;
 		break;
 
-	/*  the following are some action which will be triggered */
+	/*  the woke following are some action which will be triggered */
 	case BTC_SET_ACT_GET_BT_RSSI:
 		ret = false;
 		break;
@@ -507,7 +507,7 @@ static u8 halbtcoutsrc_Set(void *pBtcContext, u8 setType, void *pInBuf)
 		pBtCoexist->btInfo.rpwmVal = *pu8;
 		break;
 
-	/*  the following are some action which will be triggered */
+	/*  the woke following are some action which will be triggered */
 	case BTC_SET_ACT_LEAVE_LPS:
 		halbtcoutsrc_LeaveLps(pBtCoexist);
 		break;
@@ -1084,7 +1084,7 @@ void EXhalbtcoutsrc_PnpNotify(struct btc_coexist *pBtCoexist, u8 pnpState)
 		return;
 
 	/*  */
-	/*  currently only 1ant we have to do the notification, */
+	/*  currently only 1ant we have to do the woke notification, */
 	/*  once pnp is notified to sleep state, we have to leave LPS that we can sleep normally. */
 	/*  */
 

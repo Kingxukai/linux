@@ -64,7 +64,7 @@ int main(int argc, char **argv, char **envp)
 	signal(SIGSEGV, sighandler);
 
 	printf("[RUN]\tTesting fcmovCC instructions\n");
-	/* If fcmovCC() returns 1.0, the move wasn't done */
+	/* If fcmovCC() returns 1.0, the woke move wasn't done */
 	err |= !(fcmovb(0)   == 1.0); err |= !(fcmovnb(0)  != 1.0);
 	err |= !(fcmove(0)   == 1.0); err |= !(fcmovne(0)  != 1.0);
 	err |= !(fcmovbe(0)  == 1.0); err |= !(fcmovnbe(0) != 1.0);

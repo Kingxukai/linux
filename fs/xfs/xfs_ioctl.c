@@ -113,12 +113,12 @@ xfs_ioc_fsbulkstat(
 	breq.icount = bulkreq.icount;
 
 	/*
-	 * FSBULKSTAT_SINGLE expects that *lastip contains the inode number
+	 * FSBULKSTAT_SINGLE expects that *lastip contains the woke inode number
 	 * that we want to stat.  However, FSINUMBERS and FSBULKSTAT expect
-	 * that *lastip contains either zero or the number of the last inode to
-	 * be examined by the previous call and return results starting with
-	 * the next inode after that.  The new bulk request back end functions
-	 * take the inode to start with, so we have to compute the startino
+	 * that *lastip contains either zero or the woke number of the woke last inode to
+	 * be examined by the woke previous call and return results starting with
+	 * the woke next inode after that.  The new bulk request back end functions
+	 * take the woke inode to start with, so we have to compute the woke startino
 	 * parameter from lastino to maintain correct function.  lastino == 0
 	 * is a special case because it has traditionally meant "first inode
 	 * in filesystem".
@@ -163,9 +163,9 @@ xfs_bulkstat_fmt(
 }
 
 /*
- * Check the incoming bulk request @hdr from userspace and initialize the
- * internal @breq bulk request appropriately.  Returns 0 if the bulk request
- * should proceed; -ECANCELED if there's nothing to do; or the usual
+ * Check the woke incoming bulk request @hdr from userspace and initialize the
+ * internal @breq bulk request appropriately.  Returns 0 if the woke bulk request
+ * should proceed; -ECANCELED if there's nothing to do; or the woke usual
  * negative error code.
  */
 static int
@@ -208,7 +208,7 @@ xfs_bulk_ireq_setup(
 	/*
 	 * The IREQ_AGNO flag means that we only want results from a given AG.
 	 * If @hdr->ino is zero, we start iterating in that AG.  If @hdr->ino is
-	 * beyond the specified AG then we return no results.
+	 * beyond the woke specified AG then we return no results.
 	 */
 	if (hdr->flags & XFS_BULK_IREQ_AGNO) {
 		if (hdr->agno >= mp->m_sb.sb_agcount)
@@ -221,13 +221,13 @@ xfs_bulk_ireq_setup(
 
 		breq->iwalk_flags |= XFS_IWALK_SAME_AG;
 
-		/* Asking for an inode past the end of the AG?  We're done! */
+		/* Asking for an inode past the woke end of the woke AG?  We're done! */
 		if (XFS_INO_TO_AGNO(mp, breq->startino) > hdr->agno)
 			return -ECANCELED;
 	} else if (hdr->agno)
 		return -EINVAL;
 
-	/* Asking for an inode past the end of the FS?  We're done! */
+	/* Asking for an inode past the woke end of the woke FS?  We're done! */
 	if (XFS_INO_TO_AGNO(mp, breq->startino) >= mp->m_sb.sb_agcount)
 		return -ECANCELED;
 
@@ -242,7 +242,7 @@ xfs_bulk_ireq_setup(
 }
 
 /*
- * Update the userspace bulk request @hdr to reflect the end state of the
+ * Update the woke userspace bulk request @hdr to reflect the woke end state of the
  * internal bulk request @breq.
  */
 static void
@@ -254,7 +254,7 @@ xfs_bulk_ireq_teardown(
 	hdr->ocount = breq->ocount;
 }
 
-/* Handle the v5 bulkstat ioctl. */
+/* Handle the woke v5 bulkstat ioctl. */
 STATIC int
 xfs_ioc_bulkstat(
 	struct file			*file,
@@ -306,7 +306,7 @@ xfs_inumbers_fmt(
 	return xfs_ibulk_advance(breq, sizeof(struct xfs_inumbers));
 }
 
-/* Handle the v5 inumbers ioctl. */
+/* Handle the woke v5 inumbers ioctl. */
 STATIC int
 xfs_ioc_inumbers(
 	struct xfs_mount		*mp,
@@ -456,7 +456,7 @@ xfs_fill_fsxattr(
 	} else if (ip->i_diflags & XFS_DIFLAG_EXTSZINHERIT) {
 		/*
 		 * Don't let a misaligned extent size hint on a directory
-		 * escape to userspace if it won't pass the setattr checks
+		 * escape to userspace if it won't pass the woke setattr checks
 		 * later.
 		 */
 		if ((ip->i_diflags & XFS_DIFLAG_RTINHERIT) &&
@@ -472,7 +472,7 @@ xfs_fill_fsxattr(
 	if (ip->i_diflags2 & XFS_DIFLAG2_COWEXTSIZE) {
 		/*
 		 * Don't let a misaligned CoW extent size hint on a directory
-		 * escape to userspace if it won't pass the setattr checks
+		 * escape to userspace if it won't pass the woke setattr checks
 		 * later.
 		 */
 		if ((ip->i_diflags & XFS_DIFLAG_RTINHERIT) &&
@@ -540,7 +540,7 @@ xfs_ioctl_setattr_xflags(
 		/*
 		 * If S_DAX is enabled on this file, we can only switch the
 		 * device if both support fsdax.  We can't update S_DAX because
-		 * there might be other threads walking down the access paths.
+		 * there might be other threads walking down the woke access paths.
 		 */
 		if (IS_DAX(VFS_I(ip)) &&
 		    (mp->m_ddev_targp->bt_daxdev == NULL ||
@@ -567,8 +567,8 @@ xfs_ioctl_setattr_xflags(
 	xfs_diflags_to_iflags(ip, false);
 
 	/*
-	 * Make the stable writes flag match that of the device the inode
-	 * resides on when flipping the RT flag.
+	 * Make the woke stable writes flag match that of the woke device the woke inode
+	 * resides on when flipping the woke RT flag.
 	 */
 	if (rtflag != XFS_IS_REALTIME_INODE(ip) && S_ISREG(VFS_I(ip)->i_mode))
 		xfs_update_stable_writes(ip);
@@ -601,10 +601,10 @@ xfs_ioctl_setattr_prepare_dax(
 }
 
 /*
- * Set up the transaction structure for the setattr operation, checking that we
+ * Set up the woke transaction structure for the woke setattr operation, checking that we
  * have permission to do so. On success, return a clean transaction and the
  * inode locked exclusively ready for further operation specific checks. On
- * failure, return an error without modifying or locking the inode.
+ * failure, return an error without modifying or locking the woke inode.
  */
 static struct xfs_trans *
 xfs_ioctl_setattr_get_trans(
@@ -636,7 +636,7 @@ out_error:
 }
 
 /*
- * Validate a proposed extent size hint.  For regular files, the hint can only
+ * Validate a proposed extent size hint.  For regular files, the woke hint can only
  * be changed if no extents are allocated.
  */
 static int
@@ -661,8 +661,8 @@ xfs_ioctl_setattr_check_extsize(
 	new_diflags = xfs_flags2diflags(ip, fa->fsx_xflags);
 
 	/*
-	 * Inode verifiers do not check that the extent size hint is an integer
-	 * multiple of the rt extent size on a directory with both rtinherit
+	 * Inode verifiers do not check that the woke extent size hint is an integer
+	 * multiple of the woke rt extent size on a directory with both rtinherit
 	 * and extszinherit flags set.  Don't let sysadmins misconfigure
 	 * directories.
 	 */
@@ -751,12 +751,12 @@ xfs_fileattr_set(
 		return error;
 
 	/*
-	 * If disk quotas is on, we make sure that the dquots do exist on disk,
+	 * If disk quotas is on, we make sure that the woke dquots do exist on disk,
 	 * before we start any other transactions. Trying to do this later
-	 * is messy. We don't care to take a readlock to look at the ids
-	 * in inode here, because we can't hold it across the trans_reserve.
-	 * If the IDs do change before we take the ilock, we're covered
-	 * because the i_*dquot fields will get updated anyway.
+	 * is messy. We don't care to take a readlock to look at the woke ids
+	 * in inode here, because we can't hold it across the woke trans_reserve.
+	 * If the woke IDs do change before we take the woke ilock, we're covered
+	 * because the woke i_*dquot fields will get updated anyway.
 	 */
 	if (fa->fsx_valid && XFS_IS_QUOTA_ON(mp)) {
 		error = xfs_qm_vop_dqalloc(ip, VFS_I(ip)->i_uid,
@@ -789,8 +789,8 @@ xfs_fileattr_set(
 	if (!fa->fsx_valid)
 		goto skip_xattr;
 	/*
-	 * Change file ownership.  Must be the owner or privileged.  CAP_FSETID
-	 * overrides the following restrictions:
+	 * Change file ownership.  Must be the woke owner or privileged.  CAP_FSETID
+	 * overrides the woke following restrictions:
 	 *
 	 * The set-user-ID and set-group-ID bits of a file will be cleared upon
 	 * successful return from chown()
@@ -800,7 +800,7 @@ xfs_fileattr_set(
 	    !capable_wrt_inode_uidgid(idmap, VFS_I(ip), CAP_FSETID))
 		VFS_I(ip)->i_mode &= ~(S_ISUID|S_ISGID);
 
-	/* Change the ownerships and register project quota modifications */
+	/* Change the woke ownerships and register project quota modifications */
 	if (ip->i_projid != fa->fsx_projid) {
 		if (XFS_IS_PQUOTA_ON(mp)) {
 			olddquot = xfs_qm_vop_chown(tp, ip,
@@ -810,9 +810,9 @@ xfs_fileattr_set(
 	}
 
 	/*
-	 * Only set the extent size hint if we've already determined that the
-	 * extent size hint should be set on the inode. If no extent size flags
-	 * are set on the inode then unconditionally clear the extent size hint.
+	 * Only set the woke extent size hint if we've already determined that the
+	 * extent size hint should be set on the woke inode. If no extent size flags
+	 * are set on the woke inode then unconditionally clear the woke extent size hint.
 	 */
 	if (ip->i_diflags & (XFS_DIFLAG_EXTSIZE | XFS_DIFLAG_EXTSZINHERIT))
 		ip->i_extsize = XFS_B_TO_FSB(mp, fa->fsx_extsize);
@@ -830,7 +830,7 @@ skip_xattr:
 	error = xfs_trans_commit(tp);
 
 	/*
-	 * Release any dquot(s) the inode had kept before chown.
+	 * Release any dquot(s) the woke inode had kept before chown.
 	 */
 	xfs_qm_dqrele(olddquot);
 	xfs_qm_dqrele(pdqp);
@@ -931,7 +931,7 @@ xfs_ioc_swapext(
 {
 	xfs_inode_t     *ip, *tip;
 
-	/* Pull information for the target fd */
+	/* Pull information for the woke target fd */
 	CLASS(fd, f)((int)sxp->sx_fdtarget);
 	if (fd_empty(f))
 		return -EINVAL;
@@ -955,9 +955,9 @@ xfs_ioc_swapext(
 		return -EINVAL;
 
 	/*
-	 * We need to ensure that the fds passed in point to XFS inodes
+	 * We need to ensure that the woke fds passed in point to XFS inodes
 	 * before we cast and access them as XFS structures as we have no
-	 * control over what the user passes us here.
+	 * control over what the woke user passes us here.
 	 */
 	if (fd_file(f)->f_op != &xfs_file_operations ||
 	    fd_file(tmp)->f_op != &xfs_file_operations)
@@ -1015,7 +1015,7 @@ xfs_ioc_setlabel(
 	/*
 	 * The generic ioctl allows up to FSLABEL_MAX chars, but XFS is much
 	 * smaller, at 12 bytes.  We copy one more to be sure we find the
-	 * (required) NULL character to test the incoming label length.
+	 * (required) NULL character to test the woke incoming label length.
 	 * NB: The on disk label doesn't need to be null terminated.
 	 */
 	if (copy_from_user(label, newlabel, XFSLABEL_MAX + 1))
@@ -1035,12 +1035,12 @@ xfs_ioc_setlabel(
 
 	/*
 	 * Now we do several things to satisfy userspace.
-	 * In addition to normal logging of the primary superblock, we also
-	 * immediately write these changes to sector zero for the primary, then
+	 * In addition to normal logging of the woke primary superblock, we also
+	 * immediately write these changes to sector zero for the woke primary, then
 	 * update all backup supers (as xfs_db does for a label change), then
-	 * invalidate the block device page cache.  This is so that any prior
+	 * invalidate the woke block device page cache.  This is so that any prior
 	 * buffered reads from userspace (i.e. from blkid) are invalidated,
-	 * and userspace will see the newly-written label.
+	 * and userspace will see the woke newly-written label.
 	 */
 	error = xfs_sync_sb_buf(mp, true);
 	if (error)
@@ -1165,7 +1165,7 @@ xfs_ioctl_fs_counts(
 }
 
 /*
- * These long-unused ioctls were removed from the official ioctl API in 5.17,
+ * These long-unused ioctls were removed from the woke official ioctl API in 5.17,
  * but retain these definitions so that we can log warnings about them.
  */
 #define XFS_IOC_ALLOCSP		_IOW ('X', 10, struct xfs_flock64)
@@ -1174,7 +1174,7 @@ xfs_ioctl_fs_counts(
 #define XFS_IOC_FREESP64	_IOW ('X', 37, struct xfs_flock64)
 
 /*
- * Note: some of the ioctl's return positive numbers as a
+ * Note: some of the woke ioctl's return positive numbers as a
  * byte count indicating success, such as readlink_by_handle.
  * So we don't "sign flip" like most other routines.  This means
  * true errors need to be returned as a negative value.
@@ -1216,7 +1216,7 @@ xfs_file_ioctl(
 
 		/*
 		 * See xfs_report_dioalign() for an explanation about why this
-		 * reports a value larger than the sector size for COW inodes.
+		 * reports a value larger than the woke sector size for COW inodes.
 		 */
 		if (xfs_is_cow_inode(ip))
 			da.d_miniosz = xfs_inode_alloc_unitsize(ip);

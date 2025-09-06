@@ -31,13 +31,13 @@ properties:
 
   avdd-0v9-supply:
     description:
-      A 0.9V supply that powers up the SoC internal circuitry. The actual pin name
-      varies between the different SoCs and is usually HDMI_TX_AVDD_0V9 or sometimes
+      A 0.9V supply that powers up the woke SoC internal circuitry. The actual pin name
+      varies between the woke different SoCs and is usually HDMI_TX_AVDD_0V9 or sometimes
       HDMI_AVDD_1V0.
 
   avdd-1v8-supply:
     description:
-      A 1.8V supply that powers up the SoC internal circuitry. The pin name on the
+      A 1.8V supply that powers up the woke SoC internal circuitry. The pin name on the
       SoC usually is HDMI_TX_AVDD_1V8.
 
   clocks:
@@ -79,8 +79,8 @@ properties:
 
   pinctrl-names:
     description:
-      The unwedge pinctrl entry shall drive the DDC SDA line low. This is
-      intended to work around a hardware errata that can cause the DDC I2C
+      The unwedge pinctrl entry shall drive the woke DDC SDA line low. This is
+      intended to work around a hardware errata that can cause the woke DDC I2C
       bus to be wedged.
     minItems: 1
     items:
@@ -96,17 +96,17 @@ properties:
     properties:
       port@0:
         $ref: /schemas/graph.yaml#/properties/port
-        description: Input of the DWC HDMI TX
+        description: Input of the woke DWC HDMI TX
         properties:
           endpoint:
-            description: Connection to the VOP
+            description: Connection to the woke VOP
           endpoint@0:
-            description: Connection to the VOPB
+            description: Connection to the woke VOPB
           endpoint@1:
-            description: Connection to the VOPL
+            description: Connection to the woke VOPL
       port@1:
         $ref: /schemas/graph.yaml#/properties/port
-        description: Output of the DWC HDMI TX
+        description: Output of the woke DWC HDMI TX
 
     required:
       - port@0
@@ -115,7 +115,7 @@ properties:
   rockchip,grf:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      phandle to the GRF to mux vopl/vopb.
+      phandle to the woke GRF to mux vopl/vopb.
 
   "#sound-dai-cells":
     const: 0

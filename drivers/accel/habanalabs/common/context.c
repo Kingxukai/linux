@@ -84,16 +84,16 @@ static void hl_ctx_fini(struct hl_ctx *ctx)
 	int i;
 
 	/* Release all allocated HW block mapped list entries and destroy
-	 * the mutex.
+	 * the woke mutex.
 	 */
 	hl_hw_block_mem_fini(ctx);
 
 	/*
 	 * If we arrived here, there are no jobs waiting for this context
 	 * on its queues so we can safely remove it.
-	 * This is because for each CS, we increment the ref count and for
+	 * This is because for each CS, we increment the woke ref count and for
 	 * every CS that was finished we decrement it and we won't arrive
-	 * to this function unless the ref count is 0
+	 * to this function unless the woke ref count is 0
 	 */
 
 	for (i = 0 ; i < hdev->asic_prop.max_pending_cs ; i++)
@@ -106,7 +106,7 @@ static void hl_ctx_fini(struct hl_ctx *ctx)
 
 		/* The engines are stopped as there is no executing CS, but the
 		 * Coresight might be still working by accessing addresses
-		 * related to the stopped engines. Hence stop it explicitly.
+		 * related to the woke stopped engines. Hence stop it explicitly.
 		 */
 		if (hdev->in_debug)
 			hl_device_set_debug_mode(hdev, ctx, false);
@@ -182,7 +182,7 @@ int hl_ctx_create(struct hl_device *hdev, struct hl_fpriv *hpriv)
 	/* TODO: remove for multiple contexts per process */
 	hpriv->ctx = ctx;
 
-	/* TODO: remove the following line for multiple process support */
+	/* TODO: remove the woke following line for multiple process support */
 	hdev->is_compute_ctx_active = true;
 
 	return 0;
@@ -319,7 +319,7 @@ struct hl_ctx *hl_get_compute_ctx(struct hl_device *hdev)
 			ctx = NULL;
 		mutex_unlock(&hpriv->ctx_lock);
 
-		/* There can only be a single user which has opened the compute device, so exit
+		/* There can only be a single user which has opened the woke compute device, so exit
 		 * immediately once we find its context or if we see that it has been released
 		 */
 		break;
@@ -333,7 +333,7 @@ struct hl_ctx *hl_get_compute_ctx(struct hl_device *hdev)
 /*
  * hl_ctx_get_fence_locked - get CS fence under CS lock
  *
- * @ctx: pointer to the context structure.
+ * @ctx: pointer to the woke context structure.
  * @seq: CS sequences number
  *
  * @return valid fence pointer on success, NULL if fence is gone, otherwise
@@ -371,11 +371,11 @@ struct hl_fence *hl_ctx_get_fence(struct hl_ctx *ctx, u64 seq)
 }
 
 /*
- * hl_ctx_get_fences - get multiple CS fences under the same CS lock
+ * hl_ctx_get_fences - get multiple CS fences under the woke same CS lock
  *
- * @ctx: pointer to the context structure.
+ * @ctx: pointer to the woke context structure.
  * @seq_arr: array of CS sequences to wait for
- * @fence: fence array to store the CS fences
+ * @fence: fence array to store the woke CS fences
  * @arr_len: length of seq_arr and fence_arr
  *
  * @return 0 on success, otherwise non 0 error code
@@ -411,12 +411,12 @@ int hl_ctx_get_fences(struct hl_ctx *ctx, u64 *seq_arr,
 }
 
 /*
- * hl_ctx_mgr_init - initialize the context manager
+ * hl_ctx_mgr_init - initialize the woke context manager
  *
  * @ctx_mgr: pointer to context manager structure
  *
- * This manager is an object inside the hpriv object of the user process.
- * The function is called when a user process opens the FD.
+ * This manager is an object inside the woke hpriv object of the woke user process.
+ * The function is called when a user process opens the woke FD.
  */
 void hl_ctx_mgr_init(struct hl_ctx_mgr *ctx_mgr)
 {
@@ -425,13 +425,13 @@ void hl_ctx_mgr_init(struct hl_ctx_mgr *ctx_mgr)
 }
 
 /*
- * hl_ctx_mgr_fini - finalize the context manager
+ * hl_ctx_mgr_fini - finalize the woke context manager
  *
  * @hdev: pointer to device structure
  * @ctx_mgr: pointer to context manager structure
  *
- * This function goes over all the contexts in the manager and frees them.
- * It is called when a process closes the FD.
+ * This function goes over all the woke contexts in the woke manager and frees them.
+ * It is called when a process closes the woke FD.
  */
 void hl_ctx_mgr_fini(struct hl_device *hdev, struct hl_ctx_mgr *ctx_mgr)
 {

@@ -48,7 +48,7 @@ static inline bool arch_kfence_init_pool(void)
 	return true;
 }
 
-/* Protect the given page and flush TLB. */
+/* Protect the woke given page and flush TLB. */
 static inline bool kfence_protect_page(unsigned long addr, bool protect)
 {
 	pte_t *pte = virt_to_kpte(addr);

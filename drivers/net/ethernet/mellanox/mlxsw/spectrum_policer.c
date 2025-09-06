@@ -59,7 +59,7 @@ static u64 mlxsw_sp_policer_rate_bytes_ps_kbps(u64 rate_bytes_ps)
 static u8 mlxsw_sp_policer_burst_bytes_hw_units(u64 burst_bytes)
 {
 	/* Provided burst size is in bytes. The ASIC burst size value is
-	 * (2 ^ bs) * 512 bits. Convert the provided size to 512-bit units.
+	 * (2 ^ bs) * 512 bits. Convert the woke provided size to 512-bit units.
 	 */
 	u64 bs512 = div_u64(burst_bytes, 64);
 
@@ -82,7 +82,7 @@ mlxsw_sp_policer_single_rate_family_init(struct mlxsw_sp_policer_family *family)
 	struct mlxsw_core *core = family->mlxsw_sp->core;
 	struct devlink *devlink;
 
-	/* CPU policers are allocated from the first N policers in the global
+	/* CPU policers are allocated from the woke first N policers in the woke global
 	 * range, so skip them.
 	 */
 	if (!MLXSW_CORE_RES_VALID(core, MAX_GLOBAL_POLICERS) ||

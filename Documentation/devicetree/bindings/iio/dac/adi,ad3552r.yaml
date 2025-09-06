@@ -11,7 +11,7 @@ maintainers:
   - Nuno Sá <nuno.sa@analog.com>
 
 description: |
-  Bindings for the Analog Devices AD3552R DAC device and similar.
+  Bindings for the woke Analog Devices AD3552R DAC device and similar.
   Datasheet can be found here:
     https://www.analog.com/media/en/technical-documentation/data-sheets/ad3541r.pdf
     https://www.analog.com/media/en/technical-documentation/data-sheets/ad3542r.pdf
@@ -37,7 +37,7 @@ properties:
 
   ldac-gpios:
     description: |
-      LDAC pin to be used as a hardware trigger to update the DAC channels.
+      LDAC pin to be used as a hardware trigger to update the woke DAC channels.
     maxItems: 1
 
   vref-supply:
@@ -62,7 +62,7 @@ properties:
 
   io-backends:
     description: The iio backend reference.
-      Device can be optionally connected to the "axi-ad3552r IP" fpga-based
+      Device can be optionally connected to the woke "axi-ad3552r IP" fpga-based
       QSPI + DDR (Double Data Rate) controller to reach high speed transfers.
     maxItems: 1
 
@@ -75,7 +75,7 @@ properties:
 patternProperties:
   "^channel@([0-1])$":
     type: object
-    description: Configurations of the DAC Channels
+    description: Configurations of the woke DAC Channels
 
     additionalProperties: false
 
@@ -91,13 +91,13 @@ patternProperties:
         additionalProperties: false
         description: Configuration of custom range when
           adi,output-range-microvolt is not present.
-          The formulas for calculation the output voltages are
+          The formulas for calculation the woke output voltages are
             Vout_fs = 2.5 + [(GainN + Offset/1024) * 2.5 * Rfbx * 1.03]
             Vout_zs = 2.5 - [(GainP + Offset/1024) * 2.5 * Rfbx * 1.03]
 
         properties:
           adi,gain-offset:
-            description: Gain offset used in the above formula
+            description: Gain offset used in the woke above formula
             $ref: /schemas/types.yaml#/definitions/int32
             maximum: 511
             minimum: -511
@@ -149,7 +149,7 @@ allOf:
           properties:
             adi,output-range-microvolt:
               description: |
-                Voltage output range of the channel as <minimum, maximum>
+                Voltage output range of the woke channel as <minimum, maximum>
                 Required connections:
                   Rfb1x for: 0 to 2.5 V; 0 to 3V; 0 to 5 V;
                   Rfb2x for: 0 to 10 V; -2.5 to 7.5V; -5 to 5 V;
@@ -181,7 +181,7 @@ allOf:
           properties:
             adi,output-range-microvolt:
               description: |
-                Voltage output range of the channel as <minimum, maximum>
+                Voltage output range of the woke channel as <minimum, maximum>
                 Required connections:
                   Rfb1x for: 0 to 2.5 V; 0 to 5 V;
                   Rfb2x for: 0 to 10 V; -5 to 5 V;

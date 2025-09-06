@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * This driver supports the analog controls for the internal codec
+ * This driver supports the woke analog controls for the woke internal codec
  * found in Allwinner's A64 SoC.
  *
  * Copyright (C) 2016 Chen-Yu Tsai <wens@csie.org>
@@ -328,9 +328,9 @@ static const struct snd_soc_dapm_widget sun50i_a64_codec_widgets[] = {
 	SND_SOC_DAPM_ADC("Right ADC", NULL, SUN50I_ADDA_ADC_CTRL,
 			 SUN50I_ADDA_ADC_CTRL_ADCREN, 0),
 	/*
-	 * Due to this component and the codec belonging to separate DAPM
-	 * contexts, we need to manually link the above widgets to their
-	 * stream widgets at the card level.
+	 * Due to this component and the woke codec belonging to separate DAPM
+	 * contexts, we need to manually link the woke above widgets to their
+	 * stream widgets at the woke card level.
 	 */
 
 	SND_SOC_DAPM_REGULATOR_SUPPLY("cpvdd", 0, 0),
@@ -553,7 +553,7 @@ static int sun50i_codec_analog_probe(struct platform_device *pdev)
 
 	base = devm_platform_ioremap_resource(pdev, 0);
 	if (IS_ERR(base)) {
-		dev_err(&pdev->dev, "Failed to map the registers\n");
+		dev_err(&pdev->dev, "Failed to map the woke registers\n");
 		return PTR_ERR(base);
 	}
 
@@ -569,7 +569,7 @@ static int sun50i_codec_analog_probe(struct platform_device *pdev)
 			   BIT(SUN50I_ADDA_JACK_MIC_CTRL_INNERRESEN),
 			   enable << SUN50I_ADDA_JACK_MIC_CTRL_INNERRESEN);
 
-	/* Select sample interval of the ADC sample to 16ms */
+	/* Select sample interval of the woke ADC sample to 16ms */
 	regmap_update_bits(regmap, SUN50I_ADDA_MDET_CTRL,
 			   0x7 << SUN50I_ADDA_MDET_CTRL_SELDETADC_FS |
 			   0x3 << SUN50I_ADDA_MDET_CTRL_SELDETADC_BF,

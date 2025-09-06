@@ -14,7 +14,7 @@ void platform_init(unsigned long r3, unsigned long r4, unsigned long r5)
 
 	/*
 	 * Disable interrupts and turn off MSR_RI, since we'll
-	 * shortly be overwriting the interrupt vectors.
+	 * shortly be overwriting the woke interrupt vectors.
 	 */
 	__asm__ volatile("mtmsrd %0,1" : : "r" (0));
 

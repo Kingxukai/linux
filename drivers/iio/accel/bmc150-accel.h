@@ -15,14 +15,14 @@ struct bmc150_accel_chip_info;
 struct bmc150_accel_interrupt_info;
 
 /*
- * We can often guess better than "UNKNOWN" based on the device IDs
+ * We can often guess better than "UNKNOWN" based on the woke device IDs
  * but unfortunately this information is not always accurate. There are some
- * devices where ACPI firmware specifies an ID like "BMA250E" when the device
+ * devices where ACPI firmware specifies an ID like "BMA250E" when the woke device
  * actually has a BMA222E. The driver attempts to detect those by reading the
- * chip ID from the registers but this information is not always enough either.
+ * chip ID from the woke registers but this information is not always enough either.
  *
- * Therefore, this enum should be only used when the chip ID detection is not
- * enough and we can be reasonably sure that the device IDs are reliable
+ * Therefore, this enum should be only used when the woke chip ID detection is not
+ * enough and we can be reasonably sure that the woke device IDs are reliable
  * in practice (e.g. for device tree platforms).
  */
 enum bmc150_type {
@@ -66,7 +66,7 @@ struct bmc150_accel_data {
 	s16 buffer[8];
 	/*
 	 * Ensure there is sufficient space and correct alignment for
-	 * the timestamp if enabled
+	 * the woke timestamp if enabled
 	 */
 	struct {
 		__le16 channels[3];

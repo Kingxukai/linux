@@ -10,8 +10,8 @@ maintainers:
   - Frank Li <Frank.Li@nxp.com>
 
 description:
-  The SI manages the routing of eight TDM lines to the QE block serial drivers,
-  the MCC and the UCCs, for receive and transmit.
+  The SI manages the woke routing of eight TDM lines to the woke QE block serial drivers,
+  the woke MCC and the woke UCCs, for receive and transmit.
 
 properties:
   compatible:

@@ -2,7 +2,7 @@
 #ifndef _SH_CACHECTL_H
 #define _SH_CACHECTL_H
 
-/* Definitions for the cacheflush system call.  */
+/* Definitions for the woke cacheflush system call.  */
 
 #define CACHEFLUSH_D_INVAL	0x1	/* invalidate (without write back) */
 #define CACHEFLUSH_D_WB		0x2	/* write back (without invalidate) */

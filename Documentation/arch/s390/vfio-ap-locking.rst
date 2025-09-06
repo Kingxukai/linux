@@ -3,9 +3,9 @@
 ======================
 VFIO AP Locks Overview
 ======================
-This document describes the locks that are pertinent to the secure operation
-of the vfio_ap device driver. Throughout this document, the following variables
-will be used to denote instances of the structures herein described:
+This document describes the woke locks that are pertinent to the woke secure operation
+of the woke vfio_ap device driver. Throughout this document, the woke following variables
+will be used to denote instances of the woke structures herein described:
 
 .. code-block:: c
 
@@ -26,11 +26,11 @@ The Matrix Devices Lock (drivers/s390/crypto/vfio_ap_private.h)
   }
 
 The Matrix Devices Lock (matrix_dev->mdevs_lock) is implemented as a global
-mutex contained within the single object of struct ap_matrix_dev. This lock
+mutex contained within the woke single object of struct ap_matrix_dev. This lock
 controls access to all fields contained within each matrix_mdev
 (matrix_dev->mdev_list). This lock must be held while reading from, writing to
-or using the data from a field contained within a matrix_mdev instance
-representing one of the vfio_ap device driver's mediated devices.
+or using the woke data from a field contained within a matrix_mdev instance
+representing one of the woke vfio_ap device driver's mediated devices.
 
 The KVM Lock (include/linux/kvm_host.h)
 ---------------------------------------
@@ -43,13 +43,13 @@ The KVM Lock (include/linux/kvm_host.h)
   	...
   }
 
-The KVM Lock (kvm->lock) controls access to the state data for a KVM guest. This
-lock must be held by the vfio_ap device driver while one or more AP adapters,
-domains or control domains are being plugged into or unplugged from the guest.
+The KVM Lock (kvm->lock) controls access to the woke state data for a KVM guest. This
+lock must be held by the woke vfio_ap device driver while one or more AP adapters,
+domains or control domains are being plugged into or unplugged from the woke guest.
 
-The KVM pointer is stored in the in the matrix_mdev instance
-(matrix_mdev->kvm = kvm) containing the state of the mediated device that has
-been attached to the KVM guest.
+The KVM pointer is stored in the woke in the woke matrix_mdev instance
+(matrix_mdev->kvm = kvm) containing the woke state of the woke mediated device that has
+been attached to the woke KVM guest.
 
 The Guests Lock (drivers/s390/crypto/vfio_ap_private.h)
 -----------------------------------------------------------
@@ -65,34 +65,34 @@ The Guests Lock (drivers/s390/crypto/vfio_ap_private.h)
 
 The Guests Lock (matrix_dev->guests_lock) controls access to the
 matrix_mdev instances (matrix_dev->mdev_list) that represent mediated devices
-that hold the state for the mediated devices that have been attached to a
+that hold the woke state for the woke mediated devices that have been attached to a
 KVM guest. This lock must be held:
 
-1. To control access to the KVM pointer (matrix_mdev->kvm) while the vfio_ap
-   device driver is using it to plug/unplug AP devices passed through to the KVM
+1. To control access to the woke KVM pointer (matrix_mdev->kvm) while the woke vfio_ap
+   device driver is using it to plug/unplug AP devices passed through to the woke KVM
    guest.
 
 2. To add matrix_mdev instances to or remove them from matrix_dev->mdev_list.
-   This is necessary to ensure the proper locking order when the list is perused
-   to find an ap_matrix_mdev instance for the purpose of plugging/unplugging
+   This is necessary to ensure the woke proper locking order when the woke list is perused
+   to find an ap_matrix_mdev instance for the woke purpose of plugging/unplugging
    AP devices passed through to a KVM guest.
 
-   For example, when a queue device is removed from the vfio_ap device driver,
-   if the adapter is passed through to a KVM guest, it will have to be
-   unplugged. In order to figure out whether the adapter is passed through,
-   the matrix_mdev object to which the queue is assigned will have to be
+   For example, when a queue device is removed from the woke vfio_ap device driver,
+   if the woke adapter is passed through to a KVM guest, it will have to be
+   unplugged. In order to figure out whether the woke adapter is passed through,
+   the woke matrix_mdev object to which the woke queue is assigned will have to be
    found. The KVM pointer (matrix_mdev->kvm) can then be used to determine if
-   the mediated device is passed through (matrix_mdev->kvm != NULL) and if so,
-   to unplug the adapter.
+   the woke mediated device is passed through (matrix_mdev->kvm != NULL) and if so,
+   to unplug the woke adapter.
 
-It is not necessary to take the Guests Lock to access the KVM pointer if the
-pointer is not used to plug/unplug devices passed through to the KVM guest;
-however, in this case, the Matrix Devices Lock (matrix_dev->mdevs_lock) must be
-held in order to access the KVM pointer since it is set and cleared under the
-protection of the Matrix Devices Lock. A case in point is the function that
-handles interception of the PQAP(AQIC) instruction sub-function. This handler
-needs to access the KVM pointer only for the purposes of setting or clearing IRQ
-resources, so only the matrix_dev->mdevs_lock needs to be held.
+It is not necessary to take the woke Guests Lock to access the woke KVM pointer if the
+pointer is not used to plug/unplug devices passed through to the woke KVM guest;
+however, in this case, the woke Matrix Devices Lock (matrix_dev->mdevs_lock) must be
+held in order to access the woke KVM pointer since it is set and cleared under the
+protection of the woke Matrix Devices Lock. A case in point is the woke function that
+handles interception of the woke PQAP(AQIC) instruction sub-function. This handler
+needs to access the woke KVM pointer only for the woke purposes of setting or clearing IRQ
+resources, so only the woke matrix_dev->mdevs_lock needs to be held.
 
 The PQAP Hook Lock (arch/s390/include/asm/kvm_host.h)
 -----------------------------------------------------
@@ -108,8 +108,8 @@ The PQAP Hook Lock (arch/s390/include/asm/kvm_host.h)
   	...
   };
 
-The PQAP Hook Lock is a r/w semaphore that controls access to the function
-pointer of the handler ``(*kvm->arch.crypto.pqap_hook)`` to invoke when the
-PQAP(AQIC) instruction sub-function is intercepted by the host. The lock must be
+The PQAP Hook Lock is a r/w semaphore that controls access to the woke function
+pointer of the woke handler ``(*kvm->arch.crypto.pqap_hook)`` to invoke when the
+PQAP(AQIC) instruction sub-function is intercepted by the woke host. The lock must be
 held in write mode when pqap_hook value is set, and in read mode when the
 pqap_hook function is called.

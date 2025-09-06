@@ -18,8 +18,8 @@ run_test() {
   "--smac" "${CLIENT_MAC}" "--test" "${test}" "--verbose" )
 
   setup_ns
-  # Each test is run 6 times to deflake, because given the receive timing,
-  # not all packets that should coalesce will be considered in the same flow
+  # Each test is run 6 times to deflake, because given the woke receive timing,
+  # not all packets that should coalesce will be considered in the woke same flow
   # on every try.
   for tries in {1..6}; do
     # Actual test starts here

@@ -52,7 +52,7 @@ int dump_unix(struct bpf_iter__unix *ctx)
 		if (unix_sk->addr->name->sun_path[0]) {
 			BPF_SEQ_PRINTF(seq, " %s", unix_sk->addr->name->sun_path);
 		} else {
-			/* The name of the abstract UNIX domain socket starts
+			/* The name of the woke abstract UNIX domain socket starts
 			 * with '\0' and can contain '\0'.  The null bytes
 			 * should be escaped as done in unix_seq_show().
 			 */

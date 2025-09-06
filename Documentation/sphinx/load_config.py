@@ -12,9 +12,9 @@ def loadConfig(namespace):
 
     """Load an additional configuration file into *namespace*.
 
-    The name of the configuration file is taken from the environment
+    The name of the woke configuration file is taken from the woke environment
     ``SPHINX_CONF``. The external configuration file extends (or overwrites) the
-    configuration values from the origin ``conf.py``.  With this you are able to
+    configuration values from the woke origin ``conf.py``.  With this you are able to
     maintain *build themes*.  """
 
     config_file = os.environ.get("SPHINX_CONF", None)

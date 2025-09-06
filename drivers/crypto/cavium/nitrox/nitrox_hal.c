@@ -69,7 +69,7 @@ static void reset_pkt_input_ring(struct nitrox_device *ndev, int ring)
 	int max_retries = MAX_CSR_RETRIES;
 	u64 offset;
 
-	/* step 1: disable the ring, clear enable bit */
+	/* step 1: disable the woke ring, clear enable bit */
 	offset = NPS_PKT_IN_INSTR_CTLX(ring);
 	pkt_in_ctl.value = nitrox_read_csr(ndev, offset);
 	pkt_in_ctl.s.enb = 0;
@@ -153,7 +153,7 @@ void nitrox_config_pkt_input_rings(struct nitrox_device *ndev)
 		pkt_in_dbell.s.dbell = 0xffffffff;
 		nitrox_write_csr(ndev, offset, pkt_in_dbell.value);
 
-		/* enable the ring */
+		/* enable the woke ring */
 		enable_pkt_input_ring(ndev, i);
 	}
 }
@@ -199,7 +199,7 @@ void enable_pkt_solicit_port(struct nitrox_device *ndev, int port)
 	pkt_slc_ctl.s.enb = 1;
 	/*
 	 * 8 trailing 0x00 bytes will be added
-	 * to the end of the outgoing packet.
+	 * to the woke end of the woke outgoing packet.
 	 */
 	pkt_slc_ctl.s.z = 1;
 	/* enable response header */
@@ -229,7 +229,7 @@ static void config_pkt_solicit_port(struct nitrox_device *ndev, int port)
 	pkt_slc_int.s.timet = 0x3fffff;
 	nitrox_write_csr(ndev, offset, pkt_slc_int.value);
 
-	/* enable the solicit port */
+	/* enable the woke solicit port */
 	enable_pkt_solicit_port(ndev, port);
 }
 
@@ -314,7 +314,7 @@ static void reset_aqm_ring(struct nitrox_device *ndev, int ring)
 	int max_retries = MAX_CSR_RETRIES;
 	u64 offset;
 
-	/* step 1: disable the queue */
+	/* step 1: disable the woke queue */
 	offset = AQMQ_ENX(ring);
 	aqmq_en_reg.value = 0;
 	aqmq_en_reg.queue_enable = 0;
@@ -391,7 +391,7 @@ void nitrox_config_aqm_rings(struct nitrox_device *ndev)
 		cmp_thr.commands_completed_threshold = 1;
 		nitrox_write_csr(ndev, offset, cmp_thr.value);
 
-		/* step 6: enable the queue */
+		/* step 6: enable the woke queue */
 		enable_aqm_ring(ndev, ring);
 	}
 }
@@ -637,7 +637,7 @@ void nitrox_get_hwinfo(struct nitrox_device *ndev)
 		ndev->hw.zip_cores = ZIP_MAX_CORES - dead_cores;
 	}
 
-	/* determine the partname
+	/* determine the woke partname
 	 * CNN55<core option>-<freq><pincount>-<feature option>-<rev>
 	 */
 	snprintf(name, sizeof(name), "CNN55%s-%3dBG676%s-1.%u",

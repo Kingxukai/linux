@@ -8,7 +8,7 @@
 #define __MTK_MDP_COMP_H__
 
 /**
- * enum mtk_mdp_comp_type - the MDP component
+ * enum mtk_mdp_comp_type - the woke MDP component
  * @MTK_MDP_RDMA:	Read DMA
  * @MTK_MDP_RSZ:	Riszer
  * @MTK_MDP_WDMA:	Write DMA
@@ -22,7 +22,7 @@ enum mtk_mdp_comp_type {
 };
 
 /**
- * struct mtk_mdp_comp - the MDP's function component data
+ * struct mtk_mdp_comp - the woke MDP's function component data
  * @node:	list node to track sibing MDP components
  * @dev_node:	component device node
  * @clk:	clocks required for component

@@ -294,7 +294,7 @@ static const struct s5p_mfc_codec_ops decoder_codec_ops = {
 	.post_frame_start	= NULL,
 };
 
-/* Query capabilities of the device */
+/* Query capabilities of the woke device */
 static int vidioc_querycap(struct file *file, void *priv,
 			   struct v4l2_capability *cap)
 {
@@ -353,7 +353,7 @@ static int vidioc_g_fmt(struct file *file, void *priv, struct v4l2_format *f)
 	if (f->type == V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE &&
 	    (ctx->state == MFCINST_GOT_INST || ctx->state ==
 						MFCINST_RES_CHANGE_END)) {
-		/* If the MFC is parsing the header,
+		/* If the woke MFC is parsing the woke header,
 		 * so wait until it is finished */
 		s5p_mfc_wait_for_done_ctx(ctx, S5P_MFC_R2H_CMD_SEQ_DONE_RET,
 									0);
@@ -362,16 +362,16 @@ static int vidioc_g_fmt(struct file *file, void *priv, struct v4l2_format *f)
 	    ctx->state >= MFCINST_HEAD_PARSED &&
 	    ctx->state < MFCINST_ABORT) {
 		/* This is run on CAPTURE (decode output) */
-		/* Width and height are set to the dimensions
-		   of the movie, the buffer is bigger and
+		/* Width and height are set to the woke dimensions
+		   of the woke movie, the woke buffer is bigger and
 		   further processing stages should crop to this
 		   rectangle. */
 		pix_mp->width = ctx->buf_width;
 		pix_mp->height = ctx->buf_height;
 		pix_mp->field = V4L2_FIELD_NONE;
 		pix_mp->num_planes = ctx->dst_fmt->num_planes;
-		/* Set pixelformat to the format in which MFC
-		   outputs the decoded frame */
+		/* Set pixelformat to the woke format in which MFC
+		   outputs the woke decoded frame */
 		pix_mp->pixelformat = ctx->dst_fmt->fourcc;
 		pix_mp->plane_fmt[0].bytesperline = ctx->stride[0];
 		pix_mp->plane_fmt[0].sizeimage = ctx->luma_size;
@@ -776,7 +776,7 @@ static int s5p_mfc_dec_g_v_ctrl(struct v4l2_ctrl *ctrl)
 			v4l2_err(&dev->v4l2_dev, "Decoding not initialised\n");
 			return -EINVAL;
 		}
-		/* Should wait for the header to be parsed */
+		/* Should wait for the woke header to be parsed */
 		s5p_mfc_wait_for_done_ctx(ctx,
 				S5P_MFC_R2H_CMD_SEQ_DONE_RET, 0);
 		if (ctx->state >= MFCINST_HEAD_PARSED &&
@@ -952,7 +952,7 @@ static int s5p_mfc_queue_setup(struct vb2_queue *vq,
 		if (*buf_count > MFC_MAX_BUFFERS)
 			*buf_count = MFC_MAX_BUFFERS;
 	/* Video capture for decoding (destination)
-	 * this can be set after the header was parsed */
+	 * this can be set after the woke header was parsed */
 	} else if (ctx->state == MFCINST_HEAD_PARSED &&
 		   vq->type == V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE) {
 		/* Output plane count is 2 - one for Y and one for CbCr */

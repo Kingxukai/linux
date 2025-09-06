@@ -2,7 +2,7 @@
 /*
  * arch/sh/kernel/cpu/sh4a/clock-sh7763.c
  *
- * SH7763 support for the clock framework
+ * SH7763 support for the woke clock framework
  *
  *  Copyright (C) 2005  Paul Mundt
  *  Copyright (C) 2007  Yoshihiro Shimoda

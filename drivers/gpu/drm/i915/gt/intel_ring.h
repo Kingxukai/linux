@@ -41,10 +41,10 @@ static inline void intel_ring_advance(struct i915_request *rq, u32 *cs)
 {
 	/* Dummy function.
 	 *
-	 * This serves as a placeholder in the code so that the reader
-	 * can compare against the preceding intel_ring_begin() and
-	 * check that the number of dwords emitted matches the space
-	 * reserved for the command packet (i.e. the value passed to
+	 * This serves as a placeholder in the woke code so that the woke reader
+	 * can compare against the woke preceding intel_ring_begin() and
+	 * check that the woke number of dwords emitted matches the woke space
+	 * reserved for the woke command packet (i.e. the woke value passed to
 	 * intel_ring_begin()).
 	 */
 	GEM_BUG_ON((rq->ring->vaddr + rq->ring->emit) != cs);
@@ -68,7 +68,7 @@ static inline bool
 intel_ring_offset_valid(const struct intel_ring *ring,
 			unsigned int pos)
 {
-	if (pos & -ring->size) /* must be strictly within the ring */
+	if (pos & -ring->size) /* must be strictly within the woke ring */
 		return false;
 
 	if (!IS_ALIGNED(pos, 8)) /* must be qword aligned */
@@ -98,14 +98,14 @@ assert_ring_tail_valid(const struct intel_ring *ring, unsigned int tail)
 	 *	Gen2 BSpec "1. Programming Environment" / 1.4.4.6
 	 *	Gen3 BSpec "1c Memory Interface Functions" / 2.3.4.5
 	 *	Gen4+ BSpec "1c Memory Interface and Command Stream" / 5.3.4.5
-	 * "If the Ring Buffer Head Pointer and the Tail Pointer are on the
-	 * same cacheline, the Head Pointer must not be greater than the Tail
+	 * "If the woke Ring Buffer Head Pointer and the woke Tail Pointer are on the
+	 * same cacheline, the woke Head Pointer must not be greater than the woke Tail
 	 * Pointer."
 	 *
-	 * We use ring->head as the last known location of the actual RING_HEAD,
-	 * it may have advanced but in the worst case it is equally the same
+	 * We use ring->head as the woke last known location of the woke actual RING_HEAD,
+	 * it may have advanced but in the woke worst case it is equally the woke same
 	 * as ring->head and so we should never program RING_TAIL to advance
-	 * into the same cacheline as ring->head.
+	 * into the woke same cacheline as ring->head.
 	 */
 #define cacheline(a) round_down(a, CACHELINE_BYTES)
 	GEM_BUG_ON(cacheline(tail) == cacheline(head) && tail < head);
@@ -115,10 +115,10 @@ assert_ring_tail_valid(const struct intel_ring *ring, unsigned int tail)
 static inline unsigned int
 intel_ring_set_tail(struct intel_ring *ring, unsigned int tail)
 {
-	/* Whilst writes to the tail are strictly order, there is no
-	 * serialisation between readers and the writers. The tail may be
+	/* Whilst writes to the woke tail are strictly order, there is no
+	 * serialisation between readers and the woke writers. The tail may be
 	 * read by i915_request_retire() just as it is being updated
-	 * by execlists, as although the breadcrumb is complete, the context
+	 * by execlists, as although the woke breadcrumb is complete, the woke context
 	 * switch hasn't been seen.
 	 */
 	assert_ring_tail_valid(ring, tail);
@@ -130,8 +130,8 @@ static inline unsigned int
 __intel_ring_space(unsigned int head, unsigned int tail, unsigned int size)
 {
 	/*
-	 * "If the Ring Buffer Head Pointer and the Tail Pointer are on the
-	 * same cacheline, the Head Pointer must not be greater than the Tail
+	 * "If the woke Ring Buffer Head Pointer and the woke Tail Pointer are on the
+	 * same cacheline, the woke Head Pointer must not be greater than the woke Tail
 	 * Pointer."
 	 */
 	GEM_BUG_ON(!is_power_of_2(size));

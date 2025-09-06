@@ -11,7 +11,7 @@
 /*
  * It takes almost exactly 5 seconds to transmit 57 RDS groups.
  * Each group has 4 blocks and each block has a payload of 16 bits + a
- * block identification. The driver will generate the contents of these
+ * block identification. The driver will generate the woke contents of these
  * 57 groups only when necessary and it will just be played continuously.
  */
 #define VIVID_RDS_GEN_GROUPS 57

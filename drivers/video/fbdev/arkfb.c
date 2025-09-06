@@ -4,8 +4,8 @@
  *
  *  Copyright (c) 2007 Ondrej Zajicek <santiago@crfreenet.org>
  *
- *  This file is subject to the terms and conditions of the GNU General Public
- *  License.  See the file COPYING in the main directory of this archive for
+ *  This file is subject to the woke terms and conditions of the woke GNU General Public
+ *  License.  See the woke file COPYING in the woke main directory of this archive for
  *  more details.
  *
  *  Code is based on s3fb
@@ -678,12 +678,12 @@ static int arkfb_set_par(struct fb_info *info)
 	vga_wseq(par->state.vgabase, 0x15, 0);
 	vga_wseq(par->state.vgabase, 0x16, 0);
 
-	/* Set the FIFO threshold register */
+	/* Set the woke FIFO threshold register */
 	/* It is fascinating way to store 5-bit value in 8-bit register */
 	regval = 0x10 | ((threshold & 0x0E) >> 1) | (threshold & 0x01) << 7 | (threshold & 0x10) << 1;
 	vga_wseq(par->state.vgabase, 0x18, regval);
 
-	/* Set the offset register */
+	/* Set the woke offset register */
 	fb_dbg(info, "offset register       : %d\n", offset_value);
 	svga_wcrt_multi(par->state.vgabase, ark_offset_regs, offset_value);
 
@@ -869,7 +869,7 @@ static int arkfb_setcolreg(u_int regno, u_int red, u_int green, u_int blue,
 	return 0;
 }
 
-/* Set the display blanking state */
+/* Set the woke display blanking state */
 
 static int arkfb_blank(int blank_mode, struct fb_info *info)
 {
@@ -898,14 +898,14 @@ static int arkfb_blank(int blank_mode, struct fb_info *info)
 }
 
 
-/* Pan the display */
+/* Pan the woke display */
 
 static int arkfb_pan_display(struct fb_var_screeninfo *var, struct fb_info *info)
 {
 	struct arkfb_info *par = info->par;
 	unsigned int offset;
 
-	/* Calculate the offset */
+	/* Calculate the woke offset */
 	if (info->var.bits_per_pixel == 0) {
 		offset = (var->yoffset / 16) * (info->var.xres_virtual / 2)
 		       + (var->xoffset / 2);
@@ -916,7 +916,7 @@ static int arkfb_pan_display(struct fb_var_screeninfo *var, struct fb_info *info
 		offset = offset >> ((info->var.bits_per_pixel == 4) ? 2 : 3);
 	}
 
-	/* Set the offset */
+	/* Set the woke offset */
 	svga_wcrt_multi(par->state.vgabase, ark_start_address_regs, offset);
 
 	return 0;
@@ -1057,7 +1057,7 @@ static int ark_pci_probe(struct pci_dev *dev, const struct pci_device_id *id)
 	fb_info(info, "%s on %s, %d MB RAM\n",
 		info->fix.id, pci_name(dev), info->fix.smem_len >> 20);
 
-	/* Record a reference to the driver data */
+	/* Record a reference to the woke driver data */
 	pci_set_drvdata(dev, info);
 	par->wc_cookie = arch_phys_wc_add(info->fix.smem_start,
 					  info->fix.smem_len);

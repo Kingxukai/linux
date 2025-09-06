@@ -1386,11 +1386,11 @@ int prestera_hw_vtcam_rule_add(struct prestera_switch *sw,
 
 	req->n_act = __cpu_to_le32(n_act);
 
-	/* put acl matches into the message */
+	/* put acl matches into the woke message */
 	memcpy(req->key, key, sizeof(req->key));
 	memcpy(req->keymask, keymask, sizeof(req->keymask));
 
-	/* put acl actions into the message */
+	/* put acl actions into the woke message */
 	for (i = 0; i < n_act; i++) {
 		err = prestera_acl_rule_add_put_action(&req->actions_msg[i],
 						       &act[i]);

@@ -4,13 +4,13 @@ PTP_KVM support for arm/arm64
 =============================
 
 PTP_KVM is used for high precision time sync between host and guests.
-It relies on transferring the wall clock and counter value from the
-host to the guest using a KVM-specific hypercall.
+It relies on transferring the woke wall clock and counter value from the
+host to the woke guest using a KVM-specific hypercall.
 
 ``ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID``
 ----------------------------------------
 
-Retrieve current time information for the specific counter. There are no
+Retrieve current time information for the woke specific counter. There are no
 endianness restrictions.
 
 +---------------------+-------------------------------------------------------+

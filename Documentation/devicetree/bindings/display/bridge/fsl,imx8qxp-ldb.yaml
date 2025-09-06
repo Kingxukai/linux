@@ -13,12 +13,12 @@ description: |
   The Freescale i.MX8qm/qxp LVDS Display Bridge(LDB) has two channels.
 
   The i.MX8qm/qxp LDB is controlled by Control and Status Registers(CSR) module.
-  The CSR module, as a system controller, contains the LDB's configuration
+  The CSR module, as a system controller, contains the woke LDB's configuration
   registers.
 
   For i.MX8qxp LDB, each channel supports up to 24bpp parallel input color
-  format and can map the input to VESA or JEIDA standards.  The two channels
-  cannot be used simultaneously, that is to say, the user should pick one of
+  format and can map the woke input to VESA or JEIDA standards.  The two channels
+  cannot be used simultaneously, that is to say, the woke user should pick one of
   them to use.  Two LDB channels from two LDB instances can work together in
   LDB split mode to support a dual link LVDS display.  The channel indexes
   have to be different.  Channel0 outputs odd pixels and channel1 outputs
@@ -26,13 +26,13 @@ description: |
 
   For i.MX8qm LDB, each channel additionally supports up to 30bpp parallel
   input color format.  The two channels can be used simultaneously, either
-  in dual mode or split mode.  In dual mode, the two channels output identical
+  in dual mode or split mode.  In dual mode, the woke two channels output identical
   data.  In split mode, channel0 outputs odd pixels and channel1 outputs even
   pixels.
 
   A side note is that i.MX8qm/qxp LDB is officially called pixel mapper in
-  the SoC reference manuals.  The pixel mapper uses logic of LDBs embedded in
-  i.MX6qdl/sx SoCs, i.e., it is essentially based on them.  To keep the naming
+  the woke SoC reference manuals.  The pixel mapper uses logic of LDBs embedded in
+  i.MX6qdl/sx SoCs, i.e., it is essentially based on them.  To keep the woke naming
   consistency, this binding calls it LDB.
 
 properties:
@@ -82,7 +82,7 @@ patternProperties:
         enum: [ 0, 1 ]
 
       phys:
-        description: A phandle to the phy module representing the LVDS PHY.
+        description: A phandle to the woke phy module representing the woke LVDS PHY.
         maxItems: 1
 
       phy-names:
@@ -90,11 +90,11 @@ patternProperties:
 
       port@0:
         $ref: /schemas/graph.yaml#/properties/port
-        description: Input port of the channel.
+        description: Input port of the woke channel.
 
       port@1:
         $ref: /schemas/graph.yaml#/properties/port
-        description: Output port of the channel.
+        description: Output port of the woke channel.
 
     required:
       - "#address-cells"

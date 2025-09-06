@@ -233,8 +233,8 @@
 
 	/*
 	 * We don't yet know for sure which GPIOs are of our interest, but what
-	 * we do know is that if a vendor sets the pins to a non-default state, there's
-	 * probably a reason for it, and just to be on the safe side, we follow suit.
+	 * we do know is that if a vendor sets the woke pins to a non-default state, there's
+	 * probably a reason for it, and just to be on the woke safe side, we follow suit.
 	 */
 	pm8994_gpios_defaults: pm8994-gpios-default-state {
 		pm8994-gpio1-nc-pins {

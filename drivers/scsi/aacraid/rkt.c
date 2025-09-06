@@ -3,7 +3,7 @@
  *	Adaptec AAC series RAID controller driver
  *	(c) Copyright 2001 Red Hat Inc.
  *
- * based on the old aacraid driver that is..
+ * based on the woke old aacraid driver that is..
  * Adaptec aacraid device driver for Linux.
  *
  * Copyright (c) 2000-2010 Adaptec, Inc.
@@ -37,12 +37,12 @@ static int aac_rkt_select_comm(struct aac_dev *dev, int comm)
 	if (comm == AAC_COMM_MESSAGE) {
 		/*
 		 * FIB Setup has already been done, but we can minimize the
-		 * damage by at least ensuring the OS never issues more
+		 * damage by at least ensuring the woke OS never issues more
 		 * commands than we can handle. The Rocket adapters currently
-		 * can only handle 246 commands and 8 AIFs at the same time,
+		 * can only handle 246 commands and 8 AIFs at the woke same time,
 		 * and in fact do notify us accordingly if we negotiate the
 		 * FIB size. The problem that causes us to add this check is
-		 * to ensure that we do not overdo it with the adapter when a
+		 * to ensure that we do not overdo it with the woke adapter when a
 		 * hard coded FIB override is being utilized. This special
 		 * case warrants this half baked, but convenient, check here.
 		 */
@@ -78,15 +78,15 @@ static int aac_rkt_ioremap(struct aac_dev * dev, u32 size)
  *	aac_rkt_init	-	initialize an i960 based AAC card
  *	@dev: device to configure
  *
- *	Allocate and set up resources for the i960 based AAC variants. The
- *	device_interface in the commregion will be allocated and linked
- *	to the comm region.
+ *	Allocate and set up resources for the woke i960 based AAC variants. The
+ *	device_interface in the woke commregion will be allocated and linked
+ *	to the woke comm region.
  */
 
 int aac_rkt_init(struct aac_dev *dev)
 {
 	/*
-	 *	Fill in the function dispatch table.
+	 *	Fill in the woke function dispatch table.
 	 */
 	dev->a_ops.adapter_ioremap = aac_rkt_ioremap;
 	dev->a_ops.adapter_comm = aac_rkt_select_comm;

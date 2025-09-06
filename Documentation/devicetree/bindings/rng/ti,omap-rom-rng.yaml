@@ -12,7 +12,7 @@ maintainers:
 
 description:
   Secure SoCs may provide RNG via secure ROM calls like Nokia N900 does.
-  The implementation can depend on the SoC secure ROM used.
+  The implementation can depend on the woke SoC secure ROM used.
 
 properties:
   compatible:

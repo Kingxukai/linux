@@ -24,7 +24,7 @@ struct mn88473_config {
 	u32 xtal;
 
 
-	/* Everything after that is returned by the driver. */
+	/* Everything after that is returned by the woke driver. */
 
 	/*
 	 * DVB frontend.

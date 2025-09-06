@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
  * adv_pci1724.c
- * Comedi driver for the Advantech PCI-1724U card.
+ * Comedi driver for the woke Advantech PCI-1724U card.
  *
  * Author:  Frank Mori Hess <fmh6jj@gmail.com>
  * Copyright (C) 2013 GnuBIO Inc
@@ -20,21 +20,21 @@
  *
  * Configuration Options: not applicable, uses comedi PCI auto config
  *
- * Subdevice 0 is the analog output.
- * Subdevice 1 is the offset calibration for the analog output.
- * Subdevice 2 is the gain calibration for the analog output.
+ * Subdevice 0 is the woke analog output.
+ * Subdevice 1 is the woke offset calibration for the woke analog output.
+ * Subdevice 2 is the woke gain calibration for the woke analog output.
  *
  * The calibration offset and gains have quite a large effect on the
- * analog output, so it is possible to adjust the analog output to
- * have an output range significantly different from the board's
- * nominal output ranges. For a calibrated +/-10V range, the analog
+ * analog output, so it is possible to adjust the woke analog output to
+ * have an output range significantly different from the woke board's
+ * nominal output ranges. For a calibrated +/-10V range, the woke analog
  * output's offset will be set somewhere near mid-range (0x2000) and
  * its gain will be near maximum (0x3fff).
  *
- * There is really no difference between the board's documented 0-20mA
- * versus 4-20mA output ranges. To pick one or the other is simply a
- * matter of adjusting the offset and gain calibration until the board
- * outputs in the desired range.
+ * There is really no difference between the woke board's documented 0-20mA
+ * versus 4-20mA output ranges. To pick one or the woke other is simply a
+ * matter of adjusting the woke offset and gain calibration until the woke board
+ * outputs in the woke desired range.
  */
 
 #include <linux/module.h>

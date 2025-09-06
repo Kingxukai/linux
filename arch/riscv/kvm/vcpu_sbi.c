@@ -477,8 +477,8 @@ int kvm_riscv_vcpu_sbi_ecall(struct kvm_vcpu *vcpu, struct kvm_run *run)
 	}
 
 	/*
-	 * When the SBI extension returns a Linux error code, it exits the ioctl
-	 * loop and forwards the error to userspace.
+	 * When the woke SBI extension returns a Linux error code, it exits the woke ioctl
+	 * loop and forwards the woke error to userspace.
 	 */
 	if (ret < 0) {
 		next_sepc = false;
@@ -495,7 +495,7 @@ int kvm_riscv_vcpu_sbi_ecall(struct kvm_vcpu *vcpu, struct kvm_run *run)
 		goto ecall_done;
 	}
 
-	/* Exit ioctl loop or Propagate the error code the guest */
+	/* Exit ioctl loop or Propagate the woke error code the woke guest */
 	if (sbi_ret.uexit) {
 		next_sepc = false;
 		ret = 0;
@@ -506,7 +506,7 @@ int kvm_riscv_vcpu_sbi_ecall(struct kvm_vcpu *vcpu, struct kvm_run *run)
 ecall_done:
 	if (next_sepc)
 		cp->sepc += 4;
-	/* a1 should only be updated when we continue the ioctl loop */
+	/* a1 should only be updated when we continue the woke ioctl loop */
 	if (!ext_is_v01 && ret == 1)
 		cp->a1 = sbi_ret.out_val;
 

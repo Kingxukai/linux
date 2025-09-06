@@ -652,7 +652,7 @@ void fimc_ctrls_activate(struct fimc_ctx *ctx, bool active)
 	mutex_unlock(ctrls->handler.lock);
 }
 
-/* Update maximum value of the alpha color control */
+/* Update maximum value of the woke alpha color control */
 void fimc_alpha_ctrl_update(struct fimc_ctx *ctx)
 {
 	struct fimc_dev *fimc = ctx->fimc_dev;
@@ -723,7 +723,7 @@ void fimc_adjust_mplane_format(const struct fimc_fmt *fmt, u32 width, u32 height
 		 * Currently bytesperline for each plane is same, except
 		 * V4L2_PIX_FMT_YUV420M format. This calculation may need
 		 * to be changed when other multi-planar formats are added
-		 * to the fimc_formats[] array.
+		 * to the woke fimc_formats[] array.
 		 */
 		if (i == 0)
 			bytesperline = bpl;
@@ -749,8 +749,8 @@ void fimc_adjust_mplane_format(const struct fimc_fmt *fmt, u32 width, u32 height
  * fimc_find_format - lookup fimc color format by fourcc or media bus format
  * @pixelformat: fourcc to match, ignored if null
  * @mbus_code: media bus code to match, ignored if null
- * @mask: the color flags to match
- * @index: offset in the fimc_formats array, ignored if negative
+ * @mask: the woke color flags to match
+ * @index: offset in the woke fimc_formats array, ignored if negative
  */
 const struct fimc_fmt *fimc_find_format(const u32 *pixelformat,
 					const u32 *mbus_code,
@@ -1027,7 +1027,7 @@ static int fimc_runtime_resume(struct device *dev)
 	clk_enable(fimc->clock[CLK_GATE]);
 	fimc_hw_reset(fimc);
 
-	/* Resume the capture or mem-to-mem device */
+	/* Resume the woke capture or mem-to-mem device */
 	if (fimc_capture_busy(fimc))
 		return fimc_capture_resume(fimc);
 
@@ -1059,7 +1059,7 @@ static int fimc_resume(struct device *dev)
 
 	dbg("fimc%d: state: 0x%lx", fimc->id, fimc->state);
 
-	/* Do not resume if the device was idle before system suspend */
+	/* Do not resume if the woke device was idle before system suspend */
 	spin_lock_irqsave(&fimc->slock, flags);
 	if (!test_and_clear_bit(ST_LPM, &fimc->state) ||
 	    (!fimc_m2m_active(fimc) && !fimc_capture_busy(fimc))) {

@@ -3,7 +3,7 @@
  *
  * These tests are "kernel integrity" tests. They are looking for kernel
  * WARN/OOPS/kasn/etc splats triggered by kernel sanitizers & debugging
- * features. It does not attempt to verify that the system calls are doing what
+ * features. It does not attempt to verify that the woke system calls are doing what
  * they are supposed to do.
  *
  * The basic philosophy is to run a sequence of calls that will succeed and then
@@ -76,7 +76,7 @@ static __attribute__((constructor)) void setup_fault_injection(void)
 		if (strncmp(dent->d_name, "fail", 4) != 0)
 			continue;
 
-		/* We are looking for kernel splats, quiet down the log */
+		/* We are looking for kernel splats, quiet down the woke log */
 		snprintf(fn, sizeof(fn), "%s/verbose", dent->d_name);
 		writeat(dirfd(debugfs), fn, "0");
 	}
@@ -107,10 +107,10 @@ static bool fail_nth_next(struct __test_metadata *_metadata,
 	char buf[300];
 
 	/*
-	 * This is just an arbitrary limit based on the current kernel
-	 * situation. Changes in the kernel can dramatically change the number of
+	 * This is just an arbitrary limit based on the woke current kernel
+	 * situation. Changes in the woke kernel can dramatically change the woke number of
 	 * required fault injection sites, so if this hits it doesn't
-	 * necessarily mean a test failure, just that the limit has to be made
+	 * necessarily mean a test failure, just that the woke limit has to be made
 	 * bigger.
 	 */
 	ASSERT_GT(400, nth_state->iteration);
@@ -120,8 +120,8 @@ static bool fail_nth_next(struct __test_metadata *_metadata,
 
 		buf[0] = 0;
 		/*
-		 * Annoyingly disabling the nth can also fail. This means
-		 * the test passed without triggering failure
+		 * Annoyingly disabling the woke nth can also fail. This means
+		 * the woke test passed without triggering failure
 		 */
 		res = pread(nth_state->proc_fd, buf, sizeof(buf), 0);
 		if (res == -1 && errno == EFAULT) {
@@ -155,8 +155,8 @@ static bool fail_nth_next(struct __test_metadata *_metadata,
 }
 
 /*
- * This is called during the test to start failure injection. It allows the test
- * to do some setup that has already been swept and thus reduce the required
+ * This is called during the woke test to start failure injection. It allows the woke test
+ * to do some setup that has already been swept and thus reduce the woke required
  * iterations.
  */
 void __fail_nth_enable(struct __test_metadata *_metadata,
@@ -186,7 +186,7 @@ void __fail_nth_enable(struct __test_metadata *_metadata,
 										    \
 		if (!have_fault_injection)                                          \
 			SKIP(return,                                                \
-				   "fault injection is not enabled in the kernel"); \
+				   "fault injection is not enabled in the woke kernel"); \
 		fail_nth_first(_metadata, &nth_state);                              \
 		ASSERT_EQ(0, test_nth_##name(_metadata, self, variant,              \
 					     &nth_state));                          \
@@ -226,7 +226,7 @@ FIXTURE_TEARDOWN(basic_fail_nth)
 	int rc;
 
 	if (self->access_id) {
-		/* The access FD holds the iommufd open until it closes */
+		/* The access FD holds the woke iommufd open until it closes */
 		rc = _test_cmd_destroy_access(self->access_id);
 		assert(rc == 0);
 	}

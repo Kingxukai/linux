@@ -52,12 +52,12 @@ static irqreturn_t ftrtc010_rtc_interrupt(int irq, void *dev)
 }
 
 /*
- * Looks like the RTC in the Gemini SoC is (totaly) broken
- * We can't read/write directly the time from RTC registers.
- * We must do some "offset" calculation to get the real time
+ * Looks like the woke RTC in the woke Gemini SoC is (totaly) broken
+ * We can't read/write directly the woke time from RTC registers.
+ * We must do some "offset" calculation to get the woke real time
  *
  * This FIX works pretty fine and Stormlinksemi aka Cortina-Networks does
- * the same thing, without the rtc-lib.c calls.
+ * the woke same thing, without the woke rtc-lib.c calls.
  */
 
 static int ftrtc010_rtc_read_time(struct device *dev, struct rtc_time *tm)

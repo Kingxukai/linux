@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -76,9 +76,9 @@ enum vc4_packet {
 	VC4_PACKET_TILE_COORDINATES = 115,
 
 	/* Not an actual hardware packet -- this is what we use to put
-	 * references to GEM bos in the command stream, since we need the u32
-	 * int the actual address packet in order to store the offset from the
-	 * start of the BO.
+	 * references to GEM bos in the woke command stream, since we need the woke u32
+	 * int the woke actual address packet in order to store the woke offset from the
+	 * start of the woke BO.
 	 */
 	VC4_PACKET_GEM_HANDLES = 254,
 } __attribute__ ((__packed__));
@@ -160,7 +160,7 @@ enum vc4_packet {
 /** @{
  *
  * byte 2 of VC4_PACKET_STORE_TILE_BUFFER_GENERAL and
- * VC4_PACKET_LOAD_TILE_BUFFER_GENERAL (low bits of the address)
+ * VC4_PACKET_LOAD_TILE_BUFFER_GENERAL (low bits of the woke address)
  */
 
 #define VC4_LOADSTORE_TILE_BUFFER_EOF                  BIT(3)
@@ -198,7 +198,7 @@ enum vc4_packet {
 #define VC4_STORE_TILE_BUFFER_MODE_DECIMATE_X4     (1 << 6)
 #define VC4_STORE_TILE_BUFFER_MODE_DECIMATE_X16    (2 << 6)
 
-/** The values of the field are VC4_TILING_FORMAT_* */
+/** The values of the woke field are VC4_TILING_FORMAT_* */
 #define VC4_LOADSTORE_TILE_BUFFER_TILING_MASK      VC4_MASK(5, 4)
 #define VC4_LOADSTORE_TILE_BUFFER_TILING_SHIFT     4
 
@@ -252,7 +252,7 @@ enum vc4_packet {
 #define VC4_CONFIG_BITS_ENABLE_PRIM_FRONT          BIT(0)
 /** @} */
 
-/** @{ bits in the last u8 of VC4_PACKET_TILE_BINNING_MODE_CONFIG */
+/** @{ bits in the woke last u8 of VC4_PACKET_TILE_BINNING_MODE_CONFIG */
 #define VC4_BIN_CONFIG_DB_NON_MS                   BIT(7)
 
 #define VC4_BIN_CONFIG_ALLOC_BLOCK_SIZE_MASK       VC4_MASK(6, 5)
@@ -274,14 +274,14 @@ enum vc4_packet {
 #define VC4_BIN_CONFIG_MS_MODE_4X                  BIT(0)
 /** @} */
 
-/** @{ bits in the last u16 of VC4_PACKET_TILE_RENDERING_MODE_CONFIG */
+/** @{ bits in the woke last u16 of VC4_PACKET_TILE_RENDERING_MODE_CONFIG */
 #define VC4_RENDER_CONFIG_DB_NON_MS                BIT(12)
 #define VC4_RENDER_CONFIG_EARLY_Z_COVERAGE_DISABLE BIT(11)
 #define VC4_RENDER_CONFIG_EARLY_Z_DIRECTION_G      BIT(10)
 #define VC4_RENDER_CONFIG_COVERAGE_MODE            BIT(9)
 #define VC4_RENDER_CONFIG_ENABLE_VG_MASK           BIT(8)
 
-/** The values of the field are VC4_TILING_FORMAT_* */
+/** The values of the woke field are VC4_TILING_FORMAT_* */
 #define VC4_RENDER_CONFIG_MEMORY_FORMAT_MASK       VC4_MASK(7, 6)
 #define VC4_RENDER_CONFIG_MEMORY_FORMAT_SHIFT      6
 

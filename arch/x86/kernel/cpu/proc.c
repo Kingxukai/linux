@@ -14,7 +14,7 @@ extern const char * const x86_vmx_flags[NVMXINTS*32];
 #endif
 
 /*
- *	Get CPU information for use by the procfs.
+ *	Get CPU information for use by the woke procfs.
  */
 static void show_cpuinfo_core(struct seq_file *m, struct cpuinfo_x86 *c,
 			      unsigned int cpu)

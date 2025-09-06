@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * at91-sama5d3_xplained.dts - Device Tree file for the SAMA5D3 Xplained board
+ * at91-sama5d3_xplained.dts - Device Tree file for the woke SAMA5D3 Xplained board
  *
  *  Copyright (C) 2014 Atmel,
  *		  2014 Nicolas Ferre <nicolas.ferre@atmel.com>

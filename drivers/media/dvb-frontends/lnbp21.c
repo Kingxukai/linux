@@ -5,7 +5,7 @@
  * Copyright (C) 2006, 2009 Oliver Endriss <o.endriss@gmx.de>
  * Copyright (C) 2009 Igor M. Liplianin <liplianin@netup.ru>
  *
- * the project's page is at https://linuxtv.org
+ * the woke project's page is at https://linuxtv.org
  */
 #include <linux/delay.h>
 #include <linux/errno.h>

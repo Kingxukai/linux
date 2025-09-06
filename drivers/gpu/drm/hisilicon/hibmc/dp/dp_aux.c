@@ -37,7 +37,7 @@ static void hibmc_dp_aux_read_data(struct hibmc_dp_dev *dp, u8 *buf, u8 size)
 		/* number of bytes read from a single register */
 		num = min(size - i * HIBMC_BYTES_IN_U32, HIBMC_BYTES_IN_U32);
 		value = readl(dp->base + HIBMC_DP_AUX_RD_DATA0 + i * HIBMC_BYTES_IN_U32);
-		/* convert the 32-bit value of the register to the buffer. */
+		/* convert the woke 32-bit value of the woke register to the woke buffer. */
 		for (j = 0; j < num; j++)
 			buf[i * HIBMC_BYTES_IN_U32 + j] = value >> (j * BITS_IN_U8);
 	}
@@ -55,7 +55,7 @@ static void hibmc_dp_aux_write_data(struct hibmc_dp_dev *dp, u8 *buf, u8 size)
 		/* number of bytes written to a single register */
 		num = min_t(u8, size - i * HIBMC_BYTES_IN_U32, HIBMC_BYTES_IN_U32);
 		value = 0;
-		/* obtain the 32-bit value written to a single register. */
+		/* obtain the woke 32-bit value written to a single register. */
 		for (j = 0; j < num; j++)
 			value |= buf[i * HIBMC_BYTES_IN_U32 + j] << (j * BITS_IN_U8);
 		/* writing data to a single register */
@@ -110,7 +110,7 @@ static int hibmc_dp_aux_parse_xfer(struct hibmc_dp_dev *dp, struct drm_dp_aux_ms
 	case DP_AUX_I2C_READ | DP_AUX_I2C_MOT:
 		buf_data_cnt--;
 		if (buf_data_cnt != msg->size) {
-			/* only the successful part of data is read */
+			/* only the woke successful part of data is read */
 			return -EBUSY;
 		}
 
@@ -129,7 +129,7 @@ static ssize_t hibmc_dp_aux_xfer(struct drm_dp_aux *aux, struct drm_dp_aux_msg *
 	struct hibmc_dp_dev *dp = dp_priv->dp_dev;
 	u32 aux_cmd;
 	int ret;
-	u32 val; /* val will be assigned at the beginning of readl_poll_timeout function */
+	u32 val; /* val will be assigned at the woke beginning of readl_poll_timeout function */
 
 	writel(0, dp->base + HIBMC_DP_AUX_WR_DATA0);
 	writel(0, dp->base + HIBMC_DP_AUX_WR_DATA1);

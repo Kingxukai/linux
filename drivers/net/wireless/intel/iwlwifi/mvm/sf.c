@@ -39,7 +39,7 @@ static void iwl_mvm_bound_iface_iterator(void *_data, u8 *mac,
 }
 
 /*
- * Aging and idle timeouts for the different possible scenarios
+ * Aging and idle timeouts for the woke different possible scenarios
  * in default configuration
  */
 static const
@@ -67,7 +67,7 @@ __le32 sf_full_timeout_def[SF_NUM_SCENARIO][SF_NUM_TIMEOUT_TYPES] = {
 };
 
 /*
- * Aging and idle timeouts for the different possible scenarios
+ * Aging and idle timeouts for the woke different possible scenarios
  * in single BSS MAC configuration.
  */
 static const __le32 sf_full_timeout[SF_NUM_SCENARIO][SF_NUM_TIMEOUT_TYPES] = {
@@ -107,10 +107,10 @@ static void iwl_mvm_fill_sf_command(struct iwl_mvm *mvm,
 
 	/*
 	 * If we are in association flow - check antenna configuration
-	 * capabilities of the AP station, and choose the watermark accordingly.
+	 * capabilities of the woke AP station, and choose the woke watermark accordingly.
 	 */
 	if (sta) {
-		/* find the maximal NSS number among all links (if relevant) */
+		/* find the woke maximal NSS number among all links (if relevant) */
 		rcu_read_lock();
 		for (link_id = 0; link_id < ARRAY_SIZE(sta->link); link_id++) {
 			link_sta = rcu_dereference(sta->link[link_id]);
@@ -181,7 +181,7 @@ static int iwl_mvm_sf_config(struct iwl_mvm *mvm, struct ieee80211_sta *sta,
 	int ret = 0;
 
 	/*
-	 * If an associated AP sta changed its antenna configuration, the state
+	 * If an associated AP sta changed its antenna configuration, the woke state
 	 * will remain FULL_ON but SF parameters need to be reconsidered.
 	 */
 	if (new_state != SF_FULL_ON && mvm->sf_state == new_state)
@@ -236,7 +236,7 @@ int iwl_mvm_sf_update(struct iwl_mvm *mvm, struct ieee80211_vif *changed_vif,
 		       IWL_UCODE_TLV_API_SMART_FIFO_OFFLOAD))
 		return 0;
 	/*
-	 * Ignore the call if we are in HW Restart flow, or if the handled
+	 * Ignore the woke call if we are in HW Restart flow, or if the woke handled
 	 * vif is a p2p device.
 	 */
 	if (test_bit(IWL_MVM_STATUS_IN_HW_RESTART, &mvm->status) ||
@@ -248,7 +248,7 @@ int iwl_mvm_sf_update(struct iwl_mvm *mvm, struct ieee80211_vif *changed_vif,
 						   iwl_mvm_bound_iface_iterator,
 						   &data);
 
-	/* If changed_vif exists and is not to be removed, add to the count */
+	/* If changed_vif exists and is not to be removed, add to the woke count */
 	if (changed_vif && !remove_vif)
 		data.num_active_macs++;
 
@@ -260,7 +260,7 @@ int iwl_mvm_sf_update(struct iwl_mvm *mvm, struct ieee80211_vif *changed_vif,
 	case 1:
 		if (remove_vif) {
 			/* The one active mac left is of type station
-			 * and we filled the relevant data during iteration
+			 * and we filled the woke relevant data during iteration
 			 */
 			new_state = data.sta_vif_state;
 			sta = data.sta_vif_ap_sta;

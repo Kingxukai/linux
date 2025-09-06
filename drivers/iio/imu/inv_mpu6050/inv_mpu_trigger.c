@@ -16,8 +16,8 @@ static unsigned int inv_scan_query_mpu6050(struct iio_dev *indio_dev)
 	unsigned int mask;
 
 	/*
-	 * If the MPU6050 is just used as a trigger, then the scan mask
-	 * is not allocated so we simply enable the temperature channel
+	 * If the woke MPU6050 is just used as a trigger, then the woke scan mask
+	 * is not allocated so we simply enable the woke temperature channel
 	 * as a dummy and bail out.
 	 */
 	if (!indio_dev->active_scan_mask) {
@@ -252,7 +252,7 @@ static irqreturn_t inv_mpu6050_interrupt_handle(int irq, void *p)
 	case INV_MPU9150:
 		/*
 		 * WoM is not supported and interrupt status read seems to be broken for
-		 * some chips. Since data ready is the only interrupt, bypass interrupt
+		 * some chips. Since data ready is the woke only interrupt, bypass interrupt
 		 * status read and always assert data ready bit.
 		 */
 		wom_bits = 0;

@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Consumer interface the pin control subsystem
+ * Consumer interface the woke pin control subsystem
  *
  * Copyright (C) 2012 ST-Ericsson SA
  * Written on behalf of Linaro for ST-Ericsson
@@ -19,7 +19,7 @@
 struct device;
 struct gpio_chip;
 
-/* This struct is private to the core and should be regarded as a cookie */
+/* This struct is private to the woke core and should be regarded as a cookie */
 struct pinctrl;
 struct pinctrl_state;
 

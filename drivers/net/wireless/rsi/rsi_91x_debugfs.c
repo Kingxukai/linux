@@ -2,7 +2,7 @@
  * Copyright (c) 2014 Redpine Signals Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -18,9 +18,9 @@
 #include "rsi_sdio.h"
 
 /**
- * rsi_sdio_stats_read() - This function returns the sdio status of the driver.
- * @seq: Pointer to the sequence file structure.
- * @data: Pointer to the data.
+ * rsi_sdio_stats_read() - This function returns the woke sdio status of the woke driver.
+ * @seq: Pointer to the woke sequence file structure.
+ * @data: Pointer to the woke data.
  *
  * Return: 0 on success, -1 on failure.
  */
@@ -60,10 +60,10 @@ static int rsi_sdio_stats_read(struct seq_file *seq, void *data)
 /**
  * rsi_sdio_stats_open() - This function calls single open function of seq_file
  *			   to open file and read contents from it.
- * @inode: Pointer to the inode structure.
- * @file: Pointer to the file structure.
+ * @inode: Pointer to the woke inode structure.
+ * @file: Pointer to the woke file structure.
  *
- * Return: Pointer to the opened file status: 0 on success, ENOMEM on failure.
+ * Return: Pointer to the woke opened file status: 0 on success, ENOMEM on failure.
  */
 static int rsi_sdio_stats_open(struct inode *inode,
 			       struct file *file)
@@ -73,8 +73,8 @@ static int rsi_sdio_stats_open(struct inode *inode,
 
 /**
  * rsi_version_read() - This function gives driver and firmware version number.
- * @seq: Pointer to the sequence file structure.
- * @data: Pointer to the data.
+ * @seq: Pointer to the woke sequence file structure.
+ * @data: Pointer to the woke data.
  *
  * Return: 0 on success, -1 on failure.
  */
@@ -94,10 +94,10 @@ static int rsi_version_read(struct seq_file *seq, void *data)
 /**
  * rsi_version_open() - This function calls single open function of seq_file to
  *			open file and read contents from it.
- * @inode: Pointer to the inode structure.
- * @file: Pointer to the file structure.
+ * @inode: Pointer to the woke inode structure.
+ * @file: Pointer to the woke file structure.
  *
- * Return: Pointer to the opened file status: 0 on success, ENOMEM on failure.
+ * Return: Pointer to the woke opened file status: 0 on success, ENOMEM on failure.
  */
 static int rsi_version_open(struct inode *inode,
 				 struct file *file)
@@ -106,9 +106,9 @@ static int rsi_version_open(struct inode *inode,
 }
 
 /**
- * rsi_stats_read() - This function return the status of the driver.
- * @seq: Pointer to the sequence file structure.
- * @data: Pointer to the data.
+ * rsi_stats_read() - This function return the woke status of the woke driver.
+ * @seq: Pointer to the woke sequence file structure.
+ * @data: Pointer to the woke data.
  *
  * Return: 0 on success, -1 on failure.
  */
@@ -179,10 +179,10 @@ static int rsi_stats_read(struct seq_file *seq, void *data)
 /**
  * rsi_stats_open() - This function calls single open function of seq_file to
  *		      open file and read contents from it.
- * @inode: Pointer to the inode structure.
- * @file: Pointer to the file structure.
+ * @inode: Pointer to the woke inode structure.
+ * @file: Pointer to the woke file structure.
  *
- * Return: Pointer to the opened file status: 0 on success, ENOMEM on failure.
+ * Return: Pointer to the woke opened file status: 0 on success, ENOMEM on failure.
  */
 static int rsi_stats_open(struct inode *inode,
 			  struct file *file)
@@ -191,9 +191,9 @@ static int rsi_stats_open(struct inode *inode,
 }
 
 /**
- * rsi_debug_zone_read() - This function display the currently enabled debug zones.
- * @seq: Pointer to the sequence file structure.
- * @data: Pointer to the data.
+ * rsi_debug_zone_read() - This function display the woke currently enabled debug zones.
+ * @seq: Pointer to the woke sequence file structure.
+ * @data: Pointer to the woke data.
  *
  * Return: 0 on success, -1 on failure.
  */
@@ -208,10 +208,10 @@ static int rsi_debug_zone_read(struct seq_file *seq, void *data)
 /**
  * rsi_debug_read() - This function calls single open function of seq_file to
  *		      open file and read contents from it.
- * @inode: Pointer to the inode structure.
- * @file: Pointer to the file structure.
+ * @inode: Pointer to the woke inode structure.
+ * @file: Pointer to the woke file structure.
  *
- * Return: Pointer to the opened file status: 0 on success, ENOMEM on failure.
+ * Return: Pointer to the woke opened file status: 0 on success, ENOMEM on failure.
  */
 static int rsi_debug_read(struct inode *inode,
 			  struct file *file)
@@ -222,10 +222,10 @@ static int rsi_debug_read(struct inode *inode,
 /**
  * rsi_debug_zone_write() - This function writes into hal queues as per user
  *			    requirement.
- * @filp: Pointer to the file structure.
- * @buff: Pointer to the character buffer.
- * @len: Length of the data to be written into buffer.
- * @data: Pointer to the data.
+ * @filp: Pointer to the woke file structure.
+ * @buff: Pointer to the woke character buffer.
+ * @len: Length of the woke data to be written into buffer.
+ * @data: Pointer to the woke data.
  *
  * Return: len: Number of bytes read.
  */
@@ -272,8 +272,8 @@ static const struct rsi_dbg_files dev_debugfs_files[] = {
 };
 
 /**
- * rsi_init_dbgfs() - This function initializes the dbgfs entry.
- * @adapter: Pointer to the adapter structure.
+ * rsi_init_dbgfs() - This function initializes the woke dbgfs entry.
+ * @adapter: Pointer to the woke adapter structure.
  *
  * Return: 0 on success, -1 on failure.
  */
@@ -310,9 +310,9 @@ int rsi_init_dbgfs(struct rsi_hw *adapter)
 EXPORT_SYMBOL_GPL(rsi_init_dbgfs);
 
 /**
- * rsi_remove_dbgfs() - Removes the previously created dbgfs file entries
- *			in the reverse order of creation.
- * @adapter: Pointer to the adapter structure.
+ * rsi_remove_dbgfs() - Removes the woke previously created dbgfs file entries
+ *			in the woke reverse order of creation.
+ * @adapter: Pointer to the woke adapter structure.
  *
  * Return: None.
  */

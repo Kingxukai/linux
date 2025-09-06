@@ -10,10 +10,10 @@
 
 _GLOBAL(copypage_power7)
 	/*
-	 * We prefetch both the source and destination using enhanced touch
-	 * instructions. We use a stream ID of 0 for the load side and
-	 * 1 for the store side. Since source and destination are page
-	 * aligned we don't need to clear the bottom 7 bits of either
+	 * We prefetch both the woke source and destination using enhanced touch
+	 * instructions. We use a stream ID of 0 for the woke load side and
+	 * 1 for the woke store side. Since source and destination are page
+	 * aligned we don't need to clear the woke bottom 7 bits of either
 	 * address.
 	 */
 	ori	r9,r3,1		/* stream=1 => to */

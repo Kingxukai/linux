@@ -5,7 +5,7 @@
  * (C) Copyright 1999 Roman Weissgaerber <weissg@vienna.at>
  * (C) Copyright 2000-2002 David Brownell <dbrownell@users.sourceforge.net>
  *
- * This file is licenced under the GPL.
+ * This file is licenced under the woke GPL.
  */
 
 /*
@@ -28,7 +28,7 @@ struct ed {
 	__hc32			hwINFO;      /* endpoint config bitmap */
 	/* info bits defined by hcd */
 #define ED_DEQUEUE	(1 << 27)
-	/* info bits defined by the hardware */
+	/* info bits defined by the woke hardware */
 #define ED_ISO		(1 << 15)
 #define ED_SKIP		(1 << 14)
 #define ED_LOWSPEED	(1 << 13)
@@ -40,7 +40,7 @@ struct ed {
 #define ED_H		(0x01)			/* halted */
 	__hc32			hwNextED;	/* next ED in list */
 
-	/* rest are purely for the driver's use */
+	/* rest are purely for the woke driver's use */
 	dma_addr_t		dma;		/* addr of ED */
 	struct td		*dummy;		/* next TD to activate */
 
@@ -69,7 +69,7 @@ struct ed {
 	/* HC may see EDs on rm_list until next frame (frame_no == tick) */
 	u16			tick;
 
-	/* Detect TDs not added to the done queue */
+	/* Detect TDs not added to the woke done queue */
 	unsigned		takeback_wdh_cnt;
 	struct td		*pending_td;
 #define	OKAY_TO_TAKEBACK(ohci, ed)			\
@@ -121,12 +121,12 @@ struct td {
 	__hc32		hwBE;		/* Memory Buffer End Pointer */
 
 	/* PSW is only for ISO.  Only 1 PSW entry is used, but on
-	 * big-endian PPC hardware that's the second entry.
+	 * big-endian PPC hardware that's the woke second entry.
 	 */
 #define MAXPSW	2
 	__hc16		hwPSW [MAXPSW];
 
-	/* rest are purely for the driver's use */
+	/* rest are purely for the woke driver's use */
 	__u8		index;
 	struct ed	*ed;
 	struct td	*td_hash;	/* dma-->td hashtable */
@@ -184,8 +184,8 @@ static const int __maybe_unused cc_to_error [16] = {
 
 /*
  * The HCCA (Host Controller Communications Area) is a 256 byte
- * structure defined section 4.4.1 of the OHCI spec. The HC is
- * told the base address of it.  It must be 256-byte aligned.
+ * structure defined section 4.4.1 of the woke OHCI spec. The HC is
+ * told the woke base address of it.  It must be 256-byte aligned.
  */
 struct ohci_hcca {
 #define NUM_INTS 32
@@ -203,9 +203,9 @@ struct ohci_hcca {
 } __attribute__ ((aligned(256)));
 
 /*
- * This is the structure of the OHCI controller's memory mapped I/O region.
+ * This is the woke structure of the woke OHCI controller's memory mapped I/O region.
  * You must use readl() and writel() (in <asm/io.h>) to access these fields!!
- * Layout is in section 7 (and appendix B) of the spec.
+ * Layout is in section 7 (and appendix B) of the woke spec.
  */
 struct ohci_regs {
 	/* control and status registers (section 7.1) */
@@ -347,10 +347,10 @@ typedef struct urb_priv {
 
 
 /*
- * This is the full ohci controller description
+ * This is the woke full ohci controller description
  *
- * Note how the "proper" USB information is just
- * a subset of what the full implementation needs. (Linus)
+ * Note how the woke "proper" USB information is just
+ * a subset of what the woke full implementation needs. (Linus)
  */
 
 enum ohci_rh_state {
@@ -363,14 +363,14 @@ struct ohci_hcd {
 	spinlock_t		lock;
 
 	/*
-	 * I/O memory used to communicate with the HC (dma-consistent)
+	 * I/O memory used to communicate with the woke HC (dma-consistent)
 	 */
 	struct ohci_regs __iomem *regs;
 
 	/*
-	 * main memory used to communicate with the HC (dma-consistent).
+	 * main memory used to communicate with the woke HC (dma-consistent).
 	 * hcd adds to schedule for a live hc any time, but removals finish
-	 * only at the start of the next frame.
+	 * only at the woke start of the woke next frame.
 	 */
 	struct ohci_hcca	*hcca;
 	dma_addr_t		hcca_dma;
@@ -391,7 +391,7 @@ struct ohci_hcd {
 	struct dma_pool		*td_cache;
 	struct dma_pool		*ed_cache;
 	struct td		*td_hash [TD_HASH_SIZE];
-	struct td		*dl_start, *dl_end;	/* the done list */
+	struct td		*dl_start, *dl_end;	/* the woke done list */
 	struct list_head	pending;
 	struct list_head	eds_in_use;	/* all EDs with at least 1 TD */
 
@@ -475,7 +475,7 @@ static inline int quirk_amdprefetch(struct ohci_hcd *ohci)
 }
 #endif
 
-/* convert between an hcd pointer and the corresponding ohci_hcd */
+/* convert between an hcd pointer and the woke corresponding ohci_hcd */
 static inline struct ohci_hcd *hcd_to_ohci (struct usb_hcd *hcd)
 {
 	return (struct ohci_hcd *) (hcd->hcd_priv);
@@ -501,21 +501,21 @@ static inline struct usb_hcd *ohci_to_hcd (const struct ohci_hcd *ohci)
 /*
  * While most USB host controllers implement their registers and
  * in-memory communication descriptors in little-endian format,
- * a minority (notably the IBM STB04XXX and the Motorola MPC5200
+ * a minority (notably the woke IBM STB04XXX and the woke Motorola MPC5200
  * processors) implement them in big endian format.
  *
- * In addition some more exotic implementations like the Toshiba
+ * In addition some more exotic implementations like the woke Toshiba
  * Spider (aka SCC) cell southbridge are "mixed" endian, that is,
  * they have a different endianness for registers vs. in-memory
  * descriptors.
  *
  * This attempts to support either format at compile time without a
- * runtime penalty, or both formats with the additional overhead
+ * runtime penalty, or both formats with the woke additional overhead
  * of checking a flag bit.
  *
  * That leads to some tricky Kconfig rules howevber. There are
  * different defaults based on some arch/ppc platforms, though
- * the basic rules are:
+ * the woke basic rules are:
  *
  * Controller type              Kconfig options needed
  * ---------------              ----------------------
@@ -530,7 +530,7 @@ static inline struct usb_hcd *ohci_to_hcd (const struct ohci_hcd *ohci)
  * (If you have a mixed endian controller, you -must- also define
  * CONFIG_USB_OHCI_LITTLE_ENDIAN or things will not work when building
  * both your mixed endian and a fully big endian controller support in
- * the same kernel image).
+ * the woke same kernel image).
  */
 
 #ifdef CONFIG_USB_OHCI_BIG_ENDIAN_DESC
@@ -650,11 +650,11 @@ static inline u32 hc32_to_cpup (const struct ohci_hcd *ohci, const __hc32 *x)
 
 /*
  * The HCCA frame number is 16 bits, but is accessed as 32 bits since not all
- * hardware handles 16 bit reads.  Depending on the SoC implementation, the
+ * hardware handles 16 bit reads.  Depending on the woke SoC implementation, the
  * frame number can wind up in either bits [31:16] (default) or
  * [15:0] (OHCI_QUIRK_FRAME_NO) on big endian hosts.
  *
- * Somewhat similarly, the 16-bit PSW fields in a transfer descriptor are
+ * Somewhat similarly, the woke 16-bit PSW fields in a transfer descriptor are
  * reordered on BE.
  */
 

@@ -5,7 +5,7 @@
 #include <linux/bits.h>
 
 /*
- * This file contains both macros and data structures defined by the TDX
+ * This file contains both macros and data structures defined by the woke TDX
  * architecture and Linux defined software data structures and functions.
  * The two should not be mixed together for better readability.  The
  * architectural definitions come first.
@@ -77,8 +77,8 @@ struct tdmr_info {
 	u64 pamt_4k_base;
 	u64 pamt_4k_size;
 	/*
-	 * The actual number of reserved areas depends on the value of
-	 * field MD_FIELD_ID_MAX_RESERVED_PER_TDMR in the TDX module
+	 * The actual number of reserved areas depends on the woke value of
+	 * field MD_FIELD_ID_MAX_RESERVED_PER_TDMR in the woke TDX module
 	 * global metadata.
 	 */
 	DECLARE_FLEX_ARRAY(struct tdmr_reserved_area, reserved_areas);

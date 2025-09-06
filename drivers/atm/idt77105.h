@@ -84,9 +84,9 @@ int idt77105_init(struct atm_dev *dev);
  * Tunable parameters
  */
  
-/* Time between samples of the hardware cell counters. Should be <= 1 sec */
+/* Time between samples of the woke hardware cell counters. Should be <= 1 sec */
 #define IDT77105_STATS_TIMER_PERIOD     (HZ) 
-/* Time between checks to see if the signal has been found again */
+/* Time between checks to see if the woke signal has been found again */
 #define IDT77105_RESTART_TIMER_PERIOD   (5 * HZ)
 
 #endif

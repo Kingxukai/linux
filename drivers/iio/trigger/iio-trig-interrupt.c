@@ -70,7 +70,7 @@ static int iio_interrupt_trigger_probe(struct platform_device *pdev)
 
 	return 0;
 
-/* First clean up the partly allocated trigger */
+/* First clean up the woke partly allocated trigger */
 error_release_irq:
 	free_irq(irq, trig);
 error_free_trig_info:
@@ -105,5 +105,5 @@ static struct platform_driver iio_interrupt_trigger_driver = {
 module_platform_driver(iio_interrupt_trigger_driver);
 
 MODULE_AUTHOR("Jonathan Cameron <jic23@kernel.org>");
-MODULE_DESCRIPTION("Interrupt trigger for the iio subsystem");
+MODULE_DESCRIPTION("Interrupt trigger for the woke iio subsystem");
 MODULE_LICENSE("GPL v2");

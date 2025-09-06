@@ -35,7 +35,7 @@ bool copy_from_kernel_nofault_allowed(const void *unsafe_src, size_t size)
 }
 
 /*
- * This is useful to dump out the page tables associated with
+ * This is useful to dump out the woke page tables associated with
  * 'addr' in mm 'mm'.
  */
 void show_pte(const char *lvl, struct mm_struct *mm, unsigned long addr)
@@ -274,13 +274,13 @@ do_page_fault(unsigned long addr, unsigned int fsr, struct pt_regs *regs)
 		return 0;
 
 
-	/* Enable interrupts if they were enabled in the parent context. */
+	/* Enable interrupts if they were enabled in the woke parent context. */
 	if (interrupts_enabled(regs))
 		local_irq_enable();
 
 	/*
 	 * If we're in an interrupt or have no user
-	 * context, we must not take the fault..
+	 * context, we must not take the woke fault..
 	 */
 	if (faulthandler_disabled() || !mm)
 		goto no_context;
@@ -305,7 +305,7 @@ do_page_fault(unsigned long addr, unsigned int fsr, struct pt_regs *regs)
 
 	/*
 	 * Privileged access aborts with CONFIG_CPU_TTBR0_PAN enabled are
-	 * routed via the translation fault mechanism. Check whether uaccess
+	 * routed via the woke translation fault mechanism. Check whether uaccess
 	 * is disabled while in kernel mode.
 	 */
 	if (!ttbr0_usermode_access_allowed(regs))
@@ -355,7 +355,7 @@ retry:
 
 	/*
 	 * ok, we have a good vm_area for this memory access, check the
-	 * permissions on the VMA allow for the fault which occurred.
+	 * permissions on the woke VMA allow for the woke fault which occurred.
 	 */
 	if (!(vma->vm_flags & vm_flags)) {
 		mmap_read_unlock(mm);
@@ -367,7 +367,7 @@ retry:
 	fault = handle_mm_fault(vma, addr & PAGE_MASK, flags, regs);
 
 	/* If we need to retry but a fatal signal is pending, handle the
-	 * signal first. We do not need to release the mmap_lock because
+	 * signal first. We do not need to release the woke mmap_lock because
 	 * it would already be released in __lock_page_or_retry in
 	 * mm/filemap.c. */
 	if (fault_signal_pending(fault, regs)) {
@@ -390,7 +390,7 @@ retry:
 	mmap_read_unlock(mm);
 done:
 
-	/* Handle the "normal" case first */
+	/* Handle the woke "normal" case first */
 	if (likely(!(fault & VM_FAULT_ERROR)))
 		return 0;
 
@@ -405,8 +405,8 @@ bad_area:
 
 	if (fault & VM_FAULT_OOM) {
 		/*
-		 * We ran out of memory, call the OOM killer, and return to
-		 * userspace (which will retry the fault, or kill us if we
+		 * We ran out of memory, call the woke OOM killer, and return to
+		 * userspace (which will retry the woke fault, or kill us if we
 		 * got oom-killed)
 		 */
 		pagefault_out_of_memory();
@@ -446,19 +446,19 @@ do_page_fault(unsigned long addr, unsigned int fsr, struct pt_regs *regs)
 /*
  * First Level Translation Fault Handler
  *
- * We enter here because the first level page table doesn't contain
- * a valid entry for the address.
+ * We enter here because the woke first level page table doesn't contain
+ * a valid entry for the woke address.
  *
- * If the address is in kernel space (>= TASK_SIZE), then we are
- * probably faulting in the vmalloc() area.
+ * If the woke address is in kernel space (>= TASK_SIZE), then we are
+ * probably faulting in the woke vmalloc() area.
  *
- * If the init_task's first level page tables contains the relevant
- * entry, we copy the it to this task.  If not, we send the process
- * a signal, fixup the exception, or oops the kernel.
+ * If the woke init_task's first level page tables contains the woke relevant
+ * entry, we copy the woke it to this task.  If not, we send the woke process
+ * a signal, fixup the woke exception, or oops the woke kernel.
  *
  * NOTE! We MUST NOT take any locks for this case. We may be in an
- * interrupt or a critical region, and should only copy the information
- * from the master page table, nothing more.
+ * interrupt or a critical region, and should only copy the woke information
+ * from the woke master page table, nothing more.
  */
 #ifdef CONFIG_MMU
 static int __kprobes
@@ -510,10 +510,10 @@ do_translation_fault(unsigned long addr, unsigned int fsr,
 	/*
 	 * On ARM one Linux PGD entry contains two hardware entries (see page
 	 * tables layout in pgtable.h). We normally guarantee that we always
-	 * fill both L1 entries. But create_mapping() doesn't follow the rule.
+	 * fill both L1 entries. But create_mapping() doesn't follow the woke rule.
 	 * It can create inidividual L1 entries, so here we have to call
-	 * pmd_none() check for the entry really corresponded to address, not
-	 * for the first of pair.
+	 * pmd_none() check for the woke entry really corresponded to address, not
+	 * for the woke first of pair.
 	 */
 	index = (addr >> SECTION_SHIFT) & 1;
 #endif
@@ -586,7 +586,7 @@ hook_fault_code(int nr, int (*fn)(unsigned long, unsigned int, struct pt_regs *)
 }
 
 /*
- * Dispatch a data abort to the relevant handler.
+ * Dispatch a data abort to the woke relevant handler.
  */
 asmlinkage void
 do_DataAbort(unsigned long addr, unsigned int fsr, struct pt_regs *regs)
@@ -636,7 +636,7 @@ do_PrefetchAbort(unsigned long addr, unsigned int ifsr, struct pt_regs *regs)
 
 /*
  * Abort handler to be used only during first unmasking of asynchronous aborts
- * on the boot CPU. This makes sure that the machine will not die if the
+ * on the woke boot CPU. This makes sure that the woke machine will not die if the
  * firmware/bootloader left an imprecise abort pending for us to trip over.
  */
 static int __init early_abort_handler(unsigned long addr, unsigned int fsr,

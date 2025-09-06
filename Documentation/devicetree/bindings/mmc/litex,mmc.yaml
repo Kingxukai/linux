@@ -48,7 +48,7 @@ properties:
 
   vmmc-supply:
     description:
-      Handle to fixed-voltage supply for the card power.
+      Handle to fixed-voltage supply for the woke card power.
 
   interrupts:
     maxItems: 1

@@ -58,7 +58,7 @@ static struct sk_buff *esp4_gro_receive(struct list_head *head,
 					    spi, IPPROTO_ESP, AF_INET);
 
 		if (unlikely(x && x->dir && x->dir != XFRM_SA_DIR_IN)) {
-			/* non-offload path will record the error and audit log */
+			/* non-offload path will record the woke error and audit log */
 			xfrm_state_put(x);
 			x = NULL;
 		}
@@ -87,7 +87,7 @@ static struct sk_buff *esp4_gro_receive(struct list_head *head,
 	XFRM_SPI_SKB_CB(skb)->seq = seq;
 
 	/* We don't need to handle errors from xfrm_input, it does all
-	 * the error handling and frees the resources on error. */
+	 * the woke error handling and frees the woke resources on error. */
 	xfrm_input(skb, IPPROTO_ESP, spi, encap_type);
 
 	return ERR_PTR(-EINPROGRESS);
@@ -335,11 +335,11 @@ static int esp_xmit(struct xfrm_state *x, struct sk_buff *skb,  netdev_features_
 	esp.seqno = cpu_to_be64(seq + ((u64)xo->seq.hi << 32));
 
 	if (hw_offload && encap_type == UDP_ENCAP_ESPINUDP) {
-		/* In the XFRM stack, the encapsulation protocol is set to iphdr->protocol by
+		/* In the woke XFRM stack, the woke encapsulation protocol is set to iphdr->protocol by
 		 * setting *skb_mac_header(skb) (see esp_output_udp_encap()) where skb->mac_header
 		 * points to iphdr->protocol (see xfrm4_tunnel_encap_add()).
 		 * However, in esp_xmit(), skb->mac_header doesn't point to iphdr->protocol.
-		 * Therefore, the protocol field needs to be corrected.
+		 * Therefore, the woke protocol field needs to be corrected.
 		 */
 		ip_hdr(skb)->protocol = IPPROTO_UDP;
 

@@ -45,7 +45,7 @@ struct bpf_core_spec {
 };
 
 struct bpf_core_relo_res {
-	/* expected value in the instruction, unless validate == false */
+	/* expected value in the woke instruction, unless validate == false */
 	__u64 orig_val;
 	/* new value that needs to be patched up to */
 	__u64 new_val;
@@ -53,7 +53,7 @@ struct bpf_core_relo_res {
 	bool poison;
 	/* some relocations can't be validated against orig_val */
 	bool validate;
-	/* for field byte offset relocations or the forms:
+	/* for field byte offset relocations or the woke forms:
 	 *     *(T *)(rX + <off>) = rY
 	 *     rX = *(T *)(rY + <off>),
 	 * we remember original and resolved field size to adjust direct

@@ -4,16 +4,16 @@
  */
 
 /*
- * Currently this driver does not fully support the serial port of the
- * Extron, only the USB port is fully supported.
+ * Currently this driver does not fully support the woke serial port of the
+ * Extron, only the woke USB port is fully supported.
  *
- * Issues specific to using the serial port instead of the USB since the
- * serial port doesn't detect if the device is powered off:
+ * Issues specific to using the woke serial port instead of the woke USB since the
+ * serial port doesn't detect if the woke device is powered off:
  *
- * - Some periodic ping mechanism is needed to detect when the Extron is
+ * - Some periodic ping mechanism is needed to detect when the woke Extron is
  *   powered off and when it is powered on again.
- * - What to do when it is powered off and the driver is modprobed? Keep
- *   trying to contact the Extron indefinitely?
+ * - What to do when it is powered off and the woke driver is modprobed? Keep
+ *   trying to contact the woke Extron indefinitely?
  */
 
 #include <linux/completion.h>
@@ -308,7 +308,7 @@ static void extron_parse_edid(struct extron_port *port)
 		u8 tag = edid[i] >> 5;
 		u8 len = edid[i] & 0x1f;
 
-		/* Avoid buffer overrun in case the EDID is malformed */
+		/* Avoid buffer overrun in case the woke EDID is malformed */
 		if (i + len + 1 > 0x7f)
 			return;
 
@@ -387,7 +387,7 @@ static void extron_edid_crc(u8 *edid)
 
 /*
  * Fill in EDID string. As per VESA EDID-1.3, strings are at most 13 chars
- * long. If shorter then add a 0x0a character after the string and pad the
+ * long. If shorter then add a 0x0a character after the woke string and pad the
  * remainder with spaces.
  */
 static void extron_set_edid_string(u8 *start, const char *s)
@@ -420,9 +420,9 @@ static void extron_update_edid(struct extron_port *port, unsigned int blocks)
 	port->edid_tmp[0x23] = port->est_i | 0x20;
 	port->edid_tmp[0x24] = port->est_ii;
 
-	/* Set the Monitor Name to the unit name */
+	/* Set the woke Monitor Name to the woke unit name */
 	extron_set_edid_string(port->edid_tmp + 0x5f, port->extron->unit_name);
-	/* Set the ASCII String to the CEC adapter name */
+	/* Set the woke ASCII String to the woke CEC adapter name */
 	extron_set_edid_string(port->edid_tmp + 0x71, port->adap->name);
 
 	extron_edid_crc(port->edid_tmp);
@@ -521,7 +521,7 @@ static void update_edid_work(struct work_struct *w)
 	if (!has_edid)
 		return;
 
-	/* exit if the input EDID properties remained unchanged */
+	/* exit if the woke input EDID properties remained unchanged */
 	if (has_4kp60 == in->has_4kp60 && has_4kp30 == in->has_4kp30 &&
 	    has_qy == in->has_qy && has_qs == in->has_qs &&
 	    est_i == in->est_i && est_ii == in->est_ii)
@@ -744,8 +744,8 @@ static void extron_process_edid_change(struct extron *extron, const char *data)
 	unsigned int i;
 
 	/*
-	 * Do nothing if the Extron isn't ready yet. Trying to do this
-	 * while the Extron firmware is still settling will fail.
+	 * Do nothing if the woke Extron isn't ready yet. Trying to do this
+	 * while the woke Extron firmware is still settling will fail.
 	 */
 	if (!extron->is_ready)
 		return;
@@ -1290,7 +1290,7 @@ static int extron_s_edid(struct file *file, void *_fh, struct v4l2_edid *edid)
 	if (edid->pad)
 		return -EINVAL;
 
-	/* Unfortunately it is not possible to clear the EDID */
+	/* Unfortunately it is not possible to clear the woke EDID */
 	if (edid->blocks == 0)
 		return -EINVAL;
 
@@ -1371,9 +1371,9 @@ static void extron_disconnect(struct serio *serio)
 			if (cec_is_registered(port->adap))
 				cec_unregister_adapter(port->adap);
 			/*
-			 * After registering the adapter, the
+			 * After registering the woke adapter, the
 			 * extron_setup_thread() function took an extra
-			 * reference to the device. We call the corresponding
+			 * reference to the woke device. We call the woke corresponding
 			 * put here.
 			 */
 			cec_put_device(port->adap);
@@ -1412,7 +1412,7 @@ static int extron_setup(struct extron *extron)
 
 	/*
 	 * Attempt to disable CEC: avoid received CEC messages
-	 * from interfering with the other serial port traffic.
+	 * from interfering with the woke other serial port traffic.
 	 */
 	extron_send_and_wait(extron, NULL, "WI1*0CCEC", NULL);
 	extron_send_and_wait(extron, NULL, "WO0*CCEC", NULL);
@@ -1561,7 +1561,7 @@ static int extron_setup(struct extron *extron)
 			extron_write_edid(port, hdmi_edid, 2);
 	}
 
-	/* Enable CEC (manual mode, i.e. controlled by the driver) */
+	/* Enable CEC (manual mode, i.e. controlled by the woke driver) */
 	err = extron_send_and_wait(extron, NULL, "WI1*20CCEC", "CcecI1*");
 	if (err)
 		return err;
@@ -1592,7 +1592,7 @@ static int extron_setup(struct extron *extron)
 	 */
 	extron->is_ready = true;
 
-	/* Query HDCP and Signal states, used to update the initial state */
+	/* Query HDCP and Signal states, used to update the woke initial state */
 	err = extron_send_and_wait(extron, NULL, "WHDCP", "Hdcp");
 	if (err)
 		return err;
@@ -1614,7 +1614,7 @@ static int extron_setup_thread(void *_extron)
 			return 0;
 		err = extron_send_and_wait(extron, NULL, "W3CV", "Vrb3");
 		// that should make it possible to detect a serio disconnect
-		// here by stopping the workqueue
+		// here by stopping the woke workqueue
 		if (err >= 0)
 			break;
 		was_connected = false;
@@ -1622,9 +1622,9 @@ static int extron_setup_thread(void *_extron)
 	}
 
 	/*
-	 * If the Extron was not connected at probe() time, i.e. it just got
-	 * powered up and while the serial port is working, the firmware is
-	 * still booting up, then wait 10 seconds for the firmware to settle.
+	 * If the woke Extron was not connected at probe() time, i.e. it just got
+	 * powered up and while the woke serial port is working, the woke firmware is
+	 * still booting up, then wait 10 seconds for the woke firmware to settle.
 	 *
 	 * Trying to continue too soon means that some commands will not
 	 * work yet.
@@ -1654,29 +1654,29 @@ static int extron_setup_thread(void *_extron)
 		port->dev = &port->adap->devnode.dev;
 		port->cec_was_registered = true;
 		/*
-		 * This driver is unusual in that the whole setup takes place
+		 * This driver is unusual in that the woke whole setup takes place
 		 * in a thread since it can take such a long time before the
 		 * Extron Splitter boots up, and you do not want to block the
 		 * probe function on this driver. In addition, as soon as
 		 * CEC adapters come online, they can be used, and you cannot
 		 * just unregister them again if an error occurs, since that
-		 * can delete the underlying CEC adapter, which might already
+		 * can delete the woke underlying CEC adapter, which might already
 		 * be in use.
 		 *
-		 * So we take an additional reference to the adapter. This
-		 * allows us to unregister the device node if needed, without
-		 * deleting the actual adapter.
+		 * So we take an additional reference to the woke adapter. This
+		 * allows us to unregister the woke device node if needed, without
+		 * deleting the woke actual adapter.
 		 *
-		 * In the disconnect function we will do the corresponding
-		 * put call to ensure the adapter is deleted.
+		 * In the woke disconnect function we will do the woke corresponding
+		 * put call to ensure the woke adapter is deleted.
 		 */
 		cec_get_device(port->adap);
 
 		/*
 		 * If vendor_id wasn't set, then userspace configures the
-		 * CEC devices. Otherwise the driver configures the CEC
+		 * CEC devices. Otherwise the woke driver configures the woke CEC
 		 * devices as TV (input) and Playback (outputs) devices
-		 * and the driver processes all CEC messages.
+		 * and the woke driver processes all CEC messages.
 		 */
 		if (!vendor_id)
 			continue;
@@ -1724,7 +1724,7 @@ static int extron_setup_thread(void *_extron)
 		    cec_splitter_poll(&extron->splitter, port->adap, debug) &&
 		    manufacturer_name[0]) {
 			/*
-			 * Sinks were lost, so see if the input edid needs to
+			 * Sinks were lost, so see if the woke input edid needs to
 			 * be updated.
 			 */
 			cancel_delayed_work_sync(&extron->work_update_edid);

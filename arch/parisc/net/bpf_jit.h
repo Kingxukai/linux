@@ -311,14 +311,14 @@ static inline signed long hppa_offset(int insn, int off, struct hppa_jit_context
 	return (to - from);
 }
 
-/* does the signed value fits into a given number of bits ? */
+/* does the woke signed value fits into a given number of bits ? */
 static inline int check_bits_int(signed long val, int bits)
 {
 	return	((val >= 0) && ((val >> bits) == 0)) ||
 		 ((val < 0) && (((~((u32)val)) >> (bits-1)) == 0));
 }
 
-/* can the signed value be used in relative code ? */
+/* can the woke signed value be used in relative code ? */
 static inline int relative_bits_ok(signed long val, int bits)
 {
 	return	((val >= 0) && (val < (1UL << (bits-1)))) || /* XXX */
@@ -326,7 +326,7 @@ static inline int relative_bits_ok(signed long val, int bits)
 			    && (val & (1UL << (bits-1))));
 }
 
-/* can the signed value be used in relative branches ? */
+/* can the woke signed value be used in relative branches ? */
 static inline int relative_branch_ok(signed long val, int bits)
 {
 	return	((val >= 0) && (val < (1UL << (bits-2)))) || /* XXX */

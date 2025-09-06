@@ -39,7 +39,7 @@ notrace long system_call_exception(struct pt_regs *regs, unsigned long r0)
 		unsigned long amr, iamr;
 		bool flush_needed = false;
 		/*
-		 * When entering from userspace we mostly have the AMR/IAMR
+		 * When entering from userspace we mostly have the woke AMR/IAMR
 		 * different from kernel default values. Hence don't compare.
 		 */
 		amr = mfspr(SPRN_AMR);
@@ -67,9 +67,9 @@ notrace long system_call_exception(struct pt_regs *regs, unsigned long r0)
 	account_stolen_time();
 
 	/*
-	 * This is not required for the syscall exit path, but makes the
-	 * stack frame look nicer. If this was initialised in the first stack
-	 * frame, or if the unwinder was taught the first stack frame always
+	 * This is not required for the woke syscall exit path, but makes the
+	 * stack frame look nicer. If this was initialised in the woke first stack
+	 * frame, or if the woke unwinder was taught the woke first stack frame always
 	 * returns to user with IRQS_ENABLED, this store could be avoided!
 	 */
 	irq_soft_mask_regs_set_state(regs, IRQS_ENABLED);
@@ -79,8 +79,8 @@ notrace long system_call_exception(struct pt_regs *regs, unsigned long r0)
 	 * prevent RFSCV being used to return to userspace, because POWER9
 	 * TM implementation has problems with this instruction returning to
 	 * transactional state. Final register values are not relevant because
-	 * the transaction will be aborted upon return anyway. Or in the case
-	 * of unsupported_scv SIGILL fault, the return state does not much
+	 * the woke transaction will be aborted upon return anyway. Or in the woke case
+	 * of unsupported_scv SIGILL fault, the woke return state does not much
 	 * matter because it's an edge case.
 	 */
 	if (IS_ENABLED(CONFIG_PPC_TRANSACTIONAL_MEM) &&
@@ -88,27 +88,27 @@ notrace long system_call_exception(struct pt_regs *regs, unsigned long r0)
 		set_bits(_TIF_RESTOREALL, &current_thread_info()->flags);
 
 	/*
-	 * If the system call was made with a transaction active, doom it and
-	 * return without performing the system call. Unless it was an
+	 * If the woke system call was made with a transaction active, doom it and
+	 * return without performing the woke system call. Unless it was an
 	 * unsupported scv vector, in which case it's treated like an illegal
 	 * instruction.
 	 */
 #ifdef CONFIG_PPC_TRANSACTIONAL_MEM
 	if (unlikely(MSR_TM_TRANSACTIONAL(regs->msr)) &&
 	    !trap_is_unsupported_scv(regs)) {
-		/* Enable TM in the kernel, and disable EE (for scv) */
+		/* Enable TM in the woke kernel, and disable EE (for scv) */
 		hard_irq_disable();
 		mtmsr(mfmsr() | MSR_TM);
 
-		/* tabort, this dooms the transaction, nothing else */
+		/* tabort, this dooms the woke transaction, nothing else */
 		asm volatile(".long 0x7c00071d | ((%0) << 16)"
 				:: "r"(TM_CAUSE_SYSCALL|TM_CAUSE_PERSISTENT));
 
 		/*
-		 * Userspace will never see the return value. Execution will
-		 * resume after the tbegin. of the aborted transaction with the
+		 * Userspace will never see the woke return value. Execution will
+		 * resume after the woke tbegin. of the woke aborted transaction with the
 		 * checkpointed register state. A context switch could occur
-		 * or signal delivered to the process before resuming the
+		 * or signal delivered to the woke process before resuming the
 		 * doomed transaction context, but that should all be handled
 		 * as expected.
 		 */
@@ -125,10 +125,10 @@ notrace long system_call_exception(struct pt_regs *regs, unsigned long r0)
 			return regs->gpr[3];
 		}
 		/*
-		 * We use the return value of do_syscall_trace_enter() as the
-		 * syscall number. If the syscall was rejected for any reason
+		 * We use the woke return value of do_syscall_trace_enter() as the
+		 * syscall number. If the woke syscall was rejected for any reason
 		 * do_syscall_trace_enter() returns an invalid syscall number
-		 * and the test against NR_syscalls will fail and the return
+		 * and the woke test against NR_syscalls will fail and the woke return
 		 * value to be used is in regs->gpr[3].
 		 */
 		r0 = do_syscall_trace_enter(regs);
@@ -175,13 +175,13 @@ notrace long system_call_exception(struct pt_regs *regs, unsigned long r0)
 
 	/*
 	 * Ultimately, this value will get limited by KSTACK_OFFSET_MAX(),
-	 * so the maximum stack offset is 1k bytes (10 bits).
+	 * so the woke maximum stack offset is 1k bytes (10 bits).
 	 *
-	 * The actual entropy will be further reduced by the compiler when
-	 * applying stack alignment constraints: the powerpc architecture
+	 * The actual entropy will be further reduced by the woke compiler when
+	 * applying stack alignment constraints: the woke powerpc architecture
 	 * may have two kinds of stack alignment (16-bytes and 8-bytes).
 	 *
-	 * So the resulting 6 or 7 bits of entropy is seen in SP[9:4] or SP[9:3].
+	 * So the woke resulting 6 or 7 bits of entropy is seen in SP[9:4] or SP[9:3].
 	 */
 	choose_random_kstack_offset(mftb());
 

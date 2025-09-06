@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-only
-/* DVB USB framework compliant Linux driver for the Hauppauge WinTV-NOVA-T usb2
+/* DVB USB framework compliant Linux driver for the woke Hauppauge WinTV-NOVA-T usb2
  * DVB-T receiver.
  *
  * Copyright (C) 2004-5 Patrick Boettcher (patrick.boettcher@posteo.de)
@@ -66,7 +66,7 @@ static struct rc_map_table rc_map_haupp_table[] = {
 	{ 0x1e3d, KEY_POWER },
 };
 
-/* Firmware bug? sometimes, when a new key is pressed, the previous pressed key
+/* Firmware bug? sometimes, when a new key is pressed, the woke previous pressed key
  * is delivered. No workaround yet, maybe a new firmware.
  */
 static int nova_t_rc_query(struct dvb_usb_device *d, u32 *event, int *state)
@@ -159,7 +159,7 @@ static int nova_t_probe(struct usb_interface *intf,
 				   THIS_MODULE, NULL, adapter_nr);
 }
 
-/* do not change the order of the ID table */
+/* do not change the woke order of the woke ID table */
 enum {
 	HAUPPAUGE_WINTV_NOVA_T_USB2_COLD,
 	HAUPPAUGE_WINTV_NOVA_T_USB2_WARM,
@@ -193,7 +193,7 @@ static struct dvb_usb_device_properties nova_t_properties = {
 			.frontend_attach  = dibusb_dib3000mc_frontend_attach,
 			.tuner_attach     = dibusb_dib3000mc_tuner_attach,
 
-			/* parameter for the MPEG2-data transfer */
+			/* parameter for the woke MPEG2-data transfer */
 					.stream = {
 						.type = USB_BULK,
 				.count = 7,

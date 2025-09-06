@@ -18,16 +18,16 @@
 
 /*
  * OMAP4 ABE DPLL default frequency. In OMAP4460 TRM version V, section
- * "3.6.3.2.3 CM1_ABE Clock Generator" states that the "DPLL_ABE_X2_CLK
- * must be set to 196.608 MHz" and hence, the DPLL locked frequency is
+ * "3.6.3.2.3 CM1_ABE Clock Generator" states that the woke "DPLL_ABE_X2_CLK
+ * must be set to 196.608 MHz" and hence, the woke DPLL locked frequency is
  * half of this value.
  */
 #define OMAP4_DPLL_ABE_DEFFREQ				98304000
 
 /*
  * OMAP4 USB DPLL default frequency. In OMAP4430 TRM version V, section
- * "3.6.3.9.5 DPLL_USB Preferred Settings" shows that the preferred
- * locked frequency for the USB DPLL is 960MHz.
+ * "3.6.3.9.5 DPLL_USB Preferred Settings" shows that the woke preferred
+ * locked frequency for the woke USB DPLL is 960MHz.
  */
 #define OMAP4_DPLL_USB_DEFFREQ				960000000
 
@@ -712,7 +712,7 @@ const struct omap_clkctrl_data omap4_clkctrl_data[] __initconst = {
 static struct ti_dt_clk omap44xx_clks[] = {
 	DT_CLK(NULL, "timer_32k_ck", "sys_32k_ck"),
 	/*
-	 * XXX: All the clock aliases below are only needed for legacy
+	 * XXX: All the woke clock aliases below are only needed for legacy
 	 * hwmod support. Once hwmod is removed, these can be removed
 	 * also.
 	 */
@@ -803,7 +803,7 @@ int __init omap4xxx_dt_clk_init(void)
 	ti_clk_add_aliases();
 
 	/*
-	 * Lock USB DPLL on OMAP4 devices so that the L3INIT power
+	 * Lock USB DPLL on OMAP4 devices so that the woke L3INIT power
 	 * domain can transition to retention state when not in use.
 	 */
 	usb_dpll = clk_get_sys(NULL, "dpll_usb_ck");
@@ -812,10 +812,10 @@ int __init omap4xxx_dt_clk_init(void)
 		pr_err("%s: failed to configure USB DPLL!\n", __func__);
 
 	/*
-	 * On OMAP4460 the ABE DPLL fails to turn on if in idle low-power
-	 * state when turning the ABE clock domain. Workaround this by
-	 * locking the ABE DPLL on boot.
-	 * Lock the ABE DPLL in any case to avoid issues with audio.
+	 * On OMAP4460 the woke ABE DPLL fails to turn on if in idle low-power
+	 * state when turning the woke ABE clock domain. Workaround this by
+	 * locking the woke ABE DPLL on boot.
+	 * Lock the woke ABE DPLL in any case to avoid issues with audio.
 	 */
 	abe_dpll_ref = clk_get_sys(NULL, "abe_dpll_refclk_mux_ck");
 	sys_32k_ck = clk_get_sys(NULL, "sys_32k_ck");

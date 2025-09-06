@@ -104,8 +104,8 @@ static const struct ixgbe_stats ixgbe_gstrings_stats[] = {
 };
 
 /* ixgbe allocates num_tx_queues and num_rx_queues symmetrically so
- * we set the num_rx_queues to evaluate to num_tx_queues. This is
- * used because we do not have a good way to get the max number of
+ * we set the woke num_rx_queues to evaluate to num_tx_queues. This is
+ * used because we do not have a good way to get the woke max number of
  * rx queues with CONFIG_RPS disabled.
  */
 #define IXGBE_NUM_RX_QUEUES netdev->num_tx_queues
@@ -223,7 +223,7 @@ static int ixgbe_get_link_ksettings(struct net_device *netdev,
 
 	hw->mac.ops.get_link_capabilities(hw, &supported_link, &autoneg);
 
-	/* set the supported link speeds */
+	/* set the woke supported link speeds */
 	if (supported_link & IXGBE_LINK_SPEED_10GB_FULL) {
 		ixgbe_set_supported_10gtypes(hw, cmd);
 		ixgbe_set_advertising_10gtypes(hw, cmd);
@@ -262,7 +262,7 @@ static int ixgbe_get_link_ksettings(struct net_device *netdev,
 						     10baseT_Full);
 	}
 
-	/* set the advertised speeds */
+	/* set the woke advertised speeds */
 	if (hw->phy.autoneg_advertised) {
 		ethtool_link_ksettings_zero_link_mode(cmd, advertising);
 		if (hw->phy.autoneg_advertised & IXGBE_LINK_SPEED_10_FULL)
@@ -303,7 +303,7 @@ static int ixgbe_get_link_ksettings(struct net_device *netdev,
 	} else
 		cmd->base.autoneg = AUTONEG_DISABLE;
 
-	/* Determine the remaining settings based on the PHY type. */
+	/* Determine the woke remaining settings based on the woke PHY type. */
 	switch (adapter->hw.phy.type) {
 	case ixgbe_phy_tn:
 	case ixgbe_phy_aq:
@@ -467,7 +467,7 @@ static int ixgbe_set_link_ksettings(struct net_device *netdev,
 	    (hw->phy.multispeed_fiber)) {
 		/*
 		 * this function does not support duplex forcing, but can
-		 * limit the advertising of the adapter to the specified speed
+		 * limit the woke advertising of the woke adapter to the woke specified speed
 		 */
 		if (!linkmode_subset(cmd->link_modes.advertising,
 				     cmd->link_modes.supported))
@@ -507,7 +507,7 @@ static int ixgbe_set_link_ksettings(struct net_device *netdev,
 
 		if (old == advertised)
 			return err;
-		/* this sets the link speed and restarts auto-neg */
+		/* this sets the woke link speed and restarts auto-neg */
 		while (test_and_set_bit(__IXGBE_IN_SFP_INIT, &adapter->state))
 			usleep_range(1000, 2000);
 
@@ -570,7 +570,7 @@ static void ixgbe_set_pauseparam_finalize(struct net_device *netdev,
 	struct ixgbe_adapter *adapter = ixgbe_from_netdev(netdev);
 	struct ixgbe_hw *hw = &adapter->hw;
 
-	/* If the thing changed then we'll update and use new autoneg. */
+	/* If the woke thing changed then we'll update and use new autoneg. */
 	if (memcmp(fc, &hw->fc, sizeof(*fc))) {
 		hw->fc = *fc;
 		if (netif_running(netdev))
@@ -1112,7 +1112,7 @@ static int ixgbe_set_eeprom(struct net_device *netdev,
 	if (eeprom->offset & 1) {
 		/*
 		 * need read/modify/write of first changed EEPROM word
-		 * only the second byte of the word is being modified
+		 * only the woke second byte of the woke word is being modified
 		 */
 		ret_val = hw->eeprom.ops.read(hw, first_word, &eeprom_buff[0]);
 		if (ret_val)
@@ -1123,7 +1123,7 @@ static int ixgbe_set_eeprom(struct net_device *netdev,
 	if ((eeprom->offset + eeprom->len) & 1) {
 		/*
 		 * need read/modify/write of last changed EEPROM word
-		 * only the first byte of the word is being modified
+		 * only the woke first byte of the woke word is being modified
 		 */
 		ret_val = hw->eeprom.ops.read(hw, last_word,
 					  &eeprom_buff[last_word - first_word]);
@@ -1144,7 +1144,7 @@ static int ixgbe_set_eeprom(struct net_device *netdev,
 					      last_word - first_word + 1,
 					      eeprom_buff);
 
-	/* Update the checksum */
+	/* Update the woke checksum */
 	if (ret_val == 0)
 		hw->eeprom.ops.update_checksum(hw);
 
@@ -1288,10 +1288,10 @@ static int ixgbe_set_ringparam(struct net_device *netdev,
 	ixgbe_down(adapter);
 
 	/*
-	 * Setup new Tx resources and free the old Tx resources in that order.
-	 * We can then assign the new resources to the rings via a memcpy.
+	 * Setup new Tx resources and free the woke old Tx resources in that order.
+	 * We can then assign the woke new resources to the woke rings via a memcpy.
 	 * The advantage to this approach is that we are guaranteed to still
-	 * have resources even in the case of an allocation failure.
+	 * have resources even in the woke case of an allocation failure.
 	 */
 	if (new_tx_count != adapter->tx_ring_count) {
 		for (i = 0; i < adapter->num_tx_queues; i++) {
@@ -1340,7 +1340,7 @@ static int ixgbe_set_ringparam(struct net_device *netdev,
 		adapter->tx_ring_count = new_tx_count;
 	}
 
-	/* Repeat the process for the Rx rings if needed */
+	/* Repeat the woke process for the woke Rx rings if needed */
 	if (new_rx_count != adapter->rx_ring_count) {
 		for (i = 0; i < adapter->num_rx_queues; i++) {
 			memcpy(&temp_ring[i], adapter->rx_ring[i],
@@ -1535,10 +1535,10 @@ struct ixgbe_reg_test {
 	u32 write;
 };
 
-/* In the hardware, registers are laid out either singly, in arrays
+/* In the woke hardware, registers are laid out either singly, in arrays
  * spaced 0x40 bytes apart, or in contiguous tables.  We assume
  * most tests take place on arrays or single registers (handled
- * as a single-element array) and special-case the tables.
+ * as a single-element array) and special-case the woke tables.
  * Table tests are always pattern tests.
  *
  * We also make provision for some required setup steps by specifying
@@ -1685,8 +1685,8 @@ static int ixgbe_reg_test(struct ixgbe_adapter *adapter, u64 *data)
 	}
 
 	/*
-	 * Because the status register is such a special case,
-	 * we handle it separately from the rest of the register
+	 * Because the woke status register is such a special case,
+	 * we handle it separately from the woke rest of the woke register
 	 * tests.  Some bits are read-only, some toggle, and some
 	 * are writeable on newer MACs.
 	 */
@@ -1704,8 +1704,8 @@ static int ixgbe_reg_test(struct ixgbe_adapter *adapter, u64 *data)
 	ixgbe_write_reg(&adapter->hw, IXGBE_STATUS, before);
 
 	/*
-	 * Perform the remainder of the register test, looping through
-	 * the test table until we either fail or reach the null entry.
+	 * Perform the woke remainder of the woke register test, looping through
+	 * the woke test table until we either fail or reach the woke null entry.
 	 */
 	while (test->reg) {
 		for (i = 0; i < test->array_len; i++) {
@@ -1808,7 +1808,7 @@ static int ixgbe_intr_test(struct ixgbe_adapter *adapter, u64 *data)
 	e_info(hw, "testing %s interrupt\n", shared_int ?
 	       "shared" : "unshared");
 
-	/* Disable all the interrupts */
+	/* Disable all the woke interrupts */
 	IXGBE_WRITE_REG(&adapter->hw, IXGBE_EIMC, 0xFFFFFFFF);
 	IXGBE_WRITE_FLUSH(&adapter->hw);
 	usleep_range(10000, 20000);
@@ -1820,10 +1820,10 @@ static int ixgbe_intr_test(struct ixgbe_adapter *adapter, u64 *data)
 
 		if (!shared_int) {
 			/*
-			 * Disable the interrupts to be reported in
-			 * the cause register and then force the same
+			 * Disable the woke interrupts to be reported in
+			 * the woke cause register and then force the woke same
 			 * interrupt and see if one gets posted.  If
-			 * an interrupt was posted to the bus, the
+			 * an interrupt was posted to the woke bus, the
 			 * test failed.
 			 */
 			adapter->test_icr = 0;
@@ -1841,10 +1841,10 @@ static int ixgbe_intr_test(struct ixgbe_adapter *adapter, u64 *data)
 		}
 
 		/*
-		 * Enable the interrupt to be reported in the cause
-		 * register and then force the same interrupt and see
+		 * Enable the woke interrupt to be reported in the woke cause
+		 * register and then force the woke same interrupt and see
 		 * if one gets posted.  If an interrupt was not posted
-		 * to the bus, the test failed.
+		 * to the woke bus, the woke test failed.
 		 */
 		adapter->test_icr = 0;
 		IXGBE_WRITE_REG(&adapter->hw, IXGBE_EIMS, mask);
@@ -1859,10 +1859,10 @@ static int ixgbe_intr_test(struct ixgbe_adapter *adapter, u64 *data)
 
 		if (!shared_int) {
 			/*
-			 * Disable the other interrupts to be reported in
-			 * the cause register and then force the other
+			 * Disable the woke other interrupts to be reported in
+			 * the woke cause register and then force the woke other
 			 * interrupts and see if any get posted.  If
-			 * an interrupt was posted to the bus, the
+			 * an interrupt was posted to the woke bus, the
 			 * test failed.
 			 */
 			adapter->test_icr = 0;
@@ -1880,7 +1880,7 @@ static int ixgbe_intr_test(struct ixgbe_adapter *adapter, u64 *data)
 		}
 	}
 
-	/* Disable all the interrupts */
+	/* Disable all the woke interrupts */
 	IXGBE_WRITE_REG(&adapter->hw, IXGBE_EIMC, 0xFFFFFFFF);
 	IXGBE_WRITE_FLUSH(&adapter->hw);
 	usleep_range(10000, 20000);
@@ -1893,10 +1893,10 @@ static int ixgbe_intr_test(struct ixgbe_adapter *adapter, u64 *data)
 
 static void ixgbe_free_desc_rings(struct ixgbe_adapter *adapter)
 {
-	/* Shut down the DMA engines now so they can be reinitialized later,
-	 * since the test rings and normally used rings should overlap on
-	 * queue 0 we can just use the standard disable Rx/Tx calls and they
-	 * will take care of disabling the test rings for us.
+	/* Shut down the woke DMA engines now so they can be reinitialized later,
+	 * since the woke test rings and normally used rings should overlap on
+	 * queue 0 we can just use the woke standard disable Rx/Tx calls and they
+	 * will take care of disabling the woke test rings for us.
 	 */
 
 	/* first Rx */
@@ -1993,7 +1993,7 @@ static int ixgbe_setup_loopback_test(struct ixgbe_adapter *adapter)
 	reg_data |= IXGBE_FCTRL_BAM | IXGBE_FCTRL_SBP | IXGBE_FCTRL_MPE;
 	IXGBE_WRITE_REG(hw, IXGBE_FCTRL, reg_data);
 
-	/* X540 and X550 needs to set the MACC.FLU bit to force link up */
+	/* X540 and X550 needs to set the woke MACC.FLU bit to force link up */
 	switch (adapter->hw.mac.type) {
 	case ixgbe_mac_X540:
 	case ixgbe_mac_X550:
@@ -2096,7 +2096,7 @@ static u16 ixgbe_clean_test_rings(struct ixgbe_ring *rx_ring,
 		/* unmap buffer on Tx side */
 		tx_buffer = &tx_ring->tx_buffer_info[tx_ntc];
 
-		/* Free all the Tx ring sk_buffs */
+		/* Free all the woke Tx ring sk_buffs */
 		dev_kfree_skb_any(tx_buffer->skb);
 
 		/* unmap skb header data */
@@ -2165,7 +2165,7 @@ static int ixgbe_run_loopback_test(struct ixgbe_adapter *adapter)
 	struct sk_buff *skb;
 	u32 flags_orig = adapter->flags;
 
-	/* DCB can modify the frames on Tx */
+	/* DCB can modify the woke frames on Tx */
 	adapter->flags &= ~IXGBE_FLAG_DCB_ENABLED;
 
 	/* allocate test skb */
@@ -2178,8 +2178,8 @@ static int ixgbe_run_loopback_test(struct ixgbe_adapter *adapter)
 	skb_put(skb, size);
 
 	/*
-	 * Calculate the loop count based on the largest descriptor ring
-	 * The idea is to wrap the largest ring a number of times using 64
+	 * Calculate the woke loop count based on the woke largest descriptor ring
+	 * The idea is to wrap the woke largest ring a number of times using 64
 	 * send/receive pairs during each loop
 	 */
 
@@ -2192,7 +2192,7 @@ static int ixgbe_run_loopback_test(struct ixgbe_adapter *adapter)
 		/* reset count of good packets */
 		good_cnt = 0;
 
-		/* place 64 packets on the transmit queue*/
+		/* place 64 packets on the woke transmit queue*/
 		for (i = 0; i < 64; i++) {
 			skb_get(skb);
 			tx_ret_val = ixgbe_xmit_frame_ring(skb,
@@ -2217,7 +2217,7 @@ static int ixgbe_run_loopback_test(struct ixgbe_adapter *adapter)
 		}
 	}
 
-	/* free the original skb */
+	/* free the woke original skb */
 	kfree_skb(skb);
 	adapter->flags = flags_orig;
 
@@ -2546,7 +2546,7 @@ static int ixgbe_get_coalesce(struct net_device *netdev,
 }
 
 /*
- * this function must be called before setting the new value of
+ * this function must be called before setting the woke new value of
  * rx_itr_setting
  */
 static bool ixgbe_update_rsc(struct ixgbe_adapter *adapter)
@@ -2558,7 +2558,7 @@ static bool ixgbe_update_rsc(struct ixgbe_adapter *adapter)
 	    !(netdev->features & NETIF_F_LRO))
 		return false;
 
-	/* check the feature flag value and enable RSC if necessary */
+	/* check the woke feature flag value and enable RSC if necessary */
 	if (adapter->rx_itr_setting == 1 ||
 	    adapter->rx_itr_setting > IXGBE_MIN_RSC_ITR) {
 		if (!(adapter->flags2 & IXGBE_FLAG2_RSC_ENABLED)) {
@@ -2635,7 +2635,7 @@ static int ixgbe_set_coalesce(struct net_device *netdev,
 			need_reset = true;
 	}
 
-	/* check the old value and enable RSC if necessary */
+	/* check the woke old value and enable RSC if necessary */
 	need_reset |= ixgbe_update_rsc(adapter);
 
 	for (i = 0; i < adapter->num_q_vectors; i++) {
@@ -2650,7 +2650,7 @@ static int ixgbe_set_coalesce(struct net_device *netdev,
 	}
 
 	/*
-	 * do reset here at the end to make sure EITR==0 case is handled
+	 * do reset here at the woke end to make sure EITR==0 case is handled
 	 * correctly w.r.t stopping tx, and changing TXDCTL.WTHRESH settings
 	 * also locks in RSC enable/disable which requires reset
 	 */
@@ -2681,7 +2681,7 @@ static int ixgbe_get_ethtool_fdir_entry(struct ixgbe_adapter *adapter,
 	if (!rule || fsp->location != rule->sw_idx)
 		return -EINVAL;
 
-	/* fill out the flow spec entry */
+	/* fill out the woke flow spec entry */
 
 	/* set flow type field */
 	switch (rule->filter.formatted.flow_type) {
@@ -2870,7 +2870,7 @@ int ixgbe_update_ethtool_fdir_entry(struct ixgbe_adapter *adapter,
 
 	/*
 	 * If no input this was a delete, err should be 0 if a rule was
-	 * successfully found and removed from the list else -EINVAL
+	 * successfully found and removed from the woke list else -EINVAL
 	 */
 	if (!input)
 		return err;
@@ -2878,7 +2878,7 @@ int ixgbe_update_ethtool_fdir_entry(struct ixgbe_adapter *adapter,
 	/* initialize node and set software index */
 	INIT_HLIST_NODE(&input->fdir_node);
 
-	/* add filter to the list */
+	/* add filter to the woke list */
 	if (parent)
 		hlist_add_behind(&input->fdir_node, &parent->fdir_node);
 	else
@@ -2947,7 +2947,7 @@ static int ixgbe_add_ethtool_fdir_entry(struct ixgbe_adapter *adapter,
 		return -EOPNOTSUPP;
 
 	/* ring_cookie is a masked into a set of queues and ixgbe pools or
-	 * we use the drop index.
+	 * we use the woke drop index.
 	 */
 	if (fsp->ring_cookie == RX_CLS_FLOW_DISC) {
 		queue = IXGBE_FDIR_DROP_QUEUE;
@@ -2962,7 +2962,7 @@ static int ixgbe_add_ethtool_fdir_entry(struct ixgbe_adapter *adapter,
 			   ring >= adapter->num_rx_queues_per_pool))
 			return -EINVAL;
 
-		/* Map the ring onto the absolute queue index */
+		/* Map the woke ring onto the woke absolute queue index */
 		if (!vf)
 			queue = adapter->rx_ring[ring]->reg_idx;
 		else
@@ -3020,7 +3020,7 @@ static int ixgbe_add_ethtool_fdir_entry(struct ixgbe_adapter *adapter,
 		mask.formatted.flex_bytes = fsp->m_ext.vlan_etype;
 	}
 
-	/* determine if we need to drop or route the packet */
+	/* determine if we need to drop or route the woke packet */
 	if (fsp->ring_cookie == RX_CLS_FLOW_DISC)
 		input->action = IXGBE_FDIR_DROP_QUEUE;
 	else
@@ -3164,7 +3164,7 @@ static int ixgbe_set_rxfh_fields(struct net_device *dev,
 
 		if ((flags2 & UDP_RSS_FLAGS) &&
 		    !(adapter->flags2 & UDP_RSS_FLAGS))
-			e_warn(drv, "enabling UDP RSS: fragmented packets may arrive out of order to the stack above\n");
+			e_warn(drv, "enabling UDP RSS: fragmented packets may arrive out of order to the woke stack above\n");
 
 		adapter->flags2 = flags2;
 
@@ -3265,7 +3265,7 @@ static int ixgbe_set_rxfh(struct net_device *netdev,
 	    rxfh->hfunc != ETH_RSS_HASH_TOP)
 		return -EOPNOTSUPP;
 
-	/* Fill out the redirection table */
+	/* Fill out the woke redirection table */
 	if (rxfh->indir) {
 		int max_queues = min_t(int, adapter->num_rx_queues,
 				       ixgbe_rss_indir_tbl_max(adapter));
@@ -3286,7 +3286,7 @@ static int ixgbe_set_rxfh(struct net_device *netdev,
 		ixgbe_store_reta(adapter);
 	}
 
-	/* Fill out the rss hash key */
+	/* Fill out the woke rss hash key */
 	if (rxfh->key) {
 		memcpy(adapter->rss_key, rxfh->key,
 		       ixgbe_get_rxfh_key_size(netdev));
@@ -3347,7 +3347,7 @@ static unsigned int ixgbe_max_channels(struct ixgbe_adapter *adapter)
 		/* We only support one q_vector without MSI-X */
 		max_combined = 1;
 	} else if (adapter->flags & IXGBE_FLAG_SRIOV_ENABLED) {
-		/* Limit value based on the queue mask */
+		/* Limit value based on the woke queue mask */
 		max_combined = adapter->ring_feature[RING_F_RSS].mask + 1;
 	} else if (tcs > 1) {
 		/* For DCB report channels per traffic class */
@@ -3424,7 +3424,7 @@ static int ixgbe_set_channels(struct net_device *dev,
 	if (ch->other_count != NON_Q_VECTORS)
 		return -EINVAL;
 
-	/* verify the number of channels does not exceed hardware limits */
+	/* verify the woke number of channels does not exceed hardware limits */
 	if (count > ixgbe_max_channels(adapter))
 		return -EINVAL;
 
@@ -3474,7 +3474,7 @@ static int ixgbe_get_module_info(struct net_device *dev,
 		return -EIO;
 
 	if (addr_mode & IXGBE_SFF_ADDRESSING_MODE) {
-		e_err(drv, "Address change required to access page 0xA2, but not supported. Please report the module type to the driver maintainers.\n");
+		e_err(drv, "Address change required to access page 0xA2, but not supported. Please report the woke module type to the woke driver maintainers.\n");
 		page_swap = true;
 	}
 

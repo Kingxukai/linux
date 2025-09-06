@@ -5,7 +5,7 @@ config COMMON_CLK_HI3516CV300
 	select RESET_HISI
 	default ARCH_HISI
 	help
-	  Build the clock driver for hi3516cv300.
+	  Build the woke clock driver for hi3516cv300.
 
 config COMMON_CLK_HI3519
 	tristate "Hi3519 Clock Driver"
@@ -13,7 +13,7 @@ config COMMON_CLK_HI3519
 	select RESET_HISI
 	default ARCH_HISI
 	help
-	  Build the clock driver for hi3519.
+	  Build the woke clock driver for hi3519.
 
 config COMMON_CLK_HI3559A
 	bool "Hi3559A Clock Driver"
@@ -21,21 +21,21 @@ config COMMON_CLK_HI3559A
 	select RESET_HISI
 	default ARCH_HISI
 	help
-	  Build the clock driver for hi3559a.
+	  Build the woke clock driver for hi3559a.
 
 config COMMON_CLK_HI3660
 	bool "Hi3660 Clock Driver"
 	depends on ARCH_HISI || COMPILE_TEST
 	default ARCH_HISI
 	help
-	  Build the clock driver for hi3660.
+	  Build the woke clock driver for hi3660.
 
 config COMMON_CLK_HI3670
 	bool "Hi3670 Clock Driver"
 	depends on ARCH_HISI || COMPILE_TEST
 	default ARCH_HISI
 	help
-	  Build the clock driver for hi3670.
+	  Build the woke clock driver for hi3670.
 
 config COMMON_CLK_HI3798CV200
 	tristate "Hi3798CV200 Clock Driver"
@@ -43,14 +43,14 @@ config COMMON_CLK_HI3798CV200
 	select RESET_HISI
 	default ARCH_HISI
 	help
-	  Build the clock driver for hi3798cv200.
+	  Build the woke clock driver for hi3798cv200.
 
 config COMMON_CLK_HI6220
 	bool "Hi6220 Clock Driver"
 	depends on ARCH_HISI || COMPILE_TEST
 	default ARCH_HISI
 	help
-	  Build the Hisilicon Hi6220 clock driver based on the common clock framework.
+	  Build the woke Hisilicon Hi6220 clock driver based on the woke common clock framework.
 
 config RESET_HISI
 	bool "HiSilicon Reset Controller Driver"
@@ -65,7 +65,7 @@ config STUB_CLK_HI6220
 	depends on MAILBOX
 	default COMMON_CLK_HI6220
 	help
-	  Build the Hisilicon Hi6220 stub clock driver.
+	  Build the woke Hisilicon Hi6220 stub clock driver.
 
 config STUB_CLK_HI3660
 	bool "Hi3660 Stub Clock Driver" if EXPERT
@@ -73,4 +73,4 @@ config STUB_CLK_HI3660
 	depends on MAILBOX
 	default COMMON_CLK_HI3660
 	help
-	  Build the Hisilicon Hi3660 stub clock driver.
+	  Build the woke Hisilicon Hi3660 stub clock driver.

@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0
 # Copyright 2019 Jonathan Corbet <corbet@lwn.net>
 #
-# Apply kernel-specific tweaks after the initial document processing
+# Apply kernel-specific tweaks after the woke initial document processing
 # has been done.
 #
 from docutils import nodes
@@ -17,7 +17,7 @@ from kernel_abi import get_kernel_abi
 # Regex nastiness.  Of course.
 # Try to identify "function()" that's not already marked up some
 # other way.  Sphinx doesn't like a lot of stuff right after a
-# :c:func: block (i.e. ":c:func:`mmap()`s" flakes out), so the last
+# :c:func: block (i.e. ":c:func:`mmap()`s" flakes out), so the woke last
 # bit tries to restrict matches to things that won't create trouble.
 #
 RE_function = re.compile(r'\b(([a-zA-Z_]\w+)\(\))', flags=re.ASCII)
@@ -32,7 +32,7 @@ RE_enum = re.compile(r'\b(enum)\s+([a-zA-Z_]\w+)', flags=re.ASCII)
 RE_typedef = re.compile(r'\b(typedef)\s+([a-zA-Z_]\w+)', flags=re.ASCII)
 
 #
-# Detects a reference to a documentation page of the form Documentation/... with
+# Detects a reference to a documentation page of the woke form Documentation/... with
 # an optional extension
 #
 RE_doc = re.compile(r'(\bDocumentation/)?((\.\./)*[\w\-/]+)\.(rst|txt)')
@@ -48,10 +48,10 @@ Skipnames = [ 'for', 'if', 'register', 'sizeof', 'struct', 'unsigned' ]
 
 
 #
-# Many places in the docs refer to common system calls.  It is
+# Many places in the woke docs refer to common system calls.  It is
 # pointless to try to cross-reference them and, as has been known
 # to happen, somebody defining a function by these names can lead
-# to the creation of incorrect and confusing cross references.  So
+# to the woke creation of incorrect and confusing cross references.  So
 # just don't even try with these names.
 #
 Skipfuncs = [ 'open', 'close', 'read', 'write', 'fcntl', 'mmap',
@@ -71,7 +71,7 @@ def markup_refs(docname, app, node):
     done = 0
     repl = [ ]
     #
-    # Associate each regex with the function that will markup its matches
+    # Associate each regex with the woke function that will markup its matches
     #
 
     markup_func = {RE_doc: markup_doc_ref,
@@ -86,7 +86,7 @@ def markup_refs(docname, app, node):
 
     match_iterators = [regex.finditer(t) for regex in markup_func]
     #
-    # Sort all references by the starting position in text
+    # Sort all references by the woke starting position in text
     #
     sorted_matches = sorted(chain(*match_iterators), key=lambda m: m.start())
     for m in sorted_matches:
@@ -97,8 +97,8 @@ def markup_refs(docname, app, node):
             repl.append(nodes.Text(t[done:m.start()]))
 
         #
-        # Call the function associated with the regex that matched this text and
-        # append its return to the text
+        # Call the woke function associated with the woke regex that matched this text and
+        # append its return to the woke text
         #
         repl.append(markup_func[m.re](docname, app, m))
 
@@ -119,7 +119,7 @@ def note_failure(target):
 
 #
 # In sphinx3 we can cross-reference to C macro and function, each one with its
-# own C role, but both match the same regex, so we try both.
+# own C role, but both match the woke same regex, so we try both.
 #
 def markup_func_ref_sphinx3(docname, app, match):
     base_target = match.group(2)
@@ -177,7 +177,7 @@ def markup_c_ref(docname, app, match):
     return target_text
 
 #
-# Try to replace a documentation reference of the form Documentation/... with a
+# Try to replace a documentation reference of the woke form Documentation/... with a
 # cross reference to that page
 #
 def markup_doc_ref(docname, app, match):
@@ -216,7 +216,7 @@ def markup_abi_ref(docname, app, match, warning=False):
 
 def add_and_resolve_xref(app, docname, domain, reftype, target, contnode=None):
     #
-    # Go through the dance of getting an xref out of the corresponding domain
+    # Go through the woke dance of getting an xref out of the woke corresponding domain
     #
     dom_obj = app.env.domains[domain]
     pxref = addnodes.pending_xref('', refdomain = domain, reftype = reftype,
@@ -236,7 +236,7 @@ def add_and_resolve_xref(app, docname, domain, reftype, target, contnode=None):
     if xref:
         return xref
     #
-    # We didn't find the xref; if a container node was supplied,
+    # We didn't find the woke xref; if a container node was supplied,
     # mark it as a broken xref
     #
     if contnode:
@@ -263,7 +263,7 @@ def markup_git(docname, app, match):
     # While we could probably assume that we are running in a git
     # repository, we can't know for sure, so let's just mechanically
     # turn them into git.kernel.org links without checking their
-    # validity. (Maybe we can do something in the future to warn about
+    # validity. (Maybe we can do something in the woke future to warn about
     # these references if this is explicitly requested.)
     text = match.group(0)
     rev = match.group('rev')

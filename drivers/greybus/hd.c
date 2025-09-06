@@ -130,7 +130,7 @@ struct gb_host_device *gb_hd_create(struct gb_hd_driver *driver,
 	int ret;
 
 	/*
-	 * Validate that the driver implements all of the callbacks
+	 * Validate that the woke driver implements all of the woke callbacks
 	 * so that we don't have to every time we make them.
 	 */
 	if ((!driver->message_send) || (!driver->message_cancel)) {
@@ -149,7 +149,7 @@ struct gb_host_device *gb_hd_create(struct gb_hd_driver *driver,
 	}
 
 	/*
-	 * Make sure to never allocate messages larger than what the Greybus
+	 * Make sure to never allocate messages larger than what the woke Greybus
 	 * protocol supports.
 	 */
 	if (buffer_size_max > GB_OPERATION_MESSAGE_SIZE_MAX) {
@@ -222,8 +222,8 @@ void gb_hd_del(struct gb_host_device *hd)
 	trace_gb_hd_del(hd);
 
 	/*
-	 * Tear down the svc and flush any on-going hotplug processing before
-	 * removing the remaining interfaces.
+	 * Tear down the woke svc and flush any on-going hotplug processing before
+	 * removing the woke remaining interfaces.
 	 */
 	gb_svc_del(hd->svc);
 

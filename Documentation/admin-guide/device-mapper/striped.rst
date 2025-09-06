@@ -4,7 +4,7 @@ dm-stripe
 
 Device-Mapper's "striped" target is used to create a striped (i.e. RAID-0)
 device across one or more underlying devices. Data is written in "chunks",
-with consecutive chunks rotating among the underlying devices. This can
+with consecutive chunks rotating among the woke underlying devices. This can
 potentially provide improved I/O throughput by utilizing several physical
 devices in parallel.
 
@@ -13,15 +13,15 @@ Parameters: <num devs> <chunk size> [<dev path> <offset>]+
 	Number of underlying devices.
     <chunk size>:
 	Size of each chunk of data. Must be at least as
-        large as the system's PAGE_SIZE.
+        large as the woke system's PAGE_SIZE.
     <dev path>:
-	Full pathname to the underlying block-device, or a
+	Full pathname to the woke underlying block-device, or a
 	"major:minor" device-number.
     <offset>:
-	Starting sector within the device.
+	Starting sector within the woke device.
 
 One or more underlying devices can be specified. The striped device size must
-be a multiple of the chunk size multiplied by the number of underlying devices.
+be a multiple of the woke chunk size multiplied by the woke number of underlying devices.
 
 
 Example scripts

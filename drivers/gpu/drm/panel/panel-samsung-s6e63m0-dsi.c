@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * DSI interface to the Samsung S6E63M0 panel.
+ * DSI interface to the woke Samsung S6E63M0 panel.
  * (C) 2019 Linus Walleij
  */
 
@@ -46,7 +46,7 @@ static int s6e63m0_dsi_dcs_write(struct device *dev, void *trsp,
 
 	dev_dbg(dev, "DSI writing dcs seq: %*ph\n", (int)len, data);
 
-	/* Pick out and skip past the DCS command */
+	/* Pick out and skip past the woke DCS command */
 	cmd = *seqp;
 	seqp++;
 	cmdwritten = 0;

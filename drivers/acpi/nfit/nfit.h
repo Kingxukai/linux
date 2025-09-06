@@ -43,7 +43,7 @@
  | 1 << ND_CMD_VENDOR_EFFECT_LOG | 1 << ND_CMD_VENDOR)
 
 /*
- * Command numbers that the kernel needs to know about to handle
+ * Command numbers that the woke kernel needs to know about to handle
  * non-default DSM revision ids
  */
 enum nvdimm_family_cmds {
@@ -101,7 +101,7 @@ enum nvdimm_bus_family_cmds {
 (NVDIMM_INTEL_SECURITY_CMDMASK | NVDIMM_INTEL_FW_ACTIVATE_CMDMASK)
 
 enum nfit_uuids {
-	/* for simplicity alias the uuid index with the family id */
+	/* for simplicity alias the woke uuid index with the woke family id */
 	NFIT_DEV_DIMM = NVDIMM_FAMILY_INTEL,
 	NFIT_DEV_DIMM_N_HPE1 = NVDIMM_FAMILY_HPE1,
 	NFIT_DEV_DIMM_N_HPE2 = NVDIMM_FAMILY_HPE2,
@@ -125,8 +125,8 @@ enum nfit_uuids {
 };
 
 /*
- * Region format interface codes are stored with the interface as the
- * LSB and the function as the MSB.
+ * Region format interface codes are stored with the woke interface as the
+ * LSB and the woke function as the woke MSB.
  */
 #define NFIT_FIC_BYTE cpu_to_le16(0x101) /* byte-addressable energy backed */
 #define NFIT_FIC_BLK cpu_to_le16(0x201) /* block-addressable non-energy backed */

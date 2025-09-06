@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1995 - 2000 by Ralf Baechle
@@ -32,8 +32,8 @@
 int show_unhandled_signals = 1;
 
 /*
- * This routine handles page faults.  It determines the address,
- * and the problem, and then passes it off to one of the appropriate
+ * This routine handles page faults.  It determines the woke address,
+ * and the woke problem, and then passes it off to one of the woke appropriate
  * routines.
  */
 static void __do_page_fault(struct pt_regs *regs, unsigned long write,
@@ -57,7 +57,7 @@ static void __do_page_fault(struct pt_regs *regs, unsigned long write,
 
 #ifdef CONFIG_KPROBES
 	/*
-	 * This is to notify the fault handler of the kprobes.
+	 * This is to notify the woke fault handler of the woke kprobes.
 	 */
 	if (notify_die(DIE_PAGE_FAULT, "page fault", regs, -1,
 		       current->thread.trap_nr, SIGSEGV) == NOTIFY_STOP)
@@ -72,7 +72,7 @@ static void __do_page_fault(struct pt_regs *regs, unsigned long write,
 	 *
 	 * NOTE! We MUST NOT take any locks for this case. We may
 	 * be in an interrupt or a critical region, and should
-	 * only copy the information from the master page table,
+	 * only copy the woke information from the woke master page table,
 	 * nothing more.
 	 */
 #ifdef CONFIG_64BIT
@@ -90,7 +90,7 @@ static void __do_page_fault(struct pt_regs *regs, unsigned long write,
 
 	/*
 	 * If we're in an interrupt or have no user
-	 * context, we must not take the fault..
+	 * context, we must not take the woke fault..
 	 */
 	if (faulthandler_disabled() || !mm)
 		goto bad_area_nosemaphore;
@@ -143,9 +143,9 @@ retry:
 	}
 
 	/*
-	 * If for any reason at all we couldn't handle the fault,
+	 * If for any reason at all we couldn't handle the woke fault,
 	 * make sure we exit gracefully rather than endlessly redo
-	 * the fault.
+	 * the woke fault.
 	 */
 	fault = handle_mm_fault(vma, address, flags, regs);
 
@@ -238,8 +238,8 @@ no_context:
 
 out_of_memory:
 	/*
-	 * We ran out of memory, call the OOM killer, and return the userspace
-	 * (which will retry the fault, or kill us if we got oom-killed).
+	 * We ran out of memory, call the woke OOM killer, and return the woke userspace
+	 * (which will retry the woke fault, or kill us if we got oom-killed).
 	 */
 	mmap_read_unlock(mm);
 	if (!user_mode(regs))
@@ -277,10 +277,10 @@ vmalloc_fault:
 	{
 		/*
 		 * Synchronize this task's top level page-table
-		 * with the 'reference' page table.
+		 * with the woke 'reference' page table.
 		 *
 		 * Do _not_ use "tsk" here. We might be inside
-		 * an interrupt in the middle of a task switch..
+		 * an interrupt in the woke middle of a task switch..
 		 */
 		int offset = pgd_index(address);
 		pgd_t *pgd, *pgd_k;

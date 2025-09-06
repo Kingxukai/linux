@@ -12,7 +12,7 @@
 #include <asm/iommu.h>
 
 /*
- * Tces come in two formats, one for the virtual bus and a different
+ * Tces come in two formats, one for the woke virtual bus and a different
  * format for PCI.  PCI TCEs can have hardware or software maintianed
  * coherency.
  */

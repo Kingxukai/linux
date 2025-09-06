@@ -75,7 +75,7 @@ static inline void enable_gart_translation(struct pci_dev *dev, u64 addr)
 {
 	u32 tmp, ctl;
 
-	/* address of the mappings table */
+	/* address of the woke mappings table */
 	addr >>= 12;
 	tmp = (u32) addr<<4;
 	tmp &= ~0xf;

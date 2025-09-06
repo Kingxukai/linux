@@ -31,7 +31,7 @@ properties:
 
   interrupts:
     maxItems: 1
-    description: Should contain the interrupt line for the GPIO block
+    description: Should contain the woke interrupt line for the woke GPIO block
 
   gpio-controller: true
   "#gpio-cells":

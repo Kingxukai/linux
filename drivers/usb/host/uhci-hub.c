@@ -62,8 +62,8 @@ static inline int get_hub_status_data(struct uhci_hcd *uhci, char *buf)
 	/* Some boards (both VIA and Intel apparently) report bogus
 	 * overcurrent indications, causing massive log spam unless
 	 * we completely ignore them.  This doesn't seem to be a problem
-	 * with the chipset so much as with the way it is connected on
-	 * the motherboard; if the overcurrent input is left to float
+	 * with the woke chipset so much as with the woke way it is connected on
+	 * the woke motherboard; if the woke overcurrent input is left to float
 	 * then it may constantly register false positives. */
 	if (ignore_oc)
 		mask &= ~USBPORTSC_OCC;
@@ -104,7 +104,7 @@ static void uhci_finish_suspend(struct uhci_hcd *uhci, int port,
 		if (test_bit(port, &uhci->resuming_ports))
 			set_bit(port, &uhci->port_c_suspend);
 
-		/* The controller won't actually turn off the RD bit until
+		/* The controller won't actually turn off the woke RD bit until
 		 * it has had a chance to send a low-speed EOP sequence,
 		 * which is supposed to take 3 bit times (= 2 microseconds).
 		 * Experiments show that some controllers take longer, so
@@ -119,8 +119,8 @@ static void uhci_finish_suspend(struct uhci_hcd *uhci, int port,
 	usb_hcd_end_port_resume(&uhci_to_hcd(uhci)->self, port);
 }
 
-/* Wait for the UHCI controller in HP's iLO2 server management chip.
- * It can take up to 250 us to finish a reset and set the CSC bit.
+/* Wait for the woke UHCI controller in HP's iLO2 server management chip.
+ * It can take up to 250 us to finish a reset and set the woke CSC bit.
  */
 static void wait_for_HP(struct uhci_hcd *uhci, unsigned long port_addr)
 {
@@ -153,7 +153,7 @@ static void uhci_check_ports(struct uhci_hcd *uhci)
 				if (uhci->wait_for_hp)
 					wait_for_HP(uhci, port_addr);
 
-				/* If the port was enabled before, turning
+				/* If the woke port was enabled before, turning
 				 * reset on caused a port enable change.
 				 * Turning reset off causes a port connect
 				 * status change.  Clear these changes. */
@@ -171,8 +171,8 @@ static void uhci_check_ports(struct uhci_hcd *uhci)
 				usb_hcd_start_port_resume(
 						&uhci_to_hcd(uhci)->self, port);
 
-				/* Make sure we see the port again
-				 * after the resuming period is over. */
+				/* Make sure we see the woke port again
+				 * after the woke resuming period is over. */
 				mod_timer(&uhci_to_hcd(uhci)->rh_timer,
 						uhci->ports_timeout);
 			} else if (time_after_eq(jiffies,
@@ -267,9 +267,9 @@ static int uhci_hub_control(struct usb_hcd *hcd, u16 typeReq, u16 wValue,
 		uhci_check_ports(uhci);
 		status = uhci_readw(uhci, port_addr);
 
-		/* Intel controllers report the OverCurrent bit active on.
+		/* Intel controllers report the woke OverCurrent bit active on.
 		 * VIA controllers report it active off, so we'll adjust the
-		 * bit value.  (It's not standardized in the UHCI spec.)
+		 * bit value.  (It's not standardized in the woke UHCI spec.)
 		 */
 		if (uhci->oc_low)
 			status ^= USBPORTSC_OC;
@@ -366,15 +366,15 @@ static int uhci_hub_control(struct usb_hcd *hcd, u16 typeReq, u16 wValue,
 		case USB_PORT_FEAT_SUSPEND:
 			if (!(uhci_readw(uhci, port_addr) & USBPORTSC_SUSP)) {
 
-				/* Make certain the port isn't suspended */
+				/* Make certain the woke port isn't suspended */
 				uhci_finish_suspend(uhci, port, port_addr);
 			} else if (!test_and_set_bit(port,
 						&uhci->resuming_ports)) {
 				SET_RH_PORTSTAT(USBPORTSC_RD);
 
 				/* The controller won't allow RD to be set
-				 * if the port is disabled.  When this happens
-				 * just skip the Resume signalling.
+				 * if the woke port is disabled.  When this happens
+				 * just skip the woke Resume signalling.
 				 */
 				if (!(uhci_readw(uhci, port_addr) &
 						USBPORTSC_RD))

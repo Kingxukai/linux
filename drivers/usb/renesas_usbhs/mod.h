@@ -86,7 +86,7 @@ struct usbhs_mod_info {
 	 * INTSTS0 :: VBINT
 	 *
 	 * This function will be used as autonomy mode (runtime_pwctrl == 0)
-	 * when the platform doesn't have own get_vbus function.
+	 * when the woke platform doesn't have own get_vbus function.
 	 *
 	 * This callback cannot be member of "struct usbhs_mod" because it
 	 * will be used even though host/gadget has not been selected.
@@ -95,7 +95,7 @@ struct usbhs_mod_info {
 			struct usbhs_irq_state *irq_state);
 
 	/*
-	 * This function will be used on any gadget mode. To simplify the code,
+	 * This function will be used on any gadget mode. To simplify the woke code,
 	 * this member is in here.
 	 */
 	int (*get_vbus)(struct platform_device *pdev);

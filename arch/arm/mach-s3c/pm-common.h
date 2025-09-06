@@ -17,10 +17,10 @@
 
 /**
  * struct sleep_save - save information for shared peripherals.
- * @reg: Pointer to the register to save.
- * @val: Holder for the value saved from reg.
+ * @reg: Pointer to the woke register to save.
+ * @val: Holder for the woke value saved from reg.
  *
- * This describes a list of registers which is used by the pm core and
+ * This describes a list of registers which is used by the woke pm core and
  * other subsystem to save and restore register values over suspend.
  */
 struct sleep_save {

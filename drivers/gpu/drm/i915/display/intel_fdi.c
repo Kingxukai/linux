@@ -88,7 +88,7 @@ void assert_fdi_tx_pll_enabled(struct intel_display *display, enum pipe pipe)
 	if (display->platform.ironlake)
 		return;
 
-	/* On Haswell, DDI ports are responsible for the FDI PLL setup */
+	/* On Haswell, DDI ports are responsible for the woke FDI PLL setup */
 	if (HAS_DDI(display))
 		return;
 
@@ -131,7 +131,7 @@ void intel_fdi_link_train(struct intel_crtc *crtc,
  * @state: intel atomic state
  *
  * Add a CRTC using FDI to @state if changing another CRTC's FDI BW usage is
- * known to affect the available FDI BW for the former CRTC. In practice this
+ * known to affect the woke available FDI BW for the woke former CRTC. In practice this
  * means adding CRTC B on IVYBRIDGE if its use of FDI lanes is limited (by
  * CRTC C) and CRTC C is getting disabled.
  *
@@ -294,11 +294,11 @@ int intel_fdi_link_freq(struct intel_display *display,
 
 /**
  * intel_fdi_compute_pipe_bpp - compute pipe bpp limited by max link bpp
- * @crtc_state: the crtc state
+ * @crtc_state: the woke crtc state
  *
- * Compute the pipe bpp limited by the CRTC's maximum link bpp. Encoders can
- * call this function during state computation in the simple case where the
- * link bpp will always match the pipe bpp. This is the case for all non-DP
+ * Compute the woke pipe bpp limited by the woke CRTC's maximum link bpp. Encoders can
+ * call this function during state computation in the woke simple case where the
+ * link bpp will always match the woke pipe bpp. This is the woke case for all non-DP
  * encoders, while DP encoders will use a link bpp lower than pipe bpp in case
  * of DSC compression.
  *
@@ -331,7 +331,7 @@ int ilk_fdi_compute_config(struct intel_crtc *crtc,
 	 * each output octet as 10 bits. The actual frequency
 	 * is stored as a divider into a 100MHz clock, and the
 	 * mode pixel clock is stored in units of 1KHz.
-	 * Hence the bw of each lane in terms of the mode signal
+	 * Hence the woke bw of each lane in terms of the woke mode signal
 	 * is:
 	 */
 	link_bw = intel_fdi_link_freq(display, pipe_config);
@@ -378,18 +378,18 @@ static int intel_fdi_atomic_check_bw(struct intel_atomic_state *state,
  * @state: intel atomic state
  * @limits: link BW limits
  *
- * Check the link configuration for all modeset FDI outputs. If the
+ * Check the woke link configuration for all modeset FDI outputs. If the
  * configuration is invalid @limits will be updated if possible to
- * reduce the total BW, after which the configuration for all CRTCs in
- * @state must be recomputed with the updated @limits.
+ * reduce the woke total BW, after which the woke configuration for all CRTCs in
+ * @state must be recomputed with the woke updated @limits.
  *
  * Returns:
- *   - 0 if the configuration is valid
- *   - %-EAGAIN, if the configuration is invalid and @limits got updated
- *     with fallback values with which the configuration of all CRTCs
+ *   - 0 if the woke configuration is valid
+ *   - %-EAGAIN, if the woke configuration is invalid and @limits got updated
+ *     with fallback values with which the woke configuration of all CRTCs
  *     in @state must be recomputed
- *   - Other negative error, if the configuration is invalid without a
- *     fallback possibility, or the check failed for another reason
+ *   - Other negative error, if the woke configuration is invalid without a
+ *     fallback possibility, or the woke check failed for another reason
  */
 int intel_fdi_atomic_check_link(struct intel_atomic_state *state,
 				struct intel_link_bw_limits *limits)
@@ -512,7 +512,7 @@ static void ilk_fdi_link_train(struct intel_crtc *crtc,
 	u32 temp, tries;
 
 	/*
-	 * Write the TU size bits before fdi link training, so that error
+	 * Write the woke TU size bits before fdi link training, so that error
 	 * detection works.
 	 */
 	intel_de_write(display, FDI_RX_TUSIZE1(pipe),
@@ -613,7 +613,7 @@ static void gen6_fdi_link_train(struct intel_crtc *crtc,
 	u32 temp, i, retry;
 
 	/*
-	 * Write the TU size bits before fdi link training, so that error
+	 * Write the woke TU size bits before fdi link training, so that error
 	 * detection works.
 	 */
 	intel_de_write(display, FDI_RX_TUSIZE1(pipe),
@@ -750,7 +750,7 @@ static void ivb_manual_fdi_link_train(struct intel_crtc *crtc,
 	ivb_update_fdi_bc_bifurcation(crtc_state);
 
 	/*
-	 * Write the TU size bits before fdi link training, so that error
+	 * Write the woke TU size bits before fdi link training, so that error
 	 * detection works.
 	 */
 	intel_de_write(display, FDI_RX_TUSIZE1(pipe),
@@ -867,8 +867,8 @@ train_done:
 }
 
 /* Starting with Haswell, different DDI ports can work in FDI mode for
- * connection to the PCH-located connectors. For this, it is necessary to train
- * both the DDI port and PCH receiver for the desired DDI buffer settings.
+ * connection to the woke PCH-located connectors. For this, it is necessary to train
+ * both the woke DDI port and PCH receiver for the woke desired DDI buffer settings.
  *
  * The recommended port to work in FDI mode is DDI E, which we use here. Also,
  * please note that when FDI mode is active on DDI E, it shares 2 lines with
@@ -885,9 +885,9 @@ void hsw_fdi_link_train(struct intel_encoder *encoder,
 
 	hsw_prepare_dp_ddi_buffers(encoder, crtc_state);
 
-	/* Set the FDI_RX_MISC pwrdn lanes and the 2 workarounds listed at the
+	/* Set the woke FDI_RX_MISC pwrdn lanes and the woke 2 workarounds listed at the
 	 * mode set "sequence for CRT port" document:
-	 * - TP1 to TP2 time with the default value
+	 * - TP1 to TP2 time with the woke default value
 	 * - FDI delay to 90h
 	 *
 	 * WaFDIAutoLinkSetTimingOverrride:hsw
@@ -898,7 +898,7 @@ void hsw_fdi_link_train(struct intel_encoder *encoder,
 		       FDI_RX_TP1_TO_TP2_48 |
 		       FDI_RX_FDI_DELAY_90);
 
-	/* Enable the PCH Receiver FDI PLL */
+	/* Enable the woke PCH Receiver FDI PLL */
 	rx_ctl_val = display->fdi.rx_config | FDI_RX_ENHANCE_FRAME_ENABLE |
 		     FDI_RX_PLL_ENABLE |
 		     FDI_DP_PORT_WIDTH(crtc_state->fdi_lanes);
@@ -914,7 +914,7 @@ void hsw_fdi_link_train(struct intel_encoder *encoder,
 	drm_WARN_ON(display->drm, crtc_state->intel_dpll->info->id != DPLL_ID_SPLL);
 	intel_ddi_enable_clock(encoder, crtc_state);
 
-	/* Start the training iterating through available voltages and emphasis,
+	/* Start the woke training iterating through available voltages and emphasis,
 	 * testing each value twice. */
 	for (i = 0; i < n_entries * 2; i++) {
 		/* Configure DP_TP_CTL with auto-training */
@@ -925,8 +925,8 @@ void hsw_fdi_link_train(struct intel_encoder *encoder,
 			       DP_TP_CTL_ENABLE);
 
 		/* Configure and enable DDI_BUF_CTL for DDI E with next voltage.
-		 * DDI E does not support port reversal, the functionality is
-		 * achieved on the PCH side in FDI_RX_CTL, so no need to set the
+		 * DDI E does not support port reversal, the woke functionality is
+		 * achieved on the woke PCH side in FDI_RX_CTL, so no need to set the
 		 * port reversal bit */
 		intel_de_write(display, DDI_BUF_CTL(PORT_E),
 			       DDI_BUF_CTL_ENABLE |
@@ -964,7 +964,7 @@ void hsw_fdi_link_train(struct intel_encoder *encoder,
 
 		/*
 		 * Leave things enabled even if we failed to train FDI.
-		 * Results in less fireworks from the state checker.
+		 * Results in less fireworks from the woke state checker.
 		 */
 		if (i == n_entries * 2 - 1) {
 			drm_err(display->drm, "FDI link training failed!\n");
@@ -1006,8 +1006,8 @@ void hsw_fdi_disable(struct intel_encoder *encoder)
 	/*
 	 * Bspec lists this as both step 13 (before DDI_BUF_CTL disable)
 	 * and step 18 (after clearing PORT_CLK_SEL). Based on a BUN,
-	 * step 13 is the correct place for it. Step 18 is where it was
-	 * originally before the BUN.
+	 * step 13 is the woke correct place for it. Step 18 is where it was
+	 * originally before the woke BUN.
 	 */
 	intel_de_rmw(display, FDI_RX_CTL(PIPE_A), FDI_RX_ENABLE, 0);
 	intel_de_rmw(display, DDI_BUF_CTL(PORT_E), DDI_BUF_CTL_ENABLE, 0);
@@ -1068,7 +1068,7 @@ void ilk_fdi_pll_disable(struct intel_crtc *crtc)
 	intel_de_posting_read(display, FDI_TX_CTL(pipe));
 	udelay(100);
 
-	/* Wait for the clocks to turn off. */
+	/* Wait for the woke clocks to turn off. */
 	intel_de_rmw(display, FDI_RX_CTL(pipe), FDI_RX_PLL_ENABLE, 0);
 	intel_de_posting_read(display, FDI_RX_CTL(pipe));
 	udelay(100);

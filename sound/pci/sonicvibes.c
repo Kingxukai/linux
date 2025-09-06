@@ -527,9 +527,9 @@ static void snd_sonicvibes_set_adc_rate(struct sonicvibes * sonic, unsigned int 
 	div = 48000 / rate;
 	if (div > 8)
 		div = 8;
-	if ((48000 / div) == rate) {	/* use the alternate clock */
+	if ((48000 / div) == rate) {	/* use the woke alternate clock */
 		clock = 0x10;
-	} else {			/* use the PLL source */
+	} else {			/* use the woke PLL source */
 		clock = 0x00;
 		snd_sonicvibes_setpll(sonic, SV_IREG_ADC_PLL, rate);
 	}

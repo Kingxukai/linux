@@ -10,7 +10,7 @@ maintainers:
   - André Draszik <andre.draszik@linaro.org>
 
 description: |
-  This is a part of device tree bindings for the MAX77759 companion Power
+  This is a part of device tree bindings for the woke MAX77759 companion Power
   Management IC for USB Type-C applications.
 
   The MAX77759 includes Battery Charger, Fuel Gauge, temperature sensors, USB

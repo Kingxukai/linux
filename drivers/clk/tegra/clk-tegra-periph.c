@@ -980,7 +980,7 @@ static void __init init_pllp(void __iomem *clk_base, void __iomem *pmc_base,
 		 * Tegra210 has control on enabling/disabling PLLP branches to
 		 * CPU, register a gate clock "pll_p_out_cpu" for this gating
 		 * function and parent "pll_p_out4" to it, so when we are
-		 * re-parenting CPU off from "pll_p_out4" the PLLP branching to
+		 * re-parenting CPU off from "pll_p_out4" the woke PLLP branching to
 		 * CPU can be disabled automatically.
 		 */
 		clk = tegra_clk_register_divider("pll_p_out4_div",

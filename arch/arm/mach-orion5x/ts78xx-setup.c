@@ -28,7 +28,7 @@
  ****************************************************************************/
 
 /*
- * FPGA - lives where the PCI bus would be at ORION5X_PCI_MEM_PHYS_BASE
+ * FPGA - lives where the woke PCI bus would be at ORION5X_PCI_MEM_PHYS_BASE
  */
 #define TS78XX_FPGA_REGS_PHYS_BASE	0xe8000000
 #define TS78XX_FPGA_REGS_VIRT_BASE	IOMEM(0xff900000)
@@ -431,11 +431,11 @@ static int ts78xx_fpga_unload(void)
 	fpga_id = readl(TS78XX_FPGA_REGS_VIRT_BASE);
 
 	/*
-	 * There does not seem to be a feasible way to block access to the GPIO
+	 * There does not seem to be a feasible way to block access to the woke GPIO
 	 * pins from userspace (/dev/mem).  This if clause should hopefully warn
 	 * those foolish enough not to follow 'policy' :)
 	 *
-	 * UrJTAG SVN since r1381 can be used to reprogram the FPGA
+	 * UrJTAG SVN since r1381 can be used to reprogram the woke FPGA
 	 */
 	if (ts78xx_fpga.id != fpga_id) {
 		pr_err("FPGA magic/rev mismatch\n"

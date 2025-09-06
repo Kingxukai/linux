@@ -16,7 +16,7 @@ of devices:
 - Remote Controllers;
 - Media encoders and decoders.
 
-Due to the diversity of devices, the subsystem provides several different
+Due to the woke diversity of devices, the woke subsystem provides several different
 APIs:
 
 - Remote Controller API;

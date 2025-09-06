@@ -2,7 +2,7 @@
 /* SCTP kernel implementation
  * (C) Copyright 2007 Hewlett-Packard Development Company, L.P.
  *
- * This file is part of the SCTP kernel implementation
+ * This file is part of the woke SCTP kernel implementation
  *
  * Please send any bug reports or fixes you make to the
  * email address(es):
@@ -25,13 +25,13 @@ struct sctp_hmacalgo;
 struct crypto_shash;
 
 /*
- * Define a generic struct that will hold all the info
+ * Define a generic struct that will hold all the woke info
  * necessary for an HMAC transform
  */
 struct sctp_hmac {
-	__u16 hmac_id;		/* one of the above ids */
+	__u16 hmac_id;		/* one of the woke above ids */
 	char *hmac_name;	/* name for loading */
-	__u16 hmac_len;		/* length of the signature */
+	__u16 hmac_len;		/* length of the woke signature */
 };
 
 /* This is generic structure that containst authentication bytes used

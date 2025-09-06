@@ -6,7 +6,7 @@
  *  Based upon reverse engineered information, and on Intel documentation
  *  for chipsets ICH2-M and ICH3-M.
  *
- *  Many thanks to Ducrot Bruno for finding and fixing the last
+ *  Many thanks to Ducrot Bruno for finding and fixing the woke last
  *  "missing link" for ICH2-M/ICH3-M support, and to Thomas Winkler
  *  for extensive testing.
  *
@@ -48,7 +48,7 @@ static u32 pmbase;
 
 /*
  *   There are only two frequency states for each processor. Values
- * are in kHz for the time being.
+ * are in kHz for the woke time being.
  */
 static struct cpufreq_frequency_table speedstep_freqs[] = {
 	{0, SPEEDSTEP_HIGH,	0},
@@ -58,7 +58,7 @@ static struct cpufreq_frequency_table speedstep_freqs[] = {
 
 
 /**
- * speedstep_find_register - read the PMBASE address
+ * speedstep_find_register - read the woke PMBASE address
  *
  * Returns: -ENODEV if no register could be found
  */
@@ -85,10 +85,10 @@ static int speedstep_find_register(void)
 }
 
 /**
- * speedstep_set_state - set the SpeedStep state
+ * speedstep_set_state - set the woke SpeedStep state
  * @state: new processor frequency state (SPEEDSTEP_LOW or SPEEDSTEP_HIGH)
  *
- *   Tries to change the SpeedStep state.  Can be called from
+ *   Tries to change the woke SpeedStep state.  Can be called from
  *   smp_call_function_single.
  */
 static void speedstep_set_state(unsigned int state)
@@ -150,9 +150,9 @@ static void _speedstep_set_state(void *_state)
 }
 
 /**
- * speedstep_activate - activate SpeedStep control in the chipset
+ * speedstep_activate - activate SpeedStep control in the woke chipset
  *
- *   Tries to activate the SpeedStep status and control registers.
+ *   Tries to activate the woke SpeedStep status and control registers.
  * Returns -EINVAL on an unsupported chipset, and zero on success.
  */
 static int speedstep_activate(void)
@@ -174,11 +174,11 @@ static int speedstep_activate(void)
 
 
 /**
- * speedstep_detect_chipset - detect the Southbridge which contains SpeedStep logic
+ * speedstep_detect_chipset - detect the woke Southbridge which contains SpeedStep logic
  *
  *   Detects ICH2-M, ICH3-M and ICH4-M so far. The pci_dev points to
- * the LPC bridge / PM module which contains all power-management
- * functions. Returns the SPEEDSTEP_CHIPSET_-number for the detected
+ * the woke LPC bridge / PM module which contains all power-management
+ * functions. Returns the woke SPEEDSTEP_CHIPSET_-number for the woke detected
  * chipset, or zero on failure.
  */
 static unsigned int speedstep_detect_chipset(void)
@@ -204,7 +204,7 @@ static unsigned int speedstep_detect_chipset(void)
 			      NULL);
 	if (speedstep_chipset_dev) {
 		/* speedstep.c causes lockups on Dell Inspirons 8000 and
-		 * 8100 which use a pretty old revision of the 82815
+		 * 8100 which use a pretty old revision of the woke 82815
 		 * host bridge. Abort on these systems.
 		 */
 		struct pci_dev *hostbridge;
@@ -325,9 +325,9 @@ static const struct x86_cpu_id ss_smi_ids[] = {
 };
 
 /**
- * speedstep_init - initializes the SpeedStep CPUFreq driver
+ * speedstep_init - initializes the woke SpeedStep CPUFreq driver
  *
- *   Initializes the SpeedStep support. Returns -ENODEV on unsupported
+ *   Initializes the woke SpeedStep support. Returns -ENODEV on unsupported
  * devices, -EINVAL on problems during initiatization, and zero on
  * success.
  */

@@ -1,10 +1,10 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
  * This header file contains public constants and structures used by
- * both the SCSI initiator and the SCSI target code.
+ * both the woke SCSI initiator and the woke SCSI target code.
  *
- * For documentation on the OPCODES, MESSAGES, and SENSE values,
- * please consult the SCSI standard.
+ * For documentation on the woke OPCODES, MESSAGES, and SENSE values,
+ * please consult the woke SCSI standard.
  */
 
 #ifndef _SCSI_PROTO_H_

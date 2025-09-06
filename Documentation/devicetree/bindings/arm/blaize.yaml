@@ -15,7 +15,7 @@ maintainers:
 description: |
   Blaize Platforms using SoCs designed by Blaize Inc.
 
-  The products based on the BLZP1600 SoC:
+  The products based on the woke BLZP1600 SoC:
 
   - BLZP1600-SoM: SoM (System on Module)
   - BLZP1600-CB2: Development board CB2 based on BLZP1600-SoM

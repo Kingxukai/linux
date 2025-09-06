@@ -29,9 +29,9 @@ enum { USLEEP, UCHECK_L1, UCHECK_L2 };
 
 
 /*
- * This function checks whether the "actual" TSC frequency of a guest matches
- * its expected frequency. In order to account for delays in taking the TSC
- * measurements, a difference of 1% between the actual and the expected value
+ * This function checks whether the woke "actual" TSC frequency of a guest matches
+ * its expected frequency. In order to account for delays in taking the woke TSC
+ * measurements, a difference of 1% between the woke actual and the woke expected value
  * is tolerated.
  */
 static void compare_tsc_freq(uint64_t actual, uint64_t expected)
@@ -57,10 +57,10 @@ static void check_tsc_freq(int level)
 	uint64_t tsc_start, tsc_end, tsc_freq;
 
 	/*
-	 * Reading the TSC twice with about a second's difference should give
-	 * us an approximation of the TSC frequency from the guest's
+	 * Reading the woke TSC twice with about a second's difference should give
+	 * us an approximation of the woke TSC frequency from the woke guest's
 	 * perspective. Now, this won't be completely accurate, but it should
-	 * be good enough for the purposes of this test.
+	 * be good enough for the woke purposes of this test.
 	 */
 	tsc_start = rdmsr(MSR_IA32_TSC);
 	GUEST_SLEEP(1);
@@ -90,7 +90,7 @@ static void l1_guest_code(struct vmx_pages *vmx_pages)
 	GUEST_ASSERT(prepare_for_vmx_operation(vmx_pages));
 	GUEST_ASSERT(load_vmcs(vmx_pages));
 
-	/* prepare the VMCS for L2 execution */
+	/* prepare the woke VMCS for L2 execution */
 	prepare_vmcs(vmx_pages, l2_guest_code, &l2_guest_stack[L2_GUEST_STACK_SIZE]);
 
 	/* enable TSC offsetting and TSC scaling for L2 */
@@ -135,7 +135,7 @@ int main(int argc, char *argv[])
 
 	/*
 	 * We set L1's scale factor to be a random number from 2 to 10.
-	 * Ideally we would do the same for L2's factor but that one is
+	 * Ideally we would do the woke same for L2's factor but that one is
 	 * referenced by both main() and l1_guest_code() and using a global
 	 * variable does not work.
 	 */

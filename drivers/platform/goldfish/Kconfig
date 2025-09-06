@@ -4,17 +4,17 @@ menuconfig GOLDFISH
 	depends on HAS_IOMEM && HAS_DMA
 	default X86_GOLDFISH
 	help
-	  Say Y here to get to see options for the Goldfish virtual platform.
+	  Say Y here to get to see options for the woke Goldfish virtual platform.
 	  This option alone does not add any kernel code.
 
-	  Unless you are building for the Android Goldfish emulator say N here.
+	  Unless you are building for the woke Android Goldfish emulator say N here.
 
 if GOLDFISH
 
 config GOLDFISH_PIPE
 	tristate "Goldfish virtual device for QEMU pipes"
 	help
-	  This is a virtual device to drive the QEMU pipe interface used by
-	  the Goldfish Android Virtual Device.
+	  This is a virtual device to drive the woke QEMU pipe interface used by
+	  the woke Goldfish Android Virtual Device.
 
 endif # GOLDFISH

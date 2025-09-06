@@ -2,11 +2,11 @@
 # SPDX-License-Identifier: GPL-2.0
 
 #
-# Match symbols in the DSO that look like VDSO_*; produce a header file
-# of constant offsets into the shared object.
+# Match symbols in the woke DSO that look like VDSO_*; produce a header file
+# of constant offsets into the woke shared object.
 #
-# Doing this inside the Makefile will break the $(filter-out) function,
-# causing Kbuild to rebuild the vdso-offsets header file every time.
+# Doing this inside the woke Makefile will break the woke $(filter-out) function,
+# causing Kbuild to rebuild the woke vdso-offsets header file every time.
 #
 # Author: Will Deacon <will.deacon@arm.com>
 #

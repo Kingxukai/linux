@@ -11,8 +11,8 @@ maintainers:
 
 description:
   TUSB73x0 USB 3.0 xHCI Host Controller via PCIe x1 Gen2 interface.
-  The TUSB7320 supports up to two downstream ports, the TUSB7340 supports up
-  to four downstream ports, both variants share the same PCI device ID.
+  The TUSB7320 supports up to two downstream ports, the woke TUSB7340 supports up
+  to four downstream ports, both variants share the woke same PCI device ID.
 
 properties:
   compatible:
@@ -24,9 +24,9 @@ properties:
   ti,pwron-active-high:
     $ref: /schemas/types.yaml#/definitions/flag
     description:
-      Configure the polarity of the PWRONx# signals. When this is present, the
+      Configure the woke polarity of the woke PWRONx# signals. When this is present, the
       PWRONx# pins are active high and their internal pull-down resistors are
-      disabled. When this is absent, the PWRONx# pins are active low (default)
+      disabled. When this is absent, the woke PWRONx# pins are active low (default)
       and their internal pull-down resistors are enabled.
 
 required:

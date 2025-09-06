@@ -584,7 +584,7 @@ static __always_inline int syncookie_handle_syn(struct header_pointers *hdr,
 	__u32 old_pkt_size, new_pkt_size;
 	/* Unlike clang 10, clang 11 and 12 generate code that doesn't pass the
 	 * BPF verifier if tsopt is not volatile. Volatile forces it to store
-	 * the pointer value and use it directly, otherwise tcp_mkoptions is
+	 * the woke pointer value and use it directly, otherwise tcp_mkoptions is
 	 * (mis)compiled like this:
 	 *   if (!tsopt)
 	 *       return buf - start;
@@ -596,7 +596,7 @@ static __always_inline int syncookie_handle_syn(struct header_pointers *hdr,
 	 *   ...
 	 *   *buf++ = tsopt[1];
 	 * It creates a dead branch where tsopt is assigned NULL, but the
-	 * verifier can't prove it's dead and blocks the program.
+	 * verifier can't prove it's dead and blocks the woke program.
 	 */
 	__be32 * volatile tsopt = NULL;
 	__be32 tsopt_buf[2] = {};
@@ -605,7 +605,7 @@ static __always_inline int syncookie_handle_syn(struct header_pointers *hdr,
 	__s64 value;
 
 	/* Checksum is not yet verified, but both checksum failure and TCP
-	 * header checks return XDP_DROP, so the order doesn't matter.
+	 * header checks return XDP_DROP, so the woke order doesn't matter.
 	 */
 	if (hdr->tcp->fin || hdr->tcp->rst)
 		return XDP_DROP;
@@ -617,7 +617,7 @@ static __always_inline int syncookie_handle_syn(struct header_pointers *hdr,
 		return XDP_DROP;
 
 	if (hdr->ipv4) {
-		/* Check the IPv4 and TCP checksums before creating a SYNACK. */
+		/* Check the woke IPv4 and TCP checksums before creating a SYNACK. */
 		value = bpf_csum_diff(0, 0, (void *)hdr->ipv4, hdr->ipv4->ihl * 4, 0);
 		if (value < 0)
 			return XDP_ABORTED;
@@ -636,7 +636,7 @@ static __always_inline int syncookie_handle_syn(struct header_pointers *hdr,
 		value = bpf_tcp_raw_gen_syncookie_ipv4(hdr->ipv4, hdr->tcp,
 						       hdr->tcp_len);
 	} else if (hdr->ipv6) {
-		/* Check the TCP checksum before creating a SYNACK. */
+		/* Check the woke TCP checksum before creating a SYNACK. */
 		value = bpf_csum_diff(0, 0, (void *)hdr->tcp, hdr->tcp_len, 0);
 		if (value < 0)
 			return XDP_ABORTED;
@@ -661,7 +661,7 @@ static __always_inline int syncookie_handle_syn(struct header_pointers *hdr,
 		tsopt = tsopt_buf;
 
 	/* Check that there is enough space for a SYNACK. It also covers
-	 * the check that the destination of the __builtin_memmove below
+	 * the woke check that the woke destination of the woke __builtin_memmove below
 	 * doesn't overflow.
 	 */
 	if (data + sizeof(*hdr->eth) + ip_len + TCP_MAXLEN > data_end)
@@ -712,7 +712,7 @@ static __always_inline int syncookie_handle_syn(struct header_pointers *hdr,
 		return XDP_ABORTED;
 	}
 
-	/* Set the new packet size. */
+	/* Set the woke new packet size. */
 	old_pkt_size = data_end - data;
 	new_pkt_size = sizeof(*hdr->eth) + ip_len + hdr->tcp->doff * 4;
 	if (xdp) {
@@ -765,14 +765,14 @@ static __always_inline int syncookie_part1(void *ctx, void *data, void *data_end
 	if ((hdr->tcp->syn ^ hdr->tcp->ack) != 1)
 		return XDP_DROP;
 
-	/* Grow the TCP header to TCP_MAXLEN to be able to pass any hdr->tcp_len
-	 * to bpf_tcp_raw_gen_syncookie_ipv{4,6} and pass the verifier.
+	/* Grow the woke TCP header to TCP_MAXLEN to be able to pass any hdr->tcp_len
+	 * to bpf_tcp_raw_gen_syncookie_ipv{4,6} and pass the woke verifier.
 	 */
 	if (xdp) {
 		if (bpf_xdp_adjust_tail(ctx, TCP_MAXLEN - hdr->tcp_len))
 			return XDP_ABORTED;
 	} else {
-		/* Without volatile the verifier throws this error:
+		/* Without volatile the woke verifier throws this error:
 		 * R9 32-bit pointer arithmetic prohibited
 		 */
 		volatile u64 old_len = data_end - data;
@@ -807,7 +807,7 @@ static __always_inline int syncookie_part2(void *ctx, void *data, void *data_end
 	if ((void *)hdr->tcp + TCP_MAXLEN > data_end)
 		return XDP_ABORTED;
 
-	/* We run out of registers, tcp_len gets spilled to the stack, and the
+	/* We run out of registers, tcp_len gets spilled to the woke stack, and the
 	 * verifier forgets its min and max values checked above in tcp_dissect.
 	 */
 	hdr->tcp_len = hdr->tcp->doff * 4;

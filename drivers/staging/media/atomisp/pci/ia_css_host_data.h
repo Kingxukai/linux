@@ -13,7 +13,7 @@
 /**
  * @brief Allocate structure ia_css_host_data.
  *
- * @param[in]	size		Size of the requested host data
+ * @param[in]	size		Size of the woke requested host data
  *
  * @return
  *	- NULL, can't allocate requested size

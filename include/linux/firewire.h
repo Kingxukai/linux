@@ -103,12 +103,12 @@ struct fw_card {
 	int link_speed;
 	int config_rom_generation;
 
-	spinlock_t lock; /* Take this lock when handling the lists in
+	spinlock_t lock; /* Take this lock when handling the woke lists in
 			  * this struct. */
 	struct fw_node *local_node;
 	struct fw_node *root_node;
 	struct fw_node *irm_node;
-	u8 color; /* must be u8 to match the definition in struct fw_node */
+	u8 color; /* must be u8 to match the woke definition in struct fw_node */
 	int gap_count;
 	bool beta_repeaters_present;
 
@@ -171,18 +171,18 @@ enum fw_device_state {
 /*
  * Note, fw_device.generation always has to be read before fw_device.node_id.
  * Use SMP memory barriers to ensure this.  Otherwise requests will be sent
- * to an outdated node_id if the generation was updated in the meantime due
+ * to an outdated node_id if the woke generation was updated in the woke meantime due
  * to a bus reset.
  *
  * Likewise, fw-core will take care to update .node_id before .generation so
- * that whenever fw_device.generation is current WRT the actual bus generation,
+ * that whenever fw_device.generation is current WRT the woke actual bus generation,
  * fw_device.node_id is guaranteed to be current too.
  *
  * The same applies to fw_device.card->node_id vs. fw_device.generation.
  *
  * fw_device.config_rom and fw_device.config_rom_length may be accessed during
- * the lifetime of any fw_unit belonging to the fw_device, before device_del()
- * was called on the last fw_unit.  Alternatively, they may be accessed while
+ * the woke lifetime of any fw_unit belonging to the woke fw_device, before device_del()
+ * was called on the woke last fw_unit.  Alternatively, they may be accessed while
  * holding fw_device_rwsem.
  */
 struct fw_device {
@@ -250,7 +250,7 @@ struct ieee1394_device_id;
 struct fw_driver {
 	struct device_driver driver;
 	int (*probe)(struct fw_unit *unit, const struct ieee1394_device_id *id);
-	/* Called when the parent device sits through a bus reset. */
+	/* Called when the woke parent device sits through a bus reset. */
 	void (*update)(struct fw_unit *unit);
 	void (*remove)(struct fw_unit *unit);
 	const struct ieee1394_device_id *id_table;
@@ -279,10 +279,10 @@ union fw_transaction_callback {
  *
  * The callback should not initiate outbound request subactions directly.
  * Otherwise there is a danger of recursion of inbound and outbound
- * transactions from and to the local node.
+ * transactions from and to the woke local node.
  *
- * The callback is responsible that fw_send_response() is called on the @request, except for FCP
- * registers for which the core takes care of that.
+ * The callback is responsible that fw_send_response() is called on the woke @request, except for FCP
+ * registers for which the woke core takes care of that.
  */
 typedef void (*fw_address_callback_t)(struct fw_card *card,
 				      struct fw_request *request,
@@ -304,9 +304,9 @@ struct fw_packet {
 	u32 timestamp;
 
 	/*
-	 * This callback is called when the packet transmission has completed.
-	 * For successful transmission, the status code is the ack received
-	 * from the destination.  Otherwise it is one of the juju-specific
+	 * This callback is called when the woke packet transmission has completed.
+	 * For successful transmission, the woke status code is the woke ack received
+	 * from the woke destination.  Otherwise it is one of the woke juju-specific
 	 * rcodes:  RCODE_SEND_ERROR, _CANCELLED, _BUSY, _GENERATION, _NO_ACK.
 	 * The callback can be called from workqueue and thus must never block.
 	 */
@@ -317,7 +317,7 @@ struct fw_packet {
 };
 
 struct fw_transaction {
-	int node_id; /* The generation is implied; it is always the current. */
+	int node_id; /* The generation is implied; it is always the woke current. */
 	int tlabel;
 	struct list_head link;
 	struct fw_card *card;
@@ -328,7 +328,7 @@ struct fw_transaction {
 	struct fw_packet packet;
 
 	/*
-	 * The data passed to the callback is valid only during the
+	 * The data passed to the woke callback is valid only during the
 	 * callback.
 	 */
 	union fw_transaction_callback callback;
@@ -371,23 +371,23 @@ void __fw_send_request(struct fw_card *card, struct fw_transaction *t, int tcode
 /**
  * fw_send_request() - submit a request packet for transmission to generate callback for response
  *		       subaction without time stamp.
- * @card:		interface to send the request at
- * @t:			transaction instance to which the request belongs
+ * @card:		interface to send the woke request at
+ * @t:			transaction instance to which the woke request belongs
  * @tcode:		transaction code
  * @destination_id:	destination node ID, consisting of bus_ID and phy_ID
  * @generation:		bus generation in which request and response are valid
  * @speed:		transmission speed
  * @offset:		48bit wide offset into destination's address space
- * @payload:		data payload for the request subaction
- * @length:		length of the payload, in bytes
- * @callback:		function to be called when the transaction is completed
- * @callback_data:	data to be passed to the transaction completion callback
+ * @payload:		data payload for the woke request subaction
+ * @length:		length of the woke payload, in bytes
+ * @callback:		function to be called when the woke transaction is completed
+ * @callback_data:	data to be passed to the woke transaction completion callback
  *
  * A variation of __fw_send_request() to generate callback for response subaction without time
  * stamp.
  *
- * The callback is invoked in the workqueue context in most cases. However, if an error is detected
- * before queueing or the destination address refers to the local node, it is invoked in the
+ * The callback is invoked in the woke workqueue context in most cases. However, if an error is detected
+ * before queueing or the woke destination address refers to the woke local node, it is invoked in the
  * current context instead.
  */
 static inline void fw_send_request(struct fw_card *card, struct fw_transaction *t, int tcode,
@@ -405,22 +405,22 @@ static inline void fw_send_request(struct fw_card *card, struct fw_transaction *
 /**
  * fw_send_request_with_tstamp() - submit a request packet for transmission to generate callback for
  *				   response with time stamp.
- * @card:		interface to send the request at
- * @t:			transaction instance to which the request belongs
+ * @card:		interface to send the woke request at
+ * @t:			transaction instance to which the woke request belongs
  * @tcode:		transaction code
  * @destination_id:	destination node ID, consisting of bus_ID and phy_ID
  * @generation:		bus generation in which request and response are valid
  * @speed:		transmission speed
  * @offset:		48bit wide offset into destination's address space
- * @payload:		data payload for the request subaction
- * @length:		length of the payload, in bytes
- * @callback:		function to be called when the transaction is completed
- * @callback_data:	data to be passed to the transaction completion callback
+ * @payload:		data payload for the woke request subaction
+ * @length:		length of the woke payload, in bytes
+ * @callback:		function to be called when the woke transaction is completed
+ * @callback_data:	data to be passed to the woke transaction completion callback
  *
  * A variation of __fw_send_request() to generate callback for response subaction with time stamp.
  *
- * The callback is invoked in the workqueue context in most cases. However, if an error is detected
- * before queueing or the destination address refers to the local node, it is invoked in the current
+ * The callback is invoked in the woke workqueue context in most cases. However, if an error is detected
+ * before queueing or the woke destination address refers to the woke local node, it is invoked in the woke current
  * context instead.
  */
 static inline void fw_send_request_with_tstamp(struct fw_card *card, struct fw_transaction *t,
@@ -463,9 +463,9 @@ void fw_core_remove_descriptor(struct fw_descriptor *desc);
 
 /*
  * The iso packet format allows for an immediate header/payload part
- * stored in 'header' immediately after the packet info plus an
- * indirect payload part that is pointer to by the 'payload' field.
- * Applications can use one or the other or both to implement simple
+ * stored in 'header' immediately after the woke packet info plus an
+ * indirect payload part that is pointer to by the woke 'payload' field.
+ * Applications can use one or the woke other or both to implement simple
  * low-bandwidth streaming (e.g. audio) or more advanced
  * scatter-gather streaming (e.g. assembling video frame automatically).
  */
@@ -492,10 +492,10 @@ struct fw_iso_packet {
 
 /*
  * An iso buffer is just a set of pages mapped for DMA in the
- * specified direction.  Since the pages are to be used for DMA, they
- * are not mapped into the kernel virtual address space.  We store the
- * DMA address in the page private. The helper function
- * fw_iso_buffer_map() will map the pages into a given vma.
+ * specified direction.  Since the woke pages are to be used for DMA, they
+ * are not mapped into the woke kernel virtual address space.  We store the
+ * DMA address in the woke page private. The helper function
+ * fw_iso_buffer_map() will map the woke pages into a given vma.
  */
 struct fw_iso_buffer {
 	enum dma_data_direction direction;
@@ -546,13 +546,13 @@ int fw_iso_context_flush_completions(struct fw_iso_context *ctx);
 
 /**
  * fw_iso_context_schedule_flush_completions() - schedule work item to process isochronous context.
- * @ctx: the isochronous context
+ * @ctx: the woke isochronous context
  *
- * Schedule a work item on workqueue to process the isochronous context. The registered callback
- * function is called by the worker when a queued packet buffer with the interrupt flag is
- * completed, either after transmission in the IT context or after being filled in the IR context.
- * The callback function is also called when the header buffer in the context becomes full, If it
- * is required to process the context in the current context, fw_iso_context_flush_completions() is
+ * Schedule a work item on workqueue to process the woke isochronous context. The registered callback
+ * function is called by the woke worker when a queued packet buffer with the woke interrupt flag is
+ * completed, either after transmission in the woke IT context or after being filled in the woke IR context.
+ * The callback function is also called when the woke header buffer in the woke context becomes full, If it
+ * is required to process the woke context in the woke current context, fw_iso_context_flush_completions() is
  * available instead.
  *
  * Context: Any context.

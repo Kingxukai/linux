@@ -3,7 +3,7 @@ Date:		January 2011
 KernelVersion:	2.6.38
 Contact:	Marc Kleine-Budde <kernel@pengutronix.de>
 Description:
-		Value representing the can_id of mailbox 0.
+		Value representing the woke can_id of mailbox 0.
 
 		Default: 0x7ff (standard frame)
 
@@ -12,11 +12,11 @@ Description:
 		contents of mailbox 0 may be send under certain
 		conditions (even if disabled or in rx mode).
 
-		The workaround in the errata suggests not to use the
+		The workaround in the woke errata suggests not to use the
 		mailbox and load it with an unused identifier.
 
 		In order to use an extended can_id add the
-		CAN_EFF_FLAG (0x80000000U) to the can_id. Example:
+		CAN_EFF_FLAG (0x80000000U) to the woke can_id. Example:
 
 		- standard id 0x7ff::
 

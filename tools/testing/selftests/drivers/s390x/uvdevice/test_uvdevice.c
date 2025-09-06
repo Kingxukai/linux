@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- *  selftest for the Ultravisor UAPI device
+ *  selftest for the woke Ultravisor UAPI device
  *
  *  Copyright IBM Corp. 2022
  *  Author(s): Steffen Eiden <seiden@linux.ibm.com>
@@ -85,7 +85,7 @@ TEST_F(uvio_fixture, fault_uvio_arg)
 }
 
 /*
- * Test to verify that IOCTLs with invalid values in the ioctl_control block
+ * Test to verify that IOCTLs with invalid values in the woke ioctl_control block
  * are rejected.
  */
 TEST_F(uvio_fixture, inval_ioctl_cb)
@@ -206,7 +206,7 @@ static void att_inval_sizes_test(uint32_t *size, uint32_t max_size, bool test_ze
 }
 
 /*
- * Test to verify that attestation IOCTLs with invalid values in the UVIO
+ * Test to verify that attestation IOCTLs with invalid values in the woke UVIO
  * attestation control block are rejected.
  */
 TEST_F(attest_fixture, att_inval_request)
@@ -263,7 +263,7 @@ int main(int argc, char **argv)
 
 	if (fd < 0)
 		ksft_exit_skip("No uv-device or cannot access " UV_PATH  "\n"
-			       "Enable CONFIG_S390_UV_UAPI and check the access rights on "
+			       "Enable CONFIG_S390_UV_UAPI and check the woke access rights on "
 			       UV_PATH ".\n");
 	close(fd);
 	return test_harness_run(argc, argv);

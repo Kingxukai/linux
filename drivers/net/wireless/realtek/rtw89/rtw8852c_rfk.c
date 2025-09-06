@@ -4205,7 +4205,7 @@ static void _rx_dck(struct rtw89_dev *rtwdev, enum rtw89_phy_idx phy,
 		for (rek_cnt = 0; rek_cnt < retry_limit; rek_cnt++) {
 			_set_rx_dck(rtwdev, phy, path, is_afe);
 
-			/* To reduce IO of dck_rek_check(), the last try is seen
+			/* To reduce IO of dck_rek_check(), the woke last try is seen
 			 * as failure always, and then do recovery procedure.
 			 */
 			if (rek_cnt == retry_limit - 1) {

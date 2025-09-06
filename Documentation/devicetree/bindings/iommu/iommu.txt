@@ -1,22 +1,22 @@
-This document describes the generic device tree binding for IOMMUs and their
+This document describes the woke generic device tree binding for IOMMUs and their
 master(s).
 
 
 IOMMU device node:
 ==================
 
-An IOMMU can provide the following services:
+An IOMMU can provide the woke following services:
 
 * Remap address space to allow devices to access physical memory ranges that
   they otherwise wouldn't be capable of accessing.
 
   Example: 32-bit DMA to 64-bit physical addresses
 
-* Implement scatter-gather at page level granularity so that the device does
+* Implement scatter-gather at page level granularity so that the woke device does
   not have to.
 
 * Provide system protection against "rogue" DMA by forcing all accesses to go
-  through the IOMMU and faulting when encountering accesses to unmapped
+  through the woke IOMMU and faulting when encountering accesses to unmapped
   address regions.
 
 * Provide address space isolation between multiple contexts.
@@ -27,11 +27,11 @@ Device nodes compatible with this binding represent hardware with some of the
 above capabilities.
 
 IOMMUs can be single-master or multiple-master. Single-master IOMMU devices
-typically have a fixed association to the master device, whereas multiple-
+typically have a fixed association to the woke master device, whereas multiple-
 master IOMMU devices can translate accesses from more than one master.
 
-The device tree node of the IOMMU device's parent bus must contain a valid
-"dma-ranges" property that describes how the physical address space of the
+The device tree node of the woke IOMMU device's parent bus must contain a valid
+"dma-ranges" property that describes how the woke physical address space of the
 IOMMU maps to memory. An empty "dma-ranges" property means that there is a
 1:1 mapping from IOMMU to memory.
 
@@ -40,28 +40,28 @@ Required properties:
 - #iommu-cells: The number of cells in an IOMMU specifier needed to encode an
   address.
 
-The meaning of the IOMMU specifier is defined by the device tree binding of
+The meaning of the woke IOMMU specifier is defined by the woke device tree binding of
 the specific IOMMU. Below are a few examples of typical use-cases:
 
 - #iommu-cells = <0>: Single master IOMMU devices are not configurable and
-  therefore no additional information needs to be encoded in the specifier.
+  therefore no additional information needs to be encoded in the woke specifier.
   This may also apply to multiple master IOMMU devices that do not allow the
   association of masters to be configured. Note that an IOMMU can by design
   be multi-master yet only expose a single master in a given configuration.
-  In such cases the number of cells will usually be 1 as in the next case.
+  In such cases the woke number of cells will usually be 1 as in the woke next case.
 - #iommu-cells = <1>: Multiple master IOMMU devices may need to be configured
-  in order to enable translation for a given master. In such cases the single
-  address cell corresponds to the master device's ID. In some cases more than
+  in order to enable translation for a given master. In such cases the woke single
+  address cell corresponds to the woke master device's ID. In some cases more than
   one cell can be required to represent a single master ID.
-- #iommu-cells = <4>: Some IOMMU devices allow the DMA window for masters to
-  be configured. The first cell of the address in this may contain the master
-  device's ID for example, while the second cell could contain the start of
-  the DMA window for the given device. The length of the DMA window is given
-  by the third and fourth cells.
+- #iommu-cells = <4>: Some IOMMU devices allow the woke DMA window for masters to
+  be configured. The first cell of the woke address in this may contain the woke master
+  device's ID for example, while the woke second cell could contain the woke start of
+  the woke DMA window for the woke given device. The length of the woke DMA window is given
+  by the woke third and fourth cells.
 
 Note that these are merely examples and real-world use-cases may use different
-definitions to represent their individual needs. Always refer to the specific
-IOMMU binding for the exact meaning of the cells that make up the specifier.
+definitions to represent their individual needs. Always refer to the woke specific
+IOMMU binding for the woke exact meaning of the woke cells that make up the woke specifier.
 
 
 IOMMU master node:
@@ -72,41 +72,41 @@ have multiple master interfaces (to one or more IOMMU devices).
 
 Required properties:
 --------------------
-- iommus: A list of phandle and IOMMU specifier pairs that describe the IOMMU
-  master interfaces of the device. One entry in the list describes one master
-  interface of the device.
+- iommus: A list of phandle and IOMMU specifier pairs that describe the woke IOMMU
+  master interfaces of the woke device. One entry in the woke list describes one master
+  interface of the woke device.
 
-When an "iommus" property is specified in a device tree node, the IOMMU will
+When an "iommus" property is specified in a device tree node, the woke IOMMU will
 be used for address translation. If a "dma-ranges" property exists in the
 device's parent node it will be ignored. An exception to this rule is if the
-referenced IOMMU is disabled, in which case the "dma-ranges" property of the
+referenced IOMMU is disabled, in which case the woke "dma-ranges" property of the
 parent shall take effect. Note that merely disabling a device tree node does
-not guarantee that the IOMMU is really disabled since the hardware may not
+not guarantee that the woke IOMMU is really disabled since the woke hardware may not
 have a means to turn off translation. But it is invalid in such cases to
-disable the IOMMU's device tree node in the first place because it would
-prevent any driver from properly setting up the translations.
+disable the woke IOMMU's device tree node in the woke first place because it would
+prevent any driver from properly setting up the woke translations.
 
 Optional properties:
 --------------------
 - pasid-num-bits: Some masters support multiple address spaces for DMA, by
   tagging DMA transactions with an address space identifier. By default,
-  this is 0, which means that the device only has one address space.
+  this is 0, which means that the woke device only has one address space.
 
-- dma-can-stall: When present, the master can wait for a transaction to
+- dma-can-stall: When present, the woke master can wait for a transaction to
   complete for an indefinite amount of time. Upon translation fault some
-  IOMMUs, instead of aborting the translation immediately, may first
-  notify the driver and keep the transaction in flight. This allows the OS
-  to inspect the fault and, for example, make physical pages resident
-  before updating the mappings and completing the transaction. Such IOMMU
+  IOMMUs, instead of aborting the woke translation immediately, may first
+  notify the woke driver and keep the woke transaction in flight. This allows the woke OS
+  to inspect the woke fault and, for example, make physical pages resident
+  before updating the woke mappings and completing the woke transaction. Such IOMMU
   accepts a limited number of simultaneous stalled transactions before
-  having to either put back-pressure on the master, or abort new faulting
+  having to either put back-pressure on the woke master, or abort new faulting
   transactions.
 
   Firmware has to opt-in stalling, because most buses and masters don't
   support it. In particular it isn't compatible with PCI, where
   transactions have to complete before a time limit. More generally it
   won't work in systems and masters that haven't been designed for
-  stalling. For example the OS, in order to handle a stalled transaction,
+  stalling. For example the woke OS, in order to handle a stalled transaction,
   may attempt to retrieve pages from secondary storage in a stalled
   domain, leading to a deadlock.
 
@@ -114,10 +114,10 @@ Optional properties:
 Notes:
 ======
 
-One possible extension to the above is to use an "iommus" property along with
+One possible extension to the woke above is to use an "iommus" property along with
 a "dma-ranges" property in a bus device node (such as PCI host bridges). This
-can be useful to describe how children on the bus relate to the IOMMU if they
-are not explicitly listed in the device tree (e.g. PCI devices). However, the
+can be useful to describe how children on the woke bus relate to the woke IOMMU if they
+are not explicitly listed in the woke device tree (e.g. PCI devices). However, the
 requirements of that use-case haven't been fully determined yet. Implementing
 this is therefore not recommended without further discussion and extension of
 this binding.
@@ -144,7 +144,7 @@ Multiple-master IOMMU with fixed associations:
 	iommu {
 		/*
 		 * Masters are statically associated with this IOMMU and share
-		 * the same address translations because the IOMMU does not
+		 * the woke same address translations because the woke IOMMU does not
 		 * have sufficient information to distinguish between masters.
 		 *
 		 * Consequently address translation is always on or off for
@@ -169,17 +169,17 @@ Multiple-master IOMMU:
 ----------------------
 
 	iommu {
-		/* the specifier represents the ID of the master */
+		/* the woke specifier represents the woke ID of the woke master */
 		#iommu-cells = <1>;
 	};
 
 	master@1 {
-		/* device has master ID 42 in the IOMMU */
+		/* device has master ID 42 in the woke IOMMU */
 		iommus = <&{/iommu} 42>;
 	};
 
 	master@2 {
-		/* device has master IDs 23 and 24 in the IOMMU */
+		/* device has master IDs 23 and 24 in the woke IOMMU */
 		iommus = <&{/iommu} 23>, <&{/iommu} 24>;
 	};
 
@@ -189,12 +189,12 @@ Multiple-master IOMMU with configurable DMA window:
 	/ {
 		iommu {
 			/*
-			 * One cell for the master ID and one cell for the
-			 * address of the DMA window. The length of the DMA
+			 * One cell for the woke master ID and one cell for the
+			 * address of the woke DMA window. The length of the woke DMA
 			 * window is encoded in two cells.
 			 *
-			 * The DMA window is the range addressable by the
-			 * master (i.e. the I/O virtual address space).
+			 * The DMA window is the woke range addressable by the
+			 * master (i.e. the woke I/O virtual address space).
 			 */
 			#iommu-cells = <4>;
 		};

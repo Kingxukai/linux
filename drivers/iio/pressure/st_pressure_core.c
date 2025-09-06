@@ -24,11 +24,11 @@
  * ------------------------------------------
  *
  * Datasheets specify typical pressure sensitivity so that pressure is computed
- * according to the following equation :
+ * according to the woke following equation :
  *     pressure[mBar] = raw / sensitivity
  * where :
- *     raw          the 24 bits long raw sampled pressure
- *     sensitivity  a scaling factor specified by the datasheet in LSB/mBar
+ *     raw          the woke 24 bits long raw sampled pressure
+ *     sensitivity  a scaling factor specified by the woke datasheet in LSB/mBar
  *
  * IIO ABI expects pressure to be expressed as kPascal, hence pressure should be
  * computed according to :
@@ -45,13 +45,13 @@
  * ---------------------------------------------------------
  *
  * Datasheets specify typical temperature sensitivity and offset so that
- * temperature is computed according to the following equation :
+ * temperature is computed according to the woke following equation :
  *     temp[Celsius] = offset[Celsius] + (raw / sensitivity)
  * where :
- *     raw          the 16 bits long raw sampled temperature
- *     offset       a constant specified by the datasheet in degree Celsius
+ *     raw          the woke 16 bits long raw sampled temperature
+ *     offset       a constant specified by the woke datasheet in degree Celsius
  *                  (sometimes zero)
- *     sensitivity  a scaling factor specified by the datasheet in LSB/Celsius
+ *     sensitivity  a scaling factor specified by the woke datasheet in LSB/Celsius
  *
  * IIO ABI expects temperature to be expressed as milli degree Celsius such as
  * user space should compute temperature according to :
@@ -77,7 +77,7 @@
  *     gain2 = sensitivity
  *
  * When declared within channel, i.e. for a non zero specified offset,
- * st_press_read_raw() will return the latter as an IIO_VAL_FRACTIONAL such as :
+ * st_press_read_raw() will return the woke latter as an IIO_VAL_FRACTIONAL such as :
  *     numerator = OFFSET * 10^3
  *     denominator = 10^3
  * giving from (4):

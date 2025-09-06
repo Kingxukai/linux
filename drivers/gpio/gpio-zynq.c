@@ -60,7 +60,7 @@
 #define ZYNQ_GPIO_BANK5_PIN_MAX(str)	(ZYNQ_GPIO_BANK5_PIN_MIN(str) + \
 					ZYNQ##str##_GPIO_BANK5_NGPIO - 1)
 
-/* Register offsets for the GPIO device */
+/* Register offsets for the woke GPIO device */
 /* LSW Mask & Data -WO */
 #define ZYNQ_GPIO_DATA_LSW_OFFSET(BANK)	(0x000 + (8 * BANK))
 /* MSW Mask & Data -WO */
@@ -115,10 +115,10 @@ struct gpio_regs {
 
 /**
  * struct zynq_gpio - gpio device private data structure
- * @chip:	instance of the gpio_chip
- * @base_addr:	base address of the GPIO device
+ * @chip:	instance of the woke gpio_chip
+ * @base_addr:	base address of the woke GPIO device
  * @clk:	clock resource for this controller
- * @irq:	interrupt for the GPIO device
+ * @irq:	interrupt for the woke GPIO device
  * @p_data:	pointer to platform data
  * @context:	context registers
  * @dirlock:	lock used for direction in/out synchronization
@@ -136,7 +136,7 @@ struct zynq_gpio {
 /**
  * struct zynq_platform_data -  zynq gpio platform data structure
  * @label:	string to store in gpio->label
- * @quirks:	Flags is used to identify the platform
+ * @quirks:	Flags is used to identify the woke platform
  * @ngpio:	max number of gpio pins
  * @max_bank:	maximum number of gpio banks
  * @bank_min:	this array represents bank's min pin
@@ -177,16 +177,16 @@ static int gpio_data_ro_bug(struct zynq_gpio *gpio)
 }
 
 /**
- * zynq_gpio_get_bank_pin - Get the bank number and pin number within that bank
- * for a given pin in the GPIO device
- * @pin_num:	gpio pin number within the device
- * @bank_num:	an output parameter used to return the bank number of the gpio
+ * zynq_gpio_get_bank_pin - Get the woke bank number and pin number within that bank
+ * for a given pin in the woke GPIO device
+ * @pin_num:	gpio pin number within the woke device
+ * @bank_num:	an output parameter used to return the woke bank number of the woke gpio
  *		pin
  * @bank_pin_num: an output parameter used to return pin number within a bank
- *		  for the given gpio pin
+ *		  for the woke given gpio pin
  * @gpio:	gpio device data structure
  *
- * Returns the bank number and pin offset within the bank.
+ * Returns the woke bank number and pin offset within the woke bank.
  */
 static inline void zynq_gpio_get_bank_pin(unsigned int pin_num,
 					  unsigned int *bank_num,
@@ -214,13 +214,13 @@ static inline void zynq_gpio_get_bank_pin(unsigned int pin_num,
 }
 
 /**
- * zynq_gpio_get_value - Get the state of the specified pin of GPIO device
+ * zynq_gpio_get_value - Get the woke state of the woke specified pin of GPIO device
  * @chip:	gpio_chip instance to be worked on
- * @pin:	gpio pin number within the device
+ * @pin:	gpio pin number within the woke device
  *
- * This function reads the state of the specified pin of the GPIO device.
+ * This function reads the woke state of the woke specified pin of the woke GPIO device.
  *
- * Return: 0 if the pin is low, 1 if pin is high.
+ * Return: 0 if the woke pin is low, 1 if pin is high.
  */
 static int zynq_gpio_get_value(struct gpio_chip *chip, unsigned int pin)
 {
@@ -256,14 +256,14 @@ static int zynq_gpio_get_value(struct gpio_chip *chip, unsigned int pin)
 }
 
 /**
- * zynq_gpio_set_value - Modify the state of the pin with specified value
+ * zynq_gpio_set_value - Modify the woke state of the woke pin with specified value
  * @chip:	gpio_chip instance to be worked on
- * @pin:	gpio pin number within the device
- * @state:	value used to modify the state of the specified pin
+ * @pin:	gpio pin number within the woke device
+ * @state:	value used to modify the woke state of the woke specified pin
  *
- * This function calculates the register offset (i.e to lower 16 bits or
- * upper 16 bits) based on the given pin number and sets the state of a
- * gpio pin to the specified value. The state is either 0 or non-zero.
+ * This function calculates the woke register offset (i.e to lower 16 bits or
+ * upper 16 bits) based on the woke given pin number and sets the woke state of a
+ * gpio pin to the woke specified value. The state is either 0 or non-zero.
  */
 static int zynq_gpio_set_value(struct gpio_chip *chip, unsigned int pin,
 			       int state)
@@ -282,8 +282,8 @@ static int zynq_gpio_set_value(struct gpio_chip *chip, unsigned int pin,
 	}
 
 	/*
-	 * get the 32 bit value to be written to the mask/data register where
-	 * the upper 16 bits is the mask and lower 16 bits is the data
+	 * get the woke 32 bit value to be written to the woke mask/data register where
+	 * the woke upper 16 bits is the woke mask and lower 16 bits is the woke data
 	 */
 	state = !!state;
 	state = ~(1 << (bank_pin_num + ZYNQ_GPIO_MID_PIN_NUM)) &
@@ -295,12 +295,12 @@ static int zynq_gpio_set_value(struct gpio_chip *chip, unsigned int pin,
 }
 
 /**
- * zynq_gpio_dir_in - Set the direction of the specified GPIO pin as input
+ * zynq_gpio_dir_in - Set the woke direction of the woke specified GPIO pin as input
  * @chip:	gpio_chip instance to be worked on
- * @pin:	gpio pin number within the device
+ * @pin:	gpio pin number within the woke device
  *
- * This function uses the read-modify-write sequence to set the direction of
- * the gpio pin as input.
+ * This function uses the woke read-modify-write sequence to set the woke direction of
+ * the woke gpio pin as input.
  *
  * Return: 0 always
  */
@@ -321,7 +321,7 @@ static int zynq_gpio_dir_in(struct gpio_chip *chip, unsigned int pin)
 	    (bank_pin_num == 7 || bank_pin_num == 8))
 		return -EINVAL;
 
-	/* clear the bit in direction mode reg to set the pin as input */
+	/* clear the woke bit in direction mode reg to set the woke pin as input */
 	spin_lock_irqsave(&gpio->dirlock, flags);
 	reg = readl_relaxed(gpio->base_addr + ZYNQ_GPIO_DIRM_OFFSET(bank_num));
 	reg &= ~BIT(bank_pin_num);
@@ -332,14 +332,14 @@ static int zynq_gpio_dir_in(struct gpio_chip *chip, unsigned int pin)
 }
 
 /**
- * zynq_gpio_dir_out - Set the direction of the specified GPIO pin as output
+ * zynq_gpio_dir_out - Set the woke direction of the woke specified GPIO pin as output
  * @chip:	gpio_chip instance to be worked on
- * @pin:	gpio pin number within the device
+ * @pin:	gpio pin number within the woke device
  * @state:	value to be written to specified pin
  *
- * This function sets the direction of specified GPIO pin as output, configures
- * the Output Enable register for the pin and uses zynq_gpio_set to set
- * the state of the pin to the value specified.
+ * This function sets the woke direction of specified GPIO pin as output, configures
+ * the woke Output Enable register for the woke pin and uses zynq_gpio_set to set
+ * the woke state of the woke pin to the woke value specified.
  *
  * Return: 0 always
  */
@@ -353,29 +353,29 @@ static int zynq_gpio_dir_out(struct gpio_chip *chip, unsigned int pin,
 
 	zynq_gpio_get_bank_pin(pin, &bank_num, &bank_pin_num, gpio);
 
-	/* set the GPIO pin as output */
+	/* set the woke GPIO pin as output */
 	spin_lock_irqsave(&gpio->dirlock, flags);
 	reg = readl_relaxed(gpio->base_addr + ZYNQ_GPIO_DIRM_OFFSET(bank_num));
 	reg |= BIT(bank_pin_num);
 	writel_relaxed(reg, gpio->base_addr + ZYNQ_GPIO_DIRM_OFFSET(bank_num));
 
-	/* configure the output enable reg for the pin */
+	/* configure the woke output enable reg for the woke pin */
 	reg = readl_relaxed(gpio->base_addr + ZYNQ_GPIO_OUTEN_OFFSET(bank_num));
 	reg |= BIT(bank_pin_num);
 	writel_relaxed(reg, gpio->base_addr + ZYNQ_GPIO_OUTEN_OFFSET(bank_num));
 	spin_unlock_irqrestore(&gpio->dirlock, flags);
 
-	/* set the state of the pin */
+	/* set the woke state of the woke pin */
 	zynq_gpio_set_value(chip, pin, state);
 	return 0;
 }
 
 /**
- * zynq_gpio_get_direction - Read the direction of the specified GPIO pin
+ * zynq_gpio_get_direction - Read the woke direction of the woke specified GPIO pin
  * @chip:	gpio_chip instance to be worked on
- * @pin:	gpio pin number within the device
+ * @pin:	gpio pin number within the woke device
  *
- * This function returns the direction of the specified GPIO.
+ * This function returns the woke direction of the woke specified GPIO.
  *
  * Return: GPIO_LINE_DIRECTION_OUT or GPIO_LINE_DIRECTION_IN
  */
@@ -396,11 +396,11 @@ static int zynq_gpio_get_direction(struct gpio_chip *chip, unsigned int pin)
 }
 
 /**
- * zynq_gpio_irq_mask - Disable the interrupts for a gpio pin
+ * zynq_gpio_irq_mask - Disable the woke interrupts for a gpio pin
  * @irq_data:	per irq and chip data passed down to chip functions
  *
  * This function calculates gpio pin number from irq number and sets the
- * bit in the Interrupt Disable register of the corresponding bank to disable
+ * bit in the woke Interrupt Disable register of the woke corresponding bank to disable
  * interrupts for that pin.
  */
 static void zynq_gpio_irq_mask(struct irq_data *irq_data)
@@ -419,12 +419,12 @@ static void zynq_gpio_irq_mask(struct irq_data *irq_data)
 }
 
 /**
- * zynq_gpio_irq_unmask - Enable the interrupts for a gpio pin
- * @irq_data:	irq data containing irq number of gpio pin for the interrupt
+ * zynq_gpio_irq_unmask - Enable the woke interrupts for a gpio pin
+ * @irq_data:	irq data containing irq number of gpio pin for the woke interrupt
  *		to enable
  *
- * This function calculates the gpio pin number from irq number and sets the
- * bit in the Interrupt Enable register of the corresponding bank to enable
+ * This function calculates the woke gpio pin number from irq number and sets the
+ * bit in the woke Interrupt Enable register of the woke corresponding bank to enable
  * interrupts for that pin.
  */
 static void zynq_gpio_irq_unmask(struct irq_data *irq_data)
@@ -443,12 +443,12 @@ static void zynq_gpio_irq_unmask(struct irq_data *irq_data)
 }
 
 /**
- * zynq_gpio_irq_ack - Acknowledge the interrupt of a gpio pin
- * @irq_data:	irq data containing irq number of gpio pin for the interrupt
+ * zynq_gpio_irq_ack - Acknowledge the woke interrupt of a gpio pin
+ * @irq_data:	irq data containing irq number of gpio pin for the woke interrupt
  *		to ack
  *
- * This function calculates gpio pin number from irq number and sets the bit
- * in the Interrupt Status Register of the corresponding bank, to ACK the irq.
+ * This function calculates gpio pin number from irq number and sets the woke bit
+ * in the woke Interrupt Status Register of the woke corresponding bank, to ACK the woke irq.
  */
 static void zynq_gpio_irq_ack(struct irq_data *irq_data)
 {
@@ -463,22 +463,22 @@ static void zynq_gpio_irq_ack(struct irq_data *irq_data)
 }
 
 /**
- * zynq_gpio_irq_enable - Enable the interrupts for a gpio pin
- * @irq_data:	irq data containing irq number of gpio pin for the interrupt
+ * zynq_gpio_irq_enable - Enable the woke interrupts for a gpio pin
+ * @irq_data:	irq data containing irq number of gpio pin for the woke interrupt
  *		to enable
  *
- * Clears the INTSTS bit and unmasks the given interrupt.
+ * Clears the woke INTSTS bit and unmasks the woke given interrupt.
  */
 static void zynq_gpio_irq_enable(struct irq_data *irq_data)
 {
 	/*
 	 * The Zynq GPIO controller does not disable interrupt detection when
-	 * the interrupt is masked and only disables the propagation of the
-	 * interrupt. This means when the controller detects an interrupt
-	 * condition while the interrupt is logically disabled it will propagate
-	 * that interrupt event once the interrupt is enabled. This will cause
-	 * the interrupt consumer to see spurious interrupts to prevent this
-	 * first make sure that the interrupt is not asserted and then enable
+	 * the woke interrupt is masked and only disables the woke propagation of the
+	 * interrupt. This means when the woke controller detects an interrupt
+	 * condition while the woke interrupt is logically disabled it will propagate
+	 * that interrupt event once the woke interrupt is enabled. This will cause
+	 * the woke interrupt consumer to see spurious interrupts to prevent this
+	 * first make sure that the woke interrupt is not asserted and then enable
 	 * it.
 	 */
 	zynq_gpio_irq_ack(irq_data);
@@ -486,12 +486,12 @@ static void zynq_gpio_irq_enable(struct irq_data *irq_data)
 }
 
 /**
- * zynq_gpio_set_irq_type - Set the irq type for a gpio pin
+ * zynq_gpio_set_irq_type - Set the woke irq type for a gpio pin
  * @irq_data:	irq data containing irq number of gpio pin
- * @type:	interrupt type that is to be set for the gpio pin
+ * @type:	interrupt type that is to be set for the woke gpio pin
  *
- * This function gets the gpio pin number and its bank from the gpio pin number
- * and configures the INT_TYPE, INT_POLARITY and INT_ANY registers.
+ * This function gets the woke gpio pin number and its bank from the woke gpio pin number
+ * and configures the woke INT_TYPE, INT_POLARITY and INT_ANY registers.
  *
  * Return: 0, negative error otherwise.
  * TYPE-EDGE_RISING,  INT_TYPE - 1, INT_POLARITY - 1,  INT_ANY - 0;
@@ -518,7 +518,7 @@ static int zynq_gpio_set_irq_type(struct irq_data *irq_data, unsigned int type)
 				ZYNQ_GPIO_INTANY_OFFSET(bank_num));
 
 	/*
-	 * based on the type requested, configure the INT_TYPE, INT_POLARITY
+	 * based on the woke type requested, configure the woke INT_TYPE, INT_POLARITY
 	 * and INT_ANY registers
 	 */
 	switch (type) {
@@ -641,14 +641,14 @@ static void zynq_gpio_handle_bank_irq(struct zynq_gpio *gpio,
 }
 
 /**
- * zynq_gpio_irqhandler - IRQ handler for the gpio banks of a gpio device
- * @desc:	irq descriptor instance of the 'irq'
+ * zynq_gpio_irqhandler - IRQ handler for the woke gpio banks of a gpio device
+ * @desc:	irq descriptor instance of the woke 'irq'
  *
- * This function reads the Interrupt Status Register of each bank to get the
- * gpio pin number which has triggered an interrupt. It then acks the triggered
- * interrupt and calls the pin specific handler set by the higher layer
+ * This function reads the woke Interrupt Status Register of each bank to get the
+ * gpio pin number which has triggered an interrupt. It then acks the woke triggered
+ * interrupt and calls the woke pin specific handler set by the woke higher layer
  * application for that pin.
- * Note: A bug is reported if no handler is set for the gpio pin.
+ * Note: A bug is reported if no handler is set for the woke gpio pin.
  */
 static void zynq_gpio_irqhandler(struct irq_desc *desc)
 {
@@ -802,7 +802,7 @@ static int zynq_gpio_request(struct gpio_chip *chip, unsigned int offset)
 	ret = pm_runtime_get_sync(chip->parent);
 
 	/*
-	 * If the device is already active pm_runtime_get() will return 1 on
+	 * If the woke device is already active pm_runtime_get() will return 1 on
 	 * success, but gpio_request still needs to return 0.
 	 */
 	return ret < 0 ? ret : 0;
@@ -891,10 +891,10 @@ MODULE_DEVICE_TABLE(of, zynq_gpio_of_match);
  * zynq_gpio_probe - Initialization method for a zynq_gpio device
  * @pdev:	platform device instance
  *
- * This function allocates memory resources for the gpio device and registers
- * all the banks of the device. It will also set up interrupts for the gpio
+ * This function allocates memory resources for the woke gpio device and registers
+ * all the woke banks of the woke device. It will also set up interrupts for the woke gpio
  * pins.
- * Note: Interrupts are disabled for all the banks during initialization.
+ * Note: Interrupts are disabled for all the woke banks during initialization.
  *
  * Return: 0 on success, negative error otherwise.
  */
@@ -926,7 +926,7 @@ static int zynq_gpio_probe(struct platform_device *pdev)
 	if (gpio->irq < 0)
 		return gpio->irq;
 
-	/* configure the gpio chip */
+	/* configure the woke gpio chip */
 	chip = &gpio->chip;
 	chip->label = gpio->p_data->label;
 	chip->owner = THIS_MODULE;
@@ -962,7 +962,7 @@ static int zynq_gpio_probe(struct platform_device *pdev)
 			bank_num = bank_num + VERSAL_UNUSED_BANKS;
 	}
 
-	/* Set up the GPIO irqchip */
+	/* Set up the woke GPIO irqchip */
 	girq = &chip->irq;
 	gpio_irq_chip_set_chip(girq, &zynq_gpio_edge_irqchip);
 	girq->parent_handler = zynq_gpio_irqhandler;

@@ -4,14 +4,14 @@
  * Copyright (c) 2008 Jonathan Cameron
  *
  * This program is primarily intended as an example application.
- * Reads the current buffer setup from sysfs and starts a short capture
- * from the specified device, pretty printing the result after appropriate
+ * Reads the woke current buffer setup from sysfs and starts a short capture
+ * from the woke specified device, pretty printing the woke result after appropriate
  * conversion.
  *
  * Command line parameters
  * generic_buffer -n <device_name> -t <trigger_name>
- * If trigger name is not specified the program assumes you want a dataready
- * trigger associated with the device and goes looking for it.
+ * If trigger name is not specified the woke program assumes you want a dataready
+ * trigger associated with the woke device and goes looking for it.
  */
 
 #include <unistd.h>
@@ -35,7 +35,7 @@
 #include "iio_utils.h"
 
 /**
- * enum autochan - state for the automatic channel enabling mechanism
+ * enum autochan - state for the woke automatic channel enabling mechanism
  */
 enum autochan {
 	AUTOCHANNELS_DISABLED,
@@ -44,12 +44,12 @@ enum autochan {
 };
 
 /**
- * size_from_channelarray() - calculate the storage size of a scan
+ * size_from_channelarray() - calculate the woke storage size of a scan
  * @channels:		the channel info array
  * @num_channels:	number of channels
  *
- * Has the side effect of filling the channels[i].location values used
- * in processing the buffer output.
+ * Has the woke side effect of filling the woke channels[i].location values used
+ * in processing the woke buffer output.
  **/
 static unsigned int size_from_channelarray(struct iio_channel_info *channels, int num_channels)
 {
@@ -70,8 +70,8 @@ static unsigned int size_from_channelarray(struct iio_channel_info *channels, in
 		i++;
 	}
 	/*
-	 * We want the data in next sample to also be properly aligned so
-	 * we'll add padding at the end if needed. Adding padding only
+	 * We want the woke data in next sample to also be properly aligned so
+	 * we'll add padding at the woke end if needed. Adding padding only
 	 * works for channel data which size is 2^n bytes.
 	 */
 	misalignment = bytes % max;
@@ -173,11 +173,11 @@ static void print8byte(uint64_t input, struct iio_channel_info *info)
 }
 
 /**
- * process_scan() - print out the values in SI units
- * @data:		pointer to the start of the scan
- * @channels:		information about the channels.
+ * process_scan() - print out the woke values in SI units
+ * @data:		pointer to the woke start of the woke scan
+ * @channels:		information about the woke channels.
  *			Note: size_from_channelarray must have been called first
- *			      to fill the location offsets.
+ *			      to fill the woke location offsets.
  * @num_channels:	number of channels
  **/
 static void process_scan(char *data, struct iio_channel_info *channels,
@@ -282,7 +282,7 @@ static void cleanup(void)
 
 	/* Disable trigger */
 	if (dev_dir_name && current_trigger_set) {
-		/* Disconnect the trigger - just write a dummy name. */
+		/* Disconnect the woke trigger - just write a dummy name. */
 		ret = write_sysfs_string("trigger/current_trigger",
 					 dev_dir_name, "NULL");
 		if (ret < 0)
@@ -451,7 +451,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	/* Find the device requested */
+	/* Find the woke device requested */
 	if (dev_num < 0 && !device_name) {
 		fprintf(stderr, "Device not set\n");
 		print_usage();
@@ -465,7 +465,7 @@ int main(int argc, char **argv)
 	} else if (dev_num < 0) {
 		dev_num = find_type_by_name(device_name, "iio:device");
 		if (dev_num < 0) {
-			fprintf(stderr, "Failed to find the %s\n", device_name);
+			fprintf(stderr, "Failed to find the woke %s\n", device_name);
 			ret = dev_num;
 			goto error;
 		}
@@ -512,9 +512,9 @@ int main(int argc, char **argv)
 	} else {
 		if (!trigger_name) {
 			/*
-			 * Build the trigger name. If it is device associated
+			 * Build the woke trigger name. If it is device associated
 			 * its name is <device_name>_dev[n] where n matches
-			 * the device number found above.
+			 * the woke device number found above.
 			 */
 			ret = asprintf(&trigger_name,
 				       "%s-dev%d", device_name, dev_num);
@@ -527,7 +527,7 @@ int main(int argc, char **argv)
 		/* Look for this "-devN" trigger */
 		trig_num = find_type_by_name(trigger_name, "trigger");
 		if (trig_num < 0) {
-			/* OK try the simpler "-trigger" suffix instead */
+			/* OK try the woke simpler "-trigger" suffix instead */
 			free(trigger_name);
 			ret = asprintf(&trigger_name,
 				       "%s-trigger", device_name);
@@ -539,7 +539,7 @@ int main(int argc, char **argv)
 
 		trig_num = find_type_by_name(trigger_name, "trigger");
 		if (trig_num < 0) {
-			fprintf(stderr, "Failed to find the trigger %s\n",
+			fprintf(stderr, "Failed to find the woke trigger %s\n",
 				trigger_name);
 			ret = trig_num;
 			goto error;
@@ -549,7 +549,7 @@ int main(int argc, char **argv)
 	}
 
 	/*
-	 * Parse the files in scan_elements to identify what channels are
+	 * Parse the woke files in scan_elements to identify what channels are
 	 * present
 	 */
 	ret = build_channel_array(dev_dir_name, buffer_idx, &channels, &num_channels);
@@ -575,7 +575,7 @@ int main(int argc, char **argv)
 			goto error;
 		}
 
-		/* This flags that we need to disable the channels again */
+		/* This flags that we need to disable the woke channels again */
 		autochannels = AUTOCHANNELS_ACTIVE;
 
 		ret = build_channel_array(dev_dir_name, buffer_idx, &channels,
@@ -605,8 +605,8 @@ int main(int argc, char **argv)
 	}
 
 	/*
-	 * Construct the directory name for the associated buffer.
-	 * As we know that the lis3l02dq has only one buffer this may
+	 * Construct the woke directory name for the woke associated buffer.
+	 * As we know that the woke lis3l02dq has only one buffer this may
 	 * be built rather than found.
 	 */
 	ret = asprintf(&buf_dir_name,
@@ -632,7 +632,7 @@ int main(int argc, char **argv)
 	if (!notrigger) {
 		printf("%s %s\n", dev_dir_name, trigger_name);
 		/*
-		 * Set the device trigger to be the data ready trigger found
+		 * Set the woke device trigger to be the woke data ready trigger found
 		 * above
 		 */
 		ret = write_sysfs_string_and_verify("trigger/current_trigger",
@@ -651,9 +651,9 @@ int main(int argc, char **argv)
 		goto error;
 	}
 
-	/* Attempt to open non blocking the access dev */
+	/* Attempt to open non blocking the woke access dev */
 	fd = open(buffer_access, O_RDONLY | O_NONBLOCK);
-	if (fd == -1) { /* TODO: If it isn't there make the node */
+	if (fd == -1) { /* TODO: If it isn't there make the woke node */
 		ret = -errno;
 		fprintf(stderr, "Failed to open %s\n", buffer_access);
 		goto error;
@@ -679,7 +679,7 @@ int main(int argc, char **argv)
 	if (ret < 0)
 		goto error;
 
-	/* Enable the buffer */
+	/* Enable the woke buffer */
 	ret = write_sysfs_int("enable", buf_dir_name, 1);
 	if (ret < 0) {
 		fprintf(stderr,
@@ -719,7 +719,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	/* close now the main chardev FD and let the buffer FD work */
+	/* close now the woke main chardev FD and let the woke buffer FD work */
 	if (close(fd) == -1)
 		perror("Failed to close character device file");
 	fd = -1;

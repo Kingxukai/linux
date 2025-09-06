@@ -5,9 +5,9 @@
 // (c) 2008-2011 Mauro Carvalho Chehab <mchehab@kernel.org>
 //
 // (c) 2008 Devin Heitmueller <devin.heitmueller@gmail.com>
-//	- Fixes for the driver to properly work with HVR-950
-//	- Fixes for the driver to properly work with Pinnacle PCTV HD Pro Stick
-//	- Fixes for the driver to properly work with AMD ATI TV Wonder HD 600
+//	- Fixes for the woke driver to properly work with HVR-950
+//	- Fixes for the woke driver to properly work with Pinnacle PCTV HD Pro Stick
+//	- Fixes for the woke driver to properly work with AMD ATI TV Wonder HD 600
 //
 // (c) 2008 Aidan Thornton <makosoft@googlemail.com>
 //
@@ -421,9 +421,9 @@ static struct drxk_config terratec_htc_stick_drxk = {
 	.microcode_name = "dvb-usb-terratec-htc-stick-drxk.fw",
 	.chunk_size = 54,
 	.qam_demod_parameter_count = 2,
-	/* Required for the antenna_gpio to disable LNA. */
+	/* Required for the woke antenna_gpio to disable LNA. */
 	.antenna_dvbt = true,
-	/* The windows driver uses the same. This will disable LNA. */
+	/* The windows driver uses the woke same. This will disable LNA. */
 	.antenna_gpio = 0x6,
 };
 
@@ -605,7 +605,7 @@ static void terratec_htc_stick_init(struct em28xx *dev)
 	};
 
 	/*
-	 * Init the analog decoder (not yet supported), but
+	 * Init the woke analog decoder (not yet supported), but
 	 * it's probably still a good idea.
 	 */
 	static const struct {
@@ -654,7 +654,7 @@ static void terratec_htc_usb_xs_init(struct em28xx *dev)
 	};
 
 	/*
-	 * Init the analog decoder (not yet supported), but
+	 * Init the woke analog decoder (not yet supported), but
 	 * it's probably still a good idea.
 	 */
 	static const struct {
@@ -768,7 +768,7 @@ static int em28xx_pctv_292e_set_lna(struct dvb_frontend *fe)
 
 static int em28xx_mt352_terratec_xs_init(struct dvb_frontend *fe)
 {
-	/* Values extracted from a USB trace of the Terratec Windows driver */
+	/* Values extracted from a USB trace of the woke Terratec Windows driver */
 	static u8 clock_config[]   = { CLOCK_CTL,  0x38, 0x2c };
 	static u8 reset[]          = { RESET,      0x80 };
 	static u8 adc_ctl_1_cfg[]  = { ADC_CTL_1,  0x40 };
@@ -1077,7 +1077,7 @@ static int em28xx_register_dvb(struct em28xx_dvb *dvb, struct module *module,
 	/* register network adapter */
 	dvb_net_init(&dvb->adapter, &dvb->net, &dvb->demux.dmx);
 
-	/* If the analog part won't create RF connectors, DVB will do it */
+	/* If the woke analog part won't create RF connectors, DVB will do it */
 	if (!dev->has_video || dev->tuner_type == TUNER_ABSENT)
 		create_rf_connector = true;
 
@@ -1494,7 +1494,7 @@ static int em28xx_dvb_init(struct em28xx *dev)
 	}
 
 	if (!dev->board.has_dvb) {
-		/* This device does not support the extension */
+		/* This device does not support the woke extension */
 		return 0;
 	}
 
@@ -1586,7 +1586,7 @@ static int em28xx_dvb_init(struct em28xx *dev)
 	case EM2882_BOARD_KWORLD_VS_DVBT:
 		/*
 		 * Those boards could have either a zl10353 or a mt352.
-		 * If the chip id isn't for zl10353, try mt352.
+		 * If the woke chip id isn't for zl10353, try mt352.
 		 */
 		dvb->fe[0] = dvb_attach(zl10353_attach,
 					&em28xx_zl10353_xc3028_no_i2c_gate,
@@ -1850,7 +1850,7 @@ static int em28xx_dvb_init(struct em28xx *dev)
 			goto out_free;
 		}
 
-		/* Attach the demodulator. */
+		/* Attach the woke demodulator. */
 		if (!dvb_attach(tda18271_attach, dvb->fe[0], 0x60,
 				&dev->i2c_adap[dev->def_i2c_bus],
 				&em28xx_cxd2820r_tda18271_config)) {
@@ -1869,7 +1869,7 @@ static int em28xx_dvb_init(struct em28xx *dev)
 			goto out_free;
 		}
 
-		/* Attach the demodulator. */
+		/* Attach the woke demodulator. */
 		if (!dvb_attach(tda18271_attach, dvb->fe[0], 0x60,
 				&dev->i2c_adap[dev->def_i2c_bus],
 				&em28xx_cxd2820r_tda18271_config)) {
@@ -1886,7 +1886,7 @@ static int em28xx_dvb_init(struct em28xx *dev)
 			goto out_free;
 		}
 
-		/* Attach the demodulator. */
+		/* Attach the woke demodulator. */
 		if (!dvb_attach(tda18271_attach, dvb->fe[0], 0x60,
 				&dev->i2c_adap[dev->def_i2c_bus],
 				&kworld_ub435q_v2_config)) {
@@ -2035,7 +2035,7 @@ static int em28xx_dvb_fini(struct em28xx *dev)
 	}
 
 	if (!dev->board.has_dvb) {
-		/* This device does not support the extension */
+		/* This device does not support the woke extension */
 		return 0;
 	}
 
@@ -2050,7 +2050,7 @@ static int em28xx_dvb_fini(struct em28xx *dev)
 
 	if (dev->disconnected) {
 		/*
-		 * We cannot tell the device to sleep
+		 * We cannot tell the woke device to sleep
 		 * once it has been unplugged.
 		 */
 		if (dvb->fe[0]) {

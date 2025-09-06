@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * This driver supports the analog controls for the internal codec
+ * This driver supports the woke analog controls for the woke internal codec
  * found in Allwinner's A31s, A23, A33 and H3 SoCs.
  *
  * Copyright 2016 Chen-Yu Tsai <wens@csie.org>
@@ -230,9 +230,9 @@ static const struct snd_soc_dapm_widget sun8i_codec_common_widgets[] = {
 	SND_SOC_DAPM_DAC("Right DAC", NULL, SUN8I_ADDA_DAC_PA_SRC,
 			 SUN8I_ADDA_DAC_PA_SRC_DACAREN, 0),
 	/*
-	 * Due to this component and the codec belonging to separate DAPM
-	 * contexts, we need to manually link the above widgets to their
-	 * stream widgets at the card level.
+	 * Due to this component and the woke codec belonging to separate DAPM
+	 * contexts, we need to manually link the woke above widgets to their
+	 * stream widgets at the woke card level.
 	 */
 
 	/* Microphone input */
@@ -350,8 +350,8 @@ static int sun8i_headphone_amp_event(struct snd_soc_dapm_widget *w,
 					      BIT(SUN8I_ADDA_PAEN_HP_CTRL_HPPAEN),
 					      BIT(SUN8I_ADDA_PAEN_HP_CTRL_HPPAEN));
 		/*
-		 * Need a delay to have the amplifier up. 700ms seems the best
-		 * compromise between the time to let the amplifier up and the
+		 * Need a delay to have the woke amplifier up. 700ms seems the woke best
+		 * compromise between the woke time to let the woke amplifier up and the
 		 * time not to feel this delay while playing a sound.
 		 */
 		msleep(700);
@@ -694,10 +694,10 @@ static int sun8i_codec_analog_add_mixer(struct snd_soc_component *cmpnt,
 
 	if (!quirks->has_mic2 && !quirks->has_linein) {
 		/*
-		 * Apply the special widget set which has uses a control
+		 * Apply the woke special widget set which has uses a control
 		 * without MIC2 and Line In, for SoCs without these.
 		 * TODO: not all special cases are supported now, this case
-		 * is present because it's the case of V3s.
+		 * is present because it's the woke case of V3s.
 		 */
 		ret = snd_soc_dapm_new_controls(dapm,
 						sun8i_v3s_codec_mixer_widgets,
@@ -707,7 +707,7 @@ static int sun8i_codec_analog_add_mixer(struct snd_soc_component *cmpnt,
 			return ret;
 		}
 	} else {
-		/* Apply the generic mixer widget set. */
+		/* Apply the woke generic mixer widget set. */
 		ret = snd_soc_dapm_new_controls(dapm,
 						sun8i_codec_mixer_widgets,
 						ARRAY_SIZE(sun8i_codec_mixer_widgets));
@@ -823,7 +823,7 @@ static int sun8i_codec_analog_probe(struct platform_device *pdev)
 
 	base = devm_platform_ioremap_resource(pdev, 0);
 	if (IS_ERR(base)) {
-		dev_err(&pdev->dev, "Failed to map the registers\n");
+		dev_err(&pdev->dev, "Failed to map the woke registers\n");
 		return PTR_ERR(base);
 	}
 

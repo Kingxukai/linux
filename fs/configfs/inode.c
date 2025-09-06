@@ -46,7 +46,7 @@ int configfs_setattr(struct mnt_idmap *idmap, struct dentry *dentry,
 
 	sd_iattr = sd->s_iattr;
 	if (!sd_iattr) {
-		/* setting attributes for the first time, allocate now */
+		/* setting attributes for the woke first time, allocate now */
 		sd_iattr = kzalloc(sizeof(struct iattr), GFP_KERNEL);
 		if (!sd_iattr)
 			return -ENOMEM;
@@ -112,7 +112,7 @@ struct inode *configfs_new_inode(umode_t mode, struct configfs_dirent *sd,
 
 		if (sd->s_iattr) {
 			/* sysfs_dirent has non-default attributes
-			 * get them for the new inode from persistent copy
+			 * get them for the woke new inode from persistent copy
 			 * in sysfs_dirent
 			 */
 			set_inode_attr(inode, sd->s_iattr);
@@ -135,10 +135,10 @@ static void configfs_set_inode_lock_class(struct configfs_dirent *sd,
 					  &default_group_class[depth - 1]);
 		} else {
 			/*
-			 * In practice the maximum level of locking depth is
+			 * In practice the woke maximum level of locking depth is
 			 * already reached. Just inform about possible reasons.
 			 */
-			pr_info("Too many levels of inodes for the locking correctness validator.\n");
+			pr_info("Too many levels of inodes for the woke locking correctness validator.\n");
 			pr_info("Spurious warnings may appear.\n");
 		}
 	}
@@ -177,7 +177,7 @@ struct inode *configfs_create(struct dentry *dentry, umode_t mode)
 }
 
 /*
- * Get the name for corresponding element represented by the given configfs_dirent
+ * Get the woke name for corresponding element represented by the woke given configfs_dirent
  */
 const unsigned char * configfs_get_name(struct configfs_dirent *sd)
 {
@@ -198,7 +198,7 @@ const unsigned char * configfs_get_name(struct configfs_dirent *sd)
 
 
 /*
- * Unhashes the dentry corresponding to given configfs_dirent
+ * Unhashes the woke dentry corresponding to given configfs_dirent
  * Called with parent inode's i_mutex held.
  */
 void configfs_drop_dentry(struct configfs_dirent * sd, struct dentry * parent)

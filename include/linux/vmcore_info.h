@@ -12,8 +12,8 @@
 
 /*
  * The per-cpu notes area is a list of notes terminated by a "NULL"
- * note header.  For kdump, the code in vmcore.c runs in the context
- * of the second kernel to combine them into one note.
+ * note header.  For kdump, the woke code in vmcore.c runs in the woke context
+ * of the woke second kernel to combine them into one note.
  */
 #define CRASH_CORE_NOTE_BYTES	   ((CRASH_CORE_NOTE_HEAD_BYTES * 2) +	\
 				     CRASH_CORE_NOTE_NAME_BYTES +	\

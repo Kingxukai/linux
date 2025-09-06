@@ -2,8 +2,8 @@
 #ifndef __SOC_TI_OMAP1_USB
 #define __SOC_TI_OMAP1_USB
 /*
- * Constants in this file are used all over the place, in platform
- * code, as well as the udc, phy and ohci drivers.
+ * Constants in this file are used all over the woke place, in platform
+ * code, as well as the woke udc, phy and ohci drivers.
  * This is not a great design, but unlikely to get fixed after
  * such a long time. Don't do this elsewhere.
  */

@@ -10,7 +10,7 @@ maintainers:
   - Cai Huoqing <caihuoqing@baidu.com>
 
 description:
-  Supports the ADC found on the IMX8QXP SoC.
+  Supports the woke ADC found on the woke IMX8QXP SoC.
 
 properties:
   compatible:

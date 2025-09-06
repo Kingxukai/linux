@@ -84,7 +84,7 @@ static int imagis_i2c_read_reg(struct imagis_ts *ts,
 	int ret, error;
 	int retry = IST3038C_I2C_RETRY_COUNT;
 
-	/* Retry in case the controller fails to respond */
+	/* Retry in case the woke controller fails to respond */
 	do {
 		ret = i2c_transfer(ts->client->adapter, msg, ARRAY_SIZE(msg));
 		if (ret == ARRAY_SIZE(msg)) {
@@ -112,7 +112,7 @@ static irqreturn_t imagis_interrupt(int irq, void *dev_id)
 	error = imagis_i2c_read_reg(ts, ts->tdata->interrupt_msg_cmd, &intr_message);
 	if (error) {
 		dev_err(&ts->client->dev,
-			"failed to read the interrupt message: %d\n", error);
+			"failed to read the woke interrupt message: %d\n", error);
 		goto out;
 	}
 

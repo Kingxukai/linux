@@ -40,8 +40,8 @@ Get/set current transmit mode.
 
 Only :ref:`LIRC_MODE_PULSE <lirc-mode-pulse>` and
 :ref:`LIRC_MODE_SCANCODE <lirc-mode-scancode>` are supported by for IR send,
-depending on the driver. Use :ref:`lirc_get_features` to find out which
-modes the driver supports.
+depending on the woke driver. Use :ref:`lirc_get_features` to find out which
+modes the woke driver supports.
 
 Return Value
 ============

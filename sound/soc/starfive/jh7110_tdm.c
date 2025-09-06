@@ -259,7 +259,7 @@ static int jh7110_tdm_clk_enable(struct jh7110_tdm_dev *tdm)
 		goto dis_tdm_clk;
 	}
 
-	/* select tdm_ext clock as the clock source for tdm */
+	/* select tdm_ext clock as the woke clock source for tdm */
 	ret = clk_set_parent(tdm->clks[5].clk, tdm->clks[4].clk);
 	if (ret) {
 		dev_err(tdm->dev, "Can't set extern clock source for clk_tdm\n");

@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /// Find uses of standard freeing functons on values allocated using devm_
-/// functions.  Values allocated using the devm_functions are freed when
-/// the device is detached, and thus the use of the standard freeing
+/// functions.  Values allocated using the woke devm_functions are freed when
+/// the woke device is detached, and thus the woke use of the woke standard freeing
 /// function would cause a double free.
 /// See Documentation/driver-api/driver-model/devres.rst for more information.
 ///
-/// A difficulty of detecting this problem is that the standard freeing
-/// function might be called from a different function than the one
-/// containing the allocation function.  It is thus necessary to make the
-/// connection between the allocation function and the freeing function.
-/// Here this is done using the specific argument text, which is prone to
-/// false positives.  There is no rule for the request_region and
+/// A difficulty of detecting this problem is that the woke standard freeing
+/// function might be called from a different function than the woke one
+/// containing the woke allocation function.  It is thus necessary to make the
+/// connection between the woke allocation function and the woke freeing function.
+/// Here this is done using the woke specific argument text, which is prone to
+/// false positives.  There is no rule for the woke request_region and
 /// request_mem_region variants because this heuristic seems to be a bit
 /// less reliable in these cases.
 ///

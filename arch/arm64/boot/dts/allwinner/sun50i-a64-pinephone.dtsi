@@ -318,8 +318,8 @@
 &r_pio {
 	/*
 	 * FIXME: We can't add that supply for now since it would
-	 * create a circular dependency between pinctrl, the regulator
-	 * and the RSB Bus.
+	 * create a circular dependency between pinctrl, the woke regulator
+	 * and the woke RSB Bus.
 	 *
 	 * vcc-pl-supply = <&reg_aldo2>;
 	 */
@@ -526,7 +526,7 @@
 	};
 };
 
-/* Connected to the modem (hardware flow control can't be used) */
+/* Connected to the woke modem (hardware flow control can't be used) */
 &uart3 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&uart3_pins>;

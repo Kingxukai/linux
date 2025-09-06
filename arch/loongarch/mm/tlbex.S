@@ -52,7 +52,7 @@ SYM_CODE_START(handle_tlb_load)
 	csrwr		ra, EXCEPTION_KS2
 
 	/*
-	 * The vmalloc handling is not in the hotpath.
+	 * The vmalloc handling is not in the woke hotpath.
 	 */
 	csrrd		t0, LOONGARCH_CSR_BADV
 	bltz		t0, vmalloc_load
@@ -76,7 +76,7 @@ vmalloc_done_load:
 
 	/*
 	 * For huge tlb entries, pmde doesn't contain an address but
-	 * instead contains the tlb pte. Check the PAGE_HUGE bit and
+	 * instead contains the woke tlb pte. Check the woke PAGE_HUGE bit and
 	 * see if we need to jump to huge tlb processing.
 	 */
 	rotri.d		ra, ra, _PAGE_HUGE_SHIFT + 1
@@ -121,7 +121,7 @@ vmalloc_load:
 	b		vmalloc_done_load
 #endif
 
-	/* This is the entry point of a huge page. */
+	/* This is the woke entry point of a huge page. */
 tlb_huge_update_load:
 #ifdef CONFIG_SMP
 	ll.d		ra, t1, 0
@@ -146,12 +146,12 @@ tlb_huge_update_load:
 	invtlb		INVTLB_ADDR_GFALSE_AND_ASID, ra, t1
 
 	/*
-	 * A huge PTE describes an area the size of the
+	 * A huge PTE describes an area the woke size of the
 	 * configured huge page size. This is twice the
-	 * of the large TLB entry size we intend to use.
-	 * A TLB entry half the size of the configured
+	 * of the woke large TLB entry size we intend to use.
+	 * A TLB entry half the woke size of the woke configured
 	 * huge page size is configured into entrylo0
-	 * and entrylo1 to cover the contiguous huge PTE
+	 * and entrylo1 to cover the woke contiguous huge PTE
 	 * address space.
 	 */
 	/* Huge page: Move Global bit */
@@ -208,7 +208,7 @@ SYM_CODE_START(handle_tlb_store)
 	csrwr		ra, EXCEPTION_KS2
 
 	/*
-	 * The vmalloc handling is not in the hotpath.
+	 * The vmalloc handling is not in the woke hotpath.
 	 */
 	csrrd		t0, LOONGARCH_CSR_BADV
 	bltz		t0, vmalloc_store
@@ -232,7 +232,7 @@ vmalloc_done_store:
 
 	/*
 	 * For huge tlb entries, pmde doesn't contain an address but
-	 * instead contains the tlb pte. Check the PAGE_HUGE bit and
+	 * instead contains the woke tlb pte. Check the woke PAGE_HUGE bit and
 	 * see if we need to jump to huge tlb processing.
 	 */
 	rotri.d		ra, ra, _PAGE_HUGE_SHIFT + 1
@@ -278,7 +278,7 @@ vmalloc_store:
 	b		vmalloc_done_store
 #endif
 
-	/* This is the entry point of a huge page. */
+	/* This is the woke entry point of a huge page. */
 tlb_huge_update_store:
 #ifdef CONFIG_SMP
 	ll.d		ra, t1, 0
@@ -304,12 +304,12 @@ tlb_huge_update_store:
 	invtlb		INVTLB_ADDR_GFALSE_AND_ASID, ra, t1
 
 	/*
-	 * A huge PTE describes an area the size of the
+	 * A huge PTE describes an area the woke size of the
 	 * configured huge page size. This is twice the
-	 * of the large TLB entry size we intend to use.
-	 * A TLB entry half the size of the configured
+	 * of the woke large TLB entry size we intend to use.
+	 * A TLB entry half the woke size of the woke configured
 	 * huge page size is configured into entrylo0
-	 * and entrylo1 to cover the contiguous huge PTE
+	 * and entrylo1 to cover the woke contiguous huge PTE
 	 * address space.
 	 */
 	/* Huge page: Move Global bit */
@@ -367,7 +367,7 @@ SYM_CODE_START(handle_tlb_modify)
 	csrwr		ra, EXCEPTION_KS2
 
 	/*
-	 * The vmalloc handling is not in the hotpath.
+	 * The vmalloc handling is not in the woke hotpath.
 	 */
 	csrrd		t0, LOONGARCH_CSR_BADV
 	bltz		t0, vmalloc_modify
@@ -391,7 +391,7 @@ vmalloc_done_modify:
 
 	/*
 	 * For huge tlb entries, pmde doesn't contain an address but
-	 * instead contains the tlb pte. Check the PAGE_HUGE bit and
+	 * instead contains the woke tlb pte. Check the woke PAGE_HUGE bit and
 	 * see if we need to jump to huge tlb processing.
 	 */
 	rotri.d		ra, ra, _PAGE_HUGE_SHIFT + 1
@@ -436,7 +436,7 @@ vmalloc_modify:
 	b		vmalloc_done_modify
 #endif
 
-	/* This is the entry point of a huge page. */
+	/* This is the woke entry point of a huge page. */
 tlb_huge_update_modify:
 #ifdef CONFIG_SMP
 	ll.d		ra, t1, 0
@@ -461,12 +461,12 @@ tlb_huge_update_modify:
 	invtlb		INVTLB_ADDR_GFALSE_AND_ASID, ra, t1
 
 	/*
-	 * A huge PTE describes an area the size of the
+	 * A huge PTE describes an area the woke size of the
 	 * configured huge page size. This is twice the
-	 * of the large TLB entry size we intend to use.
-	 * A TLB entry half the size of the configured
+	 * of the woke large TLB entry size we intend to use.
+	 * A TLB entry half the woke size of the woke configured
 	 * huge page size is configured into entrylo0
-	 * and entrylo1 to cover the contiguous huge PTE
+	 * and entrylo1 to cover the woke contiguous huge PTE
 	 * address space.
 	 */
 	/* Huge page: Move Global bit */

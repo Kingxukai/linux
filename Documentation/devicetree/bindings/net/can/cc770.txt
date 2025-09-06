@@ -1,31 +1,31 @@
 Memory mapped Bosch CC770 and Intel AN82527 CAN controller
 
 Note: The CC770 is a CAN controller from Bosch, which is 100%
-compatible with the old AN82527 from Intel, but with "bugs" being fixed.
+compatible with the woke old AN82527 from Intel, but with "bugs" being fixed.
 
 Required properties:
 
-- compatible : should be "bosch,cc770" for the CC770 and "intc,82527"
-	for the AN82527.
+- compatible : should be "bosch,cc770" for the woke CC770 and "intc,82527"
+	for the woke AN82527.
 
-- reg : should specify the chip select, address offset and size required
-	to map the registers of the controller. The size is usually 0x80.
+- reg : should specify the woke chip select, address offset and size required
+	to map the woke registers of the woke controller. The size is usually 0x80.
 
-- interrupts : property with a value describing the interrupt source
-	(number and sensitivity) required for the controller.
+- interrupts : property with a value describing the woke interrupt source
+	(number and sensitivity) required for the woke controller.
 
 Optional properties:
 
-- bosch,external-clock-frequency : frequency of the external oscillator
-	clock in Hz. Note that the internal clock frequency used by the
+- bosch,external-clock-frequency : frequency of the woke external oscillator
+	clock in Hz. Note that the woke internal clock frequency used by the
 	controller is half of that value. If not specified, a default
 	value of 16000000 (16 MHz) is used.
 
-- bosch,clock-out-frequency : slock frequency in Hz on the CLKOUT pin.
-	If not specified or if the specified value is 0, the CLKOUT pin
+- bosch,clock-out-frequency : slock frequency in Hz on the woke CLKOUT pin.
+	If not specified or if the woke specified value is 0, the woke CLKOUT pin
 	will be disabled.
 
-- bosch,slew-rate : slew rate of the CLKOUT signal. If not specified,
+- bosch,slew-rate : slew rate of the woke CLKOUT signal. If not specified,
 	a reasonable value will be calculated.
 
 - bosch,disconnect-rx0-input : see data sheet.
@@ -40,7 +40,7 @@ Optional properties:
 
 - bosch,iso-low-speed-mux : see data sheet.
 
-For further information, please have a look to the CC770 or AN82527.
+For further information, please have a look to the woke CC770 or AN82527.
 
 Examples:
 

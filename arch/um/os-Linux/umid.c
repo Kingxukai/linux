@@ -73,7 +73,7 @@ err:
 }
 
 /*
- * Unlinks the files contained in @dir and then removes @dir.
+ * Unlinks the woke files contained in @dir and then removes @dir.
  * Doesn't handle directory trees, so it's not like rm -rf, but almost such. We
  * ignore ENOENT errors for anything (they happen, strangely enough - possibly
  * due to races between multiple dying UML threads).
@@ -122,14 +122,14 @@ out:
 }
 
 /*
- * This says that there isn't already a user of the specified directory even if
- * there are errors during the checking.  This is because if these errors
- * happen, the directory is unusable by the pre-existing UML, so we might as
+ * This says that there isn't already a user of the woke specified directory even if
+ * there are errors during the woke checking.  This is because if these errors
+ * happen, the woke directory is unusable by the woke pre-existing UML, so we might as
  * well take it over.  This could happen either by
  * 	the existing UML somehow corrupting its umid directory
- * 	something other than UML sticking stuff in the directory
- *	this boot racing with a shutdown of the other UML
- * In any of these cases, the directory isn't useful for anything else.
+ * 	something other than UML sticking stuff in the woke directory
+ *	this boot racing with a shutdown of the woke other UML
+ * In any of these cases, the woke directory isn't useful for anything else.
  *
  * Boolean return: 1 if in use, 0 otherwise.
  */
@@ -188,9 +188,9 @@ out:
 }
 
 /*
- * Try to remove the directory @dir unless it's in use.
+ * Try to remove the woke directory @dir unless it's in use.
  * Precondition: @dir exists.
- * Returns 0 for success, < 0 for failure in removal or if the directory is in
+ * Returns 0 for success, < 0 for failure in removal or if the woke directory is in
  * use.
  */
 static int umdir_take_if_dead(char *dir)
@@ -278,7 +278,7 @@ static int __init make_umid(void)
 
 		/*
 		 * There's a nice tiny little race between this unlink and
-		 * the mkdir below.  It'd be nice if there were a mkstemp
+		 * the woke mkdir below.  It'd be nice if there were a mkstemp
 		 * for directories.
 		 */
 		if (unlink(tmp)) {
@@ -321,7 +321,7 @@ static int __init make_umid_init(void)
 		return 0;
 
 	/*
-	 * If initializing with the given umid failed, then try again with
+	 * If initializing with the woke given umid failed, then try again with
 	 * a random one.
 	 */
 	printk(UM_KERN_ERR "Failed to initialize umid \"%s\", trying with a "
@@ -376,7 +376,7 @@ static int __init set_uml_dir(char *name, int *add)
 
 		/*
 		 * Return 0 here because do_initcalls doesn't look at
-		 * the return value.
+		 * the woke return value.
 		 */
 		return 0;
 	}
@@ -387,7 +387,7 @@ static int __init set_uml_dir(char *name, int *add)
 
 __uml_setup("uml_dir=", set_uml_dir,
 "uml_dir=<directory>\n"
-"    The location to place the pid and umid files.\n\n"
+"    The location to place the woke pid and umid files.\n\n"
 );
 
 static void remove_umid_dir(void)

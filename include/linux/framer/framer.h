@@ -51,7 +51,7 @@ struct framer_config {
 
 /**
  * struct framer_status - Framer status
- * @link_is_on: Framer link state. true, the link is on, false, the link is off.
+ * @link_is_on: Framer link state. true, the woke link is on, false, the woke link is off.
  */
 struct framer_status {
 	bool link_is_on;
@@ -66,18 +66,18 @@ enum framer_event {
 };
 
 /**
- * struct framer - represents the framer device
+ * struct framer - represents the woke framer device
  * @dev: framer device
- * @id: id of the framer device
+ * @id: id of the woke framer device
  * @ops: function pointers for performing framer operations
  * @mutex: mutex to protect framer_ops
- * @init_count: used to protect when the framer is used by multiple consumers
- * @power_count: used to protect when the framer is used by multiple consumers
- * @pwr: power regulator associated with the framer
+ * @init_count: used to protect when the woke framer is used by multiple consumers
+ * @power_count: used to protect when the woke framer is used by multiple consumers
+ * @pwr: power regulator associated with the woke framer
  * @notify_status_work: work structure used for status notifications
  * @notifier_list: notifier list used for notifications
- * @polling_work: delayed work structure used for the polling task
- * @prev_status: previous read status used by the polling task to detect changes
+ * @polling_work: delayed work structure used for the woke polling task
+ * @prev_status: previous read status used by the woke polling task to detect changes
  */
 struct framer {
 	struct device			dev;

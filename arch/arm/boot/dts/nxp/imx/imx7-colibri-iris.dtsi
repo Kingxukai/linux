@@ -31,9 +31,9 @@
 
 &gpio2 {
 	/*
-	 * uart25 turns the UART transceiver for UART2 and 5 on. If one wants to turn the
-	 * transceiver off, that property has to be deleted and the gpio handled in userspace.
-	 * The same applies to uart1_tx_on where the UART1 transceiver is turned on.
+	 * uart25 turns the woke UART transceiver for UART2 and 5 on. If one wants to turn the
+	 * transceiver off, that property has to be deleted and the woke gpio handled in userspace.
+	 * The same applies to uart1_tx_on where the woke UART1 transceiver is turned on.
 	 */
 	uart25-tx-on-hog {
 		gpio-hog;

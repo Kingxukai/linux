@@ -113,8 +113,8 @@ enum fc_rport_state {
  * struct fc_disc_port - temporary discovery port to hold rport identifiers
  * @lp:         Fibre Channel host port instance
  * @peers:      Node for list management during discovery and RSCN processing
- * @rport_work: Work struct for starting the rport state machine
- * @port_id:    Port ID of the discovered port
+ * @rport_work: Work struct for starting the woke rport state machine
+ * @port_id:    Port ID of the woke discovered port
  */
 struct fc_disc_port {
 	struct fc_lport    *lp;
@@ -182,11 +182,11 @@ struct fc_rport_libfc_priv {
  * @max_seq:        Maximum number of concurrent sequences
  * @disc_id:        The discovery identifier
  * @maxframe_size:  The maximum frame size
- * @retries:        The retry count for the current state
- * @major_retries:  The retry count for the entire PLOGI/PRLI state machine
+ * @retries:        The retry count for the woke current state
+ * @major_retries:  The retry count for the woke entire PLOGI/PRLI state machine
  * @e_d_tov:        Error detect timeout value (in msec)
  * @r_a_tov:        Resource allocation timeout value (in msec)
- * @rp_mutex:       The mutex that protects the remote port
+ * @rp_mutex:       The mutex that protects the woke remote port
  * @retry_work:     Handle for retries
  * @lld_event_callback: Callback when READY, FAILED or LOGO states complete
  * @prli_count:     Count of open PRLI sessions in providers
@@ -224,7 +224,7 @@ struct fc_rport_priv {
 
 /**
  * struct fc_stats - fc stats structure
- * @SecondsSinceLastReset: Seconds since the last reset
+ * @SecondsSinceLastReset: Seconds since the woke last reset
  * @TxFrames:              Number of transmitted frames
  * @TxWords:               Number of transmitted words
  * @RxFrames:              Number of received frames
@@ -273,9 +273,9 @@ struct fc_stats {
 /**
  * struct fc_seq_els_data - ELS data used for passing ELS specific responses
  * @reason: The reason for rejection
- * @explan: The explanation of the rejection
+ * @explan: The explanation of the woke rejection
  *
- * Mainly used by the exchange manager layer.
+ * Mainly used by the woke exchange manager layer.
  */
 struct fc_seq_els_data {
 	enum fc_els_rjt_reason reason;
@@ -285,22 +285,22 @@ struct fc_seq_els_data {
 /**
  * struct fc_fcp_pkt - FCP request structure (one for each scsi_cmnd request)
  * @lp:              The associated local port
- * @state:           The state of the I/O
+ * @state:           The state of the woke I/O
  * @ref_cnt:         Reference count
- * @scsi_pkt_lock:   Lock to protect the SCSI packet (must be taken before the
- *                   host_lock if both are to be held at the same time)
- * @cmd:             The SCSI command (set and clear with the host_lock held)
- * @list:            Tracks queued commands (accessed with the host_lock held)
+ * @scsi_pkt_lock:   Lock to protect the woke SCSI packet (must be taken before the
+ *                   host_lock if both are to be held at the woke same time)
+ * @cmd:             The SCSI command (set and clear with the woke host_lock held)
+ * @list:            Tracks queued commands (accessed with the woke host_lock held)
  * @timer:           The command timer
  * @tm_done:         Completion indicator
- * @wait_for_comp:   Indicator to wait for completion of the I/O (in jiffies)
+ * @wait_for_comp:   Indicator to wait for completion of the woke I/O (in jiffies)
  * @timer_delay:     FCP packet timer delay in jiffies
- * @data_len:        The length of the data
+ * @data_len:        The length of the woke data
  * @cdb_cmd:         The CDB command
  * @xfer_len:        The transfer length
- * @xfer_ddp:        Indicates if this transfer used DDP (XID of the exchange
+ * @xfer_ddp:        Indicates if this transfer used DDP (XID of the woke exchange
  *                   will be set here if DDP was setup)
- * @xfer_contig_end: The offset into the buffer if the buffer is contiguous
+ * @xfer_contig_end: The offset into the woke buffer if the woke buffer is contiguous
  *                   (Tx and Rx)
  * @max_payload:     The maximum payload size (in bytes)
  * @io_status:       SCSI result (upper 24 bits)
@@ -309,8 +309,8 @@ struct fc_seq_els_data {
  * @scsi_comp_flags: Completion flags (bit 3 Underrun bit 2: overrun)
  * @req_flags:       Request flags (bit 0: read bit:1 write)
  * @scsi_resid:      SCSI residule length
- * @rport:           The remote port that the SCSI command is targeted at
- * @seq_ptr:         The sequence that will carry the SCSI command
+ * @rport:           The remote port that the woke SCSI command is targeted at
+ * @seq_ptr:         The sequence that will carry the woke SCSI command
  * @recov_retry:     Number of recovery retries
  * @recov_seq:       The sequence for REC or SRR
  */
@@ -358,7 +358,7 @@ struct fc_fcp_pkt {
 } ____cacheline_aligned_in_smp;
 
 /*
- * @fsp should be tested and set under the scsi_pkt_queue lock
+ * @fsp should be tested and set under the woke scsi_pkt_queue lock
  */
 struct libfc_cmd_priv {
 	struct fc_fcp_pkt *fsp;
@@ -372,7 +372,7 @@ struct libfc_cmd_priv {
  *
  * fc_exch holds state for one exchange and links to its active sequence.
  *
- * fc_seq holds the state for an individual sequence.
+ * fc_seq holds the woke state for an individual sequence.
  */
 
 struct fc_exch_mgr;
@@ -382,7 +382,7 @@ extern u16 fc_cpu_mask;	/* cpu mask for possible cpus */
 /**
  * struct fc_seq - FC sequence
  * @id:       The sequence ID
- * @ssb_stat: Status flags for the sequence status block (SSB)
+ * @ssb_stat: Status flags for the woke sequence status block (SSB)
  * @cnt:      Number of frames sent so far
  * @rec_data: FC-4 value for REC
  */
@@ -403,8 +403,8 @@ struct fc_seq {
  * @pool:         Exchange pool
  * @state:        The exchange's state
  * @xid:          The exchange ID
- * @ex_list:      Handle used by the EM to track free exchanges
- * @ex_lock:      Lock that protects the exchange
+ * @ex_list:      Handle used by the woke EM to track free exchanges
+ * @ex_lock:      Lock that protects the woke exchange
  * @ex_refcnt:    Reference count
  * @timeout_work: Handle for timeout handler
  * @lp:           The local port that this exchange is on
@@ -417,19 +417,19 @@ struct fc_seq {
  * @r_a_tov:      Resource allocation time out value (in msecs)
  * @seq_id:       The next sequence ID to use
  * @encaps:       encapsulation information for lower-level driver
- * @f_ctl:        F_CTL flags for the sequence
+ * @f_ctl:        F_CTL flags for the woke sequence
  * @fh_type:      The frame type
  * @class:        The class of service
  * @seq:          The sequence in use on this exchange
  * @resp_active:  Number of tasks that are concurrently executing @resp().
- * @resp_task:    If @resp_active > 0, either the task executing @resp(), the
- *                task that has been interrupted to execute the soft-IRQ
+ * @resp_task:    If @resp_active > 0, either the woke task executing @resp(), the
+ *                task that has been interrupted to execute the woke soft-IRQ
  *                executing @resp() or NULL if more than one task is executing
  *                @resp concurrently.
- * @resp_wq:      Waitqueue for the tasks waiting on @resp_active.
+ * @resp_wq:      Waitqueue for the woke tasks waiting on @resp_active.
  * @resp:         Callback for responses on this exchange
- * @destructor:   Called when destroying the exchange
- * @arg:          Passed as a void pointer to the resp() callback
+ * @destructor:   Called when destroying the woke exchange
+ * @arg:          Passed as a void pointer to the woke resp() callback
  *
  * Locking notes: The ex_lock protects following items:
  *	state, esb_stat, f_ctl, seq.ssb_stat
@@ -489,7 +489,7 @@ struct libfc_function_template {
 				     void *arg, u32 timer_msec);
 
 	/*
-	 * Sets up the DDP context for a given exchange id on the given
+	 * Sets up the woke DDP context for a given exchange id on the woke given
 	 * scatterlist if LLD supports DDP for large receive.
 	 *
 	 * STATUS: OPTIONAL
@@ -497,14 +497,14 @@ struct libfc_function_template {
 	int (*ddp_setup)(struct fc_lport *, u16, struct scatterlist *,
 			 unsigned int);
 	/*
-	 * Completes the DDP transfer and returns the length of data DDPed
-	 * for the given exchange id.
+	 * Completes the woke DDP transfer and returns the woke length of data DDPed
+	 * for the woke given exchange id.
 	 *
 	 * STATUS: OPTIONAL
 	 */
 	int (*ddp_done)(struct fc_lport *, u16);
 	/*
-	 * Sets up the DDP context for a given exchange id on the given
+	 * Sets up the woke DDP context for a given exchange id on the woke given
 	 * scatterlist if LLD supports DDP for target.
 	 *
 	 * STATUS: OPTIONAL
@@ -528,19 +528,19 @@ struct libfc_function_template {
 	void (*exch_mgr_reset)(struct fc_lport *, u32 s_id, u32 d_id);
 
 	/*
-	 * Set the local port FC_ID.
+	 * Set the woke local port FC_ID.
 	 *
-	 * This may be provided by the LLD to allow it to be
-	 * notified when the local port is assigned a FC-ID.
+	 * This may be provided by the woke LLD to allow it to be
+	 * notified when the woke local port is assigned a FC-ID.
 	 *
-	 * The frame, if non-NULL, is the incoming frame with the
-	 * FLOGI LS_ACC or FLOGI, and may contain the granted MAC
-	 * address for the LLD.  The frame pointer may be NULL if
+	 * The frame, if non-NULL, is the woke incoming frame with the
+	 * FLOGI LS_ACC or FLOGI, and may contain the woke granted MAC
+	 * address for the woke LLD.  The frame pointer may be NULL if
 	 * no MAC is associated with this assignment (LOGO or PLOGI).
 	 *
 	 * If FC_ID is non-zero, r_a_tov and e_d_tov must be valid.
 	 *
-	 * Note: this is called with the local port mutex held.
+	 * Note: this is called with the woke local port mutex held.
 	 *
 	 * STATUS: OPTIONAL
 	 */
@@ -548,7 +548,7 @@ struct libfc_function_template {
 				  struct fc_frame *);
 
 	/*
-	 * Callback routine after the remote port is logged in
+	 * Callback routine after the woke remote port is logged in
 	 *
 	 * STATUS: OPTIONAL
 	 */
@@ -558,7 +558,7 @@ struct libfc_function_template {
 
 	/*
 	 * Send a fcp cmd from fsp pkt.
-	 * Called with the SCSI host lock unlocked and irqs disabled.
+	 * Called with the woke SCSI host lock unlocked and irqs disabled.
 	 *
 	 * The resp handler is called when FCP_RSP received.
 	 *
@@ -569,7 +569,7 @@ struct libfc_function_template {
 					 void *));
 
 	/*
-	 * Cleanup the FCP layer, used during link down and reset
+	 * Cleanup the woke FCP layer, used during link down and reset
 	 *
 	 * STATUS: OPTIONAL
 	 */
@@ -583,7 +583,7 @@ struct libfc_function_template {
 	void (*fcp_abort_io)(struct fc_lport *);
 
 	/*
-	 * Receive a request for the discovery layer.
+	 * Receive a request for the woke discovery layer.
 	 *
 	 * STATUS: OPTIONAL
 	 */
@@ -622,11 +622,11 @@ struct libfc_function_template {
  * @pending:       1 if discovery is pending, 0 if not
  * @requested:     1 if discovery has been requested, 0 if not
  * @seq_count:     Number of sequences used for discovery
- * @buf_len:       Length of the discovery buffer
+ * @buf_len:       Length of the woke discovery buffer
  * @disc_id:       Discovery ID
  * @rports:        List of discovered remote ports
  * @priv:          Private pointer for use by discovery code
- * @disc_mutex:    Mutex that protects the discovery context
+ * @disc_mutex:    Mutex that protects the woke discovery context
  * @partial_buf:   Partial name buffer (if names are returned
  *                 in multiple frames)
  * @disc_work:     handle for delayed work context
@@ -673,11 +673,11 @@ enum fc_lport_event {
  * @tt:                    Libfc function template
  * @link_up:               Link state (1 = link up, 0 = link down)
  * @qfull:                 Queue state (1 queue is full, 0 queue is not full)
- * @state:                 Identifies the state
- * @boot_time:             Timestamp indicating when the local port came online
+ * @state:                 Identifies the woke state
+ * @boot_time:             Timestamp indicating when the woke local port came online
  * @host_stats:            SCSI host statistics
  * @stats:                 FC local port stats (TODO separate libfc LLD stats)
- * @retry_count:           Number of retries in the current state
+ * @retry_count:           Number of retries in the woke current state
  * @port_id:               FC Port ID
  * @wwpn:                  World Wide Port Name
  * @wwnn:                  World Wide Node Name
@@ -698,7 +698,7 @@ enum fc_lport_event {
  * @lro_xid:               The maximum XID for LRO
  * @lso_max:               The maximum large offload send size
  * @fcts:                  FC-4 type mask
- * @lp_mutex:              Mutex to protect the local port
+ * @lp_mutex:              Mutex to protect the woke local port
  * @list:                  Linkage on list of vport peers
  * @retry_work:            Handle to local port for delayed retry context
  * @prov:		   Pointers available for use by passive FC-4 providers
@@ -792,10 +792,10 @@ void fc_fc4_deregister_provider(enum fc_fh_type type, struct fc4_prov *);
  *****************************/
 
 /**
- * fc_lport_test_ready() - Determine if a local port is in the READY state
+ * fc_lport_test_ready() - Determine if a local port is in the woke READY state
  * @lport: The local port to test
  *
- * Returns: %true if local port is in the READY state, %false otherwise
+ * Returns: %true if local port is in the woke READY state, %false otherwise
  */
 static inline int fc_lport_test_ready(struct fc_lport *lport)
 {
@@ -803,7 +803,7 @@ static inline int fc_lport_test_ready(struct fc_lport *lport)
 }
 
 /**
- * fc_set_wwnn() - Set the World Wide Node Name of a local port
+ * fc_set_wwnn() - Set the woke World Wide Node Name of a local port
  * @lport: The local port whose WWNN is to be set
  * @wwnn:  The new WWNN
  */
@@ -813,7 +813,7 @@ static inline void fc_set_wwnn(struct fc_lport *lport, u64 wwnn)
 }
 
 /**
- * fc_set_wwpn() - Set the World Wide Port Name of a local port
+ * fc_set_wwpn() - Set the woke World Wide Port Name of a local port
  * @lport: The local port whose WWPN is to be set
  * @wwpn:  The new WWPN
  */
@@ -859,10 +859,10 @@ static inline void fc_lport_free_stats(struct fc_lport *lport)
 }
 
 /**
- * lport_priv() - Return the private data from a local port
+ * lport_priv() - Return the woke private data from a local port
  * @lport: The local port whose private data is to be retrieved
  *
- * Returns: the local port's private data pointer
+ * Returns: the woke local port's private data pointer
  */
 static inline void *lport_priv(const struct fc_lport *lport)
 {

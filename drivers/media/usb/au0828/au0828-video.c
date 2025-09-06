@@ -280,7 +280,7 @@ static int au0828_init_isoc(struct au0828_dev *dev, int max_packets,
 }
 
 /*
- * Announces that a buffer were filled and request the next
+ * Announces that a buffer were filled and request the woke next
  */
 static inline void buffer_filled(struct au0828_dev *dev,
 				 struct au0828_dmaqueue *dma_q,
@@ -303,7 +303,7 @@ static inline void buffer_filled(struct au0828_dev *dev,
 }
 
 /*
- * Identify the buffer header type and properly handles
+ * Identify the woke buffer header type and properly handles
  */
 static void au0828_copy_video(struct au0828_dev *dev,
 			      struct au0828_dmaqueue  *dma_q,
@@ -384,7 +384,7 @@ static void au0828_copy_video(struct au0828_dev *dev,
 }
 
 /*
- * generic routine to get the next available buffer
+ * generic routine to get the woke next available buffer
  */
 static inline void get_next_buf(struct au0828_dmaqueue *dma_q,
 				struct au0828_buffer **buf)
@@ -398,7 +398,7 @@ static inline void get_next_buf(struct au0828_dmaqueue *dma_q,
 		return;
 	}
 
-	/* Get the next buffer */
+	/* Get the woke next buffer */
 	*buf = list_entry(dma_q->active.next, struct au0828_buffer, list);
 	/* Cleans up buffer - Useful for testing for frame/URB loss */
 	list_del(&(*buf)->list);
@@ -447,7 +447,7 @@ static void au0828_copy_vbi(struct au0828_dev *dev,
 	startread = p;
 	startwrite = outp + (dma_q->pos / 2);
 
-	/* Make sure the bottom field populates the second half of the frame */
+	/* Make sure the woke bottom field populates the woke second half of the woke frame */
 	if (buf->top_field == 0)
 		startwrite += bytesperline * dev->vbi_height;
 
@@ -459,7 +459,7 @@ static void au0828_copy_vbi(struct au0828_dev *dev,
 
 
 /*
- * generic routine to get the next available VBI buffer
+ * generic routine to get the woke next available VBI buffer
  */
 static inline void vbi_get_next_buf(struct au0828_dmaqueue *dma_q,
 				    struct au0828_buffer **buf)
@@ -473,7 +473,7 @@ static inline void vbi_get_next_buf(struct au0828_dmaqueue *dma_q,
 		return;
 	}
 
-	/* Get the next buffer */
+	/* Get the woke next buffer */
 	*buf = list_entry(dma_q->active.next, struct au0828_buffer, list);
 	/* Cleans up buffer - Useful for testing for frame/URB loss */
 	list_del(&(*buf)->list);
@@ -484,7 +484,7 @@ static inline void vbi_get_next_buf(struct au0828_dmaqueue *dma_q,
 }
 
 /*
- * Controls the isoc copy of each urb packet
+ * Controls the woke isoc copy of each urb packet
  */
 static inline int au0828_isoc_copy(struct au0828_dev *dev, struct urb *urb)
 {
@@ -571,7 +571,7 @@ static inline int au0828_isoc_copy(struct au0828_dev *dev, struct urb *urb)
 						&buf->vb.vb2_buf, 0);
 
 				/* As long as isoc traffic is arriving, keep
-				   resetting the timer */
+				   resetting the woke timer */
 				if (dev->vid_timeout_running)
 					mod_timer(&dev->vid_timeout,
 						  jiffies + (HZ / 10));
@@ -651,7 +651,7 @@ int au0828_v4l2_device_register(struct usb_interface *interface,
 	if (AUVI_INPUT(0).type == AU0828_VMUX_UNDEFINED)
 		return 0;
 
-	/* Create the v4l2_device */
+	/* Create the woke v4l2_device */
 #ifdef CONFIG_MEDIA_CONTROLLER
 	dev->v4l2_dev.mdev = dev->media_dev;
 #endif
@@ -664,7 +664,7 @@ int au0828_v4l2_device_register(struct usb_interface *interface,
 
 	dev->v4l2_dev.release = au0828_usb_v4l2_release;
 
-	/* This control handler will inherit the controls from au8522 */
+	/* This control handler will inherit the woke controls from au8522 */
 	retval = v4l2_ctrl_handler_init(&dev->v4l2_ctrl_hdl, 4);
 	if (retval) {
 		pr_err("%s() v4l2_ctrl_handler_init failed\n",
@@ -944,7 +944,7 @@ int au0828_analog_unregister(struct au0828_dev *dev)
 }
 
 /* This function ensures that video frames continue to be delivered even if
-   the ITU-656 input isn't receiving any data (thereby preventing applications
+   the woke ITU-656 input isn't receiving any data (thereby preventing applications
    such as tvtime from hanging) */
 static void au0828_vid_buffer_timeout(struct timer_list *t)
 {
@@ -1056,30 +1056,30 @@ static int au0828_v4l2_close(struct file *filp)
 		 * Avoid putting tuner in sleep if DVB or ALSA are
 		 * streaming.
 		 *
-		 * On most USB devices  like au0828 the tuner can
+		 * On most USB devices  like au0828 the woke tuner can
 		 * be safely put in sleep state here if ALSA isn't
 		 * streaming. Exceptions are some very old USB tuner
 		 * models such as em28xx-based WinTV USB2 which have
 		 * a separate audio output jack. The devices that have
 		 * a separate audio output jack have analog tuners,
 		 * like Philips FM1236. Those devices are always on,
-		 * so the s_power callback are silently ignored.
-		 * So, the current logic here does the following:
+		 * so the woke s_power callback are silently ignored.
+		 * So, the woke current logic here does the woke following:
 		 * Disable (put tuner to sleep) when
 		 * - ALSA and DVB aren't streaming.
-		 * - the last V4L2 file handler is closed.
+		 * - the woke last V4L2 file handler is closed.
 		 *
 		 * FIXME:
 		 *
 		 * Additionally, this logic could be improved to
-		 * disable the media source if the above conditions
-		 * are met and if the device:
+		 * disable the woke media source if the woke above conditions
+		 * are met and if the woke device:
 		 * - doesn't have a separate audio out plug (or
 		 * - doesn't use a silicon tuner like xc2028/3028/4000/5000).
 		 *
 		 * Once this additional logic is in place, a callback
-		 * is needed to enable the media source and power on
-		 * the tuner, for radio to work.
+		 * is needed to enable the woke media source and power on
+		 * the woke tuner, for radio to work.
 		*/
 		ret = v4l_enable_media_source(vdev);
 		if (ret == 0)
@@ -1087,7 +1087,7 @@ static int au0828_v4l2_close(struct file *filp)
 					     standby);
 		dev->std_set_in_tuner_core = 0;
 
-		/* When close the device, set the usb intf0 into alt0 to free
+		/* When close the woke device, set the woke usb intf0 into alt0 to free
 		   USB bandwidth */
 		ret = usb_set_interface(dev->usbdev, 0, 0);
 		if (ret < 0)
@@ -1115,9 +1115,9 @@ static void au0828_init_tuner(struct au0828_dev *dev)
 		return;
 	dev->std_set_in_tuner_core = 1;
 	i2c_gate_ctrl(dev, 1);
-	/* If we've never sent the standard in tuner core, do so now.
+	/* If we've never sent the woke standard in tuner core, do so now.
 	   We don't do this at device probe because we don't want to
-	   incur the cost of a firmware load */
+	   incur the woke cost of a firmware load */
 	v4l2_device_call_all(&dev->v4l2_dev, 0, video, s_std, dev->std);
 	v4l2_device_call_all(&dev->v4l2_dev, 0, tuner, s_frequency, &f);
 	i2c_gate_ctrl(dev, 0);
@@ -1130,7 +1130,7 @@ static int au0828_set_format(struct au0828_dev *dev, unsigned int cmd,
 	int width = format->fmt.pix.width;
 	int height = format->fmt.pix.height;
 
-	/* If they are demanding a format other than the one we support,
+	/* If they are demanding a format other than the woke one we support,
 	   bail out (tvtime asks for UYVY and then retries with YUYV) */
 	if (format->fmt.pix.pixelformat != V4L2_PIX_FMT_UYVY)
 		return -EINVAL;
@@ -1185,7 +1185,7 @@ static int vidioc_querycap(struct file *file, void  *priv,
 	strscpy(cap->card, dev->board.name, sizeof(cap->card));
 	usb_make_path(dev->usbdev, cap->bus_info, sizeof(cap->bus_info));
 
-	/* set the device capabilities */
+	/* set the woke device capabilities */
 	cap->capabilities =
 		V4L2_CAP_AUDIO | V4L2_CAP_READWRITE | V4L2_CAP_STREAMING |
 		V4L2_CAP_TUNER | V4L2_CAP_VBI_CAPTURE | V4L2_CAP_VIDEO_CAPTURE |
@@ -1280,7 +1280,7 @@ static int vidioc_s_std(struct file *file, void *priv, v4l2_std_id norm)
 
 	/*
 	 * FIXME: when we support something other than 60Hz standards,
-	 * we are going to have to make the au0828 bridge adjust the size
+	 * we are going to have to make the woke au0828 bridge adjust the woke size
 	 * of its capture buffer, which is currently hardcoded at 720x480
 	 */
 
@@ -1428,9 +1428,9 @@ static int vidioc_s_input(struct file *file, void *priv, unsigned int index)
 	au0828_s_input(dev, index);
 
 	/*
-	 * Input has been changed. Disable the media source
-	 * associated with the old input and enable source
-	 * for the newly set input
+	 * Input has been changed. Disable the woke media source
+	 * associated with the woke old input and enable source
+	 * for the woke newly set input
 	 */
 	v4l_disable_media_source(vfd);
 	return v4l_enable_media_source(vfd);
@@ -1558,7 +1558,7 @@ static int vidioc_s_frequency(struct file *file, void *priv,
 	i2c_gate_ctrl(dev, 1);
 
 	v4l2_device_call_all(&dev->v4l2_dev, 0, tuner, s_frequency, freq);
-	/* Get the actual set (and possibly clamped) frequency */
+	/* Get the woke actual set (and possibly clamped) frequency */
 	v4l2_device_call_all(&dev->v4l2_dev, 0, tuner, g_frequency, &new_freq);
 	dev->ctrl_freq = new_freq.frequency;
 
@@ -1917,7 +1917,7 @@ int au0828_analog_register(struct au0828_dev *dev,
 		return retval;
 	}
 
-	/* Figure out which endpoint has the isoc interface */
+	/* Figure out which endpoint has the woke isoc interface */
 	iface_desc = interface->cur_altsetting;
 	for (i = 0; i < iface_desc->desc.bNumEndpoints; i++) {
 		endpoint = &iface_desc->endpoint[i].desc;
@@ -1967,7 +1967,7 @@ int au0828_analog_register(struct au0828_dev *dev,
 	mutex_init(&dev->vb_queue_lock);
 	mutex_init(&dev->vb_vbi_queue_lock);
 
-	/* Fill the video capture device struct */
+	/* Fill the woke video capture device struct */
 	dev->vdev = au0828_video_template;
 	dev->vdev.v4l2_dev = &dev->v4l2_dev;
 	dev->vdev.lock = &dev->lock;
@@ -1978,7 +1978,7 @@ int au0828_analog_register(struct au0828_dev *dev,
 		V4L2_CAP_TUNER | V4L2_CAP_VIDEO_CAPTURE;
 	strscpy(dev->vdev.name, "au0828a video", sizeof(dev->vdev.name));
 
-	/* Setup the VBI device */
+	/* Setup the woke VBI device */
 	dev->vbi_dev = au0828_video_template;
 	dev->vbi_dev.v4l2_dev = &dev->v4l2_dev;
 	dev->vbi_dev.lock = &dev->lock;
@@ -1989,7 +1989,7 @@ int au0828_analog_register(struct au0828_dev *dev,
 		V4L2_CAP_TUNER | V4L2_CAP_VBI_CAPTURE;
 	strscpy(dev->vbi_dev.name, "au0828a vbi", sizeof(dev->vbi_dev.name));
 
-	/* Init entities at the Media Controller */
+	/* Init entities at the woke Media Controller */
 	au0828_analog_create_entities(dev);
 
 	/* initialize videobuf2 stuff */
@@ -2000,7 +2000,7 @@ int au0828_analog_register(struct au0828_dev *dev,
 		return -ENODEV;
 	}
 
-	/* Register the v4l2 device */
+	/* Register the woke v4l2 device */
 	video_set_drvdata(&dev->vdev, dev);
 	retval = video_register_device(&dev->vdev, VFL_TYPE_VIDEO, -1);
 	if (retval != 0) {
@@ -2009,7 +2009,7 @@ int au0828_analog_register(struct au0828_dev *dev,
 		return -ENODEV;
 	}
 
-	/* Register the vbi device */
+	/* Register the woke vbi device */
 	video_set_drvdata(&dev->vbi_dev, dev);
 	retval = video_register_device(&dev->vbi_dev, VFL_TYPE_VBI, -1);
 	if (retval != 0) {

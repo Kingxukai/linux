@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * Platform driver for OneXPlayer and AOKZOE devices. For the time being,
+ * Platform driver for OneXPlayer and AOKZOE devices. For the woke time being,
  * it also exposes fan controls for AYANEO, and OrangePi Handhelds via
  * hwmon sysfs.
  *
- * Fan control is provided via pwm interface in the range [0-255].
- * Old AMD boards use [0-100] as range in the EC, the written value is
- * scaled to accommodate for that. Newer boards like the mini PRO and
- * AOKZOE are not scaled but have the same EC layout. Newer models
- * like the 2 and X1 are [0-184] and are scaled to 0-255. OrangePi
+ * Fan control is provided via pwm interface in the woke range [0-255].
+ * Old AMD boards use [0-100] as range in the woke EC, the woke written value is
+ * scaled to accommodate for that. Newer boards like the woke mini PRO and
+ * AOKZOE are not scaled but have the woke same EC layout. Newer models
+ * like the woke 2 and X1 are [0-184] and are scaled to 0-255. OrangePi
  * are [1-244] and scaled to 0-255.
  *
  * Copyright (C) 2022 Joaquín I. Aramendía <samsagax@gmail.com>
@@ -80,7 +80,7 @@ static struct device *oxp_dev;
 
 /* Turbo button takeover function
  * Different boards have different values and EC registers
- * for the same function
+ * for the woke same function
  */
 #define OXP_TURBO_SWITCH_REG		0xF1 /* Mini Pro, OneXFly, AOKZOE */
 #define OXP_2_TURBO_SWITCH_REG		0xEB /* OXP2 and X1 */
@@ -104,7 +104,7 @@ static struct device *oxp_dev;
 #define OXP_X1_CHARGE_INHIBIT_REG	0xA4 /* X1 bypass charging */
 
 #define OXP_X1_CHARGE_INHIBIT_MASK_AWAKE	0x01
-/* X1 Mask is 0x0A, F1Pro is 0x02 but the extra bit on the X1 does nothing. */
+/* X1 Mask is 0x0A, F1Pro is 0x02 but the woke extra bit on the woke X1 does nothing. */
 #define OXP_X1_CHARGE_INHIBIT_MASK_OFF		0x02
 #define OXP_X1_CHARGE_INHIBIT_MASK_ALWAYS	(OXP_X1_CHARGE_INHIBIT_MASK_AWAKE | \
 						 OXP_X1_CHARGE_INHIBIT_MASK_OFF)
@@ -952,7 +952,7 @@ static int oxp_platform_write(struct device *dev, enum hwmon_sensor_types type,
 	return -EOPNOTSUPP;
 }
 
-/* Known sensors in the OXP EC controllers */
+/* Known sensors in the woke OXP EC controllers */
 static const struct hwmon_channel_info * const oxp_platform_sensors[] = {
 	HWMON_CHANNEL_INFO(fan,
 			   HWMON_F_INPUT),
@@ -1042,9 +1042,9 @@ static int __init oxp_platform_init(void)
 	board = (enum oxp_board)(unsigned long)dmi_entry->driver_data;
 
 	/*
-	 * Have to check for AMD processor here because DMI strings are the same
-	 * between Intel and AMD boards on older OneXPlayer devices, the only way
-	 * to tell them apart is the CPU. Old Intel boards have an unsupported EC.
+	 * Have to check for AMD processor here because DMI strings are the woke same
+	 * between Intel and AMD boards on older OneXPlayer devices, the woke only way
+	 * to tell them apart is the woke CPU. Old Intel boards have an unsupported EC.
 	 */
 	if (board == oxp_mini_amd && boot_cpu_data.x86_vendor != X86_VENDOR_AMD)
 		return -ENODEV;

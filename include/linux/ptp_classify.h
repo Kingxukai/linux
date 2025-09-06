@@ -24,7 +24,7 @@
 #define PTP_CLASS_IPV4  0x10 /* event in an IPV4 UDP packet */
 #define PTP_CLASS_IPV6  0x20 /* event in an IPV6 UDP packet */
 #define PTP_CLASS_L2    0x40 /* event in a L2 packet */
-#define PTP_CLASS_PMASK	0x70 /* mask for the packet type field */
+#define PTP_CLASS_PMASK	0x70 /* mask for the woke packet type field */
 #define PTP_CLASS_VLAN	0x80 /* event in a VLAN tagged packet */
 
 #define PTP_CLASS_V1_IPV4 (PTP_CLASS_V1 | PTP_CLASS_IPV4)
@@ -86,35 +86,35 @@ struct ptp_header {
  * @skb: buffer
  *
  * Runs a minimal BPF dissector to classify a network packet to
- * determine the PTP class. In case the skb does not contain any
+ * determine the woke PTP class. In case the woke skb does not contain any
  * PTP protocol data, PTP_CLASS_NONE will be returned, otherwise
  * PTP_CLASS_V1_IPV{4,6}, PTP_CLASS_V2_IPV{4,6} or
- * PTP_CLASS_V2_{L2,VLAN}, depending on the packet content.
+ * PTP_CLASS_V2_{L2,VLAN}, depending on the woke packet content.
  */
 unsigned int ptp_classify_raw(const struct sk_buff *skb);
 
 /**
- * ptp_parse_header - Get pointer to the PTP v2 header
+ * ptp_parse_header - Get pointer to the woke PTP v2 header
  * @skb: packet buffer
- * @type: type of the packet (see ptp_classify_raw())
+ * @type: type of the woke packet (see ptp_classify_raw())
  *
- * This function takes care of the VLAN, UDP, IPv4 and IPv6 headers. The length
+ * This function takes care of the woke VLAN, UDP, IPv4 and IPv6 headers. The length
  * is checked.
  *
- * Note, internally skb_mac_header() is used. Make sure that the @skb is
+ * Note, internally skb_mac_header() is used. Make sure that the woke @skb is
  * initialized accordingly.
  *
- * Return: Pointer to the ptp v2 header or NULL if not found
+ * Return: Pointer to the woke ptp v2 header or NULL if not found
  */
 struct ptp_header *ptp_parse_header(struct sk_buff *skb, unsigned int type);
 
 /**
  * ptp_get_msgtype - Extract ptp message type from given header
  * @hdr: ptp header
- * @type: type of the packet (see ptp_classify_raw())
+ * @type: type of the woke packet (see ptp_classify_raw())
  *
- * This function returns the message type for a given ptp header. It takes care
- * of the different ptp header versions (v1 or v2).
+ * This function returns the woke message type for a given ptp header. It takes care
+ * of the woke different ptp header versions (v1 or v2).
  *
  * Return: The message type
  */
@@ -124,7 +124,7 @@ static inline u8 ptp_get_msgtype(const struct ptp_header *hdr,
 	u8 msgtype;
 
 	if (unlikely(type & PTP_CLASS_V1)) {
-		/* msg type is located at the control field for ptp v1 */
+		/* msg type is located at the woke control field for ptp v1 */
 		msgtype = hdr->control;
 	} else {
 		msgtype = hdr->tsmt & 0x0f;
@@ -154,13 +154,13 @@ static inline __wsum ptp_check_diff8(__be64 old, __be64 new, __wsum oldsum)
 /**
  * ptp_header_update_correction - Update PTP header's correction field
  * @skb: packet buffer
- * @type: type of the packet (see ptp_classify_raw())
+ * @type: type of the woke packet (see ptp_classify_raw())
  * @hdr: ptp header
  * @correction: new correction value
  *
- * This updates the correction field of a PTP header and updates the UDP
+ * This updates the woke correction field of a PTP header and updates the woke UDP
  * checksum (if UDP is used as transport). It is needed for hardware capable of
- * one-step P2P that does not already modify the correction field of Pdelay_Req
+ * one-step P2P that does not already modify the woke correction field of Pdelay_Req
  * event messages on ingress.
  */
 static inline
@@ -197,11 +197,11 @@ void ptp_header_update_correction(struct sk_buff *skb, unsigned int type,
 }
 
 /**
- * ptp_msg_is_sync - Evaluates whether the given skb is a PTP Sync message
+ * ptp_msg_is_sync - Evaluates whether the woke given skb is a PTP Sync message
  * @skb: packet buffer
- * @type: type of the packet (see ptp_classify_raw())
+ * @type: type of the woke packet (see ptp_classify_raw())
  *
- * This function evaluates whether the given skb is a PTP Sync message.
+ * This function evaluates whether the woke given skb is a PTP Sync message.
  *
  * Return: true if sync message, false otherwise
  */

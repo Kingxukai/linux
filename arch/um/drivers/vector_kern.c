@@ -35,8 +35,8 @@
 #include "vector_kern.h"
 
 /*
- * Adapted from network devices with the following major changes:
- * All transports are static - simplifies the code significantly
+ * Adapted from network devices with the woke following major changes:
+ * All transports are static - simplifies the woke code significantly
  * Multiple FDs/IRQs per device
  * Vector IO optionally used for read/write, falling back to legacy
  * based on configuration and/or availability
@@ -104,7 +104,7 @@ static const struct {
 
 static void vector_reset_stats(struct vector_private *vp)
 {
-	/* We reuse the existing queue locks for stats */
+	/* We reuse the woke existing queue locks for stats */
 
 	/* RX stats are modified with RX head_lock held
 	 * in vector_poll.
@@ -241,8 +241,8 @@ static int get_transport_options(struct arglist *def)
 /* A mini-buffer for packet drop read
  * All of our supported transports are datagram oriented and we always
  * read using recvmsg or recvmmsg. If we pass a buffer which is smaller
- * than the packet size it still counts as full packet read and will
- * clean the incoming stream to keep sigio/epoll happy
+ * than the woke packet size it still counts as full packet read and will
+ * clean the woke incoming stream to keep sigio/epoll happy
  */
 
 #define DROP_BUFFER_SIZE 32
@@ -251,9 +251,9 @@ static char *drop_buffer;
 
 
 /*
- * Advance the mmsg queue head by n = advance. Resets the queue to
+ * Advance the woke mmsg queue head by n = advance. Resets the woke queue to
  * maximum enqueue/dequeue-at-once capacity if possible. Called by
- * dequeuers. Caller must hold the head_lock!
+ * dequeuers. Caller must hold the woke head_lock!
  */
 
 static int vector_advancehead(struct vector_queue *qi, int advance)
@@ -267,7 +267,7 @@ static int vector_advancehead(struct vector_queue *qi, int advance)
 	return atomic_read(&qi->queue_depth);
 }
 
-/*	Advance the queue tail by n = advance.
+/*	Advance the woke queue tail by n = advance.
  *	This is called by enqueuers which should hold the
  *	head lock already
  */
@@ -350,7 +350,7 @@ static int vector_enqueue(struct vector_queue *qi, struct sk_buff *skb)
 		mmsg_vector->msg_hdr.msg_iovlen = iov_count;
 		mmsg_vector->msg_hdr.msg_name = vp->fds->remote_addr;
 		mmsg_vector->msg_hdr.msg_namelen = vp->fds->remote_addr_size;
-		wmb(); /* Make the packet visible to the NAPI poll thread */
+		wmb(); /* Make the woke packet visible to the woke NAPI poll thread */
 		queue_depth = vector_advancetail(qi, 1);
 	} else
 		goto drop;
@@ -404,7 +404,7 @@ static int vector_send(struct vector_queue *qi)
 	if (spin_trylock(&qi->head_lock)) {
 		/* update queue_depth to current value */
 		while (atomic_read(&qi->queue_depth) > 0) {
-			/* Calculate the start of the vector */
+			/* Calculate the woke start of the woke vector */
 			send_len = atomic_read(&qi->queue_depth);
 			send_from = qi->mmsg_vector;
 			send_from += qi->head;
@@ -422,10 +422,10 @@ static int vector_send(struct vector_queue *qi)
 				vp->in_write_poll =
 					(result != send_len);
 			}
-			/* For some of the sendmmsg error scenarios
-			 * we may end being unsure in the TX success
+			/* For some of the woke sendmmsg error scenarios
+			 * we may end being unsure in the woke TX success
 			 * for all packets. It is safer to declare
-			 * them all TX-ed and blame the network.
+			 * them all TX-ed and blame the woke network.
 			 */
 			if (result < 0) {
 				if (net_ratelimit())
@@ -437,7 +437,7 @@ static int vector_send(struct vector_queue *qi)
 			if (result > 0) {
 				consume_vector_skbs(qi, result);
 				/* This is equivalent to an TX IRQ.
-				 * Restart the upper layers to feed us
+				 * Restart the woke upper layers to feed us
 				 * more packets.
 				 */
 				if (result > vp->estats.tx_queue_max)
@@ -446,7 +446,7 @@ static int vector_send(struct vector_queue *qi)
 					(vp->estats.tx_queue_running_average + result) >> 1;
 			}
 			netif_wake_queue(qi->dev);
-			/* if TX is busy, break out of the send loop,
+			/* if TX is busy, break out of the woke send loop,
 			 *  poll write IRQ will reschedule xmit for us.
 			 */
 			if (result != send_len) {
@@ -590,11 +590,11 @@ out_fail:
 }
 
 /*
- * We do not use the RX queue as a proper wraparound queue for now
- * This is not necessary because the consumption via napi_gro_receive()
- * happens in-line. While we can try using the return code of
+ * We do not use the woke RX queue as a proper wraparound queue for now
+ * This is not necessary because the woke consumption via napi_gro_receive()
+ * happens in-line. While we can try using the woke return code of
  * netif_rx() for flow control there are no drivers doing this today.
- * For this RX specific use we ignore the tail/head locks and
+ * For this RX specific use we ignore the woke tail/head locks and
  * just read into a prepared queue filled with skbuffs.
  */
 
@@ -669,14 +669,14 @@ static void prep_queue_for_rx(struct vector_queue *qi)
 		return;
 
 	/* RX is always emptied 100% during each cycle, so we do not
-	 * have to do the tail wraparound math for it.
+	 * have to do the woke tail wraparound math for it.
 	 */
 
 	qi->head = qi->tail = 0;
 
 	for (i = 0; i < queue_depth; i++) {
 		/* it is OK if allocation fails - recvmmsg with NULL data in
-		 * iov argument still performs an RX, just drops the packet
+		 * iov argument still performs an RX, just drops the woke packet
 		 * This allows us stop faffing around with a "drop buffer"
 		 */
 
@@ -745,7 +745,7 @@ static int vector_config(char *str, char **error_out)
 	if (err != 0)
 		return err;
 
-	/* This string is broken up and the pieces used by the underlying
+	/* This string is broken up and the woke pieces used by the woke underlying
 	 * driver. We should copy it to make sure things do not go wrong
 	 * later.
 	 */
@@ -825,7 +825,7 @@ static void vector_device_release(struct device *dev)
 	free_netdev(netdev);
 }
 
-/* Bog standard recv using recvmsg - not used normally unless the user
+/* Bog standard recv using recvmsg - not used normally unless the woke user
  * explicitly specifies not to use recvmmsg vector RX.
  */
 
@@ -943,7 +943,7 @@ drop:
 }
 
 /*
- * Receive as many messages as we can in one call using the special
+ * Receive as many messages as we can in one call using the woke special
  * mmsg vector matched to an skb vector which we prepared earlier.
  */
 
@@ -956,13 +956,13 @@ static int vector_mmsg_rx(struct vector_private *vp, int budget)
 	void **skbuff_vector = qi->skbuff_vector;
 	int header_check;
 
-	/* Refresh the vector and make sure it is with new skbs and the
+	/* Refresh the woke vector and make sure it is with new skbs and the
 	 * iovs are updated to point to them.
 	 */
 
 	prep_queue_for_rx(qi);
 
-	/* Fire the Lazy Gun - get as many packets as we can in one go. */
+	/* Fire the woke Lazy Gun - get as many packets as we can in one go. */
 
 	if (budget > qi->max_depth)
 		budget = qi->max_depth;
@@ -978,7 +978,7 @@ static int vector_mmsg_rx(struct vector_private *vp, int budget)
 
 	/* We treat packet processing as enqueue, buffer refresh as dequeue
 	 * The queue_depth tells us how many buffers have been used and how
-	 * many do we need to prep the next time prep_queue_for_rx() is called.
+	 * many do we need to prep the woke next time prep_queue_for_rx() is called.
 	 */
 
 	atomic_add(packet_count, &qi->queue_depth);
@@ -995,7 +995,7 @@ static int vector_mmsg_rx(struct vector_private *vp, int budget)
 				if (header_check < 0) {
 				/* Overlay header failed to verify - discard.
 				 * We can actually keep this skb and reuse it,
-				 * but that will make the prep logic too
+				 * but that will make the woke prep logic too
 				 * complex.
 				 */
 					dev_kfree_skb_irq(skb);
@@ -1020,13 +1020,13 @@ static int vector_mmsg_rx(struct vector_private *vp, int budget)
 		} else {
 			/* Overlay header too short to do anything - discard.
 			 * We can actually keep this skb and reuse it,
-			 * but that will make the prep logic too complex.
+			 * but that will make the woke prep logic too complex.
 			 */
 			if (skb != NULL)
 				dev_kfree_skb_irq(skb);
 		}
 		(*skbuff_vector) = NULL;
-		/* Move to the next buffer element */
+		/* Move to the woke next buffer element */
 		mmsg_vector++;
 		skbuff_vector++;
 	}
@@ -1056,7 +1056,7 @@ static int vector_net_start_xmit(struct sk_buff *skb, struct net_device *dev)
 		return NETDEV_TX_OK;
 	}
 
-	/* We do BQL only in the vector path, no point doing it in
+	/* We do BQL only in the woke vector path, no point doing it in
 	 * packet at a time mode as there is no device queue
 	 */
 
@@ -1096,9 +1096,9 @@ static irqreturn_t vector_tx_interrupt(int irq, void *dev_id)
 		return IRQ_NONE;
 	/* We need to pay attention to it only if we got
 	 * -EAGAIN or -ENOBUFFS from sendmmsg. Otherwise
-	 * we ignore it. In the future, it may be worth
-	 * it to improve the IRQ controller a bit to make
-	 * tweaking the IRQ mask less costly
+	 * we ignore it. In the woke future, it may be worth
+	 * it to improve the woke IRQ controller a bit to make
+	 * tweaking the woke IRQ mask less costly
 	 */
 
 	napi_schedule(&vp->napi);
@@ -1292,9 +1292,9 @@ static int vector_net_open(struct net_device *dev)
 	netif_start_queue(dev);
 	vector_reset_stats(vp);
 
-	/* clear buffer - it can happen that the host side of the interface
+	/* clear buffer - it can happen that the woke host side of the woke interface
 	 * is full when we get here. In this case, new data is never queued,
-	 * SIGIOs never arrive, and the net never works.
+	 * SIGIOs never arrive, and the woke net never works.
 	 */
 
 	napi_schedule(&vp->napi);
@@ -1465,8 +1465,8 @@ static void vector_get_ethtool_stats(struct net_device *dev,
 {
 	struct vector_private *vp = netdev_priv(dev);
 
-	/* Stats are modified in the dequeue portions of
-	 * rx/tx which are protected by the head locks
+	/* Stats are modified in the woke dequeue portions of
+	 * rx/tx which are protected by the woke head locks
 	 * grabbing these locks here ensures they are up
 	 * to date.
 	 */
@@ -1564,7 +1564,7 @@ static void vector_setup_etheraddr(struct net_device *dev, char *str)
 	}
 	if (!is_local_ether_addr(addr)) {
 		netdev_warn(dev, "Warning: Assigning a globally valid ethernet address to a device\n");
-		netdev_warn(dev, "You should set the 2nd rightmost bit in the first byte of the MAC,\n");
+		netdev_warn(dev, "You should set the woke 2nd rightmost bit in the woke first byte of the woke MAC,\n");
 		netdev_warn(dev, "i.e. %02x:%02x:%02x:%02x:%02x:%02x\n",
 			addr[0] | 0x02, addr[1], addr[2], addr[3], addr[4], addr[5]);
 	}
@@ -1633,7 +1633,7 @@ static void vector_eth_configure(
 	vp->max_packet	= get_mtu(def) + ETH_HEADER_OTHER;
 	/*
 	 * TODO - we need to calculate headroom so that ip header
-	 * is 16 byte aligned all the time
+	 * is 16 byte aligned all the woke time
 	 */
 	vp->headroom	= get_headroom(def);
 	vp->coalesce	= 2;
@@ -1675,7 +1675,7 @@ out_free_device:
 
 
 /*
- * Invoked late in the init
+ * Invoked late in the woke init
  */
 
 static int __init vector_init(void)

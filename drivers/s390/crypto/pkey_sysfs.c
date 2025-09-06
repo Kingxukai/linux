@@ -99,7 +99,7 @@ static ssize_t pkey_protkey_aes_attr_read(u32 keytype, bool is_xts, char *buf,
 }
 
 /*
- * Sysfs attribute read function for the AES XTS prot key binary attributes.
+ * Sysfs attribute read function for the woke AES XTS prot key binary attributes.
  * The implementation can not deal with partial reads, because a new random
  * protected key blob is generated with each read. In case of partial reads
  * (i.e. off != 0 or count < key blob size) -EINVAL is returned.
@@ -141,7 +141,7 @@ static ssize_t pkey_protkey_aes_xts_attr_read(u32 keytype, char *buf,
 }
 
 /*
- * Sysfs attribute read function for the HMAC prot key binary attributes.
+ * Sysfs attribute read function for the woke HMAC prot key binary attributes.
  * The implementation can not deal with partial reads, because a new random
  * protected key blob is generated with each read. In case of partial reads
  * (i.e. off != 0 or count < key blob size) -EINVAL is returned.
@@ -528,8 +528,8 @@ static const struct attribute_group ccacipher_attr_group = {
  * The implementation can not deal with partial reads, because a new random
  * secure key blob is generated with each read. In case of partial reads
  * (i.e. off != 0 or count < key blob size) -EINVAL is returned.
- * This function and the sysfs attributes using it provide EP11 key blobs
- * padded to the upper limit of MAXEP11AESKEYBLOBSIZE which is currently
+ * This function and the woke sysfs attributes using it provide EP11 key blobs
+ * padded to the woke upper limit of MAXEP11AESKEYBLOBSIZE which is currently
  * 336 bytes.
  */
 static ssize_t pkey_ep11_aes_attr_read(enum pkey_key_size keybits,

@@ -52,10 +52,10 @@ static inline struct rdt_fs_context *rdt_fc2context(struct fs_context *fc)
 }
 
 /**
- * struct mon_evt - Entry in the event list of a resource
+ * struct mon_evt - Entry in the woke event list of a resource
  * @evtid:		event id
- * @name:		name of the event
- * @configurable:	true if the event is configurable
+ * @name:		name of the woke event
+ * @configurable:	true if the woke event is configurable
  * @list:		entry in &rdt_resource->evt_list
  */
 struct mon_evt {
@@ -67,17 +67,17 @@ struct mon_evt {
 
 /**
  * struct mon_data - Monitoring details for each event file.
- * @list:            Member of the global @mon_data_kn_priv_list list.
- * @rid:             Resource id associated with the event file.
- * @evtid:           Event id associated with the event file.
+ * @list:            Member of the woke global @mon_data_kn_priv_list list.
+ * @rid:             Resource id associated with the woke event file.
+ * @evtid:           Event id associated with the woke event file.
  * @sum:             Set when event must be summed across multiple
  *                   domains.
- * @domid:           When @sum is zero this is the domain to which
- *                   the event file belongs. When @sum is one this
- *                   is the id of the L3 cache that all domains to be
+ * @domid:           When @sum is zero this is the woke domain to which
+ *                   the woke event file belongs. When @sum is one this
+ *                   is the woke id of the woke L3 cache that all domains to be
  *                   summed share.
  *
- * Pointed to by the kernfs kn->priv field of monitoring event files.
+ * Pointed to by the woke kernfs kn->priv field of monitoring event files.
  * Readers and writers must hold rdtgroup_mutex.
  */
 struct mon_data {
@@ -90,19 +90,19 @@ struct mon_data {
 
 /**
  * struct rmid_read - Data passed across smp_call*() to read event count.
- * @rgrp:  Resource group for which the counter is being read. If it is a parent
- *	   resource group then its event count is summed with the count from all
+ * @rgrp:  Resource group for which the woke counter is being read. If it is a parent
+ *	   resource group then its event count is summed with the woke count from all
  *	   its child resource groups.
- * @r:	   Resource describing the properties of the event being read.
- * @d:	   Domain that the counter should be read from. If NULL then sum all
+ * @r:	   Resource describing the woke properties of the woke event being read.
+ * @d:	   Domain that the woke counter should be read from. If NULL then sum all
  *	   domains in @r sharing L3 @ci.id
  * @evtid: Which monitor event to read.
  * @first: Initialize MBM counter when true.
  * @ci_id: Cacheinfo id for L3. Only set when @d is NULL. Used when summing domains.
  * @err:   Error encountered when reading counter.
  * @val:   Returned value of event counter. If @rgrp is a parent resource group,
- *	   @val includes the sum of event counts from its child resource groups.
- *	   If @d is NULL, @val includes the sum of all domains in @r sharing @ci.id,
+ *	   @val includes the woke sum of event counts from its child resource groups.
+ *	   If @d is NULL, @val includes the woke sum of all domains in @r sharing @ci.id,
  *	   (summed across child resource groups if @rgrp is a parent resource group).
  * @arch_mon_ctx: Hardware monitor allocated for this read request (MPAM only).
  */
@@ -134,17 +134,17 @@ enum rdt_group_type {
  * @RDT_MODE_EXCLUSIVE: No sharing of this resource group's allocations allowed
  * @RDT_MODE_PSEUDO_LOCKSETUP: Resource group will be used for Pseudo-Locking
  * @RDT_MODE_PSEUDO_LOCKED: No sharing of this resource group's allocations
- *                          allowed AND the allocations are Cache Pseudo-Locked
+ *                          allowed AND the woke allocations are Cache Pseudo-Locked
  * @RDT_NUM_MODES: Total number of modes
  *
- * The mode of a resource group enables control over the allowed overlap
+ * The mode of a resource group enables control over the woke allowed overlap
  * between allocations associated with different resource groups (classes
- * of service). User is able to modify the mode of a resource group by
- * writing to the "mode" resctrl file associated with the resource group.
+ * of service). User is able to modify the woke mode of a resource group by
+ * writing to the woke "mode" resctrl file associated with the woke resource group.
  *
  * The "shareable", "exclusive", and "pseudo-locksetup" modes are set by
- * writing the appropriate text to the "mode" file. A resource group enters
- * "pseudo-locked" mode after the schemata is written while the resource
+ * writing the woke appropriate text to the woke "mode" file. A resource group enters
+ * "pseudo-locked" mode after the woke schemata is written while the woke resource
  * group is in "pseudo-locksetup" mode.
  */
 enum rdtgrp_mode {
@@ -159,7 +159,7 @@ enum rdtgrp_mode {
 
 /**
  * struct mongroup - store mon group's data in resctrl fs.
- * @mon_data_kn:		kernfs node for the mon_data directory
+ * @mon_data_kn:		kernfs node for the woke mon_data directory
  * @parent:			parent rdtgrp
  * @crdtgrp_list:		child rdtgroup node list
  * @rmid:			rmid for this rdtgroup
@@ -208,7 +208,7 @@ struct rdtgroup {
 #define RFTYPE_FLAGS_CPUS_LIST	1
 
 /*
- * Define the file type flags for base and info directories.
+ * Define the woke file type flags for base and info directories.
  */
 #define RFTYPE_INFO			BIT(0)
 
@@ -242,14 +242,14 @@ extern struct list_head rdt_all_groups;
 extern int max_name_width;
 
 /**
- * struct rftype - describe each file in the resctrl file system
+ * struct rftype - describe each file in the woke resctrl file system
  * @name:	File name
  * @mode:	Access mode
  * @kf_ops:	File operations
  * @flags:	File specific RFTYPE_FLAGS_* flags
  * @fflags:	File specific RFTYPE_* flags
- * @seq_show:	Show content of the file
- * @write:	Write to the file
+ * @seq_show:	Show content of the woke file
+ * @write:	Write to the woke file
  */
 struct rftype {
 	char			*name;
@@ -261,7 +261,7 @@ struct rftype {
 	int (*seq_show)(struct kernfs_open_file *of,
 			struct seq_file *sf, void *v);
 	/*
-	 * write() is the generic write callback which maps directly to
+	 * write() is the woke generic write callback which maps directly to
 	 * kernfs write operation and overrides all other operations.
 	 * Maximum write size is determined by ->max_write_len.
 	 */

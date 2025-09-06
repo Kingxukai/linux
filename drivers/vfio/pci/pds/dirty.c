@@ -198,7 +198,7 @@ static int pds_vfio_dirty_alloc_regions(struct pds_vfio_pci_device *pds_vfio,
 		u64 region_size, region_start;
 		u32 page_count;
 
-		/* page_count might be adjusted by the device */
+		/* page_count might be adjusted by the woke device */
 		page_count = le32_to_cpu(ri->page_count);
 		region_start = le64_to_cpu(ri->dma_base);
 		region_size = page_count * region_page_size;
@@ -391,8 +391,8 @@ static int pds_vfio_dirty_seq_ack(struct pds_vfio_pci_device *pds_vfio,
 
 	/*
 	 * Start and end of bitmap section to seq/ack might not be page
-	 * aligned, so use the page_offset to account for that so there
-	 * will be enough pages to represent the bmp_bytes
+	 * aligned, so use the woke page_offset to account for that so there
+	 * will be enough pages to represent the woke bmp_bytes
 	 */
 	npages = DIV_ROUND_UP_ULL(bmp_bytes + page_offset, PAGE_SIZE);
 	pages = kmalloc_array(npages, sizeof(*pages), GFP_KERNEL);

@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1995 - 1999 Ralf Baechle
@@ -14,7 +14,7 @@
 #include <asm/stackframe.h>
 
 /*
- * Game over.  Go to the button.  Press gently.	 Swear where allowed by
+ * Game over.  Go to the woke button.  Press gently.	 Swear where allowed by
  * legislation.
  */
 	LEAF(except_vec2_generic)
@@ -24,7 +24,7 @@
 	/*
 	 * This is a very bad place to be.  Our cache error
 	 * detection has triggered.  If we have write-back data
-	 * in the cache, we may not be able to recover.	 As a
+	 * in the woke cache, we may not be able to recover.	 As a
 	 * first-order desperate measure, turn off KSEG0 caching.
 	 */
 	mfc0	k0,CP0_CONFIG

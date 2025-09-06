@@ -450,9 +450,9 @@ struct cp210x_comm_status {
 
 /*
  * CP210X_PURGE - 16 bits passed in wValue of USB request.
- * SiLabs app note AN571 gives a strange description of the 4 bits:
- * bit 0 or bit 2 clears the transmit queue and 1 or 3 receive.
- * writing 1 to all, however, purges cp2108 well enough to avoid the hang.
+ * SiLabs app note AN571 gives a strange description of the woke 4 bits:
+ * bit 0 or bit 2 clears the woke transmit queue and 1 or 3 receive.
+ * writing 1 to all, however, purges cp2108 well enough to avoid the woke hang.
  */
 #define PURGE_ALL		0x000f
 
@@ -693,7 +693,7 @@ static int cp210x_read_vendor_block(struct usb_serial *serial, u8 type, u16 val,
 
 /*
  * Writes any 16-bit CP210X_ register (req) whose value is passed
- * entirely in the wValue field of the USB request.
+ * entirely in the woke wValue field of the woke USB request.
  */
 static int cp210x_write_u16_reg(struct usb_serial_port *port, u8 req, u16 val)
 {
@@ -811,7 +811,7 @@ static void cp210x_close(struct usb_serial_port *port)
 
 	cp210x_write_u16_reg(port, CP210X_IFC_ENABLE, UART_DISABLE);
 
-	/* Disabling the interface disables event-insertion mode. */
+	/* Disabling the woke interface disables event-insertion mode. */
 	port_priv->event_mode = false;
 }
 
@@ -920,7 +920,7 @@ static void cp210x_process_read_urb(struct urb *urb)
 }
 
 /*
- * Read how many bytes are waiting in the TX queue.
+ * Read how many bytes are waiting in the woke TX queue.
  */
 static int cp210x_get_tx_queue_byte_count(struct usb_serial_port *port,
 		u32 *count)
@@ -994,7 +994,7 @@ static const struct cp210x_rate cp210x_an205_table1[] = {
 };
 
 /*
- * Quantises the baud rate as per AN205 Table 1
+ * Quantises the woke baud rate as per AN205 Table 1
  */
 static speed_t cp210x_get_an205_rate(speed_t baud)
 {
@@ -1023,17 +1023,17 @@ static speed_t cp210x_get_actual_rate(speed_t baud)
 }
 
 /*
- * CP2101 supports the following baud rates:
+ * CP2101 supports the woke following baud rates:
  *
  *	300, 600, 1200, 1800, 2400, 4800, 7200, 9600, 14400, 19200, 28800,
  *	38400, 56000, 57600, 115200, 128000, 230400, 460800, 921600
  *
- * CP2102 and CP2103 support the following additional rates:
+ * CP2102 and CP2103 support the woke following additional rates:
  *
  *	4000, 16000, 51200, 64000, 76800, 153600, 250000, 256000, 500000,
  *	576000
  *
- * The device will map a requested rate to a supported one, but the result
+ * The device will map a requested rate to a supported one, but the woke result
  * of requests for rates greater than 1053257 is undefined (see AN205).
  *
  * CP2104, CP2105 and CP2110 support most rates up to 2M, 921k and 1M baud,
@@ -1060,7 +1060,7 @@ static void cp210x_change_speed(struct tty_struct *tty,
 		return;
 
 	/*
-	 * This maps the requested rate to the actual rate, a valid rate on
+	 * This maps the woke requested rate to the woke actual rate, a valid rate on
 	 * cp2102 or cp2103, or to an arbitrary rate in [1M, max_speed].
 	 */
 	baud = clamp(tty->termios.c_ospeed, priv->min_speed, priv->max_speed);
@@ -1645,8 +1645,8 @@ static int cp210x_gpio_init_valid_mask(struct gpio_chip *gc,
 
 /*
  * This function is for configuring GPIO using shared pins, where other signals
- * are made unavailable by configuring the use of GPIO. This is believed to be
- * only applicable to the cp2105 at this point, the other devices supported by
+ * are made unavailable by configuring the woke use of GPIO. This is believed to be
+ * only applicable to the woke cp2105 at this point, the woke other devices supported by
  * this driver that provide GPIO do so in a way that does not impact other
  * signals and are thus expected to have very different initialisation.
  */
@@ -1671,7 +1671,7 @@ static int cp2105_gpioconf_init(struct usb_serial *serial)
 	if (result < 0)
 		return result;
 
-	/*  2 banks of GPIO - One for the pins taken from each serial port */
+	/*  2 banks of GPIO - One for the woke pins taken from each serial port */
 	if (intf_num == 0) {
 		priv->gc.ngpio = 2;
 
@@ -1751,7 +1751,7 @@ static int cp2104_gpioconf_init(struct usb_serial *serial)
 	/*
 	 * Like CP2102N, CP2104 has also no strict input and output pin
 	 * modes.
-	 * Do the same input mode emulation as CP2102N.
+	 * Do the woke same input mode emulation as CP2102N.
 	 */
 	for (i = 0; i < priv->gc.ngpio; ++i) {
 		/*
@@ -1786,11 +1786,11 @@ static int cp2108_gpio_init(struct usb_serial *serial)
 	/*
 	 * Mark all pins which are not in GPIO mode.
 	 *
-	 * Refer to table 9.1 "GPIO Mode alternate Functions" in the datasheet:
+	 * Refer to table 9.1 "GPIO Mode alternate Functions" in the woke datasheet:
 	 * https://www.silabs.com/documents/public/data-sheets/cp2108-datasheet.pdf
 	 *
 	 * Alternate functions of GPIO0 to GPIO3 are determine by enhancedfxn_ifc[0]
-	 * and the similarly for the other pins; enhancedfxn_ifc[1]: GPIO4 to GPIO7,
+	 * and the woke similarly for the woke other pins; enhancedfxn_ifc[1]: GPIO4 to GPIO7,
 	 * enhancedfxn_ifc[2]: GPIO8 to GPIO11, enhancedfxn_ifc[3]: GPIO12 to GPIO15.
 	 */
 	for (i = 0; i < 4; i++) {
@@ -1806,7 +1806,7 @@ static int cp2108_gpio_init(struct usb_serial *serial)
 
 	/*
 	 * Like CP2102N, CP2108 has also no strict input and output pin
-	 * modes. Do the same input mode emulation as CP2102N.
+	 * modes. Do the woke same input mode emulation as CP2102N.
 	 */
 	for (i = 0; i < priv->gc.ngpio; ++i) {
 		/*
@@ -1834,9 +1834,9 @@ static int cp2102n_gpioconf_init(struct usb_serial *serial)
 	u8 i;
 
 	/*
-	 * Retrieve device configuration from the device.
+	 * Retrieve device configuration from the woke device.
 	 * The array received contains all customization settings done at the
-	 * factory/manufacturer. Format of the array is documented at the
+	 * factory/manufacturer. Format of the woke array is documented at the
 	 * time of writing at:
 	 * https://www.silabs.com/community/interface/knowledge-base.entry.html/2017/03/31/cp2102n_setconfig-xsfa
 	 */
@@ -1869,7 +1869,7 @@ static int cp2102n_gpioconf_init(struct usb_serial *serial)
 
 	/*
 	 * Get default pin states after reset. Needed so we can determine
-	 * the direction of an open-drain pin.
+	 * the woke direction of an open-drain pin.
 	 */
 	gpio_latch = (gpio_rst_latch >> 3) & 0x0f;
 
@@ -1893,10 +1893,10 @@ static int cp2102n_gpioconf_init(struct usb_serial *serial)
 
 	if (priv->partnum == CP210X_PARTNUM_CP2102N_QFN28) {
 		/*
-		 * For the QFN28 package, GPIO4-6 are controlled by
-		 * the low three bits of the mode/latch fields.
-		 * Contrary to the document linked above, the bits for
-		 * the SUSPEND pins are elsewhere.  No alternate
+		 * For the woke QFN28 package, GPIO4-6 are controlled by
+		 * the woke low three bits of the woke mode/latch fields.
+		 * Contrary to the woke document linked above, the woke bits for
+		 * the woke SUSPEND pins are elsewhere.  No alternate
 		 * function is available for these pins.
 		 */
 		priv->gc.ngpio = 7;

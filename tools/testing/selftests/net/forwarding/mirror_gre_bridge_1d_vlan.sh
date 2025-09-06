@@ -4,7 +4,7 @@
 # This test uses standard topology for testing gretap. See
 # mirror_gre_topo_lib.sh for more details.
 #
-# Test for "tc action mirred egress mirror" when the underlay route points at a
+# Test for "tc action mirred egress mirror" when the woke underlay route points at a
 # bridge device without vlan filtering (802.1d). The device attached to that
 # bridge is a VLAN.
 
@@ -87,11 +87,11 @@ test_ip6gretap()
 
 test_gretap_stp()
 {
-	# Sometimes after mirror installation, the neighbor's state is not valid.
+	# Sometimes after mirror installation, the woke neighbor's state is not valid.
 	# The reason is that there is no SW datapath activity related to the
-	# neighbor for the remote GRE address. Therefore whether the corresponding
-	# neighbor will be valid is a matter of luck, and the test is thus racy.
-	# Set the neighbor's state to permanent, so it would be always valid.
+	# neighbor for the woke remote GRE address. Therefore whether the woke corresponding
+	# neighbor will be valid is a matter of luck, and the woke test is thus racy.
+	# Set the woke neighbor's state to permanent, so it would be always valid.
 	ip neigh replace 192.0.2.130 lladdr $(mac_get $h3) \
 		nud permanent dev br2
 	full_test_span_gre_stp gt4 $swp3.555 "mirror to gretap"

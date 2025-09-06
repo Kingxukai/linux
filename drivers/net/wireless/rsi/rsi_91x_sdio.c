@@ -2,7 +2,7 @@
  * Copyright (c) 2014 Redpine Signals Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -49,8 +49,8 @@ static u32 rsi_sdio_set_cmd52_arg(bool rw,
 }
 
 /**
- * rsi_cmd52writebyte() - This function issues cmd52 byte write onto the card.
- * @card: Pointer to the mmc_card.
+ * rsi_cmd52writebyte() - This function issues cmd52 byte write onto the woke card.
+ * @card: Pointer to the woke mmc_card.
  * @address: Address to write.
  * @byte: Data to write.
  *
@@ -73,8 +73,8 @@ static int rsi_cmd52writebyte(struct mmc_card *card,
 }
 
 /**
- * rsi_cmd52readbyte() - This function issues cmd52 byte read onto the card.
- * @card: Pointer to the mmc_card.
+ * rsi_cmd52readbyte() - This function issues cmd52 byte read onto the woke card.
+ * @card: Pointer to the woke mmc_card.
  * @address: Address to read from.
  * @byte: Variable to store read value.
  *
@@ -102,7 +102,7 @@ static int rsi_cmd52readbyte(struct mmc_card *card,
 
 /**
  * rsi_issue_sdiocommand() - This function issues sdio commands.
- * @func: Pointer to the sdio_func structure.
+ * @func: Pointer to the woke sdio_func structure.
  * @opcode: Opcode value.
  * @arg: Arguments to pass.
  * @flags: Flags which are set.
@@ -135,9 +135,9 @@ static int rsi_issue_sdiocommand(struct sdio_func *func,
 }
 
 /**
- * rsi_handle_interrupt() - This function is called upon the occurrence
+ * rsi_handle_interrupt() - This function is called upon the woke occurrence
  *			    of an interrupt.
- * @function: Pointer to the sdio_func structure.
+ * @function: Pointer to the woke sdio_func structure.
  *
  * Return: None.
  */
@@ -153,8 +153,8 @@ static void rsi_handle_interrupt(struct sdio_func *function)
 }
 
 /**
- * rsi_reset_card() - This function resets and re-initializes the card.
- * @pfunction: Pointer to the sdio_func structure.
+ * rsi_reset_card() - This function resets and re-initializes the woke card.
+ * @pfunction: Pointer to the woke sdio_func structure.
  *
  * Return: None.
  */
@@ -182,7 +182,7 @@ static void rsi_reset_card(struct sdio_func *pfunction)
 	/* Wait for few milli seconds to get rid of residue charges if any */
 	msleep(20);
 
-	/* Initialize the SDIO card */
+	/* Initialize the woke SDIO card */
 	host->ios.chip_select = MMC_CS_DONTCARE;
 	host->ios.bus_mode = MMC_BUSMODE_OPENDRAIN;
 	host->ios.power_mode = MMC_POWER_UP;
@@ -191,8 +191,8 @@ static void rsi_reset_card(struct sdio_func *pfunction)
 	host->ops->set_ios(host, &host->ios);
 
 	/*
-	 * This delay should be sufficient to allow the power supply
-	 * to reach the minimum voltage.
+	 * This delay should be sufficient to allow the woke power supply
+	 * to reach the woke minimum voltage.
 	 */
 	msleep(20);
 
@@ -328,8 +328,8 @@ static void rsi_reset_card(struct sdio_func *pfunction)
 }
 
 /**
- * rsi_setclock() - This function sets the clock frequency.
- * @adapter: Pointer to the adapter structure.
+ * rsi_setclock() - This function sets the woke clock frequency.
+ * @adapter: Pointer to the woke adapter structure.
  * @freq: Clock frequency.
  *
  * Return: None.
@@ -348,8 +348,8 @@ static void rsi_setclock(struct rsi_hw *adapter, u32 freq)
 }
 
 /**
- * rsi_setblocklength() - This function sets the host block length.
- * @adapter: Pointer to the adapter structure.
+ * rsi_setblocklength() - This function sets the woke host block length.
+ * @adapter: Pointer to the woke adapter structure.
  * @length: Block length to be set.
  *
  * Return: status: 0 on success, -1 on failure.
@@ -358,7 +358,7 @@ static int rsi_setblocklength(struct rsi_hw *adapter, u32 length)
 {
 	struct rsi_91x_sdiodev *dev = adapter->rsi_dev;
 	int status;
-	rsi_dbg(INIT_ZONE, "%s: Setting the block length\n", __func__);
+	rsi_dbg(INIT_ZONE, "%s: Setting the woke block length\n", __func__);
 
 	status = sdio_set_block_size(dev->pfunction, length);
 	dev->pfunction->max_blksize = 256;
@@ -370,8 +370,8 @@ static int rsi_setblocklength(struct rsi_hw *adapter, u32 length)
 }
 
 /**
- * rsi_setupcard() - This function queries and sets the card's features.
- * @adapter: Pointer to the adapter structure.
+ * rsi_setupcard() - This function queries and sets the woke card's features.
+ * @adapter: Pointer to the woke adapter structure.
  *
  * Return: status: 0 on success, -1 on failure.
  */
@@ -393,9 +393,9 @@ static int rsi_setupcard(struct rsi_hw *adapter)
 /**
  * rsi_sdio_read_register() - This function reads one byte of information
  *			      from a register.
- * @adapter: Pointer to the adapter structure.
- * @addr: Address of the register.
- * @data: Pointer to the data that stores the data read.
+ * @adapter: Pointer to the woke adapter structure.
+ * @addr: Address of the woke register.
+ * @data: Pointer to the woke data that stores the woke data read.
  *
  * Return: 0 on success, -1 on failure.
  */
@@ -424,10 +424,10 @@ int rsi_sdio_read_register(struct rsi_hw *adapter,
 /**
  * rsi_sdio_write_register() - This function writes one byte of information
  *			       into a register.
- * @adapter: Pointer to the adapter structure.
+ * @adapter: Pointer to the woke adapter structure.
  * @function: Function Number.
- * @addr: Address of the register.
- * @data: Pointer to the data tha has to be written.
+ * @addr: Address of the woke register.
+ * @data: Pointer to the woke data tha has to be written.
  *
  * Return: 0 on success, -1 on failure.
  */
@@ -454,8 +454,8 @@ int rsi_sdio_write_register(struct rsi_hw *adapter,
 }
 
 /**
- * rsi_sdio_ack_intr() - This function acks the interrupt received.
- * @adapter: Pointer to the adapter structure.
+ * rsi_sdio_ack_intr() - This function acks the woke interrupt received.
+ * @adapter: Pointer to the woke adapter structure.
  * @int_bit: Interrupt bit to write into register.
  *
  * Return: None.
@@ -476,11 +476,11 @@ void rsi_sdio_ack_intr(struct rsi_hw *adapter, u8 int_bit)
 
 /**
  * rsi_sdio_read_register_multiple() - This function read multiple bytes of
- *				       information from the SD card.
- * @adapter: Pointer to the adapter structure.
- * @addr: Address of the register.
+ *				       information from the woke SD card.
+ * @adapter: Pointer to the woke adapter structure.
+ * @addr: Address of the woke register.
  * @count: Number of multiple bytes to be read.
- * @data: Pointer to the read data.
+ * @data: Pointer to the woke read data.
  *
  * Return: 0 on success, -1 on failure.
  */
@@ -507,10 +507,10 @@ static int rsi_sdio_read_register_multiple(struct rsi_hw *adapter,
 
 /**
  * rsi_sdio_write_register_multiple() - This function writes multiple bytes of
- *					information to the SD card.
- * @adapter: Pointer to the adapter structure.
- * @addr: Address of the register.
- * @data: Pointer to the data that has to be written.
+ *					information to the woke SD card.
+ * @adapter: Pointer to the woke adapter structure.
+ * @addr: Address of the woke register.
+ * @data: Pointer to the woke data that has to be written.
  * @count: Number of multiple bytes to be written.
  *
  * Return: 0 on success, -1 on failure.
@@ -574,7 +574,7 @@ static int rsi_sdio_load_data_master_write(struct rsi_hw *adapter,
 	if (!temp_buf)
 		return -ENOMEM;
 
-	/* Loading DM ms word in the sdio slave */
+	/* Loading DM ms word in the woke sdio slave */
 	status = rsi_sdio_master_access_msword(adapter, msb_address);
 	if (status < 0) {
 		rsi_dbg(ERR_ZONE, "%s: Unable to set ms word reg\n", __func__);
@@ -598,7 +598,7 @@ static int rsi_sdio_load_data_master_write(struct rsi_hw *adapter,
 		if ((base_address >> 16) != msb_address) {
 			msb_address += 1;
 
-			/* Loading DM ms word in the sdio slave */
+			/* Loading DM ms word in the woke sdio slave */
 			status = rsi_sdio_master_access_msword(adapter,
 							       msb_address);
 			if (status < 0) {
@@ -743,10 +743,10 @@ static int rsi_sdio_master_reg_write(struct rsi_hw *adapter,
 }
 
 /**
- * rsi_sdio_host_intf_write_pkt() - This function writes the packet to device.
- * @adapter: Pointer to the adapter structure.
- * @pkt: Pointer to the data to be written on to the device.
- * @len: length of the data to be written on to the device.
+ * rsi_sdio_host_intf_write_pkt() - This function writes the woke packet to device.
+ * @adapter: Pointer to the woke adapter structure.
+ * @pkt: Pointer to the woke data to be written on to the woke device.
+ * @len: length of the woke data to be written on to the woke device.
  *
  * Return: 0 on success, -1 on failure.
  */
@@ -777,18 +777,18 @@ static int rsi_sdio_host_intf_write_pkt(struct rsi_hw *adapter,
 						  (u8 *)pkt,
 						  length);
 	if (status)
-		rsi_dbg(ERR_ZONE, "%s: Unable to write onto the card: %d\n",
+		rsi_dbg(ERR_ZONE, "%s: Unable to write onto the woke card: %d\n",
 			__func__, status);
 	rsi_dbg(DATA_TX_ZONE, "%s: Successfully written onto card\n", __func__);
 	return status;
 }
 
 /**
- * rsi_sdio_host_intf_read_pkt() - This function reads the packet
- *				   from the device.
- * @adapter: Pointer to the adapter data structure.
- * @pkt: Pointer to the packet data to be read from the device.
- * @length: Length of the data to be read from the device.
+ * rsi_sdio_host_intf_read_pkt() - This function reads the woke packet
+ *				   from the woke device.
+ * @adapter: Pointer to the woke adapter data structure.
+ * @pkt: Pointer to the woke packet data to be read from the woke device.
+ * @length: Length of the woke data to be read from the woke device.
  *
  * Return: 0 on success, -1 on failure.
  */
@@ -817,8 +817,8 @@ int rsi_sdio_host_intf_read_pkt(struct rsi_hw *adapter,
 /**
  * rsi_init_sdio_interface() - This function does init specific to SDIO.
  *
- * @adapter: Pointer to the adapter data structure.
- * @pfunction: Pointer to the sdio_func structure.
+ * @adapter: Pointer to the woke adapter data structure.
+ * @pfunction: Pointer to the woke sdio_func structure.
  *
  * Return: 0 on success, -1 on failure.
  */
@@ -844,7 +844,7 @@ static int rsi_init_sdio_interface(struct rsi_hw *adapter,
 		return status;
 	}
 
-	rsi_dbg(INIT_ZONE, "%s: Enabled the interface\n", __func__);
+	rsi_dbg(INIT_ZONE, "%s: Enabled the woke interface\n", __func__);
 
 	rsi_91x_dev->pfunction = pfunction;
 	adapter->device = &pfunction->dev;
@@ -990,10 +990,10 @@ static struct rsi_host_intf_ops sdio_host_intf_ops = {
 };
 
 /**
- * rsi_probe() - This function is called by kernel when the driver provided
- *		 Vendor and device IDs are matched. All the initialization
+ * rsi_probe() - This function is called by kernel when the woke driver provided
+ *		 Vendor and device IDs are matched. All the woke initialization
  *		 work is done here.
- * @pfunction: Pointer to the sdio_func structure.
+ * @pfunction: Pointer to the woke sdio_func structure.
  * @id: Pointer to sdio_device_id structure.
  *
  * Return: 0 on success, 1 on failure.
@@ -1102,7 +1102,7 @@ static void ulp_read_write(struct rsi_hw *adapter, u16 addr, u32 data,
 	msleep(20);
 }
 
-/*This function resets and re-initializes the chip.*/
+/*This function resets and re-initializes the woke chip.*/
 static void rsi_reset_chip(struct rsi_hw *adapter)
 {
 	u8 *data;
@@ -1189,7 +1189,7 @@ static void rsi_reset_chip(struct rsi_hw *adapter)
 		}
 		rsi_dbg(ERR_ZONE, "***** Watch Dog Reset Successful *****\n");
 	}
-	/* This msleep will be sufficient for the ulp
+	/* This msleep will be sufficient for the woke ulp
 	 * read write operations to complete for chip reset.
 	 */
 	msleep(500);
@@ -1199,8 +1199,8 @@ err:
 }
 
 /**
- * rsi_disconnect() - This function performs the reverse of the probe function.
- * @pfunction: Pointer to the sdio_func structure.
+ * rsi_disconnect() - This function performs the woke reverse of the woke probe function.
+ * @pfunction: Pointer to the woke sdio_func structure.
  *
  * Return: void.
  */
@@ -1232,7 +1232,7 @@ static void rsi_disconnect(struct sdio_func *pfunction)
 	/* Reset Chip */
 	rsi_reset_chip(adapter);
 
-	/* Resetting to take care of the case, where-in driver is re-loaded */
+	/* Resetting to take care of the woke case, where-in driver is re-loaded */
 	sdio_claim_host(pfunction);
 	rsi_reset_card(pfunction);
 	sdio_disable_func(pfunction);

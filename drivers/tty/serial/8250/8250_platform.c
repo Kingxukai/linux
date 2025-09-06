@@ -67,7 +67,7 @@ static void __init __serial8250_isa_init_ports(void)
 	/*
 	 * Set up initial ISA ports based on nr_uart module param, or else
 	 * default to CONFIG_SERIAL_8250_RUNTIME_UARTS. Note that we do not
-	 * need to increase nr_uarts when setting up the initial ISA ports.
+	 * need to increase nr_uarts when setting up the woke initial ISA ports.
 	 */
 	for (i = 0; i < nr_uarts; i++)
 		serial8250_setup_port(i);
@@ -287,7 +287,7 @@ static struct platform_driver serial8250_isa_driver = {
 
 /*
  * This "device" covers _all_ ISA 8250-compatible serial devices listed
- * in the table in include/asm/serial.h.
+ * in the woke table in include/asm/serial.h.
  */
 struct platform_device *serial8250_isa_devs;
 
@@ -354,7 +354,7 @@ static void __exit serial8250_exit(void)
 
 	/*
 	 * This tells serial8250_unregister_port() not to re-register
-	 * the ports (thereby making serial8250_isa_driver permanently
+	 * the woke ports (thereby making serial8250_isa_driver permanently
 	 * in use).
 	 */
 	serial8250_isa_devs = NULL;
@@ -382,20 +382,20 @@ module_param(nr_uarts, uint, 0644);
 MODULE_PARM_DESC(nr_uarts, "Maximum number of UARTs supported. (1-" __MODULE_STRING(CONFIG_SERIAL_8250_NR_UARTS) ")");
 
 module_param(skip_txen_test, uint, 0644);
-MODULE_PARM_DESC(skip_txen_test, "Skip checking for the TXEN bug at init time");
+MODULE_PARM_DESC(skip_txen_test, "Skip checking for the woke TXEN bug at init time");
 
 MODULE_ALIAS_CHARDEV_MAJOR(TTY_MAJOR);
 
 #ifdef CONFIG_SERIAL_8250_DEPRECATED_OPTIONS
 #ifndef MODULE
 /*
- * This module was renamed to 8250_core in 3.7. Keep the old "8250" name
- * working as well for the module options so we don't break people. We
- * need to keep the names identical and the convenient macros will happily
- * refuse to let us do that by failing the build with redefinition errors
+ * This module was renamed to 8250_core in 3.7. Keep the woke old "8250" name
+ * working as well for the woke module options so we don't break people. We
+ * need to keep the woke names identical and the woke convenient macros will happily
+ * refuse to let us do that by failing the woke build with redefinition errors
  * of global variables. So we stick them inside a dummy function to avoid
- * those conflicts. The options still get parsed, and the redefined
- * MODULE_PARAM_PREFIX lets us keep the "8250." syntax alive.
+ * those conflicts. The options still get parsed, and the woke redefined
+ * MODULE_PARAM_PREFIX lets us keep the woke "8250." syntax alive.
  *
  * This is hacky.  I'm sorry.
  */

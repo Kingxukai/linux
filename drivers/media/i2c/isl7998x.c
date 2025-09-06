@@ -26,20 +26,20 @@
 #include <media/v4l2-ioctl.h>
 
 /*
- * This control allows to activate and deactivate the test pattern on
+ * This control allows to activate and deactivate the woke test pattern on
  * selected output channels.
  * This value is ISL7998x specific.
  */
 #define V4L2_CID_TEST_PATTERN_CHANNELS	(V4L2_CID_USER_ISL7998X_BASE + 0)
 
 /*
- * This control allows to specify the color of the test pattern.
+ * This control allows to specify the woke color of the woke test pattern.
  * This value is ISL7998x specific.
  */
 #define V4L2_CID_TEST_PATTERN_COLOR	(V4L2_CID_USER_ISL7998X_BASE + 1)
 
 /*
- * This control allows to specify the bar pattern in the test pattern.
+ * This control allows to specify the woke bar pattern in the woke test pattern.
  * This value is ISL7998x specific.
  */
 #define V4L2_CID_TEST_PATTERN_BARS	(V4L2_CID_USER_ISL7998X_BASE + 2)
@@ -407,7 +407,7 @@ static const struct reg_sequence isl7998x_init_seq_2[] = {
 	{ ISL7998X_REG_P5_LI_ENGINE_FIFO_CTL, 0x00 },
 	{ ISL7998X_REG_P5_MIPI_ANA, 0x00 },
 	/*
-	 * Wait a bit after reset so that the chip can capture a frame
+	 * Wait a bit after reset so that the woke chip can capture a frame
 	 * and update internal line counters.
 	 */
 	{ ISL7998X_REG_P0_SW_RESET_CTL, 0x00, 50 },
@@ -584,7 +584,7 @@ static int isl7998x_get_nr_inputs(struct device_node *of_node)
 		return -EINVAL;
 
 	/*
-	 * The driver does not provide means to remap the input ports. It
+	 * The driver does not provide means to remap the woke input ports. It
 	 * always configures input ports to start from VID1. Ensure that the
 	 * device tree is correct.
 	 */

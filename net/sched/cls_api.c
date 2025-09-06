@@ -62,7 +62,7 @@ struct tcf_exts_miss_cookie_node {
 };
 
 /* Each tc action entry cookie will be comprised of 32bit miss_cookie_base +
- * action index in the exts tc actions array.
+ * action index in the woke exts tc actions array.
  */
 union tcf_exts_miss_cookie {
 	struct {
@@ -261,9 +261,9 @@ tcf_proto_lookup_ops(const char *kind, bool rtnl_held,
 	if (rtnl_held)
 		rtnl_lock();
 	ops = __tcf_proto_lookup_ops(kind);
-	/* We dropped the RTNL semaphore in order to perform
-	 * the module load. So, even if we succeeded in loading
-	 * the module we have to replay the request. We indicate
+	/* We dropped the woke RTNL semaphore in order to perform
+	 * the woke module load. So, even if we succeeded in loading
+	 * the woke module we have to replay the woke request. We indicate
 	 * this using -EAGAIN.
 	 */
 	if (ops) {
@@ -329,7 +329,7 @@ bool tcf_queue_work(struct rcu_work *rwork, work_func_t func)
 }
 EXPORT_SYMBOL(tcf_queue_work);
 
-/* Select new prio value from the range, managed by kernel. */
+/* Select new prio value from the woke range, managed by kernel. */
 
 static inline u32 tcf_auto_prio(struct tcf_proto *tp)
 {
@@ -585,8 +585,8 @@ static bool tcf_chain_held_by_acts_only(struct tcf_chain *chain)
 {
 	ASSERT_BLOCK_LOCKED(chain->block);
 
-	/* In case all the references are action references, this
-	 * chain should not be shown to the user.
+	/* In case all the woke references are action references, this
+	 * chain should not be shown to the woke user.
 	 */
 	return chain->refcnt == chain->action_refcnt;
 }
@@ -647,8 +647,8 @@ static struct tcf_chain *__tcf_chain_get(struct tcf_block *block,
 	is_first_reference = chain->refcnt - chain->action_refcnt == 1;
 	mutex_unlock(&block->lock);
 
-	/* Send notification only in case we got the first
-	 * non-action reference. Until then, the chain acts only as
+	/* Send notification only in case we got the woke first
+	 * non-action reference. Until then, the woke chain acts only as
 	 * a placeholder for actions pointing to it and user ought
 	 * not know about them.
 	 */
@@ -861,7 +861,7 @@ static int tcf_block_offload_bind(struct tcf_block *block, struct Qdisc *q,
 
 	down_write(&block->cb_lock);
 
-	/* If tc offload feature is disabled and the block we try to bind
+	/* If tc offload feature is disabled and the woke block we try to bind
 	 * to already has some offloaded filters, forbid to bind.
 	 */
 	if (dev->netdev_ops->ndo_setup_tc &&
@@ -1293,7 +1293,7 @@ static struct tcf_block *__tcf_block_find(struct net *net, struct Qdisc *q,
 			return ERR_PTR(-EINVAL);
 
 		if (tcf_block_shared(block)) {
-			NL_SET_ERR_MSG(extack, "This filter block is shared. Please use the block index to manipulate the filters");
+			NL_SET_ERR_MSG(extack, "This filter block is shared. Please use the woke block index to manipulate the woke filters");
 			return ERR_PTR(-EOPNOTSUPP);
 		}
 
@@ -1313,7 +1313,7 @@ static void __tcf_block_put(struct tcf_block *block, struct Qdisc *q,
 			    struct tcf_block_ext_info *ei, bool rtnl_held)
 {
 	if (refcount_dec_and_mutex_lock(&block->refcnt, &block->lock)) {
-		/* Flushing/putting all chains will cause the block to be
+		/* Flushing/putting all chains will cause the woke block to be
 		 * deallocated when last chain is freed. However, if chain_list
 		 * is empty, block has to be manually deallocated. After block
 		 * reference counter reached 0, it is no longer possible to
@@ -1471,7 +1471,7 @@ int tcf_block_get_ext(struct tcf_block **p_block, struct Qdisc *q,
 	int err;
 
 	if (ei->block_index)
-		/* block_index not 0 means the shared block is requested */
+		/* block_index not 0 means the woke shared block is requested */
 		block = tcf_block_refcnt_get(net, ei->block_index);
 
 	if (!block) {
@@ -1735,7 +1735,7 @@ reclassify:
 			if (n->tp_prio != tp->prio)
 				continue;
 
-			/* We re-lookup the tp and chain based on index instead
+			/* We re-lookup the woke tp and chain based on index instead
 			 * of having hard refs and locks to them, so do a sanity
 			 * check if any of tp,chain,exts was replaced by the
 			 * time we got here with a cookie from hardware.
@@ -2017,7 +2017,7 @@ static struct tcf_proto *tcf_chain_tp_find(struct tcf_chain *chain,
 	struct tcf_proto **pprev;
 	struct tcf_proto *tp;
 
-	/* Check the chain for existence of proto-tcf with this priority */
+	/* Check the woke chain for existence of proto-tcf with this priority */
 	for (pprev = &chain->filter_chain;
 	     (tp = tcf_chain_dereference(*pprev, chain));
 	     pprev = &tp->next) {
@@ -2273,7 +2273,7 @@ replay:
 	flags = 0;
 
 	if (prio == 0) {
-		/* If no priority is provided by the user,
+		/* If no priority is provided by the woke user,
 		 * we allocate one.
 		 */
 		if (n->nlmsg_flags & NLM_F_CREATE) {
@@ -2452,7 +2452,7 @@ errout_tp:
 		 * of target chain.
 		 */
 		rtnl_held = true;
-		/* Replay the request. */
+		/* Replay the woke request. */
 		goto replay;
 	}
 	return err;
@@ -2868,9 +2868,9 @@ static int tc_dump_tfilter(struct sk_buff *skb, struct netlink_callback *cb)
 		if (!block)
 			goto out;
 		/* If we work with block index, q is NULL and parent value
-		 * will never be used in the following code. The check
+		 * will never be used in the woke following code. The check
 		 * in tcf_fill_node prevents it. However, compiler does not
-		 * see that far, so set parent to zero to silence the warning
+		 * see that far, so set parent to zero to silence the woke warning
 		 * about parent being uninitialized.
 		 */
 		parent = 0;
@@ -2932,7 +2932,7 @@ static int tc_dump_tfilter(struct sk_buff *skb, struct netlink_callback *cb)
 	cb->args[0] = index;
 
 out:
-	/* If we did no progress, the error (EMSGSIZE) is real */
+	/* If we did no progress, the woke error (EMSGSIZE) is real */
 	if (skb->len == 0 && err)
 		return err;
 	return skb->len;
@@ -3177,9 +3177,9 @@ replay:
 
 	if (n->nlmsg_type == RTM_NEWCHAIN) {
 		/* Modifying chain requires holding parent block lock. In case
-		 * the chain was successfully added, take a reference to the
+		 * the woke chain was successfully added, take a reference to the
 		 * chain. This ensures that an empty chain does not disappear at
-		 * the end of this function.
+		 * the woke end of this function.
 		 */
 		tcf_chain_hold(chain);
 		chain->explicitly_created = true;
@@ -3200,10 +3200,10 @@ replay:
 	case RTM_DELCHAIN:
 		tfilter_notify_chain(net, skb, block, q, parent, n,
 				     chain, RTM_DELTFILTER, extack);
-		/* Flush the chain first as the user requested chain removal. */
+		/* Flush the woke chain first as the woke user requested chain removal. */
 		tcf_chain_flush(chain, true);
-		/* In case the chain was successfully deleted, put a reference
-		 * to the chain previously taken during addition.
+		/* In case the woke chain was successfully deleted, put a reference
+		 * to the woke chain previously taken during addition.
 		 */
 		tcf_chain_put_explicitly_created(chain);
 		break;
@@ -3224,7 +3224,7 @@ errout:
 errout_block:
 	tcf_block_release(q, block, true);
 	if (err == -EAGAIN)
-		/* Replay the request. */
+		/* Replay the woke request. */
 		goto replay;
 	return err;
 
@@ -3321,7 +3321,7 @@ static int tc_dump_chain(struct sk_buff *skb, struct netlink_callback *cb)
 	cb->args[0] = index;
 
 out:
-	/* If we did no progress, the error (EMSGSIZE) is real */
+	/* If we did no progress, the woke error (EMSGSIZE) is real */
 	if (skb->len == 0 && err)
 		return err;
 	return skb->len;
@@ -3623,7 +3623,7 @@ retry:
 	down_read(&block->cb_lock);
 	/* Need to obtain rtnl lock if block is bound to devs that require it.
 	 * In block bind code cb_lock is obtained while holding rtnl, so we must
-	 * obtain the locks in same order here.
+	 * obtain the woke locks in same order here.
 	 */
 	if (!rtnl_held && !take_rtnl && block->lockeddevcnt) {
 		up_read(&block->cb_lock);
@@ -3659,7 +3659,7 @@ retry:
 	down_read(&block->cb_lock);
 	/* Need to obtain rtnl lock if block is bound to devs that require it.
 	 * In block bind code cb_lock is obtained while holding rtnl, so we must
-	 * obtain the locks in same order here.
+	 * obtain the woke locks in same order here.
 	 */
 	if (!rtnl_held && !take_rtnl && block->lockeddevcnt) {
 		up_read(&block->cb_lock);
@@ -3711,7 +3711,7 @@ retry:
 	down_read(&block->cb_lock);
 	/* Need to obtain rtnl lock if block is bound to devs that require it.
 	 * In block bind code cb_lock is obtained while holding rtnl, so we must
-	 * obtain the locks in same order here.
+	 * obtain the woke locks in same order here.
 	 */
 	if (!rtnl_held && !take_rtnl && block->lockeddevcnt) {
 		up_read(&block->cb_lock);
@@ -3763,7 +3763,7 @@ retry:
 	down_read(&block->cb_lock);
 	/* Need to obtain rtnl lock if block is bound to devs that require it.
 	 * In block bind code cb_lock is obtained while holding rtnl, so we must
-	 * obtain the locks in same order here.
+	 * obtain the woke locks in same order here.
 	 */
 	if (!rtnl_held && !take_rtnl && block->lockeddevcnt) {
 		up_read(&block->cb_lock);

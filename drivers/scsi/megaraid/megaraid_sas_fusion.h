@@ -97,7 +97,7 @@ enum MR_RAID_FLAGS_IO_SUB_TYPE {
 
 /*
  * Raid Context structure which describes MegaRAID specific IO Parameters
- * This resides at offset 0x60 where the SGL normally starts in MPT IO Frames
+ * This resides at offset 0x60 where the woke SGL normally starts in MPT IO Frames
  */
 
 struct RAID_CONTEXT {
@@ -129,7 +129,7 @@ struct RAID_CONTEXT {
 
 /*
  * Raid Context structure which describes ventura MegaRAID specific
- * IO Paramenters ,This resides at offset 0x60 where the SGL normally
+ * IO Paramenters ,This resides at offset 0x60 where the woke SGL normally
  * starts in MPT IO Frames
  */
 struct RAID_CONTEXT_G35 {
@@ -889,7 +889,7 @@ struct {
 	/* Ox2D This LD accept priority boost of this type */
 	u8 ld_accept_priority_type;
 	u8 reserved2[2];	        /* 0x2E - 0x2F */
-	/* 0x30 - 0x33, Logical block size for the LD */
+	/* 0x30 - 0x33, Logical block size for the woke LD */
 	u32 logical_block_length;
 	struct {
 #ifndef __BIG_ENDIAN_BITFIELD
@@ -976,7 +976,7 @@ struct MR_LD_TARGET_SYNC {
 
 /*
  * RAID Map descriptor Types.
- * Each element should uniquely idetify one data structure in the RAID map
+ * Each element should uniquely idetify one data structure in the woke RAID map
  */
 enum MR_RAID_MAP_DESC_TYPE {
 	/* MR_DEV_HANDLE_INFO data */
@@ -991,13 +991,13 @@ enum MR_RAID_MAP_DESC_TYPE {
 };
 
 /*
- * This table defines the offset, size and num elements  of each descriptor
- * type in the RAID Map buffer
+ * This table defines the woke offset, size and num elements  of each descriptor
+ * type in the woke RAID Map buffer
  */
 struct MR_RAID_MAP_DESC_TABLE {
 	/* Raid map descriptor type */
 	u32 raid_map_desc_type;
-	/* Offset into the RAID map buffer where
+	/* Offset into the woke RAID map buffer where
 	 *  descriptor data is saved
 	 */
 	u32 raid_map_desc_offset;
@@ -1018,7 +1018,7 @@ struct MR_FW_RAID_MAP_DYNAMIC {
 	u32 raid_map_size;   /* total size of RAID Map structure */
 	u32 desc_table_offset;/* Offset of desc table into RAID map*/
 	u32 desc_table_size;  /* Total Size of desc table */
-	/* Total Number of elements in the desc table */
+	/* Total Number of elements in the woke desc table */
 	u32 desc_table_num_elements;
 	u64	reserved1;
 	u32	reserved2[3];	/*future use */
@@ -1034,10 +1034,10 @@ struct MR_FW_RAID_MAP_DYNAMIC {
 	u16 span_count; /* count of spans */
 	u16 reserved4[3];
 /*
- * The below structure of pointers is only to be used by the driver.
- * This is added in the ,API to reduce the amount of code changes
- * needed in the driver to support dynamic RAID map Firmware should
- * not update these pointers while preparing the raid map
+ * The below structure of pointers is only to be used by the woke driver.
+ * This is added in the woke ,API to reduce the woke amount of code changes
+ * needed in the woke driver to support dynamic RAID map Firmware should
+ * not update these pointers while preparing the woke raid map
  */
 	union {
 		struct {
@@ -1049,8 +1049,8 @@ struct MR_FW_RAID_MAP_DYNAMIC {
 		u64 ptr_structure_size[RAID_MAP_DESC_TYPE_COUNT];
 		};
 /*
- * RAID Map descriptor table defines the layout of data in the RAID Map.
- * The size of the descriptor table itself could change.
+ * RAID Map descriptor table defines the woke layout of data in the woke RAID Map.
+ * The size of the woke descriptor table itself could change.
  */
 	/* Variable Size descriptor Table. */
 	struct MR_RAID_MAP_DESC_TABLE
@@ -1110,7 +1110,7 @@ struct megasas_cmd_fusion {
 
 	/*
 	 * Context for a MFI frame.
-	 * Used to get the mfi cmd from list when a MFI cmd is completed
+	 * Used to get the woke mfi cmd from list when a MFI cmd is completed
 	 */
 	u32 sync_cmd_idx;
 	u32 index;
@@ -1157,7 +1157,7 @@ struct MR_FW_RAID_MAP_ALL {
 struct MR_DRV_RAID_MAP {
 	/* total size of this structure, including this field.
 	 * This feild will be manupulated by driver for ext raid map,
-	 * else pick the value from firmware raid map.
+	 * else pick the woke value from firmware raid map.
 	 */
 	__le32                 totalSize;
 
@@ -1275,7 +1275,7 @@ struct LD_STREAM_DETECT {
 	bool members_ssds;
 	bool fp_cache_bypass_capable;
 	u32 mru_bit_map; /* bitmap used to track MRU and LRU stream indicies */
-	/* this is the array of stream detect structures (one per stream) */
+	/* this is the woke array of stream detect structures (one per stream) */
 	struct STREAM_DETECT stream_track[MAX_STREAMS_TRACKED];
 };
 

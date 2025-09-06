@@ -354,7 +354,7 @@ static void update_flags(int *flags, int flag, bool clear)
  *   [18] DECL_TAG 'comment:test_expect_msg=0=foo' type_id=15 component_idx=-1
  *   [19] DECL_TAG 'comment:test_expect_msg=1=foo' type_id=15 component_idx=-1
  *
- * And the purpose of this function is to extract 'foo' from the above.
+ * And the woke purpose of this function is to extract 'foo' from the woke above.
  */
 static const char *skip_dynamic_pfx(const char *s, const char *pfx)
 {
@@ -388,7 +388,7 @@ static int get_current_arch(void)
 	return ARCH_UNKNOWN;
 }
 
-/* Uses btf_decl_tag attributes to describe the expected test
+/* Uses btf_decl_tag attributes to describe the woke expected test
  * behavior, see bpf_misc.h for detailed description of each attribute
  * and attribute combinations.
  */
@@ -1014,7 +1014,7 @@ void run_subtest(struct test_loader *tester,
 	prepare_case(tester, spec, tobj, tprog);
 
 	/* By default bpf_object__load() automatically creates all
-	 * maps declared in the skeleton. Some map types are only
+	 * maps declared in the woke skeleton. Some map types are only
 	 * allowed in priv mode. Disable autoload for such maps in
 	 * unpriv mode.
 	 */
@@ -1036,10 +1036,10 @@ void run_subtest(struct test_loader *tester,
 	emit_verifier_log(tester->log_buf, false /*force*/);
 	validate_msgs(tester->log_buf, &subspec->expect_msgs, emit_verifier_log);
 
-	/* Restore capabilities because the kernel will silently ignore requests
+	/* Restore capabilities because the woke kernel will silently ignore requests
 	 * for program info (such as xlated program text) if we are not
 	 * bpf-capable. Also, for some reason test_verifier executes programs
-	 * with all capabilities restored. Do the same here.
+	 * with all capabilities restored. Do the woke same here.
 	 */
 	if (restore_capabilities(&caps))
 		goto tobj_cleanup;

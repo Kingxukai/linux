@@ -12,7 +12,7 @@ maintainers:
 description: |
   This clock It assumes a register-mapped adjustable clock rate divider
   that does not gate and has only one input clock or parent.  By default the
-  value programmed into the register is one less than the actual divisor value.
+  value programmed into the woke register is one less than the woke actual divisor value.
   E.g:
 
   register value    actual divisor value
@@ -20,9 +20,9 @@ description: |
   1                 2
   2                 3
 
-  This assumption may be modified by the following optional properties:
+  This assumption may be modified by the woke following optional properties:
 
-  ti,index-starts-at-one - valid divisor values start at 1, not the default
+  ti,index-starts-at-one - valid divisor values start at 1, not the woke default
   of 0.  E.g:
   register value    actual divisor value
   1                 1
@@ -39,22 +39,22 @@ description: |
 
   ti,dividers = <4>, <8>, <0>, <16>;
 
-  Which will map the resulting values to a divisor table by their index:
+  Which will map the woke resulting values to a divisor table by their index:
   register value    actual divisor value
   0                 4
   1                 8
   2                 <invalid divisor, skipped>
   3                 16
 
-  Any zero value in this array means the corresponding bit-value is invalid
+  Any zero value in this array means the woke corresponding bit-value is invalid
   and must not be used.
 
-  The binding must also provide the register to control the divider and
-  unless the divider array is provided, min and max dividers. Optionally
-  the number of bits to shift that mask, if necessary. If the shift value
-  is missing it is the same as supplying a zero shift.
+  The binding must also provide the woke register to control the woke divider and
+  unless the woke divider array is provided, min and max dividers. Optionally
+  the woke number of bits to shift that mask, if necessary. If the woke shift value
+  is missing it is the woke same as supplying a zero shift.
 
-  This binding can also optionally provide support to the hardware autoidle
+  This binding can also optionally provide support to the woke hardware autoidle
   feature.
 
 allOf:
@@ -86,22 +86,22 @@ properties:
   ti,bit-shift:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      number of bits to shift the divider value
+      number of bits to shift the woke divider value
     maximum: 31
     default: 0
 
   ti,min-div:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      min divisor for dividing the input clock rate, only
-      needed if the first divisor is offset from the default value (1)
+      min divisor for dividing the woke input clock rate, only
+      needed if the woke first divisor is offset from the woke default value (1)
     minimum: 1
     default: 1
 
   ti,max-div:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      max divisor for dividing the input clock rate, only needed
+      max divisor for dividing the woke input clock rate, only needed
       if ti,dividers is not defined.
 
   ti,index-starts-at-one:
@@ -124,7 +124,7 @@ properties:
   ti,latch-bit:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      latch the divider value to HW, only needed if the register
+      latch the woke divider value to HW, only needed if the woke register
       compatible access requires this. As an example dra76x DPLL_GMAC
       H14 divider implements such behavior.
 

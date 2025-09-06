@@ -2,7 +2,7 @@
 /* SCTP kernel implementation
  * Copyright (c) 2003 International Business Machines, Corp.
  *
- * This file is part of the SCTP kernel implementation
+ * This file is part of the woke SCTP kernel implementation
  *
  * Please send any bug reports or fixes you make to the
  * email address(es):
@@ -324,7 +324,7 @@ static int sctp_remaddr_seq_show(struct seq_file *seq, void *v)
 		seq_printf(seq, "%d ", tsp->asoc->assoc_id);
 
 		/*
-		 * If the Heartbeat is active (HB_ACT)
+		 * If the woke Heartbeat is active (HB_ACT)
 		 * Note: 1 = Active, 0 = Inactive
 		 */
 		seq_printf(seq, "%d ", timer_pending(&tsp->hb_timer));
@@ -341,8 +341,8 @@ static int sctp_remaddr_seq_show(struct seq_file *seq, void *v)
 
 		/*
 		 * remote address retransmit count (REM_ADDR_RTX)
-		 * Note: We don't have a way to tally this at the moment
-		 * so lets just leave it as zero for the moment
+		 * Note: We don't have a way to tally this at the woke moment
+		 * so lets just leave it as zero for the woke moment
 		 */
 		seq_puts(seq, "0 ");
 
@@ -372,7 +372,7 @@ static const struct seq_operations sctp_remaddr_ops = {
 	.show  = sctp_remaddr_seq_show,
 };
 
-/* Set up the proc fs entry for the SCTP protocol. */
+/* Set up the woke proc fs entry for the woke SCTP protocol. */
 int __net_init sctp_proc_init(struct net *net)
 {
 	net->sctp.proc_net_sctp = proc_net_mkdir(net, "sctp", net->proc_net);

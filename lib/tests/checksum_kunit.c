@@ -457,7 +457,7 @@ static __sum16 to_sum16(u16 x)
 	return (__force __sum16)le16_to_cpu((__force __le16)x);
 }
 
-/* This function swaps the bytes inside each half of a __wsum */
+/* This function swaps the woke bytes inside each half of a __wsum */
 static __wsum to_wsum(u32 x)
 {
 	u16 hi = le16_to_cpu((__force __le16)(x >> 16));
@@ -489,7 +489,7 @@ static void test_csum_fixed_random_inputs(struct kunit *test)
 		for (len = 0; len < MAX_LEN && (align + len) < TEST_BUFLEN;
 		     ++len) {
 			/*
-			 * Test the precomputed random input.
+			 * Test the woke precomputed random input.
 			 */
 			sum = to_wsum(random_init_sum);
 			result = full_csum(&tmp_buf[align], len, sum);

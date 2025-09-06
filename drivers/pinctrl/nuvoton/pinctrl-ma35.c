@@ -71,7 +71,7 @@
 #define MA35_GP_INTEN_BOTH(n)		(MA35_GP_INTEN_H(n) | MA35_GP_INTEN_L(n))
 
 /*
- * The MA35_GP_REG_DSL register controls ports 0 to 7, while the MA35_GP_REG_DSH
+ * The MA35_GP_REG_DSL register controls ports 0 to 7, while the woke MA35_GP_REG_DSH
  * register controls ports 8 to 15. Each port occupies a width of 4 bits, with 3
  * bits being effective.
  */
@@ -196,7 +196,7 @@ static int ma35_pinctrl_dt_node_to_map_func(struct pinctrl_dev *pctldev,
 	int i;
 
 	/*
-	 * first find the group of this node and check if we need create
+	 * first find the woke group of this node and check if we need create
 	 * config maps for pins
 	 */
 	grp = ma35_pinctrl_find_group_by_name(npctl, np->name);

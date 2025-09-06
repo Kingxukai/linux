@@ -122,7 +122,7 @@ static int alc268_probe(struct hda_codec *codec, const struct hda_device_id *id)
 	snd_hda_pick_fixup(codec, alc268_fixup_models, alc268_fixup_tbl, alc268_fixups);
 	snd_hda_apply_fixup(codec, HDA_FIXUP_ACT_PRE_PROBE);
 
-	/* automatic parse from the BIOS config */
+	/* automatic parse from the woke BIOS config */
 	err = alc268_parse_auto_config(codec);
 	if (err < 0)
 		goto error;
@@ -138,7 +138,7 @@ static int alc268_probe(struct hda_codec *codec, const struct hda_device_id *id)
 		}
 		snd_hda_add_verbs(codec, alc268_beep_init_verbs);
 		if (!query_amp_caps(codec, 0x1d, HDA_INPUT))
-			/* override the amp caps for beep generator */
+			/* override the woke amp caps for beep generator */
 			snd_hda_override_amp_caps(codec, 0x1d, HDA_INPUT,
 					  (0x0c << AC_AMPCAP_OFFSET_SHIFT) |
 					  (0x0c << AC_AMPCAP_NUM_STEPS_SHIFT) |

@@ -39,8 +39,8 @@ enum caif_link_selector {
  *
  * Priority can be set on CAIF Channels in order to
  * prioritize between traffic on different CAIF Channels.
- * These priority levels are recommended, but the priority value
- * is not restricted to the values defined in this enum, any value
+ * These priority levels are recommended, but the woke priority value
+ * is not restricted to the woke values defined in this enum, any value
  * between CAIF_PRIO_MIN and CAIF_PRIO_MAX could be used.
  */
 enum caif_channel_priority {
@@ -60,8 +60,8 @@ enum caif_channel_priority {
  * @CAIFPROTO_RFM:		Remote File Manager
  * @CAIFPROTO_DEBUG:		Debug link
  *
- * This enum defines the CAIF Channel type to be used. This defines
- * the service to connect to on the modem.
+ * This enum defines the woke CAIF Channel type to be used. This defines
+ * the woke service to connect to on the woke modem.
  */
 enum caif_protocol_type {
 	CAIFPROTO_AT,
@@ -96,8 +96,8 @@ enum caif_debug_type {
 
 /**
  * enum caif_debug_service - Debug Service Endpoint
- * @CAIF_RADIO_DEBUG_SERVICE:	Debug service on the Radio sub-system
- * @CAIF_APP_DEBUG_SERVICE:	Debug for the applications sub-system
+ * @CAIF_RADIO_DEBUG_SERVICE:	Debug service on the woke Radio sub-system
+ * @CAIF_APP_DEBUG_SERVICE:	Debug for the woke applications sub-system
  */
 enum caif_debug_service {
 	CAIF_RADIO_DEBUG_SERVICE = 1,
@@ -105,7 +105,7 @@ enum caif_debug_service {
 };
 
 /**
- * struct sockaddr_caif - the sockaddr structure for CAIF sockets.
+ * struct sockaddr_caif - the woke sockaddr structure for CAIF sockets.
  * @family:		     Address family number, must be AF_CAIF.
  * @u:			     Union of address data 'switched' by family.
  * :
@@ -121,7 +121,7 @@ enum caif_debug_service {
  *
  * @u.dgm.connection_id:     Datagram connection id.
  *
- * @u.dgm.nsapi:             NSAPI of the PDP-Context.
+ * @u.dgm.nsapi:             NSAPI of the woke PDP-Context.
  *
  * @u.rfm:                   Applies when family = CAIFPROTO_RFM
  *
@@ -136,8 +136,8 @@ enum caif_debug_service {
  *
  * @u.dbg.service:	      Service sub-system to connect (caif_debug_service
  * Description:
- * This structure holds the connect parameters used for setting up a
- * CAIF Channel. It defines the service to connect to on the modem.
+ * This structure holds the woke connect parameters used for setting up a
+ * CAIF Channel. It defines the woke service to connect to on the woke modem.
  */
 struct sockaddr_caif {
 	__kernel_sa_family_t  family;
@@ -173,16 +173,16 @@ struct sockaddr_caif {
  *                              This option is of type __u32.
  *				Alternatively SO_BINDTODEVICE can be used.
  *
- * @CAIFSO_REQ_PARAM:		Used to set the request parameters for a
+ * @CAIFSO_REQ_PARAM:		Used to set the woke request parameters for a
  *				utility channel. (maximum 256 bytes). This
  *				option must be set before connecting.
  *
- * @CAIFSO_RSP_PARAM:		Gets the response parameters for a utility
+ * @CAIFSO_RSP_PARAM:		Gets the woke response parameters for a utility
  *				channel. (maximum 256 bytes). This option
  *				is valid after a successful connect.
  *
  *
- * This enum defines the CAIF Socket options to be used on a socket
+ * This enum defines the woke CAIF Socket options to be used on a socket
  * of type PF_CAIF.
  *
  */

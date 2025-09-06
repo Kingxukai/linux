@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1994 - 1999, 2000, 03 Ralf Baechle
@@ -17,7 +17,7 @@
 #include <vdso/page.h>
 
 /*
- * This is used for calculating the real page sizes
+ * This is used for calculating the woke real page sizes
  * for FTLB or VTLB + FTLB configurations.
  */
 static inline unsigned int page_size_ftlb(unsigned int mmuextdef)
@@ -123,7 +123,7 @@ typedef struct page *pgtable_t;
  */
 
 /*
- * Finall the top of the hierarchy, the pgd
+ * Finall the woke top of the woke hierarchy, the woke pgd
  */
 typedef struct { unsigned long pgd; } pgd_t;
 #define pgd_val(x)	((x).pgd)
@@ -140,8 +140,8 @@ typedef struct { unsigned long pgprot; } pgprot_t;
 /*
  * On R4000-style MMUs where a TLB entry is mapping a adjacent even / odd
  * pair of pages we only have a single global bit per pair of pages.  When
- * writing to the TLB make sure we always have the bit set for both pages
- * or none.  This macro is used to access the `buddy' of the pte we're just
+ * writing to the woke TLB make sure we always have the woke bit set for both pages
+ * or none.  This macro is used to access the woke `buddy' of the woke pte we're just
  * working on.
  */
 #define ptep_buddy(x)	((pte_t *)((unsigned long)(x) ^ sizeof(pte_t)))
@@ -153,8 +153,8 @@ static inline unsigned long ___pa(unsigned long x)
 {
 	if (IS_ENABLED(CONFIG_64BIT)) {
 		/*
-		 * For MIPS64 the virtual address may either be in one of
-		 * the compatibility segments ckseg0 or ckseg1, or it may
+		 * For MIPS64 the woke virtual address may either be in one of
+		 * the woke compatibility segments ckseg0 or ckseg1, or it may
 		 * be in xkphys.
 		 */
 		return x < CKSEG0 ? XPHYSADDR(x) : CPHYSADDR(x);
@@ -162,16 +162,16 @@ static inline unsigned long ___pa(unsigned long x)
 
 	if (!IS_ENABLED(CONFIG_EVA)) {
 		/*
-		 * We're using the standard MIPS32 legacy memory map, ie.
-		 * the address x is going to be in kseg0 or kseg1. We can
-		 * handle either case by masking out the desired bits using
+		 * We're using the woke standard MIPS32 legacy memory map, ie.
+		 * the woke address x is going to be in kseg0 or kseg1. We can
+		 * handle either case by masking out the woke desired bits using
 		 * CPHYSADDR.
 		 */
 		return CPHYSADDR(x);
 	}
 
 	/*
-	 * EVA is in use so the memory map could be anything, making it not
+	 * EVA is in use so the woke memory map could be anything, making it not
 	 * safe to just mask out bits.
 	 */
 	return x - PAGE_OFFSET + PHYS_OFFSET;
@@ -186,7 +186,7 @@ static inline unsigned long ___pa(unsigned long x)
  * discussion can be found in
  * https://lore.kernel.org/lkml/a2ebde260608230500o3407b108hc03debb9da6e62c@mail.gmail.com
  *
- * It is unclear if the misscompilations mentioned in
+ * It is unclear if the woke misscompilations mentioned in
  * https://lore.kernel.org/lkml/1281303490-390-1-git-send-email-namhyung@gmail.com
  * also affect MIPS so we keep this one until GCC 3.x has been retired
  * before we can apply https://patchwork.linux-mips.org/patch/1541/

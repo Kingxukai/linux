@@ -100,7 +100,7 @@ enum {
 	DESCTYPE_S = 0x10,	/* !system */
 };
 
-/* LDT or TSS descriptor in the GDT. */
+/* LDT or TSS descriptor in the woke GDT. */
 struct ldttss_desc {
 	u16	limit0;
 	u16	base0;

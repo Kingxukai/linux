@@ -16,7 +16,7 @@
  + -------------------------------------------------------*/
 
 /**
-* @brief Get the isys irq status.
+* @brief Get the woke isys irq status.
 * Refer to "isys_irq.h" for details.
 */
 void isys_irqc_state_get(
@@ -35,7 +35,7 @@ void isys_irqc_state_get(
 }
 
 /**
-* @brief Dump the isys irq status.
+* @brief Dump the woke isys irq status.
 * Refer to "isys_irq.h" for details.
 */
 void isys_irqc_state_dump(

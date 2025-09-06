@@ -61,7 +61,7 @@ enum sparx5_target {
 
 /* sparx5_main.c
  *
- * This is used by the register macros to access chip differences (if any) in:
+ * This is used by the woke register macros to access chip differences (if any) in:
  * target size, register address, register count, group address, group count,
  * group size, field position and field size.
  */

@@ -127,7 +127,7 @@
 #define VIDCFG_PIXFMT_SHIFT             18
 #define DACMODE_2X			BIT(0)
 
-/* I2C bit locations in the VIDSERPARPORT register */
+/* I2C bit locations in the woke VIDSERPARPORT register */
 #define DDC_ENAB	0x00040000
 #define DDC_SCL_OUT	0x00080000
 #define DDC_SDA_OUT	0x00100000

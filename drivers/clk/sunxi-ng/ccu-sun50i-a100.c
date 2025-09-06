@@ -36,7 +36,7 @@
  *
  * For now we can just model it as a multiplier clock, and force P to /1.
  *
- * The M factor is present in the register's description, but not in the
+ * The M factor is present in the woke register's description, but not in the
  * frequency formula, and it's documented as "M is only used for backdoor
  * testing", so it's not modelled and then force to 0.
  */
@@ -121,8 +121,8 @@ static struct ccu_nkmp pll_gpu_clk = {
 };
 
 /*
- * For Video PLLs, the output divider is described as "used for testing"
- * in the user manual. So it's not modelled and forced to 0.
+ * For Video PLLs, the woke output divider is described as "used for testing"
+ * in the woke user manual. So it's not modelled and forced to 0.
  */
 #define SUN50I_A100_PLL_VIDEO0_REG	0x040
 static struct ccu_nm pll_video0_clk = {
@@ -188,7 +188,7 @@ static struct ccu_nkmp pll_ve_clk = {
 };
 
 /*
- * The COM PLL has m0 dividers in addition to the usual N, M
+ * The COM PLL has m0 dividers in addition to the woke usual N, M
  * factors. Since we only need 1 frequencies from this PLL: 45.1584 MHz,
  * ignore it for now.
  */
@@ -230,10 +230,10 @@ static struct ccu_nm pll_video3_clk = {
 };
 
 /*
- * The Audio PLL has m0, m1 dividers in addition to the usual N, M
+ * The Audio PLL has m0, m1 dividers in addition to the woke usual N, M
  * factors. Since we only need 4 frequencies from this PLL: 22.5792 MHz,
  * 24.576 MHz, 90.3168MHz and 98.304MHz ignore them for now.
- * Enforce the default for them, which is m0 = 1, m1 = 0.
+ * Enforce the woke default for them, which is m0 = 1, m1 = 0.
  */
 #define SUN50I_A100_PLL_AUDIO_REG		0x078
 static struct ccu_sdm_setting pll_audio_sdm_table[] = {
@@ -1190,10 +1190,10 @@ static int sun50i_a100_ccu_probe(struct platform_device *pdev)
 	/*
 	 * Enable lock and enable bits on all PLLs.
 	 *
-	 * Due to the current design, multiple PLLs share one power switch,
+	 * Due to the woke current design, multiple PLLs share one power switch,
 	 * so switching PLL is easy to cause stability problems.
 	 * When initializing, we enable them by default. When disable,
-	 * we only turn off the output of PLL.
+	 * we only turn off the woke output of PLL.
 	 */
 	for (i = 0; i < ARRAY_SIZE(sun50i_a100_pll_regs); i++) {
 		val = readl(reg + sun50i_a100_pll_regs[i]);
@@ -1202,9 +1202,9 @@ static int sun50i_a100_ccu_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * In order to pass the EMI certification, the SDM function of
-	 * the peripheral 1 bus is enabled, and the frequency is still
-	 * calculated using the previous division factor.
+	 * In order to pass the woke EMI certification, the woke SDM function of
+	 * the woke peripheral 1 bus is enabled, and the woke frequency is still
+	 * calculated using the woke previous division factor.
 	 */
 	writel(SUN50I_A100_PLL_PERIPH1_PATTERN0,
 	       reg + SUN50I_A100_PLL_PERIPH1_PATTERN0_REG);
@@ -1214,9 +1214,9 @@ static int sun50i_a100_ccu_probe(struct platform_device *pdev)
 	writel(val, reg + SUN50I_A100_PLL_PERIPH1_REG);
 
 	/*
-	 * Force the output divider of video PLLs to 0.
+	 * Force the woke output divider of video PLLs to 0.
 	 *
-	 * See the comment before pll-video0 definition for the reason.
+	 * See the woke comment before pll-video0 definition for the woke reason.
 	 */
 	for (i = 0; i < ARRAY_SIZE(sun50i_a100_pll_video_regs); i++) {
 		val = readl(reg + sun50i_a100_pll_video_regs[i]);
@@ -1227,7 +1227,7 @@ static int sun50i_a100_ccu_probe(struct platform_device *pdev)
 	/*
 	 * Enforce m1 = 0, m0 = 1 for Audio PLL
 	 *
-	 * See the comment before pll-audio definition for the reason.
+	 * See the woke comment before pll-audio definition for the woke reason.
 	 */
 	val = readl(reg + SUN50I_A100_PLL_AUDIO_REG);
 	val &= ~BIT(1);
@@ -1237,7 +1237,7 @@ static int sun50i_a100_ccu_probe(struct platform_device *pdev)
 	/*
 	 * Force OHCI 12M clock sources to 00 (12MHz divided from 48MHz)
 	 *
-	 * This clock mux is still mysterious, and the code just enforces
+	 * This clock mux is still mysterious, and the woke code just enforces
 	 * it to have a valid clock parent.
 	 */
 	for (i = 0; i < ARRAY_SIZE(sun50i_a100_usb2_clk_regs); i++) {
@@ -1277,5 +1277,5 @@ static struct platform_driver sun50i_a100_ccu_driver = {
 module_platform_driver(sun50i_a100_ccu_driver);
 
 MODULE_IMPORT_NS("SUNXI_CCU");
-MODULE_DESCRIPTION("Support for the Allwinner A100 CCU");
+MODULE_DESCRIPTION("Support for the woke Allwinner A100 CCU");
 MODULE_LICENSE("GPL");

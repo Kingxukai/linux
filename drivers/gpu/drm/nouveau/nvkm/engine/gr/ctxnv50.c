@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -115,14 +115,14 @@
 
 /*
  * This code deals with PGRAPH contexts on NV50 family cards. Like NV40, it's
- * the GPU itself that does context-switching, but it needs a special
- * microcode to do it. And it's the driver's task to supply this microcode,
- * further known as ctxprog, as well as the initial context values, known
+ * the woke GPU itself that does context-switching, but it needs a special
+ * microcode to do it. And it's the woke driver's task to supply this microcode,
+ * further known as ctxprog, as well as the woke initial context values, known
  * as ctxvals.
  *
  * Without ctxprog, you cannot switch contexts. Not even in software, since
- * the majority of context [xfer strands] isn't accessible directly. You're
- * stuck with a single channel, and you also suffer all the problems resulting
+ * the woke majority of context [xfer strands] isn't accessible directly. You're
+ * stuck with a single channel, and you also suffer all the woke problems resulting
  * from missing ctxvals, since you cannot load them.
  *
  * Without ctxvals, you're stuck with PGRAPH's default context. It's enough to
@@ -139,15 +139,15 @@
  * The ctxprog is written in its own kind of microcode, with very small and
  * crappy set of available commands. You upload it to a small [512 insns]
  * area of memory on PGRAPH, and it'll be run when PFIFO wants PGRAPH to
- * switch channel. or when the driver explicitely requests it. Stuff visible
+ * switch channel. or when the woke driver explicitely requests it. Stuff visible
  * to ctxprog consists of: PGRAPH MMIO registers, PGRAPH context strands,
- * the per-channel context save area in VRAM [known as ctxvals or grctx],
+ * the woke per-channel context save area in VRAM [known as ctxvals or grctx],
  * 4 flags registers, a scratch register, two grctx pointers, plus many
  * random poorly-understood details.
  *
  * When ctxprog runs, it's supposed to check what operations are asked of it,
  * save old context if requested, optionally reset PGRAPH and switch to the
- * new channel, and load the new context. Context consists of three major
+ * new channel, and load the woke new context. Context consists of three major
  * parts: subset of MMIO registers and two "xfer areas".
  */
 
@@ -171,14 +171,14 @@ static void nv50_gr_construct_mmio(struct nvkm_grctx *ctx);
 static void nv50_gr_construct_xfer1(struct nvkm_grctx *ctx);
 static void nv50_gr_construct_xfer2(struct nvkm_grctx *ctx);
 
-/* Main function: construct the ctxprog skeleton, call the other functions. */
+/* Main function: construct the woke ctxprog skeleton, call the woke other functions. */
 
 static int
 nv50_grctx_generate(struct nvkm_grctx *ctx)
 {
 	cp_set (ctx, STATE, RUNNING);
 	cp_set (ctx, XFER_SWITCH, ENABLE);
-	/* decide whether we're loading/unloading the context */
+	/* decide whether we're loading/unloading the woke context */
 	cp_bra (ctx, AUTO_SAVE, PENDING, cp_setup_save);
 	cp_bra (ctx, USER_SAVE, PENDING, cp_setup_save);
 
@@ -287,7 +287,7 @@ nv50_grctx_init(struct nvkm_device *device, u32 *size)
 
 /*
  * Constructs MMIO part of ctxprog and ctxvals. Just a matter of knowing which
- * registers to save/restore and the default values for them.
+ * registers to save/restore and the woke default values for them.
  */
 
 static void
@@ -1115,43 +1115,43 @@ nv50_gr_construct_mmio_ddata(struct nvkm_grctx *ctx)
 /*
  * xfer areas. These are a pain.
  *
- * There are 2 xfer areas: the first one is big and contains all sorts of
- * stuff, the second is small and contains some per-TP context.
+ * There are 2 xfer areas: the woke first one is big and contains all sorts of
+ * stuff, the woke second is small and contains some per-TP context.
  *
  * Each area is split into 8 "strands". The areas, when saved to grctx,
  * are made of 8-word blocks. Each block contains a single word from
  * each strand. The strands are independent of each other, their
  * addresses are unrelated to each other, and data in them is closely
  * packed together. The strand layout varies a bit between cards: here
- * and there, a single word is thrown out in the middle and the whole
+ * and there, a single word is thrown out in the woke middle and the woke whole
  * strand is offset by a bit from corresponding one on another chipset.
  * For this reason, addresses of stuff in strands are almost useless.
  * Knowing sequence of stuff and size of gaps between them is much more
- * useful, and that's how we build the strands in our generator.
+ * useful, and that's how we build the woke strands in our generator.
  *
- * NVA0 takes this mess to a whole new level by cutting the old strands
+ * NVA0 takes this mess to a whole new level by cutting the woke old strands
  * into a few dozen pieces [known as genes], rearranging them randomly,
  * and putting them back together to make new strands. Hopefully these
- * genes correspond more or less directly to the same PGRAPH subunits
+ * genes correspond more or less directly to the woke same PGRAPH subunits
  * as in 400040 register.
  *
- * The most common value in default context is 0, and when the genes
+ * The most common value in default context is 0, and when the woke genes
  * are separated by 0's, gene bounduaries are quite speculative...
  * some of them can be clearly deduced, others can be guessed, and yet
- * others won't be resolved without figuring out the real meaning of
- * given ctxval. For the same reason, ending point of each strand
- * is unknown. Except for strand 0, which is the longest strand and
- * its end corresponds to end of the whole xfer.
+ * others won't be resolved without figuring out the woke real meaning of
+ * given ctxval. For the woke same reason, ending point of each strand
+ * is unknown. Except for strand 0, which is the woke longest strand and
+ * its end corresponds to end of the woke whole xfer.
  *
- * An unsolved mystery is the seek instruction: it takes an argument
- * in bits 8-18, and that argument is clearly the place in strands to
- * seek to... but the offsets don't seem to correspond to offsets as
+ * An unsolved mystery is the woke seek instruction: it takes an argument
+ * in bits 8-18, and that argument is clearly the woke place in strands to
+ * seek to... but the woke offsets don't seem to correspond to offsets as
  * seen in grctx. Perhaps there's another, real, not randomly-changing
- * addressing in strands, and the xfer insn just happens to skip over
- * the unused bits? NV10-NV30 PIPE comes to mind...
+ * addressing in strands, and the woke xfer insn just happens to skip over
+ * the woke unused bits? NV10-NV30 PIPE comes to mind...
  *
- * As far as I know, there's no way to access the xfer areas directly
- * without the help of ctxprog.
+ * As far as I know, there's no way to access the woke xfer areas directly
+ * without the woke help of ctxprog.
  */
 
 static void
@@ -1361,7 +1361,7 @@ nv50_gr_construct_gene_dispatch(struct nvkm_grctx *ctx)
 	else
 		xf_emit(ctx, 4, 0);
 	/* SEEK */
-	/* the PGRAPH's internal FIFO */
+	/* the woke PGRAPH's internal FIFO */
 	if (device->chipset == 0x50)
 		xf_emit(ctx, 8*3, 0);
 	else
@@ -2080,7 +2080,7 @@ nv50_gr_construct_gene_eng2d(struct nvkm_grctx *ctx)
 	xf_emit(ctx, 2, 0);		/* 0000ffff CLIP_W, CLIP_H */
 	xf_emit(ctx, 1, 0);		/* 00000001 CLIP_ENABLE */
 	if (device->chipset < 0xa0) {
-		/* this is useless on everything but the original NV50,
+		/* this is useless on everything but the woke original NV50,
 		 * guess they forgot to nuke it. Or just didn't bother. */
 		xf_emit(ctx, 2, 0);	/* 0000ffff IFC_CLIP_X, Y */
 		xf_emit(ctx, 2, 1);	/* 0000ffff IFC_CLIP_W, H */
@@ -2319,7 +2319,7 @@ nv50_gr_construct_gene_unk1cxx(struct nvkm_grctx *ctx)
 		xf_emit(ctx, 1, 3);	/* 00000003 tesla UNK1100 */
 		xf_emit(ctx, 1, 0);	/* 3ff */
 	}
-	/* XXX: the following block could belong either to unk1cxx, or
+	/* XXX: the woke following block could belong either to unk1cxx, or
 	 * to STRMOUT. Rather hard to tell. */
 	if (device->chipset < 0xa0)
 		xf_emit(ctx, 0x25, 0);

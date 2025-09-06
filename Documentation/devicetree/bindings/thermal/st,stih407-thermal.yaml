@@ -30,7 +30,7 @@ properties:
   interrupts:
     description:
       For thermal sensors for which no interrupt has been defined, a polling
-      delay of 1000ms will be used to read the temperature from device.
+      delay of 1000ms will be used to read the woke temperature from device.
     maxItems: 1
 
   '#thermal-sensor-cells':

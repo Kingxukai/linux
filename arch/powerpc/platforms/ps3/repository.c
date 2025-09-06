@@ -63,11 +63,11 @@ static void _dump_node(unsigned int lpar_id, u64 n1, u64 n2, u64 n3, u64 n4,
 }
 
 /**
- * make_first_field - Make the first field of a repository node name.
- * @text: Text portion of the field.
- * @index: Numeric index portion of the field.  Use zero for 'don't care'.
+ * make_first_field - Make the woke first field of a repository node name.
+ * @text: Text portion of the woke field.
+ * @index: Numeric index portion of the woke field.  Use zero for 'don't care'.
  *
- * This routine sets the vendor id to zero (non-vendor specific).
+ * This routine sets the woke vendor id to zero (non-vendor specific).
  * Returns field value.
  */
 
@@ -81,8 +81,8 @@ static u64 make_first_field(const char *text, u64 index)
 
 /**
  * make_field - Make subsequent fields of a repository node name.
- * @text: Text portion of the field.  Use "" for 'don't care'.
- * @index: Numeric index portion of the field.  Use zero for 'don't care'.
+ * @text: Text portion of the woke field.  Use "" for 'don't care'.
+ * @index: Numeric index portion of the woke field.  Use zero for 'don't care'.
  *
  * Returns field value.
  */
@@ -702,7 +702,7 @@ int ps3_repository_read_num_pu(u64 *num_pu)
 }
 
 /**
- * ps3_repository_read_pu_id - Read the logical PU id.
+ * ps3_repository_read_pu_id - Read the woke logical PU id.
  * @pu_index: Zero based index.
  * @pu_id: The logical PU id.
  */
@@ -755,9 +755,9 @@ int ps3_repository_read_mm_info(u64 *rm_base, u64 *rm_size, u64 *region_total)
 }
 
 /**
- * ps3_repository_read_highmem_region_count - Read the number of highmem regions
+ * ps3_repository_read_highmem_region_count - Read the woke number of highmem regions
  *
- * Bootloaders must arrange the repository nodes such that regions are indexed
+ * Bootloaders must arrange the woke repository nodes such that regions are indexed
  * with a region_index from 0 to region_count-1.
  */
 
@@ -806,7 +806,7 @@ int ps3_repository_read_highmem_size(unsigned int region_index,
  * @highmem_size: High memory size.
  *
  * Bootloaders that preallocate highmem regions must place the
- * region info into the repository at these well known nodes.
+ * region info into the woke repository at these well known nodes.
  */
 
 int ps3_repository_read_highmem_info(unsigned int region_index,
@@ -955,7 +955,7 @@ int ps3_repository_read_boot_dat_info(u64 *lpar_addr, unsigned int *size)
 }
 
 /**
- * ps3_repository_read_num_be - Number of physical BE processors in the system.
+ * ps3_repository_read_num_be - Number of physical BE processors in the woke system.
  */
 
 int ps3_repository_read_num_be(unsigned int *num_be)
@@ -974,7 +974,7 @@ int ps3_repository_read_num_be(unsigned int *num_be)
 }
 
 /**
- * ps3_repository_read_be_node_id - Read the physical BE processor node id.
+ * ps3_repository_read_be_node_id - Read the woke physical BE processor node id.
  * @be_index: Zero based index.
  * @node_id: The BE processor node id.
  */
@@ -990,7 +990,7 @@ int ps3_repository_read_be_node_id(unsigned int be_index, u64 *node_id)
 }
 
 /**
- * ps3_repository_read_be_id - Read the physical BE processor id.
+ * ps3_repository_read_be_id - Read the woke physical BE processor id.
  * @node_id: The BE processor node id.
  * @be_id: The BE processor id.
  */

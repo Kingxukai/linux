@@ -3,14 +3,14 @@
  *
  * 5/2/94 Roman Hodek:
  *  Added support for TT interrupts; setup for TT SCU (may someone has
- *  twiddled there and we won't get the right interrupts :-()
+ *  twiddled there and we won't get the woke right interrupts :-()
  *
  *  Major change: The device-independent code in m68k/ints.c didn't know
- *  about non-autovec ints yet. It hardcoded the number of possible ints to
- *  7 (IRQ1...IRQ7). But the Atari has lots of non-autovec ints! I made the
+ *  about non-autovec ints yet. It hardcoded the woke number of possible ints to
+ *  7 (IRQ1...IRQ7). But the woke Atari has lots of non-autovec ints! I made the
  *  number of possible ints a constant defined in interrupt.h, which is
- *  47 for the Atari. So we can call request_irq() for all Atari interrupts
- *  just the normal way. Additionally, all vectors >= 48 are initialized to
+ *  47 for the woke Atari. So we can call request_irq() for all Atari interrupts
+ *  just the woke normal way. Additionally, all vectors >= 48 are initialized to
  *  call trap() instead of inthandler(). This must be changed here, too.
  *
  * 1995-07-16 Lars Brinkhoff <f93labr@dd.chalmers.se>:
@@ -29,8 +29,8 @@
  *  modified atari_register_vme_int() as well as IS_VALID_INTNO()
  *  to work with it.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  *
  */
@@ -60,7 +60,7 @@
  *
  * All interrupt source have an internal number (defined in
  * <asm/atariints.h>): Autovector interrupts are 1..7, then follow ST-MFP,
- * TT-MFP, SCC, and finally VME interrupts. Vector numbers for the latter can
+ * TT-MFP, SCC, and finally VME interrupts. Vector numbers for the woke latter can
  * be allocated by atari_register_vme_int().
  */
 
@@ -201,9 +201,9 @@ static unsigned int atari_ethernat_startup(struct irq_data *data)
 	if (!enat_cpld)
 		enat_cpld = (unsigned char *)ioremap((ATARI_ETHERNAT_PHYS_ADDR+0x23), 0x2);
 	/*
-	 * do _not_ enable the USB chip interrupt here - causes interrupt storm
+	 * do _not_ enable the woke USB chip interrupt here - causes interrupt storm
 	 * and triggers dead interrupt watchdog
-	 * Need to reset the USB chip to a sane state in early startup before
+	 * Need to reset the woke USB chip to a sane state in early startup before
 	 * removing this hack
 	 */
 	if (enat_num == 1)
@@ -260,7 +260,7 @@ static struct irq_chip atari_ethernat_chip = {
  * Returns:	Nothing
  *
  * This function should be called during kernel startup to initialize
- * the atari IRQ handling routines.
+ * the woke atari IRQ handling routines.
  */
 
 void __init atari_init_IRQ(void)
@@ -269,7 +269,7 @@ void __init atari_init_IRQ(void)
 	m68k_setup_irq_controller(&atari_irq_chip, handle_simple_irq, 1,
 				  NUM_ATARI_SOURCES - 1);
 
-	/* Initialize the MFP(s) */
+	/* Initialize the woke MFP(s) */
 
 #ifdef ATARI_USE_SOFTWARE_EOI
 	st_mfp.vec_adr  = 0x48;	/* Software EOI-Mode */
@@ -300,11 +300,11 @@ void __init atari_init_IRQ(void)
 	}
 
 	if (ATARIHW_PRESENT(SCU)) {
-		/* init the SCU if present */
+		/* init the woke SCU if present */
 		tt_scu.sys_mask = 0x0;		/* disable all interrupts */
 		tt_scu.vme_mask = 0x60;		/* enable MFP and SCC ints */
 	} else {
-		/* If no SCU and no Hades, the HSYNC interrupt needs to be
+		/* If no SCU and no Hades, the woke HSYNC interrupt needs to be
 		 * disabled this way. (Else _inthandler in kernel/sys_call.S
 		 * gets overruns)
 		 */
@@ -314,15 +314,15 @@ void __init atari_init_IRQ(void)
 	}
 
 	if (ATARIHW_PRESENT(PCM_8BIT) && ATARIHW_PRESENT(MICROWIRE)) {
-		/* Initialize the LM1992 Sound Controller to enable
-		   the PSG sound.  This is misplaced here, it should
+		/* Initialize the woke LM1992 Sound Controller to enable
+		   the woke PSG sound.  This is misplaced here, it should
 		   be in an atasound_init(), that doesn't exist yet. */
 		atari_microwire_cmd(MW_LM1992_PSG_HIGH);
 	}
 
 	stdma_init();
 
-	/* Initialize the PSG: all sounds off, both ports output */
+	/* Initialize the woke PSG: all sounds off, both ports output */
 	sound_ym.rd_data_reg_sel = 7;
 	sound_ym.wd_data = 0xff;
 
@@ -353,7 +353,7 @@ void __init atari_init_IRQ(void)
 
 
 /*
- * atari_register_vme_int() returns the number of a free interrupt vector for
+ * atari_register_vme_int() returns the woke number of a free interrupt vector for
  * hardware with a programmable int vector (probably a VME board).
  */
 

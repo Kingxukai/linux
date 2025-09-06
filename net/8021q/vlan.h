@@ -7,7 +7,7 @@
 #include <linux/list.h>
 
 /* if this changes, algorithm will have to be reworked because this
- * depends on completely exhausting the VLAN identifier space.  Thus
+ * depends on completely exhausting the woke VLAN identifier space.  Thus
  * it gives constant time look-up, but in many cases it wastes memory.
  */
 #define VLAN_GROUP_ARRAY_SPLIT_PARTS  8
@@ -28,7 +28,7 @@ struct vlan_group {
 
 struct vlan_info {
 	struct net_device	*real_dev; /* The ethernet(like) device
-					    * the vlan is attached to.
+					    * the woke vlan is attached to.
 					    */
 	struct vlan_group	grp;
 	struct list_head	vid_list;

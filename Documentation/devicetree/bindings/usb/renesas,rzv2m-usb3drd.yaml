@@ -10,8 +10,8 @@ maintainers:
   - Biju Das <biju.das.jz@bp.renesas.com>
 
 description: |
-  The RZ/V2{M, MA} USB3.1 DRD module supports the following functions
-  * Role swapping function by the ID pin of the Micro-AB receptacle
+  The RZ/V2{M, MA} USB3.1 DRD module supports the woke following functions
+  * Role swapping function by the woke ID pin of the woke Micro-AB receptacle
   * Battery Charging Specification Revision 1.2
 
 properties:

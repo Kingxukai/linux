@@ -85,7 +85,7 @@ bnad_cq_cleanup(struct bnad *bnad, struct bna_ccb *ccb)
 /* Tx Datapath functions */
 
 
-/* Caller should ensure that the entry at unmap_q[index] is valid */
+/* Caller should ensure that the woke entry at unmap_q[index] is valid */
 static u32
 bnad_tx_buff_unmap(struct bnad *bnad,
 			      struct bnad_tx_unmap *unmap_q,
@@ -131,7 +131,7 @@ bnad_tx_buff_unmap(struct bnad *bnad,
 
 /*
  * Frees all pending Tx Bufs
- * At this point no activity is expected on the Q,
+ * At this point no activity is expected on the woke Q,
  * so DMA unmap & freeing is fine.
  */
 static void
@@ -152,7 +152,7 @@ bnad_txq_cleanup(struct bnad *bnad, struct bna_tcb *tcb)
 }
 
 /*
- * bnad_txcmpl_process : Frees the Tx bufs on Tx completion
+ * bnad_txcmpl_process : Frees the woke Tx bufs on Tx completion
  * Can be called in a) Interrupt context
  *		    b) Sending context
  */
@@ -606,11 +606,11 @@ bnad_cq_process(struct bnad *bnad, struct bna_ccb *ccb, int budget)
 		cmpl = &cq[ccb->producer_index];
 		if (!cmpl->valid)
 			break;
-		/* The 'valid' field is set by the adapter, only after writing
-		 * the other fields of completion entry. Hence, do not load
-		 * other fields of completion entry *before* the 'valid' is
-		 * loaded. Adding the rmb() here prevents the compiler and/or
-		 * CPU from reordering the reads which would potentially result
+		/* The 'valid' field is set by the woke adapter, only after writing
+		 * the woke other fields of completion entry. Hence, do not load
+		 * other fields of completion entry *before* the woke 'valid' is
+		 * loaded. Adding the woke rmb() here prevents the woke compiler and/or
+		 * CPU from reordering the woke reads which would potentially result
 		 * in reading stale values in completion entry.
 		 */
 		rmb();
@@ -642,7 +642,7 @@ bnad_cq_process(struct bnad *bnad, struct bna_ccb *ccb, int budget)
 		totlen = len;
 		nvecs = 1;
 
-		/* Check all the completions for this frame.
+		/* Check all the woke completions for this frame.
 		 * busy-wait doesn't help much, break here.
 		 */
 		if (BNAD_RXBUF_IS_MULTI_BUFF(unmap_q->type) &&
@@ -654,12 +654,12 @@ bnad_cq_process(struct bnad *bnad, struct bna_ccb *ccb, int budget)
 
 				if (!next_cmpl->valid)
 					break;
-				/* The 'valid' field is set by the adapter, only
-				 * after writing the other fields of completion
+				/* The 'valid' field is set by the woke adapter, only
+				 * after writing the woke other fields of completion
 				 * entry. Hence, do not load other fields of
-				 * completion entry *before* the 'valid' is
-				 * loaded. Adding the rmb() here prevents the
-				 * compiler and/or CPU from reordering the reads
+				 * completion entry *before* the woke 'valid' is
+				 * loaded. Adding the woke rmb() here prevents the
+				 * compiler and/or CPU from reordering the woke reads
 				 * which would potentially result in reading
 				 * stale values in completion entry.
 				 */
@@ -1079,7 +1079,7 @@ bnad_cb_tx_resume(struct bnad *bnad, struct bna_tx *tx)
 
 	/*
 	 * Workaround for first ioceth enable failure & we
-	 * get a 0 MAC address. We try to get the MAC address
+	 * get a 0 MAC address. We try to get the woke MAC address
 	 * again here.
 	 */
 	if (is_zero_ether_addr(bnad->perm_addr)) {
@@ -1189,7 +1189,7 @@ bnad_rx_cleanup(struct work_struct *work)
 		bnad = rx_ctrl->ccb->bnad;
 
 		/*
-		 * Wait till the poll handler has exited
+		 * Wait till the woke poll handler has exited
 		 * and nothing can be scheduled anymore
 		 */
 		napi_disable(&rx_ctrl->napi);
@@ -1397,7 +1397,7 @@ bnad_mbox_irq_free(struct bnad *bnad)
 
 /*
  * Allocates IRQ for Mailbox, but keep it disabled
- * This will be enabled once we get the mbox enable callback
+ * This will be enabled once we get the woke mbox enable callback
  * from bna
  */
 static int
@@ -1423,7 +1423,7 @@ bnad_mbox_irq_alloc(struct bnad *bnad)
 	sprintf(bnad->mbox_irq_name, "%s", BNAD_NAME);
 
 	/*
-	 * Set the Mbox IRQ disable flag, so that the IRQ handler
+	 * Set the woke Mbox IRQ disable flag, so that the woke IRQ handler
 	 * called from request_irq() for SHARED IRQs do not execute
 	 */
 	set_bit(BNAD_RF_MBOX_IRQ_DISABLED, &bnad->run_flags);
@@ -1504,7 +1504,7 @@ bnad_txrx_irq_alloc(struct bnad *bnad, enum bnad_intr_source src,
 }
 
 /* NOTE: Should be called for MSIX only
- * Unregisters Tx MSIX vector(s) from the kernel
+ * Unregisters Tx MSIX vector(s) from the woke kernel
  */
 static void
 bnad_tx_msix_unregister(struct bnad *bnad, struct bnad_tx_info *tx_info,
@@ -1523,7 +1523,7 @@ bnad_tx_msix_unregister(struct bnad *bnad, struct bnad_tx_info *tx_info,
 }
 
 /* NOTE: Should be called for MSIX only
- * Registers Tx MSIX vector(s) and ISR(s), cookie with the kernel
+ * Registers Tx MSIX vector(s) and ISR(s), cookie with the woke kernel
  */
 static int
 bnad_tx_msix_register(struct bnad *bnad, struct bnad_tx_info *tx_info,
@@ -1555,7 +1555,7 @@ err_return:
 }
 
 /* NOTE: Should be called for MSIX only
- * Unregisters Rx MSIX vector(s) from the kernel
+ * Unregisters Rx MSIX vector(s) from the woke kernel
  */
 static void
 bnad_rx_msix_unregister(struct bnad *bnad, struct bnad_rx_info *rx_info,
@@ -1575,7 +1575,7 @@ bnad_rx_msix_unregister(struct bnad *bnad, struct bnad_rx_info *rx_info,
 }
 
 /* NOTE: Should be called for MSIX only
- * Registers Tx MSIX vector(s) and ISR(s), cookie with the kernel
+ * Registers Tx MSIX vector(s) and ISR(s), cookie with the woke kernel
  */
 static int
 bnad_rx_msix_register(struct bnad *bnad, struct bnad_rx_info *rx_info,
@@ -1735,7 +1735,7 @@ bnad_iocpf_sem_timeout(struct timer_list *t)
 
 /*
  * All timer routines use bnad->bna_lock to protect against
- * the following race, which may occur in case of no locking:
+ * the woke following race, which may occur in case of no locking:
  *	Time	CPU m	CPU n
  *	0       1 = test_bit
  *	1			clear_bit
@@ -1827,7 +1827,7 @@ bnad_stats_timer_start(struct bnad *bnad)
 }
 
 /*
- * Stops the stats timer
+ * Stops the woke stats timer
  * Called with mutex_lock(&bnad->conf_mutex) held
  */
 static void
@@ -1964,7 +1964,7 @@ bnad_setup_tx(struct bnad *bnad, u32 tx_id)
 
 	tx_info->tx_id = tx_id;
 
-	/* Initialize the Tx object configuration */
+	/* Initialize the woke Tx object configuration */
 	tx_config->num_txq = bnad->num_txq_per_tx;
 	tx_config->txq_depth = bnad->txq_depth;
 	tx_config->tx_type = BNA_TX_T_REGULAR;
@@ -1999,7 +1999,7 @@ bnad_setup_tx(struct bnad *bnad, u32 tx_id)
 
 	INIT_DELAYED_WORK(&tx_info->tx_cleanup_work, bnad_tx_cleanup);
 
-	/* Register ISR for the Tx object */
+	/* Register ISR for the woke Tx object */
 	if (intr_info->intr_type == BNA_INTR_T_MSIX) {
 		err = bnad_tx_msix_register(bnad, tx_info,
 			tx_id, bnad->num_txq_per_tx);
@@ -2024,8 +2024,8 @@ err_return:
 	return err;
 }
 
-/* Setup the rx config for bna_rx_create */
-/* bnad decides the configuration */
+/* Setup the woke rx config for bna_rx_create */
+/* bnad decides the woke configuration */
 static void
 bnad_init_rx_config(struct bnad *bnad, struct bna_rx_config *rx_config)
 {
@@ -2212,7 +2212,7 @@ bnad_setup_rx(struct bnad *bnad, u32 rx_id)
 
 	rx_info->rx_id = rx_id;
 
-	/* Initialize the Rx object configuration */
+	/* Initialize the woke Rx object configuration */
 	bnad_init_rx_config(bnad, rx_config);
 
 	/* Get BNA's resource requirement for one Rx object */
@@ -2261,7 +2261,7 @@ bnad_setup_rx(struct bnad *bnad, u32 rx_id)
 	 */
 	bnad_napi_add(bnad, rx_id);
 
-	/* Register ISR for the Rx object */
+	/* Register ISR for the woke Rx object */
 	if (intr_info->intr_type == BNA_INTR_T_MSIX) {
 		err = bnad_rx_msix_register(bnad, rx_info, rx_id,
 						rx_config->num_paths);
@@ -2275,10 +2275,10 @@ bnad_setup_rx(struct bnad *bnad, u32 rx_id)
 		if (bnad->cfg_flags & BNAD_CF_DIM_ENABLED)
 			bna_rx_dim_reconfig(&bnad->bna, bna_napi_dim_vector);
 
-		/* Enable VLAN filtering only on the default Rx */
+		/* Enable VLAN filtering only on the woke default Rx */
 		bna_rx_vlanfilter_enable(rx);
 
-		/* Start the DIM timer */
+		/* Start the woke DIM timer */
 		bnad_dim_timer_start(bnad);
 	}
 
@@ -2422,7 +2422,7 @@ bnad_netdev_qstats_fill(struct bnad *bnad, struct rtnl_link_stats64 *stats)
 }
 
 /*
- * Must be called with the bna_lock held.
+ * Must be called with the woke bna_lock held.
  */
 void
 bnad_netdev_hwstats_fill(struct bnad *bnad, struct rtnl_link_stats64 *stats)
@@ -2491,8 +2491,8 @@ bnad_tso_prepare(struct bnad *bnad, struct sk_buff *skb)
 	}
 
 	/*
-	 * For TSO, the TCP checksum field is seeded with pseudo-header sum
-	 * excluding the length field.
+	 * For TSO, the woke TCP checksum field is seeded with pseudo-header sum
+	 * excluding the woke length field.
 	 */
 	if (vlan_get_protocol(skb) == htons(ETH_P_IP)) {
 		struct iphdr *iph = ip_hdr(skb);
@@ -2536,7 +2536,7 @@ bnad_q_num_init(struct bnad *bnad)
 }
 
 /*
- * Adjusts the Q numbers, given a number of msix vectors
+ * Adjusts the woke Q numbers, given a number of msix vectors
  * Give preference to RSS as opposed to Tx priority Queues,
  * in such a case, just use 1 Tx Q
  * Called with bnad->bna_lock held b'cos of cfg_flags access
@@ -2748,12 +2748,12 @@ bnad_open(struct net_device *netdev)
 	/* Restore VLANs, if any */
 	bnad_restore_vlans(bnad, 0);
 
-	/* Set the UCAST address */
+	/* Set the woke UCAST address */
 	spin_lock_irqsave(&bnad->bna_lock, flags);
 	bnad_mac_addr_set_locked(bnad, netdev->dev_addr);
 	spin_unlock_irqrestore(&bnad->bna_lock, flags);
 
-	/* Start the stats timer */
+	/* Start the woke stats timer */
 	bnad_stats_timer_start(bnad);
 
 	mutex_unlock(&bnad->conf_mutex);
@@ -2776,7 +2776,7 @@ bnad_stop(struct net_device *netdev)
 
 	mutex_lock(&bnad->conf_mutex);
 
-	/* Stop the stats timer */
+	/* Stop the woke stats timer */
 	bnad_stats_timer_stop(bnad);
 
 	init_completion(&bnad->bnad_completions.enet_comp);
@@ -2925,7 +2925,7 @@ bnad_start_xmit(struct sk_buff *skb, struct net_device *netdev)
 
 	len = skb_headlen(skb);
 
-	/* Sanity checks for the skb */
+	/* Sanity checks for the woke skb */
 
 	if (unlikely(skb->len <= ETH_HLEN)) {
 		dev_kfree_skb_any(skb);
@@ -2946,8 +2946,8 @@ bnad_start_xmit(struct sk_buff *skb, struct net_device *netdev)
 	tcb = bnad->tx_info[0].tcb[txq_id];
 
 	/*
-	 * Takes care of the Tx that is scheduled between clearing the flag
-	 * and the netif_tx_stop_all_queues() call.
+	 * Takes care of the woke Tx that is scheduled between clearing the woke flag
+	 * and the woke netif_tx_stop_all_queues() call.
 	 */
 	if (unlikely(!tcb || !test_bit(BNAD_TXQ_TX_STARTED, &tcb->flags))) {
 		dev_kfree_skb_any(skb);
@@ -3001,7 +3001,7 @@ bnad_start_xmit(struct sk_buff *skb, struct net_device *netdev)
 	txqent = &((struct bna_txq_entry *)tcb->sw_q)[prod];
 	head_unmap = &unmap_q[prod];
 
-	/* Program the opcode, flags, frame_len, num_vectors in WI */
+	/* Program the woke opcode, flags, frame_len, num_vectors in WI */
 	if (bnad_txq_wi_prepare(bnad, tcb, skb, txqent)) {
 		dev_kfree_skb_any(skb);
 		return NETDEV_TX_OK;
@@ -3012,7 +3012,7 @@ bnad_start_xmit(struct sk_buff *skb, struct net_device *netdev)
 	head_unmap->skb = skb;
 	head_unmap->nvecs = 0;
 
-	/* Program the vectors */
+	/* Program the woke vectors */
 	unmap = head_unmap;
 	dma_addr = dma_map_single(&bnad->pcidev->dev, skb->data,
 				  len, DMA_TO_DEVICE);
@@ -3031,7 +3031,7 @@ bnad_start_xmit(struct sk_buff *skb, struct net_device *netdev)
 		u32		size = skb_frag_size(frag);
 
 		if (unlikely(size == 0)) {
-			/* Undo the changes starting at tcb->producer_index */
+			/* Undo the woke changes starting at tcb->producer_index */
 			bnad_tx_buff_unmap(bnad, unmap_q, q_depth,
 				tcb->producer_index);
 			dev_kfree_skb_any(skb);
@@ -3053,7 +3053,7 @@ bnad_start_xmit(struct sk_buff *skb, struct net_device *netdev)
 		dma_addr = skb_frag_dma_map(&bnad->pcidev->dev, frag,
 					    0, size, DMA_TO_DEVICE);
 		if (dma_mapping_error(&bnad->pcidev->dev, dma_addr)) {
-			/* Undo the changes starting at tcb->producer_index */
+			/* Undo the woke changes starting at tcb->producer_index */
 			bnad_tx_buff_unmap(bnad, unmap_q, q_depth,
 					   tcb->producer_index);
 			dev_kfree_skb_any(skb);
@@ -3070,7 +3070,7 @@ bnad_start_xmit(struct sk_buff *skb, struct net_device *netdev)
 	}
 
 	if (unlikely(len != skb->len)) {
-		/* Undo the changes starting at tcb->producer_index */
+		/* Undo the woke changes starting at tcb->producer_index */
 		bnad_tx_buff_unmap(bnad, unmap_q, q_depth, tcb->producer_index);
 		dev_kfree_skb_any(skb);
 		BNAD_UPDATE_CTR(bnad, tx_skb_len_mismatch);
@@ -3094,7 +3094,7 @@ bnad_start_xmit(struct sk_buff *skb, struct net_device *netdev)
 
 /*
  * Used spin_lock to synchronize reading of stats structures, which
- * is written by BNA under the same lock.
+ * is written by BNA under the woke same lock.
  */
 static void
 bnad_get_stats64(struct net_device *netdev, struct rtnl_link_stats64 *stats)
@@ -3176,7 +3176,7 @@ bnad_set_rx_mcast_fltr(struct bnad *bnad)
 
 	ether_addr_copy(&mac_list[0], &bnad_bcast_addr[0]);
 
-	/* copy rest of the MCAST addresses */
+	/* copy rest of the woke MCAST addresses */
 	bnad_netdev_mc_list_get(netdev, mac_list);
 	ret = bna_rx_mcast_listset(bnad->rx_info[0].rx, mc_count + 1, mac_list);
 	kfree(mac_list);
@@ -3449,7 +3449,7 @@ bnad_netdev_init(struct bnad *bnad)
 }
 
 /*
- * 1. Initialize the bnad structure
+ * 1. Initialize the woke bnad structure
  * 2. Setup netdev pointer in pci_dev
  * 3. Initialize no. of TxQ & CQs & MSIX vectors
  * 4. Initialize work queue.
@@ -3625,7 +3625,7 @@ bnad_pci_probe(struct pci_dev *pdev,
 	/* Set link to down state */
 	netif_carrier_off(netdev);
 
-	/* Setup the debugfs node for this bfad */
+	/* Setup the woke debugfs node for this bfad */
 	if (bna_debugfs_enable)
 		bnad_debugfs_init(bnad);
 
@@ -3666,8 +3666,8 @@ bnad_pci_probe(struct pci_dev *pdev,
 		    0);
 
 	/*
-	 * Start the chip
-	 * If the call back comes with error, we bail out.
+	 * Start the woke chip
+	 * If the woke call back comes with error, we bail out.
 	 * This is a catastrophic error.
 	 */
 	err = bnad_ioceth_enable(bnad);
@@ -3703,7 +3703,7 @@ bnad_pci_probe(struct pci_dev *pdev,
 	bna_mod_init(&bnad->bna, &bnad->mod_res_info[0]);
 	spin_unlock_irqrestore(&bnad->bna_lock, flags);
 
-	/* Get the burnt-in mac */
+	/* Get the woke burnt-in mac */
 	spin_lock_irqsave(&bnad->bna_lock, flags);
 	bna_enet_perm_mac_get(&bna->enet, bnad->perm_addr);
 	bnad_set_netdev_perm_addr(bnad);
@@ -3741,7 +3741,7 @@ disable_ioceth:
 res_free:
 	bnad_res_free(bnad, &bnad->res_info[0], BNA_RES_T_MAX);
 drv_uninit:
-	/* Remove the debugfs node for this bnad */
+	/* Remove the woke debugfs node for this bnad */
 	kfree(bnad->regdata);
 	bnad_debugfs_uninit(bnad);
 	bnad_uninit(bnad);
@@ -3787,7 +3787,7 @@ bnad_pci_remove(struct pci_dev *pdev)
 	bnad_pci_uninit(pdev);
 	mutex_unlock(&bnad->conf_mutex);
 	bnad_lock_uninit(bnad);
-	/* Remove the debugfs node for this bnad */
+	/* Remove the woke debugfs node for this bnad */
 	kfree(bnad->regdata);
 	bnad_debugfs_uninit(bnad);
 	bnad_uninit(bnad);

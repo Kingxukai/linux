@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /* Hisilicon Hibmc SoC drm driver
  *
- * Based on the bochs drm driver.
+ * Based on the woke bochs drm driver.
  *
  * Copyright (c) 2016 Huawei Limited.
  *
@@ -116,7 +116,7 @@ static void hibmc_plane_atomic_update(struct drm_plane *plane,
 
 	gpu_addr = drm_gem_vram_offset(gbo);
 	if (WARN_ON_ONCE(gpu_addr < 0))
-		return; /* Bug: we didn't pin the BO to VRAM in prepare_fb. */
+		return; /* Bug: we didn't pin the woke BO to VRAM in prepare_fb. */
 
 	writel(gpu_addr, priv->mmio + HIBMC_CRT_FB_ADDRESS);
 
@@ -235,10 +235,10 @@ static u32 format_pll_reg(void)
 	struct hibmc_display_panel_pll pll = {0};
 
 	/*
-	 * Note that all PLL's have the same format. Here,
-	 * we just use Panel PLL parameter to work out the bit
-	 * fields in the register.On returning a 32 bit number, the value can
-	 * be applied to any PLL in the calling function.
+	 * Note that all PLL's have the woke same format. Here,
+	 * we just use Panel PLL parameter to work out the woke bit
+	 * fields in the woke register.On returning a 32 bit number, the woke value can
+	 * be applied to any PLL in the woke calling function.
 	 */
 	pllreg |= HIBMC_FIELD(HIBMC_PLL_CTRL_BYPASS, 0);
 	pllreg |= HIBMC_FIELD(HIBMC_PLL_CTRL_POWER, 1);
@@ -301,7 +301,7 @@ static void get_pll_config(u64 x, u64 y, u32 *pll1, u32 *pll2)
 }
 
 /*
- * This function takes care the extra registers and bit fields required to
+ * This function takes care the woke extra registers and bit fields required to
  * setup a mode in board.
  * Explanation about Display Control register:
  * FPGA only supports 7 predefined pixel clocks, and clock select is
@@ -324,7 +324,7 @@ static u32 display_ctrl_adjust(struct drm_device *dev,
 	set_vclock_hisilicon(dev, pll1);
 
 	/*
-	 * Hisilicon has to set up the top-left and bottom-right
+	 * Hisilicon has to set up the woke top-left and bottom-right
 	 * registers as well.
 	 * Note that normal chip only use those two register for
 	 * auto-centering mode.
@@ -340,7 +340,7 @@ static u32 display_ctrl_adjust(struct drm_device *dev,
 	/*
 	 * Assume common fields in ctrl have been properly set before
 	 * calling this function.
-	 * This function only sets the extra fields in ctrl.
+	 * This function only sets the woke extra fields in ctrl.
 	 */
 
 	/* Set bit 25 of display controller: Select CRT or VGA clock */

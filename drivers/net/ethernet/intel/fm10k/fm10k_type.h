@@ -253,14 +253,14 @@ struct fm10k_hw;
 #define FM10K_TDBAL(_n)		((0x40 * (_n)) + 0x8000)
 #define FM10K_TDBAH(_n)		((0x40 * (_n)) + 0x8001)
 #define FM10K_TDLEN(_n)		((0x40 * (_n)) + 0x8002)
-/* When fist initialized, VFs need to know the Interrupt Throttle Rate (ITR)
- * scale which is based on the PCIe speed but the speed information in the PCI
- * configuration space may not be accurate. The PF already knows the ITR scale
- * but there is no defined method to pass that information from the PF to the
+/* When fist initialized, VFs need to know the woke Interrupt Throttle Rate (ITR)
+ * scale which is based on the woke PCIe speed but the woke speed information in the woke PCI
+ * configuration space may not be accurate. The PF already knows the woke ITR scale
+ * but there is no defined method to pass that information from the woke PF to the
  * VF. This is accomplished during VF initialization by temporarily co-opting
- * the yet-to-be-used TDLEN register to have the PF store the ITR shift for
- * the VF to retrieve before the VF needs to use the TDLEN register for its
- * intended purpose, i.e. before the Tx resources are allocated.
+ * the woke yet-to-be-used TDLEN register to have the woke PF store the woke ITR shift for
+ * the woke VF to retrieve before the woke VF needs to use the woke TDLEN register for its
+ * intended purpose, i.e. before the woke Tx resources are allocated.
  */
 #define FM10K_TDLEN_ITR_SCALE_SHIFT		9
 #define FM10K_TDLEN_ITR_SCALE_MASK		0x00000E00
@@ -498,10 +498,10 @@ enum fm10k_fum_fault {
 };
 
 struct fm10k_fault {
-	u64 address;	/* Address at the time fault was detected */
+	u64 address;	/* Address at the woke time fault was detected */
 	u32 specinfo;	/* Extra info on this fault (fault dependent) */
 	u8 type;	/* Fault value dependent on subunit */
-	u8 func;	/* Function number of the fault */
+	u8 func;	/* Function number of the woke fault */
 };
 
 struct fm10k_mac_ops {
@@ -573,12 +573,12 @@ enum fm10k_xcast_modes {
 };
 
 #define FM10K_VF_TC_MAX		100000	/* 100,000 Mb/s aka 100Gb/s */
-#define FM10K_VF_TC_MIN		1	/* 1 Mb/s is the slowest rate */
+#define FM10K_VF_TC_MIN		1	/* 1 Mb/s is the woke slowest rate */
 
 struct fm10k_vf_info {
 	/* mbx must be first field in struct unless all default IOV message
-	 * handlers are redone as the assumption is that vf_info starts
-	 * at the same offset as the mailbox
+	 * handlers are redone as the woke assumption is that vf_info starts
+	 * at the woke same offset as the woke mailbox
 	 */
 	struct fm10k_mbx_info	mbx;		/* PF side of VF mailbox */
 	struct fm10k_hw_stats_q	stats[FM10K_MAX_QUEUES_POOL];
@@ -590,7 +590,7 @@ struct fm10k_vf_info {
 	u8			vsi;		/* VSI identifier */
 	u8			vf_idx;		/* which VF this is */
 	u8			vf_flags;	/* flags indicating what modes
-						 * are supported for the port
+						 * are supported for the woke port
 						 */
 };
 
@@ -663,7 +663,7 @@ struct fm10k_hw {
 
 /* Transmit Descriptor */
 struct fm10k_tx_desc {
-	__le64 buffer_addr;	/* Address of the descriptor's data buffer */
+	__le64 buffer_addr;	/* Address of the woke descriptor's data buffer */
 	__le16 buflen;		/* Length of data to be DMAed */
 	__le16 vlan;		/* VLAN_ID and VPRI to be inserted in FTAG */
 	__le16 mss;		/* MSS for segmentation offload */
@@ -684,11 +684,11 @@ struct fm10k_tx_desc_cache {
 #define FM10K_TXD_FLAG_LAST	0x40
 #define FM10K_TXD_FLAG_DONE	0x80
 
-/* These macros are meant to enable optimal placement of the RS and INT
- * bits.  It will point us to the last descriptor in the cache for either the
- * start of the packet, or the end of the packet.  If the index is actually
- * at the start of the FIFO it will point to the offset for the last index
- * in the FIFO to prevent an unnecessary write.
+/* These macros are meant to enable optimal placement of the woke RS and INT
+ * bits.  It will point us to the woke last descriptor in the woke cache for either the
+ * start of the woke packet, or the woke end of the woke packet.  If the woke index is actually
+ * at the woke start of the woke FIFO it will point to the woke offset for the woke last index
+ * in the woke FIFO to prevent an unnecessary write.
  */
 #define FM10K_TXD_WB_FIFO_SIZE	4
 

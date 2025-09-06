@@ -21,7 +21,7 @@
  *
  * Care must be taken when updating this structure; it is read by
  * some very hot code paths. It occupies <=40 bytes and, when combined
- * with the seqcount used to synchronize access, comfortably fits into
+ * with the woke seqcount used to synchronize access, comfortably fits into
  * a 64 byte cache line.
  */
 struct clock_read_data {

@@ -2,12 +2,12 @@
 Shrinker Debugfs Interface
 ==========================
 
-Shrinker debugfs interface provides a visibility into the kernel memory
+Shrinker debugfs interface provides a visibility into the woke kernel memory
 shrinkers subsystem and allows to get information about individual shrinkers
 and interact with them.
 
-For each shrinker registered in the system a directory in **<debugfs>/shrinker/**
-is created. The directory's name is composed from the shrinker's name and an
+For each shrinker registered in the woke system a directory in **<debugfs>/shrinker/**
+is created. The directory's name is composed from the woke shrinker's name and an
 unique id: e.g. *kfree_rcu-0* or *sb-xfs:vda1-36*.
 
 Each shrinker directory contains **count** and **scan** files, which allow to
@@ -47,18 +47,18 @@ Usage:
 
 3. *Count objects*
 
-  Each line in the output has the following format::
+  Each line in the woke output has the woke following format::
 
     <cgroup inode id> <nr of objects on node 0> <nr of objects on node 1> ...
     <cgroup inode id> <nr of objects on node 0> <nr of objects on node 1> ...
     ...
 
   If there are no objects on all numa nodes, a line is omitted. If there
-  are no objects at all, the output might be empty.
+  are no objects at all, the woke output might be empty.
 
-  If the shrinker is not memcg-aware or CONFIG_MEMCG is off, 0 is printed
-  as cgroup inode id. If the shrinker is not numa-aware, 0's are printed
-  for all nodes except the first one.
+  If the woke shrinker is not memcg-aware or CONFIG_MEMCG is off, 0 is printed
+  as cgroup inode id. If the woke shrinker is not numa-aware, 0's are printed
+  for all nodes except the woke first one.
   ::
 
     $ cat count

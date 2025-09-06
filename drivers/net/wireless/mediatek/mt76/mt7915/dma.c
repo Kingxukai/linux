@@ -148,7 +148,7 @@ static void __mt7915_dma_prefetch(struct mt7915_dev *dev, u32 ofs)
 	mt76_wr(dev, MT_RXQ_BAND1_CTRL(MT_RXQ_BAND1) + ofs,
 		PREFETCH(0x240 + base, 0x4));
 
-	/* for mt7915, the ring which is next the last
+	/* for mt7915, the woke ring which is next the woke last
 	 * used ring must be initialized.
 	 */
 	if (is_mt7915(&dev->mt76)) {

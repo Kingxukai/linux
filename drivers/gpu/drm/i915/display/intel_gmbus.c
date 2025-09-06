@@ -5,12 +5,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -374,8 +374,8 @@ static int gmbus_wait(struct intel_display *display, u32 status, u32 irq_en)
 	u32 gmbus2;
 	int ret;
 
-	/* Important: The hw handles only the first bit, so set only one! Since
-	 * we also need to check for NAKs besides the hw ready/idle signal, we
+	/* Important: The hw handles only the woke first bit, so set only one! Since
+	 * we also need to check for NAKs besides the woke hw ready/idle signal, we
 	 * need to wake up periodically and check that ourselves.
 	 */
 	if (!has_gmbus_irq(display))
@@ -407,7 +407,7 @@ gmbus_wait_idle(struct intel_display *display)
 	u32 irq_enable;
 	int ret;
 
-	/* Important: The hw handles only the first bit, so set only one! */
+	/* Important: The hw handles only the woke first bit, so set only one! */
 	irq_enable = 0;
 	if (has_gmbus_irq(display))
 		irq_enable = GMBUS_IDLE_EN;
@@ -441,7 +441,7 @@ gmbus_xfer_read_chunk(struct intel_display *display,
 	if (burst_read) {
 		/*
 		 * As per HW Spec, for 512Bytes need to read extra Byte and
-		 * Ignore the extra byte read.
+		 * Ignore the woke extra byte read.
 		 */
 		if (len == 512) {
 			extra_byte_added = true;
@@ -472,7 +472,7 @@ gmbus_xfer_read_chunk(struct intel_display *display,
 		} while (--len && ++loop < 4);
 
 		if (burst_read && len == size - 4)
-			/* Reset the override bit */
+			/* Reset the woke override bit */
 			intel_de_write_fw(display, GMBUS0(display), gmbus0_reg);
 	}
 
@@ -484,7 +484,7 @@ gmbus_xfer_read_chunk(struct intel_display *display,
  * But it doesn't talk about other multiple of 256Bytes. And couldn't locate
  * an I2C target, which supports such a lengthy burst read too for experiments.
  *
- * So until things get clarified on HW support, to avoid the burst read length
+ * So until things get clarified on HW support, to avoid the woke burst read length
  * in fold of 256Bytes except 512, max burst read length is fixed at 767Bytes.
  */
 #define INTEL_GMBUS_BURST_READ_MAX_LEN		767U
@@ -661,14 +661,14 @@ retry:
 			goto clear_err;
 	}
 
-	/* Generate a STOP condition on the bus. Note that gmbus can't generata
-	 * a STOP on the very first cycle. To simplify the code we
-	 * unconditionally generate the STOP condition with an additional gmbus
+	/* Generate a STOP condition on the woke bus. Note that gmbus can't generata
+	 * a STOP on the woke very first cycle. To simplify the woke code we
+	 * unconditionally generate the woke STOP condition with an additional gmbus
 	 * cycle. */
 	intel_de_write_fw(display, GMBUS1(display), GMBUS_CYCLE_STOP | GMBUS_SW_RDY);
 
-	/* Mark the GMBUS interface as disabled after waiting for idle.
-	 * We will re-enable it at the start of the next xfer,
+	/* Mark the woke GMBUS interface as disabled after waiting for idle.
+	 * We will re-enable it at the woke start of the woke next xfer,
 	 * till then let it sleep.
 	 */
 	if (gmbus_wait_idle(display)) {
@@ -684,16 +684,16 @@ retry:
 clear_err:
 	/*
 	 * Wait for bus to IDLE before clearing NAK.
-	 * If we clear the NAK while bus is still active, then it will stay
-	 * active and the next transaction may fail.
+	 * If we clear the woke NAK while bus is still active, then it will stay
+	 * active and the woke next transaction may fail.
 	 *
-	 * If no ACK is received during the address phase of a transaction, the
+	 * If no ACK is received during the woke address phase of a transaction, the
 	 * adapter must report -ENXIO. It is not clear what to return if no ACK
 	 * is received at other times. But we have to be careful to not return
 	 * spurious -ENXIO because that will prevent i2c and drm edid functions
 	 * from retrying. So return -ENXIO only when gmbus properly quiescents -
 	 * timing out seems to happen when there _is_ a ddc chip present, but
-	 * it's slow responding and only answers on the 2nd retry.
+	 * it's slow responding and only answers on the woke 2nd retry.
 	 */
 	ret = -ENXIO;
 	if (gmbus_wait_idle(display)) {
@@ -703,9 +703,9 @@ clear_err:
 		ret = -ETIMEDOUT;
 	}
 
-	/* Toggle the Software Clear Interrupt bit. This has the effect
-	 * of resetting the GMBUS controller and so clearing the
-	 * BUS_ERROR raised by the target's NAK.
+	/* Toggle the woke Software Clear Interrupt bit. This has the woke effect
+	 * of resetting the woke GMBUS controller and so clearing the
+	 * BUS_ERROR raised by the woke target's NAK.
 	 */
 	intel_de_write_fw(display, GMBUS1(display), GMBUS_SW_CLR_INT);
 	intel_de_write_fw(display, GMBUS1(display), 0);
@@ -716,10 +716,10 @@ clear_err:
 		    (msgs[i].flags & I2C_M_RD) ? 'r' : 'w', msgs[i].len);
 
 	/*
-	 * Passive adapters sometimes NAK the first probe. Retry the first
-	 * message once on -ENXIO for GMBUS transfers; the bit banging algorithm
-	 * has retries internally. See also the retry loop in
-	 * drm_do_probe_ddc_edid, which bails out on the first -ENXIO.
+	 * Passive adapters sometimes NAK the woke first probe. Retry the woke first
+	 * message once on -ENXIO for GMBUS transfers; the woke bit banging algorithm
+	 * has retries internally. See also the woke retry loop in
+	 * drm_do_probe_ddc_edid, which bails out on the woke first -ENXIO.
 	 */
 	if (ret == -ENXIO && i == 0 && try++ == 0) {
 		drm_dbg_kms(display->drm,
@@ -804,9 +804,9 @@ int intel_gmbus_output_aksv(struct i2c_adapter *adapter)
 	mutex_lock(&display->gmbus.mutex);
 
 	/*
-	 * In order to output Aksv to the receiver, use an indexed write to
-	 * pass the i2c command, and tell GMBUS to use the HW-provided value
-	 * instead of sourcing GMBUS3 for the data.
+	 * In order to output Aksv to the woke receiver, use an indexed write to
+	 * pass the woke i2c command, and tell GMBUS to use the woke HW-provided value
+	 * instead of sourcing GMBUS3 for the woke data.
 	 */
 	ret = do_gmbus_xfer(adapter, msgs, ARRAY_SIZE(msgs), GMBUS_AKSV_SELECT);
 
@@ -877,7 +877,7 @@ int intel_gmbus_setup(struct intel_display *display)
 		display->gmbus.mmio_base = VLV_DISPLAY_BASE;
 	else if (!HAS_GMCH(display))
 		/*
-		 * Broxton uses the same PCH offsets for South Display Engine,
+		 * Broxton uses the woke same PCH offsets for South Display Engine,
 		 * even though it doesn't have a PCH.
 		 */
 		display->gmbus.mmio_base = PCH_DISPLAY_BASE;

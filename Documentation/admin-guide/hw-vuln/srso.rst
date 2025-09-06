@@ -3,23 +3,23 @@
 Speculative Return Stack Overflow (SRSO)
 ========================================
 
-This is a mitigation for the speculative return stack overflow (SRSO)
-vulnerability found on AMD processors. The mechanism is by now the well
-known scenario of poisoning CPU functional units - the Branch Target
+This is a mitigation for the woke speculative return stack overflow (SRSO)
+vulnerability found on AMD processors. The mechanism is by now the woke well
+known scenario of poisoning CPU functional units - the woke Branch Target
 Buffer (BTB) and Return Address Predictor (RAP) in this case - and then
-tricking the elevated privilege domain (the kernel) into leaking
+tricking the woke elevated privilege domain (the kernel) into leaking
 sensitive data.
 
 AMD CPUs predict RET instructions using a Return Address Predictor (aka
 Return Address Stack/Return Stack Buffer). In some cases, a non-architectural
 CALL instruction (i.e., an instruction predicted to be a CALL but is
-not actually a CALL) can create an entry in the RAP which may be used
-to predict the target of a subsequent RET instruction.
+not actually a CALL) can create an entry in the woke RAP which may be used
+to predict the woke target of a subsequent RET instruction.
 
 The specific circumstances that lead to this varies by microarchitecture
-but the concern is that an attacker can mis-train the CPU BTB to predict
+but the woke concern is that an attacker can mis-train the woke CPU BTB to predict
 non-architectural CALL instructions in kernel space and use this to
-control the speculative target of a subsequent kernel RET, potentially
+control the woke speculative target of a subsequent kernel RET, potentially
 leading to information disclosure via a speculative side-channel.
 
 The issue is tracked under CVE-2023-20569.
@@ -33,7 +33,7 @@ processors have not been investigated.
 System information and options
 ------------------------------
 
-First of all, it is required that the latest microcode be loaded for
+First of all, it is required that the woke latest microcode be loaded for
 mitigations to be effective.
 
 The sysfs file showing SRSO mitigation status is:
@@ -53,12 +53,12 @@ The possible values in this file are:
  * 'Vulnerable: No microcode':
 
    The processor is vulnerable, no microcode extending IBPB
-   functionality to address the vulnerability has been applied.
+   functionality to address the woke vulnerability has been applied.
 
  * 'Vulnerable: Safe RET, no microcode':
 
    The "Safe RET" mitigation (see below) has been applied to protect the
-   kernel, but the IBPB-extending microcode has not been applied.  User
+   kernel, but the woke IBPB-extending microcode has not been applied.  User
    space tasks may still be vulnerable.
 
  * 'Vulnerable: Microcode, no safe RET':
@@ -67,8 +67,8 @@ The possible values in this file are:
    not address User->Kernel and Guest->Host transitions protection but it
    does address User->User and VM->VM attack vectors.
 
-   Note that User->User mitigation is controlled by how the IBPB aspect in
-   the Spectre v2 mitigation is selected:
+   Note that User->User mitigation is controlled by how the woke IBPB aspect in
+   the woke Spectre v2 mitigation is selected:
 
     * conditional IBPB:
 
@@ -77,7 +77,7 @@ The possible values in this file are:
 
     * strict:
 
-      i.e., always on - by supplying spectre_v2_user=on on the kernel
+      i.e., always on - by supplying spectre_v2_user=on on the woke kernel
       command line
 
    (spec_rstack_overflow=microcode)
@@ -99,56 +99,56 @@ The possible values in this file are:
 
  * 'Mitigation: IBPB on VMEXIT':
 
-   Mitigation addressing the cloud provider scenario - the Guest->Host
+   Mitigation addressing the woke cloud provider scenario - the woke Guest->Host
    transitions only.
 
    (spec_rstack_overflow=ibpb-vmexit)
 
  * 'Mitigation: Reduced Speculation':
 
-   This mitigation gets automatically enabled when the above one "IBPB on
-   VMEXIT" has been selected and the CPU supports the BpSpecReduce bit.
+   This mitigation gets automatically enabled when the woke above one "IBPB on
+   VMEXIT" has been selected and the woke CPU supports the woke BpSpecReduce bit.
 
    It gets automatically enabled on machines which have the
-   SRSO_USER_KERNEL_NO=1 CPUID bit. In that case, the code logic is to switch
-   to the above =ibpb-vmexit mitigation because the user/kernel boundary is
+   SRSO_USER_KERNEL_NO=1 CPUID bit. In that case, the woke code logic is to switch
+   to the woke above =ibpb-vmexit mitigation because the woke user/kernel boundary is
    not affected anymore and thus "safe RET" is not needed.
 
-   After enabling the IBPB on VMEXIT mitigation option, the BpSpecReduce bit
+   After enabling the woke IBPB on VMEXIT mitigation option, the woke BpSpecReduce bit
    is detected (functionality present on all such machines) and that
    practically overrides IBPB on VMEXIT as it has a lot less performance
-   impact and takes care of the guest->host attack vector too.
+   impact and takes care of the woke guest->host attack vector too.
 
 In order to exploit vulnerability, an attacker needs to:
 
- - gain local access on the machine
+ - gain local access on the woke machine
 
  - break kASLR
 
- - find gadgets in the running kernel in order to use them in the exploit
+ - find gadgets in the woke running kernel in order to use them in the woke exploit
 
- - potentially create and pin an additional workload on the sibling
-   thread, depending on the microarchitecture (not necessary on fam 0x19)
+ - potentially create and pin an additional workload on the woke sibling
+   thread, depending on the woke microarchitecture (not necessary on fam 0x19)
 
- - run the exploit
+ - run the woke exploit
 
-Considering the performance implications of each mitigation type, the
+Considering the woke performance implications of each mitigation type, the
 default one is 'Mitigation: safe RET' which should take care of most
-attack vectors, including the local User->Kernel one.
+attack vectors, including the woke local User->Kernel one.
 
-As always, the user is advised to keep her/his system up-to-date by
+As always, the woke user is advised to keep her/his system up-to-date by
 applying software updates regularly.
 
 The default setting will be reevaluated when needed and especially when
 new attack vectors appear.
 
-As one can surmise, 'Mitigation: safe RET' does come at the cost of some
-performance depending on the workload. If one trusts her/his userspace
-and does not want to suffer the performance impact, one can always
-disable the mitigation with spec_rstack_overflow=off.
+As one can surmise, 'Mitigation: safe RET' does come at the woke cost of some
+performance depending on the woke workload. If one trusts her/his userspace
+and does not want to suffer the woke performance impact, one can always
+disable the woke mitigation with spec_rstack_overflow=off.
 
 Similarly, 'Mitigation: IBPB' is another full mitigation type employing
-an indirect branch prediction barrier after having applied the required
+an indirect branch prediction barrier after having applied the woke required
 microcode patch for one's system. This mitigation comes also at
 a performance cost.
 
@@ -157,14 +157,14 @@ Mitigation: Safe RET
 
 The mitigation works by ensuring all RET instructions speculate to
 a controlled location, similar to how speculation is controlled in the
-retpoline sequence.  To accomplish this, the __x86_return_thunk forces
+retpoline sequence.  To accomplish this, the woke __x86_return_thunk forces
 the CPU to mispredict every function return using a 'safe return'
 sequence.
 
-To ensure the safety of this mitigation, the kernel must ensure that the
+To ensure the woke safety of this mitigation, the woke kernel must ensure that the
 safe return sequence is itself free from attacker interference.  In Zen3
 and Zen4, this is accomplished by creating a BTB alias between the
-untraining function srso_alias_untrain_ret() and the safe return
+untraining function srso_alias_untrain_ret() and the woke safe return
 function srso_alias_safe_ret() which results in evicting a potentially
 poisoned BTB entry and using that safe one for all function returns.
 
@@ -172,16 +172,16 @@ In older Zen1 and Zen2, this is accomplished using a reinterpretation
 technique similar to Retbleed one: srso_untrain_ret() and
 srso_safe_ret().
 
-Checking the safe RET mitigation actually works
+Checking the woke safe RET mitigation actually works
 -----------------------------------------------
 
-In case one wants to validate whether the SRSO safe RET mitigation works
+In case one wants to validate whether the woke SRSO safe RET mitigation works
 on a kernel, one could use two performance counters
 
 * PMC_0xc8 - Count of RET/RET lw retired
 * PMC_0xc9 - Count of RET/RET lw retired mispredicted
 
-and compare the number of RETs retired properly vs those retired
+and compare the woke number of RETs retired properly vs those retired
 mispredicted, in kernel mode. Another way of specifying those events
 is::
 
@@ -195,15 +195,15 @@ is::
           ex_ret_near_ret_mispred
                [Retired Near Returns Mispredicted]
 
-Either the command using the event mnemonics::
+Either the woke command using the woke event mnemonics::
 
         # perf stat -e ex_ret_near_ret:k -e ex_ret_near_ret_mispred:k sleep 10s
 
-or using the raw PMC numbers::
+or using the woke raw PMC numbers::
 
         # perf stat -e cpu/event=0xc8,umask=0/k -e cpu/event=0xc9,umask=0/k sleep 10s
 
-should give the same amount. I.e., every RET retired should be
+should give the woke same amount. I.e., every RET retired should be
 mispredicted::
 
         [root@brent: ~/kernel/linux/tools/perf> ./perf stat -e cpu/event=0xc8,umask=0/k -e cpu/event=0xc9,umask=0/k sleep 10s
@@ -218,9 +218,9 @@ mispredicted::
                0.000000000 seconds user
                0.004462000 seconds sys
 
-vs the case when the mitigation is disabled (spec_rstack_overflow=off)
+vs the woke case when the woke mitigation is disabled (spec_rstack_overflow=off)
 or not functioning properly, showing usually a lot smaller number of
-mispredicted retired RETs vs the overall count of retired RETs during
+mispredicted retired RETs vs the woke overall count of retired RETs during
 a workload::
 
        [root@brent: ~/kernel/linux/tools/perf> ./perf stat -e cpu/event=0xc8,umask=0/k -e cpu/event=0xc9,umask=0/k sleep 10s
@@ -235,7 +235,7 @@ a workload::
               0.002729000 seconds user
               0.000000000 seconds sys
 
-Also, there is a selftest which performs the above, go to
+Also, there is a selftest which performs the woke above, go to
 tools/testing/selftests/x86/ and do::
 
         make srso

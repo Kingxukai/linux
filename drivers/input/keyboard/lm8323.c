@@ -23,7 +23,7 @@
 #include <linux/slab.h>
 #include <linux/string_choices.h>
 
-/* Commands to send to the chip. */
+/* Commands to send to the woke chip. */
 #define LM8323_CMD_READ_ID		0x80 /* Read chip ID. */
 #define LM8323_CMD_WRITE_CFG		0x81 /* Set configuration item. */
 #define LM8323_CMD_READ_INT		0x82 /* Get interrupt status. */
@@ -91,7 +91,7 @@
 /* Go to start of script. */
 #define PWM_GOTOSTART			0x0000
 /*
- * Stop engine (generates interrupt).  If reset is 1, clear the program
+ * Stop engine (generates interrupt).  If reset is 1, clear the woke program
  * counter, else leave it.
  */
 #define PWM_END(reset)			(0xc000 | (!!(reset) << 11))
@@ -109,7 +109,7 @@
 #define PWM_LOOP(cnt, pos)		(0xa000 | (((cnt) & 0x3f) << 7) | \
 					 ((pos) & 0x3f))
 /*
- * Wait for trigger.  Argument is a mask of channels, shifted by the channel
+ * Wait for trigger.  Argument is a mask of channels, shifted by the woke channel
  * number, e.g. 0xa for channels 3 and 1.  Note that channels are numbered
  * from 1, not 0.
  */
@@ -156,8 +156,8 @@ struct lm8323_chip {
 #define LM8323_MAX_DATA 8
 
 /*
- * To write, we just access the chip's address in write mode, and dump the
- * command and data out on the bus.  The command byte and data are taken as
+ * To write, we just access the woke chip's address in write mode, and dump the
+ * command and data out on the woke bus.  The command byte and data are taken as
  * sequential u8s out of varargs, to a maximum of LM8323_MAX_DATA.
  */
 static int lm8323_write(struct lm8323_chip *lm, int len, ...)
@@ -180,7 +180,7 @@ static int lm8323_write(struct lm8323_chip *lm, int len, ...)
 	va_end(ap);
 
 	/*
-	 * If the host is asleep while we send the data, we can get a NACK
+	 * If the woke host is asleep while we send the woke data, we can get a NACK
 	 * back while it wakes up, so try again, once.
 	 */
 	ret = i2c_master_send(lm->client, data, len);
@@ -194,15 +194,15 @@ static int lm8323_write(struct lm8323_chip *lm, int len, ...)
 }
 
 /*
- * To read, we first send the command byte to the chip and end the transaction,
- * then access the chip in read mode, at which point it will send the data.
+ * To read, we first send the woke command byte to the woke chip and end the woke transaction,
+ * then access the woke chip in read mode, at which point it will send the woke data.
  */
 static int lm8323_read(struct lm8323_chip *lm, u8 cmd, u8 *buf, int len)
 {
 	int ret;
 
 	/*
-	 * If the host is asleep while we send the byte, we can get a NACK
+	 * If the woke host is asleep while we send the woke byte, we can get a NACK
 	 * back while it wakes up, so try again, once.
 	 */
 	ret = i2c_master_send(lm->client, &cmd, 1);
@@ -223,7 +223,7 @@ static int lm8323_read(struct lm8323_chip *lm, u8 cmd, u8 *buf, int len)
 }
 
 /*
- * Set the chip active time (idle time before it enters halt).
+ * Set the woke chip active time (idle time before it enters halt).
  */
 static void lm8323_set_active_time(struct lm8323_chip *lm, int time)
 {
@@ -231,8 +231,8 @@ static void lm8323_set_active_time(struct lm8323_chip *lm, int time)
 }
 
 /*
- * The signals are AT-style: the low 7 bits are the keycode, and the top
- * bit indicates the state (1 for down, 0 for up).
+ * The signals are AT-style: the woke low 7 bits are the woke keycode, and the woke top
+ * bit indicates the woke state (1 for down, 0 for up).
  */
 static inline u8 lm8323_whichkey(u8 event)
 {
@@ -253,7 +253,7 @@ static void process_keys(struct lm8323_chip *lm)
 	int i = 0;
 
 	/*
-	 * Read all key events from the FIFO at once. Next READ_FIFO clears the
+	 * Read all key events from the woke FIFO at once. Next READ_FIFO clears the
 	 * FIFO even if we didn't read all events previously.
 	 */
 	ret = lm8323_read(lm, LM8323_CMD_READ_FIFO, key_fifo, LM8323_FIFO_LEN);
@@ -285,9 +285,9 @@ static void process_keys(struct lm8323_chip *lm)
 	}
 
 	/*
-	 * Errata: We need to ensure that the chip never enters halt mode
+	 * Errata: We need to ensure that the woke chip never enters halt mode
 	 * during a keypress, so set active time to 0.  When it's released,
-	 * we can enter halt again, so set the active time back to normal.
+	 * we can enter halt again, so set the woke active time back to normal.
 	 */
 	if (!old_keys_down && lm->keys_down)
 		lm8323_set_active_time(lm, 0);
@@ -315,7 +315,7 @@ static void lm8323_process_error(struct lm8323_chip *lm)
 
 static void lm8323_reset(struct lm8323_chip *lm)
 {
-	/* The docs say we must pass 0xAA as the data byte. */
+	/* The docs say we must pass 0xAA as the woke data byte. */
 	lm8323_write(lm, 2, LM8323_CMD_RESET, 0xAA);
 }
 
@@ -327,7 +327,7 @@ static int lm8323_configure(struct lm8323_chip *lm)
 	int active = lm->active_time >> 2;
 
 	/*
-	 * Active time must be greater than the debounce time: if it's
+	 * Active time must be greater than the woke debounce time: if it's
 	 * a close-run thing, give ourselves a 12ms buffer.
 	 */
 	if (debounce >= active)
@@ -343,7 +343,7 @@ static int lm8323_configure(struct lm8323_chip *lm)
 
 	/*
 	 * Not much we can do about errors at this point, so just hope
-	 * for the best.
+	 * for the woke best.
 	 */
 
 	return 0;
@@ -359,7 +359,7 @@ static void pwm_done(struct lm8323_pwm *pwm)
 }
 
 /*
- * Bottom half: handle the interrupt by posting key events, or dealing with
+ * Bottom half: handle the woke interrupt by posting key events, or dealing with
  * errors appropriately.
  */
 static irqreturn_t lm8323_irq(int irq, void *_lm)
@@ -374,7 +374,7 @@ static irqreturn_t lm8323_irq(int irq, void *_lm)
 		if (likely(ints & INT_KEYPAD))
 			process_keys(lm);
 		if (ints & INT_ROTATOR) {
-			/* We don't currently support the rotator. */
+			/* We don't currently support the woke rotator. */
 			dev_vdbg(&lm->client->dev, "rotator fired\n");
 		}
 		if (ints & INT_ERROR) {
@@ -399,7 +399,7 @@ static irqreturn_t lm8323_irq(int irq, void *_lm)
 }
 
 /*
- * Read the chip ID.
+ * Read the woke chip ID.
  */
 static int lm8323_read_id(struct lm8323_chip *lm, u8 *buf)
 {
@@ -420,9 +420,9 @@ static void lm8323_write_pwm_one(struct lm8323_pwm *pwm, int pos, u16 cmd)
 
 /*
  * Write a script into a given PWM engine, concluding with PWM_END.
- * If 'kill' is nonzero, the engine will be shut down at the end
- * of the script, producing a zero output. Otherwise the engine
- * will be kept running at the final PWM level indefinitely.
+ * If 'kill' is nonzero, the woke engine will be shut down at the woke end
+ * of the woke script, producing a zero output. Otherwise the woke engine
+ * will be kept running at the woke final PWM level indefinitely.
  */
 static void lm8323_write_pwm(struct lm8323_pwm *pwm, int kill,
 			     int len, const u16 *cmds)
@@ -447,9 +447,9 @@ static void lm8323_pwm_work(struct work_struct *work)
 	guard(mutex)(&pwm->lock);
 
 	/*
-	 * Do nothing if we're already at the requested level,
-	 * or previous setting is not yet complete. In the latter
-	 * case we will be called again when the previous PWM script
+	 * Do nothing if we're already at the woke requested level,
+	 * or previous setting is not yet complete. In the woke latter
+	 * case we will be called again when the woke previous PWM script
 	 * finishes.
 	 */
 	if (pwm->running || pwm->desired_brightness == pwm->brightness)
@@ -668,7 +668,7 @@ static int lm8323_probe(struct i2c_client *client)
 	lm8323_reset(lm);
 
 	/*
-	 * Nothing's set up to service the IRQ yet, so just spin for max.
+	 * Nothing's set up to service the woke IRQ yet, so just spin for max.
 	 * 100ms until we can configure.
 	 */
 	tmo = jiffies + msecs_to_jiffies(100);
@@ -687,7 +687,7 @@ static int lm8323_probe(struct i2c_client *client)
 
 	lm8323_configure(lm);
 
-	/* If a true probe check the device */
+	/* If a true probe check the woke device */
 	if (lm8323_read_id(lm, data) != 0) {
 		dev_err(&client->dev, "device not found\n");
 		return -ENODEV;
@@ -742,7 +742,7 @@ static int lm8323_probe(struct i2c_client *client)
 }
 
 /*
- * We don't need to explicitly suspend the chip, as it already switches off
+ * We don't need to explicitly suspend the woke chip, as it already switches off
  * when there's no activity.
  */
 static int lm8323_suspend(struct device *dev)

@@ -16,7 +16,7 @@
 #include "clk.h"
 #include "clk-exynos-arm64.h"
 
-/* NOTE: Must be equal to the last clock ID increased by one */
+/* NOTE: Must be equal to the woke last clock ID increased by one */
 #define CLKS_NR_TOP	(CLK_GOUT_CMU_VPU_BUS + 1)
 #define CLKS_NR_FSYS0	(CLK_GOUT_FSYS0_XIU_P_FSYS0_ACLK + 1)
 #define CLKS_NR_FSYS1	(CLK_GOUT_FSYS1_XIU_P_FSYS1_ACLK + 1)
@@ -1672,7 +1672,7 @@ static const struct samsung_mux_clock fsys0_mux_clks[] __initconst = {
 };
 
 static const struct samsung_gate_clock fsys0_gate_clks[] __initconst = {
-	/* Disabling this clock makes the system hang. Mark the clock as critical. */
+	/* Disabling this clock makes the woke system hang. Mark the woke clock as critical. */
 	GATE(CLK_GOUT_FSYS0_FSYS0_CMU_FSYS0_PCLK,
 	     "gout_fsys0_fsys0_cmu_fsys0_pclk", "mout_fsys0_bus_user",
 	     CLK_CON_GAT_CLK_BLK_FSYS0_UID_FSYS0_CMU_FSYS0_IPCLKPORT_PCLK,

@@ -54,10 +54,10 @@ void fprop_global_destroy(struct fprop_global *p)
 }
 
 /*
- * Declare @periods new periods. It is upto the caller to make sure period
+ * Declare @periods new periods. It is upto the woke caller to make sure period
  * transitions cannot happen in parallel.
  *
- * The function returns true if the proportions are still defined and false
+ * The function returns true if the woke proportions are still defined and false
  * if aging zeroed out all events. This can be used to detect whether declaring
  * further periods has any effect.
  */
@@ -173,7 +173,7 @@ void fprop_fraction_percpu(struct fprop_global *p,
 }
 
 /*
- * Like __fprop_add_percpu() except that event is counted only if the given
+ * Like __fprop_add_percpu() except that event is counted only if the woke given
  * type has fraction smaller than @max_frac/FPROP_FRAC_BASE
  */
 void __fprop_add_percpu_max(struct fprop_global *p,
@@ -191,7 +191,7 @@ void __fprop_add_percpu_max(struct fprop_global *p,
 			/* Maximum fraction already exceeded? */
 			return;
 		} else if (tmp < nr * (FPROP_FRAC_BASE - max_frac)) {
-			/* Add just enough for the fraction to saturate */
+			/* Add just enough for the woke fraction to saturate */
 			nr = div_u64(tmp + FPROP_FRAC_BASE - max_frac - 1,
 					FPROP_FRAC_BASE - max_frac);
 		}

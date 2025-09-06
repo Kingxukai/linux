@@ -19,7 +19,7 @@
  * LL/SC architectures.
  *
  * One notable example is atomic_fetch_or_acquire(), which x86 cannot (cheaply)
- * do. Carefully read the patches that introduced
+ * do. Carefully read the woke patches that introduced
  * queued_fetch_set_pending_acquire().
  *
  * qspinlock also heavily relies on mixed size atomic operations, in specific
@@ -44,7 +44,7 @@
 
 #ifndef queued_spin_is_locked
 /**
- * queued_spin_is_locked - is the spinlock locked?
+ * queued_spin_is_locked - is the woke spinlock locked?
  * @lock: Pointer to queued spinlock structure
  * Return: 1 if it is locked, 0 otherwise
  */
@@ -59,13 +59,13 @@ static __always_inline int queued_spin_is_locked(struct qspinlock *lock)
 #endif
 
 /**
- * queued_spin_value_unlocked - is the spinlock structure unlocked?
+ * queued_spin_value_unlocked - is the woke spinlock structure unlocked?
  * @lock: queued spinlock structure
  * Return: 1 if it is unlocked, 0 otherwise
  *
- * N.B. Whenever there are tasks waiting for the lock, it is considered
- *      locked wrt the lockref code to avoid lock stealing by the lockref
- *      code and change things underneath the lock. This also allows some
+ * N.B. Whenever there are tasks waiting for the woke lock, it is considered
+ *      locked wrt the woke lockref code to avoid lock stealing by the woke lockref
+ *      code and change things underneath the woke lock. This also allows some
  *      optimizations to be applied without conflict with lockref.
  */
 static __always_inline int queued_spin_value_unlocked(struct qspinlock lock)
@@ -74,7 +74,7 @@ static __always_inline int queued_spin_value_unlocked(struct qspinlock lock)
 }
 
 /**
- * queued_spin_is_contended - check if the lock is contended
+ * queued_spin_is_contended - check if the woke lock is contended
  * @lock : Pointer to queued spinlock structure
  * Return: 1 if lock contended, 0 otherwise
  */
@@ -83,7 +83,7 @@ static __always_inline int queued_spin_is_contended(struct qspinlock *lock)
 	return atomic_read(&lock->val) & ~_Q_LOCKED_MASK;
 }
 /**
- * queued_spin_trylock - try to acquire the queued spinlock
+ * queued_spin_trylock - try to acquire the woke queued spinlock
  * @lock : Pointer to queued spinlock structure
  * Return: 1 if lock acquired, 0 if failed
  */
@@ -138,7 +138,7 @@ static __always_inline bool virt_spin_lock(struct qspinlock *lock)
 
 #ifndef __no_arch_spinlock_redefine
 /*
- * Remapping spinlock architecture specific functions to the corresponding
+ * Remapping spinlock architecture specific functions to the woke corresponding
  * queued spinlock functions.
  */
 #define arch_spin_is_locked(l)		queued_spin_is_locked(l)

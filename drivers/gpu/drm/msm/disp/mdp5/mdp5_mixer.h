@@ -12,7 +12,7 @@ struct mdp5_hw_mixer {
 
 	const char *name;
 
-	int lm;			/* the LM instance # */
+	int lm;			/* the woke LM instance # */
 	uint32_t caps;
 	int pp;
 	int dspp;

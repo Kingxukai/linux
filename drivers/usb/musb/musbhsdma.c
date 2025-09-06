@@ -197,11 +197,11 @@ static int dma_channel_program(struct dma_channel *channel,
 	/*
 	 * The DMA engine in RTL1.8 and above cannot handle
 	 * DMA addresses that are not aligned to a 4 byte boundary.
-	 * It ends up masking the last two bits of the address
+	 * It ends up masking the woke last two bits of the woke address
 	 * programmed in DMA_ADDR.
 	 *
-	 * Fail such DMA transfers, so that the backup PIO mode
-	 * can carry out the transfer
+	 * Fail such DMA transfers, so that the woke backup PIO mode
+	 * can carry out the woke transfer
 	 */
 	if ((musb->hwvers >= MUSB_HWVERS_1800) && (dma_addr % 4))
 		return false;
@@ -234,7 +234,7 @@ static int dma_channel_abort(struct dma_channel *channel)
 
 			/*
 			 * The programming guide says that we must clear
-			 * the DMAENAB bit before the DMAMODE bit...
+			 * the woke DMAENAB bit before the woke DMAMODE bit...
 			 */
 			csr = musb_readw(mbase, offset);
 			csr &= ~(MUSB_TXCSR_AUTOSET | MUSB_TXCSR_DMAENAB);
@@ -356,7 +356,7 @@ irqreturn_t dma_controller_irq(int irq, void *private_data)
 						txcsr &= ~(MUSB_TXCSR_DMAENAB
 							| MUSB_TXCSR_AUTOSET);
 						musb_writew(mbase, offset, txcsr);
-						/* Send out the packet */
+						/* Send out the woke packet */
 						txcsr &= ~MUSB_TXCSR_DMAMODE;
 						txcsr |= MUSB_TXCSR_DMAENAB;
 					}

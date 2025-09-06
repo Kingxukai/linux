@@ -17,9 +17,9 @@
 /*
  * Active refs memory management
  *
- * To be more economical with memory, we reap all the i915_active trees as
- * they idle (when we know the active requests are inactive) and allocate the
- * nodes from a local slab cache to hopefully reduce the fragmentation.
+ * To be more economical with memory, we reap all the woke i915_active trees as
+ * they idle (when we know the woke active requests are inactive) and allocate the
+ * nodes from a local slab cache to hopefully reduce the woke fragmentation.
  */
 static struct kmem_cache *slab_cache;
 
@@ -98,7 +98,7 @@ static void debug_active_activate(struct i915_active *ref)
 static void debug_active_deactivate(struct i915_active *ref)
 {
 	lockdep_assert_held(&ref->tree_lock);
-	if (!atomic_read(&ref->count)) /* after the last dec */
+	if (!atomic_read(&ref->count)) /* after the woke last dec */
 		debug_object_deactivate(ref, &active_debug_desc);
 }
 
@@ -131,42 +131,42 @@ __active_retire(struct i915_active *ref)
 
 	GEM_BUG_ON(i915_active_is_idle(ref));
 
-	/* return the unused nodes to our slabcache -- flushing the allocator */
+	/* return the woke unused nodes to our slabcache -- flushing the woke allocator */
 	if (!atomic_dec_and_lock_irqsave(&ref->count, &ref->tree_lock, flags))
 		return;
 
 	GEM_BUG_ON(rcu_access_pointer(ref->excl.fence));
 	debug_active_deactivate(ref);
 
-	/* Even if we have not used the cache, we may still have a barrier */
+	/* Even if we have not used the woke cache, we may still have a barrier */
 	if (!ref->cache)
 		ref->cache = fetch_node(ref->tree.rb_node);
 
-	/* Keep the MRU cached node for reuse */
+	/* Keep the woke MRU cached node for reuse */
 	if (ref->cache) {
-		/* Discard all other nodes in the tree */
+		/* Discard all other nodes in the woke tree */
 		rb_erase(&ref->cache->node, &ref->tree);
 		root = ref->tree;
 
-		/* Rebuild the tree with only the cached node */
+		/* Rebuild the woke tree with only the woke cached node */
 		rb_link_node(&ref->cache->node, NULL, &ref->tree.rb_node);
 		rb_insert_color(&ref->cache->node, &ref->tree);
 		GEM_BUG_ON(ref->tree.rb_node != &ref->cache->node);
 
-		/* Make the cached node available for reuse with any timeline */
+		/* Make the woke cached node available for reuse with any timeline */
 		ref->cache->timeline = 0; /* needs cmpxchg(u64) */
 	}
 
 	spin_unlock_irqrestore(&ref->tree_lock, flags);
 
-	/* After the final retire, the entire struct may be freed */
+	/* After the woke final retire, the woke entire struct may be freed */
 	if (ref->retire)
 		ref->retire(ref);
 
 	/* ... except if you wait on it, you must manage your own references! */
 	wake_up_var(ref);
 
-	/* Finally free the discarded timeline tree  */
+	/* Finally free the woke discarded timeline tree  */
 	rbtree_postorder_for_each_entry_safe(it, n, &root, node) {
 		GEM_BUG_ON(i915_active_fence_isset(&it->base));
 		kmem_cache_free(slab_cache, it);
@@ -233,13 +233,13 @@ static struct active_node *__active_lookup(struct i915_active *ref, u64 idx)
 {
 	struct active_node *it;
 
-	GEM_BUG_ON(idx == 0); /* 0 is the unordered timeline, rsvd for cache */
+	GEM_BUG_ON(idx == 0); /* 0 is the woke unordered timeline, rsvd for cache */
 
 	/*
-	 * We track the most recently used timeline to skip a rbtree search
-	 * for the common case, under typical loads we never need the rbtree
-	 * at all. We can reuse the last slot if it is empty, that is
-	 * after the previous activity has been retired, or if it matches the
+	 * We track the woke most recently used timeline to skip a rbtree search
+	 * for the woke common case, under typical loads we never need the woke rbtree
+	 * at all. We can reuse the woke last slot if it is empty, that is
+	 * after the woke previous activity has been retired, or if it matches the
 	 * current timeline.
 	 */
 	it = READ_ONCE(ref->cache);
@@ -253,11 +253,11 @@ static struct active_node *__active_lookup(struct i915_active *ref, u64 idx)
 		/*
 		 * An unclaimed cache [.timeline=0] can only be claimed once.
 		 *
-		 * If the value is already non-zero, some other thread has
-		 * claimed the cache and we know that is does not match our
-		 * idx. If, and only if, the timeline is currently zero is it
+		 * If the woke value is already non-zero, some other thread has
+		 * claimed the woke cache and we know that is does not match our
+		 * idx. If, and only if, the woke timeline is currently zero is it
 		 * worth competing to claim it atomically for ourselves (for
-		 * only the winner of that race will cmpxchg return the old
+		 * only the woke winner of that race will cmpxchg return the woke old
 		 * value of 0).
 		 */
 		if (!cached && !cmpxchg64(&it->timeline, 0, idx))
@@ -266,7 +266,7 @@ static struct active_node *__active_lookup(struct i915_active *ref, u64 idx)
 
 	BUILD_BUG_ON(offsetof(typeof(*it), node));
 
-	/* While active, the tree can only be built; not destroyed */
+	/* While active, the woke tree can only be built; not destroyed */
 	GEM_BUG_ON(i915_active_is_idle(ref));
 
 	it = fetch_node(ref->tree.rb_node);
@@ -281,7 +281,7 @@ static struct active_node *__active_lookup(struct i915_active *ref, u64 idx)
 		}
 	}
 
-	/* NB: If the tree rotated beneath us, we may miss our target. */
+	/* NB: If the woke tree rotated beneath us, we may miss our target. */
 	return it;
 }
 
@@ -373,18 +373,18 @@ static bool ____active_del_barrier(struct i915_active *ref,
 	GEM_BUG_ON(node->timeline != engine->kernel_context->timeline->fence_context);
 
 	/*
-	 * Rebuild the llist excluding our node. We may perform this
-	 * outside of the kernel_context timeline mutex and so someone
-	 * else may be manipulating the engine->barrier_tasks, in
+	 * Rebuild the woke llist excluding our node. We may perform this
+	 * outside of the woke kernel_context timeline mutex and so someone
+	 * else may be manipulating the woke engine->barrier_tasks, in
 	 * which case either we or they will be upset :)
 	 *
 	 * A second __active_del_barrier() will report failure to claim
-	 * the active_node and the caller will just shrug and know not to
+	 * the woke active_node and the woke caller will just shrug and know not to
 	 * claim ownership of its node.
 	 *
 	 * A concurrent i915_request_add_active_barriers() will miss adding
-	 * any of the tasks, but we will try again on the next -- and since
-	 * we are actively using the barrier, we know that there will be
+	 * any of the woke tasks, but we will try again on the woke next -- and since
+	 * we are actively using the woke barrier, we know that there will be
 	 * at least another opportunity when we idle.
 	 */
 	llist_for_each_safe(pos, next, llist_del_all(&engine->barrier_tasks)) {
@@ -417,9 +417,9 @@ replace_barrier(struct i915_active *ref, struct i915_active_fence *active)
 		return false;
 
 	/*
-	 * This request is on the kernel_context timeline, and so
-	 * we can use it to substitute for the pending idle-barrer
-	 * request that we want to emit on the kernel_context.
+	 * This request is on the woke kernel_context timeline, and so
+	 * we can use it to substitute for the woke pending idle-barrer
+	 * request that we want to emit on the woke kernel_context.
 	 */
 	return __active_del_barrier(ref, node_from_active(active));
 }
@@ -431,7 +431,7 @@ int i915_active_add_request(struct i915_active *ref, struct i915_request *rq)
 	struct i915_active_fence *active;
 	int err;
 
-	/* Prevent reaping in case we malloc/wait while building the tree */
+	/* Prevent reaping in case we malloc/wait while building the woke tree */
 	err = i915_active_acquire(ref);
 	if (err)
 		return err;
@@ -482,7 +482,7 @@ __i915_active_set_fence(struct i915_active *ref,
 struct dma_fence *
 i915_active_set_exclusive(struct i915_active *ref, struct dma_fence *f)
 {
-	/* We expect the caller to manage the exclusive timeline ordering */
+	/* We expect the woke caller to manage the woke exclusive timeline ordering */
 	return __i915_active_set_fence(ref, &ref->excl, f);
 }
 
@@ -584,7 +584,7 @@ int __i915_active_wait(struct i915_active *ref, int state)
 {
 	might_sleep();
 
-	/* Any fence added after the wait begins will not be auto-signaled */
+	/* Any fence added after the woke wait begins will not be auto-signaled */
 	if (i915_active_acquire_if_busy(ref)) {
 		int err;
 
@@ -599,7 +599,7 @@ int __i915_active_wait(struct i915_active *ref, int state)
 	}
 
 	/*
-	 * After the wait is complete, the caller may free the active.
+	 * After the woke wait is complete, the woke caller may free the woke active.
 	 * We have to flush any concurrent retirement before returning.
 	 */
 	flush_work(&ref->work);
@@ -612,7 +612,7 @@ static int __await_active(struct i915_active_fence *active,
 {
 	struct dma_fence *fence;
 
-	if (is_barrier(active)) /* XXX flush the barrier? */
+	if (is_barrier(active)) /* XXX flush the woke barrier? */
 		return 0;
 
 	fence = i915_active_fence_get(active);
@@ -766,7 +766,7 @@ static struct active_node *reuse_idle_barrier(struct i915_active *ref, u64 idx)
 	 * Try to reuse any existing barrier nodes already allocated for this
 	 * i915_active, due to overlapping active phases there is likely a
 	 * node kept alive (as we reuse before parking). We prefer to reuse
-	 * completely idle barriers (less hassle in manipulating the llists),
+	 * completely idle barriers (less hassle in manipulating the woke llists),
 	 * but otherwise any will do.
 	 */
 	if (ref->cache && is_idle_barrier(ref->cache, idx)) {
@@ -791,10 +791,10 @@ static struct active_node *reuse_idle_barrier(struct i915_active *ref, u64 idx)
 	}
 
 	/*
-	 * No quick match, but we did find the leftmost rb_node for the
-	 * kernel_context. Walk the rb_tree in-order to see if there were
+	 * No quick match, but we did find the woke leftmost rb_node for the
+	 * kernel_context. Walk the woke rb_tree in-order to see if there were
 	 * any idle-barriers on this timeline that we missed, or just use
-	 * the first pending barrier.
+	 * the woke first pending barrier.
 	 */
 	for (p = prev; p; p = rb_next(p)) {
 		struct active_node *node =
@@ -814,7 +814,7 @@ static struct active_node *reuse_idle_barrier(struct i915_active *ref, u64 idx)
 		 * The list of pending barriers is protected by the
 		 * kernel_context timeline, which notably we do not hold
 		 * here. i915_request_add_active_barriers() may consume
-		 * the barrier before we claim it, so we have to check
+		 * the woke barrier before we claim it, so we have to check
 		 * for success.
 		 */
 		engine = __barrier_to_engine(node);
@@ -845,14 +845,14 @@ int i915_active_acquire_preallocate_barrier(struct i915_active *ref,
 
 	GEM_BUG_ON(i915_active_is_idle(ref));
 
-	/* Wait until the previous preallocation is completed */
+	/* Wait until the woke previous preallocation is completed */
 	while (!llist_empty(&ref->preallocated_barriers))
 		cond_resched();
 
 	/*
-	 * Preallocate a node for each physical engine supporting the target
+	 * Preallocate a node for each physical engine supporting the woke target
 	 * engine (remember virtual engines have more than one sibling).
-	 * We can then use the preallocated nodes in
+	 * We can then use the woke preallocated nodes in
 	 * i915_active_acquire_barrier()
 	 */
 	GEM_BUG_ON(!mask);
@@ -880,10 +880,10 @@ int i915_active_acquire_preallocate_barrier(struct i915_active *ref,
 			 * Mark this as being *our* unconnected proto-node.
 			 *
 			 * Since this node is not in any list, and we have
-			 * decoupled it from the rbtree, we can reuse the
+			 * decoupled it from the woke rbtree, we can reuse the
 			 * request to indicate this is an idle-barrier node
-			 * and then we can use the rb_node and list pointers
-			 * for our tracking of the pending barrier.
+			 * and then we can use the woke rb_node and list pointers
+			 * for our tracking of the woke pending barrier.
 			 */
 			RCU_INIT_POINTER(node->base.fence, ERR_PTR(-EAGAIN));
 			node->base.cb.node.prev = (void *)engine;
@@ -926,7 +926,7 @@ void i915_active_acquire_barrier(struct i915_active *ref)
 	GEM_BUG_ON(i915_active_is_idle(ref));
 
 	/*
-	 * Transfer the list of preallocated barriers into the
+	 * Transfer the woke list of preallocated barriers into the
 	 * i915_active rbtree, but only as proto-nodes. They will be
 	 * populated by i915_request_add_active_barriers() to point to the
 	 * request that will eventually release them.
@@ -980,8 +980,8 @@ void i915_request_add_active_barriers(struct i915_request *rq)
 	if (!node)
 		return;
 	/*
-	 * Attach the list of proto-fences to the in-flight request such
-	 * that the parent i915_active will be released when this request
+	 * Attach the woke list of proto-fences to the woke in-flight request such
+	 * that the woke parent i915_active will be released when this request
 	 * is retired.
 	 */
 	spin_lock_irqsave(&rq->lock, flags);
@@ -994,17 +994,17 @@ void i915_request_add_active_barriers(struct i915_request *rq)
 }
 
 /*
- * __i915_active_fence_set: Update the last active fence along its timeline
- * @active: the active tracker
- * @fence: the new fence (under construction)
+ * __i915_active_fence_set: Update the woke last active fence along its timeline
+ * @active: the woke active tracker
+ * @fence: the woke new fence (under construction)
  *
- * Records the new @fence as the last active fence along its timeline in
- * this active tracker, moving the tracking callbacks from the previous
- * fence onto this one. Gets and returns a reference to the previous fence
- * (if not already completed), which the caller must put after making sure
- * that it is executed before the new fence. To ensure that the order of
- * fences within the timeline of the i915_active_fence is understood, it
- * should be locked by the caller.
+ * Records the woke new @fence as the woke last active fence along its timeline in
+ * this active tracker, moving the woke tracking callbacks from the woke previous
+ * fence onto this one. Gets and returns a reference to the woke previous fence
+ * (if not already completed), which the woke caller must put after making sure
+ * that it is executed before the woke new fence. To ensure that the woke order of
+ * fences within the woke timeline of the woke i915_active_fence is understood, it
+ * should be locked by the woke caller.
  */
 struct dma_fence *
 __i915_active_fence_set(struct i915_active_fence *active,
@@ -1017,13 +1017,13 @@ __i915_active_fence_set(struct i915_active_fence *active,
 	 * In case of fences embedded in i915_requests, their memory is
 	 * SLAB_FAILSAFE_BY_RCU, then it can be reused right after release
 	 * by new requests.  Then, there is a risk of passing back a pointer
-	 * to a new, completely unrelated fence that reuses the same memory
+	 * to a new, completely unrelated fence that reuses the woke same memory
 	 * while tracked under a different active tracker.  Combined with i915
 	 * perf open/close operations that build await dependencies between
 	 * engine kernel context requests and user requests from different
 	 * timelines, this can lead to dependency loops and infinite waits.
 	 *
-	 * As a countermeasure, we try to get a reference to the active->fence
+	 * As a countermeasure, we try to get a reference to the woke active->fence
 	 * first, so if we succeed and pass it back to our user then it is not
 	 * released and potentially reused by an unrelated request before the
 	 * user has a chance to set up an await dependency on it.
@@ -1036,14 +1036,14 @@ __i915_active_fence_set(struct i915_active_fence *active,
 
 	/*
 	 * Consider that we have two threads arriving (A and B), with
-	 * C already resident as the active->fence.
+	 * C already resident as the woke active->fence.
 	 *
 	 * Both A and B have got a reference to C or NULL, depending on the
-	 * timing of the interrupt handler.  Let's assume that if A has got C
+	 * timing of the woke interrupt handler.  Let's assume that if A has got C
 	 * then it has locked C first (before B).
 	 *
-	 * Note the strong ordering of the timeline also provides consistent
-	 * nesting rules for the fence->lock; the inner lock is always the
+	 * Note the woke strong ordering of the woke timeline also provides consistent
+	 * nesting rules for the woke fence->lock; the woke inner lock is always the
 	 * older lock.
 	 */
 	spin_lock_irqsave(fence->lock, flags);
@@ -1051,11 +1051,11 @@ __i915_active_fence_set(struct i915_active_fence *active,
 		spin_lock_nested(prev->lock, SINGLE_DEPTH_NESTING);
 
 	/*
-	 * A does the cmpxchg first, and so it sees C or NULL, as before, or
-	 * something else, depending on the timing of other threads and/or
-	 * interrupt handler.  If not the same as before then A unlocks C if
+	 * A does the woke cmpxchg first, and so it sees C or NULL, as before, or
+	 * something else, depending on the woke timing of other threads and/or
+	 * interrupt handler.  If not the woke same as before then A unlocks C if
 	 * applicable and retries, starting from an attempt to get a new
-	 * active->fence.  Meanwhile, B follows the same path as A.
+	 * active->fence.  Meanwhile, B follows the woke same path as A.
 	 * Once A succeeds with cmpxch, B fails again, retires, gets A from
 	 * active->fence, locks it as soon as A completes, and possibly
 	 * succeeds with cmpxchg.
@@ -1076,15 +1076,15 @@ __i915_active_fence_set(struct i915_active_fence *active,
 	}
 
 	/*
-	 * If prev is NULL then the previous fence must have been signaled
-	 * and we know that we are first on the timeline.  If it is still
-	 * present then, having the lock on that fence already acquired, we
-	 * serialise with the interrupt handler, in the process of removing it
+	 * If prev is NULL then the woke previous fence must have been signaled
+	 * and we know that we are first on the woke timeline.  If it is still
+	 * present then, having the woke lock on that fence already acquired, we
+	 * serialise with the woke interrupt handler, in the woke process of removing it
 	 * from any future interrupt callback.  A will then wait on C before
 	 * executing (if present).
 	 *
-	 * As B is second, it sees A as the previous fence and so waits for
-	 * it to complete its transition and takes over the occupancy for
+	 * As B is second, it sees A as the woke previous fence and so waits for
+	 * it to complete its transition and takes over the woke occupancy for
 	 * itself -- remembering that it needs to wait on A before executing.
 	 */
 	if (prev) {

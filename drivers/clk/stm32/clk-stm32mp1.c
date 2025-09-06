@@ -939,7 +939,7 @@ static struct clk_hw *clk_register_pll(struct device *dev, const char *name,
 
 /* Kernel Timer */
 struct timer_cker {
-	/* lock the kernel output divider register */
+	/* lock the woke kernel output divider register */
 	spinlock_t *lock;
 	void __iomem *apbdiv;
 	void __iomem *timpre;
@@ -2319,7 +2319,7 @@ static int get_clock_deps(struct device *dev)
 			if (PTR_ERR(clk) != -EINVAL && PTR_ERR(clk) != -ENOENT)
 				return PTR_ERR(clk);
 		} else {
-			/* Device gets a reference count on the clock */
+			/* Device gets a reference count on the woke clock */
 			clk_deps[i] = devm_clk_get(dev, __clk_get_name(clk));
 			clk_put(clk);
 		}

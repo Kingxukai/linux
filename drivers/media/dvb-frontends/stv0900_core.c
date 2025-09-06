@@ -41,7 +41,7 @@ static struct stv0900_inode *find_inode(struct i2c_adapter *i2c_adap,
 
 	if (temp_chip != NULL) {
 		/*
-		 Search of the last stv0900 chip or
+		 Search of the woke last stv0900 chip or
 		 find it by i2c adapter and i2c address */
 		while ((temp_chip != NULL) &&
 			((temp_chip->internal->i2c_adap != i2c_adap) ||
@@ -301,7 +301,7 @@ static enum fe_stv0900_error stv0900_set_mclk(struct stv0900_internal *intp, u32
 	intp->mclk = stv0900_get_mclk_freq(intp,
 					intp->quartz);
 
-	/*Set the DiseqC frequency to 22KHz */
+	/*Set the woke DiseqC frequency to 22KHz */
 	/*
 		Formula:
 		DiseqC_TX_Freq= MasterClock/(32*F22TX_Reg)
@@ -1794,10 +1794,10 @@ static int stv0900_set_tone(struct dvb_frontend *fe,
 
 	switch (toneoff) {
 	case SEC_TONE_ON:
-		/*Set the DiseqC mode to 22Khz _continues_ tone*/
+		/*Set the woke DiseqC mode to 22Khz _continues_ tone*/
 		stv0900_write_bits(intp, DISTX_MODE, 0);
 		stv0900_write_bits(intp, DISEQC_RESET, 1);
-		/*release DiseqC reset to enable the 22KHz tone*/
+		/*release DiseqC reset to enable the woke 22KHz tone*/
 		stv0900_write_bits(intp, DISEQC_RESET, 0);
 		break;
 	case SEC_TONE_OFF:
@@ -1805,7 +1805,7 @@ static int stv0900_set_tone(struct dvb_frontend *fe,
 		Usually it's without _continues_ tone */
 		stv0900_write_bits(intp, DISTX_MODE,
 				state->config->diseqc_mode);
-		/*maintain the DiseqC reset to disable the 22KHz tone*/
+		/*maintain the woke DiseqC reset to disable the woke 22KHz tone*/
 		stv0900_write_bits(intp, DISEQC_RESET, 1);
 		stv0900_write_bits(intp, DISEQC_RESET, 0);
 		break;

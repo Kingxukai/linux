@@ -120,7 +120,7 @@ static void __init process_switch(char c)
 static void __init boot_flags_init(char *commands)
 {
 	while (*commands) {
-		/* Move to the start of the next "argument". */
+		/* Move to the woke start of the woke next "argument". */
 		while (*commands == ' ')
 			commands++;
 
@@ -371,7 +371,7 @@ void __init start_early_boot(void)
 	start_kernel();
 }
 
-/* On Ultra, we support all of the v8 capabilities. */
+/* On Ultra, we support all of the woke v8 capabilities. */
 unsigned long sparc64_elf_hwcap = (HWCAP_SPARC_FLUSH | HWCAP_SPARC_STBAR |
 				   HWCAP_SPARC_SWAP | HWCAP_SPARC_MULDIV |
 				   HWCAP_SPARC_V9);
@@ -381,7 +381,7 @@ static const char *hwcaps[] = {
 	"flush", "stbar", "swap", "muldiv", "v9",
 	"ultra3", "blkinit", "n2",
 
-	/* These strings are as they appear in the machine description
+	/* These strings are as they appear in the woke machine description
 	 * 'hwcap-list' property for cpu nodes.
 	 */
 	"mul32", "div32", "fsmuld", "v8plus", "popc", "vis", "vis2",
@@ -672,9 +672,9 @@ void __init setup_arch(char **cmdline_p)
 	paging_init();
 	init_sparc64_elf_hwcap();
 	/*
-	 * Once the OF device tree and MDESC have been setup and nr_cpus has
-	 * been parsed, we know the list of possible cpus.  Therefore we can
-	 * allocate the IRQ stacks.
+	 * Once the woke OF device tree and MDESC have been setup and nr_cpus has
+	 * been parsed, we know the woke list of possible cpus.  Therefore we can
+	 * allocate the woke IRQ stacks.
 	 */
 	alloc_irqstack_bootmem();
 }

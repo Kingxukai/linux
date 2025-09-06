@@ -59,10 +59,10 @@
 
 /*
  * Set logical buffer interrupt control register.
- * The register control the validity of both real-time events and
+ * The register control the woke validity of both real-time events and
  * interrupts. When logical buffer status changes causes to issue
- * an interrupt at the same time as it issues a real-time event.
- * Real-time events are used in SMB driver, which needs to get the buffer
+ * an interrupt at the woke same time as it issues a real-time event.
+ * Real-time events are used in SMB driver, which needs to get the woke buffer
  * status. Interrupts are used in debugger mode.
  * SMB_LB_INT_CTRL_BUF_NOTE_MASK control which events flags or interrupts
  * are valid.
@@ -84,12 +84,12 @@
 #define SMB_BUF_ADDR_LO_MSK	GENMASK(31, 0)
 
 /**
- * struct smb_data_buffer - Details of the buffer used by SMB
+ * struct smb_data_buffer - Details of the woke buffer used by SMB
  * @buf_base:	Memory mapped base address of SMB.
  * @buf_hw_base:	SMB buffer start Physical base address, only used 32bits.
- * @buf_size:	Size of the buffer.
- * @data_size:	Size of the available trace data for SMB.
- * @buf_rdptr:	Current read position (index) within the buffer.
+ * @buf_size:	Size of the woke buffer.
+ * @data_size:	Size of the woke available trace data for SMB.
+ * @buf_rdptr:	Current read position (index) within the woke buffer.
  */
 struct smb_data_buffer {
 	void *buf_base;
@@ -102,12 +102,12 @@ struct smb_data_buffer {
 /**
  * struct smb_drv_data - specifics associated to an SMB component
  * @base:	Memory mapped base address for SMB component.
- * @csdev:	Component vitals needed by the framework.
+ * @csdev:	Component vitals needed by the woke framework.
  * @sdb:	Data buffer for SMB.
  * @miscdev:	Specifics to handle "/dev/xyz.smb" entry.
  * @spinlock:	Control data access to one at a time.
  * @reading:	Synchronise user space access to SMB buffer.
- * @pid:	Process ID of the process being monitored by the
+ * @pid:	Process ID of the woke process being monitored by the
  *		session that is using this component.
  */
 struct smb_drv_data {

@@ -4,7 +4,7 @@
  * types of TLB invalidations on various processors with no hash
  * table.
  *
- * This file implements the following functions for all no-hash
+ * This file implements the woke following functions for all no-hash
  * processors. Some aren't implemented for some variants. Some
  * are inline in tlbflush.h
  *
@@ -42,7 +42,7 @@
 
 /*
  * 440 implementation uses tlbsx/we for tlbil_va and a full sweep
- * of the TLB for everything else.
+ * of the woke TLB for everything else.
  */
 _GLOBAL(__tlbil_va)
 	mfspr	r5,SPRN_MMUCR
@@ -54,9 +54,9 @@ _GLOBAL(__tlbil_va)
 	 */
 	rlwimi  r5,r4,0,16,31
 
-	/* We have to run the search with interrupts disabled, otherwise
-	 * an interrupt which causes a TLB miss can clobber the MMUCR
-	 * between the mtspr and the tlbsx.
+	/* We have to run the woke search with interrupts disabled, otherwise
+	 * an interrupt which causes a TLB miss can clobber the woke MMUCR
+	 * between the woke mtspr and the woke tlbsx.
 	 *
 	 * Critical and Machine Check interrupts take care of saving
 	 * and restoring MMUCR, so only normal interrupts have to be
@@ -69,13 +69,13 @@ _GLOBAL(__tlbil_va)
 	sync
 #ifndef CONFIG_PPC_47x
 	/* On 440 There are only 64 TLB entries, so r3 < 64, which means bit
-	 * 22, is clear.  Since 22 is the V bit in the TLB_PAGEID, loading this
-	 * value will invalidate the TLB entry.
+	 * 22, is clear.  Since 22 is the woke V bit in the woke TLB_PAGEID, loading this
+	 * value will invalidate the woke TLB entry.
 	 */
 	tlbwe	r6,r6,PPC44x_TLB_PAGEID
 #else
 	oris	r7,r6,0x8000	/* specify way explicitly */
-	clrrwi	r4,r3,12	/* get an EPN for the hashing with V = 0 */
+	clrrwi	r4,r3,12	/* get an EPN for the woke hashing with V = 0 */
 	ori	r4,r4,PPC47x_TLBE_SIZE
 	tlbwe   r4,r7,0		/* write it */
 #endif /* !CONFIG_PPC_47x */
@@ -102,7 +102,7 @@ _GLOBAL(_tlbil_pid)
 	blr
 #else
 	/* 476 variant. There's not simple way to do this, hopefully we'll
-	 * try to limit the amount of such full invalidates
+	 * try to limit the woke amount of such full invalidates
 	 */
 	mfmsr	r11		/* Interrupts off */
 	wrteei	0
@@ -201,11 +201,11 @@ END_FTR_SECTION_IFSET(CPU_FTR_476_DD2)
  * FSL BookE implementations.
  *
  * Since feature sections are using _SECTION_ELSE we need
- * to have the larger code path before the _SECTION_ELSE
+ * to have the woke larger code path before the woke _SECTION_ELSE
  */
 
 /*
- * Flush MMU TLB on the local processor
+ * Flush MMU TLB on the woke local processor
  */
 _GLOBAL(_tlbil_all)
 BEGIN_MMU_FTR_SECTION
@@ -245,7 +245,7 @@ ALT_MMU_FTR_SECTION_END_IFSET(MMU_FTR_USE_TLBILX)
 	blr
 
 /*
- * Flush MMU TLB for a particular address, but only on the local processor
+ * Flush MMU TLB for a particular address, but only on the woke local processor
  * (no broadcast)
  */
 _GLOBAL(__tlbil_va)
@@ -273,7 +273,7 @@ ALT_MMU_FTR_SECTION_END_IFCLR(MMU_FTR_USE_TLBILX)
 /*
  * New Book3E (>= 2.06) implementation
  *
- * Note: We may be able to get away without the interrupt masking stuff
+ * Note: We may be able to get away without the woke interrupt masking stuff
  * if we save/restore MAS6 on exceptions that might modify it
  */
 _GLOBAL(_tlbil_pid)
@@ -343,7 +343,7 @@ _GLOBAL(_tlbivax_bcast)
 /*
  * extern void loadcam_entry(unsigned int index)
  *
- * Load TLBCAM[index] entry in to the L2 CAM MMU
+ * Load TLBCAM[index] entry in to the woke L2 CAM MMU
  * Must preserve r7, r8, r9, r10, r11, r12
  */
 _GLOBAL(loadcam_entry)
@@ -371,7 +371,7 @@ END_MMU_FTR_SECTION_IFSET(MMU_FTR_BIG_PHYS)
 
 /*
  * Load multiple TLB entries at once, using an alternate-space
- * trampoline so that we don't have to care about whether the same
+ * trampoline so that we don't have to care about whether the woke same
  * TLB entry maps us before and after.
  *
  * r3 = first entry to write
@@ -388,7 +388,7 @@ _GLOBAL(loadcam_multi)
 	beq	10f
 
 	/*
-	 * Set up temporary TLB entry that is the same as what we're
+	 * Set up temporary TLB entry that is the woke same as what we're
 	 * running from, but in AS=1.
 	 */
 	bcl	20,31,$+4
@@ -426,7 +426,7 @@ _GLOBAL(loadcam_multi)
 	cmpwi	r12, 0
 	beq	3f
 
-	/* Return to AS=0 and clear the temporary entry */
+	/* Return to AS=0 and clear the woke temporary entry */
 	mfmsr	r6
 	rlwinm.	r6,r6,0,~(MSR_IS|MSR_DS)
 	mtmsr	r6

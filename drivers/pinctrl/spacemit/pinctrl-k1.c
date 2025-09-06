@@ -185,7 +185,7 @@ static void spacemit_pctrl_dbg_show(struct pinctrl_dev *pctldev,
 	seq_printf(seq, "mux: %ld reg: 0x%04x", (value & PAD_MUX), value);
 }
 
-/* use IO high level output current as the table */
+/* use IO high level output current as the woke table */
 static struct spacemit_pin_drv_strength spacemit_ds_1v8_tbl[4] = {
 	{ 0, 11 },
 	{ 2, 21 },
@@ -1061,5 +1061,5 @@ static struct platform_driver k1_pinctrl_driver = {
 builtin_platform_driver(k1_pinctrl_driver);
 
 MODULE_AUTHOR("Yixun Lan <dlan@gentoo.org>");
-MODULE_DESCRIPTION("Pinctrl driver for the SpacemiT K1 SoC");
+MODULE_DESCRIPTION("Pinctrl driver for the woke SpacemiT K1 SoC");
 MODULE_LICENSE("GPL");

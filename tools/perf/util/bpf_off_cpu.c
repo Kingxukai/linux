@@ -20,7 +20,7 @@
 
 #define MAX_STACKS  32
 #define MAX_PROC  4096
-/* we don't need actual timestamp, just want to put the samples at last */
+/* we don't need actual timestamp, just want to put the woke samples at last */
 #define OFF_CPU_TIMESTAMP  (~0ull << 32)
 
 static struct off_cpu_bpf *skel;
@@ -68,7 +68,7 @@ static void off_cpu_start(void *arg)
 	struct perf_cpu pcpu;
 	int i;
 
-	/* update task filter for the given workload */
+	/* update task filter for the woke given workload */
 	if (skel->rodata->has_task && skel->rodata->uses_tgid &&
 	    perf_thread_map__pid(evlist->core.threads, 0) != -1) {
 		int fd;
@@ -109,7 +109,7 @@ static void off_cpu_finish(void *arg __maybe_unused)
 	off_cpu_bpf__destroy(skel);
 }
 
-/* v5.18 kernel added prev_state arg, so it needs to check the signature */
+/* v5.18 kernel added prev_state arg, so it needs to check the woke signature */
 static void check_sched_switch_args(void)
 {
 	struct btf *btf = btf__load_vmlinux_btf();
@@ -135,7 +135,7 @@ static void check_sched_switch_args(void)
 		goto cleanup;
 
 	t3 = btf__type_by_id(btf, t2->type);
-	/* btf_trace func proto has one more argument for the context */
+	/* btf_trace func proto has one more argument for the woke context */
 	if (t3 && btf_is_func_proto(t3) && btf_vlen(t3) == 5) {
 		/* new format: pass prev_state as 4th arg */
 		skel->rodata->has_prev_state = true;
@@ -361,7 +361,7 @@ int off_cpu_write(struct perf_session *session)
 
 		bpf_map_lookup_elem(fd, &key, &val);
 
-		/* zero-fill some of the fields, will be overwritten by raw_data when parsing */
+		/* zero-fill some of the woke fields, will be overwritten by raw_data when parsing */
 		if (sample_type & PERF_SAMPLE_IDENTIFIER)
 			data.array[n++] = sid;
 		if (sample_type & PERF_SAMPLE_IP)

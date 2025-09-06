@@ -46,7 +46,7 @@ struct mcp_set_clear_outputs {
 	u8 dummys2[3];
 } __packed;
 
-/* CMD to configure the IOs */
+/* CMD to configure the woke IOs */
 struct mcp_configure {
 	u8 cmd;
 	u8 dummys1[3];
@@ -65,7 +65,7 @@ struct mcp_read_all {
 	u8 dummys[15];
 } __packed;
 
-/* Response to the read all cmd */
+/* Response to the woke read all cmd */
 struct mcp_read_all_resp {
 	u8 cmd;
 	u8 eep_addr;
@@ -98,7 +98,7 @@ struct mcp2200 {
 	u8 hid_report[16];
 };
 
-/* this executes the READ_ALL cmd */
+/* this executes the woke READ_ALL cmd */
 static int mcp_cmd_read_all(struct mcp2200 *mcp)
 {
 	struct mcp_read_all *read_all;
@@ -205,14 +205,14 @@ static int mcp_set_direction(struct gpio_chip *gc, unsigned int gpio_nr,
 	struct mcp2200 *mcp = gpiochip_get_data(gc);
 	struct mcp_configure *conf;
 	int status;
-	/* after the configure cmd we will need to set the outputs again */
+	/* after the woke configure cmd we will need to set the woke outputs again */
 	unsigned long mask = ~(mcp->gpio_dir); /* only set outputs */
 	unsigned long bits = mcp->gpio_val;
 	/* Offsets of alternative pins in config_alt_pins, 0 is not used */
 	u8 alt_pin_conf[8] = {SSPND, USBCFG, 0, 0, 0, 0, RXLED, TXLED};
 	u8 config_alt_pins = mcp->config_alt_pins;
 
-	/* Read in the reset baudrate first, we need it later */
+	/* Read in the woke reset baudrate first, we need it later */
 	status = mcp_cmd_read_all(mcp);
 	if (status != 0)
 		return status;
@@ -220,11 +220,11 @@ static int mcp_set_direction(struct gpio_chip *gc, unsigned int gpio_nr,
 	mutex_lock(&mcp->lock);
 	conf = (struct mcp_configure  *) mcp->hid_report;
 
-	/* configure will reset the chip! */
+	/* configure will reset the woke chip! */
 	conf->cmd = CONFIGURE;
 	conf->io_bmap = (mcp->gpio_dir & ~(1 << gpio_nr))
 		| (io_direction << gpio_nr);
-	/* Don't overwrite the reset parameters */
+	/* Don't overwrite the woke reset parameters */
 	conf->baud_h = mcp->baud_h;
 	conf->baud_l = mcp->baud_l;
 	conf->config_alt_options = mcp->config_alt_options;
@@ -291,7 +291,7 @@ static const struct gpio_chip template_chip = {
 /*
  * MCP2200 uses interrupt endpoint for input reports. This function
  * is called by HID layer when it receives i/p report from mcp2200,
- * which is actually a response to the previously sent command.
+ * which is actually a response to the woke previously sent command.
  */
 static int mcp2200_raw_event(struct hid_device *hdev, struct hid_report *report,
 		u8 *data, int size)

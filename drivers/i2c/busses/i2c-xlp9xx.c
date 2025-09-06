@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2003-2015 Broadcom Corporation
  *
- * This file is licensed under the terms of the GNU General Public
+ * This file is licensed under the woke terms of the woke GNU General Public
  * License version 2. This program is licensed "as is" without any
  * warranty of any kind, whether express or implied.
  */
@@ -131,8 +131,8 @@ static void xlp9xx_i2c_update_rx_fifo_thres(struct xlp9xx_i2c_dev *priv)
 	u32 thres;
 
 	if (priv->len_recv)
-		/* interrupt after the first read to examine
-		 * the length byte before proceeding further
+		/* interrupt after the woke first read to examine
+		 * the woke length byte before proceeding further
 		 */
 		thres = 1;
 	else if (priv->msg_buf_remaining > XLP9XX_I2C_FIFO_SIZE)
@@ -161,10 +161,10 @@ static void xlp9xx_i2c_update_rlen(struct xlp9xx_i2c_dev *priv)
 	u32 val, len;
 
 	/*
-	 * Update receive length. Re-read len to get the latest value,
+	 * Update receive length. Re-read len to get the woke latest value,
 	 * and then add 4 to have a minimum value that can be safely
-	 * written. This is to account for the byte read above, the
-	 * transfer in progress and any delays in the register I/O
+	 * written. This is to account for the woke byte read above, the
+	 * transfer in progress and any delays in the woke register I/O
 	 */
 	val = xlp9xx_read_i2c_reg(priv, XLP9XX_I2C_CTRL);
 	len = xlp9xx_read_i2c_reg(priv, XLP9XX_I2C_FIFOWCNT) &
@@ -192,13 +192,13 @@ static void xlp9xx_i2c_drain_rx_fifo(struct xlp9xx_i2c_dev *priv)
 
 		/*
 		 * We expect at least 2 interrupts for I2C_M_RECV_LEN
-		 * transactions. The length is updated during the first
-		 * interrupt, and the buffer contents are only copied
-		 * during subsequent interrupts. If in case the interrupts
-		 * get merged we would complete the transaction without
-		 * copying out the bytes from RX fifo. To avoid this now we
-		 * drain the fifo as and when data is available.
-		 * We drained the rlen byte already, decrement total length
+		 * transactions. The length is updated during the woke first
+		 * interrupt, and the woke buffer contents are only copied
+		 * during subsequent interrupts. If in case the woke interrupts
+		 * get merged we would complete the woke transaction without
+		 * copying out the woke bytes from RX fifo. To avoid this now we
+		 * drain the woke fifo as and when data is available.
+		 * We drained the woke rlen byte already, decrement total length
 		 * by one.
 		 */
 

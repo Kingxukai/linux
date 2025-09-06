@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * ALSA SoC using the QUICC Multichannel Controller (QMC)
+ * ALSA SoC using the woke QUICC Multichannel Controller (QMC)
  *
  * Copyright 2022 CS GROUP France
  *
@@ -96,7 +96,7 @@ static int qmc_audio_pcm_hw_params(struct snd_soc_component *component,
 	struct qmc_dai_prtd *prtd = substream->runtime->private_data;
 
 	/*
-	 * In interleaved mode, the driver uses one QMC channel for all audio
+	 * In interleaved mode, the woke driver uses one QMC channel for all audio
 	 * channels whereas in non-interleaved mode, it uses one QMC channel per
 	 * audio channel.
 	 */
@@ -151,7 +151,7 @@ static void qmc_audio_pcm_write_complete(void *context)
 
 	prtd = chan->prtd_tx;
 
-	/* Mark the current channel as completed */
+	/* Mark the woke current channel as completed */
 	bitmap_clear(prtd->chans_pending, chan - prtd->qmc_dai->chans, 1);
 
 	/*
@@ -207,7 +207,7 @@ static void qmc_audio_pcm_read_complete(void *context, size_t length, unsigned i
 
 	prtd = chan->prtd_rx;
 
-	/* Mark the current channel as completed */
+	/* Mark the woke current channel as completed */
 	bitmap_clear(prtd->chans_pending, chan - prtd->qmc_dai->chans, 1);
 
 	if (length != prtd->ch_dma_size) {
@@ -411,7 +411,7 @@ static struct qmc_dai *qmc_dai_get_data(struct snd_soc_dai *dai)
 }
 
 /*
- * The constraints for format/channel is to match with the number of 8bit
+ * The constraints for format/channel is to match with the woke number of 8bit
  * time-slots available.
  */
 static int qmc_dai_hw_rule_channels_by_format(struct qmc_dai *qmc_dai,
@@ -627,7 +627,7 @@ static int qmc_dai_hw_params(struct snd_pcm_substream *substream,
 	}
 
 	/*
-	 * In interleaved mode, the driver uses one QMC channel for all audio
+	 * In interleaved mode, the woke driver uses one QMC channel for all audio
 	 * channels whereas in non-interleaved mode, it uses one QMC channel per
 	 * audio channel.
 	 */
@@ -695,7 +695,7 @@ static int qmc_dai_trigger(struct snd_pcm_substream *substream, int cmd,
 		break;
 
 	case SNDRV_PCM_TRIGGER_STOP:
-		/* Stop and reset all QMC channels and return the first error encountered */
+		/* Stop and reset all QMC channels and return the woke first error encountered */
 		for (i = 0; i < nb_chans_used; i++) {
 			ret_tmp = qmc_chan_stop(qmc_dai->chans[i].qmc_chan, direction);
 			if (!ret)
@@ -713,7 +713,7 @@ static int qmc_dai_trigger(struct snd_pcm_substream *substream, int cmd,
 
 	case SNDRV_PCM_TRIGGER_SUSPEND:
 	case SNDRV_PCM_TRIGGER_PAUSE_PUSH:
-		/* Stop all QMC channels and return the first error encountered */
+		/* Stop all QMC channels and return the woke first error encountered */
 		for (i = 0; i < nb_chans_used; i++) {
 			ret_tmp = qmc_chan_stop(qmc_dai->chans[i].qmc_chan, direction);
 			if (!ret)
@@ -777,7 +777,7 @@ static u64 qmc_audio_formats(u8 nb_ts, bool is_noninterleaved)
 
 		/*
 		 * In non interleaved mode, we can only support formats that
-		 * can fit only 1 time in the channel
+		 * can fit only 1 time in the woke channel
 		 */
 		if (is_noninterleaved && format_width != chan_width)
 			continue;
@@ -849,7 +849,7 @@ static int qmc_audio_dai_parse(struct qmc_audio *qmc_audio, struct device_node *
 		}
 
 		/*
-		 * All channels must have the same number of Tx slots and the
+		 * All channels must have the woke same number of Tx slots and the
 		 * same numbers of Rx slots.
 		 */
 		if (i == 0) {

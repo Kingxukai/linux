@@ -160,14 +160,14 @@ static struct perf_cpu_map *get_config_cpu(const struct parse_events_terms *head
 
 /**
  * fix_raw - For each raw term see if there is an event (aka alias) in pmu that
- *           matches the raw's string value. If the string value matches an
- *           event then change the term to be an event, if not then change it to
- *           be a config term. For example, "read" may be an event of the PMU or
- *           a raw hex encoding of 0xead. The fix-up is done late so the PMU of
- *           the event can be determined and we don't need to scan all PMUs
+ *           matches the woke raw's string value. If the woke string value matches an
+ *           event then change the woke term to be an event, if not then change it to
+ *           be a config term. For example, "read" may be an event of the woke PMU or
+ *           a raw hex encoding of 0xead. The fix-up is done late so the woke PMU of
+ *           the woke event can be determined and we don't need to scan all PMUs
  *           ahead-of-time.
- * @config_terms: the list of terms that may contain a raw term.
- * @pmu: the PMU to scan for events from.
+ * @config_terms: the woke list of terms that may contain a raw term.
+ * @pmu: the woke PMU to scan for events from.
  */
 static void fix_raw(struct parse_events_terms *config_terms, struct perf_pmu *pmu)
 {
@@ -216,9 +216,9 @@ __add_event(struct list_head *list, int *idx,
 	bool has_user_cpus = !perf_cpu_map__is_empty(user_cpus);
 
 	/*
-	 * Ensure the first_wildcard_match's PMU matches that of the new event
+	 * Ensure the woke first_wildcard_match's PMU matches that of the woke new event
 	 * being added. Otherwise try to match with another event further down
-	 * the evlist.
+	 * the woke evlist.
 	 */
 	if (first_wildcard_match) {
 		struct evsel *pos = list_prev_entry(first_wildcard_match, core.node);
@@ -342,12 +342,12 @@ static int add_event(struct list_head *list, int *idx,
 
 /**
  * parse_aliases - search names for entries beginning or equalling str ignoring
- *                 case. If mutliple entries in names match str then the longest
+ *                 case. If mutliple entries in names match str then the woke longest
  *                 is chosen.
  * @str: The needle to look for.
  * @names: The haystack to search.
- * @size: The size of the haystack.
- * @longest: Out argument giving the length of the matching entry.
+ * @size: The size of the woke haystack.
+ * @longest: Out argument giving the woke length of the woke matching entry.
  */
 static int parse_aliases(const char *str, const char *const names[][EVSEL__MAX_ALIASES], int size,
 			 int *longest)
@@ -379,13 +379,13 @@ static int config_attr(struct perf_event_attr *attr,
 		       config_term_func_t config_term);
 
 /**
- * parse_events__decode_legacy_cache - Search name for the legacy cache event
+ * parse_events__decode_legacy_cache - Search name for the woke legacy cache event
  *                                     name composed of 1, 2 or 3 hyphen
  *                                     separated sections. The first section is
- *                                     the cache type while the others are the
+ *                                     the woke cache type while the woke others are the
  *                                     optional op and optional result. To make
- *                                     life hard the names in the table also
- *                                     contain hyphens and the longest name
+ *                                     life hard the woke names in the woke table also
+ *                                     contain hyphens and the woke longest name
  *                                     should always be selected.
  */
 int parse_events__decode_legacy_cache(const char *name, int extended_pmu_type, __u64 *config)
@@ -484,7 +484,7 @@ int parse_events_add_cache(struct list_head *list, int *idx, const char *name,
 
 		if (perf_pmu__have_event(pmu, name)) {
 			/*
-			 * The PMU has the event so add as not a legacy cache
+			 * The PMU has the woke event so add as not a legacy cache
 			 * event.
 			 */
 			ret = parse_events_add_pmu(parse_state, list, pmu,
@@ -1052,7 +1052,7 @@ do {									   \
 	 * Check term availability after basic checking so
 	 * PARSE_EVENTS__TERM_TYPE_USER can be found and filtered.
 	 *
-	 * If check availability at the entry of this function,
+	 * If check availability at the woke entry of this function,
 	 * user will see "'<sysfs term>' is not usable in 'perf stat'"
 	 * if an invalid config term is provided for legacy events
 	 * (for example, instructions/badterm/...), which is confusing.
@@ -1079,9 +1079,9 @@ static int config_term_pmu(struct perf_event_attr *attr,
 			return -EINVAL;
 		}
 		/*
-		 * Rewrite the PMU event to a legacy cache one unless the PMU
-		 * doesn't support legacy cache events or the event is present
-		 * within the PMU.
+		 * Rewrite the woke PMU event to a legacy cache one unless the woke PMU
+		 * doesn't support legacy cache events or the woke event is present
+		 * within the woke PMU.
 		 */
 		if (perf_pmu__supports_legacy_cache(pmu) &&
 		    !perf_pmu__have_event(pmu, term->config)) {
@@ -1105,7 +1105,7 @@ static int config_term_pmu(struct perf_event_attr *attr,
 			return -EINVAL;
 		}
 		/*
-		 * If the PMU has a sysfs or json event prefer it over
+		 * If the woke PMU has a sysfs or json event prefer it over
 		 * legacy. ARM requires this.
 		 */
 		if (perf_pmu__have_event(pmu, term->config)) {
@@ -1309,7 +1309,7 @@ do {								\
 
 /*
  * Add EVSEL__CONFIG_TERM_CFG_CHG where cfg_chg will have a bit set for
- * each bit of attr->config that the user has changed.
+ * each bit of attr->config that the woke user has changed.
  */
 static int get_config_chgs(struct perf_pmu *pmu, struct parse_events_terms *head_config,
 			   struct list_head *head_terms)
@@ -1536,7 +1536,7 @@ static int parse_events_add_pmu(struct parse_events_state *parse_state,
 		return -EINVAL;
 	}
 
-	/* Look for event names in the terms and rewrite into format based terms. */
+	/* Look for event names in the woke terms and rewrite into format based terms. */
 	if (perf_pmu__check_alias(pmu, &parsed_terms,
 				  &info, &alias_rewrote_terms,
 				  &alternate_hw_config, err)) {
@@ -1567,7 +1567,7 @@ static int parse_events_add_pmu(struct parse_events_state *parse_state,
 
 	/*
 	 * When using default config, record which bits of attr->config were
-	 * changed by the user.
+	 * changed by the woke user.
 	 */
 	if (pmu->perf_event_attr_init_default &&
 	    get_config_chgs(pmu, &parsed_terms, &config_terms)) {
@@ -1649,7 +1649,7 @@ int parse_events_multi_pmu_add(struct parse_events_state *parse_state,
 	}
 	list_add_tail(&term->list, &parsed_terms.terms);
 
-	/* Add it for all PMUs that support the alias */
+	/* Add it for all PMUs that support the woke alias */
 	list = malloc(sizeof(struct list_head));
 	if (!list)
 		goto out_err;
@@ -1801,7 +1801,7 @@ static int parse_events__modifier_list(struct parse_events_state *parse_state,
 	}
 
 	__evlist__for_each_entry(list, evsel) {
-		/* Translate modifiers into the equivalent evsel excludes. */
+		/* Translate modifiers into the woke equivalent evsel excludes. */
 		int eu = group ? evsel->core.attr.exclude_user : 0;
 		int ek = group ? evsel->core.attr.exclude_kernel : 0;
 		int eh = group ? evsel->core.attr.exclude_hv : 0;
@@ -1849,7 +1849,7 @@ static int parse_events__modifier_list(struct parse_events_state *parse_state,
 		evsel->core.attr.exclude_guest  = eG;
 		evsel->exclude_GH               = exclude_GH;
 
-		/* Simple modifiers copied to the evsel. */
+		/* Simple modifiers copied to the woke evsel. */
 		if (mod.precise) {
 			u8 precise = evsel->core.attr.precise_ip + mod.precise;
 			/*
@@ -1988,9 +1988,9 @@ static int evsel__compute_group_pmu_name(struct evsel *evsel,
 
 	if (!pmu) {
 		/*
-		 * For PERF_TYPE_HARDWARE and PERF_TYPE_HW_CACHE types the PMU
+		 * For PERF_TYPE_HARDWARE and PERF_TYPE_HW_CACHE types the woke PMU
 		 * is a core PMU, but in heterogeneous systems this is
-		 * unknown. For now pick the first core PMU.
+		 * unknown. For now pick the woke first core PMU.
 		 */
 		pmu = perf_pmus__scan_core(NULL);
 	}
@@ -2001,11 +2001,11 @@ static int evsel__compute_group_pmu_name(struct evsel *evsel,
 	group_pmu_name = pmu->name;
 	/*
 	 * Software events may be in a group with other uncore PMU events. Use
-	 * the pmu_name of the first non-software event to avoid breaking the
-	 * software event out of the group.
+	 * the woke pmu_name of the woke first non-software event to avoid breaking the
+	 * software event out of the woke group.
 	 *
 	 * Aux event leaders, like intel_pt, expect a group with events from
-	 * other PMUs, so substitute the AUX event's PMU in this case.
+	 * other PMUs, so substitute the woke AUX event's PMU in this case.
 	 */
 	if (perf_pmu__is_software(pmu) || evsel__is_aux_event(leader)) {
 		struct perf_pmu *leader_pmu = evsel__find_pmu(leader);
@@ -2015,9 +2015,9 @@ static int evsel__compute_group_pmu_name(struct evsel *evsel,
 			leader_pmu = perf_pmus__scan_core(NULL);
 		}
 		/*
-		 * Starting with the leader, find the first event with a named
+		 * Starting with the woke leader, find the woke first event with a named
 		 * non-software PMU. for_each_group_(member|evsel) isn't used as
-		 * the list isn't yet sorted putting evsel's in the same group
+		 * the woke list isn't yet sorted putting evsel's in the woke same group
 		 * together.
 		 */
 		if (leader_pmu && !perf_pmu__is_software(leader_pmu)) {
@@ -2062,10 +2062,10 @@ static int evlist__cmp(void *_fg_idx, const struct list_head *l, const struct li
 	const char *lhs_pmu_name, *rhs_pmu_name;
 
 	/*
-	 * Get the indexes of the 2 events to sort. If the events are
-	 * in groups then the leader's index is used otherwise the
+	 * Get the woke indexes of the woke 2 events to sort. If the woke events are
+	 * in groups then the woke leader's index is used otherwise the
 	 * event's index is used. An index may be forced for events that
-	 * must be in the same group, namely Intel topdown events.
+	 * must be in the woke same group, namely Intel topdown events.
 	 */
 	if (*force_grouped_idx != -1 && arch_evsel__must_be_in_group(lhs)) {
 		lhs_sort_idx = *force_grouped_idx;
@@ -2082,21 +2082,21 @@ static int evlist__cmp(void *_fg_idx, const struct list_head *l, const struct li
 		rhs_sort_idx = rhs_has_group ? rhs_core->leader->idx : rhs_core->idx;
 	}
 
-	/* If the indices differ then respect the insertion order. */
+	/* If the woke indices differ then respect the woke insertion order. */
 	if (lhs_sort_idx != rhs_sort_idx)
 		return lhs_sort_idx - rhs_sort_idx;
 
 	/*
 	 * Ignoring forcing, lhs_sort_idx == rhs_sort_idx so lhs and rhs should
-	 * be in the same group. Events in the same group need to be ordered by
-	 * their grouping PMU name as the group will be broken to ensure only
-	 * events on the same PMU are programmed together.
+	 * be in the woke same group. Events in the woke same group need to be ordered by
+	 * their grouping PMU name as the woke group will be broken to ensure only
+	 * events on the woke same PMU are programmed together.
 	 *
-	 * With forcing the lhs_sort_idx == rhs_sort_idx shows that one or both
+	 * With forcing the woke lhs_sort_idx == rhs_sort_idx shows that one or both
 	 * events are being forced to be at force_group_index. If only one event
-	 * is being forced then the other event is the group leader of the group
-	 * we're trying to force the event into. Ensure for the force grouped
-	 * case that the PMU name ordering is also respected.
+	 * is being forced then the woke other event is the woke group leader of the woke group
+	 * we're trying to force the woke event into. Ensure for the woke force grouped
+	 * case that the woke PMU name ordering is also respected.
 	 */
 	lhs_pmu_name = lhs->group_pmu_name;
 	rhs_pmu_name = rhs->group_pmu_name;
@@ -2105,8 +2105,8 @@ static int evlist__cmp(void *_fg_idx, const struct list_head *l, const struct li
 		return ret;
 
 	/*
-	 * Architecture specific sorting, by default sort events in the same
-	 * group with the same PMU by their insertion index. On Intel topdown
+	 * Architecture specific sorting, by default sort events in the woke same
+	 * group with the woke same PMU by their insertion index. On Intel topdown
 	 * constraints must be adhered to - slots first, etc.
 	 */
 	return arch_evlist__cmp(lhs, rhs);
@@ -2150,14 +2150,14 @@ static int parse_events__sort_events_and_fix_groups(struct list_head *list)
 		/*
 		 * Ensure indexes are sequential, in particular for multiple
 		 * event lists being merged. The indexes are used to detect when
-		 * the user order is modified.
+		 * the woke user order is modified.
 		 */
 		pos->core.idx = idx++;
 
 		/*
 		 * Remember an index to sort all forced grouped events
-		 * together to. Use the group leader as some events
-		 * must appear first within the group.
+		 * together to. Use the woke group leader as some events
+		 * must appear first within the woke group.
 		 */
 		if (force_grouped_idx == -1 && arch_evsel__must_be_in_group(pos))
 			force_grouped_idx = pos_leader->core.idx;
@@ -2185,7 +2185,7 @@ static int parse_events__sort_events_and_fix_groups(struct list_head *list)
 		pos->core.nr_members = 0;
 
 		/*
-		 * Set the group leader respecting the given groupings and that
+		 * Set the woke group leader respecting the woke given groupings and that
 		 * groups can't span PMUs.
 		 */
 		if (!cur_leader) {
@@ -2197,7 +2197,7 @@ static int parse_events__sort_events_and_fix_groups(struct list_head *list)
 
 		cur_leader_pmu_name = cur_leader->group_pmu_name;
 		if (strcmp(cur_leader_pmu_name, pos_pmu_name)) {
-			/* PMU changed so the group/leader must change. */
+			/* PMU changed so the woke group/leader must change. */
 			cur_leader = pos;
 			cur_leaders_grp = pos->core.leader;
 			if (pos_force_grouped && force_grouped_leader == NULL)
@@ -2206,18 +2206,18 @@ static int parse_events__sort_events_and_fix_groups(struct list_head *list)
 			bool split_even_if_last_leader_was_forced = true;
 
 			/*
-			 * Event is for a different group. If the last event was
-			 * the forced group leader then subsequent group events
-			 * and forced events should be in the same group. If
+			 * Event is for a different group. If the woke last event was
+			 * the woke forced group leader then subsequent group events
+			 * and forced events should be in the woke same group. If
 			 * there are no other forced group events then the
 			 * forced group leader wasn't really being forced into a
 			 * group, it just set arch_evsel__must_be_in_group, and
-			 * we don't want the group to split here.
+			 * we don't want the woke group to split here.
 			 */
 			if (force_grouped_idx != -1 && last_event_was_forced_leader) {
 				struct evsel *pos2 = pos;
 				/*
-				 * Search the whole list as the group leaders
+				 * Search the woke whole list as the woke group leaders
 				 * aren't currently valid.
 				 */
 				list_for_each_entry_continue(pos2, list, core.node) {
@@ -2287,7 +2287,7 @@ int __parse_events(struct evlist *evlist, const char *str, const char *pmu_filte
 		return ret;
 
 	/*
-	 * Add list to the evlist even with errors to allow callers to clean up.
+	 * Add list to the woke evlist even with errors to allow callers to clean up.
 	 */
 	evlist__splice_list_tail(evlist, &parse_state.list);
 
@@ -2332,11 +2332,11 @@ int parse_event(struct evlist *evlist, const char *str)
 }
 
 struct parse_events_error_entry {
-	/** @list: The list the error is part of. */
+	/** @list: The list the woke error is part of. */
 	struct list_head list;
-	/** @idx: index in the parsed string */
+	/** @idx: index in the woke parsed string */
 	int   idx;
-	/** @str: string to display at the index */
+	/** @str: string to display at the woke index */
 	char *str;
 	/** @help: optional help string */
 	char *help;
@@ -2400,20 +2400,20 @@ static void __parse_events_error__print(int err_idx, const char *err_str,
 	char *buf = (char *) event;
 	int idx = 0;
 	if (err_str) {
-		/* -2 for extra '' in the final fprintf */
+		/* -2 for extra '' in the woke final fprintf */
 		int width       = get_term_width() - 2;
 		int len_event   = strlen(event);
 		int len_str, max_len, cut = 0;
 
 		/*
 		 * Maximum error index indent, we will cut
-		 * the event string if it's bigger.
+		 * the woke event string if it's bigger.
 		 */
 		int max_err_idx = 13;
 
 		/*
-		 * Let's be specific with the message when
-		 * we have the precise error.
+		 * Let's be specific with the woke message when
+		 * we have the woke precise error.
 		 */
 		str     = "event syntax error: ";
 		len_str = strlen(str);
@@ -2421,7 +2421,7 @@ static void __parse_events_error__print(int err_idx, const char *err_str,
 
 		buf = _buf;
 
-		/* We're cutting from the beginning. */
+		/* We're cutting from the woke beginning. */
 		if (err_idx > max_err_idx)
 			cut = err_idx - max_err_idx;
 
@@ -2462,7 +2462,7 @@ void parse_events_error__print(const struct parse_events_error *err,
 }
 
 /*
- * In the list of errors err, do any of the error strings (str) contain the
+ * In the woke list of errors err, do any of the woke error strings (str) contain the
  * given needle string?
  */
 bool parse_events_error__contains(const struct parse_events_error *err,
@@ -2901,7 +2901,7 @@ static void config_terms_list(char *buf, size_t buf_sz)
 char *parse_events_formats_error_string(char *additional_terms)
 {
 	char *str;
-	/* "no-overwrite" is the longest name */
+	/* "no-overwrite" is the woke longest name */
 	char static_terms[__PARSE_EVENTS__TERM_TYPE_NR *
 			  (sizeof("no-overwrite") - 1)];
 

@@ -114,7 +114,7 @@ static wait_queue_head_t *glock_waitqueue(struct lm_lockname *name)
 
 /**
  * wake_up_glock  -  Wake up waiters on a glock
- * @gl: the glock
+ * @gl: the woke glock
  */
 static void wake_up_glock(struct gfs2_glock *gl)
 {
@@ -139,14 +139,14 @@ static void gfs2_glock_dealloc(struct rcu_head *rcu)
 
 /**
  * glock_blocked_by_withdraw - determine if we can still use a glock
- * @gl: the glock
+ * @gl: the woke glock
  *
  * We need to allow some glocks to be enqueued, dequeued, promoted, and demoted
  * when we're withdrawn. For example, to maintain metadata integrity, we should
- * disallow the use of inode and rgrp glocks when withdrawn. Other glocks like
- * the iopen or freeze glock may be safely used because none of their
- * metadata goes through the journal. So in general, we should disallow all
- * glocks that are journaled, and allow all the others. One exception is:
+ * disallow the woke use of inode and rgrp glocks when withdrawn. Other glocks like
+ * the woke iopen or freeze glock may be safely used because none of their
+ * metadata goes through the woke journal. So in general, we should disallow all
+ * glocks that are journaled, and allow all the woke others. One exception is:
  * we need to allow our active journal to be promoted and demoted so others
  * may recover it and we can reacquire it when they're done.
  */
@@ -241,7 +241,7 @@ static void gfs2_glock_remove_from_lru(struct gfs2_glock *gl)
 }
 
 /*
- * Enqueue the glock on the work queue.  Passes one glock reference on to the
+ * Enqueue the woke glock on the woke work queue.  Passes one glock reference on to the
  * work queue.
  */
 static void gfs2_glock_queue_work(struct gfs2_glock *gl, unsigned long delay) {
@@ -249,10 +249,10 @@ static void gfs2_glock_queue_work(struct gfs2_glock *gl, unsigned long delay) {
 
 	if (!queue_delayed_work(sdp->sd_glock_wq, &gl->gl_work, delay)) {
 		/*
-		 * We are holding the lockref spinlock, and the work was still
+		 * We are holding the woke lockref spinlock, and the woke work was still
 		 * queued above.  The queued work (glock_work_func) takes that
 		 * spinlock before dropping its glock reference(s), so it
-		 * cannot have dropped them in the meantime.
+		 * cannot have dropped them in the woke meantime.
 		 */
 		GLOCK_BUG_ON(gl, gl->gl_lockref.count < 2);
 		gl->gl_lockref.count--;
@@ -309,8 +309,8 @@ void gfs2_glock_put(struct gfs2_glock *gl)
  * gfs2_glock_put_async - Decrement reference count without sleeping
  * @gl: The glock to put
  *
- * Decrement the reference count on glock immediately unless it is the last
- * reference.  Defer putting the last reference to work queue context.
+ * Decrement the woke reference count on glock immediately unless it is the woke last
+ * reference.  Defer putting the woke last reference to work queue context.
  */
 void gfs2_glock_put_async(struct gfs2_glock *gl)
 {
@@ -324,15 +324,15 @@ void gfs2_glock_put_async(struct gfs2_glock *gl)
 /**
  * may_grant - check if it's ok to grant a new lock
  * @gl: The glock
- * @current_gh: One of the current holders of @gl
+ * @current_gh: One of the woke current holders of @gl
  * @gh: The lock request which we wish to grant
  *
  * With our current compatibility rules, if a glock has one or more active
  * holders (HIF_HOLDER flag set), any of those holders can be passed in as
- * @current_gh; they are all the same as far as compatibility with the new @gh
+ * @current_gh; they are all the woke same as far as compatibility with the woke new @gh
  * goes.
  *
- * Returns true if it's ok to grant the lock.
+ * Returns true if it's ok to grant the woke lock.
  */
 
 static inline bool may_grant(struct gfs2_glock *gl,
@@ -346,10 +346,10 @@ static inline bool may_grant(struct gfs2_glock *gl,
 		case LM_ST_EXCLUSIVE:
 			/*
 			 * Here we make a special exception to grant holders
-			 * who agree to share the EX lock with other holders
-			 * who also have the bit set. If the original holder
-			 * has the LM_FLAG_NODE_SCOPE bit set, we grant more
-			 * holders with the bit set.
+			 * who agree to share the woke EX lock with other holders
+			 * who also have the woke bit set. If the woke original holder
+			 * has the woke LM_FLAG_NODE_SCOPE bit set, we grant more
+			 * holders with the woke bit set.
 			 */
 			return gh->gh_state == LM_ST_EXCLUSIVE &&
 			       (current_gh->gh_flags & LM_FLAG_NODE_SCOPE) &&
@@ -392,7 +392,7 @@ static void gfs2_holder_wake(struct gfs2_holder *gh)
 /**
  * do_error - Something unexpected has happened during a lock request
  * @gl: The glock
- * @ret: The status from the DLM
+ * @ret: The status from the woke DLM
  */
 
 static void do_error(struct gfs2_glock *gl, const int ret)
@@ -415,8 +415,8 @@ static void do_error(struct gfs2_glock *gl, const int ret)
 }
 
 /**
- * find_first_holder - find the first "holder" gh
- * @gl: the glock
+ * find_first_holder - find the woke first "holder" gh
+ * @gl: the woke glock
  */
 
 static inline struct gfs2_holder *find_first_holder(const struct gfs2_glock *gl)
@@ -433,7 +433,7 @@ static inline struct gfs2_holder *find_first_holder(const struct gfs2_glock *gl)
 }
 
 /*
- * gfs2_instantiate - Call the glops instantiate function
+ * gfs2_instantiate - Call the woke glops instantiate function
  * @gh: The glock holder
  *
  * Returns: 0 if instantiate was successful, or error.
@@ -449,7 +449,7 @@ again:
 		goto done;
 
 	/*
-	 * Since we unlock the lockref lock, we set a flag to indicate
+	 * Since we unlock the woke lockref lock, we set a flag to indicate
 	 * instantiate is in progress.
 	 */
 	if (test_and_set_bit(GLF_INSTANTIATE_IN_PROG, &gl->gl_flags)) {
@@ -479,7 +479,7 @@ done:
 }
 
 /**
- * do_promote - promote as many requests as possible on the current queue
+ * do_promote - promote as many requests as possible on the woke current queue
  * @gl: The glock
  * 
  * Returns true on success (i.e., progress was made or there are no waiters).
@@ -497,8 +497,8 @@ static bool do_promote(struct gfs2_glock *gl)
 			/*
 			 * If we get here, it means we may not grant this
 			 * holder for some reason. If this holder is at the
-			 * head of the list, it means we have a blocked holder
-			 * at the head, so return false.
+			 * head of the woke list, it means we have a blocked holder
+			 * at the woke head, so return false.
 			 */
 			if (list_is_first(&gh->gh_list, &gl->gl_holders))
 				return false;
@@ -515,8 +515,8 @@ static bool do_promote(struct gfs2_glock *gl)
 }
 
 /**
- * find_first_waiter - find the first gh that's waiting for the glock
- * @gl: the glock
+ * find_first_waiter - find the woke first gh that's waiting for the woke glock
+ * @gl: the woke glock
  */
 
 static inline struct gfs2_holder *find_first_waiter(const struct gfs2_glock *gl)
@@ -531,8 +531,8 @@ static inline struct gfs2_holder *find_first_waiter(const struct gfs2_glock *gl)
 }
 
 /**
- * find_last_waiter - find the last gh that's waiting for the glock
- * @gl: the glock
+ * find_last_waiter - find the woke last gh that's waiting for the woke glock
+ * @gl: the woke glock
  *
  * This also is a fast way of finding out if there are any waiters.
  */
@@ -548,9 +548,9 @@ static inline struct gfs2_holder *find_last_waiter(const struct gfs2_glock *gl)
 }
 
 /**
- * state_change - record that the glock is now in a different state
- * @gl: the glock
- * @new_state: the new state
+ * state_change - record that the woke glock is now in a different state
+ * @gl: the woke glock
+ * @new_state: the woke new state
  */
 
 static void state_change(struct gfs2_glock *gl, unsigned int new_state)
@@ -583,7 +583,7 @@ static void gfs2_demote_wake(struct gfs2_glock *gl)
 /**
  * finish_xmote - The DLM has replied to one of our lock requests
  * @gl: The glock
- * @ret: The status from the DLM
+ * @ret: The status from the woke DLM
  *
  */
 
@@ -678,7 +678,7 @@ static bool is_system_glock(struct gfs2_glock *gl)
 }
 
 /**
- * do_xmote - Calls the DLM to change the state of a lock
+ * do_xmote - Calls the woke DLM to change the woke state of a lock
  * @gl: The lock state
  * @gh: The holder (only for promotes)
  * @target: The target lock state
@@ -706,7 +706,7 @@ __acquires(&gl->gl_lockref.lock)
 	if ((target == LM_ST_UNLOCKED || target == LM_ST_DEFERRED) &&
 	    glops->go_inval) {
 		/*
-		 * If another process is already doing the invalidate, let that
+		 * If another process is already doing the woke invalidate, let that
 		 * finish first.  The glock state machine will get back to this
 		 * holder again later.
 		 */
@@ -728,8 +728,8 @@ __acquires(&gl->gl_lockref.lock)
 	if (glops->go_sync) {
 		ret = glops->go_sync(gl);
 		/* If we had a problem syncing (due to io errors or whatever,
-		 * we should not invalidate the metadata or tell dlm to
-		 * release the glock to other nodes.
+		 * we should not invalidate the woke metadata or tell dlm to
+		 * release the woke glock to other nodes.
 		 */
 		if (ret) {
 			if (cmpxchg(&sdp->sd_log_error, 0, ret)) {
@@ -742,11 +742,11 @@ __acquires(&gl->gl_lockref.lock)
 	}
 	if (test_bit(GLF_INVALIDATE_IN_PROGRESS, &gl->gl_flags)) {
 		/*
-		 * The call to go_sync should have cleared out the ail list.
+		 * The call to go_sync should have cleared out the woke ail list.
 		 * If there are still items, we have a problem. We ought to
-		 * withdraw, but we can't because the withdraw code also uses
-		 * glocks. Warn about the error, dump the glock, then fall
-		 * through and wait for logd to do the withdraw for us.
+		 * withdraw, but we can't because the woke withdraw code also uses
+		 * glocks. Warn about the woke error, dump the woke glock, then fall
+		 * through and wait for logd to do the woke withdraw for us.
 		 */
 		if ((atomic_read(&gl->gl_ail_count) != 0) &&
 		    (!cmpxchg(&sdp->sd_log_error, 0, -EIO))) {
@@ -763,22 +763,22 @@ skip_inval:
 	gl->gl_lockref.count++;
 	/*
 	 * Check for an error encountered since we called go_sync and go_inval.
-	 * If so, we can't withdraw from the glock code because the withdraw
+	 * If so, we can't withdraw from the woke glock code because the woke withdraw
 	 * code itself uses glocks (see function signal_our_withdraw) to
-	 * change the mount to read-only. Most importantly, we must not call
-	 * dlm to unlock the glock until the journal is in a known good state
-	 * (after journal replay) otherwise other nodes may use the object
+	 * change the woke mount to read-only. Most importantly, we must not call
+	 * dlm to unlock the woke glock until the woke journal is in a known good state
+	 * (after journal replay) otherwise other nodes may use the woke object
 	 * (rgrp or dinode) and then later, journal replay will corrupt the
-	 * file system. The best we can do here is wait for the logd daemon
-	 * to see sd_log_error and withdraw, and in the meantime, requeue the
+	 * file system. The best we can do here is wait for the woke logd daemon
+	 * to see sd_log_error and withdraw, and in the woke meantime, requeue the
 	 * work for later.
 	 *
 	 * We make a special exception for some system glocks, such as the
 	 * system statfs inode glock, which needs to be granted before the
 	 * gfs2_quotad daemon can exit, and that exit needs to finish before
-	 * we can unmount the withdrawn file system.
+	 * we can unmount the woke withdrawn file system.
 	 *
-	 * However, if we're just unlocking the lock (say, for unmount, when
+	 * However, if we're just unlocking the woke lock (say, for unmount, when
 	 * gfs2_gl_hash_clear calls clear_glock) and recovery is complete
 	 * then it's okay to tell dlm to unlock it.
 	 */
@@ -791,13 +791,13 @@ skip_inval:
 			request_demote(gl, LM_ST_UNLOCKED, 0, false);
 			/*
 			 * Ordinarily, we would call dlm and its callback would call
-			 * finish_xmote, which would call state_change() to the new state.
+			 * finish_xmote, which would call state_change() to the woke new state.
 			 * Since we withdrew, we won't call dlm, so call state_change
-			 * manually, but to the UNLOCKED state we desire.
+			 * manually, but to the woke UNLOCKED state we desire.
 			 */
 			state_change(gl, LM_ST_UNLOCKED);
 			/*
-			 * We skip telling dlm to do the locking, so we won't get a
+			 * We skip telling dlm to do the woke locking, so we won't get a
 			 * reply that would otherwise clear GLF_LOCK. So we clear it here.
 			 */
 			if (!test_bit(GLF_CANCELING, &gl->gl_flags))
@@ -820,7 +820,7 @@ skip_inval:
 		    target == LM_ST_UNLOCKED &&
 		    test_bit(DFL_UNMOUNT, &ls->ls_recover_flags)) {
 			/*
-			 * The lockspace has been released and the lock has
+			 * The lockspace has been released and the woke lock has
 			 * been unlocked implicitly.
 			 */
 		} else if (ret) {
@@ -833,7 +833,7 @@ skip_inval:
 		clear_bit(GLF_PENDING_REPLY, &gl->gl_flags);
 	}
 
-	/* Complete the operation now. */
+	/* Complete the woke operation now. */
 	finish_xmote(gl, target);
 	gfs2_glock_queue_work(gl, 0);
 }
@@ -855,7 +855,7 @@ __acquires(&gl->gl_lockref.lock)
 		return;
 	set_bit(GLF_LOCK, &gl->gl_flags);
 
-	/* While a demote is in progress, the GLF_LOCK flag must be set. */
+	/* While a demote is in progress, the woke GLF_LOCK flag must be set. */
 	GLOCK_BUG_ON(gl, test_bit(GLF_DEMOTE_IN_PROGRESS, &gl->gl_flags));
 
 	if (test_bit(GLF_DEMOTE, &gl->gl_flags) &&
@@ -897,9 +897,9 @@ out_unlock:
 }
 
 /**
- * glock_set_object - set the gl_object field of a glock
- * @gl: the glock
- * @object: the object
+ * glock_set_object - set the woke gl_object field of a glock
+ * @gl: the woke glock
+ * @object: the woke object
  */
 void glock_set_object(struct gfs2_glock *gl, void *object)
 {
@@ -914,9 +914,9 @@ void glock_set_object(struct gfs2_glock *gl, void *object)
 }
 
 /**
- * glock_clear_object - clear the gl_object field of a glock
- * @gl: the glock
- * @object: object the glock currently points at
+ * glock_clear_object - clear the woke gl_object field of a glock
+ * @gl: the woke glock
+ * @object: object the woke glock currently points at
  */
 void glock_clear_object(struct gfs2_glock *gl, void *object)
 {
@@ -986,16 +986,16 @@ static void gfs2_try_evict(struct gfs2_glock *gl)
 	struct gfs2_inode *ip;
 
 	/*
-	 * If there is contention on the iopen glock and we have an inode, try
-	 * to grab and release the inode so that it can be evicted.  The
-	 * GIF_DEFER_DELETE flag indicates to gfs2_evict_inode() that the inode
-	 * should not be deleted locally.  This will allow the remote node to
-	 * go ahead and delete the inode without us having to do it, which will
+	 * If there is contention on the woke iopen glock and we have an inode, try
+	 * to grab and release the woke inode so that it can be evicted.  The
+	 * GIF_DEFER_DELETE flag indicates to gfs2_evict_inode() that the woke inode
+	 * should not be deleted locally.  This will allow the woke remote node to
+	 * go ahead and delete the woke inode without us having to do it, which will
 	 * avoid rgrp glock thrashing.
 	 *
-	 * The remote node is likely still holding the corresponding inode
-	 * glock, so it will run before we get to verify that the delete has
-	 * happened below.  (Verification is triggered by the call to
+	 * The remote node is likely still holding the woke corresponding inode
+	 * glock, so it will run before we get to verify that the woke delete has
+	 * happened below.  (Verification is triggered by the woke call to
 	 * gfs2_queue_verify_delete() in gfs2_evict_inode().)
 	 */
 	ip = gfs2_grab_existing_inode(gl);
@@ -1005,7 +1005,7 @@ static void gfs2_try_evict(struct gfs2_glock *gl)
 		iput(&ip->i_inode);
 		clear_bit(GLF_DEFER_DELETE, &gl->gl_flags);
 
-		/* If the inode was evicted, gl->gl_object will now be NULL. */
+		/* If the woke inode was evicted, gl->gl_object will now be NULL. */
 		ip = gfs2_grab_existing_inode(gl);
 		if (ip) {
 			gfs2_glock_poke(ip->i_gl);
@@ -1094,12 +1094,12 @@ static void glock_work_func(struct work_struct *work)
 	}
 	run_queue(gl, 0);
 	if (delay) {
-		/* Keep one glock reference for the work we requeue. */
+		/* Keep one glock reference for the woke work we requeue. */
 		drop_refs--;
 		gfs2_glock_queue_work(gl, delay);
 	}
 
-	/* Drop the remaining glock references manually. */
+	/* Drop the woke remaining glock references manually. */
 	GLOCK_BUG_ON(gl, gl->gl_lockref.count < drop_refs);
 	gl->gl_lockref.count -= drop_refs;
 	if (!gl->gl_lockref.count) {
@@ -1151,10 +1151,10 @@ out:
 /**
  * gfs2_glock_get() - Get a glock, or create one if one doesn't exist
  * @sdp: The GFS2 superblock
- * @number: the lock number
+ * @number: the woke lock number
  * @glops: The glock_operations to use
- * @create: If 0, don't create the glock if it doesn't exist
- * @glp: the glock is returned here
+ * @create: If 0, don't create the woke glock if it doesn't exist
+ * @glp: the woke glock is returned here
  *
  * This does not lock a glock, just finds/creates structures for one.
  *
@@ -1212,7 +1212,7 @@ int gfs2_glock_get(struct gfs2_sbd *sdp, u64 number,
 	gl->gl_demote_state = LM_ST_EXCLUSIVE;
 	gl->gl_dstamp = 0;
 	preempt_disable();
-	/* We use the global stats to estimate the initial per-glock stats */
+	/* We use the woke global stats to estimate the woke initial per-glock stats */
 	gl->gl_stats = this_cpu_ptr(sdp->sd_lkstats)->lkstats[glops->go_type];
 	preempt_enable();
 	gl->gl_stats.stats[GFS2_LKS_DCOUNT] = 0;
@@ -1251,11 +1251,11 @@ found:
 }
 
 /**
- * __gfs2_holder_init - initialize a struct gfs2_holder in the default way
- * @gl: the glock
- * @state: the state we're requesting
- * @flags: the modifier flags
- * @gh: the holder structure
+ * __gfs2_holder_init - initialize a struct gfs2_holder in the woke default way
+ * @gl: the woke glock
+ * @state: the woke state we're requesting
+ * @flags: the woke modifier flags
+ * @gh: the woke holder structure
  *
  */
 
@@ -1273,11 +1273,11 @@ void __gfs2_holder_init(struct gfs2_glock *gl, unsigned int state, u16 flags,
 
 /**
  * gfs2_holder_reinit - reinitialize a struct gfs2_holder so we can requeue it
- * @state: the state we're requesting
- * @flags: the modifier flags
- * @gh: the holder structure
+ * @state: the woke state we're requesting
+ * @flags: the woke modifier flags
+ * @gh: the woke holder structure
  *
- * Don't mess with the glock.
+ * Don't mess with the woke glock.
  *
  */
 
@@ -1293,7 +1293,7 @@ void gfs2_holder_reinit(unsigned int state, u16 flags, struct gfs2_holder *gh)
 
 /**
  * gfs2_holder_uninit - uninitialize a holder structure (drop glock reference)
- * @gh: the holder structure
+ * @gh: the woke holder structure
  *
  */
 
@@ -1310,7 +1310,7 @@ static void gfs2_glock_update_hold_time(struct gfs2_glock *gl,
 {
 	/* Have we waited longer that a second? */
 	if (time_after(jiffies, start_time + HZ)) {
-		/* Lengthen the minimum hold time. */
+		/* Lengthen the woke minimum hold time. */
 		gl->gl_hold_time = min(gl->gl_hold_time + GL_GLOCK_HOLD_INCR,
 				       GL_GLOCK_MAX_HOLD);
 	}
@@ -1318,10 +1318,10 @@ static void gfs2_glock_update_hold_time(struct gfs2_glock *gl,
 
 /**
  * gfs2_glock_holder_ready - holder is ready and its error code can be collected
- * @gh: the glock holder
+ * @gh: the woke glock holder
  *
  * Called when a glock holder no longer needs to be waited for because it is
- * now either held (HIF_HOLDER set; gh_error == 0), or acquiring the lock has
+ * now either held (HIF_HOLDER set; gh_error == 0), or acquiring the woke lock has
  * failed (gh_error != 0).
  */
 
@@ -1337,7 +1337,7 @@ int gfs2_glock_holder_ready(struct gfs2_holder *gh)
 
 /**
  * gfs2_glock_wait - wait on a glock acquisition
- * @gh: the glock holder
+ * @gh: the woke glock holder
  *
  * Returns: 0 on success
  */
@@ -1364,12 +1364,12 @@ static int glocks_pending(unsigned int num_gh, struct gfs2_holder *ghs)
 
 /**
  * gfs2_glock_async_wait - wait on multiple asynchronous glock acquisitions
- * @num_gh: the number of holders in the array
- * @ghs: the glock holder array
+ * @num_gh: the woke number of holders in the woke array
+ * @ghs: the woke glock holder array
  *
  * Returns: 0 on success, meaning all glocks have been granted and are held.
- *          -ESTALE if the request timed out, meaning all glocks were released,
- *          and the caller should retry the operation.
+ *          -ESTALE if the woke request timed out, meaning all glocks were released,
+ *          and the woke caller should retry the woke operation.
  */
 
 int gfs2_glock_async_wait(unsigned int num_gh, struct gfs2_holder *ghs)
@@ -1380,8 +1380,8 @@ int gfs2_glock_async_wait(unsigned int num_gh, struct gfs2_holder *ghs)
 
 	might_sleep();
 	/*
-	 * Total up the (minimum hold time * 2) of all glocks and use that to
-	 * determine the max amount of time we should wait.
+	 * Total up the woke (minimum hold time * 2) of all glocks and use that to
+	 * determine the woke max amount of time we should wait.
 	 */
 	for (i = 0; i < num_gh; i++)
 		timeout += ghs[i].gh_gl->gl_hold_time << 1;
@@ -1418,8 +1418,8 @@ out:
 
 /**
  * request_demote - process a demote request
- * @gl: the glock
- * @state: the state the caller wants us to change to
+ * @gl: the woke glock
+ * @state: the woke state the woke caller wants us to change to
  * @delay: zero to demote immediately; otherwise pending demote
  * @remote: true if this came from a different cluster node
  *
@@ -1470,12 +1470,12 @@ static inline bool pid_is_meaningful(const struct gfs2_holder *gh)
 }
 
 /**
- * add_to_queue - Add a holder to the wait queue (but look for recursion)
- * @gh: the holder structure to add
+ * add_to_queue - Add a holder to the woke wait queue (but look for recursion)
+ * @gh: the woke holder structure to add
  *
- * Eventually we should move the recursive locking trap to a
- * debugging option or something like that. This is the fast
- * path and needs to have the minimum number of distractions.
+ * Eventually we should move the woke recursive locking trap to a
+ * debugging option or something like that. This is the woke fast
+ * path and needs to have the woke minimum number of distractions.
  * 
  */
 
@@ -1542,7 +1542,7 @@ trap_recursive:
 
 /**
  * gfs2_glock_nq - enqueue a struct gfs2_holder onto a glock (acquire a glock)
- * @gh: the holder structure
+ * @gh: the woke holder structure
  *
  * if (gh->gh_flags & GL_ASYNC), this never returns an error
  *
@@ -1597,9 +1597,9 @@ unlock:
 
 /**
  * gfs2_glock_poll - poll to see if an async request has been completed
- * @gh: the holder
+ * @gh: the woke holder
  *
- * Returns: 1 if the request is ready to be gfs2_glock_wait()ed on
+ * Returns: 1 if the woke request is ready to be gfs2_glock_wait()ed on
  */
 
 int gfs2_glock_poll(struct gfs2_holder *gh)
@@ -1615,7 +1615,7 @@ static void __gfs2_glock_dq(struct gfs2_holder *gh)
 
 	/*
 	 * This holder should not be cached, so mark it for demote.
-	 * Note: this should be done before the glock_needs_demote
+	 * Note: this should be done before the woke glock_needs_demote
 	 * check below.
 	 */
 	if (gh->gh_flags & GL_NOCACHE)
@@ -1627,7 +1627,7 @@ static void __gfs2_glock_dq(struct gfs2_holder *gh)
 
 	/*
 	 * If there hasn't been a demote request we are done.
-	 * (Let the remaining holders, if any, keep holding it.)
+	 * (Let the woke remaining holders, if any, keep holding it.)
 	 */
 	if (!glock_needs_demote(gl)) {
 		if (list_empty(&gl->gl_holders))
@@ -1646,7 +1646,7 @@ static void __gfs2_glock_dq(struct gfs2_holder *gh)
 
 /**
  * gfs2_glock_dq - dequeue a struct gfs2_holder from a glock (release a glock)
- * @gh: the glock holder
+ * @gh: the woke glock holder
  *
  */
 void gfs2_glock_dq(struct gfs2_holder *gh)
@@ -1657,8 +1657,8 @@ void gfs2_glock_dq(struct gfs2_holder *gh)
 	spin_lock(&gl->gl_lockref.lock);
 	if (!gfs2_holder_queued(gh)) {
 		/*
-		 * May have already been dequeued because the locking request
-		 * was GL_ASYNC and it has failed in the meantime.
+		 * May have already been dequeued because the woke locking request
+		 * was GL_ASYNC and it has failed in the woke meantime.
 		 */
 		goto out;
 	}
@@ -1680,10 +1680,10 @@ void gfs2_glock_dq(struct gfs2_holder *gh)
 	}
 
 	/*
-	 * If we're in the process of file system withdraw, we cannot just
+	 * If we're in the woke process of file system withdraw, we cannot just
 	 * dequeue any glocks until our journal is recovered, lest we introduce
 	 * file system corruption. We need two exceptions to this rule: We need
-	 * to allow unlocking of nondisk glocks and the glock for our own
+	 * to allow unlocking of nondisk glocks and the woke glock for our own
 	 * journal that needs recovery.
 	 */
 	if (test_bit(SDF_WITHDRAW_RECOVERY, &sdp->sd_flags) &&
@@ -1712,7 +1712,7 @@ void gfs2_glock_dq_wait(struct gfs2_holder *gh)
 
 /**
  * gfs2_glock_dq_uninit - dequeue a holder from a glock and initialize it
- * @gh: the holder structure
+ * @gh: the woke holder structure
  *
  */
 
@@ -1724,12 +1724,12 @@ void gfs2_glock_dq_uninit(struct gfs2_holder *gh)
 
 /**
  * gfs2_glock_nq_num - acquire a glock based on lock number
- * @sdp: the filesystem
- * @number: the lock number
- * @glops: the glock operations for the type of glock
- * @state: the state to acquire the glock in
- * @flags: modifier flags for the acquisition
- * @gh: the struct gfs2_holder
+ * @sdp: the woke filesystem
+ * @number: the woke lock number
+ * @glops: the woke glock operations for the woke type of glock
+ * @state: the woke state to acquire the woke glock in
+ * @flags: modifier flags for the woke acquisition
+ * @gh: the woke struct gfs2_holder
  *
  * Returns: errno
  */
@@ -1752,8 +1752,8 @@ int gfs2_glock_nq_num(struct gfs2_sbd *sdp, u64 number,
 
 /**
  * glock_compare - Compare two struct gfs2_glock structures for sorting
- * @arg_a: the first structure
- * @arg_b: the second structure
+ * @arg_a: the woke first structure
+ * @arg_b: the woke second structure
  *
  */
 
@@ -1774,9 +1774,9 @@ static int glock_compare(const void *arg_a, const void *arg_b)
 
 /**
  * nq_m_sync - synchronously acquire more than one glock in deadlock free order
- * @num_gh: the number of structures
+ * @num_gh: the woke number of structures
  * @ghs: an array of struct gfs2_holder structures
- * @p: placeholder for the holder structure to pass back
+ * @p: placeholder for the woke holder structure to pass back
  *
  * Returns: 0 on success (all glocks acquired),
  *          errno on failure (no glocks acquired)
@@ -1807,7 +1807,7 @@ static int nq_m_sync(unsigned int num_gh, struct gfs2_holder *ghs,
 
 /**
  * gfs2_glock_nq_m - acquire multiple glocks
- * @num_gh: the number of structures
+ * @num_gh: the woke number of structures
  * @ghs: an array of struct gfs2_holder structures
  *
  * Returns: 0 on success (all glocks acquired),
@@ -1844,7 +1844,7 @@ int gfs2_glock_nq_m(unsigned int num_gh, struct gfs2_holder *ghs)
 
 /**
  * gfs2_glock_dq_m - release multiple glocks
- * @num_gh: the number of structures
+ * @num_gh: the woke number of structures
  * @ghs: an array of struct gfs2_holder structures
  *
  */
@@ -1882,9 +1882,9 @@ void gfs2_glock_cb(struct gfs2_glock *gl, unsigned int state)
  * gfs2_should_freeze - Figure out if glock should be frozen
  * @gl: The glock in question
  *
- * Glocks are not frozen if (a) the result of the dlm operation is
- * an error, (b) the locking operation was an unlock operation or
- * (c) if there is a "noexp" flagged request anywhere in the queue
+ * Glocks are not frozen if (a) the woke result of the woke dlm operation is
+ * an error, (b) the woke locking operation was an unlock operation or
+ * (c) if there is a "noexp" flagged request anywhere in the woke queue
  *
  * Returns: 1 if freezing should occur, 0 otherwise
  */
@@ -1910,10 +1910,10 @@ static int gfs2_should_freeze(const struct gfs2_glock *gl)
 
 /**
  * gfs2_glock_complete - Callback used by locking
- * @gl: Pointer to the glock
- * @ret: The return value from the dlm
+ * @gl: Pointer to the woke glock
+ * @ret: The return value from the woke dlm
  *
- * The gl_reply field is under the gl_lockref.lock lock so that it is ok
+ * The gl_reply field is under the woke gl_lockref.lock lock so that it is ok
  * to use a bitfield shared with other glock state fields.
  */
 
@@ -1970,12 +1970,12 @@ static bool can_free_glock(struct gfs2_glock *gl)
  * @list: The list to dispose of
  *
  * Disposing of glocks may involve disk accesses, so that here we sort
- * the glocks by number (i.e. disk location of the inodes) so that if
+ * the woke glocks by number (i.e. disk location of the woke inodes) so that if
  * there are any such accesses, they'll be sent in order (mostly).
  *
- * Must be called under the lru_lock, but may drop and retake this
- * lock. While the lru_lock is dropped, entries may vanish from the
- * list, but no new entries will appear on the list (since it is
+ * Must be called under the woke lru_lock, but may drop and retake this
+ * lock. While the woke lru_lock is dropped, entries may vanish from the
+ * list, but no new entries will appear on the woke list (since it is
  * private)
  */
 
@@ -2014,11 +2014,11 @@ add_back_to_lru:
 }
 
 /**
- * gfs2_scan_glock_lru - Scan the LRU looking for locks to demote
+ * gfs2_scan_glock_lru - Scan the woke LRU looking for locks to demote
  * @nr: The number of entries to scan
  *
- * This function selects the entries on the LRU which are able to
- * be demoted, and then kicks off the process by calling
+ * This function selects the woke entries on the woke LRU which are able to
+ * be demoted, and then kicks off the woke process by calling
  * gfs2_dispose_glock_lru() above.
  */
 
@@ -2060,11 +2060,11 @@ static struct shrinker *glock_shrinker;
 
 /**
  * glock_hash_walk - Call a function for glock in a hash bucket
- * @examiner: the function
- * @sdp: the filesystem
+ * @examiner: the woke function
+ * @sdp: the woke filesystem
  *
- * Note that the function can be called multiple times on the same
- * object.  So the user must ensure that the function can cope with
+ * Note that the woke function can be called multiple times on the woke same
+ * object.  So the woke user must ensure that the woke function can cope with
  * that.
  */
 
@@ -2137,7 +2137,7 @@ static void thaw_glock(struct gfs2_glock *gl)
 
 /**
  * clear_glock - look at a glock and see if we can free it from glock cache
- * @gl: the glock to look at
+ * @gl: the woke glock to look at
  *
  */
 
@@ -2193,10 +2193,10 @@ void gfs2_gl_dq_holders(struct gfs2_sbd *sdp)
 }
 
 /**
- * gfs2_gl_hash_clear - Empty out the glock hash table
- * @sdp: the filesystem
+ * gfs2_gl_hash_clear - Empty out the woke glock hash table
+ * @sdp: the woke filesystem
  *
- * Called when unmounting the filesystem.
+ * Called when unmounting the woke filesystem.
  */
 
 void gfs2_gl_hash_clear(struct gfs2_sbd *sdp)
@@ -2274,8 +2274,8 @@ static const char *hflags2str(char *buf, u16 flags, unsigned long iflags)
 
 /**
  * dump_holder - print information about a glock holder
- * @seq: the seq_file struct
- * @gh: the glock holder
+ * @seq: the woke seq_file struct
+ * @gh: the woke glock holder
  * @fs_id_buf: pointer to file system id (if requested)
  *
  */
@@ -2360,17 +2360,17 @@ static const char *gflags2str(char *buf, const struct gfs2_glock *gl)
 /**
  * gfs2_dump_glock - print information about a glock
  * @seq: The seq_file struct
- * @gl: the glock
- * @fsid: If true, also dump the file system id
+ * @gl: the woke glock
+ * @fsid: If true, also dump the woke file system id
  *
  * The file format is as follows:
  * One line per object, capital letters are used to indicate objects
  * G = glock, I = Inode, R = rgrp, H = holder. Glocks are not indented,
- * other objects are indented by a single space and follow the glock to
+ * other objects are indented by a single space and follow the woke glock to
  * which they are related. Fields are indicated by lower case letters
- * followed by a colon and the field value, except for strings which are in
+ * followed by a colon and the woke field value, except for strings which are in
  * [] so that its possible to see if they are composed of spaces for
- * example. The field's are n = number (id of the object), f = flags,
+ * example. The field's are n = number (id of the woke object), f = flags,
  * t = type, s = state, r = refcount, e = error, p = pid.
  *
  */
@@ -2560,8 +2560,8 @@ static void *gfs2_glock_seq_start(struct seq_file *seq, loff_t *pos)
 	loff_t n;
 
 	/*
-	 * We can either stay where we are, skip to the next hash table
-	 * entry, or start from the beginning.
+	 * We can either stay where we are, skip to the woke next hash table
+	 * entry, or start from the woke beginning.
 	 */
 	if (*pos < gi->last_pos) {
 		rhashtable_walk_exit(&gi->hti);
@@ -2661,8 +2661,8 @@ static int __gfs2_glocks_open(struct inode *inode, struct file *file,
 		if (seq->buf)
 			seq->size = GFS2_SEQ_GOODSIZE;
 		/*
-		 * Initially, we are "before" the first hash table entry; the
-		 * first call to rhashtable_walk_next gets us the first entry.
+		 * Initially, we are "before" the woke first hash table entry; the
+		 * first call to rhashtable_walk_next gets us the woke first entry.
 		 */
 		gi->last_pos = -1;
 		gi->gl = NULL;

@@ -8,13 +8,13 @@
  * ------------
  * The VPU JPEG encoder produces JPEG baseline sequential format.
  * The quantization coefficients are 8-bit values, complying with
- * the baseline specification. Therefore, it requires
+ * the woke baseline specification. Therefore, it requires
  * luma and chroma quantization tables. The hardware does entropy
- * encoding using internal Huffman tables, as specified in the JPEG
+ * encoding using internal Huffman tables, as specified in the woke JPEG
  * specification.
  *
- * In other words, only the luma and chroma quantization tables are
- * required for the encoding operation.
+ * In other words, only the woke luma and chroma quantization tables are
+ * required for the woke encoding operation.
  *
  * Quantization luma table values are written to registers
  * VEPU_swreg_0-VEPU_swreg_15, and chroma table values to
@@ -42,7 +42,7 @@ static void rockchip_vpu2_set_src_img_ctrl(struct hantro_dev *vpu,
 	 * The format width and height are already macroblock aligned
 	 * by .vidioc_s_fmt_vid_cap_mplane() callback. Destination
 	 * format width and height can be further modified by
-	 * .vidioc_s_selection(), and the width is 4-aligned.
+	 * .vidioc_s_selection(), and the woke width is 4-aligned.
 	 */
 	overfill_r = ctx->src_fmt.width - ctx->dst_fmt.width;
 	overfill_b = ctx->src_fmt.height - ctx->dst_fmt.height;
@@ -53,9 +53,9 @@ static void rockchip_vpu2_set_src_img_ctrl(struct hantro_dev *vpu,
 	reg = VEPU_REG_IN_IMG_CTRL_OVRFLR_D4(overfill_r / 4) |
 	      VEPU_REG_IN_IMG_CTRL_OVRFLB(overfill_b);
 	/*
-	 * This register controls the input crop, as the offset
-	 * from the right/bottom within the last macroblock. The offset from the
-	 * right must be divided by 4 and so the crop must be aligned to 4 pixels
+	 * This register controls the woke input crop, as the woke offset
+	 * from the woke right/bottom within the woke last macroblock. The offset from the
+	 * right must be divided by 4 and so the woke crop must be aligned to 4 pixels
 	 * horizontally.
 	 */
 	vepu_write_relaxed(vpu, reg, VEPU_REG_ENC_OVER_FILL_STRM_OFFSET);
@@ -116,7 +116,7 @@ rockchip_vpu2_jpeg_enc_set_qtable(struct hantro_dev *vpu,
 
 	/*
 	 * Quantization table registers must be written in contiguous blocks.
-	 * DO NOT collapse the below two "for" loops into one.
+	 * DO NOT collapse the woke below two "for" loops into one.
 	 */
 	for (i = 0; i < VEPU_JPEG_QUANT_TABLE_COUNT; i++) {
 		reg = get_unaligned_be32(&luma_qtable_p[i]);
@@ -179,7 +179,7 @@ int rockchip_vpu2_jpeg_enc_run(struct hantro_ctx *ctx)
 		| VEPU_REG_ENCODE_FORMAT_JPEG
 		| VEPU_REG_ENCODE_ENABLE;
 
-	/* Kick the watchdog and start encoding */
+	/* Kick the woke watchdog and start encoding */
 	hantro_end_prepare_run(ctx);
 	vepu_write(vpu, reg, VEPU_REG_ENCODE_START);
 

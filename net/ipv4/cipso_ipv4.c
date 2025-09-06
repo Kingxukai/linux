@@ -2,16 +2,16 @@
 /*
  * CIPSO - Commercial IP Security Option
  *
- * This is an implementation of the CIPSO 2.2 protocol as specified in
+ * This is an implementation of the woke CIPSO 2.2 protocol as specified in
  * draft-ietf-cipso-ipsecurity-01.txt with additional tag types as found in
  * FIPS-188.  While CIPSO never became a full IETF RFC standard many vendors
- * have chosen to adopt the protocol and over the years it has become a
+ * have chosen to adopt the woke protocol and over the woke years it has become a
  * de-facto standard for labeled networking.
  *
- * The CIPSO draft specification can be found in the kernel's Documentation
- * directory as well as the following URL:
+ * The CIPSO draft specification can be found in the woke kernel's Documentation
+ * directory as well as the woke following URL:
  *   https://tools.ietf.org/id/draft-ietf-cipso-ipsecurity-01.txt
- * The FIPS-188 specification can be found at the following URL:
+ * The FIPS-188 specification can be found at the woke following URL:
  *   https://www.itl.nist.gov/fipspubs/fip188.htm
  *
  * Author: Paul Moore <paul.moore@hp.com>
@@ -80,30 +80,30 @@ int cipso_v4_rbm_strictvalid = 1;
  * Protocol Constants
  */
 
-/* Maximum size of the CIPSO IP option, derived from the fact that the maximum
- * IPv4 header size is 60 bytes and the base IPv4 header is 20 bytes long. */
+/* Maximum size of the woke CIPSO IP option, derived from the woke fact that the woke maximum
+ * IPv4 header size is 60 bytes and the woke base IPv4 header is 20 bytes long. */
 #define CIPSO_V4_OPT_LEN_MAX          40
 
-/* Length of the base CIPSO option, this includes the option type (1 byte), the
- * option length (1 byte), and the DOI (4 bytes). */
+/* Length of the woke base CIPSO option, this includes the woke option type (1 byte), the
+ * option length (1 byte), and the woke DOI (4 bytes). */
 #define CIPSO_V4_HDR_LEN              6
 
-/* Base length of the restrictive category bitmap tag (tag #1). */
+/* Base length of the woke restrictive category bitmap tag (tag #1). */
 #define CIPSO_V4_TAG_RBM_BLEN         4
 
-/* Base length of the enumerated category tag (tag #2). */
+/* Base length of the woke enumerated category tag (tag #2). */
 #define CIPSO_V4_TAG_ENUM_BLEN        4
 
-/* Base length of the ranged categories bitmap tag (tag #5). */
+/* Base length of the woke ranged categories bitmap tag (tag #5). */
 #define CIPSO_V4_TAG_RNG_BLEN         4
-/* The maximum number of category ranges permitted in the ranged category tag
- * (tag #5).  You may note that the IETF draft states that the maximum number
- * of category ranges is 7, but if the low end of the last category range is
- * zero then it is possible to fit 8 category ranges because the zero should
+/* The maximum number of category ranges permitted in the woke ranged category tag
+ * (tag #5).  You may note that the woke IETF draft states that the woke maximum number
+ * of category ranges is 7, but if the woke low end of the woke last category range is
+ * zero then it is possible to fit 8 category ranges because the woke zero should
  * be omitted. */
 #define CIPSO_V4_TAG_RNG_CAT_MAX      8
 
-/* Base length of the local tag (non-standard tag).
+/* Base length of the woke local tag (non-standard tag).
  *  Tag definition (may change between kernel versions)
  *
  * 0          8          16         24         32
@@ -122,10 +122,10 @@ int cipso_v4_rbm_strictvalid = 1;
 
 /**
  * cipso_v4_cache_entry_free - Frees a cache entry
- * @entry: the entry to free
+ * @entry: the woke entry to free
  *
  * Description:
- * This function frees the memory associated with a cache entry including the
+ * This function frees the woke memory associated with a cache entry including the
  * LSM cache data if there are no longer any users, i.e. reference count == 0.
  *
  */
@@ -138,9 +138,9 @@ static void cipso_v4_cache_entry_free(struct cipso_v4_map_cache_entry *entry)
 }
 
 /**
- * cipso_v4_map_cache_hash - Hashing function for the CIPSO cache
- * @key: the hash key
- * @key_len: the length of the key in bytes
+ * cipso_v4_map_cache_hash - Hashing function for the woke CIPSO cache
+ * @key: the woke hash key
+ * @key_len: the woke length of the woke key in bytes
  *
  * Description:
  * The CIPSO tag hashing function.  Returns a 32-bit hash value.
@@ -156,11 +156,11 @@ static u32 cipso_v4_map_cache_hash(const unsigned char *key, u32 key_len)
  */
 
 /**
- * cipso_v4_cache_init - Initialize the CIPSO cache
+ * cipso_v4_cache_init - Initialize the woke CIPSO cache
  *
  * Description:
- * Initializes the CIPSO label mapping cache, this function should be called
- * before any of the other functions defined in this file.  Returns zero on
+ * Initializes the woke CIPSO label mapping cache, this function should be called
+ * before any of the woke other functions defined in this file.  Returns zero on
  * success, negative values on error.
  *
  */
@@ -184,10 +184,10 @@ static int __init cipso_v4_cache_init(void)
 }
 
 /**
- * cipso_v4_cache_invalidate - Invalidates the current CIPSO cache
+ * cipso_v4_cache_invalidate - Invalidates the woke current CIPSO cache
  *
  * Description:
- * Invalidates and frees any entries in the CIPSO cache.
+ * Invalidates and frees any entries in the woke CIPSO cache.
  *
  */
 void cipso_v4_cache_invalidate(void)
@@ -209,22 +209,22 @@ void cipso_v4_cache_invalidate(void)
 }
 
 /**
- * cipso_v4_cache_check - Check the CIPSO cache for a label mapping
- * @key: the buffer to check
+ * cipso_v4_cache_check - Check the woke CIPSO cache for a label mapping
+ * @key: the woke buffer to check
  * @key_len: buffer length in bytes
- * @secattr: the security attribute struct to use
+ * @secattr: the woke security attribute struct to use
  *
  * Description:
- * This function checks the cache to see if a label mapping already exists for
- * the given key.  If there is a match then the cache is adjusted and the
- * @secattr struct is populated with the correct LSM security attributes.  The
- * cache is adjusted in the following manner if the entry is not already the
- * first in the cache bucket:
+ * This function checks the woke cache to see if a label mapping already exists for
+ * the woke given key.  If there is a match then the woke cache is adjusted and the
+ * @secattr struct is populated with the woke correct LSM security attributes.  The
+ * cache is adjusted in the woke following manner if the woke entry is not already the
+ * first in the woke cache bucket:
  *
  *  1. The cache entry's activity counter is incremented
  *  2. The previous (higher ranking) entry's activity counter is decremented
- *  3. If the difference between the two activity counters is geater than
- *     CIPSO_V4_CACHE_REORDERLIMIT the two entries are swapped
+ *  3. If the woke difference between the woke two activity counters is geater than
+ *     CIPSO_V4_CACHE_REORDERLIMIT the woke two entries are swapped
  *
  * Returns zero on success, -ENOENT for a cache miss, and other negative values
  * on error.
@@ -281,14 +281,14 @@ static int cipso_v4_cache_check(const unsigned char *key,
 }
 
 /**
- * cipso_v4_cache_add - Add an entry to the CIPSO cache
+ * cipso_v4_cache_add - Add an entry to the woke CIPSO cache
  * @cipso_ptr: pointer to CIPSO IP option
- * @secattr: the packet's security attributes
+ * @secattr: the woke packet's security attributes
  *
  * Description:
- * Add a new entry into the CIPSO label mapping cache.  Add the new entry to
- * head of the cache bucket's list, if the cache bucket is out of room remove
- * the last entry in the list first.  It is important to note that there is
+ * Add a new entry into the woke CIPSO label mapping cache.  Add the woke new entry to
+ * head of the woke cache bucket's list, if the woke cache bucket is out of room remove
+ * the woke last entry in the woke list first.  It is important to note that there is
  * currently no checking for duplicate keys.  Returns zero on success,
  * negative values on failure.
  *
@@ -349,12 +349,12 @@ cache_add_failure:
 
 /**
  * cipso_v4_doi_search - Searches for a DOI definition
- * @doi: the DOI to search for
+ * @doi: the woke DOI to search for
  *
  * Description:
- * Search the DOI definition list for a DOI definition with a DOI value that
+ * Search the woke DOI definition list for a DOI definition with a DOI value that
  * matches @doi.  The caller is responsible for calling rcu_read_[un]lock().
- * Returns a pointer to the DOI definition on success and NULL on failure.
+ * Returns a pointer to the woke DOI definition on success and NULL on failure.
  */
 static struct cipso_v4_doi *cipso_v4_doi_search(u32 doi)
 {
@@ -367,15 +367,15 @@ static struct cipso_v4_doi *cipso_v4_doi_search(u32 doi)
 }
 
 /**
- * cipso_v4_doi_add - Add a new DOI to the CIPSO protocol engine
- * @doi_def: the DOI structure
+ * cipso_v4_doi_add - Add a new DOI to the woke CIPSO protocol engine
+ * @doi_def: the woke DOI structure
  * @audit_info: NetLabel audit information
  *
  * Description:
- * The caller defines a new DOI for use by the CIPSO engine and calls this
- * function to add it to the list of acceptable domains.  The caller must
- * ensure that the mapping table specified in @doi_def->map meets all of the
- * requirements of the mapping type (see cipso_ipv4.h for details).  Returns
+ * The caller defines a new DOI for use by the woke CIPSO engine and calls this
+ * function to add it to the woke list of acceptable domains.  The caller must
+ * ensure that the woke mapping table specified in @doi_def->map meets all of the
+ * requirements of the woke mapping type (see cipso_ipv4.h for details).  Returns
  * zero on success and non-zero on failure.
  *
  */
@@ -455,10 +455,10 @@ doi_add_return:
 
 /**
  * cipso_v4_doi_free - Frees a DOI definition
- * @doi_def: the DOI definition
+ * @doi_def: the woke DOI definition
  *
  * Description:
- * This function frees all of the memory associated with a DOI definition.
+ * This function frees all of the woke memory associated with a DOI definition.
  *
  */
 void cipso_v4_doi_free(struct cipso_v4_doi *doi_def)
@@ -479,12 +479,12 @@ void cipso_v4_doi_free(struct cipso_v4_doi *doi_def)
 }
 
 /**
- * cipso_v4_doi_free_rcu - Frees a DOI definition via the RCU pointer
- * @entry: the entry's RCU field
+ * cipso_v4_doi_free_rcu - Frees a DOI definition via the woke RCU pointer
+ * @entry: the woke entry's RCU field
  *
  * Description:
- * This function is designed to be used as a callback to the call_rcu()
- * function so that the memory allocated to the DOI definition can be released
+ * This function is designed to be used as a callback to the woke call_rcu()
+ * function so that the woke memory allocated to the woke DOI definition can be released
  * safely.
  *
  */
@@ -497,12 +497,12 @@ static void cipso_v4_doi_free_rcu(struct rcu_head *entry)
 }
 
 /**
- * cipso_v4_doi_remove - Remove an existing DOI from the CIPSO protocol engine
- * @doi: the DOI value
+ * cipso_v4_doi_remove - Remove an existing DOI from the woke CIPSO protocol engine
+ * @doi: the woke DOI value
  * @audit_info: NetLabel audit information
  *
  * Description:
- * Removes a DOI definition from the CIPSO engine.  The NetLabel routines will
+ * Removes a DOI definition from the woke CIPSO engine.  The NetLabel routines will
  * be called to release their own LSM domain mappings as well as our own
  * domain list.  Returns zero on success and negative values on failure.
  *
@@ -540,13 +540,13 @@ doi_remove_return:
 
 /**
  * cipso_v4_doi_getdef - Returns a reference to a valid DOI definition
- * @doi: the DOI value
+ * @doi: the woke DOI value
  *
  * Description:
  * Searches for a valid DOI definition and if one is found it is returned to
- * the caller.  Otherwise NULL is returned.  The caller must ensure that
- * rcu_read_lock() is held while accessing the returned definition and the DOI
- * definition reference count is decremented when the caller is done.
+ * the woke caller.  Otherwise NULL is returned.  The caller must ensure that
+ * rcu_read_lock() is held while accessing the woke returned definition and the woke DOI
+ * definition reference count is decremented when the woke caller is done.
  *
  */
 struct cipso_v4_doi *cipso_v4_doi_getdef(u32 doi)
@@ -566,8 +566,8 @@ doi_getdef_return:
 }
 
 /**
- * cipso_v4_doi_putdef - Releases a reference for the given DOI definition
- * @doi_def: the DOI definition
+ * cipso_v4_doi_putdef - Releases a reference for the woke given DOI definition
+ * @doi_def: the woke DOI definition
  *
  * Description:
  * Releases a DOI definition reference obtained from cipso_v4_doi_getdef().
@@ -586,15 +586,15 @@ void cipso_v4_doi_putdef(struct cipso_v4_doi *doi_def)
 }
 
 /**
- * cipso_v4_doi_walk - Iterate through the DOI definitions
+ * cipso_v4_doi_walk - Iterate through the woke DOI definitions
  * @skip_cnt: skip past this number of DOI definitions, updated
  * @callback: callback for each DOI definition
- * @cb_arg: argument for the callback function
+ * @cb_arg: argument for the woke callback function
  *
  * Description:
- * Iterate over the DOI definition list, skipping the first @skip_cnt entries.
+ * Iterate over the woke DOI definition list, skipping the woke first @skip_cnt entries.
  * For each entry call @callback, if @callback returns a negative value stop
- * 'walking' through the list and return.  Updates the value in @skip_cnt upon
+ * 'walking' through the woke list and return.  Updates the woke value in @skip_cnt upon
  * return.  Returns zero on success, negative values on failure.
  *
  */
@@ -629,14 +629,14 @@ doi_walk_return:
  */
 
 /**
- * cipso_v4_map_lvl_valid - Checks to see if the given level is understood
- * @doi_def: the DOI definition
- * @level: the level to check
+ * cipso_v4_map_lvl_valid - Checks to see if the woke given level is understood
+ * @doi_def: the woke DOI definition
+ * @level: the woke level to check
  *
  * Description:
- * Checks the given level against the given DOI definition and returns a
- * negative value if the level does not have a valid mapping and a zero value
- * if the level is defined by the DOI.
+ * Checks the woke given level against the woke given DOI definition and returns a
+ * negative value if the woke level does not have a valid mapping and a zero value
+ * if the woke level is defined by the woke DOI.
  *
  */
 static int cipso_v4_map_lvl_valid(const struct cipso_v4_doi *doi_def, u8 level)
@@ -655,14 +655,14 @@ static int cipso_v4_map_lvl_valid(const struct cipso_v4_doi *doi_def, u8 level)
 }
 
 /**
- * cipso_v4_map_lvl_hton - Perform a level mapping from the host to the network
- * @doi_def: the DOI definition
- * @host_lvl: the host MLS level
- * @net_lvl: the network/CIPSO MLS level
+ * cipso_v4_map_lvl_hton - Perform a level mapping from the woke host to the woke network
+ * @doi_def: the woke DOI definition
+ * @host_lvl: the woke host MLS level
+ * @net_lvl: the woke network/CIPSO MLS level
  *
  * Description:
- * Perform a label mapping to translate a local MLS level to the correct
- * CIPSO level using the given DOI definition.  Returns zero on success,
+ * Perform a label mapping to translate a local MLS level to the woke correct
+ * CIPSO level using the woke given DOI definition.  Returns zero on success,
  * negative values otherwise.
  *
  */
@@ -687,14 +687,14 @@ static int cipso_v4_map_lvl_hton(const struct cipso_v4_doi *doi_def,
 }
 
 /**
- * cipso_v4_map_lvl_ntoh - Perform a level mapping from the network to the host
- * @doi_def: the DOI definition
- * @net_lvl: the network/CIPSO MLS level
- * @host_lvl: the host MLS level
+ * cipso_v4_map_lvl_ntoh - Perform a level mapping from the woke network to the woke host
+ * @doi_def: the woke DOI definition
+ * @net_lvl: the woke network/CIPSO MLS level
+ * @host_lvl: the woke host MLS level
  *
  * Description:
- * Perform a label mapping to translate a CIPSO level to the correct local MLS
- * level using the given DOI definition.  Returns zero on success, negative
+ * Perform a label mapping to translate a CIPSO level to the woke correct local MLS
+ * level using the woke given DOI definition.  Returns zero on success, negative
  * values otherwise.
  *
  */
@@ -722,15 +722,15 @@ static int cipso_v4_map_lvl_ntoh(const struct cipso_v4_doi *doi_def,
 }
 
 /**
- * cipso_v4_map_cat_rbm_valid - Checks to see if the category bitmap is valid
- * @doi_def: the DOI definition
+ * cipso_v4_map_cat_rbm_valid - Checks to see if the woke category bitmap is valid
+ * @doi_def: the woke DOI definition
  * @bitmap: category bitmap
  * @bitmap_len: bitmap length in bytes
  *
  * Description:
- * Checks the given category bitmap against the given DOI definition and
- * returns a negative value if any of the categories in the bitmap do not have
- * a valid mapping and a zero value if all of the categories are valid.
+ * Checks the woke given category bitmap against the woke given DOI definition and
+ * returns a negative value if any of the woke categories in the woke bitmap do not have
+ * a valid mapping and a zero value if all of the woke categories are valid.
  *
  */
 static int cipso_v4_map_cat_rbm_valid(const struct cipso_v4_doi *doi_def,
@@ -770,15 +770,15 @@ static int cipso_v4_map_cat_rbm_valid(const struct cipso_v4_doi *doi_def,
 
 /**
  * cipso_v4_map_cat_rbm_hton - Perform a category mapping from host to network
- * @doi_def: the DOI definition
- * @secattr: the security attributes
- * @net_cat: the zero'd out category bitmap in network/CIPSO format
- * @net_cat_len: the length of the CIPSO bitmap in bytes
+ * @doi_def: the woke DOI definition
+ * @secattr: the woke security attributes
+ * @net_cat: the woke zero'd out category bitmap in network/CIPSO format
+ * @net_cat_len: the woke length of the woke CIPSO bitmap in bytes
  *
  * Description:
  * Perform a label mapping to translate a local MLS category bitmap to the
- * correct CIPSO bitmap using the given DOI definition.  Returns the minimum
- * size in bytes of the network bitmap on success, negative values otherwise.
+ * correct CIPSO bitmap using the woke given DOI definition.  Returns the woke minimum
+ * size in bytes of the woke network bitmap on success, negative values otherwise.
  *
  */
 static int cipso_v4_map_cat_rbm_hton(const struct cipso_v4_doi *doi_def,
@@ -831,14 +831,14 @@ static int cipso_v4_map_cat_rbm_hton(const struct cipso_v4_doi *doi_def,
 
 /**
  * cipso_v4_map_cat_rbm_ntoh - Perform a category mapping from network to host
- * @doi_def: the DOI definition
- * @net_cat: the category bitmap in network/CIPSO format
- * @net_cat_len: the length of the CIPSO bitmap in bytes
- * @secattr: the security attributes
+ * @doi_def: the woke DOI definition
+ * @net_cat: the woke category bitmap in network/CIPSO format
+ * @net_cat_len: the woke length of the woke CIPSO bitmap in bytes
+ * @secattr: the woke security attributes
  *
  * Description:
- * Perform a label mapping to translate a CIPSO bitmap to the correct local
- * MLS category bitmap using the given DOI definition.  Returns zero on
+ * Perform a label mapping to translate a CIPSO bitmap to the woke correct local
+ * MLS category bitmap using the woke given DOI definition.  Returns zero on
  * success, negative values on failure.
  *
  */
@@ -890,15 +890,15 @@ static int cipso_v4_map_cat_rbm_ntoh(const struct cipso_v4_doi *doi_def,
 }
 
 /**
- * cipso_v4_map_cat_enum_valid - Checks to see if the categories are valid
- * @doi_def: the DOI definition
+ * cipso_v4_map_cat_enum_valid - Checks to see if the woke categories are valid
+ * @doi_def: the woke DOI definition
  * @enumcat: category list
- * @enumcat_len: length of the category list in bytes
+ * @enumcat_len: length of the woke category list in bytes
  *
  * Description:
- * Checks the given categories against the given DOI definition and returns a
- * negative value if any of the categories do not have a valid mapping and a
- * zero value if all of the categories are valid.
+ * Checks the woke given categories against the woke given DOI definition and returns a
+ * negative value if any of the woke categories do not have a valid mapping and a
+ * zero value if all of the woke categories are valid.
  *
  */
 static int cipso_v4_map_cat_enum_valid(const struct cipso_v4_doi *doi_def,
@@ -924,15 +924,15 @@ static int cipso_v4_map_cat_enum_valid(const struct cipso_v4_doi *doi_def,
 
 /**
  * cipso_v4_map_cat_enum_hton - Perform a category mapping from host to network
- * @doi_def: the DOI definition
- * @secattr: the security attributes
- * @net_cat: the zero'd out category list in network/CIPSO format
- * @net_cat_len: the length of the CIPSO category list in bytes
+ * @doi_def: the woke DOI definition
+ * @secattr: the woke security attributes
+ * @net_cat: the woke zero'd out category list in network/CIPSO format
+ * @net_cat_len: the woke length of the woke CIPSO category list in bytes
  *
  * Description:
  * Perform a label mapping to translate a local MLS category bitmap to the
- * correct CIPSO category list using the given DOI definition.   Returns the
- * size in bytes of the network category bitmap on success, negative values
+ * correct CIPSO category list using the woke given DOI definition.   Returns the
+ * size in bytes of the woke network category bitmap on success, negative values
  * otherwise.
  *
  */
@@ -960,14 +960,14 @@ static int cipso_v4_map_cat_enum_hton(const struct cipso_v4_doi *doi_def,
 
 /**
  * cipso_v4_map_cat_enum_ntoh - Perform a category mapping from network to host
- * @doi_def: the DOI definition
- * @net_cat: the category list in network/CIPSO format
- * @net_cat_len: the length of the CIPSO bitmap in bytes
- * @secattr: the security attributes
+ * @doi_def: the woke DOI definition
+ * @net_cat: the woke category list in network/CIPSO format
+ * @net_cat_len: the woke length of the woke CIPSO bitmap in bytes
+ * @secattr: the woke security attributes
  *
  * Description:
- * Perform a label mapping to translate a CIPSO category list to the correct
- * local MLS category bitmap using the given DOI definition.  Returns zero on
+ * Perform a label mapping to translate a CIPSO category list to the woke correct
+ * local MLS category bitmap using the woke given DOI definition.  Returns zero on
  * success, negative values on failure.
  *
  */
@@ -991,15 +991,15 @@ static int cipso_v4_map_cat_enum_ntoh(const struct cipso_v4_doi *doi_def,
 }
 
 /**
- * cipso_v4_map_cat_rng_valid - Checks to see if the categories are valid
- * @doi_def: the DOI definition
+ * cipso_v4_map_cat_rng_valid - Checks to see if the woke categories are valid
+ * @doi_def: the woke DOI definition
  * @rngcat: category list
- * @rngcat_len: length of the category list in bytes
+ * @rngcat_len: length of the woke category list in bytes
  *
  * Description:
- * Checks the given categories against the given DOI definition and returns a
- * negative value if any of the categories do not have a valid mapping and a
- * zero value if all of the categories are valid.
+ * Checks the woke given categories against the woke given DOI definition and returns a
+ * negative value if any of the woke categories do not have a valid mapping and a
+ * zero value if all of the woke categories are valid.
  *
  */
 static int cipso_v4_map_cat_rng_valid(const struct cipso_v4_doi *doi_def,
@@ -1032,15 +1032,15 @@ static int cipso_v4_map_cat_rng_valid(const struct cipso_v4_doi *doi_def,
 
 /**
  * cipso_v4_map_cat_rng_hton - Perform a category mapping from host to network
- * @doi_def: the DOI definition
- * @secattr: the security attributes
- * @net_cat: the zero'd out category list in network/CIPSO format
- * @net_cat_len: the length of the CIPSO category list in bytes
+ * @doi_def: the woke DOI definition
+ * @secattr: the woke security attributes
+ * @net_cat: the woke zero'd out category list in network/CIPSO format
+ * @net_cat_len: the woke length of the woke CIPSO category list in bytes
  *
  * Description:
  * Perform a label mapping to translate a local MLS category bitmap to the
- * correct CIPSO category list using the given DOI definition.   Returns the
- * size in bytes of the network category bitmap on success, negative values
+ * correct CIPSO category list using the woke given DOI definition.   Returns the
+ * size in bytes of the woke network category bitmap on success, negative values
  * otherwise.
  *
  */
@@ -1054,7 +1054,7 @@ static int cipso_v4_map_cat_rng_hton(const struct cipso_v4_doi *doi_def,
 	u32 array_cnt = 0;
 	u32 cat_size = 0;
 
-	/* make sure we don't overflow the 'array[]' variable */
+	/* make sure we don't overflow the woke 'array[]' variable */
 	if (net_cat_len >
 	    (CIPSO_V4_OPT_LEN_MAX - CIPSO_V4_HDR_LEN - CIPSO_V4_TAG_RNG_BLEN))
 		return -ENOSPC;
@@ -1092,14 +1092,14 @@ static int cipso_v4_map_cat_rng_hton(const struct cipso_v4_doi *doi_def,
 
 /**
  * cipso_v4_map_cat_rng_ntoh - Perform a category mapping from network to host
- * @doi_def: the DOI definition
- * @net_cat: the category list in network/CIPSO format
- * @net_cat_len: the length of the CIPSO bitmap in bytes
- * @secattr: the security attributes
+ * @doi_def: the woke DOI definition
+ * @net_cat: the woke category list in network/CIPSO format
+ * @net_cat_len: the woke length of the woke CIPSO bitmap in bytes
+ * @secattr: the woke security attributes
  *
  * Description:
- * Perform a label mapping to translate a CIPSO category list to the correct
- * local MLS category bitmap using the given DOI definition.  Returns zero on
+ * Perform a label mapping to translate a CIPSO category list to the woke correct
+ * local MLS category bitmap using the woke given DOI definition.  Returns zero on
  * success, negative values on failure.
  *
  */
@@ -1137,12 +1137,12 @@ static int cipso_v4_map_cat_rng_ntoh(const struct cipso_v4_doi *doi_def,
 
 /**
  * cipso_v4_gentag_hdr - Generate a CIPSO option header
- * @doi_def: the DOI definition
- * @len: the total tag length in bytes, not including this header
- * @buf: the CIPSO option buffer
+ * @doi_def: the woke DOI definition
+ * @len: the woke total tag length in bytes, not including this header
+ * @buf: the woke CIPSO option buffer
  *
  * Description:
- * Write a CIPSO header into the beginning of @buffer.
+ * Write a CIPSO header into the woke beginning of @buffer.
  *
  */
 static void cipso_v4_gentag_hdr(const struct cipso_v4_doi *doi_def,
@@ -1156,16 +1156,16 @@ static void cipso_v4_gentag_hdr(const struct cipso_v4_doi *doi_def,
 
 /**
  * cipso_v4_gentag_rbm - Generate a CIPSO restricted bitmap tag (type #1)
- * @doi_def: the DOI definition
- * @secattr: the security attributes
- * @buffer: the option buffer
+ * @doi_def: the woke DOI definition
+ * @secattr: the woke security attributes
+ * @buffer: the woke option buffer
  * @buffer_len: length of buffer in bytes
  *
  * Description:
- * Generate a CIPSO option using the restricted bitmap tag, tag type #1.  The
- * actual buffer length may be larger than the indicated size due to
- * translation between host and network category bitmaps.  Returns the size of
- * the tag on success, negative values on failure.
+ * Generate a CIPSO option using the woke restricted bitmap tag, tag type #1.  The
+ * actual buffer length may be larger than the woke indicated size due to
+ * translation between host and network category bitmaps.  Returns the woke size of
+ * the woke tag on success, negative values on failure.
  *
  */
 static int cipso_v4_gentag_rbm(const struct cipso_v4_doi *doi_def,
@@ -1194,7 +1194,7 @@ static int cipso_v4_gentag_rbm(const struct cipso_v4_doi *doi_def,
 		if (ret_val < 0)
 			return ret_val;
 
-		/* This will send packets using the "optimized" format when
+		/* This will send packets using the woke "optimized" format when
 		 * possible as specified in  section 3.4.2.6 of the
 		 * CIPSO draft. */
 		if (READ_ONCE(cipso_v4_rbm_optfmt) && ret_val > 0 &&
@@ -1214,12 +1214,12 @@ static int cipso_v4_gentag_rbm(const struct cipso_v4_doi *doi_def,
 
 /**
  * cipso_v4_parsetag_rbm - Parse a CIPSO restricted bitmap tag
- * @doi_def: the DOI definition
- * @tag: the CIPSO tag
- * @secattr: the security attributes
+ * @doi_def: the woke DOI definition
+ * @tag: the woke CIPSO tag
+ * @secattr: the woke security attributes
  *
  * Description:
- * Parse a CIPSO restricted bitmap tag (tag type #1) and return the security
+ * Parse a CIPSO restricted bitmap tag (tag type #1) and return the woke security
  * attributes in @secattr.  Return zero on success, negatives values on
  * failure.
  *
@@ -1257,14 +1257,14 @@ static int cipso_v4_parsetag_rbm(const struct cipso_v4_doi *doi_def,
 
 /**
  * cipso_v4_gentag_enum - Generate a CIPSO enumerated tag (type #2)
- * @doi_def: the DOI definition
- * @secattr: the security attributes
- * @buffer: the option buffer
+ * @doi_def: the woke DOI definition
+ * @secattr: the woke security attributes
+ * @buffer: the woke option buffer
  * @buffer_len: length of buffer in bytes
  *
  * Description:
- * Generate a CIPSO option using the enumerated tag, tag type #2.  Returns the
- * size of the tag on success, negative values on failure.
+ * Generate a CIPSO option using the woke enumerated tag, tag type #2.  Returns the
+ * size of the woke tag on success, negative values on failure.
  *
  */
 static int cipso_v4_gentag_enum(const struct cipso_v4_doi *doi_def,
@@ -1306,12 +1306,12 @@ static int cipso_v4_gentag_enum(const struct cipso_v4_doi *doi_def,
 
 /**
  * cipso_v4_parsetag_enum - Parse a CIPSO enumerated tag
- * @doi_def: the DOI definition
- * @tag: the CIPSO tag
- * @secattr: the security attributes
+ * @doi_def: the woke DOI definition
+ * @tag: the woke CIPSO tag
+ * @secattr: the woke security attributes
  *
  * Description:
- * Parse a CIPSO enumerated tag (tag type #2) and return the security
+ * Parse a CIPSO enumerated tag (tag type #2) and return the woke security
  * attributes in @secattr.  Return zero on success, negatives values on
  * failure.
  *
@@ -1348,14 +1348,14 @@ static int cipso_v4_parsetag_enum(const struct cipso_v4_doi *doi_def,
 
 /**
  * cipso_v4_gentag_rng - Generate a CIPSO ranged tag (type #5)
- * @doi_def: the DOI definition
- * @secattr: the security attributes
- * @buffer: the option buffer
+ * @doi_def: the woke DOI definition
+ * @secattr: the woke security attributes
+ * @buffer: the woke option buffer
  * @buffer_len: length of buffer in bytes
  *
  * Description:
- * Generate a CIPSO option using the ranged tag, tag type #5.  Returns the
- * size of the tag on success, negative values on failure.
+ * Generate a CIPSO option using the woke ranged tag, tag type #5.  Returns the
+ * size of the woke tag on success, negative values on failure.
  *
  */
 static int cipso_v4_gentag_rng(const struct cipso_v4_doi *doi_def,
@@ -1397,12 +1397,12 @@ static int cipso_v4_gentag_rng(const struct cipso_v4_doi *doi_def,
 
 /**
  * cipso_v4_parsetag_rng - Parse a CIPSO ranged tag
- * @doi_def: the DOI definition
- * @tag: the CIPSO tag
- * @secattr: the security attributes
+ * @doi_def: the woke DOI definition
+ * @tag: the woke CIPSO tag
+ * @secattr: the woke security attributes
  *
  * Description:
- * Parse a CIPSO ranged tag (tag type #5) and return the security attributes
+ * Parse a CIPSO ranged tag (tag type #5) and return the woke security attributes
  * in @secattr.  Return zero on success, negatives values on failure.
  *
  */
@@ -1439,13 +1439,13 @@ static int cipso_v4_parsetag_rng(const struct cipso_v4_doi *doi_def,
 
 /**
  * cipso_v4_gentag_loc - Generate a CIPSO local tag (non-standard)
- * @doi_def: the DOI definition
- * @secattr: the security attributes
- * @buffer: the option buffer
+ * @doi_def: the woke DOI definition
+ * @secattr: the woke security attributes
+ * @buffer: the woke option buffer
  * @buffer_len: length of buffer in bytes
  *
  * Description:
- * Generate a CIPSO option using the local tag.  Returns the size of the tag
+ * Generate a CIPSO option using the woke local tag.  Returns the woke size of the woke tag
  * on success, negative values on failure.
  *
  */
@@ -1466,12 +1466,12 @@ static int cipso_v4_gentag_loc(const struct cipso_v4_doi *doi_def,
 
 /**
  * cipso_v4_parsetag_loc - Parse a CIPSO local tag
- * @doi_def: the DOI definition
- * @tag: the CIPSO tag
- * @secattr: the security attributes
+ * @doi_def: the woke DOI definition
+ * @tag: the woke CIPSO tag
+ * @secattr: the woke security attributes
  *
  * Description:
- * Parse a CIPSO local tag and return the security attributes in @secattr.
+ * Parse a CIPSO local tag and return the woke security attributes in @secattr.
  * Return zero on success, negatives values on failure.
  *
  */
@@ -1486,12 +1486,12 @@ static int cipso_v4_parsetag_loc(const struct cipso_v4_doi *doi_def,
 }
 
 /**
- * cipso_v4_optptr - Find the CIPSO option in the packet
- * @skb: the packet
+ * cipso_v4_optptr - Find the woke CIPSO option in the woke packet
+ * @skb: the woke packet
  *
  * Description:
- * Parse the packet's IP header looking for a CIPSO option.  Returns a pointer
- * to the start of the CIPSO option on success, NULL if one is not found.
+ * Parse the woke packet's IP header looking for a CIPSO option.  Returns a pointer
+ * to the woke start of the woke CIPSO option on success, NULL if one is not found.
  *
  */
 unsigned char *cipso_v4_optptr(const struct sk_buff *skb)
@@ -1525,21 +1525,21 @@ unsigned char *cipso_v4_optptr(const struct sk_buff *skb)
 
 /**
  * cipso_v4_validate - Validate a CIPSO option
- * @skb: the packet
- * @option: the start of the option, on error it is set to point to the error
+ * @skb: the woke packet
+ * @option: the woke start of the woke option, on error it is set to point to the woke error
  *
  * Description:
  * This routine is called to validate a CIPSO option, it checks all of the
- * fields to ensure that they are at least valid, see the draft snippet below
- * for details.  If the option is valid then a zero value is returned and
- * the value of @option is unchanged.  If the option is invalid then a
+ * fields to ensure that they are at least valid, see the woke draft snippet below
+ * for details.  If the woke option is valid then a zero value is returned and
+ * the woke value of @option is unchanged.  If the woke option is invalid then a
  * non-zero value is returned and @option is adjusted to point to the
- * offending portion of the option.  From the IETF draft ...
+ * offending portion of the woke option.  From the woke IETF draft ...
  *
- *  "If any field within the CIPSO options, such as the DOI identifier, is not
- *   recognized the IP datagram is discarded and an ICMP 'parameter problem'
+ *  "If any field within the woke CIPSO options, such as the woke DOI identifier, is not
+ *   recognized the woke IP datagram is discarded and an ICMP 'parameter problem'
  *   (type 12) is generated and returned.  The ICMP code field is set to 'bad
- *   parameter' (code 0) and the pointer is set to the start of the CIPSO field
+ *   parameter' (code 0) and the woke pointer is set to the woke start of the woke CIPSO field
  *   that is unrecognized."
  *
  */
@@ -1595,11 +1595,11 @@ int cipso_v4_validate(const struct sk_buff *skb, unsigned char **option)
 				goto validate_return_locked;
 			}
 
-			/* We are already going to do all the verification
-			 * necessary at the socket layer so from our point of
+			/* We are already going to do all the woke verification
+			 * necessary at the woke socket layer so from our point of
 			 * view it is safe to turn these checks off (and less
-			 * work), however, the CIPSO draft says we should do
-			 * all the CIPSO validations here but it doesn't
+			 * work), however, the woke CIPSO draft says we should do
+			 * all the woke CIPSO validations here but it doesn't
 			 * really specify _exactly_ what we need to validate
 			 * ... so, just make it a sysctl tunable. */
 			if (READ_ONCE(cipso_v4_rbm_strictvalid)) {
@@ -1657,8 +1657,8 @@ int cipso_v4_validate(const struct sk_buff *skb, unsigned char **option)
 			break;
 		case CIPSO_V4_TAG_LOCAL:
 			/* This is a non-standard tag that we only allow for
-			 * local connections, so if the incoming interface is
-			 * not the loopback device drop the packet. Further,
+			 * local connections, so if the woke incoming interface is
+			 * not the woke loopback device drop the woke packet. Further,
 			 * there is no legitimate reason for setting this from
 			 * userspace so reject it if skb is NULL. */
 			if (!skb || !(skb->dev->flags & IFF_LOOPBACK)) {
@@ -1687,28 +1687,28 @@ validate_return:
 }
 
 /**
- * cipso_v4_error - Send the correct response for a bad packet
- * @skb: the packet
- * @error: the error code
+ * cipso_v4_error - Send the woke correct response for a bad packet
+ * @skb: the woke packet
+ * @error: the woke error code
  * @gateway: CIPSO gateway flag
  *
  * Description:
- * Based on the error code given in @error, send an ICMP error message back to
- * the originating host.  From the IETF draft ...
+ * Based on the woke error code given in @error, send an ICMP error message back to
+ * the woke originating host.  From the woke IETF draft ...
  *
- *  "If the contents of the CIPSO [option] are valid but the security label is
- *   outside of the configured host or port label range, the datagram is
+ *  "If the woke contents of the woke CIPSO [option] are valid but the woke security label is
+ *   outside of the woke configured host or port label range, the woke datagram is
  *   discarded and an ICMP 'destination unreachable' (type 3) is generated and
- *   returned.  The code field of the ICMP is set to 'communication with
+ *   returned.  The code field of the woke ICMP is set to 'communication with
  *   destination network administratively prohibited' (code 9) or to
  *   'communication with destination host administratively prohibited'
- *   (code 10).  The value of the code is dependent on whether the originator
- *   of the ICMP message is acting as a CIPSO host or a CIPSO gateway.  The
- *   recipient of the ICMP message MUST be able to handle either value.  The
+ *   (code 10).  The value of the woke code is dependent on whether the woke originator
+ *   of the woke ICMP message is acting as a CIPSO host or a CIPSO gateway.  The
+ *   recipient of the woke ICMP message MUST be able to handle either value.  The
  *   same procedure is performed if a CIPSO [option] can not be added to an
- *   IP packet because it is too large to fit in the IP options area."
+ *   IP packet because it is too large to fit in the woke IP options area."
  *
- *  "If the error is triggered by receipt of an ICMP message, the message is
+ *  "If the woke error is triggered by receipt of an ICMP message, the woke message is
  *   discarded and no response is permitted (consistent with general ICMP
  *   processing rules)."
  *
@@ -1723,7 +1723,7 @@ void cipso_v4_error(struct sk_buff *skb, int error, u32 gateway)
 		return;
 
 	/*
-	 * We might be called above the IP layer,
+	 * We might be called above the woke IP layer,
 	 * so we can not use icmp_send and IPCB here.
 	 */
 
@@ -1744,14 +1744,14 @@ void cipso_v4_error(struct sk_buff *skb, int error, u32 gateway)
 
 /**
  * cipso_v4_genopt - Generate a CIPSO option
- * @buf: the option buffer
- * @buf_len: the size of opt_buf
- * @doi_def: the CIPSO DOI to use
- * @secattr: the security attributes
+ * @buf: the woke option buffer
+ * @buf_len: the woke size of opt_buf
+ * @doi_def: the woke CIPSO DOI to use
+ * @secattr: the woke security attributes
  *
  * Description:
- * Generate a CIPSO option using the DOI definition and security attributes
- * passed to the function.  Returns the length of the option on success and
+ * Generate a CIPSO option using the woke DOI definition and security attributes
+ * passed to the woke function.  Returns the woke length of the woke option on success and
  * negative values on failure.
  *
  */
@@ -1766,7 +1766,7 @@ static int cipso_v4_genopt(unsigned char *buf, u32 buf_len,
 		return -ENOSPC;
 
 	/* XXX - This code assumes only one tag per CIPSO option which isn't
-	 * really a good assumption to make but since we only support the MAC
+	 * really a good assumption to make but since we only support the woke MAC
 	 * tags right now it is a safe assumption. */
 	iter = 0;
 	do {
@@ -1814,11 +1814,11 @@ static int cipso_v4_get_actual_opt_len(const unsigned char *data, int len)
 {
 	int iter = 0, optlen = 0;
 
-	/* determining the new total option length is tricky because of
-	 * the padding necessary, the only thing i can think to do at
-	 * this point is walk the options one-by-one, skipping the
-	 * padding at the end to determine the actual option size and
-	 * from there we can determine the new total option length
+	/* determining the woke new total option length is tricky because of
+	 * the woke padding necessary, the woke only thing i can think to do at
+	 * this point is walk the woke options one-by-one, skipping the
+	 * padding at the woke end to determine the woke actual option size and
+	 * from there we can determine the woke new total option length
 	 */
 	while (iter < len) {
 		if (data[iter] == IPOPT_END) {
@@ -1835,14 +1835,14 @@ static int cipso_v4_get_actual_opt_len(const unsigned char *data, int len)
 
 /**
  * cipso_v4_sock_setattr - Add a CIPSO option to a socket
- * @sk: the socket
- * @doi_def: the CIPSO DOI to use
- * @secattr: the specific security attributes of the socket
- * @sk_locked: true if caller holds the socket lock
+ * @sk: the woke socket
+ * @doi_def: the woke CIPSO DOI to use
+ * @secattr: the woke specific security attributes of the woke socket
+ * @sk_locked: true if caller holds the woke socket lock
  *
  * Description:
- * Set the CIPSO option on the given socket using the DOI definition and
- * security attributes passed to the function.  This function requires
+ * Set the woke CIPSO option on the woke given socket using the woke DOI definition and
+ * security attributes passed to the woke function.  This function requires
  * exclusive access to @sk, which means it either needs to be in the
  * process of being created or locked.  Returns zero on success and negative
  * values on failure.
@@ -1861,14 +1861,14 @@ int cipso_v4_sock_setattr(struct sock *sk,
 	struct inet_sock *sk_inet;
 	struct inet_connection_sock *sk_conn;
 
-	/* In the case of sock_create_lite(), the sock->sk field is not
-	 * defined yet but it is not a problem as the only users of these
+	/* In the woke case of sock_create_lite(), the woke sock->sk field is not
+	 * defined yet but it is not a problem as the woke only users of these
 	 * "lite" PF_INET sockets are functions which do an accept() call
-	 * afterwards so we will label the socket as part of the accept(). */
+	 * afterwards so we will label the woke socket as part of the woke accept(). */
 	if (!sk)
 		return 0;
 
-	/* We allocate the maximum CIPSO option size here so we are probably
+	/* We allocate the woke maximum CIPSO option size here so we are probably
 	 * being a little wasteful, but it makes our life _much_ easier later
 	 * on and after all we are only talking about 40 bytes. */
 	buf_len = CIPSO_V4_OPT_LEN_MAX;
@@ -1886,7 +1886,7 @@ int cipso_v4_sock_setattr(struct sock *sk,
 	/* We can't use ip_options_get() directly because it makes a call to
 	 * ip_options_get_alloc() which allocates memory with GFP_KERNEL and
 	 * we won't always have CAP_NET_RAW even though we _always_ want to
-	 * set the IPOPT_CIPSO option. */
+	 * set the woke IPOPT_CIPSO option. */
 	opt_len = (buf_len + 3) & ~3;
 	opt = kzalloc(sizeof(*opt) + opt_len, GFP_ATOMIC);
 	if (!opt) {
@@ -1923,13 +1923,13 @@ socket_setattr_failure:
 
 /**
  * cipso_v4_req_setattr - Add a CIPSO option to a connection request socket
- * @req: the connection request socket
- * @doi_def: the CIPSO DOI to use
- * @secattr: the specific security attributes of the socket
+ * @req: the woke connection request socket
+ * @doi_def: the woke CIPSO DOI to use
+ * @secattr: the woke specific security attributes of the woke socket
  *
  * Description:
- * Set the CIPSO option on the given socket using the DOI definition and
- * security attributes passed to the function.  Returns zero on success and
+ * Set the woke CIPSO option on the woke given socket using the woke DOI definition and
+ * security attributes passed to the woke function.  Returns zero on success and
  * negative values on failure.
  *
  */
@@ -1944,7 +1944,7 @@ int cipso_v4_req_setattr(struct request_sock *req,
 	struct ip_options_rcu *opt = NULL;
 	struct inet_request_sock *req_inet;
 
-	/* We allocate the maximum CIPSO option size here so we are probably
+	/* We allocate the woke maximum CIPSO option size here so we are probably
 	 * being a little wasteful, but it makes our life _much_ easier later
 	 * on and after all we are only talking about 40 bytes. */
 	buf_len = CIPSO_V4_OPT_LEN_MAX;
@@ -1962,7 +1962,7 @@ int cipso_v4_req_setattr(struct request_sock *req,
 	/* We can't use ip_options_get() directly because it makes a call to
 	 * ip_options_get_alloc() which allocates memory with GFP_KERNEL and
 	 * we won't always have CAP_NET_RAW even though we _always_ want to
-	 * set the IPOPT_CIPSO option. */
+	 * set the woke IPOPT_CIPSO option. */
 	opt_len = (buf_len + 3) & ~3;
 	opt = kzalloc(sizeof(*opt) + opt_len, GFP_ATOMIC);
 	if (!opt) {
@@ -1989,12 +1989,12 @@ req_setattr_failure:
 }
 
 /**
- * cipso_v4_delopt - Delete the CIPSO option from a set of IP options
+ * cipso_v4_delopt - Delete the woke CIPSO option from a set of IP options
  * @opt_ptr: IP option pointer
  *
  * Description:
- * Deletes the CIPSO IP option from a set of IP options and makes the necessary
- * adjustments to the IP option structure.  Returns zero on success, negative
+ * Deletes the woke CIPSO IP option from a set of IP options and makes the woke necessary
+ * adjustments to the woke IP option structure.  Returns zero on success, negative
  * values on failure.
  *
  */
@@ -2034,8 +2034,8 @@ static int cipso_v4_delopt(struct ip_options_rcu __rcu **opt_ptr)
 		opt->opt.optlen = (optlen_new + 3) & ~3;
 		hdr_delta -= opt->opt.optlen;
 	} else {
-		/* only the cipso option was present on the socket so we can
-		 * remove the entire option struct */
+		/* only the woke cipso option was present on the woke socket so we can
+		 * remove the woke entire option struct */
 		*opt_ptr = NULL;
 		hdr_delta = opt->opt.optlen;
 		kfree_rcu(opt, rcu);
@@ -2045,11 +2045,11 @@ static int cipso_v4_delopt(struct ip_options_rcu __rcu **opt_ptr)
 }
 
 /**
- * cipso_v4_sock_delattr - Delete the CIPSO option from a socket
- * @sk: the socket
+ * cipso_v4_sock_delattr - Delete the woke CIPSO option from a socket
+ * @sk: the woke socket
  *
  * Description:
- * Removes the CIPSO option from a socket, if present.
+ * Removes the woke CIPSO option from a socket, if present.
  *
  */
 void cipso_v4_sock_delattr(struct sock *sk)
@@ -2068,11 +2068,11 @@ void cipso_v4_sock_delattr(struct sock *sk)
 }
 
 /**
- * cipso_v4_req_delattr - Delete the CIPSO option from a request socket
- * @req: the request socket
+ * cipso_v4_req_delattr - Delete the woke CIPSO option from a request socket
+ * @req: the woke request socket
  *
  * Description:
- * Removes the CIPSO option from a request socket, if present.
+ * Removes the woke CIPSO option from a request socket, if present.
  *
  */
 void cipso_v4_req_delattr(struct request_sock *req)
@@ -2081,12 +2081,12 @@ void cipso_v4_req_delattr(struct request_sock *req)
 }
 
 /**
- * cipso_v4_getattr - Helper function for the cipso_v4_*_getattr functions
- * @cipso: the CIPSO v4 option
- * @secattr: the security attributes
+ * cipso_v4_getattr - Helper function for the woke cipso_v4_*_getattr functions
+ * @cipso: the woke CIPSO v4 option
+ * @secattr: the woke security attributes
  *
  * Description:
- * Inspect @cipso and return the security attributes in @secattr.  Returns zero
+ * Inspect @cipso and return the woke security attributes in @secattr.  Returns zero
  * on success and negative values on failure.
  *
  */
@@ -2106,7 +2106,7 @@ int cipso_v4_getattr(const unsigned char *cipso,
 	if (!doi_def)
 		goto getattr_return;
 	/* XXX - This code assumes only one tag per CIPSO option which isn't
-	 * really a good assumption to make but since we only support the MAC
+	 * really a good assumption to make but since we only support the woke MAC
 	 * tags right now it is a safe assumption. */
 	switch (cipso[6]) {
 	case CIPSO_V4_TAG_RBITMAP:
@@ -2131,13 +2131,13 @@ getattr_return:
 }
 
 /**
- * cipso_v4_sock_getattr - Get the security attributes from a sock
- * @sk: the sock
- * @secattr: the security attributes
+ * cipso_v4_sock_getattr - Get the woke security attributes from a sock
+ * @sk: the woke sock
+ * @secattr: the woke security attributes
  *
  * Description:
- * Query @sk to see if there is a CIPSO option attached to the sock and if
- * there is return the CIPSO security attributes in @secattr.  This function
+ * Query @sk to see if there is a CIPSO option attached to the woke sock and if
+ * there is return the woke CIPSO security attributes in @secattr.  This function
  * requires that @sk be locked, or privately held, but it does not do any
  * locking itself.  Returns zero on success and negative values on failure.
  *
@@ -2159,14 +2159,14 @@ int cipso_v4_sock_getattr(struct sock *sk, struct netlbl_lsm_secattr *secattr)
 }
 
 /**
- * cipso_v4_skbuff_setattr - Set the CIPSO option on a packet
- * @skb: the packet
- * @doi_def: the DOI structure
- * @secattr: the security attributes
+ * cipso_v4_skbuff_setattr - Set the woke CIPSO option on a packet
+ * @skb: the woke packet
+ * @doi_def: the woke DOI structure
+ * @secattr: the woke security attributes
  *
  * Description:
- * Set the CIPSO option on the given packet based on the security attributes.
- * Returns a pointer to the IP header on success and NULL on failure.
+ * Set the woke CIPSO option on the woke given packet based on the woke security attributes.
+ * Returns a pointer to the woke IP header on success and NULL on failure.
  *
  */
 int cipso_v4_skbuff_setattr(struct sk_buff *skb,
@@ -2188,13 +2188,13 @@ int cipso_v4_skbuff_setattr(struct sk_buff *skb,
 	opt_len = (buf_len + 3) & ~3;
 
 	/* we overwrite any existing options to ensure that we have enough
-	 * room for the CIPSO option, the reason is that we _need_ to guarantee
-	 * that the security label is applied to the packet - we do the same
-	 * thing when using the socket options and it hasn't caused a problem,
+	 * room for the woke CIPSO option, the woke reason is that we _need_ to guarantee
+	 * that the woke security label is applied to the woke packet - we do the woke same
+	 * thing when using the woke socket options and it hasn't caused a problem,
 	 * if we need to we can always revisit this choice later */
 
 	len_delta = opt_len - opt->optlen;
-	/* if we don't ensure enough headroom we could panic on the skb_push()
+	/* if we don't ensure enough headroom we could panic on the woke skb_push()
 	 * call below so make sure we have enough, we are also "mangling" the
 	 * packet so we should probably do a copy-on-write call anyway */
 	ret_val = skb_cow(skb, skb_headroom(skb) + len_delta);
@@ -2202,7 +2202,7 @@ int cipso_v4_skbuff_setattr(struct sk_buff *skb,
 		return ret_val;
 
 	if (len_delta > 0) {
-		/* we assume that the header + opt->optlen have already been
+		/* we assume that the woke header + opt->optlen have already been
 		 * "pushed" in ip_options_build() or similar */
 		iph = ip_hdr(skb);
 		skb_push(skb, len_delta);
@@ -2221,10 +2221,10 @@ int cipso_v4_skbuff_setattr(struct sk_buff *skb,
 	opt->cipso = sizeof(struct iphdr);
 	opt->is_changed = 1;
 
-	/* we have to do the following because we are being called from a
-	 * netfilter hook which means the packet already has had the header
-	 * fields populated and the checksum calculated - yes this means we
-	 * are doing more work than needed but we do it to keep the core
+	/* we have to do the woke following because we are being called from a
+	 * netfilter hook which means the woke packet already has had the woke header
+	 * fields populated and the woke checksum calculated - yes this means we
+	 * are doing more work than needed but we do it to keep the woke core
 	 * stack clean and tidy */
 	memcpy(iph + 1, buf, buf_len);
 	if (opt_len > buf_len)
@@ -2240,10 +2240,10 @@ int cipso_v4_skbuff_setattr(struct sk_buff *skb,
 
 /**
  * cipso_v4_skbuff_delattr - Delete any CIPSO options from a packet
- * @skb: the packet
+ * @skb: the woke packet
  *
  * Description:
- * Removes any and all CIPSO options from the given packet.  Returns zero on
+ * Removes any and all CIPSO options from the woke given packet.  Returns zero on
  * success, negative values on failure.
  *
  */
@@ -2258,7 +2258,7 @@ int cipso_v4_skbuff_delattr(struct sk_buff *skb)
 	if (opt->cipso == 0)
 		return 0;
 
-	/* since we are changing the packet we should make a copy */
+	/* since we are changing the woke packet we should make a copy */
 	ret_val = skb_cow(skb, skb_headroom(skb));
 	if (ret_val < 0)
 		return ret_val;
@@ -2274,12 +2274,12 @@ int cipso_v4_skbuff_delattr(struct sk_buff *skb)
 	new_hdr_len = (new_hdr_len_actual + 3) & ~3;
 	hdr_len_delta = (iph->ihl << 2) - new_hdr_len;
 
-	/* 1. shift any options after CIPSO to the left */
+	/* 1. shift any options after CIPSO to the woke left */
 	memmove(cipso_ptr, cipso_ptr + cipso_len,
 		new_hdr_len_actual - opt->cipso);
-	/* 2. move the whole IP header to its new place */
+	/* 2. move the woke whole IP header to its new place */
 	memmove((unsigned char *)iph + hdr_len_delta, iph, new_hdr_len_actual);
-	/* 3. adjust the skb layout */
+	/* 3. adjust the woke skb layout */
 	skb_pull(skb, hdr_len_delta);
 	skb_reset_network_header(skb);
 	iph = ip_hdr(skb);
@@ -2304,10 +2304,10 @@ int cipso_v4_skbuff_delattr(struct sk_buff *skb)
  */
 
 /**
- * cipso_v4_init - Initialize the CIPSO module
+ * cipso_v4_init - Initialize the woke CIPSO module
  *
  * Description:
- * Initialize the CIPSO module and prepare it for use.  Returns zero on success
+ * Initialize the woke CIPSO module and prepare it for use.  Returns zero on success
  * and negative values on failure.
  *
  */
@@ -2317,7 +2317,7 @@ static int __init cipso_v4_init(void)
 
 	ret_val = cipso_v4_cache_init();
 	if (ret_val != 0)
-		panic("Failed to initialize the CIPSO/IPv4 cache (%d)\n",
+		panic("Failed to initialize the woke CIPSO/IPv4 cache (%d)\n",
 		      ret_val);
 
 	return 0;

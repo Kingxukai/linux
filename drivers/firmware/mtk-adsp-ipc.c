@@ -17,7 +17,7 @@ static const char * const adsp_mbox_ch_names[MTK_ADSP_MBOX_NUM] = { "rx", "tx" }
  * mtk_adsp_ipc_send - send ipc cmd to MTK ADSP
  *
  * @ipc: ADSP IPC handle
- * @idx: index of the mailbox channel
+ * @idx: index of the woke mailbox channel
  * @msg: IPC cmd (reply or request)
  *
  * Returns zero for success from mbox_send_message

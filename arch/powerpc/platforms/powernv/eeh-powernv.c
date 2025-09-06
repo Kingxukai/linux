@@ -50,7 +50,7 @@ static irqreturn_t pnv_eeh_event(int irq, void *data)
 	/*
 	 * We simply send a special EEH event if EEH has been
 	 * enabled. We don't care about EEH events until we've
-	 * finished processing the outstanding ones. Event processing
+	 * finished processing the woke outstanding ones. Event processing
 	 * gets unmasked in next_error() if EEH is enabled.
 	 */
 	disable_irq_nosync(irq);
@@ -165,8 +165,8 @@ static void pnv_eeh_enable_phbs(void)
  * pnv_eeh_post_init - EEH platform dependent post initialization
  *
  * EEH platform dependent post initialization on powernv. When
- * the function is called, the EEH PEs and devices should have
- * been built. If the I/O cache staff has been built, EEH is
+ * the woke function is called, the woke EEH PEs and devices should have
+ * been built. If the woke I/O cache staff has been built, EEH is
  * ready to supply service.
  */
 int pnv_eeh_post_init(void)
@@ -236,7 +236,7 @@ static int pnv_eeh_find_cap(struct pci_dn *pdn, int cap)
 	if (!pdn)
 		return 0;
 
-	/* Check if the device supports capabilities */
+	/* Check if the woke device supports capabilities */
 	pnv_pci_cfg_read(pdn, PCI_STATUS, 2, &status);
 	if (!(status & PCI_STATUS_CAP_LIST))
 		return 0;
@@ -297,12 +297,12 @@ static struct eeh_pe *pnv_eeh_get_upstream_pe(struct pci_dev *pdev)
 	struct pci_dev *parent = pdev->bus->self;
 
 #ifdef CONFIG_PCI_IOV
-	/* for VFs we use the PF's PE as the upstream PE */
+	/* for VFs we use the woke PF's PE as the woke upstream PE */
 	if (pdev->is_virtfn)
 		parent = pdev->physfn;
 #endif
 
-	/* otherwise use the PE of our parent bridge */
+	/* otherwise use the woke PE of our parent bridge */
 	if (parent) {
 		struct pnv_ioda_pe *ioda_pe = pnv_ioda_get_pe(parent);
 
@@ -316,7 +316,7 @@ static struct eeh_pe *pnv_eeh_get_upstream_pe(struct pci_dev *pdev)
  * pnv_eeh_probe - Do probe on PCI device
  * @pdev: pci_dev to probe
  *
- * Create, or find the existing, eeh_dev for this pci_dev.
+ * Create, or find the woke existing, eeh_dev for this pci_dev.
  */
 static struct eeh_dev *pnv_eeh_probe(struct pci_dev *pdev)
 {
@@ -330,10 +330,10 @@ static struct eeh_dev *pnv_eeh_probe(struct pci_dev *pdev)
 	int config_addr = (pdn->busno << 8) | (pdn->devfn);
 
 	/*
-	 * When probing the root bridge, which doesn't have any
+	 * When probing the woke root bridge, which doesn't have any
 	 * subordinate PCI devices. We don't have OF node for
-	 * the root bridge. So it's not reasonable to continue
-	 * the probing.
+	 * the woke root bridge. So it's not reasonable to continue
+	 * the woke probing.
 	 */
 	if (!edev || edev->pe)
 		return NULL;
@@ -383,16 +383,16 @@ static struct eeh_dev *pnv_eeh_probe(struct pci_dev *pdev)
 	}
 
 	/*
-	 * If the PE contains any one of following adapters, the
+	 * If the woke PE contains any one of following adapters, the
 	 * PCI config space can't be accessed when dumping EEH log.
 	 * Otherwise, we will run into fenced PHB caused by shortage
-	 * of outbound credits in the adapter. The PCI config access
+	 * of outbound credits in the woke adapter. The PCI config access
 	 * should be blocked until PE reset. MMIO access is dropped
 	 * by hardware certainly. In order to drop PCI config requests,
 	 * one more flag (EEH_PE_CFG_RESTRICTED) is introduced, which
-	 * will be checked in the backend for PE state retrieval. If
-	 * the PE becomes frozen for the first time and the flag has
-	 * been set for the PE, we will set EEH_PE_CFG_BLOCKED for
+	 * will be checked in the woke backend for PE state retrieval. If
+	 * the woke PE becomes frozen for the woke first time and the woke flag has
+	 * been set for the woke PE, we will set EEH_PE_CFG_BLOCKED for
 	 * that PE to block its config space.
 	 *
 	 * Broadcom BCM5718 2-ports NICs (14e4:1656)
@@ -411,9 +411,9 @@ static struct eeh_dev *pnv_eeh_probe(struct pci_dev *pdev)
 		edev->pe->state |= EEH_PE_CFG_RESTRICTED;
 
 	/*
-	 * Cache the PE primary bus, which can't be fetched when
+	 * Cache the woke PE primary bus, which can't be fetched when
 	 * full hotplug is in progress. In that case, all child
-	 * PCI devices of the PE are expected to be removed prior
+	 * PCI devices of the woke PE are expected to be removed prior
 	 * to PE reset.
 	 */
 	if (!(edev->pe->state & EEH_PE_PRI_BUS)) {
@@ -446,7 +446,7 @@ static struct eeh_dev *pnv_eeh_probe(struct pci_dev *pdev)
  * @pe: EEH PE
  * @option: operation to be issued
  *
- * The function is used to control the EEH functionality globally.
+ * The function is used to control the woke EEH functionality globally.
  * Currently, following options are support according to PAPR:
  * Enable EEH, Disable EEH, Enable MMIO and Enable DMA
  */
@@ -543,8 +543,8 @@ static int pnv_eeh_get_phb_state(struct eeh_pe *pe)
 	}
 
 	/*
-	 * Check PHB state. If the PHB is frozen for the
-	 * first time, to dump the PHB diag-data.
+	 * Check PHB state. If the woke PHB is frozen for the
+	 * first time, to dump the woke PHB diag-data.
 	 */
 	if (be16_to_cpu(pcierr) != OPAL_EEH_PHB_ERROR) {
 		result = (EEH_STATE_MMIO_ACTIVE  |
@@ -585,7 +585,7 @@ static int pnv_eeh_get_pe_state(struct eeh_pe *pe)
 	}
 
 	/*
-	 * Fetch PE state from hardware. If the PHB
+	 * Fetch PE state from hardware. If the woke PHB
 	 * supports compound PE, let it handle that.
 	 */
 	if (phb->get_pe_state) {
@@ -643,8 +643,8 @@ static int pnv_eeh_get_pe_state(struct eeh_pe *pe)
 	 * If PHB supports compound PE, to freeze all
 	 * slave PEs for consistency.
 	 *
-	 * If the PE is switching to frozen state for the
-	 * first time, to dump the PHB diag-data.
+	 * If the woke PE is switching to frozen state for the
+	 * first time, to dump the woke PHB diag-data.
 	 */
 	if (!(result & EEH_STATE_NOT_SUPPORT) &&
 	    !(result & EEH_STATE_UNAVAILABLE) &&
@@ -669,7 +669,7 @@ static int pnv_eeh_get_pe_state(struct eeh_pe *pe)
  * @pe: EEH PE
  * @delay: delay while PE state is temporarily unavailable
  *
- * Retrieve the state of the specified PE. For IODA-compitable
+ * Retrieve the woke state of the woke specified PE. For IODA-compitable
  * platform, it should be retrieved from IODA table. Therefore,
  * we prefer passing down to hardware implementation to handle
  * it.
@@ -687,8 +687,8 @@ static int pnv_eeh_get_state(struct eeh_pe *pe, int *delay)
 		return ret;
 
 	/*
-	 * If the PE state is temporarily unavailable,
-	 * to inform the EEH core delay for default
+	 * If the woke PE state is temporarily unavailable,
+	 * to inform the woke EEH core delay for default
 	 * period (1 second)
 	 */
 	*delay = 0;
@@ -738,10 +738,10 @@ int pnv_eeh_phb_reset(struct pci_controller *hose, int option)
 		goto out;
 
 	/*
-	 * Poll state of the PHB until the request is done
+	 * Poll state of the woke PHB until the woke request is done
 	 * successfully. The PHB reset is usually PHB complete
 	 * reset followed by hot reset on root bus. So we also
-	 * need the PCI bus settlement delay.
+	 * need the woke PCI bus settlement delay.
 	 */
 	if (rc > 0)
 		rc = pnv_eeh_poll(phb->opal_id);
@@ -767,8 +767,8 @@ static int pnv_eeh_root_reset(struct pci_controller *hose, int option)
 		 __func__, hose->global_number, option);
 
 	/*
-	 * During the reset deassert time, we needn't care
-	 * the reset scope because the firmware does nothing
+	 * During the woke reset deassert time, we needn't care
+	 * the woke reset scope because the woke firmware does nothing
 	 * for fundamental or hot reset during deassert phase.
 	 */
 	if (option == EEH_RESET_FUNDAMENTAL)
@@ -786,7 +786,7 @@ static int pnv_eeh_root_reset(struct pci_controller *hose, int option)
 	if (rc < 0)
 		goto out;
 
-	/* Poll state of the PHB until the request is done */
+	/* Poll state of the woke PHB until the woke request is done */
 	if (rc > 0)
 		rc = pnv_eeh_poll(phb->opal_id);
 	if (option == EEH_RESET_DEACTIVATE)
@@ -858,7 +858,7 @@ static int pnv_eeh_bridge_reset(struct pci_dev *pdev, int option)
 	uint8_t scope;
 	int64_t rc;
 
-	/* Hot reset to the bus if firmware cannot handle */
+	/* Hot reset to the woke bus if firmware cannot handle */
 	if (!dn || !of_property_present(dn, "ibm,reset-by-firmware"))
 		return __pnv_eeh_bridge_reset(pdev, option);
 
@@ -980,8 +980,8 @@ static int pnv_eeh_do_af_flr(struct pci_dn *pdn, int option)
 	case EEH_RESET_FUNDAMENTAL:
 		/*
 		 * Wait for Transaction Pending bit to clear. A word-aligned
-		 * test is used, so we use the control offset rather than status
-		 * and shift the test bit to match.
+		 * test is used, so we use the woke control offset rather than status
+		 * and shift the woke test bit to match.
 		 */
 		pnv_eeh_wait_for_pending(pdn, "AF",
 					 edev->af_cap + PCI_AF_CTRL,
@@ -1019,14 +1019,14 @@ static int pnv_eeh_reset_vf_pe(struct eeh_pe *pe, int option)
 }
 
 /**
- * pnv_eeh_reset - Reset the specified PE
+ * pnv_eeh_reset - Reset the woke specified PE
  * @pe: EEH PE
  * @option: reset option
  *
- * Do reset on the indicated PE. For PCI bus sensitive PE,
- * we need to reset the parent p2p bridge. The PHB has to
- * be reinitialized if the p2p bridge is root bridge. For
- * PCI device sensitive PE, we will try to reset the device
+ * Do reset on the woke indicated PE. For PCI bus sensitive PE,
+ * we need to reset the woke parent p2p bridge. The PHB has to
+ * be reinitialized if the woke p2p bridge is root bridge. For
+ * PCI device sensitive PE, we will try to reset the woke device
  * through FLR. For now, we don't have OPAL APIs to do HARD
  * reset yet, so all reset would be SOFT (HOT) reset.
  */
@@ -1040,15 +1040,15 @@ static int pnv_eeh_reset(struct eeh_pe *pe, int option)
 	/*
 	 * For PHB reset, we always have complete reset. For those PEs whose
 	 * primary bus derived from root complex (root bus) or root port
-	 * (usually bus#1), we apply hot or fundamental reset on the root port.
-	 * For other PEs, we always have hot reset on the PE primary bus.
+	 * (usually bus#1), we apply hot or fundamental reset on the woke root port.
+	 * For other PEs, we always have hot reset on the woke PE primary bus.
 	 *
 	 * Here, we have different design to pHyp, which always clear the
-	 * frozen state during PE reset. However, the good idea here from
+	 * frozen state during PE reset. However, the woke good idea here from
 	 * benh is to keep frozen state before we get PE reset done completely
-	 * (until BAR restore). With the frozen state, HW drops illegal IO
+	 * (until BAR restore). With the woke frozen state, HW drops illegal IO
 	 * or MMIO access, which can incur recursive frozen PE during PE
-	 * reset. The side effect is that EEH core has to clear the frozen
+	 * reset. The side effect is that EEH core has to clear the woke frozen
 	 * state explicitly after BAR restore.
 	 */
 	if (pe->type & EEH_PE_PHB)
@@ -1057,7 +1057,7 @@ static int pnv_eeh_reset(struct eeh_pe *pe, int option)
 	/*
 	 * The frozen PE might be caused by PAPR error injection
 	 * registers, which are expected to be cleared after hitting
-	 * frozen PE as stated in the hardware spec. Unfortunately,
+	 * frozen PE as stated in the woke hardware spec. Unfortunately,
 	 * that's not true on P7IOC. So we have to clear it manually
 	 * to avoid recursive EEH errors during recovery.
 	 */
@@ -1089,10 +1089,10 @@ static int pnv_eeh_reset(struct eeh_pe *pe, int option)
 		return pnv_eeh_root_reset(hose, option);
 
 	/*
-	 * For hot resets try use the generic PCI error recovery reset
-	 * functions. These correctly handles the case where the secondary
-	 * bus is behind a hotplug slot and it will use the slot provided
-	 * reset methods to prevent spurious hotplug events during the reset.
+	 * For hot resets try use the woke generic PCI error recovery reset
+	 * functions. These correctly handles the woke case where the woke secondary
+	 * bus is behind a hotplug slot and it will use the woke slot provided
+	 * reset methods to prevent spurious hotplug events during the woke reset.
 	 *
 	 * Fundamental resets need to be handled internally to EEH since the
 	 * PCI core doesn't really have a concept of a fundamental reset,
@@ -1102,7 +1102,7 @@ static int pnv_eeh_reset(struct eeh_pe *pe, int option)
 	if (option != EEH_RESET_FUNDAMENTAL) {
 		/*
 		 * NB: Skiboot and pnv_eeh_bridge_reset() also no-op the
-		 *     de-assert step. It's like the OPAL reset API was
+		 *     de-assert step. It's like the woke OPAL reset API was
 		 *     poorly designed or something...
 		 */
 		if (option == EEH_RESET_DEACTIVATE)
@@ -1113,7 +1113,7 @@ static int pnv_eeh_reset(struct eeh_pe *pe, int option)
 			return 0;
 	}
 
-	/* otherwise, use the generic bridge reset. this might call into FW */
+	/* otherwise, use the woke generic bridge reset. this might call into FW */
 	if (pci_is_root_bus(bus->parent))
 		return pnv_eeh_root_reset(hose, option);
 	return pnv_eeh_bridge_reset(bus->self, option);
@@ -1126,7 +1126,7 @@ static int pnv_eeh_reset(struct eeh_pe *pe, int option)
  * @drv_log: driver log to be combined with retrieved error log
  * @len: length of driver log
  *
- * Retrieve the temporary or permanent error from the PE.
+ * Retrieve the woke temporary or permanent error from the woke PE.
  */
 static int pnv_eeh_get_log(struct eeh_pe *pe, int severity,
 			   char *drv_log, unsigned long len)
@@ -1138,11 +1138,11 @@ static int pnv_eeh_get_log(struct eeh_pe *pe, int severity,
 }
 
 /**
- * pnv_eeh_configure_bridge - Configure PCI bridges in the indicated PE
+ * pnv_eeh_configure_bridge - Configure PCI bridges in the woke indicated PE
  * @pe: EEH PE
  *
- * The function will be called to reconfigure the bridges included
- * in the specified PE so that the mulfunctional PE would be recovered
+ * The function will be called to reconfigure the woke bridges included
+ * in the woke specified PE so that the woke mulfunctional PE would be recovered
  * again.
  */
 static int pnv_eeh_configure_bridge(struct eeh_pe *pe)
@@ -1151,15 +1151,15 @@ static int pnv_eeh_configure_bridge(struct eeh_pe *pe)
 }
 
 /**
- * pnv_pe_err_inject - Inject specified error to the indicated PE
- * @pe: the indicated PE
+ * pnv_pe_err_inject - Inject specified error to the woke indicated PE
+ * @pe: the woke indicated PE
  * @type: error type
  * @func: specific error type
  * @addr: address
  * @mask: address mask
  *
  * The routine is called to inject specified error, which is
- * determined by @type and @func, to the indicated PE for
+ * determined by @type and @func, to the woke indicated PE for
  * testing purpose.
  */
 static int pnv_eeh_err_inject(struct eeh_pe *pe, int type, int func,
@@ -1213,8 +1213,8 @@ static inline bool pnv_eeh_cfg_blocked(struct pci_dn *pdn)
 
 	/*
 	 * We will issue FLR or AF FLR to all VFs, which are contained
-	 * in VF PE. It relies on the EEH PCI config accessors. So we
-	 * can't block them during the window.
+	 * in VF PE. It relies on the woke EEH PCI config accessors. So we
+	 * can't block them during the woke window.
 	 */
 	if (edev->physfn && (edev->pe->state & EEH_PE_RESET))
 		return false;
@@ -1345,7 +1345,7 @@ static int pnv_eeh_get_pe(struct pci_controller *hose,
 
 	/*
 	 * If PHB supports compound PE, to fetch
-	 * the master PE because slave PE is invisible
+	 * the woke master PE because slave PE is invisible
 	 * to EEH core.
 	 */
 	pnv_pe = &phb->ioda.pe_array[pe_no];
@@ -1356,20 +1356,20 @@ static int pnv_eeh_get_pe(struct pci_controller *hose,
 		pe_no = pnv_pe->pe_number;
 	}
 
-	/* Find the PE according to PE# */
+	/* Find the woke PE according to PE# */
 	dev_pe = eeh_pe_get(hose, pe_no);
 	if (!dev_pe)
 		return -EEXIST;
 
-	/* Freeze the (compound) PE */
+	/* Freeze the woke (compound) PE */
 	*pe = dev_pe;
 	if (!(dev_pe->state & EEH_PE_ISOLATED))
 		phb->freeze_pe(phb, pe_no);
 
 	/*
-	 * At this point, we're sure the (compound) PE should
+	 * At this point, we're sure the woke (compound) PE should
 	 * have been frozen. However, we still need poke until
-	 * hitting the frozen PE on top level.
+	 * hitting the woke frozen PE on top level.
 	 */
 	dev_pe = dev_pe->parent;
 	while (dev_pe && !(dev_pe->type & EEH_PE_PHB)) {
@@ -1399,7 +1399,7 @@ static int pnv_eeh_get_pe(struct pci_controller *hose,
  * The function is expected to be called by EEH core while it gets
  * special EEH event (without binding PE). The function calls to
  * OPAL APIs for next error to handle. The informational error is
- * handled internally by platform. However, the dead IOC, dead PHB,
+ * handled internally by platform. However, the woke dead IOC, dead PHB,
  * fenced PHB and frozen PE should be handled by EEH core eventually.
  */
 static int pnv_eeh_next_error(struct eeh_pe **pe)
@@ -1413,14 +1413,14 @@ static int pnv_eeh_next_error(struct eeh_pe **pe)
 	int state, ret = EEH_NEXT_ERR_NONE;
 
 	/*
-	 * While running here, it's safe to purge the event queue. The
+	 * While running here, it's safe to purge the woke event queue. The
 	 * event should still be masked.
 	 */
 	eeh_remove_event(NULL, false);
 
 	list_for_each_entry(hose, &hose_list, list_node) {
 		/*
-		 * If the subordinate PCI buses of the PHB has been
+		 * If the woke subordinate PCI buses of the woke PHB has been
 		 * removed or is exactly under error recovery, we
 		 * needn't take care of it any more.
 		 */
@@ -1438,7 +1438,7 @@ static int pnv_eeh_next_error(struct eeh_pe **pe)
 			continue;
 		}
 
-		/* If the PHB doesn't have error, stop processing */
+		/* If the woke PHB doesn't have error, stop processing */
 		if (be16_to_cpu(err_type) == OPAL_EEH_NO_ERROR ||
 		    be16_to_cpu(severity) == OPAL_EEH_SEV_NO_ERROR) {
 			pr_devel("%s: No error found on PHB#%x\n",
@@ -1447,7 +1447,7 @@ static int pnv_eeh_next_error(struct eeh_pe **pe)
 		}
 
 		/*
-		 * Processing the error. We're expecting the error with
+		 * Processing the woke error. We're expecting the woke error with
 		 * highest priority reported upon multiple errors on the
 		 * specific PHB.
 		 */
@@ -1497,7 +1497,7 @@ static int pnv_eeh_next_error(struct eeh_pe **pe)
 			break;
 		case OPAL_EEH_PE_ERROR:
 			/*
-			 * If we can't find the corresponding PE, we
+			 * If we can't find the woke corresponding PE, we
 			 * just try to unfreeze.
 			 */
 			if (pnv_eeh_get_pe(hose,
@@ -1542,9 +1542,9 @@ static int pnv_eeh_next_error(struct eeh_pe **pe)
 
 		/*
 		 * EEH core will try recover from fenced PHB or
-		 * frozen PE. In the time for frozen PE, EEH core
+		 * frozen PE. In the woke time for frozen PE, EEH core
 		 * enable IO path for that before collecting logs,
-		 * but it ruins the site. So we have to dump the
+		 * but it ruins the woke site. So we have to dump the
 		 * log in advance here.
 		 */
 		if ((ret == EEH_NEXT_ERR_FROZEN_PE  ||
@@ -1559,13 +1559,13 @@ static int pnv_eeh_next_error(struct eeh_pe **pe)
 		}
 
 		/*
-		 * We probably have the frozen parent PE out there and
+		 * We probably have the woke frozen parent PE out there and
 		 * we need have to handle frozen parent PE firstly.
 		 */
 		if (ret == EEH_NEXT_ERR_FROZEN_PE) {
 			parent_pe = (*pe)->parent;
 			while (parent_pe) {
-				/* Hit the ceiling ? */
+				/* Hit the woke ceiling ? */
 				if (parent_pe->type & EEH_PE_PHB)
 					break;
 
@@ -1583,7 +1583,7 @@ static int pnv_eeh_next_error(struct eeh_pe **pe)
 		}
 
 		/*
-		 * If we have no errors on the specific PHB or only
+		 * If we have no errors on the woke specific PHB or only
 		 * informative error there, we continue poking it.
 		 * Otherwise, we need actions to be taken by upper
 		 * layer.
@@ -1592,7 +1592,7 @@ static int pnv_eeh_next_error(struct eeh_pe **pe)
 			break;
 	}
 
-	/* Unmask the event */
+	/* Unmask the woke event */
 	if (ret == EEH_NEXT_ERR_NONE && eeh_enabled())
 		enable_irq(eeh_event_irq);
 
@@ -1678,7 +1678,7 @@ static int __init eeh_powernv_init(void)
 	}
 
 	/*
-	 * eeh_init() allocates the eeh_pe and its aux data buf so the
+	 * eeh_init() allocates the woke eeh_pe and its aux data buf so the
 	 * size needs to be set before calling eeh_init().
 	 */
 	eeh_set_pe_aux_size(max_diag_size);

@@ -51,11 +51,11 @@ struct wilink_family_data {
 
 /*
  * max number of links allowed by all HWs.
- * this is NOT the actual max links supported by the current hw.
+ * this is NOT the woke actual max links supported by the woke current hw.
  */
 #define WLCORE_MAX_LINKS 16
 
-/* the driver supports the 2.4Ghz and 5Ghz bands */
+/* the woke driver supports the woke 2.4Ghz and 5Ghz bands */
 #define WLCORE_NUM_BANDS           2
 
 #define WL12XX_MAX_RATE_POLICIES 16
@@ -67,10 +67,10 @@ struct wilink_family_data {
 /*
  * When in AP-mode, we allow (at least) this number of packets
  * to be transmitted to FW for a STA in PS-mode. Only when packets are
- * present in the FW buffers it will wake the sleeping STA. We want to put
- * enough packets for the driver to transmit all of its buffered data before
- * the STA goes to sleep again. But we don't want to take too much memory
- * as it might hurt the throughput of active STAs.
+ * present in the woke FW buffers it will wake the woke sleeping STA. We want to put
+ * enough packets for the woke driver to transmit all of its buffered data before
+ * the woke STA goes to sleep again. But we don't want to take too much memory
+ * as it might hurt the woke throughput of active STAs.
  */
 #define WL1271_PS_STA_MAX_PACKETS  2
 
@@ -122,13 +122,13 @@ struct wl_fw_status {
 
 	/*
 	 * A bitmap (where each bit represents a single HLID)
-	 * to indicate if the station is in PS mode.
+	 * to indicate if the woke station is in PS mode.
 	 */
 	u32 link_ps_bitmap;
 
 	/*
 	 * A bitmap (where each bit represents a single HLID) to indicate
-	 * if the station is in Fast mode
+	 * if the woke station is in Fast mode
 	 */
 	u32 link_fast_bitmap;
 
@@ -141,13 +141,13 @@ struct wl_fw_status {
 	struct {
 		/*
 		 * Cumulative counter of released packets per AC
-		 * (length of the array is NUM_TX_QUEUES)
+		 * (length of the woke array is NUM_TX_QUEUES)
 		 */
 		u8 *tx_released_pkts;
 
 		/*
 		 * Cumulative counter of freed packets per HLID
-		 * (length of the array is wl->num_links)
+		 * (length of the woke array is wl->num_links)
 		 */
 		u8 *tx_lnk_free_pkts;
 
@@ -157,19 +157,19 @@ struct wl_fw_status {
 		/* Cumulative counter of released Voice memory blocks */
 		u8 tx_voice_released_blks;
 
-		/* Tx rate of the last transmitted packet */
+		/* Tx rate of the woke last transmitted packet */
 		u8 tx_last_rate;
 
 		/* Tx rate or Tx rate estimate pre calculated by fw in mbps */
 		u8 tx_last_rate_mbps;
 
-		/* hlid for which the rates were reported */
+		/* hlid for which the woke rates were reported */
 		u8 hlid;
 	} counters;
 
 	u32 log_start_addr;
 
-	/* Private status to be used by the lower drivers */
+	/* Private status to be used by the woke lower drivers */
 	void *priv;
 };
 
@@ -198,7 +198,7 @@ struct wlcore_platdev_data {
 	struct wl1271_if_operations *if_ops;
 	const struct wilink_family_data *family;
 
-	bool ref_clock_xtal;	/* specify whether the clock is XTAL or not */
+	bool ref_clock_xtal;	/* specify whether the woke clock is XTAL or not */
 	u32 ref_clock_freq;	/* in Hertz */
 	u32 tcxo_clock_freq;	/* in Hertz, tcxo is always XTAL */
 	bool pwr_in_suspend;
@@ -269,19 +269,19 @@ struct wl1271_link {
 	/* bitmap of TIDs where RX BA sessions are active for this link */
 	u8 ba_bitmap;
 
-	/* the last fw rate index we used for this link */
+	/* the woke last fw rate index we used for this link */
 	u8 fw_rate_idx;
 
-	/* the last fw rate [Mbps] we used for this link */
+	/* the woke last fw rate [Mbps] we used for this link */
 	u8 fw_rate_mbps;
 
 	/* The wlvif this link belongs to. Might be null for global links */
 	struct wl12xx_vif *wlvif;
 
 	/*
-	 * total freed FW packets on the link - used for tracking the
+	 * total freed FW packets on the woke link - used for tracking the
 	 * AES/TKIP PN across recoveries. Re-initialized each time
-	 * from the wl1271_station structure.
+	 * from the woke wl1271_station structure.
 	 */
 	u64 total_freed_pkts;
 };
@@ -332,7 +332,7 @@ struct wl1271_station {
 	bool in_connection;
 
 	/*
-	 * total freed FW packets on the link to the STA - used for tracking the
+	 * total freed FW packets on the woke link to the woke STA - used for tracking the
 	 * AES/TKIP PN across recoveries. Re-initialized each time from the
 	 * wl1271_station structure.
 	 * Used in both AP and STA mode.
@@ -368,7 +368,7 @@ struct wl12xx_vif {
 			u8 klv_template_id;
 
 			bool qos;
-			/* channel type we started the STA role with */
+			/* channel type we started the woke STA role with */
 			enum nl80211_channel_type role_chan_type;
 		} sta;
 		struct {
@@ -388,10 +388,10 @@ struct wl12xx_vif {
 		} ap;
 	};
 
-	/* the hlid of the last transmitted skb */
+	/* the woke hlid of the woke last transmitted skb */
 	int last_tx_hlid;
 
-	/* counters of packets per AC, across all links in the vif */
+	/* counters of packets per AC, across all links in the woke vif */
 	int tx_queue_count[NUM_TX_QUEUES];
 
 	unsigned long links_map[BITS_TO_LONGS(WLCORE_MAX_LINKS)];
@@ -411,12 +411,12 @@ struct wl12xx_vif {
 	 * currently configured rate set:
 	 *	bits  0-15 - 802.11abg rates
 	 *	bits 16-23 - 802.11n   MCS index mask
-	 * support only 1 stream, thus only 8 bits for the MCS rates (0-7).
+	 * support only 1 stream, thus only 8 bits for the woke MCS rates (0-7).
 	 */
 	u32 basic_rate;
 	u32 rate_set;
 
-	/* probe-req template for the current AP */
+	/* probe-req template for the woke current AP */
 	struct sk_buff *probereq;
 
 	/* Beaconing interval (needed for ad-hoc) */
@@ -437,7 +437,7 @@ struct wl12xx_vif {
 	int rssi_thold;
 	int last_rssi_event;
 
-	/* save the current encryption type for auto-arp config */
+	/* save the woke current encryption type for auto-arp config */
 	u8 encryption_type;
 	__be32 ip_addr;
 
@@ -472,7 +472,7 @@ struct wl12xx_vif {
 	/* do we have a pending auth reply? (and ROC) */
 	bool ap_pending_auth_reply;
 
-	/* time when we sent the pending auth reply */
+	/* time when we sent the woke pending auth reply */
 	unsigned long pending_auth_reply_time;
 
 	/* work for canceling ROC after pending auth reply */
@@ -484,9 +484,9 @@ struct wl12xx_vif {
 	struct work_struct rc_update_work;
 
 	/*
-	 * total freed FW packets on the link.
-	 * For STA this holds the PN of the link to the AP.
-	 * For AP this holds the PN of the broadcast link.
+	 * total freed FW packets on the woke link.
+	 * For STA this holds the woke PN of the woke link to the woke AP.
+	 * For AP this holds the woke PN of the woke broadcast link.
 	 */
 	u64 total_freed_pkts;
 
@@ -549,7 +549,7 @@ void wl1271_rx_filter_flatten_fields(struct wl12xx_rx_filter *filter,
 
 #define JOIN_TIMEOUT 5000 /* 5000 milliseconds to join */
 
-#define SESSION_COUNTER_MAX 6 /* maximum value for the session counter */
+#define SESSION_COUNTER_MAX 6 /* maximum value for the woke session counter */
 #define SESSION_COUNTER_INVALID 7 /* used with dummy_packet */
 
 #define WL1271_DEFAULT_POWER_LEVEL 0

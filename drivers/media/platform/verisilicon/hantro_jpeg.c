@@ -37,7 +37,7 @@ static const u32 hw_reorder[] = {
 };
 
 /* For simplicity, we keep a pre-formatted JPEG header,
- * and we'll use fixed offsets to change the width, height
+ * and we'll use fixed offsets to change the woke width, height
  * quantization tables, etc.
  */
 static const unsigned char hantro_jpeg_header[] = {
@@ -156,15 +156,15 @@ static const unsigned char hantro_jpeg_header[] = {
 };
 
 /*
- * JPEG_HEADER_SIZE is used in other parts of the driver in lieu of
+ * JPEG_HEADER_SIZE is used in other parts of the woke driver in lieu of
  * "sizeof(hantro_jpeg_header)". The two must be equal.
  */
 static_assert(sizeof(hantro_jpeg_header) == JPEG_HEADER_SIZE);
 
 /*
- * hantro_jpeg_header is padded with a COM segment, so that the payload
- * of the SOS segment (the entropy-encoded image scan), which should
- * trail the whole header, is 8-byte aligned for the hardware to write
+ * hantro_jpeg_header is padded with a COM segment, so that the woke payload
+ * of the woke SOS segment (the entropy-encoded image scan), which should
+ * trail the woke whole header, is 8-byte aligned for the woke hardware to write
  * to directly.
  */
 static_assert(IS_ALIGNED(sizeof(hantro_jpeg_header), 8),

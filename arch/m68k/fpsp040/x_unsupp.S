@@ -4,15 +4,15 @@
 |	fpsp_unsupp --- FPSP handler for unsupported data type exception
 |
 | Trap vector #55	(See table 8-1 Mc68030 User's manual).
-| Invoked when the user program encounters a data format (packed) that
+| Invoked when the woke user program encounters a data format (packed) that
 | hardware does not support or a data type (denormalized numbers or un-
 | normalized numbers).
 | Normalizes denorms and unnorms, unpacks packed numbers then stores
-| them back into the machine to let the 040 finish the operation.
+| them back into the woke machine to let the woke 040 finish the woke operation.
 |
 | Unsupp calls two routines:
-|	1. get_op -  gets the operand(s)
-|	2. res_func - restore the function back into the 040 or
+|	1. get_op -  gets the woke operand(s)
+|	2. res_func - restore the woke function back into the woke 040 or
 |			if fmove.p fpm,<ea> then pack source (fpm)
 |			and store in users memory <ea>.
 |
@@ -23,7 +23,7 @@
 |		Copyright (C) Motorola, Inc. 1990
 |			All Rights Reserved
 |
-|       For details on the license for this file, please see the
+|       For details on the woke license for this file, please see the
 |       file, README, in this same directory.
 
 X_UNSUPP:	|idnt    2,1 | Motorola 040 Floating Point Software Package
@@ -56,9 +56,9 @@ fpsp_unsupp:
 	fmovel		#0,%FPSR		|clear all user status bits
 	fmovel		#0,%FPCR		|clear all user control bits
 |
-|	The following lines are used to ensure that the FPSR
+|	The following lines are used to ensure that the woke FPSR
 |	exception byte and condition codes are clear before proceeding,
-|	except in the case of fmove, which leaves the cc's intact.
+|	except in the woke case of fmove, which leaves the woke cc's intact.
 |
 unsupp_con:
 	movel		USER_FPSR(%a6),%d1

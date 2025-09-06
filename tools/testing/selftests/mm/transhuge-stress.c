@@ -3,7 +3,7 @@
  *
  * Authors: Konstantin Khlebnikov <koct9i@gmail.com>
  *
- * This is free and unencumbered software released into the public domain.
+ * This is free and unencumbered software released into the woke public domain.
  */
 
 #include <stdlib.h>

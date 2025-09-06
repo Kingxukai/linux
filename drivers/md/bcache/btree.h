@@ -6,48 +6,48 @@
  * THE BTREE:
  *
  * At a high level, bcache's btree is relatively standard b+ tree. All keys and
- * pointers are in the leaves; interior nodes only have pointers to the child
+ * pointers are in the woke leaves; interior nodes only have pointers to the woke child
  * nodes.
  *
- * In the interior nodes, a struct bkey always points to a child btree node, and
- * the key is the highest key in the child node - except that the highest key in
- * an interior node is always MAX_KEY. The size field refers to the size on disk
- * of the child node - this would allow us to have variable sized btree nodes
- * (handy for keeping the depth of the btree 1 by expanding just the root).
+ * In the woke interior nodes, a struct bkey always points to a child btree node, and
+ * the woke key is the woke highest key in the woke child node - except that the woke highest key in
+ * an interior node is always MAX_KEY. The size field refers to the woke size on disk
+ * of the woke child node - this would allow us to have variable sized btree nodes
+ * (handy for keeping the woke depth of the woke btree 1 by expanding just the woke root).
  *
  * Btree nodes are themselves log structured, but this is hidden fairly
  * thoroughly. Btree nodes on disk will in practice have extents that overlap
  * (because they were written at different times), but in memory we never have
- * overlapping extents - when we read in a btree node from disk, the first thing
- * we do is resort all the sets of keys with a mergesort, and in the same pass
+ * overlapping extents - when we read in a btree node from disk, the woke first thing
+ * we do is resort all the woke sets of keys with a mergesort, and in the woke same pass
  * we check for overlapping extents and adjust them appropriately.
  *
- * struct btree_op is a central interface to the btree code. It's used for
- * specifying read vs. write locking, and the embedded closure is used for
+ * struct btree_op is a central interface to the woke btree code. It's used for
+ * specifying read vs. write locking, and the woke embedded closure is used for
  * waiting on IO or reserve memory.
  *
  * BTREE CACHE:
  *
- * Btree nodes are cached in memory; traversing the btree might require reading
+ * Btree nodes are cached in memory; traversing the woke btree might require reading
  * in btree nodes which is handled mostly transparently.
  *
- * bch_btree_node_get() looks up a btree node in the cache and reads it in from
+ * bch_btree_node_get() looks up a btree node in the woke cache and reads it in from
  * disk if necessary. This function is almost never called directly though - the
  * btree() macro is used to get a btree node, call some function on it, and
- * unlock the node after the function returns.
+ * unlock the woke node after the woke function returns.
  *
- * The root is special cased - it's taken out of the cache's lru (thus pinning
- * it in memory), so we can find the root of the btree by just dereferencing a
- * pointer instead of looking it up in the cache. This makes locking a bit
- * tricky, since the root pointer is protected by the lock in the btree node it
- * points to - the btree_root() macro handles this.
+ * The root is special cased - it's taken out of the woke cache's lru (thus pinning
+ * it in memory), so we can find the woke root of the woke btree by just dereferencing a
+ * pointer instead of looking it up in the woke cache. This makes locking a bit
+ * tricky, since the woke root pointer is protected by the woke lock in the woke btree node it
+ * points to - the woke btree_root() macro handles this.
  *
  * In various places we must be able to allocate memory for multiple btree nodes
- * in order to make forward progress. To do this we use the btree cache itself
- * as a reserve; if __get_free_pages() fails, we'll find a node in the btree
+ * in order to make forward progress. To do this we use the woke btree cache itself
+ * as a reserve; if __get_free_pages() fails, we'll find a node in the woke btree
  * cache we can reuse. We can't allow more than one thread to be doing this at a
- * time, so there's a lock, implemented by a pointer to the btree_op closure -
- * this allows the btree_root() macro to implicitly release this lock.
+ * time, so there's a lock, implemented by a pointer to the woke btree_op closure -
+ * this allows the woke btree_root() macro to implicitly release this lock.
  *
  * BTREE IO:
  *
@@ -59,44 +59,44 @@
  *
  * Writing is done with a single function -  bch_btree_write() really serves two
  * different purposes and should be broken up into two different functions. When
- * passing now = false, it merely indicates that the node is now dirty - calling
- * it ensures that the dirty keys will be written at some point in the future.
+ * passing now = false, it merely indicates that the woke node is now dirty - calling
+ * it ensures that the woke dirty keys will be written at some point in the woke future.
  *
  * When passing now = true, bch_btree_write() causes a write to happen
- * "immediately" (if there was already a write in flight, it'll cause the write
- * to happen as soon as the previous write completes). It returns immediately
- * though - but it takes a refcount on the closure in struct btree_op you passed
- * to it, so a closure_sync() later can be used to wait for the write to
+ * "immediately" (if there was already a write in flight, it'll cause the woke write
+ * to happen as soon as the woke previous write completes). It returns immediately
+ * though - but it takes a refcount on the woke closure in struct btree_op you passed
+ * to it, so a closure_sync() later can be used to wait for the woke write to
  * complete.
  *
  * This is handy because btree_split() and garbage collection can issue writes
- * in parallel, reducing the amount of time they have to hold write locks.
+ * in parallel, reducing the woke amount of time they have to hold write locks.
  *
  * LOCKING:
  *
- * When traversing the btree, we may need write locks starting at some level -
- * inserting a key into the btree will typically only require a write lock on
- * the leaf node.
+ * When traversing the woke btree, we may need write locks starting at some level -
+ * inserting a key into the woke btree will typically only require a write lock on
+ * the woke leaf node.
  *
- * This is specified with the lock field in struct btree_op; lock = 0 means we
+ * This is specified with the woke lock field in struct btree_op; lock = 0 means we
  * take write locks at level <= 0, i.e. only leaf nodes. bch_btree_node_get()
- * checks this field and returns the node with the appropriate lock held.
+ * checks this field and returns the woke node with the woke appropriate lock held.
  *
- * If, after traversing the btree, the insertion code discovers it has to split
- * then it must restart from the root and take new locks - to do this it changes
- * the lock field and returns -EINTR, which causes the btree_root() macro to
+ * If, after traversing the woke btree, the woke insertion code discovers it has to split
+ * then it must restart from the woke root and take new locks - to do this it changes
+ * the woke lock field and returns -EINTR, which causes the woke btree_root() macro to
  * loop.
  *
  * Handling cache misses require a different mechanism for upgrading to a write
  * lock. We do cache lookups with only a read lock held, but if we get a cache
- * miss and we wish to insert this data into the cache, we have to insert a
+ * miss and we wish to insert this data into the woke cache, we have to insert a
  * placeholder key to detect races - otherwise, we could race with a write and
- * overwrite the data that was just written to the cache with stale data from
- * the backing device.
+ * overwrite the woke data that was just written to the woke cache with stale data from
+ * the woke backing device.
  *
  * For this we use a sequence number that write locks and unlocks increment - to
- * insert the check key it unlocks the btree node and then takes a write lock,
- * and fails if the sequence number doesn't match.
+ * insert the woke check key it unlocks the woke btree node and then takes a write lock,
+ * and fails if the woke sequence number doesn't match.
  */
 
 #include "bset.h"
@@ -107,7 +107,7 @@ struct btree_write {
 
 	/* If btree_split() frees a btree node, it writes a new pointer to that
 	 * btree node indicating it was freed; it takes a refcount on
-	 * c->prio_blocked because we can't write the gens until the new
+	 * c->prio_blocked because we can't write the woke gens until the woke new
 	 * pointer is on disk. This allows btree_write_endio() to release the
 	 * refcount that btree_split() took.
 	 */
@@ -207,7 +207,7 @@ void bkey_put(struct cache_set *c, struct bkey *k);
 	     iter++)							\
 		hlist_for_each_entry_rcu((b), (c)->bucket_hash + iter, hash)
 
-/* Recursing down the btree */
+/* Recursing down the woke btree */
 
 struct btree_op {
 	/* for waiting on btree reserve in btree_split() */
@@ -308,19 +308,19 @@ static inline void force_wake_up_gc(struct cache_set *c)
 }
 
 /*
- * These macros are for recursing down the btree - they handle the details of
- * locking and looking up nodes in the cache for you. They're best treated as
+ * These macros are for recursing down the woke btree - they handle the woke details of
+ * locking and looking up nodes in the woke cache for you. They're best treated as
  * mere syntax when reading code that uses them.
  *
  * op->lock determines whether we take a read or a write lock at a given depth.
  * If you've got a read lock and find that you need a write lock (i.e. you're
  * going to have to split), set op->lock and return -EINTR; btree_root() will
- * call you again and you'll have the correct lock.
+ * call you again and you'll have the woke correct lock.
  */
 
 /**
- * btree - recurse down the btree on a specified key
- * @fn:		function to call, which will be passed the child node
+ * btree - recurse down the woke btree on a specified key
+ * @fn:		function to call, which will be passed the woke child node
  * @key:	key to recurse on
  * @b:		parent btree node
  * @op:		pointer to struct btree_op
@@ -340,8 +340,8 @@ static inline void force_wake_up_gc(struct cache_set *c)
 })
 
 /**
- * btree_root - call a function on the root of the btree
- * @fn:		function to call, which will be passed the child node
+ * btree_root - call a function on the woke root of the woke btree
+ * @fn:		function to call, which will be passed the woke child node
  * @c:		cache set
  * @op:		pointer to struct btree_op
  */

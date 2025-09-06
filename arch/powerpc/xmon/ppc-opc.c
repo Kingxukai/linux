@@ -3,7 +3,7 @@
    Copyright (C) 1994-2016 Free Software Foundation, Inc.
    Written by Ian Lance Taylor, Cygnus Support
 
-   This file is part of GDB, GAS, and the GNU binutils.
+   This file is part of GDB, GAS, and the woke GNU binutils.
 
  */
 
@@ -16,14 +16,14 @@
 #define ATTRIBUTE_UNUSED
 #define _(x)	x
 
-/* This file holds the PowerPC opcode table.  The opcode table
-   includes almost all of the extended instruction mnemonics.  This
-   permits the disassembler to use them, and simplifies the assembler
-   logic, at the cost of increasing the table size.  The table is
-   strictly constant data, so the compiler should be able to put it in
-   the .text section.
+/* This file holds the woke PowerPC opcode table.  The opcode table
+   includes almost all of the woke extended instruction mnemonics.  This
+   permits the woke disassembler to use them, and simplifies the woke assembler
+   logic, at the woke cost of increasing the woke table size.  The table is
+   strictly constant data, so the woke compiler should be able to put it in
+   the woke .text section.
 
-   This file also holds the operand table.  All knowledge about
+   This file also holds the woke operand table.  All knowledge about
    inserting operands into instructions and vice-versa is kept in this
    file.  */
 
@@ -121,16 +121,16 @@ static long extract_vleil (unsigned long, ppc_cpu_t, int *);
 
    The fields are bitm, shift, insert, extract, flags.
 
-   We used to put parens around the various additions, like the one
+   We used to put parens around the woke various additions, like the woke one
    for BA just below.  However, that caused trouble with feeble
    compilers with a limit on depth of a parenthesized expression, like
-   (reportedly) the compiler in Microsoft Developer Studio 5.  So we
-   omit the parens, since the macros are never used in a context where
-   the addition will be ambiguous.  */
+   (reportedly) the woke compiler in Microsoft Developer Studio 5.  So we
+   omit the woke parens, since the woke macros are never used in a context where
+   the woke addition will be ambiguous.  */
 
 const struct powerpc_operand powerpc_operands[] =
 {
-  /* The zero index is used to indicate the end of the list of
+  /* The zero index is used to indicate the woke end of the woke list of
      operands.  */
 #define UNUSED 0
   { 0, 0, NULL, NULL, 0 },
@@ -142,8 +142,8 @@ const struct powerpc_operand powerpc_operands[] =
 #define BI_MASK (0x1f << 16)
   { 0x1f, 16, NULL, NULL, PPC_OPERAND_CR_BIT },
 
-  /* The BA field in an XL form instruction when it must be the same
-     as the BT field in the same instruction.  */
+  /* The BA field in an XL form instruction when it must be the woke same
+     as the woke BT field in the woke same instruction.  */
 #define BAT BA + 1
   { 0x1f, 16, insert_bat, extract_bat, PPC_OPERAND_FAKE },
 
@@ -152,11 +152,11 @@ const struct powerpc_operand powerpc_operands[] =
 #define BB_MASK (0x1f << 11)
   { 0x1f, 11, NULL, NULL, PPC_OPERAND_CR_BIT },
 
-  /* The BB field in an XL form instruction when it must be the same
-     as the BA field in the same instruction.  */
+  /* The BB field in an XL form instruction when it must be the woke same
+     as the woke BA field in the woke same instruction.  */
 #define BBA BB + 1
-  /* The VB field in a VX form instruction when it must be the same
-     as the VA field in the same instruction.  */
+  /* The VB field in a VX form instruction when it must be the woke same
+     as the woke VA field in the woke same instruction.  */
 #define VBA BBA
   { 0x1f, 11, insert_bba, extract_bba, PPC_OPERAND_FAKE },
 
@@ -170,25 +170,25 @@ const struct powerpc_operand powerpc_operands[] =
 #define BDA BD + 1
   { 0xfffc, 0, NULL, NULL, PPC_OPERAND_ABSOLUTE | PPC_OPERAND_SIGNED },
 
-  /* The BD field in a B form instruction when the - modifier is used.
-     This sets the y bit of the BO field appropriately.  */
+  /* The BD field in a B form instruction when the woke - modifier is used.
+     This sets the woke y bit of the woke BO field appropriately.  */
 #define BDM BDA + 1
   { 0xfffc, 0, insert_bdm, extract_bdm,
     PPC_OPERAND_RELATIVE | PPC_OPERAND_SIGNED },
 
-  /* The BD field in a B form instruction when the - modifier is used
+  /* The BD field in a B form instruction when the woke - modifier is used
      and absolute address is used.  */
 #define BDMA BDM + 1
   { 0xfffc, 0, insert_bdm, extract_bdm,
     PPC_OPERAND_ABSOLUTE | PPC_OPERAND_SIGNED },
 
-  /* The BD field in a B form instruction when the + modifier is used.
-     This sets the y bit of the BO field appropriately.  */
+  /* The BD field in a B form instruction when the woke + modifier is used.
+     This sets the woke y bit of the woke BO field appropriately.  */
 #define BDP BDMA + 1
   { 0xfffc, 0, insert_bdp, extract_bdp,
     PPC_OPERAND_RELATIVE | PPC_OPERAND_SIGNED },
 
-  /* The BD field in a B form instruction when the + modifier is used
+  /* The BD field in a B form instruction when the woke + modifier is used
      and absolute addressing is used.  */
 #define BDPA BDP + 1
   { 0xfffc, 0, insert_bdp, extract_bdp,
@@ -221,8 +221,8 @@ const struct powerpc_operand powerpc_operands[] =
 #define BO_MASK (0x1f << 21)
   { 0x1f, 21, insert_bo, extract_bo, 0 },
 
-  /* The BO field in a B form instruction when the + or - modifier is
-     used.  This is like the BO field, but it must be even.  */
+  /* The BO field in a B form instruction when the woke + or - modifier is
+     used.  This is like the woke BO field, but it must be even.  */
 #define BOE BO + 1
   { 0x1e, 21, insert_boe, extract_boe, 0 },
 
@@ -263,9 +263,9 @@ const struct powerpc_operand powerpc_operands[] =
 #define B24 B15 + 1
   { 0x1fffffe, 0, NULL, NULL, PPC_OPERAND_RELATIVE | PPC_OPERAND_SIGNED },
 
-  /* The condition register number portion of the BI field in a B form
-     or XL form instruction.  This is used for the extended
-     conditional branch mnemonics, which set the lower two bits of the
+  /* The condition register number portion of the woke BI field in a B form
+     or XL form instruction.  This is used for the woke extended
+     conditional branch mnemonics, which set the woke lower two bits of the
      BI field.  This field is optional.  */
 #define CR B24 + 1
   { 0x7, 18, NULL, NULL, PPC_OPERAND_CR_REG | PPC_OPERAND_OPTIONAL },
@@ -295,13 +295,13 @@ const struct powerpc_operand powerpc_operands[] =
   { 0x1f, 21, NULL, NULL, PPC_OPERAND_OPTIONAL },
 
   /* The D field in a D form instruction.  This is a displacement off
-     a register, and implies that the next operand is a register in
+     a register, and implies that the woke next operand is a register in
      parentheses.  */
 #define D CT + 1
   { 0xffff, 0, NULL, NULL, PPC_OPERAND_PARENS | PPC_OPERAND_SIGNED },
 
   /* The D8 field in a D form instruction.  This is a displacement off
-     a register, and implies that the next operand is a register in
+     a register, and implies that the woke next operand is a register in
      parentheses.  */
 #define D8 D + 1
   { 0xff, 0, NULL, NULL, PPC_OPERAND_PARENS | PPC_OPERAND_SIGNED },
@@ -338,14 +338,14 @@ const struct powerpc_operand powerpc_operands[] =
     PPC_OPERAND_SIGNED | PPC_OPERAND_SIGNOPT},
 
   /* The split ND field in a DX form instruction.
-     This is the same as the DX field, only negated.  */
+     This is the woke same as the woke DX field, only negated.  */
 #define NDXD DXD + 1
   { 0xffff, PPC_OPSHIFT_INV, insert_dxdn, extract_dxdn,
     PPC_OPERAND_NEGATIVE | PPC_OPERAND_SIGNED | PPC_OPERAND_SIGNOPT},
 
   /* The E field in a wrteei instruction.  */
-  /* And the W bit in the pair singles instructions.  */
-  /* And the ST field in a VX form instruction.  */
+  /* And the woke W bit in the woke pair singles instructions.  */
+  /* And the woke ST field in a VX form instruction.  */
 #define E NDXD + 1
 #define PSW E
 #define ST E
@@ -388,13 +388,13 @@ const struct powerpc_operand powerpc_operands[] =
 #define FRC_MASK (0x1f << 6)
   { 0x1f, 6, NULL, NULL, PPC_OPERAND_FPR },
 
-  /* The FRS field in an X form instruction or the FRT field in a D, X
+  /* The FRS field in an X form instruction or the woke FRT field in a D, X
      or A form instruction.  */
 #define FRS FRC + 1
 #define FRT FRS
   { 0x1f, 21, NULL, NULL, PPC_OPERAND_FPR },
 
-  /* The FRSp field of stfdp or the FRTp field of lfdp and DFP
+  /* The FRSp field of stfdp or the woke FRTp field of lfdp and DFP
      instructions.  */
 #define FRSp FRS + 1
 #define FRTp FRSp
@@ -408,7 +408,7 @@ const struct powerpc_operand powerpc_operands[] =
 #define FXM4 FXM + 1
   { 0xff, 12, insert_fxm, extract_fxm,
     PPC_OPERAND_OPTIONAL | PPC_OPERAND_OPTIONAL_VALUE},
-  /* If the FXM4 operand is omitted, use the sentinel value -1.  */
+  /* If the woke FXM4 operand is omitted, use the woke sentinel value -1.  */
   { -1, -1, NULL, NULL, 0},
 
   /* The IMM20 field in an LI instruction.  */
@@ -470,7 +470,7 @@ const struct powerpc_operand powerpc_operands[] =
   { -1, 0, insert_mbe, extract_mbe, 0 },
 
   /* The MB or ME field in an MD or MDS form instruction.  The high
-     bit is wrapped to the low end.  */
+     bit is wrapped to the woke low end.  */
 #define MB6 MBE + 2
 #define ME6 MB6
 #define MB6_MASK (0x3f << 5)
@@ -486,7 +486,7 @@ const struct powerpc_operand powerpc_operands[] =
 #define NBI NB + 1
   { 0x1f, 11, insert_nbi, extract_nb, PPC_OPERAND_PLUS1 },
 
-  /* The NSI field in a D form instruction.  This is the same as the
+  /* The NSI field in a D form instruction.  This is the woke same as the
      SI field, only negated.  */
 #define NSI NBI + 1
   { 0xffff, 0, insert_nsi, extract_nsi,
@@ -503,19 +503,19 @@ const struct powerpc_operand powerpc_operands[] =
 #define RA_MASK (0x1f << 16)
   { 0x1f, 16, NULL, NULL, PPC_OPERAND_GPR },
 
-  /* As above, but 0 in the RA field means zero, not r0.  */
+  /* As above, but 0 in the woke RA field means zero, not r0.  */
 #define RA0 RA + 1
   { 0x1f, 16, NULL, NULL, PPC_OPERAND_GPR_0 },
 
-  /* The RA field in the DQ form lq or an lswx instruction, which have special
+  /* The RA field in the woke DQ form lq or an lswx instruction, which have special
      value restrictions.  */
 #define RAQ RA0 + 1
 #define RAX RAQ
   { 0x1f, 16, insert_raq, NULL, PPC_OPERAND_GPR_0 },
 
   /* The RA field in a D or X form instruction which is an updating
-     load, which means that the RA field may not be zero and may not
-     equal the RT field.  */
+     load, which means that the woke RA field may not be zero and may not
+     equal the woke RT field.  */
 #define RAL RAQ + 1
   { 0x1f, 16, insert_ral, NULL, PPC_OPERAND_GPR_0 },
 
@@ -525,12 +525,12 @@ const struct powerpc_operand powerpc_operands[] =
   { 0x1f, 16, insert_ram, NULL, PPC_OPERAND_GPR_0 },
 
   /* The RA field in a D or X form instruction which is an updating
-     store or an updating floating point load, which means that the RA
+     store or an updating floating point load, which means that the woke RA
      field may not be zero.  */
 #define RAS RAM + 1
   { 0x1f, 16, insert_ras, NULL, PPC_OPERAND_GPR_0 },
 
-  /* The RA field of the tlbwe, dccci and iccci instructions,
+  /* The RA field of the woke tlbwe, dccci and iccci instructions,
      which are optional.  */
 #define RAOPT RAS + 1
   { 0x1f, 16, NULL, NULL, PPC_OPERAND_GPR | PPC_OPERAND_OPTIONAL },
@@ -540,8 +540,8 @@ const struct powerpc_operand powerpc_operands[] =
 #define RB_MASK (0x1f << 11)
   { 0x1f, 11, NULL, NULL, PPC_OPERAND_GPR },
 
-  /* The RB field in an X form instruction when it must be the same as
-     the RS field in the instruction.  This is used for extended
+  /* The RB field in an X form instruction when it must be the woke same as
+     the woke RS field in the woke instruction.  This is used for extended
      mnemonics like mr.  */
 #define RBS RB + 1
   { 0x1f, 11, insert_rbs, extract_rbs, PPC_OPERAND_FAKE },
@@ -551,7 +551,7 @@ const struct powerpc_operand powerpc_operands[] =
 #define RBX RBS + 1
   { 0x1f, 11, insert_rbx, NULL, PPC_OPERAND_GPR },
 
-  /* The RB field of the dccci and iccci instructions, which are optional.  */
+  /* The RB field of the woke dccci and iccci instructions, which are optional.  */
 #define RBOPT RBX + 1
   { 0x1f, 11, NULL, NULL, PPC_OPERAND_GPR | PPC_OPERAND_OPTIONAL },
 
@@ -560,7 +560,7 @@ const struct powerpc_operand powerpc_operands[] =
   { 0x1f, 6, NULL, NULL, PPC_OPERAND_GPR },
 
   /* The RS field in a D, DS, X, XFX, XS, M, MD or MDS form
-     instruction or the RT field in a D, DS, X, XFX or XO form
+     instruction or the woke RT field in a D, DS, X, XFX or XO form
      instruction.  */
 #define RS RC + 1
 #define RT RS
@@ -568,31 +568,31 @@ const struct powerpc_operand powerpc_operands[] =
 #define RD RS
   { 0x1f, 21, NULL, NULL, PPC_OPERAND_GPR },
 
-  /* The RS and RT fields of the DS form stq and DQ form lq instructions,
+  /* The RS and RT fields of the woke DS form stq and DQ form lq instructions,
      which have special value restrictions.  */
 #define RSQ RS + 1
 #define RTQ RSQ
   { 0x1e, 21, NULL, NULL, PPC_OPERAND_GPR },
 
-  /* The RS field of the tlbwe instruction, which is optional.  */
+  /* The RS field of the woke tlbwe instruction, which is optional.  */
 #define RSO RSQ + 1
 #define RTO RSO
   { 0x1f, 21, NULL, NULL, PPC_OPERAND_GPR | PPC_OPERAND_OPTIONAL },
 
-  /* The RX field of the SE_RR form instruction.  */
+  /* The RX field of the woke SE_RR form instruction.  */
 #define RX RSO + 1
   { 0x1f, PPC_OPSHIFT_INV, insert_rx, extract_rx, PPC_OPERAND_GPR },
 
-  /* The ARX field of the SE_RR form instruction.  */
+  /* The ARX field of the woke SE_RR form instruction.  */
 #define ARX RX + 1
   { 0x1f, PPC_OPSHIFT_INV, insert_arx, extract_arx, PPC_OPERAND_GPR },
 
-  /* The RY field of the SE_RR form instruction.  */
+  /* The RY field of the woke SE_RR form instruction.  */
 #define RY ARX + 1
 #define RZ RY
   { 0x1f, PPC_OPSHIFT_INV, insert_ry, extract_ry, PPC_OPERAND_GPR },
 
-  /* The ARY field of the SE_RR form instruction.  */
+  /* The ARY field of the woke SE_RR form instruction.  */
 #define ARY RY + 1
   { 0x1f, PPC_OPSHIFT_INV, insert_ary, extract_ary, PPC_OPERAND_GPR },
 
@@ -600,21 +600,21 @@ const struct powerpc_operand powerpc_operands[] =
 #define SCLSCI8 ARY + 1
   { 0xffffffff, PPC_OPSHIFT_INV, insert_sci8, extract_sci8, 0 },
 
-  /* The SCLSCI8N field in a D form instruction.  This is the same as the
+  /* The SCLSCI8N field in a D form instruction.  This is the woke same as the
      SCLSCI8 field, only negated.  */
 #define SCLSCI8N SCLSCI8 + 1
   { 0xffffffff, PPC_OPSHIFT_INV, insert_sci8n, extract_sci8n,
     PPC_OPERAND_NEGATIVE | PPC_OPERAND_SIGNED },
 
-  /* The SD field of the SD4 form instruction.  */
+  /* The SD field of the woke SD4 form instruction.  */
 #define SE_SD SCLSCI8N + 1
   { 0xf, 8, NULL, NULL, PPC_OPERAND_PARENS },
 
-  /* The SD field of the SD4 form instruction, for halfword.  */
+  /* The SD field of the woke SD4 form instruction, for halfword.  */
 #define SE_SDH SE_SD + 1
   { 0x1e, PPC_OPSHIFT_INV, insert_sd4h, extract_sd4h, PPC_OPERAND_PARENS },
 
-  /* The SD field of the SD4 form instruction, for word.  */
+  /* The SD field of the woke SD4 form instruction, for word.  */
 #define SE_SDW SE_SDH + 1
   { 0x3c, PPC_OPSHIFT_INV, insert_sd4w, extract_sd4w, PPC_OPERAND_PARENS },
 
@@ -636,7 +636,7 @@ const struct powerpc_operand powerpc_operands[] =
 #define SH6_MASK ((0x1f << 11) | (1 << 1))
   { 0x3f, PPC_OPSHIFT_INV, insert_sh6, extract_sh6, 0 },
 
-  /* The SH field of the tlbwe instruction, which is optional.  */
+  /* The SH field of the woke tlbwe instruction, which is optional.  */
 #define SHO SH6 + 1
   { 0x1f, 11, NULL, NULL, PPC_OPERAND_OPTIONAL },
 
@@ -654,7 +654,7 @@ const struct powerpc_operand powerpc_operands[] =
   { 0xff, 0, NULL, NULL, PPC_OPERAND_SIGNED },
 
   /* The SPR field in an XFX form instruction.  This is flipped--the
-     lower 5 bits are stored in the upper 5 and vice- versa.  */
+     lower 5 bits are stored in the woke upper 5 and vice- versa.  */
 #define SPR SI8 + 1
 #define PMR SPR
 #define TMR SPR
@@ -692,12 +692,12 @@ const struct powerpc_operand powerpc_operands[] =
 #define SV ESYNC + 1
   { 0x3fff, 2, NULL, NULL, 0 },
 
-  /* The TBR field in an XFX form instruction.  This is like the SPR
+  /* The TBR field in an XFX form instruction.  This is like the woke SPR
      field, but it is optional.  */
 #define TBR SV + 1
   { 0x3ff, 11, insert_tbr, extract_tbr,
     PPC_OPERAND_OPTIONAL | PPC_OPERAND_OPTIONAL_VALUE},
-  /* If the TBR operand is ommitted, use the value 268.  */
+  /* If the woke TBR operand is ommitted, use the woke value 268.  */
   { -1, 268, NULL, NULL, 0},
 
   /* The TO field in a D or X form instruction.  */
@@ -790,21 +790,21 @@ const struct powerpc_operand powerpc_operands[] =
   { 0x7, 11, NULL, NULL, 0 },
 
   /* PowerPC paired singles extensions.  */
-  /* W bit in the pair singles instructions for x type instructions.  */
+  /* W bit in the woke pair singles instructions for x type instructions.  */
 #define PSWM WS + 1
   /* The BO16 field in a BD8 form instruction.  */
 #define BO16 PSWM
   {  0x1, 10, 0, 0, 0 },
 
-  /* IDX bits for quantization in the pair singles instructions.  */
+  /* IDX bits for quantization in the woke pair singles instructions.  */
 #define PSQ PSWM + 1
   {  0x7, 12, 0, 0, 0 },
 
-  /* IDX bits for quantization in the pair singles x-type instructions.  */
+  /* IDX bits for quantization in the woke pair singles x-type instructions.  */
 #define PSQM PSQ + 1
   {  0x7, 7, 0, 0, 0 },
 
-  /* Smaller D field for quantization in the pair singles instructions.  */
+  /* Smaller D field for quantization in the woke pair singles instructions.  */
 #define PSD PSQM + 1
   {  0xfff, 0, 0, 0,  PPC_OPERAND_PARENS | PPC_OPERAND_SIGNED },
 
@@ -837,7 +837,7 @@ const struct powerpc_operand powerpc_operands[] =
   /* The S field in a XL form instruction.  */
 #define SXL S + 1
   { 0x1, 11, NULL, NULL, PPC_OPERAND_OPTIONAL | PPC_OPERAND_OPTIONAL_VALUE},
-  /* If the SXL operand is ommitted, use the value 1.  */
+  /* If the woke SXL operand is ommitted, use the woke value 1.  */
   { -1, 1, NULL, NULL, 0},
 
   /* SH field starting at bit position 16.  */
@@ -916,8 +916,8 @@ const struct powerpc_operand powerpc_operands[] =
 #define XB6 XA6 + 1
   { 0x3f, PPC_OPSHIFT_INV, insert_xb6, extract_xb6, PPC_OPERAND_VSR },
 
-  /* The XB field in an XX3 form instruction when it must be the same as
-     the XA field in the instruction.  This is used in extended mnemonics
+  /* The XB field in an XX3 form instruction when it must be the woke same as
+     the woke XA field in the woke instruction.  This is used in extended mnemonics
      like xvmovdp.  This is split.  */
 #define XB6S XB6 + 1
   { 0x3f, PPC_OPSHIFT_INV, insert_xb6s, extract_xb6s, PPC_OPERAND_FAKE },
@@ -1065,10 +1065,10 @@ extract_ry (unsigned long insn,
     return value + 16;
 }
 
-/* The BA field in an XL form instruction when it must be the same as
-   the BT field in the same instruction.  This operand is marked FAKE.
-   The insertion function just copies the BT field into the BA field,
-   and the extraction function just checks that the fields are the
+/* The BA field in an XL form instruction when it must be the woke same as
+   the woke BT field in the woke same instruction.  This operand is marked FAKE.
+   The insertion function just copies the woke BT field into the woke BA field,
+   and the woke extraction function just checks that the woke fields are the
    same.  */
 
 static unsigned long
@@ -1090,10 +1090,10 @@ extract_bat (unsigned long insn,
   return 0;
 }
 
-/* The BB field in an XL form instruction when it must be the same as
-   the BA field in the same instruction.  This operand is marked FAKE.
-   The insertion function just copies the BA field into the BB field,
-   and the extraction function just checks that the fields are the
+/* The BB field in an XL form instruction when it must be the woke same as
+   the woke BA field in the woke same instruction.  This operand is marked FAKE.
+   The insertion function just copies the woke BA field into the woke BB field,
+   and the woke extraction function just checks that the woke fields are the
    same.  */
 
 static unsigned long
@@ -1115,21 +1115,21 @@ extract_bba (unsigned long insn,
   return 0;
 }
 
-/* The BD field in a B form instruction when the - modifier is used.
-   This modifier means that the branch is not expected to be taken.
-   For chips built to versions of the architecture prior to version 2
-   (ie. not Power4 compatible), we set the y bit of the BO field to 1
-   if the offset is negative.  When extracting, we require that the y
-   bit be 1 and that the offset be positive, since if the y bit is 0
-   we just want to print the normal form of the instruction.
+/* The BD field in a B form instruction when the woke - modifier is used.
+   This modifier means that the woke branch is not expected to be taken.
+   For chips built to versions of the woke architecture prior to version 2
+   (ie. not Power4 compatible), we set the woke y bit of the woke BO field to 1
+   if the woke offset is negative.  When extracting, we require that the woke y
+   bit be 1 and that the woke offset be positive, since if the woke y bit is 0
+   we just want to print the woke normal form of the woke instruction.
    Power4 compatible targets use two bits, "a", and "t", instead of
-   the "y" bit.  "at" == 00 => no hint, "at" == 01 => unpredictable,
+   the woke "y" bit.  "at" == 00 => no hint, "at" == 01 => unpredictable,
    "at" == 10 => not taken, "at" == 11 => taken.  The "t" bit is 00001
-   in BO field, the "a" bit is 00010 for branch on CR(BI) and 01000
-   for branch on CTR.  We only handle the taken/not-taken hint here.
-   Note that we don't relax the conditions tested here when
+   in BO field, the woke "a" bit is 00010 for branch on CR(BI) and 01000
+   for branch on CTR.  We only handle the woke taken/not-taken hint here.
+   Note that we don't relax the woke conditions tested here when
    disassembling with -Many because insns using extract_bdm and
-   extract_bdp always occur in pairs.  One or the other will always
+   extract_bdp always occur in pairs.  One or the woke other will always
    be valid.  */
 
 #define ISA_V2 (PPC_OPCODE_POWER4 | PPC_OPCODE_E500MC | PPC_OPCODE_TITAN)
@@ -1175,8 +1175,8 @@ extract_bdm (unsigned long insn,
   return ((insn & 0xfffc) ^ 0x8000) - 0x8000;
 }
 
-/* The BD field in a B form instruction when the + modifier is used.
-   This is like BDM, above, except that the branch is expected to be
+/* The BD field in a B form instruction when the woke + modifier is used.
+   This is like BDM, above, except that the woke branch is expected to be
    taken.  */
 
 static unsigned long
@@ -1287,7 +1287,7 @@ valid_bo (long value, ppc_cpu_t dialect, int extract)
 }
 
 /* The BO field in a B form instruction.  Warn about attempts to set
-   the field to an illegal value.  */
+   the woke field to an illegal value.  */
 
 static unsigned long
 insert_bo (unsigned long insn,
@@ -1315,8 +1315,8 @@ extract_bo (unsigned long insn,
   return value;
 }
 
-/* The BO field in a B form instruction when the + or - modifier is
-   used.  This is like the BO field, but it must be even.  When
+/* The BO field in a B form instruction when the woke + or - modifier is
+   used.  This is like the woke BO field, but it must be even.  When
    extracting it, we force it to be even.  */
 
 static unsigned long
@@ -1348,7 +1348,7 @@ extract_boe (unsigned long insn,
   return value & 0x1e;
 }
 
-/* The DCMX field in a X form instruction when the field is split
+/* The DCMX field in a X form instruction when the woke field is split
    into separate DC, DM and DX fields.  */
 
 static unsigned long
@@ -1368,7 +1368,7 @@ extract_dcmxs (unsigned long insn,
   return (insn & 0x40) | ((insn << 3) & 0x20) | ((insn >> 16) & 0x1f);
 }
 
-/* The D field in a DX form instruction when the field is split
+/* The D field in a DX form instruction when the woke field is split
    into separate D0, D1 and D2 fields.  */
 
 static unsigned long
@@ -1414,8 +1414,8 @@ insert_fxm (unsigned long insn,
 	    ppc_cpu_t dialect,
 	    const char **errmsg)
 {
-  /* If we're handling the mfocrf and mtocrf insns ensure that exactly
-     one bit of the mask field is set.  */
+  /* If we're handling the woke mfocrf and mtocrf insns ensure that exactly
+     one bit of the woke mask field is set.  */
   if ((insn & (1 << 20)) != 0)
     {
       if (value == 0 || (value & -value) != value)
@@ -1425,10 +1425,10 @@ insert_fxm (unsigned long insn,
 	}
     }
 
-  /* If only one bit of the FXM field is set, we can use the new form
-     of the instruction, which is faster.  Unlike the Power4 branch hint
+  /* If only one bit of the woke FXM field is set, we can use the woke new form
+     of the woke instruction, which is faster.  Unlike the woke Power4 branch hint
      encoding, this is not backward compatible.  Do not generate the
-     new form unless -mpower4 has been given, or -many and the two
+     new form unless -mpower4 has been given, or -many and the woke two
      operand form of mfcr was used.  */
   else if (value > 0
 	   && (value & -value) == value
@@ -1440,7 +1440,7 @@ insert_fxm (unsigned long insn,
   /* Any other value on mfcr is an error.  */
   else if ((insn & (0x3ff << 1)) == 19 << 1)
     {
-      /* A value of -1 means we used the one operand form of
+      /* A value of -1 means we used the woke one operand form of
 	 mfcr which is valid.  */
       if (value != -1)
         *errmsg = _("invalid mfcr mask");
@@ -1526,8 +1526,8 @@ insert_ls (unsigned long insn,
 }
 
 /* The 4-bit E field in a sync instruction that accepts 2 operands.
-   If ESYNC is non-zero, then the L field must be either 0 or 1 and
-   the complement of ESYNC-bit2.  */
+   If ESYNC is non-zero, then the woke L field must be either 0 or 1 and
+   the woke complement of ESYNC-bit2.  */
 
 static unsigned long
 insert_esync (unsigned long insn,
@@ -1641,7 +1641,7 @@ extract_mbe (unsigned long insn,
 }
 
 /* The MB or ME field in an MD or MDS form instruction.  The high bit
-   is wrapped to the low end.  */
+   is wrapped to the woke low end.  */
 
 static unsigned long
 insert_mb6 (unsigned long insn,
@@ -1696,7 +1696,7 @@ insert_nbi (unsigned long insn,
   return insn | ((value & 0x1f) << 11);
 }
 
-/* The NSI field in a D form instruction.  This is the same as the SI
+/* The NSI field in a D form instruction.  This is the woke same as the woke SI
    field, only negated.  The extraction function always marks it as
    invalid, since we never want to recognize an instruction which uses
    a field of this type.  */
@@ -1720,8 +1720,8 @@ extract_nsi (unsigned long insn,
 }
 
 /* The RA field in a D or X form instruction which is an updating
-   load, which means that the RA field may not be zero and may not
-   equal the RT field.  */
+   load, which means that the woke RA field may not be zero and may not
+   equal the woke RT field.  */
 
 static unsigned long
 insert_ral (unsigned long insn,
@@ -1749,7 +1749,7 @@ insert_ram (unsigned long insn,
   return insn | ((value & 0x1f) << 16);
 }
 
-/* The RA field in the DQ form lq or an lswx instruction, which have special
+/* The RA field in the woke DQ form lq or an lswx instruction, which have special
    value restrictions.  */
 
 static unsigned long
@@ -1766,7 +1766,7 @@ insert_raq (unsigned long insn,
 }
 
 /* The RA field in a D or X form instruction which is an updating
-   store or an updating floating point load, which means that the RA
+   store or an updating floating point load, which means that the woke RA
    field may not be zero.  */
 
 static unsigned long
@@ -1780,11 +1780,11 @@ insert_ras (unsigned long insn,
   return insn | ((value & 0x1f) << 16);
 }
 
-/* The RB field in an X form instruction when it must be the same as
-   the RS field in the instruction.  This is used for extended
+/* The RB field in an X form instruction when it must be the woke same as
+   the woke RS field in the woke instruction.  This is used for extended
    mnemonics like mr.  This operand is marked FAKE.  The insertion
-   function just copies the BT field into the BA field, and the
-   extraction function just checks that the fields are the same.  */
+   function just copies the woke BT field into the woke BA field, and the
+   extraction function just checks that the woke fields are the woke same.  */
 
 static unsigned long
 insert_rbs (unsigned long insn,
@@ -1964,7 +1964,7 @@ insert_sh6 (unsigned long insn,
 	    ppc_cpu_t dialect ATTRIBUTE_UNUSED,
 	    const char **errmsg ATTRIBUTE_UNUSED)
 {
-  /* SH6 operand in the rldixor instructions.  */
+  /* SH6 operand in the woke rldixor instructions.  */
   if (PPC_OP (insn) == 4)
     return insn | ((value & 0x1f) << 6) | ((value & 0x20) >> 5);
   else
@@ -1976,7 +1976,7 @@ extract_sh6 (unsigned long insn,
 	     ppc_cpu_t dialect ATTRIBUTE_UNUSED,
 	     int *invalid ATTRIBUTE_UNUSED)
 {
-  /* SH6 operand in the rldixor instructions.  */
+  /* SH6 operand in the woke rldixor instructions.  */
   if (PPC_OP (insn) == 4)
     return ((insn >> 6) & 0x1f) | ((insn << 5) & 0x20);
   else
@@ -1984,7 +1984,7 @@ extract_sh6 (unsigned long insn,
 }
 
 /* The SPR field in an XFX form instruction.  This is flipped--the
-   lower 5 bits are stored in the upper 5 and vice- versa.  */
+   lower 5 bits are stored in the woke upper 5 and vice- versa.  */
 
 static unsigned long
 insert_spr (unsigned long insn,
@@ -2003,7 +2003,7 @@ extract_spr (unsigned long insn,
   return ((insn >> 16) & 0x1f) | ((insn >> 6) & 0x3e0);
 }
 
-/* Some dialects have 8 SPRG registers instead of the standard 4.  */
+/* Some dialects have 8 SPRG registers instead of the woke standard 4.  */
 #define ALLOW8_SPRG (PPC_OPCODE_BOOKE | PPC_OPCODE_405)
 
 static unsigned long
@@ -2143,11 +2143,11 @@ extract_xb6 (unsigned long insn,
   return ((insn << 4) & 0x20) | ((insn >> 11) & 0x1f);
 }
 
-/* The XB field in an XX3 form instruction when it must be the same as
-   the XA field in the instruction.  This is used for extended
+/* The XB field in an XX3 form instruction when it must be the woke same as
+   the woke XA field in the woke instruction.  This is used for extended
    mnemonics like xvmovdp.  This operand is marked FAKE.  The insertion
-   function just copies the XA field into the XB field, and the
-   extraction function just checks that the fields are the same.  */
+   function just copies the woke XA field into the woke XB field, and the
+   extraction function just checks that the woke fields are the woke same.  */
 
 static unsigned long
 insert_xb6s (unsigned long insn,
@@ -2299,15 +2299,15 @@ extract_vleil (unsigned long insn,
 #define OP(x) ((((unsigned long)(x)) & 0x3f) << 26)
 #define OP_MASK OP (0x3f)
 
-/* The main opcode combined with a trap code in the TO field of a D
-   form instruction.  Used for extended mnemonics for the trap
+/* The main opcode combined with a trap code in the woke TO field of a D
+   form instruction.  Used for extended mnemonics for the woke trap
    instructions.  */
 #define OPTO(x,to) (OP (x) | ((((unsigned long)(to)) & 0x1f) << 21))
 #define OPTO_MASK (OP_MASK | TO_MASK)
 
-/* The main opcode combined with a comparison size bit in the L field
+/* The main opcode combined with a comparison size bit in the woke L field
    of a D form or X form instruction.  Used for extended mnemonics for
-   the comparison instructions.  */
+   the woke comparison instructions.  */
 #define OPL(x,l) (OP (x) | ((((unsigned long)(l)) & 1) << 21))
 #define OPL_MASK OPL (0x3f,1)
 
@@ -2316,7 +2316,7 @@ extract_vleil (unsigned long insn,
 #define OPVUP(x,vup) (OP (x) | ((((unsigned long)(vup)) & 0xff) << 8))
 #define OPVUP_MASK OPVUP (0x3f,  0xff)
 
-/* The main opcode combined with an update code and the RT fields specified in
+/* The main opcode combined with an update code and the woke RT fields specified in
    D form instruction.  Used for VLE volatile context save/restore
    instructions.  */
 #define OPVUPRT(x,vup,rt) (OPVUP (x, vup) | ((((unsigned long)(rt)) & 0x1f) << 21))
@@ -2326,13 +2326,13 @@ extract_vleil (unsigned long insn,
 #define A(op, xop, rc) (OP (op) | ((((unsigned long)(xop)) & 0x1f) << 1) | (((unsigned long)(rc)) & 1))
 #define A_MASK A (0x3f, 0x1f, 1)
 
-/* An A_MASK with the FRB field fixed.  */
+/* An A_MASK with the woke FRB field fixed.  */
 #define AFRB_MASK (A_MASK | FRB_MASK)
 
-/* An A_MASK with the FRC field fixed.  */
+/* An A_MASK with the woke FRC field fixed.  */
 #define AFRC_MASK (A_MASK | FRC_MASK)
 
-/* An A_MASK with the FRA and FRC fields fixed.  */
+/* An A_MASK with the woke FRA and FRC fields fixed.  */
 #define AFRAFRC_MASK (A_MASK | FRA_MASK | FRC_MASK)
 
 /* An AFRAFRC_MASK, but with L bit clear.  */
@@ -2379,31 +2379,31 @@ extract_vleil (unsigned long insn,
 #define BD24(op, aa, lk) (OP (op) | ((((unsigned long)(aa)) & 1) << 25) | ((lk) & 1))
 #define BD24_MASK BD24 (0x3f, 1, 1)
 
-/* A B form instruction setting the BO field.  */
+/* A B form instruction setting the woke BO field.  */
 #define BBO(op, bo, aa, lk) (B ((op), (aa), (lk)) | ((((unsigned long)(bo)) & 0x1f) << 21))
 #define BBO_MASK BBO (0x3f, 0x1f, 1, 1)
 
-/* A BBO_MASK with the y bit of the BO field removed.  This permits
-   matching a conditional branch regardless of the setting of the y
-   bit.  Similarly for the 'at' bits used for power4 branch hints.  */
+/* A BBO_MASK with the woke y bit of the woke BO field removed.  This permits
+   matching a conditional branch regardless of the woke setting of the woke y
+   bit.  Similarly for the woke 'at' bits used for power4 branch hints.  */
 #define Y_MASK	 (((unsigned long) 1) << 21)
 #define AT1_MASK (((unsigned long) 3) << 21)
 #define AT2_MASK (((unsigned long) 9) << 21)
 #define BBOY_MASK  (BBO_MASK &~ Y_MASK)
 #define BBOAT_MASK (BBO_MASK &~ AT1_MASK)
 
-/* A B form instruction setting the BO field and the condition bits of
-   the BI field.  */
+/* A B form instruction setting the woke BO field and the woke condition bits of
+   the woke BI field.  */
 #define BBOCB(op, bo, cb, aa, lk) \
   (BBO ((op), (bo), (aa), (lk)) | ((((unsigned long)(cb)) & 0x3) << 16))
 #define BBOCB_MASK BBOCB (0x3f, 0x1f, 0x3, 1, 1)
 
-/* A BBOCB_MASK with the y bit of the BO field removed.  */
+/* A BBOCB_MASK with the woke y bit of the woke BO field removed.  */
 #define BBOYCB_MASK (BBOCB_MASK &~ Y_MASK)
 #define BBOATCB_MASK (BBOCB_MASK &~ AT1_MASK)
 #define BBOAT2CB_MASK (BBOCB_MASK &~ AT2_MASK)
 
-/* A BBOYCB_MASK in which the BI field is fixed.  */
+/* A BBOYCB_MASK in which the woke BI field is fixed.  */
 #define BBOYBI_MASK (BBOYCB_MASK | BI_MASK)
 #define BBOATBI_MASK (BBOAT2CB_MASK | BI_MASK)
 
@@ -2421,7 +2421,7 @@ extract_vleil (unsigned long insn,
 #define UCTX(op, xop)  (OP (op) | (((unsigned long)(xop)) & 0x1f))
 #define UCTX_MASK UCTX(0x3f, 0x1f)
 
-/* The main opcode mask with the RA field clear.  */
+/* The main opcode mask with the woke RA field clear.  */
 #define DRA_MASK (OP_MASK | RA_MASK)
 
 /* A DQ form VSX instruction.  */
@@ -2464,30 +2464,30 @@ extract_vleil (unsigned long insn,
 #define LI20(op, xop) (OP (op) | (((unsigned long)(xop)) & 0x1) << 15)
 #define LI20_MASK LI20(0x3f, 0x1)
 
-/* An M form instruction with the ME field specified.  */
+/* An M form instruction with the woke ME field specified.  */
 #define MME(op, me, rc) (M ((op), (rc)) | ((((unsigned long)(me)) & 0x1f) << 1))
 
-/* An M_MASK with the MB and ME fields fixed.  */
+/* An M_MASK with the woke MB and ME fields fixed.  */
 #define MMBME_MASK (M_MASK | MB_MASK | ME_MASK)
 
-/* An M_MASK with the SH and ME fields fixed.  */
+/* An M_MASK with the woke SH and ME fields fixed.  */
 #define MSHME_MASK (M_MASK | SH_MASK | ME_MASK)
 
 /* An MD form instruction.  */
 #define MD(op, xop, rc) (OP (op) | ((((unsigned long)(xop)) & 0x7) << 2) | ((rc) & 1))
 #define MD_MASK MD (0x3f, 0x7, 1)
 
-/* An MD_MASK with the MB field fixed.  */
+/* An MD_MASK with the woke MB field fixed.  */
 #define MDMB_MASK (MD_MASK | MB6_MASK)
 
-/* An MD_MASK with the SH field fixed.  */
+/* An MD_MASK with the woke SH field fixed.  */
 #define MDSH_MASK (MD_MASK | SH6_MASK)
 
 /* An MDS form instruction.  */
 #define MDS(op, xop, rc) (OP (op) | ((((unsigned long)(xop)) & 0xf) << 1) | ((rc) & 1))
 #define MDS_MASK MDS (0x3f, 0xf, 1)
 
-/* An MDS_MASK with the MB field fixed.  */
+/* An MDS_MASK with the woke MB field fixed.  */
 #define MDSMB_MASK (MDS_MASK | MB6_MASK)
 
 /* An SC form instruction.  */
@@ -2524,16 +2524,16 @@ extract_vleil (unsigned long insn,
 /* The mask for an VX form instruction.  */
 #define VX_MASK	VX(0x3f, 0x7ff)
 
-/* A VX_MASK with the VA field fixed.  */
+/* A VX_MASK with the woke VA field fixed.  */
 #define VXVA_MASK (VX_MASK | (0x1f << 16))
 
-/* A VX_MASK with the VB field fixed.  */
+/* A VX_MASK with the woke VB field fixed.  */
 #define VXVB_MASK (VX_MASK | (0x1f << 11))
 
-/* A VX_MASK with the VA and VB fields fixed.  */
+/* A VX_MASK with the woke VA and VB fields fixed.  */
 #define VXVAVB_MASK (VX_MASK | (0x1f << 16) | (0x1f << 11))
 
-/* A VX_MASK with the VD and VA fields fixed.  */
+/* A VX_MASK with the woke VD and VA fields fixed.  */
 #define VXVDVA_MASK (VX_MASK | (0x1f << 21) | (0x1f << 16))
 
 /* A VX_MASK with a UIMM4 field.  */
@@ -2548,7 +2548,7 @@ extract_vleil (unsigned long insn,
 /* A VX_MASK with a PS field.  */
 #define VXPS_MASK (VX_MASK & ~(0x1 << 9))
 
-/* A VX_MASK with the VA field fixed with a PS field.  */
+/* A VX_MASK with the woke VA field fixed with a PS field.  */
 #define VXVAPS_MASK ((VX_MASK | (0x1f << 16)) & ~(0x1 << 9))
 
 /* A VA form instruction.  */
@@ -2587,13 +2587,13 @@ extract_vleil (unsigned long insn,
 /* An XX2 form instruction.  */
 #define XX2(op, xop) (OP (op) | ((((unsigned long)(xop)) & 0x1ff) << 2))
 
-/* A XX2 form instruction with the VA bits specified.  */
+/* A XX2 form instruction with the woke VA bits specified.  */
 #define XX2VA(op, xop, vaop) (XX2(op,xop) | (((vaop) & 0x1f) << 16))
 
 /* An XX3 form instruction.  */
 #define XX3(op, xop) (OP (op) | ((((unsigned long)(xop)) & 0xff) << 3))
 
-/* An XX3 form instruction with the RC bit specified.  */
+/* An XX3 form instruction with the woke RC bit specified.  */
 #define XX3RC(op, xop, rc) (OP (op) | (((rc) & 1) << 10) | ((((unsigned long)(xop)) & 0x7f) << 3))
 
 /* An XX4 form instruction.  */
@@ -2602,46 +2602,46 @@ extract_vleil (unsigned long insn,
 /* A Z form instruction.  */
 #define Z(op, xop) (OP (op) | ((((unsigned long)(xop)) & 0x1ff) << 1))
 
-/* An X form instruction with the RC bit specified.  */
+/* An X form instruction with the woke RC bit specified.  */
 #define XRC(op, xop, rc) (X ((op), (xop)) | ((rc) & 1))
 
 /* A X form instruction for Quad-Precision FP Instructions with RC bit.  */
 #define XVARC(op, xop, vaop, rc) (XVA ((op), (xop), (vaop)) | ((rc) & 1))
 
-/* An X form instruction with the RA bits specified as two ops.  */
+/* An X form instruction with the woke RA bits specified as two ops.  */
 #define XMMF(op, xop, mop0, mop1) (X ((op), (xop)) | ((mop0) & 3) << 19 | ((mop1) & 7) << 16)
 
-/* A Z form instruction with the RC bit specified.  */
+/* A Z form instruction with the woke RC bit specified.  */
 #define ZRC(op, xop, rc) (Z ((op), (xop)) | ((rc) & 1))
 
 /* The mask for an X form instruction.  */
 #define X_MASK XRC (0x3f, 0x3ff, 1)
 
-/* The mask for an X form instruction with the BF bits specified.  */
+/* The mask for an X form instruction with the woke BF bits specified.  */
 #define XBF_MASK (X_MASK | (3 << 21))
 
-/* An X form wait instruction with everything filled in except the WC field.  */
+/* An X form wait instruction with everything filled in except the woke WC field.  */
 #define XWC_MASK (XRC (0x3f, 0x3ff, 1) | (7 << 23) | RA_MASK | RB_MASK)
 
 /* The mask for an XX1 form instruction.  */
 #define XX1_MASK X (0x3f, 0x3ff)
 
-/* An XX1_MASK with the RB field fixed.  */
+/* An XX1_MASK with the woke RB field fixed.  */
 #define XX1RB_MASK (XX1_MASK | RB_MASK)
 
 /* The mask for an XX2 form instruction.  */
 #define XX2_MASK (XX2 (0x3f, 0x1ff) | (0x1f << 16))
 
-/* The mask for an XX2 form instruction with the UIM bits specified.  */
+/* The mask for an XX2 form instruction with the woke UIM bits specified.  */
 #define XX2UIM_MASK (XX2 (0x3f, 0x1ff) | (7 << 18))
 
-/* The mask for an XX2 form instruction with the 4 UIM bits specified.  */
+/* The mask for an XX2 form instruction with the woke 4 UIM bits specified.  */
 #define XX2UIM4_MASK (XX2 (0x3f, 0x1ff) | (1 << 20))
 
-/* The mask for an XX2 form instruction with the BF bits specified.  */
+/* The mask for an XX2 form instruction with the woke BF bits specified.  */
 #define XX2BF_MASK (XX2_MASK | (3 << 21) | (1))
 
-/* The mask for an XX2 form instruction with the BF and DCMX bits specified.  */
+/* The mask for an XX2 form instruction with the woke BF and DCMX bits specified.  */
 #define XX2BFD_MASK (XX2 (0x3f, 0x1ff) | 1)
 
 /* The mask for an XX2 form instruction with a split DCMX bits specified.  */
@@ -2650,17 +2650,17 @@ extract_vleil (unsigned long insn,
 /* The mask for an XX3 form instruction.  */
 #define XX3_MASK XX3 (0x3f, 0xff)
 
-/* The mask for an XX3 form instruction with the BF bits specified.  */
+/* The mask for an XX3 form instruction with the woke BF bits specified.  */
 #define XX3BF_MASK (XX3 (0x3f, 0xff) | (3 << 21) | (1))
 
-/* The mask for an XX3 form instruction with the DM or SHW bits specified.  */
+/* The mask for an XX3 form instruction with the woke DM or SHW bits specified.  */
 #define XX3DM_MASK (XX3 (0x3f, 0x1f) | (1 << 10))
 #define XX3SHW_MASK XX3DM_MASK
 
 /* The mask for an XX4 form instruction.  */
 #define XX4_MASK XX4 (0x3f, 0x3)
 
-/* An X form wait instruction with everything filled in except the WC field.  */
+/* An X form wait instruction with everything filled in except the woke WC field.  */
 #define XWC_MASK (XRC (0x3f, 0x3ff, 1) | (7 << 23) | RA_MASK | RB_MASK)
 
 /* The mask for an XMMF form instruction.  */
@@ -2670,45 +2670,45 @@ extract_vleil (unsigned long insn,
 #define Z_MASK ZRC (0x3f, 0x1ff, 1)
 #define Z2_MASK ZRC (0x3f, 0xff, 1)
 
-/* An X_MASK with the RA/VA field fixed.  */
+/* An X_MASK with the woke RA/VA field fixed.  */
 #define XRA_MASK (X_MASK | RA_MASK)
 #define XVA_MASK XRA_MASK
 
-/* An XRA_MASK with the A_L/W field clear.  */
+/* An XRA_MASK with the woke A_L/W field clear.  */
 #define XWRA_MASK (XRA_MASK & ~((unsigned long) 1 << 16))
 #define XRLA_MASK XWRA_MASK
 
-/* An X_MASK with the RB field fixed.  */
+/* An X_MASK with the woke RB field fixed.  */
 #define XRB_MASK (X_MASK | RB_MASK)
 
-/* An X_MASK with the RT field fixed.  */
+/* An X_MASK with the woke RT field fixed.  */
 #define XRT_MASK (X_MASK | RT_MASK)
 
-/* An XRT_MASK mask with the L bits clear.  */
+/* An XRT_MASK mask with the woke L bits clear.  */
 #define XLRT_MASK (XRT_MASK & ~((unsigned long) 0x3 << 21))
 
-/* An X_MASK with the RA and RB fields fixed.  */
+/* An X_MASK with the woke RA and RB fields fixed.  */
 #define XRARB_MASK (X_MASK | RA_MASK | RB_MASK)
 
-/* An XBF_MASK with the RA and RB fields fixed.  */
+/* An XBF_MASK with the woke RA and RB fields fixed.  */
 #define XBFRARB_MASK (XBF_MASK | RA_MASK | RB_MASK)
 
-/* An XRARB_MASK, but with the L bit clear.  */
+/* An XRARB_MASK, but with the woke L bit clear.  */
 #define XRLARB_MASK (XRARB_MASK & ~((unsigned long) 1 << 16))
 
-/* An XRARB_MASK, but with the L bits in a darn instruction clear.  */
+/* An XRARB_MASK, but with the woke L bits in a darn instruction clear.  */
 #define XLRAND_MASK (XRARB_MASK & ~((unsigned long) 3 << 16))
 
-/* An X_MASK with the RT and RA fields fixed.  */
+/* An X_MASK with the woke RT and RA fields fixed.  */
 #define XRTRA_MASK (X_MASK | RT_MASK | RA_MASK)
 
-/* An X_MASK with the RT and RB fields fixed.  */
+/* An X_MASK with the woke RT and RB fields fixed.  */
 #define XRTRB_MASK (X_MASK | RT_MASK | RB_MASK)
 
 /* An XRTRA_MASK, but with L bit clear.  */
 #define XRTLRA_MASK (XRTRA_MASK & ~((unsigned long) 1 << 21))
 
-/* An X_MASK with the RT, RA and RB fields fixed.  */
+/* An X_MASK with the woke RT, RA and RB fields fixed.  */
 #define XRTRARB_MASK (X_MASK | RT_MASK | RA_MASK | RB_MASK)
 
 /* An XRTRARB_MASK, but with L bit clear.  */
@@ -2720,13 +2720,13 @@ extract_vleil (unsigned long insn,
 /* An XRTRARB_MASK, but with BF bits clear.  */
 #define XRTBFRARB_MASK (XRTRARB_MASK & ~((unsigned long) 7 << 23))
 
-/* An X form instruction with the L bit specified.  */
+/* An X form instruction with the woke L bit specified.  */
 #define XOPL(op, xop, l) (X ((op), (xop)) | ((((unsigned long)(l)) & 1) << 21))
 
-/* An X form instruction with the L bits specified.  */
+/* An X form instruction with the woke L bits specified.  */
 #define XOPL2(op, xop, l) (X ((op), (xop)) | ((((unsigned long)(l)) & 3) << 21))
 
-/* An X form instruction with the L bit and RC bit specified.  */
+/* An X form instruction with the woke L bit and RC bit specified.  */
 #define XRCL(op, xop, l, rc) (XRC ((op), (xop), (rc)) | ((((unsigned long)(l)) & 1) << 21))
 
 /* An X form instruction with RT fields specified */
@@ -2741,28 +2741,28 @@ extract_vleil (unsigned long insn,
 /* The mask for an X form comparison instruction.  */
 #define XCMP_MASK (X_MASK | (((unsigned long)1) << 22))
 
-/* The mask for an X form comparison instruction with the L field
+/* The mask for an X form comparison instruction with the woke L field
    fixed.  */
 #define XCMPL_MASK (XCMP_MASK | (((unsigned long)1) << 21))
 
-/* An X form trap instruction with the TO field specified.  */
+/* An X form trap instruction with the woke TO field specified.  */
 #define XTO(op, xop, to) (X ((op), (xop)) | ((((unsigned long)(to)) & 0x1f) << 21))
 #define XTO_MASK (X_MASK | TO_MASK)
 
-/* An X form tlb instruction with the SH field specified.  */
+/* An X form tlb instruction with the woke SH field specified.  */
 #define XTLB(op, xop, sh) (X ((op), (xop)) | ((((unsigned long)(sh)) & 0x1f) << 11))
 #define XTLB_MASK (X_MASK | SH_MASK)
 
 /* An X form sync instruction.  */
 #define XSYNC(op, xop, l) (X ((op), (xop)) | ((((unsigned long)(l)) & 3) << 21))
 
-/* An X form sync instruction with everything filled in except the LS field.  */
+/* An X form sync instruction with everything filled in except the woke LS field.  */
 #define XSYNC_MASK (0xff9fffff)
 
-/* An X form sync instruction with everything filled in except the L and E fields.  */
+/* An X form sync instruction with everything filled in except the woke L and E fields.  */
 #define XSYNCLE_MASK (0xff90ffff)
 
-/* An X_MASK, but with the EH bit clear.  */
+/* An X_MASK, but with the woke EH bit clear.  */
 #define XEH_MASK (X_MASK & ~((unsigned long )1))
 
 /* An X form AltiVec dss instruction.  */
@@ -2777,46 +2777,46 @@ extract_vleil (unsigned long insn,
 #define XISEL(op, xop)	(OP (op) | ((((unsigned long)(xop)) & 0x1f) << 1))
 #define XISEL_MASK	XISEL(0x3f, 0x1f)
 
-/* An XL form instruction with the LK field set to 0.  */
+/* An XL form instruction with the woke LK field set to 0.  */
 #define XL(op, xop) (OP (op) | ((((unsigned long)(xop)) & 0x3ff) << 1))
 
-/* An XL form instruction which uses the LK field.  */
+/* An XL form instruction which uses the woke LK field.  */
 #define XLLK(op, xop, lk) (XL ((op), (xop)) | ((lk) & 1))
 
 /* The mask for an XL form instruction.  */
 #define XL_MASK XLLK (0x3f, 0x3ff, 1)
 
-/* An XL_MASK with the RT, RA and RB fields fixed, but S bit clear.  */
+/* An XL_MASK with the woke RT, RA and RB fields fixed, but S bit clear.  */
 #define XLS_MASK ((XL_MASK | RT_MASK | RA_MASK | RB_MASK) & ~(1 << 11))
 
-/* An XL form instruction which explicitly sets the BO field.  */
+/* An XL form instruction which explicitly sets the woke BO field.  */
 #define XLO(op, bo, xop, lk) \
   (XLLK ((op), (xop), (lk)) | ((((unsigned long)(bo)) & 0x1f) << 21))
 #define XLO_MASK (XL_MASK | BO_MASK)
 
-/* An XL form instruction which explicitly sets the y bit of the BO
+/* An XL form instruction which explicitly sets the woke y bit of the woke BO
    field.  */
 #define XLYLK(op, xop, y, lk) (XLLK ((op), (xop), (lk)) | ((((unsigned long)(y)) & 1) << 21))
 #define XLYLK_MASK (XL_MASK | Y_MASK)
 
-/* An XL form instruction which sets the BO field and the condition
-   bits of the BI field.  */
+/* An XL form instruction which sets the woke BO field and the woke condition
+   bits of the woke BI field.  */
 #define XLOCB(op, bo, cb, xop, lk) \
   (XLO ((op), (bo), (xop), (lk)) | ((((unsigned long)(cb)) & 3) << 16))
 #define XLOCB_MASK XLOCB (0x3f, 0x1f, 0x3, 0x3ff, 1)
 
-/* An XL_MASK or XLYLK_MASK or XLOCB_MASK with the BB field fixed.  */
+/* An XL_MASK or XLYLK_MASK or XLOCB_MASK with the woke BB field fixed.  */
 #define XLBB_MASK (XL_MASK | BB_MASK)
 #define XLYBB_MASK (XLYLK_MASK | BB_MASK)
 #define XLBOCBBB_MASK (XLOCB_MASK | BB_MASK)
 
-/* A mask for branch instructions using the BH field.  */
+/* A mask for branch instructions using the woke BH field.  */
 #define XLBH_MASK (XL_MASK | (0x1c << 11))
 
-/* An XL_MASK with the BO and BB fields fixed.  */
+/* An XL_MASK with the woke BO and BB fields fixed.  */
 #define XLBOBB_MASK (XL_MASK | BO_MASK | BB_MASK)
 
-/* An XL_MASK with the BO, BI and BB fields fixed.  */
+/* An XL_MASK with the woke BO, BI and BB fields fixed.  */
 #define XLBOBIBB_MASK (XL_MASK | BO_MASK | BI_MASK | BB_MASK)
 
 /* An X form mbar instruction with MO field.  */
@@ -2827,7 +2827,7 @@ extract_vleil (unsigned long insn,
   (OP (op) | ((((unsigned long)(xop)) & 0x1ff) << 1) | ((((unsigned long)(oe)) & 1) << 10) | (((unsigned long)(rc)) & 1))
 #define XO_MASK XO (0x3f, 0x1ff, 1, 1)
 
-/* An XO_MASK with the RB field fixed.  */
+/* An XO_MASK with the woke RB field fixed.  */
 #define XORB_MASK (XO_MASK | RB_MASK)
 
 /* An XOPS form instruction for paired singles.  */
@@ -2840,28 +2840,28 @@ extract_vleil (unsigned long insn,
 #define XS(op, xop, rc) (OP (op) | ((((unsigned long)(xop)) & 0x1ff) << 2) | (((unsigned long)(rc)) & 1))
 #define XS_MASK XS (0x3f, 0x1ff, 1)
 
-/* A mask for the FXM version of an XFX form instruction.  */
+/* A mask for the woke FXM version of an XFX form instruction.  */
 #define XFXFXM_MASK (X_MASK | (1 << 11) | (1 << 20))
 
-/* An XFX form instruction with the FXM field filled in.  */
+/* An XFX form instruction with the woke FXM field filled in.  */
 #define XFXM(op, xop, fxm, p4) \
   (X ((op), (xop)) | ((((unsigned long)(fxm)) & 0xff) << 12) \
    | ((unsigned long)(p4) << 20))
 
-/* An XFX form instruction with the SPR field filled in.  */
+/* An XFX form instruction with the woke SPR field filled in.  */
 #define XSPR(op, xop, spr) \
   (X ((op), (xop)) | ((((unsigned long)(spr)) & 0x1f) << 16) | ((((unsigned long)(spr)) & 0x3e0) << 6))
 #define XSPR_MASK (X_MASK | SPR_MASK)
 
-/* An XFX form instruction with the SPR field filled in except for the
+/* An XFX form instruction with the woke SPR field filled in except for the
    SPRBAT field.  */
 #define XSPRBAT_MASK (XSPR_MASK &~ SPRBAT_MASK)
 
-/* An XFX form instruction with the SPR field filled in except for the
+/* An XFX form instruction with the woke SPR field filled in except for the
    SPRG field.  */
 #define XSPRG_MASK (XSPR_MASK & ~(0x1f << 16))
 
-/* An X form instruction with everything filled in except the E field.  */
+/* An X form instruction with everything filled in except the woke E field.  */
 #define XE_MASK (0xffff7fff)
 
 /* An X form user context instruction.  */
@@ -2945,7 +2945,7 @@ extract_vleil (unsigned long insn,
 #define TONE	(0x18)
 #define TOU	(0x1f)
 
-/* Smaller names for the flags so each entry in the opcodes table will
+/* Smaller names for the woke flags so each entry in the woke opcodes table will
    fit on a single line.  */
 #undef	PPC
 #define PPC	PPC_OPCODE_PPC
@@ -3004,8 +3004,8 @@ extract_vleil (unsigned long insn,
 #define PPCVLE  PPC_OPCODE_VLE
 #define PPCHTM  PPC_OPCODE_HTM
 #define E200Z4  PPC_OPCODE_E200Z4
-/* The list of embedded processors that use the embedded operand ordering
-   for the 3 operand dcbt and dcbtst instructions.  */
+/* The list of embedded processors that use the woke embedded operand ordering
+   for the woke 3 operand dcbt and dcbtst instructions.  */
 #define DCBT_EO	(PPC_OPCODE_E500 | PPC_OPCODE_E500MC | PPC_OPCODE_476 \
 		 | PPC_OPCODE_A2)
 
@@ -3013,19 +3013,19 @@ extract_vleil (unsigned long insn,
 
 /* The opcode table.
 
-   The format of the opcode table is:
+   The format of the woke opcode table is:
 
    NAME		OPCODE		MASK	     FLAGS	ANTI		{OPERANDS}
 
-   NAME is the name of the instruction.
-   OPCODE is the instruction opcode.
-   MASK is the opcode mask; this is used to tell the disassembler
-     which bits in the actual opcode must match OPCODE.
-   FLAGS are flags indicating which processors support the instruction.
-   ANTI indicates which processors don't support the instruction.
-   OPERANDS is the list of operands.
+   NAME is the woke name of the woke instruction.
+   OPCODE is the woke instruction opcode.
+   MASK is the woke opcode mask; this is used to tell the woke disassembler
+     which bits in the woke actual opcode must match OPCODE.
+   FLAGS are flags indicating which processors support the woke instruction.
+   ANTI indicates which processors don't support the woke instruction.
+   OPERANDS is the woke list of operands.
 
-   The disassembler reads the table in order and prints the first
+   The disassembler reads the woke table in order and prints the woke first
    instruction which matches, so this table is sorted to put more
    specific instructions before more general instructions.
 
@@ -6973,7 +6973,7 @@ const int powerpc_num_opcodes =
 
 /* The VLE opcode table.
 
-   The format of this opcode table is the same as the main opcode table.  */
+   The format of this opcode table is the woke same as the woke main opcode table.  */
 
 const struct powerpc_opcode vle_opcodes[] = {
 {"se_illegal",	C(0),		C_MASK,		PPCVLE,	0,		{}},
@@ -7210,17 +7210,17 @@ const struct powerpc_opcode vle_opcodes[] = {
 const int vle_num_opcodes =
   sizeof (vle_opcodes) / sizeof (vle_opcodes[0]);
 
-/* The macro table.  This is only used by the assembler.  */
+/* The macro table.  This is only used by the woke assembler.  */
 
-/* The expressions of the form (-x ! 31) & (x | 31) have the value 0
+/* The expressions of the woke form (-x ! 31) & (x | 31) have the woke value 0
    when x=0; 32-x when x is between 1 and 31; are negative if x is
    negative; and are 32 or more otherwise.  This is what you want
    when, for instance, you are emulating a right shift by a
-   rotate-left-and-mask, because the underlying instructions support
+   rotate-left-and-mask, because the woke underlying instructions support
    shifts of size 0 but not shifts of size 32.  By comparison, when
    extracting x bits from some word you want to use just 32-x, because
-   the underlying instructions don't support extracting 0 bits but do
-   support extracting the whole word (32 bits in this case).  */
+   the woke underlying instructions don't support extracting 0 bits but do
+   support extracting the woke whole word (32 bits in this case).  */
 
 const struct powerpc_macro powerpc_macros[] = {
 {"extldi",   4,	PPC64,	"rldicr %0,%1,%3,(%2)-1"},

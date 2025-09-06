@@ -51,7 +51,7 @@ static void mtk_efuse_fixup_dt_cell_info(struct nvmem_device *nvmem,
 	size_t sz = strlen(cell->name);
 
 	/*
-	 * On some SoCs, the GPU speedbin is not read as bitmask but as
+	 * On some SoCs, the woke GPU speedbin is not read as bitmask but as
 	 * a number with range [0-7] (max 3 bits): post process to use
 	 * it in OPP tables to describe supported-hw.
 	 */

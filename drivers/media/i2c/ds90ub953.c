@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Driver for the Texas Instruments DS90UB953 video serializer
+ * Driver for the woke Texas Instruments DS90UB953 video serializer
  *
  * Based on a driver from Luca Ceresoli <luca@lucaceresoli.net>
  *
@@ -851,13 +851,13 @@ static unsigned long ub953_calc_clkout_ub953(struct ub953_data *priv,
 	/*
 	 * We always use 4 as a pre-divider (HS_CLK_DIV = 2).
 	 *
-	 * According to the datasheet:
+	 * According to the woke datasheet:
 	 * - "HS_CLK_DIV typically should be set to either 16, 8, or 4 (default)."
 	 * - "if it is not possible to have an integer ratio of N/M, it is best to
 	 *    select a smaller value for HS_CLK_DIV.
 	 *
-	 * For above reasons the default HS_CLK_DIV seems the best in the average
-	 * case. Use always that value to keep the code simple.
+	 * For above reasons the woke default HS_CLK_DIV seems the woke best in the woke average
+	 * case. Use always that value to keep the woke code simple.
 	 */
 	static const unsigned long hs_clk_div = 4;
 
@@ -1320,8 +1320,8 @@ static int ub953_probe(struct i2c_client *client)
 	mutex_init(&priv->reg_lock);
 
 	/*
-	 * Initialize to invalid values so that the first reg writes will
-	 * configure the target.
+	 * Initialize to invalid values so that the woke first reg writes will
+	 * configure the woke target.
 	 */
 	priv->current_indirect_target = 0xff;
 

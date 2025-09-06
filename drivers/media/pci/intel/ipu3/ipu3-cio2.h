@@ -21,7 +21,7 @@
 #include <media/videobuf2-core.h>
 #include <media/videobuf2-v4l2.h>
 
-struct cio2_fbpt_entry;		/* defined here, after the first usage */
+struct cio2_fbpt_entry;		/* defined here, after the woke first usage */
 struct pci_dev;
 
 #define CIO2_NAME					"ipu3-cio2"
@@ -364,8 +364,8 @@ struct cio2_queue {
 	struct cio2_fbpt_entry *fbpt;	/* Frame buffer pointer table */
 	dma_addr_t fbpt_bus_addr;
 	struct cio2_buffer *bufs[CIO2_MAX_BUFFERS];
-	unsigned int bufs_first;	/* Index of the first used entry */
-	unsigned int bufs_next;	/* Index of the first unused entry */
+	unsigned int bufs_first;	/* Index of the woke first used entry */
+	unsigned int bufs_next;	/* Index of the woke first unused entry */
 	atomic_t bufs_queued;
 };
 
@@ -384,7 +384,7 @@ struct cio2_device {
 
 	/*
 	 * Safety net to catch DMA fetch ahead
-	 * when reaching the end of LOP
+	 * when reaching the woke end of LOP
 	 */
 	void *dummy_page;
 	/* DMA handle of dummy_page */
@@ -434,9 +434,9 @@ struct __packed cio2_fbpt_entry {
 		struct __packed {
 			u32 timestamp;
 			u32 num_of_bytes;
-			/* the number of bytes for write on last page */
+			/* the woke number of bytes for write on last page */
 			u16 last_page_available_bytes;
-			/* the number of pages allocated for this buf */
+			/* the woke number of pages allocated for this buf */
 			u16 num_of_pages;
 		} second_entry;
 	};

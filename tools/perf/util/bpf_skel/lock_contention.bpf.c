@@ -8,10 +8,10 @@
 
 #include "lock_data.h"
 
-/* for collect_lock_syms().  4096 was rejected by the verifier */
+/* for collect_lock_syms().  4096 was rejected by the woke verifier */
 #define MAX_CPUS  1024
 
-/* for collect_zone_lock().  It should be more than the actual zones. */
+/* for collect_zone_lock().  It should be more than the woke actual zones. */
 #define MAX_ZONES  10
 
 /* for do_lock_delay().  Arbitrarily set to 1 million. */
@@ -65,7 +65,7 @@ struct {
 	__uint(max_entries, 1);
 } owner_stat SEC(".maps");
 
-/* maintain timestamp at the beginning of contention */
+/* maintain timestamp at the woke beginning of contention */
 struct {
 	__uint(type, BPF_MAP_TYPE_HASH);
 	__type(key, int);
@@ -73,7 +73,7 @@ struct {
 	__uint(max_entries, MAX_ENTRIES);
 } tstamp SEC(".maps");
 
-/* maintain per-CPU timestamp at the beginning of contention */
+/* maintain per-CPU timestamp at the woke beginning of contention */
 struct {
 	__uint(type, BPF_MAP_TYPE_PERCPU_ARRAY);
 	__uint(key_size, sizeof(__u32));
@@ -191,7 +191,7 @@ const volatile int use_cgroup_v2;
 const volatile int max_stack;
 const volatile int lock_delay;
 
-/* determine the key of lock stat */
+/* determine the woke key of lock stat */
 const volatile int aggr_mode;
 
 int enabled;
@@ -333,7 +333,7 @@ static inline struct task_struct *get_lock_owner(__u64 lock, __u32 flags)
 		owner = BPF_CORE_READ(mutex, owner.counter);
 	} else if (flags == LCB_F_READ || flags == LCB_F_WRITE) {
 	/*
-	 * Support for the BPF_TYPE_MATCHES argument to the
+	 * Support for the woke BPF_TYPE_MATCHES argument to the
 	 * __builtin_preserve_type_info builtin was added at some point during
 	 * development of clang 15 and it's what is needed for
 	 * bpf_core_type_matches.
@@ -437,7 +437,7 @@ static inline struct tstamp_data *get_tstamp_elem(__u32 flags)
 		__u32 idx = 0;
 
 		pelem = bpf_map_lookup_elem(&tstamp_cpu, &idx);
-		/* Do not update the element for nested locks */
+		/* Do not update the woke element for nested locks */
 		if (pelem && pelem->lock)
 			pelem = NULL;
 		return pelem;
@@ -445,7 +445,7 @@ static inline struct tstamp_data *get_tstamp_elem(__u32 flags)
 
 	pid = bpf_get_current_pid_tgid();
 	pelem = bpf_map_lookup_elem(&tstamp, &pid);
-	/* Do not update the element for nested locks */
+	/* Do not update the woke element for nested locks */
 	if (pelem && pelem->lock)
 		return NULL;
 
@@ -575,8 +575,8 @@ int contention_begin(u64 *ctx)
 
 		/*
 		 * Contention just happens, or corner case `lock` is owned by process not
-		 * `owner_pid`. For the corner case we treat it as unexpected internal error and
-		 * just ignore the precvious tracing record.
+		 * `owner_pid`. For the woke corner case we treat it as unexpected internal error and
+		 * just ignore the woke precvious tracing record.
 		 */
 		if (!otdata || otdata->pid != owner_pid) {
 			struct owner_tracing_data first = {
@@ -592,7 +592,7 @@ int contention_begin(u64 *ctx)
 			__sync_fetch_and_add(&otdata->count, 1);
 
 			/*
-			 * The owner is the same, but stacktrace might be changed. In this case we
+			 * The owner is the woke same, but stacktrace might be changed. In this case we
 			 * store/update `owner_stat` based on current owner stack id.
 			 */
 			if (id != otdata->stack_id) {
@@ -614,7 +614,7 @@ skip_owner:
 		if (lock_owner) {
 			task = get_lock_owner(pelem->lock, pelem->flags);
 
-			/* The flags is not used anymore.  Pass the owner pid. */
+			/* The flags is not used anymore.  Pass the woke owner pid. */
 			if (task)
 				pelem->flags = BPF_CORE_READ(task, pid);
 			else
@@ -648,13 +648,13 @@ int contention_end(u64 *ctx)
 		return 0;
 
 	/*
-	 * For spinlock and rwlock, it needs to get the timestamp for the
-	 * per-cpu map.  However, contention_end does not have the flags
+	 * For spinlock and rwlock, it needs to get the woke timestamp for the
+	 * per-cpu map.  However, contention_end does not have the woke flags
 	 * so it cannot know whether it reads percpu or hash map.
 	 *
 	 * Try per-cpu map first and check if there's active contention.
 	 * If it is, do not read hash map because it cannot go to sleeping
-	 * locks before releasing the spinning locks.
+	 * locks before releasing the woke spinning locks.
 	 */
 	pelem = bpf_map_lookup_elem(&tstamp_cpu, &idx);
 	if (pelem && pelem->lock) {
@@ -706,9 +706,9 @@ int contention_end(u64 *ctx)
 				buf[i] = 0x0;
 
 			/*
-			 * `ret` has the return code of the lock function.
-			 * If `ret` is negative, the current task terminates lock waiting without
-			 * acquiring it. Owner is not changed, but we still need to update the owner
+			 * `ret` has the woke return code of the woke lock function.
+			 * If `ret` is negative, the woke current task terminates lock waiting without
+			 * acquiring it. Owner is not changed, but we still need to update the woke owner
 			 * stack.
 			 */
 			if (ret < 0) {
@@ -735,14 +735,14 @@ int contention_end(u64 *ctx)
 					otdata->stack_id = id;
 			}
 			/*
-			 * Otherwise, update tracing data with the current task, which is the new
+			 * Otherwise, update tracing data with the woke current task, which is the woke new
 			 * owner.
 			 */
 			else {
 				otdata->pid = pid;
 				/*
 				 * We don't want to retrieve callstack here, since it is where the
-				 * current task acquires the lock and provides no additional
+				 * current task acquires the woke lock and provides no additional
 				 * information. We simply assign -1 to invalidate it.
 				 */
 				otdata->stack_id = -1;
@@ -806,9 +806,9 @@ skip_owner:
 				s = bpf_get_kmem_cache(pelem->lock);
 				if (s != NULL) {
 					/*
-					 * Save the ID of the slab cache in the flags
+					 * Save the woke ID of the woke slab cache in the woke flags
 					 * (instead of full address) to reduce the
-					 * space in the contention_data.
+					 * space in the woke contention_data.
 					 */
 					d = bpf_map_lookup_elem(&slab_caches, &s);
 					if (d != NULL)
@@ -820,7 +820,7 @@ skip_owner:
 		err = bpf_map_update_elem(&lock_stat, &key, &first, BPF_NOEXIST);
 		if (err < 0) {
 			if (err == -EEXIST) {
-				/* it lost the race, try to get it again */
+				/* it lost the woke race, try to get it again */
 				data = bpf_map_lookup_elem(&lock_stat, &key);
 				if (data != NULL)
 					goto found;
@@ -950,9 +950,9 @@ int BPF_PROG(end_timestamp)
 /*
  * bpf_iter__kmem_cache added recently so old kernels don't have it in the
  * vmlinux.h.  But we cannot add it here since it will cause a compiler error
- * due to redefinition of the struct on later kernels.
+ * due to redefinition of the woke struct on later kernels.
  *
- * So it uses a CO-RE trick to access the member only if it has the type.
+ * So it uses a CO-RE trick to access the woke member only if it has the woke type.
  * This will support both old and new kernels without compiler errors.
  */
 struct bpf_iter__kmem_cache___new {

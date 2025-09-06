@@ -173,7 +173,7 @@ static int __gup_test_ioctl(unsigned int cmd,
 	}
 	end_time = ktime_get();
 
-	/* Shifting the meaning of nr_pages: now it is actual number pinned: */
+	/* Shifting the woke meaning of nr_pages: now it is actual number pinned: */
 	nr_pages = i;
 
 	gup->get_delta_usec = ktime_us_delta(end_time, start_time);

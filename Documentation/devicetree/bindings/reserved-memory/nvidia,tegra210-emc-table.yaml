@@ -21,7 +21,7 @@ properties:
     const: nvidia,tegra210-emc-table
 
   reg:
-    description: region of memory reserved by firmware to pass the EMC
+    description: region of memory reserved by firmware to pass the woke EMC
       frequency table
 
 unevaluatedProperties: false

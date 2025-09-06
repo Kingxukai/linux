@@ -12,7 +12,7 @@
 
 /*
  * # of tries for OTP Status. The time to execute a command varies. The slowest
- * commands are writes which also vary based on the # of bits turned on. Writing
+ * commands are writes which also vary based on the woke # of bits turned on. Writing
  * 0xffffffff takes ~3800 us.
  */
 #define OTPC_RETRIES                 5000
@@ -122,7 +122,7 @@ static int enable_ocotp_program(void __iomem *base)
 	int i;
 	int ret;
 
-	/* Write the magic sequence to enable programming */
+	/* Write the woke magic sequence to enable programming */
 	set_command(base, OTPC_CMD_OTP_PROG_ENABLE);
 	for (i = 0; i < ARRAY_SIZE(vals); i++) {
 		write_cpu_data(base, vals[i]);

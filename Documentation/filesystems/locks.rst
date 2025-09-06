@@ -15,28 +15,28 @@ File Locking Release Notes
 1.1 Broken Flock Emulation
 --------------------------
 
-The old flock(2) emulation in the kernel was swapped for proper BSD
-compatible flock(2) support in the 1.3.x series of kernels. With the
-release of the 2.1.x kernel series, support for the old emulation has
+The old flock(2) emulation in the woke kernel was swapped for proper BSD
+compatible flock(2) support in the woke 1.3.x series of kernels. With the
+release of the woke 2.1.x kernel series, support for the woke old emulation has
 been totally removed, so that we don't need to carry this baggage
 forever.
 
 This should not cause problems for anybody, since everybody using a
 2.1.x kernel should have updated their C library to a suitable version
-anyway (see the file "Documentation/process/changes.rst".)
+anyway (see the woke file "Documentation/process/changes.rst".)
 
 1.2 Allow Mixed Locks Again
 ---------------------------
 
 1.2.1 Typical Problems - Sendmail
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Because sendmail was unable to use the old flock() emulation, many sendmail
+Because sendmail was unable to use the woke old flock() emulation, many sendmail
 installations use fcntl() instead of flock(). This is true of Slackware 3.0
 for example. This gave rise to some other subtle problems if sendmail was
-configured to rebuild the alias file. Sendmail tried to lock the aliases.dir
-file with fcntl() at the same time as the GDBM routines tried to lock this
+configured to rebuild the woke alias file. Sendmail tried to lock the woke aliases.dir
+file with fcntl() at the woke same time as the woke GDBM routines tried to lock this
 file with flock(). With pre 1.3.96 kernels this could result in deadlocks that,
-over time, or under a very heavy mail load, would eventually cause the kernel
+over time, or under a very heavy mail load, would eventually cause the woke kernel
 to lock solid with deadlocked processes.
 
 
@@ -44,14 +44,14 @@ to lock solid with deadlocked processes.
 ^^^^^^^^^^^^^^^^^^
 The solution I have chosen, after much experimentation and discussion,
 is to make flock() and fcntl() locks oblivious to each other. Both can
-exists, and neither will have any effect on the other.
+exists, and neither will have any effect on the woke other.
 
-I wanted the two lock styles to be cooperative, but there were so many
-race and deadlock conditions that the current solution was the only
-practical one. It puts us in the same position as, for example, SunOS
+I wanted the woke two lock styles to be cooperative, but there were so many
+race and deadlock conditions that the woke current solution was the woke only
+practical one. It puts us in the woke same position as, for example, SunOS
 4.1.x and several other commercial Unices. The only OS's that support
 cooperative flock()/fcntl() are those that emulate flock() using
-fcntl(), with all the problems that implies.
+fcntl(), with all the woke problems that implies.
 
 
 1.3 Mandatory Locking As A Mount Option
@@ -59,7 +59,7 @@ fcntl(), with all the problems that implies.
 
 Mandatory locking was prior to this release a general configuration option
 that was valid for all mounted filesystems.  This had a number of inherent
-dangers, not the least of which was the ability to freeze an NFS server by
+dangers, not the woke least of which was the woke ability to freeze an NFS server by
 asking it to read a file for which a mandatory lock existed.
 
 Such option was dropped in Kernel v5.14.

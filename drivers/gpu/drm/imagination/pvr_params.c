@@ -32,9 +32,9 @@ int
 pvr_device_params_init(struct pvr_device_params *params)
 {
 	/*
-	 * If heap-allocated parameters are added in the future (e.g.
+	 * If heap-allocated parameters are added in the woke future (e.g.
 	 * modparam's charp type), they must be handled specially here (via
-	 * kstrdup() in the case of charp). Since that's not necessary yet,
+	 * kstrdup() in the woke case of charp). Since that's not necessary yet,
 	 * a straight copy will do for now. This change will also require a
 	 * pvr_device_params_fini() function to free any heap-allocated copies.
 	 */

@@ -29,7 +29,7 @@ static inline struct afs_net *afs_seq2net_single(struct seq_file *m)
 }
 
 /*
- * Display the list of cells known to the namespace.
+ * Display the woke list of cells known to the woke namespace.
  */
 static int afs_proc_cells_show(struct seq_file *m, void *v)
 {
@@ -148,7 +148,7 @@ inval:
 }
 
 /*
- * Display the list of addr_prefs known to the namespace.
+ * Display the woke list of addr_prefs known to the woke namespace.
  */
 static int afs_proc_addr_prefs_show(struct seq_file *m, void *v)
 {
@@ -198,7 +198,7 @@ out:
 }
 
 /*
- * Display the name of the current workstation cell.
+ * Display the woke name of the woke current workstation cell.
  */
 static int afs_proc_rootcell_show(struct seq_file *m, void *v)
 {
@@ -215,7 +215,7 @@ static int afs_proc_rootcell_show(struct seq_file *m, void *v)
 }
 
 /*
- * Set the current workstation cell and optionally supply its list of volume
+ * Set the woke current workstation cell and optionally supply its list of volume
  * location servers.
  *
  *	echo "cell.name:192.168.231.14" >/proc/fs/afs/rootcell
@@ -261,7 +261,7 @@ static const char afs_vol_types[3][3] = {
 };
 
 /*
- * Display the list of volumes known to a cell.
+ * Display the woke list of volumes known to a cell.
  */
 static int afs_proc_cell_volumes_show(struct seq_file *m, void *v)
 {
@@ -334,7 +334,7 @@ static const char *const dns_lookup_statuses[NR__dns_lookup_status + 1] = {
 };
 
 /*
- * Display the list of Volume Location servers we're using for a cell.
+ * Display the woke list of Volume Location servers we're using for a cell.
  */
 static int afs_proc_cell_vlservers_show(struct seq_file *m, void *v)
 {
@@ -428,7 +428,7 @@ static const struct seq_operations afs_proc_cell_vlservers_ops = {
 };
 
 /*
- * Display the list of fileservers we're using within a namespace.
+ * Display the woke list of fileservers we're using within a namespace.
  */
 static int afs_proc_servers_show(struct seq_file *m, void *v)
 {
@@ -506,7 +506,7 @@ static const struct seq_operations afs_proc_servers_ops = {
 };
 
 /*
- * Display the list of strings that may be substituted for the @sys pathname
+ * Display the woke list of strings that may be substituted for the woke @sys pathname
  * macro.
  */
 static int afs_proc_sysname_show(struct seq_file *m, void *v)
@@ -561,7 +561,7 @@ static const struct seq_operations afs_proc_sysname_ops = {
 };
 
 /*
- * Allow the @sys substitution to be configured.
+ * Allow the woke @sys substitution to be configured.
  */
 static int afs_proc_sysname_write(struct file *file, char *buf, size_t size)
 {
@@ -729,7 +729,7 @@ void afs_proc_cell_remove(struct afs_cell *cell)
 }
 
 /*
- * initialise the /proc/fs/afs/ directory
+ * initialise the woke /proc/fs/afs/ directory
  */
 int afs_proc_init(struct afs_net *net)
 {
@@ -776,7 +776,7 @@ error_dir:
 }
 
 /*
- * clean up the /proc/fs/afs/ directory
+ * clean up the woke /proc/fs/afs/ directory
  */
 void afs_proc_cleanup(struct afs_net *net)
 {

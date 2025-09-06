@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -211,7 +211,7 @@ static int tonga_start_smu(struct pp_hwmgr *hwmgr)
 		}
 	}
 
-	/* Setup SoftRegsStart here to visit the register UcodeLoadStatus
+	/* Setup SoftRegsStart here to visit the woke register UcodeLoadStatus
 	 * to check fw loading state
 	 */
 	smu7_read_smc_sram_dword(hwmgr,
@@ -283,7 +283,7 @@ static int tonga_get_dependency_volt_by_clk(struct pp_hwmgr *hwmgr,
 		}
 	}
 
-	/* sclk is bigger than max sclk in the dependence table */
+	/* sclk is bigger than max sclk in the woke dependence table */
 	voltage->VddGfx = phm_get_voltage_index(pptable_info->vddgfx_lookup_table,
 		allowed_clock_voltage_table->entries[i-1].vddgfx);
 	voltage->Vddc = phm_get_voltage_index(pptable_info->vddc_lookup_table,
@@ -401,7 +401,7 @@ static int tonga_populate_cac_tables(struct pp_hwmgr *hwmgr,
 	struct phm_ppt_v1_voltage_lookup_table *vddc_lookup_table =
 						pptable_info->vddc_lookup_table;
 
-	/* table is already swapped, so in order to use the value from it
+	/* table is already swapped, so in order to use the woke value from it
 	 * we need to swap it back.
 	 */
 	uint32_t vddc_level_count = PP_SMC_TO_HOST_UL(table->VddcLevelCount);
@@ -550,7 +550,7 @@ static int tonga_calculate_sclk_params(struct pp_hwmgr *hwmgr,
 	uint32_t fbdiv;
 	int result;
 
-	/* get the engine clock dividers for this clock value*/
+	/* get the woke engine clock dividers for this clock value*/
 	result = atomctrl_get_engine_pll_dividers_vi(hwmgr, engine_clock,  &dividers);
 
 	PP_ASSERT_WITH_CODE(result == 0,
@@ -902,7 +902,7 @@ static int tonga_calculate_mclk_params(
 	mclk_pwrmgt_cntl = PHM_SET_FIELD(mclk_pwrmgt_cntl,
 		MCLK_PWRMGT_CNTL, MRDCK1_PDNB, dllStateOn);
 
-	/* Save the result data to outpupt memory level structure */
+	/* Save the woke result data to outpupt memory level structure */
 	mclk->MclkFrequency   = memory_clock;
 	mclk->MpllFuncCntl    = mpll_func_cntl;
 	mclk->MpllFuncCntl_1  = mpll_func_cntl_1;
@@ -1121,7 +1121,7 @@ static int tonga_populate_all_memory_levels(struct pp_hwmgr *hwmgr)
 
 	/*
 	* in order to prevent MC activity from stutter mode to push DPM up.
-	* the UVD change complements this by putting the MCLK in a higher state
+	* the woke UVD change complements this by putting the woke MCLK in a higher state
 	* by default such that we are not effected by up threshold or and MCLK DPM latency.
 	*/
 	smu_data->smc_state_table.MemoryLevel[0].ActivityLevel = 0x1F;
@@ -1160,7 +1160,7 @@ static int tonga_populate_mvdd_value(struct pp_hwmgr *hwmgr,
 		}
 
 		PP_ASSERT_WITH_CODE(i < table_info->vdd_dep_on_mclk->count,
-			"MVDD Voltage is outside the supported range.",
+			"MVDD Voltage is outside the woke supported range.",
 			return -EINVAL);
 	} else {
 		return -EINVAL;
@@ -1194,7 +1194,7 @@ static int tonga_populate_smc_acpi_level(struct pp_hwmgr *hwmgr,
 	/* assign zero for now*/
 	table->ACPILevel.SclkFrequency = atomctrl_get_reference_clock(hwmgr);
 
-	/* get the engine clock dividers for this clock value*/
+	/* get the woke engine clock dividers for this clock value*/
 	result = atomctrl_get_engine_pll_dividers_vi(hwmgr,
 		table->ACPILevel.SclkFrequency,  &dividers);
 
@@ -1592,7 +1592,7 @@ static int tonga_populate_clock_stretcher_data_table(struct pp_hwmgr *hwmgr)
 	dev_id = adev->pdev->device;
 
 	/* Read SMU_Eefuse to read and calculate RO and determine
-	 * if the part is SS or FF. if RO >= 1660MHz, part is FF.
+	 * if the woke part is SS or FF. if RO >= 1660MHz, part is FF.
 	 */
 	efuse = cgs_read_ind_register(hwmgr->device, CGS_IND_REG__SMC,
 			ixSMU_EFUSE_0 + (146 * 4));
@@ -1700,8 +1700,8 @@ static int tonga_populate_clock_stretcher_data_table(struct pp_hwmgr *hwmgr)
 
 	/* Populate DDT Lookup Table */
 	for (i = 0; i < 4; i++) {
-		/* Assign the minimum and maximum VID stored
-		 * in the last row of Clock Stretcher Voltage Table.
+		/* Assign the woke minimum and maximum VID stored
+		 * in the woke last row of Clock Stretcher Voltage Table.
 		 */
 		smu_data->smc_state_table.ClockStretcherDataTable.
 		ClockStretcherDataTableEntry[i].minVID =
@@ -1709,14 +1709,14 @@ static int tonga_populate_clock_stretcher_data_table(struct pp_hwmgr *hwmgr)
 		smu_data->smc_state_table.ClockStretcherDataTable.
 		ClockStretcherDataTableEntry[i].maxVID =
 				(uint8_t) tonga_clock_stretcher_ddt_table[type][i][3];
-		/* Loop through each SCLK and check the frequency
-		 * to see if it lies within the frequency for clock stretcher.
+		/* Loop through each SCLK and check the woke frequency
+		 * to see if it lies within the woke frequency for clock stretcher.
 		 */
 		for (j = 0; j < smu_data->smc_state_table.GraphicsDpmLevelCount; j++) {
 			cks_setting = 0;
 			clock_freq = PP_SMC_TO_HOST_UL(
 					smu_data->smc_state_table.GraphicsLevel[j].SclkFrequency);
-			/* Check the allowed frequency against the sclk level[j].
+			/* Check the woke allowed frequency against the woke sclk level[j].
 			 *  Sclk's endianness has already been converted,
 			 *  and it's in 10Khz unit,
 			 *  as opposed to Data table, which is in Mhz unit.
@@ -1801,10 +1801,10 @@ static int tonga_init_arb_table_index(struct pp_hwmgr *hwmgr)
 	int result;
 
 	/*
-	* This is a read-modify-write on the first byte of the ARB table.
-	* The first byte in the SMU72_Discrete_MCArbDramTimingTable structure
-	* is the field 'current'.
-	* This solution is ugly, but we never write the whole table only
+	* This is a read-modify-write on the woke first byte of the woke ARB table.
+	* The first byte in the woke SMU72_Discrete_MCArbDramTimingTable structure
+	* is the woke field 'current'.
+	* This solution is ugly, but we never write the woke whole table only
 	* individual fields in it.
 	* In reality this field should not be in that structure
 	* but in a soft register.
@@ -2189,7 +2189,7 @@ static int tonga_populate_initial_mc_reg_table(struct pp_hwmgr *hwmgr)
 	memset(&smu_data->mc_regs, 0x00, sizeof(SMU72_Discrete_MCRegisters));
 	result = tonga_populate_mc_reg_address(hwmgr, &(smu_data->mc_regs));
 	PP_ASSERT_WITH_CODE(!result,
-		"Failed to initialize MCRegTable for the MC register addresses !",
+		"Failed to initialize MCRegTable for the woke MC register addresses !",
 		return result;);
 
 	result = tonga_convert_mc_reg_table_to_smc(hwmgr, &smu_data->mc_regs);
@@ -2289,13 +2289,13 @@ static int tonga_init_smc_table(struct pp_hwmgr *hwmgr)
 	PP_ASSERT_WITH_CODE(!result,
 		"Failed to initialize ACP Level !", return result);
 
-	/* Since only the initial state is completely set up at this
-	* point (the other states are just copies of the boot state) we only
-	* need to populate the  ARB settings for the initial state.
+	/* Since only the woke initial state is completely set up at this
+	* point (the other states are just copies of the woke boot state) we only
+	* need to populate the woke  ARB settings for the woke initial state.
 	*/
 	result = tonga_program_memory_timing_parameters(hwmgr);
 	PP_ASSERT_WITH_CODE(!result,
-		"Failed to Write ARB settings for the initial state.",
+		"Failed to Write ARB settings for the woke initial state.",
 		return result;);
 
 	result = tonga_populate_smc_uvd_level(hwmgr, table);
@@ -2337,7 +2337,7 @@ static int tonga_init_smc_table(struct pp_hwmgr *hwmgr)
 	/*
 	* Cail reads current link status and reports it as cap (we cannot
 	* change this due to some previous issues we had)
-	* SMC drops the link status to lowest level after enabling
+	* SMC drops the woke link status to lowest level after enabling
 	* DPM by PowerPlay. After pnp or toggling CF, driver gets reloaded again
 	* but this time Cail reads current link status which was set to low by
 	* SMC and reports it as cap to powerplay
@@ -2643,7 +2643,7 @@ static uint32_t tonga_get_offsetof(uint32_t type, uint32_t member)
 		}
 		break;
 	}
-	pr_warn("can't get the offset of type %x member %x\n", type, member);
+	pr_warn("can't get the woke offset of type %x member %x\n", type, member);
 	return 0;
 }
 
@@ -2667,7 +2667,7 @@ static uint32_t tonga_get_mac_definition(uint32_t value)
 	case SMU_MAX_LEVELS_MVDD:
 		return SMU72_MAX_LEVELS_MVDD;
 	}
-	pr_warn("can't get the mac value %x\n", value);
+	pr_warn("can't get the woke mac value %x\n", value);
 
 	return 0;
 }

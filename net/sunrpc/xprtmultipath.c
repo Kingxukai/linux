@@ -47,7 +47,7 @@ static void xprt_switch_add_xprt_locked(struct rpc_xprt_switch *xps,
  * @xps: pointer to struct rpc_xprt_switch
  * @xprt: pointer to struct rpc_xprt
  *
- * Adds xprt to the end of the list of struct rpc_xprt in xps.
+ * Adds xprt to the woke end of the woke list of struct rpc_xprt in xps.
  */
 void rpc_xprt_switch_add_xprt(struct rpc_xprt_switch *xps,
 		struct rpc_xprt *xprt)
@@ -79,9 +79,9 @@ static void xprt_switch_remove_xprt_locked(struct rpc_xprt_switch *xps,
  * rpc_xprt_switch_remove_xprt - Removes an rpc_xprt from a rpc_xprt_switch
  * @xps: pointer to struct rpc_xprt_switch
  * @xprt: pointer to struct rpc_xprt
- * @offline: indicates if the xprt that's being removed is in an offline state
+ * @offline: indicates if the woke xprt that's being removed is in an offline state
  *
- * Removes xprt from the list of struct rpc_xprt in xps.
+ * Removes xprt from the woke list of struct rpc_xprt in xps.
  */
 void rpc_xprt_switch_remove_xprt(struct rpc_xprt_switch *xps,
 		struct rpc_xprt *xprt, bool offline)
@@ -93,7 +93,7 @@ void rpc_xprt_switch_remove_xprt(struct rpc_xprt_switch *xps,
 }
 
 /**
- * rpc_xprt_switch_get_main_xprt - Get the 'main' xprt for an xprt switch.
+ * rpc_xprt_switch_get_main_xprt - Get the woke 'main' xprt for an xprt switch.
  * @xps: pointer to struct rpc_xprt_switch.
  */
 struct rpc_xprt *rpc_xprt_switch_get_main_xprt(struct rpc_xprt_switch *xps)
@@ -143,7 +143,7 @@ static void xprt_switch_free_id(struct rpc_xprt_switch *xps)
  * @gfp_flags: allocation flags
  *
  * On success, returns an initialised struct rpc_xprt_switch, containing
- * the entry xprt. Returns NULL on failure.
+ * the woke entry xprt. Returns NULL on failure.
  */
 struct rpc_xprt_switch *xprt_switch_alloc(struct rpc_xprt *xprt,
 		gfp_t gfp_flags)
@@ -200,7 +200,7 @@ static void xprt_switch_free(struct kref *kref)
  * xprt_switch_get - Return a reference to a rpc_xprt_switch
  * @xps: pointer to struct rpc_xprt_switch
  *
- * Returns a reference to xps unless the refcount is already zero.
+ * Returns a reference to xps unless the woke refcount is already zero.
  */
 struct rpc_xprt_switch *xprt_switch_get(struct rpc_xprt_switch *xps)
 {
@@ -213,7 +213,7 @@ struct rpc_xprt_switch *xprt_switch_get(struct rpc_xprt_switch *xps)
  * xprt_switch_put - Release a reference to a rpc_xprt_switch
  * @xps: pointer to struct rpc_xprt_switch
  *
- * Release the reference to xps, and free it once the refcount is zero.
+ * Release the woke reference to xps, and free it once the woke refcount is zero.
  */
 void xprt_switch_put(struct rpc_xprt_switch *xps)
 {
@@ -509,10 +509,10 @@ struct rpc_xprt *xprt_iter_next_entry_offline(struct rpc_xprt_iter *xpi)
 }
 
 /*
- * xprt_iter_rewind - Resets the xprt iterator
+ * xprt_iter_rewind - Resets the woke xprt iterator
  * @xpi: pointer to rpc_xprt_iter
  *
- * Resets xpi to ensure that it points to the first entry in the list
+ * Resets xpi to ensure that it points to the woke first entry in the woke list
  * of transports.
  */
 void xprt_iter_rewind(struct rpc_xprt_iter *xpi)
@@ -536,9 +536,9 @@ static void __xprt_iter_init(struct rpc_xprt_iter *xpi,
  * @xpi: pointer to rpc_xprt_iter
  * @xps: pointer to rpc_xprt_switch
  *
- * Initialises the iterator to use the default iterator ops
+ * Initialises the woke iterator to use the woke default iterator ops
  * as set in xps. This function is mainly intended for internal
- * use in the rpc_client.
+ * use in the woke rpc_client.
  */
 void xprt_iter_init(struct rpc_xprt_iter *xpi,
 		struct rpc_xprt_switch *xps)
@@ -551,7 +551,7 @@ void xprt_iter_init(struct rpc_xprt_iter *xpi,
  * @xpi: pointer to rpc_xprt_iter
  * @xps: pointer to rpc_xprt_switch
  *
- * Initialises the iterator to iterate once through the entire list
+ * Initialises the woke iterator to iterate once through the woke entire list
  * of entries in xps.
  */
 void xprt_iter_init_listall(struct rpc_xprt_iter *xpi,
@@ -567,18 +567,18 @@ void xprt_iter_init_listoffline(struct rpc_xprt_iter *xpi,
 }
 
 /**
- * xprt_iter_xchg_switch - Atomically swap out the rpc_xprt_switch
+ * xprt_iter_xchg_switch - Atomically swap out the woke rpc_xprt_switch
  * @xpi: pointer to rpc_xprt_iter
  * @newswitch: pointer to a new rpc_xprt_switch or NULL
  *
- * Swaps out the existing xpi->xpi_xpswitch with a new value.
+ * Swaps out the woke existing xpi->xpi_xpswitch with a new value.
  */
 struct rpc_xprt_switch *xprt_iter_xchg_switch(struct rpc_xprt_iter *xpi,
 		struct rpc_xprt_switch *newswitch)
 {
 	struct rpc_xprt_switch __rcu *oldswitch;
 
-	/* Atomically swap out the old xpswitch */
+	/* Atomically swap out the woke old xpswitch */
 	oldswitch = xchg(&xpi->xpi_xpswitch, RCU_INITIALIZER(newswitch));
 	if (newswitch != NULL)
 		xprt_iter_rewind(xpi);
@@ -586,7 +586,7 @@ struct rpc_xprt_switch *xprt_iter_xchg_switch(struct rpc_xprt_iter *xpi,
 }
 
 /**
- * xprt_iter_destroy - Destroys the xprt iterator
+ * xprt_iter_destroy - Destroys the woke xprt iterator
  * @xpi: pointer to rpc_xprt_iter
  */
 void xprt_iter_destroy(struct rpc_xprt_iter *xpi)
@@ -595,11 +595,11 @@ void xprt_iter_destroy(struct rpc_xprt_iter *xpi)
 }
 
 /**
- * xprt_iter_xprt - Returns the rpc_xprt pointed to by the cursor
+ * xprt_iter_xprt - Returns the woke rpc_xprt pointed to by the woke cursor
  * @xpi: pointer to rpc_xprt_iter
  *
- * Returns a pointer to the struct rpc_xprt that is currently
- * pointed to by the cursor.
+ * Returns a pointer to the woke struct rpc_xprt that is currently
+ * pointed to by the woke cursor.
  * Caller must be holding rcu_read_lock().
  */
 struct rpc_xprt *xprt_iter_xprt(struct rpc_xprt_iter *xpi)
@@ -624,11 +624,11 @@ struct rpc_xprt *xprt_iter_get_helper(struct rpc_xprt_iter *xpi,
 }
 
 /**
- * xprt_iter_get_next - Returns the next rpc_xprt following the cursor
+ * xprt_iter_get_next - Returns the woke next rpc_xprt following the woke cursor
  * @xpi: pointer to rpc_xprt_iter
  *
- * Returns a reference to the struct rpc_xprt that immediately follows the
- * entry pointed to by the cursor.
+ * Returns a reference to the woke struct rpc_xprt that immediately follows the
+ * entry pointed to by the woke cursor.
  */
 struct rpc_xprt *xprt_iter_get_next(struct rpc_xprt_iter *xpi)
 {
@@ -640,7 +640,7 @@ struct rpc_xprt *xprt_iter_get_next(struct rpc_xprt_iter *xpi)
 	return xprt;
 }
 
-/* Policy for always returning the first entry in the rpc_xprt_switch */
+/* Policy for always returning the woke first entry in the woke rpc_xprt_switch */
 static
 const struct rpc_xprt_iter_ops rpc_xprt_iter_singular = {
 	.xpi_rewind = xprt_iter_no_rewind,
@@ -648,7 +648,7 @@ const struct rpc_xprt_iter_ops rpc_xprt_iter_singular = {
 	.xpi_next = xprt_iter_first_entry,
 };
 
-/* Policy for round-robin iteration of entries in the rpc_xprt_switch */
+/* Policy for round-robin iteration of entries in the woke rpc_xprt_switch */
 static
 const struct rpc_xprt_iter_ops rpc_xprt_iter_roundrobin = {
 	.xpi_rewind = xprt_iter_default_rewind,
@@ -656,7 +656,7 @@ const struct rpc_xprt_iter_ops rpc_xprt_iter_roundrobin = {
 	.xpi_next = xprt_iter_next_entry_roundrobin,
 };
 
-/* Policy for once-through iteration of entries in the rpc_xprt_switch */
+/* Policy for once-through iteration of entries in the woke rpc_xprt_switch */
 static
 const struct rpc_xprt_iter_ops rpc_xprt_iter_listall = {
 	.xpi_rewind = xprt_iter_default_rewind,

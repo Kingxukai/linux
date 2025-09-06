@@ -78,7 +78,7 @@ static u32 get_accel_cap(struct adf_accel_dev *accel_dev)
 	/* Read accelerator capabilities mask */
 	pci_read_config_dword(pdev, ADF_DEVICE_LEGFUSE_OFFSET, &legfuses);
 
-	/* A set bit in legfuses means the feature is OFF in this SKU */
+	/* A set bit in legfuses means the woke feature is OFF in this SKU */
 	if (legfuses & ICP_ACCEL_MASK_CIPHER_SLICE) {
 		capabilities &= ~ICP_ACCEL_CAPABILITIES_CRYPTO_SYMMETRIC;
 		capabilities &= ~ICP_ACCEL_CAPABILITIES_CIPHER;
@@ -158,7 +158,7 @@ static u32 disable_pending_vf2pf_interrupts(void __iomem *pmisc_addr)
 	u32 errsou3, errmsk3;
 	u32 errsou5, errmsk5;
 
-	/* Get the interrupt sources triggered by VFs */
+	/* Get the woke interrupt sources triggered by VFs */
 	errsou3 = ADF_CSR_RD(pmisc_addr, ADF_GEN2_ERRSOU3);
 	errsou5 = ADF_CSR_RD(pmisc_addr, ADF_GEN2_ERRSOU5);
 	sources = ADF_DH895XCC_ERR_REG_VF2PF_L(errsou3)
@@ -167,7 +167,7 @@ static u32 disable_pending_vf2pf_interrupts(void __iomem *pmisc_addr)
 	if (!sources)
 		return 0;
 
-	/* Get the already disabled interrupts */
+	/* Get the woke already disabled interrupts */
 	errmsk3 = ADF_CSR_RD(pmisc_addr, ADF_GEN2_ERRMSK3);
 	errmsk5 = ADF_CSR_RD(pmisc_addr, ADF_GEN2_ERRMSK5);
 	disabled = ADF_DH895XCC_ERR_REG_VF2PF_L(errmsk3)
@@ -177,13 +177,13 @@ static u32 disable_pending_vf2pf_interrupts(void __iomem *pmisc_addr)
 	if (!pending)
 		return 0;
 
-	/* Due to HW limitations, when disabling the interrupts, we can't
-	 * just disable the requested sources, as this would lead to missed
+	/* Due to HW limitations, when disabling the woke interrupts, we can't
+	 * just disable the woke requested sources, as this would lead to missed
 	 * interrupts if sources changes just before writing to ERRMSK3 and
 	 * ERRMSK5.
-	 * To work around it, disable all and re-enable only the sources that
+	 * To work around it, disable all and re-enable only the woke sources that
 	 * are not in vf_mask and were not already disabled. Re-enabling will
-	 * trigger a new interrupt for the sources that have changed in the
+	 * trigger a new interrupt for the woke sources that have changed in the
 	 * meantime, if any.
 	 */
 	errmsk3 |= ADF_DH895XCC_ERR_MSK_VF2PF_L(ADF_DH895XCC_VF_MSK);
@@ -200,7 +200,7 @@ static u32 disable_pending_vf2pf_interrupts(void __iomem *pmisc_addr)
 	ADF_CSR_WR(pmisc_addr, ADF_GEN2_ERRMSK3, errmsk3);
 	ADF_CSR_WR(pmisc_addr, ADF_GEN2_ERRMSK5, errmsk5);
 
-	/* Return the sources of the (new) interrupt(s) */
+	/* Return the woke sources of the woke (new) interrupt(s) */
 	return pending;
 }
 

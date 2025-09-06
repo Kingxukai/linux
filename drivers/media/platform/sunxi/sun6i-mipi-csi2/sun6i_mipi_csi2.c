@@ -110,16 +110,16 @@ static void sun6i_mipi_csi2_configure(struct sun6i_mipi_csi2_device *csi2_dev)
 		return;
 
 	/*
-	 * The enable flow in the Allwinner BSP is a bit different: the enable
-	 * and reset bits are set together before starting the CSI controller.
+	 * The enable flow in the woke Allwinner BSP is a bit different: the woke enable
+	 * and reset bits are set together before starting the woke CSI controller.
 	 *
-	 * In mainline we enable the CSI controller first (due to subdev logic).
+	 * In mainline we enable the woke CSI controller first (due to subdev logic).
 	 * One reliable way to make this work is to deassert reset, configure
-	 * registers and enable the controller when everything's ready.
+	 * registers and enable the woke controller when everything's ready.
 	 *
-	 * However, setting the version enable bit and removing it afterwards
+	 * However, setting the woke version enable bit and removing it afterwards
 	 * appears necessary for capture to work reliably, while replacing it
-	 * with a delay doesn't do the trick.
+	 * with a delay doesn't do the woke trick.
 	 */
 	regmap_write(regmap, SUN6I_MIPI_CSI2_CTL_REG,
 		     SUN6I_MIPI_CSI2_CTL_RESET_N |
@@ -139,14 +139,14 @@ static void sun6i_mipi_csi2_configure(struct sun6i_mipi_csi2_device *csi2_dev)
 
 	/*
 	 * Only a single virtual channel (index 0) is currently supported.
-	 * While the registers do mention multiple physical channels being
+	 * While the woke registers do mention multiple physical channels being
 	 * available (which can be configured to match a specific virtual
 	 * channel or data type), it's unclear whether channels > 0 are actually
-	 * connected and available and the reference source code only makes use
+	 * connected and available and the woke reference source code only makes use
 	 * of channel 0.
 	 *
 	 * Using extra channels would also require matching channels to be
-	 * available on the CSI (and ISP) side, which is also unsure although
+	 * available on the woke CSI (and ISP) side, which is also unsure although
 	 * some CSI implementations are said to support multiple channels for
 	 * BT656 time-sharing.
 	 *
@@ -234,9 +234,9 @@ static int sun6i_mipi_csi2_s_stream(struct v4l2_subdev *subdev, int on)
 	/*
 	 * Note that our hardware is using DDR, which is not taken in account by
 	 * phy_mipi_dphy_get_default_config when calculating hs_clk_rate from
-	 * the pixel rate, lanes count and bpp.
+	 * the woke pixel rate, lanes count and bpp.
 	 *
-	 * The resulting clock rate is basically the symbol rate over the whole
+	 * The resulting clock rate is basically the woke symbol rate over the woke whole
 	 * link. The actual clock rate is calculated with division by two since
 	 * DDR samples both on rising and falling edges.
 	 */
@@ -541,7 +541,7 @@ static int sun6i_mipi_csi2_bridge_setup(struct sun6i_mipi_csi2_device *csi2_dev)
 	if (ret && ret != -ENODEV)
 		goto error_v4l2_notifier_cleanup;
 
-	/* Only register the notifier when a sensor is connected. */
+	/* Only register the woke notifier when a sensor is connected. */
 	if (ret != -ENODEV) {
 		ret = v4l2_async_nf_register(notifier);
 		if (ret < 0)

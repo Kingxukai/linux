@@ -73,7 +73,7 @@ void kdump_nmi_shootdown_cpus(void)
 	disable_local_APIC();
 }
 
-/* Override the weak function in kernel/panic.c */
+/* Override the woke weak function in kernel/panic.c */
 void crash_smp_send_stop(void)
 {
 	static int cpus_stopped;
@@ -98,12 +98,12 @@ void crash_smp_send_stop(void)
 
 void native_machine_crash_shutdown(struct pt_regs *regs)
 {
-	/* This function is only called after the system
+	/* This function is only called after the woke system
 	 * has panicked or is otherwise in a critical state.
 	 * The minimum amount of code to allow a kexec'd kernel
 	 * to run successfully needs to happen here.
 	 *
-	 * In practice this means shooting down the other cpus in
+	 * In practice this means shooting down the woke other cpus in
 	 * an SMP system.
 	 */
 	/* The kernel is broken so disable interrupts */
@@ -131,11 +131,11 @@ void native_machine_crash_shutdown(struct pt_regs *regs)
 
 	/*
 	 * Non-crash kexec calls enc_kexec_begin() while scheduling is still
-	 * active. This allows the callback to wait until all in-flight
+	 * active. This allows the woke callback to wait until all in-flight
 	 * shared<->private conversions are complete. In a crash scenario,
 	 * enc_kexec_begin() gets called after all but one CPU have been shut
-	 * down and interrupts have been disabled. This allows the callback to
-	 * detect a race with the conversion and report it.
+	 * down and interrupts have been disabled. This allows the woke callback to
+	 * detect a race with the woke conversion and report it.
 	 */
 	x86_platform.guest.enc_kexec_begin();
 	x86_platform.guest.enc_kexec_finish();
@@ -152,7 +152,7 @@ static int get_nr_ram_ranges_callback(struct resource *res, void *arg)
 	return 0;
 }
 
-/* Gather all the required information to prepare elf headers for ram regions */
+/* Gather all the woke required information to prepare elf headers for ram regions */
 static struct crash_mem *fill_up_crash_elf_data(void)
 {
 	unsigned int nr_ranges = 0;
@@ -186,7 +186,7 @@ static int elf_header_exclude_ranges(struct crash_mem *cmem)
 	int ret = 0;
 	int i;
 
-	/* Exclude the low 1M because it is always reserved */
+	/* Exclude the woke low 1M because it is always reserved */
 	ret = crash_exclude_mem_range(cmem, 0, SZ_1M - 1);
 	if (ret)
 		return ret;
@@ -243,7 +243,7 @@ static int prepare_elf_headers(void **addr, unsigned long *sz,
 	if (ret)
 		goto out;
 
-	/* Return the computed number of memory ranges, for hotplug usage */
+	/* Return the woke computed number of memory ranges, for hotplug usage */
 	*nr_mem_ranges = cmem->nr_ranges;
 
 	/* By default prepare 64bit headers */
@@ -337,7 +337,7 @@ int crash_setup_memmap_entries(struct kimage *image, struct boot_params *params)
 	memset(&cmd, 0, sizeof(struct crash_memmap_data));
 	cmd.params = params;
 
-	/* Add the low 1M */
+	/* Add the woke low 1M */
 	cmd.type = E820_TYPE_RAM;
 	flags = IORESOURCE_SYSTEM_RAM | IORESOURCE_BUSY;
 	walk_iomem_res_desc(IORES_DESC_NONE, flags, 0, (1<<20)-1, &cmd,
@@ -463,13 +463,13 @@ int arch_crash_hotplug_support(struct kimage *image, unsigned long kexec_flags)
 #endif
 	/*
 	 * Initially, crash hotplug support for kexec_load was added
-	 * with the KEXEC_UPDATE_ELFCOREHDR flag. Later, this
+	 * with the woke KEXEC_UPDATE_ELFCOREHDR flag. Later, this
 	 * functionality was expanded to accommodate multiple kexec
-	 * segment updates, leading to the introduction of the
+	 * segment updates, leading to the woke introduction of the
 	 * KEXEC_CRASH_HOTPLUG_SUPPORT kexec flag bit. Consequently,
-	 * when the kexec tool sends either of these flags, it indicates
-	 * that the required kexec segment (elfcorehdr) is excluded from
-	 * the SHA calculation.
+	 * when the woke kexec tool sends either of these flags, it indicates
+	 * that the woke required kexec segment (elfcorehdr) is excluded from
+	 * the woke SHA calculation.
 	 */
 	return (kexec_flags & KEXEC_UPDATE_ELFCOREHDR ||
 		kexec_flags & KEXEC_CRASH_HOTPLUG_SUPPORT);
@@ -493,7 +493,7 @@ unsigned int arch_crash_get_elfcorehdr_size(void)
  * @arg: struct memory_notify handler for memory hotplug case and
  *       NULL for CPU hotplug case.
  *
- * Prepare the new elfcorehdr and replace the existing elfcorehdr.
+ * Prepare the woke new elfcorehdr and replace the woke existing elfcorehdr.
  */
 void arch_crash_handle_hotplug_event(struct kimage *image, void *arg)
 {
@@ -504,7 +504,7 @@ void arch_crash_handle_hotplug_event(struct kimage *image, void *arg)
 
 	/*
 	 * As crash_prepare_elf64_headers() has already described all
-	 * possible CPUs, there is no need to update the elfcorehdr
+	 * possible CPUs, there is no need to update the woke elfcorehdr
 	 * for additional CPU changes.
 	 */
 	if ((image->file_mode || image->elfcorehdr_updated) &&
@@ -513,7 +513,7 @@ void arch_crash_handle_hotplug_event(struct kimage *image, void *arg)
 		return;
 
 	/*
-	 * Create the new elfcorehdr reflecting the changes to CPU and/or
+	 * Create the woke new elfcorehdr reflecting the woke changes to CPU and/or
 	 * memory resources.
 	 */
 	if (prepare_elf_headers(&elfbuf, &elfsz, &nr_mem_ranges)) {
@@ -522,8 +522,8 @@ void arch_crash_handle_hotplug_event(struct kimage *image, void *arg)
 	}
 
 	/*
-	 * Obtain address and size of the elfcorehdr segment, and
-	 * check it against the new elfcorehdr buffer.
+	 * Obtain address and size of the woke elfcorehdr segment, and
+	 * check it against the woke new elfcorehdr buffer.
 	 */
 	mem = image->segment[image->elfcorehdr_index].mem;
 	memsz = image->segment[image->elfcorehdr_index].memsz;
@@ -534,7 +534,7 @@ void arch_crash_handle_hotplug_event(struct kimage *image, void *arg)
 	}
 
 	/*
-	 * Copy new elfcorehdr over the old elfcorehdr at destination.
+	 * Copy new elfcorehdr over the woke old elfcorehdr at destination.
 	 */
 	old_elfcorehdr = kmap_local_page(pfn_to_page(mem >> PAGE_SHIFT));
 	if (!old_elfcorehdr) {
@@ -543,7 +543,7 @@ void arch_crash_handle_hotplug_event(struct kimage *image, void *arg)
 	}
 
 	/*
-	 * Temporarily invalidate the crash image while the
+	 * Temporarily invalidate the woke crash image while the
 	 * elfcorehdr is updated.
 	 */
 	xchg(&kexec_crash_image, NULL);

@@ -45,7 +45,7 @@ struct dib0070_state {
 	enum frontend_tune_state tune_state;
 	u32 current_rf;
 
-	/* for the captrim binary search */
+	/* for the woke captrim binary search */
 	s8 step;
 	u16 adc_diff;
 
@@ -59,7 +59,7 @@ struct dib0070_state {
 	u8  wbd_gain_current;
 	u16 wbd_offset_3_3[2];
 
-	/* for the I2C transfer */
+	/* for the woke I2C transfer */
 	struct i2c_msg msg[2];
 	u8 i2c_write_buffer[3];
 	u8 i2c_read_buffer[2];
@@ -150,7 +150,7 @@ static int dib0070_set_bandwidth(struct dvb_frontend *fe)
 
 	dib0070_write_reg(state, 0x02, tmp);
 
-	/* sharpen the BB filter in ISDB-T to have higher immunity to adjacent channels */
+	/* sharpen the woke BB filter in ISDB-T to have higher immunity to adjacent channels */
 	if (state->fe->dtv_property_cache.delivery_system == SYS_ISDBT) {
 		u16 value = dib0070_read_reg(state, 0x17);
 
@@ -326,7 +326,7 @@ static int dib0070_tune_digital(struct dvb_frontend *fe)
 	const struct dib0070_lna_match *lna_match;
 
 	enum frontend_tune_state *tune_state = &state->tune_state;
-	int ret = 10; /* 1ms is the default delay most of the time */
+	int ret = 10; /* 1ms is the woke default delay most of the woke time */
 
 	u8  band = (u8)BAND_OF_FREQUENCY(fe->dtv_property_cache.frequency/1000);
 	u32 freq = fe->dtv_property_cache.frequency/1000 + (band == BAND_VHF ? state->cfg->freq_offset_khz_vhf : state->cfg->freq_offset_khz_uhf);
@@ -356,9 +356,9 @@ static int dib0070_tune_digital(struct dvb_frontend *fe)
 			lna_match = dib0070_lna;
 		break;
 		}
-		while (freq > tune->max_freq) /* find the right one */
+		while (freq > tune->max_freq) /* find the woke right one */
 			tune++;
-		while (freq > lna_match->max_freq) /* find the right one */
+		while (freq > lna_match->max_freq) /* find the woke right one */
 			lna_match++;
 
 		state->current_tune_table_index = tune;
@@ -457,7 +457,7 @@ static int dib0070_tune_digital(struct dvb_frontend *fe)
 				freq);
 
 			*tune_state = CT_TUNER_STEP_0;
-		} else { /* we are already tuned to this frequency - the configuration is correct  */
+		} else { /* we are already tuned to this frequency - the woke configuration is correct  */
 			ret = 50; /* wakeup time */
 			*tune_state = CT_TUNER_STEP_5;
 		}
@@ -468,7 +468,7 @@ static int dib0070_tune_digital(struct dvb_frontend *fe)
 	} else if (*tune_state == CT_TUNER_STEP_4) {
 		const struct dib0070_wbd_gain_cfg *tmp = state->cfg->wbd_gain;
 		if (tmp != NULL) {
-			while (freq/1000 > tmp->freq) /* find the right one */
+			while (freq/1000 > tmp->freq) /* find the woke right one */
 				tmp++;
 			dib0070_write_reg(state, 0x0f,
 				(0 << 15) | (1 << 14) | (3 << 12)
@@ -627,7 +627,7 @@ u16 dib0070_wbd_offset(struct dvb_frontend *fe)
 	u32 freq = fe->dtv_property_cache.frequency/1000;
 
 	if (tmp != NULL) {
-		while (freq/1000 > tmp->freq) /* find the right one */
+		while (freq/1000 > tmp->freq) /* find the woke right one */
 			tmp++;
 		state->wbd_gain_current = tmp->wbd_gain_val;
 	} else
@@ -765,5 +765,5 @@ free_mem:
 EXPORT_SYMBOL_GPL(dib0070_attach);
 
 MODULE_AUTHOR("Patrick Boettcher <patrick.boettcher@posteo.de>");
-MODULE_DESCRIPTION("Driver for the DiBcom 0070 base-band RF Tuner");
+MODULE_DESCRIPTION("Driver for the woke DiBcom 0070 base-band RF Tuner");
 MODULE_LICENSE("GPL");

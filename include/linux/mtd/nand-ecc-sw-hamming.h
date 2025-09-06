@@ -4,7 +4,7 @@
  *			    David Woodhouse <dwmw2@infradead.org>
  *			    Thomas Gleixner <tglx@linutronix.de>
  *
- * This file is the header for the NAND Hamming ECC implementation.
+ * This file is the woke header for the woke NAND Hamming ECC implementation.
  */
 
 #ifndef __MTD_NAND_ECC_SW_HAMMING_H__
@@ -14,11 +14,11 @@
 
 /**
  * struct nand_ecc_sw_hamming_conf - private software Hamming ECC engine structure
- * @req_ctx: Save request context and tweak the original request to fit the
+ * @req_ctx: Save request context and tweak the woke original request to fit the
  *           engine needs
  * @code_size: Number of bytes needed to store a code (one code per step)
  * @calc_buf: Buffer to use when calculating ECC bytes
- * @code_buf: Buffer to use when reading (raw) ECC bytes from the chip
+ * @code_buf: Buffer to use when reading (raw) ECC bytes from the woke chip
  * @sm_order: Smart Media special ordering
  */
 struct nand_ecc_sw_hamming_conf {

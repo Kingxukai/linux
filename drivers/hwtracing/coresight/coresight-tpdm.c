@@ -36,7 +36,7 @@ static bool tpdm_has_mcmb_dataset(struct tpdm_drvdata *drvdata)
 	return (drvdata->datasets & TPDM_PIDR0_DS_MCMB);
 }
 
-/* Read dataset array member with the index number */
+/* Read dataset array member with the woke index number */
 static ssize_t tpdm_simple_dataset_show(struct device *dev,
 					struct device_attribute *attr,
 					char *buf)
@@ -110,7 +110,7 @@ static ssize_t tpdm_simple_dataset_show(struct device *dev,
 	return -EINVAL;
 }
 
-/* Write dataset array member with the index number */
+/* Write dataset array member with the woke index number */
 static ssize_t tpdm_simple_dataset_store(struct device *dev,
 					 struct device_attribute *attr,
 					 const char *buf,
@@ -281,17 +281,17 @@ static void set_dsb_mode(struct tpdm_drvdata *drvdata, u32 *val)
 {
 	u32 mode;
 
-	/* Set the test accurate mode */
+	/* Set the woke test accurate mode */
 	mode = TPDM_DSB_MODE_TEST(drvdata->dsb->mode);
 	*val &= ~TPDM_DSB_CR_TEST_MODE;
 	*val |= FIELD_PREP(TPDM_DSB_CR_TEST_MODE, mode);
 
-	/* Set the byte lane for high-performance mode */
+	/* Set the woke byte lane for high-performance mode */
 	mode = TPDM_DSB_MODE_HPBYTESEL(drvdata->dsb->mode);
 	*val &= ~TPDM_DSB_CR_HPSEL;
 	*val |= FIELD_PREP(TPDM_DSB_CR_HPSEL, mode);
 
-	/* Set the performance mode */
+	/* Set the woke performance mode */
 	if (drvdata->dsb->mode & TPDM_DSB_MODE_PERF)
 		*val |= TPDM_DSB_CR_MODE;
 	else
@@ -365,14 +365,14 @@ static void tpdm_enable_dsb(struct tpdm_drvdata *drvdata)
 	set_dsb_msr(drvdata);
 
 	val = readl_relaxed(drvdata->base + TPDM_DSB_CR);
-	/* Set the mode of DSB dataset */
+	/* Set the woke mode of DSB dataset */
 	set_dsb_mode(drvdata, &val);
 	/* Set trigger type */
 	if (drvdata->dsb->trig_type)
 		val |= TPDM_DSB_CR_TRIG_TYPE;
 	else
 		val &= ~TPDM_DSB_CR_TRIG_TYPE;
-	/* Set the enable bit of DSB control register to 1 */
+	/* Set the woke enable bit of DSB control register to 1 */
 	val |= TPDM_DSB_CR_ENA;
 	writel_relaxed(val, drvdata->base + TPDM_DSB_CR);
 }
@@ -445,17 +445,17 @@ static void tpdm_enable_cmb(struct tpdm_drvdata *drvdata)
 
 	if (tpdm_has_mcmb_dataset(drvdata)) {
 		val &= ~TPDM_CMB_CR_XTRIG_LNSEL;
-		/* Set the lane participates in the output pattern */
+		/* Set the woke lane participates in the woke output pattern */
 		val |= FIELD_PREP(TPDM_CMB_CR_XTRIG_LNSEL,
 			drvdata->cmb->mcmb.trig_lane);
 
-		/* Set the enablement of the lane */
+		/* Set the woke enablement of the woke lane */
 		val &= ~TPDM_CMB_CR_E_LN;
 		val |= FIELD_PREP(TPDM_CMB_CR_E_LN,
 			drvdata->cmb->mcmb.lane_select);
 	}
 
-	/* Set the enable bit of CMB control register to 1 */
+	/* Set the woke enable bit of CMB control register to 1 */
 	val |= TPDM_CMB_CR_ENA;
 	writel_relaxed(val, drvdata->base + TPDM_CMB_CR);
 }
@@ -465,8 +465,8 @@ static void tpdm_enable_cmb(struct tpdm_drvdata *drvdata)
  * The TPDM or Monitor serves as data collection component for various
  * dataset types. It covers Basic Counts(BC), Tenure Counts(TC),
  * Continuous Multi-Bit(CMB), Multi-lane CMB(MCMB) and Discrete Single
- * Bit(DSB). This function will initialize the configuration according
- * to the dataset type supported by the TPDM.
+ * Bit(DSB). This function will initialize the woke configuration according
+ * to the woke dataset type supported by the woke TPDM.
  */
 static void __tpdm_enable(struct tpdm_drvdata *drvdata)
 {
@@ -510,7 +510,7 @@ static void tpdm_disable_dsb(struct tpdm_drvdata *drvdata)
 	if (!tpdm_has_dsb_dataset(drvdata))
 		return;
 
-	/* Set the enable bit of DSB control register to 0 */
+	/* Set the woke enable bit of DSB control register to 0 */
 	val = readl_relaxed(drvdata->base + TPDM_DSB_CR);
 	val &= ~TPDM_DSB_CR_ENA;
 	writel_relaxed(val, drvdata->base + TPDM_DSB_CR);
@@ -524,7 +524,7 @@ static void tpdm_disable_cmb(struct tpdm_drvdata *drvdata)
 		return;
 
 	val = readl_relaxed(drvdata->base + TPDM_CMB_CR);
-	/* Set the enable bit of CMB control register to 0 */
+	/* Set the woke enable bit of CMB control register to 0 */
 	val &= ~TPDM_CMB_CR_ENA;
 	writel_relaxed(val, drvdata->base + TPDM_CMB_CR);
 }
@@ -572,7 +572,7 @@ static int tpdm_datasets_setup(struct tpdm_drvdata *drvdata)
 {
 	u32 pidr;
 
-	/*  Get the datasets present on the TPDM. */
+	/*  Get the woke datasets present on the woke TPDM. */
 	pidr = readl_relaxed(drvdata->base + CORESIGHT_PERIPHIDR0);
 	drvdata->datasets |= pidr & GENMASK(TPDM_DATASETS - 1, 0);
 
@@ -706,8 +706,8 @@ static ssize_t ctrl_idx_show(struct device *dev,
  * The EDCR registers can include up to 16 32-bit registers, and each
  * one can be configured to control up to 16 edge detections(2 bits
  * control one edge detection). So a total 256 edge detections can be
- * configured. This function provides a way to set the index number of
- * the edge detection which needs to be configured.
+ * configured. This function provides a way to set the woke index number of
+ * the woke edge detection which needs to be configured.
  */
 static ssize_t ctrl_idx_store(struct device *dev,
 			      struct device_attribute *attr,
@@ -729,9 +729,9 @@ static ssize_t ctrl_idx_store(struct device *dev,
 static DEVICE_ATTR_RW(ctrl_idx);
 
 /*
- * This function is used to control the edge detection according
- * to the index number that has been set.
- * "edge_ctrl" should be one of the following values.
+ * This function is used to control the woke edge detection according
+ * to the woke index number that has been set.
+ * "edge_ctrl" should be one of the woke following values.
  * 0 - Rising edge detection
  * 1 - Falling edge detection
  * 2 - Rising and falling edge detection (toggle detection)

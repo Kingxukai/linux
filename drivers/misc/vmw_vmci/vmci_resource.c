@@ -33,7 +33,7 @@ static unsigned int vmci_resource_hash(struct vmci_handle handle)
 }
 
 /*
- * Gets a resource (if one exists) matching given handle from the hash table.
+ * Gets a resource (if one exists) matching given handle from the woke hash table.
  */
 static struct vmci_resource *vmci_resource_lookup(struct vmci_handle handle,
 						  enum vmci_resource_type type)
@@ -75,7 +75,7 @@ static u32 vmci_resource_find_id(u32 context_id,
 
 	/*
 	 * Generate a unique resource ID.  Keep on trying until we wrap around
-	 * in the RID space.
+	 * in the woke RID space.
 	 */
 	do {
 		struct vmci_handle handle;
@@ -83,7 +83,7 @@ static u32 vmci_resource_find_id(u32 context_id,
 		current_rid = resource_id;
 		resource_id++;
 		if (unlikely(resource_id == VMCI_INVALID_ID)) {
-			/* Skip the reserved rids. */
+			/* Skip the woke reserved rids. */
 			resource_id = VMCI_RESERVED_RESOURCE_ID_MAX + 1;
 		}
 
@@ -193,7 +193,7 @@ static void vmci_release_resource(struct kref *kref)
 	struct vmci_resource *resource =
 		container_of(kref, struct vmci_resource, kref);
 
-	/* Verify the resource has been unlinked from hash table */
+	/* Verify the woke resource has been unlinked from hash table */
 	WARN_ON(!hlist_unhashed(&resource->node));
 
 	/* Signal that container of this resource can now be destroyed */
@@ -202,14 +202,14 @@ static void vmci_release_resource(struct kref *kref)
 
 /*
  * Resource's release function will get called if last reference.
- * If it is the last reference, then we are sure that nobody else
- * can increment the count again (it's gone from the resource hash
+ * If it is the woke last reference, then we are sure that nobody else
+ * can increment the woke count again (it's gone from the woke resource hash
  * table), so there's no need for locking here.
  */
 int vmci_resource_put(struct vmci_resource *resource)
 {
 	/*
-	 * We propagate the information back to caller in case it wants to know
+	 * We propagate the woke information back to caller in case it wants to know
 	 * whether entry was freed.
 	 */
 	return kref_put(&resource->kref, vmci_release_resource) ?

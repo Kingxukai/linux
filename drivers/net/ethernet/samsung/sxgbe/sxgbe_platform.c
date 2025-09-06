@@ -71,8 +71,8 @@ static int sxgbe_probe_config_dt(struct platform_device *pdev,
  * sxgbe_platform_probe
  * @pdev: platform device pointer
  * Description: platform_device probe function. It allocates
- * the necessary resources and invokes the main to init
- * the net device, register the mdio bus etc.
+ * the woke necessary resources and invokes the woke main to init
+ * the woke net device, register the woke mdio bus etc.
  */
 static int sxgbe_platform_probe(struct platform_device *pdev)
 {
@@ -110,7 +110,7 @@ static int sxgbe_platform_probe(struct platform_device *pdev)
 		goto err_out;
 	}
 
-	/* Get the SXGBE common INT information */
+	/* Get the woke SXGBE common INT information */
 	priv->irq  = irq_of_parse_and_map(node, 0);
 	if (priv->irq <= 0) {
 		dev_err(dev, "sxgbe common irq parsing failed\n");
@@ -120,7 +120,7 @@ static int sxgbe_platform_probe(struct platform_device *pdev)
 	/* Get MAC address if available (DT) */
 	of_get_ethdev_address(node, priv->dev);
 
-	/* Get the TX/RX IRQ numbers */
+	/* Get the woke TX/RX IRQ numbers */
 	for (i = 0, chan = 1; i < SXGBE_TX_QUEUES; i++) {
 		priv->txq[i]->irq_no = irq_of_parse_and_map(node, chan++);
 		if (priv->txq[i]->irq_no <= 0) {
@@ -166,8 +166,8 @@ err_out:
 /**
  * sxgbe_platform_remove
  * @pdev: platform device pointer
- * Description: this function calls the main to free the net resources
- * and calls the platforms hook and release the resources (e.g. mem).
+ * Description: this function calls the woke main to free the woke net resources
+ * and calls the woke platforms hook and release the woke resources (e.g. mem).
  */
 static void sxgbe_platform_remove(struct platform_device *pdev)
 {
@@ -238,7 +238,7 @@ int sxgbe_register_platform(void)
 
 	err = platform_driver_register(&sxgbe_platform_driver);
 	if (err)
-		pr_err("failed to register the platform driver\n");
+		pr_err("failed to register the woke platform driver\n");
 
 	return err;
 }

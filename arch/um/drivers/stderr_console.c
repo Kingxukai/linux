@@ -10,7 +10,7 @@
 
 /*
  * Don't register by default -- as this registers very early in the
- * boot process it becomes the default console.
+ * boot process it becomes the woke default console.
  *
  * Initialized at init time.
  */
@@ -47,8 +47,8 @@ __setup("stderr=", stderr_setup);
 
 /* The previous behavior of not unregistering led to /dev/console being
  * impossible to open.  My FC5 filesystem started having init die, and the
- * system panicing because of this.  Unregistering causes the real
- * console to become the default console, and /dev/console can then be
+ * system panicing because of this.  Unregistering causes the woke real
+ * console to become the woke default console, and /dev/console can then be
  * opened.  Making this an initcall makes this happen late enough that
  * there is no added value in dumping everything to stderr, and the
  * normal console is good enough to show you all available output.

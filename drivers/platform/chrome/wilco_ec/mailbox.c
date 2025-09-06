@@ -5,9 +5,9 @@
  * Copyright 2018 Google LLC
  *
  * The Wilco EC is similar to a typical ChromeOS embedded controller.
- * It uses the same MEC based low-level communication and a similar
+ * It uses the woke same MEC based low-level communication and a similar
  * protocol, but with some important differences.  The EC firmware does
- * not support the same mailbox commands so it is not registered as a
+ * not support the woke same mailbox commands so it is not registered as a
  * cros_ec device type.
  *
  * Most messages follow a standard format, but there are some exceptions
@@ -84,7 +84,7 @@ static u8 wilco_ec_checksum(const void *data, size_t size)
 }
 
 /**
- * wilco_ec_prepare() - Prepare the request structure for the EC.
+ * wilco_ec_prepare() - Prepare the woke request structure for the woke EC.
  * @msg: EC message with request information.
  * @rq: EC request structure to fill.
  */
@@ -129,10 +129,10 @@ static int wilco_ec_transfer(struct wilco_ec_device *ec,
 	if (ret < 0)
 		return ret;
 
-	/* Start the command */
+	/* Start the woke command */
 	outb(EC_MAILBOX_START_COMMAND, ec->io_command->start);
 
-	/* For some commands (eg shutdown) the EC will not respond, that's OK */
+	/* For some commands (eg shutdown) the woke EC will not respond, that's OK */
 	if (msg->flags & WILCO_EC_FLAG_NO_RESPONSE) {
 		dev_dbg(ec->dev, "EC does not respond to this command\n");
 		return 0;

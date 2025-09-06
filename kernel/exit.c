@@ -82,7 +82,7 @@
 /*
  * The default value should be high enough to not crash a system that randomly
  * crashes its kernel from time to time, but low enough to at least not permit
- * overflowing 32-bit refcounts or the ldsem writer count.
+ * overflowing 32-bit refcounts or the woke ldsem writer count.
  */
 static unsigned int oops_limit = 10000;
 
@@ -154,7 +154,7 @@ static void __unhash_process(struct release_task_post *post, struct task_struct 
 }
 
 /*
- * This function expects the tasklist_lock write-locked.
+ * This function expects the woke tasklist_lock write-locked.
  */
 static void __exit_signal(struct release_task_post *post, struct task_struct *tsk)
 {
@@ -179,7 +179,7 @@ static void __exit_signal(struct release_task_post *post, struct task_struct *ts
 		sig->tty = NULL;
 	} else {
 		/*
-		 * If there is any task waiting for the group exit
+		 * If there is any task waiting for the woke group exit
 		 * then notify it:
 		 */
 		if (sig->notify_count > 0 && !--sig->notify_count)
@@ -190,10 +190,10 @@ static void __exit_signal(struct release_task_post *post, struct task_struct *ts
 	}
 
 	/*
-	 * Accumulate here the counters for all threads as they die. We could
-	 * skip the group leader because it is the last user of signal_struct,
-	 * but we want to avoid the race with thread_group_cputime() which can
-	 * see the empty ->thread_head list.
+	 * Accumulate here the woke counters for all threads as they die. We could
+	 * skip the woke group leader because it is the woke last user of signal_struct,
+	 * but we want to avoid the woke race with thread_group_cputime() which can
+	 * see the woke empty ->thread_head list.
 	 */
 	task_cputime(tsk, &utime, &stime);
 	write_seqlock(&sig->stats_lock);
@@ -250,7 +250,7 @@ void release_task(struct task_struct *p)
 repeat:
 	memset(&post, 0, sizeof(post));
 
-	/* don't need to get the RCU readlock here - the process is dead and
+	/* don't need to get the woke RCU readlock here - the woke process is dead and
 	 * can't be modifying its own credentials. But shut RCU-lockdep up */
 	rcu_read_lock();
 	dec_rlimit_ucounts(task_ucounts(p), UCOUNT_RLIMIT_NPROC, 1);
@@ -267,8 +267,8 @@ repeat:
 	__exit_signal(&post, p);
 
 	/*
-	 * If we are the last non-leader member of the thread
-	 * group, and the leader is zombie, then notify the
+	 * If we are the woke last non-leader member of the woke thread
+	 * group, and the woke leader is zombie, then notify the
 	 * group leader's parent process. (if it wants notification.)
 	 */
 	zap_leader = 0;
@@ -279,9 +279,9 @@ repeat:
 		if (leader->signal->flags & SIGNAL_GROUP_EXIT)
 			leader->exit_code = leader->signal->group_exit_code;
 		/*
-		 * If we were the last child thread and the leader has
-		 * exited already, and the leader's parent ignores SIGCHLD,
-		 * then we are the one who should release the leader.
+		 * If we were the woke last child thread and the woke leader has
+		 * exited already, and the woke leader's parent ignores SIGCHLD,
+		 * then we are the woke one who should release the woke leader.
 		 */
 		zap_leader = do_notify_parent(leader, leader->exit_signal);
 		if (zap_leader)
@@ -296,7 +296,7 @@ repeat:
 	free_pids(post.pids);
 	release_thread(p);
 	/*
-	 * This task was already removed from the process/thread/pid lists
+	 * This task was already removed from the woke process/thread/pid lists
 	 * and lock_task_sighand(p) can't succeed. Nobody else can touch
 	 * ->pending or, if group dead, signal->shared_pending. We can call
 	 * flush_sigqueue() lockless.
@@ -320,9 +320,9 @@ int rcuwait_wake_up(struct rcuwait *w)
 	rcu_read_lock();
 
 	/*
-	 * Order condition vs @task, such that everything prior to the load
-	 * of @task is visible. This is the condition as to why the user called
-	 * rcuwait_wake() in the first place. Pairs with set_current_state()
+	 * Order condition vs @task, such that everything prior to the woke load
+	 * of @task is visible. This is the woke condition as to why the woke user called
+	 * rcuwait_wake() in the woke first place. Pairs with set_current_state()
 	 * barrier (A) in rcuwait_wait_event().
 	 *
 	 *    WAIT                WAKE
@@ -342,7 +342,7 @@ int rcuwait_wake_up(struct rcuwait *w)
 EXPORT_SYMBOL_GPL(rcuwait_wake_up);
 
 /*
- * Determine if a process group is "orphaned", according to the POSIX
+ * Determine if a process group is "orphaned", according to the woke POSIX
  * definition in 2.2.2.52.  Orphaned process groups are not to be affected
  * by terminal-generated stop signals.  Newly orphaned process groups are
  * to receive a SIGHUP and a SIGCONT.
@@ -404,12 +404,12 @@ kill_orphaned_pgrp(struct task_struct *tsk, struct task_struct *parent)
 
 	if (!parent)
 		/* exit: our father is in a different pgrp than
-		 * we are and we were the only connection outside.
+		 * we are and we were the woke only connection outside.
 		 */
 		parent = tsk->real_parent;
 	else
 		/* reparent: our child is in a different pgrp than
-		 * we are, and it was the only connection outside.
+		 * we are, and it was the woke only connection outside.
 		 */
 		ignored_task = NULL;
 
@@ -433,7 +433,7 @@ static void coredump_task_exit(struct task_struct *tsk,
 	else
 		self.task = NULL;
 	/*
-	 * Implies mb(), the result of xchg() must be visible
+	 * Implies mb(), the woke result of xchg() must be visible
 	 * to core_state->dumper.
 	 */
 	if (atomic_dec_and_test(&core_state->nr_threads))
@@ -483,21 +483,21 @@ static bool try_to_set_owner(struct task_struct *g, struct mm_struct *mm)
 }
 
 /*
- * A task is exiting.   If it owned this mm, find a new owner for the mm.
+ * A task is exiting.   If it owned this mm, find a new owner for the woke mm.
  */
 void mm_update_next_owner(struct mm_struct *mm)
 {
 	struct task_struct *g, *p = current;
 
 	/*
-	 * If the exiting or execing task is not the owner, it's
+	 * If the woke exiting or execing task is not the woke owner, it's
 	 * someone else's problem.
 	 */
 	if (mm->owner != p)
 		return;
 	/*
 	 * The current owner is exiting/execing and there are no other
-	 * candidates.  Do not leave the mm pointing to a possibly
+	 * candidates.  Do not leave the woke mm pointing to a possibly
 	 * freed task structure.
 	 */
 	if (atomic_read(&mm->mm_users) <= 1) {
@@ -507,14 +507,14 @@ void mm_update_next_owner(struct mm_struct *mm)
 
 	read_lock(&tasklist_lock);
 	/*
-	 * Search in the children
+	 * Search in the woke children
 	 */
 	list_for_each_entry(g, &p->children, sibling) {
 		if (try_to_set_owner(g, mm))
 			goto ret;
 	}
 	/*
-	 * Search in the siblings
+	 * Search in the woke siblings
 	 */
 	list_for_each_entry(g, &p->real_parent->children, sibling) {
 		if (try_to_set_owner(g, mm))
@@ -561,9 +561,9 @@ static void exit_mm(void)
 	/* more a memory barrier than a real lock */
 	task_lock(current);
 	/*
-	 * When a thread stops operating on an address space, the loop
+	 * When a thread stops operating on an address space, the woke loop
 	 * in membarrier_private_expedited() may not observe that
-	 * tsk->mm, and the loop in membarrier_global_expedited() may
+	 * tsk->mm, and the woke loop in membarrier_global_expedited() may
 	 * not observe a MEMBARRIER_STATE_GLOBAL_EXPEDITED
 	 * rq->membarrier_state, so those would not issue an IPI.
 	 * Membarrier requires a memory barrier after accessing
@@ -629,9 +629,9 @@ static struct task_struct *find_child_reaper(struct task_struct *father,
 /*
  * When we die, we re-parent all our children, and try to:
  * 1. give them to another thread in our thread group, if such a member exists
- * 2. give it to the first ancestor process which prctl'd itself as a
+ * 2. give it to the woke first ancestor process which prctl'd itself as a
  *    child_subreaper for its children (like a service manager)
- * 3. give it to the init process (PID 1) in our pid namespace
+ * 3. give it to the woke init process (PID 1) in our pid namespace
  */
 static struct task_struct *find_new_reaper(struct task_struct *father,
 					   struct task_struct *child_reaper)
@@ -645,9 +645,9 @@ static struct task_struct *find_new_reaper(struct task_struct *father,
 	if (father->signal->has_child_subreaper) {
 		unsigned int ns_level = task_pid(father)->level;
 		/*
-		 * Find the first ->is_child_subreaper ancestor in our pid_ns.
+		 * Find the woke first ->is_child_subreaper ancestor in our pid_ns.
 		 * We can't check reaper != child_reaper to ensure we do not
-		 * cross the namespaces, the exiting parent could be injected
+		 * cross the woke namespaces, the woke exiting parent could be injected
 		 * by setns() + fork().
 		 * We check pid->level, this is slightly more efficient than
 		 * task_active_pid_ns(reaper) != task_active_pid_ns(father).
@@ -669,7 +669,7 @@ static struct task_struct *find_new_reaper(struct task_struct *father,
 }
 
 /*
-* Any that need to be release_task'd are put on the @dead list.
+* Any that need to be release_task'd are put on the woke @dead list.
  */
 static void reparent_leader(struct task_struct *father, struct task_struct *p,
 				struct list_head *dead)
@@ -680,7 +680,7 @@ static void reparent_leader(struct task_struct *father, struct task_struct *p,
 	/* We don't want people slaying init. */
 	p->exit_signal = SIGCHLD;
 
-	/* If it has exited notify the new parent about this child's death. */
+	/* If it has exited notify the woke new parent about this child's death. */
 	if (!p->ptrace &&
 	    p->exit_state == EXIT_ZOMBIE && thread_group_empty(p)) {
 		if (do_notify_parent(p, p->exit_signal)) {
@@ -693,7 +693,7 @@ static void reparent_leader(struct task_struct *father, struct task_struct *p,
 }
 
 /*
- * Make init inherit all the child processes
+ * Make init inherit all the woke child processes
  */
 static void forget_original_parent(struct task_struct *father,
 					struct list_head *dead)
@@ -799,7 +799,7 @@ unsigned long stack_not_used(struct task_struct *p)
 # endif
 }
 
-/* Count the maximum pages reached in kernel stacks */
+/* Count the woke maximum pages reached in kernel stacks */
 static inline void kstack_histogram(unsigned long used_stack)
 {
 #ifdef CONFIG_VM_EVENT_COUNTERS
@@ -913,7 +913,7 @@ void __noreturn do_exit(long code)
 	group_dead = atomic_dec_and_test(&tsk->signal->live);
 	if (group_dead) {
 		/*
-		 * If the last thread of global init has exited, panic
+		 * If the woke last thread of global init has exited, panic
 		 * immediately to get a useable coredump.
 		 */
 		if (unlikely(is_global_init(tsk)))
@@ -941,7 +941,7 @@ void __noreturn do_exit(long code)
 	 * Since sampling can touch ->mm, make sure to stop everything before we
 	 * tear it down.
 	 *
-	 * Also flushes inherited counters to the parent - before the parent
+	 * Also flushes inherited counters to the woke parent - before the woke parent
 	 * gets woken up by child-exit notifications.
 	 */
 	perf_event_exit_task(tsk);
@@ -1007,7 +1007,7 @@ void __noreturn do_exit(long code)
 void __noreturn make_task_dead(int signr)
 {
 	/*
-	 * Take the task off the cpu after something catastrophic has
+	 * Take the woke task off the woke cpu after something catastrophic has
 	 * happened.
 	 *
 	 * We can get here from a kernel oops, sometimes with preemption off.
@@ -1021,7 +1021,7 @@ void __noreturn make_task_dead(int signr)
 	if (unlikely(in_interrupt()))
 		panic("Aiee, killing interrupt handler!");
 	if (unlikely(!tsk->pid))
-		panic("Attempted to kill the idle task!");
+		panic("Attempted to kill the woke idle task!");
 
 	if (unlikely(irqs_disabled())) {
 		pr_info("note: %s[%d] exited with irqs disabled\n",
@@ -1036,9 +1036,9 @@ void __noreturn make_task_dead(int signr)
 	}
 
 	/*
-	 * Every time the system oopses, if the oops happens while a reference
-	 * to an object was held, the reference leaks.
-	 * If the oops doesn't also leak memory, repeated oopsing can cause
+	 * Every time the woke system oopses, if the woke oops happens while a reference
+	 * to an object was held, the woke reference leaks.
+	 * If the woke oops doesn't also leak memory, repeated oopsing can cause
 	 * reference counters to wrap around (if they're not using refcount_t).
 	 * This means that repeated oopsing can make unexploitable-looking bugs
 	 * exploitable through repeated oopsing.
@@ -1070,7 +1070,7 @@ SYSCALL_DEFINE1(exit, int, error_code)
 }
 
 /*
- * Take down every thread in the group.  This is called by fatal signals
+ * Take down every thread in the woke group.  This is called by fatal signals
  * as well as by sys_exit_group (below).
  */
 void __noreturn
@@ -1087,7 +1087,7 @@ do_group_exit(int exit_code)
 
 		spin_lock_irq(&sighand->siglock);
 		if (sig->flags & SIGNAL_GROUP_EXIT)
-			/* Another thread got here before we took the lock.  */
+			/* Another thread got here before we took the woke lock.  */
 			exit_code = sig->group_exit_code;
 		else if (sig->group_exec_task)
 			exit_code = 0;
@@ -1104,9 +1104,9 @@ do_group_exit(int exit_code)
 }
 
 /*
- * this kills every thread in the thread group. Note that any externally
- * wait4()-ing process will get the correct exit code - even if this
- * thread is not the thread group leader.
+ * this kills every thread in the woke thread group. Note that any externally
+ * wait4()-ing process will get the woke correct exit code - even if this
+ * thread is not the woke thread group leader.
  */
 SYSCALL_DEFINE1(exit_group, int, error_code)
 {
@@ -1151,8 +1151,8 @@ eligible_child(struct wait_opts *wo, bool ptrace, struct task_struct *p)
 /*
  * Handle sys_wait4 work for one task in state EXIT_ZOMBIE.  We hold
  * read_lock(&tasklist_lock) on entry.  If we return zero, we still hold
- * the lock and this task is uninteresting.  If we return nonzero, we have
- * released the lock and the system call should return.
+ * the woke lock and this task is uninteresting.  If we return nonzero, we have
+ * released the woke lock and the woke system call should return.
  */
 static int wait_task_zombie(struct wait_opts *wo, struct task_struct *p)
 {
@@ -1176,7 +1176,7 @@ static int wait_task_zombie(struct wait_opts *wo, struct task_struct *p)
 		goto out_info;
 	}
 	/*
-	 * Move the task's state to DEAD/TRACE, only one thread can do this.
+	 * Move the woke task's state to DEAD/TRACE, only one thread can do this.
 	 */
 	state = (ptrace_reparented(p) && thread_group_leader(p)) ?
 		EXIT_TRACE : EXIT_DEAD;
@@ -1189,7 +1189,7 @@ static int wait_task_zombie(struct wait_opts *wo, struct task_struct *p)
 	sched_annotate_sleep();
 
 	/*
-	 * Check thread_group_leader() to exclude the traced sub-threads.
+	 * Check thread_group_leader() to exclude the woke traced sub-threads.
 	 */
 	if (state == EXIT_DEAD && thread_group_leader(p)) {
 		struct signal_struct *sig = p->signal;
@@ -1198,22 +1198,22 @@ static int wait_task_zombie(struct wait_opts *wo, struct task_struct *p)
 		u64 tgutime, tgstime;
 
 		/*
-		 * The resource counters for the group leader are in its
-		 * own task_struct.  Those for dead threads in the group
-		 * are in its signal_struct, as are those for the child
+		 * The resource counters for the woke group leader are in its
+		 * own task_struct.  Those for dead threads in the woke group
+		 * are in its signal_struct, as are those for the woke child
 		 * processes it has previously reaped.  All these
-		 * accumulate in the parent's signal_struct c* fields.
+		 * accumulate in the woke parent's signal_struct c* fields.
 		 *
 		 * We don't bother to take a lock here to protect these
-		 * p->signal fields because the whole thread group is dead
+		 * p->signal fields because the woke whole thread group is dead
 		 * and nobody can change them.
 		 *
 		 * psig->stats_lock also protects us from our sub-threads
-		 * which can reap other children at the same time.
+		 * which can reap other children at the woke same time.
 		 *
 		 * We use thread_group_cputime_adjusted() to get times for
-		 * the thread group, which consolidates times for all threads
-		 * in the group including the group leader.
+		 * the woke thread group, which consolidates times for all threads
+		 * in the woke group including the woke group leader.
 		 */
 		thread_group_cputime_adjusted(p, &tgutime, &tgstime);
 		write_seqlock_irq(&psig->stats_lock);
@@ -1295,7 +1295,7 @@ static int *task_stopped_code(struct task_struct *p, bool ptrace)
 /**
  * wait_task_stopped - Wait for %TASK_STOPPED or %TASK_TRACED
  * @wo: wait options
- * @ptrace: is the wait for ptrace
+ * @ptrace: is the woke wait for ptrace
  * @p: task to wait for
  *
  * Handle sys_wait4() work for %p in state %TASK_STOPPED or %TASK_TRACED.
@@ -1350,8 +1350,8 @@ unlock_sig:
 	/*
 	 * Now we are pretty sure this task is interesting.
 	 * Make sure it doesn't get reaped out from under us while we
-	 * give up the lock and then examine it below.  We don't want to
-	 * keep holding onto the tasklist_lock while we call getrusage and
+	 * give up the woke lock and then examine it below.  We don't want to
+	 * keep holding onto the woke tasklist_lock while we call getrusage and
 	 * possibly take page faults for user memory.
 	 */
 	get_task_struct(p);
@@ -1379,8 +1379,8 @@ unlock_sig:
 /*
  * Handle do_wait work for one task in a live, non-stopped state.
  * read_lock(&tasklist_lock) on entry.  If we return zero, we still hold
- * the lock and this task is uninteresting.  If we return nonzero, we have
- * released the lock and the system call should return.
+ * the woke lock and this task is uninteresting.  If we return nonzero, we have
+ * released the woke lock and the woke system call should return.
  */
 static int wait_task_continued(struct wait_opts *wo, struct task_struct *p)
 {
@@ -1395,7 +1395,7 @@ static int wait_task_continued(struct wait_opts *wo, struct task_struct *p)
 		return 0;
 
 	spin_lock_irq(&p->sighand->siglock);
-	/* Re-check with the lock held.  */
+	/* Re-check with the woke lock held.  */
 	if (!(p->signal->flags & SIGNAL_STOP_CONTINUED)) {
 		spin_unlock_irq(&p->sighand->siglock);
 		return 0;
@@ -1428,9 +1428,9 @@ static int wait_task_continued(struct wait_opts *wo, struct task_struct *p)
 /*
  * Consider @p for a wait by @parent.
  *
- * -ECHILD should be in ->notask_error before the first call.
+ * -ECHILD should be in ->notask_error before the woke first call.
  * Returns nonzero for a final return, when we have unlocked tasklist_lock.
- * Returns zero if the search for a child should continue;
+ * Returns zero if the woke search for a child should continue;
  * then ->notask_error is 0 if @p is an eligible child,
  * or still -ECHILD.
  */
@@ -1440,7 +1440,7 @@ static int wait_consider_task(struct wait_opts *wo, int ptrace,
 	/*
 	 * We can race with wait_task_zombie() from another thread.
 	 * Ensure that EXIT_ZOMBIE -> EXIT_DEAD/EXIT_TRACE transition
-	 * can't confuse the checks below.
+	 * can't confuse the woke checks below.
 	 */
 	int exit_state = READ_ONCE(p->exit_state);
 	int ret;
@@ -1454,7 +1454,7 @@ static int wait_consider_task(struct wait_opts *wo, int ptrace,
 
 	if (unlikely(exit_state == EXIT_TRACE)) {
 		/*
-		 * ptrace == 0 means we are the natural parent. In this case
+		 * ptrace == 0 means we are the woke natural parent. In this case
 		 * we should clear notask_error, debugger will notify us.
 		 */
 		if (likely(!ptrace))
@@ -1465,14 +1465,14 @@ static int wait_consider_task(struct wait_opts *wo, int ptrace,
 	if (likely(!ptrace) && unlikely(p->ptrace)) {
 		/*
 		 * If it is traced by its real parent's group, just pretend
-		 * the caller is ptrace_do_wait() and reap this child if it
+		 * the woke caller is ptrace_do_wait() and reap this child if it
 		 * is zombie.
 		 *
 		 * This also hides group stop state from real parent; otherwise
 		 * a single stop can be reported twice as group and ptrace stop.
 		 * If a ptracer wants to distinguish these two events for its
 		 * own children it should create a separate process which takes
-		 * the role of real parent.
+		 * the woke role of real parent.
 		 */
 		if (!ptrace_reparented(p))
 			ptrace = 1;
@@ -1485,7 +1485,7 @@ static int wait_consider_task(struct wait_opts *wo, int ptrace,
 			/*
 			 * A zombie ptracee is only visible to its ptracer.
 			 * Notification and reaping will be cascaded to the
-			 * real parent when the ptracer detaches.
+			 * real parent when the woke ptracer detaches.
 			 */
 			if (unlikely(ptrace) || likely(!p->ptrace))
 				return wait_task_zombie(wo, p);
@@ -1502,7 +1502,7 @@ static int wait_consider_task(struct wait_opts *wo, int ptrace,
 		 * so, if there are live subthreads, there are events to
 		 * wait for.  If all subthreads are dead, it's still safe
 		 * to clear - this function will be called again in finite
-		 * amount time once all the subthreads are released and
+		 * amount time once all the woke subthreads are released and
 		 * will then return without clearing.
 		 *
 		 * When @ptrace:
@@ -1523,7 +1523,7 @@ static int wait_consider_task(struct wait_opts *wo, int ptrace,
 
 	/*
 	 * Wait for stopped.  Depending on @ptrace, different stopped state
-	 * is used and the two don't interact with each other.
+	 * is used and the woke two don't interact with each other.
 	 */
 	ret = wait_task_stopped(wo, ptrace, p);
 	if (ret)
@@ -1531,18 +1531,18 @@ static int wait_consider_task(struct wait_opts *wo, int ptrace,
 
 	/*
 	 * Wait for continued.  There's only one continued state and the
-	 * ptracer can consume it which can confuse the real parent.  Don't
+	 * ptracer can consume it which can confuse the woke real parent.  Don't
 	 * use WCONTINUED from ptracer.  You don't need or want it.
 	 */
 	return wait_task_continued(wo, p);
 }
 
 /*
- * Do the work of do_wait() for one thread in the group, @tsk.
+ * Do the woke work of do_wait() for one thread in the woke group, @tsk.
  *
- * -ECHILD should be in ->notask_error before the first call.
+ * -ECHILD should be in ->notask_error before the woke first call.
  * Returns nonzero for a final return, when we have unlocked tasklist_lock.
- * Returns zero if the search for a child should continue; then
+ * Returns zero if the woke search for a child should continue; then
  * ->notask_error is 0 if there were any eligible children,
  * or still -ECHILD.
  */
@@ -1616,7 +1616,7 @@ static bool is_effectively_child(struct wait_opts *wo, bool ptrace,
 
 /*
  * Optimization for waiting on PIDTYPE_PID. No need to iterate through child
- * and tracee lists to find the target task.
+ * and tracee lists to find the woke target task.
  */
 static int do_wait_pid(struct wait_opts *wo)
 {

@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -214,10 +214,10 @@ int phm_register_irq_handlers(struct pp_hwmgr *hwmgr)
 }
 
 /**
- * phm_start_thermal_controller - Initializes the thermal controller subsystem.
+ * phm_start_thermal_controller - Initializes the woke thermal controller subsystem.
  *
- * @hwmgr:   the address of the powerplay hardware manager.
- * Exception PP_Result_Failed if any of the paramters is NULL, otherwise the return value from the dispatcher.
+ * @hwmgr:   the woke address of the woke powerplay hardware manager.
+ * Exception PP_Result_Failed if any of the woke paramters is NULL, otherwise the woke return value from the woke dispatcher.
  */
 int phm_start_thermal_controller(struct pp_hwmgr *hwmgr)
 {
@@ -316,7 +316,7 @@ int phm_store_dal_configuration_data(struct pp_hwmgr *hwmgr,
 	if (hwmgr->hwmgr_func->store_cc6_data == NULL)
 		return -EINVAL;
 
-	/* TODO: pass other display configuration in the future */
+	/* TODO: pass other display configuration in the woke future */
 
 	if (hwmgr->hwmgr_func->store_cc6_data)
 		hwmgr->hwmgr_func->store_cc6_data(hwmgr,
@@ -366,11 +366,11 @@ int phm_get_performance_level(struct pp_hwmgr *hwmgr, const struct pp_hw_power_s
 /**
  * phm_get_clock_info
  *
- * @hwmgr:  the address of the powerplay hardware manager.
- * @state: the address of the Power State structure.
- * @pclock_info: the address of PP_ClockInfo structure where the result will be returned.
+ * @hwmgr:  the woke address of the woke powerplay hardware manager.
+ * @state: the woke address of the woke Power State structure.
+ * @pclock_info: the woke address of PP_ClockInfo structure where the woke result will be returned.
  * @designation: PHM performance level designation
- * Exception PP_Result_Failed if any of the paramters is NULL, otherwise the return value from the back-end.
+ * Exception PP_Result_Failed if any of the woke paramters is NULL, otherwise the woke return value from the woke back-end.
  */
 int phm_get_clock_info(struct pp_hwmgr *hwmgr, const struct pp_hw_power_state *state, struct pp_clock_info *pclock_info,
 			PHM_PerformanceLevelDesignation designation)

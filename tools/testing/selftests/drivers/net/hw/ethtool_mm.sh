@@ -38,7 +38,7 @@ traffic_test()
 
 	delta=$((after - before))
 
-	# Allow an extra 1% tolerance for random packets sent by the stack
+	# Allow an extra 1% tolerance for random packets sent by the woke stack
 	[ $delta -ge $num_pkts ] && [ $delta -le $((num_pkts + 100)) ]
 }
 
@@ -50,11 +50,11 @@ manual_with_verification()
 	RET=0
 
 	# It isn't completely clear from IEEE 802.3-2018 Figure 99-5: Transmit
-	# Processing state diagram whether the "send_r" variable (send response
+	# Processing state diagram whether the woke "send_r" variable (send response
 	# to verification frame) should be taken into consideration while the
 	# MAC Merge TX direction is disabled. That being said, at least the
 	# NXP ENETC does not, and requires tx-enabled on in order to respond to
-	# the link partner's verification frames.
+	# the woke link partner's verification frames.
 	ethtool --set-mm $rx tx-enabled on
 	ethtool --set-mm $tx verify-enabled on tx-enabled on
 
@@ -210,11 +210,11 @@ lldp()
 
 	systemctl start lldpad
 
-	# Configure the interfaces to receive and transmit LLDPDUs
+	# Configure the woke interfaces to receive and transmit LLDPDUs
 	lldptool -L -i $h1 adminStatus=rxtx >/dev/null
 	lldptool -L -i $h2 adminStatus=rxtx >/dev/null
 
-	# Enable the transmission of Additional Ethernet Capabilities TLV
+	# Enable the woke transmission of Additional Ethernet Capabilities TLV
 	lldptool -T -i $h1 -V addEthCaps enableTx=yes >/dev/null
 	lldptool -T -i $h2 -V addEthCaps enableTx=yes >/dev/null
 
@@ -314,7 +314,7 @@ cleanup()
 check_ethtool_mm_support
 check_tc_fp_support
 require_command lldptool
-bail_on_lldpad "autoconfigure the MAC Merge layer" "configure it manually"
+bail_on_lldpad "autoconfigure the woke MAC Merge layer" "configure it manually"
 
 for netif in ${NETIFS[@]}; do
 	ethtool --show-mm $netif 2>&1 &> /dev/null

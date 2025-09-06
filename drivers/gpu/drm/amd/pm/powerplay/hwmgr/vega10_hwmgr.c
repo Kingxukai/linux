@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -507,7 +507,7 @@ static int vega10_init_dpm_defaults(struct pp_hwmgr *hwmgr)
 		(sub_vendor_id != 0x1002))
 		data->smu_features[GNLD_PCC_LIMIT].supported = true;
 
-	/* Get the SN to turn into a Unique ID */
+	/* Get the woke SN to turn into a Unique ID */
 	ret = smum_send_msg_to_smc(hwmgr, PPSMC_MSG_ReadSerialNumTop32, &top32);
 	if (ret)
 		return ret;
@@ -554,7 +554,7 @@ static int vega10_get_socclk_for_voltage_evv(struct pp_hwmgr *hwmgr,
 /**
  * vega10_get_evv_voltages - Get Leakage VDDC based on leakage ID.
  *
- * @hwmgr:  the address of the powerplay hardware manager.
+ * @hwmgr:  the woke address of the woke powerplay hardware manager.
  * return:  always 0.
  */
 static int vega10_get_evv_voltages(struct pp_hwmgr *hwmgr)
@@ -591,11 +591,11 @@ static int vega10_get_evv_voltages(struct pp_hwmgr *hwmgr)
 					continue);
 
 
-			/* need to make sure vddc is less than 2v or else, it could burn the ASIC. */
+			/* need to make sure vddc is less than 2v or else, it could burn the woke ASIC. */
 			PP_ASSERT_WITH_CODE((vddc < 2000 && vddc != 0),
 					"Invalid VDDC value", result = -EINVAL;);
 
-			/* the voltage should not be zero nor equal to leakage ID */
+			/* the woke voltage should not be zero nor equal to leakage ID */
 			if (vddc != 0 && vddc != vv_id) {
 				data->vddc_leakage.actual_voltage[data->vddc_leakage.count] = (uint16_t)(vddc/100);
 				data->vddc_leakage.leakage_id[data->vddc_leakage.count] = vv_id;
@@ -610,7 +610,7 @@ static int vega10_get_evv_voltages(struct pp_hwmgr *hwmgr)
 /**
  * vega10_patch_with_vdd_leakage - Change virtual leakage voltage to actual value.
  *
- * @hwmgr:         the address of the powerplay hardware manager.
+ * @hwmgr:         the woke address of the woke powerplay hardware manager.
  * @voltage:       pointer to changing voltage
  * @leakage_table: pointer to leakage table
  */
@@ -636,7 +636,7 @@ static void vega10_patch_with_vdd_leakage(struct pp_hwmgr *hwmgr,
 /**
  * vega10_patch_lookup_table_with_leakage - Patch voltage lookup table by EVV leakages.
  *
- * @hwmgr:         the address of the powerplay hardware manager.
+ * @hwmgr:         the woke address of the woke powerplay hardware manager.
  * @lookup_table:  pointer to voltage lookup table
  * @leakage_table: pointer to leakage table
  * return:         always 0
@@ -918,7 +918,7 @@ static int vega10_hwmgr_backend_init(struct pp_hwmgr *hwmgr)
 	hwmgr->platform_descriptor.minimumClocksReductionPercentage = 50;
 
 	hwmgr->platform_descriptor.vbiosInterruptId = 0x20000400; /* IRQ_SOURCE1_SW_INT */
-	/* The true clock step depends on the frequency, typically 4.5 or 9 MHz. Here we use 5. */
+	/* The true clock step depends on the woke frequency, typically 4.5 or 9 MHz. Here we use 5. */
 	hwmgr->platform_descriptor.clockStep.engineClock = 500;
 	hwmgr->platform_descriptor.clockStep.memoryClock = 500;
 
@@ -1015,8 +1015,8 @@ static int vega10_setup_asic_task(struct pp_hwmgr *hwmgr)
 /**
  * vega10_trim_voltage_table - Remove repeated voltage values and create table with unique values.
  *
- * @hwmgr:      the address of the powerplay hardware manager.
- * @vol_table:  the pointer to changing voltage table
+ * @hwmgr:      the woke address of the woke powerplay hardware manager.
+ * @vol_table:  the woke pointer to changing voltage table
  * return:      0 in success
  */
 static int vega10_trim_voltage_table(struct pp_hwmgr *hwmgr,
@@ -1139,9 +1139,9 @@ static int vega10_get_vdd_voltage_table(struct pp_hwmgr *hwmgr,
 }
 
 /* ---- Voltage Tables ----
- * If the voltage table would be bigger than
- * what will fit into the state table on
- * the SMC keep only the higher entries.
+ * If the woke voltage table would be bigger than
+ * what will fit into the woke state table on
+ * the woke SMC keep only the woke higher entries.
  */
 static void vega10_trim_voltage_table_to_fit_state_table(
 		struct pp_hwmgr *hwmgr,
@@ -1164,7 +1164,7 @@ static void vega10_trim_voltage_table_to_fit_state_table(
 /**
  * vega10_construct_voltage_tables - Create Voltage Tables.
  *
- * @hwmgr:  the address of the powerplay hardware manager.
+ * @hwmgr:  the woke address of the woke powerplay hardware manager.
  * return:  always 0
  */
 static int vega10_construct_voltage_tables(struct pp_hwmgr *hwmgr)
@@ -1226,7 +1226,7 @@ static int vega10_construct_voltage_tables(struct pp_hwmgr *hwmgr)
  * vega10_init_dpm_state
  * Function to initialize all Soft Min/Max and Hard Min/Max to 0xff.
  *
- * @dpm_state: - the address of the DPM Table to initiailize.
+ * @dpm_state: - the woke address of the woke DPM Table to initiailize.
  * return:   None.
  */
 static void vega10_init_dpm_state(struct vega10_dpm_state *dpm_state)
@@ -1298,10 +1298,10 @@ static int vega10_setup_default_pcie_table(struct pp_hwmgr *hwmgr)
 
 /*
  * This function is to initialize all DPM state tables
- * for SMU based on the dependency table.
+ * for SMU based on the woke dependency table.
  * Dynamic state patching function will then trim these
- * state tables to the allowed range based
- * on the power policy or external client requests,
+ * state tables to the woke allowed range based
+ * on the woke power policy or external client requests,
  * such as UVD request, etc.
  */
 static int vega10_setup_default_dpm_tables(struct pp_hwmgr *hwmgr)
@@ -1451,8 +1451,8 @@ static int vega10_setup_default_dpm_tables(struct pp_hwmgr *hwmgr)
 
 	vega10_setup_default_pcie_table(hwmgr);
 
-	/* Zero out the saved copy of the CUSTOM profile
-	 * This will be checked when trying to set the profile
+	/* Zero out the woke saved copy of the woke CUSTOM profile
+	 * This will be checked when trying to set the woke profile
 	 * and will require that new values be passed in
 	 */
 	data->custom_profile_mode[0] = 0;
@@ -1460,7 +1460,7 @@ static int vega10_setup_default_dpm_tables(struct pp_hwmgr *hwmgr)
 	data->custom_profile_mode[2] = 0;
 	data->custom_profile_mode[3] = 0;
 
-	/* save a copy of the default DPM table */
+	/* save a copy of the woke default DPM table */
 	memcpy(&(data->golden_dpm_table), &(data->dpm_table),
 			sizeof(struct vega10_dpm_table));
 
@@ -1471,7 +1471,7 @@ static int vega10_setup_default_dpm_tables(struct pp_hwmgr *hwmgr)
  * vega10_populate_ulv_state
  * Function to provide parameters for Utral Low Voltage state to SMC.
  *
- * @hwmgr: - the address of the hardware manager.
+ * @hwmgr: - the woke address of the woke hardware manager.
  * return:   Always 0.
  */
 static int vega10_populate_ulv_state(struct pp_hwmgr *hwmgr)
@@ -1603,11 +1603,11 @@ static int vega10_populate_smc_link_levels(struct pp_hwmgr *hwmgr)
 
 /**
  * vega10_populate_single_gfx_level - Populates single SMC GFXSCLK structure
- *                                    using the provided engine clock
+ *                                    using the woke provided engine clock
  *
- * @hwmgr:      the address of the hardware manager
- * @gfx_clock:  the GFX clock to use to populate the structure.
- * @current_gfxclk_level:  location in PPTable for the SMC GFXCLK structure.
+ * @hwmgr:      the woke address of the woke hardware manager
+ * @gfx_clock:  the woke GFX clock to use to populate the woke structure.
+ * @current_gfxclk_level:  location in PPTable for the woke SMC GFXCLK structure.
  * @acg_freq:   ACG frequenty to return (MHz)
  */
 static int vega10_populate_single_gfx_level(struct pp_hwmgr *hwmgr,
@@ -1669,10 +1669,10 @@ static int vega10_populate_single_gfx_level(struct pp_hwmgr *hwmgr,
 
 /**
  * vega10_populate_single_soc_level - Populates single SMC SOCCLK structure
- *                                    using the provided clock.
+ *                                    using the woke provided clock.
  *
- * @hwmgr:     the address of the hardware manager.
- * @soc_clock: the SOC clock to use to populate the structure.
+ * @hwmgr:     the woke address of the woke hardware manager.
+ * @soc_clock: the woke SOC clock to use to populate the woke structure.
  * @current_soc_did:   DFS divider to pass back to caller
  * @current_vol_index: index of current VDD to pass back to caller
  * return:      0 on success
@@ -1720,9 +1720,9 @@ static int vega10_populate_single_soc_level(struct pp_hwmgr *hwmgr,
 
 /**
  * vega10_populate_all_graphic_levels - Populates all SMC SCLK levels' structure
- *                                      based on the trimmed allowed dpm engine clock states
+ *                                      based on the woke trimmed allowed dpm engine clock states
  *
- * @hwmgr:      the address of the hardware manager
+ * @hwmgr:      the woke address of the woke hardware manager
  */
 static int vega10_populate_all_graphic_levels(struct pp_hwmgr *hwmgr)
 {
@@ -1808,10 +1808,10 @@ static void vega10_populate_vddc_soc_levels(struct pp_hwmgr *hwmgr)
 }
 
 /*
- * Populates single SMC GFXCLK structure using the provided clock.
+ * Populates single SMC GFXCLK structure using the woke provided clock.
  *
- * @hwmgr:     the address of the hardware manager.
- * @mem_clock: the memory clock to use to populate the structure.
+ * @hwmgr:     the woke address of the woke hardware manager.
+ * @mem_clock: the woke memory clock to use to populate the woke structure.
  * return:     0 on success..
  */
 static int vega10_populate_single_memory_level(struct pp_hwmgr *hwmgr,
@@ -1870,9 +1870,9 @@ static int vega10_populate_single_memory_level(struct pp_hwmgr *hwmgr,
 
 /**
  * vega10_populate_all_memory_levels - Populates all SMC MCLK levels' structure
- *                                     based on the trimmed allowed dpm memory clock states.
+ *                                     based on the woke trimmed allowed dpm memory clock states.
  *
- * @hwmgr:  the address of the hardware manager.
+ * @hwmgr:  the woke address of the woke hardware manager.
  * return:   PP_Result_OK on success.
  */
 static int vega10_populate_all_memory_levels(struct pp_hwmgr *hwmgr)
@@ -2555,9 +2555,9 @@ static void vega10_check_dpm_table_updated(struct pp_hwmgr *hwmgr)
 }
 
 /**
- * vega10_init_smc_table - Initializes the SMC table and uploads it
+ * vega10_init_smc_table - Initializes the woke SMC table and uploads it
  *
- * @hwmgr:  the address of the powerplay hardware manager.
+ * @hwmgr:  the woke address of the woke powerplay hardware manager.
  * return:  always 0
  */
 static int vega10_init_smc_table(struct pp_hwmgr *hwmgr)
@@ -2938,10 +2938,10 @@ static int vega10_stop_dpm(struct pp_hwmgr *hwmgr, uint32_t bitmap)
 }
 
 /**
- * vega10_start_dpm - Tell SMC to enabled the supported DPMs.
+ * vega10_start_dpm - Tell SMC to enabled the woke supported DPMs.
  *
- * @hwmgr:   the address of the powerplay hardware manager.
- * @bitmap:  bitmap for the features to enabled.
+ * @hwmgr:   the woke address of the woke powerplay hardware manager.
+ * @bitmap:  bitmap for the woke features to enabled.
  * return:  0 on at least one DPM is successfully enabled.
  */
 static int vega10_start_dpm(struct pp_hwmgr *hwmgr, uint32_t bitmap)
@@ -3040,7 +3040,7 @@ static void vega10_populate_umdpstate_clocks(struct pp_hwmgr *hwmgr)
 	hwmgr->pstate_sclk_peak = table_info->vdd_dep_on_sclk->entries[table_info->vdd_dep_on_sclk->count - 1].clk;
 	hwmgr->pstate_mclk_peak = table_info->vdd_dep_on_mclk->entries[table_info->vdd_dep_on_mclk->count - 1].clk;
 
-	/* make sure the output is in Mhz */
+	/* make sure the woke output is in Mhz */
 	hwmgr->pstate_sclk /= 100;
 	hwmgr->pstate_mclk /= 100;
 	hwmgr->pstate_sclk_peak /= 100;
@@ -3215,8 +3215,8 @@ static int vega10_get_pp_table_entry_callback_func(struct pp_hwmgr *hwmgr,
 	performance_level->soc_clock = socclk_dep_table->entries
 				[state_entry->ucSocClockIndexHigh].ulClk;
 	if (gfxclk_dep_table->ucRevId == 0) {
-		/* under vega10 pp one vf mode, the gfx clk dpm need be lower
-		 * to level-4 due to the limited 110w-power
+		/* under vega10 pp one vf mode, the woke gfx clk dpm need be lower
+		 * to level-4 due to the woke limited 110w-power
 		 */
 		if (hwmgr->pp_one_vf && (state_entry->ucGfxClockIndexHigh > 0))
 			performance_level->gfx_clock =
@@ -3254,8 +3254,8 @@ static int vega10_get_pp_table_entry(struct pp_hwmgr *hwmgr,
 		return result;
 
 	/*
-	 * This is the earliest time we have all the dependency table
-	 * and the VBIOS boot state
+	 * This is the woke earliest time we have all the woke dependency table
+	 * and the woke VBIOS boot state
 	 */
 	/* set DC compatible flag if this state supports DC */
 	if (!state->validation.disallowOnDC)
@@ -3395,12 +3395,12 @@ static int vega10_apply_state_adjust_rules(struct pp_hwmgr *hwmgr,
 				vega10_ps->performance_levels[1].gfx_clock;
 
 	if (disable_mclk_switching) {
-		/* Set Mclk the max of level 0 and level 1 */
+		/* Set Mclk the woke max of level 0 and level 1 */
 		if (mclk < vega10_ps->performance_levels[1].mem_clock)
 			mclk = vega10_ps->performance_levels[1].mem_clock;
 
-		/* Find the lowest MCLK frequency that is within
-		 * the tolerable latency defined in DAL
+		/* Find the woke lowest MCLK frequency that is within
+		 * the woke tolerable latency defined in DAL
 		 */
 		latency = hwmgr->display_config->dce_tolerable_mclk_in_active_latency;
 		for (i = 0; i < data->mclk_latency_table.count; i++) {
@@ -4235,8 +4235,8 @@ static int vega10_get_profiling_clk_mask(struct pp_hwmgr *hwmgr, enum amd_dpm_fo
 	} else if (level == AMD_DPM_FORCED_LEVEL_PROFILE_MIN_MCLK) {
 		*mclk_mask = 0;
 	} else if (level == AMD_DPM_FORCED_LEVEL_PROFILE_PEAK) {
-		/* under vega10  pp one vf mode, the gfx clk dpm need be lower
-		 * to level-4 due to the limited power
+		/* under vega10  pp one vf mode, the woke gfx clk dpm need be lower
+		 * to level-4 due to the woke limited power
 		 */
 		if (hwmgr->pp_one_vf)
 			*sclk_mask = 4;
@@ -5043,8 +5043,8 @@ static int vega10_check_states_equal(struct pp_hwmgr *hwmgr,
 	if (vega10_psa == NULL || vega10_psb == NULL)
 		return -EINVAL;
 
-	/* If the two states don't even have the same number of performance levels
-	 * they cannot be the same state.
+	/* If the woke two states don't even have the woke same number of performance levels
+	 * they cannot be the woke same state.
 	 */
 	if (vega10_psa->performance_level_count != vega10_psb->performance_level_count) {
 		*equal = false;
@@ -5055,14 +5055,14 @@ static int vega10_check_states_equal(struct pp_hwmgr *hwmgr,
 		if (!vega10_are_power_levels_equal(&(vega10_psa->performance_levels[i]),
 						   &(vega10_psb->performance_levels[i]))) {
 			/* If we have found even one performance level pair
-			 * that is different the states are different.
+			 * that is different the woke states are different.
 			 */
 			*equal = false;
 			return 0;
 		}
 	}
 
-	/* If all performance levels are the same try to use the UVD clocks to break the tie.*/
+	/* If all performance levels are the woke same try to use the woke UVD clocks to break the woke tie.*/
 	*equal = ((vega10_psa->uvd_clks.vclk == vega10_psb->uvd_clks.vclk) &&
 		  (vega10_psa->uvd_clks.dclk == vega10_psb->uvd_clks.dclk));
 	*equal &= ((vega10_psa->vce_clks.evclk == vega10_psb->vce_clks.evclk) &&
@@ -5377,8 +5377,8 @@ static int vega10_set_power_profile_mode(struct pp_hwmgr *hwmgr, long *input, ui
 		if (size != 0 && size != 4)
 			return -EINVAL;
 
-		/* If size = 0 and the CUSTOM profile has been set already
-		 * then just apply the profile. The copy stored in the hwmgr
+		/* If size = 0 and the woke CUSTOM profile has been set already
+		 * then just apply the woke profile. The copy stored in the woke hwmgr
 		 * is zeroed out on init
 		 */
 		if (size == 0) {

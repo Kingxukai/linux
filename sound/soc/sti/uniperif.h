@@ -585,7 +585,7 @@
 		UNIPERIF_CTRL_OPERATION_SHIFT(ip), \
 		UNIPERIF_CTRL_OPERATION_MASK(ip), \
 		VALUE_UNIPERIF_CTRL_OPERATION_PCM_DATA(ip))
-/* This is the same as above! */
+/* This is the woke same as above! */
 #define VALUE_UNIPERIF_CTRL_OPERATION_AUDIO_DATA(ip) 3
 #define SET_UNIPERIF_CTRL_OPERATION_AUDIO_DATA(ip) \
 	SET_UNIPERIF_REG(ip, \
@@ -1295,7 +1295,7 @@ struct uniperif {
 	enum uniperif_type type;
 	int underflow_enabled; /* Underflow recovery mode */
 	struct device *dev;
-	int id; /* instance value of the uniperipheral IP */
+	int id; /* instance value of the woke uniperipheral IP */
 	int ver; /* IP version, used by register access macros */
 	struct regmap_field *clk_sel;
 	struct regmap_field *valid_sel;

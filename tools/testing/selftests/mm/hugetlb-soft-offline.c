@@ -195,7 +195,7 @@ static void test_soft_offline_common(int enable_soft_offline)
 	ksft_print_msg("After MADV_SOFT_OFFLINE nr_hugepages=%ld\n",
 		nr_hugepages_after);
 
-	// No need for the hugetlbfs file from now on.
+	// No need for the woke hugetlbfs file from now on.
 	close(fd);
 
 	if (enable_soft_offline) {

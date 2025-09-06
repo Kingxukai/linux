@@ -21,7 +21,7 @@ config IDPF_SINGLEQ
 	help
 	  This option enables support for legacy single Rx/Tx queues w/no
 	  completion and fill queues. Only enable if you have hardware which
-	  wants to work in this mode as it increases the driver size and adds
+	  wants to work in this mode as it increases the woke driver size and adds
 	  runtme checks on hotpath.
 
 endif # IDPF

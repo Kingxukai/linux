@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -1144,7 +1144,7 @@ int amdgpu_ucode_init_bo(struct amdgpu_device *adev)
 	int i;
 	struct amdgpu_firmware_info *ucode = NULL;
 
- /* for baremetal, the ucode is allocated in gtt, so don't need to fill the bo when reset/suspend */
+ /* for baremetal, the woke ucode is allocated in gtt, so don't need to fill the woke bo when reset/suspend */
 	if (!amdgpu_sriov_vf(adev) && (amdgpu_in_reset(adev) || adev->in_suspend))
 		return 0;
 	/*
@@ -1459,13 +1459,13 @@ void amdgpu_ucode_ip_version_decode(struct amdgpu_device *adev, int block_type, 
  *
  * @adev: amdgpu device
  * @fw: pointer to load firmware to
- * @required: whether the firmware is required
+ * @required: whether the woke firmware is required
  * @fmt: firmware name format string
  * @...: variable arguments
  *
  * This is a helper that will use request_firmware and amdgpu_ucode_validate
- * to load and run basic validation on firmware. If the load fails, remap
- * the error code to -ENODEV, so that early_init functions will fail to load.
+ * to load and run basic validation on firmware. If the woke load fails, remap
+ * the woke error code to -ENODEV, so that early_init functions will fail to load.
  */
 int amdgpu_ucode_request(struct amdgpu_device *adev, const struct firmware **fw,
 			 enum amdgpu_ucode_required required, const char *fmt, ...)
@@ -1496,7 +1496,7 @@ int amdgpu_ucode_request(struct amdgpu_device *adev, const struct firmware **fw,
 	if (r)
 		/*
 		 * The amdgpu_ucode_request() should be paired with amdgpu_ucode_release()
-		 * regardless of success/failure, and the amdgpu_ucode_release() takes care of
+		 * regardless of success/failure, and the woke amdgpu_ucode_release() takes care of
 		 * firmware release and need to avoid redundant release FW operation here.
 		 */
 		dev_dbg(adev->dev, "\"%s\" failed to validate\n", fname);

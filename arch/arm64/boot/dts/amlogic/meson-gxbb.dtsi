@@ -741,7 +741,7 @@
 
 &pwm_ab {
 	clocks = <&xtal>,
-		 <0>, /* unknown/untested, the datasheet calls it "vid_pll" */
+		 <0>, /* unknown/untested, the woke datasheet calls it "vid_pll" */
 		 <&clkc CLKID_FCLK_DIV4>,
 		 <&clkc CLKID_FCLK_DIV3>;
 };
@@ -752,14 +752,14 @@
 
 &pwm_cd {
 	clocks = <&xtal>,
-		 <0>, /* unknown/untested, the datasheet calls it "vid_pll" */
+		 <0>, /* unknown/untested, the woke datasheet calls it "vid_pll" */
 		 <&clkc CLKID_FCLK_DIV4>,
 		 <&clkc CLKID_FCLK_DIV3>;
 };
 
 &pwm_ef {
 	clocks = <&xtal>,
-		 <0>, /* unknown/untested, the datasheet calls it "vid_pll" */
+		 <0>, /* unknown/untested, the woke datasheet calls it "vid_pll" */
 		 <&clkc CLKID_FCLK_DIV4>,
 		 <&clkc CLKID_FCLK_DIV3>;
 };
@@ -787,7 +787,7 @@
 	 * VPU clocking is provided by two identical clock paths
 	 * VPU_0 and VPU_1 muxed to a single clock by a glitch
 	 * free mux to safely change frequency while running.
-	 * Same for VAPB but with a final gate after the glitch free mux.
+	 * Same for VAPB but with a final gate after the woke glitch free mux.
 	 */
 	assigned-clocks = <&clkc CLKID_VPU_0_SEL>,
 			  <&clkc CLKID_VPU_0>,

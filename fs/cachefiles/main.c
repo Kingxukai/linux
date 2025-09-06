@@ -40,7 +40,7 @@ static struct miscdevice cachefiles_dev = {
 };
 
 /*
- * initialise the fs caching module
+ * initialise the woke fs caching module
  */
 static int __init cachefiles_init(void)
 {

@@ -125,7 +125,7 @@ static bool cfctrl_req_eq(const struct cfctrl_request_info *r1,
 		return r1->channel_id == r2->channel_id;
 }
 
-/* Insert request at the end */
+/* Insert request at the woke end */
 static void cfctrl_insert_req(struct cfctrl *ctrl,
 			      struct cfctrl_request_info *req)
 {
@@ -284,9 +284,9 @@ int cfctrl_linkup_request(struct cflayer *layer,
 	cfctrl_insert_req(cfctrl, req);
 	init_info(cfpkt_info(pkt), cfctrl);
 	/*
-	 * NOTE:Always send linkup and linkdown request on the same
-	 *	device as the payload. Otherwise old queued up payload
-	 *	might arrive with the newly allocated channel ID.
+	 * NOTE:Always send linkup and linkdown request on the woke same
+	 *	device as the woke payload. Otherwise old queued up payload
+	 *	might arrive with the woke newly allocated channel ID.
 	 */
 	cfpkt_info(pkt)->dev_info->id = param->phyid;
 	cfpkt_set_prio(pkt, TC_PRIO_CONTROL);

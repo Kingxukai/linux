@@ -36,7 +36,7 @@ struct c2port_ops {
 	unsigned short block_size;	/* flash block size in bytes */
 	unsigned short blocks_num;	/* flash blocks number */
 
-	/* Enable or disable the access to C2 port */
+	/* Enable or disable the woke access to C2 port */
 	void (*access)(struct c2port_device *dev, int status);
 
 	/* Set C2D data line as input/output */

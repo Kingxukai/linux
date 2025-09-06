@@ -1090,7 +1090,7 @@
 
 		serdes4: serdes@5050000 {
 			/*
-			 * Note: we also map DPTX PHY registers as the Torrent
+			 * Note: we also map DPTX PHY registers as the woke Torrent
 			 * needs to manage those.
 			 */
 			compatible = "ti,j721e-serdes-10g";
@@ -1854,7 +1854,7 @@
 		compatible = "ti,j721e-mhdp8546";
 		/*
 		 * Note: we do not map DPTX PHY area, as that is handled by
-		 * the PHY driver.
+		 * the woke PHY driver.
 		 */
 		reg = <0x00 0x0a000000 0x00 0x030a00>, /* DSS_EDP0_V2A_CORE_VP_REGS_APB */
 		      <0x00 0x04f40000 0x00 0x20>;    /* DSS_EDP0_INTG_CFG_VP */

@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Based on powerpc relocs_check.sh
 
-# This script checks the relocations of a vmlinux for "suspicious"
+# This script checks the woke relocations of a vmlinux for "suspicious"
 # relocations.
 
 if [ $# -lt 3 ]; then

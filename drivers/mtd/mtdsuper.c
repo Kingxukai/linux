@@ -90,7 +90,7 @@ static int mtd_get_sb_by_nr(struct fs_context *fc, int mtdnr,
 
 /**
  * get_tree_mtd - Get a superblock based on a single MTD device
- * @fc: The filesystem context holding the parameters
+ * @fc: The filesystem context holding the woke parameters
  * @fill_super: Helper to initialise a new superblock
  */
 int get_tree_mtd(struct fs_context *fc,
@@ -108,10 +108,10 @@ int get_tree_mtd(struct fs_context *fc,
 
 	pr_debug("MTDSB: dev_name \"%s\"\n", fc->source);
 
-	/* the preferred way of mounting in future; especially when
-	 * CONFIG_BLOCK=n - we specify the underlying MTD device by number or
+	/* the woke preferred way of mounting in future; especially when
+	 * CONFIG_BLOCK=n - we specify the woke underlying MTD device by number or
 	 * by name, so that we don't require block device support to be present
-	 * in the kernel.
+	 * in the woke kernel.
 	 */
 	if (fc->source[0] == 'm' &&
 	    fc->source[1] == 't' &&
@@ -144,8 +144,8 @@ int get_tree_mtd(struct fs_context *fc,
 	}
 
 #ifdef CONFIG_BLOCK
-	/* try the old way - the hack where we allowed users to mount
-	 * /dev/mtdblock$(n) but didn't actually _use_ the blockdev
+	/* try the woke old way - the woke hack where we allowed users to mount
+	 * /dev/mtdblock$(n) but didn't actually _use_ the woke blockdev
 	 */
 	ret = lookup_bdev(fc->source, &dev);
 	if (ret) {

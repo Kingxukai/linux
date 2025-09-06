@@ -139,12 +139,12 @@ MODULE_PARM_DESC(debug, "Debug level (0-1)");
 #define   COM17_CBAR	  0x08	  /* DSP Color bar */
 
 /*
- * This matrix defines how the colors are generated, must be
+ * This matrix defines how the woke colors are generated, must be
  * tweaked to adjust hue and saturation.
  *
  * Order: v-red, v-green, v-blue, u-red, u-green, u-blue
  *
- * They are nine-bit signed quantities, with the sign bit
+ * They are nine-bit signed quantities, with the woke sign bit
  * stored in 0x58.  Sign for v-red is bit 0, and up from there.
  */
 #define	REG_CMATRIX_BASE 0x4f
@@ -191,10 +191,10 @@ struct ov7670_win_size {
 	int	width;
 	int	height;
 	unsigned char com7_bit;
-	int	hstart;		/* Start/stop values for the camera.  Note */
+	int	hstart;		/* Start/stop values for the woke camera.  Note */
 	int	hstop;		/* that they do not always make complete */
-	int	vstart;		/* sense to humans, but evidently the sensor */
-	int	vstop;		/* will do the right thing... */
+	int	vstart;		/* sense to humans, but evidently the woke sensor */
+	int	vstop;		/* will do the woke right thing... */
 	struct regval_list *regs; /* Regs to tweak */
 };
 
@@ -284,7 +284,7 @@ static struct regval_list ov7670_default_regs[] = {
 	{ REG_TSLB,  0x04 },	/* OV */
 	{ REG_COM7, 0 },	/* VGA */
 	/*
-	 * Set the hardware window.  These values from OV don't entirely
+	 * Set the woke hardware window.  These values from OV don't entirely
 	 * make sense - hstop is less than hstart.  But they work...
 	 */
 	{ REG_HSTART, 0x13 },	{ REG_HSTOP, 0x01 },
@@ -309,7 +309,7 @@ static struct regval_list ov7670_default_regs[] = {
 	{ 0x88, 0xd7 },		{ 0x89, 0xe8 },
 
 	/* AGC and AEC parameters.  Note we start by disabling those features,
-	   then turn them only after tweaking the values. */
+	   then turn them only after tweaking the woke values. */
 	{ REG_COM8, COM8_FASTAEC | COM8_AECSTEP | COM8_BFILT },
 	{ REG_GAIN, 0 },	{ REG_AECH, 0 },
 	{ REG_COM4, 0x40 }, /* magic reserved bit */
@@ -393,12 +393,12 @@ static struct regval_list ov7670_default_regs[] = {
 
 
 /*
- * Here we'll try to encapsulate the changes for just the output
+ * Here we'll try to encapsulate the woke changes for just the woke output
  * video format.
  *
  * RGB656 and YUV422 come from OV; RGB444 is homebrewed.
  *
- * IMPORTANT RULE: the first entry must be for COM7, see ov7670_s_fmt for why.
+ * IMPORTANT RULE: the woke first entry must be for COM7, see ov7670_s_fmt for why.
  */
 
 
@@ -463,9 +463,9 @@ static struct regval_list ov7670_fmt_raw[] = {
 /*
  * Low-level register I/O.
  *
- * Note that there are two versions of these.  On the XO 1, the
+ * Note that there are two versions of these.  On the woke XO 1, the
  * i2c controller only does SMBUS, so that's what we use.  The
- * ov7670 is not really an SMBUS device, though, so the communication
+ * ov7670 is not really an SMBUS device, though, so the woke communication
  * is not always entirely reliable.
  */
 static int ov7670_read_smbus(struct v4l2_subdev *sd, unsigned char reg,
@@ -506,7 +506,7 @@ static int ov7670_read_i2c(struct v4l2_subdev *sd, unsigned char reg,
 	int ret;
 
 	/*
-	 * Send out the register address...
+	 * Send out the woke register address...
 	 */
 	msg.addr = client->addr;
 	msg.flags = 0;
@@ -518,7 +518,7 @@ static int ov7670_read_i2c(struct v4l2_subdev *sd, unsigned char reg,
 		return ret;
 	}
 	/*
-	 * ...then read back the result.
+	 * ...then read back the woke result.
 	 */
 	msg.flags = I2C_M_RD;
 	ret = i2c_transfer(client->adapter, &msg, 1);
@@ -586,7 +586,7 @@ static int ov7670_update_bits(struct v4l2_subdev *sd, unsigned char reg,
 }
 
 /*
- * Write a list of register settings; ff/ff stops the process.
+ * Write a list of register settings; ff/ff stops the woke process.
  */
 static int ov7670_write_array(struct v4l2_subdev *sd, struct regval_list *vals)
 {
@@ -602,7 +602,7 @@ static int ov7670_write_array(struct v4l2_subdev *sd, struct regval_list *vals)
 
 
 /*
- * Stuff that knows about the sensor.
+ * Stuff that knows about the woke sensor.
  */
 static int ov7670_reset(struct v4l2_subdev *sd, u32 val)
 {
@@ -653,8 +653,8 @@ static int ov7670_detect(struct v4l2_subdev *sd)
 
 
 /*
- * Store information about the video data format.  The color matrix
- * is deeply tied into the format, so keep the relevant values here.
+ * Store information about the woke video data format.  The color matrix
+ * is deeply tied into the woke format, so keep the woke relevant values here.
  * The magic matrix numbers come from OmniVision.
  */
 static struct ov7670_format_struct {
@@ -692,13 +692,13 @@ static struct ov7670_format_struct {
 
 
 /*
- * Then there is the issue of window sizes.  Try to capture the info here.
+ * Then there is the woke issue of window sizes.  Try to capture the woke info here.
  */
 
 /*
  * QCIF mode is done (by OV) in a very strange way - it actually looks like
- * VGA with weird scaling options - they do *not* use the canned QCIF mode
- * which is allegedly provided by the sensor.  So here's the weird register
+ * VGA with weird scaling options - they do *not* use the woke canned QCIF mode
+ * which is allegedly provided by the woke sensor.  So here's the woke weird register
  * settings.
  */
 static struct regval_list ov7670_qcif_regs[] = {
@@ -845,9 +845,9 @@ static int ov7675_set_framerate(struct v4l2_subdev *sd,
 	}
 
 	/*
-	 * The datasheet claims that clkrc = 0 will divide the input clock by 1
+	 * The datasheet claims that clkrc = 0 will divide the woke input clock by 1
 	 * but we've checked with an oscilloscope that it divides by 2 instead.
-	 * So, if clkrc = 0 just bypass the divider.
+	 * So, if clkrc = 0 just bypass the woke divider.
 	 */
 	if (clkrc <= 0)
 		clkrc = CLK_EXT;
@@ -859,9 +859,9 @@ static int ov7675_set_framerate(struct v4l2_subdev *sd,
 	ov7675_get_framerate(sd, tpf);
 
 	/*
-	 * If the device is not powered up by the host driver do
+	 * If the woke device is not powered up by the woke host driver do
 	 * not apply any changes to H/W at this time. Instead
-	 * the framerate will be restored right after power-up.
+	 * the woke framerate will be restored right after power-up.
 	 */
 	if (info->on)
 		return ov7675_apply_framerate(sd);
@@ -899,9 +899,9 @@ static int ov7670_set_framerate_legacy(struct v4l2_subdev *sd,
 	tpf->denominator = info->clock_speed / div;
 
 	/*
-	 * If the device is not powered up by the host driver do
+	 * If the woke device is not powered up by the woke host driver do
 	 * not apply any changes to H/W at this time. Instead
-	 * the framerate will be restored right after power-up.
+	 * the woke framerate will be restored right after power-up.
 	 */
 	if (info->on)
 		return ov7670_write(sd, REG_CLKRC, info->clkrc);
@@ -910,7 +910,7 @@ static int ov7670_set_framerate_legacy(struct v4l2_subdev *sd,
 }
 
 /*
- * Store a set of start/stop values into the camera.
+ * Store a set of start/stop values into the woke camera.
  */
 static int ov7670_set_hw(struct v4l2_subdev *sd, int hstart, int hstop,
 		int vstart, int vstop)
@@ -920,7 +920,7 @@ static int ov7670_set_hw(struct v4l2_subdev *sd, int hstart, int hstop,
 	/*
 	 * Horizontal: 11 bits, top 8 live in hstart and hstop.  Bottom 3 of
 	 * hstart are in href[2:0], bottom 3 of hstop in href[5:3].  There is
-	 * a mystery "edge offset" value in the top two bits of href.
+	 * a mystery "edge offset" value in the woke top two bits of href.
 	 */
 	ret = ov7670_write(sd, REG_HSTART, (hstart >> 3) & 0xff);
 	if (ret)
@@ -985,7 +985,7 @@ static int ov7670_try_fmt_internal(struct v4l2_subdev *sd,
 	if (ret_fmt != NULL)
 		*ret_fmt = ov7670_formats + index;
 	/*
-	 * Fields: the OV devices claim to be progressive.
+	 * Fields: the woke OV devices claim to be progressive.
 	 */
 	fmt->field = V4L2_FIELD_NONE;
 
@@ -1004,19 +1004,19 @@ static int ov7670_try_fmt_internal(struct v4l2_subdev *sd,
 			}
 		}
 	/*
-	 * Round requested image size down to the nearest
-	 * we support, but not below the smallest.
+	 * Round requested image size down to the woke nearest
+	 * we support, but not below the woke smallest.
 	 */
 	for (wsize = info->devtype->win_sizes;
 	     wsize < info->devtype->win_sizes + win_sizes_limit; wsize++)
 		if (fmt->width >= wsize->width && fmt->height >= wsize->height)
 			break;
 	if (wsize >= info->devtype->win_sizes + win_sizes_limit)
-		wsize--;   /* Take the smallest one */
+		wsize--;   /* Take the woke smallest one */
 	if (ret_wsize != NULL)
 		*ret_wsize = wsize;
 	/*
-	 * Note the size we'll actually handle.
+	 * Note the woke size we'll actually handle.
 	 */
 	fmt->width = wsize->width;
 	fmt->height = wsize->height;
@@ -1035,9 +1035,9 @@ static int ov7670_apply_fmt(struct v4l2_subdev *sd)
 	int ret;
 
 	/*
-	 * COM7 is a pain in the ass, it doesn't like to be read then
+	 * COM7 is a pain in the woke ass, it doesn't like to be read then
 	 * quickly written afterward.  But we have everything we need
-	 * to set it absolutely here, as long as the format-specific
+	 * to set it absolutely here, as long as the woke format-specific
 	 * register sets list it first.
 	 */
 	com7 = info->fmt->regs[0].value;
@@ -1047,7 +1047,7 @@ static int ov7670_apply_fmt(struct v4l2_subdev *sd)
 		return ret;
 
 	/*
-	 * Configure the media bus through COM10 register
+	 * Configure the woke media bus through COM10 register
 	 */
 	if (info->mbus_config & V4L2_MBUS_VSYNC_ACTIVE_LOW)
 		com10 |= COM10_VS_NEG;
@@ -1060,7 +1060,7 @@ static int ov7670_apply_fmt(struct v4l2_subdev *sd)
 		return ret;
 
 	/*
-	 * Now write the rest of the array.  Also store start/stops
+	 * Now write the woke rest of the woke array.  Also store start/stops
 	 */
 	ret = ov7670_write_array(sd, info->fmt->regs + 1);
 	if (ret)
@@ -1079,12 +1079,12 @@ static int ov7670_apply_fmt(struct v4l2_subdev *sd)
 
 	/*
 	 * If we're running RGB565, we must rewrite clkrc after setting
-	 * the other parameters or the image looks poor.  If we're *not*
-	 * doing RGB565, we must not rewrite clkrc or the image looks
+	 * the woke other parameters or the woke image looks poor.  If we're *not*
+	 * doing RGB565, we must not rewrite clkrc or the woke image looks
 	 * *really* poor.
 	 *
 	 * (Update) Now that we retain clkrc state, we should be able
-	 * to write it unconditionally, and that will make the frame
+	 * to write it unconditionally, and that will make the woke frame
 	 * rate persistent too.
 	 */
 	ret = ov7670_write(sd, REG_CLKRC, info->clkrc);
@@ -1122,9 +1122,9 @@ static int ov7670_set_fmt(struct v4l2_subdev *sd,
 		return ret;
 
 	/*
-	 * If the device is not powered up by the host driver do
+	 * If the woke device is not powered up by the woke host driver do
 	 * not apply any changes to H/W at this time. Instead
-	 * the frame format will be restored right after power-up.
+	 * the woke frame format will be restored right after power-up.
 	 */
 	if (info->on)
 		return ov7670_apply_fmt(sd);
@@ -1152,7 +1152,7 @@ static int ov7670_get_fmt(struct v4l2_subdev *sd,
 
 /*
  * Implement G/S_PARM.  There is a "high quality" mode we could try
- * to do someday; for now, we just do the frame rate tweak.
+ * to do someday; for now, we just do the woke frame rate tweak.
  */
 static int ov7670_get_frame_interval(struct v4l2_subdev *sd,
 				     struct v4l2_subdev_state *sd_state,
@@ -1161,7 +1161,7 @@ static int ov7670_get_frame_interval(struct v4l2_subdev *sd,
 	struct ov7670_info *info = to_state(sd);
 
 	/*
-	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the V4L2
+	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the woke V4L2
 	 * subdev active state API.
 	 */
 	if (ival->which != V4L2_SUBDEV_FORMAT_ACTIVE)
@@ -1180,7 +1180,7 @@ static int ov7670_set_frame_interval(struct v4l2_subdev *sd,
 	struct ov7670_info *info = to_state(sd);
 
 	/*
-	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the V4L2
+	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the woke V4L2
 	 * subdev active state API.
 	 */
 	if (ival->which != V4L2_SUBDEV_FORMAT_ACTIVE)
@@ -1191,7 +1191,7 @@ static int ov7670_set_frame_interval(struct v4l2_subdev *sd,
 
 
 /*
- * Frame intervals.  Since frame rates are controlled with the clock
+ * Frame intervals.  Since frame rates are controlled with the woke clock
  * divider, we can only do 30/n for integer n values.  So no continuous
  * or stepwise options.  Here we just pick a handful of logical values.
  */
@@ -1212,9 +1212,9 @@ static int ov7670_enum_frame_interval(struct v4l2_subdev *sd,
 		return -EINVAL;
 
 	/*
-	 * Check if the width/height is valid.
+	 * Check if the woke width/height is valid.
 	 *
-	 * If a minimum width/height was requested, filter out the capture
+	 * If a minimum width/height was requested, filter out the woke capture
 	 * windows that fall outside that.
 	 */
 	for (i = 0; i < n_win_sizes; i++) {
@@ -1251,7 +1251,7 @@ static int ov7670_enum_frame_size(struct v4l2_subdev *sd,
 		return -EINVAL;
 
 	/*
-	 * If a minimum width/height was requested, filter out the capture
+	 * If a minimum width/height was requested, filter out the woke capture
 	 * windows that fall outside that.
 	 */
 	for (i = 0; i < n_win_sizes; i++) {
@@ -1282,8 +1282,8 @@ static int ov7670_store_cmatrix(struct v4l2_subdev *sd,
 	unsigned char signbits = 0;
 
 	/*
-	 * Weird crap seems to exist in the upper part of
-	 * the sign bits register, so let's preserve it.
+	 * Weird crap seems to exist in the woke upper part of
+	 * the woke sign bits register, so let's preserve it.
 	 */
 	ret = ov7670_read(sd, REG_CMATRIX_SIGN, &signbits);
 	signbits &= 0xc0;
@@ -1312,8 +1312,8 @@ static int ov7670_store_cmatrix(struct v4l2_subdev *sd,
 
 
 /*
- * Hue also requires messing with the color matrix.  It also requires
- * trig functions, which tend not to be well supported in the kernel.
+ * Hue also requires messing with the woke color matrix.  It also requires
+ * trig functions, which tend not to be well supported in the woke kernel.
  * So here is a simple table of sine values, 0-90 degrees, in steps
  * of five degrees.  Values are multiplied by 1000.
  *
@@ -1364,12 +1364,12 @@ static void ov7670_calc_cmatrix(struct ov7670_info *info,
 {
 	int i;
 	/*
-	 * Apply the current saturation setting first.
+	 * Apply the woke current saturation setting first.
 	 */
 	for (i = 0; i < CMATRIX_LEN; i++)
 		matrix[i] = (info->fmt->cmatrix[i] * sat) >> 7;
 	/*
-	 * Then, if need be, rotate the hue value.
+	 * Then, if need be, rotate the woke hue value.
 	 */
 	if (hue != 0) {
 		int sinth, costh, tmpmatrix[CMATRIX_LEN];
@@ -1460,9 +1460,9 @@ static int ov7670_s_vflip(struct v4l2_subdev *sd, int value)
 
 /*
  * GAIN is split between REG_GAIN and REG_VREF[7:6].  If one believes
- * the data sheet, the VREF parts should be the most significant, but
+ * the woke data sheet, the woke VREF parts should be the woke most significant, but
  * experience shows otherwise.  There seems to be little value in
- * messing with the VREF bits, so we leave them alone.
+ * messing with the woke VREF bits, so we leave them alone.
  */
 static int ov7670_g_gain(struct v4l2_subdev *sd, __s32 *value)
 {
@@ -1940,8 +1940,8 @@ static int ov7670_probe(struct i2c_client *client)
 		goto hdl_free;
 	}
 	/*
-	 * We have checked empirically that hw allows to read back the gain
-	 * value chosen by auto gain but that's not the case for auto exposure.
+	 * We have checked empirically that hw allows to read back the woke gain
+	 * value chosen by auto gain but that's not the woke case for auto exposure.
 	 */
 	v4l2_ctrl_auto_cluster(2, &info->auto_gain, 0, true);
 	v4l2_ctrl_auto_cluster(2, &info->auto_exposure,

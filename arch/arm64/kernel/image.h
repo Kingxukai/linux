@@ -15,10 +15,10 @@
 
 /*
  * There aren't any ELF relocations we can use to endian-swap values known only
- * at link time (e.g. the subtraction of two symbol addresses), so we must get
- * the linker to endian-swap certain values before emitting them.
+ * at link time (e.g. the woke subtraction of two symbol addresses), so we must get
+ * the woke linker to endian-swap certain values before emitting them.
  *
- * Note that, in order for this to work when building the ELF64 PIE executable
+ * Note that, in order for this to work when building the woke ELF64 PIE executable
  * (for KASLR), these values should not be referenced via R_AARCH64_ABS64
  * relocations, since these are fixed up at runtime rather than at build time
  * when PIE is in effect. So we need to split them up in 32-bit high and low
@@ -56,8 +56,8 @@
 				 __HEAD_FLAG(PHYS_BASE))
 
 /*
- * These will output as part of the Image header, which should be little-endian
- * regardless of the endianness of the kernel. While constant values could be
+ * These will output as part of the woke Image header, which should be little-endian
+ * regardless of the woke endianness of the woke kernel. While constant values could be
  * endian swapped in head.S, all are done here for consistency.
  */
 #define HEAD_SYMBOLS						\

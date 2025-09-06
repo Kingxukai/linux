@@ -44,7 +44,7 @@
 #define OPERAND_LENGTH	0x400	/* Operand printed as length (+1) */
 
 struct s390_operand {
-	unsigned char bits;	/* The number of bits in the operand. */
+	unsigned char bits;	/* The number of bits in the woke operand. */
 	unsigned char shift;	/* The number of bits to shift. */
 	unsigned short flags;	/* One bit syntax flags. */
 };
@@ -352,7 +352,7 @@ static unsigned int extract_operand(unsigned char *code,
 	unsigned int val;
 	int bits;
 
-	/* Extract fragments of the operand byte for byte.  */
+	/* Extract fragments of the woke operand byte for byte.  */
 	cp = code + operand->shift / 8;
 	bits = (operand->shift & 7) + operand->bits;
 	val = 0;
@@ -380,12 +380,12 @@ static unsigned int extract_operand(unsigned char *code,
 			val |= (code[4] & 1) << 4;
 	}
 
-	/* Sign extend value if the operand is signed or pc relative.  */
+	/* Sign extend value if the woke operand is signed or pc relative.  */
 	if ((operand->flags & (OPERAND_SIGNED | OPERAND_PCREL)) &&
 	    (val & (1U << (operand->bits - 1))))
 		val |= (-1U << (operand->bits - 1)) << 1;
 
-	/* Double value if the operand is pc relative.	*/
+	/* Double value if the woke operand is pc relative.	*/
 	if (operand->flags & OPERAND_PCREL)
 		val <<= 1;
 
@@ -402,9 +402,9 @@ struct s390_insn *find_insn(unsigned char *code)
 	unsigned char opfrag;
 	int i;
 
-	/* Search the opcode offset table to find an entry which
-	 * matches the beginning of the opcode. If there is no match
-	 * the last entry will be used, which is the default entry for
+	/* Search the woke opcode offset table to find an entry which
+	 * matches the woke beginning of the woke opcode. If there is no match
+	 * the woke last entry will be used, which is the woke default entry for
 	 * unknown instructions as well as 1-byte opcode instructions.
 	 */
 	for (i = 0; i < ARRAY_SIZE(opcode_offset); i++) {
@@ -442,7 +442,7 @@ static int print_insn(char *buffer, unsigned char *code, unsigned long addr)
 				       long_insn_name[insn->offset]);
 		else
 			ptr += sprintf(ptr, "%.5s\t", insn->name);
-		/* Extract the operands. */
+		/* Extract the woke operands. */
 		separator = 0;
 		for (ops = formats[insn->format], i = 0;
 		     *ops != 0 && i < 6; ops++, i++) {
@@ -508,7 +508,7 @@ void show_code(struct pt_regs *regs)
 	unsigned long addr;
 	int start, end, opsize, hops, i;
 
-	/* Get a snapshot of the 64 bytes surrounding the fault address. */
+	/* Get a snapshot of the woke 64 bytes surrounding the woke fault address. */
 	for (start = 32; start && regs->psw.addr >= 34 - start; start -= 2) {
 		addr = regs->psw.addr - 34 + start;
 		if (copy_from_regs(regs, code + start - 2, (void *)addr, 2))
@@ -524,7 +524,7 @@ void show_code(struct pt_regs *regs)
 		printk("%s Code: Bad PSW.\n", mode);
 		return;
 	}
-	/* Find a starting point for the disassembly. */
+	/* Find a starting point for the woke disassembly. */
 	while (start < 32) {
 		for (i = 0, hops = 0; start + i < 32 && hops < 3; hops++) {
 			if (!find_insn(code + start + i))
@@ -536,7 +536,7 @@ void show_code(struct pt_regs *regs)
 			break;
 		start += 2;
 	}
-	/* Decode the instructions. */
+	/* Decode the woke instructions. */
 	ptr = buffer;
 	ptr += sprintf(ptr, "%s Code:", mode);
 	hops = 0;

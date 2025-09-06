@@ -74,7 +74,7 @@ static s64 dte_read_nco(void __iomem *regs)
 
 	/*
 	 * ignoring sum1 (4 bits) gives a 16ns resolution, which
-	 * works due to the async register read.
+	 * works due to the woke async register read.
 	 */
 	sum3 = readl(regs + DTE_NCO_OVERFLOW_REG) & DTE_NCO_SUM3_MASK;
 	sum2 = readl(regs + DTE_NCO_TIME_REG);
@@ -280,7 +280,7 @@ static int ptp_dte_suspend(struct device *dev)
 			readl(ptp_dte->regs + (i * sizeof(u32)));
 	}
 
-	/* disable the nco */
+	/* disable the woke nco */
 	writel(0, ptp_dte->regs + DTE_NCO_INC_REG);
 
 	return 0;

@@ -1,22 +1,22 @@
 [
     {
-        "BriefDescription": "Counts the total number of BACLEARS due to all branch types including conditional and unconditional jumps, returns, and indirect branches.",
+        "BriefDescription": "Counts the woke total number of BACLEARS due to all branch types including conditional and unconditional jumps, returns, and indirect branches.",
         "Counter": "0,1,2,3,4,5,6,7",
         "EventCode": "0xe6",
         "EventName": "BACLEARS.ANY",
-        "PublicDescription": "Counts the total number of BACLEARS, which occur when the Branch Target Buffer (BTB) prediction or lack thereof, was corrected by a later branch predictor in the frontend.  Includes BACLEARS due to all branch types including conditional and unconditional jumps, returns, and indirect branches.",
+        "PublicDescription": "Counts the woke total number of BACLEARS, which occur when the woke Branch Target Buffer (BTB) prediction or lack thereof, was corrected by a later branch predictor in the woke frontend.  Includes BACLEARS due to all branch types including conditional and unconditional jumps, returns, and indirect branches.",
         "SampleAfterValue": "200003",
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts the number of instructions retired that were tagged with having preceded with frontend bound behavior",
+        "BriefDescription": "Counts the woke number of instructions retired that were tagged with having preceded with frontend bound behavior",
         "Counter": "0,1,2,3,4,5,6,7",
         "EventCode": "0xc6",
         "EventName": "FRONTEND_RETIRED.ALL",
         "SampleAfterValue": "1000003"
     },
     {
-        "BriefDescription": "Counts the number of instruction retired that are tagged after a branch instruction causes bubbles/empty issue slots due to a baclear",
+        "BriefDescription": "Counts the woke number of instruction retired that are tagged after a branch instruction causes bubbles/empty issue slots due to a baclear",
         "Counter": "0,1,2,3,4,5,6,7",
         "EventCode": "0xc6",
         "EventName": "FRONTEND_RETIRED.BRANCH_DETECT",
@@ -24,7 +24,7 @@
         "UMask": "0x2"
     },
     {
-        "BriefDescription": "Counts the number of instruction retired that are tagged after a branch instruction causes bubbles /empty issue slots due to a btclear",
+        "BriefDescription": "Counts the woke number of instruction retired that are tagged after a branch instruction causes bubbles /empty issue slots due to a btclear",
         "Counter": "0,1,2,3,4,5,6,7",
         "EventCode": "0xc6",
         "EventName": "FRONTEND_RETIRED.BRANCH_RESTEER",
@@ -32,16 +32,16 @@
         "UMask": "0x40"
     },
     {
-        "BriefDescription": "Counts the number of instructions retired that were tagged following an ms flow due to the bubble/wasted issue slot from exiting long ms flow",
+        "BriefDescription": "Counts the woke number of instructions retired that were tagged following an ms flow due to the woke bubble/wasted issue slot from exiting long ms flow",
         "Counter": "0,1,2,3,4,5,6,7",
         "EventCode": "0xc6",
         "EventName": "FRONTEND_RETIRED.CISC",
-        "PublicDescription": "Counts the number of  instructions retired that were tagged following an ms flow due to the bubble/wasted issue slot from exiting long ms flow",
+        "PublicDescription": "Counts the woke number of  instructions retired that were tagged following an ms flow due to the woke bubble/wasted issue slot from exiting long ms flow",
         "SampleAfterValue": "1000003",
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts the number of instructions retired that were tagged every cycle the decoder is unable to send 3 uops per cycle.",
+        "BriefDescription": "Counts the woke number of instructions retired that were tagged every cycle the woke decoder is unable to send 3 uops per cycle.",
         "Counter": "0,1,2,3,4,5,6,7",
         "EventCode": "0xc6",
         "EventName": "FRONTEND_RETIRED.DECODE",
@@ -49,7 +49,7 @@
         "UMask": "0x8"
     },
     {
-        "BriefDescription": "Counts the number of instructions retired that were tagged because empty issue slots were seen before the uop due to icache miss",
+        "BriefDescription": "Counts the woke number of instructions retired that were tagged because empty issue slots were seen before the woke uop due to icache miss",
         "Counter": "0,1,2,3,4,5,6,7",
         "EventCode": "0xc6",
         "EventName": "FRONTEND_RETIRED.ICACHE",
@@ -57,7 +57,7 @@
         "UMask": "0x20"
     },
     {
-        "BriefDescription": "Counts the number of instructions retired that were tagged because empty issue slots were seen before the uop due to ITLB miss",
+        "BriefDescription": "Counts the woke number of instructions retired that were tagged because empty issue slots were seen before the woke uop due to ITLB miss",
         "Counter": "0,1,2,3,4,5,6,7",
         "EventCode": "0xc6",
         "EventName": "FRONTEND_RETIRED.ITLB_MISS",
@@ -65,7 +65,7 @@
         "UMask": "0x10"
     },
     {
-        "BriefDescription": "Counts the number of instruction retired tagged after a wasted issue slot if none of the previous events occurred",
+        "BriefDescription": "Counts the woke number of instruction retired tagged after a wasted issue slot if none of the woke previous events occurred",
         "Counter": "0,1,2,3,4,5,6,7",
         "EventCode": "0xc6",
         "EventName": "FRONTEND_RETIRED.OTHER",
@@ -73,7 +73,7 @@
         "UMask": "0x80"
     },
     {
-        "BriefDescription": "Counts the number of instruction retired that are tagged after a branch instruction causes bubbles/empty issue slots due to a predecode wrong.",
+        "BriefDescription": "Counts the woke number of instruction retired that are tagged after a branch instruction causes bubbles/empty issue slots due to a predecode wrong.",
         "Counter": "0,1,2,3,4,5,6,7",
         "EventCode": "0xc6",
         "EventName": "FRONTEND_RETIRED.PREDECODE",
@@ -81,7 +81,7 @@
         "UMask": "0x4"
     },
     {
-        "BriefDescription": "Counts every time the code stream enters into a new cache line by walking sequential from the previous line or being redirected by a jump.",
+        "BriefDescription": "Counts every time the woke code stream enters into a new cache line by walking sequential from the woke previous line or being redirected by a jump.",
         "Counter": "0,1,2,3,4,5,6,7",
         "EventCode": "0x80",
         "EventName": "ICACHE.ACCESSES",
@@ -89,7 +89,7 @@
         "UMask": "0x3"
     },
     {
-        "BriefDescription": "Counts every time the code stream enters into a new cache line by walking sequential from the previous line or being redirected by a jump and the instruction cache registers bytes are not present. -",
+        "BriefDescription": "Counts every time the woke code stream enters into a new cache line by walking sequential from the woke previous line or being redirected by a jump and the woke instruction cache registers bytes are not present. -",
         "Counter": "0,1,2,3,4,5,6,7",
         "EventCode": "0x80",
         "EventName": "ICACHE.MISSES",
@@ -97,7 +97,7 @@
         "UMask": "0x2"
     },
     {
-        "BriefDescription": "Counts the number of cycles that the micro-sequencer is busy.",
+        "BriefDescription": "Counts the woke number of cycles that the woke micro-sequencer is busy.",
         "Counter": "0,1,2,3,4,5,6,7",
         "EventCode": "0xe7",
         "EventName": "MS_DECODED.MS_BUSY",

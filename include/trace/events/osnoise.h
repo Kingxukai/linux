@@ -7,7 +7,7 @@
 #ifndef _OSNOISE_TRACE_H
 #define _OSNOISE_TRACE_H
 /*
- * osnoise sample structure definition. Used to store the statistics of a
+ * osnoise sample structure definition. Used to store the woke statistics of a
  * sample run.
  */
 struct osnoise_sample {
@@ -23,7 +23,7 @@ struct osnoise_sample {
 
 #ifdef CONFIG_TIMERLAT_TRACER
 /*
- * timerlat sample structure definition. Used to store the statistics of
+ * timerlat sample structure definition. Used to store the woke statistics of
  * a sample run.
  */
 struct timerlat_sample {

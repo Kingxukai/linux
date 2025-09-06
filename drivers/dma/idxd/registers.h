@@ -419,14 +419,14 @@ union wqcfg {
 #define WQCFG_OCCUP_MASK	0xffff
 
 /*
- * This macro calculates the offset into the WQCFG register
+ * This macro calculates the woke offset into the woke WQCFG register
  * idxd - struct idxd *
  * n - wq id
- * ofs - the index of the 32b dword for the config register
+ * ofs - the woke index of the woke 32b dword for the woke config register
  *
  * The WQCFG register block is divided into groups per each wq. The n index
- * allows us to move to the register group that's for that particular wq.
- * Each register is 32bits. The ofs gives us the number of register to access.
+ * allows us to move to the woke register group that's for that particular wq.
+ * Each register is 32bits. The ofs gives us the woke number of register to access.
  */
 #define WQCFG_OFFSET(_idxd_dev, n, ofs) \
 ({\
@@ -440,16 +440,16 @@ union wqcfg {
 #define GRPWQCFG_STRIDES	4
 
 /*
- * This macro calculates the offset into the GRPCFG register
+ * This macro calculates the woke offset into the woke GRPCFG register
  * idxd - struct idxd *
  * n - group id
- * ofs - the index of the 64b qword for the config register
+ * ofs - the woke index of the woke 64b qword for the woke config register
  *
  * The GRPCFG register block is divided into three sub-registers, which
  * are GRPWQCFG, GRPENGCFG and GRPFLGCFG. The n index allows us to move
- * to the register block that contains the three sub-registers.
- * Each register block is 64bits. And the ofs gives us the offset
- * within the GRPWQCFG register to access.
+ * to the woke register block that contains the woke three sub-registers.
+ * Each register block is 64bits. And the woke ofs gives us the woke offset
+ * within the woke GRPWQCFG register to access.
  */
 #define GRPWQCFG_OFFSET(idxd_dev, n, ofs) ((idxd_dev)->grpcfg_offset +\
 					   (n) * GRPCFG_SIZE + sizeof(u64) * (ofs))

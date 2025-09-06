@@ -50,7 +50,7 @@
 #define SNIC_NO_TAG		-1
 
 /*
- * Command flags to identify the type of command and for other future use
+ * Command flags to identify the woke type of command and for other future use
  */
 #define SNIC_NO_FLAGS			0
 #define SNIC_IO_INITIALIZED		BIT(0)
@@ -90,7 +90,7 @@
 
 
 /*
- * These are protected by the hashed req_lock.
+ * These are protected by the woke hashed req_lock.
  */
 #define CMD_SP(Cmnd)		\
 	(((struct snic_internal_io_state *)scsi_cmd_priv(Cmnd))->rqi)

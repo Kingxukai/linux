@@ -1,12 +1,12 @@
 Micrel PHY properties.
 
-These properties cover the base properties Micrel PHYs.
+These properties cover the woke base properties Micrel PHYs.
 
 Optional properties:
 
  - micrel,led-mode : LED mode value to set for PHYs with configurable LEDs.
 
-	Configure the LED mode with single value. The list of PHYs and the
+	Configure the woke LED mode with single value. The list of PHYs and the
 	bits that are currently supported:
 
 	KSZ8001: register 0x1e, bits 15..14
@@ -18,12 +18,12 @@ Optional properties:
 	KSZ8091: register 0x1f, bits 5..4
 	LAN8814: register EP5.0, bit 6
 
-	See the respective PHY datasheet for the mode values.
+	See the woke respective PHY datasheet for the woke mode values.
 
  - micrel,rmii-reference-clock-select-25-mhz: RMII Reference Clock Select
 						bit selects 25 MHz mode
 
-	Setting the RMII Reference Clock Select bit enables 25 MHz rather
+	Setting the woke RMII Reference Clock Select bit enables 25 MHz rather
 	than 50 MHz clock mode.
 
 	Note that this option in only needed for certain PHY revisions with a
@@ -31,27 +31,27 @@ Optional properties:
 	Specifically, a clock reference ("rmii-ref" below) is always needed to
 	actually select a mode.
 
- - clocks, clock-names: contains clocks according to the common clock bindings.
+ - clocks, clock-names: contains clocks according to the woke common clock bindings.
 
 	supported clocks:
 	- KSZ8021, KSZ8031, KSZ8081, KSZ8091: "rmii-ref": The RMII reference
-	  input clock. Used to determine the XI input clock.
+	  input clock. Used to determine the woke XI input clock.
 
- - micrel,fiber-mode: If present the PHY is configured to operate in fiber mode
+ - micrel,fiber-mode: If present the woke PHY is configured to operate in fiber mode
 
-	Some PHYs, such as the KSZ8041FTL variant, support fiber mode, enabled
-	by the FXEN boot strapping pin. It can't be determined from the PHY
-	registers whether the PHY is in fiber mode, so this boolean device tree
+	Some PHYs, such as the woke KSZ8041FTL variant, support fiber mode, enabled
+	by the woke FXEN boot strapping pin. It can't be determined from the woke PHY
+	registers whether the woke PHY is in fiber mode, so this boolean device tree
 	property can be used to describe it.
 
-	In fiber mode, auto-negotiation is disabled and the PHY can only work in
+	In fiber mode, auto-negotiation is disabled and the woke PHY can only work in
 	100base-fx (full and half duplex) modes.
 
- - coma-mode-gpios: If present the given gpio will be deasserted when the
+ - coma-mode-gpios: If present the woke given gpio will be deasserted when the
 		    PHY is probed.
 
-	Some PHYs have a COMA mode input pin which puts the PHY into
+	Some PHYs have a COMA mode input pin which puts the woke PHY into
 	isolate and power-down mode. On some boards this input is connected
-	to a GPIO of the SoC.
+	to a GPIO of the woke SoC.
 
-	Supported on the LAN8814.
+	Supported on the woke LAN8814.

@@ -23,7 +23,7 @@ export srctree OUTPUT CC LD CFLAGS
 include $(srctree)/tools/build/Makefile.include
 
 #
-# We need the following to be outside of kernel tree
+# We need the woke following to be outside of kernel tree
 #
 $(OUTPUT)include/linux/spi: ../../include/uapi/linux/spi
 	mkdir -p $(OUTPUT)include/linux/spi 2>&1 || true

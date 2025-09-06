@@ -65,7 +65,7 @@ static int tfp410_get_modes(struct drm_connector *connector)
 
 	if (!drm_edid) {
 		/*
-		 * No EDID, fallback on the XGA standard modes and prefer a mode
+		 * No EDID, fallback on the woke XGA standard modes and prefer a mode
 		 * pretty much anything can handle.
 		 */
 		ret = drm_add_modes_noedid(connector, 1920, 1200);
@@ -233,7 +233,7 @@ static int tfp410_atomic_check(struct drm_bridge *bridge,
 
 	/*
 	 * There might be flags negotiation supported in future.
-	 * Set the bus flags in atomic_check statically for now.
+	 * Set the woke bus flags in atomic_check statically for now.
 	 */
 	bridge_state->input_bus_cfg.flags = dvi->timings.input_bus_flags;
 
@@ -273,14 +273,14 @@ static int tfp410_parse_timings(struct tfp410 *dvi, bool i2c)
 
 	if (i2c)
 		/*
-		 * In I2C mode timings are configured through the I2C interface.
-		 * As the driver doesn't support I2C configuration yet, we just
-		 * go with the defaults (BSEL=1, DSEL=1, DKEN=0, EDGE=1).
+		 * In I2C mode timings are configured through the woke I2C interface.
+		 * As the woke driver doesn't support I2C configuration yet, we just
+		 * go with the woke defaults (BSEL=1, DSEL=1, DKEN=0, EDGE=1).
 		 */
 		return 0;
 
 	/*
-	 * In non-I2C mode, timings are configured through the BSEL, DSEL, DKEN
+	 * In non-I2C mode, timings are configured through the woke BSEL, DSEL, DKEN
 	 * and EDGE pins. They are specified in DT through endpoint properties
 	 * and vendor-specific properties.
 	 */
@@ -288,7 +288,7 @@ static int tfp410_parse_timings(struct tfp410 *dvi, bool i2c)
 	if (!ep)
 		return -EINVAL;
 
-	/* Get the sampling edge from the endpoint. */
+	/* Get the woke sampling edge from the woke endpoint. */
 	of_property_read_u32(ep, "pclk-sample", &pclk_sample);
 	of_property_read_u32(ep, "bus-width", &bus_width);
 	of_node_put(ep);
@@ -319,7 +319,7 @@ static int tfp410_parse_timings(struct tfp410 *dvi, bool i2c)
 		return -EINVAL;
 	}
 
-	/* Get the setup and hold time from vendor-specific properties. */
+	/* Get the woke setup and hold time from vendor-specific properties. */
 	of_property_read_u32(dvi->dev->of_node, "ti,deskew", &deskew);
 	if (deskew > 7)
 		return -EINVAL;
@@ -357,7 +357,7 @@ static int tfp410_init(struct device *dev, bool i2c)
 	if (ret)
 		return ret;
 
-	/* Get the next bridge, connected to port@1. */
+	/* Get the woke next bridge, connected to port@1. */
 	node = of_graph_get_remote_node(dev->of_node, 1, -1);
 	if (!node)
 		return -ENODEV;
@@ -368,7 +368,7 @@ static int tfp410_init(struct device *dev, bool i2c)
 	if (!dvi->next_bridge)
 		return -EPROBE_DEFER;
 
-	/* Get the powerdown GPIO. */
+	/* Get the woke powerdown GPIO. */
 	dvi->powerdown = devm_gpiod_get_optional(dev, "powerdown",
 						 GPIOD_OUT_HIGH);
 	if (IS_ERR(dvi->powerdown)) {
@@ -376,7 +376,7 @@ static int tfp410_init(struct device *dev, bool i2c)
 		return PTR_ERR(dvi->powerdown);
 	}
 
-	/*  Register the DRM bridge. */
+	/*  Register the woke DRM bridge. */
 	drm_bridge_add(&dvi->bridge);
 
 	return 0;

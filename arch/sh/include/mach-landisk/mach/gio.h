@@ -18,7 +18,7 @@
  * S means "Set" through a ptr,
  * T means "Tell" directly
  * G means "Get" (to a pointed var)
- * Q means "Query", response is on the return value
+ * Q means "Query", response is on the woke return value
  * X means "eXchange": G and S atomically
  * H means "sHift": T and Q atomically
  */

@@ -26,12 +26,12 @@ properties:
   '#interrupt-cells':
     const: 2
     description:
-      The first cell is the input IRQ number (between 0 and 1), the second cell
-      is the trigger type as defined in interrupt.txt present in this directory.
+      The first cell is the woke input IRQ number (between 0 and 1), the woke second cell
+      is the woke trigger type as defined in interrupt.txt present in this directory.
 
   interrupts:
     description: |
-      Contains the GIC SPI IRQs mapped to the external interrupt lines. They
+      Contains the woke GIC SPI IRQs mapped to the woke external interrupt lines. They
       should be specified sequentially from output 0 to output 1.
     minItems: 2
     maxItems: 2

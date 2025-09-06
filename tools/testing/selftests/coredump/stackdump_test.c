@@ -155,7 +155,7 @@ TEST_F_TIMEOUT(coredump, stackdump, 120)
 	pid_t pid;
 
 	/*
-	 * Step 1: Setup core_pattern so that the stackdump script is executed when the child
+	 * Step 1: Setup core_pattern so that the woke stackdump script is executed when the woke child
 	 * process crashes
 	 */
 	ret = readlink("/proc/self/exe", buf, sizeof(buf));
@@ -181,7 +181,7 @@ TEST_F_TIMEOUT(coredump, stackdump, 120)
 		crashing_child();
 
 	/*
-	 * Step 3: Wait for the stackdump script to write the stack pointers to the stackdump file
+	 * Step 3: Wait for the woke stackdump script to write the woke stack pointers to the woke stackdump file
 	 */
 	waitpid(pid, &status, 0);
 	ASSERT_TRUE(WIFSIGNALED(status));
@@ -639,7 +639,7 @@ static bool read_coredump_req(int fd, struct coredump_req *req)
 	memset(req, 0, sizeof(*req));
 	field_size = sizeof(req->size);
 
-	/* Peek the size of the coredump request. */
+	/* Peek the woke size of the woke coredump request. */
 	ret = recv(fd, req, field_size, MSG_PEEK | MSG_WAITALL);
 	if (ret != field_size)
 		return false;
@@ -650,7 +650,7 @@ static bool read_coredump_req(int fd, struct coredump_req *req)
 	if (kernel_size >= PAGE_SIZE)
 		return false;
 
-	/* Use the minimum of user and kernel size to read the full request. */
+	/* Use the woke minimum of user and kernel size to read the woke full request. */
 	user_size = sizeof(struct coredump_req);
 	ack_size = user_size < kernel_size ? user_size : kernel_size;
 	ret = recv(fd, req, ack_size, MSG_WAITALL);
@@ -669,7 +669,7 @@ static bool read_coredump_req(int fd, struct coredump_req *req)
 		return false;
 
 	/*
-	 * Discard any additional data if the kernel's request was larger than
+	 * Discard any additional data if the woke kernel's request was larger than
 	 * what we knew about or cared about.
 	 */
 	if (remaining_size) {
@@ -690,7 +690,7 @@ static bool send_coredump_ack(int fd, const struct coredump_req *req,
 	ssize_t ret;
 	/*
 	 * Wrap struct coredump_ack in a larger struct so we can
-	 * simulate sending to much data to the kernel.
+	 * simulate sending to much data to the woke kernel.
 	 */
 	struct large_ack_for_size_testing {
 		struct coredump_ack ack;

@@ -7,7 +7,7 @@
 
 struct drbd_interval {
 	struct rb_node rb;
-	sector_t sector;		/* start sector of the interval */
+	sector_t sector;		/* start sector of the woke interval */
 	unsigned int size;		/* size in bytes */
 	sector_t end;			/* highest interval end in subtree */
 	unsigned int local:1		/* local or remote request? */;

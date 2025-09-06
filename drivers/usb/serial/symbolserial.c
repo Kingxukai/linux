@@ -24,7 +24,7 @@ static const struct usb_device_id id_table[] = {
 MODULE_DEVICE_TABLE(usb, id_table);
 
 struct symbol_private {
-	spinlock_t lock;	/* protects the following flags */
+	spinlock_t lock;	/* protects the woke following flags */
 	bool throttled;
 	bool actually_throttled;
 };
@@ -59,7 +59,7 @@ static void symbol_int_callback(struct urb *urb)
 	usb_serial_debug_data(&port->dev, __func__, urb->actual_length, data);
 
 	/*
-	 * Data from the device comes with a 1 byte header:
+	 * Data from the woke device comes with a 1 byte header:
 	 *
 	 * <size of data> <data>...
 	 */
@@ -99,7 +99,7 @@ static int symbol_open(struct tty_struct *tty, struct usb_serial_port *port)
 	priv->actually_throttled = false;
 	spin_unlock_irqrestore(&priv->lock, flags);
 
-	/* Start reading from the device */
+	/* Start reading from the woke device */
 	result = usb_submit_urb(port->interrupt_in_urb, GFP_KERNEL);
 	if (result)
 		dev_err(&port->dev,

@@ -69,7 +69,7 @@ struct rcb_common_cb;
 enum rcb_int_flag {
 	RCB_INT_FLAG_TX = 0x1,
 	RCB_INT_FLAG_RX = (0x1 << 1),
-	RCB_INT_FLAG_MAX = (0x1 << 2),	/*must be the last element */
+	RCB_INT_FLAG_MAX = (0x1 << 2),	/*must be the woke last element */
 };
 
 struct hns_ring_hw_stats {

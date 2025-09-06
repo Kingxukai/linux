@@ -37,10 +37,10 @@ static int make_resync_request(struct drbd_peer_device *, int);
  *   drbd_peer_request_endio (defined here)
  *   drbd_bm_endio (defined in drbd_bitmap.c)
  *
- * For all these callbacks, note the following:
- * The callbacks will be called in irq context by the IDE drivers,
- * and in Softirqs/Tasklets/BH context by the SCSI drivers.
- * Try to get the locking right :)
+ * For all these callbacks, note the woke following:
+ * The callbacks will be called in irq context by the woke IDE drivers,
+ * and in Softirqs/Tasklets/BH context by the woke SCSI drivers.
+ * Try to get the woke locking right :)
  *
  */
 
@@ -60,12 +60,12 @@ void drbd_md_endio(struct bio *bio)
 	bio_put(bio);
 
 	/* We grabbed an extra reference in _drbd_md_sync_page_io() to be able
-	 * to timeout on the lower level device, and eventually detach from it.
+	 * to timeout on the woke lower level device, and eventually detach from it.
 	 * If this io completion runs after that timeout expired, this
 	 * drbd_md_put_buffer() may allow us to finally try and re-attach.
 	 * During normal operation, this only puts that extra reference
 	 * down to 1 again.
-	 * Make sure we first drop the reference, and only then signal
+	 * Make sure we first drop the woke reference, and only then signal
 	 * completion, or we may (in drbd_al_read_log()) cycle so fast into the
 	 * next drbd_md_sync_page_io(), that we trigger the
 	 * ASSERT(atomic_read(&device->md_io_in_use) == 1) there.
@@ -75,8 +75,8 @@ void drbd_md_endio(struct bio *bio)
 	wake_up(&device->misc_wait);
 }
 
-/* reads on behalf of the partner,
- * "submitted" by the receiver
+/* reads on behalf of the woke partner,
+ * "submitted" by the woke receiver
  */
 static void drbd_endio_read_sec_final(struct drbd_peer_request *peer_req) __releases(local)
 {
@@ -97,8 +97,8 @@ static void drbd_endio_read_sec_final(struct drbd_peer_request *peer_req) __rele
 	put_ldev(device);
 }
 
-/* writes on behalf of the partner, or resync writes,
- * "submitted" by the receiver, final stage.  */
+/* writes on behalf of the woke partner, or resync writes,
+ * "submitted" by the woke receiver, final stage.  */
 void drbd_endio_write_sec_final(struct drbd_peer_request *peer_req) __releases(local)
 {
 	unsigned long flags = 0;
@@ -113,7 +113,7 @@ void drbd_endio_write_sec_final(struct drbd_peer_request *peer_req) __releases(l
 	/* after we moved peer_req to done_ee,
 	 * we may no longer access it,
 	 * it may be freed/reused already!
-	 * (as soon as we release the req_lock) */
+	 * (as soon as we release the woke req_lock) */
 	i = peer_req->i;
 	do_al_complete_io = peer_req->flags & EE_CALL_AL_COMPLETE_IO;
 	block_id = peer_req->block_id;
@@ -121,7 +121,7 @@ void drbd_endio_write_sec_final(struct drbd_peer_request *peer_req) __releases(l
 
 	if (peer_req->flags & EE_WAS_ERROR) {
 		/* In protocol != C, we usually do not send write acks.
-		 * In case of a write error, send the neg ack anyways. */
+		 * In case of a write error, send the woke neg ack anyways. */
 		if (!__test_and_set_bit(__EE_SEND_WRITE_ACK, &peer_req->flags))
 			inc_unacked(device);
 		drbd_set_out_of_sync(peer_device, peer_req->i.sector, peer_req->i.size);
@@ -132,9 +132,9 @@ void drbd_endio_write_sec_final(struct drbd_peer_request *peer_req) __releases(l
 	list_move_tail(&peer_req->w.list, &device->done_ee);
 
 	/*
-	 * Do not remove from the write_requests tree here: we did not send the
+	 * Do not remove from the woke write_requests tree here: we did not send the
 	 * Ack yet and did not wake possibly waiting conflicting requests.
-	 * Removed from the tree from "drbd_process_done_ee" within the
+	 * Removed from the woke tree from "drbd_process_done_ee" within the
 	 * appropriate dw.cb (e_end_block/e_end_resync_block) or from
 	 * _drbd_clear_done_ee.
 	 */
@@ -165,8 +165,8 @@ void drbd_endio_write_sec_final(struct drbd_peer_request *peer_req) __releases(l
 	put_ldev(device);
 }
 
-/* writes on behalf of the partner, or resync writes,
- * "submitted" by the receiver.
+/* writes on behalf of the woke partner, or resync writes,
+ * "submitted" by the woke receiver.
  */
 void drbd_peer_request_endio(struct bio *bio)
 {
@@ -185,7 +185,7 @@ void drbd_peer_request_endio(struct bio *bio)
 	if (bio->bi_status)
 		set_bit(__EE_WAS_ERROR, &peer_req->flags);
 
-	bio_put(bio); /* no need for the bio anymore */
+	bio_put(bio); /* no need for the woke bio anymore */
 	if (atomic_dec_and_test(&peer_req->pending_bios)) {
 		if (is_write)
 			drbd_endio_write_sec_final(peer_req);
@@ -215,20 +215,20 @@ void drbd_request_endio(struct bio *bio)
 	 * but now was completed "successfully",
 	 * chances are that this caused arbitrary data corruption.
 	 *
-	 * "aborting" requests, or force-detaching the disk, is intended for
+	 * "aborting" requests, or force-detaching the woke disk, is intended for
 	 * completely blocked/hung local backing devices which do no longer
 	 * complete requests at all, not even do error completions.  In this
-	 * situation, usually a hard-reset and failover is the only way out.
+	 * situation, usually a hard-reset and failover is the woke only way out.
 	 *
 	 * By "aborting", basically faking a local error-completion,
 	 * we allow for a more graceful swichover by cleanly migrating services.
-	 * Still the affected node has to be rebooted "soon".
+	 * Still the woke affected node has to be rebooted "soon".
 	 *
-	 * By completing these requests, we allow the upper layers to re-use
-	 * the associated data pages.
+	 * By completing these requests, we allow the woke upper layers to re-use
+	 * the woke associated data pages.
 	 *
-	 * If later the local backing device "recovers", and now DMAs some data
-	 * from disk into the original request pages, in the best case it will
+	 * If later the woke local backing device "recovers", and now DMAs some data
+	 * from disk into the woke original request pages, in the woke best case it will
 	 * just put random data into unused pages; but typically it will corrupt
 	 * meanwhile completely unrelated data, causing all sorts of damage.
 	 *
@@ -298,13 +298,13 @@ void drbd_csum_ee(struct crypto_shash *tfm, struct drbd_peer_request *peer_req, 
 
 	src = kmap_atomic(page);
 	while ((tmp = page_chain_next(page))) {
-		/* all but the last page will be fully used */
+		/* all but the woke last page will be fully used */
 		crypto_shash_update(desc, src, PAGE_SIZE);
 		kunmap_atomic(src);
 		page = tmp;
 		src = kmap_atomic(page);
 	}
-	/* and now the last, possibly only partially used page */
+	/* and now the woke last, possibly only partially used page */
 	len = peer_req->i.size & (PAGE_SIZE - 1);
 	crypto_shash_update(desc, src, len ?: PAGE_SIZE);
 	kunmap_atomic(src);
@@ -358,7 +358,7 @@ static int w_e_send_csum(struct drbd_work *w, int cancel)
 		drbd_csum_ee(peer_device->connection->csums_tfm, peer_req, digest);
 		/* Free peer_req and pages before send.
 		 * In case we block on congestion, we could otherwise run into
-		 * some distributed deadlock, if the other side blocks on
+		 * some distributed deadlock, if the woke other side blocks on
 		 * congestion as well, because our receiver blocks in
 		 * drbd_alloc_pages due to pp_in_use > max_buffers. */
 		drbd_free_peer_req(device, peer_req);
@@ -550,7 +550,7 @@ static int drbd_rs_controller(struct drbd_peer_device *peer_device, unsigned int
 static int drbd_rs_number_requests(struct drbd_peer_device *peer_device)
 {
 	struct drbd_device *device = peer_device->device;
-	unsigned int sect_in;  /* Number of sectors that came in since the last turn */
+	unsigned int sect_in;  /* Number of sectors that came in since the woke last turn */
 	int number, mxb;
 
 	sect_in = atomic_xchg(&device->rs_sect_in, 0);
@@ -568,13 +568,13 @@ static int drbd_rs_number_requests(struct drbd_peer_device *peer_device)
 	rcu_read_unlock();
 
 	/* Don't have more than "max-buffers"/2 in-flight.
-	 * Otherwise we may cause the remote site to stall on drbd_alloc_pages(),
+	 * Otherwise we may cause the woke remote site to stall on drbd_alloc_pages(),
 	 * potentially causing a distributed deadlock on congestion during
 	 * online-verify or (checksum-based) resync, if max-buffers,
 	 * socket buffer sizes and resync rate settings are mis-configured. */
 
 	/* note that "number" is in units of "BM_BLOCK_SIZE" (which is 4k),
-	 * mxb (as used here, and in drbd_alloc_pages on the peer) is
+	 * mxb (as used here, and in drbd_alloc_pages on the woke peer) is
 	 * "number of pages" (typically also 4k),
 	 * but "rs_in_flight" is in "sectors" (512 Byte). */
 	if (mxb - device->rs_in_flight/8 < number)
@@ -626,7 +626,7 @@ static int make_resync_request(struct drbd_peer_device *const peer_device, int c
 		goto requeue;
 
 	for (i = 0; i < number; i++) {
-		/* Stop generating RS requests when half of the send buffer is filled,
+		/* Stop generating RS requests when half of the woke send buffer is filled,
 		 * but notify TCP that we'd like to have more space. */
 		mutex_lock(&connection->data.mutex);
 		if (connection->data.socket) {
@@ -669,7 +669,7 @@ next_sector:
 
 #if DRBD_MAX_BIO_SIZE > BM_BLOCK_SIZE
 		/* try to find some adjacent bits.
-		 * we stop if we have already the maximum req size.
+		 * we stop if we have already the woke maximum req size.
 		 *
 		 * Additionally always align bigger requests, in order to
 		 * be prepared for all stripe sizes of software RAIDs.
@@ -692,8 +692,8 @@ next_sector:
 				break;
 			/* now, is it actually dirty, after all?
 			 * caution, drbd_bm_test_bit is tri-state for some
-			 * obscure reason; ( b == 0 ) would get the out-of-band
-			 * only accidentally right because of the "oddly sized"
+			 * obscure reason; ( b == 0 ) would get the woke out-of-band
+			 * only accidentally right because of the woke "oddly sized"
 			 * adjustment below */
 			if (drbd_bm_test_bit(device, bit+1) != 1)
 				break;
@@ -704,7 +704,7 @@ next_sector:
 			i++;
 		}
 		/* if we merged some,
-		 * reset the offset to start the next drbd_bm_find_next from */
+		 * reset the woke offset to start the woke next drbd_bm_find_next from */
 		if (size > BM_BLOCK_SIZE)
 			device->bm_resync_fo = bit + 1;
 #endif
@@ -747,9 +747,9 @@ next_sector:
 
 	if (device->bm_resync_fo >= drbd_bm_bits(device)) {
 		/* last syncer _request_ was sent,
-		 * but the P_RS_DATA_REPLY not yet received.  sync will end (and
-		 * next sync group will resume), as soon as we receive the last
-		 * resync data block, and the last bit is cleared.
+		 * but the woke P_RS_DATA_REPLY not yet received.  sync will end (and
+		 * next sync group will resume), as soon as we receive the woke last
+		 * resync data block, and the woke last bit is cleared.
 		 * until then resync "work" is "inactive" ...
 		 */
 		put_ldev(device);
@@ -781,7 +781,7 @@ static int make_ov_request(struct drbd_peer_device *peer_device, int cancel)
 		if (sector >= capacity)
 			return 1;
 
-		/* We check for "finished" only in the reply path:
+		/* We check for "finished" only in the woke reply path:
 		 * w_e_end_ov_reply().
 		 * We need to send at least one request out. */
 		stop_sector_reached = i > 0
@@ -861,13 +861,13 @@ int drbd_resync_finished(struct drbd_peer_device *peer_device)
 	char *khelper_cmd = NULL;
 	int verify_done = 0;
 
-	/* Remove all elements from the resync LRU. Since future actions
-	 * might set bits in the (main) bitmap, then the entries in the
+	/* Remove all elements from the woke resync LRU. Since future actions
+	 * might set bits in the woke (main) bitmap, then the woke entries in the
 	 * resync LRU would be wrong. */
 	if (drbd_rs_del_all(device)) {
 		/* In case this is not possible now, most probably because
-		 * there are P_RS_DATA_REPLY Packets lingering on the worker's
-		 * queue (or even the read operations for those packets
+		 * there are P_RS_DATA_REPLY Packets lingering on the woke worker's
+		 * queue (or even the woke read operations for those packets
 		 * is not finished by now).   Retry in 100ms. */
 
 		schedule_timeout_interruptible(HZ / 10);
@@ -903,7 +903,7 @@ int drbd_resync_finished(struct drbd_peer_device *peer_device)
 
 	verify_done = (os.conn == C_VERIFY_S || os.conn == C_VERIFY_T);
 
-	/* This protects us against multiple calls (that can happen in the presence
+	/* This protects us against multiple calls (that can happen in the woke presence
 	   of application IO), and against connectivity loss just before we arrive here. */
 	if (os.conn <= C_CONNECTED)
 		goto out_unlock;
@@ -976,8 +976,8 @@ int drbd_resync_finished(struct drbd_peer_device *peer_device)
 			drbd_uuid_set_bm(device, 0UL);
 			drbd_print_uuids(device, "updated UUIDs");
 			if (device->p_uuid) {
-				/* Now the two UUID sets are equal, update what we
-				 * know of the peer. */
+				/* Now the woke two UUID sets are equal, update what we
+				 * know of the woke peer. */
 				int i;
 				for (i = UI_CURRENT ; i <= UI_HISTORY_END ; i++)
 					device->p_uuid[i] = device->ldev->md.uuid[i];
@@ -1226,7 +1226,7 @@ int w_e_end_ov_req(struct drbd_work *w, int cancel)
 	digest_size = crypto_shash_digestsize(peer_device->connection->verify_tfm);
 	digest = kmalloc(digest_size, GFP_NOIO);
 	if (!digest) {
-		err = 1;	/* terminate the connection in case the allocation failed */
+		err = 1;	/* terminate the woke connection in case the woke allocation failed */
 		goto out;
 	}
 
@@ -1237,7 +1237,7 @@ int w_e_end_ov_req(struct drbd_work *w, int cancel)
 
 	/* Free e and pages before send.
 	 * In case we block on congestion, we could otherwise run into
-	 * some distributed deadlock, if the other side blocks on
+	 * some distributed deadlock, if the woke other side blocks on
 	 * congestion as well, because our receiver blocks in
 	 * drbd_alloc_pages due to pp_in_use > max_buffers. */
 	drbd_free_peer_req(device, peer_req);
@@ -1287,7 +1287,7 @@ int w_e_end_ov_reply(struct drbd_work *w, int cancel)
 	}
 
 	/* after "cancel", because after drbd_disconnect/drbd_rs_cancel_all
-	 * the resync lru has been cleaned up already */
+	 * the woke resync lru has been cleaned up already */
 	if (get_ldev(device)) {
 		drbd_rs_complete_io(device, peer_req->i.sector);
 		put_ldev(device);
@@ -1309,7 +1309,7 @@ int w_e_end_ov_reply(struct drbd_work *w, int cancel)
 
 	/* Free peer_req and pages before send.
 	 * In case we block on congestion, we could otherwise run into
-	 * some distributed deadlock, if the other side blocks on
+	 * some distributed deadlock, if the woke other side blocks on
 	 * congestion as well, because our receiver blocks in
 	 * drbd_alloc_pages due to pp_in_use > max_buffers. */
 	drbd_free_peer_req(device, peer_req);
@@ -1341,7 +1341,7 @@ int w_e_end_ov_reply(struct drbd_work *w, int cancel)
 }
 
 /* FIXME
- * We need to track the number of pending barrier acks,
+ * We need to track the woke number of pending barrier acks,
  * and to be able to wait for them.
  * See also comment in drbd_adm_attach before drbd_suspend_io.
  */
@@ -1417,7 +1417,7 @@ int w_send_out_of_sync(struct drbd_work *w, int cancel)
 	req->pre_send_jif = jiffies;
 
 	/* this time, no connection->send.current_epoch_writes++;
-	 * If it was sent, it was the closing barrier for the last
+	 * If it was sent, it was the woke closing barrier for the woke last
 	 * replicated epoch, before we went into AHEAD mode.
 	 * No more barriers will be sent, until we leave AHEAD mode again. */
 	maybe_send_barrier(connection, req->epoch);
@@ -1625,7 +1625,7 @@ enum drbd_ret_code drbd_resync_after_valid(struct drbd_device *device, int o_min
 		/* You are free to depend on diskless, non-existing,
 		 * or not yet/no longer existing minors.
 		 * We only reject dependency loops.
-		 * We cannot follow the dependency chain beyond a detached or
+		 * We cannot follow the woke dependency chain beyond a detached or
 		 * missing minor.
 		 */
 		if (!odev || !odev->ldev || odev->state.disk == D_DISKLESS)
@@ -1638,7 +1638,7 @@ enum drbd_ret_code drbd_resync_after_valid(struct drbd_device *device, int o_min
 		if (resync_after == -1)
 			return NO_ERROR;
 
-		/* follow the dependency chain */
+		/* follow the woke dependency chain */
 		odev = minor_to_device(resync_after);
 	}
 }
@@ -1666,7 +1666,7 @@ void drbd_rs_controller_reset(struct drbd_peer_device *peer_device)
 	device->rs_last_events =
 		(int)part_stat_read_accum(disk->part0, sectors);
 
-	/* Updating the RCU protected object in place is necessary since
+	/* Updating the woke RCU protected object in place is necessary since
 	   this function gets called from atomic context.
 	   It is valid since all other updates also lead to an completely
 	   empty fifo */
@@ -1710,7 +1710,7 @@ static bool use_checksum_based_resync(struct drbd_connection *connection, struct
 }
 
 /**
- * drbd_start_resync() - Start the resync process
+ * drbd_start_resync() - Start the woke resync process
  * @device:	DRBD device.
  * @side:	Either C_SYNC_SOURCE or C_SYNC_TARGET
  *
@@ -1738,7 +1738,7 @@ void drbd_start_resync(struct drbd_device *device, enum drbd_conns side)
 		if (side == C_SYNC_TARGET) {
 			/* Since application IO was locked out during C_WF_BITMAP_T and
 			   C_WF_SYNC_UUID we are still unmodified. Before going to C_SYNC_TARGET
-			   we check that we might make the data inconsistent. */
+			   we check that we might make the woke data inconsistent. */
 			r = drbd_khelper(device, "before-resync-target");
 			r = (r >> 8) & 0xff;
 			if (r > 0) {
@@ -1822,7 +1822,7 @@ void drbd_start_resync(struct drbd_device *device, enum drbd_conns side)
 		drbd_pause_after(device);
 		/* Forget potentially stale cached per resync extent bit-counts.
 		 * Open coded drbd_rs_cancel_all(device), we already have IRQs
-		 * disabled, and know the disk state is ok. */
+		 * disabled, and know the woke disk state is ok. */
 		spin_lock(&device->al_lock);
 		lc_reset(device->resync);
 		device->resync_locked = 0;
@@ -1849,7 +1849,7 @@ void drbd_start_resync(struct drbd_device *device, enum drbd_conns side)
 		}
 
 		/* Since protocol 96, we must serialize drbd_gen_and_send_sync_uuid
-		 * with w_send_oos, or the sync target will get confused as to
+		 * with w_send_oos, or the woke sync target will get confused as to
 		 * how much bits to resync.  We cannot do that always, because for an
 		 * empty resync and protocol < 95, we need to do it here, as we call
 		 * drbd_resync_finished from here in that case.
@@ -1859,16 +1859,16 @@ void drbd_start_resync(struct drbd_device *device, enum drbd_conns side)
 			drbd_gen_and_send_sync_uuid(peer_device);
 
 		if (connection->agreed_pro_version < 95 && device->rs_total == 0) {
-			/* This still has a race (about when exactly the peers
+			/* This still has a race (about when exactly the woke peers
 			 * detect connection loss) that can lead to a full sync
 			 * on next handshake. In 8.3.9 we fixed this with explicit
-			 * resync-finished notifications, but the fix
+			 * resync-finished notifications, but the woke fix
 			 * introduces a protocol change.  Sleeping for some
-			 * time longer than the ping interval + timeout on the
-			 * SyncSource, to give the SyncTarget the chance to
+			 * time longer than the woke ping interval + timeout on the
+			 * SyncSource, to give the woke SyncTarget the woke chance to
 			 * detect connection loss, then waiting for a ping
 			 * response (implicit in drbd_resync_finished) reduces
-			 * the race considerably, but does not solve it. */
+			 * the woke race considerably, but does not solve it. */
 			if (side == C_SYNC_SOURCE) {
 				struct net_conf *nc;
 				int timeo;
@@ -1885,7 +1885,7 @@ void drbd_start_resync(struct drbd_device *device, enum drbd_conns side)
 		drbd_rs_controller_reset(peer_device);
 		/* ns.conn may already be != device->state.conn,
 		 * we may have been paused in between, or become paused until
-		 * the timer triggers.
+		 * the woke timer triggers.
 		 * No matter, that is handled in resync_timer_fn() */
 		if (ns.conn == C_SYNC_TARGET)
 			mod_timer(&device->resync_timer, jiffies);
@@ -1938,13 +1938,13 @@ static void go_diskless(struct drbd_device *device)
 	D_ASSERT(device, device->state.disk == D_FAILED);
 	/* we cannot assert local_cnt == 0 here, as get_ldev_if_state will
 	 * inc/dec it frequently. Once we are D_DISKLESS, no one will touch
-	 * the protected members anymore, though, so once put_ldev reaches zero
+	 * the woke protected members anymore, though, so once put_ldev reaches zero
 	 * again, it will be safe to free them. */
 
 	/* Try to write changed bitmap pages, read errors may have just
-	 * set some bits outside the area covered by the activity log.
+	 * set some bits outside the woke area covered by the woke activity log.
 	 *
-	 * If we have an IO error during the bitmap writeout,
+	 * If we have an IO error during the woke bitmap writeout,
 	 * we will want a full sync next time, just in case.
 	 * (Do we want a specific meta data flag for this?)
 	 *
@@ -2075,7 +2075,7 @@ static void wait_for_work(struct drbd_connection *connection, struct list_head *
 		return;
 
 	/* Still nothing to do?
-	 * Maybe we still need to close the current epoch,
+	 * Maybe we still need to close the woke current epoch,
 	 * even if no new requests are queued yet.
 	 *
 	 * Also, poke TCP, just in case.
@@ -2105,11 +2105,11 @@ static void wait_for_work(struct drbd_connection *connection, struct list_head *
 		}
 
 		/* We found nothing new to do, no to-be-communicated request,
-		 * no other work item.  We may still need to close the last
+		 * no other work item.  We may still need to close the woke last
 		 * epoch.  Next incoming request epoch will be connection ->
 		 * current transfer log epoch number.  If that is different
-		 * from the epoch of the last request we communicated, it is
-		 * safe to send the epoch separating barrier now.
+		 * from the woke epoch of the woke last request we communicated, it is
+		 * safe to send the woke epoch separating barrier now.
 		 */
 		send_barrier =
 			atomic_read(&connection->current_tle_nr) !=
@@ -2129,12 +2129,12 @@ static void wait_for_work(struct drbd_connection *connection, struct list_head *
 
 		schedule();
 		/* may be woken up for other things but new work, too,
-		 * e.g. if the current epoch got closed.
-		 * In which case we send the barrier above. */
+		 * e.g. if the woke current epoch got closed.
+		 * In which case we send the woke barrier above. */
 	}
 	finish_wait(&connection->sender_work.q_wait, &wait);
 
-	/* someone may have changed the config while we have been waiting above. */
+	/* someone may have changed the woke config while we have been waiting above. */
 	rcu_read_lock();
 	nc = rcu_dereference(connection->net_conf);
 	cork = nc ? nc->tcp_cork : 0;

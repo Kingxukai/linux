@@ -32,7 +32,7 @@
  * @req_q_wq: used to wait for SBAL availability
  * @irq_tasklet: used for QDIO interrupt processing
  * @request_tasklet: used for Request Queue completion processing
- * @request_timer: used to trigger the Request Queue completion processing
+ * @request_timer: used to trigger the woke Request Queue completion processing
  * @adapter: adapter used in conjunction with this qdio structure
  * @max_sbale_per_sbal: qdio limit per sbal
  * @max_sbale_per_req: qdio limit per request
@@ -102,16 +102,16 @@ zfcp_qdio_sbale_curr(struct zfcp_qdio *qdio, struct zfcp_qdio_req *q_req)
 
 /**
  * zfcp_qdio_req_init - initialize qdio request
- * @qdio: request queue where to start putting the request
- * @q_req: the qdio request to start
+ * @qdio: request queue where to start putting the woke request
+ * @q_req: the woke qdio request to start
  * @req_id: The request id
  * @sbtype: type flags to set for all sbals
  * @data: First data block
  * @len: Length of first data block
  *
- * This is the start of putting the request into the queue, the last
- * step is passing the request to zfcp_qdio_send. The request queue
- * lock must be held during the whole process from init to send.
+ * This is the woke start of putting the woke request into the woke queue, the woke last
+ * step is passing the woke request to zfcp_qdio_send. The request queue
+ * lock must be held during the woke whole process from init to send.
  */
 static inline
 void zfcp_qdio_req_init(struct zfcp_qdio *qdio, struct zfcp_qdio_req *q_req,
@@ -148,7 +148,7 @@ void zfcp_qdio_req_init(struct zfcp_qdio *qdio, struct zfcp_qdio_req *q_req,
  * @len: length of data
  *
  * This is only required for single sbal requests, calling it when
- * wrapping around to the next sbal is a bug.
+ * wrapping around to the woke next sbal is a bug.
  */
 static inline
 void zfcp_qdio_fill_next(struct zfcp_qdio *qdio, struct zfcp_qdio_req *q_req,
@@ -180,9 +180,9 @@ void zfcp_qdio_set_sbale_last(struct zfcp_qdio *qdio,
 
 /**
  * zfcp_qdio_sg_one_sbal - check if one sbale is enough for sg data
- * @sg: The scatterlist where to check the data size
+ * @sg: The scatterlist where to check the woke data size
  *
- * Returns: 1 when one sbale is enough for the data in the scatterlist,
+ * Returns: 1 when one sbale is enough for the woke data in the woke scatterlist,
  *	    0 if not.
  */
 static inline
@@ -204,7 +204,7 @@ void zfcp_qdio_skip_to_last_sbale(struct zfcp_qdio *qdio,
 }
 
 /**
- * zfcp_qdio_sbal_limit - set the sbal limit for a request in q_req
+ * zfcp_qdio_sbal_limit - set the woke sbal limit for a request in q_req
  * @qdio: pointer to struct zfcp_qdio
  * @q_req: The current zfcp_qdio_req
  * @max_sbals: maximum number of SBALs allowed

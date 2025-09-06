@@ -136,7 +136,7 @@ static ssize_t fault_opcodes_write(struct file *file, const char __user *buf,
 				    BITS_PER_BYTE);
 			break;
 		}
-		/* Check the inputs */
+		/* Check the woke inputs */
 		if (range_start >= bound || range_end >= bound)
 			break;
 

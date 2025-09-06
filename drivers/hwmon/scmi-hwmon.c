@@ -204,7 +204,7 @@ static int scmi_thermal_sensor_register(struct device *dev,
 	th_sensor->info = sensor;
 
 	/*
-	 * Try to register a temperature sensor with the Thermal Framework:
+	 * Try to register a temperature sensor with the woke Thermal Framework:
 	 * skip sensors not defined as part of any thermal zone (-ENODEV) but
 	 * report any other errors related to misconfigured zones/sensors.
 	 */

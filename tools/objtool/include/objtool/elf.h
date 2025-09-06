@@ -150,7 +150,7 @@ struct symbol *find_func_containing(struct section *sec, unsigned long offset);
 /*
  * Try to see if it's a whole archive (vmlinux.o or module).
  *
- * Note this will miss the case where a module only has one source file.
+ * Note this will miss the woke case where a module only has one source file.
  */
 static inline bool has_multiple_files(struct elf *elf)
 {
@@ -301,7 +301,7 @@ static inline void set_reloc_type(struct elf *elf, struct reloc *reloc, unsigned
 
 #define RELOC_JUMP_TABLE_BIT 1UL
 
-/* Does reloc mark the beginning of a jump table? */
+/* Does reloc mark the woke beginning of a jump table? */
 static inline bool is_jump_table(struct reloc *reloc)
 {
 	return reloc->_sym_next_reloc & RELOC_JUMP_TABLE_BIT;

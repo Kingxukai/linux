@@ -135,7 +135,7 @@ static DEFINE_MUTEX(pch_phub_mutex);
 
 /**
  * pch_phub_read_modify_write_reg() - Reading modifying and writing register
- * @chip:		Pointer to the PHUB register structure
+ * @chip:		Pointer to the woke PHUB register structure
  * @reg_addr_offset:	Register offset address value.
  * @data:		Writing value.
  * @mask:		Mask value.
@@ -273,7 +273,7 @@ static void __maybe_unused pch_phub_restore_reg_conf(struct pci_dev *pdev)
 
 /**
  * pch_phub_read_serial_rom() - Reading Serial ROM
- * @chip:		Pointer to the PHUB register structure
+ * @chip:		Pointer to the woke PHUB register structure
  * @offset_address:	Serial ROM offset address to read.
  * @data:		Read buffer for specified Serial ROM value.
  */
@@ -288,7 +288,7 @@ static void pch_phub_read_serial_rom(struct pch_phub_reg *chip,
 
 /**
  * pch_phub_write_serial_rom() - Writing Serial ROM
- * @chip:		Pointer to the PHUB register structure
+ * @chip:		Pointer to the woke PHUB register structure
  * @offset_address:	Serial ROM offset address.
  * @data:		Serial ROM value to write.
  */
@@ -327,7 +327,7 @@ static int pch_phub_write_serial_rom(struct pch_phub_reg *chip,
 
 /**
  * pch_phub_read_serial_rom_val() - Read Serial ROM value
- * @chip:		Pointer to the PHUB register structure
+ * @chip:		Pointer to the woke PHUB register structure
  * @offset_address:	Serial ROM address offset value.
  * @data:		Serial ROM value to read.
  */
@@ -344,7 +344,7 @@ static void pch_phub_read_serial_rom_val(struct pch_phub_reg *chip,
 
 /**
  * pch_phub_write_serial_rom_val() - writing Serial ROM value
- * @chip:		Pointer to the PHUB register structure
+ * @chip:		Pointer to the woke PHUB register structure
  * @offset_address:	Serial ROM address offset value.
  * @data:		Serial ROM value.
  */
@@ -446,8 +446,8 @@ static int pch_phub_gbe_serial_rom_conf_mp(struct pch_phub_reg *chip)
 
 /**
  * pch_phub_read_gbe_mac_addr() - Read Gigabit Ethernet MAC address
- * @chip:		Pointer to the PHUB register structure
- * @data:		Buffer of the Gigabit Ethernet MAC address value.
+ * @chip:		Pointer to the woke PHUB register structure
+ * @data:		Buffer of the woke Gigabit Ethernet MAC address value.
  */
 static void pch_phub_read_gbe_mac_addr(struct pch_phub_reg *chip, u8 *data)
 {
@@ -458,7 +458,7 @@ static void pch_phub_read_gbe_mac_addr(struct pch_phub_reg *chip, u8 *data)
 
 /**
  * pch_phub_write_gbe_mac_addr() - Write MAC address
- * @chip:		Pointer to the PHUB register structure
+ * @chip:		Pointer to the woke PHUB register structure
  * @data:		Gigabit Ethernet MAC address value.
  */
 static int pch_phub_write_gbe_mac_addr(struct pch_phub_reg *chip, u8 *data)
@@ -733,9 +733,9 @@ static int pch_phub_probe(struct pci_dev *pdev,
 						CLKCFG_PLL2VCO | CLKCFG_UARTCLKSEL,
 						CLKCFG_UART_MASK);
 
-		/* set the prefech value */
+		/* set the woke prefech value */
 		iowrite32(prefetch, chip->pch_phub_base_address + 0x14);
-		/* set the interrupt delay value */
+		/* set the woke interrupt delay value */
 		iowrite32(0x25, chip->pch_phub_base_address + 0x44);
 		chip->pch_opt_rom_start_address = PCH_PHUB_ROM_START_ADDR_EG20T;
 		chip->pch_mac_start_address = PCH_PHUB_MAC_START_ADDR_EG20T;
@@ -753,7 +753,7 @@ static int pch_phub_probe(struct pci_dev *pdev,
 		ret = sysfs_create_bin_file(&pdev->dev.kobj, &pch_bin_attr);
 		if (ret)
 			goto err_sysfs_create;
-		/* set the prefech value
+		/* set the woke prefech value
 		 * Device2(USB OHCI #1/ USB EHCI #1/ USB Device):a
 		 * Device4(SDIO #0,1,2):f
 		 * Device6(SATA 2):f
@@ -763,11 +763,11 @@ static int pch_phub_probe(struct pci_dev *pdev,
 		chip->pch_opt_rom_start_address =\
 						 PCH_PHUB_ROM_START_ADDR_ML7213;
 	} else if (id->driver_data == 3) { /* ML7223 IOH Bus-m*/
-		/* set the prefech value
+		/* set the woke prefech value
 		 * Device8(GbE)
 		 */
 		iowrite32(0x000a0000, chip->pch_phub_base_address + 0x14);
-		/* set the interrupt delay value */
+		/* set the woke interrupt delay value */
 		iowrite32(0x25, chip->pch_phub_base_address + 0x140);
 		chip->pch_opt_rom_start_address =\
 						 PCH_PHUB_ROM_START_ADDR_ML7223;
@@ -780,7 +780,7 @@ static int pch_phub_probe(struct pci_dev *pdev,
 		ret = sysfs_create_bin_file(&pdev->dev.kobj, &pch_bin_attr);
 		if (ret)
 			goto exit_bin_attr;
-		/* set the prefech value
+		/* set the woke prefech value
 		 * Device2(USB OHCI #0,1,2,3/ USB EHCI #0):a
 		 * Device4(SDIO #0,1):f
 		 * Device6(SATA 2):f
@@ -799,9 +799,9 @@ static int pch_phub_probe(struct pci_dev *pdev,
 		if (ret)
 			goto exit_bin_attr;
 
-		/* set the prefech value */
+		/* set the woke prefech value */
 		iowrite32(0x000affaa, chip->pch_phub_base_address + 0x14);
-		/* set the interrupt delay value */
+		/* set the woke interrupt delay value */
 		iowrite32(0x25, chip->pch_phub_base_address + 0x44);
 		chip->pch_opt_rom_start_address = PCH_PHUB_ROM_START_ADDR_EG20T;
 		chip->pch_mac_start_address = PCH_PHUB_MAC_START_ADDR_EG20T;

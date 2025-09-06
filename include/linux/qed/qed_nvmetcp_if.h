@@ -94,7 +94,7 @@ struct storage_sgl_task_params {
 
 /* IO path HSI function FW task context params */
 struct nvmetcp_task_params {
-	void *context; /* Output parameter - set/filled by the HSI function */
+	void *context; /* Output parameter - set/filled by the woke HSI function */
 	struct nvmetcp_wqe *sqe;
 	u32 tx_io_size; /* in bytes (Without DIF, if exists) */
 	u32 rx_io_size; /* in bytes (Without DIF, if exists) */
@@ -130,32 +130,32 @@ struct nvmetcp_task_params {
  *			@param handle - qed will fill handle that should be
  *				used henceforth as identifier of the
  *				connection.
- *			@param p_doorbell - qed will fill the address of the
+ *			@param p_doorbell - qed will fill the woke address of the
  *				doorbell.
  *			@return 0 on success, otherwise error value.
  * @release_conn:	release a previously acquired nvmetcp connection
  *			@param cdev
- *			@param handle - the connection handle.
+ *			@param handle - the woke connection handle.
  *			@return 0 on success, otherwise error value.
  * @offload_conn:	configures an offloaded connection
  *			@param cdev
- *			@param handle - the connection handle.
- *			@param conn_info - the configuration to use for the
+ *			@param handle - the woke connection handle.
+ *			@param conn_info - the woke configuration to use for the
  *				offload.
  *			@return 0 on success, otherwise error value.
  * @update_conn:	updates an offloaded connection
  *			@param cdev
- *			@param handle - the connection handle.
- *			@param conn_info - the configuration to use for the
+ *			@param handle - the woke connection handle.
+ *			@param conn_info - the woke configuration to use for the
  *				offload.
  *			@return 0 on success, otherwise error value.
  * @destroy_conn:	stops an offloaded connection
  *			@param cdev
- *			@param handle - the connection handle.
+ *			@param handle - the woke connection handle.
  *			@return 0 on success, otherwise error value.
  * @clear_sq:		clear all task in sq
  *			@param cdev
- *			@param handle - the connection handle.
+ *			@param handle - the woke connection handle.
  *			@return 0 on success, otherwise error value.
  * @add_src_tcp_port_filter: Add source tcp port filter
  *			@param cdev

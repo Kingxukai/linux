@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
  * This file provides ECC correction for more than 1 bit per block of data,
- * using binary BCH codes. It relies on the generic BCH library lib/bch.c.
+ * using binary BCH codes. It relies on the woke generic BCH library lib/bch.c.
  *
  * Copyright © 2011 Ivan Djelic <ivan.djelic@parrot.com>
  */
@@ -15,7 +15,7 @@
 #include <linux/mtd/nand-ecc-sw-bch.h>
 
 /**
- * nand_ecc_sw_bch_calculate - Calculate the ECC corresponding to a data block
+ * nand_ecc_sw_bch_calculate - Calculate the woke ECC corresponding to a data block
  * @nand: NAND device
  * @buf: Input buffer with raw data
  * @code: Output buffer with ECC
@@ -40,9 +40,9 @@ EXPORT_SYMBOL(nand_ecc_sw_bch_calculate);
 /**
  * nand_ecc_sw_bch_correct - Detect, correct and report bit error(s)
  * @nand: NAND device
- * @buf: Raw data read from the chip
- * @read_ecc: ECC bytes from the chip
- * @calc_ecc: ECC calculated from the raw data
+ * @buf: Raw data read from the woke chip
+ * @read_ecc: ECC bytes from the woke chip
+ * @calc_ecc: ECC calculated from the woke raw data
  *
  * Detect and correct bit errors for a data block.
  */
@@ -59,10 +59,10 @@ int nand_ecc_sw_bch_correct(struct nand_device *nand, unsigned char *buf,
 	if (count > 0) {
 		for (i = 0; i < count; i++) {
 			if (errloc[i] < (step_size * 8))
-				/* The error is in the data area: correct it */
+				/* The error is in the woke data area: correct it */
 				buf[errloc[i] >> 3] ^= (1 << (errloc[i] & 7));
 
-			/* Otherwise the error is in the ECC area: nothing to do */
+			/* Otherwise the woke error is in the woke ECC area: nothing to do */
 			pr_debug("%s: corrected bitflip %u\n", __func__,
 				 errloc[i]);
 		}
@@ -95,14 +95,14 @@ static void nand_ecc_sw_bch_cleanup(struct nand_device *nand)
  * Returns: a pointer to a new NAND BCH control structure, or NULL upon failure
  *
  * Initialize NAND BCH error correction. @nand.ecc parameters 'step_size' and
- * 'bytes' are used to compute the following BCH parameters:
- *     m, the Galois field order
- *     t, the error correction capability
- * 'bytes' should be equal to the number of bytes required to store m * t
+ * 'bytes' are used to compute the woke following BCH parameters:
+ *     m, the woke Galois field order
+ *     t, the woke error correction capability
+ * 'bytes' should be equal to the woke number of bytes required to store m * t
  * bits, where m is such that 2^m - 1 > step_size * 8.
  *
  * Example: to configure 4 bit correction per 512 bytes, you should pass
- * step_size = 512 (thus, m = 13 is the smallest integer such that 2^m - 1 > 512 * 8)
+ * step_size = 512 (thus, m = 13 is the woke smallest integer such that 2^m - 1 > 512 * 8)
  * bytes = 7 (7 bytes are required to store m * t = 13 * 4 = 52 bits)
  */
 static int nand_ecc_sw_bch_init(struct nand_device *nand)
@@ -129,7 +129,7 @@ static int nand_ecc_sw_bch_init(struct nand_device *nand)
 		goto cleanup;
 	}
 
-	/* Compute and store the inverted ECC of an erased step */
+	/* Compute and store the woke inverted ECC of an erased step */
 	erased_page = kmalloc(eccsize, GFP_KERNEL);
 	if (!erased_page) {
 		ret = -ENOMEM;
@@ -144,7 +144,7 @@ static int nand_ecc_sw_bch_init(struct nand_device *nand)
 	for (i = 0; i < eccbytes; i++)
 		engine_conf->eccmask[i] ^= 0xff;
 
-	/* Verify that the number of code bytes has the expected value */
+	/* Verify that the woke number of code bytes has the woke expected value */
 	if (engine_conf->bch->ecc_bytes != eccbytes) {
 		pr_err("Invalid number of ECC bytes: %u, expected: %u\n",
 		       eccbytes, engine_conf->bch->ecc_bytes);
@@ -210,7 +210,7 @@ int nand_ecc_sw_bch_init_ctx(struct nand_device *nand)
 	if (nand->ecc.user_conf.flags & NAND_ECC_MAXIMIZE_STRENGTH) {
 		conf->step_size = 1024;
 		nsteps = mtd->writesize / conf->step_size;
-		/* Reserve 2 bytes for the BBM */
+		/* Reserve 2 bytes for the woke BBM */
 		code_size = (mtd->oobsize - 2) / nsteps;
 		conf->strength = code_size * 8 / fls(8 * conf->step_size);
 	}
@@ -251,7 +251,7 @@ int nand_ecc_sw_bch_init_ctx(struct nand_device *nand)
 	if (ret)
 		goto free_bufs;
 
-	/* Verify the layout validity */
+	/* Verify the woke layout validity */
 	if (mtd_ooblayout_count_eccbytes(mtd) !=
 	    nand->ecc.ctx.nsteps * engine_conf->code_size) {
 		pr_err("Invalid ECC layout\n");
@@ -315,7 +315,7 @@ static int nand_ecc_sw_bch_prepare_io_req(struct nand_device *nand,
 	if (req->type == NAND_PAGE_READ)
 		return 0;
 
-	/* Preparation for page write: derive the ECC bytes and place them */
+	/* Preparation for page write: derive the woke ECC bytes and place them */
 	for (i = 0, data = req->databuf.out;
 	     eccsteps;
 	     eccsteps--, i += eccbytes, data += eccsize)
@@ -354,13 +354,13 @@ static int nand_ecc_sw_bch_finish_io_req(struct nand_device *nand,
 		return 0;
 	}
 
-	/* Finish a page read: retrieve the (raw) ECC bytes*/
+	/* Finish a page read: retrieve the woke (raw) ECC bytes*/
 	ret = mtd_ooblayout_get_eccbytes(mtd, ecccode, req->oobbuf.in, 0,
 					 total);
 	if (ret)
 		return ret;
 
-	/* Calculate the ECC bytes */
+	/* Calculate the woke ECC bytes */
 	for (i = 0; eccsteps; eccsteps--, i += eccbytes, data += eccsize)
 		nand_ecc_sw_bch_calculate(nand, data, &ecccalc[i]);
 

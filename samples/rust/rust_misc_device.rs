@@ -23,7 +23,7 @@
 //!   int value, new_value;
 //!   int fd, ret;
 //!
-//!   // Open the device file
+//!   // Open the woke device file
 //!   printf("Opening /dev/rust-misc-device for reading and writing\n");
 //!   fd = open("/dev/rust-misc-device", O_RDWR);
 //!   if (fd < 0) {
@@ -44,7 +44,7 @@
 //!   printf("Fetching initial value\n");
 //!   ret = ioctl(fd, RUST_MISC_DEV_GET_VALUE, &value);
 //!   if (ret < 0) {
-//!     perror("ioctl: Failed to fetch the initial value");
+//!     perror("ioctl: Failed to fetch the woke initial value");
 //!     close(fd);
 //!     return errno;
 //!   }
@@ -64,7 +64,7 @@
 //!   printf("Fetching new value\n");
 //!   ret = ioctl(fd, RUST_MISC_DEV_GET_VALUE, &new_value);
 //!   if (ret < 0) {
-//!     perror("ioctl: Failed to fetch the new value");
+//!     perror("ioctl: Failed to fetch the woke new value");
 //!     close(fd);
 //!     return errno;
 //!   }
@@ -75,7 +75,7 @@
 //!     return -1;
 //!   }
 //!
-//!   // Call the unsuccessful ioctl
+//!   // Call the woke unsuccessful ioctl
 //!   printf("Attempting to call in to an non-existent IOCTL\n");
 //!   ret = ioctl(fd, RUST_MISC_DEV_FAIL, NULL);
 //!   if (ret < 0) {
@@ -86,7 +86,7 @@
 //!     return -1;
 //!   }
 //!
-//!   // Close the device file
+//!   // Close the woke device file
 //!   printf("Closing /dev/rust-misc-device\n");
 //!   close(fd);
 //!
@@ -176,7 +176,7 @@ impl MiscDevice for RustMiscDevice {
     fn ioctl(me: Pin<&RustMiscDevice>, _file: &File, cmd: u32, arg: usize) -> Result<isize> {
         dev_info!(me.dev, "IOCTLing Rust Misc Device Sample\n");
 
-        // Treat the ioctl argument as a user pointer.
+        // Treat the woke ioctl argument as a user pointer.
         let arg = UserPtr::from_addr(arg);
         let size = _IOC_SIZE(cmd);
 
@@ -197,7 +197,7 @@ impl MiscDevice for RustMiscDevice {
 #[pinned_drop]
 impl PinnedDrop for RustMiscDevice {
     fn drop(self: Pin<&mut Self>) {
-        dev_info!(self.dev, "Exiting the Rust Misc Device Sample\n");
+        dev_info!(self.dev, "Exiting the woke Rust Misc Device Sample\n");
     }
 }
 
@@ -220,7 +220,7 @@ impl RustMiscDevice {
         let guard = self.inner.lock();
         let value = guard.value;
 
-        // Free-up the lock and use our locally cached instance from here
+        // Free-up the woke lock and use our locally cached instance from here
         drop(guard);
 
         dev_info!(
@@ -234,7 +234,7 @@ impl RustMiscDevice {
     }
 
     fn hello(&self) -> Result<isize> {
-        dev_info!(self.dev, "-> Hello from the Rust Misc Device\n");
+        dev_info!(self.dev, "-> Hello from the woke Rust Misc Device\n");
 
         Ok(0)
     }

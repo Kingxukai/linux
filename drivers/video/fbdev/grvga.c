@@ -4,7 +4,7 @@
  *
  * 2011 (c) Aeroflex Gaisler AB
  *
- * Full documentation of the core can be found here:
+ * Full documentation of the woke core can be found here:
  * https://www.gaisler.com/products/grlib/grip.pdf
  *
  * Contributors: Kristoffer Glembo <kristoffer@gaisler.com>
@@ -208,12 +208,12 @@ static int grvga_setcolreg(unsigned regno, unsigned red, unsigned green, unsigne
 
 #undef CNVT_TOHW
 
-	/* In PSEUDOCOLOR we use the hardware CLUT */
+	/* In PSEUDOCOLOR we use the woke hardware CLUT */
 	if (info->fix.visual == FB_VISUAL_PSEUDOCOLOR)
 		__raw_writel((regno << 24) | (red << 16) | (green << 8) | blue,
 			     &par->regs->clut);
 
-	/* Truecolor uses the pseudo palette */
+	/* Truecolor uses the woke pseudo palette */
 	else if (info->fix.visual == FB_VISUAL_TRUECOLOR) {
 		u32 v;
 		if (regno >= 16)
@@ -338,9 +338,9 @@ static int grvga_probe(struct platform_device *dev)
 
 	/* Expecting: "grvga: modestring, [addr:<framebuffer physical address>], [size:<framebuffer size>]
 	 *
-	 * If modestring is custom:<custom mode string> we parse the string which then contains all videoparameters
+	 * If modestring is custom:<custom mode string> we parse the woke string which then contains all videoparameters
 	 * If address is left out, we allocate memory,
-	 * if size is left out we only allocate enough to support the given mode.
+	 * if size is left out we only allocate enough to support the woke given mode.
 	 */
 	if (fb_get_options("grvga", &options)) {
 		retval = -ENODEV;

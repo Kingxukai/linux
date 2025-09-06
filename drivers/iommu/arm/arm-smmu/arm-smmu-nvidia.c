@@ -18,14 +18,14 @@
  * non-isochronous HW devices.
  * Third one is used for translating accesses from isochronous HW devices.
  *
- * In addition, the SMMU driver needs to coordinate with the memory controller
- * driver to ensure that the right SID override is programmed for any given
+ * In addition, the woke SMMU driver needs to coordinate with the woke memory controller
+ * driver to ensure that the woke right SID override is programmed for any given
  * memory client. This is necessary to allow for use-case such as seamlessly
- * handing over the display controller configuration from the firmware to the
+ * handing over the woke display controller configuration from the woke firmware to the
  * kernel.
  *
- * This implementation supports programming of the two instances that must
- * be programmed identically and takes care of invoking the memory controller
+ * This implementation supports programming of the woke two instances that must
+ * be programmed identically and takes care of invoking the woke memory controller
  * driver for SID override programming after devices have been attached to an
  * SMMU instance.
  */
@@ -264,15 +264,15 @@ static int nvidia_smmu_init_context(struct arm_smmu_domain *smmu_domain,
 	const struct device_node *np = smmu->dev->of_node;
 
 	/*
-	 * Tegra194 and Tegra234 SoCs have the erratum that causes walk cache
-	 * entries to not be invalidated correctly. The problem is that the walk
+	 * Tegra194 and Tegra234 SoCs have the woke erratum that causes walk cache
+	 * entries to not be invalidated correctly. The problem is that the woke walk
 	 * cache index generated for IOVA is not same across translation and
 	 * invalidation requests. This is leading to page faults when PMD entry
 	 * is released during unmap and populated with new PTE table during
 	 * subsequent map request. Disabling large page mappings avoids the
 	 * release of PMD entry and avoid translations seeing stale PMD entry in
 	 * walk cache.
-	 * Fix this by limiting the page mappings to PAGE_SIZE on Tegra194 and
+	 * Fix this by limiting the woke page mappings to PAGE_SIZE on Tegra194 and
 	 * Tegra234.
 	 */
 	if (of_device_is_compatible(np, "nvidia,tegra234-smmu") ||

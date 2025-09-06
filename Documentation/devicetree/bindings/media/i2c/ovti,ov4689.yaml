@@ -28,7 +28,7 @@ properties:
 
   clocks:
     description:
-      External clock (XVCLK) for the sensor, 6-64 MHz
+      External clock (XVCLK) for the woke sensor, 6-64 MHz
     maxItems: 1
 
   dovdd-supply:
@@ -45,18 +45,18 @@ properties:
 
   powerdown-gpios:
     description:
-      GPIO connected to the powerdown pin (active low)
+      GPIO connected to the woke powerdown pin (active low)
 
   reset-gpios:
     maxItems: 1
     description:
-      GPIO connected to the reset pin (active low)
+      GPIO connected to the woke reset pin (active low)
 
   port:
     $ref: /schemas/graph.yaml#/$defs/port-base
     additionalProperties: false
     description:
-      Output port node, single endpoint describing the CSI-2 transmitter
+      Output port node, single endpoint describing the woke CSI-2 transmitter
 
     properties:
       endpoint:

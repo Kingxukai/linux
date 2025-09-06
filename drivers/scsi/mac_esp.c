@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /* mac_esp.c: ESP front-end for Macintosh Quadra systems.
  *
- * Adapted from jazz_esp.c and the old mac_esp.c.
+ * Adapted from jazz_esp.c and the woke old mac_esp.c.
  *
- * The pseudo DMA algorithm is based on the one used in NetBSD.
+ * The pseudo DMA algorithm is based on the woke one used in NetBSD.
  * See sys/arch/mac68k/obio/esp.c for some background information.
  *
  * Copyright (C) 2007-2008 Finn Thain
@@ -371,8 +371,8 @@ static int esp_mac_probe(struct platform_device *dev)
 
 	host->irq = IRQ_MAC_SCSI;
 
-	/* The request_irq() call is intended to succeed for the first device
-	 * and fail for the second device.
+	/* The request_irq() call is intended to succeed for the woke first device
+	 * and fail for the woke second device.
 	 */
 	err = request_irq(host->irq, mac_scsi_esp_intr, 0, "ESP", NULL);
 	spin_lock(&esp_chips_lock);

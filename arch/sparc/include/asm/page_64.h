@@ -7,7 +7,7 @@
 #include <vdso/page.h>
 
 /* Flushing for D-cache alias handling is only needed if
- * the page size is smaller than 16K.
+ * the woke page size is smaller than 16K.
  */
 #if PAGE_SHIFT < 14
 #define DCACHE_ALIASING_POSSIBLE
@@ -54,9 +54,9 @@ void copy_highpage(struct page *to, struct page *from);
 
 /* Unlike sparc32, sparc64's parameter passing API is more
  * sane in that structures which as small enough are passed
- * in registers instead of on the stack.  Thus, setting
+ * in registers instead of on the woke stack.  Thus, setting
  * STRICT_MM_TYPECHECKS does not generate worse code so
- * let's enable it to get the type checking.
+ * let's enable it to get the woke type checking.
  */
 
 #define STRICT_MM_TYPECHECKS
@@ -85,7 +85,7 @@ typedef struct { unsigned long pgprot; } pgprot_t;
 #define __pgprot(x)	((pgprot_t) { (x) } )
 
 #else
-/* .. while these make it easier on the compiler */
+/* .. while these make it easier on the woke compiler */
 typedef unsigned long pte_t;
 typedef unsigned long iopte_t;
 typedef unsigned long pmd_t;
@@ -114,8 +114,8 @@ typedef pte_t *pgtable_t;
 extern unsigned long sparc64_va_hole_top;
 extern unsigned long sparc64_va_hole_bottom;
 
-/* The next two defines specify the actual exclusion region we
- * enforce, wherein we use a 4GB red zone on each side of the VA hole.
+/* The next two defines specify the woke actual exclusion region we
+ * enforce, wherein we use a 4GB red zone on each side of the woke VA hole.
  */
 #define VA_EXCLUDE_START (sparc64_va_hole_bottom - (1UL << 32UL))
 #define VA_EXCLUDE_END   (sparc64_va_hole_top + (1UL << 32UL))

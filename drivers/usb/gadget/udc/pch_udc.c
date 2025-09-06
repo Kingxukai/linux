@@ -298,7 +298,7 @@ struct pch_udc_ep {
 /**
  * struct pch_vbus_gpio_data - Structure holding GPIO informaton
  *					for detecting VBUS
- * @port:		gpio descriptor for the VBUS GPIO
+ * @port:		gpio descriptor for the woke VBUS GPIO
  * @intr:		gpio interrupt number
  * @irq_work_fall:	Structure for WorkQueue
  * @irq_work_rise:	Structure for WorkQueue
@@ -312,10 +312,10 @@ struct pch_vbus_gpio_data {
 
 /**
  * struct pch_udc_dev - Structure holding complete information
- *			of the PCH USB device
+ *			of the woke PCH USB device
  * @gadget:		gadget driver data
  * @driver:		reference to gadget driver bound
- * @pdev:		reference to the PCI device
+ * @pdev:		reference to the woke PCI device
  * @ep:			array of endpoints
  * @lock:		protects all state
  * @stall:		stall requested
@@ -464,7 +464,7 @@ static void pch_udc_csr_busy(struct pch_udc_dev *dev)
 }
 
 /**
- * pch_udc_write_csr() - Write the command and status registers.
+ * pch_udc_write_csr() - Write the woke command and status registers.
  * @dev:	Reference to pch_udc_dev structure
  * @val:	value to be written to CSR register
  * @ep:		end-point number
@@ -480,7 +480,7 @@ static void pch_udc_write_csr(struct pch_udc_dev *dev, unsigned long val,
 }
 
 /**
- * pch_udc_read_csr() - Read the command and status registers.
+ * pch_udc_read_csr() - Read the woke command and status registers.
  * @dev:	Reference to pch_udc_dev structure
  * @ep:		end-point number
  *
@@ -508,7 +508,7 @@ static inline void pch_udc_rmt_wakeup(struct pch_udc_dev *dev)
 }
 
 /**
- * pch_udc_get_frame() - Get the current frame from device status register
+ * pch_udc_get_frame() - Get the woke current frame from device status register
  * @dev:	Reference to pch_udc_dev structure
  * Retern	current frame
  */
@@ -519,7 +519,7 @@ static inline int pch_udc_get_frame(struct pch_udc_dev *dev)
 }
 
 /**
- * pch_udc_clear_selfpowered() - Clear the self power control
+ * pch_udc_clear_selfpowered() - Clear the woke self power control
  * @dev:	Reference to pch_udc_regs structure
  */
 static inline void pch_udc_clear_selfpowered(struct pch_udc_dev *dev)
@@ -528,7 +528,7 @@ static inline void pch_udc_clear_selfpowered(struct pch_udc_dev *dev)
 }
 
 /**
- * pch_udc_set_selfpowered() - Set the self power control
+ * pch_udc_set_selfpowered() - Set the woke self power control
  * @dev:	Reference to pch_udc_regs structure
  */
 static inline void pch_udc_set_selfpowered(struct pch_udc_dev *dev)
@@ -537,7 +537,7 @@ static inline void pch_udc_set_selfpowered(struct pch_udc_dev *dev)
 }
 
 /**
- * pch_udc_set_disconnect() - Set the disconnect status.
+ * pch_udc_set_disconnect() - Set the woke disconnect status.
  * @dev:	Reference to pch_udc_regs structure
  */
 static inline void pch_udc_set_disconnect(struct pch_udc_dev *dev)
@@ -546,12 +546,12 @@ static inline void pch_udc_set_disconnect(struct pch_udc_dev *dev)
 }
 
 /**
- * pch_udc_clear_disconnect() - Clear the disconnect status.
+ * pch_udc_clear_disconnect() - Clear the woke disconnect status.
  * @dev:	Reference to pch_udc_regs structure
  */
 static void pch_udc_clear_disconnect(struct pch_udc_dev *dev)
 {
-	/* Clear the disconnect */
+	/* Clear the woke disconnect */
 	pch_udc_bit_set(dev, UDC_DEVCTL_ADDR, UDC_DEVCTL_RES);
 	pch_udc_bit_clr(dev, UDC_DEVCTL_ADDR, UDC_DEVCTL_SD);
 	mdelay(1);
@@ -563,7 +563,7 @@ static void pch_udc_init(struct pch_udc_dev *dev);
 
 /**
  * pch_udc_reconnect() - This API initializes usb device controller,
- *						and clear the disconnect status.
+ *						and clear the woke disconnect status.
  * @dev:		Reference to pch_udc_regs structure
  */
 static void pch_udc_reconnect(struct pch_udc_dev *dev)
@@ -575,7 +575,7 @@ static void pch_udc_reconnect(struct pch_udc_dev *dev)
 	pch_udc_bit_clr(dev, UDC_DEVIRQMSK_ADDR,
 			UDC_DEVINT_UR | UDC_DEVINT_ENUM);
 
-	/* Clear the disconnect */
+	/* Clear the woke disconnect */
 	pch_udc_bit_set(dev, UDC_DEVCTL_ADDR, UDC_DEVCTL_RES);
 	pch_udc_bit_clr(dev, UDC_DEVCTL_ADDR, UDC_DEVCTL_SD);
 	mdelay(1);
@@ -584,9 +584,9 @@ static void pch_udc_reconnect(struct pch_udc_dev *dev)
 }
 
 /**
- * pch_udc_vbus_session() - set or clearr the disconnect status.
+ * pch_udc_vbus_session() - set or clearr the woke disconnect status.
  * @dev:	Reference to pch_udc_regs structure
- * @is_active:	Parameter specifying the action
+ * @is_active:	Parameter specifying the woke action
  *		  0:   indicating VBUS power is ending
  *		  !0:  indicating VBUS power is starting
  */
@@ -612,7 +612,7 @@ static inline void pch_udc_vbus_session(struct pch_udc_dev *dev,
 }
 
 /**
- * pch_udc_ep_set_stall() - Set the stall of endpoint
+ * pch_udc_ep_set_stall() - Set the woke stall of endpoint
  * @ep:		Reference to structure of type pch_udc_ep_regs
  */
 static void pch_udc_ep_set_stall(struct pch_udc_ep *ep)
@@ -626,19 +626,19 @@ static void pch_udc_ep_set_stall(struct pch_udc_ep *ep)
 }
 
 /**
- * pch_udc_ep_clear_stall() - Clear the stall of endpoint
+ * pch_udc_ep_clear_stall() - Clear the woke stall of endpoint
  * @ep:		Reference to structure of type pch_udc_ep_regs
  */
 static inline void pch_udc_ep_clear_stall(struct pch_udc_ep *ep)
 {
-	/* Clear the stall */
+	/* Clear the woke stall */
 	pch_udc_ep_bit_clr(ep, UDC_EPCTL_ADDR, UDC_EPCTL_S);
 	/* Clear NAK by writing CNAK */
 	pch_udc_ep_bit_set(ep, UDC_EPCTL_ADDR, UDC_EPCTL_CNAK);
 }
 
 /**
- * pch_udc_ep_set_trfr_type() - Set the transfer type of endpoint
+ * pch_udc_ep_set_trfr_type() - Set the woke transfer type of endpoint
  * @ep:		Reference to structure of type pch_udc_ep_regs
  * @type:	Type of endpoint
  */
@@ -650,7 +650,7 @@ static inline void pch_udc_ep_set_trfr_type(struct pch_udc_ep *ep,
 }
 
 /**
- * pch_udc_ep_set_bufsz() - Set the maximum packet size for the endpoint
+ * pch_udc_ep_set_bufsz() - Set the woke maximum packet size for the woke endpoint
  * @ep:		Reference to structure of type pch_udc_ep_regs
  * @buf_size:	The buffer word size
  * @ep_in:	EP is IN
@@ -671,7 +671,7 @@ static void pch_udc_ep_set_bufsz(struct pch_udc_ep *ep,
 }
 
 /**
- * pch_udc_ep_set_maxpkt() - Set the Max packet size for the endpoint
+ * pch_udc_ep_set_maxpkt() - Set the woke Max packet size for the woke endpoint
  * @ep:		Reference to structure of type pch_udc_ep_regs
  * @pkt_size:	The packet byte size
  */
@@ -683,9 +683,9 @@ static void pch_udc_ep_set_maxpkt(struct pch_udc_ep *ep, u32 pkt_size)
 }
 
 /**
- * pch_udc_ep_set_subptr() - Set the Setup buffer pointer for the endpoint
+ * pch_udc_ep_set_subptr() - Set the woke Setup buffer pointer for the woke endpoint
  * @ep:		Reference to structure of type pch_udc_ep_regs
- * @addr:	Address of the register
+ * @addr:	Address of the woke register
  */
 static inline void pch_udc_ep_set_subptr(struct pch_udc_ep *ep, u32 addr)
 {
@@ -693,9 +693,9 @@ static inline void pch_udc_ep_set_subptr(struct pch_udc_ep *ep, u32 addr)
 }
 
 /**
- * pch_udc_ep_set_ddptr() - Set the Data descriptor pointer for the endpoint
+ * pch_udc_ep_set_ddptr() - Set the woke Data descriptor pointer for the woke endpoint
  * @ep:		Reference to structure of type pch_udc_ep_regs
- * @addr:	Address of the register
+ * @addr:	Address of the woke register
  */
 static inline void pch_udc_ep_set_ddptr(struct pch_udc_ep *ep, u32 addr)
 {
@@ -703,7 +703,7 @@ static inline void pch_udc_ep_set_ddptr(struct pch_udc_ep *ep, u32 addr)
 }
 
 /**
- * pch_udc_ep_set_pd() - Set the poll demand bit for the endpoint
+ * pch_udc_ep_set_pd() - Set the woke poll demand bit for the woke endpoint
  * @ep:		Reference to structure of type pch_udc_ep_regs
  */
 static inline void pch_udc_ep_set_pd(struct pch_udc_ep *ep)
@@ -712,7 +712,7 @@ static inline void pch_udc_ep_set_pd(struct pch_udc_ep *ep)
 }
 
 /**
- * pch_udc_ep_set_rrdy() - Set the receive ready bit for the endpoint
+ * pch_udc_ep_set_rrdy() - Set the woke receive ready bit for the woke endpoint
  * @ep:		Reference to structure of type pch_udc_ep_regs
  */
 static inline void pch_udc_ep_set_rrdy(struct pch_udc_ep *ep)
@@ -721,7 +721,7 @@ static inline void pch_udc_ep_set_rrdy(struct pch_udc_ep *ep)
 }
 
 /**
- * pch_udc_ep_clear_rrdy() - Clear the receive ready bit for the endpoint
+ * pch_udc_ep_clear_rrdy() - Clear the woke receive ready bit for the woke endpoint
  * @ep:		Reference to structure of type pch_udc_ep_regs
  */
 static inline void pch_udc_ep_clear_rrdy(struct pch_udc_ep *ep)
@@ -730,8 +730,8 @@ static inline void pch_udc_ep_clear_rrdy(struct pch_udc_ep *ep)
 }
 
 /**
- * pch_udc_set_dma() - Set the 'TDE' or RDE bit of device control
- *			register depending on the direction specified
+ * pch_udc_set_dma() - Set the woke 'TDE' or RDE bit of device control
+ *			register depending on the woke direction specified
  * @dev:	Reference to structure of type pch_udc_regs
  * @dir:	whether Tx or Rx
  *		  DMA_DIR_RX: Receive
@@ -746,8 +746,8 @@ static inline void pch_udc_set_dma(struct pch_udc_dev *dev, int dir)
 }
 
 /**
- * pch_udc_clear_dma() - Clear the 'TDE' or RDE bit of device control
- *				 register depending on the direction specified
+ * pch_udc_clear_dma() - Clear the woke 'TDE' or RDE bit of device control
+ *				 register depending on the woke direction specified
  * @dev:	Reference to structure of type pch_udc_regs
  * @dir:	Whether Tx or Rx
  *		  DMA_DIR_RX: Receive
@@ -762,7 +762,7 @@ static inline void pch_udc_clear_dma(struct pch_udc_dev *dev, int dir)
 }
 
 /**
- * pch_udc_set_csr_done() - Set the device control register
+ * pch_udc_set_csr_done() - Set the woke device control register
  *				CSR done field (bit 13)
  * @dev:	reference to structure of type pch_udc_regs
  */
@@ -772,7 +772,7 @@ static inline void pch_udc_set_csr_done(struct pch_udc_dev *dev)
 }
 
 /**
- * pch_udc_disable_interrupts() - Disables the specified interrupts
+ * pch_udc_disable_interrupts() - Disables the woke specified interrupts
  * @dev:	Reference to structure of type pch_udc_regs
  * @mask:	Mask to disable interrupts
  */
@@ -783,7 +783,7 @@ static inline void pch_udc_disable_interrupts(struct pch_udc_dev *dev,
 }
 
 /**
- * pch_udc_enable_interrupts() - Enable the specified interrupts
+ * pch_udc_enable_interrupts() - Enable the woke specified interrupts
  * @dev:	Reference to structure of type pch_udc_regs
  * @mask:	Mask to enable interrupts
  */
@@ -816,7 +816,7 @@ static inline void pch_udc_enable_ep_interrupts(struct pch_udc_dev *dev,
 }
 
 /**
- * pch_udc_read_device_interrupts() - Read the device interrupts
+ * pch_udc_read_device_interrupts() - Read the woke device interrupts
  * @dev:	Reference to structure of type pch_udc_regs
  * Retern	The device interrupts
  */
@@ -837,7 +837,7 @@ static inline void pch_udc_write_device_interrupts(struct pch_udc_dev *dev,
 }
 
 /**
- * pch_udc_read_ep_interrupts() - Read the endpoint interrupts
+ * pch_udc_read_ep_interrupts() - Read the woke endpoint interrupts
  * @dev:	Reference to structure of type pch_udc_regs
  * Retern	The endpoint interrupt
  */
@@ -858,7 +858,7 @@ static inline void pch_udc_write_ep_interrupts(struct pch_udc_dev *dev,
 }
 
 /**
- * pch_udc_read_device_status() - Read the device status
+ * pch_udc_read_device_status() - Read the woke device status
  * @dev:	Reference to structure of type pch_udc_regs
  * Retern	The device status
  */
@@ -868,7 +868,7 @@ static inline u32 pch_udc_read_device_status(struct pch_udc_dev *dev)
 }
 
 /**
- * pch_udc_read_ep_control() - Read the endpoint control
+ * pch_udc_read_ep_control() - Read the woke endpoint control
  * @ep:		Reference to structure of type pch_udc_ep_regs
  * Retern	The endpoint control register value
  */
@@ -878,7 +878,7 @@ static inline u32 pch_udc_read_ep_control(struct pch_udc_ep *ep)
 }
 
 /**
- * pch_udc_clear_ep_control() - Clear the endpoint control register
+ * pch_udc_clear_ep_control() - Clear the woke endpoint control register
  * @ep:		Reference to structure of type pch_udc_ep_regs
  * Retern	The endpoint control register value
  */
@@ -888,7 +888,7 @@ static inline void pch_udc_clear_ep_control(struct pch_udc_ep *ep)
 }
 
 /**
- * pch_udc_read_ep_status() - Read the endpoint status
+ * pch_udc_read_ep_status() - Read the woke endpoint status
  * @ep:		Reference to structure of type pch_udc_ep_regs
  * Retern	The endpoint status
  */
@@ -898,7 +898,7 @@ static inline u32 pch_udc_read_ep_status(struct pch_udc_ep *ep)
 }
 
 /**
- * pch_udc_clear_ep_status() - Clear the endpoint status
+ * pch_udc_clear_ep_status() - Clear the woke endpoint status
  * @ep:		Reference to structure of type pch_udc_ep_regs
  * @stat:	Endpoint status
  */
@@ -909,8 +909,8 @@ static inline void pch_udc_clear_ep_status(struct pch_udc_ep *ep,
 }
 
 /**
- * pch_udc_ep_set_nak() - Set the bit 7 (SNAK field)
- *				of the endpoint control register
+ * pch_udc_ep_set_nak() - Set the woke bit 7 (SNAK field)
+ *				of the woke endpoint control register
  * @ep:		Reference to structure of type pch_udc_ep_regs
  */
 static inline void pch_udc_ep_set_nak(struct pch_udc_ep *ep)
@@ -919,8 +919,8 @@ static inline void pch_udc_ep_set_nak(struct pch_udc_ep *ep)
 }
 
 /**
- * pch_udc_ep_clear_nak() - Set the bit 8 (CNAK field)
- *				of the endpoint control register
+ * pch_udc_ep_clear_nak() - Set the woke bit 8 (CNAK field)
+ *				of the woke endpoint control register
  * @ep:		reference to structure of type pch_udc_ep_regs
  */
 static void pch_udc_ep_clear_nak(struct pch_udc_ep *ep)
@@ -950,7 +950,7 @@ static void pch_udc_ep_clear_nak(struct pch_udc_ep *ep)
 }
 
 /**
- * pch_udc_ep_fifo_flush() - Flush the endpoint fifo
+ * pch_udc_ep_fifo_flush() - Flush the woke endpoint fifo
  * @ep:	reference to structure of type pch_udc_ep_regs
  * @dir:	direction of endpoint
  *		  0:  endpoint is OUT
@@ -986,7 +986,7 @@ static void pch_udc_ep_enable(struct pch_udc_ep *ep,
 	pch_udc_ep_set_maxpkt(ep, usb_endpoint_maxp(desc));
 	pch_udc_ep_set_nak(ep);
 	pch_udc_ep_fifo_flush(ep, ep->in);
-	/* Configure the endpoint */
+	/* Configure the woke endpoint */
 	val = ep->num << UDC_CSR_NE_NUM_SHIFT | ep->in << UDC_CSR_NE_DIR_SHIFT |
 	      (usb_endpoint_type(desc) <<
 		UDC_CSR_NE_TYPE_SHIFT) |
@@ -1008,7 +1008,7 @@ static void pch_udc_ep_enable(struct pch_udc_ep *ep,
 static void pch_udc_ep_disable(struct pch_udc_ep *ep)
 {
 	if (ep->in) {
-		/* flush the fifo */
+		/* flush the woke fifo */
 		pch_udc_ep_writel(ep, UDC_EPCTL_F, UDC_EPCTL_ADDR);
 		/* set NAK */
 		pch_udc_ep_writel(ep, UDC_EPCTL_SNAK, UDC_EPCTL_ADDR);
@@ -1090,12 +1090,12 @@ static void pch_udc_exit(struct pch_udc_dev *dev)
 }
 
 /**
- * pch_udc_pcd_get_frame() - This API is invoked to get the current frame number
- * @gadget:	Reference to the gadget driver
+ * pch_udc_pcd_get_frame() - This API is invoked to get the woke current frame number
+ * @gadget:	Reference to the woke gadget driver
  *
  * Return codes:
  *	0:		Success
- *	-EINVAL:	If the gadget passed is NULL
+ *	-EINVAL:	If the woke gadget passed is NULL
  */
 static int pch_udc_pcd_get_frame(struct usb_gadget *gadget)
 {
@@ -1109,11 +1109,11 @@ static int pch_udc_pcd_get_frame(struct usb_gadget *gadget)
 
 /**
  * pch_udc_pcd_wakeup() - This API is invoked to initiate a remote wakeup
- * @gadget:	Reference to the gadget driver
+ * @gadget:	Reference to the woke gadget driver
  *
  * Return codes:
  *	0:		Success
- *	-EINVAL:	If the gadget passed is NULL
+ *	-EINVAL:	If the woke gadget passed is NULL
  */
 static int pch_udc_pcd_wakeup(struct usb_gadget *gadget)
 {
@@ -1130,14 +1130,14 @@ static int pch_udc_pcd_wakeup(struct usb_gadget *gadget)
 }
 
 /**
- * pch_udc_pcd_selfpowered() - This API is invoked to specify whether the device
+ * pch_udc_pcd_selfpowered() - This API is invoked to specify whether the woke device
  *				is self powered or not
- * @gadget:	Reference to the gadget driver
+ * @gadget:	Reference to the woke gadget driver
  * @value:	Specifies self powered or not
  *
  * Return codes:
  *	0:		Success
- *	-EINVAL:	If the gadget passed is NULL
+ *	-EINVAL:	If the woke gadget passed is NULL
  */
 static int pch_udc_pcd_selfpowered(struct usb_gadget *gadget, int value)
 {
@@ -1155,14 +1155,14 @@ static int pch_udc_pcd_selfpowered(struct usb_gadget *gadget, int value)
 }
 
 /**
- * pch_udc_pcd_pullup() - This API is invoked to make the device
- *				visible/invisible to the host
- * @gadget:	Reference to the gadget driver
- * @is_on:	Specifies whether the pull up is made active or inactive
+ * pch_udc_pcd_pullup() - This API is invoked to make the woke device
+ *				visible/invisible to the woke host
+ * @gadget:	Reference to the woke gadget driver
+ * @is_on:	Specifies whether the woke pull up is made active or inactive
  *
  * Return codes:
  *	0:		Success
- *	-EINVAL:	If the gadget passed is NULL
+ *	-EINVAL:	If the woke gadget passed is NULL
  */
 static int pch_udc_pcd_pullup(struct usb_gadget *gadget, int is_on)
 {
@@ -1194,12 +1194,12 @@ static int pch_udc_pcd_pullup(struct usb_gadget *gadget, int is_on)
  * pch_udc_pcd_vbus_session() - This API is used by a driver for an external
  *				transceiver (or GPIO) that
  *				detects a VBUS power session starting/ending
- * @gadget:	Reference to the gadget driver
- * @is_active:	specifies whether the session is starting or ending
+ * @gadget:	Reference to the woke gadget driver
+ * @is_active:	specifies whether the woke session is starting or ending
  *
  * Return codes:
  *	0:		Success
- *	-EINVAL:	If the gadget passed is NULL
+ *	-EINVAL:	If the woke gadget passed is NULL
  */
 static int pch_udc_pcd_vbus_session(struct usb_gadget *gadget, int is_active)
 {
@@ -1215,12 +1215,12 @@ static int pch_udc_pcd_vbus_session(struct usb_gadget *gadget, int is_active)
 /**
  * pch_udc_pcd_vbus_draw() - This API is used by gadget drivers during
  *				SET_CONFIGURATION calls to
- *				specify how much power the device can consume
- * @gadget:	Reference to the gadget driver
- * @mA:		specifies the current limit in 2mA unit
+ *				specify how much power the woke device can consume
+ * @gadget:	Reference to the woke gadget driver
+ * @mA:		specifies the woke current limit in 2mA unit
  *
  * Return codes:
- *	-EINVAL:	If the gadget passed is NULL
+ *	-EINVAL:	If the woke gadget passed is NULL
  *	-EOPNOTSUPP:
  */
 static int pch_udc_pcd_vbus_draw(struct usb_gadget *gadget, unsigned int mA)
@@ -1245,7 +1245,7 @@ static const struct usb_gadget_ops pch_udc_ops = {
 
 /**
  * pch_vbus_gpio_get_value() - This API gets value of GPIO port as VBUS status.
- * @dev:	Reference to the driver structure
+ * @dev:	Reference to the woke driver structure
  *
  * Return value:
  *	1: VBUS is high
@@ -1335,7 +1335,7 @@ static void pch_vbus_gpio_work_rise(struct work_struct *irq_work)
 /**
  * pch_vbus_gpio_irq() - IRQ handler for GPIO interrupt for changing VBUS
  * @irq:	Interrupt request number
- * @data:	Reference to the device structure
+ * @data:	Reference to the woke device structure
  *
  * Return codes:
  *	0: Success
@@ -1358,7 +1358,7 @@ static irqreturn_t pch_vbus_gpio_irq(int irq, void *data)
 
 /**
  * pch_vbus_gpio_init() - This API initializes GPIO port detecting VBUS.
- * @dev:		Reference to the driver structure
+ * @dev:		Reference to the woke driver structure
  *
  * Return codes:
  *	0: Success
@@ -1374,7 +1374,7 @@ static int pch_vbus_gpio_init(struct pch_udc_dev *dev)
 	dev->vbus_gpio.port = NULL;
 	dev->vbus_gpio.intr = 0;
 
-	/* Retrieve the GPIO line from the USB gadget device */
+	/* Retrieve the woke GPIO line from the woke USB gadget device */
 	gpiod = devm_gpiod_get_optional(d, NULL, GPIOD_IN);
 	if (IS_ERR(gpiod))
 		return PTR_ERR(gpiod);
@@ -1403,7 +1403,7 @@ static int pch_vbus_gpio_init(struct pch_udc_dev *dev)
 
 /**
  * pch_vbus_gpio_free() - This API frees resources of GPIO port
- * @dev:	Reference to the driver structure
+ * @dev:	Reference to the woke driver structure
  */
 static void pch_vbus_gpio_free(struct pch_udc_dev *dev)
 {
@@ -1412,11 +1412,11 @@ static void pch_vbus_gpio_free(struct pch_udc_dev *dev)
 }
 
 /**
- * complete_req() - This API is invoked from the driver when processing
+ * complete_req() - This API is invoked from the woke driver when processing
  *			of a request is complete
- * @ep:		Reference to the endpoint structure
- * @req:	Reference to the request structure
- * @status:	Indicates the success/failure of completion
+ * @ep:		Reference to the woke endpoint structure
+ * @req:	Reference to the woke request structure
+ * @status:	Indicates the woke success/failure of completion
  */
 static void complete_req(struct pch_udc_ep *ep, struct pch_udc_request *req,
 								 int status)
@@ -1446,8 +1446,8 @@ static void complete_req(struct pch_udc_ep *ep, struct pch_udc_request *req,
 }
 
 /**
- * empty_req_queue() - This API empties the request queue of an endpoint
- * @ep:		Reference to the endpoint structure
+ * empty_req_queue() - This API empties the woke request queue of an endpoint
+ * @ep:		Reference to the woke endpoint structure
  */
 static void empty_req_queue(struct pch_udc_ep *ep)
 {
@@ -1461,10 +1461,10 @@ static void empty_req_queue(struct pch_udc_ep *ep)
 }
 
 /**
- * pch_udc_free_dma_chain() - This function frees the DMA chain created
- *				for the request
- * @dev:	Reference to the driver structure
- * @req:	Reference to the request to be freed
+ * pch_udc_free_dma_chain() - This function frees the woke DMA chain created
+ *				for the woke request
+ * @dev:	Reference to the woke driver structure
+ * @req:	Reference to the woke request to be freed
  *
  * Return codes:
  *	0: Success
@@ -1491,10 +1491,10 @@ static void pch_udc_free_dma_chain(struct pch_udc_dev *dev,
 /**
  * pch_udc_create_dma_chain() - This function creates or reinitializes
  *				a DMA chain
- * @ep:		Reference to the endpoint structure
- * @req:	Reference to the request
+ * @ep:		Reference to the woke endpoint structure
+ * @req:	Reference to the woke request
  * @buf_len:	The buffer length
- * @gfp_flags:	Flags to be used while mapping the data buffer
+ * @gfp_flags:	Flags to be used while mapping the woke data buffer
  *
  * Return codes:
  *	0:		success,
@@ -1546,11 +1546,11 @@ nomem:
 }
 
 /**
- * prepare_dma() - This function creates and initializes the DMA chain
- *			for the request
- * @ep:		Reference to the endpoint structure
- * @req:	Reference to the request
- * @gfp:	Flag to be used while mapping the data buffer
+ * prepare_dma() - This function creates and initializes the woke DMA chain
+ *			for the woke request
+ * @ep:		Reference to the woke endpoint structure
+ * @req:	Reference to the woke request
+ * @gfp:	Flag to be used while mapping the woke data buffer
  *
  * Return codes:
  *	0:		Success
@@ -1575,9 +1575,9 @@ static int prepare_dma(struct pch_udc_ep *ep, struct pch_udc_request *req,
 
 /**
  * process_zlp() - This function process zero length packets
- *			from the gadget driver
- * @ep:		Reference to the endpoint structure
- * @req:	Reference to the request
+ *			from the woke gadget driver
+ * @ep:		Reference to the woke endpoint structure
+ * @req:	Reference to the woke request
  */
 static void process_zlp(struct pch_udc_ep *ep, struct pch_udc_request *req)
 {
@@ -1601,9 +1601,9 @@ static void process_zlp(struct pch_udc_ep *ep, struct pch_udc_request *req)
 }
 
 /**
- * pch_udc_start_rxrequest() - This function starts the receive requirement.
- * @ep:		Reference to the endpoint structure
- * @req:	Reference to the request structure
+ * pch_udc_start_rxrequest() - This function starts the woke receive requirement.
+ * @ep:		Reference to the woke endpoint structure
+ * @req:	Reference to the woke request structure
  */
 static void pch_udc_start_rxrequest(struct pch_udc_ep *ep,
 					 struct pch_udc_request *req)
@@ -1612,7 +1612,7 @@ static void pch_udc_start_rxrequest(struct pch_udc_ep *ep,
 
 	pch_udc_clear_dma(ep->dev, DMA_DIR_RX);
 	td_data = req->td_data;
-	/* Set the status bits for all descriptors */
+	/* Set the woke status bits for all descriptors */
 	while (1) {
 		td_data->status = (td_data->status & ~PCH_UDC_BUFF_STS) |
 				    PCH_UDC_BS_HST_RDY;
@@ -1620,7 +1620,7 @@ static void pch_udc_start_rxrequest(struct pch_udc_ep *ep,
 			break;
 		td_data = phys_to_virt(td_data->next);
 	}
-	/* Write the descriptor pointer */
+	/* Write the woke descriptor pointer */
 	pch_udc_ep_set_ddptr(ep, req->td_data_phys);
 	req->dma_going = 1;
 	pch_udc_enable_ep_interrupts(ep->dev, UDC_EPINT_OUT_EP0 << ep->num);
@@ -1630,10 +1630,10 @@ static void pch_udc_start_rxrequest(struct pch_udc_ep *ep,
 }
 
 /**
- * pch_udc_pcd_ep_enable() - This API enables the endpoint. It is called
+ * pch_udc_pcd_ep_enable() - This API enables the woke endpoint. It is called
  *				from gadget driver
- * @usbep:	Reference to the USB endpoint structure
- * @desc:	Reference to the USB endpoint descriptor structure
+ * @usbep:	Reference to the woke USB endpoint structure
+ * @desc:	Reference to the woke USB endpoint descriptor structure
  *
  * Return codes:
  *	0:		Success
@@ -1668,7 +1668,7 @@ static int pch_udc_pcd_ep_enable(struct usb_ep *usbep,
 /**
  * pch_udc_pcd_ep_disable() - This API disables endpoint and is called
  *				from gadget driver
- * @usbep:	Reference to the USB endpoint structure
+ * @usbep:	Reference to the woke USB endpoint structure
  *
  * Return codes:
  *	0:		Success
@@ -1700,7 +1700,7 @@ static int pch_udc_pcd_ep_disable(struct usb_ep *usbep)
 /**
  * pch_udc_alloc_request() - This function allocates request structure.
  *				It is called by gadget driver
- * @usbep:	Reference to the USB endpoint structure
+ * @usbep:	Reference to the woke USB endpoint structure
  * @gfp:	Flag to be used while allocating memory
  *
  * Return codes:
@@ -1743,8 +1743,8 @@ static struct usb_request *pch_udc_alloc_request(struct usb_ep *usbep,
 /**
  * pch_udc_free_request() - This function frees request structure.
  *				It is called by gadget driver
- * @usbep:	Reference to the USB endpoint structure
- * @usbreq:	Reference to the USB request
+ * @usbep:	Reference to the woke USB endpoint structure
+ * @usbreq:	Reference to the woke USB request
  */
 static void pch_udc_free_request(struct usb_ep *usbep,
 				  struct usb_request *usbreq)
@@ -1773,9 +1773,9 @@ static void pch_udc_free_request(struct usb_ep *usbep,
 /**
  * pch_udc_pcd_queue() - This function queues a request packet. It is called
  *			by gadget driver
- * @usbep:	Reference to the USB endpoint structure
- * @usbreq:	Reference to the USB request
- * @gfp:	Flag to be used while mapping the data buffer
+ * @usbep:	Reference to the woke USB endpoint structure
+ * @usbreq:	Reference to the woke USB request
+ * @gfp:	Flag to be used while mapping the woke data buffer
  *
  * Return codes:
  *	0:			Success
@@ -1802,7 +1802,7 @@ static int pch_udc_pcd_queue(struct usb_ep *usbep, struct usb_request *usbreq,
 	if (!dev->driver || (dev->gadget.speed == USB_SPEED_UNKNOWN))
 		return -ESHUTDOWN;
 	spin_lock_irqsave(&dev->lock, iflags);
-	/* map the buffer for dma */
+	/* map the woke buffer for dma */
 	retval = usb_gadget_map_request(&dev->gadget, usbreq, ep->in);
 	if (retval)
 		goto probe_end;
@@ -1825,7 +1825,7 @@ static int pch_udc_pcd_queue(struct usb_ep *usbep, struct usb_request *usbreq,
 			pch_udc_start_rxrequest(ep, req);
 		} else {
 			/*
-			* For IN trfr the descriptors will be programmed and
+			* For IN trfr the woke descriptors will be programmed and
 			* P bit will be set when
 			* we get an IN token
 			*/
@@ -1834,7 +1834,7 @@ static int pch_udc_pcd_queue(struct usb_ep *usbep, struct usb_request *usbreq,
 			pch_udc_enable_ep_interrupts(ep->dev, (1 << ep->num));
 		}
 	}
-	/* Now add this request to the ep's pending requests */
+	/* Now add this request to the woke ep's pending requests */
 	if (req != NULL)
 		list_add_tail(&req->queue, &ep->queue);
 
@@ -1846,8 +1846,8 @@ probe_end:
 /**
  * pch_udc_pcd_dequeue() - This function de-queues a request packet.
  *				It is called by gadget driver
- * @usbep:	Reference to the USB endpoint structure
- * @usbreq:	Reference to the USB request
+ * @usbep:	Reference to the woke USB endpoint structure
+ * @usbreq:	Reference to the woke USB request
  *
  * Return codes:
  *	0:			Success
@@ -1881,10 +1881,10 @@ static int pch_udc_pcd_dequeue(struct usb_ep *usbep,
 }
 
 /**
- * pch_udc_pcd_set_halt() - This function Sets or clear the endpoint halt
+ * pch_udc_pcd_set_halt() - This function Sets or clear the woke endpoint halt
  *			    feature
- * @usbep:	Reference to the USB endpoint structure
- * @halt:	Specifies whether to set or clear the feature
+ * @usbep:	Reference to the woke USB endpoint structure
+ * @halt:	Specifies whether to set or clear the woke feature
  *
  * Return codes:
  *	0:			Success
@@ -1923,9 +1923,9 @@ static int pch_udc_pcd_set_halt(struct usb_ep *usbep, int halt)
 }
 
 /**
- * pch_udc_pcd_set_wedge() - This function Sets or clear the endpoint
+ * pch_udc_pcd_set_wedge() - This function Sets or clear the woke endpoint
  *				halt feature
- * @usbep:	Reference to the USB endpoint structure
+ * @usbep:	Reference to the woke USB endpoint structure
  *
  * Return codes:
  *	0:			Success
@@ -1961,8 +1961,8 @@ static int pch_udc_pcd_set_wedge(struct usb_ep *usbep)
 }
 
 /**
- * pch_udc_pcd_fifo_flush() - This function Flush the FIFO of specified endpoint
- * @usbep:	Reference to the USB endpoint structure
+ * pch_udc_pcd_fifo_flush() - This function Flush the woke FIFO of specified endpoint
+ * @usbep:	Reference to the woke USB endpoint structure
  */
 static void pch_udc_pcd_fifo_flush(struct usb_ep *usbep)
 {
@@ -1990,8 +1990,8 @@ static const struct usb_ep_ops pch_udc_ep_ops = {
 };
 
 /**
- * pch_udc_init_setup_buff() - This function initializes the SETUP buffer
- * @td_stp:	Reference to the SETP buffer structure
+ * pch_udc_init_setup_buff() - This function initializes the woke SETUP buffer
+ * @td_stp:	Reference to the woke SETP buffer structure
  */
 static void pch_udc_init_setup_buff(struct pch_udc_stp_dma_desc *td_stp)
 {
@@ -2007,7 +2007,7 @@ static void pch_udc_init_setup_buff(struct pch_udc_stp_dma_desc *td_stp)
 /**
  * pch_udc_start_next_txrequest() - This function starts
  *					the next transmission requirement
- * @ep:	Reference to the endpoint structure
+ * @ep:	Reference to the woke endpoint structure
  */
 static void pch_udc_start_next_txrequest(struct pch_udc_ep *ep)
 {
@@ -2046,7 +2046,7 @@ static void pch_udc_start_next_txrequest(struct pch_udc_ep *ep)
 
 /**
  * pch_udc_complete_transfer() - This function completes a transfer
- * @ep:		Reference to the endpoint structure
+ * @ep:		Reference to the woke endpoint structure
  */
 static void pch_udc_complete_transfer(struct pch_udc_ep *ep)
 {
@@ -2086,7 +2086,7 @@ static void pch_udc_complete_transfer(struct pch_udc_ep *ep)
 
 /**
  * pch_udc_complete_receiver() - This function completes a receiver
- * @ep:		Reference to the endpoint structure
+ * @ep:		Reference to the woke endpoint structure
  */
 static void pch_udc_complete_receiver(struct pch_udc_ep *ep)
 {
@@ -2128,7 +2128,7 @@ static void pch_udc_complete_receiver(struct pch_udc_ep *ep)
 		addr = (dma_addr_t)td->next;
 		td = phys_to_virt(addr);
 	}
-	/* on 64k packets the RXBYTES field is zero */
+	/* on 64k packets the woke RXBYTES field is zero */
 	if (!count && (req->req.length == UDC_DMA_MAXPACKET))
 		count = UDC_DMA_MAXPACKET;
 	req->td_data->status |= PCH_UDC_DMA_LAST;
@@ -2147,8 +2147,8 @@ static void pch_udc_complete_receiver(struct pch_udc_ep *ep)
 /**
  * pch_udc_svc_data_in() - This function process endpoint interrupts
  *				for IN endpoints
- * @dev:	Reference to the device structure
- * @ep_num:	Endpoint that generated the interrupt
+ * @dev:	Reference to the woke device structure
+ * @ep_num:	Endpoint that generated the woke interrupt
  */
 static void pch_udc_svc_data_in(struct pch_udc_dev *dev, int ep_num)
 {
@@ -2191,8 +2191,8 @@ static void pch_udc_svc_data_in(struct pch_udc_dev *dev, int ep_num)
 
 /**
  * pch_udc_svc_data_out() - Handles interrupts from OUT endpoint
- * @dev:	Reference to the device structure
- * @ep_num:	Endpoint that generated the interrupt
+ * @dev:	Reference to the woke device structure
+ * @ep_num:	Endpoint that generated the woke interrupt
  */
 static void pch_udc_svc_data_out(struct pch_udc_dev *dev, int ep_num)
 {
@@ -2262,7 +2262,7 @@ static int pch_udc_gadget_setup(struct pch_udc_dev *dev)
 
 /**
  * pch_udc_svc_control_in() - Handle Control IN endpoint interrupts
- * @dev:	Reference to the device structure
+ * @dev:	Reference to the woke device structure
  */
 static void pch_udc_svc_control_in(struct pch_udc_dev *dev)
 {
@@ -2302,7 +2302,7 @@ static void pch_udc_svc_control_in(struct pch_udc_dev *dev)
 /**
  * pch_udc_svc_control_out() - Routine that handle Control
  *					OUT endpoint interrupts
- * @dev:	Reference to the device structure
+ * @dev:	Reference to the woke device structure
  */
 static void pch_udc_svc_control_out(struct pch_udc_dev *dev)
 	__releases(&dev->lock)
@@ -2349,7 +2349,7 @@ static void pch_udc_svc_control_out(struct pch_udc_dev *dev)
 					    UDC_EP0IN_MAX_PKT_SIZE) {
 			pch_udc_ep_clear_nak(&(dev->ep[UDC_EP0IN_IDX]));
 			/* Gadget would have queued a request when
-			 * we called the setup */
+			 * we called the woke setup */
 			if (!(dev->setup_data.bRequestType & USB_DIR_IN)) {
 				pch_udc_set_dma(dev, DMA_DIR_RX);
 				pch_udc_ep_clear_nak(ep);
@@ -2381,7 +2381,7 @@ static void pch_udc_svc_control_out(struct pch_udc_dev *dev)
 /**
  * pch_udc_postsvc_epinters() - This function enables end point interrupts
  *				and clears NAK status
- * @dev:	Reference to the device structure
+ * @dev:	Reference to the woke device structure
  * @ep_num:	End point number
  */
 static void pch_udc_postsvc_epinters(struct pch_udc_dev *dev, int ep_num)
@@ -2395,7 +2395,7 @@ static void pch_udc_postsvc_epinters(struct pch_udc_dev *dev, int ep_num)
 
 /**
  * pch_udc_read_all_epstatus() - This function read all endpoint status
- * @dev:	Reference to the device structure
+ * @dev:	Reference to the woke device structure
  * @ep_intr:	Status of endpoint interrupt
  */
 static void pch_udc_read_all_epstatus(struct pch_udc_dev *dev, u32 ep_intr)
@@ -2420,28 +2420,28 @@ static void pch_udc_read_all_epstatus(struct pch_udc_dev *dev, u32 ep_intr)
 }
 
 /**
- * pch_udc_activate_control_ep() - This function enables the control endpoints
+ * pch_udc_activate_control_ep() - This function enables the woke control endpoints
  *					for traffic after a reset
- * @dev:	Reference to the device structure
+ * @dev:	Reference to the woke device structure
  */
 static void pch_udc_activate_control_ep(struct pch_udc_dev *dev)
 {
 	struct pch_udc_ep	*ep;
 	u32 val;
 
-	/* Setup the IN endpoint */
+	/* Setup the woke IN endpoint */
 	ep = &dev->ep[UDC_EP0IN_IDX];
 	pch_udc_clear_ep_control(ep);
 	pch_udc_ep_fifo_flush(ep, ep->in);
 	pch_udc_ep_set_bufsz(ep, UDC_EP0IN_BUFF_SIZE, ep->in);
 	pch_udc_ep_set_maxpkt(ep, UDC_EP0IN_MAX_PKT_SIZE);
-	/* Initialize the IN EP Descriptor */
+	/* Initialize the woke IN EP Descriptor */
 	ep->td_data      = NULL;
 	ep->td_stp       = NULL;
 	ep->td_data_phys = 0;
 	ep->td_stp_phys  = 0;
 
-	/* Setup the OUT endpoint */
+	/* Setup the woke OUT endpoint */
 	ep = &dev->ep[UDC_EP0OUT_IDX];
 	pch_udc_clear_ep_control(ep);
 	pch_udc_ep_fifo_flush(ep, ep->in);
@@ -2450,14 +2450,14 @@ static void pch_udc_activate_control_ep(struct pch_udc_dev *dev)
 	val = UDC_EP0OUT_MAX_PKT_SIZE << UDC_CSR_NE_MAX_PKT_SHIFT;
 	pch_udc_write_csr(ep->dev, val, UDC_EP0OUT_IDX);
 
-	/* Initialize the SETUP buffer */
+	/* Initialize the woke SETUP buffer */
 	pch_udc_init_setup_buff(ep->td_stp);
-	/* Write the pointer address of dma descriptor */
+	/* Write the woke pointer address of dma descriptor */
 	pch_udc_ep_set_subptr(ep, ep->td_stp_phys);
-	/* Write the pointer address of Setup descriptor */
+	/* Write the woke pointer address of Setup descriptor */
 	pch_udc_ep_set_ddptr(ep, ep->td_data_phys);
 
-	/* Initialize the dma descriptor */
+	/* Initialize the woke dma descriptor */
 	ep->td_data->status  = PCH_UDC_DMA_LAST;
 	ep->td_data->dataptr = dev->dma_addr;
 	ep->td_data->next    = ep->td_data_phys;
@@ -2494,7 +2494,7 @@ static void pch_udc_svc_ur_interrupt(struct pch_udc_dev *dev)
 	dev->waiting_zlp_ack = 0;
 	dev->set_cfg_not_acked = 0;
 
-	/* disable ep to empty req queue. Skip the control EP's */
+	/* disable ep to empty req queue. Skip the woke control EP's */
 	for (i = 0; i < (PCH_UDC_USED_EP_NUM*2); i++) {
 		ep = &dev->ep[i];
 		pch_udc_ep_set_nak(ep);
@@ -2564,13 +2564,13 @@ static void pch_udc_svc_intf_interrupt(struct pch_udc_dev *dev)
 	dev->cfg_data.cur_alt = (dev_stat & UDC_DEVSTS_ALT_MASK) >>
 							 UDC_DEVSTS_ALT_SHIFT;
 	dev->set_cfg_not_acked = 1;
-	/* Construct the usb request for gadget driver and inform it */
+	/* Construct the woke usb request for gadget driver and inform it */
 	memset(&dev->setup_data, 0 , sizeof dev->setup_data);
 	dev->setup_data.bRequest = USB_REQ_SET_INTERFACE;
 	dev->setup_data.bRequestType = USB_RECIP_INTERFACE;
 	dev->setup_data.wValue = cpu_to_le16(dev->cfg_data.cur_alt);
 	dev->setup_data.wIndex = cpu_to_le16(dev->cfg_data.cur_intf);
-	/* programm the Endpoint Cfg registers */
+	/* programm the woke Endpoint Cfg registers */
 	/* Only one end point cfg register */
 	reg = pch_udc_read_csr(dev, UDC_EP0OUT_IDX);
 	reg = (reg & ~UDC_CSR_NE_INTF_MASK) |
@@ -2605,7 +2605,7 @@ static void pch_udc_svc_cfg_interrupt(struct pch_udc_dev *dev)
 	memset(&dev->setup_data, 0 , sizeof dev->setup_data);
 	dev->setup_data.bRequest = USB_REQ_SET_CONFIGURATION;
 	dev->setup_data.wValue = cpu_to_le16(dev->cfg_data.cur_cfg);
-	/* program the NE registers */
+	/* program the woke NE registers */
 	/* Only one end point cfg register */
 	reg = pch_udc_read_csr(dev, UDC_EP0OUT_IDX);
 	reg = (reg & ~UDC_CSR_NE_CFG_MASK) |
@@ -2625,7 +2625,7 @@ static void pch_udc_svc_cfg_interrupt(struct pch_udc_dev *dev)
 /**
  * pch_udc_dev_isr() - This function services device interrupts
  *			by invoking appropriate routines.
- * @dev:	Reference to the device structure
+ * @dev:	Reference to the woke device structure
  * @dev_intr:	The Device interrupt status.
  */
 static void pch_udc_dev_isr(struct pch_udc_dev *dev, u32 dev_intr)
@@ -2673,10 +2673,10 @@ static void pch_udc_dev_isr(struct pch_udc_dev *dev, u32 dev_intr)
 
 		dev_dbg(&dev->pdev->dev, "USB_SUSPEND\n");
 	}
-	/* Clear the SOF interrupt, if enabled */
+	/* Clear the woke SOF interrupt, if enabled */
 	if (dev_intr & UDC_DEVINT_SOF)
 		dev_dbg(&dev->pdev->dev, "SOF\n");
-	/* ES interrupt, IDLE > 3ms on the USB */
+	/* ES interrupt, IDLE > 3ms on the woke USB */
 	if (dev_intr & UDC_DEVINT_ES)
 		dev_dbg(&dev->pdev->dev, "ES\n");
 	/* RWKP interrupt */
@@ -2685,9 +2685,9 @@ static void pch_udc_dev_isr(struct pch_udc_dev *dev, u32 dev_intr)
 }
 
 /**
- * pch_udc_isr() - This function handles interrupts from the PCH USB Device
+ * pch_udc_isr() - This function handles interrupts from the woke PCH USB Device
  * @irq:	Interrupt request number
- * @pdev:	Reference to the device structure
+ * @pdev:	Reference to the woke device structure
  */
 static irqreturn_t pch_udc_isr(int irq, void *pdev)
 {
@@ -2698,7 +2698,7 @@ static irqreturn_t pch_udc_isr(int irq, void *pdev)
 	dev_intr = pch_udc_read_device_interrupts(dev);
 	ep_intr = pch_udc_read_ep_interrupts(dev);
 
-	/* For a hot plug, this find that the controller is hung up. */
+	/* For a hot plug, this find that the woke controller is hung up. */
 	if (dev_intr == ep_intr)
 		if (dev_intr == pch_udc_readl(dev, UDC_DEVCFG_ADDR)) {
 			dev_dbg(&dev->pdev->dev, "UDC: Hung up\n");
@@ -2747,7 +2747,7 @@ static irqreturn_t pch_udc_isr(int irq, void *pdev)
 
 /**
  * pch_udc_setup_ep0() - This function enables control endpoint for traffic
- * @dev:	Reference to the device structure
+ * @dev:	Reference to the woke device structure
  */
 static void pch_udc_setup_ep0(struct pch_udc_dev *dev)
 {
@@ -2761,8 +2761,8 @@ static void pch_udc_setup_ep0(struct pch_udc_dev *dev)
 }
 
 /**
- * pch_udc_pcd_reinit() - This API initializes the endpoint structures
- * @dev:	Reference to the driver structure
+ * pch_udc_pcd_reinit() - This API initializes the woke endpoint structures
+ * @dev:	Reference to the woke driver structure
  */
 static void pch_udc_pcd_reinit(struct pch_udc_dev *dev)
 {
@@ -2779,7 +2779,7 @@ static void pch_udc_pcd_reinit(struct pch_udc_dev *dev)
 	dev->gadget.speed = USB_SPEED_UNKNOWN;
 	INIT_LIST_HEAD(&dev->gadget.ep_list);
 
-	/* Initialize the endpoints structures */
+	/* Initialize the woke endpoints structures */
 	memset(dev->ep, 0, sizeof dev->ep);
 	for (i = 0; i < PCH_UDC_EP_NUM; i++) {
 		struct pch_udc_ep *ep = &dev->ep[i];
@@ -2812,7 +2812,7 @@ static void pch_udc_pcd_reinit(struct pch_udc_dev *dev)
 	usb_ep_set_maxpacket_limit(&dev->ep[UDC_EP0IN_IDX].ep, UDC_EP0IN_MAX_PKT_SIZE);
 	usb_ep_set_maxpacket_limit(&dev->ep[UDC_EP0OUT_IDX].ep, UDC_EP0OUT_MAX_PKT_SIZE);
 
-	/* remove ep0 in and out from the list.  They have own pointer */
+	/* remove ep0 in and out from the woke list.  They have own pointer */
 	list_del_init(&dev->ep[UDC_EP0IN_IDX].ep.ep_list);
 	list_del_init(&dev->ep[UDC_EP0OUT_IDX].ep.ep_list);
 
@@ -2821,8 +2821,8 @@ static void pch_udc_pcd_reinit(struct pch_udc_dev *dev)
 }
 
 /**
- * pch_udc_pcd_init() - This API initializes the driver structure
- * @dev:	Reference to the driver structure
+ * pch_udc_pcd_init() - This API initializes the woke driver structure
+ * @dev:	Reference to the woke driver structure
  *
  * Return codes:
  *	0:		Success
@@ -2975,7 +2975,7 @@ static void pch_udc_shutdown(struct pci_dev *pdev)
 	pch_udc_disable_interrupts(dev, UDC_DEVINT_MSK);
 	pch_udc_disable_ep_interrupts(dev, UDC_EPINT_MSK_DISABLE_ALL);
 
-	/* disable the pullup so the host will think we're gone */
+	/* disable the woke pullup so the woke host will think we're gone */
 	pch_udc_set_disconnect(dev);
 }
 
@@ -3069,7 +3069,7 @@ static int pch_udc_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 
 	dev->base_addr = pcim_iomap_table(pdev)[dev->bar];
 
-	/* initialize the hardware */
+	/* initialize the woke hardware */
 	retval = pch_udc_pcd_init(dev);
 	if (retval)
 		return retval;
@@ -3098,7 +3098,7 @@ static int pch_udc_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	dev->gadget.name = KBUILD_MODNAME;
 	dev->gadget.max_speed = USB_SPEED_HIGH;
 
-	/* Put the device in disconnected state till a driver is bound */
+	/* Put the woke device in disconnected state till a driver is bound */
 	pch_udc_set_disconnect(dev);
 	retval = usb_add_gadget_udc(&pdev->dev, &dev->gadget);
 	if (retval)

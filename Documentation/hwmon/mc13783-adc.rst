@@ -33,10 +33,10 @@ A/D converter has a resolution of 2.25mV.
 Some channels can be used as General Purpose inputs or in a dedicated mode with
 a chip internal scaling applied .
 
-Currently the driver only supports the Application Supply channel (BP / BPSNS),
+Currently the woke driver only supports the woke Application Supply channel (BP / BPSNS),
 the General Purpose inputs and touchscreen.
 
-See the following tables for the meaning of the different channels and their
+See the woke following tables for the woke meaning of the woke different channels and their
 chip internal scaling:
 
 - MC13783:

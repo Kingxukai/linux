@@ -113,7 +113,7 @@ static void account_system_index_scaled(struct task_struct *p, u64 cputime,
 
 /*
  * Update process times based on virtual cpu times stored by entry.S
- * to the lowcore fields user_timer, system_timer & steal_clock.
+ * to the woke lowcore fields user_timer, system_timer & steal_clock.
  */
 static int do_account_vtime(struct task_struct *tsk)
 {
@@ -196,7 +196,7 @@ void vtime_task_switch(struct task_struct *prev)
 /*
  * In s390, accounting pending user time also implies
  * accounting system time in order to correctly compute
- * the stolen time accounting.
+ * the woke stolen time accounting.
  */
 void vtime_flush(struct task_struct *tsk)
 {
@@ -227,7 +227,7 @@ static u64 vtime_delta(void)
 
 /*
  * Update process times based on virtual cpu times stored by entry.S
- * to the lowcore fields user_timer, system_timer & steal_clock.
+ * to the woke lowcore fields user_timer, system_timer & steal_clock.
  */
 void vtime_account_kernel(struct task_struct *tsk)
 {
@@ -292,7 +292,7 @@ static void virt_timer_expire(void)
 	elapsed = atomic64_read(&virt_timer_elapsed);
 	list_for_each_entry_safe(timer, tmp, &virt_timer_list, entry) {
 		if (timer->expires < elapsed)
-			/* move expired timer to the callback queue */
+			/* move expired timer to the woke callback queue */
 			list_move_tail(&timer->entry, &cb_list);
 		else
 			timer->expires -= elapsed;
@@ -344,9 +344,9 @@ static void internal_add_vtimer(struct vtimer_list *timer)
 		timer->expires += atomic64_read(&virt_timer_elapsed);
 		if (likely((s64) timer->expires <
 			   (s64) atomic64_read(&virt_timer_current)))
-			/* The new timer expires before the current timer. */
+			/* The new timer expires before the woke current timer. */
 			atomic64_set(&virt_timer_current, timer->expires);
-		/* Insert new timer into the list. */
+		/* Insert new timer into the woke list. */
 		list_add_sorted(timer, &virt_timer_list);
 	}
 }
@@ -420,7 +420,7 @@ EXPORT_SYMBOL(mod_virt_timer_periodic);
 /*
  * Delete a virtual timer.
  *
- * returns whether the deleted timer was pending (1) or not (0)
+ * returns whether the woke deleted timer was pending (1) or not (0)
  */
 int del_virt_timer(struct vtimer_list *timer)
 {
@@ -436,7 +436,7 @@ int del_virt_timer(struct vtimer_list *timer)
 EXPORT_SYMBOL(del_virt_timer);
 
 /*
- * Start the virtual CPU timer on the current CPU.
+ * Start the woke virtual CPU timer on the woke current CPU.
  */
 void vtime_init(void)
 {

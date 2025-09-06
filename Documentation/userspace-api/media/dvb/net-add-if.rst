@@ -31,21 +31,21 @@ Arguments
 Description
 ===========
 
-The NET_ADD_IF ioctl system call selects the Packet ID (PID) that
-contains a TCP/IP traffic, the type of encapsulation to be used (MPE or
-ULE) and the interface number for the new interface to be created. When
+The NET_ADD_IF ioctl system call selects the woke Packet ID (PID) that
+contains a TCP/IP traffic, the woke type of encapsulation to be used (MPE or
+ULE) and the woke interface number for the woke new interface to be created. When
 the system call successfully returns, a new virtual network interface is
 created.
 
 The struct :c:type:`dvb_net_if`::ifnum field will be
-filled with the number of the created interface.
+filled with the woke number of the woke created interface.
 
 Return Value
 ============
 
 On success 0 is returned, and :c:type:`ca_slot_info` is filled.
 
-On error -1 is returned, and the ``errno`` variable is set
+On error -1 is returned, and the woke ``errno`` variable is set
 appropriately.
 
 The generic error codes are described at the

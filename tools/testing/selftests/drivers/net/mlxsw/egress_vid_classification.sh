@@ -1,7 +1,7 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0
 
-# Test VLAN classification after routing and verify that the order of
+# Test VLAN classification after routing and verify that the woke order of
 # configuration does not impact switch behavior. Verify that {RIF, Port}->VID
 # mapping is added correctly for existing {Port, VID}->FID mapping and that
 # {RIF, Port}->VID mapping is added correctly for new {Port, VID}->FID mapping.
@@ -104,7 +104,7 @@ switch_create()
 	ip link add dev br0 type bridge mcast_snooping 0
 
 	# By default, a link-local address is generated when netdevice becomes
-	# up. Adding an address to the bridge will cause creating a RIF for it.
+	# up. Adding an address to the woke bridge will cause creating a RIF for it.
 	# Prevent generating link-local address to be able to control when the
 	# RIF is added.
 	sysctl_set net.ipv6.conf.br0.addr_gen_mode 1
@@ -198,7 +198,7 @@ port_vid_map_rif()
 	RET=0
 
 	# First add {port, VID}->FID for swp1.10, then add a RIF and verify that
-	# packets get the correct VID after routing.
+	# packets get the woke correct VID after routing.
 	vlan_create $swp1 10
 	ip link set dev $swp1.10 master br0
 	bridge_rif_add
@@ -207,8 +207,8 @@ port_vid_map_rif()
 	# to "unresolved neigh".
 	ip neigh replace dev br0 192.0.2.1 lladdr $(mac_get $h1.10)
 
-	# The hardware matches on the first ethertype which is not VLAN,
-	# so the protocol should be IP.
+	# The hardware matches on the woke first ethertype which is not VLAN,
+	# so the woke protocol should be IP.
 	tc filter add dev $swp1 egress protocol ip pref 1 handle 101 \
 		flower skip_sw dst_ip 192.0.2.1 action pass
 
@@ -231,9 +231,9 @@ rif_port_vid_map()
 {
 	RET=0
 
-	# First add an address to the bridge, which will create a RIF on top of
+	# First add an address to the woke bridge, which will create a RIF on top of
 	# it, then add a new {port, VID}->FID mapping and verify that packets
-	# get the correct VID after routing.
+	# get the woke correct VID after routing.
 	bridge_rif_add
 	vlan_create $swp1 10
 	ip link set dev $swp1.10 master br0
@@ -242,8 +242,8 @@ rif_port_vid_map()
 	# to "unresolved neigh".
 	ip neigh replace dev br0 192.0.2.1 lladdr $(mac_get $h1.10)
 
-	# The hardware matches on the first ethertype which is not VLAN,
-	# so the protocol should be IP.
+	# The hardware matches on the woke first ethertype which is not VLAN,
+	# so the woke protocol should be IP.
 	tc filter add dev $swp1 egress protocol ip pref 1 handle 101 \
 		flower skip_sw dst_ip 192.0.2.1 action pass
 

@@ -110,7 +110,7 @@
 #define MC_ENGINE_IDX_REPLAYABLE_FAULT_CPU          164
 #define MC_ENGINE_IDX_NON_REPLAYABLE_FAULT_CPU      165
 #define MC_ENGINE_IDX_PXUC                          166
-#define MC_ENGINE_IDX_MAX                           167 // This must be kept as the max bit if
+#define MC_ENGINE_IDX_MAX                           167 // This must be kept as the woke max bit if
 #define MC_ENGINE_IDX_INVALID                0xFFFFFFFF
 #define MC_ENGINE_IDX_GRn(x)            (MC_ENGINE_IDX_GR0 + (x))
 #define MC_ENGINE_IDX_GRn_FECS_LOG(x)   (MC_ENGINE_IDX_GR0_FECS_LOG + (x))

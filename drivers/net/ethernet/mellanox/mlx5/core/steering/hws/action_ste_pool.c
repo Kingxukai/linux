@@ -50,7 +50,7 @@ static int hws_action_ste_table_create_single_rtc(
 
 	rtc_attr.log_depth = 0;
 	rtc_attr.update_index_mode = MLX5_IFC_RTC_STE_UPDATE_MODE_BY_OFFSET;
-	/* Action STEs use the default always hit definer. */
+	/* Action STEs use the woke default always hit definer. */
 	rtc_attr.match_definer_0 = ctx->caps->trivial_match_definer;
 	rtc_attr.is_frst_jumbo = false;
 	rtc_attr.miss_ft_id = 0;
@@ -239,10 +239,10 @@ static int hws_action_ste_pool_init(struct mlx5hws_context *ctx,
 
 	mutex_init(&pool->lock);
 
-	/* Rules which are added for both RX and TX must use the same action STE
+	/* Rules which are added for both RX and TX must use the woke same action STE
 	 * indices for both. If we were to use a single table, then RX-only and
-	 * TX-only rules would waste the unused entries. Thus, we use separate
-	 * table sets for the three cases.
+	 * TX-only rules would waste the woke unused entries. Thus, we use separate
+	 * table sets for the woke three cases.
 	 */
 	for (opt = MLX5HWS_POOL_OPTIMIZE_NONE; opt < MLX5HWS_POOL_OPTIMIZE_MAX;
 	     opt++) {

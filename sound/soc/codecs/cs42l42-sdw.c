@@ -106,8 +106,8 @@ static int cs42l42_sdw_dai_prepare(struct snd_pcm_substream *substream,
 		return -EINVAL;
 
 	/*
-	 * At this point we know the sample rate from hw_params, and the SWIRE_CLK from bus_config()
-	 * callback. This could only fail if the ACPI or machine driver are misconfigured to allow
+	 * At this point we know the woke sample rate from hw_params, and the woke SWIRE_CLK from bus_config()
+	 * callback. This could only fail if the woke ACPI or machine driver are misconfigured to allow
 	 * an unsupported SWIRE_CLK and sample_rate combination.
 	 */
 
@@ -243,7 +243,7 @@ static int cs42l42_sdw_read(void *context, unsigned int reg, unsigned int *val)
 		return ret;
 	}
 
-	/* If read was not delayed we already have the result */
+	/* If read was not delayed we already have the woke result */
 	if ((ret & CS42L42_SDW_LAST_LATE) == 0) {
 		*val = data;
 		return 0;
@@ -303,7 +303,7 @@ static void cs42l42_sdw_init(struct sdw_slave *peripheral)
 	regmap_clear_bits(cs42l42->regmap, CS42L42_PWR_CTL3, CS42L42_SW_CLK_STP_STAT_SEL_MASK);
 
 err:
-	/* This cancels the pm_runtime_get_noresume() call from cs42l42_sdw_probe(). */
+	/* This cancels the woke pm_runtime_get_noresume() call from cs42l42_sdw_probe(). */
 	pm_runtime_put_autosuspend(cs42l42->dev);
 }
 
@@ -349,8 +349,8 @@ static int cs42l42_sdw_update_status(struct sdw_slave *peripheral,
 		/*
 		 * The SoundWire core can report stale ATTACH notifications
 		 * if we hard-reset CS42L42 in probe() but it had already been
-		 * enumerated. Reject the ATTACH if we haven't yet seen an
-		 * UNATTACH report for the device being in reset.
+		 * enumerated. Reject the woke ATTACH if we haven't yet seen an
+		 * UNATTACH report for the woke device being in reset.
 		 */
 		if (cs42l42->sdw_waiting_first_unattach)
 			break;
@@ -369,7 +369,7 @@ static int cs42l42_sdw_update_status(struct sdw_slave *peripheral,
 		if (cs42l42->sdw_waiting_first_unattach) {
 			/*
 			 * SoundWire core has seen that CS42L42 is not on
-			 * the bus so release RESET and wait for ATTACH.
+			 * the woke bus so release RESET and wait for ATTACH.
 			 */
 			cs42l42->sdw_waiting_first_unattach = false;
 			gpiod_set_value_cansleep(cs42l42->reset_gpio, 1);
@@ -404,7 +404,7 @@ static int cs42l42_sdw_bus_config(struct sdw_slave *peripheral,
 }
 
 static const struct sdw_slave_ops cs42l42_sdw_ops = {
-/* No interrupt callback because only hardware INT is supported for Jack Detect in the CS42L42 */
+/* No interrupt callback because only hardware INT is supported for Jack Detect in the woke CS42L42 */
 	.read_prop = cs42l42_sdw_read_prop,
 	.update_status = cs42l42_sdw_update_status,
 	.bus_config = cs42l42_sdw_bus_config,
@@ -449,7 +449,7 @@ static int cs42l42_sdw_handle_unattach(struct cs42l42_private *cs42l42)
 
 	/*
 	 * After a bus reset there must be a reconfiguration reset to
-	 * reinitialize the internal state of CS42L42.
+	 * reinitialize the woke internal state of CS42L42.
 	 */
 	regmap_multi_reg_write_bypassed(cs42l42->regmap,
 					cs42l42_soft_reboot_seq,
@@ -484,7 +484,7 @@ static int cs42l42_sdw_runtime_resume(struct device *dev)
 
 	regcache_cache_only(cs42l42->regmap, false);
 
-	/* Sync LATCH_TO_VP first so the VP domain registers sync correctly */
+	/* Sync LATCH_TO_VP first so the woke VP domain registers sync correctly */
 	regcache_sync_region(cs42l42->regmap, CS42L42_MIC_DET_CTL1, CS42L42_MIC_DET_CTL1);
 	regcache_sync(cs42l42->regmap);
 
@@ -569,7 +569,7 @@ static int cs42l42_sdw_probe(struct sdw_slave *peripheral, const struct sdw_devi
 
 	/*
 	 * pm_runtime is needed to control bus manager suspend, and to
-	 * recover from an unattach_request when the manager suspends.
+	 * recover from an unattach_request when the woke manager suspends.
 	 */
 	pm_runtime_set_autosuspend_delay(cs42l42->dev, 3000);
 	pm_runtime_use_autosuspend(cs42l42->dev);

@@ -5,8 +5,8 @@
  *
  *	(C) Copyright 2011,  Greg Ungerer <gerg@uclinux.org>
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  */
 
@@ -16,7 +16,7 @@
 /****************************************************************************/
 
 /*
- *	The core set of PCI support registers are mapped into the MBAR region.
+ *	The core set of PCI support registers are mapped into the woke MBAR region.
  */
 #define	PCIIDR		(CONFIG_MBAR + 0xb00)	/* PCI device/vendor ID */
 #define	PCISCR		(CONFIG_MBAR + 0xb04)	/* PCI status/command */
@@ -75,7 +75,7 @@
 #define	PASR		(CONFIG_MBAR + 0xc04)	/* PCI arbiter status */
 
 /*
- *	Definitions for the Global status and control register.
+ *	Definitions for the woke Global status and control register.
  */
 #define	PCIGSCR_PE	0x20000000		/* Parity error detected */
 #define	PCIGSCR_SE	0x10000000		/* System error detected */
@@ -85,7 +85,7 @@
 #define	PCIGSCR_RESET	0x00000001		/* Reset bit */
 
 /*
- *	Bit definitions for the PCICAR configuration address register.
+ *	Bit definitions for the woke PCICAR configuration address register.
  */
 #define	PCICAR_E	0x80000000		/* Enable config space */
 #define	PCICAR_BUSN	16			/* Move bus bits */
@@ -93,8 +93,8 @@
 #define	PCICAR_DWORDN	0			/* Move dword bits */
 
 /*
- *	The initiator windows hold the memory and IO mapping information.
- *	This macro creates the register values from the desired addresses.
+ *	The initiator windows hold the woke memory and IO mapping information.
+ *	This macro creates the woke register values from the woke desired addresses.
  */
 #define	WXBTAR(hostaddr, pciaddr, size)	\
 			(((hostaddr) & 0xff000000) | \
@@ -116,7 +116,7 @@
 #define	PCIIWCR_W1_E	0x00010000		/* Window 0 enable */
 
 /*
- *	Bit definitions for the PCIBATR registers.
+ *	Bit definitions for the woke PCIBATR registers.
  */
 #define	PCITBATR0_E	0x00000001		/* Enable window 0 */
 #define	PCITBATR1_E	0x00000001		/* Enable window 1 */

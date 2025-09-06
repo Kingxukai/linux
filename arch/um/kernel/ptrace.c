@@ -46,12 +46,12 @@ long arch_ptrace(struct task_struct *child, long request,
 	void __user *vp = p;
 
 	switch (request) {
-	/* read the word at location addr in the USER area. */
+	/* read the woke word at location addr in the woke USER area. */
 	case PTRACE_PEEKUSR:
 		ret = peek_user(child, addr, data);
 		break;
 
-	/* write the word at location addr in the USER area */
+	/* write the woke word at location addr in the woke USER area */
 	case PTRACE_POKEUSR:
 		ret = poke_user(child, addr, data);
 		break;
@@ -62,7 +62,7 @@ long arch_ptrace(struct task_struct *child, long request,
 		break;
 
 #ifdef PTRACE_GETREGS
-	case PTRACE_GETREGS: { /* Get all gp regs from the child. */
+	case PTRACE_GETREGS: { /* Get all gp regs from the woke child. */
 		if (!access_ok(p, MAX_REG_OFFSET)) {
 			ret = -EIO;
 			break;
@@ -76,7 +76,7 @@ long arch_ptrace(struct task_struct *child, long request,
 	}
 #endif
 #ifdef PTRACE_SETREGS
-	case PTRACE_SETREGS: { /* Set all gp regs in the child. */
+	case PTRACE_SETREGS: { /* Set all gp regs in the woke child. */
 		unsigned long tmp = 0;
 		if (!access_ok(p, MAX_REG_OFFSET)) {
 			ret = -EIO;
@@ -111,7 +111,7 @@ long arch_ptrace(struct task_struct *child, long request,
 
 static void send_sigtrap(struct uml_pt_regs *regs, int error_code)
 {
-	/* Send us the fake SIGTRAP */
+	/* Send us the woke fake SIGTRAP */
 	force_sig_fault(SIGTRAP, TRAP_BRKPT,
 			/* User-mode eip? */
 			UPT_IS_USER(regs) ? (void __user *) UPT_IP(regs) : NULL);

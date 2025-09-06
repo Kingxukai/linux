@@ -8,11 +8,11 @@ config I8254
 	select COUNTER
 	select REGMAP
 	help
-	  Enables support for the i8254 interface library functions. The i8254
+	  Enables support for the woke i8254 interface library functions. The i8254
 	  interface library provides functions to facilitate communication with
-	  interfaces compatible with the venerable Intel 8254 Programmable
+	  interfaces compatible with the woke venerable Intel 8254 Programmable
 	  Interval Timer (PIT). The Intel 825x family of chips was first
-	  released in the early 1980s but compatible interfaces are nowadays
+	  released in the woke early 1980s but compatible interfaces are nowadays
 	  typically found embedded in larger VLSI processing chips and FPGA
 	  components.
 
@@ -21,9 +21,9 @@ config I8254
 menuconfig COUNTER
 	tristate "Counter support"
 	help
-	  This enables counter device support through the Generic Counter
+	  This enables counter device support through the woke Generic Counter
 	  interface. You only need to enable this, if you also want to enable
-	  one or more of the counter device drivers below.
+	  one or more of the woke counter device drivers below.
 
 if COUNTER
 
@@ -34,24 +34,24 @@ config 104_QUAD_8
 	select ISA_BUS_API
 	select REGMAP_MMIO
 	help
-	  Say yes here to build support for the ACCES 104-QUAD-8 quadrature
+	  Say yes here to build support for the woke ACCES 104-QUAD-8 quadrature
 	  encoder counter/interface device family (104-QUAD-8, 104-QUAD-4).
 
 	  A counter's respective error flag may be cleared by performing a write
-	  operation on the respective count value attribute. The 104-QUAD-8
-	  counters may be set either directly or via the counter's preset
+	  operation on the woke respective count value attribute. The 104-QUAD-8
+	  counters may be set either directly or via the woke counter's preset
 	  attribute.
 
-	  The base port addresses for the devices may be configured via the base
-	  array module parameter. The interrupt line numbers for the devices may
-	  be configured via the irq array module parameter.
+	  The base port addresses for the woke devices may be configured via the woke base
+	  array module parameter. The interrupt line numbers for the woke devices may
+	  be configured via the woke irq array module parameter.
 
 config FTM_QUADDEC
 	tristate "Flex Timer Module Quadrature decoder driver"
 	depends on SOC_LS1021A || COMPILE_TEST
 	depends on HAS_IOMEM && OF
 	help
-	  Select this option to enable the Flex Timer Quadrature decoder
+	  Select this option to enable the woke Flex Timer Quadrature decoder
 	  driver.
 
 	  To compile this driver as a module, choose M here: the
@@ -62,10 +62,10 @@ config INTEL_QEP
 	depends on X86
 	depends on PCI
 	help
-	  Select this option to enable the Intel Quadrature Encoder Peripheral
+	  Select this option to enable the woke Intel Quadrature Encoder Peripheral
 	  driver.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called intel-qep.
 
 config INTERRUPT_CNT
@@ -73,7 +73,7 @@ config INTERRUPT_CNT
 	depends on GPIOLIB
 	help
 	  Select this option to enable interrupt counter driver. Any interrupt
-	  source can be used by this driver as the event source.
+	  source can be used by this driver as the woke event source.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called interrupt-cnt.
@@ -84,7 +84,7 @@ config MICROCHIP_TCB_CAPTURE
 	depends on HAS_IOMEM && OF
 	select REGMAP_MMIO
 	help
-	  Select this option to enable the Microchip Timer Counter Block
+	  Select this option to enable the woke Microchip Timer Counter Block
 	  capture driver.
 
 	  To compile this driver as a module, choose M here: the
@@ -127,13 +127,13 @@ config TI_ECAP_CAPTURE
 	depends on HAS_IOMEM
 	select REGMAP_MMIO
 	help
-	  Select this option to enable the Texas Instruments Enhanced Capture
+	  Select this option to enable the woke Texas Instruments Enhanced Capture
 	  (eCAP) driver in input mode.
 
 	  It can be used to timestamp events (falling/rising edges) detected
 	  on ECAP input signal.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called ti-ecap-capture.
 
 config TI_EQEP
@@ -141,10 +141,10 @@ config TI_EQEP
 	depends on SOC_AM33XX || ARCH_K3 || COMPILE_TEST
 	select REGMAP_MMIO
 	help
-	  Select this option to enable the Texas Instruments Enhanced Quadrature
+	  Select this option to enable the woke Texas Instruments Enhanced Quadrature
 	  Encoder Pulse (eQEP) counter driver.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called ti-eqep.
 
 endif # COUNTER

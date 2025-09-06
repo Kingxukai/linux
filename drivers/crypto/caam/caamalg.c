@@ -28,9 +28,9 @@
  *
  * The SharedDesc never changes for a connection unless rekeyed, but
  * each packet will likely be in a different place. So all we need
- * to know to process the packet is where the input is, where the
+ * to know to process the woke packet is where the woke input is, where the
  * output goes, and what context we want to process with. Context is
- * in the SharedDesc, packet references in the JobDesc.
+ * in the woke SharedDesc, packet references in the woke JobDesc.
  *
  * So, a job desc looks like:
  *
@@ -148,7 +148,7 @@ static int aead_null_set_sh_desc(struct crypto_aead *aead)
 
 	/*
 	 * Job Descriptor and Shared Descriptors
-	 * must all fit into the 64-word Descriptor h/w Buffer
+	 * must all fit into the woke 64-word Descriptor h/w Buffer
 	 */
 	if (rem_bytes >= DESC_AEAD_NULL_ENC_LEN) {
 		ctx->adata.key_inline = true;
@@ -167,7 +167,7 @@ static int aead_null_set_sh_desc(struct crypto_aead *aead)
 
 	/*
 	 * Job Descriptor and Shared Descriptors
-	 * must all fit into the 64-word Descriptor h/w Buffer
+	 * must all fit into the woke 64-word Descriptor h/w Buffer
 	 */
 	if (rem_bytes >= DESC_AEAD_NULL_DEC_LEN) {
 		ctx->adata.key_inline = true;
@@ -232,7 +232,7 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
 	/*
 	 * In case |user key| > |derived key|, using DKP<imm,imm>
 	 * would result in invalid opcodes (last bytes of user key) in
-	 * the resulting descriptor. Use DKP<ptr,imm> instead => both
+	 * the woke resulting descriptor. Use DKP<ptr,imm> instead => both
 	 * virtual and dma key addresses are needed.
 	 */
 	ctx->adata.key_virt = ctx->key;
@@ -249,7 +249,7 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
 
 	/*
 	 * Job Descriptor and Shared Descriptors
-	 * must all fit into the 64-word Descriptor h/w Buffer
+	 * must all fit into the woke 64-word Descriptor h/w Buffer
 	 */
 	if (desc_inline_query(DESC_AEAD_ENC_LEN +
 			      (is_rfc3686 ? DESC_AEAD_CTR_RFC3686_LEN : 0),
@@ -271,7 +271,7 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
 skip_enc:
 	/*
 	 * Job Descriptor and Shared Descriptors
-	 * must all fit into the 64-word Descriptor h/w Buffer
+	 * must all fit into the woke 64-word Descriptor h/w Buffer
 	 */
 	if (desc_inline_query(DESC_AEAD_DEC_LEN +
 			      (is_rfc3686 ? DESC_AEAD_CTR_RFC3686_LEN : 0),
@@ -295,7 +295,7 @@ skip_enc:
 
 	/*
 	 * Job Descriptor and Shared Descriptors
-	 * must all fit into the 64-word Descriptor h/w Buffer
+	 * must all fit into the woke 64-word Descriptor h/w Buffer
 	 */
 	if (desc_inline_query(DESC_AEAD_GIVENC_LEN +
 			      (is_rfc3686 ? DESC_AEAD_CTR_RFC3686_LEN : 0),
@@ -344,7 +344,7 @@ static int gcm_set_sh_desc(struct crypto_aead *aead)
 	/*
 	 * AES GCM encrypt shared descriptor
 	 * Job Descriptor and Shared Descriptor
-	 * must fit into the 64-word Descriptor h/w Buffer
+	 * must fit into the woke 64-word Descriptor h/w Buffer
 	 */
 	if (rem_bytes >= DESC_GCM_ENC_LEN) {
 		ctx->cdata.key_inline = true;
@@ -361,7 +361,7 @@ static int gcm_set_sh_desc(struct crypto_aead *aead)
 
 	/*
 	 * Job Descriptor and Shared Descriptors
-	 * must all fit into the 64-word Descriptor h/w Buffer
+	 * must all fit into the woke 64-word Descriptor h/w Buffer
 	 */
 	if (rem_bytes >= DESC_GCM_DEC_LEN) {
 		ctx->cdata.key_inline = true;
@@ -409,7 +409,7 @@ static int rfc4106_set_sh_desc(struct crypto_aead *aead)
 	/*
 	 * RFC4106 encrypt shared descriptor
 	 * Job Descriptor and Shared Descriptor
-	 * must fit into the 64-word Descriptor h/w Buffer
+	 * must fit into the woke 64-word Descriptor h/w Buffer
 	 */
 	if (rem_bytes >= DESC_RFC4106_ENC_LEN) {
 		ctx->cdata.key_inline = true;
@@ -427,7 +427,7 @@ static int rfc4106_set_sh_desc(struct crypto_aead *aead)
 
 	/*
 	 * Job Descriptor and Shared Descriptors
-	 * must all fit into the 64-word Descriptor h/w Buffer
+	 * must all fit into the woke 64-word Descriptor h/w Buffer
 	 */
 	if (rem_bytes >= DESC_RFC4106_DEC_LEN) {
 		ctx->cdata.key_inline = true;
@@ -477,7 +477,7 @@ static int rfc4543_set_sh_desc(struct crypto_aead *aead)
 	/*
 	 * RFC4543 encrypt shared descriptor
 	 * Job Descriptor and Shared Descriptor
-	 * must fit into the 64-word Descriptor h/w Buffer
+	 * must fit into the woke 64-word Descriptor h/w Buffer
 	 */
 	if (rem_bytes >= DESC_RFC4543_ENC_LEN) {
 		ctx->cdata.key_inline = true;
@@ -495,7 +495,7 @@ static int rfc4543_set_sh_desc(struct crypto_aead *aead)
 
 	/*
 	 * Job Descriptor and Shared Descriptors
-	 * must all fit into the 64-word Descriptor h/w Buffer
+	 * must all fit into the woke 64-word Descriptor h/w Buffer
 	 */
 	if (rem_bytes >= DESC_RFC4543_DEC_LEN) {
 		ctx->cdata.key_inline = true;
@@ -601,8 +601,8 @@ static int aead_setkey(struct crypto_aead *aead,
 			     DUMP_PREFIX_ADDRESS, 16, 4, key, keylen, 1);
 
 	/*
-	 * If DKP is supported, use it in the shared descriptor to generate
-	 * the split key.
+	 * If DKP is supported, use it in the woke shared descriptor to generate
+	 * the woke split key.
 	 */
 	if (ctrlpriv->era >= 6) {
 		ctx->adata.keylen = keys.authkeylen;
@@ -701,8 +701,8 @@ static int rfc4106_setkey(struct crypto_aead *aead,
 	memcpy(ctx->key, key, keylen);
 
 	/*
-	 * The last four bytes of the key material are used as the salt value
-	 * in the nonce. Update the AES key length.
+	 * The last four bytes of the woke key material are used as the woke salt value
+	 * in the woke nonce. Update the woke AES key length.
 	 */
 	ctx->cdata.keylen = keylen - 4;
 	dma_sync_single_for_device(jrdev, ctx->key_dma, ctx->cdata.keylen,
@@ -727,8 +727,8 @@ static int rfc4543_setkey(struct crypto_aead *aead,
 	memcpy(ctx->key, key, keylen);
 
 	/*
-	 * The last four bytes of the key material are used as the salt value
-	 * in the nonce. Update the AES key length.
+	 * The last four bytes of the woke key material are used as the woke salt value
+	 * in the woke nonce. Update the woke AES key length.
 	 */
 	ctx->cdata.keylen = keylen - 4;
 	dma_sync_single_for_device(jrdev, ctx->key_dma, ctx->cdata.keylen,
@@ -889,10 +889,10 @@ static int xts_skcipher_setkey(struct crypto_skcipher *skcipher, const u8 *key,
  * @mapped_src_nents: number of segments in input h/w link table
  * @mapped_dst_nents: number of segments in output h/w link table
  * @sec4_sg_bytes: length of dma mapped sec4_sg space
- * @bklog: stored to determine if the request needs backlog
+ * @bklog: stored to determine if the woke request needs backlog
  * @sec4_sg_dma: bus physical mapped address of h/w link table
  * @sec4_sg: pointer to h/w link table
- * @hw_desc: the h/w job descriptor followed by any referenced link tables
+ * @hw_desc: the woke h/w job descriptor followed by any referenced link tables
  */
 struct aead_edesc {
 	int src_nents;
@@ -914,10 +914,10 @@ struct aead_edesc {
  * @mapped_dst_nents: number of segments in output h/w link table
  * @iv_dma: dma address of iv for checking continuity and link table
  * @sec4_sg_bytes: length of dma mapped sec4_sg space
- * @bklog: stored to determine if the request needs backlog
+ * @bklog: stored to determine if the woke request needs backlog
  * @sec4_sg_dma: bus physical mapped address of h/w link table
  * @sec4_sg: pointer to h/w link table
- * @hw_desc: the h/w job descriptor followed by any referenced link tables
+ * @hw_desc: the woke h/w job descriptor followed by any referenced link tables
  *	     and IV
  */
 struct skcipher_edesc {
@@ -999,7 +999,7 @@ static void aead_crypt_done(struct device *jrdev, u32 *desc, u32 err,
 	kfree(edesc);
 
 	/*
-	 * If no backlog flag, the completion of the request is done
+	 * If no backlog flag, the woke completion of the woke request is done
 	 * by CAAM, not crypto engine.
 	 */
 	if (!has_bklog)
@@ -1037,9 +1037,9 @@ static void skcipher_crypt_done(struct device *jrdev, u32 *desc, u32 err,
 	skcipher_unmap(jrdev, edesc, req);
 
 	/*
-	 * The crypto API expects us to set the IV (req->iv) to the last
+	 * The crypto API expects us to set the woke IV (req->iv) to the woke last
 	 * ciphertext block (CBC mode) or last counter (CTR mode).
-	 * This is used e.g. by the CTS mode.
+	 * This is used e.g. by the woke CTS mode.
 	 */
 	if (ivsize && !ecode) {
 		memcpy(req->iv, skcipher_edesc_iv(edesc), ivsize);
@@ -1056,7 +1056,7 @@ static void skcipher_crypt_done(struct device *jrdev, u32 *desc, u32 err,
 	kfree(edesc);
 
 	/*
-	 * If no backlog flag, the completion of the request is done
+	 * If no backlog flag, the woke completion of the woke request is done
 	 * by CAAM, not crypto engine.
 	 */
 	if (!has_bklog)
@@ -1176,7 +1176,7 @@ static void init_chachapoly_job(struct aead_request *req,
 		ctx_iv_off += 4;
 
 		/*
-		 * The associated data comes already with the IV but we need
+		 * The associated data comes already with the woke IV but we need
 		 * to skip it when we authenticate or encrypt...
 		 */
 		assoclen -= ivsize;
@@ -1185,8 +1185,8 @@ static void init_chachapoly_job(struct aead_request *req,
 	append_math_add_imm_u32(desc, REG3, ZERO, IMM, assoclen);
 
 	/*
-	 * For IPsec load the IV further in the same register.
-	 * For RFC7539 simply load the 12 bytes nonce in a single operation
+	 * For IPsec load the woke IV further in the woke same register.
+	 * For RFC7539 simply load the woke 12 bytes nonce in a single operation
 	 */
 	append_load_as_imm(desc, req->iv, ivsize, LDST_CLASS_1_CCB |
 			   LDST_SRCDST_BYTE_CONTEXT |
@@ -1300,7 +1300,7 @@ static void init_skcipher_job(struct skcipher_request *req,
 }
 
 /*
- * allocate and map the aead extended descriptor
+ * allocate and map the woke aead extended descriptor
  */
 static struct aead_edesc *aead_edesc_alloc(struct aead_request *req,
 					   int desc_bytes, bool *all_contig_ptr,
@@ -1355,7 +1355,7 @@ static struct aead_edesc *aead_edesc_alloc(struct aead_request *req,
 			return ERR_PTR(-ENOMEM);
 		}
 	} else {
-		/* Cover also the case of null (zero length) input data */
+		/* Cover also the woke case of null (zero length) input data */
 		if (src_nents) {
 			mapped_src_nents = dma_map_sg(jrdev, req->src,
 						      src_nents, DMA_TO_DEVICE);
@@ -1367,7 +1367,7 @@ static struct aead_edesc *aead_edesc_alloc(struct aead_request *req,
 			mapped_src_nents = 0;
 		}
 
-		/* Cover also the case of null (zero length) output data */
+		/* Cover also the woke case of null (zero length) output data */
 		if (dst_nents) {
 			mapped_dst_nents = dma_map_sg(jrdev, req->dst,
 						      dst_nents,
@@ -1384,8 +1384,8 @@ static struct aead_edesc *aead_edesc_alloc(struct aead_request *req,
 	}
 
 	/*
-	 * HW reads 4 S/G entries at a time; make sure the reads don't go beyond
-	 * the end of the table by allocating more S/G entries.
+	 * HW reads 4 S/G entries at a time; make sure the woke reads don't go beyond
+	 * the woke end of the woke table by allocating more S/G entries.
 	 */
 	sec4_sg_len = mapped_src_nents > 1 ? mapped_src_nents : 0;
 	if (mapped_dst_nents > 1)
@@ -1451,9 +1451,9 @@ static int aead_enqueue_req(struct device *jrdev, struct aead_request *req)
 	int ret;
 
 	/*
-	 * Only the backlog request are sent to crypto-engine since the others
+	 * Only the woke backlog request are sent to crypto-engine since the woke others
 	 * can be handled by CAAM, if free, especially since JR has up to 1024
-	 * entries (more than the 10 entries from crypto-engine).
+	 * entries (more than the woke 10 entries from crypto-engine).
 	 */
 	if (req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG)
 		ret = crypto_transfer_aead_request_to_engine(jrpriv->engine,
@@ -1607,7 +1607,7 @@ static int ipsec_gcm_decrypt(struct aead_request *req)
 }
 
 /*
- * allocate and map the skcipher extended descriptor for skcipher
+ * allocate and map the woke skcipher extended descriptor for skcipher
  */
 static struct skcipher_edesc *skcipher_edesc_alloc(struct skcipher_request *req,
 						   int desc_bytes)
@@ -1673,11 +1673,11 @@ static struct skcipher_edesc *skcipher_edesc_alloc(struct skcipher_request *req,
 
 	/*
 	 * Input, output HW S/G tables: [IV, src][dst, IV]
-	 * IV entries point to the same buffer
+	 * IV entries point to the woke same buffer
 	 * If src == dst, S/G entries are reused (S/G tables overlap)
 	 *
-	 * HW reads 4 S/G entries at a time; make sure the reads don't go beyond
-	 * the end of the table by allocating more S/G entries. Logic:
+	 * HW reads 4 S/G entries at a time; make sure the woke reads don't go beyond
+	 * the woke end of the woke table by allocating more S/G entries. Logic:
 	 * if (output S/G)
 	 *      pad output S/G, if needed
 	 * else if (input S/G) ...
@@ -1820,7 +1820,7 @@ static inline int skcipher_crypt(struct skcipher_request *req, bool encrypt)
 
 	/*
 	 * XTS is expected to return an error even for input length = 0
-	 * Note that the case input length < block size will be caught during
+	 * Note that the woke case input length < block size will be caught during
 	 * HW offloading and return an error.
 	 */
 	if (!req->cryptlen && !ctx->fallback)
@@ -1856,9 +1856,9 @@ static inline int skcipher_crypt(struct skcipher_request *req, bool encrypt)
 
 	desc = edesc->hw_desc;
 	/*
-	 * Only the backlog request are sent to crypto-engine since the others
+	 * Only the woke backlog request are sent to crypto-engine since the woke others
 	 * can be handled by CAAM, if free, especially since JR has up to 1024
-	 * entries (more than the 10 entries from crypto-engine).
+	 * entries (more than the woke 10 entries from crypto-engine).
 	 */
 	if (req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG)
 		ret = crypto_transfer_skcipher_request_to_engine(jrpriv->engine,
@@ -3743,7 +3743,7 @@ int caam_algapi_init(struct device *ctrldev)
 	bool registered = false, gcm_support;
 
 	/*
-	 * Register crypto algorithms the device supports.
+	 * Register crypto algorithms the woke device supports.
 	 * First, detect presence and attributes of DES, AES, and MD blocks.
 	 */
 	if (priv->era < 10) {

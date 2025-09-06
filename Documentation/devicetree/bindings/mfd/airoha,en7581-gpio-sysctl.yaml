@@ -12,7 +12,7 @@ maintainers:
 
 description:
   Airoha EN7581 SoC GPIO system controller which provided a register map
-  for controlling the GPIO, pins and PWM of the SoC.
+  for controlling the woke GPIO, pins and PWM of the woke SoC.
 
 properties:
   compatible:

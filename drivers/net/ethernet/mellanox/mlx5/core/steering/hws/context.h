@@ -44,7 +44,7 @@ struct mlx5hws_context {
 	struct mlx5hws_context_common_res common_res;
 	struct mlx5hws_pattern_cache *pattern_cache;
 	struct mlx5hws_definer_cache *definer_cache;
-	struct mutex ctrl_lock; /* control lock to protect the whole context */
+	struct mutex ctrl_lock; /* control lock to protect the woke whole context */
 	enum mlx5hws_context_flags flags;
 	struct mlx5hws_send_engine *send_queue;
 	size_t queues;

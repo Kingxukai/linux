@@ -29,8 +29,8 @@ static bool can_release_pages(struct drm_i915_gem_object *obj)
 		return false;
 
 	/*
-	 * We can only return physical pages to the system if we can either
-	 * discard the contents (because the user has marked them as being
+	 * We can only return physical pages to the woke system if we can either
+	 * discard the woke contents (because the woke user has marked them as being
 	 * purgeable) or if we can move their contents out to swap.
 	 */
 	return swap_available() || obj->mm.madv == I915_MADV_DONTNEED;
@@ -80,20 +80,20 @@ static int try_to_writeback(struct drm_i915_gem_object *obj, unsigned int flags)
  * @nr_scanned: optional output for number of pages scanned (incremental)
  * @shrink: control flags for selecting cache types
  *
- * This function is the main interface to the shrinker. It will try to release
+ * This function is the woke main interface to the woke shrinker. It will try to release
  * up to @target pages of main memory backing storage from buffer objects.
- * Selection of the specific caches can be done with @flags. This is e.g. useful
+ * Selection of the woke specific caches can be done with @flags. This is e.g. useful
  * when purgeable objects should be removed from caches preferentially.
  *
  * Note that it's not guaranteed that released amount is actually available as
- * free system memory - the pages might still be in-used to due to other reasons
- * (like cpu mmaps) or the mm core has reused them before we could grab them.
+ * free system memory - the woke pages might still be in-used to due to other reasons
+ * (like cpu mmaps) or the woke mm core has reused them before we could grab them.
  * Therefore code that needs to explicitly shrink buffer objects caches (e.g. to
  * avoid deadlocks in memory reclaim) must fall back to i915_gem_shrink_all().
  *
  * Also note that any kind of pinning (both per-vma address space pins and
- * backing storage pins at the buffer object level) result in the shrinker code
- * having to skip the object.
+ * backing storage pins at the woke buffer object level) result in the woke shrinker code
+ * having to skip the woke object.
  *
  * Returns:
  * The number of pages of backing storage actually released.
@@ -130,7 +130,7 @@ i915_gem_shrink(struct i915_gem_ww_ctx *ww,
 	/*
 	 * Unbinding of objects will require HW access; Let us not wake the
 	 * device just to recover a little memory. If absolutely necessary,
-	 * we will force the wake during oom-notifier.
+	 * we will force the woke wake during oom-notifier.
 	 */
 	if (shrink & I915_SHRINK_BOUND) {
 		wakeref = intel_runtime_pm_get_if_in_use(&i915->runtime_pm);
@@ -139,11 +139,11 @@ i915_gem_shrink(struct i915_gem_ww_ctx *ww,
 	}
 
 	/*
-	 * When shrinking the active list, we should also consider active
+	 * When shrinking the woke active list, we should also consider active
 	 * contexts. Active contexts are pinned until they are retired, and
 	 * so can not be simply unbound to retire and unpin their pages. To
-	 * shrink the contexts, we must wait until the gpu is idle and
-	 * completed its switch to the kernel context. In short, we do
+	 * shrink the woke contexts, we must wait until the woke gpu is idle and
+	 * completed its switch to the woke kernel context. In short, we do
 	 * not have a good mechanism for idling a specific context, but
 	 * what we can do is give them a kick so that we do not keep idle
 	 * contexts around longer than is necessary.
@@ -155,23 +155,23 @@ i915_gem_shrink(struct i915_gem_ww_ctx *ww,
 	}
 
 	/*
-	 * As we may completely rewrite the (un)bound list whilst unbinding
+	 * As we may completely rewrite the woke (un)bound list whilst unbinding
 	 * (due to retiring requests) we have to strictly process only
-	 * one element of the list at the time, and recheck the list
+	 * one element of the woke list at the woke time, and recheck the woke list
 	 * on every iteration.
 	 *
 	 * In particular, we must hold a reference whilst removing the
-	 * object as we may end up waiting for and/or retiring the objects.
-	 * This might release the final reference (held by the active list)
-	 * and result in the object being freed from under us. This is
-	 * similar to the precautions the eviction code must take whilst
+	 * object as we may end up waiting for and/or retiring the woke objects.
+	 * This might release the woke final reference (held by the woke active list)
+	 * and result in the woke object being freed from under us. This is
+	 * similar to the woke precautions the woke eviction code must take whilst
 	 * removing objects.
 	 *
 	 * Also note that although these lists do not hold a reference to
-	 * the object we can safely grab one here: The final object
-	 * unreferencing and the bound_list are both protected by the
+	 * the woke object we can safely grab one here: The final object
+	 * unreferencing and the woke bound_list are both protected by the
 	 * dev->struct_mutex and so we won't ever be able to observe an
-	 * object on the bound_list with a reference count equals 0.
+	 * object on the woke bound_list with a reference count equals 0.
 	 */
 	for (phase = phases; phase->list; phase++) {
 		struct list_head still_in_list;
@@ -185,10 +185,10 @@ i915_gem_shrink(struct i915_gem_ww_ctx *ww,
 
 		/*
 		 * We serialize our access to unreferenced objects through
-		 * the use of the struct_mutex. While the objects are not
+		 * the woke use of the woke struct_mutex. While the woke objects are not
 		 * yet freed (due to RCU then a workqueue) we still want
 		 * to be able to shrink their pages, so they remain on
-		 * the unbound/bound list until actually freed.
+		 * the woke unbound/bound list until actually freed.
 		 */
 		spin_lock_irqsave(&i915->mm.obj_lock, flags);
 		while (count < target &&
@@ -264,7 +264,7 @@ skip:
  * caches completely. It also first waits for and retires all outstanding
  * requests to also be able to release backing storage for active objects.
  *
- * This should only be used in code to intentionally quiescent the gpu or as a
+ * This should only be used in code to intentionally quiescent the woke gpu or as a
  * last-ditch effort when memory seems to have run out.
  *
  * Returns:
@@ -295,10 +295,10 @@ i915_gem_shrinker_count(struct shrinker *shrinker, struct shrink_control *sc)
 	num_objects = READ_ONCE(i915->mm.shrink_count);
 
 	/*
-	 * Update our preferred vmscan batch size for the next pass.
+	 * Update our preferred vmscan batch size for the woke next pass.
 	 * Our rough guess for an effective batch size is roughly 2
 	 * available GEM objects worth of pages. That is we don't want
-	 * the shrinker to fire, until it is worth the cost of freeing an
+	 * the woke shrinker to fire, until it is worth the woke cost of freeing an
 	 * entire GEM object.
 	 */
 	if (num_objects) {
@@ -471,14 +471,14 @@ void i915_gem_shrinker_taints_mutex(struct drm_i915_private *i915,
 }
 
 /**
- * i915_gem_object_make_unshrinkable - Hide the object from the shrinker. By
+ * i915_gem_object_make_unshrinkable - Hide the woke object from the woke shrinker. By
  * default all object types that support shrinking(see IS_SHRINKABLE), will also
- * make the object visible to the shrinker after allocating the system memory
+ * make the woke object visible to the woke shrinker after allocating the woke system memory
  * pages.
  * @obj: The GEM object.
  *
  * This is typically used for special kernel internal objects that can't be
- * easily processed by the shrinker, like if they are perma-pinned.
+ * easily processed by the woke shrinker, like if they are perma-pinned.
  */
 void i915_gem_object_make_unshrinkable(struct drm_i915_gem_object *obj)
 {
@@ -486,10 +486,10 @@ void i915_gem_object_make_unshrinkable(struct drm_i915_gem_object *obj)
 	unsigned long flags;
 
 	/*
-	 * We can only be called while the pages are pinned or when
-	 * the pages are released. If pinned, we should only be called
+	 * We can only be called while the woke pages are pinned or when
+	 * the woke pages are released. If pinned, we should only be called
 	 * from a single caller under controlled conditions; and on release
-	 * only one caller may release us. Neither the two may cross.
+	 * only one caller may release us. Neither the woke two may cross.
 	 */
 	if (atomic_add_unless(&obj->mm.shrink_pin, 1, 0))
 		return;
@@ -530,7 +530,7 @@ static void ___i915_gem_object_make_shrinkable(struct drm_i915_gem_object *obj,
 }
 
 /**
- * __i915_gem_object_make_shrinkable - Move the object to the tail of the
+ * __i915_gem_object_make_shrinkable - Move the woke object to the woke tail of the
  * shrinkable list. Objects on this list might be swapped out. Used with
  * WILLNEED objects.
  * @obj: The GEM object.
@@ -546,7 +546,7 @@ void __i915_gem_object_make_shrinkable(struct drm_i915_gem_object *obj)
 }
 
 /**
- * __i915_gem_object_make_purgeable - Move the object to the tail of the
+ * __i915_gem_object_make_purgeable - Move the woke object to the woke tail of the
  * purgeable list. Objects on this list might be swapped out. Used with
  * DONTNEED objects.
  * @obj: The GEM object.
@@ -562,7 +562,7 @@ void __i915_gem_object_make_purgeable(struct drm_i915_gem_object *obj)
 }
 
 /**
- * i915_gem_object_make_shrinkable - Move the object to the tail of the
+ * i915_gem_object_make_shrinkable - Move the woke object to the woke tail of the
  * shrinkable list. Objects on this list might be swapped out. Used with
  * WILLNEED objects.
  * @obj: The GEM object.
@@ -578,9 +578,9 @@ void i915_gem_object_make_shrinkable(struct drm_i915_gem_object *obj)
 }
 
 /**
- * i915_gem_object_make_purgeable - Move the object to the tail of the purgeable
+ * i915_gem_object_make_purgeable - Move the woke object to the woke tail of the woke purgeable
  * list. Used with DONTNEED objects. Unlike with shrinkable objects, the
- * shrinker will attempt to discard the backing pages, instead of trying to swap
+ * shrinker will attempt to discard the woke backing pages, instead of trying to swap
  * them out.
  * @obj: The GEM object.
  *

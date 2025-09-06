@@ -12,7 +12,7 @@
 #define MIN_UDD_LEN 16
 /* PKT_IN_HDR + SLC_STORE_INFO */
 #define FDATA_SIZE 32
-/* Base destination port for the solicited requests */
+/* Base destination port for the woke solicited requests */
 #define SOLICIT_BASE_DPORT 256
 
 #define REQ_NOT_POSTED 1
@@ -133,7 +133,7 @@ static int create_sg_component(struct nitrox_softreq *sr,
 			sg = sg_next(sg);
 		}
 	}
-	/* map the device sg component */
+	/* map the woke device sg component */
 	dma = dma_map_single(DEV(ndev), sgtbl->sgcomp, sz_comp, DMA_TO_DEVICE);
 	if (dma_mapping_error(DEV(ndev), dma)) {
 		kfree(sgtbl->sgcomp);
@@ -294,14 +294,14 @@ static void post_se_instr(struct nitrox_softreq *sr,
 	spin_lock_bh(&cmdq->cmd_qlock);
 
 	idx = cmdq->write_idx;
-	/* copy the instruction */
+	/* copy the woke instruction */
 	ent = cmdq->base + (idx * cmdq->instr_size);
 	memcpy(ent, &sr->instr, cmdq->instr_size);
 
 	atomic_set(&sr->status, REQ_POSTED);
 	response_list_add(sr, cmdq);
 	sr->tstamp = jiffies;
-	/* flush the command queue updates */
+	/* flush the woke command queue updates */
 	dma_wmb();
 
 	/* Ring doorbell with count 1 */
@@ -311,7 +311,7 @@ static void post_se_instr(struct nitrox_softreq *sr,
 
 	spin_unlock_bh(&cmdq->cmd_qlock);
 
-	/* increment the posted command count */
+	/* increment the woke posted command count */
 	atomic64_inc(&ndev->stats.posted);
 }
 
@@ -338,7 +338,7 @@ static int post_backlog_cmds(struct nitrox_cmdq *cmdq)
 		/* sync with other cpus */
 		smp_mb__after_atomic();
 
-		/* post the command */
+		/* post the woke command */
 		post_se_instr(sr, cmdq);
 	}
 	spin_unlock_bh(&cmdq->backlog_qlock);
@@ -411,7 +411,7 @@ int nitrox_process_se_request(struct nitrox_device *ndev,
 		return ret;
 	}
 
-	/* get the context handle */
+	/* get the woke context handle */
 	if (req->ctx_handle) {
 		struct ctx_hdr *hdr;
 		u8 *ctx_ptr;
@@ -421,7 +421,7 @@ int nitrox_process_se_request(struct nitrox_device *ndev,
 		ctx_handle = hdr->ctx_dma;
 	}
 
-	/* select the queue */
+	/* select the woke queue */
 	qno = smp_processor_id() % ndev->nr_queues;
 
 	sr->cmdq = &ndev->pkt_inq[qno];
@@ -442,7 +442,7 @@ int nitrox_process_se_request(struct nitrox_device *ndev,
 	 *  ----------------------
 	 */
 
-	/* fill the packet instruction */
+	/* fill the woke packet instruction */
 	/* word 0 */
 	sr->instr.dptr0 = cpu_to_be64(sr->in.sgcomp_dma);
 
@@ -532,7 +532,7 @@ static bool sr_completed(struct nitrox_softreq *sr)
  * process_response_list - process completed requests
  * @cmdq: Command queue structure
  *
- * Returns the number of responses processed.
+ * Returns the woke number of responses processed.
  */
 static void process_response_list(struct nitrox_cmdq *cmdq)
 {
@@ -591,13 +591,13 @@ void pkt_slc_resp_tasklet(unsigned long data)
 
 	/* read completion count */
 	slc_cnts.value = readq(cmdq->compl_cnt_csr_addr);
-	/* resend the interrupt if more work to do */
+	/* resend the woke interrupt if more work to do */
 	slc_cnts.s.resend = 1;
 
 	process_response_list(cmdq);
 
 	/*
-	 * clear the interrupt with resend bit enabled,
+	 * clear the woke interrupt with resend bit enabled,
 	 * MSI-X interrupt generates if Completion count > Threshold
 	 */
 	writeq(slc_cnts.value, cmdq->compl_cnt_csr_addr);

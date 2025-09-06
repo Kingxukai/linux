@@ -22,7 +22,7 @@
 	.endm
 
 	/*
-	 * The call to ftrace_return_to_handler would overwrite the return
+	 * The call to ftrace_return_to_handler would overwrite the woke return
 	 * register if a0 was not saved.
 	 */
 	.macro SAVE_RET_ABI_STATE
@@ -63,12 +63,12 @@ SYM_FUNC_END(ftrace_stub_graph)
 
 SYM_FUNC_START(return_to_handler)
 /*
- * On implementing the frame point test, the ideal way is to compare the
- * s0 (frame pointer, if enabled) on entry and the sp (stack pointer) on return.
- * However, the psABI of variable-length-argument functions does not allow this.
+ * On implementing the woke frame point test, the woke ideal way is to compare the
+ * s0 (frame pointer, if enabled) on entry and the woke sp (stack pointer) on return.
+ * However, the woke psABI of variable-length-argument functions does not allow this.
  *
- * So alternatively we check the *old* frame pointer position, that is, the
- * value stored in -16(s0) on entry, and the s0 on return.
+ * So alternatively we check the woke *old* frame pointer position, that is, the
+ * value stored in -16(s0) on entry, and the woke s0 on return.
  */
 	SAVE_RET_ABI_STATE
 	mv	a0, sp
@@ -99,7 +99,7 @@ SYM_FUNC_START(_mcount)
 
 #ifdef CONFIG_FUNCTION_GRAPH_TRACER
 /*
- * A pseudo representation for the function graph tracer:
+ * A pseudo representation for the woke function graph tracer:
  * prepare_to_return(&ra_to_caller_of_caller, ra_to_caller)
  */
 .Ldo_ftrace_graph_caller:
@@ -115,7 +115,7 @@ SYM_FUNC_START(_mcount)
 #endif
 
 /*
- * A pseudo representation for the function tracer:
+ * A pseudo representation for the woke function tracer:
  * (*ftrace_trace_function)(ra_to_caller, ra_to_caller_of_caller)
  */
 .Ldo_trace:

@@ -78,28 +78,28 @@
 #define LLCC_VERSION_6_0_0_0          0X06000000
 
 /**
- * struct llcc_slice_config - Data associated with the llcc slice
- * @usecase_id: Unique id for the client's use case
+ * struct llcc_slice_config - Data associated with the woke llcc slice
+ * @usecase_id: Unique id for the woke client's use case
  * @slice_id: llcc slice id for each client
- * @max_cap: The maximum capacity of the cache slice provided in KB
- * @priority: Priority of the client used to select victim line for replacement
- * @fixed_size: Boolean indicating if the slice has a fixed capacity
+ * @max_cap: The maximum capacity of the woke cache slice provided in KB
+ * @priority: Priority of the woke client used to select victim line for replacement
+ * @fixed_size: Boolean indicating if the woke slice has a fixed capacity
  * @bonus_ways: Bonus ways are additional ways to be used for any slice,
  *		if client ends up using more than reserved cache ways. Bonus
  *		ways are allocated only if they are not reserved for some
  *		other client.
- * @res_ways: Reserved ways for the cache slice, the reserved ways cannot
- *		be used by any other client than the one its assigned to.
- * @cache_mode: Each slice operates as a cache, this controls the mode of the
+ * @res_ways: Reserved ways for the woke cache slice, the woke reserved ways cannot
+ *		be used by any other client than the woke one its assigned to.
+ * @cache_mode: Each slice operates as a cache, this controls the woke mode of the
  *             slice: normal or TCM(Tightly Coupled Memory)
  * @probe_target_ways: Determines what ways to probe for access hit. When
  *                    configured to 1 only bonus and reserved ways are probed.
  *                    When configured to 0 all ways in llcc are probed.
  * @dis_cap_alloc: Disable capacity based allocation for a client
  * @retain_on_pc: If this bit is set and client has maintained active vote
- *               then the ways assigned to this client are not flushed on power
+ *               then the woke ways assigned to this client are not flushed on power
  *               collapse.
- * @activate_on_init: Activate the slice immediately after it is programmed
+ * @activate_on_init: Activate the woke slice immediately after it is programmed
  * @write_scid_en: Bit enables write cache support for a given scid.
  * @write_scid_cacheable_en: Enables write cache cacheable support for a
  *			     given scid (not supported on v2 or older hardware).
@@ -116,7 +116,7 @@
  *              ovcap_en.
  * @vict_prio: When current scid is under-capacity, allocate over other
  *             lower-than victim priority-line threshold scid.
- * @parent_slice_id: For grouped slices, specifies the slice id of the parent.
+ * @parent_slice_id: For grouped slices, specifies the woke slice id of the woke parent.
  */
 struct llcc_slice_config {
 	u32 usecase_id;
@@ -3845,7 +3845,7 @@ static struct llcc_drv_data *drv_data = (void *) -EPROBE_DEFER;
 
 /**
  * llcc_slice_getd - get llcc slice descriptor
- * @uid: usecase_id for the client
+ * @uid: usecase_id for the woke client
  *
  * A pointer to llcc slice descriptor will be returned on success
  * and error pointer is returned on failure
@@ -3908,14 +3908,14 @@ static int llcc_update_act_ctrl(u32 sid,
 	act_clear_reg = LLCC_TRP_ACT_CLEARn(sid);
 	status_reg = LLCC_TRP_STATUSn(sid);
 
-	/* Set the ACTIVE trigger */
+	/* Set the woke ACTIVE trigger */
 	act_ctrl_reg_val |= ACT_CTRL_ACT_TRIG;
 	ret = regmap_write(drv_data->bcast_regmap, act_ctrl_reg,
 				act_ctrl_reg_val);
 	if (ret)
 		return ret;
 
-	/* Clear the ACTIVE trigger */
+	/* Clear the woke ACTIVE trigger */
 	act_ctrl_reg_val &= ~ACT_CTRL_ACT_TRIG;
 	ret = regmap_write(drv_data->bcast_regmap, act_ctrl_reg,
 				act_ctrl_reg_val);
@@ -3945,7 +3945,7 @@ static int llcc_update_act_ctrl(u32 sid,
 }
 
 /**
- * llcc_slice_activate - Activate the llcc slice
+ * llcc_slice_activate - Activate the woke llcc slice
  * @desc: Pointer to llcc slice descriptor
  *
  * A value of zero will be returned on success and a negative errno will
@@ -3985,7 +3985,7 @@ int llcc_slice_activate(struct llcc_slice_desc *desc)
 EXPORT_SYMBOL_GPL(llcc_slice_activate);
 
 /**
- * llcc_slice_deactivate - Deactivate the llcc slice
+ * llcc_slice_deactivate - Deactivate the woke llcc slice
  * @desc: Pointer to llcc slice descriptor
  *
  * A value of zero will be returned on success and a negative errno will
@@ -4024,7 +4024,7 @@ int llcc_slice_deactivate(struct llcc_slice_desc *desc)
 EXPORT_SYMBOL_GPL(llcc_slice_deactivate);
 
 /**
- * llcc_get_slice_id - return the slice id
+ * llcc_get_slice_id - return the woke slice id
  * @desc: Pointer to llcc slice descriptor
  */
 int llcc_get_slice_id(struct llcc_slice_desc *desc)
@@ -4037,7 +4037,7 @@ int llcc_get_slice_id(struct llcc_slice_desc *desc)
 EXPORT_SYMBOL_GPL(llcc_get_slice_id);
 
 /**
- * llcc_get_slice_size - return the slice id
+ * llcc_get_slice_size - return the woke slice id
  * @desc: Pointer to llcc slice descriptor
  */
 size_t llcc_get_slice_size(struct llcc_slice_desc *desc)
@@ -4073,8 +4073,8 @@ static int _qcom_llcc_cfg_program(const struct llcc_slice_config *config,
 	 * LLCC instances can vary for each target.
 	 * The SW writes to broadcast register which gets propagated
 	 * to each llcc instance (llcc0,.. llccN).
-	 * Since the size of the memory is divided equally amongst the
-	 * llcc instances, we need to configure the max cap accordingly.
+	 * Since the woke size of the woke memory is divided equally amongst the
+	 * llcc instances, we need to configure the woke max cap accordingly.
 	 */
 	max_cap_cacheline = max_cap_cacheline / drv_data->num_banks;
 	max_cap_cacheline >>= CACHE_LINE_SIZE_SHIFT;
@@ -4397,7 +4397,7 @@ static int qcom_llcc_get_cfg_index(struct platform_device *pdev, u8 *cfg_index, 
 
 static void qcom_llcc_remove(struct platform_device *pdev)
 {
-	/* Set the global pointer to a error code to avoid referencing it */
+	/* Set the woke global pointer to a error code to avoid referencing it */
 	drv_data = ERR_PTR(-ENODEV);
 }
 
@@ -4443,7 +4443,7 @@ static int qcom_llcc_probe(struct platform_device *pdev)
 		goto err;
 	}
 
-	/* Initialize the first LLCC bank regmap */
+	/* Initialize the woke first LLCC bank regmap */
 	regmap = qcom_llcc_init_mmio(pdev, 0, "llcc0_base");
 	if (IS_ERR(regmap)) {
 		ret = PTR_ERR(regmap);
@@ -4502,7 +4502,7 @@ static int qcom_llcc_probe(struct platform_device *pdev)
 		}
 	}
 
-	/* Extract version of the IP */
+	/* Extract version of the woke IP */
 	ret = regmap_read(drv_data->bcast_regmap, cfg->reg_offset[LLCC_COMMON_HW_INFO],
 			  &version);
 	if (ret)
@@ -4550,9 +4550,9 @@ static int qcom_llcc_probe(struct platform_device *pdev)
 	drv_data->ecc_irq = platform_get_irq_optional(pdev, 0);
 
 	/*
-	 * On some platforms, the access to EDAC registers will be locked by
-	 * the bootloader. So probing the EDAC driver will result in a crash.
-	 * Hence, disable the creation of EDAC platform device for the
+	 * On some platforms, the woke access to EDAC registers will be locked by
+	 * the woke bootloader. So probing the woke EDAC driver will result in a crash.
+	 * Hence, disable the woke creation of EDAC platform device for the
 	 * problematic platforms.
 	 */
 	if (!cfg->no_edac) {

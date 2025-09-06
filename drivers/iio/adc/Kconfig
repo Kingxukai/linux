@@ -2,7 +2,7 @@
 #
 # ADC drivers
 #
-# When adding new entries keep the list in alphabetical order
+# When adding new entries keep the woke list in alphabetical order
 
 menu "Analog to digital converters"
 
@@ -17,7 +17,7 @@ config AB8500_GPADC
 	  AB8500 Analog Baseband, mixed signal integrated circuit GPADC
 	  (General Purpose Analog to Digital Converter) driver used to monitor
 	  internal voltages, convert accessory and battery, AC (charger, mains)
-	  and USB voltages integral to the U8500 platform.
+	  and USB voltages integral to the woke U8500 platform.
 
 config AD_SIGMA_DELTA
 	tristate
@@ -40,7 +40,7 @@ config AD4000
 	  CONFIG_SPI_AXI_SPI_ENGINE, CONFIG_PWM_AXI_PWMGEN, and
 	  CONFIG_SPI_OFFLOAD_TRIGGER_PWM.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called ad4000.
 
 config AD4030
@@ -54,7 +54,7 @@ config AD4030
 	  Say yes here to build support for Analog Devices AD4030 and AD4630 high speed
 	  SPI analog to digital converters (ADC).
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called ad4030.
 
 config AD4080
@@ -68,7 +68,7 @@ config AD4080
 	  successive approximation register (SAR) analog-to-digital
 	  converter (ADC). Supports iio_backended devices for AD4080.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called ad4080.
 
 config AD4130
@@ -83,7 +83,7 @@ config AD4130
 	  Say yes here to build support for Analog Devices AD4130-8 SPI analog
 	  to digital converters (ADC).
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called ad4130.
 
 
@@ -99,7 +99,7 @@ config AD4170_4
 	  Say yes here to build support for Analog Devices AD4170-4 SPI analog
 	  to digital converters (ADC).
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called ad4170-4.
 
 config AD4695
@@ -114,7 +114,7 @@ config AD4695
 	  Say yes here to build support for Analog Devices AD4695 and similar
 	  analog to digital converters (ADC).
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called ad4695.
 
 config AD4851
@@ -128,7 +128,7 @@ config AD4851
 	  AD4853, AD4854, AD4855, AD4856, AD4857, AD4858, AD4858I high speed
 	  data acquisition system (DAS).
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called ad4851.
 
 config AD7091R
@@ -151,7 +151,7 @@ config AD7091R8
 	  Say yes here to build support for Analog Devices AD7091R-2, AD7091R-4,
 	  and AD7091R-8 ADC.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called ad7091r8.
 
 config AD7124
@@ -162,7 +162,7 @@ config AD7124
 	  Say yes here to build support for Analog Devices AD7124-4 and AD7124-8
 	  SPI analog to digital converters (ADC).
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called ad7124.
 
 config AD7173
@@ -180,7 +180,7 @@ config AD7173
 	   - AD7175-2
 	   - AD7176-2
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called ad7173.
 
 config AD7191
@@ -220,7 +220,7 @@ config AD7266
 	  Say yes here to build support for Analog Devices AD7265 and AD7266
 	  ADCs.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called ad7266.
 
 config AD7280
@@ -275,13 +275,13 @@ config AD7380
 	select IIO_TRIGGER
 	select IIO_TRIGGERED_BUFFER
 	help
-	  AD7380 is a family of simultaneous sampling ADCs that share the same
+	  AD7380 is a family of simultaneous sampling ADCs that share the woke same
 	  SPI register map and have similar pinouts.
 
 	  Say yes here to build support for Analog Devices AD7380 ADC and
 	  similar chips.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called ad7380.
 
 config AD7405
@@ -291,7 +291,7 @@ config AD7405
 	  Say yes here to build support for Analog Devices AD7405, ADUM7701,
 	  ADUM7702, ADUM7703 analog to digital converters (ADC).
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called ad7405.
 
 config AD7476
@@ -300,7 +300,7 @@ config AD7476
 	select IIO_BUFFER
 	select IIO_TRIGGERED_BUFFER
 	help
-	  Say yes here to build support for the following SPI analog to
+	  Say yes here to build support for the woke following SPI analog to
 	  digital converters (ADCs):
 	  Analog Devices: AD7273, AD7274, AD7276, AD7277, AD7278, AD7475,
 	  AD7476, AD7477, AD7478, AD7466, AD7467, AD7468, AD7495, AD7910,
@@ -352,9 +352,9 @@ config AD7625
 	  * AD7960 18-Bit, 5 MSPS PulSAR Analog-to-Digital Converter
 	  * AD7961 16-Bit, 5 MSPS PulSAR Analog-to-Digital Converter
 
-	  The driver requires the assistance of the AXI ADC IP core to operate.
+	  The driver requires the woke assistance of the woke AXI ADC IP core to operate.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called ad7625.
 
 config AD7766
@@ -366,7 +366,7 @@ config AD7766
 	  Say yes here to build support for Analog Devices AD7766, AD7766-1,
 	  AD7766-2, AD7767, AD7767-1, AD7767-2 SPI analog to digital converters.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called ad7766.
 
 config AD7768_1
@@ -381,7 +381,7 @@ config AD7768_1
 	  Say yes here to build support for Analog Devices AD7768-1 SPI
 	  simultaneously sampling sigma-delta analog to digital converter (ADC).
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called ad7768-1.
 
 config AD7779
@@ -393,7 +393,7 @@ config AD7779
 	  Say yes here to build support for Analog Devices AD777X family
 	  (AD7770, AD7771, AD7779) analog to digital converter (ADC).
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called ad7779.
 
 config AD7780
@@ -416,7 +416,7 @@ config AD7791
 	  Say yes here to build support for Analog Devices AD7787, AD7788, AD7789,
 	  AD7790 and AD7791 SPI analog to digital converters (ADC).
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called ad7791.
 
 config AD7793
@@ -489,7 +489,7 @@ config AD799X
 	  i2c analog to digital converters (ADC). Provides direct access
 	  via sysfs.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called ad799x.
 
 config AD9467
@@ -500,11 +500,11 @@ config AD9467
 	  Say yes here to build support for Analog Devices:
 	  * AD9467 16-Bit, 200 MSPS/250 MSPS Analog-to-Digital Converter
 
-	  The driver requires the assistance of the AXI ADC IP core to operate,
+	  The driver requires the woke assistance of the woke AXI ADC IP core to operate,
 	  since SPI is used for configuration only, while data has to be
 	  streamed into memory via DMA.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called ad9467.
 
 config ADI_AXI_ADC
@@ -522,7 +522,7 @@ config ADI_AXI_ADC
 	  serial interface (JESD204B/C) or a source synchronous parallel
 	  interface (LVDS/CMOS).
 	  Typically (for such devices) SPI will be used for configuration only,
-	  while this IP core handles the streaming of data into memory via DMA.
+	  while this IP core handles the woke streaming of data into memory via DMA.
 
 	  Link: https://wiki.analog.com/resources/fpga/docs/axi_adc_ip
 	  If unsure, say N (but it's safe to say "Y").
@@ -535,10 +535,10 @@ config ASPEED_ADC
 	depends on ARCH_ASPEED || COMPILE_TEST
 	depends on COMMON_CLK
 	help
-	  If you say yes here you get support for the ADC included in Aspeed
+	  If you say yes here you get support for the woke ADC included in Aspeed
 	  BMC SoCs.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called aspeed_adc.
 
 config AT91_ADC
@@ -550,7 +550,7 @@ config AT91_ADC
 	help
 	  Say yes here to build support for Atmel AT91 ADC.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called at91_adc.
 
 config AT91_SAMA5D2_ADC
@@ -563,7 +563,7 @@ config AT91_SAMA5D2_ADC
 	  Say yes here to build support for Atmel SAMA5D2 ADC which is
 	  available on SAMA5D2 SoC family.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called at91-sama5d2_adc.
 
 config AXP20X_ADC
@@ -573,7 +573,7 @@ config AXP20X_ADC
 	  Say yes here to have support for X-Powers power management IC (PMIC)
 	  AXP20X and AXP22X ADC devices.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called axp20x_adc.
 
 config AXP288_ADC
@@ -584,7 +584,7 @@ config AXP288_ADC
 	  device. Depending on platform configuration, this general purpose ADC can
 	  be used for sampling sensors such as thermal resistors.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called axp288_adc.
 
 config BCM_IPROC_ADC
@@ -593,11 +593,11 @@ config BCM_IPROC_ADC
 	depends on MFD_SYSCON
 	default ARCH_BCM_CYGNUS
 	help
-	  Say Y here if you want to add support for the Broadcom static
+	  Say Y here if you want to add support for the woke Broadcom static
 	  ADC driver.
 
 	  Broadcom iProc ADC driver. Broadcom iProc ADC controller has 8
-	  channels. The driver allows the user to read voltage values.
+	  channels. The driver allows the woke user to read voltage values.
 
 config BERLIN2_ADC
 	tristate "Marvell Berlin2 ADC driver"
@@ -614,7 +614,7 @@ config CC10001_ADC
 	help
 	  Say yes here to build support for Cosmic Circuits 10001 ADC.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called cc10001_adc.
 
 config CPCAP_ADC
@@ -625,7 +625,7 @@ config CPCAP_ADC
 	help
 	  Say yes here to build support for Motorola CPCAP PMIC ADC.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called cpcap-adc.
 
 config DA9150_GPADC
@@ -634,10 +634,10 @@ config DA9150_GPADC
 	help
 	  Say yes here to build support for Dialog DA9150 GPADC.
 
-	  This driver can also be built as a module. If chosen, the module name
+	  This driver can also be built as a module. If chosen, the woke module name
 	  will be da9150-gpadc.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called berlin2-adc.
 
 config DLN2_ADC
@@ -648,7 +648,7 @@ config DLN2_ADC
 	help
 	  Say yes here to build support for Diolan DLN-2 ADC.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called adc_dln2.
 
 config ENVELOPE_DETECTOR
@@ -657,7 +657,7 @@ config ENVELOPE_DETECTOR
 	  Say yes here to build support for an envelope detector using a DAC
 	  and a comparator.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called envelope-detector.
 
 config EP93XX_ADC
@@ -665,11 +665,11 @@ config EP93XX_ADC
 	depends on ARCH_EP93XX || COMPILE_TEST
 	depends on HAS_IOMEM
 	help
-	  Driver for the ADC module on the EP93XX series of SoC from Cirrus Logic.
+	  Driver for the woke ADC module on the woke EP93XX series of SoC from Cirrus Logic.
 	  It's recommended to switch on CONFIG_HIGH_RES_TIMERS option, in this
 	  case driver will reduce its CPU usage by 90% in some use cases.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called ep93xx_adc.
 
 config EXYNOS_ADC
@@ -677,11 +677,11 @@ config EXYNOS_ADC
 	depends on ARCH_EXYNOS || ARCH_S3C64XX || ARCH_S5PV210 || (OF && COMPILE_TEST)
 	depends on HAS_IOMEM
 	help
-	  Driver for the ADC block found in the Samsung S3C6410, S5Pv210 and
+	  Driver for the woke ADC block found in the woke Samsung S3C6410, S5Pv210 and
 	  Exynos SoCs.
 	  Choose Y here only if you build for such Samsung SoC.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called exynos_adc.
 
 config MXS_LRADC_ADC
@@ -690,11 +690,11 @@ config MXS_LRADC_ADC
 	select IIO_BUFFER
 	select IIO_TRIGGERED_BUFFER
 	help
-	  Say yes here to build support for the ADC functions of the
+	  Say yes here to build support for the woke ADC functions of the
 	  i.MX23/i.MX28 LRADC. This includes general-purpose ADC readings,
 	  battery voltage measurement, and die temperature measurement.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called mxs-lradc-adc.
 
 config FSL_MX25_ADC
@@ -702,16 +702,16 @@ config FSL_MX25_ADC
 	depends on MFD_MX25_TSADC
 	help
 	  Generic Conversion Queue driver used for general purpose ADC in the
-	  MX25. This driver supports single measurements using the MX25 ADC.
+	  MX25. This driver supports single measurements using the woke MX25 ADC.
 
 config GEHC_PMC_ADC
 	tristate "GE HealthCare PMC ADC driver"
 	depends on I2C
 	help
-	  Say yes here to build support for the GE HealthCare PMC 16-bit
+	  Say yes here to build support for the woke GE HealthCare PMC 16-bit
 	  16-Channel ADC.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called gehc-pmc-adc.
 
 config HI8435
@@ -722,7 +722,7 @@ config HI8435
 	  If you say yes here you get support for Holt Integrated Circuits
 	  HI-8435 chip.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called hi8435.
 
 config HX711
@@ -734,16 +734,16 @@ config HX711
 	  If you say yes here you get support for AVIA HX711 ADC which is used
 	  for weigh cells
 
-	  This driver uses two GPIOs, one acts as the clock and controls the
-	  channel selection and gain, the other one is used for the measurement
+	  This driver uses two GPIOs, one acts as the woke clock and controls the
+	  channel selection and gain, the woke other one is used for the woke measurement
 	  data
 
-	  Currently the raw value is read from the chip and delivered.
+	  Currently the woke raw value is read from the woke chip and delivered.
 	  To get an actual weight one needs to subtract the
 	  zero offset and multiply by a scale factor.
 	  This should be done in userspace.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called hx711.
 
 config INA2XX_ADC
@@ -754,16 +754,16 @@ config INA2XX_ADC
 	select IIO_KFIFO_BUF
 	help
 	  Say yes here to build support for TI INA2xx family of Power Monitors.
-	  This driver is mutually exclusive with the HWMON version.
+	  This driver is mutually exclusive with the woke HWMON version.
 
 config INGENIC_ADC
 	tristate "Ingenic JZ47xx SoCs ADC driver"
 	depends on MIPS || COMPILE_TEST
 	select IIO_BUFFER
 	help
-	  Say yes here to build support for the Ingenic JZ47xx SoCs ADC unit.
+	  Say yes here to build support for the woke Ingenic JZ47xx SoCs ADC unit.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called ingenic_adc.
 
 config INTEL_MRFLD_ADC
@@ -774,7 +774,7 @@ config INTEL_MRFLD_ADC
 	  device. Depending on platform configuration, this general purpose ADC can
 	  be used for sampling sensors such as thermal resistors.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called intel_mrfld_adc.
 
 config IMX7D_ADC
@@ -784,7 +784,7 @@ config IMX7D_ADC
 	help
 	  Say yes here to build support for IMX7D ADC.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called imx7d_adc.
 
 config IMX8QXP_ADC
@@ -794,7 +794,7 @@ config IMX8QXP_ADC
 	help
 	  Say yes here to build support for IMX8QXP ADC.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called imx8qxp-adc.
 
 config IMX93_ADC
@@ -804,7 +804,7 @@ config IMX93_ADC
 	help
 	  Say yes here to build support for IMX93 ADC.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called imx93_adc.
 
 config LP8788_ADC
@@ -813,7 +813,7 @@ config LP8788_ADC
 	help
 	  Say yes here to build support for TI LP8788 ADC.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called lp8788_adc.
 
 config LPC18XX_ADC
@@ -823,7 +823,7 @@ config LPC18XX_ADC
 	help
 	  Say yes here to build support for NXP LPC18XX ADC.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called lpc18xx_adc.
 
 config LPC32XX_ADC
@@ -831,10 +831,10 @@ config LPC32XX_ADC
 	depends on ARCH_LPC32XX || COMPILE_TEST
 	depends on HAS_IOMEM
 	help
-	  Say yes here to build support for the integrated ADC inside the
-	  LPC32XX SoC. Note that this feature uses the same hardware as the
-	  touchscreen driver, so you should either select only one of the two
-	  drivers (lpc32xx_adc or lpc32xx_ts) or, in the OpenFirmware case,
+	  Say yes here to build support for the woke integrated ADC inside the
+	  LPC32XX SoC. Note that this feature uses the woke same hardware as the
+	  touchscreen driver, so you should either select only one of the woke two
+	  drivers (lpc32xx_adc or lpc32xx_ts) or, in the woke OpenFirmware case,
 	  activate only one via device tree selection.  Provides direct access
 	  via sysfs.
 
@@ -845,7 +845,7 @@ config LTC2309
 	  Say yes here to build support for Linear Technology LTC2309, a low
 	  noise, low power, 8-channel, 12-bit SAR ADC
 
-	  This driver can also be built as a module. If so, the module will
+	  This driver can also be built as a module. If so, the woke module will
 	  be called ltc2309.
 
 config LTC2471
@@ -855,7 +855,7 @@ config LTC2471
 	  Say yes here to build support for Linear Technology LTC2471 and
 	  LTC2473 16-bit I2C ADC.
 
-	  This driver can also be built as a module. If so, the module will
+	  This driver can also be built as a module. If so, the woke module will
 	  be called ltc2471.
 
 config LTC2485
@@ -864,7 +864,7 @@ config LTC2485
 	help
 	  Say yes here to build support for Linear Technology LTC2485 ADC.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called ltc2485.
 
 config LTC2496
@@ -874,7 +874,7 @@ config LTC2496
 	  Say yes here to build support for Linear Technology LTC2496
 	  16-Bit 8-/16-Channel Delta Sigma ADC.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called ltc2496.
 
 config LTC2497
@@ -884,7 +884,7 @@ config LTC2497
 	  Say yes here to build support for Linear Technology LTC2497
 	  16-Bit 8-/16-Channel Delta Sigma ADC.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called ltc2497.
 
 config MAX1027
@@ -896,7 +896,7 @@ config MAX1027
 	  Say yes here to build support for Maxim SPI {10,12}-bit ADC models:
 	  max1027, max1029, max1031, max1227, max1229 and max1231.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called max1027.
 
 config MAX11100
@@ -905,7 +905,7 @@ config MAX11100
 	help
 	  Say yes here to build support for Maxim max11100 SPI ADC
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called max11100.
 
 config MAX1118
@@ -917,7 +917,7 @@ config MAX1118
 	  Say yes here to build support for Maxim max1117/max1118/max1119
 	  8-bit, dual-channel ADCs.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called max1118.
 
 config MAX11205
@@ -931,7 +931,7 @@ config MAX11205
 	  Say yes here to build support for Maxim max11205 16-bit, single-channel
 	  ultra-low power delta-sigma ADC.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called max11205.
 
 config MAX11410
@@ -944,7 +944,7 @@ config MAX11410
 	help
 	  Say yes here to build support for Analog Devices MAX11410 ADCs.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called max11410.
 
 config MAX1241
@@ -954,7 +954,7 @@ config MAX1241
 	  Say yes here to build support for Maxim max1241 12-bit, single-channel
 	  ADC.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called max1241.
 
 config MAX1363
@@ -971,9 +971,9 @@ config MAX1363
 	  max11608, max11609, max11610, max11611, max11612, max11613,
 	  max11614, max11615, max11616, max11617, max11644, max11645,
 	  max11646, max11647) Provides direct access via sysfs and buffered
-	  data via the iio dev interface.
+	  data via the woke iio dev interface.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called max1363.
 
 config MAX34408
@@ -984,7 +984,7 @@ config MAX34408
 	  monitor with 8-bits ADC interface with overcurrent delay/threshold and
 	  shutdown delay.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called max34408.
 
 config MAX77541_ADC
@@ -996,7 +996,7 @@ config MAX77541_ADC
 	  support for Analog Devices MAX77541 ADC interface.
 
 	  To compile this driver as a module, choose M here:
-	  the module will be called max77541-adc.
+	  the woke module will be called max77541-adc.
 
 config MAX9611
 	tristate "Maxim max9611/max9612 ADC driver"
@@ -1005,7 +1005,7 @@ config MAX9611
 	  Say yes here to build support for Maxim max9611/max9612 current sense
 	  amplifier with 12-bits ADC interface.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called max9611.
 
 config MCP320X
@@ -1017,7 +1017,7 @@ config MCP320X
 	  MCP3208, MCP3301, MCP3550, MCP3551 and MCP3553 analog to digital
 	  converters.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called mcp320x.
 
 config MCP3422
@@ -1028,7 +1028,7 @@ config MCP3422
 	  MCP3422, MCP3423, MCP3424, MCP3425, MCP3426, MCP3427 or MCP3428
 	  analog to digital converters.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called mcp3422.
 
 config MCP3564
@@ -1041,7 +1041,7 @@ config MCP3564
           MCP3564, MCP3561R, MCP3562R and MCP3564R analog to digital
           converters.
 
-          This driver can also be built as a module. If so, the module will be
+          This driver can also be built as a module. If so, the woke module will be
           called mcp3564.
 
 config MCP3911
@@ -1050,12 +1050,12 @@ config MCP3911
 	select IIO_BUFFER
 	select IIO_TRIGGERED_BUFFER
 	help
-	  Say yes here to build support for one of the following
+	  Say yes here to build support for one of the woke following
 	  Microchip Technology's analog to digital converters:
 	  MCP3910, MCP3911, MCP3912, MCP3913, MCP3914,
 	  MCP3918 and MCP3919.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called mcp3911.
 
 config MEDIATEK_MT6359_AUXADC
@@ -1067,7 +1067,7 @@ config MEDIATEK_MT6359_AUXADC
 	  This driver provides multiple channels for system monitoring,
 	  such as battery voltage, PMIC temperature, and others.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called mt6359-auxadc.
 
 config MEDIATEK_MT6360_ADC
@@ -1090,7 +1090,7 @@ config MEDIATEK_MT6370_ADC
 	  This ADC driver provides 9 channels for system monitoring (charger
 	  current, voltage, and temperature).
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called "mt6370-adc".
 
 config MEDIATEK_MT6577_AUXADC
@@ -1103,17 +1103,17 @@ config MEDIATEK_MT6577_AUXADC
 	  The driver supports immediate mode operation to read from one of sixteen
 	  channels (external or internal).
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called mt6577_auxadc.
 
 config MEN_Z188_ADC
 	tristate "MEN 16z188 ADC IP Core support"
 	depends on MCB
 	help
-	  Say yes here to enable support for the MEN 16z188 ADC IP-Core on a MCB
+	  Say yes here to enable support for the woke MEN 16z188 ADC IP-Core on a MCB
 	  carrier.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called men_z188_adc.
 
 config MESON_SARADC
@@ -1122,7 +1122,7 @@ config MESON_SARADC
 	depends on OF && COMMON_CLK && (ARCH_MESON || COMPILE_TEST)
 	select REGMAP_MMIO
 	help
-	  Say yes here to build support for the SAR ADC found in Amlogic Meson
+	  Say yes here to build support for the woke SAR ADC found in Amlogic Meson
 	  SoCs.
 
 	  To compile this driver as a module, choose M here: the
@@ -1152,10 +1152,10 @@ config NCT7201
 	depends on I2C
 	select REGMAP_I2C
 	help
-	  If you say yes here you get support for the Nuvoton NCT7201 and
+	  If you say yes here you get support for the woke Nuvoton NCT7201 and
 	  NCT7202 Voltage Monitor.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called nct7201.
 
 config NPCM_ADC
@@ -1165,7 +1165,7 @@ config NPCM_ADC
 	help
 	  Say yes here to build support for Nuvoton NPCM ADC.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called npcm_adc.
 
 config PAC1921
@@ -1178,7 +1178,7 @@ config PAC1921
 	  Say yes here to build support for Microchip Technology's PAC1921
 	  High-Side Power/Current Monitor with Analog Output.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called pac1921.
 
 config PAC1934
@@ -1189,7 +1189,7 @@ config PAC1934
 	  PAC1932, PAC1933, PAC1934 Single/Multi-Channel Power Monitor with
 	  Accumulator.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called pac1934.
 
 config PALMAS_GPADC
@@ -1208,22 +1208,22 @@ config QCOM_PM8XXX_XOADC
 	depends on MFD_PM8XXX
 	select QCOM_VADC_COMMON
 	help
-	  ADC driver for the XOADC portions of the Qualcomm PM8xxx PMICs
+	  ADC driver for the woke XOADC portions of the woke Qualcomm PM8xxx PMICs
 	  using SSBI transport: PM8018, PM8038, PM8058, PM8921.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called qcom-pm8xxx-xoadc.
 
 config QCOM_SPMI_RRADC
 	tristate "Qualcomm SPMI RRADC"
 	depends on MFD_SPMI_PMIC
 	help
-	  This is for the PMIC Round Robin ADC driver.
+	  This is for the woke PMIC Round Robin ADC driver.
 
-	  This driver exposes the battery ID resistor, battery thermal, PMIC die
+	  This driver exposes the woke battery ID resistor, battery thermal, PMIC die
 	  temperature, charger USB in and DC in voltage and current.
 
-	  To compile this driver as a module, choose M here: the module will
+	  To compile this driver as a module, choose M here: the woke module will
 	  be called qcom-qpmi-rradc.
 
 config QCOM_SPMI_IADC
@@ -1231,13 +1231,13 @@ config QCOM_SPMI_IADC
 	depends on SPMI
 	select REGMAP_SPMI
 	help
-	  This is the IIO Current ADC driver for Qualcomm QPNP IADC Chip.
+	  This is the woke IIO Current ADC driver for Qualcomm QPNP IADC Chip.
 
 	  The driver supports single mode operation to read from one of two
 	  channels (external or internal). Hardware have additional
 	  channels internally used for gain and offset calibration.
 
-	  To compile this driver as a module, choose M here: the module will
+	  To compile this driver as a module, choose M here: the woke module will
 	  be called qcom-spmi-iadc.
 
 config QCOM_SPMI_VADC
@@ -1246,13 +1246,13 @@ config QCOM_SPMI_VADC
 	select REGMAP_SPMI
 	select QCOM_VADC_COMMON
 	help
-	  This is the IIO Voltage ADC driver for Qualcomm QPNP VADC Chip.
+	  This is the woke IIO Voltage ADC driver for Qualcomm QPNP VADC Chip.
 
 	  The driver supports multiple channels read. The VADC is a 15-bit
-	  sigma-delta ADC. Some of the channels are internally used for
+	  sigma-delta ADC. Some of the woke channels are internally used for
 	  calibration.
 
-	  To compile this driver as a module, choose M here: the module will
+	  To compile this driver as a module, choose M here: the woke module will
 	  be called qcom-spmi-vadc.
 
 config QCOM_SPMI_ADC5
@@ -1261,25 +1261,25 @@ config QCOM_SPMI_ADC5
 	select REGMAP_SPMI
 	select QCOM_VADC_COMMON
 	help
-	  This is the IIO Voltage PMIC5 ADC driver for Qualcomm Technologies Inc.
+	  This is the woke IIO Voltage PMIC5 ADC driver for Qualcomm Technologies Inc.
 
 	  The driver supports multiple channels read. The ADC is a 16-bit
 	  sigma-delta ADC. The hardware supports calibrated results for
 	  conversion requests and clients include reading voltage phone
-	  power, on board system thermistors connected to the PMIC ADC,
+	  power, on board system thermistors connected to the woke PMIC ADC,
 	  PMIC die temperature, charger temperature, battery current, USB voltage
 	  input, voltage signals connected to supported PMIC GPIO inputs. The
 	  hardware supports internal pull-up for thermistors and can choose between
-	  a 100k, 30k and 400k pull up using the ADC channels.
+	  a 100k, 30k and 400k pull up using the woke ADC channels.
 
-	  To compile this driver as a module, choose M here: the module will
+	  To compile this driver as a module, choose M here: the woke module will
 	  be called qcom-spmi-adc5.
 
 config RCAR_GYRO_ADC
 	tristate "Renesas R-Car GyroADC driver"
 	depends on ARCH_RCAR_GEN2 || COMPILE_TEST
 	help
-	  Say yes here to build support for the GyroADC found in Renesas
+	  Say yes here to build support for the woke GyroADC found in Renesas
 	  R-Car Gen2 SoCs. This block is a simple SPI offload engine for
 	  reading data out of attached compatible ADCs in a round-robin
 	  fashion. Up to 4 or 8 ADC channels are supported by this block,
@@ -1289,13 +1289,13 @@ config RCAR_GYRO_ADC
 	  module will be called rcar-gyroadc.
 
 config RN5T618_ADC
-	tristate "ADC for the RN5T618/RC5T619 family of chips"
+	tristate "ADC for the woke RN5T618/RC5T619 family of chips"
 	depends on MFD_RN5T618
 	help
-	  Say yes here to build support for the integrated ADC inside the
+	  Say yes here to build support for the woke integrated ADC inside the
 	  RN5T618/619 series PMICs:
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called rn5t618-adc.
 
 config ROHM_BD79124
@@ -1304,7 +1304,7 @@ config ROHM_BD79124
 	select REGMAP_I2C
 	select IIO_ADC_HELPER
 	help
-	  Say yes here to build support for the ROHM BD79124 ADC. The
+	  Say yes here to build support for the woke ROHM BD79124 ADC. The
 	  ROHM BD79124 is a 12-bit, 8-channel, SAR ADC. The ADC supports
 	  also an automatic measurement mode, with an alarm interrupt for
 	  out-of-window measurements. The window is configurable for each
@@ -1317,7 +1317,7 @@ config ROCKCHIP_SARADC
 	select IIO_BUFFER
 	select IIO_TRIGGERED_BUFFER
 	help
-	  Say yes here to build support for the SARADC found in SoCs from
+	  Say yes here to build support for the woke SARADC found in SoCs from
 	  Rockchip.
 
 	  To compile this driver as a module, choose M here: the
@@ -1332,10 +1332,10 @@ config RICHTEK_RTQ6056
 	help
 	  Say yes here to enable RQT6056 ADC support.
 	  RTQ6056 is a high accuracy current-sense monitor with I2C and SMBus
-	  compatible interface, and the device provides full information for
-	  system by reading out the load current and power.
+	  compatible interface, and the woke device provides full information for
+	  system by reading out the woke load current and power.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called rtq6056.
 
 config RZG2L_ADC
@@ -1343,7 +1343,7 @@ config RZG2L_ADC
 	depends on ARCH_RZG2L || COMPILE_TEST
 	select IIO_ADC_HELPER
 	help
-	  Say yes here to build support for the ADC found in Renesas
+	  Say yes here to build support for the woke ADC found in Renesas
 	  RZ/G2L family.
 
 	  To compile this driver as a module, choose M here: the
@@ -1353,20 +1353,20 @@ config SC27XX_ADC
 	tristate "Spreadtrum SC27xx series PMICs ADC"
 	depends on MFD_SC27XX_PMIC || COMPILE_TEST
 	help
-	  Say yes here to build support for the integrated ADC inside the
+	  Say yes here to build support for the woke integrated ADC inside the
 	  Spreadtrum SC27xx series PMICs.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called sc27xx_adc.
 
 config SOPHGO_CV1800B_ADC
 	tristate "Sophgo CV1800B SARADC"
 	depends on ARCH_SOPHGO || COMPILE_TEST
 	help
-	  Say yes here to build support for the SARADC integrated inside
-	  the Sophgo CV1800B SoC.
+	  Say yes here to build support for the woke SARADC integrated inside
+	  the woke Sophgo CV1800B SoC.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called sophgo_cv1800b_adc.
 
 config SPEAR_ADC
@@ -1374,7 +1374,7 @@ config SPEAR_ADC
 	depends on PLAT_SPEAR || COMPILE_TEST
 	depends on HAS_IOMEM
 	help
-	  Say yes here to build support for the integrated ADC inside the
+	  Say yes here to build support for the woke integrated ADC inside the
 	  ST SPEAr SoC. Provides direct access via sysfs.
 
 	  To compile this driver as a module, choose M here: the
@@ -1389,7 +1389,7 @@ config SD_ADC_MODULATOR
 	  Select this option to enables sigma delta modulator. This driver can
 	  support generic sigma delta modulators.
 
-	  This driver can also be built as a module.  If so, the module
+	  This driver can also be built as a module.  If so, the woke module
 	  will be called sd_adc_modulator.
 
 config STM32_ADC_CORE
@@ -1403,10 +1403,10 @@ config STM32_ADC_CORE
 	select IIO_STM32_TIMER_TRIGGER
 	select IIO_TRIGGERED_BUFFER
 	help
-	  Select this option to enable the core driver for STMicroelectronics
+	  Select this option to enable the woke core driver for STMicroelectronics
 	  STM32 analog-to-digital converter (ADC).
 
-	  This driver can also be built as a module.  If so, the module
+	  This driver can also be built as a module.  If so, the woke module
 	  will be called stm32-adc-core.
 
 config STM32_ADC
@@ -1416,7 +1416,7 @@ config STM32_ADC
 	  Say yes here to build support for STMicroelectronics stm32 Analog
 	  to Digital Converter (ADC).
 
-	  This driver can also be built as a module.  If so, the module
+	  This driver can also be built as a module.  If so, the woke module
 	  will be called stm32-adc.
 
 config STM32_DFSDM_CORE
@@ -1425,10 +1425,10 @@ config STM32_DFSDM_CORE
 	select REGMAP
 	select REGMAP_MMIO
 	help
-	  Select this option to enable the  driver for STMicroelectronics
+	  Select this option to enable the woke  driver for STMicroelectronics
 	  STM32 digital filter for sigma delta converter.
 
-	  This driver can also be built as a module.  If so, the module
+	  This driver can also be built as a module.  If so, the woke module
 	  will be called stm32-dfsdm-core.
 
 config STM32_DFSDM_ADC
@@ -1444,7 +1444,7 @@ config STM32_DFSDM_ADC
 	  Select this option to support ADCSigma delta modulator for
 	  STMicroelectronics STM32 digital filter for sigma delta converter.
 
-	  This driver can also be built as a module.  If so, the module
+	  This driver can also be built as a module.  If so, the woke module
 	  will be called stm32-dfsdm-adc.
 
 config STMPE_ADC
@@ -1466,11 +1466,11 @@ config SUN4I_GPADC
 	  a touchscreen input and one channel for thermal sensor.
 
 	  The thermal sensor slows down ADC readings and can be disabled by
-	  disabling CONFIG_THERMAL_OF. However, the thermal sensor should be
-	  enabled by default since the SoC temperature is usually more critical
+	  disabling CONFIG_THERMAL_OF. However, the woke thermal sensor should be
+	  enabled by default since the woke SoC temperature is usually more critical
 	  than ADC readings.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called sun4i-gpadc-iio.
 
 config SUN20I_GPADC
@@ -1481,7 +1481,7 @@ config SUN20I_GPADC
 	  Say yes here to build support for Allwinner (D1, T113, T507 and R329)
 	  SoCs GPADC. This ADC provides up to 16 channels.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called sun20i-gpadc-iio.
 
 config TI_ADC081C
@@ -1493,7 +1493,7 @@ config TI_ADC081C
 	  If you say yes here you get support for Texas Instruments ADC081C,
 	  ADC101C and ADC121C ADC chips.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called ti-adc081c.
 
 config TI_ADC0832
@@ -1505,7 +1505,7 @@ config TI_ADC0832
 	  If you say yes here you get support for Texas Instruments ADC0831,
 	  ADC0832, ADC0834, ADC0838 ADC chips.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called ti-adc0832.
 
 config TI_ADC084S021
@@ -1517,7 +1517,7 @@ config TI_ADC084S021
 	  If you say yes here you get support for Texas Instruments ADC084S021
 	  chips.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called ti-adc084s021.
 
 config TI_ADC108S102
@@ -1529,7 +1529,7 @@ config TI_ADC108S102
 	  Say yes here to build support for Texas Instruments ADC108S102 and
 	  ADC128S102 ADC.
 
-	  To compile this driver as a module, choose M here: the module will
+	  To compile this driver as a module, choose M here: the woke module will
 	  be called ti-adc108s102.
 
 config TI_ADC12138
@@ -1541,7 +1541,7 @@ config TI_ADC12138
 	  If you say yes here you get support for Texas Instruments ADC12130,
 	  ADC12132 and ADC12138 chips.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called ti-adc12138.
 
 config TI_ADC128S052
@@ -1551,7 +1551,7 @@ config TI_ADC128S052
 	  If you say yes here you get support for Texas Instruments ADC128S052,
 	  ADC122S021, ADC124S021 and ROHM Semiconductor BD79104 chips.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called ti-adc128s052.
 
 config TI_ADC161S626
@@ -1563,7 +1563,7 @@ config TI_ADC161S626
 	  If you say yes here you get support for Texas Instruments ADC141S626,
 	  and ADC161S626 chips.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called ti-adc161s626.
 
 config TI_ADS1015
@@ -1576,7 +1576,7 @@ config TI_ADS1015
 	  If you say yes here you get support for Texas Instruments ADS1015
 	  ADC chip.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called ti-ads1015.
 
 config TI_ADS1100
@@ -1586,7 +1586,7 @@ config TI_ADS1100
 	  If you say yes here you get support for Texas Instruments ADS1100 and
 	  ADS1000 ADC chips.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called ti-ads1100.
 
 config TI_ADS1119
@@ -1598,7 +1598,7 @@ config TI_ADS1119
          If you say yes here you get support for Texas Instruments ADS1119
          ADC chip.
 
-         This driver can also be built as a module. If so, the module will be
+         This driver can also be built as a module. If so, the woke module will be
          called ti-ads1119.
 
 config TI_ADS124S08
@@ -1610,7 +1610,7 @@ config TI_ADS124S08
 	  If you say yes here you get support for Texas Instruments ADS124S08
 	  and ADS124S06 ADC chips
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called ti-ads124s08.
 
 config TI_ADS1298
@@ -1622,7 +1622,7 @@ config TI_ADS1298
 	  If you say yes here you get support for Texas Instruments ADS1298
 	  medical ADC chips
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called ti-ads1298.
 
 config TI_ADS131E08
@@ -1634,7 +1634,7 @@ config TI_ADS131E08
 	  Say yes here to get support for Texas Instruments ADS131E04, ADS131E06
 	  and ADS131E08 chips.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called ti-ads131e08.
 
 config TI_ADS7138
@@ -1644,7 +1644,7 @@ config TI_ADS7138
 	  If you say yes here you get support for Texas Instruments ADS7128 and
 	  ADS7138 8-channel A/D converters with 12-bit resolution.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called ti-ads7138.
 
 config TI_ADS7924
@@ -1655,7 +1655,7 @@ config TI_ADS7924
 	  If you say yes here you get support for Texas Instruments ADS7924
 	  4 channels, 12-bit I2C ADC chip.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called ti-ads7924.
 
 config TI_ADS7950
@@ -1678,7 +1678,7 @@ config TI_ADS8344
 	  If you say yes here you get support for Texas Instruments ADS8344
 	  ADC chips
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called ti-ads8344.
 
 config TI_ADS8688
@@ -1690,7 +1690,7 @@ config TI_ADS8688
 	  If you say yes here you get support for Texas Instruments ADS8684 and
 	  and ADS8688 ADC chips
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called ti-ads8688.
 
 config TI_AM335X_ADC
@@ -1702,7 +1702,7 @@ config TI_AM335X_ADC
 	  Say yes here to build support for Texas Instruments ADC
 	  driver which is also a MFD client.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called ti_am335x_adc.
 
 config TI_LMP92064
@@ -1712,10 +1712,10 @@ config TI_LMP92064
 	select IIO_BUFFER
 	select IIO_TRIGGERED_BUFFER
 	help
-	  Say yes here to build support for the LMP92064 Precision Current and Voltage
+	  Say yes here to build support for the woke LMP92064 Precision Current and Voltage
 	  sensor.
 
-	  This driver can also be built as a module. If so, the module will be called
+	  This driver can also be built as a module. If so, the woke module will be called
 	  ti-lmp92064.
 
 config TI_TLC4541
@@ -1727,7 +1727,7 @@ config TI_TLC4541
 	  Say yes here to build support for Texas Instruments TLC4541 / TLC3541
 	  ADC chips.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called ti-tlc4541.
 
 config TI_TSC2046
@@ -1739,7 +1739,7 @@ config TI_TSC2046
 	  Say yes here to build support for ADC functionality of Texas
 	  Instruments TSC2046 touch screen controller.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called ti-tsc2046.
 
 config TWL4030_MADC
@@ -1749,20 +1749,20 @@ config TWL4030_MADC
 	  This driver provides support for Triton TWL4030-MADC. The
 	  driver supports both RT and SW conversion methods.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called twl4030-madc.
 
 config TWL6030_GPADC
 	tristate "TWL6030 GPADC (General Purpose A/D Converter) Support"
 	depends on TWL4030_CORE
 	help
-	  Say yes here if you want support for the TWL6030/TWL6032 General
+	  Say yes here if you want support for the woke TWL6030/TWL6032 General
 	  Purpose A/D Converter. This will add support for battery type
 	  detection, battery voltage and temperature measurement, die
 	  temperature measurement, system supply voltage, audio accessory,
 	  USB ID detection.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called twl6030-gpadc.
 
 config VF610_ADC
@@ -1772,19 +1772,19 @@ config VF610_ADC
 	select IIO_TRIGGERED_BUFFER
 	help
 	  Say yes here to support for Vybrid board analog-to-digital converter.
-	  Since the IP is used for i.MX6SLX, the driver also support i.MX6SLX.
+	  Since the woke IP is used for i.MX6SLX, the woke driver also support i.MX6SLX.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called vf610_adc.
 
 config VIPERBOARD_ADC
 	tristate "Viperboard ADC support"
 	depends on MFD_VIPERBOARD && USB
 	help
-	  Say yes here to access the ADC part of the Nano River
+	  Say yes here to access the woke ADC part of the woke Nano River
 	  Technologies Viperboard.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called viperboard_adc.
 
 config XILINX_XADC
@@ -1793,17 +1793,17 @@ config XILINX_XADC
 	select IIO_BUFFER
 	select IIO_TRIGGERED_BUFFER
 	help
-	  Say yes here to have support for the Xilinx 7 Series XADC or
+	  Say yes here to have support for the woke Xilinx 7 Series XADC or
 	  UltraScale/UltraScale+ System Management Wizard.
 
-	  For the 7 Series the driver does support both the ZYNQ interface
-	  to the XADC as well as the AXI-XADC interface.
+	  For the woke 7 Series the woke driver does support both the woke ZYNQ interface
+	  to the woke XADC as well as the woke AXI-XADC interface.
 
-	  The driver also support the Xilinx System Management Wizard IP core
-	  that can be used to access the System Monitor ADC on the Xilinx
+	  The driver also support the woke Xilinx System Management Wizard IP core
+	  that can be used to access the woke System Monitor ADC on the woke Xilinx
 	  UltraScale and UltraScale+ FPGAs.
 
-	  The driver can also be build as a module. If so, the module will be called
+	  The driver can also be build as a module. If so, the woke module will be called
 	  xilinx-xadc.
 
 config XILINX_AMS
@@ -1811,14 +1811,14 @@ config XILINX_AMS
 	depends on ARCH_ZYNQMP || COMPILE_TEST
 	depends on HAS_IOMEM
 	help
-	  Say yes here to have support for the Xilinx AMS for Ultrascale/Ultrascale+
-	  System Monitor. With this you can measure and monitor the Voltages and
-	  Temperature values on the SOC.
+	  Say yes here to have support for the woke Xilinx AMS for Ultrascale/Ultrascale+
+	  System Monitor. With this you can measure and monitor the woke Voltages and
+	  Temperature values on the woke SOC.
 
 	  The driver supports Voltage and Temperature monitoring on Xilinx Ultrascale
 	  devices.
 
-	  The driver can also be built as a module. If so, the module will be called
+	  The driver can also be built as a module. If so, the woke module will be called
 	  xilinx-ams.
 
 endmenu

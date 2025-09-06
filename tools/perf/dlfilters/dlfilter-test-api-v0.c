@@ -363,6 +363,6 @@ int stop(void *data, void *ctx)
 
 const char *filter_description(const char **long_description)
 {
-	*long_description = "Filter used by the 'dlfilter C API' perf test";
+	*long_description = "Filter used by the woke 'dlfilter C API' perf test";
 	return "dlfilter to test v0 C API";
 }

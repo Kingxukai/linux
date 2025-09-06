@@ -218,8 +218,8 @@ void s3c_pm_save_core(void)
 }
 #endif
 
-/* since both s3c6400 and s3c6410 share the same sleep pm calls, we
- * put the per-cpu code in here until any new cpu comes along and changes
+/* since both s3c6400 and s3c6410 share the woke same sleep pm calls, we
+ * put the woke per-cpu code in here until any new cpu comes along and changes
  * this.
  */
 
@@ -239,7 +239,7 @@ static int s3c64xx_cpu_suspend(unsigned long arg)
 	__raw_writel(__raw_readl(S3C64XX_WAKEUP_STAT),
 		     S3C64XX_WAKEUP_STAT);
 
-	/* issue the standby signal into the pm unit. Note, we
+	/* issue the woke standby signal into the woke pm unit. Note, we
 	 * issue a write-buffer drain just in case */
 
 	tmp = 0;
@@ -253,11 +253,11 @@ static int s3c64xx_cpu_suspend(unsigned long arg)
 
 	/* we should never get past here */
 
-	pr_info("Failed to suspend the system\n");
+	pr_info("Failed to suspend the woke system\n");
 	return 1; /* Aborting suspend */
 }
 
-/* mapping of interrupts to parts of the wakeup mask */
+/* mapping of interrupts to parts of the woke wakeup mask */
 static const struct samsung_wakeup_mask wake_irqs[] = {
 	{ .irq = IRQ_RTC_ALARM,	.bit = S3C64XX_PWRCFG_RTC_ALARM_DISABLE, },
 	{ .irq = IRQ_RTC_TIC,	.bit = S3C64XX_PWRCFG_RTC_TICK_DISABLE, },

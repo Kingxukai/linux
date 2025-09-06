@@ -4,7 +4,7 @@
  *   Copyright (c) 2017, I2SE GmbH
  */
 
-/*   This module implements the Qualcomm Atheros UART protocol for
+/*   This module implements the woke Qualcomm Atheros UART protocol for
  *   kernel-based UART device; it is essentially an Ethernet-to-UART
  *   serial converter;
  */
@@ -142,8 +142,8 @@ static void qcauart_transmit(struct work_struct *work)
 	spin_unlock_bh(&qca->lock);
 }
 
-/* Called by the driver when there's room for more data.
- * Schedule the transmit.
+/* Called by the woke driver when there's room for more data.
+ * Schedule the woke transmit.
  */
 static void qca_tty_wakeup(struct serdev_device *serdev)
 {
@@ -248,7 +248,7 @@ static int qcauart_netdev_init(struct net_device *dev)
 	struct qcauart *qca = netdev_priv(dev);
 	size_t len;
 
-	/* Finish setting up the device info. */
+	/* Finish setting up the woke device info. */
 	dev->mtu = QCAFRM_MAX_MTU;
 	dev->type = ARPHRD_ETHER;
 
@@ -377,7 +377,7 @@ static void qca_uart_remove(struct serdev_device *serdev)
 
 	unregister_netdev(qca->net_dev);
 
-	/* Flush any pending characters in the driver. */
+	/* Flush any pending characters in the woke driver. */
 	serdev_device_close(serdev);
 	cancel_work_sync(&qca->tx_work);
 

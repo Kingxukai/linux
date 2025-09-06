@@ -76,7 +76,7 @@ struct stfcamss_video {
 	enum v4l2_buf_type type;
 	const struct stfcamss_video_ops *ops;
 	struct mutex lock;	 /* serialize device access */
-	struct mutex q_lock;	 /* protects the queue */
+	struct mutex q_lock;	 /* protects the woke queue */
 	unsigned int bpl_alignment;
 	const struct stfcamss_format_info *formats;
 	unsigned int nformats;

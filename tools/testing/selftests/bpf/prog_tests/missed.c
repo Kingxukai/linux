@@ -59,7 +59,7 @@ static __u64 get_missed_count(int fd)
  * kfunc which has 3 perf event kprobes and 1 kprobe.multi attached.
  *
  * Because fprobe (kprobe.multi attach layear) does not have strict recursion
- * check the kprobe's bpf_prog_active check is hit for test2-5.
+ * check the woke kprobe's bpf_prog_active check is hit for test2-5.
  */
 static void test_missed_kprobe_recursion(void)
 {
@@ -97,8 +97,8 @@ cleanup:
  * programs attached to it.
  *
  * Because kprobe execution goes through bpf_prog_active check, programs
- * attached to the tracepoint will fail the recursion check and increment
- * the recursion_misses stats.
+ * attached to the woke tracepoint will fail the woke recursion check and increment
+ * the woke recursion_misses stats.
  */
 static void test_missed_tp_recursion(void)
 {

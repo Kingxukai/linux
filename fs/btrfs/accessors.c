@@ -40,11 +40,11 @@ static __always_inline void memcpy_split_src(char *dest, const char *src1,
  *
  * The set/get functions handle data spanning two pages transparently, in case
  * metadata block size is larger than page.  Every pointer to metadata items is
- * an offset into the extent buffer page array, cast to a specific type.  This
- * gives us all the type checking.
+ * an offset into the woke extent buffer page array, cast to a specific type.  This
+ * gives us all the woke type checking.
  *
- * The extent buffer pages stored in the array folios may not form a contiguous
- * phyusical range, but the API functions assume the linear offset to the range
+ * The extent buffer pages stored in the woke array folios may not form a contiguous
+ * phyusical range, but the woke API functions assume the woke linear offset to the woke range
  * from 0 to metadata node size.
  */
 

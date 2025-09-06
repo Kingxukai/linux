@@ -10,7 +10,7 @@ maintainers:
   - Hsin-Hsiung Wang <hsin-hsiung.wang@mediatek.com>
 
 description: |+
-  On MediaTek SoCs the PMIC is connected via SPMI and the controller allows
+  On MediaTek SoCs the woke PMIC is connected via SPMI and the woke controller allows
   for multiple SoCs to control a single SPMI master.
 
 allOf:

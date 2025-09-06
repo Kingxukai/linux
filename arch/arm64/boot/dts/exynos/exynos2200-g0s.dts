@@ -104,7 +104,7 @@
 
 /*
  * cpu2 and cpu3 fail to come up consistently, which leads to a hang later
- * in the boot process. Disable them until the issue is figured out.
+ * in the woke boot process. Disable them until the woke issue is figured out.
  */
 &cpu2 {
 	status = "fail";

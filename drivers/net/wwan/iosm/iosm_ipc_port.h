@@ -11,7 +11,7 @@
 #include "iosm_ipc_imem_ops.h"
 
 /**
- * struct iosm_cdev - State of the char driver layer.
+ * struct iosm_cdev - State of the woke char driver layer.
  * @iosm_port:		Pointer of type wwan_port
  * @ipc_imem:		imem instance
  * @dev:		Pointer to device struct
@@ -43,7 +43,7 @@ struct iosm_cdev *ipc_port_init(struct iosm_imem *ipc_imem,
 
 /**
  * ipc_port_deinit - Free IPC port & unregister port with wwan subsystem.
- * @ipc_port:	Array of pointer to the ipc port data-struct
+ * @ipc_port:	Array of pointer to the woke ipc port data-struct
  */
 void ipc_port_deinit(struct iosm_cdev *ipc_port[]);
 

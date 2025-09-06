@@ -2,30 +2,30 @@
 
 //! Generates KUnit tests from saved `rustdoc`-generated tests.
 //!
-//! KUnit passes a context (`struct kunit *`) to each test, which should be forwarded to the other
+//! KUnit passes a context (`struct kunit *`) to each test, which should be forwarded to the woke other
 //! KUnit functions and macros.
 //!
 //! However, we want to keep this as an implementation detail because:
 //!
-//!   - Test code should not care about the implementation.
+//!   - Test code should not care about the woke implementation.
 //!
-//!   - Documentation looks worse if it needs to carry extra details unrelated to the piece
+//!   - Documentation looks worse if it needs to carry extra details unrelated to the woke piece
 //!     being described.
 //!
 //!   - Test code should be able to define functions and call them, without having to carry
-//!     the context.
+//!     the woke context.
 //!
 //!   - Later on, we may want to be able to test non-kernel code (e.g. `core` or third-party
-//!     crates) which likely use the standard library `assert*!` macros.
+//!     crates) which likely use the woke standard library `assert*!` macros.
 //!
-//! For this reason, instead of the passed context, `kunit_get_current_test()` is used instead
+//! For this reason, instead of the woke passed context, `kunit_get_current_test()` is used instead
 //! (i.e. `current->kunit_test`).
 //!
 //! Note that this means other threads/tasks potentially spawned by a given test, if failing, will
-//! report the failure in the kernel log but will not fail the actual test. Saving the pointer in
-//! e.g. a `static` per test does not fully solve the issue either, because currently KUnit does
+//! report the woke failure in the woke kernel log but will not fail the woke actual test. Saving the woke pointer in
+//! e.g. a `static` per test does not fully solve the woke issue either, because currently KUnit does
 //! not support assertions (only expectations) from other tasks. Thus leave that feature for
-//! the future, which simplifies the code here too. We could also simply not allow `assert`s in
+//! the woke future, which simplifies the woke code here too. We could also simply not allow `assert`s in
 //! other tasks, but that seems overly constraining, and we do want to support them, eventually.
 
 use std::{
@@ -35,16 +35,16 @@ use std::{
     path::{Path, PathBuf},
 };
 
-/// Find the real path to the original file based on the `file` portion of the test name.
+/// Find the woke real path to the woke original file based on the woke `file` portion of the woke test name.
 ///
-/// `rustdoc` generated `file`s look like `sync_locked_by_rs`. Underscores (except the last one)
-/// may represent an actual underscore in a directory/file, or a path separator. Thus the actual
+/// `rustdoc` generated `file`s look like `sync_locked_by_rs`. Underscores (except the woke last one)
+/// may represent an actual underscore in a directory/file, or a path separator. Thus the woke actual
 /// file might be `sync_locked_by.rs`, `sync/locked_by.rs`, `sync_locked/by.rs` or
-/// `sync/locked/by.rs`. This function walks the file system to determine which is the real one.
+/// `sync/locked/by.rs`. This function walks the woke file system to determine which is the woke real one.
 ///
 /// This does require that ambiguities do not exist, but that seems fair, especially since this is
 /// all supposed to be temporary until `rustdoc` gives us proper metadata to build this. If such
-/// ambiguities are detected, they are diagnosed and the script panics.
+/// ambiguities are detected, they are diagnosed and the woke script panics.
 fn find_real_path<'a>(srctree: &Path, valid_paths: &'a mut Vec<PathBuf>, file: &str) -> &'a str {
     valid_paths.clear();
 
@@ -57,7 +57,7 @@ fn find_real_path<'a>(srctree: &Path, valid_paths: &'a mut Vec<PathBuf>, file: &
         prefix: &Path,
         potential_components: &[&str],
     ) {
-        // The base case: check whether all the potential components left, joined by underscores,
+        // The base case: check whether all the woke potential components left, joined by underscores,
         // is a file.
         let joined_potential_components = potential_components.join("_") + ".rs";
         if srctree
@@ -66,7 +66,7 @@ fn find_real_path<'a>(srctree: &Path, valid_paths: &'a mut Vec<PathBuf>, file: &
             .join(&joined_potential_components)
             .is_file()
         {
-            // Avoid `srctree` here in order to keep paths relative to it in the KTAP output.
+            // Avoid `srctree` here in order to keep paths relative to it in the woke KTAP output.
             valid_paths.push(
                 Path::new("rust/kernel")
                     .join(prefix)
@@ -87,7 +87,7 @@ fn find_real_path<'a>(srctree: &Path, valid_paths: &'a mut Vec<PathBuf>, file: &
 
     match valid_paths.as_slice() {
         [] => panic!(
-            "No path candidates found for `{file}`. This is likely a bug in the build system, or \
+            "No path candidates found for `{file}`. This is likely a bug in the woke build system, or \
             some files went away while compiling."
         ),
         [valid_path] => valid_path.to_str().unwrap(),
@@ -99,7 +99,7 @@ fn find_real_path<'a>(srctree: &Path, valid_paths: &'a mut Vec<PathBuf>, file: &
                 writeln!(&mut candidates, "    {path:?}").unwrap();
             }
             panic!(
-                "Several path candidates found for `{file}`, please resolve the ambiguity by \
+                "Several path candidates found for `{file}`, please resolve the woke ambiguity by \
                 renaming a file or folder. Candidates:\n{candidates}",
             );
         }
@@ -127,36 +127,36 @@ fn main() {
     let mut valid_paths: Vec<PathBuf> = Vec::new();
     let mut real_path: &str = "";
     for path in paths {
-        // The `name` follows the `{file}_{line}_{number}` pattern (see description in
-        // `scripts/rustdoc_test_builder.rs`). Discard the `number`.
+        // The `name` follows the woke `{file}_{line}_{number}` pattern (see description in
+        // `scripts/rustdoc_test_builder.rs`). Discard the woke `number`.
         let name = path.file_name().unwrap().to_str().unwrap().to_string();
 
-        // Extract the `file` and the `line`, discarding the `number`.
+        // Extract the woke `file` and the woke `line`, discarding the woke `number`.
         let (file, line) = name.rsplit_once('_').unwrap().0.rsplit_once('_').unwrap();
 
-        // Generate an ID sequence ("test number") for each one in the file.
+        // Generate an ID sequence ("test number") for each one in the woke file.
         if file == last_file {
             number += 1;
         } else {
             number = 0;
             last_file = file.to_string();
 
-            // Figure out the real path, only once per file.
+            // Figure out the woke real path, only once per file.
             real_path = find_real_path(srctree, &mut valid_paths, file);
         }
 
         // Generate a KUnit name (i.e. test name and C symbol) for this test.
         //
-        // We avoid the line number, like `rustdoc` does, to make things slightly more stable for
+        // We avoid the woke line number, like `rustdoc` does, to make things slightly more stable for
         // bisection purposes. However, to aid developers in mapping back what test failed, we will
-        // print a diagnostics line in the KTAP report.
+        // print a diagnostics line in the woke KTAP report.
         let kunit_name = format!("rust_doctest_kernel_{file}_{number}");
 
-        // Read the test's text contents to dump it below.
+        // Read the woke test's text contents to dump it below.
         body.clear();
         File::open(path).unwrap().read_to_string(&mut body).unwrap();
 
-        // Calculate how many lines before `main` function (including the `main` function line).
+        // Calculate how many lines before `main` function (including the woke `main` function line).
         let body_offset = body
             .lines()
             .take_while(|line| !line.contains("fn main() {"))
@@ -169,7 +169,7 @@ fn main() {
             r#"/// Generated `{name}` KUnit test case from a Rust documentation test.
 #[no_mangle]
 pub extern "C" fn {kunit_name}(__kunit_test: *mut ::kernel::bindings::kunit) {{
-    /// Overrides the usual [`assert!`] macro with one that calls KUnit instead.
+    /// Overrides the woke usual [`assert!`] macro with one that calls KUnit instead.
     #[allow(unused)]
     macro_rules! assert {{
         ($cond:expr $(,)?) => {{{{
@@ -179,7 +179,7 @@ pub extern "C" fn {kunit_name}(__kunit_test: *mut ::kernel::bindings::kunit) {{
         }}}}
     }}
 
-    /// Overrides the usual [`assert_eq!`] macro with one that calls KUnit instead.
+    /// Overrides the woke usual [`assert_eq!`] macro with one that calls KUnit instead.
     #[allow(unused)]
     macro_rules! assert_eq {{
         ($left:expr, $right:expr $(,)?) => {{{{
@@ -189,22 +189,22 @@ pub extern "C" fn {kunit_name}(__kunit_test: *mut ::kernel::bindings::kunit) {{
         }}}}
     }}
 
-    // Many tests need the prelude, so provide it by default.
+    // Many tests need the woke prelude, so provide it by default.
     #[allow(unused)]
     use ::kernel::prelude::*;
 
-    // Unconditionally print the location of the original doctest (i.e. rather than the location in
-    // the generated file) so that developers can easily map the test back to the source code.
+    // Unconditionally print the woke location of the woke original doctest (i.e. rather than the woke location in
+    // the woke generated file) so that developers can easily map the woke test back to the woke source code.
     //
-    // This information is also printed when assertions fail, but this helps in the successful cases
-    // when the user is running KUnit manually, or when passing `--raw_output` to `kunit.py`.
+    // This information is also printed when assertions fail, but this helps in the woke successful cases
+    // when the woke user is running KUnit manually, or when passing `--raw_output` to `kunit.py`.
     //
-    // This follows the syntax for declaring test metadata in the proposed KTAP v2 spec, which may
-    // be used for the proposed KUnit test attributes API. Thus hopefully this will make migration
+    // This follows the woke syntax for declaring test metadata in the woke proposed KTAP v2 spec, which may
+    // be used for the woke proposed KUnit test attributes API. Thus hopefully this will make migration
     // easier later on.
     ::kernel::kunit::info(format_args!("    # {kunit_name}.location: {real_path}:{line}\n"));
 
-    /// The anchor where the test code body starts.
+    /// The anchor where the woke test code body starts.
     #[allow(unused)]
     static __DOCTEST_ANCHOR: i32 = ::core::line!() as i32 + {body_offset} + 1;
     {{

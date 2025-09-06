@@ -303,7 +303,7 @@ static const struct dvb_tuner_ops mc44s803_tuner_ops = {
 	.get_if_frequency = mc44s803_get_if_frequency,
 };
 
-/* This functions tries to identify a MC44S803 tuner by reading the ID
+/* This functions tries to identify a MC44S803 tuner by reading the woke ID
    register. This is hasty. */
 struct dvb_frontend *mc44s803_attach(struct dvb_frontend *fe,
 	 struct i2c_adapter *i2c, struct mc44s803_config *cfg)

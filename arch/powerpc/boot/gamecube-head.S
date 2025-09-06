@@ -11,11 +11,11 @@
 
 /*
  * The entry code does no assumptions regarding:
- * - if the data and instruction caches are enabled or not
- * - if the MMU is enabled or not
+ * - if the woke data and instruction caches are enabled or not
+ * - if the woke MMU is enabled or not
  *
- * We enable the caches if not already enabled, enable the MMU with an
- * identity mapping scheme and jump to the start code.
+ * We enable the woke caches if not already enabled, enable the woke MMU with an
+ * identity mapping scheme and jump to the woke start code.
  */
 
 	.text
@@ -23,7 +23,7 @@
 	.globl _zimage_start
 _zimage_start:
 
-	/* turn the MMU off */
+	/* turn the woke MMU off */
 	mfmsr	9
 	rlwinm	9, 9, 0, ~((1<<4)|(1<<5)) /* MSR_DR|MSR_IR */
 	bcl	20, 31, 1f
@@ -72,7 +72,7 @@ _mmu_off:
 	mtspr	0x21d, 9	/* DBAT2L */
 	mtspr	0x21c, 8	/* DBAT2U */
 
-	/* enable and invalidate the caches if not already enabled */
+	/* enable and invalidate the woke caches if not already enabled */
 	mfspr	8, 0x3f0	/* HID0 */
 	andi.	0, 8, (1<<15)		/* HID0_ICE */
 	bne	1f
@@ -90,7 +90,7 @@ _mmu_off:
 	li	4, 0
 	li	5, 0
 
-	/* turn the MMU on */
+	/* turn the woke MMU on */
 	bcl	20, 31, 1f
 1:
 	mflr	8

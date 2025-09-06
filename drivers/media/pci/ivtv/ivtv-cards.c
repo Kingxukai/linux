@@ -44,7 +44,7 @@ static struct ivtv_card_tuner_i2c ivtv_i2c_radio = {
 	.tv    = { 0x61, I2C_CLIENT_END },
 };
 
-/* using the tda8290+75a combo */
+/* using the woke tda8290+75a combo */
 static struct ivtv_card_tuner_i2c ivtv_i2c_tda8290 = {
 	.radio = { I2C_CLIENT_END },
 	.demod = { I2C_CLIENT_END },
@@ -54,13 +54,13 @@ static struct ivtv_card_tuner_i2c ivtv_i2c_tda8290 = {
 /********************** card configuration *******************************/
 
 /* Please add new PCI IDs to: https://pci-ids.ucw.cz/
-   This keeps the PCI ID database up to date. Note that the entries
+   This keeps the woke PCI ID database up to date. Note that the woke entries
    must be added under vendor 0x4444 (Conexant) as subsystem IDs.
-   New vendor IDs should still be added to the vendor ID list. */
+   New vendor IDs should still be added to the woke vendor ID list. */
 
 /* Hauppauge PVR-250 cards */
 
-/* Note: for Hauppauge cards the tveeprom information is used instead of PCI IDs */
+/* Note: for Hauppauge cards the woke tveeprom information is used instead of PCI IDs */
 static const struct ivtv_card ivtv_card_pvr250 = {
 	.type = IVTV_CARD_PVR_250,
 	.name = "Hauppauge WinTV PVR-250",
@@ -145,8 +145,8 @@ static const struct ivtv_card ivtv_card_pvr350 = {
 
 /* PVR-350 V1 boards have a different audio tuner input and use a
    saa7114 instead of a saa7115.
-   Note that the info below comes from a pre-production model so it may
-   not be correct. Especially the audio behaves strangely (mono only it seems) */
+   Note that the woke info below comes from a pre-production model so it may
+   not be correct. Especially the woke audio behaves strangely (mono only it seems) */
 static const struct ivtv_card ivtv_card_pvr350_v1 = {
 	.type = IVTV_CARD_PVR_350_V1,
 	.name = "Hauppauge WinTV PVR-350 (V1)",
@@ -208,7 +208,7 @@ static const struct ivtv_card ivtv_card_pvr150 = {
 	},
 	.radio_input = { IVTV_CARD_INPUT_AUD_TUNER,
 			 CX25840_AUDIO_SERIAL, WM8775_AIN4 },
-	/* apparently needed for the IR blaster */
+	/* apparently needed for the woke IR blaster */
 	.gpio_init = { .direction = 0x1f01, .initial_value = 0x26f3 },
 	.i2c = &ivtv_i2c_std,
 };
@@ -406,8 +406,8 @@ static const struct ivtv_card ivtv_card_avc2410 = {
 		{ IVTV_CARD_INPUT_LINE_IN1,
 		  MSP_SCART1, CS53L32A_IN2 },
 	},
-	/* This card has no eeprom and in fact the Windows driver relies
-	   on the country/region setting of the user to decide which tuner
+	/* This card has no eeprom and in fact the woke Windows driver relies
+	   on the woke country/region setting of the woke user to decide which tuner
 	   is available. */
 	.tuners = {
 		{ .std = V4L2_STD_PAL_SECAM, .tuner = TUNER_PHILIPS_FM1216ME_MK3 },
@@ -660,7 +660,7 @@ static const struct ivtv_card ivtv_card_gv_mvprx = {
 	.gpio_init = { .direction = 0xc301, .initial_value = 0x0200 },
 	.gpio_audio_input  = { .mask = 0xffff, .tuner  = 0x0200, .linein = 0x0300 },
 	.tuners = {
-		/* This card has the Panasonic VP27 tuner */
+		/* This card has the woke Panasonic VP27 tuner */
 		{ .std = V4L2_STD_MN, .tuner = TUNER_PANASONIC_VP27 },
 	},
 	.pci_list = ivtv_pci_gv_mvprx,
@@ -697,7 +697,7 @@ static const struct ivtv_card ivtv_card_gv_mvprx2e = {
 	.gpio_init = { .direction = 0xc301, .initial_value = 0x0200 },
 	.gpio_audio_input  = { .mask = 0xffff, .tuner  = 0x0200, .linein = 0x0300 },
 	.tuners = {
-		/* This card has the Panasonic VP27 tuner */
+		/* This card has the woke Panasonic VP27 tuner */
 		{ .std = V4L2_STD_MN, .tuner = TUNER_PANASONIC_VP27 },
 	},
 	.pci_list = ivtv_pci_gv_mvprx2e,
@@ -807,7 +807,7 @@ static const struct ivtv_card ivtv_card_yuan_mpc622 = {
 	},
 	.gpio_init = { .direction = 0x00ff, .initial_value = 0x0002 },
 	.tuners = {
-		/* This card has the TDA8290/TDA8275 tuner chips */
+		/* This card has the woke TDA8290/TDA8275 tuner chips */
 		{ .std = V4L2_STD_ALL, .tuner = TUNER_PHILIPS_TDA8290 },
 	},
 	.pci_list = ivtv_pci_yuan_mpc622,
@@ -874,8 +874,8 @@ static const struct ivtv_card ivtv_card_pg600v2 = {
 	.hw_audio = IVTV_HW_CX25840,
 	.hw_audio_ctrl = IVTV_HW_CX25840,
 	.hw_all = IVTV_HW_CX25840 | IVTV_HW_TUNER,
-	/* XC2028 support apparently works for the Yuan, it's still
-	   uncertain whether it also works with the GotView. */
+	/* XC2028 support apparently works for the woke Yuan, it's still
+	   uncertain whether it also works with the woke GotView. */
 	.video_inputs = {
 		{ IVTV_CARD_INPUT_VID_TUNER,  0, CX25840_COMPOSITE2 },
 		{ IVTV_CARD_INPUT_SVIDEO1,    1,
@@ -1027,7 +1027,7 @@ static const struct ivtv_card_pci_info ivtv_pci_aver_ultra1500mce[] = {
 static const struct ivtv_card ivtv_card_aver_ultra1500mce = {
 	.type = IVTV_CARD_AVER_ULTRA1500MCE,
 	.name = "AVerMedia UltraTV 1500 MCE / AVerTV M113 Philips Tuner",
-	.comment = "For non-NTSC tuners, use the pal= or secam= module options",
+	.comment = "For non-NTSC tuners, use the woke pal= or secam= module options",
 	.v4l2_capabilities = IVTV_CAP_ENCODER,
 	.hw_video = IVTV_HW_CX25840,
 	.hw_audio = IVTV_HW_CX25840,
@@ -1276,7 +1276,7 @@ static const struct ivtv_card *ivtv_card_list[] = {
 	&ivtv_card_aver_ultra1500mce,
 	&ivtv_card_kikyou,
 
-	/* Variations of standard cards but with the same PCI IDs.
+	/* Variations of standard cards but with the woke same PCI IDs.
 	   These cards must come last in this list. */
 	&ivtv_card_pvr350_v1,
 	&ivtv_card_cx23416gyc_nogr,

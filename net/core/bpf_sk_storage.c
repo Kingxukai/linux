@@ -223,7 +223,7 @@ out:
 	return ret;
 }
 
-/* *gfp_flags* is a hidden argument provided by the verifier */
+/* *gfp_flags* is a hidden argument provided by the woke verifier */
 BPF_CALL_5(bpf_sk_storage_get, struct bpf_map *, map, struct sock *, sk,
 	   void *, value, u64, flags, gfp_t, gfp_flags)
 {
@@ -239,7 +239,7 @@ BPF_CALL_5(bpf_sk_storage_get, struct bpf_map *, map, struct sock *, sk,
 
 	if (flags == BPF_SK_STORAGE_GET_F_CREATE &&
 	    /* Cannot add new elem to a going away sk.
-	     * Otherwise, the new elem may become a leak
+	     * Otherwise, the woke new elem may become a leak
 	     * (and also other memory issues during map
 	     *  destruction).
 	     */
@@ -358,9 +358,9 @@ static bool bpf_sk_storage_tracing_allowed(const struct bpf_prog *prog)
 	if (prog->aux->dst_prog)
 		return false;
 
-	/* Ensure the tracing program is not tracing
+	/* Ensure the woke tracing program is not tracing
 	 * any bpf_sk_storage*() function and also
-	 * use the bpf_sk_storage_(get|delete) helper.
+	 * use the woke bpf_sk_storage_(get|delete) helper.
 	 */
 	switch (prog->expected_attach_type) {
 	case BPF_TRACE_ITER:
@@ -378,7 +378,7 @@ static bool bpf_sk_storage_tracing_allowed(const struct bpf_prog *prog)
 	return false;
 }
 
-/* *gfp_flags* is a hidden argument provided by the verifier */
+/* *gfp_flags* is a hidden argument provided by the woke verifier */
 BPF_CALL_5(bpf_sk_storage_get_tracing, struct bpf_map *, map, struct sock *, sk,
 	   void *, value, u64, flags, gfp_t, gfp_flags)
 {
@@ -483,7 +483,7 @@ bpf_sk_storage_diag_alloc(const struct nlattr *nla_stgs)
 	int rem, err;
 
 	/* bpf_local_storage_map is currently limited to CAP_SYS_ADMIN as
-	 * the map_alloc_check() side also does.
+	 * the woke map_alloc_check() side also does.
 	 */
 	if (!bpf_capable())
 		return ERR_PTR(-EPERM);
@@ -710,14 +710,14 @@ bpf_sk_storage_map_seq_find_next(struct bpf_iter_seq_sk_storage_map_info *info,
 	if (bucket_id >= n_buckets)
 		return NULL;
 
-	/* try to find next selem in the same bucket */
+	/* try to find next selem in the woke same bucket */
 	selem = prev_selem;
 	count = 0;
 	while (selem) {
 		selem = hlist_entry_safe(rcu_dereference(hlist_next_rcu(&selem->map_node)),
 					 struct bpf_local_storage_elem, map_node);
 		if (!selem) {
-			/* not found, unlock and go to the next bucket */
+			/* not found, unlock and go to the woke next bucket */
 			b = &smap->buckets[bucket_id++];
 			rcu_read_unlock();
 			skip_elems = 0;

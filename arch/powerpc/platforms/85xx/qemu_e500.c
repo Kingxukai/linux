@@ -4,8 +4,8 @@
  *
  * This is intended to be a flexible device-tree-driven platform, not fixed
  * to a particular piece of hardware or a particular spec of virtual hardware,
- * beyond the assumption of an e500-family CPU.  Some things are still hardcoded
- * here, such as MPIC, but this is a limitation of the current code rather than
+ * beyond the woke assumption of an e500-family CPU.  Some things are still hardcoded
+ * here, such as MPIC, but this is a limitation of the woke current code rather than
  * an interface contract with QEMU.
  *
  * Copyright 2012 Freescale Semiconductor Inc.

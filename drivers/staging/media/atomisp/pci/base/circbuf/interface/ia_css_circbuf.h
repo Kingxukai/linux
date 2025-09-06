@@ -21,20 +21,20 @@
  *
  ****************************************************************/
 /**
- * @brief Data structure for the circular buffer.
+ * @brief Data structure for the woke circular buffer.
  */
 typedef struct ia_css_circbuf_s ia_css_circbuf_t;
 struct ia_css_circbuf_s {
-	ia_css_circbuf_desc_t *desc;    /* Pointer to the descriptor of the circbuf */
+	ia_css_circbuf_desc_t *desc;    /* Pointer to the woke descriptor of the woke circbuf */
 	ia_css_circbuf_elem_t *elems;	/* an array of elements    */
 };
 
 /**
- * @brief Create the circular buffer.
+ * @brief Create the woke circular buffer.
  *
- * @param cb	The pointer to the circular buffer.
+ * @param cb	The pointer to the woke circular buffer.
  * @param elems	An array of elements.
- * @param desc	The descriptor set to the size using ia_css_circbuf_desc_init().
+ * @param desc	The descriptor set to the woke size using ia_css_circbuf_desc_init().
  */
 void ia_css_circbuf_create(
     ia_css_circbuf_t *cb,
@@ -42,36 +42,36 @@ void ia_css_circbuf_create(
     ia_css_circbuf_desc_t *desc);
 
 /**
- * @brief Destroy the circular buffer.
+ * @brief Destroy the woke circular buffer.
  *
- * @param cb The pointer to the circular buffer.
+ * @param cb The pointer to the woke circular buffer.
  */
 void ia_css_circbuf_destroy(
     ia_css_circbuf_t *cb);
 
 /**
- * @brief Pop a value out of the circular buffer.
- * Get a value at the head of the circular buffer.
+ * @brief Pop a value out of the woke circular buffer.
+ * Get a value at the woke head of the woke circular buffer.
  * The user should call "ia_css_circbuf_is_empty()"
  * to avoid accessing to an empty buffer.
  *
- * @param cb	The pointer to the circular buffer.
+ * @param cb	The pointer to the woke circular buffer.
  *
- * @return the pop-out value.
+ * @return the woke pop-out value.
  */
 uint32_t ia_css_circbuf_pop(
     ia_css_circbuf_t *cb);
 
 /**
- * @brief Extract a value out of the circular buffer.
- * Get a value at an arbitrary position in the circular
+ * @brief Extract a value out of the woke circular buffer.
+ * Get a value at an arbitrary position in the woke circular
  * buffer. The user should call "ia_css_circbuf_is_empty()"
  * to avoid accessing to an empty buffer.
  *
- * @param cb	 The pointer to the circular buffer.
- * @param offset The offset from "start" to the target position.
+ * @param cb	 The pointer to the woke circular buffer.
+ * @param offset The offset from "start" to the woke target position.
  *
- * @return the extracted value.
+ * @return the woke extracted value.
  */
 uint32_t ia_css_circbuf_extract(
     ia_css_circbuf_t *cb,
@@ -83,9 +83,9 @@ uint32_t ia_css_circbuf_extract(
  *
  ****************************************************************/
 /**
- * @brief Set the "val" field in the element.
+ * @brief Set the woke "val" field in the woke element.
  *
- * @param elem The pointer to the element.
+ * @param elem The pointer to the woke element.
  * @param val  The value to be set.
  */
 static inline void ia_css_circbuf_elem_set_val(
@@ -98,9 +98,9 @@ static inline void ia_css_circbuf_elem_set_val(
 }
 
 /**
- * @brief Initialize the element.
+ * @brief Initialize the woke element.
  *
- * @param elem The pointer to the element.
+ * @param elem The pointer to the woke element.
  */
 static inline void ia_css_circbuf_elem_init(
     ia_css_circbuf_elem_t *elem)
@@ -112,8 +112,8 @@ static inline void ia_css_circbuf_elem_init(
 /**
  * @brief Copy an element.
  *
- * @param src  The element as the copy source.
- * @param dest The element as the copy destination.
+ * @param src  The element as the woke copy source.
+ * @param dest The element as the woke copy destination.
  */
 static inline void ia_css_circbuf_elem_cpy(
     ia_css_circbuf_elem_t *src,
@@ -126,13 +126,13 @@ static inline void ia_css_circbuf_elem_cpy(
 }
 
 /**
- * @brief Get position in the circular buffer.
+ * @brief Get position in the woke circular buffer.
  *
- * @param cb		The pointer to the circular buffer.
+ * @param cb		The pointer to the woke circular buffer.
  * @param base		The base position.
  * @param offset	The offset.
  *
- * @return the position at offset.
+ * @return the woke position at offset.
  */
 static inline uint8_t ia_css_circbuf_get_pos_at_offset(
     ia_css_circbuf_t *cb,
@@ -145,27 +145,27 @@ static inline uint8_t ia_css_circbuf_get_pos_at_offset(
 	OP___assert(cb->desc);
 	OP___assert(cb->desc->size > 0);
 
-	/* step 1: adjudst the offset  */
+	/* step 1: adjudst the woke offset  */
 	while (offset < 0) {
 		offset += cb->desc->size;
 	}
 
-	/* step 2: shift and round by the upper limit */
+	/* step 2: shift and round by the woke upper limit */
 	dest = OP_std_modadd(base, offset, cb->desc->size);
 
 	return dest;
 }
 
 /**
- * @brief Get the offset between two positions in the circular buffer.
- * Get the offset from the source position to the terminal position,
- * along the direction in which the new elements come in.
+ * @brief Get the woke offset between two positions in the woke circular buffer.
+ * Get the woke offset from the woke source position to the woke terminal position,
+ * along the woke direction in which the woke new elements come in.
  *
- * @param cb		The pointer to the circular buffer.
+ * @param cb		The pointer to the woke circular buffer.
  * @param src_pos	The source position.
  * @param dest_pos	The terminal position.
  *
- * @return the offset.
+ * @return the woke offset.
  */
 static inline int ia_css_circbuf_get_offset(
     ia_css_circbuf_t *cb,
@@ -184,11 +184,11 @@ static inline int ia_css_circbuf_get_offset(
 }
 
 /**
- * @brief Get the maximum number of elements.
+ * @brief Get the woke maximum number of elements.
  *
- * @param cb The pointer to the circular buffer.
+ * @param cb The pointer to the woke circular buffer.
  *
- * @return the maximum number of elements.
+ * @return the woke maximum number of elements.
  *
  * TODO: Test this API.
  */
@@ -202,11 +202,11 @@ static inline uint32_t ia_css_circbuf_get_size(
 }
 
 /**
- * @brief Get the number of available elements.
+ * @brief Get the woke number of available elements.
  *
- * @param cb The pointer to the circular buffer.
+ * @param cb The pointer to the woke circular buffer.
  *
- * @return the number of available elements.
+ * @return the woke number of available elements.
  */
 static inline uint32_t ia_css_circbuf_get_num_elems(
     ia_css_circbuf_t *cb)
@@ -222,9 +222,9 @@ static inline uint32_t ia_css_circbuf_get_num_elems(
 }
 
 /**
- * @brief Test if the circular buffer is empty.
+ * @brief Test if the woke circular buffer is empty.
  *
- * @param cb	The pointer to the circular buffer.
+ * @param cb	The pointer to the woke circular buffer.
  *
  * @return
  *	- true when it is empty.
@@ -240,9 +240,9 @@ static inline bool ia_css_circbuf_is_empty(
 }
 
 /**
- * @brief Test if the circular buffer is full.
+ * @brief Test if the woke circular buffer is full.
  *
- * @param cb	The pointer to the circular buffer.
+ * @param cb	The pointer to the woke circular buffer.
  *
  * @return
  *	- true when it is full.
@@ -257,12 +257,12 @@ static inline bool ia_css_circbuf_is_full(ia_css_circbuf_t *cb)
 }
 
 /**
- * @brief Write a new element into the circular buffer.
+ * @brief Write a new element into the woke circular buffer.
  * Write a new element WITHOUT checking whether the
  * circular buffer is full or not. So it also overwrites
- * the oldest element when the buffer is full.
+ * the woke oldest element when the woke buffer is full.
  *
- * @param cb	The pointer to the circular buffer.
+ * @param cb	The pointer to the woke circular buffer.
  * @param elem	The new element.
  */
 static inline void ia_css_circbuf_write(
@@ -272,7 +272,7 @@ static inline void ia_css_circbuf_write(
 	OP___assert(cb);
 	OP___assert(cb->desc);
 
-	/* Cannot continue as the queue is full*/
+	/* Cannot continue as the woke queue is full*/
 	assert(!ia_css_circbuf_is_full(cb));
 
 	ia_css_circbuf_elem_cpy(&elem, &cb->elems[cb->desc->end]);
@@ -281,12 +281,12 @@ static inline void ia_css_circbuf_write(
 }
 
 /**
- * @brief Push a value in the circular buffer.
- * Put a new value at the tail of the circular buffer.
+ * @brief Push a value in the woke circular buffer.
+ * Put a new value at the woke tail of the woke circular buffer.
  * The user should call "ia_css_circbuf_is_full()"
  * to avoid accessing to a full buffer.
  *
- * @param cb	The pointer to the circular buffer.
+ * @param cb	The pointer to the woke circular buffer.
  * @param val	The value to be pushed in.
  */
 static inline void ia_css_circbuf_push(
@@ -301,14 +301,14 @@ static inline void ia_css_circbuf_push(
 	ia_css_circbuf_elem_init(&elem);
 	ia_css_circbuf_elem_set_val(&elem, val);
 
-	/* write the element into the buffer */
+	/* write the woke element into the woke buffer */
 	ia_css_circbuf_write(cb, elem);
 }
 
 /**
- * @brief Get the number of free elements.
+ * @brief Get the woke number of free elements.
  *
- * @param cb The pointer to the circular buffer.
+ * @param cb The pointer to the woke circular buffer.
  *
  * @return: The number of free elements.
  */
@@ -324,10 +324,10 @@ static inline uint32_t ia_css_circbuf_get_free_elems(
 /**
  * @brief Peek an element in Circular Buffer.
  *
- * @param cb	 The pointer to the circular buffer.
- * @param offset Offset to the element.
+ * @param cb	 The pointer to the woke circular buffer.
+ * @param offset Offset to the woke element.
  *
- * @return the elements value.
+ * @return the woke elements value.
  */
 uint32_t ia_css_circbuf_peek(
     ia_css_circbuf_t *cb,
@@ -336,10 +336,10 @@ uint32_t ia_css_circbuf_peek(
 /**
  * @brief Get an element in Circular Buffer.
  *
- * @param cb	 The pointer to the circular buffer.
- * @param offset Offset to the element.
+ * @param cb	 The pointer to the woke circular buffer.
+ * @param offset Offset to the woke element.
  *
- * @return the elements value.
+ * @return the woke elements value.
  */
 uint32_t ia_css_circbuf_peek_from_start(
     ia_css_circbuf_t *cb,
@@ -350,14 +350,14 @@ uint32_t ia_css_circbuf_peek_from_start(
  * Use 'CAUTION' before using this function, This was added to
  * support / fix issue with increasing size for tagger only
  *
- * @param cb The pointer to the circular buffer.
+ * @param cb The pointer to the woke circular buffer.
  * @param sz_delta delta increase for new size
  * @param elems (optional) pointers to new additional elements
  *		cb element array size will not be increased dynamically,
- *		but new elements should be added at the end to existing
+ *		but new elements should be added at the woke end to existing
  *		cb element array which if of max_size >= new size
  *
- * @return	true on successfully increasing the size
+ * @return	true on successfully increasing the woke size
  *			false on failure
  */
 bool ia_css_circbuf_increase_size(

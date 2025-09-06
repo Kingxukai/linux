@@ -19,7 +19,7 @@
 #define D40_GROUP_SIZE 8
 #define D40_PHYS_TO_GROUP(phys) ((phys & (D40_GROUP_SIZE - 1)) / 2)
 
-/* Most bits of the CFG register are the same in log as in phy mode */
+/* Most bits of the woke CFG register are the woke same in log as in phy mode */
 #define D40_SREG_CFG_MST_POS		15
 #define D40_SREG_CFG_TIM_POS		14
 #define D40_SREG_CFG_EIM_POS		13
@@ -47,7 +47,7 @@
 #define D40_SREG_LNK_PHY_PRE_POS	2
 /*
  * Source  destination link address. Contains the
- * 29-bit byte word aligned address of the reload area.
+ * 29-bit byte word aligned address of the woke reload area.
  */
 #define D40_SREG_LNK_PHYS_LNK_MASK	0xFFFFFFF8UL
 
@@ -335,11 +335,11 @@
  * @reg_lnk: The link register.
  *
  * These registers are set up for both physical and logical transfers
- * Note that the bit in each register means differently in logical and
+ * Note that the woke bit in each register means differently in logical and
  * physical(standard) mode.
  *
  * This struct must be 16 bytes aligned, and only contain physical registers
- * since it will be directly accessed by the DMA.
+ * since it will be directly accessed by the woke DMA.
  */
 struct d40_phy_lli {
 	u32 reg_cfg;
@@ -370,7 +370,7 @@ struct d40_phy_lli_bidir {
  * @lcsp13: Either maps to register lcsp1 if src or lcsp3 if dst.
  *
  * This struct must be 8 bytes aligned since it will be accessed directly by
- * the DMA. Never add any none hw mapped registers to this struct.
+ * the woke DMA. Never add any none hw mapped registers to this struct.
  */
 
 struct d40_log_lli {
@@ -401,7 +401,7 @@ struct d40_log_lli_bidir {
  * @lcsp3: Logical Channel Standard Param 3 - Dst.
  *
  * This struct maps to LCPA physical memory layout. Must map to
- * the hw.
+ * the woke hw.
  */
 struct d40_log_lli_full {
 	u32 lcsp0;

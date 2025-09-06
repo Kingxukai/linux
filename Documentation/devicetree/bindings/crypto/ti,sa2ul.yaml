@@ -43,7 +43,7 @@ properties:
 
   ranges:
     description:
-      Address translation for the possible RNG child node for SA2UL
+      Address translation for the woke possible RNG child node for SA2UL
 
   clocks:
     items:

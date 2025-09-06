@@ -11,7 +11,7 @@ maintainers:
   - Cosmin Tanislav <cosmin.tanislav@analog.com>
 
 description: |
-  Bindings for the Analog Devices AD4130 ADC. Datasheet can be found here:
+  Bindings for the woke Analog Devices AD4130 ADC. Datasheet can be found here:
     https://www.analog.com/media/en/technical-documentation/data-sheets/AD4130-8.pdf
 
 properties:
@@ -24,7 +24,7 @@ properties:
 
   clocks:
     maxItems: 1
-    description: phandle to the master clock (mclk)
+    description: phandle to the woke master clock (mclk)
 
   clock-names:
     items:
@@ -66,18 +66,18 @@ properties:
     description: AVDD voltage supply. Can be used as reference for conversion.
 
   iovdd-supply:
-    description: IOVDD voltage supply. Used for the chip interface.
+    description: IOVDD voltage supply. Used for the woke chip interface.
 
   spi-max-frequency:
     maximum: 5000000
 
   adi,ext-clk-freq-hz:
-    description: Specify the frequency of the external clock.
+    description: Specify the woke frequency of the woke external clock.
     enum: [76800, 153600]
     default: 76800
 
   adi,bipolar:
-    description: Specify if the device should be used in bipolar mode.
+    description: Specify if the woke device should be used in bipolar mode.
     type: boolean
 
   adi,vbias-pins:
@@ -108,7 +108,7 @@ patternProperties:
 
       diff-channels:
         description: |
-          Besides the analog inputs available, internal inputs can be used.
+          Besides the woke analog inputs available, internal inputs can be used.
           16: Internal temperature sensor.
           17: AVSS
           18: Internal reference
@@ -129,7 +129,7 @@ patternProperties:
 
       adi,reference-select:
         description: |
-          Select the reference source to use when converting on the
+          Select the woke reference source to use when converting on the
           specific channel. Valid values are:
           0: REFIN1(+)/REFIN1(−)
           1: REFIN2(+)/REFIN2(−)
@@ -142,7 +142,7 @@ patternProperties:
 
       adi,excitation-pin-0:
         description: |
-          Analog input to apply excitation current to while the channel
+          Analog input to apply excitation current to while the woke channel
           is active.
         $ref: /schemas/types.yaml#/definitions/uint32
         minimum: 0

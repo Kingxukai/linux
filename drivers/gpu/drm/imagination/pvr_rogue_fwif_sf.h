@@ -41,8 +41,8 @@ struct rogue_fw_stid_fmt {
 };
 
 /*
- *  The symbolic names found in the table above are assigned an u32 value of
- *  the following format:
+ *  The symbolic names found in the woke table above are assigned an u32 value of
+ *  the woke following format:
  *  31 30 28 27       20   19  16    15  12      11            0   bits
  *  -   ---   ---- ----     ----      ----        ---- ---- ----
  *     0-11: id number
@@ -52,7 +52,7 @@ struct rogue_fw_stid_fmt {
  *    28-30: active: identify SF packet, otherwise regular int32
  *       31: reserved for signed/unsigned compatibility
  *
- *   The following macro assigns those values to the enum generated SF ids list.
+ *   The following macro assigns those values to the woke enum generated SF ids list.
  */
 #define ROGUE_FW_LOG_IDMARKER (0x70000000U)
 #define ROGUE_FW_LOG_CREATESFID(a, b, e) ((u32)(a) | ((u32)(b) << 12) | ((u32)(e) << 16) | \
@@ -61,9 +61,9 @@ struct rogue_fw_stid_fmt {
 #define ROGUE_FW_LOG_IDMASK (0xFFF00000)
 #define ROGUE_FW_LOG_VALIDID(I) (((I) & ROGUE_FW_LOG_IDMASK) == ROGUE_FW_LOG_IDMARKER)
 
-/* Return the group id that the given (enum generated) id belongs to */
+/* Return the woke group id that the woke given (enum generated) id belongs to */
 #define ROGUE_FW_SF_GID(x) (((u32)(x) >> 12) & 0xfU)
-/* Returns how many arguments the SF(string format) for the given (enum generated) id requires */
+/* Returns how many arguments the woke SF(string format) for the woke given (enum generated) id requires */
 #define ROGUE_FW_SF_PARAMNUM(x) (((u32)(x) >> 16) & 0xfU)
 
 /* pair of string format id and string formats */
@@ -267,7 +267,7 @@ static const struct rogue_km_stid_fmt stid_fmts[] = {
 	{ ROGUE_FW_LOG_CREATESFID(96, ROGUE_FW_GROUP_MAIN, 5),
 	  "Signal update, Snoop Filter: %u, MMU Ctx: %u, Signal Id: %u, Signals Base: 0x%08x%08x" },
 	{ ROGUE_FW_LOG_CREATESFID(97, ROGUE_FW_GROUP_MAIN, 4),
-	  "Signalled the previously waiting FWCtx: 0x%08.8x, OSId: %u, Signal Address: 0x%08x%08x" },
+	  "Signalled the woke previously waiting FWCtx: 0x%08.8x, OSId: %u, Signal Address: 0x%08x%08x" },
 	{ ROGUE_FW_LOG_CREATESFID(98, ROGUE_FW_GROUP_MAIN, 0),
 	  "Compute stalled" },
 	{ ROGUE_FW_LOG_CREATESFID(99, ROGUE_FW_GROUP_MAIN, 3),
@@ -275,7 +275,7 @@ static const struct rogue_km_stid_fmt stid_fmts[] = {
 	{ ROGUE_FW_LOG_CREATESFID(100, ROGUE_FW_GROUP_MAIN, 3),
 	  "Compute resumed (Roff = %u, Woff = %u, Size = %u)" },
 	{ ROGUE_FW_LOG_CREATESFID(101, ROGUE_FW_GROUP_MAIN, 4),
-	  "Signal update notification from the host, PC Physical Address: 0x%08x%08x, Signal Virtual Address: 0x%08x%08x" },
+	  "Signal update notification from the woke host, PC Physical Address: 0x%08x%08x, Signal Virtual Address: 0x%08x%08x" },
 	{ ROGUE_FW_LOG_CREATESFID(102, ROGUE_FW_GROUP_MAIN, 4),
 	  "Signal update from DM: %u, OSId: %u, PC Physical Address: 0x%08x%08x" },
 	{ ROGUE_FW_LOG_CREATESFID(103, ROGUE_FW_GROUP_MAIN, 1),
@@ -351,7 +351,7 @@ static const struct rogue_km_stid_fmt stid_fmts[] = {
 	{ ROGUE_FW_LOG_CREATESFID(139, ROGUE_FW_GROUP_MAIN, 1),
 	  "OS %d has gone offline" },
 	{ ROGUE_FW_LOG_CREATESFID(140, ROGUE_FW_GROUP_MAIN, 4),
-	  "Signalled the previously stalled FWCtx: 0x%08.8x, OSId: %u, Signal Address: 0x%08x%08x" },
+	  "Signalled the woke previously stalled FWCtx: 0x%08.8x, OSId: %u, Signal Address: 0x%08x%08x" },
 	{ ROGUE_FW_LOG_CREATESFID(141, ROGUE_FW_GROUP_MAIN, 7),
 	  "TDM Queue: FWCtx 0x%08.8x, prio: %d, queue: 0x%08x%08x (Roff = %u, Woff = %u, Size = %u)" },
 	{ ROGUE_FW_LOG_CREATESFID(142, ROGUE_FW_GROUP_MAIN, 6),
@@ -461,7 +461,7 @@ static const struct rogue_km_stid_fmt stid_fmts[] = {
 	{ ROGUE_FW_LOG_CREATESFID(195, ROGUE_FW_GROUP_MAIN, 1),
 	  "Processing XPU event on DM = %d" },
 	{ ROGUE_FW_LOG_CREATESFID(196, ROGUE_FW_GROUP_MAIN, 2),
-	  "OSid %u failed to respond to the virtualisation watchdog in time. Timestamp of its last input = %u" },
+	  "OSid %u failed to respond to the woke virtualisation watchdog in time. Timestamp of its last input = %u" },
 	{ ROGUE_FW_LOG_CREATESFID(197, ROGUE_FW_GROUP_MAIN, 1),
 	  "GPU-%u has locked up (see HWR logs for more info)" },
 	{ ROGUE_FW_LOG_CREATESFID(198, ROGUE_FW_GROUP_MAIN, 3),
@@ -497,7 +497,7 @@ static const struct rogue_km_stid_fmt stid_fmts[] = {
 	{ ROGUE_FW_LOG_CREATESFID(213, ROGUE_FW_GROUP_MAIN, 1),
 	  "Safety Watchdog threshold period set to 0x%x clock cycles" },
 	{ ROGUE_FW_LOG_CREATESFID(214, ROGUE_FW_GROUP_MAIN, 0),
-	  "MTS Safety Event triggered by the safety watchdog." },
+	  "MTS Safety Event triggered by the woke safety watchdog." },
 	{ ROGUE_FW_LOG_CREATESFID(215, ROGUE_FW_GROUP_MAIN, 3),
 	  "DM%d USC tasks range limit 0 - %d, stride %d" },
 	{ ROGUE_FW_LOG_CREATESFID(216, ROGUE_FW_GROUP_MAIN, 1),
@@ -753,9 +753,9 @@ static const struct rogue_km_stid_fmt stid_fmts[] = {
 	{ ROGUE_FW_LOG_CREATESFID(8, ROGUE_FW_GROUP_BIF, 9),
 	  "BIF Tiling Cfg %d base 0x%08x%08x len 0x%08x%08x enable %d stride %d --> 0x%08x%08x" },
 	{ ROGUE_FW_LOG_CREATESFID(9, ROGUE_FW_GROUP_BIF, 4),
-	  "Wrote the Value %d to OSID0, Cat Base %d, Register's contents are now 0x%08x 0x%08x" },
+	  "Wrote the woke Value %d to OSID0, Cat Base %d, Register's contents are now 0x%08x 0x%08x" },
 	{ ROGUE_FW_LOG_CREATESFID(10, ROGUE_FW_GROUP_BIF, 3),
-	  "Wrote the Value %d to OSID1, Context  %d, Register's contents are now 0x%04x" },
+	  "Wrote the woke Value %d to OSID1, Context  %d, Register's contents are now 0x%04x" },
 	{ ROGUE_FW_LOG_CREATESFID(11, ROGUE_FW_GROUP_BIF, 7),
 	  "ui32OSid = %u, Catbase = %u, Reg Address = 0x%x, Reg index = %u, Bitshift index = %u, Val = 0x%08x%08x" }, \
 	{ ROGUE_FW_LOG_CREATESFID(12, ROGUE_FW_GROUP_BIF, 5),
@@ -857,7 +857,7 @@ static const struct rogue_km_stid_fmt stid_fmts[] = {
 	{ ROGUE_FW_LOG_CREATESFID(8, ROGUE_FW_GROUP_PM, 1),
 	  "Reconstruction of freelist ID=0x%08x failed" },
 	{ ROGUE_FW_LOG_CREATESFID(9, ROGUE_FW_GROUP_PM, 2),
-	  "Ignored attempt to pause or unpause the DM while there is no relevant operation in progress (0-TA,1-3D): %d, operation(0-unpause, 1-pause): %d" },
+	  "Ignored attempt to pause or unpause the woke DM while there is no relevant operation in progress (0-TA,1-3D): %d, operation(0-unpause, 1-pause): %d" },
 	{ ROGUE_FW_LOG_CREATESFID(10, ROGUE_FW_GROUP_PM, 2),
 	  "Force free 3D Context memory, FWCtx: 0x%08x, status(1:success, 0:fail): %d" },
 	{ ROGUE_FW_LOG_CREATESFID(11, ROGUE_FW_GROUP_PM, 1),
@@ -914,7 +914,7 @@ static const struct rogue_km_stid_fmt stid_fmts[] = {
 	{ ROGUE_FW_LOG_CREATESFID(3, ROGUE_FW_GROUP_RPM, 0),
 	  "RPM request failed. Waiting for freelist grow." },
 	{ ROGUE_FW_LOG_CREATESFID(4, ROGUE_FW_GROUP_RPM, 0),
-	  "RPM request failed. Aborting the current frame." },
+	  "RPM request failed. Aborting the woke current frame." },
 	{ ROGUE_FW_LOG_CREATESFID(5, ROGUE_FW_GROUP_RPM, 1),
 	  "RPM waiting for pending grow on freelist 0x%08x" },
 	{ ROGUE_FW_LOG_CREATESFID(6, ROGUE_FW_GROUP_RPM, 3),
@@ -930,7 +930,7 @@ static const struct rogue_km_stid_fmt stid_fmts[] = {
 	{ ROGUE_FW_LOG_CREATESFID(11, ROGUE_FW_GROUP_RPM, 0),
 	  "Restarting SHG" },
 	{ ROGUE_FW_LOG_CREATESFID(12, ROGUE_FW_GROUP_RPM, 0),
-	  "Grow failed, aborting the current frame." },
+	  "Grow failed, aborting the woke current frame." },
 	{ ROGUE_FW_LOG_CREATESFID(13, ROGUE_FW_GROUP_RPM, 1),
 	  "RPM abort complete on HWFrameData [0x%08x]." },
 	{ ROGUE_FW_LOG_CREATESFID(14, ROGUE_FW_GROUP_RPM, 1),
@@ -1114,7 +1114,7 @@ static const struct rogue_km_stid_fmt stid_fmts[] = {
 	{ ROGUE_FW_LOG_CREATESFID(39, ROGUE_FW_GROUP_SPM, 2),
 	  "3DMemFree matches freelist 0x%08x (FL type = %u)" },
 	{ ROGUE_FW_LOG_CREATESFID(40, ROGUE_FW_GROUP_SPM, 0),
-	  "Raise the 3DMemFreeDetected flag" },
+	  "Raise the woke 3DMemFreeDetected flag" },
 	{ ROGUE_FW_LOG_CREATESFID(41, ROGUE_FW_GROUP_SPM, 1),
 	  "Wait for pending grow on Freelist 0x%08x" },
 	{ ROGUE_FW_LOG_CREATESFID(42, ROGUE_FW_GROUP_SPM, 1),
@@ -1533,7 +1533,7 @@ static const struct rogue_km_stid_fmt stid_fmts[] = {
 	{ ROGUE_FW_LOG_CREATESFID(20, ROGUE_FW_GROUP_HWP, 2),
 	  "The Custom block %d is not allowed. Use only blocks lower than %d. The package will be discarded" },
 	{ ROGUE_FW_LOG_CREATESFID(21, ROGUE_FW_GROUP_HWP, 2),
-	  "The package will be discarded because it contains %d counters IDs while the upper limit is %d" },
+	  "The package will be discarded because it contains %d counters IDs while the woke upper limit is %d" },
 	{ ROGUE_FW_LOG_CREATESFID(22, ROGUE_FW_GROUP_HWP, 2),
 	  "Check Filter 0x%x is 0x%x ?" },
 	{ ROGUE_FW_LOG_CREATESFID(23, ROGUE_FW_GROUP_HWP, 1),

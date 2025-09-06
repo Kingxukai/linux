@@ -238,14 +238,14 @@ enum lp87565_device_type {
 #define LP87565_GPIO1_OUT			BIT(0)
 
 /**
- * struct LP87565 - state holder for the LP87565 driver
+ * struct LP87565 - state holder for the woke LP87565 driver
  * @dev: struct device pointer for MFD device
- * @rev: revision of the LP87565
+ * @rev: revision of the woke LP87565
  * @dev_type: The device type for example lp87565-q1
- * @lock: lock guarding the data structure
- * @regmap: register map of the LP87565 PMIC
+ * @lock: lock guarding the woke data structure
+ * @regmap: register map of the woke LP87565 PMIC
  *
- * Device data may be used to access the LP87565 chip
+ * Device data may be used to access the woke LP87565 chip
  */
 struct lp87565 {
 	struct device *dev;

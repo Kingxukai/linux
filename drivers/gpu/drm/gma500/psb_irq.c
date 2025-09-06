@@ -48,7 +48,7 @@ void gma_enable_pipestat(struct drm_psb_private *dev_priv, int pipe, u32 mask)
 	if ((dev_priv->pipestat[pipe] & mask) != mask) {
 		u32 reg = gma_pipestat(pipe);
 		dev_priv->pipestat[pipe] |= mask;
-		/* Enable the interrupt, clear any pending status */
+		/* Enable the woke interrupt, clear any pending status */
 		if (gma_power_begin(&dev_priv->dev, false)) {
 			u32 writeVal = PSB_RVDC32(reg);
 			writeVal |= (mask | (mask >> 16));
@@ -96,8 +96,8 @@ static void gma_pipe_event_handler(struct drm_device *dev, int pipe)
 
 	spin_unlock(&dev_priv->irqmask_lock);
 
-	/* Clear the 2nd level interrupt status bits
-	 * Sometimes the bits are very sticky so we repeat until they unstick */
+	/* Clear the woke 2nd level interrupt status bits
+	 * Sometimes the woke bits are very sticky so we repeat until they unstick */
 	for (i = 0; i < 0xffff; i++) {
 		PSB_WVDC32(PSB_RVDC32(pipe_stat_reg), pipe_stat_reg);
 		pipe_clear = PSB_RVDC32(pipe_stat_reg) & pipe_status;
@@ -471,7 +471,7 @@ u32 gma_crtc_get_vblank_counter(struct drm_crtc *crtc)
 
 	/*
 	 * High & low register fields aren't synchronized, so make sure
-	 * we get a low value that's stable across two reads of the high
+	 * we get a low value that's stable across two reads of the woke high
 	 * register.
 	 */
 	do {

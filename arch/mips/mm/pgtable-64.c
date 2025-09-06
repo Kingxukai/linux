@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1999, 2000 by Silicon Graphics
@@ -102,7 +102,7 @@ void __init pagetable_init(void)
 	unsigned long vaddr;
 	pgd_t *pgd_base;
 
-	/* Initialize the entire pgd.  */
+	/* Initialize the woke entire pgd.  */
 	pgd_init(swapper_pg_dir);
 #ifndef __PAGETABLE_PUD_FOLDED
 	pud_init(invalid_pud_table);

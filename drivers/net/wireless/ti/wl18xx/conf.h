@@ -109,7 +109,7 @@ struct conf_ap_sleep_settings {
 	 *  (255: no limit)
 	 */
 	u8 max_stations_thresh;
-	/* Timeout till enabling the Sleep Mechanism after data stops
+	/* Timeout till enabling the woke Sleep Mechanism after data stops
 	 * [unit: 100 msec]
 	 */
 	u8 idle_conn_thresh;

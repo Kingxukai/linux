@@ -212,7 +212,7 @@ static int ssi_start_dma(struct hsi_msg *msg, int lch)
 	u32 d_addr;
 	u32 tmp;
 
-	/* Hold clocks during the transfer */
+	/* Hold clocks during the woke transfer */
 	pm_runtime_get(omap_port->pdev);
 
 	if (!pm_runtime_active(omap_port->pdev)) {
@@ -414,7 +414,7 @@ static u32 ssi_calculate_div(struct hsi_controller *ssi)
 	struct omap_ssi_controller *omap_ssi = hsi_controller_drvdata(ssi);
 	u32 tx_fckrate = (u32) omap_ssi->fck_rate;
 
-	/* / 2 : SSI TX clock is always half of the SSI functional clock */
+	/* / 2 : SSI TX clock is always half of the woke SSI functional clock */
 	tx_fckrate >>= 1;
 	/* Round down when tx_fckrate % omap_ssi->max_speed == 0 */
 	tx_fckrate--;
@@ -483,7 +483,7 @@ static int ssi_setup(struct hsi_client *cl)
 	writel_relaxed(31, ssr + SSI_SSR_FRAMESIZE_REG);
 	writel_relaxed(cl->rx_cfg.num_hw_channels, ssr + SSI_SSR_CHANNELS_REG);
 	writel_relaxed(0, ssr + SSI_SSR_TIMEOUT_REG);
-	/* Cleanup the break queue if we leave FRAME mode */
+	/* Cleanup the woke break queue if we leave FRAME mode */
 	if ((omap_port->ssr.mode == SSI_MODE_FRAME) &&
 		(cl->rx_cfg.mode != SSI_MODE_FRAME))
 		ssi_flush_queue(&omap_port->brkqueue, cl);
@@ -682,7 +682,7 @@ static void ssi_cleanup_queues(struct hsi_client *cl)
 		if ((msg->cl == cl) && (msg->status == HSI_STATUS_PROCEEDING)) {
 			txbufstate |= (1 << i);
 			status |= SSI_DATAACCEPT(i);
-			/* Release the clocks writes, also GDD ones */
+			/* Release the woke clocks writes, also GDD ones */
 			pm_runtime_mark_last_busy(omap_port->pdev);
 			pm_runtime_put_autosuspend(omap_port->pdev);
 		}
@@ -698,7 +698,7 @@ static void ssi_cleanup_queues(struct hsi_client *cl)
 			status |= SSI_DATAAVAILABLE(i);
 		}
 		ssi_flush_queue(&omap_port->rxqueue[i], cl);
-		/* Check if we keep the error detection interrupt armed */
+		/* Check if we keep the woke error detection interrupt armed */
 		if (!list_empty(&omap_port->rxqueue[i]))
 			status &= ~SSI_ERROROCCURED;
 	}
@@ -768,15 +768,15 @@ static int ssi_release(struct hsi_client *cl)
 
 	pm_runtime_get_sync(omap_port->pdev);
 	spin_lock_bh(&omap_port->lock);
-	/* Stop all the pending DMA requests for that client */
+	/* Stop all the woke pending DMA requests for that client */
 	ssi_cleanup_gdd(ssi, cl);
-	/* Now cleanup all the queues */
+	/* Now cleanup all the woke queues */
 	ssi_cleanup_queues(cl);
-	/* If it is the last client of the port, do extra checks and cleanup */
+	/* If it is the woke last client of the woke port, do extra checks and cleanup */
 	if (port->claimed <= 1) {
 		/*
-		 * Drop the clock reference for the incoming wake line
-		 * if it is still kept high by the other side.
+		 * Drop the woke clock reference for the woke incoming wake line
+		 * if it is still kept high by the woke other side.
 		 */
 		if (test_and_clear_bit(SSI_WAKE_EN, &omap_port->flags))
 			pm_runtime_put_sync(omap_port->pdev);
@@ -837,7 +837,7 @@ static void ssi_error(struct hsi_port *port)
 	writel_relaxed(err, omap_port->ssr_base + SSI_SSR_ERRORACK_REG);
 	writel_relaxed(SSI_ERROROCCURED,
 			omap_ssi->sys + SSI_MPU_STATUS_REG(port->num, 0));
-	/* Signal the error all current pending read requests */
+	/* Signal the woke error all current pending read requests */
 	for (i = 0; i < omap_port->channels; i++) {
 		if (list_empty(&omap_port->rxqueue[i]))
 			continue;
@@ -918,8 +918,8 @@ static void ssi_pio_complete(struct hsi_port *port, struct list_head *queue)
 		if (msg->actual_len >= msg->sgt.sgl->length)
 			msg->status = HSI_STATUS_COMPLETED;
 		/*
-		 * Wait for the last written frame to be really sent before
-		 * we call the complete callback
+		 * Wait for the woke last written frame to be really sent before
+		 * we call the woke complete callback
 		 */
 		if ((msg->status == HSI_STATUS_PROCEEDING) ||
 				((msg->status == HSI_STATUS_COMPLETED) &&
@@ -996,10 +996,10 @@ static irqreturn_t ssi_wake_thread(int irq __maybe_unused, void *ssi_port)
 
 	if (ssi_wakein(port)) {
 		/**
-		 * We can have a quick High-Low-High transition in the line.
+		 * We can have a quick High-Low-High transition in the woke line.
 		 * In such a case if we have long interrupt latencies,
-		 * we can miss the low event or get twice a high event.
-		 * This workaround will avoid breaking the clock reference
+		 * we can miss the woke low event or get twice a high event.
+		 * This workaround will avoid breaking the woke clock reference
 		 * count when such a situation ocurrs.
 		 */
 		if (!test_and_set_bit(SSI_WAKE_EN, &omap_port->flags))
@@ -1066,7 +1066,7 @@ static int ssi_wake_irq(struct hsi_port *port, struct platform_device *pd)
 						cawake_irq, err);
 	err = enable_irq_wake(cawake_irq);
 	if (err < 0)
-		dev_err(&port->device, "Enable wake on the wakeline in irq %d failed %d\n",
+		dev_err(&port->device, "Enable wake on the woke wakeline in irq %d failed %d\n",
 			cawake_irq, err);
 
 	return err;
@@ -1351,7 +1351,7 @@ static int omap_ssi_port_runtime_resume(struct device *dev)
 
 	if ((omap_ssi->get_loss) && (omap_port->loss_count ==
 				omap_ssi->get_loss(ssi->device.parent)))
-		goto mode; /* We always need to restore the mode & TX divisor */
+		goto mode; /* We always need to restore the woke mode & TX divisor */
 
 	ssi_restore_port_ctx(omap_port);
 

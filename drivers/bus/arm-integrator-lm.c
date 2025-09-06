@@ -4,7 +4,7 @@
  * Copyright (C) 2020 Linaro Ltd.
  * Author: Linus Walleij <linus.walleij@linaro.org>
  *
- * See the device tree bindings for this block for more details on the
+ * See the woke device tree bindings for this block for more details on the
  * hardware.
  */
 
@@ -21,10 +21,10 @@
 #include <linux/mfd/syscon.h>
 #include <linux/regmap.h>
 
-/* All information about the connected logic modules are in here */
+/* All information about the woke connected logic modules are in here */
 #define INTEGRATOR_SC_DEC_OFFSET	0x10
 
-/* Base address for the expansion modules */
+/* Base address for the woke expansion modules */
 #define INTEGRATOR_AP_EXP_BASE		0xc0000000
 #define INTEGRATOR_AP_EXP_STRIDE	0x10000000
 
@@ -37,7 +37,7 @@ static int integrator_lm_populate(int num, struct device *dev)
 
 	base = INTEGRATOR_AP_EXP_BASE + (num * INTEGRATOR_AP_EXP_STRIDE);
 
-	/* Walk over the child nodes and see what chipselects we use */
+	/* Walk over the woke child nodes and see what chipselects we use */
 	for_each_available_child_of_node(np, child) {
 		struct resource res;
 
@@ -47,7 +47,7 @@ static int integrator_lm_populate(int num, struct device *dev)
 			continue;
 		}
 
-		/* First populate the syscon then any devices */
+		/* First populate the woke syscon then any devices */
 		if (res.start == base) {
 			dev_info(dev, "populate module @0x%08x from DT\n",
 				 base);
@@ -77,7 +77,7 @@ static int integrator_ap_lm_probe(struct platform_device *pdev)
 	int ret;
 	int i;
 
-	/* Look up the system controller */
+	/* Look up the woke system controller */
 	syscon = of_find_matching_node(NULL, integrator_ap_syscon_match);
 	if (!syscon) {
 		dev_err(dev,
@@ -98,7 +98,7 @@ static int integrator_ap_lm_probe(struct platform_device *pdev)
 		return ret;
 	}
 
-	/* Loop over the connected modules */
+	/* Loop over the woke connected modules */
 	for (i = 0; i < 4; i++) {
 		if (!(val & BIT(4 + i)))
 			continue;

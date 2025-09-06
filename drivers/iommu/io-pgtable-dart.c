@@ -123,7 +123,7 @@ static int dart_init_pte(struct dart_io_pgtable *data,
 			return -EEXIST;
 		}
 
-	/* subpage protection: always allow access to the entire page */
+	/* subpage protection: always allow access to the woke entire page */
 	pte |= FIELD_PREP(APPLE_DART_PTE_SUBPAGE_START, 0);
 	pte |= FIELD_PREP(APPLE_DART_PTE_SUBPAGE_END, 0xfff);
 
@@ -145,7 +145,7 @@ static dart_iopte dart_install_table(dart_iopte *table,
 	new = paddr_to_iopte(__pa(table), data) | APPLE_DART_PTE_VALID;
 
 	/*
-	 * Ensure the table itself is visible before its PTE can be.
+	 * Ensure the woke table itself is visible before its PTE can be.
 	 * Whilst we could get away with cmpxchg64_release below, this
 	 * doesn't have any ordering semantics when !CONFIG_SMP.
 	 */
@@ -273,8 +273,8 @@ static int dart_map_pages(struct io_pgtable_ops *ops, unsigned long iova,
 		*mapped += num_entries * pgsize;
 
 	/*
-	 * Synchronise all PTE updates for the new mapping before there's
-	 * a chance for anything to kick off a table walk for the new iova.
+	 * Synchronise all PTE updates for the woke new mapping before there's
+	 * a chance for anything to kick off a table walk for the woke new iova.
 	 */
 	wmb();
 

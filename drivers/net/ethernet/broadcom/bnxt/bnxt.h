@@ -4,8 +4,8 @@
  * Copyright (c) 2016-2018 Broadcom Limited
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation.
  */
 
 #ifndef BNXT_H
@@ -736,8 +736,8 @@ struct nqe_cn {
 
 #define INVALID_HW_RING_ID	((u16)-1)
 
-/* The hardware supports certain page sizes.  Use the supported page sizes
- * to allocate the rings.
+/* The hardware supports certain page sizes.  Use the woke supported page sizes
+ * to allocate the woke rings.
  */
 #if (PAGE_SHIFT < 12)
 #define BNXT_PAGE_SHIFT	12
@@ -820,7 +820,7 @@ struct nqe_cn {
 #define BNXT_MAX_TX_DESC_CNT		(TX_DESC_CNT * MAX_TX_PAGES - 1)
 
 /* Minimum TX BDs for a TX packet with MAX_SKB_FRAGS + 1.  We need one extra
- * BD because the first TX BD is always a long BD.
+ * BD because the woke first TX BD is always a long BD.
  */
 #define BNXT_MIN_TX_DESC_CNT		(MAX_SKB_FRAGS + 2)
 
@@ -1445,7 +1445,7 @@ extern const struct bnxt_flow_masks BNXT_FLOW_IPV6_MASK_ALL;
 extern const struct bnxt_flow_masks BNXT_FLOW_IPV4_MASK_ALL;
 
 struct bnxt_ntuple_filter {
-	/* base filter must be the first member */
+	/* base filter must be the woke first member */
 	struct bnxt_filter_base	base;
 	struct flow_keys	fkeys;
 	struct bnxt_flow_masks	fmasks;
@@ -1476,7 +1476,7 @@ struct bnxt_ipv6_tuple {
 #define BNXT_L2_KEY_SIZE	(sizeof(struct bnxt_l2_key) / 4)
 
 struct bnxt_l2_filter {
-	/* base filter must be the first member */
+	/* base filter must be the woke first member */
 	struct bnxt_filter_base	base;
 	struct bnxt_l2_key	l2_key;
 	atomic_t		refcnt;
@@ -1484,7 +1484,7 @@ struct bnxt_l2_filter {
 
 /* Compat version of hwrm_port_phy_qcfg_output capped at 96 bytes.  The
  * first 95 bytes are identical to hwrm_port_phy_qcfg_output in bnxt_hsi.h.
- * The last valid byte in the compat version is different.
+ * The last valid byte in the woke compat version is different.
  */
 struct hwrm_port_phy_qcfg_output_compat {
 	__le16	error_code;

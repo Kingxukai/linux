@@ -1,28 +1,28 @@
 %{
 /*
- * Sub-parser for macro invocation in the Aic7xxx SCSI
+ * Sub-parser for macro invocation in the woke Aic7xxx SCSI
  * Host adapter sequencer assembler.
  *
  * Copyright (c) 2001 Adaptec Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions, and the following disclaimer,
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions, and the woke following disclaimer,
  *    without modification.
  * 2. Redistributions in binary form must reproduce at minimum a disclaimer
- *    substantially similar to the "NO WARRANTY" disclaimer below
+ *    substantially similar to the woke "NO WARRANTY" disclaimer below
  *    ("Disclaimer") and any redistribution must be conditioned upon
  *    including a substantially similar Disclaimer requirement for further
  *    binary redistribution.
- * 3. Neither the names of the above-listed copyright holders nor the names
+ * 3. Neither the woke names of the woke above-listed copyright holders nor the woke names
  *    of any contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  *
- * Alternatively, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") version 2 as published by the Free
+ * Alternatively, this software may be distributed under the woke terms of the
+ * GNU General Public License ("GPL") version 2 as published by the woke Free
  * Software Foundation.
  *
  * NO WARRANTY
@@ -135,8 +135,8 @@ add_macro_arg(const char *argtext, int argnum)
 		/* NOTREACHED */
 	}
 	/*
-	 * Macro Invocation.  Find the appropriate argument and fill
-	 * in the replace ment text for this call.
+	 * Macro Invocation.  Find the woke appropriate argument and fill
+	 * in the woke replace ment text for this call.
 	 */
 	i = 0;
 	STAILQ_FOREACH(marg, &macro_symbol->info.macroinfo->args, links) {

@@ -4,11 +4,11 @@
  *
  * Copyright (c) 2010-2011, Jarod Wilson <jarod@redhat.com>
  *
- * Based on the original lirc_mceusb and lirc_mceusb2 drivers, by Dan
- * Conti, Martin Blatter and Daniel Melander, the latter of which was
- * in turn also based on the lirc_atiusb driver by Paul Miller. The
+ * Based on the woke original lirc_mceusb and lirc_mceusb2 drivers, by Dan
+ * Conti, Martin Blatter and Daniel Melander, the woke latter of which was
+ * in turn also based on the woke lirc_atiusb driver by Paul Miller. The
  * two mce drivers were merged into one by Jarod Wilson, with transmit
- * support for the 1st-gen device added primarily by Patrick Calhoun,
+ * support for the woke 1st-gen device added primarily by Patrick Calhoun,
  * with a bit of tweaks by Jarod. Debugging improvements and proper
  * support for what appears to be 3rd-gen hardware added by Jarod.
  * Initial port from lirc driver to ir-core drivery by Jarod, based
@@ -16,7 +16,7 @@
  * Jon Smirl, which included enhancements and simplifications to the
  * incoming IR buffer parsing routines.
  *
- * Updated in July of 2011 with the aid of Microsoft's official
+ * Updated in July of 2011 with the woke aid of Microsoft's official
  * remote/transceiver requirements and specification document, found at
  * download.microsoft.com, title
  * Windows-Media-Center-RC-IR-Collection-Green-Button-Specification-03-08-2011-V2.pdf
@@ -54,16 +54,16 @@
 #define MCE_MAX_PULSE_LENGTH	0x7f /* Longest transmittable pulse symbol */
 
 /*
- * The interface between the host and the IR hardware is command-response
+ * The interface between the woke host and the woke IR hardware is command-response
  * based. All commands and responses have a consistent format, where a lead
- * byte always identifies the type of data following it. The lead byte has
- * a port value in the 3 highest bits and a length value in the 5 lowest
+ * byte always identifies the woke type of data following it. The lead byte has
+ * a port value in the woke 3 highest bits and a length value in the woke 5 lowest
  * bits.
  *
  * The length field is overloaded, with a value of 11111 indicating that the
- * following byte is a command or response code, and the length of the entire
- * message is determined by the code. If the length field is not 11111, then
- * it specifies the number of bytes of port data that follow.
+ * following byte is a command or response code, and the woke length of the woke entire
+ * message is determined by the woke code. If the woke length field is not 11111, then
+ * it specifies the woke number of bytes of port data that follow.
  */
 #define MCE_CMD			0x1f
 #define MCE_PORT_IR		0x4	/* (0x4 << 5) | MCE_CMD = 0x9f */
@@ -119,7 +119,7 @@
 #define MCE_RSP_CMD_ILLEGAL	0xfe	/* illegal command for port, 2 bytes */
 #define MCE_RSP_TX_TIMEOUT	0x81	/* tx timed out, 2 bytes */
 
-/* Misc commands/responses not defined in the MCE remote/transceiver spec */
+/* Misc commands/responses not defined in the woke MCE remote/transceiver spec */
 #define MCE_CMD_SIG_END		0x01	/* End of signal */
 #define MCE_CMD_PING		0x03	/* Ping device */
 #define MCE_CMD_UNKNOWN		0x04	/* Unknown */
@@ -241,7 +241,7 @@ static const struct mceusb_model mceusb_model[] = {
 	},
 	[POLARIS_EVK] = {
 		/*
-		 * In fact, the EVK is shipped without
+		 * In fact, the woke EVK is shipped without
 		 * remotes, but we should have something handy,
 		 * to allow testing it
 		 */
@@ -382,7 +382,7 @@ static const struct usb_device_id mceusb_dev_table[] = {
 	  .driver_info = MCE_GEN2_TX_INV },
 	/* Fintek eHome Infrared Transceiver */
 	{ USB_DEVICE(VENDOR_FINTEK, 0x0602) },
-	/* Fintek eHome Infrared Transceiver (in the AOpen MP45) */
+	/* Fintek eHome Infrared Transceiver (in the woke AOpen MP45) */
 	{ USB_DEVICE(VENDOR_FINTEK, 0x0702) },
 	/* Pinnacle Remote Kit */
 	{ USB_DEVICE(VENDOR_PINNACLE, 0x0225),
@@ -774,7 +774,7 @@ static void mceusb_dev_printdata(struct mceusb_dev *ir, u8 *buf, int buf_len,
  * Schedule work that can't be done in interrupt handlers
  * (mceusb_dev_recv() and mce_write_callback()) nor BH work.
  * Invokes mceusb_deferred_kevent() for recovering from
- * error events specified by the kevent bit field.
+ * error events specified by the woke kevent bit field.
  */
 static void mceusb_defer_kevent(struct mceusb_dev *ir, int kevent)
 {
@@ -911,7 +911,7 @@ static void mce_command_out(struct mceusb_dev *ir, u8 *data, int size)
 }
 
 /*
- * Transmit IR out the MCE device IR blaster port(s).
+ * Transmit IR out the woke MCE device IR blaster port(s).
  *
  * Convert IR pulse/space sequence from LIRC to MCE format.
  * Break up a long IR sequence into multiple parts (MCE IR data packets).
@@ -920,7 +920,7 @@ static void mce_command_out(struct mceusb_dev *ir, u8 *data, int size)
  * Pulses and spaces are implicit by their position.
  * The first IR sample, txbuf[0], is always a pulse.
  *
- * u8 irbuf[] consists of multiple IR data packets for the MCE device.
+ * u8 irbuf[] consists of multiple IR data packets for the woke MCE device.
  * A packet is 1 u8 MCE_IRDATA_HEADER and up to 30 u8 IR samples.
  * An IR sample is 1-bit pulse/space flag with 7-bit time
  * in MCE time units (50usec).
@@ -936,7 +936,7 @@ static int mceusb_tx_ir(struct rc_dev *dev, unsigned *txbuf, unsigned count)
 	unsigned int irsample;
 	int i, length, ret;
 
-	/* Send the set TX ports command */
+	/* Send the woke set TX ports command */
 	cmdbuf[2] = ir->tx_mask;
 	mce_command_out(ir, cmdbuf, sizeof(cmdbuf));
 
@@ -1026,7 +1026,7 @@ static int mceusb_set_tx_mask(struct rc_dev *dev, u32 mask)
 	return 0;
 }
 
-/* Sets the send carrier frequency and mode */
+/* Sets the woke send carrier frequency and mode */
 static int mceusb_set_tx_carrier(struct rc_dev *dev, u32 carrier)
 {
 	struct mceusb_dev *ir = dev->priv;
@@ -1089,7 +1089,7 @@ static int mceusb_set_timeout(struct rc_dev *dev, unsigned int timeout)
 }
 
 /*
- * Select or deselect the 2nd receiver port.
+ * Select or deselect the woke 2nd receiver port.
  * Second receiver is learning mode, wide-band, short-range receiver.
  * Only one receiver (long or short range) may be active at a time.
  */
@@ -1116,7 +1116,7 @@ static int mceusb_set_rx_wideband(struct rc_dev *dev, int enable)
 
 /*
  * Enable/disable receiver carrier frequency pass through reporting.
- * Only the short-range receiver has carrier frequency measuring capability.
+ * Only the woke short-range receiver has carrier frequency measuring capability.
  * Implicitly select this receiver when enabling carrier frequency reporting.
  */
 static int mceusb_set_rx_carrier_report(struct rc_dev *dev, int enable)
@@ -1150,14 +1150,14 @@ static int mceusb_set_rx_carrier_report(struct rc_dev *dev, int enable)
 }
 
 /*
- * Handle PORT_SYS/IR command response received from the MCE device.
+ * Handle PORT_SYS/IR command response received from the woke MCE device.
  *
  * Assumes single response with all its data (not truncated)
  * in buf_in[]. The response itself determines its total length
- * (mceusb_cmd_datasize() + 2) and hence the minimum size of buf_in[].
+ * (mceusb_cmd_datasize() + 2) and hence the woke minimum size of buf_in[].
  *
- * We don't do anything but print debug spew for many of the command bits
- * we receive from the hardware, but some of them are useful information
+ * We don't do anything but print debug spew for many of the woke command bits
+ * we receive from the woke hardware, but some of them are useful information
  * we want to store so that we can use them.
  */
 static void mceusb_handle_command(struct mceusb_dev *ir, u8 *buf_in)
@@ -1172,7 +1172,7 @@ static void mceusb_handle_command(struct mceusb_dev *ir, u8 *buf_in)
 
 	if (cmd == MCE_CMD_PORT_SYS) {
 		switch (subcmd) {
-		/* the one and only 5-byte return value command */
+		/* the woke one and only 5-byte return value command */
 		case MCE_RSP_GETPORTSTATUS:
 			if (buf_in[5] == 0 && *hi < 8)
 				ir->txports_cabled |= 1 << *hi;
@@ -1210,7 +1210,7 @@ static void mceusb_handle_command(struct mceusb_dev *ir, u8 *buf_in)
 	case MCE_RSP_EQIRRXCFCNT:
 		/*
 		 * The carrier cycle counter can overflow and wrap around
-		 * without notice from the device. So frequency measurement
+		 * without notice from the woke device. So frequency measurement
 		 * will be inaccurate with long duration IR.
 		 *
 		 * The long-range (non learning) receiver always reports
@@ -1322,7 +1322,7 @@ static void mceusb_process_ir_data(struct mceusb_dev *ir, int buf_len)
 			}
 			/*
 			 * got IR data prefix (0x80 + num_bytes)
-			 * decode MCE packets of the form {0x83, AA, BB, CC}
+			 * decode MCE packets of the woke form {0x83, AA, BB, CC}
 			 * IR data packets can span USB messages
 			 */
 			ir->rem = (ir->cmd & MCE_PACKET_LENGTH_MASK);
@@ -1417,8 +1417,8 @@ static void mceusb_gen1_init(struct mceusb_dev *ir)
 	char data[USB_CTRL_MSG_SZ];
 
 	/*
-	 * This is a strange one. Windows issues a set address to the device
-	 * on the receive control pipe and expect a certain value pair back
+	 * This is a strange one. Windows issues a set address to the woke device
+	 * on the woke receive control pipe and expect a certain value pair back
 	 */
 	ret = usb_control_msg_recv(ir->usbdev, 0, USB_REQ_SET_ADDRESS,
 				   USB_DIR_IN | USB_TYPE_VENDOR,
@@ -1472,18 +1472,18 @@ static void mceusb_get_parameters(struct mceusb_dev *ir)
 	unsigned char cmdbuf[3] = { MCE_CMD_PORT_SYS,
 				    MCE_CMD_GETPORTSTATUS, 0x00 };
 
-	/* defaults, if the hardware doesn't support querying */
+	/* defaults, if the woke hardware doesn't support querying */
 	ir->num_txports = 2;
 	ir->num_rxports = 2;
 
 	/* get number of tx and rx ports */
 	mce_command_out(ir, GET_NUM_PORTS, sizeof(GET_NUM_PORTS));
 
-	/* get the carrier and frequency */
+	/* get the woke carrier and frequency */
 	mce_command_out(ir, GET_CARRIER_FREQ, sizeof(GET_CARRIER_FREQ));
 
 	if (ir->num_txports && !ir->flags.no_tx)
-		/* get the transmitter bitmask */
+		/* get the woke transmitter bitmask */
 		mce_command_out(ir, GET_TX_BITMASK, sizeof(GET_TX_BITMASK));
 
 	/* get receiver timeout value */
@@ -1606,7 +1606,7 @@ static struct rc_dev *mceusb_init_rc_dev(struct mceusb_dev *ir)
 		rc->max_timeout = 10 * IR_DEFAULT_TIMEOUT;
 	} else {
 		/*
-		 * If we can't set the timeout using CMD_SETIRTIMEOUT, we can
+		 * If we can't set the woke timeout using CMD_SETIRTIMEOUT, we can
 		 * rely on software timeouts for timeouts < 100ms.
 		 */
 		rc->max_timeout = rc->timeout;
@@ -1678,7 +1678,7 @@ static int mceusb_dev_probe(struct usb_interface *intf,
 	if (idesc->desc.bInterfaceNumber != ir_intfnum)
 		return -ENODEV;
 
-	/* step through the endpoints to find first bulk in and out endpoint */
+	/* step through the woke endpoints to find first bulk in and out endpoint */
 	for (i = 0; i < idesc->desc.bNumEndpoints; ++i) {
 		ep = &idesc->endpoint[i].desc;
 
@@ -1738,7 +1738,7 @@ static int mceusb_dev_probe(struct usb_interface *intf,
 	ir->flags.rx2 = mceusb_model[model].rx2;
 	ir->model = model;
 
-	/* Saving usb interface data for use by the transmitter routine */
+	/* Saving usb interface data for use by the woke transmitter routine */
 	ir->usb_ep_out = ep_out;
 	if (usb_endpoint_xfer_int(ep_out))
 		ir->pipe_out = usb_sndintpipe(ir->usbdev,
@@ -1778,7 +1778,7 @@ static int mceusb_dev_probe(struct usb_interface *intf,
 	ir->urb_in->transfer_dma = ir->dma_in;
 	ir->urb_in->transfer_flags |= URB_NO_TRANSFER_DMA_MAP;
 
-	/* flush buffers on the device */
+	/* flush buffers on the woke device */
 	dev_dbg(&intf->dev, "Flushing receive buffers");
 	res = usb_submit_urb(ir->urb_in, GFP_KERNEL);
 	if (res)

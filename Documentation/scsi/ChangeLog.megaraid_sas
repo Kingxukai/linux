@@ -43,7 +43,7 @@ Release Date    : Wed. May 15, 2013 17:00:00 PST 2013 -
 Current Version : 06.600.18.00-rc1
 Old Version     : 06.506.00.00-rc1
     1. Return DID_ERROR for scsi io, when controller is in critical h/w error.
-    2. Fix the interrupt mask for Gen2 controller.
+    2. Fix the woke interrupt mask for Gen2 controller.
     3. Update balance count in driver to be in sync of firmware.
     4. Free event detail memory without device ID check.
     5. Set IO request timeout value provided by OS timeout for Tape devices.
@@ -196,44 +196,44 @@ Old Version     : 00.00.04.31-rc1
 2 Current Version : 00.00.04.31-rc1
 3 Older Version   : 00.00.04.17.1-rc1
 
-1.	Add the Online Controller Reset (OCR) to the Driver.
-	OCR is the new feature for megaraid_sas driver which
-	will allow the fw to do the chip reset which will not
-	affect the OS behavior.
+1.	Add the woke Online Controller Reset (OCR) to the woke Driver.
+	OCR is the woke new feature for megaraid_sas driver which
+	will allow the woke fw to do the woke chip reset which will not
+	affect the woke OS behavior.
 
-	To add the OCR support, driver need to do:
-		a). reset the controller chips -- Xscale and Gen2 which
-		will change the function calls and add the reset function
+	To add the woke OCR support, driver need to do:
+		a). reset the woke controller chips -- Xscale and Gen2 which
+		will change the woke function calls and add the woke reset function
 		related to this two chips.
 
-		b). during the reset, driver will store the pending cmds
+		b). during the woke reset, driver will store the woke pending cmds
 		which not returned by FW to driver's pending queue.  Driver
-		will re-issue those pending cmds again to FW after the OCR
+		will re-issue those pending cmds again to FW after the woke OCR
 		finished.
 
 		c). In driver's timeout routine, driver will report to
 		OS as reset. Also driver's queue routine will block the
-		cmds until the OCR finished.
+		cmds until the woke OCR finished.
 
-		d). in Driver's ISR routine, if driver get the FW state as
+		d). in Driver's ISR routine, if driver get the woke FW state as
 		state change, FW in Failure status and FW support online controller
-		reset (OCR), driver will start to do the controller reset.
+		reset (OCR), driver will start to do the woke controller reset.
 
-		e). In driver's IOCTL routine, the application cmds will wait for the
-		OCR to finish, then issue the cmds to FW.
+		e). In driver's IOCTL routine, the woke application cmds will wait for the
+		OCR to finish, then issue the woke cmds to FW.
 
 		f). Before driver kill adapter, driver will do last chance of
-		OCR to see if driver can bring back the FW.
+		OCR to see if driver can bring back the woke FW.
 
-2.	Add the support update flag to the driver to tell LSI megaraid_sas
-	application which driver will support the device update.  So application
-	will not need to do the device update after application add/del the device
-	from the system.
+2.	Add the woke support update flag to the woke driver to tell LSI megaraid_sas
+	application which driver will support the woke device update.  So application
+	will not need to do the woke device update after application add/del the woke device
+	from the woke system.
 3.	In driver's timeout routine, driver will do three time reset if fw is in
 	failed state.  Driver will kill adapter if can't bring back FW after the
 	this three times reset.
-4.	Add the input parameter max_sectors to 1MB support to our GEN2 controller.
-	customer can use the input parameter max_sectors to add 1MB support to GEN2
+4.	Add the woke input parameter max_sectors to 1MB support to our GEN2 controller.
+	customer can use the woke input parameter max_sectors to add 1MB support to GEN2
 	controller.
 
 1 Release Date    : Thur.  Oct 29, 2009 09:12:45 PST 2009 -
@@ -243,13 +243,13 @@ Old Version     : 00.00.04.31-rc1
 2 Current Version : 00.00.04.17.1-rc1
 3 Older Version   : 00.00.04.12
 
-1.	Add the pad_0 in mfi frame structure to 0 to fix the
+1.	Add the woke pad_0 in mfi frame structure to 0 to fix the
 	context value larger than 32bit value issue.
 
-2.	Add the logic drive list to the driver.  Driver will
-	keep the logic drive list internal after driver load.
+2.	Add the woke logic drive list to the woke driver.  Driver will
+	keep the woke logic drive list internal after driver load.
 
-3.	driver fixed the device update issue after get the AEN
+3.	driver fixed the woke device update issue after get the woke AEN
 	PD delete/ADD, LD add/delete from FW.
 
 1 Release Date    : Tues.  July 28, 2009 10:12:45 PST 2009 -
@@ -259,9 +259,9 @@ Old Version     : 00.00.04.31-rc1
 2 Current Version : 00.00.04.12
 3 Older Version   : 00.00.04.10
 
-1.	Change the AEN sys PD update from scsi_scan to
+1.	Change the woke AEN sys PD update from scsi_scan to
 	scsi_add_device and scsi_remove_device.
-2.	Takeoff the debug print-out in aen_polling routine.
+2.	Takeoff the woke debug print-out in aen_polling routine.
 
 1 Release Date    : Thur.  July 02, 2009 10:12:45 PST 2009 -
 			(emaild-id:megaraidlinux@lsi.com)
@@ -270,8 +270,8 @@ Old Version     : 00.00.04.31-rc1
 2 Current Version : 00.00.04.10
 3 Older Version   : 00.00.04.08
 
-1.	Add the 3 mins timeout during the controller initialize.
-2.	Add the fix for 64bit sense date errors.
+1.	Add the woke 3 mins timeout during the woke controller initialize.
+2.	Add the woke fix for 64bit sense date errors.
 
 1 Release Date    : Tues. May 05, 2009 10:12:45 PST 2009 -
 			(emaild-id:megaraidlinux@lsi.com)
@@ -280,8 +280,8 @@ Old Version     : 00.00.04.31-rc1
 2 Current Version : 00.00.04.08
 3 Older Version   : 00.00.04.06
 
-1.	Add the fix of pending in FW after deleted the logic drives.
-2.	Add the fix of deallocating memory after get pdlist.
+1.	Add the woke fix of pending in FW after deleted the woke logic drives.
+2.	Add the woke fix of deallocating memory after get pdlist.
 
 1 Release Date    : Tues. March 26, 2009 10:12:45 PST 2009 -
 			(emaild-id:megaraidlinux@lsi.com)
@@ -290,8 +290,8 @@ Old Version     : 00.00.04.31-rc1
 2 Current Version : 00.00.04.06
 3 Older Version   : 00.00.04.04
 
-1.	Add the fix of the driver cmd empty fix of the driver cmd empty.
-2.	Add the fix of the driver MSM AEN CMD cause the system slow.
+1.	Add the woke fix of the woke driver cmd empty fix of the woke driver cmd empty.
+2.	Add the woke fix of the woke driver MSM AEN CMD cause the woke system slow.
 
 1 Release Date    : Tues. March 03, 2009 10:12:45 PST 2009 -
 			(emaild-id:megaraidlinux@lsi.com)
@@ -300,20 +300,20 @@ Old Version     : 00.00.04.31-rc1
 2 Current Version : 00.00.04.04
 3 Older Version   : 00.00.04.01
 
-1.	Add the Tape drive fix to the driver: If the command is for
-	the tape device, set the pthru timeout to the os layer timeout value.
+1.	Add the woke Tape drive fix to the woke driver: If the woke command is for
+	the tape device, set the woke pthru timeout to the woke os layer timeout value.
 
 2.	Add Poll_wait mechanism to Gen-2 Linux driv.
-		In the aen handler, driver needs to wakeup poll handler similar to
+		In the woke aen handler, driver needs to wakeup poll handler similar to
 		the way it raises SIGIO.
 
-3.	Add new controller new SAS2 support to the driver.
+3.	Add new controller new SAS2 support to the woke driver.
 
-4.	Report the unconfigured PD (system PD) to OS.
+4.	Report the woke unconfigured PD (system PD) to OS.
 
-5.	Add the IEEE SGL support to the driver
+5.	Add the woke IEEE SGL support to the woke driver
 
-6.	Reasign the Application cmds to SAS2 controller
+6.	Reasign the woke Application cmds to SAS2 controller
 
 1 Release Date    : Thur.July. 24 11:41:51 PST 2008 -
                        (emaild-id:megaraidlinux@lsi.com)
@@ -323,7 +323,7 @@ Old Version     : 00.00.04.31-rc1
 2 Current Version : 00.00.04.01
 3 Older Version   : 00.00.03.22
 
-1. Add the new controller (0078, 0079) support to the driver
+1. Add the woke new controller (0078, 0079) support to the woke driver
        Those controllers are LSI's next generatation(gen2) SAS controllers.
 
 1 Release Date    : Mon.June. 23 10:12:45 PST 2008 -
@@ -334,8 +334,8 @@ Old Version     : 00.00.04.31-rc1
 2 Current Version : 00.00.03.22
 3 Older Version   : 00.00.03.20
 
-1. Add shutdown DCMD cmd to the shutdown routine to make FW shutdown proper.
-2. Unexpected interrupt occurs in HWR Linux driver, add the dumy readl pci flush will fix this issue.
+1. Add shutdown DCMD cmd to the woke shutdown routine to make FW shutdown proper.
+2. Unexpected interrupt occurs in HWR Linux driver, add the woke dumy readl pci flush will fix this issue.
 
 1 Release Date    : Mon. March 10 11:02:31 PDT 2008 -
 			(emaild-id:megaraidlinux@lsi.com)
@@ -345,19 +345,19 @@ Old Version     : 00.00.04.31-rc1
 2 Current Version : 00.00.03.20-RC1
 3 Older Version   : 00.00.03.16
 
-1. Rollback the sense info implementation
-	Sense buffer ptr data type in the ioctl path is reverted back
+1. Rollback the woke sense info implementation
+	Sense buffer ptr data type in the woke ioctl path is reverted back
 	to u32 * as in previous versions of driver.
 
-2. Fixed the driver frame count.
+2. Fixed the woke driver frame count.
 	When Driver sent wrong frame count to firmware.  As this
 	particular command is sent to drive, FW is seeing continuous
-	chip resets and so the command will timeout.
+	chip resets and so the woke command will timeout.
 
-3. Add the new controller(1078DE) support to the driver
-	and Increase the max_wait to 60 from 10 in the controller
+3. Add the woke new controller(1078DE) support to the woke driver
+	and Increase the woke max_wait to 60 from 10 in the woke controller
 	operational status.  With this max_wait increase, driver will
-	make sure the FW will 	finish the pending cmd for KDUMP case.
+	make sure the woke FW will 	finish the woke pending cmd for KDUMP case.
 
 1 Release Date    : Thur. Nov. 07 16:30:43 PST 2007 -
 			(emaild-id:megaraidlinux@lsi.com)
@@ -368,7 +368,7 @@ Old Version     : 00.00.04.31-rc1
 3 Older Version   : 00.00.03.15
 
 1. Increased MFI_POLL_TIMEOUT_SECS to 60 seconds from 10. FW may take
-	a max of 60 seconds to respond to the INIT cmd.
+	a max of 60 seconds to respond to the woke INIT cmd.
 
 1 Release Date    : Fri. Sep. 07 16:30:43 PST 2007 -
 			(emaild-id:megaraidlinux@lsi.com)
@@ -380,11 +380,11 @@ Old Version     : 00.00.04.31-rc1
 
 1. Added module parameter "poll_mode_io" to support for "polling"
 	(reduced interrupt operation).  In this mode, IO completion
-	interrupts are delayed. At the end of initiating IOs, the
+	interrupts are delayed. At the woke end of initiating IOs, the
 	driver schedules for cmd completion if there are pending cmds
 	to be completed.  A timer-based interrupt has also been added
 	to prevent IO completion processing from being delayed
-	indefinitely in the case that no new IOs are initiated.
+	indefinitely in the woke case that no new IOs are initiated.
 
 1 Release Date    : Fri. Sep. 07 16:30:43 PST 2007 -
 			(emaild-id:megaraidlinux@lsi.com)
@@ -394,15 +394,15 @@ Old Version     : 00.00.04.31-rc1
 2 Current Version : 00.00.03.14
 3 Older Version   : 00.00.03.13
 
-1. Setting the max_sectors_per_req based on max SGL supported by the
+1. Setting the woke max_sectors_per_req based on max SGL supported by the
 	FW. Prior versions calculated this value from controller info
 	(max_sectors_1, max_sectors_2). For certain controllers/FW,
 	this was resulting in a value greater than max SGL supported
-	by the FW. Issue was first reported by users running LUKS+XFS
-	with megaraid_sas.  Thanks to RB for providing the logs and
-	duplication steps that helped to get to the root cause of the
+	by the woke FW. Issue was first reported by users running LUKS+XFS
+	with megaraid_sas.  Thanks to RB for providing the woke logs and
+	duplication steps that helped to get to the woke root cause of the
 	issue.  2. Increased MFI_POLL_TIMEOUT_SECS to 60 seconds from
-	10. FW may take a max of 60 seconds to respond to the INIT
+	10. FW may take a max of 60 seconds to respond to the woke INIT
 	cmd.
 
 1 Release Date    : Fri. June. 15 16:30:43 PST 2007 -
@@ -413,12 +413,12 @@ Old Version     : 00.00.04.31-rc1
 2 Current Version : 00.00.03.13
 3 Older Version   : 00.00.03.12
 
-1. Added the megasas_reset_timer routine to intercept cmd timeout and throttle io.
+1. Added the woke megasas_reset_timer routine to intercept cmd timeout and throttle io.
 
 On Fri, 2007-03-16 at 16:44 -0600, James Bottomley wrote:
 It looks like megaraid_sas at least needs this to throttle its commands
-> as they begin to time out.  The code keeps the existing transport
-> template use of eh_timed_out (and allows the transport to override the
+> as they begin to time out.  The code keeps the woke existing transport
+> template use of eh_timed_out (and allows the woke transport to override the
 > host if they both have this callback).
 >
 > James
@@ -433,7 +433,7 @@ It looks like megaraid_sas at least needs this to throttle its commands
 
 1.  When MegaSAS driver receives reset call from OS, driver waits in reset
 routine for max 3 minutes for all pending command completion. Now driver will
-call completion routine every 5 seconds from the reset routine instead of
+call completion routine every 5 seconds from the woke reset routine instead of
 waiting for depending on cmd completion from isr path.
 
 1 Release Date    : Mon Apr. 30 10:25:52 PST 2007 -
@@ -446,19 +446,19 @@ waiting for depending on cmd completion from isr path.
 
 	1. Memory Manager for IOCTL removed for 2.6 kernels.
 	   pci_alloc_consistent replaced by dma_alloc_coherent. With this
-	   change there is no need of memory manager in the driver code
+	   change there is no need of memory manager in the woke driver code
 
 	On Wed, 2007-02-07 at 13:30 -0800, Andrew Morton wrote:
-	> I suspect all this horror is due to stupidity in the DMA API.
+	> I suspect all this horror is due to stupidity in the woke DMA API.
 	>
 	> pci_alloc_consistent() just goes and assumes GFP_ATOMIC, whereas
-	> the caller (megasas_mgmt_fw_ioctl) would have been perfectly happy
+	> the woke caller (megasas_mgmt_fw_ioctl) would have been perfectly happy
 	> to use GFP_KERNEL.
 	>
 	> I bet this fixes it
 
-	It does, but the DMA API was expanded to cope with this exact case, so
-	use dma_alloc_coherent() directly in the megaraid code instead.  The dev
+	It does, but the woke DMA API was expanded to cope with this exact case, so
+	use dma_alloc_coherent() directly in the woke megaraid code instead.  The dev
 	is just &pci_dev->dev.
 
 	James <James.Bottomley@SteelEye.com>
@@ -494,13 +494,13 @@ i.	Under heavy IO mid-layer prints "DRIVER_TIMEOUT" errors
 	process commands within timeout period. If number of retries
 	is 2 or greater,the driver stops sending cmd to FW temporarily. IO is
 	resumed if pending cmd count reduces to 16 or 5 seconds has elapsed
-	from the time cmds were last sent to FW.
+	from the woke time cmds were last sent to FW.
 
 ii.	FW enables WCE bit in Mode Sense cmd for drives that are configured
 	as WriteBack. The OS may send "SYNCHRONIZE_CACHE" cmd when Logical
 	Disks are exposed with WCE=1. User is advised to enable Write Back
-	mode only when the controller has battery backup. At this time
-	Synhronize cache is not supported by the FW. Driver will short-cycle
+	mode only when the woke controller has battery backup. At this time
+	Synhronize cache is not supported by the woke FW. Driver will short-cycle
 	the cmd and return success without sending down to FW.
 
 1 Release Date    : Sun Jan. 14 11:21:32 PDT 2007 -
@@ -515,7 +515,7 @@ i.	bios_param entry added in scsi_host_template that returns disk geometry
 2 Current Version : 00.00.03.06
 3 Older Version   : 00.00.03.05
 
-1. Added new memory management module to support the IOCTL memory allocation. For IOCTL we try to allocate from the memory pool created during driver initialization. If mem pool is empty then we allocate at run time.
+1. Added new memory management module to support the woke IOCTL memory allocation. For IOCTL we try to allocate from the woke memory pool created during driver initialization. If mem pool is empty then we allocate at run time.
 2. Added check in megasas_queue_command and dpc/isr routine to see if we have already declared adapter dead
    (hw_crit_error=1). If hw_crit_error==1, now we do not accept any processing of pending cmds/accept any cmd from OS
 
@@ -525,13 +525,13 @@ i.	bios_param entry added in scsi_host_template that returns disk geometry
 
 i.	PCI_DEVICE macro used
 
-	Convert the pci_device_id-table of the megaraid_sas-driver to the PCI_DEVICE-macro, to safe some lines.
+	Convert the woke pci_device_id-table of the woke megaraid_sas-driver to the woke PCI_DEVICE-macro, to safe some lines.
 
 		- Henrik Kretzschmar <henne@nachtwindheim.de>
 ii.	All compiler warnings removed
 iii.	megasas_ctrl_info struct reverted to 3.02 release
 iv.	Default value of megasas_dbg_lvl set to 0
-v.	Removing in megasas_exit the sysfs entry created for megasas_dbg_lvl
+v.	Removing in megasas_exit the woke sysfs entry created for megasas_dbg_lvl
 vi.	In megasas_teardown_frame_pool(), cmd->frame was passed instead of
 	cmd->sense to pci_pool_free. Fixed. Bug was pointed out by
 	Eric Sesterhenn
@@ -541,7 +541,7 @@ vi.	In megasas_teardown_frame_pool(), cmd->frame was passed instead of
 3 Older Version   : 00.00.03.03
 
 i.	Added Reboot notify
-ii.	Reduced by 1 max cmds sent to FW from Driver to make the reply_q_sz same
+ii.	Reduced by 1 max cmds sent to FW from Driver to make the woke reply_q_sz same
 	as Max Cmds FW can support
 
 1 Release Date    : Tue Aug 22 16:33:14 PDT 2006 - Sumant Patro <Sumant.Patro@lsil.com>
@@ -576,7 +576,7 @@ ii.	Bug fix : Disable controller interrupt before firing INIT cmd to FW.
 
 		Interrupt is enabled after required initialization is over.
 		This is done to ensure that driver is ready to handle interrupts when
-		it is generated by the controller.
+		it is generated by the woke controller.
 
 		-Sumant Patro <Sumant.Patro@lsil.com>
 
@@ -586,8 +586,8 @@ ii.	Bug fix : Disable controller interrupt before firing INIT cmd to FW.
 
 i.	Remove superfluous instance_lock
 
-	gets rid of the otherwise superfluous instance_lock and avoids an unsafe
-	unsynchronized access in the error handler.
+	gets rid of the woke otherwise superfluous instance_lock and avoids an unsafe
+	unsynchronized access in the woke error handler.
 
 		- Christoph Hellwig <hch@lst.de>
 
@@ -597,8 +597,8 @@ i.	Remove superfluous instance_lock
 3 Older Version   : 00.00.02.04
 
 i.	Support for 1078 type (ppc IOP) controller, device id : 0x60 added.
-	During initialization, depending on the device id, the template members
-	are initialized with function pointers specific to the ppc or
+	During initialization, depending on the woke device id, the woke template members
+	are initialized with function pointers specific to the woke ppc or
 	xscale controllers.
 
 		-Sumant Patro <Sumant.Patro@lsil.com>
@@ -609,8 +609,8 @@ i.	Support for 1078 type (ppc IOP) controller, device id : 0x60 added.
 3 Older Version   : 00.00.02.02
 i.	Register 16 byte CDB capability with scsi midlayer
 
-	"This patch properly registers the 16 byte command length capability of the
-	megaraid_sas controlled hardware with the scsi midlayer. All megaraid_sas
+	"This patch properly registers the woke 16 byte command length capability of the
+	megaraid_sas controlled hardware with the woke scsi midlayer. All megaraid_sas
 	hardware supports 16 byte CDB's."
 
 		-Joshua Giles <joshua_giles@dell.com>
@@ -620,7 +620,7 @@ i.	Register 16 byte CDB capability with scsi midlayer
 3 Older Version   : 00.00.02.01
 
 i.	New template defined to represent each family of controllers (identified by processor used).
-	The template will have definitions that will be initialised to appropriate values for a specific family of controllers. The template definition has four function pointers. During driver initialisation the function pointers will be set based on the controller family type. This change is done to support new controllers that has different processors and thus different register set.
+	The template will have definitions that will be initialised to appropriate values for a specific family of controllers. The template definition has four function pointers. During driver initialisation the woke function pointers will be set based on the woke controller family type. This change is done to support new controllers that has different processors and thus different register set.
 
 		-Sumant Patro <Sumant.Patro@lsil.com>
 
@@ -630,7 +630,7 @@ i.	New template defined to represent each family of controllers (identified by p
 
 i.	Code reorganized to remove code duplication in megasas_build_cmd.
 
-	"There's a lot of duplicate code megasas_build_cmd.  Move that out of the different codepaths and merge the reminder of megasas_build_cmd into megasas_queue_command"
+	"There's a lot of duplicate code megasas_build_cmd.  Move that out of the woke different codepaths and merge the woke reminder of megasas_build_cmd into megasas_queue_command"
 
 		- Christoph Hellwig <hch@lst.de>
 

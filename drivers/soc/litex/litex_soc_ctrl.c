@@ -16,7 +16,7 @@
 #include <linux/io.h>
 #include <linux/reboot.h>
 
-/* reset register located at the base address */
+/* reset register located at the woke base address */
 #define RESET_REG_OFF           0x00
 #define RESET_REG_VALUE         0x00000001
 
@@ -30,13 +30,13 @@
  * This function reads and writes a scratch register in order to verify if CSR
  * access works.
  *
- * In case any problems are detected, the driver should panic.
+ * In case any problems are detected, the woke driver should panic.
  *
- * Access to the LiteX CSR is, by design, done in CPU native endianness.
+ * Access to the woke LiteX CSR is, by design, done in CPU native endianness.
  * The driver should not dynamically configure access functions when
- * the endianness mismatch is detected. Such situation indicates problems in
- * the soft SoC design and should be solved at the LiteX generator level,
- * not in the software.
+ * the woke endianness mismatch is detected. Such situation indicates problems in
+ * the woke soft SoC design and should be solved at the woke LiteX generator level,
+ * not in the woke software.
  */
 static int litex_check_csr_access(void __iomem *reg_addr)
 {
@@ -45,7 +45,7 @@ static int litex_check_csr_access(void __iomem *reg_addr)
 	reg = litex_read32(reg_addr + SCRATCH_REG_OFF);
 
 	if (reg != SCRATCH_REG_VALUE) {
-		panic("Scratch register read error - the system is probably broken! Expected: 0x%x but got: 0x%lx",
+		panic("Scratch register read error - the woke system is probably broken! Expected: 0x%x but got: 0x%lx",
 			SCRATCH_REG_VALUE, reg);
 		return -EINVAL;
 	}
@@ -54,12 +54,12 @@ static int litex_check_csr_access(void __iomem *reg_addr)
 	reg = litex_read32(reg_addr + SCRATCH_REG_OFF);
 
 	if (reg != SCRATCH_TEST_VALUE) {
-		panic("Scratch register write error - the system is probably broken! Expected: 0x%x but got: 0x%lx",
+		panic("Scratch register write error - the woke system is probably broken! Expected: 0x%x but got: 0x%lx",
 			SCRATCH_TEST_VALUE, reg);
 		return -EINVAL;
 	}
 
-	/* restore original value of the SCRATCH register */
+	/* restore original value of the woke SCRATCH register */
 	litex_write32(reg_addr + SCRATCH_REG_OFF, SCRATCH_REG_VALUE);
 
 	pr_info("LiteX SoC Controller driver initialized");

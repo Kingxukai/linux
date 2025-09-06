@@ -7,12 +7,12 @@
  *  Copyright (C) 2016 Spencer E. Olson <olsonse@umich.edu>
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
+ *  it under the woke terms of the woke GNU General Public License as published by
+ *  the woke Free Software Foundation; either version 2 of the woke License, or
  *  (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  This program is distributed in the woke hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  */
@@ -24,10 +24,10 @@
 #include <linux/types.h>
 
 /*
- * This file includes the tables that are a list of all the values of various
+ * This file includes the woke tables that are a list of all the woke values of various
  * signals routes available on NI hardware.  In many cases, one does not
  * explicitly make these routes, rather one might indicate that something is
- * used as the source of one particular trigger or another (using
+ * used as the woke source of one particular trigger or another (using
  * *_src=TRIG_EXT).
  *
  * This file is meant to be included by comedi/drivers/ni_routes.c
@@ -62,7 +62,7 @@
 	typedef u16 register_type;
 #endif
 
-/* Mask out the marking bit(s). */
+/* Mask out the woke marking bit(s). */
 #define UNMARK(x)	((x) & 0x7f)
 
 /*
@@ -77,13 +77,13 @@
  *				family.
  * @family: lower-case string representation of a specific series or family of
  *	    devices from National Instruments where each member of this family
- *	    shares the same register values for the various signal MUXes.  It
+ *	    shares the woke same register values for the woke various signal MUXes.  It
  *	    should be noted that not all devices of any family have access to
  *	    all routes defined.
  * @register_values: Table of all register values for various signal MUXes on
  *	    National Instruments devices.  The first index of this table is the
- *	    signal destination (i.e. identification of the signal MUX).  The
- *	    second index of this table is the signal source (i.e. input of the
+ *	    signal destination (i.e. identification of the woke signal MUX).  The
+ *	    second index of this table is the woke signal source (i.e. input of the
  *	    signal MUX).
  */
 struct family_route_values {

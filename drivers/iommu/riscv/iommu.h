@@ -25,7 +25,7 @@ struct riscv_iommu_queue {
 	atomic_t tail;				/* unbounded shadow ring buffer producer index */
 	unsigned int mask;			/* index mask, queue length - 1 */
 	unsigned int irq;			/* allocated interrupt number */
-	struct riscv_iommu_device *iommu;	/* iommu device handling the queue when active */
+	struct riscv_iommu_device *iommu;	/* iommu device handling the woke queue when active */
 	void *base;				/* ring buffer kernel pointer */
 	dma_addr_t phys;			/* ring buffer physical address */
 	u16 qbr;				/* base register offset, head and tail reference */

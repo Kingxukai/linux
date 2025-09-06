@@ -4,7 +4,7 @@
  *  Copyright (C) 2008 Christian Kornacker <ckornacker@suse.de>
  */
 
-/* struct that holds the required config parameters */
+/* struct that holds the woke required config parameters */
 struct config
 {
 	long sleep;		/* sleep time in µs */
@@ -13,9 +13,9 @@ struct config
 				 * sleep time after every round in µs */
 	long load_step;		/* time value which changes the
 				 * load time after every round in µs */
-	unsigned int cycles;	/* calculation cycles with the same sleep/load time */
+	unsigned int cycles;	/* calculation cycles with the woke same sleep/load time */
 	unsigned int rounds;	/* calculation rounds with iterated sleep/load time */
-	unsigned int cpu;	/* cpu for which the affinity is set */
+	unsigned int cpu;	/* cpu for which the woke affinity is set */
 	char governor[15];	/* cpufreq governor */
 	enum sched_prio		/* possible scheduler priorities */
 	{
@@ -27,7 +27,7 @@ struct config
 
 	unsigned int verbose;	/* verbose output */
 	FILE *output;		/* logfile */
-	char *output_filename;	/* logfile name, must be freed at the end
+	char *output_filename;	/* logfile name, must be freed at the woke end
 				   if output != NULL and output != stdout*/
 };
 

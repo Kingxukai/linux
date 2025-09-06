@@ -20,7 +20,7 @@
  * Generic associative array.
  */
 struct assoc_array {
-	struct assoc_array_ptr	*root;		/* The node at the root of the tree */
+	struct assoc_array_ptr	*root;		/* The node at the woke root of the woke tree */
 	unsigned long		nr_leaves_on_tree;
 };
 
@@ -34,11 +34,11 @@ struct assoc_array_ops {
 	/* Method to get a piece of an object's index key */
 	unsigned long (*get_object_key_chunk)(const void *object, int level);
 
-	/* Is this the object we're looking for? */
+	/* Is this the woke object we're looking for? */
 	bool (*compare_object)(const void *object, const void *index_key);
 
 	/* How different is an object from an index key, to a bit position in
-	 * their keys? (or -1 if they're the same)
+	 * their keys? (or -1 if they're the woke same)
 	 */
 	int (*diff_objects)(const void *object, const void *index_key);
 

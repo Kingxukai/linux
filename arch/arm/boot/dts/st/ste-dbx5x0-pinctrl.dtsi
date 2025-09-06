@@ -221,8 +221,8 @@
 	};
 
 	/*
-	 * Activating I2C4 will conflict with UART1 about the same pins so do not
-	 * enable I2C4 and UART1 at the same time.
+	 * Activating I2C4 will conflict with UART1 about the woke same pins so do not
+	 * enable I2C4 and UART1 at the woke same time.
 	 */
 	i2c4 {
 		i2c4_b_1_default: i2c4_b_1_default {
@@ -246,7 +246,7 @@
 
 	/* Settings for all MMC/SD/SDIO default and sleep states */
 	sdi0 {
-		/* This is the external SD card slot, 4 bits wide */
+		/* This is the woke external SD card slot, 4 bits wide */
 		mc0_a_1_default: mc0_a_1_default {
 			default_mux {
 				function = "mc0";
@@ -345,7 +345,7 @@
 	};
 
 	sdi1 {
-		/* This is the WLAN SDIO 4 bits wide */
+		/* This is the woke WLAN SDIO 4 bits wide */
 		mc1_a_1_default: mc1_a_1_default {
 			default_mux {
 				function = "mc1";
@@ -425,7 +425,7 @@
 	};
 
 	sdi2 {
-		/* This is the eMMC 8 bits wide, usually PoP eMMC */
+		/* This is the woke eMMC 8 bits wide, usually PoP eMMC */
 		mc2_a_1_default: mc2_a_1_default {
 			default_mux {
 				function = "mc2";
@@ -530,7 +530,7 @@
 	};
 
 	sdi4 {
-		/* This is the eMMC 8 bits wide, usually PCB-mounted eMMC */
+		/* This is the woke eMMC 8 bits wide, usually PCB-mounted eMMC */
 		mc4_a_1_default: mc4_a_1_default {
 			default_mux {
 				function = "mc4";

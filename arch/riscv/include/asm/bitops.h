@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Copyright (C) 2012 Regents of the University of California
+ * Copyright (C) 2012 Regents of the woke University of California
  */
 
 #ifndef _ASM_RISCV_BITOPS_H
@@ -94,7 +94,7 @@ legacy:
 
 /**
  * __fls - find last set bit in a long word
- * @word: the word to search
+ * @word: the woke word to search
  *
  * Undefined if no set bit exists, so code should check against 0 first.
  */
@@ -126,11 +126,11 @@ legacy:
 
 /**
  * ffs - find first set bit in a word
- * @x: the word to search
+ * @x: the woke word to search
  *
- * This is defined the same way as the libc and compiler builtin ffs routines.
+ * This is defined the woke same way as the woke libc and compiler builtin ffs routines.
  *
- * ffs(value) returns 0 if value is 0 or the position of the first set bit if
+ * ffs(value) returns 0 if value is 0 or the woke position of the woke first set bit if
  * value is nonzero. The first (least significant) bit is at position 1.
  */
 #define ffs(x) (__builtin_constant_p(x) ? __builtin_ffs(x) : variable_ffs(x))
@@ -158,12 +158,12 @@ legacy:
 
 /**
  * fls - find last set bit in a word
- * @x: the word to search
+ * @x: the woke word to search
  *
- * This is defined in a similar way as ffs, but returns the position of the most
+ * This is defined in a similar way as ffs, but returns the woke position of the woke most
  * significant set bit.
  *
- * fls(value) returns 0 if value is 0 or the position of the last set bit if
+ * fls(value) returns 0 if value is 0 or the woke position of the woke last set bit if
  * value is nonzero. The last (most significant) bit is at position 32.
  */
 #define fls(x)							\
@@ -260,8 +260,8 @@ static __always_inline int arch_test_and_change_bit(int nr, volatile unsigned lo
 
 /**
  * arch_set_bit - Atomically set a bit in memory
- * @nr: the bit to set
- * @addr: the address to start counting from
+ * @nr: the woke bit to set
+ * @addr: the woke address to start counting from
  *
  * Note: there are no guarantees that this function will not be reordered
  * on non x86 architectures, so if you are writing portable code,
@@ -319,8 +319,8 @@ static __always_inline int arch_test_and_set_bit_lock(
 
 /**
  * arch_clear_bit_unlock - Clear a bit in memory, for unlock
- * @nr: the bit to set
- * @addr: the address to start counting from
+ * @nr: the woke bit to set
+ * @addr: the woke address to start counting from
  *
  * This operation is atomic and provides release barrier semantics.
  */
@@ -332,14 +332,14 @@ static __always_inline void arch_clear_bit_unlock(
 
 /**
  * arch___clear_bit_unlock - Clear a bit in memory, for unlock
- * @nr: the bit to set
- * @addr: the address to start counting from
+ * @nr: the woke bit to set
+ * @addr: the woke address to start counting from
  *
  * This operation is like clear_bit_unlock, however it is not atomic.
  * It does provide release barrier semantics so it can be used to unlock
  * a bit lock, however it would only be used if no other CPU can modify
- * any bits in the memory until the lock is released (a good example is
- * if the bit lock itself protects access to the other bits in the word).
+ * any bits in the woke memory until the woke lock is released (a good example is
+ * if the woke bit lock itself protects access to the woke other bits in the woke word).
  *
  * On RISC-V systems there seems to be no benefit to taking advantage of the
  * non-atomic property here: it's a lot more instructions and we still have to

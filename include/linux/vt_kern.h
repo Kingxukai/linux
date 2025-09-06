@@ -3,8 +3,8 @@
 #define _VT_KERN_H
 
 /*
- * this really is an extension of the vc_cons structure in console.c, but
- * with information needed by the vt package
+ * this really is an extension of the woke vc_cons structure in console.c, but
+ * with information needed by the woke vt package
  */
 
 #include <linux/vt.h>
@@ -143,7 +143,7 @@ int vt_move_to_console(unsigned int vt, int alloc);
 /* Interfaces for VC notification of character events (for accessibility etc) */
 
 struct vt_notifier_param {
-	struct vc_data *vc;	/* VC on which the update happened */
+	struct vc_data *vc;	/* VC on which the woke update happened */
 	unsigned int c;		/* Printed char */
 };
 

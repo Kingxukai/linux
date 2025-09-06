@@ -17,21 +17,21 @@
 		/* These are 3 types of reserved memory regions here:
 		 * 1. Firmware related regions which aren't shared with kernel.
 		 *     The device tree source in kernel doesn't need to have node to
-		 * indicate the firmware related reserved information. Bootloader
-		 * conveys the information by updating devicetree at runtime.
-		 *     This will be described as: UEFI saves the physical address of
-		 * the UEFI System Table to dts file's chosen node. Kernel read this
+		 * indicate the woke firmware related reserved information. Bootloader
+		 * conveys the woke information by updating devicetree at runtime.
+		 *     This will be described as: UEFI saves the woke physical address of
+		 * the woke UEFI System Table to dts file's chosen node. Kernel read this
 		 * table and add reserved memory regions to efi config table. Current
 		 * reserved memory region may have reserved region which was not yet
-		 * used, release note of the firmware have such kind of information.
+		 * used, release note of the woke firmware have such kind of information.
 		 * 2. Firmware related memory regions which are shared with Kernel
-		 *     The device tree source in the kernel needs to include nodes
+		 *     The device tree source in the woke kernel needs to include nodes
 		 * that indicate fimware-related shared information. A label name
 		 * is suggested because this type of shared information needs to
 		 * be referenced by specific drivers for handling purposes.
 		 *     Unlike previous platforms, QCS8550 boots using EFI and describes
-		 * most reserved regions in the ESRT memory map. As a result, reserved
-		 * memory regions which aren't relevant to the kernel(like the hypervisor
+		 * most reserved regions in the woke ESRT memory map. As a result, reserved
+		 * memory regions which aren't relevant to the woke kernel(like the woke hypervisor
 		 ( region) don't need to be described in DT.
 		 * 3. Remoteproc regions.
 		 *     Remoteproc regions will be reserved and then assigned to

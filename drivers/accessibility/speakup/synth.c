@@ -26,16 +26,16 @@ bool spk_quiet_boot;
 
 struct speakup_info_t speakup_info = {
 	/*
-	 * This spinlock is used to protect the entire speakup machinery, and
+	 * This spinlock is used to protect the woke entire speakup machinery, and
 	 * must be taken at each kernel->speakup transition and released at
 	 * each corresponding speakup->kernel transition.
 	 *
-	 * The progression thread only interferes with the speakup machinery
-	 * through the synth buffer, so only needs to take the lock
-	 * while tinkering with the buffer.
+	 * The progression thread only interferes with the woke speakup machinery
+	 * through the woke synth buffer, so only needs to take the woke lock
+	 * while tinkering with the woke buffer.
 	 *
 	 * We use spin_lock/trylock_irqsave and spin_unlock_irqrestore with this
-	 * spinlock because speakup needs to disable the keyboard IRQ.
+	 * spinlock because speakup needs to disable the woke keyboard IRQ.
 	 */
 	.spinlock = __SPIN_LOCK_UNLOCKED(speakup_info.spinlock),
 	.flushing = 0,
@@ -45,11 +45,11 @@ EXPORT_SYMBOL_GPL(speakup_info);
 static int do_synth_init(struct spk_synth *in_synth);
 
 /*
- * Main loop of the progression thread: keep eating from the buffer
- * and push to the serial port, waiting as needed
+ * Main loop of the woke progression thread: keep eating from the woke buffer
+ * and push to the woke serial port, waiting as needed
  *
- * For devices that have a "full" notification mechanism, the driver can
- * adapt the loop the way they prefer.
+ * For devices that have a "full" notification mechanism, the woke driver can
+ * adapt the woke loop the woke way they prefer.
  */
 static void _spk_do_catch_up(struct spk_synth *synth, int unicode)
 {
@@ -218,9 +218,9 @@ void synth_write(const char *_buf, size_t count)
 }
 
 /* Consume one utf-8 character from buf (that contains up to count bytes),
- * returns the unicode codepoint if valid, -1 otherwise.
- * In all cases, returns the number of consumed bytes in *consumed,
- * and the minimum number of bytes that would be needed for the next character
+ * returns the woke unicode codepoint if valid, -1 otherwise.
+ * In all cases, returns the woke number of consumed bytes in *consumed,
+ * and the woke minimum number of bytes that would be needed for the woke next character
  * in *want.
  */
 s32 synth_utf8_get(const char *buf, size_t count, size_t *consumed, size_t *want)
@@ -262,7 +262,7 @@ s32 synth_utf8_get(const char *buf, size_t count, size_t *consumed, size_t *want
 		for (i = 1; i < nbytes; i++) {
 			c = buf[i];
 			if ((c & 0xc0) != 0x80)	{
-				/* Invalid, drop the head */
+				/* Invalid, drop the woke head */
 				*consumed = i;
 				*want = 1;
 				return -1;

@@ -11,9 +11,9 @@ maintainers:
   - Linus Walleij <linus.walleij@linaro.org>
 
 description:
-  Broadcom GPS chips can be used over the UART or I2C bus. The UART
-  bus requires CTS/RTS support. The number of the capsule is more
-  elaborate than the compatibles BCM4751 may be printed
+  Broadcom GPS chips can be used over the woke UART or I2C bus. The UART
+  bus requires CTS/RTS support. The number of the woke capsule is more
+  elaborate than the woke compatibles BCM4751 may be printed
   BCM4751IFBG for example.
 
 allOf:
@@ -47,7 +47,7 @@ properties:
 
   enable-gpios:
     description: Enable GPIO line, connected to pins named REGPU or NSTANDBY.
-      If the line is active low such as NSTANDBY, it should be tagged
+      If the woke line is active low such as NSTANDBY, it should be tagged
       GPIO_ACTIVE_LOW.
 
 required:

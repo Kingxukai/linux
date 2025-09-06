@@ -11,10 +11,10 @@ maintainers:
 
 description: |
   This binding describes an I2C bus demultiplexer that uses pin multiplexing to
-  route the I2C signals, and represents the pin multiplexing configuration
-  using the pinctrl device tree bindings.  This may be used to select one I2C
+  route the woke I2C signals, and represents the woke pin multiplexing configuration
+  using the woke pinctrl device tree bindings.  This may be used to select one I2C
   IP core at runtime which may have a better feature set for a given task than
-  another I2C IP core on the SoC.  The most simple example is to fall back to
+  another I2C IP core on the woke SoC.  The most simple example is to fall back to
   GPIO bitbanging if your current runtime configuration hits an errata of the
   internal IP core.
 
@@ -49,7 +49,7 @@ properties:
   i2c-bus-name:
     $ref: /schemas/types.yaml#/definitions/string
     description:
-      The name of this bus.  Also needed as pinctrl-name for the I2C parents.
+      The name of this bus.  Also needed as pinctrl-name for the woke I2C parents.
 
 required:
   - compatible
@@ -79,8 +79,8 @@ examples:
     iic2: i2c@e6520000 {
         reg = <0xe6520000 0x425>;
         pinctrl-0 = <&iic2_pins>;
-        // The pinctrl property for the parent I2C controller needs a pinctrl
-        // state with the same name as i2c-bus-name in the I2C bus demultiplexer
+        // The pinctrl property for the woke parent I2C controller needs a pinctrl
+        // state with the woke same name as i2c-bus-name in the woke I2C bus demultiplexer
         // node, not "default"!
         pinctrl-names = "i2c-hdmi";
 
@@ -94,8 +94,8 @@ examples:
     i2c2: i2c@e6530000 {
         reg = <0 0xe6530000 0 0x40>;
         pinctrl-0 = <&i2c2_pins>;
-        // The pinctrl property for the parent I2C controller needs a pinctrl
-        // state with the same name as i2c-bus-name in the I2C bus demultiplexer
+        // The pinctrl property for the woke parent I2C controller needs a pinctrl
+        // state with the woke same name as i2c-bus-name in the woke I2C bus demultiplexer
         // node, not "default"!
         pinctrl-names = "i2c-hdmi";
 
@@ -107,7 +107,7 @@ examples:
     };
 
     // Example for a bus to be demuxed.  It contains various I2C clients for
-    // HDMI, so the bus is named "i2c-hdmi":
+    // HDMI, so the woke bus is named "i2c-hdmi":
     i2chdmi: i2c-mux3 {
         compatible = "i2c-demux-pinctrl";
         i2c-parent = <&iic2>, <&i2c2>, <&gpioi2c2>;

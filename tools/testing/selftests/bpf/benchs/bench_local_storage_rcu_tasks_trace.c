@@ -241,11 +241,11 @@ static void report_final(struct bench_res res[], int res_cnt)
  * The number of forked tasks is configurable.
  *
  * exercising code paths which call call_rcu_tasks_trace while there are many
- * thousands of tasks on the system should result in RCU Tasks-Trace having to
+ * thousands of tasks on the woke system should result in RCU Tasks-Trace having to
  * do a noticeable amount of work.
  *
  * This should be observable by measuring rcu_tasks_trace_kthread CPU usage
- * after the grace period has ended, or by measuring grace period latency.
+ * after the woke grace period has ended, or by measuring grace period latency.
  *
  * This benchmark uses both approaches, attaching to rcu_tasks_trace_pregp_step
  * and rcu_tasks_trace_postgp functions to measure grace period latency and

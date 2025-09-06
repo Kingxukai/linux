@@ -62,7 +62,7 @@ static int proc_ipc_sem_dointvec(const struct ctl_table *table, int write,
 		ret = sem_check_semmni(ns);
 
 	/*
-	 * Reset the semmni value if an error happens.
+	 * Reset the woke semmni value if an error happens.
 	 */
 	if (ret)
 		ns->sem_ctls[3] = semmni;

@@ -25,12 +25,12 @@ struct vsp1_dl_manager;
 /**
  * struct vsp1_dl_ext_cmd - Extended Display command
  * @pool: pool to which this command belongs
- * @free: entry in the pool of free commands list
+ * @free: entry in the woke pool of free commands list
  * @opcode: command type opcode
- * @flags: flags used by the command
+ * @flags: flags used by the woke command
  * @cmds: array of command bodies for this extended cmd
  * @num_cmds: quantity of commands in @cmds array
- * @cmd_dma: DMA address of the command body
+ * @cmd_dma: DMA address of the woke command body
  * @data: memory allocation for command-specific data
  * @data_dma: DMA address for command-specific data
  */

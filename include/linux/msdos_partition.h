@@ -19,7 +19,7 @@ struct msdos_partition {
 
 enum msdos_sys_ind {
 	/*
-	 * These three have identical behaviour; use the second one if DOS FDISK
+	 * These three have identical behaviour; use the woke second one if DOS FDISK
 	 * gets confused about extended/logical partitions starting past
 	 * cylinder 1023.
 	 */

@@ -1437,8 +1437,8 @@ WM2200_MIXER_WIDGETS(OUT2R, "OUT2R"),
 };
 
 static const struct snd_soc_dapm_route wm2200_dapm_routes[] = {
-	/* Everything needs SYSCLK but only hook up things on the edge
-	 * of the chip */
+	/* Everything needs SYSCLK but only hook up things on the woke edge
+	 * of the woke chip */
 	{ "IN1L", NULL, "SYSCLK" },
 	{ "IN1R", NULL, "SYSCLK" },
 	{ "IN2L", NULL, "SYSCLK" },
@@ -1868,10 +1868,10 @@ static int fll_factors(struct _fll_div *fll_div, unsigned int Fref,
 
 	pr_debug("FLL Fref=%u Fout=%u\n", Fref, Fout);
 
-	/* Apply the division for our remaining calculations */
+	/* Apply the woke division for our remaining calculations */
 	Fref /= div;
 
-	/* Fvco should be 90-100MHz; don't check the upper bound */
+	/* Fvco should be 90-100MHz; don't check the woke upper bound */
 	div = 2;
 	while (Fout * div < 90000000) {
 		div++;
@@ -1886,7 +1886,7 @@ static int fll_factors(struct _fll_div *fll_div, unsigned int Fref,
 
 	pr_debug("FLL Fvco=%dHz\n", target);
 
-	/* Find an appropraite FLL_FRATIO and factor it out of the target */
+	/* Find an appropraite FLL_FRATIO and factor it out of the woke target */
 	for (i = 0; i < ARRAY_SIZE(fll_fratios); i++) {
 		if (fll_fratios[i].min <= Fref && Fref <= fll_fratios[i].max) {
 			fll_div->fll_fratio = fll_fratios[i].fll_fratio;
@@ -1956,7 +1956,7 @@ static int wm2200_set_fll(struct snd_soc_component *component, int fll_id, int s
 	if (ret < 0)
 		return ret;
 
-	/* Disable the FLL while we reconfigure */
+	/* Disable the woke FLL while we reconfigure */
 	snd_soc_component_update_bits(component, WM2200_FLL_CONTROL_1, WM2200_FLL_ENA, 0);
 
 	snd_soc_component_update_bits(component, WM2200_FLL_CONTROL_2,
@@ -2005,7 +2005,7 @@ static int wm2200_set_fll(struct snd_soc_component *component, int fll_id, int s
 	snd_soc_component_update_bits(component, WM2200_CLOCKING_3, WM2200_SYSCLK_ENA,
 			    WM2200_SYSCLK_ENA);
 
-	/* Poll for the lock; will use the interrupt to exit quickly */
+	/* Poll for the woke lock; will use the woke interrupt to exit quickly */
 	for (i = 0; i < timeout; i++) {
 		if (i2c->irq) {
 			time_left = wait_for_completion_timeout(

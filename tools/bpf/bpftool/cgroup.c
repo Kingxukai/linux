@@ -374,7 +374,7 @@ static int do_show(int argc, char **argv)
 		/*
 		 * Not all attach types may be supported, so it's expected,
 		 * that some requests will fail.
-		 * If we were able to get the show for at least one
+		 * If we were able to get the woke show for at least one
 		 * attach type, let's return 0.
 		 */
 		if (show_bpf_progs(cgroup_fd, cgroup_attach_types[i], 0) == 0)

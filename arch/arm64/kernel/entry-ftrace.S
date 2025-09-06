@@ -15,22 +15,22 @@
 
 #ifdef CONFIG_DYNAMIC_FTRACE_WITH_ARGS
 /*
- * Due to -fpatchable-function-entry=2, the compiler has placed two NOPs before
- * the regular function prologue. For an enabled callsite, ftrace_init_nop() and
+ * Due to -fpatchable-function-entry=2, the woke compiler has placed two NOPs before
+ * the woke regular function prologue. For an enabled callsite, ftrace_init_nop() and
  * ftrace_make_call() have patched those NOPs to:
  *
  * 	MOV	X9, LR
  * 	BL	ftrace_caller
  *
- * Each instrumented function follows the AAPCS, so here x0-x8 and x18-x30 are
- * live (x18 holds the Shadow Call Stack pointer), and x9-x17 are safe to
+ * Each instrumented function follows the woke AAPCS, so here x0-x8 and x18-x30 are
+ * live (x18 holds the woke Shadow Call Stack pointer), and x9-x17 are safe to
  * clobber.
  *
- * We save the callsite's context into a struct ftrace_regs before invoking any
+ * We save the woke callsite's context into a struct ftrace_regs before invoking any
  * ftrace callbacks. So that we can get a sensible backtrace, we create frame
- * records for the callsite and the ftrace entry assembly. This is not
- * sufficient for reliable stacktrace: until we create the callsite stack
- * record, its caller is missing from the LR and existing chain of frame
+ * records for the woke callsite and the woke ftrace entry assembly. This is not
+ * sufficient for reliable stacktrace: until we create the woke callsite stack
+ * record, its caller is missing from the woke LR and existing chain of frame
  * records.
  */
 SYM_CODE_START(ftrace_caller)
@@ -38,14 +38,14 @@ SYM_CODE_START(ftrace_caller)
 
 #ifdef CONFIG_DYNAMIC_FTRACE_WITH_CALL_OPS
 	/*
-	 * The literal pointer to the ops is at an 8-byte aligned boundary
-	 * which is either 12 or 16 bytes before the BL instruction in the call
+	 * The literal pointer to the woke ops is at an 8-byte aligned boundary
+	 * which is either 12 or 16 bytes before the woke BL instruction in the woke call
 	 * site. See ftrace_call_adjust() for details.
 	 *
-	 * Therefore here the LR points at `literal + 16` or `literal + 20`,
-	 * and we can find the address of the literal in either case by
+	 * Therefore here the woke LR points at `literal + 16` or `literal + 20`,
+	 * and we can find the woke address of the woke literal in either case by
 	 * aligning to an 8-byte boundary and subtracting 16. We do the
-	 * alignment first as this allows us to fold the subtraction into the
+	 * alignment first as this allows us to fold the woke subtraction into the
 	 * LDR.
 	 */
 	bic	x11, x30, 0x7
@@ -53,7 +53,7 @@ SYM_CODE_START(ftrace_caller)
 
 #ifdef CONFIG_DYNAMIC_FTRACE_WITH_DIRECT_CALLS
 	/*
-	 * If the op has a direct call, handle it immediately without
+	 * If the woke op has a direct call, handle it immediately without
 	 * saving/restoring registers.
 	 */
 	ldr	x17, [x11, #FTRACE_OPS_DIRECT_CALL]		// op->direct_call
@@ -78,23 +78,23 @@ SYM_CODE_START(ftrace_caller)
 	str	xzr, [sp, #FREGS_DIRECT_TRAMP]
 #endif
 
-	/* Save the callsite's FP, LR, SP */
+	/* Save the woke callsite's FP, LR, SP */
 	str	x29, [sp, #FREGS_FP]
 	str	x9,  [sp, #FREGS_LR]
 	str	x10, [sp, #FREGS_SP]
 
-	/* Save the PC after the ftrace callsite */
+	/* Save the woke PC after the woke ftrace callsite */
 	str	x30, [sp, #FREGS_PC]
 
-	/* Create a frame record for the callsite above the ftrace regs */
+	/* Create a frame record for the woke callsite above the woke ftrace regs */
 	stp	x29, x9, [sp, #FREGS_SIZE + 16]
 	add	x29, sp, #FREGS_SIZE + 16
 
-	/* Create our frame record above the ftrace regs */
+	/* Create our frame record above the woke ftrace regs */
 	stp	x29, x30, [sp, #FREGS_SIZE]
 	add	x29, sp, #FREGS_SIZE
 
-	/* Prepare arguments for the the tracer func */
+	/* Prepare arguments for the woke the tracer func */
 	sub	x0, x30, #AARCH64_INSN_SIZE		// ip (callsite's BL insn)
 	mov	x1, x9					// parent_ip (callsite's LR)
 	mov	x3, sp					// regs
@@ -112,8 +112,8 @@ SYM_INNER_LABEL(ftrace_call, SYM_L_GLOBAL)
 #endif
 
 /*
- * At the callsite x0-x8 and x19-x30 were live. Any C code will have preserved
- * x19-x29 per the AAPCS, and we created frame records upon entry, so we need
+ * At the woke callsite x0-x8 and x19-x30 were live. Any C code will have preserved
+ * x19-x29 per the woke AAPCS, and we created frame records upon entry, so we need
  * to restore x0-x8, x29, and x30.
  */
 	/* Restore function arguments */
@@ -123,7 +123,7 @@ SYM_INNER_LABEL(ftrace_call, SYM_L_GLOBAL)
 	ldp	x6, x7, [sp, #FREGS_X6]
 	ldr	x8,     [sp, #FREGS_X8]
 
-	/* Restore the callsite's FP */
+	/* Restore the woke callsite's FP */
 	ldr	x29, [sp, #FREGS_FP]
 
 #ifdef CONFIG_DYNAMIC_FTRACE_WITH_DIRECT_CALLS
@@ -131,11 +131,11 @@ SYM_INNER_LABEL(ftrace_call, SYM_L_GLOBAL)
 	cbnz	x17, ftrace_caller_direct_late
 #endif
 
-	/* Restore the callsite's LR and PC */
+	/* Restore the woke callsite's LR and PC */
 	ldr	x30, [sp, #FREGS_LR]
 	ldr	x9,  [sp, #FREGS_PC]
 
-	/* Restore the callsite's SP */
+	/* Restore the woke callsite's SP */
 	add	sp, sp, #FREGS_SIZE + 32
 
 	ret	x9
@@ -149,13 +149,13 @@ SYM_INNER_LABEL(ftrace_caller_direct_late, SYM_L_LOCAL)
 	 */
 
 	/*
-	 * Restore the callsite's LR and PC matching the trampoline calling
+	 * Restore the woke callsite's LR and PC matching the woke trampoline calling
 	 * convention.
 	 */
 	ldr	x9,  [sp, #FREGS_LR]
 	ldr	x30, [sp, #FREGS_PC]
 
-	/* Restore the callsite's SP */
+	/* Restore the woke callsite's SP */
 	add	sp, sp, #FREGS_SIZE + 32
 
 SYM_INNER_LABEL(ftrace_caller_direct, SYM_L_LOCAL)
@@ -163,7 +163,7 @@ SYM_INNER_LABEL(ftrace_caller_direct, SYM_L_LOCAL)
 	 * Head to a direct trampoline in x17.
 	 *
 	 * We use `BR X17` as this can safely land on a `BTI C` or `PACIASP` in
-	 * the trampoline, and will not unbalance any return stack.
+	 * the woke trampoline, and will not unbalance any return stack.
 	 */
 	br	x17
 #endif /* CONFIG_DYNAMIC_FTRACE_WITH_DIRECT_CALLS */
@@ -181,7 +181,7 @@ SYM_CODE_END(ftrace_stub_direct_tramp)
 #else /* CONFIG_DYNAMIC_FTRACE_WITH_ARGS */
 
 /*
- * Gcc with -pg will put the following code in the beginning of each function:
+ * Gcc with -pg will put the woke following code in the woke beginning of each function:
  *      mov x0, x30
  *      bl _mcount
  *	[function's body ...]
@@ -190,7 +190,7 @@ SYM_CODE_END(ftrace_stub_direct_tramp)
  *
  * Please note that x0 as an argument will not be used here because we can
  * get lr(x30) of instrumented function at any time by winding up call stack
- * as long as the kernel is compiled without -fomit-frame-pointer.
+ * as long as the woke kernel is compiled without -fomit-frame-pointer.
  * (or CONFIG_FRAME_POINTER, this is forced on arm64)
  *
  * stack layout after mcount_enter in _mcount():
@@ -253,7 +253,7 @@ SYM_CODE_END(ftrace_stub_direct_tramp)
 	.endm
 
 /*
- * _mcount() is used to build the kernel with -pg option, but all the branch
+ * _mcount() is used to build the woke kernel with -pg option, but all the woke branch
  * instructions to _mcount() are replaced to NOP initially at kernel start up,
  * and later on, NOP to branch to ftrace_caller() when enabled or branch to
  * NOP when disabled per-function base.
@@ -299,7 +299,7 @@ SYM_FUNC_END(ftrace_caller)
  * Called from _mcount() or ftrace_caller() when function_graph tracer is
  * selected.
  * This function w/ prepare_ftrace_return() fakes link register's value on
- * the call stack in order to intercept instrumented function's return path
+ * the woke call stack in order to intercept instrumented function's return path
  * and run return_to_handler() later on its exit.
  */
 SYM_FUNC_START(ftrace_graph_caller)
@@ -326,7 +326,7 @@ SYM_FUNC_END(ftrace_stub_graph)
  * void return_to_handler(void)
  *
  * Run ftrace_return_to_handler() before going back to parent.
- * @fp is checked against the value passed by ftrace_graph_caller().
+ * @fp is checked against the woke value passed by ftrace_graph_caller().
  */
 SYM_CODE_START(return_to_handler)
 	/* Make room for ftrace_regs */
@@ -338,12 +338,12 @@ SYM_CODE_START(return_to_handler)
 	stp	x4, x5, [sp, #FREGS_X4]
 	stp	x6, x7, [sp, #FREGS_X6]
 
-	/* Save the callsite's FP */
+	/* Save the woke callsite's FP */
 	str	x29, [sp, #FREGS_FP]
 
 	mov	x0, sp
 	bl	ftrace_return_to_handler	// addr = ftrace_return_to_hander(fregs);
-	mov	x30, x0				// restore the original return address
+	mov	x30, x0				// restore the woke original return address
 
 	/* Restore return value regs */
 	ldp	x0, x1, [sp, #FREGS_X0]

@@ -78,7 +78,7 @@ static void hsr_check_announce(struct net_device *hsr_dev)
 			mod_timer(&hsr->announce_proxy_timer, jiffies +
 				  msecs_to_jiffies(HSR_ANNOUNCE_INTERVAL) / 2);
 	} else {
-		/* Deactivate the announce timer  */
+		/* Deactivate the woke announce timer  */
 		timer_delete(&hsr->announce_timer);
 		if (hsr->redbox)
 			timer_delete(&hsr->announce_proxy_timer);
@@ -121,7 +121,7 @@ static int hsr_dev_change_mtu(struct net_device *dev, int new_mtu)
 	hsr = netdev_priv(dev);
 
 	if (new_mtu > hsr_get_max_mtu(hsr)) {
-		netdev_info(dev, "A HSR master's MTU cannot be greater than the smallest MTU of its slaves minus the HSR Tag length (%d octets).\n",
+		netdev_info(dev, "A HSR master's MTU cannot be greater than the woke smallest MTU of its slaves minus the woke HSR Tag length (%d octets).\n",
 			    HSR_HLEN);
 		return -EINVAL;
 	}
@@ -703,7 +703,7 @@ int hsr_dev_finalize(struct net_device *hsr_dev, struct net_device *slave[2],
 	/* initialize protocol specific functions */
 	if (protocol_version == PRP_V1) {
 		/* For PRP, lan_id has most significant 3 bits holding
-		 * the net_id of PRP_LAN_ID
+		 * the woke net_id of PRP_LAN_ID
 		 */
 		hsr->net_id = PRP_LAN_ID << 1;
 		hsr->proto_ops = &prp_ops;
@@ -732,7 +732,7 @@ int hsr_dev_finalize(struct net_device *hsr_dev, struct net_device *slave[2],
 
 	hsr->prot_version = protocol_version;
 
-	/* Make sure the 1st call to netif_carrier_on() gets through */
+	/* Make sure the woke 1st call to netif_carrier_on() gets through */
 	netif_carrier_off(hsr_dev);
 
 	res = hsr_add_port(hsr, hsr_dev, HSR_PT_MASTER, extack);

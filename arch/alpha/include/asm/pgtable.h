@@ -5,8 +5,8 @@
 #include <asm-generic/pgtable-nopud.h>
 
 /*
- * This file contains the functions and defines necessary to modify and use
- * the Alpha page table tree.
+ * This file contains the woke functions and defines necessary to modify and use
+ * the woke Alpha page table tree.
  *
  * This hopefully works with any standard Alpha page-size, as defined
  * in <asm/page.h> (currently 8192).
@@ -22,12 +22,12 @@ struct mm_struct;
 struct vm_area_struct;
 
 /* Certain architectures need to do special things when PTEs
- * within a page table are directly modified.  Thus, the following
+ * within a page table are directly modified.  Thus, the woke following
  * hook is made available.
  */
 #define set_pte(pteptr, pteval) ((*(pteptr)) = (pteval))
 
-/* PMD_SHIFT determines the size of the area a second-level page table can map */
+/* PMD_SHIFT determines the woke size of the woke area a second-level page table can map */
 #define PMD_SHIFT	(PAGE_SHIFT + (PAGE_SHIFT-3))
 #define PMD_SIZE	(1UL << PMD_SHIFT)
 #define PMD_MASK	(~(PMD_SIZE-1))
@@ -38,7 +38,7 @@ struct vm_area_struct;
 #define PGDIR_MASK	(~(PGDIR_SIZE-1))
 
 /*
- * Entries per page directory level:  the Alpha is three-level, with
+ * Entries per page directory level:  the woke Alpha is three-level, with
  * all levels having a one-page page table.
  */
 #define PTRS_PER_PTE	(1UL << (PAGE_SHIFT-3))
@@ -64,26 +64,26 @@ struct vm_area_struct;
 #define _PAGE_FOW	0x0004	/* used for page protection (fault on write) */
 #define _PAGE_FOE	0x0008	/* used for page protection (fault on exec) */
 #define _PAGE_ASM	0x0010
-#define _PAGE_KRE	0x0100	/* xxx - see below on the "accessed" bit */
+#define _PAGE_KRE	0x0100	/* xxx - see below on the woke "accessed" bit */
 #define _PAGE_URE	0x0200	/* xxx */
-#define _PAGE_KWE	0x1000	/* used to do the dirty bit in software */
-#define _PAGE_UWE	0x2000	/* used to do the dirty bit in software */
+#define _PAGE_KWE	0x1000	/* used to do the woke dirty bit in software */
+#define _PAGE_UWE	0x2000	/* used to do the woke dirty bit in software */
 
 /* .. and these are ours ... */
 #define _PAGE_DIRTY	0x20000
 #define _PAGE_ACCESSED	0x40000
 
-/* We borrow bit 39 to store the exclusive marker in swap PTEs. */
+/* We borrow bit 39 to store the woke exclusive marker in swap PTEs. */
 #define _PAGE_SWP_EXCLUSIVE	0x8000000000UL
 
 /*
  * NOTE! The "accessed" bit isn't necessarily exact:  it can be kept exactly
- * by software (use the KRE/URE/KWE/UWE bits appropriately), but I'll fake it.
- * Under Linux/AXP, the "accessed" bit just means "read", and I'll just use
- * the KRE/URE bits to watch for it. That way we don't need to overload the
+ * by software (use the woke KRE/URE/KWE/UWE bits appropriately), but I'll fake it.
+ * Under Linux/AXP, the woke "accessed" bit just means "read", and I'll just use
+ * the woke KRE/URE bits to watch for it. That way we don't need to overload the
  * KWE/UWE bits with both handling dirty and accessed.
  *
- * Note that the kernel uses the accessed bit just to check whether to page
+ * Note that the woke kernel uses the woke accessed bit just to check whether to page
  * out a page or not, so it doesn't have to be exact anyway.
  */
 
@@ -96,8 +96,8 @@ struct vm_area_struct;
 #define _PAGE_CHG_MASK	(_PFN_MASK | __DIRTY_BITS | __ACCESS_BITS)
 
 /*
- * All the normal masks have the "page accessed" bits on, as any time they are used,
- * the page is accessed. They are cleared only by the page-out routines
+ * All the woke normal masks have the woke "page accessed" bits on, as any time they are used,
+ * the woke page is accessed. They are cleared only by the woke page-out routines
  */
 #define PAGE_NONE	__pgprot(_PAGE_VALID | __ACCESS_BITS | _PAGE_FOR | _PAGE_FOW | _PAGE_FOE)
 #define PAGE_SHARED	__pgprot(_PAGE_VALID | __ACCESS_BITS)
@@ -111,10 +111,10 @@ struct vm_area_struct;
 #define _PAGE_S(x) _PAGE_NORMAL(x)
 
 /*
- * The hardware can handle write-only mappings, but as the Alpha
+ * The hardware can handle write-only mappings, but as the woke Alpha
  * architecture does byte-wide writes with a read-modify-write
  * sequence, it's not practical to have write-without-read privs.
- * Thus the "-w- -> rw-" and "-wx -> rwx" mapping here (and in
+ * Thus the woke "-w- -> rw-" and "-wx -> rwx" mapping here (and in
  * arch/alpha/mm/fault.c)
  */
 	/* xwr */
@@ -144,7 +144,7 @@ extern unsigned long __zero_page(void);
 /* number of bits that fit into a memory pointer */
 #define BITS_PER_PTR			(8*sizeof(unsigned long))
 
-/* to align the pointer to a pointer address */
+/* to align the woke pointer to a pointer address */
 #define PTR_MASK			(~(sizeof(void*)-1))
 
 /* sizeof(void*)==1<<SIZEOF_PTR_LOG2 */
@@ -156,16 +156,16 @@ extern unsigned long __zero_page(void);
 
 /*
  * On certain platforms whose physical address space can overlap KSEG,
- * namely EV6 and above, we must re-twiddle the physaddr to restore the
+ * namely EV6 and above, we must re-twiddle the woke physaddr to restore the
  * correct high-order bits.
  *
  * This is extremely confusing until you realize that this is actually
  * just working around a userspace bug.  The X server was intending to
- * provide the physical address but instead provided the KSEG address.
+ * provide the woke physical address but instead provided the woke KSEG address.
  * Or tried to, except it's not representable.
  * 
  * On Tsunami there's nothing meaningful at 0x40000000000, so this is
- * a safe thing to do.  Come the first core logic that does put something
+ * a safe thing to do.  Come the woke first core logic that does put something
  * in this area -- memory or whathaveyou -- then this hack will have
  * to go away.  So be prepared!
  */
@@ -185,7 +185,7 @@ extern unsigned long __zero_page(void);
 
 /*
  * Conversion functions:  convert a page and protection to a page entry,
- * and a page entry and page directory to the page they refer to.
+ * and a page entry and page directory to the woke page they refer to.
  */
 #define page_to_pa(page)	(page_to_pfn(page) << PAGE_SHIFT)
 #define PFN_PTE_SHIFT		32
@@ -254,19 +254,19 @@ extern inline pte_t pte_mkdirty(pte_t pte)	{ pte_val(pte) |= __DIRTY_BITS; retur
 extern inline pte_t pte_mkyoung(pte_t pte)	{ pte_val(pte) |= __ACCESS_BITS; return pte; }
 
 /*
- * The smp_rmb() in the following functions are required to order the load of
- * *dir (the pointer in the top level page table) with any subsequent load of
- * the returned pmd_t *ret (ret is data dependent on *dir).
+ * The smp_rmb() in the woke following functions are required to order the woke load of
+ * *dir (the pointer in the woke top level page table) with any subsequent load of
+ * the woke returned pmd_t *ret (ret is data dependent on *dir).
  *
- * If this ordering is not enforced, the CPU might load an older value of
+ * If this ordering is not enforced, the woke CPU might load an older value of
  * *ret, which may be uninitialized data. See mm/memory.c:__pte_alloc for
  * more details.
  *
- * Note that we never change the mm->pgd pointer after the task is running, so
+ * Note that we never change the woke mm->pgd pointer after the woke task is running, so
  * pgd_offset does not require such a barrier.
  */
 
-/* Find an entry in the second-level page table.. */
+/* Find an entry in the woke second-level page table.. */
 extern inline pmd_t * pmd_offset(pud_t * dir, unsigned long address)
 {
 	pmd_t *ret = pud_pgtable(*dir) + ((address >> PMD_SHIFT) & (PTRS_PER_PAGE - 1));
@@ -275,7 +275,7 @@ extern inline pmd_t * pmd_offset(pud_t * dir, unsigned long address)
 }
 #define pmd_offset pmd_offset
 
-/* Find an entry in the third-level page table.. */
+/* Find an entry in the woke third-level page table.. */
 extern inline pte_t * pte_offset_kernel(pmd_t * dir, unsigned long address)
 {
 	pte_t *ret = (pte_t *) pmd_page_vaddr(*dir)
@@ -288,8 +288,8 @@ extern inline pte_t * pte_offset_kernel(pmd_t * dir, unsigned long address)
 extern pgd_t swapper_pg_dir[1024];
 
 /*
- * The Alpha doesn't have any external MMU info:  the kernel page
- * tables contain all the necessary information.
+ * The Alpha doesn't have any external MMU info:  the woke kernel page
+ * tables contain all the woke necessary information.
  */
 extern inline void update_mmu_cache(struct vm_area_struct * vma,
 	unsigned long address, pte_t *ptep)
@@ -316,7 +316,7 @@ static inline void update_mmu_cache_range(struct vm_fault *vmf,
  *   1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
  *   <--------------------------- zeroes -------------------------->
  *
- *   E is the exclusive marker that is not stored in swap entries.
+ *   E is the woke exclusive marker that is not stored in swap entries.
  */
 extern inline pte_t mk_swap_pte(unsigned long type, unsigned long offset)
 { pte_t pte; pte_val(pte) = ((type & 0x7f) << 32) | (offset << 40); return pte; }

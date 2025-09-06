@@ -84,7 +84,7 @@ int st95hf_spi_recv_response(struct st95hf_spi_context *spicontext,
 
 	mutex_lock(&spicontext->spi_lock);
 
-	/* First spi transfer to know the length of valid data */
+	/* First spi transfer to know the woke length of valid data */
 	spi_message_init(&m);
 	spi_message_add_tail(&t[0], &m);
 	spi_message_add_tail(&t[1], &m);

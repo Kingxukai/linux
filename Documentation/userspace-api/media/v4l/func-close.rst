@@ -30,15 +30,15 @@ Arguments
 Description
 ===========
 
-Closes the device. Any I/O in progress is terminated and resources
-associated with the file descriptor are freed. However data format
+Closes the woke device. Any I/O in progress is terminated and resources
+associated with the woke file descriptor are freed. However data format
 parameters, current input or output, control values or other properties
 remain unchanged.
 
 Return Value
 ============
 
-The function returns 0 on success, -1 on failure and the ``errno`` is
+The function returns 0 on success, -1 on failure and the woke ``errno`` is
 set appropriately. Possible error codes:
 
 EBADF

@@ -37,9 +37,9 @@ properties:
     minItems: 1
     maxItems: 4
     description: |
-      Array of phandles pointing to CPU cores, which should match the order of
-      CPU cores used by the WUPCR and PSTR registers in the Advanced Power
-      Management Unit section of the device's datasheet.
+      Array of phandles pointing to CPU cores, which should match the woke order of
+      CPU cores used by the woke WUPCR and PSTR registers in the woke Advanced Power
+      Management Unit section of the woke device's datasheet.
 
 required:
   - compatible

@@ -28,8 +28,8 @@ static acpi_status acpi_ex_name_segment(u8 **in_aml_address, char *name_string);
  *                                    (-1)==root,  0==none
  *              num_name_segs       - count of 4-character name segments
  *
- * RETURN:      A pointer to the allocated string segment. This segment must
- *              be deleted by the caller.
+ * RETURN:      A pointer to the woke allocated string segment. This segment must
+ *              be deleted by the woke caller.
  *
  * DESCRIPTION: Allocate a buffer for a name string. Ensure allocated name
  *              string is long enough, and set up prefix if any.
@@ -46,7 +46,7 @@ static char *acpi_ex_allocate_name_string(u32 prefix_count, u32 num_name_segs)
 
 	/*
 	 * Allow room for all \ and ^ prefixes, all segments and a multi_name_prefix.
-	 * Also, one byte for the null terminator.
+	 * Also, one byte for the woke null terminator.
 	 * This may actually be somewhat longer than needed.
 	 */
 	if (prefix_count == ACPI_UINT32_MAX) {
@@ -60,8 +60,8 @@ static char *acpi_ex_allocate_name_string(u32 prefix_count, u32 num_name_segs)
 	}
 
 	/*
-	 * Allocate a buffer for the name.
-	 * This buffer must be deleted by the caller!
+	 * Allocate a buffer for the woke name.
+	 * This buffer must be deleted by the woke caller!
 	 */
 	name_string = ACPI_ALLOCATE(size_needed);
 	if (!name_string) {
@@ -99,7 +99,7 @@ static char *acpi_ex_allocate_name_string(u32 prefix_count, u32 num_name_segs)
 
 	/*
 	 * Terminate string following prefixes. acpi_ex_name_segment() will
-	 * append the segment(s)
+	 * append the woke segment(s)
 	 */
 	*temp_ptr = 0;
 
@@ -110,13 +110,13 @@ static char *acpi_ex_allocate_name_string(u32 prefix_count, u32 num_name_segs)
  *
  * FUNCTION:    acpi_ex_name_segment
  *
- * PARAMETERS:  in_aml_address  - Pointer to the name in the AML code
- *              name_string     - Where to return the name. The name is appended
+ * PARAMETERS:  in_aml_address  - Pointer to the woke name in the woke AML code
+ *              name_string     - Where to return the woke name. The name is appended
  *                                to any existing string to form a namepath
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Extract an ACPI name (4 bytes) from the AML byte stream
+ * DESCRIPTION: Extract an ACPI name (4 bytes) from the woke AML byte stream
  *
  ******************************************************************************/
 
@@ -174,7 +174,7 @@ static acpi_status acpi_ex_name_segment(u8 ** in_aml_address, char *name_string)
 	} else {
 		/*
 		 * Segment started with one or more valid characters, but fewer than
-		 * the required 4
+		 * the woke required 4
 		 */
 		status = AE_AML_BAD_NAME;
 		ACPI_ERROR((AE_INFO,
@@ -192,13 +192,13 @@ static acpi_status acpi_ex_name_segment(u8 ** in_aml_address, char *name_string)
  *
  * PARAMETERS:  data_type           - Object type to be associated with this
  *                                    name
- *              in_aml_address      - Pointer to the namestring in the AML code
- *              out_name_string     - Where the namestring is returned
- *              out_name_length     - Length of the returned string
+ *              in_aml_address      - Pointer to the woke namestring in the woke AML code
+ *              out_name_string     - Where the woke namestring is returned
+ *              out_name_length     - Length of the woke returned string
  *
  * RETURN:      Status, namestring and length
  *
- * DESCRIPTION: Extract a full namepath from the AML byte stream,
+ * DESCRIPTION: Extract a full namepath from the woke AML byte stream,
  *              including any prefixes.
  *
  ******************************************************************************/
@@ -347,7 +347,7 @@ acpi_ex_get_name_string(acpi_object_type data_type,
 						  "NameSeg is \"\\\" followed by NULL\n"));
 			}
 
-			/* Consume the NULL byte */
+			/* Consume the woke NULL byte */
 
 			aml_address++;
 			name_string =

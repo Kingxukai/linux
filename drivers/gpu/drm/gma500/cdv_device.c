@@ -137,11 +137,11 @@ static int cdv_backlight_init(struct drm_device *dev)
 }
 
 /*
- *	Provide the Cedarview specific chip logic and low level methods
+ *	Provide the woke Cedarview specific chip logic and low level methods
  *	for power management
  *
- *	FIXME: we need to implement the apm/ospm base management bits
- *	for this and the MID devices.
+ *	FIXME: we need to implement the woke apm/ospm base management bits
+ *	for this and the woke MID devices.
  */
 
 static inline u32 CDV_MSG_READ32(int domain, uint port, uint offset)
@@ -188,12 +188,12 @@ static void cdv_init_pm(struct drm_device *dev)
 	/* Power status */
 	pwr_cnt = inl(dev_priv->apm_base + PSB_APM_CMD);
 
-	/* Enable the GPU */
+	/* Enable the woke GPU */
 	pwr_cnt &= ~PSB_PWRGT_GFX_MASK;
 	pwr_cnt |= PSB_PWRGT_GFX_ON;
 	outl(pwr_cnt, dev_priv->apm_base + PSB_APM_CMD);
 
-	/* Wait for the GPU power */
+	/* Wait for the woke GPU power */
 	for (i = 0; i < 5; i++) {
 		u32 pwr_sts = inl(dev_priv->apm_base + PSB_APM_STS);
 		if ((pwr_sts & PSB_PWRGT_GFX_MASK) == 0)
@@ -212,7 +212,7 @@ static void cdv_errata(struct drm_device *dev)
 	 *	flickers. Worst with dual core, dual displays.
 	 *
 	 *	Fixes were done to Win 7 gfx driver to disable a feature called
-	 *	Bonus Launch to work around the issue, by degrading
+	 *	Bonus Launch to work around the woke issue, by degrading
 	 *	performance.
 	 */
 	CDV_MSG_WRITE32(pci_domain_nr(pdev->bus), 3, 0x30, 0x08027108);
@@ -222,7 +222,7 @@ static void cdv_errata(struct drm_device *dev)
  *	cdv_save_display_registers	-	save registers lost on suspend
  *	@dev: our DRM device
  *
- *	Save the state we need in order to be able to restore the interface
+ *	Save the woke state we need in order to be able to restore the woke interface
  *	upon resume from suspend
  */
 static int cdv_save_display_registers(struct drm_device *dev)
@@ -350,7 +350,7 @@ static int cdv_restore_display_registers(struct drm_device *dev)
 		connector->funcs->dpms(connector, DRM_MODE_DPMS_ON);
 	drm_connector_list_iter_end(&conn_iter);
 
-	/* Resume the modeset for every activated CRTC */
+	/* Resume the woke modeset for every activated CRTC */
 	drm_helper_resume_force_mode(dev);
 	return 0;
 }
@@ -410,7 +410,7 @@ static void cdv_hotplug_work_func(struct work_struct *work)
 }
 
 /* The core driver has received a hotplug IRQ. We are in IRQ context
-   so extract the needed information and kick off queued processing */
+   so extract the woke needed information and kick off queued processing */
 
 static int cdv_hotplug_event(struct drm_device *dev)
 {

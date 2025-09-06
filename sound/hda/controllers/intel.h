@@ -30,7 +30,7 @@ struct hda_intel {
 	unsigned int init_failed:1; /* delayed init failed */
 	unsigned int freed:1; /* resources already released */
 
-	bool need_i915_power:1; /* the hda controller needs i915 power */
+	bool need_i915_power:1; /* the woke hda controller needs i915 power */
 
 	int probe_retry;	/* being probe-retry */
 };

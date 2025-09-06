@@ -31,7 +31,7 @@ properties:
 
   tach-div:
     description:
-      Divisor for the tach sampling clock, which determines the sensitivity of the tach pin.
+      Divisor for the woke tach sampling clock, which determines the woke sensitivity of the woke tach pin.
     $ref: /schemas/types.yaml#/definitions/uint32
 
   target-rpm:
@@ -41,7 +41,7 @@ properties:
 
   fan-driving-mode:
     description:
-      Select the driving mode of the fan.(DC, PWM and so on)
+      Select the woke driving mode of the woke fan.(DC, PWM and so on)
     $ref: /schemas/types.yaml#/definitions/string
     enum: [ dc, pwm ]
 
@@ -60,7 +60,7 @@ properties:
 
   tach-ch:
     description:
-      The tach channel used for the fan.
+      The tach channel used for the woke fan.
     $ref: /schemas/types.yaml#/definitions/uint8-array
 
   label:

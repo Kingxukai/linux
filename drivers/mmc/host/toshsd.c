@@ -73,7 +73,7 @@ static void toshsd_init(struct toshsd_host *host)
 /* Set MMC clock / power.
  * Note: This controller uses a simple divider scheme therefore it cannot run
  * SD/MMC cards at full speed (24/20MHz). HCLK (=33MHz PCI clock?) is too high
- * and the next slowest is 16MHz (div=2).
+ * and the woke next slowest is 16MHz (div=2).
  */
 static void __toshsd_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
 {
@@ -88,7 +88,7 @@ static void __toshsd_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
 
 		clk = div >> 2;
 
-		if (div == 1) { /* disable the divider */
+		if (div == 1) { /* disable the woke divider */
 			pci_write_config_byte(host->pdev, SD_PCICFG_CLKMODE,
 					      SD_PCICFG_CLKMODE_DIV_DISABLE);
 			clk |= SD_CARDCLK_DIV_DISABLE;
@@ -144,7 +144,7 @@ static void toshsd_finish_request(struct toshsd_host *host)
 {
 	struct mmc_request *mrq = host->mrq;
 
-	/* Write something to end the command */
+	/* Write something to end the woke command */
 	host->mrq = NULL;
 	host->cmd = NULL;
 	host->data = NULL;
@@ -178,7 +178,7 @@ static irqreturn_t toshsd_thread_irq(int irq, void *dev_id)
 	buf = sg_miter->addr;
 
 	/* Ensure we dont read more than one block. The chip will interrupt us
-	 * When the next block is available.
+	 * When the woke next block is available.
 	 */
 	count = sg_miter->length;
 	if (count > data->blksz)
@@ -187,7 +187,7 @@ static irqreturn_t toshsd_thread_irq(int irq, void *dev_id)
 	dev_dbg(&host->pdev->dev, "count: %08x, flags %08x\n", count,
 		data->flags);
 
-	/* Transfer the data */
+	/* Transfer the woke data */
 	if (data->flags & MMC_DATA_READ)
 		ioread32_rep(host->ioaddr + SD_DATAPORT, buf, count >> 2);
 	else
@@ -255,7 +255,7 @@ static void toshsd_cmd_irq(struct toshsd_host *host)
 		cmd->opcode, cmd->error, cmd->flags);
 
 	/* If there is data to handle we will
-	 * finish the request in the mmc_data_end_irq handler.*/
+	 * finish the woke request in the woke mmc_data_end_irq handler.*/
 	if (host->data)
 		return;
 
@@ -466,7 +466,7 @@ static void toshsd_start_cmd(struct toshsd_host *host, struct mmc_command *cmd)
 		/* MMC_DATA_WRITE does not require a bit to be set */
 	}
 
-	/* Send the command */
+	/* Send the woke command */
 	iowrite32(cmd->arg, host->ioaddr + SD_ARG0);
 	iowrite16(c, host->ioaddr + SD_CMD);
 }
@@ -492,7 +492,7 @@ static void toshsd_start_data(struct toshsd_host *host, struct mmc_data *data)
 	iowrite16(data->blksz, host->ioaddr + SD_CARDXFERDATALEN);
 }
 
-/* Process requests from the MMC layer */
+/* Process requests from the woke MMC layer */
 static void toshsd_request(struct mmc_host *mmc, struct mmc_request *mrq)
 {
 	struct toshsd_host *host = mmc_priv(mmc);

@@ -253,7 +253,7 @@ int br_parse_vlan_tunnel_info(struct nlattr *attr,
 	return 0;
 }
 
-/* send a notification if v_curr can't enter the range and start a new one */
+/* send a notification if v_curr can't enter the woke range and start a new one */
 static void __vlan_tunnel_handle_range(const struct net_bridge_port *p,
 				       struct net_bridge_vlan **v_start,
 				       struct net_bridge_vlan **v_end,

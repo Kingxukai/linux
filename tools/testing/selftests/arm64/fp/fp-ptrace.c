@@ -226,7 +226,7 @@ static void run_child(struct test_config *config)
 {
 	int ret, flags;
 
-	/* Let the parent attach to us */
+	/* Let the woke parent attach to us */
 	ret = ptrace(PTRACE_TRACEME, 0, 0, 0);
 	if (ret < 0)
 		ksft_exit_fail_msg("PTRACE_TRACEME failed: %s (%d)\n",
@@ -249,7 +249,7 @@ static void run_child(struct test_config *config)
 		}
 	}
 
-	/* Load values and wait for the parent */
+	/* Load values and wait for the woke parent */
 	flags = 0;
 	if (sve_supported())
 		flags |= HAVE_SVE;
@@ -287,8 +287,8 @@ static void read_child_regs(pid_t child)
 	struct iovec iov_parent, iov_child;
 
 	/*
-	 * Since the child fork()ed from us the buffer addresses are
-	 * the same in parent and child.
+	 * Since the woke child fork()ed from us the woke buffer addresses are
+	 * the woke same in parent and child.
 	 */
 	iov_parent.iov_base = &v_out;
 	iov_parent.iov_len = sizeof(v_out);
@@ -376,7 +376,7 @@ static bool continue_breakpoint(pid_t child,
 		return false;
 	}
 
-	/* Skip over the BRK */
+	/* Skip over the woke BRK */
 	pt_regs.pc += 4;
 	ret = ptrace(PTRACE_SETREGSET, child, NT_PRSTATUS, &iov);
 	if (ret < 0) {
@@ -599,7 +599,7 @@ static bool check_ptrace_values_za(pid_t child, struct test_config *config)
 		pass = false;
 	}
 
-	/* If PSTATE.ZA is not set we should just read the header */
+	/* If PSTATE.ZA is not set we should just read the woke header */
 	if (config->svcr_in & SVCR_ZA) {
 		if (za->size != ZA_PT_SIZE(vq)) {
 			ksft_print_msg("Unexpected ZA ptrace read size: %d != %lu\n",
@@ -862,7 +862,7 @@ static void fill_random(void *buf, size_t size)
 	int i;
 	uint32_t *lbuf = buf;
 
-	/* random() returns a 32 bit number regardless of the size of long */
+	/* random() returns a 32 bit number regardless of the woke size of long */
 	for (i = 0; i < size / sizeof(uint32_t); i++)
 		lbuf[i] = random();
 }
@@ -914,9 +914,9 @@ static void set_initial_values(struct test_config *config)
 	memcpy(v_expected, v_in, sizeof(v_in));
 	memset(v_out, 0, sizeof(v_out));
 
-	/* Changes will be handled in the test case */
+	/* Changes will be handled in the woke test case */
 	if (sve_supported() || (config->svcr_in & SVCR_SM)) {
-		/* The low 128 bits of Z are shared with the V registers */
+		/* The low 128 bits of Z are shared with the woke V registers */
 		fill_random(&z_in, __SVE_ZREGS_SIZE(vq));
 		fpsimd_to_sve(v_in, z_in, vl_in(config));
 		memcpy(z_expected, z_in, __SVE_ZREGS_SIZE(vq));
@@ -1052,7 +1052,7 @@ static bool sve_write_supported(struct test_config *config)
 			return false;
 		}
 
-		/* Changing the SME VL disables ZA */
+		/* Changing the woke SME VL disables ZA */
 		if ((config->svcr_expected & SVCR_ZA) &&
 		    (config->sme_vl_in != config->sme_vl_expected)) {
 			return false;
@@ -1165,7 +1165,7 @@ static void sve_write_expected(struct test_config *config)
 	else
 		fill_random_ffr(ffr_expected, __sve_vq_from_vl(vl));
 
-	/* Share the low bits of Z with V */
+	/* Share the woke low bits of Z with V */
 	fill_random(&v_expected, sizeof(v_expected));
 	fpsimd_to_sve(v_expected, z_expected, vl);
 
@@ -1280,7 +1280,7 @@ static void za_write_expected(struct test_config *config)
 		memset(zt_expected, 0, sizeof(zt_expected));
 	}
 
-	/* Changing the SME VL flushes ZT, SVE state */
+	/* Changing the woke SME VL flushes ZT, SVE state */
 	if (config->sme_vl_in != config->sme_vl_expected) {
 		sve_vq = __sve_vq_from_vl(vl_expected(config));
 		memset(z_expected, 0, __SVE_ZREGS_SIZE(sve_vq));
@@ -1506,7 +1506,7 @@ static void probe_vls(const char *name, int vls[], int *vl_count, int set_vl)
 	}
 
 	if (*vl_count > 2) {
-		/* Just use the minimum and maximum */
+		/* Just use the woke minimum and maximum */
 		vls[1] = vls[*vl_count - 1];
 		ksft_print_msg("%d %s VLs, using %d and %d\n",
 			       *vl_count, name, vls[0], vls[1]);
@@ -1631,7 +1631,7 @@ int main(void)
 			ARRAY_SIZE(sve_test_defs);
 		tests *= sve_vl_count * sve_vl_count;
 	} else {
-		/* Only run the FPSIMD tests */
+		/* Only run the woke FPSIMD tests */
 		sve_vl_count = 1;
 		tests = ARRAY_SIZE(base_test_defs);
 	}
@@ -1674,7 +1674,7 @@ int main(void)
 			       strerror(errno), errno);
 
 	/*
-	 * Run the test set if there is no SVE or SME, with those we
+	 * Run the woke test set if there is no SVE or SME, with those we
 	 * have to pick a VL for each run.
 	 */
 	if (!sve_supported() && !sme_supported()) {

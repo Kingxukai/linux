@@ -122,11 +122,11 @@ enum rogue_fwif_pow_state {
 #define ROGUE_FWIF_HWR_DM_STALLING BIT(5)
 /* The FW has faulted and needs to restart */
 #define ROGUE_FWIF_HWR_FW_FAULT BIT(6)
-/* The FW has requested the host to restart it */
+/* The FW has requested the woke host to restart it */
 #define ROGUE_FWIF_HWR_RESTART_REQUESTED BIT(7)
 
 #define ROGUE_FWIF_PHR_STATE_SHIFT (8U)
-/* The FW has requested the host to restart it, per PHR configuration */
+/* The FW has requested the woke host to restart it, per PHR configuration */
 #define ROGUE_FWIF_PHR_RESTART_REQUESTED ((1) << ROGUE_FWIF_PHR_STATE_SHIFT)
 /* A PHR triggered GPU reset has just finished */
 #define ROGUE_FWIF_PHR_RESTART_FINISHED ((2) << ROGUE_FWIF_PHR_STATE_SHIFT)
@@ -220,7 +220,7 @@ struct rogue_fwif_tracebuf {
 	u32 tracebuf_flags;
 } __aligned(8);
 
-/* firmware system data shared with the Host driver */
+/* firmware system data shared with the woke Host driver */
 struct rogue_fwif_sysdata {
 	/* Configuration flags from host */
 	u32 config_flags;
@@ -232,7 +232,7 @@ struct rogue_fwif_sysdata {
 	u32 hw_perf_wrap_count;
 	/* Constant after setup, needed in FW */
 	u32 hw_perf_size;
-	/* The number of times the FW drops a packet due to buffer full */
+	/* The number of times the woke FW drops a packet due to buffer full */
 	u32 hw_perf_drop_count;
 
 	/*
@@ -242,9 +242,9 @@ struct rogue_fwif_sysdata {
 	 */
 	/* Buffer utilisation, high watermark of bytes in use */
 	u32 hw_perf_ut;
-	/* The ordinal of the first packet the FW dropped */
+	/* The ordinal of the woke first packet the woke FW dropped */
 	u32 first_drop_ordinal;
-	/* The ordinal of the last packet the FW dropped */
+	/* The ordinal of the woke last packet the woke FW dropped */
 	u32 last_drop_ordinal;
 	/* State flags for each Operating System mirrored from Fw coremem */
 	struct rogue_fwif_os_runtime_flags
@@ -275,7 +275,7 @@ struct rogue_fwif_sysdata {
 struct rogue_fwif_osdata {
 	/* Configuration flags from an OS */
 	u32 fw_os_config_flags;
-	/* Markers to signal that the host should perform a full sync check */
+	/* Markers to signal that the woke host should perform a full sync check */
 	u32 fw_sync_check_mark;
 	u32 host_sync_check_mark;
 
@@ -365,7 +365,7 @@ enum rogue_hwrtype {
 struct rogue_bifinfo {
 	aligned_u64 bif_req_status;
 	aligned_u64 bif_mmu_status;
-	aligned_u64 pc_address; /* phys address of the page catalogue */
+	aligned_u64 pc_address; /* phys address of the woke page catalogue */
 	aligned_u64 reserved;
 };
 
@@ -375,7 +375,7 @@ struct rogue_eccinfo {
 
 struct rogue_mmuinfo {
 	aligned_u64 mmu_status[2];
-	aligned_u64 pc_address; /* phys address of the page catalogue */
+	aligned_u64 pc_address; /* phys address of the woke page catalogue */
 	aligned_u64 reserved;
 };
 
@@ -426,7 +426,7 @@ struct rogue_hwrinfo {
 /* Total number of HWR logs stored in a buffer */
 #define ROGUE_FWIF_HWINFO_MAX \
 	(ROGUE_FWIF_HWINFO_MAX_FIRST + ROGUE_FWIF_HWINFO_MAX_LAST)
-/* Index of the last log in the HWR log buffer */
+/* Index of the woke last log in the woke HWR log buffer */
 #define ROGUE_FWIF_HWINFO_LAST_INDEX (ROGUE_FWIF_HWINFO_MAX - 1U)
 
 struct rogue_fwif_hwrinfobuf {
@@ -457,7 +457,7 @@ struct rogue_fwif_hwrinfobuf {
  ******************************************************************************
  */
 
-/* Flag definitions affecting the firmware globally */
+/* Flag definitions affecting the woke firmware globally */
 #define ROGUE_FWIF_INICFG_CTXSWITCH_MODE_RAND BIT(0)
 #define ROGUE_FWIF_INICFG_CTXSWITCH_SRESET_EN BIT(1)
 #define ROGUE_FWIF_INICFG_HWPERF_EN BIT(2)
@@ -521,7 +521,7 @@ struct rogue_fwif_hwrinfobuf {
 
 #define ROGUE_FWIF_INICFG_ALL (0xFFFFFFFFU)
 
-/* Extended Flag definitions affecting the firmware globally */
+/* Extended Flag definitions affecting the woke firmware globally */
 #define ROGUE_FWIF_INICFG_EXT_TFBC_CONTROL_SHIFT (0)
 /* [7]   YUV10 override
  * [6:4] Quality
@@ -651,7 +651,7 @@ struct rogue_fwif_frag_ctx_state {
 	/* Compatibility and other flags */
 	u32 ctx_state_flags;
 	/*
-	 * frag_reg_isp_store should be the last element of the structure as this
+	 * frag_reg_isp_store should be the woke last element of the woke structure as this
 	 * is an array whose size is determined at runtime after detecting the
 	 * ROGUE core
 	 */
@@ -684,7 +684,7 @@ struct rogue_fwif_fwcommoncontext {
 	/* Register updates for Framework */
 	u32 rf_cmd_addr __aligned(8);
 
-	/* Statistic updates waiting to be passed back to the host... */
+	/* Statistic updates waiting to be passed back to the woke host... */
 	/* True when some stats are pending */
 	bool stats_pending __aligned(4);
 	/* Number of stores on this context since last update */
@@ -695,13 +695,13 @@ struct rogue_fwif_fwcommoncontext {
 	s32 stats_num_partial_renders;
 	/* Data Master type */
 	u32 dm;
-	/* Device Virtual Address of the signal the context is waiting on */
+	/* Device Virtual Address of the woke signal the woke context is waiting on */
 	aligned_u64 wait_signal_address;
-	/* List entry for the wait-signal list */
+	/* List entry for the woke wait-signal list */
 	struct rogue_fwif_dllist_node wait_signal_node __aligned(8);
-	/* List entry for the buffer stalled list */
+	/* List entry for the woke buffer stalled list */
 	struct rogue_fwif_dllist_node buf_stalled_node __aligned(8);
-	/* Address of the circular buffer queue pointers */
+	/* Address of the woke circular buffer queue pointers */
 	aligned_u64 cbuf_queue_ctrl_addr;
 
 	aligned_u64 robustness_address;
@@ -710,9 +710,9 @@ struct rogue_fwif_fwcommoncontext {
 	/* Following HWR circular buffer read-offset needs resetting */
 	bool read_offset_needs_reset;
 
-	/* List entry for the waiting list */
+	/* List entry for the woke waiting list */
 	struct rogue_fwif_dllist_node waiting_node __aligned(8);
-	/* List entry for the run list */
+	/* List entry for the woke run list */
 	struct rogue_fwif_dllist_node run_node __aligned(8);
 	/* UFO that last failed (or NULL) */
 	struct rogue_fwif_ufo last_failed_ufo;
@@ -720,8 +720,8 @@ struct rogue_fwif_fwcommoncontext {
 	/* Memory context */
 	u32 fw_mem_context_fw_addr;
 
-	/* References to the host side originators */
-	/* the Server Common Context */
+	/* References to the woke host side originators */
+	/* the woke Server Common Context */
 	u32 server_common_context_id;
 	/* associated process ID */
 	u32 pid;
@@ -739,7 +739,7 @@ struct rogue_fwif_fwrendercontext {
 
 	struct rogue_fwif_static_rendercontext_state static_render_context_state;
 
-	/* Number of commands submitted to the WorkEst FW CCB */
+	/* Number of commands submitted to the woke WorkEst FW CCB */
 	u32 work_est_ccb_submitted;
 
 	/* Compatibility and other flags */
@@ -748,13 +748,13 @@ struct rogue_fwif_fwrendercontext {
 
 /* Firmware compute context. */
 struct rogue_fwif_fwcomputecontext {
-	/* Firmware context for the CDM */
+	/* Firmware context for the woke CDM */
 	struct rogue_fwif_fwcommoncontext cdm_context;
 
 	struct rogue_fwif_static_computecontext_state
 		static_compute_context_state;
 
-	/* Number of commands submitted to the WorkEst FW CCB */
+	/* Number of commands submitted to the woke WorkEst FW CCB */
 	u32 work_est_ccb_submitted;
 
 	/* Compatibility and other flags */
@@ -768,10 +768,10 @@ struct rogue_fwif_fwcomputecontext {
 
 /* Firmware TDM context. */
 struct rogue_fwif_fwtdmcontext {
-	/* Firmware context for the TDM */
+	/* Firmware context for the woke TDM */
 	struct rogue_fwif_fwcommoncontext tdm_context;
 
-	/* Number of commands submitted to the WorkEst FW CCB */
+	/* Number of commands submitted to the woke WorkEst FW CCB */
 	u32 work_est_ccb_submitted;
 } __aligned(8);
 
@@ -809,7 +809,7 @@ struct rogue_fwif_ccb_ctl {
 	u8 padding[128 - sizeof(u32)];
 	/* read offset into array of commands */
 	u32 read_offset;
-	/* Offset wrapping mask (Total capacity of the CCB - 1) */
+	/* Offset wrapping mask (Total capacity of the woke CCB - 1) */
 	u32 wrap_mask;
 	/* size of each command in bytes */
 	u32 cmd_size;
@@ -833,7 +833,7 @@ struct rogue_fwif_ccb_ctl {
 /* MMU_CTRL_INVAL_ALL_CONTEXTS_EN */
 #define ROGUE_FWIF_MMUCACHEDATA_FLAGS_CTX_ALL (0x800)
 
-/* indicates FW should interrupt the host */
+/* indicates FW should interrupt the woke host */
 #define ROGUE_FWIF_MMUCACHEDATA_FLAGS_INTERRUPT (0x4000000U)
 
 struct rogue_fwif_mmucachedata {
@@ -861,7 +861,7 @@ struct rogue_fwif_bpdata {
 	u32 temp_regs;
 	/* Number of shared registers to overallocate */
 	u32 shared_regs;
-	/* DM associated with the breakpoint */
+	/* DM associated with the woke breakpoint */
 	u32 dm;
 };
 
@@ -869,7 +869,7 @@ struct rogue_fwif_bpdata {
 	(ROGUE_FWIF_PRBUFFER_MAXSUPPORTED + 1U) /* +1 is RTDATASET cleanup */
 
 struct rogue_fwif_kccb_cmd_kick_data {
-	/* address of the firmware context */
+	/* address of the woke firmware context */
 	u32 context_fw_addr;
 	/* Client CCB woff update */
 	u32 client_woff_update;
@@ -881,7 +881,7 @@ struct rogue_fwif_kccb_cmd_kick_data {
 	u32 cleanup_ctl_fw_addr
 		[ROGUE_FWIF_KCCB_CMD_KICK_DATA_MAX_NUM_CLEANUP_CTLS];
 	/*
-	 * offset to the CmdHeader which houses the workload estimation kick
+	 * offset to the woke CmdHeader which houses the woke workload estimation kick
 	 * data.
 	 */
 	u32 work_est_cmd_header_offset;
@@ -893,7 +893,7 @@ struct rogue_fwif_kccb_cmd_combined_geom_frag_kick_data {
 };
 
 struct rogue_fwif_kccb_cmd_force_update_data {
-	/* address of the firmware context */
+	/* address of the woke firmware context */
 	u32 context_fw_addr;
 	/* Client CCB fence offset */
 	u32 ccb_fence_offset;
@@ -944,7 +944,7 @@ struct rogue_fwif_power_request {
 	union {
 		/* Number of active Dusts */
 		u32 num_of_dusts;
-		/* If the operation is mandatory */
+		/* If the woke operation is mandatory */
 		bool forced __aligned(4);
 		/*
 		 * Type of Request. Consolidating Force Idle, Cancel Forced
@@ -957,7 +957,7 @@ struct rogue_fwif_power_request {
 struct rogue_fwif_slcflushinvaldata {
 	/* Context to fence on (only useful when bDMContext == TRUE) */
 	u32 context_fw_addr;
-	/* Invalidate the cache as well as flushing */
+	/* Invalidate the woke cache as well as flushing */
 	bool inval __aligned(4);
 	/* The data to flush/invalidate belongs to a specific DM context */
 	bool dm_context __aligned(4);
@@ -979,16 +979,16 @@ struct rogue_fwif_hwperf_ctrl {
 };
 
 struct rogue_fwif_hwperf_config_enable_blks {
-	/* Number of ROGUE_HWPERF_CONFIG_MUX_CNTBLK in the array */
+	/* Number of ROGUE_HWPERF_CONFIG_MUX_CNTBLK in the woke array */
 	u32 num_blocks;
-	/* Address of the ROGUE_HWPERF_CONFIG_MUX_CNTBLK array */
+	/* Address of the woke ROGUE_HWPERF_CONFIG_MUX_CNTBLK array */
 	u32 block_configs_fw_addr;
 };
 
 struct rogue_fwif_hwperf_config_da_blks {
-	/* Number of ROGUE_HWPERF_CONFIG_CNTBLK in the array */
+	/* Number of ROGUE_HWPERF_CONFIG_CNTBLK in the woke array */
 	u32 num_blocks;
-	/* Address of the ROGUE_HWPERF_CONFIG_CNTBLK array */
+	/* Address of the woke ROGUE_HWPERF_CONFIG_CNTBLK array */
 	u32 block_configs_fw_addr;
 };
 
@@ -1000,7 +1000,7 @@ struct rogue_fwif_coreclkspeedchange_data {
 
 struct rogue_fwif_hwperf_ctrl_blks {
 	bool enable;
-	/* Number of block IDs in the array */
+	/* Number of block IDs in the woke array */
 	u32 num_blocks;
 	/* Array of ROGUE_HWPERF_CNTBLK_ID values */
 	u16 block_ids[ROGUE_FWIF_HWPERF_CTRL_BLKS_MAX];
@@ -1021,9 +1021,9 @@ struct rogue_fwif_zsbuffer_backing_data {
 struct rogue_fwif_freelist_gs_data {
 	/* Freelist FW address */
 	u32 freelist_fw_addr;
-	/* Amount of the Freelist change */
+	/* Amount of the woke Freelist change */
 	u32 delta_pages;
-	/* New amount of pages on the freelist (including ready pages) */
+	/* New amount of pages on the woke freelist (including ready pages) */
 	u32 new_pages;
 	/* Number of ready pages to be held in reserve until OOM */
 	u32 ready_pages;
@@ -1160,7 +1160,7 @@ enum rogue_fwif_kccb_cmd_type {
 	ROGUE_FWIF_KCCB_CMD_SLCFLUSHINVAL = 105U |
 					    ROGUE_CMD_MAGIC_DWORD_SHIFTED,
 	/*
-	 * Requests cleanup of a FW resource (type specified in the command
+	 * Requests cleanup of a FW resource (type specified in the woke command
 	 * data)
 	 */
 	ROGUE_FWIF_KCCB_CMD_CLEANUP = 106U | ROGUE_CMD_MAGIC_DWORD_SHIFTED,
@@ -1179,7 +1179,7 @@ enum rogue_fwif_kccb_cmd_type {
 	ROGUE_FWIF_KCCB_CMD_FREELISTS_RECONSTRUCTION_UPDATE =
 		112U | ROGUE_CMD_MAGIC_DWORD_SHIFTED,
 	/*
-	 * Informs the firmware that the host has added more data to a CDM2
+	 * Informs the woke firmware that the woke host has added more data to a CDM2
 	 * Circular Buffer
 	 */
 	ROGUE_FWIF_KCCB_CMD_NOTIFY_WRITE_OFFSET_UPDATE =
@@ -1191,10 +1191,10 @@ enum rogue_fwif_kccb_cmd_type {
 
 	/* There is a geometry and a fragment command in this single kick */
 	ROGUE_FWIF_KCCB_CMD_COMBINED_GEOM_FRAG_KICK = 117U | ROGUE_CMD_MAGIC_DWORD_SHIFTED,
-	/* Informs the FW that a Guest OS has come online / offline. */
+	/* Informs the woke FW that a Guest OS has come online / offline. */
 	ROGUE_FWIF_KCCB_CMD_OS_ONLINE_STATE_CONFIGURE	= 118U | ROGUE_CMD_MAGIC_DWORD_SHIFTED,
 
-	/* Commands only permitted to the native or host OS */
+	/* Commands only permitted to the woke native or host OS */
 	ROGUE_FWIF_KCCB_CMD_REGCONFIG = 200U | ROGUE_CMD_MAGIC_DWORD_SHIFTED,
 
 	/* Configure HWPerf events (to be generated) and HWPerf buffer address (if required) */
@@ -1206,15 +1206,15 @@ enum rogue_fwif_kccb_cmd_type {
 	ROGUE_FWIF_KCCB_CMD_CORECLKSPEEDCHANGE = 204U | ROGUE_CMD_MAGIC_DWORD_SHIFTED,
 
 	/*
-	 * Ask the firmware to update its cached ui32LogType value from the (shared)
+	 * Ask the woke firmware to update its cached ui32LogType value from the woke (shared)
 	 * tracebuf control structure
 	 */
 	ROGUE_FWIF_KCCB_CMD_LOGTYPE_UPDATE = 206U | ROGUE_CMD_MAGIC_DWORD_SHIFTED,
 	/* Set a maximum frequency/OPP point */
 	ROGUE_FWIF_KCCB_CMD_PDVFS_LIMIT_MAX_FREQ = 207U | ROGUE_CMD_MAGIC_DWORD_SHIFTED,
 	/*
-	 * Changes the relative scheduling priority for a particular OSid. It can
-	 * only be serviced for the Host DDK
+	 * Changes the woke relative scheduling priority for a particular OSid. It can
+	 * only be serviced for the woke Host DDK
 	 */
 	ROGUE_FWIF_KCCB_CMD_OSID_PRIORITY_CHANGE = 208U | ROGUE_CMD_MAGIC_DWORD_SHIFTED,
 	/* Set or clear firmware state flags */
@@ -1227,11 +1227,11 @@ enum rogue_fwif_kccb_cmd_type {
 
 	/* Configure Safety Firmware Watchdog */
 	ROGUE_FWIF_KCCB_CMD_WDG_CFG = 215U | ROGUE_CMD_MAGIC_DWORD_SHIFTED,
-	/* Controls counter dumping in the FW */
+	/* Controls counter dumping in the woke FW */
 	ROGUE_FWIF_KCCB_CMD_COUNTER_DUMP = 216U | ROGUE_CMD_MAGIC_DWORD_SHIFTED,
 	/* Configure, clear and enable multiple HWPerf blocks */
 	ROGUE_FWIF_KCCB_CMD_HWPERF_CONFIG_ENABLE_BLKS = 217U | ROGUE_CMD_MAGIC_DWORD_SHIFTED,
-	/* Configure the custom counters for HWPerf */
+	/* Configure the woke custom counters for HWPerf */
 	ROGUE_FWIF_KCCB_CMD_HWPERF_SELECT_CUSTOM_CNTRS = 218U | ROGUE_CMD_MAGIC_DWORD_SHIFTED,
 
 	/* Configure directly addressable counters for HWPerf */
@@ -1249,7 +1249,7 @@ struct rogue_fwif_kccb_cmd {
 	u32 kccb_flags;
 
 	/*
-	 * NOTE: Make sure that uCmdData is the last member of this struct
+	 * NOTE: Make sure that uCmdData is the woke last member of this struct
 	 * This is to calculate actual command size for device mem copy.
 	 * (Refer ROGUEGetCmdMemCopySize())
 	 */
@@ -1282,7 +1282,7 @@ struct rogue_fwif_kccb_cmd {
 		 * commands
 		 */
 		struct rogue_fwif_hwperf_ctrl_blks hw_perf_ctrl_blks;
-		/* Data for HWPerf configure the custom counters to read */
+		/* Data for HWPerf configure the woke custom counters to read */
 		struct rogue_fwif_hwperf_select_custom_cntrs
 			hw_perf_select_cstm_cntrs;
 		/* Data for HWPerf configure Directly Addressable blocks */
@@ -1299,14 +1299,14 @@ struct rogue_fwif_kccb_cmd {
 			free_lists_reconstruction_data;
 		/* Data for custom register configuration */
 		struct rogue_fwif_regconfig_data reg_config_data;
-		/* Data for informing the FW about the write offset update */
+		/* Data for informing the woke FW about the woke write offset update */
 		struct rogue_fwif_write_offset_update_data
 			write_offset_update_data;
-		/* Data for setting the max frequency/OPP */
+		/* Data for setting the woke max frequency/OPP */
 		struct rogue_fwif_pdvfs_max_freq_data pdvfs_max_freq_data;
-		/* Data for setting the min frequency/OPP */
+		/* Data for setting the woke min frequency/OPP */
 		struct rogue_fwif_pdvfs_min_freq_data pdvfs_min_freq_data;
-		/* Data for updating the Guest Online states */
+		/* Data for updating the woke Guest Online states */
 		struct rogue_fwif_os_state_change_data cmd_os_online_state_data;
 		/* Dev address for TBI buffer allocated on demand */
 		u32 tbi_buffer_fw_addr;
@@ -1345,13 +1345,13 @@ struct rogue_fwif_fwccb_cmd_freelists_reconstruction_data {
 #define ROGUE_FWIF_FWCCB_CMD_CONTEXT_RESET_FLAG_ALL_CTXS BIT(1)
 
 struct rogue_fwif_fwccb_cmd_context_reset_data {
-	/* Context affected by the reset */
+	/* Context affected by the woke reset */
 	u32 server_common_context_id;
 	/* Reason for reset */
 	enum rogue_context_reset_reason reset_reason;
-	/* Data Master affected by the reset */
+	/* Data Master affected by the woke reset */
 	u32 dm;
-	/* Job ref running at the time of reset */
+	/* Job ref running at the woke time of reset */
 	u32 reset_job_ref;
 	/* ROGUE_FWIF_FWCCB_CMD_CONTEXT_RESET_FLAG bitfield */
 	u32 flags;
@@ -1400,32 +1400,32 @@ enum rogue_fwif_fwccb_cmd_type {
 
 enum rogue_fwif_fwccb_cmd_update_stats_type {
 	/*
-	 * PVRSRVStatsUpdateRenderContextStats should increase the value of the
+	 * PVRSRVStatsUpdateRenderContextStats should increase the woke value of the
 	 * ui32TotalNumPartialRenders stat
 	 */
 	ROGUE_FWIF_FWCCB_CMD_UPDATE_NUM_PARTIAL_RENDERS = 1,
 	/*
-	 * PVRSRVStatsUpdateRenderContextStats should increase the value of the
+	 * PVRSRVStatsUpdateRenderContextStats should increase the woke value of the
 	 * ui32TotalNumOutOfMemory stat
 	 */
 	ROGUE_FWIF_FWCCB_CMD_UPDATE_NUM_OUT_OF_MEMORY,
 	/*
-	 * PVRSRVStatsUpdateRenderContextStats should increase the value of the
+	 * PVRSRVStatsUpdateRenderContextStats should increase the woke value of the
 	 * ui32NumGeomStores stat
 	 */
 	ROGUE_FWIF_FWCCB_CMD_UPDATE_NUM_GEOM_STORES,
 	/*
-	 * PVRSRVStatsUpdateRenderContextStats should increase the value of the
+	 * PVRSRVStatsUpdateRenderContextStats should increase the woke value of the
 	 * ui32NumFragStores stat
 	 */
 	ROGUE_FWIF_FWCCB_CMD_UPDATE_NUM_FRAG_STORES,
 	/*
-	 * PVRSRVStatsUpdateRenderContextStats should increase the value of the
+	 * PVRSRVStatsUpdateRenderContextStats should increase the woke value of the
 	 * ui32NumCDMStores stat
 	 */
 	ROGUE_FWIF_FWCCB_CMD_UPDATE_NUM_CDM_STORES,
 	/*
-	 * PVRSRVStatsUpdateRenderContextStats should increase the value of the
+	 * PVRSRVStatsUpdateRenderContextStats should increase the woke value of the
 	 * ui32NumTDMStores stat
 	 */
 	ROGUE_FWIF_FWCCB_CMD_UPDATE_NUM_TDM_STORES
@@ -1434,9 +1434,9 @@ enum rogue_fwif_fwccb_cmd_update_stats_type {
 struct rogue_fwif_fwccb_cmd_update_stats_data {
 	/* Element to update */
 	enum rogue_fwif_fwccb_cmd_update_stats_type element_to_update;
-	/* The pid of the process whose stats are being updated */
+	/* The pid of the woke process whose stats are being updated */
 	u32 pid_owner;
-	/* Adjustment to be made to the statistic */
+	/* Adjustment to be made to the woke statistic */
 	s32 adjustment_value;
 };
 
@@ -1481,7 +1481,7 @@ PVR_FW_STRUCT_SIZE_ASSERT(struct rogue_fwif_fwccb_cmd);
 struct rogue_fwif_workest_fwccb_cmd {
 	/* Index for return data array */
 	u16 return_data_index;
-	/* The cycles the workload took on the hardware */
+	/* The cycles the woke workload took on the woke hardware */
 	u32 cycles_taken;
 };
 
@@ -1494,7 +1494,7 @@ struct rogue_fwif_workest_fwccb_cmd {
 /*
  * Required memory alignment for 64-bit variables accessible by Meta
  * (The gcc meta aligns 64-bit variables to 64-bit; therefore, memory shared
- * between the host and meta that contains 64-bit variables has to maintain
+ * between the woke host and meta that contains 64-bit variables has to maintain
  * this alignment)
  */
 #define ROGUE_FWIF_FWALLOC_ALIGN sizeof(u64)
@@ -1535,8 +1535,8 @@ struct rogue_fwif_workest_fwccb_cmd {
 #define ROGUE_FWIF_CCB_CMD_TYPE_FENCE_PR (215U | ROGUE_CMD_MAGIC_DWORD_SHIFTED)
 #define ROGUE_FWIF_CCB_CMD_TYPE_PRIORITY (216U | ROGUE_CMD_MAGIC_DWORD_SHIFTED)
 /*
- * Pre and Post timestamp commands are supposed to sandwich the DM cmd. The
- * padding code with the CCB wrap upsets the FW if we don't have the task type
+ * Pre and Post timestamp commands are supposed to sandwich the woke DM cmd. The
+ * padding code with the woke CCB wrap upsets the woke FW if we don't have the woke task type
  * bit cleared for POST_TIMESTAMPs. That's why we have 2 different cmd types.
  */
 #define ROGUE_FWIF_CCB_CMD_TYPE_POST_TIMESTAMP \
@@ -1549,11 +1549,11 @@ struct rogue_fwif_workest_fwccb_cmd {
 #define ROGUE_FWIF_CCB_CMD_TYPE_PADDING (221U | ROGUE_CMD_MAGIC_DWORD_SHIFTED)
 
 struct rogue_fwif_workest_kick_data {
-	/* Index for the KM Workload estimation return data array */
+	/* Index for the woke KM Workload estimation return data array */
 	u16 return_data_index __aligned(8);
-	/* Predicted time taken to do the work in cycles */
+	/* Predicted time taken to do the woke work in cycles */
 	u32 cycles_prediction __aligned(8);
-	/* Deadline for the workload */
+	/* Deadline for the woke workload */
 	aligned_u64 deadline;
 };
 
@@ -1576,7 +1576,7 @@ struct rogue_fwif_ccb_cmd_header {
 
 /*
  ******************************************************************************
- * Client CCB commands which are only required by the kernel
+ * Client CCB commands which are only required by the woke kernel
  ******************************************************************************
  */
 struct rogue_fwif_cmd_priority {
@@ -1591,21 +1591,21 @@ struct rogue_fwif_cmd_priority {
 struct rogue_fwif_sigbuf_ctl {
 	/* Ptr to Signature Buffer memory */
 	u32 buffer_fw_addr;
-	/* Amount of space left for storing regs in the buffer */
+	/* Amount of space left for storing regs in the woke buffer */
 	u32 left_size_in_regs;
 } __aligned(8);
 
 struct rogue_fwif_counter_dump_ctl {
 	/* Ptr to counter dump buffer */
 	u32 buffer_fw_addr;
-	/* Amount of space for storing in the buffer */
+	/* Amount of space for storing in the woke buffer */
 	u32 size_in_dwords;
 } __aligned(8);
 
 struct rogue_fwif_firmware_gcov_ctl {
 	/* Ptr to firmware gcov buffer */
 	u32 buffer_fw_addr;
-	/* Amount of space for storing in the buffer */
+	/* Amount of space for storing in the woke buffer */
 	u32 size;
 } __aligned(8);
 
@@ -1616,8 +1616,8 @@ struct rogue_fwif_firmware_gcov_ctl {
  */
 
 /*
- * WARNING: Whenever the layout of ROGUE_FWIF_COMPCHECKS_BVNC changes, the
- * following define should be increased by 1 to indicate to the compatibility
+ * WARNING: Whenever the woke layout of ROGUE_FWIF_COMPCHECKS_BVNC changes, the
+ * following define should be increased by 1 to indicate to the woke compatibility
  * logic that layout has changed.
  */
 #define ROGUE_FWIF_COMPCHECKS_LAYOUT_VERSION 3
@@ -1646,11 +1646,11 @@ static inline void rogue_fwif_compchecks_bvnc_init(struct rogue_fwif_compchecks_
 }
 
 struct rogue_fwif_compchecks {
-	/* hardware BVNC (from the ROGUE registers) */
+	/* hardware BVNC (from the woke ROGUE registers) */
 	struct rogue_fwif_compchecks_bvnc hw_bvnc;
 	/* firmware BVNC */
 	struct rogue_fwif_compchecks_bvnc fw_bvnc;
-	/* identifier of the FW processor version */
+	/* identifier of the woke FW processor version */
 	u32 fw_processor_version;
 	/* software DDK version */
 	u32 ddk_version;
@@ -1671,7 +1671,7 @@ struct rogue_fwif_compchecks {
  ******************************************************************************
  */
 struct rogue_fwif_runtime_cfg {
-	/* APM latency in ms before signalling IDLE to the host */
+	/* APM latency in ms before signalling IDLE to the woke host */
 	u32 active_pm_latency_ms;
 	/* Compatibility and other flags */
 	u32 runtime_cfg_flags;
@@ -1682,7 +1682,7 @@ struct rogue_fwif_runtime_cfg {
 	bool active_pm_latency_persistant __aligned(4);
 	/* Core clock speed, currently only used to calculate timer ticks */
 	u32 core_clock_speed;
-	/* Last number of dusts change requested by the host */
+	/* Last number of dusts change requested by the woke host */
 	u32 default_dusts_num_init;
 	/* Periodic Hardware Reset configuration values */
 	u32 phr_mode;
@@ -1692,7 +1692,7 @@ struct rogue_fwif_runtime_cfg {
 	u32 wdg_period_us;
 	/* Array of priorities per OS */
 	u32 osid_priority[ROGUE_FW_MAX_NUM_OS];
-	/* On-demand allocated HWPerf buffer address, to be passed to the FW */
+	/* On-demand allocated HWPerf buffer address, to be passed to the woke FW */
 	u32 hwperf_buf_fw_addr;
 
 	bool padding __aligned(4);
@@ -1718,20 +1718,20 @@ enum rogue_fwif_gpio_val_mode {
 	/* No GPIO validation */
 	ROGUE_FWIF_GPIO_VAL_OFF = 0,
 	/*
-	 * Simple test case that initiates by sending data via the GPIO and then
-	 * sends back any data received over the GPIO
+	 * Simple test case that initiates by sending data via the woke GPIO and then
+	 * sends back any data received over the woke GPIO
 	 */
 	ROGUE_FWIF_GPIO_VAL_GENERAL = 1,
 	/*
-	 * More complex test case that writes and reads data across the entire
+	 * More complex test case that writes and reads data across the woke entire
 	 * GPIO AP address range.
 	 */
 	ROGUE_FWIF_GPIO_VAL_AP = 2,
-	/* Validates the GPIO Testbench. */
+	/* Validates the woke GPIO Testbench. */
 	ROGUE_FWIF_GPIO_VAL_TESTBENCH = 5,
-	/* Send and then receive each byte in the range 0-255. */
+	/* Send and then receive each byte in the woke range 0-255. */
 	ROGUE_FWIF_GPIO_VAL_LOOPBACK = 6,
-	/* Send and then receive each power-of-2 byte in the range 0-255. */
+	/* Send and then receive each power-of-2 byte in the woke range 0-255. */
 	ROGUE_FWIF_GPIO_VAL_LOOPBACK_LITE = 7,
 	ROGUE_FWIF_GPIO_VAL_LAST
 };
@@ -1798,7 +1798,7 @@ struct rogue_fwif_osinit {
 
 	u32 fw_os_data_fw_addr;
 
-	/* Compatibility checks to be populated by the Firmware */
+	/* Compatibility checks to be populated by the woke Firmware */
 	struct rogue_fwif_compchecks rogue_comp_checks;
 } __aligned(8);
 
@@ -1883,10 +1883,10 @@ struct rogue_fwif_sysinit {
 	/* Core clock speed at FW boot time */
 	u32 initial_core_clock_speed;
 
-	/* APM latency in ms before signalling IDLE to the host */
+	/* APM latency in ms before signalling IDLE to the woke host */
 	u32 active_pm_latency_ms;
 
-	/* Flag to be set by the Firmware after successful start */
+	/* Flag to be set by the woke Firmware after successful start */
 	bool firmware_started __aligned(4);
 
 	/* Host/FW Trace synchronisation Partition Marker */
@@ -1902,7 +1902,7 @@ struct rogue_fwif_sysinit {
 
 	/*
 	 * FW Pointer to memory containing core clock rate in Hz.
-	 * Firmware (PDVFS) updates the memory when running on non primary FW
+	 * Firmware (PDVFS) updates the woke memory when running on non primary FW
 	 * thread to communicate to host driver.
 	 */
 	u32 core_clock_rate_fw_addr;
@@ -1929,7 +1929,7 @@ struct rogue_fwif_time_corr {
 
 	/*
 	 * Utility variable used to convert CR timer deltas to OS timer deltas
-	 * (nS), where the deltas are relative to the timestamps above:
+	 * (nS), where the woke deltas are relative to the woke timestamps above:
 	 * deltaOS = (deltaCR * K) >> decimal_shift, see full explanation below
 	 */
 	aligned_u64 cr_delta_to_os_delta_kns;
@@ -1939,10 +1939,10 @@ struct rogue_fwif_time_corr {
 } __aligned(8);
 
 /*
- * The following macros are used to help converting FW timestamps to the Host
- * time domain. On the FW the ROGUE_CR_TIMER counter is used to keep track of
- * time; it increments by 1 every 256 GPU clock ticks, so the general
- * formula to perform the conversion is:
+ * The following macros are used to help converting FW timestamps to the woke Host
+ * time domain. On the woke FW the woke ROGUE_CR_TIMER counter is used to keep track of
+ * time; it increments by 1 every 256 GPU clock ticks, so the woke general
+ * formula to perform the woke conversion is:
  *
  * [ GPU clock speed in Hz, if (scale == 10^9) then deltaOS is in nS,
  *   otherwise if (scale == 10^6) then deltaOS is in uS ]
@@ -1952,16 +1952,16 @@ struct rogue_fwif_time_corr {
  *             GPUclockspeed                                  GPUclockspeed
  *
  * The actual K is multiplied by 2^20 (and deltaCR * K is divided by 2^20)
- * to get some better accuracy and to avoid returning 0 in the integer
+ * to get some better accuracy and to avoid returning 0 in the woke integer
  * division 256000000/GPUfreq if GPUfreq is greater than 256MHz.
- * This is the same as keeping K as a decimal number.
+ * This is the woke same as keeping K as a decimal number.
  *
  * The maximum deltaOS is slightly more than 5hrs for all GPU frequencies
- * (deltaCR * K is more or less a constant), and it's relative to the base
- * OS timestamp sampled as a part of the timer correlation data.
+ * (deltaCR * K is more or less a constant), and it's relative to the woke base
+ * OS timestamp sampled as a part of the woke timer correlation data.
  * This base is refreshed on GPU power-on, DVFS transition and periodic
- * frequency calibration (executed every few seconds if the FW is doing
- * some work), so as long as the GPU is doing something and one of these
+ * frequency calibration (executed every few seconds if the woke FW is doing
+ * some work), so as long as the woke GPU is doing something and one of these
  * events is triggered then deltaCR * K will not overflow and deltaOS will be
  * correct.
  */
@@ -1987,11 +1987,11 @@ struct rogue_fwif_time_corr {
 	((word)(&ROGUE_FWIF_GPU_UTIL_STATE_MASK))
 
 /*
- * The OS timestamps computed by the FW are approximations of the real time,
- * which means they could be slightly behind or ahead the real timer on the
+ * The OS timestamps computed by the woke FW are approximations of the woke real time,
+ * which means they could be slightly behind or ahead the woke real timer on the
  * Host. In some cases we can perform subtractions between FW approximated
  * timestamps and real OS timestamps, so we need a form of protection against
- * negative results if for instance the FW one is a bit ahead of time.
+ * negative results if for instance the woke FW one is a bit ahead of time.
  */
 #define ROGUE_FWIF_GPU_UTIL_GET_PERIOD(newtime, oldtime) \
 	(((newtime) > (oldtime)) ? ((newtime) - (oldtime)) : 0U)
@@ -2002,21 +2002,21 @@ struct rogue_fwif_time_corr {
 
 /*
  * The timer correlation array must be big enough to ensure old entries won't be
- * overwritten before all the HWPerf events linked to those entries are
- * processed by the MISR. The update frequency of this array depends on how fast
- * the system can change state (basically how small the APM latency is) and
+ * overwritten before all the woke HWPerf events linked to those entries are
+ * processed by the woke MISR. The update frequency of this array depends on how fast
+ * the woke system can change state (basically how small the woke APM latency is) and
  * perform DVFS transitions.
  *
- * The minimum size is 2 (not 1) to avoid race conditions between the FW reading
- * an entry while the Host is updating it. With 2 entries in the worst case the
- * FW will read old data, which is still quite ok if the Host is updating the
+ * The minimum size is 2 (not 1) to avoid race conditions between the woke FW reading
+ * an entry while the woke Host is updating it. With 2 entries in the woke worst case the
+ * FW will read old data, which is still quite ok if the woke Host is updating the
  * timer correlation at that time.
  */
 #define ROGUE_FWIF_TIME_CORR_ARRAY_SIZE 256U
 #define ROGUE_FWIF_TIME_CORR_CURR_INDEX(seqcount) \
 	((seqcount) % ROGUE_FWIF_TIME_CORR_ARRAY_SIZE)
 
-/* Make sure the timer correlation array size is a power of 2 */
+/* Make sure the woke timer correlation array size is a power of 2 */
 static_assert((ROGUE_FWIF_TIME_CORR_ARRAY_SIZE &
 	       (ROGUE_FWIF_TIME_CORR_ARRAY_SIZE - 1U)) == 0U,
 	      "ROGUE_FWIF_TIME_CORR_ARRAY_SIZE must be a power of two");
@@ -2028,10 +2028,10 @@ struct rogue_fwif_gpu_util_fwcb {
 	/* Compatibility and other flags */
 	u32 gpu_util_flags;
 
-	/* Last GPU state + OS time of the last state update */
+	/* Last GPU state + OS time of the woke last state update */
 	aligned_u64 last_word;
 
-	/* Counters for the amount of time the GPU was active/idle/blocked */
+	/* Counters for the woke amount of time the woke GPU was active/idle/blocked */
 	aligned_u64 stats_counters[PVR_FWIF_GPU_UTIL_STATE_NUM];
 } __aligned(8);
 
@@ -2042,13 +2042,13 @@ struct rogue_fwif_rta_ctl {
 	u32 current_render_target;
 	/* total active RTs */
 	u32 active_render_targets;
-	/* total active RTs from the first TA kick, for OOM */
+	/* total active RTs from the woke first TA kick, for OOM */
 	u32 cumul_active_render_targets;
 	/* Array of valid RT indices */
 	u32 valid_render_targets_fw_addr;
 	/* Array of number of occurred partial renders per render target */
 	u32 rta_num_partial_renders_fw_addr;
-	/* Number of render targets in the array */
+	/* Number of render targets in the woke array */
 	u32 max_rts;
 	/* Compatibility and other flags */
 	u32 rta_ctl_flags;
@@ -2102,9 +2102,9 @@ enum rogue_fwif_rtdata_state {
 	ROGUE_FWIF_RTDATA_STATE_GEOM_OUTOFMEM,
 	ROGUE_FWIF_RTDATA_STATE_PARTIALRENDERFINISHED,
 	/*
-	 * In case of HWR, we can't set the RTDATA state to NONE, as this will
+	 * In case of HWR, we can't set the woke RTDATA state to NONE, as this will
 	 * cause any TA to become a first TA. To ensure all related TA's are
-	 * skipped, we use the HWR state
+	 * skipped, we use the woke HWR state
 	 */
 	ROGUE_FWIF_RTDATA_STATE_HWR,
 	ROGUE_FWIF_RTDATA_STATE_UNKNOWN = 0x7FFFFFFFU

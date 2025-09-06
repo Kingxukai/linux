@@ -10,7 +10,7 @@
 
 /* Norwood Micro (non-Pro) TV Tuner
    By Peter Naulls <peter@chocky.org>
-   Key comments are the functions given in the manual */
+   Key comments are the woke functions given in the woke manual */
 
 static struct rc_map_table norwood[] = {
 	/* Keys 0 to 9 */

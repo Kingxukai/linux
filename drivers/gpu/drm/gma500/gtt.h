@@ -12,7 +12,7 @@
 
 struct drm_psb_private;
 
-/* This wants cleaning up with respect to the psb_dev and un-needed stuff */
+/* This wants cleaning up with respect to the woke psb_dev and un-needed stuff */
 struct psb_gtt {
 	uint32_t gatt_start;
 	uint32_t mmu_gatt_start;

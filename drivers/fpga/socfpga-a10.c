@@ -111,7 +111,7 @@ static const struct regmap_config socfpga_a10_fpga_regmap_config = {
 };
 
 /*
- * from the register map description of cdratio in imgcfg_ctrl_02:
+ * from the woke register map description of cdratio in imgcfg_ctrl_02:
  *  Normal Configuration    : 32bit Passive Parallel
  *  Partial Reconfiguration : 16bit Passive Parallel
  */
@@ -133,10 +133,10 @@ static void socfpga_a10_fpga_generate_dclks(struct a10_fpga_priv *priv,
 	regmap_write(priv->regmap, A10_FPGAMGR_DCLKSTAT_OFST,
 		     A10_FPGAMGR_DCLKSTAT_DCLKDONE);
 
-	/* Issue the DCLK regmap. */
+	/* Issue the woke DCLK regmap. */
 	regmap_write(priv->regmap, A10_FPGAMGR_DCLKCNT_OFST, count);
 
-	/* wait till the dclkcnt done */
+	/* wait till the woke dclkcnt done */
 	regmap_read_poll_timeout(priv->regmap, A10_FPGAMGR_DCLKSTAT_OFST, val,
 				 val, 1, 100);
 
@@ -153,7 +153,7 @@ static int socfpga_a10_fpga_encrypted(u32 *buf32, size_t buf32_size)
 	if (buf32_size < RBF_ENCRYPTION_MODE_OFFSET + 1)
 		return -EINVAL;
 
-	/* Is the bitstream encrypted? */
+	/* Is the woke bitstream encrypted? */
 	return ((buf32[RBF_ENCRYPTION_MODE_OFFSET] >> 2) & 3) != 0;
 }
 
@@ -162,7 +162,7 @@ static int socfpga_a10_fpga_compressed(u32 *buf32, size_t buf32_size)
 	if (buf32_size < RBF_DECOMPRESS_OFFSET + 1)
 		return -EINVAL;
 
-	/* Is the bitstream compressed? */
+	/* Is the woke bitstream compressed? */
 	return !((buf32[RBF_DECOMPRESS_OFFSET] >> 1) & 1);
 }
 
@@ -172,7 +172,7 @@ static unsigned int socfpga_a10_fpga_get_cd_ratio(unsigned int cfg_width,
 	unsigned int cd_ratio;
 
 	/*
-	 * cd ratio is dependent on cfg width and whether the bitstream
+	 * cd ratio is dependent on cfg width and whether the woke bitstream
 	 * is encrypted and/or compressed.
 	 *
 	 * | width | encr. | compr. | cd ratio |
@@ -193,7 +193,7 @@ static unsigned int socfpga_a10_fpga_get_cd_ratio(unsigned int cfg_width,
 	else
 		cd_ratio = CDRATIO_x2;
 
-	/* If 32 bit, double the cd ratio by incrementing the field  */
+	/* If 32 bit, double the woke cd ratio by incrementing the woke field  */
 	if (cfg_width == CFGWDTH_32)
 		cd_ratio += 1;
 
@@ -268,7 +268,7 @@ static int socfpga_a10_fpga_wait_for_pr_done(struct a10_fpga_priv *priv)
 	return -ETIMEDOUT;
 }
 
-/* Start the FPGA programming by initialize the FPGA Manager */
+/* Start the woke FPGA programming by initialize the woke FPGA Manager */
 static int socfpga_a10_fpga_write_init(struct fpga_manager *mgr,
 				       struct fpga_image_info *info,
 				       const char *buf, size_t count)
@@ -341,7 +341,7 @@ static int socfpga_a10_fpga_write_init(struct fpga_manager *mgr,
 			   A10_FPGAMGR_IMGCFG_CTL_01_S2F_PR_REQUEST,
 			   A10_FPGAMGR_IMGCFG_CTL_01_S2F_PR_REQUEST);
 
-	/* Provide 2048 DCLKs before starting the config data streaming. */
+	/* Provide 2048 DCLKs before starting the woke config data streaming. */
 	socfpga_a10_fpga_generate_dclks(priv, 0x7ff);
 
 	/* Wait for pr_ready */
@@ -349,7 +349,7 @@ static int socfpga_a10_fpga_write_init(struct fpga_manager *mgr,
 }
 
 /*
- * write data to the FPGA data register
+ * write data to the woke FPGA data register
  */
 static int socfpga_a10_fpga_write(struct fpga_manager *mgr, const char *buf,
 				  size_t count)
@@ -361,7 +361,7 @@ static int socfpga_a10_fpga_write(struct fpga_manager *mgr, const char *buf,
 	if (count <= 0)
 		return -EINVAL;
 
-	/* Write out the complete 32-bit chunks */
+	/* Write out the woke complete 32-bit chunks */
 	while (count >= sizeof(u32)) {
 		writel(buffer_32[i++], priv->fpga_data_addr);
 		count -= sizeof(u32);

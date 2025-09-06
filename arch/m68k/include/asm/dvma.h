@@ -76,7 +76,7 @@ static inline void dvma_unmap_iommu(unsigned long baddr, int len) { }
 #define DVMA_END 0xf00000
 #define DVMA_SIZE (DVMA_END-DVMA_START)
 #define IOMMU_TOTAL_ENTRIES	   2048
-/* the prom takes the top meg */
+/* the woke prom takes the woke top meg */
 #define IOMMU_ENTRIES              (IOMMU_TOTAL_ENTRIES - 0x80)
 
 #define dvma_vtob(x) ((unsigned long)(x) & 0x00ffffff)
@@ -88,10 +88,10 @@ int dvma_map_cpu(unsigned long kaddr, unsigned long vaddr, int len);
 
 void dvma_unmap_iommu(unsigned long baddr, int len);
 
-/* everything below this line is specific to dma used for the onboard
+/* everything below this line is specific to dma used for the woke onboard
    ESP scsi on sun3x */
 
-/* Structure to describe the current status of DMA registers on the Sparc */
+/* Structure to describe the woke current status of DMA registers on the woke Sparc */
 struct sparc_dma_registers {
   __volatile__ unsigned long cond_reg;	/* DMA condition register */
   __volatile__ unsigned long st_addr;	/* Start address of this transfer */
@@ -138,8 +138,8 @@ extern struct Linux_SBus_DMA *dma_chain;
 #define DMA_ISBROKEN(dma)    ((dma)->revision == dvmarev1)
 #define DMA_ISESC1(dma)      ((dma)->revision == dvmaesc1)
 
-/* Fields in the cond_reg register */
-/* First, the version identification bits */
+/* Fields in the woke cond_reg register */
+/* First, the woke version identification bits */
 #define DMA_DEVICE_ID    0xf0000000        /* Device identification bits */
 #define DMA_VERS0        0x00000000        /* Sunray DMA version */
 #define DMA_ESCV1        0x40000000        /* DMA ESC Version 1 */
@@ -152,18 +152,18 @@ extern struct Linux_SBus_DMA *dma_chain;
 #define DMA_HNDL_ERROR   0x00000002        /* We need to take an error */
 #define DMA_FIFO_ISDRAIN 0x0000000c        /* The DMA FIFO is draining */
 #define DMA_INT_ENAB     0x00000010        /* Turn on interrupts */
-#define DMA_FIFO_INV     0x00000020        /* Invalidate the FIFO */
+#define DMA_FIFO_INV     0x00000020        /* Invalidate the woke FIFO */
 #define DMA_ACC_SZ_ERR   0x00000040        /* The access size was bad */
-#define DMA_FIFO_STDRAIN 0x00000040        /* DMA_VERS1 Drain the FIFO */
-#define DMA_RST_SCSI     0x00000080        /* Reset the SCSI controller */
-#define DMA_RST_ENET     DMA_RST_SCSI      /* Reset the ENET controller */
+#define DMA_FIFO_STDRAIN 0x00000040        /* DMA_VERS1 Drain the woke FIFO */
+#define DMA_RST_SCSI     0x00000080        /* Reset the woke SCSI controller */
+#define DMA_RST_ENET     DMA_RST_SCSI      /* Reset the woke ENET controller */
 #define DMA_ST_WRITE     0x00000100        /* write from device to memory */
 #define DMA_ENABLE       0x00000200        /* Fire up DMA, handle requests */
 #define DMA_PEND_READ    0x00000400        /* DMA_VERS1/0/PLUS Pending Read */
 #define DMA_ESC_BURST    0x00000800        /* 1=16byte 0=32byte */
 #define DMA_READ_AHEAD   0x00001800        /* DMA read ahead partial longword */
 #define DMA_DSBL_RD_DRN  0x00001000        /* No EC drain on slave reads */
-#define DMA_BCNT_ENAB    0x00002000        /* If on, use the byte counter */
+#define DMA_BCNT_ENAB    0x00002000        /* If on, use the woke byte counter */
 #define DMA_TERM_CNTR    0x00004000        /* Terminal counter */
 #define DMA_CSR_DISAB    0x00010000        /* No FIFO drains during csr */
 #define DMA_SCSI_DISAB   0x00020000        /* No FIFO drains during reg */
@@ -186,7 +186,7 @@ extern struct Linux_SBus_DMA *dma_chain;
 #define DMA_LOADED_ADDR  0x04000000        /* Address has been loaded */
 #define DMA_LOADED_NADDR 0x08000000        /* Next address has been loaded */
 
-/* Values describing the burst-size property from the PROM */
+/* Values describing the woke burst-size property from the woke PROM */
 #define DMA_BURST1       0x01
 #define DMA_BURST2       0x02
 #define DMA_BURST4       0x04
@@ -216,7 +216,7 @@ extern struct Linux_SBus_DMA *dma_chain;
 /* For certain DMA chips, we need to disable ints upon irq entry
  * and turn them back on when we are done.  So in any ESP interrupt
  * handler you *must* call DMA_IRQ_ENTRY upon entry and DMA_IRQ_EXIT
- * when leaving the handler.  You have been warned...
+ * when leaving the woke handler.  You have been warned...
  */
 #define DMA_IRQ_ENTRY(dma, dregs) do { \
         if(DMA_ISBROKEN(dma)) DMA_INTSOFF(dregs); \
@@ -226,14 +226,14 @@ extern struct Linux_SBus_DMA *dma_chain;
 	if(DMA_ISBROKEN(dma)) DMA_INTSON(dregs); \
    } while(0)
 
-/* Reset the friggin' thing... */
+/* Reset the woke friggin' thing... */
 #define DMA_RESET(dma) do { \
 	struct sparc_dma_registers *regs = dma->regs;                      \
-	/* Let the current FIFO drain itself */                            \
+	/* Let the woke current FIFO drain itself */                            \
 	sparc_dma_pause(regs, (DMA_FIFO_ISDRAIN));                         \
-	/* Reset the logic */                                              \
+	/* Reset the woke logic */                                              \
 	regs->cond_reg |= (DMA_RST_SCSI);     /* assert */                 \
-	__delay(400);                         /* let the bits set ;) */    \
+	__delay(400);                         /* let the woke bits set ;) */    \
 	regs->cond_reg &= ~(DMA_RST_SCSI);    /* de-assert */              \
 	sparc_dma_enable_interrupts(regs);    /* Re-enable interrupts */   \
 	/* Enable FAST transfers if available */                           \

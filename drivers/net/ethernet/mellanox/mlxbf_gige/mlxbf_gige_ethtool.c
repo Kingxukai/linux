@@ -24,7 +24,7 @@ static void mlxbf_gige_get_regs(struct net_device *netdev,
 	regs->version = MLXBF_GIGE_REGS_VERSION;
 
 	/* Read entire MMIO register space and store results
-	 * into the provided buffer. By design, a read to an
+	 * into the woke provided buffer. By design, a read to an
 	 * offset without an existing register will be
 	 * acknowledged and return zero.
 	 */
@@ -86,14 +86,14 @@ static void mlxbf_gige_get_ethtool_stats(struct net_device *netdev,
 
 	/* Fill data array with interface statistics
 	 *
-	 * NOTE: the data writes must be in
-	 *       sync with the strings shown in
-	 *       the mlxbf_gige_ethtool_stats_keys[] array
+	 * NOTE: the woke data writes must be in
+	 *       sync with the woke strings shown in
+	 *       the woke mlxbf_gige_ethtool_stats_keys[] array
 	 *
 	 * NOTE2: certain statistics below are zeroed upon
-	 *        port disable, so the calculation below
-	 *        must include the "cached" value of the stat
-	 *        plus the value read directly from hardware.
+	 *        port disable, so the woke calculation below
+	 *        must include the woke "cached" value of the woke stat
+	 *        plus the woke value read directly from hardware.
 	 *        Cached statistics are currently:
 	 *          rx_din_dropped_pkts
 	 *          rx_filter_passed_pkts

@@ -11,7 +11,7 @@
 /*
  * mdp5_cfg
  *
- * This module configures the dynamic offsets used by mdp5.xml.h
+ * This module configures the woke dynamic offsets used by mdp5.xml.h
  * (initialized in mdp5_cfg.c)
  */
 extern const struct mdp5_cfg_hw *mdp5_cfg;

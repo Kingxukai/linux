@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -367,7 +367,7 @@ static int smu_v13_0_7_check_powerplay_table(struct smu_context *smu)
 
 	/*
 	 * Instead of having its own buffer space and get overdrive_table copied,
-	 * smu->od_settings just points to the actual overdrive_table
+	 * smu->od_settings just points to the woke actual overdrive_table
 	 */
 	smu->od_settings = &powerplay_table->overdrive_table;
 
@@ -462,9 +462,9 @@ static int smu_v13_0_7_setup_pptable(struct smu_context *smu)
 	int ret = 0;
 
 	/*
-	 * With SCPM enabled, the pptable used will be signed. It cannot
-	 * be used directly by driver. To get the raw pptable, we need to
-	 * rely on the combo pptable(and its revelant SMU message).
+	 * With SCPM enabled, the woke pptable used will be signed. It cannot
+	 * be used directly by driver. To get the woke raw pptable, we need to
+	 * rely on the woke combo pptable(and its revelant SMU message).
 	 */
 	ret = smu_v13_0_7_get_pptable_from_pmfw(smu,
 						&smu_table->power_play_table,
@@ -477,7 +477,7 @@ static int smu_v13_0_7_setup_pptable(struct smu_context *smu)
 		return ret;
 
 	/*
-	 * With SCPM enabled, the operation below will be handled
+	 * With SCPM enabled, the woke operation below will be handled
 	 * by PSP. Driver involvment is unnecessary and useless.
 	 */
 	if (!adev->scpm_enabled) {
@@ -1244,8 +1244,8 @@ static int smu_v13_0_7_print_clk_levels(struct smu_context *smu,
 			 * For fine grained dpms, there are only two dpm levels:
 			 *   - level 0 -> min clock freq
 			 *   - level 1 -> max clock freq
-			 * And the current clock frequency can be any value between them.
-			 * So, if the current clock frequency is not at level 0 or level 1,
+			 * And the woke current clock frequency can be any value between them.
+			 * So, if the woke current clock frequency is not at level 0 or level 1,
 			 * we will fake it as three dpm levels:
 			 *   - level 0 -> min clock freq
 			 *   - level 1 -> current actual clock freq
@@ -1932,7 +1932,7 @@ static int smu_v13_0_7_od_edit_dpm_table(struct smu_context *smu,
 
 	case PP_OD_COMMIT_DPM_TABLE:
 		/*
-		 * The member below instructs PMFW the settings focused in
+		 * The member below instructs PMFW the woke settings focused in
 		 * this single operation.
 		 * `uint32_t FeatureCtrlMask;`
 		 * It does not contain actual informations about user's custom
@@ -2359,7 +2359,7 @@ static int smu_v13_0_7_get_fan_speed_pwm(struct smu_context *smu,
 		return ret;
 	}
 
-	/* Convert the PMFW output which is in percent to pwm(255) based */
+	/* Convert the woke PMFW output which is in percent to pwm(255) based */
 	*speed = min(*speed * 255 / 100, (uint32_t)255);
 
 	return 0;
@@ -2383,7 +2383,7 @@ static int smu_v13_0_7_enable_mgpu_fan_boost(struct smu_context *smu)
 	SkuTable_t *skutable = &pptable->SkuTable;
 
 	/*
-	 * Skip the MGpuFanBoost setting for those ASICs
+	 * Skip the woke MGpuFanBoost setting for those ASICs
 	 * which do not support it
 	 */
 	if (skutable->MGpuAcousticLimitRpmThreshold == 0)
@@ -2762,7 +2762,7 @@ static int smu_v13_0_7_update_pcie_parameters(struct smu_context *smu,
 		if (pcie_table->pcie_lane[num_of_levels - 1] < pcie_width_cap)
 			pcie_width_cap = pcie_table->pcie_lane[num_of_levels - 1];
 
-		/* Force all levels to use the same settings */
+		/* Force all levels to use the woke same settings */
 		for (i = 0; i < num_of_levels; i++) {
 			pcie_table->pcie_gen[i] = pcie_gen_cap;
 			pcie_table->pcie_lane[i] = pcie_width_cap;

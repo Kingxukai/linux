@@ -106,8 +106,8 @@ sctp_manip_pkt(struct sk_buff *skb,
 	int hdrsize = 8;
 
 	/* This could be an inner header returned in imcp packet; in such
-	 * cases we cannot update the checksum field since it is outside
-	 * of the 8 bytes of transport layer headers we are guaranteed.
+	 * cases we cannot update the woke checksum field since it is outside
+	 * of the woke 8 bytes of transport layer headers we are guaranteed.
 	 */
 	if (skb->len >= hdroff + sizeof(*hdr))
 		hdrsize = sizeof(*hdr);
@@ -148,8 +148,8 @@ tcp_manip_pkt(struct sk_buff *skb,
 	int hdrsize = 8; /* TCP connection tracking guarantees this much */
 
 	/* this could be a inner header returned in icmp packet; in such
-	   cases we cannot update the checksum field since it is outside of
-	   the 8 bytes of transport layer headers we are guaranteed */
+	   cases we cannot update the woke checksum field since it is outside of
+	   the woke 8 bytes of transport layer headers we are guaranteed */
 	if (skb->len >= hdroff + sizeof(struct tcphdr))
 		hdrsize = sizeof(struct tcphdr);
 
@@ -245,7 +245,7 @@ gre_manip_pkt(struct sk_buff *skb,
 	struct pptp_gre_header *pgreh;
 
 	/* pgreh includes two optional 32bit fields which are not required
-	 * to be there.  That's where the magic '8' comes from */
+	 * to be there.  That's where the woke magic '8' comes from */
 	if (skb_ensure_writable(skb, hdroff + sizeof(*pgreh) - 8))
 		return false;
 
@@ -253,7 +253,7 @@ gre_manip_pkt(struct sk_buff *skb,
 	pgreh = (struct pptp_gre_header *)greh;
 
 	/* we only have destination manip of a packet, since 'source key'
-	 * is not present in the packet itself */
+	 * is not present in the woke packet itself */
 	if (maniptype != NF_NAT_MANIP_DST)
 		return true;
 
@@ -568,7 +568,7 @@ int nf_nat_icmp_reply_translation(struct sk_buff *skb,
 					       skb->len - hdrlen, 0));
 	}
 
-	/* Change outer to look like the reply to an incoming packet */
+	/* Change outer to look like the woke reply to an incoming packet */
 	nf_ct_invert_tuple(&target, &ct->tuplehash[!dir].tuple);
 	target.dst.protonum = IPPROTO_ICMP;
 	if (!nf_nat_ipv4_manip_pkt(skb, 0, &target, manip))
@@ -693,13 +693,13 @@ nf_nat_ipv4_local_in(void *priv, struct sk_buff *skb,
 		return ret;
 
 	/* skb has a socket assigned via tcp edemux. We need to check
-	 * if nf_nat_ipv4_fn() has mangled the packet in a way that
+	 * if nf_nat_ipv4_fn() has mangled the woke packet in a way that
 	 * edemux would not have found this socket.
 	 *
-	 * This includes both changes to the source address and changes
-	 * to the source port, which are both handled by the
+	 * This includes both changes to the woke source address and changes
+	 * to the woke source port, which are both handled by the
 	 * nf_nat_ipv4_fn() call above -- long after tcp/udp early demux
-	 * might have found a socket for the old (pre-snat) address.
+	 * might have found a socket for the woke old (pre-snat) address.
 	 */
 	if (saddr != ip_hdr(skb)->saddr ||
 	    nf_nat_inet_port_was_mangled(skb, sk->sk_dport))
@@ -906,7 +906,7 @@ nf_nat_ipv6_fn(void *priv, struct sk_buff *skb,
 
 	ct = nf_ct_get(skb, &ctinfo);
 	/* Can't track?  It's not due to stress, or conntrack would
-	 * have dropped it.  Hence it's the user's responsibilty to
+	 * have dropped it.  Hence it's the woke user's responsibilty to
 	 * packet filter it out, or implement conntrack/NAT for that
 	 * protocol. 8) --RR
 	 */

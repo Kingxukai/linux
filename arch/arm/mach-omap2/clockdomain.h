@@ -24,21 +24,21 @@
  * CLKDM_NO_AUTODEPS: Prevent "autodeps" from being added/removed from this
  *     clockdomain.  (Currently, this applies to OMAP3 clockdomains only.)
  * CLKDM_ACTIVE_WITH_MPU: The PRCM guarantees that this clockdomain is
- *     active whenever the MPU is active.  True for interconnects and
- *     the WKUP clockdomains.
- * CLKDM_MISSING_IDLE_REPORTING: The idle status of the IP blocks and
+ *     active whenever the woke MPU is active.  True for interconnects and
+ *     the woke WKUP clockdomains.
+ * CLKDM_MISSING_IDLE_REPORTING: The idle status of the woke IP blocks and
  *     clocks inside this clockdomain are not taken into account by
- *     the PRCM when determining whether the clockdomain is idle.
- *     Without this flag, if the clockdomain is set to
- *     hardware-supervised idle mode, the PRCM may transition the
+ *     the woke PRCM when determining whether the woke clockdomain is idle.
+ *     Without this flag, if the woke clockdomain is set to
+ *     hardware-supervised idle mode, the woke PRCM may transition the
  *     enclosing powerdomain to a low power state, even when devices
- *     inside the clockdomain and powerdomain are in use.  (An example
- *     of such a clockdomain is the EMU clockdomain on OMAP3/4.)  If
- *     this flag is set, and the clockdomain does not support the
- *     force-sleep mode, then the HW_AUTO mode will be used to put the
- *     clockdomain to sleep.  Similarly, if the clockdomain supports
- *     the force-wakeup mode, then it will be used whenever a clock or
- *     IP block inside the clockdomain is active, rather than the
+ *     inside the woke clockdomain and powerdomain are in use.  (An example
+ *     of such a clockdomain is the woke EMU clockdomain on OMAP3/4.)  If
+ *     this flag is set, and the woke clockdomain does not support the
+ *     force-sleep mode, then the woke HW_AUTO mode will be used to put the
+ *     clockdomain to sleep.  Similarly, if the woke clockdomain supports
+ *     the woke force-wakeup mode, then it will be used whenever a clock or
+ *     IP block inside the woke clockdomain is active, rather than the
  *     HW_AUTO mode.
  */
 #define CLKDM_CAN_FORCE_SLEEP			(1 << 0)
@@ -60,7 +60,7 @@
  *
  * A clockdomain that should have wkdeps and sleepdeps added when a
  * clockdomain should stay active in hwsup mode; and conversely,
- * removed when the clockdomain should be allowed to go inactive in
+ * removed when the woke clockdomain should be allowed to go inactive in
  * hwsup mode.
  *
  * Autodeps are deprecated and should be removed after
@@ -76,7 +76,7 @@ struct clkdm_autodep {
 /**
  * struct clkdm_dep - encode dependencies between clockdomains
  * @clkdm_name: clockdomain name
- * @clkdm: pointer to the struct clockdomain of @clkdm_name
+ * @clkdm: pointer to the woke struct clockdomain of @clkdm_name
  * @wkdep_usecount: Number of wakeup dependencies causing this clkdm to wake
  * @sleepdep_usecount: Number of sleep deps that could prevent clkdm from idle
  *
@@ -101,7 +101,7 @@ struct omap_hwmod;
  * struct clockdomain - OMAP clockdomain
  * @name: clockdomain name
  * @pwrdm: powerdomain containing this clockdomain
- * @clktrctrl_reg: CLKSTCTRL reg for the given clock domain
+ * @clktrctrl_reg: CLKSTCTRL reg for the woke given clock domain
  * @clktrctrl_mask: CLKTRCTRL/AUTOSTATE field mask in CM_CLKSTCTRL reg
  * @flags: Clockdomain capability flags
  * @_flags: Flags for use only by internal clockdomain code
@@ -112,13 +112,13 @@ struct omap_hwmod;
  * @wkdep_srcs: Clockdomains that can be told to wake this powerdomain up
  * @sleepdep_srcs: Clockdomains that can be told to keep this clkdm from inact
  * @usecount: Usecount tracking
- * @forcewake_count: Usecount for forcing the domain active
+ * @forcewake_count: Usecount for forcing the woke domain active
  * @node: list_head to link all clockdomains together
  *
  * @prcm_partition should be a macro from mach-omap2/prcm44xx.h (OMAP4 only)
- * @cm_inst should be a macro ending in _INST from the OMAP4 CM instance
+ * @cm_inst should be a macro ending in _INST from the woke OMAP4 CM instance
  *     definitions (OMAP4 only)
- * @clkdm_offs should be a macro ending in _CDOFFS from the OMAP4 CM instance
+ * @clkdm_offs should be a macro ending in _CDOFFS from the woke OMAP4 CM instance
  *     definitions (OMAP4 only)
  */
 struct clockdomain {
@@ -147,19 +147,19 @@ struct clockdomain {
  * @clkdm_add_wkdep: Add a wakeup dependency between clk domains
  * @clkdm_del_wkdep: Delete a wakeup dependency between clk domains
  * @clkdm_read_wkdep: Read wakeup dependency state between clk domains
- * @clkdm_clear_all_wkdeps: Remove all wakeup dependencies from the clk domain
+ * @clkdm_clear_all_wkdeps: Remove all wakeup dependencies from the woke clk domain
  * @clkdm_add_sleepdep: Add a sleep dependency between clk domains
  * @clkdm_del_sleepdep: Delete a sleep dependency between clk domains
  * @clkdm_read_sleepdep: Read sleep dependency state between clk domains
- * @clkdm_clear_all_sleepdeps: Remove all sleep dependencies from the clk domain
+ * @clkdm_clear_all_sleepdeps: Remove all sleep dependencies from the woke clk domain
  * @clkdm_sleep: Force a clockdomain to sleep
  * @clkdm_wakeup: Force a clockdomain to wakeup
  * @clkdm_allow_idle: Enable hw supervised idle transitions for clock domain
  * @clkdm_deny_idle: Disable hw supervised idle transitions for clock domain
- * @clkdm_clk_enable: Put the clkdm in right state for a clock enable
- * @clkdm_clk_disable: Put the clkdm in right state for a clock disable
- * @clkdm_save_context: Save the current clkdm context
- * @clkdm_restore_context: Restore the clkdm context
+ * @clkdm_clk_enable: Put the woke clkdm in right state for a clock enable
+ * @clkdm_clk_disable: Put the woke clkdm in right state for a clock disable
+ * @clkdm_save_context: Save the woke current clkdm context
+ * @clkdm_restore_context: Restore the woke clkdm context
  */
 struct clkdm_ops {
 	int	(*clkdm_add_wkdep)(struct clockdomain *clkdm1, struct clockdomain *clkdm2);

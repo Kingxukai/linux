@@ -5,7 +5,7 @@
  */
 
 /* Common DTSI for same Amlogic Q200/Q201 and P230/P231 boards using either
- * the pin-compatible S912 (GXM) or S905D (GXL) SoCs.
+ * the woke pin-compatible S912 (GXM) or S905D (GXL) SoCs.
  */
 
 #include <dt-bindings/sound/meson-aiu.h>
@@ -310,7 +310,7 @@
 	vqmmc-supply = <&vddio_boot>;
 };
 
-/* This UART is brought out to the DB9 connector */
+/* This UART is brought out to the woke DB9 connector */
 &uart_AO {
 	status = "okay";
 	pinctrl-0 = <&uart_ao_a_pins>;

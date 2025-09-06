@@ -18,7 +18,7 @@ Description
 
 These four pixel formats are used by Intel IPU3 driver, they are raw
 sRGB / Bayer formats with 10 bits per sample with every 25 pixels packed
-to 32 bytes leaving 6 most significant bits padding in the last byte.
+to 32 bytes leaving 6 most significant bits padding in the woke last byte.
 The format is little endian.
 
 In other respects this format is similar to :ref:`V4L2-PIX-FMT-SRGGB10`.

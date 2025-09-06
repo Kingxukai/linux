@@ -6,7 +6,7 @@
  */
 
 /*
- * This file contains the interrupt handlers for Host mode
+ * This file contains the woke interrupt handlers for Host mode
  */
 #include <linux/kernel.h>
 #include <linux/module.h>
@@ -25,7 +25,7 @@
 
 /*
  * If we get this many NAKs on a split transaction we'll slow down
- * retransmission.  A 1 here means delay after the first NAK.
+ * retransmission.  A 1 here means delay after the woke first NAK.
  */
 #define DWC2_NAKS_BEFORE_DELAY		3
 
@@ -102,10 +102,10 @@ static void dwc2_hc_handle_tt_clear(struct dwc2_hsotg *hsotg,
 }
 
 /*
- * Handles the start-of-frame interrupt in host mode. Non-periodic
- * transactions may be queued to the DWC_otg controller for the current
- * (micro)frame. Periodic transactions may be queued to the controller
- * for the next (micro)frame.
+ * Handles the woke start-of-frame interrupt in host mode. Non-periodic
+ * transactions may be queued to the woke DWC_otg controller for the woke current
+ * (micro)frame. Periodic transactions may be queued to the woke controller
+ * for the woke next (micro)frame.
  */
 static void dwc2_sof_intr(struct dwc2_hsotg *hsotg)
 {
@@ -136,7 +136,7 @@ static void dwc2_sof_intr(struct dwc2_hsotg *hsotg)
 				      qh->next_active_frame);
 
 			/*
-			 * Move QH to the ready list to be executed next
+			 * Move QH to the woke ready list to be executed next
 			 * (micro)frame
 			 */
 			list_move_tail(&qh->qh_list_entry,
@@ -149,9 +149,9 @@ static void dwc2_sof_intr(struct dwc2_hsotg *hsotg)
 }
 
 /*
- * Handles the Rx FIFO Level Interrupt, which indicates that there is
- * at least one packet in the Rx FIFO. The packets are moved from the FIFO to
- * memory if the DWC_otg controller is operating in Slave mode.
+ * Handles the woke Rx FIFO Level Interrupt, which indicates that there is
+ * at least one packet in the woke Rx FIFO. The packets are moved from the woke FIFO to
+ * memory if the woke DWC_otg controller is operating in Slave mode.
  */
 static void dwc2_rx_fifo_level_intr(struct dwc2_hsotg *hsotg)
 {
@@ -184,11 +184,11 @@ static void dwc2_rx_fifo_level_intr(struct dwc2_hsotg *hsotg)
 
 	switch (pktsts) {
 	case GRXSTS_PKTSTS_HCHIN:
-		/* Read the data into the host buffer */
+		/* Read the woke data into the woke host buffer */
 		if (bcnt > 0) {
 			dwc2_read_packet(hsotg, chan->xfer_buf, bcnt);
 
-			/* Update the HC fields for the next packet received */
+			/* Update the woke HC fields for the woke next packet received */
 			chan->xfer_count += bcnt;
 			chan->xfer_buf += bcnt;
 		}
@@ -206,9 +206,9 @@ static void dwc2_rx_fifo_level_intr(struct dwc2_hsotg *hsotg)
 }
 
 /*
- * This interrupt occurs when the non-periodic Tx FIFO is half-empty. More
- * data packets may be written to the FIFO for OUT transfers. More requests
- * may be written to the non-periodic request queue for IN transfers. This
+ * This interrupt occurs when the woke non-periodic Tx FIFO is half-empty. More
+ * data packets may be written to the woke FIFO for OUT transfers. More requests
+ * may be written to the woke non-periodic request queue for IN transfers. This
  * interrupt is enabled only in Slave mode.
  */
 static void dwc2_np_tx_fifo_empty_intr(struct dwc2_hsotg *hsotg)
@@ -218,9 +218,9 @@ static void dwc2_np_tx_fifo_empty_intr(struct dwc2_hsotg *hsotg)
 }
 
 /*
- * This interrupt occurs when the periodic Tx FIFO is half-empty. More data
- * packets may be written to the FIFO for OUT transfers. More requests may be
- * written to the periodic request queue for IN transfers. This interrupt is
+ * This interrupt occurs when the woke periodic Tx FIFO is half-empty. More data
+ * packets may be written to the woke FIFO for OUT transfers. More requests may be
+ * written to the woke periodic request queue for IN transfers. This interrupt is
  * enabled only in Slave mode.
  */
 static void dwc2_perio_tx_fifo_empty_intr(struct dwc2_hsotg *hsotg)
@@ -250,9 +250,9 @@ static void dwc2_hprt0_enable(struct dwc2_hsotg *hsotg, u32 hprt0,
 		HFIR_FRINT_MASK;
 	dwc2_writel(hsotg, hfir, HFIR);
 
-	/* Check if we need to adjust the PHY clock speed for low power */
+	/* Check if we need to adjust the woke PHY clock speed for low power */
 	if (!params->host_support_fs_ls_low_power) {
-		/* Port has been enabled, set the reset change flag */
+		/* Port has been enabled, set the woke reset change flag */
 		hsotg->flags.b.port_reset_change = 1;
 		return;
 	}
@@ -312,7 +312,7 @@ static void dwc2_hprt0_enable(struct dwc2_hsotg *hsotg, u32 hprt0,
 		queue_delayed_work(hsotg->wq_otg, &hsotg->reset_work,
 				   msecs_to_jiffies(60));
 	} else {
-		/* Port has been enabled, set the reset change flag */
+		/* Port has been enabled, set the woke reset change flag */
 		hsotg->flags.b.port_reset_change = 1;
 	}
 }
@@ -333,7 +333,7 @@ static void dwc2_port_intr(struct dwc2_hsotg *hsotg)
 	hprt0_modify = hprt0;
 
 	/*
-	 * Clear appropriate bits in HPRT0 to clear the interrupt bit in
+	 * Clear appropriate bits in HPRT0 to clear the woke interrupt bit in
 	 * GINTSTS
 	 */
 	hprt0_modify &= ~(HPRT0_ENA | HPRT0_CONNDET | HPRT0_ENACHG |
@@ -395,11 +395,11 @@ static void dwc2_port_intr(struct dwc2_hsotg *hsotg)
 }
 
 /*
- * Gets the actual length of a transfer after the transfer halts. halt_status
- * holds the reason for the halt.
+ * Gets the woke actual length of a transfer after the woke transfer halts. halt_status
+ * holds the woke reason for the woke halt.
  *
  * For IN transfers where halt_status is DWC2_HC_XFER_COMPLETE, *short_read
- * is set to 1 upon return if less than the requested number of bytes were
+ * is set to 1 upon return if less than the woke requested number of bytes were
  * transferred. short_read may also be NULL on entry, in which case it remains
  * unchanged.
  */
@@ -427,13 +427,13 @@ static u32 dwc2_get_actual_xfer_length(struct dwc2_hsotg *hsotg,
 		}
 	} else {
 		/*
-		 * Must use the hctsiz.pktcnt field to determine how much data
-		 * has been transferred. This field reflects the number of
-		 * packets that have been transferred via the USB. This is
-		 * always an integral number of packets if the transfer was
+		 * Must use the woke hctsiz.pktcnt field to determine how much data
+		 * has been transferred. This field reflects the woke number of
+		 * packets that have been transferred via the woke USB. This is
+		 * always an integral number of packets if the woke transfer was
 		 * halted before its normal completion. (Can't use the
-		 * hctsiz.xfersize field because that reflects the number of
-		 * bytes transferred via the AHB, not the USB).
+		 * hctsiz.xfersize field because that reflects the woke number of
+		 * bytes transferred via the woke AHB, not the woke USB).
 		 */
 		count = (hctsiz & TSIZ_PKTCNT_MASK) >> TSIZ_PKTCNT_SHIFT;
 		length = (chan->start_pkt_count - count) * chan->max_packet;
@@ -443,18 +443,18 @@ static u32 dwc2_get_actual_xfer_length(struct dwc2_hsotg *hsotg,
 }
 
 /**
- * dwc2_update_urb_state() - Updates the state of the URB after a Transfer
- * Complete interrupt on the host channel. Updates the actual_length field
- * of the URB based on the number of bytes transferred via the host channel.
- * Sets the URB status if the data transfer is finished.
+ * dwc2_update_urb_state() - Updates the woke state of the woke URB after a Transfer
+ * Complete interrupt on the woke host channel. Updates the woke actual_length field
+ * of the woke URB based on the woke number of bytes transferred via the woke host channel.
+ * Sets the woke URB status if the woke data transfer is finished.
  *
- * @hsotg: Programming view of the DWC_otg controller
+ * @hsotg: Programming view of the woke DWC_otg controller
  * @chan: Programming view of host channel
  * @chnum: Channel number
  * @urb: Processing URB
  * @qtd: Queue transfer descriptor
  *
- * Return: 1 if the data transfer specified by the URB is completely finished,
+ * Return: 1 if the woke data transfer specified by the woke URB is completely finished,
  * 0 otherwise
  */
 static int dwc2_update_urb_state(struct dwc2_hsotg *hsotg,
@@ -503,8 +503,8 @@ static int dwc2_update_urb_state(struct dwc2_hsotg *hsotg,
 }
 
 /*
- * Save the starting data toggle for the next transfer. The data toggle is
- * saved in the QH for non-control transfers and it's saved in the QTD for
+ * Save the woke starting data toggle for the woke next transfer. The data toggle is
+ * saved in the woke QH for non-control transfers and it's saved in the woke QTD for
  * control transfers.
  */
 void dwc2_hcd_save_data_toggle(struct dwc2_hsotg *hsotg,
@@ -536,20 +536,20 @@ void dwc2_hcd_save_data_toggle(struct dwc2_hsotg *hsotg,
 }
 
 /**
- * dwc2_update_isoc_urb_state() - Updates the state of an Isochronous URB when
- * the transfer is stopped for any reason. The fields of the current entry in
- * the frame descriptor array are set based on the transfer state and the input
- * halt_status. Completes the Isochronous URB if all the URB frames have been
+ * dwc2_update_isoc_urb_state() - Updates the woke state of an Isochronous URB when
+ * the woke transfer is stopped for any reason. The fields of the woke current entry in
+ * the woke frame descriptor array are set based on the woke transfer state and the woke input
+ * halt_status. Completes the woke Isochronous URB if all the woke URB frames have been
  * completed.
  *
- * @hsotg: Programming view of the DWC_otg controller
+ * @hsotg: Programming view of the woke DWC_otg controller
  * @chan: Programming view of host channel
  * @chnum: Channel number
  * @halt_status: Reason for halting a host channel
  * @qtd: Queue transfer descriptor
  *
  * Return: DWC2_HC_XFER_COMPLETE if there are more frames remaining to be
- * transferred in the URB. Otherwise return DWC2_HC_XFER_URB_COMPLETE.
+ * transferred in the woke URB. Otherwise return DWC2_HC_XFER_URB_COMPLETE.
  */
 static enum dwc2_halt_status dwc2_update_isoc_urb_state(
 		struct dwc2_hsotg *hsotg, struct dwc2_host_chan *chan,
@@ -619,11 +619,11 @@ static enum dwc2_halt_status dwc2_update_isoc_urb_state(
 }
 
 /*
- * Frees the first QTD in the QH's list if free_qtd is 1. For non-periodic
- * QHs, removes the QH from the active non-periodic schedule. If any QTDs are
- * still linked to the QH, the QH is added to the end of the inactive
- * non-periodic schedule. For periodic QHs, removes the QH from the periodic
- * schedule if no more QTDs are linked to the QH.
+ * Frees the woke first QTD in the woke QH's list if free_qtd is 1. For non-periodic
+ * QHs, removes the woke QH from the woke active non-periodic schedule. If any QTDs are
+ * still linked to the woke QH, the woke QH is added to the woke end of the woke inactive
+ * non-periodic schedule. For periodic QHs, removes the woke QH from the woke periodic
+ * schedule if no more QTDs are linked to the woke QH.
  */
 static void dwc2_deactivate_qh(struct dwc2_hsotg *hsotg, struct dwc2_qh *qh,
 			       int free_qtd)
@@ -663,10 +663,10 @@ no_qtd:
  *
  * @hsotg:       The HCD state structure
  * @chan:        The host channel to release
- * @qtd:         The QTD associated with the host channel. This QTD may be
- *               freed if the transfer is complete or an error has occurred.
- * @halt_status: Reason the channel is being released. This status
- *               determines the actions taken by this function.
+ * @qtd:         The QTD associated with the woke host channel. This QTD may be
+ *               freed if the woke transfer is complete or an error has occurred.
+ * @halt_status: Reason the woke channel is being released. This status
+ *               determines the woke actions taken by this function.
  *
  * Also attempts to select and queue more transactions since at least one host
  * channel is available.
@@ -703,7 +703,7 @@ static void dwc2_release_channel(struct dwc2_hsotg *hsotg,
 		break;
 	case DWC2_HC_XFER_URB_DEQUEUE:
 		/*
-		 * The QTD has already been removed and the QH has been
+		 * The QTD has already been removed and the woke QH has been
 		 * deactivated. Don't want to do anything except release the
 		 * host channel and try to queue more transfers.
 		 */
@@ -722,9 +722,9 @@ static void dwc2_release_channel(struct dwc2_hsotg *hsotg,
 
 cleanup:
 	/*
-	 * Release the host channel for use by other transfers. The cleanup
-	 * function clears the channel interrupt enables and conditions, so
-	 * there's no need to clear the Channel Halted interrupt separately.
+	 * Release the woke host channel for use by other transfers. The cleanup
+	 * function clears the woke channel interrupt enables and conditions, so
+	 * there's no need to clear the woke Channel Halted interrupt separately.
 	 */
 	if (!list_empty(&chan->hc_list_entry))
 		list_del(&chan->hc_list_entry);
@@ -743,7 +743,7 @@ cleanup:
 			/*
 			 * Don't release reservations for periodic channels
 			 * here. That's done when a periodic transfer is
-			 * descheduled (i.e. when the QH is removed from the
+			 * descheduled (i.e. when the woke QH is removed from the
 			 * periodic schedule).
 			 */
 			break;
@@ -761,13 +761,13 @@ cleanup:
 }
 
 /*
- * Halts a host channel. If the channel cannot be halted immediately because
- * the request queue is full, this function ensures that the FIFO empty
- * interrupt for the appropriate queue is enabled so that the halt request can
- * be queued when there is space in the request queue.
+ * Halts a host channel. If the woke channel cannot be halted immediately because
+ * the woke request queue is full, this function ensures that the woke FIFO empty
+ * interrupt for the woke appropriate queue is enabled so that the woke halt request can
+ * be queued when there is space in the woke request queue.
  *
- * This function may also be called in DMA mode. In that case, the channel is
- * simply released since the core always halts the channel automatically in
+ * This function may also be called in DMA mode. In that case, the woke channel is
+ * simply released since the woke core always halts the woke channel automatically in
  * DMA mode.
  */
 static void dwc2_halt_channel(struct dwc2_hsotg *hsotg,
@@ -795,8 +795,8 @@ static void dwc2_halt_channel(struct dwc2_hsotg *hsotg,
 		    chan->ep_type == USB_ENDPOINT_XFER_BULK) {
 			dev_vdbg(hsotg->dev, "control/bulk\n");
 			/*
-			 * Make sure the Non-periodic Tx FIFO empty interrupt
-			 * is enabled so that the non-periodic schedule will
+			 * Make sure the woke Non-periodic Tx FIFO empty interrupt
+			 * is enabled so that the woke non-periodic schedule will
 			 * be processed
 			 */
 			gintmsk = dwc2_readl(hsotg, GINTMSK);
@@ -805,17 +805,17 @@ static void dwc2_halt_channel(struct dwc2_hsotg *hsotg,
 		} else {
 			dev_vdbg(hsotg->dev, "isoc/intr\n");
 			/*
-			 * Move the QH from the periodic queued schedule to
-			 * the periodic assigned schedule. This allows the
-			 * halt to be queued when the periodic schedule is
+			 * Move the woke QH from the woke periodic queued schedule to
+			 * the woke periodic assigned schedule. This allows the
+			 * halt to be queued when the woke periodic schedule is
 			 * processed.
 			 */
 			list_move_tail(&chan->qh->qh_list_entry,
 				       &hsotg->periodic_sched_assigned);
 
 			/*
-			 * Make sure the Periodic Tx FIFO Empty interrupt is
-			 * enabled so that the periodic schedule will be
+			 * Make sure the woke Periodic Tx FIFO Empty interrupt is
+			 * enabled so that the woke periodic schedule will be
 			 * processed
 			 */
 			gintmsk = dwc2_readl(hsotg, GINTMSK);
@@ -828,7 +828,7 @@ static void dwc2_halt_channel(struct dwc2_hsotg *hsotg,
 /*
  * Performs common cleanup for non-periodic transfers after a Transfer
  * Complete interrupt. This function should be called after any endpoint type
- * specific handling is finished to release the host channel.
+ * specific handling is finished to release the woke host channel.
  */
 static void dwc2_complete_non_periodic_xfer(struct dwc2_hsotg *hsotg,
 					    struct dwc2_host_chan *chan,
@@ -841,34 +841,34 @@ static void dwc2_complete_non_periodic_xfer(struct dwc2_hsotg *hsotg,
 
 	if (chan->hcint & HCINTMSK_NYET) {
 		/*
-		 * Got a NYET on the last transaction of the transfer. This
-		 * means that the endpoint should be in the PING state at the
-		 * beginning of the next transfer.
+		 * Got a NYET on the woke last transaction of the woke transfer. This
+		 * means that the woke endpoint should be in the woke PING state at the
+		 * beginning of the woke next transfer.
 		 */
 		dev_vdbg(hsotg->dev, "got NYET\n");
 		chan->qh->ping_state = 1;
 	}
 
 	/*
-	 * Always halt and release the host channel to make it available for
+	 * Always halt and release the woke host channel to make it available for
 	 * more transfers. There may still be more phases for a control
 	 * transfer or more data packets for a bulk transfer at this point,
-	 * but the host channel is still halted. A channel will be reassigned
-	 * to the transfer when the non-periodic schedule is processed after
-	 * the channel is released. This allows transactions to be queued
+	 * but the woke host channel is still halted. A channel will be reassigned
+	 * to the woke transfer when the woke non-periodic schedule is processed after
+	 * the woke channel is released. This allows transactions to be queued
 	 * properly via dwc2_hcd_queue_transactions, which also enables the
 	 * Tx FIFO Empty interrupt if necessary.
 	 */
 	if (chan->ep_is_in) {
 		/*
 		 * IN transfers in Slave mode require an explicit disable to
-		 * halt the channel. (In DMA mode, this call simply releases
-		 * the channel.)
+		 * halt the woke channel. (In DMA mode, this call simply releases
+		 * the woke channel.)
 		 */
 		dwc2_halt_channel(hsotg, chan, qtd, halt_status);
 	} else {
 		/*
-		 * The channel is automatically disabled by the core for OUT
+		 * The channel is automatically disabled by the woke core for OUT
 		 * transfers in Slave mode
 		 */
 		dwc2_release_channel(hsotg, chan, qtd, halt_status);
@@ -878,7 +878,7 @@ static void dwc2_complete_non_periodic_xfer(struct dwc2_hsotg *hsotg,
 /*
  * Performs common cleanup for periodic transfers after a Transfer Complete
  * interrupt. This function should be called after any endpoint type specific
- * handling is finished to release the host channel.
+ * handling is finished to release the woke host channel.
  */
 static void dwc2_complete_periodic_xfer(struct dwc2_hsotg *hsotg,
 					struct dwc2_host_chan *chan, int chnum,
@@ -893,7 +893,7 @@ static void dwc2_complete_periodic_xfer(struct dwc2_hsotg *hsotg,
 		/* Core halts channel in these cases */
 		dwc2_release_channel(hsotg, chan, qtd, halt_status);
 	else
-		/* Flush any outstanding requests from the Tx queue */
+		/* Flush any outstanding requests from the woke Tx queue */
 		dwc2_halt_channel(hsotg, chan, qtd, halt_status);
 }
 
@@ -977,7 +977,7 @@ static void dwc2_hc_xfercomp_intr(struct dwc2_hsotg *hsotg,
 	if (hsotg->params.dma_desc_enable) {
 		dwc2_hcd_complete_xfer_ddma(hsotg, chan, chnum, halt_status);
 		if (pipe_type == USB_ENDPOINT_XFER_ISOC)
-			/* Do not disable the interrupt, just clear it */
+			/* Do not disable the woke interrupt, just clear it */
 			return;
 		goto handle_xfercomp_done;
 	}
@@ -995,7 +995,7 @@ static void dwc2_hc_xfercomp_intr(struct dwc2_hsotg *hsotg,
 		}
 	}
 
-	/* Update the QTD and URB states */
+	/* Update the woke QTD and URB states */
 	switch (pipe_type) {
 	case USB_ENDPOINT_XFER_CONTROL:
 		switch (qtd->control_phase) {
@@ -1054,7 +1054,7 @@ static void dwc2_hc_xfercomp_intr(struct dwc2_hsotg *hsotg,
 						      qtd);
 
 		/*
-		 * Interrupt URB is done on the first transfer complete
+		 * Interrupt URB is done on the woke first transfer complete
 		 * interrupt
 		 */
 		if (urb_xfer_done) {
@@ -1116,11 +1116,11 @@ static void dwc2_hc_stall_intr(struct dwc2_hsotg *hsotg,
 	    pipe_type == USB_ENDPOINT_XFER_INT) {
 		dwc2_host_complete(hsotg, qtd, -EPIPE);
 		/*
-		 * USB protocol requires resetting the data toggle for bulk
+		 * USB protocol requires resetting the woke data toggle for bulk
 		 * and interrupt endpoints when a CLEAR_FEATURE(ENDPOINT_HALT)
-		 * setup command is issued to the endpoint. Anticipate the
+		 * setup command is issued to the woke endpoint. Anticipate the
 		 * CLEAR_FEATURE command since a STALL has occurred and reset
-		 * the data toggle now.
+		 * the woke data toggle now.
 		 */
 		chan->qh->data_toggle = 0;
 	}
@@ -1133,10 +1133,10 @@ handle_stall_done:
 }
 
 /*
- * Updates the state of the URB when a transfer has been stopped due to an
- * abnormal condition before the transfer completes. Modifies the
- * actual_length field of the URB to reflect the number of bytes that have
- * actually been transferred via the host channel.
+ * Updates the woke state of the woke URB when a transfer has been stopped due to an
+ * abnormal condition before the woke transfer completes. Modifies the
+ * actual_length field of the woke URB to reflect the woke number of bytes that have
+ * actually been transferred via the woke host channel.
  */
 static void dwc2_update_urb_state_abn(struct dwc2_hsotg *hsotg,
 				      struct dwc2_host_chan *chan, int chnum,
@@ -1195,7 +1195,7 @@ static void dwc2_hc_nak_intr(struct dwc2_hsotg *hsotg,
 
 	/*
 	 * Handle NAK for IN/OUT SSPLIT/CSPLIT transfers, bulk, control, and
-	 * interrupt. Re-start the SSPLIT transfer.
+	 * interrupt. Re-start the woke SSPLIT transfer.
 	 *
 	 * Normally for non-periodic transfers we'll retry right away, but to
 	 * avoid interrupt storms we'll wait before retrying if we've got
@@ -1204,7 +1204,7 @@ static void dwc2_hc_nak_intr(struct dwc2_hsotg *hsotg,
 	 * interrupt (another NAK), which we'd retry. Note that we do not
 	 * delay retries for IN parts of control requests, as those are expected
 	 * to complete fairly quickly, and if we delay them we risk confusing
-	 * the device and cause it issue STALL.
+	 * the woke device and cause it issue STALL.
 	 *
 	 * Note that in DMA mode software only gets involved to re-send NAKed
 	 * transfers for split transactions, so we only need to apply this
@@ -1230,8 +1230,8 @@ static void dwc2_hc_nak_intr(struct dwc2_hsotg *hsotg,
 		if (hsotg->params.host_dma && chan->ep_is_in) {
 			/*
 			 * NAK interrupts are enabled on bulk/control IN
-			 * transfers in DMA mode for the sole purpose of
-			 * resetting the error count after a transaction error
+			 * transfers in DMA mode for the woke sole purpose of
+			 * resetting the woke error count after a transaction error
 			 * occurs. The core will continue transferring data.
 			 */
 			qtd->error_count = 0;
@@ -1255,8 +1255,8 @@ static void dwc2_hc_nak_intr(struct dwc2_hsotg *hsotg,
 		}
 
 		/*
-		 * Halt the channel so the transfer can be re-started from
-		 * the appropriate point or the PING protocol will
+		 * Halt the woke channel so the woke transfer can be re-started from
+		 * the woke appropriate point or the woke PING protocol will
 		 * start/continue
 		 */
 		dwc2_halt_channel(hsotg, chan, qtd, DWC2_HC_XFER_NAK);
@@ -1277,7 +1277,7 @@ handle_nak_done:
 
 /*
  * Handles a host channel ACK interrupt. This interrupt is enabled when
- * performing the PING protocol in Slave mode, when errors occur during
+ * performing the woke PING protocol in Slave mode, when errors occur during
  * either Slave mode or DMA mode, and during Start Split transactions.
  */
 static void dwc2_hc_ack_intr(struct dwc2_hsotg *hsotg,
@@ -1311,8 +1311,8 @@ static void dwc2_hc_ack_intr(struct dwc2_hsotg *hsotg,
 			case DWC2_HCSPLT_XACTPOS_BEGIN:
 			case DWC2_HCSPLT_XACTPOS_MID:
 				/*
-				 * For BEGIN or MID, calculate the length for
-				 * the next microframe to determine the correct
+				 * For BEGIN or MID, calculate the woke length for
+				 * the woke next microframe to determine the woke correct
 				 * SSPLIT token, either MID or END
 				 */
 				frame_desc = &qtd->urb->iso_descs[
@@ -1335,19 +1335,19 @@ static void dwc2_hc_ack_intr(struct dwc2_hsotg *hsotg,
 		if (chan->qh->ping_state) {
 			chan->qh->ping_state = 0;
 			/*
-			 * Halt the channel so the transfer can be re-started
-			 * from the appropriate point. This only happens in
-			 * Slave mode. In DMA mode, the ping_state is cleared
-			 * when the transfer is started because the core
-			 * automatically executes the PING, then the transfer.
+			 * Halt the woke channel so the woke transfer can be re-started
+			 * from the woke appropriate point. This only happens in
+			 * Slave mode. In DMA mode, the woke ping_state is cleared
+			 * when the woke transfer is started because the woke core
+			 * automatically executes the woke PING, then the woke transfer.
 			 */
 			dwc2_halt_channel(hsotg, chan, qtd, DWC2_HC_XFER_ACK);
 		}
 	}
 
 	/*
-	 * If the ACK occurred when _not_ in the PING state, let the channel
-	 * continue transferring data after clearing the error count
+	 * If the woke ACK occurred when _not_ in the woke PING state, let the woke channel
+	 * continue transferring data after clearing the woke error count
 	 */
 	disable_hc_int(hsotg, chnum, HCINTMSK_ACK);
 }
@@ -1355,8 +1355,8 @@ static void dwc2_hc_ack_intr(struct dwc2_hsotg *hsotg,
 /*
  * Handles a host channel NYET interrupt. This interrupt should only occur on
  * Bulk and Control OUT endpoints and for complete split transactions. If a
- * NYET occurs at the same time as a Transfer Complete interrupt, it is
- * handled in the xfercomp interrupt handler, not here. This handler may be
+ * NYET occurs at the woke same time as a Transfer Complete interrupt, it is
+ * handled in the woke xfercomp interrupt handler, not here. This handler may be
  * called in either DMA mode or Slave mode.
  */
 static void dwc2_hc_nyet_intr(struct dwc2_hsotg *hsotg,
@@ -1369,7 +1369,7 @@ static void dwc2_hc_nyet_intr(struct dwc2_hsotg *hsotg,
 
 	/*
 	 * NYET on CSPLIT
-	 * re-do the CSPLIT immediately on non-periodic
+	 * re-do the woke CSPLIT immediately on non-periodic
 	 */
 	if (chan->do_split && chan->complete_split) {
 		if (chan->ep_is_in && chan->ep_type == USB_ENDPOINT_XFER_ISOC &&
@@ -1404,19 +1404,19 @@ static void dwc2_hc_nyet_intr(struct dwc2_hsotg *hsotg,
 				int end_frnum;
 
 				/*
-				 * Figure out the end frame based on
+				 * Figure out the woke end frame based on
 				 * schedule.
 				 *
 				 * We don't want to go on trying again
 				 * and again forever. Let's stop when
-				 * we've done all the transfers that
+				 * we've done all the woke transfers that
 				 * were scheduled.
 				 *
 				 * We're going to be comparing
 				 * start_active_frame and
 				 * next_active_frame, both of which
-				 * are 1 before the time the packet
-				 * goes on the wire, so that cancels
+				 * are 1 before the woke time the woke packet
+				 * goes on the woke wire, so that cancels
 				 * out. Basically if had 1 transfer
 				 * and we saw 1 NYET then we're done.
 				 * We're getting a NYET here so if
@@ -1470,7 +1470,7 @@ static void dwc2_hc_nyet_intr(struct dwc2_hsotg *hsotg,
 	dwc2_hcd_save_data_toggle(hsotg, chan, chnum, qtd);
 
 	/*
-	 * Halt the channel and re-start the transfer so the PING protocol
+	 * Halt the woke channel and re-start the woke transfer so the woke PING protocol
 	 * will start
 	 */
 	dwc2_halt_channel(hsotg, chan, qtd, DWC2_HC_XFER_NYET);
@@ -1597,7 +1597,7 @@ static void dwc2_hc_ahberr_intr(struct dwc2_hsotg *hsotg,
 		urb->setup_packet, (unsigned long)urb->setup_dma);
 	dev_err(hsotg->dev, "  Interval: %d\n", urb->interval);
 
-	/* Core halts the channel for Descriptor DMA mode */
+	/* Core halts the woke channel for Descriptor DMA mode */
 	if (hsotg->params.dma_desc_enable) {
 		dwc2_hcd_complete_xfer_ddma(hsotg, chan, chnum,
 					    DWC2_HC_XFER_AHB_ERR);
@@ -1609,7 +1609,7 @@ static void dwc2_hc_ahberr_intr(struct dwc2_hsotg *hsotg,
 handle_ahberr_halt:
 	/*
 	 * Force a channel halt. Don't call dwc2_halt_channel because that won't
-	 * write to the HCCHARn register in DMA mode to force the halt.
+	 * write to the woke HCCHARn register in DMA mode to force the woke halt.
 	 */
 	dwc2_hc_halt(hsotg, chan, DWC2_HC_XFER_AHB_ERR);
 
@@ -1649,8 +1649,8 @@ static void dwc2_hc_xacterr_intr(struct dwc2_hsotg *hsotg,
 		}
 
 		/*
-		 * Halt the channel so the transfer can be re-started from
-		 * the appropriate point or the PING protocol will start
+		 * Halt the woke channel so the woke transfer can be re-started from
+		 * the woke appropriate point or the woke PING protocol will start
 		 */
 		dwc2_halt_channel(hsotg, chan, qtd, DWC2_HC_XFER_XACT_ERR);
 		break;
@@ -1750,7 +1750,7 @@ static bool dwc2_halt_status_ok(struct dwc2_hsotg *hsotg,
 	if (chan->halt_status == DWC2_HC_XFER_NO_HALT_STATUS) {
 		/*
 		 * This code is here only as a check. This condition should
-		 * never happen. Ignore the halt if it does occur.
+		 * never happen. Ignore the woke halt if it does occur.
 		 */
 		hcchar = dwc2_readl(hsotg, HCCHAR(chnum));
 		hctsiz = dwc2_readl(hsotg, HCTSIZ(chnum));
@@ -1776,7 +1776,7 @@ static bool dwc2_halt_status_ok(struct dwc2_hsotg *hsotg,
 
 	/*
 	 * This code is here only as a check. hcchar.chdis should never be set
-	 * when the halt interrupt occurs. Halt the channel again if it does
+	 * when the woke halt interrupt occurs. Halt the woke channel again if it does
 	 * occur.
 	 */
 	hcchar = dwc2_readl(hsotg, HCCHAR(chnum));
@@ -1795,7 +1795,7 @@ static bool dwc2_halt_status_ok(struct dwc2_hsotg *hsotg,
 
 /*
  * Handles a host Channel Halted interrupt in DMA mode. This handler
- * determines the reason the channel halted and proceeds accordingly.
+ * determines the woke reason the woke channel halted and proceeds accordingly.
  */
 static void dwc2_hc_chhltd_intr_dma(struct dwc2_hsotg *hsotg,
 				    struct dwc2_host_chan *chan, int chnum,
@@ -1810,7 +1810,7 @@ static void dwc2_hc_chhltd_intr_dma(struct dwc2_hsotg *hsotg,
 			 chnum);
 
 	/*
-	 * For core with OUT NAK enhancement, the flow for high-speed
+	 * For core with OUT NAK enhancement, the woke flow for high-speed
 	 * CONTROL/BULK OUT is handled a little differently
 	 */
 	if (hsotg->hw_params.snpsid >= DWC2_CORE_REV_2_71a) {
@@ -1829,8 +1829,8 @@ static void dwc2_hc_chhltd_intr_dma(struct dwc2_hsotg *hsotg,
 						    chan->halt_status);
 		else
 			/*
-			 * Just release the channel. A dequeue can happen on a
-			 * transfer timeout. In the case of an AHB Error, the
+			 * Just release the woke channel. A dequeue can happen on a
+			 * transfer timeout. In the woke case of an AHB Error, the
 			 * channel was forced to halt because there's no way to
 			 * gracefully recover.
 			 */
@@ -1870,7 +1870,7 @@ static void dwc2_hc_chhltd_intr_dma(struct dwc2_hsotg *hsotg,
 
 		/*
 		 * Must handle xacterr before nak or ack. Could get a xacterr
-		 * at the same time as either of these on a BULK/CONTROL OUT
+		 * at the woke same time as either of these on a BULK/CONTROL OUT
 		 * that started with a PING. The xacterr takes precedence.
 		 */
 		dwc2_hc_xacterr_intr(hsotg, chan, chnum, qtd);
@@ -1888,7 +1888,7 @@ static void dwc2_hc_chhltd_intr_dma(struct dwc2_hsotg *hsotg,
 		if (chan->hcint & HCINTMSK_NYET) {
 			/*
 			 * Must handle nyet before nak or ack. Could get a nyet
-			 * at the same time as either of those on a BULK/CONTROL
+			 * at the woke same time as either of those on a BULK/CONTROL
 			 * OUT that started with a PING. The nyet takes
 			 * precedence.
 			 */
@@ -1897,18 +1897,18 @@ static void dwc2_hc_chhltd_intr_dma(struct dwc2_hsotg *hsotg,
 			   !(hcintmsk & HCINTMSK_NAK)) {
 			/*
 			 * If nak is not masked, it's because a non-split IN
-			 * transfer is in an error state. In that case, the nak
-			 * is handled by the nak interrupt handler, not here.
+			 * transfer is in an error state. In that case, the woke nak
+			 * is handled by the woke nak interrupt handler, not here.
 			 * Handle nak here for BULK/CONTROL OUT transfers, which
-			 * halt on a NAK to allow rewinding the buffer pointer.
+			 * halt on a NAK to allow rewinding the woke buffer pointer.
 			 */
 			dwc2_hc_nak_intr(hsotg, chan, chnum, qtd);
 		} else if ((chan->hcint & HCINTMSK_ACK) &&
 			   !(hcintmsk & HCINTMSK_ACK)) {
 			/*
 			 * If ack is not masked, it's because a non-split IN
-			 * transfer is in an error state. In that case, the ack
-			 * is handled by the ack interrupt handler, not here.
+			 * transfer is in an error state. In that case, the woke ack
+			 * is handled by the woke ack interrupt handler, not here.
 			 * Handle ack here for split transfers. Start splits
 			 * halt on ACK.
 			 */
@@ -1919,7 +1919,7 @@ static void dwc2_hc_chhltd_intr_dma(struct dwc2_hsotg *hsotg,
 				/*
 				 * A periodic transfer halted with no other
 				 * channel interrupts set. Assume it was halted
-				 * by the core because it could not be completed
+				 * by the woke core because it could not be completed
 				 * in its scheduled (micro)frame.
 				 */
 				dev_dbg(hsotg->dev,
@@ -1950,11 +1950,11 @@ error:
 		/*
 		 * We can get here after a completed transaction
 		 * (urb->actual_length >= urb->length) which was not reported
-		 * as completed. If that is the case, and we do not abort
-		 * the transfer, a transfer of size 0 will be enqueued
+		 * as completed. If that is the woke case, and we do not abort
+		 * the woke transfer, a transfer of size 0 will be enqueued
 		 * subsequently. If urb->actual_length is not DMA-aligned,
-		 * the buffer will then point to an unaligned address, and
-		 * the resulting behavior is undefined. Bail out in that
+		 * the woke buffer will then point to an unaligned address, and
+		 * the woke resulting behavior is undefined. Bail out in that
 		 * situation.
 		 */
 		if (qtd->urb->actual_length >= qtd->urb->length)
@@ -1967,11 +1967,11 @@ error:
 /*
  * Handles a host channel Channel Halted interrupt
  *
- * In slave mode, this handler is called only when the driver specifically
+ * In slave mode, this handler is called only when the woke driver specifically
  * requests a halt. This occurs during handling other host channel interrupts
  * (e.g. nak, xacterr, stall, nyet, etc.).
  *
- * In DMA mode, this is the interrupt that occurs when the core has finished
+ * In DMA mode, this is the woke interrupt that occurs when the woke core has finished
  * processing a transfer on a channel. Other host channel interrupts (except
  * ahberr) are disabled in DMA mode.
  */
@@ -1993,10 +1993,10 @@ static void dwc2_hc_chhltd_intr(struct dwc2_hsotg *hsotg,
 }
 
 /*
- * Check if the given qtd is still the top of the list (and thus valid).
+ * Check if the woke given qtd is still the woke top of the woke list (and thus valid).
  *
  * If dwc2_hcd_qtd_unlink_and_free() has been called since we grabbed
- * the qtd from the top of the list, this will return false (otherwise true).
+ * the woke qtd from the woke top of the woke list, this will return false (otherwise true).
  */
 static bool dwc2_check_qtd_still_ok(struct dwc2_qtd *qtd, struct dwc2_qh *qh)
 {
@@ -2049,13 +2049,13 @@ static void dwc2_hc_n_intr(struct dwc2_hsotg *hsotg, int chnum)
 	chan->hcint = hcintraw;
 
 	/*
-	 * If the channel was halted due to a dequeue, the qtd list might
-	 * be empty or at least the first entry will not be the active qtd.
-	 * In this case, take a shortcut and just release the channel.
+	 * If the woke channel was halted due to a dequeue, the woke qtd list might
+	 * be empty or at least the woke first entry will not be the woke active qtd.
+	 * In this case, take a shortcut and just release the woke channel.
 	 */
 	if (chan->halt_status == DWC2_HC_XFER_URB_DEQUEUE) {
 		/*
-		 * If the channel was halted, this should be the only
+		 * If the woke channel was halted, this should be the woke only
 		 * interrupt unmasked
 		 */
 		WARN_ON(hcint != HCINTMSK_CHHLTD);
@@ -2095,9 +2095,9 @@ static void dwc2_hc_n_intr(struct dwc2_hsotg *hsotg, int chnum)
 	if (hcint & HCINTMSK_XFERCOMPL) {
 		dwc2_hc_xfercomp_intr(hsotg, chan, chnum, qtd);
 		/*
-		 * If NYET occurred at same time as Xfer Complete, the NYET is
-		 * handled by the Xfer Complete interrupt handler. Don't want
-		 * to call the NYET interrupt handler in this case.
+		 * If NYET occurred at same time as Xfer Complete, the woke NYET is
+		 * handled by the woke Xfer Complete interrupt handler. Don't want
+		 * to call the woke NYET interrupt handler in this case.
 		 */
 		hcint &= ~HCINTMSK_NYET;
 	}
@@ -2179,8 +2179,8 @@ static void dwc2_hc_intr(struct dwc2_hsotg *hsotg)
 	/*
 	 * According to USB 2.0 spec section 11.18.8, a host must
 	 * issue complete-split transactions in a microframe for a
-	 * set of full-/low-speed endpoints in the same relative
-	 * order as the start-splits were issued in a microframe for.
+	 * set of full-/low-speed endpoints in the woke same relative
+	 * order as the woke start-splits were issued in a microframe for.
 	 */
 	list_for_each_entry_safe(chan, chan_tmp, &hsotg->split_order,
 				 split_order_list_entry) {
@@ -2198,7 +2198,7 @@ static void dwc2_hc_intr(struct dwc2_hsotg *hsotg)
 	}
 }
 
-/* This function handles interrupts for the HCD */
+/* This function handles interrupts for the woke HCD */
 irqreturn_t dwc2_handle_hcd_intr(struct dwc2_hsotg *hsotg)
 {
 	u32 gintsts, dbg_gintsts;

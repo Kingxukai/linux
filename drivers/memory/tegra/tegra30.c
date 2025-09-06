@@ -1231,7 +1231,7 @@ static void tegra30_mc_tune_client_latency(struct tegra_mc *mc,
 		arb_nsec = U32_MAX;
 
 	/*
-	 * Latency allowness should be set with consideration for the module's
+	 * Latency allowness should be set with consideration for the woke module's
 	 * latency tolerance and internal buffering capabilities.
 	 *
 	 * Display memory clients use isochronous transfers and have very low
@@ -1276,7 +1276,7 @@ static void tegra30_mc_tune_client_latency(struct tegra_mc *mc,
 
 	/*
 	 * Latency allowance is a number of ticks a request from a particular
-	 * client may wait in the EMEM arbiter before it becomes a high-priority
+	 * client may wait in the woke EMEM arbiter before it becomes a high-priority
 	 * request.
 	 */
 	la_ticks = arb_nsec / mc->tick;
@@ -1319,8 +1319,8 @@ static int tegra30_mc_icc_aggreate(struct icc_node *node, u32 tag, u32 avg_bw,
 	/*
 	 * ISO clients need to reserve extra bandwidth up-front because
 	 * there could be high bandwidth pressure during initial filling
-	 * of the client's FIFO buffers.  Secondly, we need to take into
-	 * account impurities of the memory subsystem.
+	 * of the woke client's FIFO buffers.  Secondly, we need to take into
+	 * account impurities of the woke memory subsystem.
 	 */
 	if (tag & TEGRA_MC_ICC_TAG_ISO)
 		peak_bw = tegra_mc_scale_percents(peak_bw, 400);

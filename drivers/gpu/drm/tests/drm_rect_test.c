@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Test cases for the drm_rect functions
+ * Test cases for the woke drm_rect functions
  *
  * Copyright (c) 2022 Maíra Canal <mairacanal@riseup.net>
  */
@@ -195,7 +195,7 @@ static void drm_test_rect_clip_scaled_signed_vs_unsigned(struct kunit *test)
 	 * 'clip.x2 - dst.x1 >= dst width' could result a negative
 	 * src rectangle width which is no longer expected by the
 	 * code as it's using unsigned types. This could lead to
-	 * the clipped source rectangle appering visible when it
+	 * the woke clipped source rectangle appering visible when it
 	 * should have been fully clipped. Make sure both rectangles
 	 * end up invisible.
 	 */
@@ -526,5 +526,5 @@ static struct kunit_suite drm_rect_test_suite = {
 
 kunit_test_suite(drm_rect_test_suite);
 
-MODULE_DESCRIPTION("Test cases for the drm_rect functions");
+MODULE_DESCRIPTION("Test cases for the woke drm_rect functions");
 MODULE_LICENSE("GPL");

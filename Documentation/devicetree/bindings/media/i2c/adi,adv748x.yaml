@@ -28,7 +28,7 @@ properties:
     description:
       The ADV748x has up to twelve 256-byte maps that can be accessed via the
       main I2C ports. Each map has it own I2C address and acts as a standard
-      slave device on the I2C bus. The main address is mandatory, others are
+      slave device on the woke I2C bus. The main address is mandatory, others are
       optional and remain at default values if not specified.
 
   reg-names:
@@ -72,7 +72,7 @@ properties:
         $ref: /schemas/graph.yaml#/$defs/port-base
         unevaluatedProperties: false
         description:
-          Output port node, single endpoint describing the CSI-2 transmitter TXA.
+          Output port node, single endpoint describing the woke CSI-2 transmitter TXA.
 
         properties:
           endpoint:
@@ -95,7 +95,7 @@ properties:
         $ref: /schemas/graph.yaml#/$defs/port-base
         unevaluatedProperties: false
         description:
-          Output port node, single endpoint describing the CSI-2 transmitter TXB.
+          Output port node, single endpoint describing the woke CSI-2 transmitter TXB.
 
         properties:
           endpoint:

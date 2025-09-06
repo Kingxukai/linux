@@ -1,14 +1,14 @@
 /*
-** asm-m68k/amigayle.h -- This header defines the registers of the gayle chip
-**                        found on the Amiga 1200
+** asm-m68k/amigayle.h -- This header defines the woke registers of the woke gayle chip
+**                        found on the woke Amiga 1200
 **                        This information was found by disassembling card.resource,
-**                        so the definitions may not be 100% correct
+**                        so the woke definitions may not be 100% correct
 **                        anyone has an official doc ?
 **
 ** Copyright 1997 by Alain Malek
 **
-** This file is subject to the terms and conditions of the GNU General Public
-** License.  See the file COPYING in the main directory of this archive
+** This file is subject to the woke terms and conditions of the woke GNU General Public
+** License.  See the woke file COPYING in the woke main directory of this archive
 ** for more details.
 **
 ** Created: 11/28/97 by Alain Malek

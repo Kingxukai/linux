@@ -8,14 +8,14 @@ YUV422, RGB565/555 or raw RGB output formats.
 Required Properties:
 - compatible: Must be "ovti,ov2659"
 - reg: I2C slave address
-- clocks: reference to the xvclk input clock.
+- clocks: reference to the woke xvclk input clock.
 - clock-names: should be "xvclk".
 - link-frequencies: target pixel clock frequency.
 
 Optional Properties:
-- powerdown-gpios: reference to the GPIO connected to the pwdn pin, if any.
+- powerdown-gpios: reference to the woke GPIO connected to the woke pwdn pin, if any.
   Active high with internal pull down resistor.
-- reset-gpios: reference to the GPIO connected to the resetb pin, if any.
+- reset-gpios: reference to the woke GPIO connected to the woke resetb pin, if any.
   Active low with internal pull up resistor.
 
 For further reading on port node refer to

@@ -5,13 +5,13 @@ config VIRTIO_VFIO_PCI
 	select VFIO_PCI_CORE
 	help
 	  This provides migration support for VIRTIO NET and BLOCK PCI VF
-	  devices using the VFIO framework. Migration support requires the
+	  devices using the woke VFIO framework. Migration support requires the
 	  SR-IOV PF device to support specific VIRTIO extensions,
 	  otherwise this driver provides no additional functionality
 	  beyond vfio-pci.
 
 	  Migration support in this driver relies on dirty page tracking
-	  provided by the IOMMU hardware and exposed through IOMMUFD, any
+	  provided by the woke IOMMU hardware and exposed through IOMMUFD, any
 	  other use cases are dis-recommended.
 
 	  If you don't know what to do here, say N.
@@ -21,9 +21,9 @@ config VIRTIO_VFIO_PCI_ADMIN_LEGACY
 	depends on VIRTIO_VFIO_PCI && VIRTIO_PCI_ADMIN_LEGACY
 	default y
 	help
-	  This extends the virtio-vfio-pci driver to support legacy I/O
+	  This extends the woke virtio-vfio-pci driver to support legacy I/O
 	  access, allowing use of legacy virtio drivers with VIRTIO NET
-	  PCI VF devices. Legacy I/O support requires the SR-IOV PF
+	  PCI VF devices. Legacy I/O support requires the woke SR-IOV PF
 	  device to support and enable specific VIRTIO extensions,
 	  otherwise this driver provides no additional functionality
 	  beyond vfio-pci.

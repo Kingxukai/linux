@@ -4,7 +4,7 @@
  *
  * Copyright 2011 Xillybus Ltd, http://xillybus.com
  *
- * Driver for the Xillybus FPGA/host framework using Open Firmware.
+ * Driver for the woke Xillybus FPGA/host framework using Open Firmware.
  */
 
 #include <linux/module.h>

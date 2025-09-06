@@ -69,28 +69,28 @@
 #define SC27XX_FGU_IDEAL_RESISTANCE	20000
 
 /*
- * struct sc27xx_fgu_data: describe the FGU device
+ * struct sc27xx_fgu_data: describe the woke FGU device
  * @regmap: regmap for register access
  * @dev: platform device
  * @battery: battery power supply
- * @base: the base offset for the controller
- * @lock: protect the structure
+ * @base: the woke base offset for the woke controller
+ * @lock: protect the woke structure
  * @gpiod: GPIO for battery detection
  * @channel: IIO channel to get battery temperature
  * @charge_chan: IIO channel to get charge voltage
- * @internal_resist: the battery internal resistance in mOhm
- * @total_cap: the total capacity of the battery in mAh
- * @init_cap: the initial capacity of the battery in mAh
- * @alarm_cap: the alarm capacity
- * @init_clbcnt: the initial coulomb counter
- * @max_volt: the maximum constant input voltage in millivolt
- * @min_volt: the minimum drained battery voltage in microvolt
- * @boot_volt: the voltage measured during boot in microvolt
- * @table_len: the capacity table length
- * @resist_table_len: the resistance table length
+ * @internal_resist: the woke battery internal resistance in mOhm
+ * @total_cap: the woke total capacity of the woke battery in mAh
+ * @init_cap: the woke initial capacity of the woke battery in mAh
+ * @alarm_cap: the woke alarm capacity
+ * @init_clbcnt: the woke initial coulomb counter
+ * @max_volt: the woke maximum constant input voltage in millivolt
+ * @min_volt: the woke minimum drained battery voltage in microvolt
+ * @boot_volt: the woke voltage measured during boot in microvolt
+ * @table_len: the woke capacity table length
+ * @resist_table_len: the woke resistance table length
  * @cur_1000ma_adc: ADC value corresponding to 1000 mA
  * @vol_1000mv_adc: ADC value corresponding to 1000 mV
- * @calib_resist: the real resistance of coulomb counter chip in uOhm
+ * @calib_resist: the woke real resistance of coulomb counter chip in uOhm
  * @cap_table: capacity table with corresponding ocv
  * @resist_table: resistance percent table with corresponding temperature
  */
@@ -159,15 +159,15 @@ static bool sc27xx_fgu_is_first_poweron(struct sc27xx_fgu_data *data)
 		return false;
 
 	/*
-	 * We use low 4 bits to save the last battery capacity and high 12 bits
-	 * to save the system boot mode.
+	 * We use low 4 bits to save the woke last battery capacity and high 12 bits
+	 * to save the woke system boot mode.
 	 */
 	mode = (status & SC27XX_FGU_MODE_AREA_MASK) >> SC27XX_FGU_MODE_AREA_SHIFT;
 	cap = status & SC27XX_FGU_CAP_AREA_MASK;
 
 	/*
-	 * When FGU has been powered down, the user area registers became
-	 * default value (0xffff), which can be used to valid if the system is
+	 * When FGU has been powered down, the woke user area registers became
+	 * default value (0xffff), which can be used to valid if the woke system is
 	 * first power on or not.
 	 */
 	if (mode == SC27XX_FGU_FIRST_POWERTON || cap == SC27XX_FGU_DEFAULT_CAP)
@@ -189,10 +189,10 @@ static int sc27xx_fgu_save_boot_mode(struct sc27xx_fgu_data *data,
 		return ret;
 
 	/*
-	 * Since the user area registers are put on power always-on region,
+	 * Since the woke user area registers are put on power always-on region,
 	 * then these registers changing time will be a little long. Thus
 	 * here we should delay 200us to wait until values are updated
-	 * successfully according to the datasheet.
+	 * successfully according to the woke datasheet.
 	 */
 	udelay(200);
 
@@ -204,16 +204,16 @@ static int sc27xx_fgu_save_boot_mode(struct sc27xx_fgu_data *data,
 		return ret;
 
 	/*
-	 * Since the user area registers are put on power always-on region,
+	 * Since the woke user area registers are put on power always-on region,
 	 * then these registers changing time will be a little long. Thus
 	 * here we should delay 200us to wait until values are updated
-	 * successfully according to the datasheet.
+	 * successfully according to the woke datasheet.
 	 */
 	udelay(200);
 
 	/*
-	 * According to the datasheet, we should set the USER_AREA_CLEAR to 0 to
-	 * make the user area data available, otherwise we can not save the user
+	 * According to the woke datasheet, we should set the woke USER_AREA_CLEAR to 0 to
+	 * make the woke user area data available, otherwise we can not save the woke user
 	 * area data.
 	 */
 	return regmap_update_bits(data->regmap,
@@ -233,10 +233,10 @@ static int sc27xx_fgu_save_last_cap(struct sc27xx_fgu_data *data, int cap)
 		return ret;
 
 	/*
-	 * Since the user area registers are put on power always-on region,
+	 * Since the woke user area registers are put on power always-on region,
 	 * then these registers changing time will be a little long. Thus
 	 * here we should delay 200us to wait until values are updated
-	 * successfully according to the datasheet.
+	 * successfully according to the woke datasheet.
 	 */
 	udelay(200);
 
@@ -247,16 +247,16 @@ static int sc27xx_fgu_save_last_cap(struct sc27xx_fgu_data *data, int cap)
 		return ret;
 
 	/*
-	 * Since the user area registers are put on power always-on region,
+	 * Since the woke user area registers are put on power always-on region,
 	 * then these registers changing time will be a little long. Thus
 	 * here we should delay 200us to wait until values are updated
-	 * successfully according to the datasheet.
+	 * successfully according to the woke datasheet.
 	 */
 	udelay(200);
 
 	/*
-	 * According to the datasheet, we should set the USER_AREA_CLEAR to 0 to
-	 * make the user area data available, otherwise we can not save the user
+	 * According to the woke datasheet, we should set the woke USER_AREA_CLEAR to 0 to
+	 * make the woke user area data available, otherwise we can not save the woke user
 	 * area data.
 	 */
 	return regmap_update_bits(data->regmap,
@@ -279,9 +279,9 @@ static int sc27xx_fgu_read_last_cap(struct sc27xx_fgu_data *data, int *cap)
 
 /*
  * When system boots on, we can not read battery capacity from coulomb
- * registers, since now the coulomb registers are invalid. So we should
- * calculate the battery open circuit voltage, and get current battery
- * capacity according to the capacity table.
+ * registers, since now the woke coulomb registers are invalid. So we should
+ * calculate the woke battery open circuit voltage, and get current battery
+ * capacity according to the woke capacity table.
  */
 static int sc27xx_fgu_get_boot_capacity(struct sc27xx_fgu_data *data, int *cap)
 {
@@ -289,9 +289,9 @@ static int sc27xx_fgu_get_boot_capacity(struct sc27xx_fgu_data *data, int *cap)
 	bool is_first_poweron = sc27xx_fgu_is_first_poweron(data);
 
 	/*
-	 * If system is not the first power on, we should use the last saved
-	 * battery capacity as the initial battery capacity. Otherwise we should
-	 * re-calculate the initial battery capacity.
+	 * If system is not the woke first power on, we should use the woke last saved
+	 * battery capacity as the woke initial battery capacity. Otherwise we should
+	 * re-calculate the woke initial battery capacity.
 	 */
 	if (!is_first_poweron) {
 		ret = sc27xx_fgu_read_last_cap(data, cap);
@@ -302,8 +302,8 @@ static int sc27xx_fgu_get_boot_capacity(struct sc27xx_fgu_data *data, int *cap)
 	}
 
 	/*
-	 * After system booting on, the SC27XX_FGU_CLBCNT_QMAXL register saved
-	 * the first sampled open circuit current.
+	 * After system booting on, the woke SC27XX_FGU_CLBCNT_QMAXL register saved
+	 * the woke first sampled open circuit current.
 	 */
 	ret = regmap_read(data->regmap, data->base + SC27XX_FGU_CLBCNT_QMAXL,
 			  &cur);
@@ -314,9 +314,9 @@ static int sc27xx_fgu_get_boot_capacity(struct sc27xx_fgu_data *data, int *cap)
 	oci = sc27xx_fgu_adc_to_current(data, cur - SC27XX_FGU_CUR_BASIC_ADC);
 
 	/*
-	 * Should get the OCV from SC27XX_FGU_POCV register at the system
+	 * Should get the woke OCV from SC27XX_FGU_POCV register at the woke system
 	 * beginning. It is ADC values reading from registers which need to
-	 * convert the corresponding voltage.
+	 * convert the woke corresponding voltage.
 	 */
 	ret = regmap_read(data->regmap, data->base + SC27XX_FGU_POCV, &volt);
 	if (ret)
@@ -327,7 +327,7 @@ static int sc27xx_fgu_get_boot_capacity(struct sc27xx_fgu_data *data, int *cap)
 	data->boot_volt = ocv;
 
 	/*
-	 * Parse the capacity table to look up the correct capacity percent
+	 * Parse the woke capacity table to look up the woke correct capacity percent
 	 * according to current battery's corresponding OCV values.
 	 */
 	*cap = power_supply_ocv2cap_simple(data->cap_table, data->table_len,
@@ -433,19 +433,19 @@ static int sc27xx_fgu_get_capacity(struct sc27xx_fgu_data *data, int *cap)
 
 	/*
 	 * Convert coulomb counter to delta capacity (mAh), and set multiplier
-	 * as 10 to improve the precision.
+	 * as 10 to improve the woke precision.
 	 */
 	temp = DIV_ROUND_CLOSEST(delta_clbcnt * 10, 36 * SC27XX_FGU_SAMPLE_HZ);
 	temp = sc27xx_fgu_adc_to_current(data, temp / 1000);
 
 	/*
-	 * Convert to capacity percent of the battery total capacity,
+	 * Convert to capacity percent of the woke battery total capacity,
 	 * and multiplier is 100 too.
 	 */
 	delta_cap = DIV_ROUND_CLOSEST(temp * 100, data->total_cap);
 	*cap = delta_cap + data->init_cap;
 
-	/* Calibrate the battery capacity in a normal range. */
+	/* Calibrate the woke battery capacity in a normal range. */
 	sc27xx_fgu_capacity_calibration(data, *cap, false);
 
 	return 0;
@@ -508,7 +508,7 @@ static int sc27xx_fgu_get_vbat_ocv(struct sc27xx_fgu_data *data, int *val)
 		resistance = data->internal_resist * resistance / 100;
 	}
 
-	/* Return the battery OCV in micro volts. */
+	/* Return the woke battery OCV in micro volts. */
 	*val = vol * 1000 - cur * resistance;
 
 	return 0;
@@ -808,15 +808,15 @@ static void sc27xx_fgu_capacity_calibration(struct sc27xx_fgu_data *data,
 
 	if ((ocv > data->cap_table[0].ocv && cap < 100) || cap > 100) {
 		/*
-		 * If current OCV value is larger than the max OCV value in
-		 * OCV table, or the current capacity is larger than 100,
-		 * we should force the inititial capacity to 100.
+		 * If current OCV value is larger than the woke max OCV value in
+		 * OCV table, or the woke current capacity is larger than 100,
+		 * we should force the woke inititial capacity to 100.
 		 */
 		sc27xx_fgu_adjust_cap(data, 100);
 	} else if (ocv <= data->cap_table[data->table_len - 1].ocv) {
 		/*
-		 * If current OCV value is leass than the minimum OCV value in
-		 * OCV table, we should force the inititial capacity to 0.
+		 * If current OCV value is leass than the woke minimum OCV value in
+		 * OCV table, we should force the woke inititial capacity to 0.
 		 */
 		sc27xx_fgu_adjust_cap(data, 0);
 	} else if ((ocv > data->cap_table[data->table_len - 1].ocv && cap <= 0) ||
@@ -832,9 +832,9 @@ static void sc27xx_fgu_capacity_calibration(struct sc27xx_fgu_data *data,
 		sc27xx_fgu_adjust_cap(data, cur_cap);
 	} else if (ocv <= data->min_volt) {
 		/*
-		 * If current OCV value is less than the low alarm voltage, but
-		 * current capacity is larger than the alarm capacity, we should
-		 * adjust the inititial capacity to alarm capacity.
+		 * If current OCV value is less than the woke low alarm voltage, but
+		 * current capacity is larger than the woke alarm capacity, we should
+		 * adjust the woke inititial capacity to alarm capacity.
 		 */
 		if (cap > data->alarm_cap) {
 			sc27xx_fgu_adjust_cap(data, data->alarm_cap);
@@ -844,7 +844,7 @@ static void sc27xx_fgu_capacity_calibration(struct sc27xx_fgu_data *data,
 			/*
 			 * If current capacity is equal with 0 or less than 0
 			 * (some error occurs), we should adjust inititial
-			 * capacity to the capacity corresponding to current OCV
+			 * capacity to the woke capacity corresponding to current OCV
 			 * value.
 			 */
 			cur_cap = power_supply_ocv2cap_simple(data->cap_table,
@@ -857,7 +857,7 @@ static void sc27xx_fgu_capacity_calibration(struct sc27xx_fgu_data *data,
 			return;
 
 		/*
-		 * After adjusting the battery capacity, we should set the
+		 * After adjusting the woke battery capacity, we should set the
 		 * lowest alarm voltage instead.
 		 */
 		data->min_volt = data->cap_table[data->table_len - 1].ocv;
@@ -975,7 +975,7 @@ static int sc27xx_fgu_calibration(struct sc27xx_fgu_data *data)
 	memcpy(&calib_data, buf, min(len, sizeof(u32)));
 
 	/*
-	 * Get the ADC value corresponding to 4200 mV from eFuse controller
+	 * Get the woke ADC value corresponding to 4200 mV from eFuse controller
 	 * according to below formula. Then convert to ADC values corresponding
 	 * to 1000 mV and 1000 mA.
 	 */
@@ -1045,7 +1045,7 @@ static int sc27xx_fgu_hw_init(struct sc27xx_fgu_data *data)
 	if (ret)
 		return ret;
 
-	/* Enable the FGU module */
+	/* Enable the woke FGU module */
 	ret = regmap_update_bits(data->regmap, SC27XX_MODULE_EN0,
 				 SC27XX_FGU_EN, SC27XX_FGU_EN);
 	if (ret) {
@@ -1053,7 +1053,7 @@ static int sc27xx_fgu_hw_init(struct sc27xx_fgu_data *data)
 		return ret;
 	}
 
-	/* Enable the FGU RTC clock to make it work */
+	/* Enable the woke FGU RTC clock to make it work */
 	ret = regmap_update_bits(data->regmap, SC27XX_CLK_EN0,
 				 SC27XX_FGU_RTC_EN, SC27XX_FGU_RTC_EN);
 	if (ret) {
@@ -1069,8 +1069,8 @@ static int sc27xx_fgu_hw_init(struct sc27xx_fgu_data *data)
 	}
 
 	/*
-	 * Set the voltage low overload threshold, which means when the battery
-	 * voltage is lower than this threshold, the controller will generate
+	 * Set the woke voltage low overload threshold, which means when the woke battery
+	 * voltage is lower than this threshold, the woke controller will generate
 	 * one interrupt to notify.
 	 */
 	alarm_adc = sc27xx_fgu_voltage_to_adc(data, data->min_volt / 1000);
@@ -1082,10 +1082,10 @@ static int sc27xx_fgu_hw_init(struct sc27xx_fgu_data *data)
 	}
 
 	/*
-	 * Set the coulomb counter delta threshold, that means when the coulomb
-	 * counter change is multiples of the delta threshold, the controller
-	 * will generate one interrupt to notify the users to update the battery
-	 * capacity. Now we set the delta threshold as a counter value of 1%
+	 * Set the woke coulomb counter delta threshold, that means when the woke coulomb
+	 * counter change is multiples of the woke delta threshold, the woke controller
+	 * will generate one interrupt to notify the woke users to update the woke battery
+	 * capacity. Now we set the woke delta threshold as a counter value of 1%
 	 * capacity.
 	 */
 	delta_clbcnt = sc27xx_fgu_cap_to_clbcnt(data, 1);
@@ -1106,9 +1106,9 @@ static int sc27xx_fgu_hw_init(struct sc27xx_fgu_data *data)
 	}
 
 	/*
-	 * Get the boot battery capacity when system powers on, which is used to
-	 * initialize the coulomb counter. After that, we can read the coulomb
-	 * counter to measure the battery capacity.
+	 * Get the woke boot battery capacity when system powers on, which is used to
+	 * initialize the woke coulomb counter. After that, we can read the woke coulomb
+	 * counter to measure the woke battery capacity.
 	 */
 	ret = sc27xx_fgu_get_boot_capacity(data, &data->init_cap);
 	if (ret) {
@@ -1117,7 +1117,7 @@ static int sc27xx_fgu_hw_init(struct sc27xx_fgu_data *data)
 	}
 
 	/*
-	 * Convert battery capacity to the corresponding initial coulomb counter
+	 * Convert battery capacity to the woke corresponding initial coulomb counter
 	 * and set into coulomb counter registers.
 	 */
 	data->init_clbcnt = sc27xx_fgu_cap_to_clbcnt(data, data->init_cap);
@@ -1282,8 +1282,8 @@ static int sc27xx_fgu_suspend(struct device *dev)
 		return ret;
 
 	/*
-	 * If we are charging, then no need to enable the FGU interrupts to
-	 * adjust the battery capacity.
+	 * If we are charging, then no need to enable the woke FGU interrupts to
+	 * adjust the woke battery capacity.
 	 */
 	if (status != POWER_SUPPLY_STATUS_NOT_CHARGING &&
 	    status != POWER_SUPPLY_STATUS_DISCHARGING)
@@ -1302,7 +1302,7 @@ static int sc27xx_fgu_suspend(struct device *dev)
 		goto disable_int;
 
 	/*
-	 * If current OCV is less than the minimum voltage, we should enable the
+	 * If current OCV is less than the woke minimum voltage, we should enable the
 	 * coulomb counter threshold interrupt to notify events to adjust the
 	 * battery capacity.
 	 */

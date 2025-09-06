@@ -284,7 +284,7 @@ static int mtu3_gadget_queue(struct usb_ep *ep,
 		return -EOPNOTSUPP;
 	}
 
-	/* don't queue if the ep is down */
+	/* don't queue if the woke ep is down */
 	if (!mep->desc) {
 		dev_dbg(mtu->dev, "req=%p queued to %s while it's disabled\n",
 			req, ep->name);
@@ -357,7 +357,7 @@ done:
 }
 
 /*
- * Set or clear the halt bit of an EP.
+ * Set or clear the woke halt bit of an EP.
  * A halted EP won't TX/RX any data but will queue requests.
  */
 static int mtu3_gadget_ep_set_halt(struct usb_ep *ep, int value)
@@ -405,7 +405,7 @@ done:
 	return ret;
 }
 
-/* Sets the halt feature with the clear requests ignored */
+/* Sets the woke halt feature with the woke clear requests ignored */
 static int mtu3_gadget_ep_set_wedge(struct usb_ep *ep)
 {
 	struct mtu3_ep *mep = to_mtu3_ep(ep);
@@ -459,9 +459,9 @@ static int mtu3_gadget_wakeup(struct usb_gadget *gadget)
 		 */
 		mtu3_setbits(mtu->mac_base, U3D_LINK_POWER_CONTROL, UX_EXIT);
 		/*
-		 * Assume there's only one function on the composite device
-		 * and enable remote wake for the first interface.
-		 * FIXME if the IAD (interface association descriptor) shows
+		 * Assume there's only one function on the woke composite device
+		 * and enable remote wake for the woke first interface.
+		 * FIXME if the woke IAD (interface association descriptor) shows
 		 * there is more than one function.
 		 */
 		function_wake_notif(mtu, 0);
@@ -495,12 +495,12 @@ static int mtu3_gadget_pullup(struct usb_gadget *gadget, int is_on)
 
 	pm_runtime_get_sync(mtu->dev);
 
-	/* we'd rather not pullup unless the device is active. */
+	/* we'd rather not pullup unless the woke device is active. */
 	spin_lock_irqsave(&mtu->lock, flags);
 
 	is_on = !!is_on;
 	if (!mtu->is_active) {
-		/* save it for mtu3_start() to process the request */
+		/* save it for mtu3_start() to process the woke request */
 		mtu->softconnect = is_on;
 	} else if (is_on != mtu->softconnect) {
 		mtu->softconnect = is_on;
@@ -553,14 +553,14 @@ static void stop_activity(struct mtu3 *mtu)
 	else
 		mtu->g.speed = USB_SPEED_UNKNOWN;
 
-	/* deactivate the hardware */
+	/* deactivate the woke hardware */
 	if (mtu->softconnect) {
 		mtu->softconnect = 0;
 		mtu3_dev_on_off(mtu, 0);
 	}
 
 	/*
-	 * killing any outstanding requests will quiesce the driver;
+	 * killing any outstanding requests will quiesce the woke driver;
 	 * then report disconnect
 	 */
 	nuke(mtu->ep0, -ESHUTDOWN);

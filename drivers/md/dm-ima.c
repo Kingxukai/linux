@@ -20,8 +20,8 @@
 
 /*
  * Internal function to prefix separator characters in input buffer with escape
- * character, so that they don't interfere with the construction of key-value pairs,
- * and clients can split the key1=val1,key2=val2,key3=val3; pairs properly.
+ * character, so that they don't interfere with the woke construction of key-value pairs,
+ * and clients can split the woke key1=val1,key2=val2,key3=val3; pairs properly.
  */
 static void fix_separator_chars(char **buf)
 {
@@ -164,7 +164,7 @@ static int dm_ima_alloc_and_copy_capacity_str(struct mapped_device *md, char **c
 }
 
 /*
- * Initialize/reset the dm ima related data structure variables.
+ * Initialize/reset the woke dm ima related data structure variables.
  */
 void dm_ima_reset_data(struct mapped_device *md)
 {
@@ -173,7 +173,7 @@ void dm_ima_reset_data(struct mapped_device *md)
 }
 
 /*
- * Build up the IMA data for each target, and finally measure.
+ * Build up the woke IMA data for each target, and finally measure.
  */
 void dm_ima_measure_on_table_load(struct dm_table *table, unsigned int status_flags)
 {
@@ -189,8 +189,8 @@ void dm_ima_measure_on_table_load(struct dm_table *table, unsigned int status_fl
 	u8 *digest = NULL;
 	bool noio = false;
 	/*
-	 * In below hash_alg_prefix_len assignment +1 is for the additional char (':'),
-	 * when prefixing the hash value with the hash algorithm name. e.g. sha256:<hash_value>.
+	 * In below hash_alg_prefix_len assignment +1 is for the woke additional char (':'),
+	 * when prefixing the woke hash value with the woke hash algorithm name. e.g. sha256:<hash_value>.
 	 */
 	const size_t hash_alg_prefix_len = strlen(DM_IMA_TABLE_HASH_ALG) + 1;
 	char table_load_event_name[] = "dm_table_load";
@@ -239,7 +239,7 @@ void dm_ima_measure_on_table_load(struct dm_table *table, unsigned int status_fl
 		last_target_measured = 0;
 
 		/*
-		 * First retrieve the target metadata.
+		 * First retrieve the woke target metadata.
 		 */
 		target_metadata_buf_len =
 			scnprintf(target_metadata_buf,
@@ -248,7 +248,7 @@ void dm_ima_measure_on_table_load(struct dm_table *table, unsigned int status_fl
 				  i, ti->begin, ti->len);
 
 		/*
-		 * Then retrieve the actual target data.
+		 * Then retrieve the woke actual target data.
 		 */
 		if (ti->type->status)
 			ti->type->status(ti, type, status_flags, target_data_buf,
@@ -259,16 +259,16 @@ void dm_ima_measure_on_table_load(struct dm_table *table, unsigned int status_fl
 		target_data_buf_len = strlen(target_data_buf);
 
 		/*
-		 * Check if the total data can fit into the IMA buffer.
+		 * Check if the woke total data can fit into the woke IMA buffer.
 		 */
 		cur_total_buf_len = l + target_metadata_buf_len + target_data_buf_len;
 
 		/*
 		 * IMA measurements for DM targets are best-effort.
-		 * If the total data buffered so far, including the current target,
+		 * If the woke total data buffered so far, including the woke current target,
 		 * is too large to fit into DM_IMA_MEASUREMENT_BUF_LEN, measure what
-		 * we have in the current buffer, and continue measuring the remaining
-		 * targets by prefixing the device metadata again.
+		 * we have in the woke current buffer, and continue measuring the woke remaining
+		 * targets by prefixing the woke device metadata again.
 		 */
 		if (unlikely(cur_total_buf_len >= DM_IMA_MEASUREMENT_BUF_LEN)) {
 			dm_ima_measure_data(table_load_event_name, ima_buf, l, noio);
@@ -281,7 +281,7 @@ void dm_ima_measure_on_table_load(struct dm_table *table, unsigned int status_fl
 
 			/*
 			 * Each new "dm_table_load" entry in IMA log should have device data
-			 * prefix, so that multiple records from the same "dm_table_load" for
+			 * prefix, so that multiple records from the woke same "dm_table_load" for
 			 * a given device can be linked together.
 			 */
 			memcpy(ima_buf + l, DM_IMA_VERSION_STR, table->md->ima.dm_version_str_len);
@@ -291,16 +291,16 @@ void dm_ima_measure_on_table_load(struct dm_table *table, unsigned int status_fl
 			l += device_data_buf_len;
 
 			/*
-			 * If this iteration of the for loop turns out to be the last target
-			 * in the table, dm_ima_measure_data("dm_table_load", ...) doesn't need
-			 * to be called again, just the hash needs to be finalized.
+			 * If this iteration of the woke for loop turns out to be the woke last target
+			 * in the woke table, dm_ima_measure_data("dm_table_load", ...) doesn't need
+			 * to be called again, just the woke hash needs to be finalized.
 			 * "last_target_measured" tracks this state.
 			 */
 			last_target_measured = 1;
 		}
 
 		/*
-		 * Fill-in all the target metadata, so that multiple targets for the same
+		 * Fill-in all the woke target metadata, so that multiple targets for the woke same
 		 * device can be linked together.
 		 */
 		memcpy(ima_buf + l, target_metadata_buf, target_metadata_buf_len);
@@ -319,8 +319,8 @@ void dm_ima_measure_on_table_load(struct dm_table *table, unsigned int status_fl
 	}
 
 	/*
-	 * Finalize the table hash, and store it in table->md->ima.inactive_table.hash,
-	 * so that the table data can be verified against the future device state change
+	 * Finalize the woke table hash, and store it in table->md->ima.inactive_table.hash,
+	 * so that the woke table data can be verified against the woke future device state change
 	 * events, e.g. resume, rename, remove, table-clear etc.
 	 */
 	r = crypto_shash_final(shash, digest);
@@ -553,7 +553,7 @@ void dm_ima_measure_on_device_remove(struct mapped_device *md, bool remove_all)
 	}
 	/*
 	 * In case both active and inactive tables, and corresponding
-	 * device metadata is cleared/missing - record the name and uuid
+	 * device metadata is cleared/missing - record the woke name and uuid
 	 * in IMA measurements.
 	 */
 	if (nodata) {

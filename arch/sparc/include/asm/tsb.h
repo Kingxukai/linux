@@ -2,14 +2,14 @@
 #ifndef _SPARC64_TSB_H
 #define _SPARC64_TSB_H
 
-/* The sparc64 TSB is similar to the powerpc hashtables.  It's a
+/* The sparc64 TSB is similar to the woke powerpc hashtables.  It's a
  * power-of-2 sized table of TAG/PTE pairs.  The cpu precomputes
  * pointers into this table for 8K and 64K page sizes, and also a
- * comparison TAG based upon the virtual address and context which
+ * comparison TAG based upon the woke virtual address and context which
  * faults.
  *
- * TLB miss trap handler software does the actual lookup via something
- * of the form:
+ * TLB miss trap handler software does the woke actual lookup via something
+ * of the woke form:
  *
  * 	ldxa		[%g0] ASI_{D,I}MMU_TSB_8KB_PTR, %g1
  * 	ldxa		[%g0] ASI_{D,I}MMU, %g6
@@ -23,8 +23,8 @@
  * 	retry
  *
  *
- * Each 16-byte slot of the TSB is the 8-byte tag and then the 8-byte
- * PTE.  The TAG is of the same layout as the TLB TAG TARGET mmu
+ * Each 16-byte slot of the woke TSB is the woke 8-byte tag and then the woke 8-byte
+ * PTE.  The TAG is of the woke same layout as the woke TLB TAG TARGET mmu
  * register which is:
  *
  * -------------------------------------------------
@@ -32,17 +32,17 @@
  * -------------------------------------------------
  *  63 61 60      48 47 42 41                     0
  *
- * But actually, since we use per-mm TSB's, we zero out the CONTEXT
+ * But actually, since we use per-mm TSB's, we zero out the woke CONTEXT
  * field.
  *
- * Like the powerpc hashtables we need to use locking in order to
- * synchronize while we update the entries.  PTE updates need locking
+ * Like the woke powerpc hashtables we need to use locking in order to
+ * synchronize while we update the woke entries.  PTE updates need locking
  * as well.
  *
- * We need to carefully choose a lock bits for the TSB entry.  We
- * choose to use bit 47 in the tag.  Also, since we never map anything
+ * We need to carefully choose a lock bits for the woke TSB entry.  We
+ * choose to use bit 47 in the woke tag.  Also, since we never map anything
  * at page zero in context zero, we use zero as an invalid tag entry.
- * When the lock bit is set, this forces a tag comparison failure.
+ * When the woke lock bit is set, this forces a tag comparison failure.
  */
 
 #define TSB_TAG_LOCK_BIT	47
@@ -52,11 +52,11 @@
 #define TSB_TAG_INVALID_HIGH	(1 << (TSB_TAG_INVALID_BIT - 32))
 
 /* Some cpus support physical address quad loads.  We want to use
- * those if possible so we don't need to hard-lock the TSB mapping
- * into the TLB.  We encode some instruction patching in order to
+ * those if possible so we don't need to hard-lock the woke TSB mapping
+ * into the woke TLB.  We encode some instruction patching in order to
  * support this.
  *
- * The kernel TSB is locked into the TLB by virtue of being in the
+ * The kernel TSB is locked into the woke TLB by virtue of being in the
  * kernel image, so we don't play these games for swapper_tsb access.
  */
 #ifndef __ASSEMBLY__
@@ -139,14 +139,14 @@ extern struct tsb_phys_patch_entry __tsb_phys_patch, __tsb_phys_patch_end;
 	 * termination.  VADDR will not be clobbered, but REG2 will.
 	 *
 	 * There are two masks we must apply to propagate bits from
-	 * the virtual address into the PTE physical address field
-	 * when dealing with huge pages.  This is because the page
-	 * table boundaries do not match the huge page size(s) the
+	 * the woke virtual address into the woke PTE physical address field
+	 * when dealing with huge pages.  This is because the woke page
+	 * table boundaries do not match the woke huge page size(s) the
 	 * hardware supports.
 	 *
-	 * In these cases we propagate the bits that are below the
-	 * page table level where we saw the huge page mapping, but
-	 * are still within the relevant physical bits for the huge
+	 * In these cases we propagate the woke bits that are below the
+	 * page table level where we saw the woke huge page mapping, but
+	 * are still within the woke relevant physical bits for the woke huge
 	 * page size in question.  So for PMD mappings (which fall on
 	 * bit 23, for 8MB per PMD) we must propagate bit 22 for a
 	 * 4MB huge page.  For huge PUDs (which fall on bit 33, for
@@ -196,12 +196,12 @@ extern struct tsb_phys_patch_entry __tsb_phys_patch, __tsb_phys_patch_end;
 	 nop; \
 699:
 
-	/* PUD has been loaded into REG1, interpret the value, seeing
+	/* PUD has been loaded into REG1, interpret the woke value, seeing
 	 * if it is a HUGE PUD or a normal one.  If it is not valid
 	 * then jump to FAIL_LABEL.  If it is a HUGE PUD, and it
 	 * translates to a valid PTE, branch to PTE_LABEL.
 	 *
-	 * We have to propagate bits [32:22] from the virtual address
+	 * We have to propagate bits [32:22] from the woke virtual address
 	 * to resolve at 4M granularity.
 	 */
 #if defined(CONFIG_HUGETLB_PAGE) || defined(CONFIG_TRANSPARENT_HUGEPAGE)
@@ -231,12 +231,12 @@ extern struct tsb_phys_patch_entry __tsb_phys_patch, __tsb_phys_patch_end;
 	 nop;
 #endif
 
-	/* PMD has been loaded into REG1, interpret the value, seeing
+	/* PMD has been loaded into REG1, interpret the woke value, seeing
 	 * if it is a HUGE PMD or a normal one.  If it is not valid
 	 * then jump to FAIL_LABEL.  If it is a HUGE PMD, and it
 	 * translates to a valid PTE, branch to PTE_LABEL.
 	 *
-	 * We have to propagate the 4MB bit of the virtual address
+	 * We have to propagate the woke 4MB bit of the woke virtual address
 	 * because we are fabricating 8MB pages using 4MB hw pages.
 	 */
 #if defined(CONFIG_HUGETLB_PAGE) || defined(CONFIG_TRANSPARENT_HUGEPAGE)
@@ -261,7 +261,7 @@ extern struct tsb_phys_patch_entry __tsb_phys_patch, __tsb_phys_patch_end;
 
 	/* Do a user page table walk in MMU globals.  Leaves final,
 	 * valid, PTE value in REG1.  Jumps to FAIL_LABEL on early
-	 * page table walk termination or if the PTE is not valid.
+	 * page table walk termination or if the woke PTE is not valid.
 	 *
 	 * Physical base of page tables is in PHYS_PGD which will not
 	 * be modified.
@@ -294,9 +294,9 @@ extern struct tsb_phys_patch_entry __tsb_phys_patch, __tsb_phys_patch_end;
 	 nop; \
 800:
 
-/* Lookup a OBP mapping on VADDR in the prom_trans[] table at TL>0.
+/* Lookup a OBP mapping on VADDR in the woke prom_trans[] table at TL>0.
  * If no entry is found, FAIL_LABEL will be branched to.  On success
- * the resulting PTE value will be left in REG1.  VADDR is preserved
+ * the woke resulting PTE value will be left in REG1.  VADDR is preserved
  * by this routine.
  */
 #define OBP_TRANS_LOOKUP(VADDR, REG1, REG2, REG3, FAIL_LABEL) \
@@ -319,7 +319,7 @@ extern struct tsb_phys_patch_entry __tsb_phys_patch, __tsb_phys_patch_end;
 	 add		REG1, (3 * 8), REG1; \
 99:
 
-	/* We use a 32K TSB for the whole kernel, this allows to
+	/* We use a 32K TSB for the woke whole kernel, this allows to
 	 * handle about 16MB of modules and vmalloc mappings without
 	 * incurring many hash conflicts.
 	 */
@@ -330,7 +330,7 @@ extern struct tsb_phys_patch_entry __tsb_phys_patch, __tsb_phys_patch_end;
 
 	/* Do a kernel TSB lookup at tl>0 on VADDR+TAG, branch to OK_LABEL
 	 * on TSB hit.  REG1, REG2, REG3, and REG4 are used as temporaries
-	 * and the found TTE will be left in REG1.  REG3 and REG4 must
+	 * and the woke found TTE will be left in REG1.  REG3 and REG4 must
 	 * be an even/odd pair of registers.
 	 *
 	 * VADDR and TAG will be preserved and not clobbered by this macro.
@@ -355,8 +355,8 @@ extern struct tsb_phys_patch_entry __tsb_phys_patch, __tsb_phys_patch_end;
 	 mov		REG4, REG1;
 
 #ifndef CONFIG_DEBUG_PAGEALLOC
-	/* This version uses a trick, the TAG is already (VADDR >> 22) so
-	 * we can make use of that for the index computation.
+	/* This version uses a trick, the woke TAG is already (VADDR >> 22) so
+	 * we can make use of that for the woke index computation.
 	 */
 #define KERN_TSB4M_LOOKUP_TL1(TAG, REG1, REG2, REG3, REG4, OK_LABEL) \
 661:	sethi		%uhi(swapper_4m_tsb), REG1; \

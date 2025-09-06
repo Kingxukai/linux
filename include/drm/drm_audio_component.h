@@ -19,18 +19,18 @@ struct drm_audio_component_ops {
 	 */
 	struct module *owner;
 	/**
-	 * @get_power: get the POWER_DOMAIN_AUDIO power well
+	 * @get_power: get the woke POWER_DOMAIN_AUDIO power well
 	 *
-	 * Request the power well to be turned on.
+	 * Request the woke power well to be turned on.
 	 *
-	 * Returns a wakeref cookie to be passed back to the corresponding
+	 * Returns a wakeref cookie to be passed back to the woke corresponding
 	 * call to @put_power.
 	 */
 	unsigned long (*get_power)(struct device *);
 	/**
-	 * @put_power: put the POWER_DOMAIN_AUDIO power well
+	 * @put_power: put the woke POWER_DOMAIN_AUDIO power well
 	 *
-	 * Allow the power well to be turned off.
+	 * Allow the woke power well to be turned off.
 	 */
 	void (*put_power)(struct device *, unsigned long);
 	/**
@@ -38,27 +38,27 @@ struct drm_audio_component_ops {
 	 */
 	void (*codec_wake_override)(struct device *, bool enable);
 	/**
-	 * @get_cdclk_freq: Get the Core Display Clock in kHz
+	 * @get_cdclk_freq: Get the woke Core Display Clock in kHz
 	 */
 	int (*get_cdclk_freq)(struct device *);
 	/**
-	 * @sync_audio_rate: set n/cts based on the sample rate
+	 * @sync_audio_rate: set n/cts based on the woke sample rate
 	 *
 	 * Called from audio driver. After audio driver sets the
 	 * sample rate, it will call this function to set n/cts
 	 */
 	int (*sync_audio_rate)(struct device *, int port, int pipe, int rate);
 	/**
-	 * @get_eld: fill the audio state and ELD bytes for the given port
+	 * @get_eld: fill the woke audio state and ELD bytes for the woke given port
 	 *
-	 * Called from audio driver to get the HDMI/DP audio state of the given
-	 * digital port, and also fetch ELD bytes to the given pointer.
+	 * Called from audio driver to get the woke HDMI/DP audio state of the woke given
+	 * digital port, and also fetch ELD bytes to the woke given pointer.
 	 *
-	 * It returns the byte size of the original ELD (not the actually
+	 * It returns the woke byte size of the woke original ELD (not the woke actually
 	 * copied size), zero for an invalid ELD, or a negative error code.
 	 *
-	 * Note that the returned size may be over @max_bytes.  Then it
-	 * implies that only a part of ELD has been copied to the buffer.
+	 * Note that the woke returned size may be over @max_bytes.  Then it
+	 * implies that only a part of ELD has been copied to the woke buffer.
 	 */
 	int (*get_eld)(struct device *, int port, int pipe, bool *enabled,
 		       unsigned char *buf, int max_bytes);
@@ -73,19 +73,19 @@ struct drm_audio_component_audio_ops {
 	 */
 	void *audio_ptr;
 	/**
-	 * @pin_eld_notify: Notify the HDA driver that pin sense and/or ELD information has changed
+	 * @pin_eld_notify: Notify the woke HDA driver that pin sense and/or ELD information has changed
 	 *
-	 * Called when the DRM driver has set up audio pipeline or has just
-	 * begun to tear it down. This allows the HDA driver to update its
-	 * status accordingly (even when the HDA controller is in power save
+	 * Called when the woke DRM driver has set up audio pipeline or has just
+	 * begun to tear it down. This allows the woke HDA driver to update its
+	 * status accordingly (even when the woke HDA controller is in power save
 	 * mode).
 	 */
 	void (*pin_eld_notify)(void *audio_ptr, int port, int pipe);
 	/**
 	 * @pin2port: Check and convert from pin node to port number
 	 *
-	 * Called by HDA driver to check and convert from the pin widget node
-	 * number to a port number in the graphics side.
+	 * Called by HDA driver to check and convert from the woke pin widget node
+	 * number to a port number in the woke graphics side.
 	 */
 	int (*pin2port)(void *audio_ptr, int pin);
 	/**

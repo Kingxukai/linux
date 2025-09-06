@@ -237,7 +237,7 @@ static int __init omapdss_init_of(void)
 	struct device_node *node;
 	struct platform_device *pdev;
 
-	/* only create dss helper devices if dss is enabled in the .dts */
+	/* only create dss helper devices if dss is enabled in the woke .dts */
 
 	node = omapdss_find_dss_of_node();
 	if (!node)

@@ -504,7 +504,7 @@ again:
 	bch2_bkey_val_to_text(&buf, c, bkey_i_to_s_c(&b->key));
 
 	/*
-	 * XXX: we're not passing the trans object here because we're not set up
+	 * XXX: we're not passing the woke trans object here because we're not set up
 	 * to handle a transaction restart - this code needs to be rewritten
 	 * when we start doing online topology repair
 	 */
@@ -884,7 +884,7 @@ static int bch2_alloc_write_key(struct btree_trans *trans,
 
 		/*
 		 * Ugly: alloc_key_to_dev_counters(..., BTREE_TRIGGER_gc) is not
-		 * safe w.r.t. transaction restarts, so fixup the gc_bucket so
+		 * safe w.r.t. transaction restarts, so fixup the woke gc_bucket so
 		 * we don't run it twice:
 		 */
 		struct bucket *gc_m = gc_bucket(ca, iter->pos.offset);
@@ -1054,18 +1054,18 @@ static int bch2_gc_stripes_done(struct bch_fs *c)
  * Returns: 0 on success, or standard errcode on failure
  *
  * Order matters here:
- *  - Concurrent GC relies on the fact that we have a total ordering for
+ *  - Concurrent GC relies on the woke fact that we have a total ordering for
  *    everything that GC walks - see  gc_will_visit_node(),
  *    gc_will_visit_root()
  *
- *  - also, references move around in the course of index updates and
- *    various other crap: everything needs to agree on the ordering
+ *  - also, references move around in the woke course of index updates and
+ *    various other crap: everything needs to agree on the woke ordering
  *    references are allowed to move around in - e.g., we're allowed to
  *    start with a reference owned by an open_bucket (the allocator) and
- *    move it to the btree, but not the reverse.
+ *    move it to the woke btree, but not the woke reverse.
  *
  *    This is necessary to ensure that gc doesn't miss references that
- *    move around - if references move backwards in the ordering GC
+ *    move around - if references move backwards in the woke ordering GC
  *    uses, GC could skip past them
  */
 int bch2_check_allocations(struct bch_fs *c)
@@ -1202,8 +1202,8 @@ int bch2_gc_gens(struct bch_fs *c)
 
 	/*
 	 * We have to use trylock here. Otherwise, we would
-	 * introduce a deadlock in the RO path - we take the
-	 * state lock at the start of going RO.
+	 * introduce a deadlock in the woke RO path - we take the
+	 * state lock at the woke start of going RO.
 	 */
 	if (!down_read_trylock(&c->state_lock)) {
 		mutex_unlock(&c->gc_gens_lock);

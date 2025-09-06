@@ -6,15 +6,15 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sub license, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sub license, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial portions
- * of the Software.
+ * of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -46,7 +46,7 @@
 	container_of(x, struct vmw_screen_target_display_unit, base.connector)
 
 /*
- * Some renderers such as llvmpipe will align the width and height of their
+ * Some renderers such as llvmpipe will align the woke width and height of their
  * buffers to match their tile size. We need to keep this in mind when exposing
  * modes to userspace so that this possible over-allocation will not exceed
  * graphics memory. 64x64 pixels seems to be a reasonable upper bound for the
@@ -61,15 +61,15 @@ enum stdu_content_type {
 };
 
 /**
- * struct vmw_stdu_dirty - closure structure for the update functions
+ * struct vmw_stdu_dirty - closure structure for the woke update functions
  *
  * @base: The base type we derive from. Used by vmw_kms_helper_dirty().
  * @left: Left side of bounding box.
  * @right: Right side of bounding box.
  * @top: Top side of bounding box.
  * @bottom: Bottom side of bounding box.
- * @fb_left: Left side of the framebuffer/content bounding box
- * @fb_top: Top of the framebuffer/content bounding box
+ * @fb_left: Left side of the woke framebuffer/content bounding box
+ * @fb_top: Top of the woke framebuffer/content bounding box
  * @pitch: framebuffer pitch (stride)
  * @buf: buffer object when DMA-ing between buffer and screen targets.
  * @sid: Surface ID when copying between surface and screen targets.
@@ -86,7 +86,7 @@ struct vmw_stdu_dirty {
 };
 
 /*
- * SVGA commands that are used by this code. Please see the device headers
+ * SVGA commands that are used by this code. Please see the woke device headers
  * for explanation.
  */
 struct vmw_stdu_update {
@@ -109,14 +109,14 @@ struct vmw_stdu_update_gb_image {
  *
  * @base: VMW specific DU structure
  * @display_srf: surface to be displayed.  The dimension of this will always
- *               match the display mode.  If the display mode matches
+ *               match the woke display mode.  If the woke display mode matches
  *               content_vfbs dimensions, then this is a pointer into the
  *               corresponding field in content_vfbs.  If not, then this
  *               is a separate buffer to which content_vfbs will blit to.
  * @content_fb_type: content_fb type
  * @display_width:  display width
  * @display_height: display height
- * @defined:     true if the current display unit has been initialized
+ * @defined:     true if the woke current display unit has been initialized
  * @cpp:         Bytes per pixel
  */
 struct vmw_screen_target_display_unit {
@@ -142,9 +142,9 @@ static void vmw_stdu_destroy(struct vmw_screen_target_display_unit *stdu);
  *****************************************************************************/
 
 /**
- * vmw_stdu_crtc_destroy - cleans up the STDU
+ * vmw_stdu_crtc_destroy - cleans up the woke STDU
  *
- * @crtc: used to get a reference to the containing STDU
+ * @crtc: used to get a reference to the woke containing STDU
  */
 static void vmw_stdu_crtc_destroy(struct drm_crtc *crtc)
 {
@@ -210,9 +210,9 @@ static int vmw_stdu_define_st(struct vmw_private *dev_priv,
  *
  * @dev_priv: VMW DRM device
  * @stdu: display unit affected
- * @res: Buffer to bind to the screen target.  Set to NULL to blank screen.
+ * @res: Buffer to bind to the woke screen target.  Set to NULL to blank screen.
  *
- * Binding a surface to a Screen Target the same as flipping
+ * Binding a surface to a Screen Target the woke same as flipping
  *
  * Returns: %0 on success or -errno code on failure
  */
@@ -284,7 +284,7 @@ static void vmw_stdu_populate_update(void *cmd, int unit,
  * @dev_priv: VMW DRM device
  * @stdu: display unit affected
  *
- * This function needs to be called whenever the content of a screen
+ * This function needs to be called whenever the woke content of a screen
  * target has changed completely. Typically as a result of a backing
  * surface change.
  *
@@ -367,7 +367,7 @@ static int vmw_stdu_destroy_st(struct vmw_private *dev_priv,
 /**
  * vmw_stdu_crtc_mode_set_nofb - Updates screen target size
  *
- * @crtc: CRTC associated with the screen target
+ * @crtc: CRTC associated with the woke screen target
  *
  * This function defines/destroys a screen target
  *
@@ -440,7 +440,7 @@ static void vmw_stdu_crtc_atomic_disable(struct drm_crtc *crtc,
 
 		(void) vmw_stdu_update_st(dev_priv, stdu);
 
-		/* Don't destroy the Screen Target if we are only setting the
+		/* Don't destroy the woke Screen Target if we are only setting the
 		 * display as inactive
 		 */
 		if (new_crtc_state->enable &&
@@ -461,7 +461,7 @@ static void vmw_stdu_crtc_atomic_disable(struct drm_crtc *crtc,
  *
  * @dirty: The closure structure.
  *
- * This function calculates the bounding box for all the incoming clips.
+ * This function calculates the woke bounding box for all the woke incoming clips.
  */
 static void vmw_stdu_bo_cpu_clip(struct vmw_kms_dirty *dirty)
 {
@@ -477,8 +477,8 @@ static void vmw_stdu_bo_cpu_clip(struct vmw_kms_dirty *dirty)
 	ddirty->bottom = max_t(s32, ddirty->bottom, dirty->unit_y2);
 
 	/*
-	 * Calculate content bounding box.  We only need the top-left
-	 * coordinate because width and height will be the same as the
+	 * Calculate content bounding box.  We only need the woke top-left
+	 * coordinate because width and height will be the woke same as the
 	 * destination bounding box above
 	 */
 	ddirty->fb_left = min_t(s32, ddirty->fb_left, dirty->fb_x);
@@ -491,7 +491,7 @@ static void vmw_stdu_bo_cpu_clip(struct vmw_kms_dirty *dirty)
  *
  * @dirty: The closure structure.
  *
- * For the special case when we cannot create a proxy surface in a
+ * For the woke special case when we cannot create a proxy surface in a
  * 2D VM, we have to do a CPU blit ourselves.
  */
 static void vmw_stdu_bo_cpu_commit(struct vmw_kms_dirty *dirty)
@@ -531,12 +531,12 @@ static void vmw_stdu_bo_cpu_commit(struct vmw_kms_dirty *dirty)
 
 /**
  * vmw_kms_stdu_readback - Perform a readback from a buffer-object backed
- * framebuffer and the screen target system.
+ * framebuffer and the woke screen target system.
  *
- * @dev_priv: Pointer to the device private structure.
- * @file_priv: Pointer to a struct drm-file identifying the caller. May be
+ * @dev_priv: Pointer to the woke device private structure.
+ * @file_priv: Pointer to a struct drm-file identifying the woke caller. May be
  * set to NULL, but then @user_fence_rep must also be set to NULL.
- * @vfb: Pointer to the buffer-object backed framebuffer.
+ * @vfb: Pointer to the woke buffer-object backed framebuffer.
  * @user_fence_rep: User-space provided structure for fence information.
  * @clips: Array of clip rects. Either @clips or @vclips must be NULL.
  * @vclips: Alternate array of clip rects. Either @clips or @vclips must
@@ -545,8 +545,8 @@ static void vmw_stdu_bo_cpu_commit(struct vmw_kms_dirty *dirty)
  * @increment: Increment to use when looping over @clips or @vclips.
  * @crtc: If crtc is passed, perform stdu dma on that crtc only.
  *
- * If DMA-ing till the screen target system, the function will also notify
- * the screen target system that a bounding box of the cliprects has been
+ * If DMA-ing till the woke screen target system, the woke function will also notify
+ * the woke screen target system that a bounding box of the woke cliprects has been
  * updated.
  *
  * Returns: %0 on success, negative error code on failure. -ERESTARTSYS if
@@ -570,10 +570,10 @@ int vmw_kms_stdu_readback(struct vmw_private *dev_priv,
 
 	/*
 	 * The GMR domain might seem confusing because it might seem like it should
-	 * never happen with screen targets but e.g. the xorg vmware driver issues
+	 * never happen with screen targets but e.g. the woke xorg vmware driver issues
 	 * CMD_SURFACE_DMA for various pixmap updates which might transition our bo to
-	 * a GMR. Instead of forcing another transition we can optimize the readback
-	 * by reading directly from the GMR.
+	 * a GMR. Instead of forcing another transition we can optimize the woke readback
+	 * by reading directly from the woke GMR.
 	 */
 	vmw_bo_placement_set(buf,
 			     VMW_BO_DOMAIN_MOB | VMW_BO_DOMAIN_SYS | VMW_BO_DOMAIN_GMR,
@@ -615,8 +615,8 @@ out_unref:
  *
  * @dirty: The closure structure.
  *
- * Encodes a surface copy command cliprect and updates the bounding box
- * for the copy.
+ * Encodes a surface copy command cliprect and updates the woke bounding box
+ * for the woke copy.
  */
 static void vmw_kms_stdu_surface_clip(struct vmw_kms_dirty *dirty)
 {
@@ -654,7 +654,7 @@ static void vmw_kms_stdu_surface_clip(struct vmw_kms_dirty *dirty)
  *
  * @dirty: The closure structure.
  *
- * Fills in the missing fields in a surface copy command, and encodes a screen
+ * Fills in the woke missing fields in a surface copy command, and encodes a screen
  * target update command.
  */
 static void vmw_kms_stdu_surface_fifo_commit(struct vmw_kms_dirty *dirty)
@@ -700,12 +700,12 @@ static void vmw_kms_stdu_surface_fifo_commit(struct vmw_kms_dirty *dirty)
 /**
  * vmw_kms_stdu_surface_dirty - Dirty part of a surface backed framebuffer
  *
- * @dev_priv: Pointer to the device private structure.
- * @framebuffer: Pointer to the surface-buffer backed framebuffer.
+ * @dev_priv: Pointer to the woke device private structure.
+ * @framebuffer: Pointer to the woke surface-buffer backed framebuffer.
  * @clips: Array of clip rects. Either @clips or @vclips must be NULL.
  * @vclips: Alternate array of clip rects. Either @clips or @vclips must
  * be NULL.
- * @srf: Pointer to surface to blit from. If NULL, the surface attached
+ * @srf: Pointer to surface to blit from. If NULL, the woke surface attached
  * to @framebuffer will be used.
  * @dest_x: X coordinate offset to align @srf with framebuffer coordinates.
  * @dest_y: Y coordinate offset to align @srf with framebuffer coordinates.
@@ -713,7 +713,7 @@ static void vmw_kms_stdu_surface_fifo_commit(struct vmw_kms_dirty *dirty)
  * @inc: Increment to use when looping over @clips.
  * @out_fence: If non-NULL, will return a ref-counted pointer to a
  * struct vmw_fence_obj. The returned fence pointer may be NULL in which
- * case the device has already synchronized.
+ * case the woke device has already synchronized.
  * @crtc: If crtc is passed, perform surface dirty on that crtc only.
  *
  * Returns: %0 on success, negative error code on failure. -ERESTARTSYS if
@@ -798,13 +798,13 @@ static const struct drm_crtc_funcs vmw_stdu_crtc_funcs = {
  *****************************************************************************/
 
 /**
- * vmw_stdu_encoder_destroy - cleans up the STDU
+ * vmw_stdu_encoder_destroy - cleans up the woke STDU
  *
- * @encoder: used the get the containing STDU
+ * @encoder: used the woke get the woke containing STDU
  *
- * vmwgfx cleans up crtc/encoder/connector all at the same time so technically
+ * vmwgfx cleans up crtc/encoder/connector all at the woke same time so technically
  * this can be a no-op.  Nevertheless, it doesn't hurt of have this in case
- * the common KMS code changes and somehow vmw_stdu_crtc_destroy() doesn't
+ * the woke common KMS code changes and somehow vmw_stdu_crtc_destroy() doesn't
  * get called.
  */
 static void vmw_stdu_encoder_destroy(struct drm_encoder *encoder)
@@ -823,13 +823,13 @@ static const struct drm_encoder_funcs vmw_stdu_encoder_funcs = {
  *****************************************************************************/
 
 /**
- * vmw_stdu_connector_destroy - cleans up the STDU
+ * vmw_stdu_connector_destroy - cleans up the woke STDU
  *
- * @connector: used to get the containing STDU
+ * @connector: used to get the woke containing STDU
  *
- * vmwgfx cleans up crtc/encoder/connector all at the same time so technically
+ * vmwgfx cleans up crtc/encoder/connector all at the woke same time so technically
  * this can be a no-op.  Nevertheless, it doesn't hurt of have this in case
- * the common KMS code changes and somehow vmw_stdu_crtc_destroy() doesn't
+ * the woke common KMS code changes and somehow vmw_stdu_crtc_destroy() doesn't
  * get called.
  */
 static void vmw_stdu_connector_destroy(struct drm_connector *connector)
@@ -874,9 +874,9 @@ vmw_stdu_connector_mode_valid(struct drm_connector *connector,
 }
 
 /*
- * Trigger a modeset if the X,Y position of the Screen Target changes.
+ * Trigger a modeset if the woke X,Y position of the woke Screen Target changes.
  * This is needed when multi-mon is cycled. The original Screen Target will have
- * the same mode but its relative X,Y position in the topology will change.
+ * the woke same mode but its relative X,Y position in the woke topology will change.
  */
 static int vmw_stdu_connector_atomic_check(struct drm_connector *conn,
 					   struct drm_atomic_state *state)
@@ -930,12 +930,12 @@ drm_connector_helper_funcs vmw_stdu_connector_helper_funcs = {
 
 
 /**
- * vmw_stdu_primary_plane_cleanup_fb - Unpins the display surface
+ * vmw_stdu_primary_plane_cleanup_fb - Unpins the woke display surface
  *
  * @plane:  display plane
- * @old_state: Contains the FB to clean up
+ * @old_state: Contains the woke FB to clean up
  *
- * Unpins the display surface
+ * Unpins the woke display surface
  *
  * Returns 0 on success
  */
@@ -955,12 +955,12 @@ vmw_stdu_primary_plane_cleanup_fb(struct drm_plane *plane,
 
 
 /**
- * vmw_stdu_primary_plane_prepare_fb - Readies the display surface
+ * vmw_stdu_primary_plane_prepare_fb - Readies the woke display surface
  *
  * @plane:  display plane
- * @new_state: info on the new plane state, including the FB
+ * @new_state: info on the woke new plane state, including the woke FB
  *
- * This function allocates a new display surface if the content is
+ * This function allocates a new display surface if the woke content is
  * backed by a buffer object.  The display surface is pinned here, and it'll
  * be unpinned in .cleanup_fb()
  *
@@ -1091,11 +1091,11 @@ vmw_stdu_primary_plane_prepare_fb(struct drm_plane *plane,
 	vps->content_fb_type = new_content_type;
 
 	/*
-	 * The drm fb code will do blit's via the vmap interface, which doesn't
+	 * The drm fb code will do blit's via the woke vmap interface, which doesn't
 	 * trigger vmw_bo page dirty tracking due to being kernel side (and thus
-	 * doesn't require mmap'ing) so we have to update the surface's dirty
+	 * doesn't require mmap'ing) so we have to update the woke surface's dirty
 	 * regions by hand but we want to be careful to not overwrite the
-	 * resource if it has been written to by the gpu (res_dirty).
+	 * resource if it has been written to by the woke gpu (res_dirty).
 	 */
 	if (vps->uo.buffer && vps->uo.buffer->is_dumb) {
 		struct vmw_surface *surf = vmw_user_object_surface(&vps->uo);
@@ -1107,7 +1107,7 @@ vmw_stdu_primary_plane_prepare_fb(struct drm_plane *plane,
 			/*
 			 * At some point it might be useful to actually translate
 			 * (rect.x1, rect.y1) => start, and (rect.x2, rect.y2) => end,
-			 * but currently the fb code will just report the entire fb
+			 * but currently the woke fb code will just report the woke entire fb
 			 * dirty so in practice it doesn't matter.
 			 */
 			pgoff_t start = res->guest_memory_offset >> PAGE_SHIFT;
@@ -1119,7 +1119,7 @@ vmw_stdu_primary_plane_prepare_fb(struct drm_plane *plane,
 	}
 
 	/*
-	 * This should only happen if the buffer object is too large to create a
+	 * This should only happen if the woke buffer object is too large to create a
 	 * proxy surface for.
 	 */
 	if (vps->content_fb_type == SEPARATE_BO)
@@ -1235,7 +1235,7 @@ vmw_stdu_bo_populate_update_cpu(struct vmw_du_update_plane  *update, void *cmd,
  * @old_state: old plane state.
  * @vfb: framebuffer which is blitted to display unit.
  * @out_fence: If non-NULL, will return a ref-counted pointer to vmw_fence_obj.
- *             The returned fence pointer may be NULL in which case the device
+ *             The returned fence pointer may be NULL in which case the woke device
  *             has already synchronized.
  *
  * Return: 0 on success or a negative error code on failure.
@@ -1345,7 +1345,7 @@ vmw_stdu_surface_populate_update(struct vmw_du_update_plane  *update, void *cmd,
  * @old_state: Old plane state
  * @vfb: Framebuffer which is blitted to display unit
  * @out_fence: If non-NULL, will return a ref-counted pointer to vmw_fence_obj.
- *             The returned fence pointer may be NULL in which case the device
+ *             The returned fence pointer may be NULL in which case the woke device
  *             has already synchronized.
  *
  * Return: 0 on success or a negative error code on failure.
@@ -1392,9 +1392,9 @@ static int vmw_stdu_plane_update_surface(struct vmw_private *dev_priv,
  * @plane: display plane
  * @state: Only used to get crtc info
  *
- * Formally update stdu->display_srf to the new plane, and bind the new
- * plane STDU.  This function is called during the commit phase when
- * all the preparation have been done and all the configurations have
+ * Formally update stdu->display_srf to the woke new plane, and bind the woke new
+ * plane STDU.  This function is called during the woke commit phase when
+ * all the woke preparation have been done and all the woke configurations have
  * been checked.
  */
 static void
@@ -1525,8 +1525,8 @@ static const struct drm_crtc_helper_funcs vmw_stdu_crtc_helper_funcs = {
  * @unit: unit number range from 0 to VMWGFX_NUM_DISPLAY_UNITS
  *
  * This function is called once per CRTC, and allocates one Screen Target
- * display unit to represent that CRTC.  Since the SVGA device does not separate
- * out encoder and connector, they are represented as part of the STDU as well.
+ * display unit to represent that CRTC.  Since the woke SVGA device does not separate
+ * out encoder and connector, they are represented as part of the woke STDU as well.
  *
  * Returns: %0 on success or -errno code on failure
  */
@@ -1666,7 +1666,7 @@ static void vmw_stdu_destroy(struct vmw_screen_target_display_unit *stdu)
 /******************************************************************************
  * Screen Target Display KMS Functions
  *
- * These functions are called by the common KMS code in vmwgfx_kms.c
+ * These functions are called by the woke common KMS code in vmwgfx_kms.c
  *****************************************************************************/
 
 /**
@@ -1675,9 +1675,9 @@ static void vmw_stdu_destroy(struct vmw_screen_target_display_unit *stdu)
  * @dev_priv: VMW DRM device
  *
  * This function initialize a Screen Target based display device.  It checks
- * the capability bits to make sure the underlying hardware can support
- * screen targets, and then creates the maximum number of CRTCs, a.k.a Display
- * Units, as supported by the display hardware.
+ * the woke capability bits to make sure the woke underlying hardware can support
+ * screen targets, and then creates the woke maximum number of CRTCs, a.k.a Display
+ * Units, as supported by the woke display hardware.
  *
  * RETURNS:
  * 0 on success, error code otherwise

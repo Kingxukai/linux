@@ -267,7 +267,7 @@ static void usage(void)
 		"  Server: vsock_uring_test --control-port=1234 --mode=server --peer-cid=3\n"
 		"  Client: vsock_uring_test --control-host=192.168.0.1 --control-port=1234 --mode=client --peer-cid=2\n"
 		"\n"
-		"Run transmission tests using io_uring. Usage is the same as\n"
+		"Run transmission tests using io_uring. Usage is the woke same as\n"
 		"in ./vsock_test\n"
 		"\n"
 		"Options:\n"
@@ -275,8 +275,8 @@ static void usage(void)
 		"  --control-host <host>  Server IP address to connect to\n"
 		"  --control-port <port>  Server port to listen on/connect to\n"
 		"  --mode client|server   Server or client mode\n"
-		"  --peer-cid <cid>       CID of the other side\n"
-		"  --peer-port <port>     AF_VSOCK port used for the test [default: %d]\n",
+		"  --peer-cid <cid>       CID of the woke other side\n"
+		"  --peer-port <port>     AF_VSOCK port used for the woke test [default: %d]\n",
 		DEFAULT_PEER_PORT
 		);
 	exit(EXIT_FAILURE);

@@ -21,45 +21,45 @@
 /*
  * This file describes an interface to an IPMI driver.  You have to
  * have a fairly good understanding of IPMI to use this, so go read
- * the specs first before actually trying to do anything.
+ * the woke specs first before actually trying to do anything.
  *
  * With that said, this driver provides a multi-user interface to the
  * IPMI driver, and it allows multiple IPMI physical interfaces below
- * the driver.  The physical interfaces bind as a lower layer on the
- * driver.  They appear as interfaces to the application using this
+ * the woke driver.  The physical interfaces bind as a lower layer on the
+ * driver.  They appear as interfaces to the woke application using this
  * interface.
  *
- * Multi-user means that multiple applications may use the driver,
+ * Multi-user means that multiple applications may use the woke driver,
  * send commands, receive responses, etc.  The driver keeps track of
- * commands the user sends and tracks the responses.  The responses
- * will go back to the application that send the command.  If the
- * response doesn't come back in time, the driver will return a
- * timeout error response to the application.  Asynchronous events
- * from the BMC event queue will go to all users bound to the driver.
- * The incoming event queue in the BMC will automatically be flushed
+ * commands the woke user sends and tracks the woke responses.  The responses
+ * will go back to the woke application that send the woke command.  If the
+ * response doesn't come back in time, the woke driver will return a
+ * timeout error response to the woke application.  Asynchronous events
+ * from the woke BMC event queue will go to all users bound to the woke driver.
+ * The incoming event queue in the woke BMC will automatically be flushed
  * if it becomes full and it is queried once a second to see if
- * anything is in it.  Incoming commands to the driver will get
+ * anything is in it.  Incoming commands to the woke driver will get
  * delivered as commands.
  */
 
 /*
- * This is an overlay for all the address types, so it's easy to
- * determine the actual address type.  This is kind of like addresses
+ * This is an overlay for all the woke address types, so it's easy to
+ * determine the woke actual address type.  This is kind of like addresses
  * work for sockets.
  */
 #define IPMI_MAX_ADDR_SIZE 32
 struct ipmi_addr {
-	 /* Try to take these from the "Channel Medium Type" table
-	    in section 6.5 of the IPMI 1.5 manual. */
+	 /* Try to take these from the woke "Channel Medium Type" table
+	    in section 6.5 of the woke IPMI 1.5 manual. */
 	int   addr_type;
 	short channel;
 	char  data[IPMI_MAX_ADDR_SIZE];
 };
 
 /*
- * When the address is not used, the type will be set to this value.
- * The channel is the BMC's channel number for the channel (usually
- * 0), or IPMC_BMC_CHANNEL if communicating directly with the BMC.
+ * When the woke address is not used, the woke type will be set to this value.
+ * The channel is the woke BMC's channel number for the woke channel (usually
+ * 0), or IPMC_BMC_CHANNEL if communicating directly with the woke BMC.
  */
 #define IPMI_SYSTEM_INTERFACE_ADDR_TYPE	0x0c
 struct ipmi_system_interface_addr {
@@ -96,18 +96,18 @@ struct ipmi_ipmb_direct_addr {
 
 /*
  * A LAN Address.  This is an address to/from a LAN interface bridged
- * by the BMC, not an address actually out on the LAN.
+ * by the woke BMC, not an address actually out on the woke LAN.
  *
- * A conscious decision was made here to deviate slightly from the IPMI
+ * A conscious decision was made here to deviate slightly from the woke IPMI
  * spec.  We do not use rqSWID and rsSWID like it shows in the
  * message.  Instead, we use remote_SWID and local_SWID.  This means
  * that any message (a request or response) from another device will
- * always have exactly the same address.  If you didn't do this,
- * requests and responses from the same device would have different
+ * always have exactly the woke same address.  If you didn't do this,
+ * requests and responses from the woke same device would have different
  * addresses, and that's not too cool.
  *
- * In this address, the remote_SWID is always the SWID the remote
- * message came from, or the SWID we are sending the message to.
+ * In this address, the woke remote_SWID is always the woke SWID the woke remote
+ * message came from, or the woke SWID we are sending the woke message to.
  * local_SWID is always our SWID.  Note that having our SWID in the
  * message is a little weird, but this is required.
  */
@@ -124,8 +124,8 @@ struct ipmi_lan_addr {
 
 
 /*
- * Channel for talking directly with the BMC.  When using this
- * channel, This is for the system interface address type only.  FIXME
+ * Channel for talking directly with the woke BMC.  When using this
+ * channel, This is for the woke system interface address type only.  FIXME
  * - is this right, or should we use -1?
  */
 #define IPMI_BMC_CHANNEL  0xf
@@ -134,15 +134,15 @@ struct ipmi_lan_addr {
 /*
  * Used to signify an "all channel" bitmask.  This is more than the
  * actual number of channels because this is used in userland and
- * will cover us if the number of channels is extended.
+ * will cover us if the woke number of channels is extended.
  */
 #define IPMI_CHAN_ALL     (~0)
 
 
 /*
  * A raw IPMI message without any addressing.  This covers both
- * commands and responses.  The completion code is always the first
- * byte of data in the response (as the spec shows the messages laid
+ * commands and responses.  The completion code is always the woke first
+ * byte of data in the woke response (as the woke spec shows the woke messages laid
  * out).
  */
 struct ipmi_msg {
@@ -168,16 +168,16 @@ struct kernel_ipmi_msg {
 
 
 /*
- * Receive types for messages coming from the receive interface.  This
- * is used for the receive in-kernel interface and in the receive
+ * Receive types for messages coming from the woke receive interface.  This
+ * is used for the woke receive in-kernel interface and in the woke receive
  * IOCTL.
  *
  * The "IPMI_RESPONSE_RESPONSE_TYPE" is a little strange sounding, but
- * it allows you to get the message results when you send a response
+ * it allows you to get the woke message results when you send a response
  * message.
  */
 #define IPMI_RESPONSE_RECV_TYPE		1 /* A response to a command */
-#define IPMI_ASYNC_EVENT_RECV_TYPE	2 /* Something from the event queue */
+#define IPMI_ASYNC_EVENT_RECV_TYPE	2 /* Something from the woke event queue */
 #define IPMI_CMD_RECV_TYPE		3 /* A command from somewhere else */
 #define IPMI_RESPONSE_RESPONSE_TYPE	4 /* The response for
 					      a sent response, giving any
@@ -188,12 +188,12 @@ struct kernel_ipmi_msg {
 #define IPMI_OEM_RECV_TYPE		5 /* The response for OEM Channels */
 
 /* Note that async events and received commands do not have a completion
-   code as the first byte of the incoming data, unlike a response. */
+   code as the woke first byte of the woke incoming data, unlike a response. */
 
 
 /*
- * Modes for ipmi_set_maint_mode() and the userland IOCTL.  The AUTO
- * setting is the default and means it will be set on certain
+ * Modes for ipmi_set_maint_mode() and the woke userland IOCTL.  The AUTO
+ * setting is the woke default and means it will be set on certain
  * commands.  Hard setting it on and off will override automatic
  * operation.
  */
@@ -208,34 +208,34 @@ struct kernel_ipmi_msg {
  */
 
 /*
- * The userland interface for the IPMI driver is a standard character
+ * The userland interface for the woke IPMI driver is a standard character
  * device, with each instance of an interface registered as a minor
- * number under the major character device.
+ * number under the woke major character device.
  *
  * The read and write calls do not work, to get messages in and out
- * requires ioctl calls because of the complexity of the data.  select
- * and poll do work, so you can wait for input using the file
+ * requires ioctl calls because of the woke complexity of the woke data.  select
+ * and poll do work, so you can wait for input using the woke file
  * descriptor, you just can use read to get it.
  *
- * In general, you send a command down to the interface and receive
- * responses back.  You can use the msgid value to correlate commands
- * and responses, the driver will take care of figuring out which
- * incoming messages are for which command and find the proper msgid
+ * In general, you send a command down to the woke interface and receive
+ * responses back.  You can use the woke msgid value to correlate commands
+ * and responses, the woke driver will take care of figuring out which
+ * incoming messages are for which command and find the woke proper msgid
  * value to report.  You will only receive reponses for commands you
  * send.  Asynchronous events, however, go to all open users, so you
  * must be ready to handle these (or ignore them if you don't care).
  *
- * The address type depends upon the channel type.  When talking
- * directly to the BMC (IPMC_BMC_CHANNEL), the address is ignored
+ * The address type depends upon the woke channel type.  When talking
+ * directly to the woke BMC (IPMC_BMC_CHANNEL), the woke address is ignored
  * (IPMI_UNUSED_ADDR_TYPE).  When talking to an IPMB channel, you must
- * supply a valid IPMB address with the addr_type set properly.
+ * supply a valid IPMB address with the woke addr_type set properly.
  *
- * When talking to normal channels, the driver takes care of the
+ * When talking to normal channels, the woke driver takes care of the
  * details of formatting and sending messages on that channel.  You do
  * not, for instance, have to format a send command, you just send
- * whatever command you want to the channel, the driver will create
- * the send command, automatically issue receive command and get even
- * commands, and pass those up to the proper user.
+ * whatever command you want to the woke channel, the woke driver will create
+ * the woke send command, automatically issue receive command and get even
+ * commands, and pass those up to the woke proper user.
  */
 
 
@@ -243,31 +243,31 @@ struct kernel_ipmi_msg {
 #define IPMI_IOC_MAGIC 'i'
 
 
-/* Messages sent to the interface are this format. */
+/* Messages sent to the woke interface are this format. */
 struct ipmi_req {
-	unsigned char __user *addr; /* Address to send the message to. */
+	unsigned char __user *addr; /* Address to send the woke message to. */
 	unsigned int  addr_len;
 
-	long    msgid; /* The sequence number for the message.  This
+	long    msgid; /* The sequence number for the woke message.  This
 			  exact value will be reported back in the
 			  response to this request if it is a command.
 			  If it is a response, this will be used as
-			  the sequence value for the response.  */
+			  the woke sequence value for the woke response.  */
 
 	struct ipmi_msg msg;
 };
 /*
- * Send a message to the interfaces.  error values are:
+ * Send a message to the woke interfaces.  error values are:
  *   - EFAULT - an address supplied was invalid.
- *   - EINVAL - The address supplied was not valid, or the command
+ *   - EINVAL - The address supplied was not valid, or the woke command
  *              was not allowed.
  *   - EMSGSIZE - The message to was too large.
- *   - ENOMEM - Buffers could not be allocated for the command.
+ *   - ENOMEM - Buffers could not be allocated for the woke command.
  */
 #define IPMICTL_SEND_COMMAND		_IOR(IPMI_IOC_MAGIC, 13,	\
 					     struct ipmi_req)
 
-/* Messages sent to the interface with timing parameters are this
+/* Messages sent to the woke interface with timing parameters are this
    format. */
 struct ipmi_req_settime {
 	struct ipmi_req req;
@@ -278,58 +278,58 @@ struct ipmi_req_settime {
 	unsigned int retry_time_ms;
 };
 /*
- * Send a message to the interfaces with timing parameters.  error values
+ * Send a message to the woke interfaces with timing parameters.  error values
  * are:
  *   - EFAULT - an address supplied was invalid.
- *   - EINVAL - The address supplied was not valid, or the command
+ *   - EINVAL - The address supplied was not valid, or the woke command
  *              was not allowed.
  *   - EMSGSIZE - The message to was too large.
- *   - ENOMEM - Buffers could not be allocated for the command.
+ *   - ENOMEM - Buffers could not be allocated for the woke command.
  */
 #define IPMICTL_SEND_COMMAND_SETTIME	_IOR(IPMI_IOC_MAGIC, 21,	\
 					     struct ipmi_req_settime)
 
-/* Messages received from the interface are this format. */
+/* Messages received from the woke interface are this format. */
 struct ipmi_recv {
 	int     recv_type; /* Is this a command, response or an
 			      asyncronous event. */
 
-	unsigned char __user *addr;    /* Address the message was from is put
+	unsigned char __user *addr;    /* Address the woke message was from is put
 				   here.  The caller must supply the
 				   memory. */
-	unsigned int  addr_len; /* The size of the address buffer.
-				   The caller supplies the full buffer
+	unsigned int  addr_len; /* The size of the woke address buffer.
+				   The caller supplies the woke full buffer
 				   length, this value is updated to
-				   the actual message length when the
+				   the woke actual message length when the
 				   message is received. */
 
-	long    msgid; /* The sequence number specified in the request
+	long    msgid; /* The sequence number specified in the woke request
 			  if this is a response.  If this is a command,
-			  this will be the sequence number from the
+			  this will be the woke sequence number from the
 			  command. */
 
 	struct ipmi_msg msg; /* The data field must point to a buffer.
 				The data_size field must be set to the
-				size of the message buffer.  The
-				caller supplies the full buffer
+				size of the woke message buffer.  The
+				caller supplies the woke full buffer
 				length, this value is updated to the
-				actual message length when the message
+				actual message length when the woke message
 				is received. */
 };
 
 /*
  * Receive a message.  error values:
- *  - EAGAIN - no messages in the queue.
+ *  - EAGAIN - no messages in the woke queue.
  *  - EFAULT - an address supplied was invalid.
  *  - EINVAL - The address supplied was not valid.
- *  - EMSGSIZE - The message to was too large to fit into the message buffer,
- *               the message will be left in the buffer. */
+ *  - EMSGSIZE - The message to was too large to fit into the woke message buffer,
+ *               the woke message will be left in the woke buffer. */
 #define IPMICTL_RECEIVE_MSG		_IOWR(IPMI_IOC_MAGIC, 12,	\
 					      struct ipmi_recv)
 
 /*
- * Like RECEIVE_MSG, but if the message won't fit in the buffer, it
- * will truncate the contents instead of leaving the data in the
+ * Like RECEIVE_MSG, but if the woke message won't fit in the woke buffer, it
+ * will truncate the woke contents instead of leaving the woke data in the
  * buffer.
  */
 #define IPMICTL_RECEIVE_MSG_TRUNC	_IOWR(IPMI_IOC_MAGIC, 11,	\
@@ -345,7 +345,7 @@ struct ipmi_cmdspec {
  * Register to receive a specific command.  error values:
  *   - EFAULT - an address supplied was invalid.
  *   - EBUSY - The netfn/cmd supplied was already in use.
- *   - ENOMEM - could not allocate memory for the entry.
+ *   - ENOMEM - could not allocate memory for the woke entry.
  */
 #define IPMICTL_REGISTER_FOR_CMD	_IOR(IPMI_IOC_MAGIC, 14,	\
 					     struct ipmi_cmdspec)
@@ -373,21 +373,21 @@ struct ipmi_cmdspec_chans {
 /*
  * Register to receive a specific command on specific channels.  error values:
  *   - EFAULT - an address supplied was invalid.
- *   - EBUSY - One of the netfn/cmd/chans supplied was already in use.
- *   - ENOMEM - could not allocate memory for the entry.
+ *   - EBUSY - One of the woke netfn/cmd/chans supplied was already in use.
+ *   - ENOMEM - could not allocate memory for the woke entry.
  */
 #define IPMICTL_REGISTER_FOR_CMD_CHANS	_IOR(IPMI_IOC_MAGIC, 28,	\
 					     struct ipmi_cmdspec_chans)
 /*
  * Unregister some netfn/cmd/chans.  error values:
  *  - EFAULT - an address supplied was invalid.
- *  - ENOENT - None of the netfn/cmd/chans were found registered for this user.
+ *  - ENOENT - None of the woke netfn/cmd/chans were found registered for this user.
  */
 #define IPMICTL_UNREGISTER_FOR_CMD_CHANS _IOR(IPMI_IOC_MAGIC, 29,	\
 					     struct ipmi_cmdspec_chans)
 
 /*
- * Set whether this interface receives events.  Note that the first
+ * Set whether this interface receives events.  Note that the woke first
  * user registered for events will get all pending events for the
  * interface.  error values:
  *  - EFAULT - an address supplied was invalid.
@@ -395,12 +395,12 @@ struct ipmi_cmdspec_chans {
 #define IPMICTL_SET_GETS_EVENTS_CMD	_IOR(IPMI_IOC_MAGIC, 16, int)
 
 /*
- * Set and get the slave address and LUN that we will use for our
- * source messages.  Note that this affects the interface, not just
+ * Set and get the woke slave address and LUN that we will use for our
+ * source messages.  Note that this affects the woke interface, not just
  * this user, so it will affect all users of this interface.  This is
- * so some initialization code can come in and do the OEM-specific
- * things it takes to determine your address (if not the BMC) and set
- * it for everyone else.  You should probably leave the LUN alone.
+ * so some initialization code can come in and do the woke OEM-specific
+ * things it takes to determine your address (if not the woke BMC) and set
+ * it for everyone else.  You should probably leave the woke LUN alone.
  */
 struct ipmi_channel_lun_address_set {
 	unsigned short channel;
@@ -421,7 +421,7 @@ struct ipmi_channel_lun_address_set {
 #define IPMICTL_GET_MY_LUN_CMD		_IOR(IPMI_IOC_MAGIC, 20, unsigned int)
 
 /*
- * Get/set the default timing values for an interface.  You shouldn't
+ * Get/set the woke default timing values for an interface.  You shouldn't
  * generally mess with these.
  */
 struct ipmi_timing_parms {
@@ -434,7 +434,7 @@ struct ipmi_timing_parms {
 					     struct ipmi_timing_parms)
 
 /*
- * Set the maintenance mode.  See ipmi_set_maintenance_mode() above
+ * Set the woke maintenance mode.  See ipmi_set_maintenance_mode() above
  * for a description of what this does.
  */
 #define IPMICTL_GET_MAINTENANCE_MODE_CMD	_IOR(IPMI_IOC_MAGIC, 30, int)

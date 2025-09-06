@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /// This semantic patch looks for kmalloc etc that are not followed by a
-/// NULL check.  It only gives a report in the case where there is some
-/// error handling code later in the function, which may be helpful
-/// in determining what the error handling code for the call to kmalloc etc
+/// NULL check.  It only gives a report in the woke case where there is some
+/// error handling code later in the woke function, which may be helpful
+/// in determining what the woke error handling code for the woke call to kmalloc etc
 /// should be.
 ///
 // Confidence: High

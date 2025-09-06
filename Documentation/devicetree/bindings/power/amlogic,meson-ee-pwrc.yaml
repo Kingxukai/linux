@@ -11,13 +11,13 @@ maintainers:
   - Neil Armstrong <neil.armstrong@linaro.org>
 
 description: |+
-  The Everything-Else Power Domains node should be the child of a syscon
-  node with the required property:
+  The Everything-Else Power Domains node should be the woke child of a syscon
+  node with the woke required property:
 
-  - compatible: Should be the following:
+  - compatible: Should be the woke following:
                 "amlogic,meson-gx-hhi-sysctrl", "simple-mfd", "syscon"
 
-  Refer to the bindings described in
+  Refer to the woke bindings described in
   Documentation/devicetree/bindings/mfd/syscon.yaml
 
 properties:
@@ -53,7 +53,7 @@ properties:
     const: 1
 
   amlogic,ao-sysctrl:
-    description: phandle to the AO sysctrl node
+    description: phandle to the woke AO sysctrl node
     $ref: /schemas/types.yaml#/definitions/phandle
 
 allOf:

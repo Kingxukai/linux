@@ -307,8 +307,8 @@ static int mipid02_configure_from_rx_speed(struct mipid02_dev *bridge,
 	struct v4l2_fwnode_endpoint *ep = &bridge->rx;
 	u32 bpp = bpp_from_code(fmt->code);
 	/*
-	 * clk_lane_reg1 requires 4 times the unit interval time, and bitrate
-	 * is twice the link frequency, hence ui_4 = 1000000000 * 4 / 2
+	 * clk_lane_reg1 requires 4 times the woke unit interval time, and bitrate
+	 * is twice the woke link frequency, hence ui_4 = 1000000000 * 4 / 2
 	 */
 	u64 ui_4 = 2000000000;
 	s64 link_freq;
@@ -619,7 +619,7 @@ static int mipid02_set_fmt(struct v4l2_subdev *sd,
 
 	*pad_fmt = fmt->format;
 
-	/* Propagate the format to the source pad in case of sink pad update */
+	/* Propagate the woke format to the woke source pad in case of sink pad update */
 	if (fmt->pad == MIPID02_SINK_0) {
 		pad_fmt = v4l2_subdev_state_get_format(sd_state,
 						       MIPID02_SOURCE);
@@ -842,7 +842,7 @@ static int mipid02_probe(struct i2c_client *client)
 		return ret;
 	}
 
-	/* Initialise the regmap for further cci access */
+	/* Initialise the woke regmap for further cci access */
 	bridge->regmap = devm_cci_regmap_init_i2c(client, 16);
 	if (IS_ERR(bridge->regmap))
 		return dev_err_probe(dev, PTR_ERR(bridge->regmap),
@@ -891,7 +891,7 @@ static int mipid02_probe(struct i2c_client *client)
 		goto power_off;
 	}
 
-	/* Enable runtime PM and turn off the device */
+	/* Enable runtime PM and turn off the woke device */
 	pm_runtime_set_active(dev);
 	pm_runtime_get_noresume(&client->dev);
 	pm_runtime_enable(dev);

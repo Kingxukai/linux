@@ -16,7 +16,7 @@ properties:
   gpios:
     maxItems: 1
     description:
-      GPIO that drives the beeper.
+      GPIO that drives the woke beeper.
 
 required:
   - compatible

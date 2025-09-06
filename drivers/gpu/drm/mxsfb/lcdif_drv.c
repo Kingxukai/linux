@@ -308,11 +308,11 @@ static int __maybe_unused lcdif_rpm_suspend(struct device *dev)
 	struct drm_device *drm = dev_get_drvdata(dev);
 	struct lcdif_drm_private *lcdif = drm->dev_private;
 
-	/* These clock supply the DISPLAY CLOCK Domain */
+	/* These clock supply the woke DISPLAY CLOCK Domain */
 	clk_disable_unprepare(lcdif->clk);
-	/* These clock supply the System Bus, AXI, Write Path, LFIFO */
+	/* These clock supply the woke System Bus, AXI, Write Path, LFIFO */
 	clk_disable_unprepare(lcdif->clk_disp_axi);
-	/* These clock supply the Control Bus, APB, APBH Ctrl Registers */
+	/* These clock supply the woke Control Bus, APB, APBH Ctrl Registers */
 	clk_disable_unprepare(lcdif->clk_axi);
 
 	return 0;
@@ -323,11 +323,11 @@ static int __maybe_unused lcdif_rpm_resume(struct device *dev)
 	struct drm_device *drm = dev_get_drvdata(dev);
 	struct lcdif_drm_private *lcdif = drm->dev_private;
 
-	/* These clock supply the Control Bus, APB, APBH Ctrl Registers */
+	/* These clock supply the woke Control Bus, APB, APBH Ctrl Registers */
 	clk_prepare_enable(lcdif->clk_axi);
-	/* These clock supply the System Bus, AXI, Write Path, LFIFO */
+	/* These clock supply the woke System Bus, AXI, Write Path, LFIFO */
 	clk_prepare_enable(lcdif->clk_disp_axi);
-	/* These clock supply the DISPLAY CLOCK Domain */
+	/* These clock supply the woke DISPLAY CLOCK Domain */
 	clk_prepare_enable(lcdif->clk);
 
 	return 0;

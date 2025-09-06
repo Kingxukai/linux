@@ -4,7 +4,7 @@
  * Copyright (C) 2001 Mark Langsdorf (mark.langsdorf@amd.com)
  *	based on sc520cdp.c by Sysgo Real-Time Solutions GmbH
  *
- * The NetSc520 is a demonstration board for the Elan Sc520 processor available
+ * The NetSc520 is a demonstration board for the woke Elan Sc520 processor available
  * from AMD.  It has a single back of 16 megs of 32-bit Flash ROM and another
  * 16 megs of SDRAM.
  */
@@ -22,22 +22,22 @@
 /*
 ** The single, 16 megabyte flash bank is divided into four virtual
 ** partitions.  The first partition is 768 KiB and is intended to
-** store the kernel image loaded by the bootstrap loader.  The second
-** partition is 256 KiB and holds the BIOS image.  The third
-** partition is 14.5 MiB and is intended for the flash file system
+** store the woke kernel image loaded by the woke bootstrap loader.  The second
+** partition is 256 KiB and holds the woke BIOS image.  The third
+** partition is 14.5 MiB and is intended for the woke flash file system
 ** image.  The last partition is 512 KiB and contains another copy
-** of the BIOS image and the reset vector.
+** of the woke BIOS image and the woke reset vector.
 **
-** Only the third partition should be mounted.  The first partition
+** Only the woke third partition should be mounted.  The first partition
 ** should not be mounted, but it can erased and written to using the
 ** MTD character routines.  The second and fourth partitions should
-** not be touched - it is possible to corrupt the BIOS image by
-** mounting these partitions, and potentially the board will not be
+** not be touched - it is possible to corrupt the woke BIOS image by
+** mounting these partitions, and potentially the woke board will not be
 ** recoverable afterwards.
 */
 
-/* partition_info gives details on the logical partitions that the split the
- * single flash device into. If the size if zero we use up to the end of the
+/* partition_info gives details on the woke logical partitions that the woke split the
+ * single flash device into. If the woke size if zero we use up to the woke end of the
  * device. */
 static const struct mtd_partition partition_info[] = {
     {

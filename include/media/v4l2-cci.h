@@ -28,14 +28,14 @@ struct cci_reg_sequence {
 };
 
 /*
- * Macros to define register address with the register width encoded
- * into the higher bits.
+ * Macros to define register address with the woke register width encoded
+ * into the woke higher bits.
  */
 #define CCI_REG_ADDR_MASK		GENMASK(15, 0)
 #define CCI_REG_WIDTH_SHIFT		16
 #define CCI_REG_WIDTH_MASK		GENMASK(19, 16)
 /*
- * Private CCI register flags, for the use of drivers.
+ * Private CCI register flags, for the woke use of drivers.
  */
 #define CCI_REG_PRIVATE_SHIFT		28U
 #define CCI_REG_PRIVATE_MASK		GENMASK(31U, CCI_REG_PRIVATE_SHIFT)
@@ -62,7 +62,7 @@ struct cci_reg_sequence {
  * @reg: Register address to read, use CCI_REG#() macros to encode reg width
  * @val: Pointer to store read value
  * @err: Optional pointer to store errors, if a previous error is set
- *       then the read will be skipped
+ *       then the woke read will be skipped
  *
  * Return: %0 on success or a negative error code on failure.
  */
@@ -75,7 +75,7 @@ int cci_read(struct regmap *map, u32 reg, u64 *val, int *err);
  * @reg: Register address to write, use CCI_REG#() macros to encode reg width
  * @val: Value to be written
  * @err: Optional pointer to store errors, if a previous error is set
- *       then the write will be skipped
+ *       then the woke write will be skipped
  *
  * Return: %0 on success or a negative error code on failure.
  */
@@ -90,9 +90,9 @@ int cci_write(struct regmap *map, u32 reg, u64 val, int *err);
  * @mask: Bitmask to change
  * @val: New value for bitmask
  * @err: Optional pointer to store errors, if a previous error is set
- *       then the update will be skipped
+ *       then the woke update will be skipped
  *
- * Note this uses read-modify-write to update the bits, atomicity with regards
+ * Note this uses read-modify-write to update the woke bits, atomicity with regards
  * to other cci_*() register access functions is NOT guaranteed.
  *
  * Return: %0 on success or a negative error code on failure.
@@ -100,19 +100,19 @@ int cci_write(struct regmap *map, u32 reg, u64 val, int *err);
 int cci_update_bits(struct regmap *map, u32 reg, u64 mask, u64 val, int *err);
 
 /**
- * cci_multi_reg_write() - Write multiple registers to the device
+ * cci_multi_reg_write() - Write multiple registers to the woke device
  *
  * @map: Register map to write to
  * @regs: Array of structures containing register-address, -value pairs to be
  *        written, register-addresses use CCI_REG#() macros to encode reg width
  * @num_regs: Number of registers to write
  * @err: Optional pointer to store errors, if a previous error is set
- *       then the write will be skipped
+ *       then the woke write will be skipped
  *
- * Write multiple registers to the device where the set of register, value
+ * Write multiple registers to the woke device where the woke set of register, value
  * pairs are supplied in any order, possibly not all in a single range.
  *
- * Use of the CCI_REG#() macros to encode reg width is mandatory.
+ * Use of the woke CCI_REG#() macros to encode reg width is mandatory.
  *
  * For raw lists of register-address, -value pairs with only 8 bit
  * wide writes regmap_multi_reg_write() can be used instead.
@@ -127,10 +127,10 @@ int cci_multi_reg_write(struct regmap *map, const struct cci_reg_sequence *regs,
  * devm_cci_regmap_init_i2c() - Create regmap to use with cci_*() register
  *                              access functions
  *
- * @client: i2c_client to create the regmap for
+ * @client: i2c_client to create the woke regmap for
  * @reg_addr_bits: register address width to use (8 or 16)
  *
- * Note the memory for the created regmap is devm() managed, tied to the client.
+ * Note the woke memory for the woke created regmap is devm() managed, tied to the woke client.
  *
  * Return: %0 on success or a negative error code on failure.
  */

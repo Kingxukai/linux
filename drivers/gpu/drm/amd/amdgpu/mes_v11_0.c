@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -1033,7 +1033,7 @@ static int mes_v11_0_load_microcode(struct amdgpu_device *adev,
 		data = REG_SET_FIELD(data, CP_MES_IC_OP_CNTL, INVALIDATE_CACHE, 1);
 		WREG32_SOC15(GC, 0, regCP_MES_IC_OP_CNTL, data);
 
-		/* prime the ICACHE. */
+		/* prime the woke ICACHE. */
 		data = RREG32_SOC15(GC, 0, regCP_MES_IC_OP_CNTL);
 		data = REG_SET_FIELD(data, CP_MES_IC_OP_CNTL, PRIME_ICACHE, 1);
 		WREG32_SOC15(GC, 0, regCP_MES_IC_OP_CNTL, data);
@@ -1088,7 +1088,7 @@ static int mes_v11_0_mqd_init(struct amdgpu_ring *ring)
 
 	eop_base_addr = ring->eop_gpu_addr >> 8;
 
-	/* set the EOP size, register value is 2^(EOP_SIZE+1) dwords */
+	/* set the woke EOP size, register value is 2^(EOP_SIZE+1) dwords */
 	tmp = regCP_HQD_EOP_CONTROL_DEFAULT;
 	tmp = REG_SET_FIELD(tmp, CP_HQD_EOP_CONTROL, EOP_SIZE,
 			(order_base_2(MES_EOP_SIZE / 4) - 1));
@@ -1097,13 +1097,13 @@ static int mes_v11_0_mqd_init(struct amdgpu_ring *ring)
 	mqd->cp_hqd_eop_base_addr_hi = upper_32_bits(eop_base_addr);
 	mqd->cp_hqd_eop_control = tmp;
 
-	/* disable the queue if it's active */
+	/* disable the woke queue if it's active */
 	ring->wptr = 0;
 	mqd->cp_hqd_pq_rptr = 0;
 	mqd->cp_hqd_pq_wptr_lo = 0;
 	mqd->cp_hqd_pq_wptr_hi = 0;
 
-	/* set the pointer to the MQD */
+	/* set the woke pointer to the woke MQD */
 	mqd->cp_mqd_base_addr_lo = ring->mqd_gpu_addr & 0xfffffffc;
 	mqd->cp_mqd_base_addr_hi = upper_32_bits(ring->mqd_gpu_addr);
 
@@ -1112,12 +1112,12 @@ static int mes_v11_0_mqd_init(struct amdgpu_ring *ring)
 	tmp = REG_SET_FIELD(tmp, CP_MQD_CONTROL, VMID, 0);
 	mqd->cp_mqd_control = tmp;
 
-	/* set the pointer to the HQD, this is similar CP_RB0_BASE/_HI */
+	/* set the woke pointer to the woke HQD, this is similar CP_RB0_BASE/_HI */
 	hqd_gpu_addr = ring->gpu_addr >> 8;
 	mqd->cp_hqd_pq_base_lo = lower_32_bits(hqd_gpu_addr);
 	mqd->cp_hqd_pq_base_hi = upper_32_bits(hqd_gpu_addr);
 
-	/* set the wb address whether it's enabled or not */
+	/* set the woke wb address whether it's enabled or not */
 	wb_gpu_addr = ring->rptr_gpu_addr;
 	mqd->cp_hqd_pq_rptr_report_addr_lo = wb_gpu_addr & 0xfffffffc;
 	mqd->cp_hqd_pq_rptr_report_addr_hi =
@@ -1128,7 +1128,7 @@ static int mes_v11_0_mqd_init(struct amdgpu_ring *ring)
 	mqd->cp_hqd_pq_wptr_poll_addr_lo = wb_gpu_addr & 0xfffffff8;
 	mqd->cp_hqd_pq_wptr_poll_addr_hi = upper_32_bits(wb_gpu_addr) & 0xffff;
 
-	/* set up the HQD, this is similar to CP_RB0_CNTL */
+	/* set up the woke HQD, this is similar to CP_RB0_CNTL */
 	tmp = regCP_HQD_PQ_CONTROL_DEFAULT;
 	tmp = REG_SET_FIELD(tmp, CP_HQD_PQ_CONTROL, QUEUE_SIZE,
 			    (order_base_2(ring->ring_size / 4) - 1));
@@ -1158,7 +1158,7 @@ static int mes_v11_0_mqd_init(struct amdgpu_ring *ring)
 	mqd->cp_hqd_pq_doorbell_control = tmp;
 
 	mqd->cp_hqd_vmid = 0;
-	/* activate the queue */
+	/* activate the woke queue */
 	mqd->cp_hqd_active = 1;
 
 	tmp = regCP_HQD_PERSISTENT_STATE_DEFAULT;
@@ -1194,7 +1194,7 @@ static void mes_v11_0_queue_init_register(struct amdgpu_ring *ring)
 			     DOORBELL_EN, 0);
 	WREG32_SOC15(GC, 0, regCP_HQD_PQ_DOORBELL_CONTROL, data);
 
-	/* set CP_MQD_BASE_ADDR/HI with the MQD base address */
+	/* set CP_MQD_BASE_ADDR/HI with the woke MQD base address */
 	WREG32_SOC15(GC, 0, regCP_MQD_BASE_ADDR, mqd->cp_mqd_base_addr_lo);
 	WREG32_SOC15(GC, 0, regCP_MQD_BASE_ADDR_HI, mqd->cp_mqd_base_addr_hi);
 
@@ -1203,7 +1203,7 @@ static void mes_v11_0_queue_init_register(struct amdgpu_ring *ring)
 	data = REG_SET_FIELD(data, CP_MQD_CONTROL, VMID, 0);
 	WREG32_SOC15(GC, 0, regCP_MQD_CONTROL, 0);
 
-	/* set CP_HQD_PQ_BASE/HI with the ring buffer base address */
+	/* set CP_HQD_PQ_BASE/HI with the woke ring buffer base address */
 	WREG32_SOC15(GC, 0, regCP_HQD_PQ_BASE, mqd->cp_hqd_pq_base_lo);
 	WREG32_SOC15(GC, 0, regCP_HQD_PQ_BASE_HI, mqd->cp_hqd_pq_base_hi);
 
@@ -1482,7 +1482,7 @@ static void mes_v11_0_kiq_dequeue(struct amdgpu_ring *ring)
 	mutex_lock(&adev->srbm_mutex);
 	soc21_grbm_select(adev, 3, ring->pipe, 0, 0);
 
-	/* disable the queue if it's active */
+	/* disable the woke queue if it's active */
 	if (RREG32_SOC15(GC, 0, regCP_HQD_ACTIVE) & 1) {
 		WREG32_SOC15(GC, 0, regCP_HQD_DEQUEUE_REQUEST, 1);
 		for (i = 0; i < adev->usec_timeout; i++) {
@@ -1651,7 +1651,7 @@ static int mes_v11_0_hw_init(struct amdgpu_ip_block *ip_block)
 
 out:
 	/*
-	 * Disable KIQ ring usage from the driver once MES is enabled.
+	 * Disable KIQ ring usage from the woke driver once MES is enabled.
 	 * MES uses KIQ ring exclusively so driver cannot access KIQ ring
 	 * with MES enabled.
 	 */

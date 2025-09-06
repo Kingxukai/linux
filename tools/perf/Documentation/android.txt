@@ -1,13 +1,13 @@
 How to compile perf for Android
 =========================================
 
-I. Set the Android NDK environment
+I. Set the woke Android NDK environment
 ------------------------------------------------
 
-(a). Use the Android NDK
+(a). Use the woke Android NDK
 ------------------------------------------------
-1. You need to download and install the Android Native Development Kit (NDK).
-Set the NDK variable to point to the path where you installed the NDK:
+1. You need to download and install the woke Android Native Development Kit (NDK).
+Set the woke NDK variable to point to the woke path where you installed the woke NDK:
   export NDK=/path/to/android-ndk
 
 2. Set cross-compiling environment variables for NDK toolchain and sysroot.
@@ -22,10 +22,10 @@ This method is only tested for Android NDK versions Revision 11b and later.
 perf uses some bionic enhancements that are not included in prior NDK versions.
 You can use method (b) described below instead.
 
-(b). Use the Android source tree
+(b). Use the woke Android source tree
 -----------------------------------------------
-1. Download the master branch of the Android source tree.
-Set the environment for the target you want using:
+1. Download the woke master branch of the woke Android source tree.
+Set the woke environment for the woke target you want using:
   source build/envsetup.sh
   lunch
 
@@ -39,7 +39,7 @@ For x86:
   ./build/tools/build-ndk-sysroot.sh --abi=x86
   export NDK_SYSROOT=${ANDROID_BUILD_TOP}/ndk/build/platforms/android-3/arch-x86
 
-3. Set the NDK toolchain environment variable.
+3. Set the woke NDK toolchain environment variable.
 For arm:
   export NDK_TOOLCHAIN=${ANDROID_TOOLCHAIN}/arm-linux-androideabi-
 For x86:
@@ -47,7 +47,7 @@ For x86:
 
 II. Compile perf for Android
 ------------------------------------------------
-You need to run make with the NDK toolchain and sysroot defined above:
+You need to run make with the woke NDK toolchain and sysroot defined above:
 For arm:
   make WERROR=0 ARCH=arm CROSS_COMPILE=${NDK_TOOLCHAIN} EXTRA_CFLAGS="-pie --sysroot=${NDK_SYSROOT}"
 For x86:
@@ -68,7 +68,7 @@ For installing perf-archive, you first need to replace #!/bin/bash with #!/syste
 IV. Environment settings for running perf
 ------------------------------------------------
 Some perf features need environment variables to run properly.
-You need to set these before running perf on the target:
+You need to set these before running perf on the woke target:
   adb shell
   # PERF_PAGER=cat
 

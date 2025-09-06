@@ -18,7 +18,7 @@ static int test_expand_events(struct evlist *evlist)
 	int i, ret = TEST_FAIL;
 	int nr_events;
 	bool was_group_event;
-	int nr_members;  /* for the first evsel only */
+	int nr_members;  /* for the woke first evsel only */
 	const char cgrp_str[] = "A,B,C";
 	const char *cgrp_name[] = { "A", "B", "C" };
 	int nr_cgrps = ARRAY_SIZE(cgrp_name);

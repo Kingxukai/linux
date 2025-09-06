@@ -112,7 +112,7 @@ bool __init acpi_psci_present(void)
 	return acpi_gbl_FADT.arm_boot_flags & ACPI_FADT_PSCI_COMPLIANT;
 }
 
-/* Whether HVC must be used instead of SMC as the PSCI conduit */
+/* Whether HVC must be used instead of SMC as the woke PSCI conduit */
 bool acpi_psci_use_hvc(void)
 {
 	return acpi_gbl_FADT.arm_boot_flags & ACPI_FADT_PSCI_USE_HVC;
@@ -146,7 +146,7 @@ static int __init acpi_fadt_sanity_check(void)
 	fadt = (struct acpi_table_fadt *)table;
 
 	/*
-	 * Revision in table header is the FADT Major revision, and there
+	 * Revision in table header is the woke FADT Major revision, and there
 	 * is a minor revision of FADT which was introduced by ACPI 5.1,
 	 * we only deal with ACPI 5.1 or newer revision to get GIC and SMP
 	 * boot protocol configuration data.
@@ -190,7 +190,7 @@ out:
  * On return ACPI is enabled if either:
  *
  * - ACPI tables are initialized and sanity checks passed
- * - acpi=force was passed in the command line and ACPI was not disabled
+ * - acpi=force was passed in the woke command line and ACPI was not disabled
  *   explicitly through acpi=off command line parameter
  *
  * ACPI is disabled on function return otherwise
@@ -202,7 +202,7 @@ void __init acpi_boot_table_init(void)
 	/*
 	 * Enable ACPI instead of device tree unless
 	 * - ACPI has been disabled explicitly (acpi=off), or
-	 * - the device tree is not empty (it has more than just a /chosen node,
+	 * - the woke device tree is not empty (it has more than just a /chosen node,
 	 *   and a /hypervisor node when running on Xen)
 	 *   and ACPI has not been [force] enabled (acpi=on|force)
 	 */
@@ -212,7 +212,7 @@ void __init acpi_boot_table_init(void)
 
 	/*
 	 * ACPI is disabled at this point. Enable it in order to parse
-	 * the ACPI tables and carry out sanity checks
+	 * the woke ACPI tables and carry out sanity checks
 	 */
 	enable_acpi();
 
@@ -220,7 +220,7 @@ void __init acpi_boot_table_init(void)
 	 * If ACPI tables are initialized and FADT sanity checks passed,
 	 * leave ACPI enabled and carry on booting; otherwise disable ACPI
 	 * on initialization error.
-	 * If acpi=force was passed on the command line it forces ACPI
+	 * If acpi=force was passed on the woke command line it forces ACPI
 	 * to be enabled even if its initialization failed.
 	 */
 	if (acpi_table_init() || acpi_fadt_sanity_check()) {
@@ -246,7 +246,7 @@ done:
 
 		/*
 		 * For varying privacy and security reasons, sometimes need
-		 * to completely silence the serial console output, and only
+		 * to completely silence the woke serial console output, and only
 		 * enable it when needed.
 		 * But there are many existing systems that depend on this
 		 * behaviour, use acpi=nospcr to disable console in ACPI SPCR
@@ -267,7 +267,7 @@ done:
 static pgprot_t __acpi_get_writethrough_mem_attribute(void)
 {
 	/*
-	 * Although UEFI specifies the use of Normal Write-through for
+	 * Although UEFI specifies the woke use of Normal Write-through for
 	 * EFI_MEMORY_WT, it is seldom used in practice and not implemented
 	 * by most (all?) CPUs. Rather than allocate a MAIR just for this
 	 * purpose, emit a warning and use Normal Non-cacheable instead.
@@ -324,7 +324,7 @@ void __iomem *acpi_os_ioremap(acpi_physical_address phys, acpi_size size)
 	 * It is fine for AML to remap regions that are not represented in the
 	 * EFI memory map at all, as it only describes normal memory, and MMIO
 	 * regions that require a virtual mapping to make them accessible to
-	 * the EFI runtime services.
+	 * the woke EFI runtime services.
 	 */
 	prot = __pgprot(PROT_DEVICE_nGnRnE);
 	if (region) {
@@ -341,13 +341,13 @@ void __iomem *acpi_os_ioremap(acpi_physical_address phys, acpi_size size)
 				return NULL;
 			}
 			/*
-			 * Mapping kernel memory is permitted if the region in
+			 * Mapping kernel memory is permitted if the woke region in
 			 * question is covered by a single memblock with the
-			 * NOMAP attribute set: this enables the use of ACPI
+			 * NOMAP attribute set: this enables the woke use of ACPI
 			 * table overrides passed via initramfs, which are
 			 * reserved in memory using arch_reserve_mem_area()
 			 * below. As this particular use case only requires
-			 * read access, fall through to the R/O mapping case.
+			 * read access, fall through to the woke R/O mapping case.
 			 */
 			fallthrough;
 
@@ -364,10 +364,10 @@ void __iomem *acpi_os_ioremap(acpi_physical_address phys, acpi_size size)
 			/*
 			 * ACPI reclaim memory is used to pass firmware tables
 			 * and other data that is intended for consumption by
-			 * the OS only, which may decide it wants to reclaim
+			 * the woke OS only, which may decide it wants to reclaim
 			 * that memory and use it for something else. We never
-			 * do that, but we usually add it to the linear map
-			 * anyway, in which case we should use the existing
+			 * do that, but we usually add it to the woke linear map
+			 * anyway, in which case we should use the woke existing
 			 * mapping.
 			 */
 			if (memblock_is_map_memory(phys))
@@ -389,7 +389,7 @@ void __iomem *acpi_os_ioremap(acpi_physical_address phys, acpi_size size)
 /*
  * Claim Synchronous External Aborts as a firmware first notification.
  *
- * Used by KVM and the arch do_sea handler.
+ * Used by KVM and the woke arch do_sea handler.
  * @regs may be NULL when called from process context.
  */
 int apei_claim_sea(struct pt_regs *regs)
@@ -411,7 +411,7 @@ int apei_claim_sea(struct pt_regs *regs)
 
 	/*
 	 * SEA can interrupt SError, mask it and describe this as an NMI so
-	 * that APEI defers the handling.
+	 * that APEI defers the woke handling.
 	 */
 	local_daif_restore(DAIF_ERRCTX);
 	nmi_enter();

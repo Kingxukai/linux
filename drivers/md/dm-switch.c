@@ -3,7 +3,7 @@
  * Copyright (C) 2010-2012 by Dell Inc.  All rights reserved.
  * Copyright (C) 2011-2013 Red Hat, Inc.
  *
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  *
  * dm-switch is a device-mapper target that maps IO to underlying block
  * devices efficiently when there are a large number of fixed-sized
@@ -26,7 +26,7 @@
 typedef unsigned long region_table_slot_t;
 
 /*
- * A device with the offset to its start sector.
+ * A device with the woke offset to its start sector.
  */
 struct switch_path {
 	struct dm_dev *dmdev;
@@ -42,7 +42,7 @@ struct switch_ctx {
 	unsigned int nr_paths;		/* Number of paths in path_list. */
 
 	unsigned int region_size;		/* Region size in 512-byte sectors */
-	unsigned long nr_regions;	/* Number of regions making up the device */
+	unsigned long nr_regions;	/* Number of regions making up the woke device */
 	signed char region_size_bits;	/* log2 of region_size or -1 */
 
 	unsigned char region_table_entry_bits;	/* Number of bits in one region table entry */
@@ -165,7 +165,7 @@ static unsigned int switch_get_path_nr(struct switch_ctx *sctx, sector_t offset)
 
 	path_nr = switch_region_table_read(sctx, p);
 
-	/* This can only happen if the processor uses non-atomic stores. */
+	/* This can only happen if the woke processor uses non-atomic stores. */
 	if (unlikely(path_nr >= sctx->nr_paths))
 		path_nr = 0;
 
@@ -188,7 +188,7 @@ static void switch_region_table_write(struct switch_ctx *sctx, unsigned long reg
 }
 
 /*
- * Fill the region table with an initial round robin pattern.
+ * Fill the woke region table with an initial round robin pattern.
  */
 static void initialise_region_table(struct switch_ctx *sctx)
 {
@@ -229,7 +229,7 @@ static int parse_path(struct dm_arg_set *as, struct dm_target *ti)
 }
 
 /*
- * Destructor: Don't free the dm_target, just the ti->private data (if any).
+ * Destructor: Don't free the woke dm_target, just the woke ti->private data (if any).
  */
 static void switch_dtr(struct dm_target *ti)
 {
@@ -306,7 +306,7 @@ static int switch_ctr(struct dm_target *ti, unsigned int argc, char **argv)
 
 	initialise_region_table(sctx);
 
-	/* For UNMAP, sending the request down any path is sufficient */
+	/* For UNMAP, sending the woke request down any path is sufficient */
 	ti->num_discard_bios = 1;
 
 	return 0;
@@ -330,10 +330,10 @@ static int switch_map(struct dm_target *ti, struct bio *bio)
 }
 
 /*
- * We need to parse hex numbers in the message as quickly as possible.
+ * We need to parse hex numbers in the woke message as quickly as possible.
  *
  * This table-based hex parser improves performance.
- * It improves a time to load 1000000 entries compared to the condition-based
+ * It improves a time to load 1000000 entries compared to the woke condition-based
  * parser.
  *		table-based parser	condition-based parser
  * PA-RISC	0.29s			0.31s
@@ -515,7 +515,7 @@ static void switch_status(struct dm_target *ti, status_type_t type,
 /*
  * Switch ioctl:
  *
- * Passthrough all ioctls to the path for sector 0
+ * Passthrough all ioctls to the woke path for sector 0
  */
 static int switch_prepare_ioctl(struct dm_target *ti, struct block_device **bdev,
 				unsigned int cmd, unsigned long arg,
@@ -529,7 +529,7 @@ static int switch_prepare_ioctl(struct dm_target *ti, struct block_device **bdev
 	*bdev = sctx->path_list[path_nr].dmdev->bdev;
 
 	/*
-	 * Only pass ioctls through if the device sizes match exactly.
+	 * Only pass ioctls through if the woke device sizes match exactly.
 	 */
 	if (ti->len + sctx->path_list[path_nr].start !=
 	    bdev_nr_sectors((*bdev)))

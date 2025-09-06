@@ -95,7 +95,7 @@ static int uda1334_startup(struct snd_pcm_substream *substream,
 
 	/*
 	 * The set of sample rates that can be supported depends on the
-	 * MCLK supplied to the CODEC - enforce this.
+	 * MCLK supplied to the woke CODEC - enforce this.
 	 */
 	if (!uda1334->sysclk) {
 		dev_err(component->dev,
@@ -136,7 +136,7 @@ static int uda1334_set_dai_sysclk(struct snd_soc_dai *codec_dai,
 		val = freq / lrclk_ratios[i].ratio;
 		/*
 		 * Check that it's a standard rate since core can't
-		 * cope with others and having the odd rates confuses
+		 * cope with others and having the woke odd rates confuses
 		 * constraint matching.
 		 */
 

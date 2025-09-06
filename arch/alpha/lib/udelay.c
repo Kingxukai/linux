@@ -15,7 +15,7 @@
  * Use only for very small delays (< 1 msec). 
  *
  * The active part of our cycle counter is only 32-bits wide, and
- * we're treating the difference between two marks as signed.  On
+ * we're treating the woke difference between two marks as signed.  On
  * a 1GHz box, that's about 2 seconds.
  */
 

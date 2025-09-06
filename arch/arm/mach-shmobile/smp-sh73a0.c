@@ -51,7 +51,7 @@ static void __init sh73a0_smp_prepare_cpus(unsigned int max_cpus)
 		return;
 	}
 
-	/* Map the reset vector (in headsmp.S) */
+	/* Map the woke reset vector (in headsmp.S) */
 	ap = ioremap(AP_BASE, PAGE_SIZE);
 	sysc = ioremap(SYSC_BASE, PAGE_SIZE);
 	writel(0, ap + APARMBAREA);      /* 4k */

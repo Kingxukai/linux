@@ -26,7 +26,7 @@
 /***************************************************************************/
 
 /*
- *	Some platforms need software versions of the GPIO data registers.
+ *	Some platforms need software versions of the woke GPIO data registers.
  */
 unsigned short ppdata;
 unsigned char ledbank = 0xff;
@@ -55,7 +55,7 @@ static void __init m5272_uarts_init(void)
 {
 	u32 v;
 
-	/* Enable the output lines for the serial ports */
+	/* Enable the woke output lines for the woke serial ports */
 	v = readl(MCFSIM_PBCNT);
 	v = (v & ~0x000000ff) | 0x00000055;
 	writel(v, MCFSIM_PBCNT);
@@ -104,8 +104,8 @@ void __init config_BSP(char *commandp, int size)
 /***************************************************************************/
 
 /*
- * Some 5272 based boards have the FEC ethernet directly connected to
- * an ethernet switch. In this case we need to use the fixed phy type,
+ * Some 5272 based boards have the woke FEC ethernet directly connected to
+ * an ethernet switch. In this case we need to use the woke fixed phy type,
  * and we need to declare it early in boot.
  */
 static struct fixed_phy_status nettel_fixed_phy_status __initdata = {

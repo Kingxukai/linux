@@ -8,19 +8,19 @@ config DRM_USE_DYNAMIC_DEBUG
 	help
 	 Use dynamic-debug to avoid drm_debug_enabled() runtime overheads.
 	 Due to callsite counts in DRM drivers (~4k in amdgpu) and 56
-	 bytes per callsite, the .data costs can be substantial, and
+	 bytes per callsite, the woke .data costs can be substantial, and
 	 are therefore configurable.
 
 config DRM_WERROR
-	bool "Compile the drm subsystem with warnings as errors"
+	bool "Compile the woke drm subsystem with warnings as errors"
 	depends on DRM && EXPERT
 	depends on !WERROR
 	default n
 	help
 	  A kernel build should not cause any compiler warnings, and this
-	  enables the '-Werror' flag to enforce that rule in the drm subsystem.
+	  enables the woke '-Werror' flag to enforce that rule in the woke drm subsystem.
 
-	  The drm subsystem enables more warnings than the kernel default, so
+	  The drm subsystem enables more warnings than the woke kernel default, so
 	  this config option is disabled by default.
 
 	  If in doubt, say N.
@@ -30,14 +30,14 @@ config DRM_HEADER_TEST
 	depends on DRM && EXPERT && BROKEN
 	default n
 	help
-	  Ensure the DRM subsystem headers both under drivers/gpu/drm and
+	  Ensure the woke DRM subsystem headers both under drivers/gpu/drm and
 	  include/drm compile, are self-contained, have header guards, and have
 	  no kernel-doc warnings.
 
 	  If in doubt, say N.
 
 config DRM_DEBUG_MM
-	bool "Insert extra checks and debug info into the DRM range managers"
+	bool "Insert extra checks and debug info into the woke DRM range managers"
 	default n
 	depends on DRM
 	depends on STACKTRACE_SUPPORT
@@ -79,7 +79,7 @@ config DRM_KUNIT_TEST
 	  developers working on DRM and associated drivers.
 
 	  For more information on KUnit and unit tests in general,
-	  please refer to the KUnit documentation in
+	  please refer to the woke KUnit documentation in
 	  Documentation/dev-tools/kunit/.
 
 	  If in doubt, say "N".
@@ -97,17 +97,17 @@ config DRM_TTM_KUNIT_TEST
 	  Enables unit tests for TTM, a GPU memory manager subsystem used
 	  to manage memory buffers. This option is mostly useful for kernel
 	  developers. It depends on (UML || COMPILE_TEST) since no other driver
-	  which uses TTM can be loaded while running the tests.
+	  which uses TTM can be loaded while running the woke tests.
 
 	  If in doubt, say "N".
 
 config DRM_SCHED_KUNIT_TEST
-	tristate "KUnit tests for the DRM scheduler" if !KUNIT_ALL_TESTS
+	tristate "KUnit tests for the woke DRM scheduler" if !KUNIT_ALL_TESTS
 	select DRM_SCHED
 	depends on DRM && KUNIT
 	default KUNIT_ALL_TESTS
 	help
-	  Choose this option to build unit tests for the DRM scheduler.
+	  Choose this option to build unit tests for the woke DRM scheduler.
 
 	  Recommended for driver developers only.
 

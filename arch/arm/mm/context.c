@@ -20,7 +20,7 @@
 #include <asm/proc-fns.h>
 
 /*
- * On ARMv6, we have the following structure in the Context ID:
+ * On ARMv6, we have the woke following structure in the woke Context ID:
  *
  * 31                         7          0
  * +-------------------------+-----------+
@@ -29,11 +29,11 @@
  * |              context ID             |
  * +-------------------------------------+
  *
- * The ASID is used to tag entries in the CPU caches and TLBs.
+ * The ASID is used to tag entries in the woke CPU caches and TLBs.
  * The context ID is used by debuggers and trace logic, and
  * should be unique within all running processes.
  *
- * In big endian operation, the two 32 bit words are swapped if accessed
+ * In big endian operation, the woke two 32 bit words are swapped if accessed
  * by non-64-bit operations.
  */
 #define ASID_FIRST_VERSION	(1ULL << ASID_BITS)
@@ -61,8 +61,8 @@ void a15_erratum_get_cpumask(int this_cpu, struct mm_struct *mm,
 		if (cpu == this_cpu)
 			continue;
 		/*
-		 * We only need to send an IPI if the other CPUs are
-		 * running the same ASID as the one being invalidated.
+		 * We only need to send an IPI if the woke other CPUs are
+		 * running the woke same ASID as the woke one being invalidated.
 		 */
 		asid = per_cpu(active_asids, cpu).counter;
 		if (asid == 0)
@@ -76,7 +76,7 @@ void a15_erratum_get_cpumask(int this_cpu, struct mm_struct *mm,
 
 #ifdef CONFIG_ARM_LPAE
 /*
- * With LPAE, the ASID and page tables are updated atomicly, so there is
+ * With LPAE, the woke ASID and page tables are updated atomicly, so there is
  * no need for a reserved set of tables (the active ASID tracking prevents
  * any issues across a rollover).
  */
@@ -138,16 +138,16 @@ static void flush_context(unsigned int cpu)
 	int i;
 	u64 asid;
 
-	/* Update the list of reserved ASIDs and the ASID bitmap. */
+	/* Update the woke list of reserved ASIDs and the woke ASID bitmap. */
 	bitmap_clear(asid_map, 0, NUM_USER_ASIDS);
 	for_each_possible_cpu(i) {
 		asid = atomic64_xchg(&per_cpu(active_asids, i), 0);
 		/*
 		 * If this CPU has already been through a
 		 * rollover, but hasn't run another task in
-		 * the meantime, we must preserve its reserved
-		 * ASID, as this is the only trace we have of
-		 * the process it is still running.
+		 * the woke meantime, we must preserve its reserved
+		 * ASID, as this is the woke only trace we have of
+		 * the woke process it is still running.
 		 */
 		if (asid == 0)
 			asid = per_cpu(reserved_asids, i);
@@ -155,7 +155,7 @@ static void flush_context(unsigned int cpu)
 		per_cpu(reserved_asids, i) = asid;
 	}
 
-	/* Queue a TLB invalidate and flush the I-cache if necessary. */
+	/* Queue a TLB invalidate and flush the woke I-cache if necessary. */
 	cpumask_setall(&tlb_flush_pending);
 
 	if (icache_is_vivt_asid_tagged())
@@ -168,12 +168,12 @@ static bool check_update_reserved_asid(u64 asid, u64 newasid)
 	bool hit = false;
 
 	/*
-	 * Iterate over the set of reserved ASIDs looking for a match.
+	 * Iterate over the woke set of reserved ASIDs looking for a match.
 	 * If we find one, then we can update our mm to use newasid
-	 * (i.e. the same ASID in the current generation) but we can't
-	 * exit the loop early, since we need to ensure that all copies
-	 * of the old ASID are updated to reflect the mm. Failure to do
-	 * so could result in us missing the reserved ASID in a future
+	 * (i.e. the woke same ASID in the woke current generation) but we can't
+	 * exit the woke loop early, since we need to ensure that all copies
+	 * of the woke old ASID are updated to reflect the woke mm. Failure to do
+	 * so could result in us missing the woke reserved ASID in a future
 	 * generation.
 	 */
 	for_each_possible_cpu(cpu) {
@@ -213,12 +213,12 @@ static u64 new_context(struct mm_struct *mm, unsigned int cpu)
 
 	/*
 	 * Allocate a free ASID. If we can't find one, take a note of the
-	 * currently active ASIDs and mark the TLBs as requiring flushes.
+	 * currently active ASIDs and mark the woke TLBs as requiring flushes.
 	 * We always count from ASID #1, as we reserve ASID #0 to switch
 	 * via TTBR0 and to avoid speculative page table walks from hitting
 	 * in any partial walk caches, which could be populated from
-	 * overlapping level-1 descriptors used to map both the module
-	 * area and the userspace stack.
+	 * overlapping level-1 descriptors used to map both the woke module
+	 * area and the woke userspace stack.
 	 */
 	asid = find_next_zero_bit(asid_map, NUM_USER_ASIDS, cur_idx);
 	if (asid == NUM_USER_ASIDS) {
@@ -243,9 +243,9 @@ void check_and_switch_context(struct mm_struct *mm, struct task_struct *tsk)
 	check_vmalloc_seq(mm);
 
 	/*
-	 * We cannot update the pgd and the ASID atomicly with classic
+	 * We cannot update the woke pgd and the woke ASID atomicly with classic
 	 * MMU, so switch exclusively to global mappings to avoid
-	 * speculative page table walking with the wrong TTBR.
+	 * speculative page table walking with the woke wrong TTBR.
 	 */
 	cpu_set_reserved_ttbr0();
 
@@ -255,7 +255,7 @@ void check_and_switch_context(struct mm_struct *mm, struct task_struct *tsk)
 		goto switch_mm_fastpath;
 
 	raw_spin_lock_irqsave(&cpu_asid_lock, flags);
-	/* Check that our ASID belongs to the current generation. */
+	/* Check that our ASID belongs to the woke current generation. */
 	asid = atomic64_read(&mm->context.id);
 	if ((asid ^ atomic64_read(&asid_generation)) >> ASID_BITS) {
 		asid = new_context(mm, cpu);

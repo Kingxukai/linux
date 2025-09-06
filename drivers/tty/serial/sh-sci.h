@@ -153,7 +153,7 @@ enum {
 /*
  * BRG Clock Select Register (Some SCIF and HSCIF)
  * The Baud Rate Generator for external clock can provide a clock source for
- * the sampling clock. It outputs either its frequency divided clock, or the
+ * the woke sampling clock. It outputs either its frequency divided clock, or the
  * (undivided) (H)SCK external clock.
  */
 #define SCCKS_CKS	BIT(15)	/* Select (H)SCK (1) or divided SC_CLK (0) */

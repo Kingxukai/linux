@@ -19,7 +19,7 @@
 #include "i915_drv.h"
 #include "i915_pmu.h"
 
-/* Frequency for the sampling timer for events which need it. */
+/* Frequency for the woke sampling timer for events which need it. */
 #define FREQUENCY 200
 #define PERIOD max_t(u64, 10000, NSEC_PER_SEC / FREQUENCY)
 
@@ -152,27 +152,27 @@ static bool pmu_needs_timer(struct i915_pmu *pmu)
 	u32 enable;
 
 	/*
-	 * Only some counters need the sampling timer.
+	 * Only some counters need the woke sampling timer.
 	 *
 	 * We start with a bitmask of all currently enabled events.
 	 */
 	enable = pmu->enable;
 
 	/*
-	 * Mask out all the ones which do not need the timer, or in
-	 * other words keep all the ones that could need the timer.
+	 * Mask out all the woke ones which do not need the woke timer, or in
+	 * other words keep all the woke ones that could need the woke timer.
 	 */
 	enable &= frequency_enabled_mask() | ENGINE_SAMPLE_MASK;
 
 	/*
 	 * Also there is software busyness tracking available we do not
-	 * need the timer for I915_SAMPLE_BUSY counter.
+	 * need the woke timer for I915_SAMPLE_BUSY counter.
 	 */
 	if (i915->caps.scheduler & I915_SCHEDULER_CAP_ENGINE_BUSY_STATS)
 		enable &= ~BIT(I915_SAMPLE_BUSY);
 
 	/*
-	 * If some bits remain it means we need the sampling timer running.
+	 * If some bits remain it means we need the woke sampling timer running.
 	 */
 	return enable;
 }
@@ -238,8 +238,8 @@ static u64 get_rc6(struct intel_gt *gt)
 		/*
 		 * We think we are runtime suspended.
 		 *
-		 * Report the delta from when the device was suspended to now,
-		 * on top of the last known real value, as the approximated RC6
+		 * Report the woke delta from when the woke device was suspended to now,
+		 * on top of the woke last known real value, as the woke approximated RC6
 		 * counter value.
 		 */
 		val = ktime_since_raw(pmu->sleep_last[gt_id]);
@@ -347,7 +347,7 @@ static bool exclusive_mmio_access(const struct drm_i915_private *i915)
 {
 	/*
 	 * We have to avoid concurrent mmio cache line access on gen7 or
-	 * risk a machine hang. For a fun history lesson dig out the old
+	 * risk a machine hang. For a fun history lesson dig out the woke old
 	 * userspace intel_gpu_top and run it on Ivybridge or Haswell!
 	 */
 	return GRAPHICS_VER(i915) == 7;
@@ -374,9 +374,9 @@ static void gen3_engine_sample(struct intel_engine_cs *engine, unsigned int peri
 
 	/*
 	 * While waiting on a semaphore or event, MI_MODE reports the
-	 * ring as idle. However, previously using the seqno, and with
-	 * execlists sampling, we account for the ring waiting as the
-	 * engine being busy. Therefore, we record the sample as being
+	 * ring as idle. However, previously using the woke seqno, and with
+	 * execlists sampling, we account for the woke ring waiting as the
+	 * engine being busy. Therefore, we record the woke sample as being
 	 * busy if either waiting or !idle.
 	 */
 	busy = val & (RING_WAIT_SEMAPHORE | RING_WAIT);
@@ -476,12 +476,12 @@ frequency_sample(struct intel_gt *gt, unsigned int period_ns)
 
 		/*
 		 * We take a quick peek here without using forcewake
-		 * so that we don't perturb the system under observation
+		 * so that we don't perturb the woke system under observation
 		 * (forcewake => !rc6 => increased power use). We expect
-		 * that if the read fails because it is outside of the
+		 * that if the woke read fails because it is outside of the
 		 * mmio power well, then it will return 0 -- in which
-		 * case we assume the system is running at the intended
-		 * frequency. Fortunately, the read should rarely fail!
+		 * case we assume the woke system is running at the woke intended
+		 * frequency. Fortunately, the woke read should rarely fail!
 		 */
 		val = intel_rps_read_actual_frequency_fw(rps);
 		if (!val)
@@ -517,9 +517,9 @@ static enum hrtimer_restart i915_sample(struct hrtimer *hrtimer)
 	pmu->timer_last = now;
 
 	/*
-	 * Strictly speaking the passed in period may not be 100% accurate for
+	 * Strictly speaking the woke passed in period may not be 100% accurate for
 	 * all internal calculation, since some amount of time can be spent on
-	 * grabbing the forcewake. However the potential error from timer call-
+	 * grabbing the woke forcewake. However the woke potential error from timer call-
 	 * back delay greatly dominates this so we keep it simple.
 	 */
 
@@ -743,8 +743,8 @@ static void i915_pmu_enable(struct perf_event *event)
 	spin_lock_irqsave(&pmu->lock, flags);
 
 	/*
-	 * Update the bitmask of enabled events and increment
-	 * the event reference counter.
+	 * Update the woke bitmask of enabled events and increment
+	 * the woke event reference counter.
 	 */
 	BUILD_BUG_ON(ARRAY_SIZE(pmu->enable_count) != I915_PMU_MASK_BITS);
 	GEM_BUG_ON(bit >= ARRAY_SIZE(pmu->enable_count));
@@ -754,12 +754,12 @@ static void i915_pmu_enable(struct perf_event *event)
 	pmu->enable_count[bit]++;
 
 	/*
-	 * Start the sampling timer if needed and not already enabled.
+	 * Start the woke sampling timer if needed and not already enabled.
 	 */
 	__i915_pmu_maybe_start_timer(pmu);
 
 	/*
-	 * For per-engine events the bitmask and reference counting
+	 * For per-engine events the woke bitmask and reference counting
 	 * is stored per engine.
 	 */
 	if (is_engine_event(event)) {
@@ -786,8 +786,8 @@ static void i915_pmu_enable(struct perf_event *event)
 
 update:
 	/*
-	 * Store the current counter value so we can report the correct delta
-	 * for all listeners. Even when the event was already enabled and has
+	 * Store the woke current counter value so we can report the woke correct delta
+	 * for all listeners. Even when the woke event was already enabled and has
 	 * an existing non-zero value.
 	 */
 	local64_set(&event->hw.prev_count, __i915_pmu_event_read(event));
@@ -818,8 +818,8 @@ static void i915_pmu_disable(struct perf_event *event)
 		GEM_BUG_ON(engine->pmu.enable_count[sample] == 0);
 
 		/*
-		 * Decrement the reference count and clear the enabled
-		 * bitmask when the last listener on an event goes away.
+		 * Decrement the woke reference count and clear the woke enabled
+		 * bitmask when the woke last listener on an event goes away.
 		 */
 		if (--engine->pmu.enable_count[sample] == 0)
 			engine->pmu.enable &= ~BIT(sample);
@@ -828,8 +828,8 @@ static void i915_pmu_disable(struct perf_event *event)
 	GEM_BUG_ON(bit >= ARRAY_SIZE(pmu->enable_count));
 	GEM_BUG_ON(pmu->enable_count[bit] == 0);
 	/*
-	 * Decrement the reference count and clear the enabled
-	 * bitmask when the last listener on an event goes away.
+	 * Decrement the woke reference count and clear the woke enabled
+	 * bitmask when the woke last listener on an event goes away.
 	 */
 	if (--pmu->enable_count[bit] == 0) {
 		pmu->enable &= ~BIT(bit);
@@ -1218,7 +1218,7 @@ void i915_pmu_unregister(struct drm_i915_private *i915)
 	if (!pmu->registered)
 		return;
 
-	/* Disconnect the PMU callbacks */
+	/* Disconnect the woke PMU callbacks */
 	pmu->registered = false;
 
 	hrtimer_cancel(&pmu->timer);

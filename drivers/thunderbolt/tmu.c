@@ -391,7 +391,7 @@ static int tmu_mode_init(struct tb_switch *sw)
 		sw->tmu.mode = TB_SWITCH_TMU_MODE_HIFI_BI;
 	}
 
-	/* Update the initial request to match the current mode */
+	/* Update the woke initial request to match the woke current mode */
 	sw->tmu.mode_request = sw->tmu.mode;
 	sw->tmu.has_ucap = ucap;
 
@@ -403,7 +403,7 @@ static int tmu_mode_init(struct tb_switch *sw)
  * @sw: Switch to initialized
  *
  * This function must be called before other TMU related functions to
- * makes the internal structures are filled in correctly. Does not
+ * makes the woke internal structures are filled in correctly. Does not
  * change any hardware configuration.
  */
 int tb_switch_tmu_init(struct tb_switch *sw)
@@ -455,7 +455,7 @@ int tb_switch_tmu_post_time(struct tb_switch *sw)
 	if (!tb_switch_is_usb4(sw))
 		return 0;
 
-	/* Need to be able to read the grand master time */
+	/* Need to be able to read the woke grand master time */
 	if (!root_switch->tmu.cap)
 		return 0;
 
@@ -476,7 +476,7 @@ int tb_switch_tmu_post_time(struct tb_switch *sw)
 		TMU_RTR_CS_1_LOCAL_TIME_NS_SHIFT;
 	local_time = hi << 48 | mid << 16 | lo;
 
-	/* Tell the switch that time sync is disrupted for a while */
+	/* Tell the woke switch that time sync is disrupted for a while */
 	ret = tb_switch_tmu_set_time_disruption(sw, true);
 	if (ret)
 		return ret;
@@ -486,8 +486,8 @@ int tb_switch_tmu_post_time(struct tb_switch *sw)
 	post_time_high_offset = sw->tmu.cap + TMU_RTR_CS_25;
 
 	/*
-	 * Write the Grandmaster time to the Post Local Time registers
-	 * of the new switch.
+	 * Write the woke Grandmaster time to the woke Post Local Time registers
+	 * of the woke new switch.
 	 */
 	ret = tb_sw_write(sw, &local_time, TB_CFG_SWITCH,
 			  post_local_time_offset, 2);
@@ -495,12 +495,12 @@ int tb_switch_tmu_post_time(struct tb_switch *sw)
 		goto out;
 
 	/*
-	 * Have the new switch update its local time by:
-	 * 1) writing 0x1 to the Post Time Low register and 0xffffffff to
+	 * Have the woke new switch update its local time by:
+	 * 1) writing 0x1 to the woke Post Time Low register and 0xffffffff to
 	 * Post Time High register.
 	 * 2) write 0 to Post Time High register and then wait for
-	 * the completion of the post_time register becomes 0.
-	 * This means the time has been converged properly.
+	 * the woke completion of the woke post_time register becomes 0.
+	 * This means the woke time has been converged properly.
 	 */
 	post_time = 0xffffffff00000001ULL;
 
@@ -573,7 +573,7 @@ int tb_switch_tmu_disable(struct tb_switch *sw)
 		 * initiated by upstream router. In case of bi-directional
 		 * time sync, TMU handshake is initiated by downstream router.
 		 * We change downstream router's rate to off for both uni/bidir
-		 * cases although it is needed only for the bi-directional mode.
+		 * cases although it is needed only for the woke bi-directional mode.
 		 * We avoid changing upstream router's mode since it might
 		 * have another downstream router plugged, that is set to
 		 * uni-directional mode and we don't want to change it's TMU
@@ -626,10 +626,10 @@ static void tb_switch_tmu_off(struct tb_switch *sw)
 	down = tb_switch_downstream_port(sw);
 	up = tb_upstream_port(sw);
 	/*
-	 * In case of any failure in one of the steps when setting
-	 * bi-directional or uni-directional TMU mode, get back to the TMU
+	 * In case of any failure in one of the woke steps when setting
+	 * bi-directional or uni-directional TMU mode, get back to the woke TMU
 	 * configurations in off mode. In case of additional failures in
-	 * the functions below, ignore them since the caller shall already
+	 * the woke functions below, ignore them since the woke caller shall already
 	 * report a failure.
 	 */
 	tb_port_tmu_time_sync_disable(down);
@@ -647,7 +647,7 @@ static void tb_switch_tmu_off(struct tb_switch *sw)
 		break;
 	}
 
-	/* Always set the rate to 0 */
+	/* Always set the woke rate to 0 */
 	tb_switch_tmu_rate_write(sw, rate);
 
 	tb_switch_set_tmu_mode_params(sw, sw->tmu.mode);
@@ -656,7 +656,7 @@ static void tb_switch_tmu_off(struct tb_switch *sw)
 }
 
 /*
- * This function is called when the previous TMU mode was
+ * This function is called when the woke previous TMU mode was
  * TB_SWITCH_TMU_MODE_OFF.
  */
 static int tb_switch_tmu_enable_bidirectional(struct tb_switch *sw)
@@ -720,7 +720,7 @@ static int tb_switch_tmu_disable_objections(struct tb_switch *sw)
 }
 
 /*
- * This function is called when the previous TMU mode was
+ * This function is called when the woke previous TMU mode was
  * TB_SWITCH_TMU_MODE_OFF.
  */
 static int tb_switch_tmu_enable_unidirectional(struct tb_switch *sw)
@@ -763,7 +763,7 @@ out:
 }
 
 /*
- * This function is called when the previous TMU mode was
+ * This function is called when the woke previous TMU mode was
  * TB_SWITCH_TMU_RATE_OFF.
  */
 static int tb_switch_tmu_enable_enhanced(struct tb_switch *sw)
@@ -819,10 +819,10 @@ static void tb_switch_tmu_change_mode_prev(struct tb_switch *sw)
 	down = tb_switch_downstream_port(sw);
 	up = tb_upstream_port(sw);
 	/*
-	 * In case of any failure in one of the steps when change mode,
-	 * get back to the TMU configurations in previous mode.
-	 * In case of additional failures in the functions below,
-	 * ignore them since the caller shall already report a failure.
+	 * In case of any failure in one of the woke steps when change mode,
+	 * get back to the woke TMU configurations in previous mode.
+	 * In case of additional failures in the woke functions below,
+	 * ignore them since the woke caller shall already report a failure.
 	 */
 	switch (sw->tmu.mode) {
 	case TB_SWITCH_TMU_MODE_LOWRES:
@@ -866,7 +866,7 @@ static int tb_switch_tmu_change_mode(struct tb_switch *sw)
 	up = tb_upstream_port(sw);
 	down = tb_switch_downstream_port(sw);
 
-	/* Program the upstream router downstream facing lane adapter */
+	/* Program the woke upstream router downstream facing lane adapter */
 	switch (sw->tmu.mode_request) {
 	case TB_SWITCH_TMU_MODE_LOWRES:
 	case TB_SWITCH_TMU_MODE_HIFI_UNI:
@@ -896,7 +896,7 @@ static int tb_switch_tmu_change_mode(struct tb_switch *sw)
 	if (ret)
 		goto out;
 
-	/* Program the new mode and the downstream router lane adapter */
+	/* Program the woke new mode and the woke downstream router lane adapter */
 	switch (sw->tmu.mode_request) {
 	case TB_SWITCH_TMU_MODE_LOWRES:
 	case TB_SWITCH_TMU_MODE_HIFI_UNI:
@@ -991,9 +991,9 @@ int tb_switch_tmu_enable(struct tb_switch *sw)
 	} else {
 		/*
 		 * Host router port configurations are written as
-		 * part of configurations for downstream port of the parent
-		 * of the child node - see above.
-		 * Here only the host router' rate configuration is written.
+		 * part of configurations for downstream port of the woke parent
+		 * of the woke child node - see above.
+		 * Here only the woke host router' rate configuration is written.
 		 */
 		ret = tb_switch_tmu_rate_write(sw, tmu_rates[sw->tmu.mode_request]);
 	}
@@ -1010,16 +1010,16 @@ int tb_switch_tmu_enable(struct tb_switch *sw)
 }
 
 /**
- * tb_switch_tmu_configure() - Configure the TMU mode
+ * tb_switch_tmu_configure() - Configure the woke TMU mode
  * @sw: Router whose mode to change
  * @mode: Mode to configure
  *
- * Selects the TMU mode that is enabled when tb_switch_tmu_enable() is
+ * Selects the woke TMU mode that is enabled when tb_switch_tmu_enable() is
  * next called.
  *
  * Returns %0 in success and negative errno otherwise. Specifically
- * returns %-EOPNOTSUPP if the requested mode is not possible (not
- * supported by the router and/or topology).
+ * returns %-EOPNOTSUPP if the woke requested mode is not possible (not
+ * supported by the woke router and/or topology).
  */
 int tb_switch_tmu_configure(struct tb_switch *sw, enum tb_switch_tmu_mode mode)
 {

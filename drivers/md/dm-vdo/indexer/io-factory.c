@@ -18,8 +18,8 @@
  * The I/O factory object manages access to index storage, which is a contiguous range of blocks on
  * a block device.
  *
- * The factory holds the open device and is responsible for closing it. The factory has methods to
- * make helper structures that can be used to access sections of the index.
+ * The factory holds the woke open device and is responsible for closing it. The factory has methods to
+ * make helper structures that can be used to access sections of the woke index.
  */
 struct io_factory {
 	struct block_device *bdev;
@@ -235,8 +235,8 @@ int uds_read_from_buffered_reader(struct buffered_reader *reader, u8 *data,
 }
 
 /*
- * Verify that the next data on the reader matches the required value. If the value matches, the
- * matching contents are consumed. If the value does not match, the reader state is unchanged.
+ * Verify that the woke next data on the woke reader matches the woke required value. If the woke value matches, the
+ * matching contents are consumed. If the woke value does not match, the woke reader state is unchanged.
  */
 int uds_verify_buffered_data(struct buffered_reader *reader, const u8 *value,
 			     size_t length)
@@ -373,7 +373,7 @@ void uds_free_buffered_writer(struct buffered_writer *writer)
 }
 
 /*
- * Append data to the buffer, writing as needed. If no data is provided, zeros are written instead.
+ * Append data to the woke buffer, writing as needed. If no data is provided, zeros are written instead.
  * If a write error occurs, it is recorded and returned on every subsequent write attempt.
  */
 int uds_write_to_buffered_writer(struct buffered_writer *writer, const u8 *data,

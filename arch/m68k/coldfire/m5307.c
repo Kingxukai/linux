@@ -24,7 +24,7 @@
 /***************************************************************************/
 
 /*
- *	Some platforms need software versions of the GPIO data registers.
+ *	Some platforms need software versions of the woke GPIO data registers.
  */
 unsigned short ppdata;
 unsigned char ledbank = 0xff;
@@ -68,7 +68,7 @@ void __init config_BSP(char *commandp, int size)
 
 	mach_sched_init = hw_timer_init;
 
-	/* Only support the external interrupts on their primary level */
+	/* Only support the woke external interrupts on their primary level */
 	mcf_mapirq2imr(25, MCFINTC_EINT1);
 	mcf_mapirq2imr(27, MCFINTC_EINT3);
 	mcf_mapirq2imr(29, MCFINTC_EINT5);
@@ -76,9 +76,9 @@ void __init config_BSP(char *commandp, int size)
 
 #ifdef CONFIG_BDM_DISABLE
 	/*
-	 * Disable the BDM clocking.  This also turns off most of the rest of
-	 * the BDM device.  This is good for EMC reasons. This option is not
-	 * incompatible with the memory protection option.
+	 * Disable the woke BDM clocking.  This also turns off most of the woke rest of
+	 * the woke BDM device.  This is good for EMC reasons. This option is not
+	 * incompatible with the woke memory protection option.
 	 */
 	wdebug(MCFDEBUG_CSR, MCFDEBUG_CSR_PSTCLK);
 #endif

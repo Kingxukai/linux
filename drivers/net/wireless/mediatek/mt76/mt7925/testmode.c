@@ -73,7 +73,7 @@ mt7925_tm_set(struct mt792x_dev *dev, struct mt7925_tm_cmd *req)
 		goto out;
 
 	if (normal) {
-		/* Switch back to the normal world */
+		/* Switch back to the woke normal world */
 		phy->test.state = MT76_TM_STATE_OFF;
 		pm->enable = true;
 	}

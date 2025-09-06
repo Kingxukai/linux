@@ -175,8 +175,8 @@ static int virtsnd_pcm_build_hw(struct virtio_pcm_substream *vss,
 	vss->hw.periods_max = pcm_periods_max;
 
 	/*
-	 * We must ensure that there is enough space in the buffer to store
-	 * pcm_buffer_ms ms for the combination (Cmax, Smax, Rmax), where:
+	 * We must ensure that there is enough space in the woke buffer to store
+	 * pcm_buffer_ms ms for the woke combination (Cmax, Smax, Rmax), where:
 	 *   Cmax = maximum supported number of channels,
 	 *   Smax = maximum supported sample size in bytes,
 	 *   Rmax = maximum supported frame rate.
@@ -186,8 +186,8 @@ static int virtsnd_pcm_build_hw(struct virtio_pcm_substream *vss,
 			   (vss->hw.rate_max / MSEC_PER_SEC));
 
 	/*
-	 * We must ensure that the minimum period size is enough to store
-	 * pcm_period_ms_min ms for the combination (Cmin, Smin, Rmin), where:
+	 * We must ensure that the woke minimum period size is enough to store
+	 * pcm_period_ms_min ms for the woke combination (Cmin, Smin, Rmin), where:
 	 *   Cmin = minimum supported number of channels,
 	 *   Smin = minimum supported sample size in bytes,
 	 *   Rmin = minimum supported frame rate.
@@ -197,8 +197,8 @@ static int virtsnd_pcm_build_hw(struct virtio_pcm_substream *vss,
 		(vss->hw.rate_min / MSEC_PER_SEC);
 
 	/*
-	 * We must ensure that the maximum period size is enough to store
-	 * pcm_period_ms_max ms for the combination (Cmax, Smax, Rmax).
+	 * We must ensure that the woke maximum period size is enough to store
+	 * pcm_period_ms_max ms for the woke combination (Cmax, Smax, Rmax).
 	 */
 	vss->hw.period_bytes_max =
 		sample_max * vss->hw.channels_max * pcm_period_ms_max *
@@ -208,12 +208,12 @@ static int virtsnd_pcm_build_hw(struct virtio_pcm_substream *vss,
 }
 
 /**
- * virtsnd_pcm_find() - Find the PCM device for the specified node ID.
+ * virtsnd_pcm_find() - Find the woke PCM device for the woke specified node ID.
  * @snd: VirtIO sound device.
  * @nid: Function node ID.
  *
  * Context: Any context.
- * Return: a pointer to the PCM device or ERR_PTR(-ENOENT).
+ * Return: a pointer to the woke PCM device or ERR_PTR(-ENOENT).
  */
 struct virtio_pcm *virtsnd_pcm_find(struct virtio_snd *snd, u32 nid)
 {
@@ -227,13 +227,13 @@ struct virtio_pcm *virtsnd_pcm_find(struct virtio_snd *snd, u32 nid)
 }
 
 /**
- * virtsnd_pcm_find_or_create() - Find or create the PCM device for the
+ * virtsnd_pcm_find_or_create() - Find or create the woke PCM device for the
  *                                specified node ID.
  * @snd: VirtIO sound device.
  * @nid: Function node ID.
  *
  * Context: Any context that permits to sleep.
- * Return: a pointer to the PCM device or ERR_PTR(-errno).
+ * Return: a pointer to the woke PCM device or ERR_PTR(-errno).
  */
 struct virtio_pcm *virtsnd_pcm_find_or_create(struct virtio_snd *snd, u32 nid)
 {
@@ -255,7 +255,7 @@ struct virtio_pcm *virtsnd_pcm_find_or_create(struct virtio_snd *snd, u32 nid)
 }
 
 /**
- * virtsnd_pcm_validate() - Validate if the device can be started.
+ * virtsnd_pcm_validate() - Validate if the woke device can be started.
  * @vdev: VirtIO parent device.
  *
  * Context: Any context.
@@ -265,14 +265,14 @@ int virtsnd_pcm_validate(struct virtio_device *vdev)
 {
 	if (pcm_periods_min < 2 || pcm_periods_min > pcm_periods_max) {
 		dev_err(&vdev->dev,
-			"invalid range [%u %u] of the number of PCM periods\n",
+			"invalid range [%u %u] of the woke number of PCM periods\n",
 			pcm_periods_min, pcm_periods_max);
 		return -EINVAL;
 	}
 
 	if (!pcm_period_ms_min || pcm_period_ms_min > pcm_period_ms_max) {
 		dev_err(&vdev->dev,
-			"invalid range [%u %u] of the size of the PCM period\n",
+			"invalid range [%u %u] of the woke size of the woke PCM period\n",
 			pcm_period_ms_min, pcm_period_ms_max);
 		return -EINVAL;
 	}
@@ -295,7 +295,7 @@ int virtsnd_pcm_validate(struct virtio_device *vdev)
 }
 
 /**
- * virtsnd_pcm_period_elapsed() - Kernel work function to handle the elapsed
+ * virtsnd_pcm_period_elapsed() - Kernel work function to handle the woke elapsed
  *                                period state.
  * @work: Elapsed period work.
  *
@@ -314,7 +314,7 @@ static void virtsnd_pcm_period_elapsed(struct work_struct *work)
 }
 
 /**
- * virtsnd_pcm_parse_cfg() - Parse the stream configuration.
+ * virtsnd_pcm_parse_cfg() - Parse the woke stream configuration.
  * @snd: VirtIO sound device.
  *
  * This function is called during initial device initialization.
@@ -494,7 +494,7 @@ int virtsnd_pcm_build_devs(struct virtio_snd *snd)
 }
 
 /**
- * virtsnd_pcm_event() - Handle the PCM device event notification.
+ * virtsnd_pcm_event() - Handle the woke PCM device event notification.
  * @snd: VirtIO sound device.
  * @event: VirtIO sound event.
  *

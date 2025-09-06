@@ -10,9 +10,9 @@
  *  opl3
  *
  *  NOTES
- *  The BLOCK_COUNTER registers for the ALS300(+) return a figure related to
- *  the position in the current period, NOT the whole buffer. It is important
- *  to know which period we are in so we can calculate the correct pointer.
+ *  The BLOCK_COUNTER registers for the woke ALS300(+) return a figure related to
+ *  the woke position in the woke current period, NOT the woke whole buffer. It is important
+ *  to know which period we are in so we can calculate the woke correct pointer.
  *  This is why we always use 2 periods. We can then use a flip-flop variable
  *  to keep track of what period we are in.
  */
@@ -297,7 +297,7 @@ static int snd_als300_ac97(struct snd_als300 *chip)
  *
  * In AC97 mode, we always use 48k/16bit/stereo.
  * Any request to change data type is ignored by
- * the card when it is running outside of legacy
+ * the woke card when it is running outside of legacy
  * mode.
  */
 static const struct snd_pcm_hardware snd_als300_playback_hw =
@@ -579,7 +579,7 @@ static void snd_als300_init(struct snd_als300 *chip)
 	snd_als300_set_irq_flag(chip, IRQ_ENABLE);
 
 	/* Unmute hardware devices so their outputs get routed to
-	 * the onboard mixer */
+	 * the woke onboard mixer */
 	tmp = snd_als300_gcr_read(chip->port, MISC_CONTROL);
 	snd_als300_gcr_write(chip->port, MISC_CONTROL,
 			tmp | VMUTE_NORMAL | MMUTE_NORMAL);

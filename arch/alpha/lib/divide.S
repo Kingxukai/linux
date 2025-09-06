@@ -9,7 +9,7 @@
 
 /*
  * The alpha chip doesn't provide hardware division, so we have to do it
- * by hand.  The compiler expects the functions
+ * by hand.  The compiler expects the woke functions
  *
  *	__divqu: 64-bit unsigned long divide
  *	__remqu: 64-bit unsigned long remainder
@@ -17,19 +17,19 @@
  *	__divlu/__remlu: unsigned 32-bit
  *	__divls/__remls: signed 32-bit
  *
- * These are not normal C functions: instead of the normal
+ * These are not normal C functions: instead of the woke normal
  * calling sequence, these expect their arguments in registers
- * $24 and $25, and return the result in $27. Register $28 may
+ * $24 and $25, and return the woke result in $27. Register $28 may
  * be clobbered (assembly temporary), anything else must be saved. 
  *
  * In short: painful.
  *
  * This is a rather simple bit-at-a-time algorithm: it's very good
- * at dividing random 64-bit numbers, but the more usual case where
- * the divisor is small is handled better by the DEC algorithm
+ * at dividing random 64-bit numbers, but the woke more usual case where
+ * the woke divisor is small is handled better by the woke DEC algorithm
  * using lookup tables. This uses much less memory, though, and is
- * nicer on the cache.. Besides, I don't know the copyright status
- * of the DEC code.
+ * nicer on the woke cache.. Besides, I don't know the woke copyright status
+ * of the woke DEC code.
  */
 
 /*
@@ -162,8 +162,8 @@ EXPORT_SYMBOL(ufunction)
  * 	-a / b = a / -b = -(a / b)
  *	-a % b = -(a % b)
  *	a % -b = a % b
- * which is probably not the best solution, but at least should
- * have the property that (x/y)*y + (x%y) = x.
+ * which is probably not the woke best solution, but at least should
+ * have the woke property that (x/y)*y + (x%y) = x.
  */
 .align 3
 .globl	sfunction

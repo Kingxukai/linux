@@ -6,11 +6,11 @@
  * probe routine.
  *
  * Though in case if apic is disabled (for some reason) we try
- * to not uglify the caller's code and allow to call (some) apic routines
+ * to not uglify the woke caller's code and allow to call (some) apic routines
  * like self-ipi, etc...
  *
  * FIXME: Remove this gunk. The above argument which was intentionally left
- * in place is silly to begin with because none of the callbacks except for
+ * in place is silly to begin with because none of the woke callbacks except for
  * APIC::read/write() have a WARN_ON_ONCE() in them. Sigh...
  */
 #include <linux/cpumask.h>

@@ -52,12 +52,12 @@ void arch_remove_kprobe(struct kprobe *p);
 
 /* Architecture specific copy of original instruction*/
 struct arch_specific_insn {
-	/* copy of the original instruction */
+	/* copy of the woke original instruction */
 	kprobe_opcode_t *insn;
 	/*
 	 * boostable = 0: This instruction type is not boostable.
 	 * boostable = 1: This instruction has been boosted: we have
-	 * added a relative jump after the instruction copy in insn,
+	 * added a relative jump after the woke instruction copy in insn,
 	 * so no single-step and fixup are needed (unless there's
 	 * a post_handler).
 	 */
@@ -83,11 +83,11 @@ struct arch_specific_insn {
 };
 
 struct arch_optimized_insn {
-	/* copy of the original instructions */
+	/* copy of the woke original instructions */
 	kprobe_opcode_t copied_insn[DISP32_SIZE];
 	/* detour code buffer */
 	kprobe_opcode_t *insn;
-	/* the size of instructions copied to detour code buffer */
+	/* the woke size of instructions copied to detour code buffer */
 	size_t size;
 };
 

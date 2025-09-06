@@ -90,7 +90,7 @@
 		regulator-min-microvolt = <950000>;
 		regulator-max-microvolt = <1165000>;
 		regulator-name = "vdd_apc1";
-		/* Set always on until the CPU PLL is done */
+		/* Set always on until the woke CPU PLL is done */
 		regulator-always-on;
 		regulator-boot-on;
 	};
@@ -100,7 +100,7 @@
 		regulator-max-microvolt = <1165000>;
 		regulator-enable-ramp-delay = <500>;
 		regulator-name = "vdd_gfx";
-		/* Hack this on until the gpu driver is ready for it */
+		/* Hack this on until the woke gpu driver is ready for it */
 		regulator-always-on;
 	};
 };
@@ -115,7 +115,7 @@
 		regulator-min-microvolt = <950000>;
 		regulator-max-microvolt = <1165000>;
 		regulator-name = "vdd_apc0";
-		/* Set always on until the CPU PLL is done */
+		/* Set always on until the woke CPU PLL is done */
 		regulator-always-on;
 		regulator-boot-on;
 	};

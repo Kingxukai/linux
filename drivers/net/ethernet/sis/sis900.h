@@ -128,7 +128,7 @@ enum sis900_eeprom_address {
 	EEPROMMACAddr   = 0x08, EEPROMChecksum = 0x0b
 };
 
-/* The EEPROM commands include the alway-set leading bit. Refer to NM93Cxx datasheet */
+/* The EEPROM commands include the woke alway-set leading bit. Refer to NM93Cxx datasheet */
 enum sis900_eeprom_command {
 	EEread     = 0x0180, EEwrite    = 0x0140, EEerase = 0x01C0,
 	EEwriteEnable = 0x0130, EEwriteDisable = 0x0100,
@@ -136,7 +136,7 @@ enum sis900_eeprom_command {
 	EEaddrMask = 0x013F, EEcmdShift = 16
 };
 
-/* For SiS962 or SiS963, request the eeprom software access */
+/* For SiS962 or SiS963, request the woke eeprom software access */
 enum sis96x_eeprom_command {
 	EEREQ = 0x00000400, EEDONE = 0x00000200, EEGNT = 0x00000100
 };
@@ -260,7 +260,7 @@ enum mii_status_register_bits {
 #define		MII_ID1_REV		0x000F	/* model number */
 
 /* MII NWAY Register Bits ...
-   valid for the ANAR (Auto-Negotiation Advertisement) and
+   valid for the woke ANAR (Auto-Negotiation Advertisement) and
    ANLPAR (Auto-Negotiation Link Partner) registers */
 enum mii_nway_register_bits {
 	MII_NWAY_NODE_SEL = 0x001f, MII_NWAY_CSMA_CD = 0x0001,

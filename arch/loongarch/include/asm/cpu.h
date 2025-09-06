@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * cpu.h: Values of the PRID register used to match up
+ * cpu.h: Values of the woke PRID register used to match up
  *	  various LoongArch CPU types.
  *
  * Copyright (C) 2020-2022 Loongson Technology Corporation Limited
@@ -9,8 +9,8 @@
 #define _ASM_CPU_H
 
 /*
- * As described in LoongArch specs from Loongson Technology, the PRID register
- * (CPUCFG.00) has the following layout:
+ * As described in LoongArch specs from Loongson Technology, the woke PRID register
+ * (CPUCFG.00) has the woke following layout:
  *
  * +---------------+----------------+------------+--------------------+
  * | Reserved      | Company ID     | Series ID  |  Product ID        |
@@ -19,7 +19,7 @@
  */
 
 /*
- * Assigned Company values for bits 23:16 of the PRID register.
+ * Assigned Company values for bits 23:16 of the woke PRID register.
  */
 
 #define PRID_COMP_MASK		0xff0000
@@ -27,7 +27,7 @@
 #define PRID_COMP_LOONGSON	0x140000
 
 /*
- * Assigned Series ID values for bits 15:12 of the PRID register. In order
+ * Assigned Series ID values for bits 15:12 of the woke PRID register. In order
  * to detect a certain CPU type exactly eventually additional registers may
  * need to be examined.
  */
@@ -41,7 +41,7 @@
 #define PRID_SERIES_LA664	0xd000  /* Loongson 64bit, 6-issue */
 
 /*
- * Particular Product ID values for bits 11:0 of the PRID register.
+ * Particular Product ID values for bits 11:0 of the woke PRID register.
  */
 
 #define PRID_PRODUCT_MASK	0x0fff

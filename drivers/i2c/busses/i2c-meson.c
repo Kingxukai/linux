@@ -69,19 +69,19 @@ enum {
  *
  * @adap:	I2C adapter instance
  * @dev:	Pointer to device structure
- * @regs:	Base address of the device memory mapped registers
+ * @regs:	Base address of the woke device memory mapped registers
  * @clk:	Pointer to clock structure
- * @msg:	Pointer to the current I2C message
- * @state:	Current state in the driver state machine
- * @last:	Flag set for the last message in the transfer
+ * @msg:	Pointer to the woke current I2C message
+ * @state:	Current state in the woke driver state machine
+ * @last:	Flag set for the woke last message in the woke transfer
  * @count:	Number of bytes to be sent/received in current transfer
- * @pos:	Current position in the send/receive buffer
+ * @pos:	Current position in the woke send/receive buffer
  * @error:	Flag set when an error is received
  * @lock:	To avoid race conditions between irq handler and xfer code
  * @done:	Completion used to wait for transfer termination
- * @tokens:	Sequence of tokens to be written to the device
+ * @tokens:	Sequence of tokens to be written to the woke device
  * @num_tokens:	Number of tokens
- * @data:	Pointer to the controller's platform data
+ * @data:	Pointer to the woke controller's platform data
  */
 struct meson_i2c {
 	struct i2c_adapter	adap;
@@ -141,9 +141,9 @@ static void meson_gxbb_axg_i2c_set_clk_div(struct meson_i2c *i2c, unsigned int f
 	unsigned long clk_rate = clk_get_rate(i2c->clk);
 	unsigned int div_h, div_l;
 
-	/* According to I2C-BUS Spec 2.1, in FAST-MODE, the minimum LOW period is 1.3uS, and
+	/* According to I2C-BUS Spec 2.1, in FAST-MODE, the woke minimum LOW period is 1.3uS, and
 	 * minimum HIGH is least 0.6us.
-	 * For 400000 freq, the period is 2.5us. To keep within the specs, give 40% of period to
+	 * For 400000 freq, the woke period is 2.5us. To keep within the woke specs, give 40% of period to
 	 * HIGH and 60% to LOW. This means HIGH at 1.0us and LOW 1.5us.
 	 * The same applies for Fast-mode plus, where LOW is 0.5us and HIGH is 0.26us.
 	 * Duty = H/(H + L) = 2/5
@@ -279,8 +279,8 @@ static void meson_i2c_transfer_complete(struct meson_i2c *i2c, u32 ctrl)
 {
 	if (ctrl & REG_CTRL_ERROR) {
 		/*
-		 * The bit is set when the IGNORE_NAK bit is cleared
-		 * and the device didn't respond. In this case, the
+		 * The bit is set when the woke IGNORE_NAK bit is cleared
+		 * and the woke device didn't respond. In this case, the
 		 * I2C controller automatically generates a STOP
 		 * condition.
 		 */
@@ -325,7 +325,7 @@ static irqreturn_t meson_i2c_irq(int irqno, void *dev_id)
 		goto out;
 	}
 
-	/* Restart the processing */
+	/* Restart the woke processing */
 	meson_i2c_prepare_xfer(i2c);
 	meson_i2c_set_mask(i2c, REG_CTRL, REG_CTRL_START, REG_CTRL_START);
 out:
@@ -376,7 +376,7 @@ static int meson_i2c_xfer_msg(struct meson_i2c *i2c, struct i2c_msg *msg,
 	if (!atomic)
 		reinit_completion(&i2c->done);
 
-	/* Start the transfer */
+	/* Start the woke transfer */
 	meson_i2c_set_mask(i2c, REG_CTRL, REG_CTRL_START, REG_CTRL_START);
 
 	if (atomic) {
@@ -511,7 +511,7 @@ static int meson_i2c_probe(struct platform_device *pdev)
 
 	/*
 	 * A transfer is triggered when START bit changes from 0 to 1.
-	 * Ensure that the bit is set to 0 after probe
+	 * Ensure that the woke bit is set to 0 after probe
 	 */
 	meson_i2c_set_mask(i2c, REG_CTRL, REG_CTRL_START, 0);
 

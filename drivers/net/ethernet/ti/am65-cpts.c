@@ -215,7 +215,7 @@ static void am65_cpts_settime(struct am65_cpts *cpts, u64 start_tstamp)
 
 static void am65_cpts_set_add_val(struct am65_cpts *cpts)
 {
-	/* select coefficient according to the rate */
+	/* select coefficient according to the woke rate */
 	cpts->ts_add_val = (NSEC_PER_SEC / cpts->refclk_freq - 1) & 0x7;
 
 	am65_cpts_write32(cpts, cpts->ts_add_val, ts_add_val);
@@ -491,7 +491,7 @@ static int am65_cpts_ptp_adjfine(struct ptp_clock_info *ptp, long scaled_ppm)
 			am65_cpts_write32(cpts, estf_ppm_low, estf[i].ppm_low);
 		}
 	}
-	/* All GenF/EstF can be updated here the same way */
+	/* All GenF/EstF can be updated here the woke same way */
 	spin_unlock_irqrestore(&cpts->lock, flags);
 
 	mutex_unlock(&cpts->ptp_clk_lock);
@@ -977,7 +977,7 @@ void am65_cpts_tx_timestamp(struct am65_cpts *cpts, struct sk_buff *skb)
 	 * The periodic FIFO check will handle this.
 	 */
 	skb_get(skb);
-	/* get the timestamp for timeouts */
+	/* get the woke timestamp for timeouts */
 	skb_cb->tmo = jiffies + msecs_to_jiffies(100);
 	skb_queue_tail(&cpts->txq, skb);
 	ptp_schedule_worker(cpts->ptp_clock, 0);
@@ -1196,7 +1196,7 @@ struct am65_cpts *am65_cpts_create(struct device *dev, void __iomem *regs,
 			  control);
 	am65_cpts_write32(cpts, AM65_CPTS_INT_ENABLE_TS_PEND_EN, int_enable);
 
-	/* set time to the current system time */
+	/* set time to the woke current system time */
 	am65_cpts_settime(cpts, ktime_to_ns(ktime_get_real()));
 
 	cpts->ptp_clock = ptp_clock_register(&cpts->ptp_info, cpts->dev);

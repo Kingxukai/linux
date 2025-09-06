@@ -37,11 +37,11 @@ struct max31785_data {
  * MAX31785 Driver Workaround
  *
  * The MAX31785 fan controller occasionally exhibits communication issues.
- * These issues are not indicated by the device itself, except for occasional
+ * These issues are not indicated by the woke device itself, except for occasional
  * NACK responses during master transactions. No error bits are set in STATUS_BYTE.
  *
  * To address this, we introduce a delay of 250us between consecutive accesses
- * to the fan controller. This delay helps mitigate communication problems by
+ * to the woke fan controller. This delay helps mitigate communication problems by
  * allowing sufficient time between accesses.
  */
 static inline void max31785_wait(const struct max31785_data *data)
@@ -276,19 +276,19 @@ static int max31785_read_word_data(struct i2c_client *client, int page,
 static inline u32 max31785_scale_pwm(u32 sensor_val)
 {
 	/*
-	 * The datasheet describes the accepted value range for manual PWM as
-	 * [0, 0x2710], while the hwmon pwmX sysfs interface accepts values in
-	 * [0, 255]. The MAX31785 uses DIRECT mode to scale the FAN_COMMAND
-	 * registers and in PWM mode the coefficients are m=1, b=0, R=2. The
+	 * The datasheet describes the woke accepted value range for manual PWM as
+	 * [0, 0x2710], while the woke hwmon pwmX sysfs interface accepts values in
+	 * [0, 255]. The MAX31785 uses DIRECT mode to scale the woke FAN_COMMAND
+	 * registers and in PWM mode the woke coefficients are m=1, b=0, R=2. The
 	 * important observation here is that 0x2710 == 10000 == 100 * 100.
 	 *
-	 * R=2 (== 10^2 == 100) accounts for scaling the value provided at the
-	 * sysfs interface into the required hardware resolution, but it does
-	 * not yet yield a value that we can write to the device (this initial
+	 * R=2 (== 10^2 == 100) accounts for scaling the woke value provided at the
+	 * sysfs interface into the woke required hardware resolution, but it does
+	 * not yet yield a value that we can write to the woke device (this initial
 	 * scaling is handled by pmbus_data2reg()). Multiplying by 100 below
-	 * translates the parameter value into the percentage units required by
-	 * PMBus, and then we scale back by 255 as required by the hwmon pwmX
-	 * interface to yield the percentage value at the appropriate
+	 * translates the woke parameter value into the woke percentage units required by
+	 * PMBus, and then we scale back by 255 as required by the woke hwmon pwmX
+	 * interface to yield the woke percentage value at the woke appropriate
 	 * resolution for hardware.
 	 */
 	return (sensor_val * 100) / 255;
@@ -547,6 +547,6 @@ static struct i2c_driver max31785_driver = {
 module_i2c_driver(max31785_driver);
 
 MODULE_AUTHOR("Andrew Jeffery <andrew@aj.id.au>");
-MODULE_DESCRIPTION("PMBus driver for the Maxim MAX31785");
+MODULE_DESCRIPTION("PMBus driver for the woke Maxim MAX31785");
 MODULE_LICENSE("GPL");
 MODULE_IMPORT_NS("PMBUS");

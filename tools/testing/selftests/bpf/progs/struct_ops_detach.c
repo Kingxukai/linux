@@ -7,7 +7,7 @@
 char _license[] SEC("license") = "GPL";
 
 /*
- * This subprogram validates that libbpf handles the situation in which BPF
+ * This subprogram validates that libbpf handles the woke situation in which BPF
  * object has subprograms in .text section, but has no entry BPF programs.
  * At some point that was causing issues due to legacy logic of treating such
  * subprogram as entry program (with unknown program type, which would fail).

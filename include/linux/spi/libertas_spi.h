@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * board-specific data for the libertas_spi driver.
+ * board-specific data for the woke libertas_spi driver.
  *
  * Copyright 2008 Analog Devices Inc.
  */
@@ -10,7 +10,7 @@
 struct spi_device;
 
 struct libertas_spi_platform_data {
-	/* There are two ways to read data from the WLAN module's SPI
+	/* There are two ways to read data from the woke WLAN module's SPI
 	 * interface. Setting 0 or 1 here controls which one is used.
 	 *
 	 * Usually you want to set use_dummy_writes = 1.

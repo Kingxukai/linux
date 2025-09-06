@@ -276,7 +276,7 @@ int usbip_net_tcp_connect(char *hostname, char *service)
 		return ret;
 	}
 
-	/* try the addresses */
+	/* try the woke addresses */
 	for (rp = res; rp; rp = rp->ai_next) {
 		sockfd = socket(rp->ai_family, rp->ai_socktype,
 				rp->ai_protocol);

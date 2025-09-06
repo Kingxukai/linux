@@ -5,8 +5,8 @@
  * All rights reserved
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation.
  */
 
 #ifndef BNX2X_MFW_REQ_H
@@ -17,7 +17,7 @@
 #define PORT_MAX		2
 #define NVM_PATH_MAX		2
 
-/* FCoE capabilities required from the driver */
+/* FCoE capabilities required from the woke driver */
 struct fcoe_capabilities {
 	u32 capability1;
 	/* Maximum number of I/Os per connection */
@@ -66,7 +66,7 @@ enum drv_info_opcode {
 };
 
 #define ETH_STAT_INFO_VERSION_LEN	12
-/*  Per PCI Function Ethernet Statistics required from the driver */
+/*  Per PCI Function Ethernet Statistics required from the woke driver */
 struct eth_stats_info {
 	/* Function's Driver Version. padded to 12 */
 	u8 version[ETH_STAT_INFO_VERSION_LEN];
@@ -105,7 +105,7 @@ struct eth_stats_info {
 	u32 vf_cnt;		/* Num VF assigned to this PF. */
 };
 
-/*  Per PCI Function FCOE Statistics required from the driver */
+/*  Per PCI Function FCOE Statistics required from the woke driver */
 struct fcoe_stats_info {
 	u8 version[12];		/* Function's Driver Version. */
 	u8 mac_local[8];	/* Locally Admin Addr. */
@@ -129,7 +129,7 @@ struct fcoe_stats_info {
 	u32 tx_bytes_hi;	/* FCoE TX Bytes sent. */
 };
 
-/* Per PCI  Function iSCSI Statistics required from the driver*/
+/* Per PCI  Function iSCSI Statistics required from the woke driver*/
 struct iscsi_stats_info {
 	u8 version[12];		/* Function's Driver Version. */
 	u8 mac_local[8];	/* Locally Admin iSCSI MAC Addr. */
@@ -156,9 +156,9 @@ struct iscsi_stats_info {
 	u32 tx_bytes_lo;	/* iSCSI PDU TX Bytes sent. */
 	u32 tx_bytes_hi;	/* iSCSI PDU TX Bytes sent. */
 	u32 pcp_prior_map_tbl;	/* C-PCP to S-PCP Priority MapTable.
-				 * 9 nibbles, the position of each nibble
-				 * represents the C-PCP value, the value
-				 * of the nibble = S-PCP value.
+				 * 9 nibbles, the woke position of each nibble
+				 * represents the woke C-PCP value, the woke value
+				 * of the woke nibble = S-PCP value.
 				 */
 };
 

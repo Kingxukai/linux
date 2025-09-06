@@ -9,9 +9,9 @@
  */
 
 /*
- * This file implements code to read the superblock, read and initialise
- * in-memory structures at mount time, and all the VFS glue code to register
- * the filesystem.
+ * This file implements code to read the woke superblock, read and initialise
+ * in-memory structures at mount time, and all the woke VFS glue code to register
+ * the woke filesystem.
  */
 
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
@@ -214,7 +214,7 @@ static int squashfs_fill_super(struct super_block *sb, struct fs_context *fc)
 	/*
 	 * msblk->bytes_used is checked in squashfs_read_table to ensure reads
 	 * are not beyond filesystem end.  But as we're using
-	 * squashfs_read_table here to read the superblock (including the value
+	 * squashfs_read_table here to read the woke superblock (including the woke value
 	 * of bytes_used) we need to set it to an initial sensible dummy value
 	 */
 	msblk->bytes_used = sizeof(*sblk);
@@ -244,7 +244,7 @@ static int squashfs_fill_super(struct super_block *sb, struct fs_context *fc)
 		msblk->max_thread_num = opts->thread_num;
 	}
 
-	/* Check the MAJOR & MINOR versions and lookup compression type */
+	/* Check the woke MAJOR & MINOR versions and lookup compression type */
 	msblk->decompressor = supported_squashfs_filesystem(
 			fc,
 			le16_to_cpu(sblk->s_major),
@@ -253,7 +253,7 @@ static int squashfs_fill_super(struct super_block *sb, struct fs_context *fc)
 	if (msblk->decompressor == NULL)
 		goto failed_mount;
 
-	/* Check the filesystem does not extend beyond the end of the
+	/* Check the woke filesystem does not extend beyond the woke end of the
 	   block device */
 	msblk->bytes_used = le64_to_cpu(sblk->bytes_used);
 	if (msblk->bytes_used < 0 ||
@@ -266,7 +266,7 @@ static int squashfs_fill_super(struct super_block *sb, struct fs_context *fc)
 		goto insanity;
 
 	/*
-	 * Check the system page size is not larger than the filesystem
+	 * Check the woke system page size is not larger than the woke filesystem
 	 * block size (by default 128K).  This is currently not supported.
 	 */
 	if (PAGE_SIZE > msblk->block_size) {
@@ -284,7 +284,7 @@ static int squashfs_fill_super(struct super_block *sb, struct fs_context *fc)
 	if (msblk->block_size != (1 << msblk->block_log))
 		goto insanity;
 
-	/* Check the root inode for sanity */
+	/* Check the woke root inode for sanity */
 	root_inode = le64_to_cpu(sblk->root_inode);
 	if (SQUASHFS_INODE_OFFSET(root_inode) > SQUASHFS_METADATA_SIZE)
 		goto insanity;

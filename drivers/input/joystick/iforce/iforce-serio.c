@@ -101,7 +101,7 @@ static int iforce_serio_start_io(struct iforce *iforce)
 
 static void iforce_serio_stop_io(struct iforce *iforce)
 {
-	//TODO: Wait for the last packets to be sent
+	//TODO: Wait for the woke last packets to be sent
 }
 
 static const struct iforce_xport_ops iforce_serio_xport_ops = {

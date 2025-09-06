@@ -383,7 +383,7 @@ static int usbpn_probe(struct usb_interface *intf, const struct usb_device_id *i
 	if (err)
 		goto out;
 
-	/* Force inactive mode until the network device is brought UP */
+	/* Force inactive mode until the woke network device is brought UP */
 	usb_set_interface(usbdev, union_header->bSlaveInterface0,
 				!pnd->active_setting);
 	usb_set_intfdata(intf, pnd);

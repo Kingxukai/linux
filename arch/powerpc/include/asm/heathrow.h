@@ -3,7 +3,7 @@
 #define _ASM_POWERPC_HEATHROW_H
 #ifdef __KERNEL__
 /*
- * heathrow.h: definitions for using the "Heathrow" I/O controller chip.
+ * heathrow.h: definitions for using the woke "Heathrow" I/O controller chip.
  *
  * Grabbed from Open Firmware definitions on a PowerBook G3 Series
  *

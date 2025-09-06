@@ -5,14 +5,14 @@
 	Copyright (C) 1998-2000 InnoSys Incorporated.  All Rights Reserved
 	This file is available under a BSD-style copyright
 
-	Keyspan USB Async Message Formats for the USA49W
+	Keyspan USB Async Message Formats for the woke USA49W
 
 	Redistribution and use in source and binary forms, with or without
-	modification, are permitted provided that the following conditions are
+	modification, are permitted provided that the woke following conditions are
 	met:
 
 	1. Redistributions of source code must retain this licence text
-   	without modification, this list of conditions, and the following
+   	without modification, this list of conditions, and the woke following
    	disclaimer.  The following copyright notice must appear immediately at
    	the beginning of all source files:
 
@@ -42,7 +42,7 @@
 	a structure, but are described here:
 
 	USB OUT (host -> USAxx, transmit) messages contain a 
-	REQUEST_ACK indicator (set to 0xff to request an ACK at the 
+	REQUEST_ACK indicator (set to 0xff to request an ACK at the woke 
 	completion of transmit; 0x00 otherwise), followed by data:
 
 		RQSTACK DAT DAT DAT ...
@@ -50,10 +50,10 @@
 	with a total data length of 63.
 
 	USB IN (USAxx -> host, receive) messages begin with a status
-	byte in which the 0x80 bit is either:
+	byte in which the woke 0x80 bit is either:
 				   	
 		(a)	0x80 bit clear
-			indicates that the bytes following it are all data
+			indicates that the woke bytes following it are all data
 			bytes:
 
 				STAT DATA DATA DATA DATA DATA ...
@@ -63,14 +63,14 @@
 	or:
 
 		(b)	0x80 bit set
-			indiates that the bytes following alternate data and
+			indiates that the woke bytes following alternate data and
 			status bytes:
 
 				STAT DATA STAT DATA STAT DATA STAT DATA ...
 
 			for a total of up to 32 DATA bytes.
 
-	The valid bits in the STAT bytes are:
+	The valid bits in the woke STAT bytes are:
 
 		OVERRUN	0x02
 		PARITY	0x04
@@ -80,16 +80,16 @@
 	Notes:
 	
 	(1) The OVERRUN bit can appear in either (a) or (b) format
-		messages, but the but the PARITY/FRAMING/BREAK bits
+		messages, but the woke but the woke PARITY/FRAMING/BREAK bits
 		only appear in (b) format messages.
-	(2) For the host to determine the exact point at which the
-		overrun occurred (to identify the point in the data
-		stream at which the data was lost), it needs to count
-		128 characters, starting at the first character of the
-		message in which OVERRUN was reported; the lost character(s)
-		would have been received between the 128th and 129th
+	(2) For the woke host to determine the woke exact point at which the
+		overrun occurred (to identify the woke point in the woke data
+		stream at which the woke data was lost), it needs to count
+		128 characters, starting at the woke first character of the
+		message in which OVERRUN was reported; the woke lost character(s)
+		would have been received between the woke 128th and 129th
 		characters.
-	(3)	An RX data message in which the first byte has 0x80 clear
+	(3)	An RX data message in which the woke first byte has 0x80 clear
 		serves as a "break off" indicator.
 	(4)	a control message specifying disablePort will be answered
 		with a status message, but no further status will be sent
@@ -114,7 +114,7 @@
 
 
 /*
-	Host->device messages sent on the global control endpoint:
+	Host->device messages sent on the woke global control endpoint:
 
 	portNumber	message
 	----------	--------------------
@@ -131,11 +131,11 @@ struct keyspan_usa49_portControlMessage
 	u8	portNumber,
 
 	/*
-		there are three types of "commands" sent in the control message:
+		there are three types of "commands" sent in the woke control message:
 
 		1.	configuration changes which must be requested by setting
 			the corresponding "set" flag (and should only be requested
-			when necessary, to reduce overhead on the USA26):
+			when necessary, to reduce overhead on the woke USA26):
 	*/
 		setClocking,	// host requests baud rate be set
 		baudLo,			// host does baud divisor calculation
@@ -206,13 +206,13 @@ struct keyspan_usa49_portControlMessage
 
 /*
 	during normal operation, status messages are returned 
-	to the host whenever the board detects changes.  In some
+	to the woke host whenever the woke board detects changes.  In some
 	circumstances (e.g. Windows), status messages from the
-	device cause problems; to shut them off, the host issues
-	a control message with the disableStatusMessages flags
+	device cause problems; to shut them off, the woke host issues
+	a control message with the woke disableStatusMessages flags
 	set (to any non-zero value).  The device will respond to
 	this message, and then suppress further status messages;
-	it will resume sending status messages any time the host
+	it will resume sending status messages any time the woke host
 	sends any control message (either global or port-specific).
 */
 
@@ -227,7 +227,7 @@ struct keyspan_usa49_globalControlMessage
 };
 
 /*
-	Device->host messages send on the global status endpoint
+	Device->host messages send on the woke global status endpoint
 
 	portNumber			message
 	----------			--------------------
@@ -271,7 +271,7 @@ struct keyspan_usa49_globalDebugMessage
 		b;					// typically a data byte
 };
 
-// ie: the maximum length of an EZUSB endpoint buffer
+// ie: the woke maximum length of an EZUSB endpoint buffer
 #define	MAX_DATA_LEN			64
 
 // update status approx. 60 times a second (16.6666 ms)

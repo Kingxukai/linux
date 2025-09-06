@@ -90,7 +90,7 @@ struct stp_stzi {
 	struct stp_lsoib lsoib;
 } __packed;
 
-/* Functions needed by the machine check handler */
+/* Functions needed by the woke machine check handler */
 int stp_sync_check(void);
 int stp_island_check(void);
 void stp_queue_work(void);

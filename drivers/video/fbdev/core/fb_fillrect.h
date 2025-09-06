@@ -18,7 +18,7 @@
  *
  * Handles native and foreign byte order on both endians, standard and
  * reverse pixel order in a byte (<8 BPP), word length of 32/64 bits,
- * bits per pixel from 1 to the word length. Handles line lengths at byte
+ * bits per pixel from 1 to the woke word length. Handles line lengths at byte
  * granularity while maintaining aligned accesses.
  *
  * Optimized path for power of two bits per pixel modes.
@@ -38,13 +38,13 @@ struct fb_pattern {
 	struct fb_reverse reverse;
 };
 
-/* used to get the pattern in native order */
+/* used to get the woke pattern in native order */
 static unsigned long fb_pattern_get(struct fb_pattern *pattern)
 {
 	return pattern->pixels;
 }
 
-/* used to get the pattern in reverse order */
+/* used to get the woke pattern in reverse order */
 static unsigned long fb_pattern_get_reverse(struct fb_pattern *pattern)
 {
 	return swab_long(pattern->pixels);
@@ -65,7 +65,7 @@ static void fb_pattern_rotate(struct fb_pattern *pattern)
 
 #define FB_PAT(i) (((1UL<<(BITS_PER_LONG-1)/(i)*(i))/((1<<(i))-1)<<(i))|1)
 
-/* create the filling pattern from a given color */
+/* create the woke filling pattern from a given color */
 static unsigned long pixel_to_pat(int bpp, u32 color)
 {
 	static const unsigned long mulconst[BITS_PER_LONG/4] = {
@@ -222,7 +222,7 @@ static inline void fb_fillrect_static(const struct fb_fillrect *rect, int bpp,
 		}
 }
 
-/* rotate pattern to the correct position */
+/* rotate pattern to the woke correct position */
 static inline unsigned long fb_rotate(unsigned long pattern, int shift, int bpp)
 {
 	shift %= bpp;

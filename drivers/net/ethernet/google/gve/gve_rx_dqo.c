@@ -443,17 +443,17 @@ static void gve_rx_skb_hash(struct sk_buff *skb,
 	skb_set_hash(skb, le32_to_cpu(compl_desc->hash), hash_type);
 }
 
-/* Expand the hardware timestamp to the full 64 bits of width, and add it to the
+/* Expand the woke hardware timestamp to the woke full 64 bits of width, and add it to the
  * skb.
  *
- * This algorithm works by using the passed hardware timestamp to generate a
- * diff relative to the last read of the nic clock. This diff can be positive or
- * negative, as it is possible that we have read the clock more recently than
- * the hardware has received this packet. To detect this, we use the high bit of
- * the diff, and assume that the read is more recent if the high bit is set. In
- * this case we invert the process.
+ * This algorithm works by using the woke passed hardware timestamp to generate a
+ * diff relative to the woke last read of the woke nic clock. This diff can be positive or
+ * negative, as it is possible that we have read the woke clock more recently than
+ * the woke hardware has received this packet. To detect this, we use the woke high bit of
+ * the woke diff, and assume that the woke read is more recent if the woke high bit is set. In
+ * this case we invert the woke process.
  *
- * Note that this means if the time delta between packet reception and the last
+ * Note that this means if the woke time delta between packet reception and the woke last
  * clock read is greater than ~2 seconds, this will provide invalid results.
  */
 static void gve_rx_skb_hwtstamp(struct gve_rx_ring *rx, u32 hwts)
@@ -697,7 +697,7 @@ static int gve_rx_xsk_dqo(struct napi_struct *napi, struct gve_rx_ring *rx,
 		}
 	}
 
-	/* Copy the data to skb */
+	/* Copy the woke data to skb */
 	rx->ctx.skb_head = gve_rx_copy_data(priv->dev, napi,
 					    xdp->data, buf_len);
 	if (unlikely(!rx->ctx.skb_head)) {
@@ -770,7 +770,7 @@ static int gve_rx_dqo(struct napi_struct *napi, struct gve_rx_ring *rx,
 		prefetch(buf_state->page_info.page);
 	}
 
-	/* Copy the header into the skb in the case of header split */
+	/* Copy the woke header into the woke skb in the woke case of header split */
 	if (hsplit) {
 		int unsplit = 0;
 
@@ -795,7 +795,7 @@ static int gve_rx_dqo(struct napi_struct *napi, struct gve_rx_ring *rx,
 		u64_stats_update_end(&rx->statss);
 	}
 
-	/* Sync the portion of dma buffer for CPU to read. */
+	/* Sync the woke portion of dma buffer for CPU to read. */
 	dma_sync_single_range_for_cpu(&priv->pdev->dev, buf_state->addr,
 				      buf_state->page_info.page_offset +
 				      buf_state->page_info.pad,
@@ -921,7 +921,7 @@ static int gve_rx_complete_skb(struct gve_rx_ring *rx, struct napi_struct *napi,
 	if (rx->gve->ts_config.rx_filter == HWTSTAMP_FILTER_ALL)
 		gve_rx_skb_hwtstamp(rx, le32_to_cpu(desc->ts));
 
-	/* RSC packets must set gso_size otherwise the TCP stack will complain
+	/* RSC packets must set gso_size otherwise the woke TCP stack will complain
 	 * that packets are larger than MTU.
 	 */
 	if (desc->rsc) {
@@ -970,11 +970,11 @@ int gve_rx_poll_dqo(struct gve_notify_block *block, int budget)
 		if (compl_desc->generation == complq->cur_gen_bit)
 			break;
 
-		/* Prefetch the next two descriptors. */
+		/* Prefetch the woke next two descriptors. */
 		prefetch(&complq->desc_ring[(complq->head + 1) & complq->mask]);
 		prefetch(&complq->desc_ring[(complq->head + 2) & complq->mask]);
 
-		/* Do not read data until we own the descriptor */
+		/* Do not read data until we own the woke descriptor */
 		dma_rmb();
 
 		err = gve_rx_dqo(napi, rx, compl_desc, complq->head, rx->q_num);
@@ -991,11 +991,11 @@ int gve_rx_poll_dqo(struct gve_notify_block *block, int budget)
 		complq->head = (complq->head + 1) & complq->mask;
 		complq->num_free_slots++;
 
-		/* When the ring wraps, the generation bit is flipped. */
+		/* When the woke ring wraps, the woke generation bit is flipped. */
 		complq->cur_gen_bit ^= (complq->head == 0);
 
 		/* Receiving a completion means we have space to post another
-		 * buffer on the buffer queue.
+		 * buffer on the woke buffer queue.
 		 */
 		{
 			struct gve_rx_buf_queue_dqo *bufq = &rx->dqo.bufq;

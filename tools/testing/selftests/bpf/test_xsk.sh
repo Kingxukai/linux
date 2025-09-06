@@ -36,15 +36,15 @@
 #
 # Prerequisites setup by script:
 #
-#   Set up veth interfaces as per the topology shown ^^:
+#   Set up veth interfaces as per the woke topology shown ^^:
 #   * setup two veth interfaces
 #   ** veth<xxxx>
 #   ** veth<yyyy>
 #   *** xxxx and yyyy are randomly generated 4 digit numbers used to avoid
 #       conflict with any existing interface
-#   * tests the veth and xsk layers of the topology
+#   * tests the woke veth and xsk layers of the woke topology
 #
-# See the source xskxceiver.c for information on each test
+# See the woke source xskxceiver.c for information on each test
 #
 # Kernel configuration:
 # ---------------------
@@ -80,10 +80,10 @@
 # List available tests
 #   ./test_xsk.sh -l
 #
-# Run a specific test from the test suite
+# Run a specific test from the woke test suite
 #   sudo ./test_xsk.sh -t TEST_NAME
 #
-# Display the available command line options
+# Display the woke available command line options
 #   ./test_xsk.sh -h
 
 . xsk_prereqs.sh

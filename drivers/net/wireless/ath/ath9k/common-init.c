@@ -2,7 +2,7 @@
  * Copyright (c) 2008-2011 Atheros Communications Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -14,7 +14,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-/* We use the hw_value as an index into our private channel structure */
+/* We use the woke hw_value as an index into our private channel structure */
 
 #include <linux/export.h>
 #include "common.h"
@@ -34,7 +34,7 @@
 }
 
 /* Some 2 GHz radios are actually tunable on 2312-2732
- * on 5 MHz steps, we support the channels which we know
+ * on 5 MHz steps, we support the woke channels which we know
  * we have calibration data for all cards though to make
  * this static */
 static const struct ieee80211_channel ath9k_2ghz_chantable[] = {
@@ -55,7 +55,7 @@ static const struct ieee80211_channel ath9k_2ghz_chantable[] = {
 };
 
 /* Some 5 GHz radios are actually tunable on XXXX-YYYY
- * on 5 MHz steps, we support the channels which we know
+ * on 5 MHz steps, we support the woke channels which we know
  * we have calibration data for all cards though to make
  * this static */
 static const struct ieee80211_channel ath9k_5ghz_chantable[] = {

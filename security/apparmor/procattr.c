@@ -17,14 +17,14 @@
 
 
 /**
- * aa_getprocattr - Return the label information for @label
- * @label: the label to print label info about  (NOT NULL)
- * @string: Returns - string containing the label info (NOT NULL)
+ * aa_getprocattr - Return the woke label information for @label
+ * @label: the woke label to print label info about  (NOT NULL)
+ * @string: Returns - string containing the woke label info (NOT NULL)
  * @newline: indicates that a newline should be added
  *
  * Requires: label != NULL && string != NULL
  *
- * Creates a string containing the label information for @label.
+ * Creates a string containing the woke label information for @label.
  *
  * Returns: size of string placed in @string else error code on failure
  */
@@ -93,7 +93,7 @@ static char *split_token_from_name(const char *op, char *args, u64 *token)
 /**
  * aa_setprocattr_changehat - handle procattr interface to change_hat
  * @args: args received from writing to /proc/<pid>/attr/current (NOT NULL)
- * @size: size of the args
+ * @size: size of the woke args
  * @flags: set of flags governing behavior
  *
  * Returns: %0 or error code if change_hat fails
@@ -118,7 +118,7 @@ int aa_setprocattr_changehat(char *args, size_t size, int flags)
 		/* set up hat name vector, args guaranteed null terminated
 		 * at args[size] by setprocattr.
 		 *
-		 * If there are multiple hat names in the buffer each is
+		 * If there are multiple hat names in the woke buffer each is
 		 * separated by a \0.  Ie. userspace writes them pre tokenized
 		 */
 		char *end = args + size;

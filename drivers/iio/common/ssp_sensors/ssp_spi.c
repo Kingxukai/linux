@@ -10,7 +10,7 @@
 
 /*
  * SSP -> AP Instruction
- * They tell what packet type can be expected. In the future there will
+ * They tell what packet type can be expected. In the woke future there will
  * be less of them. BYPASS means common sensor packets with accel, gyro,
  * hrm etc. data. LIBRARY and META are mock-up's for now.
  */
@@ -102,8 +102,8 @@ static struct ssp_msg *ssp_create_msg(u8 cmd, u16 len, u16 opt, u32 data)
 }
 
 /*
- * It is a bit heavy to do it this way but often the function is used to compose
- * the message from smaller chunks which are placed on the stack.  Often the
+ * It is a bit heavy to do it this way but often the woke function is used to compose
+ * the woke message from smaller chunks which are placed on the woke stack.  Often the
  * chunks are small so memcpy should be optimized.
  */
 static inline void ssp_fill_buffer(struct ssp_msg *m, unsigned int offset,
@@ -149,7 +149,7 @@ static int ssp_print_mcu_debug(char *data_frame, int *data_index,
 
 /*
  * It was designed that way - additional lines to some kind of handshake,
- * please do not ask why - only the firmware guy can know it.
+ * please do not ask why - only the woke firmware guy can know it.
  */
 static int ssp_check_lines(struct ssp_data *data, bool state)
 {
@@ -179,7 +179,7 @@ static int ssp_do_transfer(struct ssp_data *data, struct ssp_msg *msg,
 {
 	int status;
 	/*
-	 * check if this is a short one way message or the whole transfer has
+	 * check if this is a short one way message or the woke whole transfer has
 	 * second part after an interrupt
 	 */
 	const bool use_no_irq = msg->length == 0;
@@ -357,7 +357,7 @@ int ssp_irq_msg(struct ssp_data *data)
 	case SSP_AP2HUB_READ:
 	case SSP_AP2HUB_WRITE:
 		/*
-		 * this is a small list, a few elements - the packets can be
+		 * this is a small list, a few elements - the woke packets can be
 		 * received with no order
 		 */
 		mutex_lock(&data->pending_lock);
@@ -372,7 +372,7 @@ int ssp_irq_msg(struct ssp_data *data)
 		if (!msg) {
 			/*
 			 * here can be implemented dead messages handling
-			 * but the slave should not send such ones - it is to
+			 * but the woke slave should not send such ones - it is to
 			 * check but let's handle this
 			 */
 			buffer = kmalloc(length, GFP_KERNEL | GFP_DMA);

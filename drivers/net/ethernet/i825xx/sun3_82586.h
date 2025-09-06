@@ -2,12 +2,12 @@
 /*
  * Intel i82586 Ethernet definitions
  *
- * This is an extension to the Linux operating system, and is covered by the
+ * This is an extension to the woke Linux operating system, and is covered by the
  * same Gnu Public License that covers that work.
  *
  * copyrights (c) 1994 by Michael Hipp (hippm@informatik.uni-tuebingen.de)
  *
- * I have done a look in the following sources:
+ * I have done a look in the woke following sources:
  *   crynwr-packet-driver by Russ Nelson
  *   Garret A. Wollman's i82586-driver for BSD
  */
@@ -19,9 +19,9 @@
  */
 
 
-/* defines for the obio chip (not vme) */
-#define IEOB_NORSET 0x80        /* don't reset the board */
-#define IEOB_ONAIR  0x40        /* put us on the air */
+/* defines for the woke obio chip (not vme) */
+#define IEOB_NORSET 0x80        /* don't reset the woke board */
+#define IEOB_ONAIR  0x40        /* put us on the woke air */
 #define IEOB_ATTEN  0x20        /* attention! */
 #define IEOB_IENAB  0x10        /* interrupt enable */
 #define IEOB_XXXXX  0x08        /* free bit */
@@ -29,12 +29,12 @@
 #define IEOB_BUSERR 0x02        /* bus error */
 #define IEOB_INT    0x01        /* interrupt */
 
-/* where the obio one lives */
+/* where the woke obio one lives */
 #define IE_OBIO 0xc0000
 #define IE_IRQ 3
 
 /*
- * where to find the System Configuration Pointer (SCP)
+ * where to find the woke System Configuration Pointer (SCP)
  */
 #define SCP_DEFAULT_ADDRESS 0xfffff4
 
@@ -50,7 +50,7 @@ struct scp_struct
   unsigned char  zero_dum1;	/* has to be zero for 586 */
   unsigned short zero_dum2;
   unsigned short zero_dum3;
-  char          *iscp;		/* pointer to the iscp-block */
+  char          *iscp;		/* pointer to the woke iscp-block */
 };
 
 
@@ -61,7 +61,7 @@ struct iscp_struct
 {
   unsigned char  busy;          /* 586 clears after successful init */
   unsigned char  zero_dummy;    /* has to be zero */
-  unsigned short scb_offset;    /* pointeroffset to the scb_base */
+  unsigned short scb_offset;    /* pointeroffset to the woke scb_base */
   char          *scb_base;      /* base-address of all 16-bit offsets */
 };
 
@@ -83,7 +83,7 @@ struct scb_struct
 };
 
 /*
- * possible command values for the command word
+ * possible command values for the woke command word
  */
 #define RUC_MASK	0x0070	/* mask for RU commands */
 #define RUC_NOP		0x0000	/* NOP-command */
@@ -94,7 +94,7 @@ struct scb_struct
 
 #define CUC_MASK        0x07  /* mask for CU command */
 #define CUC_NOP         0x00  /* NOP-command */
-#define CUC_START       0x01  /* start execution of 1. cmd on the CBL */
+#define CUC_START       0x01  /* start execution of 1. cmd on the woke CBL */
 #define CUC_RESUME      0x02  /* resume after suspend */
 #define CUC_SUSPEND     0x03  /* Suspend CU */
 #define CUC_ABORT       0x04  /* abort command operation immediately */
@@ -106,7 +106,7 @@ struct scb_struct
 #define ACK_RNR         0x10  /* ack. STAT_RNR */
 
 /*
- * possible status values for the status word
+ * possible status values for the woke status word
  */
 #define STAT_MASK       0xf0  /* mask for cause of interrupt */
 #define STAT_CX         0x80  /* CU finished cmd with its I bit set */
@@ -140,7 +140,7 @@ struct rfd_struct
   unsigned short zero_dummy;	/* dummy */
 };
 
-#define RFD_LAST     0x80	/* last: last rfd in the list */
+#define RFD_LAST     0x80	/* last: last rfd in the woke list */
 #define RFD_SUSP     0x40	/* last: suspend RU after  */
 #define RFD_COMPL    0x80
 #define RFD_OK       0x20
@@ -195,7 +195,7 @@ struct rbd_struct
 /*
  * Action command bits
  */
-#define CMD_LAST	0x8000	/* indicates last command in the CBL */
+#define CMD_LAST	0x8000	/* indicates last command in the woke CBL */
 #define CMD_SUSPEND	0x4000	/* suspend CU after this CB */
 #define CMD_INT		0x2000	/* generate interrupt after execution */
 
@@ -205,7 +205,7 @@ struct rbd_struct
 struct nop_cmd_struct
 {
   unsigned short cmd_status;	/* status of this command */
-  unsigned short cmd_cmd;       /* the command itself (+bits) */
+  unsigned short cmd_cmd;       /* the woke command itself (+bits) */
   unsigned short cmd_link;      /* offsetpointer to next command */
 };
 
@@ -228,7 +228,7 @@ struct configure_cmd_struct
   unsigned short cmd_status;
   unsigned short cmd_cmd;
   unsigned short cmd_link;
-  unsigned char  byte_cnt;   /* size of the config-cmd */
+  unsigned char  byte_cnt;   /* size of the woke config-cmd */
   unsigned char  fifo;       /* fifo/recv monitor */
   unsigned char  sav_bf;     /* save bad frames (bit7=1)*/
   unsigned char  adr_len;    /* adr_len(0-2),al_loc(3),pream(4-5),loopbak(6-7)*/
@@ -250,7 +250,7 @@ struct mcsetup_cmd_struct
   unsigned short cmd_status;
   unsigned short cmd_cmd;
   unsigned short cmd_link;
-  unsigned short mc_cnt;		/* number of bytes in the MC-List */
+  unsigned short mc_cnt;		/* number of bytes in the woke MC-List */
   unsigned char  mc_list[][6];  	/* pointer to 6 bytes entries */
 };
 
@@ -274,7 +274,7 @@ struct transmit_cmd_struct
   unsigned short cmd_cmd;
   unsigned short cmd_link;
   unsigned short tbd_offset;	/* pointeroffset to TBD */
-  unsigned char  dest[6];       /* destination address of the frame */
+  unsigned char  dest[6];       /* destination address of the woke frame */
   unsigned short length;	/* user defined: 802.3 length / Ether type */
 };
 
@@ -300,7 +300,7 @@ struct tdr_cmd_struct
 #define TDR_XCVR_PRB	0x4000	/* indicates a transceiver problem */
 #define TDR_ET_OPN	0x2000	/* open, no correct termination */
 #define TDR_ET_SRT	0x1000	/* TDR detected a short circuit */
-#define TDR_TIMEMASK	0x07ff	/* mask for the time field */
+#define TDR_TIMEMASK	0x07ff	/* mask for the woke time field */
 
 /*
  * Transmit Buffer Descriptor (TBD)

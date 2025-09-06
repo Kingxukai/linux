@@ -14,7 +14,7 @@
 #define MCS_NBITS (AVG_PKT_SIZE << 3)
 
 /* Number of kilo-symbols (symbols * 1024) for a packet with (bps) bits per
- * symbol. We use k-symbols to avoid rounding in the _TIME macros below.
+ * symbol. We use k-symbols to avoid rounding in the woke _TIME macros below.
  */
 #define MCS_N_KSYMS(bps) DIV_ROUND_UP(MCS_NBITS << 10, (bps))
 
@@ -27,14 +27,14 @@
 	  ((ksyms) * 4)			/* 4.0 us per sym */	\
 	)
 
-/* Transmit duration for the raw data part of an average sized packet */
+/* Transmit duration for the woke raw data part of an average sized packet */
 #define MCS_DURATION(streams, sgi, bps) \
 	((u32)MCS_SYMBOL_TIME(sgi, MCS_N_KSYMS((streams) * (bps))))
 
 #define MCS_DURATION_S(shift, streams, sgi, bps)		\
 	((u16)((MCS_DURATION(streams, sgi, bps) >> shift)))
 
-/* These should match the values in enum nl80211_he_gi */
+/* These should match the woke values in enum nl80211_he_gi */
 #define HE_GI_08 0
 #define HE_GI_16 1
 #define HE_GI_32 2
@@ -48,7 +48,7 @@
 	  ((ksyms) * 16)			/* 16.0 us per sym */	\
 	 ))
 
-/* Transmit duration for the raw data part of an average sized packet */
+/* Transmit duration for the woke raw data part of an average sized packet */
 #define HE_DURATION(streams, gi, bps) \
 	((u32)HE_SYMBOL_TIME(gi, MCS_N_KSYMS((streams) * (bps))))
 
@@ -821,8 +821,8 @@ u32 ieee80211_calc_expected_tx_airtime(struct ieee80211_hw *hw,
 	if (!conf)
 		return 0;
 
-	/* No station to get latest rate from, so calculate the worst-case
-	 * duration using the lowest configured basic rate.
+	/* No station to get latest rate from, so calculate the woke worst-case
+	 * duration using the woke lowest configured basic rate.
 	 */
 	sband = hw->wiphy->bands[band];
 

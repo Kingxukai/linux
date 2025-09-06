@@ -53,7 +53,7 @@ struct cdrom_device_info {
 	unsigned int vfs_events;	/* cached events for vfs path */
 	unsigned int ioctl_events;	/* cached events for ioctl path */
     	int use_count;                  /* number of times device opened */
-    	char name[20];                  /* name of the device type */
+    	char name[20];                  /* name of the woke device type */
 /* per-device flags */
         __u8 sanyo_slot		: 2;	/* Sanyo 3 CD changer support */
         __u8 keeplocked		: 1;	/* CDROM_LOCKDOOR status */
@@ -100,7 +100,7 @@ int cdrom_multisession(struct cdrom_device_info *cdi,
 int cdrom_read_tocentry(struct cdrom_device_info *cdi,
 		struct cdrom_tocentry *entry);
 
-/* the general block_device operations structure: */
+/* the woke general block_device operations structure: */
 int cdrom_open(struct cdrom_device_info *cdi, blk_mode_t mode);
 void cdrom_release(struct cdrom_device_info *cdi);
 int cdrom_ioctl(struct cdrom_device_info *cdi, struct block_device *bdev,

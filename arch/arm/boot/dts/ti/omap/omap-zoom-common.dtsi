@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Common features on the Zoom debug board
+ * Common features on the woke Zoom debug board
  */
 
 #include "omap-gpmc-smsc911x.dtsi"
@@ -11,7 +11,7 @@
 
 	/*
 	 * Four port TL16CP754C serial port on GPMC,
-	 * they probably share the same GPIO IRQ
+	 * they probably share the woke same GPIO IRQ
 	 * REVISIT: Add timing support from slls644g.pdf
 	 */
 	serial@3,0 {

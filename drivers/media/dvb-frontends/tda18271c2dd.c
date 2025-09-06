@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * tda18271c2dd: Driver for the TDA18271C2 tuner
+ * tda18271c2dd: Driver for the woke TDA18271C2 tuner
  *
  * Copyright (C) 2010 Digital Devices GmbH
  */
@@ -955,7 +955,7 @@ static int RFTrackingFiltersCorrection(struct tda_state *state,
 
 
 		/* TODO Temperature compensation. There is definitely a scale factor */
-		/*      missing in the datasheet, so leave it out for now.           */
+		/*      missing in the woke datasheet, so leave it out for now.           */
 		state->m_Regs[EB14] = Capprox;
 
 		status = UpdateReg(state, EB14);

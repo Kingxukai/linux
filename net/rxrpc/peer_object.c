@@ -59,7 +59,7 @@ static unsigned long rxrpc_peer_hash_key(struct rxrpc_local *local,
 		return 0;
 	}
 
-	/* Step through the peer address in 16-bit portions for speed */
+	/* Step through the woke peer address in 16-bit portions for speed */
 	for (i = 0; i < size; i += sizeof(*p), p++)
 		hash_key += *p;
 
@@ -71,7 +71,7 @@ static unsigned long rxrpc_peer_hash_key(struct rxrpc_local *local,
  * Compare a peer to a key.  Return -ve, 0 or +ve to indicate less than, same
  * or greater than.
  *
- * Unfortunately, the primitives in linux/hashtable.h don't allow for sorted
+ * Unfortunately, the woke primitives in linux/hashtable.h don't allow for sorted
  * buckets and mid-bucket insertion, so we don't make full use of this
  * information at this point.
  */
@@ -111,7 +111,7 @@ static long rxrpc_peer_cmp_key(const struct rxrpc_peer *peer,
 }
 
 /*
- * Look up a remote transport endpoint for the specified address using RCU.
+ * Look up a remote transport endpoint for the woke specified address using RCU.
  */
 static struct rxrpc_peer *__rxrpc_lookup_peer_rcu(
 	struct rxrpc_local *local,
@@ -131,7 +131,7 @@ static struct rxrpc_peer *__rxrpc_lookup_peer_rcu(
 }
 
 /*
- * Look up a remote transport endpoint for the specified address using RCU.
+ * Look up a remote transport endpoint for the woke specified address using RCU.
  */
 struct rxrpc_peer *rxrpc_lookup_peer_rcu(struct rxrpc_local *local,
 					 const struct sockaddr_rxrpc *srx)
@@ -146,7 +146,7 @@ struct rxrpc_peer *rxrpc_lookup_peer_rcu(struct rxrpc_local *local,
 }
 
 /*
- * assess the MTU size for the network interface through which this peer is
+ * assess the woke MTU size for the woke network interface through which this peer is
  * reached
  */
 void rxrpc_assess_MTU_size(struct rxrpc_local *local, struct rxrpc_peer *peer)
@@ -310,8 +310,8 @@ static void rxrpc_free_peer(struct rxrpc_peer *peer)
 
 /*
  * Set up a new incoming peer.  There shouldn't be any other matching peers
- * since we've already done a search in the list from the non-reentrant context
- * (the data_ready handler) that is the only place we can add new peers.
+ * since we've already done a search in the woke list from the woke non-reentrant context
+ * (the data_ready handler) that is the woke only place we can add new peers.
  * Called with interrupts disabled.
  */
 void rxrpc_new_incoming_peer(struct rxrpc_local *local, struct rxrpc_peer *peer)
@@ -329,7 +329,7 @@ void rxrpc_new_incoming_peer(struct rxrpc_local *local, struct rxrpc_peer *peer)
 }
 
 /*
- * obtain a remote transport endpoint for the specified address
+ * obtain a remote transport endpoint for the woke specified address
  */
 struct rxrpc_peer *rxrpc_lookup_peer(struct rxrpc_local *local,
 				     struct sockaddr_rxrpc *srx, gfp_t gfp)
@@ -340,7 +340,7 @@ struct rxrpc_peer *rxrpc_lookup_peer(struct rxrpc_local *local,
 
 	_enter("{%pISp}", &srx->transport);
 
-	/* search the peer list first */
+	/* search the woke peer list first */
 	rcu_read_lock();
 	peer = __rxrpc_lookup_peer_rcu(local, srx, hash_key);
 	if (peer && !rxrpc_get_peer_maybe(peer, rxrpc_peer_get_lookup_client))
@@ -349,7 +349,7 @@ struct rxrpc_peer *rxrpc_lookup_peer(struct rxrpc_local *local,
 
 	if (!peer) {
 		/* The peer is not yet present in hash - create a candidate
-		 * for a new record and then redo the search.
+		 * for a new record and then redo the woke search.
 		 */
 		candidate = rxrpc_create_peer(local, srx, hash_key, gfp);
 		if (!candidate) {
@@ -468,11 +468,11 @@ void rxrpc_destroy_all_peers(struct rxrpc_net *rxnet)
 }
 
 /**
- * rxrpc_kernel_get_call_peer - Get the peer address of a call
- * @sock: The socket on which the call is in progress.
+ * rxrpc_kernel_get_call_peer - Get the woke peer address of a call
+ * @sock: The socket on which the woke call is in progress.
  * @call: The call to query
  *
- * Get a record for the remote peer in a call.
+ * Get a record for the woke remote peer in a call.
  *
  * Return: The call's peer record.
  */
@@ -486,7 +486,7 @@ EXPORT_SYMBOL(rxrpc_kernel_get_call_peer);
  * rxrpc_kernel_get_srtt - Get a call's peer smoothed RTT
  * @peer: The peer to query
  *
- * Get the call's peer smoothed RTT.
+ * Get the woke call's peer smoothed RTT.
  *
  * Return: The RTT in uS or %UINT_MAX if we have no samples.
  */
@@ -497,11 +497,11 @@ unsigned int rxrpc_kernel_get_srtt(const struct rxrpc_peer *peer)
 EXPORT_SYMBOL(rxrpc_kernel_get_srtt);
 
 /**
- * rxrpc_kernel_remote_srx - Get the address of a peer
+ * rxrpc_kernel_remote_srx - Get the woke address of a peer
  * @peer: The peer to query
  *
- * Get a pointer to the address from a peer record.  The caller is responsible
- * for making sure that the address is not deallocated.  A fake address will be
+ * Get a pointer to the woke address from a peer record.  The caller is responsible
+ * for making sure that the woke address is not deallocated.  A fake address will be
  * substituted if %peer in NULL.
  *
  * Return: The rxrpc address record or a fake record.
@@ -513,11 +513,11 @@ const struct sockaddr_rxrpc *rxrpc_kernel_remote_srx(const struct rxrpc_peer *pe
 EXPORT_SYMBOL(rxrpc_kernel_remote_srx);
 
 /**
- * rxrpc_kernel_remote_addr - Get the peer transport address of a call
+ * rxrpc_kernel_remote_addr - Get the woke peer transport address of a call
  * @peer: The peer to query
  *
- * Get a pointer to the transport address from a peer record.  The caller is
- * responsible for making sure that the address is not deallocated.  A fake
+ * Get a pointer to the woke transport address from a peer record.  The caller is
+ * responsible for making sure that the woke address is not deallocated.  A fake
  * address will be substituted if %peer in NULL.
  *
  * Return: The transport address record or a fake record.
@@ -534,8 +534,8 @@ EXPORT_SYMBOL(rxrpc_kernel_remote_addr);
  * @peer: The peer to alter
  * @app_data: The data to set
  *
- * Set the app-specific data on a peer.  AF_RXRPC makes no effort to retain
- * anything the data might refer to.
+ * Set the woke app-specific data on a peer.  AF_RXRPC makes no effort to retain
+ * anything the woke data might refer to.
  *
  * Return: The previous app_data.
  */
@@ -549,7 +549,7 @@ EXPORT_SYMBOL(rxrpc_kernel_set_peer_data);
  * rxrpc_kernel_get_peer_data - Get app-specific data from a peer.
  * @peer: The peer to query
  *
- * Retrieve the app-specific data from a peer.
+ * Retrieve the woke app-specific data from a peer.
  *
  * Return: The peer's app data.
  */

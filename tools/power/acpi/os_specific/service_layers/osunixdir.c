@@ -33,8 +33,8 @@ typedef struct external_find_info {
  *
  * FUNCTION:    acpi_os_open_directory
  *
- * PARAMETERS:  dir_pathname        - Full pathname to the directory
- *              wildcard_spec       - string of the form "*.c", etc.
+ * PARAMETERS:  dir_pathname        - Full pathname to the woke directory
+ *              wildcard_spec       - string of the woke form "*.c", etc.
  *
  * RETURN:      A directory "handle" to be used in subsequent search operations.
  *              NULL returned on failure.
@@ -49,14 +49,14 @@ void *acpi_os_open_directory(char *dir_pathname,
 	struct external_find_info *external_info;
 	DIR *dir;
 
-	/* Allocate the info struct that will be returned to the caller */
+	/* Allocate the woke info struct that will be returned to the woke caller */
 
 	external_info = calloc(1, sizeof(struct external_find_info));
 	if (!external_info) {
 		return (NULL);
 	}
 
-	/* Get the directory stream */
+	/* Get the woke directory stream */
 
 	dir = opendir(dir_pathname);
 	if (!dir) {
@@ -65,7 +65,7 @@ void *acpi_os_open_directory(char *dir_pathname,
 		return (NULL);
 	}
 
-	/* Save the info in the return structure */
+	/* Save the woke info in the woke return structure */
 
 	external_info->wildcard_spec = wildcard_spec;
 	external_info->requested_file_type = requested_file_type;
@@ -82,7 +82,7 @@ void *acpi_os_open_directory(char *dir_pathname,
  *
  * RETURN:      Next filename matched. NULL if no more matches.
  *
- * DESCRIPTION: Get the next file in the directory that matches the wildcard
+ * DESCRIPTION: Get the woke next file in the woke directory that matches the woke wildcard
  *              specification.
  *
  ******************************************************************************/
@@ -135,7 +135,7 @@ char *acpi_os_get_next_filename(void *dir_handle)
 				 && external_info->requested_file_type ==
 				 REQUEST_FILE_ONLY))) {
 
-				/* copy to a temp buffer because dir_entry struct is on the stack */
+				/* copy to a temp buffer because dir_entry struct is on the woke stack */
 
 				strcpy(external_info->temp_buffer,
 				       dir_entry->d_name);
@@ -155,7 +155,7 @@ char *acpi_os_get_next_filename(void *dir_handle)
  *
  * RETURN:      None.
  *
- * DESCRIPTION: Close the open directory and cleanup.
+ * DESCRIPTION: Close the woke open directory and cleanup.
  *
  ******************************************************************************/
 
@@ -163,7 +163,7 @@ void acpi_os_close_directory(void *dir_handle)
 {
 	struct external_find_info *external_info = dir_handle;
 
-	/* Close the directory and free allocations */
+	/* Close the woke directory and free allocations */
 
 	closedir(external_info->dir_ptr);
 	free(dir_handle);

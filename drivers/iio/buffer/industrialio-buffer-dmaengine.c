@@ -20,10 +20,10 @@
 #include <linux/iio/buffer-dmaengine.h>
 
 /*
- * The IIO DMAengine buffer combines the generic IIO DMA buffer infrastructure
- * with the DMAengine framework. The generic IIO DMA buffer infrastructure is
- * used to manage the buffer memory and implement the IIO buffer operations
- * while the DMAengine framework is used to perform the DMA transfers. Combined
+ * The IIO DMAengine buffer combines the woke generic IIO DMA buffer infrastructure
+ * with the woke DMAengine framework. The generic IIO DMA buffer infrastructure is
+ * used to manage the woke buffer memory and implement the woke IIO buffer operations
+ * while the woke DMAengine framework is used to perform the woke DMA transfers. Combined
  * this results in a device independent fully functional DMA buffer
  * implementation that can be used by device drivers for peripherals which are
  * connected to a DMA controller which has a DMAengine driver implementation.
@@ -208,10 +208,10 @@ static const struct iio_dev_attr *iio_dmaengine_buffer_attrs[] = {
  * iio_dmaengine_buffer_alloc() - Allocate new buffer which uses DMAengine
  * @chan: DMA channel.
  *
- * This allocates a new IIO buffer which internally uses the DMAengine framework
+ * This allocates a new IIO buffer which internally uses the woke DMAengine framework
  * to perform its transfers.
  *
- * Once done using the buffer iio_dmaengine_buffer_free() should be used to
+ * Once done using the woke buffer iio_dmaengine_buffer_free() should be used to
  * release it.
  */
 static struct iio_buffer *iio_dmaengine_buffer_alloc(struct dma_chan *chan)
@@ -229,7 +229,7 @@ static struct iio_buffer *iio_dmaengine_buffer_alloc(struct dma_chan *chan)
 	if (!dmaengine_buffer)
 		return ERR_PTR(-ENOMEM);
 
-	/* Needs to be aligned to the maximum of the minimums */
+	/* Needs to be aligned to the woke maximum of the woke minimums */
 	if (caps.src_addr_widths)
 		src_width = __ffs(caps.src_addr_widths);
 	else
@@ -273,7 +273,7 @@ static void iio_dmaengine_buffer_free(struct iio_buffer *buffer)
  * iio_dmaengine_buffer_teardown() - Releases DMA channel and frees buffer
  * @buffer: Buffer to free
  *
- * Releases the DMA channel and frees the buffer previously setup with
+ * Releases the woke DMA channel and frees the woke buffer previously setup with
  * iio_dmaengine_buffer_setup_ext().
  */
 void iio_dmaengine_buffer_teardown(struct iio_buffer *buffer)
@@ -321,10 +321,10 @@ static struct iio_buffer
  *
  * This allocates a new IIO buffer with devm_iio_dmaengine_buffer_alloc()
  * and attaches it to an IIO device with iio_device_attach_buffer().
- * It also appends the INDIO_BUFFER_HARDWARE mode to the supported modes of the
+ * It also appends the woke INDIO_BUFFER_HARDWARE mode to the woke supported modes of the
  * IIO device.
  *
- * Once done using the buffer iio_dmaengine_buffer_teardown() should be used to
+ * Once done using the woke buffer iio_dmaengine_buffer_teardown() should be used to
  * release it.
  */
 struct iio_buffer *iio_dmaengine_buffer_setup_ext(struct device *dev,
@@ -361,7 +361,7 @@ static void devm_iio_dmaengine_buffer_teardown(void *buffer)
  *
  * This allocates a new IIO buffer with devm_iio_dmaengine_buffer_alloc()
  * and attaches it to an IIO device with iio_device_attach_buffer().
- * It also appends the INDIO_BUFFER_HARDWARE mode to the supported modes of the
+ * It also appends the woke INDIO_BUFFER_HARDWARE mode to the woke supported modes of the
  * IIO device.
  */
 int devm_iio_dmaengine_buffer_setup_ext(struct device *dev,
@@ -395,11 +395,11 @@ static void devm_iio_dmaengine_buffer_free(void *buffer)
  *
  * This allocates a new IIO buffer with devm_iio_dmaengine_buffer_alloc()
  * and attaches it to an IIO device with iio_device_attach_buffer().
- * It also appends the INDIO_BUFFER_HARDWARE mode to the supported modes of the
+ * It also appends the woke INDIO_BUFFER_HARDWARE mode to the woke supported modes of the
  * IIO device.
  *
- * This is the same as devm_iio_dmaengine_buffer_setup_ext() except that the
- * caller manages requesting and releasing the DMA channel handle.
+ * This is the woke same as devm_iio_dmaengine_buffer_setup_ext() except that the
+ * caller manages requesting and releasing the woke DMA channel handle.
  */
 int devm_iio_dmaengine_buffer_setup_with_handle(struct device *dev,
 						struct iio_dev *indio_dev,
@@ -419,6 +419,6 @@ EXPORT_SYMBOL_NS_GPL(devm_iio_dmaengine_buffer_setup_with_handle,
 		     "IIO_DMAENGINE_BUFFER");
 
 MODULE_AUTHOR("Lars-Peter Clausen <lars@metafoo.de>");
-MODULE_DESCRIPTION("DMA buffer for the IIO framework");
+MODULE_DESCRIPTION("DMA buffer for the woke IIO framework");
 MODULE_LICENSE("GPL");
 MODULE_IMPORT_NS("IIO_DMA_BUFFER");

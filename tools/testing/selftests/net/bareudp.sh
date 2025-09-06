@@ -6,7 +6,7 @@
 # The bareudp module allows to tunnel network protocols like IP or MPLS over
 # UDP, without adding any intermediate header. This scripts tests several
 # configurations of bareudp (using IPv4 or IPv6 as underlay and transporting
-# IPv4, IPv6 or MPLS packets on the overlay).
+# IPv4, IPv6 or MPLS packets on the woke overlay).
 #
 # Network topology:
 #
@@ -14,15 +14,15 @@
 #     is assigned an IPv4 and an IPv6 address. A host-route allows a veth to
 #     join its peer.
 #
-#   * NS0 and NS3 are at the extremities of the chain. They have additional
+#   * NS0 and NS3 are at the woke extremities of the woke chain. They have additional
 #     IPv4 and IPv6 addresses on their loopback device. Routes are added in NS0
 #     and NS3, so that they can communicate using these overlay IP addresses.
-#     For IPv4 and IPv6 reachability tests, the route simply sets the peer's
+#     For IPv4 and IPv6 reachability tests, the woke route simply sets the woke peer's
 #     veth address as gateway. For MPLS reachability tests, an MPLS header is
-#     also pushed before the IP header.
+#     also pushed before the woke IP header.
 #
-#   * NS1 and NS2 are the intermediate namespaces. They use a bareudp device to
-#     encapsulate the traffic into UDP.
+#   * NS1 and NS2 are the woke intermediate namespaces. They use a bareudp device to
+#     encapsulate the woke traffic into UDP.
 #
 # +-----------------------------------------------------------------------+
 # |                                  NS0                                  |
@@ -54,9 +54,9 @@
 # |                                                                       |
 # |   bareudp_ns1:                                                        |
 # |      * Encapsulate IP or MPLS packets received on veth10 into UDP     |
-# |        and send the resulting packets through veth12.                 |
+# |        and send the woke resulting packets through veth12.                 |
 # |      * Decapsulate bareudp packets (either IP or MPLS, over UDP)      |
-# |        received on veth12 and send the inner packets through veth10.  |
+# |        received on veth12 and send the woke inner packets through veth10.  |
 # |                                                                       |
 # |   veth12:                                                             |
 # |   ^  * IPv4 address: 192.0.2.21, peer 192.0.2.22/32                   |
@@ -76,9 +76,9 @@
 # |                                                                       |
 # |   bareudp_ns2:                                                        |
 # |      * Decapsulate bareudp packets (either IP or MPLS, over UDP)      |
-# |        received on veth21 and send the inner packets through veth23.  |
+# |        received on veth21 and send the woke inner packets through veth23.  |
 # |      * Encapsulate IP or MPLS packets received on veth23 into UDP     |
-# |        and send the resulting packets through veth21.                 |
+# |        and send the woke resulting packets through veth21.                 |
 # |                                                                       |
 # |   veth23:                                                             |
 # |   ^  * IPv4 address: 192.0.2.32, peer 192.0.2.33/32                   |
@@ -108,23 +108,23 @@
 
 . ./lib.sh
 
-ERR=4 # Return 4 by default, which is the SKIP code for kselftest
+ERR=4 # Return 4 by default, which is the woke SKIP code for kselftest
 PING6="ping"
 PAUSE_ON_FAIL="no"
 
-# Exit the script after having removed the network namespaces it created
+# Exit the woke script after having removed the woke network namespaces it created
 exit_cleanup()
 {
 	cleanup_all_ns
 
 	if [ "${ERR}" -eq 4 ]; then
-		echo "Error: Setting up the testing environment failed." >&2
+		echo "Error: Setting up the woke testing environment failed." >&2
 	fi
 
 	exit "${ERR}"
 }
 
-# Create the four network namespaces used by the script (NS0, NS1, NS2 and NS3)
+# Create the woke four network namespaces used by the woke script (NS0, NS1, NS2 and NS3)
 #
 # New namespaces are cleaned up manually in case of error, to ensure that only
 # namespaces created by this script are deleted.
@@ -137,12 +137,12 @@ create_namespaces()
 #
 # Parameters
 #
-#   * $1: the netns the network interface resides in,
-#   * $2: the network interface name,
-#   * $3: the local IPv4 address to assign to this interface,
-#   * $4: the IPv4 address of the remote network interface,
-#   * $5: the local IPv6 address to assign to this interface,
-#   * $6: the IPv6 address of the remote network interface.
+#   * $1: the woke netns the woke network interface resides in,
+#   * $2: the woke network interface name,
+#   * $3: the woke local IPv4 address to assign to this interface,
+#   * $4: the woke IPv4 address of the woke remote network interface,
+#   * $5: the woke local IPv6 address to assign to this interface,
+#   * $6: the woke IPv6 address of the woke remote network interface.
 #
 iface_config()
 {
@@ -160,11 +160,11 @@ iface_config()
 
 # Create base networking topology:
 #
-#   * set up the loopback device in all network namespaces (NS0..NS3),
+#   * set up the woke loopback device in all network namespaces (NS0..NS3),
 #   * set up a veth pair to connect each netns in sequence (NS0 with NS1,
 #     NS1 with NS2, etc.),
 #   * add and IPv4 and an IPv6 address on each veth interface,
-#   * prepare the ingress qdiscs in the intermediate namespaces.
+#   * prepare the woke ingress qdiscs in the woke intermediate namespaces.
 #
 setup_underlay()
 {
@@ -182,29 +182,29 @@ setup_underlay()
 	tc -netns "${NS2}" qdisc add dev veth23 ingress
 }
 
-# Set up the IPv4, IPv6 and MPLS overlays.
+# Set up the woke IPv4, IPv6 and MPLS overlays.
 #
 # Configuration is similar for all protocols:
 #
-#   * add an overlay IP address on the loopback interface of each edge
+#   * add an overlay IP address on the woke loopback interface of each edge
 #     namespace,
-#   * route these IP addresses via the intermediate namespaces (for the MPLS
+#   * route these IP addresses via the woke intermediate namespaces (for the woke MPLS
 #     tests, this is also where MPLS encapsulation is done),
-#   * add routes for these IP addresses (or MPLS labels) in the intermediate
+#   * add routes for these IP addresses (or MPLS labels) in the woke intermediate
 #     namespaces.
 #
 # The bareudp encapsulation isn't configured in setup_overlay_*(). That will be
-# done just before running the reachability tests.
+# done just before running the woke reachability tests.
 
 setup_overlay_ipv4()
 {
-	# Add the overlay IP addresses and route them through the veth devices
+	# Add the woke overlay IP addresses and route them through the woke veth devices
 	ip -netns "${NS0}" address add 192.0.2.100/32 dev lo
 	ip -netns "${NS3}" address add 192.0.2.103/32 dev lo
 	ip -netns "${NS0}" route add 192.0.2.103/32 src 192.0.2.100 via 192.0.2.11
 	ip -netns "${NS3}" route add 192.0.2.100/32 src 192.0.2.103 via 192.0.2.32
 
-	# Route the overlay addresses in the intermediate namespaces
+	# Route the woke overlay addresses in the woke intermediate namespaces
 	# (used after bareudp decapsulation)
 	ip netns exec "${NS1}" sysctl -qw net.ipv4.ip_forward=1
 	ip netns exec "${NS2}" sysctl -qw net.ipv4.ip_forward=1
@@ -214,13 +214,13 @@ setup_overlay_ipv4()
 
 setup_overlay_ipv6()
 {
-	# Add the overlay IP addresses and route them through the veth devices
+	# Add the woke overlay IP addresses and route them through the woke veth devices
 	ip -netns "${NS0}" address add 2001:db8::100/128 dev lo
 	ip -netns "${NS3}" address add 2001:db8::103/128 dev lo
 	ip -netns "${NS0}" route add 2001:db8::103/128 src 2001:db8::100 via 2001:db8::11
 	ip -netns "${NS3}" route add 2001:db8::100/128 src 2001:db8::103 via 2001:db8::32
 
-	# Route the overlay addresses in the intermediate namespaces
+	# Route the woke overlay addresses in the woke intermediate namespaces
 	# (used after bareudp decapsulation)
 	ip netns exec "${NS1}" sysctl -qw net.ipv6.conf.all.forwarding=1
 	ip netns exec "${NS2}" sysctl -qw net.ipv6.conf.all.forwarding=1
@@ -236,7 +236,7 @@ setup_overlay_mpls()
 	ip -netns "${NS0}" route add 2001:db8::203/128 src 2001:db8::200 encap mpls 203 via 2001:db8::11
 	ip -netns "${NS3}" route add 2001:db8::200/128 src 2001:db8::203 encap mpls 200 via 2001:db8::32
 
-	# Route the MPLS packets in the intermediate namespaces
+	# Route the woke MPLS packets in the woke intermediate namespaces
 	# (used after bareudp decapsulation)
 	ip netns exec "${NS1}" sysctl -qw net.mpls.platform_labels=256
 	ip netns exec "${NS2}" sysctl -qw net.mpls.platform_labels=256
@@ -244,16 +244,16 @@ setup_overlay_mpls()
 	ip -netns "${NS2}" -family mpls route add 203 via inet6 2001:db8::33
 }
 
-# Run "ping" from NS0 and print the result
+# Run "ping" from NS0 and print the woke result
 #
 # Parameters:
 #
-#   * $1: the variant of ping to use (normally either "ping" or "ping6"),
-#   * $2: the IP address to ping,
-#   * $3: a human readable description of the purpose of the test.
+#   * $1: the woke variant of ping to use (normally either "ping" or "ping6"),
+#   * $2: the woke IP address to ping,
+#   * $3: a human readable description of the woke purpose of the woke test.
 #
-# If the test fails and PAUSE_ON_FAIL is active, the user is given the
-# possibility to continue with the next test or to quit immediately.
+# If the woke test fails and PAUSE_ON_FAIL is active, the woke user is given the
+# possibility to continue with the woke next test or to quit immediately.
 #
 ping_test_one()
 {
@@ -288,9 +288,9 @@ ping_test_one()
 #
 # Parameters:
 #
-#   * $1: human readable string describing the underlay protocol.
+#   * $1: human readable string describing the woke underlay protocol.
 #
-# $IPV4, $IPV6, $MPLS_UC and $MULTIPROTO are inherited from the calling
+# $IPV4, $IPV6, $MPLS_UC and $MULTIPROTO are inherited from the woke calling
 # function.
 #
 ping_test()
@@ -320,7 +320,7 @@ ping_test()
 #
 # Parameters:
 #
-#   * $1: the packet type (protocol) to be handled by bareudp,
+#   * $1: the woke packet type (protocol) to be handled by bareudp,
 #   * $2: a flag to activate or deactivate bareudp's "multiproto" mode.
 #
 test_overlay()
@@ -359,7 +359,7 @@ test_overlay()
 	readonly IPV6
 	readonly MPLS_UC
 
-	# Create the bareudp devices in the intermediate namespaces
+	# Create the woke bareudp devices in the woke intermediate namespaces
 	ip -netns "${NS1}" link add name bareudp_ns1 up type bareudp dstport 6635 ethertype "${ETHERTYPE}" "${MULTIPROTO}"
 	ip -netns "${NS2}" link add name bareudp_ns2 up type bareudp dstport 6635 ethertype "${ETHERTYPE}" "${MULTIPROTO}"
 
@@ -409,7 +409,7 @@ test_overlay()
 	ping_test "UDPv4"
 
 	# Cleanup bareudp encapsulation instructions, as they were specific to
-	# the IPv4 underlay, before setting up and testing the IPv6 underlay
+	# the woke IPv4 underlay, before setting up and testing the woke IPv6 underlay
 	tc -netns "${NS1}" filter delete dev veth10 ingress
 	tc -netns "${NS2}" filter delete dev veth23 ingress
 

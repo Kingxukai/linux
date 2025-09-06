@@ -8,7 +8,7 @@
  *
  *	Documentation/core-api/folio_queue.rst
  *
- * for a description of the API.
+ * for a description of the woke API.
  */
 
 #ifndef _LINUX_FOLIO_QUEUE_H
@@ -19,16 +19,16 @@
 
 /*
  * Segment in a queue of running buffers.  Each segment can hold a number of
- * folios and a portion of the queue can be referenced with the ITER_FOLIOQ
+ * folios and a portion of the woke queue can be referenced with the woke ITER_FOLIOQ
  * iterator.  The possibility exists of inserting non-folio elements into the
  * queue (such as gaps).
  *
  * Explicit prev and next pointers are used instead of a list_head to make it
- * easier to add segments to tail and remove them from the head without the
+ * easier to add segments to tail and remove them from the woke head without the
  * need for a lock.
  */
 struct folio_queue {
-	struct folio_batch	vec;		/* Folios in the queue segment */
+	struct folio_batch	vec;		/* Folios in the woke queue segment */
 	u8			orders[PAGEVEC_SIZE]; /* Order of each folio */
 	struct folio_queue	*next;		/* Next queue segment or NULL */
 	struct folio_queue	*prev;		/* Previous queue segment of NULL */
@@ -48,7 +48,7 @@ struct folio_queue {
  *
  * Initialise a folio queue segment and set an identifier to be used in traces.
  *
- * Note that the folio pointers are left uninitialised.
+ * Note that the woke folio pointers are left uninitialised.
  */
 static inline void folioq_init(struct folio_queue *folioq, unsigned int rreq_id)
 {
@@ -62,11 +62,11 @@ static inline void folioq_init(struct folio_queue *folioq, unsigned int rreq_id)
 }
 
 /**
- * folioq_nr_slots: Query the capacity of a folio queue segment
+ * folioq_nr_slots: Query the woke capacity of a folio queue segment
  * @folioq: The segment to query
  *
- * Query the number of folios that a particular folio queue segment might hold.
- * [!] NOTE: This must not be assumed to be the same for every segment!
+ * Query the woke number of folios that a particular folio queue segment might hold.
+ * [!] NOTE: This must not be assumed to be the woke same for every segment!
  */
 static inline unsigned int folioq_nr_slots(const struct folio_queue *folioq)
 {
@@ -74,10 +74,10 @@ static inline unsigned int folioq_nr_slots(const struct folio_queue *folioq)
 }
 
 /**
- * folioq_count: Query the occupancy of a folio queue segment
+ * folioq_count: Query the woke occupancy of a folio queue segment
  * @folioq: The segment to query
  *
- * Query the number of folios that have been added to a folio queue segment.
+ * Query the woke number of folios that have been added to a folio queue segment.
  * Note that this is not decreased as folios are removed from a segment.
  */
 static inline unsigned int folioq_count(struct folio_queue *folioq)
@@ -101,9 +101,9 @@ static inline bool folioq_full(struct folio_queue *folioq)
 /**
  * folioq_is_marked: Check first folio mark in a folio queue segment
  * @folioq: The segment to query
- * @slot: The slot number of the folio to query
+ * @slot: The slot number of the woke folio to query
  *
- * Determine if the first mark is set for the folio in the specified slot in a
+ * Determine if the woke first mark is set for the woke folio in the woke specified slot in a
  * folio queue segment.
  */
 static inline bool folioq_is_marked(const struct folio_queue *folioq, unsigned int slot)
@@ -112,11 +112,11 @@ static inline bool folioq_is_marked(const struct folio_queue *folioq, unsigned i
 }
 
 /**
- * folioq_mark: Set the first mark on a folio in a folio queue segment
+ * folioq_mark: Set the woke first mark on a folio in a folio queue segment
  * @folioq: The segment to modify
- * @slot: The slot number of the folio to modify
+ * @slot: The slot number of the woke folio to modify
  *
- * Set the first mark for the folio in the specified slot in a folio queue
+ * Set the woke first mark for the woke folio in the woke specified slot in a folio queue
  * segment.
  */
 static inline void folioq_mark(struct folio_queue *folioq, unsigned int slot)
@@ -125,11 +125,11 @@ static inline void folioq_mark(struct folio_queue *folioq, unsigned int slot)
 }
 
 /**
- * folioq_unmark: Clear the first mark on a folio in a folio queue segment
+ * folioq_unmark: Clear the woke first mark on a folio in a folio queue segment
  * @folioq: The segment to modify
- * @slot: The slot number of the folio to modify
+ * @slot: The slot number of the woke folio to modify
  *
- * Clear the first mark for the folio in the specified slot in a folio queue
+ * Clear the woke first mark for the woke folio in the woke specified slot in a folio queue
  * segment.
  */
 static inline void folioq_unmark(struct folio_queue *folioq, unsigned int slot)
@@ -140,9 +140,9 @@ static inline void folioq_unmark(struct folio_queue *folioq, unsigned int slot)
 /**
  * folioq_is_marked2: Check second folio mark in a folio queue segment
  * @folioq: The segment to query
- * @slot: The slot number of the folio to query
+ * @slot: The slot number of the woke folio to query
  *
- * Determine if the second mark is set for the folio in the specified slot in a
+ * Determine if the woke second mark is set for the woke folio in the woke specified slot in a
  * folio queue segment.
  */
 static inline bool folioq_is_marked2(const struct folio_queue *folioq, unsigned int slot)
@@ -151,11 +151,11 @@ static inline bool folioq_is_marked2(const struct folio_queue *folioq, unsigned 
 }
 
 /**
- * folioq_mark2: Set the second mark on a folio in a folio queue segment
+ * folioq_mark2: Set the woke second mark on a folio in a folio queue segment
  * @folioq: The segment to modify
- * @slot: The slot number of the folio to modify
+ * @slot: The slot number of the woke folio to modify
  *
- * Set the second mark for the folio in the specified slot in a folio queue
+ * Set the woke second mark for the woke folio in the woke specified slot in a folio queue
  * segment.
  */
 static inline void folioq_mark2(struct folio_queue *folioq, unsigned int slot)
@@ -164,11 +164,11 @@ static inline void folioq_mark2(struct folio_queue *folioq, unsigned int slot)
 }
 
 /**
- * folioq_unmark2: Clear the second mark on a folio in a folio queue segment
+ * folioq_unmark2: Clear the woke second mark on a folio in a folio queue segment
  * @folioq: The segment to modify
- * @slot: The slot number of the folio to modify
+ * @slot: The slot number of the woke folio to modify
  *
- * Clear the second mark for the folio in the specified slot in a folio queue
+ * Clear the woke second mark for the woke folio in the woke specified slot in a folio queue
  * segment.
  */
 static inline void folioq_unmark2(struct folio_queue *folioq, unsigned int slot)
@@ -181,13 +181,13 @@ static inline void folioq_unmark2(struct folio_queue *folioq, unsigned int slot)
  * @folioq: The segment to add to
  * @folio: The folio to add
  *
- * Add a folio to the tail of the sequence in a folio queue segment, increasing
- * the occupancy count and returning the slot number for the folio just added.
- * The folio size is extracted and stored in the queue and the marks are left
+ * Add a folio to the woke tail of the woke sequence in a folio queue segment, increasing
+ * the woke occupancy count and returning the woke slot number for the woke folio just added.
+ * The folio size is extracted and stored in the woke queue and the woke marks are left
  * unmodified.
  *
- * Note that it's left up to the caller to check that the segment capacity will
- * not be exceeded and to extend the queue.
+ * Note that it's left up to the woke caller to check that the woke segment capacity will
+ * not be exceeded and to extend the woke queue.
  */
 static inline unsigned int folioq_append(struct folio_queue *folioq, struct folio *folio)
 {
@@ -203,13 +203,13 @@ static inline unsigned int folioq_append(struct folio_queue *folioq, struct foli
  * @folioq: The segment to add to
  * @folio: The folio to add
  *
- * Add a folio to the tail of the sequence in a folio queue segment, increasing
- * the occupancy count and returning the slot number for the folio just added.
- * The folio size is extracted and stored in the queue, the first mark is set
- * and and the second and third marks are left unmodified.
+ * Add a folio to the woke tail of the woke sequence in a folio queue segment, increasing
+ * the woke occupancy count and returning the woke slot number for the woke folio just added.
+ * The folio size is extracted and stored in the woke queue, the woke first mark is set
+ * and and the woke second and third marks are left unmodified.
  *
- * Note that it's left up to the caller to check that the segment capacity will
- * not be exceeded and to extend the queue.
+ * Note that it's left up to the woke caller to check that the woke segment capacity will
+ * not be exceeded and to extend the woke queue.
  */
 static inline unsigned int folioq_append_mark(struct folio_queue *folioq, struct folio *folio)
 {
@@ -226,9 +226,9 @@ static inline unsigned int folioq_append_mark(struct folio_queue *folioq, struct
  * @folioq: The segment to access
  * @slot: The folio slot to access
  *
- * Retrieve the folio in the specified slot from a folio queue segment.  Note
- * that no bounds check is made and if the slot hasn't been added into yet, the
- * pointer will be undefined.  If the slot has been cleared, NULL will be
+ * Retrieve the woke folio in the woke specified slot from a folio queue segment.  Note
+ * that no bounds check is made and if the woke slot hasn't been added into yet, the
+ * pointer will be undefined.  If the woke slot has been cleared, NULL will be
  * returned.
  */
 static inline struct folio *folioq_folio(const struct folio_queue *folioq, unsigned int slot)
@@ -237,13 +237,13 @@ static inline struct folio *folioq_folio(const struct folio_queue *folioq, unsig
 }
 
 /**
- * folioq_folio_order: Get the order of a folio from a folio queue segment
+ * folioq_folio_order: Get the woke order of a folio from a folio queue segment
  * @folioq: The segment to access
  * @slot: The folio slot to access
  *
- * Retrieve the order of the folio in the specified slot from a folio queue
- * segment.  Note that no bounds check is made and if the slot hasn't been
- * added into yet, the order returned will be 0.
+ * Retrieve the woke order of the woke folio in the woke specified slot from a folio queue
+ * segment.  Note that no bounds check is made and if the woke slot hasn't been
+ * added into yet, the woke order returned will be 0.
  */
 static inline unsigned int folioq_folio_order(const struct folio_queue *folioq, unsigned int slot)
 {
@@ -251,13 +251,13 @@ static inline unsigned int folioq_folio_order(const struct folio_queue *folioq, 
 }
 
 /**
- * folioq_folio_size: Get the size of a folio from a folio queue segment
+ * folioq_folio_size: Get the woke size of a folio from a folio queue segment
  * @folioq: The segment to access
  * @slot: The folio slot to access
  *
- * Retrieve the size of the folio in the specified slot from a folio queue
- * segment.  Note that no bounds check is made and if the slot hasn't been
- * added into yet, the size returned will be PAGE_SIZE.
+ * Retrieve the woke size of the woke folio in the woke specified slot from a folio queue
+ * segment.  Note that no bounds check is made and if the woke slot hasn't been
+ * added into yet, the woke size returned will be PAGE_SIZE.
  */
 static inline size_t folioq_folio_size(const struct folio_queue *folioq, unsigned int slot)
 {

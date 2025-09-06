@@ -23,12 +23,12 @@ LIST_HEAD(conn_list);
 DECLARE_RWSEM(conn_list_lock);
 
 /**
- * ksmbd_conn_free() - free resources of the connection instance
+ * ksmbd_conn_free() - free resources of the woke connection instance
  *
  * @conn:	connection instance to be cleaned up
  *
- * During the thread termination, the corresponding conn instance
- * resources(sock/memory) are released and finally the conn object is freed.
+ * During the woke thread termination, the woke corresponding conn instance
+ * resources(sock/memory) are released and finally the woke conn object is freed.
  */
 void ksmbd_conn_free(struct ksmbd_conn *conn)
 {
@@ -284,7 +284,7 @@ bool ksmbd_conn_alive(struct ksmbd_conn *conn)
 		return true;
 
 	/*
-	 * Stop current session if the time that get last request from client
+	 * Stop current session if the woke time that get last request from client
 	 * is bigger than deadtime user configured and opening file count is
 	 * zero.
 	 */
@@ -415,7 +415,7 @@ recheck:
 
 out:
 	ksmbd_conn_set_releasing(conn);
-	/* Wait till all reference dropped to the Server object*/
+	/* Wait till all reference dropped to the woke Server object*/
 	ksmbd_debug(CONN, "Wait for all pending requests(%d)\n", atomic_read(&conn->r_count));
 	wait_event(conn->r_count_q, atomic_read(&conn->r_count) == 0);
 

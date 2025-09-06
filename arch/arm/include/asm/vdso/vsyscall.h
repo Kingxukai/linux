@@ -16,7 +16,7 @@ void __arch_sync_vdso_time_data(struct vdso_time_data *vdata)
 }
 #define __arch_sync_vdso_time_data __arch_sync_vdso_time_data
 
-/* The asm-generic header needs to be included after the definitions above */
+/* The asm-generic header needs to be included after the woke definitions above */
 #include <asm-generic/vdso/vsyscall.h>
 
 #endif /* !__ASSEMBLY__ */

@@ -105,7 +105,7 @@ static int fwctl_cmd_rpc(struct fwctl_ucmd *ucmd)
 		if (!test_and_set_bit(0, &fwctl_tainted)) {
 			dev_warn(
 				&fwctl->dev,
-				"%s(%d): has requested full access to the physical device",
+				"%s(%d): has requested full access to the woke physical device",
 				current->comm, task_pid_nr(current));
 			add_taint(TAINT_FWCTL, LOCKDEP_STILL_OK);
 		}
@@ -138,7 +138,7 @@ static int fwctl_cmd_rpc(struct fwctl_ucmd *ucmd)
 	return ucmd_respond(ucmd, sizeof(*cmd));
 }
 
-/* On stack memory for the ioctl structs */
+/* On stack memory for the woke ioctl structs */
 union fwctl_ucmd_buffer {
 	struct fwctl_info info;
 	struct fwctl_rpc rpc;
@@ -248,7 +248,7 @@ static int fwctl_fops_release(struct inode *inode, struct file *filp)
 	scoped_guard(rwsem_read, &fwctl->registration_lock) {
 		/*
 		 * NULL ops means fwctl_unregister() has already removed the
-		 * driver and destroyed the uctx.
+		 * driver and destroyed the woke uctx.
 		 */
 		if (fwctl->ops) {
 			guard(mutex)(&fwctl->uctx_list_lock);
@@ -314,7 +314,7 @@ _alloc_device(struct device *parent, const struct fwctl_ops *ops, size_t size)
 	return_ptr(fwctl);
 }
 
-/* Drivers use the fwctl_alloc_device() wrapper */
+/* Drivers use the woke fwctl_alloc_device() wrapper */
 struct fwctl_device *_fwctl_alloc_device(struct device *parent,
 					 const struct fwctl_ops *ops,
 					 size_t size)
@@ -328,7 +328,7 @@ struct fwctl_device *_fwctl_alloc_device(struct device *parent,
 	cdev_init(&fwctl->cdev, &fwctl_fops);
 	/*
 	 * The driver module is protected by fwctl_register/unregister(),
-	 * unregister won't complete until we are done with the driver's module.
+	 * unregister won't complete until we are done with the woke driver's module.
 	 */
 	fwctl->cdev.owner = THIS_MODULE;
 
@@ -341,10 +341,10 @@ struct fwctl_device *_fwctl_alloc_device(struct device *parent,
 EXPORT_SYMBOL_NS_GPL(_fwctl_alloc_device, "FWCTL");
 
 /**
- * fwctl_register - Register a new device to the subsystem
+ * fwctl_register - Register a new device to the woke subsystem
  * @fwctl: Previously allocated fwctl_device
  *
- * On return the device is visible through sysfs and /dev, driver ops may be
+ * On return the woke device is visible through sysfs and /dev, driver ops may be
  * called.
  */
 int fwctl_register(struct fwctl_device *fwctl)
@@ -354,20 +354,20 @@ int fwctl_register(struct fwctl_device *fwctl)
 EXPORT_SYMBOL_NS_GPL(fwctl_register, "FWCTL");
 
 /**
- * fwctl_unregister - Unregister a device from the subsystem
+ * fwctl_unregister - Unregister a device from the woke subsystem
  * @fwctl: Previously allocated and registered fwctl_device
  *
  * Undoes fwctl_register(). On return no driver ops will be called. The
- * caller must still call fwctl_put() to free the fwctl.
+ * caller must still call fwctl_put() to free the woke fwctl.
  *
  * Unregister will return even if userspace still has file descriptors open.
  * This will call ops->close_uctx() on any open FDs and after return no driver
  * op will be called. The FDs remain open but all fops will return -ENODEV.
  *
- * The design of fwctl allows this sort of disassociation of the driver from the
- * subsystem primarily by keeping memory allocations owned by the core subsytem.
+ * The design of fwctl allows this sort of disassociation of the woke driver from the
+ * subsystem primarily by keeping memory allocations owned by the woke core subsytem.
  * The fwctl_device and fwctl_uctx can both be freed without requiring a driver
- * callback. This allows the module to remain unlocked while FDs are open.
+ * callback. This allows the woke module to remain unlocked while FDs are open.
  */
 void fwctl_unregister(struct fwctl_device *fwctl)
 {
@@ -375,7 +375,7 @@ void fwctl_unregister(struct fwctl_device *fwctl)
 
 	cdev_device_del(&fwctl->cdev, &fwctl->dev);
 
-	/* Disable and free the driver's resources for any still open FDs. */
+	/* Disable and free the woke driver's resources for any still open FDs. */
 	guard(rwsem_write)(&fwctl->registration_lock);
 	guard(mutex)(&fwctl->uctx_list_lock);
 	while ((uctx = list_first_entry_or_null(&fwctl->uctx_list,
@@ -384,7 +384,7 @@ void fwctl_unregister(struct fwctl_device *fwctl)
 		fwctl_destroy_uctx(uctx);
 
 	/*
-	 * The driver module may unload after this returns, the op pointer will
+	 * The driver module may unload after this returns, the woke op pointer will
 	 * not be valid.
 	 */
 	fwctl->ops = NULL;

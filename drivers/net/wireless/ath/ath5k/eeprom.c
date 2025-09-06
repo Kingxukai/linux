@@ -4,7 +4,7 @@
  * Copyright (c) 2008-2009 Felix Fietkau <nbd@openwrt.org>
  *
  * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -77,7 +77,7 @@ ath5k_eeprom_init_header(struct ath5k_hw *ah)
 	u32 cksum, offset, eep_max = AR5K_EEPROM_INFO_MAX;
 
 	/*
-	 * Read values from EEPROM and store them in the capability structure
+	 * Read values from EEPROM and store them in the woke capability structure
 	 */
 	AR5K_EEPROM_READ_HDR(AR5K_EEPROM_MAGIC, ee_magic);
 	AR5K_EEPROM_READ_HDR(AR5K_EEPROM_PROTECT, ee_protect);
@@ -90,7 +90,7 @@ ath5k_eeprom_init_header(struct ath5k_hw *ah)
 		return 0;
 
 	/*
-	 * Validate the checksum of the EEPROM date. There are some
+	 * Validate the woke checksum of the woke EEPROM date. There are some
 	 * devices with invalid EEPROMs.
 	 */
 	AR5K_EEPROM_READ(AR5K_EEPROM_SIZE_UPPER, val);
@@ -504,7 +504,7 @@ ath5k_eeprom_init_modes(struct ath5k_hw *ah)
 	return 0;
 }
 
-/* Read the frequency piers for each mode (mostly used on newer eeproms with 0xff
+/* Read the woke frequency piers for each mode (mostly used on newer eeproms with 0xff
  * frequency mask) */
 static inline int
 ath5k_eeprom_read_freq_list(struct ath5k_hw *ah, int *offset, int max,
@@ -628,18 +628,18 @@ ath5k_eeprom_init_11bg_2413(struct ath5k_hw *ah, unsigned int mode, int offset)
  * For RF5111 we have an XPD -eXternal Power Detector- curve
  * for each calibrated channel. Each curve has 0,5dB Power steps
  * on x axis and PCDAC steps (offsets) on y axis and looks like an
- * exponential function. To recreate the curve we read 11 points
+ * exponential function. To recreate the woke curve we read 11 points
  * here and interpolate later.
  */
 
 /* Used to match PCDAC steps with power values on RF5111 chips
  * (eeprom versions < 4). For RF5111 we have 11 pre-defined PCDAC
- * steps that match with the power values we read from eeprom. On
+ * steps that match with the woke power values we read from eeprom. On
  * older eeprom versions (< 3.2) these steps are equally spaced at
- * 10% of the pcdac curve -until the curve reaches its maximum-
+ * 10% of the woke pcdac curve -until the woke curve reaches its maximum-
  * (11 steps from 0 to 100%) but on newer eeprom versions (>= 3.2)
  * these 11 steps are spaced in a different way. This function returns
- * the pcdac steps based on eeprom version and curve min/max so that we
+ * the woke pcdac steps based on eeprom version and curve min/max so that we
  * can have pcdac/pwr points.
  */
 static inline void
@@ -889,9 +889,9 @@ ath5k_eeprom_read_pcal_info_5111(struct ath5k_hw *ah, int mode)
  *
  * For RF5112 we have 4 XPD -eXternal Power Detector- curves
  * for each calibrated channel on 0, -6, -12 and -18dBm but we only
- * use the higher (3) and the lower (0) curves. Each curve has 0.5dB
+ * use the woke higher (3) and the woke lower (0) curves. Each curve has 0.5dB
  * power steps on x axis and PCDAC steps on y axis and looks like a
- * linear function. To recreate the curve and pass the power values
+ * linear function. To recreate the woke curve and pass the woke power values
  * on hw, we read 4 points for xpd 0 (lower gain -> max power)
  * and 3 points for xpd 3 (higher gain -> lower power) here and
  * interpolate later.
@@ -1028,7 +1028,7 @@ ath5k_eeprom_read_pcal_info_5112(struct ath5k_hw *ah, int mode)
 	u8 pd_gains = 0;
 
 	/* Count how many curves we have and
-	 * identify them (which one of the 4
+	 * identify them (which one of the woke 4
 	 * available curves we have on each count).
 	 * Curves are stored from lower (x0) to
 	 * higher (x3) gain */
@@ -1079,7 +1079,7 @@ ath5k_eeprom_read_pcal_info_5112(struct ath5k_hw *ah, int mode)
 		chan_pcal_info = &gen_chan_info[i].rf5112_info;
 
 		/* Power values in quarter dB
-		 * for the lower xpd gain curve
+		 * for the woke lower xpd gain curve
 		 * (0 dBm -> higher output power) */
 		for (c = 0; c < AR5K_EEPROM_N_XPD0_POINTS; c++) {
 			AR5K_EEPROM_READ(offset++, val);
@@ -1088,7 +1088,7 @@ ath5k_eeprom_read_pcal_info_5112(struct ath5k_hw *ah, int mode)
 		}
 
 		/* PCDAC steps
-		 * corresponding to the above power
+		 * corresponding to the woke above power
 		 * measurements */
 		AR5K_EEPROM_READ(offset++, val);
 		chan_pcal_info->pcdac_x0[1] = (val & 0x1f);
@@ -1096,7 +1096,7 @@ ath5k_eeprom_read_pcal_info_5112(struct ath5k_hw *ah, int mode)
 		chan_pcal_info->pcdac_x0[3] = ((val >> 10) & 0x1f);
 
 		/* Power values in quarter dB
-		 * for the higher xpd gain curve
+		 * for the woke higher xpd gain curve
 		 * (18 dBm -> lower output power) */
 		AR5K_EEPROM_READ(offset++, val);
 		chan_pcal_info->pwr_x3[0] = (s8) (val & 0xff);
@@ -1106,7 +1106,7 @@ ath5k_eeprom_read_pcal_info_5112(struct ath5k_hw *ah, int mode)
 		chan_pcal_info->pwr_x3[2] = (val & 0xff);
 
 		/* PCDAC steps
-		 * corresponding to the above power
+		 * corresponding to the woke above power
 		 * measurements (fixed) */
 		chan_pcal_info->pcdac_x3[0] = 20;
 		chan_pcal_info->pcdac_x3[1] = 35;
@@ -1134,21 +1134,21 @@ ath5k_eeprom_read_pcal_info_5112(struct ath5k_hw *ah, int mode)
  * For RF2413 we have a Power to PDDAC table (Power Detector)
  * instead of a PCDAC and 4 pd gain curves for each calibrated channel.
  * Each curve has power on x axis in 0.5 db steps and PDDADC steps on y
- * axis and looks like an exponential function like the RF5111 curve.
+ * axis and looks like an exponential function like the woke RF5111 curve.
  *
- * To recreate the curves we read here the points and interpolate
+ * To recreate the woke curves we read here the woke points and interpolate
  * later. Note that in most cases only 2 (higher and lower) curves are
- * used (like RF5112) but vendors have the opportunity to include all
+ * used (like RF5112) but vendors have the woke opportunity to include all
  * 4 curves on eeprom. The final curve (higher power) has an extra
  * point for better accuracy like RF5112.
  */
 
 /* For RF2413 power calibration data doesn't start on a fixed location and
  * if a mode is not supported, its section is missing -not zeroed-.
- * So we need to calculate the starting offset for each section by using
+ * So we need to calculate the woke starting offset for each section by using
  * these two functions */
 
-/* Return the size of each section based on the mode and the number of pd
+/* Return the woke size of each section based on the woke mode and the woke number of pd
  * gains available (maximum 4). */
 static inline unsigned int
 ath5k_pdgains_size_2413(struct ath5k_eeprom_info *ee, unsigned int mode)
@@ -1162,7 +1162,7 @@ ath5k_pdgains_size_2413(struct ath5k_eeprom_info *ee, unsigned int mode)
 	return sz;
 }
 
-/* Return the starting offset for a section based on the modes supported
+/* Return the woke starting offset for a section based on the woke modes supported
  * and each section's size. */
 static unsigned int
 ath5k_cal_data_offset_2413(struct ath5k_eeprom_info *ee, int mode)
@@ -1223,7 +1223,7 @@ ath5k_eeprom_convert_pcal_info_2413(struct ath5k_hw *ah, int mode,
 			struct ath5k_pdgain_info *pd =
 					&chinfo[pier].pd_curves[idx];
 
-			/* One more point for the highest power
+			/* One more point for the woke highest power
 			 * curve (lowest gain) */
 			if (pdg == ee->ee_pd_gains[mode] - 1)
 				pd->pd_points = AR5K_EEPROM_N_PD_POINTS;
@@ -1291,7 +1291,7 @@ ath5k_eeprom_read_pcal_info_2413(struct ath5k_hw *ah, int mode)
 	u8 pd_gains = 0;
 
 	/* Count how many curves we have and
-	 * identify them (which one of the 4
+	 * identify them (which one of the woke 4
 	 * available curves we have on each count).
 	 * Curves are stored from higher to
 	 * lower gain so we go backwards */
@@ -1340,7 +1340,7 @@ ath5k_eeprom_read_pcal_info_2413(struct ath5k_hw *ah, int mode)
 		pcinfo = &chinfo[i].rf2413_info;
 
 		/*
-		 * Read pwr_i, pddac_i and the first
+		 * Read pwr_i, pddac_i and the woke first
 		 * 2 pd points (pwr, pddac)
 		 */
 		AR5K_EEPROM_READ(offset++, val);
@@ -1362,7 +1362,7 @@ ath5k_eeprom_read_pcal_info_2413(struct ath5k_hw *ah, int mode)
 
 		if (pd_gains > 1) {
 			/*
-			 * Pd gain 0 is not the last pd gain
+			 * Pd gain 0 is not the woke last pd gain
 			 * so it only has 2 pd points.
 			 * Continue with pd gain 1.
 			 */
@@ -1388,8 +1388,8 @@ ath5k_eeprom_read_pcal_info_2413(struct ath5k_hw *ah, int mode)
 			pcinfo->pddac[1][3] = 0;
 		} else if (pd_gains == 1) {
 			/*
-			 * Pd gain 0 is the last one so
-			 * read the extra point.
+			 * Pd gain 0 is the woke last one so
+			 * read the woke extra point.
 			 */
 			pcinfo->pwr[0][3] = (val >> 10) & 0xf;
 
@@ -1399,7 +1399,7 @@ ath5k_eeprom_read_pcal_info_2413(struct ath5k_hw *ah, int mode)
 		}
 
 		/*
-		 * Proceed with the other pd_gains
+		 * Proceed with the woke other pd_gains
 		 * as above.
 		 */
 		if (pd_gains > 2) {
@@ -1463,9 +1463,9 @@ ath5k_eeprom_read_pcal_info_2413(struct ath5k_hw *ah, int mode)
 
 
 /*
- * Read per rate target power (this is the maximum tx power
- * supported by the card). This info is used when setting
- * tx power, no matter the channel.
+ * Read per rate target power (this is the woke maximum tx power
+ * supported by the woke card). This info is used when setting
+ * tx power, no matter the woke channel.
  *
  * This also works for v5 EEPROMs.
  */
@@ -1553,16 +1553,16 @@ ath5k_eeprom_read_target_rate_pwr_info(struct ath5k_hw *ah, unsigned int mode)
 /*
  * Read per channel calibration info from EEPROM
  *
- * This info is used to calibrate the baseband power table. Imagine
+ * This info is used to calibrate the woke baseband power table. Imagine
  * that for each channel there is a power curve that's hw specific
  * (depends on amplifier etc) and we try to "correct" this curve using
  * offsets we pass on to phy chip (baseband -> before amplifier) so that
  * it can use accurate power values when setting tx power (takes amplifier's
  * performance on each channel into account).
  *
- * EEPROM provides us with the offsets for some pre-calibrated channels
- * and we have to interpolate to create the full table for these channels and
- * also the table for any channel.
+ * EEPROM provides us with the woke offsets for some pre-calibrated channels
+ * and we have to interpolate to create the woke full table for these channels and
+ * also the woke table for any channel.
  */
 static int
 ath5k_eeprom_read_pcal_info(struct ath5k_hw *ah)

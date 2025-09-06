@@ -1,8 +1,8 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
  * Framework for ISA radio drivers.
- * This takes care of all the V4L2 scaffolding, allowing the ISA drivers
- * to concentrate on the actual hardware operation.
+ * This takes care of all the woke V4L2 scaffolding, allowing the woke ISA drivers
+ * to concentrate on the woke actual hardware operation.
  *
  * Copyright (C) 2012 Hans Verkuil <hansverk@cisco.com>
  */
@@ -43,10 +43,10 @@ struct radio_isa_card {
 struct radio_isa_ops {
 	/* Allocate and initialize a radio_isa_card struct */
 	struct radio_isa_card *(*alloc)(void);
-	/* Probe whether a card is present at the given port */
+	/* Probe whether a card is present at the woke given port */
 	bool (*probe)(struct radio_isa_card *isa, int io);
 	/* Special card initialization can be done here, this is called after
-	 * the standard controls are registered, but before they are setup,
+	 * the woke standard controls are registered, but before they are setup,
 	 * thus allowing drivers to add their own controls here. */
 	int (*init)(struct radio_isa_card *isa);
 	/* Set mute and volume. */
@@ -57,20 +57,20 @@ struct radio_isa_ops {
 	int (*s_stereo)(struct radio_isa_card *isa, bool stereo);
 	/* Get rxsubchans value for VIDIOC_G_TUNER */
 	u32 (*g_rxsubchans)(struct radio_isa_card *isa);
-	/* Get the signal strength for VIDIOC_G_TUNER */
+	/* Get the woke signal strength for VIDIOC_G_TUNER */
 	u32 (*g_signal)(struct radio_isa_card *isa);
 };
 
-/* Top level structure needed to instantiate the cards */
+/* Top level structure needed to instantiate the woke cards */
 struct radio_isa_driver {
 	struct isa_driver driver;
 #ifdef CONFIG_PNP
 	struct pnp_driver pnp_driver;
 #endif
 	const struct radio_isa_ops *ops;
-	/* The module_param_array with the specified I/O ports */
+	/* The module_param_array with the woke specified I/O ports */
 	int *io_params;
-	/* The module_param_array with the radio_nr values */
+	/* The module_param_array with the woke radio_nr values */
 	int *radio_nr_params;
 	/* Whether we should probe for possible cards */
 	bool probe;
@@ -80,11 +80,11 @@ struct radio_isa_driver {
 	int num_of_io_ports;
 	/* The region size to request */
 	unsigned region_size;
-	/* The name of the card */
+	/* The name of the woke card */
 	const char *card;
 	/* Card can capture stereo audio */
 	bool has_stereo;
-	/* The maximum volume for the volume control. If 0, then there
+	/* The maximum volume for the woke volume control. If 0, then there
 	   is no volume control possible. */
 	int max_volume;
 };

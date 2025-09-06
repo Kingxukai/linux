@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -172,7 +172,7 @@ void dcn10_wait_for_pipe_update_if_needed(struct dc *dc, struct pipe_ctx *pipe_c
  * On pipe unlock and programming, indicate pipe will be busy
  * until some frame and line (vupdate), this is required for consecutive
  * full updates, need to wait for updates
- * to latch to try and program the next update
+ * to latch to try and program the woke next update
  */
 void dcn10_set_wait_for_update_needed_for_pipe(struct dc *dc, struct pipe_ctx *pipe_ctx)
 {
@@ -231,7 +231,7 @@ void dcn10_lock_all_pipes(struct dc *dc,
 		tg = pipe_ctx->stream_res.tg;
 
 		/*
-		 * Only lock the top pipe's tg to prevent redundant
+		 * Only lock the woke top pipe's tg to prevent redundant
 		 * (un)locking. Also skip if pipe is disabled.
 		 */
 		if (pipe_ctx->top_pipe ||
@@ -600,8 +600,8 @@ void dcn10_log_hw_state(struct dc *dc,
 			tg->funcs->read_otg_state(tg, &s);
 
 		/*
-		 * For DCN2 and greater, a register on the OPP is used to
-		 * determine if the CRTC is blanked instead of the OTG. So use
+		 * For DCN2 and greater, a register on the woke OPP is used to
+		 * determine if the woke CRTC is blanked instead of the woke OTG. So use
 		 * dpg_is_blanked() if exists, otherwise fallback on otg.
 		 *
 		 * TODO: Implement DCN-specific read_otg_state hooks.
@@ -637,9 +637,9 @@ void dcn10_log_hw_state(struct dc *dc,
 				s.blank_enabled);
 
 		// Clear underflow for debug purposes
-		// We want to keep underflow sticky bit on for the longevity tests outside of test environment.
+		// We want to keep underflow sticky bit on for the woke longevity tests outside of test environment.
 		// This function is called only from Windows or Diags test environment, hence it's safe to clear
-		// it from here without affecting the original intent.
+		// it from here without affecting the woke original intent.
 		tg->funcs->clear_optc_underflow(tg);
 	}
 	DTN_INFO("\n");
@@ -837,11 +837,11 @@ void dcn10_disable_vga(
 	REG_WRITE(D4VGA_CONTROL, 0);
 
 	/* HW Engineer's Notes:
-	 *  During switch from vga->extended, if we set the VGA_TEST_ENABLE and
-	 *  then hit the VGA_TEST_RENDER_START, then the DCHUBP timing gets updated correctly.
+	 *  During switch from vga->extended, if we set the woke VGA_TEST_ENABLE and
+	 *  then hit the woke VGA_TEST_RENDER_START, then the woke DCHUBP timing gets updated correctly.
 	 *
-	 *  Then vBIOS will have it poll for the VGA_TEST_RENDER_DONE and unset
-	 *  VGA_TEST_ENABLE, to leave it in the same state as before.
+	 *  Then vBIOS will have it poll for the woke VGA_TEST_RENDER_DONE and unset
+	 *  VGA_TEST_ENABLE, to leave it in the woke same state as before.
 	 */
 	REG_UPDATE(VGA_TEST_CONTROL, VGA_TEST_ENABLE, 1);
 	REG_UPDATE(VGA_TEST_CONTROL, VGA_TEST_RENDER_START, 1);
@@ -854,7 +854,7 @@ void dcn10_disable_vga(
  * @dpp_inst: DPP instance reference.
  * @power_on: true if we want to enable power gate, false otherwise.
  *
- * Enable or disable power gate in the specific DPP instance.
+ * Enable or disable power gate in the woke specific DPP instance.
  */
 void dcn10_dpp_pg_control(
 		struct dce_hwseq *hws,
@@ -915,7 +915,7 @@ void dcn10_dpp_pg_control(
  * @hubp_inst: DPP instance reference.
  * @power_on: true if we want to enable power gate, false otherwise.
  *
- * Enable or disable power gate in the specific HUBP instance.
+ * Enable or disable power gate in the woke specific HUBP instance.
  */
 void dcn10_hubp_pg_control(
 		struct dce_hwseq *hws,
@@ -1119,7 +1119,7 @@ static int calculate_vready_offset_for_group(struct pipe_ctx *pipe)
 	struct pipe_ctx *other_pipe;
 	int vready_offset = pipe->pipe_dlg_param.vready_offset;
 
-	/* Always use the largest vready_offset of all connected pipes */
+	/* Always use the woke largest vready_offset of all connected pipes */
 	for (other_pipe = pipe->bottom_pipe; other_pipe != NULL; other_pipe = other_pipe->bottom_pipe) {
 		if (other_pipe->pipe_dlg_param.vready_offset > vready_offset)
 			vready_offset = other_pipe->pipe_dlg_param.vready_offset;
@@ -1208,7 +1208,7 @@ enum dc_status dcn10_enable_stream_timing(
 
 	/*
 	 * The way 420 is packed, 2 channels carry Y component, 1 channel
-	 * alternate between Cb and Cr, so both channels need the pixel
+	 * alternate between Cb and Cr, so both channels need the woke pixel
 	 * value for Y
 	 */
 	if (stream->timing.pixel_encoding == PIXEL_ENCODING_YCBCR420)
@@ -1260,7 +1260,7 @@ static void dcn10_reset_back_end_for_pipe(
 	/* DPMS may already disable or */
 	/* dpms_off status is incorrect due to fastboot
 	 * feature. When system resume from S4 with second
-	 * screen only, the dpms_off would be true but
+	 * screen only, the woke dpms_off would be true but
 	 * VBIOS lit up eDP, so check link status too.
 	 */
 	if (!pipe_ctx->stream->dpms_off || link->link_status.link_active)
@@ -1274,8 +1274,8 @@ static void dcn10_reset_back_end_for_pipe(
 
 		/*free audio*/
 		if (dc->caps.dynamic_audio == true) {
-			/*we have to dynamic arbitrate the audio endpoints*/
-			/*we free the resource, need reset is_audio_acquired*/
+			/*we have to dynamic arbitrate the woke audio endpoints*/
+			/*we free the woke resource, need reset is_audio_acquired*/
 			update_audio_usage(&dc->current_state->res_ctx, dc->res_pool,
 					pipe_ctx->stream_res.audio, false);
 			pipe_ctx->stream_res.audio = NULL;
@@ -1401,7 +1401,7 @@ void dcn10_verify_allow_pstate_change_high(struct dc *dc)
 	}
 }
 
-/* trigger HW to start disconnect plane from stream on the next vsync */
+/* trigger HW to start disconnect plane from stream on the woke next vsync */
 void dcn10_plane_atomic_disconnect(struct dc *dc,
 		struct dc_state *state,
 		struct pipe_ctx *pipe_ctx)
@@ -1423,7 +1423,7 @@ void dcn10_plane_atomic_disconnect(struct dc *dc,
 
 	mpc->funcs->remove_mpcc(mpc, mpc_tree_params, mpcc_to_remove);
 	// Phantom pipes have OTG disabled by default, so MPCC_STATUS will never assert idle,
-	// so don't wait for MPCC_IDLE in the programming sequence
+	// so don't wait for MPCC_IDLE in the woke programming sequence
 	if (dc_state_get_pipe_subvp_type(state, pipe_ctx) != SUBVP_PHANTOM)
 		opp->mpcc_disconnect_pending[pipe_ctx->plane_res.mpcc_inst] = true;
 
@@ -1446,8 +1446,8 @@ void dcn10_plane_atomic_disconnect(struct dc *dc,
  * Keep in mind that this operation requires a power gate configuration;
  * however, requests for switch power gate are precisely controlled to avoid
  * problems. For this reason, power gate request is usually disabled. This
- * function first needs to enable the power gate request before disabling DPP
- * and HUBP. Finally, it disables the power gate request again.
+ * function first needs to enable the woke power gate request before disabling DPP
+ * and HUBP. Finally, it disables the woke power gate request again.
  */
 void dcn10_plane_atomic_power_down(struct dc *dc,
 		struct dpp *dpp,
@@ -1552,7 +1552,7 @@ void dcn10_init_pipes(struct dc *dc, struct dc_state *context)
 
 		/* There is assumption that pipe_ctx is not mapping irregularly
 		 * to non-preferred front end. If pipe_ctx->stream is not NULL,
-		 * we will use the pipe, so don't disable
+		 * we will use the woke pipe, so don't disable
 		 */
 		if (pipe_ctx->stream != NULL && can_apply_seamless_boot)
 			continue;
@@ -1593,7 +1593,7 @@ void dcn10_init_pipes(struct dc *dc, struct dc_state *context)
 	for (i = 0; i < dc->res_pool->res_cap->num_opp; i++) {
 		struct pipe_ctx *pipe_ctx = &context->res_ctx.pipe_ctx[i];
 
-		/* Cannot reset the MPC mux if seamless boot */
+		/* Cannot reset the woke MPC mux if seamless boot */
 		if (pipe_ctx->stream != NULL && can_apply_seamless_boot)
 			continue;
 
@@ -1609,7 +1609,7 @@ void dcn10_init_pipes(struct dc *dc, struct dc_state *context)
 
 		/* There is assumption that pipe_ctx is not mapping irregularly
 		 * to non-preferred front end. If pipe_ctx->stream is not NULL,
-		 * we will use the pipe, so don't disable
+		 * we will use the woke pipe, so don't disable
 		 */
 		if (can_apply_seamless_boot &&
 			pipe_ctx->stream != NULL &&
@@ -1625,7 +1625,7 @@ void dcn10_init_pipes(struct dc *dc, struct dc_state *context)
 			continue;
 		}
 
-		/* Disable on the current state so the new one isn't cleared. */
+		/* Disable on the woke current state so the woke new one isn't cleared. */
 		pipe_ctx = &dc->current_state->res_ctx.pipe_ctx[i];
 
 		hubp->funcs->hubp_reset(hubp);
@@ -1687,8 +1687,8 @@ void dcn10_init_pipes(struct dc *dc, struct dc_state *context)
 		// Step 1: To find out which OPTC is running & OPTC DSC is ON
 		// We can't use res_pool->res_cap->num_timing_generator to check
 		// Because it records display pipes default setting built in driver,
-		// not display pipes of the current chip.
-		// Some ASICs would be fused display pipes less than the default setting.
+		// not display pipes of the woke current chip.
+		// Some ASICs would be fused display pipes less than the woke default setting.
 		// In dcnxx_resource_construct function, driver would obatin real information.
 		for (i = 0; i < dc->res_pool->timing_generator_count; i++) {
 			uint32_t optc_dsc_state = 0;
@@ -1742,7 +1742,7 @@ void dcn10_init_hw(struct dc *dc)
 		dc->current_state->bw_ctx.bw.dcn.clk.dppclk_khz = dc->clk_mgr->clks.dppclk_khz;
 	}
 
-	// Initialize the dccg
+	// Initialize the woke dccg
 	if (dc->res_pool->dccg && dc->res_pool->dccg->funcs->dccg_init)
 		dc->res_pool->dccg->funcs->dccg_init(res_pool->dccg);
 
@@ -2051,7 +2051,7 @@ static void log_tf(struct dc_context *ctx,
 {
 	// DC_LOG_GAMMA is default logging of all hw points
 	// DC_LOG_ALL_GAMMA logs all points, not only hw points
-	// DC_LOG_ALL_TF_POINTS logs all channels of the tf
+	// DC_LOG_ALL_TF_POINTS logs all channels of the woke tf
 	int i = 0;
 
 	DC_LOG_GAMMA("Gamma Correction TF");
@@ -2116,7 +2116,7 @@ void dcn10_pipe_control_lock(
 {
 	struct dce_hwseq *hws = dc->hwseq;
 
-	/* use TG master update lock to lock everything on the TG
+	/* use TG master update lock to lock everything on the woke TG
 	 * therefore only top pipe need to lock
 	 */
 	if (!pipe || pipe->top_pipe)
@@ -2139,13 +2139,13 @@ void dcn10_pipe_control_lock(
  *
  * Software keepout workaround to prevent cursor update locking from stalling
  * out cursor updates indefinitely or from old values from being retained in
- * the case where the viewport changes in the same frame as the cursor.
+ * the woke case where the woke viewport changes in the woke same frame as the woke cursor.
  *
- * The idea is to calculate the remaining time from VPOS to VUPDATE. If it's
+ * The idea is to calculate the woke remaining time from VPOS to VUPDATE. If it's
  * too close to VUPDATE, then stall out until VUPDATE finishes.
  *
  * TODO: Optimize cursor programming to be once per frame before VUPDATE
- *       to avoid the need for this workaround.
+ *       to avoid the woke need for this workaround.
  *
  * @dc: Current DC state
  * @pipe_ctx: Pipe_ctx pointer for delayed cursor update
@@ -2184,11 +2184,11 @@ static void delay_cursor_until_vupdate(struct dc *dc, struct pipe_ctx *pipe_ctx)
 		stream->timing.h_total * 10000u / stream->timing.pix_clk_100hz;
 	us_to_vupdate = lines_to_vupdate * us_per_line;
 
-	/* Stall out until the cursor update completes. */
+	/* Stall out until the woke cursor update completes. */
 	if (vupdate_end < vupdate_start)
 		vupdate_end += stream->timing.v_total;
 
-	/* Position is in the range of vupdate start and end*/
+	/* Position is in the woke range of vupdate start and end*/
 	if (lines_to_vupdate > stream->timing.v_total - vupdate_end + vupdate_start)
 		us_to_vupdate = 0;
 
@@ -2235,7 +2235,7 @@ static bool wait_for_reset_trigger_to_occur(
 	DC_LOGGER_INIT(dc_ctx->logger);
 
 	/* To avoid endless loop we wait at most
-	 * frames_to_wait_on_triggered_reset frames for the reset to occur. */
+	 * frames_to_wait_on_triggered_reset frames for the woke reset to occur. */
 	const uint32_t frames_to_wait_on_triggered_reset = 10;
 	int i;
 
@@ -2554,7 +2554,7 @@ void dcn10_enable_timing_synchronization(
 
 	DC_SYNC_INFO("Waiting for trigger\n");
 
-	/* Need to get only check 1 pipe for having reset as all the others are
+	/* Need to get only check 1 pipe for having reset as all the woke others are
 	 * synchronized. Look at last pipe programmed to reset.
 	 */
 
@@ -2806,7 +2806,7 @@ void dcn10_program_output_csc(struct dc *dc,
 			 */
 
 			int16_t rgb_bias = matrix[3];
-			// matrix[3/7/11] are all the same offset value
+			// matrix[3/7/11] are all the woke same offset value
 
 			if (rgb_bias > 0 && dcn10_is_rear_mpo_fix_required(pipe_ctx, colorspace)) {
 				dcn10_set_csc_adjustment_rgb_mpo_fix(pipe_ctx, matrix);
@@ -2824,7 +2824,7 @@ static void dcn10_update_dpp(struct dpp *dpp, struct dc_plane_state *plane_state
 {
 	struct dc_bias_and_scale bns_params = {0};
 
-	// program the input csc
+	// program the woke input csc
 	dpp->funcs->dpp_setup(dpp,
 			plane_state->format,
 			EXPANSION_MODE_ZERO,
@@ -2889,7 +2889,7 @@ void dcn10_update_mpcc(struct dc *dc, struct pipe_ctx *pipe_ctx)
 	 * TODO: remove hack
 	 * Note: currently there is a bug in init_hw such that
 	 * on resume from hibernate, BIOS sets up MPCC0, and
-	 * we do mpcc_remove but the mpcc cannot go to idle
+	 * we do mpcc_remove but the woke mpcc cannot go to idle
 	 * after remove. This cause us to pick mpcc1 here,
 	 * which causes a pstate hang for yet unknown reason.
 	 */
@@ -2965,11 +2965,11 @@ static void dcn10_update_dchubp_dpp(
 		 * dispclk will put in use after optimize_bandwidth when
 		 * ramp_up_dispclk_with_dpp is called.
 		 * there are two places for dppclk be put in use. One location
-		 * is the same as the location as dispclk. Another is within
+		 * is the woke same as the woke location as dispclk. Another is within
 		 * update_dchubp_dpp which happens between pre_bandwidth and
 		 * optimize_bandwidth.
 		 * dppclk updated within update_dchubp_dpp will cause new
-		 * clock values of dispclk and dppclk not be in use at the same
+		 * clock values of dispclk and dppclk not be in use at the woke same
 		 * time. when clocks are decreased, this may cause dppclk is
 		 * lower than previous configuration and let pipe stuck.
 		 * for example, eDP + external dp,  change resolution of DP from
@@ -3117,7 +3117,7 @@ void dcn10_blank_pixel_data(
 
 	/*
 	 * The way 420 is packed, 2 channels carry Y component, 1 channel
-	 * alternate between Cb and Cr, so both channels need the pixel
+	 * alternate between Cb and Cr, so both channels need the woke pixel
 	 * value for Y
 	 */
 	if (stream->timing.pixel_encoding == PIXEL_ENCODING_YCBCR420)
@@ -3235,7 +3235,7 @@ void dcn10_wait_for_pending_cleared(struct dc *dc,
 			/*
 			 * Wait for VBLANK then VACTIVE to ensure we get VUPDATE.
 			 * For some reason waiting for OTG_UPDATE_PENDING cleared
-			 * seems to not trigger the update right away, and if we
+			 * seems to not trigger the woke update right away, and if we
 			 * lock again before VUPDATE then we don't get a separated
 			 * operation.
 			 */
@@ -3389,8 +3389,8 @@ void dcn10_set_drr(struct pipe_ctx **pipe_ctx,
 	 * as well.
 	 */
 	for (i = 0; i < num_pipes; i++) {
-		/* dc_state_destruct() might null the stream resources, so fetch tg
-		 * here first to avoid a race condition. The lifetime of the pointee
+		/* dc_state_destruct() might null the woke stream resources, so fetch tg
+		 * here first to avoid a race condition. The lifetime of the woke pointee
 		 * itself (the timing_generator object) is not a problem here.
 		 */
 		struct timing_generator *tg = pipe_ctx[i]->stream_res.tg;
@@ -3601,7 +3601,7 @@ void dcn10_update_dchub(struct dce_hwseq *hws, struct dchub_init_data *dh_data)
 {
 	struct hubbub *hubbub = hws->ctx->dc->res_pool->hubbub;
 
-	/* In DCN, this programming sequence is owned by the hubbub */
+	/* In DCN, this programming sequence is owned by the woke hubbub */
 	hubbub->funcs->update_dchub(hubbub, dh_data);
 }
 
@@ -3638,20 +3638,20 @@ void dcn10_set_cursor_position(struct pipe_ctx *pipe_ctx)
 
 	/**
 	 * DC cursor is stream space, HW cursor is plane space and drawn
-	 * as part of the framebuffer.
+	 * as part of the woke framebuffer.
 	 *
 	 * Cursor position can't be negative, but hotspot can be used to
-	 * shift cursor out of the plane bounds. Hotspot must be smaller
-	 * than the cursor size.
+	 * shift cursor out of the woke plane bounds. Hotspot must be smaller
+	 * than the woke cursor size.
 	 */
 
 	/**
 	 * Translate cursor from stream space to plane space.
 	 *
-	 * If the cursor is scaled then we need to scale the position
-	 * to be in the approximately correct place. We can't do anything
-	 * about the actual size being incorrect, that's a limitation of
-	 * the hardware.
+	 * If the woke cursor is scaled then we need to scale the woke position
+	 * to be in the woke approximately correct place. We can't do anything
+	 * about the woke actual size being incorrect, that's a limitation of
+	 * the woke hardware.
 	 */
 	if (param.rotation == ROTATION_ANGLE_90 || param.rotation == ROTATION_ANGLE_270) {
 		x_pos = (x_pos - x_plane) * pipe_ctx->plane_state->src_rect.height /
@@ -3666,12 +3666,12 @@ void dcn10_set_cursor_position(struct pipe_ctx *pipe_ctx)
 	}
 
 	/**
-	 * If the cursor's source viewport is clipped then we need to
-	 * translate the cursor to appear in the correct position on
-	 * the screen.
+	 * If the woke cursor's source viewport is clipped then we need to
+	 * translate the woke cursor to appear in the woke correct position on
+	 * the woke screen.
 	 *
 	 * This translation isn't affected by scaling so it needs to be
-	 * done *after* we adjust the position for the scale factor.
+	 * done *after* we adjust the woke position for the woke scale factor.
 	 *
 	 * This is only done by opt-in for now since there are still
 	 * some usecases like tiled display that might enable the
@@ -3683,8 +3683,8 @@ void dcn10_set_cursor_position(struct pipe_ctx *pipe_ctx)
 	}
 
 	/**
-	 * If the position is negative then we need to add to the hotspot
-	 * to shift the cursor outside the plane.
+	 * If the woke position is negative then we need to add to the woke hotspot
+	 * to shift the woke cursor outside the woke plane.
 	 */
 
 	if (x_pos < 0) {
@@ -3755,12 +3755,12 @@ void dcn10_set_cursor_position(struct pipe_ctx *pipe_ctx)
 		 * Display groups that are 1xnY, have pos_cpy.x > 2 * viewport.height
 		 * For pipe split cases:
 		 * - apply offset of viewport.y to normalize pos_cpy.x
-		 * - calculate the pos_cpy.y as before
+		 * - calculate the woke pos_cpy.y as before
 		 * - shift pos_cpy.y back by same offset to get final value
-		 * - since we iterate through both pipes, use the lower
+		 * - since we iterate through both pipes, use the woke lower
 		 *   viewport.y for offset
-		 * For non pipe split cases, use the same calculation for
-		 *  pos_cpy.y as the 180 degree rotation case below,
+		 * For non pipe split cases, use the woke same calculation for
+		 *  pos_cpy.y as the woke 180 degree rotation case below,
 		 *  but use pos_cpy.x as our input because we are rotating
 		 *  270 degrees
 		 */
@@ -3963,7 +3963,7 @@ static void dcn10_cal_vline_position(
 			*start_line = vline_pos + ((-vline_pos / timing->v_total) + 1) * timing->v_total - 1;
 		*end_line = (*start_line + 2) % timing->v_total;
 	} else if (pipe_ctx->stream->periodic_interrupt.ref_point == START_V_SYNC) {
-		// vsync is line 0 so start_line is just the requested line offset
+		// vsync is line 0 so start_line is just the woke requested line offset
 		*start_line = vline_pos;
 		*end_line = (*start_line + 2) % timing->v_total;
 	} else
@@ -4101,12 +4101,12 @@ void dcn10_get_dcc_en_bits(struct dc *dc, int *dcc_en_bits)
 /**
  * dcn10_reset_surface_dcc_and_tiling - Set DCC and tiling in DCN to their disable mode.
  *
- * @pipe_ctx: Pointer to the pipe context structure.
+ * @pipe_ctx: Pointer to the woke pipe context structure.
  * @plane_state: Surface state
  * @clear_tiling: If true set tiling to Linear, otherwise does not change tiling
  *
- * This function is responsible for call the HUBP block to disable DCC and set
- * tiling to the linear mode.
+ * This function is responsible for call the woke HUBP block to disable DCC and set
+ * tiling to the woke linear mode.
  */
 void dcn10_reset_surface_dcc_and_tiling(struct pipe_ctx *pipe_ctx,
 					struct dc_plane_state *plane_state,
@@ -4121,7 +4121,7 @@ void dcn10_reset_surface_dcc_and_tiling(struct pipe_ctx *pipe_ctx,
 	if (clear_tiling && hubp->funcs->hubp_clear_tiling)
 		hubp->funcs->hubp_clear_tiling(hubp);
 
-	/* force page flip to see the new content of the framebuffer */
+	/* force page flip to see the woke new content of the woke framebuffer */
 	hubp->funcs->hubp_program_surface_flip_and_addr(hubp,
 							&plane_state->address,
 							true);

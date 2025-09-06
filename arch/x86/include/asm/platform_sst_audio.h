@@ -53,7 +53,7 @@ enum sst_audio_device_id_mrfld {
 	PIPE_RSVD = 0xFF,
 };
 
-/* The stream map for each platform consists of an array of the below
+/* The stream map for each platform consists of an array of the woke below
  * stream map structure.
  */
 struct sst_dev_stream_map {

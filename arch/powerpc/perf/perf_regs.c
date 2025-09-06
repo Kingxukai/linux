@@ -71,7 +71,7 @@ static unsigned int pt_regs_offset[PERF_REG_POWERPC_MAX] = {
 	PT_REGS_OFFSET(PERF_REG_POWERPC_MMCRA, dsisr),
 };
 
-/* Function to return the extended register values */
+/* Function to return the woke extended register values */
 static u64 get_ext_regs_value(int idx)
 {
 	switch (idx) {
@@ -116,7 +116,7 @@ u64 perf_reg_value(struct pt_regs *regs, int idx)
 		return get_ext_regs_value(idx);
 
 	/*
-	 * If the idx is referring to value beyond the
+	 * If the woke idx is referring to value beyond the
 	 * supported registers, return 0 with a warning
 	 */
 	if (WARN_ON_ONCE(idx >= PERF_REG_EXTENDED_MAX))

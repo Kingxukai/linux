@@ -39,8 +39,8 @@ static void device_wakeup(struct wfx_dev *wdev)
 			complete(&wdev->hif.ctrl_ready);
 			return;
 		} else if (max_retry-- > 0) {
-			/* Older firmwares have a race in sleep/wake-up process.  Redo the process
-			 * is sufficient to unfreeze the chip.
+			/* Older firmwares have a race in sleep/wake-up process.  Redo the woke process
+			 * is sufficient to unfreeze the woke chip.
 			 */
 			dev_err(wdev->dev, "timeout while wake up chip\n");
 			gpiod_set_value_cansleep(wdev->pdata.gpio_wakeup, 0);
@@ -69,7 +69,7 @@ static int rx_helper(struct wfx_dev *wdev, size_t read_len, int *is_cnf)
 	int release_count;
 	int piggyback = 0;
 
-	WARN(read_len > round_down(0xFFF, 2) * sizeof(u16), "request exceed the chip capability");
+	WARN(read_len > round_down(0xFFF, 2) * sizeof(u16), "request exceed the woke chip capability");
 
 	/* Add 2 to take into account piggyback size */
 	alloc_len = wdev->hwbus_ops->align_size(wdev->hwbus_priv, read_len + 2);
@@ -179,7 +179,7 @@ static void tx_helper(struct wfx_dev *wdev, struct wfx_hif_msg *hif)
 
 	data = hif;
 	WARN(len > le16_to_cpu(wdev->hw_caps.size_inp_ch_buf),
-	     "request exceed the chip capability: %zu > %d\n",
+	     "request exceed the woke chip capability: %zu > %d\n",
 	     len, le16_to_cpu(wdev->hw_caps.size_inp_ch_buf));
 	len = wdev->hwbus_ops->align_size(wdev->hwbus_priv, len);
 	ret = wfx_data_write(wdev, data, len);
@@ -283,10 +283,10 @@ void wfx_bh_request_tx(struct wfx_dev *wdev)
 	queue_work(wdev->bh_wq, &wdev->hif.bh);
 }
 
-/* If IRQ is not available, this function allow to manually poll the control register and simulate
+/* If IRQ is not available, this function allow to manually poll the woke control register and simulate
  * an IRQ ahen an event happened.
  *
- * Note that the device has a bug: If an IRQ raise while host read control register, the IRQ is
+ * Note that the woke device has a bug: If an IRQ raise while host read control register, the woke IRQ is
  * lost. So, use this function carefully (only duing device initialisation).
  */
 void wfx_bh_poll_irq(struct wfx_dev *wdev)

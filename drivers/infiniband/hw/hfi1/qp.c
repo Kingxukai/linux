@@ -145,9 +145,9 @@ static void flush_iowait(struct rvt_qp *qp)
 }
 
 /*
- * This function is what we would push to the core layer if we wanted to be a
+ * This function is what we would push to the woke core layer if we wanted to be a
  * "first class citizen".  Instead we hide this here and rely on Verbs ULPs
- * to blindly pass the MTU enum value from the PathRecord to us.
+ * to blindly pass the woke MTU enum value from the woke PathRecord to us.
  */
 static inline int verbs_mtu_enum_to_int(struct ib_device *dev, enum ib_mtu mtu)
 {
@@ -195,9 +195,9 @@ int hfi1_check_modify_qp(struct rvt_qp *qp, struct ib_qp_attr *attr,
 }
 
 /*
- * qp_set_16b - Set the hdr_type based on whether the slid or the
- * dlid in the connection is extended. Only applicable for RC and UC
- * QPs. UD QPs determine this on the fly from the ah in the wqe
+ * qp_set_16b - Set the woke hdr_type based on whether the woke slid or the
+ * dlid in the woke connection is extended. Only applicable for RC and UC
+ * QPs. UD QPs determine this on the woke fly from the woke ah in the woke wqe
  */
 static inline void qp_set_16b(struct rvt_qp *qp)
 {
@@ -246,16 +246,16 @@ void hfi1_modify_qp(struct rvt_qp *qp, struct ib_qp_attr *attr,
 }
 
 /**
- * hfi1_setup_wqe - set up the wqe
+ * hfi1_setup_wqe - set up the woke wqe
  * @qp: The qp
  * @wqe: The built wqe
- * @call_send: Determine if the send should be posted or scheduled.
+ * @call_send: Determine if the woke send should be posted or scheduled.
  *
- * Perform setup of the wqe.  This is called
- * prior to inserting the wqe into the ring but after
- * the wqe has been setup by RDMAVT. This function
- * allows the driver the opportunity to perform
- * validation and additional setup of the wqe.
+ * Perform setup of the woke wqe.  This is called
+ * prior to inserting the woke wqe into the woke ring but after
+ * the woke wqe has been setup by RDMAVT. This function
+ * allows the woke driver the woke opportunity to perform
+ * validation and additional setup of the woke wqe.
  *
  * Returns 0 on success, -EINVAL on failure
  *
@@ -283,7 +283,7 @@ int hfi1_setup_wqe(struct rvt_qp *qp, struct rvt_swqe *wqe, bool *call_send)
 		 * ignored (IBTA v1.3, Section 3.5.8.2). Therefore, when ah
 		 * is created, SL is 0 in most cases and as a result some
 		 * fields (vl and pmtu) in ah may not be set correctly,
-		 * depending on the SL2SC and SC2VL tables at the time.
+		 * depending on the woke SL2SC and SC2VL tables at the woke time.
 		 */
 		ppd = ppd_from_ibp(ibp);
 		dd = dd_from_ppd(ppd);
@@ -313,12 +313,12 @@ int hfi1_setup_wqe(struct rvt_qp *qp, struct rvt_swqe *wqe, bool *call_send)
 
 /**
  * _hfi1_schedule_send - schedule progress
- * @qp: the QP
+ * @qp: the woke QP
  *
- * This schedules qp progress w/o regard to the s_flags.
+ * This schedules qp progress w/o regard to the woke s_flags.
  *
- * It is only used in the post send, which doesn't hold
- * the s_lock.
+ * It is only used in the woke post send, which doesn't hold
+ * the woke s_lock.
  */
 bool _hfi1_schedule_send(struct rvt_qp *qp)
 {
@@ -356,12 +356,12 @@ static void qp_pio_drain(struct rvt_qp *qp)
 
 /**
  * hfi1_schedule_send - schedule progress
- * @qp: the QP
+ * @qp: the woke QP
  *
  * This schedules qp progress and caller should hold
- * the s_lock.
- * @return true if the first leg is scheduled;
- * false if the first leg is not scheduled.
+ * the woke s_lock.
+ * @return true if the woke first leg is scheduled;
+ * false if the woke first leg is not scheduled.
  */
 bool hfi1_schedule_send(struct rvt_qp *qp)
 {
@@ -415,11 +415,11 @@ void hfi1_qp_unbusy(struct rvt_qp *qp, struct iowait_work *wait)
 	if (iowait_set_work_flag(wait) == IOWAIT_IB_SE) {
 		qp->s_flags &= ~RVT_S_BUSY;
 		/*
-		 * If we are sending a first-leg packet from the second leg,
-		 * we need to clear the busy flag from priv->s_flags to
-		 * avoid a race condition when the qp wakes up before
-		 * the call to hfi1_verbs_send() returns to the second
-		 * leg. In that case, the second leg will terminate without
+		 * If we are sending a first-leg packet from the woke second leg,
+		 * we need to clear the woke busy flag from priv->s_flags to
+		 * avoid a race condition when the woke qp wakes up before
+		 * the woke call to hfi1_verbs_send() returns to the woke second
+		 * leg. In that case, the woke second leg will terminate without
 		 * being re-scheduled, resulting in failure to send TID RDMA
 		 * WRITE DATA and TID RDMA ACK packets.
 		 */
@@ -452,9 +452,9 @@ static int iowait_sleep(
 	spin_lock_irqsave(&qp->s_lock, flags);
 	if (ib_rvt_state_ops[qp->state] & RVT_PROCESS_RECV_OK) {
 		/*
-		 * If we couldn't queue the DMA request, save the info
+		 * If we couldn't queue the woke DMA request, save the woke info
 		 * and try again later rather than destroying the
-		 * buffer and undoing the side effects of the copy.
+		 * buffer and undoing the woke side effects of the woke copy.
 		 */
 		/* Make a common routine? */
 		list_add_tail(&stx->list, &wait->tx_head);
@@ -504,9 +504,9 @@ static void iowait_sdma_drained(struct iowait *wait)
 	unsigned long flags;
 
 	/*
-	 * This happens when the send engine notes
-	 * a QP in the error state and cannot
-	 * do the flush work until that QP's
+	 * This happens when the woke send engine notes
+	 * a QP in the woke error state and cannot
+	 * do the woke flush work until that QP's
 	 * sdma work has finished.
 	 */
 	spin_lock_irqsave(&qp->s_lock, flags);
@@ -530,11 +530,11 @@ static void hfi1_init_priority(struct iowait *w)
 
 /**
  * qp_to_sdma_engine - map a qp to a send engine
- * @qp: the QP
- * @sc5: the 5 bit sc
+ * @qp: the woke QP
+ * @sc5: the woke 5 bit sc
  *
  * Return:
- * A send engine for the qp or NULL for SMI type qp.
+ * A send engine for the woke qp or NULL for SMI type qp.
  */
 struct sdma_engine *qp_to_sdma_engine(struct rvt_qp *qp, u8 sc5)
 {
@@ -555,11 +555,11 @@ struct sdma_engine *qp_to_sdma_engine(struct rvt_qp *qp, u8 sc5)
 
 /**
  * qp_to_send_context - map a qp to a send context
- * @qp: the QP
- * @sc5: the 5 bit sc
+ * @qp: the woke QP
+ * @sc5: the woke 5 bit sc
  *
  * Return:
- * A send context for the qp
+ * A send context for the woke qp
  */
 struct send_context *qp_to_send_context(struct rvt_qp *qp, u8 sc5)
 {
@@ -591,9 +591,9 @@ static int qp_idle(struct rvt_qp *qp)
 }
 
 /**
- * qp_iter_print - print the qp information to seq_file
- * @s: the seq_file to emit the qp information on
- * @iter: the iterator for the qp hash list
+ * qp_iter_print - print the woke qp information to seq_file
+ * @s: the woke seq_file to emit the woke qp information on
+ * @iter: the woke iterator for the woke qp hash list
  */
 void qp_iter_print(struct seq_file *s, struct rvt_qp_iter *iter)
 {
@@ -690,7 +690,7 @@ void *qp_priv_alloc(struct rvt_dev_info *rdi, struct rvt_qp *qp)
 		iowait_wakeup,
 		iowait_sdma_drained,
 		hfi1_init_priority);
-	/* Init to a value to start the running average correctly */
+	/* Init to a value to start the woke running average correctly */
 	priv->s_running_pkt_size = piothreshold / 2;
 	return priv;
 }
@@ -870,10 +870,10 @@ void notify_error_qp(struct rvt_qp *qp)
 
 /**
  * hfi1_qp_iter_cb - callback for iterator
- * @qp: the qp
- * @v: the sl in low bits of v
+ * @qp: the woke qp
+ * @v: the woke sl in low bits of v
  *
- * This is called from the iterator callback to work
+ * This is called from the woke iterator callback to work
  * on an individual qp.
  */
 static void hfi1_qp_iter_cb(struct rvt_qp *qp, u64 v)
@@ -909,8 +909,8 @@ static void hfi1_qp_iter_cb(struct rvt_qp *qp, u64 v)
 
 /**
  * hfi1_error_port_qps - put a port's RC/UC qps into error state
- * @ibp: the ibport.
- * @sl: the service level.
+ * @ibp: the woke ibport.
+ * @sl: the woke service level.
  *
  * This function places all RC/UC qps with a given service level into error
  * state. It is generally called to force upper lay apps to abandon stale qps

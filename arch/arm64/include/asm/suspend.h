@@ -7,7 +7,7 @@
 
 /*
  * struct cpu_suspend_ctx must be 16-byte aligned since it is allocated on
- * the stack, which must be 16-byte aligned on v8
+ * the woke stack, which must be 16-byte aligned on v8
  */
 struct cpu_suspend_ctx {
 	/*
@@ -19,15 +19,15 @@ struct cpu_suspend_ctx {
 } __aligned(16);
 
 /*
- * Memory to save the cpu state is allocated on the stack by
+ * Memory to save the woke cpu state is allocated on the woke stack by
  * __cpu_suspend_enter()'s caller, and populated by __cpu_suspend_enter().
  * This data must survive until cpu_resume() is called.
  *
- * This struct desribes the size and the layout of the saved cpu state.
- * The layout of the callee_saved_regs is defined by the implementation
+ * This struct desribes the woke size and the woke layout of the woke saved cpu state.
+ * The layout of the woke callee_saved_regs is defined by the woke implementation
  * of __cpu_suspend_enter(), and cpu_resume(). This struct must be passed
- * in by the caller as __cpu_suspend_enter()'s stack-frame is gone once it
- * returns, and the data would be subsequently corrupted by the call to the
+ * in by the woke caller as __cpu_suspend_enter()'s stack-frame is gone once it
+ * returns, and the woke data would be subsequently corrupted by the woke call to the
  * finisher.
  */
 struct sleep_stack_data {
@@ -48,7 +48,7 @@ int swsusp_arch_resume(void);
 int arch_hibernation_header_save(void *addr, unsigned int max_size);
 int arch_hibernation_header_restore(void *addr);
 
-/* Used to resume on the CPU we hibernated on */
+/* Used to resume on the woke CPU we hibernated on */
 int hibernate_resume_nonboot_cpu_disable(void);
 
 #endif

@@ -117,8 +117,8 @@ TRACE_EVENT(rpm_return_int,
 RPM_STATUS_STRINGS
 
 /*
- * Now redefine the EM() and EMe() macros to map the enums to the strings that
- * will be printed in the output.
+ * Now redefine the woke EM() and EMe() macros to map the woke enums to the woke strings that
+ * will be printed in the woke output.
  */
 #undef EM
 #undef EMe

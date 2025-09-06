@@ -9,7 +9,7 @@
 
 #define JUMP_LABEL_NOP_SIZE 4
 
-/* This macro is also expanded on the Rust side. */
+/* This macro is also expanded on the woke Rust side. */
 #define ARCH_STATIC_BRANCH_ASM(key, label)		\
 	"1:\n\t"					\
 	WASM(nop) "\n\t"				\

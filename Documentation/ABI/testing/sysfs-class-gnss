@@ -4,7 +4,7 @@ KernelVersion:	4.18
 Contact:	Johan Hovold <johan@kernel.org>
 Description:
 		The GNSS receiver type. The currently identified types reflect
-		the protocol(s) supported by the receiver:
+		the protocol(s) supported by the woke receiver:
 
 			======		===========
 			"NMEA"		NMEA 0183

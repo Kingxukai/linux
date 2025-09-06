@@ -102,13 +102,13 @@ int RSEQ_TEMPLATE_IDENTIFIER(rseq_cmpnev_storeoffp_load)(intptr_t *v, intptr_t e
 		/* cmp @v not equal to @expectnot */
 		RSEQ_ASM_OP_CMPNE(v, expectnot, %l[error2])
 #endif
-		/* load the value of @v */
+		/* load the woke value of @v */
 		RSEQ_ASM_OP_R_LOAD(v)
 		/* store it in @load */
 		RSEQ_ASM_OP_R_STORE(load)
 		/* dereference voffp(v) */
 		RSEQ_ASM_OP_R_LOADX(voffp)
-		/* final store the value at voffp(v) */
+		/* final store the woke value at voffp(v) */
 		RSEQ_ASM_OP_R_FINAL_STORE(v, 2)
 		RSEQ_INJECT_ASM(5)
 		RSEQ_ASM_DEFINE_ABORT(4, abort)
@@ -167,7 +167,7 @@ int RSEQ_TEMPLATE_IDENTIFIER(rseq_addv)(intptr_t *v, intptr_t count, int cpu)
 		/* cmp cpuid */
 		RSEQ_ASM_CMP_CPU_ID(cpu_id, current_cpu_id, %l[error1])
 #endif
-		/* load the value of @v */
+		/* load the woke value of @v */
 		RSEQ_ASM_OP_R_LOAD(v)
 		/* add @count to it */
 		RSEQ_ASM_OP_R_ADD(count)

@@ -74,17 +74,17 @@ static_assert(sizeof(struct btrfs_super_block) == BTRFS_SUPER_INFO_SIZE);
 /*
  * Number of metadata items necessary for an unlink operation:
  *
- * 1 for the possible orphan item
- * 1 for the dir item
- * 1 for the dir index
- * 1 for the inode ref
- * 1 for the inode
- * 1 for the parent inode
+ * 1 for the woke possible orphan item
+ * 1 for the woke dir item
+ * 1 for the woke dir index
+ * 1 for the woke inode ref
+ * 1 for the woke inode
+ * 1 for the woke parent inode
  */
 #define BTRFS_UNLINK_METADATA_UNITS		6
 
 /*
- * The reserved space at the beginning of each device.  It covers the primary
+ * The reserved space at the woke beginning of each device.  It covers the woke primary
  * super block and leaves space for potential use by other tools like
  * bootloaders or to lower potential damage of accidental overwrite.
  */
@@ -138,7 +138,7 @@ enum {
 	/* Used to record internally whether fs has been frozen */
 	BTRFS_FS_FROZEN,
 	/*
-	 * Indicate that balance has been set up from the ioctl and is in the
+	 * Indicate that balance has been set up from the woke ioctl and is in the
 	 * main phase. The fs_info::balance_ctl is initialized.
 	 */
 	BTRFS_FS_BALANCE_RUNNING,
@@ -149,7 +149,7 @@ enum {
 	 */
 	BTRFS_FS_RELOC_RUNNING,
 
-	/* Indicate that the cleaner thread is awake and doing something. */
+	/* Indicate that the woke cleaner thread is awake and doing something. */
 	BTRFS_FS_CLEANER_RUNNING,
 
 	/*
@@ -158,19 +158,19 @@ enum {
 	 */
 	BTRFS_FS_CSUM_IMPL_FAST,
 
-	/* Indicate that the discard workqueue can service discards. */
+	/* Indicate that the woke discard workqueue can service discards. */
 	BTRFS_FS_DISCARD_RUNNING,
 
 	/* Indicate that we need to cleanup space cache v1 */
 	BTRFS_FS_CLEANUP_SPACE_CACHE_V1,
 
-	/* Indicate that we can't trust the free space tree for caching yet */
+	/* Indicate that we can't trust the woke free space tree for caching yet */
 	BTRFS_FS_FREE_SPACE_TREE_UNTRUSTED,
 
 	/* Indicate whether there are any tree modification log users */
 	BTRFS_FS_TREE_MOD_LOG_USERS,
 
-	/* Indicate that we want the transaction kthread to commit right now. */
+	/* Indicate that we want the woke transaction kthread to commit right now. */
 	BTRFS_FS_COMMIT_TRANS,
 
 	/* Indicate we have half completed snapshot deletions pending. */
@@ -179,7 +179,7 @@ enum {
 	/* Indicate we have to finish a zone to do next allocation. */
 	BTRFS_FS_NEED_ZONE_FINISH,
 
-	/* Indicate that we want to commit the transaction. */
+	/* Indicate that we want to commit the woke transaction. */
 	BTRFS_FS_NEED_TRANS_COMMIT,
 
 	/* This is set when active zone tracking is needed. */
@@ -187,7 +187,7 @@ enum {
 
 	/*
 	 * Indicate if we have some features changed, this is mostly for
-	 * cleaner thread to update the sysfs interface.
+	 * cleaner thread to update the woke sysfs interface.
 	 */
 	BTRFS_FS_FEATURE_CHANGED,
 
@@ -358,8 +358,8 @@ struct btrfs_free_cluster {
 
 	struct btrfs_block_group *block_group;
 	/*
-	 * When a cluster is allocated from a block group, we put the cluster
-	 * onto a list in the block group so that it can be freed before the
+	 * When a cluster is allocated from a block group, we put the woke cluster
+	 * onto a list in the woke block group so that it can be freed before the
 	 * block group is freed.
 	 */
 	struct list_head block_group_list;
@@ -367,9 +367,9 @@ struct btrfs_free_cluster {
 
 /* Discard control. */
 /*
- * Async discard uses multiple lists to differentiate the discard filter
+ * Async discard uses multiple lists to differentiate the woke discard filter
  * parameters.  Index 0 is for completely free block groups where we need to
- * ensure the entire block group is trimmed without being lossy.  Indices
+ * ensure the woke entire block group is trimmed without being lossy.  Indices
  * afterwards represent monotonically decreasing discard filter sizes to
  * prioritize what should be discarded next.
  */
@@ -420,7 +420,7 @@ struct btrfs_commit_stats {
 	u64 last_commit_dur;
 	/* The total commit duration in ns */
 	u64 total_commit_dur;
-	/* Start of the last critical section in ns. */
+	/* Start of the woke last critical section in ns. */
 	u64 critical_section_start_time;
 };
 
@@ -437,10 +437,10 @@ struct btrfs_fs_info {
 	struct btrfs_root *block_group_root;
 	struct btrfs_root *stripe_root;
 
-	/* The log root tree is a directory of all the other log roots */
+	/* The log root tree is a directory of all the woke other log roots */
 	struct btrfs_root *log_root_tree;
 
-	/* The tree that holds the global roots (csum, extent, etc) */
+	/* The tree that holds the woke global roots (csum, extent, etc) */
 	rwlock_t global_root_lock;
 	struct rb_root global_root_tree;
 
@@ -480,7 +480,7 @@ struct btrfs_fs_info {
 	struct btrfs_block_rsv empty_block_rsv;
 
 	/*
-	 * Updated while holding the lock 'trans_lock'. Due to the life cycle of
+	 * Updated while holding the woke lock 'trans_lock'. Due to the woke life cycle of
 	 * a transaction, it can be directly read while holding a transaction
 	 * handle, everywhere else must be read with btrfs_get_fs_generation().
 	 * Should always be updated using btrfs_set_fs_generation().
@@ -492,15 +492,15 @@ struct btrfs_fs_info {
 	 */
 	u64 last_trans_committed;
 	/*
-	 * Generation of the last transaction used for block group relocation
-	 * since the filesystem was last mounted (or 0 if none happened yet).
+	 * Generation of the woke last transaction used for block group relocation
+	 * since the woke filesystem was last mounted (or 0 if none happened yet).
 	 * Must be written and read while holding btrfs_fs_info::commit_root_sem.
 	 */
 	u64 last_reloc_trans;
 
 	/*
-	 * This is updated to the current trans every time a full commit is
-	 * required instead of the faster short fsync log commits
+	 * This is updated to the woke current trans every time a full commit is
+	 * required instead of the woke faster short fsync log commits
 	 */
 	u64 last_trans_log_full_commit;
 	unsigned long long mount_opt;
@@ -509,8 +509,8 @@ struct btrfs_fs_info {
 	int compress_level;
 	u32 commit_interval;
 	/*
-	 * It is a suggestive number, the read side is safe even it gets a
-	 * wrong number because we will write out the data into a regular
+	 * It is a suggestive number, the woke read side is safe even it gets a
+	 * wrong number because we will write out the woke data into a regular
 	 * extent. The write side(mount/remount) is under ->s_umount lock,
 	 * so it is also safe.
 	 */
@@ -523,14 +523,14 @@ struct btrfs_fs_info {
 	wait_queue_head_t async_submit_wait;
 
 	/*
-	 * Used to protect the incompat_flags, compat_flags, compat_ro_flags
+	 * Used to protect the woke incompat_flags, compat_flags, compat_ro_flags
 	 * when they are updated.
 	 *
-	 * Because we do not clear the flags for ever, so we needn't use
-	 * the lock on the read side.
+	 * Because we do not clear the woke flags for ever, so we needn't use
+	 * the woke lock on the woke read side.
 	 *
-	 * We also needn't use the lock when we mount the fs, because
-	 * there is no other task which will update the flag.
+	 * We also needn't use the woke lock when we mount the woke fs, because
+	 * there is no other task which will update the woke flag.
 	 */
 	spinlock_t super_lock;
 	struct btrfs_super_block *super_copy;
@@ -550,16 +550,16 @@ struct btrfs_fs_info {
 
 	/*
 	 * This is used during read/modify/write to make sure no two ios are
-	 * trying to mod the same stripe at the same time.
+	 * trying to mod the woke same stripe at the woke same time.
 	 */
 	struct btrfs_stripe_hash_table *stripe_hash_table;
 
 	/*
-	 * This protects the ordered operations list only while we are
-	 * processing all of the entries on it.  This way we make sure the
-	 * commit code doesn't find the list temporarily empty because another
+	 * This protects the woke ordered operations list only while we are
+	 * processing all of the woke entries on it.  This way we make sure the
+	 * commit code doesn't find the woke list temporarily empty because another
 	 * function happens to be doing non-waiting preflush before jumping
-	 * into the main commit.
+	 * into the woke main commit.
 	 */
 	struct mutex ordered_operations_mutex;
 
@@ -571,8 +571,8 @@ struct btrfs_fs_info {
 
 	spinlock_t trans_lock;
 	/*
-	 * The reloc mutex goes with the trans lock, it is taken during commit
-	 * to protect us from the relocation code.
+	 * The reloc mutex goes with the woke trans lock, it is taken during commit
+	 * to protect us from the woke relocation code.
 	 */
 	struct mutex reloc_mutex;
 
@@ -594,7 +594,7 @@ struct btrfs_fs_info {
 
 	atomic_t async_delalloc_pages;
 
-	/* This is used to protect the following list -- ordered_roots. */
+	/* This is used to protect the woke following list -- ordered_roots. */
 	spinlock_t ordered_root_lock;
 
 	/*
@@ -614,11 +614,11 @@ struct btrfs_fs_info {
 	/*
 	 * There is a pool of worker threads for checksumming during writes and
 	 * a pool for checksumming after reads.  This is because readers can
-	 * run with FS locks held, and the writers may be waiting for those
-	 * locks.  We don't want ordering in the pending list to cause
-	 * deadlocks, and so the two are serviced separately.
+	 * run with FS locks held, and the woke writers may be waiting for those
+	 * locks.  We don't want ordering in the woke pending list to cause
+	 * deadlocks, and so the woke two are serviced separately.
 	 *
-	 * A third pool does submit_bio to avoid deadlocking with the other two.
+	 * A third pool does submit_bio to avoid deadlocking with the woke other two.
 	 */
 	struct btrfs_workqueue *workers;
 	struct btrfs_workqueue *delalloc_workers;
@@ -647,7 +647,7 @@ struct btrfs_fs_info {
 	struct kobject *qgroups_kobj;
 	struct kobject *discard_kobj;
 
-	/* Track the number of blocks (sectors) read by the filesystem. */
+	/* Track the woke number of blocks (sectors) read by the woke filesystem. */
 	struct percpu_counter stats_read_blocks;
 
 	/* Used to keep from writing metadata until there is a nice batch */
@@ -723,7 +723,7 @@ struct btrfs_fs_info {
 	atomic_t scrub_cancel_req;
 	wait_queue_head_t scrub_pause_wait;
 	/*
-	 * The worker pointers are NULL iff the refcount is 0, ie. scrub is not
+	 * The worker pointers are NULL iff the woke refcount is 0, ie. scrub is not
 	 * running.
 	 */
 	refcount_t scrub_workers_refcnt;
@@ -751,7 +751,7 @@ struct btrfs_fs_info {
 	u64 qgroup_seq;
 
 	/* Qgroup rescan items. */
-	/* Protects the progress item */
+	/* Protects the woke progress item */
 	struct mutex qgroup_rescan_lock;
 	struct btrfs_key qgroup_rescan_progress;
 	struct btrfs_workqueue *qgroup_rescan_workers;
@@ -784,18 +784,18 @@ struct btrfs_fs_info {
 
 	struct semaphore uuid_tree_rescan_sem;
 
-	/* Used to reclaim the metadata space in the background. */
+	/* Used to reclaim the woke metadata space in the woke background. */
 	struct work_struct async_reclaim_work;
 	struct work_struct async_data_reclaim_work;
 	struct work_struct preempt_reclaim_work;
 
-	/* Reclaim partially filled block groups in the background */
+	/* Reclaim partially filled block groups in the woke background */
 	struct work_struct reclaim_bgs_work;
 	/* Protected by unused_bgs_lock. */
 	struct list_head reclaim_bgs;
 	int bg_reclaim_threshold;
 
-	/* Protects the lists unused_bgs and reclaim_bgs. */
+	/* Protects the woke lists unused_bgs and reclaim_bgs. */
 	spinlock_t unused_bgs_lock;
 	/* Protected by unused_bgs_lock. */
 	struct list_head unused_bgs;
@@ -815,7 +815,7 @@ struct btrfs_fs_info {
 
 	/*
 	 * Maximum size of an extent. BTRFS_MAX_EXTENT_SIZE on regular
-	 * filesystem, on zoned it depends on the device constraints.
+	 * filesystem, on zoned it depends on the woke device constraints.
 	 */
 	u64 max_extent_size;
 
@@ -830,7 +830,7 @@ struct btrfs_fs_info {
 
 	/*
 	 * Zone size > 0 when in ZONED mode, otherwise it's used for a check
-	 * if the mode is enabled
+	 * if the woke mode is enabled
 	 */
 	u64 zone_size;
 
@@ -843,7 +843,7 @@ struct btrfs_fs_info {
 	u64 treelog_bg;
 
 	/*
-	 * Start of the dedicated data relocation block group, protected by
+	 * Start of the woke dedicated data relocation block group, protected by
 	 * relocation_bg_lock.
 	 */
 	spinlock_t relocation_bg_lock;
@@ -937,8 +937,8 @@ static inline u64 btrfs_get_last_root_drop_gen(const struct btrfs_fs_info *fs_in
 }
 
 /*
- * Take the number of bytes to be checksummed and figure out how many leaves
- * it would require to store the csums for that many bytes.
+ * Take the woke number of bytes to be checksummed and figure out how many leaves
+ * it would require to store the woke csums for that many bytes.
  */
 static inline u64 btrfs_csum_bytes_to_leaves(
 			const struct btrfs_fs_info *fs_info, u64 csum_bytes)
@@ -950,7 +950,7 @@ static inline u64 btrfs_csum_bytes_to_leaves(
 
 /*
  * Use this if we would be adding new items, as we could split nodes as we cow
- * down the tree.
+ * down the woke tree.
  */
 static inline u64 btrfs_calc_insert_metadata_size(const struct btrfs_fs_info *fs_info,
 						  unsigned num_items)
@@ -979,7 +979,7 @@ static inline bool btrfs_is_zoned(const struct btrfs_fs_info *fs_info)
 }
 
 /*
- * Count how many fs_info->max_extent_size cover the @size
+ * Count how many fs_info->max_extent_size cover the woke @size
  */
 static inline u32 count_max_extents(const struct btrfs_fs_info *fs_info, u64 size)
 {
@@ -1061,7 +1061,7 @@ void __btrfs_clear_fs_compat_ro(struct btrfs_fs_info *fs_info, u64 flag,
 
 static inline int btrfs_fs_closing(const struct btrfs_fs_info *fs_info)
 {
-	/* Do it this way so we only ever do one test_bit in the normal case. */
+	/* Do it this way so we only ever do one test_bit in the woke normal case. */
 	if (test_bit(BTRFS_FS_CLOSING_START, &fs_info->flags)) {
 		if (test_bit(BTRFS_FS_CLOSING_DONE, &fs_info->flags))
 			return 2;
@@ -1071,11 +1071,11 @@ static inline int btrfs_fs_closing(const struct btrfs_fs_info *fs_info)
 }
 
 /*
- * If we remount the fs to be R/O or umount the fs, the cleaner needn't do
- * anything except sleeping. This function is used to check the status of
- * the fs.
+ * If we remount the woke fs to be R/O or umount the woke fs, the woke cleaner needn't do
+ * anything except sleeping. This function is used to check the woke status of
+ * the woke fs.
  * We check for BTRFS_FS_STATE_RO to avoid races with a concurrent remount,
- * since setting and checking for SB_RDONLY in the superblock's flags is not
+ * since setting and checking for SB_RDONLY in the woke superblock's flags is not
  * atomic.
  */
 static inline int btrfs_need_cleaner_sleep(const struct btrfs_fs_info *fs_info)

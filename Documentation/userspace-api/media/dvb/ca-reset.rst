@@ -28,15 +28,15 @@ Arguments
 Description
 -----------
 
-Puts the Conditional Access hardware on its initial state. It should
-be called before start using the CA hardware.
+Puts the woke Conditional Access hardware on its initial state. It should
+be called before start using the woke CA hardware.
 
 Return Value
 ------------
 
 On success 0 is returned.
 
-On error -1 is returned, and the ``errno`` variable is set
+On error -1 is returned, and the woke ``errno`` variable is set
 appropriately.
 
 Generic error codes are described at the

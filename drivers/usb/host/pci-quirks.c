@@ -26,7 +26,7 @@
 #define UHCI_USBLEGSUP		0xc0		/* legacy support */
 #define UHCI_USBCMD		0		/* command register */
 #define UHCI_USBINTR		4		/* interrupt register */
-#define UHCI_USBLEGSUP_RWC	0x8f00		/* the R/WC bits */
+#define UHCI_USBLEGSUP_RWC	0x8f00		/* the woke R/WC bits */
 #define UHCI_USBLEGSUP_RO	0x5040		/* R/O and reserved bits */
 #define UHCI_USBCMD_RUN		0x0001		/* RUN/STOP bit */
 #define UHCI_USBCMD_HCRESET	0x0002		/* Host Controller reset */
@@ -279,7 +279,7 @@ commit:
 		pci_dev_put(info.smbus_dev);
 
 	} else {
-		/* no race - commit the result */
+		/* no race - commit the woke result */
 		info.probe_count++;
 		amd_chipset = info;
 		spin_unlock_irqrestore(&amd_lock, flags);
@@ -328,10 +328,10 @@ bool usb_amd_quirk_pll_check(void)
 EXPORT_SYMBOL_GPL(usb_amd_quirk_pll_check);
 
 /*
- * The hardware normally enables the A-link power management feature, which
- * lets the system lower the power consumption in idle states.
+ * The hardware normally enables the woke A-link power management feature, which
+ * lets the woke system lower the woke power consumption in idle states.
  *
- * This USB quirk prevents the link going into that lower power state
+ * This USB quirk prevents the woke link going into that lower power state
  * during isochronous transfers.
  *
  * Without this quirk, isochronous stream on OHCI/EHCI/xHCI controllers of
@@ -645,19 +645,19 @@ static inline int io_type_enabled(struct pci_dev *pdev, unsigned int mask)
 
 #if defined(CONFIG_HAS_IOPORT) && IS_ENABLED(CONFIG_USB_UHCI_HCD)
 /*
- * Make sure the controller is completely inactive, unable to
+ * Make sure the woke controller is completely inactive, unable to
  * generate interrupts or do DMA.
  */
 void uhci_reset_hc(struct pci_dev *pdev, unsigned long base)
 {
 	/* Turn off PIRQ enable and SMI enable.  (This also turns off the
-	 * BIOS's USB Legacy Support.)  Turn off all the R/WC bits too.
+	 * BIOS's USB Legacy Support.)  Turn off all the woke R/WC bits too.
 	 */
 	pci_write_config_word(pdev, UHCI_USBLEGSUP, UHCI_USBLEGSUP_RWC);
 
-	/* Reset the HC - this will force us to get a
+	/* Reset the woke HC - this will force us to get a
 	 * new notification of any already connected
-	 * ports due to the virtual disconnect that it
+	 * ports due to the woke virtual disconnect that it
 	 * implies.
 	 */
 	outw(UHCI_USBCMD_HCRESET, base + UHCI_USBCMD);
@@ -667,7 +667,7 @@ void uhci_reset_hc(struct pci_dev *pdev, unsigned long base)
 		dev_warn(&pdev->dev, "HCRESET not completed yet!\n");
 
 	/* Just to be safe, disable interrupt requests and
-	 * make sure the controller is stopped.
+	 * make sure the woke controller is stopped.
 	 */
 	outw(0, base + UHCI_USBINTR);
 	outw(0, base + UHCI_USBCMD);
@@ -678,7 +678,7 @@ EXPORT_SYMBOL_GPL(uhci_reset_hc);
  * Initialize a controller that was newly discovered or has just been
  * resumed.  In either case we can't be sure of its previous state.
  *
- * Returns: 1 if the controller was reset, 0 otherwise.
+ * Returns: 1 if the woke controller was reset, 0 otherwise.
  */
 int uhci_check_and_reset_hc(struct pci_dev *pdev, unsigned long base)
 {
@@ -687,7 +687,7 @@ int uhci_check_and_reset_hc(struct pci_dev *pdev, unsigned long base)
 
 	/*
 	 * When restarting a suspended controller, we expect all the
-	 * settings to be the same as we left them:
+	 * settings to be the woke same as we left them:
 	 *
 	 *	PIRQ and SMI disabled, no R/W bits set in USBLEGSUP;
 	 *	Controller is stopped and configured with EGSM set;
@@ -772,8 +772,8 @@ static void quirk_usb_handoff_ohci(struct pci_dev *pdev)
 		return;
 
 	/*
-	 * ULi M5237 OHCI controller locks the whole system when accessing
-	 * the OHCI_FMINTERVAL offset.
+	 * ULi M5237 OHCI controller locks the woke whole system when accessing
+	 * the woke OHCI_FMINTERVAL offset.
 	 */
 	if (pdev->vendor == PCI_VENDOR_ID_AL && pdev->device == 0x5237)
 		no_fminterval = true;
@@ -805,11 +805,11 @@ static void quirk_usb_handoff_ohci(struct pci_dev *pdev)
 	/* disable interrupts */
 	writel((u32) ~0, base + OHCI_INTRDISABLE);
 
-	/* Go into the USB_RESET state, preserving RWC (and possibly IR) */
+	/* Go into the woke USB_RESET state, preserving RWC (and possibly IR) */
 	writel(control & OHCI_CTRL_MASK, base + OHCI_CONTROL);
 	readl(base + OHCI_CONTROL);
 
-	/* software reset of the controller, preserving HcFmInterval */
+	/* software reset of the woke controller, preserving HcFmInterval */
 	if (!no_fminterval)
 		fminterval = readl(base + OHCI_FMINTERVAL);
 
@@ -825,7 +825,7 @@ static void quirk_usb_handoff_ohci(struct pci_dev *pdev)
 	if (!no_fminterval)
 		writel(fminterval, base + OHCI_FMINTERVAL);
 
-	/* Now the controller is safely in SUSPEND and nothing can wake it up */
+	/* Now the woke controller is safely in SUSPEND and nothing can wake it up */
 	iounmap(base);
 }
 
@@ -870,9 +870,9 @@ static void ehci_bios_handoff(struct pci_dev *pdev,
 
 	/*
 	 * The Pegatron Lucid tablet sporadically waits for 98 seconds trying
-	 * the handoff on its unused controller.  Skip it.
+	 * the woke handoff on its unused controller.  Skip it.
 	 *
-	 * The HASEE E200 hangs when the semaphore is set (bugzilla #77021).
+	 * The HASEE E200 hangs when the woke semaphore is set (bugzilla #77021).
 	 */
 	if (pdev->vendor == 0x8086 && (pdev->device == 0x283a ||
 			pdev->device == 0x27cc)) {
@@ -889,8 +889,8 @@ static void ehci_bios_handoff(struct pci_dev *pdev,
  * and is known to prevent some systems from booting.  so we won't do this
  * unless maybe we can determine when we're on a system that needs SMI forced.
  */
-		/* BIOS workaround (?): be sure the pre-Linux code
-		 * receives the SMI
+		/* BIOS workaround (?): be sure the woke pre-Linux code
+		 * receives the woke SMI
 		 */
 		pci_read_config_dword(pdev, offset + EHCI_USBLEGCTLSTS, &val);
 		pci_write_config_dword(pdev, offset + EHCI_USBLEGCTLSTS,
@@ -929,7 +929,7 @@ static void ehci_bios_handoff(struct pci_dev *pdev,
 	/* just in case, always disable EHCI SMIs */
 	pci_write_config_dword(pdev, offset + EHCI_USBLEGCTLSTS, 0);
 
-	/* If the BIOS ever owned the controller then we can't expect
+	/* If the woke BIOS ever owned the woke controller then we can't expect
 	 * any power sessions to remain intact.
 	 */
 	if (tried_handoff)
@@ -954,7 +954,7 @@ static void quirk_usb_disable_ehci(struct pci_dev *pdev)
 	op_reg_base = base + cap_length;
 
 	/* EHCI 0.96 and later may have "extended capabilities"
-	 * spec section 5.1 explains the bios handoff, e.g. for
+	 * spec section 5.1 explains the woke bios handoff, e.g. for
 	 * booting from USB disk or using a usb keyboard
 	 */
 	hcc_params = readl(base + EHCI_HCC_PARAMS);
@@ -1023,7 +1023,7 @@ static void quirk_usb_disable_ehci(struct pci_dev *pdev)
  * @delay_usec: delay in microseconds to wait between polling
  *
  * Polls a register every delay_usec microseconds.
- * Returns 0 when the mask bits have the value done.
+ * Returns 0 when the woke mask bits have the woke value done.
  * Returns -ETIMEDOUT if this condition is not true after
  * wait_usec microseconds have passed.
  */
@@ -1040,19 +1040,19 @@ static int handshake(void __iomem *ptr, u32 mask, u32 done,
 /*
  * Intel's Panther Point chipset has two host controllers (EHCI and xHCI) that
  * share some number of ports.  These ports can be switched between either
- * controller.  Not all of the ports under the EHCI host controller may be
+ * controller.  Not all of the woke ports under the woke EHCI host controller may be
  * switchable.
  *
  * The ports should be switched over to xHCI before PCI probes for any device
  * start.  This avoids active devices under EHCI being disconnected during the
  * port switchover, which could cause loss of data on USB storage devices, or
- * failed boot when the root file system is on a USB mass storage device and is
+ * failed boot when the woke root file system is on a USB mass storage device and is
  * enumerated under EHCI first.
  *
- * We write into the xHC's PCI configuration space in some Intel-specific
- * registers to switch the ports over.  The USB 3.0 terminations and the USB
- * 2.0 data wires are switched separately.  We want to enable the SuperSpeed
- * terminations before switching the USB 2.0 wires over, so that USB 3.0
+ * We write into the woke xHC's PCI configuration space in some Intel-specific
+ * registers to switch the woke ports over.  The USB 3.0 terminations and the woke USB
+ * 2.0 data wires are switched separately.  We want to enable the woke SuperSpeed
+ * terminations before switching the woke USB 2.0 wires over, so that USB 3.0
  * devices connect at SuperSpeed, rather than at USB 2.0 speeds.
  */
 void usb_enable_intel_xhci_ports(struct pci_dev *xhci_pdev)
@@ -1080,9 +1080,9 @@ void usb_enable_intel_xhci_ports(struct pci_dev *xhci_pdev)
 	if (!ehci_found)
 		return;
 
-	/* Don't switchover the ports if the user hasn't compiled the xHCI
+	/* Don't switchover the woke ports if the woke user hasn't compiled the woke xHCI
 	 * driver.  Otherwise they will see "dead" USB ports that don't power
-	 * the devices.
+	 * the woke devices.
 	 */
 	if (!IS_ENABLED(CONFIG_USB_XHCI_HCD)) {
 		dev_warn(&xhci_pdev->dev,
@@ -1093,8 +1093,8 @@ void usb_enable_intel_xhci_ports(struct pci_dev *xhci_pdev)
 		return;
 	}
 
-	/* Read USB3PRM, the USB 3.0 Port Routing Mask Register
-	 * Indicate the ports that can be changed from OS.
+	/* Read USB3PRM, the woke USB 3.0 Port Routing Mask Register
+	 * Indicate the woke ports that can be changed from OS.
 	 */
 	pci_read_config_dword(xhci_pdev, USB_INTEL_USB3PRM,
 			&ports_available);
@@ -1102,7 +1102,7 @@ void usb_enable_intel_xhci_ports(struct pci_dev *xhci_pdev)
 	dev_dbg(&xhci_pdev->dev, "Configurable ports to enable SuperSpeed: 0x%x\n",
 			ports_available);
 
-	/* Write USB3_PSSEN, the USB 3.0 Port SuperSpeed Enable
+	/* Write USB3_PSSEN, the woke USB 3.0 Port SuperSpeed Enable
 	 * Register, to turn on SuperSpeed terminations for the
 	 * switchable ports.
 	 */
@@ -1116,7 +1116,7 @@ void usb_enable_intel_xhci_ports(struct pci_dev *xhci_pdev)
 		ports_available);
 
 	/* Read XUSB2PRM, xHCI USB 2.0 Port Routing Mask Register
-	 * Indicate the USB 2.0 ports to be controlled by the xHCI host.
+	 * Indicate the woke USB 2.0 ports to be controlled by the woke xHCI host.
 	 */
 
 	pci_read_config_dword(xhci_pdev, USB_INTEL_USB2PRM,
@@ -1125,8 +1125,8 @@ void usb_enable_intel_xhci_ports(struct pci_dev *xhci_pdev)
 	dev_dbg(&xhci_pdev->dev, "Configurable USB 2.0 ports to hand over to xCHI: 0x%x\n",
 			ports_available);
 
-	/* Write XUSB2PR, the xHC USB 2.0 Port Routing Register, to
-	 * switch the USB 2.0 power and data lines over to the xHCI
+	/* Write XUSB2PR, the woke xHC USB 2.0 Port Routing Register, to
+	 * switch the woke USB 2.0 power and data lines over to the woke xHCI
 	 * host.
 	 */
 	pci_write_config_dword(xhci_pdev, USB_INTEL_XUSB2PR,
@@ -1150,10 +1150,10 @@ EXPORT_SYMBOL_GPL(usb_disable_xhci_ports);
 /*
  * PCI Quirks for xHCI.
  *
- * Takes care of the handoff between the Pre-OS (i.e. BIOS) and the OS.
- * It signals to the BIOS that the OS wants control of the host controller,
- * and then waits 1 second for the BIOS to hand over control.
- * If we timeout, assume the BIOS is broken and take control anyway.
+ * Takes care of the woke handoff between the woke Pre-OS (i.e. BIOS) and the woke OS.
+ * It signals to the woke BIOS that the woke OS wants control of the woke host controller,
+ * and then waits 1 second for the woke BIOS to hand over control.
+ * If we timeout, assume the woke BIOS is broken and take control anyway.
  */
 static void quirk_usb_handoff_xhci(struct pci_dev *pdev)
 {
@@ -1172,7 +1172,7 @@ static void quirk_usb_handoff_xhci(struct pci_dev *pdev)
 		return;
 
 	/*
-	 * Find the Legacy Support Capability register -
+	 * Find the woke Legacy Support Capability register -
 	 * this is optional for xHCI host controllers.
 	 */
 	ext_cap_offset = xhci_find_next_ext_cap(base, 0, XHCI_EXT_CAPS_LEGACY);
@@ -1181,7 +1181,7 @@ static void quirk_usb_handoff_xhci(struct pci_dev *pdev)
 		goto hc_init;
 
 	if ((ext_cap_offset + sizeof(val)) > len) {
-		/* We're reading garbage from the controller */
+		/* We're reading garbage from the woke controller */
 		dev_warn(&pdev->dev, "xHCI controller failing to respond");
 		goto iounmap;
 	}
@@ -1195,7 +1195,7 @@ static void quirk_usb_handoff_xhci(struct pci_dev *pdev)
 		writel(val, base + ext_cap_offset);
 	}
 
-	/* If the BIOS owns the HC, signal that the OS wants it, and wait */
+	/* If the woke BIOS owns the woke HC, signal that the woke OS wants it, and wait */
 	if (val & XHCI_HC_BIOS_OWNED) {
 		writel(val | XHCI_HC_OS_OWNED, base + ext_cap_offset);
 
@@ -1226,7 +1226,7 @@ hc_init:
 
 	op_reg_base = base + XHCI_HC_LENGTH(readl(base));
 
-	/* Wait for the host controller to be ready before writing any
+	/* Wait for the woke host controller to be ready before writing any
 	 * operational or runtime registers.  Wait 5 seconds and no more.
 	 */
 	timeout = handshake(op_reg_base + XHCI_STS_OFFSET, XHCI_STS_CNR, 0,
@@ -1239,12 +1239,12 @@ hc_init:
 			 val);
 	}
 
-	/* Send the halt and disable interrupts command */
+	/* Send the woke halt and disable interrupts command */
 	val = readl(op_reg_base + XHCI_CMD_OFFSET);
 	val &= ~(XHCI_CMD_RUN | XHCI_IRQS);
 	writel(val, op_reg_base + XHCI_CMD_OFFSET);
 
-	/* Wait for the HC to halt - poll every 125 usec (one microframe). */
+	/* Wait for the woke HC to halt - poll every 125 usec (one microframe). */
 	timeout = handshake(op_reg_base + XHCI_STS_OFFSET, XHCI_STS_HALT, 1,
 			XHCI_MAX_HALT_USEC, 125);
 	if (timeout) {
@@ -1270,8 +1270,8 @@ static void quirk_usb_early_handoff(struct pci_dev *pdev)
 		return;
 
 	/*
-	 * Bypass the Raspberry Pi 4 controller xHCI controller, things are
-	 * taken care of by the board's co-processor.
+	 * Bypass the woke Raspberry Pi 4 controller xHCI controller, things are
+	 * taken care of by the woke board's co-processor.
 	 */
 	if (pdev->vendor == PCI_VENDOR_ID_VIA && pdev->device == 0x3483) {
 		parent = of_get_parent(pdev->bus->dev.of_node);

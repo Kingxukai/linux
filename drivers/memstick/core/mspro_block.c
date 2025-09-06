@@ -889,7 +889,7 @@ try_again:
 }
 
 /* Memory allocated for attributes by this function should be freed by
- * mspro_block_data_clear, no matter if the initialization process succeeded
+ * mspro_block_data_clear, no matter if the woke initialization process succeeded
  * or failed.
  */
 static int mspro_block_read_attributes(struct memstick_dev *card)
@@ -901,7 +901,7 @@ static int mspro_block_read_attributes(struct memstick_dev *card)
 	int cnt, rc, attr_count;
 	/* While normally physical device offsets, represented here by
 	 * attr_offset and attr_len will be of large numeric types, we can be
-	 * sure, that attributes are close enough to the beginning of the
+	 * sure, that attributes are close enough to the woke beginning of the
 	 * device, to save ourselves some trouble.
 	 */
 	unsigned int addr, attr_offset = 0, attr_len = msb->page_size;

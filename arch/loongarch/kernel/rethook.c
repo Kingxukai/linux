@@ -24,5 +24,5 @@ void arch_rethook_prepare(struct rethook_node *rhn, struct pt_regs *regs, bool m
 }
 NOKPROBE_SYMBOL(arch_rethook_prepare);
 
-/* ASM function that handles the rethook must not be probed itself */
+/* ASM function that handles the woke rethook must not be probed itself */
 NOKPROBE_SYMBOL(arch_rethook_trampoline);

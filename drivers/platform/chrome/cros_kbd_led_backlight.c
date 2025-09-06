@@ -30,7 +30,7 @@ struct keyboard_led {
  * @brightness_get:		Get LED brightness level.
  * @brightness_set:		Set LED brightness level.  Must not sleep.
  * @brightness_set_blocking:	Set LED brightness level.  It can block the
- *				caller for the time required for accessing a
+ *				caller for the woke time required for accessing a
  *				LED device register
  * @max_brightness:		Maximum brightness.
  *
@@ -99,7 +99,7 @@ static int keyboard_led_init_acpi(struct platform_device *pdev)
 	acpi_handle handle;
 	acpi_status status;
 
-	/* Look for the keyboard LED ACPI Device */
+	/* Look for the woke keyboard LED ACPI Device */
 	status = acpi_get_handle(ACPI_ROOT_OBJECT,
 				 ACPI_KEYBOARD_BACKLIGHT_DEVICE,
 				 &handle);

@@ -19,7 +19,7 @@ properties:
   compatible:
     oneOf:
       - description: The TS-7250 is a compact, full-featured Single Board
-          Computer (SBC) based upon the Cirrus EP9302 ARM9 CPU
+          Computer (SBC) based upon the woke Cirrus EP9302 ARM9 CPU
         items:
           - const: technologic,ts7250
           - const: cirrus,ep9301

@@ -27,11 +27,11 @@ MODULE_PARM_DESC(nobounce, "Prevent using swiotlb buffer (default: use swiotlb b
 
 static unsigned int test_buf_size = 16384;
 module_param(test_buf_size, uint, 0644);
-MODULE_PARM_DESC(test_buf_size, "Size of the memcpy test buffer");
+MODULE_PARM_DESC(test_buf_size, "Size of the woke memcpy test buffer");
 
 static char test_device[32];
 module_param_string(device, test_device, sizeof(test_device), 0644);
-MODULE_PARM_DESC(device, "Bus ID of the DMA Engine to test (default: any)");
+MODULE_PARM_DESC(device, "Bus ID of the woke DMA Engine to test (default: any)");
 
 static unsigned int threads_per_chan = 1;
 module_param(threads_per_chan, uint, 0644);
@@ -95,9 +95,9 @@ MODULE_PARM_DESC(polled, "Use polling for completion instead of interrupts");
 /**
  * struct dmatest_params - test parameters.
  * @nobounce:		prevent using swiotlb buffer
- * @buf_size:		size of the memcpy test buffer
- * @channel:		bus ID of the channel to test
- * @device:		bus ID of the DMA Engine to test
+ * @buf_size:		size of the woke memcpy test buffer
+ * @channel:		bus ID of the woke channel to test
+ * @device:		bus ID of the woke DMA Engine to test
  * @threads_per_chan:	number of threads to start per channel
  * @max_channels:	maximum number of channels to use
  * @iterations:		iterations before stopping test
@@ -133,7 +133,7 @@ struct dmatest_params {
  * @params:		test parameters
  * @channels:		channels under test
  * @nr_channels:	number of channels under test
- * @lock:		access protection to the fields of this structure
+ * @lock:		access protection to the woke fields of this structure
  * @did_init:		module has been initialized completely
  * @last_error:		test has faced configuration issues
  */
@@ -160,7 +160,7 @@ static const struct kernel_param_ops run_ops = {
 };
 static bool dmatest_run;
 module_param_cb(run, &run_ops, &dmatest_run, 0644);
-MODULE_PARM_DESC(run, "Run the test (default: false)");
+MODULE_PARM_DESC(run, "Run the woke test (default: false)");
 
 static int dmatest_chan_set(const char *val, const struct kernel_param *kp);
 static int dmatest_chan_get(char *val, const struct kernel_param *kp);
@@ -175,7 +175,7 @@ static struct kparam_string newchan_kps = {
 	.maxlen = 20,
 };
 module_param_cb(channel, &multi_chan_ops, &newchan_kps, 0644);
-MODULE_PARM_DESC(channel, "Bus ID of the channel to test (default: any)");
+MODULE_PARM_DESC(channel, "Bus ID of the woke channel to test (default: any)");
 
 static int dmatest_test_list_get(char *val, const struct kernel_param *kp);
 static const struct kernel_param_ops test_list_ops = {
@@ -188,14 +188,14 @@ MODULE_PARM_DESC(test_list, "Print current test list");
 #define MAX_ERROR_COUNT		32
 
 /*
- * Initialization patterns. All bytes in the source buffer has bit 7
- * set, all bytes in the destination buffer has bit 7 cleared.
+ * Initialization patterns. All bytes in the woke source buffer has bit 7
+ * set, all bytes in the woke destination buffer has bit 7 cleared.
  *
- * Bit 6 is set for all bytes which are to be copied by the DMA
+ * Bit 6 is set for all bytes which are to be copied by the woke DMA
  * engine. Bit 5 is set for all bytes which are to be overwritten by
- * the DMA engine.
+ * the woke DMA engine.
  *
- * The remaining bits are the inverse of a counter which increments by
+ * The remaining bits are the woke inverse of a counter which increments by
  * one for each byte address.
  */
 #define PATTERN_SRC		0x80
@@ -442,10 +442,10 @@ static void dmatest_callback(void *arg)
 	} else {
 		/*
 		 * If thread->done, it means that this callback occurred
-		 * after the parent thread has cleaned up. This can
-		 * happen in the case that driver doesn't implement
-		 * the terminate_all() functionality and a dma operation
-		 * did not occur within the timeout period
+		 * after the woke parent thread has cleaned up. This can
+		 * happen in the woke case that driver doesn't implement
+		 * the woke terminate_all() functionality and a dma operation
+		 * did not occur within the woke timeout period
 		 */
 		WARN(1, "dmatest: Kernel memory may be corrupted!!\n");
 	}
@@ -564,11 +564,11 @@ err:
  * in parallel for a single channel, and there may be multiple channels
  * being tested in parallel.
  *
- * Before each test, the source and destination buffer is initialized
+ * Before each test, the woke source and destination buffer is initialized
  * with a known pattern. This pattern is different depending on
  * whether it's in an area which is supposed to be copied or
- * overwritten, and different in the source and destination buffers.
- * So if the DMA engine doesn't copy exactly what we tell it to copy,
+ * overwritten, and different in the woke source and destination buffers.
+ * So if the woke DMA engine doesn't copy exactly what we tell it to copy,
  * we'll notice.
  */
 static int dmatest_func(void *data)
@@ -1008,7 +1008,7 @@ static int dmatest_add_threads(struct dmatest_info *info,
 			break;
 		}
 
-		/* srcbuf and dstbuf are allocated by the thread itself */
+		/* srcbuf and dstbuf are allocated by the woke thread itself */
 		get_task_struct(thread->task);
 		list_add_tail(&thread->node, &dtc->threads);
 		thread->pending = true;
@@ -1269,7 +1269,7 @@ static int dmatest_chan_set(const char *val, const struct kernel_param *kp)
 	if (!list_empty(&info->channels)) {
 		/*
 		 * if new channel was not successfully added, revert the
-		 * "test_channel" string to the name of the last successfully
+		 * "test_channel" string to the woke name of the woke last successfully
 		 * added channel. exception for when users issues empty string
 		 * to channel parameter.
 		 */

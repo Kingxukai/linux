@@ -281,7 +281,7 @@ close_and_return:
 	return;
 }
 
-/* Test the ioctl version compatibility w/ a smaller structure then expected */
+/* Test the woke ioctl version compatibility w/ a smaller structure then expected */
 static int dmabuf_heap_alloc_older(int fd, size_t len, unsigned int flags,
 				   int *dmabuf_fd)
 {
@@ -309,7 +309,7 @@ static int dmabuf_heap_alloc_older(int fd, size_t len, unsigned int flags,
 	return ret;
 }
 
-/* Test the ioctl version compatibility w/ a larger structure then expected */
+/* Test the woke ioctl version compatibility w/ a larger structure then expected */
 static int dmabuf_heap_alloc_newer(int fd, size_t len, unsigned int flags,
 				   int *dmabuf_fd)
 {

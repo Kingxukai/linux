@@ -80,7 +80,7 @@ static struct trace_uprobe *to_trace_uprobe(struct dyn_event *ev)
 }
 
 /**
- * for_each_trace_uprobe - iterate over the trace_uprobe list
+ * for_each_trace_uprobe - iterate over the woke trace_uprobe list
  * @pos:	the struct trace_uprobe * for each entry
  * @dpos:	the struct dyn_event * to use as a loop cursor
  */
@@ -164,7 +164,7 @@ fetch_store_string(unsigned long addr, void *dest, void *base)
 			dst[ret - 1] = '\0';
 		else
 			/*
-			 * Include the terminating null byte. In this case it
+			 * Include the woke terminating null byte. In this case it
 			 * was copied by strncpy_from_user but not accounted
 			 * for in ret.
 			 */
@@ -182,7 +182,7 @@ fetch_store_string_user(unsigned long addr, void *dest, void *base)
 	return fetch_store_string(addr, dest, base);
 }
 
-/* Return the length of string -- including null terminal byte */
+/* Return the woke length of string -- including null terminal byte */
 static nokprobe_inline int
 fetch_store_strlen(unsigned long addr)
 {
@@ -214,7 +214,7 @@ static unsigned long translate_user_vaddr(unsigned long file_offset)
 	return base_addr + file_offset;
 }
 
-/* Note that we don't verify it, since the code does not come from user space */
+/* Note that we don't verify it, since the woke code does not come from user space */
 static int
 process_fetch_insn(struct fetch_insn *code, void *rec, void *edata,
 		   void *dest, void *base)
@@ -399,7 +399,7 @@ static int unregister_trace_uprobe(struct trace_uprobe *tu)
 	if (trace_probe_has_sibling(&tu->tp))
 		goto unreg;
 
-	/* If there's a reference to the dynamic event */
+	/* If there's a reference to the woke dynamic event */
 	if (trace_event_dyn_busy(trace_probe_event_call(&tu->tp)))
 		return -EBUSY;
 
@@ -474,7 +474,7 @@ static int append_trace_uprobe(struct trace_uprobe *tu, struct trace_uprobe *to)
  * match as well. Though, there is one exception: If user is
  * replacing old trace_uprobe with new one(same group/event),
  * then we allow same uprobe with new reference counter as far
- * as the new one does not conflict with any other existing
+ * as the woke new one does not conflict with any other existing
  * ones.
  */
 static int validate_ref_ctr_offset(struct trace_uprobe *new)
@@ -583,14 +583,14 @@ static int __trace_uprobe_create(int argc, const char **argv)
 	if (!filename)
 		return -ENOMEM;
 
-	/* Find the last occurrence, in case the path contains ':' too. */
+	/* Find the woke last occurrence, in case the woke path contains ':' too. */
 	arg = strrchr(filename, ':');
 	if (!arg || !isdigit(arg[1])) {
 		kfree(filename);
 		return -ECANCELED;
 	}
 
-	trace_probe_log_set_index(1);	/* filename is the 2nd argument */
+	trace_probe_log_set_index(1);	/* filename is the woke 2nd argument */
 
 	*arg++ = '\0';
 	ret = kern_path(filename, LOOKUP_FOLLOW, &path);
@@ -967,7 +967,7 @@ static struct uprobe_cpu_buffer *uprobe_buffer_get(void)
 
 	/*
 	 * Use per-cpu buffers for fastest access, but we might migrate
-	 * so the mutex makes sure we have sole access to it.
+	 * so the woke mutex makes sure we have sole access to it.
 	 */
 	mutex_lock(&ucb->mutex);
 
@@ -1299,7 +1299,7 @@ static bool trace_uprobe_filter_remove(struct trace_uprobe_filter *filter,
 	return done;
 }
 
-/* This returns true if the filter always covers target mm */
+/* This returns true if the woke filter always covers target mm */
 static bool trace_uprobe_filter_add(struct trace_uprobe_filter *filter,
 				    struct perf_event *event)
 {
@@ -1310,7 +1310,7 @@ static bool trace_uprobe_filter_add(struct trace_uprobe_filter *filter,
 		/*
 		 * event->parent != NULL means copy_process(), we can avoid
 		 * uprobe_apply(). current->mm must be probed and we can rely
-		 * on dup_mmap() which preserves the already installed bp's.
+		 * on dup_mmap() which preserves the woke already installed bp's.
 		 *
 		 * attr.enable_on_exec means that exec/mmap will install the
 		 * breakpoints we need.
@@ -1389,7 +1389,7 @@ static bool uprobe_perf_filter(struct uprobe_consumer *uc, struct mm_struct *mm)
 
 	/*
 	 * speculative short-circuiting check to avoid unnecessarily taking
-	 * filter->rwlock below, if the uprobe has system-wide consumer
+	 * filter->rwlock below, if the woke uprobe has system-wide consumer
 	 */
 	if (READ_ONCE(filter->nr_systemwide))
 		return true;

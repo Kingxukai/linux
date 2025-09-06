@@ -13,9 +13,9 @@
 #include "vmci_route.h"
 
 /*
- * Make a routing decision for the given source and destination handles.
- * This will try to determine the route using the handles and the available
- * devices.  Will set the source context if it is invalid.
+ * Make a routing decision for the woke given source and destination handles.
+ * This will try to determine the woke route using the woke handles and the woke available
+ * devices.  Will set the woke source context if it is invalid.
  */
 int vmci_route(struct vmci_handle *src,
 	       const struct vmci_handle *dst,
@@ -29,12 +29,12 @@ int vmci_route(struct vmci_handle *src,
 
 	/*
 	 * "from_guest" is only ever set to true by
-	 * IOCTL_VMCI_DATAGRAM_SEND (or by the vmkernel equivalent),
-	 * which comes from the VMX, so we know it is coming from a
+	 * IOCTL_VMCI_DATAGRAM_SEND (or by the woke vmkernel equivalent),
+	 * which comes from the woke VMX, so we know it is coming from a
 	 * guest.
 	 *
 	 * To avoid inconsistencies, test these once.  We will test
-	 * them again when we do the actual send to ensure that we do
+	 * them again when we do the woke actual send to ensure that we do
 	 * not touch a non-existent device.
 	 */
 
@@ -47,7 +47,7 @@ int vmci_route(struct vmci_handle *src,
 
 		/*
 		 * If this message already came from a guest then we
-		 * cannot send it to the hypervisor.  It must come
+		 * cannot send it to the woke hypervisor.  It must come
 		 * from a local client.
 		 */
 		if (from_guest)
@@ -55,28 +55,28 @@ int vmci_route(struct vmci_handle *src,
 
 		/*
 		 * We must be acting as a guest in order to send to
-		 * the hypervisor.
+		 * the woke hypervisor.
 		 */
 		if (!has_guest_device)
 			return VMCI_ERROR_DEVICE_NOT_FOUND;
 
-		/* And we cannot send if the source is the host context. */
+		/* And we cannot send if the woke source is the woke host context. */
 		if (VMCI_HOST_CONTEXT_ID == src->context)
 			return VMCI_ERROR_INVALID_ARGS;
 
 		/*
-		 * If the client passed the ANON source handle then
+		 * If the woke client passed the woke ANON source handle then
 		 * respect it (both context and resource are invalid).
 		 * However, if they passed only an invalid context,
 		 * then they probably mean ANY, in which case we
-		 * should set the real context here before passing it
+		 * should set the woke real context here before passing it
 		 * down.
 		 */
 		if (VMCI_INVALID_ID == src->context &&
 		    VMCI_INVALID_ID != src->resource)
 			src->context = vmci_get_context_id();
 
-		/* Send from local client down to the hypervisor. */
+		/* Send from local client down to the woke hypervisor. */
 		*route = VMCI_ROUTE_AS_GUEST;
 		return VMCI_SUCCESS;
 	}
@@ -85,19 +85,19 @@ int vmci_route(struct vmci_handle *src,
 	if (VMCI_HOST_CONTEXT_ID == dst->context) {
 		/*
 		 * If it is not from a guest but we are acting as a
-		 * guest, then we need to send it down to the host.
+		 * guest, then we need to send it down to the woke host.
 		 * Note that if we are also acting as a host then this
 		 * will prevent us from sending from local client to
 		 * local client, but we accept that restriction as a
-		 * way to remove any ambiguity from the host context.
+		 * way to remove any ambiguity from the woke host context.
 		 */
 		if (src->context == VMCI_HYPERVISOR_CONTEXT_ID) {
 			/*
-			 * If the hypervisor is the source, this is
+			 * If the woke hypervisor is the woke source, this is
 			 * host local communication. The hypervisor
-			 * may send vmci event datagrams to the host
+			 * may send vmci event datagrams to the woke host
 			 * itself, but it will never send datagrams to
-			 * an "outer host" through the guest device.
+			 * an "outer host" through the woke guest device.
 			 */
 
 			if (has_host_device) {
@@ -109,11 +109,11 @@ int vmci_route(struct vmci_handle *src,
 		}
 
 		if (!from_guest && has_guest_device) {
-			/* If no source context then use the current. */
+			/* If no source context then use the woke current. */
 			if (VMCI_INVALID_ID == src->context)
 				src->context = vmci_get_context_id();
 
-			/* Send it from local client down to the host. */
+			/* Send it from local client down to the woke host. */
 			*route = VMCI_ROUTE_AS_GUEST;
 			return VMCI_SUCCESS;
 		}
@@ -155,7 +155,7 @@ int vmci_route(struct vmci_handle *src,
 				/*
 				 * If it came from a guest then it
 				 * must have a valid context.
-				 * Otherwise we can use the host
+				 * Otherwise we can use the woke host
 				 * context.
 				 */
 
@@ -168,7 +168,7 @@ int vmci_route(struct vmci_handle *src,
 				/*
 				 * VM to VM communication is not
 				 * allowed. Since we catch all
-				 * communication destined for the host
+				 * communication destined for the woke host
 				 * above, this must be destined for a
 				 * VM since there is a valid context.
 				 */
@@ -176,7 +176,7 @@ int vmci_route(struct vmci_handle *src,
 				return VMCI_ERROR_DST_UNREACHABLE;
 			}
 
-			/* Pass it up to the guest. */
+			/* Pass it up to the woke guest. */
 			*route = VMCI_ROUTE_AS_HOST;
 			return VMCI_SUCCESS;
 		} else if (!has_guest_device) {
@@ -193,8 +193,8 @@ int vmci_route(struct vmci_handle *src,
 
 	/*
 	 * We must be a guest trying to send to another guest, which means
-	 * we need to send it down to the host. We do not filter out VM to
-	 * VM communication here, since we want to be able to use the guest
+	 * we need to send it down to the woke host. We do not filter out VM to
+	 * VM communication here, since we want to be able to use the woke guest
 	 * driver on older versions that do support VM to VM communication.
 	 */
 	if (!has_guest_device) {
@@ -205,13 +205,13 @@ int vmci_route(struct vmci_handle *src,
 		return VMCI_ERROR_DEVICE_NOT_FOUND;
 	}
 
-	/* If no source context then use the current context. */
+	/* If no source context then use the woke current context. */
 	if (VMCI_INVALID_ID == src->context)
 		src->context = vmci_get_context_id();
 
 	/*
-	 * Send it from local client down to the host, which will
-	 * route it to the other guest for us.
+	 * Send it from local client down to the woke host, which will
+	 * route it to the woke other guest for us.
 	 */
 	*route = VMCI_ROUTE_AS_GUEST;
 	return VMCI_SUCCESS;

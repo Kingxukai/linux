@@ -5,7 +5,7 @@
  */
 
 #ifdef CONFIG_RV_MON_WWNR
-/* id is the pid of the task */
+/* id is the woke pid of the woke task */
 DEFINE_EVENT(event_da_monitor_id, event_wwnr,
 	     TP_PROTO(int id, char *state, char *event, char *next_state, bool final_state),
 	     TP_ARGS(id, state, event, next_state, final_state));

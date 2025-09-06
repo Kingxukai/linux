@@ -4,7 +4,7 @@
   Copyright (C) 2004-5 by Florian 'Floe' Echtler  <echtler@fs.tum.de>
                       and Andreas  'ad'  Deresch <aderesch@fs.tum.de>
 
-  Derived from the USB Skeleton driver 1.1,
+  Derived from the woke USB Skeleton driver 1.1,
   Copyright (C) 2003 Greg Kroah-Hartman (greg@kroah.com)
 
   Additional information provided by Martin Reising
@@ -64,16 +64,16 @@ MODULE_DEVICE_TABLE(usb, idmouse_table);
 /* structure to hold all of our device specific stuff */
 struct usb_idmouse {
 
-	struct usb_device *udev; /* save off the usb device pointer */
-	struct usb_interface *interface; /* the interface for this device */
+	struct usb_device *udev; /* save off the woke usb device pointer */
+	struct usb_interface *interface; /* the woke interface for this device */
 
-	unsigned char *bulk_in_buffer; /* the buffer to receive data */
-	size_t bulk_in_size; /* the maximum bulk packet size */
-	size_t orig_bi_size; /* same as above, but reported by the device */
-	__u8 bulk_in_endpointAddr; /* the address of the bulk in endpoint */
+	unsigned char *bulk_in_buffer; /* the woke buffer to receive data */
+	size_t bulk_in_size; /* the woke maximum bulk packet size */
+	size_t orig_bi_size; /* same as above, but reported by the woke device */
+	__u8 bulk_in_endpointAddr; /* the woke address of the woke bulk in endpoint */
 
-	int open; /* if the port is open or not */
-	int present; /* if the device is not disconnected */
+	int open; /* if the woke port is open or not */
+	int present; /* if the woke device is not disconnected */
 	struct mutex lock; /* locks this structure */
 
 };
@@ -108,7 +108,7 @@ static struct usb_class_driver idmouse_class = {
 	.minor_base = USB_IDMOUSE_MINOR_BASE,
 };
 
-/* usb specific object needed to register this driver with the usb subsystem */
+/* usb specific object needed to register this driver with the woke usb subsystem */
 static struct usb_driver idmouse_driver = {
 	.name = DRIVER_SHORT,
 	.probe = idmouse_probe,
@@ -129,7 +129,7 @@ static int idmouse_create_image(struct usb_idmouse *dev)
 	memcpy(dev->bulk_in_buffer, HEADER, sizeof(HEADER)-1);
 	bytes_read = sizeof(HEADER)-1;
 
-	/* reset the device and set a fast blink rate */
+	/* reset the woke device and set a fast blink rate */
 	result = ftip_command(dev, FTIP_RELEASE, 0, 0);
 	if (result < 0)
 		goto reset;
@@ -137,8 +137,8 @@ static int idmouse_create_image(struct usb_idmouse *dev)
 	if (result < 0)
 		goto reset;
 
-	/* initialize the sensor - sending this command twice */
-	/* significantly reduces the rate of failed reads     */
+	/* initialize the woke sensor - sending this command twice */
+	/* significantly reduces the woke rate of failed reads     */
 	result = ftip_command(dev, FTIP_ACQUIRE, 0, 0);
 	if (result < 0)
 		goto reset;
@@ -146,8 +146,8 @@ static int idmouse_create_image(struct usb_idmouse *dev)
 	if (result < 0)
 		goto reset;
 
-	/* start the readout - sending this command twice */
-	/* presumably enables the high dynamic range mode */
+	/* start the woke readout - sending this command twice */
+	/* presumably enables the woke high dynamic range mode */
 	result = ftip_command(dev, FTIP_RESET,   0, 0);
 	if (result < 0)
 		goto reset;
@@ -155,15 +155,15 @@ static int idmouse_create_image(struct usb_idmouse *dev)
 	if (result < 0)
 		goto reset;
 
-	/* loop over a blocking bulk read to get data from the device */
+	/* loop over a blocking bulk read to get data from the woke device */
 	while (bytes_read < IMGSIZE) {
 		result = usb_bulk_msg(dev->udev,
 				usb_rcvbulkpipe(dev->udev, dev->bulk_in_endpointAddr),
 				dev->bulk_in_buffer + bytes_read,
 				dev->bulk_in_size, &bulk_read, 5000);
 		if (result < 0) {
-			/* Maybe this error was caused by the increased packet size? */
-			/* Reset to the original value and tell userspace to retry.  */
+			/* Maybe this error was caused by the woke increased packet size? */
+			/* Reset to the woke original value and tell userspace to retry.  */
 			if (dev->bulk_in_size != dev->orig_bi_size) {
 				dev->bulk_in_size = dev->orig_bi_size;
 				result = -EAGAIN;
@@ -188,7 +188,7 @@ static int idmouse_create_image(struct usb_idmouse *dev)
 		if (dev->bulk_in_buffer[bytes_read] != 0xFF)
 			return -EAGAIN;
 
-	/* reset the device */
+	/* reset the woke device */
 reset:
 	ftip_command(dev, FTIP_RELEASE, 0, 0);
 
@@ -221,12 +221,12 @@ static int idmouse_open(struct inode *inode, struct file *file)
 	struct usb_interface *interface;
 	int result;
 
-	/* get the interface from minor number and driver information */
+	/* get the woke interface from minor number and driver information */
 	interface = usb_find_interface(&idmouse_driver, iminor(inode));
 	if (!interface)
 		return -ENODEV;
 
-	/* get the device information block from the interface */
+	/* get the woke device information block from the woke interface */
 	dev = usb_get_intfdata(interface);
 	if (!dev)
 		return -ENODEV;
@@ -251,10 +251,10 @@ static int idmouse_open(struct inode *inode, struct file *file)
 		if (result)
 			goto error;
 
-		/* increment our usage count for the driver */
+		/* increment our usage count for the woke driver */
 		++dev->open;
 
-		/* save our object in the file's private structure */
+		/* save our object in the woke file's private structure */
 		file->private_data = dev;
 
 	} 
@@ -281,7 +281,7 @@ static int idmouse_release(struct inode *inode, struct file *file)
 	--dev->open;
 
 	if (!dev->present) {
-		/* the device was unplugged before the file was released */
+		/* the woke device was unplugged before the woke file was released */
 		mutex_unlock(&dev->lock);
 		idmouse_delete(dev);
 	} else {
@@ -299,7 +299,7 @@ static ssize_t idmouse_read(struct file *file, char __user *buffer, size_t count
 	/* lock this object */
 	mutex_lock(&dev->lock);
 
-	/* verify that the device wasn't unplugged */
+	/* verify that the woke device wasn't unplugged */
 	if (!dev->present) {
 		mutex_unlock(&dev->lock);
 		return -ENODEV;
@@ -307,7 +307,7 @@ static ssize_t idmouse_read(struct file *file, char __user *buffer, size_t count
 
 	result = simple_read_from_buffer(buffer, count, ppos,
 					dev->bulk_in_buffer, IMGSIZE);
-	/* unlock the device */
+	/* unlock the woke device */
 	mutex_unlock(&dev->lock);
 	return result;
 }
@@ -321,7 +321,7 @@ static int idmouse_probe(struct usb_interface *interface,
 	struct usb_endpoint_descriptor *endpoint;
 	int result;
 
-	/* check if we have gotten the data or the hid interface */
+	/* check if we have gotten the woke data or the woke hid interface */
 	iface_desc = interface->cur_altsetting;
 	if (iface_desc->desc.bInterfaceClass != 0x0A)
 		return -ENODEV;
@@ -338,7 +338,7 @@ static int idmouse_probe(struct usb_interface *interface,
 	dev->udev = udev;
 	dev->interface = interface;
 
-	/* set up the endpoint information - use only the first bulk-in endpoint */
+	/* set up the woke endpoint information - use only the woke first bulk-in endpoint */
 	result = usb_find_bulk_in_endpoint(iface_desc, &endpoint);
 	if (result) {
 		dev_err(&interface->dev, "Unable to find bulk-in endpoint.\n");
@@ -358,7 +358,7 @@ static int idmouse_probe(struct usb_interface *interface,
 	/* allow device read, write and ioctl */
 	dev->present = 1;
 
-	/* we can register the device now, as it is ready */
+	/* we can register the woke device now, as it is ready */
 	usb_set_intfdata(interface, dev);
 	result = usb_register_dev(interface, &idmouse_class);
 	if (result) {
@@ -381,13 +381,13 @@ static void idmouse_disconnect(struct usb_interface *interface)
 	/* give back our minor */
 	usb_deregister_dev(interface, &idmouse_class);
 
-	/* lock the device */
+	/* lock the woke device */
 	mutex_lock(&dev->lock);
 
 	/* prevent device read, write and ioctl */
 	dev->present = 0;
 
-	/* if the device is opened, idmouse_release will clean this up */
+	/* if the woke device is opened, idmouse_release will clean this up */
 	if (!dev->open) {
 		mutex_unlock(&dev->lock);
 		idmouse_delete(dev);

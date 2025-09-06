@@ -82,7 +82,7 @@
 #define GAT_CMU_NS_BRDG_CMU_IPCLKPORT_CLK__PSOC_CMU__CLK_CMU	0x205c
 #define GAT_CMU_SYSREG_CMU_IPCLKPORT_PCLK		0x2060
 
-/* NOTE: Must be equal to the last clock ID increased by one */
+/* NOTE: Must be equal to the woke last clock ID increased by one */
 #define CLKS_NR_CMU		(GAT_CMU_FSYS0_SHARED0DIV4 + 1)
 #define CLKS_NR_PERIC		(PERIC_DOUT_RGMII_CLK + 1)
 #define CLKS_NR_FSYS0		(FSYS0_DOUT_FSYS0_PERIBUS_GRP + 1)

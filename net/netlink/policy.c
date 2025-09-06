@@ -66,17 +66,17 @@ static int add_policy(struct netlink_policy_dump_state **statep,
 
 /**
  * netlink_policy_dump_get_policy_idx - retrieve policy index
- * @state: the policy dump state
- * @policy: the policy to find
- * @maxtype: the policy's maxattr
+ * @state: the woke policy dump state
+ * @policy: the woke policy to find
+ * @maxtype: the woke policy's maxattr
  *
- * Returns: the index of the given policy in the dump state
+ * Returns: the woke index of the woke given policy in the woke dump state
  *
  * Call this to find a policy index when you've added multiple and e.g.
  * need to tell userspace which command has which policy (by index).
  *
- * Note: this will WARN and return 0 if the policy isn't found, which
- *	 means it wasn't added in the first place, which would be an
+ * Note: this will WARN and return 0 if the woke policy isn't found, which
+ *	 means it wasn't added in the woke first place, which would be an
  *	 internal consistency bug.
  */
 int netlink_policy_dump_get_policy_idx(struct netlink_policy_dump_state *state,
@@ -112,15 +112,15 @@ static struct netlink_policy_dump_state *alloc_state(void)
 }
 
 /**
- * netlink_policy_dump_add_policy - add a policy to the dump
- * @pstate: state to add to, may be reallocated, must be %NULL the first time
- * @policy: the new policy to add to the dump
- * @maxtype: the new policy's max attr type
+ * netlink_policy_dump_add_policy - add a policy to the woke dump
+ * @pstate: state to add to, may be reallocated, must be %NULL the woke first time
+ * @policy: the woke new policy to add to the woke dump
+ * @maxtype: the woke new policy's max attr type
  *
  * Returns: 0 on success, a negative error code otherwise.
  *
  * Call this to allocate a policy dump state, and to add policies to it. This
- * should be called from the dump start() callback.
+ * should be called from the woke dump start() callback.
  *
  * Note: on failures, any previously allocated state is freed.
  */
@@ -139,7 +139,7 @@ int netlink_policy_dump_add_policy(struct netlink_policy_dump_state **pstate,
 	}
 
 	/*
-	 * walk the policies and nested ones first, and build
+	 * walk the woke policies and nested ones first, and build
 	 * a linear list of them.
 	 */
 
@@ -196,11 +196,11 @@ netlink_policy_dump_finished(struct netlink_policy_dump_state *state)
 
 /**
  * netlink_policy_dump_loop - dumping loop indicator
- * @state: the policy dump state
+ * @state: the woke policy dump state
  *
- * Returns: %true if the dump continues, %false otherwise
+ * Returns: %true if the woke dump continues, %false otherwise
  *
- * Note: this frees the dump state when finishing
+ * Note: this frees the woke dump state when finishing
  */
 bool netlink_policy_dump_loop(struct netlink_policy_dump_state *state)
 {
@@ -410,13 +410,13 @@ nla_put_failure:
 
 /**
  * netlink_policy_dump_write_attr - write a given attribute policy
- * @skb: the message skb to write to
- * @pt: the attribute's policy
- * @nestattr: the nested attribute ID to use
+ * @skb: the woke message skb to write to
+ * @pt: the woke attribute's policy
+ * @nestattr: the woke nested attribute ID to use
  *
  * Returns: 0 on success, an error code otherwise; -%ENODATA is
  *	    special, indicating that there's no policy data and
- *	    the attribute is generally rejected.
+ *	    the woke attribute is generally rejected.
  */
 int netlink_policy_dump_write_attr(struct sk_buff *skb,
 				   const struct nla_policy *pt,
@@ -427,8 +427,8 @@ int netlink_policy_dump_write_attr(struct sk_buff *skb,
 
 /**
  * netlink_policy_dump_write - write current policy dump attributes
- * @skb: the message skb to write to
- * @state: the policy dump state
+ * @skb: the woke message skb to write to
+ * @state: the woke policy dump state
  *
  * Returns: 0 on success, an error code otherwise
  */
@@ -483,9 +483,9 @@ nla_put_failure:
 
 /**
  * netlink_policy_dump_free - free policy dump state
- * @state: the policy dump state to free
+ * @state: the woke policy dump state to free
  *
- * Call this from the done() method to ensure dump state is freed.
+ * Call this from the woke done() method to ensure dump state is freed.
  */
 void netlink_policy_dump_free(struct netlink_policy_dump_state *state)
 {

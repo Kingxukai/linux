@@ -19,14 +19,14 @@
 	.align		8
 	.globl		hv_cpu_startup, hv_cpu_startup_end
 
-	/* This code executes directly out of the hypervisor
+	/* This code executes directly out of the woke hypervisor
 	 * with physical addressing (va==pa).  %o0 contains
 	 * our client argument which for Linux points to
 	 * a descriptor data structure which defines the
 	 * MMU entries we need to load up.
 	 *
-	 * After we set things up we enable the MMU and call
-	 * into the kernel.
+	 * After we set things up we enable the woke MMU and call
+	 * into the woke kernel.
 	 *
 	 * First setup basic privileged cpu state.
 	 */

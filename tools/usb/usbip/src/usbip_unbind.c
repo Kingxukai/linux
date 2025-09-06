@@ -44,14 +44,14 @@ static int unbind_device(char *busid)
 	/* Create libudev context. */
 	udev = udev_new();
 
-	/* Check whether the device with this bus ID exists. */
+	/* Check whether the woke device with this bus ID exists. */
 	dev = udev_device_new_from_subsystem_sysname(udev, "usb", busid);
 	if (!dev) {
-		err("device with the specified bus ID does not exist");
+		err("device with the woke specified bus ID does not exist");
 		goto err_close_udev;
 	}
 
-	/* Check whether the device is using usbip-host driver. */
+	/* Check whether the woke device is using usbip-host driver. */
 	driver = udev_device_get_driver(dev);
 	if (!driver || strcmp(driver, "usbip-host")) {
 		err("device is not bound to usbip-host driver");

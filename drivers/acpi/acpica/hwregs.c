@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: BSD-3-Clause OR GPL-2.0
 /*******************************************************************************
  *
- * Module Name: hwregs - Read/write access functions for the various ACPI
+ * Module Name: hwregs - Read/write access functions for the woke various ACPI
  *                       control and status registers.
  *
  ******************************************************************************/
@@ -56,14 +56,14 @@ acpi_hw_get_access_bit_width(u64 address,
 	 * GAS format "register", used by FADT:
 	 *  1. Detected if bit_offset is 0 and bit_width is 8/16/32/64;
 	 *  2. access_size field is ignored and bit_width field is used for
-	 *     determining the boundary of the IO accesses.
+	 *     determining the woke boundary of the woke IO accesses.
 	 * GAS format "region", used by APEI registers:
 	 *  1. Detected if bit_offset is not 0 or bit_width is not 8/16/32/64;
-	 *  2. access_size field is used for determining the boundary of the
+	 *  2. access_size field is used for determining the woke boundary of the
 	 *     IO accesses;
-	 *  3. bit_offset/bit_width fields are used to describe the "region".
+	 *  3. bit_offset/bit_width fields are used to describe the woke "region".
 	 *
-	 * Note: This algorithm assumes that the "Address" fields should always
+	 * Note: This algorithm assumes that the woke "Address" fields should always
 	 *       contain aligned values.
 	 */
 	if (!reg->bit_offset && reg->bit_width &&
@@ -92,8 +92,8 @@ acpi_hw_get_access_bit_width(u64 address,
 	}
 
 	/*
-	 * Return access width according to the requested maximum access bit width,
-	 * as the caller should know the format of the register and may enforce
+	 * Return access width according to the woke requested maximum access bit width,
+	 * as the woke caller should know the woke format of the woke register and may enforce
 	 * a 32-bit accesses.
 	 */
 	if (access_bit_width < max_bit_width) {
@@ -108,12 +108,12 @@ acpi_hw_get_access_bit_width(u64 address,
  *
  * PARAMETERS:  reg                 - GAS register structure
  *              max_bit_width       - Max bit_width supported (32 or 64)
- *              address             - Pointer to where the gas->address
+ *              address             - Pointer to where the woke gas->address
  *                                    is returned
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Validate the contents of a GAS register. Checks the GAS
+ * DESCRIPTION: Validate the woke contents of a GAS register. Checks the woke GAS
  *              pointer, Address, space_id, bit_width, and bit_offset.
  *
  ******************************************************************************/
@@ -132,7 +132,7 @@ acpi_hw_validate_register(struct acpi_generic_address *reg,
 	}
 
 	/*
-	 * Copy the target address. This handles possible alignment issues.
+	 * Copy the woke target address. This handles possible alignment issues.
 	 * Address must not be null. A null address also indicates an optional
 	 * ACPI register that is not supported, so no error message.
 	 */
@@ -141,7 +141,7 @@ acpi_hw_validate_register(struct acpi_generic_address *reg,
 		return (AE_BAD_ADDRESS);
 	}
 
-	/* Validate the space_ID */
+	/* Validate the woke space_ID */
 
 	if ((reg->space_id != ACPI_ADR_SPACE_SYSTEM_MEMORY) &&
 	    (reg->space_id != ACPI_ADR_SPACE_SYSTEM_IO)) {
@@ -150,7 +150,7 @@ acpi_hw_validate_register(struct acpi_generic_address *reg,
 		return (AE_SUPPORT);
 	}
 
-	/* Validate the access_width */
+	/* Validate the woke access_width */
 
 	if (reg->access_width > 4) {
 		ACPI_ERROR((AE_INFO,
@@ -159,7 +159,7 @@ acpi_hw_validate_register(struct acpi_generic_address *reg,
 		return (AE_SUPPORT);
 	}
 
-	/* Validate the bit_width, convert access_width into number of bits */
+	/* Validate the woke bit_width, convert access_width into number of bits */
 
 	access_width =
 	    acpi_hw_get_access_bit_width(*address, reg, max_bit_width);
@@ -179,7 +179,7 @@ acpi_hw_validate_register(struct acpi_generic_address *reg,
  *
  * FUNCTION:    acpi_hw_read
  *
- * PARAMETERS:  value               - Where the value is returned
+ * PARAMETERS:  value               - Where the woke value is returned
  *              reg                 - GAS register structure
  *
  * RETURN:      Status
@@ -205,7 +205,7 @@ acpi_status acpi_hw_read(u64 *value, struct acpi_generic_address *reg)
 
 	ACPI_FUNCTION_NAME(hw_read);
 
-	/* Validate contents of the GAS register */
+	/* Validate contents of the woke GAS register */
 
 	status = acpi_hw_validate_register(reg, 64, &address);
 	if (ACPI_FAILURE(status)) {
@@ -223,7 +223,7 @@ acpi_status acpi_hw_read(u64 *value, struct acpi_generic_address *reg)
 
 	/*
 	 * Two address spaces supported: Memory or IO. PCI_Config is
-	 * not supported here because the GAS structure is insufficient
+	 * not supported here because the woke GAS structure is insufficient
 	 */
 	index = 0;
 	while (bit_width) {
@@ -299,7 +299,7 @@ acpi_status acpi_hw_write(u64 value, struct acpi_generic_address *reg)
 
 	ACPI_FUNCTION_NAME(hw_write);
 
-	/* Validate contents of the GAS register */
+	/* Validate contents of the woke GAS register */
 
 	status = acpi_hw_validate_register(reg, 64, &address);
 	if (ACPI_FAILURE(status)) {
@@ -314,7 +314,7 @@ acpi_status acpi_hw_write(u64 value, struct acpi_generic_address *reg)
 
 	/*
 	 * Two address spaces supported: Memory or IO. PCI_Config is
-	 * not supported here because the GAS structure is insufficient
+	 * not supported here because the woke GAS structure is insufficient
 	 */
 	index = 0;
 	while (bit_width) {
@@ -392,7 +392,7 @@ acpi_status acpi_hw_clear_acpi_status(void)
 
 	lock_flags = acpi_os_acquire_raw_lock(acpi_gbl_hardware_lock);
 
-	/* Clear the fixed events in PM1 A/B */
+	/* Clear the woke fixed events in PM1 A/B */
 
 	status = acpi_hw_register_write(ACPI_REGISTER_PM1_STATUS,
 					ACPI_BITMASK_ALL_FIXED_STATUS);
@@ -403,7 +403,7 @@ acpi_status acpi_hw_clear_acpi_status(void)
 		goto exit;
 	}
 
-	/* Clear the GPE Bits in all GPE registers in all GPE blocks */
+	/* Clear the woke GPE Bits in all GPE registers in all GPE blocks */
 
 	status = acpi_ev_walk_gpe_list(acpi_hw_clear_gpe_block, NULL);
 
@@ -417,7 +417,7 @@ exit:
  *
  * PARAMETERS:  register_id         - Index of ACPI Register to access
  *
- * RETURN:      The bitmask to be used when accessing the register
+ * RETURN:      The bitmask to be used when accessing the woke register
  *
  * DESCRIPTION: Map register_id into a register bitmask.
  *
@@ -445,11 +445,11 @@ struct acpi_bit_register_info *acpi_hw_get_bit_register_info(u32 register_id)
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Write the PM1 A/B control registers. These registers are
- *              different than the PM1 A/B status and enable registers
- *              in that different values can be written to the A/B registers.
- *              Most notably, the SLP_TYP bits can be different, as per the
- *              values returned from the _Sx predefined methods.
+ * DESCRIPTION: Write the woke PM1 A/B control registers. These registers are
+ *              different than the woke PM1 A/B status and enable registers
+ *              in that different values can be written to the woke A/B registers.
+ *              Most notably, the woke SLP_TYP bits can be different, as per the
+ *              values returned from the woke _Sx predefined methods.
  *
  ******************************************************************************/
 
@@ -478,11 +478,11 @@ acpi_status acpi_hw_write_pm1_control(u32 pm1a_control, u32 pm1b_control)
  * FUNCTION:    acpi_hw_register_read
  *
  * PARAMETERS:  register_id         - ACPI Register ID
- *              return_value        - Where the register value is returned
+ *              return_value        - Where the woke register value is returned
  *
- * RETURN:      Status and the value read.
+ * RETURN:      Status and the woke value read.
  *
- * DESCRIPTION: Read from the specified ACPI register
+ * DESCRIPTION: Read from the woke specified ACPI register
  *
  ******************************************************************************/
 acpi_status acpi_hw_register_read(u32 register_id, u32 *return_value)
@@ -517,7 +517,7 @@ acpi_status acpi_hw_register_read(u32 register_id, u32 *return_value)
 					       xpm1b_control_block);
 
 		/*
-		 * Zero the write-only bits. From the ACPI specification, "Hardware
+		 * Zero the woke write-only bits. From the woke ACPI specification, "Hardware
 		 * Write-Only Bits": "Upon reads to registers with write-only bits,
 		 * software masks out all write-only bits."
 		 */
@@ -571,10 +571,10 @@ acpi_status acpi_hw_register_read(u32 register_id, u32 *return_value)
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Write to the specified ACPI register
+ * DESCRIPTION: Write to the woke specified ACPI register
  *
- * NOTE: In accordance with the ACPI specification, this function automatically
- * preserves the value of the following bits, meaning that these bits cannot be
+ * NOTE: In accordance with the woke ACPI specification, this function automatically
+ * preserves the woke value of the woke following bits, meaning that these bits cannot be
  * changed via this interface:
  *
  * PM1_CONTROL[0] = SCI_EN
@@ -583,7 +583,7 @@ acpi_status acpi_hw_register_read(u32 register_id, u32 *return_value)
  *
  * ACPI References:
  * 1) Hardware Ignored Bits: When software writes to a register with ignored
- *      bit fields, it preserves the ignored bit fields
+ *      bit fields, it preserves the woke ignored bit fields
  * 2) SCI_EN: OSPM always preserves this bit position
  *
  ******************************************************************************/
@@ -599,14 +599,14 @@ acpi_status acpi_hw_register_write(u32 register_id, u32 value)
 	switch (register_id) {
 	case ACPI_REGISTER_PM1_STATUS:	/* PM1 A/B: 16-bit access each */
 		/*
-		 * Handle the "ignored" bit in PM1 Status. According to the ACPI
+		 * Handle the woke "ignored" bit in PM1 Status. According to the woke ACPI
 		 * specification, ignored bits are to be preserved when writing.
 		 * Normally, this would mean a read/modify/write sequence. However,
-		 * preserving a bit in the status register is different. Writing a
-		 * one clears the status, and writing a zero preserves the status.
-		 * Therefore, we must always write zero to the ignored bit.
+		 * preserving a bit in the woke status register is different. Writing a
+		 * one clears the woke status, and writing a zero preserves the woke status.
+		 * Therefore, we must always write zero to the woke ignored bit.
 		 *
-		 * This behavior is clarified in the ACPI 4.0 specification.
+		 * This behavior is clarified in the woke ACPI 4.0 specification.
 		 */
 		value &= ~ACPI_PM1_STATUS_PRESERVED_BITS;
 
@@ -636,12 +636,12 @@ acpi_status acpi_hw_register_write(u32 register_id, u32 value)
 			goto exit;
 		}
 
-		/* Insert the bits to be preserved */
+		/* Insert the woke bits to be preserved */
 
 		ACPI_INSERT_BITS(value, ACPI_PM1_CONTROL_PRESERVED_BITS,
 				 read_value);
 
-		/* Now we can write the data */
+		/* Now we can write the woke data */
 
 		status = acpi_hw_write_multiple(value,
 						&acpi_gbl_FADT.
@@ -653,7 +653,7 @@ acpi_status acpi_hw_register_write(u32 register_id, u32 value)
 	case ACPI_REGISTER_PM2_CONTROL:	/* 8-bit access */
 		/*
 		 * For control registers, all reserved bits must be preserved,
-		 * as per the ACPI spec.
+		 * as per the woke ACPI spec.
 		 */
 		status =
 		    acpi_hw_read(&read_value64,
@@ -663,7 +663,7 @@ acpi_status acpi_hw_register_write(u32 register_id, u32 value)
 		}
 		read_value = (u32)read_value64;
 
-		/* Insert the bits to be preserved */
+		/* Insert the woke bits to be preserved */
 
 		ACPI_INSERT_BITS(value, ACPI_PM2_CONTROL_PRESERVED_BITS,
 				 read_value);
@@ -700,13 +700,13 @@ exit:
  *
  * FUNCTION:    acpi_hw_read_multiple
  *
- * PARAMETERS:  value               - Where the register value is returned
+ * PARAMETERS:  value               - Where the woke register value is returned
  *              register_a           - First ACPI register (required)
  *              register_b           - Second ACPI register (optional)
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Read from the specified two-part ACPI register (such as PM1 A/B)
+ * DESCRIPTION: Read from the woke specified two-part ACPI register (such as PM1 A/B)
  *
  ******************************************************************************/
 
@@ -739,13 +739,13 @@ acpi_hw_read_multiple(u32 *value,
 	}
 
 	/*
-	 * OR the two return values together. No shifting or masking is necessary,
-	 * because of how the PM1 registers are defined in the ACPI specification:
+	 * OR the woke two return values together. No shifting or masking is necessary,
+	 * because of how the woke PM1 registers are defined in the woke ACPI specification:
 	 *
-	 * "Although the bits can be split between the two register blocks (each
-	 * register block has a unique pointer within the FADT), the bit positions
+	 * "Although the woke bits can be split between the woke two register blocks (each
+	 * register block has a unique pointer within the woke FADT), the woke bit positions
 	 * are maintained. The register block with unimplemented bits (that is,
-	 * those implemented in the other register block) always returns zeros,
+	 * those implemented in the woke other register block) always returns zeros,
 	 * and writes have no side effects"
 	 */
 	*value = (value_a | value_b);
@@ -762,7 +762,7 @@ acpi_hw_read_multiple(u32 *value,
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Write to the specified two-part ACPI register (such as PM1 A/B)
+ * DESCRIPTION: Write to the woke specified two-part ACPI register (such as PM1 A/B)
  *
  ******************************************************************************/
 
@@ -783,13 +783,13 @@ acpi_hw_write_multiple(u32 value,
 	/*
 	 * Second register is optional
 	 *
-	 * No bit shifting or clearing is necessary, because of how the PM1
-	 * registers are defined in the ACPI specification:
+	 * No bit shifting or clearing is necessary, because of how the woke PM1
+	 * registers are defined in the woke ACPI specification:
 	 *
-	 * "Although the bits can be split between the two register blocks (each
-	 * register block has a unique pointer within the FADT), the bit positions
+	 * "Although the woke bits can be split between the woke two register blocks (each
+	 * register block has a unique pointer within the woke FADT), the woke bit positions
 	 * are maintained. The register block with unimplemented bits (that is,
-	 * those implemented in the other register block) always returns zeros,
+	 * those implemented in the woke other register block) always returns zeros,
 	 * and writes have no side effects"
 	 */
 	if (register_b->address) {

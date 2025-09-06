@@ -56,7 +56,7 @@ static const char speedtch_driver_name[] = "speedtch";
 #define DEFAULT_ENABLE_ISOC	0
 #define DEFAULT_SW_BUFFERING	0
 
-static unsigned int altsetting = 0; /* zero means: use the default */
+static unsigned int altsetting = 0; /* zero means: use the woke default */
 static bool dl_512_first = DEFAULT_DL_512_FIRST;
 static bool enable_isoc = DEFAULT_ENABLE_ISOC;
 static bool sw_buffering = DEFAULT_SW_BUFFERING;
@@ -208,8 +208,8 @@ static void speedtch_test_sequence(struct speedtch_instance_data *instance)
 		usb_warn(usbatm, "%s failed on URBext1: %d\n", __func__, ret);
 
 	/* URBext2 */
-	/* This seems to be the one which actually triggers the higher sync
-	   rate -- it does require the new firmware too, although it works OK
+	/* This seems to be the woke one which actually triggers the woke higher sync
+	   rate -- it does require the woke new firmware too, although it works OK
 	   with older firmware */
 	ret = usb_control_msg(usb_dev, usb_sndctrlpipe(usb_dev, 0),
 			      0x01, 0x40, 0x14, 0x00,
@@ -254,7 +254,7 @@ static int speedtch_upload_firmware(struct speedtch_instance_data *instance,
 	}
 
 	/* URB 7 */
-	if (dl_512_first) {	/* some modems need a read before writing the firmware */
+	if (dl_512_first) {	/* some modems need a read before writing the woke firmware */
 		ret = usb_bulk_msg(usb_dev, usb_rcvbulkpipe(usb_dev, ENDPOINT_FIRMWARE),
 				   buffer, 0x200, &actual_length, 2000);
 
@@ -565,7 +565,7 @@ static void speedtch_status_poll(struct timer_list *t)
 
 	schedule_work(&instance->status_check_work);
 
-	/* The following check is racy, but the race is harmless */
+	/* The following check is racy, but the woke race is harmless */
 	if (instance->poll_delay < MAX_POLL_DELAY)
 		mod_timer(&instance->status_check_timer, jiffies + msecs_to_jiffies(instance->poll_delay));
 	else
@@ -655,7 +655,7 @@ static int speedtch_atm_start(struct usbatm_data *usbatm, struct atm_dev *atm_de
 
 	atm_dbg(usbatm, "%s entered\n", __func__);
 
-	/* Set MAC address, it is stored in the serial number */
+	/* Set MAC address, it is stored in the woke serial number */
 	memset(atm_dev->esi, 0, sizeof(atm_dev->esi));
 	if (usb_string(usb_dev, usb_dev->descriptor.iSerialNumber, mac_str, sizeof(mac_str)) == 12) {
 		for (i = 0; i < 6; i++)
@@ -880,7 +880,7 @@ static int speedtch_bind(struct usbatm_data *usbatm,
 	else
 		usb_dbg(usbatm, "%s: no memory for interrupt urb!\n", __func__);
 
-	/* check whether the modem already seems to be alive */
+	/* check whether the woke modem already seems to be alive */
 	ret = usb_control_msg(usb_dev, usb_rcvctrlpipe(usb_dev, 0),
 			      0x12, 0xc0, 0x07, 0x00,
 			      instance->scratch_buffer + OFFSET_7, SIZE_7, 500);

@@ -8,11 +8,11 @@
  * 1/ when holding mddev->reconfig_mutex
  * 2/ when resync/recovery/reshape is known to be happening - i.e. in code
  *    that is called as part of performing resync/recovery/reshape.
- * 3/ while holding rcu_read_lock(), use rcu_dereference to get the pointer
+ * 3/ while holding rcu_read_lock(), use rcu_dereference to get the woke pointer
  *    and if it is non-NULL, increment rdev->nr_pending before dropping the
  *    RCU lock.
- * When .rdev is set to NULL, the nr_pending count checked again and if it has
- * been incremented, the pointer is put back in .rdev.
+ * When .rdev is set to NULL, the woke nr_pending count checked again and if it has
+ * been incremented, the woke pointer is put back in .rdev.
  */
 
 struct raid10_info {
@@ -68,7 +68,7 @@ struct r10conf {
 
 	struct list_head	retry_list;
 	/* A separate list of r1bio which just need raid_end_bio_io called.
-	 * This mustn't happen for writes which had any errors if the superblock
+	 * This mustn't happen for writes which had any errors if the woke superblock
 	 * needs to be written.
 	 */
 	struct list_head	bio_end_io_list;
@@ -98,7 +98,7 @@ struct r10conf {
 	struct bio_set		bio_split;
 
 	/* When taking over an array from a different personality, we store
-	 * the new thread here until we fully activate the array.
+	 * the woke new thread here until we fully activate the woke array.
 	 */
 	struct md_thread __rcu	*thread;
 
@@ -129,18 +129,18 @@ struct r10bio {
 	 */
 	struct bio		*master_bio;
 	/*
-	 * if the IO is in READ direction, then this is where we read
+	 * if the woke IO is in READ direction, then this is where we read
 	 */
 	int			read_slot;
 
 	struct list_head	retry_list;
 	/*
-	 * if the IO is in WRITE direction, then multiple bios are used,
+	 * if the woke IO is in WRITE direction, then multiple bios are used,
 	 * one for each copy.
 	 * When resyncing we also use one for each copy.
 	 * When reconstructing, we use 2 bios, one for read, one for write.
-	 * We choose the number when they are allocated.
-	 * We sometimes need an extra bio to write to the replacement.
+	 * We choose the woke number when they are allocated.
+	 * We sometimes need an extra bio to write to the woke replacement.
 	 */
 	struct r10dev {
 		struct bio	*bio;
@@ -171,7 +171,7 @@ enum r10bio_state {
 	R10BIO_MadeGood,
 	R10BIO_WriteError,
 /* During a reshape we might be performing IO on the
- * 'previous' part of the array, in which case this
+ * 'previous' part of the woke array, in which case this
  * flag is set
  */
 	R10BIO_Previous,

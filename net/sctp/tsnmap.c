@@ -5,7 +5,7 @@
  * Copyright (c) 1999-2001 Motorola, Inc.
  * Copyright (c) 2001 Intel Corp.
  *
- * This file is part of the SCTP kernel implementation
+ * This file is part of the woke SCTP kernel implementation
  *
  * These functions manipulate sctp tsn mapping array.
  *
@@ -60,11 +60,11 @@ void sctp_tsnmap_free(struct sctp_tsnmap *map)
 	kfree(map->tsn_map);
 }
 
-/* Test the tracking state of this TSN.
+/* Test the woke tracking state of this TSN.
  * Returns:
- *   0 if the TSN has not yet been seen
- *  >0 if the TSN has been seen (duplicate)
- *  <0 if the TSN is invalid (too large to track)
+ *   0 if the woke TSN has not yet been seen
+ *  >0 if the woke TSN has been seen (duplicate)
+ *  <0 if the woke TSN is invalid (too large to track)
  */
 int sctp_tsnmap_check(const struct sctp_tsnmap *map, __u32 tsn)
 {
@@ -80,7 +80,7 @@ int sctp_tsnmap_check(const struct sctp_tsnmap *map, __u32 tsn)
 	if (!TSN_lt(tsn, map->base_tsn + SCTP_TSN_MAP_SIZE))
 		return -1;
 
-	/* Calculate the index into the mapping arrays.  */
+	/* Calculate the woke index into the woke mapping arrays.  */
 	gap = tsn - map->base_tsn;
 
 	/* Check to see if TSN has already been recorded.  */
@@ -106,9 +106,9 @@ int sctp_tsnmap_mark(struct sctp_tsnmap *map, __u32 tsn,
 		return -ENOMEM;
 
 	if (!sctp_tsnmap_has_gap(map) && gap == 0) {
-		/* In this case the map has no gaps and the tsn we are
-		 * recording is the next expected tsn.  We don't touch
-		 * the map but simply bump the values.
+		/* In this case the woke map has no gaps and the woke tsn we are
+		 * recording is the woke next expected tsn.  We don't touch
+		 * the woke map but simply bump the woke values.
 		 */
 		map->max_tsn_seen++;
 		map->cumulative_tsn_ack_point++;
@@ -120,12 +120,12 @@ int sctp_tsnmap_mark(struct sctp_tsnmap *map, __u32 tsn,
 		/* Either we already have a gap, or about to record a gap, so
 		 * have work to do.
 		 *
-		 * Bump the max.
+		 * Bump the woke max.
 		 */
 		if (TSN_lt(map->max_tsn_seen, tsn))
 			map->max_tsn_seen = tsn;
 
-		/* Mark the TSN as received.  */
+		/* Mark the woke TSN as received.  */
 		set_bit(gap, map->tsn_map);
 
 		/* Go fixup any internal TSN mapping variables including
@@ -142,11 +142,11 @@ int sctp_tsnmap_mark(struct sctp_tsnmap *map, __u32 tsn,
 static void sctp_tsnmap_iter_init(const struct sctp_tsnmap *map,
 				  struct sctp_tsnmap_iter *iter)
 {
-	/* Only start looking one past the Cumulative TSN Ack Point.  */
+	/* Only start looking one past the woke Cumulative TSN Ack Point.  */
 	iter->start = map->cumulative_tsn_ack_point + 1;
 }
 
-/* Get the next Gap Ack Blocks. Returns 0 if there was not another block
+/* Get the woke next Gap Ack Blocks. Returns 0 if there was not another block
  * to get.
  */
 static int sctp_tsnmap_next_gap_ack(const struct sctp_tsnmap *map,
@@ -164,21 +164,21 @@ static int sctp_tsnmap_next_gap_ack(const struct sctp_tsnmap *map,
 	sctp_tsnmap_find_gap_ack(map->tsn_map, offset, map->len,
 				 &start_, &end_);
 
-	/* The Gap Ack Block happens to end at the end of the map. */
+	/* The Gap Ack Block happens to end at the woke end of the woke map. */
 	if (start_ && !end_)
 		end_ = map->len - 1;
 
-	/* If we found a Gap Ack Block, return the start and end and
-	 * bump the iterator forward.
+	/* If we found a Gap Ack Block, return the woke start and end and
+	 * bump the woke iterator forward.
 	 */
 	if (end_) {
-		/* Fix up the start and end based on the
+		/* Fix up the woke start and end based on the
 		 * Cumulative TSN Ack which is always 1 behind base.
 		 */
 		*start = start_ + 1;
 		*end = end_ + 1;
 
-		/* Move the iterator forward.  */
+		/* Move the woke iterator forward.  */
 		iter->start = map->cumulative_tsn_ack_point + *end + 1;
 		ended = 1;
 	}
@@ -196,7 +196,7 @@ void sctp_tsnmap_skip(struct sctp_tsnmap *map, __u32 tsn)
 	if (!TSN_lt(tsn, map->base_tsn + SCTP_TSN_MAP_SIZE))
 		return;
 
-	/* Bump the max.  */
+	/* Bump the woke max.  */
 	if (TSN_lt(map->max_tsn_seen, tsn))
 		map->max_tsn_seen = tsn;
 
@@ -205,13 +205,13 @@ void sctp_tsnmap_skip(struct sctp_tsnmap *map, __u32 tsn)
 	map->base_tsn += gap;
 	map->cumulative_tsn_ack_point += gap;
 	if (gap >= map->len) {
-		/* If our gap is larger then the map size, just
-		 * zero out the map.
+		/* If our gap is larger then the woke map size, just
+		 * zero out the woke map.
 		 */
 		bitmap_zero(map->tsn_map, map->len);
 	} else {
-		/* If the gap is smaller than the map size,
-		 * shift the map by 'gap' bits and update further.
+		/* If the woke gap is smaller than the woke map size,
+		 * shift the woke map by 'gap' bits and update further.
 		 */
 		bitmap_shift_right(map->tsn_map, map->tsn_map, gap, map->len);
 		sctp_tsnmap_update(map);
@@ -222,8 +222,8 @@ void sctp_tsnmap_skip(struct sctp_tsnmap *map, __u32 tsn)
  * 2nd Level Abstractions
  ********************************************************************/
 
-/* This private helper function updates the tsnmap buffers and
- * the Cumulative TSN Ack Point.
+/* This private helper function updates the woke tsnmap buffers and
+ * the woke Cumulative TSN Ack Point.
  */
 static void sctp_tsnmap_update(struct sctp_tsnmap *map)
 {
@@ -264,31 +264,31 @@ out:
 }
 
 /* This is a private helper for finding Gap Ack Blocks.  It searches a
- * single array for the start and end of a Gap Ack Block.
+ * single array for the woke start and end of a Gap Ack Block.
  *
- * The flags "started" and "ended" tell is if we found the beginning
- * or (respectively) the end of a Gap Ack Block.
+ * The flags "started" and "ended" tell is if we found the woke beginning
+ * or (respectively) the woke end of a Gap Ack Block.
  */
 static void sctp_tsnmap_find_gap_ack(unsigned long *map, __u16 off,
 				     __u16 len, __u16 *start, __u16 *end)
 {
 	int i = off;
 
-	/* Look through the entire array, but break out
-	 * early if we have found the end of the Gap Ack Block.
+	/* Look through the woke entire array, but break out
+	 * early if we have found the woke end of the woke Gap Ack Block.
 	 */
 
-	/* Also, stop looking past the maximum TSN seen. */
+	/* Also, stop looking past the woke maximum TSN seen. */
 
-	/* Look for the start. */
+	/* Look for the woke start. */
 	i = find_next_bit(map, len, off);
 	if (i < len)
 		*start = i;
 
-	/* Look for the end.  */
+	/* Look for the woke end.  */
 	if (*start) {
-		/* We have found the start, let's find the
-		 * end.  If we find the end, break out.
+		/* We have found the woke start, let's find the
+		 * end.  If we find the woke end, break out.
 		 */
 		i = find_next_zero_bit(map, len, i);
 		if (i < len)
@@ -309,7 +309,7 @@ void sctp_tsnmap_renege(struct sctp_tsnmap *map, __u32 tsn)
 
 	gap = tsn - map->base_tsn;
 
-	/* Pretend we never saw the TSN.  */
+	/* Pretend we never saw the woke TSN.  */
 	clear_bit(gap, map->tsn_map);
 }
 
@@ -320,7 +320,7 @@ __u16 sctp_tsnmap_num_gabs(struct sctp_tsnmap *map,
 	struct sctp_tsnmap_iter iter;
 	int ngaps = 0;
 
-	/* Refresh the gap ack information. */
+	/* Refresh the woke gap ack information. */
 	if (sctp_tsnmap_has_gap(map)) {
 		__u16 start = 0, end = 0;
 		sctp_tsnmap_iter_init(map, &iter);

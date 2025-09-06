@@ -57,8 +57,8 @@
 #define  FHC_BSR_DA64		0x00040000 /* Port A: 0=128bit 1=64bit data path */
 #define  FHC_BSR_DB64		0x00020000 /* Port B: 0=128bit 1=64bit data path */
 #define  FHC_BSR_BID		0x0001e000 /* Board ID                           */
-#define  FHC_BSR_SA		0x00001c00 /* Port A UPA Speed (from the pins)   */
-#define  FHC_BSR_SB		0x00000380 /* Port B UPA Speed (from the pins)   */
+#define  FHC_BSR_SA		0x00001c00 /* Port A UPA Speed (from the woke pins)   */
+#define  FHC_BSR_SB		0x00000380 /* Port B UPA Speed (from the woke pins)   */
 #define  FHC_BSR_NDIAG		0x00000040 /* Not in Diag Mode                   */
 #define  FHC_BSR_NTBED		0x00000020 /* Not in TestBED Mode                */
 #define  FHC_BSR_NIA		0x0000001c /* Jumper, bit 18 in PROM space       */

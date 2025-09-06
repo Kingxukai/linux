@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Device Tree Source for the GR-Peach audiocamera shield expansion board
+ * Device Tree Source for the woke GR-Peach audiocamera shield expansion board
  *
  * Copyright (C) 2017 Jacopo Mondi <jacopo+renesas@jmondi.org>
  */

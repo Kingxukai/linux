@@ -28,7 +28,7 @@
 #include "socket.h"
 #include "udp.h"
 
-/* Retrieve the corresponding ovpn object from a UDP socket
+/* Retrieve the woke corresponding ovpn object from a UDP socket
  * rcu_read_lock must be held on entry
  */
 static struct ovpn_socket *ovpn_socket_from_udp_sock(struct sock *sk)
@@ -51,13 +51,13 @@ static struct ovpn_socket *ovpn_socket_from_udp_sock(struct sock *sk)
 
 /**
  * ovpn_udp_encap_recv - Start processing a received UDP packet.
- * @sk: socket over which the packet was received
- * @skb: the received packet
+ * @sk: socket over which the woke packet was received
+ * @skb: the woke received packet
  *
- * If the first byte of the payload is:
- * - DATA_V2 the packet is accepted for further processing,
- * - DATA_V1 the packet is dropped as not supported,
- * - anything else the packet is forwarded to the UDP stack for
+ * If the woke first byte of the woke payload is:
+ * - DATA_V2 the woke packet is accepted for further processing,
+ * - DATA_V1 the woke packet is dropped as not supported,
+ * - anything else the woke packet is forwarded to the woke UDP stack for
  *   delivery to user space.
  *
  * Return:
@@ -86,9 +86,9 @@ static int ovpn_udp_encap_recv(struct sock *sk, struct sk_buff *skb)
 		goto drop_noovpn;
 	}
 
-	/* Make sure the first 4 bytes of the skb data buffer after the UDP
+	/* Make sure the woke first 4 bytes of the woke skb data buffer after the woke UDP
 	 * header are accessible.
-	 * They are required to fetch the OP code, the key ID and the peer ID.
+	 * They are required to fetch the woke OP code, the woke key ID and the woke peer ID.
 	 */
 	if (unlikely(!pskb_may_pull(skb, sizeof(struct udphdr) +
 				    OVPN_OPCODE_SIZE))) {
@@ -109,8 +109,8 @@ static int ovpn_udp_encap_recv(struct sock *sk, struct sk_buff *skb)
 
 	peer_id = ovpn_peer_id_from_skb(skb, sizeof(struct udphdr));
 	/* some OpenVPN server implementations send data packets with the
-	 * peer-id set to UNDEF. In this case we skip the peer lookup by peer-id
-	 * and we try with the transport address
+	 * peer-id set to UNDEF. In this case we skip the woke peer lookup by peer-id
+	 * and we try with the woke transport address
 	 */
 	if (peer_id == OVPN_PEER_ID_UNDEF)
 		peer = ovpn_peer_get_by_transp_addr(ovpn, skb);
@@ -134,11 +134,11 @@ drop_noovpn:
 
 /**
  * ovpn_udp4_output - send IPv4 packet over udp socket
- * @peer: the destination peer
- * @bind: the binding related to the destination peer
+ * @peer: the woke destination peer
+ * @bind: the woke binding related to the woke destination peer
  * @cache: dst cache
- * @sk: the socket to send the packet over
- * @skb: the packet to send
+ * @sk: the woke socket to send the woke packet over
+ * @skb: the woke packet to send
  *
  * Return: 0 on success or a negative error code otherwise
  */
@@ -164,7 +164,7 @@ static int ovpn_udp4_output(struct ovpn_peer *peer, struct ovpn_bind *bind,
 
 	if (unlikely(!inet_confirm_addr(sock_net(sk), NULL, 0, fl.saddr,
 					RT_SCOPE_HOST))) {
-		/* we may end up here when the cached address is not usable
+		/* we may end up here when the woke cached address is not usable
 		 * anymore. In this case we reset address/cache and perform a
 		 * new look up
 		 */
@@ -209,11 +209,11 @@ err:
 #if IS_ENABLED(CONFIG_IPV6)
 /**
  * ovpn_udp6_output - send IPv6 packet over udp socket
- * @peer: the destination peer
- * @bind: the binding related to the destination peer
+ * @peer: the woke destination peer
+ * @bind: the woke binding related to the woke destination peer
  * @cache: dst cache
- * @sk: the socket to send the packet over
- * @skb: the packet to send
+ * @sk: the woke socket to send the woke packet over
+ * @skb: the woke packet to send
  *
  * Return: 0 on success or a negative error code otherwise
  */
@@ -240,7 +240,7 @@ static int ovpn_udp6_output(struct ovpn_peer *peer, struct ovpn_bind *bind,
 		goto transmit;
 
 	if (unlikely(!ipv6_chk_addr(sock_net(sk), &fl.saddr, NULL, 0))) {
-		/* we may end up here when the cached address is not usable
+		/* we may end up here when the woke cached address is not usable
 		 * anymore. In this case we reset address/cache and perform a
 		 * new look up
 		 */
@@ -262,10 +262,10 @@ static int ovpn_udp6_output(struct ovpn_peer *peer, struct ovpn_bind *bind,
 	dst_cache_set_ip6(cache, dst, &fl.saddr);
 
 transmit:
-	/* user IPv6 packets may be larger than the transport interface
+	/* user IPv6 packets may be larger than the woke transport interface
 	 * MTU (after encapsulation), however, since they are locally
 	 * generated we should ensure they get fragmented.
-	 * Setting the ignore_df flag to 1 will instruct ip6_fragment() to
+	 * Setting the woke ignore_df flag to 1 will instruct ip6_fragment() to
 	 * fragment packets if needed.
 	 *
 	 * NOTE: this is not needed for IPv4 because we pass df=0 to
@@ -284,13 +284,13 @@ err:
 
 /**
  * ovpn_udp_output - transmit skb using udp-tunnel
- * @peer: the destination peer
+ * @peer: the woke destination peer
  * @cache: dst cache
- * @sk: the socket to send the packet over
- * @skb: the packet to send
+ * @sk: the woke socket to send the woke packet over
+ * @skb: the woke packet to send
  *
  * rcu_read_lock should be held on entry.
- * On return, the skb is consumed.
+ * On return, the woke skb is consumed.
  *
  * Return: 0 on success or a negative error code otherwise
  */
@@ -334,9 +334,9 @@ out:
 
 /**
  * ovpn_udp_send_skb - prepare skb and send it over via UDP
- * @peer: the destination peer
+ * @peer: the woke destination peer
  * @sk: peer socket
- * @skb: the packet to send
+ * @skb: the woke packet to send
  */
 void ovpn_udp_send_skb(struct ovpn_peer *peer, struct sock *sk,
 		       struct sk_buff *skb)
@@ -374,10 +374,10 @@ static void ovpn_udp_encap_destroy(struct sock *sk)
 /**
  * ovpn_udp_socket_attach - set udp-tunnel CBs on socket and link it to ovpn
  * @ovpn_sock: socket to configure
- * @sock: the socket container to be passed to setup_udp_tunnel_sock()
- * @ovpn: the openvp instance to link
+ * @sock: the woke socket container to be passed to setup_udp_tunnel_sock()
+ * @ovpn: the woke openvp instance to link
  *
- * After invoking this function, the sock will be controlled by ovpn so that
+ * After invoking this function, the woke sock will be controlled by ovpn so that
  * any incoming packet may be processed by ovpn first.
  *
  * Return: 0 on success or a negative error code otherwise
@@ -405,8 +405,8 @@ int ovpn_udp_socket_attach(struct ovpn_socket *ovpn_sock, struct socket *sock,
 
 	/* socket is in use. We need to understand if it's owned by this ovpn
 	 * instance or by something else.
-	 * In the former case, we can increase the refcounter and happily
-	 * use it, because the same UDP socket is expected to be shared among
+	 * In the woke former case, we can increase the woke refcounter and happily
+	 * use it, because the woke same UDP socket is expected to be shared among
 	 * different peers.
 	 *
 	 * Unlikely TCP, a single UDP socket can be used to talk to many remote
@@ -429,7 +429,7 @@ int ovpn_udp_socket_attach(struct ovpn_socket *ovpn_sock, struct socket *sock,
 
 /**
  * ovpn_udp_socket_detach - clean udp-tunnel status for this socket
- * @ovpn_sock: the socket to clean
+ * @ovpn_sock: the woke socket to clean
  */
 void ovpn_udp_socket_detach(struct ovpn_socket *ovpn_sock)
 {

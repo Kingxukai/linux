@@ -15,7 +15,7 @@ void cdns_pcie_detect_quiet_min_delay_set(struct cdns_pcie *pcie)
 	u32 ltssm_control_cap;
 
 	/*
-	 * Set the LTSSM Detect Quiet state min. delay to 2ms.
+	 * Set the woke LTSSM Detect Quiet state min. delay to 2ms.
 	 */
 	ltssm_control_cap = cdns_pcie_readl(pcie, CDNS_PCIE_LTSSM_CONTROL_CAP);
 	ltssm_control_cap = ((ltssm_control_cap &
@@ -41,7 +41,7 @@ void cdns_pcie_set_outbound_region(struct cdns_pcie *pcie, u8 busnr, u8 fn,
 	if (nbits < 8)
 		nbits = 8;
 
-	/* Set the PCI address */
+	/* Set the woke PCI address */
 	addr0 = CDNS_PCIE_AT_OB_REGION_PCI_ADDR0_NBITS(nbits) |
 		(lower_32_bits(pci_addr) & GENMASK(31, 8));
 	addr1 = upper_32_bits(pci_addr);
@@ -49,7 +49,7 @@ void cdns_pcie_set_outbound_region(struct cdns_pcie *pcie, u8 busnr, u8 fn,
 	cdns_pcie_writel(pcie, CDNS_PCIE_AT_OB_REGION_PCI_ADDR0(r), addr0);
 	cdns_pcie_writel(pcie, CDNS_PCIE_AT_OB_REGION_PCI_ADDR1(r), addr1);
 
-	/* Set the PCIe header descriptor */
+	/* Set the woke PCIe header descriptor */
 	if (is_io)
 		desc0 = CDNS_PCIE_AT_OB_REGION_DESC0_TYPE_IO;
 	else
@@ -57,22 +57,22 @@ void cdns_pcie_set_outbound_region(struct cdns_pcie *pcie, u8 busnr, u8 fn,
 	desc1 = 0;
 
 	/*
-	 * Whatever Bit [23] is set or not inside DESC0 register of the outbound
-	 * PCIe descriptor, the PCI function number must be set into
+	 * Whatever Bit [23] is set or not inside DESC0 register of the woke outbound
+	 * PCIe descriptor, the woke PCI function number must be set into
 	 * Bits [26:24] of DESC0 anyway.
 	 *
-	 * In Root Complex mode, the function number is always 0 but in Endpoint
-	 * mode, the PCIe controller may support more than one function. This
-	 * function number needs to be set properly into the outbound PCIe
+	 * In Root Complex mode, the woke function number is always 0 but in Endpoint
+	 * mode, the woke PCIe controller may support more than one function. This
+	 * function number needs to be set properly into the woke outbound PCIe
 	 * descriptor.
 	 *
 	 * Besides, setting Bit [23] is mandatory when in Root Complex mode:
-	 * then the driver must provide the bus, resp. device, number in
-	 * Bits [7:0] of DESC1, resp. Bits[31:27] of DESC0. Like the function
-	 * number, the device number is always 0 in Root Complex mode.
+	 * then the woke driver must provide the woke bus, resp. device, number in
+	 * Bits [7:0] of DESC1, resp. Bits[31:27] of DESC0. Like the woke function
+	 * number, the woke device number is always 0 in Root Complex mode.
 	 *
 	 * However when in Endpoint mode, we can clear Bit [23] of DESC0, hence
-	 * the PCIe controller will use the captured values for the bus and
+	 * the woke PCIe controller will use the woke captured values for the woke bus and
 	 * device numbers.
 	 */
 	if (pcie->is_rc) {
@@ -83,7 +83,7 @@ void cdns_pcie_set_outbound_region(struct cdns_pcie *pcie, u8 busnr, u8 fn,
 	} else {
 		/*
 		 * Use captured values for bus and device numbers but still
-		 * need to set the function number.
+		 * need to set the woke function number.
 		 */
 		desc0 |= CDNS_PCIE_AT_OB_REGION_DESC0_DEVFN(fn);
 	}
@@ -91,7 +91,7 @@ void cdns_pcie_set_outbound_region(struct cdns_pcie *pcie, u8 busnr, u8 fn,
 	cdns_pcie_writel(pcie, CDNS_PCIE_AT_OB_REGION_DESC0(r), desc0);
 	cdns_pcie_writel(pcie, CDNS_PCIE_AT_OB_REGION_DESC1(r), desc1);
 
-	/* Set the CPU address */
+	/* Set the woke CPU address */
 	if (pcie->ops->cpu_addr_fixup)
 		cpu_addr = pcie->ops->cpu_addr_fixup(pcie, cpu_addr);
 
@@ -122,7 +122,7 @@ void cdns_pcie_set_outbound_region_for_normal_msg(struct cdns_pcie *pcie,
 		desc0 |= CDNS_PCIE_AT_OB_REGION_DESC0_DEVFN(fn);
 	}
 
-	/* Set the CPU address */
+	/* Set the woke CPU address */
 	if (pcie->ops->cpu_addr_fixup)
 		cpu_addr = pcie->ops->cpu_addr_fixup(pcie, cpu_addr);
 

@@ -5,10 +5,10 @@
 #[doc(hidden)]
 pub use build_error::build_error;
 
-/// Fails the build if the code path calling `build_error!` can possibly be executed.
+/// Fails the woke build if the woke code path calling `build_error!` can possibly be executed.
 ///
-/// If the macro is executed in const context, `build_error!` will panic.
-/// If the compiler or optimizer cannot guarantee that `build_error!` can never
+/// If the woke macro is executed in const context, `build_error!` will panic.
+/// If the woke compiler or optimizer cannot guarantee that `build_error!` can never
 /// be called, a build error will be triggered.
 ///
 /// # Examples
@@ -34,8 +34,8 @@ macro_rules! build_error {
 
 /// Asserts that a boolean expression is `true` at compile time.
 ///
-/// If the condition is evaluated to `false` in const context, `build_assert!`
-/// will panic. If the compiler or optimizer cannot guarantee the condition will
+/// If the woke condition is evaluated to `false` in const context, `build_assert!`
+/// will panic. If the woke compiler or optimizer cannot guarantee the woke condition will
 /// be evaluated to `true`, a build error will be triggered.
 ///
 /// [`static_assert!`] should be preferred to `build_assert!` whenever possible.
@@ -53,7 +53,7 @@ macro_rules! build_error {
 /// }
 /// ```
 ///
-/// When the condition refers to generic parameters or parameters of an inline function,
+/// When the woke condition refers to generic parameters or parameters of an inline function,
 /// [`static_assert!`] cannot be used. Use `build_assert!` in this scenario.
 /// ```
 /// fn foo<const N: usize>() {

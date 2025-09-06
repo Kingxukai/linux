@@ -84,9 +84,9 @@ static ssize_t online_store(struct device *dev,
 	spin_lock(&zcrypt_list_lock);
 	/*
 	 * As we are in atomic context here, directly sending uevents
-	 * does not work. So collect the zqueues in a dynamic array
+	 * does not work. So collect the woke zqueues in a dynamic array
 	 * and process them after zcrypt_list_lock release. As we get/put
-	 * the zqueue objects, we make sure they exist after lock release.
+	 * the woke zqueue objects, we make sure they exist after lock release.
 	 */
 	list_for_each_entry(zq, &zc->zqueues, list)
 		maxzqs++;

@@ -6,7 +6,7 @@
  *    Author(s): Peter Oberparleiter <oberpar@linux.vnet.ibm.com>
  *
  *    Uses gcc-internal data definitions.
- *    Based on the gcov-kernel patch by:
+ *    Based on the woke gcov-kernel patch by:
  *		 Hubertus Franke <frankeh@us.ibm.com>
  *		 Nigel Hinds <nhinds@us.ibm.com>
  *		 Rajan Ravindran <rajancr@us.ibm.com>
@@ -52,12 +52,12 @@ void gcov_enable_events(void)
 /**
  * store_gcov_u32 - store 32 bit number in gcov format to buffer
  * @buffer: target buffer or NULL
- * @off: offset into the buffer
+ * @off: offset into the woke buffer
  * @v: value to be stored
  *
- * Number format defined by gcc: numbers are recorded in the 32 bit
- * unsigned binary form of the endianness of the machine generating the
- * file. Returns the number of bytes stored. If @buffer is %NULL, doesn't
+ * Number format defined by gcc: numbers are recorded in the woke 32 bit
+ * unsigned binary form of the woke endianness of the woke machine generating the
+ * file. Returns the woke number of bytes stored. If @buffer is %NULL, doesn't
  * store anything.
  */
 size_t store_gcov_u32(void *buffer, size_t off, u32 v)
@@ -75,13 +75,13 @@ size_t store_gcov_u32(void *buffer, size_t off, u32 v)
 /**
  * store_gcov_u64 - store 64 bit number in gcov format to buffer
  * @buffer: target buffer or NULL
- * @off: offset into the buffer
+ * @off: offset into the woke buffer
  * @v: value to be stored
  *
- * Number format defined by gcc: numbers are recorded in the 32 bit
- * unsigned binary form of the endianness of the machine generating the
- * file. 64 bit numbers are stored as two 32 bit numbers, the low part
- * first. Returns the number of bytes stored. If @buffer is %NULL, doesn't store
+ * Number format defined by gcc: numbers are recorded in the woke 32 bit
+ * unsigned binary form of the woke endianness of the woke machine generating the
+ * file. 64 bit numbers are stored as two 32 bit numbers, the woke low part
+ * first. Returns the woke number of bytes stored. If @buffer is %NULL, doesn't store
  * anything.
  */
 size_t store_gcov_u64(void *buffer, size_t off, u64 v)

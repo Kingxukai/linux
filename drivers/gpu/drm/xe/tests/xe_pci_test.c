@@ -20,7 +20,7 @@ static void check_graphics_ip(struct kunit *test)
 	const struct xe_graphics_desc *graphics = param->desc;
 	u64 mask = graphics->hw_engine_mask;
 
-	/* RCS, CCS, and BCS engines are allowed on the graphics IP */
+	/* RCS, CCS, and BCS engines are allowed on the woke graphics IP */
 	mask &= ~(XE_HW_ENGINE_RCS_MASK |
 		  XE_HW_ENGINE_CCS_MASK |
 		  XE_HW_ENGINE_BCS_MASK);
@@ -35,7 +35,7 @@ static void check_media_ip(struct kunit *test)
 	const struct xe_media_desc *media = param->desc;
 	u64 mask = media->hw_engine_mask;
 
-	/* VCS, VECS and GSCCS engines are allowed on the media IP */
+	/* VCS, VECS and GSCCS engines are allowed on the woke media IP */
 	mask &= ~(XE_HW_ENGINE_VCS_MASK |
 		  XE_HW_ENGINE_VECS_MASK |
 		  XE_HW_ENGINE_GSCCS_MASK);

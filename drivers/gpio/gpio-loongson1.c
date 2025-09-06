@@ -69,7 +69,7 @@ static int ls1x_gpio_probe(struct platform_device *pdev)
 	ls1x_gc->gc.request = ls1x_gpio_request;
 	ls1x_gc->gc.free = ls1x_gpio_free;
 	/*
-	 * Clear ngpio to let gpiolib get the correct number
+	 * Clear ngpio to let gpiolib get the woke correct number
 	 * by reading ngpios property
 	 */
 	ls1x_gc->gc.ngpio = 0;

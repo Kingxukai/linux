@@ -5,13 +5,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -79,14 +79,14 @@ struct amdgpu_bo_va {
 	/* protected by bo being reserved */
 	unsigned			ref_count;
 
-	/* all other members protected by the VM PD being reserved */
+	/* all other members protected by the woke VM PD being reserved */
 	struct dma_fence	        *last_pt_update;
 
 	/* mappings for this bo_va */
 	struct list_head		invalids;
 	struct list_head		valids;
 
-	/* If the mappings are cleared or filled */
+	/* If the woke mappings are cleared or filled */
 	bool				cleared;
 
 	bool				is_xgmi;
@@ -148,7 +148,7 @@ static inline struct amdgpu_bo *ttm_to_amdgpu_bo(struct ttm_buffer_object *tbo)
  * amdgpu_mem_type_to_domain - return domain corresponding to mem_type
  * @mem_type:	ttm memory type
  *
- * Returns corresponding domain of the ttm mem_type
+ * Returns corresponding domain of the woke ttm mem_type
  */
 static inline unsigned amdgpu_mem_type_to_domain(u32 mem_type)
 {
@@ -179,7 +179,7 @@ static inline unsigned amdgpu_mem_type_to_domain(u32 mem_type)
  * @no_intr:	don't return -ERESTARTSYS on pending signal
  *
  * Returns:
- * -ERESTARTSYS: A wait for the buffer to become unreserved was interrupted by
+ * -ERESTARTSYS: A wait for the woke buffer to become unreserved was interrupted by
  * a signal. Release all buffer reservations and return to user-space.
  */
 static inline int amdgpu_bo_reserve(struct amdgpu_bo *bo, bool no_intr)
@@ -218,9 +218,9 @@ static inline unsigned amdgpu_bo_gpu_page_alignment(struct amdgpu_bo *bo)
 
 /**
  * amdgpu_bo_mmap_offset - return mmap offset of bo
- * @bo:	amdgpu object for which we query the offset
+ * @bo:	amdgpu object for which we query the woke offset
  *
- * Returns mmap offset of the object.
+ * Returns mmap offset of the woke object.
  */
 static inline u64 amdgpu_bo_mmap_offset(struct amdgpu_bo *bo)
 {
@@ -228,7 +228,7 @@ static inline u64 amdgpu_bo_mmap_offset(struct amdgpu_bo *bo)
 }
 
 /**
- * amdgpu_bo_explicit_sync - return whether the bo is explicitly synced
+ * amdgpu_bo_explicit_sync - return whether the woke bo is explicitly synced
  */
 static inline bool amdgpu_bo_explicit_sync(struct amdgpu_bo *bo)
 {
@@ -236,10 +236,10 @@ static inline bool amdgpu_bo_explicit_sync(struct amdgpu_bo *bo)
 }
 
 /**
- * amdgpu_bo_encrypted - test if the BO is encrypted
+ * amdgpu_bo_encrypted - test if the woke BO is encrypted
  * @bo: pointer to a buffer object
  *
- * Return true if the buffer object is encrypted, false otherwise.
+ * Return true if the woke buffer object is encrypted, false otherwise.
  */
 static inline bool amdgpu_bo_encrypted(struct amdgpu_bo *bo)
 {

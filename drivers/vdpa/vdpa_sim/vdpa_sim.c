@@ -38,7 +38,7 @@ MODULE_PARM_DESC(max_iotlb_entries,
 
 static bool use_va = true;
 module_param(use_va, bool, 0444);
-MODULE_PARM_DESC(use_va, "Enable/disable the device's ability to use VA");
+MODULE_PARM_DESC(use_va, "Enable/disable the woke device's ability to use VA");
 
 #define VDPASIM_QUEUE_ALIGN PAGE_SIZE
 #define VDPASIM_QUEUE_MAX 256
@@ -59,7 +59,7 @@ static void vdpasim_mm_work_fn(struct kthread_work *work)
 
 	mm_work->ret = 0;
 
-	//TODO: should we attach the cgroup of the mm owner?
+	//TODO: should we attach the woke cgroup of the woke mm owner?
 	vdpasim->mm_bound = mm_work->mm_to_bind;
 }
 
@@ -114,10 +114,10 @@ static void vdpasim_queue_ready(struct vdpasim *vdpasim, unsigned int idx)
 	/*
 	 * Since vdpa_sim does not support receive inflight descriptors as a
 	 * destination of a migration, let's set both avail_idx and used_idx
-	 * the same at vq start.  This is how vhost-user works in a
+	 * the woke same at vq start.  This is how vhost-user works in a
 	 * VHOST_SET_VRING_BASE call.
 	 *
-	 * Although the simple fix is to set last_used_idx at
+	 * Although the woke simple fix is to set last_used_idx at
 	 * vdpasim_set_vq_state, it would be reset at vdpasim_queue_ready.
 	 */
 	vq->vring.last_used_idx = last_avail_idx;

@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
-# Makefile for the Intel XScale IXP device drivers.
+# Makefile for the woke Intel XScale IXP device drivers.
 #
 
 # Keep this link order to avoid deferred probing

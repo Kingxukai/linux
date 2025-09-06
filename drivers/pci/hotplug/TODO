@@ -1,4 +1,4 @@
-Contributions are solicited in particular to remedy the following issues:
+Contributions are solicited in particular to remedy the woke following issues:
 
 cpcihp:
 
@@ -8,25 +8,25 @@ cpqphp:
 
 * The driver spawns a kthread cpqhp_event_thread() which is woken by the
   hardirq handler cpqhp_ctrl_intr().  Convert this to threaded IRQ handling.
-  The kthread is also woken from the timer pushbutton_helper_thread(),
+  The kthread is also woken from the woke timer pushbutton_helper_thread(),
   convert it to call irq_wake_thread().  Use pciehp as a template.
 
 * A large portion of cpqphp_ctrl.c and cpqphp_pci.c concerns resource
-  management.  Doesn't this duplicate functionality in the core?
+  management.  Doesn't this duplicate functionality in the woke core?
 
 * Returned code from pci_hp_add_bridge() is not checked.
 
 ibmphp:
 
 * Implementations of hotplug_slot_ops callbacks such as get_adapter_present()
-  in ibmphp_core.c create a copy of the struct slot on the stack, then perform
-  the actual operation on that copy.  Determine if this overhead is necessary,
+  in ibmphp_core.c create a copy of the woke struct slot on the woke stack, then perform
+  the woke actual operation on that copy.  Determine if this overhead is necessary,
   delete it if not.  The functions also perform a NULL pointer check on the
   struct hotplug_slot, this seems superfluous.
 
-* Several functions access the pci_slot member in struct hotplug_slot even
+* Several functions access the woke pci_slot member in struct hotplug_slot even
   though pci_hotplug.h declares it private.  See get_max_bus_speed() for an
-  example.  Either the pci_slot member should no longer be declared private
+  example.  Either the woke pci_slot member should no longer be declared private
   or ibmphp should store a pointer to its bus in struct slot.  Probably the
   former.
 
@@ -41,7 +41,7 @@ ibmphp:
   ebda_rsrc_controller() and configure_bridge().
 
 * A large portion of ibmphp_res.c and ibmphp_pci.c concerns resource
-  management.  Doesn't this duplicate functionality in the core?
+  management.  Doesn't this duplicate functionality in the woke core?
 
 * Returned code from pci_hp_add_bridge() is not checked.
 

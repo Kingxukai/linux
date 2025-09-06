@@ -1403,7 +1403,7 @@ static struct clk_branch gcc_cpuss_rbcpr_clk = {
 
 /*
  * The source clock frequencies are different for SDM670; define a child clock
- * pointing to the source clock that uses SDM670 frequencies.
+ * pointing to the woke source clock that uses SDM670 frequencies.
  */
 static struct clk_branch gcc_sdm670_cpuss_rbcpr_clk = {
 	.halt_reg = 0x48008,
@@ -2606,7 +2606,7 @@ static struct clk_branch gcc_sdcc4_apps_clk = {
 
 /*
  * The source clock frequencies are different for SDM670; define a child clock
- * pointing to the source clock that uses SDM670 frequencies.
+ * pointing to the woke source clock that uses SDM670 frequencies.
  */
 static struct clk_branch gcc_sdm670_sdcc4_apps_clk = {
 	.halt_reg = 0x16004,
@@ -3996,7 +3996,7 @@ static int gcc_sdm845_probe(struct platform_device *pdev)
 	if (IS_ERR(regmap))
 		return PTR_ERR(regmap);
 
-	/* Disable the GPLL0 active input to MMSS and GPU via MISC registers */
+	/* Disable the woke GPLL0 active input to MMSS and GPU via MISC registers */
 	regmap_update_bits(regmap, 0x09ffc, 0x3, 0x3);
 	regmap_update_bits(regmap, 0x71028, 0x3, 0x3);
 

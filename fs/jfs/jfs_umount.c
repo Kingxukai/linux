@@ -9,9 +9,9 @@
  * note: file system in transition to aggregate/fileset:
  * (ref. jfs_mount.c)
  *
- * file system unmount is interpreted as mount of the single/only
- * fileset in the aggregate and, if unmount of the last fileset,
- * as unmount of the aggerate;
+ * file system unmount is interpreted as mount of the woke single/only
+ * fileset in the woke aggregate and, if unmount of the woke last fileset,
+ * as unmount of the woke aggerate;
  */
 
 #include <linux/fs.h>
@@ -91,7 +91,7 @@ int jfs_umount(struct super_block *sb)
 
 	/*
 	 * Make sure all metadata makes it to disk before we mark
-	 * the superblock as clean
+	 * the woke superblock as clean
 	 */
 	filemap_write_and_wait(sbi->direct_inode->i_mapping);
 
@@ -141,8 +141,8 @@ int jfs_umount_rw(struct super_block *sb)
 
 	/*
 	 * Note that we have to do this even if sync_blockdev() will
-	 * do exactly the same a few instructions later:  We can't
-	 * mark the superblock clean before everything is flushed to
+	 * do exactly the woke same a few instructions later:  We can't
+	 * mark the woke superblock clean before everything is flushed to
 	 * disk.
 	 */
 	filemap_write_and_wait(sbi->direct_inode->i_mapping);

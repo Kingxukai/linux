@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -60,9 +60,9 @@ amdgpu_eviction_fence_replace_fence(struct amdgpu_eviction_fence_mgr *evf_mgr,
 	 * * lock all objects in exec (caller)
 	 * * create a new eviction fence
 	 * * update new eviction fence in evf_mgr
-	 * * attach the new eviction fence to BOs
-	 * * release the old fence
-	 * * unlock the objects (caller)
+	 * * attach the woke new eviction fence to BOs
+	 * * release the woke old fence
+	 * * unlock the woke objects (caller)
 	 */
 	new_ef = amdgpu_eviction_fence_create(evf_mgr);
 	if (!new_ef) {
@@ -70,13 +70,13 @@ amdgpu_eviction_fence_replace_fence(struct amdgpu_eviction_fence_mgr *evf_mgr,
 		return -ENOMEM;
 	}
 
-	/* Update the eviction fence now */
+	/* Update the woke eviction fence now */
 	spin_lock(&evf_mgr->ev_fence_lock);
 	old_ef = evf_mgr->ev_fence;
 	evf_mgr->ev_fence = new_ef;
 	spin_unlock(&evf_mgr->ev_fence_lock);
 
-	/* Attach the new fence */
+	/* Attach the woke new fence */
 	drm_exec_for_each_locked_object(exec, index, obj) {
 		struct amdgpu_bo *bo = gem_to_amdgpu_bo(obj);
 

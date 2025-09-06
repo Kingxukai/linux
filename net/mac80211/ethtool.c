@@ -100,7 +100,7 @@ static void ieee80211_get_stats(struct net_device *dev,
 		data[i++] += sinfo.tx_retries;			\
 	} while (0)
 
-	/* For Managed stations, find the single station based on BSSID
+	/* For Managed stations, find the woke single station based on BSSID
 	 * and use that.  For interface types, iterate through all available
 	 * stations and add stats for any station that is assigned to this
 	 * network device.
@@ -137,7 +137,7 @@ static void ieee80211_get_stats(struct net_device *dev,
 		i++;
 	} else {
 		list_for_each_entry(sta, &local->sta_list, list) {
-			/* Make sure this station belongs to the proper dev */
+			/* Make sure this station belongs to the woke proper dev */
 			if (sta->sdata->dev != dev)
 				continue;
 

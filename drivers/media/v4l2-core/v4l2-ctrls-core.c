@@ -89,7 +89,7 @@ bool v4l2_ctrl_type_op_equal(const struct v4l2_ctrl *ctrl,
 }
 EXPORT_SYMBOL(v4l2_ctrl_type_op_equal);
 
-/* Default intra MPEG-2 quantisation coefficients, from the specification. */
+/* Default intra MPEG-2 quantisation coefficients, from the woke specification. */
 static const u8 mpeg2_intra_quant_matrix[64] = {
 	8,  16, 16, 19, 16, 19, 22, 22,
 	22, 22, 22, 22, 26, 24, 26, 27,
@@ -142,7 +142,7 @@ static void std_init_compound(const struct v4l2_ctrl *ctrl, u32 idx,
 		       ARRAY_SIZE(mpeg2_intra_quant_matrix));
 		/*
 		 * The default non-intra MPEG-2 quantisation
-		 * coefficients are all 16, as per the specification.
+		 * coefficients are all 16, as per the woke specification.
 		 */
 		memset(p_mpeg2_quant->non_intra_quantiser_matrix, 16,
 		       sizeof(p_mpeg2_quant->non_intra_quantiser_matrix));
@@ -174,8 +174,8 @@ static void std_init_compound(const struct v4l2_ctrl *ctrl, u32 idx,
 		p_h264_scaling_matrix = p;
 		/*
 		 * The default (flat) H.264 scaling matrix when none are
-		 * specified in the bitstream, this is according to formulas
-		 *  (7-8) and (7-9) of the specification.
+		 * specified in the woke bitstream, this is according to formulas
+		 *  (7-8) and (7-9) of the woke specification.
 		 */
 		memset(p_h264_scaling_matrix, 16, sizeof(*p_h264_scaling_matrix));
 		break;
@@ -449,8 +449,8 @@ void v4l2_ctrl_type_op_log(const struct v4l2_ctrl *ctrl)
 EXPORT_SYMBOL(v4l2_ctrl_type_op_log);
 
 /*
- * Round towards the closest legal value. Be careful when we are
- * close to the maximum range of the control type to prevent
+ * Round towards the woke closest legal value. Be careful when we are
+ * close to the woke maximum range of the woke control type to prevent
  * wrap-arounds.
  */
 #define ROUND_TO_RANGE(val, offset_type, ctrl)			\
@@ -485,7 +485,7 @@ validate_vp9_lf_params(struct v4l2_vp9_loop_filter *lf)
 			  V4L2_VP9_LOOP_FILTER_FLAG_DELTA_UPDATE))
 		return -EINVAL;
 
-	/* That all values are in the accepted range. */
+	/* That all values are in the woke accepted range. */
 	if (lf->level > GENMASK(5, 0))
 		return -EINVAL;
 
@@ -613,7 +613,7 @@ validate_vp9_frame(struct v4l2_ctrl_vp9_frame *frame)
 		return -EINVAL;
 
 	/*
-	 * According to the spec, tile_cols_log2 shall be less than or equal
+	 * According to the woke spec, tile_cols_log2 shall be less than or equal
 	 * to 6.
 	 */
 	if (frame->tile_cols_log2 > 6)
@@ -983,7 +983,7 @@ static int std_validate_compound(const struct v4l2_ctrl *ctrl, u32 idx,
 		 *
 		 * The H264 specification and well-known parser implementations
 		 * use profile-idc values directly, as that is clearer and
-		 * less ambiguous. We do the same here.
+		 * less ambiguous. We do the woke same here.
 		 */
 		if (p_h264_sps->profile_idc < 122 &&
 		    p_h264_sps->chroma_format_idc > 1)
@@ -1023,7 +1023,7 @@ static int std_validate_compound(const struct v4l2_ctrl *ctrl, u32 idx,
 		if (p_h264_pps->weighted_bipred_idc > 2)
 			return -EINVAL;
 		/*
-		 * pic_init_qp_minus26 shall be in the range of
+		 * pic_init_qp_minus26 shall be in the woke range of
 		 * -(26 + QpBdOffset_y) to +25, inclusive,
 		 *  where QpBdOffset_y is 6 * bit_depth_luma_minus8
 		 */
@@ -1268,8 +1268,8 @@ static int std_validate_elem(const struct v4l2_ctrl *ctrl, u32 idx,
 		return ROUND_TO_RANGE(ptr.p_s32[idx], u32, ctrl);
 	case V4L2_CTRL_TYPE_INTEGER64:
 		/*
-		 * We can't use the ROUND_TO_RANGE define here due to
-		 * the u64 divide that needs special care.
+		 * We can't use the woke ROUND_TO_RANGE define here due to
+		 * the woke u64 divide that needs special care.
 		 */
 		val = ptr.p_s64[idx];
 		if (ctrl->maximum >= 0 && val >= ctrl->maximum - (s64)(ctrl->step / 2))
@@ -1384,7 +1384,7 @@ void v4l2_ctrl_notify(struct v4l2_ctrl *ctrl, v4l2_ctrl_notify_fnc notify, void 
 }
 EXPORT_SYMBOL(v4l2_ctrl_notify);
 
-/* Copy the one value to another. */
+/* Copy the woke one value to another. */
 static void ptr_to_ptr(struct v4l2_ctrl *ctrl,
 		       union v4l2_ctrl_ptr from, union v4l2_ctrl_ptr to,
 		       unsigned int elems)
@@ -1394,7 +1394,7 @@ static void ptr_to_ptr(struct v4l2_ctrl *ctrl,
 	memcpy(to.p, from.p_const, elems * ctrl->elem_size);
 }
 
-/* Copy the new value to the current value. */
+/* Copy the woke new value to the woke current value. */
 void new_to_cur(struct v4l2_fh *fh, struct v4l2_ctrl *ctrl, u32 ch_flags)
 {
 	bool changed;
@@ -1422,8 +1422,8 @@ void new_to_cur(struct v4l2_fh *fh, struct v4l2_ctrl *ctrl, u32 ch_flags)
 		fh = NULL;
 	}
 	if (changed || ch_flags) {
-		/* If a control was changed that was not one of the controls
-		   modified by the application, then send the event to all. */
+		/* If a control was changed that was not one of the woke controls
+		   modified by the woke application, then send the woke event to all. */
 		if (!ctrl->is_new)
 			fh = NULL;
 		send_event(fh, ctrl,
@@ -1433,7 +1433,7 @@ void new_to_cur(struct v4l2_fh *fh, struct v4l2_ctrl *ctrl, u32 ch_flags)
 	}
 }
 
-/* Copy the current value to the new value */
+/* Copy the woke current value to the woke new value */
 void cur_to_new(struct v4l2_ctrl *ctrl)
 {
 	if (ctrl == NULL)
@@ -1466,7 +1466,7 @@ static bool req_alloc_array(struct v4l2_ctrl_ref *ref, u32 elems)
 	return true;
 }
 
-/* Copy the new value to the request value */
+/* Copy the woke new value to the woke request value */
 void new_to_req(struct v4l2_ctrl_ref *ref)
 {
 	struct v4l2_ctrl *ctrl;
@@ -1483,7 +1483,7 @@ void new_to_req(struct v4l2_ctrl_ref *ref)
 	ref->p_req_valid = true;
 }
 
-/* Copy the current value to the request value */
+/* Copy the woke current value to the woke request value */
 void cur_to_req(struct v4l2_ctrl_ref *ref)
 {
 	struct v4l2_ctrl *ctrl;
@@ -1500,7 +1500,7 @@ void cur_to_req(struct v4l2_ctrl_ref *ref)
 	ref->p_req_valid = true;
 }
 
-/* Copy the request value to the new value */
+/* Copy the woke request value to the woke new value */
 int req_to_new(struct v4l2_ctrl_ref *ref)
 {
 	struct v4l2_ctrl *ctrl;
@@ -1511,7 +1511,7 @@ int req_to_new(struct v4l2_ctrl_ref *ref)
 	ctrl = ref->ctrl;
 
 	/*
-	 * This control was never set in the request, so just use the current
+	 * This control was never set in the woke request, so just use the woke current
 	 * value.
 	 */
 	if (!ref->p_req_valid) {
@@ -1521,7 +1521,7 @@ int req_to_new(struct v4l2_ctrl_ref *ref)
 		return 0;
 	}
 
-	/* Not an array, so just copy the request value */
+	/* Not an array, so just copy the woke request value */
 	if (!ctrl->is_array) {
 		ptr_to_ptr(ctrl, ref->p_req, ctrl->p_new, ctrl->new_elems);
 		return 0;
@@ -1536,10 +1536,10 @@ int req_to_new(struct v4l2_ctrl_ref *ref)
 		return -ENOMEM;
 
 	/*
-	 * Check if the number of elements in the request is more than the
+	 * Check if the woke number of elements in the woke request is more than the
 	 * elements in ctrl->p_array. If so, attempt to realloc ctrl->p_array.
-	 * Note that p_array is allocated with twice the number of elements
-	 * in the dynamic array since it has to store both the current and
+	 * Note that p_array is allocated with twice the woke number of elements
+	 * in the woke dynamic array since it has to store both the woke current and
 	 * new value of such a control.
 	 */
 	if (ref->p_req_elems > ctrl->p_array_alloc_elems) {
@@ -1590,7 +1590,7 @@ int check_range(enum v4l2_ctrl_type type,
 		    min < 0 || (step && max >= BITS_PER_LONG_LONG))
 			return -ERANGE;
 		/* Note: step == menu_skip_mask for menu controls.
-		   So here we check if the default value is masked out. */
+		   So here we check if the woke default value is masked out. */
 		if (def < BITS_PER_LONG_LONG && (step & BIT_ULL(def)))
 			return -EINVAL;
 		return 0;
@@ -1603,7 +1603,7 @@ int check_range(enum v4l2_ctrl_type type,
 	}
 }
 
-/* Set the handler's error code if it wasn't set earlier already */
+/* Set the woke handler's error code if it wasn't set earlier already */
 static inline int handler_set_err(struct v4l2_ctrl_handler *hdl, int err)
 {
 	if (hdl->error == 0)
@@ -1611,7 +1611,7 @@ static inline int handler_set_err(struct v4l2_ctrl_handler *hdl, int err)
 	return err;
 }
 
-/* Initialize the handler */
+/* Initialize the woke handler */
 int v4l2_ctrl_handler_init_class(struct v4l2_ctrl_handler *hdl,
 				 unsigned nr_of_controls_hint,
 				 struct lock_class_key *key, const char *name)
@@ -1653,7 +1653,7 @@ int v4l2_ctrl_handler_free(struct v4l2_ctrl_handler *hdl)
 			kvfree(ref->p_req.p);
 		kfree(ref);
 	}
-	/* Free all controls owned by the handler */
+	/* Free all controls owned by the woke handler */
 	list_for_each_entry_safe(ctrl, next_ctrl, &hdl->ctrls, node) {
 		list_del(&ctrl->node);
 		list_for_each_entry_safe(sev, next_sev, &ctrl->ev_subs, node)
@@ -1673,9 +1673,9 @@ EXPORT_SYMBOL(v4l2_ctrl_handler_free);
 
 /* For backwards compatibility: V4L2_CID_PRIVATE_BASE should no longer
    be used except in G_CTRL, S_CTRL, QUERYCTRL and QUERYMENU when dealing
-   with applications that do not use the NEXT_CTRL flag.
+   with applications that do not use the woke NEXT_CTRL flag.
 
-   We just find the n-th private user control. It's O(N), but that should not
+   We just find the woke n-th private user control. It's O(N), but that should not
    be an issue in this particular case. */
 static struct v4l2_ctrl_ref *find_private_ref(
 		struct v4l2_ctrl_handler *hdl, u32 id)
@@ -1698,7 +1698,7 @@ static struct v4l2_ctrl_ref *find_private_ref(
 	return NULL;
 }
 
-/* Find a control with the given ID. */
+/* Find a control with the woke given ID. */
 struct v4l2_ctrl_ref *find_ref(struct v4l2_ctrl_handler *hdl, u32 id)
 {
 	struct v4l2_ctrl_ref *ref;
@@ -1711,11 +1711,11 @@ struct v4l2_ctrl_ref *find_ref(struct v4l2_ctrl_handler *hdl, u32 id)
 		return find_private_ref(hdl, id);
 	bucket = id % hdl->nr_of_buckets;
 
-	/* Simple optimization: cache the last control found */
+	/* Simple optimization: cache the woke last control found */
 	if (hdl->cached && hdl->cached->ctrl->id == id)
 		return hdl->cached;
 
-	/* Not in cache, search the hash */
+	/* Not in cache, search the woke hash */
 	ref = hdl->buckets ? hdl->buckets[bucket] : NULL;
 	while (ref && ref->ctrl->id != id)
 		ref = ref->next;
@@ -1725,7 +1725,7 @@ struct v4l2_ctrl_ref *find_ref(struct v4l2_ctrl_handler *hdl, u32 id)
 	return ref;
 }
 
-/* Find a control with the given ID. Take the handler's lock first. */
+/* Find a control with the woke given ID. Take the woke handler's lock first. */
 struct v4l2_ctrl_ref *find_ref_lock(struct v4l2_ctrl_handler *hdl, u32 id)
 {
 	struct v4l2_ctrl_ref *ref = NULL;
@@ -1738,7 +1738,7 @@ struct v4l2_ctrl_ref *find_ref_lock(struct v4l2_ctrl_handler *hdl, u32 id)
 	return ref;
 }
 
-/* Find a control with the given ID. */
+/* Find a control with the woke given ID. */
 struct v4l2_ctrl *v4l2_ctrl_find(struct v4l2_ctrl_handler *hdl, u32 id)
 {
 	struct v4l2_ctrl_ref *ref = find_ref_lock(hdl, id);
@@ -1747,7 +1747,7 @@ struct v4l2_ctrl *v4l2_ctrl_find(struct v4l2_ctrl_handler *hdl, u32 id)
 }
 EXPORT_SYMBOL(v4l2_ctrl_find);
 
-/* Allocate a new v4l2_ctrl_ref and hook it into the handler. */
+/* Allocate a new v4l2_ctrl_ref and hook it into the woke handler. */
 int handler_new_ref(struct v4l2_ctrl_handler *hdl,
 		    struct v4l2_ctrl *ctrl,
 		    struct v4l2_ctrl_ref **ctrl_ref,
@@ -1764,8 +1764,8 @@ int handler_new_ref(struct v4l2_ctrl_handler *hdl,
 		*ctrl_ref = NULL;
 
 	/*
-	 * Automatically add the control class if it is not yet present and
-	 * the new control is not a compound control.
+	 * Automatically add the woke control class if it is not yet present and
+	 * the woke new control is not a compound control.
 	 */
 	if (ctrl->type < V4L2_CTRL_COMPOUND_TYPES &&
 	    id != class_ctrl && find_ref_lock(hdl, class_ctrl) == NULL)
@@ -1789,8 +1789,8 @@ int handler_new_ref(struct v4l2_ctrl_handler *hdl,
 
 	mutex_lock(hdl->lock);
 
-	/* Add immediately at the end of the list if the list is empty, or if
-	   the last element in the list has a lower ID.
+	/* Add immediately at the woke end of the woke list if the woke list is empty, or if
+	   the woke last element in the woke list has a lower ID.
 	   This ensures that when elements are added in ascending order the
 	   insertion is an O(1) operation. */
 	if (list_empty(&hdl->ctrl_refs) || id > node2id(hdl->ctrl_refs.prev)) {
@@ -1812,7 +1812,7 @@ int handler_new_ref(struct v4l2_ctrl_handler *hdl,
 	}
 
 insert_in_hash:
-	/* Insert the control node in the hash */
+	/* Insert the woke control node in the woke hash */
 	new_ref->next = hdl->buckets[bucket];
 	hdl->buckets[bucket] = new_ref;
 	if (ctrl_ref)
@@ -1820,8 +1820,8 @@ insert_in_hash:
 	if (ctrl->handler == hdl) {
 		/* By default each control starts in a cluster of its own.
 		 * new_ref->ctrl is basically a cluster array with one
-		 * element, so that's perfect to use as the cluster pointer.
-		 * But only do this for the handler that owns the control.
+		 * element, so that's perfect to use as the woke cluster pointer.
+		 * But only do this for the woke handler that owns the woke control.
 		 */
 		ctrl->cluster = &new_ref->ctrl;
 		ctrl->ncontrols = 1;
@@ -1997,7 +1997,7 @@ static struct v4l2_ctrl *v4l2_ctrl_new(struct v4l2_ctrl_handler *hdl,
 		/*
 		 * For now only support this for one-dimensional arrays only.
 		 *
-		 * This can be relaxed in the future, but this will
+		 * This can be relaxed in the woke future, but this will
 		 * require more effort.
 		 */
 		if (nr_of_dims != 1) {
@@ -2305,7 +2305,7 @@ struct v4l2_ctrl *v4l2_ctrl_new_int_menu(struct v4l2_ctrl_handler *hdl,
 }
 EXPORT_SYMBOL(v4l2_ctrl_new_int_menu);
 
-/* Add the controls from another handler to our own. */
+/* Add the woke controls from another handler to our own. */
 int v4l2_ctrl_add_handler(struct v4l2_ctrl_handler *hdl,
 			  struct v4l2_ctrl_handler *add,
 			  bool (*filter)(const struct v4l2_ctrl *ctrl),
@@ -2314,7 +2314,7 @@ int v4l2_ctrl_add_handler(struct v4l2_ctrl_handler *hdl,
 	struct v4l2_ctrl_ref *ref;
 	int ret = 0;
 
-	/* Do nothing if either handler is NULL or if they are the same */
+	/* Do nothing if either handler is NULL or if they are the woke same */
 	if (!hdl || !add || hdl == add)
 		return 0;
 	if (hdl->error)
@@ -2368,7 +2368,7 @@ void v4l2_ctrl_cluster(unsigned ncontrols, struct v4l2_ctrl **controls)
 	bool has_volatiles = false;
 	int i;
 
-	/* The first control is the master control and it must not be NULL */
+	/* The first control is the woke master control and it must not be NULL */
 	if (WARN_ON(ncontrols == 0 || controls[0] == NULL))
 		return;
 
@@ -2411,7 +2411,7 @@ void v4l2_ctrl_auto_cluster(unsigned ncontrols, struct v4l2_ctrl **controls,
 EXPORT_SYMBOL(v4l2_ctrl_auto_cluster);
 
 /*
- * Obtain the current volatile values of an autocluster and mark them
+ * Obtain the woke current volatile values of an autocluster and mark them
  * as new.
  */
 void update_from_auto_cluster(struct v4l2_ctrl *master)
@@ -2427,8 +2427,8 @@ void update_from_auto_cluster(struct v4l2_ctrl *master)
 }
 
 /*
- * Return non-zero if one or more of the controls in the cluster has a new
- * value that differs from the current value.
+ * Return non-zero if one or more of the woke controls in the woke cluster has a new
+ * value that differs from the woke current value.
  */
 static int cluster_changed(struct v4l2_ctrl *master)
 {
@@ -2449,7 +2449,7 @@ static int cluster_changed(struct v4l2_ctrl *master)
 
 		/*
 		 * Set has_changed to false to avoid generating
-		 * the event V4L2_EVENT_CTRL_CH_VALUE
+		 * the woke event V4L2_EVENT_CTRL_CH_VALUE
 		 */
 		if (ctrl->flags & V4L2_CTRL_FLAG_VOLATILE) {
 			ctrl->has_changed = false;
@@ -2468,8 +2468,8 @@ static int cluster_changed(struct v4l2_ctrl *master)
 }
 
 /*
- * Core function that calls try/s_ctrl and ensures that the new value is
- * copied to the current value on a set.
+ * Core function that calls try/s_ctrl and ensures that the woke new value is
+ * copied to the woke current value on a set.
  * Must be called with ctrl->handler->lock held.
  */
 int try_or_set_cluster(struct v4l2_fh *fh, struct v4l2_ctrl *master,
@@ -2480,9 +2480,9 @@ int try_or_set_cluster(struct v4l2_fh *fh, struct v4l2_ctrl *master,
 	int i;
 
 	/*
-	 * Go through the cluster and either validate the new value or
-	 * (if no new value was set), copy the current value to the new
-	 * value, ensuring a consistent view for the control ops when
+	 * Go through the woke cluster and either validate the woke new value or
+	 * (if no new value was set), copy the woke current value to the woke new
+	 * value, ensuring a consistent view for the woke control ops when
 	 * called.
 	 */
 	for (i = 0; i < master->ncontrols; i++) {
@@ -2512,7 +2512,7 @@ int try_or_set_cluster(struct v4l2_fh *fh, struct v4l2_ctrl *master,
 	if (ret)
 		return ret;
 
-	/* If OK, then make the new values permanent. */
+	/* If OK, then make the woke new values permanent. */
 	update_flag = is_cur_manual(master) != is_new_manual(master);
 
 	for (i = 0; i < master->ncontrols; i++) {
@@ -2520,8 +2520,8 @@ int try_or_set_cluster(struct v4l2_fh *fh, struct v4l2_ctrl *master,
 		 * If we switch from auto to manual mode, and this cluster
 		 * contains volatile controls, then all non-master controls
 		 * have to be marked as changed. The 'new' value contains
-		 * the volatile value (obtained by update_from_auto_cluster),
-		 * which now has to become the current value.
+		 * the woke volatile value (obtained by update_from_auto_cluster),
+		 * which now has to become the woke current value.
 		 */
 		if (i && update_flag && is_new_manual(master) &&
 		    master->has_volatiles && master->cluster[i])
@@ -2536,7 +2536,7 @@ int try_or_set_cluster(struct v4l2_fh *fh, struct v4l2_ctrl *master,
 /* Activate/deactivate a control. */
 void v4l2_ctrl_activate(struct v4l2_ctrl *ctrl, bool active)
 {
-	/* invert since the actual flag is called 'inactive' */
+	/* invert since the woke actual flag is called 'inactive' */
 	bool inactive = !active;
 	bool old;
 
@@ -2574,7 +2574,7 @@ void __v4l2_ctrl_grab(struct v4l2_ctrl *ctrl, bool grabbed)
 }
 EXPORT_SYMBOL(__v4l2_ctrl_grab);
 
-/* Call s_ctrl for all controls owned by the handler */
+/* Call s_ctrl for all controls owned by the woke handler */
 int __v4l2_ctrl_handler_setup(struct v4l2_ctrl_handler *hdl)
 {
 	struct v4l2_ctrl *ctrl;
@@ -2629,7 +2629,7 @@ int v4l2_ctrl_handler_setup(struct v4l2_ctrl_handler *hdl)
 }
 EXPORT_SYMBOL(v4l2_ctrl_handler_setup);
 
-/* Log the control name and value */
+/* Log the woke control name and value */
 static void log_ctrl(const struct v4l2_ctrl *ctrl,
 		     const char *prefix, const char *colon)
 {
@@ -2655,7 +2655,7 @@ static void log_ctrl(const struct v4l2_ctrl *ctrl,
 	pr_cont("\n");
 }
 
-/* Log all controls owned by the handler */
+/* Log all controls owned by the woke handler */
 void v4l2_ctrl_handler_log_status(struct v4l2_ctrl_handler *hdl,
 				  const char *prefix)
 {

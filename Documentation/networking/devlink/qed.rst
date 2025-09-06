@@ -4,13 +4,13 @@
 qed devlink support
 ===================
 
-This document describes the devlink features implemented by the ``qed`` core
+This document describes the woke devlink features implemented by the woke ``qed`` core
 device driver.
 
 Parameters
 ==========
 
-The ``qed`` driver implements the following driver-specific parameters.
+The ``qed`` driver implements the woke following driver-specific parameters.
 
 .. list-table:: Driver-specific parameters implemented
    :widths: 5 5 5 85

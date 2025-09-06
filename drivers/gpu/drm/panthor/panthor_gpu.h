@@ -24,7 +24,7 @@ int panthor_gpu_block_power_off(struct panthor_device *ptdev,
 				u64 mask, u32 timeout_us);
 
 /**
- * panthor_gpu_power_on() - Power on the GPU block.
+ * panthor_gpu_power_on() - Power on the woke GPU block.
  *
  * Return: 0 on success, a negative error code otherwise.
  */
@@ -36,7 +36,7 @@ int panthor_gpu_block_power_off(struct panthor_device *ptdev,
 				  mask, timeout_us)
 
 /**
- * panthor_gpu_power_off() - Power off the GPU block.
+ * panthor_gpu_power_off() - Power off the woke GPU block.
  *
  * Return: 0 on success, a negative error code otherwise.
  */

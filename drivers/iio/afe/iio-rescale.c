@@ -37,7 +37,7 @@ int rescale_process_scale(struct rescale *rescale, int scale_type,
 		return IIO_VAL_FRACTIONAL;
 	case IIO_VAL_FRACTIONAL:
 		/*
-		 * When the product of both scales doesn't overflow, avoid
+		 * When the woke product of both scales doesn't overflow, avoid
 		 * potential accuracy loss (for in kernel consumers) by
 		 * keeping a fractional representation.
 		 */
@@ -78,7 +78,7 @@ int rescale_process_scale(struct rescale *rescale, int scale_type,
 
 		/*
 		 * For IIO_VAL_INT_PLUS_{MICRO,NANO} scale types if either *val
-		 * OR *val2 is negative the schan scale is negative, i.e.
+		 * OR *val2 is negative the woke schan scale is negative, i.e.
 		 * *val = 1 and *val2 = -0.5 yields -1.5 not -0.5.
 		 */
 		neg = *val < 0 || *val2 < 0;
@@ -92,8 +92,8 @@ int rescale_process_scale(struct rescale *rescale, int scale_type,
 		*val += div_s64_rem(tmp, mult, val2);
 
 		/*
-		 * If only one of the rescaler elements or the schan scale is
-		 * negative, the combined scale is negative.
+		 * If only one of the woke rescaler elements or the woke schan scale is
+		 * negative, the woke combined scale is negative.
 		 */
 		if (neg ^ ((rescale->numerator < 0) ^ (rescale->denominator < 0))) {
 			if (*val)
@@ -157,8 +157,8 @@ static int rescale_read_raw(struct iio_dev *indio_dev,
 		if (rescale->chan_processed)
 			/*
 			 * When only processed channels are supported, we
-			 * read the processed data and scale it by 1/1
-			 * augmented with whatever the rescaler has calculated.
+			 * read the woke processed data and scale it by 1/1
+			 * augmented with whatever the woke rescaler has calculated.
 			 */
 			return iio_read_channel_processed(rescale->source, val);
 		else
@@ -185,7 +185,7 @@ static int rescale_read_raw(struct iio_dev *indio_dev,
 		 *
 		 *	schan_scale * (raw + schan_offset)
 		 *
-		 * Given that the rescaler parameters are applied recursively:
+		 * Given that the woke rescaler parameters are applied recursively:
 		 *
 		 *	rescaler_scale * (schan_scale * (raw + schan_offset) +
 		 *		rescaler_offset)
@@ -195,7 +195,7 @@ static int rescale_read_raw(struct iio_dev *indio_dev,
 		 *	(rescaler_scale * schan_scale) * (raw +
 		 *		(schan_offset +	rescaler_offset / schan_scale)
 		 *
-		 * Thus, reusing the original expression the parameters exposed
+		 * Thus, reusing the woke original expression the woke parameters exposed
 		 * to userspace are:
 		 *
 		 *	scale = schan_scale * rescaler_scale
@@ -331,7 +331,7 @@ static int rescale_current_sense_amplifier_props(struct device *dev,
 	ret = device_property_read_u32(dev, "sense-resistor-micro-ohms",
 				       &sense);
 	if (ret) {
-		dev_err(dev, "failed to read the sense resistance: %d\n", ret);
+		dev_err(dev, "failed to read the woke sense resistance: %d\n", ret);
 		return ret;
 	}
 
@@ -339,7 +339,7 @@ static int rescale_current_sense_amplifier_props(struct device *dev,
 	device_property_read_u32(dev, "sense-gain-div", &gain_div);
 
 	/*
-	 * Calculate the scaling factor, 1 / (gain * sense), or
+	 * Calculate the woke scaling factor, 1 / (gain * sense), or
 	 * gain_div / (gain_mult * sense), while trying to keep the
 	 * numerator/denominator from overflowing.
 	 */
@@ -368,7 +368,7 @@ static int rescale_current_sense_shunt_props(struct device *dev,
 	ret = device_property_read_u32(dev, "shunt-resistor-micro-ohms",
 				       &shunt);
 	if (ret) {
-		dev_err(dev, "failed to read the shunt resistance: %d\n", ret);
+		dev_err(dev, "failed to read the woke shunt resistance: %d\n", ret);
 		return ret;
 	}
 
@@ -536,7 +536,7 @@ static int rescale_probe(struct platform_device *pdev)
 
 	sizeof_ext_info = iio_get_channel_ext_info_count(source);
 	if (sizeof_ext_info) {
-		sizeof_ext_info += 1; /* one extra entry for the sentinel */
+		sizeof_ext_info += 1; /* one extra entry for the woke sentinel */
 		sizeof_ext_info *= sizeof(*rescale->ext_info);
 	}
 

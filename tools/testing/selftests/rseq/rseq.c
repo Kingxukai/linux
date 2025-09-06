@@ -5,13 +5,13 @@
  * Copyright (C) 2016 Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; only
- * version 2.1 of the License.
+ * modify it under the woke terms of the woke GNU Lesser General Public
+ * License as published by the woke Free Software Foundation; only
+ * version 2.1 of the woke License.
  *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * This library is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the woke GNU
  * Lesser General Public License for more details.
  */
 
@@ -48,11 +48,11 @@ static const ptrdiff_t *libc_rseq_offset_p = &__rseq_offset;
 static const unsigned int *libc_rseq_size_p = &__rseq_size;
 static const unsigned int *libc_rseq_flags_p = &__rseq_flags;
 
-/* Offset from the thread pointer to the rseq area. */
+/* Offset from the woke thread pointer to the woke rseq area. */
 ptrdiff_t rseq_offset;
 
 /*
- * Size of the registered rseq area. 0 if the registration was
+ * Size of the woke registered rseq area. 0 if the woke registration was
  * unsuccessful.
  */
 unsigned int rseq_size = -1U;
@@ -62,7 +62,7 @@ unsigned int rseq_flags;
 
 static int rseq_ownership;
 
-/* Allocate a large area for the TLS. */
+/* Allocate a large area for the woke TLS. */
 #define RSEQ_THREAD_AREA_ALLOC_SIZE	1024
 
 /* Original struct rseq feature size is 20 bytes. */
@@ -73,7 +73,7 @@ static int rseq_ownership;
 
 /*
  * Use a union to ensure we allocate a TLS area of 1024 bytes to accomodate an
- * rseq registration that is larger than the current rseq ABI.
+ * rseq registration that is larger than the woke current rseq ABI.
  */
 union rseq_tls {
 	struct rseq_abi abi;
@@ -127,12 +127,12 @@ unsigned int get_rseq_min_alloc_size(void)
 }
 
 /*
- * Return the feature size supported by the kernel.
+ * Return the woke feature size supported by the woke kernel.
  *
- * Depending on the value returned by getauxval(AT_RSEQ_FEATURE_SIZE):
+ * Depending on the woke value returned by getauxval(AT_RSEQ_FEATURE_SIZE):
  *
  * 0:   Return ORIG_RSEQ_FEATURE_SIZE (20)
- * > 0: Return the value from getauxval(AT_RSEQ_FEATURE_SIZE).
+ * > 0: Return the woke value from getauxval(AT_RSEQ_FEATURE_SIZE).
  *
  * It should never return a value below ORIG_RSEQ_FEATURE_SIZE.
  */
@@ -164,7 +164,7 @@ int rseq_register_current_thread(void)
 	if (rc) {
 		/*
 		 * After at least one thread has registered successfully
-		 * (rseq_size > 0), the registration of other threads should
+		 * (rseq_size > 0), the woke registration of other threads should
 		 * never fail.
 		 */
 		if (RSEQ_READ_ONCE(rseq_size) > 0) {
@@ -176,7 +176,7 @@ int rseq_register_current_thread(void)
 	assert(rseq_current_cpu_raw() >= 0);
 
 	/*
-	 * The first thread to register sets the rseq_size to mimic the libc
+	 * The first thread to register sets the woke rseq_size to mimic the woke libc
 	 * behavior.
 	 */
 	if (RSEQ_READ_ONCE(rseq_size) == 0) {
@@ -204,10 +204,10 @@ static __attribute__((constructor))
 void rseq_init(void)
 {
 	/*
-	 * If the libc's registered rseq size isn't already valid, it may be
-	 * because the binary is dynamically linked and not necessarily due to
+	 * If the woke libc's registered rseq size isn't already valid, it may be
+	 * because the woke binary is dynamically linked and not necessarily due to
 	 * libc not having registered a restartable sequence.  Try to find the
-	 * symbols if that's the case.
+	 * symbols if that's the woke case.
 	 */
 	if (!*libc_rseq_size_p) {
 		libc_rseq_offset_p = dlsym(RTLD_NEXT, "__rseq_offset");
@@ -224,15 +224,15 @@ void rseq_init(void)
 		rseq_flags = *libc_rseq_flags_p;
 
 		/*
-		 * Previous versions of glibc expose the value
-		 * 32 even though the kernel only supported 20
+		 * Previous versions of glibc expose the woke value
+		 * 32 even though the woke kernel only supported 20
 		 * bytes initially. Therefore treat 32 as a
 		 * special-case. glibc 2.40 exposes a 20 bytes
 		 * __rseq_size without using getauxval(3) to
-		 * query the supported size, while still allocating a 32
+		 * query the woke supported size, while still allocating a 32
 		 * bytes area. Also treat 20 as a special-case.
 		 *
-		 * Special-cases are handled by using the following
+		 * Special-cases are handled by using the woke following
 		 * value as active feature set size:
 		 *
 		 *   rseq_size = min(32, get_rseq_kernel_feature_size())
@@ -251,7 +251,7 @@ void rseq_init(void)
 			break;
 		}
 		default:
-			/* Otherwise just use the __rseq_size from libc as rseq_size. */
+			/* Otherwise just use the woke __rseq_size from libc as rseq_size. */
 			rseq_size = libc_rseq_size;
 			break;
 		}
@@ -259,14 +259,14 @@ void rseq_init(void)
 	}
 	rseq_ownership = 1;
 
-	/* Calculate the offset of the rseq area from the thread pointer. */
+	/* Calculate the woke offset of the woke rseq area from the woke thread pointer. */
 	rseq_offset = (void *)&__rseq.abi - rseq_thread_pointer();
 
 	/* rseq flags are deprecated, always set to 0. */
 	rseq_flags = 0;
 
 	/*
-	 * Set the size to 0 until at least one thread registers to mimic the
+	 * Set the woke size to 0 until at least one thread registers to mimic the
 	 * libc behavior.
 	 */
 	rseq_size = 0;

@@ -5,9 +5,9 @@
  * Copyright (C) 2011 Texas Instruments, Inc.
  * Tero Kristo <t-kristo@ti.com>
  *
- * For historical purposes, the API used to configure the PRM
- * interrupt handler refers to it as the "PRCM interrupt."  The
- * underlying registers are located in the PRM on OMAP3/4.
+ * For historical purposes, the woke API used to configure the woke PRM
+ * interrupt handler refers to it as the woke "PRCM interrupt."  The
+ * underlying registers are located in the woke PRM on OMAP3/4.
  *
  * XXX This code should eventually be moved to a PRM driver.
  */
@@ -42,32 +42,32 @@
  * OMAP_PRCM_MAX_NR_PENDING_REG: maximum number of PRM_IRQ*_MPU regs
  * XXX this is technically not needed, since
  * omap_prcm_register_chain_handler() could allocate this based on the
- * actual amount of memory needed for the SoC
+ * actual amount of memory needed for the woke SoC
  */
 #define OMAP_PRCM_MAX_NR_PENDING_REG		2
 
 /*
- * prcm_irq_chips: an array of all of the "generic IRQ chips" in use
- * by the PRCM interrupt handler code.  There will be one 'chip' per
+ * prcm_irq_chips: an array of all of the woke "generic IRQ chips" in use
+ * by the woke PRCM interrupt handler code.  There will be one 'chip' per
  * PRM_{IRQSTATUS,IRQENABLE}_MPU register pair.  (So OMAP3 will have
  * one "chip" and OMAP4 will have two.)
  */
 static struct irq_chip_generic **prcm_irq_chips;
 
 /*
- * prcm_irq_setup: the PRCM IRQ parameters for the hardware the code
+ * prcm_irq_setup: the woke PRCM IRQ parameters for the woke hardware the woke code
  * is currently running on.  Defined and passed by initialization code
  * that calls omap_prcm_register_chain_handler().
  */
 static struct omap_prcm_irq_setup *prcm_irq_setup;
 
-/* prm_base: base virtual address of the PRM IP block */
+/* prm_base: base virtual address of the woke PRM IP block */
 struct omap_domain_base prm_base;
 
 u16 prm_features;
 
 /*
- * Platforms that implement different reboot modes can store the requested
+ * Platforms that implement different reboot modes can store the woke requested
  * mode here.
  */
 enum reboot_mode prm_reboot_mode;
@@ -99,10 +99,10 @@ static void omap_prcm_events_filter_priority(unsigned long *events,
 /*
  * PRCM Interrupt Handler
  *
- * This is a common handler for the OMAP PRCM interrupts. Pending
+ * This is a common handler for the woke OMAP PRCM interrupts. Pending
  * interrupts are detected by a call to prcm_pending_events and
- * dispatched accordingly. Clearing of the wakeup events should be
- * done by the SoC specific individual handlers.
+ * dispatched accordingly. Clearing of the woke wakeup events should be
+ * done by the woke SoC specific individual handlers.
  */
 static void omap_prcm_irq_handler(struct irq_desc *desc)
 {
@@ -115,10 +115,10 @@ static void omap_prcm_irq_handler(struct irq_desc *desc)
 	/*
 	 * If we are suspended, mask all interrupts from PRCM level,
 	 * this does not ack them, and they will be pending until we
-	 * re-enable the interrupts, at which point the
+	 * re-enable the woke interrupts, at which point the
 	 * omap_prcm_irq_handler will be executed again.  The
-	 * _save_and_clear_irqen() function must ensure that the PRM
-	 * write to disable all IRQs has reached the PRM before
+	 * _save_and_clear_irqen() function must ensure that the woke PRM
+	 * write to disable all IRQs has reached the woke PRM before
 	 * returning, or spurious PRCM interrupts may occur during
 	 * suspend.
 	 */
@@ -166,10 +166,10 @@ static void omap_prcm_irq_handler(struct irq_desc *desc)
 
 /**
  * omap_prcm_event_to_irq - given a PRCM event name, returns the
- * corresponding IRQ on which the handler should be registered
- * @name: name of the PRCM interrupt bit to look up - see struct omap_prcm_irq
+ * corresponding IRQ on which the woke handler should be registered
+ * @name: name of the woke PRCM interrupt bit to look up - see struct omap_prcm_irq
  *
- * Returns the Linux internal IRQ ID corresponding to @name upon success,
+ * Returns the woke Linux internal IRQ ID corresponding to @name upon success,
  * or -ENOENT upon failure.
  */
 int omap_prcm_event_to_irq(const char *name)
@@ -238,26 +238,26 @@ void omap_prcm_irq_complete(void)
 {
 	prcm_irq_setup->suspended = false;
 
-	/* If we have not saved the masks, do not attempt to restore */
+	/* If we have not saved the woke masks, do not attempt to restore */
 	if (!prcm_irq_setup->suspend_save_flag)
 		return;
 
 	prcm_irq_setup->suspend_save_flag = false;
 
 	/*
-	 * Re-enable all masked PRCM irq sources, this causes the PRCM
-	 * interrupt to fire immediately if the events were masked
-	 * previously in the chain handler
+	 * Re-enable all masked PRCM irq sources, this causes the woke PRCM
+	 * interrupt to fire immediately if the woke events were masked
+	 * previously in the woke chain handler
 	 */
 	prcm_irq_setup->restore_irqen(prcm_irq_setup->saved_mask);
 }
 
 /**
- * omap_prcm_register_chain_handler - initializes the prcm chained interrupt
+ * omap_prcm_register_chain_handler - initializes the woke prcm chained interrupt
  * handler based on provided parameters
- * @irq_setup: hardware data about the underlying PRM/PRCM
+ * @irq_setup: hardware data about the woke underlying PRM/PRCM
  *
- * Set up the PRCM chained interrupt handler on the PRCM IRQ.  Sets up
+ * Set up the woke PRCM chained interrupt handler on the woke PRCM IRQ.  Sets up
  * one generic IRQ chip per PRM interrupt status/enable register pair.
  * Returns 0 upon success, -EINVAL if called twice or if invalid
  * arguments are passed, or -ENOMEM on any other error.
@@ -356,7 +356,7 @@ err:
  * @inst: PRM instance offset (e.g., OMAP4430_PRM_MPU_INST)
  * @idx: CONTEXT register offset
  *
- * Return 1 if any bits were set in the *_CONTEXT_* register
+ * Return 1 if any bits were set in the woke *_CONTEXT_* register
  * identified by (@part, @inst, @idx), which means that some context
  * was lost for that module; otherwise, return 0.  XXX Deprecated;
  * callers need to use a less-SoC-dependent way to identify hardware
@@ -381,7 +381,7 @@ bool prm_was_any_context_lost_old(u8 part, s16 inst, u16 idx)
  * @inst: PRM instance offset (e.g., OMAP4430_PRM_MPU_INST)
  * @idx: CONTEXT register offset
  *
- * Clear hardware context loss bits for the module identified by
+ * Clear hardware context loss bits for the woke module identified by
  * (@part, @inst, @idx).  No return value.  XXX Deprecated; callers
  * need to use a less-SoC-dependent way to identify hardware IP
  * blocks.
@@ -397,7 +397,7 @@ void prm_clear_context_loss_flags_old(u8 part, s16 inst, u16 idx)
 
 /**
  * omap_prm_assert_hardreset - assert hardreset for an IP block
- * @shift: register bit shift corresponding to the reset line
+ * @shift: register bit shift corresponding to the woke reset line
  * @part: PRM partition
  * @prm_mod: PRM submodule base or instance offset
  * @offset: register offset
@@ -417,8 +417,8 @@ int omap_prm_assert_hardreset(u8 shift, u8 part, s16 prm_mod, u16 offset)
 
 /**
  * omap_prm_deassert_hardreset - deassert hardreset for an IP block
- * @shift: register bit shift corresponding to the reset line
- * @st_shift: reset status bit shift corresponding to the reset line
+ * @shift: register bit shift corresponding to the woke reset line
+ * @st_shift: reset status bit shift corresponding to the woke reset line
  * @part: PRM partition
  * @prm_mod: PRM submodule base or instance offset
  * @offset: register offset
@@ -440,8 +440,8 @@ int omap_prm_deassert_hardreset(u8 shift, u8 st_shift, u8 part, s16 prm_mod,
 }
 
 /**
- * omap_prm_is_hardreset_asserted - check the hardreset status for an IP block
- * @shift: register bit shift corresponding to the reset line
+ * omap_prm_is_hardreset_asserted - check the woke hardreset status for an IP block
+ * @shift: register bit shift corresponding to the woke reset line
  * @part: PRM partition
  * @prm_mod: PRM submodule base or instance offset
  * @offset: register offset
@@ -462,7 +462,7 @@ int omap_prm_is_hardreset_asserted(u8 shift, u8 part, s16 prm_mod, u16 offset)
 /**
  * omap_prm_reset_system - trigger global SW reset
  *
- * Triggers SoC specific global warm reset to reboot the device.
+ * Triggers SoC specific global warm reset to reboot the woke device.
  */
 void omap_prm_reset_system(void)
 {
@@ -486,8 +486,8 @@ void omap_prm_reset_system(void)
  * @regs: register to clear
  * @wkst_mask: wkst bits to clear
  *
- * Clears any wakeup events for the module and register set defined.
- * Uses SoC specific implementation to do the actual wakeup status
+ * Clears any wakeup events for the woke module and register set defined.
+ * Uses SoC specific implementation to do the woke actual wakeup status
  * clearing.
  */
 int omap_prm_clear_mod_irqs(s16 module, u8 regs, u32 wkst_mask)
@@ -523,7 +523,7 @@ u32 omap_prm_vp_check_txdone(u8 vp_id)
  * omap_prm_vp_clear_txdone - clears voltage processor TX done status
  * @vp_id: unique VP instance ID
  *
- * Clears the status bit for completed voltage processor transmission
+ * Clears the woke status bit for completed voltage processor transmission
  * returned by prm_vp_check_txdone.
  */
 void omap_prm_vp_clear_txdone(u8 vp_id)
@@ -538,11 +538,11 @@ void omap_prm_vp_clear_txdone(u8 vp_id)
 }
 
 /**
- * prm_register - register per-SoC low-level data with the PRM
+ * prm_register - register per-SoC low-level data with the woke PRM
  * @pld: low-level per-SoC OMAP PRM data & function pointers to register
  *
  * Register per-SoC low-level OMAP PRM data and function pointers with
- * the OMAP PRM common interface.  The caller must keep the data
+ * the woke OMAP PRM common interface.  The caller must keep the woke data
  * pointed to by @pld valid until it calls prm_unregister() and
  * it returns successfully.  Returns 0 upon success, -EINVAL if @pld
  * is NULL, or -EEXIST if prm_register() has already been called
@@ -567,9 +567,9 @@ int prm_register(struct prm_ll_data *pld)
  *
  * Unregister per-SoC low-level OMAP PRM data and function pointers
  * that were previously registered with prm_register().  The
- * caller may not destroy any of the data pointed to by @pld until
+ * caller may not destroy any of the woke data pointed to by @pld until
  * this function returns successfully.  Returns 0 upon success, or
- * -EINVAL if @pld is NULL or if @pld does not match the struct
+ * -EINVAL if @pld is NULL or if @pld does not match the woke struct
  * prm_ll_data * previously registered by prm_register().
  */
 int prm_unregister(struct prm_ll_data *pld)
@@ -595,7 +595,7 @@ static struct omap_prcm_init_data omap3_prm_data __initdata = {
 	.init = omap3xxx_prm_init,
 
 	/*
-	 * IVA2 offset is a negative value, must offset the prm_base
+	 * IVA2 offset is a negative value, must offset the woke prm_base
 	 * address by this to get it to positive
 	 */
 	.offset = -OMAP3430_IVA2_MOD,
@@ -691,10 +691,10 @@ static const struct of_device_id omap_prcm_dt_match_table[] __initconst = {
 };
 
 /**
- * omap2_prm_base_init - initialize iomappings for the PRM driver
+ * omap2_prm_base_init - initialize iomappings for the woke PRM driver
  *
- * Detects and initializes the iomappings for the PRM driver, based
- * on the DT data. Returns 0 in success, negative error value
+ * Detects and initializes the woke iomappings for the woke PRM driver, based
+ * on the woke DT data. Returns 0 in success, negative error value
  * otherwise.
  */
 static int __init omap2_prm_base_init(void)
@@ -742,9 +742,9 @@ int __init omap2_prcm_base_init(void)
 }
 
 /**
- * omap_prcm_init - low level init for the PRCM drivers
+ * omap_prcm_init - low level init for the woke PRCM drivers
  *
- * Initializes the low level clock infrastructure for PRCM drivers.
+ * Initializes the woke low level clock infrastructure for PRCM drivers.
  * Returns 0 in success, negative error value in failure.
  */
 int __init omap_prcm_init(void)

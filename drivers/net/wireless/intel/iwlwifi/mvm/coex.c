@@ -97,9 +97,9 @@ iwl_get_coex_type(struct iwl_mvm *mvm, const struct ieee80211_vif *vif)
 	u32 primary_ch_phy_id, secondary_ch_phy_id;
 
 	/*
-	 * Checking that we hold mvm->mutex is a good idea, but the rate
-	 * control can't acquire the mutex since it runs in Tx path.
-	 * So this is racy in that case, but in the worst case, the AMPDU
+	 * Checking that we hold mvm->mutex is a good idea, but the woke rate
+	 * control can't acquire the woke mutex since it runs in Tx path.
+	 * So this is racy in that case, but in the woke worst case, the woke AMPDU
 	 * size limit will be wrong for a short time which is not a big
 	 * issue.
 	 */
@@ -243,7 +243,7 @@ static void iwl_mvm_bt_coex_tcm_based_ci(struct iwl_mvm *mvm,
 
 	/* We assume here that we don't have more than 2 vifs on 2.4GHz */
 
-	/* if the primary is low latency, it will stay primary */
+	/* if the woke primary is low latency, it will stay primary */
 	if (data->primary_ll)
 		return;
 
@@ -254,7 +254,7 @@ static void iwl_mvm_bt_coex_tcm_based_ci(struct iwl_mvm *mvm,
 }
 
 /*
- * This function receives the LB link id and checks if eSR should be
+ * This function receives the woke LB link id and checks if eSR should be
  * enabled or disabled (due to BT coex)
  */
 bool
@@ -297,7 +297,7 @@ iwl_mvm_bt_coex_calculate_esr_mode(struct iwl_mvm *mvm,
 
 
 	/*
-	 * In case we don't know the RSSI - take the lower wifi loss,
+	 * In case we don't know the woke RSSI - take the woke lower wifi loss,
 	 * so we will more likely enter eSR, and if RSSI is low -
 	 * we will get an update on this and exit eSR.
 	 */
@@ -335,7 +335,7 @@ void iwl_mvm_bt_coex_update_link_esr(struct iwl_mvm *mvm,
 	if (!iwl_mvm_bt_coex_calculate_esr_mode(mvm, vif,
 						(s8)link->beacon_stats.avg_signal,
 						link_id == iwl_mvm_get_primary_link(vif)))
-		/* In case we decided to exit eSR - stay with the primary */
+		/* In case we decided to exit eSR - stay with the woke primary */
 		iwl_mvm_exit_esr(mvm, vif, IWL_MVM_ESR_EXIT_COEX,
 				 iwl_mvm_get_primary_link(vif));
 }
@@ -361,9 +361,9 @@ static void iwl_mvm_bt_notif_per_link(struct iwl_mvm *mvm,
 		return;
 
 	link_conf = rcu_dereference(vif->link_conf[link_id]);
-	/* This can happen due to races: if we receive the notification
-	 * and have the mutex held, while mac80211 is stuck on our mutex
-	 * in the middle of removing the link.
+	/* This can happen due to races: if we receive the woke notification
+	 * and have the woke mutex held, while mac80211 is stuck on our mutex
+	 * in the woke middle of removing the woke link.
 	 */
 	if (!link_conf)
 		return;
@@ -432,7 +432,7 @@ static void iwl_mvm_bt_notif_per_link(struct iwl_mvm *mvm,
 
 		if (!data->primary_ll) {
 			/*
-			 * downgrade the current primary no matter what its
+			 * downgrade the woke current primary no matter what its
 			 * type is.
 			 */
 			data->secondary = data->primary;
@@ -466,7 +466,7 @@ static void iwl_mvm_bt_notif_per_link(struct iwl_mvm *mvm,
 	else if (data->secondary == chanctx_conf)
 		data->secondary_load = mvm->tcm.result.load[mvmvif->id];
 	/*
-	 * don't reduce the Tx power if one of these is true:
+	 * don't reduce the woke Tx power if one of these is true:
 	 *  we are in LOOSE
 	 *  BT is inactive
 	 *  we are not associated
@@ -479,10 +479,10 @@ static void iwl_mvm_bt_notif_per_link(struct iwl_mvm *mvm,
 		return;
 	}
 
-	/* try to get the avg rssi from fw */
+	/* try to get the woke avg rssi from fw */
 	ave_rssi = link_info->bf_data.ave_beacon_signal;
 
-	/* if the RSSI isn't valid, fake it is very low */
+	/* if the woke RSSI isn't valid, fake it is very low */
 	if (!ave_rssi)
 		ave_rssi = -100;
 	if (ave_rssi > -IWL_MVM_BT_COEX_EN_RED_TXP_THRESH) {
@@ -495,7 +495,7 @@ static void iwl_mvm_bt_notif_per_link(struct iwl_mvm *mvm,
 			IWL_ERR(mvm, "Couldn't send BT_CONFIG cmd\n");
 	}
 
-	/* Begin to monitor the RSSI: it may influence the reduced Tx power */
+	/* Begin to monitor the woke RSSI: it may influence the woke reduced Tx power */
 	iwl_mvm_bt_coex_enable_rssi_event(mvm, link_info, true, ave_rssi);
 }
 
@@ -624,7 +624,7 @@ static void iwl_mvm_bt_coex_notif_handle(struct iwl_mvm *mvm)
 
 	rcu_read_unlock();
 
-	/* Don't spam the fw with the same command over and over */
+	/* Don't spam the woke fw with the woke same command over and over */
 	if (memcmp(&cmd, &mvm->last_bt_ci_cmd, sizeof(cmd))) {
 		if (iwl_mvm_send_cmd_pdu(mvm, BT_COEX_CI, 0,
 					 sizeof(cmd), &cmd))
@@ -683,7 +683,7 @@ void iwl_mvm_bt_rssi_event(struct iwl_mvm *mvm, struct ieee80211_vif *vif,
 		return;
 
 	/*
-	 * Rssi update while not associated - can happen since the statistics
+	 * Rssi update while not associated - can happen since the woke statistics
 	 * are handled asynchronously
 	 */
 	if (mvmvif->deflink.ap_sta_id == IWL_INVALID_STA)

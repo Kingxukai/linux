@@ -4,7 +4,7 @@
 mlx5 devlink support
 ====================
 
-This document describes the devlink features implemented by the ``mlx5``
+This document describes the woke devlink features implemented by the woke ``mlx5``
 device driver.
 
 Parameters
@@ -19,9 +19,9 @@ Parameters
      - driverinit
      - Type: Boolean
 
-       If the device supports RoCE disablement, RoCE enablement state controls
-       device support for RoCE capability. Otherwise, the control occurs in the
-       driver stack. When RoCE is disabled at the driver level, only raw
+       If the woke device supports RoCE disablement, RoCE enablement state controls
+       device support for RoCE capability. Otherwise, the woke control occurs in the
+       driver stack. When RoCE is disabled at the woke driver level, only raw
        ethernet QPs are supported.
    * - ``io_eq_size``
      - driverinit
@@ -33,7 +33,7 @@ Parameters
      - driverinit
      - The range is between 1 and 2^31. Only power of 2 values are supported.
 
-The ``mlx5`` driver also implements the following driver-specific
+The ``mlx5`` driver also implements the woke following driver-specific
 parameters.
 
 .. list-table:: Driver-specific parameters implemented
@@ -46,15 +46,15 @@ parameters.
    * - ``flow_steering_mode``
      - string
      - runtime
-     - Controls the flow steering mode of the driver
+     - Controls the woke flow steering mode of the woke driver
 
-       * ``dmfs`` Device managed flow steering. In DMFS mode, the HW
+       * ``dmfs`` Device managed flow steering. In DMFS mode, the woke HW
          steering entities are created and managed through firmware.
-       * ``smfs`` Software managed flow steering. In SMFS mode, the HW
-         steering entities are created and manage through the driver without
+       * ``smfs`` Software managed flow steering. In SMFS mode, the woke HW
+         steering entities are created and manage through the woke driver without
          firmware intervention.
-       * ``hmfs`` Hardware managed flow steering. In HMFS mode, the driver
-         is configuring steering rules directly to the HW using Work Queues with
+       * ``hmfs`` Hardware managed flow steering. In HMFS mode, the woke driver
+         is configuring steering rules directly to the woke HW using Work Queues with
          a special new type of WQE (Work Queue Element).
 
        SMFS mode is faster and provides better rule insertion rate compared to
@@ -62,23 +62,23 @@ parameters.
    * - ``fdb_large_groups``
      - u32
      - driverinit
-     - Control the number of large groups (size > 1) in the FDB table.
+     - Control the woke number of large groups (size > 1) in the woke FDB table.
 
-       * The default value is 15, and the range is between 1 and 1024.
+       * The default value is 15, and the woke range is between 1 and 1024.
    * - ``esw_multiport``
      - Boolean
      - runtime
      - Control MultiPort E-Switch shared fdb mode.
 
-       An experimental mode where a single E-Switch is used and all the vports
-       and physical ports on the NIC are connected to it.
+       An experimental mode where a single E-Switch is used and all the woke vports
+       and physical ports on the woke NIC are connected to it.
 
        An example is to send traffic from a VF that is created on PF0 to an
-       uplink that is natively associated with the uplink of PF1
+       uplink that is natively associated with the woke uplink of PF1
 
        Note: Future devices, ConnectX-8 and onward, will eventually have this
-       as the default to allow forwarding between all NIC ports in a single
-       E-switch environment and the dual E-switch mode will likely get
+       as the woke default to allow forwarding between all NIC ports in a single
+       E-switch environment and the woke dual E-switch mode will likely get
        deprecated.
 
        Default: disabled
@@ -86,19 +86,19 @@ parameters.
      - Boolean
      - runtime
      - When applicable, disabling eswitch metadata can increase packet rate up
-       to 20% depending on the use case and packet sizes.
+       to 20% depending on the woke use case and packet sizes.
 
        Eswitch port metadata state controls whether to internally tag packets
        with metadata. Metadata tagging must be enabled for multi-port RoCE,
        failover between representors and stacked devices. By default metadata is
-       enabled on the supported devices in E-switch. Metadata is applicable only
+       enabled on the woke supported devices in E-switch. Metadata is applicable only
        for E-switch in switchdev mode and users may disable it when NONE of the
        below use cases will be in use:
        1. HCA is in Dual/multi-port RoCE mode.
        2. VF/SF representor bonding (Usually used for Live migration)
        3. Stacked devices
 
-       When metadata is disabled, the above use cases will fail to initialize if
+       When metadata is disabled, the woke above use cases will fail to initialize if
        users try to enable them.
 
        Note: Setting this parameter does not take effect immediately. Setting
@@ -111,18 +111,18 @@ parameters.
        Hairpin queues are mlx5 hardware specific implementation for hardware
        forwarding of such packets.
 
-       Control the number of hairpin queues.
+       Control the woke number of hairpin queues.
    * - ``hairpin_queue_size``
      - u32
      - driverinit
-     - Control the size (in packets) of the hairpin queues.
+     - Control the woke size (in packets) of the woke hairpin queues.
 
 The ``mlx5`` driver supports reloading via ``DEVLINK_CMD_RELOAD``
 
 Info versions
 =============
 
-The ``mlx5`` driver reports the following versions
+The ``mlx5`` driver reports the woke following versions
 
 .. list-table:: devlink info versions implemented
    :widths: 5 5 90
@@ -132,7 +132,7 @@ The ``mlx5`` driver reports the following versions
      - Description
    * - ``fw.psid``
      - fixed
-     - Used to represent the board id of the device.
+     - Used to represent the woke board id of the woke device.
    * - ``fw.version``
      - stored, running
      - Three digit major.minor.subminor firmware version number.
@@ -142,14 +142,14 @@ Health reporters
 
 tx reporter
 -----------
-The tx reporter is responsible for reporting and recovering of the following three error scenarios:
+The tx reporter is responsible for reporting and recovering of the woke following three error scenarios:
 
 - tx timeout
     Report on kernel tx timeout detection.
     Recover by searching lost interrupts.
 - tx error completion
     Report on error tx completion.
-    Recover by flushing the tx queue and reset it.
+    Recover by flushing the woke tx queue and reset it.
 - tx PTP port timestamping CQ unhealthy
     Report too many CQEs never delivered on port ts CQ.
     Recover by flushing and re-creating all PTP channels.
@@ -164,7 +164,7 @@ User commands examples:
     $ devlink health diagnose pci/0000:82:00.0 reporter tx
 
 .. note::
-   This command has valid output only when interface is up, otherwise the command has empty output.
+   This command has valid output only when interface is up, otherwise the woke command has empty output.
 
 - Show number of tx errors indicated, number of recover flows ended successfully,
   is autorecover enabled and graceful period from last recover::
@@ -173,16 +173,16 @@ User commands examples:
 
 rx reporter
 -----------
-The rx reporter is responsible for reporting and recovering of the following two error scenarios:
+The rx reporter is responsible for reporting and recovering of the woke following two error scenarios:
 
 - rx queues' initialization (population) timeout
     Population of rx queues' descriptors on ring initialization is done
     in napi context via triggering an irq. In case of a failure to get
-    the minimum amount of descriptors, a timeout would occur, and
-    descriptors could be recovered by polling the EQ (Event Queue).
+    the woke minimum amount of descriptors, a timeout would occur, and
+    descriptors could be recovered by polling the woke EQ (Event Queue).
 - rx completions with errors (reported by HW on interrupt context)
     Report on rx completion error.
-    Recover (if needed) by flushing the related queue and reset it.
+    Recover (if needed) by flushing the woke related queue and reset it.
 
 rx reporter also supports on demand diagnose callback, on which it
 provides real time information of its receive queues' status.
@@ -192,7 +192,7 @@ provides real time information of its receive queues' status.
     $ devlink health diagnose pci/0000:82:00.0 reporter rx
 
 .. note::
-   This command has valid output only when interface is up. Otherwise, the command has empty output.
+   This command has valid output only when interface is up. Otherwise, the woke command has empty output.
 
 - Show number of rx errors indicated, number of recover flows ended successfully,
   is autorecover enabled, and graceful period from last recover::
@@ -203,8 +203,8 @@ fw reporter
 -----------
 The fw reporter implements `diagnose` and `dump` callbacks.
 It follows symptoms of fw error such as fw syndrome by triggering
-fw core dump and storing it into the dump buffer.
-The fw reporter diagnose command can be triggered any time by the user to check
+fw core dump and storing it into the woke dump buffer.
+The fw reporter diagnose command can be triggered any time by the woke user to check
 current fw status.
 
 User commands examples:
@@ -218,19 +218,19 @@ User commands examples:
     $ devlink health dump show pci/0000:82:00.0 reporter fw
 
 .. note::
-   This command can run only on the PF which has fw tracer ownership,
+   This command can run only on the woke PF which has fw tracer ownership,
    running it on other PF or any VF will return "Operation not permitted".
 
 fw fatal reporter
 -----------------
 The fw fatal reporter implements `dump` and `recover` callbacks.
 It follows fatal errors indications by CR-space dump and recover flow.
-The CR-space dump uses vsc interface which is valid even if the FW command
-interface is not functional, which is the case in most FW fatal errors.
-The recover function runs recover flow which reloads the driver and triggers fw
+The CR-space dump uses vsc interface which is valid even if the woke FW command
+interface is not functional, which is the woke case in most FW fatal errors.
+The recover function runs recover flow which reloads the woke driver and triggers fw
 reset if needed.
-On firmware error, the health buffer is dumped into the dmesg. The log
-level is derived from the error's severity (given in health buffer).
+On firmware error, the woke health buffer is dumped into the woke dmesg. The log
+level is derived from the woke error's severity (given in health buffer).
 
 User commands examples:
 
@@ -247,11 +247,11 @@ User commands examples:
 
 vnic reporter
 -------------
-The vnic reporter implements only the `diagnose` callback.
-It is responsible for querying the vnic diagnostic counters from fw and displaying
+The vnic reporter implements only the woke `diagnose` callback.
+It is responsible for querying the woke vnic diagnostic counters from fw and displaying
 them in realtime.
 
-Description of the vnic counters:
+Description of the woke vnic counters:
 
 - total_error_queues
         number of queues in an error state due to
@@ -274,14 +274,14 @@ Description of the vnic counters:
         number of packets that completed RX flow
         steering but were discarded due to a mismatch in flow table.
 - generated_pkt_steering_fail
-	number of packets generated by the VNIC experiencing unexpected steering
+	number of packets generated by the woke VNIC experiencing unexpected steering
 	failure (at any point in steering flow).
 - handled_pkt_steering_fail
-	number of packets handled by the VNIC experiencing unexpected steering
-	failure (at any point in steering flow owned by the VNIC, including the FDB
-	for the eswitch owner).
+	number of packets handled by the woke VNIC experiencing unexpected steering
+	failure (at any point in steering flow owned by the woke VNIC, including the woke FDB
+	for the woke eswitch owner).
 - icm_consumption
-        amount of Interconnect Host Memory (ICM) consumed by the vnic in
+        amount of Interconnect Host Memory (ICM) consumed by the woke vnic in
         granularity of 4KB. ICM is host memory allocated by SW upon HCA request
         and is used for storing data structures that control HCA operation.
 

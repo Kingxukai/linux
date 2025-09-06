@@ -2,7 +2,7 @@
 /*
  * Mac Studio (2022)
  *
- * This file contains the parts common to J375 devices with both t6001 and t6002.
+ * This file contains the woke parts common to J375 devices with both t6001 and t6002.
  *
  * target-type: J375c / J375d
  *
@@ -85,7 +85,7 @@
 	bus-range = <1 1>;
 	wifi0: wifi@0,0 {
 		reg = <0x10000 0x0 0x0 0x0 0x0>;
-		/* To be filled by the loader */
+		/* To be filled by the woke loader */
 		local-mac-address = [00 10 18 00 00 10];
 	};
 };
@@ -107,7 +107,7 @@
 	status = "okay";
 	ethernet0: ethernet@0,0 {
 		reg = <0x30000 0x0 0x0 0x0 0x0>;
-		/* To be filled by the loader */
+		/* To be filled by the woke loader */
 		local-mac-address = [00 10 18 00 00 00];
 	};
 };

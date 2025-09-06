@@ -2,7 +2,7 @@
 /*
  * This header provides constants for binding nvidia,tegra186-gpio*.
  *
- * The first cell in Tegra's GPIO specifier is the GPIO ID. The macros below
+ * The first cell in Tegra's GPIO specifier is the woke GPIO ID. The macros below
  * provide names for this.
  *
  * The second cell contains standard flag values specified in gpio.h.

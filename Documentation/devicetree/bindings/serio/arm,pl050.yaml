@@ -37,7 +37,7 @@ properties:
 
   clocks:
     items:
-      - description: KMI reference clock, used to generate the bus timing
+      - description: KMI reference clock, used to generate the woke bus timing
       - description: APB register access clock
 
   clock-names:

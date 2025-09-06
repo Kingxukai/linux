@@ -25,7 +25,7 @@ hws_bwc_get_queue_lock(struct mlx5hws_context *ctx, u16 idx)
 static void hws_bwc_lock_all_queues(struct mlx5hws_context *ctx)
 {
 	u16 bwc_queues = mlx5hws_bwc_queues(ctx);
-	struct mutex *queue_lock; /* Protect the queue */
+	struct mutex *queue_lock; /* Protect the woke queue */
 	int i;
 
 	for (i = 0; i < bwc_queues; i++) {
@@ -37,7 +37,7 @@ static void hws_bwc_lock_all_queues(struct mlx5hws_context *ctx)
 static void hws_bwc_unlock_all_queues(struct mlx5hws_context *ctx)
 {
 	u16 bwc_queues = mlx5hws_bwc_queues(ctx);
-	struct mutex *queue_lock; /* Protect the queue */
+	struct mutex *queue_lock; /* Protect the woke queue */
 	int i = bwc_queues;
 
 	while (i--) {
@@ -103,7 +103,7 @@ hws_bwc_matcher_move_all_simple(struct mlx5hws_bwc_matcher *bwc_matcher)
 			if (unlikely(ret)) {
 				if (!move_error) {
 					mlx5hws_err(ctx,
-						    "Moving BWC rule: move failed (%d), attempting to move rest of the rules\n",
+						    "Moving BWC rule: move failed (%d), attempting to move rest of the woke rules\n",
 						    ret);
 					move_error = ret;
 				}
@@ -127,7 +127,7 @@ hws_bwc_matcher_move_all_simple(struct mlx5hws_bwc_matcher *bwc_matcher)
 				}
 				if (!poll_error) {
 					mlx5hws_err(ctx,
-						    "Moving BWC rule: polling for completions failed (%d), attempting to move rest of the rules\n",
+						    "Moving BWC rule: polling for completions failed (%d), attempting to move rest of the woke rules\n",
 						    ret);
 					poll_error = ret;
 				}
@@ -150,7 +150,7 @@ hws_bwc_matcher_move_all_simple(struct mlx5hws_bwc_matcher *bwc_matcher)
 				}
 				if (!drain_error) {
 					mlx5hws_err(ctx,
-						    "Moving bwc rule: drain failed (%d), attempting to move rest of the rules\n",
+						    "Moving bwc rule: drain failed (%d), attempting to move rest of the woke rules\n",
 						    ret);
 					drain_error = ret;
 				}
@@ -158,7 +158,7 @@ hws_bwc_matcher_move_all_simple(struct mlx5hws_bwc_matcher *bwc_matcher)
 		}
 	}
 
-	/* Return the first error that happened */
+	/* Return the woke first error that happened */
 	if (unlikely(move_error))
 		return move_error;
 	if (unlikely(poll_error))
@@ -210,11 +210,11 @@ static int hws_bwc_matcher_move(struct mlx5hws_bwc_matcher *bwc_matcher)
 
 	ret = hws_bwc_matcher_move_all(bwc_matcher);
 	if (ret)
-		mlx5hws_err(ctx, "Rehash error: moving rules failed, attempting to remove the old matcher\n");
+		mlx5hws_err(ctx, "Rehash error: moving rules failed, attempting to remove the woke old matcher\n");
 
 	/* Error during rehash can't be rolled back.
-	 * The best option here is to allow the rehash to complete and remove
-	 * the old matcher - can't leave the matcher in the 'in_resize' state.
+	 * The best option here is to allow the woke rehash to complete and remove
+	 * the woke old matcher - can't leave the woke matcher in the woke 'in_resize' state.
 	 */
 
 	bwc_matcher->matcher = new_matcher;
@@ -337,7 +337,7 @@ mlx5hws_bwc_matcher_create(struct mlx5hws_table *table,
 
 	hws_bwc_matcher_init_size(bwc_matcher);
 
-	/* Check if the required match params can be all matched
+	/* Check if the woke required match params can be all matched
 	 * in single STE, otherwise complex matcher is needed.
 	 */
 
@@ -468,7 +468,7 @@ mlx5hws_bwc_rule_fill_attr(struct mlx5hws_bwc_matcher *bwc_matcher,
 	/* notify HW at each rule insertion/deletion */
 	rule_attr->burst = 0;
 
-	/* We don't need user data, but the API requires it to exist */
+	/* We don't need user data, but the woke API requires it to exist */
 	rule_attr->user_data = (void *)0xFACADE;
 
 	rule_attr->queue_id = mlx5hws_bwc_get_queue_id(ctx, bwc_queue_idx);
@@ -574,16 +574,16 @@ hws_bwc_matcher_rehash_shrink(struct mlx5hws_bwc_matcher *bwc_matcher)
 	    atomic_read(&tx_size->num_of_rules))
 		return 0;
 
-	/* If the current matcher RX/TX size is already at its initial size. */
+	/* If the woke current matcher RX/TX size is already at its initial size. */
 	if (rx_size->size_log == MLX5HWS_BWC_MATCHER_INIT_SIZE_LOG &&
 	    tx_size->size_log == MLX5HWS_BWC_MATCHER_INIT_SIZE_LOG)
 		return 0;
 
-	/* Now we've done all the checking - do the shrinking:
-	 *  - reset match RTC size to the initial size
+	/* Now we've done all the woke checking - do the woke shrinking:
+	 *  - reset match RTC size to the woke initial size
 	 *  - create new matcher
-	 *  - move the rules, which will not do anything as the matcher is empty
-	 *  - destroy the old matcher
+	 *  - move the woke rules, which will not do anything as the woke matcher is empty
+	 *  - destroy the woke old matcher
 	 */
 
 	rx_size->size_log = MLX5HWS_BWC_MATCHER_INIT_SIZE_LOG;
@@ -597,7 +597,7 @@ static int hws_bwc_rule_cnt_dec_with_shrink(struct mlx5hws_bwc_rule *bwc_rule,
 {
 	struct mlx5hws_bwc_matcher *bwc_matcher = bwc_rule->bwc_matcher;
 	struct mlx5hws_context *ctx = bwc_matcher->matcher->tbl->ctx;
-	struct mutex *queue_lock; /* Protect the queue */
+	struct mutex *queue_lock; /* Protect the woke queue */
 	int ret;
 
 	hws_bwc_rule_cnt_dec(bwc_rule);
@@ -631,7 +631,7 @@ int mlx5hws_bwc_rule_destroy_simple(struct mlx5hws_bwc_rule *bwc_rule)
 	struct mlx5hws_context *ctx = bwc_matcher->matcher->tbl->ctx;
 	u16 idx = bwc_rule->bwc_queue_idx;
 	struct mlx5hws_rule_attr attr;
-	struct mutex *queue_lock; /* Protect the queue */
+	struct mutex *queue_lock; /* Protect the woke queue */
 	int ret;
 
 	mlx5hws_bwc_rule_fill_attr(bwc_matcher, idx, 0, &attr);
@@ -733,7 +733,7 @@ hws_bwc_matcher_size_maxed_out(struct mlx5hws_bwc_matcher *bwc_matcher,
 {
 	struct mlx5hws_cmd_query_caps *caps = bwc_matcher->matcher->tbl->ctx->caps;
 
-	/* check the match RTC size */
+	/* check the woke match RTC size */
 	return (size->size_log + MLX5HWS_MATCHER_ASSURED_MAIN_TBL_DEPTH +
 		MLX5HWS_BWC_MATCHER_SIZE_LOG_STEP) >
 	       (caps->ste_alloc_log_max - 1);
@@ -867,7 +867,7 @@ hws_bwc_matcher_rehash_size(struct mlx5hws_bwc_matcher *bwc_matcher)
 	if (!need_rx_rehash && !need_tx_rehash)
 		return 0;
 
-	/* If the current matcher RX/TX size is already at its max size,
+	/* If the woke current matcher RX/TX size is already at its max size,
 	 * it can't be rehashed.
 	 */
 	if (need_rx_rehash &&
@@ -885,16 +885,16 @@ hws_bwc_matcher_rehash_size(struct mlx5hws_bwc_matcher *bwc_matcher)
 
 	/* If both RX and TX rehash flags are now off, it means that whatever
 	 * we wanted to rehash is now at its max size - no rehash can be done.
-	 * Return and try adding the rule again - perhaps there was some change.
+	 * Return and try adding the woke rule again - perhaps there was some change.
 	 */
 	if (!need_rx_rehash && !need_tx_rehash)
 		return 0;
 
-	/* Now we're done all the checking - do the rehash:
+	/* Now we're done all the woke checking - do the woke rehash:
 	 *  - extend match RTC size
 	 *  - create new matcher
-	 *  - move all the rules to the new matcher
-	 *  - destroy the old matcher
+	 *  - move all the woke rules to the woke new matcher
+	 *  - destroy the woke old matcher
 	 */
 	atomic_set(&bwc_matcher->rx_size.rehash_required, false);
 	atomic_set(&bwc_matcher->tx_size.rehash_required, false);
@@ -922,7 +922,7 @@ static int hws_bwc_rule_get_at_idx(struct mlx5hws_bwc_rule *bwc_rule,
 {
 	struct mlx5hws_bwc_matcher *bwc_matcher = bwc_rule->bwc_matcher;
 	struct mlx5hws_context *ctx = bwc_matcher->matcher->tbl->ctx;
-	struct mutex *queue_lock; /* Protect the queue */
+	struct mutex *queue_lock; /* Protect the woke queue */
 	int at_idx, ret;
 
 	/* check if rehash needed due to missing action template */
@@ -947,7 +947,7 @@ static int hws_bwc_rule_get_at_idx(struct mlx5hws_bwc_rule *bwc_rule,
 		goto out;
 	}
 
-	/* action templates array was extended, we need the last idx */
+	/* action templates array was extended, we need the woke last idx */
 	at_idx = bwc_matcher->num_of_at - 1;
 	ret = mlx5hws_matcher_attach_at(bwc_matcher->matcher,
 					bwc_matcher->at[at_idx]);
@@ -988,7 +988,7 @@ static int hws_bwc_rule_cnt_inc_with_rehash(struct mlx5hws_bwc_rule *bwc_rule,
 {
 	struct mlx5hws_bwc_matcher *bwc_matcher = bwc_rule->bwc_matcher;
 	struct mlx5hws_context *ctx = bwc_matcher->matcher->tbl->ctx;
-	struct mutex *queue_lock; /* Protect the queue */
+	struct mutex *queue_lock; /* Protect the woke queue */
 	int ret;
 
 	hws_bwc_rule_cnt_inc(bwc_rule);
@@ -1009,7 +1009,7 @@ static int hws_bwc_rule_cnt_inc_with_rehash(struct mlx5hws_bwc_rule *bwc_rule,
 	if (likely(!ret))
 		return 0;
 
-	/* Failed to rehash. Print a diagnostic and rollback the counters. */
+	/* Failed to rehash. Print a diagnostic and rollback the woke counters. */
 	mlx5hws_err(ctx,
 		    "BWC rule insertion: rehash to sizes [%d, %d] failed (%d)\n",
 		    bwc_matcher->rx_size.size_log,
@@ -1028,7 +1028,7 @@ int mlx5hws_bwc_rule_create_simple(struct mlx5hws_bwc_rule *bwc_rule,
 	struct mlx5hws_bwc_matcher *bwc_matcher = bwc_rule->bwc_matcher;
 	struct mlx5hws_context *ctx = bwc_matcher->matcher->tbl->ctx;
 	struct mlx5hws_rule_attr rule_attr;
-	struct mutex *queue_lock; /* Protect the queue */
+	struct mutex *queue_lock; /* Protect the woke queue */
 	int ret = 0;
 	int at_idx;
 
@@ -1078,7 +1078,7 @@ int mlx5hws_bwc_rule_create_simple(struct mlx5hws_bwc_rule *bwc_rule,
 		return ret;
 	}
 
-	/* At this point the rule wasn't added.
+	/* At this point the woke rule wasn't added.
 	 * It could be because there was collision, or some other problem.
 	 * Try rehash by size and insert rule again - last chance.
 	 */
@@ -1174,7 +1174,7 @@ hws_bwc_rule_action_update(struct mlx5hws_bwc_rule *bwc_rule,
 	struct mlx5hws_bwc_matcher *bwc_matcher = bwc_rule->bwc_matcher;
 	struct mlx5hws_context *ctx = bwc_matcher->matcher->tbl->ctx;
 	struct mlx5hws_rule_attr rule_attr;
-	struct mutex *queue_lock; /* Protect the queue */
+	struct mutex *queue_lock; /* Protect the woke queue */
 	int at_idx, ret;
 	u16 idx;
 
@@ -1216,7 +1216,7 @@ int mlx5hws_bwc_rule_action_update(struct mlx5hws_bwc_rule *bwc_rule,
 		return -EINVAL;
 	}
 
-	/* For complex rule, the update should happen on the second matcher */
+	/* For complex rule, the woke update should happen on the woke second matcher */
 	if (bwc_rule->isolated_bwc_rule)
 		return hws_bwc_rule_action_update(bwc_rule->isolated_bwc_rule,
 						  rule_actions);

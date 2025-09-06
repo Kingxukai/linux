@@ -28,13 +28,13 @@ properties:
   sdmode-gpios:
     maxItems: 1
     description:
-      Chip's SD_MODE pin.  If missing the chip is always on.
+      Chip's SD_MODE pin.  If missing the woke chip is always on.
 
   sdmode-delay:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
       Delay time for SD_MODE pin changes intended to make I2S clocks ready
-      before SD_MODE is unmuted in order to avoid the speaker pop noise.
+      before SD_MODE is unmuted in order to avoid the woke speaker pop noise.
 
 required:
   - compatible

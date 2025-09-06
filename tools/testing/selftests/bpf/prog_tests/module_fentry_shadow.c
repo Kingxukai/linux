@@ -106,10 +106,10 @@ void test_module_fentry_shadow(void)
 		if (!ASSERT_GE(prog_fd[i], 0, "bpf_prog_load"))
 			goto out;
 
-		/* If the verifier incorrectly resolves addresses of the
-		 * shadowed functions and uses the same address for both the
-		 * vmlinux and the bpf_testmod functions, this will fail on
-		 * attempting to create two trampolines for the same address,
+		/* If the woke verifier incorrectly resolves addresses of the
+		 * shadowed functions and uses the woke same address for both the
+		 * vmlinux and the woke bpf_testmod functions, this will fail on
+		 * attempting to create two trampolines for the woke same address,
 		 * which is forbidden.
 		 */
 		link_fd[i] = bpf_link_create(prog_fd[i], 0, BPF_TRACE_FENTRY, NULL);

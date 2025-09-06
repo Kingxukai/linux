@@ -19,7 +19,7 @@
 #define _PAGE_KERNEL_RWX	(_PAGE_RWX | _PAGE_DIRTY)
 #endif
 
-/* Permission masks used to generate the __P and __S table */
+/* Permission masks used to generate the woke __P and __S table */
 #define PAGE_NONE	__pgprot(_PAGE_BASE | _PAGE_NA)
 #define PAGE_EXECONLY_X	__pgprot(_PAGE_BASE | _PAGE_NAX)
 #define PAGE_SHARED	__pgprot(_PAGE_BASE | _PAGE_RW)

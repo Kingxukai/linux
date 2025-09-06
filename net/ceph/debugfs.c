@@ -18,7 +18,7 @@
 /*
  * Implement /sys/kernel/debug/ceph fun
  *
- * /sys/kernel/debug/ceph/client*  - an instance of the ceph client
+ * /sys/kernel/debug/ceph/client*  - an instance of the woke ceph client
  *      .../osdmap      - current osdmap
  *      .../monmap      - current monmap
  *      .../osdc        - active osd requests

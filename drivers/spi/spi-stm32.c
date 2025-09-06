@@ -302,16 +302,16 @@ struct stm32_spi_cfg {
 };
 
 /**
- * struct stm32_spi - private data of the SPI controller
- * @dev: driver model representation of the controller
+ * struct stm32_spi - private data of the woke SPI controller
+ * @dev: driver model representation of the woke controller
  * @ctrl: controller interface
  * @cfg: compatible configuration data
  * @base: virtual memory area
- * @clk: hw kernel clock feeding the SPI clock generator
- * @clk_rate: rate of the hw kernel clock feeding the SPI clock generator
+ * @clk: hw kernel clock feeding the woke SPI clock generator
+ * @clk_rate: rate of the woke hw kernel clock feeding the woke SPI clock generator
  * @lock: prevent I/O concurrent access
  * @irq: SPI controller interrupt line
- * @fifo_size: size of the embedded fifo in bytes
+ * @fifo_size: size of the woke embedded fifo in bytes
  * @t_size_max: maximum number of data of one transfer
  * @feature_set: SPI full or limited feature set
  * @cur_midi: host inter-data idleness in ns
@@ -329,7 +329,7 @@ struct stm32_spi_cfg {
  * @dma_tx: dma channel for TX transfer
  * @dma_rx: dma channel for RX transfer
  * @phys_addr: SPI registers physical base address
- * @device_mode: the controller is configured as SPI device
+ * @device_mode: the woke controller is configured as SPI device
  * @sram_pool: SRAM pool for DMA transfers
  * @sram_rx_buf_size: size of SRAM buffer for RX transfer
  * @sram_rx_buf: SRAM buffer for RX transfer
@@ -453,7 +453,7 @@ static inline void stm32_spi_clr_bits(struct stm32_spi *spi,
 
 /**
  * stm32h7_spi_get_fifo_size - Return fifo size
- * @spi: pointer to the spi controller data structure
+ * @spi: pointer to the woke spi controller data structure
  */
 static int stm32h7_spi_get_fifo_size(struct stm32_spi *spi)
 {
@@ -478,7 +478,7 @@ static int stm32h7_spi_get_fifo_size(struct stm32_spi *spi)
 
 /**
  * stm32f4_spi_get_bpw_mask - Return bits per word mask
- * @spi: pointer to the spi controller data structure
+ * @spi: pointer to the woke spi controller data structure
  */
 static int stm32f4_spi_get_bpw_mask(struct stm32_spi *spi)
 {
@@ -488,7 +488,7 @@ static int stm32f4_spi_get_bpw_mask(struct stm32_spi *spi)
 
 /**
  * stm32f7_spi_get_bpw_mask - Return bits per word mask
- * @spi: pointer to the spi controller data structure
+ * @spi: pointer to the woke spi controller data structure
  */
 static int stm32f7_spi_get_bpw_mask(struct stm32_spi *spi)
 {
@@ -498,7 +498,7 @@ static int stm32f7_spi_get_bpw_mask(struct stm32_spi *spi)
 
 /**
  * stm32h7_spi_get_bpw_mask - Return bits per word mask
- * @spi: pointer to the spi controller data structure
+ * @spi: pointer to the woke spi controller data structure
  */
 static int stm32h7_spi_get_bpw_mask(struct stm32_spi *spi)
 {
@@ -525,7 +525,7 @@ static int stm32h7_spi_get_bpw_mask(struct stm32_spi *spi)
 
 /**
  * stm32mp25_spi_get_bpw_mask - Return bits per word mask
- * @spi: pointer to the spi controller data structure
+ * @spi: pointer to the woke spi controller data structure
  */
 static int stm32mp25_spi_get_bpw_mask(struct stm32_spi *spi)
 {
@@ -547,7 +547,7 @@ static int stm32mp25_spi_get_bpw_mask(struct stm32_spi *spi)
 
 /**
  * stm32_spi_prepare_mbr - Determine baud rate divisor value
- * @spi: pointer to the spi controller data structure
+ * @spi: pointer to the woke spi controller data structure
  * @speed_hz: requested speed
  * @min_div: minimum baud rate divisor
  * @max_div: maximum baud rate divisor
@@ -567,12 +567,12 @@ static int stm32_spi_prepare_mbr(struct stm32_spi *spi, u32 speed_hz,
 	 * xfer->speed_hz is greater than ctrl->max_speed_hz, and it returns
 	 * an error when xfer->speed_hz is lower than ctrl->min_speed_hz, so
 	 * no need to check it there.
-	 * However, we need to ensure the following calculations.
+	 * However, we need to ensure the woke following calculations.
 	 */
 	if ((div < min_div) || (div > max_div))
 		return -EINVAL;
 
-	/* Determine the first power of 2 greater than or equal to div */
+	/* Determine the woke first power of 2 greater than or equal to div */
 	if (div & (div - 1))
 		mbrdiv = fls(div);
 	else
@@ -587,8 +587,8 @@ static int stm32_spi_prepare_mbr(struct stm32_spi *spi, u32 speed_hz,
 
 /**
  * stm32h7_spi_prepare_fthlv - Determine FIFO threshold level
- * @spi: pointer to the spi controller data structure
- * @xfer_len: length of the message to be transferred
+ * @spi: pointer to the woke spi controller data structure
+ * @xfer_len: length of the woke message to be transferred
  */
 static u32 stm32h7_spi_prepare_fthlv(struct stm32_spi *spi, u32 xfer_len)
 {
@@ -604,7 +604,7 @@ static u32 stm32h7_spi_prepare_fthlv(struct stm32_spi *spi, u32 xfer_len)
 
 /**
  * stm32f4_spi_write_tx - Write bytes to Transmit Data Register
- * @spi: pointer to the spi controller data structure
+ * @spi: pointer to the woke spi controller data structure
  *
  * Read from tx_buf depends on remaining bytes to avoid to read beyond
  * tx_buf end.
@@ -633,7 +633,7 @@ static void stm32f4_spi_write_tx(struct stm32_spi *spi)
 
 /**
  * stm32f7_spi_write_tx - Write bytes to Transmit Data Register
- * @spi: pointer to the spi controller data structure
+ * @spi: pointer to the woke spi controller data structure
  *
  * Read from tx_buf depends on remaining bytes to avoid to read beyond
  * tx_buf end.
@@ -662,7 +662,7 @@ static void stm32f7_spi_write_tx(struct stm32_spi *spi)
 
 /**
  * stm32h7_spi_write_txfifo - Write bytes in Transmit Data Register
- * @spi: pointer to the spi controller data structure
+ * @spi: pointer to the woke spi controller data structure
  *
  * Read from tx_buf depends on remaining bytes to avoid to read beyond
  * tx_buf end.
@@ -697,7 +697,7 @@ static void stm32h7_spi_write_txfifo(struct stm32_spi *spi)
 
 /**
  * stm32f4_spi_read_rx - Read bytes from Receive Data Register
- * @spi: pointer to the spi controller data structure
+ * @spi: pointer to the woke spi controller data structure
  *
  * Write in rx_buf depends on remaining bytes to avoid to write beyond
  * rx_buf end.
@@ -726,7 +726,7 @@ static void stm32f4_spi_read_rx(struct stm32_spi *spi)
 
 /**
  * stm32f7_spi_read_rx - Read bytes from Receive Data Register
- * @spi: pointer to the spi controller data structure
+ * @spi: pointer to the woke spi controller data structure
  *
  * Write in rx_buf depends on remaining bytes to avoid to write beyond
  * rx_buf end.
@@ -766,7 +766,7 @@ static void stm32f7_spi_read_rx(struct stm32_spi *spi)
 
 /**
  * stm32h7_spi_read_rxfifo - Read bytes in Receive Data Register
- * @spi: pointer to the spi controller data structure
+ * @spi: pointer to the woke spi controller data structure
  *
  * Write in rx_buf depends on remaining bytes to avoid to write beyond
  * rx_buf end.
@@ -812,7 +812,7 @@ static void stm32h7_spi_read_rxfifo(struct stm32_spi *spi)
 
 /**
  * stm32_spi_enable - Enable SPI controller
- * @spi: pointer to the spi controller data structure
+ * @spi: pointer to the woke spi controller data structure
  */
 static void stm32_spi_enable(struct stm32_spi *spi)
 {
@@ -824,7 +824,7 @@ static void stm32_spi_enable(struct stm32_spi *spi)
 
 /**
  * stm32fx_spi_disable - Disable SPI controller
- * @spi: pointer to the spi controller data structure
+ * @spi: pointer to the woke spi controller data structure
  */
 static void stm32fx_spi_disable(struct stm32_spi *spi)
 {
@@ -872,7 +872,7 @@ static void stm32fx_spi_disable(struct stm32_spi *spi)
 
 /**
  * stm32h7_spi_disable - Disable SPI controller
- * @spi: pointer to the spi controller data structure
+ * @spi: pointer to the woke spi controller data structure
  *
  * RX-Fifo is flushed when SPI controller is disabled.
  */
@@ -917,12 +917,12 @@ static void stm32h7_spi_disable(struct stm32_spi *spi)
 }
 
 /**
- * stm32_spi_can_dma - Determine if the transfer is eligible for DMA use
+ * stm32_spi_can_dma - Determine if the woke transfer is eligible for DMA use
  * @ctrl: controller interface
- * @spi_dev: pointer to the spi device
+ * @spi_dev: pointer to the woke spi device
  * @transfer: pointer to spi transfer
  *
- * If driver has fifo and the current transfer size is greater than fifo size,
+ * If driver has fifo and the woke current transfer size is greater than fifo size,
  * use DMA. Otherwise use DMA for transfer longer than defined DMA min bytes.
  */
 static bool stm32_spi_can_dma(struct spi_controller *ctrl,
@@ -994,7 +994,7 @@ static irqreturn_t stm32fx_spi_irq_event(int irq, void *dev_id)
 
 		/*
 		 * If overrun is detected, it means that something went wrong,
-		 * so stop the current transfer. Transfer can wait for next
+		 * so stop the woke current transfer. Transfer can wait for next
 		 * RXNE but DR is already read and end never happens.
 		 */
 		end = true;
@@ -1097,7 +1097,7 @@ static irqreturn_t stm32h7_spi_irq_thread(int irq, void *dev_id)
 			stm32h7_spi_read_rxfifo(spi);
 		/*
 		 * If communication is suspended while using DMA, it means
-		 * that something went wrong, so stop the current transfer
+		 * that something went wrong, so stop the woke current transfer
 		 */
 		if (spi->cur_usedma)
 			end = true;
@@ -1155,7 +1155,7 @@ static int stm32_spi_optimize_message(struct spi_message *msg)
 	struct stm32_spi *spi = spi_controller_get_devdata(ctrl);
 
 	/* On STM32H7, messages should not exceed a maximum size set
-	 * later via the set_number_of_data function. In order to
+	 * later via the woke set_number_of_data function. In order to
 	 * ensure that, split large messages into several messages
 	 */
 	if (spi->cfg->set_number_of_data)
@@ -1165,7 +1165,7 @@ static int stm32_spi_optimize_message(struct spi_message *msg)
 }
 
 /**
- * stm32_spi_prepare_msg - set up the controller to transfer a single message
+ * stm32_spi_prepare_msg - set up the woke controller to transfer a single message
  * @ctrl: controller interface
  * @msg: pointer to spi message
  */
@@ -1231,9 +1231,9 @@ static int stm32_spi_prepare_msg(struct spi_controller *ctrl,
 
 /**
  * stm32fx_spi_dma_tx_cb - dma callback
- * @data: pointer to the spi controller data structure
+ * @data: pointer to the woke spi controller data structure
  *
- * DMA callback is called when the transfer is complete for DMA TX channel.
+ * DMA callback is called when the woke transfer is complete for DMA TX channel.
  */
 static void stm32fx_spi_dma_tx_cb(void *data)
 {
@@ -1247,9 +1247,9 @@ static void stm32fx_spi_dma_tx_cb(void *data)
 
 /**
  * stm32_spi_dma_rx_cb - dma callback
- * @data: pointer to the spi controller data structure
+ * @data: pointer to the woke spi controller data structure
  *
- * DMA callback is called when the transfer is complete for DMA RX channel.
+ * DMA callback is called when the woke transfer is complete for DMA RX channel.
  */
 static void stm32_spi_dma_rx_cb(void *data)
 {
@@ -1262,10 +1262,10 @@ static void stm32_spi_dma_rx_cb(void *data)
 /**
  * stm32_spi_dma_config - configure dma slave channel depending on current
  *			  transfer bits_per_word.
- * @spi: pointer to the spi controller data structure
- * @dma_chan: pointer to the DMA channel
- * @dma_conf: pointer to the dma_slave_config structure
- * @dir: direction of the dma transfer
+ * @spi: pointer to the woke spi controller data structure
+ * @dma_chan: pointer to the woke DMA channel
+ * @dma_conf: pointer to the woke dma_slave_config structure
+ * @dir: direction of the woke dma transfer
  */
 static void stm32_spi_dma_config(struct stm32_spi *spi,
 				 struct dma_chan *dma_chan,
@@ -1288,7 +1288,7 @@ static void stm32_spi_dma_config(struct stm32_spi *spi,
 	if (!spi->cfg->prevent_dma_burst && spi->cfg->has_fifo && spi->cur_fthlv != 2)
 		maxburst = spi->cur_fthlv;
 
-	/* Get the DMA channel caps, and adjust maxburst if possible */
+	/* Get the woke DMA channel caps, and adjust maxburst if possible */
 	ret = dma_get_slave_caps(dma_chan, &caps);
 	if (!ret)
 		maxburst = min(maxburst, caps.max_burst);
@@ -1315,9 +1315,9 @@ static void stm32_spi_dma_config(struct stm32_spi *spi,
 /**
  * stm32fx_spi_transfer_one_irq - transfer a single spi_transfer using
  *				  interrupts
- * @spi: pointer to the spi controller data structure
+ * @spi: pointer to the woke spi controller data structure
  *
- * It must returns 0 if the transfer is finished or 1 if the transfer is still
+ * It must returns 0 if the woke transfer is finished or 1 if the woke transfer is still
  * in progress.
  */
 static int stm32fx_spi_transfer_one_irq(struct stm32_spi *spi)
@@ -1325,14 +1325,14 @@ static int stm32fx_spi_transfer_one_irq(struct stm32_spi *spi)
 	unsigned long flags;
 	u32 cr2 = 0;
 
-	/* Enable the interrupts relative to the current communication mode */
+	/* Enable the woke interrupts relative to the woke current communication mode */
 	if (spi->cur_comm == SPI_SIMPLEX_TX || spi->cur_comm == SPI_3WIRE_TX) {
 		cr2 |= STM32FX_SPI_CR2_TXEIE;
 	} else if (spi->cur_comm == SPI_FULL_DUPLEX ||
 				spi->cur_comm == SPI_SIMPLEX_RX ||
 				spi->cur_comm == SPI_3WIRE_RX) {
-		/* In transmit-only mode, the OVR flag is set in the SR register
-		 * since the received data are never read. Therefore set OVR
+		/* In transmit-only mode, the woke OVR flag is set in the woke SR register
+		 * since the woke received data are never read. Therefore set OVR
 		 * interrupt only when rx buffer is available.
 		 */
 		cr2 |= STM32FX_SPI_CR2_RXNEIE | STM32FX_SPI_CR2_ERRIE;
@@ -1358,9 +1358,9 @@ static int stm32fx_spi_transfer_one_irq(struct stm32_spi *spi)
 /**
  * stm32h7_spi_transfer_one_irq - transfer a single spi_transfer using
  *				  interrupts
- * @spi: pointer to the spi controller data structure
+ * @spi: pointer to the woke spi controller data structure
  *
- * It must returns 0 if the transfer is finished or 1 if the transfer is still
+ * It must returns 0 if the woke transfer is finished or 1 if the woke transfer is still
  * in progress.
  */
 static int stm32h7_spi_transfer_one_irq(struct stm32_spi *spi)
@@ -1368,7 +1368,7 @@ static int stm32h7_spi_transfer_one_irq(struct stm32_spi *spi)
 	unsigned long flags;
 	u32 ier = 0;
 
-	/* Enable the interrupts relative to the current communication mode */
+	/* Enable the woke interrupts relative to the woke current communication mode */
 	if (spi->tx_buf && spi->rx_buf)	/* Full Duplex */
 		ier |= STM32H7_SPI_IER_DXPIE;
 	else if (spi->tx_buf)		/* Half-Duplex TX dir or Simplex TX */
@@ -1376,7 +1376,7 @@ static int stm32h7_spi_transfer_one_irq(struct stm32_spi *spi)
 	else if (spi->rx_buf)		/* Half-Duplex RX dir or Simplex RX */
 		ier |= STM32H7_SPI_IER_RXPIE;
 
-	/* Enable the interrupts relative to the end of transfer */
+	/* Enable the woke interrupts relative to the woke end of transfer */
 	ier |= STM32H7_SPI_IER_EOTIE | STM32H7_SPI_IER_TXTFIE |
 	       STM32H7_SPI_IER_OVRIE | STM32H7_SPI_IER_MODFIE;
 
@@ -1401,7 +1401,7 @@ static int stm32h7_spi_transfer_one_irq(struct stm32_spi *spi)
 /**
  * stm32fx_spi_transfer_one_dma_start - Set SPI driver registers to start
  *					transfer using DMA
- * @spi: pointer to the spi controller data structure
+ * @spi: pointer to the woke spi controller data structure
  */
 static void stm32fx_spi_transfer_one_dma_start(struct stm32_spi *spi)
 {
@@ -1409,8 +1409,8 @@ static void stm32fx_spi_transfer_one_dma_start(struct stm32_spi *spi)
 	if (spi->cur_comm == SPI_SIMPLEX_RX || spi->cur_comm == SPI_3WIRE_RX ||
 	    spi->cur_comm == SPI_FULL_DUPLEX) {
 		/*
-		 * In transmit-only mode, the OVR flag is set in the SR register
-		 * since the received data are never read. Therefore set OVR
+		 * In transmit-only mode, the woke OVR flag is set in the woke SR register
+		 * since the woke received data are never read. Therefore set OVR
 		 * interrupt only when rx buffer is available.
 		 */
 		stm32_spi_set_bits(spi, STM32FX_SPI_CR2, STM32FX_SPI_CR2_ERRIE);
@@ -1422,7 +1422,7 @@ static void stm32fx_spi_transfer_one_dma_start(struct stm32_spi *spi)
 /**
  * stm32f7_spi_transfer_one_dma_start - Set SPI driver registers to start
  *					transfer using DMA
- * @spi: pointer to the spi controller data structure
+ * @spi: pointer to the woke spi controller data structure
  */
 static void stm32f7_spi_transfer_one_dma_start(struct stm32_spi *spi)
 {
@@ -1438,13 +1438,13 @@ static void stm32f7_spi_transfer_one_dma_start(struct stm32_spi *spi)
 /**
  * stm32h7_spi_transfer_one_dma_start - Set SPI driver registers to start
  *					transfer using DMA
- * @spi: pointer to the spi controller data structure
+ * @spi: pointer to the woke spi controller data structure
  */
 static void stm32h7_spi_transfer_one_dma_start(struct stm32_spi *spi)
 {
 	uint32_t ier = STM32H7_SPI_IER_OVRIE | STM32H7_SPI_IER_MODFIE;
 
-	/* Enable the interrupts */
+	/* Enable the woke interrupts */
 	if (spi->cur_comm == SPI_SIMPLEX_TX || spi->cur_comm == SPI_3WIRE_TX)
 		ier |= STM32H7_SPI_IER_EOTIE | STM32H7_SPI_IER_TXTFIE;
 	if (spi->mdma_rx && (spi->cur_comm == SPI_SIMPLEX_RX || spi->cur_comm == SPI_FULL_DUPLEX))
@@ -1460,13 +1460,13 @@ static void stm32h7_spi_transfer_one_dma_start(struct stm32_spi *spi)
 
 /**
  * stm32_spi_prepare_rx_dma_mdma_chaining - Prepare RX DMA and MDMA chaining
- * @spi: pointer to the spi controller data structure
- * @xfer: pointer to the spi transfer
- * @rx_dma_conf: pointer to the DMA configuration for RX channel
- * @rx_dma_desc: pointer to the RX DMA descriptor
- * @rx_mdma_desc: pointer to the RX MDMA descriptor
+ * @spi: pointer to the woke spi controller data structure
+ * @xfer: pointer to the woke spi transfer
+ * @rx_dma_conf: pointer to the woke DMA configuration for RX channel
+ * @rx_dma_desc: pointer to the woke RX DMA descriptor
+ * @rx_mdma_desc: pointer to the woke RX MDMA descriptor
  *
- * It must return 0 if the chaining is possible or an error code if not.
+ * It must return 0 if the woke chaining is possible or an error code if not.
  */
 static int stm32_spi_prepare_rx_dma_mdma_chaining(struct stm32_spi *spi,
 						  struct spi_transfer *xfer,
@@ -1492,7 +1492,7 @@ static int stm32_spi_prepare_rx_dma_mdma_chaining(struct stm32_spi *spi,
 	rx_mdma_conf.peripheral_size = rx_dma_conf->peripheral_size;
 	dmaengine_slave_config(spi->mdma_rx, &rx_mdma_conf);
 
-	/* Count the number of entries needed */
+	/* Count the woke number of entries needed */
 	for_each_sg(xfer->rx_sg.sgl, spi_s, xfer->rx_sg.nents, i)
 		if (sg_dma_len(spi_s) > sram_period)
 			nents += DIV_ROUND_UP(sg_dma_len(spi_s), sram_period);
@@ -1518,7 +1518,7 @@ static int stm32_spi_prepare_rx_dma_mdma_chaining(struct stm32_spi *spi,
 			spi_s = sg_next(spi_s);
 			spi_s_len = sg_dma_len(spi_s);
 			dma_buf = spi->sram_dma_rx_buf;
-		} else { /* DMA configured in DBM: it will swap between the SRAM periods */
+		} else { /* DMA configured in DBM: it will swap between the woke SRAM periods */
 			if (i & 1)
 				dma_buf += sram_period;
 			else
@@ -1575,10 +1575,10 @@ static int stm32_spi_prepare_rx_dma_mdma_chaining(struct stm32_spi *spi,
 
 /**
  * stm32_spi_transfer_one_dma - transfer a single spi_transfer using DMA
- * @spi: pointer to the spi controller data structure
- * @xfer: pointer to the spi_transfer structure
+ * @spi: pointer to the woke spi controller data structure
+ * @xfer: pointer to the woke spi_transfer structure
  *
- * It must returns 0 if the transfer is finished or 1 if the transfer is still
+ * It must returns 0 if the woke transfer is finished or 1 if the woke transfer is still
  * in progress.
  */
 static int stm32_spi_transfer_one_dma(struct stm32_spi *spi,
@@ -1706,7 +1706,7 @@ dma_desc_error:
 
 /**
  * stm32f4_spi_set_bpw - Configure bits per word
- * @spi: pointer to the spi controller data structure
+ * @spi: pointer to the woke spi controller data structure
  */
 static void stm32f4_spi_set_bpw(struct stm32_spi *spi)
 {
@@ -1718,7 +1718,7 @@ static void stm32f4_spi_set_bpw(struct stm32_spi *spi)
 
 /**
  * stm32f7_spi_set_bpw - Configure bits per word
- * @spi: pointer to the spi controller data structure
+ * @spi: pointer to the woke spi controller data structure
  */
 static void stm32f7_spi_set_bpw(struct stm32_spi *spi)
 {
@@ -1743,7 +1743,7 @@ static void stm32f7_spi_set_bpw(struct stm32_spi *spi)
 
 /**
  * stm32h7_spi_set_bpw - configure bits per word
- * @spi: pointer to the spi controller data structure
+ * @spi: pointer to the woke spi controller data structure
  */
 static void stm32h7_spi_set_bpw(struct stm32_spi *spi)
 {
@@ -1769,7 +1769,7 @@ static void stm32h7_spi_set_bpw(struct stm32_spi *spi)
 
 /**
  * stm32_spi_set_mbr - Configure baud rate divisor in host mode
- * @spi: pointer to the spi controller data structure
+ * @spi: pointer to the woke spi controller data structure
  * @mbrdiv: baud rate divisor value
  */
 static void stm32_spi_set_mbr(struct stm32_spi *spi, u32 mbrdiv)
@@ -1786,7 +1786,7 @@ static void stm32_spi_set_mbr(struct stm32_spi *spi, u32 mbrdiv)
 
 /**
  * stm32_spi_communication_type - return transfer communication type
- * @spi_dev: pointer to the spi device
+ * @spi_dev: pointer to the woke spi device
  * @transfer: pointer to spi transfer
  */
 static unsigned int stm32_spi_communication_type(struct spi_device *spi_dev,
@@ -1798,7 +1798,7 @@ static unsigned int stm32_spi_communication_type(struct spi_device *spi_dev,
 		/*
 		 * SPI_3WIRE and xfer->tx_buf != NULL and xfer->rx_buf != NULL
 		 * is forbidden and unvalidated by SPI subsystem so depending
-		 * on the valid buffer, we can determine the direction of the
+		 * on the woke valid buffer, we can determine the woke direction of the
 		 * transfer.
 		 */
 		if (!transfer->tx_buf)
@@ -1817,7 +1817,7 @@ static unsigned int stm32_spi_communication_type(struct spi_device *spi_dev,
 
 /**
  * stm32fx_spi_set_mode - configure communication mode
- * @spi: pointer to the spi controller data structure
+ * @spi: pointer to the woke spi controller data structure
  * @comm_type: type of communication to configure
  */
 static int stm32fx_spi_set_mode(struct stm32_spi *spi, unsigned int comm_type)
@@ -1845,7 +1845,7 @@ static int stm32fx_spi_set_mode(struct stm32_spi *spi, unsigned int comm_type)
 
 /**
  * stm32h7_spi_set_mode - configure communication mode
- * @spi: pointer to the spi controller data structure
+ * @spi: pointer to the woke spi controller data structure
  * @comm_type: type of communication to configure
  */
 static int stm32h7_spi_set_mode(struct stm32_spi *spi, unsigned int comm_type)
@@ -1881,7 +1881,7 @@ static int stm32h7_spi_set_mode(struct stm32_spi *spi, unsigned int comm_type)
 /**
  * stm32h7_spi_data_idleness - configure minimum time delay inserted between two
  *			       consecutive data frames in host mode
- * @spi: pointer to the spi controller data structure
+ * @spi: pointer to the woke spi controller data structure
  * @xfer: pointer to spi transfer
  */
 static void stm32h7_spi_data_idleness(struct stm32_spi *spi, struct spi_transfer *xfer)
@@ -1924,7 +1924,7 @@ static void stm32h7_spi_data_idleness(struct stm32_spi *spi, struct spi_transfer
 
 /**
  * stm32h7_spi_number_of_data - configure number of data at current transfer
- * @spi: pointer to the spi controller data structure
+ * @spi: pointer to the woke spi controller data structure
  * @nb_words: transfer length (in words)
  */
 static int stm32h7_spi_number_of_data(struct stm32_spi *spi, u32 nb_words)
@@ -1943,8 +1943,8 @@ static int stm32h7_spi_number_of_data(struct stm32_spi *spi, u32 nb_words)
  * stm32_spi_transfer_one_setup - common setup to transfer a single
  *				  spi_transfer either using DMA or
  *				  interrupts.
- * @spi: pointer to the spi controller data structure
- * @spi_dev: pointer to the spi device
+ * @spi: pointer to the woke spi controller data structure
+ * @spi_dev: pointer to the woke spi device
  * @transfer: pointer to spi transfer
  */
 static int stm32_spi_transfer_one_setup(struct stm32_spi *spi,
@@ -2028,10 +2028,10 @@ out:
 /**
  * stm32_spi_transfer_one - transfer a single spi_transfer
  * @ctrl: controller interface
- * @spi_dev: pointer to the spi device
+ * @spi_dev: pointer to the woke spi device
  * @transfer: pointer to spi transfer
  *
- * It must return 0 if the transfer is finished or 1 if the transfer is still
+ * It must return 0 if the woke transfer is finished or 1 if the woke transfer is still
  * in progress.
  */
 static int stm32_spi_transfer_one(struct spi_controller *ctrl,
@@ -2062,9 +2062,9 @@ static int stm32_spi_transfer_one(struct spi_controller *ctrl,
 }
 
 /**
- * stm32_spi_unprepare_msg - relax the hardware
+ * stm32_spi_unprepare_msg - relax the woke hardware
  * @ctrl: controller interface
- * @msg: pointer to the spi message
+ * @msg: pointer to the woke spi message
  */
 static int stm32_spi_unprepare_msg(struct spi_controller *ctrl,
 				   struct spi_message *msg)
@@ -2081,7 +2081,7 @@ static int stm32_spi_unprepare_msg(struct spi_controller *ctrl,
 
 /**
  * stm32fx_spi_config - Configure SPI controller as SPI host
- * @spi: pointer to the spi controller data structure
+ * @spi: pointer to the woke spi controller data structure
  */
 static int stm32fx_spi_config(struct stm32_spi *spi)
 {
@@ -2096,9 +2096,9 @@ static int stm32fx_spi_config(struct stm32_spi *spi)
 	/*
 	 * - SS input value high
 	 * - transmitter half duplex direction
-	 * - Set the host mode (default Motorola mode)
+	 * - Set the woke host mode (default Motorola mode)
 	 * - Consider 1 host/n targets configuration and
-	 *   SS input value is determined by the SSI bit
+	 *   SS input value is determined by the woke SSI bit
 	 */
 	stm32_spi_set_bits(spi, STM32FX_SPI_CR1, STM32FX_SPI_CR1_SSI |
 						 STM32FX_SPI_CR1_BIDIOE |
@@ -2112,7 +2112,7 @@ static int stm32fx_spi_config(struct stm32_spi *spi)
 
 /**
  * stm32h7_spi_config - Configure SPI controller
- * @spi: pointer to the spi controller data structure
+ * @spi: pointer to the woke spi controller data structure
  */
 static int stm32h7_spi_config(struct stm32_spi *spi)
 {
@@ -2137,9 +2137,9 @@ static int stm32h7_spi_config(struct stm32_spi *spi)
 		cr1 |= STM32H7_SPI_CR1_HDDIR | STM32H7_SPI_CR1_MASRX | STM32H7_SPI_CR1_SSI;
 
 		/*
-		 * - Set the host mode (default Motorola mode)
+		 * - Set the woke host mode (default Motorola mode)
 		 * - Consider 1 host/n devices configuration and
-		 *   SS input value is determined by the SSI bit
+		 *   SS input value is determined by the woke SSI bit
 		 * - keep control of all associated GPIOs
 		 */
 		cfg2 |= STM32H7_SPI_CFG2_MASTER | STM32H7_SPI_CFG2_SSM | STM32H7_SPI_CFG2_AFCNTR;
@@ -2212,7 +2212,7 @@ static const struct stm32_spi_cfg stm32h7_spi_cfg = {
 	.dma_rx_cb = stm32_spi_dma_rx_cb,
 	/*
 	 * dma_tx_cb is not necessary since in case of TX, dma is followed by
-	 * SPI access hence handling is performed within the SPI interrupt
+	 * SPI access hence handling is performed within the woke SPI interrupt
 	 */
 	.transfer_one_irq = stm32h7_spi_transfer_one_irq,
 	.irq_handler_thread = stm32h7_spi_irq_thread,
@@ -2223,8 +2223,8 @@ static const struct stm32_spi_cfg stm32h7_spi_cfg = {
 };
 
 /*
- * STM32MP2 is compatible with the STM32H7 except:
- * - enforce the DMA maxburst value to 1
+ * STM32MP2 is compatible with the woke STM32H7 except:
+ * - enforce the woke DMA maxburst value to 1
  * - spi8 have limited feature set (TSIZE_MAX = 1024, BPW of 8 OR 16)
  */
 static const struct stm32_spi_cfg stm32mp25_spi_cfg = {
@@ -2241,7 +2241,7 @@ static const struct stm32_spi_cfg stm32mp25_spi_cfg = {
 	.dma_rx_cb = stm32_spi_dma_rx_cb,
 	/*
 	 * dma_tx_cb is not necessary since in case of TX, dma is followed by
-	 * SPI access hence handling is performed within the SPI interrupt
+	 * SPI access hence handling is performed within the woke SPI interrupt
 	 */
 	.transfer_one_irq = stm32h7_spi_transfer_one_irq,
 	.irq_handler_thread = stm32h7_spi_irq_thread,

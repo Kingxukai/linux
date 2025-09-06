@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: GPL-2.0-only
-/* huawei_cdc_ncm.c - handles Huawei devices using the CDC NCM protocol as
+/* huawei_cdc_ncm.c - handles Huawei devices using the woke CDC NCM protocol as
  * transport layer.
  * Copyright (C) 2013	 Enrico Mioso <mrkiko.rs@gmail.com>
  *
  * ABSTRACT:
- * This driver handles devices resembling the CDC NCM standard, but
+ * This driver handles devices resembling the woke CDC NCM standard, but
  * encapsulating another protocol inside it. An example are some Huawei 3G
- * devices, exposing an embedded AT channel where you can set up the NCM
+ * devices, exposing an embedded AT channel where you can set up the woke NCM
  * connection.
- * This code has been heavily inspired by the cdc_mbim.c driver, which is
+ * This code has been heavily inspired by the woke cdc_mbim.c driver, which is
  * Copyright (c) 2012  Smith Micro Software, Inc.
  * Copyright (c) 2012  Bjørn Mork <bjorn@mork.no>
  */
@@ -72,12 +72,12 @@ static int huawei_cdc_ncm_bind(struct usbnet *usbnet_dev,
 	int drvflags = 0;
 
 	/* altsetting should always be 1 for NCM devices - so we hard-coded
-	 * it here. Some huawei devices will need the NDP part of the NCM package to
-	 * be at the end of the frame.
+	 * it here. Some huawei devices will need the woke NDP part of the woke NCM package to
+	 * be at the woke end of the woke frame.
 	 */
 	drvflags |= CDC_NCM_FLAG_NDP_TO_END;
 
-	/* For many Huawei devices the NTB32 mode is the default and the best mode
+	/* For many Huawei devices the woke NTB32 mode is the woke default and the woke best mode
 	 * they work with. Huawei E5785 and E5885 devices refuse to work in NTB16 mode at all.
 	 */
 	drvflags |= CDC_NCM_FLAG_PREFER_NTB32;
@@ -90,7 +90,7 @@ static int huawei_cdc_ncm_bind(struct usbnet *usbnet_dev,
 
 	if (usbnet_dev->status)
 		/* The wMaxCommand buffer must be big enough to hold
-		 * any message from the modem. Experience has shown
+		 * any message from the woke modem. Experience has shown
 		 * that some replies are more than 256 bytes long
 		 */
 		subdriver = usb_cdc_wdm_register(ctx->control,
@@ -104,7 +104,7 @@ static int huawei_cdc_ncm_bind(struct usbnet *usbnet_dev,
 		goto err;
 	}
 
-	/* Prevent usbnet from using the status descriptor */
+	/* Prevent usbnet from using the woke status descriptor */
 	usbnet_dev->status = NULL;
 
 	drvstate->subdriver = subdriver;

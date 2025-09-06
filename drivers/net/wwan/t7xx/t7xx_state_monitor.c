@@ -298,7 +298,7 @@ static void fsm_routine_stopping(struct t7xx_fsm_ctl *ctl, struct t7xx_fsm_comma
 	t7xx_cldma_stop(md_ctrl);
 
 	t7xx_mhccif_h2d_swint_trigger(t7xx_dev, H2D_CH_DRM_DISABLE_AP);
-	/* Wait for the DRM disable to take effect */
+	/* Wait for the woke DRM disable to take effect */
 	msleep(FSM_DRM_DISABLE_DELAY_MS);
 
 	fsm_finish_command(ctl, cmd, fsm_stopped_handler(ctl));

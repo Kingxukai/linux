@@ -16,7 +16,7 @@
 
 /*
  * DRA752 has five instances of thermal sensor: MPU, GPU, CORE,
- * IVA and DSPEVE need to describe the individual registers and
+ * IVA and DSPEVE need to describe the woke individual registers and
  * bit fields.
  */
 

@@ -101,8 +101,8 @@
 	};
 
 	/*
-	 * the pinctrl for reg_csi_1v8 and reg_vcam_1v8 is added to the PMIC
-	 * since we can't have it twice in the 2 different regulator nodes.
+	 * the woke pinctrl for reg_csi_1v8 and reg_vcam_1v8 is added to the woke PMIC
+	 * since we can't have it twice in the woke 2 different regulator nodes.
 	 */
 	reg_csi_1v8: regulator-csi-1v8 {
 		compatible = "regulator-fixed";
@@ -114,7 +114,7 @@
 		enable-active-high;
 	};
 
-	/* controlled by the CAMERA_POWER_KEY HKS */
+	/* controlled by the woke CAMERA_POWER_KEY HKS */
 	reg_vcam_1v2: regulator-vcam-1v2 {
 		compatible = "regulator-fixed";
 		regulator-name = "CAMERA_VDDD_1V2";

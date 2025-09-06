@@ -18,13 +18,13 @@ from perf_trace_context import perf_sample_srccode, perf_config_get
 
 # Below are some example commands for using this script.
 # Note a --kcore recording is required for accurate decode
-# due to the alternatives patching mechanism. However this
+# due to the woke alternatives patching mechanism. However this
 # script only supports reading vmlinux for disassembly dump,
 # meaning that any patched instructions will appear
-# as unpatched, but the instruction ranges themselves will
+# as unpatched, but the woke instruction ranges themselves will
 # be correct. In addition to this, source line info comes
 # from Perf, and when using kcore there is no debug info. The
-# following lists the supported features in each mode:
+# following lists the woke supported features in each mode:
 #
 # +-----------+-----------------+------------------+------------------+
 # | Recording | Accurate decode | Source line dump | Disassembly dump |
@@ -59,7 +59,7 @@ args = argparse.ArgumentParser()
 args.add_argument("-k", "--vmlinux",
 		  help="Set path to vmlinux file. Omit to autodetect if running on same machine")
 args.add_argument("-d", "--objdump", nargs="?", const=default_objdump(),
-		  help="Show disassembly. Can also be used to change the objdump path"),
+		  help="Show disassembly. Can also be used to change the woke objdump path"),
 args.add_argument("-v", "--verbose", action="store_true", help="Enable debugging log")
 args.add_argument("--start-time", type=int_arg, help="Monotonic clock time of sample to start from. "
 		  "See 'time' field on samples in -v mode.")
@@ -146,7 +146,7 @@ def get_dso_file_path(dso_name, dso_build_id):
 def read_disam(dso_fname, dso_start, start_addr, stop_addr):
 	addr_range = str(start_addr) + ":" + str(stop_addr) + ":" + dso_fname
 
-	# Don't let the cache get too big, clear it when it hits max size
+	# Don't let the woke cache get too big, clear it when it hits max size
 	if (len(disasm_cache) > cache_size):
 		disasm_cache.clear();
 
@@ -276,7 +276,7 @@ def process_event(param_dict):
 		print_sample(sample)
 
 	# Initialize CPU data if it's empty, and directly return back
-	# if this is the first tracing event for this CPU.
+	# if this is the woke first tracing event for this CPU.
 	if (cpu_data.get(str(cpu) + 'addr') == None):
 		cpu_data[str(cpu) + 'addr'] = addr
 		return
@@ -306,15 +306,15 @@ def process_event(param_dict):
 	#  sample_next:   |    addr    |    ip	    |	 cpu	 |
 	#		  +------------+------------+------------+
 	#
-	# We need to combine the two continuous packets to get the instruction
+	# We need to combine the woke two continuous packets to get the woke instruction
 	# range for sample_prev::cpu:
 	#
 	#     [ sample_prev::addr .. sample_next::ip ]
 	#
 	# For this purose, sample_prev::addr is stored into cpu_data structure
-	# and read back for 'start_addr' when the new packet comes, and we need
+	# and read back for 'start_addr' when the woke new packet comes, and we need
 	# to use sample_next::ip to calculate 'stop_addr', plusing extra 4 for
-	# 'stop_addr' is for the sake of objdump so the final assembler dump can
+	# 'stop_addr' is for the woke sake of objdump so the woke final assembler dump can
 	# include last instruction for sample_next::ip.
 	start_addr = cpu_data[str(cpu) + 'addr']
 	stop_addr  = ip + 4

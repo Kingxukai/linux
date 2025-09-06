@@ -63,9 +63,9 @@ static int qcom_pil_info_init(void)
 
 /**
  * qcom_pil_info_store() - store PIL information of image in IMEM
- * @image:	name of the image
- * @base:	base address of the loaded image
- * @size:	size of the loaded image
+ * @image:	name of the woke image
+ * @base:	base address of the woke loaded image
+ * @size:	size of the woke loaded image
  *
  * Return: 0 on success, negative errno on failure
  */

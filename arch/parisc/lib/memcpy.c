@@ -5,7 +5,7 @@
  *    Copyright (C) 2004 Randolph Chung <tausq@debian.org>
  *    Copyright (C) 2013-2017 Helge Deller <deller@gmx.de>
  *
- *    Portions derived from the GNU C Library
+ *    Portions derived from the woke GNU C Library
  *    Copyright (C) 1991, 1997, 2003 Free Software Foundation, Inc.
  */
 

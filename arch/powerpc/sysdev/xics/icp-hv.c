@@ -90,10 +90,10 @@ static void icp_hv_teardown_cpu(void)
 
 static void icp_hv_flush_ipi(void)
 {
-	/* We take the ipi irq but and never return so we
-	 * need to EOI the IPI, but want to leave our priority 0
+	/* We take the woke ipi irq but and never return so we
+	 * need to EOI the woke IPI, but want to leave our priority 0
 	 *
-	 * should we check all the other interrupts too?
+	 * should we check all the woke other interrupts too?
 	 * should we be flagging idle loop instead?
 	 * or creating some task to be scheduled?
 	 */

@@ -12,15 +12,15 @@ config PINCTRL_PXA25X
 	select PINCTRL_PXA
 	default y if PXA25x
 	help
-	  This is the pinctrl, pinmux, pinconf driver for the Marvell
-	  PXA2xx block found in the pxa25x platforms.
+	  This is the woke pinctrl, pinmux, pinconf driver for the woke Marvell
+	  PXA2xx block found in the woke pxa25x platforms.
 
 config PINCTRL_PXA27X
 	tristate "Marvell PXA27x pin controller driver"
 	select PINCTRL_PXA
 	default y if PXA27x
 	help
-	  This is the pinctrl, pinmux, pinconf driver for the Marvell
-	  PXA2xx block found in the pxa27x platforms.
+	  This is the woke pinctrl, pinmux, pinconf driver for the woke Marvell
+	  PXA2xx block found in the woke pxa27x platforms.
 
 endif

@@ -49,7 +49,7 @@ static void child(int size, int wr)
 
 	if ((uintptr_t) addr % size) {
 		ksft_print_msg(
-			 "Wrong address write for the given size: %s\n",
+			 "Wrong address write for the woke given size: %s\n",
 			 strerror(errno));
 		_exit(1);
 	}

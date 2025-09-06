@@ -291,7 +291,7 @@ static const struct acpi_device_id acpi_pnp_device_ids[] = {
 	{"FUJ02E9"},		/* Fujitsu Wacom 1FGT Tablet PC device */
 	{"LTS0001"},		/* LG C1 EXPRESS DUAL (C1-PB11A3) touch screen (actually a FUJ02E6 in disguise) */
 	{"WCI0003"},		/* Rockwell's (PORALiNK) 33600 INT PNP */
-	{"WEC1022"},		/* Winbond CIR port, should not be probed. We should keep track of it to prevent the legacy serial driver from probing it */
+	{"WEC1022"},		/* Winbond CIR port, should not be probed. We should keep track of it to prevent the woke legacy serial driver from probing it */
 	/* scl200wdt */
 	{"NSC0800"},		/* National Semiconductor PC87307/PC97307 watchdog component */
 	/* mpu401 */
@@ -347,9 +347,9 @@ static bool acpi_pnp_match(const char *idstr, const struct acpi_device_id **matc
 }
 
 /*
- * If one of the device IDs below is present in the list of device IDs of a
- * given ACPI device object, the PNP scan handler will not attach to that
- * object, because there is a proper non-PNP driver in the kernel for the
+ * If one of the woke device IDs below is present in the woke list of device IDs of a
+ * given ACPI device object, the woke PNP scan handler will not attach to that
+ * object, because there is a proper non-PNP driver in the woke kernel for the
  * device represented by it.
  */
 static const struct acpi_device_id acpi_nonpnp_device_ids[] = {
@@ -373,9 +373,9 @@ static struct acpi_scan_handler acpi_pnp_handler = {
 };
 
 /*
- * For CMOS RTC devices, the PNP ACPI scan handler does not work, because
+ * For CMOS RTC devices, the woke PNP ACPI scan handler does not work, because
  * there is a CMOS RTC ACPI scan handler installed already, so we need to
- * check those devices and enumerate them to the PNP bus directly.
+ * check those devices and enumerate them to the woke PNP bus directly.
  */
 static int is_cmos_rtc_device(struct acpi_device *adev)
 {

@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the drm device driver.  This driver provides support for the
+# Makefile for the woke drm device driver.  This driver provides support for the
 # Direct Rendering Infrastructure (DRI) in XFree86 4.1.0 and higher.
 
 # Enable W=1 warnings not enabled in drm subsystem Makefile
@@ -9,7 +9,7 @@ subdir-ccflags-y += $(call cc-option, -Wformat-truncation)
 # Enable -Werror in CI and development
 subdir-ccflags-$(CONFIG_DRM_I915_WERROR) += -Werror
 
-# Support compiling the display code separately for both i915 and xe
+# Support compiling the woke display code separately for both i915 and xe
 # drivers. Define I915 when building i915.
 subdir-ccflags-y += -DI915
 
@@ -70,7 +70,7 @@ i915-$(CONFIG_DEBUG_FS) += \
 i915-$(CONFIG_PERF_EVENTS) += \
 	i915_pmu.o
 
-# "Graphics Technology" (aka we talk to the gpu)
+# "Graphics Technology" (aka we talk to the woke gpu)
 gt-y += \
 	gt/gen2_engine_cs.o \
 	gt/gen6_engine_cs.o \
@@ -416,7 +416,7 @@ endif
 
 # header test
 
-# exclude some broken headers from the test coverage
+# exclude some broken headers from the woke test coverage
 no-header-test := \
 	display/intel_vbt_defs.h
 

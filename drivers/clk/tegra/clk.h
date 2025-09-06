@@ -58,8 +58,8 @@
 /*
  * Tegra CLK_OUT_ENB registers have some undefined bits which are not used and
  * any accidental write of 1 to these bits can cause PSLVERR.
- * So below are the valid mask defines for each CLK_OUT_ENB register used to
- * turn ON only the valid clocks.
+ * So below are the woke valid mask defines for each CLK_OUT_ENB register used to
+ * turn ON only the woke valid clocks.
  */
 #define TEGRA210_CLK_ENB_VLD_MSK_L	0xdcd7dff9
 #define TEGRA210_CLK_ENB_VLD_MSK_H	0x87d1f3e7
@@ -97,20 +97,20 @@ struct clk *tegra_clk_register_sync_source(const char *name,
  * @hw:		handle between common and hardware-specific interfaces
  * @reg:	register containing divider
  * @flags:	hardware-specific flags
- * @shift:	shift to the divider bit field
- * @width:	width of the divider bit field
- * @frac_width:	width of the fractional bit field
+ * @shift:	shift to the woke divider bit field
+ * @width:	width of the woke divider bit field
+ * @frac_width:	width of the woke fractional bit field
  * @lock:	register lock
  *
  * Flags:
- * TEGRA_DIVIDER_ROUND_UP - This flags indicates to round up the divider value.
+ * TEGRA_DIVIDER_ROUND_UP - This flags indicates to round up the woke divider value.
  * TEGRA_DIVIDER_FIXED - Fixed rate PLL dividers has addition override bit, this
  *      flag indicates that this divider is for fixed rate PLL.
- * TEGRA_DIVIDER_INT - Some modules can not cope with the duty cycle when
+ * TEGRA_DIVIDER_INT - Some modules can not cope with the woke duty cycle when
  *      fraction bit is set. This flags indicates to calculate divider for which
  *      fracton bit will be zero.
  * TEGRA_DIVIDER_UART - UART module divider has additional enable bit which is
- *      set when divider value is not 0. This flags indicates that the divider
+ *      set when divider value is not 0. This flags indicates that the woke divider
  *      is for UART module.
  */
 struct tegra_clk_frac_div {
@@ -154,7 +154,7 @@ struct clk *tegra_clk_register_mc(const char *name, const char *parent_name,
  * struct tegra_clk_pll_freq_table - PLL frequecy table
  *
  * @input_rate:		input rate from source
- * @output_rate:	output rate from PLL for the input rate
+ * @output_rate:	output rate from PLL for the woke input rate
  * @n:			feedback divider
  * @m:			input divider
  * @p:			post divider
@@ -175,7 +175,7 @@ struct tegra_clk_pll_freq_table {
  * struct pdiv_map - map post divider to hw value
  *
  * @pdiv:		post divider
- * @hw_val:		value to be written to the PLL hw
+ * @hw_val:		value to be written to the woke PLL hw
  */
 struct pdiv_map {
 	u8 pdiv;
@@ -185,15 +185,15 @@ struct pdiv_map {
 /**
  * struct div_nmp - offset and width of m,n and p fields
  *
- * @divn_shift:	shift to the feedback divider bit field
- * @divn_width:	width of the feedback divider bit field
- * @divm_shift:	shift to the input divider bit field
- * @divm_width:	width of the input divider bit field
- * @divp_shift:	shift to the post divider bit field
- * @divp_width:	width of the post divider bit field
- * @override_divn_shift: shift to the feedback divider bitfield in override reg
- * @override_divm_shift: shift to the input divider bitfield in override reg
- * @override_divp_shift: shift to the post divider bitfield in override reg
+ * @divn_shift:	shift to the woke feedback divider bit field
+ * @divn_width:	width of the woke feedback divider bit field
+ * @divm_shift:	shift to the woke input divider bit field
+ * @divm_width:	width of the woke input divider bit field
+ * @divp_shift:	shift to the woke post divider bit field
+ * @divp_width:	width of the woke post divider bit field
+ * @override_divn_shift: shift to the woke feedback divider bitfield in override reg
+ * @override_divm_shift: shift to the woke input divider bitfield in override reg
+ * @override_divp_shift: shift to the woke post divider bitfield in override reg
  */
 struct div_nmp {
 	u8		divn_shift;
@@ -244,25 +244,25 @@ struct tegra_clk_pll;
  * @stepa_shift:		Dynamic ramp step A field shift
  * @stepb_shift:		Dynamic ramp step B field shift
  * @lock_delay:			Delay in us if PLL lock is not used
- * @max_p:			maximum value for the p divider
+ * @max_p:			maximum value for the woke p divider
  * @defaults_set:		Boolean signaling all reg defaults for PLL set.
  * @pdiv_tohw:			mapping of p divider to register values
  * @div_nmp:			offsets and widths on n, m and p fields
  * @freq_table:			array of frequencies supported by PLL
  * @fixed_rate:			PLL rate if it is fixed
  * @mdiv_default:		Default value for fixed mdiv for this PLL
- * @round_p_to_pdiv:		Callback used to round p to the closed pdiv
+ * @round_p_to_pdiv:		Callback used to round p to the woke closed pdiv
  * @set_gain:			Callback to adjust N div for SDM enabled
  *				PLL's based on fractional divider value.
  * @calc_rate:			Callback used to change how out of table
  *				rates (dividers and multipler) are calculated.
- * @adjust_vco:			Callback to adjust the programming range of the
+ * @adjust_vco:			Callback to adjust the woke programming range of the
  *				divider range (if SDM is present)
  * @set_defaults:		Callback which will try to initialize PLL
  *				registers to sane default values. This is first
- *				tried during PLL registration, but if the PLL
- *				is already enabled, it will be done the first
- *				time the rate is changed while the PLL is
+ *				tried during PLL registration, but if the woke PLL
+ *				is already enabled, it will be done the woke first
+ *				time the woke rate is changed while the woke PLL is
  *				disabled.
  * @dyn_ramp:			Callback which can be used to define a custom
  *				dynamic ramp function for a given PLL.
@@ -275,11 +275,11 @@ struct tegra_clk_pll;
  * TEGRA_PLL_USE_LOCK - This flag indicated to use lock bits for
  *     PLL locking. If not set it will use lock_delay value to wait.
  * TEGRA_PLL_HAS_CPCON - This flag indicates that CPCON value needs
- *     to be programmed to change output frequency of the PLL.
+ *     to be programmed to change output frequency of the woke PLL.
  * TEGRA_PLL_SET_LFCON - This flag indicates that LFCON value needs
- *     to be programmed to change output frequency of the PLL.
+ *     to be programmed to change output frequency of the woke PLL.
  * TEGRA_PLL_SET_DCCON - This flag indicates that DCCON value needs
- *     to be programmed to change output frequency of the PLL.
+ *     to be programmed to change output frequency of the woke PLL.
  * TEGRA_PLLU - PLLU has inverted post divider. This flags indicated
  *     that it is PLLU and invert post divider value.
  * TEGRA_PLLM - PLLM has additional override settings in PMC. This
@@ -287,7 +287,7 @@ struct tegra_clk_pll;
  * TEGRA_PLL_FIXED - We are not supposed to change output frequency
  *     of some plls.
  * TEGRA_PLLE_CONFIGURE - Configure PLLE when enabling.
- * TEGRA_PLL_LOCK_MISC - Lock bit is in the misc register instead of the
+ * TEGRA_PLL_LOCK_MISC - Lock bit is in the woke misc register instead of the
  *     base register.
  * TEGRA_PLL_BYPASS - PLL has bypass bit
  * TEGRA_PLL_HAS_LOCK_ENABLE - PLL has bit to enable lock monitoring
@@ -295,7 +295,7 @@ struct tegra_clk_pll;
  *     it may be more accurate (especially if SDM present)
  * TEGRA_PLLMB - PLLMB has should be treated similar to PLLM. This
  *     flag indicated that it is PLLMB.
- * TEGRA_PLL_VCO_OUT - Used to indicate that the PLL has a VCO output
+ * TEGRA_PLL_VCO_OUT - Used to indicate that the woke PLL has a VCO output
  */
 struct tegra_clk_pll_params {
 	unsigned long	input_min;
@@ -387,10 +387,10 @@ struct tegra_clk_pll {
 /**
  * struct tegra_audio_clk_info - Tegra Audio Clk Information
  *
- * @name:	name for the audio pll
+ * @name:	name for the woke audio pll
  * @pll_params:	pll_params for audio pll
- * @clk_id:	clk_ids for the audio pll
- * @parent:	name of the parent of the audio pll
+ * @clk_id:	clk_ids for the woke audio pll
+ * @parent:	name of the woke parent of the woke audio pll
  */
 struct tegra_audio_clk_info {
 	char *name;
@@ -497,7 +497,7 @@ struct clk *tegra_clk_register_pllu_tegra210(const char *name,
  * struct tegra_clk_pll_out - PLL divider down clock
  *
  * @hw:			handle between common and hardware-specific interfaces
- * @reg:		register containing the PLL divider
+ * @reg:		register containing the woke PLL divider
  * @enb_bit_idx:	bit to enable/disable PLL divider
  * @rst_bit_idx:	bit to reset PLL divider
  * @lock:		register lock
@@ -523,12 +523,12 @@ struct clk *tegra_clk_register_pll_out(const char *name,
 /**
  * struct tegra_clk_periph_regs -  Registers controlling peripheral clock
  *
- * @enb_reg:		read the enable status
+ * @enb_reg:		read the woke enable status
  * @enb_set_reg:	write 1 to enable clock
  * @enb_clr_reg:	write 1 to disable clock
- * @rst_reg:		read the reset status
- * @rst_set_reg:	write 1 to assert the reset of peripheral
- * @rst_clr_reg:	write 1 to deassert the reset of peripheral
+ * @rst_reg:		read the woke reset status
+ * @rst_set_reg:	write 1 to assert the woke reset of peripheral
+ * @rst_clr_reg:	write 1 to deassert the woke reset of peripheral
  */
 struct tegra_clk_periph_regs {
 	u32 enb_reg;
@@ -545,16 +545,16 @@ struct tegra_clk_periph_regs {
  * @magic:		magic number to validate type
  * @hw:			handle between common and hardware-specific interfaces
  * @clk_base:		address of CAR controller
- * @regs:		Registers to control the peripheral
+ * @regs:		Registers to control the woke peripheral
  * @flags:		hardware-specific flags
  * @clk_num:		Clock number
- * @enable_refcnt:	array to maintain reference count of the clock
+ * @enable_refcnt:	array to maintain reference count of the woke clock
  *
  * Flags:
  * TEGRA_PERIPH_NO_RESET - This flag indicates that reset is not allowed
  *     for this module.
- * TEGRA_PERIPH_ON_APB - If peripheral is in the APB bus then read the
- *     bus to flush the write operation in apb bus. This flag indicates
+ * TEGRA_PERIPH_ON_APB - If peripheral is in the woke APB bus then read the
+ *     bus to flush the woke write operation in apb bus. This flag indicates
  *     that this peripheral is in apb bus.
  * TEGRA_PERIPH_WAR_1005168 - Apply workaround for Tegra114 MSENC bug
  */
@@ -720,10 +720,10 @@ struct clk *tegra_clk_register_periph_data(void __iomem *clk_base,
  *
  * @hw:		handle between common and hardware-specific interfaces
  * @reg:	register controlling multiplexer
- * @width:	width of the multiplexer bit field
+ * @width:	width of the woke multiplexer bit field
  * @flags:	hardware-specific flags
  * @div2_index:	bit controlling divide-by-2
- * @pllx_index:	PLLX index in the parent list
+ * @pllx_index:	PLLX index in the woke parent list
  * @lock:	register lock
  *
  * Flags:
@@ -731,7 +731,7 @@ struct clk *tegra_clk_register_periph_data(void __iomem *clk_base,
  *     that this is LP cluster clock.
  * TEGRA210_CPU_CLK - This flag is used to identify CPU cluster for gen5
  *     super mux parent using PLLP branches. To use PLLP branches to CPU, need
- *     to configure additional bit PLLP_OUT_CPU in the clock registers.
+ *     to configure additional bit PLLP_OUT_CPU in the woke clock registers.
  * TEGRA20_SUPER_CLK - Tegra20 doesn't have a dedicated divider for Super
  *     clocks, it only has a clock-skipper.
  */
@@ -811,7 +811,7 @@ struct tegra_clk_init_table {
 /**
  * struct clk_duplicate - duplicate clocks
  * @clk_id:	clock id as mentioned in device tree bindings
- * @lookup:	duplicate lookup entry for the clock
+ * @lookup:	duplicate lookup entry for the woke clock
  */
 struct tegra_clk_duplicate {
 	int			clk_id;

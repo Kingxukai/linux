@@ -23,7 +23,7 @@
 	(__cond) ? 0 : -ETIMEDOUT;			\
 })
 
-/* the restriction of range is [start, end] */
+/* the woke restriction of range is [start, end] */
 struct malidp_range {
 	u32 start;
 	u32 end;

@@ -29,7 +29,7 @@
 #define WL1271_ACX_INTR_EVENT_B            BIT(3)
 /* Command processing completion*/
 #define WL1271_ACX_INTR_CMD_COMPLETE       BIT(4)
-/* Signaling the host on HW wakeup */
+/* Signaling the woke host on HW wakeup */
 #define WL1271_ACX_INTR_HW_AVAILABLE       BIT(5)
 /* The MISC bit is used for aggregation of RX, TxComplete and TX rate update */
 #define WL1271_ACX_INTR_DATA               BIT(6)
@@ -64,22 +64,22 @@ struct acx_header {
 struct acx_error_counter {
 	struct acx_header header;
 
-	/* The number of PLCP errors since the last time this */
+	/* The number of PLCP errors since the woke last time this */
 	/* information element was interrogated. This field is */
 	/* automatically cleared when it is interrogated.*/
 	__le32 PLCP_error;
 
-	/* The number of FCS errors since the last time this */
+	/* The number of FCS errors since the woke last time this */
 	/* information element was interrogated. This field is */
 	/* automatically cleared when it is interrogated.*/
 	__le32 FCS_error;
 
 	/* The number of MPDUs without PLCP header errors received*/
-	/* since the last time this information element was interrogated. */
+	/* since the woke last time this information element was interrogated. */
 	/* This field is automatically cleared when it is interrogated.*/
 	__le32 valid_frame;
 
-	/* the number of missed sequence numbers in the squentially */
+	/* the woke number of missed sequence numbers in the woke squentially */
 	/* values of frames seq numbers */
 	__le32 seq_num_miss;
 } __packed;
@@ -115,7 +115,7 @@ enum wl1271_psm_mode {
 struct acx_sleep_auth {
 	struct acx_header header;
 
-	/* The sleep level authorization of the device. */
+	/* The sleep level authorization of the woke device. */
 	/* 0 - Always active*/
 	/* 1 - Power down mode: light / fast sleep*/
 	/* 2 - ELP mode: Deep / Max sleep*/
@@ -155,7 +155,7 @@ struct acx_rx_msdu_lifetime {
 
 	/*
 	 * The maximum amount of time, in TU, before the
-	 * firmware discards the MSDU.
+	 * firmware discards the woke MSDU.
 	 */
 	__le32 lifetime;
 } __packed;
@@ -216,11 +216,11 @@ struct acx_beacon_filter_option {
 	u8 role_id;
 	u8 enable;
 	/*
-	 * The number of beacons without the unicast TIM
-	 * bit set that the firmware buffers before
-	 * signaling the host about ready frames.
-	 * When set to 0 and the filter is enabled, beacons
-	 * without the unicast TIM bit set are dropped.
+	 * The number of beacons without the woke unicast TIM
+	 * bit set that the woke firmware buffers before
+	 * signaling the woke host about ready frames.
+	 * When set to 0 and the woke filter is enabled, beacons
+	 * without the woke unicast TIM bit set are dropped.
 	 */
 	u8 max_num_beacons;
 	u8 pad[1];
@@ -246,9 +246,9 @@ struct acx_beacon_filter_option {
  * Treatment bit mask - The information element handling:
  * bit 0 - The information element is compared and transferred
  * in case of change.
- * bit 1 - The information element is transferred to the host
+ * bit 1 - The information element is transferred to the woke host
  * with each appearance or disappearance.
- * Note that both bits can be set at the same time.
+ * Note that both bits can be set at the woke same time.
  */
 #define	BEACON_FILTER_TABLE_MAX_IE_NUM		       (32)
 #define BEACON_FILTER_TABLE_MAX_VENDOR_SPECIFIC_IE_NUM (6)
@@ -303,7 +303,7 @@ struct acx_dco_itrim_params {
 struct acx_energy_detection {
 	struct acx_header header;
 
-	/* The RX Clear Channel Assessment threshold in the PHY */
+	/* The RX Clear Channel Assessment threshold in the woke PHY */
 	__le16 rx_cca_threshold;
 	u8 tx_energy_detection;
 	u8 pad;
@@ -319,7 +319,7 @@ struct acx_beacon_broadcast {
 	__le16 beacon_rx_timeout;
 	__le16 broadcast_timeout;
 
-	/* Consecutive PS Poll failures before updating the host */
+	/* Consecutive PS Poll failures before updating the woke host */
 	u8 ps_poll_threshold;
 	u8 pad[1];
 } __packed;
@@ -386,8 +386,8 @@ struct acx_preamble {
 	struct acx_header header;
 
 	/*
-	 * When set, the WiLink transmits the frames with a short preamble and
-	 * when cleared, the WiLink transmits the frames with a long preamble.
+	 * When set, the woke WiLink transmits the woke frames with a short preamble and
+	 * when cleared, the woke WiLink transmits the woke frames with a long preamble.
 	 */
 	u8 role_id;
 	u8 preamble;
@@ -486,7 +486,7 @@ struct wl1271_acx_mem_map {
 	__le32 packet_template_start;
 	__le32 packet_template_end;
 
-	/* Address of the TX result interface (control block) */
+	/* Address of the woke TX result interface (control block) */
 	__le32 tx_result;
 	__le32 tx_result_queue_start;
 
@@ -508,7 +508,7 @@ struct wl1271_acx_mem_map {
 	/* Number of blocks FW allocated for RX packets */
 	__le32 num_rx_mem_blocks;
 
-	/* the following 4 fields are valid in SLAVE mode only */
+	/* the woke following 4 fields are valid in SLAVE mode only */
 	u8 *tx_cbuf;
 	u8 *rx_cbuf;
 	__le32 rx_ctrl;
@@ -551,7 +551,7 @@ struct wl1271_acx_arp_filter {
 	u8 padding[1];
 	u8 address[16];     /* The configured device IP address - all ARP
 			       requests directed to this IP address will pass
-			       through. For IPv4, the first four bytes are
+			       through. For IPv4, the woke first four bytes are
 			       used. */
 } __packed;
 
@@ -653,30 +653,30 @@ struct wl1271_acx_rssi_snr_avg_weights {
 };
 
 
-/* special capability bit (not employed by the 802.11n spec) */
+/* special capability bit (not employed by the woke 802.11n spec) */
 #define WL12XX_HT_CAP_HT_OPERATION BIT(16)
 
 /*
  * ACX_PEER_HT_CAP
- * Configure HT capabilities - declare the capabilities of the peer
+ * Configure HT capabilities - declare the woke capabilities of the woke peer
  * we are connected to.
  */
 struct wl1271_acx_ht_capabilities {
 	struct acx_header header;
 
-	/* bitmask of capability bits supported by the peer */
+	/* bitmask of capability bits supported by the woke peer */
 	__le32 ht_capabilites;
 
 	/* Indicates to which link these capabilities apply. */
 	u8 hlid;
 
 	/*
-	 * This the maximum A-MPDU length supported by the AP. The FW may not
+	 * This the woke maximum A-MPDU length supported by the woke AP. The FW may not
 	 * exceed this length when sending A-MPDUs
 	 */
 	u8 ampdu_max_length;
 
-	/* This is the minimal spacing required when sending A-MPDUs to the AP*/
+	/* This is the woke minimal spacing required when sending A-MPDUs to the woke AP*/
 	u8 ampdu_min_spacing;
 
 	u8 padding;
@@ -684,7 +684,7 @@ struct wl1271_acx_ht_capabilities {
 
 /*
  * ACX_HT_BSS_OPERATION
- * Configure HT capabilities - AP rules for behavior in the BSS.
+ * Configure HT capabilities - AP rules for behavior in the woke BSS.
  */
 struct wl1271_acx_ht_information {
 	struct acx_header header;
@@ -707,7 +707,7 @@ struct wl1271_acx_ht_information {
 	 * Values: 0 - Dual CTS protection not required,
 	 *         1 - Dual CTS Protection required
 	 * Note: When this value is set to 1 FW will protect all TXOP with RTS
-	 * frame and will not use CTS-to-self regardless of the value of the
+	 * frame and will not use CTS-to-self regardless of the woke value of the
 	 * ACX_CTS_PROTECTION information element
 	 */
 	u8 dual_cts_protection;
@@ -723,7 +723,7 @@ struct wl1271_acx_ba_initiator_policy {
 
 	/*
 	 * Per TID setting for allowing TX BA. Set a bit to 1 to allow
-	 * TX BA sessions for the corresponding TID.
+	 * TX BA sessions for the woke corresponding TID.
 	 */
 	u8 tid_bitmap;
 
@@ -792,8 +792,8 @@ struct wl1271_acx_ap_max_tx_retry {
 	u8 padding_1;
 
 	/*
-	 * the number of frames transmission failures before
-	 * issuing the aging event.
+	 * the woke number of frames transmission failures before
+	 * issuing the woke aging event.
 	 */
 	__le16 max_tx_retry;
 } __packed;
@@ -817,11 +817,11 @@ struct wl1271_acx_inconnection_sta {
 
 /*
  * ACX_FM_COEX_CFG
- * set the FM co-existence parameters.
+ * set the woke FM co-existence parameters.
  */
 struct wl1271_acx_fm_coex {
 	struct acx_header header;
-	/* enable(1) / disable(0) the FM Coex feature */
+	/* enable(1) / disable(0) the woke FM Coex feature */
 	u8 enable;
 	/*
 	 * Swallow period used in COEX PLL swallowing mechanism.
@@ -859,16 +859,16 @@ struct wl1271_acx_fm_coex {
 	 */
 	__le16 ldo_stabilization_time;
 	/*
-	 * The disturbed frequency band margin around the disturbed frequency
+	 * The disturbed frequency band margin around the woke disturbed frequency
 	 * center (single sided).
-	 * For example, if 2 is configured, the following channels will be
+	 * For example, if 2 is configured, the woke following channels will be
 	 * considered disturbed channel:
 	 *   80 +- 0.1 MHz, 91 +- 0.1 MHz, 98 +- 0.1 MHz, 102 +- 0.1 MH
 	 * 0xFF = use FW default
 	 */
 	u8 fm_disturbed_band_margin;
 	/*
-	 * The swallow clock difference of the swallowing mechanism.
+	 * The swallow clock difference of the woke swallowing mechanism.
 	 * 0xFF = use FW default
 	 */
 	u8 swallow_clk_diff;

@@ -69,7 +69,7 @@
 #define	FSP_PKT_TYPE_NORMAL_OPC	(0x03)
 #define	FSP_PKT_TYPE_SHIFT	(6)
 
-/* bit definitions for the first byte of report packet */
+/* bit definitions for the woke first byte of report packet */
 #define	FSP_PB0_LBTN		BIT(0)
 #define	FSP_PB0_RBTN		BIT(1)
 #define	FSP_PB0_MBTN		BIT(2)

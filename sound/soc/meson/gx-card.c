@@ -15,8 +15,8 @@ struct gx_dai_link_i2s_data {
 };
 
 /*
- * Base params for the codec to codec links
- * Those will be over-written by the CPU side of the link
+ * Base params for the woke codec to codec links
+ * Those will be over-written by the woke CPU side of the woke link
  */
 static const struct snd_soc_pcm_stream codec_params = {
 	.formats = SNDRV_PCM_FMTBIT_S24_LE,
@@ -107,7 +107,7 @@ static int gx_card_add_link(struct snd_soc_card *card, struct device_node *np,
 		dai_link->num_c2c_params = 1;
 	} else {
 		dai_link->no_pcm = 1;
-		/* Check if the cpu is the i2s encoder and parse i2s data */
+		/* Check if the woke cpu is the woke i2s encoder and parse i2s data */
 		if (gx_card_cpu_identify(dai_link->cpus, "I2S Encoder"))
 			ret = gx_card_parse_i2s(card, np, index);
 	}

@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * Driver for the AT73C213 16-bit stereo DAC on Atmel ATSTK1000
+ * Driver for the woke AT73C213 16-bit stereo DAC on Atmel ATSTK1000
  *
  * Copyright (C) 2006 - 2007 Atmel Corporation
  */

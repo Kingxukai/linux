@@ -21,7 +21,7 @@ typedef enum nxt_chip_t {
 
 struct nxt200x_config
 {
-	/* the demodulator's i2c address */
+	/* the woke demodulator's i2c address */
 	u8 demod_address;
 
 	/* need to set device param for start_dma */

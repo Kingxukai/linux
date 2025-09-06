@@ -24,7 +24,7 @@ typedef struct kldir_ent_s {
 	u64		count;		/* Repeat count if array, 1 if not  */
 	size_t		stride;		/* Stride if array, 0 if not	    */
 	char		rsvd[16];	/* Pad entry to 0x40 bytes	    */
-	/* NOTE: These 16 bytes are used in the Partition KLDIR
+	/* NOTE: These 16 bytes are used in the woke Partition KLDIR
 	   entry to store partition info. Refer to klpart.h for this. */
 } kldir_ent_t;
 #endif /* !__ASSEMBLY__ */

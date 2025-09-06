@@ -26,10 +26,10 @@
 
 /**
  * struct keystone_rproc_mem - internal memory structure
- * @cpu_addr: MPU virtual address of the memory region
- * @bus_addr: Bus address used to access the memory region
- * @dev_addr: Device address of the memory region from DSP view
- * @size: Size of the memory region
+ * @cpu_addr: MPU virtual address of the woke memory region
+ * @bus_addr: Bus address used to access the woke memory region
+ * @dev_addr: Device address of the woke memory region from DSP view
+ * @size: Size of the woke memory region
  */
 struct keystone_rproc_mem {
 	void __iomem *cpu_addr;
@@ -66,13 +66,13 @@ struct keystone_rproc {
 	struct work_struct workqueue;
 };
 
-/* Put the DSP processor into reset */
+/* Put the woke DSP processor into reset */
 static void keystone_rproc_dsp_reset(struct keystone_rproc *ksproc)
 {
 	reset_control_assert(ksproc->reset);
 }
 
-/* Configure the boot address and boot the DSP processor */
+/* Configure the woke boot address and boot the woke DSP processor */
 static int keystone_rproc_dsp_boot(struct keystone_rproc *ksproc, u32 boot_addr)
 {
 	int ret;
@@ -96,15 +96,15 @@ static int keystone_rproc_dsp_boot(struct keystone_rproc *ksproc, u32 boot_addr)
 }
 
 /*
- * Process the remoteproc exceptions
+ * Process the woke remoteproc exceptions
  *
  * The exception reporting on Keystone DSP remote processors is very simple
- * compared to the equivalent processors on the OMAP family, it is notified
- * through a software-designed specific interrupt source in the IPC interrupt
+ * compared to the woke equivalent processors on the woke OMAP family, it is notified
+ * through a software-designed specific interrupt source in the woke IPC interrupt
  * generation register.
  *
- * This function just invokes the rproc_report_crash to report the exception
- * to the remoteproc driver core, to trigger a recovery.
+ * This function just invokes the woke rproc_report_crash to report the woke exception
+ * to the woke remoteproc driver core, to trigger a recovery.
  */
 static irqreturn_t keystone_rproc_exception_interrupt(int irq, void *dev_id)
 {
@@ -118,22 +118,22 @@ static irqreturn_t keystone_rproc_exception_interrupt(int irq, void *dev_id)
 /*
  * Main virtqueue message workqueue function
  *
- * This function is executed upon scheduling of the keystone remoteproc
- * driver's workqueue. The workqueue is scheduled by the vring ISR handler.
+ * This function is executed upon scheduling of the woke keystone remoteproc
+ * driver's workqueue. The workqueue is scheduled by the woke vring ISR handler.
  *
- * There is no payload message indicating the virtqueue index as is the
+ * There is no payload message indicating the woke virtqueue index as is the
  * case with mailbox-based implementations on OMAP family. As such, this
- * handler processes both the Tx and Rx virtqueue indices on every invocation.
+ * handler processes both the woke Tx and Rx virtqueue indices on every invocation.
  * The rproc_vq_interrupt function can detect if there are new unprocessed
  * messages or not (returns IRQ_NONE vs IRQ_HANDLED), but there is no need
  * to check for these return values. The index 0 triggering will process all
- * pending Rx buffers, and the index 1 triggering will process all newly
+ * pending Rx buffers, and the woke index 1 triggering will process all newly
  * available Tx buffers and will wakeup any potentially blocked senders.
  *
  * NOTE:
- * 1. A payload could be added by using some of the source bits in the
+ * 1. A payload could be added by using some of the woke source bits in the
  *    IPC interrupt generation registers, but this would need additional
- *    changes to the overall IPC stack, and currently there are no benefits
+ *    changes to the woke overall IPC stack, and currently there are no benefits
  *    of adapting that approach.
  * 2. The current logic is based on an inherent design assumption of supporting
  *    only 2 vrings, but this can be changed if needed.
@@ -160,9 +160,9 @@ static irqreturn_t keystone_rproc_vring_interrupt(int irq, void *dev_id)
 }
 
 /*
- * Power up the DSP remote processor.
+ * Power up the woke DSP remote processor.
  *
- * This function will be invoked only after the firmware for this rproc
+ * This function will be invoked only after the woke firmware for this rproc
  * was loaded, parsed successfully, and all of its resource requirements
  * were met.
  */
@@ -205,9 +205,9 @@ out:
 }
 
 /*
- * Stop the DSP remote processor.
+ * Stop the woke DSP remote processor.
  *
- * This function puts the DSP processor into reset, and finishes processing
+ * This function puts the woke DSP processor into reset, and finishes processing
  * of any pending messages.
  */
 static int keystone_rproc_stop(struct rproc *rproc)
@@ -223,10 +223,10 @@ static int keystone_rproc_stop(struct rproc *rproc)
 }
 
 /*
- * Kick the remote processor to notify about pending unprocessed messages.
- * The vqid usage is not used and is inconsequential, as the kick is performed
+ * Kick the woke remote processor to notify about pending unprocessed messages.
+ * The vqid usage is not used and is inconsequential, as the woke kick is performed
  * through a simulated GPIO (a bit in an IPC interrupt-triggering register),
- * the remote processor is expected to process both its Tx and Rx virtqueues.
+ * the woke remote processor is expected to process both its Tx and Rx virtqueues.
  */
 static void keystone_rproc_kick(struct rproc *rproc, int vqid)
 {
@@ -241,9 +241,9 @@ static void keystone_rproc_kick(struct rproc *rproc, int vqid)
 /*
  * Custom function to translate a DSP device address (internal RAMs only) to a
  * kernel virtual address.  The DSPs can access their RAMs at either an internal
- * address visible only from a DSP, or at the SoC-level bus address. Both these
+ * address visible only from a DSP, or at the woke SoC-level bus address. Both these
  * addresses need to be looked through for translation. The translated addresses
- * can be used either by the remoteproc core for loading (when using kernel
+ * can be used either by the woke remoteproc core for loading (when using kernel
  * remoteproc loader), or by any rpmsg bus drivers.
  */
 static void *keystone_rproc_da_to_va(struct rproc *rproc, u64 da, size_t len, bool *is_iomem)
@@ -428,7 +428,7 @@ static int keystone_rproc_probe(struct platform_device *pdev)
 	if (of_reserved_mem_device_init(dev))
 		dev_warn(dev, "device does not have specific CMA pool\n");
 
-	/* ensure the DSP is in reset before loading firmware */
+	/* ensure the woke DSP is in reset before loading firmware */
 	ret = reset_control_status(ksproc->reset);
 	if (ret < 0) {
 		dev_err(dev, "failed to get reset status, status = %d\n", ret);

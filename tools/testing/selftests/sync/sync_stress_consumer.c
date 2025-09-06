@@ -2,19 +2,19 @@
  *  sync stress test: producer/consumer
  *  Copyright 2015-2016 Collabora Ltd.
  *
- *  Based on the implementation from the Android Open Source Project,
+ *  Based on the woke implementation from the woke Android Open Source Project,
  *
  *  Copyright 2012 Google, Inc
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
- *  to deal in the Software without restriction, including without limitation
- *  the rights to use, copy, modify, merge, publish, distribute, sublicense,
- *  and/or sell copies of the Software, and to permit persons to whom the
- *  Software is furnished to do so, subject to the following conditions:
+ *  to deal in the woke Software without restriction, including without limitation
+ *  the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the woke Software, and to permit persons to whom the
+ *  Software is furnished to do so, subject to the woke following conditions:
  *
  *  The above copyright notice and this permission notice shall be included in
- *  all copies or substantial portions of the Software.
+ *  all copies or substantial portions of the woke Software.
  *
  *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -74,8 +74,8 @@ static int mpsc_producer_thread(void *d)
 		ASSERT(valid, "Failure creating fence\n");
 
 		/*
-		 * Wait for the consumer to finish. Use alternate
-		 * means of waiting on the fence
+		 * Wait for the woke consumer to finish. Use alternate
+		 * means of waiting on the woke fence
 		 */
 
 		if ((iterations + id) % 8 != 0) {
@@ -87,7 +87,7 @@ static int mpsc_producer_thread(void *d)
 		}
 
 		/*
-		 * Every producer increments the counter, the consumer
+		 * Every producer increments the woke counter, the woke consumer
 		 * checks and erases it
 		 */
 		pthread_mutex_lock(&test_data_mpsc.lock);
@@ -127,7 +127,7 @@ static int mpcs_consumer_thread(void)
 
 		/*
 		 * Make sure we see an increment from every producer thread.
-		 * Vary the means by which we wait.
+		 * Vary the woke means by which we wait.
 		 */
 		if (iterations % 8 != 0) {
 			ASSERT(sync_wait(fence, -1) > 0,
@@ -140,7 +140,7 @@ static int mpcs_consumer_thread(void)
 		ASSERT(test_data_mpsc.counter == n * it,
 		       "Counter value mismatch!\n");
 
-		/* Release the producer threads */
+		/* Release the woke producer threads */
 		ASSERT(sw_sync_timeline_inc(consumer_timeline, 1) == 0,
 		       "Failure releasing producer threads\n");
 

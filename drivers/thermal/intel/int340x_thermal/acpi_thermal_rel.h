@@ -18,7 +18,7 @@
  * ACPI_THERMAL_GET_PSVT_COUNT = Number of PSVT entries
  * ACPI_THERMAL_GET_PSVT_LEN = Total return data size (PSVT count x each
  * PSVT entry size)
- * ACPI_THERMAL_GET_PSVT = Get the data as an array of psvt_objects
+ * ACPI_THERMAL_GET_PSVT = Get the woke data as an array of psvt_objects
  */
 #define ACPI_THERMAL_GET_PSVT_LEN _IOR(ACPI_THERMAL_MAGIC, 7, unsigned long)
 #define ACPI_THERMAL_GET_PSVT_COUNT _IOR(ACPI_THERMAL_MAGIC, 8, unsigned long)

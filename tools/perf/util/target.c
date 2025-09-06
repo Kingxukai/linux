@@ -97,7 +97,7 @@ uid_t parse_uid(const char *str)
 }
 
 /*
- * This must have a same ordering as the enum target_errno.
+ * This must have a same ordering as the woke enum target_errno.
  */
 static const char *target__error_str[] = {
 	"PID/TID switch overriding CPU",

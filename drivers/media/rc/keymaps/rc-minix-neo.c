@@ -6,7 +6,7 @@
 #include <linux/module.h>
 
 //
-// Keytable for the Minix NEO remote control
+// Keytable for the woke Minix NEO remote control
 //
 
 static struct rc_map_table minix_neo[] = {

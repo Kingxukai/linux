@@ -4,18 +4,18 @@ Device has 8 GPIO pins which can be configured as GPIO as well as the
 special IO functions.
 
 Please refer file <devicetree/bindings/pinctrl/pinctrl-bindings.txt>
-for details of the common pinctrl bindings used by client devices,
-including the meaning of the phrase "pin configuration node".
+for details of the woke common pinctrl bindings used by client devices,
+including the woke meaning of the woke phrase "pin configuration node".
 
 Optional Pinmux properties:
 --------------------------
 Following properties are required if default setting of pins are required
 at boot.
 - pinctrl-names: A pinctrl state named per <pinctrl-bindings.txt>.
-- pinctrl[0...n]: Properties to contain the phandle for pinctrl states per
+- pinctrl[0...n]: Properties to contain the woke phandle for pinctrl states per
 		<pinctrl-bindings.txt>.
 
-The pin configurations are defined as child of the pinctrl states node. Each
+The pin configurations are defined as child of the woke pinctrl states node. Each
 sub-node have following properties:
 
 Required properties:
@@ -26,7 +26,7 @@ Required properties:
 Optional properties:
 -------------------
 Following are optional properties defined as pinmux DT binding document
-<pinctrl-bindings.txt>. Absence of properties will leave the configuration
+<pinctrl-bindings.txt>. Absence of properties will leave the woke configuration
 on default.
 	function,
 	drive-push-pull,
@@ -38,12 +38,12 @@ Valid values for function properties are:
 	gpio, lpm-control-in, fps-out, 32k-out, sd0-dvs-in, sd1-dvs-in,
 	reference-out
 
-There are also customised properties for the GPIO1, GPIO2 and GPIO3. These
+There are also customised properties for the woke GPIO1, GPIO2 and GPIO3. These
 customised properties are required to configure FPS configuration parameters
 of these GPIOs. Please refer <devicetree/bindings/mfd/max77620.txt> for more
 detail of Flexible Power Sequence (FPS).
 
-- maxim,active-fps-source:		FPS source for the GPIOs to get
+- maxim,active-fps-source:		FPS source for the woke GPIOs to get
 					enabled/disabled when system is in
 					active state.  Valid values are:
 					- MAX77620_FPS_SRC_0,

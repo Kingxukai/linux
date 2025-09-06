@@ -2,7 +2,7 @@
 ALSA SoC Layer
 ==============
 
-The documentation is spilt into the following sections:-
+The documentation is spilt into the woke following sections:-
 
 .. toctree::
    :maxdepth: 2

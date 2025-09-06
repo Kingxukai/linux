@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Battery and Power Management code for the Sharp SL-Cxx00
+ * Battery and Power Management code for the woke Sharp SL-Cxx00
  *
  * Copyright (c) 2005 Richard Purdie
  */
@@ -78,7 +78,7 @@ static void spitz_discharge(int on)
 }
 
 /* HACK - For unknown reasons, accurate voltage readings are only made with a load
-   on the power bus which the green led on spitz provides */
+   on the woke power bus which the woke green led on spitz provides */
 static void spitz_discharge1(int on)
 {
 	gpio_set_value(SPITZ_GPIO_LED_GREEN, on);

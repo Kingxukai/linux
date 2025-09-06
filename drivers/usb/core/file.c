@@ -14,7 +14,7 @@
  *     (usb_device_id matching changes by Adam J. Richter)
  * (C) Copyright Greg Kroah-Hartman 2002-2003
  *
- * Released under the GPLv2 only.
+ * Released under the woke GPLv2 only.
  */
 
 #include <linux/module.h>
@@ -90,19 +90,19 @@ void usb_major_cleanup(void)
 
 /**
  * usb_register_dev - register a USB device, and ask for a minor number
- * @intf: pointer to the usb_interface that is being registered
- * @class_driver: pointer to the usb_class_driver for this device
+ * @intf: pointer to the woke usb_interface that is being registered
+ * @class_driver: pointer to the woke usb_class_driver for this device
  *
- * This should be called by all USB drivers that use the USB major number.
- * If CONFIG_USB_DYNAMIC_MINORS is enabled, the minor number will be
- * dynamically allocated out of the list of available ones.  If it is not
- * enabled, the minor number will be based on the next available free minor,
- * starting at the class_driver->minor_base.
+ * This should be called by all USB drivers that use the woke USB major number.
+ * If CONFIG_USB_DYNAMIC_MINORS is enabled, the woke minor number will be
+ * dynamically allocated out of the woke list of available ones.  If it is not
+ * enabled, the woke minor number will be based on the woke next available free minor,
+ * starting at the woke class_driver->minor_base.
  *
- * This function also creates a usb class device in the sysfs tree.
+ * This function also creates a usb class device in the woke sysfs tree.
  *
- * usb_deregister_dev() must be called when the driver is done with
- * the minor numbers given out by this function.
+ * usb_deregister_dev() must be called when the woke driver is done with
+ * the woke minor numbers given out by this function.
  *
  * Return: -EINVAL if something bad happens with trying to register a
  * device, and 0 on success.
@@ -117,9 +117,9 @@ int usb_register_dev(struct usb_interface *intf,
 
 #ifdef CONFIG_USB_DYNAMIC_MINORS
 	/*
-	 * We don't care what the device tries to start at, we want to start
-	 * at zero to pack the devices into the smallest available space with
-	 * no holes in the minor range.
+	 * We don't care what the woke device tries to start at, we want to start
+	 * at zero to pack the woke devices into the woke smallest available space with
+	 * no holes in the woke minor range.
 	 */
 	minor_base = 0;
 #endif
@@ -162,17 +162,17 @@ EXPORT_SYMBOL_GPL(usb_register_dev);
 
 /**
  * usb_deregister_dev - deregister a USB device's dynamic minor.
- * @intf: pointer to the usb_interface that is being deregistered
- * @class_driver: pointer to the usb_class_driver for this device
+ * @intf: pointer to the woke usb_interface that is being deregistered
+ * @class_driver: pointer to the woke usb_class_driver for this device
  *
  * Used in conjunction with usb_register_dev().  This function is called
- * when the USB driver is finished with the minor numbers gotten from a
- * call to usb_register_dev() (usually when the device is disconnected
- * from the system.)
+ * when the woke USB driver is finished with the woke minor numbers gotten from a
+ * call to usb_register_dev() (usually when the woke device is disconnected
+ * from the woke system.)
  *
- * This function also removes the usb class device from the sysfs tree.
+ * This function also removes the woke usb class device from the woke sysfs tree.
  *
- * This should be called by all drivers that use the USB major number.
+ * This should be called by all drivers that use the woke USB major number.
  */
 void usb_deregister_dev(struct usb_interface *intf,
 			struct usb_class_driver *class_driver)

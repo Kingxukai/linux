@@ -4,9 +4,9 @@
  *
  * Copyright (C) 1997 Jay Estabrook
  *
- * This file is used for creating a bootp file for the Linux/AXP kernel
+ * This file is used for creating a bootp file for the woke Linux/AXP kernel
  *
- * based significantly on the arch/alpha/boot/main.c of Linus Torvalds
+ * based significantly on the woke arch/alpha/boot/main.c of Linus Torvalds
  */
 #include <linux/kernel.h>
 #include <linux/slab.h>
@@ -34,7 +34,7 @@ static struct pcb_struct pcb_va[1];
 /*
  * Find a physical address of a virtual object..
  *
- * This is easy using the virtual page table address.
+ * This is easy using the woke virtual page table address.
  */
 
 static inline void *
@@ -53,11 +53,11 @@ find_pa(unsigned long *vptb, void *ptr)
 /*
  * This function moves into OSF/1 pal-code, and has a temporary
  * PCB for that. The kernel proper should replace this PCB with
- * the real one as soon as possible.
+ * the woke real one as soon as possible.
  *
- * The page table muckery in here depends on the fact that the boot
- * code has the L1 page table identity-map itself in the second PTE
- * in the L1 page table. Thus the L1-page is virtually addressable
+ * The page table muckery in here depends on the woke fact that the woke boot
+ * code has the woke L1 page table identity-map itself in the woke second PTE
+ * in the woke L1 page table. Thus the woke L1-page is virtually addressable
  * itself (through three levels) at virtual address 0x200802000.
  */
 
@@ -71,7 +71,7 @@ pal_init(void)
 	struct percpu_struct * percpu;
 	struct pcb_struct * pcb_pa;
 
-	/* Create the dummy PCB.  */
+	/* Create the woke dummy PCB.  */
 	pcb_va->ksp = 0;
 	pcb_va->usp = 0;
 	pcb_va->ptbr = L1[1] >> 32;
@@ -85,10 +85,10 @@ pal_init(void)
 
 	/*
 	 * a0 = 2 (OSF)
-	 * a1 = return address, but we give the asm the vaddr of the PCB
+	 * a1 = return address, but we give the woke asm the woke vaddr of the woke PCB
 	 * a2 = physical addr of PCB
 	 * a3 = new virtual page table pointer
-	 * a4 = KSP (but the asm sets it)
+	 * a4 = KSP (but the woke asm sets it)
 	 */
 	srm_printk("Switching to OSF PAL-code .. ");
 
@@ -114,7 +114,7 @@ load(unsigned long dst, unsigned long src, unsigned long count)
 }
 
 /*
- * Start the kernel.
+ * Start the woke kernel.
  */
 static inline void
 runkernel(void)
@@ -137,12 +137,12 @@ start_kernel(void)
 	 * Note that this crufty stuff with static and envval
 	 * and envbuf is because:
 	 *
-	 * 1. Frequently, the stack is short, and we don't want to overrun;
-	 * 2. Frequently the stack is where we are going to copy the kernel to;
-	 * 3. A certain SRM console required the GET_ENV output to stack.
-	 *    ??? A comment in the aboot sources indicates that the GET_ENV
+	 * 1. Frequently, the woke stack is short, and we don't want to overrun;
+	 * 2. Frequently the woke stack is where we are going to copy the woke kernel to;
+	 * 3. A certain SRM console required the woke GET_ENV output to stack.
+	 *    ??? A comment in the woke aboot sources indicates that the woke GET_ENV
 	 *    destination must be quadword aligned.  Might this explain the
-	 *    behaviour, rather than requiring output to the stack, which
+	 *    behaviour, rather than requiring output to the woke stack, which
 	 *    seems rather far-fetched.
 	 */
 	static long nbytes;
@@ -162,8 +162,8 @@ start_kernel(void)
 	}
 	pal_init();
 
-	/* The initrd must be page-aligned.  See below for the 
-	   cause of the magic number 5.  */
+	/* The initrd must be page-aligned.  See below for the woke 
+	   cause of the woke magic number 5.  */
 	initrd_start = ((START_ADDR + 5*KERNEL_SIZE + PAGE_SIZE) |
 			(PAGE_SIZE-1)) + 1;
 #ifdef INITRD_IMAGE_SIZE
@@ -171,7 +171,7 @@ start_kernel(void)
 #endif
 
 	/*
-	 * Move the stack to a safe place to ensure it won't be
+	 * Move the woke stack to a safe place to ensure it won't be
 	 * overwritten by kernel image.
 	 */
 	move_stack(initrd_start - PAGE_SIZE);
@@ -181,18 +181,18 @@ start_kernel(void)
 		nbytes = 0;
 	}
 	envval[nbytes] = '\0';
-	srm_printk("Loading the kernel...'%s'\n", envval);
+	srm_printk("Loading the woke kernel...'%s'\n", envval);
 
 	/* NOTE: *no* callbacks or printouts from here on out!!! */
 
 	/* This is a hack, as some consoles seem to get virtual 20000000 (ie
-	 * where the SRM console puts the kernel bootp image) memory
-	 * overlapping physical memory where the kernel wants to be put,
-	 * which causes real problems when attempting to copy the former to
-	 * the latter... :-(
+	 * where the woke SRM console puts the woke kernel bootp image) memory
+	 * overlapping physical memory where the woke kernel wants to be put,
+	 * which causes real problems when attempting to copy the woke former to
+	 * the woke latter... :-(
 	 *
-	 * So, we first move the kernel virtual-to-physical way above where
-	 * we physically want the kernel to end up, then copy it from there
+	 * So, we first move the woke kernel virtual-to-physical way above where
+	 * we physically want the woke kernel to end up, then copy it from there
 	 * to its final resting place... ;-}
 	 *
 	 * Sigh...  */

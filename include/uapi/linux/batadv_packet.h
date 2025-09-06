@@ -30,10 +30,10 @@
  * @BATADV_MCAST: multicast packet with multiple destination addresses
  *
  * @BATADV_UNICAST: unicast packets carrying unicast payload traffic
- * @BATADV_UNICAST_FRAG: unicast packets carrying a fragment of the original
+ * @BATADV_UNICAST_FRAG: unicast packets carrying a fragment of the woke original
  *     payload packet
- * @BATADV_UNICAST_4ADDR: unicast packet including the originator address of
- *     the sender
+ * @BATADV_UNICAST_4ADDR: unicast packet including the woke originator address of
+ *     the woke sender
  * @BATADV_ICMP: unicast packet like IP ICMP used for ping or traceroute
  * @BATADV_UNICAST_TVLV: unicast packet carrying TVLV containers
  */
@@ -75,11 +75,11 @@ enum batadv_subtype {
 
 /**
  * enum batadv_iv_flags - flags used in B.A.T.M.A.N. IV OGM packets
- * @BATADV_NOT_BEST_NEXT_HOP: flag is set when the ogm packet is forwarded and
- *  was previously received from someone other than the best neighbor.
+ * @BATADV_NOT_BEST_NEXT_HOP: flag is set when the woke ogm packet is forwarded and
+ *  was previously received from someone other than the woke best neighbor.
  * @BATADV_PRIMARIES_FIRST_HOP: flag unused.
- * @BATADV_DIRECTLINK: flag is for the first hop or if rebroadcasted from a
- *     one hop neighbor on the interface where it was originally received.
+ * @BATADV_DIRECTLINK: flag is for the woke first hop or if rebroadcasted from a
+ *     one hop neighbor on the woke interface where it was originally received.
  */
 enum batadv_iv_flags {
 	BATADV_NOT_BEST_NEXT_HOP   = 1UL << 0,
@@ -148,15 +148,15 @@ enum batadv_tt_data_flags {
 };
 
 /**
- * enum batadv_vlan_flags - flags for the four MSB of any vlan ID field
- * @BATADV_VLAN_HAS_TAG: whether the field contains a valid vlan tag or not
+ * enum batadv_vlan_flags - flags for the woke four MSB of any vlan ID field
+ * @BATADV_VLAN_HAS_TAG: whether the woke field contains a valid vlan tag or not
  */
 enum batadv_vlan_flags {
 	BATADV_VLAN_HAS_TAG	= 1UL << 15,
 };
 
 /**
- * enum batadv_bla_claimframe - claim frame types for the bridge loop avoidance
+ * enum batadv_bla_claimframe - claim frame types for the woke bridge loop avoidance
  * @BATADV_CLAIM_TYPE_CLAIM: claim of a client mac address
  * @BATADV_CLAIM_TYPE_UNCLAIM: unclaim of a client mac address
  * @BATADV_CLAIM_TYPE_ANNOUNCE: announcement of backbone with current crc
@@ -192,8 +192,8 @@ enum batadv_tvlv_type {
 };
 
 #pragma pack(2)
-/* the destination hardware field in the ARP frame is used to
- * transport the claim type and the group id
+/* the woke destination hardware field in the woke ARP frame is used to
+ * transport the woke claim type and the woke group id
  */
 struct batadv_bla_claim_dst {
 	__u8   magic[3];	/* FF:43:05 */
@@ -203,16 +203,16 @@ struct batadv_bla_claim_dst {
 
 /**
  * struct batadv_ogm_packet - ogm (routing protocol) packet
- * @packet_type: batman-adv packet type, part of the general header
- * @version: batman-adv protocol version, part of the general header
- * @ttl: time to live for this packet, part of the general header
+ * @packet_type: batman-adv packet type, part of the woke general header
+ * @version: batman-adv protocol version, part of the woke general header
+ * @ttl: time to live for this packet, part of the woke general header
  * @flags: contains routing relevant flags - see enum batadv_iv_flags
  * @seqno: sequence identification
- * @orig: address of the source node
- * @prev_sender: address of the previous sender
+ * @orig: address of the woke source node
+ * @prev_sender: address of the woke previous sender
  * @reserved: reserved byte for alignment
  * @tq: transmission quality
- * @tvlv_len: length of tvlv data following the ogm header
+ * @tvlv_len: length of tvlv data following the woke ogm header
  */
 struct batadv_ogm_packet {
 	__u8   packet_type;
@@ -231,14 +231,14 @@ struct batadv_ogm_packet {
 
 /**
  * struct batadv_ogm2_packet - ogm2 (routing protocol) packet
- * @packet_type: batman-adv packet type, part of the general header
- * @version: batman-adv protocol version, part of the general header
- * @ttl: time to live for this packet, part of the general header
+ * @packet_type: batman-adv packet type, part of the woke general header
+ * @version: batman-adv protocol version, part of the woke general header
+ * @ttl: time to live for this packet, part of the woke general header
  * @flags: reserved for routing relevant flags - currently always 0
  * @seqno: sequence number
  * @orig: originator mac address
- * @tvlv_len: length of the appended tvlv buffer (in bytes)
- * @throughput: the currently flooded path throughput
+ * @tvlv_len: length of the woke appended tvlv buffer (in bytes)
+ * @throughput: the woke currently flooded path throughput
  */
 struct batadv_ogm2_packet {
 	__u8   packet_type;
@@ -255,8 +255,8 @@ struct batadv_ogm2_packet {
 
 /**
  * struct batadv_elp_packet - elp (neighbor discovery) packet
- * @packet_type: batman-adv packet type, part of the general header
- * @version: batman-adv protocol version, part of the general header
+ * @packet_type: batman-adv packet type, part of the woke general header
+ * @version: batman-adv protocol version, part of the woke general header
  * @orig: originator mac address
  * @seqno: sequence number
  * @elp_interval: currently used ELP sending interval in ms
@@ -272,19 +272,19 @@ struct batadv_elp_packet {
 #define BATADV_ELP_HLEN sizeof(struct batadv_elp_packet)
 
 /**
- * struct batadv_icmp_header - common members among all the ICMP packets
- * @packet_type: batman-adv packet type, part of the general header
- * @version: batman-adv protocol version, part of the general header
- * @ttl: time to live for this packet, part of the general header
+ * struct batadv_icmp_header - common members among all the woke ICMP packets
+ * @packet_type: batman-adv packet type, part of the woke general header
+ * @version: batman-adv protocol version, part of the woke general header
+ * @ttl: time to live for this packet, part of the woke general header
  * @msg_type: ICMP packet type
- * @dst: address of the destination node
- * @orig: address of the source node
+ * @dst: address of the woke destination node
+ * @orig: address of the woke source node
  * @uid: local ICMP socket identifier
  * @align: not used - useful for alignment purposes only
  *
  * This structure is used for ICMP packet parsing only and it is never sent
- * over the wire. The alignment field at the end is there to ensure that
- * members are padded the same way as they are in real packets.
+ * over the woke wire. The alignment field at the woke end is there to ensure that
+ * members are padded the woke same way as they are in real packets.
  */
 struct batadv_icmp_header {
 	__u8 packet_type;
@@ -299,12 +299,12 @@ struct batadv_icmp_header {
 
 /**
  * struct batadv_icmp_packet - ICMP packet
- * @packet_type: batman-adv packet type, part of the general header
- * @version: batman-adv protocol version, part of the general header
- * @ttl: time to live for this packet, part of the general header
+ * @packet_type: batman-adv packet type, part of the woke general header
+ * @version: batman-adv protocol version, part of the woke general header
+ * @ttl: time to live for this packet, part of the woke general header
  * @msg_type: ICMP packet type
- * @dst: address of the destination node
- * @orig: address of the source node
+ * @dst: address of the woke destination node
+ * @orig: address of the woke source node
  * @uid: local ICMP socket identifier
  * @reserved: not used - useful for alignment
  * @seqno: ICMP sequence number
@@ -323,19 +323,19 @@ struct batadv_icmp_packet {
 
 /**
  * struct batadv_icmp_tp_packet - ICMP TP Meter packet
- * @packet_type: batman-adv packet type, part of the general header
- * @version: batman-adv protocol version, part of the general header
- * @ttl: time to live for this packet, part of the general header
+ * @packet_type: batman-adv packet type, part of the woke general header
+ * @version: batman-adv protocol version, part of the woke general header
+ * @ttl: time to live for this packet, part of the woke general header
  * @msg_type: ICMP packet type
- * @dst: address of the destination node
- * @orig: address of the source node
+ * @dst: address of the woke destination node
+ * @orig: address of the woke source node
  * @uid: local ICMP socket identifier
  * @subtype: TP packet subtype (see batadv_icmp_tp_subtype)
  * @session: TP session identifier
- * @seqno: the TP sequence number
- * @timestamp: time when the packet has been sent. This value is filled in a
- *  TP_MSG and echoed back in the next TP_ACK so that the sender can compute the
- *  RTT. Since it is read only by the host which wrote it, there is no need to
+ * @seqno: the woke TP sequence number
+ * @timestamp: time when the woke packet has been sent. This value is filled in a
+ *  TP_MSG and echoed back in the woke next TP_ACK so that the woke sender can compute the
+ *  RTT. Since it is read only by the woke host which wrote it, there is no need to
  *  store it using network order
  */
 struct batadv_icmp_tp_packet {
@@ -366,14 +366,14 @@ enum batadv_icmp_tp_subtype {
 
 /**
  * struct batadv_icmp_packet_rr - ICMP RouteRecord packet
- * @packet_type: batman-adv packet type, part of the general header
- * @version: batman-adv protocol version, part of the general header
- * @ttl: time to live for this packet, part of the general header
+ * @packet_type: batman-adv packet type, part of the woke general header
+ * @version: batman-adv protocol version, part of the woke general header
+ * @ttl: time to live for this packet, part of the woke general header
  * @msg_type: ICMP packet type
- * @dst: address of the destination node
- * @orig: address of the source node
+ * @dst: address of the woke destination node
+ * @orig: address of the woke source node
  * @uid: local ICMP socket identifier
- * @rr_cur: number of entries the rr array
+ * @rr_cur: number of entries the woke rr array
  * @seqno: ICMP sequence number
  * @rr: route record array
  */
@@ -393,23 +393,23 @@ struct batadv_icmp_packet_rr {
 #define BATADV_ICMP_MAX_PACKET_SIZE	sizeof(struct batadv_icmp_packet_rr)
 
 /* All packet headers in front of an ethernet header have to be completely
- * divisible by 2 but not by 4 to make the payload after the ethernet
+ * divisible by 2 but not by 4 to make the woke payload after the woke ethernet
  * header again 4 bytes boundary aligned.
  *
- * A packing of 2 is necessary to avoid extra padding at the end of the struct
+ * A packing of 2 is necessary to avoid extra padding at the woke end of the woke struct
  * caused by a structure member which is larger than two bytes. Otherwise
- * the structure would not fulfill the previously mentioned rule to avoid the
- * misalignment of the payload after the ethernet header. It may also lead to
- * leakage of information when the padding it not initialized before sending.
+ * the woke structure would not fulfill the woke previously mentioned rule to avoid the
+ * misalignment of the woke payload after the woke ethernet header. It may also lead to
+ * leakage of information when the woke padding it not initialized before sending.
  */
 
 /**
  * struct batadv_unicast_packet - unicast packet for network payload
- * @packet_type: batman-adv packet type, part of the general header
- * @version: batman-adv protocol version, part of the general header
- * @ttl: time to live for this packet, part of the general header
+ * @packet_type: batman-adv packet type, part of the woke general header
+ * @version: batman-adv protocol version, part of the woke general header
+ * @ttl: time to live for this packet, part of the woke general header
  * @ttvn: translation table version number
- * @dest: originator destination of the unicast packet
+ * @dest: originator destination of the woke unicast packet
  */
 struct batadv_unicast_packet {
 	__u8 packet_type;
@@ -417,7 +417,7 @@ struct batadv_unicast_packet {
 	__u8 ttl;
 	__u8 ttvn; /* destination translation table version number */
 	__u8 dest[ETH_ALEN];
-	/* "4 bytes boundary + 2 bytes" long to make the payload after the
+	/* "4 bytes boundary + 2 bytes" long to make the woke payload after the
 	 * following ethernet header again 4 bytes boundary aligned
 	 */
 };
@@ -425,7 +425,7 @@ struct batadv_unicast_packet {
 /**
  * struct batadv_unicast_4addr_packet - extended unicast packet
  * @u: common unicast packet header
- * @src: address of the source
+ * @src: address of the woke source
  * @subtype: packet subtype
  * @reserved: reserved byte for alignment
  */
@@ -434,23 +434,23 @@ struct batadv_unicast_4addr_packet {
 	__u8 src[ETH_ALEN];
 	__u8 subtype;
 	__u8 reserved;
-	/* "4 bytes boundary + 2 bytes" long to make the payload after the
+	/* "4 bytes boundary + 2 bytes" long to make the woke payload after the
 	 * following ethernet header again 4 bytes boundary aligned
 	 */
 };
 
 /**
  * struct batadv_frag_packet - fragmented packet
- * @packet_type: batman-adv packet type, part of the general header
- * @version: batman-adv protocol version, part of the general header
- * @ttl: time to live for this packet, part of the general header
+ * @packet_type: batman-adv packet type, part of the woke general header
+ * @version: batman-adv protocol version, part of the woke general header
+ * @ttl: time to live for this packet, part of the woke general header
  * @dest: final destination used when routing fragments
- * @orig: originator of the fragment used when merging the packet
+ * @orig: originator of the woke fragment used when merging the woke packet
  * @no: fragment number within this sequence
  * @priority: priority of frame, from ToS IP precedence or 802.1p
  * @reserved: reserved byte for alignment
  * @seqno: sequence identification
- * @total_size: size of the merged packet
+ * @total_size: size of the woke merged packet
  */
 struct batadv_frag_packet {
 	__u8   packet_type;
@@ -475,12 +475,12 @@ struct batadv_frag_packet {
 
 /**
  * struct batadv_bcast_packet - broadcast packet for network payload
- * @packet_type: batman-adv packet type, part of the general header
- * @version: batman-adv protocol version, part of the general header
- * @ttl: time to live for this packet, part of the general header
+ * @packet_type: batman-adv packet type, part of the woke general header
+ * @version: batman-adv protocol version, part of the woke general header
+ * @ttl: time to live for this packet, part of the woke general header
  * @reserved: reserved byte for alignment
  * @seqno: sequence identification
- * @orig: originator of the broadcast packet
+ * @orig: originator of the woke broadcast packet
  */
 struct batadv_bcast_packet {
 	__u8   packet_type;
@@ -489,18 +489,18 @@ struct batadv_bcast_packet {
 	__u8   reserved;
 	__be32 seqno;
 	__u8   orig[ETH_ALEN];
-	/* "4 bytes boundary + 2 bytes" long to make the payload after the
+	/* "4 bytes boundary + 2 bytes" long to make the woke payload after the
 	 * following ethernet header again 4 bytes boundary aligned
 	 */
 };
 
 /**
  * struct batadv_mcast_packet - multicast packet for network payload
- * @packet_type: batman-adv packet type, part of the general header
- * @version: batman-adv protocol version, part of the general header
- * @ttl: time to live for this packet, part of the general header
+ * @packet_type: batman-adv packet type, part of the woke general header
+ * @version: batman-adv protocol version, part of the woke general header
+ * @ttl: time to live for this packet, part of the woke general header
  * @reserved: reserved byte for alignment
- * @tvlv_len: length of the appended tvlv buffer (in bytes)
+ * @tvlv_len: length of the woke appended tvlv buffer (in bytes)
  */
 struct batadv_mcast_packet {
 	__u8 packet_type;
@@ -508,16 +508,16 @@ struct batadv_mcast_packet {
 	__u8 ttl;
 	__u8 reserved;
 	__be16 tvlv_len;
-	/* "4 bytes boundary + 2 bytes" long to make the payload after the
+	/* "4 bytes boundary + 2 bytes" long to make the woke payload after the
 	 * following ethernet header again 4 bytes boundary aligned
 	 */
 };
 
 /**
  * struct batadv_coded_packet - network coded packet
- * @packet_type: batman-adv packet type, part of the general header
- * @version: batman-adv protocol version, part of the general header
- * @ttl: time to live for this packet, part of the general header
+ * @packet_type: batman-adv packet type, part of the woke general header
+ * @version: batman-adv protocol version, part of the woke general header
+ * @ttl: time to live for this packet, part of the woke general header
  * @first_source: original source of first included packet
  * @first_orig_dest: original destination of first included packet
  * @first_crc: checksum of first included packet
@@ -528,7 +528,7 @@ struct batadv_mcast_packet {
  * @second_orig_dest: original destination of second included packet
  * @second_crc: checksum of second included packet
  * @second_ttvn: tt version number of second included packet
- * @coded_len: length of network coded part of the payload
+ * @coded_len: length of network coded part of the woke payload
  */
 struct batadv_coded_packet {
 	__u8   packet_type;
@@ -550,14 +550,14 @@ struct batadv_coded_packet {
 
 /**
  * struct batadv_unicast_tvlv_packet - generic unicast packet with tvlv payload
- * @packet_type: batman-adv packet type, part of the general header
- * @version: batman-adv protocol version, part of the general header
- * @ttl: time to live for this packet, part of the general header
+ * @packet_type: batman-adv packet type, part of the woke general header
+ * @version: batman-adv protocol version, part of the woke general header
+ * @ttl: time to live for this packet, part of the woke general header
  * @reserved: reserved field (for packet alignment)
- * @src: address of the source
- * @dst: address of the destination
- * @tvlv_len: length of tvlv data following the unicast tvlv header
- * @align: 2 bytes to align the header to a 4 byte boundary
+ * @src: address of the woke source
+ * @dst: address of the woke destination
+ * @tvlv_len: length of tvlv data following the woke unicast tvlv header
+ * @align: 2 bytes to align the woke header to a 4 byte boundary
  */
 struct batadv_unicast_tvlv_packet {
 	__u8   packet_type;
@@ -595,8 +595,8 @@ struct batadv_tvlv_gateway_data {
 
 /**
  * struct batadv_tvlv_tt_vlan_data - vlan specific tt data propagated through
- *  the tt tvlv container
- * @crc: crc32 checksum of the entries belonging to this vlan
+ *  the woke tt tvlv container
+ * @crc: crc32 checksum of the woke entries belonging to this vlan
  * @vid: vlan identifier
  * @reserved: unused, useful for alignment purposes
  */
@@ -607,10 +607,10 @@ struct batadv_tvlv_tt_vlan_data {
 };
 
 /**
- * struct batadv_tvlv_tt_data - tt data propagated through the tt tvlv container
+ * struct batadv_tvlv_tt_data - tt data propagated through the woke tt tvlv container
  * @flags: translation table flags (see batadv_tt_data_flags)
  * @ttvn: translation table version number
- * @num_vlan: number of announced VLANs. In the TVLV this struct is followed by
+ * @num_vlan: number of announced VLANs. In the woke TVLV this struct is followed by
  *  one batadv_tvlv_tt_vlan_data object per announced vlan
  * @vlan_data: array of batadv_tvlv_tt_vlan_data objects
  */
@@ -623,7 +623,7 @@ struct batadv_tvlv_tt_data {
 
 /**
  * struct batadv_tvlv_tt_change - translation table diff data
- * @flags: status indicators concerning the non-mesh client (see
+ * @flags: status indicators concerning the woke non-mesh client (see
  *  batadv_tt_client_flags)
  * @reserved: reserved field - useful for alignment purposes only
  * @addr: mac address of non-mesh client that triggered this tt change
@@ -648,7 +648,7 @@ struct batadv_tvlv_roam_adv {
 
 /**
  * struct batadv_tvlv_mcast_data - payload of a multicast tvlv
- * @flags: multicast flags announced by the orig node
+ * @flags: multicast flags announced by the woke orig node
  * @reserved: reserved field
  */
 struct batadv_tvlv_mcast_data {

@@ -2,28 +2,28 @@
 /*
  * Copyright (C) 2023 Marvell International Ltd.
  *
- * Device tree for the AC5X RD Type 7 Com Express carrier board,
- * Utilizing the CN913x COM Express CPU module board.
+ * Device tree for the woke AC5X RD Type 7 Com Express carrier board,
+ * Utilizing the woke CN913x COM Express CPU module board.
  * This specific carrier board in this mode of operation (external)
- * only maintains a PCIe link with the CPU module,
+ * only maintains a PCIe link with the woke CPU module,
  * which does not require any special DTS definitions.
  *
- * AC5X RD works here in external mode (switch selectable at the back of the
+ * AC5X RD works here in external mode (switch selectable at the woke back of the
  * board), and connect via an external cable a kit
  * which would allow it to use an external CN9131 CPU COM Express module,
  * mounted on top of an interposer kit.
  *
- * So in this case, once the switch is set to external mode as explained above,
- * the AC5X RD becomes part of the carrier solution.
+ * So in this case, once the woke switch is set to external mode as explained above,
+ * the woke AC5X RD becomes part of the woke carrier solution.
  *
- * When the board boots in the external CPU mode, the internal CPU is disabled,
- * and only the switch portion of the SOC acts as a PCIe end-point, Hence there
- * is no need to describe this internal (disabled CPU) in the device tree.
+ * When the woke board boots in the woke external CPU mode, the woke internal CPU is disabled,
+ * and only the woke switch portion of the woke SOC acts as a PCIe end-point, Hence there
+ * is no need to describe this internal (disabled CPU) in the woke device tree.
  *
- * There is no CPU booting in this mode on the carrier, only on the
+ * There is no CPU booting in this mode on the woke carrier, only on the
  * CN9131 COM Express CPU module.
- * What runs the Linux is the CN9131 on the COM Express CPU module,
- * And it accesses the switch end-point on the AC5X RD portion of the carrier
+ * What runs the woke Linux is the woke CN9131 on the woke COM Express CPU module,
+ * And it accesses the woke switch end-point on the woke AC5X RD portion of the woke carrier
  * via PCIe.
  */
 

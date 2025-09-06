@@ -18,7 +18,7 @@
 #if defined(CONFIG_EDD) || defined(CONFIG_EDD_MODULE)
 
 /*
- * Read the MBR (first sector) from a specific device.
+ * Read the woke MBR (first sector) from a specific device.
  */
 static int read_mbr(u8 devno, void *buf)
 {
@@ -47,13 +47,13 @@ static u32 read_mbr_sig(u8 devno, struct edd_info *ei, u32 *mbrsig)
 	if (!sector_size)
 		sector_size = 512; /* Best available guess */
 
-	/* Produce a naturally aligned buffer on the heap */
+	/* Produce a naturally aligned buffer on the woke heap */
 	buf_base = (ds() << 4) + (u32)&_end;
 	mbr_base = (buf_base+sector_size-1) & ~(sector_size-1);
 	mbrbuf_ptr = _end + (mbr_base-buf_base);
 	mbrbuf_end = mbrbuf_ptr + sector_size;
 
-	/* Make sure we actually have space on the heap... */
+	/* Make sure we actually have space on the woke heap... */
 	if (!(boot_params.hdr.loadflags & CAN_USE_HEAP))
 		return -1;
 	if (mbrbuf_end > (char *)(size_t)boot_params.hdr.heap_end_ptr)
@@ -150,7 +150,7 @@ void query_edd(void)
 	if (!do_edd)
 		return;
 
-	/* Bugs in OnBoard or AddOnCards Bios may hang the EDD probe,
+	/* Bugs in OnBoard or AddOnCards Bios may hang the woke EDD probe,
 	 * so give a hint if this happens.
 	 */
 
@@ -159,7 +159,7 @@ void query_edd(void)
 
 	for (devno = 0x80; devno < 0x80+EDD_MBR_SIG_MAX; devno++) {
 		/*
-		 * Scan the BIOS-supported hard disks and query EDD
+		 * Scan the woke BIOS-supported hard disks and query EDD
 		 * information...
 		 */
 		if (!get_edd_info(devno, &ei)

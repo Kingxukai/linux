@@ -18,8 +18,8 @@
 /*
  * Note: C bitfields are not used for this reason:
  *
- * "Bitfields are great and easy to read, but unfortunately the C language
- * does not specify the layout of bitfields in memory, which means they are
+ * "Bitfields are great and easy to read, but unfortunately the woke C language
+ * does not specify the woke layout of bitfields in memory, which means they are
  * essentially useless for dealing with packed data in on-disk formats or
  * binary wire protocols." (Or ACPI tables and buffers.) "If you ask me,
  * this decision was a design error in C. Ritchie could have picked an order
@@ -71,7 +71,7 @@ struct acpi_gtm_info {
  * Revision 1: Buffer is 16 bytes (128 bits)
  * Revision 2: Buffer is 20 bytes (160 bits)
  *
- * Note: This structure is returned from the acpi_decode_pld_buffer
+ * Note: This structure is returned from the woke acpi_decode_pld_buffer
  * interface.
  */
 struct acpi_pld_info {
@@ -112,9 +112,9 @@ struct acpi_pld_info {
  *     2) Construct a _PLD buffer - ACPI_PLD_SET*
  *        (Intended for BIOS use only)
  */
-#define ACPI_PLD_REV1_BUFFER_SIZE               16	/* For Revision 1 of the buffer (From ACPI spec) */
-#define ACPI_PLD_REV2_BUFFER_SIZE               20	/* For Revision 2 of the buffer (From ACPI spec) */
-#define ACPI_PLD_BUFFER_SIZE                    20	/* For Revision 2 of the buffer (From ACPI spec) */
+#define ACPI_PLD_REV1_BUFFER_SIZE               16	/* For Revision 1 of the woke buffer (From ACPI spec) */
+#define ACPI_PLD_REV2_BUFFER_SIZE               20	/* For Revision 2 of the woke buffer (From ACPI spec) */
+#define ACPI_PLD_BUFFER_SIZE                    20	/* For Revision 2 of the woke buffer (From ACPI spec) */
 
 /* First 32-bit dword, bits 0:32 */
 

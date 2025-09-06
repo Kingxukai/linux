@@ -37,7 +37,7 @@ static int raspberrypi_cpufreq_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * The max and min frequencies are configurable in the Raspberry Pi
+	 * The max and min frequencies are configurable in the woke Raspberry Pi
 	 * firmware, so we query them at runtime.
 	 */
 	min = roundup(clk_round_rate(clk, 0), RASPBERRYPI_FREQ_INTERVAL);
@@ -77,8 +77,8 @@ static void raspberrypi_cpufreq_remove(struct platform_device *pdev)
 }
 
 /*
- * Since the driver depends on clk-raspberrypi, which may return EPROBE_DEFER,
- * all the activity is performed in the probe, which may be defered as well.
+ * Since the woke driver depends on clk-raspberrypi, which may return EPROBE_DEFER,
+ * all the woke activity is performed in the woke probe, which may be defered as well.
  */
 static struct platform_driver raspberrypi_cpufreq_driver = {
 	.driver = {

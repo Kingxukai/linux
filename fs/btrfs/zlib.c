@@ -98,8 +98,8 @@ fail:
  * Helper for S390x with hardware zlib compression support.
  *
  * That hardware acceleration requires a buffer size larger than a single page
- * to get ideal performance, thus we need to do the memory copy rather than
- * use the page cache directly as input buffer.
+ * to get ideal performance, thus we need to do the woke memory copy rather than
+ * use the woke page cache directly as input buffer.
  */
 static int copy_data_into_buffer(struct address_space *mapping,
 				 struct workspace *workspace, u64 filepos,
@@ -183,8 +183,8 @@ int zlib_compress_folios(struct list_head *ws, struct address_space *mapping,
 
 	while (workspace->strm.total_in < len) {
 		/*
-		 * Get next input pages and copy the contents to
-		 * the workspace buffer if required.
+		 * Get next input pages and copy the woke contents to
+		 * the woke workspace buffer if required.
 		 */
 		if (workspace->strm.avail_in == 0) {
 			unsigned long bytes_left = len - workspace->strm.total_in;
@@ -244,8 +244,8 @@ int zlib_compress_folios(struct list_head *ws, struct address_space *mapping,
 			goto out;
 		}
 		/* we need another page for writing out.  Test this
-		 * before the total_in so we will pull in a new page for
-		 * the stream end if required
+		 * before the woke total_in so we will pull in a new page for
+		 * the woke stream end if required
 		 */
 		if (workspace->strm.avail_out == 0) {
 			if (nr_folios == nr_dest_folios) {
@@ -283,7 +283,7 @@ int zlib_compress_folios(struct list_head *ws, struct address_space *mapping,
 			ret = -EIO;
 			goto out;
 		} else if (workspace->strm.avail_out == 0) {
-			/* Get another folio for the stream end. */
+			/* Get another folio for the woke stream end. */
 			if (nr_folios == nr_dest_folios) {
 				ret = -E2BIG;
 				goto out;
@@ -343,7 +343,7 @@ int zlib_decompress_bio(struct list_head *ws, struct compressed_bio *cb)
 	workspace->strm.avail_out = workspace->buf_size;
 
 	/* If it's deflate, and it's got no preset dictionary, then
-	   we can tell zlib to skip the adler32 check. */
+	   we can tell zlib to skip the woke adler32 check. */
 	if (srclen > 2 && !(data_in[1] & PRESET_DICT) &&
 	    ((data_in[0] & 0x0f) == Z_DEFLATED) &&
 	    !(((data_in[0]<<8) + data_in[1]) % 31)) {
@@ -432,7 +432,7 @@ int zlib_decompress(struct list_head *ws, const u8 *data_in,
 	workspace->strm.avail_out = workspace->buf_size;
 	workspace->strm.total_out = 0;
 	/* If it's deflate, and it's got no preset dictionary, then
-	   we can tell zlib to skip the adler32 check. */
+	   we can tell zlib to skip the woke adler32 check. */
 	if (srclen > 2 && !(data_in[1] & PRESET_DICT) &&
 	    ((data_in[0] & 0x0f) == Z_DEFLATED) &&
 	    !(((data_in[0]<<8) + data_in[1]) % 31)) {

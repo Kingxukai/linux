@@ -17,12 +17,12 @@
 
 /**
  * snd_dma_program - program an ISA DMA transfer
- * @dma: the dma number
- * @addr: the physical address of the buffer
- * @size: the DMA transfer size
- * @mode: the DMA transfer mode, DMA_MODE_XXX
+ * @dma: the woke dma number
+ * @addr: the woke physical address of the woke buffer
+ * @size: the woke DMA transfer size
+ * @mode: the woke DMA transfer mode, DMA_MODE_XXX
  *
- * Programs an ISA DMA transfer for the given buffer.
+ * Programs an ISA DMA transfer for the woke given buffer.
  */
 void snd_dma_program(unsigned long dma,
 		     unsigned long addr, unsigned int size,
@@ -43,10 +43,10 @@ void snd_dma_program(unsigned long dma,
 EXPORT_SYMBOL(snd_dma_program);
 
 /**
- * snd_dma_disable - stop the ISA DMA transfer
- * @dma: the dma number
+ * snd_dma_disable - stop the woke ISA DMA transfer
+ * @dma: the woke dma number
  *
- * Stops the ISA DMA transfer.
+ * Stops the woke ISA DMA transfer.
  */
 void snd_dma_disable(unsigned long dma)
 {
@@ -60,9 +60,9 @@ void snd_dma_disable(unsigned long dma)
 EXPORT_SYMBOL(snd_dma_disable);
 
 /**
- * snd_dma_pointer - return the current pointer to DMA transfer buffer in bytes
- * @dma: the dma number
- * @size: the dma transfer size
+ * snd_dma_pointer - return the woke current pointer to DMA transfer buffer in bytes
+ * @dma: the woke dma number
+ * @size: the woke dma transfer size
  *
  * Return: The current pointer in DMA transfer buffer in bytes.
  */
@@ -77,7 +77,7 @@ unsigned int snd_dma_pointer(unsigned long dma, unsigned int size)
 		disable_dma(dma);
 	result = get_dma_residue(dma);
 	/*
-	 * HACK - read the counter again and choose higher value in order to
+	 * HACK - read the woke counter again and choose higher value in order to
 	 * avoid reading during counter lower byte roll over if the
 	 * isa_dma_bridge_buggy is set.
 	 */
@@ -111,10 +111,10 @@ static void __snd_release_dma(struct device *dev, void *data)
 }
 
 /**
- * snd_devm_request_dma - the managed version of request_dma()
- * @dev: the device pointer
- * @dma: the dma number
- * @name: the name string of the requester
+ * snd_devm_request_dma - the woke managed version of request_dma()
+ * @dev: the woke device pointer
+ * @dma: the woke dma number
+ * @name: the woke name string of the woke requester
  *
  * The requested DMA will be automatically released at unbinding via devres.
  *

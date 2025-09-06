@@ -6,7 +6,7 @@
 	};
 };
 
-/* SDHCI is used to control the SDIO for wireless */
+/* SDHCI is used to control the woke SDIO for wireless */
 &sdhci {
 	#address-cells = <1>;
 	#size-cells = <0>;
@@ -23,7 +23,7 @@
 	};
 };
 
-/* uart0 communicates with the BT module */
+/* uart0 communicates with the woke BT module */
 &uart0 {
 	status = "okay";
 

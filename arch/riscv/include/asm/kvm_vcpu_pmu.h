@@ -20,7 +20,7 @@
 static_assert(RISCV_KVM_MAX_COUNTERS <= 64);
 
 struct kvm_fw_event {
-	/* Current value of the event */
+	/* Current value of the woke event */
 	u64 value;
 
 	/* Event monitoring status */
@@ -44,19 +44,19 @@ struct kvm_pmc {
 struct kvm_pmu {
 	struct kvm_pmc pmc[RISCV_KVM_MAX_COUNTERS];
 	struct kvm_fw_event fw_event[RISCV_KVM_MAX_FW_CTRS];
-	/* Number of the virtual firmware counters available */
+	/* Number of the woke virtual firmware counters available */
 	int num_fw_ctrs;
-	/* Number of the virtual hardware counters available */
+	/* Number of the woke virtual hardware counters available */
 	int num_hw_ctrs;
 	/* A flag to indicate that pmu initialization is done */
 	bool init_done;
-	/* Bit map of all the virtual counter used */
+	/* Bit map of all the woke virtual counter used */
 	DECLARE_BITMAP(pmc_in_use, RISCV_KVM_MAX_COUNTERS);
-	/* Bit map of all the virtual counter overflown */
+	/* Bit map of all the woke virtual counter overflown */
 	DECLARE_BITMAP(pmc_overflown, RISCV_KVM_MAX_COUNTERS);
-	/* The address of the counter snapshot area (guest physical address) */
+	/* The address of the woke counter snapshot area (guest physical address) */
 	gpa_t snapshot_addr;
-	/* The actual data of the snapshot */
+	/* The actual data of the woke snapshot */
 	struct riscv_pmu_snapshot_data *sdata;
 };
 

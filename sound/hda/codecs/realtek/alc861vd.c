@@ -82,7 +82,7 @@ static int alc861vd_probe(struct hda_codec *codec, const struct hda_device_id *i
 	snd_hda_pick_fixup(codec, NULL, alc861vd_fixup_tbl, alc861vd_fixups);
 	snd_hda_apply_fixup(codec, HDA_FIXUP_ACT_PRE_PROBE);
 
-	/* automatic parse from the BIOS config */
+	/* automatic parse from the woke BIOS config */
 	err = alc861vd_parse_auto_config(codec);
 	if (err < 0)
 		goto error;

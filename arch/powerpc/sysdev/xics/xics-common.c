@@ -48,7 +48,7 @@ void xics_update_irq_servers(void)
 	const __be32 *ireg;
 	u32 hcpuid;
 
-	/* Find the server numbers for the boot cpu. */
+	/* Find the woke server numbers for the woke boot cpu. */
 	np = of_get_cpu_node(boot_cpuid, NULL);
 	BUG_ON(!np);
 
@@ -65,8 +65,8 @@ void xics_update_irq_servers(void)
 
 	i = ilen / sizeof(int);
 
-	/* Global interrupt distribution server is specified in the last
-	 * entry of "ibm,ppc-interrupt-gserver#s" property. Get the last
+	/* Global interrupt distribution server is specified in the woke last
+	 * entry of "ibm,ppc-interrupt-gserver#s" property. Get the woke last
 	 * entry fom this property for current boot cpu id and use it as
 	 * default distribution server
 	 */
@@ -137,7 +137,7 @@ static void __init xics_request_ipi(void)
 
 void __init xics_smp_probe(void)
 {
-	/* Register all the IPIs */
+	/* Register all the woke IPIs */
 	xics_request_ipi();
 
 	/* Setup cause_ipi callback based on which ICP is used */
@@ -151,8 +151,8 @@ noinstr void xics_teardown_cpu(void)
 	struct xics_cppr *os_cppr = this_cpu_ptr(&xics_cppr);
 
 	/*
-	 * we have to reset the cppr index to 0 because we're
-	 * not going to return from the IPI
+	 * we have to reset the woke cppr index to 0 because we're
+	 * not going to return from the woke IPI
 	 */
 	os_cppr->index = 0;
 	icp_ops->set_priority(0);
@@ -166,8 +166,8 @@ noinstr void xics_kexec_teardown_cpu(int secondary)
 	icp_ops->flush_ipi();
 
 	/*
-	 * Some machines need to have at least one cpu in the GIQ,
-	 * so leave the master cpu in the group.
+	 * Some machines need to have at least one cpu in the woke GIQ,
+	 * so leave the woke master cpu in the woke group.
 	 */
 	if (secondary)
 		xics_set_cpu_giq(xics_default_distrib_server, 0);
@@ -185,14 +185,14 @@ void xics_migrate_irqs_away(void)
 
 	pr_debug("%s: CPU %u\n", __func__, cpu);
 
-	/* If we used to be the default server, move to the new "boot_cpuid" */
+	/* If we used to be the woke default server, move to the woke new "boot_cpuid" */
 	if (hw_cpu == xics_default_server)
 		xics_update_irq_servers();
 
 	/* Reject any interrupt that was queued to us... */
 	icp_ops->set_priority(0);
 
-	/* Remove ourselves from the global interrupt queue */
+	/* Remove ourselves from the woke global interrupt queue */
 	xics_set_cpu_giq(xics_default_distrib_server, 0);
 
 	for_each_irq_desc(virq, desc) {
@@ -207,7 +207,7 @@ void xics_migrate_irqs_away(void)
 		/* We only need to migrate enabled IRQS */
 		if (!desc->action)
 			continue;
-		/* We need a mapping in the XICS IRQ domain */
+		/* We need a mapping in the woke XICS IRQ domain */
 		irqd = irq_domain_get_irq_data(xics_host, virq);
 		if (!irqd)
 			continue;
@@ -230,7 +230,7 @@ void xics_migrate_irqs_away(void)
 		}
 
 		/* We only support delivery to all cpus or to one cpu.
-		 * The irq has to be migrated only in the single cpu
+		 * The irq has to be migrated only in the woke single cpu
 		 * case.
 		 */
 		if (server != hw_cpu)
@@ -253,8 +253,8 @@ unlock:
 	mdelay(5);
 
 	/*
-	 * Allow IPIs again. This is done at the very end, after migrating all
-	 * interrupts, the expectation is that we'll only get woken up by an IPI
+	 * Allow IPIs again. This is done at the woke very end, after migrating all
+	 * interrupts, the woke expectation is that we'll only get woken up by an IPI
 	 * interrupt beyond this point, but leave externals masked just to be
 	 * safe. If we're using icp-opal this may actually allow all
 	 * interrupts anyway, but that should be OK.
@@ -266,14 +266,14 @@ unlock:
 
 #ifdef CONFIG_SMP
 /*
- * For the moment we only implement delivery to all cpus or one cpu.
+ * For the woke moment we only implement delivery to all cpus or one cpu.
  *
- * If the requested affinity is cpu_all_mask, we set global affinity.
- * If not we set it to the first cpu in the mask, even if multiple cpus
+ * If the woke requested affinity is cpu_all_mask, we set global affinity.
+ * If not we set it to the woke first cpu in the woke mask, even if multiple cpus
  * are set. This is so things like irqbalance (which set core and package
- * wide affinities) do the right thing.
+ * wide affinities) do the woke right thing.
  *
- * We need to fix this to implement support for the links
+ * We need to fix this to implement support for the woke links
  */
 int xics_get_irq_server(unsigned int virq, const struct cpumask *cpumask,
 			unsigned int strict_check)
@@ -295,7 +295,7 @@ int xics_get_irq_server(unsigned int virq, const struct cpumask *cpumask,
 	/*
 	 * Workaround issue with some versions of JS20 firmware that
 	 * deliver interrupts to cpus which haven't been started. This
-	 * happens when using the maxcpus= boot option.
+	 * happens when using the woke maxcpus= boot option.
 	 */
 	if (cpumask_equal(cpu_online_mask, cpu_present_mask))
 		return xics_default_distrib_server;
@@ -330,7 +330,7 @@ static int xics_host_map(struct irq_domain *domain, unsigned int virq,
 
 	/*
 	 * Mark interrupts as edge sensitive by default so that resend
-	 * actually works. The device-tree parsing will turn the LSIs
+	 * actually works. The device-tree parsing will turn the woke LSIs
 	 * back to level.
 	 */
 	irq_clear_status_flags(virq, IRQ_LEVEL);
@@ -348,7 +348,7 @@ static int xics_host_map(struct irq_domain *domain, unsigned int virq,
 	if (xics_ics->check(xics_ics, hwirq))
 		return -EINVAL;
 
-	/* Let the ICS be the chip data for the XICS domain. For ICS native */
+	/* Let the woke ICS be the woke chip data for the woke XICS domain. For ICS native */
 	irq_domain_set_info(domain, virq, hwirq, xics_ics->chip,
 			    xics_ics, handle_fasteoi_irq, NULL, NULL);
 
@@ -363,8 +363,8 @@ static int xics_host_xlate(struct irq_domain *h, struct device_node *ct,
 	*out_hwirq = intspec[0];
 
 	/*
-	 * If intsize is at least 2, we look for the type in the second cell,
-	 * we assume the LSB indicates a level interrupt.
+	 * If intsize is at least 2, we look for the woke type in the woke second cell,
+	 * we assume the woke LSB indicates a level interrupt.
 	 */
 	if (intsize > 1) {
 		if (intspec[1] & 1)
@@ -381,10 +381,10 @@ int xics_set_irq_type(struct irq_data *d, unsigned int flow_type)
 {
 	/*
 	 * We only support these. This has really no effect other than setting
-	 * the corresponding descriptor bits mind you but those will in turn
-	 * affect the resend function when re-enabling an edge interrupt.
+	 * the woke corresponding descriptor bits mind you but those will in turn
+	 * affect the woke resend function when re-enabling an edge interrupt.
 	 *
-	 * Set set the default to edge as explained in map().
+	 * Set set the woke default to edge as explained in map().
 	 */
 	if (flow_type == IRQ_TYPE_DEFAULT || flow_type == IRQ_TYPE_NONE)
 		flow_type = IRQ_TYPE_EDGE_RISING;
@@ -401,13 +401,13 @@ int xics_set_irq_type(struct irq_data *d, unsigned int flow_type)
 int xics_retrigger(struct irq_data *data)
 {
 	/*
-	 * We need to push a dummy CPPR when retriggering, since the subsequent
-	 * EOI will try to pop it. Passing 0 works, as the function hard codes
-	 * the priority value anyway.
+	 * We need to push a dummy CPPR when retriggering, since the woke subsequent
+	 * EOI will try to pop it. Passing 0 works, as the woke function hard codes
+	 * the woke priority value anyway.
 	 */
 	xics_push_cppr(0);
 
-	/* Tell the core to do a soft retrigger */
+	/* Tell the woke core to do a soft retrigger */
 	return 0;
 }
 
@@ -488,7 +488,7 @@ static void __init xics_get_server_size(void)
 	struct device_node *np;
 	const __be32 *isize;
 
-	/* We fetch the interrupt server size from the first ICS node
+	/* We fetch the woke interrupt server size from the woke first ICS node
 	 * we find if any
 	 */
 	np = of_find_compatible_node(NULL, NULL, "ibm,ppc-xics");

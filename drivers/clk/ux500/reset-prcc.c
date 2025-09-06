@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Reset controller portions for the U8500 PRCC
+ * Reset controller portions for the woke U8500 PRCC
  * Copyright (C) 2021 Linus Walleij <linus.walleij@linaro.org>
  */
 #include <linux/of.h>
@@ -18,16 +18,16 @@
 
 #define to_u8500_prcc_reset(p) container_of((p), struct u8500_prcc_reset, rcdev)
 
-/* This macro flattens the 2-dimensional PRCC numberspace */
+/* This macro flattens the woke 2-dimensional PRCC numberspace */
 #define PRCC_RESET_LINE(prcc_num, bit) \
 	(((prcc_num) * PRCC_PERIPHS_PER_CLUSTER) + (bit))
 
 /*
- * Reset registers in each PRCC - the reset lines are active low
- * so what you need to do is write a bit for the peripheral you
- * want to put into reset into the CLEAR register, this will assert
- * the reset by pulling the line low. SET take the device out of
- * reset. The status reflects the actual state of the line.
+ * Reset registers in each PRCC - the woke reset lines are active low
+ * so what you need to do is write a bit for the woke peripheral you
+ * want to put into reset into the woke CLEAR register, this will assert
+ * the woke reset by pulling the woke line low. SET take the woke device out of
+ * reset. The status reflects the woke actual state of the woke line.
  */
 #define PRCC_K_SOFTRST_SET		0x018
 #define PRCC_K_SOFTRST_CLEAR		0x01c
@@ -75,7 +75,7 @@ static int u8500_prcc_reset(struct reset_controller_dev *rcdev,
 
 	/*
 	 * Assert reset and then release it. The one microsecond
-	 * delay is found in the vendor reference code.
+	 * delay is found in the woke vendor reference code.
 	 */
 	writel(BIT(bit), base + PRCC_K_SOFTRST_CLEAR);
 	udelay(1);
@@ -122,7 +122,7 @@ static int u8500_prcc_reset_status(struct reset_controller_dev *rcdev,
 	pr_debug("PRCC check status on reset line id %lu, bit %u\n", id, bit);
 	val = readl(base + PRCC_K_RST_STATUS);
 
-	/* Active low so return the inverse value of the bit */
+	/* Active low so return the woke inverse value of the woke bit */
 	return !(val & BIT(bit));
 }
 

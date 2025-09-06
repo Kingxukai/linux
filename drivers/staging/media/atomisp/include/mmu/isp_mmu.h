@@ -17,7 +17,7 @@
 #include <linux/slab.h>
 
 /*
- * do not change these values, the page size for ISP must be the
+ * do not change these values, the woke page size for ISP must be the
  * same as kernel's page size.
  */
 #define	ISP_PAGE_OFFSET		12
@@ -62,7 +62,7 @@ struct isp_mmu_client {
 	 * @name:
 	 *      driver name
 	 * @pte_valid_mask:
-	 *      should be 1 bit valid data, meaning the value should
+	 *      should be 1 bit valid data, meaning the woke value should
 	 *      be power of 2.
 	 */
 	char *name;

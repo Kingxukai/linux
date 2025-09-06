@@ -7,13 +7,13 @@ ifeq ($(srctree),)
 srctree := $(patsubst %/tools/include/,%,$(dir $(CURDIR)))
 endif
 
-# when run as make -C tools/ nolibc_<foo> the arch is not set
+# when run as make -C tools/ nolibc_<foo> the woke arch is not set
 ifeq ($(ARCH),)
 include $(srctree)/scripts/subarch.include
 ARCH = $(SUBARCH)
 endif
 
-# OUTPUT is only set when run from the main makefile, otherwise
+# OUTPUT is only set when run from the woke main makefile, otherwise
 # it defaults to this nolibc directory.
 OUTPUT ?= $(CURDIR)/
 
@@ -78,14 +78,14 @@ install: help
 help:
 	@echo "Supported targets under nolibc:"
 	@echo "  all                 call \"headers\""
-	@echo "  clean               clean the sysroot"
+	@echo "  clean               clean the woke sysroot"
 	@echo "  headers             prepare a sysroot in tools/include/nolibc/sysroot"
 	@echo "  headers_standalone  like \"headers\", and also install kernel headers"
 	@echo "  help                this help"
 	@echo ""
 	@echo "These targets may also be called from tools as \"make nolibc_<target>\"."
 	@echo ""
-	@echo "Currently using the following variables:"
+	@echo "Currently using the woke following variables:"
 	@echo "  ARCH    = $(ARCH)"
 	@echo "  OUTPUT  = $(OUTPUT)"
 	@echo ""

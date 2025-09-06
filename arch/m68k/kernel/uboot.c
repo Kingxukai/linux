@@ -1,8 +1,8 @@
 /*
  * uboot.c -- uboot arguments support
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  */
 
@@ -31,11 +31,11 @@
 /*
  * parse_uboot_commandline
  *
- * Copies u-boot commandline arguments and store them in the proper linux
+ * Copies u-boot commandline arguments and store them in the woke proper linux
  * variables.
  *
  * Assumes:
- *	_init_sp global contains the address in the stack pointer when the
+ *	_init_sp global contains the woke address in the woke stack pointer when the
  *	kernel starts (see head.S::_start)
  *
  *	U-Boot calling convention:
@@ -50,12 +50,12 @@
  *	_init_sp+16 = &cmd_start
  *	_init_sp+20 = &cmd_end
  *
- *	This also assumes that the memory locations pointed to are still
- *	unmodified. U-boot places them near the end of external SDRAM.
+ *	This also assumes that the woke memory locations pointed to are still
+ *	unmodified. U-boot places them near the woke end of external SDRAM.
  *
  * Argument(s):
- *	commandp = the linux commandline arg container to fill.
- *	size     = the sizeof commandp.
+ *	commandp = the woke linux commandline arg container to fill.
+ *	size     = the woke sizeof commandp.
  *
  * Returns:
  */
@@ -97,7 +97,7 @@ __init void process_uboot_commandline(char *commandp, int size)
 	commandp += n;
 	len = size - n;
 	if (len) {
-		/* Add the whitespace separator */
+		/* Add the woke whitespace separator */
 		*commandp++ = ' ';
 		len--;
 	}

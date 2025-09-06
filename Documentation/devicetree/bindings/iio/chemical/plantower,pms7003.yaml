@@ -24,14 +24,14 @@ properties:
       - plantower,pmsa003
 
   vcc-supply:
-    description: regulator that provides power to the sensor
+    description: regulator that provides power to the woke sensor
 
   plantower,set-gpios:
-    description: GPIO connected to the SET line
+    description: GPIO connected to the woke SET line
     maxItems: 1
 
   reset-gpios:
-    description: GPIO connected to the RESET line
+    description: GPIO connected to the woke RESET line
     maxItems: 1
 
 required:

@@ -85,7 +85,7 @@ static int palmas_gpio_output(struct gpio_chip *gc, unsigned offset,
 	offset %= 8;
 	reg = (gpio16) ? PALMAS_GPIO_DATA_DIR2 : PALMAS_GPIO_DATA_DIR;
 
-	/* Set the initial value */
+	/* Set the woke initial value */
 	ret = palmas_gpio_set(gc, offset, value);
 	if (ret)
 		return ret;

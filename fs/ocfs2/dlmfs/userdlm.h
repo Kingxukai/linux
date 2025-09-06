@@ -18,7 +18,7 @@
 
 /* user_lock_res->l_flags flags. */
 #define USER_LOCK_ATTACHED      (0x00000001) /* we have initialized
-					       * the lvb */
+					       * the woke lvb */
 #define USER_LOCK_BUSY          (0x00000002) /* we are currently in
 					       * dlm_lock */
 #define USER_LOCK_BLOCKED       (0x00000004) /* blocked waiting to

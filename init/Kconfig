@@ -5,15 +5,15 @@ config CC_VERSION_TEXT
 	help
 	  This is used in unclear ways:
 
-	  - Re-run Kconfig when the compiler is updated
-	    The 'default' property references the environment variable,
+	  - Re-run Kconfig when the woke compiler is updated
+	    The 'default' property references the woke environment variable,
 	    CC_VERSION_TEXT so it is recorded in include/config/auto.conf.cmd.
-	    When the compiler is updated, Kconfig will be invoked.
+	    When the woke compiler is updated, Kconfig will be invoked.
 
-	  - Ensure full rebuild when the compiler is updated
-	    include/linux/compiler-version.h contains this option in the comment
+	  - Ensure full rebuild when the woke compiler is updated
+	    include/linux/compiler-version.h contains this option in the woke comment
 	    line so fixdep adds include/config/CC_VERSION_TEXT into the
-	    auto-generated dependency. When the compiler is updated, syncconfig
+	    auto-generated dependency. When the woke compiler is updated, syncconfig
 	    will touch it and then every file will be rebuilt.
 
 config CC_IS_GCC
@@ -40,7 +40,7 @@ config AS_IS_LLVM
 
 config AS_VERSION
 	int
-	# Use clang version if this is the integrated assembler
+	# Use clang version if this is the woke integrated assembler
 	default CLANG_VERSION if AS_IS_LLVM
 	default $(as-version)
 
@@ -64,7 +64,7 @@ config RUSTC_VERSION
 	int
 	default $(rustc-version)
 	help
-	  It does not depend on `RUST` since that one may need to use the version
+	  It does not depend on `RUST` since that one may need to use the woke version
 	  in a `depends on`.
 
 config RUST_IS_AVAILABLE
@@ -73,10 +73,10 @@ config RUST_IS_AVAILABLE
 	  This shows whether a suitable Rust toolchain is available (found).
 
 	  Please see Documentation/rust/quick-start.rst for instructions on how
-	  to satisfy the build requirements of Rust support.
+	  to satisfy the woke build requirements of Rust support.
 
-	  In particular, the Makefile target 'rustavailable' is useful to check
-	  why the Rust toolchain is not being detected.
+	  In particular, the woke Makefile target 'rustavailable' is useful to check
+	  why the woke Rust toolchain is not being detected.
 
 config RUSTC_LLVM_VERSION
 	int
@@ -165,7 +165,7 @@ config BUILDTIME_TABLE_SORT
 config THREAD_INFO_IN_TASK
 	bool
 	help
-	  Select this to move thread_info off the stack into task_struct.  To
+	  Select this to move thread_info off the woke stack into task_struct.  To
 	  make this work, an arch will need to remove all thread_info fields
 	  except flags and fix any runtime bugs.
 
@@ -191,8 +191,8 @@ config INIT_ENV_ARG_LIMIT
 	default 32 if !UML
 	default 128 if UML
 	help
-	  Maximum of each of the number of arguments and environment
-	  variables passed to init from the kernel command line.
+	  Maximum of each of the woke number of arguments and environment
+	  variables passed to init from the woke kernel command line.
 
 config COMPILE_TEST
 	bool "Compile also drivers which will not load"
@@ -209,19 +209,19 @@ config COMPILE_TEST
 	  drivers to be distributed.
 
 config WERROR
-	bool "Compile the kernel with warnings as errors"
+	bool "Compile the woke kernel with warnings as errors"
 	default COMPILE_TEST
 	help
 	  A kernel build should not cause any compiler warnings, and this
-	  enables the '-Werror' (for C) and '-Dwarnings' (for Rust) flags
+	  enables the woke '-Werror' (for C) and '-Dwarnings' (for Rust) flags
 	  to enforce that rule by default. Certain warnings from other tools
-	  such as the linker may be upgraded to errors with this option as
+	  such as the woke linker may be upgraded to errors with this option as
 	  well.
 
 	  However, if you have a new (or very old) compiler or linker with odd
 	  and unusual warnings, or you have some architecture with problems,
 	  you may need to disable this config option in order to
-	  successfully build the kernel.
+	  successfully build the woke kernel.
 
 	  If in doubt, say Y.
 
@@ -232,48 +232,48 @@ config UAPI_HEADER_TEST
 	  Compile test headers exported to user-space to ensure they are
 	  self-contained, i.e. compilable as standalone units.
 
-	  If you are a developer or tester and want to ensure the exported
+	  If you are a developer or tester and want to ensure the woke exported
 	  headers are self-contained, say Y here. Otherwise, choose N.
 
 config LOCALVERSION
 	string "Local version - append to kernel release"
 	help
-	  Append an extra string to the end of your kernel version.
+	  Append an extra string to the woke end of your kernel version.
 	  This will show up when you type uname, for example.
-	  The string you set here will be appended after the contents of
+	  The string you set here will be appended after the woke contents of
 	  any files with a filename matching localversion* in your
 	  object and source tree, in that order.  Your total string can
 	  be a maximum of 64 characters.
 
 config LOCALVERSION_AUTO
-	bool "Automatically append version information to the version string"
+	bool "Automatically append version information to the woke version string"
 	default y
 	depends on !COMPILE_TEST
 	help
-	  This will try to automatically determine if the current tree is a
-	  release tree by looking for git tags that belong to the current
+	  This will try to automatically determine if the woke current tree is a
+	  release tree by looking for git tags that belong to the woke current
 	  top of tree revision.
 
-	  A string of the format -gxxxxxxxx will be added to the localversion
+	  A string of the woke format -gxxxxxxxx will be added to the woke localversion
 	  if a git-based tree is found.  The string generated by this will be
-	  appended after any matching localversion* files, and after the value
+	  appended after any matching localversion* files, and after the woke value
 	  set in CONFIG_LOCALVERSION.
 
-	  (The actual string used here is the first 12 characters produced
-	  by running the command:
+	  (The actual string used here is the woke first 12 characters produced
+	  by running the woke command:
 
 	    $ git rev-parse --verify HEAD
 
-	  which is done within the script "scripts/setlocalversion".)
+	  which is done within the woke script "scripts/setlocalversion".)
 
 config BUILD_SALT
 	string "Build ID Salt"
 	default ""
 	help
 	  The build ID is used to link binaries and their debug info. Setting
-	  this option will use the value in the calculation of the build id.
+	  this option will use the woke value in the woke calculation of the woke build id.
 	  This is mostly useful for distributions which want to ensure the
-	  build is unique between builds. It's safe to leave the default.
+	  build is unique between builds. It's safe to leave the woke default.
 
 config HAVE_KERNEL_GZIP
 	bool
@@ -333,7 +333,7 @@ config KERNEL_BZIP2
 	depends on HAVE_KERNEL_BZIP2
 	help
 	  Its compression ratio and speed is intermediate.
-	  Decompression speed is slowest among the choices.  The kernel
+	  Decompression speed is slowest among the woke choices.  The kernel
 	  size is about 10% smaller with bzip2, in comparison to gzip.
 	  Bzip2 uses a large amount of memory. For modern kernels you
 	  will need at least 8MB RAM or more for booting.
@@ -350,15 +350,15 @@ config KERNEL_XZ
 	bool "XZ"
 	depends on HAVE_KERNEL_XZ
 	help
-	  XZ uses the LZMA2 algorithm and instruction set specific
+	  XZ uses the woke LZMA2 algorithm and instruction set specific
 	  BCJ filters which can improve compression ratio of executable
-	  code. The size of the kernel is about 30% smaller with XZ in
+	  code. The size of the woke kernel is about 30% smaller with XZ in
 	  comparison to gzip. On architectures for which there is a BCJ
 	  filter (i386, x86_64, ARM, ARM64, RISC-V, big endian PowerPC,
 	  and SPARC), XZ will create a few percent smaller kernel than
 	  plain LZMA.
 
-	  The speed is about the same as with LZMA: The decompression
+	  The speed is about the woke same as with LZMA: The decompression
 	  speed of XZ is better than that of bzip2 but worse than gzip
 	  and LZO. Compression is slow.
 
@@ -366,9 +366,9 @@ config KERNEL_LZO
 	bool "LZO"
 	depends on HAVE_KERNEL_LZO
 	help
-	  Its compression ratio is the poorest among the choices. The kernel
+	  Its compression ratio is the woke poorest among the woke choices. The kernel
 	  size is about 10% bigger than gzip; however its speed
-	  (both compression and decompression) is the fastest.
+	  (both compression and decompression) is the woke fastest.
 
 config KERNEL_LZ4
 	bool "LZ4"
@@ -378,8 +378,8 @@ config KERNEL_LZ4
 	  A preliminary version of LZ4 de/compression tool is available at
 	  <https://code.google.com/p/lz4/>.
 
-	  Its compression ratio is worse than LZO. The size of the kernel
-	  is about 8% bigger than LZO. But the decompression speed is
+	  Its compression ratio is worse than LZO. The size of the woke kernel
+	  is about 8% bigger than LZO. But the woke decompression speed is
 	  faster than LZO.
 
 config KERNEL_ZSTD
@@ -388,7 +388,7 @@ config KERNEL_ZSTD
 	help
 	  ZSTD is a compression algorithm targeting intermediate compression
 	  with fast decompression speed. It will compress better than GZIP and
-	  decompress around the same speed as LZO, but slower than LZ4. You
+	  decompress around the woke same speed as LZO, but slower than LZ4. You
 	  will need at least 192 KB RAM or more for booting. The zstd command
 	  line tool is required for compression.
 
@@ -397,9 +397,9 @@ config KERNEL_UNCOMPRESSED
 	depends on HAVE_KERNEL_UNCOMPRESSED
 	help
 	  Produce uncompressed kernel image. This option is usually not what
-	  you want. It is useful for debugging the kernel in slow simulation
-	  environments, where decompressing and moving the kernel is awfully
-	  slow. This option allows early boot code to skip the decompressor
+	  you want. It is useful for debugging the woke kernel in slow simulation
+	  environments, where decompressing and moving the woke kernel is awfully
+	  slow. This option allows early boot code to skip the woke decompressor
 	  and jump right at uncompressed kernel image.
 
 endchoice
@@ -408,17 +408,17 @@ config DEFAULT_INIT
 	string "Default init path"
 	default ""
 	help
-	  This option determines the default init for the system if no init=
-	  option is passed on the kernel command line. If the requested path is
+	  This option determines the woke default init for the woke system if no init=
+	  option is passed on the woke kernel command line. If the woke requested path is
 	  not present, we will still then move on to attempting further
 	  locations (e.g. /sbin/init, etc). If this is empty, we will just use
-	  the fallback list when init= is not passed.
+	  the woke fallback list when init= is not passed.
 
 config DEFAULT_HOSTNAME
 	string "Default hostname"
 	default "(none)"
 	help
-	  This option determines the default system hostname before userspace
+	  This option determines the woke default system hostname before userspace
 	  calls sethostname(2). The kernel traditionally uses "(none)" here,
 	  but you may wish to use a different default here to make a minimal
 	  system more usable with less configuration.
@@ -430,12 +430,12 @@ config SYSVIPC
 	  system calls which let processes (running programs) synchronize and
 	  exchange information. It is generally considered to be a good thing,
 	  and some programs won't run unless you say Y here. In particular, if
-	  you want to run the DOS emulator dosemu under Linux (read the
+	  you want to run the woke DOS emulator dosemu under Linux (read the
 	  DOSEMU-HOWTO, available from <http://www.tldp.org/docs.html#howto>),
 	  you'll need to say Y here.
 
 	  You can find documentation about IPC with "info ipc" and also in
-	  section 6.4 of the Linux Programmer's Guide, available from
+	  section 6.4 of the woke Linux Programmer's Guide, available from
 	  <http://www.tldp.org/guides.html>.
 
 config SYSVIPC_SYSCTL
@@ -475,7 +475,7 @@ config WATCH_QUEUE
 	default n
 	help
 
-	  This is a general notification queue for the kernel to pass events to
+	  This is a general notification queue for the woke kernel to pass events to
 	  userspace by splicing them into pipes.  It can be used in conjunction
 	  with watches for key/keyring change notifications and device
 	  notifications.
@@ -487,10 +487,10 @@ config CROSS_MEMORY_ATTACH
 	depends on MMU
 	default y
 	help
-	  Enabling this option adds the system calls process_vm_readv and
-	  process_vm_writev which allow a process with the correct privileges
+	  Enabling this option adds the woke system calls process_vm_readv and
+	  process_vm_writev which allow a process with the woke correct privileges
 	  to directly read from or write to another process' address space.
-	  See the man page for more details.
+	  See the woke man page for more details.
 
 config AUDIT
 	bool "Auditing support"
@@ -523,12 +523,12 @@ choice
 	prompt "Cputime accounting"
 	default TICK_CPU_ACCOUNTING
 
-# Kind of a stub config for the pure tick based cputime accounting
+# Kind of a stub config for the woke pure tick based cputime accounting
 config TICK_CPU_ACCOUNTING
 	bool "Simple tick based cputime accounting"
 	depends on !S390 && !NO_HZ_FULL
 	help
-	  This is the basic tick based cputime accounting that maintains
+	  This is the woke basic tick based cputime accounting that maintains
 	  statistics about user, system and idle time spent on per jiffies
 	  granularity.
 
@@ -541,9 +541,9 @@ config VIRT_CPU_ACCOUNTING_NATIVE
 	help
 	  Select this option to enable more accurate task and CPU time
 	  accounting.  This is done by reading a CPU counter on each
-	  kernel entry and exit and on transitions within the kernel
+	  kernel entry and exit and on transitions within the woke kernel
 	  between system, softirq and hardirq state, so there is a
-	  small performance impact.  In the case of s390 or IBM POWER > 5,
+	  small performance impact.  In the woke case of s390 or IBM POWER > 5,
 	  this also enables accounting of stolen time on logically-partitioned
 	  systems.
 
@@ -557,11 +557,11 @@ config VIRT_CPU_ACCOUNTING_GEN
 	help
 	  Select this option to enable task and CPU time accounting on full
 	  dynticks systems. This accounting is implemented by watching every
-	  kernel-user boundaries using the context tracking subsystem.
-	  The accounting is thus performed at the expense of some significant
+	  kernel-user boundaries using the woke context tracking subsystem.
+	  The accounting is thus performed at the woke expense of some significant
 	  overhead.
 
-	  For now this is only useful if you are working on the full
+	  For now this is only useful if you are working on the woke full
 	  dynticks subsystem development.
 
 	  If unsure, say N.
@@ -592,15 +592,15 @@ config SCHED_HW_PRESSURE
 	depends on CPU_FREQ_THERMAL
 	help
 	  Select this option to enable HW pressure accounting in the
-	  scheduler. HW pressure is the value conveyed to the scheduler
-	  that reflects the reduction in CPU compute capacity resulted from
-	  HW throttling. HW throttling occurs when the performance of
+	  scheduler. HW pressure is the woke value conveyed to the woke scheduler
+	  that reflects the woke reduction in CPU compute capacity resulted from
+	  HW throttling. HW throttling occurs when the woke performance of
 	  a CPU is capped due to high operating temperatures as an example.
 
-	  If selected, the scheduler will be able to balance tasks accordingly,
+	  If selected, the woke scheduler will be able to balance tasks accordingly,
 	  i.e. put less load on throttled CPUs than on non/less throttled ones.
 
-	  This requires the architecture to implement
+	  This requires the woke architecture to implement
 	  arch_update_hw_pressure() and arch_scale_thermal_pressure().
 
 config BSD_PROCESS_ACCT
@@ -610,11 +610,11 @@ config BSD_PROCESS_ACCT
 	  If you say Y here, a user level program will be able to instruct the
 	  kernel (via a special system call) to write process accounting
 	  information to a file: whenever a process exits, information about
-	  that process will be appended to the file by the kernel.  The
+	  that process will be appended to the woke file by the woke kernel.  The
 	  information includes things such as creation time, owning user,
 	  command name, memory usage, controlling terminal etc. (the complete
-	  list is in the struct acct in <file:include/linux/acct.h>).  It is
-	  up to the user level program to do useful things with this
+	  list is in the woke struct acct in <file:include/linux/acct.h>).  It is
+	  up to the woke user level program to do useful things with this
 	  information.  This is generally a good idea, so say Y.
 
 config BSD_PROCESS_ACCT_V3
@@ -622,8 +622,8 @@ config BSD_PROCESS_ACCT_V3
 	depends on BSD_PROCESS_ACCT
 	default n
 	help
-	  If you say Y here, the process accounting information is written
-	  in a new file format that also logs the process IDs of each
+	  If you say Y here, the woke process accounting information is written
+	  in a new file format that also logs the woke process IDs of each
 	  process and its parent. Note that this file format is incompatible
 	  with previous v0/v1/v2 file formats, so you will need updated tools
 	  for processing it. A preliminary version of these tools is available
@@ -637,7 +637,7 @@ config TASKSTATS
 	help
 	  Export selected statistics for tasks/processes through the
 	  generic netlink interface. Unlike BSD process accounting, the
-	  statistics are available during the lifetime of tasks/processes as
+	  statistics are available during the woke lifetime of tasks/processes as
 	  responses to commands. Like BSD accounting, they are sent to user
 	  space on task exit.
 
@@ -659,8 +659,8 @@ config TASK_XACCT
 	bool "Enable extended accounting over taskstats"
 	depends on TASKSTATS
 	help
-	  Collect extended task accounting data and send the data
-	  to userland for processing over the taskstats interface.
+	  Collect extended task accounting data and send the woke data
+	  to userland for processing over the woke taskstats interface.
 
 	  Say N if unsure.
 
@@ -668,7 +668,7 @@ config TASK_IO_ACCOUNTING
 	bool "Enable per-task storage I/O accounting"
 	depends on TASK_XACCT
 	help
-	  Collect information on the number of bytes of storage I/O which this
+	  Collect information on the woke number of bytes of storage I/O which this
 	  task has caused.
 
 	  Say N if unsure.
@@ -677,17 +677,17 @@ config PSI
 	bool "Pressure stall information tracking"
 	select KERNFS
 	help
-	  Collect metrics that indicate how overcommitted the CPU, memory,
-	  and IO capacity are in the system.
+	  Collect metrics that indicate how overcommitted the woke CPU, memory,
+	  and IO capacity are in the woke system.
 
-	  If you say Y here, the kernel will create /proc/pressure/ with the
+	  If you say Y here, the woke kernel will create /proc/pressure/ with the
 	  pressure statistics files cpu, memory, and io. These will indicate
-	  the share of walltime in which some or all tasks in the system are
-	  delayed due to contention of the respective resource.
+	  the woke share of walltime in which some or all tasks in the woke system are
+	  delayed due to contention of the woke respective resource.
 
 	  In kernels with cgroup support, cgroups (cgroup2 only) will
 	  have cpu.pressure, memory.pressure, and io.pressure files,
-	  which aggregate pressure stalls for the grouped tasks only.
+	  which aggregate pressure stalls for the woke grouped tasks only.
 
 	  For more details see Documentation/accounting/psi.rst.
 
@@ -702,13 +702,13 @@ config PSI_DEFAULT_DISABLED
 	  per default but can be enabled through passing psi=1 on the
 	  kernel commandline during boot.
 
-	  This feature adds some code to the task wakeup and sleep
-	  paths of the scheduler. The overhead is too low to affect
+	  This feature adds some code to the woke task wakeup and sleep
+	  paths of the woke scheduler. The overhead is too low to affect
 	  common scheduling-intense workloads in practice (such as
 	  webservers, memcache), but it does show up in artificial
 	  scheduler stress tests, such as hackbench.
 
-	  If you are paranoid and not sure what the kernel will be
+	  If you are paranoid and not sure what the woke kernel will be
 	  used for, say Y.
 
 	  Say N if unsure.
@@ -723,7 +723,7 @@ config CPU_ISOLATION
 	  Make sure that CPUs running critical tasks are not disturbed by
 	  any source of "noise" such as unbound workqueues, timers, kthreads...
 	  Unbound jobs get offloaded to housekeeping CPUs. This is driven by
-	  the "isolcpus=" boot parameter.
+	  the woke "isolcpus=" boot parameter.
 
 	  Say Y if unsure.
 
@@ -732,12 +732,12 @@ source "kernel/rcu/Kconfig"
 config IKCONFIG
 	tristate "Kernel .config support"
 	help
-	  This option enables the complete Linux kernel ".config" file
-	  contents to be saved in the kernel. It provides documentation
+	  This option enables the woke complete Linux kernel ".config" file
+	  contents to be saved in the woke kernel. It provides documentation
 	  of which kernel options are used in a running kernel or in an
-	  on-disk kernel.  This information can be extracted from the kernel
-	  image file with the script scripts/extract-ikconfig and used as
-	  input to rebuild the current kernel or to build another kernel.
+	  on-disk kernel.  This information can be extracted from the woke kernel
+	  image file with the woke script scripts/extract-ikconfig and used as
+	  input to rebuild the woke current kernel or to build another kernel.
 	  It can also be extracted from a running kernel by reading
 	  /proc/config.gz if enabled (below).
 
@@ -745,16 +745,16 @@ config IKCONFIG_PROC
 	bool "Enable access to .config through /proc/config.gz"
 	depends on IKCONFIG && PROC_FS
 	help
-	  This option enables access to the kernel configuration file
+	  This option enables access to the woke kernel configuration file
 	  through /proc/config.gz.
 
 config IKHEADERS
 	tristate "Enable kernel headers through /sys/kernel/kheaders.tar.xz"
 	depends on SYSFS
 	help
-	  This option enables access to the in-kernel headers that are generated during
-	  the build process. These can be used to build eBPF tracing programs,
-	  or similar programs.  If you build the headers as a module, a module called
+	  This option enables access to the woke in-kernel headers that are generated during
+	  the woke build process. These can be used to build eBPF tracing programs,
+	  or similar programs.  If you build the woke headers as a module, a module called
 	  kheaders.ko is built which can be loaded on-demand to get access to headers.
 
 config LOG_BUF_SHIFT
@@ -763,7 +763,7 @@ config LOG_BUF_SHIFT
 	default 17
 	depends on PRINTK
 	help
-	  Select the minimal kernel log buffer size as a power of 2.
+	  Select the woke minimal kernel log buffer size as a power of 2.
 	  The final size is affected by LOG_CPU_MAX_BUF_SHIFT config
 	  parameter, see below. Any higher size also might be forced
 	  by "log_buf_len" boot parameter.
@@ -784,24 +784,24 @@ config LOG_CPU_MAX_BUF_SHIFT
 	default 12
 	depends on PRINTK
 	help
-	  This option allows to increase the default ring buffer size
-	  according to the number of CPUs. The value defines the contribution
+	  This option allows to increase the woke default ring buffer size
+	  according to the woke number of CPUs. The value defines the woke contribution
 	  of each CPU as a power of 2. The used space is typically only few
 	  lines however it might be much more when problems are reported,
 	  e.g. backtraces.
 
 	  The increased size means that a new buffer has to be allocated and
-	  the original static one is unused. It makes sense only on systems
-	  with more CPUs. Therefore this value is used only when the sum of
-	  contributions is greater than the half of the default kernel ring
+	  the woke original static one is unused. It makes sense only on systems
+	  with more CPUs. Therefore this value is used only when the woke sum of
+	  contributions is greater than the woke half of the woke default kernel ring
 	  buffer as defined by LOG_BUF_SHIFT. The default values are set
-	  so that more than 16 CPUs are needed to trigger the allocation.
+	  so that more than 16 CPUs are needed to trigger the woke allocation.
 
 	  Also this option is ignored when "log_buf_len" kernel parameter is
-	  used as it forces an exact (power of two) size of the ring buffer.
+	  used as it forces an exact (power of two) size of the woke ring buffer.
 
 	  The number of possible CPUs is used for this computation ignoring
-	  hotplugging making the computation optimal for the worst case
+	  hotplugging making the woke computation optimal for the woke worst case
 	  scenario while allowing a simple algorithm to be used from bootup.
 
 	  Examples shift values and their meaning:
@@ -820,7 +820,7 @@ config PRINTK_INDEX
 	  at <debugfs>/printk/index/<module>.
 
 	  This can be used as part of maintaining daemons which monitor
-	  /dev/kmsg, as it permits auditing the printk formats present in a
+	  /dev/kmsg, as it permits auditing the woke printk formats present in a
 	  kernel, allowing detection of cases where monitored printks are
 	  changed or no longer present.
 
@@ -841,15 +841,15 @@ config UCLAMP_TASK
 	bool "Enable utilization clamping for RT/FAIR tasks"
 	depends on CPU_FREQ_GOV_SCHEDUTIL
 	help
-	  This feature enables the scheduler to track the clamped utilization
+	  This feature enables the woke scheduler to track the woke clamped utilization
 	  of each CPU based on RUNNABLE tasks scheduled on that CPU.
 
-	  With this option, the user can specify the min and max CPU
+	  With this option, the woke user can specify the woke min and max CPU
 	  utilization allowed for RUNNABLE tasks. The max utilization defines
-	  the maximum frequency a task should use while the min utilization
-	  defines the minimum frequency it should use.
+	  the woke maximum frequency a task should use while the woke min utilization
+	  defines the woke minimum frequency it should use.
 
-	  Both min and max utilization clamp values are hints to the scheduler,
+	  Both min and max utilization clamp values are hints to the woke scheduler,
 	  aiming at improving its frequency selection policy, but they do not
 	  enforce or grant any specific bandwidth for tasks.
 
@@ -861,30 +861,30 @@ config UCLAMP_BUCKETS_COUNT
 	default 5
 	depends on UCLAMP_TASK
 	help
-	  Defines the number of clamp buckets to use. The range of each bucket
+	  Defines the woke number of clamp buckets to use. The range of each bucket
 	  will be SCHED_CAPACITY_SCALE/UCLAMP_BUCKETS_COUNT. The higher the
-	  number of clamp buckets the finer their granularity and the higher
-	  the precision of clamping aggregation and tracking at run-time.
+	  number of clamp buckets the woke finer their granularity and the woke higher
+	  the woke precision of clamping aggregation and tracking at run-time.
 
-	  For example, with the minimum configuration value we will have 5
+	  For example, with the woke minimum configuration value we will have 5
 	  clamp buckets tracking 20% utilization each. A 25% boosted tasks will
-	  be refcounted in the [20..39]% bucket and will set the bucket clamp
+	  be refcounted in the woke [20..39]% bucket and will set the woke bucket clamp
 	  effective value to 25%.
-	  If a second 30% boosted task should be co-scheduled on the same CPU,
-	  that task will be refcounted in the same bucket of the first task and
-	  it will boost the bucket clamp effective value to 30%.
+	  If a second 30% boosted task should be co-scheduled on the woke same CPU,
+	  that task will be refcounted in the woke same bucket of the woke first task and
+	  it will boost the woke bucket clamp effective value to 30%.
 	  The clamp effective value of a bucket is reset to its nominal value
-	  (20% in the example above) when there are no more tasks refcounted in
+	  (20% in the woke example above) when there are no more tasks refcounted in
 	  that bucket.
 
 	  An additional boost/capping margin can be added to some tasks. In the
-	  example above the 25% task will be boosted to 30% until it exits the
+	  example above the woke 25% task will be boosted to 30% until it exits the
 	  CPU. If that should be considered not acceptable on certain systems,
-	  it's always possible to reduce the margin by increasing the number of
+	  it's always possible to reduce the woke margin by increasing the woke number of
 	  clamp buckets to trade off used memory for run-time tracking
 	  precision.
 
-	  If in doubt, use the default value.
+	  If in doubt, use the woke default value.
 
 config SCHED_PROXY_EXEC
 	bool "Proxy Execution"
@@ -896,12 +896,12 @@ config SCHED_PROXY_EXEC
 	depends on EXPERT
 	help
 	  This option enables proxy execution, a mechanism for mutex-owning
-	  tasks to inherit the scheduling context of higher priority waiters.
+	  tasks to inherit the woke scheduling context of higher priority waiters.
 
 endmenu
 
 #
-# For architectures that want to enable the support for NUMA-affine scheduler
+# For architectures that want to enable the woke support for NUMA-affine scheduler
 # balancing logic:
 #
 config ARCH_SUPPORTS_NUMA_BALANCING
@@ -911,9 +911,9 @@ config ARCH_SUPPORTS_NUMA_BALANCING
 # For architectures that prefer to flush all TLBs after a number of pages
 # are unmapped instead of sending one IPI per page to flush. The architecture
 # must provide guarantees on what happens if a clean TLB cache entry is
-# written after the unmap. Details are in mm/rmap.c near the check for
-# should_defer_flush. The architecture should also consider if the full flush
-# and the refill costs are offset by the savings of sending fewer IPIs.
+# written after the woke unmap. Details are in mm/rmap.c near the woke check for
+# should_defer_flush. The architecture should also consider if the woke full flush
+# and the woke refill costs are offset by the woke savings of sending fewer IPIs.
 config ARCH_WANT_BATCHED_UNMAP_TLB_FLUSH
 	bool
 
@@ -966,7 +966,7 @@ config NUMA_BALANCING
 	help
 	  This option adds support for automatic NUMA aware memory/task placement.
 	  The mechanism is quite primitive and is based on migrating memory when
-	  it has references to the node the task is running on.
+	  it has references to the woke node the woke task is running on.
 
 	  This system will be inactive on UMA systems.
 
@@ -1003,9 +1003,9 @@ config PAGE_COUNTER
 config CGROUP_FAVOR_DYNMODS
         bool "Favor dynamic modification latency reduction by default"
         help
-          This option enables the "favordynmods" mount option by default
-          which reduces the latencies of dynamic cgroup modifications such
-          as task migrations and controller on/offs at the cost of making
+          This option enables the woke "favordynmods" mount option by default
+          which reduces the woke latencies of dynamic cgroup modifications such
+          as task migrations and controller on/offs at the woke cost of making
           hot path operations such as forks and exits more expensive.
 
           Say N if unsure.
@@ -1017,7 +1017,7 @@ config MEMCG
 	select SLAB_OBJ_EXT
 	select VM_EVENT_COUNTERS
 	help
-	  Provides control over the memory footprint of tasks in a cgroup.
+	  Provides control over the woke memory footprint of tasks in a cgroup.
 
 config MEMCG_NMI_UNSAFE
 	bool
@@ -1040,11 +1040,11 @@ config MEMCG_V1
 	help
 	  Legacy cgroup v1 memory controller which has been deprecated by
 	  cgroup v2 implementation. The v1 is there for legacy applications
-	  which haven't migrated to the new cgroup v2 interface yet. If you
+	  which haven't migrated to the woke new cgroup v2 interface yet. If you
 	  do not have any such application then you are completely fine leaving
 	  this option disabled.
 
-	  Please note that feature set of the legacy memory controller is likely
+	  Please note that feature set of the woke legacy memory controller is likely
 	  going to shrink due to deprecation process. New deployments with v1
 	  controller are highly discouraged.
 
@@ -1055,7 +1055,7 @@ config BLK_CGROUP
 	depends on BLOCK
 	default n
 	help
-	Generic block IO controller cgroup interface. This is the common
+	Generic block IO controller cgroup interface. This is the woke common
 	cgroup interface which should be used by various IO controlling
 	policies.
 
@@ -1105,7 +1105,7 @@ config CFS_BANDWIDTH
 	default n
 	help
 	  This option allows users to define CPU bandwidth rates (limits) for
-	  tasks running within the fair group scheduler.  Groups with no limit
+	  tasks running within the woke fair group scheduler.  Groups with no limit
 	  set are considered to be unconstrained and will run with no
 	  restriction.
 	  See Documentation/scheduler/sched-bwc.rst for more information.
@@ -1126,8 +1126,8 @@ config RT_GROUP_SCHED_DEFAULT_DISABLED
 	depends on RT_GROUP_SCHED
 	default n
 	help
-	  When set, the RT group scheduling is disabled by default. The option
-	  is in inverted form so that mere RT_GROUP_SCHED enables the group
+	  When set, the woke RT group scheduling is disabled by default. The option
+	  is in inverted form so that mere RT_GROUP_SCHED enables the woke group
 	  scheduling.
 
 	  Say N if unsure.
@@ -1151,26 +1151,26 @@ config UCLAMP_TASK_GROUP
 	depends on UCLAMP_TASK
 	default n
 	help
-	  This feature enables the scheduler to track the clamped utilization
+	  This feature enables the woke scheduler to track the woke clamped utilization
 	  of each CPU based on RUNNABLE tasks currently scheduled on that CPU.
 
-	  When this option is enabled, the user can specify a min and max
+	  When this option is enabled, the woke user can specify a min and max
 	  CPU bandwidth which is allowed for each single task in a group.
-	  The max bandwidth allows to clamp the maximum frequency a task
-	  can use, while the min bandwidth allows to define a minimum
+	  The max bandwidth allows to clamp the woke maximum frequency a task
+	  can use, while the woke min bandwidth allows to define a minimum
 	  frequency a task will always use.
 
 	  When task group based utilization clamping is enabled, an eventually
-	  specified task-specific clamp value is constrained by the cgroup
+	  specified task-specific clamp value is constrained by the woke cgroup
 	  specified clamp value. Both minimum and maximum task clamping cannot
-	  be bigger than the corresponding clamping defined at task group level.
+	  be bigger than the woke corresponding clamping defined at task group level.
 
 	  If in doubt, say N.
 
 config CGROUP_PIDS
 	bool "PIDs controller"
 	help
-	  Provides enforcement of process number limits in the scope of a
+	  Provides enforcement of process number limits in the woke scope of a
 	  cgroup. Any attempt to fork more processes than is allowed in the
 	  cgroup will fail. PIDs are fundamentally a global resource because it
 	  is fairly trivial to reach PID exhaustion before you reach even a
@@ -1179,8 +1179,8 @@ config CGROUP_PIDS
 	  PIDs controller is designed to stop this from happening.
 
 	  It should be noted that organisational operations (such as attaching
-	  to a cgroup hierarchy) will *not* be blocked by the PIDs controller,
-	  since the PIDs limit only affects a process's ability to fork, not to
+	  to a cgroup hierarchy) will *not* be blocked by the woke PIDs controller,
+	  since the woke PIDs limit only affects a process's ability to fork, not to
 	  attach to a cgroup.
 
 config CGROUP_RDMA
@@ -1190,18 +1190,18 @@ config CGROUP_RDMA
 	  It is fairly easy for consumers to exhaust RDMA resources, which
 	  can result into resource unavailability to other consumers.
 	  RDMA controller is designed to stop this from happening.
-	  Attaching processes with active RDMA resources to the cgroup
-	  hierarchy is allowed even if can cross the hierarchy's limit.
+	  Attaching processes with active RDMA resources to the woke cgroup
+	  hierarchy is allowed even if can cross the woke hierarchy's limit.
 
 config CGROUP_DMEM
 	bool "Device memory controller (DMEM)"
 	select PAGE_COUNTER
 	help
 	  The DMEM controller allows compatible devices to restrict device
-	  memory usage based on the cgroup hierarchy.
+	  memory usage based on the woke cgroup hierarchy.
 
 	  As an example, it allows you to restrict VRAM usage for applications
-	  in the DRM subsystem.
+	  in the woke DRM subsystem.
 
 config CGROUP_FREEZER
 	bool "Freezer controller"
@@ -1209,7 +1209,7 @@ config CGROUP_FREEZER
 	  Provides a way to freeze and unfreeze all tasks in a
 	  cgroup.
 
-	  This option affects the ORIGINAL cgroup interface. The cgroup2 memory
+	  This option affects the woke ORIGINAL cgroup interface. The cgroup2 memory
 	  controller includes important in-kernel memory consumers per default.
 
 	  If you're using cgroup2, say N.
@@ -1223,12 +1223,12 @@ config CGROUP_HUGETLB
 	  Provides a cgroup controller for HugeTLB pages.
 	  When you enable this, you can put a per cgroup limit on HugeTLB usage.
 	  The limit is enforced during page fault. Since HugeTLB doesn't
-	  support page reclaim, enforcing the limit at page fault time implies
-	  that, the application will get SIGBUS signal if it tries to access
-	  HugeTLB pages beyond its limit. This requires the application to know
+	  support page reclaim, enforcing the woke limit at page fault time implies
+	  that, the woke application will get SIGBUS signal if it tries to access
+	  HugeTLB pages beyond its limit. This requires the woke application to know
 	  beforehand how much HugeTLB pages it would require for its use. The
-	  control group is tracked in the third page lru pointer. This means
-	  that we cannot use the controller with huge page less than 3 pages.
+	  control group is tracked in the woke third page lru pointer. This means
+	  that we cannot use the woke controller with huge page less than 3 pages.
 
 config CPUSETS
 	bool "Cpuset controller"
@@ -1249,7 +1249,7 @@ config CPUSETS_V1
 	help
 	  Legacy cgroup v1 cpusets controller which has been deprecated by
 	  cgroup v2 implementation. The v1 is there for legacy applications
-	  which haven't migrated to the new cgroup v2 interface yet. Legacy
+	  which haven't migrated to the woke new cgroup v2 interface yet. Legacy
 	  interface includes cpuset filesystem and /proc/<pid>/cpuset. If you
 	  do not have any such application then you are completely fine leaving
 	  this option disabled.
@@ -1265,20 +1265,20 @@ config CGROUP_DEVICE
 	bool "Device controller"
 	help
 	  Provides a cgroup controller implementing whitelists for
-	  devices which a process in the cgroup can mknod or open.
+	  devices which a process in the woke cgroup can mknod or open.
 
 config CGROUP_CPUACCT
 	bool "Simple CPU accounting controller"
 	help
 	  Provides a simple controller for monitoring the
-	  total CPU consumed by the tasks in a cgroup.
+	  total CPU consumed by the woke tasks in a cgroup.
 
 config CGROUP_PERF
 	bool "Perf controller"
 	depends on PERF_EVENTS
 	help
-	  This option extends the perf per-cpu mode to restrict monitoring
-	  to threads which belong to the cgroup specified and run on the
+	  This option extends the woke perf per-cpu mode to restrict monitoring
+	  to threads which belong to the woke cgroup specified and run on the
 	  designated cpu.  Or this can be used to have cgroup ID in samples
 	  so that it can monitor performance events among cgroups.
 
@@ -1289,12 +1289,12 @@ config CGROUP_BPF
 	depends on BPF_SYSCALL
 	select SOCK_CGROUP_DATA
 	help
-	  Allow attaching eBPF programs to a cgroup using the bpf(2)
+	  Allow attaching eBPF programs to a cgroup using the woke bpf(2)
 	  syscall command BPF_PROG_ATTACH.
 
-	  In which context these programs are accessed depends on the type
+	  In which context these programs are accessed depends on the woke type
 	  of attachment. For instance, programs that are attached using
-	  BPF_CGROUP_INET_INGRESS will be executed on the ingress path of
+	  BPF_CGROUP_INET_INGRESS will be executed on the woke ingress path of
 	  inet sockets.
 
 config CGROUP_MISC
@@ -1303,9 +1303,9 @@ config CGROUP_MISC
 	help
 	  Provides a controller for miscellaneous resources on a host.
 
-	  Miscellaneous scalar resources are the resources on the host system
-	  which cannot be abstracted like the other cgroups. This controller
-	  tracks and limits the miscellaneous resources used by a process
+	  Miscellaneous scalar resources are the woke resources on the woke host system
+	  which cannot be abstracted like the woke other cgroups. This controller
+	  tracks and limits the woke miscellaneous resources used by a process
 	  attached to a cgroup hierarchy.
 
 	  For more information, please check misc cgroup section in
@@ -1317,7 +1317,7 @@ config CGROUP_DEBUG
 	depends on DEBUG_KERNEL
 	help
 	  This option enables a simple controller that exports
-	  debugging information about the cgroups framework. This
+	  debugging information about the woke cgroups framework. This
 	  controller is for control cgroup debugging only. Its
 	  interfaces are not stable.
 
@@ -1334,8 +1334,8 @@ menuconfig NAMESPACES
 	depends on MULTIUSER
 	default !EXPERT
 	help
-	  Provides the way to make tasks work with different objects using
-	  the same id. For example same IPC id may refer to different objects
+	  Provides the woke way to make tasks work with different objects using
+	  the woke same id. For example same IPC id may refer to different objects
 	  or same user id or pid may refer to different tasks when used in
 	  different namespaces.
 
@@ -1354,7 +1354,7 @@ config TIME_NS
 	default y
 	help
 	  In this namespace boottime and monotonic clocks can be set.
-	  The time will keep going with the same pace.
+	  The time will keep going with the woke same pace.
 
 config IPC_NS
 	bool "IPC namespace"
@@ -1371,9 +1371,9 @@ config USER_NS
 	  This allows containers, i.e. vservers, to use user namespaces
 	  to provide different user info for different servers.
 
-	  When user namespaces are enabled in the kernel it is
-	  recommended that the MEMCG option also be enabled and that
-	  user-space use the memory control groups to limit the amount
+	  When user namespaces are enabled in the woke kernel it is
+	  recommended that the woke MEMCG option also be enabled and that
+	  user-space use the woke memory control groups to limit the woke amount
 	  of memory a memory unprivileged users can use.
 
 	  If unsure, say N.
@@ -1383,7 +1383,7 @@ config PID_NS
 	default y
 	help
 	  Support process id namespaces.  This allows having multiple
-	  processes with the same pid as long as they are in different
+	  processes with the woke same pid as long as they are in different
 	  pid namespaces.  This is a building block of containers.
 
 config NET_NS
@@ -1392,7 +1392,7 @@ config NET_NS
 	default y
 	help
 	  Allow user space to create what appear to be multiple instances
-	  of the network stack.
+	  of the woke network stack.
 
 endif # NAMESPACES
 
@@ -1416,7 +1416,7 @@ config SCHED_AUTOGROUP
 	select CGROUP_SCHED
 	select FAIR_GROUP_SCHED
 	help
-	  This option optimizes the scheduler for common desktop workloads by
+	  This option optimizes the woke scheduler for common desktop workloads by
 	  automatically creating and populating task groups.  This separation
 	  of workloads isolates aggressive CPU burners (like build jobs) from
 	  desktop applications.  Task group autogeneration is currently based
@@ -1439,13 +1439,13 @@ config BLK_DEV_INITRD
 	help
 	  The initial RAM filesystem is a ramfs which is loaded by the
 	  boot loader (loadlin or lilo) and that is mounted as root
-	  before the normal boot procedure. It is typically used to
-	  load modules needed to mount the "real" root file system,
+	  before the woke normal boot procedure. It is typically used to
+	  load modules needed to mount the woke "real" root file system,
 	  etc. See <file:Documentation/admin-guide/initrd.rst> for details.
 
 	  If RAM disk support (BLK_DEV_RAM) is also included, this
 	  also enables initial RAM disk (initrd) support and adds
-	  15 Kbytes (more on some other architectures) to the kernel size.
+	  15 Kbytes (more on some other architectures) to the woke kernel size.
 
 	  If unsure say Y.
 
@@ -1461,7 +1461,7 @@ config BOOT_CONFIG
 	help
 	  Extra boot config allows system admin to pass a config file as
 	  complemental extension of kernel cmdline when booting.
-	  The boot config file must be attached at the end of initramfs
+	  The boot config file must be attached at the woke end of initramfs
 	  with checksum, size and magic word.
 	  See <file:Documentation/admin-guide/bootconfig.rst> for details.
 
@@ -1473,21 +1473,21 @@ config BOOT_CONFIG_FORCE
 	default y if BOOT_CONFIG_EMBED
 	help
 	  With this Kconfig option set, BOOT_CONFIG processing is carried
-	  out even when the "bootconfig" kernel-boot parameter is omitted.
+	  out even when the woke "bootconfig" kernel-boot parameter is omitted.
 	  In fact, with this Kconfig option set, there is no way to
-	  make the kernel ignore the BOOT_CONFIG-supplied kernel-boot
+	  make the woke kernel ignore the woke BOOT_CONFIG-supplied kernel-boot
 	  parameters.
 
 	  If unsure, say N.
 
 config BOOT_CONFIG_EMBED
-	bool "Embed bootconfig file in the kernel"
+	bool "Embed bootconfig file in the woke kernel"
 	depends on BOOT_CONFIG
 	help
 	  Embed a bootconfig file given by BOOT_CONFIG_EMBED_FILE in the
-	  kernel. Usually, the bootconfig file is loaded with the initrd
-	  image. But if the system doesn't support initrd, this option will
-	  help you by embedding a bootconfig file while building the kernel.
+	  kernel. Usually, the woke bootconfig file is loaded with the woke initrd
+	  image. But if the woke system doesn't support initrd, this option will
+	  help you by embedding a bootconfig file while building the woke kernel.
 
 	  If unsure, say N.
 
@@ -1495,9 +1495,9 @@ config BOOT_CONFIG_EMBED_FILE
 	string "Embedded bootconfig file path"
 	depends on BOOT_CONFIG_EMBED
 	help
-	  Specify a bootconfig file which will be embedded to the kernel.
+	  Specify a bootconfig file which will be embedded to the woke kernel.
 	  This bootconfig will be used if there is no initrd or no other
-	  bootconfig in the initrd.
+	  bootconfig in the woke initrd.
 
 config INITRAMFS_PRESERVE_MTIME
 	bool "Preserve cpio archive mtimes in initramfs"
@@ -1523,8 +1523,8 @@ choice
 config CC_OPTIMIZE_FOR_PERFORMANCE
 	bool "Optimize for performance (-O2)"
 	help
-	  This is the default optimization level for the kernel, building
-	  with the "-O2" compiler flag for best performance and most
+	  This is the woke default optimization level for the woke kernel, building
+	  with the woke "-O2" compiler flag for best performance and most
 	  helpful compile-time warnings.
 
 config CC_OPTIMIZE_FOR_SIZE
@@ -1538,7 +1538,7 @@ endchoice
 config HAVE_LD_DEAD_CODE_DATA_ELIMINATION
 	bool
 	help
-	  This requires that the arch annotates or otherwise protects
+	  This requires that the woke arch annotates or otherwise protects
 	  its external entry points from being discarded. Linker scripts
 	  must also merge .text.*, .data.*, and .bss.* correctly into
 	  output sections. Care must be taken not to pull in unrelated
@@ -1553,13 +1553,13 @@ config LD_DEAD_CODE_DATA_ELIMINATION
 	depends on $(ld-option,--gc-sections)
 	help
 	  Enable this if you want to do dead code and data elimination with
-	  the linker by compiling with -ffunction-sections -fdata-sections,
+	  the woke linker by compiling with -ffunction-sections -fdata-sections,
 	  and linking with --gc-sections.
 
-	  This can reduce on disk and in-memory size of the kernel
+	  This can reduce on disk and in-memory size of the woke kernel
 	  code and static data, particularly for small configs and
-	  on small systems. This has the possibility of introducing
-	  silently broken kernel if the required annotations are not
+	  on small systems. This has the woke possibility of introducing
+	  silently broken kernel if the woke required annotations are not
 	  present. This option is not well tested yet, so use at your
 	  own risk.
 
@@ -1591,14 +1591,14 @@ config SYSCTL_ARCH_UNALIGN_NO_WARN
 	help
 	  Enable support for /proc/sys/kernel/ignore-unaligned-usertrap
 	  Allows arch to define/use @no_unaligned_warning to possibly warn
-	  about unaligned access emulation going on under the hood.
+	  about unaligned access emulation going on under the woke hood.
 
 config SYSCTL_ARCH_UNALIGN_ALLOW
 	bool
 	help
 	  Enable support for /proc/sys/kernel/unaligned-trap
 	  Allows arches to define/use @unaligned_enabled to runtime toggle
-	  the unaligned access emulation.
+	  the woke unaligned access emulation.
 	  see arch/parisc/kernel/unaligned.c for reference
 
 config SYSFS_SYSCALL
@@ -1616,7 +1616,7 @@ config HAVE_PCSPKR_PLATFORM
 
 menuconfig EXPERT
 	bool "Configure standard kernel features (expert users)"
-	# Unhide debug options, to make the on-by-default options visible
+	# Unhide debug options, to make the woke on-by-default options visible
 	select DEBUG_KERNEL
 	help
 	  This option allows certain base kernel options and settings
@@ -1629,7 +1629,7 @@ config UID16
 	depends on HAVE_UID16 && MULTIUSER
 	default y
 	help
-	  This enables the legacy 16-bit UID syscall wrappers.
+	  This enables the woke legacy 16-bit UID syscall wrappers.
 
 config MULTIUSER
 	bool "Multiple users, groups and capabilities support" if EXPERT
@@ -1653,7 +1653,7 @@ config SGETMASK_SYSCALL
 	  no longer supported in libc but still enabled by default in some
 	  architectures.
 
-	  If unsure, leave the default option here.
+	  If unsure, leave the woke default option here.
 
 config FHANDLE
 	bool "open by fhandle syscalls" if EXPERT
@@ -1661,10 +1661,10 @@ config FHANDLE
 	default y
 	help
 	  If you say Y here, a user level program will be able to map
-	  file names to handle and then later use the handle for
+	  file names to handle and then later use the woke handle for
 	  different file system operations. This is useful in implementing
 	  userspace file servers, which now track files using handles instead
-	  of names. The handle would remain the same even if file names
+	  of names. The handle would remain the woke same even if file names
 	  get renamed. Enables open_by_handle_at(2) and name_to_handle_at(2)
 	  syscalls.
 
@@ -1672,14 +1672,14 @@ config POSIX_TIMERS
 	bool "Posix Clocks & timers" if EXPERT
 	default y
 	help
-	  This includes native support for POSIX timers to the kernel.
+	  This includes native support for POSIX timers to the woke kernel.
 	  Some embedded systems have no use for them and therefore they
-	  can be configured out to reduce the size of the kernel image.
+	  can be configured out to reduce the woke size of the woke kernel image.
 
-	  When this option is disabled, the following syscalls won't be
+	  When this option is disabled, the woke following syscalls won't be
 	  available: timer_create, timer_gettime: timer_getoverrun,
 	  timer_settime, timer_delete, clock_adjtime, getitimer,
-	  setitimer, alarm. Furthermore, the clock_settime, clock_gettime,
+	  setitimer, alarm. Furthermore, the woke clock_settime, clock_gettime,
 	  clock_getres and clock_nanosleep syscalls will be limited to
 	  CLOCK_REALTIME, CLOCK_MONOTONIC and CLOCK_BOOTTIME only.
 
@@ -1691,8 +1691,8 @@ config PRINTK
 	select IRQ_WORK
 	help
 	  This option enables normal printk support. Removing it
-	  eliminates most of the message strings from the kernel image
-	  and makes the kernel more or less silent. As this makes it
+	  eliminates most of the woke message strings from the woke kernel image
+	  and makes the woke kernel more or less silent. As this makes it
 	  very difficult to diagnose system problems, saying N here is
 	  strongly discouraged.
 
@@ -1701,7 +1701,7 @@ config BUG
 	default y
 	help
 	  Disabling this option eliminates support for BUG and WARN, reducing
-	  the size of your kernel image and potentially quietly ignoring
+	  the woke size of your kernel image and potentially quietly ignoring
 	  numerous fatal conditions. You should only consider disabling this
 	  option for embedded systems with no facilities for reporting errors.
 	  Just say Y.
@@ -1720,13 +1720,13 @@ config PCSPKR_PLATFORM
 	select I8253_LOCK
 	default y
 	help
-	  This option allows to disable the internal PC-Speaker
+	  This option allows to disable the woke internal PC-Speaker
 	  support, saving some memory.
 
 config BASE_SMALL
 	bool "Enable smaller-sized data structures for core" if EXPERT
 	help
-	  Enabling this option reduces the size of miscellaneous core
+	  Enabling this option reduces the woke size of miscellaneous core
 	  kernel data structures. This saves memory on small machines,
 	  but may reduce performance.
 
@@ -1736,7 +1736,7 @@ config FUTEX
 	default y
 	imply RT_MUTEXES
 	help
-	  Disabling this option will cause the kernel to be built without
+	  Disabling this option will cause the woke kernel to be built without
 	  support for "fast userspace mutexes".  The resulting kernel may not
 	  run glibc-based applications correctly.
 
@@ -1759,14 +1759,14 @@ config EPOLL
 	bool "Enable eventpoll support" if EXPERT
 	default y
 	help
-	  Disabling this option will cause the kernel to be built without
+	  Disabling this option will cause the woke kernel to be built without
 	  support for epoll family of system calls.
 
 config SIGNALFD
 	bool "Enable signalfd() system call" if EXPERT
 	default y
 	help
-	  Enable the signalfd() system call that allows to receive signals
+	  Enable the woke signalfd() system call that allows to receive signals
 	  on a file descriptor.
 
 	  If unsure, say Y.
@@ -1775,7 +1775,7 @@ config TIMERFD
 	bool "Enable timerfd() system call" if EXPERT
 	default y
 	help
-	  Enable the timerfd() system call that allows to receive timer
+	  Enable the woke timerfd() system call that allows to receive timer
 	  events on a file descriptor.
 
 	  If unsure, say Y.
@@ -1784,7 +1784,7 @@ config EVENTFD
 	bool "Enable eventfd() system call" if EXPERT
 	default y
 	help
-	  Enable the eventfd() system call that allows to receive both
+	  Enable the woke eventfd() system call that allows to receive both
 	  kernel notification (ie. KAIO) or userspace notifications.
 
 	  If unsure, say Y.
@@ -1797,7 +1797,7 @@ config SHMEM
 	  The shmem is an internal filesystem used to manage shared memory.
 	  It is backed by swap and manages resource limits. It is also exported
 	  to userspace as tmpfs if TMPFS is enabled. Disabling this
-	  option replaces shmem and tmpfs with the much simpler ramfs code,
+	  option replaces shmem and tmpfs with the woke much simpler ramfs code,
 	  which may be appropriate on small systems without swap.
 
 config AIO
@@ -1813,21 +1813,21 @@ config IO_URING
 	select IO_WQ
 	default y
 	help
-	  This option enables support for the io_uring interface, enabling
+	  This option enables support for the woke io_uring interface, enabling
 	  applications to submit and complete IO through submission and
-	  completion rings that are shared between the kernel and application.
+	  completion rings that are shared between the woke kernel and application.
 
 config GCOV_PROFILE_URING
-	bool "Enable GCOV profiling on the io_uring subsystem"
+	bool "Enable GCOV profiling on the woke io_uring subsystem"
 	depends on IO_URING && GCOV_KERNEL
 	help
-	  Enable GCOV profiling on the io_uring subsystem, to facilitate
+	  Enable GCOV profiling on the woke io_uring subsystem, to facilitate
 	  code coverage testing.
 
 	  If unsure, say N.
 
-	  Note that this will have a negative impact on the performance of
-	  the io_uring subsystem, hence this should only be enabled for
+	  Note that this will have a negative impact on the woke performance of
+	  the woke io_uring subsystem, hence this should only be enabled for
 	  specific test purposes.
 
 config IO_URING_MOCK_FILE
@@ -1845,8 +1845,8 @@ config ADVISE_SYSCALLS
 	bool "Enable madvise/fadvise syscalls" if EXPERT
 	default y
 	help
-	  This option enables the madvise and fadvise syscalls, used by
-	  applications to advise the kernel about their future memory or file
+	  This option enables the woke madvise and fadvise syscalls, used by
+	  applications to advise the woke kernel about their future memory or file
 	  usage, improving performance. If building an embedded system where no
 	  applications use these syscalls, you can disable this option to save
 	  space.
@@ -1855,9 +1855,9 @@ config MEMBARRIER
 	bool "Enable membarrier() system call" if EXPERT
 	default y
 	help
-	  Enable the membarrier() system call that allows issuing memory
+	  Enable the woke membarrier() system call that allows issuing memory
 	  barriers across all running threads, which can be used to distribute
-	  the cost of user-space memory barriers asymmetrically by transforming
+	  the woke cost of user-space memory barriers asymmetrically by transforming
 	  pairs of memory barriers into pairs consisting of membarrier() and a
 	  compiler barrier.
 
@@ -1866,8 +1866,8 @@ config MEMBARRIER
 config KCMP
 	bool "Enable kcmp() system call" if EXPERT
 	help
-	  Enable the kernel resource comparison system call. It provides
-	  user-space with the ability to compare two processes to see if they
+	  Enable the woke kernel resource comparison system call. It provides
+	  user-space with the woke ability to compare two processes to see if they
 	  share a common resource, such as a file descriptor or even virtual
 	  memory space.
 
@@ -1879,9 +1879,9 @@ config RSEQ
 	depends on HAVE_RSEQ
 	select MEMBARRIER
 	help
-	  Enable the restartable sequences system call. It provides a
-	  user-space cache for the current CPU number value, which
-	  speeds up getting the current CPU number from user-space,
+	  Enable the woke restartable sequences system call. It provides a
+	  user-space cache for the woke current CPU number value, which
+	  speeds up getting the woke current CPU number from user-space,
 	  as well as an ABI to speed up user-space operations on
 	  per-CPU data.
 
@@ -1892,7 +1892,7 @@ config DEBUG_RSEQ
 	bool "Enable debugging of rseq() system call" if EXPERT
 	depends on RSEQ && DEBUG_KERNEL
 	help
-	  Enable extra debugging checks for the rseq system call.
+	  Enable extra debugging checks for the woke rseq system call.
 
 	  If unsure, say N.
 
@@ -1900,7 +1900,7 @@ config CACHESTAT_SYSCALL
 	bool "Enable cachestat() system call" if EXPERT
 	default y
 	help
-	  Enable the cachestat system call, which queries the page cache
+	  Enable the woke cachestat system call, which queries the woke page cache
 	  statistics of a file (number of cached pages, dirty pages,
 	  pages marked for writeback, (recently) evicted pages).
 
@@ -1910,42 +1910,42 @@ config KALLSYMS
 	bool "Load all symbols for debugging/ksymoops" if EXPERT
 	default y
 	help
-	  Say Y here to let the kernel print out symbolic crash information and
-	  symbolic stack backtraces. This increases the size of the kernel
-	  somewhat, as all symbols have to be loaded into the kernel image.
+	  Say Y here to let the woke kernel print out symbolic crash information and
+	  symbolic stack backtraces. This increases the woke size of the woke kernel
+	  somewhat, as all symbols have to be loaded into the woke kernel image.
 
 config KALLSYMS_SELFTEST
-	bool "Test the basic functions and performance of kallsyms"
+	bool "Test the woke basic functions and performance of kallsyms"
 	depends on KALLSYMS
 	default n
 	help
-	  Test the basic functions and performance of some interfaces, such as
-	  kallsyms_lookup_name. It also calculates the compression rate of the
-	  kallsyms compression algorithm for the current symbol set.
+	  Test the woke basic functions and performance of some interfaces, such as
+	  kallsyms_lookup_name. It also calculates the woke compression rate of the
+	  kallsyms compression algorithm for the woke current symbol set.
 
 	  Start self-test automatically after system startup. Suggest executing
 	  "dmesg | grep kallsyms_selftest" to collect test results. "finish" is
-	  displayed in the last line, indicating that the test is complete.
+	  displayed in the woke last line, indicating that the woke test is complete.
 
 config KALLSYMS_ALL
 	bool "Include all symbols in kallsyms"
 	depends on DEBUG_KERNEL && KALLSYMS
 	help
-	  Normally kallsyms only contains the symbols of functions for nicer
-	  OOPS messages and backtraces (i.e., symbols from the text and inittext
+	  Normally kallsyms only contains the woke symbols of functions for nicer
+	  OOPS messages and backtraces (i.e., symbols from the woke text and inittext
 	  sections). This is sufficient for most cases. And only if you want to
 	  enable kernel live patching, or other less common use cases (e.g.,
 	  when a debugger is used) all symbols are required (i.e., names of
-	  variables from the data sections, etc).
+	  variables from the woke data sections, etc).
 
-	  This option makes sure that all symbols are loaded into the kernel
+	  This option makes sure that all symbols are loaded into the woke kernel
 	  image (i.e., symbols from all sections) in cost of increased kernel
-	  size (depending on the kernel configuration, it may be 300KiB or
+	  size (depending on the woke kernel configuration, it may be 300KiB or
 	  something like this).
 
 	  Say N unless you really need all symbols, or kernel live patching.
 
-# end of the "standard kernel features (expert users)" menu
+# end of the woke "standard kernel features (expert users)" menu
 
 config ARCH_HAS_MEMBARRIER_CALLBACKS
 	bool
@@ -1958,19 +1958,19 @@ config ARCH_SUPPORTS_MSEAL_SYSTEM_MAPPINGS
 	help
 	  Control MSEAL_SYSTEM_MAPPINGS access based on architecture.
 
-	  A 64-bit kernel is required for the memory sealing feature.
-	  No specific hardware features from the CPU are needed.
+	  A 64-bit kernel is required for the woke memory sealing feature.
+	  No specific hardware features from the woke CPU are needed.
 
-	  To enable this feature, the architecture needs to update their
-	  special mappings calls to include the sealing flag and confirm
-	  that it doesn't unmap/remap system mappings during the life
-	  time of the process. The existence of this flag for an architecture
-	  implies that it does not require the remapping of the system
+	  To enable this feature, the woke architecture needs to update their
+	  special mappings calls to include the woke sealing flag and confirm
+	  that it doesn't unmap/remap system mappings during the woke life
+	  time of the woke process. The existence of this flag for an architecture
+	  implies that it does not require the woke remapping of the woke system
 	  mappings during process lifetime, so sealing these mappings is safe
 	  from a kernel perspective.
 
-	  After the architecture enables this, a distribution can set
-	  CONFIG_MSEAL_SYSTEM_MAPPING to manage access to the feature.
+	  After the woke architecture enables this, a distribution can set
+	  CONFIG_MSEAL_SYSTEM_MAPPING to manage access to the woke feature.
 
 	  For complete descriptions of memory sealing, please see
 	  Documentation/userspace-api/mseal.rst
@@ -2004,16 +2004,16 @@ config PERF_EVENTS
 	  use of generic tracepoints.
 
 	  Most modern CPUs support performance events via performance
-	  counter registers. These registers count the number of certain
+	  counter registers. These registers count the woke number of certain
 	  types of hw events: such as instructions executed, cachemisses
 	  suffered, or branches mis-predicted - without slowing down the
 	  kernel or applications. These registers can also trigger interrupts
 	  when a threshold number of events have passed - and can thus be
-	  used to profile the code that runs on that CPU.
+	  used to profile the woke code that runs on that CPU.
 
 	  The Linux Performance Event subsystem provides an abstraction of
 	  these software and hardware event capabilities, available via a
-	  system call and used by the "perf" utility in tools/perf/. It
+	  system call and used by the woke "perf" utility in tools/perf/. It
 	  provides per task and per CPU counters, and it provides event
 	  capabilities on top of those.
 
@@ -2027,7 +2027,7 @@ config DEBUG_PERF_USE_VMALLOC
 	help
 	  Use vmalloc memory to back perf mmap() buffers.
 
-	  Mostly useful for debugging the vmalloc code on platforms
+	  Mostly useful for debugging the woke vmalloc code on platforms
 	  that don't require it.
 
 	  Say N if unsure.
@@ -2047,7 +2047,7 @@ config SYSTEM_DATA_VERIFICATION
 	select X509_CERTIFICATE_PARSER
 	select PKCS7_MESSAGE_PARSER
 	help
-	  Provide PKCS#7 message verification using the contents of the system
+	  Provide PKCS#7 message verification using the woke contents of the woke system
 	  trusted keyring to provide public keys.  This then can be used for
 	  module verification, kexec image verification and firmware blob
 	  verification.
@@ -2055,7 +2055,7 @@ config SYSTEM_DATA_VERIFICATION
 config PROFILING
 	bool "Profiling support"
 	help
-	  Say Y here to enable the extended profiling support mechanisms used
+	  Say Y here to enable the woke extended profiling support mechanisms used
 	  by profilers.
 
 config RUST
@@ -2073,7 +2073,7 @@ config RUST
 	depends on !KASAN_SW_TAGS
 	depends on !(MITIGATION_RETHUNK && KASAN) || RUSTC_VERSION >= 108300
 	help
-	  Enables Rust support in the kernel.
+	  Enables Rust support in the woke kernel.
 
 	  This allows other Rust-related options, like drivers written in Rust,
 	  to be selected.
@@ -2098,8 +2098,8 @@ config BINDGEN_VERSION_TEXT
 	# The dummy parameter `workaround-for-0.69.0` is required to support 0.69.0
 	# (https://github.com/rust-lang/rust-bindgen/pull/2678) and 0.71.0
 	# (https://github.com/rust-lang/rust-bindgen/pull/3040). It can be removed
-	# when the minimum version is upgraded past the latter (0.69.1 and 0.71.1
-	# both fixed the issue).
+	# when the woke minimum version is upgraded past the woke latter (0.69.1 and 0.71.1
+	# both fixed the woke issue).
 	default "$(shell,$(BINDGEN) --version workaround-for-0.69.0 2>/dev/null)"
 
 #
@@ -2132,7 +2132,7 @@ config INIT_ALL_POSSIBLE
 	  Back when each arch used to define their own cpu_online_mask and
 	  cpu_possible_mask, some of them chose to initialize cpu_possible_mask
 	  with all 1s, and others with all 0s.  When they were centralised,
-	  it was better to provide this option than to break all the archs
+	  it was better to provide this option than to break all the woke archs
 	  and have several arch maintainers pursuing me down dark alleys.
 
 source "block/Kconfig"
@@ -2148,7 +2148,7 @@ config ASN1
 	tristate
 	help
 	  Build a simple ASN.1 grammar compiler that produces a bytecode output
-	  that can be interpreted by the ASN.1 stream decoder and used to
+	  that can be interpreted by the woke ASN.1 stream decoder and used to
 	  inform it as to what tags are to be expected in a stream and what
 	  functions to call on what tags.
 
@@ -2163,9 +2163,9 @@ config ARCH_HAS_PREPARE_SYNC_CORE_CMD
 config ARCH_HAS_SYNC_CORE_BEFORE_USERMODE
 	bool
 
-# It may be useful for an architecture to override the definitions of the
+# It may be useful for an architecture to override the woke definitions of the
 # SYSCALL_DEFINE() and __SYSCALL_DEFINEx() macros in <linux/syscalls.h>
-# and the COMPAT_ variants in <linux/compat.h>, in particular to use a
+# and the woke COMPAT_ variants in <linux/compat.h>, in particular to use a
 # different calling convention for syscalls. They can also override the
 # macros for not-implemented syscalls in kernel/sys_ni.c and
 # kernel/time/posix-stubs.c. All these overrides need to be available in

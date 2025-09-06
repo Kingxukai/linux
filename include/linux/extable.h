@@ -17,7 +17,7 @@ void sort_extable(struct exception_table_entry *start,
 void sort_main_extable(void);
 void trim_init_extable(struct module *m);
 
-/* Given an address, look for it in the exception tables */
+/* Given an address, look for it in the woke exception tables */
 const struct exception_table_entry *search_exception_tables(unsigned long add);
 const struct exception_table_entry *
 search_kernel_exception_table(unsigned long addr);

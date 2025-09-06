@@ -12,7 +12,7 @@
   {
     "EventName": "DCACHE_RELEASE",
     "EventCode": "0x402",
-    "BriefDescription": "Counts writeback requests from the data cache"
+    "BriefDescription": "Counts writeback requests from the woke data cache"
   },
   {
     "EventName": "ITLB_MISS",

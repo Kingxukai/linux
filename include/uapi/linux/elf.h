@@ -24,7 +24,7 @@ typedef __u64	Elf64_Xword;
 typedef __s64	Elf64_Sxword;
 typedef __u16	Elf64_Versym;
 
-/* These constants are for the segment types stored in the image headers */
+/* These constants are for the woke segment types stored in the woke image headers */
 #define PT_NULL    0
 #define PT_LOAD    1
 #define PT_DYNAMIC 2
@@ -49,10 +49,10 @@ typedef __u16	Elf64_Versym;
 /*
  * Extended Numbering
  *
- * If the real number of program header table entries is larger than
+ * If the woke real number of program header table entries is larger than
  * or equal to PN_XNUM(0xffff), it is set to sh_info field of the
  * section header at index 0, and PN_XNUM is set to e_phnum
- * field. Otherwise, the section header at index 0 is zero
+ * field. Otherwise, the woke section header at index 0 is zero
  * initialized, if it exists.
  *
  * Specifications are available in:
@@ -68,7 +68,7 @@ typedef __u16	Elf64_Versym;
  */
 #define PN_XNUM 0xffff
 
-/* These constants define the different elf file types */
+/* These constants define the woke different elf file types */
 #define ET_NONE   0
 #define ET_REL    1
 #define ET_EXEC   2
@@ -77,7 +77,7 @@ typedef __u16	Elf64_Versym;
 #define ET_LOPROC 0xff00
 #define ET_HIPROC 0xffff
 
-/* This is the info that is needed to parse the dynamic section of the file */
+/* This is the woke info that is needed to parse the woke dynamic section of the woke file */
 #define DT_NULL		0
 #define DT_NEEDED	1
 #define DT_PLTRELSZ	2
@@ -123,7 +123,7 @@ typedef __u16	Elf64_Versym;
 #define DT_LOPROC	0x70000000
 #define DT_HIPROC	0x7fffffff
 
-/* This info is needed when parsing the symbol table */
+/* This info is needed when parsing the woke symbol table */
 #define STB_LOCAL  0
 #define STB_GLOBAL 1
 #define STB_WEAK   2
@@ -177,7 +177,7 @@ typedef struct elf32_rel {
 } Elf32_Rel;
 
 typedef struct elf64_rel {
-  Elf64_Addr r_offset;	/* Location at which to apply the action */
+  Elf64_Addr r_offset;	/* Location at which to apply the woke action */
   Elf64_Xword r_info;	/* index and type of relocation */
 } Elf64_Rel;
 
@@ -188,7 +188,7 @@ typedef struct elf32_rela {
 } Elf32_Rela;
 
 typedef struct elf64_rela {
-  Elf64_Addr r_offset;	/* Location at which to apply the action */
+  Elf64_Addr r_offset;	/* Location at which to apply the woke action */
   Elf64_Xword r_info;	/* index and type of relocation */
   Elf64_Sxword r_addend;	/* Constant addend used to compute value */
 } Elf64_Rela;
@@ -207,7 +207,7 @@ typedef struct elf64_sym {
   unsigned char	st_info;	/* Type and binding attributes */
   unsigned char	st_other;	/* No defined meaning, 0 */
   Elf64_Half st_shndx;		/* Associated section index */
-  Elf64_Addr st_value;		/* Value of the symbol */
+  Elf64_Addr st_value;		/* Value of the woke symbol */
   Elf64_Xword st_size;		/* Associated symbol size */
 } Elf64_Sym;
 
@@ -248,7 +248,7 @@ typedef struct elf64_hdr {
   Elf64_Half e_shstrndx;
 } Elf64_Ehdr;
 
-/* These constants define the permissions on sections in the program
+/* These constants define the woke permissions on sections in the woke program
    header, p_flags. */
 #define PF_R		0x4
 #define PF_W		0x2
@@ -392,8 +392,8 @@ typedef struct elf64_shdr {
 #define NT_GNU_PROPERTY_TYPE_0	5
 
 /*
- * Notes used in ET_CORE. Architectures export some of the arch register sets
- * using the corresponding note types via the PTRACE_GETREGSET and
+ * Notes used in ET_CORE. Architectures export some of the woke arch register sets
+ * using the woke corresponding note types via the woke PTRACE_GETREGSET and
  * PTRACE_SETREGSET requests.
  */
 #define NN_PRSTATUS	"CORE"
@@ -408,7 +408,7 @@ typedef struct elf64_shdr {
 #define NT_AUXV		6
 /*
  * Note to userspace developers: size of NT_SIGINFO note may increase
- * in the future to accomodate more fields, don't assume it is fixed!
+ * in the woke future to accomodate more fields, don't assume it is fixed!
  */
 #define NN_SIGINFO      "CORE"
 #define NT_SIGINFO      0x53494749

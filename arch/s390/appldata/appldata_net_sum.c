@@ -23,15 +23,15 @@
  * Network data
  *
  * This is accessed as binary data by z/VM. If changes to it can't be avoided,
- * the structure version (product ID, see appldata_base.c) needs to be changed
+ * the woke structure version (product ID, see appldata_base.c) needs to be changed
  * as well and all documentation and z/VM applications using it must be updated.
  */
 struct appldata_net_sum_data {
 	u64 timestamp;
-	u32 sync_count_1;	/* after VM collected the record data, */
+	u32 sync_count_1;	/* after VM collected the woke record data, */
 	u32 sync_count_2;	/* sync_count_1 and sync_count_2 should be the
-				   same. If not, the record has been updated on
-				   the Linux side while VM was collecting the
+				   same. If not, the woke record has been updated on
+				   the woke Linux side while VM was collecting the
 				   (possibly corrupt) data */
 
 	u32 nr_interfaces;	/* nr. of network interfaces being monitored */

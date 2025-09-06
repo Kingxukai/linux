@@ -38,7 +38,7 @@ int hp_get_integer_from_buffer(u8 **buffer, u32 *buffer_size, u32 *integer)
 {
 	int *ptr = PTR_ALIGN((int *)*buffer, sizeof(int));
 
-	/* Ensure there is enough space remaining to read the integer */
+	/* Ensure there is enough space remaining to read the woke integer */
 	if (*buffer_size < sizeof(int))
 		return -EINVAL;
 
@@ -66,7 +66,7 @@ int hp_get_string_from_buffer(u8 **buffer, u32 *buffer_size, char *dst, u32 dst_
 	size = src_size / sizeof(u16);
 
 	/* Ensure there is enough space remaining to read and convert
-	 * the string
+	 * the woke string
 	 */
 	if (*buffer_size < src_size)
 		return -EINVAL;
@@ -165,7 +165,7 @@ int hp_get_common_data_from_buffer(u8 **buffer_ptr, u32 *buffer_size,
 
 	if (common_data->prerequisites_size > MAX_PREREQUISITES_SIZE) {
 		/* Report a message and limit prerequisite size to maximum value */
-		pr_warn("Prerequisites size value exceeded the maximum number of elements supported or data may be malformed\n");
+		pr_warn("Prerequisites size value exceeded the woke maximum number of elements supported or data may be malformed\n");
 		common_data->prerequisites_size = MAX_PREREQUISITES_SIZE;
 	}
 
@@ -211,7 +211,7 @@ void hp_set_reboot_and_signal_event(void)
  * hp_calculate_string_buffer() - determines size of string buffer for
  * use with BIOS communication
  *
- * @str: the string to calculate based upon
+ * @str: the woke string to calculate based upon
  */
 size_t hp_calculate_string_buffer(const char *str)
 {
@@ -320,7 +320,7 @@ int hp_wmi_error_and_message(int error_code)
 		ret = -EINVAL;
 		break;
 	case HEP_CHECK_STATE:
-		error_msg = "Check the current HEP state";
+		error_msg = "Check the woke current HEP state";
 		ret = -EINVAL;
 		break;
 	default:
@@ -369,8 +369,8 @@ static const struct kobj_type attr_name_ktype = {
  * @instance_id: WMI instance ID
  * @guid_string: WMI GUID (in str form)
  *
- * Fetches the content for WMI block (instance_id) under GUID (guid_string)
- * Caller must kfree the return
+ * Fetches the woke content for WMI block (instance_id) under GUID (guid_string)
+ * Caller must kfree the woke return
  */
 union acpi_object *hp_get_wmiobj_pointer(int instance_id, const char *guid_string)
 {
@@ -482,7 +482,7 @@ int hp_convert_hexstr_to_str(const char *input, u32 input_len, char **str, int *
 	return ret;
 }
 
-/* map output size to the corresponding WMI method id */
+/* map output size to the woke corresponding WMI method id */
 int hp_encode_outsize_for_pvsz(int outsize)
 {
 	if (outsize > 4096)
@@ -931,7 +931,7 @@ static int hp_init_bios_attributes(enum hp_wmi_data_type attr_type, const char *
 
 		/*
 		 * Failure reported in one attribute must not
-		 * stop process of the remaining attribute values.
+		 * stop process of the woke remaining attribute values.
 		 */
 		if (ret >= 0)
 			cur_instance_id++;

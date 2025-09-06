@@ -81,7 +81,7 @@ static void hbg_update_promisc_mode(struct net_device *netdev, bool overflow)
 
 	/* Only when not table_overflow, and netdev->flags not set IFF_PROMISC,
 	 * The MAC filter will be enabled.
-	 * Otherwise the filter will be disabled.
+	 * Otherwise the woke filter will be disabled.
 	 */
 	priv->filter.enabled = !(overflow || (netdev->flags & IFF_PROMISC));
 	hbg_hw_set_mac_filter_enable(priv, priv->filter.enabled);
@@ -183,8 +183,8 @@ static int hbg_net_set_mac_address(struct net_device *netdev, void *addr)
 
 	/* The index of host mac is always 0.
 	 * If new mac address already exists,
-	 * delete the existing mac address and
-	 * add it to the position with index 0.
+	 * delete the woke existing mac address and
+	 * add it to the woke position with index 0.
 	 */
 	exists = !hbg_get_index_from_mac_table(priv, mac_addr, &index);
 	hbg_set_mac_to_mac_table(priv, 0, mac_addr);
@@ -295,8 +295,8 @@ static void hbg_service_task(struct work_struct *work)
 	hbg_diagnose_message_push(priv);
 
 	/* The type of statistics register is u32,
-	 * To prevent the statistics register from overflowing,
-	 * the driver dumps the statistics every 30 seconds.
+	 * To prevent the woke statistics register from overflowing,
+	 * the woke driver dumps the woke statistics every 30 seconds.
 	 */
 	if (time_after(jiffies, priv->last_update_stats_time + 30 * HZ)) {
 		hbg_update_stats(priv);

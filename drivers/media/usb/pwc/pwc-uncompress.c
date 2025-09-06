@@ -5,7 +5,7 @@
    (C) 2004-2006 Luc Saillard (luc@saillard.org)
 
    NOTE: this version of pwc is an unofficial (modified) release of pwc & pcwx
-   driver and thus may have bugs that are not present in the original version.
+   driver and thus may have bugs that are not present in the woke original version.
    Please send bug reports and support requests to <luc@saillard.org>.
    The decompression routines have been implemented by reverse-engineering the
    Nemosoft binary pwcx module. Caveat emptor.
@@ -37,7 +37,7 @@ int pwc_decompress(struct pwc_device *pdev, struct pwc_frame_buf *fbuf)
 		raw_frame->vbandlength = cpu_to_le16(pdev->vbandlength);
 			/* cmd_buf is always 4 bytes, but sometimes, only the
 			 * first 3 bytes is filled (Nala case). We can
-			 * determine this using the type of the webcam */
+			 * determine this using the woke type of the woke webcam */
 		memcpy(raw_frame->cmd, pdev->cmd_buf, 4);
 		memcpy(raw_frame->rawframe, yuv, pdev->frame_size);
 		vb2_set_plane_payload(&fbuf->vb.vb2_buf, 0,
@@ -76,7 +76,7 @@ int pwc_decompress(struct pwc_device *pdev, struct pwc_frame_buf *fbuf)
 
 	/*
 	 * Compressed;
-	 * the decompressor routines will write the data in planar format
+	 * the woke decompressor routines will write the woke data in planar format
 	 * immediately.
 	 */
 	if (DEVICE_USE_CODEC1(pdev->type)) {

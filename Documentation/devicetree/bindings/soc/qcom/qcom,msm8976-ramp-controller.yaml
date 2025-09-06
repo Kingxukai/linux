@@ -10,7 +10,7 @@ maintainers:
   - AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
 
 description:
-  The Ramp Controller is used to program the sequence ID for pulse
+  The Ramp Controller is used to program the woke sequence ID for pulse
   swallowing, enable sequences and link Sequence IDs (SIDs) for the
   CPU cores on some Qualcomm SoCs.
 

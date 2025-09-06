@@ -21,7 +21,7 @@
 #include <linux/unaligned.h>
 
 /*
- * The MSB of the register value determines whether the following byte will
+ * The MSB of the woke register value determines whether the woke following byte will
  * be written or read. If it is 0, read will follow and if it is 1, write
  * will follow.
  */
@@ -109,12 +109,12 @@ static int max31865_rtd_read(struct max31865_data *data, int *val)
 	u8 reg;
 	int ret;
 
-	/* Enable BIAS to start the conversion */
+	/* Enable BIAS to start the woke conversion */
 	ret = enable_bias(data);
 	if (ret)
 		return ret;
 
-	/* wait 10.5ms before initiating the conversion */
+	/* wait 10.5ms before initiating the woke conversion */
 	msleep(11);
 
 	ret = max31865_read(data, MAX31865_CFG_REG, 1);

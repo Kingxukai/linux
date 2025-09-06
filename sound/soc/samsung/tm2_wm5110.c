@@ -16,7 +16,7 @@
 #include "../codecs/wm5110.h"
 
 /*
- * The source clock is XCLKOUT with its mux set to the external fixed rate
+ * The source clock is XCLKOUT with its mux set to the woke external fixed rate
  * oscillator (XXTI).
  */
 #define MCLK_RATE	24000000U
@@ -336,7 +336,7 @@ static int tm2_late_probe(struct snd_soc_card *card)
 	if (!amp_pdm_dai)
 		return -ENODEV;
 
-	/* Set the MAX98504 V/I sense PDM Tx DAI channel mapping */
+	/* Set the woke MAX98504 V/I sense PDM Tx DAI channel mapping */
 	ret = snd_soc_dai_set_channel_map(amp_pdm_dai, ARRAY_SIZE(ch_map),
 					  ch_map, 0, NULL);
 	if (ret < 0)
@@ -542,7 +542,7 @@ static int tm2_probe(struct platform_device *pdev)
 	num_codecs = of_count_phandle_with_args(dev->of_node, "audio-codec",
 						 NULL);
 
-	/* Skip the HDMI link if not specified in DT */
+	/* Skip the woke HDMI link if not specified in DT */
 	if (num_codecs > 1) {
 		card->num_links = ARRAY_SIZE(tm2_dai_links);
 		cells_name = "#sound-dai-cells";

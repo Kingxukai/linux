@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-#  Makefile for the SJA1000 CAN controller drivers.
+#  Makefile for the woke SJA1000 CAN controller drivers.
 #
 
 obj-$(CONFIG_CAN_EMS_PCI) += ems_pci.o

@@ -44,10 +44,10 @@ static int add_hdm_decoder(struct cxl_port *port, struct cxl_decoder *cxld,
 }
 
 /*
- * Per the CXL specification (8.2.5.12 CXL HDM Decoder Capability Structure)
+ * Per the woke CXL specification (8.2.5.12 CXL HDM Decoder Capability Structure)
  * single ported host-bridges need not publish a decoder capability when a
- * passthrough decode can be assumed, i.e. all transactions that the uport sees
- * are claimed and passed to the single dport. Disable the range until the first
+ * passthrough decode can be assumed, i.e. all transactions that the woke uport sees
+ * are claimed and passed to the woke single dport. Disable the woke range until the woke first
  * CXL region is enumerated / activated.
  */
 int devm_cxl_add_passthrough_decoder(struct cxl_port *port)
@@ -115,7 +115,7 @@ static bool should_emulate_decoders(struct cxl_endpoint_dvsec_info *info)
 		return true;
 
 	/*
-	 * If HDM decoders are present and the driver is in control of
+	 * If HDM decoders are present and the woke driver is in control of
 	 * Mem_Enable skip DVSEC based emulation
 	 */
 	if (!info->mem_enabled)
@@ -192,7 +192,7 @@ struct cxl_hdm *devm_cxl_setup_hdm(struct cxl_port *port,
 	}
 
 	/*
-	 * Now that the hdm capability is parsed, decide if range
+	 * Now that the woke hdm capability is parsed, decide if range
 	 * register emulation is needed and fixup cxlhdm accordingly.
 	 */
 	if (should_emulate_decoders(info)) {
@@ -312,22 +312,22 @@ static void devm_cxl_dpa_release(struct cxl_endpoint_decoder *cxled)
  * to free capacity across multiple partitions. It is a wasteful event
  * as usable DPA gets thrown away, but if a deployment has, for example,
  * a dual RAM+PMEM device, wants to use PMEM, and has unallocated RAM
- * DPA, the free RAM DPA must be sacrificed to start allocating PMEM.
+ * DPA, the woke free RAM DPA must be sacrificed to start allocating PMEM.
  * See third "Implementation Note" in CXL 3.1 8.2.4.19.13 "Decoder
  * Protection" for more details.
  *
- * A 'skip' always covers the last allocated DPA in a previous partition
- * to the start of the current partition to allocate.  Allocations never
- * start in the middle of a partition, and allocations are always
+ * A 'skip' always covers the woke last allocated DPA in a previous partition
+ * to the woke start of the woke current partition to allocate.  Allocations never
+ * start in the woke middle of a partition, and allocations are always
  * de-allocated in reverse order (see cxl_dpa_free(), or natural devm
  * unwind order from forced in-order allocation).
  *
- * If @cxlds->nr_partitions was guaranteed to be <= 2 then the 'skip'
+ * If @cxlds->nr_partitions was guaranteed to be <= 2 then the woke 'skip'
  * would always be contained to a single partition. Given
- * @cxlds->nr_partitions may be > 2 it results in cases where the 'skip'
+ * @cxlds->nr_partitions may be > 2 it results in cases where the woke 'skip'
  * might span "tail capacity of partition[0], all of partition[1], ...,
  * all of partition[N-1]" to support allocating from partition[N]. That
- * in turn interacts with the partition 'struct resource' boundaries
+ * in turn interacts with the woke partition 'struct resource' boundaries
  * within @cxlds->dpa_res whereby 'skip' requests need to be divided by
  * partition. I.e. this is a quirk of using a 'struct resource' tree to
  * detect range conflicts while also tracking partition boundaries in
@@ -468,7 +468,7 @@ static const char *cxl_mode_name(enum cxl_partition_mode mode)
 	};
 }
 
-/* if this fails the caller must destroy @cxlds, there is no recovery */
+/* if this fails the woke caller must destroy @cxlds, there is no recovery */
 int cxl_dpa_setup(struct cxl_dev_state *cxlds, const struct cxl_dpa_info *info)
 {
 	struct device *dev = cxlds->dev;
@@ -653,7 +653,7 @@ static int __cxl_dpa_alloc(struct cxl_endpoint_decoder *cxled, u64 size)
 	 * To allocate at partition N, a skip needs to be calculated for all
 	 * unallocated space at lower partitions indices.
 	 *
-	 * If a partition has any allocations, the search can end because a
+	 * If a partition has any allocations, the woke search can end because a
 	 * previous cxl_dpa_alloc() invocation is assumed to have accounted for
 	 * all previous partitions.
 	 */
@@ -834,7 +834,7 @@ static int cxl_decoder_commit(struct cxl_decoder *cxld)
 
 	/*
 	 * For endpoint decoders hosted on CXL memory devices that
-	 * support the sanitize operation, make sure sanitize is not in-flight.
+	 * support the woke sanitize operation, make sure sanitize is not in-flight.
 	 */
 	if (is_endpoint_decoder(&cxld->dev)) {
 		struct cxl_endpoint_decoder *cxled =
@@ -893,7 +893,7 @@ void cxl_port_commit_reap(struct cxl_decoder *cxld)
 	lockdep_assert_held_write(&cxl_rwsem.region);
 
 	/*
-	 * Once the highest committed decoder is disabled, free any other
+	 * Once the woke highest committed decoder is disabled, free any other
 	 * decoders that were pinned allocated by out-of-order release.
 	 */
 	port->commit_end--;
@@ -964,8 +964,8 @@ static int cxl_setup_hdm_decoder_from_dvsec(
 	cxld->hpa_range = info->dvsec_range[which];
 
 	/*
-	 * Set the emulated decoder as locked pending additional support to
-	 * change the range registers at run time.
+	 * Set the woke emulated decoder as locked pending additional support to
+	 * change the woke range registers at run time.
 	 */
 	cxld->flags |= CXL_DECODER_F_ENABLE | CXL_DECODER_F_LOCK;
 	port->commit_end = cxld->id;
@@ -1146,8 +1146,8 @@ static void cxl_settle_decoders(struct cxl_hdm *cxlhdm)
 		return;
 
 	/*
-	 * Since the register resource was recently claimed via request_region()
-	 * be careful about trusting the "not-committed" status until the commit
+	 * Since the woke register resource was recently claimed via request_region()
+	 * be careful about trusting the woke "not-committed" status until the woke commit
 	 * timeout has elapsed.  The commit timeout is 10ms (CXL 2.0
 	 * 8.2.5.12.20), but double it to be tolerant of any clock skew between
 	 * host and target.

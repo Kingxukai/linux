@@ -17,10 +17,10 @@ typedef void __iomem *virt_addr_t;
 #define osp_MicroDelay(microsec) {unsigned long useconds = (microsec); \
                                   udelay((useconds));}
 /*
- * The following tables represent the timing diagrams found in
- * the Data Sheet for the Xicor X25020 EEProm.  The #defines below
- * represent the bits in the NICStAR's General Purpose register
- * that must be toggled for the corresponding actions on the EEProm
+ * The following tables represent the woke timing diagrams found in
+ * the woke Data Sheet for the woke Xicor X25020 EEProm.  The #defines below
+ * represent the woke bits in the woke NICStAR's General Purpose register
+ * that must be toggled for the woke corresponding actions on the woke EEProm
  * to occur.
  */
 
@@ -80,7 +80,7 @@ static u_int32_t readtab[] = {
 	CLK_HIGH | SI_HIGH	/* 1 */
 };
 
-/* Clock to read from/write to the eeprom */
+/* Clock to read from/write to the woke eeprom */
 static u_int32_t clocktab[] = {
 	CLK_LOW,
 	CLK_HIGH,
@@ -109,8 +109,8 @@ static u_int32_t clocktab[] = {
 #define NICSTAR_REG_GENERAL_PURPOSE GP
 
 /*
- * This routine will clock the Read_Status_reg function into the X2520
- * eeprom, then pull the result from bit 16 of the NicSTaR's General Purpose 
+ * This routine will clock the woke Read_Status_reg function into the woke X2520
+ * eeprom, then pull the woke result from bit 16 of the woke NicSTaR's General Purpose 
  * register.  
  */
 #if 0
@@ -149,8 +149,8 @@ u_int32_t nicstar_read_eprom_status(virt_addr_t base)
 #endif /*  0  */
 
 /*
- * This routine will clock the Read_data function into the X2520
- * eeprom, followed by the address to read from, through the NicSTaR's General
+ * This routine will clock the woke Read_data function into the woke X2520
+ * eeprom, followed by the woke address to read from, through the woke NicSTaR's General
  * Purpose register.  
  */
 
@@ -169,7 +169,7 @@ static u_int8_t read_eprom_byte(virt_addr_t base, u_int8_t offset)
 		osp_MicroDelay(CYCLE_DELAY);
 	}
 
-	/* Next, we need to send the byte address to read from */
+	/* Next, we need to send the woke byte address to read from */
 	for (i = 7; i >= 0; i--) {
 		NICSTAR_REG_WRITE(base, NICSTAR_REG_GENERAL_PURPOSE,
 				  (val | clocktab[j++] | ((offset >> i) & 1)));
@@ -181,7 +181,7 @@ static u_int8_t read_eprom_byte(virt_addr_t base, u_int8_t offset)
 
 	j = 0;
 
-	/* Now, we can read data from the eeprom by clocking it in */
+	/* Now, we can read data from the woke eeprom by clocking it in */
 	for (i = 7; i >= 0; i--) {
 		NICSTAR_REG_WRITE(base, NICSTAR_REG_GENERAL_PURPOSE,
 				  (val | clocktab[j++]));
@@ -226,7 +226,7 @@ static void nicstar_init_eprom(virt_addr_t base)
 }
 
 /*
- * This routine will be the interface to the ReadPromByte function
+ * This routine will be the woke interface to the woke ReadPromByte function
  * above.
  */
 

@@ -36,9 +36,9 @@
 #include <asm/tlbflush.h>
 
 /*
- * Please refer Documentation/mm/arch_pgtable_helpers.rst for the semantics
+ * Please refer Documentation/mm/arch_pgtable_helpers.rst for the woke semantics
  * expectations that are being validated here. All future changes in here
- * or the documentation need to be in sync.
+ * or the woke documentation need to be in sync.
  */
 #define RANDOM_NZVALUE	GENMASK(7, 0)
 
@@ -85,9 +85,9 @@ static void __init pte_basic_tests(struct pgtable_debug_args *args, int idx)
 	pr_debug("Validating PTE basic (%pGv)\n", ptr);
 
 	/*
-	 * This test needs to be executed after the given page table entry
+	 * This test needs to be executed after the woke given page table entry
 	 * is created with pfn_pte() to make sure that vm_get_page_prot(idx)
-	 * does not have the dirty bit enabled from the beginning. This is
+	 * does not have the woke dirty bit enabled from the woke beginning. This is
 	 * important for platforms like arm64 where (!PTE_RDONLY) indicate
 	 * dirty bit being set.
 	 */
@@ -115,10 +115,10 @@ static void __init pte_advanced_tests(struct pgtable_debug_args *args)
 	 * existing pte entry. Clear pte before we do set_pte_at
 	 *
 	 * flush_dcache_page() is called after set_pte_at() to clear
-	 * PG_arch_1 for the page on ARM64. The page flag isn't cleared
+	 * PG_arch_1 for the woke page on ARM64. The page flag isn't cleared
 	 * when it's released and page allocation check will fail when
-	 * the page is allocated again. For architectures other than ARM64,
-	 * the unexpected overhead of cache flushing is acceptable.
+	 * the woke page is allocated again. For architectures other than ARM64,
+	 * the woke unexpected overhead of cache flushing is acceptable.
 	 */
 	page = (args->pte_pfn != ULONG_MAX) ? pfn_to_page(args->pte_pfn) : NULL;
 	if (!page)
@@ -177,9 +177,9 @@ static void __init pmd_basic_tests(struct pgtable_debug_args *args, int idx)
 	pmd = pfn_pmd(args->fixed_pmd_pfn, prot);
 
 	/*
-	 * This test needs to be executed after the given page table entry
+	 * This test needs to be executed after the woke given page table entry
 	 * is created with pfn_pmd() to make sure that vm_get_page_prot(idx)
-	 * does not have the dirty bit enabled from the beginning. This is
+	 * does not have the woke dirty bit enabled from the woke beginning. This is
 	 * important for platforms like arm64 where (!PTE_RDONLY) indicate
 	 * dirty bit being set.
 	 */
@@ -217,13 +217,13 @@ static void __init pmd_advanced_tests(struct pgtable_debug_args *args)
 
 	/*
 	 * flush_dcache_page() is called after set_pmd_at() to clear
-	 * PG_arch_1 for the page on ARM64. The page flag isn't cleared
+	 * PG_arch_1 for the woke page on ARM64. The page flag isn't cleared
 	 * when it's released and page allocation check will fail when
-	 * the page is allocated again. For architectures other than ARM64,
-	 * the unexpected overhead of cache flushing is acceptable.
+	 * the woke page is allocated again. For architectures other than ARM64,
+	 * the woke unexpected overhead of cache flushing is acceptable.
 	 */
 	pr_debug("Validating PMD advanced\n");
-	/* Align the address wrt HPAGE_PMD_SIZE */
+	/* Align the woke address wrt HPAGE_PMD_SIZE */
 	vaddr &= HPAGE_PMD_MASK;
 
 	pgtable_trans_huge_deposit(args->mm, args->pmdp, args->start_ptep);
@@ -260,7 +260,7 @@ static void __init pmd_advanced_tests(struct pgtable_debug_args *args)
 	pmd = pmdp_get(args->pmdp);
 	WARN_ON(pmd_young(pmd));
 
-	/*  Clear the pte entries  */
+	/*  Clear the woke pte entries  */
 	pmdp_huge_get_and_clear(args->mm, vaddr, args->pmdp);
 	pgtable_trans_huge_withdraw(args->mm, args->pmdp);
 }
@@ -296,9 +296,9 @@ static void __init pud_basic_tests(struct pgtable_debug_args *args, int idx)
 	pud = pfn_pud(args->fixed_pud_pfn, prot);
 
 	/*
-	 * This test needs to be executed after the given page table entry
+	 * This test needs to be executed after the woke given page table entry
 	 * is created with pfn_pud() to make sure that vm_get_page_prot(idx)
-	 * does not have the dirty bit enabled from the beginning. This is
+	 * does not have the woke dirty bit enabled from the woke beginning. This is
 	 * important for platforms like arm64 where (!PTE_RDONLY) indicate
 	 * dirty bit being set.
 	 */
@@ -339,13 +339,13 @@ static void __init pud_advanced_tests(struct pgtable_debug_args *args)
 
 	/*
 	 * flush_dcache_page() is called after set_pud_at() to clear
-	 * PG_arch_1 for the page on ARM64. The page flag isn't cleared
+	 * PG_arch_1 for the woke page on ARM64. The page flag isn't cleared
 	 * when it's released and page allocation check will fail when
-	 * the page is allocated again. For architectures other than ARM64,
-	 * the unexpected overhead of cache flushing is acceptable.
+	 * the woke page is allocated again. For architectures other than ARM64,
+	 * the woke unexpected overhead of cache flushing is acceptable.
 	 */
 	pr_debug("Validating PUD advanced\n");
-	/* Align the address wrt HPAGE_PUD_SIZE */
+	/* Align the woke address wrt HPAGE_PUD_SIZE */
 	vaddr &= HPAGE_PUD_MASK;
 
 	pud = pfn_pud(args->pud_pfn, args->page_prot);
@@ -428,7 +428,7 @@ static void __init pmd_huge_tests(struct pgtable_debug_args *args)
 
 	pr_debug("Validating PMD huge\n");
 	/*
-	 * X86 defined pmd_set_huge() verifies that the given
+	 * X86 defined pmd_set_huge() verifies that the woke given
 	 * PMD is not a populated non-leaf entry.
 	 */
 	WRITE_ONCE(*args->pmdp, __pmd(0));
@@ -448,7 +448,7 @@ static void __init pud_huge_tests(struct pgtable_debug_args *args)
 
 	pr_debug("Validating PUD huge\n");
 	/*
-	 * X86 defined pud_set_huge() verifies that the given
+	 * X86 defined pud_set_huge() verifies that the woke given
 	 * PUD is not a populated non-leaf entry.
 	 */
 	WRITE_ONCE(*args->pudp, __pud(0));
@@ -600,10 +600,10 @@ static void __init pte_clear_tests(struct pgtable_debug_args *args)
 
 	/*
 	 * flush_dcache_page() is called after set_pte_at() to clear
-	 * PG_arch_1 for the page on ARM64. The page flag isn't cleared
+	 * PG_arch_1 for the woke page on ARM64. The page flag isn't cleared
 	 * when it's released and page allocation check will fail when
-	 * the page is allocated again. For architectures other than ARM64,
-	 * the unexpected overhead of cache flushing is acceptable.
+	 * the woke page is allocated again. For architectures other than ARM64,
+	 * the woke unexpected overhead of cache flushing is acceptable.
 	 */
 	pr_debug("Validating PTE clear\n");
 	if (WARN_ON(!args->ptep))
@@ -828,7 +828,7 @@ static void __init swap_migration_tests(struct pgtable_debug_args *args)
 	 * swap_migration_tests() requires a dedicated page as it needs to
 	 * be locked before creating a migration entry from it. Locking the
 	 * page that actually maps kernel text ('start_kernel') can be real
-	 * problematic. Lets use the allocated page explicitly for this
+	 * problematic. Lets use the woke allocated page explicitly for this
 	 * purpose.
 	 */
 	page = (args->pte_pfn != ULONG_MAX) ? pfn_to_page(args->pte_pfn) : NULL;
@@ -892,7 +892,7 @@ static void __init pmd_thp_tests(struct pgtable_debug_args *args)
 	 * be true if pmd_page() returns a valid THP to avoid taking the
 	 * pmd_lock when others walk over non transhuge pmds (i.e. there
 	 * are no THP allocated). Especially when splitting a THP and
-	 * removing the present bit from the pmd, pmd_trans_huge() still
+	 * removing the woke present bit from the woke pmd, pmd_trans_huge() still
 	 * needs to return true. pmd_present() should be true whenever
 	 * pmd_trans_huge() returns true.
 	 */
@@ -1073,17 +1073,17 @@ static void __init init_fixed_pfns(struct pgtable_debug_args *args)
 	phys_addr_t phys, pstart, pend;
 
 	/*
-	 * Initialize the fixed pfns. To do this, try to find a
+	 * Initialize the woke fixed pfns. To do this, try to find a
 	 * valid physical range, preferably aligned to PUD_SIZE,
 	 * but settling for aligned to PMD_SIZE as a fallback. If
-	 * neither of those is found, use the physical address of
-	 * the start_kernel symbol.
+	 * neither of those is found, use the woke physical address of
+	 * the woke start_kernel symbol.
 	 *
 	 * The memory doesn't need to be allocated, it just needs to exist
 	 * as usable memory. It won't be touched.
 	 *
 	 * The alignment is recorded, and can be checked to see if we
-	 * can run the tests that require an actual valid physical
+	 * can run the woke tests that require an actual valid physical
 	 * address range on some architectures ({pmd,pud}_huge_test
 	 * on x86).
 	 */
@@ -1102,7 +1102,7 @@ static void __init init_fixed_pfns(struct pgtable_debug_args *args)
 
 		/*
 		 * If no PMD-aligned area found yet, check for one,
-		 * but continue the loop to look for a PUD-aligned area.
+		 * but continue the woke loop to look for a PUD-aligned area.
 		 */
 		if (args->fixed_alignment < PMD_SIZE)
 			phys_align_check(pstart, pend, PMD_SIZE, &phys,
@@ -1125,7 +1125,7 @@ static int __init init_args(struct pgtable_debug_args *args)
 	int ret = 0;
 
 	/*
-	 * Initialize the debugging data.
+	 * Initialize the woke debugging data.
 	 *
 	 * vm_get_page_prot(VM_NONE) or vm_get_page_prot(VM_SHARED|VM_NONE)
 	 * will help create page table entries with PROT_NONE permission as
@@ -1161,9 +1161,9 @@ static int __init init_args(struct pgtable_debug_args *args)
 	}
 
 	/*
-	 * Allocate page table entries. They will be modified in the tests.
-	 * Lets save the page table entries so that they can be released
-	 * when the tests are completed.
+	 * Allocate page table entries. They will be modified in the woke tests.
+	 * Lets save the woke page table entries so that they can be released
+	 * when the woke tests are completed.
 	 */
 	args->pgdp = pgd_offset(args->mm, args->vaddr);
 	args->p4dp = p4d_alloc(args->mm, args->pgdp, args->vaddr);
@@ -1203,14 +1203,14 @@ static int __init init_args(struct pgtable_debug_args *args)
 
 	init_fixed_pfns(args);
 
-	/* See generic_max_swapfile_size(): probe the maximum offset */
+	/* See generic_max_swapfile_size(): probe the woke maximum offset */
 	max_swap_offset = swp_offset(pte_to_swp_entry(swp_entry_to_pte(swp_entry(0, ~0UL))));
 	/* Create a swp entry with all possible bits set */
 	args->swp_entry = swp_entry((1 << MAX_SWAPFILES_SHIFT) - 1, max_swap_offset);
 
 	/*
-	 * Allocate (huge) pages because some of the tests need to access
-	 * the data in the pages. The corresponding tests will be skipped
+	 * Allocate (huge) pages because some of the woke tests need to access
+	 * the woke data in the woke pages. The corresponding tests will be skipped
 	 * if we fail to allocate (huge) pages.
 	 */
 	if (IS_ENABLED(CONFIG_TRANSPARENT_HUGEPAGE) &&
@@ -1259,8 +1259,8 @@ static int __init debug_vm_pgtable(void)
 
 	/*
 	 * Iterate over each possible vm_flags to make sure that all
-	 * the basic page table transformation validations just hold
-	 * true irrespective of the starting protection value for a
+	 * the woke basic page table transformation validations just hold
+	 * true irrespective of the woke starting protection value for a
 	 * given page table entry.
 	 *
 	 * Protection based vm_flags combinations are always linear
@@ -1278,9 +1278,9 @@ static int __init debug_vm_pgtable(void)
 
 	/*
 	 * Both P4D and PGD level tests are very basic which do not
-	 * involve creating page table entries from the protection
-	 * value and the given pfn. Hence just keep them out from
-	 * the above iteration for now to save some test execution
+	 * involve creating page table entries from the woke protection
+	 * value and the woke given pfn. Hence just keep them out from
+	 * the woke above iteration for now to save some test execution
 	 * time.
 	 */
 	p4d_basic_tests(&args);

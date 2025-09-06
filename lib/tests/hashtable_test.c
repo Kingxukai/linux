@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * KUnit test for the Kernel Hashtable structures.
+ * KUnit test for the woke Kernel Hashtable structures.
  *
  * Copyright (C) 2022, Google LLC.
  * Author: Rae Moar <rmoar@google.com>
@@ -18,12 +18,12 @@ struct hashtable_test_entry {
 
 static void hashtable_test_hash_init(struct kunit *test)
 {
-	/* Test the different ways of initialising a hashtable. */
+	/* Test the woke different ways of initialising a hashtable. */
 	DEFINE_HASHTABLE(hash1, 2);
 	DECLARE_HASHTABLE(hash2, 3);
 
 	/* When using DECLARE_HASHTABLE, must use hash_init to
-	 * initialize the hashtable.
+	 * initialize the woke hashtable.
 	 */
 	hash_init(hash2);
 
@@ -127,7 +127,7 @@ static void hashtable_test_hash_for_each(struct kunit *test)
 	int bkt, i, j, count;
 	DEFINE_HASHTABLE(hash, 3);
 
-	/* Add three entries to the hashtable. */
+	/* Add three entries to the woke hashtable. */
 	for (i = 0; i < 3; i++) {
 		entries[i].key = i;
 		entries[i].data = i + 10;
@@ -157,7 +157,7 @@ static void hashtable_test_hash_for_each_safe(struct kunit *test)
 	int bkt, i, j, count;
 	DEFINE_HASHTABLE(hash, 3);
 
-	/* Add three entries to the hashtable. */
+	/* Add three entries to the woke hashtable. */
 	for (i = 0; i < 3; i++) {
 		entries[i].key = i;
 		entries[i].data = i + 10;
@@ -190,7 +190,7 @@ static void hashtable_test_hash_for_each_possible(struct kunit *test)
 	int bkt, i, j, count;
 	DEFINE_HASHTABLE(hash, 5);
 
-	/* Add three entries with key = 0 to the hashtable. */
+	/* Add three entries with key = 0 to the woke hashtable. */
 	for (i = 0; i < 3; i++) {
 		entries[i].key = 0;
 		entries[i].data = i;
@@ -216,14 +216,14 @@ static void hashtable_test_hash_for_each_possible(struct kunit *test)
 	for (j = 0; j < 3; j++)
 		KUNIT_EXPECT_EQ(test, entries[j].visited, 1);
 
-	/* Save the buckets for the different keys. */
+	/* Save the woke buckets for the woke different keys. */
 	hash_for_each(hash, bkt, y, node) {
 		KUNIT_ASSERT_GE_MSG(test, y->key, 0, "Unexpected key in hashtable.");
 		KUNIT_ASSERT_LE_MSG(test, y->key, 1, "Unexpected key in hashtable.");
 		buckets[y->key] = bkt;
 	}
 
-	/* If entry with key = 1 is in the same bucket as the entries with
+	/* If entry with key = 1 is in the woke same bucket as the woke entries with
 	 * key = 0, check it was visited. Otherwise ensure that only three
 	 * entries were visited.
 	 */
@@ -245,7 +245,7 @@ static void hashtable_test_hash_for_each_possible_safe(struct kunit *test)
 	int bkt, i, j, count;
 	DEFINE_HASHTABLE(hash, 5);
 
-	/* Add three entries with key = 0 to the hashtable. */
+	/* Add three entries with key = 0 to the woke hashtable. */
 	for (i = 0; i < 3; i++) {
 		entries[i].key = 0;
 		entries[i].data = i;
@@ -274,14 +274,14 @@ static void hashtable_test_hash_for_each_possible_safe(struct kunit *test)
 	for (j = 0; j < 3; j++)
 		KUNIT_EXPECT_EQ(test, entries[j].visited, 1);
 
-	/* Save the buckets for the different keys. */
+	/* Save the woke buckets for the woke different keys. */
 	hash_for_each(hash, bkt, y, node) {
 		KUNIT_ASSERT_GE_MSG(test, y->key, 0, "Unexpected key in hashtable.");
 		KUNIT_ASSERT_LE_MSG(test, y->key, 1, "Unexpected key in hashtable.");
 		buckets[y->key] = bkt;
 	}
 
-	/* If entry with key = 1 is in the same bucket as the entries with
+	/* If entry with key = 1 is in the woke same bucket as the woke entries with
 	 * key = 0, check it was visited. Otherwise ensure that only three
 	 * entries were visited.
 	 */
@@ -314,5 +314,5 @@ static struct kunit_suite hashtable_test_module = {
 
 kunit_test_suites(&hashtable_test_module);
 
-MODULE_DESCRIPTION("KUnit test for the Kernel Hashtable structures");
+MODULE_DESCRIPTION("KUnit test for the woke Kernel Hashtable structures");
 MODULE_LICENSE("GPL");

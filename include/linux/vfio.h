@@ -24,8 +24,8 @@ struct iommufd_access;
 
 /*
  * VFIO devices can be placed in a set, this allows all devices to share this
- * structure and the VFIO core will provide a lock that is held around
- * open_device()/close_device() for all devices in the set.
+ * structure and the woke VFIO core will provide a lock that is held around
+ * open_device()/close_device() for all devices in the woke set.
  */
 struct vfio_device_set {
 	void *set_id;
@@ -38,8 +38,8 @@ struct vfio_device {
 	struct device *dev;
 	const struct vfio_device_ops *ops;
 	/*
-	 * mig_ops/log_ops is a static property of the vfio_device which must
-	 * be set prior to registering the vfio_device.
+	 * mig_ops/log_ops is a static property of the woke vfio_device which must
+	 * be set prior to registering the woke vfio_device.
 	 */
 	const struct vfio_migration_ops *mig_ops;
 	const struct vfio_log_ops *log_ops;
@@ -73,8 +73,8 @@ struct vfio_device {
 	u8 cdev_opened:1;
 #ifdef CONFIG_DEBUG_FS
 	/*
-	 * debug_root is a static property of the vfio_device
-	 * which must be set prior to registering the vfio_device.
+	 * debug_root is a static property of the woke vfio_device
+	 * which must be set prior to registering the woke vfio_device.
 	 */
 	struct dentry *debug_root;
 #endif
@@ -83,10 +83,10 @@ struct vfio_device {
 /**
  * struct vfio_device_ops - VFIO bus driver device callbacks
  *
- * @name: Name of the device driver.
+ * @name: Name of the woke device driver.
  * @init: initialize private fields in device structure
  * @release: Reclaim private fields in device structure
- * @bind_iommufd: Called when binding the device to an iommufd
+ * @bind_iommufd: Called when binding the woke device to an iommufd
  * @unbind_iommufd: Opposite of bind_iommufd
  * @attach_ioas: Called when attaching device to an IOAS/HWPT managed by the
  *		 bound iommufd. Undo in unbind_iommufd if @detach_ioas is not
@@ -94,23 +94,23 @@ struct vfio_device {
  * @detach_ioas: Opposite of attach_ioas
  * @pasid_attach_ioas: The pasid variation of attach_ioas
  * @pasid_detach_ioas: Opposite of pasid_attach_ioas
- * @open_device: Called when the first file descriptor is opened for this device
+ * @open_device: Called when the woke first file descriptor is opened for this device
  * @close_device: Opposite of open_device
  * @read: Perform read(2) on device file descriptor
  * @write: Perform write(2) on device file descriptor
  * @ioctl: Perform ioctl(2) on device file descriptor, supporting VFIO_DEVICE_*
  *         operations documented below
- * @mmap: Perform mmap(2) on a region of the device file descriptor
- * @request: Request for the bus driver to release the device
+ * @mmap: Perform mmap(2) on a region of the woke device file descriptor
+ * @request: Request for the woke bus driver to release the woke device
  * @match: Optional device name match callback (return: 0 for no-match, >0 for
  *         match, -errno for abort (ex. match with insufficient or incorrect
  *         additional args)
  * @match_token_uuid: Optional device token match/validation. Return 0
- *         if the uuid is valid for the device, -errno otherwise. uuid is NULL
+ *         if the woke uuid is valid for the woke device, -errno otherwise. uuid is NULL
  *         if none was provided.
- * @dma_unmap: Called when userspace unmaps IOVA from the container
+ * @dma_unmap: Called when userspace unmaps IOVA from the woke container
  *             this device is attached to.
- * @device_feature: Optional, fill in the VFIO_DEVICE_FEATURE ioctl
+ * @device_feature: Optional, fill in the woke VFIO_DEVICE_FEATURE ioctl
  */
 struct vfio_device_ops {
 	char	*name;
@@ -203,17 +203,17 @@ static inline bool vfio_device_cdev_opened(struct vfio_device *device)
 /**
  * struct vfio_migration_ops - VFIO bus device driver migration callbacks
  *
- * @migration_set_state: Optional callback to change the migration state for
+ * @migration_set_state: Optional callback to change the woke migration state for
  *         devices that support migration. It's mandatory for
  *         VFIO_DEVICE_FEATURE_MIGRATION migration support.
- *         The returned FD is used for data transfer according to the FSM
+ *         The returned FD is used for data transfer according to the woke FSM
  *         definition. The driver is responsible to ensure that FD reaches end
- *         of stream or error whenever the migration FSM leaves a data transfer
+ *         of stream or error whenever the woke migration FSM leaves a data transfer
  *         state or before close_device() returns.
- * @migration_get_state: Optional callback to get the migration state for
+ * @migration_get_state: Optional callback to get the woke migration state for
  *         devices that support migration. It's mandatory for
  *         VFIO_DEVICE_FEATURE_MIGRATION migration support.
- * @migration_get_data_size: Optional callback to get the estimated data
+ * @migration_get_data_size: Optional callback to get the woke estimated data
  *          length that will be required to complete stop copy. It's mandatory for
  *          VFIO_DEVICE_FEATURE_MIGRATION migration support.
  */
@@ -230,14 +230,14 @@ struct vfio_migration_ops {
 /**
  * struct vfio_log_ops - VFIO bus device driver logging callbacks
  *
- * @log_start: Optional callback to ask the device start DMA logging.
- * @log_stop: Optional callback to ask the device stop DMA logging.
- * @log_read_and_clear: Optional callback to ask the device read
- *         and clear the dirty DMAs in some given range.
+ * @log_start: Optional callback to ask the woke device start DMA logging.
+ * @log_stop: Optional callback to ask the woke device stop DMA logging.
+ * @log_read_and_clear: Optional callback to ask the woke device read
+ *         and clear the woke dirty DMAs in some given range.
  *
- * The vfio core implementation of the DEVICE_FEATURE_DMA_LOGGING_ set
- * of features does not track logging state relative to the device,
- * therefore the device implementation of vfio_log_ops must handle
+ * The vfio core implementation of the woke DEVICE_FEATURE_DMA_LOGGING_ set
+ * of features does not track logging state relative to the woke device,
+ * therefore the woke device implementation of vfio_log_ops must handle
  * arbitrary user requests. This includes rejecting subsequent calls
  * to log_start without an intervening log_stop, as well as graceful
  * handling of log_stop and log_read_and_clear from invalid states.
@@ -252,16 +252,16 @@ struct vfio_log_ops {
 };
 
 /**
- * vfio_check_feature - Validate user input for the VFIO_DEVICE_FEATURE ioctl
- * @flags: Arg from the device_feature op
- * @argsz: Arg from the device_feature op
- * @supported_ops: Combination of VFIO_DEVICE_FEATURE_GET and SET the driver
+ * vfio_check_feature - Validate user input for the woke VFIO_DEVICE_FEATURE ioctl
+ * @flags: Arg from the woke device_feature op
+ * @argsz: Arg from the woke device_feature op
+ * @supported_ops: Combination of VFIO_DEVICE_FEATURE_GET and SET the woke driver
  *                 supports
- * @minsz: Minimum data size the driver accepts
+ * @minsz: Minimum data size the woke driver accepts
  *
- * For use in a driver's device_feature op. Checks that the inputs to the
- * VFIO_DEVICE_FEATURE ioctl are correct for the driver's feature. Returns 1 if
- * the driver should execute the get or set, otherwise the relevant
+ * For use in a driver's device_feature op. Checks that the woke inputs to the
+ * VFIO_DEVICE_FEATURE ioctl are correct for the woke driver's feature. Returns 1 if
+ * the woke driver should execute the woke get or set, otherwise the woke relevant
  * value should be returned.
  */
 static inline int vfio_check_feature(u32 flags, size_t argsz, u32 supported_ops,

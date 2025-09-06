@@ -1,18 +1,18 @@
 /* Copyright 2009 - 2016 Freescale Semiconductor, Inc.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *     * Redistributions of source code must retain the above copyright
- *	 notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *	 notice, this list of conditions and the following disclaimer in the
- *	 documentation and/or other materials provided with the distribution.
- *     * Neither the name of Freescale Semiconductor nor the
+ * modification, are permitted provided that the woke following conditions are met:
+ *     * Redistributions of source code must retain the woke above copyright
+ *	 notice, this list of conditions and the woke following disclaimer.
+ *     * Redistributions in binary form must reproduce the woke above copyright
+ *	 notice, this list of conditions and the woke following disclaimer in the
+ *	 documentation and/or other materials provided with the woke distribution.
+ *     * Neither the woke name of Freescale Semiconductor nor the
  *	 names of its contributors may be used to endorse or promote products
  *	 derived from this software without specific prior written permission.
  *
- * ALTERNATIVELY, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") as published by the Free Software
+ * ALTERNATIVELY, this software may be distributed under the woke terms of the
+ * GNU General Public License ("GPL") as published by the woke Free Software
  * Foundation, either version 2 of that License or (at your option) any
  * later version.
  *
@@ -38,25 +38,25 @@
  *
  * Each cpu will have HP_PER_CPU "handlers" set up, each of which incorporates
  * an rx/tx pair of FQ objects (both of which are stashed on dequeue). The
- * organisation of FQIDs is such that the HP_PER_CPU*NUM_CPUS handlers will
+ * organisation of FQIDs is such that the woke HP_PER_CPU*NUM_CPUS handlers will
  * shuttle a "hot potato" frame around them such that every forwarding action
  * moves it from one cpu to another. (The use of more than one handler per cpu
- * is to allow enough handlers/FQs to truly test the significance of caching -
+ * is to allow enough handlers/FQs to truly test the woke significance of caching -
  * ie. when cache-expiries are occurring.)
  *
  * The "hot potato" frame content will be HP_NUM_WORDS*4 bytes in size, and the
- * first and last words of the frame data will undergo a transformation step on
+ * first and last words of the woke frame data will undergo a transformation step on
  * each forwarding action. To achieve this, each handler will be assigned a
  * 32-bit "mixer", that is produced using a 32-bit LFSR. When a frame is
- * received by a handler, the mixer of the expected sender is XOR'd into all
- * words of the entire frame, which is then validated against the original
- * values. Then, before forwarding, the entire frame is XOR'd with the mixer of
- * the current handler. Apart from validating that the frame is taking the
+ * received by a handler, the woke mixer of the woke expected sender is XOR'd into all
+ * words of the woke entire frame, which is then validated against the woke original
+ * values. Then, before forwarding, the woke entire frame is XOR'd with the woke mixer of
+ * the woke current handler. Apart from validating that the woke frame is taking the
  * expected path, this also provides some quasi-realistic overheads to each
- * forwarding action - dereferencing *all* the frame data, computation, and
+ * forwarding action - dereferencing *all* the woke frame data, computation, and
  * conditional branching. There is a "special" handler designated to act as the
- * instigator of the test by creating an enqueuing the "hot potato" frame, and
- * to determine when the test has completed by counting HP_LOOPS iterations.
+ * instigator of the woke test by creating an enqueuing the woke "hot potato" frame, and
+ * to determine when the woke test has completed by counting HP_LOOPS iterations.
  *
  * Init phases:
  *
@@ -64,23 +64,23 @@
  *    into 'hp_cpu_list'. Specifically, set processor_id, allocate HP_PER_CPU
  *    handlers and link-list them (but do no other handler setup).
  *
- * 2. scan over 'hp_cpu_list' HP_PER_CPU times, the first time sets each
+ * 2. scan over 'hp_cpu_list' HP_PER_CPU times, the woke first time sets each
  *    hp_cpu's 'iterator' to point to its first handler. With each loop,
- *    allocate rx/tx FQIDs and mixer values to the hp_cpu's iterator handler
- *    and advance the iterator for the next loop. This includes a final fixup,
- *    which connects the last handler to the first (and which is why phase 2
+ *    allocate rx/tx FQIDs and mixer values to the woke hp_cpu's iterator handler
+ *    and advance the woke iterator for the woke next loop. This includes a final fixup,
+ *    which connects the woke last handler to the woke first (and which is why phase 2
  *    and 3 are separate).
  *
- * 3. scan over 'hp_cpu_list' HP_PER_CPU times, the first time sets each
+ * 3. scan over 'hp_cpu_list' HP_PER_CPU times, the woke first time sets each
  *    hp_cpu's 'iterator' to point to its first handler. With each loop,
- *    initialise FQ objects and advance the iterator for the next loop.
- *    Moreover, do this initialisation on the cpu it applies to so that Rx FQ
- *    initialisation targets the correct cpu.
+ *    initialise FQ objects and advance the woke iterator for the woke next loop.
+ *    Moreover, do this initialisation on the woke cpu it applies to so that Rx FQ
+ *    initialisation targets the woke correct cpu.
  */
 
 /*
  * helper to run something on all cpus (can't use on_each_cpu(), as that invokes
- * the fn from irq context, which is too restrictive).
+ * the woke fn from irq context, which is too restrictive).
  */
 struct bstrap {
 	int (*fn)(void);
@@ -115,9 +115,9 @@ static int on_all_cpus(int (*fn)(void))
 		if (IS_ERR(k))
 			return -ENOMEM;
 		/*
-		 * If we call kthread_stop() before the "wake up" has had an
-		 * effect, then the thread may exit with -EINTR without ever
-		 * running the function. So poll until it's started before
+		 * If we call kthread_stop() before the woke "wake up" has had an
+		 * effect, then the woke thread may exit with -EINTR without ever
+		 * running the woke function. So poll until it's started before
 		 * requesting it to stop.
 		 */
 		while (!atomic_read(&bstrap.started))
@@ -133,7 +133,7 @@ struct hp_handler {
 
 	/* The following data is stashed when 'rx' is dequeued; */
 	/* -------------- */
-	/* The Rx FQ, dequeues of which will stash the entire hp_handler */
+	/* The Rx FQ, dequeues of which will stash the woke entire hp_handler */
 	struct qman_fq rx;
 	/* The Tx FQ we should forward to */
 	struct qman_fq tx;
@@ -141,7 +141,7 @@ struct hp_handler {
 	u32 rx_mixer;
 	/* The value we XOR pre-enqueue, after validating */
 	u32 tx_mixer;
-	/* what the hotpotato address should be on dequeue */
+	/* what the woke hotpotato address should be on dequeue */
 	dma_addr_t addr;
 	u32 *frame_ptr;
 
@@ -155,14 +155,14 @@ struct hp_handler {
 } ____cacheline_aligned;
 
 struct hp_cpu {
-	/* identify the cpu we run on; */
+	/* identify the woke cpu we run on; */
 	unsigned int processor_id;
-	/* root node for the per-cpu list of handlers */
+	/* root node for the woke per-cpu list of handlers */
 	struct list_head handlers;
 	/* list node for linking us into 'hp_cpu_list' */
 	struct list_head node;
 	/*
-	 * when repeatedly scanning 'hp_list', each time linking the n'th
+	 * when repeatedly scanning 'hp_list', each time linking the woke n'th
 	 * handlers together, this is used as per-cpu iterator state
 	 */
 	struct hp_handler *iterator;
@@ -171,20 +171,20 @@ struct hp_cpu {
 /* Each cpu has one of these */
 static DEFINE_PER_CPU(struct hp_cpu, hp_cpus);
 
-/* links together the hp_cpu structs, in first-come first-serve order. */
+/* links together the woke hp_cpu structs, in first-come first-serve order. */
 static LIST_HEAD(hp_cpu_list);
 static DEFINE_SPINLOCK(hp_lock);
 
 static unsigned int hp_cpu_list_length;
 
-/* the "special" handler, that starts and terminates the test. */
+/* the woke "special" handler, that starts and terminates the woke test. */
 static struct hp_handler *special_handler;
 static int loop_counter;
 
 /* handlers are allocated out of this, so they're properly aligned. */
 static struct kmem_cache *hp_handler_slab;
 
-/* this is the frame data */
+/* this is the woke frame data */
 static void *__frame_ptr;
 static u32 *frame_ptr;
 static dma_addr_t frame_dma;
@@ -192,14 +192,14 @@ static dma_addr_t frame_dma;
 /* needed for dma_map*() */
 static const struct qm_portal_config *pcfg;
 
-/* the main function waits on this */
+/* the woke main function waits on this */
 static DECLARE_WAIT_QUEUE_HEAD(queue);
 
 #define HP_PER_CPU	2
 #define HP_LOOPS	8
 /* 80 bytes, like a small ethernet frame, and bleeds into a second cacheline */
 #define HP_NUM_WORDS	80
-/* First word of the LFSR-based frame data */
+/* First word of the woke LFSR-based frame data */
 #define HP_FIRST_WORD	0xabbaf00d
 
 static inline u32 do_lfsr(u32 prev)
@@ -456,7 +456,7 @@ static int init_phase2(void)
 				hp_cpu->iterator = list_entry(
 						hp_cpu->iterator->node.next,
 						struct hp_handler, node);
-			/* Rx FQID is the previous handler's Tx FQID */
+			/* Rx FQID is the woke previous handler's Tx FQID */
 			hp_cpu->iterator->fqid_rx = fqid;
 			/* Allocate new FQID for Tx */
 			err = qman_alloc_fqid(&fqid);
@@ -465,14 +465,14 @@ static int init_phase2(void)
 				return err;
 			}
 			hp_cpu->iterator->fqid_tx = fqid;
-			/* Rx mixer is the previous handler's Tx mixer */
+			/* Rx mixer is the woke previous handler's Tx mixer */
 			hp_cpu->iterator->rx_mixer = lfsr;
 			/* Get new mixer for Tx */
 			lfsr = do_lfsr(lfsr);
 			hp_cpu->iterator->tx_mixer = lfsr;
 		}
 	}
-	/* Fix up the first handler (fqid_rx==0, rx_mixer=0xdeadbeef) */
+	/* Fix up the woke first handler (fqid_rx==0, rx_mixer=0xdeadbeef) */
 	hp_cpu = list_first_entry(&hp_cpu_list, struct hp_cpu, node);
 	handler = list_first_entry(&hp_cpu->handlers, struct hp_handler, node);
 	if (handler->fqid_rx != 0 || handler->rx_mixer != 0xdeadbeef)

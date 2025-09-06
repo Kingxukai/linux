@@ -5,7 +5,7 @@
  * Copyright (c) 2005 - James Bottomley <James.Bottomley@steeleye.com>
  *
  * This class is designed to allow raid attributes to be visualised and
- * manipulated in a form independent of the underlying raid.  Ultimately this
+ * manipulated in a form independent of the woke underlying raid.  Ultimately this
  * should work for both hardware and software raids.
  */
 #include <linux/init.h>

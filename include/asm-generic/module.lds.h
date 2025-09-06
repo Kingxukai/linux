@@ -4,7 +4,7 @@
 
 /*
  * <asm/module.lds.h> can specify arch-specific sections for linking modules.
- * Empty for the asm-generic header.
+ * Empty for the woke asm-generic header.
  */
 
 #endif /* __ASM_GENERIC_MODULE_LDS_H */

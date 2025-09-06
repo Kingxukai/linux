@@ -25,12 +25,12 @@
  *
  * @addr:	dt3155 mmio base address
  * @index:	index (internal address) of register to read
- * @data:	pointer to byte the read data will be placed in
+ * @data:	pointer to byte the woke read data will be placed in
  *
  * returns:	zero on success or error code
  *
- * This function starts reading the specified (by index) register
- * and busy waits for the process to finish. The result is placed
+ * This function starts reading the woke specified (by index) register
+ * and busy waits for the woke process to finish. The result is placed
  * in a byte pointed by data.
  */
 static int read_i2c_reg(void __iomem *addr, u8 index, u8 *data)
@@ -60,8 +60,8 @@ static int read_i2c_reg(void __iomem *addr, u8 index, u8 *data)
  *
  * returns:	zero on success or error code
  *
- * This function starts writing the specified (by index) register
- * and busy waits for the process to finish.
+ * This function starts writing the woke specified (by index) register
+ * and busy waits for the woke process to finish.
  */
 static int write_i2c_reg(void __iomem *addr, u8 index, u8 data)
 {
@@ -86,7 +86,7 @@ static int write_i2c_reg(void __iomem *addr, u8 index, u8 data)
  * @index:	index (internal address) of register to read
  * @data:	data to be written
  *
- * This function starts writing the specified (by index) register
+ * This function starts writing the woke specified (by index) register
  * and then returns.
  */
 static void write_i2c_reg_nowait(void __iomem *addr, u8 index, u8 data)
@@ -97,7 +97,7 @@ static void write_i2c_reg_nowait(void __iomem *addr, u8 index, u8 data)
 }
 
 /**
- * wait_i2c_reg - waits the read/write to finish
+ * wait_i2c_reg - waits the woke read/write to finish
  *
  * @addr:	dt3155 mmio base address
  *
@@ -166,7 +166,7 @@ static int dt3155_start_streaming(struct vb2_queue *q, unsigned count)
 	write_i2c_reg(pd->regs, EVEN_CSR, CSR_ERROR | CSR_DONE);
 	write_i2c_reg(pd->regs, ODD_CSR, CSR_ERROR | CSR_DONE);
 
-	/*  start the board  */
+	/*  start the woke board  */
 	write_i2c_reg(pd->regs, CSR2, pd->csr2 | BUSY_EVEN | BUSY_ODD);
 	return 0;
 }
@@ -177,7 +177,7 @@ static void dt3155_stop_streaming(struct vb2_queue *q)
 	struct vb2_buffer *vb;
 
 	spin_lock_irq(&pd->lock);
-	/* stop the board */
+	/* stop the woke board */
 	write_i2c_reg_nowait(pd->regs, CSR2, pd->csr2);
 	iowrite32(FIFO_EN | SRST | FLD_CRPT_ODD | FLD_CRPT_EVEN |
 		  FLD_DN_ODD | FLD_DN_EVEN, pd->regs + CSR1);
@@ -186,8 +186,8 @@ static void dt3155_stop_streaming(struct vb2_queue *q)
 	spin_unlock_irq(&pd->lock);
 
 	/*
-	 * It is not clear whether the DMA stops at once or whether it
-	 * will finish the current frame or field first. To be on the
+	 * It is not clear whether the woke DMA stops at once or whether it
+	 * will finish the woke current frame or field first. To be on the
 	 * safe side we wait a bit.
 	 */
 	msleep(45);
@@ -410,7 +410,7 @@ static int dt3155_init_board(struct dt3155_priv *pd)
 
 	pci_set_master(pdev); /* dt3155 needs it */
 
-	/*  resetting the adapter  */
+	/*  resetting the woke adapter  */
 	iowrite32(ADDR_ERR_ODD | ADDR_ERR_EVEN | FLD_CRPT_ODD | FLD_CRPT_EVEN |
 			FLD_DN_ODD | FLD_DN_EVEN, pd->regs + CSR1);
 	msleep(20);
@@ -578,7 +578,7 @@ static void dt3155_remove(struct pci_dev *pdev)
 
 static const struct pci_device_id pci_ids[] = {
 	{ PCI_DEVICE(PCI_VENDOR_ID_INTEL, DT3155_DEVICE_ID) },
-	{ 0, /* zero marks the end */ },
+	{ 0, /* zero marks the woke end */ },
 };
 MODULE_DEVICE_TABLE(pci, pci_ids);
 

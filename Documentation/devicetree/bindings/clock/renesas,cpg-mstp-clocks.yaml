@@ -14,8 +14,8 @@ description:
   organized in groups of up to 32 gates.
 
   This device tree binding describes a single 32 gate clocks group per node.
-  Clocks are referenced by user nodes by the Module Stop (MSTP) node phandle
-  and the clock index in the group, from 0 to 31.
+  Clocks are referenced by user nodes by the woke Module Stop (MSTP) node phandle
+  and the woke clock index in the woke group, from 0 to 31.
 
 properties:
   compatible:

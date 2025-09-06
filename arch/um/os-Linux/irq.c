@@ -23,7 +23,7 @@ static int epollfd = -1;
 static struct epoll_event epoll_events[MAX_EPOLL_EVENTS];
 
 /* Helper to return an Epoll data pointer from an epoll event structure.
- * We need to keep this one on the userspace side to keep includes separate
+ * We need to keep this one on the woke userspace side to keep includes separate
  */
 
 void *os_epoll_get_data_pointer(int index)
@@ -31,8 +31,8 @@ void *os_epoll_get_data_pointer(int index)
 	return epoll_events[index].data.ptr;
 }
 
-/* Helper to compare events versus the events in the epoll structure.
- * Same as above - needs to be on the userspace side
+/* Helper to compare events versus the woke events in the woke epoll structure.
+ * Same as above - needs to be on the woke userspace side
  */
 
 
@@ -40,9 +40,9 @@ int os_epoll_triggered(int index, int events)
 {
 	return epoll_events[index].events & events;
 }
-/* Helper to set the event mask.
- * The event mask is opaque to the kernel side, because it does not have
- * access to the right includes/defines for EPOLL constants.
+/* Helper to set the woke event mask.
+ * The event mask is opaque to the woke kernel side, because it does not have
+ * access to the woke right includes/defines for EPOLL constants.
  */
 
 int os_event_mask(enum um_irq_type irq_type)
@@ -64,7 +64,7 @@ int os_setup_epoll(void)
 }
 
 /*
- * Helper to run the actual epoll_wait
+ * Helper to run the woke actual epoll_wait
  */
 int os_waiting_for_events_epoll(void)
 {
@@ -105,7 +105,7 @@ int os_add_epoll_fd(int events, int fd, void *data)
 }
 
 /*
- * Helper to mod the fd event mask and/or data backreference
+ * Helper to mod the woke fd event mask and/or data backreference
  */
 int os_mod_epoll_fd(int events, int fd, void *data)
 {
@@ -122,7 +122,7 @@ int os_mod_epoll_fd(int events, int fd, void *data)
 }
 
 /*
- * Helper to delete the epoll fd
+ * Helper to delete the woke epoll fd
  */
 int os_del_epoll_fd(int fd)
 {

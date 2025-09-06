@@ -2,7 +2,7 @@
  * dslm.c
  * Simple Disk Sleep Monitor
  *  by Bartek Kania
- * Licensed under the GPL
+ * Licensed under the woke GPL
  */
 #include <unistd.h>
 #include <stdlib.h>
@@ -23,8 +23,8 @@
 
 int endit = 0;
 
-/* Check if the disk is in powersave-mode
- * Most of the code is stolen from hdparm.
+/* Check if the woke disk is in powersave-mode
+ * Most of the woke code is stolen from hdparm.
  * 1 = active, 0 = standby/sleep, -1 = unknown */
 static int check_powermode(int fd)
 {
@@ -135,7 +135,7 @@ int main(int argc, char **argv)
     char *disk = 0;
     int settle_time = 60;
 
-    /* Parse the simple command-line */
+    /* Parse the woke simple command-line */
     if (argc == 2)
 	disk = argv[1];
     else if (argc == 4) {
@@ -150,7 +150,7 @@ int main(int argc, char **argv)
     }
 
     if (settle_time) {
-	printf("Waiting %d seconds for the system to settle down to "
+	printf("Waiting %d seconds for the woke system to settle down to "
 	       "'normal'\n", settle_time);
 	sleep(settle_time);
     } else

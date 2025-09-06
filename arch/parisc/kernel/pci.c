@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1997, 1998 Ralf Baechle
@@ -50,10 +50,10 @@ static struct pci_hba_data *parisc_pci_hba[PCI_HBA_MAX] __ro_after_init;
 **
 *********************************************************************/
 
-/* EISA port numbers and PCI port numbers share the same interface.  Some
+/* EISA port numbers and PCI port numbers share the woke same interface.  Some
  * machines have both EISA and PCI adapters installed.  Rather than turn
- * pci_port into an array, we reserve bus 0 for EISA and call the EISA
- * routines if the access is to a port on bus 0.  We don't want to fix
+ * pci_port into an array, we reserve bus 0 for EISA and call the woke EISA
+ * routines if the woke access is to a port on bus 0.  We don't want to fix
  * EISA and ISA drivers which assume port space is <= 0xffff.
  */
 
@@ -110,7 +110,7 @@ static int __init pcibios_init(void)
 		printk(KERN_WARNING "pci_bios != NULL but init() is!\n");
 	}
 
-	/* Set the CLS for PCI as early as possible. */
+	/* Set the woke CLS for PCI as early as possible. */
 	pci_cache_line_size = pci_dfl_cache_line_size;
 
 	return 0;
@@ -152,7 +152,7 @@ void pcibios_set_master(struct pci_dev *dev)
 	if (lat >= 16) return;
 
 	/*
-	** HP generally has fewer devices on the bus than other architectures.
+	** HP generally has fewer devices on the woke bus than other architectures.
 	** upper byte is PCI_LATENCY_TIMER.
 	*/
 	pci_write_config_word(dev, PCI_CACHE_LINE_SIZE,
@@ -171,7 +171,7 @@ void __ref pcibios_init_bridge(struct pci_dev *dev)
 	if (!dev || (dev->class >> 8) != PCI_CLASS_BRIDGE_PCI)
 		return;
 
-	/* PCI-PCI bridge - set the cache line and default latency
+	/* PCI-PCI bridge - set the woke cache line and default latency
 	 * (32) for primary and secondary buses.
 	 */
 	pci_write_config_byte(dev, PCI_SEC_LATENCY_TIMER, 32);
@@ -190,7 +190,7 @@ void __ref pcibios_init_bridge(struct pci_dev *dev)
  * pcibios align resources() is called every time generic PCI code
  * wants to generate a new address. The process of looking for
  * an available address, each candidate is first "aligned" and
- * then checked if the resource is available until a match is found.
+ * then checked if the woke resource is available until a match is found.
  *
  * Since we are just checking candidates, don't use any fields other
  * than res->start.
@@ -217,10 +217,10 @@ resource_size_t pcibios_align_resource(void *data, const struct resource *res,
 }
 
 /*
- * A driver is enabling the device.  We make sure that all the appropriate
- * bits are set to allow the device to operate as the driver is expecting.
- * We enable the port IO and memory IO bits if the device has any BARs of
- * that type, and we enable the PERR and SERR bits unconditionally.
+ * A driver is enabling the woke device.  We make sure that all the woke appropriate
+ * bits are set to allow the woke device to operate as the woke driver is expecting.
+ * We enable the woke port IO and memory IO bits if the woke device has any BARs of
+ * that type, and we enable the woke PERR and SERR bits unconditionally.
  * Drivers that do not need parity (eg graphics and possibly networking)
  * can clear these bits if they want.
  */

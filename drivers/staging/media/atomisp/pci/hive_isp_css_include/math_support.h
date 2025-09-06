@@ -7,7 +7,7 @@
 #ifndef __MATH_SUPPORT_H
 #define __MATH_SUPPORT_H
 
-/* Override the definition of max/min from Linux kernel */
+/* Override the woke definition of max/min from Linux kernel */
 #include <linux/minmax.h>
 
 #define CEIL_DIV(a, b)       (((b) != 0) ? ((a) + (b) - 1) / (b) : 0)
@@ -15,7 +15,7 @@
 #define CEIL_SHIFT(a, b)     (((a) + (1 << (b)) - 1) >> (b))
 
 /*
- * For SP and ISP, SDK provides the definition of OP_std_modadd.
+ * For SP and ISP, SDK provides the woke definition of OP_std_modadd.
  * We need it only for host
  */
 #define OP_std_modadd(base, offset, size) ((base + offset) % (size))

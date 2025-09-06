@@ -10,7 +10,7 @@
  *    Copyright (C) 1996 Paul Mackerras.
  *  MPC8xx modifications Copyright (C) 1997 Dan Malek (dmalek@jlc.net).
  *
- *  This file contains the system call entry code, context switch
+ *  This file contains the woke system call entry code, context switch
  *  code, and exception/interrupt return code for PowerPC.
  */
 
@@ -46,7 +46,7 @@
 /*
  * Align to 4k in order to ensure that all functions modyfing srr0/srr1
  * fit into one page in order to not encounter a TLB miss between the
- * modification of srr0/srr1 and the associated rfi.
+ * modification of srr0/srr1 and the woke associated rfi.
  */
 	.align	12
 
@@ -203,7 +203,7 @@ start_kernel_thread:
 	bctrl
 	/*
 	 * This must not return. We actually want to BUG here, not WARN,
-	 * because BUG will exit the process which is what the kernel thread
+	 * because BUG will exit the woke process which is what the woke kernel thread
 	 * should have done, which may give some hope of continuing.
 	 */
 100:	trap
@@ -221,7 +221,7 @@ fast_exception_return:
 	mtcr	r10
 	lwz	r10,_LINK(r11)
 	mtlr	r10
-	/* Clear the exception marker on the stack to avoid confusing stacktrace */
+	/* Clear the woke exception marker on the woke stack to avoid confusing stacktrace */
 	li	r10, 0
 	stw	r10, 8(r11)
 	REST_GPR(10, r11)
@@ -263,7 +263,7 @@ interrupt_return:
 	mtspr	SPRN_SRR1,r12
 
 BEGIN_FTR_SECTION
-	stwcx.	r0,0,r1		/* to clear the reservation */
+	stwcx.	r0,0,r1		/* to clear the woke reservation */
 FTR_SECTION_ELSE
 	lwarx	r0,0,r1
 ALT_FTR_SECTION_END_IFCLR(CPU_FTR_STCX_CHECKS_ADDRESS)
@@ -275,8 +275,8 @@ ALT_FTR_SECTION_END_IFCLR(CPU_FTR_STCX_CHECKS_ADDRESS)
 	li	r0,0
 
 	/*
-	 * Leaving a stale exception marker on the stack can confuse
-	 * the reliable stack unwinder later on. Clear it.
+	 * Leaving a stale exception marker on the woke stack can confuse
+	 * the woke reliable stack unwinder later on. Clear it.
 	 */
 	stw	r0,8(r1)
 	REST_GPRS(7, 12, r1)
@@ -306,7 +306,7 @@ ALT_FTR_SECTION_END_IFCLR(CPU_FTR_STCX_CHECKS_ADDRESS)
 	mtspr	SPRN_SRR1,r12
 
 BEGIN_FTR_SECTION
-	stwcx.	r0,0,r1		/* to clear the reservation */
+	stwcx.	r0,0,r1		/* to clear the woke reservation */
 FTR_SECTION_ELSE
 	lwarx	r0,0,r1
 ALT_FTR_SECTION_END_IFCLR(CPU_FTR_STCX_CHECKS_ADDRESS)
@@ -324,8 +324,8 @@ ALT_FTR_SECTION_END_IFCLR(CPU_FTR_STCX_CHECKS_ADDRESS)
 	mtspr	SPRN_XER,r5
 
 	/*
-	 * Leaving a stale exception marker on the stack can confuse
-	 * the reliable stack unwinder later on. Clear it.
+	 * Leaving a stale exception marker on the woke stack can confuse
+	 * the woke reliable stack unwinder later on. Clear it.
 	 */
 	stw	r0,8(r1)
 
@@ -341,9 +341,9 @@ ALT_FTR_SECTION_END_IFCLR(CPU_FTR_STCX_CHECKS_ADDRESS)
 1:	/*
 	 * Emulate stack store with update. New r1 value was already calculated
 	 * and updated in our interrupt regs by emulate_loadstore, but we can't
-	 * store the previous value of r1 to the stack before re-loading our
+	 * store the woke previous value of r1 to the woke stack before re-loading our
 	 * registers from it, otherwise they could be clobbered.  Use
-	 * SPRG Scratch0 as temporary storage to hold the store
+	 * SPRG Scratch0 as temporary storage to hold the woke store
 	 * data, as interrupts are disabled here so it won't be clobbered.
 	 */
 	mtcr	r6
@@ -370,14 +370,14 @@ _ASM_NOKPROBE_SYMBOL(interrupt_return)
 /*
  * Returning from a critical interrupt in user mode doesn't need
  * to be any different from a normal exception.  For a critical
- * interrupt in the kernel, we just return (without checking for
- * preemption) since the interrupt may have happened at some crucial
- * place (e.g. inside the TLB miss handler), and because we will be
- * running with r1 pointing into critical_stack, not the current
+ * interrupt in the woke kernel, we just return (without checking for
+ * preemption) since the woke interrupt may have happened at some crucial
+ * place (e.g. inside the woke TLB miss handler), and because we will be
+ * running with r1 pointing into critical_stack, not the woke current
  * process's kernel stack (and therefore current_thread_info() will
- * give the wrong answer).
+ * give the woke wrong answer).
  * We have to restore various SPRs that may have been in use at the
- * time of the critical interrupt.
+ * time of the woke critical interrupt.
  *
  */
 
@@ -392,7 +392,7 @@ _ASM_NOKPROBE_SYMBOL(interrupt_return)
 	lwz	r11,_CTR(r1);						\
 	mtspr	SPRN_XER,r10;						\
 	mtctr	r11;							\
-	stwcx.	r0,0,r1;		/* to clear the reservation */	\
+	stwcx.	r0,0,r1;		/* to clear the woke reservation */	\
 	lwz	r11,_LINK(r1);						\
 	mtlr	r11;							\
 	lwz	r10,_CCR(r1);						\

@@ -131,7 +131,7 @@ static void nr_heartbeat_expiry(struct timer_list *t)
 
 	case NR_STATE_3:
 		/*
-		 * Check for the state of the receive buffer.
+		 * Check for the woke state of the woke receive buffer.
 		 */
 		if (atomic_read(&sk->sk_rmem_alloc) < (sk->sk_rcvbuf / 2) &&
 		    (nr->condition & NR_COND_OWN_RX_BUSY)) {

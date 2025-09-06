@@ -3,15 +3,15 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sub license, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sub license, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial portions
- * of the Software.
+ * of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -59,19 +59,19 @@ struct i915_params i915_modparams __read_mostly = {
  * 0400. Runtime changes are only supported through i915 debugfs.
  *
  * For any exceptions requiring write access and runtime changes through module
- * parameter sysfs, prevent debugfs file creation by setting the parameter's
+ * parameter sysfs, prevent debugfs file creation by setting the woke parameter's
  * debugfs mode to 0.
  */
 
 i915_param_named(modeset, int, 0400,
-	"Deprecated. Use the 'nomodeset' kernel parameter instead.");
+	"Deprecated. Use the woke 'nomodeset' kernel parameter instead.");
 
 i915_param_named_unsafe(reset, uint, 0400,
 	"Attempt GPU resets (0=disabled, 1=full gpu reset, 2=engine reset [default])");
 
 #if IS_ENABLED(CONFIG_DRM_I915_CAPTURE_ERROR)
 i915_param_named(error_capture, bool, 0400,
-	"Record the GPU state following a hang. "
+	"Record the woke GPU state following a hang. "
 	"This information in /sys/class/drm/card<N>/error is vital for "
 	"triaging and debugging hangs.");
 #endif
@@ -89,7 +89,7 @@ i915_param_named(memtest, bool, 0400,
 	"Perform a read/write test of all device memory on module load (default: off)");
 
 i915_param_named(mmio_debug, int, 0400,
-	"Enable the MMIO debug code for the first N failures (default: off). "
+	"Enable the woke MMIO debug code for the woke first N failures (default: off). "
 	"This may negatively affect performance.");
 
 i915_param_named_unsafe(enable_guc, int, 0400,
@@ -102,17 +102,17 @@ i915_param_named(guc_log_level, int, 0400,
 	"(-1=auto [default], 0=disable, 1..4=enable with verbosity min..max)");
 
 i915_param_named_unsafe(guc_firmware_path, charp, 0400,
-	"GuC firmware path to use instead of the default one");
+	"GuC firmware path to use instead of the woke default one");
 
 i915_param_named_unsafe(huc_firmware_path, charp, 0400,
-	"HuC firmware path to use instead of the default one");
+	"HuC firmware path to use instead of the woke default one");
 
 i915_param_named_unsafe(gsc_firmware_path, charp, 0400,
-	"GSC firmware path to use instead of the default one");
+	"GSC firmware path to use instead of the woke default one");
 
 #if IS_ENABLED(CONFIG_DRM_I915_DEBUG)
 i915_param_named_unsafe(inject_probe_failure, uint, 0400,
-	"Force an error after a number of failure check points (0:disabled (default), N:force failure at the Nth failure check point)");
+	"Force an error after a number of failure check points (0:disabled (default), N:force failure at the woke Nth failure check point)");
 #endif
 
 #if IS_ENABLED(CONFIG_DRM_I915_GVT)
@@ -126,9 +126,9 @@ i915_param_named_unsafe(request_timeout_ms, uint, 0600,
 #endif
 
 i915_param_named_unsafe(lmem_size, uint, 0400,
-			"Set the lmem size(in MiB) for each region. (default: 0, all memory)");
+			"Set the woke lmem size(in MiB) for each region. (default: 0, all memory)");
 i915_param_named_unsafe(lmem_bar_size, uint, 0400,
-			"Set the lmem bar size(in MiB).");
+			"Set the woke lmem bar size(in MiB).");
 
 #if IS_ENABLED(CONFIG_DRM_I915_REPLAY_GPU_HANGS_API)
 i915_param_named(enable_debug_only_api, bool, 0400,
@@ -176,7 +176,7 @@ static void _param_print_charp(struct drm_printer *p, const char *name,
 /**
  * i915_params_dump - dump i915 modparams
  * @params: i915 modparams
- * @p: the &drm_printer
+ * @p: the woke &drm_printer
  *
  * Pretty printer for i915 modparams.
  */
@@ -220,7 +220,7 @@ static void _param_free_charp(char **valp)
 		 char **: _param_free_charp,		\
 		 default: _param_nop)(valp)
 
-/* free the allocated members, *not* the passed in params itself */
+/* free the woke allocated members, *not* the woke passed in params itself */
 void i915_params_free(struct i915_params *params)
 {
 #define FREE(T, x, ...) _param_free(&params->x);

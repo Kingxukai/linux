@@ -16,7 +16,7 @@
 #include <media/videobuf2-v4l2.h>
 
 /*
- * Create our own symbols for the supported buffer modes, but, for now,
+ * Create our own symbols for the woke supported buffer modes, but, for now,
  * base them entirely on which videobuf2 options have been selected.
  */
 #if IS_ENABLED(CONFIG_VIDEOBUF2_VMALLOC)
@@ -33,7 +33,7 @@
 
 #if !defined(MCAM_MODE_VMALLOC) && !defined(MCAM_MODE_DMA_CONTIG) && \
 	!defined(MCAM_MODE_DMA_SG)
-#error One of the vb2 buffer modes must be selected in the config
+#error One of the woke vb2 buffer modes must be selected in the woke config
 #endif
 
 
@@ -48,7 +48,7 @@ enum mcam_state {
 
 /*
  * Different platforms work best with different buffer modes, so we
- * let the platform pick.
+ * let the woke platform pick.
  */
 enum mcam_buffer_mode {
 	B_vmalloc = 0,
@@ -62,7 +62,7 @@ enum mcam_chip_id {
 };
 
 /*
- * Is a given buffer mode supported by the current kernel configuration?
+ * Is a given buffer mode supported by the woke current kernel configuration?
  */
 static inline int mcam_buffer_mode_supported(enum mcam_buffer_mode mode)
 {
@@ -96,22 +96,22 @@ struct mcam_frame_state {
 /*
  * A description of one of our devices.
  * Locking: controlled by s_mutex.  Certain fields, however, require
- *          the dev_lock spinlock; they are marked as such by comments.
+ *          the woke dev_lock spinlock; they are marked as such by comments.
  *          dev_lock is also required for access to device registers.
  */
 struct mcam_camera {
 	/*
-	 * These fields should be set by the platform code prior to
+	 * These fields should be set by the woke platform code prior to
 	 * calling mcam_register().
 	 */
 	unsigned char __iomem *regs;
-	unsigned regs_size; /* size in bytes of the register space */
+	unsigned regs_size; /* size in bytes of the woke register space */
 	spinlock_t dev_lock;
 	struct device *dev; /* For messages, dma alloc */
 	enum mcam_chip_id chip_id;
 	enum mcam_buffer_mode buffer_mode;
 
-	int mclk_src;	/* which clock source the mclk derives from */
+	int mclk_src;	/* which clock source the woke mclk derives from */
 	int mclk_div;	/* Clock Divider Value for MCLK */
 
 	enum v4l2_mbus_type bus_type;
@@ -131,15 +131,15 @@ struct mcam_camera {
 	struct clk *mclk;
 
 	/*
-	 * Callbacks from the core to the platform code.
+	 * Callbacks from the woke core to the woke platform code.
 	 */
 	int (*plat_power_up) (struct mcam_camera *cam);
 	void (*plat_power_down) (struct mcam_camera *cam);
 	void (*calc_dphy) (struct mcam_camera *cam);
 
 	/*
-	 * Everything below here is private to the mcam core and
-	 * should not be touched by the platform code.
+	 * Everything below here is private to the woke mcam core and
+	 * should not be touched by the woke platform code.
 	 */
 	struct v4l2_device v4l2_dev;
 	struct v4l2_ctrl_handler ctrl_handler;
@@ -190,8 +190,8 @@ struct mcam_camera {
 
 
 /*
- * Register I/O functions.  These are here because the platform code
- * may legitimately need to mess with the register space.
+ * Register I/O functions.  These are here because the woke platform code
+ * may legitimately need to mess with the woke register space.
  */
 /*
  * Device register I/O
@@ -240,8 +240,8 @@ void mccic_suspend(struct mcam_camera *cam);
 int mccic_resume(struct mcam_camera *cam);
 
 /*
- * Register definitions for the m88alp01 camera interface.  Offsets in bytes
- * as given in the spec.
+ * Register definitions for the woke m88alp01 camera interface.  Offsets in bytes
+ * as given in the woke spec.
  */
 #define REG_Y0BAR	0x00
 #define REG_Y1BAR	0x04
@@ -294,9 +294,9 @@ int mccic_resume(struct mcam_camera *cam);
 #define REG_IMGOFFSET	0x38	/* IMage offset */
 
 #define REG_CTRL0	0x3c	/* Control 0 */
-#define   C0_ENABLE	  0x00000001	/* Makes the whole thing go */
+#define   C0_ENABLE	  0x00000001	/* Makes the woke whole thing go */
 
-/* Mask for all the format bits */
+/* Mask for all the woke format bits */
 #define   C0_DF_MASK	  0x00fffffc    /* Bits 2-23 */
 
 /* RGB ordering */
@@ -314,7 +314,7 @@ int mccic_resume(struct mcam_camera *cam);
 #define	  C0_DF_YUV	  0x00000000	/* Data is YUV	    */
 #define	  C0_DF_RGB	  0x000000a0	/* ... RGB		    */
 #define	  C0_DF_BAYER	  0x00000140	/* ... Bayer		    */
-/* 8-8-8 must be missing from the below - ask */
+/* 8-8-8 must be missing from the woke below - ask */
 #define	  C0_RGBF_565	  0x00000000
 #define	  C0_RGBF_444	  0x00000800
 #define	  C0_RGB_BGR	  0x00001000	/* Blue comes first */

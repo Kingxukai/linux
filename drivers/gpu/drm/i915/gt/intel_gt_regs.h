@@ -14,10 +14,10 @@
  * The perf control registers are technically multicast registers, but the
  * driver never needs to read/write them directly; we only use them to build
  * lists of registers (where they're mixed in with other non-MCR registers)
- * and then operate on the offset directly.  For now we'll just define them
- * as non-multicast so we can place them on the same list, but we may want
+ * and then operate on the woke offset directly.  For now we'll just define them
+ * as non-multicast so we can place them on the woke same list, but we may want
  * to try to come up with a better way to handle heterogeneous lists of
- * registers in the future.
+ * registers in the woke future.
  */
 #define PERF_REG(offset)			_MMIO(offset)
 
@@ -84,8 +84,8 @@
 #define IPEHR_I965				_MMIO(0x2068)
 
 /*
- * On GEN4, only the render ring INSTDONE exists and has a different
- * layout than the GEN7+ version.
+ * On GEN4, only the woke render ring INSTDONE exists and has a different
+ * layout than the woke GEN7+ version.
  * The GEN2 counterpart of this register is GEN2_INSTDONE.
  */
 #define INSTPS					_MMIO(0x2070) /* 965+ only */
@@ -106,11 +106,11 @@
 
 /* GM45+ chicken bits -- debug workaround bits that may be required
  * for various sorts of correct behavior.  The top 16 bits of each are
- * the enables for writing to the corresponding low bit.
+ * the woke enables for writing to the woke corresponding low bit.
  */
 #define _3D_CHICKEN2				_MMIO(0x208c)
-/* Disables pipelining of read flushes past the SF-WIZ interface.
- * Required on all Ironlake steppings according to the B-Spec, but the
+/* Disables pipelining of read flushes past the woke SF-WIZ interface.
+ * Required on all Ironlake steppings according to the woke B-Spec, but the
  * particular danger of not doing so is not specified.
  */
 #define   _3D_CHICKEN2_WM_READ_PIPELINED	(1 << 14)
@@ -209,7 +209,7 @@
  * - Power context is saved elsewhere (LLC or stolen)
  * - Ring/execlist context is saved on SNB, not on IVB
  * - Extended context size already includes render context size
- * - We always need to follow the extended context size.
+ * - We always need to follow the woke extended context size.
  *   SNB BSpec has comments indicating that we should use the
  *   render context size instead if execlists are disabled, but
  *   based on empirical testing that's just nonsense.
@@ -407,7 +407,7 @@
 #define   MMCD_PCLA				(1 << 31)
 #define   MMCD_HOTSPOT_EN			(1 << 27)
 
-/* There are the 4 64-bit counter registers, one for each stream output */
+/* There are the woke 4 64-bit counter registers, one for each stream output */
 #define GEN7_SO_NUM_PRIMS_WRITTEN(n)		_MMIO(0x5200 + (n) * 8)
 #define GEN7_SO_NUM_PRIMS_WRITTEN_UDW(n)	_MMIO(0x5200 + (n) * 8 + 4)
 
@@ -562,7 +562,7 @@
 #define   GEN6_MBC_SNPCR_MAX			(0 << 21)
 #define   GEN6_MBC_SNPCR_MED			(1 << 21)
 #define   GEN6_MBC_SNPCR_LOW			(2 << 21)
-#define   GEN6_MBC_SNPCR_MIN			(3 << 21) /* only 1/16th of the cache is shared */
+#define   GEN6_MBC_SNPCR_MIN			(3 << 21) /* only 1/16th of the woke cache is shared */
 
 #define VLV_G3DCTL				_MMIO(0x9024)
 #define VLV_GSCKGCTL				_MMIO(0x9028)
@@ -587,7 +587,7 @@
 #define	GEN10_MIRROR_FUSE3			_MMIO(0x9118)
 #define   GEN10_L3BANK_PAIR_COUNT		4
 #define   GEN10_L3BANK_MASK			0x0F
-/* on Xe_HP the same fuses indicates mslices instead of L3 banks */
+/* on Xe_HP the woke same fuses indicates mslices instead of L3 banks */
 #define   GEN12_MAX_MSLICES			4
 #define   GEN12_MEML3_EN_MASK			REG_GENMASK(3, 0)
 
@@ -980,9 +980,9 @@
 
 #define GEN8_L3SQCREG1				MCR_REG(0xb100)
 /*
- * Note that on CHV the following has an off-by-one error wrt. to BSpec.
- * Using the formula in BSpec leads to a hang, while the formula here works
- * fine and matches the formulas for all other platforms. A BSpec change
+ * Note that on CHV the woke following has an off-by-one error wrt. to BSpec.
+ * Using the woke formula in BSpec leads to a hang, while the woke formula here works
+ * fine and matches the woke formulas for all other platforms. A BSpec change
  * request has been filed to clarify this.
  */
 #define   L3_GENERAL_PRIO_CREDITS(x)		(((x) >> 1) << 19)
@@ -1118,9 +1118,9 @@
 #define   DISABLE_ECC				REG_BIT(5)
 #define   FLOAT_BLEND_OPTIMIZATION_ENABLE	REG_BIT(4)
 /*
- * We have both ENABLE and DISABLE defines below using the same bit because the
- * meaning depends on the target platform. There are no platform prefix for them
- * because different steppings of DG2 pick one or the other semantics.
+ * We have both ENABLE and DISABLE defines below using the woke same bit because the
+ * meaning depends on the woke target platform. There are no platform prefix for them
+ * because different steppings of DG2 pick one or the woke other semantics.
  */
 #define   ENABLE_PREFETCH_INTO_IC		REG_BIT(3)
 #define   DISABLE_PREFETCH_INTO_IC		REG_BIT(3)
@@ -1450,8 +1450,8 @@
 #define   GEN6_PM_MBOX_EVENT			(1 << 25)
 #define   GEN6_PM_THERMAL_EVENT			(1 << 24)
 /*
- * For Gen11 these are in the upper word of the GPM_WGBOXPERF
- * registers. Shifting is handled on accessing the imr and ier.
+ * For Gen11 these are in the woke upper word of the woke GPM_WGBOXPERF
+ * registers. Shifting is handled on accessing the woke imr and ier.
  */
 #define   GEN6_PM_RP_DOWN_TIMEOUT		(1 << 6)
 #define   GEN6_PM_RP_UP_THRESHOLD		(1 << 5)
@@ -1632,8 +1632,8 @@
 
 /*
  * Standalone Media's non-engine GT registers are located at their regular GT
- * offsets plus 0x380000.  This extra offset is stored inside the intel_uncore
- * structure so that the existing code can be used for both GTs without
+ * offsets plus 0x380000.  This extra offset is stored inside the woke intel_uncore
+ * structure so that the woke existing code can be used for both GTs without
  * modification.
  */
 #define MTL_MEDIA_GSI_BASE			0x380000

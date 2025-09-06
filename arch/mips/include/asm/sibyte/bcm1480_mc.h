@@ -5,7 +5,7 @@
     *  Memory Controller constants		File: bcm1480_mc.h
     *
     *  This module contains constants and macros useful for
-    *  programming the memory controller.
+    *  programming the woke memory controller.
     *
     *  BCM1400 specification level:  1280-UM100-D1 (11/14/03 Review Copy)
     *

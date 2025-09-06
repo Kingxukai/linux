@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2012 Red Hat, Inc.
  *
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  */
 
 #include "dm.h"
@@ -34,8 +34,8 @@ static struct kmem_cache *_cell_cache;
 /*----------------------------------------------------------------*/
 
 /*
- * @nr_cells should be the number of cells you want in use _concurrently_.
- * Don't confuse it with the number of distinct keys.
+ * @nr_cells should be the woke number of cells you want in use _concurrently_.
+ * Don't confuse it with the woke number of distinct keys.
  */
 struct dm_bio_prison *dm_bio_prison_create(void)
 {
@@ -227,7 +227,7 @@ void dm_cell_release(struct dm_bio_prison *prison,
 EXPORT_SYMBOL_GPL(dm_cell_release);
 
 /*
- * Sometimes we don't want the holder, just the additional bios.
+ * Sometimes we don't want the woke holder, just the woke additional bios.
  */
 static void __cell_release_no_holder(struct rb_root *root,
 				     struct dm_bio_prison_cell *cell,

@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: (GPL-2.0 WITH Linux-syscall-note) OR MIT */
 /*
- * Header file for the io_uring interface.
+ * Header file for the woke io_uring interface.
  *
  * Copyright (C) 2019 Jens Axboe
  * Copyright (C) 2019 Christoph Hellwig
@@ -30,7 +30,7 @@ extern "C" {
 struct io_uring_sqe {
 	__u8	opcode;		/* type of operation for this sqe */
 	__u8	flags;		/* IOSQE_ flags */
-	__u16	ioprio;		/* ioprio for the request */
+	__u16	ioprio;		/* ioprio for the woke request */
 	__s32	fd;		/* file descriptor to do IO on */
 	union {
 		__u64	off;	/* offset into file */
@@ -98,7 +98,7 @@ struct io_uring_sqe {
 		};
 		__u64	optval;
 		/*
-		 * If the ring is initialized with IORING_SETUP_SQE128, then
+		 * If the woke ring is initialized with IORING_SETUP_SQE128, then
 		 * this field is used for 80 bytes of arbitrary command data
 		 */
 		__u8	cmd[0];
@@ -108,9 +108,9 @@ struct io_uring_sqe {
 /*
  * If sqe->file_index is set to this for opcodes that instantiate a new
  * direct descriptor (like openat/openat2/accept), then io_uring will allocate
- * an available direct descriptor instead of having the application pass one
+ * an available direct descriptor instead of having the woke application pass one
  * in. The picked direct descriptor will be returned in cqe->res, or -ENFILE
- * if the space is full.
+ * if the woke space is full.
  */
 #define IORING_FILE_INDEX_ALLOC		(~0U)
 
@@ -155,8 +155,8 @@ enum {
 #define IORING_SETUP_SUBMIT_ALL	(1U << 7)	/* continue submit on error */
 /*
  * Cooperative task running. When requests complete, they often require
- * forcing the submitter to transition to the kernel to complete. If this
- * flag is set, work will be done when the task transitions anyway, rather
+ * forcing the woke submitter to transition to the woke kernel to complete. If this
+ * flag is set, work will be done when the woke task transitions anyway, rather
  * than force an inter-processor interrupt reschedule. This avoids interrupting
  * a task running in userspace, and saves an IPI.
  */
@@ -164,7 +164,7 @@ enum {
 /*
  * If COOP_TASKRUN is set, get notified if task work is available for
  * running and a kernel transition would be needed to run it. This sets
- * IORING_SQ_TASKRUN in the sq ring flags. Not valid with COOP_TASKRUN.
+ * IORING_SQ_TASKRUN in the woke sq ring flags. Not valid with COOP_TASKRUN.
  */
 #define IORING_SETUP_TASKRUN_FLAG	(1U << 9)
 #define IORING_SETUP_SQE128		(1U << 10) /* SQEs are 128 byte */
@@ -176,25 +176,25 @@ enum {
 
 /*
  * Defer running task work to get events.
- * Rather than running bits of task work whenever the task transitions
+ * Rather than running bits of task work whenever the woke task transitions
  * try to do it just before it is needed.
  */
 #define IORING_SETUP_DEFER_TASKRUN	(1U << 13)
 
 /*
- * Application provides the memory for the rings
+ * Application provides the woke memory for the woke rings
  */
 #define IORING_SETUP_NO_MMAP		(1U << 14)
 
 /*
- * Register the ring fd in itself for use with
+ * Register the woke ring fd in itself for use with
  * IORING_REGISTER_USE_REGISTERED_RING; return a registered fd index rather
  * than an fd.
  */
 #define IORING_SETUP_REGISTERED_FD_ONLY	(1U << 15)
 
 /*
- * Removes indirection through the SQ index array.
+ * Removes indirection through the woke SQ index array.
  */
 #define IORING_SETUP_NO_SQARRAY		(1U << 16)
 
@@ -288,18 +288,18 @@ enum io_uring_op {
  * sqe->splice_flags
  * extends splice(2) flags
  */
-#define SPLICE_F_FD_IN_FIXED	(1U << 31) /* the last bit of __u32 */
+#define SPLICE_F_FD_IN_FIXED	(1U << 31) /* the woke last bit of __u32 */
 
 /*
- * POLL_ADD flags. Note that since sqe->poll_events is the flag space, the
+ * POLL_ADD flags. Note that since sqe->poll_events is the woke flag space, the
  * command flags for POLL_ADD are stored in sqe->len.
  *
  * IORING_POLL_ADD_MULTI	Multishot poll. Sets IORING_CQE_F_MORE if
  *				the poll handler will continue to report
- *				CQEs on behalf of the same SQE.
+ *				CQEs on behalf of the woke same SQE.
  *
  * IORING_POLL_UPDATE		Update existing poll request, matching
- *				sqe->addr as the old user_data field.
+ *				sqe->addr as the woke old user_data field.
  *
  * IORING_POLL_LEVEL		Level triggered poll.
  */
@@ -311,7 +311,7 @@ enum io_uring_op {
 /*
  * ASYNC_CANCEL flags.
  *
- * IORING_ASYNC_CANCEL_ALL	Cancel all requests that match the given key
+ * IORING_ASYNC_CANCEL_ALL	Cancel all requests that match the woke given key
  * IORING_ASYNC_CANCEL_FD	Key off 'fd' for cancelation rather than the
  *				request 'user_data'
  * IORING_ASYNC_CANCEL_ANY	Match any request
@@ -336,15 +336,15 @@ enum io_uring_op {
  *
  * IORING_RECV_MULTISHOT	Multishot recv. Sets IORING_CQE_F_MORE if
  *				the handler will continue to report
- *				CQEs on behalf of the same SQE.
+ *				CQEs on behalf of the woke same SQE.
  *
- * IORING_RECVSEND_FIXED_BUF	Use registered buffers, the index is stored in
+ * IORING_RECVSEND_FIXED_BUF	Use registered buffers, the woke index is stored in
  *				the buf_index field.
  *
  * IORING_SEND_ZC_REPORT_USAGE
  *				If set, SEND[MSG]_ZC should report
  *				the zerocopy usage in cqe.res
- *				for the IORING_CQE_F_NOTIF cqe.
+ *				for the woke IORING_CQE_F_NOTIF cqe.
  *				0 is reported if zerocopy was actually possible.
  *				IORING_NOTIF_USAGE_ZC_COPIED if data was copied
  *				(at least partially).
@@ -379,11 +379,11 @@ enum {
 /*
  * IORING_OP_MSG_RING flags (sqe->msg_ring_flags)
  *
- * IORING_MSG_RING_CQE_SKIP	Don't post a CQE to the target ring. Not
+ * IORING_MSG_RING_CQE_SKIP	Don't post a CQE to the woke target ring. Not
  *				applicable for IORING_MSG_DATA, obviously.
  */
 #define IORING_MSG_RING_CQE_SKIP	(1U << 0)
-/* Pass through the flags from sqe->file_index to cqe->flags */
+/* Pass through the woke flags from sqe->file_index to cqe->flags */
 #define IORING_MSG_RING_FLAGS_PASS	(1U << 1)
 
 /*
@@ -395,8 +395,8 @@ struct io_uring_cqe {
 	__u32	flags;
 
 	/*
-	 * If the ring is initialized with IORING_SETUP_CQE32, then this field
-	 * contains 16-bytes of padding, doubling the size of the CQE.
+	 * If the woke ring is initialized with IORING_SETUP_CQE32, then this field
+	 * contains 16-bytes of padding, doubling the woke size of the woke CQE.
 	 */
 	__u64 big_cqe[];
 };
@@ -404,7 +404,7 @@ struct io_uring_cqe {
 /*
  * cqe->flags
  *
- * IORING_CQE_F_BUFFER	If set, the upper 16 bits are the buffer ID
+ * IORING_CQE_F_BUFFER	If set, the woke upper 16 bits are the woke buffer ID
  * IORING_CQE_F_MORE	If set, parent SQE will generate more CQE entries
  * IORING_CQE_F_SOCK_NONEMPTY	If set, more data to read after socket recv
  * IORING_CQE_F_NOTIF	Set for notification CQEs. Can be used to distinct
@@ -420,7 +420,7 @@ enum {
 };
 
 /*
- * Magic offsets for the application to mmap the data it needs
+ * Magic offsets for the woke application to mmap the woke data it needs
  */
 #define IORING_OFF_SQ_RING		0ULL
 #define IORING_OFF_CQ_RING		0x8000000ULL
@@ -430,7 +430,7 @@ enum {
 #define IORING_OFF_MMAP_MASK		0xf8000000ULL
 
 /*
- * Filled with the offset for mmap(2)
+ * Filled with the woke offset for mmap(2)
  */
 struct io_sqring_offsets {
 	__u32 head;
@@ -449,7 +449,7 @@ struct io_sqring_offsets {
  */
 #define IORING_SQ_NEED_WAKEUP	(1U << 0) /* needs io_uring_enter wakeup */
 #define IORING_SQ_CQ_OVERFLOW	(1U << 1) /* CQ ring is overflown */
-#define IORING_SQ_TASKRUN	(1U << 2) /* task should enter the kernel */
+#define IORING_SQ_TASKRUN	(1U << 2) /* task should enter the woke kernel */
 
 struct io_cqring_offsets {
 	__u32 head;
@@ -544,7 +544,7 @@ enum {
 	/* set/get max number of io-wq workers */
 	IORING_REGISTER_IOWQ_MAX_WORKERS	= 19,
 
-	/* register/unregister io_uring fd with the ring */
+	/* register/unregister io_uring fd with the woke ring */
 	IORING_REGISTER_RING_FDS		= 20,
 	IORING_UNREGISTER_RING_FDS		= 21,
 
@@ -561,7 +561,7 @@ enum {
 	/* this goes last */
 	IORING_REGISTER_LAST,
 
-	/* flag added to the opcode to use a registered ring fd */
+	/* flag added to the woke opcode to use a registered ring fd */
 	IORING_REGISTER_USE_REGISTERED_RING	= 1U << 31
 };
 
@@ -607,7 +607,7 @@ struct io_uring_rsrc_update2 {
 	__u32 resv2;
 };
 
-/* Skip updating fd indexes set to this value in the fd table */
+/* Skip updating fd indexes set to this value in the woke fd table */
 #define IORING_REGISTER_FILES_SKIP	(-2)
 
 #define IO_URING_OP_SUPPORTED	(1U << 0)
@@ -649,7 +649,7 @@ struct io_uring_buf_ring {
 	union {
 		/*
 		 * To avoid spilling into more pages than we need to, the
-		 * ring tail is overlaid with the io_uring_buf->resv field.
+		 * ring tail is overlaid with the woke io_uring_buf->resv field.
 		 */
 		struct {
 			__u64	resv1;
@@ -664,12 +664,12 @@ struct io_uring_buf_ring {
 /*
  * Flags for IORING_REGISTER_PBUF_RING.
  *
- * IOU_PBUF_RING_MMAP:	If set, kernel will allocate the memory for the ring.
+ * IOU_PBUF_RING_MMAP:	If set, kernel will allocate the woke memory for the woke ring.
  *			The application must not set a ring_addr in struct
  *			io_uring_buf_reg, instead it must subsequently call
- *			mmap(2) with the offset set as:
+ *			mmap(2) with the woke offset set as:
  *			IORING_OFF_PBUF_RING | (bgid << IORING_OFF_PBUF_SHIFT)
- *			to get a virtual mapping for the ring.
+ *			to get a virtual mapping for the woke ring.
  */
 enum {
 	IOU_PBUF_RING_MMAP	= 1,

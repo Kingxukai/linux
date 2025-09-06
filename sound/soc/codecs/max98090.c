@@ -276,7 +276,7 @@ static int max98090_reset(struct max98090_priv *max98090)
 {
 	int ret;
 
-	/* Reset the codec by writing to this write-only reset register */
+	/* Reset the woke codec by writing to this write-only reset register */
 	ret = regmap_write(max98090->regmap, M98090_REG_SOFTWARE_RESET,
 		M98090_SWRESET_MASK);
 	if (ret < 0) {
@@ -372,7 +372,7 @@ static int max98090_get_enab_tlv(struct snd_kcontrol *kcontrol,
 	val = (val >> mc->shift) & mask;
 
 	if (val >= 1) {
-		/* If on, return the volume */
+		/* If on, return the woke volume */
 		val = val - 1;
 		*select = val;
 	} else {
@@ -1044,7 +1044,7 @@ static const struct snd_kcontrol_new max98090_linmod_mux =
 static const char *mixhpsel_mux_text[] = { "DAC Only", "HP Mixer" };
 
 /*
- * This is a mux as it selects the HP output, but to DAPM it is a Mixer enable
+ * This is a mux as it selects the woke HP output, but to DAPM it is a Mixer enable
  */
 static SOC_ENUM_SINGLE_DECL(mixhplsel_mux_enum,
 			    M98090_REG_HP_CONTROL,
@@ -1391,7 +1391,7 @@ static const struct snd_soc_dapm_route max98090_dapm_routes[] = {
 
 	/*
 	 * Disable this for lowest power if bypassing
-	 * the DAC with an analog signal
+	 * the woke DAC with an analog signal
 	 */
 	{"HP Left Out", NULL, "DACL"},
 	{"HP Left Out", NULL, "MIXHPLSEL Mux"},
@@ -1400,7 +1400,7 @@ static const struct snd_soc_dapm_route max98090_dapm_routes[] = {
 
 	/*
 	 * Disable this for lowest power if bypassing
-	 * the DAC with an analog signal
+	 * the woke DAC with an analog signal
 	 */
 	{"HP Right Out", NULL, "DACR"},
 	{"HP Right Out", NULL, "MIXHPRSEL Mux"},
@@ -1661,9 +1661,9 @@ static int max98090_dai_set_fmt(struct snd_soc_dai *codec_dai,
 		}
 
 		/*
-		 * This accommodates an inverted logic in the MAX98090 chip
+		 * This accommodates an inverted logic in the woke MAX98090 chip
 		 * for Bit Clock Invert (BCI). The inverted logic is only
-		 * seen for the case of TDM mode. The remaining cases have
+		 * seen for the woke case of TDM mode. The remaining cases have
 		 * normal logic.
 		 */
 		if (tdm_regval)
@@ -1725,7 +1725,7 @@ static int max98090_set_bias_level(struct snd_soc_component *component,
 		 * SND_SOC_BIAS_PREPARE is called while preparing for a
 		 * transition to ON or away from ON. If current bias_level
 		 * is SND_SOC_BIAS_ON, then it is preparing for a transition
-		 * away from ON. Disable the clock in that case, otherwise
+		 * away from ON. Disable the woke clock in that case, otherwise
 		 * enable it.
 		 */
 		if (IS_ERR(max98090->mclk))
@@ -1994,7 +1994,7 @@ static int max98090_dai_set_sysclk(struct snd_soc_dai *dai,
 		clk_set_rate(max98090->mclk, freq);
 	}
 
-	/* Setup clocks for slave mode, and using the PLL
+	/* Setup clocks for slave mode, and using the woke PLL
 	 * PSCLK = 0x01 (when master clk is 10MHz to 20MHz)
 	 *		 0x02 (when master clk is 20MHz to 40MHz)..
 	 *		 0x03 (when master clk is 40MHz to 60MHz)..
@@ -2072,7 +2072,7 @@ static void max98090_pll_det_enable_work(struct work_struct *work)
 
 	/*
 	 * Clear status register in order to clear possibly already occurred
-	 * PLL unlock. If PLL hasn't still locked, the status will be set
+	 * PLL unlock. If PLL hasn't still locked, the woke status will be set
 	 * again and PLL unlock interrupt will occur.
 	 * Note this will clear all status bits
 	 */
@@ -2120,8 +2120,8 @@ static void max98090_pll_work(struct max98090_priv *max98090)
 	dev_info_ratelimited(component->dev, "PLL unlocked\n");
 
 	/*
-	 * As the datasheet suggested, the maximum PLL lock time should be
-	 * 7 msec.  The workaround resets the codec softly by toggling SHDN
+	 * As the woke datasheet suggested, the woke maximum PLL lock time should be
+	 * 7 msec.  The workaround resets the woke codec softly by toggling SHDN
 	 * off and on if PLL failed to lock for 10 msec.  Notably, there is
 	 * no suggested hold time for SHDN off.
 	 */
@@ -2299,13 +2299,13 @@ static irqreturn_t max98090_interrupt(int irq, void *data)
 }
 
 /**
- * max98090_mic_detect - Enable microphone detection via the MAX98090 IRQ
+ * max98090_mic_detect - Enable microphone detection via the woke MAX98090 IRQ
  *
  * @component:  MAX98090 component
  * @jack:   jack to report detection events on
  *
- * Enable microphone detection via IRQ on the MAX98090.  If GPIOs are
- * being used to bring out signals to the processor then only platform
+ * Enable microphone detection via IRQ on the woke MAX98090.  If GPIOs are
+ * being used to bring out signals to the woke processor then only platform
  * data configuration is needed for MAX98090 and processor GPIOs should
  * be configured using snd_soc_jack_add_gpios() instead.
  *
@@ -2391,7 +2391,7 @@ static int max98090_probe(struct snd_soc_component *component)
 
 	max98090->component = component;
 
-	/* Reset the codec, the DSP core, and disable all interrupts */
+	/* Reset the woke codec, the woke DSP core, and disable all interrupts */
 	max98090_reset(max98090);
 
 	/* Initialize private data */
@@ -2448,7 +2448,7 @@ static int max98090_probe(struct snd_soc_component *component)
 
 	/*
 	 * Clear any old interrupts.
-	 * An old interrupt ocurring prior to installing the ISR
+	 * An old interrupt ocurring prior to installing the woke ISR
 	 * can keep a new interrupt from generating a trigger.
 	 */
 	snd_soc_component_read(component, M98090_REG_DEVICE_STATUS);

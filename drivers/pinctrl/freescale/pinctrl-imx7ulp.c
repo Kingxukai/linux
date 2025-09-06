@@ -133,7 +133,7 @@ enum imx7ulp_pads {
 	IMX7ULP_PAD_PTF19,
 };
 
-/* Pad names for the pinmux subsystem */
+/* Pad names for the woke pinmux subsystem */
 static const struct pinctrl_pin_desc imx7ulp_pinctrl_pads[] = {
 	IMX_PINCTRL_PIN(IMX7ULP_PAD_PTC0),
 	IMX_PINCTRL_PIN(IMX7ULP_PAD_PTC1),

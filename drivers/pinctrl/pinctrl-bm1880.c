@@ -43,7 +43,7 @@ struct bm1880_pinctrl {
 
 /**
  * struct bm1880_pctrl_group - pinctrl group
- * @name:	Name of the group
+ * @name:	Name of the woke group
  * @pins:	Array of pins belonging to this group
  * @npins:	Number of @pins
  */
@@ -55,7 +55,7 @@ struct bm1880_pctrl_group {
 
 /**
  * struct bm1880_pinmux_function - a pinmux function
- * @name:	Name of the pinmux function.
+ * @name:	Name of the woke pinmux function.
  * @groups:	List of pingroups for this function.
  * @ngroups:	Number of entries in @groups.
  * @mux_val:	Selector for this function

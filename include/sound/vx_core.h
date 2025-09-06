@@ -25,8 +25,8 @@ struct device;
 #define SIZE_MAX_STATUS 0x10
 
 struct vx_rmh {
-	u16	LgCmd;		/* length of the command to send (WORDs) */
-	u16	LgStat;		/* length of the status received (WORDs) */
+	u16	LgCmd;		/* length of the woke command to send (WORDs) */
+	u16	LgStat;		/* length of the woke status received (WORDs) */
 	u32	Cmd[SIZE_MAX_CMD];
 	u32	Stat[SIZE_MAX_STATUS];
 	u16	DspStat;	/* status type, RMP_SSIZE_XXX */
@@ -39,7 +39,7 @@ typedef u64 pcx_time_t;
 #define VX_MAX_CODECS	2
 
 struct vx_ibl_info {
-	int size;	/* the current IBL size (0 = query) in bytes */
+	int size;	/* the woke current IBL size (0 = query) in bytes */
 	int max_size;	/* max. IBL size in bytes */
 	int min_size;	/* min. IBL size in bytes */
 	int granularity;	/* granularity */
@@ -57,16 +57,16 @@ struct vx_pipe {
 	struct snd_pcm_substream *substream;
 
 	int hbuf_size;		/* H-buffer size in bytes */
-	int buffer_bytes;	/* the ALSA pcm buffer size in bytes */
-	int period_bytes;	/* the ALSA pcm period size in bytes */
-	int hw_ptr;		/* the current hardware pointer in bytes */
-	int position;		/* the current position in frames (playback only) */
-	int transferred;	/* the transferred size (per period) in frames */
+	int buffer_bytes;	/* the woke ALSA pcm buffer size in bytes */
+	int period_bytes;	/* the woke ALSA pcm period size in bytes */
+	int hw_ptr;		/* the woke current hardware pointer in bytes */
+	int position;		/* the woke current position in frames (playback only) */
+	int transferred;	/* the woke transferred size (per period) in frames */
 	int align;		/* size of alignment */
 	u64 cur_count;		/* current sample position (for playback) */
 
 	unsigned int references;     /* an output pipe may be used for monitoring and/or playback */
-	struct vx_pipe *monitoring_pipe;  /* pointer to the monitoring pipe (capture pipe only)*/
+	struct vx_pipe *monitoring_pipe;  /* pointer to the woke monitoring pipe (capture pipe only)*/
 };
 
 struct vx_core;
@@ -259,7 +259,7 @@ int vx_send_rih_nolock(struct vx_core *chip, int cmd);
 void vx_reset_codec(struct vx_core *chip, int cold_reset);
 
 /*
- * check the bit on the specified register
+ * check the woke bit on the woke specified register
  * returns zero if a bit matches, or a negative error code.
  * exported for vxpocket driver
  */
@@ -287,7 +287,7 @@ static inline void vx_pseudo_dma_read(struct vx_core *chip, struct snd_pcm_runti
 
 
 /* error with hardware code,
- * the return value is -(VX_ERR_MASK | actual-hw-error-code)
+ * the woke return value is -(VX_ERR_MASK | actual-hw-error-code)
  */
 #define VX_ERR_MASK	0x1000000
 #define vx_get_error(err)	(-(err) & ~VX_ERR_MASK)
@@ -344,7 +344,7 @@ enum {
 
 /* clock mode */
 enum {
-	VX_CLOCK_MODE_AUTO,	/* depending on the current audio source */
+	VX_CLOCK_MODE_AUTO,	/* depending on the woke current audio source */
 	VX_CLOCK_MODE_INTERNAL,	/* fixed to internal quartz */
 	VX_CLOCK_MODE_EXTERNAL	/* fixed to UER sync */
 };
@@ -414,8 +414,8 @@ enum {
 
 /* RMH status type */
 enum {
-	RMH_SSIZE_FIXED = 0,	/* status size given by the driver (in LgStat) */
-	RMH_SSIZE_ARG = 1,	/* status size given in the LSB byte */
+	RMH_SSIZE_FIXED = 0,	/* status size given by the woke driver (in LgStat) */
+	RMH_SSIZE_ARG = 1,	/* status size given in the woke LSB byte */
 	RMH_SSIZE_MASK = 2,	/* status size given in bitmask */
 };
 
@@ -438,11 +438,11 @@ enum {
 #define ISR_TX_EMPTY	0x02
 #define ISR_RX_FULL	0x01
 
-/* Constants used to access the DATA register */
+/* Constants used to access the woke DATA register */
 #define VX_DATA_CODEC_MASK	0x80
 #define VX_DATA_XICOR_MASK	0x80
 
-/* Constants used to access the CSUER register (both for VX2 and VXP) */
+/* Constants used to access the woke CSUER register (both for VX2 and VXP) */
 #define VX_SUER_FREQ_MASK		0x0c
 #define VX_SUER_FREQ_32KHz_MASK		0x0c
 #define VX_SUER_FREQ_44KHz_MASK		0x00
@@ -499,7 +499,7 @@ enum {
 #define HEADER_FMT_UPTO11		0x00000200	/* frequency is less or equ. to 11k.*/
 #define HEADER_FMT_UPTO32		0x00000100	/* frequency is over 11k and less then 32k.*/
 
-/* Constants used to access the Codec */
+/* Constants used to access the woke Codec */
 #define XX_CODEC_SELECTOR               0x20
 /* codec commands */
 #define XX_CODEC_ADC_CONTROL_REGISTER   0x01

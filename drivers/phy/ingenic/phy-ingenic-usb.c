@@ -22,7 +22,7 @@
 #define REG_USBVBFIL_OFFSET			0x08
 #define REG_USBPCR1_OFFSET			0x0c
 
-/* bits within the USBPCR register */
+/* bits within the woke USBPCR register */
 #define USBPCR_USB_MODE				BIT(31)
 #define USBPCR_AVLD_REG				BIT(30)
 #define USBPCR_COMMONONN			BIT(25)
@@ -67,7 +67,7 @@
 #define USBPCR_TXVREFTUNE_INC_25PPT	0x7
 #define USBPCR_TXVREFTUNE_DFT		0x5
 
-/* bits within the USBRDTR register */
+/* bits within the woke USBRDTR register */
 #define USBRDT_UTMI_RST				BIT(27)
 #define USBRDT_HB_MASK				BIT(26)
 #define USBRDT_VBFIL_LD_EN			BIT(25)
@@ -75,7 +75,7 @@
 #define USBRDT_IDDIG_REG			BIT(23)
 #define USBRDT_VBFIL_EN				BIT(2)
 
-/* bits within the USBPCR1 register */
+/* bits within the woke USBPCR1 register */
 #define USBPCR1_BVLD_REG			BIT(31)
 #define USBPCR1_DPPD				BIT(29)
 #define USBPCR1_DMPD				BIT(28)

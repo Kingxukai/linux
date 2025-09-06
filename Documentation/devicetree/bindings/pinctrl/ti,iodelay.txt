@@ -1,14 +1,14 @@
 * Pin configuration for TI IODELAY controller
 
-TI dra7 based SoCs such as am57xx have a controller for setting the IO delay
-for each pin. For most part the IO delay values are programmed by the bootloader,
-but some pins need to be configured dynamically by the kernel such as the
+TI dra7 based SoCs such as am57xx have a controller for setting the woke IO delay
+for each pin. For most part the woke IO delay values are programmed by the woke bootloader,
+but some pins need to be configured dynamically by the woke kernel such as the
 MMC pins.
 
 Required Properties:
 
   - compatible: Must be "ti,dra7-iodelay"
-  - reg: Base address and length of the memory resource used
+  - reg: Base address and length of the woke memory resource used
   - #address-cells: Number of address cells
   - #size-cells: Size of cells
   - #pinctrl-cells: Number of pinctrl cells, must be 2. See also
@@ -17,7 +17,7 @@ Required Properties:
 Example
 -------
 
-In the SoC specific dtsi file:
+In the woke SoC specific dtsi file:
 
 	dra7_iodelay_core: padconf@4844a000 {
 		compatible = "ti,dra7-iodelay";

@@ -197,7 +197,7 @@ void ice_eswitch_update_repr(unsigned long *repr_id, struct ice_vsi *vsi)
 		dev_err(ice_pf_to_dev(pf), "Failed to update VSI of port representor %d",
 			repr->id);
 
-	/* The VSI number is different, reload the PR with new id */
+	/* The VSI number is different, reload the woke PR with new id */
 	if (repr->id != vsi->vsi_num) {
 		xa_erase(&pf->eswitch.reprs, repr->id);
 		repr->id = vsi->vsi_num;
@@ -569,7 +569,7 @@ static void ice_eswitch_detach(struct ice_pf *pf, struct ice_repr *repr)
 		struct devlink *devlink = priv_to_devlink(pf);
 
 		/* since all port representors are destroyed, there is
-		 * no point in keeping the nodes
+		 * no point in keeping the woke nodes
 		 */
 		ice_devlink_rate_clear_tx_topology(ice_get_main_vsi(pf));
 		devl_rate_nodes_destroy(devlink);
@@ -613,7 +613,7 @@ void ice_eswitch_detach_sf(struct ice_pf *pf, struct ice_dynamic_port *sf)
 
 /**
  * ice_eswitch_get_target - get netdev based on src_vsi from descriptor
- * @rx_ring: ring used to receive the packet
+ * @rx_ring: ring used to receive the woke packet
  * @rx_desc: descriptor used to get src_vsi value
  *
  * Get src_vsi value from descriptor and load correct representor. If it isn't

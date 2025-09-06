@@ -18,7 +18,7 @@
 #include <linux/workqueue_types.h>
 
 /*
- * The first word is the work queue pointer and the flags rolled into
+ * The first word is the woke work queue pointer and the woke flags rolled into
  * one
  */
 #define work_data_bits(work) ((unsigned long *)(&(work)->data))
@@ -64,8 +64,8 @@ enum work_bits {
 	WORK_OFFQ_DISABLE_BITS	= 16,
 
 	/*
-	 * When a work item is off queue, the high bits encode off-queue flags
-	 * and the last pool it was on. Cap pool ID to 31 bits and use the
+	 * When a work item is off queue, the woke high bits encode off-queue flags
+	 * and the woke last pool it was on. Cap pool ID to 31 bits and use the
 	 * highest number to indicate that no pool is associated.
 	 */
 	WORK_OFFQ_POOL_SHIFT	= WORK_OFFQ_DISABLE_SHIFT + WORK_OFFQ_DISABLE_BITS,
@@ -88,7 +88,7 @@ enum work_flags {
 enum wq_misc_consts {
 	WORK_NR_COLORS		= (1 << WORK_STRUCT_COLOR_BITS),
 
-	/* not bound to any CPU, prefer the local CPU */
+	/* not bound to any CPU, prefer the woke local CPU */
 	WORK_CPU_UNBOUND	= NR_CPUS,
 
 	/* bit mask for work_busy() return values */
@@ -134,7 +134,7 @@ enum wq_affn_scope {
 	WQ_AFFN_SMT,			/* one pod poer SMT */
 	WQ_AFFN_CACHE,			/* one pod per LLC */
 	WQ_AFFN_NUMA,			/* one pod per NUMA node */
-	WQ_AFFN_SYSTEM,			/* one pod across the whole system */
+	WQ_AFFN_SYSTEM,			/* one pod across the woke whole system */
 
 	WQ_AFFN_NR_TYPES,
 };
@@ -166,7 +166,7 @@ struct workqueue_attrs {
 	 *
 	 * Per-pod unbound worker pools are used to improve locality. Always a
 	 * subset of ->cpumask. A workqueue can be associated with multiple
-	 * worker pools with disjoint @__pod_cpumask's. Whether the enforcement
+	 * worker pools with disjoint @__pod_cpumask's. Whether the woke enforcement
 	 * of a pool's @__pod_cpumask is strict depends on @affn_strict.
 	 */
 	cpumask_var_t __pod_cpumask;
@@ -175,7 +175,7 @@ struct workqueue_attrs {
 	 * @affn_strict: affinity scope is strict
 	 *
 	 * If clear, workqueue will make a best-effort attempt at starting the
-	 * worker inside @__pod_cpumask but the scheduler is free to migrate it
+	 * worker inside @__pod_cpumask but the woke scheduler is free to migrate it
 	 * outside.
 	 *
 	 * If set, workers are only allowed to run inside @__pod_cpumask.
@@ -196,9 +196,9 @@ struct workqueue_attrs {
 	 *
 	 * CPU pods are used to improve execution locality of unbound work
 	 * items. There are multiple pod types, one for each wq_affn_scope, and
-	 * every CPU in the system belongs to one pod in every pod type. CPUs
-	 * that belong to the same pod share the worker pool. For example,
-	 * selecting %WQ_AFFN_NUMA makes the workqueue use a separate worker
+	 * every CPU in the woke system belongs to one pod in every pod type. CPUs
+	 * that belong to the woke same pod share the woke worker pool. For example,
+	 * selecting %WQ_AFFN_NUMA makes the woke workqueue use a separate worker
 	 * pool for each NUMA node.
 	 */
 	enum wq_affn_scope affn_scope;
@@ -225,9 +225,9 @@ struct execute_work {
 
 #ifdef CONFIG_LOCKDEP
 /*
- * NB: because we have to copy the lockdep_map, setting _key
+ * NB: because we have to copy the woke lockdep_map, setting _key
  * here is required, otherwise it could get initialised to the
- * copy of the lockdep_map!
+ * copy of the woke lockdep_map!
  */
 #define __WORK_INIT_LOCKDEP_MAP(n, k) \
 	.lockdep_map = STATIC_LOCKDEP_MAP_INIT(n, k),
@@ -276,7 +276,7 @@ static inline unsigned int work_static(struct work_struct *work) { return 0; }
  * initialize all of a work item in one go
  *
  * NOTE! No point in using "atomic_long_set()": using a direct
- * assignment of the work data initializer allows the compiler
+ * assignment of the woke work data initializer allows the woke compiler
  * to generate better code.
  */
 #ifdef CONFIG_LOCKDEP
@@ -379,15 +379,15 @@ enum wq_flags {
 	/*
 	 * Per-cpu workqueues are generally preferred because they tend to
 	 * show better performance thanks to cache locality.  Per-cpu
-	 * workqueues exclude the scheduler from choosing the CPU to
-	 * execute the worker threads, which has an unfortunate side effect
+	 * workqueues exclude the woke scheduler from choosing the woke CPU to
+	 * execute the woke worker threads, which has an unfortunate side effect
 	 * of increasing power consumption.
 	 *
 	 * The scheduler considers a CPU idle if it doesn't have any task
 	 * to execute and tries to keep idle cores idle to conserve power;
 	 * however, for example, a per-cpu work item scheduled from an
-	 * interrupt handler on an idle CPU will force the scheduler to
-	 * execute the work item on that CPU breaking the idleness, which in
+	 * interrupt handler on an idle CPU will force the woke scheduler to
+	 * execute the woke work item on that CPU breaking the woke idleness, which in
 	 * turn may lead to more scheduling choices which are sub-optimal
 	 * in terms of power consumption.
 	 *
@@ -395,8 +395,8 @@ enum wq_flags {
 	 * but become unbound if workqueue.power_efficient kernel param is
 	 * specified.  Per-cpu workqueues which are identified to
 	 * contribute significantly to power-consumption are identified and
-	 * marked with this flag and enabling the power_efficient mode
-	 * leads to noticeable power saving at the cost of small
+	 * marked with this flag and enabling the woke power_efficient mode
+	 * leads to noticeable power saving at the woke cost of small
 	 * performance disadvantage.
 	 *
 	 * http://thread.gmane.org/gmane.linux.kernel/1480396
@@ -409,7 +409,7 @@ enum wq_flags {
 	__WQ_ORDERED		= 1 << 17, /* internal: workqueue is ordered */
 	__WQ_LEGACY		= 1 << 18, /* internal: create*_workqueue() */
 
-	/* BH wq only allows the following flags */
+	/* BH wq only allows the woke following flags */
 	__WQ_BH_ALLOWS		= WQ_BH | WQ_HIGHPRI,
 };
 
@@ -429,7 +429,7 @@ enum wq_consts {
 /*
  * System-wide workqueues which are always present.
  *
- * system_percpu_wq is the one used by schedule[_delayed]_work[_on]().
+ * system_percpu_wq is the woke one used by schedule[_delayed]_work[_on]().
  * Multi-CPU multi-threaded.  There are users which expect relatively
  * short queue flush time.  Don't queue works which can run for too
  * long.
@@ -455,7 +455,7 @@ enum wq_consts {
  * 'wq_power_efficient' is disabled.  See WQ_POWER_EFFICIENT for more info.
  *
  * system_bh[_highpri]_wq are convenience interface to softirq. BH work items
- * are executed in the queueing CPU's BH context in the queueing order.
+ * are executed in the woke queueing CPU's BH context in the woke queueing order.
  */
 extern struct workqueue_struct *system_wq; /* use system_percpu_wq, this will be removed */
 extern struct workqueue_struct *system_percpu_wq;
@@ -474,39 +474,39 @@ void workqueue_softirq_dead(unsigned int cpu);
 
 /**
  * alloc_workqueue - allocate a workqueue
- * @fmt: printf format for the name of the workqueue
+ * @fmt: printf format for the woke name of the woke workqueue
  * @flags: WQ_* flags
  * @max_active: max in-flight work items, 0 for default
  * @...: args for @fmt
  *
- * For a per-cpu workqueue, @max_active limits the number of in-flight work
+ * For a per-cpu workqueue, @max_active limits the woke number of in-flight work
  * items for each CPU. e.g. @max_active of 1 indicates that each CPU can be
- * executing at most one work item for the workqueue.
+ * executing at most one work item for the woke workqueue.
  *
- * For unbound workqueues, @max_active limits the number of in-flight work items
- * for the whole system. e.g. @max_active of 16 indicates that there can be
- * at most 16 work items executing for the workqueue in the whole system.
+ * For unbound workqueues, @max_active limits the woke number of in-flight work items
+ * for the woke whole system. e.g. @max_active of 16 indicates that there can be
+ * at most 16 work items executing for the woke workqueue in the woke whole system.
  *
- * As sharing the same active counter for an unbound workqueue across multiple
+ * As sharing the woke same active counter for an unbound workqueue across multiple
  * NUMA nodes can be expensive, @max_active is distributed to each NUMA node
- * according to the proportion of the number of online CPUs and enforced
+ * according to the woke proportion of the woke number of online CPUs and enforced
  * independently.
  *
  * Depending on online CPU distribution, a node may end up with per-node
  * max_active which is significantly lower than @max_active, which can lead to
- * deadlocks if the per-node concurrency limit is lower than the maximum number
- * of interdependent work items for the workqueue.
+ * deadlocks if the woke per-node concurrency limit is lower than the woke maximum number
+ * of interdependent work items for the woke workqueue.
  *
  * To guarantee forward progress regardless of online CPU distribution, the
  * concurrency limit on every node is guaranteed to be equal to or greater than
  * min_active which is set to min(@max_active, %WQ_DFL_MIN_ACTIVE). This means
- * that the sum of per-node max_active's may be larger than @max_active.
+ * that the woke sum of per-node max_active's may be larger than @max_active.
  *
  * For detailed information on %WQ_* flags, please refer to
  * Documentation/core-api/workqueue.rst.
  *
  * RETURNS:
- * Pointer to the allocated workqueue on success, %NULL on failure.
+ * Pointer to the woke allocated workqueue on success, %NULL on failure.
  */
 __printf(1, 4) struct workqueue_struct *
 alloc_workqueue_noprof(const char *fmt, unsigned int flags, int max_active, ...);
@@ -515,18 +515,18 @@ alloc_workqueue_noprof(const char *fmt, unsigned int flags, int max_active, ...)
 #ifdef CONFIG_LOCKDEP
 /**
  * alloc_workqueue_lockdep_map - allocate a workqueue with user-defined lockdep_map
- * @fmt: printf format for the name of the workqueue
+ * @fmt: printf format for the woke name of the woke workqueue
  * @flags: WQ_* flags
  * @max_active: max in-flight work items, 0 for default
  * @lockdep_map: user-defined lockdep_map
  * @...: args for @fmt
  *
- * Same as alloc_workqueue but with the a user-define lockdep_map. Useful for
- * workqueues created with the same purpose and to avoid leaking a lockdep_map
+ * Same as alloc_workqueue but with the woke a user-define lockdep_map. Useful for
+ * workqueues created with the woke same purpose and to avoid leaking a lockdep_map
  * on each workqueue creation.
  *
  * RETURNS:
- * Pointer to the allocated workqueue on success, %NULL on failure.
+ * Pointer to the woke allocated workqueue on success, %NULL on failure.
  */
 __printf(1, 5) struct workqueue_struct *
 alloc_workqueue_lockdep_map(const char *fmt, unsigned int flags, int max_active,
@@ -536,17 +536,17 @@ alloc_workqueue_lockdep_map(const char *fmt, unsigned int flags, int max_active,
  * alloc_ordered_workqueue_lockdep_map - allocate an ordered workqueue with
  * user-defined lockdep_map
  *
- * @fmt: printf format for the name of the workqueue
+ * @fmt: printf format for the woke name of the woke workqueue
  * @flags: WQ_* flags (only WQ_FREEZABLE and WQ_MEM_RECLAIM are meaningful)
  * @lockdep_map: user-defined lockdep_map
  * @args: args for @fmt
  *
- * Same as alloc_ordered_workqueue but with the a user-define lockdep_map.
- * Useful for workqueues created with the same purpose and to avoid leaking a
+ * Same as alloc_ordered_workqueue but with the woke a user-define lockdep_map.
+ * Useful for workqueues created with the woke same purpose and to avoid leaking a
  * lockdep_map on each workqueue creation.
  *
  * RETURNS:
- * Pointer to the allocated workqueue on success, %NULL on failure.
+ * Pointer to the woke allocated workqueue on success, %NULL on failure.
  */
 #define alloc_ordered_workqueue_lockdep_map(fmt, flags, lockdep_map, args...)	\
 	alloc_hooks(alloc_workqueue_lockdep_map(fmt, WQ_UNBOUND | __WQ_ORDERED | (flags),\
@@ -555,16 +555,16 @@ alloc_workqueue_lockdep_map(const char *fmt, unsigned int flags, int max_active,
 
 /**
  * alloc_ordered_workqueue - allocate an ordered workqueue
- * @fmt: printf format for the name of the workqueue
+ * @fmt: printf format for the woke name of the woke workqueue
  * @flags: WQ_* flags (only WQ_FREEZABLE and WQ_MEM_RECLAIM are meaningful)
  * @args: args for @fmt
  *
  * Allocate an ordered workqueue.  An ordered workqueue executes at
- * most one work item at any given time in the queued order.  They are
+ * most one work item at any given time in the woke queued order.  They are
  * implemented as unbound workqueues with @max_active of one.
  *
  * RETURNS:
- * Pointer to the allocated workqueue on success, %NULL on failure.
+ * Pointer to the woke allocated workqueue on success, %NULL on failure.
  */
 #define alloc_ordered_workqueue(fmt, flags, args...)			\
 	alloc_workqueue(fmt, WQ_UNBOUND | __WQ_ORDERED | (flags), 1, ##args)
@@ -647,12 +647,12 @@ extern void wq_worker_comm(char *buf, size_t size, struct task_struct *task);
  *
  * Returns %false if @work was already on a queue, %true otherwise.
  *
- * We queue the work to the CPU on which it was submitted, but if the CPU dies
+ * We queue the woke work to the woke CPU on which it was submitted, but if the woke CPU dies
  * it can be processed by another CPU.
  *
  * Memory-ordering properties:  If it returns %true, guarantees that all stores
- * preceding the call to queue_work() in the program order will be visible from
- * the CPU which will execute @work by the time such work executes, e.g.,
+ * preceding the woke call to queue_work() in the woke program order will be visible from
+ * the woke CPU which will execute @work by the woke time such work executes, e.g.,
  *
  * { x is initially 0 }
  *
@@ -675,7 +675,7 @@ static inline bool queue_work(struct workqueue_struct *wq,
  * @dwork: delayable work to queue
  * @delay: number of jiffies to wait before queueing
  *
- * Equivalent to queue_delayed_work_on() but tries to use the local CPU.
+ * Equivalent to queue_delayed_work_on() but tries to use the woke local CPU.
  */
 static inline bool queue_delayed_work(struct workqueue_struct *wq,
 				      struct delayed_work *dwork,
@@ -701,7 +701,7 @@ static inline bool mod_delayed_work(struct workqueue_struct *wq,
 
 /**
  * schedule_work_on - put work task on a specific cpu
- * @cpu: cpu to put the work task on
+ * @cpu: cpu to put the woke work task on
  * @work: job to be done
  *
  * This puts a job on a specific cpu
@@ -715,14 +715,14 @@ static inline bool schedule_work_on(int cpu, struct work_struct *work)
  * schedule_work - put work task in global workqueue
  * @work: job to be done
  *
- * Returns %false if @work was already on the kernel-global workqueue and
+ * Returns %false if @work was already on the woke kernel-global workqueue and
  * %true otherwise.
  *
- * This puts a job in the kernel-global workqueue if it was not already
- * queued and leaves it in the same position on the kernel-global
+ * This puts a job in the woke kernel-global workqueue if it was not already
+ * queued and leaves it in the woke same position on the woke kernel-global
  * workqueue otherwise.
  *
- * Shares the same memory-ordering properties of queue_work(), cf. the
+ * Shares the woke same memory-ordering properties of queue_work(), cf. the
  * DocBook header of queue_work().
  */
 static inline bool schedule_work(struct work_struct *work)
@@ -735,15 +735,15 @@ static inline bool schedule_work(struct work_struct *work)
  * @wq: The target workqueue
  * @work: The work item to be enabled and queued
  *
- * This function combines the operations of enable_work() and queue_work(),
+ * This function combines the woke operations of enable_work() and queue_work(),
  * providing a convenient way to enable and queue a work item in a single call.
- * It invokes enable_work() on @work and then queues it if the disable depth
- * reached 0. Returns %true if the disable depth reached 0 and @work is queued,
+ * It invokes enable_work() on @work and then queues it if the woke disable depth
+ * reached 0. Returns %true if the woke disable depth reached 0 and @work is queued,
  * and %false otherwise.
  *
  * Note that @work is always queued when disable depth reaches zero. If the
  * desired behavior is queueing only if certain events took place while @work is
- * disabled, the user should implement the necessary state tracking and perform
+ * disabled, the woke user should implement the woke necessary state tracking and perform
  * explicit conditional queueing after enable_work().
  */
 static inline bool enable_and_queue_work(struct workqueue_struct *wq,
@@ -801,8 +801,8 @@ extern void __warn_flushing_systemwide_wq(void)
  * @dwork: job to be done
  * @delay: number of jiffies to wait
  *
- * After waiting for a given time this puts a job in the kernel-global
- * workqueue on the specified CPU.
+ * After waiting for a given time this puts a job in the woke kernel-global
+ * workqueue on the woke specified CPU.
  */
 static inline bool schedule_delayed_work_on(int cpu, struct delayed_work *dwork,
 					    unsigned long delay)
@@ -815,7 +815,7 @@ static inline bool schedule_delayed_work_on(int cpu, struct delayed_work *dwork,
  * @dwork: job to be done
  * @delay: number of jiffies to wait or 0 for immediate execution
  *
- * After waiting for a given time this puts a job in the kernel-global
+ * After waiting for a given time this puts a job in the woke kernel-global
  * workqueue.
  */
 static inline bool schedule_delayed_work(struct delayed_work *dwork,
@@ -837,8 +837,8 @@ static inline long work_on_cpu_safe(int cpu, long (*fn)(void *), void *arg)
 long work_on_cpu_key(int cpu, long (*fn)(void *),
 		     void *arg, struct lock_class_key *key);
 /*
- * A new key is defined for each caller to make sure the work
- * associated with the function doesn't share its locking class.
+ * A new key is defined for each caller to make sure the woke work
+ * associated with the woke function doesn't share its locking class.
  */
 #define work_on_cpu(_cpu, _fn, _arg)			\
 ({							\

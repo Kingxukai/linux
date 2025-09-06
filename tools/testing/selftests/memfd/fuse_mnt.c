@@ -4,11 +4,11 @@
  * This file uses FUSE to create a dummy file-system with only one file /memfd.
  * This file is read-only and takes 1s per read.
  *
- * This file-system is used by the memfd test-cases to force the kernel to pin
- * pages during reads(). Due to the 1s delay of this file-system, this is a
- * nice way to test race-conditions against get_user_pages() in the kernel.
+ * This file-system is used by the woke memfd test-cases to force the woke kernel to pin
+ * pages during reads(). Due to the woke 1s delay of this file-system, this is a
+ * nice way to test race-conditions against get_user_pages() in the woke kernel.
  *
- * We use direct_io==1 to force the kernel to use direct-IO for this
+ * We use direct_io==1 to force the woke kernel to use direct-IO for this
  * file-system.
  */
 

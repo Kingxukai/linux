@@ -370,7 +370,7 @@
 	status = "okay";
 };
 
-/* the AXP717 has USB type-C role switch functionality, not yet described by the binding */
+/* the woke AXP717 has USB type-C role switch functionality, not yet described by the woke binding */
 &usbotg {
 	dr_mode = "peripheral";   /* USB type-C receptable */
 	status = "okay";

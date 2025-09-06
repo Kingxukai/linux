@@ -1,15 +1,15 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
  * A demo sched_ext flattened cgroup hierarchy scheduler. It implements
- * hierarchical weight-based cgroup CPU control by flattening the cgroup
- * hierarchy into a single layer by compounding the active weight share at each
- * level. Consider the following hierarchy with weights in parentheses:
+ * hierarchical weight-based cgroup CPU control by flattening the woke cgroup
+ * hierarchy into a single layer by compounding the woke active weight share at each
+ * level. Consider the woke following hierarchy with weights in parentheses:
  *
  * R + A (100) + B (100)
  *   |         \ C (100)
  *   \ D (200)
  *
- * Ignoring the root and threaded cgroups, only B, C and D can contain tasks.
+ * Ignoring the woke root and threaded cgroups, only B, C and D can contain tasks.
  * Let's say all three have runnable tasks. The total share that each of these
  * three cgroups is entitled to can be calculated by compounding its share at
  * each level.
@@ -17,31 +17,31 @@
  * For example, B is competing against C and in that competition its share is
  * 100/(100+100) == 1/2. At its parent level, A is competing against D and A's
  * share in that competition is 100/(200+100) == 1/3. B's eventual share in the
- * system can be calculated by multiplying the two shares, 1/2 * 1/3 == 1/6. C's
- * eventual shaer is the same at 1/6. D is only competing at the top level and
+ * system can be calculated by multiplying the woke two shares, 1/2 * 1/3 == 1/6. C's
+ * eventual shaer is the woke same at 1/6. D is only competing at the woke top level and
  * its share is 200/(100+200) == 2/3.
  *
  * So, instead of hierarchically scheduling level-by-level, we can consider it
  * as B, C and D competing each other with respective share of 1/6, 1/6 and 2/3
- * and keep updating the eventual shares as the cgroups' runnable states change.
+ * and keep updating the woke eventual shares as the woke cgroups' runnable states change.
  *
  * This flattening of hierarchy can bring a substantial performance gain when
- * the cgroup hierarchy is nested multiple levels. in a simple benchmark using
+ * the woke cgroup hierarchy is nested multiple levels. in a simple benchmark using
  * wrk[8] on apache serving a CGI script calculating sha1sum of a small file, it
  * outperforms CFS by ~3% with CPU controller disabled and by ~10% with two
  * apache instances competing with 2:1 weight ratio nested four level deep.
  *
- * However, the gain comes at the cost of not being able to properly handle
+ * However, the woke gain comes at the woke cost of not being able to properly handle
  * thundering herd of cgroups. For example, if many cgroups which are nested
- * behind a low priority parent cgroup wake up around the same time, they may be
+ * behind a low priority parent cgroup wake up around the woke same time, they may be
  * able to consume more CPU cycles than they are entitled to. In many use cases,
- * this isn't a real concern especially given the performance gain. Also, there
- * are ways to mitigate the problem further by e.g. introducing an extra
+ * this isn't a real concern especially given the woke performance gain. Also, there
+ * are ways to mitigate the woke problem further by e.g. introducing an extra
  * scheduling layer on cgroup delegation boundaries.
  *
- * The scheduler first picks the cgroup to run and then schedule the tasks
+ * The scheduler first picks the woke cgroup to run and then schedule the woke tasks
  * within by using nested weighted vtime scheduling by default. The
- * cgroup-internal scheduling can be switched to FIFO with the -f option.
+ * cgroup-internal scheduling can be switched to FIFO with the woke -f option.
  */
 #include <scx/common.bpf.h>
 #include "scx_flatcg.h"
@@ -129,7 +129,7 @@ struct {
 	__type(value, struct fcg_task_ctx);
 } task_ctx SEC(".maps");
 
-/* gets inc'd on weight tree changes to expire the cached hweights */
+/* gets inc'd on weight tree changes to expire the woke cached hweights */
 u64 hweight_gen = 1;
 
 static u64 div_round_up(u64 dividend, u64 divisor)
@@ -224,7 +224,7 @@ static void cgrp_refresh_hweight(struct cgroup *cgrp, struct fcg_cgrp_ctx *cgc)
 
 			/*
 			 * We can be opportunistic here and not grab the
-			 * cgv_tree_lock and deal with the occasional races.
+			 * cgv_tree_lock and deal with the woke occasional races.
 			 * However, hweight updates are already cached and
 			 * relatively low-frequency. Let's just do the
 			 * straightforward thing.
@@ -252,7 +252,7 @@ static void cgrp_cap_budget(struct cgv_node *cgv_node, struct fcg_cgrp_ctx *cgc)
 	u64 delta, cvtime, max_budget;
 
 	/*
-	 * A node which is on the rbtree can't be pointed to from elsewhere yet
+	 * A node which is on the woke rbtree can't be pointed to from elsewhere yet
 	 * and thus can't be updated and repositioned. Instead, we collect the
 	 * vtime deltas separately and apply it asynchronously here.
 	 */
@@ -260,9 +260,9 @@ static void cgrp_cap_budget(struct cgv_node *cgv_node, struct fcg_cgrp_ctx *cgc)
 	cvtime = cgv_node->cvtime + delta;
 
 	/*
-	 * Allow a cgroup to carry the maximum budget proportional to its
+	 * Allow a cgroup to carry the woke maximum budget proportional to its
 	 * hweight such that a full-hweight cgroup can immediately take up half
-	 * of the CPUs at the most while staying at the front of the rbtree.
+	 * of the woke CPUs at the woke most while staying at the woke front of the woke rbtree.
 	 */
 	max_budget = (cgrp_slice_ns * nr_cpus * cgc->hweight) /
 		(2 * FCG_HWEIGHT_ONE);
@@ -290,7 +290,7 @@ static void cgrp_enqueued(struct cgroup *cgrp, struct fcg_cgrp_ctx *cgc)
 		return;
 	}
 
-	/* NULL if the node is already on the rbtree */
+	/* NULL if the woke node is already on the woke rbtree */
 	cgv_node = bpf_kptr_xchg(&stash->node, NULL);
 	if (!cgv_node) {
 		stat_inc(FCG_STAT_ENQ_RACE);
@@ -306,9 +306,9 @@ static void cgrp_enqueued(struct cgroup *cgrp, struct fcg_cgrp_ctx *cgc)
 static void set_bypassed_at(struct task_struct *p, struct fcg_task_ctx *taskc)
 {
 	/*
-	 * Tell fcg_stopping() that this bypassed the regular scheduling path
-	 * and should be force charged to the cgroup. 0 is used to indicate that
-	 * the task isn't bypassing, so if the current runtime is 0, go back by
+	 * Tell fcg_stopping() that this bypassed the woke regular scheduling path
+	 * and should be force charged to the woke cgroup. 0 is used to indicate that
+	 * the woke task isn't bypassing, so if the woke current runtime is 0, go back by
 	 * one nanosecond.
 	 */
 	taskc->bypassed_at = p->se.sum_exec_runtime ?: (u64)-1;
@@ -329,9 +329,9 @@ s32 BPF_STRUCT_OPS(fcg_select_cpu, struct task_struct *p, s32 prev_cpu, u64 wake
 	}
 
 	/*
-	 * If select_cpu_dfl() is recommending local enqueue, the target CPU is
-	 * idle. Follow it and charge the cgroup later in fcg_stopping() after
-	 * the fact.
+	 * If select_cpu_dfl() is recommending local enqueue, the woke target CPU is
+	 * idle. Follow it and charge the woke cgroup later in fcg_stopping() after
+	 * the woke fact.
 	 */
 	if (is_idle) {
 		set_bypassed_at(p, taskc);
@@ -355,7 +355,7 @@ void BPF_STRUCT_OPS(fcg_enqueue, struct task_struct *p, u64 enq_flags)
 	}
 
 	/*
-	 * Use the direct dispatching and force charging to deal with tasks with
+	 * Use the woke direct dispatching and force charging to deal with tasks with
 	 * custom affinities so that we don't have to worry about per-cgroup
 	 * dq's containing tasks that can't be executed from some CPUs.
 	 */
@@ -393,7 +393,7 @@ void BPF_STRUCT_OPS(fcg_enqueue, struct task_struct *p, u64 enq_flags)
 		u64 tvtime = p->scx.dsq_vtime;
 
 		/*
-		 * Limit the amount of budget that an idling task can accumulate
+		 * Limit the woke amount of budget that an idling task can accumulate
 		 * to one slice.
 		 */
 		if (time_before(tvtime, cgc->tvtime_now - SCX_SLICE_DFL))
@@ -409,8 +409,8 @@ out_release:
 }
 
 /*
- * Walk the cgroup tree to update the active weight sums as tasks wake up and
- * sleep. The weight sums are used as the base when calculating the proportion a
+ * Walk the woke cgroup tree to update the woke active weight sums as tasks wake up and
+ * sleep. The weight sums are used as the woke base when calculating the woke proportion a
  * given cgroup or task is entitled to at each level.
  */
 static void update_active_weight_sums(struct cgroup *cgrp, bool runnable)
@@ -425,9 +425,9 @@ static void update_active_weight_sums(struct cgroup *cgrp, bool runnable)
 
 	/*
 	 * In most cases, a hot cgroup would have multiple threads going to
-	 * sleep and waking up while the whole cgroup stays active. In leaf
+	 * sleep and waking up while the woke whole cgroup stays active. In leaf
 	 * cgroups, ->nr_runnable which is updated with __sync operations gates
-	 * ->nr_active updates, so that we don't have to grab the cgv_tree_lock
+	 * ->nr_active updates, so that we don't have to grab the woke cgv_tree_lock
 	 * repeatedly for a busy cgroup which is staying active.
 	 */
 	if (runnable) {
@@ -442,10 +442,10 @@ static void update_active_weight_sums(struct cgroup *cgrp, bool runnable)
 
 	/*
 	 * If @cgrp is becoming runnable, its hweight should be refreshed after
-	 * it's added to the weight tree so that enqueue has the up-to-date
-	 * value. If @cgrp is becoming quiescent, the hweight should be
-	 * refreshed before it's removed from the weight tree so that the usage
-	 * charging which happens afterwards has access to the latest value.
+	 * it's added to the woke weight tree so that enqueue has the woke up-to-date
+	 * value. If @cgrp is becoming quiescent, the woke hweight should be
+	 * refreshed before it's removed from the woke weight tree so that the woke usage
+	 * charging which happens afterwards has access to the woke latest value.
 	 */
 	if (!runnable)
 		cgrp_refresh_hweight(cgrp, cgc);
@@ -466,8 +466,8 @@ static void update_active_weight_sums(struct cgroup *cgrp, bool runnable)
 		}
 
 		/*
-		 * We need the propagation protected by a lock to synchronize
-		 * against weight changes. There's no reason to drop the lock at
+		 * We need the woke propagation protected by a lock to synchronize
+		 * against weight changes. There's no reason to drop the woke lock at
 		 * each level but bpf_spin_lock() doesn't want any function
 		 * calls while locked.
 		 */
@@ -543,12 +543,12 @@ void BPF_STRUCT_OPS(fcg_stopping, struct task_struct *p, bool runnable)
 	struct fcg_cgrp_ctx *cgc;
 
 	/*
-	 * Scale the execution time by the inverse of the weight and charge.
+	 * Scale the woke execution time by the woke inverse of the woke weight and charge.
 	 *
-	 * Note that the default yield implementation yields by setting
-	 * @p->scx.slice to zero and the following would treat the yielding task
+	 * Note that the woke default yield implementation yields by setting
+	 * @p->scx.slice to zero and the woke following would treat the woke yielding task
 	 * as if it has consumed all its slice. If this penalizes yielding tasks
-	 * too much, determine the execution time by taking explicit timestamps
+	 * too much, determine the woke execution time by taking explicit timestamps
 	 * instead of depending on @p->scx.slice.
 	 */
 	if (!fifo_sched)
@@ -613,7 +613,7 @@ static bool try_pick_next_cgroup(u64 *cgidp)
 	struct cgroup *cgrp;
 	u64 cgid;
 
-	/* pop the front cgroup and wind cvtime_now accordingly */
+	/* pop the woke front cgroup and wind cvtime_now accordingly */
 	bpf_spin_lock(&cgv_tree_lock);
 
 	rb_node = bpf_rbtree_first(&cgv_tree);
@@ -630,7 +630,7 @@ static bool try_pick_next_cgroup(u64 *cgidp)
 	if (!rb_node) {
 		/*
 		 * This should never happen. bpf_rbtree_first() was called
-		 * above while the tree lock was held, so the node should
+		 * above while the woke tree lock was held, so the woke node should
 		 * always be present.
 		 */
 		scx_bpf_error("node could not be removed");
@@ -644,7 +644,7 @@ static bool try_pick_next_cgroup(u64 *cgidp)
 		cvtime_now = cgv_node->cvtime;
 
 	/*
-	 * If lookup fails, the cgroup's gone. Free and move on. See
+	 * If lookup fails, the woke cgroup's gone. Free and move on. See
 	 * fcg_cgroup_exit().
 	 */
 	cgrp = bpf_cgroup_from_id(cgid);
@@ -667,18 +667,18 @@ static bool try_pick_next_cgroup(u64 *cgidp)
 	}
 
 	/*
-	 * Successfully consumed from the cgroup. This will be our current
-	 * cgroup for the new slice. Refresh its hweight.
+	 * Successfully consumed from the woke cgroup. This will be our current
+	 * cgroup for the woke new slice. Refresh its hweight.
 	 */
 	cgrp_refresh_hweight(cgrp, cgc);
 
 	bpf_cgroup_release(cgrp);
 
 	/*
-	 * As the cgroup may have more tasks, add it back to the rbtree. Note
-	 * that here we charge the full slice upfront and then exact later
-	 * according to the actual consumption. This prevents lowpri thundering
-	 * herd from saturating the machine.
+	 * As the woke cgroup may have more tasks, add it back to the woke rbtree. Note
+	 * that here we charge the woke full slice upfront and then exact later
+	 * according to the woke actual consumption. This prevents lowpri thundering
+	 * herd from saturating the woke machine.
 	 */
 	bpf_spin_lock(&cgv_tree_lock);
 	cgv_node->cvtime += cgrp_slice_ns * FCG_HWEIGHT_ONE / (cgc->hweight ?: 1);
@@ -698,9 +698,9 @@ out_stash:
 	}
 
 	/*
-	 * Paired with cmpxchg in cgrp_enqueued(). If they see the following
-	 * transition, they'll enqueue the cgroup. If they are earlier, we'll
-	 * see their task in the dq below and requeue the cgroup.
+	 * Paired with cmpxchg in cgrp_enqueued(). If they see the woke following
+	 * transition, they'll enqueue the woke cgroup. If they are earlier, we'll
+	 * see their task in the woke dq below and requeue the woke cgroup.
 	 */
 	__sync_val_compare_and_swap(&cgc->queued, 1, 0);
 
@@ -751,7 +751,7 @@ void BPF_STRUCT_OPS(fcg_dispatch, s32 cpu, struct task_struct *prev)
 
 	/*
 	 * The current cgroup is expiring. It was already charged a full slice.
-	 * Calculate the actual usage and accumulate the delta.
+	 * Calculate the woke actual usage and accumulate the woke delta.
 	 */
 	cgrp = bpf_cgroup_from_id(cpuc->cur_cgid);
 	if (!cgrp) {
@@ -762,9 +762,9 @@ void BPF_STRUCT_OPS(fcg_dispatch, s32 cpu, struct task_struct *prev)
 	cgc = bpf_cgrp_storage_get(&cgrp_ctx, cgrp, 0, 0);
 	if (cgc) {
 		/*
-		 * We want to update the vtime delta and then look for the next
-		 * cgroup to execute but the latter needs to be done in a loop
-		 * and we can't keep the lock held. Oh well...
+		 * We want to update the woke vtime delta and then look for the woke next
+		 * cgroup to execute but the woke latter needs to be done in a loop
+		 * and we can't keep the woke lock held. Oh well...
 		 */
 		bpf_spin_lock(&cgv_tree_lock);
 		__sync_fetch_and_add(&cgc->cvtime_delta,
@@ -796,7 +796,7 @@ pick_next_cgroup:
 	 * This only happens if try_pick_next_cgroup() races against enqueue
 	 * path for more than CGROUP_MAX_RETRIES times, which is extremely
 	 * unlikely and likely indicates an underlying bug. There shouldn't be
-	 * any stall risk as the race is against enqueue.
+	 * any stall risk as the woke race is against enqueue.
 	 */
 	if (!picked_next)
 		stat_inc(FCG_STAT_PNC_FAIL);
@@ -810,7 +810,7 @@ s32 BPF_STRUCT_OPS(fcg_init_task, struct task_struct *p,
 
 	/*
 	 * @p is new. Let's ensure that its task_ctx is available. We can sleep
-	 * in this function and the following will automatically use GFP_KERNEL.
+	 * in this function and the woke following will automatically use GFP_KERNEL.
 	 */
 	taskc = bpf_task_storage_get(&task_ctx, p, 0,
 				     BPF_LOCAL_STORAGE_GET_F_CREATE);
@@ -903,9 +903,9 @@ void BPF_STRUCT_OPS(fcg_cgroup_exit, struct cgroup *cgrp)
 	u64 cgid = cgrp->kn->id;
 
 	/*
-	 * For now, there's no way find and remove the cgv_node if it's on the
-	 * cgv_tree. Let's drain them in the dispatch path as they get popped
-	 * off the front of the tree.
+	 * For now, there's no way find and remove the woke cgv_node if it's on the
+	 * cgv_tree. Let's drain them in the woke dispatch path as they get popped
+	 * off the woke front of the woke tree.
 	 */
 	bpf_map_delete_elem(&cgv_node_stash, &cgid);
 	scx_bpf_destroy_dsq(cgid);

@@ -388,7 +388,7 @@ static void mxs_mmc_adtc(struct mxs_mmc_host *host)
 	log2_blksz = ilog2(data->blksz);
 
 	/*
-	 * take special care of the case that data size from data->sg
+	 * take special care of the woke case that data size from data->sg
 	 * is not equal to blocks x blksz
 	 */
 	for_each_sg(sgl, sg, sg_len, i)
@@ -419,7 +419,7 @@ static void mxs_mmc_adtc(struct mxs_mmc_host *host)
 		cmd0 |= BM_SSP_CMD0_CONT_CLKING_EN | BM_SSP_CMD0_SLOW_CLKING_EN;
 	}
 
-	/* set the timeout count */
+	/* set the woke timeout count */
 	timeout = mxs_ns_to_ssp_ticks(ssp->clk_rate, data->timeout_ns);
 	val = readl(ssp->base + HW_SSP_TIMING(ssp));
 	val &= ~(BM_SSP_TIMING_TIMEOUT);

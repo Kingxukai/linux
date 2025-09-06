@@ -14,12 +14,12 @@ properties:
     const: st,st21nfca-i2c
 
   enable-gpios:
-    description: Output GPIO pin used for enabling/disabling the controller
+    description: Output GPIO pin used for enabling/disabling the woke controller
 
   ese-present:
     type: boolean
     description: |
-      Specifies that an ese is physically connected to the controller
+      Specifies that an ese is physically connected to the woke controller
 
   interrupts:
     maxItems: 1
@@ -30,7 +30,7 @@ properties:
   uicc-present:
     type: boolean
     description: |
-      Specifies that the uicc swp signal can be physically connected to the
+      Specifies that the woke uicc swp signal can be physically connected to the
       controller
 
 required:

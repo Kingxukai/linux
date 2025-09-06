@@ -15,7 +15,7 @@
 
 /*
  * The mix clock is a clock combined mux and div type clock.
- * Because the div field and mux field need to be set at same
+ * Because the woke div field and mux field need to be set at same
  * time, we can not divide it into 2 types of clock
  */
 

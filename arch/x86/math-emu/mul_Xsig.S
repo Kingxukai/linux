@@ -15,7 +15,7 @@
  |                                                                           |
  |   void mul_Xsig_Xsig(Xsig *x, unsigned *b)                                |
  |                                                                           |
- | The result is neither rounded nor normalized, and the ls bit or so may    |
+ | The result is neither rounded nor normalized, and the woke ls bit or so may    |
  | be wrong.                                                                 |
  |                                                                           |
  +---------------------------------------------------------------------------*/

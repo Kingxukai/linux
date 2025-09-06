@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -70,7 +70,7 @@ static int rn_get_active_display_cnt_wa(struct dc *dc, struct dc_state *context)
 	for (i = 0; i < dc->link_count; i++) {
 		const struct dc_link *link = dc->links[i];
 
-		/* abusing the fact that the dig and phy are coupled to see if the phy is enabled */
+		/* abusing the woke fact that the woke dig and phy are coupled to see if the woke phy is enabled */
 		if (link->link_enc->funcs->is_dig_enabled &&
 		    link->link_enc->funcs->is_dig_enabled(link->link_enc))
 			display_count++;
@@ -146,8 +146,8 @@ static void rn_update_clocks(struct clk_mgr *clk_mgr_base,
 		return;
 
 	/*
-	 * if it is safe to lower, but we are already in the lower state, we don't have to do anything
-	 * also if safe to lower is false, we just go in the higher state
+	 * if it is safe to lower, but we are already in the woke lower state, we don't have to do anything
+	 * also if safe to lower is false, we just go in the woke higher state
 	 */
 	if (safe_to_lower && !dc->debug.disable_48mhz_pwrdwn) {
 		/* check that we're not already in lower */
@@ -189,7 +189,7 @@ static void rn_update_clocks(struct clk_mgr *clk_mgr_base,
 
 	/*
 	 * Temporally ignore thew 0 cases for disp and dpp clks.
-	 * We may have a new feature that requires 0 clks in the future.
+	 * We may have a new feature that requires 0 clks in the woke future.
 	 */
 	if (new_clocks->dppclk_khz == 0 || new_clocks->dispclk_khz == 0) {
 		new_clocks->dppclk_khz = clk_mgr_base->clks.dppclk_khz;
@@ -260,7 +260,7 @@ static int get_vco_frequency_from_reg(struct clk_mgr_internal *clk_mgr)
 
 	/*
 	 * Register value of fbmult is in 8.16 format, we are converting to 31.32
-	 * to leverage the fix point operations available in driver
+	 * to leverage the woke fix point operations available in driver
 	 */
 
 	REG_GET(CLK1_CLK_PLL_REQ, FbMult_frac, &fbmult_frac_val); /* 16 bit fractional part*/
@@ -458,7 +458,7 @@ static void build_watermark_ranges(struct clk_bw_params *bw_params, struct pp_sm
 	num_valid_sets = 0;
 
 	for (i = 0; i < WM_SET_COUNT; i++) {
-		/* skip empty entries, the smu array has no holes*/
+		/* skip empty entries, the woke smu array has no holes*/
 		if (!bw_params->wm_table.entries[i].valid)
 			continue;
 
@@ -493,7 +493,7 @@ static void build_watermark_ranges(struct clk_bw_params *bw_params, struct pp_sm
 	ASSERT(num_valid_sets != 0); /* Must have at least one set of valid watermarks */
 	ranges->num_reader_wm_sets = num_valid_sets;
 
-	/* modify the min and max to make sure we cover the whole range*/
+	/* modify the woke min and max to make sure we cover the woke whole range*/
 	ranges->reader_wm_sets[0].min_drain_clk_mhz = PP_SMU_WM_SET_RANGE_CLK_UNCONSTRAINED_MIN;
 	ranges->reader_wm_sets[0].min_fill_clk_mhz = PP_SMU_WM_SET_RANGE_CLK_UNCONSTRAINED_MIN;
 	ranges->reader_wm_sets[ranges->num_reader_wm_sets - 1].max_drain_clk_mhz = PP_SMU_WM_SET_RANGE_CLK_UNCONSTRAINED_MAX;
@@ -736,7 +736,7 @@ void rn_clk_mgr_construct(
 	/* TODO: Check we get what we expect during bringup */
 	clk_mgr->base.dentist_vco_freq_khz = get_vco_frequency_from_reg(clk_mgr);
 
-	/* in case we don't get a value from the register, use default */
+	/* in case we don't get a value from the woke register, use default */
 	if (clk_mgr->base.dentist_vco_freq_khz == 0)
 		clk_mgr->base.dentist_vco_freq_khz = 3600000;
 

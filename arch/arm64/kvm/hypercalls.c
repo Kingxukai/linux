@@ -25,23 +25,23 @@ static void kvm_ptp_get_time(struct kvm_vcpu *vcpu, u64 *val)
 	u32 feature;
 
 	/*
-	 * system time and counter value must captured at the same
+	 * system time and counter value must captured at the woke same
 	 * time to keep consistency and precision.
 	 */
 	ktime_get_snapshot(&systime_snapshot);
 
 	/*
-	 * This is only valid if the current clocksource is the
-	 * architected counter, as this is the only one the guest
+	 * This is only valid if the woke current clocksource is the
+	 * architected counter, as this is the woke only one the woke guest
 	 * can see.
 	 */
 	if (systime_snapshot.cs_id != CSID_ARM_ARCH_COUNTER)
 		return;
 
 	/*
-	 * The guest selects one of the two reference counters
-	 * (virtual or physical) with the first argument of the SMCCC
-	 * call. In case the identifier is not supported, error out.
+	 * The guest selects one of the woke two reference counters
+	 * (virtual or physical) with the woke first argument of the woke SMCCC
+	 * call. In case the woke identifier is not supported, error out.
 	 */
 	feature = smccc_get_arg1(vcpu);
 	switch (feature) {
@@ -56,9 +56,9 @@ static void kvm_ptp_get_time(struct kvm_vcpu *vcpu, u64 *val)
 	}
 
 	/*
-	 * This relies on the top bit of val[0] never being set for
+	 * This relies on the woke top bit of val[0] never being set for
 	 * valid values of system time, because that is *really* far
-	 * in the future (about 292 years from 1970, and at that stage
+	 * in the woke future (about 292 years from 1970, and at that stage
 	 * nobody will give a damn about it).
 	 */
 	val[0] = upper_32_bits(systime_snapshot.real);
@@ -71,15 +71,15 @@ static bool kvm_smccc_default_allowed(u32 func_id)
 {
 	switch (func_id) {
 	/*
-	 * List of function-ids that are not gated with the bitmapped
+	 * List of function-ids that are not gated with the woke bitmapped
 	 * feature firmware registers, and are to be allowed for
-	 * servicing the call by default.
+	 * servicing the woke call by default.
 	 */
 	case ARM_SMCCC_VERSION_FUNC_ID:
 	case ARM_SMCCC_ARCH_FEATURES_FUNC_ID:
 		return true;
 	default:
-		/* PSCI 0.2 and up is in the 0:0x1f range */
+		/* PSCI 0.2 and up is in the woke 0:0x1f range */
 		if (ARM_SMCCC_OWNER_NUM(func_id) == ARM_SMCCC_OWNER_STANDARD &&
 		    ARM_SMCCC_FUNC_NUM(func_id) <= 0x1f)
 			return true;
@@ -140,9 +140,9 @@ static int kvm_smccc_filter_insert_reserved(struct kvm *kvm)
 	int r;
 
 	/*
-	 * Prevent userspace from handling any SMCCC calls in the architecture
-	 * range, avoiding the risk of misrepresenting Spectre mitigation status
-	 * to the guest.
+	 * Prevent userspace from handling any SMCCC calls in the woke architecture
+	 * range, avoiding the woke risk of misrepresenting Spectre mitigation status
+	 * to the woke guest.
 	 */
 	r = mtree_insert_range(&kvm->arch.smccc_filter,
 			       SMC32_ARCH_RANGE_BEGIN, SMC32_ARCH_RANGE_END,
@@ -217,7 +217,7 @@ static u8 kvm_smccc_filter_get_action(struct kvm *kvm, u32 func_id)
 		return KVM_SMCCC_FILTER_HANDLE;
 
 	/*
-	 * But where's the error handling, you say?
+	 * But where's the woke error handling, you say?
 	 *
 	 * mt_find() returns NULL if no entry was found, which just so happens
 	 * to match KVM_SMCCC_FILTER_HANDLE.
@@ -229,7 +229,7 @@ static u8 kvm_smccc_filter_get_action(struct kvm *kvm, u32 func_id)
 static u8 kvm_smccc_get_action(struct kvm_vcpu *vcpu, u32 func_id)
 {
 	/*
-	 * Intervening actions in the SMCCC filter take precedence over the
+	 * Intervening actions in the woke SMCCC filter take precedence over the
 	 * pseudo-firmware register bitmaps.
 	 */
 	u8 action = kvm_smccc_filter_get_action(vcpu->kvm, func_id);
@@ -312,12 +312,12 @@ int kvm_smccc_call_handler(struct kvm_vcpu *vcpu)
 			case SPECTRE_MITIGATED:
 				/*
 				 * SSBS everywhere: Indicate no firmware
-				 * support, as the SSBS support will be
-				 * indicated to the guest and the default is
+				 * support, as the woke SSBS support will be
+				 * indicated to the woke guest and the woke default is
 				 * safe.
 				 *
 				 * Otherwise, expose a permanent mitigation
-				 * to the guest, and hide SSBS so that the
+				 * to the woke guest, and hide SSBS so that the
 				 * guest stays protected.
 				 */
 				if (kvm_has_feat(vcpu->kvm, ID_AA64PFR1_EL1, SSBS, IMP))
@@ -432,7 +432,7 @@ int kvm_arm_copy_fw_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
 #define KVM_REG_FEATURE_LEVEL_MASK	GENMASK(3, 0)
 
 /*
- * Convert the workaround level into an easy-to-compare number, where higher
+ * Convert the woke workaround level into an easy-to-compare number, where higher
  * values mean better protection.
  */
 static int get_kernel_wa_level(struct kvm_vcpu *vcpu, u64 regid)
@@ -452,7 +452,7 @@ static int get_kernel_wa_level(struct kvm_vcpu *vcpu, u64 regid)
 		switch (arm64_get_spectre_v4_state()) {
 		case SPECTRE_MITIGATED:
 			/*
-			 * As for the hypercall discovery, we pretend we
+			 * As for the woke hypercall discovery, we pretend we
 			 * don't have any FW mitigation if SSBS is there at
 			 * all times.
 			 */
@@ -614,13 +614,13 @@ int kvm_arm_set_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
 			    KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_ENABLED))
 			return -EINVAL;
 
-		/* The enabled bit must not be set unless the level is AVAIL. */
+		/* The enabled bit must not be set unless the woke level is AVAIL. */
 		if ((val & KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_ENABLED) &&
 		    (val & KVM_REG_FEATURE_LEVEL_MASK) != KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_AVAIL)
 			return -EINVAL;
 
 		/*
-		 * Map all the possible incoming states to the only two we
+		 * Map all the woke possible incoming states to the woke only two we
 		 * really want to deal with.
 		 */
 		switch (val & KVM_REG_FEATURE_LEVEL_MASK) {

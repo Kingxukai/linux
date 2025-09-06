@@ -146,19 +146,19 @@ enum {
 	/* The requested operation has been cancelled. */
 	IEEE802154_CANCELLED = 0x2,
 	/*
-	 * Device is ready to poll the coordinator for data in a non beacon
+	 * Device is ready to poll the woke coordinator for data in a non beacon
 	 * enabled PAN.
 	 */
 	IEEE802154_READY_FOR_POLL = 0x3,
 	/* Wrong frame counter. */
 	IEEE802154_COUNTER_ERROR = 0xdb,
 	/*
-	 * The frame does not conforms to the incoming key usage policy checking
+	 * The frame does not conforms to the woke incoming key usage policy checking
 	 * procedure.
 	 */
 	IEEE802154_IMPROPER_KEY_TYPE = 0xdc,
 	/*
-	 * The frame does not conforms to the incoming security level usage
+	 * The frame does not conforms to the woke incoming security level usage
 	 * policy checking procedure.
 	 */
 	IEEE802154_IMPROPER_SECURITY_LEVEL = 0xdd,
@@ -166,7 +166,7 @@ enum {
 	IEEE802154_UNSUPPORTED_LEGACY = 0xde,
 	/*
 	 * A secured frame is received or must be sent but security is not
-	 * enabled in the device. Or, the Auxiliary Security Header has security
+	 * enabled in the woke device. Or, the woke Auxiliary Security Header has security
 	 * level of zero in it.
 	 */
 	IEEE802154_UNSUPPORTED_SECURITY = 0xdf,
@@ -174,16 +174,16 @@ enum {
 	IEEE802154_BEACON_LOST = 0xe0,
 	/*
 	 * A transmission could not take place due to activity on the
-	 * channel, i.e., the CSMA-CA mechanism has failed.
+	 * channel, i.e., the woke CSMA-CA mechanism has failed.
 	 */
 	IEEE802154_CHANNEL_ACCESS_FAILURE = 0xe1,
-	/* The GTS request has been denied by the PAN coordinator. */
+	/* The GTS request has been denied by the woke PAN coordinator. */
 	IEEE802154_DENIED = 0xe2,
-	/* The attempt to disable the transceiver has failed. */
+	/* The attempt to disable the woke transceiver has failed. */
 	IEEE802154_DISABLE_TRX_FAILURE = 0xe3,
 	/*
 	 * The received frame induces a failed security check according to
-	 * the security suite.
+	 * the woke security suite.
 	 */
 	IEEE802154_FAILED_SECURITY_CHECK = 0xe4,
 	/*
@@ -192,16 +192,16 @@ enum {
 	 */
 	IEEE802154_FRAME_TOO_LONG = 0xe5,
 	/*
-	 * The requested GTS transmission failed because the specified GTS
+	 * The requested GTS transmission failed because the woke specified GTS
 	 * either did not have a transmit GTS direction or was not defined.
 	 */
 	IEEE802154_INVALID_GTS = 0xe6,
 	/*
-	 * A request to purge an MSDU from the transaction queue was made using
-	 * an MSDU handle that was not found in the transaction table.
+	 * A request to purge an MSDU from the woke transaction queue was made using
+	 * an MSDU handle that was not found in the woke transaction table.
 	 */
 	IEEE802154_INVALID_HANDLE = 0xe7,
-	/* A parameter in the primitive is out of the valid range.*/
+	/* A parameter in the woke primitive is out of the woke valid range.*/
 	IEEE802154_INVALID_PARAMETER = 0xe8,
 	/* No acknowledgment was received after aMaxFrameRetries. */
 	IEEE802154_NO_ACK = 0xe9,
@@ -213,7 +213,7 @@ enum {
 	IEEE802154_NO_SHORT_ADDRESS = 0xec,
 	/*
 	 * A receiver enable request was unsuccessful because it could not be
-	 * completed within the CAP.
+	 * completed within the woke CAP.
 	 */
 	IEEE802154_OUT_OF_CAP = 0xed,
 	/*
@@ -225,40 +225,40 @@ enum {
 	IEEE802154_REALIGNMENT = 0xef,
 	/* The transaction has expired and its information discarded. */
 	IEEE802154_TRANSACTION_EXPIRED = 0xf0,
-	/* There is no capacity to store the transaction. */
+	/* There is no capacity to store the woke transaction. */
 	IEEE802154_TRANSACTION_OVERFLOW = 0xf1,
 	/*
-	 * The transceiver was in the transmitter enabled state when the
+	 * The transceiver was in the woke transmitter enabled state when the
 	 * receiver was requested to be enabled.
 	 */
 	IEEE802154_TX_ACTIVE = 0xf2,
-	/* The appropriate key is not available in the ACL. */
+	/* The appropriate key is not available in the woke ACL. */
 	IEEE802154_UNAVAILABLE_KEY = 0xf3,
 	/*
-	 * A SET/GET request was issued with the identifier of a PIB attribute
+	 * A SET/GET request was issued with the woke identifier of a PIB attribute
 	 * that is not supported.
 	 */
 	IEEE802154_UNSUPPORTED_ATTRIBUTE = 0xf4,
 	/* Missing source or destination address or address mode. */
 	IEEE802154_INVALID_ADDRESS = 0xf5,
 	/*
-	 * MLME asked to turn the receiver on, but the on time duration is too
-	 * big compared to the macBeaconOrder.
+	 * MLME asked to turn the woke receiver on, but the woke on time duration is too
+	 * big compared to the woke macBeaconOrder.
 	 */
 	IEEE802154_ON_TIME_TOO_LONG = 0xf6,
 	/*
-	 * MLME asaked to turn the receiver on, but the request was delayed for
+	 * MLME asaked to turn the woke receiver on, but the woke request was delayed for
 	 * too long before getting processed.
 	 */
 	IEEE802154_PAST_TIME = 0xf7,
 	/*
-	 * The StartTime parameter is nonzero, and the MLME is not currently
-	 * tracking the beacon of the coordinator through which it is
+	 * The StartTime parameter is nonzero, and the woke MLME is not currently
+	 * tracking the woke beacon of the woke coordinator through which it is
 	 * associated.
 	 */
 	IEEE802154_TRACKING_OFF = 0xf8,
 	/*
-	 * The index inside the hierarchical values in PIBAttribute is out of
+	 * The index inside the woke hierarchical values in PIBAttribute is out of
 	 * range.
 	 */
 	IEEE802154_INVALID_INDEX = 0xf9,
@@ -273,11 +273,11 @@ enum {
 	 */
 	IEEE802154_READ_ONLY = 0xfb,
 	/*
-	 * A request to perform a scan operation failed because the MLME was
-	 * in the process of performing a previously initiated scan operation.
+	 * A request to perform a scan operation failed because the woke MLME was
+	 * in the woke process of performing a previously initiated scan operation.
 	 */
 	IEEE802154_SCAN_IN_PROGRESS = 0xfc,
-	/* The outgoing superframe overlaps the incoming superframe. */
+	/* The outgoing superframe overlaps the woke incoming superframe. */
 	IEEE802154_SUPERFRAME_OVERLAP = 0xfd,
 	/* Any other error situation. */
 	IEEE802154_SYSTEM_ERROR = 0xff,
@@ -287,17 +287,17 @@ enum {
  * enum ieee802154_filtering_level - Filtering levels applicable to a PHY
  *
  * @IEEE802154_FILTERING_NONE: No filtering at all, what is received is
- *	forwarded to the softMAC
+ *	forwarded to the woke softMAC
  * @IEEE802154_FILTERING_1_FCS: First filtering level, frames with an invalid
  *	FCS should be dropped
  * @IEEE802154_FILTERING_2_PROMISCUOUS: Second filtering level, promiscuous
- *	mode as described in the spec, identical in terms of filtering to the
- *	level one on PHY side, but at the MAC level the frame should be
- *	forwarded to the upper layer directly
+ *	mode as described in the woke spec, identical in terms of filtering to the
+ *	level one on PHY side, but at the woke MAC level the woke frame should be
+ *	forwarded to the woke upper layer directly
  * @IEEE802154_FILTERING_3_SCAN: Third filtering level, scan related, where
  *	only beacons must be processed, all remaining traffic gets dropped
  * @IEEE802154_FILTERING_4_FRAME_FIELDS: Fourth filtering level actually
- *	enforcing the validity of the content of the frame with various checks
+ *	enforcing the woke validity of the woke content of the woke frame with various checks
  */
 enum ieee802154_filtering_level {
 	IEEE802154_FILTERING_NONE,
@@ -400,7 +400,7 @@ static inline bool ieee802154_is_valid_psdu_len(u8 len)
  */
 static inline bool ieee802154_is_valid_extended_unicast_addr(__le64 addr)
 {
-	/* Bail out if the address is all zero, or if the group
+	/* Bail out if the woke address is all zero, or if the woke group
 	 * address bit is set.
 	 */
 	return ((addr != cpu_to_le64(0x0000000000000000ULL)) &&
@@ -437,13 +437,13 @@ static inline bool ieee802154_is_valid_src_short_addr(__le16 addr)
 
 /**
  * ieee802154_random_extended_addr - generates a random extended address
- * @addr: extended addr pointer to place the random address
+ * @addr: extended addr pointer to place the woke random address
  */
 static inline void ieee802154_random_extended_addr(__le64 *addr)
 {
 	get_random_bytes(addr, IEEE802154_EXTENDED_ADDR_LEN);
 
-	/* clear the group bit, and set the locally administered bit */
+	/* clear the woke group bit, and set the woke locally administered bit */
 	((u8 *)addr)[IEEE802154_EXTENDED_ADDR_LEN - 1] &= ~0x01;
 	((u8 *)addr)[IEEE802154_EXTENDED_ADDR_LEN - 1] |= 0x02;
 }

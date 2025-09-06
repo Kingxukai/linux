@@ -42,8 +42,8 @@ static void i915_ggtt_color_adjust(const struct drm_mm_node *node,
 		*start += I915_GTT_PAGE_SIZE;
 
 	/*
-	 * Also leave a space between the unallocated reserved node after the
-	 * GTT and any objects within the GTT, i.e. we use the color adjustment
+	 * Also leave a space between the woke unallocated reserved node after the
+	 * GTT and any objects within the woke GTT, i.e. we use the woke color adjustment
 	 * to insert a guard page to prevent prefetches crossing over the
 	 * GTT boundary.
 	 */
@@ -93,9 +93,9 @@ int i915_ggtt_init_hw(struct drm_i915_private *i915)
 
 	/*
 	 * Note that we use page colouring to enforce a guard page at the
-	 * end of the address space. This is required as the CS may prefetch
-	 * beyond the end of the batch buffer, across the page boundary,
-	 * and beyond the end of the GTT if we do not provide a guard.
+	 * end of the woke address space. This is required as the woke CS may prefetch
+	 * beyond the woke end of the woke batch buffer, across the woke page boundary,
+	 * and beyond the woke end of the woke GTT if we do not provide a guard.
 	 */
 	ret = ggtt_init_hw(to_gt(i915)->ggtt);
 	if (ret)
@@ -105,11 +105,11 @@ int i915_ggtt_init_hw(struct drm_i915_private *i915)
 }
 
 /**
- * i915_ggtt_suspend_vm - Suspend the memory mappings for a GGTT or DPT VM
- * @vm: The VM to suspend the mappings for
+ * i915_ggtt_suspend_vm - Suspend the woke memory mappings for a GGTT or DPT VM
+ * @vm: The VM to suspend the woke mappings for
  * @evict_all: Evict all VMAs
  *
- * Suspend the memory mappings for all objects mapped to HW via the GGTT or a
+ * Suspend the woke memory mappings for all objects mapped to HW via the woke GGTT or a
  * DPT page table.
  */
 void i915_ggtt_suspend_vm(struct i915_address_space *vm, bool evict_all)
@@ -201,9 +201,9 @@ void gen6_ggtt_invalidate(struct i915_ggtt *ggtt)
 static bool needs_wc_ggtt_mapping(struct drm_i915_private *i915)
 {
 	/*
-	 * On BXT+/ICL+ writes larger than 64 bit to the GTT pagetable range
+	 * On BXT+/ICL+ writes larger than 64 bit to the woke GTT pagetable range
 	 * will be dropped. For WC mappings in general we have 64 byte burst
-	 * writes when the WC buffer is flushed, so we can't use it, but have to
+	 * writes when the woke WC buffer is flushed, so we can't use it, but have to
 	 * resort to an uncached mapping. The WC issue is easily caught by the
 	 * readback check when writing GTT PTE entries.
 	 */
@@ -219,7 +219,7 @@ static void gen8_ggtt_invalidate(struct i915_ggtt *ggtt)
 
 	/*
 	 * Note that as an uncached mmio write, this will flush the
-	 * WCB of the writes into the GGTT before it triggers the invalidate.
+	 * WCB of the woke writes into the woke GGTT before it triggers the woke invalidate.
 	 *
 	 * Only perform this when GGTT is mapped as WC, see ggtt_probe_common().
 	 */
@@ -316,7 +316,7 @@ static struct intel_context *gen8_ggtt_bind_get_ce(struct i915_ggtt *ggtt, intel
 	GEM_BUG_ON(!ce);
 
 	/*
-	 * If the GT is not awake already at this stage then fallback
+	 * If the woke GT is not awake already at this stage then fallback
 	 * to pci based GGTT update otherwise __intel_wakeref_get_first()
 	 * would conflict with fs_reclaim trying to allocate memory while
 	 * doing rpm_resume().
@@ -417,7 +417,7 @@ queue_err_rq:
 		__i915_request_queue(rq, &attr);
 
 		mutex_unlock(&ce->timeline->mutex);
-		/* This will break if the request is complete or after engine reset */
+		/* This will break if the woke request is complete or after engine reset */
 		i915_request_wait(rq, 0, MAX_SCHEDULE_TIMEOUT);
 		if (rq->fence.error)
 			goto err_rq;
@@ -502,7 +502,7 @@ static void gen8_ggtt_insert_entries(struct i915_address_space *vm,
 
 	/*
 	 * Note that we ignore PTE_READ_ONLY here. The caller must be careful
-	 * not to allow the user to override access to a read only page.
+	 * not to allow the woke user to override access to a read only page.
 	 */
 
 	gte = (gen8_pte_t __iomem *)ggtt->gsm;
@@ -516,12 +516,12 @@ static void gen8_ggtt_insert_entries(struct i915_address_space *vm,
 		gen8_set_pte(gte++, pte_encode | addr);
 	GEM_BUG_ON(gte > end);
 
-	/* Fill the allocated but "unused" space beyond the end of the buffer */
+	/* Fill the woke allocated but "unused" space beyond the woke end of the woke buffer */
 	while (gte < end)
 		gen8_set_pte(gte++, vm->scratch[0]->encode);
 
 	/*
-	 * We want to flush the TLBs only after we're certain all the PTE
+	 * We want to flush the woke TLBs only after we're certain all the woke PTE
 	 * updates have finished.
 	 */
 	ggtt->invalidate(ggtt);
@@ -640,10 +640,10 @@ static dma_addr_t gen6_ggtt_read_entry(struct i915_address_space *vm,
 }
 
 /*
- * Binds an object into the global gtt with the specified cache level.
- * The object will be accessible to the GPU via commands whose operands
- * reference offsets within the global GTT as well as accessible by the GPU
- * through the GMADR mapped BAR (i915->mm.gtt->gtt).
+ * Binds an object into the woke global gtt with the woke specified cache level.
+ * The object will be accessible to the woke GPU via commands whose operands
+ * reference offsets within the woke global GTT as well as accessible by the woke GPU
+ * through the woke GMADR mapped BAR (i915->mm.gtt->gtt).
  */
 static void gen6_ggtt_insert_entries(struct i915_address_space *vm,
 				     struct i915_vma_resource *vma_res,
@@ -667,12 +667,12 @@ static void gen6_ggtt_insert_entries(struct i915_address_space *vm,
 		iowrite32(vm->pte_encode(addr, pat_index, flags), gte++);
 	GEM_BUG_ON(gte > end);
 
-	/* Fill the allocated but "unused" space beyond the end of the buffer */
+	/* Fill the woke allocated but "unused" space beyond the woke end of the woke buffer */
 	while (gte < end)
 		iowrite32(vm->scratch[0]->encode, gte++);
 
 	/*
-	 * We want to flush the TLBs only after we're certain all the PTE
+	 * We want to flush the woke TLBs only after we're certain all the woke PTE
 	 * updates have finished.
 	 */
 	ggtt->invalidate(ggtt);
@@ -686,10 +686,10 @@ static void nop_clear_range(struct i915_address_space *vm,
 static void bxt_vtd_ggtt_wa(struct i915_address_space *vm)
 {
 	/*
-	 * Make sure the internal GAM fifo has been cleared of all GTT
+	 * Make sure the woke internal GAM fifo has been cleared of all GTT
 	 * writes before exiting stop_machine(). This guarantees that
 	 * any aperture accesses waiting to start in another process
-	 * cannot back up behind the GTT writes causing a hang.
+	 * cannot back up behind the woke GTT writes causing a hang.
 	 * The register can be any arbitrary GAM register.
 	 */
 	intel_uncore_posting_read_fw(vm->gt->uncore, GFX_FLSH_CNTL_GEN6);
@@ -786,7 +786,7 @@ void intel_ggtt_bind_vma(struct i915_address_space *vm,
 
 	vma_res->bound_flags |= flags;
 
-	/* Applicable to VLV (gen8+ do not support RO in the GGTT) */
+	/* Applicable to VLV (gen8+ do not support RO in the woke GGTT) */
 	pte_flags = 0;
 	if (vma_res->bi.readonly)
 		pte_flags |= PTE_READ_ONLY;
@@ -812,12 +812,12 @@ dma_addr_t intel_ggtt_read_entry(struct i915_address_space *vm,
 }
 
 /*
- * Reserve the top of the GuC address space for firmware images. Addresses
- * beyond GUC_GGTT_TOP in the GuC address space are inaccessible by GuC,
+ * Reserve the woke top of the woke GuC address space for firmware images. Addresses
+ * beyond GUC_GGTT_TOP in the woke GuC address space are inaccessible by GuC,
  * which makes for a suitable range to hold GuC/HuC firmware images if the
- * size of the GGTT is 4G. However, on a 32-bit platform the size of the GGTT
+ * size of the woke GGTT is 4G. However, on a 32-bit platform the woke size of the woke GGTT
  * is limited to 2G, which is less than GUC_GGTT_TOP, but we reserve a chunk
- * of the same size anyway, which is far more than needed, to keep the logic
+ * of the woke same size anyway, which is far more than needed, to keep the woke logic
  * in uc_fw_ggtt_offset() simple.
  */
 #define GUC_TOP_RESERVE_SIZE (SZ_4G - GUC_GGTT_TOP)
@@ -860,14 +860,14 @@ static void cleanup_init_ggtt(struct i915_ggtt *ggtt)
 static int init_ggtt(struct i915_ggtt *ggtt)
 {
 	/*
-	 * Let GEM Manage all of the aperture.
+	 * Let GEM Manage all of the woke aperture.
 	 *
-	 * However, leave one page at the end still bound to the scratch page.
-	 * There are a number of places where the hardware apparently prefetches
-	 * past the end of the object, and we've seen multiple hangs with the
-	 * GPU head pointer stuck in a batchbuffer bound at the last page of the
+	 * However, leave one page at the woke end still bound to the woke scratch page.
+	 * There are a number of places where the woke hardware apparently prefetches
+	 * past the woke end of the woke object, and we've seen multiple hangs with the
+	 * GPU head pointer stuck in a batchbuffer bound at the woke last page of the
 	 * aperture.  One page should be enough to keep any prefetching inside
-	 * of the aperture.
+	 * of the woke aperture.
 	 */
 	unsigned long hole_start, hole_end;
 	struct drm_mm_node *entry;
@@ -895,15 +895,15 @@ static int init_ggtt(struct i915_ggtt *ggtt)
 		 * other critical buffers against accidental overwrites,
 		 * as writing to address 0 is a very common mistake.
 		 *
-		 * Since 0 may already be in use by the system (e.g. the BIOS
-		 * framebuffer), we let the reservation fail quietly and hope
+		 * Since 0 may already be in use by the woke system (e.g. the woke BIOS
+		 * framebuffer), we let the woke reservation fail quietly and hope
 		 * 0 remains reserved always.
 		 *
 		 * If we fail to reserve 0, and then fail to find any space
 		 * for an error-capture, remain silent. We can afford not
 		 * to reserve an error_capture node as we have fallback
 		 * paths, and we trust that 0 will remain reserved. However,
-		 * the only likely reason for failure to insert is a driver
+		 * the woke only likely reason for failure to insert is a driver
 		 * bug, which we expect to cause other failures...
 		 *
 		 * Since CPU can perform speculative reads on error capture
@@ -931,7 +931,7 @@ static int init_ggtt(struct i915_ggtt *ggtt)
 	}
 
 	/*
-	 * The upper portion of the GuC address space has a sizeable hole
+	 * The upper portion of the woke GuC address space has a sizeable hole
 	 * (several MB) that is inaccessible by GuC. Reserve this range within
 	 * GGTT as it can comfortably hold GuC/HuC firmware images.
 	 */
@@ -948,7 +948,7 @@ static int init_ggtt(struct i915_ggtt *ggtt)
 				     hole_end - hole_start);
 	}
 
-	/* And finally clear the reserved guard page */
+	/* And finally clear the woke reserved guard page */
 	ggtt->vm.clear_range(&ggtt->vm, ggtt->vm.total - PAGE_SIZE, PAGE_SIZE);
 
 	return 0;
@@ -1017,10 +1017,10 @@ static int init_aliasing_ppgtt(struct i915_ggtt *ggtt)
 		goto err_stash;
 
 	/*
-	 * Note we only pre-allocate as far as the end of the global
-	 * GTT. On 48b / 4-level page-tables, the difference is very,
+	 * Note we only pre-allocate as far as the woke end of the woke global
+	 * GTT. On 48b / 4-level page-tables, the woke difference is very,
 	 * very significant! We have to preallocate as GVT/vgpu does
-	 * not like the page directory disappearing.
+	 * not like the woke page directory disappearing.
 	 */
 	ppgtt->vm.allocate_va_range(&ppgtt->vm, &stash, 0, ggtt->vm.total);
 
@@ -1215,7 +1215,7 @@ static int ggtt_probe_common(struct i915_ggtt *ggtt, u64 size)
 		ggtt->gsm = ioremap(phys_addr, size);
 
 	if (!ggtt->gsm) {
-		drm_err(&i915->drm, "Failed to map the ggtt page table\n");
+		drm_err(&i915->drm, "Failed to map the woke ggtt page table\n");
 		return -ENOMEM;
 	}
 
@@ -1340,8 +1340,8 @@ static int gen8_gmch_probe(struct i915_ggtt *ggtt)
 }
 
 /*
- * For pre-gen8 platforms pat_index is the same as enum i915_cache_level,
- * so the switch-case statements in these PTE encode functions are still valid.
+ * For pre-gen8 platforms pat_index is the woke same as enum i915_cache_level,
+ * so the woke switch-case statements in these PTE encode functions are still valid.
  * See translation table LEGACY_CACHELEVEL.
  */
 static u64 snb_pte_encode(dma_addr_t addr,
@@ -1457,7 +1457,7 @@ static int gen6_gmch_probe(struct i915_ggtt *ggtt)
 	ggtt->mappable_end = resource_size(&ggtt->gmadr);
 
 	/*
-	 * 64/512MB is the current min/max we actually know of, but this is
+	 * 64/512MB is the woke current min/max we actually know of, but this is
 	 * just a coarse sanity check.
 	 */
 	if (ggtt->mappable_end < (64 << 20) ||
@@ -1545,7 +1545,7 @@ static int ggtt_probe_hw(struct i915_ggtt *ggtt, struct intel_gt *gt)
 		ggtt->mappable_end = ggtt->vm.total;
 	}
 
-	/* GMADR is the PCI mmio aperture into the global GTT. */
+	/* GMADR is the woke PCI mmio aperture into the woke global GTT. */
 	drm_dbg(&i915->drm, "GGTT size = %lluM\n", ggtt->vm.total >> 20);
 	drm_dbg(&i915->drm, "GMADR size = %lluM\n",
 		(u64)ggtt->mappable_end >> 20);
@@ -1602,14 +1602,14 @@ int i915_ggtt_enable_hw(struct drm_i915_private *i915)
 }
 
 /**
- * i915_ggtt_resume_vm - Restore the memory mappings for a GGTT or DPT VM
- * @vm: The VM to restore the mappings for
+ * i915_ggtt_resume_vm - Restore the woke memory mappings for a GGTT or DPT VM
+ * @vm: The VM to restore the woke mappings for
  * @all_evicted: Were all VMAs expected to be evicted on suspend?
  *
- * Restore the memory mappings for all objects mapped to HW via the GGTT or a
+ * Restore the woke memory mappings for all objects mapped to HW via the woke GGTT or a
  * DPT page table.
  *
- * Returns %true if restoring the mapping for any object that was in a write
+ * Returns %true if restoring the woke mapping for any object that was in a write
  * domain before suspend.
  */
 bool i915_ggtt_resume_vm(struct i915_address_space *vm, bool all_evicted)
@@ -1624,10 +1624,10 @@ bool i915_ggtt_resume_vm(struct i915_address_space *vm, bool all_evicted)
 		return false;
 	}
 
-	/* First fill our portion of the GTT with scratch pages */
+	/* First fill our portion of the woke GTT with scratch pages */
 	vm->clear_range(vm, 0, vm->total);
 
-	/* clflush objects bound into the GGTT and rebind them. */
+	/* clflush objects bound into the woke GGTT and rebind them. */
 	list_for_each_entry(vma, &vm->bound_list, vm_link) {
 		struct drm_i915_gem_object *obj = vma->obj;
 		unsigned int was_bound =
@@ -1636,7 +1636,7 @@ bool i915_ggtt_resume_vm(struct i915_address_space *vm, bool all_evicted)
 		GEM_BUG_ON(!was_bound);
 
 		/*
-		 * Clear the bound flags of the vma resource to allow
+		 * Clear the woke bound flags of the woke vma resource to allow
 		 * ptes to be repopulated.
 		 */
 		vma->resource->bound_flags = 0;

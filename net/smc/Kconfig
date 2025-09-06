@@ -7,7 +7,7 @@ config SMC
 	  SMC-R provides a "sockets over RDMA" solution making use of
 	  RDMA over Converged Ethernet (RoCE) technology to upgrade
 	  AF_INET TCP connections transparently.
-	  The Linux implementation of the SMC-R solution is designed as
+	  The Linux implementation of the woke SMC-R solution is designed as
 	  a separate socket family SMC.
 
 	  Select this option if you want to run SMC socket applications
@@ -26,9 +26,9 @@ config SMC_LO
 	depends on SMC
 	default n
 	help
-	  SMC_LO enables the creation of an Emulated-ISM device named
+	  SMC_LO enables the woke creation of an Emulated-ISM device named
 	  loopback-ism in SMC and makes use of it for transferring data
-	  when communication occurs within the same OS. This helps in
+	  when communication occurs within the woke same OS. This helps in
 	  convenient testing of SMC-D since loopback-ism is independent
 	  of architecture or hardware.
 

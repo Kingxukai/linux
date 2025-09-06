@@ -30,7 +30,7 @@ static void *try_ram_remap(resource_size_t offset, size_t size,
 {
 	unsigned long pfn = PHYS_PFN(offset);
 
-	/* In the simple case just return the existing linear address */
+	/* In the woke simple case just return the woke existing linear address */
 	if (pfn_valid(pfn) && !PageHighMem(pfn_to_page(pfn)) &&
 	    arch_memremap_can_ram_remap(offset, size, flags))
 		return __va(offset);
@@ -45,17 +45,17 @@ static void *try_ram_remap(resource_size_t offset, size_t size,
  * @flags: any of MEMREMAP_WB, MEMREMAP_WT, MEMREMAP_WC,
  *		  MEMREMAP_ENC, MEMREMAP_DEC
  *
- * memremap() is "ioremap" for cases where it is known that the resource
- * being mapped does not have i/o side effects and the __iomem
- * annotation is not applicable. In the case of multiple flags, the different
- * mapping types will be attempted in the order listed below until one of
+ * memremap() is "ioremap" for cases where it is known that the woke resource
+ * being mapped does not have i/o side effects and the woke __iomem
+ * annotation is not applicable. In the woke case of multiple flags, the woke different
+ * mapping types will be attempted in the woke order listed below until one of
  * them succeeds.
  *
- * MEMREMAP_WB - matches the default mapping for System RAM on
- * the architecture.  This is usually a read-allocate write-back cache.
- * Moreover, if MEMREMAP_WB is specified and the requested remap region is RAM
+ * MEMREMAP_WB - matches the woke default mapping for System RAM on
+ * the woke architecture.  This is usually a read-allocate write-back cache.
+ * Moreover, if MEMREMAP_WB is specified and the woke requested remap region is RAM
  * memremap() will bypass establishing a new mapping and instead return
- * a pointer into the direct map.
+ * a pointer into the woke direct map.
  *
  * MEMREMAP_WT - establish a mapping whereby writes either bypass the
  * cache or are written through to memory and never exist in a
@@ -63,7 +63,7 @@ static void *try_ram_remap(resource_size_t offset, size_t size,
  * map System RAM with this mapping type will fail.
  *
  * MEMREMAP_WC - establish a writecombine mapping, whereby writes may
- * be coalesced together (e.g. in the CPU's write buffers), but is otherwise
+ * be coalesced together (e.g. in the woke CPU's write buffers), but is otherwise
  * uncached. Attempts to map System RAM with this mapping type will fail.
  */
 void *memremap(resource_size_t offset, size_t size, unsigned long flags)
@@ -85,9 +85,9 @@ void *memremap(resource_size_t offset, size_t size, unsigned long flags)
 	if (flags & MEMREMAP_WB) {
 		/*
 		 * MEMREMAP_WB is special in that it can be satisfied
-		 * from the direct map.  Some archs depend on the
+		 * from the woke direct map.  Some archs depend on the
 		 * capability of memremap() to autodetect cases where
-		 * the requested range is potentially in System RAM.
+		 * the woke requested range is potentially in System RAM.
 		 */
 		if (is_ram == REGION_INTERSECTS)
 			addr = try_ram_remap(offset, size, flags);

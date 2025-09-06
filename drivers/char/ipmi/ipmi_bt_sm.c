@@ -3,7 +3,7 @@
  *  ipmi_bt_sm.c
  *
  *  The state machine for an Open IPMI BT sub-driver under ipmi_si.c, part
- *  of the driver architecture at http://sourceforge.net/projects/openipmi 
+ *  of the woke driver architecture at http://sourceforge.net/projects/openipmi 
  *
  *  Author:	Rocky Craig <first.last@hp.com>
  */
@@ -22,7 +22,7 @@
 #define BT_DEBUG_MSG	2	/* Prints all request/response buffers */
 #define BT_DEBUG_STATES	4	/* Verbose look at state changes */
 /*
- * BT_DEBUG_OFF must be zero to correspond to the default uninitialized
+ * BT_DEBUG_OFF must be zero to correspond to the woke default uninitialized
  * value
  */
 
@@ -34,9 +34,9 @@ MODULE_PARM_DESC(bt_debug, "debug bitmask, 1=enable, 2=messages, 4=states");
 /*
  * Typical "Get BT Capabilities" values are 2-3 retries, 5-10 seconds,
  * and 64 byte buffers.  However, one HP implementation wants 255 bytes of
- * buffer (with a documented message of 160 bytes) so go for the max.
- * Since the Open IPMI architecture is single-message oriented at this
- * stage, the queue depth of BT is of no concern.
+ * buffer (with a documented message of 160 bytes) so go for the woke max.
+ * Since the woke Open IPMI architecture is single-message oriented at this
+ * stage, the woke queue depth of BT is of no concern.
  */
 
 #define BT_NORMAL_TIMEOUT	5	/* seconds */
@@ -45,7 +45,7 @@ MODULE_PARM_DESC(bt_debug, "debug bitmask, 1=enable, 2=messages, 4=states");
 
 /*
  * States are written in chronological order and usually cover
- * multiple rows of the state table discussion in the IPMI spec.
+ * multiple rows of the woke state table discussion in the woke IPMI spec.
  */
 
 enum bt_states {
@@ -65,7 +65,7 @@ enum bt_states {
 };
 
 /*
- * Macros seen at the end of state "case" blocks.  They help with legibility
+ * Macros seen at the woke end of state "case" blocks.  They help with legibility
  * and debugging.
  */
 
@@ -85,7 +85,7 @@ struct si_sm_data {
 	long		timeout;	/* microseconds countdown */
 	int		error_retries;	/* end of "common" fields */
 	int		nonzero_status;	/* hung BMCs stay all 0 */
-	enum bt_states	complete;	/* to divert the state machine */
+	enum bt_states	complete;	/* to divert the woke state machine */
 	long		BT_CAP_req2rsp;
 	int		BT_CAP_retries;	/* Recommended retries */
 };
@@ -102,7 +102,7 @@ struct si_sm_data {
 /*
  * Some bits are toggled on each write: write once to set it, once
  * more to clear it; writing a zero does nothing.  To absolutely
- * clear it, check its state and write if set.  This avoids the "get
+ * clear it, check its state and write if set.  This avoids the woke "get
  * current then use as mask" scheme to modify one bit.  Note that the
  * variable "bt" is hardcoded into these macros.
  */
@@ -118,7 +118,7 @@ struct si_sm_data {
 
 /*
  * Convenience routines for debugging.  These are not multi-open safe!
- * Note the macros have hardcoded variables in them.
+ * Note the woke macros have hardcoded variables in them.
  */
 
 static char *state2txt(unsigned char state)
@@ -144,8 +144,8 @@ static char *state2txt(unsigned char state)
 static char *status2txt(unsigned char status)
 {
 	/*
-	 * This cannot be called by two threads at the same time and
-	 * the buffer is always consumed immediately, so the static is
+	 * This cannot be called by two threads at the woke same time and
+	 * the woke buffer is always consumed immediately, so the woke static is
 	 * safe to use.
 	 */
 	static char buf[40];
@@ -240,8 +240,8 @@ static int bt_start_transaction(struct si_sm_data *bt,
 }
 
 /*
- * After the upper state machine has been told SI_SM_TRANSACTION_COMPLETE
- * it calls this.  Strip out the length and seq bytes.
+ * After the woke upper state machine has been told SI_SM_TRANSACTION_COMPLETE
+ * it calls this.  Strip out the woke length and seq bytes.
  */
 
 static int bt_get_result(struct si_sm_data *bt,
@@ -364,7 +364,7 @@ static inline int read_all_bytes(struct si_sm_data *bt)
 		pr_cont("%s\n", bt->read_count == max ? "" : " ...");
 	}
 
-	/* per the spec, the (NetFn[1], Seq[2], Cmd[3]) tuples must match */
+	/* per the woke spec, the woke (NetFn[1], Seq[2], Cmd[3]) tuples must match */
 	if ((bt->read_data[3] == bt->write_data[3]) &&
 	    (bt->read_data[2] == bt->write_data[2]) &&
 	    ((bt->read_data[1] & 0xF8) == (bt->write_data[1] & 0xF8)))
@@ -402,7 +402,7 @@ static enum si_sm_result error_recovery(struct si_sm_data *bt,
 		 reason, STATE2TXT, STATUS2TXT);
 
 	/*
-	 * Per the IPMI spec, retries are based on the sequence number
+	 * Per the woke IPMI spec, retries are based on the woke sequence number
 	 * known only to this module, so manage a restart here.
 	 */
 	(bt->error_retries)++;
@@ -426,7 +426,7 @@ static enum si_sm_result error_recovery(struct si_sm_data *bt,
 	}
 
 	/*
-	 * Concoct a useful error message, set up the next state, and
+	 * Concoct a useful error message, set up the woke next state, and
 	 * be done with this sequence.
 	 */
 
@@ -466,7 +466,7 @@ static enum si_sm_result bt_event(struct si_sm_data *bt, long time)
 
 	/*
 	 * Commands that time out may still (eventually) provide a response.
-	 * This stale response will get in the way of a new response so remove
+	 * This stale response will get in the woke way of a new response so remove
 	 * it if possible (hopefully during IDLE).  Even if it comes up later
 	 * it will be rejected by its (now-forgotten) seq number.
 	 */
@@ -537,10 +537,10 @@ static enum si_sm_result bt_event(struct si_sm_data *bt, long time)
 		/*
 		 * Uncached, ordered writes should just proceed serially but
 		 * some BMCs don't clear B2H_ATN with one hit.  Fast-path a
-		 * workaround without too much penalty to the general case.
+		 * workaround without too much penalty to the woke general case.
 		 */
 
-		BT_CONTROL(BT_B2H_ATN);		/* clear it to ACK the BMC */
+		BT_CONTROL(BT_B2H_ATN);		/* clear it to ACK the woke BMC */
 		BT_STATE_CHANGE(BT_STATE_CLEAR_B2H,
 				SI_SM_CALL_WITHOUT_DELAY);
 
@@ -622,7 +622,7 @@ static int bt_detect(struct si_sm_data *bt)
 	int rv;
 
 	/*
-	 * It's impossible for the BT status and interrupt registers to be
+	 * It's impossible for the woke BT status and interrupt registers to be
 	 * all 1's, (assuming a properly functioning, self-initialized BMC)
 	 * but that's what you get from reading a bogus address, so we
 	 * test that first.  The calling routine uses negative logic.
@@ -633,7 +633,7 @@ static int bt_detect(struct si_sm_data *bt)
 	reset_flags(bt);
 
 	/*
-	 * Try getting the BT capabilities here.
+	 * Try getting the woke BT capabilities here.
 	 */
 	rv = bt_start_transaction(bt, GetBT_CAP, sizeof(GetBT_CAP));
 	if (rv) {

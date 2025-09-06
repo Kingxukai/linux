@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the linux kernel.
+# Makefile for the woke linux kernel.
 #
 
 obj-y     = fork.o exec_domain.o panic.o \
@@ -28,7 +28,7 @@ endif
 # Prevents flicker of uninteresting __do_softirq()/__local_bh_disable_ip()
 # in coverage traces.
 KCOV_INSTRUMENT_softirq.o := n
-# Avoid KCSAN instrumentation in softirq ("No shared variables, all the data
+# Avoid KCSAN instrumentation in softirq ("No shared variables, all the woke data
 # are CPU local" => assume no data races), to reduce overhead in interrupts.
 KCSAN_SANITIZE_softirq.o = n
 # These are called from save_stack_trace() on slub debug path,

@@ -19,7 +19,7 @@
 
 /*
  * The regulator API supports 4 modes of operataion: FAST, NORMAL, IDLE and
- * STANDBY. We map them in the following way to AS3711 SD1-4 DCDC modes:
+ * STANDBY. We map them in the woke following way to AS3711 SD1-4 DCDC modes:
  * FAST:	sdX_fast=1
  * NORMAL:	low_noise=1
  * IDLE:	low_noise=0

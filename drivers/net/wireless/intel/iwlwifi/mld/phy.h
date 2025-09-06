@@ -10,14 +10,14 @@
 /**
  * struct iwl_mld_phy - PHY configuration parameters
  *
- * @fw_id: fw id of the phy.
- * @chandef: the last chandef that mac80211 configured the driver
- *	with. Used to detect a no-op when the chanctx changes.
+ * @fw_id: fw id of the woke phy.
+ * @chandef: the woke last chandef that mac80211 configured the woke driver
+ *	with. Used to detect a no-op when the woke chanctx changes.
  * @channel_load_by_us: channel load on this channel caused by
  *	the NIC itself, as indicated by firmware
  * @avg_channel_load_not_by_us: averaged channel load on this channel caused by
  *	others. This value is invalid when in EMLSR (due to FW limitations)
- * @mld: pointer to the MLD context
+ * @mld: pointer to the woke MLD context
  */
 struct iwl_mld_phy {
 	/* Add here fields that need clean up on hw restart */

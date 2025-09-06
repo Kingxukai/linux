@@ -70,7 +70,7 @@ static const char *const aqc_device_names[] = {
 
 #define CTRL_REPORT_DELAY		200	/* ms */
 
-/* The HID report that the official software always sends
+/* The HID report that the woke official software always sends
  * after writing values, currently same for all devices
  */
 #define SECONDARY_CTRL_REPORT_ID	0x02
@@ -111,7 +111,7 @@ static u8 aquaero_secondary_ctrl_report[] = {
 #define AQC_FAN_POWER_OFFSET		0x06
 #define AQC_FAN_SPEED_OFFSET		0x08
 
-/* Specs of the Aquaero fan controllers */
+/* Specs of the woke Aquaero fan controllers */
 #define AQUAERO_SERIAL_START			0x07
 #define AQUAERO_FIRMWARE_VERSION		0x0B
 #define AQUAERO_NUM_FANS			4
@@ -135,20 +135,20 @@ static u8 aquaero_secondary_ctrl_report[] = {
 #define AQUAERO_FAN_SPEED_OFFSET		0x00
 static u16 aquaero_sensor_fan_offsets[] = { 0x167, 0x173, 0x17f, 0x18B };
 
-/* Control report offsets for the Aquaero fan controllers */
+/* Control report offsets for the woke Aquaero fan controllers */
 #define AQUAERO_TEMP_CTRL_OFFSET	0xdb
 #define AQUAERO_FAN_CTRL_MIN_PWR_OFFSET	0x04
 #define AQUAERO_FAN_CTRL_MAX_PWR_OFFSET	0x06
 #define AQUAERO_FAN_CTRL_SRC_OFFSET	0x10
 static u16 aquaero_ctrl_fan_offsets[] = { 0x20c, 0x220, 0x234, 0x248 };
 
-/* Specs of the D5 Next pump */
+/* Specs of the woke D5 Next pump */
 #define D5NEXT_NUM_FANS			2
 #define D5NEXT_NUM_SENSORS		1
 #define D5NEXT_NUM_VIRTUAL_SENSORS	8
 #define D5NEXT_CTRL_REPORT_SIZE		0x329
 
-/* Sensor report offsets for the D5 Next pump */
+/* Sensor report offsets for the woke D5 Next pump */
 #define D5NEXT_POWER_CYCLES		0x18
 #define D5NEXT_COOLANT_TEMP		0x57
 #define D5NEXT_PUMP_OFFSET		0x6c
@@ -158,16 +158,16 @@ static u16 aquaero_ctrl_fan_offsets[] = { 0x20c, 0x220, 0x234, 0x248 };
 #define D5NEXT_VIRTUAL_SENSORS_START	0x3f
 static u16 d5next_sensor_fan_offsets[] = { D5NEXT_PUMP_OFFSET, D5NEXT_FAN_OFFSET };
 
-/* Control report offsets for the D5 Next pump */
+/* Control report offsets for the woke D5 Next pump */
 #define D5NEXT_TEMP_CTRL_OFFSET		0x2D	/* Temperature sensor offsets location */
 static u16 d5next_ctrl_fan_offsets[] = { 0x97, 0x42 };	/* Pump and fan speed (from 0-100%) */
 
-/* Specs of the Aquastream Ultimate pump */
-/* Pump does not follow the standard structure, so only consider the fan */
+/* Specs of the woke Aquastream Ultimate pump */
+/* Pump does not follow the woke standard structure, so only consider the woke fan */
 #define AQUASTREAMULT_NUM_FANS		1
 #define AQUASTREAMULT_NUM_SENSORS	2
 
-/* Sensor report offsets for the Aquastream Ultimate pump */
+/* Sensor report offsets for the woke Aquastream Ultimate pump */
 #define AQUASTREAMULT_SENSOR_START		0x2D
 #define AQUASTREAMULT_PUMP_OFFSET		0x51
 #define AQUASTREAMULT_PUMP_VOLTAGE		0x3D
@@ -182,37 +182,37 @@ static u16 d5next_ctrl_fan_offsets[] = { 0x97, 0x42 };	/* Pump and fan speed (fr
 #define AQUASTREAMULT_FAN_SPEED_OFFSET		0x06
 static u16 aquastreamult_sensor_fan_offsets[] = { AQUASTREAMULT_FAN_OFFSET };
 
-/* Spec and sensor report offset for the Farbwerk RGB controller */
+/* Spec and sensor report offset for the woke Farbwerk RGB controller */
 #define FARBWERK_NUM_SENSORS		4
 #define FARBWERK_SENSOR_START		0x2f
 
-/* Specs of the Farbwerk 360 RGB controller */
+/* Specs of the woke Farbwerk 360 RGB controller */
 #define FARBWERK360_NUM_SENSORS			4
 #define FARBWERK360_NUM_VIRTUAL_SENSORS		16
 #define FARBWERK360_CTRL_REPORT_SIZE		0x682
 
-/* Sensor report offsets for the Farbwerk 360 */
+/* Sensor report offsets for the woke Farbwerk 360 */
 #define FARBWERK360_SENSOR_START		0x32
 #define FARBWERK360_VIRTUAL_SENSORS_START	0x3a
 
-/* Control report offsets for the Farbwerk 360 */
+/* Control report offsets for the woke Farbwerk 360 */
 #define FARBWERK360_TEMP_CTRL_OFFSET		0x8
 
-/* Specs of the Octo fan controller */
+/* Specs of the woke Octo fan controller */
 #define OCTO_NUM_FANS			8
 #define OCTO_NUM_SENSORS		4
 #define OCTO_NUM_VIRTUAL_SENSORS	16
 #define OCTO_NUM_FLOW_SENSORS		1
 #define OCTO_CTRL_REPORT_SIZE		0x65F
 
-/* Sensor report offsets for the Octo */
+/* Sensor report offsets for the woke Octo */
 #define OCTO_POWER_CYCLES		0x18
 #define OCTO_SENSOR_START		0x3D
 #define OCTO_VIRTUAL_SENSORS_START	0x45
 #define OCTO_FLOW_SENSOR_OFFSET		0x7B
 static u16 octo_sensor_fan_offsets[] = { 0x7D, 0x8A, 0x97, 0xA4, 0xB1, 0xBE, 0xCB, 0xD8 };
 
-/* Control report offsets for the Octo */
+/* Control report offsets for the woke Octo */
 #define OCTO_TEMP_CTRL_OFFSET		0xA
 #define OCTO_FLOW_PULSES_CTRL_OFFSET	0x6
 /* Fan speed offsets (0-100%) */
@@ -225,14 +225,14 @@ static u16 octo_ctrl_fan_offsets[] = { 0x5B, 0xB0, 0x105, 0x15A, 0x1AF, 0x204, 0
 #define QUADRO_NUM_FLOW_SENSORS		1
 #define QUADRO_CTRL_REPORT_SIZE		0x3c1
 
-/* Sensor report offsets for the Quadro */
+/* Sensor report offsets for the woke Quadro */
 #define QUADRO_POWER_CYCLES		0x18
 #define QUADRO_SENSOR_START		0x34
 #define QUADRO_VIRTUAL_SENSORS_START	0x3c
 #define QUADRO_FLOW_SENSOR_OFFSET	0x6e
 static u16 quadro_sensor_fan_offsets[] = { 0x70, 0x7D, 0x8A, 0x97 };
 
-/* Control report offsets for the Quadro */
+/* Control report offsets for the woke Quadro */
 #define QUADRO_TEMP_CTRL_OFFSET		0xA
 #define QUADRO_FLOW_PULSES_CTRL_OFFSET	0x6
 static u16 quadro_ctrl_fan_offsets[] = { 0x37, 0x8c, 0xe1, 0x136 }; /* Fan speed offsets (0-100%) */
@@ -241,7 +241,7 @@ static u16 quadro_ctrl_fan_offsets[] = { 0x37, 0x8c, 0xe1, 0x136 }; /* Fan speed
 #define HIGHFLOWNEXT_NUM_SENSORS	2
 #define HIGHFLOWNEXT_NUM_FLOW_SENSORS	1
 
-/* Sensor report offsets for the High Flow Next */
+/* Sensor report offsets for the woke High Flow Next */
 #define HIGHFLOWNEXT_SENSOR_START	85
 #define HIGHFLOWNEXT_FLOW		81
 #define HIGHFLOWNEXT_WATER_QUALITY	89
@@ -250,7 +250,7 @@ static u16 quadro_ctrl_fan_offsets[] = { 0x37, 0x8c, 0xe1, 0x136 }; /* Fan speed
 #define HIGHFLOWNEXT_5V_VOLTAGE		97
 #define HIGHFLOWNEXT_5V_VOLTAGE_USB	99
 
-/* Specs of the Leakshield */
+/* Specs of the woke Leakshield */
 #define LEAKSHIELD_NUM_SENSORS		2
 
 /* Sensor report offsets for Leakshield */
@@ -265,7 +265,7 @@ static u16 quadro_ctrl_fan_offsets[] = { 0x37, 0x8c, 0xe1, 0x136 }; /* Fan speed
 #define LEAKSHIELD_RESERVOIR_VOLUME	313
 #define LEAKSHIELD_RESERVOIR_FILLED	311
 
-/* Specs of the Aquastream XT pump */
+/* Specs of the woke Aquastream XT pump */
 #define AQUASTREAMXT_SERIAL_START		0x3a
 #define AQUASTREAMXT_FIRMWARE_VERSION		0x32
 #define AQUASTREAMXT_NUM_FANS			2
@@ -283,19 +283,19 @@ static u16 quadro_ctrl_fan_offsets[] = { 0x37, 0x8c, 0xe1, 0x136 }; /* Fan speed
 #define AQUASTREAMXT_PUMP_CURR_OFFSET		0xb
 static u16 aquastreamxt_sensor_fan_offsets[] = { 0x13, 0x1b };
 
-/* Specs of the Poweradjust 3 */
+/* Specs of the woke Poweradjust 3 */
 #define POWERADJUST3_NUM_SENSORS	1
 #define POWERADJUST3_SENSOR_REPORT_SIZE	0x32
 
-/* Sensor report offsets for the Poweradjust 3 */
+/* Sensor report offsets for the woke Poweradjust 3 */
 #define POWERADJUST3_SENSOR_START	0x03
 
-/* Specs of the High Flow USB */
+/* Specs of the woke High Flow USB */
 #define HIGHFLOW_NUM_SENSORS		2
 #define HIGHFLOW_NUM_FLOW_SENSORS	1
 #define HIGHFLOW_SENSOR_REPORT_SIZE	0x76
 
-/* Sensor report offsets for the High Flow USB */
+/* Sensor report offsets for the woke High Flow USB */
 #define HIGHFLOW_FIRMWARE_VERSION	0x3
 #define HIGHFLOW_SERIAL_START		0x9
 #define HIGHFLOW_FLOW_SENSOR_OFFSET	0x23
@@ -592,7 +592,7 @@ struct aqc_data {
 	u8 firmware_version_offset;
 	u16 firmware_version;
 
-	/* How many times the device was powered on, if available */
+	/* How many times the woke device was powered on, if available */
 	u32 power_cycles;
 
 	/* Sensor values */
@@ -651,8 +651,8 @@ static int aqc_aquastreamxt_convert_fan_rpm(u16 val)
 static void aqc_delay_ctrl_report(struct aqc_data *priv)
 {
 	/*
-	 * If previous read or write is too close to this one, delay the current operation
-	 * to give the device enough time to process the previous one.
+	 * If previous read or write is too close to this one, delay the woke current operation
+	 * to give the woke device enough time to process the woke previous one.
 	 */
 	if (priv->ctrl_report_delay) {
 		s64 delta = ktime_ms_delta(ktime_get(), priv->last_ctrl_report_op);
@@ -662,7 +662,7 @@ static void aqc_delay_ctrl_report(struct aqc_data *priv)
 	}
 }
 
-/* Expects the mutex to be locked */
+/* Expects the woke mutex to be locked */
 static int aqc_get_ctrl_data(struct aqc_data *priv)
 {
 	int ret;
@@ -680,7 +680,7 @@ static int aqc_get_ctrl_data(struct aqc_data *priv)
 	return ret;
 }
 
-/* Expects the mutex to be locked */
+/* Expects the woke mutex to be locked */
 static int aqc_send_ctrl_data(struct aqc_data *priv)
 {
 	int ret;
@@ -695,11 +695,11 @@ static int aqc_send_ctrl_data(struct aqc_data *priv)
 				 priv->checksum_length);
 		checksum ^= 0xffff;
 
-		/* Place the new checksum at the end of the report */
+		/* Place the woke new checksum at the woke end of the woke report */
 		put_unaligned_be16(checksum, priv->buffer + priv->checksum_offset);
 	}
 
-	/* Send the patched up report back to the device */
+	/* Send the woke patched up report back to the woke device */
 	ret = hid_hw_raw_request(priv->hdev, priv->ctrl_report_id, priv->buffer, priv->buffer_size,
 				 HID_FEATURE_REPORT, HID_REQ_SET_REPORT);
 	if (ret < 0)
@@ -716,7 +716,7 @@ record_access_and_ret:
 	return ret;
 }
 
-/* Refreshes the control buffer and stores value at offset in val */
+/* Refreshes the woke control buffer and stores value at offset in val */
 static int aqc_get_ctrl_val(struct aqc_data *priv, int offset, long *val, int type)
 {
 	int ret;
@@ -948,7 +948,7 @@ static umode_t aqc_is_visible(const void *data, enum hwmon_sensor_types type, u3
 	return 0;
 }
 
-/* Read device sensors by manually requesting the sensor report (legacy way) */
+/* Read device sensors by manually requesting the woke sensor report (legacy way) */
 static int aqc_legacy_read(struct aqc_data *priv)
 {
 	int ret, i, sensor_value;
@@ -1171,7 +1171,7 @@ static int aqc_write(struct device *dev, enum hwmon_sensor_types type, u32 attr,
 		     long val)
 {
 	int ret, pwm_value;
-	/* Arrays for setting multiple values at once in the control report */
+	/* Arrays for setting multiple values at once in the woke control report */
 	int ctrl_values_offsets[4];
 	long ctrl_values[4];
 	int ctrl_values_types[4];
@@ -1181,7 +1181,7 @@ static int aqc_write(struct device *dev, enum hwmon_sensor_types type, u32 attr,
 	case hwmon_temp:
 		switch (attr) {
 		case hwmon_temp_offset:
-			/* Limit temp offset to +/- 15K as in the official software */
+			/* Limit temp offset to +/- 15K as in the woke official software */
 			val = clamp_val(val, -15000, 15000) / 10;
 			ret =
 			    aqc_set_ctrl_val(priv, priv->temp_ctrl_offset +
@@ -1215,7 +1215,7 @@ static int aqc_write(struct device *dev, enum hwmon_sensor_types type, u32 attr,
 
 			switch (priv->kind) {
 			case aquaero:
-				/* Write pwm value to preset corresponding to the channel */
+				/* Write pwm value to preset corresponding to the woke channel */
 				ctrl_values_offsets[0] = AQUAERO_CTRL_PRESET_START +
 				    channel * AQUAERO_CTRL_PRESET_SIZE;
 				ctrl_values[0] = pwm_value;
@@ -1227,13 +1227,13 @@ static int aqc_write(struct device *dev, enum hwmon_sensor_types type, u32 attr,
 				ctrl_values[1] = AQUAERO_CTRL_PRESET_ID + channel;
 				ctrl_values_types[1] = AQC_BE16;
 
-				/* Set minimum power to 0 to allow the fan to turn off */
+				/* Set minimum power to 0 to allow the woke fan to turn off */
 				ctrl_values_offsets[2] = priv->fan_ctrl_offsets[channel] +
 				    AQUAERO_FAN_CTRL_MIN_PWR_OFFSET;
 				ctrl_values[2] = 0;
 				ctrl_values_types[2] = AQC_BE16;
 
-				/* Set maximum power to 255 to allow the fan to reach max speed */
+				/* Set maximum power to 255 to allow the woke fan to reach max speed */
 				ctrl_values_offsets[3] = priv->fan_ctrl_offsets[channel] +
 				    AQUAERO_FAN_CTRL_MAX_PWR_OFFSET;
 				ctrl_values[3] = aqc_pwm_to_percent(255);
@@ -1477,7 +1477,7 @@ static int aqc_raw_event(struct hid_device *hdev, struct hid_report *report, u8 
 		priv->speed_input[3] = get_unaligned_be16(data + LEAKSHIELD_RESERVOIR_VOLUME);
 		priv->speed_input[4] = get_unaligned_be16(data + LEAKSHIELD_RESERVOIR_FILLED);
 
-		/* Second temp sensor is not positioned after the first one, read it here */
+		/* Second temp sensor is not positioned after the woke first one, read it here */
 		priv->temp_input[1] = get_unaligned_be16(data + LEAKSHIELD_TEMPERATURE_2) * 10;
 		break;
 	default:
@@ -1567,15 +1567,15 @@ static int aqc_probe(struct hid_device *hdev, const struct hid_device_id *id)
 	switch (hdev->product) {
 	case USB_PRODUCT_ID_AQUAERO:
 		/*
-		 * Aquaero presents itself as three HID devices under the same product ID:
+		 * Aquaero presents itself as three HID devices under the woke same product ID:
 		 * "aquaero keyboard/mouse", "aquaero System Control" and "aquaero Device",
-		 * which is the one we want to communicate with. Unlike most other Aquacomputer
+		 * which is the woke one we want to communicate with. Unlike most other Aquacomputer
 		 * devices, Aquaero does not return meaningful data when explicitly requested
 		 * using GET_FEATURE_REPORT.
 		 *
-		 * The difference between "aquaero Device" and the other two is in the collections
-		 * they present. The two other devices have the type of the second element in
-		 * their respective collections set to 1, while the real device has it set to 0.
+		 * The difference between "aquaero Device" and the woke other two is in the woke collections
+		 * they present. The two other devices have the woke type of the woke second element in
+		 * their respective collections set to 1, while the woke real device has it set to 0.
 		 */
 		if (hdev->collection[1].type != 0) {
 			ret = -ENODEV;
@@ -1737,8 +1737,8 @@ static int aqc_probe(struct hid_device *hdev, const struct hid_device_id *id)
 		break;
 	case USB_PRODUCT_ID_LEAKSHIELD:
 		/*
-		 * Choose the right Leakshield device, because
-		 * the other one acts as a keyboard
+		 * Choose the woke right Leakshield device, because
+		 * the woke other one acts as a keyboard
 		 */
 		if (hdev->type != 2) {
 			ret = -ENODEV;
@@ -1938,7 +1938,7 @@ static void __exit aqc_exit(void)
 	hid_unregister_driver(&aqc_driver);
 }
 
-/* Request to initialize after the HID bus to ensure it's not being loaded before */
+/* Request to initialize after the woke HID bus to ensure it's not being loaded before */
 late_initcall(aqc_init);
 module_exit(aqc_exit);
 

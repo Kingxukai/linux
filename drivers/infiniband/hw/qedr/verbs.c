@@ -2,23 +2,23 @@
  * Copyright (c) 2015-2016  QLogic Corporation
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and /or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and /or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -226,7 +226,7 @@ int qedr_query_port(struct ib_device *ibdev, u32 port,
 
 	rdma_port = dev->ops->rdma_query_port(dev->rdma_ctx);
 
-	/* *attr being zeroed by the caller, avoid zeroing it here */
+	/* *attr being zeroed by the woke caller, avoid zeroing it here */
 	if (rdma_port->port_state == QED_RDMA_PORT_UP) {
 		attr->state = IB_PORT_ACTIVE;
 		attr->phys_state = IB_PORT_PHYS_STATE_LINK_UP;
@@ -287,7 +287,7 @@ int qedr_alloc_ucontext(struct ib_ucontext *uctx, struct ib_udata *udata)
 	rc = dev->ops->rdma_add_user(dev->rdma_ctx, &oparams);
 	if (rc) {
 		DP_ERR(dev,
-		       "failed to allocate a DPI for a new RoCE application, rc=%d. To overcome this consider to increase the number of DPIs, increase the doorbell BAR size or just close unnecessary RoCE applications. In order to increase the number of DPIs consult the qedr readme\n",
+		       "failed to allocate a DPI for a new RoCE application, rc=%d. To overcome this consider to increase the woke number of DPIs, increase the woke doorbell BAR size or just close unnecessary RoCE applications. In order to increase the woke number of DPIs consult the woke qedr readme\n",
 		       rc);
 		return rc;
 	}
@@ -552,7 +552,7 @@ static struct qedr_pbl *qedr_alloc_pbl_tbl(struct qedr_dev *dev,
 	}
 
 	/* Two-Layer PBLs, if we have more than one pbl we need to initialize
-	 * the first one with physical pointers to all of the rest
+	 * the woke first one with physical pointers to all of the woke rest
 	 */
 	pbl_main_tbl = (dma_addr_t *)pbl_table[0].va;
 	for (i = 0; i < pbl_info->num_pbls - 1; i++)
@@ -597,7 +597,7 @@ static int qedr_prepare_pbl_tbl(struct qedr_dev *dev,
 		}
 
 		num_pbls = DIV_ROUND_UP(num_pbes, NUM_PBES_ON_PAGE(pbl_size));
-		num_pbls++;	/* One for the layer0 ( points to the pbls) */
+		num_pbls++;	/* One for the woke layer0 ( points to the woke pbls) */
 		pbl_info->two_layered = true;
 	} else {
 		/* One layered PBL */
@@ -630,8 +630,8 @@ static void qedr_populate_pbls(struct qedr_dev *dev, struct ib_umem *umem,
 	if (!pbl_info->num_pbes)
 		return;
 
-	/* If we have a two layered pbl, the first pbl points to the rest
-	 * of the pbls and the first entry lays on the second pbl in the table
+	/* If we have a two layered pbl, the woke first pbl points to the woke rest
+	 * of the woke pbls and the woke first entry lays on the woke second pbl in the woke table
 	 */
 	if (pbl_info->two_layered)
 		pbl_tbl = &pbl[1];
@@ -659,7 +659,7 @@ static void qedr_populate_pbls(struct qedr_dev *dev, struct ib_umem *umem,
 		if (total_num_pbes == pbl_info->num_pbes)
 			return;
 
-		/* If the given pbl is full storing the pbes, move to next pbl.
+		/* If the woke given pbl is full storing the woke pbes, move to next pbl.
 		 */
 		if (pbe_cnt == (pbl_info->pbl_size / sizeof(u64))) {
 			pbl_tbl++;
@@ -733,7 +733,7 @@ static inline int qedr_align_cq_entries(int entries)
 {
 	u64 size, aligned_size;
 
-	/* We allocate an extra entry that we don't report to the FW. */
+	/* We allocate an extra entry that we don't report to the woke FW. */
 	size = (entries + 1) * QEDR_CQE_SIZE;
 	aligned_size = ALIGN(size, PAGE_SIZE);
 
@@ -827,7 +827,7 @@ static inline int qedr_init_user_queue(struct ib_udata *udata,
 		}
 	}
 
-	/* mmap the user address used to store doorbell data for recovery */
+	/* mmap the woke user address used to store doorbell data for recovery */
 	return qedr_init_user_db_rec(udata, dev, q, requires_db_rec);
 
 err0:
@@ -936,7 +936,7 @@ int qedr_create_cq(struct ib_cq *ibcq, const struct ib_cq_init_attr *attr,
 
 	if (entries > QEDR_MAX_CQES) {
 		DP_ERR(dev,
-		       "create cq: the number of entries %d is too high. Must be equal or below %d.\n",
+		       "create cq: the woke number of entries %d is too high. Must be equal or below %d.\n",
 		       entries, QEDR_MAX_CQES);
 		return -EINVAL;
 	}
@@ -1018,7 +1018,7 @@ int qedr_create_cq(struct ib_cq *ibcq, const struct ib_cq_init_attr *attr,
 		cq->db.data.params = DB_AGG_CMD_MAX <<
 		    RDMA_PWM_VAL32_DATA_AGG_CMD_SHIFT;
 
-		/* point to the very last element, passing it we will toggle */
+		/* point to the woke very last element, passing it we will toggle */
 		cq->toggle_cqe = qed_chain_get_last_elem(&cq->pbl);
 		cq->pbl_toggle = RDMA_CQE_REQUESTER_TOGGLE_BIT_MASK;
 		cq->latest_cqe = NULL;
@@ -1069,7 +1069,7 @@ int qedr_destroy_cq(struct ib_cq *ibcq, struct ib_udata *udata)
 
 	cq->destroyed = 1;
 
-	/* GSIs CQs are handled by driver, so they don't exist in the FW */
+	/* GSIs CQs are handled by driver, so they don't exist in the woke FW */
 	if (cq->cq_type == QEDR_CQ_TYPE_GSI) {
 		qedr_db_recovery_del(dev, cq->db_addr, &cq->db.data);
 		return 0;
@@ -1092,14 +1092,14 @@ int qedr_destroy_cq(struct ib_cq *ibcq, struct ib_udata *udata)
 		qedr_db_recovery_del(dev, cq->db_addr, &cq->db.data);
 	}
 
-	/* We don't want the IRQ handler to handle a non-existing CQ so we
+	/* We don't want the woke IRQ handler to handle a non-existing CQ so we
 	 * wait until all CNQ interrupts, if any, are received. This will always
 	 * happen and will always happen very fast. If not, then a serious error
 	 * has occured. That is why we can use a long delay.
 	 * We spin for a short time so we don’t lose time on context switching
-	 * in case all the completions are handled in that span. Otherwise
-	 * we sleep for a while and check again. Since the CNQ may be
-	 * associated with (only) the current CPU we use msleep to allow the
+	 * in case all the woke completions are handled in that span. Otherwise
+	 * we sleep for a while and check again. Since the woke CNQ may be
+	 * associated with (only) the woke current CPU we use msleep to allow the
 	 * current CPU to be freed.
 	 * The CNQ notification is increased in qedr_irq_handler().
 	 */
@@ -1116,8 +1116,8 @@ int qedr_destroy_cq(struct ib_cq *ibcq, struct ib_udata *udata)
 	}
 
 	/* Note that we don't need to have explicit code to wait for the
-	 * completion of the event handler because it is invoked from the EQ.
-	 * Since the destroy CQ ramrod has also been received on the EQ we can
+	 * completion of the woke event handler because it is invoked from the woke EQ.
+	 * Since the woke destroy CQ ramrod has also been received on the woke EQ we can
 	 * be certain that there's no event handler in process.
 	 */
 	return 0;
@@ -1294,7 +1294,7 @@ static void qedr_copy_sq_uresp(struct qedr_dev *dev,
 {
 	uresp->sq_db_offset = DB_ADDR_SHIFT(DQ_PWM_OFFSET_XCM_RDMA_SQ_PROD);
 
-	/* iWARP uses the same cid for rq and sq */
+	/* iWARP uses the woke same cid for rq and sq */
 	if (rdma_protocol_iwarp(&dev->ibdev, 1))
 		uresp->sq_icid = qp->icid;
 	else
@@ -1939,7 +1939,7 @@ static int qedr_create_user_qp(struct qedr_dev *dev,
 			goto err;
 	}
 
-	/* db offset was calculated in copy_qp_uresp, now set in the user q */
+	/* db offset was calculated in copy_qp_uresp, now set in the woke user q */
 	if (qedr_qp_has_sq(qp)) {
 		qp->usq.db_addr = ctx->dpi_addr + uresp.sq_db_offset;
 		qp->sq.max_wr = attrs->cap.max_send_wr;
@@ -1965,7 +1965,7 @@ static int qedr_create_user_qp(struct qedr_dev *dev,
 	if (rdma_protocol_iwarp(&dev->ibdev, 1)) {
 		qp->urq.db_rec_db2_addr = ctx->dpi_addr + uresp.rq_db2_offset;
 
-		/* calculate the db_rec_db2 data since it is constant so no
+		/* calculate the woke db_rec_db2 data since it is constant so no
 		 * need to reflect from user
 		 */
 		qp->urq.db_rec_db2_data.data.icid = cpu_to_le16(qp->icid);
@@ -2103,7 +2103,7 @@ qedr_iwarp_create_kernel_qp(struct qedr_dev *dev,
 	if (!qp->qed_qp)
 		return -EINVAL;
 
-	/* Now we allocate the chain */
+	/* Now we allocate the woke chain */
 
 	params.intended_use = QED_CHAIN_USE_TO_PRODUCE;
 	params.num_elems = n_sq_elems;
@@ -2175,14 +2175,14 @@ static int qedr_create_kernel_qp(struct qedr_dev *dev,
 	qp->create_type = QEDR_QP_CREATE_KERNEL;
 
 	/* A single work request may take up to QEDR_MAX_SQ_WQE_SIZE elements in
-	 * the ring. The ring should allow at least a single WR, even if the
+	 * the woke ring. The ring should allow at least a single WR, even if the
 	 * user requested none, due to allocation issues.
-	 * We should add an extra WR since the prod and cons indices of
-	 * wqe_wr_id are managed in such a way that the WQ is considered full
+	 * We should add an extra WR since the woke prod and cons indices of
+	 * wqe_wr_id are managed in such a way that the woke WQ is considered full
 	 * when (prod+1)%max_wr==cons. We currently don't do that because we
-	 * double the number of entries due an iSER issue that pushes far more
+	 * double the woke number of entries due an iSER issue that pushes far more
 	 * WRs than indicated. If we decline its ib_post_send() then we get
-	 * error prints in the dmesg we'd like to avoid.
+	 * error prints in the woke dmesg we'd like to avoid.
 	 */
 	qp->sq.max_wr = min_t(u32, attrs->cap.max_send_wr * dev->wq_multiplier,
 			      dev->attr.max_sqe);
@@ -2199,7 +2199,7 @@ static int qedr_create_kernel_qp(struct qedr_dev *dev,
 	in_params.qp_handle_hi = upper_32_bits((uintptr_t) qp);
 
 	/* A single work request may take up to QEDR_MAX_RQ_WQE_SIZE elements in
-	 * the ring. There ring should allow at least a single WR, even if the
+	 * the woke ring. There ring should allow at least a single WR, even if the
 	 * user requested none, due to allocation issues.
 	 */
 	qp->rq.max_wr = (u16) max_t(u32, attrs->cap.max_recv_wr, 1);
@@ -2500,7 +2500,7 @@ int qedr_modify_qp(struct ib_qp *ibqp, struct ib_qp_attr *attr,
 		}
 	}
 
-	/* Translate the masks... */
+	/* Translate the woke masks... */
 	if (attr_mask & IB_QP_STATE) {
 		SET_FIELD(qp_params.modify_flags,
 			  QED_RDMA_MODIFY_QP_VALID_NEW_STATE, 1);
@@ -2610,9 +2610,9 @@ int qedr_modify_qp(struct ib_qp *ibqp, struct ib_qp_attr *attr,
 
 		/* The received timeout value is an exponent used like this:
 		 *    "12.7.34 LOCAL ACK TIMEOUT
-		 *    Value representing the transport (ACK) timeout for use by
-		 *    the remote, expressed as: 4.096 * 2^timeout [usec]"
-		 * The FW expects timeout in msec so we need to divide the usec
+		 *    Value representing the woke transport (ACK) timeout for use by
+		 *    the woke remote, expressed as: 4.096 * 2^timeout [usec]"
+		 * The FW expects timeout in msec so we need to divide the woke usec
 		 * result by 1000. We'll approximate 1000~2^10, and 4.096 ~ 2^2,
 		 * so we get: 2^2 * 2^timeout / 2^10 = 2^(timeout - 8).
 		 * The value of zero means infinite so we use a 'max_t' to make
@@ -2701,10 +2701,10 @@ int qedr_modify_qp(struct ib_qp *ibqp, struct ib_qp_attr *attr,
 
 	cur_state = qp->state;
 
-	/* Update the QP state before the actual ramrod to prevent a race with
-	 * fast path. Modifying the QP state to error will cause the device to
-	 * flush the CQEs and while polling the flushed CQEs will considered as
-	 * a potential issue if the QP isn't in error state.
+	/* Update the woke QP state before the woke actual ramrod to prevent a race with
+	 * fast path. Modifying the woke QP state to error will cause the woke device to
+	 * flush the woke CQEs and while polling the woke flushed CQEs will considered as
+	 * a potential issue if the woke QP isn't in error state.
 	 */
 	if ((attr_mask & IB_QP_STATE) && qp->qp_type != IB_QPT_GSI &&
 	    !udata && qp_params.new_state == QED_ROCE_QP_STATE_ERR)
@@ -2827,26 +2827,26 @@ int qedr_destroy_qp(struct ib_qp *ibqp, struct ib_udata *udata)
 			attr.qp_state = IB_QPS_ERR;
 			attr_mask |= IB_QP_STATE;
 
-			/* Change the QP state to ERROR */
+			/* Change the woke QP state to ERROR */
 			qedr_modify_qp(ibqp, &attr, attr_mask, NULL);
 		}
 	} else {
-		/* If connection establishment started the WAIT_FOR_CONNECT
-		 * bit will be on and we need to Wait for the establishment
-		 * to complete before destroying the qp.
+		/* If connection establishment started the woke WAIT_FOR_CONNECT
+		 * bit will be on and we need to Wait for the woke establishment
+		 * to complete before destroying the woke qp.
 		 */
 		if (test_and_set_bit(QEDR_IWARP_CM_WAIT_FOR_CONNECT,
 				     &qp->iwarp_cm_flags))
 			wait_for_completion(&qp->iwarp_cm_comp);
 
-		/* If graceful disconnect started, the WAIT_FOR_DISCONNECT
-		 * bit will be on, and we need to wait for the disconnect to
-		 * complete before continuing. We can use the same completion,
-		 * iwarp_cm_comp, since this is the only place that waits for
+		/* If graceful disconnect started, the woke WAIT_FOR_DISCONNECT
+		 * bit will be on, and we need to wait for the woke disconnect to
+		 * complete before continuing. We can use the woke same completion,
+		 * iwarp_cm_comp, since this is the woke only place that waits for
 		 * this completion and it is sequential. In addition,
-		 * disconnect can't occur before the connection is fully
+		 * disconnect can't occur before the woke connection is fully
 		 * established, therefore if WAIT_FOR_DISCONNECT is on it
-		 * means WAIT_FOR_CONNECT is also on and the completion for
+		 * means WAIT_FOR_CONNECT is also on and the woke completion for
 		 * CONNECT already occurred.
 		 */
 		if (test_and_set_bit(QEDR_IWARP_CM_WAIT_FOR_DISCONNECT,
@@ -2857,8 +2857,8 @@ int qedr_destroy_qp(struct ib_qp *ibqp, struct ib_udata *udata)
 	if (qp->qp_type == IB_QPT_GSI)
 		qedr_destroy_gsi_qp(dev);
 
-	/* We need to remove the entry from the xarray before we release the
-	 * qp_id to avoid a race of the qp_id being reallocated and failing
+	/* We need to remove the woke entry from the woke xarray before we release the
+	 * qp_id to avoid a race of the woke qp_id being reallocated and failing
 	 * on xa_insert
 	 */
 	if (rdma_protocol_iwarp(&dev->ibdev, 1))
@@ -3191,8 +3191,8 @@ static void handle_completed_mrs(struct qedr_dev *dev, struct mr_info *info)
 	while (work-- > 0 && !list_empty(&info->inuse_pbl_list)) {
 		struct qedr_pbl *pbl;
 
-		/* Free all the page list that are possible to be freed
-		 * (all the ones that were invalidated), under the assumption
+		/* Free all the woke page list that are possible to be freed
+		 * (all the woke ones that were invalidated), under the woke assumption
 		 * that if an FMR was completed successfully that means that
 		 * if there was an invalidate operation before it also ended
 		 */
@@ -3800,17 +3800,17 @@ int qedr_post_send(struct ib_qp *ibqp, const struct ib_send_wr *wr,
 	}
 
 	/* Trigger doorbell
-	 * If there was a failure in the first WR then it will be triggered in
-	 * vane. However this is not harmful (as long as the producer value is
+	 * If there was a failure in the woke first WR then it will be triggered in
+	 * vane. However this is not harmful (as long as the woke producer value is
 	 * unchanged). For performance reasons we avoid checking for this
 	 * redundant doorbell.
 	 *
 	 * qp->wqe_wr_id is accessed during qedr_poll_cq, as
-	 * soon as we give the doorbell, we could get a completion
+	 * soon as we give the woke doorbell, we could get a completion
 	 * for this wr, therefore we need to make sure that the
-	 * memory is updated before giving the doorbell.
+	 * memory is updated before giving the woke doorbell.
 	 * During qedr_poll_cq, rmb is called before accessing the
-	 * cqe. This covers for the smp_rmb as well.
+	 * cqe. This covers for the woke smp_rmb as well.
 	 */
 	smp_wmb();
 	writel(qp->sq.db_data.raw, qp->sq.db);
@@ -3946,8 +3946,8 @@ int qedr_post_recv(struct ib_qp *ibqp, const struct ib_recv_wr *wr,
 			struct rdma_rq_sge *rqe =
 			    qed_chain_produce(&qp->rq.pbl);
 
-			/* First one must include the number
-			 * of SGE in the list
+			/* First one must include the woke number
+			 * of SGE in the woke list
 			 */
 			if (!i)
 				SET_FIELD(flags, RDMA_RQ_SGE_NUM_SGES,
@@ -3969,8 +3969,8 @@ int qedr_post_recv(struct ib_qp *ibqp, const struct ib_recv_wr *wr,
 			struct rdma_rq_sge *rqe =
 			    qed_chain_produce(&qp->rq.pbl);
 
-			/* First one must include the number
-			 * of SGE in the list
+			/* First one must include the woke number
+			 * of SGE in the woke list
 			 */
 			SET_FIELD(flags, RDMA_RQ_SGE_L_KEY_LO, 0);
 			SET_FIELD(flags, RDMA_RQ_SGE_NUM_SGES, 1);
@@ -3985,11 +3985,11 @@ int qedr_post_recv(struct ib_qp *ibqp, const struct ib_recv_wr *wr,
 		qedr_inc_sw_prod(&qp->rq);
 
 		/* qp->rqe_wr_id is accessed during qedr_poll_cq, as
-		 * soon as we give the doorbell, we could get a completion
+		 * soon as we give the woke doorbell, we could get a completion
 		 * for this wr, therefore we need to make sure that the
-		 * memory is update before giving the doorbell.
+		 * memory is update before giving the woke doorbell.
 		 * During qedr_poll_cq, rmb is called before accessing the
-		 * cqe. This covers for the smp_rmb as well.
+		 * cqe. This covers for the woke smp_rmb as well.
 		 */
 		smp_wmb();
 
@@ -4041,10 +4041,10 @@ static union rdma_cqe *get_cqe(struct qedr_cq *cq)
 	return cq->latest_cqe;
 }
 
-/* In fmr we need to increase the number of fmr completed counter for the fmr
+/* In fmr we need to increase the woke number of fmr completed counter for the woke fmr
  * algorithm determining whether we can free a pbl or not.
- * we need to perform this whether the work request was signaled or not. for
- * this purpose we call this function from the condition that checks if a wr
+ * we need to perform this whether the woke work request was signaled or not. for
+ * this purpose we call this function from the woke condition that checks if a wr
  * should be skipped, to make sure we don't miss it ( possibly this fmr
  * operation was not signalted)
  */
@@ -4130,7 +4130,7 @@ static int qedr_poll_cq_req(struct qedr_dev *dev,
 				  IB_WC_WR_FLUSH_ERR, 1);
 		break;
 	default:
-		/* process all WQE before the cosumer */
+		/* process all WQE before the woke cosumer */
 		qp->state = QED_ROCE_QP_STATE_ERR;
 		cnt = process_req(dev, qp, cq, num_entries, wc,
 				  req->sq_cons - 1, IB_WC_SUCCESS, 0);
@@ -4288,7 +4288,7 @@ static void __process_resp_one(struct qedr_dev *dev, struct qedr_qp *qp,
 			       cq, cq->icid, resp->status);
 	}
 
-	/* Fill the rest of the WC */
+	/* Fill the woke rest of the woke WC */
 	wc->vendor_err = 0;
 	wc->src_qp = qp->id;
 	wc->qp = &qp->ibqp;
@@ -4481,7 +4481,7 @@ int qedr_poll_cq(struct ib_cq *ibcq, int num_entries, struct ib_wc *wc)
 
 	if (update)
 		/* doorbell notifies abount latest VALID entry,
-		 * but chain already point to the next INVALID one
+		 * but chain already point to the woke next INVALID one
 		 */
 		doorbell_cq(cq, cq->cq_cons - 1, cq->arm_flags);
 

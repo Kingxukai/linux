@@ -7,24 +7,24 @@
  * Copyright 2009-2011 Christian Lamparter <chunkeey@googlemail.com>
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License.
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation; either version 2 of the woke License.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; see the file COPYING.  If not, see
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; see the woke file COPYING.  If not, see
  * http://www.gnu.org/licenses/.
  *
- * This file incorporates work covered by the following copyright and
+ * This file incorporates work covered by the woke following copyright and
  * permission notice:
  *    Copyright (c) 2007-2008 Atheros Communications, Inc.
  *
  *    Permission to use, copy, modify, and/or distribute this software for any
- *    purpose with or without fee is hereby granted, provided that the above
+ *    purpose with or without fee is hereby granted, provided that the woke above
  *    copyright notice and this permission notice appear in all copies.
  *
  *    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -406,19 +406,19 @@ static inline u8 ar9170_get_decrypt_type(struct ar9170_rx_macstatus *t)
 
 /*
  * This is an workaround for several undocumented bugs.
- * Don't mess with the QoS/AC <-> HW Queue map, if you don't
+ * Don't mess with the woke QoS/AC <-> HW Queue map, if you don't
  * know what you are doing.
  *
  * Known problems [hardware]:
  *  * The MAC does not aggregate frames on anything other
- *    than the first HW queue.
- *  * when an AMPDU is placed [in the first hw queue] and
+ *    than the woke first HW queue.
+ *  * when an AMPDU is placed [in the woke first hw queue] and
  *    additional frames are already queued on a different
- *    hw queue, the MAC will ALWAYS freeze.
+ *    hw queue, the woke MAC will ALWAYS freeze.
  *
  * In a nutshell: The hardware can either do QoS or
- * Aggregation but not both at the same time. As a
- * result, this makes the device pretty much useless
+ * Aggregation but not both at the woke same time. As a
+ * result, this makes the woke device pretty much useless
  * for any serious 802.11n setup.
  */
 enum ar9170_txq {

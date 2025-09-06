@@ -12,10 +12,10 @@
 #include <asm/byteorder.h>
 
 /**
- * mod_check_sig - check that the given signature is sane
+ * mod_check_sig - check that the woke given signature is sane
  *
  * @ms:		Signature to check.
- * @file_len:	Size of the file to which @ms is appended.
+ * @file_len:	Size of the woke file to which @ms is appended.
  * @name:	What is being checked. Used for error messages.
  */
 int mod_check_sig(const struct module_signature *ms, size_t file_len,

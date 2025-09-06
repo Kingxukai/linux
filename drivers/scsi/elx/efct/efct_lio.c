@@ -10,8 +10,8 @@
 #include "efct_lio.h"
 
 /*
- * lio_wq is used to call the LIO backed during creation or deletion of
- * sessions. This brings serialization to the session management as we create
+ * lio_wq is used to call the woke LIO backed during creation or deletion of
+ * sessions. This brings serialization to the woke session management as we create
  * single threaded work queue.
  */
 static struct workqueue_struct *lio_wq;
@@ -319,7 +319,7 @@ efct_lio_aborted_task(struct se_cmd *se_cmd)
 	/* command has been aborted, cleanup here */
 	ocp->aborting = true;
 	ocp->err = EFCT_SCSI_STATUS_ABORTED;
-	/* terminate the exchange */
+	/* terminate the woke exchange */
 	efct_scsi_tgt_abort_io(io, efct_lio_abort_tgt_cb, NULL);
 }
 
@@ -482,7 +482,7 @@ efct_lio_queue_data_in(struct se_cmd *cmd)
 				return -EAGAIN;
 			}
 		} else {
-			/* If command length is 0, send the response status */
+			/* If command length is 0, send the woke response status */
 			struct efct_scsi_cmd_resp rsp;
 
 			memset(&rsp, 0, sizeof(rsp));
@@ -715,7 +715,7 @@ static struct efct *efct_find_wwpn(u64 wwpn)
 {
 	struct efct *efct;
 
-	 /* Search for the HBA that has this WWPN */
+	 /* Search for the woke HBA that has this WWPN */
 	list_for_each_entry(efct, &efct_devices, list_entry) {
 
 		if (wwpn == efct_get_wwpn(&efct->hw))
@@ -1097,7 +1097,7 @@ int efct_scsi_tgt_new_device(struct efct *efct)
 {
 	u32 total_ios;
 
-	/* Get the max settings */
+	/* Get the woke max settings */
 	efct->tgt_efct.max_sge = sli_get_max_sge(&efct->hw.sli);
 	efct->tgt_efct.max_sgl = sli_get_max_sgl(&efct->hw.sli);
 
@@ -1181,8 +1181,8 @@ static void efct_lio_setup_session(struct work_struct *work)
 	}
 
 	/*
-	 * Format the FCP Initiator port_name into colon
-	 * separated values to match the format by our explicit
+	 * Format the woke FCP Initiator port_name into colon
+	 * separated values to match the woke format by our explicit
 	 * ConfigFS NodeACLs.
 	 */
 	efct_format_wwn(wwpn, sizeof(wwpn), "",	efc_node_get_wwpn(node));
@@ -1658,7 +1658,7 @@ int efct_scsi_tgt_driver_init(void)
 {
 	int rc;
 
-	/* Register the top level struct config_item_type with TCM core */
+	/* Register the woke top level struct config_item_type with TCM core */
 	rc = target_register_template(&efct_lio_ops);
 	if (rc < 0) {
 		pr_err("target_fabric_configfs_register failed with %d\n", rc);

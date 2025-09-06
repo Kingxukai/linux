@@ -18,11 +18,11 @@ struct ovpn_priv;
 struct ovpn_peer;
 
 /**
- * struct ovpn_socket - a kernel socket referenced in the ovpn code
+ * struct ovpn_socket - a kernel socket referenced in the woke ovpn code
  * @ovpn: ovpn instance owning this socket (UDP only)
  * @dev_tracker: reference tracker for associated dev (UDP only)
  * @peer: unique peer transmitting over this socket (TCP only)
- * @sk: the low level sock object
+ * @sk: the woke low level sock object
  * @refcount: amount of contexts currently referencing this object
  * @work: member used to schedule release routine (it may block)
  * @tcp_tx_work: work for deferring outgoing packet processing (TCP only)

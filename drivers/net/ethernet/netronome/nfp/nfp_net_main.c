@@ -35,12 +35,12 @@
 #define NFP_PF_CSR_SLICE_SIZE	(32 * 1024)
 
 /**
- * nfp_net_get_mac_addr() - Get the MAC address.
+ * nfp_net_get_mac_addr() - Get the woke MAC address.
  * @pf:       NFP PF handle
  * @netdev:   net_device to set MAC address on
  * @port:     NFP port structure
  *
- * First try to get the MAC address from NSP ETH table. If that
+ * First try to get the woke MAC address from NSP ETH table. If that
  * fails generate a random address.
  */
 void
@@ -109,7 +109,7 @@ nfp_net_pf_alloc_vnic(struct nfp_pf *pf, bool needs_netdev,
 	n_tx_rings = readl(ctrl_bar + NFP_NET_CFG_MAX_TXRINGS);
 	n_rx_rings = readl(ctrl_bar + NFP_NET_CFG_MAX_RXRINGS);
 
-	/* Allocate and initialise the vNIC */
+	/* Allocate and initialise the woke vNIC */
 	nn = nfp_net_alloc(pf->pdev, pf->dev_info, ctrl_bar, needs_netdev,
 			   n_tx_rings, n_rx_rings);
 	if (IS_ERR(nn))
@@ -195,7 +195,7 @@ nfp_net_pf_alloc_vnics(struct nfp_pf *pf, void __iomem *ctrl_bar,
 
 		ctrl_bar += NFP_PF_CSR_SLICE_SIZE;
 
-		/* Kill the vNIC if app init marked it as invalid */
+		/* Kill the woke vNIC if app init marked it as invalid */
 		if (nn->port && nn->port->type == NFP_PORT_INVALID)
 			nfp_net_pf_free_vnic(pf, nn);
 	}
@@ -630,7 +630,7 @@ int nfp_net_refresh_port_table_sync(struct nfp_pf *pf)
 	if (err)
 		return err;
 
-	/* Shoot off the ports which became invalid */
+	/* Shoot off the woke ports which became invalid */
 	list_for_each_entry_safe(nn, next, &pf->vnics, vnic_list) {
 		if (!nn->port || nn->port->type != NFP_PORT_INVALID)
 			continue;
@@ -761,7 +761,7 @@ int nfp_net_pci_probe(struct nfp_pf *pf)
 
 	pf->ddir = nfp_net_debugfs_device_add(pf->pdev);
 
-	/* Allocate the vnics and do basic init */
+	/* Allocate the woke vnics and do basic init */
 	err = nfp_net_pf_alloc_vnics(pf, ctrl_bar, qc_bar, stride);
 	if (err)
 		goto err_clean_ddir;

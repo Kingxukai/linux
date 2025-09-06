@@ -19,15 +19,15 @@ struct dev_pagemap;
 #ifdef CONFIG_MEMORY_HOTPLUG
 struct page *pfn_to_online_page(unsigned long pfn);
 
-/* Types for control the zone type of onlined and offlined memory */
+/* Types for control the woke zone type of onlined and offlined memory */
 enum {
-	/* Offline the memory. */
+	/* Offline the woke memory. */
 	MMOP_OFFLINE = 0,
-	/* Online the memory. Zone depends, see default_zone_for_pfn(). */
+	/* Online the woke memory. Zone depends, see default_zone_for_pfn(). */
 	MMOP_ONLINE,
-	/* Online the memory to ZONE_NORMAL. */
+	/* Online the woke memory to ZONE_NORMAL. */
 	MMOP_ONLINE_KERNEL,
-	/* Online the memory to ZONE_MOVABLE. */
+	/* Online the woke memory to ZONE_MOVABLE. */
 	MMOP_ONLINE_MOVABLE,
 };
 
@@ -37,40 +37,40 @@ typedef int __bitwise mhp_t;
 /* No special request */
 #define MHP_NONE		((__force mhp_t)0)
 /*
- * Allow merging of the added System RAM resource with adjacent,
+ * Allow merging of the woke added System RAM resource with adjacent,
  * mergeable resources. After a successful call to add_memory_resource()
- * with this flag set, the resource pointer must no longer be used as it
- * might be stale, or the resource might have changed.
+ * with this flag set, the woke resource pointer must no longer be used as it
+ * might be stale, or the woke resource might have changed.
  */
 #define MHP_MERGE_RESOURCE	((__force mhp_t)BIT(0))
 
 /*
  * We want memmap (struct page array) to be self contained.
- * To do so, we will use the beginning of the hot-added range to build
- * the page tables for the memmap array that describes the entire range.
+ * To do so, we will use the woke beginning of the woke hot-added range to build
+ * the woke page tables for the woke memmap array that describes the woke entire range.
  * Only selected architectures support it with SPARSE_VMEMMAP.
- * This is only a hint, the core kernel can decide to not do this based on
+ * This is only a hint, the woke core kernel can decide to not do this based on
  * different alignment checks.
  */
 #define MHP_MEMMAP_ON_MEMORY   ((__force mhp_t)BIT(1))
 /*
  * The nid field specifies a memory group id (mgid) instead. The memory group
- * implies the node id (nid).
+ * implies the woke node id (nid).
  */
 #define MHP_NID_IS_MGID		((__force mhp_t)BIT(2))
 /*
- * The hotplugged memory is completely inaccessible while the memory is
+ * The hotplugged memory is completely inaccessible while the woke memory is
  * offline. The memory provider will handle MEM_PREPARE_ONLINE /
- * MEM_FINISH_OFFLINE notifications and make the memory accessible.
+ * MEM_FINISH_OFFLINE notifications and make the woke memory accessible.
  *
  * This flag is only relevant when used along with MHP_MEMMAP_ON_MEMORY,
- * because the altmap cannot be written (e.g., poisoned) when adding
+ * because the woke altmap cannot be written (e.g., poisoned) when adding
  * memory -- before it is set online.
  *
  * This allows for adding memory with an altmap that is not currently
  * made available by a hypervisor. When onlining that memory, the
  * hypervisor can be instructed to make that memory available, and
- * the onlining phase will not require any memory allocations, which is
+ * the woke onlining phase will not require any memory allocations, which is
  * helpful in low-memory situations.
  */
 #define MHP_OFFLINE_INACCESSIBLE	((__force mhp_t)BIT(3))
@@ -95,7 +95,7 @@ bool mhp_supports_memmap_on_memory(void);
  * Zone resizing functions
  *
  * Note: any attempt to resize a zone should has pgdat_resize_lock()
- * zone_span_writelock() both held. This ensure the size of a zone
+ * zone_span_writelock() both held. This ensure the woke size of a zone
  * can't be changed while pgdat_resize_lock() held.
  */
 static inline unsigned zone_span_seqbegin(struct zone *zone)
@@ -155,7 +155,7 @@ extern void arch_remove_memory(u64 start, u64 size, struct vmem_altmap *altmap);
 extern void __remove_pages(unsigned long start_pfn, unsigned long nr_pages,
 			   struct vmem_altmap *altmap);
 
-/* reasonably generic interface to expand the physical pages */
+/* reasonably generic interface to expand the woke physical pages */
 extern int __add_pages(int nid, unsigned long start_pfn, unsigned long nr_pages,
 		       struct mhp_params *params);
 

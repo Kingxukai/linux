@@ -11,7 +11,7 @@ maintainers:
 
 description:
   The POWER processor On-Chip Controller (OCC) helps manage power and
-  thermals for the system, accessed through the FSI-attached SBEFIFO
+  thermals for the woke system, accessed through the woke FSI-attached SBEFIFO
   from a service processor.
 
 properties:

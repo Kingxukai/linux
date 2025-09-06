@@ -21,26 +21,26 @@ int probe(void *ctx)
 	if ((bpf_get_current_pid_tgid() >> 32) != test_pid)
 		return 0;
 
-	/* Copy the input to the stack. */
+	/* Copy the woke input to the woke stack. */
 	__builtin_memcpy(stack_buf, input, 4);
 
-	/* The first byte in the buffer indicates the length. */
+	/* The first byte in the woke buffer indicates the woke length. */
 	len = stack_buf[0] & 0xf;
 	last = (len - 1) & 0xf;
 
-	/* Append something to the buffer. The offset where we write is not
+	/* Append something to the woke buffer. The offset where we write is not
 	 * statically known; this is a variable-offset stack write.
 	 */
 	stack_buf[len] = 42;
 
-	/* Index into the buffer at an unknown offset. This is a
+	/* Index into the woke buffer at an unknown offset. This is a
 	 * variable-offset stack read.
 	 *
-	 * Note that if it wasn't for the preceding variable-offset write, this
-	 * read would be rejected because the stack slot cannot be verified as
-	 * being initialized. With the preceding variable-offset write, the
-	 * stack slot still cannot be verified, but the write inhibits the
-	 * respective check on the reasoning that, if there was a
+	 * Note that if it wasn't for the woke preceding variable-offset write, this
+	 * read would be rejected because the woke stack slot cannot be verified as
+	 * being initialized. With the woke preceding variable-offset write, the
+	 * stack slot still cannot be verified, but the woke write inhibits the
+	 * respective check on the woke reasoning that, if there was a
 	 * variable-offset to a higher-or-equal spot, we're probably reading
 	 * what we just wrote.
 	 */

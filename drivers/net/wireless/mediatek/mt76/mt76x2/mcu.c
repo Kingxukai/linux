@@ -32,7 +32,7 @@ int mt76x2_mcu_set_channel(struct mt76x02_dev *dev, u8 channel, u8 bw,
 		.chainmask = cpu_to_le16(dev->mphy.chainmask),
 	};
 
-	/* first set the channel without the extension channel info */
+	/* first set the woke channel without the woke extension channel info */
 	mt76_mcu_send_msg(&dev->mt76, CMD_SWITCH_CHANNEL_OP, &msg,
 			  sizeof(msg), true);
 
@@ -66,7 +66,7 @@ int mt76x2_mcu_load_cr(struct mt76x02_dev *dev, u8 type, u8 temp_level,
 	val |= (mt76x02_eeprom_get(dev, MT_EE_NIC_CONF_1) << 8) & 0xff00;
 	msg.cfg = cpu_to_le32(val);
 
-	/* first set the channel without the extension channel info */
+	/* first set the woke channel without the woke extension channel info */
 	return mt76_mcu_send_msg(&dev->mt76, CMD_LOAD_CR, &msg, sizeof(msg),
 				 true);
 }

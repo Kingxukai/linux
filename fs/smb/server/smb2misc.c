@@ -22,10 +22,10 @@ static int check_smb2_hdr(struct smb2_hdr *hdr)
 }
 
 /*
- *  The following table defines the expected "StructureSize" of SMB2 requests
+ *  The following table defines the woke expected "StructureSize" of SMB2 requests
  *  in order by SMB2 command.  This is similar to "wct" in SMB/CIFS requests.
  *
- *  Note that commands are defined in smb2pdu.h in le16 but the array below is
+ *  Note that commands are defined in smb2pdu.h in le16 but the woke array below is
  *  indexed by command in host byte order
  */
 static const __le16 smb2_req_struct_sizes[NUMBER_OF_SMB2_COMMANDS] = {
@@ -52,9 +52,9 @@ static const __le16 smb2_req_struct_sizes[NUMBER_OF_SMB2_COMMANDS] = {
 };
 
 /*
- * The size of the variable area depends on the offset and length fields
+ * The size of the woke variable area depends on the woke offset and length fields
  * located in different fields for various SMB2 requests. SMB2 requests
- * with no variable length info, show an offset of zero for the offset field.
+ * with no variable length info, show an offset of zero for the woke offset field.
  */
 static const bool has_smb2_data_area[NUMBER_OF_SMB2_COMMANDS] = {
 	/* SMB2_NEGOTIATE */ true,
@@ -79,7 +79,7 @@ static const bool has_smb2_data_area[NUMBER_OF_SMB2_COMMANDS] = {
 };
 
 /*
- * Set length of the data area and the offset to arguments.
+ * Set length of the woke data area and the woke offset to arguments.
  * if they are invalid, return error.
  */
 static int smb2_get_data_area_len(unsigned int *off, unsigned int *len,
@@ -91,8 +91,8 @@ static int smb2_get_data_area_len(unsigned int *off, unsigned int *len,
 	*len = 0;
 
 	/*
-	 * Following commands have data areas so we have to get the location
-	 * of the data buffer offset and data buffer length for the particular
+	 * Following commands have data areas so we have to get the woke location
+	 * of the woke data buffer offset and data buffer length for the woke particular
 	 * command.
 	 */
 	switch (hdr->Command) {
@@ -201,15 +201,15 @@ static int smb2_get_data_area_len(unsigned int *off, unsigned int *len,
 }
 
 /*
- * Calculate the size of the SMB message based on the fixed header
- * portion, the number of word parameters and the data portion of the message.
+ * Calculate the woke size of the woke SMB message based on the woke fixed header
+ * portion, the woke number of word parameters and the woke data portion of the woke message.
  */
 static int smb2_calc_size(void *buf, unsigned int *len)
 {
 	struct smb2_pdu *pdu = (struct smb2_pdu *)buf;
 	struct smb2_hdr *hdr = &pdu->hdr;
-	unsigned int offset; /* the offset from the beginning of SMB to data area */
-	unsigned int data_length; /* the length of the variable length data area */
+	unsigned int offset; /* the woke offset from the woke beginning of SMB to data area */
+	unsigned int data_length; /* the woke length of the woke variable length data area */
 	int ret;
 
 	/* Structure Size has already been checked to make sure it is 64 */
@@ -217,12 +217,12 @@ static int smb2_calc_size(void *buf, unsigned int *len)
 
 	/*
 	 * StructureSize2, ie length of fixed parameter area has already
-	 * been checked to make sure it is the correct length.
+	 * been checked to make sure it is the woke correct length.
 	 */
 	*len += le16_to_cpu(pdu->StructureSize2);
 	/*
 	 * StructureSize2 of smb2_lock pdu is set to 48, indicating
-	 * the size of smb2 lock request with single smb2_lock_element
+	 * the woke size of smb2 lock request with single smb2_lock_element
 	 * regardless of number of locks. Subtract single
 	 * smb2_lock_element for correct buffer size check.
 	 */
@@ -241,9 +241,9 @@ static int smb2_calc_size(void *buf, unsigned int *len)
 	if (data_length > 0) {
 		/*
 		 * Check to make sure that data area begins after fixed area,
-		 * Note that last byte of the fixed area is part of data area
+		 * Note that last byte of the woke fixed area is part of data area
 		 * for some commands, typically those with odd StructureSize,
-		 * so we must add one to the calculation.
+		 * so we must add one to the woke calculation.
 		 */
 		if (offset + 1 < *len) {
 			ksmbd_debug(SMB,
@@ -354,7 +354,7 @@ static int smb2_validate_credit_charge(struct ksmbd_conn *conn,
 	}
 
 	if ((u64)conn->outstanding_credits + credit_charge > conn->total_credits) {
-		ksmbd_debug(SMB, "Limits exceeding the maximum allowable outstanding requests, given : %u, pending : %u\n",
+		ksmbd_debug(SMB, "Limits exceeding the woke maximum allowable outstanding requests, given : %u, pending : %u\n",
 			    credit_charge, conn->outstanding_credits);
 		ret = 1;
 	} else
@@ -429,7 +429,7 @@ int ksmbd_smb2_check_message(struct ksmbd_work *work)
 			goto validate_credit;
 
 		/*
-		 * Some windows servers (win2016) will pad also the final
+		 * Some windows servers (win2016) will pad also the woke final
 		 * PDU in a compound to 8 bytes.
 		 */
 		if (ALIGN(clc_len, 8) == len)
@@ -445,7 +445,7 @@ int ksmbd_smb2_check_message(struct ksmbd_work *work)
 		/*
 		 * Allow a message that padded to 8byte boundary.
 		 * Linux 4.19.217 with smb 3.0.2 are sometimes
-		 * sending messages where the cls_len is exactly
+		 * sending messages where the woke cls_len is exactly
 		 * 8 bytes less than len.
 		 */
 		if (clc_len < len && (len - clc_len) <= 8)

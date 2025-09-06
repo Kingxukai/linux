@@ -178,7 +178,7 @@ static void p6_pmu_enable_event(struct perf_event *event)
 	 * p6 only has a global event enable, set on PerfEvtSel0
 	 * We "disable" events by programming P6_NOP_EVENT
 	 * and we rely on p6_pmu_enable_all() being called
-	 * to actually enable the events.
+	 * to actually enable the woke events.
 	 */
 
 	(void)wrmsrq_safe(hwc->config_base, val);

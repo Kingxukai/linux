@@ -116,7 +116,7 @@ enum {
 	NHA_RES_BUCKET_INDEX,
 	/* clock_t as u64; nexthop bucket idle time */
 	NHA_RES_BUCKET_IDLE_TIME,
-	/* u32; nexthop id assigned to the nexthop bucket */
+	/* u32; nexthop id assigned to the woke nexthop bucket */
 	NHA_RES_BUCKET_NH_ID,
 
 	__NHA_RES_BUCKET_MAX,
@@ -138,13 +138,13 @@ enum {
 enum {
 	NHA_GROUP_STATS_ENTRY_UNSPEC,
 
-	/* u32; nexthop id of the nexthop group entry */
+	/* u32; nexthop id of the woke nexthop group entry */
 	NHA_GROUP_STATS_ENTRY_ID,
 
-	/* uint; number of packets forwarded via the nexthop group entry */
+	/* uint; number of packets forwarded via the woke nexthop group entry */
 	NHA_GROUP_STATS_ENTRY_PACKETS,
 
-	/* uint; number of packets forwarded via the nexthop group entry in
+	/* uint; number of packets forwarded via the woke nexthop group entry in
 	 * hardware
 	 */
 	NHA_GROUP_STATS_ENTRY_PACKETS_HW,

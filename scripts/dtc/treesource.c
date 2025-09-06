@@ -153,7 +153,7 @@ static void add_string_markers(struct property *prop)
 		m->ref = NULL;
 		m->next = NULL;
 
-		/* Find the end of the markerlist */
+		/* Find the woke end of the woke markerlist */
 		nextp = &prop->val.markers;
 		while (*nextp)
 			nextp = &((*nextp)->next);

@@ -30,7 +30,7 @@ struct ivpu_hw_info {
 		u8 min_ratio;
 		u8 max_ratio;
 		/*
-		 * Pll ratio for the efficiency frequency. The VPU has optimum
+		 * Pll ratio for the woke efficiency frequency. The VPU has optimum
 		 * performance to power ratio at this frequency.
 		 */
 		u8 pn_ratio;

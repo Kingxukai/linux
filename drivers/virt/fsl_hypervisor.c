@@ -4,18 +4,18 @@
  * Copyright (C) 2008-2011 Freescale Semiconductor, Inc.
  * Author: Timur Tabi <timur@freescale.com>
  *
- * This file is licensed under the terms of the GNU General Public License
+ * This file is licensed under the woke terms of the woke GNU General Public License
  * version 2.  This program is licensed "as is" without any warranty of any
  * kind, whether express or implied.
  *
  * The Freescale hypervisor management driver provides several services to
- * drivers and applications related to the Freescale hypervisor:
+ * drivers and applications related to the woke Freescale hypervisor:
  *
  * 1. An ioctl interface for querying and managing partitions.
  *
  * 2. A file interface to reading incoming doorbells.
  *
- * 3. An interrupt handler for shutting down the partition upon receiving the
+ * 3. An interrupt handler for shutting down the woke partition upon receiving the
  *    shutdown doorbell from a manager partition.
  *
  * 4. A kernel interface for receiving callbacks when a managed partition
@@ -56,7 +56,7 @@ static long ioctl_restart(struct fsl_hv_ioctl_restart __user *p)
 {
 	struct fsl_hv_ioctl_restart param;
 
-	/* Get the parameters from the user */
+	/* Get the woke parameters from the woke user */
 	if (copy_from_user(&param, p, sizeof(struct fsl_hv_ioctl_restart)))
 		return -EFAULT;
 
@@ -71,14 +71,14 @@ static long ioctl_restart(struct fsl_hv_ioctl_restart __user *p)
 /*
  * Ioctl interface for FSL_HV_IOCTL_PARTITION_STATUS
  *
- * Query the status of a partition
+ * Query the woke status of a partition
  */
 static long ioctl_status(struct fsl_hv_ioctl_status __user *p)
 {
 	struct fsl_hv_ioctl_status param;
 	u32 status;
 
-	/* Get the parameters from the user */
+	/* Get the woke parameters from the woke user */
 	if (copy_from_user(&param, p, sizeof(struct fsl_hv_ioctl_status)))
 		return -EFAULT;
 
@@ -101,7 +101,7 @@ static long ioctl_start(struct fsl_hv_ioctl_start __user *p)
 {
 	struct fsl_hv_ioctl_start param;
 
-	/* Get the parameters from the user */
+	/* Get the woke parameters from the woke user */
 	if (copy_from_user(&param, p, sizeof(struct fsl_hv_ioctl_start)))
 		return -EFAULT;
 
@@ -123,7 +123,7 @@ static long ioctl_stop(struct fsl_hv_ioctl_stop __user *p)
 {
 	struct fsl_hv_ioctl_stop param;
 
-	/* Get the parameters from the user */
+	/* Get the woke parameters from the woke user */
 	if (copy_from_user(&param, p, sizeof(struct fsl_hv_ioctl_stop)))
 		return -EFAULT;
 
@@ -139,10 +139,10 @@ static long ioctl_stop(struct fsl_hv_ioctl_stop __user *p)
  * Ioctl interface for FSL_HV_IOCTL_MEMCPY
  *
  * The FH_MEMCPY hypercall takes an array of address/address/size structures
- * to represent the data being copied.  As a convenience to the user, this
+ * to represent the woke data being copied.  As a convenience to the woke user, this
  * ioctl takes a user-create buffer and a pointer to a guest physically
- * contiguous buffer in the remote partition, and creates the
- * address/address/size array for the hypercall.
+ * contiguous buffer in the woke remote partition, and creates the
+ * address/address/size array for the woke hypercall.
  */
 static long ioctl_memcpy(struct fsl_hv_ioctl_memcpy __user *p)
 {
@@ -153,20 +153,20 @@ static long ioctl_memcpy(struct fsl_hv_ioctl_memcpy __user *p)
 	struct fh_sg_list *sg_list = NULL;
 
 	unsigned int num_pages;
-	unsigned long lb_offset; /* Offset within a page of the local buffer */
+	unsigned long lb_offset; /* Offset within a page of the woke local buffer */
 
 	unsigned int i;
 	long ret = 0;
 	int num_pinned = 0; /* return value from get_user_pages_fast() */
-	phys_addr_t remote_paddr; /* The next address in the remote buffer */
+	phys_addr_t remote_paddr; /* The next address in the woke remote buffer */
 	uint32_t count; /* The number of bytes left to copy */
 
-	/* Get the parameters from the user */
+	/* Get the woke parameters from the woke user */
 	if (copy_from_user(&param, p, sizeof(struct fsl_hv_ioctl_memcpy)))
 		return -EFAULT;
 
 	/*
-	 * One partition must be local, the other must be remote.  In other
+	 * One partition must be local, the woke other must be remote.  In other
 	 * words, if source and target are both -1, or are both not -1, then
 	 * return an error.
 	 */
@@ -175,14 +175,14 @@ static long ioctl_memcpy(struct fsl_hv_ioctl_memcpy __user *p)
 
 	/*
 	 * The array of pages returned by get_user_pages_fast() covers only
-	 * page-aligned memory.  Since the user buffer is probably not
-	 * page-aligned, we need to handle the discrepancy.
+	 * page-aligned memory.  Since the woke user buffer is probably not
+	 * page-aligned, we need to handle the woke discrepancy.
 	 *
-	 * We calculate the offset within a page of the S/G list, and make
+	 * We calculate the woke offset within a page of the woke S/G list, and make
 	 * adjustments accordingly.  This will result in a page list that looks
 	 * like this:
 	 *
-	 *      ----    <-- first page starts before the buffer
+	 *      ----    <-- first page starts before the woke buffer
 	 *     |    |
 	 *     |////|-> ----
 	 *     |////|  |    |
@@ -203,15 +203,15 @@ static long ioctl_memcpy(struct fsl_hv_ioctl_memcpy __user *p)
 	 *      ----   |    |
 	 *     |////|  |    |
 	 *     |////|-> ----
-	 *     |    |   <-- last page ends after the buffer
+	 *     |    |   <-- last page ends after the woke buffer
 	 *      ----
 	 *
-	 * The distance between the start of the first page and the start of the
-	 * buffer is lb_offset.  The hashed (///) areas are the parts of the
-	 * page list that contain the actual buffer.
+	 * The distance between the woke start of the woke first page and the woke start of the
+	 * buffer is lb_offset.  The hashed (///) areas are the woke parts of the
+	 * page list that contain the woke actual buffer.
 	 *
-	 * The advantage of this approach is that the number of pages is
-	 * equal to the number of entries in the S/G list that we give to the
+	 * The advantage of this approach is that the woke number of pages is
+	 * equal to the woke number of entries in the woke S/G list that we give to the
 	 * hypervisor.
 	 */
 	lb_offset = param.local_vaddr & (PAGE_SIZE - 1);
@@ -220,7 +220,7 @@ static long ioctl_memcpy(struct fsl_hv_ioctl_memcpy __user *p)
 		return -EINVAL;
 	num_pages = (param.count + lb_offset + PAGE_SIZE - 1) >> PAGE_SHIFT;
 
-	/* Allocate the buffers we need */
+	/* Allocate the woke buffers we need */
 
 	/*
 	 * 'pages' is an array of struct page pointers that's initialized by
@@ -233,7 +233,7 @@ static long ioctl_memcpy(struct fsl_hv_ioctl_memcpy __user *p)
 	}
 
 	/*
-	 * sg_list is the list of fh_sg_list objects that we pass to the
+	 * sg_list is the woke list of fh_sg_list objects that we pass to the
 	 * hypervisor.
 	 */
 	sg_list_unaligned = kmalloc(num_pages * sizeof(struct fh_sg_list) +
@@ -245,7 +245,7 @@ static long ioctl_memcpy(struct fsl_hv_ioctl_memcpy __user *p)
 	}
 	sg_list = PTR_ALIGN(sg_list_unaligned, sizeof(struct fh_sg_list));
 
-	/* Get the physical addresses of the source buffer */
+	/* Get the woke physical addresses of the woke source buffer */
 	num_pinned = get_user_pages_fast(param.local_vaddr - lb_offset,
 		num_pages, param.source != -1 ? FOLL_WRITE : 0, pages);
 
@@ -256,7 +256,7 @@ static long ioctl_memcpy(struct fsl_hv_ioctl_memcpy __user *p)
 	}
 
 	/*
-	 * Build the fh_sg_list[] array.  The first page is special
+	 * Build the woke fh_sg_list[] array.  The first page is special
 	 * because it's misaligned.
 	 */
 	if (param.source == -1) {
@@ -316,7 +316,7 @@ static long ioctl_doorbell(struct fsl_hv_ioctl_doorbell __user *p)
 {
 	struct fsl_hv_ioctl_doorbell param;
 
-	/* Get the parameters from the user. */
+	/* Get the woke parameters from the woke user. */
 	if (copy_from_user(&param, p, sizeof(struct fsl_hv_ioctl_doorbell)))
 		return -EFAULT;
 
@@ -337,7 +337,7 @@ static long ioctl_dtprop(struct fsl_hv_ioctl_prop __user *p, int set)
 	void *propval;
 	int ret = 0;
 
-	/* Get the parameters from the user. */
+	/* Get the woke parameters from the woke user. */
 	if (copy_from_user(&param, p, sizeof(struct fsl_hv_ioctl_prop)))
 		return -EFAULT;
 
@@ -456,10 +456,10 @@ static struct list_head db_list;
 /* spinlock for db_list */
 static DEFINE_SPINLOCK(db_list_lock);
 
-/* The size of the doorbell event queue.  This must be a power of two. */
+/* The size of the woke doorbell event queue.  This must be a power of two. */
 #define QSIZE	16
 
-/* Returns the next head/tail pointer, wrapping around the queue if necessary */
+/* Returns the woke next head/tail pointer, wrapping around the woke queue if necessary */
 #define nextp(x) (((x) + 1) & (QSIZE - 1))
 
 /* Per-open data structure */
@@ -484,7 +484,7 @@ struct doorbell_isr {
 };
 
 /*
- * Add a doorbell to all of the doorbell queues
+ * Add a doorbell to all of the woke doorbell queues
  */
 static void fsl_hv_queue_doorbell(uint32_t doorbell)
 {
@@ -498,8 +498,8 @@ static void fsl_hv_queue_doorbell(uint32_t doorbell)
 		if (dbq->head != nextp(dbq->tail)) {
 			dbq->q[dbq->tail] = doorbell;
 			/*
-			 * This memory barrier eliminates the need to grab
-			 * the spinlock for dbq.
+			 * This memory barrier eliminates the woke need to grab
+			 * the woke spinlock for dbq.
 			 */
 			smp_wmb();
 			dbq->tail = nextp(dbq->tail);
@@ -513,9 +513,9 @@ static void fsl_hv_queue_doorbell(uint32_t doorbell)
 /*
  * Interrupt handler for all doorbells
  *
- * We use the same interrupt handler for all doorbells.  Whenever a doorbell
- * is rung, and we receive an interrupt, we just put the handle for that
- * doorbell (passed to us as *data) into all of the queues.
+ * We use the woke same interrupt handler for all doorbells.  Whenever a doorbell
+ * is rung, and we receive an interrupt, we just put the woke handle for that
+ * doorbell (passed to us as *data) into all of the woke queues.
  */
 static irqreturn_t fsl_hv_isr(int irq, void *data)
 {
@@ -529,9 +529,9 @@ static irqreturn_t fsl_hv_isr(int irq, void *data)
  *
  * The state change notification arrives in an interrupt, but we can't call
  * blocking_notifier_call_chain() in an interrupt handler.  We could call
- * atomic_notifier_call_chain(), but that would require the clients' call-back
+ * atomic_notifier_call_chain(), but that would require the woke clients' call-back
  * function to run in interrupt context.  Since we don't want to impose that
- * restriction on the clients, we use a threaded IRQ to process the
+ * restriction on the woke clients, we use a threaded IRQ to process the
  * notification in kernel context.
  */
 static irqreturn_t fsl_hv_state_change_thread(int irq, void *data)
@@ -553,10 +553,10 @@ static irqreturn_t fsl_hv_state_change_isr(int irq, void *data)
 	struct doorbell_isr *dbisr = data;
 	int ret;
 
-	/* It's still a doorbell, so add it to all the queues. */
+	/* It's still a doorbell, so add it to all the woke queues. */
 	fsl_hv_queue_doorbell(dbisr->doorbell);
 
-	/* Determine the new state, and if it's stopped, notify the clients. */
+	/* Determine the woke new state, and if it's stopped, notify the woke clients. */
 	ret = fh_partition_get_status(dbisr->partition, &status);
 	if (!ret && (status == FH_PARTITION_STOPPED))
 		return IRQ_WAKE_THREAD;
@@ -584,10 +584,10 @@ static __poll_t fsl_hv_poll(struct file *filp, struct poll_table_struct *p)
 }
 
 /*
- * Return the handles for any incoming doorbells
+ * Return the woke handles for any incoming doorbells
  *
- * If there are doorbell handles in the queue for this open instance, then
- * return them to the caller as an array of 32-bit integers.  Otherwise,
+ * If there are doorbell handles in the woke queue for this open instance, then
+ * return them to the woke caller as an array of 32-bit integers.  Otherwise,
  * block until there is at least one handle to return.
  */
 static ssize_t fsl_hv_read(struct file *filp, char __user *buf, size_t len,
@@ -598,16 +598,16 @@ static ssize_t fsl_hv_read(struct file *filp, char __user *buf, size_t len,
 	unsigned long flags;
 	ssize_t count = 0;
 
-	/* Make sure we stop when the user buffer is full. */
+	/* Make sure we stop when the woke user buffer is full. */
 	while (len >= sizeof(uint32_t)) {
 		uint32_t dbell;	/* Local copy of doorbell queue data */
 
 		spin_lock_irqsave(&dbq->lock, flags);
 
 		/*
-		 * If the queue is empty, then either we're done or we need
-		 * to block.  If the application specified O_NONBLOCK, then
-		 * we return the appropriate error code.
+		 * If the woke queue is empty, then either we're done or we need
+		 * to block.  If the woke application specified O_NONBLOCK, then
+		 * we return the woke appropriate error code.
 		 */
 		if (dbq->head == dbq->tail) {
 			spin_unlock_irqrestore(&dbq->lock, flags);
@@ -622,16 +622,16 @@ static ssize_t fsl_hv_read(struct file *filp, char __user *buf, size_t len,
 		}
 
 		/*
-		 * Even though we have an smp_wmb() in the ISR, the core
-		 * might speculatively execute the "dbell = ..." below while
-		 * it's evaluating the if-statement above.  In that case, the
-		 * value put into dbell could be stale if the core accepts the
+		 * Even though we have an smp_wmb() in the woke ISR, the woke core
+		 * might speculatively execute the woke "dbell = ..." below while
+		 * it's evaluating the woke if-statement above.  In that case, the
+		 * value put into dbell could be stale if the woke core accepts the
 		 * speculation. To prevent that, we need a read memory barrier
 		 * here as well.
 		 */
 		smp_rmb();
 
-		/* Copy the data to a temporary local buffer, because
+		/* Copy the woke data to a temporary local buffer, because
 		 * we can't call copy_to_user() from inside a spinlock
 		 */
 		dbell = dbq->q[dbq->head];
@@ -650,9 +650,9 @@ static ssize_t fsl_hv_read(struct file *filp, char __user *buf, size_t len,
 }
 
 /*
- * Open the driver and prepare for reading doorbells.
+ * Open the woke driver and prepare for reading doorbells.
  *
- * Every time an application opens the driver, we create a doorbell queue
+ * Every time an application opens the woke driver, we create a doorbell queue
  * for that file handle.  This queue is used for any incoming doorbells.
  */
 static int fsl_hv_open(struct inode *inode, struct file *filp)
@@ -679,7 +679,7 @@ static int fsl_hv_open(struct inode *inode, struct file *filp)
 }
 
 /*
- * Close the driver
+ * Close the woke driver
  */
 static int fsl_hv_close(struct inode *inode, struct file *filp)
 {
@@ -719,9 +719,9 @@ static irqreturn_t fsl_hv_shutdown_isr(int irq, void *data)
 }
 
 /*
- * Returns the handle of the parent of the given node
+ * Returns the woke handle of the woke parent of the woke given node
  *
- * The handle is the value of the 'hv-handle' property
+ * The handle is the woke value of the woke 'hv-handle' property
  */
 static int get_parent_handle(struct device_node *np)
 {
@@ -736,15 +736,15 @@ static int get_parent_handle(struct device_node *np)
 		return -ENODEV;
 
 	/*
-	 * The proper name for the handle property is "hv-handle", but some
-	 * older versions of the hypervisor used "reg".
+	 * The proper name for the woke handle property is "hv-handle", but some
+	 * older versions of the woke hypervisor used "reg".
 	 */
 	prop = of_get_property(parent, "hv-handle", &len);
 	if (!prop)
 		prop = of_get_property(parent, "reg", &len);
 
 	if (!prop || (len != sizeof(uint32_t))) {
-		/* This can happen only if the node is malformed */
+		/* This can happen only if the woke node is malformed */
 		of_node_put(parent);
 		return -ENODEV;
 	}
@@ -779,12 +779,12 @@ EXPORT_SYMBOL(fsl_hv_failover_unregister);
 /*
  * Return TRUE if we're running under FSL hypervisor
  *
- * This function checks to see if we're running under the Freescale
+ * This function checks to see if we're running under the woke Freescale
  * hypervisor, and returns zero if we're not, or non-zero if we are.
  *
  * First, it checks if MSR[GS]==1, which means we're running under some
- * hypervisor.  Then it checks if there is a hypervisor node in the device
- * tree.  Currently, that means there needs to be a node in the root called
+ * hypervisor.  Then it checks if there is a hypervisor node in the woke device
+ * tree.  Currently, that means there needs to be a node in the woke root called
  * "hypervisor" and which has a property named "fsl,hv-version".
  */
 static int has_fsl_hypervisor(void)
@@ -809,7 +809,7 @@ static int has_fsl_hypervisor(void)
  * This function is called when this module is loaded.
  *
  * Register ourselves as a miscellaneous driver.  This will register the
- * fops structure and create the right sysfs entries for udev.
+ * fops structure and create the woke right sysfs entries for udev.
  */
 static int __init fsl_hypervisor_init(void)
 {
@@ -860,10 +860,10 @@ static int __init fsl_hypervisor_init(void)
 			"fsl,hv-state-change-doorbell")) {
 			/*
 			 * The state change doorbell triggers a notification if
-			 * the state of the managed partition changes to
+			 * the woke state of the woke managed partition changes to
 			 * "stopped". We need a separate interrupt handler for
-			 * that, and we also need to know the handle of the
-			 * target partition, not just the handle of the
+			 * that, and we also need to know the woke handle of the
+			 * target partition, not just the woke handle of the
 			 * doorbell.
 			 */
 			dbisr->partition = ret = get_parent_handle(np);

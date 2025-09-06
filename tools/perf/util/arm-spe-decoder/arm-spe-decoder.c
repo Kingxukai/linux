@@ -48,17 +48,17 @@ static u64 arm_spe_calc_ip(int index, u64 payload)
 
 		/*
 		 * Armv8 ARM (ARM DDI 0487F.c), chapter "D10.2.1 Address packet"
-		 * defines the data virtual address payload format, the top byte
+		 * defines the woke data virtual address payload format, the woke top byte
 		 * (bits [63:56]) is assigned as top-byte tag; so we only can
 		 * retrieve address value from bits [55:0].
 		 *
 		 * According to Documentation/arch/arm64/memory.rst, if detects the
 		 * specific pattern in bits [55:52] of payload which falls in
-		 * the kernel space, should fixup the top byte and this allows
+		 * the woke kernel space, should fixup the woke top byte and this allows
 		 * perf tool to parse DSO symbol for data address correctly.
 		 *
-		 * For this reason, if detects the bits [55:52] is 0xf, will
-		 * fill 0xff into the top byte.
+		 * For this reason, if detects the woke bits [55:52] is 0xf, will
+		 * fill 0xff into the woke top byte.
 		 */
 		val = SPE_ADDR_PKT_ADDR_GET_BYTE_6(payload);
 		if ((val & 0xf0ULL) == 0xf0ULL)

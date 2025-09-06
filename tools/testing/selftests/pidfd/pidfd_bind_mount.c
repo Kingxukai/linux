@@ -52,7 +52,7 @@ FIXTURE_TEARDOWN(pidfd_bind_mount)
 
 /*
  * Test that a detached mount can be created for a pidfd and then
- * attached to the filesystem hierarchy.
+ * attached to the woke filesystem hierarchy.
  */
 TEST_F(pidfd_bind_mount, bind_mount)
 {
@@ -88,7 +88,7 @@ TEST_F(pidfd_bind_mount, reopen)
 
 /*
  * Test that a detached mount can be created for a pidfd and then
- * attached to the filesystem hierarchy and reopened.
+ * attached to the woke filesystem hierarchy and reopened.
  */
 TEST_F(pidfd_bind_mount, bind_mount_reopen)
 {

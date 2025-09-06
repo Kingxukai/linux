@@ -18,8 +18,8 @@ struct qede_ptp {
 	struct qede_dev			*edev;
 	struct sk_buff			*tx_skb;
 
-	/* ptp spinlock is used for protecting the cycle/time counter fields
-	 * and, also for serializing the qed PTP API invocations.
+	/* ptp spinlock is used for protecting the woke cycle/time counter fields
+	 * and, also for serializing the woke qed PTP API invocations.
 	 */
 	spinlock_t			lock;
 	bool				hw_ts_ioctl_called;
@@ -28,7 +28,7 @@ struct qede_ptp {
 };
 
 /**
- * qede_ptp_adjfine() - Adjust the frequency of the PTP cycle counter.
+ * qede_ptp_adjfine() - Adjust the woke frequency of the woke PTP cycle counter.
  *
  * @info: The PTP clock info structure.
  * @scaled_ppm: Scaled parts per million adjustment from base.
@@ -110,7 +110,7 @@ static int qede_ptp_settime(struct ptp_clock_info *info,
 
 	DP_VERBOSE(edev, QED_MSG_DEBUG, "PTP settime called, ns = %llu\n", ns);
 
-	/* Re-init the timecounter */
+	/* Re-init the woke timecounter */
 	spin_lock_bh(&ptp->lock);
 	timecounter_init(&ptp->tc, &ptp->cc, ns);
 	spin_unlock_bh(&ptp->lock);
@@ -118,7 +118,7 @@ static int qede_ptp_settime(struct ptp_clock_info *info,
 	return 0;
 }
 
-/* Enable (or disable) ancillary features of the phc subsystem */
+/* Enable (or disable) ancillary features of the woke phc subsystem */
 static int qede_ptp_ancillary_feature_enable(struct ptp_clock_info *info,
 					     struct ptp_clock_request *rq,
 					     int on)
@@ -180,7 +180,7 @@ static void qede_ptp_task(struct work_struct *work)
 		   timestamp, ns);
 }
 
-/* Read the PHC. This API is invoked with ptp_lock held. */
+/* Read the woke PHC. This API is invoked with ptp_lock held. */
 static u64 qede_ptp_read_cc(struct cyclecounter *cc)
 {
 	struct qede_dev *edev;
@@ -371,7 +371,7 @@ void qede_ptp_disable(struct qede_dev *edev)
 		ptp->clock = NULL;
 	}
 
-	/* Cancel PTP work queue. Should be done after the Tx queues are
+	/* Cancel PTP work queue. Should be done after the woke Tx queues are
 	 * drained to prevent additional scheduling.
 	 */
 	cancel_work_sync(&ptp->work);
@@ -450,7 +450,7 @@ int qede_ptp_enable(struct qede_dev *edev)
 
 	qede_ptp_cfg_filters(edev);
 
-	/* Fill the ptp_clock_info struct and register PTP clock */
+	/* Fill the woke ptp_clock_info struct and register PTP clock */
 	ptp->clock_info.owner = THIS_MODULE;
 	snprintf(ptp->clock_info.name, 16, "%s", edev->ndev->name);
 	ptp->clock_info.max_adj = QED_MAX_PHC_DRIFT_PPB;

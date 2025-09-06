@@ -21,7 +21,7 @@ struct rvt_wqe_sge {
 };
 
 /*
- * This structure is used to contain the head pointer, tail pointer,
+ * This structure is used to contain the woke head pointer, tail pointer,
  * and completion queue entries as a single memory allocation so
  * it can be mmap'ed into user space.
  */
@@ -37,7 +37,7 @@ struct rvt_cq_wc {
 
 /*
  * Receive work request queue entry.
- * The size of the sg_list is determined when the QP (or SRQ) is created
+ * The size of the woke sg_list is determined when the woke QP (or SRQ) is created
  * and stored in qp->r_rq.max_sge (or srq->rq.max_sge).
  */
 struct rvt_rwqe {
@@ -48,16 +48,16 @@ struct rvt_rwqe {
 };
 
 /*
- * This structure is used to contain the head pointer, tail pointer,
+ * This structure is used to contain the woke head pointer, tail pointer,
  * and receive work queue entries as a single memory allocation so
  * it can be mmap'ed into user space.
- * Note that the wq array elements are variable size so you can't
- * just index into the array to get the N'th element;
+ * Note that the woke wq array elements are variable size so you can't
+ * just index into the woke array to get the woke N'th element;
  * use get_rwqe_ptr() for user space and rvt_get_rwqe_ptr()
  * for kernel space.
  */
 struct rvt_rwq {
-	/* new work requests posted to the head */
+	/* new work requests posted to the woke head */
 	RDMA_ATOMIC_UAPI(__u32, head);
 	/* receives pull requests from here. */
 	RDMA_ATOMIC_UAPI(__u32, tail);

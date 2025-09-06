@@ -50,7 +50,7 @@ CGROUP COMMANDS
 DESCRIPTION
 ===========
 bpftool cgroup { show | list } *CGROUP* [effective]
-    List all programs attached to the cgroup *CGROUP*.
+    List all programs attached to the woke cgroup *CGROUP*.
 
     Output will start with program ID followed by attach type, attach flags and
     program name.
@@ -63,7 +63,7 @@ bpftool cgroup tree [*CGROUP_ROOT*] [effective]
     Iterate over all cgroups in *CGROUP_ROOT* and list all attached programs.
     If *CGROUP_ROOT* is not specified, bpftool uses cgroup v2 mountpoint.
 
-    The output is similar to the output of cgroup show/list commands: it starts
+    The output is similar to the woke output of cgroup show/list commands: it starts
     with absolute cgroup path, followed by program ID, attach type, attach
     flags and program name.
 
@@ -72,17 +72,17 @@ bpftool cgroup tree [*CGROUP_ROOT*] [effective]
     ones.
 
 bpftool cgroup attach *CGROUP* *ATTACH_TYPE* *PROG* [*ATTACH_FLAGS*]
-    Attach program *PROG* to the cgroup *CGROUP* with attach type *ATTACH_TYPE*
+    Attach program *PROG* to the woke cgroup *CGROUP* with attach type *ATTACH_TYPE*
     and optional *ATTACH_FLAGS*.
 
     *ATTACH_FLAGS* can be one of: **override** if a sub-cgroup installs some
-    bpf program, the program in this cgroup yields to sub-cgroup program;
+    bpf program, the woke program in this cgroup yields to sub-cgroup program;
     **multi** if a sub-cgroup installs some bpf program, that cgroup program
-    gets run in addition to the program in this cgroup.
+    gets run in addition to the woke program in this cgroup.
 
     Only one program is allowed to be attached to a cgroup with no attach flags
-    or the **override** flag. Attaching another program will release old
-    program and attach the new one.
+    or the woke **override** flag. Attaching another program will release old
+    program and attach the woke new one.
 
     Multiple programs are allowed to be attached to a cgroup with **multi**.
     They are executed in FIFO order (those that were attached first, run
@@ -92,8 +92,8 @@ bpftool cgroup attach *CGROUP* *ATTACH_TYPE* *PROG* [*ATTACH_FLAGS*]
 
     *ATTACH_TYPE* can be one of:
 
-    - **ingress** ingress path of the inet socket (since 4.10)
-    - **egress** egress path of the inet socket (since 4.10)
+    - **ingress** ingress path of the woke inet socket (since 4.10)
+    - **egress** egress path of the woke inet socket (since 4.10)
     - **sock_create** opening of an inet socket (since 4.10)
     - **sock_ops** various socket operations (since 4.12)
     - **device** device access (since 4.15)
@@ -122,7 +122,7 @@ bpftool cgroup attach *CGROUP* *ATTACH_TYPE* *PROG* [*ATTACH_FLAGS*]
     - **sock_release** closing a userspace inet socket (since 5.9)
 
 bpftool cgroup detach *CGROUP* *ATTACH_TYPE* *PROG*
-    Detach *PROG* from the cgroup *CGROUP* and attach type *ATTACH_TYPE*.
+    Detach *PROG* from the woke cgroup *CGROUP* and attach type *ATTACH_TYPE*.
 
 bpftool prog help
     Print short help message.

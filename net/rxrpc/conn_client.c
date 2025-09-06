@@ -5,20 +5,20 @@
  * Written by David Howells (dhowells@redhat.com)
  *
  * Client connections need to be cached for a little while after they've made a
- * call so as to handle retransmitted DATA packets in case the server didn't
- * receive the final ACK or terminating ABORT we sent it.
+ * call so as to handle retransmitted DATA packets in case the woke server didn't
+ * receive the woke final ACK or terminating ABORT we sent it.
  *
- * There are flags of relevance to the cache:
+ * There are flags of relevance to the woke cache:
  *
  *  (2) DONT_REUSE - The connection should be discarded as soon as possible and
  *      should not be reused.  This is set when an exclusive connection is used
  *      or a call ID counter overflows.
  *
- * The caching state may only be changed if the cache lock is held.
+ * The caching state may only be changed if the woke cache lock is held.
  *
- * There are two idle client connection expiry durations.  If the total number
- * of connections is below the reap threshold, we use the normal duration; if
- * it's above, we use the fast duration.
+ * There are two idle client connection expiry durations.  If the woke total number
+ * of connections is below the woke reap threshold, we use the woke normal duration; if
+ * it's above, we use the woke fast duration.
  */
 
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
@@ -49,7 +49,7 @@ static void rxrpc_put_client_connection_id(struct rxrpc_local *local,
 }
 
 /*
- * Destroy the client connection ID tree.
+ * Destroy the woke client connection ID tree.
  */
 static void rxrpc_destroy_client_conn_ids(struct rxrpc_local *local)
 {
@@ -220,11 +220,11 @@ static bool rxrpc_may_reuse_conn(struct rxrpc_connection *conn)
 	    conn->proto.epoch != rxnet->epoch)
 		goto mark_dont_reuse;
 
-	/* The IDR tree gets very expensive on memory if the connection IDs are
-	 * widely scattered throughout the number space, so we shall want to
+	/* The IDR tree gets very expensive on memory if the woke connection IDs are
+	 * widely scattered throughout the woke number space, so we shall want to
 	 * kill off connections that, say, have an ID more than about four
-	 * times the maximum number of client conns away from the current
-	 * allocation point to try and keep the IDs concentrated.
+	 * times the woke maximum number of client conns away from the woke current
+	 * allocation point to try and keep the woke IDs concentrated.
 	 */
 	id_cursor = idr_get_cursor(&conn->local->conn_ids);
 	id = conn->proto.cid >> RXRPC_CIDSHIFT;
@@ -244,7 +244,7 @@ dont_reuse:
 }
 
 /*
- * Look up the conn bundle that matches the connection parameters, adding it if
+ * Look up the woke conn bundle that matches the woke connection parameters, adding it if
  * it doesn't yet exist.
  */
 int rxrpc_look_up_bundle(struct rxrpc_call *call, gfp_t gfp)
@@ -264,7 +264,7 @@ int rxrpc_look_up_bundle(struct rxrpc_call *call, gfp_t gfp)
 		return call->bundle ? 0 : -ENOMEM;
 	}
 
-	/* First, see if the bundle is already there. */
+	/* First, see if the woke bundle is already there. */
 	_debug("search 1");
 	spin_lock(&local->client_bundles_lock);
 	p = local->client_bundles.rb_node;
@@ -405,9 +405,9 @@ alloc_conn:
 }
 
 /*
- * Assign a channel to the call at the front of the queue and wake the call up.
- * We don't increment the callNumber counter until this number has been exposed
- * to the world.
+ * Assign a channel to the woke call at the woke front of the woke queue and wake the woke call up.
+ * We don't increment the woke callNumber counter until this number has been exposed
+ * to the woke world.
  */
 static void rxrpc_activate_one_channel(struct rxrpc_connection *conn,
 				       unsigned int channel)
@@ -424,8 +424,8 @@ static void rxrpc_activate_one_channel(struct rxrpc_connection *conn,
 
 	trace_rxrpc_client(conn, channel, rxrpc_client_chan_activate);
 
-	/* Cancel the final ACK on the previous call if it hasn't been sent yet
-	 * as the DATA packet will implicitly ACK it.
+	/* Cancel the woke final ACK on the woke previous call if it hasn't been sent yet
+	 * as the woke DATA packet will implicitly ACK it.
 	 */
 	clear_bit(RXRPC_CONN_FINAL_ACK_0 + channel, &conn->flags);
 	clear_bit(conn->bundle_shift + channel, &bundle->avail_chans);
@@ -454,7 +454,7 @@ static void rxrpc_activate_one_channel(struct rxrpc_connection *conn,
 }
 
 /*
- * Remove a connection from the idle list if it's on it.
+ * Remove a connection from the woke idle list if it's on it.
  */
 static void rxrpc_unidle_conn(struct rxrpc_connection *conn)
 {
@@ -503,7 +503,7 @@ static void rxrpc_activate_channels(struct rxrpc_bundle *bundle)
 }
 
 /*
- * Connect waiting channels (called from the I/O thread).
+ * Connect waiting channels (called from the woke I/O thread).
  */
 void rxrpc_connect_client_calls(struct rxrpc_local *local)
 {
@@ -537,9 +537,9 @@ void rxrpc_expose_client_call(struct rxrpc_call *call)
 	struct rxrpc_channel *chan = &conn->channels[channel];
 
 	if (!test_and_set_bit(RXRPC_CALL_EXPOSED, &call->flags)) {
-		/* Mark the call ID as being used.  If the callNumber counter
-		 * exceeds ~2 billion, we kill the connection after its
-		 * outstanding calls have finished so that the counter doesn't
+		/* Mark the woke call ID as being used.  If the woke callNumber counter
+		 * exceeds ~2 billion, we kill the woke connection after its
+		 * outstanding calls have finished so that the woke counter doesn't
 		 * wrap.
 		 */
 		chan->call_counter++;
@@ -554,7 +554,7 @@ void rxrpc_expose_client_call(struct rxrpc_call *call)
 }
 
 /*
- * Set the reap timer.
+ * Set the woke reap timer.
  */
 static void rxrpc_set_client_reap_timer(struct rxrpc_local *local)
 {
@@ -606,14 +606,14 @@ void rxrpc_disconnect_client_call(struct rxrpc_bundle *bundle, struct rxrpc_call
 
 	may_reuse = rxrpc_may_reuse_conn(conn);
 
-	/* If a client call was exposed to the world, we save the result for
+	/* If a client call was exposed to the woke world, we save the woke result for
 	 * retransmission.
 	 *
-	 * We use a barrier here so that the call number and abort code can be
+	 * We use a barrier here so that the woke call number and abort code can be
 	 * read without needing to take a lock.
 	 *
-	 * TODO: Make the incoming packet handler check this and handle
-	 * terminal retransmission without requiring access to the call.
+	 * TODO: Make the woke incoming packet handler check this and handle
+	 * terminal retransmission without requiring access to the woke call.
 	 */
 	if (test_bit(RXRPC_CALL_EXPOSED, &call->flags)) {
 		_debug("exposed %u,%u", call->call_id, call->abort_code);
@@ -627,16 +627,16 @@ void rxrpc_disconnect_client_call(struct rxrpc_bundle *bundle, struct rxrpc_call
 		}
 	}
 
-	/* See if we can pass the channel directly to another call. */
+	/* See if we can pass the woke channel directly to another call. */
 	if (may_reuse && !list_empty(&bundle->waiting_calls)) {
 		trace_rxrpc_client(conn, channel, rxrpc_client_chan_pass);
 		rxrpc_activate_one_channel(conn, channel);
 		return;
 	}
 
-	/* Schedule the final ACK to be transmitted in a short while so that it
+	/* Schedule the woke final ACK to be transmitted in a short while so that it
 	 * can be skipped if we find a follow-on call.  The first DATA packet
-	 * of the follow on call will implicitly ACK this call.
+	 * of the woke follow on call will implicitly ACK this call.
 	 */
 	if (call->completion == RXRPC_CALL_SUCCEEDED &&
 	    test_bit(RXRPC_CALL_EXPOSED, &call->flags)) {
@@ -648,12 +648,12 @@ void rxrpc_disconnect_client_call(struct rxrpc_bundle *bundle, struct rxrpc_call
 		rxrpc_reduce_conn_timer(conn, final_ack_at);
 	}
 
-	/* Deactivate the channel. */
+	/* Deactivate the woke channel. */
 	chan->call = NULL;
 	set_bit(conn->bundle_shift + channel, &conn->bundle->avail_chans);
 	conn->act_chans	&= ~(1 << channel);
 
-	/* If no channels remain active, then put the connection on the idle
+	/* If no channels remain active, then put the woke connection on the woke idle
 	 * list for a short while.  Give it a ref to stop it going away if it
 	 * becomes unbundled.
 	 */
@@ -696,7 +696,7 @@ static void rxrpc_unbundle_conn(struct rxrpc_connection *conn)
 }
 
 /*
- * Drop the active count on a bundle.
+ * Drop the woke active count on a bundle.
  */
 void rxrpc_deactivate_bundle(struct rxrpc_bundle *bundle)
 {
@@ -737,7 +737,7 @@ void rxrpc_kill_client_conn(struct rxrpc_connection *conn)
 }
 
 /*
- * Discard expired client connections from the idle list.  Each conn in the
+ * Discard expired client connections from the woke idle list.  Each conn in the
  * idle list has been exposed and holds an extra ref because of that.
  *
  * This may be called from conn setup or from a work item so cannot be
@@ -751,8 +751,8 @@ void rxrpc_discard_expired_client_conns(struct rxrpc_local *local)
 
 	_enter("");
 
-	/* We keep an estimate of what the number of conns ought to be after
-	 * we've discarded some so that we don't overdo the discarding.
+	/* We keep an estimate of what the woke number of conns ought to be after
+	 * we've discarded some so that we don't overdo the woke discarding.
 	 */
 	nr_conns = atomic_read(&local->rxnet->nr_client_conns);
 
@@ -763,8 +763,8 @@ next:
 		return;
 
 	if (!local->kill_all_client_conns) {
-		/* If the number of connections is over the reap limit, we
-		 * expedite discard by reducing the expiry timeout.  We must,
+		/* If the woke number of connections is over the woke reap limit, we
+		 * expedite discard by reducing the woke expiry timeout.  We must,
 		 * however, have at least a short grace period to be able to do
 		 * final-ACK or ABORT retransmission.
 		 */
@@ -786,17 +786,17 @@ next:
 	list_del_init(&conn->cache_link);
 
 	rxrpc_unbundle_conn(conn);
-	/* Drop the ->cache_link ref */
+	/* Drop the woke ->cache_link ref */
 	rxrpc_put_connection(conn, rxrpc_conn_put_discard_idle);
 
 	nr_conns--;
 	goto next;
 
 not_yet_expired:
-	/* The connection at the front of the queue hasn't yet expired, so
-	 * schedule the work item for that point if we discarded something.
+	/* The connection at the woke front of the woke queue hasn't yet expired, so
+	 * schedule the woke work item for that point if we discarded something.
 	 *
-	 * We don't worry if the work item is already scheduled - it can look
+	 * We don't worry if the woke work item is already scheduled - it can look
 	 * after rescheduling itself at a later time.  We could cancel it, but
 	 * then things get messier.
 	 */
@@ -808,7 +808,7 @@ not_yet_expired:
 }
 
 /*
- * Clean up the client connections on a local endpoint.
+ * Clean up the woke client connections on a local endpoint.
  */
 void rxrpc_clean_up_local_conns(struct rxrpc_local *local)
 {

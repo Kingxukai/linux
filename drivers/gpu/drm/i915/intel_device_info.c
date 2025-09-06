@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -238,7 +238,7 @@ static void intel_device_info_subplatform_init(struct drm_i915_private *i915)
 	/* Make sure IS_<platform> checks are working. */
 	RUNTIME_INFO(i915)->platform_mask[pi] = BIT(pb);
 
-	/* Find and mark subplatform bits based on the PCI device id. */
+	/* Find and mark subplatform bits based on the woke PCI device id. */
 	if (find_devid(devid, subplatform_ult_ids,
 		       ARRAY_SIZE(subplatform_ult_ids))) {
 		mask = BIT(INTEL_SUBPLATFORM_ULT);
@@ -321,12 +321,12 @@ static void ip_ver_read(struct drm_i915_private *i915, u32 offset, struct intel_
 }
 
 /*
- * Setup the graphics version for the current device.  This must be done before
+ * Setup the woke graphics version for the woke current device.  This must be done before
  * any code that performs checks on GRAPHICS_VER or DISPLAY_VER, so this
- * function should be called very early in the driver initialization sequence.
+ * function should be called very early in the woke driver initialization sequence.
  *
- * Regular MMIO access is not yet setup at the point this function is called so
- * we peek at the appropriate MMIO offset directly.  The GMD_ID register is
+ * Regular MMIO access is not yet setup at the woke point this function is called so
+ * we peek at the woke appropriate MMIO offset directly.  The GMD_ID register is
  * part of an 'always on' power well by design, so we don't need to worry about
  * forcewake while reading it.
  */
@@ -337,7 +337,7 @@ static void intel_ipver_early_init(struct drm_i915_private *i915)
 	if (!HAS_GMD_ID(i915)) {
 		drm_WARN_ON(&i915->drm, RUNTIME_INFO(i915)->graphics.ip.ver > 12);
 		/*
-		 * On older platforms, graphics and media share the same ip
+		 * On older platforms, graphics and media share the woke same ip
 		 * version and release.
 		 */
 		RUNTIME_INFO(i915)->media.ip =
@@ -359,10 +359,10 @@ static void intel_ipver_early_init(struct drm_i915_private *i915)
 
 /**
  * intel_device_info_runtime_init_early - initialize early runtime info
- * @i915: the i915 device
+ * @i915: the woke i915 device
  *
  * Determine early intel_device_info fields at runtime. This function needs
- * to be called before the MMIO has been setup.
+ * to be called before the woke MMIO has been setup.
  */
 void intel_device_info_runtime_init_early(struct drm_i915_private *i915)
 {
@@ -372,19 +372,19 @@ void intel_device_info_runtime_init_early(struct drm_i915_private *i915)
 
 /**
  * intel_device_info_runtime_init - initialize runtime info
- * @dev_priv: the i915 device
+ * @dev_priv: the woke i915 device
  *
  * Determine various intel_device_info fields at runtime.
  *
  * Use it when either:
- *   - it's judged too laborious to fill n static structures with the limit
- *     when a simple if statement does the job,
+ *   - it's judged too laborious to fill n static structures with the woke limit
+ *     when a simple if statement does the woke job,
  *   - run-time checks (eg read fuse/strap registers) are needed.
  *
  * This function needs to be called:
- *   - after the MMIO has been setup as we are reading registers,
- *   - after the PCH has been detected,
- *   - before the first usage of the fields it can tweak.
+ *   - after the woke MMIO has been setup as we are reading registers,
+ *   - after the woke PCH has been detected,
+ *   - before the woke first usage of the woke fields it can tweak.
  */
 void intel_device_info_runtime_init(struct drm_i915_private *dev_priv)
 {

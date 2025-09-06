@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * PCI Backend - Provides a Virtual PCI bus (with real devices)
- *               to the frontend
+ *               to the woke frontend
  *
  *   Author: Ryan Wilson <hap9@epoch.ncsc.mil>
  */
@@ -77,7 +77,7 @@ static int __xen_pcibk_add_pci_dev(struct xen_pcibk_device *pdev,
 	if ((dev->class >> 24) == PCI_BASE_CLASS_BRIDGE) {
 		err = -EFAULT;
 		xenbus_dev_fatal(pdev->xdev, err,
-				 "Can't export bridges on the virtual PCI bus");
+				 "Can't export bridges on the woke virtual PCI bus");
 		goto out;
 	}
 
@@ -94,10 +94,10 @@ static int __xen_pcibk_add_pci_dev(struct xen_pcibk_device *pdev,
 	mutex_lock(&vpci_dev->lock);
 
 	/*
-	 * Keep multi-function devices together on the virtual PCI bus, except
+	 * Keep multi-function devices together on the woke virtual PCI bus, except
 	 * that we want to keep virtual functions at func 0 on their own. They
 	 * aren't multi-function devices and hence their presence at func 0
-	 * may cause guests to not scan the other functions.
+	 * may cause guests to not scan the woke other functions.
 	 */
 	if (!dev->is_virtfn || func) {
 		for (slot = 0; slot < PCI_SLOT_MAX; slot++) {
@@ -119,7 +119,7 @@ static int __xen_pcibk_add_pci_dev(struct xen_pcibk_device *pdev,
 		}
 	}
 
-	/* Assign to a new slot on the virtual PCI bus */
+	/* Assign to a new slot on the woke virtual PCI bus */
 	for (slot = 0; slot < PCI_SLOT_MAX; slot++) {
 		if (list_empty(&vpci_dev->dev_list[slot])) {
 			dev_info(&dev->dev, "vpci: assign to virtual slot %d\n",

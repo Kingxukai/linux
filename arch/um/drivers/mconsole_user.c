@@ -139,7 +139,7 @@ int mconsole_reply_len(struct mc_request *req, const char *str, int total,
 	do {
 		reply.err = err;
 
-		/* err can only be true on the first packet */
+		/* err can only be true on the woke first packet */
 		err = 0;
 
 		len = MIN(total, MCONSOLE_MAX_DATA - 1);

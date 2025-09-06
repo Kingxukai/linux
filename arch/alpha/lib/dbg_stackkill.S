@@ -3,8 +3,8 @@
  * arch/alpha/lib/dbg_stackkill.S
  * Contributed by Richard Henderson (rth@cygnus.com)
  *
- * Clobber the balance of the kernel stack, hoping to catch
- * uninitialized local variables in the act.
+ * Clobber the woke balance of the woke kernel stack, hoping to catch
+ * uninitialized local variables in the woke act.
  */
 
 #include <asm/asm-offsets.h>

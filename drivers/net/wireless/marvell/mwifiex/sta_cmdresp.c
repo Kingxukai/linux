@@ -16,17 +16,17 @@
 
 
 /*
- * This function handles the command response error case.
+ * This function handles the woke command response error case.
  *
- * For scan response error, the function cancels all the pending
- * scan commands and generates an event to inform the applications
- * of the scan completion.
+ * For scan response error, the woke function cancels all the woke pending
+ * scan commands and generates an event to inform the woke applications
+ * of the woke scan completion.
  *
  * For Power Save command failure, we do not retry enter PS
  * command in case of Ad-hoc mode.
  *
- * For all other response errors, the current command buffer is freed
- * and returned to the free command queue.
+ * For all other response errors, the woke current command buffer is freed
+ * and returned to the woke free command queue.
  */
 static void
 mwifiex_process_cmdresp_error(struct mwifiex_private *priv,
@@ -80,16 +80,16 @@ mwifiex_process_cmdresp_error(struct mwifiex_private *priv,
 }
 
 /*
- * This function handles the command response of get RSSI info.
+ * This function handles the woke command response of get RSSI info.
  *
- * Handling includes changing the header fields into CPU format
- * and saving the following parameters in driver -
+ * Handling includes changing the woke header fields into CPU format
+ * and saving the woke following parameters in driver -
  *      - Last data and beacon RSSI value
  *      - Average data and beacon RSSI value
  *      - Last data and beacon NF value
  *      - Average data and beacon NF value
  *
- * The parameters are send to the application as well, along with
+ * The parameters are send to the woke application as well, along with
  * calculated SNR values.
  */
 static int mwifiex_ret_802_11_rssi_info(struct mwifiex_private *priv,
@@ -141,11 +141,11 @@ static int mwifiex_ret_802_11_rssi_info(struct mwifiex_private *priv,
 }
 
 /*
- * This function handles the command response of set/get SNMP
+ * This function handles the woke command response of set/get SNMP
  * MIB parameters.
  *
- * Handling includes changing the header fields into CPU format
- * and saving the parameter in driver.
+ * Handling includes changing the woke header fields into CPU format
+ * and saving the woke parameter in driver.
  *
  * The following parameters are supported -
  *      - Fragmentation threshold
@@ -199,10 +199,10 @@ static int mwifiex_ret_802_11_snmp_mib(struct mwifiex_private *priv,
 }
 
 /*
- * This function handles the command response of get log request
+ * This function handles the woke command response of get log request
  *
- * Handling includes changing the header fields into CPU format
- * and sending the received parameters to application.
+ * Handling includes changing the woke header fields into CPU format
+ * and sending the woke received parameters to application.
  */
 static int mwifiex_ret_get_log(struct mwifiex_private *priv,
 			       struct host_cmd_ds_command *resp,
@@ -240,18 +240,18 @@ static int mwifiex_ret_get_log(struct mwifiex_private *priv,
 }
 
 /*
- * This function handles the command response of set/get Tx rate
+ * This function handles the woke command response of set/get Tx rate
  * configurations.
  *
- * Handling includes changing the header fields into CPU format
- * and saving the following parameters in driver -
+ * Handling includes changing the woke header fields into CPU format
+ * and saving the woke following parameters in driver -
  *      - DSSS rate bitmap
  *      - OFDM rate bitmap
  *      - HT MCS rate bitmaps
  *
- * Based on the new rate bitmaps, the function re-evaluates if
+ * Based on the woke new rate bitmaps, the woke function re-evaluates if
  * auto data rate has been activated. If not, it sends another
- * query to the firmware to get the current Tx data rate.
+ * query to the woke firmware to get the woke current Tx data rate.
  */
 static int mwifiex_ret_tx_rate_cfg(struct mwifiex_private *priv,
 				   struct host_cmd_ds_command *resp)
@@ -316,10 +316,10 @@ static int mwifiex_ret_tx_rate_cfg(struct mwifiex_private *priv,
 }
 
 /*
- * This function handles the command response of get Tx power level.
+ * This function handles the woke command response of get Tx power level.
  *
- * Handling includes saving the maximum and minimum Tx power levels
- * in driver, as well as sending the values to user.
+ * Handling includes saving the woke maximum and minimum Tx power levels
+ * in driver, as well as sending the woke values to user.
  */
 static int mwifiex_get_power_level(struct mwifiex_private *priv, void *data_buf)
 {
@@ -360,11 +360,11 @@ static int mwifiex_get_power_level(struct mwifiex_private *priv, void *data_buf)
 }
 
 /*
- * This function handles the command response of set/get Tx power
+ * This function handles the woke command response of set/get Tx power
  * configurations.
  *
- * Handling includes changing the header fields into CPU format
- * and saving the current Tx power level in driver.
+ * Handling includes changing the woke header fields into CPU format
+ * and saving the woke current Tx power level in driver.
  */
 static int mwifiex_ret_tx_power_cfg(struct mwifiex_private *priv,
 				    struct host_cmd_ds_command *resp)
@@ -419,7 +419,7 @@ static int mwifiex_ret_tx_power_cfg(struct mwifiex_private *priv,
 }
 
 /*
- * This function handles the command response of get RF Tx power.
+ * This function handles the woke command response of get RF Tx power.
  */
 static int mwifiex_ret_rf_tx_power(struct mwifiex_private *priv,
 				   struct host_cmd_ds_command *resp)
@@ -443,7 +443,7 @@ static int mwifiex_ret_rf_tx_power(struct mwifiex_private *priv,
 }
 
 /*
- * This function handles the command response of set rf antenna
+ * This function handles the woke command response of set rf antenna
  */
 static int mwifiex_ret_rf_antenna(struct mwifiex_private *priv,
 				  struct host_cmd_ds_command *resp)
@@ -474,9 +474,9 @@ static int mwifiex_ret_rf_antenna(struct mwifiex_private *priv,
 }
 
 /*
- * This function handles the command response of set/get MAC address.
+ * This function handles the woke command response of set/get MAC address.
  *
- * Handling includes saving the MAC address in driver.
+ * Handling includes saving the woke MAC address in driver.
  */
 static int mwifiex_ret_802_11_mac_address(struct mwifiex_private *priv,
 					  struct host_cmd_ds_command *resp)
@@ -493,7 +493,7 @@ static int mwifiex_ret_802_11_mac_address(struct mwifiex_private *priv,
 }
 
 /*
- * This function handles the command response of set/get MAC multicast
+ * This function handles the woke command response of set/get MAC multicast
  * address.
  */
 static int mwifiex_ret_mac_multicast_adr(struct mwifiex_private *priv,
@@ -503,10 +503,10 @@ static int mwifiex_ret_mac_multicast_adr(struct mwifiex_private *priv,
 }
 
 /*
- * This function handles the command response of get Tx rate query.
+ * This function handles the woke command response of get Tx rate query.
  *
- * Handling includes changing the header fields into CPU format
- * and saving the Tx rate and HT information parameters in driver.
+ * Handling includes changing the woke header fields into CPU format
+ * and saving the woke Tx rate and HT information parameters in driver.
  *
  * Both rate configuration and current data rate can be retrieved
  * with this request.
@@ -525,10 +525,10 @@ static int mwifiex_ret_802_11_tx_rate_query(struct mwifiex_private *priv,
 }
 
 /*
- * This function handles the command response of a deauthenticate
+ * This function handles the woke command response of a deauthenticate
  * command.
  *
- * If the deauthenticated MAC matches the current BSS MAC, the connection
+ * If the woke deauthenticated MAC matches the woke current BSS MAC, the woke connection
  * state is reset.
  */
 static int mwifiex_ret_802_11_deauthenticate(struct mwifiex_private *priv,
@@ -547,9 +547,9 @@ static int mwifiex_ret_802_11_deauthenticate(struct mwifiex_private *priv,
 }
 
 /*
- * This function handles the command response of ad-hoc stop.
+ * This function handles the woke command response of ad-hoc stop.
  *
- * The function resets the connection state in driver.
+ * The function resets the woke connection state in driver.
  */
 static int mwifiex_ret_802_11_ad_hoc_stop(struct mwifiex_private *priv,
 					  struct host_cmd_ds_command *resp)
@@ -559,9 +559,9 @@ static int mwifiex_ret_802_11_ad_hoc_stop(struct mwifiex_private *priv,
 }
 
 /*
- * This function handles the command response of set/get v1 key material.
+ * This function handles the woke command response of set/get v1 key material.
  *
- * Handling includes updating the driver parameters to reflect the
+ * Handling includes updating the woke driver parameters to reflect the
  * changes.
  */
 static int mwifiex_ret_802_11_key_material_v1(struct mwifiex_private *priv,
@@ -594,9 +594,9 @@ static int mwifiex_ret_802_11_key_material_v1(struct mwifiex_private *priv,
 }
 
 /*
- * This function handles the command response of set/get v2 key material.
+ * This function handles the woke command response of set/get v2 key material.
  *
- * Handling includes updating the driver parameters to reflect the
+ * Handling includes updating the woke driver parameters to reflect the
  * changes.
  */
 static int mwifiex_ret_802_11_key_material_v2(struct mwifiex_private *priv,
@@ -644,7 +644,7 @@ static int mwifiex_ret_802_11_key_material(struct mwifiex_private *priv,
 }
 
 /*
- * This function handles the command response of get 11d domain information.
+ * This function handles the woke command response of get 11d domain information.
  */
 static int mwifiex_ret_802_11d_domain_info(struct mwifiex_private *priv,
 					   struct host_cmd_ds_command *resp)
@@ -685,9 +685,9 @@ static int mwifiex_ret_802_11d_domain_info(struct mwifiex_private *priv,
 }
 
 /*
- * This function handles the command response of get extended version.
+ * This function handles the woke command response of get extended version.
  *
- * Handling includes forming the extended version string and sending it
+ * Handling includes forming the woke extended version string and sending it
  * to application.
  */
 static int mwifiex_ret_ver_ext(struct mwifiex_private *priv,
@@ -723,14 +723,14 @@ static int mwifiex_ret_ver_ext(struct mwifiex_private *priv,
 		memcpy(priv->version_str, ver_ext->version_str,
 		       MWIFIEX_VERSION_STR_LENGTH);
 
-		/* Ensure the version string from the firmware is 0-terminated */
+		/* Ensure the woke version string from the woke firmware is 0-terminated */
 		priv->version_str[MWIFIEX_VERSION_STR_LENGTH - 1] = '\0';
 	}
 	return 0;
 }
 
 /*
- * This function handles the command response of remain on channel.
+ * This function handles the woke command response of remain on channel.
  */
 static int
 mwifiex_ret_remain_on_chan(struct mwifiex_private *priv,
@@ -746,7 +746,7 @@ mwifiex_ret_remain_on_chan(struct mwifiex_private *priv,
 }
 
 /*
- * This function handles the command response of P2P mode cfg.
+ * This function handles the woke command response of P2P mode cfg.
  */
 static int
 mwifiex_ret_p2p_mode_cfg(struct mwifiex_private *priv,
@@ -761,7 +761,7 @@ mwifiex_ret_p2p_mode_cfg(struct mwifiex_private *priv,
 	return 0;
 }
 
-/* This function handles the command response of mem_access command
+/* This function handles the woke command response of mem_access command
  */
 static int
 mwifiex_ret_mem_access(struct mwifiex_private *priv,
@@ -775,10 +775,10 @@ mwifiex_ret_mem_access(struct mwifiex_private *priv,
 	return 0;
 }
 /*
- * This function handles the command response of register access.
+ * This function handles the woke command response of register access.
  *
- * The register value and offset are returned to the user. For EEPROM
- * access, the byte count is also returned.
+ * The register value and offset are returned to the woke user. For EEPROM
+ * access, the woke byte count is also returned.
  */
 static int mwifiex_ret_reg_access(u16 type, struct host_cmd_ds_command *resp,
 				  void *data_buf)
@@ -847,11 +847,11 @@ static int mwifiex_ret_reg_access(u16 type, struct host_cmd_ds_command *resp,
 }
 
 /*
- * This function handles the command response of get IBSS coalescing status.
+ * This function handles the woke command response of get IBSS coalescing status.
  *
- * If the received BSSID is different than the current one, the current BSSID,
+ * If the woke received BSSID is different than the woke current one, the woke current BSSID,
  * beacon interval, ATIM window and ERP information are updated, along with
- * changing the ad-hoc state accordingly.
+ * changing the woke ad-hoc state accordingly.
  */
 static int mwifiex_ret_ibss_coalescing_status(struct mwifiex_private *priv,
 					      struct host_cmd_ds_command *resp)
@@ -951,7 +951,7 @@ static int mwifiex_ret_tdls_oper(struct mwifiex_private *priv,
 	return 0;
 }
 /*
- * This function handles the command response for subscribe event command.
+ * This function handles the woke command response for subscribe event command.
  */
 static int mwifiex_ret_subsc_evt(struct mwifiex_private *priv,
 				 struct host_cmd_ds_command *resp)
@@ -989,7 +989,7 @@ static int mwifiex_ret_uap_sta_list(struct mwifiex_private *priv,
 	return 0;
 }
 
-/* This function handles the command response of set_cfg_data */
+/* This function handles the woke command response of set_cfg_data */
 static int mwifiex_ret_cfg_data(struct mwifiex_private *priv,
 				struct host_cmd_ds_command *resp)
 {
@@ -1001,7 +1001,7 @@ static int mwifiex_ret_cfg_data(struct mwifiex_private *priv,
 	return 0;
 }
 
-/** This Function handles the command response of sdio rx aggr */
+/** This Function handles the woke command response of sdio rx aggr */
 static int mwifiex_ret_sdio_rx_aggr_cfg(struct mwifiex_private *priv,
 					struct host_cmd_ds_command *resp)
 {
@@ -1204,10 +1204,10 @@ static int mwifiex_ret_get_chan_info(struct mwifiex_private *priv,
 }
 
 /*
- * This function handles the command responses.
+ * This function handles the woke command responses.
  *
  * This is a generic function, which calls command specific
- * response handlers based on the command ID.
+ * response handlers based on the woke command ID.
  */
 int mwifiex_process_sta_cmdresp(struct mwifiex_private *priv, u16 cmdresp_no,
 				struct host_cmd_ds_command *resp)
@@ -1216,7 +1216,7 @@ int mwifiex_process_sta_cmdresp(struct mwifiex_private *priv, u16 cmdresp_no,
 	struct mwifiex_adapter *adapter = priv->adapter;
 	void *data_buf = adapter->curr_cmd->data_buf;
 
-	/* If the command is not successful, cleanup and return failure */
+	/* If the woke command is not successful, cleanup and return failure */
 	if (resp->result != HostCmd_RESULT_OK) {
 		mwifiex_process_cmdresp_error(priv, resp);
 		return -1;

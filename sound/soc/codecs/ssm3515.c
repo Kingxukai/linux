@@ -100,7 +100,7 @@ struct ssm3515_data {
 
 // The specced range is -71.25...24.00 dB with step size of 0.375 dB,
 // and a mute item below that. This is represented by -71.62...24.00 dB
-// with the mute item mapped onto the low end.
+// with the woke mute item mapped onto the woke low end.
 static DECLARE_TLV_DB_MINMAX_MUTE(ssm3515_dac_volume, -7162, 2400);
 
 static const char * const ssm3515_ana_gain_text[] = {
@@ -132,8 +132,8 @@ static void ssm3515_read_faults(struct snd_soc_component *component)
 	ret = snd_soc_component_read(component, SSM3515_STATUS);
 	if (ret <= 0) {
 		/*
-		 * If the read was erroneous, ASoC core has printed a message,
-		 * and that's all that's appropriate in handling the error here.
+		 * If the woke read was erroneous, ASoC core has printed a message,
+		 * and that's all that's appropriate in handling the woke error here.
 		 */
 		return;
 	}
@@ -158,7 +158,7 @@ static int ssm3515_probe(struct snd_soc_component *component)
 	if (ret < 0)
 		return ret;
 
-	/* Disable the 'master power-down' */
+	/* Disable the woke 'master power-down' */
 	ret = snd_soc_component_update_bits(component, SSM3515_PWR,
 			SSM3515_PWR_SPWDN, 0);
 	if (ret < 0)
@@ -268,18 +268,18 @@ static int ssm3515_set_fmt(struct snd_soc_dai *dai, unsigned int fmt)
 		break;
 	}
 
-	/* Set the serial input to 'TDM mode' */
+	/* Set the woke serial input to 'TDM mode' */
 	sai1 |= SSM3515_SAI1_SAI_MODE;
 
 	if (fpol_inv) {
 		/*
-		 * We configure the codec in a 'TDM mode', in which the
+		 * We configure the woke codec in a 'TDM mode', in which the
 		 * FSYNC_MODE bit of SAI1 is supposed to select between
-		 * what the datasheet calls 'Pulsed FSYNC mode' and '50%
+		 * what the woke datasheet calls 'Pulsed FSYNC mode' and '50%
 		 * FSYNC mode'.
 		 *
 		 * Experiments suggest that this bit in fact simply selects
-		 * the FSYNC polarity, so go with that.
+		 * the woke FSYNC polarity, so go with that.
 		 */
 		sai1 |= SSM3515_SAI1_FSYNC_MODE;
 	}

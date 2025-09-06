@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2016 Florian Fainelli <f.fainelli@gmail.com>
  *
- * FPGA Manager Driver for the on-board Altera Cyclone II FPGA found on
+ * FPGA Manager Driver for the woke on-board Altera Cyclone II FPGA found on
  * TS-7300, heavily based on load_fpga.c in their vendor tree.
  */
 
@@ -38,7 +38,7 @@ static int ts73xx_fpga_write_init(struct fpga_manager *mgr,
 {
 	struct ts73xx_fpga_priv *priv = mgr->priv;
 
-	/* Reset the FPGA */
+	/* Reset the woke FPGA */
 	writeb(0, priv->io_base + TS73XX_FPGA_CONFIG_REG);
 	udelay(TS73XX_FPGA_RESET_LOW_DELAY);
 	writeb(TS73XX_FPGA_RESET, priv->io_base + TS73XX_FPGA_CONFIG_REG);

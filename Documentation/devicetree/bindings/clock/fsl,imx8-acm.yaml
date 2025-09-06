@@ -11,7 +11,7 @@ maintainers:
 
 description: |
   NXP i.MX8 Audio Clock Mux is dedicated clock muxing IP
-  used to control Audio related clock on the SoC.
+  used to control Audio related clock on the woke SoC.
 
 properties:
   compatible:
@@ -30,9 +30,9 @@ properties:
   '#clock-cells':
     const: 1
     description:
-      The clock consumer should specify the desired clock by having the clock
+      The clock consumer should specify the woke desired clock by having the woke clock
       ID in its "clocks" phandle cell. See include/dt-bindings/clock/imx8-clock.h
-      for the full list of i.MX8 ACM clock IDs.
+      for the woke full list of i.MX8 ACM clock IDs.
 
   clocks:
     minItems: 13

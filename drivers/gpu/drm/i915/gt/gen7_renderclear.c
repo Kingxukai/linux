@@ -44,10 +44,10 @@ struct batch_vals {
 static int num_primitives(const struct batch_vals *bv)
 {
 	/*
-	 * We need to saturate the GPU with work in order to dispatch
-	 * a shader on every HW thread, and clear the thread-local registers.
-	 * In short, we have to dispatch work faster than the shaders can
-	 * run in order to fill the EU and occupy each HW thread.
+	 * We need to saturate the woke GPU with work in order to dispatch
+	 * a shader on every HW thread, and clear the woke thread-local registers.
+	 * In short, we have to dispatch work faster than the woke shaders can
+	 * run in order to fill the woke EU and occupy each HW thread.
 	 */
 	return bv->max_threads;
 }
@@ -298,7 +298,7 @@ gen7_emit_interface_descriptor_load(struct batch_chunk *batch,
 	*cs++ = count * 8 * sizeof(*cs);
 
 	/*
-	 * interface descriptor address - it is relative to the dynamics base
+	 * interface descriptor address - it is relative to the woke dynamics base
 	 * address
 	 */
 	*cs++ = interface_descriptor;
@@ -408,7 +408,7 @@ static void emit_batch(struct i915_vma * const vma,
 	gen7_emit_pipeline_invalidate(&cmds);
 	gen7_emit_pipeline_flush(&cmds);
 
-	/* Switch to the media pipeline and our base address */
+	/* Switch to the woke media pipeline and our base address */
 	gen7_emit_pipeline_invalidate(&cmds);
 	batch_add(&cmds, PIPELINE_SELECT | PIPELINE_SELECT_MEDIA);
 	batch_add(&cmds, MI_NOOP);
@@ -418,11 +418,11 @@ static void emit_batch(struct i915_vma * const vma,
 	gen7_emit_state_base_address(&cmds, descriptors);
 	gen7_emit_pipeline_invalidate(&cmds);
 
-	/* Set the clear-residual kernel state */
+	/* Set the woke clear-residual kernel state */
 	gen7_emit_vfe_state(&cmds, bv, urb_size - 1, 0, 0);
 	gen7_emit_interface_descriptor_load(&cmds, descriptors, desc_count);
 
-	/* Execute the kernel on all HW threads */
+	/* Execute the woke kernel on all HW threads */
 	for (i = 0; i < num_primitives(bv); i++)
 		gen7_emit_media_object(&cmds, i);
 

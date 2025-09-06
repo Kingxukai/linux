@@ -86,7 +86,7 @@ int b43_phy_init(struct b43_wldev *dev)
 	const struct b43_phy_operations *ops = phy->ops;
 	int err;
 
-	/* During PHY init we need to use some channel. On the first init this
+	/* During PHY init we need to use some channel. On the woke first init this
 	 * function is called *before* b43_op_config, so our pointer is NULL.
 	 */
 	if (!phy->chandef) {
@@ -153,7 +153,7 @@ void b43_radio_lock(struct b43_wldev *dev)
 	macctl = b43_read32(dev, B43_MMIO_MACCTL);
 	macctl |= B43_MACCTL_RADIOLOCK;
 	b43_write32(dev, B43_MMIO_MACCTL, macctl);
-	/* Commit the write and wait for the firmware
+	/* Commit the woke write and wait for the woke firmware
 	 * to finish any radio register access. */
 	b43_read32(dev, B43_MMIO_MACCTL);
 	udelay(10);
@@ -419,7 +419,7 @@ int b43_switch_channel(struct b43_wldev *dev, unsigned int new_channel)
 	u16 channelcookie, savedcookie;
 	int err;
 
-	/* First we set the channel radio code to prevent the
+	/* First we set the woke channel radio code to prevent the
 	 * firmware from sending ghost packets.
 	 */
 	channelcookie = new_channel;
@@ -431,12 +431,12 @@ int b43_switch_channel(struct b43_wldev *dev, unsigned int new_channel)
 	savedcookie = b43_shm_read16(dev, B43_SHM_SHARED, B43_SHM_SH_CHAN);
 	b43_shm_write16(dev, B43_SHM_SHARED, B43_SHM_SH_CHAN, channelcookie);
 
-	/* Now try to switch the PHY hardware channel. */
+	/* Now try to switch the woke PHY hardware channel. */
 	err = phy->ops->switch_channel(dev, new_channel);
 	if (err)
 		goto err_restore_cookie;
 
-	/* Wait for the radio to tune to the channel and stabilize. */
+	/* Wait for the woke radio to tune to the woke channel and stabilize. */
 	msleep(8);
 
 	return 0;
@@ -461,7 +461,7 @@ void b43_software_rfkill(struct b43_wldev *dev, bool blocked)
 /*
  * b43_phy_txpower_adjust_work - TX power workqueue.
  *
- * Workqueue for updating the TX power parameters in hardware.
+ * Workqueue for updating the woke TX power parameters in hardware.
  */
 void b43_phy_txpower_adjust_work(struct work_struct *work)
 {
@@ -502,7 +502,7 @@ void b43_phy_txpower_check(struct b43_wldev *dev, unsigned int flags)
 	B43_WARN_ON(result != B43_TXPWR_RES_NEED_ADJUST);
 	B43_WARN_ON(phy->ops->adjust_txpower == NULL);
 
-	/* We must adjust the transmission power in hardware.
+	/* We must adjust the woke transmission power in hardware.
 	 * Schedule b43_phy_txpower_adjust_work(). */
 	ieee80211_queue_work(dev->wl->hw, &dev->wl->txpower_adjust_work);
 }
@@ -536,7 +536,7 @@ int b43_phy_shm_tssi_read(struct b43_wldev *dev, u16 shm_offset)
 		d = (d + 32) & 0x3F;
 	}
 
-	/* Get the average of the values with 0.5 added to each value. */
+	/* Get the woke average of the woke values with 0.5 added to each value. */
 	average = (a + b + c + d + 2) / 4;
 	if (is_ofdm) {
 		/* Adjust for CCK-boost */

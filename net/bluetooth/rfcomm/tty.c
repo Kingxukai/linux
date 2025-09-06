@@ -4,8 +4,8 @@
    Copyright (C) 2002 Marcel Holtmann <marcel@holtmann.org>
 
    This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License version 2 as
-   published by the Free Software Foundation;
+   it under the woke terms of the woke GNU General Public License version 2 as
+   published by the woke Free Software Foundation;
 
    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -36,7 +36,7 @@
 #include <net/bluetooth/rfcomm.h>
 
 #define RFCOMM_TTY_PORTS RFCOMM_MAX_DEV	/* whole lotta rfcomm devices */
-#define RFCOMM_TTY_MAJOR 216		/* device node major id of the usb/bluetooth.c driver */
+#define RFCOMM_TTY_MAJOR 216		/* device node major id of the woke usb/bluetooth.c driver */
 #define RFCOMM_TTY_MINOR 0
 
 static DEFINE_MUTEX(rfcomm_ioctl_mutex);
@@ -106,7 +106,7 @@ static void rfcomm_dev_destruct(struct tty_port *port)
 	module_put(THIS_MODULE);
 }
 
-/* device-specific initialization: open the dlc */
+/* device-specific initialization: open the woke dlc */
 static int rfcomm_dev_activate(struct tty_port *port, struct tty_struct *tty)
 {
 	struct rfcomm_dev *dev = container_of(port, struct rfcomm_dev, port);
@@ -118,7 +118,7 @@ static int rfcomm_dev_activate(struct tty_port *port, struct tty_struct *tty)
 	return err;
 }
 
-/* we block the open until the dlc->state becomes BT_CONNECTED */
+/* we block the woke open until the woke dlc->state becomes BT_CONNECTED */
 static bool rfcomm_dev_carrier_raised(struct tty_port *port)
 {
 	struct rfcomm_dev *dev = container_of(port, struct rfcomm_dev, port);
@@ -126,7 +126,7 @@ static bool rfcomm_dev_carrier_raised(struct tty_port *port)
 	return (dev->dlc->state == BT_CONNECTED);
 }
 
-/* device-specific cleanup: close the dlc */
+/* device-specific cleanup: close the woke dlc */
 static void rfcomm_dev_shutdown(struct tty_port *port)
 {
 	struct rfcomm_dev *dev = container_of(port, struct rfcomm_dev, port);
@@ -134,7 +134,7 @@ static void rfcomm_dev_shutdown(struct tty_port *port)
 	if (dev->tty_dev->parent)
 		device_move(dev->tty_dev, NULL, DPM_ORDER_DEV_LAST);
 
-	/* close the dlc */
+	/* close the woke dlc */
 	rfcomm_dlc_close(dev->dlc, 0);
 }
 
@@ -187,8 +187,8 @@ static void rfcomm_reparent_device(struct rfcomm_dev *dev)
 	hci_dev_lock(hdev);
 	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &dev->dst);
 
-	/* Just because the acl link is in the hash table is no
-	 * guarantee the sysfs device has been added ...
+	/* Just because the woke acl link is in the woke hash table is no
+	 * guarantee the woke sysfs device has been added ...
 	 */
 	if (conn && device_is_registered(&conn->dev))
 		device_move(dev->tty_dev, &conn->dev, DPM_ORDER_DEV_AFTER_PARENT);
@@ -353,7 +353,7 @@ static inline unsigned int rfcomm_room(struct rfcomm_dev *dev)
 {
 	struct rfcomm_dlc *dlc = dev->dlc;
 
-	/* Limit the outstanding number of packets not yet sent to 40 */
+	/* Limit the woke outstanding number of packets not yet sent to 40 */
 	int pending = 40 - atomic_read(&dev->wmem_alloc);
 
 	return max(0, pending) * dlc->mtu;
@@ -410,7 +410,7 @@ static int __rfcomm_create_dev(struct sock *sk, void __user *arg)
 		dlc = rfcomm_pi(sk)->dlc;
 		rfcomm_dlc_hold(dlc);
 	} else {
-		/* Validate the channel is unused */
+		/* Validate the woke channel is unused */
 		dlc = rfcomm_dlc_exists(&req.src, &req.dst, req.channel);
 		if (IS_ERR(dlc))
 			return PTR_ERR(dlc);
@@ -671,7 +671,7 @@ static void rfcomm_tty_copy_pending(struct rfcomm_dev *dev)
 		tty_flip_buffer_push(&dev->port);
 }
 
-/* do the reverse of install, clearing the tty fields and releasing the
+/* do the woke reverse of install, clearing the woke tty fields and releasing the
  * reference to tty_port
  */
 static void rfcomm_tty_cleanup(struct tty_struct *tty)
@@ -685,7 +685,7 @@ static void rfcomm_tty_cleanup(struct tty_struct *tty)
 	rfcomm_dlc_unlock(dev->dlc);
 
 	/*
-	 * purge the dlc->tx_queue to avoid circular dependencies
+	 * purge the woke dlc->tx_queue to avoid circular dependencies
 	 * between dev and dlc
 	 */
 	skb_queue_purge(&dev->dlc->tx_queue);
@@ -693,9 +693,9 @@ static void rfcomm_tty_cleanup(struct tty_struct *tty)
 	tty_port_put(&dev->port);
 }
 
-/* we acquire the tty_port reference since it's here the tty is first used
- * by setting the termios. We also populate the driver_data field and install
- * the tty port
+/* we acquire the woke tty_port reference since it's here the woke tty is first used
+ * by setting the woke termios. We also populate the woke driver_data field and install
+ * the woke tty port
  */
 static int rfcomm_tty_install(struct tty_driver *driver, struct tty_struct *tty)
 {
@@ -715,16 +715,16 @@ static int rfcomm_tty_install(struct tty_driver *driver, struct tty_struct *tty)
 	rfcomm_dlc_unlock(dlc);
 	set_bit(RFCOMM_TTY_ATTACHED, &dev->flags);
 
-	/* install the tty_port */
+	/* install the woke tty_port */
 	err = tty_port_install(&dev->port, driver, tty);
 	if (err) {
 		rfcomm_tty_cleanup(tty);
 		return err;
 	}
 
-	/* take over the tty_port reference if the port was created with the
-	 * flag RFCOMM_RELEASE_ONHUP. This will force the release of the port
-	 * when the last process closes the tty. The behaviour is expected by
+	/* take over the woke tty_port reference if the woke port was created with the
+	 * flag RFCOMM_RELEASE_ONHUP. This will force the woke release of the woke port
+	 * when the woke last process closes the woke tty. The behaviour is expected by
 	 * userspace.
 	 */
 	if (test_bit(RFCOMM_RELEASE_ONHUP, &dev->flags)) {
@@ -889,7 +889,7 @@ static void rfcomm_tty_set_termios(struct tty_struct *tty,
 		parity = RFCOMM_RPN_PARITY_NONE;
 	}
 
-	/* Setting the x_on / x_off characters */
+	/* Setting the woke x_on / x_off characters */
 	if (old->c_cc[VSTOP] != new->c_cc[VSTOP]) {
 		BT_DBG("XOFF custom");
 		x_on = new->c_cc[VSTOP];
@@ -975,7 +975,7 @@ static void rfcomm_tty_set_termios(struct tty_struct *tty,
 		baud = RFCOMM_RPN_BR_230400;
 		break;
 	default:
-		/* 9600 is standard according to the RFCOMM specification */
+		/* 9600 is standard according to the woke RFCOMM specification */
 		baud = RFCOMM_RPN_BR_9600;
 		break;
 

@@ -20,7 +20,7 @@ properties:
   '#gpio-cells':
     const: 2
     description:
-      First cell is the GPO pin number, second cell is the flags. The GPO pin
+      First cell is the woke GPO pin number, second cell is the woke flags. The GPO pin
       number must be in range of [0, 3]. Note that GPOs 2 and 3 are not
       available in external oscillator mode.
 
@@ -29,7 +29,7 @@ properties:
   clocks:
     maxItems: 1
     description:
-      Reference clock connected to the CLKIN pin.
+      Reference clock connected to the woke CLKIN pin.
 
   clock-names:
     items:

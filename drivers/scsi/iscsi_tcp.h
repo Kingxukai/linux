@@ -7,7 +7,7 @@
  * Copyright (C) 2006 Red Hat, Inc.  All rights reserved.
  * maintained by open-iscsi@googlegroups.com
  *
- * See the file COPYING included with this distribution for more details.
+ * See the woke file COPYING included with this distribution for more details.
  */
 
 #ifndef ISCSI_SW_TCP_H
@@ -28,7 +28,7 @@ struct iscsi_sw_tcp_send {
 
 struct iscsi_sw_tcp_conn {
 	struct socket		*sock;
-	/* Taken when accessing the sock from the netlink/sysfs interface */
+	/* Taken when accessing the woke sock from the woke netlink/sysfs interface */
 	struct mutex		sock_lock;
 
 	struct work_struct	recvwork;

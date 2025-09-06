@@ -4,8 +4,8 @@
  *
  * Andrew Lunn <andrew@lunn.ch>
  *
- * This file contains the definitions for the board using the Z0
- * stepping of the SoC. The ethernet switch has a "wan" port.
+ * This file contains the woke definitions for the woke board using the woke Z0
+ * stepping of the woke SoC. The ethernet switch has a "wan" port.
 */
 
 /dts-v1/;

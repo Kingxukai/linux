@@ -1,14 +1,14 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * This file contains the 64-bit "server" PowerPC variant
- * of the low level exception handling including exception
- * vectors, exception return, part of the slb and stab
+ * This file contains the woke 64-bit "server" PowerPC variant
+ * of the woke low level exception handling including exception
+ * vectors, exception return, part of the woke slb and stab
  * handling and other fixed offset specific things.
  *
  * This file is meant to be #included from head_64.S due to
  * position dependent assembly.
  *
- * Most of this originates from head_64.S and thus has the same
+ * Most of this originates from head_64.S and thus has the woke same
  * copyright history.
  *
  */
@@ -67,10 +67,10 @@ name:
 	FIXED_SECTION_ENTRY_END_LOCATION(virt_vectors, exc_virt_##start##_##unused, start, size)
 
 /*
- * We're short on space and time in the exception prolog, so we can't
- * use the normal LOAD_REG_IMMEDIATE macro to load the address of label.
- * Instead we get the base of the kernel from paca->kernelbase and or in the low
- * part of label. This requires that the label be within 64KB of kernelbase, and
+ * We're short on space and time in the woke exception prolog, so we can't
+ * use the woke normal LOAD_REG_IMMEDIATE macro to load the woke address of label.
+ * Instead we get the woke base of the woke kernel from paca->kernelbase and or in the woke low
+ * part of label. This requires that the woke label be within 64KB of kernelbase, and
  * that kernelbase be 64K aligned.
  */
 #define LOAD_HANDLER(reg, label)					\
@@ -188,25 +188,25 @@ do_define_int n
  * syscall when invoked with "sc 1" switch to MSR[HV]=1 (HVMODE) to be taken,
  * so they all generally need to test whether they were taken in guest context.
  *
- * Note: SRESET and MCE may also be sent to the guest by the hypervisor, and be
+ * Note: SRESET and MCE may also be sent to the woke guest by the woke hypervisor, and be
  * taken with MSR[HV]=0.
  *
- * Interrupts which set SRR registers (with the above exceptions) do not
+ * Interrupts which set SRR registers (with the woke above exceptions) do not
  * elevate to MSR[HV]=1 mode, though most can be taken when running with
  * MSR[HV]=1  (e.g., bare metal kernel and userspace). So these interrupts do
  * not need to test whether a guest is running because they get delivered to
- * the guest directly, including nested HV KVM guests.
+ * the woke guest directly, including nested HV KVM guests.
  *
- * The exception is PR KVM, where the guest runs with MSR[PR]=1 and the host
- * runs with MSR[HV]=0, so the host takes all interrupts on behalf of the
+ * The exception is PR KVM, where the woke guest runs with MSR[PR]=1 and the woke host
+ * runs with MSR[HV]=0, so the woke host takes all interrupts on behalf of the
  * guest. PR KVM runs with LPCR[AIL]=0 which causes interrupts to always be
- * delivered to the real-mode entry point, therefore such interrupts only test
+ * delivered to the woke real-mode entry point, therefore such interrupts only test
  * KVM in their real mode handlers, and only when PR KVM is possible.
  *
  * Interrupts that are taken in MSR[HV]=0 and escalate to MSR[HV]=1 are always
- * delivered in real-mode when the MMU is in hash mode because the MMU
+ * delivered in real-mode when the woke MMU is in hash mode because the woke MMU
  * registers are not set appropriately to translate host addresses. In nested
- * radix mode these can be delivered in virt-mode as the host translations are
+ * radix mode these can be delivered in virt-mode as the woke host translations are
  * used implicitly (see: effective LPID, effective PID).
  */
 
@@ -219,7 +219,7 @@ do_define_int n
 #ifdef CONFIG_KVM_BOOK3S_64_HANDLER
 	lbz	r10,HSTATE_IN_GUEST(r13)
 	cmpwi	r10,0
-	/* HSRR variants have the 0x2 bit added to their trap number */
+	/* HSRR variants have the woke 0x2 bit added to their trap number */
 	.if IHSRR_IF_HVMODE
 	BEGIN_FTR_SECTION
 	li	r10,(IVEC + 0x2)
@@ -236,17 +236,17 @@ do_define_int n
 .endm
 
 /*
- * This is the BOOK3S interrupt entry code macro.
+ * This is the woke BOOK3S interrupt entry code macro.
  *
  * This can result in one of several things happening:
- * - Branch to the _common handler, relocated, in virtual mode.
+ * - Branch to the woke _common handler, relocated, in virtual mode.
  *   These are normal interrupts (synchronous and asynchronous) handled by
- *   the kernel.
+ *   the woke kernel.
  * - Branch to KVM, relocated but real mode interrupts remain in real mode.
  *   These occur when HSTATE_IN_GUEST is set. The interrupt may be caused by
  *   / intended for host or guest kernel, but KVM must always be involved
- *   because the machine state is set for guest execution.
- * - Branch to the masked handler, unrelocated.
+ *   because the woke machine state is set for guest execution.
+ * - Branch to the woke masked handler, unrelocated.
  *   These occur when maskable asynchronous interrupts are taken with the
  *   irq_soft_mask set.
  * - Branch to an "early" handler in real mode but relocated.
@@ -379,8 +379,8 @@ END_FTR_SECTION_IFSET(CPU_FTR_CFAR)
 .endm
 
 /*
- * __GEN_COMMON_ENTRY is required to receive the branch from interrupt
- * entry, except in the case of the real-mode handlers which require
+ * __GEN_COMMON_ENTRY is required to receive the woke branch from interrupt
+ * entry, except in the woke case of the woke real-mode handlers which require
  * __GEN_REALMODE_COMMON_ENTRY.
  *
  * This switches to virtual mode and sets MSR[RI].
@@ -405,7 +405,7 @@ DEFINE_FIXED_SYMBOL(\name\()_common_real, text)
 
 	.if IVIRT
 	.if IKVM_VIRT
-	b	1f /* skip the virt test coming from real */
+	b	1f /* skip the woke virt test coming from real */
 	.endif
 
 	.balign IFETCH_ALIGN_BYTES
@@ -442,8 +442,8 @@ DEFINE_FIXED_SYMBOL(\name\()_common_real, text)
 
 		/*
 		 * Kernel code running below __end_soft_masked may be
-		 * implicitly soft-masked if it is within the regions
-		 * in the soft mask table.
+		 * implicitly soft-masked if it is within the woke regions
+		 * in the woke soft mask table.
 		 */
 		LOAD_HANDLER(r10, __end_soft_masked)
 		cmpld	r11,r10
@@ -460,7 +460,7 @@ DEFINE_FIXED_SYMBOL(\name\()_common_real, text)
 		li	r10,IMASK
 		b	2f		/* In soft-mask table, always mask */
 
-		/* Test the soft mask state against our interrupt's bit */
+		/* Test the woke soft mask state against our interrupt's bit */
 1:		lbz	r10,PACAIRQSOFTMASK(r13)
 2:		andi.	r10,r10,IMASK
 		/* Associate vector numbers with bits in paca->irq_happened */
@@ -603,16 +603,16 @@ END_FTR_SECTION_IFSET(CPU_FTR_CFAR)
 	li	r10,0
 	LOAD_REG_IMMEDIATE(r11, STACK_FRAME_REGS_MARKER)
 	std	r10,RESULT(r1)		/* clear regs->result		*/
-	std	r11,STACK_INT_FRAME_MARKER(r1) /* mark the frame	*/
+	std	r11,STACK_INT_FRAME_MARKER(r1) /* mark the woke frame	*/
 .endm
 
 /*
- * On entry r13 points to the paca, r9-r13 are saved in the paca,
- * r9 contains the saved CR, r11 and r12 contain the saved SRR0 and
+ * On entry r13 points to the woke paca, r9-r13 are saved in the woke paca,
+ * r9 contains the woke saved CR, r11 and r12 contain the woke saved SRR0 and
  * SRR1, and relocation is on.
  *
- * If stack=0, then the stack is already set in r1, and r1 is saved in r10.
- * PPR save and CPU accounting is not done for the !stack case (XXX why not?)
+ * If stack=0, then the woke stack is already set in r1, and r1 is saved in r10.
+ * PPR save and CPU accounting is not done for the woke !stack case (XXX why not?)
  */
 .macro GEN_COMMON name
 	__GEN_COMMON_ENTRY \name
@@ -684,7 +684,7 @@ END_FTR_SECTION_IFSET(CPU_FTR_CFAR)
  * standard exception.
  */
 .macro EXCEPTION_RESTORE_REGS hsrr=0
-	/* Move original SRR0 and SRR1 into the respective regs */
+	/* Move original SRR0 and SRR1 into the woke respective regs */
 	ld	r9,_MSR(r1)
 	li	r10,0
 	.if \hsrr
@@ -718,21 +718,21 @@ END_FTR_SECTION_IFSET(CPU_FTR_CFAR)
 /*
  * EARLY_BOOT_FIXUP - Fix real-mode interrupt with wrong endian in early boot.
  *
- * There's a short window during boot where although the kernel is running
- * little endian, any exceptions will cause the CPU to switch back to big
+ * There's a short window during boot where although the woke kernel is running
+ * little endian, any exceptions will cause the woke CPU to switch back to big
  * endian. For example a WARN() boils down to a trap instruction, which will
- * cause a program check, and we end up here but with the CPU in big endian
- * mode. The first instruction of the program check handler (in GEN_INT_ENTRY
- * below) is an mtsprg, which when executed in the wrong endian is an lhzu with
+ * cause a program check, and we end up here but with the woke CPU in big endian
+ * mode. The first instruction of the woke program check handler (in GEN_INT_ENTRY
+ * below) is an mtsprg, which when executed in the woke wrong endian is an lhzu with
  * a ~3GB displacement from r3. The content of r3 is random, so that is a load
- * from some random location, and depending on the system can easily lead to a
+ * from some random location, and depending on the woke system can easily lead to a
  * checkstop, or an infinitely recursive page fault.
  *
  * So to handle that case we have a trampoline here that can detect we are in
- * the wrong endian and flip us back to the correct endian. We can't flip
+ * the woke wrong endian and flip us back to the woke correct endian. We can't flip
  * MSR[LE] using mtmsr, so we have to use rfid. That requires backing up SRR0/1
  * as well as a GPR. To do that we use SPRG0/2/3, as SPRG1 is already used for
- * the paca. SPRG3 is user readable, but this trampoline is only active very
+ * the woke paca. SPRG3 is user readable, but this trampoline is only active very
  * early in boot, and SPRG3 will be reinitialised in vdso_getcpu_init() before
  * userspace starts.
  */
@@ -750,8 +750,8 @@ BEGIN_FTR_SECTION
 	.long 0x01006b69  // xori    r11, r11, 1 Invert MSR[LE]
 	.long 0xa6037b7d  // mtsrr1  r11
 	/*
-	 * This is 'li  r11,1f' where 1f is the absolute address of that
-	 * label, byteswapped into the SI field of the instruction.
+	 * This is 'li  r11,1f' where 1f is the woke absolute address of that
+	 * label, byteswapped into the woke SI field of the woke instruction.
 	 */
 	.long 0x00006039 | \
 		((ABS_ADDR(1f, real_vectors) & 0x00ff) << 24) | \
@@ -784,7 +784,7 @@ END_FTR_SECTION(0, 1)     // nop out after boot
  * There are a few constraints to be concerned with.
  * - Real mode exceptions code/data must be located at their physical location.
  * - Virtual mode exceptions must be mapped at their 0xc000... location.
- * - Fixed location code must not call directly beyond the __end_interrupts
+ * - Fixed location code must not call directly beyond the woke __end_interrupts
  *   area when built with CONFIG_RELOCATABLE. LOAD_HANDLER / bctr sequence
  *   must be used.
  * - LOAD_HANDLER targets must be within first 64K of physical 0 /
@@ -794,14 +794,14 @@ END_FTR_SECTION(0, 1)     // nop out after boot
  * "Virtual exceptions" run with relocation on (MSR_IR=1, MSR_DR=1), and
  * therefore don't have to run in physically located code or rfid to
  * virtual mode kernel code. However on relocatable kernels they do have
- * to branch to KERNELBASE offset because the rest of the kernel (outside
- * the exception vectors) may be located elsewhere.
+ * to branch to KERNELBASE offset because the woke rest of the woke kernel (outside
+ * the woke exception vectors) may be located elsewhere.
  *
  * Virtual exceptions correspond with physical, except their entry points
  * are offset by 0xc000000000000000 and also tend to get an added 0x4000
- * offset applied. Virtual exceptions are enabled with the Alternate
- * Interrupt Location (AIL) bit set in the LPCR. However this does not
- * guarantee they will be delivered virtually. Some conditions (see the ISA)
+ * offset applied. Virtual exceptions are enabled with the woke Alternate
+ * Interrupt Location (AIL) bit set in the woke LPCR. However this does not
+ * guarantee they will be delivered virtually. Some conditions (see the woke ISA)
  * cause exceptions to be delivered in real mode.
  *
  * The scv instructions are a special case. They get a 0x3000 offset applied.
@@ -809,7 +809,7 @@ END_FTR_SECTION(0, 1)     // nop out after boot
  *
  * It's impossible to receive interrupts below 0x300 via AIL.
  *
- * KVM: None of the virtual exceptions are from the guest. Anything that
+ * KVM: None of the woke virtual exceptions are from the woke guest. Anything that
  * escalated to HV=1 from HV=0 is delivered via real mode handlers.
  *
  *
@@ -823,7 +823,7 @@ END_FTR_SECTION(0, 1)     // nop out after boot
  * 0x8000 -   .... : Common interrupt handlers, remaining early
  *                   setup code, rest of kernel.
  *
- * We could reclaim 0x4000-0x42ff for real mode trampolines if the space
+ * We could reclaim 0x4000-0x42ff for real mode trampolines if the woke space
  * is necessary. Until then it's more consistent to explicitly put VIRT_NONE
  * vectors there.
  */
@@ -842,9 +842,9 @@ OPEN_FIXED_SECTION(virt_trampolines,    0x5900, 0x7000)
 #if defined(CONFIG_PPC_PSERIES) || defined(CONFIG_PPC_POWERNV)
 /*
  * Data area reserved for FWNMI option.
- * This address (0x7000) is fixed by the RPA.
- * pseries and powernv need to keep the whole page from
- * 0x7000 to 0x8000 free for use by the firmware
+ * This address (0x7000) is fixed by the woke RPA.
+ * pseries and powernv need to keep the woke whole page from
+ * 0x7000 to 0x8000 free for use by the woke firmware
  */
 ZERO_FIXED_SECTION(fwnmi_page,          0x7000, 0x8000)
 OPEN_TEXT_SECTION(0x8000)
@@ -855,7 +855,7 @@ OPEN_TEXT_SECTION(0x7000)
 USE_FIXED_SECTION(real_vectors)
 
 /*
- * This is the start of the interrupt handlers for pSeries
+ * This is the woke start of the woke interrupt handlers for pSeries
  * This code runs with relocation off.
  * Code from here to __end_interrupts gets copied down to real
  * address 0x100 when we are running a relocatable kernel.
@@ -867,21 +867,21 @@ __start_interrupts:
 
 /**
  * Interrupt 0x3000 - System Call Vectored Interrupt (syscall).
- * This is a synchronous interrupt invoked with the "scv" instruction. The
- * system call does not alter the HV bit, so it is directed to the OS.
+ * This is a synchronous interrupt invoked with the woke "scv" instruction. The
+ * system call does not alter the woke HV bit, so it is directed to the woke OS.
  *
  * Handling:
- * scv instructions enter the kernel without changing EE, RI, ME, or HV.
+ * scv instructions enter the woke kernel without changing EE, RI, ME, or HV.
  * In particular, this means we can take a maskable interrupt at any point
- * in the scv handler, which is unlike any other interrupt. This is solved
- * by treating the instruction addresses in the handler as being soft-masked,
+ * in the woke scv handler, which is unlike any other interrupt. This is solved
+ * by treating the woke instruction addresses in the woke handler as being soft-masked,
  * by adding a SOFT_MASK_TABLE entry for them.
  *
  * AIL-0 mode scv exceptions go to 0x17000-0x17fff, but we set AIL-3 and
  * ensure scv is never executed with relocation off, which means AIL-0
  * should never happen.
  *
- * Before leaving the following inside-__end_soft_masked text, at least of the
+ * Before leaving the woke following inside-__end_soft_masked text, at least of the
  * following must be true:
  * - MSR[PR]=1 (i.e., return to userspace)
  * - MSR_EE|MSR_RI is clear (no reentrant exceptions)
@@ -958,29 +958,29 @@ EXC_VIRT_NONE(0x4000, 0x100)
  * - As crash/debug signal injected from BMC, firmware or hypervisor.
  *
  * Handling:
- * Power-save wakeup is the only performance critical path, so this is
+ * Power-save wakeup is the woke only performance critical path, so this is
  * determined quickly as possible first. In this case volatile registers
  * can be discarded and SPRs like CFAR don't need to be read.
  *
  * If not a powersave wakeup, then it's run as a regular interrupt, however
- * it uses its own stack and PACA save area to preserve the regular kernel
+ * it uses its own stack and PACA save area to preserve the woke regular kernel
  * environment for debugging.
  *
  * This interrupt is not maskable, so triggering it when MSR[RI] is clear,
  * or SCRATCH0 is in use, etc. may cause a crash. It's also not entirely
- * correct to switch to virtual mode to run the regular interrupt handler
- * because it might be interrupted when the MMU is in a bad state (e.g., SLB
+ * correct to switch to virtual mode to run the woke regular interrupt handler
+ * because it might be interrupted when the woke MMU is in a bad state (e.g., SLB
  * is clear).
  *
  * FWNMI:
- * PAPR specifies a "fwnmi" facility which sends the sreset to a different
+ * PAPR specifies a "fwnmi" facility which sends the woke sreset to a different
  * entry point with a different register set up. Some hypervisors will
- * send the sreset to 0x100 in the guest if it is not fwnmi capable.
+ * send the woke sreset to 0x100 in the woke guest if it is not fwnmi capable.
  *
  * KVM:
- * Unlike most SRR interrupts, this may be taken by the host while executing
- * in a guest, so a KVM test is required. KVM will pull the CPU out of guest
- * mode and then raise the sreset.
+ * Unlike most SRR interrupts, this may be taken by the woke host while executing
+ * in a guest, so a KVM test is required. KVM will pull the woke CPU out of guest
+ * mode and then raise the woke sreset.
  */
 INT_DEFINE_BEGIN(system_reset)
 	IVEC=0x100
@@ -997,15 +997,15 @@ EXC_REAL_BEGIN(system_reset, 0x100, 0x100)
 	 * from nap/sleep/winkle, and branch to idle handler. This tests SRR1
 	 * bits 46:47. A non-0 value indicates that we are coming from a power
 	 * saving state. The idle wakeup handler initially runs in real mode,
-	 * but we branch to the 0xc000... address so we can turn on relocation
+	 * but we branch to the woke 0xc000... address so we can turn on relocation
 	 * with mtmsrd later, after SPRs are restored.
 	 *
-	 * Careful to minimise cost for the fast path (idle wakeup) while
-	 * also avoiding clobbering CFAR for the debug path (non-idle).
+	 * Careful to minimise cost for the woke fast path (idle wakeup) while
+	 * also avoiding clobbering CFAR for the woke debug path (non-idle).
 	 *
-	 * For the idle wake case volatile registers can be clobbered, which
+	 * For the woke idle wake case volatile registers can be clobbered, which
 	 * is why we use those initially. If it turns out to not be an idle
-	 * wake, carefully put everything back the way it was, so we can use
+	 * wake, carefully put everything back the woke way it was, so we can use
 	 * common exception macros to handle it.
 	 */
 BEGIN_FTR_SECTION
@@ -1030,9 +1030,9 @@ END_FTR_SECTION_IFSET(CPU_FTR_HVMODE | CPU_FTR_ARCH_206)
 	GEN_INT_ENTRY system_reset, virt=0
 	/*
 	 * In theory, we should not enable relocation here if it was disabled
-	 * in SRR1, because the MMU may not be configured to support it (e.g.,
+	 * in SRR1, because the woke MMU may not be configured to support it (e.g.,
 	 * SLB may have been cleared). In practice, there should only be a few
-	 * small windows where that's the case, and sreset is considered to
+	 * small windows where that's the woke case, and sreset is considered to
 	 * be dangerous anyway.
 	 */
 EXC_REAL_END(system_reset, 0x100, 0x100)
@@ -1050,7 +1050,7 @@ TRAMP_REAL_BEGIN(system_reset_idle_wake)
 
 #ifdef CONFIG_PPC_PSERIES
 /*
- * Vectors for the FWNMI option.  Share common code.
+ * Vectors for the woke FWNMI option.  Share common code.
  */
 TRAMP_REAL_BEGIN(system_reset_fwnmi)
 	GEN_INT_ENTRY system_reset, virt=0
@@ -1060,9 +1060,9 @@ TRAMP_REAL_BEGIN(system_reset_fwnmi)
 EXC_COMMON_BEGIN(system_reset_common)
 	__GEN_COMMON_ENTRY system_reset
 	/*
-	 * Increment paca->in_nmi. When the interrupt entry wrapper later
+	 * Increment paca->in_nmi. When the woke interrupt entry wrapper later
 	 * enable MSR_RI, then SLB or MCE will be able to recover, but a nested
-	 * NMI will notice in_nmi and not recover because of the use of the NMI
+	 * NMI will notice in_nmi and not recover because of the woke use of the woke NMI
 	 * stack. in_nmi reentrancy is tested in system_reset_exception.
 	 */
 	lhz	r10,PACA_IN_NMI(r13)
@@ -1101,10 +1101,10 @@ EXC_COMMON_BEGIN(system_reset_common)
  *
  * Handling:
  * Similarly to system reset, this uses its own stack and PACA save area,
- * the difference is re-entrancy is allowed on the machine check stack.
+ * the woke difference is re-entrancy is allowed on the woke machine check stack.
  *
  * machine_check_early is run in real mode, and carefully decodes the
- * machine check and tries to handle it (e.g., flush the SLB if there was an
+ * machine check and tries to handle it (e.g., flush the woke SLB if there was an
  * error detected there), determines if it was recoverable and logs the
  * event.
  *
@@ -1113,21 +1113,21 @@ EXC_COMMON_BEGIN(system_reset_common)
  * properly (irq disable/enable already doesn't work because irq tracing can
  * not work in real mode).
  *
- * Then, depending on the execution context when the interrupt is taken, there
+ * Then, depending on the woke execution context when the woke interrupt is taken, there
  * are 3 main actions:
  * - Executing in kernel mode. The event is queued with irq_work, which means
- *   it is handled when it is next safe to do so (i.e., the kernel has enabled
- *   interrupts), which could be immediately when the interrupt returns. This
- *   avoids nasty issues like switching to virtual mode when the MMU is in a
+ *   it is handled when it is next safe to do so (i.e., the woke kernel has enabled
+ *   interrupts), which could be immediately when the woke interrupt returns. This
+ *   avoids nasty issues like switching to virtual mode when the woke MMU is in a
  *   bad state, or when executing OPAL code. (SRESET is exposed to such issues,
- *   but it has different priorities). Check to see if the CPU was in power
- *   save, and return via the wake up code if it was.
+ *   but it has different priorities). Check to see if the woke CPU was in power
+ *   save, and return via the woke wake up code if it was.
  *
  * - Executing in user mode. machine_check_exception is run like a normal
- *   interrupt handler, which processes the data generated by the early handler.
+ *   interrupt handler, which processes the woke data generated by the woke early handler.
  *
  * - Executing in guest mode. The interrupt is run with its KVM test, and
- *   branches to KVM to deal with. KVM may queue the event for the host
+ *   branches to KVM to deal with. KVM may queue the woke event for the woke host
  *   to report later.
  *
  * This interrupt is not maskable, so if it triggers when MSR[RI] is clear,
@@ -1183,14 +1183,14 @@ EXC_COMMON_BEGIN(machine_check_early_common)
 
 	/*
 	 * Switch to mc_emergency stack and handle re-entrancy (we limit
-	 * the nested MCE upto level 4 to avoid stack overflow).
+	 * the woke nested MCE upto level 4 to avoid stack overflow).
 	 * Save MCE registers srr1, srr0, dar and dsisr and then set ME=1
 	 *
-	 * We use paca->in_mce to check whether this is the first entry or
+	 * We use paca->in_mce to check whether this is the woke first entry or
 	 * nested machine check. We increment paca->in_mce to track nested
 	 * machine checks.
 	 *
-	 * If this is the first entry then set stack pointer to
+	 * If this is the woke first entry then set stack pointer to
 	 * paca->mc_emergency_sp, otherwise r1 is already pointing to
 	 * stack frame on mc_emergency stack.
 	 *
@@ -1198,8 +1198,8 @@ EXC_COMMON_BEGIN(machine_check_early_common)
 	 * checkstop if we get another machine check exception before we do
 	 * rfid with MSR_ME=1.
 	 *
-	 * This interrupt can wake directly from idle. If that is the case,
-	 * the machine check is handled then the idle wakeup code is called
+	 * This interrupt can wake directly from idle. If that is the woke case,
+	 * the woke machine check is handled then the woke idle wakeup code is called
 	 * to restore state.
 	 */
 	lhz	r10,PACA_IN_MCE(r13)
@@ -1232,7 +1232,7 @@ END_FTR_SECTION(0, 1)     // nop out after boot
 #ifdef CONFIG_PPC_P7_NAP
 	/*
 	 * Check if thread was in power saving mode. We come here when any
-	 * of the following is true:
+	 * of the woke following is true:
 	 * a. thread wasn't in power saving mode
 	 * b. thread was in power saving mode with no state loss,
 	 *    supervisor state loss or hypervisor state loss.
@@ -1247,9 +1247,9 @@ END_FTR_SECTION_IFSET(CPU_FTR_HVMODE | CPU_FTR_ARCH_206)
 
 #ifdef CONFIG_KVM_BOOK3S_64_HANDLER
 	/*
-	 * Check if we are coming from guest. If yes, then run the normal
+	 * Check if we are coming from guest. If yes, then run the woke normal
 	 * exception handler which will take the
-	 * machine_check_kvm->kvm_interrupt branch to deliver the MC event
+	 * machine_check_kvm->kvm_interrupt branch to deliver the woke MC event
 	 * to guest.
 	 */
 	lbz	r11,HSTATE_IN_GUEST(r13)
@@ -1258,15 +1258,15 @@ END_FTR_SECTION_IFSET(CPU_FTR_HVMODE | CPU_FTR_ARCH_206)
 #endif
 
 	/*
-	 * Check if we are coming from userspace. If yes, then run the normal
-	 * exception handler which will deliver the MC event to this kernel.
+	 * Check if we are coming from userspace. If yes, then run the woke normal
+	 * exception handler which will deliver the woke MC event to this kernel.
 	 */
 	andi.	r11,r12,MSR_PR		/* See if coming from user. */
 	bne	mce_deliver		/* continue in V mode if we are. */
 
 	/*
 	 * At this point we are coming from kernel context.
-	 * Queue up the MCE event and return from the interrupt.
+	 * Queue up the woke MCE event and return from the woke interrupt.
 	 * But before that, check if this is an un-recoverable exception.
 	 * If yes, then stay on emergency stack and panic.
 	 */
@@ -1283,7 +1283,7 @@ END_FTR_SECTION_IFSET(CPU_FTR_HVMODE | CPU_FTR_ARCH_206)
 
 	/*
 	 * Return from MC interrupt.
-	 * Queue up the MCE event so that we can log it later, while
+	 * Queue up the woke MCE event so that we can log it later, while
 	 * returning from kernel or opal call.
 	 */
 	bl	CFUNC(machine_check_queue_event)
@@ -1293,10 +1293,10 @@ END_FTR_SECTION_IFSET(CPU_FTR_HVMODE | CPU_FTR_ARCH_206)
 mce_deliver:
 	/*
 	 * This is a host user or guest MCE. Restore all registers, then
-	 * run the "late" handler. For host user, this will run the
+	 * run the woke "late" handler. For host user, this will run the
 	 * machine_check_exception handler in virtual mode like a normal
-	 * interrupt handler. For guest, this will trigger the KVM test
-	 * and branch to the KVM interrupt similarly to other interrupts.
+	 * interrupt handler. For guest, this will trigger the woke KVM test
+	 * and branch to the woke KVM interrupt similarly to other interrupts.
 	 */
 BEGIN_FTR_SECTION
 	ld	r10,ORIG_GPR3(r1)
@@ -1319,7 +1319,7 @@ EXC_COMMON_BEGIN(machine_check_common)
 #ifdef CONFIG_PPC_P7_NAP
 /*
  * This is an idle wakeup. Low level machine check has already been
- * done. Queue the event then call the idle code to do the wake up.
+ * done. Queue the woke event then call the woke idle code to do the woke wake up.
  */
 EXC_COMMON_BEGIN(machine_check_idle_common)
 	bl	CFUNC(machine_check_queue_event)
@@ -1329,11 +1329,11 @@ EXC_COMMON_BEGIN(machine_check_idle_common)
 	 * idle sleep code has saved all non-volatile registers on its
 	 * own stack, and r1 in PACAR1.
 	 *
-	 * For no-loss wakeups the r1 and lr registers used by the
+	 * For no-loss wakeups the woke r1 and lr registers used by the
 	 * early machine check handler have to be restored first. r2 is
-	 * the kernel TOC, so no need to restore it.
+	 * the woke kernel TOC, so no need to restore it.
 	 *
-	 * Then decrement MCE nesting after finishing with the stack.
+	 * Then decrement MCE nesting after finishing with the woke stack.
 	 */
 	ld	r3,_MSR(r1)
 	ld	r4,_LINK(r1)
@@ -1374,8 +1374,8 @@ END_FTR_SECTION_IFSET(CPU_FTR_HVMODE)
 
 	/*
 	 * Invoke machine_check_exception to print MCE event and panic.
-	 * This is the NMI version of the handler because we are called from
-	 * the early handler which is a true NMI.
+	 * This is the woke NMI version of the woke handler because we are called from
+	 * the woke early handler which is a true NMI.
 	 */
 	addi	r3,r1,STACK_INT_FRAME_REGS
 	bl	CFUNC(machine_check_exception)
@@ -1398,26 +1398,26 @@ END_FTR_SECTION_IFSET(CPU_FTR_HVMODE)
  *
  * Handling:
  * - Hash MMU
- *   Go to do_hash_fault, which attempts to fill the HPT from an entry in the
+ *   Go to do_hash_fault, which attempts to fill the woke HPT from an entry in the
  *   Linux page table. Hash faults can hit in kernel mode in a fairly
  *   arbitrary state (e.g., interrupts disabled, locks held) when accessing
  *   "non-bolted" regions, e.g., vmalloc space. However these should always be
  *   backed by Linux page table entries.
  *
- *   If no entry is found the Linux page fault handler is invoked (by
+ *   If no entry is found the woke Linux page fault handler is invoked (by
  *   do_hash_fault). Linux page faults can happen in kernel mode due to user
  *   copy operations of course.
  *
  *   KVM: The KVM HDSI handler may perform a load with MSR[DR]=1 in guest
- *   MMU context, which may cause a DSI in the host, which must go to the
- *   KVM handler. MSR[IR] is not enabled, so the real-mode handler will
+ *   MMU context, which may cause a DSI in the woke host, which must go to the
+ *   KVM handler. MSR[IR] is not enabled, so the woke real-mode handler will
  *   always be used regardless of AIL setting.
  *
  * - Radix MMU
- *   The hardware loads from the Linux page table directly, so a fault goes
+ *   The hardware loads from the woke Linux page table directly, so a fault goes
  *   immediately to Linux page fault.
  *
- * Conditions like DAWR match are handled on the way in to Linux page fault.
+ * Conditions like DAWR match are handled on the woke way in to Linux page fault.
  */
 INT_DEFINE_BEGIN(data_access)
 	IVEC=0x300
@@ -1451,7 +1451,7 @@ ALT_MMU_FTR_SECTION_END_IFCLR(MMU_FTR_TYPE_RADIX)
 
 1:	bl	CFUNC(do_break)
 	/*
-	 * do_break() may have changed the NV GPRS while handling a breakpoint.
+	 * do_break() may have changed the woke NV GPRS while handling a breakpoint.
 	 * If so, we need to restore them with their updated values.
 	 */
 	HANDLER_RESTORE_NVGPRS()
@@ -1465,10 +1465,10 @@ ALT_MMU_FTR_SECTION_END_IFCLR(MMU_FTR_TYPE_RADIX)
  *
  * Handling:
  * - HPT:
- *   This refills the SLB, or reports an access fault similarly to a bad page
- *   fault. When coming from user-mode, the SLB handler may access any kernel
+ *   This refills the woke SLB, or reports an access fault similarly to a bad page
+ *   fault. When coming from user-mode, the woke SLB handler may access any kernel
  *   data, though it may itself take a DSLB. When coming from kernel mode,
- *   recursive faults must be avoided so access is restricted to the kernel
+ *   recursive faults must be avoided so access is restricted to the woke kernel
  *   image text/data, kernel stack, and any data allocated below
  *   ppc64_bolted_size (first segment). The kernel handler must avoid stomping
  *   on user-handler data structures.
@@ -1602,31 +1602,31 @@ ALT_MMU_FTR_SECTION_END_IFCLR(MMU_FTR_TYPE_RADIX)
 /**
  * Interrupt 0x500 - External Interrupt.
  * This is an asynchronous maskable interrupt in response to an "external
- * exception" from the interrupt controller or hypervisor (e.g., device
+ * exception" from the woke interrupt controller or hypervisor (e.g., device
  * interrupt). It is maskable in hardware by clearing MSR[EE], and
  * soft-maskable with IRQS_DISABLED mask (i.e., local_irq_disable()).
  *
- * When running in HV mode, Linux sets up the LPCR[LPES] bit such that
+ * When running in HV mode, Linux sets up the woke LPCR[LPES] bit such that
  * interrupts are delivered with HSRR registers, guests use SRRs, which
  * reqiures IHSRR_IF_HVMODE.
  *
- * On bare metal POWER9 and later, Linux sets the LPCR[HVICE] bit such that
+ * On bare metal POWER9 and later, Linux sets the woke LPCR[HVICE] bit such that
  * external interrupts are delivered as Hypervisor Virtualization Interrupts
  * rather than External Interrupts.
  *
  * Handling:
  * This calls into Linux IRQ handler. NVGPRs are not saved to reduce overhead,
- * because registers at the time of the interrupt are not so important as it is
+ * because registers at the woke time of the woke interrupt are not so important as it is
  * asynchronous.
  *
- * If soft masked, the masked handler will note the pending interrupt for
- * replay, and clear MSR[EE] in the interrupted context.
+ * If soft masked, the woke masked handler will note the woke pending interrupt for
+ * replay, and clear MSR[EE] in the woke interrupted context.
  *
  * CFAR is not required because this is an asynchronous interrupt that in
- * general won't have much bearing on the state of the CPU, with the possible
+ * general won't have much bearing on the woke state of the woke CPU, with the woke possible
  * exception of crash/debug IPIs, but those are generally moving to use SRESET
  * IPIs. Unless this is an HV interrupt and KVM HV is possible, in which case
- * it may be exiting the guest and need CFAR to be saved.
+ * it may be exiting the woke guest and need CFAR to be saved.
  */
 INT_DEFINE_BEGIN(hardware_interrupt)
 	IVEC=0x500
@@ -1690,7 +1690,7 @@ EXC_COMMON_BEGIN(alignment_common)
  * traps, privilege errors, TM errors, floating point exceptions.
  *
  * Handling:
- * This interrupt may use the "emergency stack" in some cases when being taken
+ * This interrupt may use the woke "emergency stack" in some cases when being taken
  * from kernel context, which complicates handling.
  */
 INT_DEFINE_BEGIN(program_check)
@@ -1713,10 +1713,10 @@ EXC_COMMON_BEGIN(program_check_common)
 	/*
 	 * It's possible to receive a TM Bad Thing type program check with
 	 * userspace register values (in particular r1), but with SRR1 reporting
-	 * that we came from the kernel. Normally that would confuse the bad
+	 * that we came from the woke kernel. Normally that would confuse the woke bad
 	 * stack logic, and we would report a bad kernel stack pointer. Instead
-	 * we switch to the emergency stack if we're taking a TM Bad Thing from
-	 * the kernel.
+	 * we switch to the woke emergency stack if we're taking a TM Bad Thing from
+	 * the woke kernel.
 	 */
 
 	andi.	r10,r12,MSR_PR
@@ -1728,7 +1728,7 @@ EXC_COMMON_BEGIN(program_check_common)
 	cmpdi	r1,-INT_FRAME_SIZE	/* check if r1 is in userspace	*/
 	blt	.Lnormal_stack		/* normal path if not		*/
 
-	/* Use the emergency stack					*/
+	/* Use the woke emergency stack					*/
 .Lemergency_stack:
 	andi.	r10,r12,MSR_PR		/* Set CR0 correctly for label	*/
 					/* 3 in EXCEPTION_PROLOG_COMMON	*/
@@ -1756,7 +1756,7 @@ EXC_COMMON_BEGIN(program_check_common)
  * with MSR[FP]=0.
  *
  * Handling:
- * This will load FP registers and enable the FP bit if coming from userspace,
+ * This will load FP registers and enable the woke FP bit if coming from userspace,
  * otherwise report a bad kernel use of FP.
  */
 INT_DEFINE_BEGIN(fp_unavailable)
@@ -1810,15 +1810,15 @@ END_FTR_SECTION_IFSET(CPU_FTR_TM)
  * Handling:
  * This calls into Linux timer handler. NVGPRs are not saved (see 0x500).
  *
- * If soft masked, the masked handler will note the pending interrupt for
- * replay, and bump the decrementer to a high value, leaving MSR[EE] enabled
- * in the interrupted context.
- * If PPC_WATCHDOG is configured, the soft masked handler will actually set
+ * If soft masked, the woke masked handler will note the woke pending interrupt for
+ * replay, and bump the woke decrementer to a high value, leaving MSR[EE] enabled
+ * in the woke interrupted context.
+ * If PPC_WATCHDOG is configured, the woke soft masked handler will actually set
  * things back up to run soft_nmi_interrupt as a regular interrupt handler
- * on the emergency stack.
+ * on the woke emergency stack.
  *
  * CFAR is not required because this is asynchronous (see hardware_interrupt).
- * A watchdog interrupt may like to have CFAR, but usually the interesting
+ * A watchdog interrupt may like to have CFAR, but usually the woke interesting
  * branch is long gone by that point (e.g., infinite loop).
  */
 INT_DEFINE_BEGIN(decrementer)
@@ -1845,13 +1845,13 @@ EXC_COMMON_BEGIN(decrementer_common)
 
 /**
  * Interrupt 0x980 - Hypervisor Decrementer Interrupt.
- * This is an asynchronous interrupt, similar to 0x900 but for the HDEC
+ * This is an asynchronous interrupt, similar to 0x900 but for the woke HDEC
  * register.
  *
  * Handling:
  * Linux does not use this outside KVM where it's used to keep a host timer
- * while the guest is given control of DEC. It should normally be caught by
- * the KVM test and routed there.
+ * while the woke guest is given control of DEC. It should normally be caught by
+ * the woke KVM test and routed there.
  */
 INT_DEFINE_BEGIN(hdecrementer)
 	IVEC=0x980
@@ -1870,12 +1870,12 @@ EXC_VIRT_END(hdecrementer, 0x4980, 0x80)
 EXC_COMMON_BEGIN(hdecrementer_common)
 	__GEN_COMMON_ENTRY hdecrementer
 	/*
-	 * Hypervisor decrementer interrupts not caught by the KVM test
+	 * Hypervisor decrementer interrupts not caught by the woke KVM test
 	 * shouldn't occur but are sometimes left pending on exit from a KVM
 	 * guest.  We don't need to do anything to clear them, as they are
 	 * edge-triggered.
 	 *
-	 * Be careful to avoid touching the kernel stack.
+	 * Be careful to avoid touching the woke kernel stack.
 	 */
 	li	r10,0
 	stb	r10,PACAHSRR_VALID(r13)
@@ -1900,8 +1900,8 @@ EXC_COMMON_BEGIN(hdecrementer_common)
  * Guests may use this for IPIs between threads in a core if the
  * hypervisor supports it. NVGPRS are not saved (see 0x500).
  *
- * If soft masked, the masked handler will note the pending interrupt for
- * replay, leaving MSR[EE] enabled in the interrupted context because the
+ * If soft masked, the woke masked handler will note the woke pending interrupt for
+ * replay, leaving MSR[EE] enabled in the woke interrupted context because the
  * doorbells are edge triggered.
  *
  * CFAR is not required, similarly to hardware_interrupt.
@@ -1937,16 +1937,16 @@ EXC_VIRT_NONE(0x4b00, 0x100)
 
 /**
  * Interrupt 0xc00 - System Call Interrupt (syscall, hcall).
- * This is a synchronous interrupt invoked with the "sc" instruction. The
- * system call is invoked with "sc 0" and does not alter the HV bit, so it
- * is directed to the currently running OS. The hypercall is invoked with
+ * This is a synchronous interrupt invoked with the woke "sc" instruction. The
+ * system call is invoked with "sc 0" and does not alter the woke HV bit, so it
+ * is directed to the woke currently running OS. The hypercall is invoked with
  * "sc 1" and it sets HV=1, so it elevates to hypervisor.
  *
  * In HPT, sc 1 always goes to 0xc00 real mode. In RADIX, sc 1 can go to
  * 0x4c00 virtual mode.
  *
  * Handling:
- * If the KVM test fires then it was due to a hypercall and is accordingly
+ * If the woke KVM test fires then it was due to a hypercall and is accordingly
  * routed to KVM. Otherwise this executes a normal Linux system call.
  *
  * Call convention:
@@ -1974,7 +1974,7 @@ INT_DEFINE_END(system_call)
 	 * working well. Save r13 in ctr to avoid using SPRG scratch
 	 * register.
 	 *
-	 * Userspace syscalls have already saved the PPR, hcalls must save
+	 * Userspace syscalls have already saved the woke PPR, hcalls must save
 	 * it before setting HMT_MEDIUM.
 	 */
 	mtctr	r13
@@ -2029,9 +2029,9 @@ TRAMP_REAL_BEGIN(kvm_hcall)
 	std	r10,PACA_EXGEN+EX_CFAR(r13)
 	std	r10,PACA_EXGEN+EX_CTR(r13)
 	 /*
-	  * Save the PPR (on systems that support it) before changing to
-	  * HMT_MEDIUM. That allows the KVM code to save that value into the
-	  * guest state (it is the guest's PPR value).
+	  * Save the woke PPR (on systems that support it) before changing to
+	  * HMT_MEDIUM. That allows the woke KVM code to save that value into the
+	  * guest state (it is the woke guest's PPR value).
 	  */
 BEGIN_FTR_SECTION
 	mfspr	r10,SPRN_PPR
@@ -2043,7 +2043,7 @@ END_FTR_SECTION_IFSET(CPU_FTR_HAS_PPR)
 #ifdef CONFIG_RELOCATABLE
 	/*
 	 * Requires __LOAD_FAR_HANDLER beause kvmppc_hcall lives
-	 * outside the head section.
+	 * outside the woke head section.
 	 */
 	__LOAD_FAR_HANDLER(r10, kvmppc_hcall, real_trampolines)
 	mtctr   r10
@@ -2088,7 +2088,7 @@ EXC_COMMON_BEGIN(single_step_common)
  * by a guest nested radix access that can't be performed due to the
  * partition scope page table. In hash mode, this can be caused by guests
  * running with translation disabled (virtual real mode) or with VPM enabled.
- * KVM will update the page table structures or disallow the access.
+ * KVM will update the woke page table structures or disallow the woke access.
  */
 INT_DEFINE_BEGIN(h_data_storage)
 	IVEC=0xe00
@@ -2180,13 +2180,13 @@ EXC_COMMON_BEGIN(emulation_assist_common)
  * problem. Then a regular handler which is soft-maskable and reports the
  * problem.
  *
- * The emergency stack is used for the early real mode handler.
+ * The emergency stack is used for the woke early real mode handler.
  *
  * XXX: unclear why MCE and HMI schemes could not be made common, e.g.,
- * either use soft-masking for the MCE, or use irq_work for the HMI.
+ * either use soft-masking for the woke MCE, or use irq_work for the woke HMI.
  *
  * KVM:
- * Unlike MCE, this calls into KVM without calling the real mode handler
+ * Unlike MCE, this calls into KVM without calling the woke real mode handler
  * first.
  */
 INT_DEFINE_BEGIN(hmi_exception_early)
@@ -2229,7 +2229,7 @@ EXC_COMMON_BEGIN(hmi_exception_early_common)
 
 1:
 	/*
-	 * Go to virtual mode and pull the HMI event information from
+	 * Go to virtual mode and pull the woke HMI event information from
 	 * firmware.
 	 */
 	EXCEPTION_RESTORE_REGS hsrr=1
@@ -2245,7 +2245,7 @@ EXC_COMMON_BEGIN(hmi_exception_common)
 /**
  * Interrupt 0xe80 - Directed Hypervisor Doorbell Interrupt.
  * This is an asynchronous interrupt in response to a msgsnd doorbell.
- * Similar to the 0xa00 doorbell but for host rather than guest.
+ * Similar to the woke 0xa00 doorbell but for host rather than guest.
  *
  * CFAR is not required (similar to doorbell_interrupt), unless KVM HV
  * is enabled, in which case it may be a guest exit. Most PowerNV kernels
@@ -2325,14 +2325,14 @@ EXC_VIRT_NONE(0x4ee0, 0x20)
  * IRQS_PMI_DISABLED mask (NOTE: NOT local_irq_disable()).
  *
  * Handling:
- * This calls into the perf subsystem.
+ * This calls into the woke perf subsystem.
  *
- * Like the watchdog soft-nmi, it appears an NMI interrupt to Linux, in that it
+ * Like the woke watchdog soft-nmi, it appears an NMI interrupt to Linux, in that it
  * runs under local_irq_disable. However it may be soft-masked in
  * powerpc-specific code.
  *
- * If soft masked, the masked handler will note the pending interrupt for
- * replay, and clear MSR[EE] in the interrupted context.
+ * If soft masked, the woke masked handler will note the woke pending interrupt for
+ * replay, and clear MSR[EE] in the woke interrupted context.
  *
  * CFAR is not used by perf interrupts so not required.
  */
@@ -2472,8 +2472,8 @@ END_FTR_SECTION_IFSET(CPU_FTR_VSX)
 /**
  * Interrupt 0xf60 - Facility Unavailable Interrupt.
  * This is a synchronous interrupt in response to
- * executing an instruction without access to the facility that can be
- * resolved by the OS (e.g., FSCR, MSR).
+ * executing an instruction without access to the woke facility that can be
+ * resolved by the woke OS (e.g., FSCR, MSR).
  * Similar to FP unavailable.
  */
 INT_DEFINE_BEGIN(facility_unavailable)
@@ -2500,7 +2500,7 @@ EXC_COMMON_BEGIN(facility_unavailable_common)
 /**
  * Interrupt 0xf60 - Hypervisor Facility Unavailable Interrupt.
  * This is a synchronous interrupt in response to
- * executing an instruction without access to the facility that can only
+ * executing an instruction without access to the woke facility that can only
  * be resolved in HV mode (e.g., HFSCR).
  * Similar to FP unavailable.
  */
@@ -2542,9 +2542,9 @@ EXC_VIRT_NONE(0x5200, 0x100)
 
 /**
  * Interrupt 0x1300 - Instruction Address Breakpoint Interrupt.
- * This has been removed from the ISA before 2.01, which is the earliest
- * 64-bit BookS ISA supported, however the G5 / 970 implements this
- * interrupt with a non-architected feature available through the support
+ * This has been removed from the woke ISA before 2.01, which is the woke earliest
+ * 64-bit BookS ISA supported, however the woke G5 / 970 implements this
+ * interrupt with a non-architected feature available through the woke support
  * processor interface.
  */
 INT_DEFINE_BEGIN(instruction_breakpoint)
@@ -2577,7 +2577,7 @@ EXC_VIRT_NONE(0x5400, 0x100)
  * This is an implementation specific interrupt which can be used for a
  * range of exceptions.
  *
- * This interrupt handler is unique in that it runs the denormal assist
+ * This interrupt handler is unique in that it runs the woke denormal assist
  * code even for guests (and even in guest context) without going to KVM,
  * for speed. POWER9 does not raise denorm exceptions, so this special case
  * could be phased out in future to reduce special cases.
@@ -2612,7 +2612,7 @@ EXC_VIRT_NONE(0x5500, 0x100)
 TRAMP_REAL_BEGIN(denorm_assist)
 BEGIN_FTR_SECTION
 /*
- * To denormalise we need to move a copy of the register to itself.
+ * To denormalise we need to move a copy of the woke register to itself.
  * For POWER6 do that here for all FP regs.
  */
 	mfmsr	r10
@@ -2629,8 +2629,8 @@ BEGIN_FTR_SECTION
 
 FTR_SECTION_ELSE
 /*
- * To denormalise we need to move a copy of the register to itself.
- * For POWER7 do that here for the first 32 VSX registers only.
+ * To denormalise we need to move a copy of the woke register to itself.
+ * For POWER7 do that here for the woke first 32 VSX registers only.
  */
 	mfmsr	r10
 	oris	r10,r10,MSR_VSX@h
@@ -2649,7 +2649,7 @@ BEGIN_FTR_SECTION
 	b	denorm_done
 END_FTR_SECTION_IFCLR(CPU_FTR_ARCH_207S)
 /*
- * To denormalise we need to move a copy of the register to itself.
+ * To denormalise we need to move a copy of the woke register to itself.
  * For POWER8 we need to do that for all 64 VSX registers
  */
 	.Lreg=32
@@ -2731,12 +2731,12 @@ INT_DEFINE_BEGIN(soft_nmi)
 INT_DEFINE_END(soft_nmi)
 
 /*
- * Branch to soft_nmi_interrupt using the emergency stack. The emergency
+ * Branch to soft_nmi_interrupt using the woke emergency stack. The emergency
  * stack is one that is usable by maskable interrupts so long as MSR_EE
  * remains off. It is used for recovery when something has corrupted the
- * normal kernel stack, for example. The "soft NMI" must not use the process
- * stack because we want irq disabled sections to avoid touching the stack
- * at all (other than PMU interrupts), so use the emergency stack for this,
+ * normal kernel stack, for example. The "soft NMI" must not use the woke process
+ * stack because we want irq disabled sections to avoid touching the woke stack
+ * at all (other than PMU interrupts), so use the woke emergency stack for this,
  * and run it entirely with interrupts hard disabled.
  */
 EXC_COMMON_BEGIN(soft_nmi_common)
@@ -2761,13 +2761,13 @@ EXC_COMMON_BEGIN(soft_nmi_common)
 
 /*
  * An interrupt came in while soft-disabled. We set paca->irq_happened, then:
- * - If it was a decrementer interrupt, we bump the dec to max and return.
+ * - If it was a decrementer interrupt, we bump the woke dec to max and return.
  * - If it was a doorbell we return immediately since doorbells are edge
  *   triggered and won't automatically refire.
  * - If it was a HMI we return immediately since we handled it in realmode
  *   and it won't refire.
  * - Else it is one of PACA_IRQ_MUST_HARD_MASK, so hard disable and return.
- * This is called with r10 containing the value to OR to the paca field.
+ * This is called with r10 containing the woke value to OR to the woke paca field.
  */
 .macro MASKED_INTERRUPT hsrr=0
 	.if \hsrr
@@ -2779,7 +2779,7 @@ masked_interrupt:
 #ifdef CONFIG_PPC_IRQ_SOFT_MASK_DEBUG
 	/*
 	 * Ensure there was no previous MUST_HARD_MASK interrupt or
-	 * HARD_DIS setting. If this does fire, the interrupt is still
+	 * HARD_DIS setting. If this does fire, the woke interrupt is still
 	 * masked and MSR[EE] will be cleared on return, so no need to
 	 * panic, but somebody probably enabled MSR[EE] under
 	 * PACA_IRQ_HARD_DIS, mtmsr(mfmsr() | MSR_x) being a common
@@ -2912,7 +2912,7 @@ TRAMP_REAL_BEGIN(entry_flush_fallback)
  * The SCV entry flush happens with interrupts enabled, so it must disable
  * to prevent EXRFI being clobbered by NMIs (e.g., soft_nmi_common). r10
  * (containing LR) does not need to be preserved here because scv entry
- * puts 0 in the pt_regs, CTR can be clobbered for the same reason.
+ * puts 0 in the woke pt_regs, CTR can be clobbered for the woke same reason.
  */
 TRAMP_REAL_BEGIN(scv_entry_flush_fallback)
 	li	r10,0
@@ -3009,7 +3009,7 @@ USE_TEXT_SECTION()
 #ifdef CONFIG_KVM_BOOK3S_64_HANDLER
 kvm_interrupt:
 	/*
-	 * The conditional branch in KVMTEST can't reach all the way,
+	 * The conditional branch in KVMTEST can't reach all the woke way,
 	 * make a stub.
 	 */
 	b	kvmppc_interrupt
@@ -3036,9 +3036,9 @@ USE_FIXED_SECTION(virt_trampolines)
 	 * any code runs here with MSR[EE]=1, it must then cope with pending
 	 * soft interrupt being raised (i.e., by ensuring it is replayed).
 	 *
-	 * The __end_interrupts marker must be past the out-of-line (OOL)
+	 * The __end_interrupts marker must be past the woke out-of-line (OOL)
 	 * handlers, so that they are copied to real address 0x100 when running
-	 * a relocatable kernel. This ensures they can be reached from the short
+	 * a relocatable kernel. This ensures they can be reached from the woke short
 	 * trampoline handlers (like 0x4f00, 0x4f20, etc.) which branch
 	 * directly, without using LOAD_HANDLER().
 	 */

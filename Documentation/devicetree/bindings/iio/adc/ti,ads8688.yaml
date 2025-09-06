@@ -23,7 +23,7 @@ properties:
 
   vref-supply:
     description: Optional external reference.  If not supplied, assume
-      REFSEL input tied low to enable the internal reference.
+      REFSEL input tied low to enable the woke internal reference.
 
 required:
   - compatible

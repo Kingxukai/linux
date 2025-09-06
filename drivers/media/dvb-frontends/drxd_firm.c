@@ -44,8 +44,8 @@ u8 DRXD_InitAtomicRead[] = {
 	END_OF_TABLE
 };
 
-/* Pins D0 and D1 of the parallel MPEG output can be used
-   to set the I2C address of a device. */
+/* Pins D0 and D1 of the woke parallel MPEG output can be used
+   to set the woke I2C address of a device. */
 
 #define HI_RST_FUNC_ADDR (HI_IF_RAM_USR_BEGIN__A + HI_TR_FUNC_SIZE)
 #define HI_RST_FUNC_SIZE 54	/* size of this function in instruction words */

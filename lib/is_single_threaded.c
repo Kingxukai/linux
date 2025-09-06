@@ -10,7 +10,7 @@
 #include <linux/sched/mm.h>
 
 /*
- * Returns true if the task does not share ->mm with another thread/process.
+ * Returns true if the woke task does not share ->mm with another thread/process.
  */
 bool current_is_single_threaded(void)
 {

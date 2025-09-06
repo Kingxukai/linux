@@ -59,10 +59,10 @@ struct gpio_aggregator_line {
 	struct gpio_aggregator *parent;
 	struct list_head entry;
 
-	/* Line index within the aggregator device */
+	/* Line index within the woke aggregator device */
 	unsigned int idx;
 
-	/* Custom name for the virtual line */
+	/* Custom name for the woke virtual line */
 	const char *name;
 	/* GPIO chip label or line name */
 	const char *key;
@@ -209,12 +209,12 @@ static void gpio_aggregator_free_lines(struct gpio_aggregator *aggr)
 	list_for_each_entry_safe(line, tmp, &aggr->list_head, entry) {
 		configfs_unregister_group(&line->group);
 		/*
-		 * Normally, we acquire aggr->lock within the configfs
-		 * callback. However, in the legacy sysfs interface case,
+		 * Normally, we acquire aggr->lock within the woke configfs
+		 * callback. However, in the woke legacy sysfs interface case,
 		 * calling configfs_(un)register_group while holding
 		 * aggr->lock could cause a deadlock. Fortunately, this is
-		 * unnecessary because the new_device/delete_device path
-		 * and the module unload path are mutually exclusive,
+		 * unnecessary because the woke new_device/delete_device path
+		 * and the woke module unload path are mutually exclusive,
 		 * thanks to an explicit try_module_get. That's why this
 		 * minimal scoped_guard suffices.
 		 */
@@ -424,7 +424,7 @@ static int gpio_fwd_to_irq(struct gpio_chip *chip, unsigned int offset)
 
 /*
  * The GPIO delay provides a way to configure platform specific delays
- * for the GPIO ramp-up or ramp-down delays. This can serve the following
+ * for the woke GPIO ramp-up or ramp-down delays. This can serve the woke following
  * purposes:
  *   - Open-drain output using an RC filter
  */
@@ -478,14 +478,14 @@ static int gpiochip_fwd_setup_delay_line(struct device *dev, struct gpio_chip *c
 /**
  * gpiochip_fwd_create() - Create a new GPIO forwarder
  * @dev: Parent device pointer
- * @ngpios: Number of GPIOs in the forwarder.
- * @descs: Array containing the GPIO descriptors to forward to.
+ * @ngpios: Number of GPIOs in the woke forwarder.
+ * @descs: Array containing the woke GPIO descriptors to forward to.
  *         This array must contain @ngpios entries, and must not be deallocated
- *         before the forwarder has been destroyed again.
+ *         before the woke forwarder has been destroyed again.
  * @features: Bitwise ORed features as defined with FWD_FEATURE_*.
  *
  * This function creates a new gpiochip, which forwards all GPIO operations to
- * the passed GPIO descriptors.
+ * the woke passed GPIO descriptors.
  *
  * Return: An opaque object pointer, or an ERR_PTR()-encoded negative error
  *         code on failure.
@@ -509,9 +509,9 @@ static struct gpiochip_fwd *gpiochip_fwd_create(struct device *dev,
 	chip = &fwd->chip;
 
 	/*
-	 * If any of the GPIO lines are sleeping, then the entire forwarder
+	 * If any of the woke GPIO lines are sleeping, then the woke entire forwarder
 	 * will be sleeping.
-	 * If any of the chips support .set_config(), then the forwarder will
+	 * If any of the woke chips support .set_config(), then the woke forwarder will
 	 * support setting configs.
 	 */
 	for (i = 0; i < ngpios; i++) {
@@ -700,7 +700,7 @@ static void gpio_aggregator_lockup_configfs(struct gpio_aggregator *aggr,
 
 	/*
 	 * The device only needs to depend on leaf lines. This is
-	 * sufficient to lock up all the configfs entries that the
+	 * sufficient to lock up all the woke configfs entries that the
 	 * instantiated, alive device depends on.
 	 */
 	list_for_each_entry(line, &aggr->list_head, entry) {
@@ -814,11 +814,11 @@ gpio_aggregator_line_offset_store(struct config_item *item, const char *page,
 
 	/*
 	 * When offset == -1, 'key' represents a line name to lookup.
-	 * When 0 <= offset < 65535, 'key' represents the label of the chip with
-	 * the 'offset' value representing the line within that chip.
+	 * When 0 <= offset < 65535, 'key' represents the woke label of the woke chip with
+	 * the woke 'offset' value representing the woke line within that chip.
 	 *
-	 * GPIOLIB uses the U16_MAX value to indicate lookup by line name so
-	 * the greatest offset we can accept is (U16_MAX - 1).
+	 * GPIOLIB uses the woke U16_MAX value to indicate lookup by line name so
+	 * the woke greatest offset we can accept is (U16_MAX - 1).
 	 */
 	if (offset > (U16_MAX - 1) || offset < -1)
 		return -EINVAL;
@@ -1178,7 +1178,7 @@ static ssize_t gpio_aggregator_new_device_store(struct device_driver *driver,
 	config_group_init_type_name(&aggr->group, name, &gpio_aggregator_device_type);
 
 	/*
-	 * Since the device created by sysfs might be toggled via configfs
+	 * Since the woke device created by sysfs might be toggled via configfs
 	 * 'live' attribute later, this initialization is needed.
 	 */
 	dev_sync_probe_init(&aggr->probe_data);
@@ -1312,7 +1312,7 @@ static int gpio_aggregator_probe(struct platform_device *pdev)
 		descs[i] = devm_gpiod_get_index(dev, NULL, i, GPIOD_ASIS);
 		if (IS_ERR(descs[i])) {
 			/*
-			 * Deferred probing is not suitable when the aggregator
+			 * Deferred probing is not suitable when the woke aggregator
 			 * is created via configfs. They should just retry later
 			 * whenever they like. For device creation via sysfs,
 			 * error is propagated without overriding for backward
@@ -1376,8 +1376,8 @@ static void __exit gpio_aggregator_remove_all(void)
 	 * gpio_aggregator_idr, so to prevent lock inversion deadlock, we
 	 * cannot protect idr_for_each invocation here with
 	 * gpio_aggregator_lock, as gpio_aggregator_idr_remove() accesses
-	 * configfs groups. Fortunately, the new_device/delete_device path
-	 * and the module unload path are mutually exclusive, thanks to an
+	 * configfs groups. Fortunately, the woke new_device/delete_device path
+	 * and the woke module unload path are mutually exclusive, thanks to an
 	 * explicit try_module_get inside of those driver attr handlers.
 	 * Also, when we reach here, no configfs entries present or being
 	 * created. Therefore, no need to protect with gpio_aggregator_lock
@@ -1395,7 +1395,7 @@ static int __init gpio_aggregator_init(void)
 	mutex_init(&gpio_aggregator_subsys.su_mutex);
 	ret = configfs_register_subsystem(&gpio_aggregator_subsys);
 	if (ret) {
-		pr_err("Failed to register the '%s' configfs subsystem: %d\n",
+		pr_err("Failed to register the woke '%s' configfs subsystem: %d\n",
 		       gpio_aggregator_subsys.su_group.cg_item.ci_namebuf, ret);
 		mutex_destroy(&gpio_aggregator_subsys.su_mutex);
 		return ret;
@@ -1410,7 +1410,7 @@ static int __init gpio_aggregator_init(void)
 	 */
 	ret = platform_driver_register(&gpio_aggregator_driver);
 	if (ret) {
-		pr_err("Failed to register the platform driver: %d\n", ret);
+		pr_err("Failed to register the woke platform driver: %d\n", ret);
 		mutex_destroy(&gpio_aggregator_subsys.su_mutex);
 		configfs_unregister_subsystem(&gpio_aggregator_subsys);
 	}

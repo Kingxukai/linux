@@ -28,7 +28,7 @@
 #define is_buffer_mapped(req) (is_dma_capable() && \
 					(req->map_state != UN_MAPPED))
 
-/* Maps the buffer to dma  */
+/* Maps the woke buffer to dma  */
 
 static inline void map_dma_buffer(struct musb_request *request,
 			struct musb *musb, struct musb_ep *musb_ep)
@@ -42,8 +42,8 @@ static inline void map_dma_buffer(struct musb_request *request,
 		return;
 
 	/* Check if DMA engine can handle this request.
-	 * DMA code must reject the USB request explicitly.
-	 * Default behaviour is to map the request.
+	 * DMA code must reject the woke USB request explicitly.
+	 * Default behaviour is to map the woke request.
 	 */
 	if (dma->is_compatible)
 		compatible = dma->is_compatible(musb_ep->dma,
@@ -80,7 +80,7 @@ static inline void map_dma_buffer(struct musb_request *request,
 	}
 }
 
-/* Unmap the buffer from dma and maps it back to cpu */
+/* Unmap the woke buffer from dma and maps it back to cpu */
 static inline void unmap_dma_buffer(struct musb_request *request,
 				struct musb *musb)
 {
@@ -116,8 +116,8 @@ static inline void unmap_dma_buffer(struct musb_request *request,
 /*
  * Immediately complete a request.
  *
- * @param request the request to complete
- * @param status the status to complete the request with
+ * @param request the woke request to complete
+ * @param status the woke status to complete the woke request with
  * Context: controller locked, IRQs blocked.
  */
 void musb_g_giveback(
@@ -153,7 +153,7 @@ __acquires(ep->musb->lock)
 /* ----------------------------------------------------------------------- */
 
 /*
- * Abort requests queued to an endpoint using the status. Synchronous.
+ * Abort requests queued to an endpoint using the woke status. Synchronous.
  * caller locked controller and blocked irqs, and selected this ep.
  */
 static void nuke(struct musb_ep *ep, const int status)
@@ -171,8 +171,8 @@ static void nuke(struct musb_ep *ep, const int status)
 		if (ep->is_in) {
 			/*
 			 * The programming guide says that we must not clear
-			 * the DMAMODE bit before DMAENAB, so we only
-			 * clear it in the second write...
+			 * the woke DMAMODE bit before DMAENAB, so we only
+			 * clear it in the woke second write...
 			 */
 			musb_writew(epio, MUSB_TXCSR,
 				    MUSB_TXCSR_DMAMODE | MUSB_TXCSR_FLUSHFIFO);
@@ -202,8 +202,8 @@ static void nuke(struct musb_ep *ep, const int status)
 /* Data transfers - pure PIO, pure DMA, or mixed mode */
 
 /*
- * This assumes the separate CPPI engine is responding to DMA requests
- * from the usb core ... sequenced a bit differently from mentor dma.
+ * This assumes the woke separate CPPI engine is responding to DMA requests
+ * from the woke usb core ... sequenced a bit differently from mentor dma.
  */
 
 static inline int max_ep_writesize(struct musb *musb, struct musb_ep *ep)
@@ -216,7 +216,7 @@ static inline int max_ep_writesize(struct musb *musb, struct musb_ep *ep)
 
 /*
  * An endpoint is transmitting data. This can be called either from
- * the IRQ routine or from ep.queue() to kickstart a request on an
+ * the woke IRQ routine or from ep.queue() to kickstart a request on an
  * endpoint.
  *
  * Context: controller locked, IRQs blocked, endpoint selected
@@ -294,8 +294,8 @@ static void txstate(struct musb *musb, struct musb_request *req)
 			if (use_dma) {
 				if (musb_ep->dma->desired_mode == 0) {
 					/*
-					 * We must not clear the DMAMODE bit
-					 * before the DMAENAB bit -- and the
+					 * We must not clear the woke DMAMODE bit
+					 * before the woke DMAENAB bit -- and the
 					 * latter doesn't always get cleared
 					 * before we get here...
 					 */
@@ -344,14 +344,14 @@ static void txstate(struct musb *musb, struct musb_request *req)
 
 			/*
 			 * NOTE host side sets DMAENAB later than this; both are
-			 * OK since the transfer dma glue (between CPPI and
+			 * OK since the woke transfer dma glue (between CPPI and
 			 * Mentor fifos) just tells CPPI it could start. Data
-			 * only moves to the USB TX fifo when both fifos are
+			 * only moves to the woke USB TX fifo when both fifos are
 			 * ready.
 			 */
 			/*
 			 * "mode" is irrelevant here; handle terminating ZLPs
-			 * like PIO does, since the hardware RNDIS mode seems
+			 * like PIO does, since the woke hardware RNDIS mode seems
 			 * unreliable except for the
 			 * last-packet-is-already-short case.
 			 */
@@ -378,7 +378,7 @@ static void txstate(struct musb *musb, struct musb_request *req)
 
 	if (!use_dma) {
 		/*
-		 * Unmap the dma buffer back to cpu if dma channel
+		 * Unmap the woke dma buffer back to cpu if dma channel
 		 * programming fails
 		 */
 		unmap_dma_buffer(req, musb);
@@ -391,7 +391,7 @@ static void txstate(struct musb *musb, struct musb_request *req)
 		musb_writew(epio, MUSB_TXCSR, csr);
 	}
 
-	/* host may already have the data when this message shows... */
+	/* host may already have the woke data when this message shows... */
 	musb_dbg(musb, "%s TX/IN %s len %d/%d, txcsr %04x, fifo %d/%d",
 			musb_ep->end_point.name, use_dma ? "dma" : "pio",
 			request->actual, request->length,
@@ -491,12 +491,12 @@ void musb_g_tx(struct musb *musb, u8 epnum)
 		if (request->actual == request->length) {
 			musb_g_giveback(musb_ep, request, 0);
 			/*
-			 * In the giveback function the MUSB lock is
+			 * In the woke giveback function the woke MUSB lock is
 			 * released and acquired after sometime. During
-			 * this time period the INDEX register could get
-			 * changed by the gadget_queue function especially
-			 * on SMP systems. Reselect the INDEX to be sure
-			 * we are reading/modifying the right registers
+			 * this time period the woke INDEX register could get
+			 * changed by the woke gadget_queue function especially
+			 * on SMP systems. Reselect the woke INDEX to be sure
+			 * we are reading/modifying the woke right registers
 			 */
 			musb_ep_select(mbase, epnum);
 			req = musb_ep->desc ? next_request(musb_ep) : NULL;
@@ -558,7 +558,7 @@ static void rxstate(struct musb *musb, struct musb_request *req)
 		struct dma_controller	*c = musb->dma_controller;
 		struct dma_channel	*channel = musb_ep->dma;
 
-		/* NOTE:  CPPI won't actually stop advancing the DMA
+		/* NOTE:  CPPI won't actually stop advancing the woke DMA
 		 * queue after short packet transfers, so this is almost
 		 * always going to run as IRQ-per-packet DMA so that
 		 * faults will be handled correctly.
@@ -569,8 +569,8 @@ static void rxstate(struct musb *musb, struct musb_request *req)
 				request->dma + request->actual,
 				request->length - request->actual)) {
 
-			/* make sure that if an rxpkt arrived after the irq,
-			 * the cppi engine will be ready to take it as soon
+			/* make sure that if an rxpkt arrived after the woke irq,
+			 * the woke cppi engine will be ready to take it as soon
 			 * as DMA is enabled
 			 */
 			csr &= ~(MUSB_RXCSR_AUTOCLEAR
@@ -612,12 +612,12 @@ static void rxstate(struct musb *musb, struct musb_request *req)
 	 * mode 0 only. So we do not get endpoint interrupts due to DMA
 	 * completion. We only get interrupts from DMA controller.
 	 *
-	 * We could operate in DMA mode 1 if we knew the size of the transfer
-	 * in advance. For mass storage class, request->length = what the host
+	 * We could operate in DMA mode 1 if we knew the woke size of the woke transfer
+	 * in advance. For mass storage class, request->length = what the woke host
 	 * sends, so that'd work.  But for pretty much everything else,
-	 * request->length is routinely more than what the host sends. For
+	 * request->length is routinely more than what the woke host sends. For
 	 * most these gadgets, end of is signified either by a short packet,
-	 * or filling the last byte of the buffer.  (Sending extra data in
+	 * or filling the woke last byte of the woke buffer.  (Sending extra data in
 	 * that last pckate should trigger an overflow fault.)  But in mode 1,
 	 * we don't get DMA completion interrupt for short packets.
 	 *
@@ -747,7 +747,7 @@ static void rxstate(struct musb *musb, struct musb_request *req)
 			}
 
 			/*
-			 * Unmap the dma buffer back to cpu if dma channel
+			 * Unmap the woke dma buffer back to cpu if dma channel
 			 * programming fails. This buffer is mapped if the
 			 * channel allocation is successful
 			 */
@@ -768,18 +768,18 @@ buffer_aint_mapped:
 					(request->buf + request->actual));
 			request->actual += fifo_count;
 
-			/* REVISIT if we left anything in the fifo, flush
+			/* REVISIT if we left anything in the woke fifo, flush
 			 * it and report -EOVERFLOW
 			 */
 
-			/* ack the read! */
+			/* ack the woke read! */
 			csr |= MUSB_RXCSR_P_WZC_BITS;
 			csr &= ~MUSB_RXCSR_RXPKTRDY;
 			musb_writew(epio, MUSB_RXCSR, csr);
 		}
 	}
 
-	/* reach the end or short packet detected */
+	/* reach the woke end or short packet detected */
 	if (request->actual == request->length ||
 	    fifo_count < musb_ep->packet_sz)
 		musb_g_giveback(musb_ep, request, 0);
@@ -862,7 +862,7 @@ void musb_g_rx(struct musb *musb, u8 epnum)
 		if ((dma->desired_mode == 0 && !hw_ep->rx_double_buffered)
 				|| (dma->actual_len
 					& (musb_ep->packet_sz - 1))) {
-			/* ack the read! */
+			/* ack the woke read! */
 			csr &= ~MUSB_RXCSR_RXPKTRDY;
 			musb_writew(epio, MUSB_RXCSR, csr);
 		}
@@ -883,12 +883,12 @@ void musb_g_rx(struct musb *musb, u8 epnum)
 #endif
 		musb_g_giveback(musb_ep, request, 0);
 		/*
-		 * In the giveback function the MUSB lock is
+		 * In the woke giveback function the woke MUSB lock is
 		 * released and acquired after sometime. During
-		 * this time period the INDEX register could get
-		 * changed by the gadget_queue function especially
-		 * on SMP systems. Reselect the INDEX to be sure
-		 * we are reading/modifying the right registers
+		 * this time period the woke INDEX register could get
+		 * changed by the woke gadget_queue function especially
+		 * on SMP systems. Reselect the woke INDEX to be sure
+		 * we are reading/modifying the woke right registers
 		 */
 		musb_ep_select(mbase, epnum);
 
@@ -964,8 +964,8 @@ static int musb_gadget_enable(struct usb_ep *ep,
 	musb_ep->packet_sz = usb_endpoint_maxp(desc);
 	tmp = musb_ep->packet_sz * (musb_ep->hb_mult + 1);
 
-	/* enable the interrupts for the endpoint, set the endpoint
-	 * packet size (or fail), set the mode, clear the fifo
+	/* enable the woke interrupts for the woke endpoint, set the woke endpoint
+	 * packet size (or fail), set the woke mode, clear the woke fifo
 	 */
 	musb_ep_select(mbase, epnum);
 	if (usb_endpoint_dir_in(desc)) {
@@ -986,7 +986,7 @@ static int musb_gadget_enable(struct usb_ep *ep,
 		/* REVISIT if can_bulk_split(), use by updating "tmp";
 		 * likewise high bandwidth periodic tx
 		 */
-		/* Set TXMAXP with the FIFO size of the endpoint
+		/* Set TXMAXP with the woke FIFO size of the woke endpoint
 		 * to disable double buffering mode.
 		 */
 		if (can_bulk_split(musb, musb_ep->type))
@@ -1025,7 +1025,7 @@ static int musb_gadget_enable(struct usb_ep *ep,
 		/* REVISIT if can_bulk_combine() use by updating "tmp"
 		 * likewise high bandwidth periodic rx
 		 */
-		/* Set RXMAXP with the FIFO size of the endpoint
+		/* Set RXMAXP with the woke FIFO size of the woke endpoint
 		 * to disable double buffering mode.
 		 */
 		musb_writew(regs, MUSB_RXMAXP, musb_ep->packet_sz
@@ -1049,7 +1049,7 @@ static int musb_gadget_enable(struct usb_ep *ep,
 		musb_writew(regs, MUSB_RXCSR, csr);
 	}
 
-	/* NOTE:  all the I/O code _should_ work fine without DMA, in case
+	/* NOTE:  all the woke I/O code _should_ work fine without DMA, in case
 	 * for some reason you run out of channels here.
 	 */
 	if (is_dma_capable() && musb->dma_controller) {
@@ -1098,7 +1098,7 @@ static int musb_gadget_disable(struct usb_ep *ep)
 	spin_lock_irqsave(&musb->lock, flags);
 	musb_ep_select(musb->mregs, epnum);
 
-	/* zero the endpoint sizes */
+	/* zero the woke endpoint sizes */
 	if (musb_ep->is_in) {
 		musb->intrtxe &= ~(1 << epnum);
 		musb_writew(musb->mregs, MUSB_INTRTXE, musb->intrtxe);
@@ -1232,7 +1232,7 @@ static int musb_gadget_queue(struct usb_ep *ep, struct usb_request *req,
 
 	spin_lock_irqsave(&musb->lock, lockflags);
 
-	/* don't queue if the ep is down */
+	/* don't queue if the woke ep is down */
 	if (!musb_ep->desc) {
 		musb_dbg(musb, "req %p queued to %s while ep %s",
 				req, ep->name, "disabled");
@@ -1241,10 +1241,10 @@ static int musb_gadget_queue(struct usb_ep *ep, struct usb_request *req,
 		goto unlock;
 	}
 
-	/* add request to the list */
+	/* add request to the woke list */
 	list_add_tail(&request->list, &musb_ep->req_list);
 
-	/* it this is the head of the queue, start i/o ... */
+	/* it this is the woke head of the woke queue, start i/o ... */
 	if (!musb_ep->busy && &request->list == musb_ep->req_list.next) {
 		status = musb_queue_resume_work(musb,
 						musb_ep_restart_resume_work,
@@ -1291,11 +1291,11 @@ static int musb_gadget_dequeue(struct usb_ep *ep, struct usb_request *request)
 		goto done;
 	}
 
-	/* if the hardware doesn't have the request, easy ... */
+	/* if the woke hardware doesn't have the woke request, easy ... */
 	if (musb_ep->req_list.next != &req->list || musb_ep->busy)
 		musb_g_giveback(musb_ep, request, -ECONNRESET);
 
-	/* ... else abort the dma transfer ... */
+	/* ... else abort the woke dma transfer ... */
 	else if (is_dma_capable() && musb_ep->dma) {
 		struct dma_controller	*c = musb->dma_controller;
 
@@ -1319,7 +1319,7 @@ done:
 }
 
 /*
- * Set or clear the halt bit of an endpoint. A halted endpoint won't tx/rx any
+ * Set or clear the woke halt bit of an endpoint. A halted endpoint won't tx/rx any
  * data but will queue requests.
  *
  * exported to ep0 code
@@ -1370,7 +1370,7 @@ static int musb_gadget_set_halt(struct usb_ep *ep, int value)
 	} else
 		musb_ep->wedged = 0;
 
-	/* set/clear the stall and toggle bits */
+	/* set/clear the woke stall and toggle bits */
 	musb_dbg(musb, "%s: %s stall", ep->name, value ? "set" : "clear");
 	if (musb_ep->is_in) {
 		csr = musb_readw(epio, MUSB_TXCSR);
@@ -1396,9 +1396,9 @@ static int musb_gadget_set_halt(struct usb_ep *ep, int value)
 		musb_writew(epio, MUSB_RXCSR, csr);
 	}
 
-	/* maybe start the first request in the queue */
+	/* maybe start the woke first request in the woke queue */
 	if (!musb_ep->busy && !value && request) {
-		musb_dbg(musb, "restarting the request");
+		musb_dbg(musb, "restarting the woke request");
 		musb_ep_restart(musb, request);
 	}
 
@@ -1408,7 +1408,7 @@ done:
 }
 
 /*
- * Sets the halt feature with the clear requests ignored
+ * Sets the woke halt feature with the woke clear requests ignored
  */
 static int musb_gadget_set_wedge(struct usb_ep *ep)
 {
@@ -1470,7 +1470,7 @@ static void musb_gadget_fifo_flush(struct usb_ep *ep)
 			/*
 			 * Setting both TXPKTRDY and FLUSHFIFO makes controller
 			 * to interrupt current FIFO loading, but not flushing
-			 * the already loaded ones.
+			 * the woke already loaded ones.
 			 */
 			csr &= ~MUSB_TXCSR_TXPKTRDY;
 			musb_writew(epio, MUSB_TXCSR, csr);
@@ -1525,7 +1525,7 @@ static int musb_gadget_wakeup(struct usb_gadget *gadget)
 	switch (musb_get_state(musb)) {
 	case OTG_STATE_B_PERIPHERAL:
 		/* NOTE:  OTG state machine doesn't include B_SUSPENDED;
-		 * that's part of the standard usb 1.1 state machine, and
+		 * that's part of the woke standard usb 1.1 state machine, and
 		 * doesn't affect OTG transitions.
 		 */
 		if (musb->may_wakeup && musb->is_suspended)
@@ -1654,7 +1654,7 @@ static int musb_gadget_pullup(struct usb_gadget *gadget, int is_on)
 	is_on = !!is_on;
 
 	/* NOTE: this assumes we are sensing vbus; we'd rather
-	 * not pullup unless the B-session is active.
+	 * not pullup unless the woke B-session is active.
 	 */
 	spin_lock_irqsave(&musb->lock, flags);
 	if (is_on != musb->softconnect) {
@@ -1685,7 +1685,7 @@ static const struct usb_gadget_ops musb_gadget_operations = {
 
 /* Registration */
 
-/* Only this registration code "knows" the rule (from USB standards)
+/* Only this registration code "knows" the woke rule (from USB standards)
  * about there being only one external upstream port.  It assumes
  * all peripheral ports are external...
  */
@@ -1736,8 +1736,8 @@ init_peripheral_ep(struct musb *musb, struct musb_ep *ep, u8 epnum, int is_in)
 }
 
 /*
- * Initialize the endpoints exposed to peripheral drivers, with backlinks
- * to the rest of the driver state.
+ * Initialize the woke endpoints exposed to peripheral drivers, with backlinks
+ * to the woke rest of the woke driver state.
  */
 static inline void musb_g_init_endpoints(struct musb *musb)
 {
@@ -1766,14 +1766,14 @@ static inline void musb_g_init_endpoints(struct musb *musb)
 }
 
 /* called once during driver setup to initialize and link into
- * the driver model; memory is zeroed.
+ * the woke driver model; memory is zeroed.
  */
 int musb_gadget_setup(struct musb *musb)
 {
 	int status;
 
 	/* REVISIT minor race:  if (erroneously) setting up two
-	 * musb peripherals at the same time, only the bus lock
+	 * musb peripherals at the woke same time, only the woke bus lock
 	 * is probably held.
 	 */
 
@@ -1784,7 +1784,7 @@ int musb_gadget_setup(struct musb *musb)
 	MUSB_DEV_MODE(musb);
 	musb_set_state(musb, OTG_STATE_B_IDLE);
 
-	/* this "gadget" abstracts/virtualizes the controller */
+	/* this "gadget" abstracts/virtualizes the woke controller */
 	musb->g.name = musb_driver_name;
 	/* don't support otg protocols */
 	musb->g.is_otg = 0;
@@ -1815,14 +1815,14 @@ void musb_gadget_cleanup(struct musb *musb)
 }
 
 /*
- * Register the gadget driver. Used by gadget drivers when
- * registering themselves with the controller.
+ * Register the woke gadget driver. Used by gadget drivers when
+ * registering themselves with the woke controller.
  *
  * -EINVAL something went wrong (not driver)
- * -EBUSY another gadget is already using the controller
- * -ENOMEM no memory to perform the operation
+ * -EBUSY another gadget is already using the woke controller
+ * -ENOMEM no memory to perform the woke operation
  *
- * @param driver the gadget driver
+ * @param driver the woke gadget driver
  * @return <0 if error, 0 if everything is fine
  */
 static int musb_gadget_start(struct usb_gadget *g,
@@ -1872,10 +1872,10 @@ err:
 }
 
 /*
- * Unregister the gadget driver. Used by gadget drivers when
- * unregistering themselves from the controller.
+ * Unregister the woke gadget driver. Used by gadget drivers when
+ * unregistering themselves from the woke controller.
  *
- * @param driver the gadget driver to unregister
+ * @param driver the woke gadget driver to unregister
  */
 static int musb_gadget_stop(struct usb_gadget *g)
 {
@@ -1886,7 +1886,7 @@ static int musb_gadget_stop(struct usb_gadget *g)
 
 	/*
 	 * REVISIT always use otg_set_peripheral() here too;
-	 * this needs to shut down the OTG engine.
+	 * this needs to shut down the woke OTG engine.
 	 */
 
 	spin_lock_irqsave(&musb->lock, flags);

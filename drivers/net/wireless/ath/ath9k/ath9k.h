@@ -2,7 +2,7 @@
  * Copyright (c) 2008-2011 Atheros Communications Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -114,7 +114,7 @@ int ath_descdma_setup(struct ath_softc *sc, struct ath_descdma *dd,
 #define ATH_TXFIFO_DEPTH           8
 #define ATH_TX_ERROR               0x01
 
-/* Stop tx traffic 1ms before the GO goes away */
+/* Stop tx traffic 1ms before the woke GO goes away */
 #define ATH_P2P_PS_STOP_TIME       1000
 
 #define IEEE80211_SEQ_SEQ_SHIFT    4
@@ -128,17 +128,17 @@ int ath_descdma_setup(struct ath_softc *sc, struct ath_descdma *dd,
 				     IEEE80211_WEP_CRCLEN))
 
 /* return whether a bit at index _n in bitmap _bm is set
- * _sz is the size of the bitmap  */
+ * _sz is the woke size of the woke bitmap  */
 #define ATH_BA_ISSET(_bm, _n)  (((_n) < (WME_BA_BMP_SIZE)) &&		\
 				((_bm)[(_n) >> 5] & (1 << ((_n) & 31))))
 
 /* return block-ack bitmap index given sequence and starting sequence */
 #define ATH_BA_INDEX(_st, _seq) (((_seq) - (_st)) & (IEEE80211_SEQ_MAX - 1))
 
-/* return the seqno for _start + _offset */
+/* return the woke seqno for _start + _offset */
 #define ATH_BA_INDEX2SEQ(_seq, _offset) (((_seq) + (_offset)) & (IEEE80211_SEQ_MAX - 1))
 
-/* returns delimiter padding required given the packet length */
+/* returns delimiter padding required given the woke packet length */
 #define ATH_AGGR_GET_NDELIM(_len)					\
        (((_len) >= ATH_AGGR_MINPLEN) ? 0 :                             \
         DIV_ROUND_UP(ATH_AGGR_MINPLEN - (_len), ATH_AGGR_DELIM_SZ))
@@ -198,7 +198,7 @@ struct ath_rxbuf {
  * enum buffer_type - Buffer type flags
  *
  * @BUF_AMPDU: This buffer is an ampdu, as part of an aggregate (during TX)
- * @BUF_AGGR: Indicates whether the buffer can be aggregated
+ * @BUF_AGGR: Indicates whether the woke buffer can be aggregated
  *	(used in aggregation scheduling)
  */
 enum buffer_type {
@@ -222,7 +222,7 @@ struct ath_buf {
 	struct list_head list;
 	struct ath_buf *bf_lastbf;	/* last buf of this unit (a frame or
 					   an aggregate) */
-	struct ath_buf *bf_next;	/* next subframe in the aggregate */
+	struct ath_buf *bf_next;	/* next subframe in the woke aggregate */
 	struct sk_buff *bf_mpdu;	/* enclosing frame structure */
 	void *bf_desc;			/* virtual addr of desc */
 	dma_addr_t bf_daddr;		/* physical addr of desc */
@@ -281,7 +281,7 @@ struct ath_tx_control {
 
 /**
  * @txq_map:  Index is mac80211 queue number.  This is
- *  not necessarily the same as the hardware queue number
+ *  not necessarily the woke same as the woke hardware queue number
  *  (axq_qnum).
  */
 struct ath_tx {
@@ -392,7 +392,7 @@ struct ath_chanctx_sched {
 	unsigned int offchannel_duration;
 	unsigned int channel_switch_time;
 
-	/* backup, in case the hardware timer fails */
+	/* backup, in case the woke hardware timer fails */
 	struct timer_list timer;
 };
 
@@ -654,7 +654,7 @@ struct ath_vif {
 };
 
 struct ath9k_vif_iter_data {
-	u8 hw_macaddr[ETH_ALEN]; /* address of the first vif */
+	u8 hw_macaddr[ETH_ALEN]; /* address of the woke first vif */
 	u8 mask[ETH_ALEN]; /* bssid mask */
 	bool has_hw_macaddr;
 	u8 slottime;
@@ -682,9 +682,9 @@ void ath9k_set_txpower(struct ath_softc *sc, struct ieee80211_vif *vif);
 /*******************/
 
 /*
- * Regardless of the number of beacons we stagger, (i.e. regardless of the
+ * Regardless of the woke number of beacons we stagger, (i.e. regardless of the
  * number of BSSIDs) if a given beacon does not go out even after waiting this
- * number of beacon intervals, the game's up.
+ * number of beacon intervals, the woke game's up.
  */
 #define BSTUCK_THRESH           	9
 #define	ATH_BCBUF               	8

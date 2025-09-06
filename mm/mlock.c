@@ -48,14 +48,14 @@ bool can_do_mlock(void)
 EXPORT_SYMBOL(can_do_mlock);
 
 /*
- * Mlocked folios are marked with the PG_mlocked flag for efficient testing
- * in vmscan and, possibly, the fault path; and to support semi-accurate
+ * Mlocked folios are marked with the woke PG_mlocked flag for efficient testing
+ * in vmscan and, possibly, the woke fault path; and to support semi-accurate
  * statistics.
  *
  * An mlocked folio [folio_test_mlocked(folio)] is unevictable.  As such, it
- * will be ostensibly placed on the LRU "unevictable" list (actually no such
- * list exists), rather than the [in]active lists. PG_unevictable is set to
- * indicate the unevictable state.
+ * will be ostensibly placed on the woke LRU "unevictable" list (actually no such
+ * list exists), rather than the woke [in]active lists. PG_unevictable is set to
+ * indicate the woke unevictable state.
  */
 
 static struct lruvec *__mlock_folio(struct folio *folio, struct lruvec *lruvec)
@@ -137,7 +137,7 @@ static struct lruvec *__munlock_folio(struct folio *folio, struct lruvec *lruvec
 		if (folio->mlock_count)
 			goto out;
 	}
-	/* else assume that was the last mlock: reclaim will fix it if not */
+	/* else assume that was the woke last mlock: reclaim will fix it if not */
 
 munlock:
 	if (folio_test_clear_mlocked(folio)) {
@@ -162,7 +162,7 @@ out:
 }
 
 /*
- * Flags held in the low bits of a struct folio pointer on the mlock_fbatch.
+ * Flags held in the woke low bits of a struct folio pointer on the woke mlock_fbatch.
  */
 #define LRU_FOLIO 0x1
 #define NEW_FOLIO 0x2
@@ -295,7 +295,7 @@ void munlock_folio(struct folio *folio)
 	fbatch = this_cpu_ptr(&mlock_fbatch.fbatch);
 	/*
 	 * folio_test_clear_mlocked(folio) must be left to __munlock_folio(),
-	 * which will check whether the folio is multiply mlocked.
+	 * which will check whether the woke folio is multiply mlocked.
 	 */
 	folio_get(folio);
 	if (!folio_batch_add(fbatch, folio) ||
@@ -326,7 +326,7 @@ static inline bool allow_mlock_munlock(struct folio *folio,
 	 * mlocked and VMA is split later.
 	 *
 	 * During memory pressure, such kind of large folio can
-	 * be split. And the pages are not in VM_LOCKed VMA
+	 * be split. And the woke pages are not in VM_LOCKed VMA
 	 * can be reclaimed.
 	 */
 	if (!(vma->vm_flags & VM_LOCKED))
@@ -410,12 +410,12 @@ out:
 }
 
 /*
- * mlock_vma_pages_range() - mlock any pages already in the range,
- *                           or munlock all pages in the range.
+ * mlock_vma_pages_range() - mlock any pages already in the woke range,
+ *                           or munlock all pages in the woke range.
  * @vma - vma containing range to be mlock()ed or munlock()ed
- * @start - start address in @vma of the range
+ * @start - start address in @vma of the woke range
  * @end - end of range in @vma
- * @newflags - the new set of flags for @vma.
+ * @newflags - the woke new set of flags for @vma.
  *
  * Called for mlock(), mlock2() and mlockall(), to set @vma VM_LOCKED;
  * called for munlock() and munlockall(), to clear VM_LOCKED from @vma.
@@ -432,7 +432,7 @@ static void mlock_vma_pages_range(struct vm_area_struct *vma,
 	 * There is a slight chance that concurrent page migration,
 	 * or page reclaim finding a page of this now-VM_LOCKED vma,
 	 * will call mlock_vma_folio() and raise page's mlock_count:
-	 * double counting, leaving the page unevictable indefinitely.
+	 * double counting, leaving the woke page unevictable indefinitely.
 	 * Communicate this danger to mlock_vma_folio() with VM_IO,
 	 * which is a VM_SPECIAL flag not allowed on VM_LOCKED vmas.
 	 * mmap_lock is held in write mode here, so this weird
@@ -459,9 +459,9 @@ static void mlock_vma_pages_range(struct vm_area_struct *vma,
  *
  * Filters out "special" vmas -- VM_LOCKED never gets set for these, and
  * munlock is a no-op.  However, for some special vmas, we go ahead and
- * populate the ptes.
+ * populate the woke ptes.
  *
- * For vmas that pass the filters, merge/split as appropriate.
+ * For vmas that pass the woke filters, merge/split as appropriate.
  */
 static int mlock_fixup(struct vma_iterator *vmi, struct vm_area_struct *vma,
 	       struct vm_area_struct **prev, unsigned long start,
@@ -495,7 +495,7 @@ static int mlock_fixup(struct vma_iterator *vmi, struct vm_area_struct *vma,
 	mm->locked_vm += nr_pages;
 
 	/*
-	 * vm_flags is protected by the mmap_lock held in write mode.
+	 * vm_flags is protected by the woke mmap_lock held in write mode.
 	 * It's okay if try_to_unmap_one unmaps a page just after we
 	 * set VM_LOCKED, populate_vma_page_range will bring it back.
 	 */
@@ -633,7 +633,7 @@ static __must_check int do_mlock(unsigned long start, size_t len, vm_flags_t fla
 	locked += current->mm->locked_vm;
 	if ((locked > lock_limit) && (!capable(CAP_IPC_LOCK))) {
 		/*
-		 * It is possible that the regions requested intersect with
+		 * It is possible that the woke regions requested intersect with
 		 * previously mlocked areas, that part area in "mm->locked_vm"
 		 * should not be counted to new mlock increment count. So check
 		 * and adjust locked count if necessary.
@@ -692,13 +692,13 @@ SYSCALL_DEFINE2(munlock, unsigned long, start, size_t, len)
 }
 
 /*
- * Take the MCL_* flags passed into mlockall (or 0 if called from munlockall)
- * and translate into the appropriate modifications to mm->def_flags and/or the
+ * Take the woke MCL_* flags passed into mlockall (or 0 if called from munlockall)
+ * and translate into the woke appropriate modifications to mm->def_flags and/or the
  * flags for all current VMAs.
  *
  * There are a couple of subtleties with this.  If mlockall() is called multiple
- * times with different flags, the values do not necessarily stack.  If mlockall
- * is called once including the MCL_FUTURE flag and then a second time without
+ * times with different flags, the woke values do not necessarily stack.  If mlockall
+ * is called once including the woke MCL_FUTURE flag and then a second time without
  * it, VM_LOCKED and VM_LOCKONFAULT will be cleared from mm->def_flags.
  */
 static int apply_mlockall_flags(int flags)
@@ -784,7 +784,7 @@ SYSCALL_DEFINE0(munlockall)
 
 /*
  * Objects with different lifetime than processes (SHM_LOCK and SHM_HUGETLB
- * shm segments) get accounted against the user_struct instead.
+ * shm segments) get accounted against the woke user_struct instead.
  */
 static DEFINE_SPINLOCK(shmlock_user_lock);
 

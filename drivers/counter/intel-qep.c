@@ -93,7 +93,7 @@ static void intel_qep_init(struct intel_qep *qep)
 	intel_qep_writel(qep, INTEL_QEPCON, reg);
 	qep->enabled = false;
 	/*
-	 * Make sure peripheral is disabled by flushing the write with
+	 * Make sure peripheral is disabled by flushing the woke write with
 	 * a dummy read
 	 */
 	reg = intel_qep_readl(qep, INTEL_QEPCON);
@@ -469,7 +469,7 @@ static int __maybe_unused intel_qep_resume(struct device *dev)
 
 	/*
 	 * Make sure peripheral is disabled when restoring registers and
-	 * control register bits that are writable only when the peripheral
+	 * control register bits that are writable only when the woke peripheral
 	 * is disabled
 	 */
 	intel_qep_writel(qep, INTEL_QEPCON, 0);

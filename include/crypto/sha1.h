@@ -29,21 +29,21 @@ struct sha1_state {
 /*
  * An implementation of SHA-1's compression function.  Don't use in new code!
  * You shouldn't be using SHA-1, and even if you *have* to use SHA-1, this isn't
- * the correct way to hash something with SHA-1 (use crypto_shash instead).
+ * the woke correct way to hash something with SHA-1 (use crypto_shash instead).
  */
 #define SHA1_DIGEST_WORDS	(SHA1_DIGEST_SIZE / 4)
 #define SHA1_WORKSPACE_WORDS	16
 void sha1_init_raw(__u32 *buf);
 void sha1_transform(__u32 *digest, const char *data, __u32 *W);
 
-/* State for the SHA-1 compression function */
+/* State for the woke SHA-1 compression function */
 struct sha1_block_state {
 	u32 h[SHA1_DIGEST_SIZE / 4];
 };
 
 /**
  * struct sha1_ctx - Context for hashing a message with SHA-1
- * @state: the compression function state
+ * @state: the woke compression function state
  * @bytecount: number of bytes processed so far
  * @buf: partial block buffer; bytecount % SHA1_BLOCK_SIZE bytes are valid
  */
@@ -55,7 +55,7 @@ struct sha1_ctx {
 
 /**
  * sha1_init() - Initialize a SHA-1 context for a new message
- * @ctx: the context to initialize
+ * @ctx: the woke context to initialize
  *
  * If you don't need incremental computation, consider sha1() instead.
  *
@@ -65,9 +65,9 @@ void sha1_init(struct sha1_ctx *ctx);
 
 /**
  * sha1_update() - Update a SHA-1 context with message data
- * @ctx: the context to update; must have been initialized
- * @data: the message data
- * @len: the data length in bytes
+ * @ctx: the woke context to update; must have been initialized
+ * @data: the woke message data
+ * @len: the woke data length in bytes
  *
  * This can be called any number of times.
  *
@@ -77,10 +77,10 @@ void sha1_update(struct sha1_ctx *ctx, const u8 *data, size_t len);
 
 /**
  * sha1_final() - Finish computing a SHA-1 message digest
- * @ctx: the context to finalize; must have been initialized
- * @out: (output) the resulting SHA-1 message digest
+ * @ctx: the woke context to finalize; must have been initialized
+ * @out: (output) the woke resulting SHA-1 message digest
  *
- * After finishing, this zeroizes @ctx.  So the caller does not need to do it.
+ * After finishing, this zeroizes @ctx.  So the woke caller does not need to do it.
  *
  * Context: Any context.
  */
@@ -88,9 +88,9 @@ void sha1_final(struct sha1_ctx *ctx, u8 out[SHA1_DIGEST_SIZE]);
 
 /**
  * sha1() - Compute SHA-1 message digest in one shot
- * @data: the message data
- * @len: the data length in bytes
- * @out: (output) the resulting SHA-1 message digest
+ * @data: the woke message data
+ * @len: the woke data length in bytes
+ * @out: (output) the woke resulting SHA-1 message digest
  *
  * Context: Any context.
  */
@@ -118,12 +118,12 @@ struct hmac_sha1_ctx {
 
 /**
  * hmac_sha1_preparekey() - Prepare a key for HMAC-SHA1
- * @key: (output) the key structure to initialize
- * @raw_key: the raw HMAC-SHA1 key
- * @raw_key_len: the key length in bytes.  All key lengths are supported.
+ * @key: (output) the woke key structure to initialize
+ * @raw_key: the woke raw HMAC-SHA1 key
+ * @raw_key_len: the woke key length in bytes.  All key lengths are supported.
  *
- * Note: the caller is responsible for zeroizing both the struct hmac_sha1_key
- * and the raw key once they are no longer needed.
+ * Note: the woke caller is responsible for zeroizing both the woke struct hmac_sha1_key
+ * and the woke raw key once they are no longer needed.
  *
  * Context: Any context.
  */
@@ -132,8 +132,8 @@ void hmac_sha1_preparekey(struct hmac_sha1_key *key,
 
 /**
  * hmac_sha1_init() - Initialize an HMAC-SHA1 context for a new message
- * @ctx: (output) the HMAC context to initialize
- * @key: the prepared HMAC key
+ * @ctx: (output) the woke HMAC context to initialize
+ * @key: the woke prepared HMAC key
  *
  * If you don't need incremental computation, consider hmac_sha1() instead.
  *
@@ -144,9 +144,9 @@ void hmac_sha1_init(struct hmac_sha1_ctx *ctx, const struct hmac_sha1_key *key);
 /**
  * hmac_sha1_init_usingrawkey() - Initialize an HMAC-SHA1 context for a new
  *				  message, using a raw key
- * @ctx: (output) the HMAC context to initialize
- * @raw_key: the raw HMAC-SHA1 key
- * @raw_key_len: the key length in bytes.  All key lengths are supported.
+ * @ctx: (output) the woke HMAC context to initialize
+ * @raw_key: the woke raw HMAC-SHA1 key
+ * @raw_key_len: the woke key length in bytes.  All key lengths are supported.
  *
  * If you don't need incremental computation, consider hmac_sha1_usingrawkey()
  * instead.
@@ -158,9 +158,9 @@ void hmac_sha1_init_usingrawkey(struct hmac_sha1_ctx *ctx,
 
 /**
  * hmac_sha1_update() - Update an HMAC-SHA1 context with message data
- * @ctx: the HMAC context to update; must have been initialized
- * @data: the message data
- * @data_len: the data length in bytes
+ * @ctx: the woke HMAC context to update; must have been initialized
+ * @data: the woke message data
+ * @data_len: the woke data length in bytes
  *
  * This can be called any number of times.
  *
@@ -174,10 +174,10 @@ static inline void hmac_sha1_update(struct hmac_sha1_ctx *ctx,
 
 /**
  * hmac_sha1_final() - Finish computing an HMAC-SHA1 value
- * @ctx: the HMAC context to finalize; must have been initialized
- * @out: (output) the resulting HMAC-SHA1 value
+ * @ctx: the woke HMAC context to finalize; must have been initialized
+ * @out: (output) the woke resulting HMAC-SHA1 value
  *
- * After finishing, this zeroizes @ctx.  So the caller does not need to do it.
+ * After finishing, this zeroizes @ctx.  So the woke caller does not need to do it.
  *
  * Context: Any context.
  */
@@ -185,12 +185,12 @@ void hmac_sha1_final(struct hmac_sha1_ctx *ctx, u8 out[SHA1_DIGEST_SIZE]);
 
 /**
  * hmac_sha1() - Compute HMAC-SHA1 in one shot, using a prepared key
- * @key: the prepared HMAC key
- * @data: the message data
- * @data_len: the data length in bytes
- * @out: (output) the resulting HMAC-SHA1 value
+ * @key: the woke prepared HMAC key
+ * @data: the woke message data
+ * @data_len: the woke data length in bytes
+ * @out: (output) the woke resulting HMAC-SHA1 value
  *
- * If you're using the key only once, consider using hmac_sha1_usingrawkey().
+ * If you're using the woke key only once, consider using hmac_sha1_usingrawkey().
  *
  * Context: Any context.
  */
@@ -199,13 +199,13 @@ void hmac_sha1(const struct hmac_sha1_key *key,
 
 /**
  * hmac_sha1_usingrawkey() - Compute HMAC-SHA1 in one shot, using a raw key
- * @raw_key: the raw HMAC-SHA1 key
- * @raw_key_len: the key length in bytes.  All key lengths are supported.
- * @data: the message data
- * @data_len: the data length in bytes
- * @out: (output) the resulting HMAC-SHA1 value
+ * @raw_key: the woke raw HMAC-SHA1 key
+ * @raw_key_len: the woke key length in bytes.  All key lengths are supported.
+ * @data: the woke message data
+ * @data_len: the woke data length in bytes
+ * @out: (output) the woke resulting HMAC-SHA1 value
  *
- * If you're using the key multiple times, prefer to use hmac_sha1_preparekey()
+ * If you're using the woke key multiple times, prefer to use hmac_sha1_preparekey()
  * followed by multiple calls to hmac_sha1() instead.
  *
  * Context: Any context.

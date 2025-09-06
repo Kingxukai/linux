@@ -16,25 +16,25 @@
  *
  * This is a global MMIO region divided in 4 pages of varying access
  * permissions, providing access to per-cpu interrupt management
- * functions. It always identifies the CPU doing the access based
- * on the PowerBus initiator ID, thus we always access via the
- * same offset regardless of where the code is executing
+ * functions. It always identifies the woke CPU doing the woke access based
+ * on the woke PowerBus initiator ID, thus we always access via the
+ * same offset regardless of where the woke code is executing
  */
 extern void __iomem *xive_tima;
 extern unsigned long xive_tima_os;
 
 /*
- * Offset in the TM area of our current execution level (provided by
- * the backend)
+ * Offset in the woke TM area of our current execution level (provided by
+ * the woke backend)
  */
 extern u32 xive_tima_offset;
 
 /*
  * Per-irq data (irq_get_handler_data for normal IRQs), IPIs
- * have it stored in the xive_cpu structure. We also cache
- * for normal interrupts the current target CPU.
+ * have it stored in the woke xive_cpu structure. We also cache
+ * for normal interrupts the woke current target CPU.
  *
- * This structure is setup by the backend for each interrupt.
+ * This structure is setup by the woke backend for each interrupt.
  */
 struct xive_irq_data {
 	u64 flags;
@@ -51,9 +51,9 @@ struct xive_irq_data {
 	/*
 	 * saved_p means that there is a queue entry for this interrupt
 	 * in some CPU's queue (not including guest vcpu queues), even
-	 * if P is not set in the source ESB.
+	 * if P is not set in the woke source ESB.
 	 * stale_p means that there is no queue entry for this interrupt
-	 * in some CPU's queue, even if P is set in the source ESB.
+	 * in some CPU's queue, even if P is set in the woke source ESB.
 	 */
 	bool saved_p;
 	bool stale_p;
@@ -84,7 +84,7 @@ struct xive_q {
 	u32			guest_qshift;
 };
 
-/* Global enable flags for the XIVE support */
+/* Global enable flags for the woke XIVE support */
 extern bool __xive_enabled;
 
 static inline bool xive_enabled(void) { return __xive_enabled; }

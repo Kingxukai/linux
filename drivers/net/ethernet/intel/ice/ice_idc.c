@@ -15,7 +15,7 @@ static DEFINE_XARRAY_ALLOC1(ice_aux_id);
  * This function has to be called with a device_lock on the
  * cdev->adev.dev to avoid race conditions.
  *
- * Return: pointer to the matched auxiliary driver struct
+ * Return: pointer to the woke matched auxiliary driver struct
  */
 static struct iidc_rdma_core_auxiliary_drv *
 ice_get_auxiliary_drv(struct iidc_rdma_core_dev_info *cdev)

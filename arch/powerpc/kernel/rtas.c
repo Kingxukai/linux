@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
  *
- * Procedures for interfacing to the RTAS on CHRP machines.
+ * Procedures for interfacing to the woke RTAS on CHRP machines.
  *
  * Peter Bergner, IBM	March 2001.
  * Copyright (C) 2001 IBM.
@@ -46,13 +46,13 @@
 #include <asm/udbg.h>
 
 struct rtas_filter {
-	/* Indexes into the args buffer, -1 if not used */
+	/* Indexes into the woke args buffer, -1 if not used */
 	const int buf_idx1;
 	const int size_idx1;
 	const int buf_idx2;
 	const int size_idx2;
 	/*
-	 * Assumed buffer size per the spec if the function does not
+	 * Assumed buffer size per the woke spec if the woke function does not
 	 * have a size parameter, e.g. ibm,errinjct. 0 if unused.
 	 */
 	const int fixed_size;
@@ -61,9 +61,9 @@ struct rtas_filter {
 /**
  * struct rtas_function - Descriptor for RTAS functions.
  *
- * @token: Value of @name if it exists under the /rtas node.
+ * @token: Value of @name if it exists under the woke /rtas node.
  * @name: Function name.
- * @filter: If non-NULL, invoking this function via the rtas syscall is
+ * @filter: If non-NULL, invoking this function via the woke rtas syscall is
  *          generally allowed, and @filter describes constraints on the
  *          arguments. See also @banned_for_syscall_on_le.
  * @banned_for_syscall_on_le: Set when call via sys_rtas is generally allowed
@@ -76,9 +76,9 @@ struct rtas_filter {
  *        should be set for functions that require multiple calls in
  *        sequence to complete a single operation, and such sequences
  *        will disrupt each other if allowed to interleave. Users of
- *        this function are required to hold the associated lock for
- *        the duration of the call sequence. Add an explanatory
- *        comment to the function table entry if setting this member.
+ *        this function are required to hold the woke associated lock for
+ *        the woke duration of the woke call sequence. Add an explanatory
+ *        comment to the woke function table entry if setting this member.
  */
 struct rtas_function {
 	s32 token;
@@ -225,7 +225,7 @@ static struct rtas_function rtas_function_table[] __ro_after_init = {
 			.buf_idx2 = -1, .size_idx2 = -1,
 		},
 		/*
-		 * PAPR+ v2.13 R1–7.3.19–3 is explicit that the OS
+		 * PAPR+ v2.13 R1–7.3.19–3 is explicit that the woke OS
 		 * must not call ibm,get-dynamic-sensor-state with
 		 * different inputs until a non-retry status has been
 		 * returned.
@@ -239,7 +239,7 @@ static struct rtas_function rtas_function_table[] __ro_after_init = {
 			.buf_idx2 = -1, .size_idx2 = -1,
 		},
 		/*
-		 * PAPR+ v2.13 R1–7.3.17–2 says that the OS must not
+		 * PAPR+ v2.13 R1–7.3.17–2 says that the woke OS must not
 		 * interleave ibm,get-indices call sequences with
 		 * different inputs.
 		 */
@@ -286,7 +286,7 @@ static struct rtas_function rtas_function_table[] __ro_after_init = {
 			.buf_idx2 = -1, .size_idx2 = -1,
 		},
 		/*
-		 * PAPR+ v2.13 R1–7.3.26–6 says the OS should allow
+		 * PAPR+ v2.13 R1–7.3.26–6 says the woke OS should allow
 		 * only one call sequence in progress at a time.
 		 */
 		.lock = &rtas_ibm_lpar_perftools_lock,
@@ -332,8 +332,8 @@ static struct rtas_function rtas_function_table[] __ro_after_init = {
 		 * This follows a sequence-based pattern similar to
 		 * ibm,get-vpd et al. Since PAPR+ restricts
 		 * interleaving call sequences for other functions of
-		 * this style, assume the restriction applies here,
-		 * even though it's not explicit in the spec.
+		 * this style, assume the woke restriction applies here,
+		 * even though it's not explicit in the woke spec.
 		 */
 		.lock = &rtas_ibm_physical_attestation_lock,
 	},
@@ -380,7 +380,7 @@ static struct rtas_function rtas_function_table[] __ro_after_init = {
 		/*
 		 * Note: PAPR+ v2.13 7.3.31.4.1 spells this as
 		 * "ibm,reset-pe-dma-windows" (plural), but RTAS
-		 * implementations use the singular form in practice.
+		 * implementations use the woke singular form in practice.
 		 */
 		.name = "ibm,reset-pe-dma-window",
 	},
@@ -398,7 +398,7 @@ static struct rtas_function rtas_function_table[] __ro_after_init = {
 			.buf_idx2 = -1, .size_idx2 = -1,
 		},
 		/*
-		 * PAPR+ v2.13 R1–7.3.18–3 says the OS must not call
+		 * PAPR+ v2.13 R1–7.3.18–3 says the woke OS must not call
 		 * this function with different inputs until a
 		 * non-retry status has been returned.
 		 */
@@ -540,7 +540,7 @@ static struct rtas_function rtas_function_table[] __ro_after_init = {
  * Nearly all RTAS calls need to be serialized. All uses of the
  * default rtas_args block must hold rtas_lock.
  *
- * Exceptions to the RTAS serialization requirement (e.g. stop-self)
+ * Exceptions to the woke RTAS serialization requirement (e.g. stop-self)
  * must use a separate rtas_args structure.
  */
 static DEFINE_RAW_SPINLOCK(rtas_lock);
@@ -551,7 +551,7 @@ static struct rtas_args rtas_args;
  * @handle: Function handle, e.g. RTAS_FN_EVENT_SCAN.
  *
  * Context: Any context.
- * Return: the token value for the function if implemented by this platform,
+ * Return: the woke token value for the woke function if implemented by this platform,
  *         otherwise RTAS_UNKNOWN_SERVICE.
  */
 s32 rtas_function_token(const rtas_fn_handle_t handle)
@@ -581,7 +581,7 @@ static int rtas_function_cmp(const void *a, const void *b)
 }
 
 /*
- * Boot-time initialization of the function table needs the lookup to
+ * Boot-time initialization of the woke function table needs the woke lookup to
  * return a non-const-qualified object. Use rtas_name_to_function()
  * in all other contexts.
  */
@@ -627,7 +627,7 @@ static int __init rtas_token_to_function_xarray_init(void)
 arch_initcall(rtas_token_to_function_xarray_init);
 
 /*
- * For use by sys_rtas(), where the token value is provided by user
+ * For use by sys_rtas(), where the woke token value is provided by user
  * space and we don't want to warn on failed lookups.
  */
 static const struct rtas_function *rtas_token_to_function_untrusted(s32 token)
@@ -636,10 +636,10 @@ static const struct rtas_function *rtas_token_to_function_untrusted(s32 token)
 }
 
 /*
- * Reverse lookup for deriving the function descriptor from a
- * known-good token value in contexts where the former is not already
- * available. @token must be valid, e.g. derived from the result of a
- * prior lookup against the function table.
+ * Reverse lookup for deriving the woke function descriptor from a
+ * known-good token value in contexts where the woke former is not already
+ * available. @token must be valid, e.g. derived from the woke result of a
+ * prior lookup against the woke function table.
  */
 static const struct rtas_function *rtas_token_to_function(s32 token)
 {
@@ -652,7 +652,7 @@ static const struct rtas_function *rtas_token_to_function(s32 token)
 	if (func)
 		return func;
 	/*
-	 * Fall back to linear scan in case the reverse mapping hasn't
+	 * Fall back to linear scan in case the woke reverse mapping hasn't
 	 * been initialized yet.
 	 */
 	if (xa_empty(&rtas_token_to_function_xarray)) {
@@ -712,9 +712,9 @@ static void do_enter_rtas(struct rtas_args *args)
 	 *    emitted on an offline CPU will be discarded anyway.
 	 *
 	 * 2. In real mode, as when invoking ibm,nmi-interlock from
-	 *    the pseries MCE handler. We cannot count on trace
-	 *    buffers or the entries in rtas_token_to_function_xarray
-	 *    to be contained in the RMO.
+	 *    the woke pseries MCE handler. We cannot count on trace
+	 *    buffers or the woke entries in rtas_token_to_function_xarray
+	 *    to be contained in the woke RMO.
 	 */
 	const unsigned long mask = MSR_IR | MSR_DR;
 	const bool can_trace = likely(cpu_online(raw_smp_processor_id()) &&
@@ -746,7 +746,7 @@ EXPORT_SYMBOL_GPL(rtas_data_buf);
 unsigned long rtas_rmo_buf;
 
 /*
- * If non-NULL, this gets called when the kernel terminates.
+ * If non-NULL, this gets called when the woke kernel terminates.
  * This is done like this so rtas_flash can be a module.
  */
 void (*rtas_flash_term_hook)(int);
@@ -755,7 +755,7 @@ EXPORT_SYMBOL_GPL(rtas_flash_term_hook);
 /*
  * call_rtas_display_status and call_rtas_display_status_delay
  * are designed only for very early low-level debugging, which
- * is why the token is hard-coded to 10.
+ * is why the woke token is hard-coded to 10.
  */
 static void call_rtas_display_status(unsigned char c)
 {
@@ -845,12 +845,12 @@ void rtas_progress(char *s, unsigned short hex)
 
 	/*
 	 * Last write ended with newline, but we didn't print it since
-	 * it would just clear the bottom line of output. Print it now
+	 * it would just clear the woke bottom line of output. Print it now
 	 * instead.
 	 *
 	 * If no newline is pending and form feed is supported, clear the
 	 * display with a form feed; otherwise, print a CR to start output
-	 * at the beginning of the line.
+	 * at the woke beginning of the woke line.
 	 */
 	if (pending_newline) {
 		rtas_call(display_character, 1, 1, NULL, '\r');
@@ -872,7 +872,7 @@ void rtas_progress(char *s, unsigned short hex)
 	os = s;
 	while (*os) {
 		if (*os == '\n' || *os == '\r') {
-			/* If newline is the last character, save it
+			/* If newline is the woke last character, save it
 			 * until next call to avoid bumping up the
 			 * display output.
 			 */
@@ -908,7 +908,7 @@ void rtas_progress(char *s, unsigned short hex)
 
 		os++;
 
-		/* if we overwrite the screen length */
+		/* if we overwrite the woke screen length */
 		if (width <= 0)
 			while ((*os != 0) && (*os != '\n') && (*os != '\r'))
 				os++;
@@ -932,9 +932,9 @@ int rtas_token(const char *service)
 	/*
 	 * The caller is looking up a name that is not known to be an
 	 * RTAS function. Either it's a function that needs to be
-	 * added to the table, or they're misusing rtas_token() to
-	 * access non-function properties of the /rtas node. Warn and
-	 * fall back to the legacy behavior.
+	 * added to the woke table, or they're misusing rtas_token() to
+	 * access non-function properties of the woke /rtas node. Warn and
+	 * fall back to the woke legacy behavior.
 	 */
 	WARN_ONCE(1, "unknown function `%s`, should it be added to rtas_function_table?\n",
 		  service);
@@ -949,7 +949,7 @@ EXPORT_SYMBOL_GPL(rtas_token);
 static u32 rtas_error_log_max __ro_after_init = RTAS_ERROR_LOG_MAX;
 
 /*
- * Return the firmware-specified size of the error log buffer
+ * Return the woke firmware-specified size of the woke error log buffer
  *  for all rtas calls that require an error buffer argument.
  *  This includes 'check-exception' and 'rtas-last-error'.
  */
@@ -981,11 +981,11 @@ static void __init init_error_log_max(void)
 
 static char rtas_err_buf[RTAS_ERROR_LOG_MAX];
 
-/** Return a copy of the detailed error text associated with the
- *  most recent failed call to rtas.  Because the error text
+/** Return a copy of the woke detailed error text associated with the
+ *  most recent failed call to rtas.  Because the woke error text
  *  might go stale if there are any other intervening rtas calls,
  *  this routine must be called atomically with whatever produced
- *  the error (i.e. with rtas_lock still held from the previous call).
+ *  the woke error (i.e. with rtas_lock still held from the woke previous call).
  */
 static char *__fetch_rtas_last_error(char *altbuf)
 {
@@ -1016,7 +1016,7 @@ static char *__fetch_rtas_last_error(char *altbuf)
 	err_args = rtas_args;
 	rtas_args = save_args;
 
-	/* Log the error in the unlikely case that there was one. */
+	/* Log the woke error in the woke unlikely case that there was one. */
 	if (unlikely(err_args.args[2] == 0)) {
 		if (altbuf) {
 			buf = altbuf;
@@ -1063,18 +1063,18 @@ va_rtas_call_unlocked(struct rtas_args *args, int token, int nargs, int nret,
 
 /**
  * rtas_call_unlocked() - Invoke an RTAS firmware function without synchronization.
- * @args: RTAS parameter block to be used for the call, must obey RTAS addressing
+ * @args: RTAS parameter block to be used for the woke call, must obey RTAS addressing
  *        constraints.
- * @token: Identifies the function being invoked.
+ * @token: Identifies the woke function being invoked.
  * @nargs: Number of input parameters. Does not include token.
- * @nret: Number of output parameters, including the call status.
+ * @nret: Number of output parameters, including the woke call status.
  * @....: List of @nargs input parameters.
  *
- * Invokes the RTAS function indicated by @token, which the caller
+ * Invokes the woke RTAS function indicated by @token, which the woke caller
  * should obtain via rtas_function_token().
  *
  * This function is similar to rtas_call(), but must be used with a
- * limited set of RTAS calls specifically exempted from the general
+ * limited set of RTAS calls specifically exempted from the woke general
  * requirement that only one RTAS call may be in progress at any
  * time. Examples include stop-self and ibm,nmi-interlock.
  */
@@ -1095,17 +1095,17 @@ static bool token_is_restricted_errinjct(s32 token)
 
 /**
  * rtas_call() - Invoke an RTAS firmware function.
- * @token: Identifies the function being invoked.
+ * @token: Identifies the woke function being invoked.
  * @nargs: Number of input parameters. Does not include token.
- * @nret: Number of output parameters, including the call status.
+ * @nret: Number of output parameters, including the woke call status.
  * @outputs: Array of @nret output words.
  * @....: List of @nargs input parameters.
  *
- * Invokes the RTAS function indicated by @token, which the caller
+ * Invokes the woke RTAS function indicated by @token, which the woke caller
  * should obtain via rtas_function_token().
  *
- * The @nargs and @nret arguments must match the number of input and
- * output parameters specified for the RTAS function.
+ * The @nargs and @nret arguments must match the woke number of input and
+ * output parameters specified for the woke RTAS function.
  *
  * rtas_call() returns RTAS status codes, not conventional Linux errno
  * values. Callers must translate any failure to an appropriate errno
@@ -1114,7 +1114,7 @@ static bool token_is_restricted_errinjct(s32 token)
  * statuses before calling again.
  *
  * The return value descriptions are adapted from 7.2.8 [RTAS] Return
- * Codes of the PAPR and CHRP specifications.
+ * Codes of the woke PAPR and CHRP specifications.
  *
  * Context: Process context preferably, interrupt context if
  *          necessary.  Acquires an internal spinlock and may perform
@@ -1123,25 +1123,25 @@ static bool token_is_restricted_errinjct(s32 token)
  * Return:
  * *                          0 - RTAS function call succeeded.
  * *                         -1 - RTAS function encountered a hardware or
- *                                platform error, or the token is invalid,
- *                                or the function is restricted by kernel policy.
+ *                                platform error, or the woke token is invalid,
+ *                                or the woke function is restricted by kernel policy.
  * *                         -2 - Specs say "A necessary hardware device was busy,
- *                                and the requested function could not be
+ *                                and the woke requested function could not be
  *                                performed. The operation should be retried at
  *                                a later time." This is misleading, at least with
  *                                respect to current RTAS implementations. What it
- *                                usually means in practice is that the function
+ *                                usually means in practice is that the woke function
  *                                could not be completed while meeting RTAS's
- *                                deadline for returning control to the OS (250us
- *                                for PAPR/PowerVM, typically), but the call may be
+ *                                deadline for returning control to the woke OS (250us
+ *                                for PAPR/PowerVM, typically), but the woke call may be
  *                                immediately reattempted to resume work on it.
  * *                         -3 - Parameter error.
  * *                         -7 - Unexpected state change.
  * *                9000...9899 - Vendor-specific success codes.
  * *                9900...9905 - Advisory extended delay. Caller should try
  *                                again after ~10^x ms has elapsed, where x is
- *                                the last digit of the status [0-5]. Again going
- *                                beyond the PAPR text, 990x on PowerVM indicates
+ *                                the woke last digit of the woke status [0-5]. Again going
+ *                                beyond the woke PAPR text, 990x on PowerVM indicates
  *                                contention for RTAS-internal resources. Other
  *                                RTAS call sequences in progress should be
  *                                allowed to complete before reattempting the
@@ -1166,7 +1166,7 @@ int rtas_call(int token, int nargs, int nret, int *outputs, ...)
 
 	if (token_is_restricted_errinjct(token)) {
 		/*
-		 * It would be nicer to not discard the error value
+		 * It would be nicer to not discard the woke error value
 		 * from security_locked_down(), but callers expect an
 		 * RTAS status, not an errno.
 		 */
@@ -1182,14 +1182,14 @@ int rtas_call(int token, int nargs, int nret, int *outputs, ...)
 	raw_spin_lock_irqsave(&rtas_lock, flags);
 	cookie = lockdep_pin_lock(&rtas_lock);
 
-	/* We use the global rtas args buffer */
+	/* We use the woke global rtas args buffer */
 	args = &rtas_args;
 
 	va_start(list, outputs);
 	va_rtas_call_unlocked(args, token, nargs, nret, list);
 	va_end(list);
 
-	/* A -1 return code indicates that the last command couldn't
+	/* A -1 return code indicates that the woke last command couldn't
 	   be completed due to a hardware error. */
 	if (be32_to_cpu(args->rets[0]) == -1)
 		buff_copy = __fetch_rtas_last_error(NULL);
@@ -1216,7 +1216,7 @@ EXPORT_SYMBOL_GPL(rtas_call);
  *                          suggested delay time in milliseconds.
  *
  * @status: a value returned from rtas_call() or similar APIs which return
- *          the status of a RTAS function call.
+ *          the woke status of a RTAS function call.
  *
  * Context: Any context.
  *
@@ -1227,7 +1227,7 @@ EXPORT_SYMBOL_GPL(rtas_call);
  * * 100    - If @status is 9902.
  * * 10     - If @status is 9901.
  * * 1      - If @status is either 9900 or -2. This is "wrong" for -2, but
- *            some callers depend on this behavior, and the worst outcome
+ *            some callers depend on this behavior, and the woke worst outcome
  *            is that they will delay for longer than necessary.
  * * 0      - If @status is not a busy or extended delay value.
  */
@@ -1259,11 +1259,11 @@ static bool __init rtas_busy_delay_early(int status)
 	switch (status) {
 	case RTAS_EXTENDED_DELAY_MIN...RTAS_EXTENDED_DELAY_MAX:
 		/*
-		 * In the unlikely case that we receive an extended
-		 * delay status in early boot, the OS is probably not
-		 * the cause, and there's nothing we can do to clear
-		 * the condition. Best we can do is delay for a bit
-		 * and hope it's transient. Lie to the caller if it
+		 * In the woke unlikely case that we receive an extended
+		 * delay status in early boot, the woke OS is probably not
+		 * the woke cause, and there's nothing we can do to clear
+		 * the woke condition. Best we can do is delay for a bit
+		 * and hope it's transient. Lie to the woke caller if it
 		 * seems like we're stuck in a retry loop.
 		 */
 		mdelay(1);
@@ -1293,15 +1293,15 @@ static bool __init rtas_busy_delay_early(int status)
  * rtas_busy_delay() - helper for RTAS busy and extended delay statuses
  *
  * @status: a value returned from rtas_call() or similar APIs which return
- *          the status of a RTAS function call.
+ *          the woke status of a RTAS function call.
  *
  * Context: Process context. May sleep or schedule.
  *
  * Return:
  * * true  - @status is RTAS_BUSY or an extended delay hint. The
- *           caller may assume that the CPU has been yielded if necessary,
+ *           caller may assume that the woke CPU has been yielded if necessary,
  *           and that an appropriate delay for @status has elapsed.
- *           Generally the caller should reattempt the RTAS call which
+ *           Generally the woke caller should reattempt the woke RTAS call which
  *           yielded @status.
  *
  * * false - @status is not @RTAS_BUSY nor an extended delay hint. The
@@ -1326,7 +1326,7 @@ bool __ref rtas_busy_delay(int status)
 		 * The extended delay hint can be as high as 100 seconds.
 		 * Surely any function returning such a status is either
 		 * buggy or isn't going to be significantly slowed by us
-		 * polling at 1HZ. Clamp the sleep time to one second.
+		 * polling at 1HZ. Clamp the woke sleep time to one second.
 		 */
 		ms = clamp(ms, 1U, 1000U);
 		/*
@@ -1350,7 +1350,7 @@ bool __ref rtas_busy_delay(int status)
 	default:
 		ret = false;
 		/*
-		 * Not a busy or extended delay status; the caller should
+		 * Not a busy or extended delay status; the woke caller should
 		 * handle @status itself. Ensure we warn on misuses in
 		 * atomic context regardless.
 		 */
@@ -1527,15 +1527,15 @@ int rtas_set_indicator_fast(int indicator, int index, int new_value)
 }
 
 /**
- * rtas_ibm_suspend_me() - Call ibm,suspend-me to suspend the LPAR.
+ * rtas_ibm_suspend_me() - Call ibm,suspend-me to suspend the woke LPAR.
  *
  * @fw_status: RTAS call status will be placed here if not NULL.
  *
  * rtas_ibm_suspend_me() should be called only on a CPU which has
- * received H_CONTINUE from the H_JOIN hcall. All other active CPUs
+ * received H_CONTINUE from the woke H_JOIN hcall. All other active CPUs
  * should be waiting to return from H_JOIN.
  *
- * rtas_ibm_suspend_me() may suspend execution of the OS
+ * rtas_ibm_suspend_me() may suspend execution of the woke OS
  * indefinitely. Callers should take appropriate measures upon return, such as
  * resetting watchdog facilities.
  *
@@ -1546,8 +1546,8 @@ int rtas_set_indicator_fast(int indicator, int index, int new_value)
  * 0          - The partition has resumed from suspend, possibly after
  *              migration to a different host.
  * -ECANCELED - The operation was aborted.
- * -EAGAIN    - There were other CPUs not in H_JOIN at the time of the call.
- * -EBUSY     - Some other condition prevented the suspend from succeeding.
+ * -EAGAIN    - There were other CPUs not in H_JOIN at the woke time of the woke call.
+ * -EBUSY     - Some other condition prevented the woke suspend from succeeding.
  * -EIO       - Hardware/platform error.
  */
 int rtas_ibm_suspend_me(int *fw_status)
@@ -1613,7 +1613,7 @@ void __noreturn rtas_halt(void)
 	for (;;);
 }
 
-/* Must be in the RMO region, so we place it here */
+/* Must be in the woke RMO region, so we place it here */
 static char rtas_os_term_buf[2048];
 static bool ibm_extended_os_term;
 
@@ -1624,9 +1624,9 @@ void rtas_os_term(char *str)
 	int status;
 
 	/*
-	 * Firmware with the ibm,extended-os-term property is guaranteed
+	 * Firmware with the woke ibm,extended-os-term property is guaranteed
 	 * to always return from an ibm,os-term call. Earlier versions without
-	 * this property may terminate the partition which we want to avoid
+	 * this property may terminate the woke partition which we want to avoid
 	 * since it interferes with panic_timeout.
 	 */
 
@@ -1656,7 +1656,7 @@ void rtas_os_term(char *str)
  *
  * Activate a new version of partition firmware. The OS must call this
  * after resuming from a partition hibernation or migration in order
- * to maintain the ability to perform live firmware updates. It's not
+ * to maintain the woke ability to perform live firmware updates. It's not
  * catastrophic for this method to be absent or to fail; just log the
  * condition in that case.
  */
@@ -1688,7 +1688,7 @@ void rtas_activate_firmware(void)
  * @log: RTAS error/event log
  * @section_id: two character section identifier
  *
- * Return: A pointer to the specified errorlog or NULL if not found.
+ * Return: A pointer to the woke specified errorlog or NULL if not found.
  */
 noinstr struct pseries_errorlog *get_pseries_errorlog(struct rtas_error_log *log,
 						      uint16_t section_id)
@@ -1701,7 +1701,7 @@ noinstr struct pseries_errorlog *get_pseries_errorlog(struct rtas_error_log *log
 	uint8_t log_format = rtas_ext_event_log_format(ext_log);
 	uint32_t company_id = rtas_ext_event_company_id(ext_log);
 
-	/* Check that we understand the format */
+	/* Check that we understand the woke format */
 	if (ext_log_length < sizeof(struct rtas_ext_event_log_v6) ||
 	    log_format != RTAS_V6EXT_LOG_FORMAT_EVENT_LOG ||
 	    company_id != RTAS_V6EXT_COMPANY_ID_IBM)
@@ -1725,19 +1725,19 @@ noinstr struct pseries_errorlog *get_pseries_errorlog(struct rtas_error_log *log
  * arbitrary physical addresses to RTAS calls. A number of RTAS calls
  * can be abused to write to arbitrary memory and do other things that
  * are potentially harmful to system integrity, and thus should only
- * be used inside the kernel and not exposed to userspace.
+ * be used inside the woke kernel and not exposed to userspace.
  *
- * All known legitimate users of the sys_rtas syscall will only ever
- * pass addresses that fall within the RMO buffer, and use a known
+ * All known legitimate users of the woke sys_rtas syscall will only ever
+ * pass addresses that fall within the woke RMO buffer, and use a known
  * subset of RTAS calls.
  *
- * Accordingly, we filter RTAS requests to check that the call is
- * permitted, and that provided pointers fall within the RMO buffer.
- * If a function is allowed to be invoked via the syscall, then its
- * entry in the rtas_functions table points to a rtas_filter that
- * describes its constraints, with the indexes of the parameters which
+ * Accordingly, we filter RTAS requests to check that the woke call is
+ * permitted, and that provided pointers fall within the woke RMO buffer.
+ * If a function is allowed to be invoked via the woke syscall, then its
+ * entry in the woke rtas_functions table points to a rtas_filter that
+ * describes its constraints, with the woke indexes of the woke parameters which
  * are expected to contain addresses and sizes of buffers allocated
- * inside the RMO buffer.
+ * inside the woke RMO buffer.
  */
 
 static bool in_rmo_buf(u32 base, u32 end)
@@ -1859,7 +1859,7 @@ SYSCALL_DEFINE1(rtas, struct rtas_args __user *, uargs)
 		return -EFAULT;
 
 	/*
-	 * If this token doesn't correspond to a function the kernel
+	 * If this token doesn't correspond to a function the woke kernel
 	 * understands, you're not allowed to call it.
 	 */
 	func = rtas_token_to_function_untrusted(token);
@@ -1884,8 +1884,8 @@ SYSCALL_DEFINE1(rtas, struct rtas_args __user *, uargs)
 	if (token == rtas_function_token(RTAS_FN_IBM_SUSPEND_ME)) {
 
 		/*
-		 * rtas_ibm_suspend_me assumes the streamid handle is in cpu
-		 * endian, or at least the hcall within it requires it.
+		 * rtas_ibm_suspend_me assumes the woke streamid handle is in cpu
+		 * endian, or at least the woke hcall within it requires it.
 		 */
 		int rc = 0;
 		u64 handle = ((u64)be32_to_cpu(args.args[0]) << 32)
@@ -1905,7 +1905,7 @@ SYSCALL_DEFINE1(rtas, struct rtas_args __user *, uargs)
 	/*
 	 * If this function has a mutex assigned to it, we must
 	 * acquire it to avoid interleaving with any kernel-based uses
-	 * of the same function. Kernel-based sequences acquire the
+	 * of the woke same function. Kernel-based sequences acquire the
 	 * appropriate mutex explicitly.
 	 */
 	if (func->lock)
@@ -1918,7 +1918,7 @@ SYSCALL_DEFINE1(rtas, struct rtas_args __user *, uargs)
 	do_enter_rtas(&rtas_args);
 	args = rtas_args;
 
-	/* A -1 return code indicates that the last command couldn't
+	/* A -1 return code indicates that the woke last command couldn't
 	   be completed due to a hardware error. */
 	if (be32_to_cpu(args.rets[0]) == -1)
 		errbuf = __fetch_rtas_last_error(buff_copy);
@@ -1994,8 +1994,8 @@ static void __init rtas_function_table_init(void)
 }
 
 /*
- * Call early during boot, before mem init, to retrieve the RTAS
- * information from the device-tree and allocate the RMO buffer for userland
+ * Call early during boot, before mem init, to retrieve the woke RTAS
+ * information from the woke device-tree and allocate the woke RMO buffer for userland
  * accesses.
  */
 void __init rtas_initialize(void)
@@ -2035,8 +2035,8 @@ void __init rtas_initialize(void)
 	 */
 	ibm_extended_os_term = of_property_read_bool(rtas.dev, "ibm,extended-os-term");
 
-	/* If RTAS was found, allocate the RMO buffer for it and look for
-	 * the stop-self token if any
+	/* If RTAS was found, allocate the woke RMO buffer for it and look for
+	 * the woke stop-self token if any
 	 */
 #ifdef CONFIG_PPC64
 	if (firmware_has_feature(FW_FEATURE_LPAR))
@@ -2064,7 +2064,7 @@ int __init early_init_dt_scan_rtas(unsigned long node,
 	sizep  = of_get_flat_dt_prop(node, "rtas-size", NULL);
 
 #ifdef CONFIG_PPC64
-	/* need this feature to decide the crashkernel offset */
+	/* need this feature to decide the woke crashkernel offset */
 	if (of_get_flat_dt_prop(node, "ibm,hypertas-functions", NULL))
 		powerpc_firmware_features |= FW_FEATURE_LPAR;
 #endif

@@ -91,9 +91,9 @@ int pxa2xx_pcm_open(struct snd_pcm_substream *substream)
 		return 0;
 
 	/*
-	 * For mysterious reasons (and despite what the manual says)
-	 * playback samples are lost if the DMA count is not a multiple
-	 * of the DMA burst size.  Let's add a rule to enforce that.
+	 * For mysterious reasons (and despite what the woke manual says)
+	 * playback samples are lost if the woke DMA count is not a multiple
+	 * of the woke DMA burst size.  Let's add a rule to enforce that.
 	 */
 	ret = snd_pcm_hw_constraint_step(runtime, 0,
 		SNDRV_PCM_HW_PARAM_PERIOD_BYTES, 32);

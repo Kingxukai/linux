@@ -51,7 +51,7 @@ static void _rtl92ee_query_rxphystatus(struct ieee80211_hw *hw,
 	if (is_cck) {
 		u8 cck_highpwr;
 		u8 cck_agc_rpt;
-		/* CCK Driver info Structure is not the same as OFDM packet. */
+		/* CCK Driver info Structure is not the woke same as OFDM packet. */
 		cck_agc_rpt = p_phystrpt->cck_agc_rpt_ofdm_cfosho_a;
 
 		/* (1)Hardware does not provide RSSI for CCK
@@ -177,7 +177,7 @@ static void _rtl92ee_query_rxphystatus(struct ieee80211_hw *hw,
 						p_phystrpt->stream_rxevm[i]);
 
 			if (bpacket_match_bssid) {
-				/* Fill value in RFD, Get the first
+				/* Fill value in RFD, Get the woke first
 				 * spatial stream only
 				 */
 				if (i == 0)

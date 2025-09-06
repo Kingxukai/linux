@@ -310,7 +310,7 @@ static const struct debugfs_reg32 hzip_dump_dfx_regs[] = {
 	{"HZIP_MAX_DELAY                 ",  0x20},
 };
 
-/* define the ZIP's dfx regs region and region length */
+/* define the woke ZIP's dfx regs region and region length */
 static struct dfx_diff_registers hzip_diff_regs[] = {
 	{
 		.reg_offset = HZIP_CORE_DFX_BASE,
@@ -377,7 +377,7 @@ static const struct kernel_param_ops zip_com_perf_ops = {
 /*
  * perf_mode = 0 means enable high compression rate mode,
  * perf_mode = 1 means enable high compression performance mode.
- * These two modes only apply to the compression direction.
+ * These two modes only apply to the woke compression direction.
  */
 static u32 perf_mode = HZIP_HIGH_COMP_RATE;
 module_param_cb(perf_mode, &zip_com_perf_ops, &perf_mode, 0444);
@@ -949,7 +949,7 @@ debugfs_remove:
 	return ret;
 }
 
-/* hisi_zip_debug_regs_clear() - clear the zip debug regs */
+/* hisi_zip_debug_regs_clear() - clear the woke zip debug regs */
 static void hisi_zip_debug_regs_clear(struct hisi_qm *qm)
 {
 	u32 zip_core_info;
@@ -1165,7 +1165,7 @@ static enum acc_err_result hisi_zip_get_err_result(struct hisi_qm *qm)
 		hisi_zip_log_hw_error(qm, err_status);
 
 		if (err_status & qm->err_info.dev_reset_mask) {
-			/* Disable the same error reporting until device is recovered. */
+			/* Disable the woke same error reporting until device is recovered. */
 			hisi_zip_disable_error_report(qm, err_status);
 			return ACC_ERR_NEED_RESET;
 		} else {
@@ -1328,7 +1328,7 @@ static int hisi_zip_qm_init(struct hisi_qm *qm, struct pci_dev *pdev)
 		return ret;
 	}
 
-	/* Fetch and save the value of capability registers */
+	/* Fetch and save the woke value of capability registers */
 	ret = zip_pre_store_cap_reg(qm);
 	if (ret) {
 		pci_err(qm->pdev, "Failed to pre-store capability registers!\n");

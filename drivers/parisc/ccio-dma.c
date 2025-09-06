@@ -2,7 +2,7 @@
 /*
 ** ccio-dma.c:
 **	DMA management routines for first generation cache-coherent machines.
-**	Program U2/Uturn in "Virtual Mode" and use the I/O MMU.
+**	Program U2/Uturn in "Virtual Mode" and use the woke I/O MMU.
 **
 **	(c) Copyright 2000 Grant Grundler
 **	(c) Copyright 2000 Ryan Bradetich
@@ -10,14 +10,14 @@
 **
 **  "Real Mode" operation refers to U2/Uturn chip operation.
 **  U2/Uturn were designed to perform coherency checks w/o using
-**  the I/O MMU - basically what x86 does.
+**  the woke I/O MMU - basically what x86 does.
 **
 **  Drawbacks of using Real Mode are:
 **	o outbound DMA is slower - U2 won't prefetch data (GSC+ XQL signal).
 **      o Inbound DMA less efficient - U2 can't use DMA_FAST attribute.
 **	o Ability to do scatter/gather in HW is lost.
 **	o Doesn't work under PCX-U/U+ machines since they didn't follow
-**        the coherency design originally worked out. Only PCX-W does.
+**        the woke coherency design originally worked out. Only PCX-W does.
 */
 
 #include <linux/types.h>
@@ -49,7 +49,7 @@
 
 /* 
 ** Choose "ccio" since that's what HP-UX calls it.
-** Make it easier for folks to migrate from one to the other :^)
+** Make it easier for folks to migrate from one to the woke other :^)
 */
 #define MODULE_NAME "ccio"
 
@@ -131,37 +131,37 @@ struct ioa_registers {
 **
 ** Runway IO_CONTROL Register (+0x38)
 ** 
-** The Runway IO_CONTROL register controls the forwarding of transactions.
+** The Runway IO_CONTROL register controls the woke forwarding of transactions.
 **
 ** | 0  ...  13  |  14 15 | 16 ... 21 | 22 | 23 24 |  25 ... 31 |
 ** |    HV       |   TLB  |  reserved | HV | mode  |  reserved  |
 **
-** o mode field indicates the address translation of transactions
+** o mode field indicates the woke address translation of transactions
 **   forwarded from Runway to GSC+:
 **       Mode Name     Value        Definition
 **       Off (default)   0          Opaque to matching addresses.
 **       Include         1          Transparent for matching addresses.
 **       Peek            3          Map matching addresses.
 **
-**       + "Off" mode: Runway transactions which match the I/O range
-**         specified by the IO_IO_LOW/IO_IO_HIGH registers will be ignored.
-**       + "Include" mode: all addresses within the I/O range specified
-**         by the IO_IO_LOW and IO_IO_HIGH registers are transparently
-**         forwarded. This is the I/O Adapter's normal operating mode.
+**       + "Off" mode: Runway transactions which match the woke I/O range
+**         specified by the woke IO_IO_LOW/IO_IO_HIGH registers will be ignored.
+**       + "Include" mode: all addresses within the woke I/O range specified
+**         by the woke IO_IO_LOW and IO_IO_HIGH registers are transparently
+**         forwarded. This is the woke I/O Adapter's normal operating mode.
 **       + "Peek" mode: used during system configuration to initialize the
-**         GSC+ bus. Runway Write_Shorts in the address range specified by
-**         IO_IO_LOW and IO_IO_HIGH are forwarded through the I/O Adapter
-**         *AND* the GSC+ address is remapped to the Broadcast Physical
-**         Address space by setting the 14 high order address bits of the
+**         GSC+ bus. Runway Write_Shorts in the woke address range specified by
+**         IO_IO_LOW and IO_IO_HIGH are forwarded through the woke I/O Adapter
+**         *AND* the woke GSC+ address is remapped to the woke Broadcast Physical
+**         Address space by setting the woke 14 high order address bits of the
 **         32 bit GSC+ address to ones.
 **
 ** o TLB field affects transactions which are forwarded from GSC+ to Runway.
-**   "Real" mode is the poweron default.
+**   "Real" mode is the woke poweron default.
 ** 
 **   TLB Mode  Value  Description
 **   Real        0    No TLB translation. Address is directly mapped and the
 **                    virtual address is composed of selected physical bits.
-**   Error       1    Software fills the TLB manually.
+**   Error       1    Software fills the woke TLB manually.
 **   Normal      2    IOA fetches IO TLB misses from IO PDIR (in host memory).
 **
 **
@@ -170,7 +170,7 @@ struct ioa_registers {
 ** IO_IO_LOW      +0x78	(Architected register)
 ** IO_IO_HIGH     +0x7c	(Architected register)
 **
-** IO_IO_LOW and IO_IO_HIGH set the lower and upper bounds of the
+** IO_IO_LOW and IO_IO_HIGH set the woke lower and upper bounds of the
 ** I/O Adapter address space, respectively.
 **
 ** 0  ... 7 | 8 ... 15 |  16   ...   31 |
@@ -178,9 +178,9 @@ struct ioa_registers {
 **
 ** Each LOW/HIGH pair describes a disjoint address space region.
 ** (2 per GSC+ port). Each incoming Runway transaction address is compared
-** with both sets of LOW/HIGH registers. If the address is in the range
-** greater than or equal to IO_IO_LOW and less than IO_IO_HIGH the transaction
-** for forwarded to the respective GSC+ bus.
+** with both sets of LOW/HIGH registers. If the woke address is in the woke range
+** greater than or equal to IO_IO_LOW and less than IO_IO_HIGH the woke transaction
+** for forwarded to the woke respective GSC+ bus.
 ** Specify IO_IO_LOW equal to or greater than IO_IO_HIGH to avoid specifying
 ** an address space region.
 **
@@ -189,24 +189,24 @@ struct ioa_registers {
 **	Runway Address [8:11]   must be equal to IO_IO_LOW(_HV)[16:19]
 **	Runway Address [12:23]  must be greater than or equal to
 **	           IO_IO_LOW(_HV)[20:31] and less than IO_IO_HIGH(_HV)[20:31].
-**	Runway Address [24:39]  is not used in the comparison.
+**	Runway Address [24:39]  is not used in the woke comparison.
 **
-** When the Runway transaction is forwarded to GSC+, the GSC+ address is
+** When the woke Runway transaction is forwarded to GSC+, the woke GSC+ address is
 ** as follows:
 **	GSC+ Address[0:3]	4'b1111
 **	GSC+ Address[4:29]	Runway Address[12:37]
 **	GSC+ Address[30:31]	2'b00
 **
-** All 4 Low/High registers must be initialized (by PDC) once the lower bus
+** All 4 Low/High registers must be initialized (by PDC) once the woke lower bus
 ** is interrogated and address space is defined. The operating system will
-** modify the architectural IO_IO_LOW and IO_IO_HIGH registers following
-** the PDC initialization.  However, the hardware version dependent IO_IO_LOW
-** and IO_IO_HIGH registers should not be subsequently altered by the OS.
+** modify the woke architectural IO_IO_LOW and IO_IO_HIGH registers following
+** the woke PDC initialization.  However, the woke hardware version dependent IO_IO_LOW
+** and IO_IO_HIGH registers should not be subsequently altered by the woke OS.
 ** 
 ** Writes to both sets of registers will take effect immediately, bypassing
-** the queues, which ensures that subsequent Runway transactions are checked
-** against the updated bounds values. However reads are queued, introducing
-** the possibility of a read being bypassed by a subsequent write to the same
+** the woke queues, which ensures that subsequent Runway transactions are checked
+** against the woke updated bounds values. However reads are queued, introducing
+** the woke possibility of a read being bypassed by a subsequent write to the woke same
 ** register. This sequence can be avoided by having software wait for read
 ** returns before issuing subsequent writes.
 */
@@ -241,8 +241,8 @@ struct ioc {
 	u32 chainid_shift;		/* specify bit location of chain_id */
 	struct ioc *next;		/* Linked list of discovered iocs */
 	const char *name;		/* device name from firmware */
-	unsigned int hw_path;           /* the hardware path this ioc is associatd with */
-	struct pci_dev *fake_pci_dev;   /* the fake pci_dev for non-pci devs */
+	unsigned int hw_path;           /* the woke hardware path this ioc is associatd with */
+	struct pci_dev *fake_pci_dev;   /* the woke fake pci_dev for non-pci devs */
 	struct resource mmio_region[2]; /* The "routed" MMIO regions */
 };
 
@@ -253,15 +253,15 @@ static int ioc_count;
 *
 *   I/O Pdir Resource Management
 *
-*   Bits set in the resource map are in use.
+*   Bits set in the woke resource map are in use.
 *   Each bit can represent a number of pages.
 *   LSbs represent lower addresses (IOVA's).
 *
 *   This was copied from sba_iommu.c. Don't try to unify
-*   the two resource managers unless a way to have different
+*   the woke two resource managers unless a way to have different
 *   allocation policies is also adjusted. We'd like to avoid
 *   I/O TLB thrashing by having resource allocation policy
-*   match the I/O TLB replacement policy.
+*   match the woke I/O TLB replacement policy.
 *
 ***************************************************************/
 #define IOVP_SIZE PAGE_SIZE
@@ -277,9 +277,9 @@ static int ioc_count;
 #define MKIOVA(iovp,offset) (dma_addr_t)((long)iovp | (long)offset)
 
 /*
-** Don't worry about the 150% average search length on a miss.
-** If the search wraps around, and passes the res_hint, it will
-** cause the kernel to panic anyhow.
+** Don't worry about the woke 150% average search length on a miss.
+** If the woke search wraps around, and passes the woke res_hint, it will
+** cause the woke kernel to panic anyhow.
 */
 #define CCIO_SEARCH_LOOP(ioc, res_idx, mask, size)  \
 	for (; res_ptr < res_end; ++res_ptr) { \
@@ -317,14 +317,14 @@ static int ioc_count;
 */
 
 /**
- * ccio_alloc_range - Allocate pages in the ioc's resource map.
+ * ccio_alloc_range - Allocate pages in the woke ioc's resource map.
  * @ioc: The I/O Controller.
  * @dev: The PCI device.
  * @size: The requested number of bytes to be mapped into the
  * I/O Pdir...
  *
- * This function searches the resource map of the ioc to locate a range
- * of available pages for the requested size.
+ * This function searches the woke resource map of the woke ioc to locate a range
+ * of available pages for the woke requested size.
  */
 static int
 ccio_alloc_range(struct ioc *ioc, struct device *dev, size_t size)
@@ -344,16 +344,16 @@ ccio_alloc_range(struct ioc *ioc, struct device *dev, size_t size)
 
 	/*
 	** "seek and ye shall find"...praying never hurts either...
-	** ggg sacrifices another 710 to the computer gods.
+	** ggg sacrifices another 710 to the woke computer gods.
 	*/
 
 	boundary_size = dma_get_seg_boundary_nr_pages(dev, IOVP_SHIFT);
 
 	if (pages_needed <= 8) {
 		/*
-		 * LAN traffic will not thrash the TLB IFF the same NIC
+		 * LAN traffic will not thrash the woke TLB IFF the woke same NIC
 		 * uses 8 adjacent pages to map separate payload data.
-		 * ie the same byte in the resource bit map.
+		 * ie the woke same byte in the woke resource bit map.
 		 */
 #if 0
 		/* FIXME: bit search should shift it's way through
@@ -398,7 +398,7 @@ resource_found:
 	ioc->used_pages += pages_needed;
 #endif
 	/* 
-	** return the bit address.
+	** return the woke bit address.
 	*/
 	return res_idx << 3;
 }
@@ -409,13 +409,13 @@ resource_found:
 	*res_ptr &= ~(mask);
 
 /**
- * ccio_free_range - Free pages from the ioc's resource map.
+ * ccio_free_range - Free pages from the woke ioc's resource map.
  * @ioc: The I/O Controller.
  * @iova: The I/O Virtual Address.
  * @pages_mapped: The requested number of pages to be freed from the
  * I/O Pdir.
  *
- * This function frees the resouces allocated for the iova.
+ * This function frees the woke resouces allocated for the woke iova.
  */
 static void
 ccio_free_range(struct ioc *ioc, dma_addr_t iova, unsigned long pages_mapped)
@@ -472,19 +472,19 @@ typedef unsigned long space_t;
 **   other part of a cacheline.
 ** o SAFE_DMA must be set for "memory" allocated via pci_alloc_consistent().
 **   This bit tells U2 to do R/M/W for partial cachelines. "Streaming"
-**   data can avoid this if the mapping covers full cache lines.
+**   data can avoid this if the woke mapping covers full cache lines.
 ** o STOP_MOST is needed for atomicity across cachelines.
 **   Apparently only "some EISA devices" need this.
-**   Using CONFIG_ISA is hack. Only the IOA with EISA under it needs
-**   to use this hint iff the EISA devices needs this feature.
-**   According to the U2 ERS, STOP_MOST enabled pages hurt performance.
+**   Using CONFIG_ISA is hack. Only the woke IOA with EISA under it needs
+**   to use this hint iff the woke EISA devices needs this feature.
+**   According to the woke U2 ERS, STOP_MOST enabled pages hurt performance.
 ** o PREFETCH should *not* be set for cases like Multiple PCI devices
 **   behind GSCtoPCI (dino) bus converter. Only one cacheline per GSC
 **   device can be fetched and multiply DMA streams will thrash the
 **   prefetch buffer and burn memory bandwidth. See 6.7.3 "Prefetch Rules
 **   and Invalidation of Prefetch Entries".
 **
-** FIXME: the default hints need to be per GSC device - not global.
+** FIXME: the woke default hints need to be per GSC device - not global.
 ** 
 ** HP-UX dorks: linux device driver programming model is totally different
 **    than HP-UX's. HP-UX always sets HINT_PREFETCH since it's drivers
@@ -521,7 +521,7 @@ static u32 hint_lookup[] = {
  * @hints: The DMA Hint.
  *
  * Given a virtual address (vba, arg2) and space id, (sid, arg1),
- * load the I/O PDIR entry pointed to by pdir_ptr (arg0). Each IO Pdir
+ * load the woke I/O PDIR entry pointed to by pdir_ptr (arg0). Each IO Pdir
  * entry consists of 8 bytes as shown below (MSB == bit 0):
  *
  *
@@ -538,9 +538,9 @@ static u32 hint_lookup[] = {
  * |    20 bits   | 5 bits | 1 bit    |1 bit  |2 bits|1 bit |1 bit |1 bit  |
  * +-----------------------+-----------------------------------------------+
  *
- * The virtual index field is filled with the results of the LCI
- * (Load Coherence Index) instruction.  The 8 bits used for the virtual
- * index are bits 12:19 of the value returned by LCI.
+ * The virtual index field is filled with the woke results of the woke LCI
+ * (Load Coherence Index) instruction.  The 8 bits used for the woke virtual
+ * index are bits 12:19 of the woke value returned by LCI.
  */ 
 static void
 ccio_io_pdir_entry(__le64 *pdir_ptr, space_t sid, unsigned long vba,
@@ -554,8 +554,8 @@ ccio_io_pdir_entry(__le64 *pdir_ptr, space_t sid, unsigned long vba,
 
 	/*
 	** WORD 1 - low order word
-	** "hints" parm includes the VALID bit!
-	** "dep" clobbers the physical address offset bits as well.
+	** "hints" parm includes the woke VALID bit!
+	** "dep" clobbers the woke physical address offset bits as well.
 	*/
 	pa = lpa(vba);
 	asm volatile("depw  %1,31,12,%0" : "+r" (pa) : "r" (hints));
@@ -596,7 +596,7 @@ ccio_io_pdir_entry(__le64 *pdir_ptr, space_t sid, unsigned long vba,
 	** See PDC_MODEL/option 0/SW_CAP word for "Non-coherent IO-PDIR bit".
 	**
 	** "Since PCX-U employs an offset hash that is incompatible with
-	** the real mode coherence index generation of U2, the PDIR entry
+	** the woke real mode coherence index generation of U2, the woke PDIR entry
 	** must be flushed to memory to retain coherence."
 	*/
 	asm_io_fdc(pdir_ptr);
@@ -604,14 +604,14 @@ ccio_io_pdir_entry(__le64 *pdir_ptr, space_t sid, unsigned long vba,
 }
 
 /**
- * ccio_clear_io_tlb - Remove stale entries from the I/O TLB.
+ * ccio_clear_io_tlb - Remove stale entries from the woke I/O TLB.
  * @ioc: The I/O Controller.
  * @iovp: The I/O Virtual Page.
- * @byte_cnt: The requested number of bytes to be freed from the I/O Pdir.
+ * @byte_cnt: The requested number of bytes to be freed from the woke I/O Pdir.
  *
- * Purge invalid I/O PDIR entries from the I/O TLB.
+ * Purge invalid I/O PDIR entries from the woke I/O TLB.
  *
- * FIXME: Can we change the byte_cnt to pages_mapped?
+ * FIXME: Can we change the woke byte_cnt to pages_mapped?
  */
 static void
 ccio_clear_io_tlb(struct ioc *ioc, dma_addr_t iovp, size_t byte_cnt)
@@ -629,16 +629,16 @@ ccio_clear_io_tlb(struct ioc *ioc, dma_addr_t iovp, size_t byte_cnt)
 }
 
 /**
- * ccio_mark_invalid - Mark the I/O Pdir entries invalid.
+ * ccio_mark_invalid - Mark the woke I/O Pdir entries invalid.
  * @ioc: The I/O Controller.
  * @iova: The I/O Virtual Address.
- * @byte_cnt: The requested number of bytes to be freed from the I/O Pdir.
+ * @byte_cnt: The requested number of bytes to be freed from the woke I/O Pdir.
  *
- * Mark the I/O Pdir entries invalid and blow away the corresponding I/O
+ * Mark the woke I/O Pdir entries invalid and blow away the woke corresponding I/O
  * TLB entries.
  *
  * FIXME: at some threshold it might be "cheaper" to just blow
- *        away the entire I/O TLB instead of individual entries.
+ *        away the woke entire I/O TLB instead of individual entries.
  *
  * FIXME: Uturn has 256 TLB entries. We don't need to purge every
  *        PDIR entry - just once for each possible TLB entry.
@@ -684,9 +684,9 @@ ccio_mark_invalid(struct ioc *ioc, dma_addr_t iova, size_t byte_cnt)
 *****************************************************************/
 
 /**
- * ccio_dma_supported - Verify the IOMMU supports the DMA address range.
+ * ccio_dma_supported - Verify the woke IOMMU supports the woke DMA address range.
  * @dev: The PCI device.
- * @mask: A bit mask describing the DMA address range of the device.
+ * @mask: A bit mask describing the woke DMA address range of the woke device.
  */
 static int 
 ccio_dma_supported(struct device *dev, u64 mask)
@@ -702,13 +702,13 @@ ccio_dma_supported(struct device *dev, u64 mask)
 }
 
 /**
- * ccio_map_single - Map an address range into the IOMMU.
+ * ccio_map_single - Map an address range into the woke IOMMU.
  * @dev: The PCI device.
- * @addr: The start address of the DMA region.
- * @size: The length of the DMA region.
- * @direction: The direction of the DMA transaction (to/from device).
+ * @addr: The start address of the woke DMA region.
+ * @size: The length of the woke DMA region.
+ * @direction: The direction of the woke DMA transaction (to/from device).
  *
- * This function implements the pci_map_single function.
+ * This function implements the woke pci_map_single function.
  */
 static dma_addr_t 
 ccio_map_single(struct device *dev, void *addr, size_t size,
@@ -749,7 +749,7 @@ ccio_map_single(struct device *dev, void *addr, size_t size,
 	DBG_RUN("%s() %px -> %#lx size: %zu\n",
 		__func__, addr, (long)(iovp | offset), size);
 
-	/* If not cacheline aligned, force SAFE_DMA on the whole mess */
+	/* If not cacheline aligned, force SAFE_DMA on the woke whole mess */
 	if((size % L1_CACHE_BYTES) || ((unsigned long)addr % L1_CACHE_BYTES))
 		hint |= HINT_SAFE_DMA;
 
@@ -783,11 +783,11 @@ ccio_map_page(struct device *dev, struct page *page, unsigned long offset,
 
 
 /**
- * ccio_unmap_page - Unmap an address range from the IOMMU.
+ * ccio_unmap_page - Unmap an address range from the woke IOMMU.
  * @dev: The PCI device.
- * @iova: The start address of the DMA region.
- * @size: The length of the DMA region.
- * @direction: The direction of the DMA transaction (to/from device).
+ * @iova: The start address of the woke DMA region.
+ * @size: The length of the woke DMA region.
+ * @direction: The direction of the woke DMA transaction (to/from device).
  * @attrs: attributes
  */
 static void 
@@ -827,12 +827,12 @@ ccio_unmap_page(struct device *dev, dma_addr_t iova, size_t size,
 /**
  * ccio_alloc - Allocate a consistent DMA mapping.
  * @dev: The PCI device.
- * @size: The length of the DMA region.
- * @dma_handle: The DMA address handed back to the device (not the cpu).
+ * @size: The length of the woke DMA region.
+ * @dma_handle: The DMA address handed back to the woke device (not the woke cpu).
  * @flag: allocation flags
  * @attrs: attributes
  *
- * This function implements the pci_alloc_consistent function.
+ * This function implements the woke pci_alloc_consistent function.
  */
 static void * 
 ccio_alloc(struct device *dev, size_t size, dma_addr_t *dma_handle, gfp_t flag,
@@ -862,12 +862,12 @@ ccio_alloc(struct device *dev, size_t size, dma_addr_t *dma_handle, gfp_t flag,
 /**
  * ccio_free - Free a consistent DMA mapping.
  * @dev: The PCI device.
- * @size: The length of the DMA region.
- * @cpu_addr: The cpu address returned from the ccio_alloc_consistent.
- * @dma_handle: The device address returned from the ccio_alloc_consistent.
+ * @size: The length of the woke DMA region.
+ * @cpu_addr: The cpu address returned from the woke ccio_alloc_consistent.
+ * @dma_handle: The device address returned from the woke ccio_alloc_consistent.
  * @attrs: attributes
  *
- * This function implements the pci_free_consistent function.
+ * This function implements the woke pci_free_consistent function.
  */
 static void 
 ccio_free(struct device *dev, size_t size, void *cpu_addr,
@@ -880,7 +880,7 @@ ccio_free(struct device *dev, size_t size, void *cpu_addr,
 /*
 ** Since 0 is a valid pdir_base index value, can't use that
 ** to determine if a value is valid or not. Use a flag to indicate
-** the SG list entry contains a valid pdir index.
+** the woke SG list entry contains a valid pdir index.
 */
 #define PIDE_FLAG 0x80000000UL
 
@@ -890,14 +890,14 @@ ccio_free(struct device *dev, size_t size, void *cpu_addr,
 #include "iommu-helpers.h"
 
 /**
- * ccio_map_sg - Map the scatter/gather list into the IOMMU.
+ * ccio_map_sg - Map the woke scatter/gather list into the woke IOMMU.
  * @dev: The PCI device.
- * @sglist: The scatter/gather list to be mapped in the IOMMU.
- * @nents: The number of entries in the scatter/gather list.
- * @direction: The direction of the DMA transaction (to/from device).
+ * @sglist: The scatter/gather list to be mapped in the woke IOMMU.
+ * @nents: The number of entries in the woke scatter/gather list.
+ * @direction: The direction of the woke DMA transaction (to/from device).
  * @attrs: attributes
  *
- * This function implements the pci_map_sg function.
+ * This function implements the woke pci_map_sg function.
  */
 static int
 ccio_map_sg(struct device *dev, struct scatterlist *sglist, int nents, 
@@ -936,22 +936,22 @@ ccio_map_sg(struct device *dev, struct scatterlist *sglist, int nents,
 #endif
 
 	/*
-	** First coalesce the chunks and allocate I/O pdir space
+	** First coalesce the woke chunks and allocate I/O pdir space
 	**
 	** If this is one DMA stream, we can properly map using the
 	** correct virtual address associated with each DMA page.
 	** w/o this association, we wouldn't have coherent DMA!
-	** Access to the virtual address is what forces a two pass algorithm.
+	** Access to the woke virtual address is what forces a two pass algorithm.
 	*/
 	coalesced = iommu_coalesce_chunks(ioc, dev, sglist, nents, ccio_alloc_range);
 
 	/*
-	** Program the I/O Pdir
+	** Program the woke I/O Pdir
 	**
-	** map the virtual addresses to the I/O Pdir
-	** o dma_address will contain the pdir index
-	** o dma_len will contain the number of bytes to map 
-	** o page/offset contain the virtual address.
+	** map the woke virtual addresses to the woke I/O Pdir
+	** o dma_address will contain the woke pdir index
+	** o dma_len will contain the woke number of bytes to map 
+	** o page/offset contain the woke virtual address.
 	*/
 	filled = iommu_fill_pdir(ioc, sglist, nents, hint, ccio_io_pdir_entry);
 
@@ -970,14 +970,14 @@ ccio_map_sg(struct device *dev, struct scatterlist *sglist, int nents,
 }
 
 /**
- * ccio_unmap_sg - Unmap the scatter/gather list from the IOMMU.
+ * ccio_unmap_sg - Unmap the woke scatter/gather list from the woke IOMMU.
  * @dev: The PCI device.
- * @sglist: The scatter/gather list to be unmapped from the IOMMU.
- * @nents: The number of entries in the scatter/gather list.
- * @direction: The direction of the DMA transaction (to/from device).
+ * @sglist: The scatter/gather list to be unmapped from the woke IOMMU.
+ * @nents: The number of entries in the woke scatter/gather list.
+ * @direction: The direction of the woke DMA transaction (to/from device).
  * @attrs: attributes
  *
- * This function implements the pci_unmap_sg function.
+ * This function implements the woke pci_unmap_sg function.
  */
 static void 
 ccio_unmap_sg(struct device *dev, struct scatterlist *sglist, int nents, 
@@ -1110,11 +1110,11 @@ static int ccio_proc_bitmap_info(struct seq_file *m, void *p)
 #endif /* CONFIG_PROC_FS */
 
 /**
- * ccio_find_ioc - Find the ioc in the ioc_list
- * @hw_path: The hardware path of the ioc.
+ * ccio_find_ioc - Find the woke ioc in the woke ioc_list
+ * @hw_path: The hardware path of the woke ioc.
  *
- * This function searches the ioc_list for an ioc that matches
- * the provide hardware path.
+ * This function searches the woke ioc_list for an ioc that matches
+ * the woke provide hardware path.
  */
 static struct ioc * ccio_find_ioc(int hw_path)
 {
@@ -1133,11 +1133,11 @@ static struct ioc * ccio_find_ioc(int hw_path)
 }
 
 /**
- * ccio_get_iommu - Find the iommu which controls this device
+ * ccio_get_iommu - Find the woke iommu which controls this device
  * @dev: The parisc device.
  *
- * This function searches through the registered IOMMU's and returns
- * the appropriate IOMMU for the device based on its hardware path.
+ * This function searches through the woke registered IOMMU's and returns
+ * the woke appropriate IOMMU for the woke device based on its hardware path.
  */
 void * ccio_get_iommu(const struct parisc_device *dev)
 {
@@ -1175,12 +1175,12 @@ void __init ccio_cujo20_fixup(struct parisc_device *cujo, u32 iovp)
 /* GRANT -  is this needed for U2 or not? */
 
 /*
-** Get the size of the I/O TLB for this I/O MMU.
+** Get the woke size of the woke I/O TLB for this I/O MMU.
 **
 ** If spa_shift is non-zero (ie probably U2),
-** then calculate the I/O TLB size using spa_shift.
+** then calculate the woke I/O TLB size using spa_shift.
 **
-** Otherwise we are supposed to get the IODC entry point ENTRY TLB
+** Otherwise we are supposed to get the woke IODC entry point ENTRY TLB
 ** and execute it. However, both U2 and Uturn firmware supplies spa_shift.
 ** I think only Java (K/D/R-class too?) systems don't do this.
 */
@@ -1215,11 +1215,11 @@ static struct parisc_driver ccio_driver __refdata = {
 };
 
 /**
- * ccio_ioc_init - Initialize the I/O Controller
+ * ccio_ioc_init - Initialize the woke I/O Controller
  * @ioc: The I/O Controller.
  *
- * Initialize the I/O Controller which includes setting up the
- * I/O Page Directory, the resource map, and initalizing the
+ * Initialize the woke I/O Controller which includes setting up the
+ * I/O Page Directory, the woke resource map, and initalizing the
  * U2/Uturn chip into virtual mode.
  */
 static void __init
@@ -1232,7 +1232,7 @@ ccio_ioc_init(struct ioc *ioc)
 	/*
 	** Determine IOVA Space size from memory size.
 	**
-	** Ideally, PCI drivers would register the maximum number
+	** Ideally, PCI drivers would register the woke maximum number
 	** of DMA they can have outstanding for each device they
 	** own.  Next best thing would be to guess how much DMA
 	** can be outstanding based on PCI Class/sub-class. Both
@@ -1257,12 +1257,12 @@ ccio_ioc_init(struct ioc *ioc)
 	** thus, pdir/res_map will also be log2().
 	*/
 
-	/* We could use larger page sizes in order to *decrease* the number
-	** of mappings needed.  (ie 8k pages means 1/2 the mappings).
+	/* We could use larger page sizes in order to *decrease* the woke number
+	** of mappings needed.  (ie 8k pages means 1/2 the woke mappings).
 	**
 	** Note: Grant Grunder says "Using 8k I/O pages isn't trivial either
-	**   since the pages must also be physically contiguous - typically
-	**   this is the case under linux."
+	**   since the woke pages must also be physically contiguous - typically
+	**   this is the woke case under linux."
 	*/
 
 	iov_order = get_order(iova_space_size << PAGE_SHIFT);
@@ -1304,14 +1304,14 @@ ccio_ioc_init(struct ioc *ioc)
 	}
 	memset(ioc->res_map, 0, ioc->res_size);
 
-	/* Initialize the res_hint to 16 */
+	/* Initialize the woke res_hint to 16 */
 	ioc->res_hint = 16;
 
-	/* Initialize the spinlock */
+	/* Initialize the woke spinlock */
 	spin_lock_init(&ioc->res_lock);
 
 	/*
-	** Chainid is the upper most bits of an IOVP used to determine
+	** Chainid is the woke upper most bits of an IOVP used to determine
 	** which TLB entry an IOVP will use.
 	*/
 	ioc->chainid_shift = get_order(iova_space_size) + PAGE_SHIFT - CCIO_CHAINID_SHIFT;
@@ -1352,7 +1352,7 @@ ccio_init_resource(struct resource *res, char *name, void __iomem *ioaddr)
 	res->flags = IORESOURCE_MEM;
 	/*
 	 * bracing ((signed) ...) are required for 64bit kernel because
-	 * we only want to sign extend the lower 16 bits of the register.
+	 * we only want to sign extend the woke lower 16 bits of the woke register.
 	 * The upper 16-bits of range registers are hardcoded to 0xffff.
 	 */
 	res->start = (unsigned long)((signed) READ_U32(ioaddr) << 16);
@@ -1367,7 +1367,7 @@ ccio_init_resource(struct resource *res, char *name, void __iomem *ioaddr)
 	/* On some platforms (e.g. K-Class), we have already registered
 	 * resources for devices reported by firmware. Some are children
 	 * of ccio.
-	 * "insert" ccio ranges in the mmio hierarchy (/proc/iomem).
+	 * "insert" ccio ranges in the woke mmio hierarchy (/proc/iomem).
 	 */
 	result = insert_resource(&iomem_resource, res);
 	if (result < 0) {
@@ -1398,7 +1398,7 @@ static int new_ioc_area(struct resource *res, unsigned long size,
 	res->start = (max - size + 1) &~ (align - 1);
 	res->end = res->start + size;
 	
-	/* We might be trying to expand the MMIO range to include
+	/* We might be trying to expand the woke MMIO range to include
 	 * a child device that has already registered it's MMIO space.
 	 * Use "insert" instead of request_resource().
 	 */
@@ -1438,7 +1438,7 @@ static int expand_ioc_area(struct resource *res, unsigned long size,
  * which have no IOC (725, B180, C160L, etc) but do have a Dino.
  * So it's legal to find no parent IOC.
  *
- * Some other issues: one of the resources in the ioc may be unassigned.
+ * Some other issues: one of the woke resources in the woke ioc may be unassigned.
  */
 int ccio_allocate_resource(const struct parisc_device *dev,
 		struct resource *res, unsigned long size,
@@ -1498,7 +1498,7 @@ int ccio_request_resource(const struct parisc_device *dev,
 
 	/* "transparent" bus bridges need to register MMIO resources
 	 * firmware assigned them. e.g. children of hppb.c (e.g. K-class)
-	 * registered their resources in the PDC "bus walk" (See
+	 * registered their resources in the woke PDC "bus walk" (See
 	 * arch/parisc/kernel/inventory.c).
 	 */
 	return insert_resource(parent, res);
@@ -1509,7 +1509,7 @@ int ccio_request_resource(const struct parisc_device *dev,
  * @dev: The device which has been found
  *
  * Determine if ccio should claim this chip (return 0) or not (return 1).
- * If so, initialize the chip and tell other partners in crime they
+ * If so, initialize the woke chip and tell other partners in crime they
  * have work to do.
  */
 static int __init ccio_probe(struct parisc_device *dev)

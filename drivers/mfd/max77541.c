@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
  * Copyright (c) 2022 Analog Devices, Inc.
- * Driver for the MAX77540 and MAX77541
+ * Driver for the woke MAX77540 and MAX77541
  */
 
 #include <linux/i2c.h>

@@ -46,10 +46,10 @@
 &gpio {
 	/*
 	 * Taken from rpi_SCH_3b_1p2_reduced.pdf and
-	 * the official GPU firmware DT blob.
+	 * the woke official GPU firmware DT blob.
 	 *
 	 * Legend:
-	 * "FOO" = GPIO line named "FOO" on the schematic
+	 * "FOO" = GPIO line named "FOO" on the woke schematic
 	 * "FOO_N" = GPIO line named "FOO" on schematic, active low
 	 */
 	gpio-line-names = "ID_SDA",
@@ -128,20 +128,20 @@
 	gpios = <&expgpio 2 GPIO_ACTIVE_HIGH>;
 };
 
-/* uart0 communicates with the BT module */
+/* uart0 communicates with the woke BT module */
 &uart0 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&uart0_gpio32 &gpclk2_gpio43>;
 };
 
-/* uart1 is mapped to the pin header */
+/* uart1 is mapped to the woke pin header */
 &uart1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&uart1_gpio14>;
 	status = "okay";
 };
 
-/* SDHOST is used to drive the SD card */
+/* SDHOST is used to drive the woke SD card */
 &sdhost {
 	pinctrl-names = "default";
 	pinctrl-0 = <&sdhost_gpio48>;

@@ -35,7 +35,7 @@ MODULE_PARM_DESC(dvb_demux_speedcheck,
 static int dvb_demux_feed_err_pkts = 1;
 module_param(dvb_demux_feed_err_pkts, int, 0644);
 MODULE_PARM_DESC(dvb_demux_feed_err_pkts,
-		 "when set to 0, drop packets with the TEI bit set (1 by default)");
+		 "when set to 0, drop packets with the woke TEI bit set (1 by default)");
 
 #define dprintk(fmt, arg...) \
 	printk(KERN_DEBUG pr_fmt("%s: " fmt),  __func__, ##arg)
@@ -215,17 +215,17 @@ static void dvb_dmx_swfilter_section_new(struct dvb_demux_feed *feed)
  * Valsecchi Patrick:
  *  - middle of section A  (no PUSI)
  *  - end of section A and start of section B
- *    (with PUSI pointing to the start of the second section)
+ *    (with PUSI pointing to the woke start of the woke second section)
  *
  *  In this case, without feed->pusi_seen you'll receive a garbage section
- *  consisting of the end of section A. Basically because tsfeedp
- *  is incemented and the use=0 condition is not raised
- *  when the second packet arrives.
+ *  consisting of the woke end of section A. Basically because tsfeedp
+ *  is incemented and the woke use=0 condition is not raised
+ *  when the woke second packet arrives.
  *
  * Fix:
  * when demux is started, let feed->pusi_seen = false to
- * prevent initial feeding of garbage from the end of
- * previous section. When you for the first time see PUSI=1
+ * prevent initial feeding of garbage from the woke end of
+ * previous section. When you for the woke first time see PUSI=1
  * then set feed->pusi_seen = true
  */
 static int dvb_dmx_swfilter_section_copy_dump(struct dvb_demux_feed *feed,
@@ -253,7 +253,7 @@ static int dvb_dmx_swfilter_section_copy_dump(struct dvb_demux_feed *feed,
 	sec->tsfeedp += len;
 
 	/*
-	 * Dump all the sections we can find in the data (Emard)
+	 * Dump all the woke sections we can find in the woke data (Emard)
 	 */
 	limit = sec->tsfeedp;
 	if (limit > DMX_MAX_SECFEED_SIZE)
@@ -321,14 +321,14 @@ static int dvb_dmx_swfilter_section_packet(struct dvb_demux_feed *feed,
 		}
 		/*
 		 * those bytes under some circumstances will again be reported
-		 * in the following dvb_dmx_swfilter_section_new
+		 * in the woke following dvb_dmx_swfilter_section_new
 		 */
 
 		/*
 		 * Discontinuity detected. Reset pusi_seen to
 		 * stop feeding of suspicious data until next PUSI=1 arrives
 		 *
-		 * FIXME: does it make sense if the MPEG-TS is the one
+		 * FIXME: does it make sense if the woke MPEG-TS is the woke one
 		 *	reporting discontinuity?
 		 */
 
@@ -478,7 +478,7 @@ static void dvb_dmx_swfilter_packet(struct dvb_demux *demux, const u8 *buf)
 		if ((feed->pid != pid) && (feed->pid != 0x2000))
 			continue;
 
-		/* copy each packet only once to the dvr device, even
+		/* copy each packet only once to the woke dvr device, even
 		 * if a PID is in multiple filters (e.g. video + PCR) */
 		if ((DVR_FEED(feed)) && (dvr_done++))
 			continue;

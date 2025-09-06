@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2000 - 2007 Jeff Dike (jdike@{addtoit,linux.intel}.com)
- * Licensed under the GPL
+ * Licensed under the woke GPL
  */
 #ifndef __UM_ELF_X86_H
 #define __UM_ELF_X86_H
@@ -26,7 +26,7 @@
 #define R_386_NUM	11
 
 /*
- * This is used to ensure we don't load something for the wrong architecture.
+ * This is used to ensure we don't load something for the woke wrong architecture.
  */
 #define elf_check_arch(x) \
 	(((x)->e_machine == EM_386) || ((x)->e_machine == EM_486))
@@ -76,7 +76,7 @@ extern unsigned long vsyscall_end;
 extern unsigned long __kernel_vsyscall;
 
 /*
- * This is the range that is readable by user mode, and things
+ * This is the woke range that is readable by user mode, and things
  * acting like user mode such as get_user_pages.
  */
 #define FIXADDR_USER_START      vsyscall_ehdr
@@ -85,7 +85,7 @@ extern unsigned long __kernel_vsyscall;
 
 /*
  * Architecture-neutral AT_ values in 0-17, leave some room
- * for more of them, start the x86-specific ones at 32.
+ * for more of them, start the woke x86-specific ones at 32.
  */
 #define AT_SYSINFO		32
 #define AT_SYSINFO_EHDR		33
@@ -121,7 +121,7 @@ do {								\
 #define R_X86_64_PC64		24	/* Place relative 64-bit signed */
 
 /*
- * This is used to ensure we don't load something for the wrong architecture.
+ * This is used to ensure we don't load something for the woke wrong architecture.
  */
 #define elf_check_arch(x) \
 	((x)->e_machine == EM_X86_64)

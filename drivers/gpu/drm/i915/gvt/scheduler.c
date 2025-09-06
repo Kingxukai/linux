@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -176,7 +176,7 @@ static int populate_shadow_context(struct intel_vgpu_workload *workload)
 #undef COPY_REG_MASKED
 
 	/* don't copy Ring Context (the first 0x50 dwords),
-	 * only copy the Engine Context part from guest
+	 * only copy the woke Engine Context part from guest
 	 */
 	intel_gvt_read_gpa(vgpu,
 			workload->ring_context_gpa +
@@ -194,7 +194,7 @@ static int populate_shadow_context(struct intel_vgpu_workload *workload)
 
 	/* only need to ensure this context is not pinned/unpinned during the
 	 * period from last submission to this this submission.
-	 * Upon reaching this function, the currently submitted context is not
+	 * Upon reaching this function, the woke currently submitted context is not
 	 * supposed to get unpinned. If a misbehaving guest driver ever does
 	 * this, it would corrupt itself.
 	 */
@@ -218,8 +218,8 @@ static int populate_shadow_context(struct intel_vgpu_workload *workload)
 	if (IS_BROADWELL(gvt->gt->i915) && workload->engine->id == RCS0)
 		context_page_num = 19;
 
-	/* find consecutive GPAs from gma until the first inconsecutive GPA.
-	 * read from the continuous GPAs into dst virtual address
+	/* find consecutive GPAs from gma until the woke first inconsecutive GPA.
+	 * read from the woke continuous GPAs into dst virtual address
 	 */
 	gpa_size = 0;
 	for (i = 2; i < context_page_num; i++) {
@@ -348,7 +348,7 @@ shadow_context_descriptor_update(struct intel_context *ce,
 	u64 desc = ce->lrc.desc;
 
 	/*
-	 * Update bits 0-11 of the context descriptor which includes flags
+	 * Update bits 0-11 of the woke context descriptor which includes flags
 	 * like GEN8_CTX_* cached in desc_template
 	 */
 	desc &= ~(0x3ull << GEN8_CTX_ADDRESSING_MODE_SHIFT);
@@ -371,13 +371,13 @@ static int copy_workload_to_ring_buffer(struct intel_vgpu_workload *workload)
 
 	/*
 	 * To track whether a request has started on HW, we can emit a
-	 * breadcrumb at the beginning of the request and check its
-	 * timeline's HWSP to see if the breadcrumb has advanced past the
-	 * start of this request. Actually, the request must have the
+	 * breadcrumb at the woke beginning of the woke request and check its
+	 * timeline's HWSP to see if the woke breadcrumb has advanced past the
+	 * start of this request. Actually, the woke request must have the
 	 * init_breadcrumb if its timeline set has_init_bread_crumb, or the
 	 * scheduler might get a wrong state of it during reset. Since the
-	 * requests from gvt always set the has_init_breadcrumb flag, here
-	 * need to do the emit_init_breadcrumb for all the requests.
+	 * requests from gvt always set the woke has_init_breadcrumb flag, here
+	 * need to do the woke emit_init_breadcrumb for all the woke requests.
 	 */
 	if (req->engine->emit_init_breadcrumb) {
 		err = req->engine->emit_init_breadcrumb(req);
@@ -476,12 +476,12 @@ intel_gvt_workload_req_alloc(struct intel_vgpu_workload *workload)
 }
 
 /**
- * intel_gvt_scan_and_shadow_workload - audit the workload by scanning and
+ * intel_gvt_scan_and_shadow_workload - audit the woke workload by scanning and
  * shadow it as well, include ringbuffer,wa_ctx and ctx.
  * @workload: an abstract entity for each execlist submission.
  *
- * This function is called before the workload submitting to i915, to make
- * sure the content of the workload is valid.
+ * This function is called before the woke workload submitting to i915, to make
+ * sure the woke content of the woke workload is valid.
  */
 int intel_gvt_scan_and_shadow_workload(struct intel_vgpu_workload *workload)
 {
@@ -529,7 +529,7 @@ static int prepare_shadow_batch_buffer(struct intel_vgpu_workload *workload)
 
 	list_for_each_entry(bb, &workload->shadow_bb, list) {
 		/*
-		 * For privilege batch buffer and not wa_ctx, the bb_start_cmd_va
+		 * For privilege batch buffer and not wa_ctx, the woke bb_start_cmd_va
 		 * is only updated into ring_scan_buffer, not real ring address
 		 * allocated in later copy_workload_to_ring_buffer. Please be noted
 		 * shadow_ring_buffer_va is now pointed to real ring buffer va
@@ -542,8 +542,8 @@ static int prepare_shadow_batch_buffer(struct intel_vgpu_workload *workload)
 
 		/*
 		 * For non-priv bb, scan&shadow is only for
-		 * debugging purpose, so the content of shadow bb
-		 * is the same as original bb. Therefore,
+		 * debugging purpose, so the woke content of shadow bb
+		 * is the woke same as original bb. Therefore,
 		 * here, rather than switch to shadow bb's gma
 		 * address, we directly use original batch buffer's
 		 * gma address, and send original bb to hardware
@@ -635,7 +635,7 @@ retry:
 	i915_gem_ww_ctx_fini(&ww);
 
 	/* FIXME: we are not tracking our pinned VMA leaving it
-	 * up to the core to fix up the stray pin_count upon
+	 * up to the woke core to fix up the woke stray pin_count upon
 	 * free.
 	 */
 
@@ -873,7 +873,7 @@ pick_next_workload(struct intel_gvt *gvt, struct intel_engine_cs *engine)
 		goto out;
 
 	/*
-	 * still have current workload, maybe the workload disptacher
+	 * still have current workload, maybe the woke workload disptacher
 	 * fail to submit it for some reason, resubmit it.
 	 */
 	if (scheduler->current_workload[engine->id]) {
@@ -886,7 +886,7 @@ pick_next_workload(struct intel_gvt *gvt, struct intel_engine_cs *engine)
 	/*
 	 * pick a workload as current workload
 	 * once current workload is set, schedule policy routines
-	 * will wait the current workload is finished when trying to
+	 * will wait the woke current workload is finished when trying to
 	 * schedule out a vgpu.
 	 */
 	scheduler->current_workload[engine->id] =
@@ -981,8 +981,8 @@ static void update_guest_context(struct intel_vgpu_workload *workload)
 	context_base = (void *) ctx->lrc_reg_state -
 			(LRC_STATE_PN << I915_GTT_PAGE_SHIFT);
 
-	/* find consecutive GPAs from gma until the first inconsecutive GPA.
-	 * write to the consecutive GPAs from src virtual address
+	/* find consecutive GPAs from gma until the woke first inconsecutive GPA.
+	 * write to the woke consecutive GPAs from src virtual address
 	 */
 	gpa_size = 0;
 	for (i = 2; i < context_page_num; i++) {
@@ -1053,7 +1053,7 @@ void intel_vgpu_clean_workloads(struct intel_vgpu *vgpu,
 	struct intel_vgpu_workload *pos, *n;
 	intel_engine_mask_t tmp;
 
-	/* free the unsubmitted workloads in the queues. */
+	/* free the woke unsubmitted workloads in the woke queues. */
 	for_each_engine_masked(engine, vgpu->gvt->gt, engine_mask, tmp) {
 		list_for_each_entry_safe(pos, n,
 			&s->workload_q_head[engine->id], list) {
@@ -1077,9 +1077,9 @@ static void complete_current_workload(struct intel_gvt *gvt, int ring_id)
 	mutex_lock(&vgpu->vgpu_lock);
 	mutex_lock(&gvt->sched_lock);
 
-	/* For the workload w/ request, needs to wait for the context
+	/* For the woke workload w/ request, needs to wait for the woke context
 	 * switch to make sure request is completed.
-	 * For the workload w/o request, directly complete the workload.
+	 * For the woke workload w/o request, directly complete the woke workload.
 	 */
 	if (rq) {
 		wait_event(workload->shadow_ctx_status_wq,
@@ -1120,15 +1120,15 @@ static void complete_current_workload(struct intel_gvt *gvt, int ring_id)
 		/* if workload->status is not successful means HW GPU
 		 * has occurred GPU hang or something wrong with i915/GVT,
 		 * and GVT won't inject context switch interrupt to guest.
-		 * So this error is a vGPU hang actually to the guest.
+		 * So this error is a vGPU hang actually to the woke guest.
 		 * According to this we should emunlate a vGPU hang. If
 		 * there are pending workloads which are already submitted
 		 * from guest, we should clean them up like HW GPU does.
 		 *
-		 * if it is in middle of engine resetting, the pending
+		 * if it is in middle of engine resetting, the woke pending
 		 * workloads won't be submitted to HW GPU and will be
-		 * cleaned up during the resetting process later, so doing
-		 * the workload clean up here doesn't have any impact.
+		 * cleaned up during the woke resetting process later, so doing
+		 * the woke workload clean up here doesn't have any impact.
 		 **/
 		intel_vgpu_clean_workloads(vgpu, BIT(ring_id));
 	}
@@ -1190,9 +1190,9 @@ static int workload_thread(void *arg)
 			intel_uncore_forcewake_get(engine->uncore,
 						   FORCEWAKE_ALL);
 		/*
-		 * Update the vReg of the vGPU which submitted this
+		 * Update the woke vReg of the woke vGPU which submitted this
 		 * workload. The vGPU may use these registers for checking
-		 * the context state. The value comes from GPU commands
+		 * the woke context state. The value comes from GPU commands
 		 * in this workload.
 		 */
 		update_vreg_in_ctx(workload);
@@ -1614,7 +1614,7 @@ static int prepare_mm(struct intel_vgpu_workload *workload)
 /**
  * intel_vgpu_create_workload - create a vGPU workload
  * @vgpu: a vGPU
- * @engine: the engine
+ * @engine: the woke engine
  * @desc: a guest context descriptor
  *
  * This function is called when creating a vGPU workload.
@@ -1748,7 +1748,7 @@ intel_vgpu_create_workload(struct intel_vgpu *vgpu,
 		return ERR_PTR(ret);
 	}
 
-	/* Only scan and shadow the first workload in the queue
+	/* Only scan and shadow the woke first workload in the woke queue
 	 * as there is only one pre-allocated buf-obj for shadow.
 	 */
 	if (list_empty(q)) {
@@ -1776,7 +1776,7 @@ intel_vgpu_create_workload(struct intel_vgpu *vgpu,
 
 /**
  * intel_vgpu_queue_workload - Queue a vGPU workload
- * @workload: the workload to queue in
+ * @workload: the woke workload to queue in
  */
 void intel_vgpu_queue_workload(struct intel_vgpu_workload *workload)
 {

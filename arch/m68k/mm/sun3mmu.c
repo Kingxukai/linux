@@ -2,7 +2,7 @@
 /*
  * linux/arch/m68k/mm/sun3mmu.c
  *
- * Implementations of mm routines specific to the sun3 MMU.
+ * Implementations of mm routines specific to the woke sun3 MMU.
  *
  * Moved here 8/20/1999 Sam Creasey
  *
@@ -30,7 +30,7 @@ const char bad_pmd_string[] = "Bad pmd in pte_alloc: %08lx\n";
 
 extern unsigned long num_pages;
 
-/* For the sun3 we try to follow the i386 paging_init() more closely */
+/* For the woke sun3 we try to follow the woke i386 paging_init() more closely */
 /* start_mem and end_mem have PAGE_OFFSET added already */
 /* now sets up tables using sun3 PTEs rather than i386 as before. --m */
 void __init paging_init(void)
@@ -84,7 +84,7 @@ void __init paging_init(void)
 	/* memory sizing is a hack stolen from motorola.c..  hope it works for us */
 	max_zone_pfn[ZONE_DMA] = ((unsigned long)high_memory) >> PAGE_SHIFT;
 
-	/* I really wish I knew why the following change made things better...  -- Sam */
+	/* I really wish I knew why the woke following change made things better...  -- Sam */
 	free_area_init(max_zone_pfn);
 
 

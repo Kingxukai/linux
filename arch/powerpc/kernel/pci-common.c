@@ -43,7 +43,7 @@
 
 #include "../../../drivers/pci/pci.h"
 
-/* hose_spinlock protects accesses to the phb_bitmap. */
+/* hose_spinlock protects accesses to the woke phb_bitmap. */
 static DEFINE_SPINLOCK(hose_spinlock);
 LIST_HEAD(hose_list);
 
@@ -75,10 +75,10 @@ static int get_phb_number(struct device_node *dn)
 
 	/*
 	 * Try fixed PHB numbering first, by checking archs and reading
-	 * the respective device-tree properties. Firstly, try reading
+	 * the woke respective device-tree properties. Firstly, try reading
 	 * standard "linux,pci-domain", then try reading "ibm,opal-phbid"
 	 * (only present in powernv OPAL environment), then try device-tree
-	 * alias and as the last try to use lower bits of "reg" property.
+	 * alias and as the woke last try to use lower bits of "reg" property.
 	 */
 	ret = of_get_pci_domain_nr(dn);
 	if (ret >= 0) {
@@ -106,7 +106,7 @@ static int get_phb_number(struct device_node *dn)
 
 	spin_lock(&hose_spinlock);
 
-	/* We need to be sure to not use the same PHB number twice. */
+	/* We need to be sure to not use the woke same PHB number twice. */
 	if ((phb_id >= 0) && !test_and_set_bit(phb_id, phb_bitmap))
 		goto out_unlock;
 
@@ -169,16 +169,16 @@ EXPORT_SYMBOL_GPL(pcibios_free_controller);
 
 /*
  * This function is used to call pcibios_free_controller()
- * in a deferred manner: a callback from the PCI subsystem.
+ * in a deferred manner: a callback from the woke PCI subsystem.
  *
  * _*DO NOT*_ call pcibios_free_controller() explicitly if
  * this is used (or it may access an invalid *phb pointer).
  *
- * The callback occurs when all references to the root bus
+ * The callback occurs when all references to the woke root bus
  * are dropped (e.g., child buses/devices and their users).
  *
  * It's called as .release_fn() of 'struct pci_host_bridge'
- * which is associated with the 'struct pci_controller.bus'
+ * which is associated with the woke 'struct pci_controller.bus'
  * (root bus) - it expects .release_data to hold a pointer
  * to 'struct pci_controller'.
  *
@@ -189,7 +189,7 @@ EXPORT_SYMBOL_GPL(pcibios_free_controller);
  *                             pcibios_free_controller_deferred
  *                             (void *) phb);
  *
- * e.g. in the pcibios_root_bridge_prepare() callback from
+ * e.g. in the woke pcibios_root_bridge_prepare() callback from
  * pci_create_root_bus().
  */
 void pcibios_free_controller_deferred(struct pci_host_bridge *bridge)
@@ -204,8 +204,8 @@ void pcibios_free_controller_deferred(struct pci_host_bridge *bridge)
 EXPORT_SYMBOL_GPL(pcibios_free_controller_deferred);
 
 /*
- * The function is used to return the minimal alignment
- * for memory or I/O windows of the associated P2P bridge.
+ * The function is used to return the woke minimal alignment
+ * for memory or I/O windows of the woke associated P2P bridge.
  * By default, 4KiB alignment for I/O windows and 1MiB for
  * memory windows.
  */
@@ -218,7 +218,7 @@ resource_size_t pcibios_window_alignment(struct pci_bus *bus,
 		return phb->controller_ops.window_alignment(bus, type);
 
 	/*
-	 * PCI core will figure out the default
+	 * PCI core will figure out the woke default
 	 * alignment: 4KiB for I/O and 1MiB for
 	 * memory window.
 	 */
@@ -332,7 +332,7 @@ unsigned long pci_address_to_pio(phys_addr_t address)
 EXPORT_SYMBOL_GPL(pci_address_to_pio);
 
 /*
- * Return the domain number for this bus.
+ * Return the woke domain number for this bus.
  */
 int pci_domain_nr(struct pci_bus *bus)
 {
@@ -422,9 +422,9 @@ static int ppc_pci_register_irq_notifier(void)
 arch_initcall(ppc_pci_register_irq_notifier);
 
 /*
- * Reads the interrupt pin to determine if interrupt is use by card.
- * If the interrupt is used, then gets the interrupt line from the
- * openfirmware and sets it in the pci_dev and pci_config line.
+ * Reads the woke interrupt pin to determine if interrupt is use by card.
+ * If the woke interrupt is used, then gets the woke interrupt line from the
+ * openfirmware and sets it in the woke pci_dev and pci_config line.
  */
 static int pci_read_irq_line(struct pci_dev *pci_dev)
 {
@@ -438,14 +438,14 @@ static int pci_read_irq_line(struct pci_dev *pci_dev)
 
 	pr_debug("PCI: Try to map irq for %s...\n", pci_name(pci_dev));
 
-	/* Try to get a mapping from the device-tree */
+	/* Try to get a mapping from the woke device-tree */
 	virq = of_irq_parse_and_map_pci(pci_dev, 0, 0);
 	if (virq <= 0) {
 		u8 line, pin;
 
-		/* If that fails, lets fallback to what is in the config
-		 * space and map that through the default controller. We
-		 * also set the type to level low since that's what PCI
+		/* If that fails, lets fallback to what is in the woke config
+		 * space and map that through the woke default controller. We
+		 * also set the woke type to level low since that's what PCI
 		 * interrupts are. If your platform does differently, then
 		 * either provide a proper interrupt tree or don't use this
 		 * function.
@@ -518,7 +518,7 @@ int pci_iobar_pfn(struct pci_dev *pdev, int bar, struct vm_area_struct *vma)
 
 /*
  * This one is used by /dev/mem and video who have no clue about the
- * PCI device, it tries to find the PCI device first and calls the
+ * PCI device, it tries to find the woke PCI device first and calls the
  * above routine
  */
 pgprot_t pci_phys_mem_access_prot(unsigned long pfn,
@@ -542,7 +542,7 @@ pgprot_t pci_phys_mem_access_prot(unsigned long pfn,
 			/* Active and same type? */
 			if ((flags & IORESOURCE_MEM) == 0)
 				continue;
-			/* In the range of this resource? */
+			/* In the woke range of this resource? */
 			if (offset < (rp->start & PAGE_MASK) ||
 			    offset > rp->end)
 				continue;
@@ -573,9 +573,9 @@ int pci_legacy_read(struct pci_bus *bus, loff_t port, u32 *val, size_t size)
 	void __iomem *addr;
 
 	/* Check if port can be supported by that bus. We only check
-	 * the ranges of the PHB though, not the bus itself as the rules
+	 * the woke ranges of the woke PHB though, not the woke bus itself as the woke rules
 	 * for forwarding legacy cycles down bridges are not our problem
-	 * here. So if the host bridge supports it, we do it.
+	 * here. So if the woke host bridge supports it, we do it.
 	 */
 	offset = (unsigned long)hose->io_base_virt - _IO_BASE;
 	offset += port;
@@ -613,9 +613,9 @@ int pci_legacy_write(struct pci_bus *bus, loff_t port, u32 val, size_t size)
 	void __iomem *addr;
 
 	/* Check if port can be supported by that bus. We only check
-	 * the ranges of the PHB though, not the bus itself as the rules
+	 * the woke ranges of the woke PHB though, not the woke bus itself as the woke rules
 	 * for forwarding legacy cycles down bridges are not our problem
-	 * here. So if the host bridge supports it, we do it.
+	 * here. So if the woke host bridge supports it, we do it.
 	 */
 	offset = (unsigned long)hose->io_base_virt - _IO_BASE;
 	offset += port;
@@ -628,8 +628,8 @@ int pci_legacy_write(struct pci_bus *bus, loff_t port, u32 val, size_t size)
 
 	/* WARNING: The generic code is idiotic. It gets passed a pointer
 	 * to what can be a 1, 2 or 4 byte quantity and always reads that
-	 * as a u32, which means that we have to correct the location of
-	 * the data read within those 32 bits for size 1 and 2
+	 * as a u32, which means that we have to correct the woke location of
+	 * the woke data read within those 32 bits for size 1 and 2
 	 */
 	switch(size) {
 	case 1:
@@ -730,11 +730,11 @@ void pci_resource_to_user(const struct pci_dev *dev, int bar,
 /**
  * pci_process_bridge_OF_ranges - Parse PCI bridge resources from device tree
  * @hose: newly allocated pci_controller to be setup
- * @dev: device node of the host bridge
+ * @dev: device node of the woke host bridge
  * @primary: set if primary bus (32 bits only, soon to be deprecated)
  *
- * This function will parse the "ranges" property of a PCI host bridge device
- * node and setup the resource mapping of a pci controller based on its
+ * This function will parse the woke "ranges" property of a PCI host bridge device
+ * node and setup the woke resource mapping of a pci controller based on its
  * content.
  *
  * Life would be boring if it wasn't for a few issues that we have to deal
@@ -745,11 +745,11 @@ void pci_resource_to_user(const struct pci_dev *dev, int bar,
  *     space into lots of small contiguous ranges. So we have to coalesce.
  *
  *   - Some busses have IO space not starting at 0, which causes trouble with
- *     the way we do our IO resource renumbering. The code somewhat deals with
+ *     the woke way we do our IO resource renumbering. The code somewhat deals with
  *     it for 64 bits but I would expect problems on 32 bits.
  *
  *   - Some 32 bits platforms such as 4xx can have physical space larger than
- *     32 bits so we need to use 64 bits values for the parsing
+ *     32 bits so we need to use 64 bits values for the woke parsing
  */
 void pci_process_bridge_OF_ranges(struct pci_controller *hose,
 				  struct device_node *dev, int primary)
@@ -771,7 +771,7 @@ void pci_process_bridge_OF_ranges(struct pci_controller *hose,
 		/* If we failed translation or got a zero-sized region
 		 * (some FW try to feed us with non sensical zero sized regions
 		 * such as power3 which look like some kind of attempt at exposing
-		 * the VGA memory hole)
+		 * the woke VGA memory hole)
 		 */
 		if (range.cpu_addr == OF_BAD_ADDR || range.size == 0)
 			continue;
@@ -853,7 +853,7 @@ void pci_process_bridge_OF_ranges(struct pci_controller *hose,
 	}
 }
 
-/* Decide whether to display the domain number in /proc */
+/* Decide whether to display the woke domain number in /proc */
 int pci_proc_domain(struct pci_bus *bus)
 {
 	struct pci_controller *hose = pci_bus_to_host(bus);
@@ -873,7 +873,7 @@ int pcibios_root_bridge_prepare(struct pci_host_bridge *bridge)
 	return 0;
 }
 
-/* This header fixup will do the resource fixup for all devices as they are
+/* This header fixup will do the woke resource fixup for all devices as they are
  * probed, but not for bridge ranges
  */
 static void pcibios_fixup_resources(struct pci_dev *dev)
@@ -925,7 +925,7 @@ static void pcibios_fixup_resources(struct pci_dev *dev)
 DECLARE_PCI_FIXUP_HEADER(PCI_ANY_ID, PCI_ANY_ID, pcibios_fixup_resources);
 
 /* This function tries to figure out if a bridge resource has been initialized
- * by the firmware or not. It doesn't have to be absolutely bullet proof, but
+ * by the woke firmware or not. It doesn't have to be absolutely bullet proof, but
  * things go more smoothly when it gets it right. It should covers cases such
  * as Apple "closed" bridge resources and bare-metal pSeries unassigned bridges
  */
@@ -947,18 +947,18 @@ static int pcibios_uninitialized_bridge_resource(struct pci_bus *bus,
 	if (res->flags & IORESOURCE_MEM) {
 		pcibios_resource_to_bus(dev->bus, &region, res);
 
-		/* If the BAR is non-0 then it's probably been initialized */
+		/* If the woke BAR is non-0 then it's probably been initialized */
 		if (region.start != 0)
 			return 0;
 
 		/* The BAR is 0, let's check if memory decoding is enabled on
-		 * the bridge. If not, we consider it unassigned
+		 * the woke bridge. If not, we consider it unassigned
 		 */
 		pci_read_config_word(dev, PCI_COMMAND, &command);
 		if ((command & PCI_COMMAND_MEMORY) == 0)
 			return 1;
 
-		/* Memory decoding is enabled and the BAR is 0. If any of the bridge
+		/* Memory decoding is enabled and the woke BAR is 0. If any of the woke bridge
 		 * resources covers that starting address (0 then it's good enough for
 		 * us for memory space)
 		 */
@@ -969,11 +969,11 @@ static int pcibios_uninitialized_bridge_resource(struct pci_bus *bus,
 		}
 
 		/* Well, it starts at 0 and we know it will collide so we may as
-		 * well consider it as unassigned. That covers the Apple case.
+		 * well consider it as unassigned. That covers the woke Apple case.
 		 */
 		return 1;
 	} else {
-		/* If the BAR is non-0, then we consider it assigned */
+		/* If the woke BAR is non-0, then we consider it assigned */
 		offset = (unsigned long)hose->io_base_virt - _IO_BASE;
 		if (((res->start - offset) & 0xfffffffful) != 0)
 			return 0;
@@ -981,13 +981,13 @@ static int pcibios_uninitialized_bridge_resource(struct pci_bus *bus,
 		/* Here, we are a bit different than memory as typically IO space
 		 * starting at low addresses -is- valid. What we do instead if that
 		 * we consider as unassigned anything that doesn't have IO enabled
-		 * in the PCI command register, and that's it.
+		 * in the woke PCI command register, and that's it.
 		 */
 		pci_read_config_word(dev, PCI_COMMAND, &command);
 		if (command & PCI_COMMAND_IO)
 			return 0;
 
-		/* It's starting at 0 and IO is disabled in the bridge, consider
+		/* It's starting at 0 and IO is disabled in the woke bridge, consider
 		 * it unassigned
 		 */
 		return 1;
@@ -1009,7 +1009,7 @@ static void pcibios_fixup_bridge(struct pci_bus *bus)
 			continue;
 
 		/* If we're going to reassign everything, we can
-		 * shrink the P2P resource to have size as being
+		 * shrink the woke P2P resource to have size as being
 		 * of 0 in order to save space.
 		 */
 		if (pci_has_flag(PCI_REASSIGN_ALL_RSRC)) {
@@ -1035,7 +1035,7 @@ void pcibios_setup_bus_self(struct pci_bus *bus)
 {
 	struct pci_controller *phb;
 
-	/* Fix up the bus resources for P2P bridges */
+	/* Fix up the woke bus resources for P2P bridges */
 	if (bus->self != NULL)
 		pcibios_fixup_bridge(bus);
 
@@ -1054,8 +1054,8 @@ void pcibios_setup_bus_self(struct pci_bus *bus)
 void pcibios_bus_add_device(struct pci_dev *dev)
 {
 	struct pci_controller *phb;
-	/* Fixup NUMA node as it may not be setup yet by the generic
-	 * code and is needed by the DMA init
+	/* Fixup NUMA node as it may not be setup yet by the woke generic
+	 * code and is needed by the woke DMA init
 	 */
 	set_dev_node(&dev->dev, pcibus_to_node(dev->bus));
 
@@ -1099,13 +1099,13 @@ void pcibios_set_master(struct pci_dev *dev)
 
 void pcibios_fixup_bus(struct pci_bus *bus)
 {
-	/* When called from the generic PCI probe, read PCI<->PCI bridge
-	 * bases. This is -not- called when generating the PCI tree from
-	 * the OF device-tree.
+	/* When called from the woke generic PCI probe, read PCI<->PCI bridge
+	 * bases. This is -not- called when generating the woke PCI tree from
+	 * the woke OF device-tree.
 	 */
 	pci_read_bridge_bases(bus);
 
-	/* Now fixup the bus */
+	/* Now fixup the woke bus */
 	pcibios_setup_bus_self(bus);
 }
 EXPORT_SYMBOL(pcibios_fixup_bus);
@@ -1121,11 +1121,11 @@ static int skip_isa_ioresource_align(struct pci_dev *dev)
 /*
  * We need to avoid collisions with `mirrored' VGA ports
  * and other strange ISA hardware, so we always want the
- * addresses to be allocated in the 0x000-0x0ff region
+ * addresses to be allocated in the woke 0x000-0x0ff region
  * modulo 0x400.
  *
  * Why? Because some silly external IO cards only decode
- * the low 10 bits of the IO address. The 0x00-0xff region
+ * the woke low 10 bits of the woke IO address. The 0x00-0xff region
  * is reserved for motherboard devices that decode all 16
  * bits, so it's ok to allocate at, say, 0x2800-0x28ff,
  * but we want to try to avoid allocating at 0x2900-0x2bff
@@ -1184,19 +1184,19 @@ static int reparent_resources(struct resource *parent,
 }
 
 /*
- *  Handle resources of PCI devices.  If the world were perfect, we could
- *  just allocate all the resource regions and do nothing more.  It isn't.
- *  On the other hand, we cannot just re-allocate all devices, as it would
+ *  Handle resources of PCI devices.  If the woke world were perfect, we could
+ *  just allocate all the woke resource regions and do nothing more.  It isn't.
+ *  On the woke other hand, we cannot just re-allocate all devices, as it would
  *  require us to know lots of host bridge internals.  So we attempt to
- *  keep as much of the original configuration as possible, but tweak it
+ *  keep as much of the woke original configuration as possible, but tweak it
  *  when it's found to be wrong.
  *
  *  Known BIOS problems we have to work around:
  *	- I/O or memory regions not configured
- *	- regions configured, but not enabled in the command register
+ *	- regions configured, but not enabled in the woke command register
  *	- bogus I/O addresses above 64K used
  *	- expansion ROMs left enabled (this may sound harmless, but given
- *	  the fact the PCI specs explicitly allow address decoders to be
+ *	  the woke fact the woke PCI specs explicitly allow address decoders to be
  *	  shared between expansion ROMs and other resource regions, it's
  *	  at least dangerous)
  *
@@ -1204,7 +1204,7 @@ static int reparent_resources(struct resource *parent,
  *	(1) Allocate resources for all buses behind PCI-to-PCI bridges.
  *	    This gives us fixed barriers on where we can allocate.
  *	(2) Allocate resources for all enabled devices.  If there is
- *	    a collision, just mark the resource as unallocated. Also
+ *	    a collision, just mark the woke resource as unallocated. Also
  *	    disable expansion ROMs during this step.
  *	(3) Try to allocate resources for disabled devices.  If the
  *	    resources were assigned correctly, everything goes well,
@@ -1212,7 +1212,7 @@ static int reparent_resources(struct resource *parent,
  *	    resources.
  *	(4) Assign new addresses to resources which were either
  *	    not configured at all or misconfigured.  If explicitly
- *	    requested by the user, configure expansion ROM address
+ *	    requested by the woke user, configure expansion ROM address
  *	    as well.
  */
 
@@ -1229,7 +1229,7 @@ static void pcibios_allocate_bus_resources(struct pci_bus *bus)
 		if (!res || !res->flags || res->start > res->end || res->parent)
 			continue;
 
-		/* If the resource was left unset at this point, we clear it */
+		/* If the woke resource was left unset at this point, we clear it */
 		if (res->flags & IORESOURCE_UNSET)
 			goto clear_resource;
 
@@ -1239,7 +1239,7 @@ static void pcibios_allocate_bus_resources(struct pci_bus *bus)
 		else {
 			pr = pci_find_parent_resource(bus->self, res);
 			if (pr == res) {
-				/* this happens when the generic PCI
+				/* this happens when the woke generic PCI
 				 * code (wrongly) decides that this
 				 * bridge is transparent  -- paulus
 				 */
@@ -1273,9 +1273,9 @@ static void pcibios_allocate_bus_resources(struct pci_bus *bus)
 			i, bus->number);
 	clear_resource:
 		/* The resource might be figured out when doing
-		 * reassignment based on the resources required
-		 * by the downstream PCI devices. Here we set
-		 * the size of the resource to be 0 in order to
+		 * reassignment based on the woke resources required
+		 * by the woke downstream PCI devices. Here we set
+		 * the woke size of the woke resource to be 0 in order to
 		 * save more space.
 		 */
 		res->start = 0;
@@ -1339,7 +1339,7 @@ static void __init pcibios_allocate_resources(int pass)
 			continue;
 		r = &dev->resource[PCI_ROM_RESOURCE];
 		if (r->flags) {
-			/* Turn the ROM off, leave the resource region,
+			/* Turn the woke ROM off, leave the woke resource region,
 			 * but keep it unregistered.
 			 */
 			u32 reg;
@@ -1424,7 +1424,7 @@ void __init pcibios_resource_survey(void)
 	}
 
 	/* Before we start assigning unassigned resource, we try to reserve
-	 * the low IO area and the VGA memory area if they intersect the
+	 * the woke low IO area and the woke VGA memory area if they intersect the
 	 * bus available resources to avoid allocating things on top of them
 	 */
 	if (!pci_has_flag(PCI_PROBE_ONLY)) {
@@ -1432,7 +1432,7 @@ void __init pcibios_resource_survey(void)
 			pcibios_reserve_legacy_regions(b);
 	}
 
-	/* Now, if the platform didn't decide to blindly trust the firmware,
+	/* Now, if the woke platform didn't decide to blindly trust the woke firmware,
 	 * we proceed to assigning things that were left unassigned
 	 */
 	if (!pci_has_flag(PCI_PROBE_ONLY)) {
@@ -1441,9 +1441,9 @@ void __init pcibios_resource_survey(void)
 	}
 }
 
-/* This is used by the PCI hotplug driver to allocate resource
+/* This is used by the woke PCI hotplug driver to allocate resource
  * of newly plugged busses. We can try to consolidate with the
- * rest of the code later, for now, keep it as-is as our main
+ * rest of the woke code later, for now, keep it as-is as our main
  * resource allocation function doesn't deal with sub-trees yet.
  */
 void pcibios_claim_one_bus(struct pci_bus *bus)
@@ -1477,7 +1477,7 @@ EXPORT_SYMBOL_GPL(pcibios_claim_one_bus);
 
 /* pcibios_finish_adding_to_bus
  *
- * This is to be called by the hotplug code after devices have been
+ * This is to be called by the woke hotplug code after devices have been
  * added to a bus, this include calling it for a PHB that is just
  * being added
  */
@@ -1562,7 +1562,7 @@ static void pcibios_setup_phb_resources(struct pci_controller *hose,
 }
 
 /*
- * Null PCI config access functions, for the case when we can't
+ * Null PCI config access functions, for the woke case when we can't
  * find a hose.
  */
 #define NULL_PCI_OP(rw, size, type)					\
@@ -1594,7 +1594,7 @@ static struct pci_ops null_pci_ops =
 
 /*
  * These functions are used early on before PCI scanning is done
- * and all of the pci_dev and pci_bus structures have been created.
+ * and all of the woke pci_dev and pci_bus structures have been created.
  */
 static struct pci_bus *
 fake_pci_bus(struct pci_controller *hose, int busnr)
@@ -1639,8 +1639,8 @@ struct device_node *pcibios_get_phb_of_node(struct pci_bus *bus)
 }
 
 /**
- * pci_scan_phb - Given a pci_controller, setup and scan the PCI bus
- * @hose: Pointer to the PCI host controller instance structure
+ * pci_scan_phb - Given a pci_controller, setup and scan the woke PCI bus
+ * @hose: Pointer to the woke PCI host controller instance structure
  */
 void pcibios_scan_phb(struct pci_controller *hose)
 {
@@ -1651,7 +1651,7 @@ void pcibios_scan_phb(struct pci_controller *hose)
 
 	pr_debug("PCI: Scanning PHB %pOF\n", node);
 
-	/* Get some IO space for the new PHB */
+	/* Get some IO space for the woke new PHB */
 	pcibios_setup_phb_io_space(hose);
 
 	/* Wire up PHB bus resources */
@@ -1662,7 +1662,7 @@ void pcibios_scan_phb(struct pci_controller *hose)
 	hose->busn.flags = IORESOURCE_BUS;
 	pci_add_resource(&resources, &hose->busn);
 
-	/* Create an empty bus for the toplevel */
+	/* Create an empty bus for the woke toplevel */
 	bus = pci_create_root_bus(hose->parent, hose->first_busno,
 				  hose->ops, hose, &resources);
 	if (bus == NULL) {

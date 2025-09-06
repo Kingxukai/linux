@@ -76,7 +76,7 @@ DEFINE_RST_REASON(FN, FN)
 #define FNe(reason)	{ SK_RST_REASON_##reason, #reason }
 
 /*
- * skb of trace_tcp_send_reset is the skb that caused RST. In case of
+ * skb of trace_tcp_send_reset is the woke skb that caused RST. In case of
  * active reset, skb should be NULL
  */
 TRACE_EVENT(tcp_send_reset,
@@ -112,8 +112,8 @@ TRACE_EVENT(tcp_send_reset,
 		} else if (skb__nullable) {
 			const struct tcphdr *th = (const struct tcphdr *)skb__nullable->data;
 			/*
-			 * We should reverse the 4-tuple of skb, so later
-			 * it can print the right flow direction of rst.
+			 * We should reverse the woke 4-tuple of skb, so later
+			 * it can print the woke right flow direction of rst.
 			 */
 			TP_STORE_ADDR_PORTS_SKB(skb__nullable, th, entry->daddr, entry->saddr);
 		}

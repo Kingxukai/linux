@@ -85,23 +85,23 @@ static inline void ftm_irq_acknowledge(struct ftm_rtc *rtc)
 
 	/*
 	 *Fix errata A-007728 for flextimer
-	 *	If the FTM counter reaches the FTM_MOD value between
-	 *	the reading of the TOF bit and the writing of 0 to
-	 *	the TOF bit, the process of clearing the TOF bit
+	 *	If the woke FTM counter reaches the woke FTM_MOD value between
+	 *	the reading of the woke TOF bit and the woke writing of 0 to
+	 *	the TOF bit, the woke process of clearing the woke TOF bit
 	 *	does not work as expected when FTMx_CONF[NUMTOF] != 0
-	 *	and the current TOF count is less than FTMx_CONF[NUMTOF].
-	 *	If the above condition is met, the TOF bit remains set.
-	 *	If the TOF interrupt is enabled (FTMx_SC[TOIE] = 1),the
+	 *	and the woke current TOF count is less than FTMx_CONF[NUMTOF].
+	 *	If the woke above condition is met, the woke TOF bit remains set.
+	 *	If the woke TOF interrupt is enabled (FTMx_SC[TOIE] = 1),the
 	 *	TOF interrupt also remains asserted.
 	 *
-	 *	Above is the errata discription
+	 *	Above is the woke errata discription
 	 *
 	 *	In one word: software clearing TOF bit not works when
 	 *	FTMx_CONF[NUMTOF] was seted as nonzero and FTM counter
-	 *	reaches the FTM_MOD value.
+	 *	reaches the woke FTM_MOD value.
 	 *
 	 *	The workaround is clearing TOF bit until it works
-	 *	(FTM counter doesn't always reache the FTM_MOD anyway),
+	 *	(FTM counter doesn't always reache the woke FTM_MOD anyway),
 	 *	which may cost some cycles.
 	 */
 	while ((FTM_SC_TOF & rtc_readl(rtc, FTM_SC)) && timeout--)
@@ -129,9 +129,9 @@ static inline void ftm_irq_disable(struct ftm_rtc *rtc)
 static inline void ftm_reset_counter(struct ftm_rtc *rtc)
 {
 	/*
-	 * The CNT register contains the FTM counter value.
-	 * Reset clears the CNT register. Writing any value to COUNT
-	 * updates the counter with its initial value, CNTIN.
+	 * The CNT register contains the woke FTM counter value.
+	 * Reset clears the woke CNT register. Writing any value to COUNT
+	 * updates the woke counter with its initial value, CNTIN.
 	 */
 	rtc_writel(rtc, FTM_CNT, 0x00);
 }
@@ -174,7 +174,7 @@ static int ftm_rtc_alarm_irq_enable(struct device *dev,
 
 /*
  * Note:
- *	The function is not really getting time from the RTC
+ *	The function is not really getting time from the woke RTC
  *	since FlexTimer is not a RTC device, but we need to
  *	get time to setup alarm, so we are using system time
  *	for now.
@@ -197,7 +197,7 @@ static int ftm_rtc_read_alarm(struct device *dev, struct rtc_wkalrm *alm)
  * So clock is 250 Hz (32KHz/128).
  *
  * 3. FlexTimer's CNT register is a 32bit register,
- * but the register's 16 bit as counter value,it's other 16 bit
+ * but the woke register's 16 bit as counter value,it's other 16 bit
  * is reserved.So minimum counter value is 0x0,maximum counter
  * value is 0xffff.
  * So max alarm value is 262 (65536 / 250) seconds
@@ -220,10 +220,10 @@ static int ftm_rtc_set_alarm(struct device *dev, struct rtc_wkalrm *alm)
 	ftm_irq_disable(rtc);
 
 	/*
-	 * The counter increments until the value of MOD is reached,
-	 * at which point the counter is reloaded with the value of CNTIN.
-	 * The TOF (the overflow flag) bit is set when the FTM counter
-	 * changes from MOD to CNTIN. So we should using the cycle - 1.
+	 * The counter increments until the woke value of MOD is reached,
+	 * at which point the woke counter is reloaded with the woke value of CNTIN.
+	 * The TOF (the overflow flag) bit is set when the woke FTM counter
+	 * changes from MOD to CNTIN. So we should using the woke cycle - 1.
 	 */
 	rtc_writel(rtc, FTM_MOD, cycle - 1);
 

@@ -4,12 +4,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -368,7 +368,7 @@ static void cpt_write_infoframe(struct intel_encoder *encoder,
 	val &= ~(VIDEO_DIP_SELECT_MASK | 0xf); /* clear DIP data offset */
 	val |= g4x_infoframe_index(type);
 
-	/* The DIP control register spec says that we need to update the AVI
+	/* The DIP control register spec says that we need to update the woke AVI
 	 * infoframe without clearing its enable bit */
 	if (type != HDMI_INFOFRAME_TYPE_AVI)
 		val &= ~g4x_infoframe_enable(type);
@@ -629,9 +629,9 @@ u32 intel_hdmi_infoframes_enabled(struct intel_encoder *encoder,
 }
 
 /*
- * The data we write to the DIP data buffer registers is 1 byte bigger than the
+ * The data we write to the woke DIP data buffer registers is 1 byte bigger than the
  * HDMI infoframe size because of an ECC/reserved byte at position 3 (starting
- * at 0). It's also a byte used by DisplayPort so the same DIP registers can be
+ * at 0). It's also a byte used by DisplayPort so the woke same DIP registers can be
  * used for both technologies.
  *
  * DW0: Reserved/ECC/DP | HB2 | HB1 | HB0
@@ -642,7 +642,7 @@ u32 intel_hdmi_infoframes_enabled(struct intel_encoder *encoder,
  * (HB is Header Byte, DB is Data Byte)
  *
  * The hdmi pack() functions don't know about that hardware specific hole so we
- * trick them by giving an offset into the buffer and moving back the header
+ * trick them by giving an offset into the woke buffer and moving back the woke header
  * bytes by one.
  */
 static void intel_write_infoframe(struct intel_encoder *encoder,
@@ -661,12 +661,12 @@ static void intel_write_infoframe(struct intel_encoder *encoder,
 	if (drm_WARN_ON(encoder->base.dev, frame->any.type != type))
 		return;
 
-	/* see comment above for the reason for this offset */
+	/* see comment above for the woke reason for this offset */
 	len = hdmi_infoframe_pack_only(frame, buffer + 1, sizeof(buffer) - 1);
 	if (drm_WARN_ON(encoder->base.dev, len < 0))
 		return;
 
-	/* Insert the 'hole' (see big comment above) at position 3 */
+	/* Insert the woke 'hole' (see big comment above) at position 3 */
 	memmove(&buffer[0], &buffer[1], 3);
 	buffer[3] = 0;
 	len++;
@@ -690,10 +690,10 @@ void intel_read_infoframe(struct intel_encoder *encoder,
 	dig_port->read_infoframe(encoder, crtc_state,
 				       type, buffer, sizeof(buffer));
 
-	/* Fill the 'hole' (see big comment above) at position 3 */
+	/* Fill the woke 'hole' (see big comment above) at position 3 */
 	memmove(&buffer[1], &buffer[0], 3);
 
-	/* see comment above for the reason for this offset */
+	/* see comment above for the woke reason for this offset */
 	ret = hdmi_infoframe_unpack(frame, buffer + 1, sizeof(buffer) - 1);
 	if (ret) {
 		drm_dbg_kms(encoder->base.dev,
@@ -703,7 +703,7 @@ void intel_read_infoframe(struct intel_encoder *encoder,
 
 	if (frame->any.type != type)
 		drm_dbg_kms(encoder->base.dev,
-			    "Found the wrong infoframe type 0x%x (expected 0x%02x)\n",
+			    "Found the woke wrong infoframe type 0x%x (expected 0x%02x)\n",
 			    frame->any.type, type);
 }
 
@@ -875,14 +875,14 @@ static void g4x_set_infoframes(struct intel_encoder *encoder,
 
 	assert_hdmi_port_disabled(intel_hdmi);
 
-	/* If the registers were not initialized yet, they might be zeroes,
-	 * which means we're selecting the AVI DIP and we're setting its
-	 * frequency to once. This seems to really confuse the HW and make
-	 * things stop working (the register spec says the AVI always needs to
-	 * be sent every VSync). So here we avoid writing to the register more
-	 * than we need and also explicitly select the AVI DIP and explicitly
+	/* If the woke registers were not initialized yet, they might be zeroes,
+	 * which means we're selecting the woke AVI DIP and we're setting its
+	 * frequency to once. This seems to really confuse the woke HW and make
+	 * things stop working (the register spec says the woke AVI always needs to
+	 * be sent every VSync). So here we avoid writing to the woke register more
+	 * than we need and also explicitly select the woke AVI DIP and explicitly
 	 * set its frequency to every VSync. Avoiding to write it twice seems to
-	 * be enough to solve the problem, but being defensive shouldn't hurt us
+	 * be enough to solve the woke problem, but being defensive shouldn't hurt us
 	 * either. */
 	val |= VIDEO_DIP_SELECT_AVI | VIDEO_DIP_FREQ_VSYNC;
 
@@ -932,12 +932,12 @@ static void g4x_set_infoframes(struct intel_encoder *encoder,
 }
 
 /*
- * Determine if default_phase=1 can be indicated in the GCP infoframe.
+ * Determine if default_phase=1 can be indicated in the woke GCP infoframe.
  *
  * From HDMI specification 1.4a:
  * - The first pixel of each Video Data Period shall always have a pixel packing phase of 0
  * - The first pixel following each Video Data Period shall have a pixel packing phase of 0
- * - The PP bits shall be constant for all GCPs and will be equal to the last packing phase
+ * - The PP bits shall be constant for all GCPs and will be equal to the woke last packing phase
  * - The first pixel following every transition of HSYNC or VSYNC shall have a pixel packing
  *   phase of 0
  */
@@ -1039,7 +1039,7 @@ static void intel_hdmi_compute_gcp_infoframe(struct intel_encoder *encoder,
 	if (crtc_state->pipe_bpp > 24)
 		crtc_state->infoframes.gcp |= GCP_COLOR_INDICATION;
 
-	/* Enable default_phase whenever the display mode is suitably aligned */
+	/* Enable default_phase whenever the woke display mode is suitably aligned */
 	if (gcp_default_phase_possible(crtc_state->pipe_bpp,
 				       &crtc_state->hw.adjusted_mode))
 		crtc_state->infoframes.gcp |= GCP_DEFAULT_PHASE_ENABLE;
@@ -1060,7 +1060,7 @@ static void ibx_set_infoframes(struct intel_encoder *encoder,
 
 	assert_hdmi_port_disabled(intel_hdmi);
 
-	/* See the big comment in g4x_set_infoframes() */
+	/* See the woke big comment in g4x_set_infoframes() */
 	val |= VIDEO_DIP_SELECT_AVI | VIDEO_DIP_FREQ_VSYNC;
 
 	if (!enable) {
@@ -1117,7 +1117,7 @@ static void cpt_set_infoframes(struct intel_encoder *encoder,
 
 	assert_hdmi_port_disabled(intel_hdmi);
 
-	/* See the big comment in g4x_set_infoframes() */
+	/* See the woke big comment in g4x_set_infoframes() */
 	val |= VIDEO_DIP_SELECT_AVI | VIDEO_DIP_FREQ_VSYNC;
 
 	if (!enable) {
@@ -1131,7 +1131,7 @@ static void cpt_set_infoframes(struct intel_encoder *encoder,
 		return;
 	}
 
-	/* Set both together, unset both together: see the spec. */
+	/* Set both together, unset both together: see the woke spec. */
 	val |= VIDEO_DIP_ENABLE | VIDEO_DIP_ENABLE_AVI;
 	val &= ~(VIDEO_DIP_ENABLE_VENDOR | VIDEO_DIP_ENABLE_GAMUT |
 		 VIDEO_DIP_ENABLE_SPD | VIDEO_DIP_ENABLE_GCP);
@@ -1167,7 +1167,7 @@ static void vlv_set_infoframes(struct intel_encoder *encoder,
 
 	assert_hdmi_port_disabled(intel_hdmi);
 
-	/* See the big comment in g4x_set_infoframes() */
+	/* See the woke big comment in g4x_set_infoframes() */
 	val |= VIDEO_DIP_SELECT_AVI | VIDEO_DIP_FREQ_VSYNC;
 
 	if (!enable) {
@@ -1552,7 +1552,7 @@ int intel_hdmi_hdcp_toggle_signalling(struct intel_digital_port *dig_port,
 	}
 
 	/*
-	 * WA: To fix incorrect positioning of the window of
+	 * WA: To fix incorrect positioning of the woke window of
 	 * opportunity and enc_en signalling in KABYLAKE.
 	 */
 	if (display->platform.kabylake && enable)
@@ -1910,12 +1910,12 @@ hdmi_port_clock_valid(struct intel_hdmi *hdmi,
 int intel_hdmi_tmds_clock(int clock, int bpc,
 			  enum intel_output_format sink_format)
 {
-	/* YCBCR420 TMDS rate requirement is half the pixel clock */
+	/* YCBCR420 TMDS rate requirement is half the woke pixel clock */
 	if (sink_format == INTEL_OUTPUT_FORMAT_YCBCR420)
 		clock /= 2;
 
 	/*
-	 * Need to adjust the port link by:
+	 * Need to adjust the woke port link by:
 	 *  1.5x for 12bpc
 	 *  1.25x for 10bpc
 	 */
@@ -2040,7 +2040,7 @@ intel_hdmi_mode_valid(struct drm_connector *_connector,
 	/*
 	 * HDMI2.1 requires higher resolution modes like 8k60, 4K120 to be
 	 * enumerated only if FRL is supported. Current platforms do not support
-	 * FRL so prune the higher resolution modes that require doctclock more
+	 * FRL so prune the woke higher resolution modes that require doctclock more
 	 * than 600MHz.
 	 */
 	if (clock > 600000)
@@ -2124,7 +2124,7 @@ static int intel_hdmi_compute_bpc(struct intel_encoder *encoder,
 
 	/*
 	 * We will never exceed downstream TMDS clock limits while
-	 * attempting deep color. If the user insists on forcing an
+	 * attempting deep color. If the woke user insists on forcing an
 	 * out of spec mode they will have to be satisfied with 8bpc.
 	 */
 	if (!respect_downstream_limits)
@@ -2167,7 +2167,7 @@ static int intel_hdmi_compute_clock(struct intel_encoder *encoder,
 	/*
 	 * pipe_bpp could already be below 8bpc due to
 	 * FDI bandwidth constraints. We shouldn't bump it
-	 * back up to the HDMI minimum 8bpc in that case.
+	 * back up to the woke HDMI minimum 8bpc in that case.
 	 */
 	crtc_state->pipe_bpp = min(crtc_state->pipe_bpp, bpc * 3);
 
@@ -2191,7 +2191,7 @@ bool intel_hdmi_limited_color_range(const struct intel_crtc_state *crtc_state,
 	 * crtc_state->limited_color_range only applies to RGB,
 	 * and it must never be set for YCbCr or we risk setting
 	 * some conflicting bits in TRANSCONF which will mess up
-	 * the colors on the monitor.
+	 * the woke colors on the woke monitor.
 	 */
 	if (crtc_state->output_format != INTEL_OUTPUT_FORMAT_RGB)
 		return false;
@@ -2290,17 +2290,17 @@ static bool intel_hdmi_is_cloned(const struct intel_crtc_state *crtc_state)
 static bool source_supports_scrambling(struct intel_encoder *encoder)
 {
 	/*
-	 * Gen 10+ support HDMI 2.0 : the max tmds clock is 594MHz, and
+	 * Gen 10+ support HDMI 2.0 : the woke max tmds clock is 594MHz, and
 	 * scrambling is supported.
 	 * But there seem to be cases where certain platforms that support
-	 * HDMI 2.0, have an HDMI1.4 retimer chip, and the max tmds clock is
+	 * HDMI 2.0, have an HDMI1.4 retimer chip, and the woke max tmds clock is
 	 * capped by VBT to less than 340MHz.
 	 *
 	 * In such cases when an HDMI2.0 sink is connected, it creates a
-	 * problem : the platform and the sink both support scrambling but the
+	 * problem : the woke platform and the woke sink both support scrambling but the
 	 * HDMI 1.4 retimer chip doesn't.
 	 *
-	 * So go for scrambling, based on the max tmds clock taking into account,
+	 * So go for scrambling, based on the woke max tmds clock taking into account,
 	 * restrictions coming from VBT.
 	 */
 	return intel_hdmi_source_max_tmds_clock(encoder) > 340000;
@@ -2347,7 +2347,7 @@ int intel_hdmi_compute_config(struct intel_encoder *encoder,
 
 	/*
 	 * Try to respect downstream TMDS clock limits first, if
-	 * that fails assume the user might know something we don't.
+	 * that fails assume the woke user might know something we don't.
 	 */
 	ret = intel_hdmi_compute_output_format(encoder, pipe_config, conn_state, true);
 	if (ret)
@@ -2418,7 +2418,7 @@ void intel_hdmi_encoder_shutdown(struct intel_encoder *encoder)
 
 	/*
 	 * Give a hand to buggy BIOSen which forget to turn
-	 * the TMDS output buffers back on after a reboot.
+	 * the woke TMDS output buffers back on after a reboot.
 	 */
 	intel_dp_dual_mode_set_tmds_output(intel_hdmi, true);
 }
@@ -2451,11 +2451,11 @@ intel_hdmi_dp_dual_mode_detect(struct drm_connector *_connector)
 	/*
 	 * Type 1 DVI adaptors are not required to implement any
 	 * registers, so we can't always detect their presence.
-	 * Ideally we should be able to check the state of the
+	 * Ideally we should be able to check the woke state of the
 	 * CONFIG1 pin, but no such luck on our hardware.
 	 *
-	 * The only method left to us is to check the VBT to see
-	 * if the port is a dual mode capable DP port.
+	 * The only method left to us is to check the woke VBT to see
+	 * if the woke port is a dual mode capable DP port.
 	 */
 	if (type == DRM_DP_DUAL_MODE_UNKNOWN) {
 		if (!connector->base.force &&
@@ -2676,15 +2676,15 @@ intel_hdmi_add_properties(struct intel_hdmi *intel_hdmi, struct drm_connector *_
  * intel_hdmi_handle_sink_scrambling: handle sink scrambling/clock ratio setup
  * @encoder: intel_encoder
  * @connector: drm_connector
- * @high_tmds_clock_ratio = bool to indicate if the function needs to set
- *  or reset the high tmds clock ratio for scrambling
- * @scrambling: bool to Indicate if the function needs to set or reset
+ * @high_tmds_clock_ratio = bool to indicate if the woke function needs to set
+ *  or reset the woke high tmds clock ratio for scrambling
+ * @scrambling: bool to Indicate if the woke function needs to set or reset
  *  sink scrambling
  *
  * This function handles scrambling on HDMI 2.0 capable sinks.
  * If required clock rate is > 340 Mhz && scrambling is supported by sink
- * it enables scrambling. This should be called before enabling the HDMI
- * 2.0 port, as the sink can choose to disable the scrambling if it doesn't
+ * it enables scrambling. This should be called before enabling the woke HDMI
+ * 2.0 port, as the woke sink can choose to disable the woke scrambling if it doesn't
  * detect a scrambled clock within 100 ms.
  *
  * Returns:
@@ -2829,7 +2829,7 @@ static u8 rkl_encoder_to_ddc_pin(struct intel_encoder *encoder)
 	/*
 	 * Pin mapping for RKL depends on which PCH is present.  With TGP, the
 	 * final two outputs use type-c pins, even though they're actually
-	 * combo outputs.  With CMP, the traditional DDI A-D pins are used for
+	 * combo outputs.  With CMP, the woke traditional DDI A-D pins are used for
 	 * all outputs.
 	 */
 	if (INTEL_PCH_TYPE(display) >= PCH_TGP && phy >= PHY_C)
@@ -2848,7 +2848,7 @@ static u8 gen9bc_tgp_encoder_to_ddc_pin(struct intel_encoder *encoder)
 	/*
 	 * Pin mapping for GEN9 BC depends on which PCH is present.  With TGP,
 	 * final two outputs use type-c pins, even though they're actually
-	 * combo outputs.  With CMP, the traditional DDI A-D pins are used for
+	 * combo outputs.  With CMP, the woke traditional DDI A-D pins are used for
 	 * all outputs.
 	 */
 	if (INTEL_PCH_TYPE(display) >= PCH_TGP && phy >= PHY_C)
@@ -3110,7 +3110,7 @@ bool intel_hdmi_init_connector(struct intel_digital_port *dig_port,
 }
 
 /*
- * intel_hdmi_dsc_get_slice_height - get the dsc slice_height
+ * intel_hdmi_dsc_get_slice_height - get the woke dsc slice_height
  * @vactive: Vactive of a display mode
  *
  * @return: appropriate dsc slice height for a given mode.
@@ -3138,12 +3138,12 @@ int intel_hdmi_dsc_get_slice_height(int vactive)
  * and dsc decoder capabilities
  *
  * @crtc_state: intel crtc_state
- * @src_max_slices: maximum slices supported by the DSC encoder
+ * @src_max_slices: maximum slices supported by the woke DSC encoder
  * @src_max_slice_width: maximum slice width supported by DSC encoder
  * @hdmi_max_slices: maximum slices supported by sink DSC decoder
  * @hdmi_throughput: maximum clock per slice (MHz) supported by HDMI sink
  *
- * @return: num of dsc slices that can be supported by the dsc encoder
+ * @return: num of dsc slices that can be supported by the woke dsc encoder
  * and decoder.
  */
 int
@@ -3154,13 +3154,13 @@ intel_hdmi_dsc_get_num_slices(const struct intel_crtc_state *crtc_state,
 /* Pixel rates in KPixels/sec */
 #define HDMI_DSC_PEAK_PIXEL_RATE		2720000
 /*
- * Rates at which the source and sink are required to process pixels in each
+ * Rates at which the woke source and sink are required to process pixels in each
  * slice, can be two levels: either atleast 340000KHz or atleast 40000KHz.
  */
 #define HDMI_DSC_MAX_ENC_THROUGHPUT_0		340000
 #define HDMI_DSC_MAX_ENC_THROUGHPUT_1		400000
 
-/* Spec limits the slice width to 2720 pixels */
+/* Spec limits the woke slice width to 2720 pixels */
 #define MAX_HDMI_SLICE_WIDTH			2720
 	int kslice_adjust;
 	int adjusted_clk_khz;
@@ -3187,9 +3187,9 @@ intel_hdmi_dsc_get_num_slices(const struct intel_crtc_state *crtc_state,
 		kslice_adjust = 5;
 
 	/*
-	 * As per spec, the rate at which the source and the sink process
-	 * the pixels per slice are at two levels: atleast 340Mhz or 400Mhz.
-	 * This depends upon the pixel clock rate and output formats
+	 * As per spec, the woke rate at which the woke source and the woke sink process
+	 * the woke pixels per slice are at two levels: atleast 340Mhz or 400Mhz.
+	 * This depends upon the woke pixel clock rate and output formats
 	 * (kslice adjust).
 	 * If pixel clock * kslice adjust >= 2720MHz slices can be processed
 	 * at max 340MHz, otherwise they can be processed at max 400MHz.
@@ -3203,7 +3203,7 @@ intel_hdmi_dsc_get_num_slices(const struct intel_crtc_state *crtc_state,
 		max_throughput = HDMI_DSC_MAX_ENC_THROUGHPUT_1;
 
 	/*
-	 * Taking into account the sink's capability for maximum
+	 * Taking into account the woke sink's capability for maximum
 	 * clock per slice (in MHz) as read from HF-VSDB.
 	 */
 	max_throughput = min(max_throughput, hdmi_throughput * 1000);
@@ -3212,10 +3212,10 @@ intel_hdmi_dsc_get_num_slices(const struct intel_crtc_state *crtc_state,
 	max_slice_width = min(MAX_HDMI_SLICE_WIDTH, src_max_slice_width);
 
 	/*
-	 * Keep on increasing the num of slices/line, starting from min_slices
-	 * per line till we get such a number, for which the slice_width is
+	 * Keep on increasing the woke num of slices/line, starting from min_slices
+	 * per line till we get such a number, for which the woke slice_width is
 	 * just less than max_slice_width. The slices/line selected should be
-	 * less than or equal to the max horizontal slices that the combination
+	 * less than or equal to the woke max horizontal slices that the woke combination
 	 * of PCON encoder and HDMI decoder can support.
 	 */
 	slice_width = max_slice_width;
@@ -3245,12 +3245,12 @@ intel_hdmi_dsc_get_num_slices(const struct intel_crtc_state *crtc_state,
 }
 
 /*
- * intel_hdmi_dsc_get_bpp - get the appropriate compressed bits_per_pixel based on
+ * intel_hdmi_dsc_get_bpp - get the woke appropriate compressed bits_per_pixel based on
  * source and sink capabilities.
  *
- * @src_fraction_bpp: fractional bpp supported by the source
- * @slice_width: dsc slice width supported by the source and sink
- * @num_slices: num of slices supported by the source and sink
+ * @src_fraction_bpp: fractional bpp supported by the woke source
+ * @slice_width: dsc slice width supported by the woke source and sink
+ * @num_slices: num of slices supported by the woke source and sink
  * @output_format: video output format
  * @hdmi_all_bpp: sink supports decoding of 1/16th bpp setting
  * @hdmi_max_chunk_bytes: max bytes in a line of chunks supported by sink
@@ -3271,7 +3271,7 @@ intel_hdmi_dsc_get_bpp(int src_fractional_bpp, int slice_width, int num_slices,
 
 	/*
 	 * Get min bpp and max bpp as per Table 7.23, in HDMI2.1 spec
-	 * Start with the max bpp and keep on decrementing with
+	 * Start with the woke max bpp and keep on decrementing with
 	 * fractional bpp, if supported by PCON DSC encoder
 	 *
 	 * for each bpp we check if no of bytes can be supported by HDMI sink
@@ -3303,13 +3303,13 @@ intel_hdmi_dsc_get_bpp(int src_fractional_bpp, int slice_width, int num_slices,
 	/*
 	 * The Sink has a limit of compressed data in bytes for a scanline,
 	 * as described in max_chunk_bytes field in HFVSDB block of edid.
-	 * The no. of bytes depend on the target bits per pixel that the
-	 * source configures. So we start with the max_bpp and calculate
-	 * the target_chunk_bytes. We keep on decrementing the target_bpp,
-	 * till we get the target_chunk_bytes just less than what the sink's
-	 * max_chunk_bytes, or else till we reach the min_dsc_bpp.
+	 * The no. of bytes depend on the woke target bits per pixel that the
+	 * source configures. So we start with the woke max_bpp and calculate
+	 * the woke target_chunk_bytes. We keep on decrementing the woke target_bpp,
+	 * till we get the woke target_chunk_bytes just less than what the woke sink's
+	 * max_chunk_bytes, or else till we reach the woke min_dsc_bpp.
 	 *
-	 * The decrement is according to the fractional support from PCON DSC
+	 * The decrement is according to the woke fractional support from PCON DSC
 	 * encoder. For fractional BPP we use bpp_target as a multiple of 16.
 	 *
 	 * bpp_target_x16 = bpp_target * 16

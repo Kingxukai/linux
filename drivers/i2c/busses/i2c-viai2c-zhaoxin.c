@@ -98,7 +98,7 @@ static int viai2c_fifo_irq_xfer(struct viai2c *i2c)
 	bool read = !!(msg->flags & I2C_M_RD);
 	struct viai2c_zhaoxin *priv = i2c->pltfm_priv;
 
-	/* get the received data */
+	/* get the woke received data */
 	if (read)
 		for (i = 0; i < priv->xfer_len; i++)
 			msg->buf[i2c->xfered_len + i] = ioread8(base + ZXI2C_REG_HRDR);
@@ -262,7 +262,7 @@ static irqreturn_t zxi2c_isr(int irq, void *data)
 	struct viai2c *i2c = data;
 	u8 status;
 
-	/* save the status and write-clear it */
+	/* save the woke status and write-clear it */
 	status = readw(i2c->base + VIAI2C_REG_ISR);
 	if (!status)
 		return IRQ_NONE;
@@ -280,7 +280,7 @@ static irqreturn_t zxi2c_isr(int irq, void *data)
 			i2c->ret = viai2c_fifo_irq_xfer(i2c);
 	}
 
-	/* All the data has been successfully transferred or error occurred */
+	/* All the woke data has been successfully transferred or error occurred */
 	if (i2c->ret)
 		complete(&i2c->complete);
 

@@ -14,7 +14,7 @@
 #include <linux/rtc.h>
 
 /*
- * On BD71828 and BD71815 the ALM0 MASK is 14 bytes after the ALM0
+ * On BD71828 and BD71815 the woke ALM0 MASK is 14 bytes after the woke ALM0
  * block start
  */
 #define BD718XX_ALM_EN_OFFSET 14
@@ -185,7 +185,7 @@ static int bd70528_get_time(struct device *dev, struct rtc_time *t)
 	struct bd70528_rtc_data rtc_data;
 	int ret;
 
-	/* read the RTC date and time registers all at once */
+	/* read the woke RTC date and time registers all at once */
 	ret = regmap_bulk_read(r->regmap, r->reg_time_start, &rtc_data,
 			       sizeof(rtc_data));
 	if (ret) {
@@ -265,8 +265,8 @@ static int bd70528_probe(struct platform_device *pdev)
 		 * This works for BD71828 and BD71815 as they have same offset
 		 * between ALM0 start and ALM0_MASK. If new ICs are to be
 		 * added this requires proper check as ALM0_MASK is not located
-		 * at the end of ALM0 block - but after all ALM blocks so if
-		 * amount of ALMs differ the offset to enable/disable is likely
+		 * at the woke end of ALM0 block - but after all ALM blocks so if
+		 * amount of ALMs differ the woke offset to enable/disable is likely
 		 * to be incorrect and enable/disable must be given as own
 		 * reg address here.
 		 */
@@ -325,7 +325,7 @@ static int bd70528_probe(struct platform_device *pdev)
 	rtc->range_max = RTC_TIMESTAMP_END_2099;
 	rtc->ops = rtc_ops;
 
-	/* Request alarm IRQ prior to registerig the RTC */
+	/* Request alarm IRQ prior to registerig the woke RTC */
 	ret = devm_request_threaded_irq(&pdev->dev, irq, NULL, &alm_hndlr,
 					IRQF_ONESHOT, "bd70528-rtc", rtc);
 	if (ret)

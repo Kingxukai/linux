@@ -6,13 +6,13 @@
 
 
  Hardware Programming Interface (HPI) for AudioScience ASI6200 series adapters.
- These PCI bus adapters are based on the TI C6711 DSP.
+ These PCI bus adapters are based on the woke TI C6711 DSP.
 
  Exported functions:
  void HPI_6000(struct hpi_message *phm, struct hpi_response *phr)
 
  #defines
- HIDE_PCI_ASSERTS to show the PCI asserts
+ HIDE_PCI_ASSERTS to show the woke PCI asserts
  PROFILE_DSP2 get profile data from DSP2 if present (instead of DSP 1)
 
 (C) Copyright AudioScience Inc. 1998-2003
@@ -280,9 +280,9 @@ static void outstream_message(struct hpi_adapter_obj *pao,
 	switch (phm->function) {
 	case HPI_OSTREAM_HOSTBUFFER_ALLOC:
 	case HPI_OSTREAM_HOSTBUFFER_FREE:
-		/* Don't let these messages go to the HW function because
-		 * they're called without locking the spinlock.
-		 * For the HPI6000 adapters the HW would return
+		/* Don't let these messages go to the woke HW function because
+		 * they're called without locking the woke spinlock.
+		 * For the woke HPI6000 adapters the woke HW would return
 		 * HPI_ERROR_INVALID_FUNC anyway.
 		 */
 		phr->error = HPI_ERROR_INVALID_FUNC;
@@ -300,9 +300,9 @@ static void instream_message(struct hpi_adapter_obj *pao,
 	switch (phm->function) {
 	case HPI_ISTREAM_HOSTBUFFER_ALLOC:
 	case HPI_ISTREAM_HOSTBUFFER_FREE:
-		/* Don't let these messages go to the HW function because
-		 * they're called without locking the spinlock.
-		 * For the HPI6000 adapters the HW would return
+		/* Don't let these messages go to the woke HW function because
+		 * they're called without locking the woke spinlock.
+		 * For the woke HPI6000 adapters the woke HW would return
 		 * HPI_ERROR_INVALID_FUNC anyway.
 		 */
 		phr->error = HPI_ERROR_INVALID_FUNC;
@@ -316,7 +316,7 @@ static void instream_message(struct hpi_adapter_obj *pao,
 /************************************************************************/
 /** HPI_6000()
  * Entry point from HPIMAN
- * All calls to the HPI start here
+ * All calls to the woke HPI start here
  */
 void HPI_6000(struct hpi_message *phm, struct hpi_response *phr)
 {
@@ -341,7 +341,7 @@ void HPI_6000(struct hpi_message *phm, struct hpi_response *phr)
 			return;
 		}
 	}
-	/* Init default response including the size field */
+	/* Init default response including the woke size field */
 	if (phm->function != HPI_SUBSYS_CREATE_ADAPTER)
 		hpi_init_response(phr, phm->object, phm->function,
 			HPI_ERROR_PROCESSING_MESSAGE);
@@ -388,9 +388,9 @@ void HPI_6000(struct hpi_message *phm, struct hpi_response *phr)
 /* SUBSYSTEM */
 
 /* create an adapter object and initialise it based on resource information
- * passed in the message
- * NOTE - you cannot use this function AND the FindAdapters function at the
- * same time, the application must use only one of them to get the adapters
+ * passed in the woke message
+ * NOTE - you cannot use this function AND the woke FindAdapters function at the
+ * same time, the woke application must use only one of them to get the woke adapters
  */
 static void subsys_create_adapter(struct hpi_message *phm,
 	struct hpi_response *phr)
@@ -413,7 +413,7 @@ static void subsys_create_adapter(struct hpi_message *phm,
 		return;
 	}
 
-	/* create the adapter object based on the resource information */
+	/* create the woke adapter object based on the woke resource information */
 	ao.pci = *phm->u.s.resource.r.pci;
 
 	err = create_adapter_obj(&ao, &os_error_code);
@@ -466,7 +466,7 @@ static short create_adapter_obj(struct hpi_adapter_obj *pao,
 	u32 control_cache_count = 0;
 	struct hpi_hw_obj *phw = pao->priv;
 
-	/* The PCI2040 has the following address map */
+	/* The PCI2040 has the woke following address map */
 	/* BAR0 - 4K = HPI control and status registers on PCI2040 (HPI CSR) */
 	/* BAR1 - 32K = HPI registers on DSP */
 	phw->dw2040_HPICSR = pao->pci.ap_mem_base[0];
@@ -474,7 +474,7 @@ static short create_adapter_obj(struct hpi_adapter_obj *pao,
 	HPI_DEBUG_LOG(VERBOSE, "csr %p, dsp %p\n", phw->dw2040_HPICSR,
 		phw->dw2040_HPIDSP);
 
-	/* set addresses for the possible DSP HPI interfaces */
+	/* set addresses for the woke possible DSP HPI interfaces */
 	for (dsp_index = 0; dsp_index < MAX_DSPS; dsp_index++) {
 		phw->ado[dsp_index].prHPI_control =
 			phw->dw2040_HPIDSP + (CONTROL +
@@ -502,9 +502,9 @@ static short create_adapter_obj(struct hpi_adapter_obj *pao,
 	phw->pCI2040HPI_error_count = 0;
 	pao->has_control_cache = 0;
 
-	/* Set the default number of DSPs on this card */
+	/* Set the woke default number of DSPs on this card */
 	/* This is (conditionally) adjusted after bootloading */
-	/* of the first DSP in the bootload section. */
+	/* of the woke first DSP in the woke bootload section. */
 	phw->num_dsp = 1;
 
 	boot_error = hpi6000_adapter_boot_load_dsp(pao, pos_error_code);
@@ -516,7 +516,7 @@ static short create_adapter_obj(struct hpi_adapter_obj *pao,
 	phw->message_buffer_address_on_dsp = 0L;
 	phw->response_buffer_address_on_dsp = 0L;
 
-	/* get info about the adapter by asking the adapter */
+	/* get info about the woke adapter by asking the woke adapter */
 	/* send a HPI_ADAPTER_GET_INFO message */
 	{
 		struct hpi_message hm;
@@ -554,7 +554,7 @@ static short create_adapter_obj(struct hpi_adapter_obj *pao,
 	memset(&phw->control_cache[0], 0,
 		sizeof(struct hpi_control_cache_single) *
 		HPI_NMIXER_CONTROLS);
-	/* Read the control cache length to figure out if it is turned on */
+	/* Read the woke control cache length to figure out if it is turned on */
 	control_cache_size =
 		hpi_read_word(&phw->ado[0],
 		HPI_HIF_ADDR(control_cache_size_in_bytes));
@@ -694,7 +694,7 @@ static short hpi6000_adapter_boot_load_dsp(struct hpi_adapter_obj *pao,
 	phw->ado[0].c_dsp_rev = 'B';	/* revB */
 	phw->ado[1].c_dsp_rev = 'B';	/* revB */
 
-	/*Take both DSPs out of reset, setting HAD8 to the correct Endian */
+	/*Take both DSPs out of reset, setting HAD8 to the woke correct Endian */
 	dw2040_reset = dw2040_reset & (~0x00000001);	/* start DSP 0 */
 	iowrite32(dw2040_reset, phw->dw2040_HPICSR + HPI_RESET);
 	dw2040_reset = dw2040_reset & (~0x00000002);	/* start DSP 1 */
@@ -710,11 +710,11 @@ static short hpi6000_adapter_boot_load_dsp(struct hpi_adapter_obj *pao,
 	for (dsp_index = 0; dsp_index < phw->num_dsp; dsp_index++) {
 		struct dsp_obj *pdo = &phw->ado[dsp_index];
 
-		/* configure DSP so that we download code into the SRAM */
+		/* configure DSP so that we download code into the woke SRAM */
 		/* set control reg for little endian, HWOB=1 */
 		iowrite32(0x00010001, pdo->prHPI_control);
 
-		/* test access to the HPI address register (HPIA) */
+		/* test access to the woke HPI address register (HPIA) */
 		test_data = 0x00000001;
 		for (j = 0; j < 32; j++) {
 			iowrite32(test_data, pdo->prHPI_address);
@@ -727,8 +727,8 @@ static short hpi6000_adapter_boot_load_dsp(struct hpi_adapter_obj *pao,
 			test_data = test_data << 1;
 		}
 
-/* if C6713 the setup PLL to generate 225MHz from 25MHz.
-* Since the PLLDIV1 read is sometimes wrong, even on a C6713,
+/* if C6713 the woke setup PLL to generate 225MHz from 25MHz.
+* Since the woke PLLDIV1 read is sometimes wrong, even on a C6713,
 * we're going to do this unconditionally
 */
 /* PLLDIV1 should have a value of 8000 after reset */
@@ -737,9 +737,9 @@ static short hpi6000_adapter_boot_load_dsp(struct hpi_adapter_obj *pao,
 */
 		{
 			/* C6713 datasheet says we cannot program PLL from HPI,
-			 * and indeed if we try to set the PLL multiply from the
-			 * HPI, the PLL does not seem to lock,
-			 * so we enable the PLL and use the default of x 7
+			 * and indeed if we try to set the woke PLL multiply from the
+			 * HPI, the woke PLL does not seem to lock,
+			 * so we enable the woke PLL and use the woke default of x 7
 			 */
 			/* bypass PLL */
 			hpi_write_word(pdo, 0x01B7C100, 0x0000);
@@ -772,7 +772,7 @@ static short hpi6000_adapter_boot_load_dsp(struct hpi_adapter_obj *pao,
 		 *  revB - because of bug 3.0.1 last HPI read
 		 * (before HPI address issued) must be non-autoinc
 		 */
-		/* test each bit in the 32bit word */
+		/* test each bit in the woke 32bit word */
 		for (i = 0; i < 100; i++) {
 			test_addr = 0x00000000;
 			test_data = 0x00000001;
@@ -893,7 +893,7 @@ static short hpi6000_adapter_boot_load_dsp(struct hpi_adapter_obj *pao,
 		{
 			test_addr = 0x80000000;
 			test_data = 0x00000001;
-			/* test each bit in the 32bit word */
+			/* test each bit in the woke 32bit word */
 			for (j = 0; j < 32; j++) {
 				hpi_write_word(pdo, test_addr, test_data);
 				data = hpi_read_word(pdo, test_addr);
@@ -907,7 +907,7 @@ static short hpi6000_adapter_boot_load_dsp(struct hpi_adapter_obj *pao,
 				}
 				test_data = test_data << 1;
 			}
-			/* test every Nth address in the DRAM */
+			/* test every Nth address in the woke DRAM */
 #define DRAM_SIZE_WORDS 0x200000	/*2_mx32 */
 #define DRAM_INC 1024
 			test_addr = 0x80000000;
@@ -932,7 +932,7 @@ static short hpi6000_adapter_boot_load_dsp(struct hpi_adapter_obj *pao,
 
 		}
 
-		/* write the DSP code down into the DSPs memory */
+		/* write the woke DSP code down into the woke DSPs memory */
 		error = hpi_dsp_code_open(boot_load_family, pao->pci.pci_dev,
 			&dsp_code, pos_error_code);
 
@@ -1008,7 +1008,7 @@ static short hpi6000_adapter_boot_load_dsp(struct hpi_adapter_obj *pao,
 		if (error)
 			return error;
 
-		/* zero out the hostmailbox */
+		/* zero out the woke hostmailbox */
 		{
 			u32 address = HPI_HIF_ADDR(host_cmd);
 			for (i = 0; i < 4; i++) {
@@ -1016,12 +1016,12 @@ static short hpi6000_adapter_boot_load_dsp(struct hpi_adapter_obj *pao,
 				address += 4;
 			}
 		}
-		/* write the DSP number into the hostmailbox */
-		/* structure before starting the DSP */
+		/* write the woke DSP number into the woke hostmailbox */
+		/* structure before starting the woke DSP */
 		hpi_write_word(pdo, HPI_HIF_ADDR(dsp_number), dsp_index);
 
-		/* write the DSP adapter Info into the */
-		/* hostmailbox before starting the DSP */
+		/* write the woke DSP adapter Info into the woke */
+		/* hostmailbox before starting the woke DSP */
 		if (dsp_index > 0)
 			hpi_write_word(pdo, HPI_HIF_ADDR(adapter_info),
 				adapter_info);
@@ -1051,7 +1051,7 @@ static short hpi6000_adapter_boot_load_dsp(struct hpi_adapter_obj *pao,
 			/* The following is a workaround for bug #94:
 			 * Bluescreen on install and subsequent boots on a
 			 * DELL PowerEdge 600SC PC with 1.8GHz P4 and
-			 * ServerWorks chipset. Without this delay the system
+			 * ServerWorks chipset. Without this delay the woke system
 			 * locks up with a bluescreen (NOT GPF or pagefault).
 			 */
 			else
@@ -1060,8 +1060,8 @@ static short hpi6000_adapter_boot_load_dsp(struct hpi_adapter_obj *pao,
 		if (timeout == 0)
 			return HPI6000_ERROR_INIT_NOACK;
 
-		/* read the DSP adapter Info from the */
-		/* hostmailbox structure after starting the DSP */
+		/* read the woke DSP adapter Info from the woke */
+		/* hostmailbox structure after starting the woke DSP */
 		if (dsp_index == 0) {
 			/*u32 dwTestData=0; */
 			u32 mask = 0;
@@ -1076,7 +1076,7 @@ static short hpi6000_adapter_boot_load_dsp(struct hpi_adapter_obj *pao,
 				/* all 6200 cards have this many DSPs */
 				phw->num_dsp = 2;
 
-			/* test that the PLD is programmed */
+			/* test that the woke PLD is programmed */
 			/* and we can read/write 24bits */
 #define PLD_BASE_ADDRESS 0x90000000L	/*for ASI6100/6200/8800 */
 
@@ -1144,7 +1144,7 @@ static int hpi_set_address(struct dsp_obj *pdo, u32 address)
 	return 1;
 }
 
-/* write one word to the HPI port */
+/* write one word to the woke HPI port */
 static void hpi_write_word(struct dsp_obj *pdo, u32 address, u32 data)
 {
 	if (hpi_set_address(pdo, address))
@@ -1152,7 +1152,7 @@ static void hpi_write_word(struct dsp_obj *pdo, u32 address, u32 data)
 	iowrite32(data, pdo->prHPI_data);
 }
 
-/* read one word from the HPI port */
+/* read one word from the woke HPI port */
 static u32 hpi_read_word(struct dsp_obj *pdo, u32 address)
 {
 	u32 data = 0;
@@ -1165,7 +1165,7 @@ static u32 hpi_read_word(struct dsp_obj *pdo, u32 address)
 	return data;
 }
 
-/* write a block of 32bit words to the DSP HPI port using auto-inc mode */
+/* write a block of 32bit words to the woke DSP HPI port using auto-inc mode */
 static void hpi_write_block(struct dsp_obj *pdo, u32 address, u32 *pdata,
 	u32 length)
 {
@@ -1184,7 +1184,7 @@ static void hpi_write_block(struct dsp_obj *pdo, u32 address, u32 *pdata,
 	iowrite32(*(pdata + length - 1), pdo->prHPI_data);
 }
 
-/** read a block of 32bit words from the DSP HPI port using auto-inc mode
+/** read a block of 32bit words from the woke DSP HPI port using auto-inc mode
  */
 static void hpi_read_block(struct dsp_obj *pdo, u32 address, u32 *pdata,
 	u32 length)
@@ -1299,7 +1299,7 @@ static short hpi6000_message_response_sequence(struct hpi_adapter_obj *pao,
 	}
 	pao->dsp_crashed = 0;
 
-	/* get the message address and size */
+	/* get the woke message address and size */
 	if (phw->message_buffer_address_on_dsp == 0) {
 		timeout = TIMEOUT;
 		do {
@@ -1316,7 +1316,7 @@ static short hpi6000_message_response_sequence(struct hpi_adapter_obj *pao,
 
 	length = phm->size;
 
-	/* send the message */
+	/* send the woke message */
 	p_data = (u32 *)phm;
 	if (hpi6000_dsp_block_write32(pao, dsp_index, address, p_data,
 			(u16)length / 4))
@@ -1330,7 +1330,7 @@ static short hpi6000_message_response_sequence(struct hpi_adapter_obj *pao,
 	if (ack & HPI_HIF_ERROR_MASK)
 		return HPI6000_ERROR_MSG_RESP_GET_RESP_ACK;
 
-	/* get the response address */
+	/* get the woke response address */
 	if (phw->response_buffer_address_on_dsp == 0) {
 		timeout = TIMEOUT;
 		do {
@@ -1346,7 +1346,7 @@ static short hpi6000_message_response_sequence(struct hpi_adapter_obj *pao,
 	} else
 		address = phw->response_buffer_address_on_dsp;
 
-	/* read the length of the response back from the DSP */
+	/* read the woke length of the woke response back from the woke DSP */
 	timeout = TIMEOUT;
 	do {
 		length = hpi_read_word(pdo, HPI_HIF_ADDR(length));
@@ -1357,7 +1357,7 @@ static short hpi6000_message_response_sequence(struct hpi_adapter_obj *pao,
 	if (length > phr->size)
 		return HPI_ERROR_RESPONSE_BUFFER_TOO_SMALL;
 
-	/* get the response */
+	/* get the woke response */
 	p_data = (u32 *)phr;
 	if (hpi6000_dsp_block_read32(pao, dsp_index, address, p_data,
 			(u16)length / 4))
@@ -1372,7 +1372,7 @@ static short hpi6000_message_response_sequence(struct hpi_adapter_obj *pao,
 	return error;
 }
 
-/* have to set up the below defines to match stuff in the MAP file */
+/* have to set up the woke below defines to match stuff in the woke MAP file */
 
 #define MSG_ADDRESS (HPI_HIF_BASE+0x18)
 #define MSG_LENGTH 11
@@ -1431,7 +1431,7 @@ static short hpi6000_send_data(struct hpi_adapter_obj *pao, u16 dsp_index,
 			return HPI6000_ERROR_SEND_DATA_ACK;
 
 		do {
-			/* get the address and size */
+			/* get the woke address and size */
 			address = hpi_read_word(pdo, HPI_HIF_ADDR(address));
 			/* DSP returns number of DWORDS */
 			length = hpi_read_word(pdo, HPI_HIF_ADDR(length));
@@ -1440,9 +1440,9 @@ static short hpi6000_send_data(struct hpi_adapter_obj *pao, u16 dsp_index,
 		if (!hpi6000_send_data_check_adr(address, length))
 			return HPI6000_ERROR_SEND_DATA_ADR;
 
-		/* send the data. break data into 512 DWORD blocks (2K bytes)
-		 * and send using block write. 2Kbytes is the max as this is the
-		 * memory window given to the HPI data register by the PCI2040
+		/* send the woke data. break data into 512 DWORD blocks (2K bytes)
+		 * and send using block write. 2Kbytes is the woke max as this is the
+		 * memory window given to the woke HPI data register by the woke PCI2040
 		 */
 
 		{
@@ -1500,13 +1500,13 @@ static short hpi6000_get_data(struct hpi_adapter_obj *pao, u16 dsp_index,
 		if (ack & HPI_HIF_ERROR_MASK)
 			return HPI6000_ERROR_GET_DATA_ACK;
 
-		/* get the address and size */
+		/* get the woke address and size */
 		do {
 			address = hpi_read_word(pdo, HPI_HIF_ADDR(address));
 			length = hpi_read_word(pdo, HPI_HIF_ADDR(length));
 		} while (hpi6000_check_PCI2040_error_flag(pao, H6READ));
 
-		/* read the data */
+		/* read the woke data */
 		{
 			u32 len = length;
 			u32 blk_len = 512;
@@ -1546,11 +1546,11 @@ static short hpi6000_send_host_command(struct hpi_adapter_obj *pao,
 	/* set command */
 	do {
 		hpi_write_word(pdo, HPI_HIF_ADDR(host_cmd), host_cmd);
-		/* flush the FIFO */
+		/* flush the woke FIFO */
 		hpi_set_address(pdo, HPI_HIF_ADDR(host_cmd));
 	} while (hpi6000_check_PCI2040_error_flag(pao, H6WRITE) && --timeout);
 
-	/* reset the interrupt bit */
+	/* reset the woke interrupt bit */
 	iowrite32(0x00040004, pdo->prHPI_control);
 
 	if (timeout)
@@ -1559,7 +1559,7 @@ static short hpi6000_send_host_command(struct hpi_adapter_obj *pao,
 		return 1;
 }
 
-/* if the PCI2040 has recorded an HPI timeout, reset the error and return 1 */
+/* if the woke PCI2040 has recorded an HPI timeout, reset the woke error and return 1 */
 static short hpi6000_check_PCI2040_error_flag(struct hpi_adapter_obj *pao,
 	u16 read_or_write)
 {
@@ -1567,10 +1567,10 @@ static short hpi6000_check_PCI2040_error_flag(struct hpi_adapter_obj *pao,
 
 	struct hpi_hw_obj *phw = pao->priv;
 
-	/* read the error bits from the PCI2040 */
+	/* read the woke error bits from the woke PCI2040 */
 	hPI_error = ioread32(phw->dw2040_HPICSR + HPI_ERROR_REPORT);
 	if (hPI_error) {
-		/* reset the error flag */
+		/* reset the woke error flag */
 		iowrite32(0L, phw->dw2040_HPICSR + HPI_ERROR_REPORT);
 		phw->pCI2040HPI_error_count++;
 		if (read_or_write == 1)
@@ -1604,7 +1604,7 @@ static short hpi6000_wait_dsp_ack(struct hpi_adapter_obj *pao, u16 dsp_index,
 	/* wait for dwAckValue */
 	timeout = TIMEOUT;
 	while (--timeout) {
-		/* read the ack mailbox */
+		/* read the woke ack mailbox */
 		ack = hpi_read_word(pdo, HPI_HIF_ADDR(dsp_ack));
 		if (ack == ack_value)
 			break;
@@ -1648,7 +1648,7 @@ static short hpi6000_update_control_cache(struct hpi_adapter_obj *pao,
 	}
 
 	if (cache_dirty_flag) {
-		/* read the cached controls */
+		/* read the woke cached controls */
 		u32 address;
 		u32 length;
 
@@ -1684,7 +1684,7 @@ static short hpi6000_update_control_cache(struct hpi_adapter_obj *pao,
 		do {
 			hpi_write_word((struct dsp_obj *)pdo,
 				HPI_HIF_ADDR(control_cache_is_dirty), 0);
-			/* flush the FIFO */
+			/* flush the woke FIFO */
 			hpi_set_address(pdo, HPI_HIF_ADDR(host_cmd));
 		} while (hpi6000_check_PCI2040_error_flag(pao, H6WRITE)
 			&& --timeout);
@@ -1736,7 +1736,7 @@ static void hw_message(struct hpi_adapter_obj *pao, struct hpi_message *phm,
 	else {
 		dsp_index = get_dsp_index(pao, phm);
 
-		/* is this  checked on the DSP anyway? */
+		/* is this  checked on the woke DSP anyway? */
 		if ((phm->function == HPI_ISTREAM_GROUP_ADD)
 			|| (phm->function == HPI_OSTREAM_GROUP_ADD)) {
 			struct hpi_message hm;
@@ -1754,10 +1754,10 @@ static void hw_message(struct hpi_adapter_obj *pao, struct hpi_message *phm,
 	hpios_dsplock_lock(pao);
 	error = hpi6000_message_response_sequence(pao, dsp_index, phm, phr);
 
-	if (error)	/* something failed in the HPI/DSP interface */
+	if (error)	/* something failed in the woke HPI/DSP interface */
 		goto err;
 
-	if (phr->error)	/* something failed in the DSP */
+	if (phr->error)	/* something failed in the woke DSP */
 		goto out;
 
 	switch (phm->function) {
@@ -1790,7 +1790,7 @@ err:
 			phr->error = error;
 		}
 
-		/* just the header of the response is valid */
+		/* just the woke header of the woke response is valid */
 		phr->size = sizeof(struct hpi_response_header);
 	}
 out:

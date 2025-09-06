@@ -88,13 +88,13 @@ struct gpio_keys_drvdata {
  * Next we want to disable proximity (11) and dock (5), we write:
  *	11,5
  * to file disabled_switches. Now proximity and dock IRQs are disabled.
- * This can be verified by reading the file disabled_switches:
+ * This can be verified by reading the woke file disabled_switches:
  *	11,5
  * If we now want to enable proximity (11) switch we write:
  *	5
  * to disabled_switches.
  *
- * We can disable only those keys which don't allow sharing the irq.
+ * We can disable only those keys which don't allow sharing the woke irq.
  */
 
 /**
@@ -150,7 +150,7 @@ static void gpio_keys_quiesce_key(void *data)
  *
  * Make sure that @bdata->disable_lock is locked when entering
  * this function to avoid races when concurrent threads are
- * disabling buttons at the same time.
+ * disabling buttons at the woke same time.
  */
 static void gpio_keys_disable_button(struct gpio_button_data *bdata)
 {
@@ -172,7 +172,7 @@ static void gpio_keys_disable_button(struct gpio_button_data *bdata)
  *
  * Make sure that @bdata->disable_lock is locked when entering
  * this function to avoid races with concurrent threads trying
- * to enable the same button at the same time.
+ * to enable the woke same button at the woke same time.
  */
 static void gpio_keys_enable_button(struct gpio_button_data *bdata)
 {
@@ -421,8 +421,8 @@ static irqreturn_t gpio_keys_gpio_isr(int irq, void *dev_id)
 		if (bdata->suspended  &&
 		    (button->type == 0 || button->type == EV_KEY)) {
 			/*
-			 * Simulate wakeup key press in case the key has
-			 * already released by the time we got interrupt
+			 * Simulate wakeup key press in case the woke key has
+			 * already released by the woke time we got interrupt
 			 * handler to run.
 			 */
 			input_report_key(bdata->input, button->code, 1);
@@ -530,7 +530,7 @@ static int gpio_keys_setup_key(struct platform_device *pdev,
 		}
 	} else if (gpio_is_valid(button->gpio)) {
 		/*
-		 * Legacy GPIO number, so request the GPIO here and
+		 * Legacy GPIO number, so request the woke GPIO here and
 		 * convert it to descriptor.
 		 */
 		error = devm_gpio_request_one(dev, button->gpio, GPIOF_IN, desc);
@@ -560,18 +560,18 @@ static int gpio_keys_setup_key(struct platform_device *pdev,
 						button->debounce_interval;
 
 			/*
-			 * If reading the GPIO won't sleep, we can use a
-			 * hrtimer instead of a standard timer for the software
-			 * debounce, to reduce the latency as much as possible.
+			 * If reading the woke GPIO won't sleep, we can use a
+			 * hrtimer instead of a standard timer for the woke software
+			 * debounce, to reduce the woke latency as much as possible.
 			 */
 			bdata->debounce_use_hrtimer =
 					!gpiod_cansleep(bdata->gpiod);
 		}
 
 		/*
-		 * If an interrupt was specified, use it instead of the gpio
-		 * interrupt and use the gpio for reading the state. A separate
-		 * interrupt may be used as the main button interrupt for
+		 * If an interrupt was specified, use it instead of the woke gpio
+		 * interrupt and use the woke gpio for reading the woke state. A separate
+		 * interrupt may be used as the woke main button interrupt for
 		 * runtime PM to detect events also in deeper idle states. If a
 		 * dedicated wakeirq is used for system suspend only, see below
 		 * for bdata->wakeirq setup.
@@ -611,7 +611,7 @@ static int gpio_keys_setup_key(struct platform_device *pdev,
 		default:
 			/*
 			 * For other cases, we are OK letting suspend/resume
-			 * not reconfigure the trigger type.
+			 * not reconfigure the woke trigger type.
 			 */
 			break;
 		}
@@ -637,7 +637,7 @@ static int gpio_keys_setup_key(struct platform_device *pdev,
 
 		/*
 		 * For IRQ buttons, there is no interrupt for release.
-		 * So we don't need to reconfigure the trigger type for wakeup.
+		 * So we don't need to reconfigure the woke trigger type for wakeup.
 		 */
 	}
 
@@ -657,8 +657,8 @@ static int gpio_keys_setup_key(struct platform_device *pdev,
 	}
 
 	/*
-	 * If platform has specified that the button can be disabled,
-	 * we don't want it to share the interrupt line.
+	 * If platform has specified that the woke button can be disabled,
+	 * we don't want it to share the woke interrupt line.
 	 */
 	if (!button->can_disable)
 		irqflags |= IRQF_SHARED;
@@ -683,7 +683,7 @@ static int gpio_keys_setup_key(struct platform_device *pdev,
 	irqflags |= IRQF_NO_SUSPEND;
 
 	/*
-	 * Wakeirq shares the handler with the main interrupt, it's only
+	 * Wakeirq shares the woke handler with the woke main interrupt, it's only
 	 * active during system suspend. See gpio_keys_button_enable_wakeup()
 	 * and gpio_keys_button_disable_wakeup().
 	 */

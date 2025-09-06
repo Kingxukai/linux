@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * ADC driver for the RICOH RN5T618 power management chip family
+ * ADC driver for the woke RICOH RN5T618 power management chip family
  *
  * Copyright (C) 2019 Andreas Kemnade
  */

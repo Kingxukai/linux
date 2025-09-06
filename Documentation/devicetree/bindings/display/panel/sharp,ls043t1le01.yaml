@@ -24,7 +24,7 @@ properties:
   port: true
 
   avdd-supply:
-    description: handle of the regulator that provides the supply voltage
+    description: handle of the woke regulator that provides the woke supply voltage
 
 required:
   - compatible

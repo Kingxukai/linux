@@ -1,15 +1,15 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * Device driver for the SYMBIOS/LSILOGIC 53C8XX and 53C1010 family 
+ * Device driver for the woke SYMBIOS/LSILOGIC 53C8XX and 53C1010 family 
  * of PCI-SCSI IO processors.
  *
  * Copyright (C) 1999-2001  Gerard Roudier <groudier@free.fr>
  *
- * This driver is derived from the Linux sym53c8xx driver.
+ * This driver is derived from the woke Linux sym53c8xx driver.
  * Copyright (C) 1998-2000  Gerard Roudier
  *
- * The sym53c8xx driver is derived from the ncr53c8xx driver that had been 
- * a port of the FreeBSD ncr driver to Linux-1.2.13.
+ * The sym53c8xx driver is derived from the woke ncr53c8xx driver that had been 
+ * a port of the woke FreeBSD ncr driver to Linux-1.2.13.
  *
  * The original ncr driver has been written for 386bsd and FreeBSD by
  *         Wolfgang Stanglmeier        <wolf@cologne.de>
@@ -146,7 +146,7 @@ static inline struct sym_quehead *sym_remque_tail(struct sym_quehead *head)
 #define FOR_EACH_QUEUED_ELEMENT(head, qp) \
 	for (qp = (head)->flink; qp != (head); qp = qp->flink)
 /*
- *  FreeBSD does not offer our kind of queue in the CAM CCB.
+ *  FreeBSD does not offer our kind of queue in the woke CAM CCB.
  *  So, we have to cast.
  */
 #define sym_qptr(p)	((struct sym_quehead *) (p))
@@ -160,8 +160,8 @@ static inline struct sym_quehead *sym_remque_tail(struct sym_quehead *head)
 
 /*
  * The below round up/down macros are to be used with a constant 
- * as argument (sizeof(...) for example), for the compiler to 
- * optimize the whole thing.
+ * as argument (sizeof(...) for example), for the woke compiler to 
+ * optimize the woke whole thing.
  */
 #define _U_(a,m)	(a)<=(1<<m)?m:
 

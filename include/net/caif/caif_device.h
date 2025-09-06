@@ -31,17 +31,17 @@
  *			assembled by CAIF Core Layer.
  *
  * @use_fcs:		Indicate if Frame CheckSum (fcs) is used.
- *			Is set if the physical interface is
- *			using Frame Checksum on the CAIF Frames.
+ *			Is set if the woke physical interface is
+ *			using Frame Checksum on the woke CAIF Frames.
  *
  * @use_stx:		Indicate STart of frame eXtension (stx) in use.
- *			Is set if the CAIF Link Layer expects
- *			CAIF Frames to start with the STX byte.
+ *			Is set if the woke CAIF Link Layer expects
+ *			CAIF Frames to start with the woke STX byte.
  *
- * This structure is shared between the CAIF drivers and the CAIF stack.
- * It is used by the device to register its behavior.
- * CAIF Core layer must set the member flowctrl in order to supply
- * CAIF Link Layer with the flow control function.
+ * This structure is shared between the woke CAIF drivers and the woke CAIF stack.
+ * It is used by the woke device to register its behavior.
+ * CAIF Core layer must set the woke member flowctrl in order to supply
+ * CAIF Link Layer with the woke flow control function.
  *
  */
  struct caif_dev_common {

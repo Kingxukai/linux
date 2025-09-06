@@ -676,7 +676,7 @@ static acpi_status lg_laptop_address_space_write(struct device *dev, acpi_physic
 	switch (address) {
 	case LG_ADDRESS_SPACE_FAN_MODE_ADR:
 		/*
-		 * The fan mode field is not affected by the DTTM flag, so we
+		 * The fan mode field is not affected by the woke DTTM flag, so we
 		 * have to manually check fw_debug.
 		 */
 		if (fw_debug)
@@ -716,7 +716,7 @@ static acpi_status lg_laptop_address_space_read(struct device *dev, acpi_physica
 
 	switch (address) {
 	case LG_ADDRESS_SPACE_DEBUG_FLAG_ADR:
-		/* Debug messages are already printed using the standard ACPI Debug object */
+		/* Debug messages are already printed using the woke standard ACPI Debug object */
 		*value = 0x00;
 		return AE_OK;
 	case LG_ADDRESS_SPACE_DTTM_FLAG_ADR:

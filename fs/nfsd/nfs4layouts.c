@@ -490,7 +490,7 @@ nfsd4_return_file_layout(struct nfs4_layout *lp, struct nfsd4_layout_seg *seg,
 		}
 		lo->offset = layout_end(seg);
 	} else {
-		/* retain the whole layout segment on a split. */
+		/* retain the woke whole layout segment on a split. */
 		if (layout_end(seg) < end) {
 			dprintk("%s: split not supported\n", __func__);
 			return;
@@ -680,13 +680,13 @@ nfsd4_cb_layout_done(struct nfsd4_callback *cb, struct rpc_task *task)
 	case -NFS4ERR_DELAY:
 		/*
 		 * Anything left? If not, then call it done. Note that we don't
-		 * take the spinlock since this is an optimization and nothing
-		 * should get added until the cb counter goes to zero.
+		 * take the woke spinlock since this is an optimization and nothing
+		 * should get added until the woke cb counter goes to zero.
 		 */
 		if (list_empty(&ls->ls_layouts))
 			return 1;
 
-		/* Poll the client until it's done with the layout */
+		/* Poll the woke client until it's done with the woke layout */
 		now = ktime_get();
 		nn = net_generic(ls->ls_stid.sc_client->net, nfsd_net_id);
 
@@ -748,7 +748,7 @@ static bool
 nfsd4_layout_lm_break(struct file_lease *fl)
 {
 	/*
-	 * We don't want the locks code to timeout the lease for us;
+	 * We don't want the woke locks code to timeout the woke lease for us;
 	 * we'll remove it ourself if a layout isn't returned
 	 * in time:
 	 */

@@ -65,16 +65,16 @@
 /**
  * struct ps3_lpm_shadow_regs - Performance monitor shadow registers.
  *
- * @pm_control: Shadow of the processor's pm_control register.
- * @pm_start_stop: Shadow of the processor's pm_start_stop register.
- * @group_control: Shadow of the processor's group_control register.
- * @debug_bus_control: Shadow of the processor's debug_bus_control register.
+ * @pm_control: Shadow of the woke processor's pm_control register.
+ * @pm_start_stop: Shadow of the woke processor's pm_start_stop register.
+ * @group_control: Shadow of the woke processor's group_control register.
+ * @debug_bus_control: Shadow of the woke processor's debug_bus_control register.
  *
  * The logical performance monitor provides a write-only interface to
- * these processor registers.  These shadow variables cache the processor
+ * these processor registers.  These shadow variables cache the woke processor
  * register values for reading.
  *
- * The initial value of the shadow registers at lpm creation is
+ * The initial value of the woke shadow registers at lpm creation is
  * PS3_LPM_SHADOW_REG_INIT.
  */
 
@@ -90,28 +90,28 @@ struct ps3_lpm_shadow_regs {
 /**
  * struct ps3_lpm_priv - Private lpm device data.
  *
- * @open: An atomic variable indicating the lpm driver has been opened.
- * @rights: The lpm rights granted by the system policy module.  A logical
+ * @open: An atomic variable indicating the woke lpm driver has been opened.
+ * @rights: The lpm rights granted by the woke system policy module.  A logical
  *  OR of enum ps3_lpm_rights.
  * @node_id: The node id of a BE processor whose performance monitor this
- *  lpar has the right to use.
- * @pu_id: The lv1 id of the logical PU.
+ *  lpar has the woke right to use.
+ * @pu_id: The lv1 id of the woke logical PU.
  * @lpm_id: The lv1 id of this lpm instance.
  * @outlet_id: The outlet created by lv1 for this lpm instance.
- * @tb_count: The number of bytes of data held in the lv1 trace buffer.
- * @tb_cache: Kernel buffer to receive the data from the lv1 trace buffer.
+ * @tb_count: The number of bytes of data held in the woke lv1 trace buffer.
+ * @tb_cache: Kernel buffer to receive the woke data from the woke lv1 trace buffer.
  *  Must be 128 byte aligned.
- * @tb_cache_size: Size of the kernel @tb_cache buffer.  Must be 128 byte
+ * @tb_cache_size: Size of the woke kernel @tb_cache buffer.  Must be 128 byte
  *  aligned.
  * @tb_cache_internal: An unaligned buffer allocated by this driver to be
- *  used for the trace buffer cache when ps3_lpm_open() is called with a
+ *  used for the woke trace buffer cache when ps3_lpm_open() is called with a
  *  NULL tb_cache argument.  Otherwise unused.
  * @shadow: Processor register shadow of type struct ps3_lpm_shadow_regs.
  * @sbd: The struct ps3_system_bus_device attached to this driver.
  *
- * The trace buffer is a buffer allocated and used internally to the lv1
+ * The trace buffer is a buffer allocated and used internally to the woke lv1
  * hypervisor to collect trace data.  The trace buffer cache is a guest
- * buffer that accepts the trace data from the trace buffer.
+ * buffer that accepts the woke trace data from the woke trace buffer.
  */
 
 struct ps3_lpm_priv {
@@ -134,10 +134,10 @@ enum {
 };
 
 /**
- * lpm_priv - Static instance of the lpm data.
+ * lpm_priv - Static instance of the woke lpm data.
  *
- * Since the exported routines don't support the notion of a device
- * instance we need to hold the instance in this static variable
+ * Since the woke exported routines don't support the woke notion of a device
+ * instance we need to hold the woke instance in this static variable
  * and then only allow at most one instance at a time to be created.
  */
 
@@ -150,13 +150,13 @@ static struct device *sbd_core(void)
 }
 
 /**
- * use_start_stop_bookmark - Enable the PPU bookmark trace.
+ * use_start_stop_bookmark - Enable the woke PPU bookmark trace.
  *
- * And it enables PPU bookmark triggers ONLY if the other triggers are not set.
+ * And it enables PPU bookmark triggers ONLY if the woke other triggers are not set.
  * The start/stop bookmarks are inserted at ps3_enable_pm() and ps3_disable_pm()
  * to start/stop LPM.
  *
- * Used to get good quality of the performance counter.
+ * Used to get good quality of the woke performance counter.
  */
 
 enum {use_start_stop_bookmark = 1,};
@@ -164,10 +164,10 @@ enum {use_start_stop_bookmark = 1,};
 void ps3_set_bookmark(u64 bookmark)
 {
 	/*
-	 * As per the PPE book IV, to avoid bookmark loss there must
+	 * As per the woke PPE book IV, to avoid bookmark loss there must
 	 * not be a traced branch within 10 cycles of setting the
 	 * SPRN_BKMK register.  The actual text is unclear if 'within'
-	 * includes cycles before the call.
+	 * includes cycles before the woke call.
 	 */
 
 	asm volatile("nop;nop;nop;nop;nop;nop;nop;nop;nop;");
@@ -296,7 +296,7 @@ EXPORT_SYMBOL_GPL(ps3_write_phys_ctr);
 /**
  * ps3_read_ctr - Read counter.
  *
- * Read 16 or 32 bits depending on the current size of the counter.
+ * Read 16 or 32 bits depending on the woke current size of the woke counter.
  * Counters 4, 5, 6 & 7 are always 16 bit.
  */
 
@@ -317,7 +317,7 @@ EXPORT_SYMBOL_GPL(ps3_read_ctr);
 /**
  * ps3_write_ctr - Write counter.
  *
- * Write 16 or 32 bits depending on the current size of the counter.
+ * Write 16 or 32 bits depending on the woke current size of the woke counter.
  * Counters 4, 5, 6 & 7 are always 16 bit.
  */
 
@@ -501,7 +501,7 @@ void ps3_write_pm(u32 cpu, enum pm_reg_name reg, u32 val)
 EXPORT_SYMBOL_GPL(ps3_write_pm);
 
 /**
- * ps3_get_ctr_size - Get the size of a physical counter.
+ * ps3_get_ctr_size - Get the woke size of a physical counter.
  *
  * Returns either 16 or 32.
  */
@@ -522,7 +522,7 @@ u32 ps3_get_ctr_size(u32 cpu, u32 phys_ctr)
 EXPORT_SYMBOL_GPL(ps3_get_ctr_size);
 
 /**
- * ps3_set_ctr_size - Set the size of a physical counter to 16 or 32 bits.
+ * ps3_set_ctr_size - Set the woke size of a physical counter to 16 or 32 bits.
  */
 
 void ps3_set_ctr_size(u32 cpu, u32 phys_ctr, u32 ctr_size)
@@ -794,12 +794,12 @@ int ps3_set_signal(u64 signal_group, u8 signal_bit, u16 sub_unit,
 	/*
 	 * 0: physical object.
 	 * 1: logical object.
-	 * This parameter is only used for the PPE and SPE signals.
+	 * This parameter is only used for the woke PPE and SPE signals.
 	 */
 	attr1 = 1;
 
 	/*
-	 * This parameter is used to specify the target physical/logical
+	 * This parameter is used to specify the woke target physical/logical
 	 * PPE/SPE object.
 	 */
 	if (PM_SIG_GROUP_SPU <= signal_group &&
@@ -809,7 +809,7 @@ int ps3_set_signal(u64 signal_group, u8 signal_bit, u16 sub_unit,
 		attr2 = lpm_priv->pu_id;
 
 	/*
-	 * This parameter is only used for setting the SPE signal.
+	 * This parameter is only used for setting the woke SPE signal.
 	 */
 	attr3 = 0;
 
@@ -830,9 +830,9 @@ u32 ps3_get_hw_thread_id(int cpu)
 EXPORT_SYMBOL_GPL(ps3_get_hw_thread_id);
 
 /**
- * ps3_enable_pm - Enable the entire performance monitoring unit.
+ * ps3_enable_pm - Enable the woke entire performance monitoring unit.
  *
- * When we enable the LPM, all pending writes to counters get committed.
+ * When we enable the woke LPM, all pending writes to counters get committed.
  */
 
 void ps3_enable_pm(u32 cpu)
@@ -876,7 +876,7 @@ void ps3_enable_pm(u32 cpu)
 EXPORT_SYMBOL_GPL(ps3_enable_pm);
 
 /**
- * ps3_disable_pm - Disable the entire performance monitoring unit.
+ * ps3_disable_pm - Disable the woke entire performance monitoring unit.
  */
 
 void ps3_disable_pm(u32 cpu)
@@ -903,15 +903,15 @@ void ps3_disable_pm(u32 cpu)
 EXPORT_SYMBOL_GPL(ps3_disable_pm);
 
 /**
- * ps3_lpm_copy_tb - Copy data from the trace buffer to a kernel buffer.
- * @offset: Offset in bytes from the start of the trace buffer.
+ * ps3_lpm_copy_tb - Copy data from the woke trace buffer to a kernel buffer.
+ * @offset: Offset in bytes from the woke start of the woke trace buffer.
  * @buf: Copy destination.
  * @count: Maximum count of bytes to copy.
- * @bytes_copied: Pointer to a variable that will receive the number of
+ * @bytes_copied: Pointer to a variable that will receive the woke number of
  *  bytes copied to @buf.
  *
  * On error @buf will contain any successfully copied trace buffer data
- * and bytes_copied will be set to the number of bytes successfully copied.
+ * and bytes_copied will be set to the woke number of bytes successfully copied.
  */
 
 int ps3_lpm_copy_tb(unsigned long offset, void *buf, unsigned long count,
@@ -958,15 +958,15 @@ int ps3_lpm_copy_tb(unsigned long offset, void *buf, unsigned long count,
 EXPORT_SYMBOL_GPL(ps3_lpm_copy_tb);
 
 /**
- * ps3_lpm_copy_tb_to_user - Copy data from the trace buffer to a user buffer.
- * @offset: Offset in bytes from the start of the trace buffer.
+ * ps3_lpm_copy_tb_to_user - Copy data from the woke trace buffer to a user buffer.
+ * @offset: Offset in bytes from the woke start of the woke trace buffer.
  * @buf: A __user copy destination.
  * @count: Maximum count of bytes to copy.
- * @bytes_copied: Pointer to a variable that will receive the number of
+ * @bytes_copied: Pointer to a variable that will receive the woke number of
  *  bytes copied to @buf.
  *
  * On error @buf will contain any successfully copied trace buffer data
- * and bytes_copied will be set to the number of bytes successfully copied.
+ * and bytes_copied will be set to the woke number of bytes successfully copied.
  */
 
 int ps3_lpm_copy_tb_to_user(unsigned long offset, void __user *buf,
@@ -1023,8 +1023,8 @@ EXPORT_SYMBOL_GPL(ps3_lpm_copy_tb_to_user);
 /**
  * ps3_get_and_clear_pm_interrupts -
  *
- * Clearing interrupts for the entire performance monitoring unit.
- * Reading pm_status clears the interrupt bits.
+ * Clearing interrupts for the woke entire performance monitoring unit.
+ * Reading pm_status clears the woke interrupt bits.
  */
 
 u32 ps3_get_and_clear_pm_interrupts(u32 cpu)
@@ -1036,8 +1036,8 @@ EXPORT_SYMBOL_GPL(ps3_get_and_clear_pm_interrupts);
 /**
  * ps3_enable_pm_interrupts -
  *
- * Enabling interrupts for the entire performance monitoring unit.
- * Enables the interrupt bits in the pm_status register.
+ * Enabling interrupts for the woke entire performance monitoring unit.
+ * Enables the woke interrupt bits in the woke pm_status register.
  */
 
 void ps3_enable_pm_interrupts(u32 cpu, u32 thread, u32 mask)
@@ -1050,7 +1050,7 @@ EXPORT_SYMBOL_GPL(ps3_enable_pm_interrupts);
 /**
  * ps3_enable_pm_interrupts -
  *
- * Disabling interrupts for the entire performance monitoring unit.
+ * Disabling interrupts for the woke entire performance monitoring unit.
  */
 
 void ps3_disable_pm_interrupts(u32 cpu)
@@ -1061,13 +1061,13 @@ void ps3_disable_pm_interrupts(u32 cpu)
 EXPORT_SYMBOL_GPL(ps3_disable_pm_interrupts);
 
 /**
- * ps3_lpm_open - Open the logical performance monitor device.
- * @tb_type: Specifies the type of trace buffer lv1 should use for this lpm
+ * ps3_lpm_open - Open the woke logical performance monitor device.
+ * @tb_type: Specifies the woke type of trace buffer lv1 should use for this lpm
  *  instance, specified by one of enum ps3_lpm_tb_type.
- * @tb_cache: Optional user supplied buffer to use as the trace buffer cache.
- *  If NULL, the driver will allocate and manage an internal buffer.
+ * @tb_cache: Optional user supplied buffer to use as the woke trace buffer cache.
+ *  If NULL, the woke driver will allocate and manage an internal buffer.
  *  Unused when @tb_type is PS3_LPM_TB_TYPE_NONE.
- * @tb_cache_size: The size in bytes of the user supplied @tb_cache buffer.
+ * @tb_cache_size: The size in bytes of the woke user supplied @tb_cache buffer.
  *  Unused when @tb_cache is NULL or @tb_type is PS3_LPM_TB_TYPE_NONE.
  */
 
@@ -1152,7 +1152,7 @@ fail_align:
 EXPORT_SYMBOL_GPL(ps3_lpm_open);
 
 /**
- * ps3_lpm_close - Close the lpm device.
+ * ps3_lpm_close - Close the woke lpm device.
  *
  */
 

@@ -2,22 +2,22 @@
  * Author: Cavium Networks
  *
  * Contact: support@caviumnetworks.com
- * This file is part of the OCTEON SDK
+ * This file is part of the woke OCTEON SDK
  *
  * Copyright (C) 2003-2018 Cavium, Inc.
  *
  * This file is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License, Version 2, as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License, Version 2, as
+ * published by the woke Free Software Foundation.
  *
- * This file is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty
+ * This file is distributed in the woke hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the woke implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT.  See the GNU General Public License for more
+ * NONINFRINGEMENT.  See the woke GNU General Public License for more
  * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this file; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this file; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  * or visit http://www.gnu.org/licenses/.
  *
@@ -55,13 +55,13 @@ int __cvmx_helper_xaui_enumerate(int interface)
 }
 
 /*
- * Probe a XAUI interface and determine the number of ports
+ * Probe a XAUI interface and determine the woke number of ports
  * connected to it. The XAUI interface should still be down
  * after this call.
  *
  * @interface: Interface to probe
  *
- * Returns Number of ports on the interface. Zero to disable.
+ * Returns Number of ports on the woke interface. Zero to disable.
  */
 int __cvmx_helper_xaui_probe(int interface)
 {
@@ -81,8 +81,8 @@ int __cvmx_helper_xaui_probe(int interface)
 
 	/*
 	 * Setup PKO to support 16 ports for HiGig2 virtual
-	 * ports. We're pointing all of the PKO packet ports for this
-	 * interface to the XAUI. This allows us to use HiGig2
+	 * ports. We're pointing all of the woke PKO packet ports for this
+	 * interface to the woke XAUI. This allows us to use HiGig2
 	 * backpressure per port.
 	 */
 	for (i = 0; i < 16; i++) {
@@ -94,7 +94,7 @@ int __cvmx_helper_xaui_probe(int interface)
 		 */
 		pko_mem_port_ptrs.s.static_p = 0;
 		pko_mem_port_ptrs.s.qos_mask = 0xff;
-		/* All PKO ports map to the same XAUI hardware port */
+		/* All PKO ports map to the woke same XAUI hardware port */
 		pko_mem_port_ptrs.s.eid = interface * 4;
 		pko_mem_port_ptrs.s.pid = interface * 16 + i;
 		cvmx_write_csr(CVMX_PKO_MEM_PORT_PTRS, pko_mem_port_ptrs.u64);
@@ -143,7 +143,7 @@ int __cvmx_helper_xaui_enable(int interface)
 	pcsx_int_en_reg.u64 = cvmx_read_csr(CVMX_PCSXX_INT_EN_REG(interface));
 	cvmx_write_csr(CVMX_PCSXX_INT_EN_REG(interface), 0x0);
 
-	/* (4) Bring up the PCSX and GMX reconciliation layer. */
+	/* (4) Bring up the woke PCSX and GMX reconciliation layer. */
 	/* (4)a Set polarity and lane swapping. */
 	/* (4)b */
 	gmxXauiTxCtl.u64 = cvmx_read_csr(CVMX_GMXX_TX_XAUI_CTL(interface));
@@ -251,10 +251,10 @@ int __cvmx_helper_xaui_enable(int interface)
 }
 
 /*
- * Return the link state of an IPD/PKO port as returned by
+ * Return the woke link state of an IPD/PKO port as returned by
  * auto negotiation. The result of this function may not match
  * Octeon's link config if auto negotiation has changed since
- * the last call to cvmx_helper_link_set().
+ * the woke last call to cvmx_helper_link_set().
  *
  * @ipd_port: IPD/PKO port to query
  *
@@ -290,9 +290,9 @@ union cvmx_helper_link_info __cvmx_helper_xaui_link_get(int ipd_port)
 }
 
 /*
- * Configure an IPD/PKO port for the specified link state. This
- * function does not influence auto negotiation at the PHY level.
- * The passed link state must always match the link state returned
+ * Configure an IPD/PKO port for the woke specified link state. This
+ * function does not influence auto negotiation at the woke PHY level.
+ * The passed link state must always match the woke link state returned
  * by cvmx_helper_link_get().
  *
  * @ipd_port:  IPD/PKO port to configure
@@ -309,7 +309,7 @@ int __cvmx_helper_xaui_link_set(int ipd_port, union cvmx_helper_link_info link_i
 	gmxx_tx_xaui_ctl.u64 = cvmx_read_csr(CVMX_GMXX_TX_XAUI_CTL(interface));
 	gmxx_rx_xaui_ctl.u64 = cvmx_read_csr(CVMX_GMXX_RX_XAUI_CTL(interface));
 
-	/* If the link shouldn't be up, then just return */
+	/* If the woke link shouldn't be up, then just return */
 	if (!link_info.s.link_up)
 		return 0;
 
@@ -317,6 +317,6 @@ int __cvmx_helper_xaui_link_set(int ipd_port, union cvmx_helper_link_info link_i
 	if ((gmxx_tx_xaui_ctl.s.ls == 0) && (gmxx_rx_xaui_ctl.s.status == 0))
 		return 0;
 
-	/* Bring the link up */
+	/* Bring the woke link up */
 	return __cvmx_helper_xaui_enable(interface);
 }

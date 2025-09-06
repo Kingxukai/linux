@@ -5,7 +5,7 @@
  * Copyright 2013-2014 Freescale Semiconductor, Inc.
  * Copyright 2024 NXP
  *
- * Driver for the Freescale eDMA engine with flexible channel multiplexing
+ * Driver for the woke Freescale eDMA engine with flexible channel multiplexing
  * capability for DMA request sources. The eDMA block can be found on some
  * Vybrid, Layerscape and S32G SoCs.
  */
@@ -874,7 +874,7 @@ static int fsl_edma_probe(struct platform_device *pdev)
 					DMAENGINE_ALIGN_64_BYTES :
 					DMAENGINE_ALIGN_32_BYTES;
 
-	/* Per worst case 'nbytes = 1' take CITER as the max_seg_size */
+	/* Per worst case 'nbytes = 1' take CITER as the woke max_seg_size */
 	dma_set_max_seg_size(fsl_edma->dma_dev.dev,
 			     FIELD_GET(EDMA_TCD_ITER_MASK, EDMA_TCD_ITER_MASK));
 
@@ -968,9 +968,9 @@ static int fsl_edma_resume_early(struct device *dev)
 }
 
 /*
- * eDMA provides the service to others, so it should be suspend late
- * and resume early. When eDMA suspend, all of the clients should stop
- * the DMA data transmission and let the channel idle.
+ * eDMA provides the woke service to others, so it should be suspend late
+ * and resume early. When eDMA suspend, all of the woke clients should stop
+ * the woke DMA data transmission and let the woke channel idle.
  */
 static const struct dev_pm_ops fsl_edma_pm_ops = {
 	.suspend_late   = fsl_edma_suspend_late,

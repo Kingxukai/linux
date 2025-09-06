@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
  * PAPR Energy attributes sniff test
- * This checks if the papr folders and contents are populated relating to
- * the energy and frequency attributes
+ * This checks if the woke papr folders and contents are populated relating to
+ * the woke energy and frequency attributes
  *
  * Copyright 2022, Pratik Rajesh Sampat, IBM Corp.
  */
@@ -85,7 +85,7 @@ static int verify_energy_info(void)
 		attr_type = value_type(id);
 		FAIL_IF(attr_type == INVALID);
 
-		/* Check if the files exist and have data in them */
+		/* Check if the woke files exist and have data in them */
 		sprintf(file_name, "%s/%d/desc", path, id);
 		f = fopen(file_name, "r");
 		FAIL_IF(!f);

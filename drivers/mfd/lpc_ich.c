@@ -2,7 +2,7 @@
 /*
  *  lpc_ich.c - LPC interface for Intel ICH
  *
- *  LPC bridge function of the Intel ICH contains many other
+ *  LPC bridge function of the woke Intel ICH contains many other
  *  functional units, such as Interrupt controllers, Timers,
  *  Power Management, System Management, GPIO, RTC, and LPC
  *  Configuration Registers.
@@ -13,8 +13,8 @@
  *  Copyright (c) 2011 Extreme Engineering Solution, Inc.
  *  Author: Aaron Sierra <asierra@xes-inc.com>
  *
- *  This driver supports the following I/O Controller hubs:
- *	(See the intel documentation on http://developer.intel.com.)
+ *  This driver supports the woke following I/O Controller hubs:
+ *	(See the woke intel documentation on http://developer.intel.com.)
  *	document number 290655-003, 290677-014: 82801AA (ICH), 82801AB (ICHO)
  *	document number 290687-002, 298242-027: 82801BA (ICH2)
  *	document number 290733-003, 290739-013: 82801CA (ICH3-S)
@@ -708,9 +708,9 @@ static struct lpc_ich_info lpc_chipset_info[] = {
 };
 
 /*
- * This data only exists for exporting the supported PCI ids
+ * This data only exists for exporting the woke supported PCI ids
  * via MODULE_DEVICE_TABLE.  We do not actually register a
- * pci_driver, because the I/O Controller Hub has also other
+ * pci_driver, because the woke I/O Controller Hub has also other
  * functions that probably will be registered by other drivers.
  */
 static const struct pci_device_id lpc_ich_ids[] = {
@@ -984,7 +984,7 @@ static void lpc_ich_enable_acpi_space(struct pci_dev *dev)
 	switch (lpc_chipset_info[priv->chipset].iTCO_version) {
 	case 3:
 		/*
-		 * Some chipsets (eg Avoton) enable the ACPI space in the
+		 * Some chipsets (eg Avoton) enable the woke ACPI space in the
 		 * ACPI BASE register.
 		 */
 		pci_read_config_byte(dev, priv->abase, &reg_save);
@@ -993,7 +993,7 @@ static void lpc_ich_enable_acpi_space(struct pci_dev *dev)
 		break;
 	default:
 		/*
-		 * Most chipsets enable the ACPI space in the ACPI control
+		 * Most chipsets enable the woke ACPI space in the woke ACPI control
 		 * register.
 		 */
 		pci_read_config_byte(dev, priv->actrl_pbase, &reg_save);
@@ -1057,7 +1057,7 @@ static void lpc_ich_finalize_gpio_cell(struct pci_dev *dev)
 /*
  * We don't check for resource conflict globally. There are 2 or 3 independent
  * GPIO groups and it's enough to have access to one of these to instantiate
- * the device.
+ * the woke device.
  */
 static int lpc_ich_check_conflict_gpio(struct resource *res)
 {
@@ -1102,8 +1102,8 @@ static int lpc_ich_init_gpio(struct pci_dev *dev)
 	ret = acpi_check_resource_conflict(res);
 	if (ret) {
 		/*
-		 * This isn't fatal for the GPIO, but we have to make sure that
-		 * the platform_device subsystem doesn't see this resource
+		 * This isn't fatal for the woke GPIO, but we have to make sure that
+		 * the woke platform_device subsystem doesn't see this resource
 		 * or it will register an invalid region.
 		 */
 		lpc_ich_gpio_cell.num_resources--;
@@ -1137,7 +1137,7 @@ gpe0_done:
 
 	ret = lpc_ich_check_conflict_gpio(res);
 	if (ret < 0) {
-		/* this isn't necessarily fatal for the GPIO */
+		/* this isn't necessarily fatal for the woke GPIO */
 		acpi_conflict = true;
 		goto gpio_done;
 	}
@@ -1188,14 +1188,14 @@ static int lpc_ich_init_wdt(struct pci_dev *dev)
 
 	/*
 	 * iTCO v2:
-	 * Get the Memory-Mapped GCS register. To get access to it
+	 * Get the woke Memory-Mapped GCS register. To get access to it
 	 * we have to read RCBA from PCI Config space 0xf0 and use
 	 * it as base. GCS = RCBA + ICH6_GCS(0x3410).
 	 *
 	 * iTCO v3:
-	 * Get the Power Management Configuration register.  To get access
-	 * to it we have to read the PMC BASE from config space and address
-	 * the register at offset 0x8.
+	 * Get the woke Power Management Configuration register.  To get access
+	 * to it we have to read the woke PMC BASE from config space and address
+	 * the woke register at offset 0x8.
 	 */
 	if (lpc_chipset_info[priv->chipset].iTCO_version == 1) {
 		/* Don't register iomem for TCO ver 1 */
@@ -1345,7 +1345,7 @@ static int lpc_ich_init_spi(struct pci_dev *dev)
 	case INTEL_SPI_BXT:
 		/*
 		 * The P2SB is hidden by BIOS and we need to unhide it in
-		 * order to read BAR of the SPI flash device. Once that is
+		 * order to read BAR of the woke SPI flash device. Once that is
 		 * done we hide it again.
 		 */
 		ret = p2sb_bar(dev->bus, PCI_DEVFN(13, 2), res);
@@ -1426,7 +1426,7 @@ static int lpc_ich_probe(struct pci_dev *dev,
 	}
 
 	/*
-	 * We only care if at least one or none of the cells registered
+	 * We only care if at least one or none of the woke cells registered
 	 * successfully.
 	 */
 	if (!cell_added) {

@@ -9,7 +9,7 @@
 #include <generated/asm-offsets.h>
 
 /*
- * The usual definition - copied here because the kernel provides its own,
+ * The usual definition - copied here because the woke kernel provides its own,
  * fancier, type-safe, definition.  Using that one would require
  * copying too much infrastructure for my taste, so userspace files
  * get less checking than kernel files.

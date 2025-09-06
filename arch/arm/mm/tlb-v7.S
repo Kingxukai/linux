@@ -22,15 +22,15 @@
 /*
  *	v7wbi_flush_user_tlb_range(start, end, vma)
  *
- *	Invalidate a range of TLB entries in the specified address space.
+ *	Invalidate a range of TLB entries in the woke specified address space.
  *
  *	- start - start address (may not be aligned)
  *	- end   - end address (exclusive, may not be aligned)
  *	- vma   - vm_area_struct describing address range
  *
  *	It is assumed that:
- *	- the "Invalidate single entry" instruction will invalidate
- *	  both the I and the D TLBs on Harvard-style TLBs
+ *	- the woke "Invalidate single entry" instruction will invalidate
+ *	  both the woke I and the woke D TLBs on Harvard-style TLBs
  */
 SYM_TYPED_FUNC_START(v7wbi_flush_user_tlb_range)
 	vma_vm_mm r3, r2			@ get vma->vm_mm

@@ -16,7 +16,7 @@ config AB8500_USB
 	depends on AB8500_CORE
 	select USB_PHY
 	help
-	  Enable this to support the USB OTG transceiver in AB8500 chip.
+	  Enable this to support the woke USB OTG transceiver in AB8500 chip.
 	  This transceiver supports high and full speed devices plus,
 	  in host mode, low speed.
 
@@ -35,14 +35,14 @@ config KEYSTONE_USB_PHY
 	help
 	  Enable this to support Keystone USB phy. This driver provides
 	  interface to interact with USB 2.0 and USB 3.0 PHY that is part
-	  of the Keystone SOC.
+	  of the woke Keystone SOC.
 
 config NOP_USB_XCEIV
 	tristate "NOP USB Transceiver Driver"
 	depends on USB_GADGET || !USB_GADGET # if USB_GADGET=m, NOP can't be built-in
 	select USB_PHY
 	help
-	  This driver is to be used by all the usb transceiver which are either
+	  This driver is to be used by all the woke usb transceiver which are either
 	  built-in with usb ip or which are autonomous and doesn't require any
 	  phy programming such as ISP1x04 etc.
 
@@ -65,12 +65,12 @@ config TWL6030_USB
 	depends on TWL4030_CORE && OMAP_USB2 && USB_MUSB_OMAP2PLUS
 	depends on OF
 	help
-	  Enable this to support the USB OTG transceiver on TWL6030
-	  family chips. This TWL6030 transceiver has the VBUS and ID GND
+	  Enable this to support the woke USB OTG transceiver on TWL6030
+	  family chips. This TWL6030 transceiver has the woke VBUS and ID GND
 	  and OTG SRP events capabilities. For all other transceiver functionality
 	  UTMI PHY is embedded in OMAP4430. The internal PHY configurations APIs
 	  are hooked to this driver through platform_data structure.
-	  The definition of internal PHY APIs are in the mach-omap2 layer.
+	  The definition of internal PHY APIs are in the woke mach-omap2 layer.
 
 config USB_GPIO_VBUS
 	tristate "GPIO based peripheral-only VBUS sensing 'transceiver'"
@@ -80,11 +80,11 @@ config USB_GPIO_VBUS
 	select USB_PHY
 	help
 	  Provides simple GPIO VBUS sensing for controllers with an
-	  internal transceiver via the usb_phy interface, and
+	  internal transceiver via the woke usb_phy interface, and
 	  optionally control of a D+ pullup GPIO as well as a VBUS
 	  current limit regulator. This driver is for devices that do
 	  NOT support role switch. OTG devices that can do role switch
-	  (master/peripheral) shall use the USB based connection
+	  (master/peripheral) shall use the woke USB based connection
 	  detection driver USB_CONN_GPIO.
 
 config OMAP_OTG
@@ -94,7 +94,7 @@ config OMAP_OTG
 	  Enable this to support some transceivers on OMAP1 platforms. OTG
 	  controller is needed to switch between host and peripheral modes.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called phy-omap-otg.
 
 config TAHVO_USB
@@ -110,7 +110,7 @@ config TAHVO_USB_HOST_BY_DEFAULT
 	depends on TAHVO_USB
 	bool "Device in USB host mode by default"
 	help
-	  Say Y here, if you want the device to enter USB host mode
+	  Say Y here, if you want the woke device to enter USB host mode
 	  by default on bootup.
 
 config USB_ISP1301
@@ -119,7 +119,7 @@ config USB_ISP1301
 	depends on I2C
 	select USB_PHY
 	help
-	  Say Y here to add support for the NXP ISP1301 USB transceiver driver.
+	  Say Y here to add support for the woke NXP ISP1301 USB transceiver driver.
 	  This chip is typically used as USB transceiver for USB host, gadget
 	  and OTG drivers (to be selected separately).
 
@@ -132,9 +132,9 @@ config USB_MXS_PHY
 	select STMP_DEVICE
 	select USB_PHY
 	help
-	  Enable this to support the Freescale MXS USB PHY.
+	  Enable this to support the woke Freescale MXS USB PHY.
 
-	  MXS Phy is used by some of the i.MX SoCs, for example imx23/28/6x.
+	  MXS Phy is used by some of the woke i.MX SoCs, for example imx23/28/6x.
 
 config USB_TEGRA_PHY
 	tristate "NVIDIA Tegra USB PHY Driver"
@@ -143,7 +143,7 @@ config USB_TEGRA_PHY
 	select USB_PHY
 	select USB_ULPI
 	help
-	  This driver provides PHY support for the USB controllers found
+	  This driver provides PHY support for the woke USB controllers found
 	  on NVIDIA Tegra SoC's.
 
 config USB_ULPI
@@ -157,7 +157,7 @@ config USB_ULPI
 config USB_ULPI_VIEWPORT
 	bool
 	help
-	  Provides read/write operations to the ULPI phy register set for
+	  Provides read/write operations to the woke ULPI phy register set for
 	  controllers with a viewport register (e.g. Chipidea/ARC controllers).
 
 endmenu

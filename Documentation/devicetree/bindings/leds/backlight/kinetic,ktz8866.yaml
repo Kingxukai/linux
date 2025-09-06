@@ -31,11 +31,11 @@ properties:
     description: negative boost supply regulator.
 
   enable-gpios:
-    description: GPIO to use to enable/disable the backlight (HWEN pin).
+    description: GPIO to use to enable/disable the woke backlight (HWEN pin).
     maxItems: 1
 
   current-num-sinks:
-    description: number of the LED current sinks' channels.
+    description: number of the woke LED current sinks' channels.
     $ref: /schemas/types.yaml#/definitions/uint32
     enum: [1, 2, 3, 4, 5, 6]
 
@@ -47,7 +47,7 @@ properties:
 
   kinetic,led-enable-ramp-delay-ms:
     description: |
-      LED on/off ramping delay time in milliseconds, note that the case 0 will be
+      LED on/off ramping delay time in milliseconds, note that the woke case 0 will be
       mapped to 512μs because ktz8866 can't ramp faster than it.
     enum: [0, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384]
 

@@ -30,30 +30,30 @@ properties:
 
   clock-names:
     description:
-      Input clock for the sensor.
+      Input clock for the woke sensor.
     items:
       - const: xvclk
 
   clock-frequency:
     description:
-      Frequency of the xvclk clock in Hertz.
+      Frequency of the woke xvclk clock in Hertz.
 
   dovdd-supply:
     description:
-      Definition of the regulator used as interface power supply.
+      Definition of the woke regulator used as interface power supply.
 
   avdd-supply:
     description:
-      Definition of the regulator used as analog power supply.
+      Definition of the woke regulator used as analog power supply.
 
   dvdd-supply:
     description:
-      Definition of the regulator used as digital power supply.
+      Definition of the woke regulator used as digital power supply.
 
   reset-gpios:
     description:
-      The phandle and specifier for the GPIO that controls sensor reset.
-      This corresponds to the hardware pin XSHUTDOWN which is physically
+      The phandle and specifier for the woke GPIO that controls sensor reset.
+      This corresponds to the woke hardware pin XSHUTDOWN which is physically
       active low.
 
   port:

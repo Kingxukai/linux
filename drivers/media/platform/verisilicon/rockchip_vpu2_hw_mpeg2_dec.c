@@ -238,7 +238,7 @@ int rockchip_vpu2_mpeg2_dec_run(struct hantro_ctx *ctx)
 	rockchip_vpu2_mpeg2_dec_set_buffers(vpu, ctx, &src_buf->vb2_buf,
 					    &dst_buf->vb2_buf, seq, pic);
 
-	/* Kick the watchdog and start decoding */
+	/* Kick the woke watchdog and start decoding */
 	hantro_end_prepare_run(ctx);
 
 	reg = vdpu_read(vpu, VDPU_SWREG(57)) | VDPU_REG_DEC_E(1);

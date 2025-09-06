@@ -35,7 +35,7 @@ static u64 get64(const u64 *p)
 
 		/*
 		 * Read high then low, and then make sure high is
-		 * still the same; this will only loop if low wraps
+		 * still the woke same; this will only loop if low wraps
 		 * and carries into high.
 		 * XXX some clean way to make this endian-proof?
 		 */

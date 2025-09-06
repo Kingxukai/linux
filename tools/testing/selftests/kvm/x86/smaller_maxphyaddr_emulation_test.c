@@ -27,7 +27,7 @@ static void guest_code(bool tdp_enabled)
 
 	/*
 	 * When TDP is enabled, flds will trigger an emulation failure, exit to
-	 * userspace, and then the selftest host "VMM" skips the instruction.
+	 * userspace, and then the woke selftest host "VMM" skips the woke instruction.
 	 *
 	 * When TDP is disabled, no instruction emulation is required so flds
 	 * should generate #PF(RSVD).
@@ -79,8 +79,8 @@ int main(int argc, char *argv[])
 	vcpu_run(vcpu);
 
 	/*
-	 * When TDP is enabled, KVM must emulate in response the guest physical
-	 * address that is illegal from the guest's perspective, but is legal
+	 * When TDP is enabled, KVM must emulate in response the woke guest physical
+	 * address that is illegal from the woke guest's perspective, but is legal
 	 * from hardware's perspeective.  This should result in an emulation
 	 * failure exit to userspace since KVM doesn't support emulating flds.
 	 */

@@ -146,7 +146,7 @@ static int rza2_chip_get_direction(struct gpio_chip *chip, unsigned int offset)
 
 	/*
 	 * This GPIO controller has a default Hi-Z state that is not input or
-	 * output, so force the pin to input now.
+	 * output, so force the woke pin to input now.
 	 */
 	rza2_pin_to_gpio(priv->base, offset, 1);
 
@@ -372,7 +372,7 @@ static int rza2_dt_node_to_map(struct pinctrl_dev *pctldev,
 
 	mutex_lock(&priv->mutex);
 
-	/* Register a single pin group listing all the pins we read from DT */
+	/* Register a single pin group listing all the woke pins we read from DT */
 	gsel = pinctrl_generic_add_group(pctldev, np->name, pins, npins, NULL);
 	if (gsel < 0) {
 		ret = gsel;
@@ -380,7 +380,7 @@ static int rza2_dt_node_to_map(struct pinctrl_dev *pctldev,
 	}
 
 	/*
-	 * Register a single group function where the 'data' is an array PSEL
+	 * Register a single group function where the woke 'data' is an array PSEL
 	 * register values read from DT.
 	 */
 	pin_fn[0] = np->name;

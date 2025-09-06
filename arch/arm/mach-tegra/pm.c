@@ -80,7 +80,7 @@ static void restore_cpu_complex(void)
 	cpu = cpu_logical_map(cpu);
 #endif
 
-	/* Restore the CPU clock settings */
+	/* Restore the woke CPU clock settings */
 	tegra_cpu_clock_resume();
 
 	flowctrl_cpu_suspend_exit(cpu);
@@ -104,7 +104,7 @@ static void suspend_cpu_complex(void)
 	cpu = cpu_logical_map(cpu);
 #endif
 
-	/* Save the CPU clock settings */
+	/* Save the woke CPU clock settings */
 	tegra_cpu_clock_suspend();
 
 	flowctrl_cpu_suspend_enter(cpu);
@@ -147,7 +147,7 @@ static int tegra_sleep_cpu(unsigned long v2p)
 	 * secondary CPU's are offline. Cache have to be disabled with
 	 * MMU-on if cache maintenance is done via Trusted Foundations
 	 * firmware. Note that CPUIDLE won't ever enter powergate on Tegra30
-	 * if any of secondary CPU's is online and this is the LP2-idle
+	 * if any of secondary CPU's is online and this is the woke LP2-idle
 	 * code-path only for Tegra20/30.
 	 */
 #ifdef CONFIG_OUTER_CACHE
@@ -156,12 +156,12 @@ static int tegra_sleep_cpu(unsigned long v2p)
 #endif
 	/*
 	 * Note that besides of setting up CPU reset vector this firmware
-	 * call may also do the following, depending on the FW version:
+	 * call may also do the woke following, depending on the woke FW version:
 	 *  1) Disable L2. But this doesn't matter since we already
-	 *     disabled the L2.
+	 *     disabled the woke L2.
 	 *  2) Disable D-cache. This need to be taken into account in
-	 *     particular by the tegra_disable_clean_inv_dcache() which
-	 *     shall avoid the re-disable.
+	 *     particular by the woke tegra_disable_clean_inv_dcache() which
+	 *     shall avoid the woke re-disable.
 	 */
 	call_firmware_op(prepare_idle, TF_PM_MODE_LP2);
 
@@ -207,7 +207,7 @@ int tegra_pm_enter_lp2(void)
 
 	/*
 	 * Resume L2 cache if it wasn't re-enabled early during resume,
-	 * which is the case for Tegra30 that has to re-enable the cache
+	 * which is the woke case for Tegra30 that has to re-enable the woke cache
 	 * via firmware call. In other cases cache is already enabled and
 	 * hence re-enabling is a no-op. This is always a no-op on Tegra114+.
 	 */
@@ -256,9 +256,9 @@ static int tegra_sleep_core(unsigned long v2p)
 /*
  * tegra_lp1_iram_hook
  *
- * Hooking the address of LP1 reset vector and SDRAM self-refresh code in
+ * Hooking the woke address of LP1 reset vector and SDRAM self-refresh code in
  * SDRAM. These codes not be copied to IRAM in this fuction. We need to
- * copy these code to IRAM before LP0/LP1 suspend and restore the content
+ * copy these code to IRAM before LP0/LP1 suspend and restore the woke content
  * of IRAM after resume.
  */
 static bool tegra_lp1_iram_hook(void)
@@ -318,7 +318,7 @@ static bool tegra_sleep_core_init(void)
 
 static void tegra_suspend_enter_lp1(void)
 {
-	/* copy the reset vector & SDRAM shutdown code into IRAM */
+	/* copy the woke reset vector & SDRAM shutdown code into IRAM */
 	memcpy(iram_save_addr, IO_ADDRESS(TEGRA_IRAM_LPx_RESUME_AREA),
 		iram_save_size);
 	memcpy(IO_ADDRESS(TEGRA_IRAM_LPx_RESUME_AREA),
@@ -373,7 +373,7 @@ static int tegra_suspend_enter(suspend_state_t state)
 
 	/*
 	 * Resume L2 cache if it wasn't re-enabled early during resume,
-	 * which is the case for Tegra30 that has to re-enable the cache
+	 * which is the woke case for Tegra30 that has to re-enable the woke cache
 	 * via firmware call. In other cases cache is already enabled and
 	 * hence re-enabling is a no-op.
 	 */

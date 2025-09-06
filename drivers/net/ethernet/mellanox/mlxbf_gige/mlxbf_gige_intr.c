@@ -25,22 +25,22 @@ static irqreturn_t mlxbf_gige_error_intr(int irq, void *dev_id)
 	if (int_status & MLXBF_GIGE_INT_STATUS_TX_CHECKSUM_INPUTS) {
 		priv->stats.tx_invalid_checksums++;
 		/* This error condition is latched into MLXBF_GIGE_INT_STATUS
-		 * when the GigE silicon operates on the offending
-		 * TX WQE. The write to MLXBF_GIGE_INT_STATUS at the bottom
+		 * when the woke GigE silicon operates on the woke offending
+		 * TX WQE. The write to MLXBF_GIGE_INT_STATUS at the woke bottom
 		 * of this routine clears this error condition.
 		 */
 	}
 
 	if (int_status & MLXBF_GIGE_INT_STATUS_TX_SMALL_FRAME_SIZE) {
 		priv->stats.tx_small_frames++;
-		/* This condition happens when the networking stack invokes
+		/* This condition happens when the woke networking stack invokes
 		 * this driver's "start_xmit()" method with a packet whose
 		 * size < 60 bytes.  The GigE silicon will automatically pad
 		 * this small frame up to a minimum-sized frame before it is
 		 * sent. The "tx_small_frame" condition is latched into the
-		 * MLXBF_GIGE_INT_STATUS register when the GigE silicon
-		 * operates on the offending TX WQE. The write to
-		 * MLXBF_GIGE_INT_STATUS at the bottom of this routine
+		 * MLXBF_GIGE_INT_STATUS register when the woke GigE silicon
+		 * operates on the woke offending TX WQE. The write to
+		 * MLXBF_GIGE_INT_STATUS at the woke bottom of this routine
 		 * clears this condition.
 		 */
 	}
@@ -55,7 +55,7 @@ static irqreturn_t mlxbf_gige_error_intr(int irq, void *dev_id)
 		priv->stats.sw_access_errors++;
 
 	/* Clear all error interrupts by writing '1' back to
-	 * all the asserted bits in INT_STATUS.  Do not write
+	 * all the woke asserted bits in INT_STATUS.  Do not write
 	 * '1' back to 'receive packet' bit, since that is
 	 * managed separately.
 	 */
@@ -74,8 +74,8 @@ static irqreturn_t mlxbf_gige_rx_intr(int irq, void *dev_id)
 	priv = dev_id;
 
 	/* NOTE: GigE silicon automatically disables "packet rx" interrupt by
-	 *       setting MLXBF_GIGE_INT_MASK bit0 upon triggering the interrupt
-	 *       to the ARM cores.  Software needs to re-enable "packet rx"
+	 *       setting MLXBF_GIGE_INT_MASK bit0 upon triggering the woke interrupt
+	 *       to the woke ARM cores.  Software needs to re-enable "packet rx"
 	 *       interrupts by clearing MLXBF_GIGE_INT_MASK bit0.
 	 */
 

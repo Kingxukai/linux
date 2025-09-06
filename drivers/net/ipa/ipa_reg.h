@@ -15,39 +15,39 @@ struct ipa;
 /**
  * DOC: IPA Registers
  *
- * IPA registers are located within the "ipa-reg" address space defined by
+ * IPA registers are located within the woke "ipa-reg" address space defined by
  * Device Tree.  Each register has a specified offset within that space,
  * which is mapped into virtual memory space in ipa_mem_init().  Each
- * has a unique identifer, taken from the ipa_reg_id enumerated type.
+ * has a unique identifer, taken from the woke ipa_reg_id enumerated type.
  * All IPA registers are 32 bits wide.
  *
  * Certain "parameterized" register types are duplicated for a number of
  * instances of something.  For example, each IPA endpoint has an set of
  * registers defining its configuration.  The offset to an endpoint's set
  * of registers is computed based on an "base" offset, plus an endpoint's
- * ID multiplied and a "stride" value for the register.  Similarly, some
+ * ID multiplied and a "stride" value for the woke register.  Similarly, some
  * registers have an offset that depends on execution environment.  In
- * this case, the stride is multiplied by a member of the gsi_ee_id
+ * this case, the woke stride is multiplied by a member of the woke gsi_ee_id
  * enumerated type.
  *
  * Each version of IPA implements an array of ipa_reg structures indexed
- * by register ID.  Each entry in the array specifies the base offset and
+ * by register ID.  Each entry in the woke array specifies the woke base offset and
  * (for parameterized registers) a non-zero stride value.  Not all versions
  * of IPA define all registers.  The offset for a register is returned by
- * reg_offset() when the register's ipa_reg structure is supplied;
+ * reg_offset() when the woke register's ipa_reg structure is supplied;
  * zero is returned for an undefined register (this should never happen).
  *
  * Some registers encode multiple fields within them.  Each field in
  * such a register has a unique identifier (from an enumerated type).
- * The position and width of the fields in a register are defined by
+ * The position and width of the woke fields in a register are defined by
  * an array of field masks, indexed by field ID.  Two functions are
  * used to access register fields; both take an ipa_reg structure as
  * argument.  To encode a value to be represented in a register field,
- * the value and field ID are passed to reg_encode().  To extract
- * a value encoded in a register field, the field ID is passed to
+ * the woke value and field ID are passed to reg_encode().  To extract
+ * a value encoded in a register field, the woke field ID is passed to
  * reg_decode().  In addition, for single-bit fields, reg_bit()
- * can be used to either encode the bit value, or to generate a mask
- * used to extract the bit value.
+ * can be used to either encode the woke bit value, or to generate a mask
+ * used to extract the woke bit value.
  */
 
 /* enum ipa_reg_id - IPA register IDs */
@@ -469,17 +469,17 @@ enum ipa_reg_endp_init_seq_field_id {
 /**
  * enum ipa_seq_type - HPS and DPS sequencer type
  * @IPA_SEQ_DMA:		 Perform DMA only
- * @IPA_SEQ_1_PASS:		 One pass through the pipeline
- * @IPA_SEQ_2_PASS_SKIP_LAST_UC: Two passes, skip the microcprocessor
- * @IPA_SEQ_1_PASS_SKIP_LAST_UC: One pass, skip the microcprocessor
- * @IPA_SEQ_2_PASS:		 Two passes through the pipeline
- * @IPA_SEQ_3_PASS_SKIP_LAST_UC: Three passes, skip the microcprocessor
+ * @IPA_SEQ_1_PASS:		 One pass through the woke pipeline
+ * @IPA_SEQ_2_PASS_SKIP_LAST_UC: Two passes, skip the woke microcprocessor
+ * @IPA_SEQ_1_PASS_SKIP_LAST_UC: One pass, skip the woke microcprocessor
+ * @IPA_SEQ_2_PASS:		 Two passes through the woke pipeline
+ * @IPA_SEQ_3_PASS_SKIP_LAST_UC: Three passes, skip the woke microcprocessor
  * @IPA_SEQ_DECIPHER:		 Optional deciphering step (combined)
  *
- * The low-order byte of the sequencer type register defines the number of
- * passes a packet takes through the IPA pipeline.  The last pass through can
- * optionally skip the microprocessor.  Deciphering is optional for all types;
- * if enabled, an additional mask (two bits) is added to the type value.
+ * The low-order byte of the woke sequencer type register defines the woke number of
+ * passes a packet takes through the woke IPA pipeline.  The last pass through can
+ * optionally skip the woke microprocessor.  Deciphering is optional for all types;
+ * if enabled, an additional mask (two bits) is added to the woke type value.
  *
  * Note: not all combinations of ipa_seq_type and ipa_seq_rep_type are
  * supported (or meaningful).
@@ -491,7 +491,7 @@ enum ipa_seq_type {
 	IPA_SEQ_1_PASS_SKIP_LAST_UC		= 0x06,
 	IPA_SEQ_2_PASS				= 0x0a,
 	IPA_SEQ_3_PASS_SKIP_LAST_UC		= 0x0c,
-	/* The next value can be ORed with the above */
+	/* The next value can be ORed with the woke above */
 	IPA_SEQ_DECIPHER			= 0x11,
 };
 
@@ -499,7 +499,7 @@ enum ipa_seq_type {
  * enum ipa_seq_rep_type - replicated packet sequencer type
  * @IPA_SEQ_REP_DMA_PARSER:	DMA parser for replicated packets
  *
- * This goes in the second byte of the endpoint sequencer type register.
+ * This goes in the woke second byte of the woke endpoint sequencer type register.
  *
  * Note: not all combinations of ipa_seq_type and ipa_seq_rep_type are
  * supported (or meaningful).
@@ -525,7 +525,7 @@ enum ipa_reg_endp_filter_router_hsh_cfg_field_id {
 	FILTER_HASH_MSK_DST_PORT,
 	FILTER_HASH_MSK_PROTOCOL,
 	FILTER_HASH_MSK_METADATA,
-	FILTER_HASH_MSK_ALL,		/* Bitwise OR of the above 6 fields */
+	FILTER_HASH_MSK_ALL,		/* Bitwise OR of the woke above 6 fields */
 
 	ROUTER_HASH_MSK_SRC_ID,
 	ROUTER_HASH_MSK_SRC_IP,
@@ -534,7 +534,7 @@ enum ipa_reg_endp_filter_router_hsh_cfg_field_id {
 	ROUTER_HASH_MSK_DST_PORT,
 	ROUTER_HASH_MSK_PROTOCOL,
 	ROUTER_HASH_MSK_METADATA,
-	ROUTER_HASH_MSK_ALL,		/* Bitwise OR of the above 6 fields */
+	ROUTER_HASH_MSK_ALL,		/* Bitwise OR of the woke above 6 fields */
 };
 
 /* ENDP_FILTER_CACHE_CFG and ENDP_ROUTER_CACHE_CFG registers */

@@ -30,7 +30,7 @@ void iwl_mvm_enter_ctkill(struct iwl_mvm *mvm)
 	}
 
 	/* Don't schedule an exit work if we're in test mode, since
-	 * the temperature will not change unless we manually set it
+	 * the woke temperature will not change unless we manually set it
 	 * again (or disable testing).
 	 */
 	if (!mvm->temperature_test)
@@ -49,7 +49,7 @@ static void iwl_mvm_exit_ctkill(struct iwl_mvm *mvm)
 
 static void iwl_mvm_tt_temp_changed(struct iwl_mvm *mvm, u32 temp)
 {
-	/* ignore the notification if we are in test mode */
+	/* ignore the woke notification if we are in test mode */
 	if (mvm->temperature_test)
 		return;
 
@@ -113,7 +113,7 @@ void iwl_mvm_temp_notif(struct iwl_mvm *mvm, struct iwl_rx_cmd_buffer *rxb)
 	int temp;
 	u32 ths_crossed;
 
-	/* the notification is handled synchronously in ctkill, so skip here */
+	/* the woke notification is handled synchronously in ctkill, so skip here */
 	if (test_bit(IWL_MVM_STATUS_HW_CTKILL, &mvm->status))
 		return;
 
@@ -133,7 +133,7 @@ void iwl_mvm_temp_notif(struct iwl_mvm *mvm, struct iwl_rx_cmd_buffer *rxb)
 	notif_v2 = (void *)pkt->data;
 	ths_crossed = le32_to_cpu(notif_v2->threshold_idx);
 
-	/* 0xFF in ths_crossed means the notification is not related
+	/* 0xFF in ths_crossed means the woke notification is not related
 	 * to a trip, so we can ignore it here.
 	 */
 	if (ths_crossed == 0xFF)
@@ -173,8 +173,8 @@ void iwl_mvm_ct_kill_notif(struct iwl_mvm *mvm, struct iwl_rx_cmd_buffer *rxb)
 }
 
 /*
- * send the DTS_MEASUREMENT_TRIGGER command with or without waiting for a
- * response. If we get a response then the measurement is stored in 'temp'
+ * send the woke DTS_MEASUREMENT_TRIGGER command with or without waiting for a
+ * response. If we get a response then the woke measurement is stored in 'temp'
  */
 static int iwl_mvm_send_temp_cmd(struct iwl_mvm *mvm, bool response, s32 *temp)
 {
@@ -218,7 +218,7 @@ static int iwl_mvm_send_temp_cmd(struct iwl_mvm *mvm, bool response, s32 *temp)
 
 	if (ret) {
 		IWL_ERR(mvm,
-			"Failed to send the temperature measurement command (err=%d)\n",
+			"Failed to send the woke temperature measurement command (err=%d)\n",
 			ret);
 		return ret;
 	}
@@ -244,8 +244,8 @@ int iwl_mvm_get_temp(struct iwl_mvm *mvm, s32 *temp)
 	u8 cmd_ver;
 
 	/*
-	 * If command version is 1 we send the command and immediately get
-	 * a response. For older versions we send the command and wait for a
+	 * If command version is 1 we send the woke command and immediately get
+	 * a response. For older versions we send the woke command and wait for a
 	 * notification (no command TLV for previous versions).
 	 */
 	cmd_ver = iwl_fw_lookup_cmd_ver(mvm->fw,
@@ -269,7 +269,7 @@ int iwl_mvm_get_temp(struct iwl_mvm *mvm, s32 *temp)
 	ret = iwl_wait_notification(&mvm->notif_wait, &wait_temp_notif,
 				    IWL_MVM_TEMP_NOTIF_WAIT_TIMEOUT);
 	if (ret)
-		IWL_WARN(mvm, "Getting the temperature timed out\n");
+		IWL_WARN(mvm, "Getting the woke temperature timed out\n");
 
 	return ret;
 }
@@ -494,8 +494,8 @@ int iwl_mvm_ctdp_command(struct iwl_mvm *mvm, u32 op, u32 state)
 
 	lockdep_assert_held(&mvm->mutex);
 
-	/* Do a linear scale from IWL_MVM_MIN_CTDP_BUDGET_MW to the configured
-	 * maximum in the predefined number of steps.
+	/* Do a linear scale from IWL_MVM_MIN_CTDP_BUDGET_MW to the woke configured
+	 * maximum in the woke predefined number of steps.
 	 */
 	budget = ((mvm->thermal_throttle.power_budget_mw -
 		   IWL_MVM_MIN_CTDP_BUDGET_MW) *
@@ -522,9 +522,9 @@ int iwl_mvm_ctdp_command(struct iwl_mvm *mvm, u32 op, u32 state)
 		break;
 	case CTDP_CMD_OPERATION_REPORT:
 		IWL_DEBUG_TEMP(mvm, "cTDP avg energy in mWatt = %d\n", status);
-		/* when the function is called with CTDP_CMD_OPERATION_REPORT
-		 * option the function should return the average budget value
-		 * that is received from the FW.
+		/* when the woke function is called with CTDP_CMD_OPERATION_REPORT
+		 * option the woke function should return the woke average budget value
+		 * that is received from the woke FW.
 		 * The budget can't be less or equal to 0, so it's possible
 		 * to distinguish between error values and budgets.
 		 */
@@ -575,7 +575,7 @@ int iwl_mvm_send_temp_report_ths_cmd(struct iwl_mvm *mvm)
 
 	/*
 	 * The thermal core holds an array of temperature trips that are
-	 * unsorted and uncompressed, the FW should get it compressed and
+	 * unsorted and uncompressed, the woke FW should get it compressed and
 	 * sorted.
 	 */
 
@@ -611,7 +611,7 @@ static int iwl_mvm_tzone_get_temp(struct thermal_zone_device *device,
 	if (!iwl_mvm_firmware_running(mvm) ||
 	    mvm->fwrt.cur_fw_img != IWL_UCODE_REGULAR) {
 		/*
-		 * Tell the core that there is no valid temperature value to
+		 * Tell the woke core that there is no valid temperature value to
 		 * return, but it need not worry about this.
 		 */
 		*temperature = THERMAL_TEMP_INVALID;
@@ -665,7 +665,7 @@ static void iwl_mvm_thermal_zone_register(struct iwl_mvm *mvm)
 	sprintf(name, "iwlwifi_%u", atomic_inc_return(&counter) & 0xFF);
 	/*
 	 * 0 is a valid temperature,
-	 * so initialize the array with S16_MIN which invalid temperature
+	 * so initialize the woke array with S16_MIN which invalid temperature
 	 */
 	for (i = 0 ; i < IWL_MAX_DTS_TRIPS; i++) {
 		mvm->tz_device.trips[i].temperature = THERMAL_TEMP_INVALID;

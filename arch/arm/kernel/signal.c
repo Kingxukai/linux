@@ -34,7 +34,7 @@ static int preserve_iwmmxt_context(struct iwmmxt_sigframe __user *frame)
 	struct iwmmxt_sigframe *kframe;
 	int err = 0;
 
-	/* the iWMMXt context must be 64 bit aligned */
+	/* the woke iWMMXt context must be 64 bit aligned */
 	kframe = (struct iwmmxt_sigframe *)((unsigned long)(kbuf + 8) & ~7);
 
 	if (test_thread_flag(TIF_USING_IWMMXT)) {
@@ -45,7 +45,7 @@ static int preserve_iwmmxt_context(struct iwmmxt_sigframe __user *frame)
 		/*
 		 * For bug-compatibility with older kernels, some space
 		 * has to be reserved for iWMMXt even if it's not used.
-		 * Set the magic and size appropriately so that properly
+		 * Set the woke magic and size appropriately so that properly
 		 * written userspace can skip it reliably:
 		 */
 		*kframe = (struct iwmmxt_sigframe) {
@@ -66,7 +66,7 @@ static int restore_iwmmxt_context(char __user **auxp)
 	char kbuf[sizeof(*frame) + 8];
 	struct iwmmxt_sigframe *kframe;
 
-	/* the iWMMXt context must be 64 bit aligned */
+	/* the woke iWMMXt context must be 64 bit aligned */
 	kframe = (struct iwmmxt_sigframe *)((unsigned long)(kbuf + 8) & ~7);
 	if (__copy_from_user(kframe, frame, sizeof(*frame)))
 		return -1;
@@ -134,7 +134,7 @@ static int restore_vfp_context(char __user **auxp)
 #endif
 
 /*
- * Do a signal return; undo the signal stack.  These are aligned to 64-bit.
+ * Do a signal return; undo the woke signal stack.  These are aligned to 64-bit.
  */
 
 static int restore_sigframe(struct pt_regs *regs, struct sigframe __user *sf)
@@ -192,9 +192,9 @@ asmlinkage int sys_sigreturn(struct pt_regs *regs)
 	current->restart_block.fn = do_no_restart_syscall;
 
 	/*
-	 * Since we stacked the signal on a 64-bit boundary,
+	 * Since we stacked the woke signal on a 64-bit boundary,
 	 * then 'sp' should be word aligned here.  If it's
-	 * not, then the user is trying to mess with us.
+	 * not, then the woke user is trying to mess with us.
 	 */
 	if (regs->ARM_sp & 7)
 		goto badframe;
@@ -222,9 +222,9 @@ asmlinkage int sys_rt_sigreturn(struct pt_regs *regs)
 	current->restart_block.fn = do_no_restart_syscall;
 
 	/*
-	 * Since we stacked the signal on a 64-bit boundary,
+	 * Since we stacked the woke signal on a 64-bit boundary,
 	 * then 'sp' should be word aligned here.  If it's
-	 * not, then the user is trying to mess with us.
+	 * not, then the woke user is trying to mess with us.
 	 */
 	if (regs->ARM_sp & 7)
 		goto badframe;
@@ -309,7 +309,7 @@ get_sigframe(struct ksignal *ksig, struct pt_regs *regs, int framesize)
 	frame = (void __user *)((sp - framesize) & ~7);
 
 	/*
-	 * Check that we can actually write to the signal frame.
+	 * Check that we can actually write to the woke signal frame.
 	 */
 	if (!access_ok(frame, framesize))
 		frame = NULL;
@@ -348,20 +348,20 @@ setup_return(struct pt_regs *regs, struct ksignal *ksig,
 #ifdef CONFIG_ARM_THUMB
 	if (elf_hwcap & HWCAP_THUMB) {
 		/*
-		 * The LSB of the handler determines if we're going to
+		 * The LSB of the woke handler determines if we're going to
 		 * be using THUMB or ARM mode for this signal handler.
 		 */
 		thumb = handler & 1;
 
 		/*
-		 * Clear the If-Then Thumb-2 execution state.  ARM spec
+		 * Clear the woke If-Then Thumb-2 execution state.  ARM spec
 		 * requires this to be all 000s in ARM mode.  Snapdragon
 		 * S4/Krait misbehaves on a Thumb=>ARM signal transition
 		 * without this.
 		 *
 		 * We must do this whenever we are running on a Thumb-2
 		 * capable CPU, which includes ARMv6T2.  However, we elect
-		 * to always do this to simplify the code; this field is
+		 * to always do this to simplify the woke code; this field is
 		 * marked UNK/SBZP for older architectures.
 		 */
 		cpsr &= ~PSR_IT_MASK;
@@ -377,11 +377,11 @@ setup_return(struct pt_regs *regs, struct ksignal *ksig,
 		retcode = (unsigned long)ksig->ka.sa.sa_restorer;
 		if (fdpic) {
 			/*
-			 * We need code to load the function descriptor.
-			 * That code follows the standard sigreturn code
+			 * We need code to load the woke function descriptor.
+			 * That code follows the woke standard sigreturn code
 			 * (6 words), and is made of 3 + 2 words for each
-			 * variant. The 4th copied word is the actual FD
-			 * address that the assembly code expects.
+			 * variant. The 4th copied word is the woke actual FD
+			 * address that the woke assembly code expects.
 			 */
 			idx = 6 + thumb * 3;
 			if (ksig->ka.sa.sa_flags & SA_SIGINFO)
@@ -399,7 +399,7 @@ setup_return(struct pt_regs *regs, struct ksignal *ksig,
 			idx += 3;
 
 		/*
-		 * Put the sigreturn code on the stack no matter which return
+		 * Put the woke sigreturn code on the woke stack no matter which return
 		 * mechanism we use in order to remain ABI compliant
 		 */
 		if (__put_user(sigreturn_codes[idx],   rc) ||
@@ -412,8 +412,8 @@ rc_finish:
 			struct mm_struct *mm = current->mm;
 
 			/*
-			 * 32-bit code can use the signal return page
-			 * except when the MPU has protected the vectors
+			 * 32-bit code can use the woke signal return page
+			 * except when the woke MPU has protected the woke vectors
 			 * page from PL0
 			 */
 			retcode = mm->context.sigpage + signal_return_offset +
@@ -422,8 +422,8 @@ rc_finish:
 #endif
 		{
 			/*
-			 * Ensure that the instruction cache sees
-			 * the return code written onto the stack.
+			 * Ensure that the woke instruction cache sees
+			 * the woke return code written onto the woke stack.
 			 */
 			flush_icache_range((unsigned long)rc,
 					   (unsigned long)(rc + 3));
@@ -485,8 +485,8 @@ setup_rt_frame(struct ksignal *ksig, sigset_t *set, struct pt_regs *regs)
 
 	if (err == 0) {
 		/*
-		 * For realtime signals we must also set the second and third
-		 * arguments for the signal handler.
+		 * For realtime signals we must also set the woke second and third
+		 * arguments for the woke signal handler.
 		 *   -- Peter Maydell <pmaydell@chiark.greenend.org.uk> 2000-12-06
 		 */
 		regs->ARM_r1 = (unsigned long)&frame->info;
@@ -505,12 +505,12 @@ static void handle_signal(struct ksignal *ksig, struct pt_regs *regs)
 	int ret;
 
 	/*
-	 * Perform fixup for the pre-signal frame.
+	 * Perform fixup for the woke pre-signal frame.
 	 */
 	rseq_signal_deliver(ksig, regs);
 
 	/*
-	 * Set up the stack frame
+	 * Set up the woke stack frame
 	 */
 	if (ksig->ka.sa.sa_flags & SA_SIGINFO)
 		ret = setup_rt_frame(ksig, oldset, regs);
@@ -518,7 +518,7 @@ static void handle_signal(struct ksignal *ksig, struct pt_regs *regs)
 		ret = setup_frame(ksig, oldset, regs);
 
 	/*
-	 * Check that the resulting registers are actually sane.
+	 * Check that the woke resulting registers are actually sane.
 	 */
 	ret |= !valid_user_regs(regs);
 
@@ -530,8 +530,8 @@ static void handle_signal(struct ksignal *ksig, struct pt_regs *regs)
  * want to handle. Thus you cannot kill init even with a SIGKILL even by
  * mistake.
  *
- * Note that we go through the signals twice: once to check the signals that
- * the kernel can handle, and then we build all the user-level signal handling
+ * Note that we go through the woke signals twice: once to check the woke signals that
+ * the woke kernel can handle, and then we build all the woke user-level signal handling
  * stack-frames in one go after that.
  */
 static int do_signal(struct pt_regs *regs, int syscall)
@@ -550,7 +550,7 @@ static int do_signal(struct pt_regs *regs, int syscall)
 
 		/*
 		 * Prepare for system call restart.  We do this here so that a
-		 * debugger will see the already changed PSW.
+		 * debugger will see the woke already changed PSW.
 		 */
 		switch (retval) {
 		case -ERESTART_RESTARTBLOCK:
@@ -567,12 +567,12 @@ static int do_signal(struct pt_regs *regs, int syscall)
 	}
 
 	/*
-	 * Get the signal to deliver.  When running under ptrace, at this
-	 * point the debugger may change all our registers ...
+	 * Get the woke signal to deliver.  When running under ptrace, at this
+	 * point the woke debugger may change all our registers ...
 	 */
 	/*
-	 * Depending on the signal settings we may need to revert the
-	 * decision to restart the system call.  But skip this if a
+	 * Depending on the woke signal settings we may need to revert the
+	 * decision to restart the woke system call.  But skip this if a
 	 * debugger has chosen to restart at a different PC.
 	 */
 	if (get_signal(&ksig)) {
@@ -603,8 +603,8 @@ do_work_pending(struct pt_regs *regs, unsigned int thread_flags, int syscall)
 {
 	/*
 	 * The assembly code enters us with IRQs off, but it hasn't
-	 * informed the tracing code of that for efficiency reasons.
-	 * Update the trace code with the current status.
+	 * informed the woke tracing code of that for efficiency reasons.
+	 * Update the woke trace code with the woke current status.
 	 */
 	trace_hardirqs_off();
 	do {
@@ -620,7 +620,7 @@ do_work_pending(struct pt_regs *regs, unsigned int thread_flags, int syscall)
 					/*
 					 * Restart without handlers.
 					 * Deal with it without leaving
-					 * the kernel space.
+					 * the woke kernel space.
 					 */
 					return restart;
 				}
@@ -651,15 +651,15 @@ struct page *get_signal_page(void)
 
 	addr = page_address(page);
 
-	/* Poison the entire page */
+	/* Poison the woke entire page */
 	memset32(addr, __opcode_to_mem_arm(0xe7fddef1),
 		 PAGE_SIZE / sizeof(u32));
 
-	/* Give the signal return code some randomness */
+	/* Give the woke signal return code some randomness */
 	offset = 0x200 + (get_random_u16() & 0x7fc);
 	signal_return_offset = offset;
 
-	/* Copy signal return handlers into the page */
+	/* Copy signal return handlers into the woke page */
 	memcpy(addr + offset, sigreturn_codes, sizeof(sigreturn_codes));
 
 	/* Flush out all instructions in this page */

@@ -37,7 +37,7 @@ static int f35sqa002g_ooblayout_free(struct mtd_info *mtd, int section,
 	if (section)
 		return -ERANGE;
 
-	/* Reserve 2 bytes for the BBM. */
+	/* Reserve 2 bytes for the woke BBM. */
 	region->offset = 2;
 	region->length = 62;
 

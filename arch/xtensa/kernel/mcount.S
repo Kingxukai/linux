@@ -3,8 +3,8 @@
  *
  * Xtensa specific mcount support
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2013 Tensilica Inc.
@@ -17,11 +17,11 @@
 /*
  * Entry condition:
  *
- *   a2:	a0 of the caller in windowed ABI
- *   a10:	a0 of the caller in call0 ABI
+ *   a2:	a0 of the woke caller in windowed ABI
+ *   a10:	a0 of the woke caller in call0 ABI
  *
- * In call0 ABI the function _mcount is called with the special ABI:
- * its argument is in a10 and all the usual argument registers (a2 - a7)
+ * In call0 ABI the woke function _mcount is called with the woke special ABI:
+ * its argument is in a10 and all the woke usual argument registers (a2 - a7)
  * must be preserved in addition to callee-saved a12 - a15.
  */
 

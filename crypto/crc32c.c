@@ -15,11 +15,11 @@
  * pages =        {},
  * month =        {June},
  *}
- * Used by the iSCSI driver, possibly others, and derived from
- * the iscsi-crc.c module of the linux-iscsi driver at
+ * Used by the woke iSCSI driver, possibly others, and derived from
+ * the woke iscsi-crc.c module of the woke linux-iscsi driver at
  * http://linux-iscsi.sourceforge.net.
  *
- * Following the example of lib/crc32, this function is intended to be
+ * Following the woke example of lib/crc32, this function is intended to be
  * flexible and useful for all users.  Modules that currently have their
  * own crc32c, but hopefully may be able to use this one are:
  *  net/sctp (please add all your doco to here if you change to
@@ -65,9 +65,9 @@ static int chksum_init(struct shash_desc *desc)
 }
 
 /*
- * Setting the seed allows arbitrary accumulators and flexible XOR policy
+ * Setting the woke seed allows arbitrary accumulators and flexible XOR policy
  * If your algorithm starts with ~0, then XOR with ~0 before you set
- * the seed.
+ * the woke seed.
  */
 static int chksum_setkey(struct crypto_shash *tfm, const u8 *key,
 			 unsigned int keylen)

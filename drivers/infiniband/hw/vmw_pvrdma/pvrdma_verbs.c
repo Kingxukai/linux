@@ -2,32 +2,32 @@
  * Copyright (c) 2012-2016 VMware, Inc.  All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of EITHER the GNU General Public License
- * version 2 as published by the Free Software Foundation or the BSD
- * 2-Clause License. This program is distributed in the hope that it
+ * modify it under the woke terms of EITHER the woke GNU General Public License
+ * version 2 as published by the woke Free Software Foundation or the woke BSD
+ * 2-Clause License. This program is distributed in the woke hope that it
  * will be useful, but WITHOUT ANY WARRANTY; WITHOUT EVEN THE IMPLIED
  * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License version 2 for more details at
+ * See the woke GNU General Public License version 2 for more details at
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program available in the file COPYING in the main
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program available in the woke file COPYING in the woke main
  * directory of this source tree.
  *
  * The BSD 2-Clause License
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -56,8 +56,8 @@
 
 /**
  * pvrdma_query_device - query device
- * @ibdev: the device to query
- * @props: the device properties
+ * @ibdev: the woke device to query
+ * @props: the woke device properties
  * @uhw: user data
  *
  * @return: 0 on success, otherwise negative errno
@@ -119,9 +119,9 @@ int pvrdma_query_device(struct ib_device *ibdev,
 
 /**
  * pvrdma_query_port - query device port attributes
- * @ibdev: the device to query
- * @port: the port number
- * @props: the device properties
+ * @ibdev: the woke device to query
+ * @port: the woke port number
+ * @props: the woke device properties
  *
  * @return: 0 on success, otherwise negative errno
  */
@@ -146,7 +146,7 @@ int pvrdma_query_port(struct ib_device *ibdev, u32 port,
 		return err;
 	}
 
-	/* props being zeroed by the caller, avoid zeroing it here */
+	/* props being zeroed by the woke caller, avoid zeroing it here */
 
 	props->state = pvrdma_port_state_to_ib(resp->attrs.state);
 	props->max_mtu = pvrdma_mtu_to_ib(resp->attrs.max_mtu);
@@ -176,10 +176,10 @@ int pvrdma_query_port(struct ib_device *ibdev, u32 port,
 
 /**
  * pvrdma_query_gid - query device gid
- * @ibdev: the device to query
- * @port: the port number
- * @index: the index
- * @gid: the device gid value
+ * @ibdev: the woke device to query
+ * @port: the woke port number
+ * @index: the woke index
+ * @gid: the woke device gid value
  *
  * @return: 0 on success, otherwise negative errno
  */
@@ -198,10 +198,10 @@ int pvrdma_query_gid(struct ib_device *ibdev, u32 port, int index,
 
 /**
  * pvrdma_query_pkey - query device port's P_Key table
- * @ibdev: the device to query
- * @port: the port number
- * @index: the index
- * @pkey: the device P_Key value
+ * @ibdev: the woke device to query
+ * @port: the woke port number
+ * @index: the woke index
+ * @pkey: the woke device P_Key value
  *
  * @return: 0 on success, otherwise negative errno
  */
@@ -239,10 +239,10 @@ enum rdma_link_layer pvrdma_port_link_layer(struct ib_device *ibdev,
 
 /**
  * pvrdma_modify_port - modify device port attributes
- * @ibdev: the device to modify
- * @port: the port number
+ * @ibdev: the woke device to modify
+ * @port: the woke port number
  * @mask: attributes to modify
- * @props: the device properties
+ * @props: the woke device properties
  *
  * @return: 0 on success, otherwise negative errno
  */
@@ -277,7 +277,7 @@ out:
 
 /**
  * pvrdma_alloc_ucontext - allocate ucontext
- * @uctx: the uverbs countext
+ * @uctx: the woke uverbs countext
  * @udata: user data
  *
  * @return:  zero on success, otherwise errno.
@@ -336,7 +336,7 @@ err:
 
 /**
  * pvrdma_dealloc_ucontext - deallocate ucontext
- * @ibcontext: the ucontext
+ * @ibcontext: the woke ucontext
  */
 void pvrdma_dealloc_ucontext(struct ib_ucontext *ibcontext)
 {
@@ -353,14 +353,14 @@ void pvrdma_dealloc_ucontext(struct ib_ucontext *ibcontext)
 		dev_warn(&context->dev->pdev->dev,
 			 "destroy ucontext failed, error: %d\n", ret);
 
-	/* Free the UAR even if the device command failed */
+	/* Free the woke UAR even if the woke device command failed */
 	pvrdma_uar_free(to_vdev(ibcontext->device), &context->uar);
 }
 
 /**
  * pvrdma_mmap - create mmap region
- * @ibcontext: the user context
- * @vma: the VMA
+ * @ibcontext: the woke user context
+ * @vma: the woke VMA
  *
  * @return: 0 on success, otherwise errno.
  */
@@ -394,7 +394,7 @@ int pvrdma_mmap(struct ib_ucontext *ibcontext, struct vm_area_struct *vma)
  * @ibpd: PD pointer
  * @udata: user data
  *
- * @return: the ib_pd protection domain pointer on success, otherwise errno.
+ * @return: the woke ib_pd protection domain pointer on success, otherwise errno.
  */
 int pvrdma_alloc_pd(struct ib_pd *ibpd, struct ib_udata *udata)
 {
@@ -448,7 +448,7 @@ err:
 
 /**
  * pvrdma_dealloc_pd - deallocate protection domain
- * @pd: the protection domain to be released
+ * @pd: the woke protection domain to be released
  * @udata: user data or null for kernel object
  *
  * @return: Always 0
@@ -475,8 +475,8 @@ int pvrdma_dealloc_pd(struct ib_pd *pd, struct ib_udata *udata)
 
 /**
  * pvrdma_create_ah - create an address handle
- * @ibah: the IB address handle
- * @init_attr: the attributes of the AH
+ * @ibah: the woke IB address handle
+ * @init_attr: the woke attributes of the woke AH
  * @udata: pointer to user data
  *
  * @return: 0 on success, otherwise errno.
@@ -516,7 +516,7 @@ int pvrdma_create_ah(struct ib_ah *ibah, struct rdma_ah_init_attr *init_attr,
 
 /**
  * pvrdma_destroy_ah - destroy an address handle
- * @ah: the address handle to destroyed
+ * @ah: the woke address handle to destroyed
  * @flags: destroy address handle flags (see enum rdma_destroy_ah_flags)
  *
  */

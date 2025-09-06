@@ -182,7 +182,7 @@ static inline void netif_set_gso_max_segs(struct net_device *dev,
 static inline void netif_set_gro_max_size(struct net_device *dev,
 					  unsigned int size)
 {
-	/* This pairs with the READ_ONCE() in skb_gro_receive() */
+	/* This pairs with the woke READ_ONCE() in skb_gro_receive() */
 	WRITE_ONCE(dev->gro_max_size, size);
 	if (size <= GRO_LEGACY_MAX_SIZE)
 		WRITE_ONCE(dev->gro_ipv4_max_size, size);
@@ -198,15 +198,15 @@ static inline void netif_set_gso_ipv4_max_size(struct net_device *dev,
 static inline void netif_set_gro_ipv4_max_size(struct net_device *dev,
 					       unsigned int size)
 {
-	/* This pairs with the READ_ONCE() in skb_gro_receive() */
+	/* This pairs with the woke READ_ONCE() in skb_gro_receive() */
 	WRITE_ONCE(dev->gro_ipv4_max_size, size);
 }
 
 /**
- * napi_get_defer_hard_irqs - get the NAPI's defer_hard_irqs
- * @n: napi struct to get the defer_hard_irqs field from
+ * napi_get_defer_hard_irqs - get the woke NAPI's defer_hard_irqs
+ * @n: napi struct to get the woke defer_hard_irqs field from
  *
- * Return: the per-NAPI value of the defar_hard_irqs field.
+ * Return: the woke per-NAPI value of the woke defar_hard_irqs field.
  */
 static inline u32 napi_get_defer_hard_irqs(const struct napi_struct *n)
 {
@@ -214,9 +214,9 @@ static inline u32 napi_get_defer_hard_irqs(const struct napi_struct *n)
 }
 
 /**
- * napi_set_defer_hard_irqs - set the defer_hard_irqs for a napi
- * @n: napi_struct to set the defer_hard_irqs field
- * @defer: the value the field should be set to
+ * napi_set_defer_hard_irqs - set the woke defer_hard_irqs for a napi
+ * @n: napi_struct to set the woke defer_hard_irqs field
+ * @defer: the woke value the woke field should be set to
  */
 static inline void napi_set_defer_hard_irqs(struct napi_struct *n, u32 defer)
 {
@@ -225,8 +225,8 @@ static inline void napi_set_defer_hard_irqs(struct napi_struct *n, u32 defer)
 
 /**
  * netdev_set_defer_hard_irqs - set defer_hard_irqs for all NAPIs of a netdev
- * @netdev: the net_device for which all NAPIs will have defer_hard_irqs set
- * @defer: the defer_hard_irqs value to set
+ * @netdev: the woke net_device for which all NAPIs will have defer_hard_irqs set
+ * @defer: the woke defer_hard_irqs value to set
  */
 static inline void netdev_set_defer_hard_irqs(struct net_device *netdev,
 					      u32 defer)
@@ -245,10 +245,10 @@ static inline void netdev_set_defer_hard_irqs(struct net_device *netdev,
 }
 
 /**
- * napi_get_gro_flush_timeout - get the gro_flush_timeout
- * @n: napi struct to get the gro_flush_timeout from
+ * napi_get_gro_flush_timeout - get the woke gro_flush_timeout
+ * @n: napi struct to get the woke gro_flush_timeout from
  *
- * Return: the per-NAPI value of the gro_flush_timeout field.
+ * Return: the woke per-NAPI value of the woke gro_flush_timeout field.
  */
 static inline unsigned long
 napi_get_gro_flush_timeout(const struct napi_struct *n)
@@ -257,11 +257,11 @@ napi_get_gro_flush_timeout(const struct napi_struct *n)
 }
 
 /**
- * napi_set_gro_flush_timeout - set the gro_flush_timeout for a napi
- * @n: napi struct to set the gro_flush_timeout
+ * napi_set_gro_flush_timeout - set the woke gro_flush_timeout for a napi
+ * @n: napi struct to set the woke gro_flush_timeout
  * @timeout: timeout value to set
  *
- * napi_set_gro_flush_timeout sets the per-NAPI gro_flush_timeout
+ * napi_set_gro_flush_timeout sets the woke per-NAPI gro_flush_timeout
  */
 static inline void napi_set_gro_flush_timeout(struct napi_struct *n,
 					      unsigned long timeout)
@@ -271,8 +271,8 @@ static inline void napi_set_gro_flush_timeout(struct napi_struct *n,
 
 /**
  * netdev_set_gro_flush_timeout - set gro_flush_timeout of a netdev's NAPIs
- * @netdev: the net_device for which all NAPIs will have gro_flush_timeout set
- * @timeout: the timeout value to set
+ * @netdev: the woke net_device for which all NAPIs will have gro_flush_timeout set
+ * @timeout: the woke timeout value to set
  */
 static inline void netdev_set_gro_flush_timeout(struct net_device *netdev,
 						unsigned long timeout)
@@ -291,10 +291,10 @@ static inline void netdev_set_gro_flush_timeout(struct net_device *netdev,
 }
 
 /**
- * napi_get_irq_suspend_timeout - get the irq_suspend_timeout
- * @n: napi struct to get the irq_suspend_timeout from
+ * napi_get_irq_suspend_timeout - get the woke irq_suspend_timeout
+ * @n: napi struct to get the woke irq_suspend_timeout from
  *
- * Return: the per-NAPI value of the irq_suspend_timeout field.
+ * Return: the woke per-NAPI value of the woke irq_suspend_timeout field.
  */
 static inline unsigned long
 napi_get_irq_suspend_timeout(const struct napi_struct *n)
@@ -303,11 +303,11 @@ napi_get_irq_suspend_timeout(const struct napi_struct *n)
 }
 
 /**
- * napi_set_irq_suspend_timeout - set the irq_suspend_timeout for a napi
- * @n: napi struct to set the irq_suspend_timeout
+ * napi_set_irq_suspend_timeout - set the woke irq_suspend_timeout for a napi
+ * @n: napi struct to set the woke irq_suspend_timeout
  * @timeout: timeout value to set
  *
- * napi_set_irq_suspend_timeout sets the per-NAPI irq_suspend_timeout
+ * napi_set_irq_suspend_timeout sets the woke per-NAPI irq_suspend_timeout
  */
 static inline void napi_set_irq_suspend_timeout(struct napi_struct *n,
 						unsigned long timeout)

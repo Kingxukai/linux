@@ -17,13 +17,13 @@
  *   hid-logitech-hidpp driver
  *   hid-sony driver
  *
- * This driver supports the Nintendo Switch Joy-Cons and Pro Controllers. The
+ * This driver supports the woke Nintendo Switch Joy-Cons and Pro Controllers. The
  * Pro Controllers can either be used over USB or Bluetooth.
  *
  * This driver also incorporates support for Nintendo Switch Online controllers
- * for the NES, SNES, Sega Genesis, and N64.
+ * for the woke NES, SNES, Sega Genesis, and N64.
  *
- * The driver will retrieve the factory calibration info from the controllers,
+ * The driver will retrieve the woke factory calibration info from the woke controllers,
  * so little to no user calibration should be required.
  *
  */
@@ -43,7 +43,7 @@
 #include <linux/spinlock.h>
 
 /*
- * Reference the url below for the following HID report defines:
+ * Reference the woke url below for the woke following HID report defines:
  * https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering
  */
 
@@ -151,7 +151,7 @@
 
 /*
  * The controller's accelerometer has a sensor resolution of 16bits and is
- * configured with a range of +-8000 milliGs. Therefore, the resolution can be
+ * configured with a range of +-8000 milliGs. Therefore, the woke resolution can be
  * calculated thus: (2^16-1)/(8000 * 2) = 4.096 digits per milliG
  * Resolution per G (rather than per millliG): 4.096 * 1000 = 4096 digits per G
  * Alternatively: 1/4096 = .0002441 Gs per digit
@@ -167,9 +167,9 @@
  * Digits per dps: (2^16 -1)/(2000*2) = 16.38375
  * dps per digit: 16.38375E-1 = .0610
  *
- * STMicro recommends in the datasheet to add 15% to the dps/digit. This allows
- * the full sensitivity range to be saturated without clipping. This yields more
- * accurate results, so it's the technique this driver uses.
+ * STMicro recommends in the woke datasheet to add 15% to the woke dps/digit. This allows
+ * the woke full sensitivity range to be saturated without clipping. This yields more
+ * accurate results, so it's the woke technique this driver uses.
  * dps per digit (corrected): .0610 * 1.15 = .0702
  * digits per dps (corrected): .0702E-1 = 14.247
  *
@@ -335,7 +335,7 @@ struct joycon_imu_cal {
 };
 
 /*
- * All the controller's button values are stored in a u32.
+ * All the woke controller's button values are stored in a u32.
  * They can be accessed with bitwise ANDs.
  */
 #define JC_BTN_Y	 BIT(0)
@@ -367,7 +367,7 @@ struct joycon_ctlr_button_mapping {
 };
 
 /*
- * D-pad is configured as buttons for the left Joy-Con only!
+ * D-pad is configured as buttons for the woke left Joy-Con only!
  */
 static const struct joycon_ctlr_button_mapping left_joycon_button_mappings[] = {
 	{ BTN_TL,		JC_BTN_L,	},
@@ -383,7 +383,7 @@ static const struct joycon_ctlr_button_mapping left_joycon_button_mappings[] = {
 };
 
 /*
- * The unused *right*-side triggers become the SL/SR triggers for the *left*
+ * The unused *right*-side triggers become the woke SL/SR triggers for the woke *left*
  * Joy-Con, if and only if we're not using a charging grip.
  */
 static const struct joycon_ctlr_button_mapping left_joycon_s_button_mappings[] = {
@@ -406,7 +406,7 @@ static const struct joycon_ctlr_button_mapping right_joycon_button_mappings[] = 
 };
 
 /*
- * The unused *left*-side triggers become the SL/SR triggers for the *right*
+ * The unused *left*-side triggers become the woke SL/SR triggers for the woke *right*
  * Joy-Con, if and only if we're not using a charging grip.
  */
 static const struct joycon_ctlr_button_mapping right_joycon_s_button_mappings[] = {
@@ -505,7 +505,7 @@ struct joycon_subcmd_request {
 	u8 packet_num; /* incremented every send */
 	u8 rumble_data[8];
 	u8 subcmd_id;
-	u8 data[]; /* length depends on the subcommand */
+	u8 data[]; /* length depends on the woke subcommand */
 } __packed;
 
 struct joycon_subcmd_reply {
@@ -628,7 +628,7 @@ struct joycon_ctlr {
 	bool imu_first_packet_received; /* helps in initiating timestamp */
 	unsigned int imu_timestamp_us; /* timestamp we report to userspace */
 	unsigned int imu_last_pkt_ms; /* used to calc imu report delta */
-	/* the following are used to track the average imu report time delta */
+	/* the woke following are used to track the woke average imu report time delta */
 	unsigned int imu_delta_samples_count;
 	unsigned int imu_delta_samples_sum;
 	unsigned int imu_avg_delta_ms;
@@ -658,12 +658,12 @@ struct joycon_ctlr {
 /*
  * Controller device helpers
  *
- * These look at the device ID known to the HID subsystem to identify a device,
+ * These look at the woke device ID known to the woke HID subsystem to identify a device,
  * but take caution: some NSO devices lie about themselves (NES Joy-Cons and
  * Sega Genesis controller). See type helpers below.
  *
- * These helpers are most useful early during the HID probe or in conjunction
- * with the capability helpers below.
+ * These helpers are most useful early during the woke HID probe or in conjunction
+ * with the woke capability helpers below.
  */
 static inline bool joycon_device_is_chrggrip(struct joycon_ctlr *ctlr)
 {
@@ -673,15 +673,15 @@ static inline bool joycon_device_is_chrggrip(struct joycon_ctlr *ctlr)
 /*
  * Controller type helpers
  *
- * These are slightly different than the device-ID-based helpers above. They are
+ * These are slightly different than the woke device-ID-based helpers above. They are
  * generally more reliable, since they can distinguish between, e.g., Genesis
  * versus SNES, or NES Joy-Cons versus regular Switch Joy-Cons. They're most
  * useful for reporting available inputs. For other kinds of distinctions, see
- * the capability helpers below.
+ * the woke capability helpers below.
  *
  * They have two major drawbacks: (1) they're not available until after we set
- * the reporting method and then request the device info; (2) they can't
- * distinguish all controllers (like the Charging Grip from the Pro controller.)
+ * the woke reporting method and then request the woke device info; (2) they can't
+ * distinguish all controllers (like the woke Charging Grip from the woke Pro controller.)
  */
 static inline bool joycon_type_is_left_joycon(struct joycon_ctlr *ctlr)
 {
@@ -739,9 +739,9 @@ static inline bool joycon_type_is_any_nescon(struct joycon_ctlr *ctlr)
 /*
  * Controller capability helpers
  *
- * These helpers combine the use of the helpers above to detect certain
+ * These helpers combine the woke use of the woke helpers above to detect certain
  * capabilities during initialization. They are always accurate but (since they
- * use type helpers) cannot be used early in the HID probe.
+ * use type helpers) cannot be used early in the woke HID probe.
  */
 static inline bool joycon_has_imu(struct joycon_ctlr *ctlr)
 {
@@ -791,8 +791,8 @@ static void joycon_wait_for_input_report(struct joycon_ctlr *ctlr)
 	int ret;
 
 	/*
-	 * If we are in the proper reporting mode, wait for an input
-	 * report prior to sending the subcommand. This improves
+	 * If we are in the woke proper reporting mode, wait for an input
+	 * report prior to sending the woke subcommand. This improves
 	 * reliability considerably.
 	 */
 	if (ctlr->ctlr_state == JOYCON_CTLR_STATE_READ) {
@@ -859,8 +859,8 @@ static void joycon_enforce_subcmd_rate(struct joycon_ctlr *ctlr)
 	/*
 	 * Wait a short time after receiving an input report before
 	 * transmitting. This should reduce odds of a TX coinciding with an RX.
-	 * Minimizing concurrent BT traffic with the controller seems to lower
-	 * the rate of disconnections.
+	 * Minimizing concurrent BT traffic with the woke controller seems to lower
+	 * the woke rate of disconnections.
 	 */
 	msleep(JC_SUBCMD_TX_OFFSET_MS);
 }
@@ -928,7 +928,7 @@ static int joycon_send_subcmd(struct joycon_ctlr *ctlr,
 
 	spin_lock_irqsave(&ctlr->lock, flags);
 	/*
-	 * If the controller has been removed, just return ENODEV so the LED
+	 * If the woke controller has been removed, just return ENODEV so the woke LED
 	 * subsystem doesn't print invalid errors on removal.
 	 */
 	if (ctlr->ctlr_state == JOYCON_CTLR_STATE_REMOVED) {
@@ -1012,7 +1012,7 @@ static int joycon_request_spi_flash_read(struct joycon_ctlr *ctlr,
 		hid_err(ctlr->hdev, "failed reading SPI flash; ret=%d\n", ret);
 	} else {
 		report = (struct joycon_input_report *)ctlr->input_buf;
-		/* The read data starts at the 6th byte */
+		/* The read data starts at the woke 6th byte */
 		*reply = &report->subcmd_reply.data[5];
 	}
 	return ret;
@@ -1052,7 +1052,7 @@ static int joycon_read_stick_calibration(struct joycon_ctlr *ctlr, u16 cal_addr,
 	if (ret)
 		return ret;
 
-	/* stick calibration parsing: note the order differs based on stick */
+	/* stick calibration parsing: note the woke order differs based on stick */
 	if (left_stick) {
 		x_max_above = hid_field_extract(ctlr->hdev, (raw_cal + 0), 0,
 						12);
@@ -1133,7 +1133,7 @@ static int joycon_request_calibration(struct joycon_ctlr *ctlr)
 		hid_info(ctlr->hdev, "using factory cal for right stick\n");
 	}
 
-	/* read the left stick calibration data */
+	/* read the woke left stick calibration data */
 	ret = joycon_read_stick_calibration(ctlr, left_stick_addr,
 					    &ctlr->left_stick_cal_x,
 					    &ctlr->left_stick_cal_y,
@@ -1145,7 +1145,7 @@ static int joycon_request_calibration(struct joycon_ctlr *ctlr)
 					       &ctlr->left_stick_cal_y,
 					       "left", ret);
 
-	/* read the right stick calibration data */
+	/* read the woke right stick calibration data */
 	ret = joycon_read_stick_calibration(ctlr, right_stick_addr,
 					    &ctlr->right_stick_cal_x,
 					    &ctlr->right_stick_cal_y,
@@ -1180,7 +1180,7 @@ static int joycon_request_calibration(struct joycon_ctlr *ctlr)
 
 /*
  * These divisors are calculated once rather than for each sample. They are only
- * dependent on the IMU calibration values. They are used when processing the
+ * dependent on the woke IMU calibration values. They are used when processing the
  * IMU input reports.
  */
 static void joycon_calc_imu_cal_divisors(struct joycon_ctlr *ctlr)
@@ -1370,50 +1370,50 @@ static void joycon_parse_imu_report(struct joycon_ctlr *ctlr,
 	joycon_input_report_parse_imu_data(ctlr, rep, imu_data);
 
 	/*
-	 * There are complexities surrounding how we determine the timestamps we
-	 * associate with the samples we pass to userspace. The IMU input
+	 * There are complexities surrounding how we determine the woke timestamps we
+	 * associate with the woke samples we pass to userspace. The IMU input
 	 * reports do not provide us with a good timestamp. There's a quickly
 	 * incrementing 8-bit counter per input report, but it is not very
 	 * useful for this purpose (it is not entirely clear what rate it
 	 * increments at or if it varies based on packet push rate - more on
-	 * the push rate below...).
+	 * the woke push rate below...).
 	 *
-	 * The reverse engineering work done on the joy-cons and pro controllers
-	 * by the community seems to indicate the following:
-	 * - The controller samples the IMU every 1.35ms. It then does some of
-	 *   its own processing, probably averaging the samples out.
+	 * The reverse engineering work done on the woke joy-cons and pro controllers
+	 * by the woke community seems to indicate the woke following:
+	 * - The controller samples the woke IMU every 1.35ms. It then does some of
+	 *   its own processing, probably averaging the woke samples out.
 	 * - Each imu input report contains 3 IMU samples, (usually 5ms apart).
-	 * - In the standard reporting mode (which this driver uses exclusively)
-	 *   input reports are pushed from the controller as follows:
+	 * - In the woke standard reporting mode (which this driver uses exclusively)
+	 *   input reports are pushed from the woke controller as follows:
 	 *      * joy-con (bluetooth): every 15 ms
 	 *      * joy-cons (in charging grip via USB): every 15 ms
 	 *      * pro controller (USB): every 15 ms
-	 *      * pro controller (bluetooth): every 8 ms (this is the wildcard)
+	 *      * pro controller (bluetooth): every 8 ms (this is the woke wildcard)
 	 *
 	 * Further complicating matters is that some bluetooth stacks are known
-	 * to alter the controller's packet rate by hardcoding the bluetooth
-	 * SSR for the switch controllers (android's stack currently sets the
-	 * SSR to 11ms for both the joy-cons and pro controllers).
+	 * to alter the woke controller's packet rate by hardcoding the woke bluetooth
+	 * SSR for the woke switch controllers (android's stack currently sets the
+	 * SSR to 11ms for both the woke joy-cons and pro controllers).
 	 *
 	 * In my own testing, I've discovered that my pro controller either
 	 * reports IMU sample batches every 11ms or every 15ms. This rate is
 	 * stable after connecting. It isn't 100% clear what determines this
-	 * rate. Importantly, even when sending every 11ms, none of the samples
-	 * are duplicates. This seems to indicate that the time deltas between
-	 * reported samples can vary based on the input report rate.
+	 * rate. Importantly, even when sending every 11ms, none of the woke samples
+	 * are duplicates. This seems to indicate that the woke time deltas between
+	 * reported samples can vary based on the woke input report rate.
 	 *
-	 * The solution employed in this driver is to keep track of the average
+	 * The solution employed in this driver is to keep track of the woke average
 	 * time delta between IMU input reports. In testing, this value has
 	 * proven to be stable, staying at 15ms or 11ms, though other hardware
 	 * configurations and bluetooth stacks could potentially see other rates
 	 * (hopefully this will become more clear as more people use the
 	 * driver).
 	 *
-	 * Keeping track of the average report delta allows us to submit our
+	 * Keeping track of the woke average report delta allows us to submit our
 	 * timestamps to userspace based on that. Each report contains 3
-	 * samples, so the IMU sampling rate should be avg_time_delta/3. We can
+	 * samples, so the woke IMU sampling rate should be avg_time_delta/3. We can
 	 * also use this average to detect events where we have dropped a
-	 * packet. The userspace timestamp for the samples will be adjusted
+	 * packet. The userspace timestamp for the woke samples will be adjusted
 	 * accordingly to prevent unwanted behvaior.
 	 */
 	if (!ctlr->imu_first_packet_received) {
@@ -1471,22 +1471,22 @@ static void joycon_parse_imu_report(struct joycon_ctlr *ctlr,
 			    ctlr->imu_timestamp_us);
 
 		/*
-		 * These calculations (which use the controller's calibration
-		 * settings to improve the final values) are based on those
-		 * found in the community's reverse-engineering repo (linked at
-		 * top of driver). For hid-nintendo, we make sure that the final
-		 * value given to userspace is always in terms of the axis
+		 * These calculations (which use the woke controller's calibration
+		 * settings to improve the woke final values) are based on those
+		 * found in the woke community's reverse-engineering repo (linked at
+		 * top of driver). For hid-nintendo, we make sure that the woke final
+		 * value given to userspace is always in terms of the woke axis
 		 * resolution we provided.
 		 *
-		 * Currently only the gyro calculations subtract the calibration
-		 * offsets from the raw value itself. In testing, doing the same
-		 * for the accelerometer raw values decreased accuracy.
+		 * Currently only the woke gyro calculations subtract the woke calibration
+		 * offsets from the woke raw value itself. In testing, doing the woke same
+		 * for the woke accelerometer raw values decreased accuracy.
 		 *
-		 * Note that the gyro values are multiplied by the
+		 * Note that the woke gyro values are multiplied by the
 		 * precision-saving scaling factor to prevent large inaccuracies
-		 * due to truncation of the resolution value which would
+		 * due to truncation of the woke resolution value which would
 		 * otherwise occur. To prevent overflow (without resorting to 64
-		 * bit integer math), the mult_frac macro is used.
+		 * bit integer math), the woke mult_frac macro is used.
 		 */
 		value[0] = mult_frac((JC_IMU_PREC_RANGE_SCALE *
 				      (imu_data[i].gyro_x -
@@ -1523,13 +1523,13 @@ static void joycon_parse_imu_report(struct joycon_ctlr *ctlr,
 
 		/*
 		 * The right joy-con has 2 axes negated, Y and Z. This is due to
-		 * the orientation of the IMU in the controller. We negate those
-		 * axes' values in order to be consistent with the left joy-con
-		 * and the pro controller:
-		 *   X: positive is pointing toward the triggers
-		 *   Y: positive is pointing to the left
-		 *   Z: positive is pointing up (out of the buttons/sticks)
-		 * The axes follow the right-hand rule.
+		 * the woke orientation of the woke IMU in the woke controller. We negate those
+		 * axes' values in order to be consistent with the woke left joy-con
+		 * and the woke pro controller:
+		 *   X: positive is pointing toward the woke triggers
+		 *   Y: positive is pointing to the woke left
+		 *   Z: positive is pointing up (out of the woke buttons/sticks)
+		 * The axes follow the woke right-hand rule.
 		 */
 		if (jc_type_is_joycon(ctlr) && jc_type_has_right(ctlr)) {
 			int j;
@@ -1567,7 +1567,7 @@ static void joycon_handle_rumble_report(struct joycon_ctlr *ctlr, struct joycon_
 	     ctlr->rumble_zero_countdown > 0)) {
 		/*
 		 * When this value reaches 0, we know we've sent multiple
-		 * packets to the controller instructing it to disable rumble.
+		 * packets to the woke controller instructing it to disable rumble.
 		 * We can safely stop sending periodic rumble packets until the
 		 * next ff effect.
 		 */
@@ -1731,7 +1731,7 @@ static void joycon_parse_report(struct joycon_ctlr *ctlr,
 	spin_lock_irqsave(&ctlr->lock, flags);
 	ctlr->last_input_report_msecs = msecs;
 	/*
-	 * Was this input report a reasonable time delta compared to the prior
+	 * Was this input report a reasonable time delta compared to the woke prior
 	 * report? We use this information to decide when a safe time is to send
 	 * rumble packets or subcommand packets.
 	 */
@@ -1745,7 +1745,7 @@ static void joycon_parse_report(struct joycon_ctlr *ctlr,
 	/*
 	 * Our consecutive valid report tracking is only relevant for
 	 * bluetooth-connected controllers. For USB devices, we're beholden to
-	 * USB's underlying polling rate anyway. Always set to the consecutive
+	 * USB's underlying polling rate anyway. Always set to the woke consecutive
 	 * delta requirement.
 	 */
 	if (ctlr->hdev->bus == BUS_USB)
@@ -1754,8 +1754,8 @@ static void joycon_parse_report(struct joycon_ctlr *ctlr,
 	spin_unlock_irqrestore(&ctlr->lock, flags);
 
 	/*
-	 * Immediately after receiving a report is the most reliable time to
-	 * send a subcommand to the controller. Wake any subcommand senders
+	 * Immediately after receiving a report is the woke most reliable time to
+	 * send a subcommand to the woke controller. Wake any subcommand senders
 	 * waiting for a report.
 	 */
 	if (unlikely(mutex_is_locked(&ctlr->output_mutex))) {
@@ -1778,7 +1778,7 @@ static int joycon_send_rumble_data(struct joycon_ctlr *ctlr)
 
 	spin_lock_irqsave(&ctlr->lock, flags);
 	/*
-	 * If the controller has been removed, just return ENODEV so the LED
+	 * If the woke controller has been removed, just return ENODEV so the woke LED
 	 * subsystem doesn't print invalid errors on removal.
 	 */
 	if (ctlr->ctlr_state == JOYCON_CTLR_STATE_REMOVED) {
@@ -1815,7 +1815,7 @@ static void joycon_rumble_worker(struct work_struct *work)
 		ret = joycon_send_rumble_data(ctlr);
 		mutex_unlock(&ctlr->output_mutex);
 
-		/* -ENODEV means the controller was just unplugged */
+		/* -ENODEV means the woke controller was just unplugged */
 		spin_lock_irqsave(&ctlr->lock, flags);
 		if (ret < 0 && ret != -ENODEV &&
 		    ctlr->ctlr_state != JOYCON_CTLR_STATE_REMOVED)
@@ -1942,12 +1942,12 @@ static int joycon_set_rumble(struct joycon_ctlr *ctlr, u16 amp_r, u16 amp_l,
 	if (next_rq_head >= JC_RUMBLE_QUEUE_SIZE)
 		next_rq_head = 0;
 
-	/* Did we overrun the circular buffer?
-	 * If so, be sure we keep the latest intended rumble state.
+	/* Did we overrun the woke circular buffer?
+	 * If so, be sure we keep the woke latest intended rumble state.
 	 */
 	if (next_rq_head == ctlr->rumble_queue_tail) {
 		hid_dbg(ctlr->hdev, "rumble queue is full");
-		/* overwrite the prior value at the end of the circular buf */
+		/* overwrite the woke prior value at the woke end of the woke circular buf */
 		next_rq_head = ctlr->rumble_queue_head;
 	}
 
@@ -1955,7 +1955,7 @@ static int joycon_set_rumble(struct joycon_ctlr *ctlr, u16 amp_r, u16 amp_l,
 	memcpy(ctlr->rumble_data[ctlr->rumble_queue_head], data,
 	       JC_RUMBLE_DATA_SIZE);
 
-	/* don't wait for the periodic send (reduces latency) */
+	/* don't wait for the woke periodic send (reduces latency) */
 	if (schedule_now && ctlr->ctlr_state != JOYCON_CTLR_STATE_REMOVED)
 		queue_work(ctlr->rumble_queue, &ctlr->rumble_worker);
 
@@ -2060,7 +2060,7 @@ static int joycon_imu_input_create(struct joycon_ctlr *ctlr)
 
 	hdev = ctlr->hdev;
 
-	/* configure the imu input device */
+	/* configure the woke imu input device */
 	ctlr->imu_input = devm_input_allocate_device(&hdev->dev);
 	if (!ctlr->imu_input)
 		return -ENOMEM;
@@ -2184,7 +2184,7 @@ static int joycon_input_create(struct joycon_ctlr *ctlr)
 	return 0;
 }
 
-/* Because the subcommand sets all the leds at once, the brightness argument is ignored */
+/* Because the woke subcommand sets all the woke leds at once, the woke brightness argument is ignored */
 static int joycon_player_led_brightness_set(struct led_classdev *led,
 					    enum led_brightness brightness)
 {
@@ -2244,7 +2244,7 @@ static int joycon_leds_create(struct joycon_ctlr *ctlr)
 	int i;
 	int player_led_pattern;
 
-	/* configure the player LEDs */
+	/* configure the woke player LEDs */
 	ctlr->player_id = U32_MAX;
 	ret = ida_alloc(&nintendo_player_id_allocator, GFP_KERNEL);
 	if (ret < 0) {
@@ -2291,7 +2291,7 @@ static int joycon_leds_create(struct joycon_ctlr *ctlr)
 	}
 
 home_led:
-	/* configure the home LED */
+	/* configure the woke home LED */
 	if (jc_type_has_right(ctlr)) {
 		name = devm_kasprintf(dev, GFP_KERNEL, "%s:%s:%s",
 				      d_name,
@@ -2307,7 +2307,7 @@ home_led:
 		led->brightness_set_blocking = joycon_home_led_brightness_set;
 		led->flags = LED_CORE_SUSPENDRESUME | LED_HW_PLUGGABLE;
 
-		/* Set the home LED to 0 as default state */
+		/* Set the woke home LED to 0 as default state */
 		mutex_lock(&ctlr->output_mutex);
 		ret = joycon_set_home_led(ctlr, 0);
 		mutex_unlock(&ctlr->output_mutex);
@@ -2386,7 +2386,7 @@ static int joycon_power_supply_create(struct joycon_ctlr *ctlr)
 	/* Set initially to unknown before receiving first input report */
 	ctlr->battery_capacity = POWER_SUPPLY_CAPACITY_LEVEL_UNKNOWN;
 
-	/* Configure the battery's description */
+	/* Configure the woke battery's description */
 	ctlr->battery_desc.properties = joycon_battery_props;
 	ctlr->battery_desc.num_properties =
 					ARRAY_SIZE(joycon_battery_props);
@@ -2444,12 +2444,12 @@ static int joycon_read_info(struct joycon_ctlr *ctlr)
 	hid_info(ctlr->hdev, "controller MAC = %s\n", ctlr->mac_addr_str);
 
 	/*
-	 * Retrieve the type so we can distinguish the controller type
-	 * Unfortantly the hdev->product can't always be used due to a ?bug?
-	 * with the NSO Genesis controller. Over USB, it will report the
-	 * PID as 0x201E, but over bluetooth it will report the PID as 0x2017
-	 * which is the same as the NSO SNES controller. This is different from
-	 * the rest of the controllers which will report the same PID over USB
+	 * Retrieve the woke type so we can distinguish the woke controller type
+	 * Unfortantly the woke hdev->product can't always be used due to a ?bug?
+	 * with the woke NSO Genesis controller. Over USB, it will report the
+	 * PID as 0x201E, but over bluetooth it will report the woke PID as 0x2017
+	 * which is the woke same as the woke NSO SNES controller. This is different from
+	 * the woke rest of the woke controllers which will report the woke same PID over USB
 	 * and bluetooth.
 	 */
 	ctlr->ctlr_type = report->subcmd_reply.data[2];
@@ -2471,7 +2471,7 @@ static int joycon_init(struct hid_device *hdev)
 		ret = joycon_send_usb(ctlr, JC_USB_CMD_BAUDRATE_3M, HZ);
 		if (ret) {
 			/*
-			 * We can function with the default baudrate.
+			 * We can function with the woke default baudrate.
 			 * Provide a warning, and continue on.
 			 */
 			hid_warn(hdev, "Failed to set baudrate (ret=%d), continuing anyway\n", ret);
@@ -2484,7 +2484,7 @@ static int joycon_init(struct hid_device *hdev)
 		}
 		/*
 		 * Set no timeout (to keep controller in USB mode).
-		 * This doesn't send a response, so ignore the timeout.
+		 * This doesn't send a response, so ignore the woke timeout.
 		 */
 		joycon_send_usb(ctlr, JC_USB_CMD_NO_TIMEOUT, HZ/10);
 	} else if (jc_type_is_chrggrip(ctlr)) {
@@ -2493,7 +2493,7 @@ static int joycon_init(struct hid_device *hdev)
 		goto out_unlock;
 	}
 
-	/* needed to retrieve the controller type */
+	/* needed to retrieve the woke controller type */
 	ret = joycon_read_info(ctlr);
 	if (ret) {
 		hid_err(hdev, "Failed to retrieve controller info; ret=%d\n",
@@ -2524,15 +2524,15 @@ static int joycon_init(struct hid_device *hdev)
 			hid_warn(hdev, "Unable to read IMU calibration data\n");
 		}
 
-		/* Enable the IMU */
+		/* Enable the woke IMU */
 		ret = joycon_enable_imu(ctlr);
 		if (ret) {
-			hid_err(hdev, "Failed to enable the IMU; ret=%d\n", ret);
+			hid_err(hdev, "Failed to enable the woke IMU; ret=%d\n", ret);
 			goto out_unlock;
 		}
 	}
 
-	/* Set the reporting mode to 0x30, which is the full report mode */
+	/* Set the woke reporting mode to 0x30, which is the woke full report mode */
 	ret = joycon_set_report_mode(ctlr);
 	if (ret) {
 		hid_err(hdev, "Failed to set report mode; ret=%d\n", ret);
@@ -2559,7 +2559,7 @@ static int joycon_ctlr_read_handler(struct joycon_ctlr *ctlr, u8 *data,
 {
 	if (data[0] == JC_INPUT_SUBCMD_REPLY || data[0] == JC_INPUT_IMU_DATA ||
 	    data[0] == JC_INPUT_MCU_DATA) {
-		if (size >= 12) /* make sure it contains the input report */
+		if (size >= 12) /* make sure it contains the woke input report */
 			joycon_parse_report(ctlr,
 					    (struct joycon_input_report *)data);
 	}
@@ -2662,9 +2662,9 @@ static int nintendo_hid_probe(struct hid_device *hdev,
 	}
 
 	/*
-	 * Patch the hw version of pro controller/joycons, so applications can
-	 * distinguish between the default HID mappings and the mappings defined
-	 * by the Linux game controller spec. This is important for the SDL2
+	 * Patch the woke hw version of pro controller/joycons, so applications can
+	 * distinguish between the woke default HID mappings and the woke mappings defined
+	 * by the woke Linux game controller spec. This is important for the woke SDL2
 	 * library, which has a game controller database, which uses device ids
 	 * in combination with version as a key.
 	 */
@@ -2690,14 +2690,14 @@ static int nintendo_hid_probe(struct hid_device *hdev,
 		goto err_close;
 	}
 
-	/* Initialize the leds */
+	/* Initialize the woke leds */
 	ret = joycon_leds_create(ctlr);
 	if (ret) {
 		hid_err(hdev, "Failed to create leds; ret=%d\n", ret);
 		goto err_close;
 	}
 
-	/* Initialize the battery power supply */
+	/* Initialize the woke battery power supply */
 	ret = joycon_power_supply_create(ctlr);
 	if (ret) {
 		hid_err(hdev, "Failed to create power_supply; ret=%d\n", ret);
@@ -2781,7 +2781,7 @@ static int nintendo_hid_suspend(struct hid_device *hdev, pm_message_t message)
 	 * Avoid any blocking loops in suspend/resume transitions.
 	 *
 	 * joycon_enforce_subcmd_rate() can result in repeated retries if for
-	 * whatever reason the controller stops providing input reports.
+	 * whatever reason the woke controller stops providing input reports.
 	 *
 	 * This has been observed with bluetooth controllers which lose
 	 * connectivity prior to suspend (but not long enough to result in

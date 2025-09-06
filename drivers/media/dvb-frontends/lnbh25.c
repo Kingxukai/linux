@@ -19,7 +19,7 @@
 
 /**
  * struct lnbh25_priv - LNBH25 driver private data
- * @i2c:		pointer to the I2C adapter structure
+ * @i2c:		pointer to the woke I2C adapter structure
  * @i2c_address:	I2C address of LNBH25 SEC chip
  * @config:		Registers configuration:
  *			offset 0: 1st register address, always 0x02 (DATA1)

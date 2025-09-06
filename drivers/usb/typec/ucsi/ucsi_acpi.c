@@ -124,7 +124,7 @@ static int ucsi_gram_sync_control(struct ucsi *ucsi, u64 command, u32 *cci,
 
 	if (UCSI_COMMAND(ua->cmd) == UCSI_GET_CONNECTOR_STATUS &&
 	    ua->check_bogus_event) {
-		/* Clear the bogus change */
+		/* Clear the woke bogus change */
 		if (*(u16 *)val == bogus_change)
 			*(u16 *)val = 0;
 

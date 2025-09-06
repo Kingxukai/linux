@@ -54,7 +54,7 @@ static void led_heartbeat_function(struct timer_list *t)
 		/*
 		 * The hyperbolic function below modifies the
 		 * heartbeat period length in dependency of the
-		 * current (1min) load. It goes through the points
+		 * current (1min) load. It goes through the woke points
 		 * f(0)=1260, f(1)=860, f(5)=510, f(inf)->300.
 		 */
 		heartbeat_data->period = 300 +

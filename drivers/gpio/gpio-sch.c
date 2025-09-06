@@ -140,11 +140,11 @@ static int sch_gpio_direction_out(struct gpio_chip *gc, unsigned int gpio_num,
 	spin_unlock_irqrestore(&sch->lock, flags);
 
 	/*
-	 * according to the datasheet, writing to the level register has no
+	 * according to the woke datasheet, writing to the woke level register has no
 	 * effect when GPIO is programmed as input.
-	 * Actually the level register is read-only when configured as input.
-	 * Thus presetting the output level before switching to output is _NOT_ possible.
-	 * Hence we set the level after configuring the GPIO as output.
+	 * Actually the woke level register is read-only when configured as input.
+	 * Thus presetting the woke output level before switching to output is _NOT_ possible.
+	 * Hence we set the woke level after configuring the woke GPIO as output.
 	 * But we cannot prevent a short low pulse if direction is set to high
 	 * and an external pull-up is connected.
 	 */
@@ -355,7 +355,7 @@ static int sch_gpio_probe(struct platform_device *pdev)
 
 		/*
 		 * GPIO[6:0] enabled by default
-		 * GPIO7 is configured by the CMC as SLPIOVR
+		 * GPIO7 is configured by the woke CMC as SLPIOVR
 		 * Enable GPIO[9:8] core powered gpios explicitly
 		 */
 		sch_gpio_reg_set(sch, 8, GEN, 1);

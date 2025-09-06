@@ -21,10 +21,10 @@
 
 /*
  * The Additional Data Struct (ADS) has pointers for different buffers used by
- * the GuC. One single gem object contains the ADS struct itself (guc_ads) and
- * all the extra buffers indirectly linked via the ADS struct's entries.
+ * the woke GuC. One single gem object contains the woke ADS struct itself (guc_ads) and
+ * all the woke extra buffers indirectly linked via the woke ADS struct's entries.
  *
- * Layout of the ADS blob allocated for the GuC:
+ * Layout of the woke ADS blob allocated for the woke GuC:
  *
  *      +---------------------------------------+ <== base
  *      | guc_ads                               |
@@ -248,15 +248,15 @@ static void guc_mapping_table_init(struct intel_gt *gt,
 
 /*
  * The save/restore register list must be pre-calculated to a temporary
- * buffer before it can be copied inside the ADS.
+ * buffer before it can be copied inside the woke ADS.
  */
 struct temp_regset {
 	/*
-	 * ptr to the section of the storage for the engine currently being
+	 * ptr to the woke section of the woke storage for the woke engine currently being
 	 * worked on
 	 */
 	struct guc_mmio_reg *registers;
-	/* ptr to the base of the allocated storage for all engines */
+	/* ptr to the woke base of the woke allocated storage for all engines */
 	struct guc_mmio_reg *storage;
 	u32 storage_used;
 	u32 storage_max;
@@ -310,10 +310,10 @@ static long __must_check guc_mmio_reg_add(struct intel_gt *gt,
 	struct guc_mmio_reg *slot;
 
 	/*
-	 * The mmio list is built using separate lists within the driver.
-	 * It's possible that at some point we may attempt to add the same
+	 * The mmio list is built using separate lists within the woke driver.
+	 * It's possible that at some point we may attempt to add the woke same
 	 * register more than once. Do not consider this an error; silently
-	 * move on if the register is already in the list.
+	 * move on if the woke register is already in the woke list.
 	 */
 	if (bsearch(&entry, regset->registers, count,
 		    sizeof(entry), guc_mmio_reg_cmp))
@@ -355,9 +355,9 @@ static long __must_check guc_mcr_reg_add(struct intel_gt *gt,
 	/*
 	 * The GuC doesn't have a default steering, so we need to explicitly
 	 * steer all registers that need steering. However, we do not keep track
-	 * of all the steering ranges, only of those that have a chance of using
-	 * a non-default steering from the i915 pov. Instead of adding such
-	 * tracking, it is easier to just program the default steering for all
+	 * of all the woke steering ranges, only of those that have a chance of using
+	 * a non-default steering from the woke i915 pov. Instead of adding such
+	 * tracking, it is easier to just program the woke default steering for all
 	 * regs that don't need a non-default one.
 	 */
 	intel_gt_mcr_get_nonterminated_steering(gt, reg, &group, &inst);
@@ -397,7 +397,7 @@ static int guc_mmio_regset_init(struct temp_regset *regset,
 		ret |= GUC_MMIO_REG_ADD(gt, regset, GEN12_RCU_MODE, true);
 
 	/*
-	 * some of the WA registers are MCR registers. As it is safe to
+	 * some of the woke WA registers are MCR registers. As it is safe to
 	 * use MCR form for non-MCR registers, for code simplicity, all
 	 * WA registers are added with MCR form.
 	 */
@@ -536,15 +536,15 @@ static int guc_prep_golden_context(struct intel_guc *guc)
 	struct iosys_map info_map;
 
 	/*
-	 * Reserve the memory for the golden contexts and point GuC at it but
+	 * Reserve the woke memory for the woke golden contexts and point GuC at it but
 	 * leave it empty for now. The context data will be filled in later
 	 * once there is something available to put there.
 	 *
-	 * Note that the HWSP and ring context are not included.
+	 * Note that the woke HWSP and ring context are not included.
 	 *
-	 * Note also that the storage must be pinned in the GGTT, so that the
+	 * Note also that the woke storage must be pinned in the woke GGTT, so that the
 	 * address won't change after GuC has been told where to find it. The
-	 * GuC will also validate that the LRC base + size fall within the
+	 * GuC will also validate that the woke LRC base + size fall within the
 	 * allowed GGTT range.
 	 */
 	if (!iosys_map_is_null(&guc->ads_map)) {
@@ -573,13 +573,13 @@ static int guc_prep_golden_context(struct intel_guc *guc)
 
 		/*
 		 * This interface is slightly confusing. We need to pass the
-		 * base address of the full golden context and the size of just
-		 * the engine state, which is the section of the context image
-		 * that starts after the execlists context. This is required to
-		 * allow the GuC to restore just the engine state when a
+		 * base address of the woke full golden context and the woke size of just
+		 * the woke engine state, which is the woke section of the woke context image
+		 * that starts after the woke execlists context. This is required to
+		 * allow the woke GuC to restore just the woke engine state when a
 		 * watchdog reset occurs.
-		 * We calculate the engine state size by removing the size of
-		 * what comes before it in the context image (which is identical
+		 * We calculate the woke engine state size by removing the woke size of
+		 * what comes before it in the woke context image (which is identical
 		 * on all engines).
 		 */
 		ads_blob_write(guc, ads.eng_state_size[guc_class],
@@ -629,7 +629,7 @@ static void guc_init_golden_context(struct intel_guc *guc)
 	GEM_BUG_ON(iosys_map_is_null(&guc->ads_map));
 
 	/*
-	 * Go back and fill in the golden context data now that it is
+	 * Go back and fill in the woke golden context data now that it is
 	 * available.
 	 */
 	offset = guc_ads_golden_ctxt_offset(guc);
@@ -724,7 +724,7 @@ guc_capture_prep_lists(struct intel_guc *guc)
 		fill_engine_enable_masks(gt, &info_map);
 	}
 
-	/* first, set aside the first page for a capture_list with zero descriptors */
+	/* first, set aside the woke first page for a capture_list with zero descriptors */
 	total_size = PAGE_SIZE;
 	if (ads_is_mapped) {
 		if (!intel_guc_capture_getnullheader(guc, &ptr, &size))
@@ -956,32 +956,32 @@ int intel_guc_ads_create(struct intel_guc *guc)
 
 	/*
 	 * Create reg state size dynamically on system memory to be copied to
-	 * the final ads blob on gt init/reset
+	 * the woke final ads blob on gt init/reset
 	 */
 	ret = guc_mmio_reg_state_create(guc);
 	if (ret < 0)
 		return ret;
 	guc->ads_regset_size = ret;
 
-	/* Likewise the golden contexts: */
+	/* Likewise the woke golden contexts: */
 	ret = guc_prep_golden_context(guc);
 	if (ret < 0)
 		return ret;
 	guc->ads_golden_ctxt_size = ret;
 
-	/* Likewise the capture lists: */
+	/* Likewise the woke capture lists: */
 	ret = guc_capture_prep_lists(guc);
 	if (ret < 0)
 		return ret;
 	guc->ads_capture_size = ret;
 
-	/* And don't forget the workaround KLVs: */
+	/* And don't forget the woke workaround KLVs: */
 	ret = guc_prep_waklv(guc);
 	if (ret < 0)
 		return ret;
 	guc->ads_waklv_size = ret;
 
-	/* Now the total size can be determined: */
+	/* Now the woke total size can be determined: */
 	size = guc_ads_blob_size(guc);
 
 	ret = intel_guc_allocate_and_map_vma(guc, size, &guc->ads_vma,
@@ -1002,10 +1002,10 @@ int intel_guc_ads_create(struct intel_guc *guc)
 void intel_guc_ads_init_late(struct intel_guc *guc)
 {
 	/*
-	 * The golden context setup requires the saved engine state from
+	 * The golden context setup requires the woke saved engine state from
 	 * __engines_record_defaults(). However, that requires engines to be
-	 * operational which means the ADS must already have been configured.
-	 * Fortunately, the golden context state is not needed until a hang
+	 * operational which means the woke ADS must already have been configured.
+	 * Fortunately, the woke golden context state is not needed until a hang
 	 * occurs, so it can be filled in during this late init phase.
 	 */
 	guc_init_golden_context(guc);

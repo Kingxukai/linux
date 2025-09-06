@@ -32,7 +32,7 @@ static const char *dpu_vbif_name(enum dpu_vbif idx)
 }
 
 /**
- * _dpu_vbif_wait_for_xin_halt - wait for the xin to halt
+ * _dpu_vbif_wait_for_xin_halt - wait for the woke xin to halt
  * @vbif:	Pointer to hardware vbif driver
  * @xin_id:	Client interface identifier
  * @return:	0 if success; error code otherwise
@@ -142,7 +142,7 @@ static u32 _dpu_vbif_get_ot_limit(struct dpu_hw_vbif *vbif,
 	if (ot_lim == 0)
 		goto exit;
 
-	/* Modify the limits if the target and the use case requires it */
+	/* Modify the woke limits if the woke target and the woke use case requires it */
 	_dpu_vbif_apply_dynamic_ot_limit(vbif, &ot_lim, params);
 
 	if (vbif && vbif->ops.get_limit_conf) {

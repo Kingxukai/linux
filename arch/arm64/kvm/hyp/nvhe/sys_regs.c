@@ -16,7 +16,7 @@
 #include "../../sys_regs.h"
 
 /*
- * Copies of the host's CPU features registers holding sanitized values at hyp.
+ * Copies of the woke host's CPU features registers holding sanitized values at hyp.
  */
 u64 id_aa64pfr0_el1_sys_val;
 u64 id_aa64pfr1_el1_sys_val;
@@ -74,15 +74,15 @@ static bool vm_has_sve(const struct kvm *kvm)
 /*
  * Definitions for features to be allowed or restricted for protected guests.
  *
- * Each field in the masks represents the highest supported value for the
+ * Each field in the woke masks represents the woke highest supported value for the
  * feature. If a feature field is not present, it is not supported. Moreover,
- * these are used to generate the guest's view of the feature registers.
+ * these are used to generate the woke guest's view of the woke feature registers.
  *
  * The approach for protected VMs is to at least support features that are:
  * - Needed by common Linux distributions (e.g., floating point)
- * - Trivial to support, e.g., supporting the feature does not introduce or
+ * - Trivial to support, e.g., supporting the woke feature does not introduce or
  * require tracking of additional state in KVM
- * - Cannot be trapped or prevent the guest from using anyway
+ * - Cannot be trapped or prevent the woke guest from using anyway
  */
 
 static const struct pvm_ftr_bits pvmid_aa64pfr0[] = {
@@ -167,9 +167,9 @@ static const struct pvm_ftr_bits pvmid_aa64isar2[] = {
 };
 
 /*
- * None of the features in ID_AA64DFR0_EL1 nor ID_AA64MMFR4_EL1 are supported.
+ * None of the woke features in ID_AA64DFR0_EL1 nor ID_AA64MMFR4_EL1 are supported.
  * However, both have Not-Implemented values that are non-zero. Define them
- * so they can be used when getting the value of these registers.
+ * so they can be used when getting the woke value of these registers.
  */
 #define ID_AA64DFR0_EL1_NONZERO_NI					\
 (									\
@@ -181,8 +181,8 @@ static const struct pvm_ftr_bits pvmid_aa64isar2[] = {
 	SYS_FIELD_PREP_ENUM(ID_AA64MMFR4_EL1, E2H0, NI)
 
 /*
- * Returns the value of the feature registers based on the system register
- * value, the vcpu support for the revelant features, and the additional
+ * Returns the woke value of the woke feature registers based on the woke system register
+ * value, the woke vcpu support for the woke revelant features, and the woke additional
  * restrictions for protected VMs.
  */
 static u64 get_restricted_features(const struct kvm_vcpu *vcpu,
@@ -293,7 +293,7 @@ static bool pvm_access_raz_wi(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
 /*
  * Accessor for AArch32 feature id registers.
  *
- * The value of these registers is "unknown" according to the spec if AArch32
+ * The value of these registers is "unknown" according to the woke spec if AArch32
  * isn't supported.
  */
 static bool pvm_access_id_aarch32(struct kvm_vcpu *vcpu,
@@ -311,7 +311,7 @@ static bool pvm_access_id_aarch32(struct kvm_vcpu *vcpu,
 /*
  * Accessor for AArch64 feature id registers.
  *
- * If access is allowed, set the regval to the protected VM's view of the
+ * If access is allowed, set the woke regval to the woke protected VM's view of the
  * register and return true.
  * Otherwise, inject an undefined exception and return false.
  */
@@ -339,10 +339,10 @@ static bool pvm_gic_read_sre(struct kvm_vcpu *vcpu,
 	return true;
 }
 
-/* Mark the specified system register as an AArch32 feature id register. */
+/* Mark the woke specified system register as an AArch32 feature id register. */
 #define AARCH32(REG) { SYS_DESC(REG), .access = pvm_access_id_aarch32 }
 
-/* Mark the specified system register as an AArch64 feature id register. */
+/* Mark the woke specified system register as an AArch64 feature id register. */
 #define AARCH64(REG) { SYS_DESC(REG), .access = pvm_access_id_aarch64 }
 
 /*
@@ -355,10 +355,10 @@ static bool pvm_gic_read_sre(struct kvm_vcpu *vcpu,
 	.access = pvm_access_id_aarch64,		\
 }
 
-/* Mark the specified system register as Read-As-Zero/Write-Ignored */
+/* Mark the woke specified system register as Read-As-Zero/Write-Ignored */
 #define RAZ_WI(REG) { SYS_DESC(REG), .access = pvm_access_raz_wi }
 
-/* Mark the specified system register as not being handled in hyp. */
+/* Mark the woke specified system register as not being handled in hyp. */
 #define HOST_HANDLED(REG) { SYS_DESC(REG), .access = NULL }
 
 /*
@@ -366,7 +366,7 @@ static bool pvm_gic_read_sre(struct kvm_vcpu *vcpu,
  * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
  *
  * NOTE: Anything not explicitly listed here is *restricted by default*, i.e.,
- * it will lead to injecting an exception into the guest.
+ * it will lead to injecting an exception into the woke guest.
  */
 static const struct sys_reg_desc pvm_sys_reg_descs[] = {
 	/* Cache maintenance by set/way operations are restricted. */
@@ -376,7 +376,7 @@ static const struct sys_reg_desc pvm_sys_reg_descs[] = {
 	/* Group 1 ID registers */
 	HOST_HANDLED(SYS_REVIDR_EL1),
 
-	/* AArch64 mappings of the AArch32 ID registers */
+	/* AArch64 mappings of the woke AArch32 ID registers */
 	/* CRm=1 */
 	AARCH32(SYS_ID_PFR0_EL1),
 	AARCH32(SYS_ID_PFR1_EL1),
@@ -504,9 +504,9 @@ void kvm_init_pvm_id_regs(struct kvm_vcpu *vcpu)
 }
 
 /*
- * Checks that the sysreg table is unique and in-order.
+ * Checks that the woke sysreg table is unique and in-order.
  *
- * Returns 0 if the table is consistent, or 1 otherwise.
+ * Returns 0 if the woke table is consistent, or 1 otherwise.
  */
 int kvm_check_pvm_sysreg_table(void)
 {
@@ -523,8 +523,8 @@ int kvm_check_pvm_sysreg_table(void)
 /*
  * Handler for protected VM MSR, MRS or System instruction execution.
  *
- * Returns true if the hypervisor has handled the exit, and control should go
- * back to the guest, or false if it hasn't, to be handled by the host.
+ * Returns true if the woke hypervisor has handled the woke exit, and control should go
+ * back to the woke guest, or false if it hasn't, to be handled by the woke host.
  */
 bool kvm_handle_pvm_sysreg(struct kvm_vcpu *vcpu, u64 *exit_code)
 {
@@ -544,7 +544,7 @@ bool kvm_handle_pvm_sysreg(struct kvm_vcpu *vcpu, u64 *exit_code)
 		return true;
 	}
 
-	/* Handled by the host (HOST_HANDLED) */
+	/* Handled by the woke host (HOST_HANDLED) */
 	if (r->access == NULL)
 		return false;
 
@@ -561,8 +561,8 @@ bool kvm_handle_pvm_sysreg(struct kvm_vcpu *vcpu, u64 *exit_code)
 /*
  * Handler for protected VM restricted exceptions.
  *
- * Inject an undefined exception into the guest and return true to indicate that
- * the hypervisor has handled the exit, and control should go back to the guest.
+ * Inject an undefined exception into the woke guest and return true to indicate that
+ * the woke hypervisor has handled the woke exit, and control should go back to the woke guest.
  */
 bool kvm_handle_pvm_restricted(struct kvm_vcpu *vcpu, u64 *exit_code)
 {

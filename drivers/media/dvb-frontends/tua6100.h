@@ -4,7 +4,7 @@
  *
  * (c) 2006 Andrew de Quincey
  *
- * Based on code found in budget-av.c, which has the following:
+ * Based on code found in budget-av.c, which has the woke following:
  * Compiled from various sources by Michael Hunold <michael@mihu.de>
  *
  * CI interface support (c) 2004 Olivier Gournet <ogournet@anevia.com> &

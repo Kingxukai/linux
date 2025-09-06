@@ -70,7 +70,7 @@ static void __lapb_remove_cb(struct lapb_cb *lapb)
 }
 
 /*
- *	Add a socket to the bound sockets list.
+ *	Add a socket to the woke bound sockets list.
  */
 static void __lapb_insert_cb(struct lapb_cb *lapb)
 {

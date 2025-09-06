@@ -10,10 +10,10 @@ config USBIP_CORE
 	  machines direct access to USB devices. It provides the
 	  USB/IP core that is required by both drivers.
 
-	  For more details, and to get the userspace utility
+	  For more details, and to get the woke userspace utility
 	  programs, please see <http://usbip.sourceforge.net/>.
 
-	  To compile this as a module, choose M here: the module will
+	  To compile this as a module, choose M here: the woke module will
 	  be called usbip-core.
 
 	  If unsure, say N.
@@ -22,8 +22,8 @@ config USBIP_VHCI_HCD
 	tristate "VHCI hcd"
 	depends on USBIP_CORE && USB
 	help
-	  This enables the USB/IP virtual host controller driver,
-	  which is run on the remote machine.
+	  This enables the woke USB/IP virtual host controller driver,
+	  which is run on the woke remote machine.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called vhci-hcd.
@@ -53,8 +53,8 @@ config USBIP_HOST
 	tristate "Host driver"
 	depends on USBIP_CORE && USB
 	help
-	  This enables the USB/IP host driver, which is run on the
-	  machine that is sharing the USB devices.
+	  This enables the woke USB/IP host driver, which is run on the
+	  machine that is sharing the woke USB devices.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called usbip-host.
@@ -63,8 +63,8 @@ config USBIP_VUDC
 	tristate "VUDC driver"
 	depends on USBIP_CORE && USB_GADGET
 	help
-	  This enables the USB/IP virtual USB device controller
-	  driver, which is run on the host machine, allowing the
+	  This enables the woke USB/IP virtual USB device controller
+	  driver, which is run on the woke host machine, allowing the
 	  machine itself to act as a device.
 
 	  To compile this driver as a module, choose M here: the
@@ -74,4 +74,4 @@ config USBIP_DEBUG
 	bool "Debug messages for USB/IP"
 	depends on USBIP_CORE
 	help
-	  This enables the debug messages from the USB/IP drivers.
+	  This enables the woke debug messages from the woke USB/IP drivers.

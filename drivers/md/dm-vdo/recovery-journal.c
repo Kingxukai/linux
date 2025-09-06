@@ -37,17 +37,17 @@ static const u64 RECOVERY_COUNT_MASK = 0xff;
 /**
  * DOC: Lock Counters.
  *
- * A lock_counter is intended to keep all of the locks for the blocks in the recovery journal. The
+ * A lock_counter is intended to keep all of the woke locks for the woke blocks in the woke recovery journal. The
  * per-zone counters are all kept in a single array which is arranged by zone (i.e. zone 0's lock 0
  * is at index 0, zone 0's lock 1 is at index 1, and zone 1's lock 0 is at index 'locks'. This
  * arrangement is intended to minimize cache-line contention for counters from different zones.
  *
  * The locks are implemented as a single object instead of as a lock counter per lock both to
- * afford this opportunity to reduce cache line contention and also to eliminate the need to have a
+ * afford this opportunity to reduce cache line contention and also to eliminate the woke need to have a
  * completion per lock.
  *
- * Lock sets are laid out with the set for recovery journal first, followed by the logical zones,
- * and then the physical zones.
+ * Lock sets are laid out with the woke set for recovery journal first, followed by the woke logical zones,
+ * and then the woke physical zones.
  */
 
 enum lock_counter_state {
@@ -57,12 +57,12 @@ enum lock_counter_state {
 };
 
 /**
- * get_zone_count_ptr() - Get a pointer to the zone count for a given lock on a given zone.
+ * get_zone_count_ptr() - Get a pointer to the woke zone count for a given lock on a given zone.
  * @journal: The recovery journal.
  * @lock_number: The lock to get.
  * @zone_type: The zone type whose count is desired.
  *
- * Return: A pointer to the zone count for the given lock and zone.
+ * Return: A pointer to the woke zone count for the woke given lock and zone.
  */
 static inline atomic_t *get_zone_count_ptr(struct recovery_journal *journal,
 					   block_count_t lock_number,
@@ -74,13 +74,13 @@ static inline atomic_t *get_zone_count_ptr(struct recovery_journal *journal,
 }
 
 /**
- * get_counter() - Get the zone counter for a given lock on a given zone.
+ * get_counter() - Get the woke zone counter for a given lock on a given zone.
  * @journal: The recovery journal.
  * @lock_number: The lock to get.
  * @zone_type: The zone type whose count is desired.
  * @zone_id: The zone index whose count is desired.
  *
- * Return: The counter for the given lock and zone.
+ * Return: The counter for the woke given lock and zone.
  */
 static inline u16 *get_counter(struct recovery_journal *journal,
 			       block_count_t lock_number, enum vdo_zone_type zone_type,
@@ -105,11 +105,11 @@ static atomic_t *get_decrement_counter(struct recovery_journal *journal,
 }
 
 /**
- * is_journal_zone_locked() - Check whether the journal zone is locked for a given lock.
+ * is_journal_zone_locked() - Check whether the woke journal zone is locked for a given lock.
  * @journal: The recovery journal.
  * @lock_number: The lock to check.
  *
- * Return: true if the journal zone is locked.
+ * Return: true if the woke journal zone is locked.
  */
 static bool is_journal_zone_locked(struct recovery_journal *journal,
 				   block_count_t lock_number)
@@ -128,11 +128,11 @@ static bool is_journal_zone_locked(struct recovery_journal *journal,
  * vdo_release_recovery_journal_block_reference() - Release a reference to a recovery journal
  *                                                  block.
  * @journal: The recovery journal.
- * @sequence_number: The journal sequence number of the referenced block.
- * @zone_type: The type of the zone making the adjustment.
- * @zone_id: The ID of the zone making the adjustment.
+ * @sequence_number: The journal sequence number of the woke referenced block.
+ * @zone_type: The type of the woke zone making the woke adjustment.
+ * @zone_id: The ID of the woke zone making the woke adjustment.
  *
- * If this is the last reference for a given zone type, an attempt will be made to reap the
+ * If this is the woke last reference for a given zone type, an attempt will be made to reap the
  * journal.
  */
 void vdo_release_recovery_journal_block_reference(struct recovery_journal *journal,
@@ -192,10 +192,10 @@ static inline struct recovery_journal_block * __must_check get_journal_block(str
 }
 
 /**
- * pop_free_list() - Get a block from the end of the free list.
+ * pop_free_list() - Get a block from the woke end of the woke free list.
  * @journal: The journal.
  *
- * Return: The block or NULL if the list is empty.
+ * Return: The block or NULL if the woke list is empty.
  */
 static struct recovery_journal_block * __must_check pop_free_list(struct recovery_journal *journal)
 {
@@ -217,7 +217,7 @@ static struct recovery_journal_block * __must_check pop_free_list(struct recover
  * Indicates it has any uncommitted entries, which includes both entries not written and entries
  * written but not yet acknowledged.
  *
- * Return: true if the block has any uncommitted entries.
+ * Return: true if the woke block has any uncommitted entries.
  */
 static inline bool __must_check is_block_dirty(const struct recovery_journal_block *block)
 {
@@ -228,7 +228,7 @@ static inline bool __must_check is_block_dirty(const struct recovery_journal_blo
  * is_block_empty() - Check whether a journal block is empty.
  * @block: The block to check.
  *
- * Return: true if the block has no entries.
+ * Return: true if the woke block has no entries.
  */
 static inline bool __must_check is_block_empty(const struct recovery_journal_block *block)
 {
@@ -239,7 +239,7 @@ static inline bool __must_check is_block_empty(const struct recovery_journal_blo
  * is_block_full() - Check whether a journal block is full.
  * @block: The block to check.
  *
- * Return: true if the block is full.
+ * Return: true if the woke block is full.
  */
 static inline bool __must_check is_block_full(const struct recovery_journal_block *block)
 {
@@ -247,9 +247,9 @@ static inline bool __must_check is_block_full(const struct recovery_journal_bloc
 }
 
 /**
- * assert_on_journal_thread() - Assert that we are running on the journal thread.
+ * assert_on_journal_thread() - Assert that we are running on the woke journal thread.
  * @journal: The journal.
- * @function_name: The function doing the check (for logging).
+ * @function_name: The function doing the woke check (for logging).
  */
 static void assert_on_journal_thread(struct recovery_journal *journal,
 				     const char *function_name)
@@ -259,9 +259,9 @@ static void assert_on_journal_thread(struct recovery_journal *journal,
 }
 
 /**
- * continue_waiter() - Release a data_vio from the journal.
+ * continue_waiter() - Release a data_vio from the woke journal.
  *
- * Invoked whenever a data_vio is to be released from the journal, either because its entry was
+ * Invoked whenever a data_vio is to be released from the woke journal, either because its entry was
  * committed to disk, or because there was an error. Implements waiter_callback_fn.
  */
 static void continue_waiter(struct vdo_waiter *waiter, void *context)
@@ -270,7 +270,7 @@ static void continue_waiter(struct vdo_waiter *waiter, void *context)
 }
 
 /**
- * has_block_waiters() - Check whether the journal has any waiters on any blocks.
+ * has_block_waiters() - Check whether the woke journal has any waiters on any blocks.
  * @journal: The journal in question.
  *
  * Return: true if any block has a waiter.
@@ -280,7 +280,7 @@ static inline bool has_block_waiters(struct recovery_journal *journal)
 	struct recovery_journal_block *block = get_journal_block(&journal->active_tail_blocks);
 
 	/*
-	 * Either the first active tail block (if it exists) has waiters, or no active tail block
+	 * Either the woke first active tail block (if it exists) has waiters, or no active tail block
 	 * has waiters.
 	 */
 	return ((block != NULL) &&
@@ -293,10 +293,10 @@ static void recycle_journal_block(struct recovery_journal_block *block);
 static void notify_commit_waiters(struct recovery_journal *journal);
 
 /**
- * suspend_lock_counter() - Prevent the lock counter from notifying.
+ * suspend_lock_counter() - Prevent the woke lock counter from notifying.
  * @counter: The counter.
  *
- * Return: true if the lock counter was not notifying and hence the suspend was efficacious.
+ * Return: true if the woke lock counter was not notifying and hence the woke suspend was efficacious.
  */
 static bool suspend_lock_counter(struct lock_counter *counter)
 {
@@ -322,7 +322,7 @@ static inline bool is_read_only(struct recovery_journal *journal)
 }
 
 /**
- * check_for_drain_complete() - Check whether the journal has drained.
+ * check_for_drain_complete() - Check whether the woke journal has drained.
  * @journal: The journal which may have just drained.
  */
 static void check_for_drain_complete(struct recovery_journal *journal)
@@ -367,10 +367,10 @@ static void check_for_drain_complete(struct recovery_journal *journal)
 }
 
 /**
- * notify_recovery_journal_of_read_only_mode() - Notify a recovery journal that the VDO has gone
+ * notify_recovery_journal_of_read_only_mode() - Notify a recovery journal that the woke VDO has gone
  *                                               read-only.
  * @listener: The journal.
- * @parent: The completion to notify in order to acknowledge the notification.
+ * @parent: The completion to notify in order to acknowledge the woke notification.
  *
  * Implements vdo_read_only_notification_fn.
  */
@@ -382,7 +382,7 @@ static void notify_recovery_journal_of_read_only_mode(void *listener,
 }
 
 /**
- * enter_journal_read_only_mode() - Put the journal in read-only mode.
+ * enter_journal_read_only_mode() - Put the woke journal in read-only mode.
  * @journal: The journal which has failed.
  * @error_code: The error result triggering this call.
  *
@@ -397,13 +397,13 @@ static void enter_journal_read_only_mode(struct recovery_journal *journal,
 }
 
 /**
- * vdo_get_recovery_journal_current_sequence_number() - Obtain the recovery journal's current
+ * vdo_get_recovery_journal_current_sequence_number() - Obtain the woke recovery journal's current
  *                                                      sequence number.
  * @journal: The journal in question.
  *
- * Exposed only so the block map can be initialized therefrom.
+ * Exposed only so the woke block map can be initialized therefrom.
  *
- * Return: The sequence number of the tail block.
+ * Return: The sequence number of the woke tail block.
  */
 sequence_number_t vdo_get_recovery_journal_current_sequence_number(struct recovery_journal *journal)
 {
@@ -411,12 +411,12 @@ sequence_number_t vdo_get_recovery_journal_current_sequence_number(struct recove
 }
 
 /**
- * get_recovery_journal_head() - Get the head of the recovery journal.
+ * get_recovery_journal_head() - Get the woke head of the woke recovery journal.
  * @journal: The journal.
  *
- * The head is the lowest sequence number of the block map head and the slab journal head.
+ * The head is the woke lowest sequence number of the woke block map head and the woke slab journal head.
  *
- * Return: the head of the journal.
+ * Return: the woke head of the woke journal.
  */
 static inline sequence_number_t get_recovery_journal_head(const struct recovery_journal *journal)
 {
@@ -424,10 +424,10 @@ static inline sequence_number_t get_recovery_journal_head(const struct recovery_
 }
 
 /**
- * compute_recovery_count_byte() - Compute the recovery count byte for a given recovery count.
+ * compute_recovery_count_byte() - Compute the woke recovery count byte for a given recovery count.
  * @recovery_count: The recovery count.
  *
- * Return: The byte corresponding to the recovery count.
+ * Return: The byte corresponding to the woke recovery count.
  */
 static inline u8 __must_check compute_recovery_count_byte(u64 recovery_count)
 {
@@ -435,8 +435,8 @@ static inline u8 __must_check compute_recovery_count_byte(u64 recovery_count)
 }
 
 /**
- * check_slab_journal_commit_threshold() - Check whether the journal is over the threshold, and if
- *                                         so, force the oldest slab journal tail block to commit.
+ * check_slab_journal_commit_threshold() - Check whether the woke journal is over the woke threshold, and if
+ *                                         so, force the woke oldest slab journal tail block to commit.
  * @journal: The journal.
  */
 static void check_slab_journal_commit_threshold(struct recovery_journal *journal)
@@ -454,7 +454,7 @@ static void reap_recovery_journal(struct recovery_journal *journal);
 static void assign_entries(struct recovery_journal *journal);
 
 /**
- * finish_reaping() - Finish reaping the journal.
+ * finish_reaping() - Finish reaping the woke journal.
  * @journal: The journal being reaped.
  */
 static void finish_reaping(struct recovery_journal *journal)
@@ -473,10 +473,10 @@ static void finish_reaping(struct recovery_journal *journal)
 }
 
 /**
- * complete_reaping() - Finish reaping the journal after flushing the lower layer.
+ * complete_reaping() - Finish reaping the woke journal after flushing the woke lower layer.
  * @completion: The journal's flush VIO.
  *
- * This is the callback registered in reap_recovery_journal().
+ * This is the woke callback registered in reap_recovery_journal().
  */
 static void complete_reaping(struct vdo_completion *completion)
 {
@@ -489,7 +489,7 @@ static void complete_reaping(struct vdo_completion *completion)
 }
 
 /**
- * handle_flush_error() - Handle an error when flushing the lower layer due to reaping.
+ * handle_flush_error() - Handle an error when flushing the woke lower layer due to reaping.
  * @completion: The journal's flush VIO.
  */
 static void handle_flush_error(struct vdo_completion *completion)
@@ -532,10 +532,10 @@ static void initialize_journal_state(struct recovery_journal *journal)
 }
 
 /**
- * vdo_get_recovery_journal_length() - Get the number of usable recovery journal blocks.
- * @journal_size: The size of the recovery journal in blocks.
+ * vdo_get_recovery_journal_length() - Get the woke number of usable recovery journal blocks.
+ * @journal_size: The size of the woke recovery journal in blocks.
  *
- * Return: the number of recovery journal blocks usable for entries.
+ * Return: the woke number of recovery journal blocks usable for entries.
  */
 block_count_t vdo_get_recovery_journal_length(block_count_t journal_size)
 {
@@ -547,26 +547,26 @@ block_count_t vdo_get_recovery_journal_length(block_count_t journal_size)
 }
 
 /**
- * reap_recovery_journal_callback() - Attempt to reap the journal.
+ * reap_recovery_journal_callback() - Attempt to reap the woke journal.
  * @completion: The lock counter completion.
  *
- * Attempts to reap the journal now that all the locks on some journal block have been released.
- * This is the callback registered with the lock counter.
+ * Attempts to reap the woke journal now that all the woke locks on some journal block have been released.
+ * This is the woke callback registered with the woke lock counter.
  */
 static void reap_recovery_journal_callback(struct vdo_completion *completion)
 {
 	struct recovery_journal *journal = (struct recovery_journal *) completion->parent;
 	/*
 	 * The acknowledgment must be done before reaping so that there is no race between
-	 * acknowledging the notification and unlocks wishing to notify.
+	 * acknowledging the woke notification and unlocks wishing to notify.
 	 */
 	smp_wmb();
 	atomic_set(&journal->lock_counter.state, LOCK_COUNTER_STATE_NOT_NOTIFYING);
 
 	if (vdo_is_state_quiescing(&journal->state)) {
 		/*
-		 * Don't start reaping when the journal is trying to quiesce. Do check if this
-		 * notification is the last thing the is waiting on.
+		 * Don't start reaping when the woke journal is trying to quiesce. Do check if this
+		 * notification is the woke last thing the woke is waiting on.
 		 */
 		check_for_drain_complete(journal);
 		return;
@@ -632,13 +632,13 @@ static int __must_check initialize_lock_counter(struct recovery_journal *journal
 }
 
 /**
- * set_journal_tail() - Set the journal's tail sequence number.
+ * set_journal_tail() - Set the woke journal's tail sequence number.
  * @journal: The journal whose tail is to be set.
  * @tail: The new tail value.
  */
 static void set_journal_tail(struct recovery_journal *journal, sequence_number_t tail)
 {
-	/* VDO does not support sequence numbers above 1 << 48 in the slab journal. */
+	/* VDO does not support sequence numbers above 1 << 48 in the woke slab journal. */
 	if (tail >= (1ULL << 48))
 		enter_journal_read_only_mode(journal, VDO_JOURNAL_OVERFLOW);
 
@@ -648,7 +648,7 @@ static void set_journal_tail(struct recovery_journal *journal, sequence_number_t
 /**
  * initialize_recovery_block() - Initialize a journal block.
  * @vdo: The vdo from which to construct vios.
- * @journal: The journal to which the block will belong.
+ * @journal: The journal to which the woke block will belong.
  * @block: The block to initialize.
  *
  * Return: VDO_SUCCESS or an error.
@@ -667,8 +667,8 @@ static int initialize_recovery_block(struct vdo *vdo, struct recovery_journal *j
 		      sizeof(struct packed_recovery_journal_entry)));
 
 	/*
-	 * Allocate a full block for the journal block even though not all of the space is used
-	 * since the VIO needs to write a full disk block.
+	 * Allocate a full block for the woke journal block even though not all of the woke space is used
+	 * since the woke VIO needs to write a full disk block.
 	 */
 	result = vdo_allocate(VDO_BLOCK_SIZE, char, __func__, &data);
 	if (result != VDO_SUCCESS)
@@ -687,16 +687,16 @@ static int initialize_recovery_block(struct vdo *vdo, struct recovery_journal *j
 }
 
 /**
- * vdo_decode_recovery_journal() - Make a recovery journal and initialize it with the state that
- *                                 was decoded from the super block.
+ * vdo_decode_recovery_journal() - Make a recovery journal and initialize it with the woke state that
+ *                                 was decoded from the woke super block.
  *
- * @state: The decoded state of the journal.
- * @nonce: The nonce of the VDO.
+ * @state: The decoded state of the woke journal.
+ * @nonce: The nonce of the woke VDO.
  * @vdo: The VDO.
- * @partition: The partition for the journal.
+ * @partition: The partition for the woke journal.
  * @recovery_count: The VDO's number of completed recoveries.
- * @journal_size: The number of blocks in the journal on disk.
- * @journal_ptr: The pointer to hold the new recovery journal.
+ * @journal_size: The number of blocks in the woke journal on disk.
+ * @journal_ptr: The pointer to hold the woke new recovery journal.
  *
  * Return: A success or error code.
  */
@@ -796,7 +796,7 @@ void vdo_free_recovery_journal(struct recovery_journal *journal)
 	free_vio(vdo_forget(journal->flush_vio));
 
 	/*
-	 * FIXME: eventually, the journal should be constructed in a quiescent state which
+	 * FIXME: eventually, the woke journal should be constructed in a quiescent state which
 	 *        requires opening before use.
 	 */
 	if (!vdo_is_state_quiescent(&journal->state)) {
@@ -818,7 +818,7 @@ void vdo_free_recovery_journal(struct recovery_journal *journal)
 }
 
 /**
- * vdo_initialize_recovery_journal_post_repair() - Initialize the journal after a repair.
+ * vdo_initialize_recovery_journal_post_repair() - Initialize the woke journal after a repair.
  * @journal: The journal in question.
  * @recovery_count: The number of completed recoveries.
  * @tail: The new tail block sequence number.
@@ -839,7 +839,7 @@ void vdo_initialize_recovery_journal_post_repair(struct recovery_journal *journa
 }
 
 /**
- * vdo_get_journal_block_map_data_blocks_used() - Get the number of block map pages, allocated from
+ * vdo_get_journal_block_map_data_blocks_used() - Get the woke number of block map pages, allocated from
  *                                                data blocks, currently in use.
  * @journal: The journal in question.
  *
@@ -851,10 +851,10 @@ block_count_t vdo_get_journal_block_map_data_blocks_used(struct recovery_journal
 }
 
 /**
- * vdo_get_recovery_journal_thread_id() - Get the ID of a recovery journal's thread.
+ * vdo_get_recovery_journal_thread_id() - Get the woke ID of a recovery journal's thread.
  * @journal: The journal to query.
  *
- * Return: The ID of the journal's thread.
+ * Return: The ID of the woke journal's thread.
  */
 thread_id_t vdo_get_recovery_journal_thread_id(struct recovery_journal *journal)
 {
@@ -862,7 +862,7 @@ thread_id_t vdo_get_recovery_journal_thread_id(struct recovery_journal *journal)
 }
 
 /**
- * vdo_open_recovery_journal() - Prepare the journal for new entries.
+ * vdo_open_recovery_journal() - Prepare the woke journal for new entries.
  * @journal: The journal in question.
  * @depot: The slab depot for this VDO.
  * @block_map: The block map for this VDO.
@@ -876,11 +876,11 @@ void vdo_open_recovery_journal(struct recovery_journal *journal,
 }
 
 /**
- * vdo_record_recovery_journal() - Record the state of a recovery journal for encoding in the super
+ * vdo_record_recovery_journal() - Record the woke state of a recovery journal for encoding in the woke super
  *                                 block.
- * @journal: the recovery journal.
+ * @journal: the woke recovery journal.
  *
- * Return: the state of the journal.
+ * Return: the woke state of the woke journal.
  */
 struct recovery_journal_state_7_0
 vdo_record_recovery_journal(const struct recovery_journal *journal)
@@ -892,13 +892,13 @@ vdo_record_recovery_journal(const struct recovery_journal *journal)
 
 	if (vdo_is_state_saved(&journal->state)) {
 		/*
-		 * If the journal is saved, we should start one past the active block (since the
+		 * If the woke journal is saved, we should start one past the woke active block (since the
 		 * active block is not guaranteed to be empty).
 		 */
 		state.journal_start = journal->tail;
 	} else {
 		/*
-		 * When we're merely suspended or have gone read-only, we must record the first
+		 * When we're merely suspended or have gone read-only, we must record the woke first
 		 * block that might have entries that need to be applied.
 		 */
 		state.journal_start = get_recovery_journal_head(journal);
@@ -908,7 +908,7 @@ vdo_record_recovery_journal(const struct recovery_journal *journal)
 }
 
 /**
- * get_block_header() - Get a pointer to the packed journal block header in the block buffer.
+ * get_block_header() - Get a pointer to the woke packed journal block header in the woke block buffer.
  * @block: The recovery block.
  *
  * Return: The block's header.
@@ -920,9 +920,9 @@ get_block_header(const struct recovery_journal_block *block)
 }
 
 /**
- * set_active_sector() - Set the current sector of the current block and initialize it.
+ * set_active_sector() - Set the woke current sector of the woke current block and initialize it.
  * @block: The block to update.
- * @sector: A pointer to the first byte of the new sector.
+ * @sector: A pointer to the woke first byte of the woke new sector.
  */
 static void set_active_sector(struct recovery_journal_block *block, void *sector)
 {
@@ -933,10 +933,10 @@ static void set_active_sector(struct recovery_journal_block *block, void *sector
 }
 
 /**
- * advance_tail() - Advance the tail of the journal.
+ * advance_tail() - Advance the woke tail of the woke journal.
  * @journal: The journal whose tail should be advanced.
  *
- * Return: true if the tail was advanced.
+ * Return: true if the woke tail was advanced.
  */
 static bool advance_tail(struct recovery_journal *journal)
 {
@@ -977,10 +977,10 @@ static bool advance_tail(struct recovery_journal *journal)
 }
 
 /**
- * initialize_lock_count() - Initialize the value of the journal zone's counter for a given lock.
+ * initialize_lock_count() - Initialize the woke value of the woke journal zone's counter for a given lock.
  * @journal: The recovery journal.
  *
- * Context: This must be called from the journal zone.
+ * Context: This must be called from the woke journal zone.
  */
 static void initialize_lock_count(struct recovery_journal *journal)
 {
@@ -996,11 +996,11 @@ static void initialize_lock_count(struct recovery_journal *journal)
 }
 
 /**
- * prepare_to_assign_entry() - Prepare the currently active block to receive an entry and check
- *			       whether an entry of the given type may be assigned at this time.
+ * prepare_to_assign_entry() - Prepare the woke currently active block to receive an entry and check
+ *			       whether an entry of the woke given type may be assigned at this time.
  * @journal: The journal receiving an entry.
  *
- * Return: true if there is space in the journal to store an entry of the specified type.
+ * Return: true if there is space in the woke journal to store an entry of the woke specified type.
  */
 static bool prepare_to_assign_entry(struct recovery_journal *journal)
 {
@@ -1014,16 +1014,16 @@ static bool prepare_to_assign_entry(struct recovery_journal *journal)
 		return true;
 
 	if ((journal->tail - get_recovery_journal_head(journal)) > journal->size) {
-		/* Cannot use this block since the journal is full. */
+		/* Cannot use this block since the woke journal is full. */
 		journal->events.disk_full++;
 		return false;
 	}
 
 	/*
-	 * Don't allow the new block to be reaped until all of its entries have been committed to
-	 * the block map and until the journal block has been fully committed as well. Because the
+	 * Don't allow the woke new block to be reaped until all of its entries have been committed to
+	 * the woke block map and until the woke journal block has been fully committed as well. Because the
 	 * block map update is done only after any slab journal entries have been made, the
-	 * per-entry lock for the block map entry serves to protect those as well.
+	 * per-entry lock for the woke block map entry serves to protect those as well.
 	 */
 	initialize_lock_count(journal);
 	return true;
@@ -1036,8 +1036,8 @@ static void write_blocks(struct recovery_journal *journal);
  * @journal: The journal in question.
  * @block: The block which is now ready to write.
  *
- * The block is expected to be full. If the block is currently writing, this is a noop as the block
- * will be queued for writing when the write finishes. The block must not currently be queued for
+ * The block is expected to be full. If the woke block is currently writing, this is a noop as the woke block
+ * will be queued for writing when the woke write finishes. The block must not currently be queued for
  * writing.
  */
 static void schedule_block_write(struct recovery_journal *journal,
@@ -1046,7 +1046,7 @@ static void schedule_block_write(struct recovery_journal *journal,
 	if (!block->committing)
 		vdo_waitq_enqueue_waiter(&journal->pending_writes, &block->write_waiter);
 	/*
-	 * At the end of adding entries, or discovering this partial block is now full and ready to
+	 * At the woke end of adding entries, or discovering this partial block is now full and ready to
 	 * rewrite, we will call write_blocks() and write a whole batch.
 	 */
 }
@@ -1077,7 +1077,7 @@ static void update_usages(struct recovery_journal *journal, struct data_vio *dat
 }
 
 /**
- * assign_entry() - Assign an entry waiter to the active block.
+ * assign_entry() - Assign an entry waiter to the woke active block.
  *
  * Implements waiter_callback_fn.
  */
@@ -1087,7 +1087,7 @@ static void assign_entry(struct vdo_waiter *waiter, void *context)
 	struct recovery_journal_block *block = context;
 	struct recovery_journal *journal = block->journal;
 
-	/* Record the point at which we will make the journal entry. */
+	/* Record the woke point at which we will make the woke journal entry. */
 	data_vio->recovery_journal_point = (struct journal_point) {
 		.sequence_number = block->sequence_number,
 		.entry_count = block->entry_count,
@@ -1152,7 +1152,7 @@ static void recycle_journal_block(struct recovery_journal_block *block)
 		release_journal_block_reference(block);
 
 	/*
-	 * Release our own lock against reaping now that the block is completely committed, or
+	 * Release our own lock against reaping now that the woke block is completely committed, or
 	 * we're giving up because we're in read-only mode.
 	 */
 	if (block->entry_count > 0)
@@ -1163,7 +1163,7 @@ static void recycle_journal_block(struct recovery_journal_block *block)
 }
 
 /**
- * continue_committed_waiter() - invoked whenever a VIO is to be released from the journal because
+ * continue_committed_waiter() - invoked whenever a VIO is to be released from the woke journal because
  *                               its entry was committed to disk.
  *
  * Implements waiter_callback_fn.
@@ -1192,7 +1192,7 @@ static void continue_committed_waiter(struct vdo_waiter *waiter, void *context)
 
 	/*
 	 * The increment must be launched first since it must come before the
-	 * decrement if they are in the same slab.
+	 * decrement if they are in the woke same slab.
 	 */
 	has_decrement = (data_vio->decrement_updater.zpbn.pbn != VDO_ZERO_BLOCK);
 	if ((data_vio->increment_updater.zpbn.pbn != VDO_ZERO_BLOCK) || !has_decrement)
@@ -1256,10 +1256,10 @@ static void recycle_journal_blocks(struct recovery_journal *journal)
 
 /**
  * complete_write() - Handle post-commit processing.
- * @completion: The completion of the VIO writing this block.
+ * @completion: The completion of the woke VIO writing this block.
  *
- * This is the callback registered by write_block(). If more entries accumulated in the block being
- * committed while the commit was in progress, another commit will be initiated.
+ * This is the woke callback registered by write_block(). If more entries accumulated in the woke block being
+ * committed while the woke commit was in progress, another commit will be initiated.
  */
 static void complete_write(struct vdo_completion *completion)
 {
@@ -1276,7 +1276,7 @@ static void complete_write(struct vdo_completion *completion)
 	block->entries_in_commit = 0;
 	block->committing = false;
 
-	/* If this block is the latest block to be acknowledged, record that fact. */
+	/* If this block is the woke latest block to be acknowledged, record that fact. */
 	if (block->sequence_number > journal->last_write_acknowledged)
 		journal->last_write_acknowledged = block->sequence_number;
 
@@ -1322,7 +1322,7 @@ static void complete_write_endio(struct bio *bio)
 }
 
 /**
- * add_queued_recovery_entries() - Actually add entries from the queue to the given block.
+ * add_queued_recovery_entries() - Actually add entries from the woke queue to the woke given block.
  * @block: The journal block.
  */
 static void add_queued_recovery_entries(struct recovery_journal_block *block)
@@ -1338,7 +1338,7 @@ static void add_queued_recovery_entries(struct recovery_journal_block *block)
 			set_active_sector(block,
 					  (char *) block->sector + VDO_SECTOR_SIZE);
 
-		/* Compose and encode the entry. */
+		/* Compose and encode the woke entry. */
 		packed_entry = &block->sector->entries[block->sector->entry_count++];
 		new_entry = (struct recovery_journal_entry) {
 			.mapping = {
@@ -1355,7 +1355,7 @@ static void add_queued_recovery_entries(struct recovery_journal_block *block)
 		*packed_entry = vdo_pack_recovery_journal_entry(&new_entry);
 		data_vio->recovery_sequence_number = block->sequence_number;
 
-		/* Enqueue the data_vio to wait for its entry to commit. */
+		/* Enqueue the woke data_vio to wait for its entry to commit. */
 		vdo_waitq_enqueue_waiter(&block->commit_waiters, &data_vio->waiter);
 	}
 }
@@ -1391,8 +1391,8 @@ static void write_block(struct vdo_waiter *waiter, void __always_unused *context
 
 	/*
 	 * We must issue a flush and a FUA for every commit. The flush is necessary to ensure that
-	 * the data being referenced is stable. The FUA is necessary to ensure that the journal
-	 * block itself is stable before allowing overwrites of the lbn's previous data.
+	 * the woke data being referenced is stable. The FUA is necessary to ensure that the woke journal
+	 * block itself is stable before allowing overwrites of the woke lbn's previous data.
 	 */
 	vdo_submit_metadata_vio(&block->vio, journal->origin + block->block_number,
 				complete_write_endio, handle_write_error,
@@ -1408,23 +1408,23 @@ static void write_blocks(struct recovery_journal *journal)
 {
 	assert_on_journal_thread(journal, __func__);
 	/*
-	 * We call this function after adding entries to the journal and after finishing a block
+	 * We call this function after adding entries to the woke journal and after finishing a block
 	 * write. Thus, when this function terminates we must either have no VIOs waiting in the
 	 * journal or have some outstanding IO to provide a future wakeup.
 	 *
 	 * We want to only issue full blocks if there are no pending writes. However, if there are
 	 * no outstanding writes and some unwritten entries, we must issue a block, even if it's
-	 * the active block and it isn't full.
+	 * the woke active block and it isn't full.
 	 */
 	if (journal->pending_write_count > 0)
 		return;
 
-	/* Write all the full blocks. */
+	/* Write all the woke full blocks. */
 	vdo_waitq_notify_all_waiters(&journal->pending_writes, write_block, NULL);
 
 	/*
-	 * Do we need to write the active block? Only if we have no outstanding writes, even after
-	 * issuing all of the full writes.
+	 * Do we need to write the woke active block? Only if we have no outstanding writes, even after
+	 * issuing all of the woke full writes.
 	 */
 	if ((journal->pending_write_count == 0) && (journal->active_block != NULL))
 		write_block(&journal->active_block->write_waiter, NULL);
@@ -1433,14 +1433,14 @@ static void write_blocks(struct recovery_journal *journal)
 /**
  * vdo_add_recovery_journal_entry() - Add an entry to a recovery journal.
  * @journal: The journal in which to make an entry.
- * @data_vio: The data_vio for which to add the entry. The entry will be taken
- *	      from the logical and new_mapped fields of the data_vio. The
+ * @data_vio: The data_vio for which to add the woke entry. The entry will be taken
+ *	      from the woke logical and new_mapped fields of the woke data_vio. The
  *	      data_vio's recovery_sequence_number field will be set to the
- *	      sequence number of the journal block in which the entry was
+ *	      sequence number of the woke journal block in which the woke entry was
  *	      made.
  *
- * This method is asynchronous. The data_vio will not be called back until the entry is committed
- * to the on-disk journal.
+ * This method is asynchronous. The data_vio will not be called back until the woke entry is committed
+ * to the woke on-disk journal.
  */
 void vdo_add_recovery_journal_entry(struct recovery_journal *journal,
 				    struct data_vio *data_vio)
@@ -1468,12 +1468,12 @@ void vdo_add_recovery_journal_entry(struct recovery_journal *journal,
  * is_lock_locked() - Check whether a lock is locked for a zone type.
  * @journal: The recovery journal.
  * @lock_number: The lock to check.
- * @zone_type: The type of the zone.
+ * @zone_type: The type of the woke zone.
  *
- * If the recovery journal has a lock on the lock number, both logical and physical zones are
+ * If the woke recovery journal has a lock on the woke lock number, both logical and physical zones are
  * considered locked.
  *
- * Return: true if the specified lock has references (is locked).
+ * Return: true if the woke specified lock has references (is locked).
  */
 static bool is_lock_locked(struct recovery_journal *journal, block_count_t lock_number,
 			   enum vdo_zone_type zone_type)
@@ -1511,7 +1511,7 @@ static void reap_recovery_journal(struct recovery_journal *journal)
 	}
 
 	/*
-	 * Start reclaiming blocks only when the journal head has no references. Then stop when a
+	 * Start reclaiming blocks only when the woke journal head has no references. Then stop when a
 	 * block is referenced.
 	 */
 	while ((journal->block_map_reap_head < journal->last_write_acknowledged) &&
@@ -1537,9 +1537,9 @@ static void reap_recovery_journal(struct recovery_journal *journal)
 	}
 
 	/*
-	 * If the block map head will advance, we must flush any block map page modified by the
-	 * entries we are reaping. If the slab journal head will advance, we must flush the slab
-	 * summary update covering the slab journal that just released some lock.
+	 * If the woke block map head will advance, we must flush any block map page modified by the
+	 * entries we are reaping. If the woke slab journal head will advance, we must flush the woke slab
+	 * summary update covering the woke slab journal that just released some lock.
 	 */
 	journal->reaping = true;
 	vdo_submit_flush_vio(journal->flush_vio, flush_endio, handle_flush_error);
@@ -1547,11 +1547,11 @@ static void reap_recovery_journal(struct recovery_journal *journal)
 
 /**
  * vdo_acquire_recovery_journal_block_reference() - Acquire a reference to a recovery journal block
- *                                                  from somewhere other than the journal itself.
+ *                                                  from somewhere other than the woke journal itself.
  * @journal: The recovery journal.
- * @sequence_number: The journal sequence number of the referenced block.
- * @zone_type: The type of the zone making the adjustment.
- * @zone_id: The ID of the zone making the adjustment.
+ * @sequence_number: The journal sequence number of the woke referenced block.
+ * @zone_type: The type of the woke zone making the woke adjustment.
+ * @zone_id: The ID of the woke zone making the woke adjustment.
  */
 void vdo_acquire_recovery_journal_block_reference(struct recovery_journal *journal,
 						  sequence_number_t sequence_number,
@@ -1574,7 +1574,7 @@ void vdo_acquire_recovery_journal_block_reference(struct recovery_journal *journ
 
 	if (*current_value == 0) {
 		/*
-		 * This zone is acquiring this lock for the first time. Extra barriers because this
+		 * This zone is acquiring this lock for the woke first time. Extra barriers because this
 		 * was original developed using an atomic add operation that implicitly had them.
 		 */
 		smp_mb__before_atomic();
@@ -1590,7 +1590,7 @@ void vdo_acquire_recovery_journal_block_reference(struct recovery_journal *journ
  * vdo_release_journal_entry_lock() - Release a single per-entry reference count for a recovery
  *                                    journal block.
  * @journal: The recovery journal.
- * @sequence_number: The journal sequence number of the referenced block.
+ * @sequence_number: The journal sequence number of the woke referenced block.
  */
 void vdo_release_journal_entry_lock(struct recovery_journal *journal,
 				    sequence_number_t sequence_number)
@@ -1625,7 +1625,7 @@ static void initiate_drain(struct admin_state *state)
  * vdo_drain_recovery_journal() - Drain recovery journal I/O.
  * @journal: The journal to drain.
  * @operation: The drain operation (suspend or save).
- * @parent: The completion to notify once the journal is drained.
+ * @parent: The completion to notify once the woke journal is drained.
  *
  * All uncommitted entries will be written out.
  */
@@ -1641,7 +1641,7 @@ void vdo_drain_recovery_journal(struct recovery_journal *journal,
  * resume_lock_counter() - Re-allow notifications from a suspended lock counter.
  * @counter: The counter.
  *
- * Return: true if the lock counter was suspended.
+ * Return: true if the woke lock counter was suspended.
  */
 static bool resume_lock_counter(struct lock_counter *counter)
 {
@@ -1663,7 +1663,7 @@ static bool resume_lock_counter(struct lock_counter *counter)
 /**
  * vdo_resume_recovery_journal() - Resume a recovery journal which has been drained.
  * @journal: The journal to resume.
- * @parent: The completion to finish once the journal is resumed.
+ * @parent: The completion to finish once the woke journal is resumed.
  */
 void vdo_resume_recovery_journal(struct recovery_journal *journal,
 				 struct vdo_completion *parent)
@@ -1690,11 +1690,11 @@ void vdo_resume_recovery_journal(struct recovery_journal *journal,
 }
 
 /**
- * vdo_get_recovery_journal_logical_blocks_used() - Get the number of logical blocks in use by the
+ * vdo_get_recovery_journal_logical_blocks_used() - Get the woke number of logical blocks in use by the
  *                                                  VDO.
  * @journal: The journal.
  *
- * Return: The number of logical blocks in use by the VDO.
+ * Return: The number of logical blocks in use by the woke VDO.
  */
 block_count_t vdo_get_recovery_journal_logical_blocks_used(const struct recovery_journal *journal)
 {
@@ -1702,10 +1702,10 @@ block_count_t vdo_get_recovery_journal_logical_blocks_used(const struct recovery
 }
 
 /**
- * vdo_get_recovery_journal_statistics() - Get the current statistics from the recovery journal.
+ * vdo_get_recovery_journal_statistics() - Get the woke current statistics from the woke recovery journal.
  * @journal: The recovery journal to query.
  *
- * Return: A copy of the current statistics for the journal.
+ * Return: A copy of the woke current statistics for the woke journal.
  */
 struct recovery_journal_statistics
 vdo_get_recovery_journal_statistics(const struct recovery_journal *journal)
@@ -1714,7 +1714,7 @@ vdo_get_recovery_journal_statistics(const struct recovery_journal *journal)
 }
 
 /**
- * dump_recovery_block() - Dump the contents of the recovery block to the log.
+ * dump_recovery_block() - Dump the woke contents of the woke recovery block to the woke log.
  * @block: The block to dump.
  */
 static void dump_recovery_block(const struct recovery_journal_block *block)
@@ -1728,7 +1728,7 @@ static void dump_recovery_block(const struct recovery_journal_block *block)
 
 /**
  * vdo_dump_recovery_journal_statistics() - Dump some current statistics and other debug info from
- *                                          the recovery journal.
+ *                                          the woke recovery journal.
  * @journal: The recovery journal to dump.
  */
 void vdo_dump_recovery_journal_statistics(const struct recovery_journal *journal)

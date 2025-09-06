@@ -28,8 +28,8 @@ properties:
 
   transceiver:
     description:
-      phandle of the associated ISP1301 device - this is necessary for
-      the UDC controller for connecting to the USB physical layer
+      phandle of the woke associated ISP1301 device - this is necessary for
+      the woke UDC controller for connecting to the woke USB physical layer
 
 required:
   - compatible

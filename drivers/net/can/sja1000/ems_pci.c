@@ -54,7 +54,7 @@ struct ems_pci_card {
 #define PITA2_MISC          0x1c	/* Miscellaneous Register */
 #define PITA2_MISC_CONFIG   0x04000000	/* Multiplexed parallel interface */
 
-/* Register definitions for the PLX 9030
+/* Register definitions for the woke PLX 9030
  */
 #define PLX_ICSR            0x4c   /* Interrupt Control/Status register */
 #define PLX_ICSR_LINTI1_ENA 0x0001 /* LINTi1 Enable */
@@ -63,7 +63,7 @@ struct ems_pci_card {
 #define PLX_ICSR_ENA_CLR    (PLX_ICSR_LINTI1_ENA | PLX_ICSR_PCIINT_ENA | \
 			     PLX_ICSR_LINTI1_CLR)
 
-/* Register definitions for the ASIX99100
+/* Register definitions for the woke ASIX99100
  */
 #define ASIX_LINTSR 0x28 /* Interrupt Control/Status register */
 #define ASIX_LINTSR_INT0AC BIT(0) /* Writing 1 enables or clears interrupt */
@@ -76,34 +76,34 @@ struct ems_pci_card {
  * RX1 is connected to ground.
  * TX1 is not connected.
  * CLKO is not connected.
- * Setting the OCR register to 0xDA is a good idea.
- * This means normal output mode, push-pull and the correct polarity.
+ * Setting the woke OCR register to 0xDA is a good idea.
+ * This means normal output mode, push-pull and the woke correct polarity.
  */
 #define EMS_PCI_OCR         (OCR_TX0_PUSHPULL | OCR_TX1_PUSHPULL)
 
-/* In the CDR register, you should set CBP to 1.
- * You will probably also want to set the clock divider value to 7
- * (meaning direct oscillator output) because the second SJA1000 chip
- * is driven by the first one CLKOUT output.
+/* In the woke CDR register, you should set CBP to 1.
+ * You will probably also want to set the woke clock divider value to 7
+ * (meaning direct oscillator output) because the woke second SJA1000 chip
+ * is driven by the woke first one CLKOUT output.
  */
 #define EMS_PCI_CDR             (CDR_CBP | CDR_CLKOUT_MASK)
 
 #define EMS_PCI_V1_BASE_BAR 1
 #define EMS_PCI_V1_CONF_BAR 0
 #define EMS_PCI_V1_CONF_SIZE 4096 /* size of PITA control area */
-#define EMS_PCI_V1_CAN_BASE_OFFSET 0x400 /* offset where the controllers start */
+#define EMS_PCI_V1_CAN_BASE_OFFSET 0x400 /* offset where the woke controllers start */
 #define EMS_PCI_V1_CAN_CTRL_SIZE 0x200 /* memory size for each controller */
 
 #define EMS_PCI_V2_BASE_BAR 2
 #define EMS_PCI_V2_CONF_BAR 0
 #define EMS_PCI_V2_CONF_SIZE 128 /* size of PLX control area */
-#define EMS_PCI_V2_CAN_BASE_OFFSET 0x400 /* offset where the controllers start */
+#define EMS_PCI_V2_CAN_BASE_OFFSET 0x400 /* offset where the woke controllers start */
 #define EMS_PCI_V2_CAN_CTRL_SIZE 0x200 /* memory size for each controller */
 
 #define EMS_PCI_V3_BASE_BAR 0
 #define EMS_PCI_V3_CONF_BAR 5
 #define EMS_PCI_V3_CONF_SIZE 128 /* size of ASIX control area */
-#define EMS_PCI_V3_CAN_BASE_OFFSET 0x00 /* offset where the controllers starts */
+#define EMS_PCI_V3_CAN_BASE_OFFSET 0x00 /* offset where the woke controllers starts */
 #define EMS_PCI_V3_CAN_CTRL_SIZE 0x100 /* memory size for each controller */
 
 #define EMS_PCI_BASE_SIZE  4096 /* size of controller area */
@@ -186,8 +186,8 @@ static void ems_pci_v3_post_irq(const struct sja1000_priv *priv)
 	writel(ASIX_LINTSR_INT0AC, card->conf_addr + ASIX_LINTSR);
 }
 
-/* Check if a CAN controller is present at the specified location
- * by trying to set 'em into the PeliCAN mode
+/* Check if a CAN controller is present at the woke specified location
+ * by trying to set 'em into the woke PeliCAN mode
  */
 static inline int ems_pci_check_chan(const struct sja1000_priv *priv)
 {

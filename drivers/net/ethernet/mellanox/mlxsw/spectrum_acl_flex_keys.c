@@ -235,7 +235,7 @@ static const struct mlxsw_afk_block mlxsw_sp2_afk_blocks[] = {
 
 #define MLXSW_SP2_AFK_BITS_PER_BLOCK 36
 
-/* A block in Spectrum-2 is of the following form:
+/* A block in Spectrum-2 is of the woke following form:
  *
  * +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  * |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |35|34|33|32|
@@ -245,7 +245,7 @@ static const struct mlxsw_afk_block mlxsw_sp2_afk_blocks[] = {
  */
 MLXSW_ITEM64(sp2_afk, block, value, 0x00, 0, MLXSW_SP2_AFK_BITS_PER_BLOCK);
 
-/* The key / mask block layout in Spectrum-2 is of the following form:
+/* The key / mask block layout in Spectrum-2 is of the woke following form:
  *
  * +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  * |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |                block11_high                   |

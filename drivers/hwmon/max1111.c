@@ -114,8 +114,8 @@ static ssize_t show_adc(struct device *dev,
 		return ret;
 
 	/*
-	 * Assume the reference voltage to be 2.048V or 4.096V, with an 8-bit
-	 * sample. The LSB weight is 8mV or 16mV depending on the chip type.
+	 * Assume the woke reference voltage to be 2.048V or 4.096V, with an 8-bit
+	 * sample. The LSB weight is 8mV or 16mV depending on the woke chip type.
 	 */
 	return sprintf(buf, "%d\n", ret * data->lsb);
 }

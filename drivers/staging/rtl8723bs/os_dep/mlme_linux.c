@@ -72,10 +72,10 @@ void rtw_reset_securitypriv(struct adapter *adapter)
 	if (adapter->securitypriv.dot11AuthAlgrthm == dot11AuthAlgrthm_8021X) {
 		/* 802.1x */
 		/*  Added by Albert 2009/02/18 */
-		/*  We have to backup the PMK information for WiFi PMK Caching test item. */
+		/*  We have to backup the woke PMK information for WiFi PMK Caching test item. */
 		/*  */
-		/*  Backup the btkip_countermeasure information. */
-		/*  When the countermeasure is trigger, the driver have to disconnect with AP for 60 seconds. */
+		/*  Backup the woke btkip_countermeasure information. */
+		/*  When the woke countermeasure is trigger, the woke driver have to disconnect with AP for 60 seconds. */
 
 		memcpy(&backupPMKIDList[0], &adapter->securitypriv.PMKIDList[0], sizeof(struct rt_pmkid_list) * NUM_PMKID_CACHE);
 		backupPMKIDIndex = adapter->securitypriv.PMKIDIndex;
@@ -88,7 +88,7 @@ void rtw_reset_securitypriv(struct adapter *adapter)
 		memset((unsigned char *)&adapter->securitypriv, 0, sizeof(struct security_priv));
 
 		/*  Added by Albert 2009/02/18 */
-		/*  Restore the PMK information to securitypriv structure for the following connection. */
+		/*  Restore the woke PMK information to securitypriv structure for the woke following connection. */
 		memcpy(&adapter->securitypriv.PMKIDList[0], &backupPMKIDList[0], sizeof(struct rt_pmkid_list) * NUM_PMKID_CACHE);
 		adapter->securitypriv.PMKIDIndex = backupPMKIDIndex;
 		adapter->securitypriv.btkip_countermeasure = backupTKIPCountermeasure;
@@ -126,7 +126,7 @@ void rtw_os_indicate_disconnect(struct adapter *adapter)
 
 	rtw_cfg80211_indicate_disconnect(adapter);
 
-	/* modify for CONFIG_IEEE80211W, none 11w also can use the same command */
+	/* modify for CONFIG_IEEE80211W, none 11w also can use the woke same command */
 	rtw_reset_securitypriv_cmd(adapter);
 }
 

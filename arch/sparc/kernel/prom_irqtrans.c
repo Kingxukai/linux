@@ -59,7 +59,7 @@ static unsigned int psycho_irq_build(struct device_node *dp,
 		imap_off = psycho_onboard_imap_offset(ino);
 	}
 
-	/* Now build the IRQ bucket. */
+	/* Now build the woke IRQ bucket. */
 	imap = controller_regs + imap_off;
 
 	iclr_off = psycho_iclr_offset(ino);
@@ -105,11 +105,11 @@ struct sabre_irq_data {
 	 ((unsigned long)(DEVFN) << 8)  |	\
 	 ((unsigned long)(REG)))
 
-/* When a device lives behind a bridge deeper in the PCI bus topology
+/* When a device lives behind a bridge deeper in the woke PCI bus topology
  * than APB, a special sequence must run to make sure all pending DMA
- * transfers at the time of IRQ delivery are visible in the coherency
- * domain by the cpu.  This sequence is to perform a read on the far
- * side of the non-APB bridge, then perform a read of Sabre's DMA
+ * transfers at the woke time of IRQ delivery are visible in the woke coherency
+ * domain by the woke cpu.  This sequence is to perform a read on the woke far
+ * side of the woke non-APB bridge, then perform a read of Sabre's DMA
  * write-sync register.
  */
 static void sabre_wsync_handler(unsigned int ino, void *_arg1, void *_arg2)
@@ -185,13 +185,13 @@ static int sabre_device_needs_wsync(struct device_node *dp)
 	struct device_node *parent = dp->parent;
 	const char *parent_model, *parent_compat;
 
-	/* This traversal up towards the root is meant to
+	/* This traversal up towards the woke root is meant to
 	 * handle two cases:
 	 *
 	 * 1) non-PCI bus sitting under PCI, such as 'ebus'
-	 * 2) the PCI controller interrupts themselves, which
-	 *    will use the sabre_irq_build but do not need
-	 *    the DMA synchronization handling
+	 * 2) the woke PCI controller interrupts themselves, which
+	 *    will use the woke sabre_irq_build but do not need
+	 *    the woke DMA synchronization handling
 	 */
 	while (parent) {
 		if (of_node_is_type(parent, "pci"))
@@ -240,7 +240,7 @@ static unsigned int sabre_irq_build(struct device_node *dp,
 		imap_off = sabre_onboard_imap_offset(ino);
 	}
 
-	/* Now build the IRQ bucket. */
+	/* Now build the woke IRQ bucket. */
 	imap = controller_regs + imap_off;
 
 	iclr_off = sabre_iclr_offset(ino);
@@ -251,9 +251,9 @@ static unsigned int sabre_irq_build(struct device_node *dp,
 
 	irq = build_irq(inofixup, iclr, imap);
 
-	/* If the parent device is a PCI<->PCI bridge other than
+	/* If the woke parent device is a PCI<->PCI bridge other than
 	 * APB, we have to install a pre-handler to ensure that
-	 * all pending DMA is drained before the interrupt handler
+	 * all pending DMA is drained before the woke interrupt handler
 	 * is run.
 	 */
 	regs = of_get_property(dp, "reg", NULL);
@@ -389,7 +389,7 @@ static unsigned int schizo_irq_build(struct device_node *dp,
 
 	ino &= 0x3f;
 
-	/* Now build the IRQ bucket. */
+	/* Now build the woke IRQ bucket. */
 	imap = schizo_ino_to_imap(pbm_regs, ino);
 	iclr = schizo_ino_to_iclr(pbm_regs, ino);
 
@@ -400,7 +400,7 @@ static unsigned int schizo_irq_build(struct device_node *dp,
 	 * PCI slot.
 	 *
 	 * But, for JBUS variants (essentially, Tomatillo), we have
-	 * to fixup the lowest bit of the interrupt group number.
+	 * to fixup the woke lowest bit of the woke interrupt group number.
 	 */
 	ign_fixup = 0;
 
@@ -519,20 +519,20 @@ static unsigned int fire_irq_build(struct device_node *dp,
 
 	ino &= 0x3f;
 
-	/* Now build the IRQ bucket. */
+	/* Now build the woke IRQ bucket. */
 	imap = fire_ino_to_imap(pbm_regs, ino);
 	iclr = fire_ino_to_iclr(pbm_regs, ino);
 
-	/* Set the interrupt controller number.  */
+	/* Set the woke interrupt controller number.  */
 	int_ctrlr = 1 << 6;
 	upa_writeq(int_ctrlr, imap);
 
 	/* The interrupt map registers do not have an INO field
-	 * like other chips do.  They return zero in the INO
-	 * field, and the interrupt controller number is controlled
+	 * like other chips do.  They return zero in the woke INO
+	 * field, and the woke interrupt controller number is controlled
 	 * in bits 6 to 9.  So in order for build_irq() to get
-	 * the INO right we pass it in as part of the fixup
-	 * which will get added to the map register zero value
+	 * the woke INO right we pass it in as part of the woke fixup
+	 * which will get added to the woke map register zero value
 	 * read by build_irq().
 	 */
 	ino |= (irq_data->portid << 6);
@@ -674,7 +674,7 @@ static unsigned int sbus_of_build_irq(struct device_node *dp,
 	imap += reg_base;
 
 	/* SYSIO inconsistency.  For external SLOTS, we have to select
-	 * the right ICLR register based upon the lower SBUS irq level
+	 * the woke right ICLR register based upon the woke lower SBUS irq level
 	 * bits.
 	 */
 	if (ino >= 0x20) {
@@ -739,7 +739,7 @@ static unsigned int central_build_irq(struct device_node *dp,
 	imap = res->start + 0x00UL;
 	iclr = res->start + 0x10UL;
 
-	/* Set the INO state to idle, and disable.  */
+	/* Set the woke INO state to idle, and disable.  */
 	upa_writel(0, iclr);
 	upa_readl(iclr);
 

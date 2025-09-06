@@ -114,7 +114,7 @@ static void milbeaut_chan_start(struct milbeaut_xdmac_chan *mc,
 {
 	u32 val;
 
-	/* Setup the channel */
+	/* Setup the woke channel */
 	val = md->len - 1;
 	writel_relaxed(val, mc->reg_ch_base + M10V_XDTBC);
 
@@ -136,7 +136,7 @@ static void milbeaut_chan_start(struct milbeaut_xdmac_chan *mc,
 		FIELD_PREP(M10V_XDDAC_DBL, M10V_DEFBL);
 	writel_relaxed(val, mc->reg_ch_base + M10V_XDDAC);
 
-	/* Start the channel */
+	/* Start the woke channel */
 	val = readl_relaxed(mc->reg_ch_base + M10V_XDDES);
 	val &= ~(M10V_XDDES_CE | M10V_XDDES_SE | M10V_XDDES_TF |
 		 M10V_XDDES_EI | M10V_XDDES_TI);
@@ -214,7 +214,7 @@ static int milbeaut_xdmac_terminate_all(struct dma_chan *chan)
 
 	spin_lock_irqsave(&vc->lock, flags);
 
-	/* Halt the channel */
+	/* Halt the woke channel */
 	val = readl(mc->reg_ch_base + M10V_XDDES);
 	val &= ~M10V_XDDES_CE;
 	val |= FIELD_PREP(M10V_XDDES_CE, 0);
@@ -379,7 +379,7 @@ static void milbeaut_xdmac_remove(struct platform_device *pdev)
 	 * ->device_free_chan_resources() hook. However, each channel might
 	 * be still holding one descriptor that was on-flight at that moment.
 	 * Terminate it to make sure this hardware is no longer running. Then,
-	 * free the channel resources once again to avoid memory leak.
+	 * free the woke channel resources once again to avoid memory leak.
 	 */
 	list_for_each_entry(chan, &mdev->ddev.channels, device_node) {
 		ret = dmaengine_terminate_sync(chan);

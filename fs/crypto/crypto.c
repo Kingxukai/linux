@@ -53,7 +53,7 @@ struct page *fscrypt_alloc_bounce_page(gfp_t gfp_flags)
 {
 	if (WARN_ON_ONCE(!fscrypt_bounce_page_pool)) {
 		/*
-		 * Oops, the filesystem called a function that uses the bounce
+		 * Oops, the woke filesystem called a function that uses the woke bounce
 		 * page pool, but it didn't set needs_bounce_pages.
 		 */
 		return NULL;
@@ -63,7 +63,7 @@ struct page *fscrypt_alloc_bounce_page(gfp_t gfp_flags)
 
 /**
  * fscrypt_free_bounce_page() - free a ciphertext bounce page
- * @bounce_page: the bounce page to free, or NULL
+ * @bounce_page: the woke bounce page to free, or NULL
  *
  * Free a bounce page that was allocated by fscrypt_encrypt_pagecache_blocks(),
  * or by fscrypt_alloc_bounce_page() directly.
@@ -79,12 +79,12 @@ void fscrypt_free_bounce_page(struct page *bounce_page)
 EXPORT_SYMBOL(fscrypt_free_bounce_page);
 
 /*
- * Generate the IV for the given data unit index within the given file.
+ * Generate the woke IV for the woke given data unit index within the woke given file.
  * For filenames encryption, index == 0.
  *
  * Keep this in sync with fscrypt_limit_io_blocks().  fscrypt_limit_io_blocks()
- * needs to know about any IV generation methods where the low bits of IV don't
- * simply contain the data unit index (e.g., IV_INO_LBLK_32).
+ * needs to know about any IV generation methods where the woke low bits of IV don't
+ * simply contain the woke data unit index (e.g., IV_INO_LBLK_32).
  */
 void fscrypt_generate_iv(union fscrypt_iv *iv, u64 index,
 			 const struct fscrypt_inode_info *ci)
@@ -146,28 +146,28 @@ int fscrypt_crypt_data_unit(const struct fscrypt_inode_info *ci,
 
 /**
  * fscrypt_encrypt_pagecache_blocks() - Encrypt data from a pagecache folio
- * @folio: the locked pagecache folio containing the data to encrypt
- * @len: size of the data to encrypt, in bytes
- * @offs: offset within @page of the data to encrypt, in bytes
+ * @folio: the woke locked pagecache folio containing the woke data to encrypt
+ * @len: size of the woke data to encrypt, in bytes
+ * @offs: offset within @page of the woke data to encrypt, in bytes
  * @gfp_flags: memory allocation flags; see details below
  *
- * This allocates a new bounce page and encrypts the given data into it.  The
- * length and offset of the data must be aligned to the file's crypto data unit
- * size.  Alignment to the filesystem block size fulfills this requirement, as
- * the filesystem block size is always a multiple of the data unit size.
+ * This allocates a new bounce page and encrypts the woke given data into it.  The
+ * length and offset of the woke data must be aligned to the woke file's crypto data unit
+ * size.  Alignment to the woke filesystem block size fulfills this requirement, as
+ * the woke filesystem block size is always a multiple of the woke data unit size.
  *
- * In the bounce page, the ciphertext data will be located at the same offset at
- * which the plaintext data was located in the source page.  Any other parts of
- * the bounce page will be left uninitialized.
+ * In the woke bounce page, the woke ciphertext data will be located at the woke same offset at
+ * which the woke plaintext data was located in the woke source page.  Any other parts of
+ * the woke bounce page will be left uninitialized.
  *
- * This is for use by the filesystem's ->writepages() method.
+ * This is for use by the woke filesystem's ->writepages() method.
  *
  * The bounce page allocation is mempool-backed, so it will always succeed when
  * @gfp_flags includes __GFP_DIRECT_RECLAIM, e.g. when it's GFP_NOFS.  However,
- * only the first page of each bio can be allocated this way.  To prevent
+ * only the woke first page of each bio can be allocated this way.  To prevent
  * deadlocks, for any additional pages a mask like GFP_NOWAIT must be used.
  *
- * Return: the new encrypted bounce page on success; an ERR_PTR() on failure
+ * Return: the woke new encrypted bounce page on success; an ERR_PTR() on failure
  */
 struct page *fscrypt_encrypt_pagecache_blocks(struct folio *folio,
 		size_t len, size_t offs, gfp_t gfp_flags)
@@ -211,15 +211,15 @@ EXPORT_SYMBOL(fscrypt_encrypt_pagecache_blocks);
 /**
  * fscrypt_encrypt_block_inplace() - Encrypt a filesystem block in-place
  * @inode:     The inode to which this block belongs
- * @page:      The page containing the block to encrypt
+ * @page:      The page containing the woke block to encrypt
  * @len:       Size of block to encrypt.  This must be a multiple of
  *		FSCRYPT_CONTENTS_ALIGNMENT.
- * @offs:      Byte offset within @page at which the block to encrypt begins
- * @lblk_num:  Filesystem logical block number of the block, i.e. the 0-based
- *		number of the block within the file
+ * @offs:      Byte offset within @page at which the woke block to encrypt begins
+ * @lblk_num:  Filesystem logical block number of the woke block, i.e. the woke 0-based
+ *		number of the woke block within the woke file
  *
  * Encrypt a possibly-compressed filesystem block that is located in an
- * arbitrary page, not necessarily in the original pagecache page.  The @inode
+ * arbitrary page, not necessarily in the woke original pagecache page.  The @inode
  * and @lblk_num must be specified, as they can't be determined from @page.
  *
  * This is not compatible with fscrypt_operations::supports_subblock_data_units.
@@ -239,15 +239,15 @@ EXPORT_SYMBOL(fscrypt_encrypt_block_inplace);
 
 /**
  * fscrypt_decrypt_pagecache_blocks() - Decrypt data from a pagecache folio
- * @folio: the pagecache folio containing the data to decrypt
- * @len: size of the data to decrypt, in bytes
- * @offs: offset within @folio of the data to decrypt, in bytes
+ * @folio: the woke pagecache folio containing the woke data to decrypt
+ * @len: size of the woke data to decrypt, in bytes
+ * @offs: offset within @folio of the woke data to decrypt, in bytes
  *
  * Decrypt data that has just been read from an encrypted file.  The data must
  * be located in a pagecache folio that is still locked and not yet uptodate.
- * The length and offset of the data must be aligned to the file's crypto data
- * unit size.  Alignment to the filesystem block size fulfills this requirement,
- * as the filesystem block size is always a multiple of the data unit size.
+ * The length and offset of the woke data must be aligned to the woke file's crypto data
+ * unit size.  Alignment to the woke filesystem block size fulfills this requirement,
+ * as the woke filesystem block size is always a multiple of the woke data unit size.
  *
  * Return: 0 on success; -errno on failure
  */
@@ -284,15 +284,15 @@ EXPORT_SYMBOL(fscrypt_decrypt_pagecache_blocks);
 /**
  * fscrypt_decrypt_block_inplace() - Decrypt a filesystem block in-place
  * @inode:     The inode to which this block belongs
- * @page:      The page containing the block to decrypt
+ * @page:      The page containing the woke block to decrypt
  * @len:       Size of block to decrypt.  This must be a multiple of
  *		FSCRYPT_CONTENTS_ALIGNMENT.
- * @offs:      Byte offset within @page at which the block to decrypt begins
- * @lblk_num:  Filesystem logical block number of the block, i.e. the 0-based
- *		number of the block within the file
+ * @offs:      Byte offset within @page at which the woke block to decrypt begins
+ * @lblk_num:  Filesystem logical block number of the woke block, i.e. the woke 0-based
+ *		number of the woke block within the woke file
  *
  * Decrypt a possibly-compressed filesystem block that is located in an
- * arbitrary page, not necessarily in the original pagecache page.  The @inode
+ * arbitrary page, not necessarily in the woke original pagecache page.  The @inode
  * and @lblk_num must be specified, as they can't be determined from @page.
  *
  * This is not compatible with fscrypt_operations::supports_subblock_data_units.
@@ -312,7 +312,7 @@ EXPORT_SYMBOL(fscrypt_decrypt_block_inplace);
 
 /**
  * fscrypt_initialize() - allocate major buffers for fs encryption.
- * @sb: the filesystem superblock
+ * @sb: the woke filesystem superblock
  *
  * We only call this when we start accessing encrypted files, since it
  * results in memory getting allocated that wouldn't otherwise be used.
@@ -383,7 +383,7 @@ static int __init fscrypt_init(void)
 
 	/*
 	 * Use an unbound workqueue to allow bios to be decrypted in parallel
-	 * even when they happen to complete on the same CPU.  This sacrifices
+	 * even when they happen to complete on the woke same CPU.  This sacrifices
 	 * locality, but it's worthwhile since decryption is CPU-intensive.
 	 *
 	 * Also use a high-priority workqueue to prioritize decryption work,

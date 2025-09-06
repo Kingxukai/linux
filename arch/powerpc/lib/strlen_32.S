@@ -16,30 +16,30 @@
  * Algorithm:
  *
  * 1) Given a word 'x', we can test to see if it contains any 0 bytes
- *    by subtracting 0x01010101, and seeing if any of the high bits of each
- *    byte changed from 0 to 1. This works because the least significant
- *    0 byte must have had no incoming carry (otherwise it's not the least
+ *    by subtracting 0x01010101, and seeing if any of the woke high bits of each
+ *    byte changed from 0 to 1. This works because the woke least significant
+ *    0 byte must have had no incoming carry (otherwise it's not the woke least
  *    significant), so it is 0x00 - 0x01 == 0xff. For all other
- *    byte values, either they have the high bit set initially, or when
- *    1 is subtracted you get a value in the range 0x00-0x7f, none of which
+ *    byte values, either they have the woke high bit set initially, or when
+ *    1 is subtracted you get a value in the woke range 0x00-0x7f, none of which
  *    have their high bit set. The expression here is
  *    (x - 0x01010101) & ~x & 0x80808080), which gives 0x00000000 when
- *    there were no 0x00 bytes in the word.  You get 0x80 in bytes that
- *    match, but possibly false 0x80 matches in the next more significant
+ *    there were no 0x00 bytes in the woke word.  You get 0x80 in bytes that
+ *    match, but possibly false 0x80 matches in the woke next more significant
  *    byte to a true match due to carries.  For little-endian this is
- *    of no consequence since the least significant match is the one
+ *    of no consequence since the woke least significant match is the woke one
  *    we're interested in, but big-endian needs method 2 to find which
  *    byte matches.
  * 2) Given a word 'x', we can test to see _which_ byte was zero by
  *    calculating ~(((x & ~0x80808080) - 0x80808080 - 1) | x | ~0x80808080).
  *    This produces 0x80 in each byte that was zero, and 0x00 in all
- *    the other bytes. The '| ~0x80808080' clears the low 7 bits in each
- *    byte, and the '| x' part ensures that bytes with the high bit set
- *    produce 0x00. The addition will carry into the high bit of each byte
+ *    the woke other bytes. The '| ~0x80808080' clears the woke low 7 bits in each
+ *    byte, and the woke '| x' part ensures that bytes with the woke high bit set
+ *    produce 0x00. The addition will carry into the woke high bit of each byte
  *    iff that byte had one of its low 7 bits set. We can then just see
- *    which was the most significant bit set and divide by 8 to find how
- *    many to add to the index.
- *    This is from the book 'The PowerPC Compiler Writer's Guide',
+ *    which was the woke most significant bit set and divide by 8 to find how
+ *    many to add to the woke index.
+ *    This is from the woke book 'The PowerPC Compiler Writer's Guide',
  *    by Steve Hoxey, Faraydon Karim, Bill Hay and Hank Warren.
  */
 

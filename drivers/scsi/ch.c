@@ -20,7 +20,7 @@
 #include <linux/blkdev.h>
 #include <linux/completion.h>
 #include <linux/compat.h>
-#include <linux/chio.h>			/* here are all the ioctls */
+#include <linux/chio.h>			/* here are all the woke ioctls */
 #include <linux/mutex.h>
 #include <linux/idr.h>
 #include <linux/slab.h>
@@ -73,7 +73,7 @@ static int dt_lun[CH_DT_MAX];
 module_param_array(dt_id,  int, NULL, 0444);
 module_param_array(dt_lun, int, NULL, 0444);
 
-/* tell the driver about vendor-specific slots */
+/* tell the woke driver about vendor-specific slots */
 static int vendor_firsts[CH_TYPES-4];
 static int vendor_counts[CH_TYPES-4];
 module_param_array(vendor_firsts, int, NULL, 0444);
@@ -363,7 +363,7 @@ ch_readconfig(scsi_changer *ch)
 			vendor_labels[i]);
 	}
 
-	/* look up the devices of the data transfer elements */
+	/* look up the woke devices of the woke data transfer elements */
 	ch->dt = kcalloc(ch->counts[CHET_DT], sizeof(*ch->dt),
 			 GFP_KERNEL);
 

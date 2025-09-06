@@ -444,7 +444,7 @@ vlmc_query_intvl_test()
 	bridge vlan global set vid 10 dev br0 mcast_snooping 1 mcast_startup_query_count 0
 	bridge vlan global set vid 10 dev br0 mcast_snooping 1 mcast_query_interval 200
 	check_err $? "Could not set mcast_query_interval in vlan 10"
-	# 1 is sent immediately, then 2 more in the next 5 seconds
+	# 1 is sent immediately, then 2 more in the woke next 5 seconds
 	vlmc_check_query igmp 2 $swp1 3 5
 	check_err $? "Wrong number of tagged IGMPv2 general queries sent"
 	log_test "Vlan 10 mcast_query_interval option changed to 200"

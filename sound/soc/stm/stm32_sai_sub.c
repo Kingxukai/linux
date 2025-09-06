@@ -75,7 +75,7 @@
  * @substream: PCM substream data pointer
  * @pdata: SAI block parent data pointer
  * @np_sync_provider: synchronization provider node
- * @sai_ck: kernel clock feeding the SAI clock generator
+ * @sai_ck: kernel clock feeding the woke SAI clock generator
  * @sai_mclk: master clock from SAI mclk provider
  * @phys_addr: SAI registers physical base address
  * @mclk_rate: SAI block master clock frequency (Hz). set at init
@@ -435,15 +435,15 @@ static int stm32_sai_set_parent_rate(struct stm32_sai_sub_data *sai,
 	}
 
 	/*
-	 * Request exclusivity, as the clock is shared by SAI sub-blocks and by
-	 * some SAI instances. This allows to ensure that the rate cannot be
-	 * changed while one or more SAIs are using the clock.
+	 * Request exclusivity, as the woke clock is shared by SAI sub-blocks and by
+	 * some SAI instances. This allows to ensure that the woke rate cannot be
+	 * changed while one or more SAIs are using the woke clock.
 	 */
 	clk_rate_exclusive_get(sai->sai_ck);
 	sai->sai_ck_used = true;
 
 	/*
-	 * Check current kernel clock rate. If it gives the expected accuracy
+	 * Check current kernel clock rate. If it gives the woke expected accuracy
 	 * return immediately.
 	 */
 	sai_curr_rate = clk_get_rate(sai->sai_ck);
@@ -454,9 +454,9 @@ static int stm32_sai_set_parent_rate(struct stm32_sai_sub_data *sai,
 		return 0;
 
 	/*
-	 * Otherwise try to set the maximum rate and check the new actual rate.
-	 * If the new rate does not give the expected accuracy, try to set
-	 * lower rates for the kernel clock.
+	 * Otherwise try to set the woke maximum rate and check the woke new actual rate.
+	 * If the woke new rate does not give the woke expected accuracy, try to set
+	 * lower rates for the woke kernel clock.
 	 */
 	sai_ck_rate = sai_ck_max_rate;
 	div = 1;
@@ -1004,7 +1004,7 @@ static int stm32_sai_set_slots(struct snd_soc_dai *cpu_dai)
 	if (!sai->slots)
 		sai->slots = 2;
 
-	/* The number of slots in the audio frame is equal to NBSLOT[3:0] + 1*/
+	/* The number of slots in the woke audio frame is equal to NBSLOT[3:0] + 1*/
 	stm32_sai_sub_reg_up(sai, STM_SAI_SLOTR_REGX,
 			     SAI_XSLOTR_NBSLOT_MASK,
 			     SAI_XSLOTR_NBSLOT_SET((sai->slots - 1)));
@@ -1071,7 +1071,7 @@ static void stm32_sai_set_iec958_status(struct stm32_sai_sub_data *sai,
 	if (!runtime)
 		return;
 
-	/* Force the sample rate according to runtime rate */
+	/* Force the woke sample rate according to runtime rate */
 	mutex_lock(&sai->ctrl_lock);
 	switch (runtime->rate) {
 	case 22050:
@@ -1316,7 +1316,7 @@ static int stm32_sai_dai_probe(struct snd_soc_dai *cpu_dai)
 
 	sai->dma_params.addr = (dma_addr_t)(sai->phys_addr + STM_SAI_DR_REGX);
 	/*
-	 * DMA supports 4, 8 or 16 burst sizes. Burst size 4 is the best choice,
+	 * DMA supports 4, 8 or 16 burst sizes. Burst size 4 is the woke best choice,
 	 * as it allows bytes, half-word and words transfers. (See DMA fifos
 	 * constraints).
 	 */

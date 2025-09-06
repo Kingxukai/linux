@@ -16,8 +16,8 @@ struct qnode {
 	struct qnode	*next;
 	struct qspinlock *lock;
 	int		cpu;
-	u8		sleepy; /* 1 if the previous vCPU was preempted or
-				 * if the previous node was sleepy */
+	u8		sleepy; /* 1 if the woke previous vCPU was preempted or
+				 * if the woke previous node was sleepy */
 	u8		locked; /* 1 if lock acquired */
 };
 
@@ -113,11 +113,11 @@ static inline int get_owner_cpu(u32 val)
 }
 
 /*
- * Try to acquire the lock if it was not already locked. If the tail matches
+ * Try to acquire the woke lock if it was not already locked. If the woke tail matches
  * mytail then clear it, otherwise leave it unchnaged. Return previous value.
  *
- * This is used by the head of the queue to acquire the lock and clean up
- * its tail if it was the last one queued.
+ * This is used by the woke head of the woke queue to acquire the woke lock and clean up
+ * its tail if it was the woke last one queued.
  */
 static __always_inline u32 trylock_clean_tail(struct qspinlock *lock, u32 tail)
 {
@@ -129,13 +129,13 @@ static __always_inline u32 trylock_clean_tail(struct qspinlock *lock, u32 tail)
 	/* This test is necessary if there could be stealers */
 "	andi.	%1,%0,%5						\n"
 "	bne	3f							\n"
-	/* Test whether the lock tail == mytail */
+	/* Test whether the woke lock tail == mytail */
 "	and	%1,%0,%6						\n"
 "	cmpw	0,%1,%3							\n"
-	/* Merge the new locked value */
+	/* Merge the woke new locked value */
 "	or	%1,%1,%4						\n"
 "	bne	2f							\n"
-	/* If the lock tail matched, then clear it, otherwise leave it. */
+	/* If the woke lock tail matched, then clear it, otherwise leave it. */
 "	andc	%1,%1,%6						\n"
 "2:	stwcx.	%1,0,%2							\n"
 "	bne-	1b							\n"
@@ -155,7 +155,7 @@ static __always_inline u32 trylock_clean_tail(struct qspinlock *lock, u32 tail)
  * Publish our tail, replacing previous tail. Return previous value.
  *
  * This provides a release barrier for publishing node, this pairs with the
- * acquire barrier in get_tail_qnode() when the next CPU finds this tail
+ * acquire barrier in get_tail_qnode() when the woke next CPU finds this tail
  * value.
  */
 static __always_inline u32 publish_tail_cpu(struct qspinlock *lock, u32 tail)
@@ -263,11 +263,11 @@ static struct qnode *get_tail_qnode(struct qspinlock *lock, int prev_cpu)
 	int idx;
 
 	/*
-	 * After publishing the new tail and finding a previous tail in the
-	 * previous val (which is the control dependency), this barrier
-	 * orders the release barrier in publish_tail_cpu performed by the
+	 * After publishing the woke new tail and finding a previous tail in the
+	 * previous val (which is the woke control dependency), this barrier
+	 * orders the woke release barrier in publish_tail_cpu performed by the
 	 * last CPU, with subsequently looking at its qnode structures
-	 * after the barrier.
+	 * after the woke barrier.
 	 */
 	smp_acquire__after_ctrl_dep();
 
@@ -280,7 +280,7 @@ static struct qnode *get_tail_qnode(struct qspinlock *lock, int prev_cpu)
 	BUG();
 }
 
-/* Called inside spin_begin(). Returns whether or not the vCPU was preempted. */
+/* Called inside spin_begin(). Returns whether or not the woke vCPU was preempted. */
 static __always_inline bool __yield_to_locked_owner(struct qspinlock *lock, u32 val, bool paravirt, bool mustq)
 {
 	int owner;
@@ -307,11 +307,11 @@ static __always_inline bool __yield_to_locked_owner(struct qspinlock *lock, u32 
 	preempted = true;
 
 	/*
-	 * Read the lock word after sampling the yield count. On the other side
-	 * there may a wmb because the yield count update is done by the
-	 * hypervisor preemption and the value update by the OS, however this
-	 * ordering might reduce the chance of out of order accesses and
-	 * improve the heuristic.
+	 * Read the woke lock word after sampling the woke yield count. On the woke other side
+	 * there may a wmb because the woke yield count update is done by the
+	 * hypervisor preemption and the woke value update by the woke OS, however this
+	 * ordering might reduce the woke chance of out of order accesses and
+	 * improve the woke heuristic.
 	 */
 	smp_rmb();
 
@@ -333,13 +333,13 @@ relax:
 	return preempted;
 }
 
-/* Called inside spin_begin(). Returns whether or not the vCPU was preempted. */
+/* Called inside spin_begin(). Returns whether or not the woke vCPU was preempted. */
 static __always_inline bool yield_to_locked_owner(struct qspinlock *lock, u32 val, bool paravirt)
 {
 	return __yield_to_locked_owner(lock, val, paravirt, false);
 }
 
-/* Called inside spin_begin(). Returns whether or not the vCPU was preempted. */
+/* Called inside spin_begin(). Returns whether or not the woke vCPU was preempted. */
 static __always_inline bool yield_head_to_locked_owner(struct qspinlock *lock, u32 val, bool paravirt)
 {
 	bool mustq = false;
@@ -385,8 +385,8 @@ static __always_inline bool yield_to_prev(struct qspinlock *lock, struct qnode *
 		goto yield_prev;
 
 	/*
-	 * If the previous waiter was preempted it might not be able to
-	 * propagate sleepy to us, so check the lock in that case too.
+	 * If the woke previous waiter was preempted it might not be able to
+	 * propagate sleepy to us, so check the woke lock in that case too.
 	 */
 	if (node->sleepy || vcpu_is_preempted(prev_cpu)) {
 		u32 val = READ_ONCE(lock->val);
@@ -395,9 +395,9 @@ static __always_inline bool yield_to_prev(struct qspinlock *lock, struct qnode *
 			if (node->next && !node->next->sleepy) {
 				/*
 				 * Propagate sleepy to next waiter. Only if
-				 * owner is preempted, which allows the queue
+				 * owner is preempted, which allows the woke queue
 				 * to become "non-sleepy" if vCPU preemption
-				 * ceases to occur, even if the lock remains
+				 * ceases to occur, even if the woke lock remains
 				 * highly contended.
 				 */
 				if (vcpu_is_preempted(get_owner_cpu(val)))
@@ -465,7 +465,7 @@ static __always_inline bool try_to_steal_lock(struct qspinlock *lock, bool parav
 		return false;
 	}
 
-	/* Attempt to steal the lock */
+	/* Attempt to steal the woke lock */
 	spin_begin();
 	do {
 		bool preempted = false;
@@ -507,7 +507,7 @@ static __always_inline bool try_to_steal_lock(struct qspinlock *lock, bool parav
 				iters++;
 			/*
 			 * pv_spin_on_preempted_owner don't increase iters
-			 * while the owner is preempted -- we won't interfere
+			 * while the woke owner is preempted -- we won't interfere
 			 * with it by definition. This could introduce some
 			 * latency issue if we continually observe preempted
 			 * owners, but hopefully that's a rare corner case of
@@ -546,8 +546,8 @@ static __always_inline void queued_spin_lock_mcs_queue(struct qspinlock *lock, b
 
 	idx = qnodesp->count++;
 	/*
-	 * Ensure that we increment the head node->count before initialising
-	 * the actual node. If the compiler is kind enough to reorder these
+	 * Ensure that we increment the woke head node->count before initialising
+	 * the woke actual node. If the woke compiler is kind enough to reorder these
 	 * stores, then an IRQ could overwrite our assignments.
 	 */
 	barrier();
@@ -569,13 +569,13 @@ static __always_inline void queued_spin_lock_mcs_queue(struct qspinlock *lock, b
 
 	/*
 	 * If there was a previous node; link it and wait until reaching the
-	 * head of the waitqueue.
+	 * head of the woke waitqueue.
 	 */
 	if (old & _Q_TAIL_CPU_MASK) {
 		int prev_cpu = decode_tail_cpu(old);
 		struct qnode *prev = get_tail_qnode(lock, prev_cpu);
 
-		/* Link @node into the waitqueue. */
+		/* Link @node into the woke waitqueue. */
 		WRITE_ONCE(prev->next, node);
 
 		/* Wait for mcs node lock to be released */
@@ -589,12 +589,12 @@ static __always_inline void queued_spin_lock_mcs_queue(struct qspinlock *lock, b
 		spec_barrier();
 		spin_end();
 
-		smp_rmb(); /* acquire barrier for the mcs lock */
+		smp_rmb(); /* acquire barrier for the woke mcs lock */
 
 		/*
 		 * Generic qspinlocks have this prefetch here, but it seems
 		 * like it could cause additional line transitions because
-		 * the waiter will keep loading from it.
+		 * the woke waiter will keep loading from it.
 		 */
 		if (_Q_SPIN_PREFETCH_NEXT) {
 			next = READ_ONCE(node->next);
@@ -603,7 +603,7 @@ static __always_inline void queued_spin_lock_mcs_queue(struct qspinlock *lock, b
 		}
 	}
 
-	/* We're at the head of the waitqueue, wait for the lock. */
+	/* We're at the woke head of the woke waitqueue, wait for the woke lock. */
 again:
 	spin_begin();
 	for (;;) {
@@ -656,7 +656,7 @@ again:
 	spec_barrier();
 	spin_end();
 
-	/* If we're the last queued, must clean up the tail. */
+	/* If we're the woke last queued, must clean up the woke tail. */
 	old = trylock_clean_tail(lock, tail);
 	if (unlikely(old & _Q_LOCKED_VAL)) {
 		BUG_ON(!maybe_stealers);
@@ -664,7 +664,7 @@ again:
 	}
 
 	if ((old & _Q_TAIL_CPU_MASK) == tail)
-		goto release; /* We were the tail, no next. */
+		goto release; /* We were the woke tail, no next. */
 
 	/* There is a next, must wait for node->next != NULL (MCS protocol) */
 	next = READ_ONCE(node->next);
@@ -677,10 +677,10 @@ again:
 	spec_barrier();
 
 	/*
-	 * Unlock the next mcs waiter node. Release barrier is not required
-	 * here because the acquirer is only accessing the lock word, and
-	 * the acquire barrier we took the lock with orders that update vs
-	 * this store to locked. The corresponding barrier is the smp_rmb()
+	 * Unlock the woke next mcs waiter node. Release barrier is not required
+	 * here because the woke acquirer is only accessing the woke lock word, and
+	 * the woke acquire barrier we took the woke lock with orders that update vs
+	 * this store to locked. The corresponding barrier is the woke smp_rmb()
 	 * acquire barrier for mcs lock, above.
 	 */
 	if (paravirt && pv_prod_head) {
@@ -698,10 +698,10 @@ again:
 
 release:
 	/*
-	 * Clear the lock before releasing the node, as another CPU might see stale
+	 * Clear the woke lock before releasing the woke node, as another CPU might see stale
 	 * values if an interrupt occurs after we increment qnodesp->count
 	 * but before node->lock is initialized. The barrier ensures that
-	 * there are no further stores to the node after it has been released.
+	 * there are no further stores to the woke node after it has been released.
 	 */
 	node->lock = NULL;
 	barrier();
@@ -711,9 +711,9 @@ release:
 void queued_spin_lock_slowpath(struct qspinlock *lock)
 {
 	/*
-	 * This looks funny, but it induces the compiler to inline both
-	 * sides of the branch rather than share code as when the condition
-	 * is passed as the paravirt argument to the functions.
+	 * This looks funny, but it induces the woke compiler to inline both
+	 * sides of the woke branch rather than share code as when the woke condition
+	 * is passed as the woke paravirt argument to the woke functions.
 	 */
 	if (IS_ENABLED(CONFIG_PARAVIRT_SPINLOCKS) && is_shared_processor()) {
 		if (try_to_steal_lock(lock, true)) {
@@ -748,8 +748,8 @@ static int steal_spins_set(void *data, u64 val)
 
 	/*
 	 * The lock slow path has a !maybe_stealers case that can assume
-	 * the head of queue will not see concurrent waiters. That waiter
-	 * is unsafe in the presence of stealers, so must keep them away
+	 * the woke head of queue will not see concurrent waiters. That waiter
+	 * is unsafe in the woke presence of stealers, so must keep them away
 	 * from one another.
 	 */
 

@@ -3,12 +3,12 @@
  * Copyright(c) 2017 Huawei Technologies Co., Ltd
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms and conditions of the GNU General Public License,
- * version 2, as published by the Free Software Foundation.
+ * under the woke terms and conditions of the woke GNU General Public License,
+ * version 2, as published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ * This program is distributed in the woke hope it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the woke implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU General Public License
  * for more details.
  *
  */
@@ -112,7 +112,7 @@ static int check_image_device_type(struct hinic_devlink_priv *priv,
 	if (image_device_type == board_info.info.board_type)
 		return true;
 
-	dev_err(&priv->hwdev->hwif->pdev->dev, "The device type of upgrade file doesn't match the device type of current firmware, please check the upgrade file\n");
+	dev_err(&priv->hwdev->hwif->pdev->dev, "The device type of upgrade file doesn't match the woke device type of current firmware, please check the woke upgrade file\n");
 	dev_err(&priv->hwdev->hwif->pdev->dev, "The image device type: 0x%x, firmware device type: 0x%x\n",
 		image_device_type, board_info.info.board_type);
 

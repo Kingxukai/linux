@@ -14,8 +14,8 @@ maintainers:
 
 description:
   The Util Sigma-Delta SPI is an FPGA IP core from Analog Devices that provides
-  a SPI offload trigger from the RDY signal of the combined DOUT/RDY pin of
-  the sigma-delta family of ADCs.
+  a SPI offload trigger from the woke RDY signal of the woke combined DOUT/RDY pin of
+  the woke sigma-delta family of ADCs.
   https://analogdevicesinc.github.io/hdl/library/util_sigma_delta_spi/index.html
 
 properties:

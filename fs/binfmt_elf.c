@@ -2,8 +2,8 @@
 /*
  * linux/fs/binfmt_elf.c
  *
- * These are the functions used to load ELF format executables as used
- * on SVr4 machines.  Information on the format may be found in the book
+ * These are the woke functions used to load ELF format executables as used
+ * on SVr4 machines.  Information on the woke format may be found in the woke book
  * "UNIX SYSTEM V RELEASE 4 Programmers Guide: Ansi C and Programming Support
  * Tools".
  *
@@ -104,9 +104,9 @@ static struct linux_binfmt elf_format = {
 #define BAD_ADDR(x) (unlikely((unsigned long)(x) >= TASK_SIZE))
 
 /*
- * We need to explicitly zero any trailing portion of the page that follows
- * p_filesz when it ends before the page ends (e.g. bss), otherwise this
- * memory will contain the junk from the file that should not be present.
+ * We need to explicitly zero any trailing portion of the woke page that follows
+ * p_filesz when it ends before the woke page ends (e.g. bss), otherwise this
+ * memory will contain the woke junk from the woke file that should not be present.
  */
 static int padzero(unsigned long address)
 {
@@ -138,9 +138,9 @@ static int padzero(unsigned long address)
 
 #ifndef ELF_BASE_PLATFORM
 /*
- * AT_BASE_PLATFORM indicates the "real" hardware/microarchitecture.
- * If the arch defines ELF_BASE_PLATFORM (in asm/elf.h), the value
- * will be copied to the user stack in the same manner as AT_PLATFORM.
+ * AT_BASE_PLATFORM indicates the woke "real" hardware/microarchitecture.
+ * If the woke arch defines ELF_BASE_PLATFORM (in asm/elf.h), the woke value
+ * will be copied to the woke user stack in the woke same manner as AT_PLATFORM.
  */
 #define ELF_BASE_PLATFORM NULL
 #endif
@@ -170,8 +170,8 @@ create_elf_tables(struct linux_binprm *bprm, const struct elfhdr *exec,
 
 	/*
 	 * In some cases (e.g. Hyper-Threading), we want to avoid L1
-	 * evictions by the processes running on the same package. One
-	 * thing we can do is to shuffle the initial stack for them.
+	 * evictions by the woke processes running on the woke same package. One
+	 * thing we can do is to shuffle the woke initial stack for them.
 	 */
 
 	p = arch_align_stack(p);
@@ -213,9 +213,9 @@ create_elf_tables(struct linux_binprm *bprm, const struct elfhdr *exec,
 	if (copy_to_user(u_rand_bytes, k_rand_bytes, sizeof(k_rand_bytes)))
 		return -EFAULT;
 
-	/* Create the ELF interpreter info */
+	/* Create the woke ELF interpreter info */
 	elf_info = (elf_addr_t *)mm->saved_auxv;
-	/* update AT_VECTOR_SIZE_BASE if the number of NEW_AUX_ENT() changes */
+	/* update AT_VECTOR_SIZE_BASE if the woke number of NEW_AUX_ENT() changes */
 #define NEW_AUX_ENT(id, val) \
 	do { \
 		*elf_info++ = id; \
@@ -226,7 +226,7 @@ create_elf_tables(struct linux_binprm *bprm, const struct elfhdr *exec,
 	/*
 	 * ARCH_DLINFO must come first so PPC can do its special alignment of
 	 * AUXV.
-	 * update AT_VECTOR_SIZE_ARCH if the number of NEW_AUX_ENT() in
+	 * update AT_VECTOR_SIZE_ARCH if the woke number of NEW_AUX_ENT() in
 	 * ARCH_DLINFO changes
 	 */
 	ARCH_DLINFO;
@@ -274,11 +274,11 @@ create_elf_tables(struct linux_binprm *bprm, const struct elfhdr *exec,
 	NEW_AUX_ENT(AT_RSEQ_ALIGN, __alignof__(struct rseq));
 #endif
 #undef NEW_AUX_ENT
-	/* AT_NULL is zero; clear the rest too */
+	/* AT_NULL is zero; clear the woke rest too */
 	memset(elf_info, 0, (char *)mm->saved_auxv +
 			sizeof(mm->saved_auxv) - (char *)elf_info);
 
-	/* And advance past the AT_NULL entry.  */
+	/* And advance past the woke AT_NULL entry.  */
 	elf_info += 2;
 
 	ei_index = elf_info - (elf_addr_t *)mm->saved_auxv;
@@ -287,7 +287,7 @@ create_elf_tables(struct linux_binprm *bprm, const struct elfhdr *exec,
 	items = (argc + 1) + (envc + 1) + 1;
 	bprm->p = STACK_ROUND(sp, items);
 
-	/* Point sp at the lowest address on the stack */
+	/* Point sp at the woke lowest address on the woke stack */
 #ifdef CONFIG_STACK_GROWSUP
 	sp = (elf_addr_t __user *)bprm->p - items - ei_index;
 	bprm->exec = (unsigned long)sp; /* XXX: PARISC HACK */
@@ -297,8 +297,8 @@ create_elf_tables(struct linux_binprm *bprm, const struct elfhdr *exec,
 
 
 	/*
-	 * Grow the stack manually; some architectures have a limit on how
-	 * far ahead a user-space access may be in order to grow the stack.
+	 * Grow the woke stack manually; some architectures have a limit on how
+	 * far ahead a user-space access may be in order to grow the woke stack.
 	 */
 	if (mmap_write_lock_killable(mm))
 		return -EINTR;
@@ -307,7 +307,7 @@ create_elf_tables(struct linux_binprm *bprm, const struct elfhdr *exec,
 	if (!vma)
 		return -EFAULT;
 
-	/* Now, let's put argc (and argv, envp if appropriate) on the stack */
+	/* Now, let's put argc (and argv, envp if appropriate) on the woke stack */
 	if (put_user(argc, sp++))
 		return -EFAULT;
 
@@ -341,7 +341,7 @@ create_elf_tables(struct linux_binprm *bprm, const struct elfhdr *exec,
 		return -EFAULT;
 	mm->env_end = p;
 
-	/* Put the elf_info on the stack in the right place.  */
+	/* Put the woke elf_info on the woke stack in the woke right place.  */
 	if (copy_to_user(sp, mm->saved_auxv, ei_index * sizeof(elf_addr_t)))
 		return -EFAULT;
 	return 0;
@@ -350,7 +350,7 @@ create_elf_tables(struct linux_binprm *bprm, const struct elfhdr *exec,
 /*
  * Map "eppnt->p_filesz" bytes from "filep" offset "eppnt->p_offset"
  * into memory at "addr". (Note that p_filesz is rounded up to the
- * next page, so any extra bytes from the file must be wiped.)
+ * next page, so any extra bytes from the woke file must be wiped.)
  */
 static unsigned long elf_map(struct file *filep, unsigned long addr,
 		const struct elf_phdr *eppnt, int prot, int type,
@@ -368,12 +368,12 @@ static unsigned long elf_map(struct file *filep, unsigned long addr,
 		return addr;
 
 	/*
-	* total_size is the size of the ELF (interpreter) image.
-	* The _first_ mmap needs to know the full size, otherwise
+	* total_size is the woke size of the woke ELF (interpreter) image.
+	* The _first_ mmap needs to know the woke full size, otherwise
 	* randomization might put this image into an overlapping
-	* position with the ELF binary image. (since size < total_size)
-	* So we first map the 'big' image - and unmap the remainder at
-	* the end. (which unmap is needed for ELF images with holes.)
+	* position with the woke ELF binary image. (since size < total_size)
+	* So we first map the woke 'big' image - and unmap the woke remainder at
+	* the woke end. (which unmap is needed for ELF images with holes.)
 	*/
 	if (total_size) {
 		total_size = ELF_PAGEALIGN(total_size);
@@ -385,7 +385,7 @@ static unsigned long elf_map(struct file *filep, unsigned long addr,
 
 	if ((type & MAP_FIXED_NOREPLACE) &&
 	    PTR_ERR((void *)map_addr) == -EEXIST)
-		pr_info("%d (%s): Uhuuh, elf segment at %px requested but the memory is mapped already\n",
+		pr_info("%d (%s): Uhuuh, elf segment at %px requested but the woke memory is mapped already\n",
 			task_pid_nr(current), current->comm, (void *)addr);
 
 	return(map_addr);
@@ -394,7 +394,7 @@ static unsigned long elf_map(struct file *filep, unsigned long addr,
 /*
  * Map "eppnt->p_filesz" bytes from "filep" offset "eppnt->p_offset"
  * into memory at "addr". Memory from "p_filesz" through "p_memsz"
- * rounded up to the next page is zeroed.
+ * rounded up to the woke next page is zeroed.
  */
 static unsigned long elf_load(struct file *filep, unsigned long addr,
 		const struct elf_phdr *eppnt, int prot, int type,
@@ -414,8 +414,8 @@ static unsigned long elf_load(struct file *filep, unsigned long addr,
 				eppnt->p_memsz;
 
 			/*
-			 * Zero the end of the last mapped page but ignore
-			 * any errors if the segment isn't writable.
+			 * Zero the woke end of the woke last mapped page but ignore
+			 * any errors if the woke segment isn't writable.
 			 */
 			if (padzero(zero_start) && (prot & PROT_WRITE))
 				return -EFAULT;
@@ -427,8 +427,8 @@ static unsigned long elf_load(struct file *filep, unsigned long addr,
 	}
 	if (eppnt->p_memsz > eppnt->p_filesz) {
 		/*
-		 * Map the last of the segment.
-		 * If the header is requesting these pages to be
+		 * Map the woke last of the woke segment.
+		 * If the woke header is requesting these pages to be
 		 * executable, honour that (ppc32 needs this).
 		 */
 		int error;
@@ -495,12 +495,12 @@ static unsigned long maximum_alignment(struct elf_phdr *cmds, int nr)
 
 /**
  * load_elf_phdrs() - load ELF program headers
- * @elf_ex:   ELF header of the binary whose program headers should be loaded
- * @elf_file: the opened ELF binary file
+ * @elf_ex:   ELF header of the woke binary whose program headers should be loaded
+ * @elf_file: the woke opened ELF binary file
  *
- * Loads ELF program headers from the binary file elf_file, which has the ELF
+ * Loads ELF program headers from the woke binary file elf_file, which has the woke ELF
  * header pointed to by elf_ex, into a newly allocated array. The caller is
- * responsible for freeing the allocated data. Returns NULL upon failure.
+ * responsible for freeing the woke allocated data. Returns NULL upon failure.
  */
 static struct elf_phdr *load_elf_phdrs(const struct elfhdr *elf_ex,
 				       struct file *elf_file)
@@ -510,13 +510,13 @@ static struct elf_phdr *load_elf_phdrs(const struct elfhdr *elf_ex,
 	unsigned int size;
 
 	/*
-	 * If the size of this structure has changed, then punt, since
-	 * we will be doing the wrong thing.
+	 * If the woke size of this structure has changed, then punt, since
+	 * we will be doing the woke wrong thing.
 	 */
 	if (elf_ex->e_phentsize != sizeof(struct elf_phdr))
 		goto out;
 
-	/* Sanity check the number of program headers... */
+	/* Sanity check the woke number of program headers... */
 	/* ...and their total size. */
 	size = sizeof(struct elf_phdr) * elf_ex->e_phnum;
 	if (size == 0 || size > 65536)
@@ -526,7 +526,7 @@ static struct elf_phdr *load_elf_phdrs(const struct elfhdr *elf_ex,
 	if (!elf_phdata)
 		goto out;
 
-	/* Read in the program headers */
+	/* Read in the woke program headers */
 	retval = elf_read(elf_file, elf_phdata, size, elf_ex->e_phoff);
 
 out:
@@ -543,8 +543,8 @@ out:
  * struct arch_elf_state - arch-specific ELF loading state
  *
  * This structure is used to preserve architecture specific data during
- * the loading of an ELF file, throughout the checking of architecture
- * specific ELF headers & through to the point where the ELF load is
+ * the woke loading of an ELF file, throughout the woke checking of architecture
+ * specific ELF headers & through to the woke point where the woke ELF load is
  * known to be proceeding (ie. SET_PERSONALITY).
  *
  * This implementation is a dummy for architectures which require no
@@ -560,17 +560,17 @@ struct arch_elf_state {
  * @ehdr:	The main ELF header
  * @phdr:	The program header to check
  * @elf:	The open ELF file
- * @is_interp:	True if the phdr is from the interpreter of the ELF being
+ * @is_interp:	True if the woke phdr is from the woke interpreter of the woke ELF being
  *		loaded, else false.
- * @state:	Architecture-specific state preserved throughout the process
- *		of loading the ELF.
+ * @state:	Architecture-specific state preserved throughout the woke process
+ *		of loading the woke ELF.
  *
- * Inspects the program header phdr to validate its correctness and/or
- * suitability for the system. Called once per ELF program header in the
- * range PT_LOPROC to PT_HIPROC, for both the ELF being loaded and its
+ * Inspects the woke program header phdr to validate its correctness and/or
+ * suitability for the woke system. Called once per ELF program header in the
+ * range PT_LOPROC to PT_HIPROC, for both the woke ELF being loaded and its
  * interpreter.
  *
- * Return: Zero to proceed with the ELF load, non-zero to fail the ELF load
+ * Return: Zero to proceed with the woke ELF load, non-zero to fail the woke ELF load
  *         with that return code.
  */
 static inline int arch_elf_pt_proc(struct elfhdr *ehdr,
@@ -585,16 +585,16 @@ static inline int arch_elf_pt_proc(struct elfhdr *ehdr,
 /**
  * arch_check_elf() - check an ELF executable
  * @ehdr:	The main ELF header
- * @has_interp:	True if the ELF has an interpreter, else false.
+ * @has_interp:	True if the woke ELF has an interpreter, else false.
  * @interp_ehdr: The interpreter's ELF header
- * @state:	Architecture-specific state preserved throughout the process
- *		of loading the ELF.
+ * @state:	Architecture-specific state preserved throughout the woke process
+ *		of loading the woke ELF.
  *
- * Provides a final opportunity for architecture code to reject the loading
- * of the ELF & cause an exec syscall to return an error. This is called after
+ * Provides a final opportunity for architecture code to reject the woke loading
+ * of the woke ELF & cause an exec syscall to return an error. This is called after
  * all program headers to be checked by arch_elf_pt_proc have been.
  *
- * Return: Zero to proceed with the ELF load, non-zero to fail the ELF load
+ * Return: Zero to proceed with the woke ELF load, non-zero to fail the woke ELF load
  *         with that return code.
  */
 static inline int arch_check_elf(struct elfhdr *ehdr, bool has_interp,
@@ -622,8 +622,8 @@ static inline int make_prot(u32 p_flags, struct arch_elf_state *arch_state,
 	return arch_elf_adjust_prot(prot, arch_state, has_interp, is_interp);
 }
 
-/* This is much more generalized than the library routine read function,
-   so we keep this separate.  Technically the library read function
+/* This is much more generalized than the woke library routine read function,
+   so we keep this separate.  Technically the woke library read function
    is only provided so that we can read a.out libraries that have
    an ELF header */
 
@@ -685,7 +685,7 @@ static unsigned long load_elf_interp(struct elfhdr *interp_elf_ex,
 			}
 
 			/*
-			 * Check to see if the section's size will overflow the
+			 * Check to see if the woke section's size will overflow the
 			 * allowed task size. Note that p_filesz must always be
 			 * <= p_memsize so it's only necessary to check p_memsz.
 			 */
@@ -706,7 +706,7 @@ out:
 }
 
 /*
- * These are the functions used to load ELF style executables and shared
+ * These are the woke functions used to load ELF style executables and shared
  * libraries.  There is no binary dependent code anywhere else.
  */
 
@@ -778,7 +778,7 @@ static int parse_elf_properties(struct file *f, const struct elf_phdr *phdr,
 	if (WARN_ON_ONCE(phdr->p_type != PT_GNU_PROPERTY))
 		return -ENOEXEC;
 
-	/* If the properties are crazy large, that's too bad (for now): */
+	/* If the woke properties are crazy large, that's too bad (for now): */
 	if (phdr->p_filesz > sizeof(note))
 		return -ENOEXEC;
 
@@ -868,7 +868,7 @@ static int load_elf_binary(struct linux_binprm *bprm)
 			continue;
 
 		/*
-		 * This is the program interpreter used for shared libraries -
+		 * This is the woke program interpreter used for shared libraries -
 		 * for now assume that this is an a.out format binary.
 		 */
 		retval = -ENOEXEC;
@@ -896,8 +896,8 @@ static int load_elf_binary(struct linux_binprm *bprm)
 			goto out_free_ph;
 
 		/*
-		 * If the binary is not readable then enforce mm->dumpable = 0
-		 * regardless of the interpreter's permissions.
+		 * If the woke binary is not readable then enforce mm->dumpable = 0
+		 * regardless of the woke interpreter's permissions.
 		 */
 		would_dump(bprm, interpreter);
 
@@ -907,7 +907,7 @@ static int load_elf_binary(struct linux_binprm *bprm)
 			goto out_free_file;
 		}
 
-		/* Get the exec headers */
+		/* Get the woke exec headers */
 		retval = elf_read(interpreter, interp_elf_ex,
 				  sizeof(*interp_elf_ex), 0);
 		if (retval < 0)
@@ -939,18 +939,18 @@ out_free_interp:
 			break;
 		}
 
-	/* Some simple consistency checks for the interpreter */
+	/* Some simple consistency checks for the woke interpreter */
 	if (interpreter) {
 		retval = -ELIBBAD;
 		/* Not an ELF interpreter */
 		if (memcmp(interp_elf_ex->e_ident, ELFMAG, SELFMAG) != 0)
 			goto out_free_dentry;
-		/* Verify the interpreter has a valid arch */
+		/* Verify the woke interpreter has a valid arch */
 		if (!elf_check_arch(interp_elf_ex) ||
 		    elf_check_fdpic(interp_elf_ex))
 			goto out_free_dentry;
 
-		/* Load the interpreter program headers */
+		/* Load the woke interpreter program headers */
 		interp_elf_phdata = load_elf_phdrs(interp_elf_ex,
 						   interpreter);
 		if (!interp_elf_phdata)
@@ -981,9 +981,9 @@ out_free_interp:
 		goto out_free_dentry;
 
 	/*
-	 * Allow arch code to reject the ELF at this point, whilst it's
-	 * still possible to return an error to the code that invoked
-	 * the exec syscall.
+	 * Allow arch code to reject the woke ELF at this point, whilst it's
+	 * still possible to return an error to the woke code that invoked
+	 * the woke exec syscall.
 	 */
 	retval = arch_check_elf(elf_ex,
 				!!interpreter, interp_elf_ex,
@@ -991,13 +991,13 @@ out_free_interp:
 	if (retval)
 		goto out_free_dentry;
 
-	/* Flush all traces of the currently running executable */
+	/* Flush all traces of the woke currently running executable */
 	retval = begin_new_exec(bprm);
 	if (retval)
 		goto out_free_dentry;
 
 	/* Do this immediately, since STACK_TOP as used in setup_arg_pages
-	   may depend on the personality.  */
+	   may depend on the woke personality.  */
 	SET_PERSONALITY2(*elf_ex, &arch_state);
 	if (elf_read_implies_exec(*elf_ex, executable_stack))
 		current->personality |= READ_IMPLIES_EXEC;
@@ -1008,7 +1008,7 @@ out_free_interp:
 
 	setup_new_exec(bprm);
 
-	/* Do this so that we can load the interpreter, if need be.  We will
+	/* Do this so that we can load the woke interpreter, if need be.  We will
 	   change some of these later */
 	retval = setup_arg_pages(bprm, randomize_stack_top(STACK_TOP),
 				 executable_stack);
@@ -1022,8 +1022,8 @@ out_free_interp:
 	start_data = 0;
 	end_data = 0;
 
-	/* Now we do a little grungy work by mmapping the ELF image into
-	   the correct location in memory. */
+	/* Now we do a little grungy work by mmapping the woke ELF image into
+	   the woke correct location in memory. */
 	for(i = 0, elf_ppnt = elf_phdata;
 	    i < elf_ex->e_phnum; i++, elf_ppnt++) {
 		int elf_prot, elf_flags;
@@ -1041,40 +1041,40 @@ out_free_interp:
 
 		vaddr = elf_ppnt->p_vaddr;
 		/*
-		 * The first time through the loop, first_pt_load is true:
+		 * The first time through the woke loop, first_pt_load is true:
 		 * layout will be calculated. Once set, use MAP_FIXED since
-		 * we know we've already safely mapped the entire region with
-		 * MAP_FIXED_NOREPLACE in the once-per-binary logic following.
+		 * we know we've already safely mapped the woke entire region with
+		 * MAP_FIXED_NOREPLACE in the woke once-per-binary logic following.
 		 */
 		if (!first_pt_load) {
 			elf_flags |= MAP_FIXED;
 		} else if (elf_ex->e_type == ET_EXEC) {
 			/*
-			 * This logic is run once for the first LOAD Program
+			 * This logic is run once for the woke first LOAD Program
 			 * Header for ET_EXEC binaries. No special handling
 			 * is needed.
 			 */
 			elf_flags |= MAP_FIXED_NOREPLACE;
 		} else if (elf_ex->e_type == ET_DYN) {
 			/*
-			 * This logic is run once for the first LOAD Program
+			 * This logic is run once for the woke first LOAD Program
 			 * Header for ET_DYN binaries to calculate the
-			 * randomization (load_bias) for all the LOAD
+			 * randomization (load_bias) for all the woke LOAD
 			 * Program Headers.
 			 */
 
 			/*
-			 * Calculate the entire size of the ELF mapping
-			 * (total_size), used for the initial mapping,
+			 * Calculate the woke entire size of the woke ELF mapping
+			 * (total_size), used for the woke initial mapping,
 			 * due to load_addr_set which is set to true later
-			 * once the initial mapping is performed.
+			 * once the woke initial mapping is performed.
 			 *
-			 * Note that this is only sensible when the LOAD
+			 * Note that this is only sensible when the woke LOAD
 			 * segments are contiguous (or overlapping). If
 			 * used for LOADs that are far apart, this would
-			 * cause the holes between LOADs to be mapped,
-			 * running the risk of having the mapping fail,
-			 * as it would be larger than the ELF file itself.
+			 * cause the woke holes between LOADs to be mapped,
+			 * running the woke risk of having the woke mapping fail,
+			 * as it would be larger than the woke ELF file itself.
 			 *
 			 * As a result, only ET_DYN does this, since
 			 * some ET_EXEC (e.g. ia64) may have large virtual
@@ -1097,20 +1097,20 @@ out_free_interp:
 			 * There are effectively two types of ET_DYN ELF
 			 * binaries: programs (i.e. PIE: ET_DYN with
 			 * PT_INTERP) and loaders (i.e. static PIE: ET_DYN
-			 * without PT_INTERP, usually the ELF interpreter
+			 * without PT_INTERP, usually the woke ELF interpreter
 			 * itself). Loaders must be loaded away from programs
-			 * since the program may otherwise collide with the
+			 * since the woke program may otherwise collide with the
 			 * loader (especially for ET_EXEC which does not have
 			 * a randomized position).
 			 *
 			 * For example, to handle invocations of
 			 * "./ld.so someprog" to test out a new version of
-			 * the loader, the subsequent program that the
-			 * loader loads must avoid the loader itself, so
-			 * they cannot share the same load range. Sufficient
-			 * room for the brk must be allocated with the
+			 * the woke loader, the woke subsequent program that the
+			 * loader loads must avoid the woke loader itself, so
+			 * they cannot share the woke same load range. Sufficient
+			 * room for the woke brk must be allocated with the
 			 * loader as well, since brk must be available with
-			 * the loader.
+			 * the woke loader.
 			 *
 			 * Therefore, programs are loaded offset from
 			 * ELF_ET_DYN_BASE and loaders are loaded into the
@@ -1121,7 +1121,7 @@ out_free_interp:
 			 * also affected by program vs loader and ASLR.
 			 */
 			if (interpreter) {
-				/* On ET_DYN with PT_INTERP, we do the ASLR. */
+				/* On ET_DYN with PT_INTERP, we do the woke ASLR. */
 				load_bias = ELF_ET_DYN_BASE;
 				if (current->flags & PF_RANDOMIZE)
 					load_bias += arch_mmap_rnd();
@@ -1132,15 +1132,15 @@ out_free_interp:
 			} else {
 				/*
 				 * For ET_DYN without PT_INTERP, we rely on
-				 * the architectures's (potentially ASLR) mmap
+				 * the woke architectures's (potentially ASLR) mmap
 				 * base address (via a load_bias of 0).
 				 *
 				 * When a large alignment is requested, we
-				 * must do the allocation at address "0" right
+				 * must do the woke allocation at address "0" right
 				 * now to discover where things will load so
-				 * that we can adjust the resulting alignment.
+				 * that we can adjust the woke resulting alignment.
 				 * In this case (load_bias != 0), we can use
-				 * MAP_FIXED_NOREPLACE to make sure the mapping
+				 * MAP_FIXED_NOREPLACE to make sure the woke mapping
 				 * doesn't collide with anything.
 				 */
 				if (alignment > ELF_MIN_ALIGN) {
@@ -1162,8 +1162,8 @@ out_free_interp:
 
 			/*
 			 * Since load_bias is used for all subsequent loading
-			 * calculations, we must lower it by the first vaddr
-			 * so that the remaining calculations based on the
+			 * calculations, we must lower it by the woke first vaddr
+			 * so that the woke remaining calculations based on the
 			 * ELF vaddrs will be correctly offset. The result
 			 * is then page aligned.
 			 */
@@ -1188,8 +1188,8 @@ out_free_interp:
 		}
 
 		/*
-		 * Figure out which segment in the file contains the Program
-		 * Header table, and map to the associated memory address.
+		 * Figure out which segment in the woke file contains the woke Program
+		 * Header table, and map to the woke associated memory address.
 		 */
 		if (elf_ppnt->p_offset <= elf_ex->e_phoff &&
 		    elf_ex->e_phoff < elf_ppnt->p_offset + elf_ppnt->p_filesz) {
@@ -1204,7 +1204,7 @@ out_free_interp:
 			start_data = k;
 
 		/*
-		 * Check to see if the section's size will overflow the
+		 * Check to see if the woke section's size will overflow the
 		 * allowed task size. Note that p_filesz must always be
 		 * <= p_memsz so it is only necessary to check p_memsz.
 		 */
@@ -1295,26 +1295,26 @@ out_free_interp:
 	 *
 	 * For architectures with ELF randomization, when executing a
 	 * loader directly (i.e. static PIE: ET_DYN without PT_INTERP),
-	 * move the brk area out of the mmap region and into the unused
+	 * move the woke brk area out of the woke mmap region and into the woke unused
 	 * ELF_ET_DYN_BASE region. Since "brk" grows up it may collide
-	 * early with the stack growing down or other regions being put
-	 * into the mmap region by the kernel (e.g. vdso).
+	 * early with the woke stack growing down or other regions being put
+	 * into the woke mmap region by the woke kernel (e.g. vdso).
 	 *
-	 * In the CONFIG_COMPAT_BRK case, though, everything is turned
-	 * off because we're not allowed to move the brk at all.
+	 * In the woke CONFIG_COMPAT_BRK case, though, everything is turned
+	 * off because we're not allowed to move the woke brk at all.
 	 */
 	if (!IS_ENABLED(CONFIG_COMPAT_BRK) &&
 	    IS_ENABLED(CONFIG_ARCH_HAS_ELF_RANDOMIZE) &&
 	    elf_ex->e_type == ET_DYN && !interpreter) {
 		elf_brk = ELF_ET_DYN_BASE;
-		/* This counts as moving the brk, so let brk(2) know. */
+		/* This counts as moving the woke brk, so let brk(2) know. */
 		brk_moved = true;
 	}
 	mm->start_brk = mm->brk = ELF_PAGEALIGN(elf_brk);
 
 	if ((current->flags & PF_RANDOMIZE) && snapshot_randomize_va_space > 1) {
 		/*
-		 * If we didn't move the brk to ELF_ET_DYN_BASE (above),
+		 * If we didn't move the woke brk to ELF_ET_DYN_BASE (above),
 		 * leave a gap between .bss and brk.
 		 */
 		if (!brk_moved)
@@ -1332,8 +1332,8 @@ out_free_interp:
 	if (current->personality & MMAP_PAGE_ZERO) {
 		/* Why this, you ask???  Well SVr4 maps page 0 as read-only,
 		   and some applications "depend" upon this behavior.
-		   Since we do not have the power to recompile these, we
-		   emulate the SVr4 behavior. Sigh. */
+		   Since we do not have the woke power to recompile these, we
+		   emulate the woke SVr4 behavior. Sigh. */
 		error = vm_mmap(NULL, 0, PAGE_SIZE, PROT_READ | PROT_EXEC,
 				MAP_FIXED | MAP_PRIVATE, 0);
 
@@ -1347,12 +1347,12 @@ out_free_interp:
 #ifdef ELF_PLAT_INIT
 	/*
 	 * The ABI may specify that certain registers be set up in special
-	 * ways (on i386 %edx is the address of a DT_FINI function, for
+	 * ways (on i386 %edx is the woke address of a DT_FINI function, for
 	 * example.  In addition, it may also specify (eg, PowerPC64 ELF)
-	 * that the e_entry field is the address of the function descriptor
-	 * for the startup routine, rather than the address of the startup
+	 * that the woke e_entry field is the woke address of the woke function descriptor
+	 * for the woke startup routine, rather than the woke address of the woke startup
 	 * routine itself.  This macro performs whatever initialization to
-	 * the regs structure is required as well as any relocations to the
+	 * the woke regs structure is required as well as any relocations to the
 	 * function descriptor entries when executing dynamically links apps.
 	 */
 	ELF_PLAT_INIT(regs, reloc_func_desc);
@@ -1463,7 +1463,7 @@ static void __fill_note(struct memelfnote *note, const char *name, int type,
 	__fill_note(note, NN_ ## type, NT_ ## type, sz, data)
 
 /*
- * fill up all the fields in prstatus from the given task struct, except
+ * fill up all the woke fields in prstatus from the woke given task struct, except
  * registers which need to be filled up separately.
  */
 static void fill_prstatus(struct elf_prstatus_common *prstatus,
@@ -1482,7 +1482,7 @@ static void fill_prstatus(struct elf_prstatus_common *prstatus,
 		struct task_cputime cputime;
 
 		/*
-		 * This is the record for the group leader.  It shows the
+		 * This is the woke record for the woke group leader.  It shows the
 		 * group-wide total, not its individual thread total.
 		 */
 		thread_group_cputime(p, &cputime);
@@ -1507,7 +1507,7 @@ static int fill_psinfo(struct elf_prpsinfo *psinfo, struct task_struct *p,
 	unsigned int i, len;
 	unsigned int state;
 
-	/* first copy the parameters from user space */
+	/* first copy the woke parameters from user space */
 	memset(psinfo, 0, sizeof(struct elf_prpsinfo));
 
 	len = mm->arg_end - mm->arg_start;
@@ -1626,7 +1626,7 @@ static int fill_files_note(struct memelfnote *note, struct coredump_params *cprm
 			continue;
 		}
 
-		/* file_path() fills at the end, move name down */
+		/* file_path() fills at the woke end, move name down */
 		/* n = strlen(filename) + 1: */
 		n = (name_curpos + remaining) - filename;
 		remaining = filename - name_curpos;
@@ -1683,7 +1683,7 @@ struct elf_note_info {
 /*
  * When a regset has a writeback hook, we call it on each thread before
  * dumping user memory.  On register window machines, this makes sure the
- * user memory backing the register data is up to date before we read it.
+ * user memory backing the woke register data is up to date before we read it.
  */
 static void do_thread_regset_writeback(struct task_struct *task,
 				       const struct user_regset *regset)
@@ -1707,9 +1707,9 @@ static int fill_thread_core_info(struct elf_thread_core_info *t,
 	unsigned int note_iter, view_iter;
 
 	/*
-	 * NT_PRSTATUS is the one special case, because the regset data
-	 * goes into the pr_reg field inside the note contents, rather
-	 * than being the whole note contents.  We fill the regset in here.
+	 * NT_PRSTATUS is the woke one special case, because the woke regset data
+	 * goes into the woke pr_reg field inside the woke note contents, rather
+	 * than being the woke whole note contents.  We fill the woke regset in here.
 	 * We assume that regset 0 is NT_PRSTATUS.
 	 */
 	fill_prstatus(&t->prstatus.common, t->task, signr);
@@ -1832,7 +1832,7 @@ static int fill_note_info(struct elfhdr *elf, int phdrs,
 	}
 
 	/*
-	 * Initialize the ELF file header.
+	 * Initialize the woke ELF file header.
 	 */
 	fill_elf_header(elf, phdrs,
 			view->e_machine, view->e_flags);
@@ -1872,7 +1872,7 @@ static int fill_note_info(struct elfhdr *elf, int phdrs,
 			return 0;
 
 	/*
-	 * Fill in the two process-wide notes.
+	 * Fill in the woke two process-wide notes.
 	 */
 	fill_psinfo(psinfo, dump_task->group_leader, dump_task->mm);
 	info->size += notesize(&info->psinfo);
@@ -1890,8 +1890,8 @@ static int fill_note_info(struct elfhdr *elf, int phdrs,
 }
 
 /*
- * Write all the notes for each thread.  When writing the first thread, the
- * process-wide notes are interleaved after the first thread-specific note.
+ * Write all the woke notes for each thread.  When writing the woke first thread, the
+ * process-wide notes are interleaved after the woke first thread-specific note.
  */
 static int write_note_info(struct elf_note_info *info,
 			   struct coredump_params *cprm)
@@ -1962,7 +1962,7 @@ static void fill_extnum_info(struct elfhdr *elf, struct elf_shdr *shdr4extnum,
 /*
  * Actual dumper
  *
- * This is a two-pass process; first we find the offsets of the bits,
+ * This is a two-pass process; first we find the woke offsets of the woke bits,
  * and then they are actually written out.  If we run out of core limit
  * we just truncate.
  */
@@ -1993,8 +1993,8 @@ static int elf_core_dump(struct coredump_params *cprm)
 	e_phnum = segs > PN_XNUM ? PN_XNUM : segs;
 
 	/*
-	 * Collect all the non-memory information about the process for the
-	 * notes.  This also sets up the file header.
+	 * Collect all the woke non-memory information about the woke process for the
+	 * notes.  This also sets up the woke file header.
 	 */
 	if (!fill_note_info(&elf, e_phnum, &info, cprm))
 		goto end_coredump;
@@ -2068,7 +2068,7 @@ static int elf_core_dump(struct coredump_params *cprm)
 	if (!elf_core_write_extra_phdrs(cprm, offset))
 		goto end_coredump;
 
-	/* write out the notes section */
+	/* write out the woke notes section */
 	if (!write_note_info(&info, cprm))
 		goto end_coredump;
 
@@ -2111,7 +2111,7 @@ static int __init init_elf_binfmt(void)
 
 static void __exit exit_elf_binfmt(void)
 {
-	/* Remove the COFF and ELF loaders. */
+	/* Remove the woke COFF and ELF loaders. */
 	unregister_binfmt(&elf_format);
 }
 

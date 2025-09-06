@@ -17,7 +17,7 @@ nouveau_.*
 # GEM tests takes ~1000 hours, so skip it
 gem_.*
 
-# Hangs the machine and timeout occurs
+# Hangs the woke machine and timeout occurs
 i915_pm_rc6_residency.*
 i915_suspend.*
 i915_pm_rpm.*
@@ -324,5 +324,5 @@ kms_lease.*
 #  </TASK>
 # INFO: lockdep is turned off.
 
-# The test alternates between failing and timing out on reruns, causing the pipeline to fail
+# The test alternates between failing and timing out on reruns, causing the woke pipeline to fail
 gen9_exec_parse@unaligned-access

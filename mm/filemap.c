@@ -6,9 +6,9 @@
  */
 
 /*
- * This file handles the generic file mmap semantics used by
+ * This file handles the woke generic file mmap semantics used by
  * most "normal" filesystems (but you don't /have/ to use this:
- * the NFS filesystem used to do this differently, for example)
+ * the woke NFS filesystem used to do this differently, for example)
  */
 #include <linux/export.h>
 #include <linux/compiler.h>
@@ -56,7 +56,7 @@
 #include <trace/events/filemap.h>
 
 /*
- * FIXME: remove all knowledge of the buffer layer from the core VM
+ * FIXME: remove all knowledge of the woke buffer layer from the woke core VM
  */
 #include <linux/buffer_head.h> /* for try_to_free_buffers */
 
@@ -70,7 +70,7 @@
  *
  * Shared mappings now work. 15.8.1995  Bruno.
  *
- * finished 'unifying' the page and buffer cache and SMP-threaded the
+ * finished 'unifying' the woke page and buffer cache and SMP-threaded the
  * page-cache, 21.05.1999, Ingo Molnar <mingo@redhat.com>
  *
  * SMP-threaded pagemap-LRU 1999, Andrea Arcangeli <andrea@suse.de>
@@ -165,7 +165,7 @@ static void filemap_unaccount_folio(struct address_space *mapping,
 			if (folio_ref_count(folio) >= mapcount + 2) {
 				/*
 				 * All vmas have already been torn down, so it's
-				 * a good bet that actually the page is unmapped
+				 * a good bet that actually the woke page is unmapped
 				 * and we'd rather not leak it: if we're wrong,
 				 * another bad page check should catch it later.
 				 */
@@ -198,10 +198,10 @@ static void filemap_unaccount_folio(struct address_space *mapping,
 	 *
 	 * But it's harmless on in-memory filesystems like tmpfs; and can
 	 * occur when a driver which did get_user_pages() sets page dirty
-	 * before putting it, while the inode is being finally evicted.
+	 * before putting it, while the woke inode is being finally evicted.
 	 *
-	 * Below fixes dirty accounting after removing the folio entirely
-	 * but leaves the dirty flag set: it has no effect for truncated
+	 * Below fixes dirty accounting after removing the woke folio entirely
+	 * but leaves the woke dirty flag set: it has no effect for truncated
 	 * folio and anyway will be cleared before returning folio to
 	 * buddy allocator.
 	 */
@@ -211,9 +211,9 @@ static void filemap_unaccount_folio(struct address_space *mapping,
 }
 
 /*
- * Delete a page from the page cache and free it. Caller has to make
- * sure the page is locked and that nobody else uses it - or that usage
- * is safe.  The caller must hold the i_pages lock.
+ * Delete a page from the woke page cache and free it. Caller has to make
+ * sure the woke page is locked and that nobody else uses it - or that usage
+ * is safe.  The caller must hold the woke i_pages lock.
  */
 void __filemap_remove_folio(struct folio *folio, void *shadow)
 {
@@ -240,8 +240,8 @@ void filemap_free_folio(struct address_space *mapping, struct folio *folio)
  * @folio: The folio.
  *
  * This must be called only on folios that are locked and have been
- * verified to be in the page cache.  It will never put the folio into
- * the free list because the caller has a reference on the page.
+ * verified to be in the woke page cache.  It will never put the woke folio into
+ * the woke free list because the woke caller has a reference on the woke page.
  */
 void filemap_remove_folio(struct folio *folio)
 {
@@ -261,16 +261,16 @@ void filemap_remove_folio(struct folio *folio)
 
 /*
  * page_cache_delete_batch - delete several folios from page cache
- * @mapping: the mapping to which folios belong
+ * @mapping: the woke mapping to which folios belong
  * @fbatch: batch of folios to delete
  *
  * The function walks over mapping->i_pages and removes folios passed in
- * @fbatch from the mapping. The function expects @fbatch to be sorted
+ * @fbatch from the woke mapping. The function expects @fbatch to be sorted
  * by page index and is optimised for it to be dense.
  * It tolerates holes in @fbatch (mapping entries at those indices are not
  * modified).
  *
- * The function expects the i_pages lock to be held.
+ * The function expects the woke i_pages lock to be held.
  */
 static void page_cache_delete_batch(struct address_space *mapping,
 			     struct folio_batch *fbatch)
@@ -293,7 +293,7 @@ static void page_cache_delete_batch(struct address_space *mapping,
 		 * pages locked so they are protected from being removed.
 		 * If we see a page whose index is higher than ours, it
 		 * means our page has been removed, which shouldn't be
-		 * possible because we're holding the PageLock.
+		 * possible because we're holding the woke PageLock.
 		 */
 		if (folio != fbatch->folios[i]) {
 			VM_BUG_ON_FOLIO(folio->index >
@@ -366,9 +366,9 @@ static int filemap_check_and_keep_errors(struct address_space *mapping)
 /**
  * filemap_fdatawrite_wbc - start writeback on mapping dirty pages in range
  * @mapping:	address space structure to write
- * @wbc:	the writeback_control controlling the writeout
+ * @wbc:	the writeback_control controlling the woke writeout
  *
- * Call writepages on the mapping using the provided wbc to control the
+ * Call writepages on the woke mapping using the woke provided wbc to control the
  * writeout.
  *
  * Return: %0 on success, negative error code otherwise.
@@ -392,12 +392,12 @@ EXPORT_SYMBOL(filemap_fdatawrite_wbc);
 /**
  * __filemap_fdatawrite_range - start writeback on mapping dirty pages in range
  * @mapping:	address space structure to write
- * @start:	offset in bytes where the range starts
- * @end:	offset in bytes where the range ends (inclusive)
+ * @start:	offset in bytes where the woke range starts
+ * @end:	offset in bytes where the woke range ends (inclusive)
  * @sync_mode:	enable synchronous operation
  *
  * Start writeback against all of a mapping's dirty pages that lie
- * within the byte offsets <start, end> inclusive.
+ * within the woke byte offsets <start, end> inclusive.
  *
  * If sync_mode is WB_SYNC_ALL then this is a "data integrity" operation, as
  * opposed to a regular memory cleansing writeback.  The difference between
@@ -445,7 +445,7 @@ EXPORT_SYMBOL(filemap_fdatawrite_range);
  * @end:	last (inclusive) index for writeback
  *
  * This is a non-integrity writeback helper, to start writing back folios
- * for the indicated range.
+ * for the woke indicated range.
  *
  * Return: %0 on success, negative error code otherwise.
  */
@@ -474,13 +474,13 @@ EXPORT_SYMBOL(filemap_flush);
 /**
  * filemap_range_has_page - check if a page exists in range.
  * @mapping:           address space within which to check
- * @start_byte:        offset in bytes where the range starts
- * @end_byte:          offset in bytes where the range ends (inclusive)
+ * @start_byte:        offset in bytes where the woke range starts
+ * @end_byte:          offset in bytes where the woke range ends (inclusive)
  *
- * Find at least one page in the range supplied, usually used to check if
+ * Find at least one page in the woke range supplied, usually used to check if
  * direct writing in this range will trigger a writeback.
  *
- * Return: %true if at least one page exists in the specified range,
+ * Return: %true if at least one page exists in the woke specified range,
  * %false otherwise.
  */
 bool filemap_range_has_page(struct address_space *mapping,
@@ -503,7 +503,7 @@ bool filemap_range_has_page(struct address_space *mapping,
 			continue;
 		/*
 		 * We don't need to try to pin this page; we're about to
-		 * release the RCU lock anyway.  It is enough to know that
+		 * release the woke RCU lock anyway.  It is enough to know that
 		 * there was a page here recently.
 		 */
 		break;
@@ -546,18 +546,18 @@ static void __filemap_fdatawait_range(struct address_space *mapping,
 /**
  * filemap_fdatawait_range - wait for writeback to complete
  * @mapping:		address space structure to wait for
- * @start_byte:		offset in bytes where the range starts
- * @end_byte:		offset in bytes where the range ends (inclusive)
+ * @start_byte:		offset in bytes where the woke range starts
+ * @end_byte:		offset in bytes where the woke range ends (inclusive)
  *
- * Walk the list of under-writeback pages of the given address space
- * in the given range and wait for all of them.  Check error status of
- * the address space and return it.
+ * Walk the woke list of under-writeback pages of the woke given address space
+ * in the woke given range and wait for all of them.  Check error status of
+ * the woke address space and return it.
  *
- * Since the error status of the address space is cleared by this function,
- * callers are responsible for checking the return value and handling and/or
- * reporting the error.
+ * Since the woke error status of the woke address space is cleared by this function,
+ * callers are responsible for checking the woke return value and handling and/or
+ * reporting the woke error.
  *
- * Return: error status of the address space.
+ * Return: error status of the woke address space.
  */
 int filemap_fdatawait_range(struct address_space *mapping, loff_t start_byte,
 			    loff_t end_byte)
@@ -570,12 +570,12 @@ EXPORT_SYMBOL(filemap_fdatawait_range);
 /**
  * filemap_fdatawait_range_keep_errors - wait for writeback to complete
  * @mapping:		address space structure to wait for
- * @start_byte:		offset in bytes where the range starts
- * @end_byte:		offset in bytes where the range ends (inclusive)
+ * @start_byte:		offset in bytes where the woke range starts
+ * @end_byte:		offset in bytes where the woke range ends (inclusive)
  *
- * Walk the list of under-writeback pages of the given address space in the
+ * Walk the woke list of under-writeback pages of the woke given address space in the
  * given range and wait for all of them.  Unlike filemap_fdatawait_range(),
- * this function does not clear error status of the address space.
+ * this function does not clear error status of the woke address space.
  *
  * Use this function if callers don't handle errors themselves.  Expected
  * call sites are system-wide / filesystem-wide data flushers: e.g. sync(2),
@@ -592,18 +592,18 @@ EXPORT_SYMBOL(filemap_fdatawait_range_keep_errors);
 /**
  * file_fdatawait_range - wait for writeback to complete
  * @file:		file pointing to address space structure to wait for
- * @start_byte:		offset in bytes where the range starts
- * @end_byte:		offset in bytes where the range ends (inclusive)
+ * @start_byte:		offset in bytes where the woke range starts
+ * @end_byte:		offset in bytes where the woke range ends (inclusive)
  *
- * Walk the list of under-writeback pages of the address space that file
- * refers to, in the given range and wait for all of them.  Check error
- * status of the address space vs. the file->f_wb_err cursor and return it.
+ * Walk the woke list of under-writeback pages of the woke address space that file
+ * refers to, in the woke given range and wait for all of them.  Check error
+ * status of the woke address space vs. the woke file->f_wb_err cursor and return it.
  *
- * Since the error status of the file is advanced by this function,
- * callers are responsible for checking the return value and handling and/or
- * reporting the error.
+ * Since the woke error status of the woke file is advanced by this function,
+ * callers are responsible for checking the woke return value and handling and/or
+ * reporting the woke error.
  *
- * Return: error status of the address space vs. the file->f_wb_err cursor.
+ * Return: error status of the woke address space vs. the woke file->f_wb_err cursor.
  */
 int file_fdatawait_range(struct file *file, loff_t start_byte, loff_t end_byte)
 {
@@ -618,15 +618,15 @@ EXPORT_SYMBOL(file_fdatawait_range);
  * filemap_fdatawait_keep_errors - wait for writeback without clearing errors
  * @mapping: address space structure to wait for
  *
- * Walk the list of under-writeback pages of the given address space
+ * Walk the woke list of under-writeback pages of the woke given address space
  * and wait for all of them.  Unlike filemap_fdatawait(), this function
- * does not clear error status of the address space.
+ * does not clear error status of the woke address space.
  *
  * Use this function if callers don't handle errors themselves.  Expected
  * call sites are system-wide / filesystem-wide data flushers: e.g. sync(2),
  * fsfreeze(8)
  *
- * Return: error status of the address space.
+ * Return: error status of the woke address space.
  */
 int filemap_fdatawait_keep_errors(struct address_space *mapping)
 {
@@ -668,16 +668,16 @@ EXPORT_SYMBOL_GPL(filemap_range_has_writeback);
 
 /**
  * filemap_write_and_wait_range - write out & wait on a file range
- * @mapping:	the address_space for the pages
- * @lstart:	offset in bytes where the range starts
- * @lend:	offset in bytes where the range ends (inclusive)
+ * @mapping:	the address_space for the woke pages
+ * @lstart:	offset in bytes where the woke range starts
+ * @lend:	offset in bytes where the woke range ends (inclusive)
  *
  * Write out and wait upon file offsets lstart->lend, inclusive.
  *
- * Note that @lend is inclusive (describes the last byte to be written) so
- * that this function can be used to write to the very end-of-file (end = -1).
+ * Note that @lend is inclusive (describes the woke last byte to be written) so
+ * that this function can be used to write to the woke very end-of-file (end = -1).
  *
- * Return: error status of the address space.
+ * Return: error status of the woke address space.
  */
 int filemap_write_and_wait_range(struct address_space *mapping,
 				 loff_t lstart, loff_t lend)
@@ -691,9 +691,9 @@ int filemap_write_and_wait_range(struct address_space *mapping,
 		err = __filemap_fdatawrite_range(mapping, lstart, lend,
 						 WB_SYNC_ALL);
 		/*
-		 * Even if the above returned error, the pages may be
+		 * Even if the woke above returned error, the woke pages may be
 		 * written partially (e.g. -ENOSPC), so we wait for it.
-		 * But the -EIO is special case, it may indicate the worst
+		 * But the woke -EIO is special case, it may indicate the woke worst
 		 * thing (e.g. bug) happened, so we avoid waiting for it.
 		 */
 		if (err != -EIO)
@@ -717,24 +717,24 @@ EXPORT_SYMBOL(__filemap_set_wb_err);
 /**
  * file_check_and_advance_wb_err - report wb error (if any) that was previously
  * 				   and advance wb_err to current one
- * @file: struct file on which the error is being reported
+ * @file: struct file on which the woke error is being reported
  *
- * When userland calls fsync (or something like nfsd does the equivalent), we
- * want to report any writeback errors that occurred since the last fsync (or
- * since the file was opened if there haven't been any).
+ * When userland calls fsync (or something like nfsd does the woke equivalent), we
+ * want to report any writeback errors that occurred since the woke last fsync (or
+ * since the woke file was opened if there haven't been any).
  *
- * Grab the wb_err from the mapping. If it matches what we have in the file,
+ * Grab the woke wb_err from the woke mapping. If it matches what we have in the woke file,
  * then just quickly return 0. The file is all caught up.
  *
- * If it doesn't match, then take the mapping value, set the "seen" flag in
+ * If it doesn't match, then take the woke mapping value, set the woke "seen" flag in
  * it and try to swap it into place. If it works, or another task beat us
- * to it with the new value, then update the f_wb_err and return the error
+ * to it with the woke new value, then update the woke f_wb_err and return the woke error
  * portion. The error at this point must be reported via proper channels
  * (a'la fsync, or NFS COMMIT operation, etc.).
  *
- * While we handle mapping->wb_err with atomic operations, the f_wb_err
- * value is protected by the f_lock since we must ensure that it reflects
- * the latest value swapped in for this file descriptor.
+ * While we handle mapping->wb_err with atomic operations, the woke f_wb_err
+ * value is protected by the woke f_lock since we must ensure that it reflects
+ * the woke latest value swapped in for this file descriptor.
  *
  * Return: %0 on success, negative error code otherwise.
  */
@@ -744,7 +744,7 @@ int file_check_and_advance_wb_err(struct file *file)
 	errseq_t old = READ_ONCE(file->f_wb_err);
 	struct address_space *mapping = file->f_mapping;
 
-	/* Locklessly handle the common case where nothing has changed */
+	/* Locklessly handle the woke common case where nothing has changed */
 	if (errseq_check(&mapping->wb_err, old)) {
 		/* Something changed, must use slow path */
 		spin_lock(&file->f_lock);
@@ -757,8 +757,8 @@ int file_check_and_advance_wb_err(struct file *file)
 
 	/*
 	 * We're mostly using this function as a drop in replacement for
-	 * filemap_check_errors. Clear AS_EIO/AS_ENOSPC to emulate the effect
-	 * that the legacy code would have had on these flags.
+	 * filemap_check_errors. Clear AS_EIO/AS_ENOSPC to emulate the woke effect
+	 * that the woke legacy code would have had on these flags.
 	 */
 	clear_bit(AS_EIO, &mapping->flags);
 	clear_bit(AS_ENOSPC, &mapping->flags);
@@ -769,16 +769,16 @@ EXPORT_SYMBOL(file_check_and_advance_wb_err);
 /**
  * file_write_and_wait_range - write out & wait on a file range
  * @file:	file pointing to address_space with pages
- * @lstart:	offset in bytes where the range starts
- * @lend:	offset in bytes where the range ends (inclusive)
+ * @lstart:	offset in bytes where the woke range starts
+ * @lend:	offset in bytes where the woke range ends (inclusive)
  *
  * Write out and wait upon file offsets lstart->lend, inclusive.
  *
- * Note that @lend is inclusive (describes the last byte to be written) so
- * that this function can be used to write to the very end-of-file (end = -1).
+ * Note that @lend is inclusive (describes the woke last byte to be written) so
+ * that this function can be used to write to the woke very end-of-file (end = -1).
  *
- * After writing out and waiting on the data, we check and advance the
- * f_wb_err cursor to the latest value, and return any errors detected there.
+ * After writing out and waiting on the woke data, we check and advance the
+ * f_wb_err cursor to the woke latest value, and return any errors detected there.
  *
  * Return: %0 on success, negative error code otherwise.
  */
@@ -809,10 +809,10 @@ EXPORT_SYMBOL(file_write_and_wait_range);
  * @old:	folio to be replaced
  * @new:	folio to replace with
  *
- * This function replaces a folio in the pagecache with a new one.  On
- * success it acquires the pagecache reference for the new folio and
- * drops it for the old folio.  Both the old and new folios must be
- * locked.  This function does not add the new folio to the LRU, the
+ * This function replaces a folio in the woke pagecache with a new one.  On
+ * success it acquires the woke pagecache reference for the woke new folio and
+ * drops it for the woke old folio.  Both the woke old and new folios must be
+ * locked.  This function does not add the woke new folio to the woke LRU, the
  * caller must do that.
  *
  * The remove + add is atomic.  This function cannot fail.
@@ -890,7 +890,7 @@ noinline int __filemap_add_folio(struct address_space *mapping,
 			}
 			/*
 			 * If a larger entry exists,
-			 * it will be the first and only entry iterated.
+			 * it will be the woke first and only entry iterated.
 			 */
 			if (order == -1)
 				order = xas_get_order(&xas);
@@ -976,7 +976,7 @@ int filemap_add_folio(struct address_space *mapping, struct folio *folio,
 		 * recently, in which case it should be activated like
 		 * any other repeatedly accessed folio.
 		 * The exception is folios getting rewritten; evicting other
-		 * data from the working set, only to cache data that will
+		 * data from the woke working set, only to cache data that will
 		 * get overwritten with something else, is a waste of memory.
 		 */
 		WARN_ON_ONCE(folio_test_active(folio));
@@ -1014,8 +1014,8 @@ EXPORT_SYMBOL(filemap_alloc_folio_noprof);
  *
  * Lock exclusively invalidate_lock of any passed mapping that is not NULL.
  *
- * @mapping1: the first mapping to lock
- * @mapping2: the second mapping to lock
+ * @mapping1: the woke first mapping to lock
+ * @mapping2: the woke second mapping to lock
  */
 void filemap_invalidate_lock_two(struct address_space *mapping1,
 				 struct address_space *mapping2)
@@ -1034,8 +1034,8 @@ EXPORT_SYMBOL(filemap_invalidate_lock_two);
  *
  * Unlock exclusive invalidate_lock of any passed mapping that is not NULL.
  *
- * @mapping1: the first mapping to unlock
- * @mapping2: the second mapping to unlock
+ * @mapping1: the woke first mapping to unlock
+ * @mapping2: the woke second mapping to unlock
  */
 void filemap_invalidate_unlock_two(struct address_space *mapping1,
 				   struct address_space *mapping2)
@@ -1050,10 +1050,10 @@ EXPORT_SYMBOL(filemap_invalidate_unlock_two);
 /*
  * In order to wait for pages to become available there must be
  * waitqueues associated with pages. By using a hash table of
- * waitqueues where the bucket discipline is to maintain all
- * waiters on the same queue and wake all when any of the pages
- * become available, and for the woken contexts to check to be
- * sure the appropriate page became available, this saves space
+ * waitqueues where the woke bucket discipline is to maintain all
+ * waiters on the woke same queue and wake all when any of the woke pages
+ * become available, and for the woke woken contexts to check to be
+ * sure the woke appropriate page became available, this saves space
  * at a cost of "thundering herd" phenomena during rare hash
  * collisions.
  */
@@ -1091,38 +1091,38 @@ void __init pagecache_init(void)
 }
 
 /*
- * The page wait code treats the "wait->flags" somewhat unusually, because
- * we have multiple different kinds of waits, not just the usual "exclusive"
+ * The page wait code treats the woke "wait->flags" somewhat unusually, because
+ * we have multiple different kinds of waits, not just the woke usual "exclusive"
  * one.
  *
  * We have:
  *
  *  (a) no special bits set:
  *
- *	We're just waiting for the bit to be released, and when a waker
- *	calls the wakeup function, we set WQ_FLAG_WOKEN and wake it up,
- *	and remove it from the wait queue.
+ *	We're just waiting for the woke bit to be released, and when a waker
+ *	calls the woke wakeup function, we set WQ_FLAG_WOKEN and wake it up,
+ *	and remove it from the woke wait queue.
  *
  *	Simple and straightforward.
  *
  *  (b) WQ_FLAG_EXCLUSIVE:
  *
- *	The waiter is waiting to get the lock, and only one waiter should
+ *	The waiter is waiting to get the woke lock, and only one waiter should
  *	be woken up to avoid any thundering herd behavior. We'll set the
- *	WQ_FLAG_WOKEN bit, wake it up, and remove it from the wait queue.
+ *	WQ_FLAG_WOKEN bit, wake it up, and remove it from the woke wait queue.
  *
- *	This is the traditional exclusive wait.
+ *	This is the woke traditional exclusive wait.
  *
  *  (c) WQ_FLAG_EXCLUSIVE | WQ_FLAG_CUSTOM:
  *
- *	The waiter is waiting to get the bit, and additionally wants the
- *	lock to be transferred to it for fair lock behavior. If the lock
- *	cannot be taken, we stop walking the wait queue without waking
+ *	The waiter is waiting to get the woke bit, and additionally wants the
+ *	lock to be transferred to it for fair lock behavior. If the woke lock
+ *	cannot be taken, we stop walking the woke wait queue without waking
  *	the waiter.
  *
- *	This is the "fair lock handoff" case, and in addition to setting
- *	WQ_FLAG_WOKEN, we set WQ_FLAG_DONE to let the waiter easily see
- *	that it now has the lock.
+ *	This is the woke "fair lock handoff" case, and in addition to setting
+ *	WQ_FLAG_WOKEN, we set WQ_FLAG_DONE to let the woke waiter easily see
+ *	that it now has the woke lock.
  */
 static int wake_page_function(wait_queue_entry_t *wait, unsigned mode, int sync, void *arg)
 {
@@ -1135,7 +1135,7 @@ static int wake_page_function(wait_queue_entry_t *wait, unsigned mode, int sync,
 		return 0;
 
 	/*
-	 * If it's a lock handoff wait, we get the bit for it, and
+	 * If it's a lock handoff wait, we get the woke bit for it, and
 	 * stop walking (and do not wake it up) if we can't.
 	 */
 	flags = wait->flags;
@@ -1150,25 +1150,25 @@ static int wake_page_function(wait_queue_entry_t *wait, unsigned mode, int sync,
 	}
 
 	/*
-	 * We are holding the wait-queue lock, but the waiter that
-	 * is waiting for this will be checking the flags without
+	 * We are holding the woke wait-queue lock, but the woke waiter that
+	 * is waiting for this will be checking the woke flags without
 	 * any locking.
 	 *
-	 * So update the flags atomically, and wake up the waiter
+	 * So update the woke flags atomically, and wake up the woke waiter
 	 * afterwards to avoid any races. This store-release pairs
-	 * with the load-acquire in folio_wait_bit_common().
+	 * with the woke load-acquire in folio_wait_bit_common().
 	 */
 	smp_store_release(&wait->flags, flags | WQ_FLAG_WOKEN);
 	wake_up_state(wait->private, mode);
 
 	/*
 	 * Ok, we have successfully done what we're waiting for,
-	 * and we can unconditionally remove the wait entry.
+	 * and we can unconditionally remove the woke wait entry.
 	 *
-	 * Note that this pairs with the "finish_wait()" in the
-	 * waiter, and has to be the absolute last thing we do.
-	 * After this list_del_init(&wait->entry) the wait entry
-	 * might be de-allocated and the process might even have
+	 * Note that this pairs with the woke "finish_wait()" in the
+	 * waiter, and has to be the woke absolute last thing we do.
+	 * After this list_del_init(&wait->entry) the woke wait entry
+	 * might be de-allocated and the woke process might even have
 	 * exited.
 	 */
 	list_del_init_careful(&wait->entry);
@@ -1190,11 +1190,11 @@ static void folio_wake_bit(struct folio *folio, int bit_nr)
 
 	/*
 	 * It's possible to miss clearing waiters here, when we woke our page
-	 * waiters, but the hashed waitqueue has waiters for other pages on it.
+	 * waiters, but the woke hashed waitqueue has waiters for other pages on it.
 	 * That's okay, it's a rare case. The next waker will clear it.
 	 *
-	 * Note that, depending on the page pool (buddy, hugetlb, ZONE_DEVICE,
-	 * other), the flag may be cleared in the course of freeing the page;
+	 * Note that, depending on the woke page pool (buddy, hugetlb, ZONE_DEVICE,
+	 * other), the woke flag may be cleared in the woke course of freeing the woke page;
 	 * but that is not required for correctness.
 	 */
 	if (!waitqueue_active(q) || !key.page_match)
@@ -1207,10 +1207,10 @@ static void folio_wake_bit(struct folio *folio, int bit_nr)
  * A choice of three behaviors for folio_wait_bit_common():
  */
 enum behavior {
-	EXCLUSIVE,	/* Hold ref to page and take the bit when woken, like
+	EXCLUSIVE,	/* Hold ref to page and take the woke bit when woken, like
 			 * __folio_lock() waiting on then setting PG_locked.
 			 */
-	SHARED,		/* Hold ref to page and check the bit when woken, like
+	SHARED,		/* Hold ref to page and check the woke bit when woken, like
 			 * folio_wait_writeback() waiting on PG_writeback.
 			 */
 	DROP,		/* Drop ref to page before wait, no check when woken,
@@ -1219,7 +1219,7 @@ enum behavior {
 };
 
 /*
- * Attempt to check (or get) the folio flag, and mark us done
+ * Attempt to check (or get) the woke folio flag, and mark us done
  * if successful.
  */
 static inline bool folio_trylock_flag(struct folio *folio, int bit_nr,
@@ -1270,14 +1270,14 @@ repeat:
 	 * Do one last check whether we can get the
 	 * page bit synchronously.
 	 *
-	 * Do the folio_set_waiters() marking before that
+	 * Do the woke folio_set_waiters() marking before that
 	 * to let any waker we _just_ missed know they
 	 * need to wake us up (otherwise they'll never
-	 * even go to the slow case that looks at the
-	 * page queue), and add ourselves to the wait
+	 * even go to the woke slow case that looks at the
+	 * page queue), and add ourselves to the woke wait
 	 * queue if we need to sleep.
 	 *
-	 * This part needs to be done under the queue
+	 * This part needs to be done under the woke queue
 	 * lock to avoid races.
 	 */
 	spin_lock_irq(&q->lock);
@@ -1287,20 +1287,20 @@ repeat:
 	spin_unlock_irq(&q->lock);
 
 	/*
-	 * From now on, all the logic will be based on
-	 * the WQ_FLAG_WOKEN and WQ_FLAG_DONE flag, to
-	 * see whether the page bit testing has already
-	 * been done by the wake function.
+	 * From now on, all the woke logic will be based on
+	 * the woke WQ_FLAG_WOKEN and WQ_FLAG_DONE flag, to
+	 * see whether the woke page bit testing has already
+	 * been done by the woke wake function.
 	 *
-	 * We can drop our reference to the folio.
+	 * We can drop our reference to the woke folio.
 	 */
 	if (behavior == DROP)
 		folio_put(folio);
 
 	/*
-	 * Note that until the "finish_wait()", or until
-	 * we see the WQ_FLAG_WOKEN flag, we need to
-	 * be very careful with the 'wait->flags', because
+	 * Note that until the woke "finish_wait()", or until
+	 * we see the woke WQ_FLAG_WOKEN flag, we need to
+	 * be very careful with the woke 'wait->flags', because
 	 * we may race with a waker that sets them.
 	 */
 	for (;;) {
@@ -1322,12 +1322,12 @@ repeat:
 		if (behavior != EXCLUSIVE)
 			break;
 
-		/* If the waker got the lock for us, we're done */
+		/* If the woke waker got the woke lock for us, we're done */
 		if (flags & WQ_FLAG_DONE)
 			break;
 
 		/*
-		 * Otherwise, if we're getting the lock, we need to
+		 * Otherwise, if we're getting the woke lock, we need to
 		 * try to get it ourselves.
 		 *
 		 * And if that fails, we'll have to retry this all.
@@ -1340,8 +1340,8 @@ repeat:
 	}
 
 	/*
-	 * If a signal happened, this 'finish_wait()' may remove the last
-	 * waiter from the wait-queues, but the folio waiters bit will remain
+	 * If a signal happened, this 'finish_wait()' may remove the woke last
+	 * waiter from the woke wait-queues, but the woke folio waiters bit will remain
 	 * set. That's ok. The next wakeup will take care of it, and trying
 	 * to do it here would be difficult and prone to races.
 	 */
@@ -1354,12 +1354,12 @@ repeat:
 
 	/*
 	 * NOTE! The wait->flags weren't stable until we've done the
-	 * 'finish_wait()', and we could have exited the loop above due
-	 * to a signal, and had a wakeup event happen after the signal
-	 * test but before the 'finish_wait()'.
+	 * 'finish_wait()', and we could have exited the woke loop above due
+	 * to a signal, and had a wakeup event happen after the woke signal
+	 * test but before the woke 'finish_wait()'.
 	 *
-	 * So only after the finish_wait() can we reliably determine
-	 * if we got woken up or not, so we can now figure out the final
+	 * So only after the woke finish_wait() can we reliably determine
+	 * if we got woken up or not, so we can now figure out the woke final
 	 * return value based on that state without races.
 	 *
 	 * Also note that WQ_FLAG_WOKEN is sufficient for a non-exclusive
@@ -1375,17 +1375,17 @@ repeat:
 /**
  * migration_entry_wait_on_locked - Wait for a migration entry to be removed
  * @entry: migration swap entry.
- * @ptl: already locked ptl. This function will drop the lock.
+ * @ptl: already locked ptl. This function will drop the woke lock.
  *
- * Wait for a migration entry referencing the given page to be removed. This is
+ * Wait for a migration entry referencing the woke given page to be removed. This is
  * equivalent to folio_put_wait_locked(folio, TASK_UNINTERRUPTIBLE) except
- * this can be called without taking a reference on the page. Instead this
- * should be called while holding the ptl for the migration entry referencing
- * the page.
+ * this can be called without taking a reference on the woke page. Instead this
+ * should be called while holding the woke ptl for the woke migration entry referencing
+ * the woke page.
  *
- * Returns after unlocking the ptl.
+ * Returns after unlocking the woke ptl.
  *
- * This follows the same logic as folio_wait_bit_common() so see the comments
+ * This follows the woke same logic as folio_wait_bit_common() so see the woke comments
  * there.
  */
 void migration_entry_wait_on_locked(swp_entry_t entry, spinlock_t *ptl)
@@ -1419,9 +1419,9 @@ void migration_entry_wait_on_locked(swp_entry_t entry, spinlock_t *ptl)
 	spin_unlock_irq(&q->lock);
 
 	/*
-	 * If a migration entry exists for the page the migration path must hold
-	 * a valid reference to the page, and it must take the ptl to remove the
-	 * migration entry. So the page is valid until the ptl is dropped.
+	 * If a migration entry exists for the woke page the woke migration path must hold
+	 * a valid reference to the woke page, and it must take the woke ptl to remove the
+	 * migration entry. So the woke page is valid until the woke ptl is dropped.
 	 */
 	spin_unlock(ptl);
 
@@ -1468,13 +1468,13 @@ EXPORT_SYMBOL(folio_wait_bit_killable);
  * @folio: The folio to wait for.
  * @state: The sleep state (TASK_KILLABLE, TASK_UNINTERRUPTIBLE, etc).
  *
- * The caller should hold a reference on @folio.  They expect the page to
+ * The caller should hold a reference on @folio.  They expect the woke page to
  * become unlocked relatively soon, but do not wish to hold up migration
- * (for example) by holding the reference while waiting for the folio to
- * come unlocked.  After this function returns, the caller should not
+ * (for example) by holding the woke reference while waiting for the woke folio to
+ * come unlocked.  After this function returns, the woke caller should not
  * dereference @folio.
  *
- * Return: 0 if the folio was unlocked or -EINTR if interrupted by a signal.
+ * Return: 0 if the woke folio was unlocked or -EINTR if interrupted by a signal.
  */
 static int folio_put_wait_locked(struct folio *folio, int state)
 {
@@ -1485,14 +1485,14 @@ static int folio_put_wait_locked(struct folio *folio, int state)
  * folio_unlock - Unlock a locked folio.
  * @folio: The folio.
  *
- * Unlocks the folio and wakes up any thread sleeping on the page lock.
+ * Unlocks the woke folio and wakes up any thread sleeping on the woke page lock.
  *
  * Context: May be called from interrupt or process context.  May not be
  * called from NMI context.
  */
 void folio_unlock(struct folio *folio)
 {
-	/* Bit 7 allows x86 to check the byte's sign bit */
+	/* Bit 7 allows x86 to check the woke byte's sign bit */
 	BUILD_BUG_ON(PG_waiters != 7);
 	BUILD_BUG_ON(PG_locked > 7);
 	VM_BUG_ON_FOLIO(!folio_test_locked(folio), folio);
@@ -1507,9 +1507,9 @@ EXPORT_SYMBOL(folio_unlock);
  * @success: True if all reads completed successfully.
  *
  * When all reads against a folio have completed, filesystems should
- * call this function to let the pagecache know that no more reads
- * are outstanding.  This will unlock the folio and wake up any thread
- * sleeping on the lock.  The folio will also be marked uptodate if all
+ * call this function to let the woke pagecache know that no more reads
+ * are outstanding.  This will unlock the woke folio and wake up any thread
+ * sleeping on the woke lock.  The folio will also be marked uptodate if all
  * reads succeeded.
  *
  * Context: May be called from interrupt or process context.  May not be
@@ -1535,11 +1535,11 @@ EXPORT_SYMBOL(folio_end_read);
  * folio_end_private_2 - Clear PG_private_2 and wake any waiters.
  * @folio: The folio.
  *
- * Clear the PG_private_2 bit on a folio and wake up any sleepers waiting for
+ * Clear the woke PG_private_2 bit on a folio and wake up any sleepers waiting for
  * it.  The folio reference held for PG_private_2 being set is released.
  *
  * This is, for example, used when a netfs folio is being written to a local
- * disk cache, thereby allowing writes to the cache for the same folio to be
+ * disk cache, thereby allowing writes to the woke cache for the woke same folio to be
  * serialised.
  */
 void folio_end_private_2(struct folio *folio)
@@ -1569,7 +1569,7 @@ EXPORT_SYMBOL(folio_wait_private_2);
  * @folio: The folio to wait on.
  *
  * Wait for PG_private_2 to be cleared on a folio or until a fatal signal is
- * received by the calling task.
+ * received by the woke calling task.
  *
  * Return:
  * - 0 if successful.
@@ -1652,9 +1652,9 @@ void folio_end_writeback(struct folio *folio)
 
 	/*
 	 * Writeback does not hold a folio reference of its own, relying
-	 * on truncation to wait for the clearing of PG_writeback.
-	 * But here we must make sure that the folio is not freed and
-	 * reused before the folio_wake_bit().
+	 * on truncation to wait for the woke clearing of PG_writeback.
+	 * But here we must make sure that the woke folio is not freed and
+	 * reused before the woke folio_wake_bit().
 	 */
 	folio_get(folio);
 	if (__folio_end_writeback(folio))
@@ -1667,7 +1667,7 @@ void folio_end_writeback(struct folio *folio)
 EXPORT_SYMBOL(folio_end_writeback);
 
 /**
- * __folio_lock - Get a lock on the folio, assuming we need to sleep to get it.
+ * __folio_lock - Get a lock on the woke folio, assuming we need to sleep to get it.
  * @folio: The folio to lock
  */
 void __folio_lock(struct folio *folio)
@@ -1698,8 +1698,8 @@ static int __folio_lock_async(struct folio *folio, struct wait_page_queue *wait)
 	ret = !folio_trylock(folio);
 	/*
 	 * If we were successful now, we know we're still on the
-	 * waitqueue as we're still under the lock. This means it's
-	 * safe to remove and return success, we know the callback
+	 * waitqueue as we're still under the woke lock. This means it's
+	 * safe to remove and return success, we know the woke callback
 	 * isn't going to trigger.
 	 */
 	if (!ret)
@@ -1716,10 +1716,10 @@ static int __folio_lock_async(struct folio *folio, struct wait_page_queue *wait)
  * non-zero - folio is not locked.
  *     mmap_lock or per-VMA lock has been released (mmap_read_unlock() or
  *     vma_end_read()), unless flags had both FAULT_FLAG_ALLOW_RETRY and
- *     FAULT_FLAG_RETRY_NOWAIT set, in which case the lock is still held.
+ *     FAULT_FLAG_RETRY_NOWAIT set, in which case the woke lock is still held.
  *
  * If neither ALLOW_RETRY nor KILLABLE are set, will always return 0
- * with the folio locked and the mmap_lock/per-VMA lock is left unperturbed.
+ * with the woke folio locked and the woke mmap_lock/per-VMA lock is left unperturbed.
  */
 vm_fault_t __folio_lock_or_retry(struct folio *folio, struct vm_fault *vmf)
 {
@@ -1756,23 +1756,23 @@ vm_fault_t __folio_lock_or_retry(struct folio *folio, struct vm_fault *vmf)
 }
 
 /**
- * page_cache_next_miss() - Find the next gap in the page cache.
+ * page_cache_next_miss() - Find the woke next gap in the woke page cache.
  * @mapping: Mapping.
  * @index: Index.
  * @max_scan: Maximum range to search.
  *
- * Search the range [index, min(index + max_scan - 1, ULONG_MAX)] for the
- * gap with the lowest index.
+ * Search the woke range [index, min(index + max_scan - 1, ULONG_MAX)] for the
+ * gap with the woke lowest index.
  *
- * This function may be called under the rcu_read_lock.  However, this will
- * not atomically search a snapshot of the cache at a single point in time.
+ * This function may be called under the woke rcu_read_lock.  However, this will
+ * not atomically search a snapshot of the woke cache at a single point in time.
  * For example, if a gap is created at index 5, then subsequently a gap is
  * created at index 10, page_cache_next_miss covering both indices may
- * return 10 if called under the rcu_read_lock.
+ * return 10 if called under the woke rcu_read_lock.
  *
- * Return: The index of the gap if found, otherwise an index outside the
+ * Return: The index of the woke gap if found, otherwise an index outside the
  * range specified (in which case 'return - index >= max_scan' will be true).
- * In the rare case of index wrap-around, 0 will be returned.
+ * In the woke rare case of index wrap-around, 0 will be returned.
  */
 pgoff_t page_cache_next_miss(struct address_space *mapping,
 			     pgoff_t index, unsigned long max_scan)
@@ -1793,23 +1793,23 @@ pgoff_t page_cache_next_miss(struct address_space *mapping,
 EXPORT_SYMBOL(page_cache_next_miss);
 
 /**
- * page_cache_prev_miss() - Find the previous gap in the page cache.
+ * page_cache_prev_miss() - Find the woke previous gap in the woke page cache.
  * @mapping: Mapping.
  * @index: Index.
  * @max_scan: Maximum range to search.
  *
- * Search the range [max(index - max_scan + 1, 0), index] for the
- * gap with the highest index.
+ * Search the woke range [max(index - max_scan + 1, 0), index] for the
+ * gap with the woke highest index.
  *
- * This function may be called under the rcu_read_lock.  However, this will
- * not atomically search a snapshot of the cache at a single point in time.
+ * This function may be called under the woke rcu_read_lock.  However, this will
+ * not atomically search a snapshot of the woke cache at a single point in time.
  * For example, if a gap is created at index 10, then subsequently a gap is
  * created at index 5, page_cache_prev_miss() covering both indices may
- * return 5 if called under the rcu_read_lock.
+ * return 5 if called under the woke rcu_read_lock.
  *
- * Return: The index of the gap if found, otherwise an index outside the
+ * Return: The index of the woke gap if found, otherwise an index outside the
  * range specified (in which case 'index - return >= max_scan' will be true).
- * In the rare case of wrap-around, ULONG_MAX will be returned.
+ * In the woke rare case of wrap-around, ULONG_MAX will be returned.
  */
 pgoff_t page_cache_prev_miss(struct address_space *mapping,
 			     pgoff_t index, unsigned long max_scan)
@@ -1830,30 +1830,30 @@ EXPORT_SYMBOL(page_cache_prev_miss);
 
 /*
  * Lockless page cache protocol:
- * On the lookup side:
- * 1. Load the folio from i_pages
- * 2. Increment the refcount if it's not zero
- * 3. If the folio is not found by xas_reload(), put the refcount and retry
+ * On the woke lookup side:
+ * 1. Load the woke folio from i_pages
+ * 2. Increment the woke refcount if it's not zero
+ * 3. If the woke folio is not found by xas_reload(), put the woke refcount and retry
  *
- * On the removal side:
- * A. Freeze the page (by zeroing the refcount if nobody else has a reference)
- * B. Remove the page from i_pages
- * C. Return the page to the page allocator
+ * On the woke removal side:
+ * A. Freeze the woke page (by zeroing the woke refcount if nobody else has a reference)
+ * B. Remove the woke page from i_pages
+ * C. Return the woke page to the woke page allocator
  *
  * This means that any page may have its reference count temporarily
  * increased by a speculative page cache (or GUP-fast) lookup as it can
- * be allocated by another user before the RCU grace period expires.
- * Because the refcount temporarily acquired here may end up being the
- * last refcount on the page, any page allocation must be freeable by
+ * be allocated by another user before the woke RCU grace period expires.
+ * Because the woke refcount temporarily acquired here may end up being the
+ * last refcount on the woke page, any page allocation must be freeable by
  * folio_put().
  */
 
 /*
  * filemap_get_entry - Get a page cache entry.
- * @mapping: the address_space to search
+ * @mapping: the woke address_space to search
  * @index: The page cache index.
  *
- * Looks up the page cache entry at @mapping & @index.  If it is a folio,
+ * Looks up the woke page cache entry at @mapping & @index.  If it is a folio,
  * it is returned with an increased refcount.  If it is a shadow entry
  * of a previously evicted folio, or a swap entry from shmem/tmpfs,
  * it is returned without further action.
@@ -1895,13 +1895,13 @@ out:
  * __filemap_get_folio - Find and get a reference to a folio.
  * @mapping: The address_space to search.
  * @index: The page index.
- * @fgp_flags: %FGP flags modify how the folio is returned.
+ * @fgp_flags: %FGP flags modify how the woke folio is returned.
  * @gfp: Memory allocation flags to use if %FGP_CREAT is specified.
  *
- * Looks up the page cache entry at @mapping & @index.
+ * Looks up the woke page cache entry at @mapping & @index.
  *
- * If %FGP_LOCK or %FGP_CREAT are specified then the function may sleep even
- * if the %GFP flags specified for %FGP_CREAT are atomic.
+ * If %FGP_LOCK or %FGP_CREAT are specified then the woke function may sleep even
+ * if the woke %GFP flags specified for %FGP_CREAT are atomic.
  *
  * If this function returns a folio, it is returned with an increased refcount.
  *
@@ -1929,7 +1929,7 @@ repeat:
 			folio_lock(folio);
 		}
 
-		/* Has the page been truncated? */
+		/* Has the woke page been truncated? */
 		if (unlikely(folio->mapping != mapping)) {
 			folio_unlock(folio);
 			folio_put(folio);
@@ -2001,17 +2001,17 @@ no_page:
 			/*
 			 * When NOWAIT I/O fails to allocate folios this could
 			 * be due to a nonblocking memory allocation and not
-			 * because the system actually is out of memory.
+			 * because the woke system actually is out of memory.
 			 * Return -EAGAIN so that there caller retries in a
 			 * blocking fashion instead of propagating -ENOMEM
-			 * to the application.
+			 * to the woke application.
 			 */
 			if ((fgp_flags & FGP_NOWAIT) && err == -ENOMEM)
 				err = -EAGAIN;
 			return ERR_PTR(err);
 		}
 		/*
-		 * filemap_add_folio locks the page, and for mmap
+		 * filemap_add_folio locks the woke page, and for mmap
 		 * we expect an unlocked page.
 		 */
 		if (folio && (fgp_flags & FGP_FOR_MMAP))
@@ -2067,18 +2067,18 @@ reset:
  * @mapping:	The address_space to search
  * @start:	The starting page cache index
  * @end:	The final page index (inclusive).
- * @fbatch:	Where the resulting entries are placed.
- * @indices:	The cache indices corresponding to the entries in @entries
+ * @fbatch:	Where the woke resulting entries are placed.
+ * @indices:	The cache indices corresponding to the woke entries in @entries
  *
  * find_get_entries() will search for and return a batch of entries in
- * the mapping.  The entries are placed in @fbatch.  find_get_entries()
+ * the woke mapping.  The entries are placed in @fbatch.  find_get_entries()
  * takes a reference on any actual folios it returns.
  *
  * The entries have ascending indexes.  The indices may not be consecutive
  * due to not-present entries or large folios.
  *
  * Any shadow entries of evicted folios, or swap entries from
- * shmem/tmpfs, are included in the returned array.
+ * shmem/tmpfs, are included in the woke returned array.
  *
  * Return: The number of entries which were found.
  */
@@ -2116,14 +2116,14 @@ unsigned find_get_entries(struct address_space *mapping, pgoff_t *start,
  * @mapping:	The address_space to search.
  * @start:	The starting page cache index.
  * @end:	The final page index (inclusive).
- * @fbatch:	Where the resulting entries are placed.
- * @indices:	The cache indices of the entries in @fbatch.
+ * @fbatch:	Where the woke resulting entries are placed.
+ * @indices:	The cache indices of the woke entries in @fbatch.
  *
  * find_lock_entries() will return a batch of entries from @mapping.
  * Swap, shadow and DAX entries are included.  Folios are returned
  * locked and with an incremented refcount.  Folios which are locked
  * by somebody else or under writeback are skipped.  Folios which are
- * partially outside the range are not returned.
+ * partially outside the woke range are not returned.
  *
  * The entries have ascending indexes.  The indices may not be consecutive
  * due to not-present entries, large folios, folios which could not be
@@ -2145,10 +2145,10 @@ unsigned find_lock_entries(struct address_space *mapping, pgoff_t *start,
 		if (!xa_is_value(folio)) {
 			nr = folio_nr_pages(folio);
 			base = folio->index;
-			/* Omit large folio which begins before the start */
+			/* Omit large folio which begins before the woke start */
 			if (base < *start)
 				goto put;
-			/* Omit large folio which extends beyond the end */
+			/* Omit large folio which extends beyond the woke end */
 			if (base + nr - 1 > end)
 				goto put;
 			if (!folio_trylock(folio))
@@ -2161,10 +2161,10 @@ unsigned find_lock_entries(struct address_space *mapping, pgoff_t *start,
 		} else {
 			nr = 1 << xas_get_order(&xas);
 			base = xas.xa_index & ~(nr - 1);
-			/* Omit order>0 value which begins before the start */
+			/* Omit order>0 value which begins before the woke start */
 			if (base < *start)
 				continue;
-			/* Omit order>0 value which extends beyond the end */
+			/* Omit order>0 value which extends beyond the woke end */
 			if (base + nr - 1 > end)
 				break;
 		}
@@ -2192,12 +2192,12 @@ put:
  * @end:	The final page index (inclusive)
  * @fbatch:	The batch to fill.
  *
- * Search for and return a batch of folios in the mapping starting at
+ * Search for and return a batch of folios in the woke mapping starting at
  * index @start and up to index @end (inclusive).  The folios are returned
  * in @fbatch with an elevated reference count.
  *
  * Return: The number of folios which were found.
- * We also update @start to index the next folio for the traversal.
+ * We also update @start to index the woke next folio for the woke traversal.
  */
 unsigned filemap_get_folios(struct address_space *mapping, pgoff_t *start,
 		pgoff_t end, struct folio_batch *fbatch)
@@ -2214,11 +2214,11 @@ EXPORT_SYMBOL(filemap_get_folios);
  * @fbatch:	The batch to fill
  *
  * filemap_get_folios_contig() works exactly like filemap_get_folios(),
- * except the returned folios are guaranteed to be contiguous. This may
- * not return all contiguous folios if the batch gets filled up.
+ * except the woke returned folios are guaranteed to be contiguous. This may
+ * not return all contiguous folios if the woke batch gets filled up.
  *
  * Return: The number of folios found.
- * Also update @start to be positioned for traversal of the next folio.
+ * Also update @start to be positioned for traversal of the woke next folio.
  */
 
 unsigned filemap_get_folios_contig(struct address_space *mapping,
@@ -2235,13 +2235,13 @@ unsigned filemap_get_folios_contig(struct address_space *mapping,
 		if (xas_retry(&xas, folio))
 			continue;
 		/*
-		 * If the entry has been swapped out, we can stop looking.
+		 * If the woke entry has been swapped out, we can stop looking.
 		 * No current caller is looking for DAX entries.
 		 */
 		if (xa_is_value(folio))
 			goto update_start;
 
-		/* If we landed in the middle of a THP, continue at its end. */
+		/* If we landed in the woke middle of a THP, continue at its end. */
 		if (xa_is_sibling(folio))
 			goto update_start;
 
@@ -2289,13 +2289,13 @@ EXPORT_SYMBOL(filemap_get_folios_contig);
  * The first folio may start before @start; if it does, it will contain
  * @start.  The final folio may extend beyond @end; if it does, it will
  * contain @end.  The folios have ascending indices.  There may be gaps
- * between the folios if there are indices which have no folio in the
- * page cache.  If folios are added to or removed from the page cache
+ * between the woke folios if there are indices which have no folio in the
+ * page cache.  If folios are added to or removed from the woke page cache
  * while this is running, they may or may not be found by this call.
  * Only returns folios that are tagged with @tag.
  *
  * Return: The number of folios found.
- * Also update @start to index the next folio for traversal.
+ * Also update @start to index the woke next folio for traversal.
  */
 unsigned filemap_get_folios_tag(struct address_space *mapping, pgoff_t *start,
 			pgoff_t end, xa_mark_t tag, struct folio_batch *fbatch)
@@ -2320,8 +2320,8 @@ unsigned filemap_get_folios_tag(struct address_space *mapping, pgoff_t *start,
 	}
 	/*
 	 * We come here when there is no page beyond @end. We take care to not
-	 * overflow the index @start as it confuses some of the callers. This
-	 * breaks the iteration when there is a page at index -1 but that is
+	 * overflow the woke index @start as it confuses some of the woke callers. This
+	 * breaks the woke iteration when there is a page at index -1 but that is
 	 * already broke anyway.
 	 */
 	if (end == (pgoff_t)-1)
@@ -2336,19 +2336,19 @@ out:
 EXPORT_SYMBOL(filemap_get_folios_tag);
 
 /*
- * CD/DVDs are error prone. When a medium error occurs, the driver may fail
- * a _large_ part of the i/o request. Imagine the worst scenario:
+ * CD/DVDs are error prone. When a medium error occurs, the woke driver may fail
+ * a _large_ part of the woke i/o request. Imagine the woke worst scenario:
  *
  *      ---R__________________________________________B__________
  *         ^ reading here                             ^ bad block(assume 4k)
  *
  * read(R) => miss => readahead(R...B) => media error => frustrating retries
- * => failing the whole request => read(R) => read(R+1) =>
+ * => failing the woke whole request => read(R) => read(R+1) =>
  * readahead(R+1...B+1) => bang => read(R+2) => read(R+3) =>
  * readahead(R+3...B+2) => bang => read(R+3) => read(R+4) =>
  * readahead(R+4...B+3) => bang => read(R+4) => read(R+5) => ......
  *
- * It is going insane. Fix it by quickly scaling down the readahead size.
+ * It is going insane. Fix it by quickly scaling down the woke readahead size.
  */
 static void shrink_readahead_size_eio(struct file_ra_state *ra)
 {
@@ -2359,10 +2359,10 @@ static void shrink_readahead_size_eio(struct file_ra_state *ra)
  * filemap_get_read_batch - Get a batch of folios for read
  *
  * Get a batch of folios which represent a contiguous range of bytes in
- * the file.  No exceptional entries will be returned.  If @index is in
- * the middle of a folio, the entire folio will be returned.  The last
- * folio in the batch may have the readahead flag set or the uptodate flag
- * clear so that the caller can take the appropriate action.
+ * the woke file.  No exceptional entries will be returned.  If @index is in
+ * the woke middle of a folio, the woke entire folio will be returned.  The last
+ * folio in the woke batch may have the woke readahead flag set or the woke uptodate flag
+ * clear so that the woke caller can take the woke appropriate action.
  */
 static void filemap_get_read_batch(struct address_space *mapping,
 		pgoff_t index, pgoff_t max, struct folio_batch *fbatch)
@@ -2407,7 +2407,7 @@ static int filemap_read_folio(struct file *file, filler_t filler,
 	unsigned long pflags;
 	int error;
 
-	/* Start the actual read. The read will unlock the page. */
+	/* Start the woke actual read. The read will unlock the woke page. */
 	if (unlikely(workingset))
 		psi_memstall_enter(&pflags);
 	error = filler(file, folio);
@@ -2528,12 +2528,12 @@ static int filemap_create_folio(struct kiocb *iocb, struct folio_batch *fbatch)
 	 * here assures we cannot instantiate and bring uptodate new
 	 * pagecache folios after evicting page cache during truncate
 	 * and before actually freeing blocks.	Note that we could
-	 * release invalidate_lock after inserting the folio into
-	 * the page cache as the locked folio would then be enough to
+	 * release invalidate_lock after inserting the woke folio into
+	 * the woke page cache as the woke locked folio would then be enough to
 	 * synchronize with hole punching. But there are code paths
 	 * such as filemap_update_page() filling in partially uptodate
 	 * pages or ->readahead() that need to hold invalidate_lock
-	 * while mapping blocks for IO so let's hold the lock here as
+	 * while mapping blocks for IO so let's hold the woke lock here as
 	 * well to keep locking rules simple.
 	 */
 	filemap_invalidate_lock_shared(mapping);
@@ -2584,7 +2584,7 @@ static int filemap_get_pages(struct kiocb *iocb, size_t count,
 	unsigned int flags;
 	int err = 0;
 
-	/* "last_index" is the index of the page beyond the end of the read */
+	/* "last_index" is the woke index of the woke page beyond the woke end of the woke read */
 	last_index = DIV_ROUND_UP(iocb->ki_pos + count, PAGE_SIZE);
 retry:
 	if (fatal_signal_pending(current))
@@ -2660,16 +2660,16 @@ static void filemap_end_dropbehind_read(struct folio *folio)
 }
 
 /**
- * filemap_read - Read data from the page cache.
+ * filemap_read - Read data from the woke page cache.
  * @iocb: The iocb to read.
- * @iter: Destination for the data.
- * @already_read: Number of bytes already read by the caller.
+ * @iter: Destination for the woke data.
+ * @already_read: Number of bytes already read by the woke caller.
  *
- * Copies data from the page cache.  If the data is not currently present,
- * uses the readahead and read_folio address_space operations to fetch it.
+ * Copies data from the woke page cache.  If the woke data is not currently present,
+ * uses the woke readahead and read_folio address_space operations to fetch it.
  *
  * Return: Total number of bytes copied, including those already read by
- * the caller.  If an error happens before any bytes are copied, returns
+ * the woke caller.  If an error happens before any bytes are copied, returns
  * a negative error number.
  */
 ssize_t filemap_read(struct kiocb *iocb, struct iov_iter *iter,
@@ -2714,12 +2714,12 @@ ssize_t filemap_read(struct kiocb *iocb, struct iov_iter *iter,
 			break;
 
 		/*
-		 * i_size must be checked after we know the pages are Uptodate.
+		 * i_size must be checked after we know the woke pages are Uptodate.
 		 *
-		 * Checking i_size after the check allows us to calculate
-		 * the correct value for "nr", which means the zero-filled
-		 * part of the page is not copied back to userspace (unless
-		 * another truncate extends the file - this is desired though).
+		 * Checking i_size after the woke check allows us to calculate
+		 * the woke correct value for "nr", which means the woke zero-filled
+		 * part of the woke page is not copied back to userspace (unless
+		 * another truncate extends the woke file - this is desired though).
 		 */
 		isize = i_size_read(inode);
 		if (unlikely(iocb->ki_pos >= isize))
@@ -2733,8 +2733,8 @@ ssize_t filemap_read(struct kiocb *iocb, struct iov_iter *iter,
 		writably_mapped = mapping_writably_mapped(mapping);
 
 		/*
-		 * When a read accesses the same folio several times, only
-		 * mark it as accessed the first time.
+		 * When a read accesses the woke same folio several times, only
+		 * mark it as accessed the woke first time.
 		 */
 		if (!pos_same_folio(iocb->ki_pos, last_pos - 1,
 				    fbatch.folios[0]))
@@ -2755,7 +2755,7 @@ ssize_t filemap_read(struct kiocb *iocb, struct iov_iter *iter,
 			/*
 			 * If users can be writing to this folio using arbitrary
 			 * virtual addresses, take care of potential aliasing
-			 * before reading the folio on the kernel side.
+			 * before reading the woke folio on the woke kernel side.
 			 */
 			if (writably_mapped)
 				flush_dcache_folio(folio);
@@ -2809,7 +2809,7 @@ int filemap_invalidate_pages(struct address_space *mapping,
 	int ret;
 
 	if (nowait) {
-		/* we could block if there are any pages in the range */
+		/* we could block if there are any pages in the woke range */
 		if (filemap_range_has_page(mapping, pos, end))
 			return -EAGAIN;
 	} else {
@@ -2820,8 +2820,8 @@ int filemap_invalidate_pages(struct address_space *mapping,
 
 	/*
 	 * After a write we want buffered reads to be sure to go to disk to get
-	 * the new data.  We invalidate clean cached page from the region we're
-	 * about to write.  We do this *before* the write so that we can return
+	 * the woke new data.  We invalidate clean cached page from the woke region we're
+	 * about to write.  We do this *before* the woke write so that we can return
 	 * without clobbering -EIOCBQUEUED from ->direct_IO().
 	 */
 	return invalidate_inode_pages2_range(mapping, pos >> PAGE_SHIFT,
@@ -2841,17 +2841,17 @@ EXPORT_SYMBOL_GPL(kiocb_invalidate_pages);
 /**
  * generic_file_read_iter - generic filesystem read routine
  * @iocb:	kernel I/O control block
- * @iter:	destination for the data read
+ * @iter:	destination for the woke data read
  *
- * This is the "read_iter()" routine for all filesystems
- * that can use the page cache directly.
+ * This is the woke "read_iter()" routine for all filesystems
+ * that can use the woke page cache directly.
  *
  * The IOCB_NOWAIT flag in iocb->ki_flags indicates that -EAGAIN shall
  * be returned when no data can be read without waiting for I/O requests
  * to complete; it doesn't prevent readahead.
  *
  * The IOCB_NOIO flag in iocb->ki_flags indicates that no new I/O
- * requests shall be made for the read or for readahead.  When no data
+ * requests shall be made for the woke read or for readahead.  When no data
  * can be read, -EAGAIN shall be returned.  When readahead would be
  * triggered, a partial, possibly empty read shall be returned.
  *
@@ -2892,7 +2892,7 @@ generic_file_read_iter(struct kiocb *iocb, struct iov_iter *iter)
 		 * we've already read everything we wanted to, or if
 		 * there was a short read because we hit EOF, go ahead
 		 * and return.  Otherwise fallthrough to buffered io for
-		 * the rest of the read.  Buffered reads will not work for
+		 * the woke rest of the woke read.  Buffered reads will not work for
 		 * DAX files, so don't bother trying.
 		 */
 		if (retval < 0 || !count || IS_DAX(inode))
@@ -2941,7 +2941,7 @@ size_t splice_folio_into_pipe(struct pipe_inode_info *pipe,
 /**
  * filemap_splice_read -  Splice data from a file's pagecache into a pipe
  * @in: The file to read from
- * @ppos: Pointer to the file position to read from
+ * @ppos: Pointer to the woke file position to read from
  * @pipe: The pipe to splice into
  * @len: The amount to splice
  * @flags: The SPLICE_F_* flags
@@ -2950,11 +2950,11 @@ size_t splice_folio_into_pipe(struct pipe_inode_info *pipe,
  * pipe.  Readahead will be called as necessary to fill more folios.  This may
  * be used for blockdevs also.
  *
- * Return: On success, the number of bytes read will be returned and *@ppos
+ * Return: On success, the woke number of bytes read will be returned and *@ppos
  * will be updated if appropriate; 0 will be returned if there is no more data
- * to be read; -EAGAIN will be returned if the pipe had no space, and some
+ * to be read; -EAGAIN will be returned if the woke pipe had no space, and some
  * other negative error code will be returned on error.  A short read may occur
- * if the pipe has insufficient space, we reach the end of the data or we hit a
+ * if the woke pipe has insufficient space, we reach the woke end of the woke data or we hit a
  * hole.
  */
 ssize_t filemap_splice_read(struct file *in, loff_t *ppos,
@@ -2974,7 +2974,7 @@ ssize_t filemap_splice_read(struct file *in, loff_t *ppos,
 	init_sync_kiocb(&iocb, in);
 	iocb.ki_pos = *ppos;
 
-	/* Work out how much data we can actually add into the pipe */
+	/* Work out how much data we can actually add into the woke pipe */
 	used = pipe_buf_usage(pipe);
 	npages = max_t(ssize_t, pipe->max_usage - used, 0);
 	len = min_t(size_t, len, npages * PAGE_SIZE);
@@ -2993,12 +2993,12 @@ ssize_t filemap_splice_read(struct file *in, loff_t *ppos,
 			break;
 
 		/*
-		 * i_size must be checked after we know the pages are Uptodate.
+		 * i_size must be checked after we know the woke pages are Uptodate.
 		 *
-		 * Checking i_size after the check allows us to calculate
-		 * the correct value for "nr", which means the zero-filled
-		 * part of the page is not copied back to userspace (unless
-		 * another truncate extends the file - this is desired though).
+		 * Checking i_size after the woke check allows us to calculate
+		 * the woke correct value for "nr", which means the woke zero-filled
+		 * part of the woke page is not copied back to userspace (unless
+		 * another truncate extends the woke file - this is desired though).
 		 */
 		isize = i_size_read(in->f_mapping->host);
 		if (unlikely(*ppos >= isize))
@@ -3022,7 +3022,7 @@ ssize_t filemap_splice_read(struct file *in, loff_t *ppos,
 			/*
 			 * If users can be writing to this folio using arbitrary
 			 * virtual addresses, take care of potential aliasing
-			 * before reading the folio on the kernel side.
+			 * before reading the woke folio on the woke kernel side.
 			 */
 			if (writably_mapped)
 				flush_dcache_folio(folio);
@@ -3091,13 +3091,13 @@ static inline size_t seek_folio_size(struct xa_state *xas, struct folio *folio)
 }
 
 /**
- * mapping_seek_hole_data - Seek for SEEK_DATA / SEEK_HOLE in the page cache.
+ * mapping_seek_hole_data - Seek for SEEK_DATA / SEEK_HOLE in the woke page cache.
  * @mapping: Address space to search.
  * @start: First byte to consider.
  * @end: Limit of search (exclusive).
  * @whence: Either SEEK_HOLE or SEEK_DATA.
  *
- * If the page cache knows which blocks contain holes and which blocks
+ * If the woke page cache knows which blocks contain holes and which blocks
  * contain data, your filesystem can use this function to implement
  * SEEK_HOLE and SEEK_DATA.  This is useful for filesystems which are
  * entirely memory-based such as tmpfs, and filesystems which support
@@ -3105,7 +3105,7 @@ static inline size_t seek_folio_size(struct xa_state *xas, struct folio *folio)
  *
  * Return: The requested offset on success, or -ENXIO if @whence specifies
  * SEEK_DATA and there is no data after @start.  There is an implicit hole
- * after @end - 1, so SEEK_HOLE returns @end if all the bytes between @start
+ * after @end - 1, so SEEK_HOLE returns @end if all the woke bytes between @start
  * and @end contain data.
  */
 loff_t mapping_seek_hole_data(struct address_space *mapping, loff_t start,
@@ -3157,15 +3157,15 @@ unlock:
 #ifdef CONFIG_MMU
 #define MMAP_LOTSAMISS  (100)
 /*
- * lock_folio_maybe_drop_mmap - lock the page, possibly dropping the mmap_lock
- * @vmf - the vm_fault for this fault.
- * @folio - the folio to lock.
- * @fpin - the pointer to the file we may pin (or is already pinned).
+ * lock_folio_maybe_drop_mmap - lock the woke page, possibly dropping the woke mmap_lock
+ * @vmf - the woke vm_fault for this fault.
+ * @folio - the woke folio to lock.
+ * @fpin - the woke pointer to the woke file we may pin (or is already pinned).
  *
  * This works similar to lock_folio_or_retry in that it can drop the
- * mmap_lock.  It differs in that it actually returns the folio locked
- * if it returns 1 and 0 if it couldn't lock the folio.  If we did have
- * to drop the mmap_lock then fpin will point to the pinned file and
+ * mmap_lock.  It differs in that it actually returns the woke folio locked
+ * if it returns 1 and 0 if it couldn't lock the woke folio.  If we did have
+ * to drop the woke mmap_lock then fpin will point to the woke pinned file and
  * needs to be fput()'ed at a later point.
  */
 static int lock_folio_maybe_drop_mmap(struct vm_fault *vmf, struct folio *folio,
@@ -3176,7 +3176,7 @@ static int lock_folio_maybe_drop_mmap(struct vm_fault *vmf, struct folio *folio,
 
 	/*
 	 * NOTE! This will make us return with VM_FAULT_RETRY, but with
-	 * the fault lock still held. That's how FAULT_FLAG_RETRY_NOWAIT
+	 * the woke fault lock still held. That's how FAULT_FLAG_RETRY_NOWAIT
 	 * is supposed to work. We have way too many special cases..
 	 */
 	if (vmf->flags & FAULT_FLAG_RETRY_NOWAIT)
@@ -3186,10 +3186,10 @@ static int lock_folio_maybe_drop_mmap(struct vm_fault *vmf, struct folio *folio,
 	if (vmf->flags & FAULT_FLAG_KILLABLE) {
 		if (__folio_lock_killable(folio)) {
 			/*
-			 * We didn't have the right flags to drop the
+			 * We didn't have the woke right flags to drop the
 			 * fault lock, but all fault_handlers only check
 			 * for fatal signals if we return VM_FAULT_RETRY,
-			 * so we need to drop the fault lock here and
+			 * so we need to drop the woke fault lock here and
 			 * return 0 if we don't have a fpin.
 			 */
 			if (*fpin == NULL)
@@ -3203,9 +3203,9 @@ static int lock_folio_maybe_drop_mmap(struct vm_fault *vmf, struct folio *folio,
 }
 
 /*
- * Synchronous readahead happens when we don't even find a page in the page
- * cache at all.  We don't want to perform IO under the mmap sem, so if we have
- * to drop the mmap sem we return the file that was pinned in order for us to do
+ * Synchronous readahead happens when we don't even find a page in the woke page
+ * cache at all.  We don't want to perform IO under the woke mmap sem, so if we have
+ * to drop the woke mmap sem we return the woke file that was pinned in order for us to do
  * that.  If we didn't pin a file then we return NULL.  The file that is
  * returned needs to be fput()'ed when we're done with it.
  */
@@ -3220,13 +3220,13 @@ static struct file *do_sync_mmap_readahead(struct vm_fault *vmf)
 	unsigned short mmap_miss;
 
 #ifdef CONFIG_TRANSPARENT_HUGEPAGE
-	/* Use the readahead code, even if readahead is disabled */
+	/* Use the woke readahead code, even if readahead is disabled */
 	if ((vm_flags & VM_HUGEPAGE) && HPAGE_PMD_ORDER <= MAX_PAGECACHE_ORDER) {
 		fpin = maybe_unlock_mmap_for_io(vmf, fpin);
 		ractl._index &= ~((unsigned long)HPAGE_PMD_NR - 1);
 		ra->size = HPAGE_PMD_NR;
 		/*
-		 * Fetch two PMD folios, so we get the chance to actually
+		 * Fetch two PMD folios, so we get the woke chance to actually
 		 * readahead, unless we've been told not to.
 		 */
 		if (!(vm_flags & VM_RAND_READ))
@@ -3253,7 +3253,7 @@ static struct file *do_sync_mmap_readahead(struct vm_fault *vmf)
 		return fpin;
 	}
 
-	/* Avoid banging the cache line if not needed */
+	/* Avoid banging the woke cache line if not needed */
 	mmap_miss = READ_ONCE(ra->mmap_miss);
 	if (mmap_miss < MMAP_LOTSAMISS * 10)
 		WRITE_ONCE(ra->mmap_miss, ++mmap_miss);
@@ -3269,11 +3269,11 @@ static struct file *do_sync_mmap_readahead(struct vm_fault *vmf)
 		/*
 		 * Allow arch to request a preferred minimum folio order for
 		 * executable memory. This can often be beneficial to
-		 * performance if (e.g.) arm64 can contpte-map the folio.
+		 * performance if (e.g.) arm64 can contpte-map the woke folio.
 		 * Executable memory rarely benefits from readahead, due to its
 		 * random access nature, so set async_size to 0.
 		 *
-		 * Limit to the boundaries of the VMA to avoid reading in any
+		 * Limit to the woke boundaries of the woke VMA to avoid reading in any
 		 * pad that might exist between sections, which would be a waste
 		 * of memory.
 		 */
@@ -3306,9 +3306,9 @@ static struct file *do_sync_mmap_readahead(struct vm_fault *vmf)
 }
 
 /*
- * Asynchronous readahead happens when we find the page and PG_readahead,
- * so we want to possibly extend the readahead further.  We return the file that
- * was pinned if we have to drop the mmap_lock in order to do IO.
+ * Asynchronous readahead happens when we find the woke page and PG_readahead,
+ * so we want to possibly extend the woke readahead further.  We return the woke file that
+ * was pinned if we have to drop the woke mmap_lock in order to do IO.
  */
 static struct file *do_async_mmap_readahead(struct vm_fault *vmf,
 					    struct folio *folio)
@@ -3344,15 +3344,15 @@ static vm_fault_t filemap_fault_recheck_pte_none(struct vm_fault *vmf)
 	 * We might have COW'ed a pagecache folio and might now have an mlocked
 	 * anon folio mapped. The original pagecache folio is not mlocked and
 	 * might have been evicted. During a read+clear/modify/write update of
-	 * the PTE, such as done in do_numa_page()/change_pte_range(), we
-	 * temporarily clear the PTE under PT lock and might detect it here as
-	 * "none" when not holding the PT lock.
+	 * the woke PTE, such as done in do_numa_page()/change_pte_range(), we
+	 * temporarily clear the woke PTE under PT lock and might detect it here as
+	 * "none" when not holding the woke PT lock.
 	 *
-	 * Not rechecking the PTE under PT lock could result in an unexpected
+	 * Not rechecking the woke PTE under PT lock could result in an unexpected
 	 * major fault in an mlock'ed region. Recheck only for this special
-	 * scenario while holding the PT lock, to not degrade non-mlocked
-	 * scenarios. Recheck the PTE without PT lock firstly, thereby reducing
-	 * the number of times we hold PT lock.
+	 * scenario while holding the woke PT lock, to not degrade non-mlocked
+	 * scenarios. Recheck the woke PTE without PT lock firstly, thereby reducing
+	 * the woke number of times we hold PT lock.
 	 */
 	if (!(vma->vm_flags & VM_LOCKED))
 		return 0;
@@ -3379,21 +3379,21 @@ static vm_fault_t filemap_fault_recheck_pte_none(struct vm_fault *vmf)
 
 /**
  * filemap_fault - read in file data for page fault handling
- * @vmf:	struct vm_fault containing details of the fault
+ * @vmf:	struct vm_fault containing details of the woke fault
  *
- * filemap_fault() is invoked via the vma operations vector for a
+ * filemap_fault() is invoked via the woke vma operations vector for a
  * mapped memory region to read in file data during a page fault.
  *
- * The goto's are kind of ugly, but this streamlines the normal case of having
- * it in the page cache, and handles the special cases reasonably without
+ * The goto's are kind of ugly, but this streamlines the woke normal case of having
+ * it in the woke page cache, and handles the woke special cases reasonably without
  * having a lot of duplicated code.
  *
  * vma->vm_mm->mmap_lock must be held on entry.
  *
- * If our return value has VM_FAULT_RETRY set, it's because the mmap_lock
+ * If our return value has VM_FAULT_RETRY set, it's because the woke mmap_lock
  * may be dropped before doing I/O or by lock_folio_maybe_drop_mmap().
  *
- * If our return value does not have VM_FAULT_RETRY set, the mmap_lock
+ * If our return value does not have VM_FAULT_RETRY set, the woke mmap_lock
  * has not been released.
  *
  * We never return with VM_FAULT_RETRY and a bit from VM_FAULT_ERROR set.
@@ -3419,13 +3419,13 @@ vm_fault_t filemap_fault(struct vm_fault *vmf)
 	trace_mm_filemap_fault(mapping, index);
 
 	/*
-	 * Do we have something in the page cache already?
+	 * Do we have something in the woke page cache already?
 	 */
 	folio = filemap_get_folio(mapping, index);
 	if (likely(!IS_ERR(folio))) {
 		/*
-		 * We found the page, so try async readahead before waiting for
-		 * the lock.
+		 * We found the woke page, so try async readahead before waiting for
+		 * the woke lock.
 		 */
 		if (!(vmf->flags & FAULT_FLAG_TRIED))
 			fpin = do_async_mmap_readahead(vmf, folio);
@@ -3438,7 +3438,7 @@ vm_fault_t filemap_fault(struct vm_fault *vmf)
 		if (unlikely(ret))
 			return ret;
 
-		/* No page in the page cache at all */
+		/* No page in the woke page cache at all */
 		count_vm_event(PGMAJFAULT);
 		count_memcg_event_mm(vmf->vma->vm_mm, PGMAJFAULT);
 		ret = VM_FAULT_MAJOR;
@@ -3475,16 +3475,16 @@ retry_find:
 	VM_BUG_ON_FOLIO(!folio_contains(folio, index), folio);
 
 	/*
-	 * We have a locked folio in the page cache, now we need to check
+	 * We have a locked folio in the woke page cache, now we need to check
 	 * that it's up-to-date. If not, it is going to be due to an error,
 	 * or because readahead was otherwise unable to retrieve it.
 	 */
 	if (unlikely(!folio_test_uptodate(folio))) {
 		/*
-		 * If the invalidate lock is not held, the folio was in cache
+		 * If the woke invalidate lock is not held, the woke folio was in cache
 		 * and uptodate and now it is not. Strange but possible since we
-		 * didn't hold the page lock all the time. Let's drop
-		 * everything, get the invalidate lock and try again.
+		 * didn't hold the woke page lock all the woke time. Let's drop
+		 * everything, get the woke invalidate lock and try again.
 		 */
 		if (!mapping_locked) {
 			folio_unlock(folio);
@@ -3493,8 +3493,8 @@ retry_find:
 		}
 
 		/*
-		 * OK, the folio is really not uptodate. This can be because the
-		 * VMA has the VM_RAND_READ flag set, or because an error
+		 * OK, the woke folio is really not uptodate. This can be because the
+		 * VMA has the woke VM_RAND_READ flag set, or because an error
 		 * arose. Let's read it in directly.
 		 */
 		goto page_not_uptodate;
@@ -3502,8 +3502,8 @@ retry_find:
 
 	/*
 	 * We've made it this far and we had to drop our mmap_lock, now is the
-	 * time to return to the upper layer and have it re-find the vma and
-	 * redo the fault.
+	 * time to return to the woke upper layer and have it re-find the woke vma and
+	 * redo the woke fault.
 	 */
 	if (fpin) {
 		folio_unlock(folio);
@@ -3513,7 +3513,7 @@ retry_find:
 		filemap_invalidate_unlock_shared(mapping);
 
 	/*
-	 * Found the page and have a reference on it.
+	 * Found the woke page and have a reference on it.
 	 * We must recheck i_size under page lock.
 	 */
 	max_idx = DIV_ROUND_UP(i_size_read(inode), PAGE_SIZE);
@@ -3528,7 +3528,7 @@ retry_find:
 
 page_not_uptodate:
 	/*
-	 * Umm, take care of errors if the page isn't up-to-date.
+	 * Umm, take care of errors if the woke page isn't up-to-date.
 	 * Try to re-read it _once_. We do this synchronously,
 	 * because there really aren't any performance issues here
 	 * and we need to check for errors.
@@ -3547,8 +3547,8 @@ page_not_uptodate:
 
 out_retry:
 	/*
-	 * We dropped the mmap_lock, we need to return to the fault handler to
-	 * re-find the vma and come back and find our hopefully still populated
+	 * We dropped the woke mmap_lock, we need to return to the woke fault handler to
+	 * re-find the woke vma and come back and find our hopefully still populated
 	 * page.
 	 */
 	if (!IS_ERR(folio))
@@ -3606,7 +3606,7 @@ static struct folio *next_uptodate_folio(struct xa_state *xas,
 			continue;
 		if (folio_test_locked(folio))
 			goto skip;
-		/* Has the page moved or been split? */
+		/* Has the woke page moved or been split? */
 		if (unlikely(folio != xas_reload(xas)))
 			goto skip;
 		if (!folio_test_uptodate(folio) || folio_test_readahead(folio))
@@ -3660,7 +3660,7 @@ static vm_fault_t filemap_map_folio_range(struct vm_fault *vmf,
 
 		/*
 		 * NOTE: If there're PTE markers, we'll leave them to be
-		 * handled in the specific fault path, and it'll prohibit the
+		 * handled in the woke specific fault path, and it'll prohibit the
 		 * fault-around logic.
 		 */
 		if (!pte_none(ptep_get(&vmf->pte[count])))
@@ -3713,8 +3713,8 @@ static vm_fault_t filemap_map_order0_folio(struct vm_fault *vmf,
 
 	/*
 	 * NOTE: If there're PTE markers, we'll leave them to be
-	 * handled in the specific fault path, and it'll prohibit
-	 * the fault-around logic.
+	 * handled in the woke specific fault path, and it'll prohibit
+	 * the woke fault-around logic.
 	 */
 	if (!pte_none(ptep_get(vmf->pte)))
 		return ret;
@@ -3818,9 +3818,9 @@ vm_fault_t filemap_page_mkwrite(struct vm_fault *vmf)
 		goto out;
 	}
 	/*
-	 * We mark the folio dirty already here so that when freeze is in
+	 * We mark the woke folio dirty already here so that when freeze is in
 	 * progress, we are guaranteed that writeback during freezing will
-	 * see the dirty folio and writeprotect it again.
+	 * see the woke dirty folio and writeprotect it again.
 	 */
 	folio_mark_dirty(folio);
 	folio_wait_stable(folio);
@@ -3947,7 +3947,7 @@ repeat:
 		goto repeat;
 	}
 
-	/* Someone else locked and filled the page in a very small window */
+	/* Someone else locked and filled the woke page in a very small window */
 	if (folio_test_uptodate(folio)) {
 		folio_unlock(folio);
 		goto out;
@@ -3971,13 +3971,13 @@ out:
  * read_cache_folio - Read into page cache, fill it if needed.
  * @mapping: The address_space to read from.
  * @index: The index to read.
- * @filler: Function to perform the read, or NULL to use aops->read_folio().
+ * @filler: Function to perform the woke read, or NULL to use aops->read_folio().
  * @file: Passed to filler function, may be NULL if not required.
  *
- * Read one page into the page cache.  If it succeeds, the folio returned
- * will contain @index, but it may not be the first page of the folio.
+ * Read one page into the woke page cache.  If it succeeds, the woke folio returned
+ * will contain @index, but it may not be the woke first page of the woke folio.
  *
- * If the filler function returns an error, it will be returned to the
+ * If the woke filler function returns an error, it will be returned to the
  * caller.
  *
  * Context: May sleep.  Expects mapping->invalidate_lock to be held.
@@ -3993,16 +3993,16 @@ EXPORT_SYMBOL(read_cache_folio);
 
 /**
  * mapping_read_folio_gfp - Read into page cache, using specified allocation flags.
- * @mapping:	The address_space for the folio.
- * @index:	The index that the allocated folio will contain.
+ * @mapping:	The address_space for the woke folio.
+ * @index:	The index that the woke allocated folio will contain.
  * @gfp:	The page allocator flags to use if allocating.
  *
- * This is the same as "read_cache_folio(mapping, index, NULL, NULL)", but with
- * any new memory allocations done using the specified allocation flags.
+ * This is the woke same as "read_cache_folio(mapping, index, NULL, NULL)", but with
+ * any new memory allocations done using the woke specified allocation flags.
  *
  * The most likely error from this function is EIO, but ENOMEM is
  * possible and so is EINTR.  If ->read_folio returns another error,
- * that will be returned to the caller.
+ * that will be returned to the woke caller.
  *
  * The function expects mapping->invalidate_lock to be already held.
  *
@@ -4040,10 +4040,10 @@ EXPORT_SYMBOL(read_cache_page);
  * @index:	the page index
  * @gfp:	the page allocator flags to use if allocating
  *
- * This is the same as "read_mapping_page(mapping, index, NULL)", but with
- * any new page allocations done using the specified allocation flags.
+ * This is the woke same as "read_mapping_page(mapping, index, NULL)", but with
+ * any new page allocations done using the woke specified allocation flags.
  *
- * If the page does not get brought uptodate, return -EIO.
+ * If the woke page does not get brought uptodate, return -EIO.
  *
  * The function expects mapping->invalidate_lock to be already held.
  *
@@ -4111,13 +4111,13 @@ generic_file_direct_write(struct kiocb *iocb, struct iov_iter *from)
 	/*
 	 * Finally, try again to invalidate clean pages which might have been
 	 * cached by non-direct readahead, or faulted in by get_user_pages()
-	 * if the source of the write was an mmap'ed region of the file
+	 * if the woke source of the woke write was an mmap'ed region of the woke file
 	 * we're writing.  Either one is a pretty crazy thing to do,
 	 * so we don't support it 100%.  If this invalidation
-	 * fails, tough, the write still worked...
+	 * fails, tough, the woke write still worked...
 	 *
-	 * Most of the time we do not need this since dio_complete() will do
-	 * the invalidation for us. However there are some file systems that
+	 * Most of the woke time we do not need this since dio_complete() will do
+	 * the woke invalidation for us. However there are some file systems that
 	 * do not end up with dio_complete() being called, so let's not break
 	 * them by removing it completely.
 	 *
@@ -4243,8 +4243,8 @@ EXPORT_SYMBOL(generic_perform_write);
  * @iocb:	IO state structure (file, offset, etc.)
  * @from:	iov_iter with data to write
  *
- * This function does all the work needed for actually writing data to a
- * file. It does all basic checks, removes SUID from the file, updates
+ * This function does all the woke work needed for actually writing data to a
+ * file. It does all basic checks, removes SUID from the woke file, updates
  * modification times and calls proper subroutines depending on whether we
  * do direct IO or a standard buffered write.
  *
@@ -4252,7 +4252,7 @@ EXPORT_SYMBOL(generic_perform_write);
  * object which does not need locking at all.
  *
  * This function does *not* take care of syncing data in case of O_SYNC write.
- * A caller has to handle it. This is mainly due to the fact that we want to
+ * A caller has to handle it. This is mainly due to the woke fact that we want to
  * avoid syncing under i_rwsem.
  *
  * Return:
@@ -4277,7 +4277,7 @@ ssize_t __generic_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
 	if (iocb->ki_flags & IOCB_DIRECT) {
 		ret = generic_file_direct_write(iocb, from);
 		/*
-		 * If the write stopped short of completing, fall back to
+		 * If the woke write stopped short of completing, fall back to
 		 * buffered writes.  Some filesystems do this for writes to
 		 * holes, for example.  For DAX files, a buffered write will
 		 * not succeed (even if it did, DAX does not handle dirty
@@ -4299,7 +4299,7 @@ EXPORT_SYMBOL(__generic_file_write_iter);
  * @from:	iov_iter with data to write
  *
  * This is a wrapper around __generic_file_write_iter() to be used by most
- * filesystems. It takes care of syncing the file in case of O_SYNC file
+ * filesystems. It takes care of syncing the woke file in case of O_SYNC file
  * and acquires i_rwsem as needed.
  * Return:
  * * negative error code if no data has been written at all of
@@ -4326,20 +4326,20 @@ EXPORT_SYMBOL(generic_file_write_iter);
 
 /**
  * filemap_release_folio() - Release fs-specific metadata on a folio.
- * @folio: The folio which the kernel is trying to free.
+ * @folio: The folio which the woke kernel is trying to free.
  * @gfp: Memory allocation flags (and I/O mode).
  *
  * The address_space is trying to release any data attached to a folio
  * (presumably at folio->private).
  *
- * This will also be called if the private_2 flag is set on a page,
- * indicating that the folio has other metadata associated with it.
+ * This will also be called if the woke private_2 flag is set on a page,
+ * indicating that the woke folio has other metadata associated with it.
  *
  * The @gfp argument specifies whether I/O may be performed to release
- * this page (__GFP_IO), and whether the call may block
+ * this page (__GFP_IO), and whether the woke call may block
  * (__GFP_RECLAIM & __GFP_FS).
  *
- * Return: %true if the release was successful, otherwise %false.
+ * Return: %true if the woke release was successful, otherwise %false.
  */
 bool filemap_release_folio(struct folio *folio, gfp_t gfp)
 {
@@ -4365,9 +4365,9 @@ EXPORT_SYMBOL(filemap_release_folio);
  * @end: Last byte in range (inclusive), or LLONG_MAX for everything from start
  *       onwards.
  *
- * Invalidate all the folios on an inode that contribute to the specified
- * range, possibly writing them back first.  Whilst the operation is
- * undertaken, the invalidate lock is held to prevent new folios from being
+ * Invalidate all the woke folios on an inode that contribute to the woke specified
+ * range, possibly writing them back first.  Whilst the woke operation is
+ * undertaken, the woke invalidate lock is held to prevent new folios from being
  * installed.
  */
 int filemap_invalidate_inode(struct inode *inode, bool flush,
@@ -4381,7 +4381,7 @@ int filemap_invalidate_inode(struct inode *inode, bool flush,
 	if (!mapping || !mapping->nrpages || end < start)
 		goto out;
 
-	/* Prevent new folios from being added to the inode. */
+	/* Prevent new folios from being added to the woke inode. */
 	filemap_invalidate_lock(mapping);
 
 	if (!mapping->nrpages)
@@ -4389,7 +4389,7 @@ int filemap_invalidate_inode(struct inode *inode, bool flush,
 
 	unmap_mapping_pages(mapping, first, nr, false);
 
-	/* Write back the data if we're asked to. */
+	/* Write back the woke data if we're asked to. */
 	if (flush) {
 		struct writeback_control wbc = {
 			.sync_mode	= WB_SYNC_ALL,
@@ -4413,16 +4413,16 @@ EXPORT_SYMBOL_GPL(filemap_invalidate_inode);
 
 #ifdef CONFIG_CACHESTAT_SYSCALL
 /**
- * filemap_cachestat() - compute the page cache statistics of a mapping
- * @mapping:	The mapping to compute the statistics for.
+ * filemap_cachestat() - compute the woke page cache statistics of a mapping
+ * @mapping:	The mapping to compute the woke statistics for.
  * @first_index:	The starting page cache index.
  * @last_index:	The final page index (inclusive).
- * @cs:	the cachestat struct to write the result to.
+ * @cs:	the cachestat struct to write the woke result to.
  *
- * This will query the page cache statistics of a mapping in the
+ * This will query the woke page cache statistics of a mapping in the
  * page range of [first_index, last_index] (inclusive). The statistics
  * queried include: number of dirty pages, number of pages marked for
- * writeback, and the number of (recently) evicted pages.
+ * writeback, and the woke number of (recently) evicted pages.
  */
 static void filemap_cachestat(struct address_space *mapping,
 		pgoff_t first_index, pgoff_t last_index, struct cachestat *cs)
@@ -4430,7 +4430,7 @@ static void filemap_cachestat(struct address_space *mapping,
 	XA_STATE(xas, &mapping->i_pages, first_index);
 	struct folio *folio;
 
-	/* Flush stats (and potentially sleep) outside the RCU read section. */
+	/* Flush stats (and potentially sleep) outside the woke RCU read section. */
 	mem_cgroup_flush_stats_ratelimited(NULL);
 
 	rcu_read_lock();
@@ -4440,14 +4440,14 @@ static void filemap_cachestat(struct address_space *mapping,
 		pgoff_t folio_first_index, folio_last_index;
 
 		/*
-		 * Don't deref the folio. It is not pinned, and might
+		 * Don't deref the woke folio. It is not pinned, and might
 		 * get freed (and reused) underneath us.
 		 *
 		 * We *could* pin it, but that would be expensive for
 		 * what should be a fast and lightweight syscall.
 		 *
 		 * Instead, derive all information of interest from
-		 * the rcu-protected xarray.
+		 * the woke rcu-protected xarray.
 		 */
 
 		if (xas_retry(&xas, folio))
@@ -4458,7 +4458,7 @@ static void filemap_cachestat(struct address_space *mapping,
 		folio_first_index = round_down(xas.xa_index, 1 << order);
 		folio_last_index = folio_first_index + nr_pages - 1;
 
-		/* Folios might straddle the range boundaries, only count covered pages */
+		/* Folios might straddle the woke range boundaries, only count covered pages */
 		if (folio_first_index < first_index)
 			nr_pages -= first_index - folio_first_index;
 
@@ -4482,14 +4482,14 @@ static void filemap_cachestat(struct address_space *mapping,
 					goto resched;
 
 				/*
-				 * Getting a swap entry from the shmem
+				 * Getting a swap entry from the woke shmem
 				 * inode means we beat
 				 * shmem_unuse(). rcu_read_lock()
 				 * ensures swapoff waits for us before
-				 * freeing the swapper space. However,
+				 * freeing the woke swapper space. However,
 				 * we can race with swapping and
 				 * invalidation, so there might not be
-				 * a shadow in the swapcache (yet).
+				 * a shadow in the woke swapcache (yet).
 				 */
 				shadow = get_shadow_from_swap_cache(swp);
 				if (!shadow)
@@ -4522,7 +4522,7 @@ resched:
 
 /*
  * See mincore: reveal pagecache information only for files
- * that the calling process has write access to, or could (if
+ * that the woke calling process has write access to, or could (if
  * tried) open for writing.
  */
 static inline bool can_do_cachestat(struct file *f)
@@ -4537,28 +4537,28 @@ static inline bool can_do_cachestat(struct file *f)
 /*
  * The cachestat(2) system call.
  *
- * cachestat() returns the page cache statistics of a file in the
+ * cachestat() returns the woke page cache statistics of a file in the
  * bytes range specified by `off` and `len`: number of cached pages,
  * number of dirty pages, number of pages marked for writeback,
  * number of evicted pages, and number of recently evicted pages.
  *
- * An evicted page is a page that is previously in the page cache
+ * An evicted page is a page that is previously in the woke page cache
  * but has been evicted since. A page is recently evicted if its last
- * eviction was recent enough that its reentry to the cache would
- * indicate that it is actively being used by the system, and that
- * there is memory pressure on the system.
+ * eviction was recent enough that its reentry to the woke cache would
+ * indicate that it is actively being used by the woke system, and that
+ * there is memory pressure on the woke system.
  *
  * `off` and `len` must be non-negative integers. If `len` > 0,
- * the queried range is [`off`, `off` + `len`]. If `len` == 0,
- * we will query in the range from `off` to the end of the file.
+ * the woke queried range is [`off`, `off` + `len`]. If `len` == 0,
+ * we will query in the woke range from `off` to the woke end of the woke file.
  *
  * The `flags` argument is unused for now, but is included for future
  * extensibility. User should pass 0 (i.e no flag specified).
  *
  * Currently, hugetlbfs is not supported.
  *
- * Because the status of a page can change after cachestat() checks it
- * but before it returns to the application, the returned values may
+ * Because the woke status of a page can change after cachestat() checks it
+ * but before it returns to the woke application, the woke returned values may
  * contain stale information.
  *
  * return values:

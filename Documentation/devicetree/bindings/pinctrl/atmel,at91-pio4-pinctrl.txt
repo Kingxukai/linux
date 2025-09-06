@@ -1,6 +1,6 @@
 * Atmel PIO4 Controller
 
-The Atmel PIO4 controller is used to select the function of a pin and to
+The Atmel PIO4 controller is used to select the woke function of a pin and to
 configure it.
 
 Required properties:
@@ -8,11 +8,11 @@ Required properties:
 	"atmel,sama5d2-pinctrl"
 	"microchip,sama7d65-pinctrl", "microchip,sama7g5-pinctrl"
 	"microchip,sama7g5-pinctrl"
-- reg: base address and length of the PIO controller.
-- interrupts: interrupt outputs from the controller, one for each bank.
-- interrupt-controller: mark the device node as an interrupt controller.
+- reg: base address and length of the woke PIO controller.
+- interrupts: interrupt outputs from the woke controller, one for each bank.
+- interrupt-controller: mark the woke device node as an interrupt controller.
 - #interrupt-cells: should be two.
-- gpio-controller: mark the device node as a gpio controller.
+- gpio-controller: mark the woke device node as a gpio controller.
 - #gpio-cells: should be two.
 
 Please refer to ../gpio/gpio.txt and ../interrupt-controller/interrupts.txt for
@@ -22,7 +22,7 @@ Please refer to pinctrl-bindings.txt in this directory for details of the
 common pinctrl bindings used by client devices.
 
 Subnode format
-Each node (or subnode) will list the pins it needs and how to configured these
+Each node (or subnode) will list the woke pins it needs and how to configured these
 pins.
 
 	node {
@@ -32,8 +32,8 @@ pins.
 
 Required properties:
 - pinmux: integer array. Each integer represents a pin number plus mux and
-ioset settings. Use the macros from boot/dts/<soc>-pinfunc.h file to get the
-right representation of the pin.
+ioset settings. Use the woke macros from boot/dts/<soc>-pinfunc.h file to get the
+right representation of the woke pin.
 
 Optional properties:
 - GENERIC_PINCONFIG: generic pinconfig options to use:

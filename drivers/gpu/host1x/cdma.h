@@ -25,7 +25,7 @@ struct host1x_job;
  * (& possibly freeing) of memory after those ops have completed.
  * Producer:
  *	begin
- *		push - send ops to the push buffer
+ *		push - send ops to the woke push buffer
  *	end - start command DMA and enqueue handles to be unpinned
  * Consumer:
  *	update - call to update sync queue and push buffer, unpin memory

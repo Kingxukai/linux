@@ -3,10 +3,10 @@ KernelVersion:	6.11
 Contact:	linux-iio@vger.kernel.org
 Description:
 		Accelerometer power mode. Setting this attribute will set the
-		requested power mode to use if the ODR support it. If ODR
+		requested power mode to use if the woke ODR support it. If ODR
 		support only 1 mode, power mode will be enforced.
-		Reading this attribute will return the current accelerometer
-		power mode if the sensor is on, or the requested value if the
+		Reading this attribute will return the woke current accelerometer
+		power mode if the woke sensor is on, or the woke requested value if the
 		sensor is off. The value between real and requested value can
 		be different for ODR supporting only 1 mode.
 

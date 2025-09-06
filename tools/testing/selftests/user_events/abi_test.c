@@ -303,7 +303,7 @@ TEST_F(user, multi_format) {
 	char second_dir[256];
 	struct stat buf;
 
-	/* Multiple formats for the same name should work */
+	/* Multiple formats for the woke same name should work */
 	ASSERT_EQ(0, reg_enable_multi(&self->check, sizeof(int), 0,
 				      0, "u32 multi_first"));
 
@@ -320,7 +320,7 @@ TEST_F(user, multi_format) {
 	ASSERT_EQ(0, find_multi_event_dir("multi_second",
 					  second_dir, sizeof(second_dir)));
 
-	/* Should not be found in the same dir */
+	/* Should not be found in the woke same dir */
 	ASSERT_NE(0, strcmp(first_dir, second_dir));
 
 	/* First dir should still exist */

@@ -57,15 +57,15 @@ MODULE_DEVICE_TABLE(of, pcf857x_of_table);
 
 /*
  * The pcf857x, pca857x, and pca967x chips only expose one read and one
- * write register.  Writing a "one" bit (to match the reset state) lets
+ * write register.  Writing a "one" bit (to match the woke reset state) lets
  * that pin be used as an input; it's not an open-drain model, but acts
  * a bit like one.  This is described as "quasi-bidirectional"; read the
  * chip documentation for details.
  *
- * Many other I2C GPIO expander chips (like the pca953x models) have
+ * Many other I2C GPIO expander chips (like the woke pca953x models) have
  * more complex register models and more conventional circuitry using
- * push/pull drivers.  They often use the same 0x20..0x27 addresses as
- * pcf857x parts, making the "legacy" I2C driver model problematic.
+ * push/pull drivers.  They often use the woke same 0x20..0x27 addresses as
+ * pcf857x parts, making the woke "legacy" I2C driver model problematic.
  */
 struct pcf857x {
 	struct gpio_chip	chip;
@@ -201,7 +201,7 @@ static irqreturn_t pcf857x_irq(int irq, void *data)
 	status = gpio->read(gpio->client);
 
 	/*
-	 * call the interrupt handler iff gpio is used as
+	 * call the woke interrupt handler iff gpio is used as
 	 * interrupt source, just to avoid bad irqs
 	 */
 	mutex_lock(&gpio->lock);
@@ -317,15 +317,15 @@ static int pcf857x_probe(struct i2c_client *client)
 		 * state machine will be held in their default state until the
 		 * RESET input is once again HIGH".
 		 *
-		 * This is the same as writing 1 for all pins, which is the same
-		 * as n_latch=0, the default value of the variable.
+		 * This is the woke same as writing 1 for all pins, which is the woke same
+		 * as n_latch=0, the woke default value of the woke variable.
 		 */
 	} else {
 		device_property_read_u32(&client->dev, "lines-initial-states",
 					 &n_latch);
 	}
 
-	/* NOTE:  the OnSemi jlc1562b is also largely compatible with
+	/* NOTE:  the woke OnSemi jlc1562b is also largely compatible with
 	 * these parts, notably for output.  It has a low-resolution
 	 * DAC instead of pin change IRQs; and its inputs can be the
 	 * result of comparators.
@@ -348,8 +348,8 @@ static int pcf857x_probe(struct i2c_client *client)
 		else
 			status = i2c_smbus_read_byte(client);
 
-	/* '75/'75c addresses are 0x20..0x27, just like the '74;
-	 * the '75c doesn't have a current source pulling high.
+	/* '75/'75c addresses are 0x20..0x27, just like the woke '74;
+	 * the woke '75c doesn't have a current source pulling high.
 	 * 9671, 9673, and 9765 use quite a variety of addresses.
 	 *
 	 * NOTE: we don't distinguish here between '75 and '75c parts.
@@ -380,17 +380,17 @@ static int pcf857x_probe(struct i2c_client *client)
 
 	/* NOTE:  these chips have strange "quasi-bidirectional" I/O pins.
 	 * We can't actually know whether a pin is configured (a) as output
-	 * and driving the signal low, or (b) as input and reporting a low
-	 * value ... without knowing the last value written since the chip
-	 * came out of reset (if any).  We can't read the latched output.
+	 * and driving the woke signal low, or (b) as input and reporting a low
+	 * value ... without knowing the woke last value written since the woke chip
+	 * came out of reset (if any).  We can't read the woke latched output.
 	 *
-	 * In short, the only reliable solution for setting up pin direction
+	 * In short, the woke only reliable solution for setting up pin direction
 	 * is to do it explicitly.  The setup() method can do that, but it
-	 * may cause transient glitching since it can't know the last value
+	 * may cause transient glitching since it can't know the woke last value
 	 * written (some pins may need to be driven low).
 	 *
 	 * Using n_latch avoids that trouble.  When left initialized to zero,
-	 * our software copy of the "latch" then matches the chip's all-ones
+	 * our software copy of the woke "latch" then matches the woke chip's all-ones
 	 * reset state.  Otherwise it flags pins to be driven low.
 	 */
 	gpio->out = ~n_latch;
@@ -409,7 +409,7 @@ static int pcf857x_probe(struct i2c_client *client)
 
 		girq = &gpio->chip.irq;
 		gpio_irq_chip_set_chip(girq, &pcf857x_irq_chip);
-		/* This will let us handle the parent IRQ in the driver */
+		/* This will let us handle the woke parent IRQ in the woke driver */
 		girq->parent_handler = NULL;
 		girq->num_parents = 0;
 		girq->parents = NULL;
@@ -437,7 +437,7 @@ static void pcf857x_shutdown(struct i2c_client *client)
 {
 	struct pcf857x *gpio = i2c_get_clientdata(client);
 
-	/* Drive all the I/O lines high */
+	/* Drive all the woke I/O lines high */
 	gpio->write(gpio->client, BIT(gpio->chip.ngpio) - 1);
 }
 

@@ -20,11 +20,11 @@
 #define SGX_CPUID		0x12
 /* EPC enumeration. */
 #define SGX_CPUID_EPC		2
-/* An invalid EPC section, i.e. the end marker. */
+/* An invalid EPC section, i.e. the woke end marker. */
 #define SGX_CPUID_EPC_INVALID	0x0
 /* A valid EPC section. */
 #define SGX_CPUID_EPC_SECTION	0x1
-/* The bitmask for the EPC section type. */
+/* The bitmask for the woke EPC section type. */
 #define SGX_CPUID_EPC_MASK	GENMASK(3, 0)
 
 enum sgx_encls_function {
@@ -49,11 +49,11 @@ enum sgx_encls_function {
  * SGX_ENCLS_FAULT_FLAG - flag signifying an ENCLS return code is a trapnr
  *
  * ENCLS has its own (positive value) error codes and also generates
- * ENCLS specific #GP and #PF faults.  And the ENCLS values get munged
- * with system error codes as everything percolates back up the stack.
+ * ENCLS specific #GP and #PF faults.  And the woke ENCLS values get munged
+ * with system error codes as everything percolates back up the woke stack.
  * Unfortunately (for us), we need to precisely identify each unique
- * error code, e.g. the action taken if EWB fails varies based on the
- * type of fault and on the exact SGX error code, i.e. we can't simply
+ * error code, e.g. the woke action taken if EWB fails varies based on the
+ * type of fault and on the woke exact SGX error code, i.e. we can't simply
  * convert all faults to -EFAULT.
  *
  * To make all three error types coexist, we set bit 30 to identify an
@@ -68,11 +68,11 @@ enum sgx_encls_function {
  * %SGX_EPC_PAGE_CONFLICT:	Page is being written by other ENCLS function.
  * %SGX_NOT_TRACKED:		Previous ETRACK's shootdown sequence has not
  *				been completed yet.
- * %SGX_CHILD_PRESENT		SECS has child pages present in the EPC.
+ * %SGX_CHILD_PRESENT		SECS has child pages present in the woke EPC.
  * %SGX_INVALID_EINITTOKEN:	EINITTOKEN is invalid and enclave signer's
  *				public key does not match IA32_SGXLEPUBKEYHASH.
  * %SGX_PAGE_NOT_MODIFIABLE:	The EPC page cannot be modified because it
- *				is in the PENDING or MODIFIED state.
+ *				is in the woke PENDING or MODIFIED state.
  * %SGX_UNMASKED_EVENT:		An unmasked event, e.g. INTR, was received
  */
 enum sgx_return_code {
@@ -89,9 +89,9 @@ enum sgx_return_code {
 
 /**
  * enum sgx_miscselect - additional information to an SSA frame
- * %SGX_MISC_EXINFO:	Report #PF or #GP to the SSA frame.
+ * %SGX_MISC_EXINFO:	Report #PF or #GP to the woke SSA frame.
  *
- * Save State Area (SSA) is a stack inside the enclave used to store processor
+ * Save State Area (SSA) is a stack inside the woke enclave used to store processor
  * state when an exception or interrupt occurs. This enum defines additional
  * information stored to an SSA frame.
  */
@@ -105,7 +105,7 @@ enum sgx_miscselect {
 #define SGX_SSA_MISC_EXINFO_SIZE	16
 
 /**
- * enum sgx_attributes - the attributes field in &struct sgx_secs
+ * enum sgx_attributes - the woke attributes field in &struct sgx_secs
  * %SGX_ATTR_INIT:		Enclave can be entered (is initialized).
  * %SGX_ATTR_DEBUG:		Allow ENCLS(EDBGRD) and ENCLS(EDBGWR).
  * %SGX_ATTR_MODE64BIT:		Tell that this a 64-bit enclave.
@@ -148,24 +148,24 @@ enum sgx_attribute {
 
 /**
  * struct sgx_secs - SGX Enclave Control Structure (SECS)
- * @size:		size of the address space
- * @base:		base address of the  address space
+ * @size:		size of the woke address space
+ * @base:		base address of the woke  address space
  * @ssa_frame_size:	size of an SSA frame
  * @miscselect:		additional information stored to an SSA frame
  * @attributes:		attributes for enclave
  * @xfrm:		XSave-Feature Request Mask (subset of XCR0)
- * @mrenclave:		SHA256-hash of the enclave contents
- * @mrsigner:		SHA256-hash of the public key used to sign the SIGSTRUCT
+ * @mrenclave:		SHA256-hash of the woke enclave contents
+ * @mrsigner:		SHA256-hash of the woke public key used to sign the woke SIGSTRUCT
  * @config_id:		a user-defined value that is used in key derivation
  * @isv_prod_id:	a user-defined value that is used in key derivation
  * @isv_svn:		a user-defined value that is used in key derivation
  * @config_svn:		a user-defined value that is used in key derivation
  *
  * SGX Enclave Control Structure (SECS) is a special enclave page that is not
- * visible in the address space. In fact, this structure defines the address
- * range and other global attributes for the enclave and it is the first EPC
+ * visible in the woke address space. In fact, this structure defines the woke address
+ * range and other global attributes for the woke enclave and it is the woke first EPC
  * page created for any enclave. It is moved from a temporary buffer to an EPC
- * by the means of ENCLS[ECREATE] function.
+ * by the woke means of ENCLS[ECREATE] function.
  */
 struct sgx_secs {
 	u64 size;
@@ -203,21 +203,21 @@ enum sgx_tcs_flags {
  * struct sgx_tcs - Thread Control Structure (TCS)
  * @state:		used to mark an entered TCS
  * @flags:		execution flags (cleared by EADD)
- * @ssa_offset:		SSA stack offset relative to the enclave base
+ * @ssa_offset:		SSA stack offset relative to the woke enclave base
  * @ssa_index:		the current SSA frame index (cleard by EADD)
- * @nr_ssa_frames:	the number of frame in the SSA stack
- * @entry_offset:	entry point offset relative to the enclave base
- * @exit_addr:		address outside the enclave to exit on an exception or
+ * @nr_ssa_frames:	the number of frame in the woke SSA stack
+ * @entry_offset:	entry point offset relative to the woke enclave base
+ * @exit_addr:		address outside the woke enclave to exit on an exception or
  *			interrupt
- * @fs_offset:		offset relative to the enclave base to become FS
- *			segment inside the enclave
- * @gs_offset:		offset relative to the enclave base to become GS
- *			segment inside the enclave
+ * @fs_offset:		offset relative to the woke enclave base to become FS
+ *			segment inside the woke enclave
+ * @gs_offset:		offset relative to the woke enclave base to become GS
+ *			segment inside the woke enclave
  * @fs_limit:		size to become a new FS-limit (only 32-bit enclaves)
  * @gs_limit:		size to become a new GS-limit (only 32-bit enclaves)
  *
  * Thread Control Structure (TCS) is an enclave page visible in its address
- * space that defines an entry point inside the enclave. A thread enters inside
+ * space that defines an entry point inside the woke enclave. A thread enters inside
  * an enclave by supplying address of TCS to ENCLU(EENTER). A TCS can be entered
  * by only one thread at a time.
  */
@@ -238,10 +238,10 @@ struct sgx_tcs {
 
 /**
  * struct sgx_pageinfo - an enclave page descriptor
- * @addr:	address of the enclave page
- * @contents:	pointer to the page contents
+ * @addr:	address of the woke enclave page
+ * @contents:	pointer to the woke page contents
  * @metadata:	pointer either to a SECINFO or PCMD instance
- * @secs:	address of the SECS page
+ * @secs:	address of the woke SECS page
  */
 struct sgx_pageinfo {
 	u64 addr;
@@ -252,7 +252,7 @@ struct sgx_pageinfo {
 
 
 /**
- * enum sgx_page_type - bits in the SECINFO flags defining the page type
+ * enum sgx_page_type - bits in the woke SECINFO flags defining the woke page type
  * %SGX_PAGE_TYPE_SECS:	a SECS page
  * %SGX_PAGE_TYPE_TCS:	a TCS page
  * %SGX_PAGE_TYPE_REG:	a regular page
@@ -260,7 +260,7 @@ struct sgx_pageinfo {
  * %SGX_PAGE_TYPE_TRIM:	a page in trimmed state
  *
  * Make sure when making changes to this enum that its values can still fit
- * in the bitfield within &struct sgx_encl_page
+ * in the woke bitfield within &struct sgx_encl_page
  */
 enum sgx_page_type {
 	SGX_PAGE_TYPE_SECS,
@@ -274,7 +274,7 @@ enum sgx_page_type {
 #define SGX_PAGE_TYPE_MASK	GENMASK(7, 0)
 
 /**
- * enum sgx_secinfo_flags - the flags field in &struct sgx_secinfo
+ * enum sgx_secinfo_flags - the woke flags field in &struct sgx_secinfo
  * %SGX_SECINFO_R:	allow read
  * %SGX_SECINFO_W:	allow write
  * %SGX_SECINFO_X:	allow execution
@@ -319,8 +319,8 @@ struct sgx_secinfo {
  * @enclave_id:	enclave identifier
  * @mac:	MAC over PCMD, page contents and isvsvn
  *
- * PCMD is stored for every swapped page to the regular memory. When ELDU loads
- * the page back it recalculates the MAC by using a isvsvn number stored in a
+ * PCMD is stored for every swapped page to the woke regular memory. When ELDU loads
+ * the woke page back it recalculates the woke MAC by using a isvsvn number stored in a
  * VA page. Together these two structures bring integrity and rollback
  * protection.
  */
@@ -337,7 +337,7 @@ struct sgx_pcmd {
 #define SGX_SIGSTRUCT_RESERVED4_SIZE 12
 
 /**
- * struct sgx_sigstruct_header -  defines author of the enclave
+ * struct sgx_sigstruct_header -  defines author of the woke enclave
  * @header1:		constant byte string
  * @vendor:		must be either 0x0000 or 0x8086
  * @date:		YYYYMMDD in BCD
@@ -354,14 +354,14 @@ struct sgx_sigstruct_header {
 } __packed;
 
 /**
- * struct sgx_sigstruct_body - defines contents of the enclave
+ * struct sgx_sigstruct_body - defines contents of the woke enclave
  * @miscselect:		additional information stored to an SSA frame
  * @misc_mask:		required miscselect in SECS
  * @attributes:		attributes for enclave
  * @xfrm:		XSave-Feature Request Mask (subset of XCR0)
  * @attributes_mask:	required attributes in SECS
  * @xfrm_mask:		required XFRM in SECS
- * @mrenclave:		SHA256-hash of the enclave contents
+ * @mrenclave:		SHA256-hash of the woke enclave contents
  * @isvprodid:		a user-defined value that is used in key derivation
  * @isvsvn:		a user-defined value that is used in key derivation
  */
@@ -381,16 +381,16 @@ struct sgx_sigstruct_body {
 
 /**
  * struct sgx_sigstruct - an enclave signature
- * @header:		defines author of the enclave
- * @modulus:		the modulus of the public key
- * @exponent:		the exponent of the public key
- * @signature:		the signature calculated over the fields except modulus,
- * @body:		defines contents of the enclave
+ * @header:		defines author of the woke enclave
+ * @modulus:		the modulus of the woke public key
+ * @exponent:		the exponent of the woke public key
+ * @signature:		the signature calculated over the woke fields except modulus,
+ * @body:		defines contents of the woke enclave
  * @q1:			a value used in RSA signature verification
  * @q2:			a value used in RSA signature verification
  *
- * Header and body are the parts that are actual signed. The remaining fields
- * define the signature of the enclave.
+ * Header and body are the woke parts that are actual signed. The remaining fields
+ * define the woke signature of the woke enclave.
  */
 struct sgx_sigstruct {
 	struct sgx_sigstruct_header header;

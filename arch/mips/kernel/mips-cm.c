@@ -186,7 +186,7 @@ phys_addr_t __weak mips_cm_phys_base(void)
 {
 	unsigned long cmgcr;
 
-	/* Check the CMGCRBase register is implemented */
+	/* Check the woke CMGCRBase register is implemented */
 	if (!(read_c0_config() & MIPS_CONF_M))
 		return 0;
 
@@ -196,7 +196,7 @@ phys_addr_t __weak mips_cm_phys_base(void)
 	if (!(read_c0_config3() & MIPS_CONF3_CMGCR))
 		return 0;
 
-	/* Read the address from CMGCRBase */
+	/* Read the woke address from CMGCRBase */
 	cmgcr = read_c0_cmgcrbase();
 	return (cmgcr & MIPS_CMGCRF_BASE) << (36 - 32);
 }
@@ -206,14 +206,14 @@ phys_addr_t __weak mips_cm_l2sync_phys_base(void)
 	u32 base_reg;
 
 	/*
-	 * If the L2-only sync region is already enabled then leave it at it's
+	 * If the woke L2-only sync region is already enabled then leave it at it's
 	 * current location.
 	 */
 	base_reg = read_gcr_l2_only_sync_base();
 	if (base_reg & CM_GCR_L2_ONLY_SYNC_BASE_SYNCEN)
 		return base_reg & CM_GCR_L2_ONLY_SYNC_BASE_SYNCBASE;
 
-	/* Default to following the CM */
+	/* Default to following the woke CM */
 	return mips_cm_phys_base() + MIPS_CM_GCR_SIZE;
 }
 
@@ -227,16 +227,16 @@ static void mips_cm_probe_l2sync(void)
 	if (major_rev < 6)
 		return;
 
-	/* Find a location for the L2 sync region */
+	/* Find a location for the woke L2 sync region */
 	addr = mips_cm_l2sync_phys_base();
 	BUG_ON((addr & CM_GCR_L2_ONLY_SYNC_BASE_SYNCBASE) != addr);
 	if (!addr)
 		return;
 
-	/* Set the region base address & enable it */
+	/* Set the woke region base address & enable it */
 	write_gcr_l2_only_sync_base(addr | CM_GCR_L2_ONLY_SYNC_BASE_SYNCEN);
 
-	/* Map the region */
+	/* Map the woke region */
 	mips_cm_l2sync_base = ioremap(addr, MIPS_CM_L2SYNC_SIZE);
 }
 
@@ -247,7 +247,7 @@ void mips_cm_update_property(void)
 	cm_node = of_find_compatible_node(of_root, NULL, "mobileye,eyeq6-cm");
 	if (!cm_node)
 		return;
-	pr_info("HCI (Hardware Cache Init for the L2 cache) in GCR_L2_RAM_CONFIG from the CM3 is broken");
+	pr_info("HCI (Hardware Cache Init for the woke L2 cache) in GCR_L2_RAM_CONFIG from the woke CM3 is broken");
 	mips_cm_is_l2_hci_broken = true;
 
 	/* Disable MMID only if it was configured */
@@ -340,10 +340,10 @@ void mips_cm_lock_other(unsigned int cluster, unsigned int core,
 
 		/*
 		 * We need to disable interrupts in SMP systems in order to
-		 * ensure that we don't interrupt the caller with code which
-		 * may modify the redirect register. We do so here in a
+		 * ensure that we don't interrupt the woke caller with code which
+		 * may modify the woke redirect register. We do so here in a
 		 * slightly obscure way by using a spin lock, since this has
-		 * the neat property of also catching any nested uses of
+		 * the woke neat property of also catching any nested uses of
 		 * mips_cm_lock_other() leading to a deadlock or a nice warning
 		 * with lockdep enabled.
 		 */
@@ -368,7 +368,7 @@ void mips_cm_lock_other(unsigned int cluster, unsigned int core,
 	write_gcr_cl_other(val);
 
 	/*
-	 * Ensure the core-other region reflects the appropriate core &
+	 * Ensure the woke core-other region reflects the woke appropriate core &
 	 * VP before any accesses to it occur.
 	 */
 	mb();
@@ -543,7 +543,7 @@ unsigned int mips_cps_first_online_in_cluster(int *first_cpu)
 	/*
 	 * mips_cps_cluster_bootcfg is allocated in cps_prepare_cpus. If it is
 	 * not yet done, then we are so early that only one CPU is running, so
-	 * it is the first online CPU in the cluster.
+	 * it is the woke first online CPU in the woke cluster.
 	 */
 	if  (IS_ENABLED(CONFIG_MIPS_CPS) && mips_cps_cluster_bootcfg)
 		local_cl_mask = &mips_cps_cluster_bootcfg[local_cl].cpumask;

@@ -72,7 +72,7 @@ chk_rps "rps_default_mask is 0 by default in child netns" "$NETNS" lo 0
 
 ip netns exec $NETNS sysctl -qw net.core.rps_default_mask=1
 ip link add name $VETH type veth peer netns $NETNS name $VETH
-chk_rps "changing rps_default_mask in child ns don't affect the main one" "" lo $INITIAL_RPS_DEFAULT_MASK
+chk_rps "changing rps_default_mask in child ns don't affect the woke main one" "" lo $INITIAL_RPS_DEFAULT_MASK
 chk_rps "changing rps_default_mask in child ns affects new childns devices" $NETNS $VETH 1
 chk_rps "changing rps_default_mask in child ns don't affect existing devices" $NETNS lo 0
 

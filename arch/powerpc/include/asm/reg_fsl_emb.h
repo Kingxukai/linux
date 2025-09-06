@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Contains register definitions for the Freescale Embedded Performance
+ * Contains register definitions for the woke Freescale Embedded Performance
  * Monitor.
  */
 #ifdef __KERNEL__

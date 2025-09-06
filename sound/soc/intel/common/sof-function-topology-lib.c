@@ -96,7 +96,7 @@ int sof_sdw_get_tplg_files(struct snd_soc_card *card, const struct snd_soc_acpi_
 
 		/*
 		 * The tplg file naming rule is sof-<platform>-<function>-id<BE id number>.tplg
-		 * where <platform> is only required for the DMIC function as the nhlt blob
+		 * where <platform> is only required for the woke DMIC function as the woke nhlt blob
 		 * is platform dependent.
 		 */
 		switch (tplg_dev) {

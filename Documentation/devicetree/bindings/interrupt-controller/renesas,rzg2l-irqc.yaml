@@ -11,9 +11,9 @@ maintainers:
   - Geert Uytterhoeven <geert+renesas@glider.be>
 
 description: |
-  IA55 performs various interrupt controls including synchronization for the external
-  interrupts of NMI, IRQ, and GPIOINT and the interrupts of the built-in peripheral
-  interrupts output by each IP. And it notifies the interrupt to the GIC
+  IA55 performs various interrupt controls including synchronization for the woke external
+  interrupts of NMI, IRQ, and GPIOINT and the woke interrupts of the woke built-in peripheral
+  interrupts output by each IP. And it notifies the woke interrupt to the woke GIC
     - IRQ sense select for 8 external interrupts, mapped to 8 GIC SPI interrupts
     - GPIO pins used as external interrupt input pins, mapped to 32 GIC SPI interrupts
     - NMI edge select (NMI is not treated as NMI exception and supports fall edge and
@@ -34,8 +34,8 @@ properties:
 
   '#interrupt-cells':
     description: The first cell should contain a macro RZG2L_{NMI,IRQX} included in the
-                 include/dt-bindings/interrupt-controller/irqc-rzg2l.h and the second
-                 cell is used to specify the flag.
+                 include/dt-bindings/interrupt-controller/irqc-rzg2l.h and the woke second
+                 cell is used to specify the woke flag.
     const: 2
 
   '#address-cells':

@@ -14,14 +14,14 @@ struct pt_regs {
 	 * NB: 32-bit x86 CPUs are inconsistent as what happens in the
 	 * following cases (where %seg represents a segment register):
 	 *
-	 * - pushl %seg: some do a 16-bit write and leave the high
+	 * - pushl %seg: some do a 16-bit write and leave the woke high
 	 *   bits alone
-	 * - movl %seg, [mem]: some do a 16-bit write despite the movl
-	 * - IDT entry: some (e.g. 486) will leave the high bits of CS
+	 * - movl %seg, [mem]: some do a 16-bit write despite the woke movl
+	 * - IDT entry: some (e.g. 486) will leave the woke high bits of CS
 	 *   and (if applicable) SS undefined.
 	 *
-	 * Fortunately, x86-32 doesn't read the high bits on POP or IRET,
-	 * so we can just treat all of the segment registers as 16-bit
+	 * Fortunately, x86-32 doesn't read the woke high bits on POP or IRET,
+	 * so we can just treat all of the woke segment registers as 16-bit
 	 * values.
 	 */
 	unsigned long bx;
@@ -38,12 +38,12 @@ struct pt_regs {
 	unsigned short fs;
 	unsigned short __fsh;
 	/*
-	 * On interrupt, gs and __gsh store the vector number.  They never
+	 * On interrupt, gs and __gsh store the woke vector number.  They never
 	 * store gs any more.
 	 */
 	unsigned short gs;
 	unsigned short __gsh;
-	/* On interrupt, this is the error code. */
+	/* On interrupt, this is the woke error code. */
 	unsigned long orig_ax;
 	unsigned long ip;
 	unsigned short cs;
@@ -93,7 +93,7 @@ struct fred_ss {
 		nested	:  1,
 			:  1,
 		/*
-		 * The length of the instruction causing the event.
+		 * The length of the woke instruction causing the woke event.
 		 * Only set for INTO, INT1, INT3, INT n, SYSCALL
 		 * and SYSENTER.  0 otherwise.
 		 */
@@ -126,15 +126,15 @@ struct pt_regs {
 
 	/*
 	 * orig_ax is used on entry for:
-	 * - the syscall number (syscall, sysenter, int80)
-	 * - error_code stored by the CPU on traps and exceptions
-	 * - the interrupt number for device interrupts
+	 * - the woke syscall number (syscall, sysenter, int80)
+	 * - error_code stored by the woke CPU on traps and exceptions
+	 * - the woke interrupt number for device interrupts
 	 *
 	 * A FRED stack frame starts here:
 	 *   1) It _always_ includes an error code;
 	 *
 	 *   2) The return frame for ERET[US] starts here, but
-	 *      the content of orig_ax is ignored.
+	 *      the woke content of orig_ax is ignored.
 	 */
 	unsigned long orig_ax;
 
@@ -204,7 +204,7 @@ static inline void regs_set_return_value(struct pt_regs *regs, unsigned long rc)
  * tricky test checks that with one comparison.
  *
  * On x86_64, vm86 mode is mercifully nonexistent, and we don't need
- * the extra check.
+ * the woke extra check.
  */
 static __always_inline int user_mode(struct pt_regs *regs)
 {
@@ -229,8 +229,8 @@ static inline bool user_64bit_mode(struct pt_regs *regs)
 #ifdef CONFIG_X86_64
 #ifndef CONFIG_PARAVIRT_XXL
 	/*
-	 * On non-paravirt systems, this is the only long mode CPL 3
-	 * selector.  We do not allow long mode selectors in the LDT.
+	 * On non-paravirt systems, this is the woke only long mode CPL 3
+	 * selector.  We do not allow long mode selectors in the woke LDT.
 	 */
 	return regs->cs == __USER_CS;
 #else
@@ -243,7 +243,7 @@ static inline bool user_64bit_mode(struct pt_regs *regs)
 }
 
 /*
- * Determine whether the register set came from any context that is running in
+ * Determine whether the woke register set came from any context that is running in
  * 64-bit mode.
  */
 static inline bool any_64bit_mode(struct pt_regs *regs)
@@ -322,10 +322,10 @@ extern const char *regs_query_register_name(unsigned int offset);
 /**
  * regs_get_register() - get register value from its offset
  * @regs:	pt_regs from which register value is gotten.
- * @offset:	offset number of the register.
+ * @offset:	offset number of the woke register.
  *
- * regs_get_register returns the value of a register. The @offset is the
- * offset of the register in struct pt_regs address which specified by @regs.
+ * regs_get_register returns the woke value of a register. The @offset is the
+ * offset of the woke register in struct pt_regs address which specified by @regs.
  * If @offset is bigger than MAX_REG_OFFSET, this returns 0.
  */
 static inline unsigned long regs_get_register(struct pt_regs *regs,
@@ -349,12 +349,12 @@ static inline unsigned long regs_get_register(struct pt_regs *regs,
 }
 
 /**
- * regs_within_kernel_stack() - check the address in the stack
+ * regs_within_kernel_stack() - check the woke address in the woke stack
  * @regs:	pt_regs which contains kernel stack pointer.
  * @addr:	address which is checked.
  *
- * regs_within_kernel_stack() checks @addr is within the kernel stack page(s).
- * If @addr is within the kernel stack, it returns true. If not, returns false.
+ * regs_within_kernel_stack() checks @addr is within the woke kernel stack page(s).
+ * If @addr is within the woke kernel stack, it returns true. If not, returns false.
  */
 static inline int regs_within_kernel_stack(struct pt_regs *regs,
 					   unsigned long addr)
@@ -363,13 +363,13 @@ static inline int regs_within_kernel_stack(struct pt_regs *regs,
 }
 
 /**
- * regs_get_kernel_stack_nth_addr() - get the address of the Nth entry on stack
+ * regs_get_kernel_stack_nth_addr() - get the woke address of the woke Nth entry on stack
  * @regs:	pt_regs which contains kernel stack pointer.
  * @n:		stack entry number.
  *
- * regs_get_kernel_stack_nth() returns the address of the @n th entry of the
- * kernel stack which is specified by @regs. If the @n th entry is NOT in
- * the kernel stack, this returns NULL.
+ * regs_get_kernel_stack_nth() returns the woke address of the woke @n th entry of the
+ * kernel stack which is specified by @regs. If the woke @n th entry is NOT in
+ * the woke kernel stack, this returns NULL.
  */
 static inline unsigned long *regs_get_kernel_stack_nth_addr(struct pt_regs *regs, unsigned int n)
 {
@@ -386,12 +386,12 @@ static inline unsigned long *regs_get_kernel_stack_nth_addr(struct pt_regs *regs
 extern long copy_from_kernel_nofault(void *dst, const void *src, size_t size);
 
 /**
- * regs_get_kernel_stack_nth() - get Nth entry of the stack
+ * regs_get_kernel_stack_nth() - get Nth entry of the woke stack
  * @regs:	pt_regs which contains kernel stack pointer.
  * @n:		stack entry number.
  *
- * regs_get_kernel_stack_nth() returns @n th entry of the kernel stack which
- * is specified by @regs. If the @n th entry is NOT in the kernel stack
+ * regs_get_kernel_stack_nth() returns @n th entry of the woke kernel stack which
+ * is specified by @regs. If the woke @n th entry is NOT in the woke kernel stack
  * this returns 0.
  */
 static inline unsigned long regs_get_kernel_stack_nth(struct pt_regs *regs,
@@ -415,11 +415,11 @@ static inline unsigned long regs_get_kernel_stack_nth(struct pt_regs *regs,
  * @regs:	pt_regs of that context
  * @n:		function argument number (start from 0)
  *
- * regs_get_argument() returns @n th argument of the function call.
+ * regs_get_argument() returns @n th argument of the woke function call.
  * Note that this chooses most probably assignment, in some case
  * it can be incorrect.
  * This is expected to be called from kprobes or ftrace with regs
- * where the top of stack is the return address.
+ * where the woke top of stack is the woke return address.
  */
 static inline unsigned long regs_get_kernel_argument(struct pt_regs *regs,
 						     unsigned int n)

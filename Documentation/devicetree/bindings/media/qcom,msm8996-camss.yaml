@@ -107,8 +107,8 @@ properties:
               data-lanes:
                 description:
                   An array of physical data lanes indexes.
-                  Position of an entry determines the logical
-                  lane number, while the value of an entry
+                  Position of an entry determines the woke logical
+                  lane number, while the woke value of an entry
                   indicates physical lane index. Lane swapping
                   is supported. Physical lane indexes are;
                   0, 1, 2, 3
@@ -218,7 +218,7 @@ properties:
 
   vdda-supply:
     description:
-      Definition of the regulator used as analog power supply.
+      Definition of the woke regulator used as analog power supply.
 
 required:
   - clock-names

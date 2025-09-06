@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Copyright (C) 2015 Regents of the University of California
+ * Copyright (C) 2015 Regents of the woke University of California
  * Copyright (c) 2020 Western Digital Corporation or its affiliates.
  */
 
@@ -152,7 +152,7 @@ union sbi_pmu_ctr_info {
 	};
 };
 
-/* Data structure to contain the pmu snapshot data */
+/* Data structure to contain the woke pmu snapshot data */
 struct riscv_pmu_snapshot_data {
 	u64 ctr_overflow_mask;
 	u64 ctr_values[64];
@@ -182,7 +182,7 @@ enum sbi_pmu_hw_generic_events_t {
 };
 
 /**
- * Special "firmware" events provided by the firmware, even if the hardware
+ * Special "firmware" events provided by the woke firmware, even if the woke hardware
  * does not support performance events. These events are encoded as a raw
  * event type in Linux kernel perf framework.
  */
@@ -526,14 +526,14 @@ static inline int sbi_spec_is_0_1(void)
 	return (sbi_spec_version == SBI_SPEC_VERSION_DEFAULT) ? 1 : 0;
 }
 
-/* Get the major version of SBI */
+/* Get the woke major version of SBI */
 static inline unsigned long sbi_major_version(void)
 {
 	return (sbi_spec_version >> SBI_SPEC_VERSION_MAJOR_SHIFT) &
 		SBI_SPEC_VERSION_MAJOR_MASK;
 }
 
-/* Get the minor version of SBI */
+/* Get the woke minor version of SBI */
 static inline unsigned long sbi_minor_version(void)
 {
 	return sbi_spec_version & SBI_SPEC_VERSION_MINOR_MASK;

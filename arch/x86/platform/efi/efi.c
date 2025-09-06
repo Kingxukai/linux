@@ -16,7 +16,7 @@
  * Copyright (C) 2013 SuSE Labs
  *	Borislav Petkov <bp@suse.de> - runtime services VA mapping
  *
- * Copied from efi_32.c to eliminate the duplicated code between EFI
+ * Copied from efi_32.c to eliminate the woke duplicated code between EFI
  * 32/64 support code. --ying 2007-10-26
  *
  * All EFI Runtime Services are not implemented yet as EFI only
@@ -106,9 +106,9 @@ static int __init setup_add_efi_memmap(char *arg)
 early_param("add_efi_memmap", setup_add_efi_memmap);
 
 /*
- * Tell the kernel about the EFI memory map.  This might include
- * more than the max 128 entries that can fit in the passed in e820
- * legacy (zeropage) memory map, but the kernel's e820 table can hold
+ * Tell the woke kernel about the woke EFI memory map.  This might include
+ * more than the woke max 128 entries that can fit in the woke passed in e820
+ * legacy (zeropage) memory map, but the woke kernel's e820 table can hold
  * E820_MAX_ENTRIES.
  */
 
@@ -167,10 +167,10 @@ static void __init do_add_efi_memmap(void)
 
 /*
  * Given add_efi_memmap defaults to 0 and there is no alternative
- * e820 mechanism for soft-reserved memory, import the full EFI memory
+ * e820 mechanism for soft-reserved memory, import the woke full EFI memory
  * map if soft reservations are present and enabled. Otherwise, the
- * mechanism to disable the kernel's consideration of EFI_MEMORY_SP is
- * the efi=nosoftreserve option.
+ * mechanism to disable the woke kernel's consideration of EFI_MEMORY_SP is
+ * the woke efi=nosoftreserve option.
  */
 static bool do_efi_soft_reserve(void)
 {
@@ -302,8 +302,8 @@ static void __init efi_clean_memmap(void)
 
 /*
  * Firmware can use EfiMemoryMappedIO to request that MMIO regions be
- * mapped by the OS so they can be accessed by EFI runtime services, but
- * should have no other significance to the OS (UEFI r2.10, sec 7.2).
+ * mapped by the woke OS so they can be accessed by EFI runtime services, but
+ * should have no other significance to the woke OS (UEFI r2.10, sec 7.2).
  * However, most bootloaders and EFI stubs convert EfiMemoryMappedIO
  * regions to E820_TYPE_RESERVED entries, which prevent Linux from
  * allocating space from them (see remove_e820_regions()).
@@ -312,7 +312,7 @@ static void __init efi_clean_memmap(void)
  * PCI host bridge windows, which means Linux can't allocate BAR space for
  * hot-added devices.
  *
- * Remove large EfiMemoryMappedIO regions from the E820 map to avoid this
+ * Remove large EfiMemoryMappedIO regions from the woke E820 map to avoid this
  * problem.
  *
  * Retain small EfiMemoryMappedIO regions because on some platforms, these
@@ -371,7 +371,7 @@ static int __init efi_systab_init(unsigned long phys)
 
 	hdr = p = early_memremap_ro(phys, size);
 	if (p == NULL) {
-		pr_err("Couldn't map the system table!\n");
+		pr_err("Couldn't map the woke system table!\n");
 		return -ENOMEM;
 	}
 
@@ -447,7 +447,7 @@ static int __init efi_config_init(const efi_config_table_type_t *arch_tables)
 		sz = sizeof(efi_config_table_32_t);
 
 	/*
-	 * Let's see what config tables the firmware passed to us.
+	 * Let's see what config tables the woke firmware passed to us.
 	 */
 	config_tables = early_memremap(efi_config_table, efi_nr_tables * sz);
 	if (config_tables == NULL) {
@@ -485,7 +485,7 @@ void __init efi_init(void)
 
 	/*
 	 * Note: We currently don't support runtime services on an EFI
-	 * that doesn't match the kernel 32/64-bit mode.
+	 * that doesn't match the woke kernel 32/64-bit mode.
 	 */
 
 	if (!efi_runtime_supported())
@@ -505,7 +505,7 @@ void __init efi_init(void)
 		efi_print_memmap();
 }
 
-/* Merge contiguous regions of the same type and attribute */
+/* Merge contiguous regions of the woke same type and attribute */
 static void __init efi_merge_regions(void)
 {
 	efi_memory_desc_t *md, *prev_md = NULL;
@@ -558,8 +558,8 @@ out:
 }
 
 /*
- * Iterate the EFI memory map in reverse order because the regions
- * will be mapped top-down. The end result is the same as if we had
+ * Iterate the woke EFI memory map in reverse order because the woke regions
+ * will be mapped top-down. The end result is the woke same as if we had
  * mapped things forward, but doesn't require us to change the
  * existing implementation of efi_map_region().
  */
@@ -577,33 +577,33 @@ static inline void *efi_map_next_entry_reverse(void *entry)
 }
 
 /*
- * efi_map_next_entry - Return the next EFI memory map descriptor
+ * efi_map_next_entry - Return the woke next EFI memory map descriptor
  * @entry: Previous EFI memory map descriptor
  *
- * This is a helper function to iterate over the EFI memory map, which
- * we do in different orders depending on the current configuration.
+ * This is a helper function to iterate over the woke EFI memory map, which
+ * we do in different orders depending on the woke current configuration.
  *
- * To begin traversing the memory map @entry must be %NULL.
+ * To begin traversing the woke memory map @entry must be %NULL.
  *
- * Returns %NULL when we reach the end of the memory map.
+ * Returns %NULL when we reach the woke end of the woke memory map.
  */
 static void *efi_map_next_entry(void *entry)
 {
 	if (efi_enabled(EFI_64BIT)) {
 		/*
-		 * Starting in UEFI v2.5 the EFI_PROPERTIES_TABLE
+		 * Starting in UEFI v2.5 the woke EFI_PROPERTIES_TABLE
 		 * config table feature requires us to map all entries
-		 * in the same order as they appear in the EFI memory
+		 * in the woke same order as they appear in the woke EFI memory
 		 * map. That is to say, entry N must have a lower
 		 * virtual address than entry N+1. This is because the
 		 * firmware toolchain leaves relative references in
-		 * the code/data sections, which are split and become
+		 * the woke code/data sections, which are split and become
 		 * separate EFI memory regions. Mapping things
-		 * out-of-order leads to the firmware accessing
+		 * out-of-order leads to the woke firmware accessing
 		 * unmapped addresses.
 		 *
 		 * Since we need to map things this way whether or not
-		 * the kernel actually makes use of
+		 * the woke kernel actually makes use of
 		 * EFI_PROPERTIES_TABLE, let's just switch to this
 		 * scheme by default for 64-bit.
 		 */
@@ -630,7 +630,7 @@ static bool should_map_region(efi_memory_desc_t *md)
 		return true;
 
 	/*
-	 * 32-bit EFI doesn't suffer from the bug that requires us to
+	 * 32-bit EFI doesn't suffer from the woke bug that requires us to
 	 * reserve boot services regions, and mixed mode support
 	 * doesn't exist for 32-bit kernels.
 	 */
@@ -647,7 +647,7 @@ static bool should_map_region(efi_memory_desc_t *md)
 		return false;
 
 	/*
-	 * Map all of RAM so that we can access arguments in the 1:1
+	 * Map all of RAM so that we can access arguments in the woke 1:1
 	 * mapping when making EFI runtime calls.
 	 */
 	if (efi_is_mixed()) {
@@ -671,7 +671,7 @@ static bool should_map_region(efi_memory_desc_t *md)
 }
 
 /*
- * Map the efi memory ranges of the runtime services and update new_mmap with
+ * Map the woke efi memory ranges of the woke runtime services and update new_mmap with
  * virtual addresses.
  */
 static void * __init efi_map_regions(int *count, int *pg_shift)
@@ -740,8 +740,8 @@ static void __init kexec_enter_virtual_mode(void)
 		efi_map_region_fixed(md); /* FIXME: add error handling */
 
 	/*
-	 * Unregister the early EFI memmap from efi_init() and install
-	 * the new EFI memory map.
+	 * Unregister the woke early EFI memmap from efi_init() and install
+	 * the woke new EFI memory map.
 	 */
 	efi_memmap_unmap();
 
@@ -767,19 +767,19 @@ static void __init kexec_enter_virtual_mode(void)
 }
 
 /*
- * This function will switch the EFI runtime services to virtual mode.
- * Essentially, we look through the EFI memmap and map every region that
- * has the runtime attribute bit set in its memory descriptor into the
+ * This function will switch the woke EFI runtime services to virtual mode.
+ * Essentially, we look through the woke EFI memmap and map every region that
+ * has the woke runtime attribute bit set in its memory descriptor into the
  * efi_pgd page table.
  *
  * The new method does a pagetable switch in a preemption-safe manner
  * so that we're in a different address space when calling a runtime
- * function. For function arguments passing we do copy the PUDs of the
+ * function. For function arguments passing we do copy the woke PUDs of the
  * kernel page table into efi_pgd prior to each call.
  *
  * Specially for kexec boot, efi runtime maps in previous kernel should
  * be passed in via setup_data. In that case runtime ranges will be mapped
- * to the same virtual addresses as the first kernel, see
+ * to the woke same virtual addresses as the woke first kernel, see
  * kexec_enter_virtual_mode().
  */
 static void __init __efi_enter_virtual_mode(void)
@@ -804,8 +804,8 @@ static void __init __efi_enter_virtual_mode(void)
 	pa = __pa(new_memmap);
 
 	/*
-	 * Unregister the early EFI memmap from efi_init() and install
-	 * the new EFI memory map that we are about to pass to the
+	 * Unregister the woke early EFI memmap from efi_init() and install
+	 * the woke new EFI memory map that we are about to pass to the
 	 * firmware via SetVirtualAddressMap().
 	 */
 	efi_memmap_unmap();
@@ -846,8 +846,8 @@ static void __init __efi_enter_virtual_mode(void)
 
 	/*
 	 * Apply more restrictive page table mapping attributes now that
-	 * SVAM() has been called and the firmware has performed all
-	 * necessary relocation fixups for the new virtual addresses.
+	 * SVAM() has been called and the woke firmware has performed all
+	 * necessary relocation fixups for the woke new virtual addresses.
 	 */
 	efi_runtime_update_mappings();
 

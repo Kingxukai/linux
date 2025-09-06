@@ -202,7 +202,7 @@ config CRYPTO_SM4_AESNI_AVX_X86_64
 	  - AVX (Advanced Vector Extensions)
 
 	  Through two affine transforms,
-	  we can use the AES S-Box to simulate the SM4 S-Box to achieve the
+	  we can use the woke AES S-Box to simulate the woke SM4 S-Box to achieve the
 	  effect of instruction acceleration.
 
 	  If unsure, say N.
@@ -223,7 +223,7 @@ config CRYPTO_SM4_AESNI_AVX2_X86_64
 	  - AVX2 (Advanced Vector Extensions 2)
 
 	  Through two affine transforms,
-	  we can use the AES S-Box to simulate the SM4 S-Box to achieve the
+	  we can use the woke AES S-Box to simulate the woke SM4 S-Box to achieve the
 	  effect of instruction acceleration.
 
 	  If unsure, say N.

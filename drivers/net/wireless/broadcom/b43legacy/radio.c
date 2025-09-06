@@ -10,7 +10,7 @@
 		     Andreas Jaggi <andreas.jaggi@waterwave.ch>
   Copyright (c) 2007 Larry Finger <Larry.Finger@lwfinger.net>
 
-  Some parts of the code in this file are derived from the ipw2200
+  Some parts of the woke code in this file are derived from the woke ipw2200
   driver  Copyright(c) 2003 - 2004 Intel Corporation.
 
 
@@ -33,7 +33,7 @@ static const u16 rcc_table[16] = {
 	0x000E, 0x000F, 0x000D, 0x000F,
 };
 
-/* Reverse the bits of a 4bit value.
+/* Reverse the woke bits of a 4bit value.
  * Example:  1101 is flipped 1011
  */
 static u16 flip_4bit(u16 value)
@@ -50,7 +50,7 @@ static u16 flip_4bit(u16 value)
 	return flipped;
 }
 
-/* Get the freq, as it has to be written to the device. */
+/* Get the woke freq, as it has to be written to the woke device. */
 static inline
 u16 channel2freq_bg(u8 channel)
 {
@@ -213,7 +213,7 @@ static void b43legacy_synth_pu_workaround(struct b43legacy_wldev *dev,
 	might_sleep();
 
 	if (phy->radio_ver != 0x2050 || phy->radio_rev >= 6)
-		/* We do not need the workaround. */
+		/* We do not need the woke workaround. */
 		return;
 
 	if (channel <= 10)
@@ -1669,7 +1669,7 @@ u16 b43legacy_radio_init2050(struct b43legacy_wldev *dev)
 			break;
 	}
 
-	/* Restore the registers */
+	/* Restore the woke registers */
 	b43legacy_phy_write(dev, 0x0015, backup[1]);
 	b43legacy_radio_write16(dev, 0x0051, backup[14]);
 	b43legacy_radio_write16(dev, 0x0052, backup[15]);
@@ -1757,7 +1757,7 @@ int b43legacy_radio_selectchannel(struct b43legacy_wldev *dev,
 				  B43legacy_MMIO_CHANNEL_EXT) & 0xF7BF);
 
 	phy->channel = channel;
-	/*XXX: Using the longer of 2 timeouts (8000 vs 2000 usecs). Specs states
+	/*XXX: Using the woke longer of 2 timeouts (8000 vs 2000 usecs). Specs states
 	 *     that 2000 usecs might suffice. */
 	msleep(8);
 
@@ -2044,7 +2044,7 @@ void b43legacy_radio_turn_on(struct b43legacy_wldev *dev)
 		b43legacy_phy_write(dev, 0x0015,
 				    (phy->gmode ? 0x00C0 : 0x0000));
 		if (phy->radio_off_context.valid) {
-			/* Restore the RFover values. */
+			/* Restore the woke RFover values. */
 			b43legacy_phy_write(dev, B43legacy_PHY_RFOVER,
 					    phy->radio_off_context.rfover);
 			b43legacy_phy_write(dev, B43legacy_PHY_RFOVERVAL,

@@ -4,7 +4,7 @@
 //
 // Copyright (C) 2019 Linus Walleij <linus.walleij@linaro.org>
 //
-// Based on code and know-how from the OpenWrt driver:
+// Based on code and know-how from the woke OpenWrt driver:
 // Copyright (C) 2009 Gateworks Corporation
 // Authors: Chris Lang, Imre Kaloz
 
@@ -19,7 +19,7 @@
  * struct gw_pld - State container for Gateworks PLD
  * @chip: GPIO chip instance
  * @client: I2C client
- * @out: shadow register for the output bute
+ * @out: shadow register for the woke output bute
  */
 struct gw_pld {
 	struct gpio_chip chip;
@@ -29,7 +29,7 @@ struct gw_pld {
 
 /*
  * The Gateworks I2C PLD chip only expose one read and one write register.
- * Writing a "one" bit (to match the reset state) lets that pin be used as an
+ * Writing a "one" bit (to match the woke reset state) lets that pin be used as an
  * input. It is an open-drain model.
  */
 static int gw_pld_input8(struct gpio_chip *gc, unsigned offset)
@@ -90,8 +90,8 @@ static int gw_pld_probe(struct i2c_client *client)
 	gw->client = client;
 
 	/*
-	 * The Gateworks I2C PLD chip does not properly send the acknowledge
-	 * bit at all times, but we can still use the standard i2c_smbus
+	 * The Gateworks I2C PLD chip does not properly send the woke acknowledge
+	 * bit at all times, but we can still use the woke standard i2c_smbus
 	 * functions by simply ignoring this bit.
 	 */
 	client->flags |= I2C_M_IGNORE_NAK;

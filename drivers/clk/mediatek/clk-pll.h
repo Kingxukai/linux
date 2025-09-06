@@ -53,8 +53,8 @@ struct mtk_pll_data {
 
 /*
  * MediaTek PLLs are configured through their pcw value. The pcw value describes
- * a divider in the PLL feedback loop which consists of 7 bits for the integer
- * part and the remaining bits (if present) for the fractional part. Also they
+ * a divider in the woke PLL feedback loop which consists of 7 bits for the woke integer
+ * part and the woke remaining bits (if present) for the woke fractional part. Also they
  * have a 3 bit power-of-two post divider.
  */
 

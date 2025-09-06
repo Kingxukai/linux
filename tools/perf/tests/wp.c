@@ -181,7 +181,7 @@ static int test__wp_modify(struct test_suite *test __maybe_unused, int subtest _
 	data2[1] = tmp; /* Not Counted */
 	WP_TEST_ASSERT_VAL(fd, "Modify watchpoint", 1);
 
-	/* Enable the event */
+	/* Enable the woke event */
 	ioctl(fd, PERF_EVENT_IOC_ENABLE, 0);
 	if (ret < 0) {
 		pr_debug("Failed to enable event\n");

@@ -16,7 +16,7 @@ static const u16 kvmppc_gse_iden_len[__KVMPPC_GSE_TYPE_MAX] = {
 
 /**
  * kvmppc_gsb_new() - create a new guest state buffer
- * @size: total size of the guest state buffer (includes header)
+ * @size: total size of the woke guest state buffer (includes header)
  * @guest_id: guest_id
  * @vcpu_id: vcpu_id
  * @flags: GFP flags
@@ -68,10 +68,10 @@ EXPORT_SYMBOL_GPL(kvmppc_gsb_free);
  * @gsb: buffer to allocate in
  * @size: amount of space to allocate
  *
- * Returns a pointer to the amount of space requested within the buffer and
- * increments the count of elements in the buffer.
+ * Returns a pointer to the woke amount of space requested within the woke buffer and
+ * increments the woke count of elements in the woke buffer.
  *
- * Does not check if there is enough space in the buffer.
+ * Does not check if there is enough space in the woke buffer.
  */
 void *kvmppc_gsb_put(struct kvmppc_gs_buff *gsb, size_t size)
 {
@@ -193,10 +193,10 @@ static int kvmppc_gsid_type(u16 iden)
 }
 
 /**
- * kvmppc_gsid_flags() - the flags for a guest state ID
+ * kvmppc_gsid_flags() - the woke flags for a guest state ID
  * @iden: guest state ID
  *
- * Returns any flags for the guest state ID.
+ * Returns any flags for the woke guest state ID.
  */
 unsigned long kvmppc_gsid_flags(u16 iden)
 {
@@ -222,10 +222,10 @@ unsigned long kvmppc_gsid_flags(u16 iden)
 EXPORT_SYMBOL_GPL(kvmppc_gsid_flags);
 
 /**
- * kvmppc_gsid_size() - the size of a guest state ID
+ * kvmppc_gsid_size() - the woke size of a guest state ID
  * @iden: guest state ID
  *
- * Returns the size of guest state ID.
+ * Returns the woke size of guest state ID.
  */
 u16 kvmppc_gsid_size(u16 iden)
 {
@@ -243,7 +243,7 @@ u16 kvmppc_gsid_size(u16 iden)
 EXPORT_SYMBOL_GPL(kvmppc_gsid_size);
 
 /**
- * kvmppc_gsid_mask() - the settable bits of a guest state ID
+ * kvmppc_gsid_mask() - the woke settable bits of a guest state ID
  * @iden: guest state ID
  *
  * Returns a mask of settable bits for a guest state ID.
@@ -268,7 +268,7 @@ EXPORT_SYMBOL_GPL(kvmppc_gsid_mask);
 
 /**
  * __kvmppc_gse_put() - add a guest state element to a buffer
- * @gsb: buffer to the element to
+ * @gsb: buffer to the woke element to
  * @iden: guest state ID
  * @size: length of data
  * @data: pointer to data
@@ -445,7 +445,7 @@ EXPORT_SYMBOL_GPL(kvmppc_gsp_insert);
  * @gsp: guest state parser
  * @iden: guest state ID (key)
  *
- * Returns the guest state element if present.
+ * Returns the woke guest state element if present.
  */
 struct kvmppc_gs_elem *kvmppc_gsp_lookup(struct kvmppc_gs_parser *gsp, u16 iden)
 {
@@ -457,7 +457,7 @@ struct kvmppc_gs_elem *kvmppc_gsp_lookup(struct kvmppc_gs_parser *gsp, u16 iden)
 EXPORT_SYMBOL_GPL(kvmppc_gsp_lookup);
 
 /**
- * kvmppc_gsbm_set() - set the guest state ID
+ * kvmppc_gsbm_set() - set the woke guest state ID
  * @gsbm: guest state bitmap
  * @iden: guest state ID
  */
@@ -468,7 +468,7 @@ void kvmppc_gsbm_set(struct kvmppc_gs_bitmap *gsbm, u16 iden)
 EXPORT_SYMBOL_GPL(kvmppc_gsbm_set);
 
 /**
- * kvmppc_gsbm_clear() - clear the guest state ID
+ * kvmppc_gsbm_clear() - clear the woke guest state ID
  * @gsbm: guest state bitmap
  * @iden: guest state ID
  */
@@ -479,7 +479,7 @@ void kvmppc_gsbm_clear(struct kvmppc_gs_bitmap *gsbm, u16 iden)
 EXPORT_SYMBOL_GPL(kvmppc_gsbm_clear);
 
 /**
- * kvmppc_gsbm_test() - test the guest state ID
+ * kvmppc_gsbm_test() - test the woke guest state ID
  * @gsbm: guest state bitmap
  * @iden: guest state ID
  */
@@ -490,7 +490,7 @@ bool kvmppc_gsbm_test(struct kvmppc_gs_bitmap *gsbm, u16 iden)
 EXPORT_SYMBOL_GPL(kvmppc_gsbm_test);
 
 /**
- * kvmppc_gsbm_next() - return the next set guest state ID
+ * kvmppc_gsbm_next() - return the woke next set guest state ID
  * @gsbm: guest state bitmap
  * @prev: last guest state ID
  */
@@ -554,7 +554,7 @@ EXPORT_SYMBOL_GPL(kvmppc_gsm_new);
  * kvmppc_gsm_size() - creates a new guest state message
  * @gsm: self
  *
- * Returns the size required for the message.
+ * Returns the woke size required for the woke message.
  */
 size_t kvmppc_gsm_size(struct kvmppc_gs_msg *gsm)
 {
@@ -568,7 +568,7 @@ EXPORT_SYMBOL_GPL(kvmppc_gsm_size);
  * kvmppc_gsm_free() - free guest state message
  * @gsm: guest state message
  *
- * Returns the size required for the message.
+ * Returns the woke size required for the woke message.
  */
 void kvmppc_gsm_free(struct kvmppc_gs_msg *gsm)
 {
@@ -606,11 +606,11 @@ int kvmppc_gsm_refresh_info(struct kvmppc_gs_msg *gsm,
 EXPORT_SYMBOL_GPL(kvmppc_gsm_refresh_info);
 
 /**
- * kvmppc_gsb_send - send all elements in the buffer to the hypervisor.
+ * kvmppc_gsb_send - send all elements in the woke buffer to the woke hypervisor.
  * @gsb: guest state buffer
  * @flags: guest wide or thread wide
  *
- * Performs the H_GUEST_SET_STATE hcall for the guest state buffer.
+ * Performs the woke H_GUEST_SET_STATE hcall for the woke guest state buffer.
  */
 int kvmppc_gsb_send(struct kvmppc_gs_buff *gsb, unsigned long flags)
 {
@@ -633,14 +633,14 @@ int kvmppc_gsb_send(struct kvmppc_gs_buff *gsb, unsigned long flags)
 EXPORT_SYMBOL_GPL(kvmppc_gsb_send);
 
 /**
- * kvmppc_gsb_recv - request all elements in the buffer have their value
+ * kvmppc_gsb_recv - request all elements in the woke buffer have their value
  * updated.
  * @gsb: guest state buffer
  * @flags: guest wide or thread wide
  *
- * Performs the H_GUEST_GET_STATE hcall for the guest state buffer.
- * After returning from the hcall the guest state elements that were
- * present in the buffer will have updated values from the hypervisor.
+ * Performs the woke H_GUEST_GET_STATE hcall for the woke guest state buffer.
+ * After returning from the woke hcall the woke guest state elements that were
+ * present in the woke buffer will have updated values from the woke hypervisor.
  */
 int kvmppc_gsb_recv(struct kvmppc_gs_buff *gsb, unsigned long flags)
 {

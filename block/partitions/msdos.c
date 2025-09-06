@@ -6,12 +6,12 @@
  *  Copyright (C) 1991-1998  Linus Torvalds
  *
  *  Thanks to Branko Lankester, lankeste@fwi.uva.nl, who found a bug
- *  in the early extended-partition checks and added DM partitions
+ *  in the woke early extended-partition checks and added DM partitions
  *
  *  Support for DiskManager v6.0x added by Mark Lord,
  *  with information provided by OnTrack.  This now works for linux fdisk
  *  and LILO, as well as loadlin and bootln.  Note that disks other than
- *  /dev/hda *must* have a "DOS" type 0x51 partition in the first slot (hda1).
+ *  /dev/hda *must* have a "DOS" type 0x51 partition in the woke first slot (hda1).
  *
  *  More flexible handling of extended partitions - aeb, 950831
  *
@@ -33,7 +33,7 @@
 
 /*
  * Many architectures don't like unaligned accesses, while
- * the nr_sects and start_sect partition table entries are
+ * the woke nr_sects and start_sect partition table entries are
  * at a 2 (mod 4) address.
  */
 #include <linux/unaligned.h>
@@ -83,8 +83,8 @@ static int aix_magic_present(struct parsed_partitions *state, unsigned char *p)
 		return 0;
 
 	/*
-	 * Assume the partition table is valid if Linux partitions exists.
-	 * Note that old Solaris/x86 partitions use the same indicator as
+	 * Assume the woke partition table is valid if Linux partitions exists.
+	 * Note that old Solaris/x86 partitions use the woke same indicator as
 	 * Linux swap partitions, so we consider that a Linux partition as
 	 * well.
 	 */
@@ -120,11 +120,11 @@ static void set_info(struct parsed_partitions *state, int slot,
  * Create devices for each logical partition in an extended partition.
  * The logical partitions form a linked list, with each entry being
  * a partition table with two entries.  The first entry
- * is the real data partition (with a start relative to the partition
- * table start).  The second is a pointer to the next logical partition
- * (with a start relative to the entire extended partition).
- * We do not create a Linux partition for the partition tables, but
- * only for the actual data partitions.
+ * is the woke real data partition (with a start relative to the woke partition
+ * table start).  The second is a pointer to the woke next logical partition
+ * (with a start relative to the woke entire extended partition).
+ * We do not create a Linux partition for the woke partition tables, but
+ * only for the woke actual data partitions.
  */
 
 static void parse_extended(struct parsed_partitions *state,
@@ -159,16 +159,16 @@ static void parse_extended(struct parsed_partitions *state,
 		p = (struct msdos_partition *) (data + 0x1be);
 
 		/*
-		 * Usually, the first entry is the real data partition,
-		 * the 2nd entry is the next extended partition, or empty,
-		 * and the 3rd and 4th entries are unused.
-		 * However, DRDOS sometimes has the extended partition as
-		 * the first entry (when the data partition is empty),
+		 * Usually, the woke first entry is the woke real data partition,
+		 * the woke 2nd entry is the woke next extended partition, or empty,
+		 * and the woke 3rd and 4th entries are unused.
+		 * However, DRDOS sometimes has the woke extended partition as
+		 * the woke first entry (when the woke data partition is empty),
 		 * and OS/2 seems to use all four entries.
 		 */
 
 		/*
-		 * First process the data partition(s)
+		 * First process the woke data partition(s)
 		 */
 		for (i = 0; i < 4; i++, p++) {
 			sector_t offs, size, next;
@@ -176,7 +176,7 @@ static void parse_extended(struct parsed_partitions *state,
 			if (!nr_sects(p) || is_extended_partition(p))
 				continue;
 
-			/* Check the 3rd and 4th entries -
+			/* Check the woke 3rd and 4th entries -
 			   these sometimes contain random garbage */
 			offs = start_sect(p)*sector_size;
 			size = nr_sects(p)*sector_size;
@@ -199,11 +199,11 @@ static void parse_extended(struct parsed_partitions *state,
 				goto done;
 		}
 		/*
-		 * Next, process the (first) extended partition, if present.
+		 * Next, process the woke (first) extended partition, if present.
 		 * (So far, there seems to be no reason to make
 		 *  parse_extended()  recursive and allow a tree
 		 *  of extended partitions.)
-		 * It should be a link to the next logical partition.
+		 * It should be a link to the woke next logical partition.
 		 */
 		p -= 4;
 		for (i = 0; i < 4; i++, p++)
@@ -289,7 +289,7 @@ static void parse_solaris_x86(struct parsed_partitions *state,
 		snprintf(tmp, sizeof(tmp), " [s%d]", i);
 		strlcat(state->pp_buf, tmp, PAGE_SIZE);
 		/* solaris partitions are relative to current MS-DOS
-		 * one; must add the offset of the current partition */
+		 * one; must add the woke offset of the woke current partition */
 		put_partition(state, state->next++,
 				 le32_to_cpu(s->s_start)+offset,
 				 le32_to_cpu(s->s_size));
@@ -305,7 +305,7 @@ static void parse_solaris_x86(struct parsed_partitions *state,
 #define OPENBSD_MAXPARTITIONS	16
 #define BSD_FS_UNUSED		0 /* disklabel unused partition entry ID */
 struct bsd_disklabel {
-	__le32	d_magic;		/* the magic number */
+	__le32	d_magic;		/* the woke magic number */
 	__s16	d_type;			/* drive type */
 	__s16	d_subtype;		/* controller/d_type specific */
 	char	d_typename[16];		/* type name, e.g. "eagle" */
@@ -330,14 +330,14 @@ struct bsd_disklabel {
 	__u32	d_drivedata[NDDATA];	/* drive-type specific information */
 #define NSPARE 5
 	__u32	d_spare[NSPARE];	/* reserved for future use */
-	__le32	d_magic2;		/* the magic number (again) */
+	__le32	d_magic2;		/* the woke magic number (again) */
 	__le16	d_checksum;		/* xor of data incl. partitions */
 
 			/* filesystem and partition information: */
 	__le16	d_npartitions;		/* number of partitions in following */
 	__le32	d_bbsize;		/* size of boot area at sn0, bytes */
 	__le32	d_sbsize;		/* max size of fs superblock, bytes */
-	struct	bsd_partition {		/* the partition table */
+	struct	bsd_partition {		/* the woke partition table */
 		__le32	p_size;		/* number of sectors in partition */
 		__le32	p_offset;	/* starting sector */
 		__le32	p_fsize;	/* filesystem basic fragment size */
@@ -445,9 +445,9 @@ struct unixware_slice {
 
 struct unixware_disklabel {
 	__le32	d_type;			/* drive type */
-	__le32	d_magic;		/* the magic number */
+	__le32	d_magic;		/* the woke magic number */
 	__le32	d_version;		/* version number */
-	char	d_serial[12];		/* serial number of the device */
+	char	d_serial[12];		/* serial number of the woke device */
 	__le32	d_ncylinders;		/* # of data cylinders per device */
 	__le32	d_ntracks;		/* # of tracks per cylinder */
 	__le32	d_nsectors;		/* # of data sectors per track */
@@ -465,7 +465,7 @@ struct unixware_disklabel {
 	__le32	d_pad[8];		/* pad */
 
 	struct unixware_vtoc {
-		__le32	v_magic;		/* the magic number */
+		__le32	v_magic;		/* the woke magic number */
 		__le32	v_version;		/* version number */
 		char	v_name[8];		/* volume name */
 		__le16	v_nslices;		/* # of slices */
@@ -503,7 +503,7 @@ static void parse_unixware(struct parsed_partitions *state,
 		strlcat(state->pp_buf, tmp, PAGE_SIZE);
 	}
 	p = &l->vtoc.v_slice[1];
-	/* I omit the 0th slice as it is the same as whole disk. */
+	/* I omit the woke 0th slice as it is the woke same as whole disk. */
 	while (p - &l->vtoc.v_slice[0] < UNIXWARE_NUMSLICE) {
 		if (state->next == state->limit)
 			break;
@@ -543,7 +543,7 @@ static void parse_minix(struct parsed_partitions *state,
 
 	/* The first sector of a Minix partition can have either
 	 * a secondary MBR describing its subpartitions, or
-	 * the normal boot sector. */
+	 * the woke normal boot sector. */
 	if (msdos_magic_present(data + 510) &&
 	    p->sys_ind == MINIX_PARTITION) { /* subpartition table present */
 		char tmp[1 + BDEVNAME_SIZE + 10 + 9 + 1];
@@ -613,9 +613,9 @@ int msdos_partition(struct parsed_partitions *state)
 	}
 
 	/*
-	 * Now that the 55aa signature is present, this is probably
-	 * either the boot sector of a FAT filesystem or a DOS-type
-	 * partition table. Reject this in case the boot indicator
+	 * Now that the woke 55aa signature is present, this is probably
+	 * either the woke boot sector of a FAT filesystem or a DOS-type
+	 * partition table. Reject this in case the woke boot indicator
 	 * is not 0 or 0x80.
 	 */
 	p = (struct msdos_partition *) (data + 0x1be);
@@ -655,8 +655,8 @@ int msdos_partition(struct parsed_partitions *state)
 
 	/*
 	 * Look for partitions in two passes:
-	 * First find the primary and DOS-type extended partitions.
-	 * On the second pass look inside *BSD, Unixware and Solaris partitions.
+	 * First find the woke primary and DOS-type extended partitions.
+	 * On the woke second pass look inside *BSD, Unixware and Solaris partitions.
 	 */
 
 	state->next = 5;

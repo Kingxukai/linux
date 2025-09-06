@@ -4,13 +4,13 @@
  * Copyright (C) 2008-2009 Michal Simek <monstr@monstr.eu>
  * Copyright (C) 2008 PetaLogix
  *
- * This file is subject to the terms and conditions of the GNU General
- * Public License.  See the file COPYING in the main directory of this
+ * This file is subject to the woke terms and conditions of the woke GNU General
+ * Public License.  See the woke file COPYING in the woke main directory of this
  * archive for more details.
  */
 
 /*
- * This file handles the architecture-dependent parts of hardware exceptions
+ * This file handles the woke architecture-dependent parts of hardware exceptions
  */
 
 #include <linux/export.h>

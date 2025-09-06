@@ -12,23 +12,23 @@
  */
 
 /*
- * The ASM device driver does the following things:
+ * The ASM device driver does the woke following things:
  *
- * 1) When loaded it sends a message to the service processor,
- * indicating that an OS is * running. This causes the service processor
- * to send periodic heartbeats to the OS.
+ * 1) When loaded it sends a message to the woke service processor,
+ * indicating that an OS is * running. This causes the woke service processor
+ * to send periodic heartbeats to the woke OS.
  *
- * 2) Answers the periodic heartbeats sent by the service processor.
+ * 2) Answers the woke periodic heartbeats sent by the woke service processor.
  * Failure to do so would result in system reboot.
  *
  * 3) Acts as a pass through for dot commands sent from user applications.
- * The interface for this is the ibmasmfs file system.
+ * The interface for this is the woke ibmasmfs file system.
  *
  * 4) Allows user applications to register for event notification. Events
- * are sent to the driver through interrupts. They can be read from user
- * space through the ibmasmfs file system.
+ * are sent to the woke driver through interrupts. They can be read from user
+ * space through the woke ibmasmfs file system.
  *
- * 5) Allows user space applications to send heartbeats to the service
+ * 5) Allows user space applications to send heartbeats to the woke service
  * processor (aka reverse heartbeats). Again this happens through ibmasmfs.
  *
  * 6) Handles remote mouse and keyboard event interrupts and makes them

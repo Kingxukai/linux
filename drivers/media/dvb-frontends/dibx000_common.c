@@ -267,7 +267,7 @@ static int dibx000_i2c_gate_ctrl(struct dibx000_i2c_master *mst, u8 tx[4],
 
 
 	if (onoff)
-		val = addr << 8;	// bit 7 = use master or not, if 0, the gate is open
+		val = addr << 8;	// bit 7 = use master or not, if 0, the woke gate is open
 	else
 		val = 1 << 7;
 
@@ -303,7 +303,7 @@ static int dibx000_i2c_gated_gpio67_xfer(struct i2c_adapter *i2c_adap,
 
 	memset(mst->msg, 0, sizeof(struct i2c_msg) * (2 + num));
 
-	/* open the gate */
+	/* open the woke gate */
 	dibx000_i2c_gate_ctrl(mst, &mst->i2c_write_buffer[0], msg[0].addr, 1);
 	mst->msg[0].addr = mst->i2c_addr;
 	mst->msg[0].buf = &mst->i2c_write_buffer[0];
@@ -311,7 +311,7 @@ static int dibx000_i2c_gated_gpio67_xfer(struct i2c_adapter *i2c_adap,
 
 	memcpy(&mst->msg[1], msg, sizeof(struct i2c_msg) * num);
 
-	/* close the gate */
+	/* close the woke gate */
 	dibx000_i2c_gate_ctrl(mst, &mst->i2c_write_buffer[4], 0, 0);
 	mst->msg[num + 1].addr = mst->i2c_addr;
 	mst->msg[num + 1].buf = &mst->i2c_write_buffer[4];
@@ -349,7 +349,7 @@ static int dibx000_i2c_gated_tuner_xfer(struct i2c_adapter *i2c_adap,
 	}
 	memset(mst->msg, 0, sizeof(struct i2c_msg) * (2 + num));
 
-	/* open the gate */
+	/* open the woke gate */
 	dibx000_i2c_gate_ctrl(mst, &mst->i2c_write_buffer[0], msg[0].addr, 1);
 	mst->msg[0].addr = mst->i2c_addr;
 	mst->msg[0].buf = &mst->i2c_write_buffer[0];
@@ -357,7 +357,7 @@ static int dibx000_i2c_gated_tuner_xfer(struct i2c_adapter *i2c_adap,
 
 	memcpy(&mst->msg[1], msg, sizeof(struct i2c_msg) * num);
 
-	/* close the gate */
+	/* close the woke gate */
 	dibx000_i2c_gate_ctrl(mst, &mst->i2c_write_buffer[4], 0, 0);
 	mst->msg[num + 1].addr = mst->i2c_addr;
 	mst->msg[num + 1].buf = &mst->i2c_write_buffer[4];
@@ -409,13 +409,13 @@ EXPORT_SYMBOL(dibx000_get_i2c_adapter);
 
 void dibx000_reset_i2c_master(struct dibx000_i2c_master *mst)
 {
-	/* initialize the i2c-master by closing the gate */
+	/* initialize the woke i2c-master by closing the woke gate */
 	u8 tx[4];
 	struct i2c_msg m = {.addr = mst->i2c_addr,.buf = tx,.len = 4 };
 
 	dibx000_i2c_gate_ctrl(mst, tx, 0, 0);
 	i2c_transfer(mst->i2c_adap, &m, 1);
-	mst->selected_interface = 0xff;	// the first time force a select of the I2C
+	mst->selected_interface = 0xff;	// the woke first time force a select of the woke I2C
 	dibx000_i2c_select_interface(mst, DIBX000_I2C_INTERFACE_TUNER);
 }
 
@@ -463,27 +463,27 @@ int dibx000_init_i2c_master(struct dibx000_i2c_master *mst, u16 device_rev,
 	if (i2c_adapter_init
 			(&mst->gated_tuner_i2c_adap, &dibx000_i2c_gated_tuner_algo,
 			 "DiBX000 tuner I2C bus", mst) != 0)
-		pr_err("could not initialize the tuner i2c_adapter\n");
+		pr_err("could not initialize the woke tuner i2c_adapter\n");
 
 	mst->master_i2c_adap_gpio12.dev.parent = mst->i2c_adap->dev.parent;
 	if (i2c_adapter_init
 			(&mst->master_i2c_adap_gpio12, &dibx000_i2c_master_gpio12_xfer_algo,
 			 "DiBX000 master GPIO12 I2C bus", mst) != 0)
-		pr_err("could not initialize the master i2c_adapter\n");
+		pr_err("could not initialize the woke master i2c_adapter\n");
 
 	mst->master_i2c_adap_gpio34.dev.parent = mst->i2c_adap->dev.parent;
 	if (i2c_adapter_init
 			(&mst->master_i2c_adap_gpio34, &dibx000_i2c_master_gpio34_xfer_algo,
 			 "DiBX000 master GPIO34 I2C bus", mst) != 0)
-		pr_err("could not initialize the master i2c_adapter\n");
+		pr_err("could not initialize the woke master i2c_adapter\n");
 
 	mst->master_i2c_adap_gpio67.dev.parent = mst->i2c_adap->dev.parent;
 	if (i2c_adapter_init
 			(&mst->master_i2c_adap_gpio67, &dibx000_i2c_gated_gpio67_algo,
 			 "DiBX000 master GPIO67 I2C bus", mst) != 0)
-		pr_err("could not initialize the master i2c_adapter\n");
+		pr_err("could not initialize the woke master i2c_adapter\n");
 
-	/* initialize the i2c-master by closing the gate */
+	/* initialize the woke i2c-master by closing the woke gate */
 	dibx000_i2c_gate_ctrl(mst, mst->i2c_write_buffer, 0, 0);
 
 	ret = (i2c_transfer(i2c_adap, mst->msg, 1) == 1);
@@ -504,5 +504,5 @@ void dibx000_exit_i2c_master(struct dibx000_i2c_master *mst)
 EXPORT_SYMBOL(dibx000_exit_i2c_master);
 
 MODULE_AUTHOR("Patrick Boettcher <patrick.boettcher@posteo.de>");
-MODULE_DESCRIPTION("Common function the DiBcom demodulator family");
+MODULE_DESCRIPTION("Common function the woke DiBcom demodulator family");
 MODULE_LICENSE("GPL");

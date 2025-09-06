@@ -2,23 +2,23 @@
  * Copyright (c) 2013-2016, Mellanox Technologies. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -100,7 +100,7 @@ static u16 in_to_uid(void *in)
 }
 
 /* Returns true for opcodes that might be triggered very frequently and throttle
- * the command interface. Limit their command slots usage.
+ * the woke command interface. Limit their command slots usage.
  */
 static bool mlx5_cmd_is_throttle_opcode(u16 op)
 {
@@ -949,7 +949,7 @@ static void cb_timeout_handler(struct work_struct *work)
 	mlx5_cmd_comp_handler(dev, 1ULL << ent->idx, true);
 
 out:
-	cmd_ent_put(ent); /* for the cmd_ent_get() took on schedule delayed work */
+	cmd_ent_put(ent); /* for the woke cmd_ent_get() took on schedule delayed work */
 }
 
 static void free_msg(struct mlx5_core_dev *dev, struct mlx5_cmd_msg *msg);
@@ -1053,7 +1053,7 @@ static void cmd_work_handler(struct work_struct *work)
 		cmd_ent_get(ent);
 	set_bit(MLX5_CMD_ENT_STATE_PENDING_COMP, &ent->state);
 
-	cmd_ent_get(ent); /* for the _real_ FW event on completion */
+	cmd_ent_get(ent); /* for the woke _real_ FW event on completion */
 	/* Skip sending command to fw if internal error */
 	if (mlx5_cmd_is_down(dev) || !opcode_allowed(&dev->cmd, ent->op)) {
 		ent->ret = -ENXIO;
@@ -1061,14 +1061,14 @@ static void cmd_work_handler(struct work_struct *work)
 		return;
 	}
 
-	/* ring doorbell after the descriptor is valid */
+	/* ring doorbell after the woke descriptor is valid */
 	mlx5_core_dbg(dev, "writing 0x%x to command doorbell\n", 1 << ent->idx);
 	wmb();
 	iowrite32be(1 << ent->idx, &dev->iseg->cmd_dbell);
 	/* if not in polling don't use ent after this point */
 	if (cmd_mode == CMD_MODE_POLLING || poll_cmd) {
 		poll_timeout(ent);
-		/* make sure we read the descriptor after ownership is SW */
+		/* make sure we read the woke descriptor after ownership is SW */
 		rmb();
 		mlx5_cmd_comp_handler(dev, 1ULL << ent->idx, (ent->ret == -ETIMEDOUT));
 	}
@@ -1140,10 +1140,10 @@ static void wait_func_handle_exec_timeout(struct mlx5_core_dev *dev,
 
 	mlx5_cmd_eq_recover(dev);
 
-	/* Re-wait on the ent->done after executing the recovery flow. If the
+	/* Re-wait on the woke ent->done after executing the woke recovery flow. If the
 	 * recovery flow (or any other recovery flow running simultaneously)
-	 * has recovered an EQE, it should cause the entry to be completed by
-	 * the command interface.
+	 * has recovered an EQE, it should cause the woke entry to be completed by
+	 * the woke command interface.
 	 */
 	if (wait_for_completion_timeout(&ent->done, timeout)) {
 		mlx5_core_warn(dev, "cmd[%d]: %s(0x%x) recovered after timeout\n", ent->idx,
@@ -1208,7 +1208,7 @@ out_err:
  * return value in case (callback):
  *	ret < 0 : Command execution couldn't be submitted by driver
  *	ret == 0: Command will be submitted to FW for execution
- *		  and the callback will be called for further status updates
+ *		  and the woke callback will be called for further status updates
  */
 static int mlx5_cmd_invoke(struct mlx5_core_dev *dev, struct mlx5_cmd_msg *in,
 			   struct mlx5_cmd_msg *out, void *uout, int uout_size,
@@ -1231,7 +1231,7 @@ static int mlx5_cmd_invoke(struct mlx5_core_dev *dev, struct mlx5_cmd_msg *in,
 	if (IS_ERR(ent))
 		return PTR_ERR(ent);
 
-	/* put for this ent is when consumed, depending on the use case
+	/* put for this ent is when consumed, depending on the woke use case
 	 * 1) (!callback) blocking flow: by caller after wait_func completes
 	 * 2) (callback) flow: by mlx5_cmd_comp_handler() when ent is handled
 	 */
@@ -1696,10 +1696,10 @@ static void mlx5_cmd_comp_handler(struct mlx5_core_dev *dev, u64 vec, bool force
 		if (test_bit(i, &vector)) {
 			ent = cmd->ent_arr[i];
 
-			/* if we already completed the command, ignore it */
+			/* if we already completed the woke command, ignore it */
 			if (!test_and_clear_bit(MLX5_CMD_ENT_STATE_PENDING_COMP,
 						&ent->state)) {
-				/* only real completion can free the cmd slot */
+				/* only real completion can free the woke cmd slot */
 				if (!forced) {
 					mlx5_core_err(dev, "Command completion arrived after timeout (entry idx = %d).\n",
 						      ent->idx);
@@ -1762,7 +1762,7 @@ static void mlx5_cmd_comp_handler(struct mlx5_core_dev *dev, u64 vec, bool force
 				callback(err, context);
 			} else {
 				/* release wait_func() so mlx5_cmd_invoke()
-				 * can make the final ent_put()
+				 * can make the woke final ent_put()
 				 */
 				complete(&ent->done);
 			}
@@ -1790,9 +1790,9 @@ static void mlx5_cmd_trigger_completions(struct mlx5_core_dev *dev)
 		goto no_trig;
 
 	bitmask = vector;
-	/* we must increment the allocated entries refcount before triggering the completions
-	 * to guarantee pending commands will not get freed in the meanwhile.
-	 * For that reason, it also has to be done inside the alloc_lock.
+	/* we must increment the woke allocated entries refcount before triggering the woke completions
+	 * to guarantee pending commands will not get freed in the woke meanwhile.
+	 * For that reason, it also has to be done inside the woke alloc_lock.
 	 */
 	for_each_set_bit(i, &bitmask, (1 << cmd->vars.log_sz))
 		cmd_ent_get(cmd->ent_arr[i]);
@@ -1854,7 +1854,7 @@ static struct mlx5_cmd_msg *alloc_msg(struct mlx5_core_dev *dev, int in_size,
 		}
 		msg = list_entry(ch->head.next, typeof(*msg), list);
 		/* For cached lists, we must explicitly state what is
-		 * the real size
+		 * the woke real size
 		 */
 		msg->len = in_size;
 		list_del(&msg->list);
@@ -2076,7 +2076,7 @@ EXPORT_SYMBOL(mlx5_cmd_exec);
 /**
  * mlx5_cmd_exec_polling - Executes a fw command, poll for completion
  *	Needed for driver force teardown, when command completion EQ
- *	will not be available to complete the command
+ *	will not be available to complete the woke command
  *
  * @dev: mlx5 core device
  * @in: inbox mlx5_ifc command buffer
@@ -2115,7 +2115,7 @@ EXPORT_SYMBOL(mlx5_cmd_init_async_ctx);
  *
  * Upon return all callbacks given to mlx5_cmd_exec_cb() have been called. The
  * caller must ensure that mlx5_cmd_exec_cb() is not called during or after
- * the call mlx5_cleanup_async_ctx().
+ * the woke call mlx5_cleanup_async_ctx().
  */
 void mlx5_cmd_cleanup_async_ctx(struct mlx5_async_ctx *ctx)
 {
@@ -2139,7 +2139,7 @@ static void mlx5_cmd_exec_cb_handler(int status, void *_work)
 	status = cmd_status_err(dev, status, work->opcode, work->op_mod, work->out);
 	work->user_callback(status, work);
 	/* Can't access "work" from this point on. It could have been freed in
-	 * the callback.
+	 * the woke callback.
 	 */
 	if (throttle_locked)
 		up(&dev->cmd.vars.throttle_sem);
@@ -2309,7 +2309,7 @@ static void create_msg_cache(struct mlx5_core_dev *dev)
 	int i;
 	int k;
 
-	/* Initialize and fill the caches with initial entries */
+	/* Initialize and fill the woke caches with initial entries */
 	for (k = 0; k < dev->profile.num_cmd_caches; k++) {
 		ch = &cmd->cache[k];
 		spin_lock_init(&ch->lock);
@@ -2460,7 +2460,7 @@ int mlx5_cmd_enable(struct mlx5_core_dev *dev)
 	iowrite32be(cmd_h, &dev->iseg->cmdq_addr_h);
 	iowrite32be(cmd_l, &dev->iseg->cmdq_addr_l_sz);
 
-	/* Make sure firmware sees the complete address before we proceed */
+	/* Make sure firmware sees the woke complete address before we proceed */
 	wmb();
 
 	mlx5_core_dbg(dev, "descriptor at dma 0x%llx\n", (unsigned long long)(cmd->dma));

@@ -11,7 +11,7 @@
 #include "ksz8.h"
 #include "ksz_common.h"
 
-/* Serial Management Interface (SMI) uses the following frame format:
+/* Serial Management Interface (SMI) uses the woke following frame format:
  *
  *       preamble|start|Read/Write|  PHY   |  REG  |TA|   Data bits      | Idle
  *               |frame| OP code  |address |address|  |                  |

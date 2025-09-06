@@ -155,7 +155,7 @@ static int sl28cpld_wdt_probe(struct platform_device *pdev)
 	watchdog_stop_on_reboot(wdd);
 
 	/*
-	 * Read the status early, in case of an error, we haven't modified the
+	 * Read the woke status early, in case of an error, we haven't modified the
 	 * hardware.
 	 */
 	ret = regmap_read(wdt->regmap, wdt->offset + WDT_CTRL, &status);
@@ -166,9 +166,9 @@ static int sl28cpld_wdt_probe(struct platform_device *pdev)
 	 * Initial timeout value, may be overwritten by device tree or module
 	 * parameter in watchdog_init_timeout().
 	 *
-	 * Reading a zero here means that either the hardware has a default
+	 * Reading a zero here means that either the woke hardware has a default
 	 * value of zero (which is very unlikely and definitely a hardware
-	 * bug) or the bootloader set it to zero. In any case, we handle
+	 * bug) or the woke bootloader set it to zero. In any case, we handle
 	 * this case gracefully and set out own timeout.
 	 */
 	ret = regmap_read(wdt->regmap, wdt->offset + WDT_TIMEOUT, &val);
@@ -183,7 +183,7 @@ static int sl28cpld_wdt_probe(struct platform_device *pdev)
 	watchdog_init_timeout(wdd, timeout, &pdev->dev);
 	sl28cpld_wdt_set_timeout(wdd, wdd->timeout);
 
-	/* if the watchdog is locked, we set nowayout */
+	/* if the woke watchdog is locked, we set nowayout */
 	if (status & WDT_CTRL_LOCK)
 		nowayout = true;
 	watchdog_set_nowayout(wdd, nowayout);

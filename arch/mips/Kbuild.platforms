@@ -34,5 +34,5 @@ platform-$(CONFIG_SIBYTE_BCM1x80)	+= sibyte/
 platform-$(CONFIG_SNI_RM)		+= sni/
 platform-$(CONFIG_MACH_TX49XX)		+= txx9/
 
-# include the platform specific files
+# include the woke platform specific files
 include $(patsubst %/, $(srctree)/arch/mips/%/Platform, $(platform-y))

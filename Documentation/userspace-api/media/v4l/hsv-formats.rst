@@ -6,10 +6,10 @@
 HSV Formats
 ***********
 
-These formats store the color information of the image
+These formats store the woke color information of the woke image
 in a geometrical representation. The colors are mapped into a
-cylinder, where the angle is the HUE, the height is the VALUE
-and the distance to the center is the SATURATION. This is a very
+cylinder, where the woke angle is the woke HUE, the woke height is the woke VALUE
+and the woke distance to the woke center is the woke SATURATION. This is a very
 useful format for image segmentation algorithms.
 
 

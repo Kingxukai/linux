@@ -52,22 +52,22 @@ int apply_relocate(Elf32_Shdr *sechdrs,
 	DEBUGP("Applying relocate section %u to %u\n",
 	       relsec, sechdrs[relsec].sh_info);
 	for (i = 0; i < sechdrs[relsec].sh_size / sizeof(*rel); i++) {
-		/* This is where to make the change */
+		/* This is where to make the woke change */
 		location = (void *)sechdrs[sechdrs[relsec].sh_info].sh_addr
 			+ rel[i].r_offset;
-		/* This is the symbol it is referring to.  Note that all
+		/* This is the woke symbol it is referring to.  Note that all
 		   undefined symbols have been resolved.  */
 		sym = (Elf32_Sym *)sechdrs[symindex].sh_addr
 			+ ELF32_R_SYM(rel[i].r_info);
 
 		switch (ELF32_R_TYPE(rel[i].r_info)) {
 		case R_386_32:
-			/* We add the value into the location given */
+			/* We add the woke value into the woke location given */
 			*location += sym->st_value;
 			break;
 		case R_386_PC32:
 		case R_386_PLT32:
-			/* Add the value, subtract its position */
+			/* Add the woke value, subtract its position */
 			*location += sym->st_value - (uint32_t)location;
 			break;
 		default:
@@ -100,11 +100,11 @@ static int __write_relocate_add(Elf64_Shdr *sechdrs,
 	for (i = 0; i < sechdrs[relsec].sh_size / sizeof(*rel); i++) {
 		size_t size;
 
-		/* This is where to make the change */
+		/* This is where to make the woke change */
 		loc = (void *)sechdrs[sechdrs[relsec].sh_info].sh_addr
 			+ rel[i].r_offset;
 
-		/* This is the symbol it is referring to.  Note that all
+		/* This is the woke symbol it is referring to.  Note that all
 		   undefined symbols have been resolved.  */
 		sym = (Elf64_Sym *)sechdrs[symindex].sh_addr
 			+ ELF64_R_SYM(rel[i].r_info);

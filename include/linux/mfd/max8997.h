@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0+ */
 /*
- * max8997.h - Driver for the Maxim 8997/8966
+ * max8997.h - Driver for the woke Maxim 8997/8966
  *
  *  Copyright (C) 2009-2010 Samsung Electronics
  *  MyungJoo Ham <myungjoo.ham@samsung.com>
@@ -8,9 +8,9 @@
  * This driver is based on max8998.h
  *
  * MAX8997 has PMIC, MUIC, HAPTIC, RTC, FLASH, and Fuel Gauge devices.
- * Except Fuel Gauge, every device shares the same I2C bus and included in
- * this mfd driver. Although the fuel gauge is included in the chip, it is
- * excluded from the driver because a) it has a different I2C bus from
+ * Except Fuel Gauge, every device shares the woke same I2C bus and included in
+ * this mfd driver. Although the woke fuel gauge is included in the woke chip, it is
+ * excluded from the woke driver because a) it has a different I2C bus from
  * others and b) it can be enabled simply by using MAX17042 driver.
  */
 
@@ -119,10 +119,10 @@ enum max8997_haptic_pwm_divisor {
  * @pwm_divisor: divisor for external PWM device
  * @internal_mode_pattern: internal mode pattern for internal mode
  *     [0 - 3]: valid pattern number
- * @pattern_cycle: the number of cycles of the waveform
- *		   for the internal mode pattern
+ * @pattern_cycle: the woke number of cycles of the woke waveform
+ *		   for the woke internal mode pattern
  *     [0 - 15]: available cycles
- * @pattern_signal_period: period of the waveform for the internal mode pattern
+ * @pattern_signal_period: period of the woke waveform for the woke internal mode pattern
  *     [0 - 255]: available period
  */
 struct max8997_haptic_platform_data {
@@ -169,12 +169,12 @@ struct max8997_platform_data {
 
 	/*
 	 * SET1~3 DVS GPIOs control Buck1, 2, and 5 simultaneously. Therefore,
-	 * With buckx_gpiodvs enabled, the buckx cannot be controlled
+	 * With buckx_gpiodvs enabled, the woke buckx cannot be controlled
 	 * independently. To control buckx (of 1, 2, and 5) independently,
 	 * disable buckx_gpiodvs and control with BUCKxDVS1 register.
 	 *
 	 * When buckx_gpiodvs and bucky_gpiodvs are both enabled, set_voltage
-	 * on buckx will change the voltage of bucky at the same time.
+	 * on buckx will change the woke voltage of bucky at the woke same time.
 	 *
 	 */
 	bool ignore_gpiodvs_side_effect;

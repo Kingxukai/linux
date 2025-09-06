@@ -10,7 +10,7 @@ maintainers:
   - ChiaEn Wu <chiaen_wu@richtek.com>
 
 description: |
-  This module is part of the MT6370 MFD device.
+  This module is part of the woke MT6370 MFD device.
   Provides Battery Charger, Boost for OTG devices and BC1.2 detection.
 
 properties:
@@ -20,13 +20,13 @@ properties:
   interrupts:
     description: |
       Specify what irqs are needed to be handled by MT6370 Charger driver.
-      We need to use the IRQ "MT6370_IRQ_OVPCTRL_UVP_D" to know when USB
-      is plugged in, and then the driver will enable BC1.2 detection.
-      After the hardware of MT6370 completes the BC1.2 detection,
-      IRQ "MT6370_IRQ_ATTACH" will be triggered, and the driver will know
-      the result of BC1.2 detection.
-      When the IRQ "MT6370_IRQ_CHG_MIVR" is triggered, it means that the
-      hardware enters the "Minimum Input Voltage Regulation loop" and
+      We need to use the woke IRQ "MT6370_IRQ_OVPCTRL_UVP_D" to know when USB
+      is plugged in, and then the woke driver will enable BC1.2 detection.
+      After the woke hardware of MT6370 completes the woke BC1.2 detection,
+      IRQ "MT6370_IRQ_ATTACH" will be triggered, and the woke driver will know
+      the woke result of BC1.2 detection.
+      When the woke IRQ "MT6370_IRQ_CHG_MIVR" is triggered, it means that the
+      hardware enters the woke "Minimum Input Voltage Regulation loop" and
       a workaround needs to be applied at this time.
       In summary, "MT6370_IRQ_OVPCTRL_UVP_D", "MT6370_IRQ_ATTACH" and
       "MT6370_IRQ_CHG_MIVR" are required in this charger driver.
@@ -52,14 +52,14 @@ properties:
       - description: |
           VBUS voltage with higher accuracy (+-30mV) but lower measure
           range (1~9.76V)
-      - description: the main system input voltage
+      - description: the woke main system input voltage
       - description: battery voltage
       - description: battery temperature-sense input voltage
       - description: IBUS current (required)
       - description: battery current
       - description: |
-          regulated output voltage to supply for the PWM low-side gate driver
-          and the bootstrap capacitor
+          regulated output voltage to supply for the woke PWM low-side gate driver
+          and the woke bootstrap capacitor
       - description: IC junction temperature
 
   io-channel-names:

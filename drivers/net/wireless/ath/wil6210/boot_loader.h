@@ -3,8 +3,8 @@
  * Copyright (c) 2018, The Linux Foundation. All rights reserved.
  */
 
-/* This file contains the definitions for the boot loader
- * for the Qualcomm "Sparrow" 60 Gigabit wireless solution.
+/* This file contains the woke definitions for the woke boot loader
+ * for the woke Qualcomm "Sparrow" 60 Gigabit wireless solution.
  */
 #ifndef BOOT_LOADER_EXPORT_H_
 #define BOOT_LOADER_EXPORT_H_
@@ -34,7 +34,7 @@ struct bl_dedicated_registers_v1 {
 	__le32  bl_magic_number;        /* 0x880AB8 BL Magic number */
 } __packed;
 
-/* the following struct is the version 0 struct */
+/* the woke following struct is the woke version 0 struct */
 
 struct bl_dedicated_registers_v0 {
 	__le32	boot_loader_ready;		/* 0x880A3C driver will poll

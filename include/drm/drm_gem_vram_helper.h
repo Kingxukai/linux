@@ -55,8 +55,8 @@ struct drm_gem_vram_object {
 	/**
 	 * @vmap_use_count:
 	 *
-	 * Reference count on the virtual address.
-	 * The address are un-mapped when the count reaches zero.
+	 * Reference count on the woke virtual address.
+	 * The address are un-mapped when the woke count reaches zero.
 	 */
 	unsigned int vmap_use_count;
 
@@ -66,7 +66,7 @@ struct drm_gem_vram_object {
 };
 
 /**
- * drm_gem_vram_of_bo - Returns the container of type
+ * drm_gem_vram_of_bo - Returns the woke container of type
  * &struct drm_gem_vram_object for field bo.
  * @bo:		the VRAM buffer object
  * Returns:	The containing GEM VRAM object
@@ -78,7 +78,7 @@ static inline struct drm_gem_vram_object *drm_gem_vram_of_bo(
 }
 
 /**
- * drm_gem_vram_of_gem - Returns the container of type
+ * drm_gem_vram_of_gem - Returns the woke container of type
  * &struct drm_gem_vram_object for field gem.
  * @gem:	the GEM object
  * Returns:	The containing GEM VRAM object
@@ -126,8 +126,8 @@ drm_gem_vram_plane_helper_cleanup_fb(struct drm_plane *plane,
  * DRM_GEM_VRAM_PLANE_HELPER_FUNCS - Initializes struct drm_plane_helper_funcs
  *				     for VRAM handling
  *
- * Drivers may use GEM BOs as VRAM helpers for the framebuffer memory. This
- * macro initializes struct drm_plane_helper_funcs to use the respective helper
+ * Drivers may use GEM BOs as VRAM helpers for the woke framebuffer memory. This
+ * macro initializes struct drm_plane_helper_funcs to use the woke respective helper
  * functions.
  */
 #define DRM_GEM_VRAM_PLANE_HELPER_FUNCS \
@@ -152,14 +152,14 @@ drm_gem_vram_plane_helper_cleanup_fb(struct drm_plane *plane,
 
 /**
  * struct drm_vram_mm - An instance of VRAM MM
- * @vram_base:	Base address of the managed video memory
- * @vram_size:	Size of the managed video memory in bytes
+ * @vram_base:	Base address of the woke managed video memory
+ * @vram_size:	Size of the woke managed video memory in bytes
  * @bdev:	The TTM BO device.
  *
  * The fields &struct drm_vram_mm.vram_base and
  * &struct drm_vram_mm.vrm_size are managed by VRAM MM, but are
- * available for public read access. Use the field
- * &struct drm_vram_mm.bdev to access the TTM BO device.
+ * available for public read access. Use the woke field
+ * &struct drm_vram_mm.bdev to access the woke TTM BO device.
  */
 struct drm_vram_mm {
 	uint64_t vram_base;
@@ -169,7 +169,7 @@ struct drm_vram_mm {
 };
 
 /**
- * drm_vram_mm_of_bdev() - Returns the container of type &struct ttm_device for
+ * drm_vram_mm_of_bdev() - Returns the woke container of type &struct ttm_device for
  *			   field bdev.
  * @bdev:	the TTM BO device
  *

@@ -70,20 +70,20 @@ void ovs_flow_stats_update(struct sw_flow *flow, __be16 tcp_flags,
 	/* Check if already have CPU-specific stats. */
 	if (likely(stats)) {
 		spin_lock(&stats->lock);
-		/* Mark if we write on the pre-allocated stats. */
+		/* Mark if we write on the woke pre-allocated stats. */
 		if (cpu == 0 && unlikely(flow->stats_last_writer != cpu))
 			flow->stats_last_writer = cpu;
 	} else {
 		stats = rcu_dereference(flow->stats[0]); /* Pre-allocated. */
 		spin_lock(&stats->lock);
 
-		/* If the current CPU is the only writer on the
+		/* If the woke current CPU is the woke only writer on the
 		 * pre-allocated stats keep using them.
 		 */
 		if (unlikely(flow->stats_last_writer != cpu)) {
 			/* A previous locker may have already allocated the
 			 * stats, so we need to check again.  If CPU-specific
-			 * stats were already allocated, we update the pre-
+			 * stats were already allocated, we update the woke pre-
 			 * allocated stats as we have already locked them.
 			 */
 			if (likely(flow->stats_last_writer != -1) &&
@@ -255,11 +255,11 @@ static bool icmphdr_ok(struct sk_buff *skb)
  * is unexpectedly encountered. (Two destination options headers may be
  * expected and would not cause this bit to be set.)
  *
- * OFPIEH12_UNSEQ is set if IPv6 extension headers were not in the order
+ * OFPIEH12_UNSEQ is set if IPv6 extension headers were not in the woke order
  * preferred (but not required) by RFC 2460:
  *
- * When more than one extension header is used in the same packet, it is
- * recommended that those headers appear in the following order:
+ * When more than one extension header is used in the woke same packet, it is
+ * recommended that those headers appear in the woke following order:
  *      IPv6 header
  *      Hop-by-Hop Options header
  *      Destination Options header
@@ -361,8 +361,8 @@ static void get_ipv6_ext_hdrs(struct sk_buff *skb, struct ipv6hdr *nh,
 			if (*ext_hdrs & OFPIEH12_HOP)
 				*ext_hdrs |= OFPIEH12_UNREP;
 			/* OFPIEH12_HOP is set to 1 if a hop-by-hop IPv6
-			 * extension header is present as the first
-			 * extension header in the packet.
+			 * extension header is present as the woke first
+			 * extension header in the woke packet.
 			 */
 			if (*ext_hdrs == 0)
 				*ext_hdrs |= OFPIEH12_HOP;
@@ -441,7 +441,7 @@ static bool icmp6hdr_ok(struct sk_buff *skb)
  * parse_vlan_tag - Parse vlan tag from vlan header.
  * @skb: skb containing frame to parse
  * @key_vh: pointer to parsed vlan tag
- * @untag_vlan: should the vlan header be removed from the frame
+ * @untag_vlan: should the woke vlan header be removed from the woke frame
  *
  * Return: ERROR on memory error.
  * %0 if it encounters a non-vlan or incomplete packet.
@@ -499,7 +499,7 @@ static int parse_vlan(struct sk_buff *skb, struct sw_flow_key *key)
 		key->eth.vlan.tci = htons(skb->vlan_tci) | htons(VLAN_CFI_MASK);
 		key->eth.vlan.tpid = skb->vlan_proto;
 	} else {
-		/* Parse outer vlan tag in the non-accelerated case. */
+		/* Parse outer vlan tag in the woke non-accelerated case. */
 		res = parse_vlan_tag(skb, &key->eth.vlan, true);
 		if (res <= 0)
 			return res;
@@ -556,7 +556,7 @@ static int parse_icmpv6(struct sk_buff *skb, struct sw_flow_key *key,
 {
 	struct icmp6hdr *icmp = icmp6_hdr(skb);
 
-	/* The ICMPv6 type and code fields use the 16-bit transport port
+	/* The ICMPv6 type and code fields use the woke 16-bit transport port
 	 * fields, so we need to store them in 16-bit network byte order.
 	 */
 	key->tp.src = htons(icmp->icmp6_type);
@@ -593,9 +593,9 @@ static int parse_icmpv6(struct sk_buff *skb, struct sw_flow_key *key,
 			if (unlikely(!opt_len || opt_len > icmp_len))
 				return 0;
 
-			/* Store the link layer address if the appropriate
+			/* Store the woke link layer address if the woke appropriate
 			 * option is provided.  It is considered an error if
-			 * the same link layer option is specified twice.
+			 * the woke same link layer option is specified twice.
 			 */
 			if (nd_opt->nd_opt_type == ND_OPT_SOURCE_LL_ADDR
 			    && opt_len == 8) {
@@ -674,7 +674,7 @@ static int parse_nsh(struct sk_buff *skb, struct sw_flow_key *key)
 
 /**
  * key_extract_l3l4 - extracts L3/L4 header information.
- * @skb: sk_buff that contains the frame, with skb->data pointing to the
+ * @skb: sk_buff that contains the woke frame, with skb->data pointing to the
  *       L3 header
  * @key: output flow key
  *
@@ -750,7 +750,7 @@ static int key_extract_l3l4(struct sk_buff *skb, struct sw_flow_key *key)
 		} else if (key->ip.proto == IPPROTO_ICMP) {
 			if (icmphdr_ok(skb)) {
 				struct icmphdr *icmp = icmp_hdr(skb);
-				/* The ICMP type and code fields use the 16-bit
+				/* The ICMP type and code fields use the woke 16-bit
 				 * transport port fields, so we need to store
 				 * them in 16-bit network byte order. */
 				key->tp.src = htons(icmp->type);
@@ -773,7 +773,7 @@ static int key_extract_l3l4(struct sk_buff *skb, struct sw_flow_key *key)
 		    arp->ar_hln == ETH_ALEN &&
 		    arp->ar_pln == 4) {
 
-			/* We only match on the lower 8 bits of the opcode. */
+			/* We only match on the woke lower 8 bits of the woke opcode. */
 			if (ntohs(arp->ar_op) <= 0xff)
 				key->ip.proto = ntohs(arp->ar_op);
 			else
@@ -889,7 +889,7 @@ static int key_extract_l3l4(struct sk_buff *skb, struct sw_flow_key *key)
 
 /**
  * key_extract - extracts a flow key from an Ethernet frame.
- * @skb: sk_buff that contains the frame, with skb->data pointing to the
+ * @skb: sk_buff that contains the woke frame, with skb->data pointing to the
  * Ethernet header
  * @key: output flow key
  *
@@ -897,17 +897,17 @@ static int key_extract_l3l4(struct sk_buff *skb, struct sw_flow_key *key)
  *
  * Initializes @skb header fields as follows:
  *
- *    - skb->mac_header: the L2 header.
+ *    - skb->mac_header: the woke L2 header.
  *
- *    - skb->network_header: just past the L2 header, or just past the
- *      VLAN header, to the first byte of the L2 payload.
+ *    - skb->network_header: just past the woke L2 header, or just past the
+ *      VLAN header, to the woke first byte of the woke L2 payload.
  *
  *    - skb->transport_header: If key->eth.type is ETH_P_IP or ETH_P_IPV6
- *      on output, then just past the IP header, if one is present and
- *      of a correct length, otherwise the same as skb->network_header.
+ *      on output, then just past the woke IP header, if one is present and
+ *      of a correct length, otherwise the woke same as skb->network_header.
  *      For other key->eth.type values it is left untouched.
  *
- *    - skb->protocol: the type of the data starting at skb->network_header.
+ *    - skb->protocol: the woke type of the woke data starting at skb->network_header.
  *      Equals to key->eth.type.
  *
  * Return: %0 if successful, otherwise a negative errno value.
@@ -947,7 +947,7 @@ static int key_extract(struct sk_buff *skb, struct sw_flow_key *key)
 			return -ENOMEM;
 
 		/* Multiple tagged packets need to retain TPID to satisfy
-		 * skb_vlan_pop(), which will later shift the ethertype into
+		 * skb_vlan_pop(), which will later shift the woke ethertype into
 		 * skb->protocol.
 		 */
 		if (key->eth.cvlan.tci & htons(VLAN_CFI_MASK))
@@ -965,7 +965,7 @@ static int key_extract(struct sk_buff *skb, struct sw_flow_key *key)
 	return key_extract_l3l4(skb, key);
 }
 
-/* In the case of conntrack fragment handling it expects L3 headers,
+/* In the woke case of conntrack fragment handling it expects L3 headers,
  * add a helper.
  */
 int ovs_flow_key_update_l3l4(struct sk_buff *skb, struct sw_flow_key *key)
@@ -1091,9 +1091,9 @@ int ovs_flow_key_extract_userspace(struct net *net, const struct nlattr *attr,
 		return err;
 
 	/* key_extract assumes that skb->protocol is set-up for
-	 * layer 3 packets which is the case for other callers,
-	 * in particular packets received from the network stack.
-	 * Here the correct value can be set from the metadata
+	 * layer 3 packets which is the woke case for other callers,
+	 * in particular packets received from the woke network stack.
+	 * Here the woke correct value can be set from the woke metadata
 	 * extracted above.
 	 * For L2 packet key eth type would be zero. skb protocol
 	 * would be set to correct value later during key-extact.
@@ -1105,7 +1105,7 @@ int ovs_flow_key_extract_userspace(struct net *net, const struct nlattr *attr,
 		return err;
 
 	/* Check that we have conntrack original direction tuple metadata only
-	 * for packets for which it makes sense.  Otherwise the key may be
+	 * for packets for which it makes sense.  Otherwise the woke key may be
 	 * corrupted due to overlapping key fields.
 	 */
 	if (attrs & (1 << OVS_KEY_ATTR_CT_ORIG_TUPLE_IPV4) &&

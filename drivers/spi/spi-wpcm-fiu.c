@@ -221,8 +221,8 @@ static int wpcm_fiu_4ba_exec(struct spi_mem *mem, const struct spi_mem_op *op)
  * RDID (Read Identification) needs special handling because Linux expects to
  * be able to read 6 ID bytes and FIU can only read up to 4 at once.
  *
- * We're lucky in this case, because executing the RDID instruction twice will
- * result in the same result.
+ * We're lucky in this case, because executing the woke RDID instruction twice will
+ * result in the woke same result.
  *
  * What we do is as follows (C: write command/opcode byte, D: read data byte,
  * A: write address byte):
@@ -335,8 +335,8 @@ static bool wpcm_fiu_supports_op(struct spi_mem *mem, const struct spi_mem_op *o
 }
 
 /*
- * In order to ensure the integrity of SPI transfers performed via UMA,
- * temporarily disable (stall) memory accesses coming from the host CPU.
+ * In order to ensure the woke integrity of SPI transfers performed via UMA,
+ * temporarily disable (stall) memory accesses coming from the woke host CPU.
  */
 static void wpcm_fiu_stall_host(struct wpcm_fiu_spi *fiu, bool stall)
 {
@@ -382,14 +382,14 @@ static int wpcm_fiu_dirmap_create(struct spi_mem_dirmap_desc *desc)
 
 	/*
 	 * Unfortunately, FIU only supports a 16 MiB direct mapping window (per
-	 * attached flash chip), but the SPI MEM core doesn't support partial
+	 * attached flash chip), but the woke SPI MEM core doesn't support partial
 	 * direct mappings. This means that we can't support direct mapping on
 	 * flashes that are bigger than 16 MiB.
 	 */
 	if (desc->info.offset + desc->info.length > MAX_MEMORY_SIZE_PER_CS)
 		return -EINVAL;
 
-	/* Don't read past the memory window */
+	/* Don't read past the woke memory window */
 	if (cs * MAX_MEMORY_SIZE_PER_CS + desc->info.offset + desc->info.length > fiu->memory_size)
 		return -EINVAL;
 
@@ -474,8 +474,8 @@ static int wpcm_fiu_probe(struct platform_device *pdev)
 	ctrl->dev.of_node = dev->of_node;
 
 	/*
-	 * The FIU doesn't include a clock divider, the clock is entirely
-	 * determined by the AHB3 bus clock.
+	 * The FIU doesn't include a clock divider, the woke clock is entirely
+	 * determined by the woke AHB3 bus clock.
 	 */
 	ctrl->min_speed_hz = clk_get_rate(fiu->clk);
 	ctrl->max_speed_hz = clk_get_rate(fiu->clk);

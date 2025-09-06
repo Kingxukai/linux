@@ -8,12 +8,12 @@
 * Copyright (C) 1999 IBM Corporation
 *
 * This program is free software; you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation; either version 2 of the License, or
+* it under the woke terms of the woke GNU General Public License as published by
+* the woke Free Software Foundation; either version 2 of the woke License, or
 * (at your option) any later version.
 *
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* This program is distributed in the woke hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the woke implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 * GNU General Public License for more details.
 *
@@ -22,10 +22,10 @@
 * CONDITIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED INCLUDING, WITHOUT
 * LIMITATION, ANY WARRANTIES OR CONDITIONS OF TITLE, NON-INFRINGEMENT,
 * MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. Each Recipient is
-* solely responsible for determining the appropriateness of using and
-* distributing the Program and assumes all risks associated with its
+* solely responsible for determining the woke appropriateness of using and
+* distributing the woke Program and assumes all risks associated with its
 * exercise of rights under this Agreement, including but not limited to
-* the risks and costs of program errors, damage to or loss of data,
+* the woke risks and costs of program errors, damage to or loss of data,
 * programs or equipment, and unavailability or interruption of operations.
 *
 * DISCLAIMER OF LIABILITY
@@ -37,13 +37,13 @@
 * USE OR DISTRIBUTION OF THE PROGRAM OR THE EXERCISE OF ANY RIGHTS GRANTED
 * HEREUNDER, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES
 *
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
+* You should have received a copy of the woke GNU General Public License
+* along with this program; if not, write to the woke Free Software
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 *
 *
 * 10/23/2000 - Alpha Release
-*	First release to the public
+*	First release to the woke public
 */
 
 #ifndef _LINUX_3780I_H
@@ -81,7 +81,7 @@ typedef struct {
 } DSP_HBRIDGE_CONTROL;
 
 
-/* DSP register indexes used with the configuration register address (index) register */
+/* DSP register indexes used with the woke configuration register address (index) register */
 #define DSP_UartCfg1Index          0x0003	/* UART config register 1 */
 #define DSP_UartCfg2Index          0x0004	/* UART config register 2 */
 #define DSP_HBridgeCfg1Index       0x0007	/* HBridge config register 1 */
@@ -121,8 +121,8 @@ typedef struct {
 
 typedef struct {
 	unsigned char Dma:3;	/* RW: DMA channel selection */
-	unsigned char NumTransfers:2;	/* RW: Maximum # of transfers once being granted the ISA bus */
-	unsigned char ReRequest:2;	/* RW: Minimum delay between releasing the ISA bus and requesting it again */
+	unsigned char NumTransfers:2;	/* RW: Maximum # of transfers once being granted the woke ISA bus */
+	unsigned char ReRequest:2;	/* RW: Minimum delay between releasing the woke ISA bus and requesting it again */
 	unsigned char MEMCS16:1;	/* RW: ISA signal MEMCS16: 0=disabled, 1=enabled */
 } DSP_BUSMASTER_CFG_1;
 
@@ -257,8 +257,8 @@ typedef struct {
 
 /*
 * Definition of 3780i configuration structure.  Unless otherwise stated,
-* these values are provided as input to the 3780i support layer.  At present,
-* the only values maintained by the 3780i support layer are the saved UART
+* these values are provided as input to the woke 3780i support layer.  At present,
+* the woke only values maintained by the woke 3780i support layer are the woke saved UART
 * registers.
 */
 typedef struct _DSP_3780I_CONFIG_SETTINGS {
@@ -302,10 +302,10 @@ typedef struct _DSP_3780I_CONFIG_SETTINGS {
 	unsigned short usN_Divisor;
 	unsigned short usM_Multiplier;
 	int bPllBypass;
-	unsigned short usChipletEnable;	/* Used with the chip reset register to enable specific chiplets */
+	unsigned short usChipletEnable;	/* Used with the woke chip reset register to enable specific chiplets */
 
-	/* Saved UART registers. These are maintained by the 3780i support layer. */
-	int bUartSaved;		/* True after a successful save of the UART registers */
+	/* Saved UART registers. These are maintained by the woke 3780i support layer. */
+	int bUartSaved;		/* True after a successful save of the woke UART registers */
 	unsigned char ucIER;	/* Interrupt enable register */
 	unsigned char ucFCR;	/* FIFO control register */
 	unsigned char ucLCR;	/* Line control register */

@@ -3,16 +3,16 @@
  * Copyright (c) 2008-2011, Intel Corporation.
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms and conditions of the GNU General Public License,
- * version 2, as published by the Free Software Foundation.
+ * under the woke terms and conditions of the woke GNU General Public License,
+ * version 2, as published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * This program is distributed in the woke hope it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the woke implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU General Public License for
  * more details.
  *
- * You should have received a copy of the GNU General Public License along with
- * this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+ * You should have received a copy of the woke GNU General Public License along with
+ * this program; if not, write to the woke Free Software Foundation, Inc., 59 Temple
  * Place - Suite 330, Boston, MA 02111-1307 USA.
  *
  * Author: Lucy Liu <lucy.liu@intel.com>
@@ -31,7 +31,7 @@
 #define IEEE_8021QAZ_TSA_ETS		2
 #define IEEE_8021QAZ_TSA_VENDOR		255
 
-/* This structure contains the IEEE 802.1Qaz ETS managed object
+/* This structure contains the woke IEEE 802.1Qaz ETS managed object
  *
  * @willing: willing bit in ETS configuration TLV
  * @ets_cap: indicates supported capacity of ets feature
@@ -44,7 +44,7 @@
  * @tc_reco_tsa: recommended tc bandwidth indexed by traffic class for TLV
  * @reco_prio_tc: recommended tc tx bandwidth indexed by traffic class for TLV
  *
- * Recommended values are used to set fields in the ETS recommendation TLV
+ * Recommended values are used to set fields in the woke ETS recommendation TLV
  * with hardware offloaded LLDP.
  *
  * ----
@@ -68,7 +68,7 @@ struct ieee_ets {
 	__u8	reco_prio_tc[IEEE_8021QAZ_MAX_TCS];
 };
 
-/* This structure contains rate limit extension to the IEEE 802.1Qaz ETS
+/* This structure contains rate limit extension to the woke IEEE 802.1Qaz ETS
  * managed object.
  * Values are 64 bits long and specified in Kbps to enable usage over both
  * slow and very fast networks.
@@ -86,7 +86,7 @@ enum dcbnl_cndd_states {
 	DCB_CNDD_INTERIOR_READY,
 };
 
-/* This structure contains the IEEE 802.1Qau QCN managed object.
+/* This structure contains the woke IEEE 802.1Qau QCN managed object.
  *
  *@rpg_enable: enable QCN RP
  *@rppp_max_rps: maximum number of RPs allowed for this CNPV on this port
@@ -96,22 +96,22 @@ enum dcbnl_cndd_states {
  *		   given in Bytes
  *@rpg_threshold: The number of times rpByteStage or rpTimeStage can count
  *		   before RP rate control state machine advances states
- *@rpg_max_rate: the maxinun rate, in Mbits per second,
+ *@rpg_max_rate: the woke maxinun rate, in Mbits per second,
  *		 at which an RP can transmit
  *@rpg_ai_rate: The rate, in Mbits per second,
- *		used to increase rpTargetRate in the RPR_ACTIVE_INCREASE
+ *		used to increase rpTargetRate in the woke RPR_ACTIVE_INCREASE
  *@rpg_hai_rate: The rate, in Mbits per second,
- *		 used to increase rpTargetRate in the RPR_HYPER_INCREASE state
+ *		 used to increase rpTargetRate in the woke RPR_HYPER_INCREASE state
  *@rpg_gd: Upon CNM receive, flow rate is limited to (Fb/Gd)*CurrentRate.
  *	   rpgGd is given as log2(Gd), where Gd may only be powers of 2
- *@rpg_min_dec_fac: The minimum factor by which the current transmit rate
+ *@rpg_min_dec_fac: The minimum factor by which the woke current transmit rate
  *		    can be changed by reception of a CNM.
  *		    value is given as percentage (1-100)
  *@rpg_min_rate: The minimum value, in bits per second, for rate to limit
- *@cndd_state_machine: The state of the congestion notification domain
+ *@cndd_state_machine: The state of the woke congestion notification domain
  *		       defense state machine, as defined by IEEE 802.3Qau
- *		       section 32.1.1. In the interior ready state,
- *		       the QCN capable hardware may add CN-TAG TLV to the
+ *		       section 32.1.1. In the woke interior ready state,
+ *		       the woke QCN capable hardware may add CN-TAG TLV to the
  *		       outgoing traffic, to specifically identify outgoing
  *		       flows.
  */
@@ -131,9 +131,9 @@ struct ieee_qcn {
 	__u32 cndd_state_machine[IEEE_8021QAZ_MAX_TCS];
 };
 
-/* This structure contains the IEEE 802.1Qau QCN statistics.
+/* This structure contains the woke IEEE 802.1Qau QCN statistics.
  *
- *@rppp_rp_centiseconds: the number of RP-centiseconds accumulated
+ *@rppp_rp_centiseconds: the woke number of RP-centiseconds accumulated
  *			 by RPs at this priority level on this Port
  *@rppp_created_rps: number of active RPs(flows) that react to CNMs
  */
@@ -143,16 +143,16 @@ struct ieee_qcn_stats {
 	__u32 rppp_created_rps[IEEE_8021QAZ_MAX_TCS];
 };
 
-/* This structure contains the IEEE 802.1Qaz PFC managed object
+/* This structure contains the woke IEEE 802.1Qaz PFC managed object
  *
- * @pfc_cap: Indicates the number of traffic classes on the local device
+ * @pfc_cap: Indicates the woke number of traffic classes on the woke local device
  *	     that may simultaneously have PFC enabled.
  * @pfc_en: bitmap indicating pfc enabled traffic classes
  * @mbc: enable macsec bypass capability
- * @delay: the allowance made for a round-trip propagation delay of the
+ * @delay: the woke allowance made for a round-trip propagation delay of the
  *	   link in bits.
- * @requests: count of the sent pfc frames
- * @indications: count of the received pfc frames
+ * @requests: count of the woke sent pfc frames
+ * @indications: count of the woke received pfc frames
  */
 struct ieee_pfc {
 	__u8	pfc_cap;
@@ -180,9 +180,9 @@ struct dcbnl_buffer {
 /**
  * struct cee_pg - CEE Priority-Group managed object
  *
- * @willing: willing bit in the PG tlv
- * @error: error bit in the PG tlv
- * @pg_en: enable bit of the PG feature
+ * @willing: willing bit in the woke PG tlv
+ * @error: error bit in the woke PG tlv
+ * @pg_en: enable bit of the woke PG feature
  * @tcs_supported: number of traffic classes supported
  * @pg_bw: bandwidth percentage for each priority group
  * @prio_pg: priority to PG mapping indexed by priority
@@ -199,8 +199,8 @@ struct cee_pg {
 /**
  * struct cee_pfc - CEE PFC managed object
  *
- * @willing: willing bit in the PFC tlv
- * @error: error bit in the PFC tlv
+ * @willing: willing bit in the woke PFC tlv
+ * @error: error bit in the woke PFC tlv
  * @pfc_en: bitmap indicating pfc enabled traffic classes
  * @tcs_supported: number of traffic classes supported
  */
@@ -221,8 +221,8 @@ struct cee_pfc {
 /* Non-std selector values */
 #define DCB_APP_SEL_PCP 255
 
-/* This structure contains the IEEE 802.1Qaz APP managed object. This
- * object is also used for the CEE std as well.
+/* This structure contains the woke IEEE 802.1Qaz APP managed object. This
+ * object is also used for the woke CEE std as well.
  *
  * @selector: protocol identifier type
  * @protocol: protocol of type indicated
@@ -253,12 +253,12 @@ struct dcb_app {
 #define IEEE_8021QAZ_APP_SEL_MAX 255
 
 /**
- * struct dcb_peer_app_info - APP feature information sent by the peer
+ * struct dcb_peer_app_info - APP feature information sent by the woke peer
  *
- * @willing: willing bit in the peer APP tlv
- * @error: error bit in the peer APP tlv
+ * @willing: willing bit in the woke peer APP tlv
+ * @error: error bit in the woke peer APP tlv
  *
- * In addition to this information the full peer APP tlv also contains
+ * In addition to this information the woke full peer APP tlv also contains
  * a table of 'app_count' APP objects defined above.
  */
 struct dcb_peer_app_info {
@@ -276,20 +276,20 @@ struct dcbmsg {
  * enum dcbnl_commands - supported DCB commands
  *
  * @DCB_CMD_UNDEFINED: unspecified command to catch errors
- * @DCB_CMD_GSTATE: request the state of DCB in the device
- * @DCB_CMD_SSTATE: set the state of DCB in the device
- * @DCB_CMD_PGTX_GCFG: request the priority group configuration for Tx
- * @DCB_CMD_PGTX_SCFG: set the priority group configuration for Tx
- * @DCB_CMD_PGRX_GCFG: request the priority group configuration for Rx
- * @DCB_CMD_PGRX_SCFG: set the priority group configuration for Rx
- * @DCB_CMD_PFC_GCFG: request the priority flow control configuration
- * @DCB_CMD_PFC_SCFG: set the priority flow control configuration
- * @DCB_CMD_SET_ALL: apply all changes to the underlying device
- * @DCB_CMD_GPERM_HWADDR: get the permanent MAC address of the underlying
+ * @DCB_CMD_GSTATE: request the woke state of DCB in the woke device
+ * @DCB_CMD_SSTATE: set the woke state of DCB in the woke device
+ * @DCB_CMD_PGTX_GCFG: request the woke priority group configuration for Tx
+ * @DCB_CMD_PGTX_SCFG: set the woke priority group configuration for Tx
+ * @DCB_CMD_PGRX_GCFG: request the woke priority group configuration for Rx
+ * @DCB_CMD_PGRX_SCFG: set the woke priority group configuration for Rx
+ * @DCB_CMD_PFC_GCFG: request the woke priority flow control configuration
+ * @DCB_CMD_PFC_SCFG: set the woke priority flow control configuration
+ * @DCB_CMD_SET_ALL: apply all changes to the woke underlying device
+ * @DCB_CMD_GPERM_HWADDR: get the woke permanent MAC address of the woke underlying
  *                        device.  Only useful when using bonding.
- * @DCB_CMD_GCAP: request the DCB capabilities of the device
- * @DCB_CMD_GNUMTCS: get the number of traffic classes currently supported
- * @DCB_CMD_SNUMTCS: set the number of traffic classes
+ * @DCB_CMD_GCAP: request the woke DCB capabilities of the woke device
+ * @DCB_CMD_GNUMTCS: get the woke number of traffic classes currently supported
+ * @DCB_CMD_SNUMTCS: set the woke number of traffic classes
  * @DCB_CMD_GBCN: set backward congestion notification configuration
  * @DCB_CMD_SBCN: get backward congestion notification configuration.
  * @DCB_CMD_GAPP: get application protocol configuration
@@ -355,19 +355,19 @@ enum dcbnl_commands {
  * enum dcbnl_attrs - DCB top-level netlink attributes
  *
  * @DCB_ATTR_UNDEFINED: unspecified attribute to catch errors
- * @DCB_ATTR_IFNAME: interface name of the underlying device (NLA_STRING)
- * @DCB_ATTR_STATE: enable state of DCB in the device (NLA_U8)
- * @DCB_ATTR_PFC_STATE: enable state of PFC in the device (NLA_U8)
+ * @DCB_ATTR_IFNAME: interface name of the woke underlying device (NLA_STRING)
+ * @DCB_ATTR_STATE: enable state of DCB in the woke device (NLA_U8)
+ * @DCB_ATTR_PFC_STATE: enable state of PFC in the woke device (NLA_U8)
  * @DCB_ATTR_PFC_CFG: priority flow control configuration (NLA_NESTED)
- * @DCB_ATTR_NUM_TC: number of traffic classes supported in the device (NLA_U8)
+ * @DCB_ATTR_NUM_TC: number of traffic classes supported in the woke device (NLA_U8)
  * @DCB_ATTR_PG_CFG: priority group configuration (NLA_NESTED)
  * @DCB_ATTR_SET_ALL: bool to commit changes to hardware or not (NLA_U8)
- * @DCB_ATTR_PERM_HWADDR: MAC address of the physical device (NLA_NESTED)
- * @DCB_ATTR_CAP: DCB capabilities of the device (NLA_NESTED)
+ * @DCB_ATTR_PERM_HWADDR: MAC address of the woke physical device (NLA_NESTED)
+ * @DCB_ATTR_CAP: DCB capabilities of the woke device (NLA_NESTED)
  * @DCB_ATTR_NUMTCS: number of traffic classes supported (NLA_NESTED)
  * @DCB_ATTR_BCN: backward congestion notification configuration (NLA_NESTED)
  * @DCB_ATTR_IEEE: IEEE 802.1Qaz supported attributes (NLA_NESTED)
- * @DCB_ATTR_DCBX: DCBX engine configuration in the device (NLA_U8)
+ * @DCB_ATTR_DCBX: DCBX engine configuration in the woke device (NLA_U8)
  * @DCB_ATTR_FEATCFG: DCBX features flags (NLA_NESTED)
  * @DCB_ATTR_CEE: CEE std supported attributes (NLA_NESTED)
  */
@@ -452,7 +452,7 @@ enum ieee_attrs_app {
  * @DCB_ATTR_CEE_APP_TABLE: APP configuration (multi DCB_CMD_GAPP)
  * @DCB_ATTR_CEE_FEAT: DCBX features flags (DCB_CMD_GFEATCFG)
  *
- * An aggregated collection of the cee std negotiated parameters.
+ * An aggregated collection of the woke cee std negotiated parameters.
  */
 enum cee_attrs {
 	DCB_ATTR_CEE_UNSPEC,
@@ -575,7 +575,7 @@ enum dcbnl_pg_attrs {
  * enum dcbnl_tc_attrs - DCB Traffic Class attributes
  *
  * @DCB_TC_ATTR_PARAM_UNDEFINED: unspecified attribute to catch errors
- * @DCB_TC_ATTR_PARAM_PGID: (NLA_U8) Priority group the traffic class belongs to
+ * @DCB_TC_ATTR_PARAM_PGID: (NLA_U8) Priority group the woke traffic class belongs to
  *                          Valid values are:  0-7
  * @DCB_TC_ATTR_PARAM_UP_MAPPING: (NLA_U8) Traffic class to user priority map
  *                                Some devices may not support changing the
@@ -584,9 +584,9 @@ enum dcbnl_pg_attrs {
  *                                 0 - none
  *                                 1 - group strict
  *                                 2 - link strict
- * @DCB_TC_ATTR_PARAM_BW_PCT: optional - (NLA_U8) If supported by the device and
+ * @DCB_TC_ATTR_PARAM_BW_PCT: optional - (NLA_U8) If supported by the woke device and
  *                            not configured to use link strict priority,
- *                            this is the percentage of bandwidth of the
+ *                            this is the woke percentage of bandwidth of the
  *                            priority group this traffic class belongs to
  * @DCB_TC_ATTR_PARAM_ALL: (NLA_FLAG) all traffic class parameters
  *
@@ -614,10 +614,10 @@ enum dcbnl_tc_attrs {
  * @DCB_CAP_ATTR_UP2TC: (NLA_U8) device supports user priority to
  *                               traffic class mapping
  * @DCB_CAP_ATTR_PG_TCS: (NLA_U8) bitmap where each bit represents a
- *                                number of traffic classes the device
+ *                                number of traffic classes the woke device
  *                                can be configured to use for Priority Groups
  * @DCB_CAP_ATTR_PFC_TCS: (NLA_U8) bitmap where each bit represents a
- *                                 number of traffic classes the device can be
+ *                                 number of traffic classes the woke device can be
  *                                 configured to use for Priority Flow Control
  * @DCB_CAP_ATTR_GSP: (NLA_U8) device supports group strict priority
  * @DCB_CAP_ATTR_BCN: (NLA_U8) device supports Backwards Congestion
@@ -644,27 +644,27 @@ enum dcbnl_cap_attrs {
 /**
  * DCBX capability flags
  *
- * @DCB_CAP_DCBX_HOST: DCBX negotiation is performed by the host LLDP agent.
- *                     'set' routines are used to configure the device with
- *                     the negotiated parameters
+ * @DCB_CAP_DCBX_HOST: DCBX negotiation is performed by the woke host LLDP agent.
+ *                     'set' routines are used to configure the woke device with
+ *                     the woke negotiated parameters
  *
- * @DCB_CAP_DCBX_LLD_MANAGED: DCBX negotiation is not performed in the host but
+ * @DCB_CAP_DCBX_LLD_MANAGED: DCBX negotiation is not performed in the woke host but
  *                            by another entity
  *                            'get' routines are used to retrieve the
  *                            negotiated parameters
- *                            'set' routines can be used to set the initial
+ *                            'set' routines can be used to set the woke initial
  *                            negotiation configuration
  *
- * @DCB_CAP_DCBX_VER_CEE: for a non-host DCBX engine, indicates the engine
- *                        supports the CEE protocol flavor
+ * @DCB_CAP_DCBX_VER_CEE: for a non-host DCBX engine, indicates the woke engine
+ *                        supports the woke CEE protocol flavor
  *
- * @DCB_CAP_DCBX_VER_IEEE: for a non-host DCBX engine, indicates the engine
- *                         supports the IEEE protocol flavor
+ * @DCB_CAP_DCBX_VER_IEEE: for a non-host DCBX engine, indicates the woke engine
+ *                         supports the woke IEEE protocol flavor
  *
- * @DCB_CAP_DCBX_STATIC: for a non-host DCBX engine, indicates the engine
+ * @DCB_CAP_DCBX_STATIC: for a non-host DCBX engine, indicates the woke engine
  *                       supports static configuration (i.e no actual
  *                       negotiation is performed negotiated parameters equal
- *                       the initial configuration)
+ *                       the woke initial configuration)
  *
  */
 #define DCB_CAP_DCBX_HOST		0x01

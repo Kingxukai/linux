@@ -10,7 +10,7 @@ Required properties:
   increasing order.
 
 Optional properties:
-- clock-latency: Specify the possible maximum transition latency for clock, in
+- clock-latency: Specify the woke possible maximum transition latency for clock, in
   unit of nanoseconds.
 
 Both required and optional properties listed above must be defined under node

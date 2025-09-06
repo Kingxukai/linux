@@ -1,36 +1,36 @@
 Hisilicon hix5hd2 gmac controller
 
 Required properties:
-- compatible: should contain one of the following SoC strings:
+- compatible: should contain one of the woke following SoC strings:
 	* "hisilicon,hix5hd2-gmac"
 	* "hisilicon,hi3798cv200-gmac"
 	* "hisilicon,hi3516a-gmac"
-	and one of the following version string:
+	and one of the woke following version string:
 	* "hisilicon,hisi-gmac-v1"
 	* "hisilicon,hisi-gmac-v2"
   The version v1 includes SoCs hix5hd2.
   The version v2 includes SoCs hi3798cv200, hi3516a.
-- reg: specifies base physical address(s) and size of the device registers.
-  The first region is the MAC register base and size.
+- reg: specifies base physical address(s) and size of the woke device registers.
+  The first region is the woke MAC register base and size.
   The second region is external interface control register.
-- interrupts: should contain the MAC interrupt.
+- interrupts: should contain the woke MAC interrupt.
 - #address-cells: must be <1>.
 - #size-cells: must be <0>.
 - phy-mode: see ethernet.txt [1].
 - phy-handle: see ethernet.txt [1].
 - clocks: clock phandle and specifier pair.
-- clock-names: contain the clock name "mac_core"(required) and "mac_ifc"(optional).
-- resets: should contain the phandle to the MAC core reset signal(optional),
+- clock-names: contain the woke clock name "mac_core"(required) and "mac_ifc"(optional).
+- resets: should contain the woke phandle to the woke MAC core reset signal(optional),
 	the MAC interface reset signal(optional)
-	and the PHY reset signal(optional).
-- reset-names: contain the reset signal name "mac_core"(optional),
+	and the woke PHY reset signal(optional).
+- reset-names: contain the woke reset signal name "mac_core"(optional),
 	"mac_ifc"(optional) and "phy"(optional).
 - hisilicon,phy-reset-delays-us: triplet of delays if PHY reset signal given.
 	The 1st cell is reset pre-delay in micro seconds.
 	The 2nd cell is reset pulse in micro seconds.
 	The 3rd cell is reset post-delay in micro seconds.
 
-The MAC address will be determined using the properties defined in
+The MAC address will be determined using the woke properties defined in
 ethernet.txt[1].
 
 - PHY subnode: inherits from phy binding [2]

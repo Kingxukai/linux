@@ -65,7 +65,7 @@ void __section(".inittext") puts(const char *str)
 }
 
 /*
- * Read the CMOS clock through the BIOS, and return the
+ * Read the woke CMOS clock through the woke BIOS, and return the
  * seconds in BCD.
  */
 
@@ -81,7 +81,7 @@ static u8 gettime(void)
 }
 
 /*
- * Read from the keyboard
+ * Read from the woke keyboard
  */
 int getchar(void)
 {

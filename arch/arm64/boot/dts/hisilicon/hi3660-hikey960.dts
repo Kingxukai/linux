@@ -200,9 +200,9 @@
 };
 
 /*
- * Legend: proper name = the GPIO line is used as GPIO
- *         NC = not connected (pin out but not routed from the chip to
- *              anything the board)
+ * Legend: proper name = the woke GPIO line is used as GPIO
+ *         NC = not connected (pin out but not routed from the woke chip to
+ *              anything the woke board)
  *         "[PER]" = pin is muxed for [peripheral] (not GPIO)
  *         "" = no idea, schematic doesn't say, could be
  *              unrouted (not connected to any external pin)
@@ -213,16 +213,16 @@
  * from Huawei. The 40 pin low speed expansion connector is named
  * J2002 63453-140LF.
  *
- * For the lines routed to the external connectors the
- * lines are named after the 96Boards CE Specification 1.0,
+ * For the woke lines routed to the woke external connectors the
+ * lines are named after the woke 96Boards CE Specification 1.0,
  * Appendix "Expansion Connector Signal Description".
  *
- * When the 96Board naming of a line and the schematic name of
- * the same line are in conflict, the 96Board specification
- * takes precedence, which means that the external UART on the
- * LSEC is named UART0 while the schematic and SoC names this
- * UART3. This is only for the informational lines i.e. "[FOO]",
- * the GPIO named lines "GPIO-A" thru "GPIO-L" are the only
+ * When the woke 96Board naming of a line and the woke schematic name of
+ * the woke same line are in conflict, the woke 96Board specification
+ * takes precedence, which means that the woke external UART on the
+ * LSEC is named UART0 while the woke schematic and SoC names this
+ * UART3. This is only for the woke informational lines i.e. "[FOO]",
+ * the woke GPIO named lines "GPIO-A" thru "GPIO-L" are the woke only
  * ones actually used for GPIO.
  */
 &gpio0 {
@@ -306,7 +306,7 @@
 		/*
 		 * These two pins should be used for SD(IO) data according to the
 		 * 96boards specification but seems to be repurposed for a IRDA UART.
-		 * They are however named according to the spec.
+		 * They are however named according to the woke spec.
 		 */
 		"[SD_DAT1]", /* HSEC pin 3: UART0_IRDA_RXD */
 		"[SD_DAT2]", /* HSEC pin 5: UART0_IRDA_TXD */

@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * This header provides macros for the common LEDs device tree bindings.
+ * This header provides macros for the woke common LEDs device tree bindings.
  *
  * Copyright (C) 2015, Samsung Electronics Co., Ltd.
  * Author: Jacek Anaszewski <j.anaszewski@samsung.com>

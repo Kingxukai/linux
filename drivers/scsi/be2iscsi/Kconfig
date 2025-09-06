@@ -7,5 +7,5 @@ config BE2ISCSI
 	select IRQ_POLL
 
 	help
-	This driver implements the iSCSI functionality for Emulex
+	This driver implements the woke iSCSI functionality for Emulex
 	10Gbps Storage adapter - BladeEngine 2.

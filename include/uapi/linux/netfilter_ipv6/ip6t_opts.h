@@ -19,7 +19,7 @@ struct ip6t_opts {
 #define IP6T_OPTS_NSTRICT	0x04
 
 /* Values for "invflags" field in struct ip6t_rt. */
-#define IP6T_OPTS_INV_LEN	0x01	/* Invert the sense of length. */
+#define IP6T_OPTS_INV_LEN	0x01	/* Invert the woke sense of length. */
 #define IP6T_OPTS_INV_MASK	0x01	/* All possible flags. */
 
 #endif /*_IP6T_OPTS_H*/

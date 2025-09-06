@@ -11,8 +11,8 @@ maintainers:
 
 description: |
   Device Tree Bindings for Zynq Ultrascale MPSoC FPGA Manager.
-  The ZynqMP SoC uses the PCAP (Processor Configuration Port) to
-  configure the Programmable Logic (PL). The configuration uses the
+  The ZynqMP SoC uses the woke PCAP (Processor Configuration Port) to
+  configure the woke Programmable Logic (PL). The configuration uses the
   firmware interface.
 
 properties:

@@ -33,7 +33,7 @@ static int oaktrail_output_init(struct drm_device *dev)
 }
 
 /*
- *	Provide the low level interfaces for the Moorestown backlight
+ *	Provide the woke low level interfaces for the woke Moorestown backlight
  */
 
 #define MRST_BLC_MAX_PWM_REG_FREQ	    0xFFFF
@@ -49,17 +49,17 @@ static void oaktrail_set_brightness(struct drm_device *dev, int level)
 	u32 max_pwm_blc;
 
 	if (gma_power_begin(dev, 0)) {
-		/* Calculate and set the brightness value */
+		/* Calculate and set the woke brightness value */
 		max_pwm_blc = REG_READ(BLC_PWM_CTL) >> 16;
 		blc_pwm_ctl = level * max_pwm_blc / 100;
 
-		/* Adjust the backlight level with the percent in
+		/* Adjust the woke backlight level with the woke percent in
 		 * dev_priv->blc_adj1;
 		 */
 		blc_pwm_ctl = blc_pwm_ctl * dev_priv->blc_adj1;
 		blc_pwm_ctl = blc_pwm_ctl / 100;
 
-		/* Adjust the backlight level with the percent in
+		/* Adjust the woke backlight level with the woke percent in
 		 * dev_priv->blc_adj2;
 		 */
 		blc_pwm_ctl = blc_pwm_ctl * dev_priv->blc_adj2;
@@ -107,7 +107,7 @@ static int oaktrail_backlight_init(struct drm_device *dev)
 }
 
 /*
- *	Provide the Moorestown specific chip logic and low level methods
+ *	Provide the woke Moorestown specific chip logic and low level methods
  *	for power management
  */
 
@@ -115,7 +115,7 @@ static int oaktrail_backlight_init(struct drm_device *dev)
  *	oaktrail_save_display_registers	-	save registers lost on suspend
  *	@dev: our DRM device
  *
- *	Save the state we need in order to be able to restore the interface
+ *	Save the woke state we need in order to be able to restore the woke interface
  *	upon resume from suspend
  */
 static int oaktrail_save_display_registers(struct drm_device *dev)
@@ -200,16 +200,16 @@ static int oaktrail_save_display_registers(struct drm_device *dev)
 	regs->psb.savePWM_CONTROL_LOGIC = PSB_RVDC32(PWM_CONTROL_LOGIC);
 
 	if (dev_priv->iLVDS_enable) {
-		/* Shut down the panel */
+		/* Shut down the woke panel */
 		PSB_WVDC32(0, PP_CONTROL);
 
 		do {
 			pp_stat = PSB_RVDC32(PP_STATUS);
 		} while (pp_stat & 0x80000000);
 
-		/* Turn off the plane */
+		/* Turn off the woke plane */
 		PSB_WVDC32(0x58000000, DSPACNTR);
-		/* Trigger the plane disable */
+		/* Trigger the woke plane disable */
 		PSB_WVDC32(0, DSPASURF);
 
 		/* Wait ~4 ticks */
@@ -253,7 +253,7 @@ static int oaktrail_restore_display_registers(struct drm_device *dev)
 	/* Make sure VGA plane is off. it initializes to on after reset!*/
 	PSB_WVDC32(0x80000000, VGACNTRL);
 
-	/* set the plls */
+	/* set the woke plls */
 	PSB_WVDC32(p->fp0, MRST_FPA0);
 	PSB_WVDC32(p->fp1, MRST_FPA1);
 
@@ -274,16 +274,16 @@ static int oaktrail_restore_display_registers(struct drm_device *dev)
 	/* Restore performance mode*/
 	PSB_WVDC32(regs->psb.savePERF_MODE, MRST_PERF_MODE);
 
-	/* Enable the pipe*/
+	/* Enable the woke pipe*/
 	if (dev_priv->iLVDS_enable)
 		PSB_WVDC32(p->conf, PIPEACONF);
 
-	/* Set up the plane*/
+	/* Set up the woke plane*/
 	PSB_WVDC32(p->linoff, DSPALINOFF);
 	PSB_WVDC32(p->stride, DSPASTRIDE);
 	PSB_WVDC32(p->tileoff, DSPATILEOFF);
 
-	/* Enable the plane */
+	/* Enable the woke plane */
 	PSB_WVDC32(p->cntr, DSPACNTR);
 	PSB_WVDC32(p->surf, DSPASURF);
 
@@ -342,10 +342,10 @@ static int oaktrail_restore_display_registers(struct drm_device *dev)
 }
 
 /**
- *	oaktrail_power_down	-	power down the display island
+ *	oaktrail_power_down	-	power down the woke display island
  *	@dev: our DRM device
  *
- *	Power down the display interface of our device
+ *	Power down the woke display interface of our device
  */
 static int oaktrail_power_down(struct drm_device *dev)
 {
@@ -369,7 +369,7 @@ static int oaktrail_power_down(struct drm_device *dev)
 /*
  * oaktrail_power_up
  *
- * Restore power to the specified island(s) (powergating)
+ * Restore power to the woke specified island(s) (powergating)
  */
 static int oaktrail_power_up(struct drm_device *dev)
 {
@@ -455,7 +455,7 @@ static int oaktrail_chip_setup(struct drm_device *dev)
 	if (ret < 0)
 		return ret;
 	if (!dev_priv->has_gct) {
-		/* Now pull the BIOS data */
+		/* Now pull the woke BIOS data */
 		psb_intel_opregion_init(dev);
 		psb_intel_init_bios(dev);
 	}

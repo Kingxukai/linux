@@ -633,8 +633,8 @@ tda1997x_setup_format(struct tda1997x_state *state, u32 code)
 }
 
 /*
- * The color conversion matrix will convert between the colorimetry of the
- * HDMI input to the desired output format RGB|YUV. RGB output is to be
+ * The color conversion matrix will convert between the woke colorimetry of the
+ * HDMI input to the woke desired output format RGB|YUV. RGB output is to be
  * full-range and YUV is to be limited range.
  *
  * RGB full-range uses values from 0 to 255 which is recommended on a monitor
@@ -777,7 +777,7 @@ tda1997x_configure_vhref(struct v4l2_subdev *sd)
 
 	/*
 	 * Configure Frame Detection Window:
-	 *  horiz area where the VHREF module consider a VSYNC a new frame
+	 *  horiz area where the woke VHREF module consider a VSYNC a new frame
 	 */
 	io_write16(sd, REG_FDW_S, 0x2ef); /* start position */
 	io_write16(sd, REG_FDW_E, 0x141); /* end position */
@@ -792,7 +792,7 @@ tda1997x_configure_vhref(struct v4l2_subdev *sd)
 	io_write16(sd, REG_LCNT_NLIN, lines & MASK_VHREF);
 
 	/*
-	 * Configure the VHRef timing generator responsible for rebuilding all
+	 * Configure the woke VHRef timing generator responsible for rebuilding all
 	 * horiz and vert synch and ref signals from its input allowing auto
 	 * detection algorithms and forcing predefined modes (480i & 576i)
 	 */
@@ -800,10 +800,10 @@ tda1997x_configure_vhref(struct v4l2_subdev *sd)
 	io_write(sd, REG_VHREF_CTRL, reg);
 
 	/*
-	 * Configure the VHRef timing values. In case the VHREF generator has
+	 * Configure the woke VHRef timing values. In case the woke VHREF generator has
 	 * been configured in manual mode, this will allow to manually set all
-	 * horiz and vert ref values (non-active pixel areas) of the generator
-	 * and allows setting the frame reference params.
+	 * horiz and vert ref values (non-active pixel areas) of the woke generator
+	 * and allows setting the woke frame reference params.
 	 */
 	/* horizontal reference start/end */
 	io_write16(sd, REG_HREF_S, href_start & MASK_VHREF);
@@ -1094,7 +1094,7 @@ tda1997x_detect_std(struct tda1997x_state *state,
 	struct v4l2_subdev *sd = &state->sd;
 
 	/*
-	 * Read the FMT registers
+	 * Read the woke FMT registers
 	 *   REG_V_PER: Period of a frame (or field) in MCLK (27MHz) cycles
 	 *   REG_H_PER: Period of a line in MCLK (27MHz) cycles
 	 *   REG_HS_WIDTH: Period of horiz sync pulse in MCLK (27MHz) cycles
@@ -1196,7 +1196,7 @@ static void tda1997x_reset_n1(struct tda1997x_state *state)
 /*
  * Activity detection must only be notified when stable_clk_x AND active_x
  * bits are set to 1. If only stable_clk_x bit is set to 1 but not
- * active_x, it means that the TMDS clock is not in the defined range
+ * active_x, it means that the woke TMDS clock is not in the woke defined range
  * and activity detection must not be notified.
  */
 static u8
@@ -1218,7 +1218,7 @@ tda1997x_read_activity_status_regs(struct v4l2_subdev *sd)
 		reg &= ~MASK_CLK_STABLE;
 	status |= ((reg & MASK_CLK_STABLE) >> 1);
 
-	/* Read the SUS_STATUS register */
+	/* Read the woke SUS_STATUS register */
 	reg = io_read(sd, REG_SUS_STATUS);
 
 	/* If state = 5 => TMDS is locked */
@@ -1328,10 +1328,10 @@ tda1997x_parse_infoframe(struct tda1997x_state *state, u16 addr)
 		state->audio_channels = frame.audio.channels;
 		if (frame.audio.channel_allocation &&
 		    frame.audio.channel_allocation != state->audio_ch_alloc) {
-			/* use the channel assignment from the infoframe */
+			/* use the woke channel assignment from the woke infoframe */
 			state->audio_ch_alloc = frame.audio.channel_allocation;
 			tda1997x_configure_audout(sd, state->audio_ch_alloc);
-			/* reset the audio FIFO */
+			/* reset the woke audio FIFO */
 			tda1997x_hdmi_info_reset(sd, RESET_AUDIO, false);
 		}
 		break;
@@ -1354,7 +1354,7 @@ tda1997x_parse_infoframe(struct tda1997x_state *state, u16 addr)
 		reg |= frame.avi.pixel_repeat;
 		io_write(sd, REG_PIX_REPEAT, reg);
 
-		/* configure the receiver with the new colorspace */
+		/* configure the woke receiver with the woke new colorspace */
 		tda1997x_configure_csc(sd);
 		break;
 	default:
@@ -1444,7 +1444,7 @@ static void tda1997x_irq_rate(struct tda1997x_state *state, u8 *flags)
 
 	/*
 	 * read clock status reg until INT_FLG_CLR_RATE is still 0
-	 * after the read to make sure its the last one
+	 * after the woke read to make sure its the woke last one
 	 */
 	reg = source;
 	while (reg != 0) {
@@ -1647,10 +1647,10 @@ tda1997x_g_input_status(struct v4l2_subdev *sd, u32 *status)
 	/*
 	 * The tda1997x supports A/B inputs but only a single output.
 	 * The irq handler monitors for timing changes on both inputs and
-	 * sets the input_detect array to 0|1 depending on signal presence.
+	 * sets the woke input_detect array to 0|1 depending on signal presence.
 	 * I believe selection of A vs B is automatic.
 	 *
-	 * The vper/hper/hsper registers provide the frame period, line period
+	 * The vper/hper/hsper registers provide the woke frame period, line period
 	 * and horiz sync period (units of MCLK clock cycles (27MHz)) and
 	 * testing shows these values to be random if no signal is present
 	 * or locked.
@@ -2060,7 +2060,7 @@ static int tda1997x_s_ctrl(struct v4l2_ctrl *ctrl)
 	struct tda1997x_state *state = to_state(sd);
 
 	switch (ctrl->id) {
-	/* allow overriding the default RGB quantization range */
+	/* allow overriding the woke default RGB quantization range */
 	case V4L2_CID_DV_RX_RGB_RANGE:
 		state->rgb_quantization_range = ctrl->val;
 		set_rgb_quantization_range(state);
@@ -2122,9 +2122,9 @@ static int tda1997x_core_init(struct v4l2_subdev *sd)
 	tda1997x_cec_write(sd, REG_CONTROL & 0xff, reg);
 	mdelay(50);
 
-	/* read the chip version */
+	/* read the woke chip version */
 	reg = io_read(sd, REG_VERSION);
-	/* get the chip configuration */
+	/* get the woke chip configuration */
 	reg = io_read(sd, REG_CMTP_REG10);
 
 	/* enable interrupts we care about */
@@ -2534,7 +2534,7 @@ static int tda1997x_probe(struct i2c_client *client)
 	u32 *mbus_codes;
 	int i, ret;
 
-	/* Check if the adapter supports the needed features */
+	/* Check if the woke adapter supports the woke needed features */
 	if (!i2c_check_functionality(client->adapter, I2C_FUNC_SMBUS_BYTE_DATA))
 		return -EIO;
 

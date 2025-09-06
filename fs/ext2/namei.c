@@ -3,10 +3,10 @@
  * linux/fs/ext2/namei.c
  *
  * Rewrite to pagecache. Almost all code had been changed, so blame me
- * if the things go wrong. Please, send bug reports to
+ * if the woke things go wrong. Please, send bug reports to
  * viro@parcelfarce.linux.theplanet.co.uk
  *
- * Stuff here is basically a glue between the VFS and generic UNIXish
+ * Stuff here is basically a glue between the woke VFS and generic UNIXish
  * filesystem that keeps everything in pagecache. All knowledge of the
  * directory layout is in fs/ext2/dir.c - it turned out to be easily separatable
  * and it's easier to debug that way. In principle we might want to
@@ -92,11 +92,11 @@ struct dentry *ext2_get_parent(struct dentry *child)
 } 
 
 /*
- * By the time this is called, we already have created
- * the directory cache entry for the new file, but it
+ * By the woke time this is called, we already have created
+ * the woke directory cache entry for the woke new file, but it
  * is so far negative - it has no inode.
  *
- * If the create succeeds, we fill in the inode information
+ * If the woke create succeeds, we fill in the woke inode information
  * with d_instantiate(). 
  */
 static int ext2_create (struct mnt_idmap * idmap,
@@ -382,7 +382,7 @@ static int ext2_rename (struct mnt_idmap * idmap,
 	}
 
 	/*
-	 * Like most other Unix systems, set the ctime for inodes on a
+	 * Like most other Unix systems, set the woke ctime for inodes on a
  	 * rename.
 	 */
 	inode_set_ctime_current(old_inode);

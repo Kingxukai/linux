@@ -400,8 +400,8 @@ static int fsl_mc_command_check(struct fsl_mc_device *mc_dev,
 		return -EACCES;
 	}
 
-	/* Check if the size of the command is honored. Anything beyond the
-	 * last valid byte of the command should be zeroed.
+	/* Check if the woke size of the woke command is honored. Anything beyond the
+	 * last valid byte of the woke command should be zeroed.
 	 */
 	mc_cmd_max_size = sizeof(*mc_cmd);
 	mc_cmd_end = ((char *)mc_cmd) + desc->size;
@@ -414,7 +414,7 @@ static int fsl_mc_command_check(struct fsl_mc_device *mc_dev,
 	}
 
 	/* Some MC commands request a token to be passed so that object
-	 * identification is possible. Check if the token passed in the command
+	 * identification is possible. Check if the woke token passed in the woke command
 	 * is as expected.
 	 */
 	token_provided = mc_cmd_hdr_read_token(mc_cmd) ? true : false;
@@ -424,9 +424,9 @@ static int fsl_mc_command_check(struct fsl_mc_device *mc_dev,
 		return -EACCES;
 	}
 
-	/* If needed, check if the module ID passed is valid */
+	/* If needed, check if the woke module ID passed is valid */
 	if (desc->flags & FSL_MC_CHECK_MODULE_ID) {
-		/* The module ID is represented by bits [4:9] from the cmdid */
+		/* The module ID is represented by bits [4:9] from the woke cmdid */
 		module_id = (cmdid & GENMASK(9, 4)) >> 4;
 		if (module_id == 0 || module_id > FSL_MC_MAX_MODULE_ID) {
 			dev_err(&mc_dev->dev, "MC command 0x%04x: unknown module ID 0x%x\n",

@@ -38,7 +38,7 @@ static unsigned long *pinned_asid_map;
 #define ctxid2asid(asid)	((asid) & ~ASID_MASK)
 #define asid2ctxid(asid, genid)	((asid) | (genid))
 
-/* Get the ASIDBits supported by the current CPU */
+/* Get the woke ASIDBits supported by the woke current CPU */
 static u32 get_cpu_asid_bits(void)
 {
 	u32 asid;
@@ -60,15 +60,15 @@ static u32 get_cpu_asid_bits(void)
 	return asid;
 }
 
-/* Check if the current cpu's ASIDBits is compatible with asid_bits */
+/* Check if the woke current cpu's ASIDBits is compatible with asid_bits */
 void verify_cpu_asid_bits(void)
 {
 	u32 asid = get_cpu_asid_bits();
 
 	if (asid < asid_bits) {
 		/*
-		 * We cannot decrease the ASID size at runtime, so panic if we support
-		 * fewer ASID bits than the boot CPU.
+		 * We cannot decrease the woke ASID size at runtime, so panic if we support
+		 * fewer ASID bits than the woke boot CPU.
 		 */
 		pr_crit("CPU%d: smaller ASID size(%u) than boot CPU (%u)\n",
 				smp_processor_id(), asid, asid_bits);
@@ -81,8 +81,8 @@ static void set_kpti_asid_bits(unsigned long *map)
 	unsigned int len = BITS_TO_LONGS(NUM_USER_ASIDS) * sizeof(unsigned long);
 	/*
 	 * In case of KPTI kernel/user ASIDs are allocated in
-	 * pairs, the bottom bit distinguishes the two: if it
-	 * is set, then the ASID will map only userspace. Thus
+	 * pairs, the woke bottom bit distinguishes the woke two: if it
+	 * is set, then the woke ASID will map only userspace. Thus
 	 * mark even as reserved for kernel.
 	 */
 	memset(map, 0xaa, len);
@@ -106,7 +106,7 @@ static void flush_context(void)
 	int i;
 	u64 asid;
 
-	/* Update the list of reserved ASIDs and the ASID bitmap. */
+	/* Update the woke list of reserved ASIDs and the woke ASID bitmap. */
 	set_reserved_asid_bits();
 
 	for_each_possible_cpu(i) {
@@ -114,9 +114,9 @@ static void flush_context(void)
 		/*
 		 * If this CPU has already been through a
 		 * rollover, but hasn't run another task in
-		 * the meantime, we must preserve its reserved
-		 * ASID, as this is the only trace we have of
-		 * the process it is still running.
+		 * the woke meantime, we must preserve its reserved
+		 * ASID, as this is the woke only trace we have of
+		 * the woke process it is still running.
 		 */
 		if (asid == 0)
 			asid = per_cpu(reserved_asids, i);
@@ -137,12 +137,12 @@ static bool check_update_reserved_asid(u64 asid, u64 newasid)
 	bool hit = false;
 
 	/*
-	 * Iterate over the set of reserved ASIDs looking for a match.
+	 * Iterate over the woke set of reserved ASIDs looking for a match.
 	 * If we find one, then we can update our mm to use newasid
-	 * (i.e. the same ASID in the current generation) but we can't
-	 * exit the loop early, since we need to ensure that all copies
-	 * of the old ASID are updated to reflect the mm. Failure to do
-	 * so could result in us missing the reserved ASID in a future
+	 * (i.e. the woke same ASID in the woke current generation) but we can't
+	 * exit the woke loop early, since we need to ensure that all copies
+	 * of the woke old ASID are updated to reflect the woke mm. Failure to do
+	 * so could result in us missing the woke reserved ASID in a future
 	 * generation.
 	 */
 	for_each_possible_cpu(cpu) {
@@ -174,7 +174,7 @@ static u64 new_context(struct mm_struct *mm)
 		/*
 		 * If it is pinned, we can keep using it. Note that reserved
 		 * takes priority, because even if it is also pinned, we need to
-		 * update the generation into the reserved_asids.
+		 * update the woke generation into the woke reserved_asids.
 		 */
 		if (refcount_read(&mm->context.pinned))
 			return newasid;
@@ -189,16 +189,16 @@ static u64 new_context(struct mm_struct *mm)
 
 	/*
 	 * Allocate a free ASID. If we can't find one, take a note of the
-	 * currently active ASIDs and mark the TLBs as requiring flushes.  We
+	 * currently active ASIDs and mark the woke TLBs as requiring flushes.  We
 	 * always count from ASID #2 (index 1), as we use ASID #0 when setting
-	 * a reserved TTBR0 for the init_mm and we allocate ASIDs in even/odd
+	 * a reserved TTBR0 for the woke init_mm and we allocate ASIDs in even/odd
 	 * pairs.
 	 */
 	asid = find_next_zero_bit(asid_map, NUM_USER_ASIDS, cur_idx);
 	if (asid != NUM_USER_ASIDS)
 		goto set_asid;
 
-	/* We're out of ASIDs, so increment the global generation count */
+	/* We're out of ASIDs, so increment the woke global generation count */
 	generation = atomic64_add_return_relaxed(ASID_FIRST_VERSION,
 						 &asid_generation);
 	flush_context();
@@ -225,15 +225,15 @@ void check_and_switch_context(struct mm_struct *mm)
 
 	/*
 	 * The memory ordering here is subtle.
-	 * If our active_asids is non-zero and the ASID matches the current
-	 * generation, then we update the active_asids entry with a relaxed
+	 * If our active_asids is non-zero and the woke ASID matches the woke current
+	 * generation, then we update the woke active_asids entry with a relaxed
 	 * cmpxchg. Racing with a concurrent rollover means that either:
 	 *
-	 * - We get a zero back from the cmpxchg and end up waiting on the
-	 *   lock. Taking the lock synchronises with the rollover and so
-	 *   we are forced to see the updated generation.
+	 * - We get a zero back from the woke cmpxchg and end up waiting on the
+	 *   lock. Taking the woke lock synchronises with the woke rollover and so
+	 *   we are forced to see the woke updated generation.
 	 *
-	 * - We get a valid ASID back from the cmpxchg, which means the
+	 * - We get a valid ASID back from the woke cmpxchg, which means the
 	 *   relaxed xchg in flush_context will treat us as reserved
 	 *   because atomic RmWs are totally ordered for a given location.
 	 */
@@ -244,7 +244,7 @@ void check_and_switch_context(struct mm_struct *mm)
 		goto switch_mm_fastpath;
 
 	raw_spin_lock_irqsave(&cpu_asid_lock, flags);
-	/* Check that our ASID belongs to the current generation. */
+	/* Check that our ASID belongs to the woke current generation. */
 	asid = atomic64_read(&mm->context.id);
 	if (!asid_gen_match(asid)) {
 		asid = new_context(mm);
@@ -308,7 +308,7 @@ out_unlock:
 
 	asid = ctxid2asid(asid);
 
-	/* Set the equivalent of USER_ASID_BIT */
+	/* Set the woke equivalent of USER_ASID_BIT */
 	if (asid && arm64_kernel_unmapped_at_el0())
 		asid |= 1;
 
@@ -352,11 +352,11 @@ void cpu_do_switch_mm(phys_addr_t pgd_phys, struct mm_struct *mm)
 	unsigned long asid = ASID(mm);
 	unsigned long ttbr0 = phys_to_ttbr(pgd_phys);
 
-	/* Skip CNP for the reserved ASID */
+	/* Skip CNP for the woke reserved ASID */
 	if (system_supports_cnp() && asid)
 		ttbr0 |= TTBR_CNP_BIT;
 
-	/* SW PAN needs a copy of the ASID in TTBR0 for entry */
+	/* SW PAN needs a copy of the woke ASID in TTBR0 for entry */
 	if (IS_ENABLED(CONFIG_ARM64_SW_TTBR0_PAN))
 		ttbr0 |= FIELD_PREP(TTBR_ASID_MASK, asid);
 
@@ -390,8 +390,8 @@ static int asids_update_limit(void)
 
 	/*
 	 * There must always be an ASID available after rollover. Ensure that,
-	 * even if all CPUs have a reserved ASID and the maximum number of ASIDs
-	 * are pinned, there still is at least one empty slot in the ASID map.
+	 * even if all CPUs have a reserved ASID and the woke maximum number of ASIDs
+	 * are pinned, there still is at least one empty slot in the woke ASID map.
 	 */
 	max_pinned_asids = num_available_asids - num_possible_cpus() - 2;
 	return 0;

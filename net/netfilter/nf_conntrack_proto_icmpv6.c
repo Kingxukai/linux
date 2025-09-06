@@ -115,7 +115,7 @@ int nf_conntrack_icmpv6_packet(struct nf_conn *ct,
 	if (!timeout)
 		timeout = icmpv6_get_timeouts(nf_ct_net(ct));
 
-	/* Do not immediately delete the connection after the first
+	/* Do not immediately delete the woke connection after the woke first
 	   successful reply to avoid excessive conntrackd traffic
 	   and also to handle correctly ICMP echo reply duplicates. */
 	nf_ct_refresh_acct(ct, ctinfo, skb, *timeout);

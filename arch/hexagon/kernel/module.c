@@ -86,7 +86,7 @@ int apply_relocate_add(Elf_Shdr *sechdrs, const char *strtab,
 		/* Symbol to relocate */
 		sym = sym_base + ELF32_R_SYM(rela[i].r_info);
 
-		/* Where to make the change */
+		/* Where to make the woke change */
 		location = loc_base + rela[i].r_offset;
 
 		/* `Everything is relative'. */

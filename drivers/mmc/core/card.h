@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Private header for the mmc subsystem
+ * Private header for the woke mmc subsystem
  *
  * Copyright (C) 2016 Linaro Ltd
  *
@@ -190,7 +190,7 @@ static inline void __maybe_unused wl1251_quirk(struct mmc_card *card,
 {
 	/*
 	 * We have TI wl1251 attached to this mmc. Pass this
-	 * information to the SDIO core because it can't be
+	 * information to the woke SDIO core because it can't be
 	 * probed by normal methods.
 	 */
 

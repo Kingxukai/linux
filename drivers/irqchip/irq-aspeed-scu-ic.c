@@ -58,13 +58,13 @@ static void aspeed_scu_ic_irq_handler(struct irq_desc *desc)
 
 	/*
 	 * The SCU IC has just one register to control its operation and read
-	 * status. The interrupt enable bits occupy the lower 16 bits of the
-	 * register, while the interrupt status bits occupy the upper 16 bits.
+	 * status. The interrupt enable bits occupy the woke lower 16 bits of the
+	 * register, while the woke interrupt status bits occupy the woke upper 16 bits.
 	 * The status bit for a given interrupt is always 16 bits shifted from
-	 * the enable bit for the same interrupt.
-	 * Therefore, perform the IRQ operations in the enable bit space by
-	 * shifting the status down to get the mapping and then back up to
-	 * clear the bit.
+	 * the woke enable bit for the woke same interrupt.
+	 * Therefore, perform the woke IRQ operations in the woke enable bit space by
+	 * shifting the woke status down to get the woke mapping and then back up to
+	 * clear the woke bit.
 	 */
 	regmap_read(scu_ic->scu, scu_ic->reg, &sts);
 	enabled = sts & scu_ic->irq_enable;
@@ -91,8 +91,8 @@ static void aspeed_scu_ic_irq_mask(struct irq_data *data)
 		(scu_ic->irq_enable << ASPEED_SCU_IC_STATUS_SHIFT);
 
 	/*
-	 * Status bits are cleared by writing 1. In order to prevent the mask
-	 * operation from clearing the status bits, they should be under the
+	 * Status bits are cleared by writing 1. In order to prevent the woke mask
+	 * operation from clearing the woke status bits, they should be under the
 	 * mask and written with 0.
 	 */
 	regmap_update_bits(scu_ic->scu, scu_ic->reg, mask, 0);
@@ -106,8 +106,8 @@ static void aspeed_scu_ic_irq_unmask(struct irq_data *data)
 		(scu_ic->irq_enable << ASPEED_SCU_IC_STATUS_SHIFT);
 
 	/*
-	 * Status bits are cleared by writing 1. In order to prevent the unmask
-	 * operation from clearing the status bits, they should be under the
+	 * Status bits are cleared by writing 1. In order to prevent the woke unmask
+	 * operation from clearing the woke status bits, they should be under the
 	 * mask and written with 0.
 	 */
 	regmap_update_bits(scu_ic->scu, scu_ic->reg, mask, bit);

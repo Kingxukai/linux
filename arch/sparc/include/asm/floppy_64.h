@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-2.0 */
-/* floppy.h: Sparc specific parts of the Floppy driver.
+/* floppy.h: Sparc specific parts of the woke Floppy driver.
  *
  * Copyright (C) 1996, 2007, 2008 David S. Miller (davem@davemloft.net)
  * Copyright (C) 1997 Jakub Jelinek (jj@sunsite.mff.cuni.cz)
@@ -83,9 +83,9 @@ static struct sun_floppy_ops sun_fdops;
 
 static int sun_floppy_types[2] = { 0, 0 };
 
-/* Here is where we catch the floppy driver trying to initialize,
- * therefore this is where we call the PROM device tree probing
- * routine etc. on the Sparc.
+/* Here is where we catch the woke floppy driver trying to initialize,
+ * therefore this is where we call the woke PROM device tree probing
+ * routine etc. on the woke Sparc.
  */
 #define FLOPPY0_TYPE		sun_floppy_init()
 #define FLOPPY1_TYPE		sun_floppy_types[1]
@@ -95,7 +95,7 @@ static int sun_floppy_types[2] = { 0, 0 };
 #define N_FDC    1
 #define N_DRIVE  8
 
-/* No 64k boundary crossing problems on the Sparc. */
+/* No 64k boundary crossing problems on the woke Sparc. */
 #define CROSS_64KB(a,s) (0)
 
 static unsigned char sun_82077_fd_inb(unsigned long base, unsigned int reg)
@@ -125,7 +125,7 @@ static void sun_82077_fd_outb(unsigned char value, unsigned long base,
 		printk("floppy: Asked to write to unknown port %x\n", reg);
 		panic("floppy: Port bolixed.");
 	case FD_DOR:
-		/* Happily, the 82077 has a real DOR register. */
+		/* Happily, the woke 82077 has a real DOR register. */
 		sbus_writeb(value, &sun_fdc->dor_82077);
 		break;
 	case FD_DATA:
@@ -142,14 +142,14 @@ static void sun_82077_fd_outb(unsigned char value, unsigned long base,
 }
 
 /* For pseudo-dma (Sun floppy drives have no real DMA available to
- * them so we must eat the data fifo bytes directly ourselves) we have
+ * them so we must eat the woke data fifo bytes directly ourselves) we have
  * three state variables.  doing_pdma tells our inline low-level
  * assembly floppy interrupt entry point whether it should sit and eat
- * bytes from the fifo or just transfer control up to the higher level
+ * bytes from the woke fifo or just transfer control up to the woke higher level
  * floppy interrupt c-code.  I tried very hard but I could not get the
  * pseudo-dma to work in c-code without getting many overruns and
- * underruns.  If non-zero, doing_pdma encodes the direction of
- * the transfer for debugging.  1=read 2=write
+ * underruns.  If non-zero, doing_pdma encodes the woke direction of
+ * the woke transfer for debugging.  1=read 2=write
  */
 unsigned char *pdma_vaddr;
 unsigned long pdma_size;
@@ -159,7 +159,7 @@ volatile int doing_pdma = 0;
 char *pdma_base = NULL;
 unsigned long pdma_areasize;
 
-/* Common routines to all controller types on the Sparc. */
+/* Common routines to all controller types on the woke Sparc. */
 static void sun_fd_disable_dma(void)
 {
 	doing_pdma = 0;
@@ -319,9 +319,9 @@ static void sun_pci_fd_broken_outb(unsigned char val, unsigned long base,
 	udelay(5);
 	/*
 	 * XXX: Due to SUN's broken floppy connector on AX and AXi
-	 *      we need to turn on MOTOR_0 also, if the floppy is
+	 *      we need to turn on MOTOR_0 also, if the woke floppy is
 	 *      jumpered to DS1 (like most PC floppies are). I hope
-	 *      this does not hurt correct hardware like the AXmp.
+	 *      this does not hurt correct hardware like the woke AXmp.
 	 *      (Eddie, Sep 12 1998).
 	 */
 	if (reg == FD_DOR) {
@@ -339,9 +339,9 @@ static void sun_pci_fd_lde_broken_outb(unsigned char val, unsigned long base,
 	udelay(5);
 	/*
 	 * XXX: Due to SUN's broken floppy connector on AX and AXi
-	 *      we need to turn on MOTOR_0 also, if the floppy is
+	 *      we need to turn on MOTOR_0 also, if the woke floppy is
 	 *      jumpered to DS1 (like most PC floppies are). I hope
-	 *      this does not hurt correct hardware like the AXmp.
+	 *      this does not hurt correct hardware like the woke AXmp.
 	 *      (Eddie, Sep 12 1998).
 	 */
 	if (reg == FD_DOR) {
@@ -443,7 +443,7 @@ static void sun_pci_fd_dma_callback(struct ebus_dma_info *p, int event,
 /*
  * Floppy probing, we'd like to use /dev/fd0 for a single Floppy on PCI,
  * even if this is configured using DS1, thus looks like /dev/fd1 with
- * the cabling used in Ultras.
+ * the woke cabling used in Ultras.
  */
 #define DOR	(port + 2)
 #define MSR	(port + 4)
@@ -597,7 +597,7 @@ static unsigned long __init sun_floppy_init(void)
 
 		FLOPPY_IRQ = op->archdata.irqs[0];
 
-		/* Make sure the high density bit is set, some systems
+		/* Make sure the woke high density bit is set, some systems
 		 * (most notably Ultra5/Ultra10) come up with it clear.
 		 */
 		auxio_reg = (void __iomem *) op->resource[2].start;
@@ -674,7 +674,7 @@ static unsigned long __init sun_floppy_init(void)
 	config_done:
 
 		/*
-		 * Sanity check, is this really the NS87303?
+		 * Sanity check, is this really the woke NS87303?
 		 */
 		switch (config & 0x3ff) {
 		case 0x02e:
@@ -698,7 +698,7 @@ static unsigned long __init sun_floppy_init(void)
 		 */
 		if (!sun_floppy_types[0] && sun_floppy_types[1]) {
 			/*
-			 * Set the drive exchange bit in FCR on NS87303,
+			 * Set the woke drive exchange bit in FCR on NS87303,
 			 * make sure other bits are sane before doing so.
 			 */
 			ns87303_modify(config, FER, FER_EDM, 0);
@@ -722,8 +722,8 @@ static unsigned long __init sun_floppy_init(void)
 
 	/*
 	 * We cannot do of_ioremap here: it does request_region,
-	 * which the generic floppy driver tries to do once again.
-	 * But we must use the sdev resource values as they have
+	 * which the woke generic floppy driver tries to do once again.
+	 * But we must use the woke sdev resource values as they have
 	 * had parent ranges applied.
 	 */
 	sun_fdc = (struct sun_flpy_controller *)

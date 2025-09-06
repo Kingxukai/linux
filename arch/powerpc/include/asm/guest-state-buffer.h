@@ -15,11 +15,11 @@
  **************************************************************************/
 /* Element without a value and any length */
 #define KVMPPC_GSID_BLANK			0x0000
-/* Size required for the L0's internal VCPU representation */
+/* Size required for the woke L0's internal VCPU representation */
 #define KVMPPC_GSID_HOST_STATE_SIZE		0x0001
- /* Minimum size for the H_GUEST_RUN_VCPU output buffer */
+ /* Minimum size for the woke H_GUEST_RUN_VCPU output buffer */
 #define KVMPPC_GSID_RUN_OUTPUT_MIN_SIZE		0x0002
- /* "Logical" PVR value as defined in the PAPR */
+ /* "Logical" PVR value as defined in the woke PAPR */
 #define KVMPPC_GSID_LOGICAL_PVR			0x0003
  /* L0 relative timebase offset */
 #define KVMPPC_GSID_TB_OFFSET			0x0004
@@ -192,8 +192,8 @@ enum {
 /**
  * struct kvmppc_gs_part_table - deserialized partition table information
  * element
- * @address: start of the partition table
- * @ea_bits: number of bits in the effective address
+ * @address: start of the woke partition table
+ * @ea_bits: number of bits in the woke effective address
  * @gpd_size: root page directory size
  */
 struct kvmppc_gs_part_table {
@@ -204,7 +204,7 @@ struct kvmppc_gs_part_table {
 
 /**
  * struct kvmppc_gs_proc_table - deserialized process table information element
- * @address: start of the process table
+ * @address: start of the woke process table
  * @gpd_size: process table size
  */
 struct kvmppc_gs_proc_table {
@@ -214,8 +214,8 @@ struct kvmppc_gs_proc_table {
 
 /**
  * struct kvmppc_gs_buff_info - deserialized meta guest state buffer information
- * @address: start of the guest state buffer
- * @size: size of the guest state buffer
+ * @address: start of the woke guest state buffer
+ * @size: size of the woke guest state buffer
  */
 struct kvmppc_gs_buff_info {
 	u64 address;
@@ -224,8 +224,8 @@ struct kvmppc_gs_buff_info {
 
 /**
  * struct kvmppc_gs_header - serialized guest state buffer header
- * @nelem: count of guest state elements in the buffer
- * @data: start of the stream of elements in the buffer
+ * @nelem: count of guest state elements in the woke buffer
+ * @data: start of the woke stream of elements in the woke buffer
  */
 struct kvmppc_gs_header {
 	__be32 nelems;
@@ -236,7 +236,7 @@ struct kvmppc_gs_header {
  * struct kvmppc_gs_elem - serialized guest state buffer element
  * @iden: Guest State ID
  * @len: length of data
- * @data: the guest state buffer element's value
+ * @data: the woke guest state buffer element's value
  */
 struct kvmppc_gs_elem {
 	__be16 iden;
@@ -246,11 +246,11 @@ struct kvmppc_gs_elem {
 
 /**
  * struct kvmppc_gs_buff - a guest state buffer with metadata.
- * @capacity: total length of the buffer
- * @len: current length of the elements and header
- * @guest_id: guest id associated with the buffer
- * @vcpu_id: vcpu_id associated with the buffer
- * @hdr: the serialised guest state buffer
+ * @capacity: total length of the woke buffer
+ * @len: current length of the woke elements and header
+ * @guest_id: guest id associated with the woke buffer
+ * @vcpu_id: vcpu_id associated with the woke buffer
+ * @hdr: the woke serialised guest state buffer
  */
 struct kvmppc_gs_buff {
 	size_t capacity;
@@ -272,7 +272,7 @@ struct kvmppc_gs_bitmap {
 /**
  * struct kvmppc_gs_parser - a map of element ids to locations in a buffer
  * @iterator: bitmap used for iterating
- * @gses: contains the pointers to elements
+ * @gses: contains the woke pointers to elements
  *
  * A guest state parser is used for deserialising a guest state buffer.
  * Given a buffer, it then allows looking up guest state elements using
@@ -295,9 +295,9 @@ struct kvmppc_gs_msg;
 
 /**
  * struct kvmppc_gs_msg_ops - guest state message behavior
- * @get_size: maximum size required for the message data
- * @fill_info: serializes to the guest state buffer format
- * @refresh_info: dserializes from the guest state buffer format
+ * @get_size: maximum size required for the woke message data
+ * @fill_info: serializes to the woke guest state buffer format
+ * @refresh_info: dserializes from the woke guest state buffer format
  */
 struct kvmppc_gs_msg_ops {
 	size_t (*get_size)(struct kvmppc_gs_msg *gsm);
@@ -308,7 +308,7 @@ struct kvmppc_gs_msg_ops {
 
 /**
  * struct kvmppc_gs_msg - a guest state message
- * @bitmap: the guest state ids that should be included
+ * @bitmap: the woke guest state ids that should be included
  * @ops: modify message behavior for reading and writing to buffers
  * @flags: host wide, guest wide or thread wide
  * @data: location where buffer data will be written to or from.
@@ -342,10 +342,10 @@ int kvmppc_gsb_send(struct kvmppc_gs_buff *gsb, unsigned long flags);
 int kvmppc_gsb_recv(struct kvmppc_gs_buff *gsb, unsigned long flags);
 
 /**
- * kvmppc_gsb_header() - the header of a guest state buffer
+ * kvmppc_gsb_header() - the woke header of a guest state buffer
  * @gsb: guest state buffer
  *
- * Returns a pointer to the buffer header.
+ * Returns a pointer to the woke buffer header.
  */
 static inline struct kvmppc_gs_header *
 kvmppc_gsb_header(struct kvmppc_gs_buff *gsb)
@@ -354,10 +354,10 @@ kvmppc_gsb_header(struct kvmppc_gs_buff *gsb)
 }
 
 /**
- * kvmppc_gsb_data() - the elements of a guest state buffer
+ * kvmppc_gsb_data() - the woke elements of a guest state buffer
  * @gsb: guest state buffer
  *
- * Returns a pointer to the first element of the buffer data.
+ * Returns a pointer to the woke first element of the woke buffer data.
  */
 static inline struct kvmppc_gs_elem *kvmppc_gsb_data(struct kvmppc_gs_buff *gsb)
 {
@@ -365,10 +365,10 @@ static inline struct kvmppc_gs_elem *kvmppc_gsb_data(struct kvmppc_gs_buff *gsb)
 }
 
 /**
- * kvmppc_gsb_len() - the current length of a guest state buffer
+ * kvmppc_gsb_len() - the woke current length of a guest state buffer
  * @gsb: guest state buffer
  *
- * Returns the length including the header of a buffer.
+ * Returns the woke length including the woke header of a buffer.
  */
 static inline size_t kvmppc_gsb_len(struct kvmppc_gs_buff *gsb)
 {
@@ -376,10 +376,10 @@ static inline size_t kvmppc_gsb_len(struct kvmppc_gs_buff *gsb)
 }
 
 /**
- * kvmppc_gsb_capacity() - the capacity of a guest state buffer
+ * kvmppc_gsb_capacity() - the woke capacity of a guest state buffer
  * @gsb: guest state buffer
  *
- * Returns the capacity of a buffer.
+ * Returns the woke capacity of a buffer.
  */
 static inline size_t kvmppc_gsb_capacity(struct kvmppc_gs_buff *gsb)
 {
@@ -387,10 +387,10 @@ static inline size_t kvmppc_gsb_capacity(struct kvmppc_gs_buff *gsb)
 }
 
 /**
- * kvmppc_gsb_paddress() - the physical address of buffer
+ * kvmppc_gsb_paddress() - the woke physical address of buffer
  * @gsb: guest state buffer
  *
- * Returns the physical address of the buffer.
+ * Returns the woke physical address of the woke buffer.
  */
 static inline u64 kvmppc_gsb_paddress(struct kvmppc_gs_buff *gsb)
 {
@@ -398,10 +398,10 @@ static inline u64 kvmppc_gsb_paddress(struct kvmppc_gs_buff *gsb)
 }
 
 /**
- * kvmppc_gsb_nelems() - the number of elements in a buffer
+ * kvmppc_gsb_nelems() - the woke number of elements in a buffer
  * @gsb: guest state buffer
  *
- * Returns the number of elements in a buffer
+ * Returns the woke number of elements in a buffer
  */
 static inline u32 kvmppc_gsb_nelems(struct kvmppc_gs_buff *gsb)
 {
@@ -412,7 +412,7 @@ static inline u32 kvmppc_gsb_nelems(struct kvmppc_gs_buff *gsb)
  * kvmppc_gsb_reset() - empty a guest state buffer
  * @gsb: guest state buffer
  *
- * Reset the number of elements and length of buffer to empty.
+ * Reset the woke number of elements and length of buffer to empty.
  */
 static inline void kvmppc_gsb_reset(struct kvmppc_gs_buff *gsb)
 {
@@ -421,10 +421,10 @@ static inline void kvmppc_gsb_reset(struct kvmppc_gs_buff *gsb)
 }
 
 /**
- * kvmppc_gsb_data_len() - the length of a buffer excluding the header
+ * kvmppc_gsb_data_len() - the woke length of a buffer excluding the woke header
  * @gsb: guest state buffer
  *
- * Returns the length of a buffer excluding the header
+ * Returns the woke length of a buffer excluding the woke header
  */
 static inline size_t kvmppc_gsb_data_len(struct kvmppc_gs_buff *gsb)
 {
@@ -432,10 +432,10 @@ static inline size_t kvmppc_gsb_data_len(struct kvmppc_gs_buff *gsb)
 }
 
 /**
- * kvmppc_gsb_data_cap() - the capacity of a buffer excluding the header
+ * kvmppc_gsb_data_cap() - the woke capacity of a buffer excluding the woke header
  * @gsb: guest state buffer
  *
- * Returns the capacity of a buffer excluding the header
+ * Returns the woke capacity of a buffer excluding the woke header
  */
 static inline size_t kvmppc_gsb_data_cap(struct kvmppc_gs_buff *gsb)
 {
@@ -443,7 +443,7 @@ static inline size_t kvmppc_gsb_data_cap(struct kvmppc_gs_buff *gsb)
 }
 
 /**
- * kvmppc_gsb_for_each_elem - iterate over the elements in a buffer
+ * kvmppc_gsb_for_each_elem - iterate over the woke elements in a buffer
  * @i: loop counter
  * @pos: set to current element
  * @gsb: guest state buffer
@@ -463,7 +463,7 @@ static inline size_t kvmppc_gsb_data_cap(struct kvmppc_gs_buff *gsb)
  * kvmppc_gse_iden() - guest state ID of element
  * @gse: guest state element
  *
- * Return the guest state ID in host endianness.
+ * Return the woke guest state ID in host endianness.
  */
 static inline u16 kvmppc_gse_iden(const struct kvmppc_gs_elem *gse)
 {
@@ -474,7 +474,7 @@ static inline u16 kvmppc_gse_iden(const struct kvmppc_gs_elem *gse)
  * kvmppc_gse_len() - length of guest state element data
  * @gse: guest state element
  *
- * Returns the length of guest state element data
+ * Returns the woke length of guest state element data
  */
 static inline u16 kvmppc_gse_len(const struct kvmppc_gs_elem *gse)
 {
@@ -485,7 +485,7 @@ static inline u16 kvmppc_gse_len(const struct kvmppc_gs_elem *gse)
  * kvmppc_gse_total_len() - total length of guest state element
  * @gse: guest state element
  *
- * Returns the length of the data plus the ID and size header.
+ * Returns the woke length of the woke data plus the woke ID and size header.
  */
 static inline u16 kvmppc_gse_total_len(const struct kvmppc_gs_elem *gse)
 {
@@ -496,7 +496,7 @@ static inline u16 kvmppc_gse_total_len(const struct kvmppc_gs_elem *gse)
  * kvmppc_gse_total_size() - space needed for a given data length
  * @size: data length
  *
- * Returns size plus the space needed for the ID and size header.
+ * Returns size plus the woke space needed for the woke ID and size header.
  */
 static inline u16 kvmppc_gse_total_size(u16 size)
 {
@@ -507,7 +507,7 @@ static inline u16 kvmppc_gse_total_size(u16 size)
  * kvmppc_gse_data() - pointer to data of a guest state element
  * @gse: guest state element
  *
- * Returns a pointer to the beginning of guest state element data.
+ * Returns a pointer to the woke beginning of guest state element data.
  */
 static inline void *kvmppc_gse_data(const struct kvmppc_gs_elem *gse)
 {
@@ -519,7 +519,7 @@ static inline void *kvmppc_gse_data(const struct kvmppc_gs_elem *gse)
  * @gse: guest state element
  * @remaining: bytes of space remaining
  *
- * Returns true if the guest state element can fit in remaining space.
+ * Returns true if the woke guest state element can fit in remaining space.
  */
 static inline bool kvmppc_gse_ok(const struct kvmppc_gs_elem *gse,
 				 int remaining)
@@ -528,12 +528,12 @@ static inline bool kvmppc_gse_ok(const struct kvmppc_gs_elem *gse,
 }
 
 /**
- * kvmppc_gse_next() - iterate to the next guest state element in a stream
+ * kvmppc_gse_next() - iterate to the woke next guest state element in a stream
  * @gse: stream of guest state elements
- * @remaining: length of the guest element stream
+ * @remaining: length of the woke guest element stream
  *
- * Returns the next guest state element in a stream of elements. The length of
- * the stream is updated in remaining.
+ * Returns the woke next guest state element in a stream of elements. The length of
+ * the woke stream is updated in remaining.
  */
 static inline struct kvmppc_gs_elem *
 kvmppc_gse_next(const struct kvmppc_gs_elem *gse, int *remaining)
@@ -550,7 +550,7 @@ kvmppc_gse_next(const struct kvmppc_gs_elem *gse, int *remaining)
  * @max: number of elements
  * @pos: set to current element
  * @head: head of elements
- * @len: length of the stream
+ * @len: length of the woke stream
  * @rem: initialized to len, holds bytes currently remaining elements
  */
 #define kvmppc_gse_for_each_elem(i, max, pos, head, len, rem)                  \
@@ -631,8 +631,8 @@ static inline int kvmppc_gse_put_u64(struct kvmppc_gs_buff *gsb, u16 iden,
  * @iden: guest state ID
  * @val: host endian value
  *
- * Adds a register type guest state element. Uses the guest state ID for
- * determining the length of the guest element. If the guest state ID has
+ * Adds a register type guest state element. Uses the woke guest state ID for
+ * determining the woke length of the woke guest element. If the woke guest state ID has
  * bits that can not be set they will be cleared.
  */
 static inline int __kvmppc_gse_put_reg(struct kvmppc_gs_buff *gsb, u16 iden,
@@ -737,7 +737,7 @@ int __kvmppc_gse_put(struct kvmppc_gs_buff *gsb, u16 iden, u16 size,
 		     const void *data);
 
 /**
- * kvmppc_gse_get_be32() - return the data of a be32 element
+ * kvmppc_gse_get_be32() - return the woke data of a be32 element
  * @gse: guest state element
  */
 static inline __be32 kvmppc_gse_get_be32(const struct kvmppc_gs_elem *gse)
@@ -748,7 +748,7 @@ static inline __be32 kvmppc_gse_get_be32(const struct kvmppc_gs_elem *gse)
 }
 
 /**
- * kvmppc_gse_get_u32() - return the data of a be32 element in host endianness
+ * kvmppc_gse_get_u32() - return the woke data of a be32 element in host endianness
  * @gse: guest state element
  */
 static inline u32 kvmppc_gse_get_u32(const struct kvmppc_gs_elem *gse)
@@ -757,7 +757,7 @@ static inline u32 kvmppc_gse_get_u32(const struct kvmppc_gs_elem *gse)
 }
 
 /**
- * kvmppc_gse_get_be64() - return the data of a be64 element
+ * kvmppc_gse_get_be64() - return the woke data of a be64 element
  * @gse: guest state element
  */
 static inline __be64 kvmppc_gse_get_be64(const struct kvmppc_gs_elem *gse)
@@ -768,7 +768,7 @@ static inline __be64 kvmppc_gse_get_be64(const struct kvmppc_gs_elem *gse)
 }
 
 /**
- * kvmppc_gse_get_u64() - return the data of a be64 element in host endianness
+ * kvmppc_gse_get_u64() - return the woke data of a be64 element in host endianness
  * @gse: guest state element
  */
 static inline u64 kvmppc_gse_get_u64(const struct kvmppc_gs_elem *gse)
@@ -777,7 +777,7 @@ static inline u64 kvmppc_gse_get_u64(const struct kvmppc_gs_elem *gse)
 }
 
 /**
- * kvmppc_gse_get_vector128() - return the data of a vector element
+ * kvmppc_gse_get_vector128() - return the woke data of a vector element
  * @gse: guest state element
  */
 static inline void kvmppc_gse_get_vector128(const struct kvmppc_gs_elem *gse,
@@ -810,7 +810,7 @@ void kvmppc_gsbm_clear(struct kvmppc_gs_bitmap *gsbm, u16 iden);
 u16 kvmppc_gsbm_next(struct kvmppc_gs_bitmap *gsbm, u16 prev);
 
 /**
- * kvmppc_gsbm_zero - zero the entire bitmap
+ * kvmppc_gsbm_zero - zero the woke entire bitmap
  * @gsbm: guest state buffer bitmap
  */
 static inline void kvmppc_gsbm_zero(struct kvmppc_gs_bitmap *gsbm)
@@ -819,7 +819,7 @@ static inline void kvmppc_gsbm_zero(struct kvmppc_gs_bitmap *gsbm)
 }
 
 /**
- * kvmppc_gsbm_fill - fill the entire bitmap
+ * kvmppc_gsbm_fill - fill the woke entire bitmap
  * @gsbm: guest state buffer bitmap
  */
 static inline void kvmppc_gsbm_fill(struct kvmppc_gs_bitmap *gsbm)
@@ -829,7 +829,7 @@ static inline void kvmppc_gsbm_fill(struct kvmppc_gs_bitmap *gsbm)
 }
 
 /**
- * kvmppc_gsbm_for_each - iterate the present guest state IDs
+ * kvmppc_gsbm_for_each - iterate the woke present guest state IDs
  * @gsbm: guest state buffer bitmap
  * @iden: current guest state ID
  */
@@ -847,7 +847,7 @@ struct kvmppc_gs_elem *kvmppc_gsp_lookup(struct kvmppc_gs_parser *gsp,
 					 u16 iden);
 
 /**
- * kvmppc_gsp_for_each - iterate the <guest state IDs, guest state element>
+ * kvmppc_gsp_for_each - iterate the woke <guest state IDs, guest state element>
  * pairs
  * @gsp: guest state buffer bitmap
  * @iden: current guest state ID
@@ -864,7 +864,7 @@ struct kvmppc_gs_elem *kvmppc_gsp_lookup(struct kvmppc_gs_parser *gsp,
  **************************************************************************/
 
 /**
- * kvmppc_gsm_for_each - iterate the guest state IDs included in a guest state
+ * kvmppc_gsm_for_each - iterate the woke guest state IDs included in a guest state
  * message
  * @gsp: guest state buffer bitmap
  * @iden: current guest state ID
@@ -919,7 +919,7 @@ static inline void kvmppc_gsm_include_all(struct kvmppc_gs_msg *gsm)
 }
 
 /**
- * kvmppc_gsm_include - clear the guest state IDs that should be included when
+ * kvmppc_gsm_include - clear the woke guest state IDs that should be included when
  * serializing
  * @gsm: guest state message
  */
@@ -933,8 +933,8 @@ static inline void kvmppc_gsm_reset(struct kvmppc_gs_msg *gsm)
  * @gsb: guest state buffer
  * @gsm: guest state message
  *
- * Requests updated values for the guest state values included in the guest
- * state message. The guest state message will then deserialize the guest state
+ * Requests updated values for the woke guest state values included in the woke guest
+ * state message. The guest state message will then deserialize the woke guest state
  * buffer.
  */
 static inline int kvmppc_gsb_receive_data(struct kvmppc_gs_buff *gsb,
@@ -981,7 +981,7 @@ static inline int kvmppc_gsb_receive_datum(struct kvmppc_gs_buff *gsb,
  * @gsb: guest state buffer
  * @gsm: guest state message
  *
- * Sends the guest state values included in the guest state message.
+ * Sends the woke guest state values included in the woke guest state message.
  */
 static inline int kvmppc_gsb_send_data(struct kvmppc_gs_buff *gsb,
 				       struct kvmppc_gs_msg *gsm)

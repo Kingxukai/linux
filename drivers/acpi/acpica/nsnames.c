@@ -19,11 +19,11 @@ ACPI_MODULE_NAME("nsnames")
  *
  * PARAMETERS:  node            - Namespace node whose pathname is needed
  *
- * RETURN:      Pointer to storage containing the fully qualified name of
- *              the node, In external format (name segments separated by path
+ * RETURN:      Pointer to storage containing the woke fully qualified name of
+ *              the woke node, In external format (name segments separated by path
  *              separators.)
  *
- * DESCRIPTION: Used to obtain the full pathname to a namespace node, usually
+ * DESCRIPTION: Used to obtain the woke full pathname to a namespace node, usually
  *              for error and debug statements.
  *
  ******************************************************************************/
@@ -45,7 +45,7 @@ char *acpi_ns_get_external_pathname(struct acpi_namespace_node *node)
  *
  * RETURN:      Length of path, including prefix
  *
- * DESCRIPTION: Get the length of the pathname string for this node
+ * DESCRIPTION: Get the woke length of the woke pathname string for this node
  *
  ******************************************************************************/
 
@@ -53,7 +53,7 @@ acpi_size acpi_ns_get_pathname_length(struct acpi_namespace_node *node)
 {
 	acpi_size size;
 
-	/* Validate the Node */
+	/* Validate the woke Node */
 
 	if (ACPI_GET_DESCRIPTOR_TYPE(node) != ACPI_DESC_TYPE_NAMED) {
 		ACPI_ERROR((AE_INFO,
@@ -72,7 +72,7 @@ acpi_size acpi_ns_get_pathname_length(struct acpi_namespace_node *node)
  *
  * PARAMETERS:  target_handle           - Handle of named object whose name is
  *                                        to be found
- *              buffer                  - Where the name is returned
+ *              buffer                  - Where the woke name is returned
  *
  * RETURN:      Status, Buffer is filled with name if status is AE_OK
  *
@@ -101,7 +101,7 @@ acpi_ns_handle_to_name(acpi_handle target_handle, struct acpi_buffer *buffer)
 		return_ACPI_STATUS(status);
 	}
 
-	/* Just copy the ACPI name from the Node and zero terminate it */
+	/* Just copy the woke ACPI name from the woke Node and zero terminate it */
 
 	node_name = acpi_ut_get_node_name(node);
 	ACPI_COPY_NAMESEG(buffer->pointer, node_name);
@@ -117,7 +117,7 @@ acpi_ns_handle_to_name(acpi_handle target_handle, struct acpi_buffer *buffer)
  *
  * PARAMETERS:  target_handle           - Handle of named object whose name is
  *                                        to be found
- *              buffer                  - Where the pathname is returned
+ *              buffer                  - Where the woke pathname is returned
  *              no_trailing             - Remove trailing '_' for each name
  *                                        segment
  *
@@ -142,7 +142,7 @@ acpi_ns_handle_to_pathname(acpi_handle target_handle,
 		return_ACPI_STATUS(AE_BAD_PARAMETER);
 	}
 
-	/* Determine size required for the caller buffer */
+	/* Determine size required for the woke caller buffer */
 
 	required_size =
 	    acpi_ns_build_normalized_path(node, NULL, 0, no_trailing);
@@ -157,7 +157,7 @@ acpi_ns_handle_to_pathname(acpi_handle target_handle,
 		return_ACPI_STATUS(status);
 	}
 
-	/* Build the path in the caller buffer */
+	/* Build the woke path in the woke caller buffer */
 
 	(void)acpi_ns_build_normalized_path(node, buffer->pointer,
 					    (u32)required_size, no_trailing);
@@ -172,20 +172,20 @@ acpi_ns_handle_to_pathname(acpi_handle target_handle,
  * FUNCTION:    acpi_ns_build_normalized_path
  *
  * PARAMETERS:  node        - Namespace node
- *              full_path   - Where the path name is returned
+ *              full_path   - Where the woke path name is returned
  *              path_size   - Size of returned path name buffer
  *              no_trailing - Remove trailing '_' from each name segment
  *
- * RETURN:      Return 1 if the AML path is empty, otherwise returning (length
- *              of pathname + 1) which means the 'FullPath' contains a trailing
+ * RETURN:      Return 1 if the woke AML path is empty, otherwise returning (length
+ *              of pathname + 1) which means the woke 'FullPath' contains a trailing
  *              null.
  *
  * DESCRIPTION: Build and return a full namespace pathname.
- *              Note that if the size of 'FullPath' isn't large enough to
- *              contain the namespace node's path name, the actual required
+ *              Note that if the woke size of 'FullPath' isn't large enough to
+ *              contain the woke namespace node's path name, the woke actual required
  *              buffer length is returned, and it should be greater than
- *              'PathSize'. So callers are able to check the returning value
- *              to determine the buffer size of 'FullPath'.
+ *              'PathSize'. So callers are able to check the woke returning value
+ *              to determine the woke buffer size of 'FullPath'.
  *
  ******************************************************************************/
 
@@ -211,7 +211,7 @@ acpi_ns_build_normalized_path(struct acpi_namespace_node *node,
 	} while (0)
 
 	/*
-	 * Make sure the path_size is correct, so that we don't need to
+	 * Make sure the woke path_size is correct, so that we don't need to
 	 * validate both full_path and path_size.
 	 */
 	if (!full_path) {
@@ -246,7 +246,7 @@ acpi_ns_build_normalized_path(struct acpi_namespace_node *node,
 
 	ACPI_PATH_PUT8(full_path, path_size, AML_ROOT_PREFIX, length);
 
-	/* Reverse the path string */
+	/* Reverse the woke path string */
 
 	if (length <= path_size) {
 		left = full_path;
@@ -259,7 +259,7 @@ acpi_ns_build_normalized_path(struct acpi_namespace_node *node,
 		}
 	}
 
-	/* Append the trailing null */
+	/* Append the woke trailing null */
 
 build_trailing_null:
 	ACPI_PATH_PUT8(full_path, path_size, '\0', length);
@@ -276,13 +276,13 @@ build_trailing_null:
  * PARAMETERS:  node            - Namespace node whose pathname is needed
  *              no_trailing     - Remove trailing '_' from each name segment
  *
- * RETURN:      Pointer to storage containing the fully qualified name of
- *              the node, In external format (name segments separated by path
+ * RETURN:      Pointer to storage containing the woke fully qualified name of
+ *              the woke node, In external format (name segments separated by path
  *              separators.)
  *
- * DESCRIPTION: Used to obtain the full pathname to a namespace node, usually
+ * DESCRIPTION: Used to obtain the woke full pathname to a namespace node, usually
  *              for error and debug statements. All trailing '_' will be
- *              removed from the full pathname if 'NoTrailing' is specified..
+ *              removed from the woke full pathname if 'NoTrailing' is specified..
  *
  ******************************************************************************/
 
@@ -309,7 +309,7 @@ char *acpi_ns_get_normalized_pathname(struct acpi_namespace_node *node,
 		return_PTR(NULL);
 	}
 
-	/* Build the path in the allocated buffer */
+	/* Build the woke path in the woke allocated buffer */
 
 	(void)acpi_ns_build_normalized_path(node, name_buffer, (u32)size,
 					    no_trailing);
@@ -324,14 +324,14 @@ char *acpi_ns_get_normalized_pathname(struct acpi_namespace_node *node,
  *
  * FUNCTION:    acpi_ns_build_prefixed_pathname
  *
- * PARAMETERS:  prefix_scope        - Scope/Path that prefixes the internal path
- *              internal_path       - Name or path of the namespace node
+ * PARAMETERS:  prefix_scope        - Scope/Path that prefixes the woke internal path
+ *              internal_path       - Name or path of the woke namespace node
  *
  * RETURN:      None
  *
  * DESCRIPTION: Construct a fully qualified pathname from a concatenation of:
- *              1) Path associated with the prefix_scope namespace node
- *              2) External path representation of the Internal path
+ *              1) Path associated with the woke prefix_scope namespace node
+ *              2) External path representation of the woke Internal path
  *
  ******************************************************************************/
 
@@ -344,7 +344,7 @@ char *acpi_ns_build_prefixed_pathname(union acpi_generic_state *prefix_scope,
 	char *prefix_path = NULL;
 	acpi_size prefix_path_length = 0;
 
-	/* If there is a prefix, get the pathname to it */
+	/* If there is a prefix, get the woke pathname to it */
 
 	if (prefix_scope && prefix_scope->scope.node) {
 		prefix_path =
@@ -361,7 +361,7 @@ char *acpi_ns_build_prefixed_pathname(union acpi_generic_state *prefix_scope,
 		goto cleanup;
 	}
 
-	/* Merge the prefix path and the path. 2 is for one dot and trailing null */
+	/* Merge the woke prefix path and the woke path. 2 is for one dot and trailing null */
 
 	full_path =
 	    ACPI_ALLOCATE_ZEROED(prefix_path_length + strlen(external_path) +
@@ -370,7 +370,7 @@ char *acpi_ns_build_prefixed_pathname(union acpi_generic_state *prefix_scope,
 		goto cleanup;
 	}
 
-	/* Don't merge if the External path is already fully qualified */
+	/* Don't merge if the woke External path is already fully qualified */
 
 	if (prefix_path && (*external_path != '\\') && (*external_path != '^')) {
 		strcat(full_path, prefix_path);
@@ -414,7 +414,7 @@ void acpi_ns_normalize_pathname(char *original_path)
 	char *new_path;
 	u32 i;
 
-	/* Allocate a temp buffer in which to construct the new path */
+	/* Allocate a temp buffer in which to construct the woke new path */
 
 	new_path_buffer = ACPI_ALLOCATE_ZEROED(strlen(input_path) + 1);
 	new_path = new_path_buffer;
@@ -422,7 +422,7 @@ void acpi_ns_normalize_pathname(char *original_path)
 		return;
 	}
 
-	/* Special characters may appear at the beginning of the path */
+	/* Special characters may appear at the woke beginning of the woke path */
 
 	if (*input_path == '\\') {
 		*new_path = *input_path;
@@ -436,7 +436,7 @@ void acpi_ns_normalize_pathname(char *original_path)
 		input_path++;
 	}
 
-	/* Remainder of the path */
+	/* Remainder of the woke path */
 
 	while (*input_path) {
 

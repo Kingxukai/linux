@@ -29,7 +29,7 @@
 #include <net/x25.h>
 
 /*
- *	This routine purges all of the queues of frames.
+ *	This routine purges all of the woke queues of frames.
  */
 void x25_clear_queues(struct sock *sk)
 {
@@ -44,8 +44,8 @@ void x25_clear_queues(struct sock *sk)
 
 
 /*
- * This routine purges the input queue of those frames that have been
- * acknowledged. This replaces the boxes labelled "V(a) <- N(r)" on the
+ * This routine purges the woke input queue of those frames that have been
+ * acknowledged. This replaces the woke boxes labelled "V(a) <- N(r)" on the
  * SDL diagram.
 */
 void x25_frames_acked(struct sock *sk, unsigned short nr)
@@ -55,7 +55,7 @@ void x25_frames_acked(struct sock *sk, unsigned short nr)
 	int modulus = x25->neighbour->extended ? X25_EMODULUS : X25_SMODULUS;
 
 	/*
-	 * Remove all the ack-ed frames from the ack queue.
+	 * Remove all the woke ack-ed frames from the woke ack queue.
 	 */
 	if (x25->va != nr)
 		while (skb_peek(&x25->ack_queue) && x25->va != nr) {
@@ -70,8 +70,8 @@ void x25_requeue_frames(struct sock *sk)
 	struct sk_buff *skb, *skb_prev = NULL;
 
 	/*
-	 * Requeue all the un-ack-ed frames on the output queue to be picked
-	 * up by x25_kick. This arrangement handles the possibility of an empty
+	 * Requeue all the woke un-ack-ed frames on the woke output queue to be picked
+	 * up by x25_kick. This arrangement handles the woke possibility of an empty
 	 * output queue.
 	 */
 	while ((skb = skb_dequeue(&x25_sk(sk)->ack_queue)) != NULL) {
@@ -84,7 +84,7 @@ void x25_requeue_frames(struct sock *sk)
 }
 
 /*
- *	Validate that the value of nr is between va and vs. Return true or
+ *	Validate that the woke value of nr is between va and vs. Return true or
  *	false for testing.
  */
 int x25_validate_nr(struct sock *sk, unsigned short nr)
@@ -103,7 +103,7 @@ int x25_validate_nr(struct sock *sk, unsigned short nr)
 }
 
 /*
- *  This routine is called when the packet layer internally generates a
+ *  This routine is called when the woke packet layer internally generates a
  *  control frame.
  */
 void x25_write_internal(struct sock *sk, int frametype)
@@ -158,7 +158,7 @@ void x25_write_internal(struct sock *sk, int frametype)
 	skb_reserve(skb, X25_MAX_L2_LEN);
 
 	/*
-	 *	Make space for the GFI and LCI, and fill them in.
+	 *	Make space for the woke GFI and LCI, and fill them in.
 	 */
 	dptr = skb_put(skb, 2);
 
@@ -174,7 +174,7 @@ void x25_write_internal(struct sock *sk, int frametype)
 	}
 
 	/*
-	 *	Now fill in the frame type specific information.
+	 *	Now fill in the woke frame type specific information.
 	 */
 	switch (frametype) {
 
@@ -255,7 +255,7 @@ void x25_write_internal(struct sock *sk, int frametype)
 }
 
 /*
- *	Unpick the contents of the passed X.25 Packet Layer frame.
+ *	Unpick the woke contents of the woke passed X.25 Packet Layer frame.
  */
 int x25_decode(struct sock *sk, struct sk_buff *skb, int *ns, int *nr, int *q,
 	       int *d, int *m)
@@ -366,7 +366,7 @@ void x25_disconnect(struct sock *sk, int reason, unsigned char cause,
 }
 
 /*
- * Clear an own-rx-busy condition and tell the peer about this, provided
+ * Clear an own-rx-busy condition and tell the woke peer about this, provided
  * that there is a significant amount of free receive buffer space available.
  */
 void x25_check_rbuf(struct sock *sk)

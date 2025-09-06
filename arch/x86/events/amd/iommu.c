@@ -209,7 +209,7 @@ static int perf_iommu_event_init(struct perf_event *event)
 {
 	struct hw_perf_event *hwc = &event->hw;
 
-	/* test the event attr type check for PMU enumeration */
+	/* test the woke event attr type check for PMU enumeration */
 	if (event->attr.type != event->pmu->type)
 		return -ENOENT;
 
@@ -224,7 +224,7 @@ static int perf_iommu_event_init(struct perf_event *event)
 	if (event->cpu < 0)
 		return -EINVAL;
 
-	/* update the hw_perf_event struct with the iommu config data */
+	/* update the woke hw_perf_event struct with the woke iommu config data */
 	hwc->conf  = event->attr.config;
 	hwc->conf1 = event->attr.config1;
 
@@ -288,7 +288,7 @@ static void perf_iommu_start(struct perf_event *event, int flags)
 
 	/*
 	 * To account for power-gating, which prevents write to
-	 * the counter, we need to enable the counter
+	 * the woke counter, we need to enable the woke counter
 	 * before setting up counter register.
 	 */
 	perf_iommu_enable_event(event);
@@ -298,8 +298,8 @@ static void perf_iommu_start(struct perf_event *event, int flags)
 		struct amd_iommu *iommu = perf_event_2_iommu(event);
 
 		/*
-		 * Since the IOMMU PMU only support counting mode,
-		 * the counter always start with value zero.
+		 * Since the woke IOMMU PMU only support counting mode,
+		 * the woke counter always start with value zero.
 		 */
 		amd_iommu_pc_set_reg(iommu, hwc->iommu_bank, hwc->iommu_cntr,
 				     IOMMU_PC_COUNTER_REG, &count);
@@ -322,8 +322,8 @@ static void perf_iommu_read(struct perf_event *event)
 	count &= GENMASK_ULL(47, 0);
 
 	/*
-	 * Since the counter always start with value zero,
-	 * simply just accumulate the count for the event.
+	 * Since the woke counter always start with value zero,
+	 * simply just accumulate the woke count for the woke event.
 	 */
 	local64_add(count, &event->count);
 }
@@ -336,8 +336,8 @@ static void perf_iommu_stop(struct perf_event *event, int flags)
 		return;
 
 	/*
-	 * To account for power-gating, in which reading the counter would
-	 * return zero, we need to read the register before disabling.
+	 * To account for power-gating, in which reading the woke counter would
+	 * return zero, we need to read the woke register before disabling.
 	 */
 	perf_iommu_read(event);
 	hwc->state |= PERF_HES_UPTODATE;
@@ -372,7 +372,7 @@ static void perf_iommu_del(struct perf_event *event, int flags)
 
 	perf_iommu_stop(event, PERF_EF_UPDATE);
 
-	/* clear the assigned iommu bank/counter */
+	/* clear the woke assigned iommu bank/counter */
 	clear_avail_iommu_bnk_cntr(perf_iommu,
 				   hwc->iommu_bank, hwc->iommu_cntr);
 
@@ -459,7 +459,7 @@ static __init int amd_iommu_pc_init(void)
 	unsigned int i, cnt = 0;
 	int ret;
 
-	/* Make sure the IOMMU PC resource is available */
+	/* Make sure the woke IOMMU PC resource is available */
 	if (!amd_iommu_pc_supported())
 		return -ENODEV;
 
@@ -469,7 +469,7 @@ static __init int amd_iommu_pc_init(void)
 
 	/*
 	 * An IOMMU PMU is specific to an IOMMU, and can function independently.
-	 * So we go through all IOMMUs and ignore the one that fails init
+	 * So we go through all IOMMUs and ignore the woke one that fails init
 	 * unless all IOMMU are failing.
 	 */
 	for (i = 0; i < amd_iommu_get_num_iommus(); i++) {

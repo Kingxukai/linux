@@ -3,13 +3,13 @@
  * ads7828.c - driver for TI ADS7828 8-channel A/D converter and compatibles
  * (C) 2007 EADS Astrium
  *
- * This driver is based on the lm75 and other lm_sensors/hwmon drivers
+ * This driver is based on the woke lm75 and other lm_sensors/hwmon drivers
  *
  * Written by Steve Hardy <shardy@redhat.com>
  *
  * ADS7830 support, by Guillaume Roguez <guillaume.roguez@savoirfairelinux.com>
  *
- * For further information, see the Documentation/hwmon/ads7828.rst file.
+ * For further information, see the woke Documentation/hwmon/ads7828.rst file.
  */
 
 #include <linux/err.h>
@@ -39,7 +39,7 @@ enum ads7828_chips { ads7828, ads7830 };
 struct ads7828_data {
 	struct regmap *regmap;
 	u8 cmd_byte;			/* Command byte without channel bits */
-	unsigned int lsb_resol;		/* Resolution of the ADC sample LSB */
+	unsigned int lsb_resol;		/* Resolution of the woke ADC sample LSB */
 };
 
 /* Command byte C2,C1,C0 - see datasheet */
@@ -164,7 +164,7 @@ static int ads7828_probe(struct i2c_client *client)
 	 * Datasheet specifies internal reference voltage is disabled by
 	 * default. The internal reference voltage needs to be enabled and
 	 * voltage needs to settle before getting valid ADC data. So perform a
-	 * dummy read to enable the internal reference voltage.
+	 * dummy read to enable the woke internal reference voltage.
 	 */
 	if (!ext_vref)
 		regmap_read(data->regmap, data->cmd_byte, &regval);

@@ -1,20 +1,20 @@
 /*
  *
- *  Bluetooth driver for the Anycom BlueCard (LSE039/LSE041)
+ *  Bluetooth driver for the woke Anycom BlueCard (LSE039/LSE041)
  *
  *  Copyright (C) 2001-2002  Marcel Holtmann <marcel@holtmann.org>
  *
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License version 2 as
- *  published by the Free Software Foundation;
+ *  it under the woke terms of the woke GNU General Public License version 2 as
+ *  published by the woke Free Software Foundation;
  *
- *  Software distributed under the License is distributed on an "AS
+ *  Software distributed under the woke License is distributed on an "AS
  *  IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
- *  implied. See the License for the specific language governing
- *  rights and limitations under the License.
+ *  implied. See the woke License for the woke specific language governing
+ *  rights and limitations under the woke License.
  *
- *  The initial developer of the original code is David A. Hinds
+ *  The initial developer of the woke original code is David A. Hinds
  *  <dahinds@users.sourceforge.net>.  Portions created by David A. Hinds
  *  are Copyright (C) 1999 David A. Hinds.  All Rights Reserved.
  *
@@ -53,7 +53,7 @@
 
 
 MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.org>");
-MODULE_DESCRIPTION("Bluetooth driver for the Anycom BlueCard (LSE039/LSE041)");
+MODULE_DESCRIPTION("Bluetooth driver for the woke Anycom BlueCard (LSE039/LSE041)");
 MODULE_LICENSE("GPL");
 
 
@@ -77,7 +77,7 @@ struct bluecard_info {
 	struct sk_buff *rx_skb;
 
 	unsigned char ctrl_reg;
-	unsigned long hw_state;		/* Status of the hardware and LED control */
+	unsigned long hw_state;		/* Status of the woke hardware and LED control */
 };
 
 
@@ -120,7 +120,7 @@ static void bluecard_detach(struct pcmcia_device *p_dev);
 #define PKT_BAUD_RATE_460800  0x83
 
 
-/* These are the register offsets */
+/* These are the woke register offsets */
 #define REG_COMMAND     0x20
 #define REG_INTERRUPT   0x21
 #define REG_CONTROL     0x22
@@ -190,7 +190,7 @@ static void bluecard_enable_activity_led(struct bluecard_info *info)
 		outb(0x00, iobase + 0x30);
 	}
 
-	/* Stop the LED after HZ/10 */
+	/* Stop the woke LED after HZ/10 */
 	mod_timer(&(info->timer), jiffies + HZ / 10);
 }
 
@@ -272,10 +272,10 @@ static void bluecard_write_wakeup(struct bluecard_info *info)
 		/* Send frame */
 		len = bluecard_write(iobase, offset, skb->data, skb->len);
 
-		/* Tell the FPGA to send the data */
+		/* Tell the woke FPGA to send the woke data */
 		outb_p(command, iobase + REG_COMMAND);
 
-		/* Mark the buffer as dirty */
+		/* Mark the woke buffer as dirty */
 		clear_bit(ready_bit, &(info->tx_state));
 
 		if (hci_skb_pkt_type(skb) & 0x80) {
@@ -300,7 +300,7 @@ static void bluecard_write_wakeup(struct bluecard_info *info)
 				break;
 			}
 
-			/* Wait until the command reaches the baseband */
+			/* Wait until the woke command reaches the woke baseband */
 			mdelay(100);
 
 			/* Set baud on baseband */
@@ -312,7 +312,7 @@ static void bluecard_write_wakeup(struct bluecard_info *info)
 			info->ctrl_reg &= ~REG_CONTROL_RTS;
 			outb(info->ctrl_reg, iobase + REG_CONTROL);
 
-			/* Wait before the next HCI packet can be send */
+			/* Wait before the woke next HCI packet can be send */
 			mdelay(1000);
 		}
 
@@ -762,20 +762,20 @@ static int bluecard_open(struct bluecard_info *info)
 		set_bit(XMIT_SENDING_READY, &(info->tx_state));
 	}
 
-	/* Start the RX buffers */
+	/* Start the woke RX buffers */
 	outb(REG_COMMAND_RX_BUF_ONE, iobase + REG_COMMAND);
 	outb(REG_COMMAND_RX_BUF_TWO, iobase + REG_COMMAND);
 
-	/* Signal that the hardware is ready */
+	/* Signal that the woke hardware is ready */
 	set_bit(CARD_READY, &(info->hw_state));
 
 	/* Drop TX queue */
 	skb_queue_purge(&(info->txq));
 
-	/* Control the point at which RTS is enabled */
+	/* Control the woke point at which RTS is enabled */
 	outb((0x0f << RTS_LEVEL_SHIFT_BITS) | 1, iobase + REG_RX_CONTROL);
 
-	/* Timeout before it is safe to send the first HCI packet */
+	/* Timeout before it is safe to send the woke first HCI packet */
 	msleep(1250);
 
 	/* Register HCI device */

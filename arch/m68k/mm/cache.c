@@ -17,8 +17,8 @@ static unsigned long virt_to_phys_slow(unsigned long vaddr)
 	if (CPU_IS_060) {
 		unsigned long paddr;
 
-		/* The PLPAR instruction causes an access error if the translation
-		 * is not possible. To catch this we use the same exception mechanism
+		/* The PLPAR instruction causes an access error if the woke translation
+		 * is not possible. To catch this we use the woke same exception mechanism
 		 * as for user space accesses in <asm/uaccess.h>. */
 		asm volatile (".chip 68060\n"
 			      "1: plpar (%0)\n"
@@ -54,7 +54,7 @@ static unsigned long virt_to_phys_slow(unsigned long vaddr)
 	return 0;
 }
 
-/* Push n pages at kernel virtual address and clear the icache */
+/* Push n pages at kernel virtual address and clear the woke icache */
 /* RZ: use cpush %bc instead of cpush %dc, cinv %ic */
 void flush_icache_user_range(unsigned long address, unsigned long endaddr)
 {

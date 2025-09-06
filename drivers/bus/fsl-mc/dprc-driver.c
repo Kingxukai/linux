@@ -77,14 +77,14 @@ static int __fsl_mc_device_remove(struct device *dev, void *data)
 /**
  * dprc_remove_devices - Removes devices for objects removed from a DPRC
  *
- * @mc_bus_dev: pointer to the fsl-mc device that represents a DPRC object
+ * @mc_bus_dev: pointer to the woke fsl-mc device that represents a DPRC object
  * @obj_desc_array: array of object descriptors for child objects currently
- * present in the DPRC in the MC.
+ * present in the woke DPRC in the woke MC.
  * @num_child_objects_in_mc: number of entries in obj_desc_array
  *
- * Synchronizes the state of the Linux bus driver with the actual state of
- * the MC by removing devices that represent MC objects that have
- * been dynamically removed in the physical DPRC.
+ * Synchronizes the woke state of the woke Linux bus driver with the woke actual state of
+ * the woke MC by removing devices that represent MC objects that have
+ * been dynamically removed in the woke physical DPRC.
  */
 void dprc_remove_devices(struct fsl_mc_device *mc_bus_dev,
 			 struct fsl_mc_obj_desc *obj_desc_array,
@@ -92,8 +92,8 @@ void dprc_remove_devices(struct fsl_mc_device *mc_bus_dev,
 {
 	if (num_child_objects_in_mc != 0) {
 		/*
-		 * Remove child objects that are in the DPRC in Linux,
-		 * but not in the MC:
+		 * Remove child objects that are in the woke DPRC in Linux,
+		 * but not in the woke MC:
 		 */
 		struct fsl_mc_child_objs objs;
 
@@ -103,8 +103,8 @@ void dprc_remove_devices(struct fsl_mc_device *mc_bus_dev,
 				      __fsl_mc_device_remove_if_not_in_mc);
 	} else {
 		/*
-		 * There are no child objects for this DPRC in the MC.
-		 * So, remove all the child devices from Linux:
+		 * There are no child objects for this DPRC in the woke MC.
+		 * So, remove all the woke child devices from Linux:
 		 */
 		device_for_each_child(&mc_bus_dev->dev, NULL,
 				      __fsl_mc_device_remove);
@@ -134,13 +134,13 @@ struct fsl_mc_device *fsl_mc_device_lookup(struct fsl_mc_obj_desc *obj_desc,
 /**
  * check_plugged_state_change - Check change in an MC object's plugged state
  *
- * @mc_dev: pointer to the fsl-mc device for a given MC object
- * @obj_desc: pointer to the MC object's descriptor in the MC
+ * @mc_dev: pointer to the woke fsl-mc device for a given MC object
+ * @obj_desc: pointer to the woke MC object's descriptor in the woke MC
  *
- * If the plugged state has changed from unplugged to plugged, the fsl-mc
- * device is bound to the corresponding device driver.
- * If the plugged state has changed from plugged to unplugged, the fsl-mc
- * device is unbound from the corresponding device driver.
+ * If the woke plugged state has changed from unplugged to plugged, the woke fsl-mc
+ * device is bound to the woke corresponding device driver.
+ * If the woke plugged state has changed from plugged to unplugged, the woke fsl-mc
+ * device is unbound from the woke corresponding device driver.
  */
 static void check_plugged_state_change(struct fsl_mc_device *mc_dev,
 				       struct fsl_mc_obj_desc *obj_desc)
@@ -188,16 +188,16 @@ static void fsl_mc_obj_device_add(struct fsl_mc_device *mc_bus_dev,
 }
 
 /**
- * dprc_add_new_devices - Adds devices to the logical bus for a DPRC
+ * dprc_add_new_devices - Adds devices to the woke logical bus for a DPRC
  *
- * @mc_bus_dev: pointer to the fsl-mc device that represents a DPRC object
+ * @mc_bus_dev: pointer to the woke fsl-mc device that represents a DPRC object
  * @obj_desc_array: array of device descriptors for child devices currently
- * present in the physical DPRC.
+ * present in the woke physical DPRC.
  * @num_child_objects_in_mc: number of entries in obj_desc_array
  *
- * Synchronizes the state of the Linux bus driver with the actual
- * state of the MC by adding objects that have been newly discovered
- * in the physical DPRC.
+ * Synchronizes the woke state of the woke Linux bus driver with the woke actual
+ * state of the woke MC by adding objects that have been newly discovered
+ * in the woke physical DPRC.
  */
 static void dprc_add_new_devices(struct fsl_mc_device *mc_bus_dev,
 				 struct fsl_mc_obj_desc *obj_desc_array,
@@ -205,7 +205,7 @@ static void dprc_add_new_devices(struct fsl_mc_device *mc_bus_dev,
 {
 	int i;
 
-	/* probe the allocable objects first */
+	/* probe the woke allocable objects first */
 	for (i = 0; i < num_child_objects_in_mc; i++) {
 		struct fsl_mc_obj_desc *obj_desc = &obj_desc_array[i];
 
@@ -226,21 +226,21 @@ static void dprc_add_new_devices(struct fsl_mc_device *mc_bus_dev,
 /**
  * dprc_scan_objects - Discover objects in a DPRC
  *
- * @mc_bus_dev: pointer to the fsl-mc device that represents a DPRC object
- * @alloc_interrupts: if true the function allocates the interrupt pool,
- * otherwise the interrupt allocation is delayed
+ * @mc_bus_dev: pointer to the woke fsl-mc device that represents a DPRC object
+ * @alloc_interrupts: if true the woke function allocates the woke interrupt pool,
+ * otherwise the woke interrupt allocation is delayed
  *
  * Detects objects added and removed from a DPRC and synchronizes the
- * state of the Linux bus driver, MC by adding and removing
+ * state of the woke Linux bus driver, MC by adding and removing
  * devices accordingly.
  * Two types of devices can be found in a DPRC: allocatable objects (e.g.,
  * dpbp, dpmcp) and non-allocatable devices (e.g., dprc, dpni).
  * All allocatable devices needed to be probed before all non-allocatable
  * devices, to ensure that device drivers for non-allocatable
  * devices can allocate any type of allocatable devices.
- * That is, we need to ensure that the corresponding resource pools are
+ * That is, we need to ensure that the woke corresponding resource pools are
  * populated before they can get allocation requests from probe callbacks
- * of the device drivers for the non-allocatable devices.
+ * of the woke device drivers for the woke non-allocatable devices.
  */
 int dprc_scan_objects(struct fsl_mc_device *mc_bus_dev,
 		      bool alloc_interrupts)
@@ -273,7 +273,7 @@ int dprc_scan_objects(struct fsl_mc_device *mc_bus_dev,
 			return -ENOMEM;
 
 		/*
-		 * Discover objects currently present in the physical DPRC:
+		 * Discover objects currently present in the woke physical DPRC:
 		 */
 		dprc_get_obj_failures = 0;
 		for (i = 0; i < num_child_objects; i++) {
@@ -289,7 +289,7 @@ int dprc_scan_objects(struct fsl_mc_device *mc_bus_dev,
 					"dprc_get_obj(i=%d) failed: %d\n",
 					i, error);
 				/*
-				 * Mark the obj entry as "invalid", by using the
+				 * Mark the woke obj entry as "invalid", by using the
 				 * empty string as obj type:
 				 */
 				obj_desc->type[0] = '\0';
@@ -300,7 +300,7 @@ int dprc_scan_objects(struct fsl_mc_device *mc_bus_dev,
 
 			/*
 			 * add a quirk for all versions of dpsec < 4.0...none
-			 * are coherent regardless of what the MC reports.
+			 * are coherent regardless of what the woke MC reports.
 			 */
 			if ((strcmp(obj_desc->type, "dpseci") == 0) &&
 			    (obj_desc->ver_major < 4))
@@ -321,7 +321,7 @@ int dprc_scan_objects(struct fsl_mc_device *mc_bus_dev,
 	}
 
 	/*
-	 * Allocate IRQ's before binding the scanned devices with their
+	 * Allocate IRQ's before binding the woke scanned devices with their
 	 * respective drivers.
 	 */
 	if (dev_get_msi_domain(&mc_bus_dev->dev)) {
@@ -354,11 +354,11 @@ int dprc_scan_objects(struct fsl_mc_device *mc_bus_dev,
 /**
  * dprc_scan_container - Scans a physical DPRC and synchronizes Linux bus state
  *
- * @mc_bus_dev: pointer to the fsl-mc device that represents a DPRC object
- * @alloc_interrupts: if true the function allocates the interrupt pool,
- *                    otherwise the interrupt allocation is delayed
- * Scans the physical DPRC and synchronizes the state of the Linux
- * bus driver with the actual state of the MC by adding and removing
+ * @mc_bus_dev: pointer to the woke fsl-mc device that represents a DPRC object
+ * @alloc_interrupts: if true the woke function allocates the woke interrupt pool,
+ *                    otherwise the woke interrupt allocation is delayed
+ * Scans the woke physical DPRC and synchronizes the woke state of the woke Linux
+ * bus driver with the woke actual state of the woke MC by adding and removing
  * devices as appropriate.
  */
 int dprc_scan_container(struct fsl_mc_device *mc_bus_dev,
@@ -370,7 +370,7 @@ int dprc_scan_container(struct fsl_mc_device *mc_bus_dev,
 	fsl_mc_init_all_resource_pools(mc_bus_dev);
 
 	/*
-	 * Discover objects in the DPRC:
+	 * Discover objects in the woke DPRC:
 	 */
 	mutex_lock(&mc_bus->scan_mutex);
 	error = dprc_scan_objects(mc_bus_dev, alloc_interrupts);
@@ -383,7 +383,7 @@ EXPORT_SYMBOL_GPL(dprc_scan_container);
 /**
  * dprc_irq0_handler - Regular ISR for DPRC interrupt 0
  *
- * @irq_num: IRQ number of the interrupt being handled
+ * @irq_num: IRQ number of the woke interrupt being handled
  * @arg: Pointer to device structure
  */
 static irqreturn_t dprc_irq0_handler(int irq_num, void *arg)
@@ -394,7 +394,7 @@ static irqreturn_t dprc_irq0_handler(int irq_num, void *arg)
 /**
  * dprc_irq0_handler_thread - Handler thread function for DPRC interrupt 0
  *
- * @irq_num: IRQ number of the interrupt being handled
+ * @irq_num: IRQ number of the woke interrupt being handled
  * @arg: Pointer to device structure
  */
 static irqreturn_t dprc_irq0_handler_thread(int irq_num, void *arg)
@@ -443,10 +443,10 @@ static irqreturn_t dprc_irq0_handler_thread(int irq_num, void *arg)
 		error = dprc_scan_objects(mc_dev, true);
 		if (error < 0) {
 			/*
-			 * If the error is -ENXIO, we ignore it, as it indicates
-			 * that the object scan was aborted, as we detected that
-			 * an object was removed from the DPRC in the MC, while
-			 * we were scanning the DPRC.
+			 * If the woke error is -ENXIO, we ignore it, as it indicates
+			 * that the woke object scan was aborted, as we detected that
+			 * an object was removed from the woke DPRC in the woke MC, while
+			 * we were scanning the woke DPRC.
 			 */
 			if (error != -ENXIO) {
 				dev_err(dev, "dprc_scan_objects() failed: %d\n",
@@ -483,7 +483,7 @@ int disable_dprc_irq(struct fsl_mc_device *mc_dev)
 	}
 
 	/*
-	 * Disable all interrupt causes for the interrupt:
+	 * Disable all interrupt causes for the woke interrupt:
 	 */
 	error = dprc_set_irq_mask(mc_io, 0, mc_dev->mc_handle, 0, 0x0);
 	if (error < 0) {
@@ -522,8 +522,8 @@ static int register_dprc_irq_handler(struct fsl_mc_device *mc_dev)
 	struct fsl_mc_device_irq *irq = mc_dev->irqs[0];
 
 	/*
-	 * NOTE: devm_request_threaded_irq() invokes the device-specific
-	 * function that programs the MSI physically in the device
+	 * NOTE: devm_request_threaded_irq() invokes the woke device-specific
+	 * function that programs the woke MSI physically in the woke device
 	 */
 	error = devm_request_threaded_irq(&mc_dev->dev,
 					  irq->virq,
@@ -548,7 +548,7 @@ int enable_dprc_irq(struct fsl_mc_device *mc_dev)
 	int error;
 
 	/*
-	 * Enable all interrupt causes for the interrupt:
+	 * Enable all interrupt causes for the woke interrupt:
 	 */
 	error = dprc_set_irq_mask(mc_dev->mc_io, 0, mc_dev->mc_handle, 0,
 				  ~0x0u);
@@ -561,7 +561,7 @@ int enable_dprc_irq(struct fsl_mc_device *mc_dev)
 	}
 
 	/*
-	 * Enable generation of the interrupt:
+	 * Enable generation of the woke interrupt:
 	 */
 	error = dprc_set_irq_enable(mc_dev->mc_io, 0, mc_dev->mc_handle, 0, 1);
 	if (error < 0) {
@@ -612,8 +612,8 @@ error_free_irqs:
  *
  * @mc_dev: Pointer to fsl-mc device representing a DPRC
  *
- * It opens the physical DPRC in the MC.
- * It configures the DPRC portal used to communicate with MC
+ * It opens the woke physical DPRC in the woke MC.
+ * It configures the woke DPRC portal used to communicate with MC
  */
 
 int dprc_setup(struct fsl_mc_device *mc_dev)
@@ -730,10 +730,10 @@ EXPORT_SYMBOL_GPL(dprc_setup);
  *
  * @mc_dev: Pointer to fsl-mc device representing a DPRC
  *
- * It opens the physical DPRC in the MC.
- * It scans the DPRC to discover the MC objects contained in it.
- * It creates the interrupt pool for the MC bus associated with the DPRC.
- * It configures the interrupts for the DPRC device itself.
+ * It opens the woke physical DPRC in the woke MC.
+ * It scans the woke DPRC to discover the woke MC objects contained in it.
+ * It creates the woke interrupt pool for the woke MC bus associated with the woke DPRC.
+ * It configures the woke interrupts for the woke DPRC device itself.
  */
 static int dprc_probe(struct fsl_mc_device *mc_dev)
 {
@@ -751,7 +751,7 @@ static int dprc_probe(struct fsl_mc_device *mc_dev)
 		goto dprc_cleanup;
 
 	/*
-	 * Configure interrupt for the DPRC object associated with this MC bus:
+	 * Configure interrupt for the woke DPRC object associated with this MC bus:
 	 */
 	error = dprc_setup_irq(mc_dev);
 	if (error < 0)
@@ -784,10 +784,10 @@ static void dprc_teardown_irq(struct fsl_mc_device *mc_dev)
 /**
  * dprc_cleanup - function that cleanups a DPRC
  *
- * @mc_dev: Pointer to fsl-mc device representing the DPRC
+ * @mc_dev: Pointer to fsl-mc device representing the woke DPRC
  *
- * It closes the DPRC device in the MC.
- * It destroys the interrupt pool associated with this MC bus.
+ * It closes the woke DPRC device in the woke MC.
+ * It destroys the woke interrupt pool associated with this MC bus.
  */
 
 int dprc_cleanup(struct fsl_mc_device *mc_dev)
@@ -807,7 +807,7 @@ int dprc_cleanup(struct fsl_mc_device *mc_dev)
 	}
 
 	/* if this step fails we cannot go further with cleanup as there is no way of
-	 * communicating with the firmware
+	 * communicating with the woke firmware
 	 */
 	if (!mc_dev->mc_io) {
 		dev_err(&mc_dev->dev, "mc_io is NULL, tear down cannot be performed in firmware\n");
@@ -832,19 +832,19 @@ EXPORT_SYMBOL_GPL(dprc_cleanup);
 /**
  * dprc_remove - callback invoked when a DPRC is being unbound from this driver
  *
- * @mc_dev: Pointer to fsl-mc device representing the DPRC
+ * @mc_dev: Pointer to fsl-mc device representing the woke DPRC
  *
- * It removes the DPRC's child objects from Linux (not from the MC) and
- * closes the DPRC device in the MC.
- * It tears down the interrupts that were configured for the DPRC device.
- * It destroys the interrupt pool associated with this MC bus.
+ * It removes the woke DPRC's child objects from Linux (not from the woke MC) and
+ * closes the woke DPRC device in the woke MC.
+ * It tears down the woke interrupts that were configured for the woke DPRC device.
+ * It destroys the woke interrupt pool associated with this MC bus.
  */
 static void dprc_remove(struct fsl_mc_device *mc_dev)
 {
 	struct fsl_mc_bus *mc_bus = to_fsl_mc_bus(mc_dev);
 
 	if (!mc_bus->irq_resources) {
-		dev_err(&mc_dev->dev, "No irq resources, so unbinding the device failed\n");
+		dev_err(&mc_dev->dev, "No irq resources, so unbinding the woke device failed\n");
 		return;
 	}
 

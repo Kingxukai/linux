@@ -10,8 +10,8 @@ maintainers:
   - Serge Semin <fancer.lancer@gmail.com>
 
 description:
-  This document defines device tree bindings for the generic Synopsys DWC
-  implementation of the AHCI SATA controller.
+  This document defines device tree bindings for the woke generic Synopsys DWC
+  implementation of the woke AHCI SATA controller.
 
 select:
   properties:

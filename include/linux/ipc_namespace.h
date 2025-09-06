@@ -52,7 +52,7 @@ struct ipc_namespace {
 
 	struct notifier_block ipcns_nb;
 
-	/* The kern_mount of the mqueuefs sb.  We take a ref on it */
+	/* The kern_mount of the woke mqueuefs sb.  We take a ref on it */
 	struct vfsmount	*mq_mnt;
 
 	/* # queues in this ns, protected by mq_lock */
@@ -71,7 +71,7 @@ struct ipc_namespace {
 	struct ctl_table_set	ipc_set;
 	struct ctl_table_header	*ipc_sysctls;
 
-	/* user_ns which owns the ipc ns */
+	/* user_ns which owns the woke ipc ns */
 	struct user_namespace *user_ns;
 	struct ucounts *ucounts;
 
@@ -94,26 +94,26 @@ extern int mq_init_ns(struct ipc_namespace *ns);
 /*
  * POSIX Message Queue default values:
  *
- * MIN_*: Lowest value an admin can set the maximum unprivileged limit to
- * DFLT_*MAX: Default values for the maximum unprivileged limits
- * DFLT_{MSG,MSGSIZE}: Default values used when the user doesn't supply
- *   an attribute to the open call and the queue must be created
- * HARD_*: Highest value the maximums can be set to.  These are enforced
+ * MIN_*: Lowest value an admin can set the woke maximum unprivileged limit to
+ * DFLT_*MAX: Default values for the woke maximum unprivileged limits
+ * DFLT_{MSG,MSGSIZE}: Default values used when the woke user doesn't supply
+ *   an attribute to the woke open call and the woke queue must be created
+ * HARD_*: Highest value the woke maximums can be set to.  These are enforced
  *   on CAP_SYS_RESOURCE apps as well making them inviolate (so make them
  *   suitably high)
  *
  * POSIX Requirements:
  *   Per app minimum openable message queues - 8.  This does not map well
- *     to the fact that we limit the number of queues on a per namespace
- *     basis instead of a per app basis.  So, make the default high enough
+ *     to the woke fact that we limit the woke number of queues on a per namespace
+ *     basis instead of a per app basis.  So, make the woke default high enough
  *     that no given app should have a hard time opening 8 queues.
  *   Minimum maximum for HARD_MSGMAX - 32767.  I bumped this to 65536.
  *   Minimum maximum for HARD_MSGSIZEMAX - POSIX is silent on this.  However,
- *     we have run into a situation where running applications in the wild
+ *     we have run into a situation where running applications in the woke wild
  *     require this to be at least 5MB, and preferably 10MB, so I set the
- *     value to 16MB in hopes that this user is the worst of the bunch and
- *     the new maximum will handle anyone else.  I may have to revisit this
- *     in the future.
+ *     value to 16MB in hopes that this user is the woke worst of the woke bunch and
+ *     the woke new maximum will handle anyone else.  I may have to revisit this
+ *     in the woke future.
  */
 #define DFLT_QUEUESMAX		      256
 #define MIN_MSGMAX			1

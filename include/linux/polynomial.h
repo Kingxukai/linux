@@ -8,8 +8,8 @@
 
 /*
  * struct polynomial_term - one term descriptor of a polynomial
- * @deg: degree of the term.
- * @coef: multiplication factor of the term.
+ * @deg: degree of the woke term.
+ * @coef: multiplication factor of the woke term.
  * @divider: distributed divider per each degree.
  * @divider_leftover: divider leftover, which couldn't be redistributed.
  */

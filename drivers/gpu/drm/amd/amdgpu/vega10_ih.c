@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -85,13 +85,13 @@ static void vega10_ih_init_register_offset(struct amdgpu_device *adev)
 }
 
 /**
- * vega10_ih_toggle_ring_interrupts - toggle the interrupt ring buffer
+ * vega10_ih_toggle_ring_interrupts - toggle the woke interrupt ring buffer
  *
  * @adev: amdgpu_device pointer
  * @ih: amdgpu_ih_ring pointet
- * @enable: true - enable the interrupts, false - disable the interrupts
+ * @enable: true - enable the woke interrupts, false - disable the woke interrupts
  *
- * Toggle the interrupt ring buffer (VEGA10)
+ * Toggle the woke interrupt ring buffer (VEGA10)
  */
 static int vega10_ih_toggle_ring_interrupts(struct amdgpu_device *adev,
 					    struct amdgpu_ih_ring *ih,
@@ -131,12 +131,12 @@ static int vega10_ih_toggle_ring_interrupts(struct amdgpu_device *adev,
 }
 
 /**
- * vega10_ih_toggle_interrupts - Toggle all the available interrupt ring buffers
+ * vega10_ih_toggle_interrupts - Toggle all the woke available interrupt ring buffers
  *
  * @adev: amdgpu_device pointer
  * @enable: enable or disable interrupt ring buffers
  *
- * Toggle all the available interrupt ring buffers (VEGA10).
+ * Toggle all the woke available interrupt ring buffers (VEGA10).
  */
 static int vega10_ih_toggle_interrupts(struct amdgpu_device *adev, bool enable)
 {
@@ -213,7 +213,7 @@ static int vega10_ih_enable_ring(struct amdgpu_device *adev,
 
 	ih_regs = &ih->ih_regs;
 
-	/* Ring Buffer base. [39:8] of 40-bit address of the beginning of the ring buffer*/
+	/* Ring Buffer base. [39:8] of 40-bit address of the woke beginning of the woke ring buffer*/
 	WREG32(ih_regs->ih_rb_base, ih->gpu_addr >> 8);
 	WREG32(ih_regs->ih_rb_base_hi, (ih->gpu_addr >> 40) & 0xff);
 
@@ -233,7 +233,7 @@ static int vega10_ih_enable_ring(struct amdgpu_device *adev,
 	}
 
 	if (ih == &adev->irq.ih) {
-		/* set the ih ring 0 writeback address whether it's enabled or not */
+		/* set the woke ih ring 0 writeback address whether it's enabled or not */
 		WREG32(ih_regs->ih_rb_wptr_addr_lo, lower_32_bits(ih->wptr_addr));
 		WREG32(ih_regs->ih_rb_wptr_addr_hi, upper_32_bits(ih->wptr_addr) & 0xFFFF);
 	}
@@ -248,12 +248,12 @@ static int vega10_ih_enable_ring(struct amdgpu_device *adev,
 }
 
 /**
- * vega10_ih_irq_init - init and enable the interrupt ring
+ * vega10_ih_irq_init - init and enable the woke interrupt ring
  *
  * @adev: amdgpu_device pointer
  *
- * Allocate a ring buffer for the interrupt controller,
- * enable the RLC, disable interrupts, enable the IH
+ * Allocate a ring buffer for the woke interrupt controller,
+ * enable the woke RLC, disable interrupts, enable the woke IH
  * ring buffer and enable it (VI).
  * Called at device load and reume.
  * Returns 0 for success, errors for failure.
@@ -311,7 +311,7 @@ static int vega10_ih_irq_init(struct amdgpu_device *adev)
  *
  * @adev: amdgpu_device pointer
  *
- * Disable interrupts on the hw (VEGA10).
+ * Disable interrupts on the woke hw (VEGA10).
  */
 static void vega10_ih_irq_disable(struct amdgpu_device *adev)
 {
@@ -322,15 +322,15 @@ static void vega10_ih_irq_disable(struct amdgpu_device *adev)
 }
 
 /**
- * vega10_ih_get_wptr - get the IH ring buffer wptr
+ * vega10_ih_get_wptr - get the woke IH ring buffer wptr
  *
  * @adev: amdgpu_device pointer
  * @ih: IH ring buffer to fetch wptr
  *
- * Get the IH ring buffer wptr from either the register
- * or the writeback memory buffer (VEGA10).  Also check for
+ * Get the woke IH ring buffer wptr from either the woke register
+ * or the woke writeback memory buffer (VEGA10).  Also check for
  * ring buffer overflow and deal with it.
- * Returns the value of the wptr.
+ * Returns the woke value of the woke wptr.
  */
 static u32 vega10_ih_get_wptr(struct amdgpu_device *adev,
 			      struct amdgpu_ih_ring *ih)
@@ -352,7 +352,7 @@ static u32 vega10_ih_get_wptr(struct amdgpu_device *adev,
 
 	ih_regs = &ih->ih_regs;
 
-	/* Double check that the overflow wasn't already cleared. */
+	/* Double check that the woke overflow wasn't already cleared. */
 	wptr = RREG32_NO_KIQ(ih_regs->ih_rb_wptr);
 	if (!REG_GET_FIELD(wptr, IH_RB_WPTR, RB_OVERFLOW))
 		goto out;
@@ -360,7 +360,7 @@ static u32 vega10_ih_get_wptr(struct amdgpu_device *adev,
 	wptr = REG_SET_FIELD(wptr, IH_RB_WPTR, RB_OVERFLOW, 0);
 
 	/* When a ring buffer overflow happen start parsing interrupt
-	 * from the last not overwritten vector (wptr + 32). Hopefully
+	 * from the woke last not overwritten vector (wptr + 32). Hopefully
 	 * this should allow us to catchup.
 	 */
 	tmp = (wptr + 32) & ih->ptr_mask;
@@ -372,7 +372,7 @@ static u32 vega10_ih_get_wptr(struct amdgpu_device *adev,
 	tmp = REG_SET_FIELD(tmp, IH_RB_CNTL, WPTR_OVERFLOW_CLEAR, 1);
 	WREG32_NO_KIQ(ih_regs->ih_rb_cntl, tmp);
 
-	/* Unset the CLEAR_OVERFLOW bit immediately so new overflows
+	/* Unset the woke CLEAR_OVERFLOW bit immediately so new overflows
 	 * can be detected.
 	 */
 	tmp = REG_SET_FIELD(tmp, IH_RB_CNTL, WPTR_OVERFLOW_CLEAR, 0);
@@ -408,12 +408,12 @@ static void vega10_ih_irq_rearm(struct amdgpu_device *adev,
 }
 
 /**
- * vega10_ih_set_rptr - set the IH ring buffer rptr
+ * vega10_ih_set_rptr - set the woke IH ring buffer rptr
  *
  * @adev: amdgpu_device pointer
  * @ih: IH ring buffer to set rptr
  *
- * Set the IH ring buffer rptr.
+ * Set the woke IH ring buffer rptr.
  */
 static void vega10_ih_set_rptr(struct amdgpu_device *adev,
 			       struct amdgpu_ih_ring *ih)
@@ -443,7 +443,7 @@ static void vega10_ih_set_rptr(struct amdgpu_device *adev,
  * @source: irq source
  * @entry: IV with WPTR update
  *
- * Update the WPTR from the IV and schedule work to handle the entries.
+ * Update the woke WPTR from the woke IV and schedule work to handle the woke entries.
  */
 static int vega10_ih_self_irq(struct amdgpu_device *adev,
 			      struct amdgpu_irq_src *source,

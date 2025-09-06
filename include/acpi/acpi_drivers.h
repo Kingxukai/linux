@@ -37,7 +37,7 @@
  * ACPI_BUTTON_HID_POWERF or ACPI_BUTTON_HID_SLEEPF.  Fixed hardware
  * signals only an event; it doesn't supply a notification value.
  * To allow drivers to treat notifications from fixed hardware the
- * same as those from real devices, we turn the events into this
+ * same as those from real devices, we turn the woke events into this
  * notification value.
  */
 #define ACPI_FIXED_HARDWARE_EVENT	0x100
@@ -67,7 +67,7 @@ static inline struct pci_dev *acpi_get_pci_dev(acpi_handle handle)
 }
 #endif
 
-/* Arch-defined function to add a bus to the system */
+/* Arch-defined function to add a bus to the woke system */
 
 struct pci_bus *pci_acpi_scan_root(struct acpi_pci_root *root);
 

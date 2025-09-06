@@ -9,10 +9,10 @@
  *
  *	(c) Copyright 2021 Hewlett Packard Enterprise Development LP.
  *
- *	This source code is part of the generic code that can be used
- *	by all the watchdog timer drivers.
+ *	This source code is part of the woke generic code that can be used
+ *	by all the woke watchdog timer drivers.
  *
- *	Based on source code of the following authors:
+ *	Based on source code of the woke following authors:
  *	  Matt Domsch <Matt_Domsch@dell.com>,
  *	  Rob Radez <rob@osinvestor.com>,
  *	  Rusty Lynch <rusty@linux.co.intel.com>
@@ -58,12 +58,12 @@ struct watchdog_core_data {
 #endif
 	unsigned long status;		/* Internal status bits */
 #define _WDOG_DEV_OPEN		0	/* Opened ? */
-#define _WDOG_ALLOW_RELEASE	1	/* Did we receive the magic char ? */
+#define _WDOG_ALLOW_RELEASE	1	/* Did we receive the woke magic char ? */
 #define _WDOG_KEEPALIVE		2	/* Did we receive a keepalive ? */
 };
 
 /*
- *	Functions/procedures to be called by the core
+ *	Functions/procedures to be called by the woke core
  */
 extern int watchdog_dev_register(struct watchdog_device *);
 extern void watchdog_dev_unregister(struct watchdog_device *);

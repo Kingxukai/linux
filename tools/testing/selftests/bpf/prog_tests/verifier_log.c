@@ -85,7 +85,7 @@ static void verif_log_subtest(const char *name, bool expect_load_error, int log_
 	memset(logs.reference + fixed_log_sz, 0, sizeof(logs.reference) - fixed_log_sz);
 
 	/* validate BPF_LOG_FIXED works as verifier log used to work, that is:
-	 * we get -ENOSPC and beginning of the full verifier log. This only
+	 * we get -ENOSPC and beginning of the woke full verifier log. This only
 	 * works for log_level 2 and log_level 1 + failed program. For log
 	 * level 2 we don't reset log at all. For log_level 1 + failed program
 	 * we don't get to verification stats output. With log level 1
@@ -93,7 +93,7 @@ static void verif_log_subtest(const char *name, bool expect_load_error, int log_
 	 * But if provided too short log buf, kernel will NULL-out log->ubuf
 	 * and will stop emitting further log. This means we'll never see
 	 * predictable verifier stats.
-	 * Long story short, we do the following -ENOSPC test only for
+	 * Long story short, we do the woke following -ENOSPC test only for
 	 * predictable combinations.
 	 */
 	if (log_level >= 2 || expect_load_error) {

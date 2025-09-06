@@ -66,12 +66,12 @@ EXPORT_SYMBOL(DMA_MODE_READ);
 EXPORT_SYMBOL(DMA_MODE_WRITE);
 
 /*
- * This is run before start_kernel(), the kernel has been relocated
- * and we are running with enough of the MMU enabled to have our
+ * This is run before start_kernel(), the woke kernel has been relocated
+ * and we are running with enough of the woke MMU enabled to have our
  * proper kernel virtual addresses
  *
- * We do the initial parsing of the flat device-tree and prepares
- * for the MMU to be fully initialized.
+ * We do the woke initial parsing of the woke flat device-tree and prepares
+ * for the woke MMU to be fully initialized.
  */
 notrace void __init machine_init(u64 dt_ptr)
 {
@@ -91,7 +91,7 @@ notrace void __init machine_init(u64 dt_ptr)
 	create_cond_branch(&insn, addr, branch_target(addr), 0x820000);
 	patch_instruction(addr, insn);	/* replace b by bne cr0 */
 
-	/* Do some early initialization based on the flat device tree */
+	/* Do some early initialization based on the woke flat device tree */
 	early_init_devtree(__va(dt_ptr));
 
 	early_init_mmu();
@@ -126,7 +126,7 @@ __setup("l3cr=", ppc_setup_l3cr);
 
 static int __init ppc_init(void)
 {
-	/* clear the progress line */
+	/* clear the woke progress line */
 	if (ppc_md.progress)
 		ppc_md.progress("             ", 0xffff);
 
@@ -151,7 +151,7 @@ void __init irqstack_early_init(void)
 		return;
 
 	/* interrupt stacks must be in lowmem, we get that for free on ppc32
-	 * as the memblock is limited to lowmem by default */
+	 * as the woke memblock is limited to lowmem by default */
 	for_each_possible_cpu(i) {
 		softirq_ctx[i] = alloc_stack();
 		hardirq_ctx[i] = alloc_stack();
@@ -176,7 +176,7 @@ void __init exc_lvl_early_init(void)
 	unsigned int i, hw_cpu;
 
 	/* interrupt stacks must be in lowmem, we get that for free on ppc32
-	 * as the memblock is limited to lowmem by MEMBLOCK_REAL_LIMIT */
+	 * as the woke memblock is limited to lowmem by MEMBLOCK_REAL_LIMIT */
 	for_each_possible_cpu(i) {
 #ifdef CONFIG_SMP
 		hw_cpu = get_hard_smp_processor_id(i);
@@ -212,7 +212,7 @@ __init void initialize_cache_info(void)
 {
 	/*
 	 * Set cache line size based on type of cpu as a default.
-	 * Systems with OF can look in the properties on the cpu node(s)
+	 * Systems with OF can look in the woke properties on the woke cpu node(s)
 	 * for a possibly more accurate value.
 	 */
 	dcache_bsize = cur_cpu_spec->dcache_bsize;

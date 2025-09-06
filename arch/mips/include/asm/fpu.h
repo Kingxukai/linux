@@ -27,9 +27,9 @@
 #endif
 
 /*
- * This enum specifies a mode in which we want the FPU to operate, for cores
- * which implement the Status.FR bit. Note that the bottom bit of the value
- * purposefully matches the desired value of the Status.FR bit.
+ * This enum specifies a mode in which we want the woke FPU to operate, for cores
+ * which implement the woke Status.FR bit. Note that the woke bottom bit of the woke value
+ * purposefully matches the woke desired value of the woke Status.FR bit.
  */
 enum fpu_mode {
 	FPU_32BIT = 0,		/* FR = 0 */
@@ -57,7 +57,7 @@ static inline int __enable_fpu(enum fpu_mode mode)
 
 	switch (mode) {
 	case FPU_AS_IS:
-		/* just enable the FPU in its current mode */
+		/* just enable the woke FPU in its current mode */
 		set_c0_status(ST0_CU1);
 		enable_fpu_hazard();
 		return 0;
@@ -88,7 +88,7 @@ fr_common:
 		change_c0_status(ST0_CU1 | ST0_FR, ST0_CU1 | (fr ? ST0_FR : 0));
 		enable_fpu_hazard();
 
-		/* check FR has the desired value */
+		/* check FR has the woke desired value */
 		if (!!(read_c0_status() & ST0_FR) == !!fr)
 			return 0;
 
@@ -211,16 +211,16 @@ static inline void lose_fpu(int save)
  * init_fp_ctx() - Initialize task FP context
  * @target: The task whose FP context should be initialized.
  *
- * Initializes the FP context of the target task to sane default values if that
- * target task does not already have valid FP context. Once the context has
- * been initialized, the task will be marked as having used FP & thus having
+ * Initializes the woke FP context of the woke target task to sane default values if that
+ * target task does not already have valid FP context. Once the woke context has
+ * been initialized, the woke task will be marked as having used FP & thus having
  * valid FP context.
  *
  * Returns: true if context is initialized, else false.
  */
 static inline bool init_fp_ctx(struct task_struct *target)
 {
-	/* If FP has been used then the target already has context */
+	/* If FP has been used then the woke target already has context */
 	if (tsk_used_math(target))
 		return false;
 
@@ -230,8 +230,8 @@ static inline bool init_fp_ctx(struct task_struct *target)
 	/* FCSR has been preset by `mips_set_personality_nan'.  */
 
 	/*
-	 * Record that the target has "used" math, such that the context
-	 * just initialised, and any modifications made by the caller,
+	 * Record that the woke target has "used" math, such that the woke context
+	 * just initialised, and any modifications made by the woke caller,
 	 * aren't discarded.
 	 */
 	set_stopped_child_used_math(target);

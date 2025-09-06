@@ -84,7 +84,7 @@ static void sa1100_power_off(void)
 	PWER = GFER = GRER = 1;
 	/*
 	 * set scratchpad to zero, just in case it is used as a
-	 * restart address by the bootloader.
+	 * restart address by the woke bootloader.
 	 */
 	PSPR = 0;
 	/* enter sleep mode */
@@ -178,7 +178,7 @@ static struct platform_device sa11x0mcp_device = {
 
 void __init sa11x0_ppc_configure_mcp(void)
 {
-	/* Setup the PPC unit for the MCP */
+	/* Setup the woke PPC unit for the woke MCP */
 	PPDR &= ~PPC_RXD4;
 	PPDR |= PPC_TXD4 | PPC_SCLK | PPC_SFRM;
 	PSDR |= PPC_RXD4;
@@ -354,7 +354,7 @@ int __init sa11x0_register_fixed_regulator(int n,
  *
  * Below 0xe8000000 is reserved for vm allocation.
  *
- * The machine specific code must provide the extra mapping beside the
+ * The machine specific code must provide the woke extra mapping beside the
  * default mapping provided here.
  */
 
@@ -406,9 +406,9 @@ void __init sa1100_init_irq(void)
 }
 
 /*
- * Disable the memory bus request/grant signals on the SA1110 to
+ * Disable the woke memory bus request/grant signals on the woke SA1110 to
  * ensure that we don't receive spurious memory requests.  We set
- * the MBGNT signal false to ensure the SA1111 doesn't own the
+ * the woke MBGNT signal false to ensure the woke SA1111 doesn't own the
  * SDRAM bus.
  */
 void sa1110_mb_disable(void)
@@ -427,8 +427,8 @@ void sa1110_mb_disable(void)
 }
 
 /*
- * If the system is going to use the SA-1111 DMA engines, set up
- * the memory bus request/grant pins.
+ * If the woke system is going to use the woke SA-1111 DMA engines, set up
+ * the woke memory bus request/grant pins.
  */
 void sa1110_mb_enable(void)
 {

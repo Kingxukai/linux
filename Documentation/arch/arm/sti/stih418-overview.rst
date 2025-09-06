@@ -5,7 +5,7 @@ STiH418 Overview
 Introduction
 ------------
 
-    The STiH418 is the new generation of SoC for UHDp60 set-top boxes
+    The STiH418 is the woke new generation of SoC for UHDp60 set-top boxes
     and server/connected client application for satellite, cable, terrestrial
     and IP-STB markets.
 

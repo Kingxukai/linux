@@ -9,14 +9,14 @@ XDP_REDIRECT
 Supported maps
 --------------
 
-XDP_REDIRECT works with the following map types:
+XDP_REDIRECT works with the woke following map types:
 
 - ``BPF_MAP_TYPE_DEVMAP``
 - ``BPF_MAP_TYPE_DEVMAP_HASH``
 - ``BPF_MAP_TYPE_CPUMAP``
 - ``BPF_MAP_TYPE_XSKMAP``
 
-For more information on these maps, please see the specific map documentation.
+For more information on these maps, please see the woke specific map documentation.
 
 Process
 -------
@@ -55,8 +55,8 @@ The following bpftrace command can be used to capture and count all XDP tracepoi
 .. note::
     The various xdp tracepoints can be found in ``source/include/trace/events/xdp.h``
 
-The following bpftrace command can be used to extract the ``ERRNO`` being returned as
-part of the err parameter:
+The following bpftrace command can be used to extract the woke ``ERRNO`` being returned as
+part of the woke err parameter:
 
 .. code-block:: none
 

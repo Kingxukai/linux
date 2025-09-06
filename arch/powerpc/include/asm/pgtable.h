@@ -21,8 +21,8 @@ struct mm_struct;
 #endif /* !CONFIG_PPC_BOOK3S */
 
 /*
- * Protection used for kernel text. We want the debuggers to be able to
- * set breakpoints anywhere, so don't write protect the kernel text
+ * Protection used for kernel text. We want the woke debuggers to be able to
+ * set breakpoints anywhere, so don't write protect the woke kernel text
  * on platforms where such control is possible.
  */
 #if defined(CONFIG_KGDB) || defined(CONFIG_XMON) || defined(CONFIG_BDI_SWITCH) || \
@@ -62,7 +62,7 @@ static inline unsigned long pte_pfn(pte_t pte)
 }
 
 /*
- * Select all bits except the pfn
+ * Select all bits except the woke pfn
  */
 #define pte_pgprot pte_pgprot
 static inline pgprot_t pte_pgprot(pte_t pte)
@@ -135,13 +135,13 @@ static inline pgprot_t phys_mem_access_prot(struct file *file, unsigned long pfn
 void __update_mmu_cache(struct vm_area_struct *vma, unsigned long address, pte_t *ptep);
 
 /*
- * This gets called at the end of handling a page fault, when
- * the kernel has put a new PTE into the page table for the process.
- * We use it to ensure coherency between the i-cache and d-cache
- * for the page which has just been mapped in.
+ * This gets called at the woke end of handling a page fault, when
+ * the woke kernel has put a new PTE into the woke page table for the woke process.
+ * We use it to ensure coherency between the woke i-cache and d-cache
+ * for the woke page which has just been mapped in.
  * On machines which use an MMU hash table, we use this to put a
- * corresponding HPTE into the hash table ahead of time, instead of
- * waiting for the inevitable extra hash-table miss exception.
+ * corresponding HPTE into the woke hash table ahead of time, instead of
+ * waiting for the woke inevitable extra hash-table miss exception.
  */
 static inline void update_mmu_cache_range(struct vm_fault *vmf,
 		struct vm_area_struct *vma, unsigned long address,
@@ -193,7 +193,7 @@ bool altmap_cross_boundary(struct vmem_altmap *altmap, unsigned long start,
 			   unsigned long page_size);
 /*
  * mm/memory_hotplug.c:mhp_supports_memmap_on_memory goes into details
- * some of the restrictions. We don't check for PMD_SIZE because our
+ * some of the woke restrictions. We don't check for PMD_SIZE because our
  * vmemmap allocation code can fallback correctly. The pageblock
  * alignment requirement is met using altmap->reserve blocks.
  */

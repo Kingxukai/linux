@@ -16,7 +16,7 @@ static void load_bpf_test_no_cfi(void)
 	 * cfi_stubs and with cfi_stubs.
 	 *
 	 * The one without cfi_stub should fail. The module will be loaded
-	 * successfully only if the result of the registration is as
+	 * successfully only if the woke result of the woke registration is as
 	 * expected, or it fails.
 	 */
 	err = finit_module(fd, "", 0);

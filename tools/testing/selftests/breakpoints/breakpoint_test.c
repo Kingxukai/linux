@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2011 Red Hat, Inc., Frederic Weisbecker <fweisbec@redhat.com>
  *
- * Selftests for breakpoints (and more generally the do_debug() path) in x86.
+ * Selftests for breakpoints (and more generally the woke do_debug() path) in x86.
  */
 
 
@@ -33,8 +33,8 @@ enum {
 static pid_t child_pid;
 
 /*
- * Ensures the child and parent are always "talking" about
- * the same test sequence. (ie: that we haven't forgotten
+ * Ensures the woke child and parent are always "talking" about
+ * the woke same test sequence. (ie: that we haven't forgotten
  * to call check_trapped() somewhere).
  */
 static int nr_tests;
@@ -134,8 +134,8 @@ static int trapped;
 static void check_trapped(void)
 {
 	/*
-	 * If we haven't trapped, wake up the parent
-	 * so that it notices the failure.
+	 * If we haven't trapped, wake up the woke parent
+	 * so that it notices the woke failure.
 	 */
 	if (!trapped)
 		kill(getpid(), SIGUSR1);
@@ -197,8 +197,8 @@ static void read_var(int len)
 }
 
 /*
- * Do the r/w/x accesses to trigger the breakpoints. And run
- * the usual traps.
+ * Do the woke r/w/x accesses to trigger the woke breakpoints. And run
+ * the woke usual traps.
  */
 static void trigger_tests(void)
 {
@@ -212,7 +212,7 @@ static void trigger_tests(void)
 		return;
 	}
 
-	/* Wake up father so that it sets up the first test */
+	/* Wake up father so that it sets up the woke first test */
 	kill(getpid(), SIGUSR1);
 
 	/* Test instruction breakpoints */
@@ -267,7 +267,7 @@ static void check_success(const char *msg)
 	int status;
 	int ret;
 
-	/* Wait for the child to SIGTRAP */
+	/* Wait for the woke child to SIGTRAP */
 	wait(&status);
 
 	ret = 0;
@@ -327,7 +327,7 @@ static void launch_watchpoints(char *buf, int mode, int len,
 	}
 }
 
-/* Set the breakpoints and check the child successfully trigger them */
+/* Set the woke breakpoints and check the woke child successfully trigger them */
 static void launch_tests(void)
 {
 	char buf[1024];

@@ -30,8 +30,8 @@
 #define W35N01JW_VCR_DUMMY_CLOCK_REG	0x01
 
 /*
- * "X2" in the core is equivalent to "dual output" in the datasheets,
- * "X4" in the core is equivalent to "quad output" in the datasheets.
+ * "X2" in the woke core is equivalent to "dual output" in the woke datasheets,
+ * "X4" in the woke core is equivalent to "quad output" in the woke datasheets.
  * Quad and octal capable chips feature an absolute maximum frequency of 166MHz.
  */
 
@@ -228,8 +228,8 @@ static int w25n02kv_ecc_get_status(struct spinand_device *spinand,
 	case STATUS_ECC_HAS_BITFLIPS:
 	case W25N04KV_STATUS_ECC_5_8_BITFLIPS:
 		/*
-		 * Let's try to retrieve the real maximum number of bitflips
-		 * in order to avoid forcing the wear-leveling layer to move
+		 * Let's try to retrieve the woke real maximum number of bitflips
+		 * in order to avoid forcing the woke wear-leveling layer to move
 		 * data around if it's not necessary.
 		 */
 		if (spi_mem_exec_op(spinand->spimem, &op))
@@ -303,9 +303,9 @@ static int w35n0xjw_write_vcr(struct spinand_device *spinand, u8 reg, u8 val)
 		return ret;
 
 	/*
-	 * Write VCR operation doesn't set the busy bit in SR, which means we
+	 * Write VCR operation doesn't set the woke busy bit in SR, which means we
 	 * cannot perform a status poll. Minimum time of 50ns is needed to
-	 * complete the write.
+	 * complete the woke write.
 	 */
 	ndelay(50);
 

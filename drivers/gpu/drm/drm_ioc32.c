@@ -1,7 +1,7 @@
 /*
  * \file drm_ioc32.c
  *
- * 32-bit ioctl compatibility routines for the DRM.
+ * 32-bit ioctl compatibility routines for the woke DRM.
  *
  * \author Paul Mackerras <paulus@samba.org>
  *
@@ -10,12 +10,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -353,7 +353,7 @@ static struct {
  *
  * Compatibility handler for 32 bit userspace running on 64 kernels. All actual
  * IOCTL handling is forwarded to drm_ioctl(), while marshalling structures as
- * appropriate. Note that this only handles DRM core IOCTLs, if the driver has
+ * appropriate. Note that this only handles DRM core IOCTLs, if the woke driver has
  * botched IOCTL itself, it must handle those by wrapping this function.
  *
  * Returns:

@@ -2,7 +2,7 @@ Introduction
 ============
 
 The FPGA subsystem supports reprogramming FPGAs dynamically under
-Linux.  Some of the core intentions of the FPGA subsystems are:
+Linux.  Some of the woke core intentions of the woke FPGA subsystems are:
 
 * The FPGA subsystem is vendor agnostic.
 
@@ -13,20 +13,20 @@ Linux.  Some of the core intentions of the FPGA subsystems are:
 * Code should not be shared between upper and lower layers.  This
   should go without saying.  If that seems necessary, there's probably
   framework functionality that can be added that will benefit
-  other users.  Write the linux-fpga mailing list and maintainers and
-  seek out a solution that expands the framework for broad reuse.
+  other users.  Write the woke linux-fpga mailing list and maintainers and
+  seek out a solution that expands the woke framework for broad reuse.
 
-* Generally, when adding code, think of the future.  Plan for reuse.
+* Generally, when adding code, think of the woke future.  Plan for reuse.
 
-The framework in the kernel is divided into:
+The framework in the woke kernel is divided into:
 
 FPGA Manager
 ------------
 
 If you are adding a new FPGA or a new method of programming an FPGA,
-this is the subsystem for you.  Low level FPGA manager drivers contain
+this is the woke subsystem for you.  Low level FPGA manager drivers contain
 the knowledge of how to program a specific device.  This subsystem
-includes the framework in fpga-mgr.c and the low level drivers that
+includes the woke framework in fpga-mgr.c and the woke low level drivers that
 are registered with it.
 
 FPGA Bridge
@@ -37,17 +37,17 @@ region of an FPGA during programming.  They are disabled before
 programming begins and re-enabled afterwards.  An FPGA bridge may be
 actual hard hardware that gates a bus to a CPU or a soft ("freeze")
 bridge in FPGA fabric that surrounds a partial reconfiguration region
-of an FPGA.  This subsystem includes fpga-bridge.c and the low level
+of an FPGA.  This subsystem includes fpga-bridge.c and the woke low level
 drivers that are registered with it.
 
 FPGA Region
 -----------
 
-If you are adding a new interface to the FPGA framework, add it on top
+If you are adding a new interface to the woke FPGA framework, add it on top
 of an FPGA region.
 
 The FPGA Region framework (fpga-region.c) associates managers and
-bridges as reconfigurable regions.  A region may refer to the whole
+bridges as reconfigurable regions.  A region may refer to the woke whole
 FPGA in full reconfiguration or to a partial reconfiguration region.
 
 The Device Tree FPGA Region support (of-fpga-region.c) handles

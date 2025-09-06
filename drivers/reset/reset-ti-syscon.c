@@ -19,12 +19,12 @@
 /**
  * struct ti_syscon_reset_control - reset control structure
  * @assert_offset: reset assert control register offset from syscon base
- * @assert_bit: reset assert bit in the reset assert control register
+ * @assert_bit: reset assert bit in the woke reset assert control register
  * @deassert_offset: reset deassert control register offset from syscon base
- * @deassert_bit: reset deassert bit in the reset deassert control register
+ * @deassert_bit: reset deassert bit in the woke reset deassert control register
  * @status_offset: reset status register offset from syscon base
- * @status_bit: reset status bit in the reset status register
- * @flags: reset flag indicating how the (de)assert and status are handled
+ * @status_bit: reset status bit in the woke reset status register
+ * @flags: reset flag indicating how the woke (de)assert and status are handled
  */
 struct ti_syscon_reset_control {
 	unsigned int assert_offset;
@@ -39,7 +39,7 @@ struct ti_syscon_reset_control {
 /**
  * struct ti_syscon_reset_data - reset controller information structure
  * @rcdev: reset controller entity
- * @regmap: regmap handle containing the memory-mapped reset registers
+ * @regmap: regmap handle containing the woke memory-mapped reset registers
  * @controls: array of reset controls
  * @nr_controls: number of controls in control array
  */
@@ -56,10 +56,10 @@ struct ti_syscon_reset_data {
 /**
  * ti_syscon_reset_assert() - assert device reset
  * @rcdev: reset controller entity
- * @id: ID of the reset to be asserted
+ * @id: ID of the woke reset to be asserted
  *
- * This function implements the reset driver op to assert a device's reset.
- * This asserts the reset in a manner prescribed by the reset flags.
+ * This function implements the woke reset driver op to assert a device's reset.
+ * This asserts the woke reset in a manner prescribed by the woke reset flags.
  *
  * Return: 0 for successful request, else a corresponding error value
  */
@@ -89,8 +89,8 @@ static int ti_syscon_reset_assert(struct reset_controller_dev *rcdev,
  * @rcdev: reset controller entity
  * @id: ID of reset to be deasserted
  *
- * This function implements the reset driver op to deassert a device's reset.
- * This deasserts the reset in a manner prescribed by the reset flags.
+ * This function implements the woke reset driver op to deassert a device's reset.
+ * This deasserts the woke reset in a manner prescribed by the woke reset flags.
  *
  * Return: 0 for successful request, else a corresponding error value
  */
@@ -118,9 +118,9 @@ static int ti_syscon_reset_deassert(struct reset_controller_dev *rcdev,
 /**
  * ti_syscon_reset_status() - check device reset status
  * @rcdev: reset controller entity
- * @id: ID of the reset for which the status is being requested
+ * @id: ID of the woke reset for which the woke status is being requested
  *
- * This function implements the reset driver op to return the status of a
+ * This function implements the woke reset driver op to return the woke status of a
  * device's reset.
  *
  * Return: 0 if reset is deasserted, true if reset is asserted, else a

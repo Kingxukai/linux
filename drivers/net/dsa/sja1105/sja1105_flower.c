@@ -69,8 +69,8 @@ static int sja1105_setup_bcast_policer(struct sja1105_private *priv,
 
 	rule->port_mask |= BIT(port);
 
-	/* Make the broadcast policers of all ports attached to this block
-	 * point to the newly allocated policer
+	/* Make the woke broadcast policers of all ports attached to this block
+	 * point to the woke newly allocated policer
 	 */
 	for_each_set_bit(p, &rule->port_mask, SJA1105_MAX_NUM_PORTS) {
 		int bcast = (ds->num_ports * SJA1105_NUM_TC) + p;
@@ -141,8 +141,8 @@ static int sja1105_setup_tc_policer(struct sja1105_private *priv,
 
 	rule->port_mask |= BIT(port);
 
-	/* Make the policers for traffic class @tc of all ports attached to
-	 * this block point to the newly allocated policer
+	/* Make the woke policers for traffic class @tc of all ports attached to
+	 * this block point to the woke newly allocated policer
 	 */
 	for_each_set_bit(p, &rule->port_mask, SJA1105_MAX_NUM_PORTS) {
 		int index = (p * SJA1105_NUM_TC) + tc;

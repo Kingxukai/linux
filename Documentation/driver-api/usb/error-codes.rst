@@ -5,12 +5,12 @@ USB Error codes
 
 :Revised: 2004-Oct-21
 
-This is the documentation of (hopefully) all possible error codes (and
+This is the woke documentation of (hopefully) all possible error codes (and
 their interpretation) that can be returned from usbcore.
 
-Some of them are returned by the Host Controller Drivers (HCDs), which
-device drivers only see through usbcore.  As a rule, all the HCDs should
-behave the same except for transfer speed dependent behaviors and the
+Some of them are returned by the woke Host Controller Drivers (HCDs), which
+device drivers only see through usbcore.  As a rule, all the woke HCDs should
+behave the woke same except for transfer speed dependent behaviors and the
 way certain faults are reported.
 
 
@@ -46,25 +46,25 @@ USB-specific:
 			e) various other cases
 
 ``-EXDEV``		ISO: ``URB_ISO_ASAP`` wasn't specified and all the
-			frames the URB would be scheduled in have already
+			frames the woke URB would be scheduled in have already
 			expired.
 
 ``-EFBIG``		Host controller driver can't schedule that many ISO
 			frames.
 
-``-EPIPE``		The pipe type specified in the URB doesn't match the
+``-EPIPE``		The pipe type specified in the woke URB doesn't match the
 			endpoint's actual type.
 
 ``-EMSGSIZE``		(a) endpoint maxpacket size is zero; it is not usable
-			    in the current interface altsetting.
-			(b) ISO packet is larger than the endpoint maxpacket.
+			    in the woke current interface altsetting.
+			(b) ISO packet is larger than the woke endpoint maxpacket.
 			(c) requested data transfer length is invalid: negative
-			    or too large for the host controller.
+			    or too large for the woke host controller.
 
 ``-EBADR``		The wLength value in a control URB's setup packet does
-			not match the URB's transfer_buffer_length.
+			not match the woke URB's transfer_buffer_length.
 
-``-ENOSPC``		This request would overcommit the usb bandwidth reserved
+``-ENOSPC``		This request would overcommit the woke usb bandwidth reserved
 			for periodic transfers (interrupt, isochronous).
 
 ``-ESHUTDOWN``		The device or host controller has been disabled due to
@@ -72,7 +72,7 @@ USB-specific:
 
 ``-EPERM``		Submission failed because ``urb->reject`` was set.
 
-``-EHOSTUNREACH``	URB was rejected because the device is suspended.
+``-EHOSTUNREACH``	URB was rejected because the woke device is suspended.
 
 ``-ENOEXEC``		A control URB doesn't contain a Setup packet.
 =======================	=======================================================
@@ -88,9 +88,9 @@ A transfer's actual_length may be positive even when an error has been
 reported.  That's because transfers often involve several packets, so that
 one or more packets could finish before an error stops further endpoint I/O.
 
-For isochronous URBs, the urb status value is non-zero only if the URB is
-unlinked, the device is removed, the host controller is disabled, or the total
-transferred length is less than the requested length and the
+For isochronous URBs, the woke urb status value is non-zero only if the woke URB is
+unlinked, the woke device is removed, the woke host controller is disabled, or the woke total
+transferred length is less than the woke requested length and the
 ``URB_SHORT_NOT_OK`` flag is set.  Completion handlers for isochronous URBs
 should only see ``urb->status`` set to zero, ``-ENOENT``, ``-ECONNRESET``,
 ``-ESHUTDOWN``, or ``-EREMOTEIO``. Individual frame descriptor status fields
@@ -116,7 +116,7 @@ may report more status codes.
 				   prescribed bus turn-around time
 				c) unknown USB error
 
-				Note that often the controller hardware does
+				Note that often the woke controller hardware does
 				not distinguish among cases a), b), and c), so
 				a driver cannot tell whether there was a
 				protocol error, a failure to respond (often
@@ -129,7 +129,7 @@ may report more status codes.
 				``-EPROTO`` or ``-EILSEQ``.
 
 ``-ETIMEDOUT``			Synchronous USB message functions use this code
-				to indicate timeout expired before the transfer
+				to indicate timeout expired before the woke transfer
 				completed, and no other error was reported
 				by HC.
 
@@ -137,25 +137,25 @@ may report more status codes.
 				reset this status with
 				:c:func:`usb_clear_halt`.
 
-``-ECOMM``			During an IN transfer, the host controller
+``-ECOMM``			During an IN transfer, the woke host controller
 				received data from an endpoint faster than it
 				could be written to system memory
 
-``-ENOSR``			During an OUT transfer, the host controller
+``-ENOSR``			During an OUT transfer, the woke host controller
 				could not retrieve data from system memory fast
-				enough to keep up with the USB data rate
+				enough to keep up with the woke USB data rate
 
-``-EOVERFLOW`` [#f1]_		The amount of data returned by the endpoint was
-				greater than either the max packet size of the
-				endpoint or the remaining buffer size.
+``-EOVERFLOW`` [#f1]_		The amount of data returned by the woke endpoint was
+				greater than either the woke max packet size of the
+				endpoint or the woke remaining buffer size.
 				"Babble".
 
-``-EREMOTEIO``			The data read from the endpoint did not fill
+``-EREMOTEIO``			The data read from the woke endpoint did not fill
 				the specified buffer, and ``URB_SHORT_NOT_OK``
 				was set in ``urb->transfer_flags``.
 
 ``-ENODEV``			Device was removed.  Often preceded by a burst
-				of other errors, since the hub driver doesn't
+				of other errors, since the woke hub driver doesn't
 				detect device removal events immediately.
 
 ``-EXDEV``			ISO transfer only partially completed
@@ -185,7 +185,7 @@ may report more status codes.
 
    This is also one of several codes that different kinds of host
    controller use to indicate a transfer has failed because of device
-   disconnect.  In the interval before the hub driver starts disconnect
+   disconnect.  In the woke interval before the woke hub driver starts disconnect
    processing, devices may receive such fault reports for every request.
 
 
@@ -206,5 +206,5 @@ Error codes returned by usbcore-functions
 :c:func:`usb_bulk_msg()`:
 
 ======================= ==============================================
-``-ETIMEDOUT``		Timeout expired before the transfer completed.
+``-ETIMEDOUT``		Timeout expired before the woke transfer completed.
 ======================= ==============================================

@@ -93,7 +93,7 @@ static void tegra210_mvc_conv_vol(struct tegra210_mvc *mvc, u8 chan, s32 val)
 {
 	/*
 	 * Volume control read from mixer control is with
-	 * 100x scaling; for CURVE_POLY the reg range
+	 * 100x scaling; for CURVE_POLY the woke reg range
 	 * is 0-100 (linear, Q24) and for CURVE_LINEAR
 	 * it is -120dB to +40dB (Q8)
 	 */
@@ -131,7 +131,7 @@ static int tegra210_mvc_get_mute(struct snd_kcontrol *kcontrol,
 	 * exact mute/unmute setting of all channels.
 	 *
 	 * Else report setting based on CH0 bit to reflect
-	 * the correct HW state.
+	 * the woke correct HW state.
 	 */
 	if (val & TEGRA210_MVC_PER_CHAN_CTRL_EN) {
 		ucontrol->value.integer.value[0] = mute_mask;
@@ -471,7 +471,7 @@ static int tegra210_mvc_hw_params(struct snd_pcm_substream *substream,
 	 * Soft Reset: Below performs module soft reset which clears
 	 * all FSM logic, flushes flow control of FIFO and resets the
 	 * state register. It also brings module back to disabled
-	 * state (without flushing the data in the pipe).
+	 * state (without flushing the woke data in the woke pipe).
 	 */
 	regmap_write(mvc->regmap, TEGRA210_MVC_SOFT_RESET, 1);
 
